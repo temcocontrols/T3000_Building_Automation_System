@@ -20,6 +20,7 @@ const int RECEIVE_WANTED_PACKAGE = 3;
 const int RECEIVE_COMPLET = 4;
 const int SEND_GET_MD5_VALUE = 5;
 const int CHECK_MD5_VALUE = 6;
+const int SHOW_FTP_PATH = 7;
 const int THREAD_IDLE = 255;
 
 const int TFTP_SEND_LENGTH = 512;
@@ -588,6 +589,11 @@ struct Data_Time_Match
 	unsigned long loggingtime;
 };
 
+struct Point_Data_str
+{
+	PointF data_point;
+	int analogdata;
+};
 
 
 const int UNITS_TYPE_ANALOG = 0;
@@ -713,7 +719,8 @@ const CString Input_List_Analog_Units[] =
 	 _T(""),
 	 _T(""),
 	 _T(""),
-	 _T("counts")
+	 _T("counts"),
+	 _T("HZ")
 };
 
 const CString Input_Analog_Units_Array[] =
@@ -743,7 +750,8 @@ const CString Input_Analog_Units_Array[] =
 	  _T("Table 3"),
 	  _T("Table 4"),
 	  _T("Table 5"),
-	  _T("High Speed Count")
+	  _T("High Speed Count"),
+	  _T("Frequency")
 };
 
 const CString Output_Analog_Units_Array[] = 
@@ -762,9 +770,7 @@ const CString Time_Server_Name[] =
 {
 	_T("ntp.sjtu.edu.cn"),
 	_T("time.nist.gov"),
-	_T("NTSC"),
-	_T("time.nist.gov"),
-	_T("time.windowns.com")
+	_T("time.windows.com")
 	
 };
 
@@ -807,7 +813,7 @@ const CString Time_Zone_Name[] =
 	_T("(UTC - 08:00) , Pacific Standard Time , Tiempo del Pac¨ªfico"),
 	_T("(UTC - 07:00) , Mountain Standard Time , Pacific Daylight Time"),
 	_T("(UTC - 06:00) , Central Standard Time , Galapagos Time"),
-	_T("(UTC - 05:00) , Colombia Time , Cuba Standard Time"),
+	_T("(UTC - 05:00) , Eastern Standard Time"),
 	_T("(UTC - 04:00) , Atlantic Standard Time , Bolivia Time"),
 	_T("(UTC - 03:00) , Atlantic Daylight Time , Amazon Summer Time"),
 	_T("(UTC - 02:00) , Fernando de Noronha Time , Oscar Time Zone"),
@@ -823,7 +829,7 @@ const CString Time_Zone_Name[] =
 	_T("(UTC + 08:00) , China Standard Time , Hotel Time Zone"),
 	_T("(UTC + 09:00) , Australian Western Daylight Time"),
 	_T("(UTC + 10:00) , Chamorro Standard Time , Kilo Time Zone"),
-	_T("(UTC + 11:00) , Eastern Daylight Time , Lima Time Zone"),
+	_T("(UTC + 11:00) , Lima ,Vanuatu , Lima "),
 	_T("(UTC + 12:00) , Anadyr Time , Fiji Time , Gilbert Island Time"),
 	_T("(UTC + 13:00) , New Zealand Daylight Time")
 };
@@ -929,7 +935,8 @@ typedef enum
 	SMALL_MINIPANEL = 2,		//16 A				//6 D	4 A
 	TINY_MINIPANEL = 3,	
 	PID_T322AI = 43,
-	T38AI8AO6DO = 44
+	T38AI8AO6DO = 44,
+	PID_T3PT12 = 46
 };
 
 const int BIG_MINIPANEL_IN_A = 32;
@@ -1424,8 +1431,26 @@ const CString System_Log[] =
 	_T("ZIG/GSM_RX"),
 	_T("MAIN_TX"),
 	_T("MAIN_RX"),
+	_T("ETHER_RX"),
+	_T("ETHER_TX"),
 	_T("BOOT")
 };
+
+
+const CString System_Unit[] =
+{
+	_T("Byte/s"),
+	_T("Byte/s"),
+	_T("Byte/s"),
+	_T("Byte/s"),
+	_T("Byte/s"),
+	_T("Byte/s"),
+	_T("Package/s"),
+	_T("Package/s"),
+	_T("Off/On")
+};
+
+
 
 
 
@@ -1564,4 +1589,36 @@ typedef struct
 #pragma pack(pop)//»Ö¸´¶ÔÆë×´Ì¬ 
 
 
+
+const int day_of_month[] = 
+{
+	31,
+	29,
+	31,
+	30,
+	31,
+	30,
+	31,
+	31,
+	30,
+	31,
+	30,
+	31
+};
+
+const int day_in_this_year[] =
+{
+	0,       
+	day_of_month[0],
+	day_of_month[0] + day_of_month[1],
+	day_of_month[0] + day_of_month[1] + day_of_month[2],
+	day_of_month[0] + day_of_month[1] + day_of_month[2] +day_of_month[3],
+	day_of_month[0] + day_of_month[1] + day_of_month[2] +day_of_month[3] + +day_of_month[4],
+	day_of_month[0] + day_of_month[1] + day_of_month[2] +day_of_month[3] + +day_of_month[4] + day_of_month[5],
+	day_of_month[0] + day_of_month[1] + day_of_month[2] +day_of_month[3] + +day_of_month[4] + day_of_month[5] + day_of_month[6],
+	day_of_month[0] + day_of_month[1] + day_of_month[2] +day_of_month[3] + +day_of_month[4] + day_of_month[5] + day_of_month[6] + day_of_month[7],
+	day_of_month[0] + day_of_month[1] + day_of_month[2] +day_of_month[3] + +day_of_month[4] + day_of_month[5] + day_of_month[6] + day_of_month[7] + day_of_month[8] ,
+	day_of_month[0] + day_of_month[1] + day_of_month[2] +day_of_month[3] + +day_of_month[4] + day_of_month[5] + day_of_month[6] + day_of_month[7] + day_of_month[8] + day_of_month[9],
+	day_of_month[0] + day_of_month[1] + day_of_month[2] +day_of_month[3] + +day_of_month[4] + day_of_month[5] + day_of_month[6] + day_of_month[7] + day_of_month[8] + day_of_month[9] + day_of_month[10],
+};
 

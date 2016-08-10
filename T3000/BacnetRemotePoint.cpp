@@ -187,10 +187,7 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 
 		temp_reg_value.Format(_T("%d"),(m_remote_point_data.at(i).point_value));
 
-		if(m_remote_point_data.at(i).device_online)
-			temp_status.Format(_T("OK"));
-		else
-			temp_status.Format(_T("-"));
+
 
 		if(dev_reg == 0)
 		{
@@ -208,6 +205,14 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 		m_remote_point_list.SetItemText(i,REMOTE_DEVICE_ID,temp_device_id);
 		m_remote_point_list.SetItemText(i,REMOTE_REG,temp_reg_number);
 		m_remote_point_list.SetItemText(i,REMOTE_VALUE,temp_reg_value);
+
+		if(m_remote_point_data.at(i).device_online)
+			temp_status.Format(_T("OK"));
+		else
+		{
+			temp_status.Format(_T("-"));
+			m_remote_point_list.SetItemText(i,REMOTE_VALUE,_T("-"));
+		}
 		m_remote_point_list.SetItemText(i,REMOTE_DEVICE_STATUS,temp_status);
 
 		if(dev_reg >= (sizeof(TSTAT_5ABCDFG_LED_ADDRESS)/sizeof(TSTAT_5ABCDFG_LED_ADDRESS[0])))

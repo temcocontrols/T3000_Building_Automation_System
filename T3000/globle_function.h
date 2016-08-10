@@ -220,4 +220,31 @@ BOOL ShowBacnetView(unsigned char product_type);
 BOOL HexFileValidation(const CString& strFileName);
 BOOL BinFileValidation(const CString& strFileName);
 BOOL AllCharactorIsDigital(LPCTSTR lpszSrc);
+
+int decode_label(LPCTSTR label ,UCHAR &n_point_type,UCHAR &n_main_panel , UCHAR &n_sub_panel,UCHAR &m_point_number);
+bool Input_data_to_string(unsigned char  temp_input_index ,
+	CString &temp_in_main_panel,
+	CString &temp_in_des,
+	CString &temp_in_auto_manual,
+	CString &temp_in_value,
+	CString &temp_in_units,
+	CString &temp_in_range,
+	CString &temp_in_cal,
+	CString &temp_cacl_sign,
+	CString &temp_in_filter,
+	CString &temp_in_decon,
+	CString &temp_in_jumper,
+	CString &temp_in_label);
+
+bool Output_data_to_string(unsigned char  temp_output_index,
+	CString &temp_out_panel,
+	CString &temp_out_des,
+	CString &temp_out_auto_manual,
+	CString &temp_out_value,
+	CString &temp_out_units,
+	CString &temp_out_range,
+	CString &temp_out_pwm_period,
+	CString &temp_out_decom,
+	CString &temp_out_label);
+
 #endif

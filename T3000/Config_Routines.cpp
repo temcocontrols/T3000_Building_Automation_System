@@ -434,7 +434,6 @@ BOOL CConfig_Routines::OnInitDialog()
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 异常: OCX 属性页应返回 FALSE
 }
-
 BEGIN_EVENTSINK_MAP(CConfig_Routines, CDialog)
 	ON_EVENT(CConfig_Routines, IDC_MSFLEXGRID1, DISPID_CLICK, ClickMsflexgrid1, VTS_NONE)
 END_EVENTSINK_MAP()

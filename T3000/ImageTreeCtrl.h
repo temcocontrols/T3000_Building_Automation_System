@@ -19,7 +19,10 @@ public:
 
 	virtual bool SortByConnection(HTREEITEM hItem)  ;
 	virtual bool SortByFloor(HTREEITEM hItem)  ;
+	virtual bool PingDevice(HTREEITEM hItem) ;
      virtual bool    DoDeleteItem(HTREEITEM);
+
+	
 protected:
 	DECLARE_MESSAGE_MAP()
 	virtual bool	HandleKeyDown(WPARAM wParam, LPARAM lParam);
@@ -111,6 +114,8 @@ public:
 	void SetSelectSerialNumber(unsigned int nserial);
 	unsigned int GetSelectSerialNumber();
 	unsigned int m_serial_number;
+	afx_msg void OnSetFocus(CWnd* pOldWnd);
+	bool is_focus ;
 };
 
 

@@ -30,17 +30,29 @@ public:
 // Dialog Data
 	enum { IDD = IDD_DIALOG_BACNET_GRAPHIC };
 
+	//enum XASIX_TIME
+	//{ 
+	//	TIME_ONE_MINUTE = 1 ,
+	//	TIME_FIVE_MINUTE = 2,
+	//	TIME_TEN_MINUTE = 3 ,
+	//	TIME_ONE_HOUR = 4	,
+	//	TIME_FOUR_HOUR = 5	,
+	//	TIME_TWELVE_HOUR = 6,
+	//	TIME_ONE_DAY = 7	,
+	//	TIME_FOUR_DAY = 8	,
+	//	TIME_THIRTY_MINUTE = 9
+	//};
 	enum XASIX_TIME
 	{ 
 		TIME_ONE_MINUTE = 1 ,
 		TIME_FIVE_MINUTE = 2,
 		TIME_TEN_MINUTE = 3 ,
-		TIME_ONE_HOUR = 4	,
-		TIME_FOUR_HOUR = 5	,
-		TIME_TWELVE_HOUR = 6,
-		TIME_ONE_DAY = 7	,
-		TIME_FOUR_DAY = 8	,
-		TIME_THIRTY_MINUTE = 9
+		TIME_THIRTY_MINUTE = 4,
+		TIME_ONE_HOUR = 5	,
+		TIME_FOUR_HOUR = 6	,
+		TIME_TWELVE_HOUR = 7,
+		TIME_ONE_DAY = 8	,
+		TIME_FOUR_DAY = 9	
 	};
 #define TIME_USER_DEFINE   100
 
@@ -135,7 +147,6 @@ public:
 	virtual void PostNcDestroy();
 	afx_msg void OnTimebase1hour();
 	afx_msg void OnTimebase1day();
-	//afx_msg void OnTimebase1minites();
 	afx_msg void OnTimebase10minutes();
 	afx_msg void OnTimebase12hours();
 	afx_msg void OnTimebase4hours();
@@ -149,6 +160,7 @@ public:
 	afx_msg void OnTimebaseCustomerdefine();
 	afx_msg void OnTimebase5minutes();
 	afx_msg void OnTimebase30minutes();
+	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 };
 	void Delete_Ram_Data();
 //const int _6_min = 1;
@@ -201,7 +213,8 @@ const COLORREF Static_Color[15] =
 
 
 const int X_ORIGIN = 200;//这4个参数是设置 矩形绘图区域的位置和大小;
-const int X_WIDTH  = 1200;
+//const int X_WIDTH  = 1200;
+const int X_WIDTH  = 1000;
 
 const int Y_ORIGIN = 30;
 const int Y_HIGHT = 500;
@@ -214,7 +227,8 @@ const int STATIC_LABLE_HIGHT = 40; //高度;
 
 const int DIGITAL_X_ORIGIN = 200;	//draw the digital graphic in this range;
 const int DIGITAL_Y_ORIGIN = 560;
-const int DIGITAL_X_WIDTH  = 1200;
+//const int DIGITAL_X_WIDTH  = 1200;
+const int DIGITAL_X_WIDTH  = 1000;
 const int DIGITAL_Y_HIGHT  = 150;
 
 

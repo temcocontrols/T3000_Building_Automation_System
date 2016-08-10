@@ -262,6 +262,8 @@ BOOL AnnualRout_InsertDia::OnInitDialog()
 	CDialog::OnInitDialog();
 	//if(DEVICE_FORMAT_TYPE == cm5)	//后来的人如果看到这个代码请不要奇怪，老毛要求这样的.用IF ELSE 来区分不同的
 	//if(1)
+	CTime temp_time =  CTime::GetCurrentTime();
+	unsigned short this_year = temp_time.GetYear();
 	if(g_protocol == PROTOCOL_BACNET_IP)
 	{								//器件。产品本来不同 界面就会有差异 都还要用一个界面。木有办法，只能 加在一起了。;
 		GetDlgItem(IDC_LIST1)->ShowWindow(0);
@@ -278,11 +280,11 @@ BOOL AnnualRout_InsertDia::OnInitDialog()
 		//g_hwnd_now = m_schedule_day_dlg_hwnd;
 
 		SYSTEMTIME StartTime1;
-		StartTime1.wYear = 2015;
+		StartTime1.wYear = this_year;
 		StartTime1.wMonth = 1;
 		StartTime1.wDay = 1;
 		SYSTEMTIME EndTime1;
-		EndTime1.wYear = 2015;
+		EndTime1.wYear = this_year;
 		EndTime1.wMonth = 12;
 		EndTime1.wDay = 31;
 		m_month_ctrl.SetRange(&StartTime1,&EndTime1);
@@ -695,9 +697,31 @@ LRESULT AnnualRout_InsertDia::Fresh_Schedule_Day_Cal(WPARAM wParam,LPARAM lParam
 	{
 		//pDayState[i] = (DWORD)g_DayState[annual_list_line]
 		//memset((void *)pDayState[i],0,sizeof(pDayState)/sizeof(pDayState[0]));
-		memcpy_s(&pBacDayState[i],4,&g_DayState[annual_list_line][i*4],4);
 
-		//	pDayState[i]  = g_DayState[annual_list_line];
+		if(i == 0)
+		{
+			memcpy_s(&pBacDayState[i],4,&g_DayState[annual_list_line][i*4],4);
+		}
+		else
+		{
+			long long temp_data = 0;
+			int start_byte = 0;
+			int move_bit = 0;
+			start_byte = day_in_this_year[i]/8;// = 3  //day_in_this_year[i]/8
+			move_bit = day_in_this_year[i]%8;// = 7  day_in_this_year[i]%8
+
+			memcpy_s(&temp_data,5,&g_DayState[annual_list_line][start_byte],5);
+			temp_data = temp_data>>move_bit;
+			temp_data = temp_data % (0x0100000000);
+
+			DWORD temp_dw;
+			temp_dw = (DWORD)temp_data;
+			memcpy_s(&pBacDayState[i],4,&temp_dw,4);
+
+			Sleep(1);
+			//memcpy_s(&temp_data,5,&day_in_this_year[1],4);
+			//memcpy_s(&pBacDayState[i],4,&g_DayState[annual_list_line][i*4],4);
+		}
 	}
 	m_month_ctrl.SetDayState(12, pBacDayState);
 
@@ -747,20 +771,30 @@ void AnnualRout_InsertDia::OnMcnSelectBacMonthcalendar(NMHDR *pNMHDR, LRESULT *p
 	int Clicked_month = pSelChange->stSelStart.wMonth ;
 	int Clicked_day =pSelChange->stSelStart.wDay;
 
+	int day_in_year =	day_in_this_year[Clicked_month - 1] + Clicked_day;
+	int charactor_control = (day_in_year - 1) / 8    ;
+	int control_bit = (day_in_year - 1)%8 ;
 	if(((pBacDayState[Clicked_month-1] >>Clicked_day-1 ) & 0x00000001) == 1)
+	{
 		pBacDayState[Clicked_month-1] &= ~(1 << Clicked_day-1);   // 4th day
+		  g_DayState[annual_list_line][charactor_control] &= ~(1 << control_bit); 
+	}
 	else
+	{
 		pBacDayState[Clicked_month-1] |= 1 << Clicked_day-1;   // 4th day
+		g_DayState[annual_list_line][charactor_control]  |= 1 << control_bit;
+	}
 
 	m_month_ctrl.SetDayState(12, pBacDayState);
 
 
+
 	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
-		for (int i=0;i<12;i++)
-		{
-			memcpy_s(&g_DayState[annual_list_line][i*4],4,&pBacDayState[i],4);
-		}
+		//for (int i=0;i<12;i++)
+		//{
+		//	memcpy_s(&g_DayState[annual_list_line][i*4],4,&pBacDayState[i],4);
+		//}
 		CString temp_task_info;
 		temp_task_info.Format(_T("Write annual schedual List Item%d ."),annual_list_line + 1);
 		Post_Write_Message(g_bac_instance,WRITEANNUALSCHEDULE_T3000,annual_list_line,annual_list_line,48,this->m_hWnd,temp_task_info);

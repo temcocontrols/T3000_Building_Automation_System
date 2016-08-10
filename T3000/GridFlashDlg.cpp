@@ -440,6 +440,12 @@
 				case  PM_CO2_RS485:
 					stemp = "CO2";
 					break;
+				case  STM32_CO2_NET:
+					stemp = "CO2 Net";
+					break;
+				case  STM32_CO2_RS485:
+					stemp = "CO2";
+					break;
                 case  PM_PRESSURE_SENSOR:
                     stemp = "Pressure";
                     break;

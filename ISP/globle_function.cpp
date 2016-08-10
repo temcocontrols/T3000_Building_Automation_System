@@ -452,6 +452,8 @@ CString GetProductName(int ModelID)
     case  PM_PRESSURE_SENSOR:
         strProductName = "Pressure";
         break;
+		  case  PM_T3PT12:
+        strProductName = "T3PT12";
 	case  PM_CO2_NODE:
 		strProductName = "CO2 Node";
 		break;

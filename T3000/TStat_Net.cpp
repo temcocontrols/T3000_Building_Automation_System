@@ -182,7 +182,7 @@ CString CTStat_Net::GetProductName()
 	    strProductName="CM5_Ethernet";
 		break;
 	case PM_MINIPANEL:
-	    strProductName="MiniPanel";
+	    strProductName="T3-BB/LB/TB";
 		break;
     case PM_CO2_NET:
         strProductName="CO2 Net";
@@ -229,7 +229,9 @@ CString CTStat_Net::GetProductName()
 	case PM_T322AI:
 		strProductName="T3-22I";
 		break;
-
+	case PM_T3PT12:
+		strProductName="T3-PT12";
+		break;
     case PM_T38AI8AO6DO:
         strProductName="T3-8AI8AO6DO";
         break;

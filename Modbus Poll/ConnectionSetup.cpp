@@ -57,7 +57,7 @@ void CConnectionSetup::OnInitUI()
 	m_combox_bradrate.AddString(_T("38400"));
 	m_combox_bradrate.AddString(_T("57600"));
 	m_combox_bradrate.AddString(_T("115200"));
-	 
+	m_combox_bradrate.AddString(_T("76800")); 
     if (m_bradrate==19200)
     {
         m_combox_bradrate.SetCurSel(1);
@@ -77,6 +77,10 @@ void CConnectionSetup::OnInitUI()
 	else if (m_bradrate==115200)
 	{
 		m_combox_bradrate.SetCurSel(4);
+	}
+	else if (m_bradrate==76800)
+	{
+		m_combox_bradrate.SetCurSel(5);
 	}
     else
     {

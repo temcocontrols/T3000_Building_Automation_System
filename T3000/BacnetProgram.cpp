@@ -47,7 +47,7 @@ BEGIN_MESSAGE_MAP(CBacnetProgram, CDialogEx)
 	ON_MESSAGE(WM_HOTKEY,&CBacnetProgram::OnHotKey)//快捷键消息映射手动加入
 	ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_Program_Item)
 	ON_MESSAGE(WM_REFRESH_BAC_PROGRAM_LIST,Fresh_Program_List)
-	ON_BN_CLICKED(IDC_BUTTON_PROGRAM_EDIT, &CBacnetProgram::OnBnClickedButtonProgramEdit)
+	ON_BN_CLICKED(IDC_BUTTON_PROGRAM_EDIT, OnBnClickedButtonProgramEdit)
 	ON_NOTIFY(NM_CLICK, IDC_LIST_PROGRAM, &CBacnetProgram::OnNMClickListProgram)
 	ON_WM_CLOSE()
 	ON_WM_TIMER()
@@ -69,7 +69,6 @@ LRESULT  CBacnetProgram::ProgramMessageCallBack(WPARAM wParam, LPARAM lParam)
 	{
 		Show_Results = temp_cs + _T("Success!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
-		//MessageBox(_T("Bacnet operation success!"));
 	}
 	else
 	{
@@ -77,8 +76,6 @@ LRESULT  CBacnetProgram::ProgramMessageCallBack(WPARAM wParam, LPARAM lParam)
 		PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,pInvoke->mRow,REFRESH_ON_ITEM);
 		Show_Results = temp_cs + _T("Fail!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
-		//AfxMessageBox(Show_Results);
-		//MessageBox(_T("Bacnet operation fail!"));
 	}
 	if((pInvoke->mRow%2)==0)	//恢复前景和 背景 颜色;
 		m_program_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
@@ -98,6 +95,14 @@ LRESULT CBacnetProgram::OnHotKey(WPARAM wParam,LPARAM lParam)
 {
 	if (wParam==KEY_INSERT)
 	{
+		for (int i=0;i<m_program_list.GetItemCount();++i)
+		{
+			if(m_program_list.GetCellChecked(i,0))
+			{
+				program_list_line = i;
+				break;
+			}
+		}
 		OnBnClickedButtonProgramEdit();
 	}
 	return 0;
@@ -390,14 +395,8 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 void CBacnetProgram::OnBnClickedButtonProgramEdit()
 {
 	// TODO: Add your control notification handler code here
-	for (int i=0;i<m_program_list.GetItemCount();++i)
-	{
-		if(m_program_list.GetCellChecked(i,0))
-		{
-			program_list_line = i;
-			break;
-		}
-	}
+
+
 	CString temp_show_info;
 	temp_show_info.Format(_T("Reading program code %d ..."),program_list_line + 1);
 	SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_show_info); 
@@ -452,13 +451,6 @@ void CBacnetProgram::OnBnClickedButtonProgramEdit()
 			bac_programcode_read_results = true;
 			::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,SHOW_PROGRAM_IDE,0);
 		}
-
-
-
-		//if(click_read_thread==NULL)
-		//{
-		//	click_read_thread =CreateThread(NULL,NULL,MSTP_Send_read_Command_Thread,this,NULL, NULL);
-		//}
 
 	}
 	else

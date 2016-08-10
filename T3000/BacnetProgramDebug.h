@@ -33,4 +33,5 @@ public:
 	CDateTimeCtrl m_prg_debug_variable_time_picker;
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnNMKillfocusDatetimepickerPrgVariable(NMHDR *pNMHDR, LRESULT *pResult);
+
 };

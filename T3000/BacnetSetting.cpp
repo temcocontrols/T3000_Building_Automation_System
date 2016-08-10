@@ -88,6 +88,8 @@ BEGIN_MESSAGE_MAP(CBacnetSetting, CDialogEx)
 	ON_EN_KILLFOCUS(IDC_EDIT_SETTING_OBJ_INSTANCE, &CBacnetSetting::OnEnKillfocusEditSettingObjInstance)
 	ON_WM_HELPINFO()
 
+	ON_BN_CLICKED(IDC_BUTTON_BAC_SETTING_OK, &CBacnetSetting::OnBnClickedButtonBacSettingOk)
+	ON_BN_CLICKED(IDC_BUTTON_BAC_SETTING_CANCEL, &CBacnetSetting::OnBnClickedButtonBacSettingCancel)
 END_MESSAGE_MAP()
 
 
@@ -255,19 +257,7 @@ void CBacnetSetting::OnBnClickedBtnBacIPChange()
 	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->GetAddress(address1,address2,address3,address4);
 	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->GetAddress(subnet1,subnet2,subnet3,subnet4);
 	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->GetAddress(gatway1,gatway2,gatway3,gatway4);
-	//if((Device_Basic_Setting.reg.ip_addr[0] != address1) ||
-	//	(Device_Basic_Setting.reg.ip_addr[1] != address2) ||
-	//	(Device_Basic_Setting.reg.ip_addr[2] != address3) ||
-	//	(Device_Basic_Setting.reg.ip_addr[3] != address4) ||
-	//	(Device_Basic_Setting.reg.subnet[0] != subnet1) ||
-	//	(Device_Basic_Setting.reg.subnet[1] != subnet2) ||
-	//	(Device_Basic_Setting.reg.subnet[2] != subnet3) ||
-	//	(Device_Basic_Setting.reg.subnet[3] != subnet4) ||
-	//	(Device_Basic_Setting.reg.gate_addr[0] != gatway1) ||
-	//	(Device_Basic_Setting.reg.gate_addr[1] != gatway2) ||
-	//	(Device_Basic_Setting.reg.gate_addr[2] != gatway3) ||
-	//	(Device_Basic_Setting.reg.gate_addr[3] != gatway4) )
-	//{
+
 		Device_Basic_Setting.reg.ip_addr[0] = address1;
 		Device_Basic_Setting.reg.ip_addr[1] = address2;
 		Device_Basic_Setting.reg.ip_addr[2] = address3;
@@ -286,10 +276,45 @@ void CBacnetSetting::OnBnClickedBtnBacIPChange()
 		else
 			Device_Basic_Setting.reg.tcp_type = 1;
 		//Device_Basic_Setting.reg.tcp_type = isstatic;
-		CString temp_task_info;
-		temp_task_info.Format(_T("Change IP Address Information "));
-		Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
-	//}
+		//CString temp_task_info;
+		//temp_task_info.Format(_T("Change IP Address Information !"));
+		//Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
+		if(Write_Private_Data_Blocking(WRITE_SETTING_COMMAND,0,0) <= 0)
+		{
+			CString temp_task_info;
+			temp_task_info.Format(_T("Change IP Address Information Timeout!"));
+			MessageBox(temp_task_info);
+		}
+		else
+		{
+			//在Ip 修改成功后 更新数据库;
+			CString strnewipadress;
+			strnewipadress.Format(_T("%u.%u.%u.%u"),address1,address2,address3,address4);
+			CString temp_task_info;
+			temp_task_info.Format(_T("Change IP Address Information OK!"));
+
+			CString strSql;
+			CBADO bado;
+			bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+			bado.OnInitADOConn(); 
+			CString temp_serial_cs;
+			temp_serial_cs.Format(_T("%u"),g_selected_serialnumber);
+			strSql.Format(_T("select * from ALL_NODE where Serial_ID = '%s' "),temp_serial_cs);
+			//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+			bado.m_pRecordset=bado.OpenRecordset(strSql);
+			while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+			{
+				strSql.Format(_T("update ALL_NODE set Bautrate='%s' where Serial_ID= '%s'"),strnewipadress,temp_serial_cs);
+				bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+				bado.m_pRecordset->MoveNext();
+			}
+			bado.CloseRecordset();
+			CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+			pFrame->m_product.at(selected_product_index).BuildingInfo.strIp = strnewipadress;
+			MessageBox(temp_task_info);
+			refresh_tree_status_immediately = true;
+		}
+
 
 }
 
@@ -311,6 +336,25 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 	CString temp_bootloader_version = _T("Unknown");
 	CString temp_serial_number = _T("Unknown");
 	
+	TIME_ZONE_INFORMATION lp_time_zone;
+	memset(&lp_time_zone,0,sizeof(TIME_ZONE_INFORMATION));
+
+	::GetTimeZoneInformation(&lp_time_zone);
+	 LONG n_tempBias;
+	 n_tempBias = 0 - lp_time_zone.Bias;
+	 n_tempBias = (n_tempBias/60)*100;
+
+	 //判断 minipanel 的时区 与本地电脑时区是否一致，不一致自动更改;
+	 if(Device_Basic_Setting.reg.time_zone != n_tempBias)
+	 {
+		 Device_Basic_Setting.reg.time_zone = n_tempBias;
+		 if(Write_Private_Data_Blocking(WRITE_SETTING_COMMAND,0,0) > 0)
+		 {
+			 CString temp_task_info;
+			 temp_task_info.Format(_T("SYNC Time zone OK!"));
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_task_info);
+		 }
+	 }
 
 	switch(command_type)
 	{
@@ -660,15 +704,15 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 			}
 			else if(bacnet_device_type == BIG_MINIPANEL)
 			{
-				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("MP24"));
+				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-BB"));
 			}
 			else if(bacnet_device_type == SMALL_MINIPANEL)
 			{
-				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("MP10"));
+				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-LB"));
 			}
 			else if(bacnet_device_type == TINY_MINIPANEL)
 			{
-				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("MP8"));
+				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-TB"));
 			}
 			else
 			{
@@ -698,7 +742,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 			((CEdit *)GetDlgItem(IDC_STATIC_SEETING_C8051_VERSION))->SetWindowTextW(temp_c8051_version);
 			((CEdit *)GetDlgItem(IDC_STATIC_SEETING_SM5964_VERSION2))->SetWindowTextW(temp_5964_version);
 			((CEdit *)GetDlgItem(IDC_STATIC_SEETING_BOOTLOADER_VERSION))->SetWindowTextW(temp_bootloader_version);
-			((CEdit *)GetDlgItem(IDC_STATIC_SEETING_SERIAL_NUMBER))->SetWindowTextW(temp_serial_number);
+			((CEdit *)GetDlgItem(IDC_STATIC_SEETING_SERIAL_NUMBER_2))->SetWindowTextW(temp_serial_number);
 
 			if((Device_Basic_Setting.reg.user_name == 2) || (Device_Basic_Setting.reg.user_name = 1))
 			{
@@ -806,7 +850,8 @@ BOOL CBacnetSetting::PreTranslateMessage(MSG* pMsg)
 			(temp_focus_id == IDC_EDIT_SETTING_PORT) ||
 			(temp_focus_id == IDC_EDIT_SETTING_OBJ_INSTANCE))
 		{
-			GetDlgItem(IDC_BUTTON_BAC_TEST)->SetFocus();
+
+			GetDlgItem(IDC_BUTTON_BAC_SETTING_OK)->SetFocus();
 		}
 		return 1;
 	}
@@ -1149,9 +1194,7 @@ void CBacnetSetting::OnEnKillfocusEditSettingNodesLabelSetting()
 		else
 		{
 			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Change Nodes label success!"));
-			//m_pCon.CreateInstance("ADODB.Connection");
-			//m_pRs.CreateInstance(_T("ADODB.Recordset"));
-			//m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+
 
 			CBADO bado;
 			bado.SetDBPath(g_strCurBuildingDatabasefilePath);
@@ -1171,10 +1214,7 @@ void CBacnetSetting::OnEnKillfocusEditSettingNodesLabelSetting()
 				bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
 				bado.m_pRecordset->MoveNext();
 			}
-			//if(m_pRs->State)
-			//	m_pRs->Close(); 
-			//if(m_pCon->State) 
-			//	m_pCon->Close();  
+
 			bado.CloseRecordset();
 			bado.CloseConn();
 			CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
@@ -1325,7 +1365,7 @@ void CBacnetSetting::OnEnKillfocusEditDyndnsDomain()
 	}
 	else
 	{
-		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Change Dyndns domain success!"));
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Change dyndns domain success!"));
 	}
 }
 
@@ -1530,4 +1570,24 @@ BOOL CBacnetSetting::OnHelpInfo(HELPINFO* pHelpInfo)
 	// 		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
 	// 	}
 	return CDialogEx::OnHelpInfo(pHelpInfo);
+}
+
+void CBacnetSetting::OnBnClickedButtonBacSettingOk()
+{
+	// TODO: Add your control notification handler code here
+	if(Write_Private_Data_Blocking(WRITE_SETTING_COMMAND,0,0) <= 0)
+	{
+		CString temp_task_info;
+		temp_task_info.Format(_T("Write into device timeout!"));
+		SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_task_info);
+	}
+	refresh_tree_status_immediately = true;
+}
+
+
+void CBacnetSetting::OnBnClickedButtonBacSettingCancel()
+{
+	// TODO: Add your control notification handler code here
+	 PostMessage(WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);
+	 PostMessage(WM_FRESH_SETTING_UI,TIME_COMMAND,NULL);
 }

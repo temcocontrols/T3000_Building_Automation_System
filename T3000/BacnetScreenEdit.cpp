@@ -100,7 +100,6 @@ BEGIN_MESSAGE_MAP(CBacnetScreenEdit, CDialogEx)
 	ON_MESSAGE(EDIT_LABEL_MESSAGE,Edit_label_Handle)
 	ON_MESSAGE(MY_REDRAW_WINDOW, RedrawScreeneditWindow)
 	ON_BN_CLICKED(IDC_BUTTON_ADD, &CBacnetScreenEdit::OnBnClickedButtonAdd)
-	ON_BN_CLICKED(IDC_BUTTON_EDIT, &CBacnetScreenEdit::OnBnClickedButtonEdit)
 	ON_BN_CLICKED(IDC_BUTTON_SCREEN_EXIT, &CBacnetScreenEdit::OnBnClickedButtonScreenExit)
 	ON_BN_CLICKED(IDC_BUTTON_DELETE, &CBacnetScreenEdit::OnBnClickedButtonDelete)
 	ON_BN_CLICKED(IDC_BUTTON_DELETE_ALL, &CBacnetScreenEdit::OnBnClickedButtonDeleteAll)
@@ -108,9 +107,15 @@ BEGIN_MESSAGE_MAP(CBacnetScreenEdit, CDialogEx)
 	ON_WM_LBUTTONDBLCLK()
 END_MESSAGE_MAP()
 
-
+#define  REFRESH_LABEL_DATA 2
 LRESULT  CBacnetScreenEdit::Edit_label_Handle(WPARAM wParam, LPARAM lParam)
 {
+	int n_command = lParam;
+	if(n_command == REFRESH_LABEL_DATA)
+	{
+		Invalidate(1);
+		return true;
+	}
 	Bacnet_Label_Info * temp_info =  (Bacnet_Label_Info *)wParam;
 	CString icon_name;
 	MultiByteToWideChar( CP_ACP, 0, (char *)temp_info->ico_name,(int)strlen((char *)temp_info->ico_name)+1, 
@@ -146,6 +151,7 @@ LRESULT  CBacnetScreenEdit::Edit_label_Handle(WPARAM wParam, LPARAM lParam)
 	ReloadLabelsFromDB();
 	if(ScreenEdit_Window->IsWindowVisible())
 		ScreenEdit_Window->SetFocus();
+	Invalidate(1);
 	return 0;
 }
 
@@ -292,7 +298,7 @@ void CBacnetScreenEdit::AddLabel(unsigned char point_type,uint8_t point_number,u
 		{
 			display_type = LABEL_ICON_FULL_DESCRIPTION;
 		}
-		strSql.Format(_T("insert into Screen_Bacnet_Label values(%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,'%s','%s',%i,%i)"),m_nSerialNumber,screen_list_line,Max_Control_ID,main_panel,sub_panel,point_type,point_number,point_x,point_y,text_color,display_type,_T(""),_T(""),LABEL_TEXT_BOTTOM,LABEL_ICON_NORMAL);
+		strSql.Format(_T("insert into Screen_Bacnet_Label values(%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,'%s','%s',%i,%i)"),m_nSerialNumber,screen_list_line,Max_Control_ID,main_panel,sub_panel,point_type,point_number,point_x,point_y,text_color,display_type,_T(""),_T(""),LABEL_TEXT_BOTTOM,LABEL_ICON_SMALL);
 
 		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
 
@@ -326,7 +332,9 @@ void CBacnetScreenEdit::OnBnClickedButtonScreenEditTest()
 }
 
 #include "BacnetMonitor.h"
+#include "BacnetProgram.h"
 extern CBacnetMonitor *Monitor_Window ;
+extern CBacnetProgram *Program_Window ;
 BOOL CBacnetScreenEdit::PreTranslateMessage(MSG* pMsg)
 {
 	// TODO: Add your specialized code here and/or call the base class
@@ -359,6 +367,16 @@ BOOL CBacnetScreenEdit::PreTranslateMessage(MSG* pMsg)
 			if(monitor_list_line < BAC_MONITOR_COUNT)
 			{
 				Monitor_Window->OnBnClickedBtnMonitorGraphic();
+			}
+			return 0;
+		}
+		else if(m_bac_label_vector.at(m_bac_select_label).nPoint_type == BAC_PRG)
+		{
+			program_list_line = m_bac_label_vector.at(m_bac_select_label).nPoint_number;
+			if(program_list_line < BAC_PROGRAM_ITEM_COUNT)
+			{
+				//Monitor_Window->OnBnClickedBtnMonitorGraphic();
+				Program_Window->OnBnClickedButtonProgramEdit();
 			}
 			return 0;
 		}
@@ -716,6 +734,18 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 	default_on_icon = AfxGetApp()->LoadIcon(IDI_ICON_SWITCH_ON);
 	default_off_icon = AfxGetApp()->LoadIcon(IDI_ICON_SWITCH_OFF);
 
+	default_input_icon = AfxGetApp()->LoadIcon(IDI_ICON_INPUT_DEFAULT);	
+	default_output_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_OUTPUT);	
+	default_variable_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_VARIABLE);	
+	default_program_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_PROGRAM);	
+	default_pid_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_PID);	
+	default_holiday_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_HOLIDAY);	
+	default_schedual_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_SCHEDUAL);	
+	default_trendlog_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_TRENDLOG);	
+
+	default_screen_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_GRAPHIC);	
+	//default_schedual_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_SCHEDUAL);	
+	
 	lock_icon = (HICON)LoadImage(AfxGetInstanceHandle(),  
 		MAKEINTRESOURCE(IDI_ICON_LABEL_LOCK),  
 		IMAGE_ICON,0,0,  
@@ -1073,7 +1103,7 @@ void CBacnetScreenEdit::PainNoImageInfo(CDC* pDC)
 }
 
 
-void CBacnetScreenEdit::Bacnet_Edit_Label()
+void CBacnetScreenEdit::Bacnet_Edit_Label(bool allow_change)
 {
 	if(m_bac_select_label<0)
 		return;
@@ -1087,6 +1117,10 @@ void CBacnetScreenEdit::Bacnet_Edit_Label()
 		Edit_Label_Window = new CBacnetEditLabel;
 		Edit_Label_Window->Create(IDD_DIALOG_BACNET_EDIT_LABEL, this);
 	}
+	if(allow_change)
+		Edit_Label_Window->m_allow_change = true;
+	else
+		Edit_Label_Window->m_allow_change = false;
 	Edit_Label_Window->FreshWindow(m_bac_label_vector.at(m_bac_select_label));
 	
 }
@@ -1284,6 +1318,7 @@ void CBacnetScreenEdit::OnPaint()
 
 
 	}
+
 
 
 	for (int i=0;i<m_bac_label_vector.size();i++)
@@ -1607,7 +1642,16 @@ void CBacnetScreenEdit::OnPaint()
 		cs_show_info = cs_show_info.Trim();
 		if(cs_show_info.IsEmpty())
 		{
-			cs_show_info = _T("Empty Label");
+			if(m_bac_label_vector.at(i).nPoint_type == BAC_PRG)
+				cs_show_info.Format(_T("PRG%u"),m_bac_label_vector.at(i).nPoint_number + 1);
+			else if(m_bac_label_vector.at(i).nPoint_type == BAC_SCH)
+				cs_show_info.Format(_T("SCH%u"),m_bac_label_vector.at(i).nPoint_number + 1);
+			else if(m_bac_label_vector.at(i).nPoint_type == BAC_HOL)
+				cs_show_info.Format(_T("HOL%u"),m_bac_label_vector.at(i).nPoint_number + 1);
+			else if(m_bac_label_vector.at(i).nPoint_type == BAC_AMON)
+				cs_show_info.Format(_T("AMON%u"),m_bac_label_vector.at(i).nPoint_number + 1);
+			else
+				cs_show_info = _T("Empty Label");
 		}
 		int x_point = 0;
 		int y_point = 0;
@@ -1653,7 +1697,7 @@ void CBacnetScreenEdit::OnPaint()
 				temp2_cstring.ReleaseBuffer();
 			//}
 
-			if(m_bac_label_vector.at(i).nPoint_type == 10)
+			if(m_bac_label_vector.at(i).nPoint_type == BAC_GRP)
 			{
 				unsigned int temp_index = m_bac_label_vector.at(i).nPoint_number;
 				if(temp_index >= BAC_SCREEN_COUNT)
@@ -1755,8 +1799,85 @@ void CBacnetScreenEdit::OnPaint()
 				}
 				else
 				{
-					Bitmap icon_bitmap(default_icon);
-					graphics_icon.DrawImage(&icon_bitmap,(int)icon_point.X ,(int)icon_point.Y,(int)icon_size_x,(int)icon_size_y);
+					//HBITMAP 	hBitmap_brown_bmp2;
+					//hBitmap_brown_bmp2 =(HBITMAP)LoadImage(AfxGetInstanceHandle(),  
+					//	MAKEINTRESOURCE(IDB_PNG1),  
+					//	IMAGE_BITMAP,0,0,  
+					//	LR_LOADMAP3DCOLORS | LR_LOADTRANSPARENT);
+
+					//Bitmap icon_bitmap(hBitmap_brown_bmp2,NULL);
+
+					//HICON default_input_icon;
+					//HICON default_output_icon;
+					//HICON default_variable_icon;
+					//HICON default_program_icon;
+					//HICON default_pid_icon;
+					//HICON default_holiday_icon;
+					//HICON default_schedual_icon;
+					//HICON default_trendlog_icon;
+
+					//Bitmap icon_bitmap(default_schedual_icon);
+					int temp_point_type = m_bac_label_vector.at(i).nPoint_type;
+					switch(temp_point_type)
+					{
+					case BAC_OUT:
+						{
+						Bitmap icon_bitmap(default_output_icon);				
+						graphics_icon.DrawImage(&icon_bitmap,(int)icon_point.X ,(int)icon_point.Y,(int)icon_size_x,(int)icon_size_y);
+						}
+						break;
+					case BAC_IN:
+						{
+						Bitmap icon_bitmap(default_input_icon);				
+						graphics_icon.DrawImage(&icon_bitmap,(int)icon_point.X ,(int)icon_point.Y,(int)icon_size_x,(int)icon_size_y);
+						}
+						break;
+					case BAC_VAR:
+						{
+						Bitmap icon_bitmap(default_variable_icon);				
+						graphics_icon.DrawImage(&icon_bitmap,(int)icon_point.X ,(int)icon_point.Y,(int)icon_size_x,(int)icon_size_y);
+						}
+						break;
+					case BAC_PRG:
+						{
+						Bitmap icon_bitmap(default_program_icon);				
+						graphics_icon.DrawImage(&icon_bitmap,(int)icon_point.X ,(int)icon_point.Y,(int)icon_size_x,(int)icon_size_y);
+						}
+						break;
+					case BAC_PID:
+						{
+						Bitmap icon_bitmap(default_pid_icon);				
+						graphics_icon.DrawImage(&icon_bitmap,(int)icon_point.X ,(int)icon_point.Y,(int)icon_size_x,(int)icon_size_y);
+						}
+						break;
+					case BAC_HOL:
+						{
+						Bitmap icon_bitmap(default_holiday_icon);				
+						graphics_icon.DrawImage(&icon_bitmap,(int)icon_point.X ,(int)icon_point.Y,(int)icon_size_x,(int)icon_size_y);
+						}
+						break;
+					case BAC_SCH:
+						{
+						Bitmap icon_bitmap(default_schedual_icon);				
+						graphics_icon.DrawImage(&icon_bitmap,(int)icon_point.X ,(int)icon_point.Y,(int)icon_size_x,(int)icon_size_y);
+						}
+						break;
+					case BAC_AMON:
+						{
+						Bitmap icon_bitmap(default_trendlog_icon);				
+						graphics_icon.DrawImage(&icon_bitmap,(int)icon_point.X ,(int)icon_point.Y,(int)icon_size_x,(int)icon_size_y);
+						}
+						break;
+					case BAC_GRP:
+						{
+						Bitmap icon_bitmap(default_screen_icon);				
+						graphics_icon.DrawImage(&icon_bitmap,(int)icon_point.X ,(int)icon_point.Y,(int)icon_size_x,(int)icon_size_y);
+						}
+						break;
+					default:
+						break;
+					}
+
 				}
 
 			}
@@ -1853,7 +1974,7 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 			Invalidate(1);
 			break;
 		}
-		
+
 		if((point.x > rect_x ) && (point.x < rect_x_right) && (point.y > rect_y) && (point.y < rect_y_botton) && (screen_lock_label == false))
 		{
 			m_bac_label_vector.at(i).nMouse_Status = LABEL_MOUSE_ON_LB_DOWN;
@@ -1866,23 +1987,9 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 			Invalidate(1);
 			break;
 		}
-		else if((point.x > rect_x ) && (point.x < rect_x_right) && (point.y > rect_y) && (point.y < rect_y_botton) && (screen_lock_label == true))
-		{
-			if((m_bac_label_vector.at(i).nPoint_type == BAC_GRP) ||
-				(m_bac_label_vector.at(i).nPoint_type == BAC_AMON))
-			{
-				click_ret = true;
-				m_bac_select_label = i;
-				PostMessage(WM_KEYDOWN, VK_RETURN,1); 
-				Sleep(1);
-				PostMessage(WM_KEYUP, VK_RETURN, 1);    //释放
-				break;
-					
-			}
-		}
 		else if(((m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_VALUE) ||
-				 (m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_FULL_DESCRIPTION) ||
-				 (m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_LABEL)) && (screen_lock_label == false))
+			(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_FULL_DESCRIPTION) ||
+			(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_LABEL)) /*&& (screen_lock_label == false)*/)
 		{
 			int temp_index = 0;
 			temp_index = m_bac_label_vector.at(i).nPoint_number;
@@ -1925,7 +2032,7 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 
 			//for (int j=i+1; j<m_bac_label_vector.size();j++)
 			//{
-				m_bac_label_vector.at(i).nMouse_Status = LABEL_MOUSE_NORMAL;
+			m_bac_label_vector.at(i).nMouse_Status = LABEL_MOUSE_NORMAL;
 
 			//}
 			if((point.x > rect_x ) && (point.x < rect_x_right) && (point.y > rect_y) && (point.y < rect_y_botton))
@@ -1955,7 +2062,7 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 								Invalidate(1);
 								return;
 							}
-	
+
 						}
 
 					}
@@ -1977,7 +2084,7 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 								Invalidate(1);
 								return;
 							}
-							
+
 						}
 
 					}
@@ -1999,19 +2106,45 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 								Invalidate(1);
 								return;
 							}
-							
+
 						}
 					}
 					break;
 				default:
 					break;
 				}
-				
+
 				Invalidate(1);
 
 			}
 
-			
+
+		}
+		if((point.x > rect_x ) && (point.x < rect_x_right) && (point.y > rect_y) && (point.y < rect_y_botton) && (screen_lock_label == true))
+		{
+			if((m_bac_label_vector.at(i).nPoint_type == BAC_GRP) ||
+				(m_bac_label_vector.at(i).nPoint_type == BAC_AMON)||
+				(m_bac_label_vector.at(i).nPoint_type == BAC_PRG))
+			{
+				click_ret = true;
+				m_bac_select_label = i;
+				PostMessage(WM_KEYDOWN, VK_RETURN,1); 
+				Sleep(1);
+				PostMessage(WM_KEYUP, VK_RETURN, 1);    //释放
+				break;
+
+			}
+			else if((m_bac_label_vector.at(i).nPoint_type == BAC_IN) ||
+				(m_bac_label_vector.at(i).nPoint_type == BAC_OUT) ||
+				(m_bac_label_vector.at(i).nPoint_type == BAC_VAR) ||
+				(m_bac_label_vector.at(i).nPoint_type == BAC_PID))
+			{
+				//如果是点击的是锁定状态下的 IN OUT VAR  要求能改变值;但是不能改变range.
+				click_ret = true;
+				m_bac_select_label = i;
+
+				Bacnet_Edit_Label(false);
+			}
 		}
 		else
 			m_bac_label_vector.at(i).nMouse_Status = LABEL_MOUSE_NORMAL;
@@ -2331,16 +2464,6 @@ void CBacnetScreenEdit::OnBnClickedButtonAdd()
 
 
 
-void CBacnetScreenEdit::OnBnClickedButtonEdit()
-{
-	// TODO: Add your control notification handler code here
-	if(m_nFoucsIndext<0)
-	{
-		MessageBox(_T("Please select a label first!"),_T("Notice"),MB_OK | MB_ICONINFORMATION);
-		return;
-	}
-	Bacnet_Edit_Label();
-}
 
 
 void CBacnetScreenEdit::OnBnClickedButtonScreenExit()

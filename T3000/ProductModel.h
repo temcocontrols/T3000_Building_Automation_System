@@ -49,6 +49,7 @@
 #define PM_T322AI				43  
 #define PM_T38AI8AO6DO			44  
 #define PM_PRESSURE_SENSOR		45  
+#define PM_T3PT12				46 
 
 #define PM_CM5					50  
 #define PM_TSTAT6_HUM_Chamber			64  
@@ -64,7 +65,14 @@
 
 #define PM_TESTER_JIG				202
 
+#define STM32_CO2_NET				210
+#define STM32_CO2_RS485				211
+#define STM32_HUM_NET				212
+#define STM32_HUM_RS485				213
+#define STM32_PRESSURE_NET			214
+#define STM32_PRESSURE_RS3485		215
 
+#define STM32_CO2_NODE				216
 
 
 #endif

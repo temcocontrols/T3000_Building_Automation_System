@@ -237,7 +237,7 @@ LRESULT CBacnetAlarmLog::Fresh_Alarmlog_List(WPARAM wParam,LPARAM lParam)
 				m_alarmlog_list.SetItemText(i,ALARMLOG_DEL,_T("Done"));
 			}
 			else
-				m_alarmlog_list.SetItemText(i,ALARMLOG_DEL,_T(""));
+				m_alarmlog_list.SetItemText(i,ALARMLOG_DEL,_T("NO"));
 
 		}
 		else

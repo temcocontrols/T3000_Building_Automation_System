@@ -23,4 +23,5 @@ public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	void Refresh_Health_Data();
+	afx_msg void OnBnClickedButtonHealthClear();
 };

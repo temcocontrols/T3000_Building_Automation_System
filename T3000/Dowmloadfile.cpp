@@ -27,6 +27,7 @@ char receive_buffer[4000];
 unsigned short totalpackage = 0;
 unsigned short current_package = 1;
 char download_filename[40];
+unsigned short download_fw_version;
 int download_step = SEND_DOWNLOAD_COMMAND;
 bool download_thread_flag = true;
 int wait_download_and_isp_finished = 0 ;
@@ -35,6 +36,7 @@ HWND downloadfile_hwnd;
 CString Folder_Path;
 CString HEX_BIN_FILE_PATH;
 extern char * receivefile_buffer;
+CString new_firmware_ip;
 
 IMPLEMENT_DYNAMIC(Dowmloadfile, CDialogEx)
 
@@ -78,8 +80,9 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 		//unsigned char IPAddress[4];
 		//((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_TEMCO_IP))->GetAddress(IPAddress[0],IPAddress[1],IPAddress[2],IPAddress[3]);
 		CString retmessage;
-		retmessage.Format(_T("Connect to server success!"));
-		//m_download_info.AddString(retmessage);
+		retmessage.Format(_T("Connect to newfirmware.com at IP="));
+		retmessage = retmessage + new_firmware_ip + _T(" Success");
+		
 		m_download_info.InsertString(m_download_info.GetCount(),retmessage);
 		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
 		if(Downloadfile_Thread == NULL)
@@ -90,7 +93,6 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 	{
 		CString retmessage;
 		retmessage.Format(_T("Disconnected with server!"));
-		//m_download_info.AddString(retmessage);
 		m_download_info.InsertString(m_download_info.GetCount(),retmessage);
 		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
 		GetDlgItem(IDC_BUTTON_START_DOWNLOAD)->EnableWindow(true);
@@ -102,7 +104,6 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 
 		CString retmessage;
 		retmessage.Format(_T("Connect to server failed!Please try again!"));
-		//m_download_info.AddString(retmessage);
 		m_download_info.InsertString(m_download_info.GetCount(),retmessage);
 		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
 		TCP_File_Socket.Close();
@@ -257,23 +258,6 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 			 temp_isp_info.Format(_T("Please wait!ISP is running!"));
 			 m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
 		}
-		//CString exe_folder;
-		//GetModuleFileName(NULL, exe_folder.GetBuffer(MAX_PATH), MAX_PATH);
-		//PathRemoveFileSpec(exe_folder.GetBuffer(MAX_PATH));
-		//exe_folder.ReleaseBuffer();
-
-		//CString file_name;
-		//MultiByteToWideChar( CP_ACP, 0, download_filename, (int)strlen((char *)download_filename)+1, file_name.GetBuffer(MAX_PATH), MAX_PATH );
-		//file_name.ReleaseBuffer();
-		//CString mypath =  exe_folder + _T("\\Database\\Firmware");
-		//mypath = mypath + _T("\\") + file_name;
-		//WritePrivateProfileStringW(_T("Data"),_T("FirmwarePath"),mypath,AutoFlashConfigPath);
-		//
-
-		//temp_isp_info.Format(_T("FirmwarePath = "));
-		//temp_isp_info = temp_isp_info + mypath;
-		//m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
-		//m_download_info.SetTopIndex(m_download_info.GetCount()-1);
 
 		HANDLE Call_ISP_Application = NULL;
 		Call_ISP_Application =CreateThread(NULL,NULL,isp_thread,this,NULL, NULL);
@@ -285,7 +269,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 
 		int npersent = (int)lParam;
 		CString persent_message;
-		persent_message.Format(_T("File download finished %d%%"),npersent);
+		persent_message.Format(_T("Downloading now:  %d%%"),npersent);
 		//bool is_the_first = true;
 		//if(!is_the_first)
 		m_download_info.DeleteString(m_download_info.GetCount() - 1);
@@ -322,36 +306,38 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 	else if(ncommand == DOWNLOAD_T3000_NO_UPDATE)
 	{
 		CString show_message;
-		show_message = _T("You T3000 is up-to-date") ;
+		show_message = _T("Your T3000 is up-to-date") ;
 		m_download_info.InsertString(m_download_info.GetCount(),show_message);
 		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
 	}
 	else if(ncommand == DOWNLOAD_NOT_FIND_LOCAL)
 	{
 		CString complete_message;
-		complete_message.Format(_T("Local firmware file doesn’t exist, downloading from server now."));
-		//m_download_info.AddString(complete_message);
+		complete_message.Format(_T("Local file doesn't exist, downloading from server now."));
 		m_download_info.InsertString(m_download_info.GetCount(),complete_message);
-		//m_download_info.SetTopIndex(m_download_info.GetCount()-1);
-
-
 		complete_message.Format(_T("Check MD5 value over!"));
-		//m_download_info.AddString(complete_message);
 		m_download_info.InsertString(m_download_info.GetCount(),complete_message);
 		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
+
+
+
+		complete_message.Format(_T("Version Details."));
+		m_download_info.InsertString(m_download_info.GetCount(),complete_message);
+		complete_message.Format(_T("Device Firmware: %.1f"),m_product_isp_auto_flash.software_version);
+		m_download_info.InsertString(m_download_info.GetCount(),complete_message);
+		complete_message.Format(_T("Newfirmware.com:: %.1f"),((float)download_fw_version)/10);
+		m_download_info.InsertString(m_download_info.GetCount(),complete_message);
+		complete_message.Format(_T("               "));
+		m_download_info.InsertString(m_download_info.GetCount(),complete_message);
 	}
 	else if(ncommand == DOWNLOAD_LOCAL_EXSIT)
 	{
-
-
-
 		CString complete_message;
-		complete_message.Format(_T("Local Firmware  already exsit in the Firmware folder.The MD5 value is match "));
-		//m_download_info.AddString(complete_message);
+		complete_message.Format(_T("Local Firmware  already exist in the Firmware folder.MD5 checksum value matches.  "));
 		m_download_info.InsertString(m_download_info.GetCount(),complete_message);
 		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
 	}
-	else if(ncommand == DOWNLOAD_RESULTS/*DOWNLOAD_RESULTS*/)
+	else if(ncommand == DOWNLOAD_RESULTS)
 	{
 		GetDlgItem(IDC_BUTTON_START_DOWNLOAD)->EnableWindow(true);
 		GetDlgItem(IDC_BUTTON_FILE_DOWNLOAD_ONLY)->EnableWindow(true);
@@ -364,14 +350,12 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 		case START_AUTO_FLASH_COMMAND:
 		case FAILED_NORESPONSED:
 			ret_message.Format(_T("The device not response ,please try again!"));
-			//m_download_info.AddString(complete_message);
 			m_download_info.InsertString(m_download_info.GetCount(),ret_message);
 			m_download_info.SetTopIndex(m_download_info.GetCount()-1);
 			break;
 		case FLASH_SUCCESS:
 			{
 				ret_message.Format(_T("ISP succeed!"));
-				//m_download_info.AddString(complete_message);
 				m_download_info.InsertString(m_download_info.GetCount(),ret_message);
 				m_download_info.SetTopIndex(m_download_info.GetCount()-1);
 			}
@@ -379,7 +363,6 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 		case FAILED_UNKNOW_ERROR:
 			{
 				ret_message.Format(_T("Unknown error! More details please reference Log_info.txt !"));
-				//m_download_info.AddString(complete_message);
 				m_download_info.InsertString(m_download_info.GetCount(),ret_message);
 				m_download_info.SetTopIndex(m_download_info.GetCount()-1);
 			}
@@ -541,6 +524,14 @@ DWORD WINAPI   Dowmloadfile::DownLoadFileProcess(LPVOID lpVoid)
 
 				break;
 			}
+		case SHOW_FTP_PATH:
+			{
+				ShellExecute(NULL, L"open", L"http://www.temcocontrols.com/ftp/software/9TstatSoftware.zip", NULL, NULL, SW_SHOWNORMAL);
+
+				return 0;
+
+			}
+			break;
 		case SEND_GET_MD5_VALUE:
 			{
 				if(retry_time>10)
@@ -592,20 +583,14 @@ DWORD WINAPI   Dowmloadfile::DownLoadFileProcess(LPVOID lpVoid)
 				}
 				else	//发现有一样的了就要比对MD5是否一致;
 				{
-					//CString remote_md5;
-					//CString local_md5;
-					//MultiByteToWideChar( CP_ACP, 0, receive_md5, (int)strlen((char *)receive_md5)+1, remote_md5.GetBuffer(MAX_PATH), MAX_PATH );
-					//remote_md5.ReleaseBuffer();
+
 
 					char locoal_char_md5[20];
 					memcpy_s(locoal_char_md5,20, MD5(ifstream( temp_file_path )).digest(),20);
 					int ret_value = memcmp(locoal_char_md5,receive_md5,16);
-					//string local_string_md5 = MD5(ifstream( temp_file_path )).toString();
-					//local_md5 = local_string_md5.c_str();
 					if(ret_value == 0)	//MD5值一样就不用下载 直接结束;
 					{
 						::PostMessage(downloadfile_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_LOCAL_EXSIT,NULL);
-						//::PostMessage(downloadfile_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_CLOSE_SOCKET,NULL);
 						download_step = THREAD_IDLE;
 					}
 					else	// 不一致就要再次下载;
@@ -660,8 +645,6 @@ DWORD WINAPI   Dowmloadfile::DownLoadFileProcess(LPVOID lpVoid)
 			}
 		case RECEIVE_COMPLET:
 			{
-
-
 				CString file_name;
 				MultiByteToWideChar( CP_ACP, 0, download_filename, (int)strlen((char *)download_filename)+1, file_name.GetBuffer(MAX_PATH), MAX_PATH );
 				file_name.ReleaseBuffer();
@@ -679,9 +662,6 @@ DWORD WINAPI   Dowmloadfile::DownLoadFileProcess(LPVOID lpVoid)
 				DWORD dWrites;
 				WriteFile(hFile,receivefile_buffer,total_file_length,&dWrites,NULL);
 				CloseHandle(hFile);  
-
-
-
 
 				if(receivefile_buffer)
 				{
@@ -711,8 +691,6 @@ DWORD WINAPI   Dowmloadfile::DownLoadFileProcess(LPVOID lpVoid)
 			}
 		case THREAD_IDLE:
 			{
-				//mparent->TCP_File_Socket.ShutDown();
-				//mparent->TCP_File_Socket.Close();
 				::PostMessage(downloadfile_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_CLOSE_SOCKET,NULL);
 				Downloadfile_Thread = NULL;
 				retry_time = 0;
@@ -744,12 +722,9 @@ BOOL Dowmloadfile::OnInitDialog()
 	temp_name = GetProductName(m_product_isp_auto_flash.product_class_id);
 	((CEdit *)GetDlgItem(IDC_EDIT_PRODUCT_ID))->SetWindowTextW(temp_id);
 	((CEdit *)GetDlgItem(IDC_EDIT_PRODUCT_ID))->EnableWindow(false);
-	//((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_TEMCO_IP))->SetAddress(114,93,27,13);
 	((CEdit *)GetDlgItem(IDC_EDIT_PRODUCT_NAME))->SetWindowTextW(temp_name);
 	((CEdit *)GetDlgItem(IDC_EDIT_PRODUCT_NAME))->EnableWindow(false);
-	//int resualt=TCP_File_Socket.Create(0,SOCK_STREAM);//SOCK_STREAM
 	downloadfile_hwnd = this->m_hWnd;
-	//TCP_File_Socket.SetParentWindow(downloadfile_hwnd);
 	Downloadfile_Thread = NULL;
 	CString ApplicationFolder;
 	download_thread_flag = true;
@@ -895,9 +870,9 @@ void Dowmloadfile::Start_Download()
 	CString Connect_ip;
 	//Connect_ip.Format(_T("%d.%d.%d.%d"),IP_ADDRESS_SERVER[0],IP_ADDRESS_SERVER[1],IP_ADDRESS_SERVER[2],IP_ADDRESS_SERVER[3]);
 	Connect_ip = IP_ADDRESS_SERVER;
-
+	new_firmware_ip = IP_ADDRESS_SERVER;
 	CString show_message;
-	show_message.Format(_T("Wait connection to the IP "));
+	show_message.Format(_T("Wait connection to newfirmware.com , IP : "));
 	show_message = show_message + Connect_ip;
 	//m_download_info.AddString(complete_message);
 	m_download_info.InsertString(m_download_info.GetCount(),show_message);
@@ -955,7 +930,8 @@ BOOL Dowmloadfile::IsNetDevice(int DevType)
 		|| DevType == PM_MINIPANEL
 		|| DevType == PM_CM5
 		|| DevType == PM_T322AI
-		|| DevType == PM_T38AI8AO6DO)
+		|| DevType == PM_T38AI8AO6DO
+		|| DevType == STM32_CO2_NET)
 	{
 		return TRUE;
 	}

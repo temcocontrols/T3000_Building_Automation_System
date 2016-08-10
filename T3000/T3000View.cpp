@@ -4040,7 +4040,7 @@ LRESULT CT3000View::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
         {
             product_type = T3000_5EH_LCD_ADDRESS;
         }
-        else if((product_register_value[7] == PM_TSTAT5A) ||(product_register_value[7] == PM_TSTAT5B) ||
+        else if((product_register_value[7] == PM_TSTAT5A) ||(product_register_value[7] == PM_TSTAT5B) ||(product_register_value[7] == PM_TSTAT5B2) ||
                 (product_register_value[7] ==PM_TSTAT5C ) || (product_register_value[7] == PM_TSTAT5D) || (product_register_value[7] == PM_TSTAT5F) ||
                 (product_register_value[7] == PM_TSTAT5G))
         {
@@ -7270,66 +7270,66 @@ void CT3000View::FreshCtrl()
     int nModel=product_register_value[MODBUS_PRODUCT_MODEL];
     if(nModel==0)
         return;
-
-    switch (nModel)
-    {
-    case 2:
-        m_strModelName=g_strTstat5a;
-        break;
-    case 1:
-        m_strModelName=g_strTstat5b;
-        break;
-    case 3:
-        m_strModelName=g_strTstat5b;
-        break;
-    case 4:
-        m_strModelName=g_strTstat5c;
-        break;
-    case 12:
-        m_strModelName=g_strTstat5d;
-        break;
-    case PM_NC:
-        m_strModelName=g_strnetWork;
-        break;
-    case PM_TSTATRUNAR:
-        m_strModelName=_T("TStatRunar");
-    case PM_TSTAT5E:
-        m_strModelName=g_strTstat5e;
-        break;
-    case PM_PM5E:
-        m_strModelName=_T("PM5E");
-        break;
-    case 17:
-        m_strModelName=g_strTstat5f;
-        break;
-    case 18:
-        m_strModelName=g_strTstat5g;
-        break;
-    case 19:
-        m_strModelName=g_strTstat5h;
-        break;
-    case PM_TSTAT5i:
-        m_strModelName=_T("Tstat 5i");
-        break;
-    case PM_TSTAT8:
-        m_strModelName=_T("Tstat8");
-        break;
-    case PM_TSTAT6:
-        m_strModelName=g_strTstat6;
-        break;
-    case PM_TSTAT7:
-        m_strModelName=g_strTstat7;
-        break;
-    case PM_PRESSURE:
-        m_strModelName=g_strPressure;
-        break;
-    case PM_HUMTEMPSENSOR:
-        m_strModelName="TstatHUM";
-        break;
-    default:
-        m_strModelName=g_strTstat5a;
-        break;
-    }
+	m_strModelName = GetProductName(nModel);
+	/*switch (nModel)
+	{
+	case 2:
+		m_strModelName=g_strTstat5a;
+		break;
+	case 1:
+		m_strModelName=g_strTstat5b;
+		break;
+	case 3:
+		m_strModelName=g_strTstat5b;
+		break;
+	case 4:
+		m_strModelName=g_strTstat5c;
+		break;
+	case 12:
+		m_strModelName=g_strTstat5d;
+		break;
+	case PM_NC:
+		m_strModelName=g_strnetWork;
+		break;
+	case PM_TSTATRUNAR:
+		m_strModelName=_T("TStatRunar");
+	case PM_TSTAT5E:
+		m_strModelName=g_strTstat5e;
+		break;
+	case PM_PM5E:
+		m_strModelName=_T("PM5E");
+		break;
+	case 17:
+		m_strModelName=g_strTstat5f;
+		break;
+	case 18:
+		m_strModelName=g_strTstat5g;
+		break;
+	case 19:
+		m_strModelName=g_strTstat5h;
+		break;
+	case PM_TSTAT5i:
+		m_strModelName=_T("Tstat 5i");
+		break;
+	case PM_TSTAT8:
+		m_strModelName=_T("Tstat8");
+		break;
+	case PM_TSTAT6:
+		m_strModelName=g_strTstat6;
+		break;
+	case PM_TSTAT7:
+		m_strModelName=g_strTstat7;
+		break;
+	case PM_PRESSURE:
+		m_strModelName=g_strPressure;
+		break;
+	case PM_HUMTEMPSENSOR:
+		m_strModelName="TstatHUM";
+		break;
+	default:
+		m_strModelName=g_strTstat5a;
+		break;
+	}*/
 
     //m_fTemperature=(float)product_register_value[MODBUS_INTERNAL_THERMISTOR]/10;	//101   121MODBUS_TEMPRATURE_CHIP
     m_fTemperature=((float)((short)product_register_value[MODBUS_TEMPRATURE_CHIP]))/10;

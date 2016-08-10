@@ -18,6 +18,7 @@ enum ECmdHandler {
 	ID_SORT_LEVELANDBELOW,
 	ID_SORT_BY_CONNECTION,
 	ID_SORT_BY_FLOOR,
+	ID_PING_CMD,
 	ID_MAX_CMD
 };
 
@@ -136,10 +137,11 @@ CImageTreeCtrl::CImageTreeCtrl()
 
 	m_Commandmap[ID_SORT_BY_CONNECTION]		     = &CImageTreeCtrl::SortByConnection;
 	m_Commandmap[ID_SORT_BY_FLOOR]		        = &CImageTreeCtrl::SortByFloor;
-
-
+	m_Commandmap[ID_PING_CMD]		        = &CImageTreeCtrl::PingDevice;
+	
 	old_hItem = NULL;
 	m_serial_number = 0;
+	is_focus = false;
 }
 
 CImageTreeCtrl::~CImageTreeCtrl()
@@ -156,6 +158,7 @@ BEGIN_MESSAGE_MAP(CImageTreeCtrl, CTreeCtrl)
 	ON_NOTIFY_REFLECT(NM_RCLICK, OnRclick)
 	ON_COMMAND_RANGE(ID_RENAME, ID_MAX_CMD-1, OnContextCmd)
 	ON_WM_KILLFOCUS()
+	ON_WM_SETFOCUS()
 END_MESSAGE_MAP()
 void CImageTreeCtrl::OnContextCmd(UINT id) {
 	HTREEITEM hCur = GetSelectedItem();
@@ -169,8 +172,48 @@ void CImageTreeCtrl::OnContextCmd(UINT id) {
 bool CImageTreeCtrl::DoEditLabel(HTREEITEM hItem) 
 {
 	m_hSelItem=hItem;
+
+
+	//root 节点和root 下一级的节点不允许更改名字;
+	HTREEITEM root_item = CImageTreeCtrl::GetRootItem();
+	
+	if(hItem == root_item)
+	{
+		return false;
+	}
+	if(CImageTreeCtrl::ItemHasChildren(root_item))
+	{
+		HTREEITEM hChildItem =	CImageTreeCtrl::GetChildItem(root_item);
+		while(hChildItem != NULL)
+		{
+			if(hChildItem == hItem)
+			{
+				return false;
+				break;
+			}
+			hChildItem = CImageTreeCtrl::GetNextItem(hChildItem, TVGN_NEXT);
+
+
+		}
+	}
+
+
+
 	return hItem ? (EditLabel(hItem) != 0) : false;
 }
+
+
+
+
+
+bool CImageTreeCtrl::PingDevice(HTREEITEM hItem) 
+{
+	::PostMessage(MainFram_hwd,6677,(WPARAM)hItem,NULL);
+//	m_strPingIP = strIP;
+
+	return true;
+}
+
 
 bool CImageTreeCtrl::SortByConnection(HTREEITEM hItem) 
 {
@@ -1372,7 +1415,12 @@ try
 
 		// Do not meddle with selected items or drop highlighted items
 		//不对选中的节点和实行拖放功能的节点进行操作
-		UINT selflag = TVIS_DROPHILITED;// | TVIS_SELECTED;
+		//UINT selflag = TVIS_DROPHILITED;// | TVIS_SELECTED;
+		UINT selflag;
+		if(is_focus)
+			selflag = TVIS_DROPHILITED | TVIS_SELECTED;
+		else
+			selflag = TVIS_DROPHILITED;
 
 		//定义字体、颜色
 		Color_Font cf;
@@ -1451,6 +1499,8 @@ return;
 void CImageTreeCtrl::OnKillFocus(CWnd* pNewWnd)
 {
 //	PostMessage(WM_PAINT,NULL,NULL);
+	is_focus = false;
+	//TRACE(_T("Lose focus.................\n"));
 	CTreeCtrl::OnKillFocus(pNewWnd);
 
 	// TODO: Add your message handler code here
@@ -1510,6 +1560,8 @@ void CImageTreeCtrl::DisplayContextMenu(CPoint & point) {
             VERIFY(menu.AppendMenu(MF_STRING, ID_DELETE, _T("Delete\tDel")));
 			VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_CONNECTION, _T("Sort By Connection")));
 			VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_FLOOR, _T("Sort By Floor")));
+			VERIFY(menu.AppendMenu(MF_STRING, ID_PING_CMD, _T("Ping")));
+			
 		}
 // 		if(CanDeleteItem(hItem))
 // 			VERIFY(menu.AppendMenu(MF_STRING, ID_DELETE, _T("Delete\tDEL")));
@@ -1536,6 +1588,30 @@ void CImageTreeCtrl::OnRclick(NMHDR* pNMHDR, LRESULT* pResult)
 	GetCursorPos(&point);
 	ScreenToClient(&point);
 	HTREEITEM hItem = HitTest(point, &flags);
+	//::getroofi
+	HTREEITEM root_item = CImageTreeCtrl::GetRootItem();
+
+	if(CImageTreeCtrl::ItemHasChildren(root_item))
+	{
+		HTREEITEM hChildItem =	CImageTreeCtrl::GetChildItem(root_item);
+		while(hChildItem != NULL)
+		{
+			if(hChildItem == hItem)
+			{
+				hItem = NULL;
+				break;
+			}
+			hChildItem = CImageTreeCtrl::GetNextItem(hChildItem, TVGN_NEXT);
+	
+
+		}
+	}
+	
+
+
+
+	if(root_item == hItem)
+		hItem = NULL;
 	if(hItem != NULL)
 	{
 		if(hItem && (flags & TVHT_ONITEM) && !(flags & TVHT_ONITEMRIGHT))
@@ -1551,3 +1627,12 @@ void CImageTreeCtrl::OnRclick(NMHDR* pNMHDR, LRESULT* pResult)
 
 }
 #pragma endregion
+
+void CImageTreeCtrl::OnSetFocus(CWnd* pOldWnd)
+{
+	is_focus = true;
+	//TRACE(_T("Get focus.................\n"));
+	CTreeCtrl::OnSetFocus(pOldWnd);
+
+	// TODO: Add your message handler code here
+}

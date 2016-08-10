@@ -38,7 +38,7 @@ public:
 	void ReloadLabelsFromDB();
 	void PainNoImageInfo(CDC* pDC);
 	void Bacnet_Add_Label();
-	void Bacnet_Edit_Label();
+	void Bacnet_Edit_Label(bool allow_change = true);
 	int JudgeClickItem(CPoint & point);
 	//void Add_Label();
 	//void Edit_Label();
@@ -71,7 +71,6 @@ public:
 	virtual void OnCancel();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnBnClickedButtonAdd();
-	afx_msg void OnBnClickedButtonEdit();
 	afx_msg void OnBnClickedButtonScreenExit();
 	afx_msg void OnBnClickedButtonDelete();
 	afx_msg void OnBnClickedButtonDeleteAll();
@@ -81,6 +80,16 @@ public:
 	HICON default_icon;
 	HICON default_on_icon;
 	HICON default_off_icon;
+
+	HICON default_input_icon;
+	HICON default_output_icon;
+	HICON default_variable_icon;
+	HICON default_program_icon;
+	HICON default_pid_icon;
+	HICON default_holiday_icon;
+	HICON default_schedual_icon;
+	HICON default_trendlog_icon;
+	HICON default_screen_icon;
 
 	HICON lock_icon;
 	HICON unlock_icon;

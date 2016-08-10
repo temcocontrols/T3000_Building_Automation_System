@@ -69,7 +69,6 @@ BOOL CDebugWindow::OnInitDialog()
 	} 
 	h_debug_window = this->m_hWnd;
 
-	//m_debug_window_combo_show
 	m_debug_window_combo_show.ResetContent();
 
 	for (int i=0;i<sizeof(Debug_Combo_Choose)/sizeof(Debug_Combo_Choose[0]);i++)
@@ -116,9 +115,7 @@ void CDebugWindow::OnClose()
 void CDebugWindow::Change_Transparency(int persent)
 {
 	//int Transparency;
-	//Transparency = persent * 255 / 100;
-	//if(Transparency < 100)
-	//	Transparency = 100;
+
 	SetWindowLong(this->GetSafeHwnd(),GWL_EXSTYLE,GetWindowLong(this->GetSafeHwnd(),GWL_EXSTYLE)^0x80000);  
 	HINSTANCE    hInst    =    LoadLibrary(_T("User32.DLL"));  
 	if(hInst)  

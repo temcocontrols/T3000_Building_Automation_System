@@ -212,7 +212,6 @@ LRESULT BacnetScreen::OnHotKey(WPARAM wParam,LPARAM lParam)
 {
 	if (wParam==KEY_INSERT)
 	{
-		//OnBnClickedButtonProgramEdit();
 		for (int i=0;i<m_screen_list.GetItemCount();++i)
 		{
 			if(m_screen_list.GetCellChecked(i,0))

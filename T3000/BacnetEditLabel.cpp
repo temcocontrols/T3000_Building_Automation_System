@@ -48,7 +48,7 @@ IMPLEMENT_DYNAMIC(CBacnetEditLabel, CDialogEx)
 CBacnetEditLabel::CBacnetEditLabel(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CBacnetEditLabel::IDD, pParent)
 {
-
+	m_allow_change = true;
 }
 
 CBacnetEditLabel::~CBacnetEditLabel()
@@ -604,6 +604,9 @@ void CBacnetEditLabel::OnBnClickedMfccolorbuttonColor()
 void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 {
 	this->ShowWindow(SW_SHOW);
+
+
+
 	memcpy(&label_info,&temp_info,sizeof(Bacnet_Label_Info));
 	memcpy(&label_info_buffer,&temp_info,sizeof(Bacnet_Label_Info));
 	
@@ -717,6 +720,8 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 		return ;
 	}
 
+
+
 	if(temp_info.nSub_Panel != Station_NUM)
 	{
 		Point_Net temp_point;
@@ -797,6 +802,16 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					}
 					m_edit_auto_manual.SetWindowTextW(m_AutoManual);
 					m_edit_value.SetWindowTextW(m_value);
+
+					if((digital_status == 0) || (digital_status == 1))
+					{
+						//如果是数字量 就 disable 对话框 ，用来响应 click的改变事件;
+						m_edit_value.EnableWindow(FALSE);
+					}
+					else
+					{
+						m_edit_value.EnableWindow(TRUE);
+					}
 				}
 			}
 			break;
@@ -812,11 +827,12 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					m_original_name.Format(_T("%d-OUT%d"),temp_info.nMain_Panel,temp_info.nPoint_number + 1);
 					GetOutputLabel(temp_info.nPoint_number,m_label_name);
 					GetOutputFullLabel(temp_info.nPoint_number,m_full_label_name);
+					
+					GetOutputValue(temp_info.nPoint_number,m_value,m_unit,m_AutoManual,digital_status);
 
 					m_static_point.SetWindowTextW(m_original_name);
 					m_static_label.SetWindowTextW(m_label_name);
 					m_static_full_label.SetWindowTextW(m_full_label_name);
-					GetOutputValue(temp_info.nPoint_number,m_value,m_unit,m_AutoManual,digital_status);
 					if(m_AutoManual.CompareNoCase(_T("M")) == 0)
 					{			
 						m_AutoManual = _T("Manual");	
@@ -829,6 +845,16 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					}
 					m_edit_auto_manual.SetWindowTextW(m_AutoManual);
 					m_edit_value.SetWindowTextW(m_value);
+
+					if((digital_status == 0) || (digital_status == 1))
+					{
+						//如果是数字量 就 disable 对话框 ，用来响应 click的改变事件;
+						m_edit_value.EnableWindow(FALSE);
+					}
+					else
+					{
+						m_edit_value.EnableWindow(TRUE);
+					}
 				}
 			}
 			break;
@@ -861,6 +887,17 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					}
 					m_edit_auto_manual.SetWindowTextW(m_AutoManual);
 					m_edit_value.SetWindowTextW(m_value);
+
+					if((digital_status == 0) || (digital_status == 1))
+					{
+						//如果是数字量 就 disable 对话框 ，用来响应 click的改变事件;
+						m_edit_value.EnableWindow(FALSE);
+					}
+					else
+					{
+						m_edit_value.EnableWindow(TRUE);
+					}
+
 				}
 			}
 			break;
@@ -1090,6 +1127,14 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 			m_edit_icon2_path.ShowWindow(false);
 
 	}
+	if(m_allow_change == false)
+	{
+		m_edit_display.ShowWindow(SW_HIDE);
+		m_bkClrBtn.ShowWindow(SW_HIDE);
+		m_static_display.ShowWindow(SW_HIDE);
+		m_static_txtcol.ShowWindow(SW_HIDE);
+		ChangeWindowPos(0);
+	}
 
 	m_bkClrBtn.SetColor(label_info.nclrTxt);
 	GetDlgItem(IDC_BUTTON_LABEL_EXIT)->SetFocus();
@@ -1139,6 +1184,7 @@ LRESULT  CBacnetEditLabel::MessageCallBack(WPARAM wParam, LPARAM lParam)
 void CBacnetEditLabel::OnStnClickedStaticEditLabelDisplay()
 {
 	// TODO: Add your control notification handler code here
+	CString temp_cs;
 	if(label_info.nDisplay_Type == LABEL_SHOW_VALUE)
 	{
 		label_info.nDisplay_Type = LABEL_SHOW_FULL_DESCRIPTION;
@@ -1175,6 +1221,8 @@ void CBacnetEditLabel::OnStnClickedStaticEditLabelDisplay()
 		m_edit_display.SetWindowTextW(Label_Display_Array[label_info.nDisplay_Type]);
 		ChangeWindowPos(0);
 	}
+	temp_cs.Format(_T("%u"),label_info.nDisplay_Type);
+	WritePrivateProfileStringW(_T("Setting"),_T("AddLabelDefaultDisplay"),temp_cs,g_cstring_ini_path);
 }
 
 void CBacnetEditLabel::ChangeWindowPos(bool nshow)
@@ -1218,6 +1266,10 @@ void CBacnetEditLabel::OnClose()
 		Bacnet_Label_Info * temp_info = new Bacnet_Label_Info;
 		memcpy(temp_info,&label_info,sizeof(Bacnet_Label_Info));		 
 		 ::PostMessage(m_screenedit_dlg_hwnd,EDIT_LABEL_MESSAGE,(WPARAM)temp_info,NULL);
+	}
+	else
+	{
+		 ::PostMessage(m_screenedit_dlg_hwnd,EDIT_LABEL_MESSAGE,NULL,(LPARAM)2);
 	}
 
 	CDialogEx::OnClose();

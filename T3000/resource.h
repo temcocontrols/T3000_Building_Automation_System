@@ -158,14 +158,9 @@
 #define IDD_DISPLAY_CONFIG              453
 #define IDI_ICON_INPUT                  454
 #define IDD_T38AI8AO                    454
-#define IDI_ICON_PROGRAMING             455
 #define IDD_T38AI16O                    455
-#define IDI_ICON_OUTPUT                 456
 #define IDD_T38I13O                     456
-#define IDI_ICON_VARIABLE               457
 #define IDD_T332AI                      457
-#define IDI_ICON_WEEKLY                 458
-#define IDI_ICON_ANNUAL                 459
 #define IDD_T36CT                       459
 #define IDD_T328IN                      460
 #define IDD_DIALOG12                    461
@@ -266,6 +261,21 @@
 #define IDD_DIALOG_BUILDING_CONFIG      602
 #define IDD_DIALOG_OPTION               603
 #define IDR_SQLITE3DLL1                 604
+#define IDB_BITMAP_ALARM_BROWN          605
+#define IDB_BITMAP_ALARM_GREEN          606
+#define IDB_BITMAP8                     608
+#define IDB_BITMAP_ALARM_RED            608
+#define IDR_MENU_PROGRAMEDIT_RIGHT_CLICK 609
+#define IDB_BITMAP9                     610
+#define IDI_ICON_INPUT_DEFAULT          620
+#define IDI_ICON_DEFAULT_OUTPUT         624
+#define IDI_ICON_DEFAULT_VARIABLE       625
+#define IDI_ICON_DEFAULT_PROGRAM        626
+#define IDI_ICON_DEFAULT_GRAPHIC        628
+#define IDI_ICON_DEFAULT_HOLIDAY        629
+#define IDI_ICON_DEFAULT_SCHEDUAL       630
+#define IDI_ICON_DEFAULT_TRENDLOG       631
+#define IDI_ICON_DEFAULT_PID            632
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -350,7 +360,6 @@
 #define IDC_EDIT48                      1035
 #define IDC_DTS7                        1035
 #define IDC_EDIT_FAN_LOW_NAME           1035
-#define IDC_EDIT_ZIP2                   1035
 #define IDC_EDIT_EUNITS                 1035
 #define IDC_FIRMWARV_EDIT               1036
 #define IDC_START_POINT                 1036
@@ -2015,8 +2024,14 @@
 #define IDC_EDIT_PACKET_ERROR_3         2173
 #define IDC_COMBO_LANGUAGE              2173
 #define IDC_EDIT_TIMEOUT_1              2174
+#define IDC_EDIT_BAC_CUS_ANALOG_UNIT    2174
 #define IDC_EDIT_TIMEOUT_2              2175
+#define IDC_STATIC_CUS_ANALOG_VALUE     2175
 #define IDC_EDIT_TIMEOUT_3              2176
+#define IDC_BUTTON_BAC_SETTING_OK       2176
+#define IDC_BUTTON_BAC_SETTING_CANCEL   2177
+#define IDC_STATIC_INPUT_PIC            2178
+#define IDC_BUTTON_HEALTH_CLEAR         2179
 #define IDC_HELP_HELP1                  3831
 #define IDC_STATIC_BAC_SETTING_SD_CARD  5817
 #define IDC_MFCCOLORBUTTON_FUNCTION     5818
@@ -2047,6 +2062,7 @@
 #define IDC_BUTTON_START_DOWNLOAD       5836
 #define IDC_EDIT_SETTING_LAST_UPDATE_TIME 5836
 #define IDC_EDIT_PRODUCT_ID             5837
+#define IDC_STATIC_SEETING_SERIAL_NUMBER_2 5837
 #define IDC_EDIT_PRODUCT_ID2            5838
 #define IDC_EDIT_PRODUCT_NAME           5838
 #define IDD_DIALOG_TSTAT_ZIGBEE_LOGIC   8501
@@ -2188,7 +2204,6 @@
 #define IDC_RADIO86                     15579
 #define IDC_RADIO87                     15580
 #define IDC_RADIO88                     15581
-#define IDC_RADIO_NEW200                15581
 #define IDC_RADIO89                     15582
 #define IDC_RADIO90                     15583
 #define IDC_RADIO91                     15584
@@ -2200,6 +2215,8 @@
 #define IDC_RADIO97                     15590
 #define IDC_RADIO98                     15591
 #define IDC_RADIO99                     15592
+#define IDC_RADIO100                    15593
+#define IDC_RADIO_NEW200                19484
 #define ID_TIMEBASE_1HOUR               19485
 #define IDC_STATIC__LOGIN_NAME          32709
 #define IDC_STATIC_LOGIN_PASSWORD       32710
@@ -2434,6 +2451,7 @@
 #define ID_FILE_EXPORTREGISETERSLIST1   34054
 #define ID_TOOLS_PSYCHROMETRY           34055
 #define ID_TOOLS_OPTION                 34056
+#define ID_PROPERTIES_GOTODEFINITION    34057
 #define ID_HELP_USING_UPDATE            34904
 #define ID_DATABASE_BACNETTOOL          34905
 #define IDD_DIALOG_BACNET_PROGRAM       34906
@@ -2496,13 +2514,22 @@
 #define IDC_BUTTON_WRITE_SERIAL_NO      60039
 #define IDC_EDIT_LISTENPORT             60040
 
+#define IDC_STATIC_IP_INFOR             60041
+ 
+ 
+#define IDC_STATIC_IP_MODEL             60043
+#define IDC_STATIC_MAC_ADDRESS          60044
+#define IDC_STATIC_GATEWAY_ADDRESS      60045
+#define IDC_STATIC_SUBNET_MASK          60046
+#define IDC_STATIC_IP_PORT              60047
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        605
-#define _APS_NEXT_COMMAND_VALUE         34057
-#define _APS_NEXT_CONTROL_VALUE         2174
+#define _APS_NEXT_RESOURCE_VALUE        635
+#define _APS_NEXT_COMMAND_VALUE         34058
+#define _APS_NEXT_CONTROL_VALUE         2180
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

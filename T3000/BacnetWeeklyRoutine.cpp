@@ -67,7 +67,6 @@ LRESULT  BacnetWeeklyRoutine::WeeklyMessageCallBack(WPARAM wParam, LPARAM lParam
 	{
 		Show_Results = temp_cs + _T("Success!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
-		//MessageBox(_T("Bacnet operation success!"));
 	}
 	else
 	{
@@ -75,10 +74,8 @@ LRESULT  BacnetWeeklyRoutine::WeeklyMessageCallBack(WPARAM wParam, LPARAM lParam
 		PostMessage(WM_REFRESH_BAC_WEEKLY_LIST,pInvoke->mRow,REFRESH_ON_ITEM);
 		Show_Results = temp_cs + _T("Fail!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
-		//AfxMessageBox(Show_Results);
-		//MessageBox(_T("Bacnet operation fail!"));
+
 	}
-	//m_weeklyr_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR);
 
 	if((pInvoke->mRow%2)==0)	//»Ö¸´Ç°¾°ºÍ ±³¾° ÑÕÉ«;
 		m_weeklyr_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
@@ -128,10 +125,7 @@ LRESULT BacnetWeeklyRoutine::OnHotKey(WPARAM wParam,LPARAM lParam)
 	if (wParam==KEY_INSERT)
 	{
 		OnBnClickedButtonWeeklyScheduleEdit();
-		//CBacnetScheduleTime DLG;
-		//DLG.DoModal();
 	}
-	//::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_PROGRAMCODE);
 	return 0;
 }
 
@@ -141,7 +135,6 @@ BOOL BacnetWeeklyRoutine::OnInitDialog()
 
 	// TODO:  Add extra initialization here
 	Initial_List();
-//	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);
 	PostMessage(WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -412,7 +405,6 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_List(WPARAM wParam,LPARAM lParam)
 		}
 	}
 	copy_data_to_ptrpanel(TYPE_WEEKLY);
-	//MessageBox("1");
 	return 0;
 }
 
@@ -459,8 +451,6 @@ void BacnetWeeklyRoutine::OnClose()
 void BacnetWeeklyRoutine::OnCancel()
 {
 	// TODO: Add your specialized code here and/or call the base class
-	//UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
-	//KillTimer(1);
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
 //	CDialogEx::OnCancel();
 }

@@ -2887,7 +2887,7 @@ void CNewHumChamberView::start(){
 	int ret_n = Open_Socket2(_T("192.168.0.113"),10000);
 	if(ret_n < 0)
 	{
-		AfxMessageBox(_T("Can't connect to Minipanel"));
+		AfxMessageBox(_T("Can't connect to T3-BB/LB/TB"));
 		m_isstart=false;
 		return;
 	}

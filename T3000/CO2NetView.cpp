@@ -61,44 +61,46 @@ CCO2NetView::~CCO2NetView()
 
 void CCO2NetView::DoDataExchange(CDataExchange* pDX)
 {
-    CFormView::DoDataExchange(pDX);
-    DDX_Control(pDX, IDC_ID_CO2_EDIT, m_edit_IDAddress);
-    DDX_Control(pDX, IDC_SERIALNUM_CO2_EDIT, m_edit_SN);
-    DDX_Control(pDX, IDC_FIRMWARV_CO2_EDIT, m_Edit_FVevsion);
-    DDX_Control(pDX, IDC_HARDWAREV_CO2_EDIT, m_Edit_HardVer);
-    DDX_Control(pDX, IDC_CO2_BRAUDRATECOMBO, m_Combox_braudrate);
-    DDX_Control(pDX, IDC_EDIT_CO2_HUMIDITY, m_Edit_RHum);
-    DDX_Control(pDX, IDC_RADIO_ALARM_MANUAL, m_AlarmSetting_M);
-    DDX_Control(pDX, IDC_RADIO_ALARM_AUTO, m_AlarmSetting_Auto);
-    DDX_Control(pDX, IDC_CO2_ALARM_STATE, m_Combox_CO2State);
+	CFormView::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_ID_CO2_EDIT, m_edit_IDAddress);
+	DDX_Control(pDX, IDC_SERIALNUM_CO2_EDIT, m_edit_SN);
+	DDX_Control(pDX, IDC_FIRMWARV_CO2_EDIT, m_Edit_FVevsion);
+	DDX_Control(pDX, IDC_HARDWAREV_CO2_EDIT, m_Edit_HardVer);
+	DDX_Control(pDX, IDC_CO2_BRAUDRATECOMBO, m_Combox_braudrate);
+	DDX_Control(pDX, IDC_EDIT_CO2_HUMIDITY, m_Edit_RHum);
+	DDX_Control(pDX, IDC_RADIO_ALARM_MANUAL, m_AlarmSetting_M);
+	DDX_Control(pDX, IDC_RADIO_ALARM_AUTO, m_AlarmSetting_Auto);
+	DDX_Control(pDX, IDC_CO2_ALARM_STATE, m_Combox_CO2State);
 
-    DDX_Control(pDX, IDC_EDIT_CO2_PASSWOR, m_Edit_Password);
-    DDX_Control(pDX, IDC_COMBO_IPModel, m_Combox_IpModel);
-    DDX_Control(pDX, IDC_MAC_ADDRESS, m_Edit_MACAddress);
-    DDX_Control(pDX, IDC_IPADDRESS_IP, m_IPCtrl_IpAddress);
-    DDX_Control(pDX, IDC_IPADDRESS_Gateway, m_IpCtrl_Gateway);
-    DDX_Control(pDX, IDC_IPADDRESS_Subnet, m_IpCtrl_Subnet);
-    DDX_Control(pDX, IDC_EDIT_ListeningPort, m_Edit_Port);
-    DDX_Control(pDX, IDC_EDIT_EXTERNAL_TEMP, m_Edit_External_Temp);
-    DDX_Control(pDX, IDC_EDIT_INTERNAL_TEMP, m_Internal_Temp);
-    DDX_Control(pDX, IDC_CO2_TEMP_UNIT, m_Combox_TempUnit);
-    DDX_Control(pDX, IDC_COMBO_CO2_SENSOR_SEL, m_Edit_SensorSelect);
-    DDX_Control(pDX, IDC_CO2_CALIBRATING_OFFSET, m_Edit_Calibrate_Offset);
-    DDX_Control(pDX, IDC_CO2_ALARM_SETPOINT, m_Edit_Alarm_Setpoint);
-    DDX_Control(pDX, IDC_CO2_PREPARE_ALARM_SETPOINT, m_Edit_PreAlarm_Setpoint);
-    DDX_Control(pDX, IDC_CO2_ALARM_ON_TIME, m_Edit_AlarmOn);
-    DDX_Control(pDX, IDC_CO2_ALARM_OFF_TIME, m_Edit_AlarmOff);
-    DDX_Control(pDX, IDC_EDIT_CO2_BLOCK_TIME, m_Edit_MenuBlockTimes);
-    DDX_Control(pDX, IDC_EDIT_CO2_BACKLIGHT_TIME, m_Edit_BacklightTime);
-    DDX_Control(pDX, IDC_RADIO_HUMIDITY_HEAT_ENABLE, m_HeatingHumiditySensor_Enable);
-    DDX_Control(pDX, IDC_RADIO_HUMIDITY_HEAT_DISABLE, m_HeatingHumiditySensor_Disable);
-    DDX_Control(pDX, IDC_ENABLE_PASSWORD, m_Check_Enable_Password);
-    DDX_Control(pDX, IDC_MSFLEXGRID1, m_msflexgrid);
-    DDX_Control(pDX, IDC_CO2_DATETIMEPICKER_TIME, m_co2_time_picker);
-    DDX_Control(pDX, IDC_CO2_DATETIMEPICKER1, m_co2_day_picker);
-    DDX_Control(pDX, IDC_EDIT_CO2_VALUE, m_edit_co2_value);
-    //  DDX_Control(pDX, IDC_CO2_INPUT_LIST, m_co2_inputs_list);
-    DDX_Control(pDX, IDC_MSFLEXGRID_INPUT, m_grid_input);
+	DDX_Control(pDX, IDC_EDIT_CO2_PASSWOR, m_Edit_Password);
+	DDX_Control(pDX, IDC_COMBO_IPModel, m_Combox_IpModel);
+	DDX_Control(pDX, IDC_MAC_ADDRESS, m_Edit_MACAddress);
+	DDX_Control(pDX, IDC_IPADDRESS_IP, m_IPCtrl_IpAddress);
+	DDX_Control(pDX, IDC_IPADDRESS_Gateway, m_IpCtrl_Gateway);
+	DDX_Control(pDX, IDC_IPADDRESS_Subnet, m_IpCtrl_Subnet);
+	DDX_Control(pDX, IDC_EDIT_ListeningPort, m_Edit_Port);
+	DDX_Control(pDX, IDC_EDIT_EXTERNAL_TEMP, m_Edit_External_Temp);
+	DDX_Control(pDX, IDC_EDIT_INTERNAL_TEMP, m_Internal_Temp);
+	DDX_Control(pDX, IDC_CO2_TEMP_UNIT, m_Combox_TempUnit);
+	DDX_Control(pDX, IDC_COMBO_CO2_SENSOR_SEL, m_Edit_SensorSelect);
+	DDX_Control(pDX, IDC_CO2_CALIBRATING_OFFSET, m_Edit_Calibrate_Offset);
+	DDX_Control(pDX, IDC_CO2_ALARM_SETPOINT, m_Edit_Alarm_Setpoint);
+	DDX_Control(pDX, IDC_CO2_PREPARE_ALARM_SETPOINT, m_Edit_PreAlarm_Setpoint);
+	DDX_Control(pDX, IDC_CO2_ALARM_ON_TIME, m_Edit_AlarmOn);
+	DDX_Control(pDX, IDC_CO2_ALARM_OFF_TIME, m_Edit_AlarmOff);
+	DDX_Control(pDX, IDC_EDIT_CO2_BLOCK_TIME, m_Edit_MenuBlockTimes);
+	DDX_Control(pDX, IDC_EDIT_CO2_BACKLIGHT_TIME, m_Edit_BacklightTime);
+	DDX_Control(pDX, IDC_RADIO_HUMIDITY_HEAT_ENABLE, m_HeatingHumiditySensor_Enable);
+	DDX_Control(pDX, IDC_RADIO_HUMIDITY_HEAT_DISABLE, m_HeatingHumiditySensor_Disable);
+	DDX_Control(pDX, IDC_ENABLE_PASSWORD, m_Check_Enable_Password);
+	DDX_Control(pDX, IDC_MSFLEXGRID1, m_msflexgrid);
+	DDX_Control(pDX, IDC_CO2_DATETIMEPICKER_TIME, m_co2_time_picker);
+	DDX_Control(pDX, IDC_CO2_DATETIMEPICKER1, m_co2_day_picker);
+	DDX_Control(pDX, IDC_EDIT_CO2_VALUE, m_edit_co2_value);
+	//  DDX_Control(pDX, IDC_CO2_INPUT_LIST, m_co2_inputs_list);
+	DDX_Control(pDX, IDC_MSFLEXGRID_INPUT, m_grid_input);
+	DDX_Control(pDX, IDC_LIST_USER, m_user_list);
+	DDX_Control(pDX, IDC_LIST_OUTPUT_AQ, m_output_list);
 }
 
 BEGIN_MESSAGE_MAP(CCO2NetView, CFormView)
@@ -163,13 +165,49 @@ void CCO2NetView::Fresh()
         Flag_Reg=TRUE;
     }
     g_NEED_MULTI_READ = FALSE;
-    register_critical_section.Lock();
-    for(int i=0; i<27; i++)
-    {
-        Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100);
-    }
-    register_critical_section.Unlock();
+     register_critical_section.Lock();
+     for(int i=0; i<27; i++)
+     {
+         Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100);
+     }
+     register_critical_section.Unlock();
+
     Initial_Window();
+	
+	if (product_register_value[7] == STM32_CO2_RS485)
+	{
+		GetDlgItem(IDC_STATIC_IP_INFOR)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_IP_MODEL)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_COMBO_IPModel)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_MAC_ADDRESS)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_MAC_ADDRESS)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_IPADDRESS)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_GATEWAY_ADDRESS)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_SUBNET_MASK)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_IPADDRESS_IP)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_IPADDRESS_Gateway)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_IPADDRESS_Subnet)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_IP_PORT)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_EDIT_ListeningPort)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_BUTTON_APPLY)->ShowWindow(SW_HIDE);
+	} 
+	else
+	{
+		GetDlgItem(IDC_STATIC_IP_INFOR)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_IP_MODEL)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_COMBO_IPModel)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_MAC_ADDRESS)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_MAC_ADDRESS)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_IPADDRESS)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_GATEWAY_ADDRESS)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_SUBNET_MASK)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_IPADDRESS_IP)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_IPADDRESS_Gateway)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_IPADDRESS_Subnet)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_IP_PORT)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_EDIT_ListeningPort)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_BUTTON_APPLY)->ShowWindow(SW_SHOW);
+	}
     if(hFirstThread != NULL)
         TerminateThread(hFirstThread, 0);
     hFirstThread=NULL;
@@ -348,6 +386,14 @@ void CCO2NetView::Initial_Window()
     m_Combox_braudrate.ResetContent();
     m_Combox_braudrate.AddString(_T("9600"));
     m_Combox_braudrate.AddString(_T("19200"));
+	m_Combox_braudrate.AddString(_T("38400"));
+	m_Combox_braudrate.AddString(_T("57600"));
+	m_Combox_braudrate.AddString(_T("115200"));
+	if (product_register_value[7] == STM32_CO2_NET||product_register_value[7] == STM32_CO2_RS485)
+	{
+		CO2_NET_MODBUS_BAUDRATE = 15;
+	}
+	 
     m_Combox_braudrate.SetCurSel(product_register_value[CO2_NET_MODBUS_BAUDRATE]);
     float fTemp;
     fTemp = (float)product_register_value[CO2_NET_MODBUS_HUMIDITY]/10;
@@ -620,7 +666,6 @@ void CCO2NetView::Fresh_Grid()
             StrTemp.Format(_T("%d"),product_register_value[CO2_NET_MODBUS_CO2_EXTERNAL_START + i - 1]);
         }
         m_msflexgrid.put_TextMatrix(i,3,StrTemp);
-
         StrTemp.Format(_T("%d"),product_register_value[CO2_NET_MODBUS_CO2_EXTERNAL_PREALARM_SETPOINT_START + i - 1]);
         m_msflexgrid.put_TextMatrix(i,4,StrTemp);
         StrTemp.Format(_T("%d"),product_register_value[CO2_NET_MODBUS_CO2_EXTERNAL_ALARM_SETPOINT_START + i - 1]);
@@ -654,17 +699,35 @@ void CCO2NetView::Show_PassWord()
 
 }
 void CCO2NetView::Show_TCPIP()
-{
+{   
+	if (product_register_value[7] == STM32_CO2_RS485)
+	{
+		return;
+	}
+    if (product_register_value[7] == STM32_CO2_NET)
+    {
+		CO2_NET_MODBUS_MAC_ADDRESS_START = 40;
+    }
     CString strtemp;
     strtemp.Format(_T("%02X-%02X-%02X-%02X-%02X-%02X"),product_register_value[CO2_NET_MODBUS_MAC_ADDRESS_START],product_register_value[CO2_NET_MODBUS_MAC_ADDRESS_START+1],product_register_value[CO2_NET_MODBUS_MAC_ADDRESS_START+2],product_register_value[CO2_NET_MODBUS_MAC_ADDRESS_START+3],product_register_value[CO2_NET_MODBUS_MAC_ADDRESS_START+4],product_register_value[CO2_NET_MODBUS_MAC_ADDRESS_START+5]);
     m_Edit_MACAddress.SetWindowText(strtemp);
-
+	if (product_register_value[7] == STM32_CO2_NET)
+	{
+		CO2_NET_MODBUS_IP_MODE = 46;
+	}
     m_Combox_IpModel.SetCurSel(product_register_value[CO2_NET_MODBUS_IP_MODE]);
     //CO2_NET_MODBUS_IP_ADDRESS_START
     //CO2_NET_MODBUS_SUBNET_MASK_ADDRESS_START
     //CO2_NET_MODBUS_GATEWAY_ADDRESS_START
     //CO2_NET_MODBUS_TCP_SERVER_ENABLE
     //CO2_NET_MODBUS_LISTEN_PORT_AT_TCP_SERVER_MODE_START
+	if (product_register_value[7] == STM32_CO2_NET)
+	{
+		CO2_NET_MODBUS_IP_ADDRESS_START = 47;
+		CO2_NET_MODBUS_SUBNET_MASK_ADDRESS_START = 51;
+		CO2_NET_MODBUS_GATEWAY_ADDRESS_START = 55;
+		CO2_NET_MODBUS_LISTEN_PORT_AT_TCP_SERVER_MODE_START = 60;
+	}
     m_IPCtrl_IpAddress.SetAddress((BYTE)product_register_value[CO2_NET_MODBUS_IP_ADDRESS_START],
                                   (BYTE)product_register_value[CO2_NET_MODBUS_IP_ADDRESS_START+1],
                                   (BYTE)product_register_value[CO2_NET_MODBUS_IP_ADDRESS_START+2],
@@ -1023,6 +1086,15 @@ void CCO2NetView::OnBnClickedButtonApply()
         AfxMessageBox(_T("The listen port number must be greater than 0!"));
         return;
     }
+	if (product_register_value[7] == STM32_CO2_NET)
+	{
+		CO2_NET_MODBUS_LISTEN_PORT_AT_TCP_SERVER_MODE_GHOST_START = 60+15;
+		CO2_NET_MODBUS_IP_ADDRESS_GHOST_START = 47+15; 
+		CO2_NET_MODBUS_SUBNET_MASK_ADDRESS_GHOST_START = 51+15;
+		CO2_NET_MODBUS_GATEWAY_ADDRESS_GHOST_START = 55+15;
+		CO2_NET_MODBUS_ENABLE_GHOST = 76;
+	}
+
     write_one(g_tstat_id,CO2_NET_MODBUS_LISTEN_PORT_AT_TCP_SERVER_MODE_GHOST_START,m_nListenPort);
     product_register_value[CO2_NET_MODBUS_LISTEN_PORT_AT_TCP_SERVER_MODE_GHOST_START]=m_nListenPort;
     BYTE address1,address2,address3,address4;
@@ -1492,3 +1564,268 @@ LRESULT CCO2NetView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
     return CFormView::WindowProc(message, wParam, lParam);
 }
+void CCO2NetView::Initial_OutputList()
+{
+	int AddressValue = -1;
+	CString strTemp;
+	m_output_list.ShowWindow(SW_HIDE);
+	m_output_list.DeleteAllItems();
+	while ( m_output_list.DeleteColumn (0)) ;
+
+	m_output_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
+	m_output_list.SetExtendedStyle(m_output_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));
+	m_output_list.InsertColumn(0, _T("NUM"), 40, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
+	m_output_list.InsertColumn(1, _T("Full Label"), 60, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_output_list.InsertColumn(2, _T("Value"), 45, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_output_list.InsertColumn(3, _T("Range"), 45, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_output_list.InsertColumn(4, _T("Min Out Scale"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_output_list.InsertColumn(5, _T("Max Out Scale"), 85, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	//²»ÏÖÊµ AM
+	
+		m_output_list.InsertColumn(6, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	
+
+	g_hwnd_now = this->m_hWnd;
+	m_output_list.InsertItem(0,_T("1"));
+	m_output_list.InsertItem(1,_T("2"));
+	m_output_list.InsertItem(2,_T("3"));
+	m_output_list.SetItemText(0,1,_T("Temperature"));
+	m_output_list.SetItemText(1,1,_T("Humidity"));
+	m_output_list.SetItemText(2,1,_T("CO2"));
+
+		AddressValue =1255;
+		strTemp.Format(_T("%0.1f"),((float)(short)(0-product_register_value[AddressValue]))/10.0);
+		m_output_list.SetItemText(0,4,strTemp);
+
+		AddressValue =1256;
+		strTemp.Format(_T("%0.1f"),(float)(short)(1000-product_register_value[AddressValue])/10.0);
+		m_output_list.SetItemText(0,5,strTemp);
+	 
+
+
+		AddressValue =1257;
+		strTemp.Format(_T("%0.1f"),((float)(short)(0-product_register_value[AddressValue]))/10.0);
+		m_output_list.SetItemText(1,4,strTemp);
+
+		AddressValue =1258;
+		strTemp.Format(_T("%0.1f"),(float)(short)(1000-product_register_value[AddressValue])/10.0);
+		m_output_list.SetItemText(1,5,strTemp);
+
+		AddressValue =1259;
+		strTemp.Format(_T("%0.1f"),((float)(short)(0-product_register_value[AddressValue]))/10.0);
+		m_output_list.SetItemText(1,4,strTemp);
+
+		AddressValue =1260;
+		strTemp.Format(_T("%0.1f"),(float)(short)(1000-product_register_value[AddressValue])/10.0);
+		m_output_list.SetItemText(1,5,strTemp);
+ 
+
+ 
+		AddressValue =1254;
+	 
+
+		int output_range=product_register_value[AddressValue];
+		if (output_range==1)
+		{
+			strTemp=_T("0-10v");
+		}
+		else if (output_range==2)
+		{
+			strTemp=_T("0-5v");
+		}
+		else if (output_range==3)
+		{
+			strTemp=_T("4-20mA");
+		}
+		else
+		{
+			strTemp=_T("");
+		}
+		m_output_list.SetItemText(0,3,strTemp);
+		m_output_list.SetItemText(1,3,strTemp);
+		m_output_list.SetItemText(2,3,strTemp);
+
+		AddressValue =1255;
+		strTemp.Format(_T("%0.1f"),((float)(short)(0-product_register_value[AddressValue]))/10.0);
+		m_output_list.SetItemText(0,4,strTemp);
+
+		float offsetvalue,Vtemp,Vhum;
+		float Temp,HUM;
+
+		if (output_range==1||output_range == 2)
+		{
+			Temp=((float)((short)product_register_value[3066]));
+			Vtemp=(Temp)/100;
+			strTemp.Format(_T("%.2f v"),Vtemp);
+		}
+		else if (output_range==3)
+		{
+			Temp=((float)((short)product_register_value[3066]));
+			Vtemp=(Temp)/100;
+			strTemp.Format(_T("%.2f ma"),Vtemp);
+		}
+		else
+		{
+			strTemp=_T("0");
+		}
+		m_output_list.SetItemText(0,2,strTemp);
+ 
+		if (output_range==1||output_range == 2)
+		{
+			Temp=((float)((short)product_register_value[3067]));
+			Vtemp=(Temp)/100;
+			strTemp.Format(_T("%.2f v"),Vtemp);
+		}
+		else if (output_range==3)
+		{
+			Temp=((float)((short)product_register_value[3067]));
+			Vtemp=(Temp)/100;
+			strTemp.Format(_T("%.2f ma"),Vtemp);
+		}
+		else
+		{
+			strTemp=_T("0");
+		}
+		m_output_list.SetItemText(1,2,strTemp);
+
+		if (output_range==1||output_range == 2)
+		{
+			Temp=((float)((short)product_register_value[3068]));
+			Vtemp=(Temp)/100;
+			strTemp.Format(_T("%.2f v"),Vtemp);
+		}
+		else if (output_range==3)
+		{
+			Temp=((float)((short)product_register_value[3068]));
+			Vtemp=(Temp)/100;
+			strTemp.Format(_T("%.2f ma"),Vtemp);
+		}
+		else
+		{
+			strTemp=_T("0");
+		}
+		m_output_list.SetItemText(2,2,strTemp);
+
+		AddressValue = 1250;
+		bitset<16> AM(product_register_value[AddressValue]);
+		if (!AM[0])
+		m_output_list.SetItemText(0,6,Global_String_AUTO);
+
+
+	m_output_list.ShowWindow(SW_SHOW);
+}
+ 
+void CCO2NetView::Initial_UserList()
+{
+	//m_input_list.InsertColumn(0, _T("NUM"), 50, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
+	//m_input_list.InsertColumn(1, _T("Full Label"), 70, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	//m_input_list.InsertColumn(2, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	//m_input_list.InsertColumn(3, _T("Value"), 50, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	//m_input_list.InsertColumn(4, _T("Range"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	//m_input_list.InsertColumn(5, _T("Calibration"), 60, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+
+	CString strTemp;
+	int AddressValue = 0;
+	m_user_list.DeleteAllItems();
+	while ( m_user_list.DeleteColumn (0)) ;
+
+
+	m_user_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
+	m_user_list.SetExtendedStyle(m_user_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));
+
+	m_user_list.InsertColumn(0, _T("NUM"), 50, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
+	m_user_list.InsertColumn(1, _T("Full Label"), 90, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_user_list.InsertColumn(2, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_user_list.InsertColumn(3, _T("Value"), 50, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_user_list.InsertColumn(4, _T("Range"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_user_list.InsertColumn(5, _T("Calibration"), 100, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+
+
+	g_hwnd_now = this->m_hWnd;
+
+	CString index;
+	for (int i=0; i< 4; i++)
+	{
+		index.Format(_T("%d"),i+1);
+		m_user_list.InsertItem(i,index);
+	}
+	int MODBUS_DEW_PT = 370;   //unit.C
+	int MODBUS_DEW_PT_F = MODBUS_DEW_PT +1;  //unit.F
+	int MODBUS_PWS= MODBUS_DEW_PT +2;    //unit.hPa
+	int MODBUS_MIX_RATIO= MODBUS_DEW_PT +3;  //unit.g/kg
+	int MODBUS_ENTHALPY= MODBUS_DEW_PT +4;  //unit.kJ/kg
+
+	if (product_register_value[7] == PM_HUMTEMPSENSOR)
+	{
+		MODBUS_DEW_PT = 482;   //unit.C
+		MODBUS_DEW_PT_F = MODBUS_DEW_PT +1;  //unit.F
+		MODBUS_PWS= 488;    //unit.hPa
+		MODBUS_MIX_RATIO= 489;  //unit.g/kg
+		MODBUS_ENTHALPY= 490;  //unit.kJ/kg
+	}
+	else
+	{
+		MODBUS_DEW_PT = 370;   //unit.C
+		MODBUS_DEW_PT_F = MODBUS_DEW_PT +1;  //unit.F
+		MODBUS_PWS= MODBUS_DEW_PT +2;    //unit.hPa
+		MODBUS_MIX_RATIO= MODBUS_DEW_PT +3;  //unit.g/kg
+		MODBUS_ENTHALPY= MODBUS_DEW_PT +4;  //unit.kJ/kg
+	}
+	if (product_register_value[7] == PM_HUMTEMPSENSOR||product_register_value[7] == PM_AirQuality||product_register_value[7]==PM_HUM_R)
+	{
+		m_user_list.SetItemText(0,1,_T("Dew Point"));
+
+		m_user_list.SetItemText(0,2,NO_APPLICATION);
+
+
+
+		if(product_register_value[121]==0)
+		{
+			AddressValue =MODBUS_DEW_PT;
+			strTemp.Format(_T("%0.1f"),((float)((short)product_register_value[AddressValue]))/10.0);
+			m_user_list.SetItemText(0,3,strTemp);
+			m_user_list.SetItemText(0,4,Global_String_C);
+		}
+		else
+		{
+
+			AddressValue =MODBUS_DEW_PT_F;
+			strTemp.Format(_T("%0.1f"),((float)((short)product_register_value[AddressValue]))/10.0);
+			m_user_list.SetItemText(0,3,strTemp);
+			m_user_list.SetItemText(0,4,Glocal_String_F);
+		}
+
+
+
+
+
+		//strTemp.Format(_T("%d"),product_register_value[MODBUS_AQ_FILTER]);
+		m_user_list.SetItemText(0,5,NO_APPLICATION );
+
+		//
+		m_user_list.SetItemText (1,1,L"Partial Pressure");
+		m_user_list.SetItemText(1,2,NO_APPLICATION);
+		strTemp.Format(_T("%0.1f"),((float)((short)product_register_value[MODBUS_PWS]))/10.0);
+		m_user_list.SetItemText(1,3,strTemp);
+		m_user_list.SetItemText(1,4,L"hPa");
+		m_user_list.SetItemText(1,5,NO_APPLICATION );
+
+
+		m_user_list.SetItemText (2,1,L"Mixing Ratio");
+		m_user_list.SetItemText(2,2,NO_APPLICATION);
+		strTemp.Format(_T("%0.1f"),((float)((short)product_register_value[MODBUS_MIX_RATIO]))/10.0);
+		m_user_list.SetItemText(2,3,strTemp);
+		m_user_list.SetItemText(2,4,L"g/Kg");
+		m_user_list.SetItemText(2,5,NO_APPLICATION );
+
+		m_user_list.SetItemText (3,1,L"Enthalpy");
+		m_user_list.SetItemText(3,2,NO_APPLICATION);
+		strTemp.Format(_T("%0.1f"),((float)((short)product_register_value[MODBUS_ENTHALPY]))/10.0);
+		m_user_list.SetItemText(3,3,strTemp);
+		m_user_list.SetItemText(3,4,L"KJ/kg");
+		m_user_list.SetItemText(3,5,NO_APPLICATION );
+
+	}
+
+}
+

@@ -882,8 +882,8 @@ void CRegisterViewerDlg::LoadDataFromDB()
     temp.Format(_T("Product Name"));
     GetDlgItem(IDC_STATIC_PRODUCTNAME)->SetWindowText(temp);
 
-    GetDlgItem(IDC_EDIT_PRODUCTNAME)->SetWindowText(GetProductName(product_register_value[7]));
-
+    GetDlgItem(IDC_EDIT_PRODUCTNAME)->SetWindowText(ProductModelName);
+//GetProductName(product_register_value[7])
 
 }
 void CRegisterViewerDlg::ShowCurPage()

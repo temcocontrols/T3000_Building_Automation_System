@@ -92,6 +92,8 @@ public:
 	CEdit m_setting_obj_instance;
 	afx_msg void OnEnKillfocusEditSettingObjInstance();
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
+	afx_msg void OnBnClickedButtonBacSettingOk();
+	afx_msg void OnBnClickedButtonBacSettingCancel();
 };
 
 

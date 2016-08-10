@@ -797,7 +797,7 @@ OUTPUT bool Open_Socket2(CString strIPAdress,short nPort)
     //if(g_Commu_type==0)
     //	return false;
 
-    int nNetTimeout=2000;//1 second.
+    int nNetTimeout=3000;//1 second.
     WSADATA wsaData;
     WORD sockVersion = MAKEWORD(2, 2);
 
@@ -5633,9 +5633,8 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
             //WriteLogFile(_T(">>No one device answer......"));
         }
 
-
-
-        if(gval[8]==0 && gval[9]==0 && gval[10]==0 && gval[11]==0 && gval[12]==0)
+		if(gval[7]==0 && gval[8]==0 && gval[9]==0 && gval[10]==0 && gval[11]==0 && gval[12]==0)  //modify by fance .解决扫描校验刚好为0而扫不到的 bug;
+        //if(gval[8]==0 && gval[9]==0 && gval[10]==0 && gval[11]==0 && gval[12]==0)
         {
             //old scan protocal
             old_or_new_scan_protocal_in_dll=2;
@@ -5677,6 +5676,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
         }
         else
         {
+
             // new scan protocal,if many old tstat ,get into here ,scan result is oK too.
             old_or_new_scan_protocal_in_dll=1;
             Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
@@ -5689,7 +5689,10 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
                 return -2;
             if(gval[8]!=(crc & 0xff))
                 return -2;
+
         }
+
+
         //here is different with CheckTstatOnline() function
         //	TRACE("%d R:%x %x %x %x %x %x %x %x %x %x %x %x %x\n",ddd,gval[0],gval[1],gval[2],gval[3],gval[4],gval[5],gval[6],gval[7],gval[8],gval[9],gval[10],gval[11],gval[12]);
         //	TRACE("%d ^-^ ^-^ %d^\n",ddd,gval[2]);

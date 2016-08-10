@@ -473,6 +473,7 @@ public:
     afx_msg void OnUpdateScanDevice(CCmdUI *pCmdUI);
     afx_msg void OnUpdateAddBuildingConfig(CCmdUI *pCmdUI);
 	afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct);
+	afx_msg LRESULT CMainFrame::PingDevice(WPARAM wParam, LPARAM lParam);
 	void OnTestPing(const CString& strIP);
     UINT m_nStyle;
 	afx_msg void OnHelpUpdatefirmware();

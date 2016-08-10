@@ -5,6 +5,7 @@
 #include "afxdtctl.h"
 #include "CM5/ListCtrlEx.h"
 #include "CM5\MyOwnListCtrl.h"
+ 
 #define	PRODUCT_ID					32
 
 #define	FLASH_OFFSET				0x70000
@@ -259,6 +260,8 @@ public:
    void Fresh_Grid();
    int get_serialnumber();
  void  Check_DayTime();
+ void Initial_OutputList();
+ void Initial_UserList();
  LRESULT OnFreshView(WPARAM wParam, LPARAM lParam);
      void  Check_HourTime();
 
@@ -486,6 +489,8 @@ public:
 	CMsflexgrid m_grid_input;
 
 	void Show_InputList();
+	ListCtrlEx::CListCtrlEx m_user_list;
+	ListCtrlEx::CListCtrlEx m_output_list;
 };
 
 

@@ -531,6 +531,12 @@ BOOL CGridLoad::OnInitDialog()
 		case  PM_CO2_RS485:
 			strTemp = "CO2";
 			break;
+		case  STM32_CO2_NET:
+			strTemp = "CO2 Net";
+			break;
+		case  STM32_CO2_RS485:
+			strTemp = "CO2";
+			break;
         case  PM_PRESSURE_SENSOR:
             strTemp = "Pressure";
             break;
@@ -1268,6 +1274,12 @@ void CGridLoad::LoadDeviceToGrid()
 			strTemp = "CO2 Net";
 			break;
 		case  PM_CO2_RS485:
+			strTemp = "CO2";
+			break;
+		case  STM32_CO2_NET:
+			strTemp = "CO2 Net";
+			break;
+		case  STM32_CO2_RS485:
 			strTemp = "CO2";
 			break;
         case  PM_PRESSURE_SENSOR:

@@ -70,7 +70,6 @@ LRESULT  CBacnetVariable::VariableMessageCallBack(WPARAM wParam, LPARAM lParam)
 				pInvoke->mRow,pInvoke->mRow,sizeof(Str_variable_point));
 			SetTimer(3,2000,NULL);
 		}
-		//MessageBox(_T("Bacnet operation success!"));
 	}
 	else
 	{
@@ -78,8 +77,6 @@ LRESULT  CBacnetVariable::VariableMessageCallBack(WPARAM wParam, LPARAM lParam)
 		PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,pInvoke->mRow,REFRESH_ON_ITEM);
 		Show_Results = temp_cs + _T("Fail!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
-		//AfxMessageBox(Show_Results);
-		//MessageBox(_T("Bacnet operation fail!"));
 	}
 	if((pInvoke->mRow%2)==0)	//»Ö¸´Ç°¾°ºÍ ±³¾° ÑÕÉ«;
 		m_variable_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
@@ -143,7 +140,7 @@ void CBacnetVariable::Initial_List()
 	m_variable_list.Set_My_WindowRect(win_rect);
 	m_variable_list.Set_My_ListRect(list_rect);
 
-	CTime TimeTemp(2015,1,1,0,0,0);
+	CTime TimeTemp(2016,1,1,0,0,0);
 	m_variable_time_picker.SetFormat(_T("HH:mm"));
 	m_variable_time_picker.SetTime(&TimeTemp);
 	m_variable_time_picker.ShowWindow(SW_HIDE);
@@ -160,13 +157,6 @@ void CBacnetVariable::Initial_List()
 
 		temp_item.Format(_T("VAR%d"),i+1);
 		m_variable_list.InsertItem(i,temp_item);
-		//if(ListCtrlEx::ComboBox == m_variable_list.GetColumnType(VARIABLE_AUTO_MANUAL))
-		//{
-		//	ListCtrlEx::CStrList strlist;
-		//	strlist.push_back(_T("Auto"));
-		//	strlist.push_back(_T("Manual"));
-		//	m_variable_list.SetCellStringList(i, VARIABLE_AUTO_MANUAL, strlist);
-		//}
 
 		if(ListCtrlEx::ComboBox == m_variable_list.GetColumnType(VARIABLE_UNITE))
 		{
@@ -189,7 +179,6 @@ void CBacnetVariable::Initial_List()
 
 	}
 	m_variable_list.InitListData();
-	//m_variable_list.SetListData((char *)m_temp_variable_data,sizeof(Str_variable_point) * BAC_VARIABLE_ITEM_COUNT);
 	m_variable_list.ShowWindow(SW_SHOW);
 }
 
@@ -240,12 +229,10 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 		if(m_Variable_data.at(i).auto_manual==0)
 		{
 			m_variable_list.SetItemText(i,VARIABLE_AUTO_MANUAL,_T("Auto"));
-			//m_variable_list.SetCellEnabled(i,VARIABLE_VALUE,0);
 		}
 		else
 		{
 			m_variable_list.SetItemText(i,VARIABLE_AUTO_MANUAL,_T("Manual"));
-			//m_variable_list.SetCellEnabled(i,VARIABLE_VALUE,1);
 		}
 
 
@@ -329,7 +316,7 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 				m_variable_list.SetItemText(i,VARIABLE_UNITE,Variable_Analog_Units_Array[m_Variable_data.at(i).range]);
 				char temp_char[50];
 				int time_seconds = m_Variable_data.at(i).value / 1000;
-				intervaltotext(temp_char,time_seconds,0,0);
+				intervaltotextfull(temp_char,time_seconds,0,0);
 				CString temp_11;
 				MultiByteToWideChar( CP_ACP, 0, temp_char, strlen(temp_char) + 1, 
 					temp_11.GetBuffer(MAX_PATH), MAX_PATH );
@@ -383,7 +370,7 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 
 	}
 	copy_data_to_ptrpanel(TYPE_VARIABLE);
-	//MessageBox("1");
+
 	return 0;
 }
 LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)
@@ -485,8 +472,6 @@ LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)
 
 		int temp_int = (int)(_wtof(temp_cs) * 1000);
 		m_Variable_data.at(Changed_Item).value = temp_int;
-		//int temp_int = _wtoi(temp_cs);
-		//m_Variable_data.at(Changed_Item).value = temp_int;
 	}
 
 	cmp_ret = memcmp(&m_temp_variable_data[Changed_Item],&m_Variable_data.at(Changed_Item),sizeof(Str_variable_point));
@@ -515,12 +500,10 @@ void CBacnetVariable::OnBnClickedButtonVariableApply()
 		if(cs_temp.CompareNoCase(_T("Auto"))==0)
 		{
 			m_Variable_data.at(i).auto_manual= BAC_AUTO;
-			//m_variable_list.SetCellEnabled(i,VARIABLE_VALUE,0);
 		}
 		else
 		{
 			m_Variable_data.at(i).auto_manual = BAC_MANUAL;
-			//m_variable_list.SetCellEnabled(i,VARIABLE_VALUE,1);
 		}
 
 
@@ -624,8 +607,6 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 
 		myrect.left = myrect.left + list_rect.left - win_rect.left  +2 ;
 		myrect.right = myrect.right + list_rect.left - win_rect.left + 2;
-		//myrect.top = myrect.top + 11;
-		//myrect.bottom = myrect.bottom + 13;
 		myrect.top = myrect.top + 24;
 		myrect.bottom = myrect.bottom + 26;
 		m_variable_time_picker.BringWindowToTop();
@@ -673,14 +654,12 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 		{
 			m_Variable_data.at(lRow).auto_manual = 1;
 			m_variable_list.SetItemText(lRow,VARIABLE_AUTO_MANUAL,_T("Manual"));
-			//m_variable_list.SetCellEnabled(lRow,VARIABLE_VALUE,TRUE);
 			New_CString = _T("Manual");
 		}
 		else
 		{
 			m_Variable_data.at(lRow).auto_manual = 0;
 			m_variable_list.SetItemText(lRow,VARIABLE_AUTO_MANUAL,_T("Auto"));
-			//m_variable_list.SetCellEnabled(lRow,VARIABLE_VALUE,FALSE);
 			New_CString = _T("Auto");
 		}
 		temp_task_info.Format(_T("Write Variable List Item%d .Changed to \"%s\" "),lRow + 1,New_CString);
@@ -737,12 +716,6 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 			}
 
 		}
-
-		//CString temp_cs = m_variable_list.GetItemText(lRow,lCol);
-		//if(temp_cs.CompareNoCase(Units_Type[UNITS_TYPE_ANALOG])==0)
-		//{
-
-
 		if(m_Variable_data.at(lRow).digital_analog == BAC_UNITS_ANALOG)
 		{
 			bac_ranges_type = VARIABLE_RANGE_ANALOG_TYPE;
@@ -765,7 +738,6 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 
 			initial_dialog = 1;
 			bac_range_number_choose = m_Variable_data.at(lRow).range;
-			//bac_ranges_type = VARIABLE_RANGE_ANALOG_TYPE;
 			dlg.DoModal();
 			if(range_cancel)
 			{
@@ -790,7 +762,7 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 				{
 					char temp_char[50];
 					int time_seconds = m_Variable_data.at(lRow).value / 1000;
-					intervaltotext(temp_char,time_seconds,0,0);
+					intervaltotextfull(temp_char,time_seconds,0,0);
 
 					CString temp_11;
 					MultiByteToWideChar( CP_ACP, 0, temp_char, strlen(temp_char) + 1, 
@@ -853,7 +825,6 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 	else
 	{
-		//m_variable_list.Set_Edit(false);
 		return;
 	}
 
@@ -863,7 +834,6 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 		m_variable_list.SetItemBkColor(lRow,lCol,LIST_ITEM_CHANGED_BKCOLOR);
 		Post_Write_Message(g_bac_instance,WRITEVARIABLE_T3000,lRow,lRow,sizeof(Str_variable_point),m_variable_dlg_hwnd,temp_task_info,lRow,lCol);
 	}
-//	GetDlgItem(IDC_BUTTON_VARIABLE_APPLY)->SetFocus();
 	*pResult = 0;
 }
 
@@ -1009,6 +979,16 @@ int GetVariableLabel(int index,CString &ret_label)
 		ret_label.GetBuffer(MAX_PATH), MAX_PATH );
 	ret_label.ReleaseBuffer();
 
+	CString temp_cs;
+	temp_cs = ret_label;
+	temp_cs = temp_cs.Trim();
+	if(temp_cs.IsEmpty())
+	{
+		temp_cs.Format(_T("VAR%u"),index + 1);
+		ret_label = temp_cs;
+	}
+
+
 	return 1;
 }
 
@@ -1023,6 +1003,16 @@ int GetVariableFullLabel(int index,CString &ret_full_label)
 	MultiByteToWideChar( CP_ACP, 0, (char *)m_Variable_data.at(i).description, (int)strlen((char *)m_Variable_data.at(i).description)+1, 
 		ret_full_label.GetBuffer(MAX_PATH), MAX_PATH );
 	ret_full_label.ReleaseBuffer();
+
+	CString temp_cs;
+	temp_cs = ret_full_label;
+	temp_cs = temp_cs.Trim();
+	if(temp_cs.IsEmpty())
+	{
+		temp_cs.Format(_T("VAR%u"),index + 1);
+		ret_full_label = temp_cs;
+	}
+
 	return 1;
 }
 
@@ -1096,12 +1086,13 @@ int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &
 			ret_unit = Variable_Analog_Units_Array[m_Variable_data.at(i).range];
 			char temp_char[50];
 			int time_seconds = m_Variable_data.at(i).value / 1000;
-			intervaltotext(temp_char,time_seconds,0,0);
+			intervaltotextfull(temp_char,time_seconds,0,0);
 
 			MultiByteToWideChar( CP_ACP, 0, temp_char, strlen(temp_char) + 1, 
 				ret_cstring.GetBuffer(MAX_PATH), MAX_PATH );
 			ret_cstring.ReleaseBuffer();	
 			digital_value = 2;
+
 		}
 		else if((m_Variable_data.at(i).range<=sizeof(Variable_Analog_Units_Array)/sizeof(Variable_Analog_Units_Array[0])) && (m_Variable_data.at(i).range != 0))
 		{

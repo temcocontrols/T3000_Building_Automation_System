@@ -5,6 +5,7 @@ extern char receive_buffer[4000];
 extern unsigned short totalpackage;
 extern unsigned short current_package;
 extern char download_filename[20];
+extern unsigned short download_fw_version;
 extern char receive_md5[20];
 extern int download_step ;
 extern unsigned int T3000_Version ; //T3000µÄ°æ±¾ºÅ.
@@ -60,12 +61,14 @@ void DownloadSocket::OnReceive(int nErrorCode)
 			totalpackage = ((unsigned char)temp_point[1]<<8) | ((unsigned char)temp_point[0]);
 			temp_point = temp_point + 2;
 			memcpy(download_filename,temp_point,40);
+			temp_point = temp_point + 40;
+			download_fw_version =  ((unsigned char)temp_point[1]<<8) | ((unsigned char)temp_point[0]);
 			if(strstr(download_filename,"T3000_EXE")!=NULL)
 			{
 				unsigned int temp_version = 0;
 				temp_version= receive_buffer[48]*256 + receive_buffer[47];
 				if(temp_version > T3000_Version)
-					download_step = SEND_GET_MD5_VALUE;
+					download_step = SHOW_FTP_PATH;
 				else
 				{
 					PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_T3000_NO_UPDATE,NULL);

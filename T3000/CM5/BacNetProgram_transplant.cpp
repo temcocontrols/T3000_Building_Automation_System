@@ -3116,7 +3116,13 @@ void parse_atom( float  *value )
 											}
 								 eoi = eoiold;
 								 if (*token != ')') 
-								 {	error = TRUE; *value = FALSE ; sntx_err(SYNTAX);get_nl();return;}
+								 {	
+									 error = TRUE; 
+									 *value = FALSE ; 
+									 sntx_err(SYNTAX);
+									 get_nl();
+									 return;
+								 }
 								 if(type_eval)
 								 {
 									buf_v[index_buf-1].op[index_op++]=ftok;

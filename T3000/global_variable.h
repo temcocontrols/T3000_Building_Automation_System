@@ -1848,6 +1848,9 @@ CString temp_unit[BAC_CUSTOMER_UNITS_COUNT];
 CString temp_unit_no_index[BAC_CUSTOMER_UNITS_COUNT];
 bool read_customer_unit;	//如果这个设备没有读过 customer unit这一项,就要尝试去读，以前老版本的没有;
 bool receive_customer_unit; //收到回复，flag就置 true;
+bool read_analog_customer_unit;  // 这个是模拟的cus tabel ;
+CString Analog_Customer_Units[BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT];
+
 unsigned char bacnet_add_id[254];
 int bacnet_device_type;
 int g_bac_instance;
@@ -1956,6 +1959,7 @@ vector <Str_table_point> m_analog_custmer_range;
 Time_block_mini Device_time;
 Str_Setting_Info Device_Basic_Setting;
 Str_MISC Device_Misc_Data;
+Str_Special Device_Special_Data;
 char m_at_write_buf[100];
 char m_at_read_buf[450];
 
@@ -2023,6 +2027,7 @@ SOCKADDR_IN h_bcast;
 _RecordsetPtr m_global_pRs;
 _ConnectionPtr m_global_pCon;
 
+Point_Data_str digital_last_data[MAX_POINTS_IN_MONITOR];//用来存 数字量 没变化的情况下又 不在时间轴范围内的值;
 Data_Time_Match * digital_data_point[MAX_POINTS_IN_MONITOR];
 Data_Time_Match * analog_data_point[MAX_POINTS_IN_MONITOR];
 int analog_data_max_value[MAX_POINTS_IN_MONITOR];
@@ -2166,3 +2171,7 @@ const CString c_strBaudate[NUMBER_BAUDRATE] =
     L"115200"
 };
 #pragma endregion For_bacnet
+
+
+bool b_remote_connection = false;  //全局的 用来判断 对远程设备的 特殊处理;
+bool refresh_tree_status_immediately = false;	//如果置为treu了，就会立即调用 刷新 ，不用等待一个周期，用于 某些IP或状态变了，立即刷新;

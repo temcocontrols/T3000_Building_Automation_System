@@ -13,6 +13,7 @@
 #include "gloab_define.h"
 #include "BacnetProgramSetting.h"
 #include "BacnetProgramDebug.h"
+#define  WM_RICHEDIT_RIGHT_CLICK  WM_USER + 1001
 extern char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network,unsigned char & sub_panel, byte panel , int *netpresent);
 CBacnetProgramDebug * Program_Debug_Window = NULL;
 extern int error;
@@ -51,6 +52,7 @@ bool prg_color_change;
 
 extern unsigned int point_number;
 extern unsigned int point_type;
+POINT right_click_Point;
 
 IMPLEMENT_DYNAMIC(CBacnetProgramEdit, CDialogEx)
 
@@ -88,6 +90,8 @@ BEGIN_MESSAGE_MAP(CBacnetProgramEdit, CDialogEx)
 	ON_WM_HELPINFO()
 	ON_COMMAND(ID_PROGRAM_IDE_SETTINGS, &CBacnetProgramEdit::OnProgramIdeSettings)
 	ON_WM_TIMER()
+//	ON_WM_RBUTTONDOWN()
+	ON_COMMAND(ID_PROPERTIES_GOTODEFINITION, &CBacnetProgramEdit::OnPropertiesGotodefinition)
 END_MESSAGE_MAP()
 
 
@@ -304,6 +308,8 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 	return FALSE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
+
+
 LRESULT CBacnetProgramEdit::Fresh_Program_RichEdit(WPARAM wParam,LPARAM lParam)
 {
 	//return 0;
@@ -370,19 +376,13 @@ LRESULT  CBacnetProgramEdit::ProgramResumeMessageCallBack(WPARAM wParam, LPARAM 
 	CString Show_Results;
 	if(msg_result)
 	{
-		//CString temp_ok;
-		//temp_ok = _T("Bacnet operation success!   Request ID:") +  temp_cs;
-		//m_Program_data.at(program_list_line).bytes =	program_code_length[program_list_line] - PRIVATE_HEAD_LENGTH;
-
 		Show_Results = temp_cs + _T("Success!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
-
-
 		CString Edit_Buffer;
 		GetDlgItemText(IDC_RICHEDIT2_PROGRAM,Edit_Buffer);
 		program_string = Edit_Buffer;
 		MessageBox(Show_Results);
-//#endif
+
 	}
 	else
 	{
@@ -504,14 +504,6 @@ void CBacnetProgramEdit::Syntax_analysis()
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->HideSelection(FALSE,FALSE);
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetReadOnly(FALSE);
 
-		//int nFirstVisible = ((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetFirstVisibleLine();
-		//if (nFirstVisible > 0)
-		//{
-		//	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->LineScroll(nFirstVisible, 0);
-		//}
-		// ((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetScrollPos(SB_VERT,nVertPos,1);
-		//((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->ShowScrollBar(SB_VERT);
-
 
 		value_test = ((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetScrollPos (SB_VERT,value_test,1);
 
@@ -544,18 +536,7 @@ void CBacnetProgramEdit::OnSend()
 	{
 	
 		TRACE(_T("Encode_Program length is %d ,copy length is %d\r\n"),program_code_length[program_list_line],my_lengthcode );
-#if 0
-		if(my_lengthcode <400)
-			memcpy_s(program_code[program_list_line],my_lengthcode,mycode,my_lengthcode);
-		else
-		{
-			CString temp_mycs;//如果npdu的长度过长，大于 400了，目前是通过换一个page来存;
-			temp_mycs.Format(_T("Encode Program Code Length is %d,Please Try to code in another page."),my_lengthcode);
-			MessageBox(temp_mycs);
-			memset(program_code[program_list_line],0,400);
-			return;
-		}
-#endif
+
 		if(my_lengthcode > 2000)
 		{
 			MessageBox(_T("Encode Program Code Length is too large"));
@@ -941,17 +922,9 @@ void CBacnetProgramEdit::OnProgramIdeSettings()
 	}
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetWindowTextW(tempcs);
 	Syntax_analysis();
-	//if(prg_color_change)
-	//{
-	//	AnalysisString.Empty();
-	//	UpdateDataProgramText();
-	//	prg_color_change = false;
-	//	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(0, 0); //操作完成后还原现场;
-	//}
-
 }
 
-void CBacnetProgramEdit::Bacnet_Show_Debug()
+int CBacnetProgramEdit::Bacnet_Show_Debug(CString &retselstring)
 {
 	CString Select_string;
 	Select_string = ((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetSelText();
@@ -1015,15 +988,16 @@ void CBacnetProgramEdit::Bacnet_Show_Debug()
 			Select_string = temp_txt;
 		}
 		else
-			return;
+			return -1;
 
 
 	//	MessageBox(_T("No Character selected .Please select label"),_T("Notice"),MB_OK);
 	}
-
+	retselstring = Select_string;
 	if(Select_string.GetLength() > 10 )
 	{
-		return;
+
+		return false;
 	}
 
 	
@@ -1043,7 +1017,7 @@ void CBacnetProgramEdit::Bacnet_Show_Debug()
 	char * tempcs=NULL;
 	tempcs = ispoint_ex(temp_point,&temp_number,&temp_value_type,&temp_point_type,&temp_panel,&temp_net,0,sub_panel,Station_NUM,&k);
 	if(tempcs == NULL)
-		return ;
+		return false;
 	point_number = temp_number - 1;
 	point_type = temp_point_type;
 
@@ -1077,6 +1051,7 @@ void CBacnetProgramEdit::Bacnet_Show_Debug()
 			Program_Debug_Window->Initial_List(point_type);
 			Program_Debug_Window->SetWindowTextW(Select_string);
 			Program_Debug_Window->ShowWindow(TRUE);
+			return true;
 		}
 		break;
 	default:
@@ -1181,7 +1156,13 @@ BOOL CBacnetProgramEdit::PreTranslateMessage(MSG* pMsg)
 	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_INSERT) 
 	{
 		Run_once_mutex = true;
-		Bacnet_Show_Debug();
+		CString temp_sel_cstring;
+		if(Bacnet_Show_Debug(temp_sel_cstring) == 0 )
+		{
+			CString temp_message;
+			temp_message.Format(_T("A definition for the symbol '%s' could not be located."),temp_sel_cstring);
+			MessageBox(temp_message,_T("Message"),MB_ICONWARNING);
+		}
 		Run_once_mutex = false;
 		return TRUE;
 	}
@@ -1212,7 +1193,7 @@ BOOL CBacnetProgramEdit::PreTranslateMessage(MSG* pMsg)
 				if(prg_key_count ++ % 2 == 0)
 				{
 					need_syntax = true;
-					SetTimer(1,3000,NULL);
+					SetTimer(1,5000,NULL);
 					prg_key_count = 1;
 				}
 
@@ -1222,10 +1203,49 @@ BOOL CBacnetProgramEdit::PreTranslateMessage(MSG* pMsg)
 
 		
 	}
+	else if(pMsg->message == WM_RBUTTONDOWN)
+	{
+		if(GetFocus())
+		{
+			if(IDC_RICHEDIT2_PROGRAM == GetFocus()->GetDlgCtrlID())
+			{
+				//right_click_Point.x = pMsg->pt.x;
+				//right_click_Point.y = pMsg->pt.y;
+				//POINT lpPoint;
+				//GetCursorPos(&lpPoint);
+				//SetCursorPos(lpPoint.x , lpPoint.y);
+				//mouse_event(MOUSEEVENTF_LEFTDOWN,0,0,0,0);
+				//mouse_event(MOUSEEVENTF_LEFTUP,0,0,0,0);
+
+				//PostMessage(WM_RICHEDIT_RIGHT_CLICK,NULL,NULL);
+
+				CString Select_string;
+				Select_string = ((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetSelText();
+				Select_string.Trim();
+
+				if(Select_string.GetLength() != 0 )
+				{
+				CMenu menu;
+				menu.LoadMenu(IDR_MENU_PROGRAMEDIT_RIGHT_CLICK);
+				CMenu* pPopup = menu.GetSubMenu(0);
+				CPoint point;
+				point.x = pMsg->pt.x ;
+				point.y = pMsg->pt.y ;
+				pPopup->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, point.x, point.y,this);
+				}
+			}
+		}
+	}
 
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
 
+
+void CBacnetProgramEdit::OnPropertiesGotodefinition()
+{
+	// TODO: Add your command handler code here
+	PostMessage(WM_KEYDOWN, VK_INSERT,1); 
+}
 

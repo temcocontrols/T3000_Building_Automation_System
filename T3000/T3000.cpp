@@ -21,6 +21,7 @@
 #include "SqliteLib/CppSQLite3.h"
 const int g_versionNO=20160520;
 
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -38,11 +39,9 @@ END_MESSAGE_MAP()
 // CT3000App construction 
 CT3000App::CT3000App()
 {
- 
 	m_bHiColorIcons = TRUE;
-	CurrentT3000Version=_T("    2016.05.20");
-	T3000_Version = 10429;
-
+	CurrentT3000Version=_T("    2016.08.04 ");
+	T3000_Version = 10729;
 	m_lastinterface=19;
 }
 // The one and only CT3000App object
@@ -110,6 +109,8 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
 	{
 	//	AfxMessageBox(_T("false"));
 			return   FALSE;
+
+
 	}
 	
 }
@@ -647,440 +648,8 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
          srcConTmp=NULL;
 #endif
 
-
-
-         CBADO bado;
-         bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-         bado.OnInitADOConn();
-#if 1		//把原来T3000 里面的老数据导入到Building的数据表中
-
-
-
-         try
-         {
-             //ALL_NODE
-#if 1
-             for (int i=0;i<m_AllNodes.size();i++)
-             {
-                 strsql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,Custom,EPsize) values('"
-                     +m_AllNodes[i].MainBuilding_Name+"','"
-                     +m_AllNodes[i].MainBuilding_Name+"','"
-                     +m_AllNodes[i].Serial_ID+"','"
-                     +m_AllNodes[i].Floor_name+"','"
-                     +m_AllNodes[i].Room_name+"','"
-                     +m_AllNodes[i].Product_name+"','"
-                     +m_AllNodes[i].Product_class_ID+"','"
-                     +m_AllNodes[i].Product_ID+"','"
-                     +m_AllNodes[i].Screen_Name+"','"
-                     +m_AllNodes[i].Bautrate+"','"
-                     +m_AllNodes[i].Background_imgID+"','"
-                     +m_AllNodes[i].Hardware_Ver+"','"
-                     +m_AllNodes[i].Software_Ver+"','"
-                     +m_AllNodes[i].Com_Port+"','"
-                     +m_AllNodes[i].Custom+"','"
-                     +m_AllNodes[i].EPsize+"')"));
-
-
-                 bado.m_pConnection->Execute(strsql.GetString(),NULL,adCmdText);	
-             }
-#endif
-
-
-             //IONAME
-#if 1
-             bado.m_pConnection->Execute(_T("delete * from IONAME"),NULL,adCmdText);
-             //srcRsTemp->Open(_T("select * from IONAME"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-             bado.m_pRecordset=bado.OpenRecordset(_T("select * from IONAME"));
-             try{
-                 for (int i=0;i<m_IONAME.size();i++)
-                 {
-                     bado.m_pRecordset->AddNew();
-                     bado.m_pRecordset->PutCollect("SERIAL_ID",m_IONAME[i].SERIAL_ID);
-                     bado.m_pRecordset->PutCollect("INPUT1",m_IONAME[i].INPUT1);
-                     bado.m_pRecordset->PutCollect("INPUT2",m_IONAME[i].INPUT2);
-                     bado.m_pRecordset->PutCollect("INPUT3",m_IONAME[i].INPUT3);
-                     bado.m_pRecordset->PutCollect("INPUT4",m_IONAME[i].INPUT4);
-                     bado.m_pRecordset->PutCollect("INPUT5",m_IONAME[i].INPUT5);
-                     bado.m_pRecordset->PutCollect("INPUT6",m_IONAME[i].INPUT6);
-                     bado.m_pRecordset->PutCollect("INPUT7",m_IONAME[i].INPUT7);
-                     bado.m_pRecordset->PutCollect("INPUT8",m_IONAME[i].INPUT8);
-                     bado.m_pRecordset->PutCollect("INPUT9",m_IONAME[i].INPUT9);
-                     bado.m_pRecordset->PutCollect("OUTPUT1",m_IONAME[i].OUTPUT1);
-                     bado.m_pRecordset->PutCollect("OUTPUT2",m_IONAME[i].OUTPUT2);
-                     bado.m_pRecordset->PutCollect("OUTPUT3",m_IONAME[i].OUTPUT3);
-                     bado.m_pRecordset->PutCollect("OUTPUT4",m_IONAME[i].OUTPUT4);
-                     bado.m_pRecordset->PutCollect("OUTPUT5",m_IONAME[i].OUTPUT5);
-                     bado.m_pRecordset->PutCollect("OUTPUT6",m_IONAME[i].OUTPUT6);
-                     bado.m_pRecordset->PutCollect("OUTPUT7",m_IONAME[i].OUTPUT7);
-                     bado.m_pRecordset->PutCollect("SENSORNAME",m_IONAME[i].SENSORNAME);
-
-                     bado.m_pRecordset->Update();
-                 }
-             }
-             catch(_com_error &e){
-                 AfxMessageBox(e.Description());
-             }
-             //srcRsTemp->Close();
-             bado.CloseRecordset();
-#endif
-             //IONAME_Config
-#if 1
-             bado.m_pConnection->Execute(_T("delete * from IONAME_CONFIG"),NULL,adCmdText);
-             //srcRsTemp->Open(_T("select * from IONAME_CONFIG"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-             bado.m_pRecordset=bado.OpenRecordset(_T("select * from IONAME_CONFIG"));
-             try{
-                 for (int i=0;i<m_IONAME_Config.size();i++)
-                 {
-                     bado.m_pRecordset->AddNew();
-                     bado.m_pRecordset->PutCollect("InOutName",m_IONAME_Config[i].InOutName);
-                     bado.m_pRecordset->PutCollect("Type",m_IONAME_Config[i].Type);
-                     bado.m_pRecordset->PutCollect("Row",m_IONAME_Config[i].Row);
-                     bado.m_pRecordset->PutCollect("SerialNo",m_IONAME_Config[i].SerialNo);
-                     bado.m_pRecordset->Update();
-                 }
-             }
-             catch(_com_error &e){
-                 AfxMessageBox(e.Description());
-             }
-             bado.CloseRecordset();
-             //srcRsTemp->Close();
-#endif
-             //LCNameConfig
-#if 1
-             bado.m_pConnection->Execute(_T("delete * from LCNameConfigure"),NULL,adCmdText);
-             //srcRsTemp->Open(_T("select * from LCNameConfigure"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-             bado.m_pRecordset=bado.OpenRecordset(_T("select * from LCNameConfigure"));
-             try{
-                 for (int i=0;i<m_LCNameConfigure.size();i++)
-                 {
-                     bado.m_pRecordset->AddNew();
-                     bado.m_pRecordset->PutCollect("SN",m_LCNameConfigure[i].SN);
-                     bado.m_pRecordset->PutCollect("Card",m_LCNameConfigure[i].Card);
-                     bado.m_pRecordset->PutCollect("Output",m_LCNameConfigure[i].Output);
-                     bado.m_pRecordset->PutCollect("OutputName",m_LCNameConfigure[i].OutputName);
-                     bado.m_pRecordset->Update();
-                 }
-             }
-             catch(_com_error &e){
-                 AfxMessageBox(e.Description());
-             }
-             bado.CloseRecordset();
-             //srcRsTemp->Close();
-#endif
-
-
-             //Product_Data
-#if 1
-             bado.m_pConnection->Execute(_T("delete * from Product_Data"),NULL,adCmdText);
-             //srcRsTemp->Open(_T("select * from Product_Data"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-             bado.m_pRecordset=bado.OpenRecordset(_T("select * from Product_Data"));
-             try{
-                 for (int i=0;i<m_Product_Data.size();i++)
-                 {
-                     bado.m_pRecordset->AddNew();
-                     bado.m_pRecordset->PutCollect("Serial_ID",m_Product_Data[i].Serial_ID);
-                     bado.m_pRecordset->PutCollect("Register_Data",m_Product_Data[i].Register_Data);
-
-                     bado.m_pRecordset->Update();
-                 }
-             }
-             catch(_com_error &e){
-                 AfxMessageBox(e.Description());
-             }
-             //srcRsTemp->Close();
-             bado.CloseRecordset();
-#endif
-             //Screen_Label
-#if 1
-             bado.m_pConnection->Execute(_T("delete * from Screen_Label"),NULL,adCmdText);
-             //srcRsTemp->Open(_T("select * from Screen_Label"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-             bado.m_pRecordset=bado.OpenRecordset(_T("select * from Screen_Label"));
-             try{
-                 for (int i=0;i<m_Screen_Label.size();i++)
-                 {
-                     bado.m_pRecordset->AddNew();
-                     bado.m_pRecordset->PutCollect("Cstatic_id",m_Screen_Label[i].Cstatic_id);
-                     bado.m_pRecordset->PutCollect("Serial_Num",m_Screen_Label[i].Serial_Num);
-                     bado.m_pRecordset->PutCollect("Point_X",m_Screen_Label[i].Point_X);
-                     bado.m_pRecordset->PutCollect("Point_Y",m_Screen_Label[i].Point_Y);
-                     bado.m_pRecordset->PutCollect("Height",m_Screen_Label[i].Height);
-                     bado.m_pRecordset->PutCollect("Width",m_Screen_Label[i].Width);
-                     bado.m_pRecordset->PutCollect("Tstat_id",m_Screen_Label[i].Tstat_id);
-                     bado.m_pRecordset->PutCollect("Status",m_Screen_Label[i].Status);
-                     bado.m_pRecordset->PutCollect("Tips",m_Screen_Label[i].Tips);
-                     bado.m_pRecordset->PutCollect("Input_or_Output",m_Screen_Label[i].Input_or_Output);
-                     bado.m_pRecordset->PutCollect("Text_Color",m_Screen_Label[i].Text_Color);
-                     bado.m_pRecordset->PutCollect("Back_Color",m_Screen_Label[i].Back_Color);
-                     bado.m_pRecordset->Update();
-                 }
-             }
-             catch(_com_error &e)
-			 {
-				  AfxMessageBox(_T("Error number 3"));
-                 AfxMessageBox(e.Description());
-             }
-             bado.CloseRecordset();
-#endif
-
-             //Value_Range
-#if 1
-             bado.m_pConnection->Execute(_T("delete * from Value_Range"),NULL,adCmdText);
-             //srcRsTemp->Open(_T("select * from Value_Range"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-             bado.m_pRecordset=bado.OpenRecordset(_T("select * from Value_Range"));
-             try{
-                 for (int i=0;i<m_Value_Range.size();i++)
-                 {
-                     bado.m_pRecordset->AddNew();
-                     bado.m_pRecordset->PutCollect("SN",m_Value_Range[i].SN);
-                     bado.m_pRecordset->PutCollect("CInputNo",m_Value_Range[i].CInputNo);
-                     bado.m_pRecordset->PutCollect("CRange",m_Value_Range[i].CRange);
-                     bado.m_pRecordset->Update();
-                 }
-             }
-             catch(_com_error &e)
-			 {
-				  AfxMessageBox(_T("Error number 4"));
-                 AfxMessageBox(e.Description());
-             }
-             bado.CloseRecordset();
-             //	srcRsTemp->Close();
-#endif
-
-         }
-         catch(_com_error *e)
-         {
-			  AfxMessageBox(_T("Error number 5"));
-             AfxMessageBox(e->ErrorMessage());
-         }
-         bado.CloseConn();
-#endif 
-
-
-
      }
-//     else if ((g_versionNO>versionno)&&(versionno>20141116 && versionno <20150415))
-//     {
-//
-//         _variant_t temp_var;
-//         _ConnectionPtr srcConTmp;
-//         _RecordsetPtr srcRsTemp;
-//         srcConTmp.CreateInstance("ADODB.Connection");
-//         srcRsTemp.CreateInstance("ADODB.Recordset");
-//         srcConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);//打开数据库
-//         //这里是All_NODE
-//
-//         //Building_ALL
-//         if (Is_haveTable(_T("Building_ALL")))
-//         {
-//#if 1
-//
-//             srcRsTemp->Open(_T("select * from Building_ALL"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);		
-//             Building_ALL Building_ALL_Temp;
-//             while(!srcRsTemp->EndOfFile){
-//                 Building_ALL_Temp.Building_Name=srcRsTemp->GetCollect(_T("Building_Name"));
-//                 Building_ALL_Temp.Address=srcRsTemp->GetCollect(_T("Address"));
-//                 Building_ALL_Temp.Telephone=srcRsTemp->GetCollect(_T("Telephone"));
-//                 Building_ALL_Temp.Default_Building=srcRsTemp->GetCollect(_T("Default_Build"));
-//                 m_Building_ALL.push_back(Building_ALL_Temp);
-//                 srcRsTemp->MoveNext();
-//             }
-//             srcRsTemp->Close();
-//#endif
-//         }
-//         CString StrTemp;
-//
-//         //Building
-//         if (Is_haveTable(_T("Building")))
-//         {
-//#if 1
-//             srcRsTemp->Open(_T("select * from Building"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);		
-//             Building Building_Temp;
-//             while(!srcRsTemp->EndOfFile){
-//
-//                 Building_Temp.Braudrate=srcRsTemp->GetCollect(_T("Braudrate"));
-//                 Building_Temp.Building_Name=srcRsTemp->GetCollect(_T("Building_Name"));
-//                 Building_Temp.Com_Port=srcRsTemp->GetCollect(_T("Com_Port"));
-//                 Building_Temp.Default_SubBuilding=srcRsTemp->GetCollect(_T("Default_SubBuilding"));
-//                 Building_Temp.Ip_Address=srcRsTemp->GetCollect(_T("Ip_Address"));
-//                 Building_Temp.Ip_Port=srcRsTemp->GetCollect(_T("Ip_Port"));
-//                 Building_Temp.Main_BuildingName=srcRsTemp->GetCollect(_T("Main_BuildingName"));
-//                 Building_Temp.Protocal=srcRsTemp->GetCollect(_T("Protocal"));
-//                 StrTemp=srcRsTemp->GetCollect(_T("Building_Path"));
-//                 int index= StrTemp.Find(_T("Database"));
-//                 StrTemp.Delete(0,index);
-//
-//                 Building_Temp.Building_Path=StrTemp;  
-//                 m_Building.push_back(Building_Temp);
-//                 srcRsTemp->MoveNext();
-//             }
-//             srcRsTemp->Close();
-//#endif
-//         }
-//
-//
-//         //CustomProductTable
-//         if (Is_haveTable(_T("CustomProductTable")))
-//         {
-//#if 1
-//             srcRsTemp->Open(_T("select * from CustomProductTable"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);		
-//             CustomProductTable CustomProductTable_Temp;
-//             while(!srcRsTemp->EndOfFile){
-//                 CustomProductTable_Temp.ModelNo=srcRsTemp->GetCollect(_T("ModelNo"));
-//                 CustomProductTable_Temp.Reg_Description=srcRsTemp->GetCollect(_T("Reg_Description"));
-//                 CustomProductTable_Temp.Reg_ID=srcRsTemp->GetCollect(_T("Reg_ID"));
-//
-//                 m_CustomProductTable.push_back(CustomProductTable_Temp);
-//                 srcRsTemp->MoveNext();
-//             }
-//             srcRsTemp->Close();
-//#endif
-//         }
-//
-//         if (srcConTmp->State)
-//         {srcConTmp->Close();
-//         }
-//
-//
-//         CString filePath=g_strExePth+_T("Database\\T3000.mdb");
-//         DeleteFile(filePath);
-//
-//
-//
-//         HANDLE hFind;//
-//         WIN32_FIND_DATA wfd;//
-//         hFind = FindFirstFile(filePath, &wfd);//
-//         if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
-//         {
-//             //CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);//
-//             //没有找到就创建一个默认的数据库
-//             filePath=g_strExePth+_T("Database\\T3000.mdb");
-//             HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000_DB2), _T("T3000_DB"));   
-//             HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
-//
-//
-//             LPVOID lpExe = LockResource(hGlobal);   
-//             CFile file;
-//             if(file.Open(filePath, CFile::modeCreate | CFile::modeWrite))    
-//                 file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
-//             file.Close();    
-//             ::UnlockResource(hGlobal);   
-//             ::FreeResource(hGlobal);
-//         }//
-//         CString strsql;
-//         srcConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-//
-//         try
-//         {
-//
-//
-//             //Building_ALL
-//#if 1
-//             srcConTmp->Execute(_T("delete * from Building_ALL"),NULL,adCmdText);	
-//             srcRsTemp->Open(_T("select * from Building_ALL"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-//             try{
-//                 for (int i=0;i<m_Building_ALL.size();i++)
-//                 {
-//                     srcRsTemp->AddNew();
-//                     srcRsTemp->PutCollect("Building_Name",m_Building_ALL[i].Building_Name);
-//                     srcRsTemp->PutCollect("Default_Build",m_Building_ALL[i].Default_Building);
-//                     srcRsTemp->PutCollect("Telephone",m_Building_ALL[i].Telephone);
-//                     srcRsTemp->PutCollect("Address",m_Building_ALL[i].Address);
-//
-//
-//                     srcRsTemp->Update();
-//                 }
-//             }
-//             catch(_com_error &e){
-//                 AfxMessageBox(e.Description());
-//             }
-//             srcRsTemp->Close();
-//#endif
-//
-//             //Building
-//#if 1
-//             srcConTmp->Execute(_T("delete * from Building"),NULL,adCmdText);
-//             srcRsTemp->Open(_T("select * from Building"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-//             try{
-//                 for (int i=0;i<m_Building.size();i++)
-//                 {
-//                     srcRsTemp->AddNew();
-//                     srcRsTemp->PutCollect("Main_BuildingName",m_Building[i].Main_BuildingName);
-//                     srcRsTemp->PutCollect("Building_Name",m_Building[i].Main_BuildingName);
-//                     srcRsTemp->PutCollect("Protocal",m_Building[i].Protocal);
-//                     srcRsTemp->PutCollect("Com_Port",m_Building[i].Com_Port);
-//                     srcRsTemp->PutCollect("Ip_Address",m_Building[i].Ip_Address);
-//                     srcRsTemp->PutCollect("Ip_Port",m_Building[i].Ip_Port);
-//                     srcRsTemp->PutCollect("Braudrate",m_Building[i].Braudrate);
-//                     srcRsTemp->PutCollect("Default_SubBuilding",m_Building[i].Default_SubBuilding);
-//                     srcRsTemp->PutCollect("Building_Path",m_Building[i].Building_Path);
-//                     srcRsTemp->Update();
-//                 }
-//             }
-//             catch(_com_error &e){
-//                 AfxMessageBox(e.Description());
-//             }
-//             srcRsTemp->Close();
-//#endif
-//
-//             //CustomProductTable
-//#if 1
-//             srcConTmp->Execute(_T("delete * from CustomProductTable"),NULL,adCmdText);
-//             srcRsTemp->Open(_T("select * from CustomProductTable"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-//             try{
-//                 for (int i=0;i<m_CustomProductTable.size();i++)
-//                 {
-//                     srcRsTemp->AddNew();
-//                     srcRsTemp->PutCollect("ModelNo",m_CustomProductTable[i].ModelNo);
-//                     srcRsTemp->PutCollect("Reg_Description",m_CustomProductTable[i].Reg_Description);
-//                     srcRsTemp->PutCollect("Reg_ID",m_CustomProductTable[i].Reg_ID);
-//                     srcRsTemp->Update();
-//                 }
-//             }
-//             catch(_com_error &e){
-//                 AfxMessageBox(e.Description());
-//             }
-//             srcRsTemp->Close();
-//
-//#endif
-//
-//
-//         }
-//         catch(_com_error *e)
-//         {
-//             AfxMessageBox(e->ErrorMessage());
-//         }
-//
-//
-//
-//         if (srcConTmp->State)
-//         {srcConTmp->Close();
-//         }
-//         srcConTmp=NULL;
-//
-//
-//
-//
-//
-//     }
-//     else {
-//
-//         CADO updateADO;
-//         updateADO.OnInitADOConn();
-//
-//         if (versionno <=20150415)
-//         {
-//             StrSql=_T("ALTER TABLE CustomProductTable ADD COLUMN Para_Type varchar(255),Counts_Number Integer,Property varchar(255)");
-//             updateADO.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
-//             StrSql=_T("INSERT INTO Version VALUES(20150605,'更新CustomProductTable')");
-//             updateADO.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
-//         }
-//         /*if (versionno <=20150605)
-//         {
-//            StrSql= _T("Insert Table ProductsTypeRegisterTables Values(20,'T3_RegisterList','T3-8I13O','RegID','T3-8I13O')");
-//         }*/
-//         updateADO.CloseConn(); 
-//
-//     }
+
 
      int BuildingVersion;
      CBADO bado;
@@ -1431,7 +1000,6 @@ BOOL CT3000App::InitInstance()
 				 
 // 				SqlText = _T("create table tbl_historical_data (ID int ,date_current datetime,hour_current int,minute_current int,temperature varchar(255),\
 // 					humidity varchar(255),station_name varchar(255))");
-
 				SqlText = _T("create table tbl_historical_data (ID INTEGER,date_current datetime,hour_current int,minute_current int,distance_from_building varchar(255),temperature varchar(255),humidity varchar(255),bar_pressure varchar(255),wind varchar(255),direction varchar(255),station_name varchar(255))");
 				memset(charqltext,0,1024);
 				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
@@ -1453,6 +1021,7 @@ BOOL CT3000App::InitInstance()
 				SqlText = L"Insert into tbl_building_location values(1,1,'China','','ShangHai','HongXinRoad,#35',200000,'121','31','3.5','DefaultBuilding')";
 				memset(charqltext,0,1024);
 				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
+
 				SqliteDB.execDML(charqltext);
 
 				SqlText = L"create table tbl_language_option (ID int,language_id int)";
@@ -1737,7 +1306,7 @@ BOOL CT3000App::InitInstance()
 			{
 				DeleteFile(temp_123);
 			}
-			AfxMessageBox(_T("Database operation to stop!"));
+			AfxMessageBox(_T("Update database!Please restart again."));
 			exit(0);
 		}
 
@@ -1974,7 +1543,6 @@ void CT3000App::PreLoadState()
 
 void CT3000App::LoadCustomState()
 {
-	
 }
 
 void CT3000App::SaveCustomState()

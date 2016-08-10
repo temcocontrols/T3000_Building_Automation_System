@@ -25,4 +25,6 @@ public:
 	afx_msg LRESULT  RedrawScreeneditWindow(WPARAM wParam, LPARAM lParam);
 	CStaticEx m_static_bac_alarm;
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnPaint();
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 };

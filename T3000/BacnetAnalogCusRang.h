@@ -45,6 +45,8 @@ public:
 	 void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	 BOOL OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult);
 	  int m_tipvalue;
+	  afx_msg void OnEnKillfocusEditBacCusAnalogUnit();
+	  void UpdateCusAnalogUnit();
 };
 
 const int ANALOG_CUS_RANGE_RBL_VALUE = 0;

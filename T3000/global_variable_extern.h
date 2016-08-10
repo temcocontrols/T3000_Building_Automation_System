@@ -960,6 +960,8 @@ extern CString temp_unit_no_index[BAC_CUSTOMER_UNITS_COUNT];
 
 extern bool read_customer_unit;	//Èç¹ûÕâ¸öÉè±¸Ã»ÓĞ¶Á¹ı customer unitÕâÒ»Ïî,¾ÍÒª³¢ÊÔÈ¥¶Á£¬ÒÔÇ°ÀÏ°æ±¾µÄÃ»ÓĞ;
 extern bool receive_customer_unit; //ÊÕµ½»Ø¸´£¬flag¾ÍÖÃ true;
+extern bool read_analog_customer_unit;  // Õâ¸öÊÇÄ£ÄâµÄcus tabel ;
+extern CString Analog_Customer_Units[BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT];
 extern unsigned char bacnet_add_id[254];
 extern int bacnet_device_type;
 extern int g_bac_instance;
@@ -1070,6 +1072,7 @@ extern vector <Str_label_point> m_graphic_label_data;	//Í¼Æ¬ÀïÃæµÄLabelµÄĞÅÏ¢Òª´
 extern vector <Str_remote_point> m_remote_point_data;  //Mini panel ÀïÃæTstat Ô¶¶ËµãµÄ Öµ;
 extern Str_Setting_Info Device_Basic_Setting;
 extern Str_MISC Device_Misc_Data;
+extern Str_Special Device_Special_Data;
 extern char m_at_write_buf[100];
 extern char m_at_read_buf[450];
 
@@ -1120,6 +1123,7 @@ extern SOCKADDR_IN h_bcast;
 
 extern _RecordsetPtr m_global_pRs;
 extern _ConnectionPtr m_global_pCon;
+extern Point_Data_str digital_last_data[MAX_POINTS_IN_MONITOR];
 extern Data_Time_Match * digital_data_point[MAX_POINTS_IN_MONITOR];
 extern Data_Time_Match * analog_data_point[MAX_POINTS_IN_MONITOR];
 extern int analog_data_max_value[MAX_POINTS_IN_MONITOR];
@@ -1232,3 +1236,6 @@ extern int graphic_last_scale_type ; //ÓÃÓÚ´æ´¢ÉÏ´Î ÓĞĞ§µÄ XÖáµÄ ¿Ì¶È;
 extern unsigned int graphic_last_time_value; //xÖáÉÏ´Î²é¿´µÄÊ±¼ä;
 extern const CString c_strBaudate[NUMBER_BAUDRATE];
 #pragma endregion For_bacnet
+
+extern bool b_remote_connection;  //È«¾ÖµÄ ÓÃÀ´ÅĞ¶Ï ¶ÔÔ¶³ÌÉè±¸µÄ ÌØÊâ´¦Àí;
+extern bool refresh_tree_status_immediately ;	//Èç¹ûÖÃÎªtrueÁË£¬¾Í»áÁ¢¼´µ÷ÓÃ Ë¢ĞÂ £¬²»ÓÃµÈ´ıÒ»¸öÖÜÆÚ£¬ÓÃÓÚ Ä³Ğ©IP»ò×´Ì¬±äÁË£¬Á¢¼´Ë¢ĞÂ;

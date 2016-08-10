@@ -29,7 +29,6 @@ public:
 	virtual void OnOK();
 	LRESULT  ProgramResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
 	LRESULT  Fresh_Program_RichEdit(WPARAM wParam,LPARAM lParam);
-//	afx_msg void OnBnClickedButtonProgramSend();
 	afx_msg void OnSend();
 	afx_msg void OnClose();
 	afx_msg void OnClear();
@@ -47,7 +46,7 @@ public:
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 	void SetRicheditFont(long nStartchar,long nEndchar,DWORD nColor);
 	afx_msg void OnProgramIdeSettings();
-	void Bacnet_Show_Debug();
+	int Bacnet_Show_Debug(CString &retselstring);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	void UpdateDataProgramText();
 	void GetColor();
@@ -55,6 +54,9 @@ public:
 	void Syntax_analysis();
 	void Delete_Repeat_Char_Vec();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+
+//	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnPropertiesGotodefinition();
 
 };
 

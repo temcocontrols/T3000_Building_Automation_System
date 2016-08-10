@@ -29,6 +29,7 @@ void CBacnetSettingHealth::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CBacnetSettingHealth, CDialogEx)
 	ON_WM_TIMER()
+	ON_BN_CLICKED(IDC_BUTTON_HEALTH_CLEAR, &CBacnetSettingHealth::OnBnClickedButtonHealthClear)
 END_MESSAGE_MAP()
 
 
@@ -112,4 +113,22 @@ void CBacnetSettingHealth::Refresh_Health_Data()
 	GetDlgItem(IDC_EDIT_TIMEOUT_2)->SetWindowTextW(CS_TIMEOUT_2);
 	GetDlgItem(IDC_EDIT_TIMEOUT_3)->SetWindowTextW(CS_TIMEOUT_3);
 
+}
+
+
+void CBacnetSettingHealth::OnBnClickedButtonHealthClear()
+{
+	// TODO: Add your control notification handler code here
+	memset(&Device_Special_Data,0,sizeof(Str_Special));
+	Device_Special_Data.reg.clear_health_rx_tx = 0x11;
+
+	if(Write_Private_Data_Blocking(WRITE_SPECIAL_COMMAND,0,0) > 0 )
+	{
+		PostMessage(WM_REFRESH_BAC_MONITOR_LIST,NULL,NULL);
+		MessageBox(_T("Clear Count : OK !"));
+	}
+	else
+	{
+		MessageBox(_T("Clear Count : Timeout !"));
+	}
 }

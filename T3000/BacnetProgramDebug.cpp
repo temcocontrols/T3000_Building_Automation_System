@@ -11,7 +11,7 @@ unsigned int point_number = 0;
 unsigned int point_type = 0;
 extern int initial_dialog;
 // CBacnetProgramDebug dialog
-
+#define UPDATE_DEBUG_DATA_TIMER           3
 IMPLEMENT_DYNAMIC(CBacnetProgramDebug, CDialogEx)
 
 CBacnetProgramDebug::CBacnetProgramDebug(CWnd* pParent /*=NULL*/)
@@ -51,7 +51,7 @@ BOOL CBacnetProgramDebug::OnInitDialog()
 	CDialogEx::OnInitDialog();
 
 	// TODO:  Add extra initialization here
-
+	SetTimer(UPDATE_DEBUG_DATA_TIMER,5000,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -80,7 +80,7 @@ BOOL CBacnetProgramDebug::PreTranslateMessage(MSG* pMsg)
 void CBacnetProgramDebug::OnCancel()
 {
 	// TODO: Add your specialized code here and/or call the base class
-
+	KillTimer(UPDATE_DEBUG_DATA_TIMER);
 	CDialogEx::OnCancel();
 }
 
@@ -88,7 +88,7 @@ void CBacnetProgramDebug::OnCancel()
 void CBacnetProgramDebug::OnClose()
 {
 	// TODO: Add your message handler code here and/or call default
-
+	KillTimer(UPDATE_DEBUG_DATA_TIMER);
 	CDialogEx::OnClose();
 }
 
@@ -107,7 +107,7 @@ void CBacnetProgramDebug::Initial_List(unsigned int list_type)
 	m_prg_debug_variable_time_picker.ShowWindow(SW_HIDE);
 	switch(list_type)
 	{
-	case 0://OUT
+	case BAC_OUT://OUT
 		{
 			m_program_debug_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 			m_program_debug_list.SetExtendedStyle(m_program_debug_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
@@ -163,7 +163,7 @@ void CBacnetProgramDebug::Initial_List(unsigned int list_type)
 
 		}
 		break;
-	case 1://IN
+	case BAC_IN://IN
 		{
 
 			m_program_debug_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
@@ -229,7 +229,7 @@ void CBacnetProgramDebug::Initial_List(unsigned int list_type)
 
 		}
 		break;
-	case 2://VAR
+	case BAC_VAR://VAR
 		{
 			m_program_debug_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 			m_program_debug_list.SetExtendedStyle(m_program_debug_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
@@ -791,7 +791,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 						m_program_debug_list.SetItemText(0,VARIABLE_UNITE,Variable_Analog_Units_Array[m_Variable_data.at(point_number).range]);
 						char temp_char[50];
 						int time_seconds = m_Variable_data.at(point_number).value / 1000;
-						intervaltotext(temp_char,time_seconds,0,0);
+						intervaltotextfull(temp_char,time_seconds,0,0);
 						CString temp_11;
 						MultiByteToWideChar( CP_ACP, 0, temp_char, strlen(temp_char) + 1, 
 							temp_11.GetBuffer(MAX_PATH), MAX_PATH );
@@ -1990,7 +1990,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 					{
 						char temp_char[50];
 						int time_seconds = m_Variable_data.at(point_number).value / 1000;
-						intervaltotext(temp_char,time_seconds,0,0);
+						intervaltotextfull(temp_char,time_seconds,0,0);
 
 						CString temp_11;
 						MultiByteToWideChar( CP_ACP, 0, temp_char, strlen(temp_char) + 1, 
@@ -2077,6 +2077,40 @@ void CBacnetProgramDebug::OnTimer(UINT_PTR nIDEvent)
 		{
 			KillTimer(2);
 			m_prg_debug_variable_time_picker.Invalidate();
+		}
+		break;
+	case UPDATE_DEBUG_DATA_TIMER:
+		{
+			if((bac_select_device_online)&& (g_protocol == PROTOCOL_BACNET_IP))
+			{
+				switch((point_type))
+				{
+				case BAC_OUT:
+					if(point_number < BAC_OUTPUT_ITEM_COUNT)
+					{
+						Post_Refresh_One_Message(g_bac_instance,READOUTPUT_T3000,point_number,point_number,	sizeof(Str_out_point));
+						Fresh_Program_List(point_type);
+					}
+					break;
+				case BAC_IN:
+					if(point_number < BAC_INPUT_ITEM_COUNT)
+					{
+						Post_Refresh_One_Message(g_bac_instance,READINPUT_T3000,point_number,point_number,	sizeof(Str_in_point));
+						Fresh_Program_List(point_type);
+					}
+					break;
+				case BAC_VAR:
+					if(point_number < BAC_VARIABLE_ITEM_COUNT)
+					{
+						Post_Refresh_One_Message(g_bac_instance,READVARIABLE_T3000,point_number,point_number,	sizeof(Str_variable_point));
+						Fresh_Program_List(point_type);
+					}
+					break;
+				default:
+					break;
+				}
+				
+			}
 		}
 		break;
 	default:

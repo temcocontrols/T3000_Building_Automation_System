@@ -342,7 +342,9 @@
     <None Include="OutputTableDlg.htm">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="res\annual.ico" />
+    <None Include="res\AlarmsBrown.bmp" />
+    <None Include="res\AlarmsGreen.bmp" />
+    <None Include="res\AlarmsRed.bmp" />
     <None Include="res\ApplyDisable.bmp" />
     <None Include="res\ApplyDown.bmp" />
     <None Include="res\ApplyFouct.bmp" />
@@ -353,6 +355,8 @@
     <None Include="res\bitmap2.bmp" />
     <None Include="res\bitmap4.bmp" />
     <None Include="C:\Users\pc\Desktop\bmp00001.bmp" />
+    <None Include="res\bitmap8.bmp" />
+    <None Include="res\bitmap9.bmp" />
     <None Include="res\bitmap_v.bmp" />
     <None Include="res\bitmap_v_Connected.bmp" />
     <None Include="res\bmp00001.bmp" />
@@ -371,9 +375,19 @@
     <None Include="res\coldtool.bmp" />
     <None Include="res\default view.bmp" />
     <None Include="res\default view.jpg" />
+    <None Include="res\default_icon\Graphics.ico" />
+    <None Include="res\default_icon\Holidays.ico" />
+    <None Include="res\default_icon\outputs.ico" />
+    <None Include="res\default_icon\PID.ico" />
+    <None Include="res\default_icon\Programs.ico" />
+    <None Include="res\default_icon\schedual.ico" />
+    <None Include="res\default_icon\TrendLogs.ico" />
+    <None Include="res\default_icon\Variables.ico" />
     <None Include="res\Exit.ico" />
     <None Include="res\hottool.bmp" />
     <None Include="res\Input.ico" />
+    <None Include="res\INPUT_DEFAULT.ico" />
+    <None Include="res\Input_Icon_Default.ico" />
     <None Include="res\LCD Table Button.bmp" />
     <None Include="res\LED Table Button.bmp" />
     <None Include="res\lock.ico" />
@@ -392,11 +406,11 @@
     <None Include="res\MUp.bmp" />
     <None Include="C:\Documents and Settings\lee\桌面\NWT3000.ico" />
     <None Include="res\OK.ico" />
-    <None Include="res\Output.ico" />
-    <None Include="res\Programing.ico" />
     <None Include="res\Refresh.ico" />
     <None Include="res\relay.ico" />
     <None Include="res\Scan.ico" />
+    <None Include="res\Schedual_Icon_Default.ico" />
+    <None Include="res\Schedual_Icon_Default2.ico" />
     <None Include="res\Schedule0607.bmp" />
     <None Include="res\Select.ico" />
     <None Include="res\serialnum.ico" />
@@ -422,10 +436,11 @@
     <None Include="res\ToolbarOwn.bmp" />
     <None Include="res\treenode.bmp" />
     <None Include="res\unlock.ico" />
-    <None Include="res\variable.ico" />
-    <None Include="res\week.ico" />
     <None Include="UserImages.bmp" />
     <None Include="..\ModbusDllforVc\ModbusDllforVc\ReadMe.txt" />
+    <None Include="Z:\Temp\lm\T3000\BluBuildings.ico" />
+    <None Include="Z:\Temp\lm\T3000\t3000_icon_output.ico" />
+    <None Include="Z:\Temp\lm\T3000\t3000_icon_output.png" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AirflowSettingDlg.h" />
@@ -511,6 +526,7 @@
     <ClInclude Include="CM5\user_data.h" />
     <ClInclude Include="CO2NetView.h" />
     <ClInclude Include="CO2_View.h" />
+    <ClInclude Include="CommandWindow.h" />
     <ClInclude Include="ConfigFileHandler.h" />
     <ClInclude Include="ConnectRemoteServer.h" />
     <ClInclude Include="CustomSTable.h" />

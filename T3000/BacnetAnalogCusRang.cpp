@@ -51,6 +51,7 @@ BEGIN_MESSAGE_MAP(CBacnetAnalogCusRang, CDialogEx)
 	ON_MESSAGE(WM_REFRESH_BAC_ANALOGCUSRANGE_LIST,Fresh_AnalogCusRange_List)
 	ON_WM_CLOSE()
 	  ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)
+	  ON_EN_KILLFOCUS(IDC_EDIT_BAC_CUS_ANALOG_UNIT, &CBacnetAnalogCusRang::OnEnKillfocusEditBacCusAnalogUnit)
 END_MESSAGE_MAP()
 
 
@@ -228,6 +229,15 @@ LRESULT CBacnetAnalogCusRang::Fresh_AnalogCusRange_List(WPARAM wParam,LPARAM lPa
 	max_unit = 0xffffffff;
     min_unit = 0x7fffffff;
 
+	CString temp_show_unit;
+	MultiByteToWideChar( CP_ACP, 0, (char *)m_analog_custmer_range.at(analog_range_tbl_line).table_name, (int)strlen(m_analog_custmer_range.at(analog_range_tbl_line).table_name)+1, 
+		temp_show_unit.GetBuffer(MAX_PATH), MAX_PATH );
+	temp_show_unit.ReleaseBuffer();
+	if(temp_show_unit.GetLength() > 9)
+		temp_show_unit = temp_show_unit.Left(9);
+
+	((CEdit *)GetDlgItem(IDC_EDIT_BAC_CUS_ANALOG_UNIT))->SetWindowText(temp_show_unit);
+	
 	for (int i=0;i<11;i++)
 	{
 		CString n_value_2byte;
@@ -301,7 +311,16 @@ void CBacnetAnalogCusRang::OnClose()
 BOOL CBacnetAnalogCusRang::PreTranslateMessage(MSG* pMsg)
 {
 	// TODO: Add your specialized code here and/or call the base class
-	if((pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN)  || (pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_ESCAPE))
+	int temp_focus_id = GetFocus()->GetDlgCtrlID();
+	if(temp_focus_id == IDC_EDIT_BAC_CUS_ANALOG_UNIT )
+	{
+		if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN) 
+		{
+			UpdateCusAnalogUnit();
+			return TRUE;
+		}
+	}
+	else if((pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN)  || (pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_ESCAPE))
 	{
 		CWnd * window_focus =	GetFocus();
 		if(window_focus == NULL)
@@ -485,4 +504,35 @@ BOOL CBacnetAnalogCusRang::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pR
 	}
 
 	return(FALSE);
+}
+
+
+void CBacnetAnalogCusRang::OnEnKillfocusEditBacCusAnalogUnit()
+{
+	// TODO: Add your control notification handler code here
+
+	UpdateCusAnalogUnit();
+}
+
+
+void CBacnetAnalogCusRang::UpdateCusAnalogUnit()
+{
+	CString temp_cs;
+	((CEdit *)GetDlgItem(IDC_EDIT_BAC_CUS_ANALOG_UNIT))->GetWindowTextW(temp_cs);
+	if(temp_cs.GetLength() > 9)
+	{
+		MessageBox(_T("Nodes label length must between 1-9"),_T("Notice"),MB_OK | MB_ICONINFORMATION);
+		return;
+	}
+
+	char cTemp1[255];
+	memset(cTemp1,0,255);
+	WideCharToMultiByte( CP_ACP, 0, temp_cs.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+
+	memcpy_s(m_analog_custmer_range.at(analog_range_tbl_line).table_name,9,cTemp1,9);
+	//m_analog_custmer_range.at(analog_range_tbl_line).table_name
+	CString temp_task_info;
+	temp_task_info.Format(_T("Update Analog Range Unit : %s  "),temp_cs);
+	Post_Write_Message(g_bac_instance,WRITEANALOG_CUS_TABLE_T3000,analog_range_tbl_line,analog_range_tbl_line,sizeof(Str_table_point),analog_cus_range_dlg ,temp_task_info);
+
 }

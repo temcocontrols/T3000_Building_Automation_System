@@ -1169,6 +1169,15 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
             memcpy(pSendBuf + 1, (BYTE*)&END_FLAG, 4);
             int nSendLen = 5;
 
+			  BYTE ptempSendBuf[100];
+			  memset(ptempSendBuf,0,100);
+			  ptempSendBuf[0] = 0xff;
+			  ptempSendBuf[1] = 0x55;
+			  ptempSendBuf[2] = 0xff;
+			  ptempSendBuf[3] = 0x55;
+			  int ntempSendLen = 4;
+			 nRet = ::sendto(h_scan_Broad,(char*)ptempSendBuf,ntempSendLen,0,(sockaddr*)&h_scan_bcast,sizeof(h_scan_bcast));
+
             /////////////////////////////////////////////////////////////////////////*/
             int time_out=0;
             BOOL bTimeOut = FALSE;
@@ -1194,7 +1203,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
                     goto END_SCAN;
                     return 0;
                 }
-
+				g_llTxCount ++ ;
                 memset(m_scan_info.at(scan_udp_item).scan_notes,0,250);
                 temp_str.Format(_T("Send UDP broadcast package to device.."));
                 char temp_char[250];
@@ -1229,6 +1238,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
                             FD_ZERO(&fdSocket);
                             if(buffer[0]==RESPONSE_MSG)
                             {
+								g_llRxCount ++ ;
                                 nLen=buffer[2]+buffer[3]*256;
                                 unsigned short dataPackage[32]= {0};
                                 memcpy(dataPackage,buffer+2,nLen*sizeof(unsigned short));
@@ -2457,13 +2467,22 @@ void CTStatScanner::AddNewNetToDB()
 		//不加这句话能解决扫描后 名字会变掉
 		//但是加了 会出现 DB是空的时候  明明扫描到了 设备，却要等很长时间 靠后台扫描 才显示出来;
 #if 1
+
+
+
         try
         {
 
             CString strSql;
-
-            strSql.Format(_T("Delete * From  ALL_NODE Where Serial_ID = '%d' "),nSID);
-            bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+			 strSql.Format(_T("Select * From  ALL_NODE Where Serial_ID = '%d' "),nSID);
+			  
+			   bado.m_pRecordset=bado.OpenRecordset(strSql);
+			  int nTemp3 = bado.GetRecordCount(bado.m_pRecordset);
+			  if(nTemp3 >= 1)
+			  {
+				   bado.CloseRecordset();	//数据库里面有就不用管了，后台会自动刷新的;
+				   continue;
+			  }
         }
         catch (...)
         {
@@ -2649,7 +2668,7 @@ void CTStatScanner::WriteOneDevInfoToDB( _ComDeviceInfo* pInfo)
         strCom=pInfo->m_tstatport;
     }
     if (nClassID == PM_TSTAT6||nClassID == PM_TSTAT7||nClassID == PM_TSTAT8||nClassID == PM_TSTAT5i
-            ||nClassID == PM_HUMTEMPSENSOR||nClassID ==PM_AirQuality||nClassID ==PM_HUM_R)
+            ||nClassID == PM_HUMTEMPSENSOR||nClassID ==PM_AirQuality||nClassID ==PM_HUM_R||nClassID == PM_CO2_RS485)
     {
         BOOL Is_Open=FALSE;
         if (pInfo->m_pDev->m_nComPort==-1)
@@ -2669,7 +2688,7 @@ void CTStatScanner::WriteOneDevInfoToDB( _ComDeviceInfo* pInfo)
         if (Is_Open)
         {
 
-            unsigned short DataBuffer[10] ;
+            unsigned short DataBuffer[20] ;
 
 
 
@@ -2683,8 +2702,15 @@ void CTStatScanner::WriteOneDevInfoToDB( _ComDeviceInfo* pInfo)
 
                 }
             }
-
-
+			 ret = Read_Multi(nID,DataBuffer,0,20);
+			 if (ret > 0)
+			 {
+				 if ((DataBuffer[7]==PM_CO2_RS485&&DataBuffer[14] == 6)||DataBuffer[7]==PM_HUMTEMPSENSOR)
+				 {
+					 strProductName = L"Hum Sensor";
+				 }
+			 }
+		
 
             close_com();
         }
@@ -4066,7 +4092,8 @@ BOOL CTStatScanner::IsNetDevice(const CString& strDevType)
             || nDeviceType == PM_NC
             || nDeviceType == PM_CO2_NET
             || nDeviceType == PM_MINIPANEL
-            || nDeviceType == PM_CM5)
+            || nDeviceType == PM_CM5
+			|| nDeviceType == STM32_CO2_NET)
     {
         return TRUE;
     }

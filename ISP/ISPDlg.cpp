@@ -746,40 +746,42 @@ void CISPDlg::OnBnClickedButtonSelfile()
     CWnd* pEditFilePath = (CWnd*)GetDlgItem(IDC_EDIT_FILEPATH);
     pEditFilePath->SetWindowText(m_strHexFileName);
 
-//    int ret=Judge_BinHexFile(m_strHexFileName);
-//    if (ret==0)
-//    {
-//        pEditFilePath->SetWindowText(_T(""));
-//        return;
-//    }
-//    if (ret == 1)
-//    {
-//        char*			pFileBuffer;
-//        CHexFileParser* pHexFile = new CHexFileParser;
-//        pHexFile->SetFileName(m_strHexFileName);
-//        pFileBuffer = new char[c_nHexFileBufLen];
-//        memset(pFileBuffer, 0xFF, c_nHexFileBufLen);
-//        int nDataSize = pHexFile->GetHexFileBuffer(pFileBuffer, c_nHexFileBufLen);//获取文件的buffer
-//
-////         if (!pHexFile->Is_RAM_HEXType())
-////         {
-////             m_isRAM = 0;
-////             ShowHexBinInfor(ret);
-////         }
-//// 
-////         if (pHexFile->Is_RAM_HEXType())
-////         {
-////             m_isRAM = 1;
-////             ShowHexBinInfor(ret);
-////         }
-//
-//        if (pFileBuffer)
-//        {
-//            delete []pFileBuffer;
-//            pFileBuffer = NULL;
-//        }
-//        delete pFileBuffer;
-//    }
+    //int ret=Judge_BinHexFile(m_strHexFileName);
+    //if (ret==0)
+    //{
+    //    pEditFilePath->SetWindowText(_T(""));
+    //    return;
+    //}
+    //if (ret == 1)
+    //{
+    //    char*			pFileBuffer;
+    //    CHexFileParser* pHexFile = new CHexFileParser;
+    //    pHexFile->SetFileName(m_strHexFileName);
+    //    pFileBuffer = new char[c_nHexFileBufLen];
+    //    memset(pFileBuffer, 0xFF, c_nHexFileBufLen);
+    //    int nDataSize = pHexFile->GetHexFileBuffer(pFileBuffer, c_nHexFileBufLen);//获取文件的buffer
+
+    //    if (!pHexFile->Is_RAM_HEXType())
+    //    {
+    //        m_isRAM = 0;
+    //        ShowHexBinInfor(ret);
+    //    }
+
+    //    if (pHexFile->Is_RAM_HEXType())
+    //    {
+    //        m_isRAM = 1;
+    //        ShowHexBinInfor(ret);
+    //    }
+
+    //    if (pFileBuffer)
+    //    {
+    //        delete []pFileBuffer;
+    //        pFileBuffer = NULL;
+    //    }
+    //    delete pFileBuffer;
+    //}
+
+
 
 }
 void CISPDlg::SaveParamToConfigFile()

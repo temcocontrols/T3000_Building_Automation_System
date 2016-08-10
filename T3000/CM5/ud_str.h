@@ -131,9 +131,11 @@ typedef enum {
 		 WRITE_REMOTE_POINT         = 140,
 		 WRITE_AT_COMMAND			= 190,	//100 length
 		 WRITE_GRPHIC_LABEL_COMMAND  = 191,
-		 WRITE_SETTING_COMMAND		= 198,
+
 		 WRITEPIC_T3000        = 195,
 		 WRITE_MISC                  = 196,
+		 WRITE_SPECIAL_COMMAND = 197,
+		 WRITE_SETTING_COMMAND		= 198,
 		 WRITE_SUB_ID_BY_HAND = 199,
 		 DELETE_MONITOR_DATABASE = 200
 } CommandRequest;	  
@@ -942,9 +944,17 @@ typedef union
 		unsigned short collision[3];  // id collision
 		unsigned short packet_error[3];  // bautrate not match
 		unsigned short timeout[3];
-
 	}reg;
 }Str_MISC;
+
+typedef union
+{
+	uint8_t all[100];
+	struct 
+	{  
+		unsigned char clear_health_rx_tx; //check if  0x11 clear rx tx
+	}reg;
+}Str_Special;
 
 
 typedef struct

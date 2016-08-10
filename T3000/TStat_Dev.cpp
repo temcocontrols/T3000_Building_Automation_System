@@ -190,6 +190,12 @@ CString CTStat_Dev::GetProductName()
 	case  PM_CO2_RS485:
 		strProductName = "CO2";
 		break;
+	case  STM32_CO2_NET:
+		strProductName = "CO2 Net";
+		break;
+	case  STM32_CO2_RS485:
+		strProductName = "CO2";
+		break;
     case  PM_PRESSURE_SENSOR:
         strProductName = "Pressure";
         break;
@@ -225,6 +231,9 @@ CString CTStat_Dev::GetProductName()
     case PM_T322AI:
         strProductName="T3-22I";
         break;
+	case PM_T3PT12:
+		strProductName="T3-PT12";
+		break;
     case PM_T38AI8AO6DO:
         strProductName="T3-8AI8AO6DO";
         break;
@@ -232,7 +241,7 @@ CString CTStat_Dev::GetProductName()
 		strProductName="T3-6CT";
 			break;
 	case PM_MINIPANEL:
-		strProductName="MiniPanel";
+		strProductName="T3-BB/LB/TB";
 		break;
     case PM_AirQuality:
         strProductName="Air Quality";

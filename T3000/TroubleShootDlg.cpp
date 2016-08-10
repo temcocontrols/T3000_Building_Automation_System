@@ -296,6 +296,25 @@ BOOL CTroubleShootDlg::ChangeNetDeviceIP(CString strIP){
 				SaveNewIPAddress(strnewipadress,stroldipaddress);
 				ret=TRUE;
 				MessageBox(_T("Successfull"));
+				CString strSql;
+				CBADO bado;
+				bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+				bado.OnInitADOConn(); 
+				CString temp_serial_cs;
+				temp_serial_cs.Format(_T("%u"),g_selected_serialnumber);
+				strSql.Format(_T("select * from ALL_NODE where Serial_ID = '%s' "),temp_serial_cs);
+				//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+				bado.m_pRecordset=bado.OpenRecordset(strSql);
+				while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+				{
+					strSql.Format(_T("update ALL_NODE set Bautrate='%s' where Serial_ID= '%s'"),strnewipadress,temp_serial_cs);
+					bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+					bado.m_pRecordset->MoveNext();
+				}
+				bado.CloseRecordset();
+				CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+				::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
+
 					//Sleep(8000);
 
 				//	SetCommunicationType(1);
@@ -476,11 +495,11 @@ void CTroubleShootDlg::OnPaint()
 	WarningMessagePoint.Y = 105;
 	mygraphics->DrawString(_T("to match the IP address of your PC?"), -1, &WarningMessageFont, WarningMessagePoint,&WarningMessageColor);
 
-	WarningMessagePoint.X = 220;
+	WarningMessagePoint.X = 170;
 	WarningMessagePoint.Y = 160;
 	mygraphics->DrawString(_T("Current"), -1, &WarningMessageFont, WarningMessagePoint,&WarningMessageColor);
 
-	WarningMessagePoint.X = 470;
+	WarningMessagePoint.X = 500;
 	WarningMessagePoint.Y = 160;
 	mygraphics->DrawString(_T("Proposed"), -1, &WarningMessageFont, WarningMessagePoint,&WarningMessageColor);
 

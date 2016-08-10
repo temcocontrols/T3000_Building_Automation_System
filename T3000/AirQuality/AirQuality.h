@@ -98,6 +98,7 @@ public:
  
 	unsigned short Default_Value[30];
 public:
+	int m_product_model;
 	bool m_fresh_data;
 	CEdit m_edit_address;
 	CEdit m_edit_sn;

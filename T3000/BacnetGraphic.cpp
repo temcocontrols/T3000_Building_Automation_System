@@ -76,7 +76,7 @@ DWORD WINAPI MyThreadPro(LPVOID lPvoid);
 DWORD WINAPI UpdateDataThreadPro(LPVOID lPvoid);
 
 int point_error_2 = 0;
-
+PointF      RclickValueTime(0, 0);
 
 //#define  MY_COLOR_BACKGRAND SolidBrush(Color(255,192,192,192))
 //#define  MY_COLOR_AUTOSCROLL			Color(255,255,255,0)
@@ -103,6 +103,7 @@ int point_error_2 = 0;
 #define  MY_COLOR_PEN_RECTANGLE_BORD    Color(255,0,0,0)
 #define  MY_COLOR_PEN_INLINE_PEN        Color(255,20,20,20)
 #define  MY_COLOR_UNIT_PEN              Color(255,0,0,0)
+#define  MY_COLOR_RIGHTCLICK_VALUE_COLOR		Color(255,255,0,255)
 
 
 
@@ -138,25 +139,22 @@ const int WM_FRESH_STATIC = 1069;
 BEGIN_MESSAGE_MAP(CBacnetGraphic, CDialogEx)
 	ON_MESSAGE(WM_FRESH_STATIC,Fresh_Static_Function)
 	ON_WM_TIMER()
-//	ON_STN_CLICKED(IDC_STATIC_GRAPHIC_A, &CBacnetGraphic::OnStnClickedStaticGraphicA)
-//ON_STN_CLICKED(IDC_STATIC_GRAPHIC_1, &CBacnetGraphic::OnStnClickedStaticGraphicA)
-ON_WM_LBUTTONDOWN()
-//ON_WM_NCDESTROY()
-ON_WM_HELPINFO()
-ON_COMMAND(ID_TIMEBASE_1HOUR, &CBacnetGraphic::OnTimebase1hour)
-ON_COMMAND(ID_TIMEBASE_1DAY, &CBacnetGraphic::OnTimebase1day)
-//ON_COMMAND(ID_TIMEBASE_1MINITES, &CBacnetGraphic::OnTimebase1minites)
-ON_COMMAND(ID_TIMEBASE_10MINUTES, &CBacnetGraphic::OnTimebase10minutes)
-ON_COMMAND(ID_TIMEBASE_12HOURS, &CBacnetGraphic::OnTimebase12hours)
-ON_COMMAND(ID_TIMEBASE_4HOURS, &CBacnetGraphic::OnTimebase4hours)
-ON_COMMAND(ID_TIMEBASE_4DAYS, &CBacnetGraphic::OnTimebase4days)
-ON_COMMAND(ID_GRAPHIC_LEFT, &CBacnetGraphic::OnGraphicLeft)
-ON_COMMAND(ID_GRAPHIC_RIGHT, &CBacnetGraphic::OnGraphicRight)
-ON_COMMAND(ID_ZOOMIN, &CBacnetGraphic::OnZoomin)
-ON_COMMAND(ID_ZOOMOUT, &CBacnetGraphic::OnZoomout)
-ON_COMMAND(ID_TIMEBASE_CUSTOMERDEFINE, &CBacnetGraphic::OnTimebaseCustomerdefine)
-ON_COMMAND(ID_TIMEBASE_5MINUTES, &CBacnetGraphic::OnTimebase5minutes)
-ON_COMMAND(ID_TIMEBASE_30MINUTES, &CBacnetGraphic::OnTimebase30minutes)
+	ON_WM_LBUTTONDOWN()
+	ON_WM_HELPINFO()
+	ON_COMMAND(ID_TIMEBASE_1HOUR, &CBacnetGraphic::OnTimebase1hour)
+	ON_COMMAND(ID_TIMEBASE_1DAY, &CBacnetGraphic::OnTimebase1day)
+	ON_COMMAND(ID_TIMEBASE_10MINUTES, &CBacnetGraphic::OnTimebase10minutes)
+	ON_COMMAND(ID_TIMEBASE_12HOURS, &CBacnetGraphic::OnTimebase12hours)
+	ON_COMMAND(ID_TIMEBASE_4HOURS, &CBacnetGraphic::OnTimebase4hours)
+	ON_COMMAND(ID_TIMEBASE_4DAYS, &CBacnetGraphic::OnTimebase4days)
+	ON_COMMAND(ID_GRAPHIC_LEFT, &CBacnetGraphic::OnGraphicLeft)
+	ON_COMMAND(ID_GRAPHIC_RIGHT, &CBacnetGraphic::OnGraphicRight)
+	ON_COMMAND(ID_ZOOMIN, &CBacnetGraphic::OnZoomin)
+	ON_COMMAND(ID_ZOOMOUT, &CBacnetGraphic::OnZoomout)
+	ON_COMMAND(ID_TIMEBASE_CUSTOMERDEFINE, &CBacnetGraphic::OnTimebaseCustomerdefine)
+	ON_COMMAND(ID_TIMEBASE_5MINUTES, &CBacnetGraphic::OnTimebase5minutes)
+	ON_COMMAND(ID_TIMEBASE_30MINUTES, &CBacnetGraphic::OnTimebase30minutes)
+	ON_WM_RBUTTONDOWN()
 END_MESSAGE_MAP()
 
 
@@ -254,9 +252,9 @@ BOOL CBacnetGraphic::OnInitDialog()
 
 	
 
-//#ifndef _DEBUG
+#ifndef _DEBUG
 	::SetWindowPos(this->m_hWnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
-//#endif
+#endif
 	// TODO:  Add extra initialization here
 	MSG msg;
 	WNDCLASS wndClass;
@@ -272,8 +270,13 @@ BOOL CBacnetGraphic::OnInitDialog()
 	myRect.bottom=myRect.bottom-myRect.top;
 
 	time_interval_point = m_monitor_data.at(monitor_list_line).hour_interval_time *3600 + m_monitor_data.at(monitor_list_line).minute_interval_time * 60 + m_monitor_data.at(monitor_list_line).second_interval_time;
-
-	Get_Input_Unit();
+	if(monitor_list_line != 11)
+		Get_Input_Unit();
+	else
+	{
+		for(int m=0;m< (sizeof(System_Unit) / sizeof(System_Unit[0]));m++)
+			InputUnit[m]= System_Unit[m];
+	}
 	for(int i=0;i<14;i++)
 		StaticShow[i] = true;	//初始化时都让显示,显示第一次的时候这些值会被自动的修改;
 	InitialParameter(scale_type);
@@ -285,11 +288,13 @@ BOOL CBacnetGraphic::OnInitDialog()
 
 	if(read_monitor_sd_ret == MONITOR_READ_TIMEOUT)
 	{
-		MessageBox(_T("Read Monitor Data Timeout!"));
+		//MessageBox(_T("Read Monitor Data Timeout!"));
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read monitor data timeout!"));
 	}
 	else if(read_monitor_sd_ret == MONITOR_READ_NO_DATA)
 	{
-		MessageBox(_T("No data in this period of time!"));
+		//MessageBox(_T("No data in this period of time!"));
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("No data in this period of time!"));
 	}
 
 
@@ -349,6 +354,7 @@ BOOL CBacnetGraphic::InitDC()
 
 int CBacnetGraphic::Search_data_from_db()
 {
+	m_time_monitor_now = (m_time_monitor_now / 10)*10;
 	unsigned long temp_timesec1970 = m_time_monitor_now; 
 	unsigned long temp_time_start;
 	unsigned long temp_time_end;
@@ -461,8 +467,8 @@ int CBacnetGraphic::Search_data_from_db()
 		else if((i >=temp_number_of_analog) && temp_number_of_digital>0)
 		{
 			CString strSql;
-			//strSql.Format(_T("select * from MonitorData where Input_Index = '%s' and SerialNumber = %i and Monitor_Index = %i and Analog_Digital = 0 and Record_Time >= %i and Record_Time <= %i ORDER BY Record_Time ASC"),cs_temp_input_index,temp_serial_number,temp_monitor_index,temp_time_start,temp_time_end);	
-			strSql.Format(_T("select * from MonitorData where Index_ = '%s'  and Analog_Digital = 0 and Time_Since1970 >= %i and Time_Since1970 <= %i ORDER BY Time_Since1970 ASC"),cs_temp_input_index,m_starttime,m_endtime);	
+			//strSql.Format(_T("select * from MonitorData where Index_ = '%s'  and Analog_Digital = 0 and Time_Since1970 >= %i and Time_Since1970 <= %i ORDER BY Time_Since1970 ASC"),cs_temp_input_index,m_starttime,m_endtime);	
+			strSql.Format(_T("select * from MonitorData where Index_ = '%s'  and Analog_Digital = 0 and Time_Since1970 <= %i  ORDER BY Time_Since1970 ASC"),cs_temp_input_index,m_endtime);	
 			monitor_bado.m_pRecordset=monitor_bado.OpenRecordset(strSql);
 			temp_record_count = monitor_bado.GetRecordCount(monitor_bado.m_pRecordset);
 			if(temp_record_count <= 0)
@@ -579,10 +585,10 @@ void CBacnetGraphic::Create_Line_Point()
 				{
 					pPrevItem->SetNext(pTempItem);
 					//切尔西说 模拟量的 值 也要改为 有变化的时候记录， 所以所有的点都需要自动连接至下一个点;  2016 02 25
-					//if(analog_data_point[x][i].loggingtime - analog_data_point[x][i - 1].loggingtime > 5*time_interval_point)
-					//{
-					//	pPrevItem->m_link_to_next = false;
-					//}
+					if(analog_data_point[x][i].loggingtime - analog_data_point[x][i - 1].loggingtime > 10*time_interval_point)
+					{
+						pPrevItem->m_link_to_next = false;
+					}
 				}
 				pPrevItem = pTempItem;
 
@@ -606,7 +612,24 @@ void CBacnetGraphic::Create_Line_Point()
 				PointF mytemppoint(0,0);
 				if(digital_data_point[x] == NULL)
 					return;
-				DigitalTimeValueToPoint(digital_data_point[x][i].loggingtime,digital_data_point[x][i].analogdata,mytemppoint);
+				bool b_ret = false;
+				b_ret = DigitalTimeValueToPoint(digital_data_point[x][i].loggingtime,digital_data_point[x][i].analogdata,mytemppoint);
+				if(digital_data_point[x][i].loggingtime    < m_starttime)
+				{
+					digital_last_data[x].analogdata = digital_data_point[x][i].analogdata;
+					digital_last_data[x].data_point.X = m_analogorignpoint.X;
+					if(digital_last_data[x].analogdata == 1)
+					{
+						digital_last_data[x].data_point.Y =m_digitalorignpoint.Y + 30;
+					}
+					else
+					{
+						digital_last_data[x].data_point.Y = m_digitalorignpoint.Y  + 110;
+					}
+					continue;
+				}
+
+
 				//TRACE(_T("X = %d , Y = %d \r\n"),(int)mytemppoint.X,(int)mytemppoint.Y);
 				MyPoint Mypoint={0,0};
 				Mypoint.x = mytemppoint.X;
@@ -718,7 +741,6 @@ DWORD WINAPI UpdateDataThreadPro(LPVOID lPvoid)
 	return 0 ;
 }
 	
-//volatile HANDLE Monitor_DB_Mutex=NULL;
 volatile HANDLE Point_Mutex=NULL;
 DWORD WINAPI MyThreadPro(LPVOID lPvoid)
 {
@@ -732,8 +754,7 @@ DWORD WINAPI MyThreadPro(LPVOID lPvoid)
 	Point_Mutex=CreateMutex(NULL,TRUE,_T("Point_Mutex_Control")); 
 	ReleaseMutex(Point_Mutex); 
 
-	//Monitor_DB_Mutex=CreateMutex(NULL,TRUE,_T("Monitor_DB_Control")); 
-	//ReleaseMutex(Monitor_DB_Mutex); 
+
 
 	while(flag_continue_thread)
 	{
@@ -759,6 +780,9 @@ DWORD WINAPI MyThreadPro(LPVOID lPvoid)
 			}
 			for (int i=0;i<INPUT_NUMBER;i++)
 			{
+				digital_last_data[i].analogdata = 0;
+				digital_last_data[i].data_point.X = 0;
+				digital_last_data[i].data_point.Y = 0;
 				if(m_pFirstItem[i] != NULL)
 				{
 
@@ -774,14 +798,12 @@ DWORD WINAPI MyThreadPro(LPVOID lPvoid)
 			}
 
 			mparent->Reset_X_Y_Parameter();
-			//WaitForSingleObject(Monitor_DB_Mutex,INFINITE); 
-			long t1=GetTickCount();//程序段开始前取得系统运行时间(ms);
+			//long t1=GetTickCount();//程序段开始前取得系统运行时间(ms);
 			mparent->Search_data_from_db();
-			long t2=GetTickCount();//程序段结束后取得系统运行时间(ms);
-			CString str_temp;
-			str_temp.Format(_T("time:%dms\r\n"),t2-t1);//前后之差即 程序运行时间;
-			TRACE(str_temp);
-			//ReleaseMutex(Monitor_DB_Mutex);
+			//long t2=GetTickCount();//程序段结束后取得系统运行时间(ms);
+			//CString str_temp;
+			//str_temp.Format(_T("time:%dms\r\n"),t2-t1);//前后之差即 程序运行时间;
+			//TRACE(str_temp);
 
 			mparent->Create_Line_Point();	//新建需要绘制的点;一直到下次开始刷新 或者定时器刷新时在去获取点;
 			//b_has_create_point = true;
@@ -886,7 +908,53 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 
 	delete Static_scroll_blackground_Brush;
 
+	Gdiplus::Font  TimeTopShow_font(&ScrollfontFamily, 24, FontStyleRegular, UnitPixel);
+	scrollpointF.X = 700;
+	scrollpointF.Y = 2;
+	CString top_string;
+	switch(m_time_selected)
+	{
+	case TIME_FIVE_MINUTE:
+			top_string.Format(_T("5 Minutes"));
+	
+		break;
+	case TIME_TEN_MINUTE :
+			top_string.Format(_T("10 Minutes"));
+		break;
+	case TIME_ONE_HOUR:
+		top_string.Format(_T("1 Hour"));
+		break;
+	case TIME_THIRTY_MINUTE:
+		top_string.Format(_T("30 Minutes"));
+		break;
+	case TIME_FOUR_HOUR:
+		top_string.Format(_T("4 Hours"));
+		break;
+	case TIME_TWELVE_HOUR:
+		top_string.Format(_T("12 Hours"));
+		break;
+	case TIME_ONE_DAY:
+		top_string.Format(_T("1 Day"));
+		break;
+	case TIME_FOUR_DAY:
+		top_string.Format(_T("4 Days"));
+		break;
+	default:
+		break;
+	}
+	
+	mygraphics->DrawString(top_string, -1, &TimeTopShow_font, scrollpointF,&Font_brush_on_off);
 
+	//右键点击 在绘图区域显示当前的值;
+	if((RclickValueTime.X != 0) && (RclickValueTime.Y != 0))
+	{
+		CString cs_value ;
+		float temp_nvalue;
+		temp_nvalue =	 ( m_analogorignpoint.Y + m_Y_ASIX_HIGHT - RclickValueTime.Y ) * m_onepiexlvalue  + m_lowvalue ;
+		cs_value.Format(_T("%.1f"),temp_nvalue);
+		SolidBrush  RClickBrush(MY_COLOR_RIGHTCLICK_VALUE_COLOR);
+		mygraphics->DrawString(cs_value, -1, &TimeTopShow_font, RclickValueTime,&RClickBrush);
+	}
 
 			//****************************************************************************************************
 	//画下面的 1 到 E 的lable	;
@@ -972,14 +1040,24 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 
 	for(int i=0;i<m_xscale + 1;i++)				//画网格线
 	{
-		mygraphics->DrawLine(my_inline_pen,(int)m_analogorignpoint.X+(m_X_ASIX_WIDTH/m_xscale)*(i+1),
-											(int)m_analogorignpoint.Y,
-											 (int)m_analogorignpoint.X+(m_X_ASIX_WIDTH/m_xscale)*(i+1),
-											 (int)m_analogorignpoint.Y + m_Y_ASIX_HIGHT);
+		//mygraphics->DrawLine(my_inline_pen,(int)m_analogorignpoint.X+(m_X_ASIX_WIDTH/m_xscale)*(i+1),
+		//									(int)m_analogorignpoint.Y,
+		//									 (int)m_analogorignpoint.X+(m_X_ASIX_WIDTH/m_xscale)*(i+1),
+		//									 (int)m_analogorignpoint.Y + m_Y_ASIX_HIGHT);
 
-		mygraphics->DrawLine(my_inline_pen,(int)m_digitalorignpoint.X+(m_X_ASIX_WIDTH/m_xscale)*(i+1),
+		//mygraphics->DrawLine(my_inline_pen,(int)m_digitalorignpoint.X+(m_X_ASIX_WIDTH/m_xscale)*(i+1),
+		//	(int)m_digitalorignpoint.Y,
+		//	(int)m_digitalorignpoint.X+(m_X_ASIX_WIDTH/m_xscale)*(i+1),
+		//	(int)m_digitalorignpoint.Y + m_Digital_Y_HIGHT);
+
+		mygraphics->DrawLine(my_inline_pen,(int)m_analogorignpoint.X+(m_X_ASIX_WIDTH*i)/m_xscale,
+			(int)m_analogorignpoint.Y,
+			(int)m_analogorignpoint.X+(m_X_ASIX_WIDTH*i)/m_xscale,
+			(int)m_analogorignpoint.Y + m_Y_ASIX_HIGHT);
+
+		mygraphics->DrawLine(my_inline_pen,(int)m_digitalorignpoint.X+(m_X_ASIX_WIDTH*i)/m_xscale,
 			(int)m_digitalorignpoint.Y,
-			(int)m_digitalorignpoint.X+(m_X_ASIX_WIDTH/m_xscale)*(i+1),
+			(int)m_digitalorignpoint.X+(m_X_ASIX_WIDTH*i)/m_xscale,
 			(int)m_digitalorignpoint.Y + m_Digital_Y_HIGHT);
 
 
@@ -1118,6 +1196,36 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 		{
 			if(first_item[i] != NULL)
 			{
+				if((digital_last_data[i].data_point.X != 0) && (digital_last_data[i].data_point.Y != 0))	//有可能确实出现前面所有一个点都没有，这种情况就不要从前面拉线了;
+				{
+					if(digital_last_data[i].data_point.X < first_item[i]->GetPoint().x)
+					{
+						//下面一部分是处理 digital  前半段没有数据，需要参考 xtime 之前的最近的状态来划线的做法;
+
+						if(digital_last_data[i].analogdata == first_item[i]->GetPointValue())
+							mygraphics->DrawLine( DrawLinePen[i],
+							(int)digital_last_data[i].data_point.X,
+							(int)digital_last_data[i].data_point.Y,
+							first_item[i]->GetPoint().x,
+							first_item[i]->GetPoint().y);
+						else
+						{
+							mygraphics->DrawLine(DrawLinePen[i],
+								(int)digital_last_data[i].data_point.X, (int)digital_last_data[i].data_point.Y,
+								first_item[i]->GetPoint().x,  (int)digital_last_data[i].data_point.Y);
+							mygraphics->DrawLine(DrawLinePen[i],
+								first_item[i]->GetPoint().x,(int)digital_last_data[i].data_point.Y,
+								first_item[i]->GetPoint().x,first_item[i]->GetPoint().y);
+						}
+					}
+				}
+
+
+
+
+
+
+
 				do 
 				{
 					second_item[i]=first_item[i]->GetNext();
@@ -1125,9 +1233,9 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 					{
 						int temp_x = 0 ;
 						
-						if(first_item[i]->GetPoint().x + 20 < m_digitalorignpoint.X + m_Digital_X_WIDTH)
-							temp_x = first_item[i]->GetPoint().x + 20;
-						else
+						//if(first_item[i]->GetPoint().x + 20 < m_digitalorignpoint.X + m_Digital_X_WIDTH)
+						//	temp_x = first_item[i]->GetPoint().x + 20;
+						//else
 							temp_x = m_digitalorignpoint.X + m_Digital_X_WIDTH;
 						mygraphics->DrawLine(DrawLinePen[i],first_item[i]->GetPoint().x,first_item[i]->GetPoint().y,temp_x,first_item[i]->GetPoint().y);
 						break;
@@ -1145,6 +1253,11 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 					first_item[i] = second_item[i];
 				} while (first_item[i]!=NULL);
 			}
+			else	//目标区域一个点都没有，需要参考很久以前的值;
+			{
+				if((digital_last_data[i].data_point.X != 0) && (digital_last_data[i].data_point.Y != 0))	//有可能确实出现前面所有一个点都没有，这种情况就不要从前面拉线了;
+					mygraphics->DrawLine(DrawLinePen[i],digital_last_data[i].data_point.X,digital_last_data[i].data_point.Y,digital_last_data[i].data_point.X + m_Digital_X_WIDTH,digital_last_data[i].data_point.Y);
+			}
 		}
 
 	}
@@ -1159,6 +1272,7 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 			DrawLinePen[i] = NULL;
 		}
 	}
+
 
 	delete CurePen;
 	delete mygraphics;
@@ -1233,6 +1347,8 @@ void CBacnetGraphic::OnOK()
 void CBacnetGraphic::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
+	RclickValueTime.X = 0;
+	RclickValueTime.Y = 0;
 	int click_item = -1;
 	for (int i=0;i<14;i++)
 	{
@@ -1249,24 +1365,16 @@ void CBacnetGraphic::OnLButtonDown(UINT nFlags, CPoint point)
 				StaticShow[i] = true;
 
 			SetTimer(2,5000,NULL);
-			//if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
-			//{
-			//	return;
-			//}
-			//b_has_create_point = false;
-			//draw_graphic_finished = false;
-			//Delete_Ram_Data();
-
 
 			break;
 		}
 	}
 
 	//点击时间轴是否 自动 卷动的 自绘按钮;
-	if((point.x > 120) &&
-		(point.x <170) &&
-		(point.y > 684) &&
-		(point.y < 684+ 20))
+	if((point.x > 122) &&
+		(point.x <172) &&
+		(point.y > 710) &&
+		(point.y < 710+ 20))
 	{
 		if(flag_auto_scroll)
 		{
@@ -1461,6 +1569,7 @@ bool CBacnetGraphic::DigitalTimeValueToPoint(unsigned long ntime , int nvalue ,P
 		returnpoint.Y = m_digitalorignpoint.Y  + 110;
 
 	long delta_time = ntime - m_starttime;
+
 	if((delta_time <0) ||(delta_time > x_axis_total_time))
 	{
 
@@ -1568,31 +1677,61 @@ void CBacnetGraphic::InitialParameter(int base_time,float y_min_value,float y_ma
 		WritePrivateProfileStringW(_T("Setting"),_T("Graphic_last_time_value"),cs_temp_value,g_cstring_ini_path);
 	}
 
+	if(m_monitor_data.at(monitor_list_line).num_inputs > m_monitor_data.at(monitor_list_line).an_inputs )
+	{
+		contain_digital = true;
+	}
+	int temp_get_data_count = m_monitor_data.at(monitor_list_line).num_inputs;
+	int temp_monitor_analog_count = m_monitor_data.at(monitor_list_line).an_inputs;
 
-	for (int i=monitor_analog_count;i<get_data_count;i++)
+	bool temp_digi = false;
+	for (int i=monitor_analog_count;i<temp_get_data_count;i++)
 	{
 		if(StaticShow[i])
 		{
-			contain_digital = true;
+			temp_digi = true;
 			break;
 		}
 	}
-	if((monitor_digital_count == 0)  || (contain_digital == false))
+	if(temp_digi)
+		contain_digital = true;
+	else
+		contain_digital = false;
+	//if((monitor_digital_count == 0)  || (contain_digital == false))
+	//if(contain_digital == false)
+	//{
+	//	Set_XAxis_Length(1200);
+	//	Set_YAxis_Length(650);
+	//	SetDigital_X_WIDTH(0);
+	//	SetDigital_Y_Hight(0);
+	//}
+	//else
+	//{
+	//	Set_XAxis_Length(1200);
+	//	Set_YAxis_Length(500);
+	//	SetDigital_X_WIDTH(1200);
+	//	SetDigital_Y_Hight(150);
+	//}
+
+	if(contain_digital == false)
 	{
-		Set_XAxis_Length(1200);
+		Set_XAxis_Length(1000);
 		Set_YAxis_Length(650);
 		SetDigital_X_WIDTH(0);
 		SetDigital_Y_Hight(0);
 	}
 	else
 	{
-		Set_XAxis_Length(1200);
+		Set_XAxis_Length(1000);
 		Set_YAxis_Length(500);
-		SetDigital_X_WIDTH(1200);
+		SetDigital_X_WIDTH(1000);
 		SetDigital_Y_Hight(150);
 	}
+
+
 	SetXaxisScale(6);
-	SetYaxisScale(5);
+//	SetYaxisScale(5);
+	SetYaxisScale(4);
 	SetAnalogOrignPoint(PointF(250,30));
 	SetDigitalOrignPoint(PointF(250,560));
 	Set_Time_Scale(base_time);
@@ -1626,20 +1765,13 @@ void CBacnetGraphic::InitialParameter(int base_time,float y_min_value,float y_ma
 	CalcOnePixelTime();
 	CalcOnePixelValue();
 	timestart = m_time_monitor_now - x_axis_total_time;
-
+	TRACE(_T("time from %u"),timestart);
+	timestart = (timestart / 10) * 10;
+	TRACE(_T(" to %u\n"),timestart);
 	SetXaxisStartTime(timestart);
 
 
 }
-
-
-//void CBacnetGraphic::OnNcDestroy()
-//{
-//	CDialogEx::OnNcDestroy();
-//
-//	
-//	// TODO: Add your message handler code here
-//}
 
 
 void CBacnetGraphic::PostNcDestroy()
@@ -1663,11 +1795,7 @@ void CBacnetGraphic::PostNcDestroy()
 void Delete_Ram_Data()
 {
 	WaitForSingleObject(Point_Mutex,INFINITE);	//防止删除数据的时候  绘图的线程又调用此数据;加锁保护;
-	//for (int i=0;i<10;i++)
-	//{
-	//	Sleep(1000);
-	//	TRACE(_T("Sleep %d\r\n"),10-i);
-	//}
+
 	for (int i=0;i< INPUT_NUMBER ;i++)
 	{
 		if(analog_data_point[i] !=NULL)
@@ -1707,10 +1835,6 @@ void Delete_Ram_Data()
 void CBacnetGraphic::OnTimebase1hour()
 {
 	// TODO: Add your command handler code here
-//	if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
-//	{
-//		return;
-//	}
 
 	CString temp_cs1;
 	temp_cs1.Format(_T("%d"),TIME_ONE_HOUR);
@@ -1730,11 +1854,6 @@ void CBacnetGraphic::OnTimebase1hour()
 void CBacnetGraphic::OnTimebase1day()
 {
 	// TODO: Add your command handler code here
-	//if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
-	//{
-	//	return;
-	//}
-
 	CString temp_cs1;
 	temp_cs1.Format(_T("%d"),TIME_ONE_DAY);
 	WritePrivateProfileString(_T("Setting"),_T("GraphicScaleType"),temp_cs1,g_cstring_ini_path);
@@ -1747,42 +1866,17 @@ void CBacnetGraphic::OnTimebase1day()
 	b_has_create_point = false;
 }
 
-#if 0
-void CBacnetGraphic::OnTimebase1minites()
-{
-	// TODO: Add your command handler code here
-	//if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
-	//{
-	//	return;
-	//}
-
-	m_time_selected = TIME_ONE_MINUTE;
-	draw_graphic_finished = false;
-	//Delete_Ram_Data();
-	b_has_create_point = false;
-}
-#endif
 
 
 void CBacnetGraphic::OnTimebase10minutes()
 {
 	// TODO: Add your command handler code here
-	//if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
-	//{
-	//	return;
-	//}
 
 	CString temp_cs1;
 	temp_cs1.Format(_T("%d"),TIME_TEN_MINUTE);
 	WritePrivateProfileString(_T("Setting"),_T("GraphicScaleType"),temp_cs1,g_cstring_ini_path);
-
-
 	m_time_selected = TIME_TEN_MINUTE;
-
-
-
 	draw_graphic_finished = false;
-	//Delete_Ram_Data();
 	b_has_create_point = false;
 
 
@@ -1792,10 +1886,6 @@ void CBacnetGraphic::OnTimebase10minutes()
 void CBacnetGraphic::OnTimebase12hours()
 {
 	// TODO: Add your command handler code here
-	//if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
-	//{
-	//	return;
-	//}
 	CString temp_cs1;
 	temp_cs1.Format(_T("%d"),TIME_TWELVE_HOUR);
 	WritePrivateProfileString(_T("Setting"),_T("GraphicScaleType"),temp_cs1,g_cstring_ini_path);
@@ -1804,7 +1894,6 @@ void CBacnetGraphic::OnTimebase12hours()
 	flag_auto_scroll = false;
 	m_time_selected = TIME_TWELVE_HOUR;
 	draw_graphic_finished = false;
-	//Delete_Ram_Data();
 	b_has_create_point = false;
 }
 
@@ -1812,10 +1901,6 @@ void CBacnetGraphic::OnTimebase12hours()
 void CBacnetGraphic::OnTimebase4hours()
 {
 	// TODO: Add your command handler code here
-//	if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
-//	{
-//		return;
-//	}
 	CString temp_cs1;
 	temp_cs1.Format(_T("%d"),TIME_FOUR_HOUR);
 	WritePrivateProfileString(_T("Setting"),_T("GraphicScaleType"),temp_cs1,g_cstring_ini_path);
@@ -1823,7 +1908,6 @@ void CBacnetGraphic::OnTimebase4hours()
 	flag_auto_scroll = true;
 	m_time_selected = TIME_FOUR_HOUR;
 	draw_graphic_finished = false;
-	//Delete_Ram_Data();
 	b_has_create_point = false;
 }
 
@@ -1847,6 +1931,13 @@ void CBacnetGraphic::OnTimebase4days()
 }
 void CBacnetGraphic::Reset_X_Y_Parameter()
 {
+	int temp_number_of_inputs = m_monitor_data.at(monitor_list_line).num_inputs;
+	int temp_number_of_analog = m_monitor_data.at(monitor_list_line).an_inputs;
+	int temp_number_of_digital = m_monitor_data.at(monitor_list_line).num_inputs - temp_number_of_analog;
+	get_data_count = temp_number_of_inputs;
+	monitor_analog_count = temp_number_of_analog;
+	monitor_digital_count = temp_number_of_digital;
+
 	total_y_max_value = 0x80000001;
 	total_y_min_value = 0x7fffffff;
 	for (int i=0;i<get_data_count;i++)
@@ -1864,6 +1955,73 @@ void CBacnetGraphic::Reset_X_Y_Parameter()
 
 		//int total_y_max_value = 0;
 		//int total_y_min_value = 0;
+	}
+
+
+	//针对 0 - 100 范围的Y轴 做出特殊处理;
+	unsigned int delta_value = 0;
+	delta_value = total_y_max_value - total_y_min_value;
+	int temp_max = total_y_max_value;
+	int temp_min = total_y_min_value;
+	if(delta_value == 0)
+	{
+		total_y_max_value = total_y_min_value + 10;
+	}
+	else if((total_y_min_value >= 0) && (total_y_min_value <= 100000) && (total_y_max_value >= 0) && (total_y_max_value <= 100000))
+	{
+		if(delta_value < 1000)
+		{
+			//差值小于1;
+			total_y_min_value = total_y_min_value / 1000;
+			total_y_min_value = total_y_min_value * 1000;
+
+			total_y_max_value = total_y_min_value + 2000;
+
+			if((total_y_max_value - 1000) >= temp_max)
+				total_y_max_value = total_y_max_value - 1000;
+
+		}
+		else if(delta_value < 10000)
+		{
+			//差值小于10;
+			total_y_min_value = total_y_min_value / 10000;
+			total_y_min_value = total_y_min_value * 10000;
+			total_y_max_value = total_y_min_value + 10000;
+			while(total_y_max_value < temp_max)
+			{
+				total_y_max_value = total_y_max_value + 1000;
+			}
+		}
+		else if(delta_value < 20000)
+		{
+			//差值小于20;
+			total_y_min_value = total_y_min_value / 20000;
+			total_y_min_value = total_y_min_value * 20000;
+
+			total_y_max_value = total_y_min_value + 20000;
+			while(total_y_max_value < temp_max)
+			{
+				total_y_max_value = total_y_max_value + 1000;
+			}
+		}
+		else if(delta_value < 40000)
+		{
+			//差值小于40;
+			total_y_min_value = total_y_min_value / 40000;
+			total_y_min_value = total_y_min_value * 40000;
+
+			total_y_max_value = total_y_min_value + 40000;
+			while(total_y_max_value < temp_max)
+			{
+				total_y_max_value = total_y_max_value + 1000;
+			}
+		}
+		else
+		{
+			total_y_min_value = 0;
+			total_y_max_value = 100000;
+		}
+
 	}
 
 
@@ -1932,10 +2090,7 @@ void CBacnetGraphic::Reset_X_Y_Parameter()
 void CBacnetGraphic::OnGraphicLeft()
 {
 	// TODO: Add your command handler code here
-	//if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
-	//{
-	//	return;
-	//}
+
 	draw_graphic_finished = false;
 
 	if(m_time_selected == TIME_USER_DEFINE)
@@ -1961,10 +2116,7 @@ void CBacnetGraphic::OnGraphicLeft()
 void CBacnetGraphic::OnGraphicRight()
 {
 	// TODO: Add your command handler code here
-	//if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
-	//{
-	//	return;
-	//}
+
 	draw_graphic_finished = false;
 
 	if(m_time_selected == TIME_USER_DEFINE)
@@ -1998,10 +2150,14 @@ void CBacnetGraphic::OnGraphicRight()
 void CBacnetGraphic::OnZoomin()
 {
 	// TODO: Add your command handler code here
-	if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
+	while(draw_graphic_finished == false)
 	{
-		return;
+		Sleep(1);
 	}
+	//if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
+	//{
+	//	return;
+	//}
 	draw_graphic_finished = false;
 	if(m_time_selected > TIME_FIVE_MINUTE)
 	{
@@ -2012,7 +2168,8 @@ void CBacnetGraphic::OnZoomin()
 	}
 	else
 	{
-		m_time_selected = 1;
+		MessageBox(_T("Min is five minutes"));
+		m_time_selected = TIME_FIVE_MINUTE;
 		draw_graphic_finished = false;
 		Delete_Ram_Data();
 		b_has_create_point = false;
@@ -2024,10 +2181,14 @@ void CBacnetGraphic::OnZoomin()
 void CBacnetGraphic::OnZoomout()
 {
 	// TODO: Add your command handler code here
-	if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
+	while(draw_graphic_finished == false)
 	{
-		return;
+		Sleep(1);
 	}
+	//if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
+	//{
+	//	return;
+	//}
 	draw_graphic_finished = false;
 	if(m_time_selected < TIME_FOUR_DAY)
 	{
@@ -2038,6 +2199,7 @@ void CBacnetGraphic::OnZoomout()
 	}
 	else
 	{
+		MessageBox(_T("Max is four days"));
 		m_time_selected = TIME_FOUR_DAY;
 		draw_graphic_finished = false;
 		Delete_Ram_Data();
@@ -2054,8 +2216,6 @@ void CBacnetGraphic::Get_Input_Unit()
 		 int temp_range = m_monitor_data.at(monitor_list_line).range[i];
 		if(i<analog_count)
 		{
-
-
 				if( m_monitor_data.at(monitor_list_line).inputs[i].point_type == ENUM_OUT + 1)
 				{
 					if(temp_range == 0)
@@ -2201,14 +2361,8 @@ void CBacnetGraphic::OnTimebaseCustomerdefine()
 void CBacnetGraphic::OnTimebase5minutes()
 {
 	// TODO: Add your command handler code here
-//	if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
-//	{
-//		return;
-//	}
-
 	m_time_selected = TIME_FIVE_MINUTE;
 	draw_graphic_finished = false;
-//	Delete_Ram_Data();
 	b_has_create_point = false;
 }
 
@@ -2224,4 +2378,24 @@ void CBacnetGraphic::OnTimebase30minutes()
 	draw_graphic_finished = false;
 	b_has_create_point = false;
 	
+}
+
+
+void CBacnetGraphic::OnRButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: Add your message handler code here and/or call default
+	if((point.x > 252) &&
+		(point.x < 1445) &&
+		(point.y > 32) &&
+		(point.y <525))
+	{
+		RclickValueTime.X = point.x;
+		RclickValueTime.Y = point.y;
+	}
+	else
+	{
+		RclickValueTime.X = 0;
+		RclickValueTime.Y = 0;
+	}
+	CDialogEx::OnRButtonDown(nFlags, point);
 }

@@ -86,33 +86,10 @@ void CConnectRemoteServer::OnPaint()
 		//step1_message.Format(_T("%d. Connect newfirmware.com "),CONNECT_NEWFIRMWARE_SERVER);
 		mygraphics->DrawString(ConnectMessage[z], -1, &WarningMessageFont, WarningMessagePoint,&WarningMessageColor);
 
-#if 0
-		switch(z)
-		{
-			case CONNECT_NEWFIRMWARE_SERVER:
-				{
-					WarningMessagePoint.X = 25;
-					WarningMessagePoint.Y = 45;
-					//step1_message.Format(_T("%d. Connect newfirmware.com "),CONNECT_NEWFIRMWARE_SERVER);
-					mygraphics->DrawString(ConnectMessage[static_step], -1, &WarningMessageFont, WarningMessagePoint,&WarningMessageColor);
-				}
-				break;
-			case CONNECT_NEWFIRMWARE_SERVER_RET:
-				{
-					WarningMessagePoint.X = 725;
-					WarningMessagePoint.Y = 45;
-					step1_message.Format(_T("OK"),CONNECT_NEWFIRMWARE_SERVER);
-					mygraphics->DrawString(step1_message, -1, &WarningMessageFont, WarningMessagePoint,&MessageRetColor);
-				}
-				break;
-			default:
-				goto end_connect_paint;
-				break;
-
-		}
-#endif
 	}
 end_connect_paint:
+	delete mygraphics;
+	delete BlackBrush;
 
 	return;
 
@@ -184,6 +161,10 @@ DWORD WINAPI  TcpClient_Connect_Thread(LPVOID lpVoid)
 			WritePrivateProfileStringW(_T("Setting"),_T("LocalTemcoNet"),_T("0"),temp_db_ini_folder);
 			WritePrivateProfileStringW(_T("Setting"),_T("TemcoServerIP"),_T("192.168.0.4"),temp_db_ini_folder);
 		}
+
+		ConnectMessage[static_step].Format(_T("Connect to newfirmware.com , please wait!"));
+		static_step ++ ;
+
 		if(is_local_temco_net == false)
 		{
 			hostent* host = gethostbyname("newfirmware.com");
@@ -238,7 +219,7 @@ DWORD WINAPI  TcpClient_Connect_Thread(LPVOID lpVoid)
     }
     sockaddr_in servAddr;
     servAddr.sin_family = AF_INET;
-    servAddr.sin_port = htons(44444);
+    servAddr.sin_port = htons(31234);
     USES_CONVERSION;
     servAddr.sin_addr.S_un.S_addr = (inet_addr(dyndns_ipaddress));
     //·¢ËÍÊ±ÏŞ
@@ -286,6 +267,8 @@ DWORD WINAPI  TcpClient_Connect_Thread(LPVOID lpVoid)
     if(ret)
     {
 		ConnectMessage[static_step].Format(_T("Connect newfirmware.com success!"));
+		static_step ++ ;
+		ConnectMessage[static_step].Format(_T("Reading panel information from server ,please wait!"));
 		static_step ++ ;
         //return true;
     }
@@ -346,7 +329,7 @@ DWORD WINAPI  TcpClient_Connect_Thread(LPVOID lpVoid)
 
 			ConnectMessage[static_step].Format(_T("Remote IP: %s"),cs_extern_ip);
 			static_step ++ ;
-			ConnectMessage[static_step].Format(_T("TCP Port Forwarding: %u"),temp_rm.external_tcp_port);
+			ConnectMessage[static_step].Format(_T("TCP Port Forwarding: %u"),temp_rm.modbus_port);
 			static_step ++ ;
 			ConnectMessage[static_step].Format(_T("UDP Port Forwarding: %u"),temp_rm.bacnet_port);
 			static_step ++ ;
@@ -390,7 +373,7 @@ DWORD WINAPI  TcpClient_Connect_Thread(LPVOID lpVoid)
 		in_addr temp_add;
 		temp_add.S_un.S_addr=temp_rm.external_ip;
 		str_ip_address = CString(inet_ntoa(temp_add));
-		str_n_port.Format(_T("%u"),temp_rm.external_tcp_port);
+		str_n_port.Format(_T("%u"),temp_rm.modbus_port);
 		str_panel_number.Format(_T("%u"),temp_rm.panel);
 		str_object_instance.Format(_T("%u"),temp_rm.object_instance);
 		try
@@ -415,7 +398,7 @@ DWORD WINAPI  TcpClient_Connect_Thread(LPVOID lpVoid)
 		::PostMessage(pFrame->m_hWnd,   WM_MYMSG_REFRESHBUILDING,0,0);
 
 	}
-
+	pParent->Invalidate(1);
 	tcp_client_thread = 0;
 	return 1;
 }

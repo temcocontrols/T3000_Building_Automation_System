@@ -819,21 +819,6 @@
     <None Include="res\Input.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\Programing.ico">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="res\Output.ico">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="res\variable.ico">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="res\week.ico">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="res\annual.ico">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="res\OK.ico">
       <Filter>Resource Files</Filter>
     </None>
@@ -940,6 +925,66 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\sqlite3.dll" />
+    <None Include="res\AlarmsBrown.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\AlarmsGreen.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\bitmap8.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\AlarmsRed.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\bitmap9.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\INPUT_DEFAULT.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Z:\Temp\lm\T3000\BluBuildings.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Z:\Temp\lm\T3000\t3000_icon_output.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Z:\Temp\lm\T3000\t3000_icon_output.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Input_Icon_Default.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Schedual_Icon_Default.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Schedual_Icon_Default2.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\default_icon\outputs.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\default_icon\Variables.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\default_icon\Programs.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\default_icon\Graphics.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\default_icon\Holidays.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\default_icon\schedual.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\default_icon\TrendLogs.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\default_icon\PID.ico">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">
@@ -1630,6 +1675,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="T3000Option.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

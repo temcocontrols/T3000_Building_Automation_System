@@ -382,7 +382,9 @@ BOOL CMyPing::SendEchoMessage(const CString& strMsg)
 	
 	cds.lpData =  (LPVOID)(LPCTSTR)strMsg;
 	
+	
 	return SendMessage(m_pWndEcho->m_hWnd, WM_COPYDATA, (WPARAM)0, (LPARAM)&cds); 
+//	return PostMessage(m_pWndEcho->m_hWnd, WM_COPYDATA, (WPARAM)0, (LPARAM)&cds); 
 
 //////////////////////////////////////////////////////////////////////////
 
