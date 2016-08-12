@@ -1117,10 +1117,10 @@ void CBacnetScreenEdit::Bacnet_Edit_Label(bool allow_change)
 		Edit_Label_Window = new CBacnetEditLabel;
 		Edit_Label_Window->Create(IDD_DIALOG_BACNET_EDIT_LABEL, this);
 	}
-	if(allow_change)
+	//if(allow_change)
 		Edit_Label_Window->m_allow_change = true;
-	else
-		Edit_Label_Window->m_allow_change = false;
+	//else
+	//	Edit_Label_Window->m_allow_change = false;
 	Edit_Label_Window->FreshWindow(m_bac_label_vector.at(m_bac_select_label));
 	
 }

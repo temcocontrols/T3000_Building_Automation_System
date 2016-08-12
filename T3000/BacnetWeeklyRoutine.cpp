@@ -202,6 +202,7 @@ void BacnetWeeklyRoutine::Initial_List()
 		{
 			ListCtrlEx::CStrList strlist;
 			CString temp1;
+			strlist.push_back(_T(" "));
 			for (int x=1;x<=8;x++)
 			{
 				temp1.Format(_T("AR%d"),x);
@@ -214,6 +215,7 @@ void BacnetWeeklyRoutine::Initial_List()
 		{
 			ListCtrlEx::CStrList strlist;
 			CString temp1;
+			strlist.push_back(_T(" "));
 			for (int x=1;x<=8;x++)
 			{
 				temp1.Format(_T("AR%d"),x);
@@ -313,6 +315,49 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_Routine_Item(WPARAM wParam,LPARAM lPar
 			m_weeklyr_list.SetCellEnabled(Changed_Item,WEEKLY_ROUTINE_OUTPUT,1);
 		}
 	}
+
+	if(Changed_SubItem == WEEKLY_ROUTINE_HOLIDAY1)
+	{
+		CString cs_temp=m_weeklyr_list.GetItemText(Changed_Item,WEEKLY_ROUTINE_HOLIDAY1);
+		if(cs_temp.CompareNoCase(_T(" ")) == 0 )
+		{
+			m_Weekly_data.at(Changed_Item).override_1.panel = 0;
+			m_Weekly_data.at(Changed_Item).override_1.point_type = 0;	
+			m_Weekly_data.at(Changed_Item).override_1.number = 0;
+		}
+		else
+		{
+			cs_temp = cs_temp.Right(1);
+			int temp_value = _wtoi(cs_temp);
+			m_Weekly_data.at(Changed_Item).override_1.panel = Station_NUM;
+			m_Weekly_data.at(Changed_Item).override_1.point_type = BAC_HOL + 1;	
+			m_Weekly_data.at(Changed_Item).override_1.number = temp_value - 1;
+		}
+
+		
+	}
+
+	if(Changed_SubItem == WEEKLY_ROUTINE_HOLIDAY2)
+	{
+		CString cs_temp=m_weeklyr_list.GetItemText(Changed_Item,WEEKLY_ROUTINE_HOLIDAY2);
+		if(cs_temp.CompareNoCase(_T(" ")) == 0 )
+		{
+			m_Weekly_data.at(Changed_Item).override_2.panel = 0;
+			m_Weekly_data.at(Changed_Item).override_2.point_type = 0;	
+			m_Weekly_data.at(Changed_Item).override_2.number = 0;
+		}
+		else
+		{
+			
+			cs_temp = cs_temp.Right(1);
+			int temp_value = _wtoi(cs_temp);
+			m_Weekly_data.at(Changed_Item).override_2.panel = Station_NUM;
+			m_Weekly_data.at(Changed_Item).override_2.point_type = BAC_HOL + 1;	
+			m_Weekly_data.at(Changed_Item).override_2.number = temp_value - 1;
+		}
+
+	}
+
 	cmp_ret = memcmp(&m_temp_weekly_data[Changed_Item],&m_Weekly_data.at(Changed_Item),sizeof(Str_weekly_routine_point));
 	if(cmp_ret!=0)
 	{
@@ -399,6 +444,31 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_List(WPARAM wParam,LPARAM lParam)
 			temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des2.ReleaseBuffer();
 		m_weeklyr_list.SetItemText(i,WEEKLY_ROUTINE_LABEL,temp_des2);
+
+
+		if((m_Weekly_data.at(i).override_1.point_type == BAC_HOL + 1) && (m_Weekly_data.at(i).override_1.number < 8))
+		{
+				CString temp_str;
+				temp_str.Format(_T("AR%d"),m_Weekly_data.at(i).override_1.number + 1);
+				m_weeklyr_list.SetItemText(i,WEEKLY_ROUTINE_HOLIDAY1,temp_str);
+		}
+		else
+		{
+			m_weeklyr_list.SetItemText(i,WEEKLY_ROUTINE_HOLIDAY1,_T(""));
+		}
+
+		if((m_Weekly_data.at(i).override_2.point_type == BAC_HOL + 1) && (m_Weekly_data.at(i).override_2.number < 8))
+		{
+				CString temp_str;
+				temp_str.Format(_T("AR%d"),m_Weekly_data.at(i).override_2.number + 1);
+				m_weeklyr_list.SetItemText(i,WEEKLY_ROUTINE_HOLIDAY2,temp_str);
+		}
+		else
+		{
+			m_weeklyr_list.SetItemText(i,WEEKLY_ROUTINE_HOLIDAY2,_T(""));
+		}
+
+
 		if(isFreshOne)
 		{
 			break;

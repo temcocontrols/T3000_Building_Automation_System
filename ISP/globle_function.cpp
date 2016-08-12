@@ -463,6 +463,9 @@ CString GetProductName(int ModelID)
 	case PM_T38AI8AO6DO:
 		strProductName="T38IO";
 		break;
+	case PM_BTU_METER:
+		strProductName="BTU METER";
+		break;
 
 	default:
 		strProductName.Format(_T("Model ID:%d is out of control"),ModelID);
