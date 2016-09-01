@@ -594,7 +594,7 @@ END_EVENTSINK_MAP()
 
 void T38AI8AO::ClickMsflexgridInput()
 {
-bPauseMultiRead=TRUE;
+	bPauseMultiRead=TRUE;
 	m_isinput=TRUE;
 	m_comboxRange.ShowWindow(FALSE);
 	UpdateData(FALSE);
@@ -602,7 +602,7 @@ bPauseMultiRead=TRUE;
 	long lRow,lCol;
 	lRow = m_msflexgrid_input.get_RowSel();//获取点击的行号	
 	lCol = m_msflexgrid_input.get_ColSel(); //获取点击的列号
-	TRACE(_T("Click input grid!\n"));
+	 
 
 	CRect rect;
 	m_msflexgrid_input.GetWindowRect(rect); //获取表格控件的窗口矩形

@@ -1142,14 +1142,13 @@ void T38I13O::ClickMsflexgridOutput()
 	}
 void T38I13O::OnEnKillfocusEditName()
 {
-     CString strTemp;
-	 GetDlgItem(IDC_EDIT_NAME)->GetWindowText(strTemp);
-	 int Value=_wtoi(strTemp);
-
-	 if (strTemp.Compare(m_oldname)==0)
-	 {
-		 return;
-	 }
+	CString strTemp;
+	GetDlgItem(IDC_EDIT_NAME)->GetWindowText(strTemp);
+	int Value=_wtoi(strTemp);
+	if (strTemp.Compare(m_oldname)==0)
+	{
+		return;
+	}
 	if (m_isinput)
 	{
 	  if (m_curcol==0)
@@ -1240,9 +1239,6 @@ void T38I13O::OnEnKillfocusEditName()
 		}
 
 	}
-
-	
-
 
 }
 

@@ -219,9 +219,9 @@ void CRegisterViewerDlg::LoadDataFromDB()
                     }
                     else
                     {
-                        tempstruct.Description=temp_var;
-                    }
-                    temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT6_Operation"));
+						tempstruct.Description=temp_var;
+					}
+					temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT6_Operation"));
                     if (temp_var.vt==VT_NULL)
                     {
                         tempstruct.Description=_T("");

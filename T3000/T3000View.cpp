@@ -789,7 +789,7 @@ void CT3000View::Fresh()
     if(product_register_value[7]==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8)||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
     {
         GetDlgItem(IDC_GRAPGICBUTTON)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_PARAMETERBTN)->ShowWindow(SW_HIDE);
+      //  GetDlgItem(IDC_PARAMETERBTN)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_BUTTON_SCHEDULE)->ShowWindow(SW_HIDE);
 
     }
@@ -801,7 +801,7 @@ void CT3000View::Fresh()
 
 
 
-    }
+    } 
     if (m_pFreshBackground==NULL)
     {
         m_pFreshBackground = AfxBeginThread(BackMainUIFresh,this);
@@ -4599,8 +4599,8 @@ LRESULT CT3000View::OnFlexSlideCallBack(WPARAM wParam, LPARAM lParam)
             m_pNightTwoSP->GetRange(nMin, nMax);
             int nNum = m_pNightTwoSP->GetPos(szPos);
 
-            int nHeatSP = szPos[0] + nMin;
-            int nCoolSP = szPos[1] + nMin;
+			int nHeatSP = szPos[0] + nMin;
+			int nCoolSP = szPos[1] + nMin;
             nSP =  product_register_value[MODBUS_NIGHT_SETPOINT];
             if (nSP-nHeatSP < Increment)
             {
@@ -6080,6 +6080,7 @@ void CT3000View::InitFlexSliderBars_tstat6()
     product_register_value[MODBUS_DAY_SETPOINT]=Round_SetPoint_Max(product_register_value[MODBUS_DAY_SETPOINT]);
     product_register_value[MODBUS_DAY_COOLING_DEADBAND]=Round_SetPoint_Max(product_register_value[MODBUS_DAY_COOLING_DEADBAND]);
     product_register_value[MODBUS_DAY_HEATING_DEADBAND]=Round_SetPoint_Max(product_register_value[MODBUS_DAY_HEATING_DEADBAND]);
+
     product_register_value[MODBUS_NIGHT_SETPOINT]=Round_SetPoint_Max(product_register_value[MODBUS_NIGHT_SETPOINT]);
     product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]=Round_SetPoint_Max(product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]);
     product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]=Round_SetPoint_Max(product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]);

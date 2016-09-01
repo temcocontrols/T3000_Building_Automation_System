@@ -19,7 +19,7 @@
 #include "T3000DefaultView.h"
 #include "bado/BADO.h"
 #include "SqliteLib/CppSQLite3.h"
-const int g_versionNO=20160520;
+const int g_versionNO=20160817;
 
 
 #ifdef _DEBUG
@@ -40,7 +40,7 @@ END_MESSAGE_MAP()
 CT3000App::CT3000App()
 {
 	m_bHiColorIcons = TRUE;
-	CurrentT3000Version=_T("    2016.08.12 ");
+	CurrentT3000Version=_T("    2016.08.31 ");
 	T3000_Version = 10812;
 
 

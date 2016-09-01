@@ -133,4 +133,9 @@ public:
     CEdit m_edit_model1;
     CEdit m_edit_model2;
     CEdit m_edit_model3;
+	afx_msg void OnBnClickedButtonModel1();
+	afx_msg void OnBnClickedButtonModel2();
+	afx_msg void OnBnClickedButtonModel3();
+	afx_msg void OnBnClickedButtonModel4();
+	afx_msg void OnBnClickedButtonModel5();
 };

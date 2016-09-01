@@ -95,7 +95,7 @@ public:
 // 	void UpdatePoint();
 				   
 	void Fresh_Input_Output();
- 
+ afx_msg void OnCbnSelendcancelBraudratecombo();
 	unsigned short Default_Value[30];
 public:
 	int m_product_model;
@@ -330,6 +330,7 @@ public:
 	afx_msg void OnNMClickList_User(NMHDR *pNMHDR, LRESULT *pResult);
     CEdit m_max_scale_aq_edit;
     int m_current_TstatID;
+	CComboBox m_Combox_braudrate;
 };		
 
 

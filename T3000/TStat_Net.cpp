@@ -245,9 +245,15 @@ CString CTStat_Net::GetProductName()
     case PM_PRESSURE:
         strProductName="Pressure Sensor";
         break;
-    case PM_HUMTEMPSENSOR:
-        strProductName="TstatHUM";
-        break;
+	case PM_HUMTEMPSENSOR:
+		strProductName="HUM Sensor";
+		break;
+	case STM32_HUM_NET:
+		strProductName="HUM Sensor";
+		break;
+	case STM32_HUM_RS485:
+		strProductName="HUM Sensor";
+		break;
     case PM_HUM_R:
         strProductName="HUM-R";
         break;

@@ -2032,6 +2032,12 @@
 #define IDC_BUTTON_BAC_SETTING_CANCEL   2177
 #define IDC_STATIC_INPUT_PIC            2178
 #define IDC_BUTTON_HEALTH_CLEAR         2179
+#define IDC_BUTTON_MODEL1               2180
+#define IDC_BUTTON_MODEL2               2181
+#define IDC_BUTTON_MODEL3               2182
+#define IDC_BUTTON_MODEL4               2183
+#define IDC_BUTTON_MODEL5               2184
+#define IDC_STATIC_MODEL_NAME           2185
 #define IDC_HELP_HELP1                  3831
 #define IDC_STATIC_BAC_SETTING_SD_CARD  5817
 #define IDC_MFCCOLORBUTTON_FUNCTION     5818
@@ -2513,10 +2519,7 @@
 #define IDC_BUTTON_REPAIRCONFLICT       60038
 #define IDC_BUTTON_WRITE_SERIAL_NO      60039
 #define IDC_EDIT_LISTENPORT             60040
-
 #define IDC_STATIC_IP_INFOR             60041
- 
- 
 #define IDC_STATIC_IP_MODEL             60043
 #define IDC_STATIC_MAC_ADDRESS          60044
 #define IDC_STATIC_GATEWAY_ADDRESS      60045
@@ -2529,7 +2532,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        635
 #define _APS_NEXT_COMMAND_VALUE         34058
-#define _APS_NEXT_CONTROL_VALUE         2180
+#define _APS_NEXT_CONTROL_VALUE         2186
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

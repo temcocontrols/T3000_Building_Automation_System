@@ -184,6 +184,11 @@ BEGIN_MESSAGE_MAP(COutPutDlg, CDialog)
     ON_EN_KILLFOCUS(IDC_EDIT_FAN_AUTO_NAME, &COutPutDlg::OnEnKillfocusEditFanAutoName)
     ON_EN_KILLFOCUS(IDC_EDIT_FAN_HEAT_NAME, &COutPutDlg::OnEnKillfocusEditFanHeatName)
     ON_EN_KILLFOCUS(IDC_EDIT_FAN_COOL_NAME, &COutPutDlg::OnEnKillfocusEditFanCoolName)
+	ON_BN_CLICKED(IDC_BUTTON_MODEL1, &COutPutDlg::OnBnClickedButtonModel1)
+	ON_BN_CLICKED(IDC_BUTTON_MODEL2, &COutPutDlg::OnBnClickedButtonModel2)
+	ON_BN_CLICKED(IDC_BUTTON_MODEL3, &COutPutDlg::OnBnClickedButtonModel3)
+	ON_BN_CLICKED(IDC_BUTTON_MODEL4, &COutPutDlg::OnBnClickedButtonModel4)
+	ON_BN_CLICKED(IDC_BUTTON_MODEL5, &COutPutDlg::OnBnClickedButtonModel5)
 END_MESSAGE_MAP()
 
 BOOL COutPutDlg::OnInitDialog()
@@ -260,24 +265,29 @@ BOOL COutPutDlg::OnInitDialog()
           strdemo=_T("");
           strdemo=GetTextFromReg(737);
           m_edit_off.SetWindowText(strdemo);
+		  GetDlgItem(IDC_BUTTON_MODEL1)->SetWindowText(strdemo);
           strdemo=_T("");
           strdemo=GetTextFromReg(741);
           m_edit_model1.SetWindowText(strdemo);
+		   GetDlgItem(IDC_BUTTON_MODEL2)->SetWindowText(strdemo);
           strdemo=_T("");
           strdemo=GetTextFromReg(745);
           m_edit_model2.SetWindowText(strdemo);
+		   GetDlgItem(IDC_BUTTON_MODEL3)->SetWindowText(strdemo);
           strdemo=_T("");
           strdemo=GetTextFromReg(749);
           m_edit_model3.SetWindowText(strdemo);
+		   GetDlgItem(IDC_BUTTON_MODEL4)->SetWindowText(strdemo);
           strdemo=_T("");
           strdemo=GetTextFromReg(753);
           m_edit_auto.SetWindowText(strdemo);
-          strdemo=_T("");
-          strdemo=GetTextFromReg(757);
-          m_edit_heat.SetWindowText(strdemo);
-          strdemo=_T("");
-          strdemo=GetTextFromReg(761);
-          m_edit_cool.SetWindowText(strdemo);
+		   GetDlgItem(IDC_BUTTON_MODEL5)->SetWindowText(strdemo);
+//           strdemo=_T("");
+//           strdemo=GetTextFromReg(757);
+//           m_edit_heat.SetWindowText(strdemo);
+//           strdemo=_T("");
+//           strdemo=GetTextFromReg(761);
+//           m_edit_cool.SetWindowText(strdemo);
         
     }
     else
@@ -339,6 +349,9 @@ BOOL COutPutDlg::OnInitDialog()
 			if(strLbText.CompareNoCase(g_strFan)==0)
 			{
 				m_fan.SetCurSel(i);
+				CString strText;
+				m_fan.GetWindowText(strText);m_fan.ShowWindow(SW_HIDE);
+				GetDlgItem(IDC_STATIC_MODEL_NAME)->SetWindowTextW(strText);
 				break;
 			}
 		}
@@ -622,6 +635,10 @@ void COutPutDlg::put_fan_variable()
             GetDlgItem(IDC_EDIT_FAN_LOW_NAME)->ShowWindow(SW_HIDE);
             GetDlgItem(IDC_STATIC_MID)->ShowWindow(SW_HIDE);
             GetDlgItem(IDC_EDIT_FAN_MID_NAME)->ShowWindow(SW_HIDE);	
+
+			 GetDlgItem(IDC_BUTTON_MODEL3)->ShowWindow(SW_HIDE);
+			 GetDlgItem(IDC_BUTTON_MODEL4)->ShowWindow(SW_HIDE);
+
 		}
 		else
 		{	
@@ -641,6 +658,10 @@ void COutPutDlg::put_fan_variable()
             GetDlgItem(IDC_EDIT_FAN_LOW_NAME)->ShowWindow(SW_HIDE);
             GetDlgItem(IDC_STATIC_MID)->ShowWindow(SW_HIDE);
             GetDlgItem(IDC_EDIT_FAN_MID_NAME)->ShowWindow(SW_HIDE);
+
+			GetDlgItem(IDC_BUTTON_MODEL3)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_BUTTON_MODEL4)->ShowWindow(SW_HIDE);
+
             }break;
             case 1:{
             m_fan.AddString(p[0]);m_fan.AddString(p[1]);m_fan.AddString(p[2]);m_fan.AddString(p[4]);
@@ -650,6 +671,10 @@ void COutPutDlg::put_fan_variable()
             GetDlgItem(IDC_EDIT_FAN_LOW_NAME)->ShowWindow(SW_SHOW);
             GetDlgItem(IDC_STATIC_MID)->ShowWindow(SW_HIDE);
             GetDlgItem(IDC_EDIT_FAN_MID_NAME)->ShowWindow(SW_HIDE);
+
+			GetDlgItem(IDC_BUTTON_MODEL3)->ShowWindow(SW_SHOW); 
+			GetDlgItem(IDC_BUTTON_MODEL4)->ShowWindow(SW_HIDE);
+
             }break;
             case 2:{m_fan.AddString(p[0]);m_fan.AddString(p[1]);m_fan.AddString(p[2]);m_fan.AddString(p[3]);m_fan.AddString(p[4]);
                 GetDlgItem(IDC_STATIC_FAN_ON)->ShowWindow(SW_SHOW);
@@ -658,6 +683,10 @@ void COutPutDlg::put_fan_variable()
                 GetDlgItem(IDC_EDIT_FAN_LOW_NAME)->ShowWindow(SW_SHOW);
                 GetDlgItem(IDC_STATIC_MID)->ShowWindow(SW_SHOW);
                 GetDlgItem(IDC_EDIT_FAN_MID_NAME)->ShowWindow(SW_SHOW);
+
+				GetDlgItem(IDC_BUTTON_MODEL3)->ShowWindow(SW_SHOW); 
+				GetDlgItem(IDC_BUTTON_MODEL4)->ShowWindow(SW_SHOW);
+
             }break;
             default:{m_fan.AddString(p[0]);m_fan.AddString(p[1]);m_fan.AddString(p[2]);m_fan.AddString(p[3]);m_fan.AddString(p[4]);
                 GetDlgItem(IDC_STATIC_FAN_ON)->ShowWindow(SW_SHOW);
@@ -666,6 +695,9 @@ void COutPutDlg::put_fan_variable()
                 GetDlgItem(IDC_EDIT_FAN_LOW_NAME)->ShowWindow(SW_SHOW);
                 GetDlgItem(IDC_STATIC_MID)->ShowWindow(SW_SHOW);
                 GetDlgItem(IDC_EDIT_FAN_MID_NAME)->ShowWindow(SW_SHOW);
+
+				GetDlgItem(IDC_BUTTON_MODEL3)->ShowWindow(SW_SHOW); 
+				GetDlgItem(IDC_BUTTON_MODEL4)->ShowWindow(SW_SHOW);
             }break;
             }
 			m_fan_mode_ctrl.EnableWindow(TRUE);
@@ -705,6 +737,9 @@ void COutPutDlg::put_fan_variable()
         
        int sel = set_real_fan_select();
       m_fan.SetCurSel(sel);
+	  CString strText;
+	  m_fan.GetWindowText(strText);m_fan.ShowWindow(SW_HIDE);
+	  GetDlgItem(IDC_STATIC_MODEL_NAME)->SetWindowTextW(strText);
 
 
 }
@@ -794,14 +829,14 @@ void COutPutDlg::OnCbnSelchangeFanmode()
 
 void COutPutDlg::OnCbnSelchangeCbfan()
 {
-		g_ifanStatus=get_real_fan_select();
+		/*g_ifanStatus=get_real_fan_select();
        	int ret=write_one(g_tstat_id, MODBUS_FAN_SPEED,g_ifanStatus);
         if (ret>0)
         {
 
             product_register_value[MODBUS_FAN_SPEED]=g_ifanStatus;
         } 
-	   FreshGrids();
+	   FreshGrids();*/
 }
 
 void COutPutDlg::OnEnKillfocusPid1Heatstageedit()
@@ -888,6 +923,7 @@ void COutPutDlg::FreshGrids()
 	//if (newtstat6[7] == PM_TSTAT6)
 	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
 	{
+		put_fan_variable();
 		FreshGrid_PID1tstat6();
 		FreshGrid_PID2tstat6();
 		//FreshGrid_PID1tstat6();
@@ -934,8 +970,10 @@ if(product_register_value[129]==1)
 		m_fan_mode_ctrl.SetCurSel(product_register_value[122]-1);
 	
 	if(product_register_value[137]>=0)
-		m_fan.SetCurSel(product_register_value[137]);
-
+	{	m_fan.SetCurSel(product_register_value[137]);
+	CString strText;
+	m_fan.GetWindowText(strText);m_fan.ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STATIC_MODEL_NAME)->SetWindowTextW(strText);}
 	int output4_value=product_register_value[283];//2 rows plug in one row
 	int output5_value=product_register_value[284];
 	 
@@ -2702,6 +2740,9 @@ void COutPutDlg::OnBnClickedFanautocheck()
 			if(strLbText.CompareNoCase(g_strFan)==0)
 			{
 				m_fan.SetCurSel(i);
+				CString strText;
+				m_fan.GetWindowText(strText);m_fan.ShowWindow(SW_HIDE);
+				GetDlgItem(IDC_STATIC_MODEL_NAME)->SetWindowTextW(strText);
 				break;
 			}
 		}
@@ -8540,4 +8581,69 @@ void COutPutDlg::OnEnKillfocusEditFanCoolName()
         m_edit_cool.SetWindowText(strText);
         put_fan_variable();
     }   
+}
+
+
+void COutPutDlg::OnBnClickedButtonModel1()
+{
+	g_ifanStatus=0;
+	int ret=write_one(g_tstat_id, MODBUS_FAN_SPEED,g_ifanStatus);
+	if (ret>0)
+	{
+
+		product_register_value[MODBUS_FAN_SPEED]=g_ifanStatus;
+	} 
+	FreshGrids();
+}
+
+
+void COutPutDlg::OnBnClickedButtonModel2()
+{
+	g_ifanStatus=1;
+	int ret=write_one(g_tstat_id, MODBUS_FAN_SPEED,g_ifanStatus);
+	if (ret>0)
+	{
+
+		product_register_value[MODBUS_FAN_SPEED]=g_ifanStatus;
+	} 
+	FreshGrids();
+}
+
+
+void COutPutDlg::OnBnClickedButtonModel3()
+{
+	g_ifanStatus=2;
+	int ret=write_one(g_tstat_id, MODBUS_FAN_SPEED,g_ifanStatus);
+	if (ret>0)
+	{
+
+		product_register_value[MODBUS_FAN_SPEED]=g_ifanStatus;
+	} 
+	FreshGrids();
+}
+
+
+void COutPutDlg::OnBnClickedButtonModel4()
+{
+	g_ifanStatus=3;
+	int ret=write_one(g_tstat_id, MODBUS_FAN_SPEED,g_ifanStatus);
+	if (ret>0)
+	{
+
+		product_register_value[MODBUS_FAN_SPEED]=g_ifanStatus;
+	} 
+	FreshGrids();
+}
+
+
+void COutPutDlg::OnBnClickedButtonModel5()
+{
+	g_ifanStatus=4;
+	int ret=write_one(g_tstat_id, MODBUS_FAN_SPEED,g_ifanStatus);
+	if (ret>0)
+	{
+
+		product_register_value[MODBUS_FAN_SPEED]=g_ifanStatus;
+	} 
+	FreshGrids();
 }

@@ -8537,8 +8537,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             {
                 SwitchToPruductType(DLG_DIALOG_PRESSURE_SENSOR);
             }
-            else if (nFlag==PM_AirQuality||nFlag==PM_HUM_R||nFlag==PM_HUMTEMPSENSOR)
-            {
+
+			else if ((product_register_value[7]==PM_CO2_RS485&&product_register_value[14] == 6)||product_register_value[7]==PM_HUMTEMPSENSOR||product_register_value[7]==STM32_HUM_NET||product_register_value[7]==STM32_HUM_RS485)
+            //else if (nFlag==PM_AirQuality||nFlag==PM_HUM_R||nFlag==PM_HUMTEMPSENSOR)
+            { 
                 SwitchToPruductType(DLG_AIRQUALITY_VIEW);
             }
             else if (nFlag==PM_TSTAT6||nFlag==PM_TSTAT7||nFlag==PM_TSTAT5i||nFlag==PM_TSTAT8)
@@ -8718,7 +8720,12 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
                 int nComPort = m_product.at(i).ncomport;
                 int n_baudrate = m_product.at(i).baudrate;
                 //38400是有一个zigbee 的 USB  它的波特率,所以也需要判断38400;
-                if((n_baudrate != 19200) && (n_baudrate != 9600) && (n_baudrate != 38400))
+                if((n_baudrate != 19200) 
+				&& (n_baudrate != 9600) 
+				&& (n_baudrate != 38400)
+				&& (n_baudrate != 57600)
+				&& (n_baudrate != 115200)
+				)
                     n_baudrate = 19200;
                 if(nComPort == 0)
                 {

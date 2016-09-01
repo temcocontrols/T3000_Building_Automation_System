@@ -4015,8 +4015,17 @@ CString GetProductName(int ModelID)
         strProductName="TStat8";
         break;
     case PM_HUMTEMPSENSOR:
-        strProductName="TstatHUM";
+        strProductName="HUM Sensor";
         break;
+
+	 
+	case STM32_HUM_NET:
+		strProductName="HUM Sensor";
+		break;
+	case STM32_HUM_RS485:
+		strProductName="HUM Sensor";
+		break;
+
     case PM_AirQuality:
         strProductName="Air Quality";
         break;
@@ -10455,7 +10464,7 @@ void LoadRegistersGraphicMode()
     {
         return;
     }
-	if (Product_Mode == PM_CO2_RS485&&product_register_value[14] == 6)
+	if ((Product_Mode == PM_CO2_RS485&&product_register_value[14] == 6)||Product_Mode == STM32_HUM_NET||Product_Mode == STM32_HUM_RS485)
 	{
 		Product_Mode = PM_HUMTEMPSENSOR;
 	}

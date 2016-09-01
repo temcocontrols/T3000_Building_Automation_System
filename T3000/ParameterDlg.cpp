@@ -545,12 +545,12 @@ BOOL CParameterDlg::OnInitDialog()
     m_keyLockCombox.AddString(_T("FAN.SP LOCK.Menu Lock"));
     m_keyLockCombox.AddString(_T("FAN.SP UNLOCK.Most Menu Unlock "));
 
-    CRect rect;
-    GetClientRect(&rect);
-    CString strTemp;
+	CRect rect;
+	GetClientRect(&rect);
+	CString strTemp;
 
 #if 1//Zigbee		  
-    if (product_register_value[7]==PM_TSTAT6&&product_register_value[MODBUS_RS485_MODE]==1)
+    if ((product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT8)&&product_register_value[MODBUS_RS485_MODE]==1)
     {
 
         WINDOWPLACEMENT wp;
@@ -758,9 +758,9 @@ BOOL CParameterDlg::OnInitDialog()
 #endif
     if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8)
     {
-        GetDlgItem(IDC_INPUTSBUTTON)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_OutPutsBUTTON)->ShowWindow(SW_HIDE);
-    }
+		GetDlgItem(IDC_INPUTSBUTTON)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_OutPutsBUTTON)->ShowWindow(SW_HIDE);
+	}
     else
     {
         GetDlgItem(IDC_INPUTSBUTTON)->ShowWindow(SW_SHOW);

@@ -261,7 +261,7 @@ public:
    int get_serialnumber();
  void  Check_DayTime();
  void Initial_OutputList();
- void Initial_UserList();
+ void Initial_VarList();
  LRESULT OnFreshView(WPARAM wParam, LPARAM lParam);
      void  Check_HourTime();
 
@@ -311,9 +311,9 @@ CBrush m_brush;
 	public:
     BOOL Flag_Reg;
     CString cs_temp_unit;
-    unsigned short product_register_value[2700];
-
-	 
+    // unsigned short product_register_value[4000];
+	unsigned short External_ArrayData[1100];
+	unsigned short Scan_ArrayData[1300]; 
 #if 1
     int	CO2_NET_MODBUS_SERIALNUMBER_LOWORD	;
     int	CO2_NET_MODBUS_SERIALNUMBER_HIWORD	;
@@ -491,6 +491,17 @@ public:
 	void Show_InputList();
 	ListCtrlEx::CListCtrlEx m_user_list;
 	ListCtrlEx::CListCtrlEx m_output_list;
+	DECLARE_EVENTSINK_MAP()
+	void DblClickMsflexgridInput();
+	CEdit m_inNameEdt;
+	afx_msg void OnEnKillfocusEditName();
+
+
+	CString m_oldname;
+	bool m_isinput;
+	int m_curcol;
+	int m_currow;
+
 };
 
 

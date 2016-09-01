@@ -2705,10 +2705,16 @@ void CTStatScanner::WriteOneDevInfoToDB( _ComDeviceInfo* pInfo)
 			 ret = Read_Multi(nID,DataBuffer,0,20);
 			 if (ret > 0)
 			 {
-				 if ((DataBuffer[7]==PM_CO2_RS485&&DataBuffer[14] == 6)||DataBuffer[7]==PM_HUMTEMPSENSOR)
+
+				// if ((DataBuffer[7]==PM_CO2_RS485&&DataBuffer[14] == 6)||DataBuffer[7]==PM_HUMTEMPSENSOR)
+				 if ((product_register_value[7]==PM_CO2_RS485&&product_register_value[14] == 6)
+				 ||product_register_value[7]==PM_HUMTEMPSENSOR
+				 ||product_register_value[7]==STM32_HUM_NET
+				 ||product_register_value[7]==STM32_HUM_RS485)
 				 {
 					 strProductName = L"Hum Sensor";
 				 }
+
 			 }
 		
 
