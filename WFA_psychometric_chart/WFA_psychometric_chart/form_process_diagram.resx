@@ -122,13 +122,13 @@
   </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="insertNodeToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>152, 22</value>
+    <value>135, 22</value>
   </data>
   <data name="insertNodeToolStripMenuItem.Text" xml:space="preserve">
     <value>Insert Node</value>
   </data>
   <data name="CMSinsertNode.Size" type="System.Drawing.Size, System.Drawing">
-    <value>153, 48</value>
+    <value>136, 26</value>
   </data>
   <data name="&gt;&gt;CMSinsertNode.Name" xml:space="preserve">
     <value>CMSinsertNode</value>

@@ -67,7 +67,6 @@
             resources.ApplyResources(this.dtp_From, "dtp_From");
             this.dtp_From.Name = "dtp_From";
             this.dtp_From.Value = new System.DateTime(2016, 1, 1, 0, 0, 0, 0);
-
             // 
             // dtp_To
             // 
@@ -119,6 +118,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.gb_select_date);
             this.Controls.Add(this.menuStrip1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MainMenuStrip = this.menuStrip1;
             this.MaximizeBox = false;
             this.MinimizeBox = false;

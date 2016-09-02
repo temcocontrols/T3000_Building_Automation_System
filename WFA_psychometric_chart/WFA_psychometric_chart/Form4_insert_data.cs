@@ -318,5 +318,10 @@ namespace WFA_psychometric_chart
       public void Form4_insert_data_Disposed ( object sender, System.EventArgs e )
       {
       }
+
+        private void Form4_insert_data_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

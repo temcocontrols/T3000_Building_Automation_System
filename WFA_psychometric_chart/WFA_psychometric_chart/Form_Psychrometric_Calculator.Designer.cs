@@ -35,9 +35,6 @@
             this.unit_mixed_gas_ratio = new System.Windows.Forms.Label();
             this.unit_mol_mass_over_mol_wt = new System.Windows.Forms.Label();
             this.unit_Pws = new System.Windows.Forms.Label();
-            this.unit_Tn = new System.Windows.Forms.Label();
-            this.unit_M = new System.Windows.Forms.Label();
-            this.unit_A = new System.Windows.Forms.Label();
             this.unit_dp = new System.Windows.Forms.Label();
             this.unit_ap = new System.Windows.Forms.Label();
             this.unit_humidity = new System.Windows.Forms.Label();
@@ -46,9 +43,6 @@
             this.label10 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -57,13 +51,13 @@
             this.textBox10 = new System.Windows.Forms.TextBox();
             this.textBox9 = new System.Windows.Forms.TextBox();
             this.textBox8 = new System.Windows.Forms.TextBox();
-            this.textBox7 = new System.Windows.Forms.TextBox();
-            this.textBox6 = new System.Windows.Forms.TextBox();
-            this.textBox5 = new System.Windows.Forms.TextBox();
             this.textBox4 = new System.Windows.Forms.TextBox();
             this.tb_atm_pressure = new System.Windows.Forms.TextBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this.radioButton1 = new System.Windows.Forms.RadioButton();
+            this.radioButton2 = new System.Windows.Forms.RadioButton();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -80,9 +74,6 @@
             this.groupBox1.Controls.Add(this.unit_mixed_gas_ratio);
             this.groupBox1.Controls.Add(this.unit_mol_mass_over_mol_wt);
             this.groupBox1.Controls.Add(this.unit_Pws);
-            this.groupBox1.Controls.Add(this.unit_Tn);
-            this.groupBox1.Controls.Add(this.unit_M);
-            this.groupBox1.Controls.Add(this.unit_A);
             this.groupBox1.Controls.Add(this.unit_dp);
             this.groupBox1.Controls.Add(this.unit_ap);
             this.groupBox1.Controls.Add(this.unit_humidity);
@@ -91,9 +82,6 @@
             this.groupBox1.Controls.Add(this.label10);
             this.groupBox1.Controls.Add(this.label9);
             this.groupBox1.Controls.Add(this.label8);
-            this.groupBox1.Controls.Add(this.label7);
-            this.groupBox1.Controls.Add(this.label6);
-            this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.label2);
@@ -102,9 +90,6 @@
             this.groupBox1.Controls.Add(this.textBox10);
             this.groupBox1.Controls.Add(this.textBox9);
             this.groupBox1.Controls.Add(this.textBox8);
-            this.groupBox1.Controls.Add(this.textBox7);
-            this.groupBox1.Controls.Add(this.textBox6);
-            this.groupBox1.Controls.Add(this.textBox5);
             this.groupBox1.Controls.Add(this.textBox4);
             this.groupBox1.Controls.Add(this.tb_atm_pressure);
             this.groupBox1.Controls.Add(this.textBox2);
@@ -137,24 +122,6 @@
             resources.ApplyResources(this.unit_Pws, "unit_Pws");
             this.unit_Pws.ForeColor = System.Drawing.Color.SlateGray;
             this.unit_Pws.Name = "unit_Pws";
-            // 
-            // unit_Tn
-            // 
-            resources.ApplyResources(this.unit_Tn, "unit_Tn");
-            this.unit_Tn.ForeColor = System.Drawing.Color.SlateGray;
-            this.unit_Tn.Name = "unit_Tn";
-            // 
-            // unit_M
-            // 
-            resources.ApplyResources(this.unit_M, "unit_M");
-            this.unit_M.ForeColor = System.Drawing.Color.SlateGray;
-            this.unit_M.Name = "unit_M";
-            // 
-            // unit_A
-            // 
-            resources.ApplyResources(this.unit_A, "unit_A");
-            this.unit_A.ForeColor = System.Drawing.Color.SlateGray;
-            this.unit_A.Name = "unit_A";
             // 
             // unit_dp
             // 
@@ -204,24 +171,6 @@
             resources.ApplyResources(this.label8, "label8");
             this.label8.Name = "label8";
             // 
-            // label7
-            // 
-            resources.ApplyResources(this.label7, "label7");
-            this.label7.ForeColor = System.Drawing.Color.SlateGray;
-            this.label7.Name = "label7";
-            // 
-            // label6
-            // 
-            resources.ApplyResources(this.label6, "label6");
-            this.label6.ForeColor = System.Drawing.Color.SlateGray;
-            this.label6.Name = "label6";
-            // 
-            // label5
-            // 
-            resources.ApplyResources(this.label5, "label5");
-            this.label5.ForeColor = System.Drawing.Color.SlateGray;
-            this.label5.Name = "label5";
-            // 
             // label4
             // 
             resources.ApplyResources(this.label4, "label4");
@@ -270,24 +219,6 @@
             this.textBox8.Name = "textBox8";
             this.textBox8.ReadOnly = true;
             // 
-            // textBox7
-            // 
-            resources.ApplyResources(this.textBox7, "textBox7");
-            this.textBox7.Name = "textBox7";
-            this.textBox7.ReadOnly = true;
-            // 
-            // textBox6
-            // 
-            resources.ApplyResources(this.textBox6, "textBox6");
-            this.textBox6.Name = "textBox6";
-            this.textBox6.ReadOnly = true;
-            // 
-            // textBox5
-            // 
-            resources.ApplyResources(this.textBox5, "textBox5");
-            this.textBox5.Name = "textBox5";
-            this.textBox5.ReadOnly = true;
-            // 
             // textBox4
             // 
             resources.ApplyResources(this.textBox4, "textBox4");
@@ -309,18 +240,45 @@
             resources.ApplyResources(this.textBox1, "textBox1");
             this.textBox1.Name = "textBox1";
             // 
+            // label12
+            // 
+            resources.ApplyResources(this.label12, "label12");
+            this.label12.Name = "label12";
+            // 
+            // radioButton1
+            // 
+            resources.ApplyResources(this.radioButton1, "radioButton1");
+            this.radioButton1.Name = "radioButton1";
+            this.radioButton1.TabStop = true;
+            this.radioButton1.UseVisualStyleBackColor = true;
+            this.radioButton1.CheckedChanged += new System.EventHandler(this.radioButton1_CheckedChanged);
+            // 
+            // radioButton2
+            // 
+            resources.ApplyResources(this.radioButton2, "radioButton2");
+            this.radioButton2.Name = "radioButton2";
+            this.radioButton2.TabStop = true;
+            this.radioButton2.UseVisualStyleBackColor = true;
+            this.radioButton2.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
+            // 
             // Form_Psychrometric_Calculator
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.radioButton2);
+            this.Controls.Add(this.radioButton1);
+            this.Controls.Add(this.label12);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.groupBox1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "Form_Psychrometric_Calculator";
+            this.Load += new System.EventHandler(this.Form_Psychrometric_Calculator_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -332,9 +290,6 @@
         private System.Windows.Forms.Label unit_mixed_gas_ratio;
         private System.Windows.Forms.Label unit_mol_mass_over_mol_wt;
         private System.Windows.Forms.Label unit_Pws;
-        private System.Windows.Forms.Label unit_Tn;
-        private System.Windows.Forms.Label unit_M;
-        private System.Windows.Forms.Label unit_A;
         private System.Windows.Forms.Label unit_dp;
         private System.Windows.Forms.Label unit_ap;
         private System.Windows.Forms.Label unit_humidity;
@@ -343,9 +298,6 @@
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
@@ -354,12 +306,12 @@
         private System.Windows.Forms.TextBox textBox10;
         private System.Windows.Forms.TextBox textBox9;
         private System.Windows.Forms.TextBox textBox8;
-        private System.Windows.Forms.TextBox textBox7;
-        private System.Windows.Forms.TextBox textBox6;
-        private System.Windows.Forms.TextBox textBox5;
         private System.Windows.Forms.TextBox textBox4;
         private System.Windows.Forms.TextBox tb_atm_pressure;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.RadioButton radioButton1;
+        private System.Windows.Forms.RadioButton radioButton2;
     }
 }

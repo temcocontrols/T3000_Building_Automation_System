@@ -892,6 +892,9 @@ namespace WFA_psychometric_chart
                     flagForDisconnectClick = 0;
                     flagNodeSelectedForConnect = 0;
 
+                    //This for closing the insert node while the disconnect is selected
+                    insertNodeToolStripMenuItem.Enabled = true;
+
                 }
 
 
@@ -1890,6 +1893,7 @@ namespace WFA_psychometric_chart
             //--This start the editing of the cells
             //Here we save a current value of cell to some variable, that later we can compare with a new value
             //For example using of dgv.Tag property
+           // MessageBox.Show("value  = " + dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString());
             if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
             {
                 this.dataGridView1.Tag = this.dataGridView1.CurrentCell.Value;
@@ -1903,23 +1907,8 @@ namespace WFA_psychometric_chart
 
         private void dataGridView1_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
         {
-            ////--This section helps in validation..
-            //if (dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value != null)
-            //{
-            //    var regex = new Regex(@"^[a-zA-Z0-9_]+$");
-            //    string name = dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
-            //    MessageBox.Show("name= " + name);
-            //    if (regex.IsMatch(name))
-            //    {
-            //        //--The value is ok 
-            //    }
-            //    else
-            //    {
-            //        MessageBox.Show("You can only have letters, numbers and underscores");
-            //        dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = string.Empty;
-            //        e.Cancel = true;
-            //    }
-            //}
+            ////--This section helps in validation..   
+            //not required now.
 
         }
         
@@ -1931,6 +1920,7 @@ namespace WFA_psychometric_chart
             //--Here we need to add datato the database...
             try
             {
+                //MessageBox.Show("end edit");
                 //--This section helps in validation..
                 if (dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value != null)
                 {
@@ -1943,13 +1933,14 @@ namespace WFA_psychometric_chart
                         //--Testing ..
                         MessageBox.Show(" cell end edit ,name = "+name);
                         //--we need to check that the table name enter doesnot matches previous values
-                 
+            
+                        if(name != beginEditText) {      
                         for(int i= 0; i < listForDataFromDB.Count; i++)
                         {
                             if(name == listForDataFromDB[i].name)
                             {
                                 MessageBox.Show("Handler can not have same name");
-                                dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = string.Empty;
+                                    dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = beginEditText;
 
                                 return;
                             }
@@ -1976,7 +1967,11 @@ namespace WFA_psychometric_chart
 
                         dataGridView1.Rows.Add();
 
-
+                        }
+                        else
+                        {
+                            MessageBox.Show("No change in name");
+                        }
 
                     }
                     else
@@ -2905,7 +2900,7 @@ namespace WFA_psychometric_chart
             {
                 Cursor = Cursors.Cross;
             }
-
+            insertNodeToolStripMenuItem.Enabled = false;
             //--Lets add the series when the button is clicked and remove it when released..
             chart1.Series.Add(addDottedSeries);
 

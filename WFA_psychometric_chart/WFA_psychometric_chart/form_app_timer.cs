@@ -45,6 +45,10 @@ namespace WFA_psychometric_chart
             dtp1.MaxDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
             dtp2.MaxDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
 
+            dtp1.Value = new DateTime(DateTime.Now.Year, 1, 1);
+            dtp2.Value = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+
+
             //this method selects location pulls the location address 
             PullLocationInformation();
         }
@@ -212,15 +216,9 @@ namespace WFA_psychometric_chart
 
                         string connString1 = @"Data Source=" + databaseFile + ";Version=3;";
 
-
-
-
-
                         using (SQLiteConnection connection1 = new SQLiteConnection(connString1))
-                  {
+                         {
                       connection1.Open();
-
-
 
                       //string sql_query = "Select * from tbl_data_stored_temp_hum_one_year WHERE date_current = " + day_list[i] + " , hour_current = " + hour_al[h] + " AND station_name = "+ station_name +" ; ";
                       //lets pass this string to a query which does the pulling part.

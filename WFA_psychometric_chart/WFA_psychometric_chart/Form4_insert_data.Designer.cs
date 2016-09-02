@@ -269,9 +269,11 @@
             this.Controls.Add(this.tb_state);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.tb_country);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "Form4_insert_data";
+            this.Load += new System.EventHandler(this.Form4_insert_data_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

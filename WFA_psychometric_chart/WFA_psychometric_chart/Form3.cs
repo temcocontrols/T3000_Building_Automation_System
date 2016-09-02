@@ -1,24 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Data.OleDb;
 using System.Net;
 using System.Xml.Linq;
 using System.Xml;
 using System.Collections;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Data.SqlClient;
 using System.IO;
 using System.Reflection;
 using System.Data.SQLite;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using System.Data.OleDb;
 
 namespace WFA_psychometric_chart
 {
@@ -31,14 +25,22 @@ namespace WFA_psychometric_chart
           this.Disposed += new System.EventHandler ( this.Form3_Disposed );
         }
 
+        private void Form3_Disposed(object sender, EventArgs e)
+        {
+            //throw new NotImplementedException();
 
+            //Disposing the timer when the device is closed.
+            timerForDevice.Stop();
+            timerForDevice.Tick -= new EventHandler(timer1_Tick_For_Device);
+            timerForDevice.Dispose();
+
+        }
 
         string buildingNameStore;
-
-
         int index_selected = 0;
         int index_for_station_selected = 0;
        
+
         //We need to store the data pulled into a List.
         //--setting variable data...
         public class DataTypeSettingList
@@ -54,34 +56,248 @@ namespace WFA_psychometric_chart
 
         //--END OF THE setting variable data
 
+        //Lets initialize a timer 
+
+        private Timer timerForDevice = new Timer();
+        public void InitTimerForDevice()
+        {
+            //update_now_function();//First time calling the function..
+            //timer1 = new System.Windows.Forms.Timer();
+            timerForDevice.Start();
+            timerForDevice.Tick += new EventHandler(timer1_Tick_For_Device);
+            timerForDevice.Interval = 1000 * 15; // in miliseconds //this is 5 seconds
+            
+
+        }
+         public void timer1_Tick_For_Device(object sender , EventArgs e)
+        {
+           // MessageBox.Show("Test called ");
+        //  ReadDataFromDevice();
+        }
+
+        public class DeviceClass
+        {
+            public string deviceIP { get; set; }
+            public uint deviceInstance { get; set; }//device id 
+
+        }
+        List<DeviceClass> device_info = new List<DeviceClass>();
+
 
         private void button4_Click(object sender, EventArgs e)
         {
-            //lets do some operation regarding the pannel id and stuff
+            //First read the data value 
+            //ReadDataFromDevice();
 
-            string panelID1 = tb_temp_panel_ID.Text;
-            string panelID2 = tb_hum_panel_ID.Text;
-            if ((panelID1 != "") &&  (panelID2 != ""))
+            // initialize timer for constant reading..
+            //InitTimerForDevice();
+
+            if (flagForTimer == 1)
             {
-                //then perform this task 
+                //Timer is already set so dissable it first and then reenable...
+                _Timer.Enabled = false;
+                _Timer.Elapsed -= HandleTick;//new System.EventHandler(HandleTick);
+               // _Timer.Stop();
+                _Timer.Dispose();
+
+                flagForTimer = 0;//Timer dissabled
+            }
+
+            device_info.Clear();//Resetting the values
+            //=========Resetting the two comboboxes first===========
+
+            CB_param_hum.Text = "";
+            CB_param_hum.Items.Clear();
+            CB_param_hum.Enabled = false;
+
+            CB_param_temp.Text = "";
+            CB_param_temp.Items.Clear();
+            CB_param_temp.Enabled = false;
+            tb_temp_panel_value.Text = "";
+            tb_hum_panel_value.Text = "";
+            //=======================end of resetting=============
 
 
+            CB_Device.Items.Clear();//Clearing the combobox
+            CB_Device.Text = "";
 
+            //DeviceConnection dc = new DeviceConnection();
+            //dc.ScanForDevice();//Scan the device
+
+            ////Now we need to scan the device and fill the values.
+            //foreach (var bn in BACnetClass.DevicesList)
+            //{
+            //    device_info.Add(new DeviceClass
+            //    {
+            //        deviceInstance = bn.device_id,
+            //        deviceIP = bn.device_id + "." + bn.adr.adr[0] + "." + bn.adr.adr[1] + "." + bn.adr.adr[2] + "." + bn.adr.adr[3]
+
+            //    });
+            //}
+            copyOfMainControllerList.Clear();//tHSI IS RESETTING 
+            copyOfMainControllerList = ControllerList();//This returns the miancontroller and copy those in copyof...
+
+
+            //Test 
+            //MessageBox.Show("Device list num =" + BACnetClass.DevicesList.Count+ ",device infor num= "+device_info.Count);
+
+            //if device infor shows 0 item the retunr immediately
+            //if (device_info.Count <= 0)
+            //{
+            //    return;
+            //}
+            if (copyOfMainControllerList.Count < 0)
+            {
+                return;
+            }
+            //MessageBox.Show("success :bacnetclass count= " + BACnetClass.DevicesList.Count);
+            //Now lets fill the combobox value
+            foreach (var b in copyOfMainControllerList)
+            {
+                CB_Device.Items.Add("Device: " + b.controllerName);
+               // MessageBox.Show("device");
+            }
+
+            //This one is for the online/offline status part
+            if (CB_Device.Items.Count > 0)
+            {
+                //if There is item then we say device is online else ofline
+                lb_device_status.Text = "connected";
             }
             else
             {
-                MessageBox.Show(WFA_psychometric_chart.Properties.Resources.Please_Enter_proper_pannel_id_);
+                lb_device_status.Text = "disconnected";
             }
-           
-            //just a fix value for now..temp=25,hum=85
-            tb_temp_panel_value.Text = "25".ToString();
-            tb_hum_panel_value.Text = "85".ToString();
 
+        }
+                   /// <summary>
+                   /// The main controller will always have Parent_SerialNum = 0;
+                   /// </summary>
+        public class dataTypeForControllerList
+        {
+            public string controllerName { get; set; }
+            public int controllerInstanceId { get; set; }
+            public bool controllerStatus { get; set; }
+        }
+
+        List<dataTypeForControllerList> mainControllerList = new List<dataTypeForControllerList>();
+        List<dataTypeForControllerList> copyOfMainControllerList = new List<dataTypeForControllerList>();
+
+
+        /// <summary>
+        /// This function return a controller list that is ONLINE only
+        /// </summary>
+        public List<dataTypeForControllerList> ControllerList()
+        {
+            mainControllerList.Clear();
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath + @"\Database\Buildings\Default_Building\Default_Building.mdb";
+            //String connection = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source="+ databaseFile+ @";Persist Security Info=True ";
+            //C:\Program Files (x86)\T3000\Database\Buildings\Default_Building
+            String connection = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Program Files (x86)\T3000\Database\Buildings\Default_Building\Default_Building.mdb;Persist Security Info=True ";
+
+            string sql = "select * from ALL_NODE  where  Parent_SerialNum = '0'";//This will only show parent controller and not sub devices
+            //  MessageBox.Show("Connection = " + connection);
+            //  MessageBox.Show("sql = " + sql);
+            //DataSet myDataSet = new DataSet();
+            //try
+            //{
+                using (OleDbConnection conn = new OleDbConnection(connection))
+                {
+                    using (OleDbCommand cmd = new OleDbCommand(sql, conn))
+                    {
+                        conn.Open();
+                        OleDbDataReader reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            //dataCheckList.Add((bool)reader["Online_Status"]);
+                            //if true then add the device or list the main controller
+                            if ((bool)reader["Online_Status"])
+                            {
+                                mainControllerList.Add(new dataTypeForControllerList
+                                {
+                                    controllerName = reader["Product_Name"].ToString(), //This is product name
+                                    controllerInstanceId = int.Parse(reader["Object_Instance"].ToString()),
+                                    controllerStatus   =(bool)reader["Online_Status"]                                               
+                                });
+
+                            }
+
+
+                        }
+
+                    }
+
+                    //MessageBox.Show("Count"+myDataSet[0])
+                    //  MessageBox.Show("Count the value = " + dataCheckList.Count+" , value = "+dataCheckList[0]);
+                }
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show(ex.Message);
+            //}
+            return mainControllerList;
+        }
+
+
+
+
+
+
+
+        /// <summary>
+        /// This is for temporary class for storing the temperature and humidity value
+        /// </summary>
+
+        public class HumTempDataType
+        {
+            public double Temp { get; set; }
+            public double Hum { get; set; }
+        }
+      public  List<HumTempDataType> HumTempList = new List<HumTempDataType>();//list to store the data form the device...
+        public void ReadDataFromDevice(int deviceID,uint panel1ID,uint panel2ID)
+        {
+            //lets do some operation regarding the pannel id and stuff
+
+            uint panelID1 = panel1ID;// tb_temp_panel_ID.Text;
+            uint panelID2 = panel2ID;//tb_hum_panel_ID.Text;
+            //if ((panelID1 != "") &&  (panelID2 != ""))
+            //{
+            //then perform this task 
+            try
+            {
+                uint panID_1 =panelID1;
+
+                uint panID_2 =panelID2;
+                BACnetClass b = new BACnetClass();
+
+                //for temperature value
+           //  b.StartProgram(panID_1);
+               string temp = b.PresentValueFromBacnet.ToString();
+                tb_temp_panel_value.Text = temp;
+                //For humidity value
+            // b.StartProgram(panID_2);
+               string humidity = b.PresentValueFromBacnet.ToString();
+                tb_hum_panel_value.Text = humidity;
+                //lets store these two values in a temporary list
+
+                HumTempList.Add(new HumTempDataType
+                {
+                    Temp = double.Parse(temp),
+                    Hum = double.Parse(humidity)
+
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+
+            }
 
         }
 
         //this is used for dynamic list creation...
-        private class station_data
+        public class station_data
         {
            public string name { get; set; }
             public double distance { get; set; }
@@ -98,7 +314,7 @@ namespace WFA_psychometric_chart
             if (cb_enable_disable.Checked == true)
             {
                 try
-                {
+               {
                     store_station_list.Clear();
                     //enable all the text boxex..
                     tb_location.Enabled = true;
@@ -132,7 +348,7 @@ namespace WFA_psychometric_chart
                         // var json = await httpClient.GetStringAsync(api_url);
 
 
-                        //MessageBox.Show("lat = " + lat_val + "lng = " + lng_val);
+                        //MessageBox.Show("lat = " + lat + "lng = " + lng);
                         string api_url = "http://api.openweathermap.org/data/2.5/station/find?mode=json&lat=" + lat + "&lon=" + lng + "&cnt=5&APPID=615afd606af791f572a1f92b27a68bcd";
                         //MessageBox.Show("api_url = " + api_url);
                         var data = wc.DownloadString(api_url);
@@ -150,7 +366,6 @@ namespace WFA_psychometric_chart
                             if ((result["station"]["name"] != null) && (result["distance"] != null))
                             {
                                 string station_name = result["station"]["name"].ToString();
-
                                 string station_distance = result["distance"].ToString();
                                 string station_id = result["station"]["id"].ToString();
                                 string latitude = result["station"]["coord"]["lat"].ToString();
@@ -182,6 +397,16 @@ namespace WFA_psychometric_chart
                             cb_station_names.Items.Add(store_station_list[i].name);
 
                         }
+
+                        if (cb_station_names.Items.Count > 0)
+                        {
+                            //There is item means we are online 
+                            lb_web_status.Text = "active";
+                        }
+                        else
+                        {
+                            lb_web_status.Text = "inactive";
+                        }
                         // MessageBox.Show("values  = " + s);
 
                     }//close of using webclient
@@ -190,10 +415,7 @@ namespace WFA_psychometric_chart
                     //--This is for the setting ie if the building is selected and closed
 
                     //CheckDataForSettings();
-
-
-
-
+               
                 }
                 catch (Exception ex)
                 {
@@ -219,8 +441,6 @@ namespace WFA_psychometric_chart
                     lbConnectionIssue.Text = "GOOD";
                     btnShowLogFile.Enabled = false;
 
-
-
                 }
 
 
@@ -228,6 +448,9 @@ namespace WFA_psychometric_chart
             }
             else
             {
+
+                cb_station_names.Text = "";
+
                 //dissable..
                 tb_location.Enabled = false;
                 // tb_distance_from_build.Enabled = false;
@@ -264,9 +487,7 @@ namespace WFA_psychometric_chart
                 tb_station_distance.Text = "";
                 lbConnectionIssue.Text = "GOOD";
                 btnShowLogFile.Enabled = false;
-
-
-
+               
                 //--Disposing the timer1 and timer2 
                 timer1.Stop();
                 timer1.Tick -= new EventHandler(timer1_Tick);
@@ -276,6 +497,10 @@ namespace WFA_psychometric_chart
 
                 timer2.Dispose();
                 timer1.Dispose();
+
+                //WE need to disable the connection   
+                //This one is for online/Offline status
+                lb_web_status.Text = "inactive";
 
 
             }
@@ -692,7 +917,13 @@ namespace WFA_psychometric_chart
                     else
                     {
 
-                        lat_val = store_station_list[index_for_station_selected].lat;
+                        try
+                        {
+
+                            //enabling the internet connection if available
+                            cb_station_names.Enabled = true;
+
+                            lat_val = store_station_list[index_for_station_selected].lat;
                         lng_val = store_station_list[index_for_station_selected].lng;
                         //display lat lng...
                         //MessageBox.Show("lat= "+lat_val+" lng = "+lng_val);
@@ -806,8 +1037,7 @@ namespace WFA_psychometric_chart
                             string loc_value = "";
                             double d = 0.0000;
                             double temp_adjust = double.Parse(temp_pulled.ToString()) - 273.15;
-                            try
-                            {
+                       
 
                                 double R = 6371.0;//radius of earth in Km
                                 double dlon = double.Parse(long_pulled.ToString()) - lng_val;
@@ -938,14 +1168,7 @@ namespace WFA_psychometric_chart
                                         lastUpdateHourOrMinuteOrSecond = datetimeSpanSplit[2].ToString() + " Seconds ago";
 
                                     }
-
-
-
-
-
-
-
-
+                
                                     // MessageBox.Show("date = " + date + " time = " + time);
                                     /*steps :
                                      1.insert the values in the given database.
@@ -973,69 +1196,17 @@ namespace WFA_psychometric_chart
                                     //finally close the connection.
                                     connection.Close();
 
+                                    //This one is for the online/offline 
+                                    lb_web_status.Text = "active";
 
                                 }//close o using..
 
-
-
-                             //   if (cb_station_names.SelectedIndex > 0) { 
-
-                               // //--Now lets update the setting data...
-                               // if (UpdateSettingIfPresent() > 0)
-                               // {
-                               //     //update the setting data already present...
-
-                               //     updateSettingData(lb_building_name.Text, 1, cb_station_names.SelectedText, cb_station_names.SelectedIndex);
-
-                               //     MessageBox.Show("Updateding");
-                               // }
-                               // else
-                               // {
-                               //     //--Insert the data in the database..
-                               //     using (SQLiteConnection connection = new SQLiteConnection(connString))
-                               //     {
-                               //         connection.Open();
-
-                               //         string sql_query = "insert into tbl_weather_settings(buildingName,enabled,selectedStationName,indexSelected) VALUES(@buildValue,@enableValue,@stationName,@indexSel)";
-                               //         SQLiteCommand cmdx = new SQLiteCommand(sql_query, connection);
-                               //         cmdx.CommandType = CommandType.Text;
-                               //         cmdx.Parameters.AddWithValue("@buildValue", lb_building_name.Text);
-                               //         cmdx.Parameters.AddWithValue("@enableValue", 1);
-                               //         cmdx.Parameters.AddWithValue("@stationName", cb_station_names.SelectedItem);
-                               //         cmdx.Parameters.AddWithValue("@indexSel", cb_station_names.SelectedIndex);
-                               //         cmdx.ExecuteNonQuery();
-                               //         //finally close the connection.
-                               //         connection.Close();
-                               //         MessageBox.Show("Updateding inse..");
-                               //     }//--Close of the using setting
-                               // }
+                
 
 
 
-                               //// }//if selected index
-
-
-
-
-
-                            }
-                            catch (Exception ex)
-                            {
-                                MessageBox.Show("Connect to internet please : "+ex.Message);
-
-
-
-                            }
-
+                         
                             //step 4:display the value..
-                            //tb_location.Text = loc_value;
-                            //tb_last_updated.Text = last_update_pulled;
-                            //tb_distance_from_build.Text = d.ToString();
-                            //tb_cw_temp.Text = temp_adjust.ToString();
-                            //tb_cw_hum.Text = hum_pulled.ToString();
-                            //tb_cw_barometer_value.Text = pressure_pulled;
-                            //tb_cw_wind.Text = wind_speed_pulled.ToString();
-                            //tb_cw_direction.Text = direction_pulled.ToString();
                             /* instead of reading the values lets pull the data...*/
                             pull_stored_weather_data();
 
@@ -1045,12 +1216,26 @@ namespace WFA_psychometric_chart
 
 
                             // MessageBox.Show("success !");
+                        } //This is the close of the using statement
+
                         }
+                        catch (Exception ex)
+                        {
+                            //   MessageBox.Show("Connect to internet please : " + ex.Message);
+
+                            //Here this occurs when the internet connection is lost so
+
+                            lb_web_status.Text = "inactive";
+                            cb_station_names.Enabled = false;
+
+                        }
+
+
 
                     }//close of else...block for tb_latitude and tb_longitude..
 
                     //--IF the intenetavailable = 2 means that internt has gone for some time and we need to recored it..
-                    if(InternetAvailable == 2)
+                    if (InternetAvailable == 2)
                     {
                         //This means the error has occured and ended we need to log to the file                                            
                         //--Present to write to it
@@ -1124,6 +1309,11 @@ namespace WFA_psychometric_chart
                     lbConnectionIssue.Text = "FAIL";
                     btnShowLogFile.Enabled = true;
 
+                    //This one is for online offline value
+
+                    //WE need to disable the connection   
+                    //This one is for online/Offline status
+                    lb_web_status.Text = "inactive";
 
 
 
@@ -1832,6 +2022,11 @@ namespace WFA_psychometric_chart
             
         }
 
+        /// <summary>
+        /// pulling the web values
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void timer1_Tick(object sender, EventArgs e)
         {
             //  MessageBox.Show("pulling...");
@@ -2094,6 +2289,17 @@ namespace WFA_psychometric_chart
             timer2.Dispose();
             timer1.Dispose();
             this.Dispose();
+
+            if (flagForTimer == 1)
+            {
+                //Timer is already set so dissable it first and then reenable...
+                _Timer.Enabled = false;
+                _Timer.Elapsed -= HandleTick;//new System.EventHandler(HandleTick);
+                _Timer.Dispose();
+
+                flagForTimer = 0;//Timer dissabled
+            }
+
         }
 
         private void cb_event_on_index_change(object sender, EventArgs e)
@@ -2219,6 +2425,542 @@ namespace WFA_psychometric_chart
 
         }
 
+        private void button2_Click(object sender, EventArgs e)
+        {
+            //Start new form for show trend log...
+           // TrendLogForm tf = new TrendLogForm(this);
+           // tf.Show();
+
+        }
+
+        List<bool> dataCheckList = new List<bool>();
+        /// <summary>
+        /// CHECKS WEATHER THE DEVICE IS ONLINE OR OFFLINE
+        /// </summary>
+        /// <param name="deviceID">device id value</param>
+        /// <param name="Parent_SerialNum">0 always</param>
+        /// <returns></returns>
+        public bool CheckDeviceOnlineOffline(int deviceID,int Parent_SerialNum)
+        {           
+            //Resetting
+            dataCheckList.Clear();
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath + @"\Database\Buildings\Default_Building\Default_Building.mdb";
+          //String connection = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source="+ databaseFile+ @";Persist Security Info=True ";
+            //C:\Program Files (x86)\T3000\Database\Buildings\Default_Building
+            String connection = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Program Files (x86)\T3000\Database\Buildings\Default_Building\Default_Building.mdb;Persist Security Info=True ";
+
+            string sql = "select * from ALL_NODE  where Object_Instance = '"+deviceID+"' and Parent_SerialNum = '"+Parent_SerialNum+"'";
+          //  MessageBox.Show("Connection = " + connection);
+          //  MessageBox.Show("sql = " + sql);
+            //DataSet myDataSet = new DataSet();
+            try { 
+            using (OleDbConnection conn = new OleDbConnection(connection))
+            {
+                using (OleDbCommand cmd = new OleDbCommand(sql, conn))
+                {
+                    conn.Open();                      
+                        OleDbDataReader reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            dataCheckList.Add((bool)reader["Online_Status"]);
+                        }
+     
+                }
+
+                    //MessageBox.Show("Count"+myDataSet[0])
+                  //  MessageBox.Show("Count the value = " + dataCheckList.Count+" , value = "+dataCheckList[0]);
+            }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            bool status = false;
+            if (dataCheckList.Count > 0) { 
+               if(dataCheckList[0]==true)
+            {
+                status = true;
+             }
+            }
+
+            // MessageBox.Show( "datacheckcount= " + dataCheckList.Count + " Status = " + status);
+
+            return status;
+        }
+
+
+        public class parameter_class1
+        {
+            public double presentValue { get; set; }
+            public uint indexID { get; set; }
+            public string device_object_name { get; set; }
+        }
+        public List<parameter_class1> parameterValFromBacnet = new List<parameter_class1>();
+
+        private void CB_Device_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            try { 
+            //now on index change
+           // groupBox3.Enabled = true;
+            //Lets clear the combobox first
+            CB_param_temp.Items.Clear();
+            CB_param_hum.Items.Clear();
+            parameterValFromBacnet.Clear();//Clearing the list value
+
+            if (CB_Device.SelectedIndex > -1)
+            {
+                //This one is if the timer is running then stop the timer second time 
+                if (flagForTimer == 1)
+                {
+                    //Timer is already set so dissable it first and then reenable...
+                    _Timer.Enabled = false;
+                    _Timer.Elapsed -= HandleTick; //new System.EventHandler(HandleTick);
+                    _Timer.Dispose();
+
+                    flagForTimer = 0;//Timer dissabled
+                }
+
+                //On this index change the we need to get the values from the 
+              int  indexSelectedDevice = CB_Device.SelectedIndex;
+                    int instanceId = copyOfMainControllerList[indexSelectedDevice].controllerInstanceId;  //(int)device_info[indexSelectedDevice].deviceInstance;//Device instance selected.
+
+                    MessageBox.Show("Instaneid = " + instanceId);
+                //===============For regulare update=============//
+                deviceInstanceValuTemp = instanceId;//This one is for regular update
+                                                    //================end of for regular update=====//
+                                                    //This uint has to be converted to int because that is what is required...
+
+                    //Checking if the device is online or offline
+                    if (CheckDeviceOnlineOffline(deviceInstanceValuTemp, 0) == true)
+                    {
+                        MessageBox.Show("Checking online status become true");
+
+                        //return;
+
+
+                        DeviceConnection db = new DeviceConnection();
+                        //We need to scan for the device first and then parameter
+                        db.ScanForDevice();
+                        //db.ScanForParameters(24649);
+                        db.ScanForParameters(instanceId);//This will return the parameters
+                        MessageBox.Show("Count = " + db.parameterListValue.Count);       //Now we can use the value strored int  the db.parameterList1
+                        string s = "";
+                        foreach (var bac in db.parameterListValue)
+                        {
+                            parameterValFromBacnet.Add(new parameter_class1
+                            {
+                                device_object_name = bac.device_object_name,
+                                indexID = bac.indexID,
+                                presentValue = bac.presentValue
+
+                            });
+                            s += bac.device_object_name + "," + bac.presentValue + "\n";
+                        }
+                       
+
+                    MessageBox.Show("value = " + s);
+
+                    //Now that we have the parameter list lets display the list in the combobox...
+                    // string s = "";
+                    foreach (var item in parameterValFromBacnet)
+                    {
+                        CB_param_temp.Items.Add(item.device_object_name + ":" + item.indexID);
+                        CB_param_hum.Items.Add(item.device_object_name + ":" + item.indexID);
+                        // CB_param_enthalpy.Items.Add(item.device_object_name + ":" + item.indexID);
+                        //     s += item.device_object_name + ":" + item.indexID + " value = " + item.presentValue+"\n";
+
+                    }
+
+                    CB_param_temp.Enabled = true;
+                    CB_param_hum.Enabled = true;
+                      //MessageBox.Show("ENd of the true");
+                    //TEST
+                }
+                else
+                {
+                        //Show device is offline
+                        lb_device_status.Text = "disconnected";
+                }
+                
+            }//Close of if
+
+
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+        }
+
+        //Don't use System.Window.Timer
+        private System.Timers.Timer _Timer = null;
+
+        int flagForTimer = 0;//DISSABLE
+        /// <summary>
+        /// This function stores a timer to watch value constantly
+        /// </summary>
+        public void temporary_timer_function()
+        {
+            flagForTimer = 1;//ENABLED
+            _Timer = new System.Timers.Timer();
+            _Timer.Elapsed += HandleTick;//new System.EventHandler(HandleTick);
+            _Timer.Interval = 1000 * 1; //new TimeSpan(0, 0, 0, 2); //Timespan of 2 seconds
+            _Timer.Start();
+        }
+        int deviceInstanceValuTemp = 0;
+        public async Task AsyncMethod1ForPullingData()
+        {
+            // Do asynchronous work.
+            await Task.Run(()=> getDataFromParameter(deviceInstanceValuTemp));
+        }
+
+        //This two variable will be set when we change the index in of cb_param_temp or cb_param_temp
+        //This index help to filter the value selected when displaying the value
+        int parameterID_ForTemp = -1;
+        int parameterID_ForHum = -1;
+        int c = 0;
+        private void HandleTick(object sender, System.EventArgs e)
+        {
+            //MessageBox.Show("hANDLER CALLED");
+
+            //Task.Run(()=>AsyncMethod1ForPullingData()); //This will run an async task
+            getDataFromParameter(deviceInstanceValuTemp);
+  
+
+            if (lb_test.InvokeRequired)
+            {
+                // lb_test.Invoke(new Action(() => CB_Device.Items.Clear()));
+                // CB_Device.Text = ""; 
+                lb_test.Invoke(new Action(() => lb_test.Text = "Test = " + c++ + " param count" + parameterValFromBacnet.Count));
+            }
+            else
+            {     //if invoke is not requred the do normal way
+                  // CB_Device.Items.Clear();
+                  // CB_Device.Text = "";
+                lb_test.Text = "Test = " + c++ + " param count" + parameterValFromBacnet.Count;
+            }
+
+
+
+        }
+
+        /// <summary>
+        /// This function bull the all the available values for particualar device id
+        /// </summary>
+        /// <param name="device_instance_id"></param>
+        /// <returns></returns>
+        public void getDataFromParameter(int device_instance_id)
+        {
+
+            if (CheckDeviceOnlineOffline(deviceInstanceValuTemp, 0) == true)
+            {
+
+
+               
+
+                DeviceConnection db = new DeviceConnection();
+              //  db.parameterListValue.Clear();//This will scan the paramter list first
+                db.ScanForParameters(device_instance_id);//This will return the parameters
+                                                         //Now we can use the value strored int  the db.parameterList1
+
+                if (db.parameterListValue.Count > 0)
+                {
+
+                    ///WE NEED TO REENABLE BOTH DORPDOWN IE FOR TEMP AND HUM IF THE SYSTEM IS ONLINE
+                    //temp
+                    //  string s = "";
+                    parameterValFromBacnet.Clear();
+                    foreach (var bac in db.parameterListValue)
+                    {
+                        parameterValFromBacnet.Add(new parameter_class1
+                        {
+                            device_object_name = bac.device_object_name,
+                            indexID = bac.indexID,
+                            presentValue = bac.presentValue
+
+                        });
+                        // s += bac.device_object_name + "," + bac.presentValue;
+                    }
+
+                    //MessageBox.Show()
+                    // MessageBox.Show("count everytime " + parameterValFromBacnet.Count);
+                    if (parameterValFromBacnet.Count < 1)
+                    {
+
+                    }
+                    else
+                    {
+                        //This is connected section
+                        //===============================Ren enabling both dropdown===============//
+                        if (CB_param_temp.InvokeRequired)
+                        {
+                            CB_param_temp.Invoke(new MethodInvoker(() =>
+                            {
+                                CB_param_temp.Enabled = true;
+
+                            }));
+                        }
+                        else
+                        {
+                            CB_param_temp.Enabled = true;
+                        }
+
+                        //hum
+                        if (CB_param_hum.InvokeRequired)
+                        {
+                            CB_param_hum.Invoke(new MethodInvoker(() =>
+                            {
+                                CB_param_hum.Enabled = true;
+
+                            }));
+                        }
+                        else
+                        {
+                            CB_param_hum.Enabled = true;
+                        }
+
+                        //============================== End=Ren enabling both dropdown===============//
+
+
+
+
+                        //Device is connected and pulling is success
+                        //This means we have values 
+                        //Temp is set 
+                        //shwo status 
+                        //lb_device_status.Text = "connected";
+                        if (lb_device_status.InvokeRequired)
+                        {
+                            lb_device_status.Invoke(new Action(() => lb_device_status.Text = "connected"));
+
+                        }
+                        else
+                        {     //if invoke is not requred the do normal way
+
+                            lb_device_status.Text = "connected";
+                        }
+
+
+                        if (parameterID_ForTemp >= 0)
+                        {
+                            //This is done to elimate the cross-thread exception which was occured while simple call
+                            if (tb_temp_panel_value.InvokeRequired)
+                            {
+                                tb_temp_panel_value.Invoke(new MethodInvoker(() =>
+                                {
+                                    //RefreshDataFromDeviceAndWeb();
+                                    //MessageBox.Show("Temp value methodinvoker bhitra");     
+                                    try { 
+                                                tb_temp_panel_value.Text = parameterValFromBacnet[parameterID_ForTemp].presentValue.ToString();
+                                    }
+                                    catch { }
+                                }));
+                            }
+                            else
+                            {
+                                // RefreshDataFromDeviceAndWeb();
+                                //tb_temp_panel_value.Text = parameterValFromBacnet[parameterID_ForTemp].presentValue.ToString();
+                                try
+                                {
+                                    tb_temp_panel_value.Text = parameterValFromBacnet[parameterID_ForTemp].presentValue.ToString();
+                                }
+                                catch { }
+                            }
+                        }
+
+                        //If hum value is set then do below
+                        if (parameterID_ForHum >= 0)
+                        {
+                            //index is set so
+                            //tb_hum_panel_value.Text = parameterValFromBacnet[parameterID_ForHum].presentValue.ToString();
+                            //This is done to elimate the cross-thread exception which was occured while simple call
+                            if (tb_hum_panel_value.InvokeRequired)
+                            {
+                                tb_hum_panel_value.Invoke(new MethodInvoker(() =>
+                                {
+                                    //RefreshDataFromDeviceAndWeb();
+                                    try { 
+                                                tb_hum_panel_value.Text = parameterValFromBacnet[parameterID_ForHum].presentValue.ToString();
+                                    }
+                                    catch { }
+                                }));
+                            }
+                            else
+                            {
+                                // RefreshDataFromDeviceAndWeb();
+                                // tb_hum_panel_value.Text = parameterValFromBacnet[parameterID_ForHum].presentValue.ToString();
+                                try
+                                {
+                                    tb_hum_panel_value.Text = parameterValFromBacnet[parameterID_ForHum].presentValue.ToString();
+                                }
+                                catch { }
+
+                            }
+                        }
+
+                    }
+
+                }//This is the close of  parameter valueList >0 this done so that when the device return nothing after 
+                //It has been online in status change nothing for eg say if device is gone online in access db but now 
+                //Device is turned OFF when the scanner just started to scan then device will return nothing thought 
+                //Db shows online so in such case in order to preserve previous setting this is used
+
+
+            }  //this is the closing of checkOnlineOfline fxn
+            else
+            {
+                //Device is offline 
+               // lb_device_status.Text = "Disconnected";
+
+
+                if (lb_device_status.InvokeRequired)
+                {
+                    lb_device_status.Invoke(new MethodInvoker(() =>
+                    {
+                        //RefreshDataFromDeviceAndWeb();
+                        //lb_device_status.Text = parameterValFromBacnet[parameterID_ForHum].presentValue.ToString();
+                        lb_device_status.Text = "Disconnected";
+
+                    }));
+                }
+                else
+                {
+                    // RefreshDataFromDeviceAndWeb();
+                    // tb_hum_panel_value.Text = parameterValFromBacnet[parameterID_ForHum].presentValue.ToString();
+                    lb_device_status.Text = "Disconnected";
+                }
+
+                //===============================disabling both dropdown===============//
+                //temp
+                if (CB_param_temp.InvokeRequired)
+                {
+                    CB_param_temp.Invoke(new MethodInvoker(() =>
+                    {
+                        CB_param_temp.Enabled = false;
+
+                    }));
+                }
+                else
+                {
+                    CB_param_temp.Enabled = false;
+                }
+
+                //hum
+                if (CB_param_hum.InvokeRequired)
+                {
+                    CB_param_hum.Invoke(new MethodInvoker(() =>
+                    {
+                        CB_param_hum.Enabled = false;
+
+                    }));
+                }
+                else
+                {
+                    CB_param_hum.Enabled = false;
+                }
+                //===============================Ende disabling both dropdown===============//
+                //reSETTING BOTH TEXT BOXES
+                //tb_temp_panel_value
+                if (tb_temp_panel_value.InvokeRequired)
+                {
+                    tb_temp_panel_value.Invoke(new MethodInvoker(() =>
+                    {
+                        tb_temp_panel_value.Text = "";
+
+                    }));
+                }
+                else
+                {
+                    tb_temp_panel_value.Text = "";
+                }
+
+                //tb_hum_panel_value
+                if (tb_hum_panel_value.InvokeRequired)
+                {
+                    tb_hum_panel_value.Invoke(new MethodInvoker(() =>
+                    {
+                        tb_hum_panel_value.Text = "";
+
+                    }));
+                }
+                else
+                {
+                    tb_hum_panel_value.Text = "";
+                }
+
+
+
+
+            }
+
+            // return true;
+        }//Close maine fxn getdatafromparameter
+
+
+        private void CB_param_temp_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(CB_param_temp.SelectedIndex >= 0)
+            { 
+            //on this index is selected the value should be displayed to text box
+            tb_temp_panel_value.Text = parameterValFromBacnet[CB_param_temp.SelectedIndex].presentValue.ToString() ;
+
+                //lets set the timer
+                //first if the timer is already set then stop that and start new ...
+                parameterID_ForTemp = CB_param_temp.SelectedIndex;//Setting the index value for constant update
+           if(flagForTimer == 1)
+            {
+                //Timer is already set so dissable it first and then reenable...
+                _Timer.Enabled = false;
+                    _Timer.Elapsed -= HandleTick;//new System.EventHandler(HandleTick);
+                _Timer.Dispose();
+
+                flagForTimer = 0;//Timer dissabled
+            }
+
+                //Checking if the device is online or offline
+                if (CheckDeviceOnlineOffline(deviceInstanceValuTemp, 0) == true)
+                {
+
+                    //then reenable again
+                    temporary_timer_function();
+                }
+                else
+                {
+                    //Device is offline 
+                    lb_device_status.Text = "Disconnected";
+
+                }
+            }
+
+        }
+
+        private void CB_param_hum_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (CB_param_hum.SelectedIndex >= 0)
+            {
+
+                tb_hum_panel_value.Text = parameterValFromBacnet[CB_param_hum.SelectedIndex].presentValue.ToString();
+
+                parameterID_ForHum = CB_param_hum.SelectedIndex;//Setting the index value for constant update
+                if (flagForTimer == 1)
+                {
+                    //Timer is already set so dissable it first and then reenable...
+                    _Timer.Enabled = false;
+                    _Timer.Elapsed -= HandleTick;//new System.EventHandler(HandleTick);
+                    _Timer.Dispose();
+
+                    flagForTimer = 0;//Timer dissabled
+                }
+
+                //then reenable again
+                temporary_timer_function();
+
+            }
+       
+       
+        }
+
         private void tb_max_adjust_TextChanged(object sender, EventArgs e)
         {
            //this is where we are going to call the function ...
@@ -2259,9 +3001,7 @@ namespace WFA_psychometric_chart
     
       
 
-      public void Form3_Disposed ( object sender, System.EventArgs e )
-      {
-      }
+   
 
         private void btnShowLogFile_Click(object sender, EventArgs e)
         {
@@ -2277,4 +3017,5 @@ namespace WFA_psychometric_chart
         }
           
     }
-}
+
+       }

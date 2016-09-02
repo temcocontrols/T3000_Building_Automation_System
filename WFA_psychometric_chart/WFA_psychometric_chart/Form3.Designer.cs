@@ -51,18 +51,27 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.lb_chose_a_device = new System.Windows.Forms.Label();
+            this.CB_param_hum = new System.Windows.Forms.ComboBox();
+            this.CB_param_temp = new System.Windows.Forms.ComboBox();
+            this.CB_Device = new System.Windows.Forms.ComboBox();
             this.button4 = new System.Windows.Forms.Button();
             this.label14 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.tb_hum_panel_value = new System.Windows.Forms.TextBox();
             this.tb_temp_panel_value = new System.Windows.Forms.TextBox();
-            this.tb_hum_panel_ID = new System.Windows.Forms.TextBox();
-            this.tb_temp_panel_ID = new System.Windows.Forms.TextBox();
             this.label12 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.groupBox7 = new System.Windows.Forms.GroupBox();
+            this.lb_real_time = new System.Windows.Forms.Label();
+            this.lb_mode = new System.Windows.Forms.Label();
+            this.lb_web_status = new System.Windows.Forms.Label();
+            this.label43 = new System.Windows.Forms.Label();
+            this.lb_device_status = new System.Windows.Forms.Label();
+            this.label44 = new System.Windows.Forms.Label();
             this.tb_station_distance = new System.Windows.Forms.TextBox();
             this.label37 = new System.Windows.Forms.Label();
             this.label36 = new System.Windows.Forms.Label();
@@ -98,6 +107,7 @@
             this.tb_cw_temp = new System.Windows.Forms.TextBox();
             this.label18 = new System.Windows.Forms.Label();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.lb_test = new System.Windows.Forms.Label();
             this.lbConnectionIssue = new System.Windows.Forms.Label();
             this.btnShowLogFile = new System.Windows.Forms.Button();
             this.label41 = new System.Windows.Forms.Label();
@@ -109,6 +119,7 @@
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
+            this.groupBox7.SuspendLayout();
             this.groupBox6.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -252,13 +263,15 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.lb_chose_a_device);
+            this.groupBox2.Controls.Add(this.CB_param_hum);
+            this.groupBox2.Controls.Add(this.CB_param_temp);
+            this.groupBox2.Controls.Add(this.CB_Device);
             this.groupBox2.Controls.Add(this.button4);
             this.groupBox2.Controls.Add(this.label14);
             this.groupBox2.Controls.Add(this.label13);
             this.groupBox2.Controls.Add(this.tb_hum_panel_value);
             this.groupBox2.Controls.Add(this.tb_temp_panel_value);
-            this.groupBox2.Controls.Add(this.tb_hum_panel_ID);
-            this.groupBox2.Controls.Add(this.tb_temp_panel_ID);
             this.groupBox2.Controls.Add(this.label12);
             this.groupBox2.Controls.Add(this.label11);
             this.groupBox2.Controls.Add(this.label10);
@@ -266,6 +279,35 @@
             resources.ApplyResources(this.groupBox2, "groupBox2");
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.TabStop = false;
+            // 
+            // lb_chose_a_device
+            // 
+            resources.ApplyResources(this.lb_chose_a_device, "lb_chose_a_device");
+            this.lb_chose_a_device.Name = "lb_chose_a_device";
+            // 
+            // CB_param_hum
+            // 
+            this.CB_param_hum.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            resources.ApplyResources(this.CB_param_hum, "CB_param_hum");
+            this.CB_param_hum.FormattingEnabled = true;
+            this.CB_param_hum.Name = "CB_param_hum";
+            this.CB_param_hum.SelectedIndexChanged += new System.EventHandler(this.CB_param_hum_SelectedIndexChanged);
+            // 
+            // CB_param_temp
+            // 
+            this.CB_param_temp.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            resources.ApplyResources(this.CB_param_temp, "CB_param_temp");
+            this.CB_param_temp.FormattingEnabled = true;
+            this.CB_param_temp.Name = "CB_param_temp";
+            this.CB_param_temp.SelectedIndexChanged += new System.EventHandler(this.CB_param_temp_SelectedIndexChanged);
+            // 
+            // CB_Device
+            // 
+            this.CB_Device.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.CB_Device.FormattingEnabled = true;
+            resources.ApplyResources(this.CB_Device, "CB_Device");
+            this.CB_Device.Name = "CB_Device";
+            this.CB_Device.SelectedIndexChanged += new System.EventHandler(this.CB_Device_SelectedIndexChanged);
             // 
             // button4
             // 
@@ -288,21 +330,13 @@
             // 
             resources.ApplyResources(this.tb_hum_panel_value, "tb_hum_panel_value");
             this.tb_hum_panel_value.Name = "tb_hum_panel_value";
+            this.tb_hum_panel_value.ReadOnly = true;
             // 
             // tb_temp_panel_value
             // 
             resources.ApplyResources(this.tb_temp_panel_value, "tb_temp_panel_value");
             this.tb_temp_panel_value.Name = "tb_temp_panel_value";
-            // 
-            // tb_hum_panel_ID
-            // 
-            resources.ApplyResources(this.tb_hum_panel_ID, "tb_hum_panel_ID");
-            this.tb_hum_panel_ID.Name = "tb_hum_panel_ID";
-            // 
-            // tb_temp_panel_ID
-            // 
-            resources.ApplyResources(this.tb_temp_panel_ID, "tb_temp_panel_ID");
-            this.tb_temp_panel_ID.Name = "tb_temp_panel_ID";
+            this.tb_temp_panel_value.ReadOnly = true;
             // 
             // label12
             // 
@@ -326,6 +360,7 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.groupBox7);
             this.groupBox3.Controls.Add(this.tb_station_distance);
             this.groupBox3.Controls.Add(this.label37);
             this.groupBox3.Controls.Add(this.label36);
@@ -338,6 +373,48 @@
             resources.ApplyResources(this.groupBox3, "groupBox3");
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.TabStop = false;
+            // 
+            // groupBox7
+            // 
+            resources.ApplyResources(this.groupBox7, "groupBox7");
+            this.groupBox7.Controls.Add(this.lb_real_time);
+            this.groupBox7.Controls.Add(this.lb_mode);
+            this.groupBox7.Controls.Add(this.lb_web_status);
+            this.groupBox7.Controls.Add(this.label43);
+            this.groupBox7.Controls.Add(this.lb_device_status);
+            this.groupBox7.Controls.Add(this.label44);
+            this.groupBox7.Name = "groupBox7";
+            this.groupBox7.TabStop = false;
+            // 
+            // lb_real_time
+            // 
+            resources.ApplyResources(this.lb_real_time, "lb_real_time");
+            this.lb_real_time.Name = "lb_real_time";
+            // 
+            // lb_mode
+            // 
+            resources.ApplyResources(this.lb_mode, "lb_mode");
+            this.lb_mode.Name = "lb_mode";
+            // 
+            // lb_web_status
+            // 
+            resources.ApplyResources(this.lb_web_status, "lb_web_status");
+            this.lb_web_status.Name = "lb_web_status";
+            // 
+            // label43
+            // 
+            resources.ApplyResources(this.label43, "label43");
+            this.label43.Name = "label43";
+            // 
+            // lb_device_status
+            // 
+            resources.ApplyResources(this.lb_device_status, "lb_device_status");
+            this.lb_device_status.Name = "lb_device_status";
+            // 
+            // label44
+            // 
+            resources.ApplyResources(this.label44, "label44");
+            this.label44.Name = "label44";
             // 
             // tb_station_distance
             // 
@@ -557,6 +634,7 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.lb_test);
             this.groupBox4.Controls.Add(this.lbConnectionIssue);
             this.groupBox4.Controls.Add(this.btnShowLogFile);
             this.groupBox4.Controls.Add(this.label41);
@@ -568,6 +646,11 @@
             resources.ApplyResources(this.groupBox4, "groupBox4");
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.TabStop = false;
+            // 
+            // lb_test
+            // 
+            resources.ApplyResources(this.lb_test, "lb_test");
+            this.lb_test.Name = "lb_test";
             // 
             // lbConnectionIssue
             // 
@@ -620,6 +703,7 @@
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "Form3";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form3_ClosingForm);
@@ -630,6 +714,8 @@
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
+            this.groupBox7.ResumeLayout(false);
+            this.groupBox7.PerformLayout();
             this.groupBox6.ResumeLayout(false);
             this.groupBox6.PerformLayout();
             this.groupBox5.ResumeLayout(false);
@@ -665,8 +751,6 @@
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.TextBox tb_hum_panel_value;
         private System.Windows.Forms.TextBox tb_temp_panel_value;
-        private System.Windows.Forms.TextBox tb_hum_panel_ID;
-        private System.Windows.Forms.TextBox tb_temp_panel_ID;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Label label10;
@@ -719,5 +803,17 @@
         private System.Windows.Forms.Label lbConnectionIssue;
         private System.Windows.Forms.Label lb_building_name;
         private System.Windows.Forms.Label label42;
+        private System.Windows.Forms.ComboBox CB_Device;
+        private System.Windows.Forms.Label lb_chose_a_device;
+        private System.Windows.Forms.ComboBox CB_param_hum;
+        private System.Windows.Forms.ComboBox CB_param_temp;
+        private System.Windows.Forms.GroupBox groupBox7;
+        private System.Windows.Forms.Label lb_real_time;
+        private System.Windows.Forms.Label lb_mode;
+        private System.Windows.Forms.Label lb_web_status;
+        private System.Windows.Forms.Label label43;
+        private System.Windows.Forms.Label lb_device_status;
+        private System.Windows.Forms.Label label44;
+        private System.Windows.Forms.Label lb_test;
     }
 }

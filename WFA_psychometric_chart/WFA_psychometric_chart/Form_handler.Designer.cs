@@ -390,6 +390,7 @@
             this.Controls.Add(this.dataGridView2);
             this.Controls.Add(this.chart1);
             this.Controls.Add(this.dataGridView1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "Form_handler";
             this.Text = "Air Handler";

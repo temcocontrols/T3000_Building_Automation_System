@@ -235,6 +235,7 @@
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.chart1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "form_process_diagram";
             this.Load += new System.EventHandler(this.form_process_diagram_Load);
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();

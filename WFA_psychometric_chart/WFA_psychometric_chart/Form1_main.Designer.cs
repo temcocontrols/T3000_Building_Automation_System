@@ -30,45 +30,45 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1_main));
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series37 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series38 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series39 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series40 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series41 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series42 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series43 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series44 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series45 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series46 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series47 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series48 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series49 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series50 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series51 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series52 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series53 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series54 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series55 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series56 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series57 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series58 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series59 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series60 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series61 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series62 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series63 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series64 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series65 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series66 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series67 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series68 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series69 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series70 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series71 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series72 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Title title2 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series73 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series74 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series75 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series76 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series77 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series78 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series79 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series80 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series81 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series82 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series83 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series84 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series85 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series86 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series87 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series88 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series89 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series90 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series91 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series92 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series93 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series94 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series95 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series96 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series97 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series98 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series99 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series100 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series101 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series102 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series103 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series104 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series105 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series106 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series107 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series108 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title3 = new System.Windows.Forms.DataVisualization.Charting.Title();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.button1 = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
@@ -89,11 +89,15 @@
             this.lb_dbt = new System.Windows.Forms.Label();
             this.label21 = new System.Windows.Forms.Label();
             this.optionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.weatherServicesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.realTimePlottingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.psychrometricCalculatorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.nodeGridViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.realTimeMode = new System.Windows.Forms.ToolStripMenuItem();
+            this.buildingChartToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.weatherServicesToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.simulationMode = new System.Windows.Forms.ToolStripMenuItem();
+            this.psychometricCalculatorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.airHandlerToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportDataToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.historyPlotToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.nodeViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.printToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -113,7 +117,7 @@
             this.dtp_To = new System.Windows.Forms.DateTimePicker();
             this.label2 = new System.Windows.Forms.Label();
             this.button2 = new System.Windows.Forms.Button();
-            this.airHandlerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.lb_unit_chosen = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.groupBox4.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -124,163 +128,167 @@
             // chart1
             // 
             resources.ApplyResources(this.chart1, "chart1");
-            chartArea2.AxisX.LabelAutoFitMinFontSize = 5;
-            chartArea2.AxisY.LabelAutoFitMinFontSize = 5;
-            chartArea2.CursorX.Interval = 5D;
-            chartArea2.CursorY.Interval = 5D;
-            chartArea2.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea2);
-            legend2.Enabled = false;
-            legend2.Name = "Legend1";
-            this.chart1.Legends.Add(legend2);
+            this.chart1.BackColor = System.Drawing.Color.Silver;
+            chartArea3.AxisX.LabelAutoFitMinFontSize = 5;
+            chartArea3.AxisX.Title = "Dry Bulb Temperature(Deg C)";
+            chartArea3.AxisY.LabelAutoFitMinFontSize = 5;
+            chartArea3.AxisY.Title = "Humidity Ratio (unitless)";
+            chartArea3.BorderWidth = 0;
+            chartArea3.CursorX.Interval = 5D;
+            chartArea3.CursorY.Interval = 5D;
+            chartArea3.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea3);
+            legend3.Enabled = false;
+            legend3.Name = "Legend1";
+            this.chart1.Legends.Add(legend3);
             this.chart1.Name = "chart1";
-            series37.ChartArea = "ChartArea1";
-            series37.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series37.Legend = "Legend1";
-            series37.Name = "Series1";
-            series38.ChartArea = "ChartArea1";
-            series38.Legend = "Legend1";
-            series38.Name = "Series2";
-            series39.ChartArea = "ChartArea1";
-            series39.Legend = "Legend1";
-            series39.Name = "Series3";
-            series40.ChartArea = "ChartArea1";
-            series40.Legend = "Legend1";
-            series40.Name = "Series4";
-            series41.ChartArea = "ChartArea1";
-            series41.Legend = "Legend1";
-            series41.Name = "Series5";
-            series42.ChartArea = "ChartArea1";
-            series42.Legend = "Legend1";
-            series42.Name = "Series6";
-            series43.ChartArea = "ChartArea1";
-            series43.Legend = "Legend1";
-            series43.Name = "Series7";
-            series44.ChartArea = "ChartArea1";
-            series44.Legend = "Legend1";
-            series44.Name = "Series8";
-            series45.ChartArea = "ChartArea1";
-            series45.Legend = "Legend1";
-            series45.Name = "Line0";
-            series46.ChartArea = "ChartArea1";
-            series46.Legend = "Legend1";
-            series46.Name = "Line1";
-            series47.ChartArea = "ChartArea1";
-            series47.Legend = "Legend1";
-            series47.Name = "Line2";
-            series48.ChartArea = "ChartArea1";
-            series48.Legend = "Legend1";
-            series48.Name = "Line3";
-            series49.ChartArea = "ChartArea1";
-            series49.Legend = "Legend1";
-            series49.Name = "Line4";
-            series50.ChartArea = "ChartArea1";
-            series50.Legend = "Legend1";
-            series50.Name = "Line5";
-            series51.ChartArea = "ChartArea1";
-            series51.Legend = "Legend1";
-            series51.Name = "Line6";
-            series52.ChartArea = "ChartArea1";
-            series52.Legend = "Legend1";
-            series52.Name = "Line_r0";
-            series53.ChartArea = "ChartArea1";
-            series53.Legend = "Legend1";
-            series53.Name = "Line_r1";
-            series54.ChartArea = "ChartArea1";
-            series54.Legend = "Legend1";
-            series54.Name = "Line_r2";
-            series55.ChartArea = "ChartArea1";
-            series55.Legend = "Legend1";
-            series55.Name = "Line_r3";
-            series56.ChartArea = "ChartArea1";
-            series56.Legend = "Legend1";
-            series56.Name = "Line_r4";
-            series57.ChartArea = "ChartArea1";
-            series57.Legend = "Legend1";
-            series57.Name = "Line_r5";
-            series58.ChartArea = "ChartArea1";
-            series58.Legend = "Legend1";
-            series58.Name = "Line_b10";
-            series59.ChartArea = "ChartArea1";
-            series59.Legend = "Legend1";
-            series59.Name = "Line_b20";
-            series60.ChartArea = "ChartArea1";
-            series60.Legend = "Legend1";
-            series60.Name = "Line_b30";
-            series61.ChartArea = "ChartArea1";
-            series61.Legend = "Legend1";
-            series61.Name = "Line_b40";
-            series62.ChartArea = "ChartArea1";
-            series62.Legend = "Legend1";
-            series62.Name = "Line_b50";
-            series63.ChartArea = "ChartArea1";
-            series63.Legend = "Legend1";
-            series63.Name = "Line_b60";
-            series64.ChartArea = "ChartArea1";
-            series64.Legend = "Legend1";
-            series64.Name = "Line_b70";
-            series65.ChartArea = "ChartArea1";
-            series65.Legend = "Legend1";
-            series65.Name = "Line_b80";
-            series66.ChartArea = "ChartArea1";
-            series66.Legend = "Legend1";
-            series66.Name = "Line_b90";
-            series67.ChartArea = "ChartArea1";
-            series67.Legend = "Legend1";
-            series67.Name = "Line_b100";
-            series68.ChartArea = "ChartArea1";
-            series68.Legend = "Legend1";
-            series68.Name = "Line_b110";
-            series69.ChartArea = "ChartArea1";
-            series69.Legend = "Legend1";
-            series69.Name = "Line_b_straight";
-            series70.ChartArea = "ChartArea1";
-            series70.Legend = "Legend1";
-            series70.Name = "SeriesDBT_HR";
-            series71.ChartArea = "ChartArea1";
-            series71.Legend = "Legend1";
-            series71.Name = "SeriesDBT_enthalpy";
-            series72.ChartArea = "ChartArea1";
-            series72.Legend = "Legend1";
-            series72.Name = "Series_enthalpy_dew_point";
-            this.chart1.Series.Add(series37);
-            this.chart1.Series.Add(series38);
-            this.chart1.Series.Add(series39);
-            this.chart1.Series.Add(series40);
-            this.chart1.Series.Add(series41);
-            this.chart1.Series.Add(series42);
-            this.chart1.Series.Add(series43);
-            this.chart1.Series.Add(series44);
-            this.chart1.Series.Add(series45);
-            this.chart1.Series.Add(series46);
-            this.chart1.Series.Add(series47);
-            this.chart1.Series.Add(series48);
-            this.chart1.Series.Add(series49);
-            this.chart1.Series.Add(series50);
-            this.chart1.Series.Add(series51);
-            this.chart1.Series.Add(series52);
-            this.chart1.Series.Add(series53);
-            this.chart1.Series.Add(series54);
-            this.chart1.Series.Add(series55);
-            this.chart1.Series.Add(series56);
-            this.chart1.Series.Add(series57);
-            this.chart1.Series.Add(series58);
-            this.chart1.Series.Add(series59);
-            this.chart1.Series.Add(series60);
-            this.chart1.Series.Add(series61);
-            this.chart1.Series.Add(series62);
-            this.chart1.Series.Add(series63);
-            this.chart1.Series.Add(series64);
-            this.chart1.Series.Add(series65);
-            this.chart1.Series.Add(series66);
-            this.chart1.Series.Add(series67);
-            this.chart1.Series.Add(series68);
-            this.chart1.Series.Add(series69);
-            this.chart1.Series.Add(series70);
-            this.chart1.Series.Add(series71);
-            this.chart1.Series.Add(series72);
-            title2.Name = "Psychometric chart";
-            this.chart1.Titles.Add(title2);
+            series73.ChartArea = "ChartArea1";
+            series73.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series73.Legend = "Legend1";
+            series73.Name = "Series1";
+            series74.ChartArea = "ChartArea1";
+            series74.Legend = "Legend1";
+            series74.Name = "Series2";
+            series75.ChartArea = "ChartArea1";
+            series75.Legend = "Legend1";
+            series75.Name = "Series3";
+            series76.ChartArea = "ChartArea1";
+            series76.Legend = "Legend1";
+            series76.Name = "Series4";
+            series77.ChartArea = "ChartArea1";
+            series77.Legend = "Legend1";
+            series77.Name = "Series5";
+            series78.ChartArea = "ChartArea1";
+            series78.Legend = "Legend1";
+            series78.Name = "Series6";
+            series79.ChartArea = "ChartArea1";
+            series79.Legend = "Legend1";
+            series79.Name = "Series7";
+            series80.ChartArea = "ChartArea1";
+            series80.Legend = "Legend1";
+            series80.Name = "Series8";
+            series81.ChartArea = "ChartArea1";
+            series81.Legend = "Legend1";
+            series81.Name = "Line0";
+            series82.ChartArea = "ChartArea1";
+            series82.Legend = "Legend1";
+            series82.Name = "Line1";
+            series83.ChartArea = "ChartArea1";
+            series83.Legend = "Legend1";
+            series83.Name = "Line2";
+            series84.ChartArea = "ChartArea1";
+            series84.Legend = "Legend1";
+            series84.Name = "Line3";
+            series85.ChartArea = "ChartArea1";
+            series85.Legend = "Legend1";
+            series85.Name = "Line4";
+            series86.ChartArea = "ChartArea1";
+            series86.Legend = "Legend1";
+            series86.Name = "Line5";
+            series87.ChartArea = "ChartArea1";
+            series87.Legend = "Legend1";
+            series87.Name = "Line6";
+            series88.ChartArea = "ChartArea1";
+            series88.Legend = "Legend1";
+            series88.Name = "Line_r0";
+            series89.ChartArea = "ChartArea1";
+            series89.Legend = "Legend1";
+            series89.Name = "Line_r1";
+            series90.ChartArea = "ChartArea1";
+            series90.Legend = "Legend1";
+            series90.Name = "Line_r2";
+            series91.ChartArea = "ChartArea1";
+            series91.Legend = "Legend1";
+            series91.Name = "Line_r3";
+            series92.ChartArea = "ChartArea1";
+            series92.Legend = "Legend1";
+            series92.Name = "Line_r4";
+            series93.ChartArea = "ChartArea1";
+            series93.Legend = "Legend1";
+            series93.Name = "Line_r5";
+            series94.ChartArea = "ChartArea1";
+            series94.Legend = "Legend1";
+            series94.Name = "Line_b10";
+            series95.ChartArea = "ChartArea1";
+            series95.Legend = "Legend1";
+            series95.Name = "Line_b20";
+            series96.ChartArea = "ChartArea1";
+            series96.Legend = "Legend1";
+            series96.Name = "Line_b30";
+            series97.ChartArea = "ChartArea1";
+            series97.Legend = "Legend1";
+            series97.Name = "Line_b40";
+            series98.ChartArea = "ChartArea1";
+            series98.Legend = "Legend1";
+            series98.Name = "Line_b50";
+            series99.ChartArea = "ChartArea1";
+            series99.Legend = "Legend1";
+            series99.Name = "Line_b60";
+            series100.ChartArea = "ChartArea1";
+            series100.Legend = "Legend1";
+            series100.Name = "Line_b70";
+            series101.ChartArea = "ChartArea1";
+            series101.Legend = "Legend1";
+            series101.Name = "Line_b80";
+            series102.ChartArea = "ChartArea1";
+            series102.Legend = "Legend1";
+            series102.Name = "Line_b90";
+            series103.ChartArea = "ChartArea1";
+            series103.Legend = "Legend1";
+            series103.Name = "Line_b100";
+            series104.ChartArea = "ChartArea1";
+            series104.Legend = "Legend1";
+            series104.Name = "Line_b110";
+            series105.ChartArea = "ChartArea1";
+            series105.Legend = "Legend1";
+            series105.Name = "Line_b_straight";
+            series106.ChartArea = "ChartArea1";
+            series106.Legend = "Legend1";
+            series106.Name = "SeriesDBT_HR";
+            series107.ChartArea = "ChartArea1";
+            series107.Legend = "Legend1";
+            series107.Name = "SeriesDBT_enthalpy";
+            series108.ChartArea = "ChartArea1";
+            series108.Legend = "Legend1";
+            series108.Name = "Series_enthalpy_dew_point";
+            this.chart1.Series.Add(series73);
+            this.chart1.Series.Add(series74);
+            this.chart1.Series.Add(series75);
+            this.chart1.Series.Add(series76);
+            this.chart1.Series.Add(series77);
+            this.chart1.Series.Add(series78);
+            this.chart1.Series.Add(series79);
+            this.chart1.Series.Add(series80);
+            this.chart1.Series.Add(series81);
+            this.chart1.Series.Add(series82);
+            this.chart1.Series.Add(series83);
+            this.chart1.Series.Add(series84);
+            this.chart1.Series.Add(series85);
+            this.chart1.Series.Add(series86);
+            this.chart1.Series.Add(series87);
+            this.chart1.Series.Add(series88);
+            this.chart1.Series.Add(series89);
+            this.chart1.Series.Add(series90);
+            this.chart1.Series.Add(series91);
+            this.chart1.Series.Add(series92);
+            this.chart1.Series.Add(series93);
+            this.chart1.Series.Add(series94);
+            this.chart1.Series.Add(series95);
+            this.chart1.Series.Add(series96);
+            this.chart1.Series.Add(series97);
+            this.chart1.Series.Add(series98);
+            this.chart1.Series.Add(series99);
+            this.chart1.Series.Add(series100);
+            this.chart1.Series.Add(series101);
+            this.chart1.Series.Add(series102);
+            this.chart1.Series.Add(series103);
+            this.chart1.Series.Add(series104);
+            this.chart1.Series.Add(series105);
+            this.chart1.Series.Add(series106);
+            this.chart1.Series.Add(series107);
+            this.chart1.Series.Add(series108);
+            title3.Name = "Psychometric chart";
+            this.chart1.Titles.Add(title3);
             this.chart1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseClick);
             this.chart1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseDown);
             this.chart1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseMove);
@@ -407,47 +415,75 @@
             // optionToolStripMenuItem
             // 
             this.optionToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.weatherServicesToolStripMenuItem,
-            this.realTimePlottingToolStripMenuItem,
-            this.exportDataToolStripMenuItem,
-            this.psychrometricCalculatorToolStripMenuItem,
-            this.nodeGridViewToolStripMenuItem,
-            this.airHandlerToolStripMenuItem});
+            this.realTimeMode,
+            this.simulationMode});
             this.optionToolStripMenuItem.Name = "optionToolStripMenuItem";
             resources.ApplyResources(this.optionToolStripMenuItem, "optionToolStripMenuItem");
             // 
-            // weatherServicesToolStripMenuItem
+            // realTimeMode
             // 
-            this.weatherServicesToolStripMenuItem.Name = "weatherServicesToolStripMenuItem";
-            resources.ApplyResources(this.weatherServicesToolStripMenuItem, "weatherServicesToolStripMenuItem");
-            this.weatherServicesToolStripMenuItem.Click += new System.EventHandler(this.weatherServicesToolStripMenuItem_Click);
+            this.realTimeMode.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.buildingChartToolStripMenuItem1,
+            this.weatherServicesToolStripMenuItem1});
+            this.realTimeMode.Name = "realTimeMode";
+            resources.ApplyResources(this.realTimeMode, "realTimeMode");
             // 
-            // realTimePlottingToolStripMenuItem
+            // buildingChartToolStripMenuItem1
             // 
-            this.realTimePlottingToolStripMenuItem.Name = "realTimePlottingToolStripMenuItem";
-            resources.ApplyResources(this.realTimePlottingToolStripMenuItem, "realTimePlottingToolStripMenuItem");
-            this.realTimePlottingToolStripMenuItem.Click += new System.EventHandler(this.realTimePlottingToolStripMenuItem_Click);
+            this.buildingChartToolStripMenuItem1.Name = "buildingChartToolStripMenuItem1";
+            resources.ApplyResources(this.buildingChartToolStripMenuItem1, "buildingChartToolStripMenuItem1");
+            this.buildingChartToolStripMenuItem1.Click += new System.EventHandler(this.buildingChartToolStripMenuItem1_Click);
             // 
-            // exportDataToolStripMenuItem
+            // weatherServicesToolStripMenuItem1
             // 
-            this.exportDataToolStripMenuItem.Name = "exportDataToolStripMenuItem";
-            resources.ApplyResources(this.exportDataToolStripMenuItem, "exportDataToolStripMenuItem");
-            this.exportDataToolStripMenuItem.Click += new System.EventHandler(this.exportDataToolStripMenuItem_Click);
+            this.weatherServicesToolStripMenuItem1.Name = "weatherServicesToolStripMenuItem1";
+            resources.ApplyResources(this.weatherServicesToolStripMenuItem1, "weatherServicesToolStripMenuItem1");
+            this.weatherServicesToolStripMenuItem1.Click += new System.EventHandler(this.weatherServicesToolStripMenuItem1_Click);
             // 
-            // psychrometricCalculatorToolStripMenuItem
+            // simulationMode
             // 
-            this.psychrometricCalculatorToolStripMenuItem.Name = "psychrometricCalculatorToolStripMenuItem";
-            resources.ApplyResources(this.psychrometricCalculatorToolStripMenuItem, "psychrometricCalculatorToolStripMenuItem");
-            this.psychrometricCalculatorToolStripMenuItem.Click += new System.EventHandler(this.psychrometricCalculatorToolStripMenuItem_Click);
+            this.simulationMode.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.psychometricCalculatorToolStripMenuItem,
+            this.airHandlerToolStripMenuItem1,
+            this.exportDataToolStripMenuItem1,
+            this.historyPlotToolStripMenuItem,
+            this.nodeViewToolStripMenuItem});
+            this.simulationMode.Name = "simulationMode";
+            resources.ApplyResources(this.simulationMode, "simulationMode");
             // 
-            // nodeGridViewToolStripMenuItem
+            // psychometricCalculatorToolStripMenuItem
             // 
-            this.nodeGridViewToolStripMenuItem.Name = "nodeGridViewToolStripMenuItem";
-            resources.ApplyResources(this.nodeGridViewToolStripMenuItem, "nodeGridViewToolStripMenuItem");
-            this.nodeGridViewToolStripMenuItem.Click += new System.EventHandler(this.nodeGridViewToolStripMenuItem_Click);
+            this.psychometricCalculatorToolStripMenuItem.Name = "psychometricCalculatorToolStripMenuItem";
+            resources.ApplyResources(this.psychometricCalculatorToolStripMenuItem, "psychometricCalculatorToolStripMenuItem");
+            this.psychometricCalculatorToolStripMenuItem.Click += new System.EventHandler(this.psychometricCalculatorToolStripMenuItem_Click);
+            // 
+            // airHandlerToolStripMenuItem1
+            // 
+            this.airHandlerToolStripMenuItem1.Name = "airHandlerToolStripMenuItem1";
+            resources.ApplyResources(this.airHandlerToolStripMenuItem1, "airHandlerToolStripMenuItem1");
+            this.airHandlerToolStripMenuItem1.Click += new System.EventHandler(this.airHandlerToolStripMenuItem1_Click);
+            // 
+            // exportDataToolStripMenuItem1
+            // 
+            this.exportDataToolStripMenuItem1.Name = "exportDataToolStripMenuItem1";
+            resources.ApplyResources(this.exportDataToolStripMenuItem1, "exportDataToolStripMenuItem1");
+            this.exportDataToolStripMenuItem1.Click += new System.EventHandler(this.exportDataToolStripMenuItem1_Click);
+            // 
+            // historyPlotToolStripMenuItem
+            // 
+            this.historyPlotToolStripMenuItem.Name = "historyPlotToolStripMenuItem";
+            resources.ApplyResources(this.historyPlotToolStripMenuItem, "historyPlotToolStripMenuItem");
+            this.historyPlotToolStripMenuItem.Click += new System.EventHandler(this.historyPlotToolStripMenuItem_Click);
+            // 
+            // nodeViewToolStripMenuItem
+            // 
+            this.nodeViewToolStripMenuItem.Name = "nodeViewToolStripMenuItem";
+            resources.ApplyResources(this.nodeViewToolStripMenuItem, "nodeViewToolStripMenuItem");
+            this.nodeViewToolStripMenuItem.Click += new System.EventHandler(this.nodeViewToolStripMenuItem_Click);
             // 
             // menuStrip1
             // 
+            this.menuStrip1.BackColor = System.Drawing.SystemColors.ControlLight;
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.optionToolStripMenuItem,
@@ -563,24 +599,25 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click_1);
             // 
-            // airHandlerToolStripMenuItem
+            // lb_unit_chosen
             // 
-            this.airHandlerToolStripMenuItem.Name = "airHandlerToolStripMenuItem";
-            resources.ApplyResources(this.airHandlerToolStripMenuItem, "airHandlerToolStripMenuItem");
-            this.airHandlerToolStripMenuItem.Click += new System.EventHandler(this.airHandlerToolStripMenuItem_Click);
+            resources.ApplyResources(this.lb_unit_chosen, "lb_unit_chosen");
+            this.lb_unit_chosen.Name = "lb_unit_chosen";
             // 
             // Form1_main
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.Controls.Add(this.lb_unit_chosen);
             this.Controls.Add(this.gb_select_date);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.chart1);
             this.Controls.Add(this.menuStrip1);
+            this.ForeColor = System.Drawing.SystemColors.ControlText;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MainMenuStrip = this.menuStrip1;
-            this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "Form1_main";
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -611,10 +648,8 @@
         private System.Windows.Forms.Label lb_dbt;
         private System.Windows.Forms.Label label21;
         private System.Windows.Forms.ToolStripMenuItem optionToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem weatherServicesToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem realTimePlottingToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem exportDataToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem psychrometricCalculatorToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem realTimeMode;
+        private System.Windows.Forms.ToolStripMenuItem simulationMode;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ContextMenuStrip CMSinsertNode;
         private System.Windows.Forms.ToolStripMenuItem insertNodeToolStripMenuItem;
@@ -641,8 +676,14 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.ToolStripMenuItem disconnectLineToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem nodeGridViewToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem airHandlerToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem buildingChartToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem weatherServicesToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem psychometricCalculatorToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem airHandlerToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem exportDataToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem historyPlotToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem nodeViewToolStripMenuItem;
+        private System.Windows.Forms.Label lb_unit_chosen;
     }
 }
 

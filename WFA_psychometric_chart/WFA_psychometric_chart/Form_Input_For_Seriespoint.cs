@@ -52,7 +52,6 @@ namespace WFA_psychometric_chart
 
             F1.SetNode(source, name, label, btnColor.BackColor, cbItemSelected);
             //MessageBox.Show(Properties.Resources.Success0);
-
             this.Close();
 
         }

@@ -491,7 +491,7 @@ namespace WFA_psychometric_chart
         }
         private void Form1_Load(object sender, EventArgs e)
         {
-            realTimePlottingToolStripMenuItem.Text = WFA_psychometric_chart.Properties.Resources.Historical_Plot;
+            //simulationMode.Text = WFA_psychometric_chart.Properties.Resources.Historical_Plot;
             //lets add the t and pg values
             add_t_pg();//Calling this method add the value...
 
@@ -504,7 +504,7 @@ namespace WFA_psychometric_chart
              //lets plot the graph as soon as the form loads.
             plot_new_graph();
 
-            button1.Text = WFA_psychometric_chart.Properties.Resources.Refresh_Graph;
+            button1.Text = "Clear Chart"; //WFA_psychometric_chart.Properties.Resources.Refresh_Graph;
             //this is for adding values dynamically as the program loads. used by plot_on_graph_values() method 
             chart1.Series.Add(series1xx);
             //--This is added for the process diagram part...
@@ -906,7 +906,7 @@ namespace WFA_psychometric_chart
             //wg_calc =  622 * pg_value / (patm - pg_value);
             wg_calc = (622 * phi * pg_value / (patm - phi * pg_value));
             double y_axis = wg_calc;
-// now lets plot on graph...
+            // now lets plot on graph...
             //chart1.Series.Add("SeriesDBT_HR"+index);//dont need this we have declared this is chart control
             //MessageBox.Show("reached near chart");
             //Series series1 = new Series("My Series"+index);
@@ -977,118 +977,7 @@ namespace WFA_psychometric_chart
             return 0;
         }
 
-      
-        public int plot_by_enthalpy_dew_point(double enthalpy,double dew_point)
-        {
-
-           /* double y_axis = 0;
-            ArrayList temperature_value = new ArrayList();
-            ArrayList pg_value_from_txtfile = new ArrayList();
-
-
-            string line1;
-            string path1 = "C:\\Users\\nischal\\Desktop\\t_pg.txt";
-            using (System.IO.StreamReader st = new System.IO.StreamReader(path1))
-            {
-
-                while ((line1 = st.ReadLine()) != null)
-                {
-
-                    string[] value = line1.Split(',');
-                    try
-                    {
-                        double temp1 = Double.Parse(value[0]);
-                        double temp2 = Double.Parse(value[1]);
-                        //now lets add to temperature and pg array..                     
-                        temperature_value.Add(temp1);
-                        pg_value_from_txtfile.Add(temp2);
-
-
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.ToString());
-                    }
-
-
-                }//close of while
-
-            }//close of using
-           
-
-            //now lets proceed forwared..
-            double x1 = dew_point;
-            //   MessageBox.Show("X1= " + x1);
-            double pg = 0;
-            for (int i = 0; i < temperature_value.Count; i++)
-            {
-                if (dew_point ==double.Parse(temperature_value[i].ToString()))
-                {
-
-                    pg =double.Parse(pg_value_from_txtfile[i].ToString());
-                    break;
-                }
-
-            }
-            
-            double y1 = pg;//given pressure value form table
-            //MessageBox.Show("y1= " + y1);
-            double x2 = enthalpy;
-            double y2 = pg;
-
-            //    MessageBox.Show("x2= " + x2+" y2  = "+y2);
-
-           // double x = enthalpy;
-            //double y = y1 + (((y2 - y1) * (x - x1) / (x2 - x1)));
-            double y = pg;
-            double x = ((y - y1) * (x2 - x1) / (y2 - y1)) + x1;
-            double x_axis = x;
-            y_axis = pg;
-            */
-
-
-            //since we know dew point and enthalpy so first 
-            /*
-             from dew point calc . Pws and then put that into the value of mixing ratio..
-             */
-/*
-            Patm = 1013;
-            A = 6.116441;
-            m = 7.591386;
-            Tn = 240.7263;
-            B = 621.9907;
-
-            double td = dew_point;
-            double h = enthalpy;
-            double const_pws = ((m * td )/ (td + Tn));
-            MessageBox.Show("td= " + td + " h = " + h +" const_pws = "+const_pws);
-            double Pws = A * Math.Pow(10.000000, const_pws);//pressure of water at saturation
-            double x = B * Pws / (Patm - Pws);//this is mixing ratio..
-            MessageBox.Show("PWs= " + Pws + " x = " + x);
-            double temp = (h - (2.5 * x) )/ (1.01 + (0.00189 * x));
-
-            MessageBox.Show("temp = " + temp);
-
-            //now x axis will be temp and y axis will be dew point..
-
-            double x_axis = temp;
-            double y_axis = td;
-
-            chart1.Series.Add("Series_DP_enthalpy" + index);
-            chart1.Series["Series_DP_enthalpy" + index].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
-            chart1.Series["Series_DP_enthalpy" + index].Color = Color.Blue;
-            chart1.Series["Series_DP_enthalpy" + index].MarkerSize = 5;
-            chart1.Series["Series_DP_enthalpy" + index].Label = "enthalpy =" + enthalpy + "dew point =" + dew_point;
-            //chart1.Series["SeriesDBT_HR" + index].;
-            chart1.Series["Series_DP_enthalpy" + index].Points.AddXY(x_axis, y_axis);
-
-            index++;
-
-
-            */
-            return 0;
-        }
-
+       
         private void button5_Click(object sender, EventArgs e)
         {
             /*
@@ -1111,13 +1000,7 @@ namespace WFA_psychometric_chart
             */
 
         }
-        public int plot_by_WBT_humidity(double WBT,double humidity){
-
-
-
-
-            return 0;
-        }
+    
 
         public class get_temp_hum
         {
@@ -1148,14 +1031,23 @@ namespace WFA_psychometric_chart
                     var xVal = result.ChartArea.AxisX.PixelPositionToValue(pos.X);
                     var yVal = result.ChartArea.AxisY.PixelPositionToValue(pos.Y);
 
-                    currentXAxis = (double)xVal;
+                    // if((currentXAxis>=0 && currentXAxis<=50)&&(currentYAxis>=0 && currentYAxis <= 30)) { 
+
+                    if (((double)xVal >= 0 && (double)xVal <= 50) && ((double)yVal >= 0 && (double)yVal <= 30))
+                    {
+
+                        currentXAxis = (double)xVal;
                     currentYAxis = (double)yVal;
-            
-                    //now lets move on to making other part 
-                    /*1.find dbt value => this is x axis value 
-                     * 2.find sp.ratio value => this is yaxis value
-                     */
-                    lb_dbt.Text =Math.Round(xVal,4).ToString();
+
+                    //lb_test.Text = "x = " + currentXAxis + ",y  = " + currentYAxis;
+                   // if ((currentXAxis >= 0 && currentXAxis <= 50) && (currentYAxis >= 0 && currentYAxis <= 30))
+                    //{
+
+                        //now lets move on to making other part 
+                        /*1.find dbt value => this is x axis value 
+                         * 2.find sp.ratio value => this is yaxis value
+                         */
+                        lb_dbt.Text =Math.Round(xVal,4).ToString();
                     lb_humidity_ratio.Text = Math.Round(yVal,4).ToString();
 
 
@@ -1224,9 +1116,13 @@ namespace WFA_psychometric_chart
                    lb_enthalpy.Text = Math.Round(h,4).ToString();
 
                 }
+
+
+                }//Closing of currentxval= 0-50 and 0-30 currentyval
             }
 
             //--IF the line is selected/disconnected and then we need to connect to a node
+
             if (flagForDisconnectClick == 1)
             {
                 //--Creating temporary line..
@@ -1235,11 +1131,12 @@ namespace WFA_psychometric_chart
                 //--Now lets move on the showing the hand when hover over the Node lets do it bro...
 
                 addCursorFunctionForLineDisconnectConnect(e);
-
+             //   lb_where.Text = "me : discon =1";
 
             }
             else {
 
+               // lb_where.Text = "me : else line detect on";
                 disconnectLineToolStripMenuItem.Enabled = false;
                 //--This is for the weather the line is moverover or not...
                 LineDeterctOnMouseMove(e);
@@ -1251,7 +1148,10 @@ namespace WFA_psychometric_chart
                 ProcessDiagramMouseMoveFunction(e);//--This does the adding and removing part
 
 
-            }            
+            }       
+            
+            
+                 
         }//close of the main private void...
 
         public void addCursorFunctionForLineDisconnectConnect(MouseEventArgs e)
@@ -1275,6 +1175,7 @@ namespace WFA_psychometric_chart
 
                     xAxis1 = xValue;
                     yAxis1 = yValue;
+                    if((xAxis1>=0&& xAxis1<=50 )&& (yAxis1 >=0 && yAxis1 <= 30)) { 
                     //Console.Write("xval = " + xValue + "yvalue = " + yValue);
                     if (menuStripNodeInfoValues.Count > 0)
                     {
@@ -1309,6 +1210,7 @@ namespace WFA_psychometric_chart
                             }
                         }
                     }//close of if menuStripAllValue>0
+                    }//close of if
                 }
                 catch (Exception ex)
                 {
@@ -1412,242 +1314,252 @@ namespace WFA_psychometric_chart
                     //Point position = e.Location;
                     double xValue = chart1.ChartAreas[0].AxisX.PixelPositionToValue(e.X);
                     double yValue = chart1.ChartAreas[0].AxisY.PixelPositionToValue(e.Y);
-                   
-                    xAxis1 = xValue;
-                    yAxis1 = yValue;
-                    //Console.Write("xval = " + xValue + "yvalue = " + yValue);
-                    if (menuStripNodeInfoValues.Count > 0)
+
+                    //Lets make this here
+                    if ((xValue >= 0 && xValue <= 50) && (yValue >= 0 && yValue <= 30))
                     {
-                        //foreach(var values in menuStripNodeInfoValues)
 
-                        for (int i = 0; i < menuStripNodeInfoValues.Count; i++)
+                     xAxis1 = xValue;
+                    yAxis1 = yValue;
+
+                   
+
+
+                        //Console.Write("xval = " + xValue + "yvalue = " + yValue);
+                        if (menuStripNodeInfoValues.Count > 0)
                         {
+                            //foreach(var values in menuStripNodeInfoValues)
 
-                            if ((xValue > menuStripNodeInfoValues[i].xVal - 0.25 && xValue < menuStripNodeInfoValues[i].xVal + 0.25) && (yValue > menuStripNodeInfoValues[i].yVal - 0.25 && yValue < menuStripNodeInfoValues[i].yVal + 0.25))
+                            for (int i = 0; i < menuStripNodeInfoValues.Count; i++)
                             {
 
-                                idSelected = menuStripNodeInfoValues[i].id;
-                                if (Cursor != Cursors.Cross)
+                                if ((xValue > menuStripNodeInfoValues[i].xVal - 0.25 && xValue < menuStripNodeInfoValues[i].xVal + 0.25) && (yValue > menuStripNodeInfoValues[i].yVal - 0.25 && yValue < menuStripNodeInfoValues[i].yVal + 0.25))
                                 {
-                                    Cursor = Cursors.Hand;
+
+                                    idSelected = menuStripNodeInfoValues[i].id;
+                                    if (Cursor != Cursors.Cross)
+                                    {
+                                        Cursor = Cursors.Hand;
+                                    }
+                                    //this.Cursor = Cursors.Hand;
+                                    //now this works so lets move forward.
+                                    readyForMouseClick = 1;//enable on click event
+
+                                    break;//this break is for if found the value no longer loop increases the perfomances..
                                 }
-                                //this.Cursor = Cursors.Hand;
-                                //now this works so lets move forward.
-                                readyForMouseClick = 1;//enable on click event
-                                                                
-                                break;//this break is for if found the value no longer loop increases the perfomances..
+                                else
+                                {
+                                    if (Cursor != Cursors.Cross)
+                                    {
+                                        this.Cursor = Cursors.Arrow;
+                                        readyForMouseClick = 0;//dissable on click event.
+
+                                    }
+
+                                }
+                            }
+                        }//close of if menuStripAllValue>0
+
+
+                        if (mouseClickAction == 1)
+                        {
+
+                            if (Control.ModifierKeys == Keys.Alt)
+                            {
+                                //--This alter key is for moving along constant x-axis ...
+                                // MessageBox.Show(" alt is pressed for x axis constant");
+
+
+                                //menuStripNodeInfoValues[idSelected].xVal = xAxis1;
+                                menuStripNodeInfoValues[idSelected].yVal = yAxis1;
+
+                                // label5.Text = "click past x =" + menuStripNodeInfoValues[idSelected].xVal + " y " + menuStripNodeInfoValues[idSelected].yVal;
+
+                                series1.Points.Clear();
+                                for (int i = 0; i < menuStripNodeLineInfoValues.Count; i++)//-- this -1 is done because for three points we have two line series..
+                                {
+                                    // chart1.Series.Remove(menuStripNodeLineInfoValues[i].lineSeriesID);//--removing line series that joins node..
+                                    menuStripNodeLineInfoValues[i].lineSeriesID.Points.Clear();
+
+                                }
+                                //--this is redraw functionality
+                                //foreach(var values in menuStripNodeInfoValues)
+                                for (int x = 0; x < menuStripNodeInfoValues.Count; x++)
+                                {
+                                    string labelValue;
+                                    if (menuStripNodeInfoValues[x].showItemText == "Label")
+                                    {
+                                        labelValue = menuStripNodeInfoValues[x].label;
+                                    }
+                                    else if (menuStripNodeInfoValues[x].showItemText == "Name")
+                                    {
+                                        labelValue = menuStripNodeInfoValues[x].name;
+                                    }
+                                    else
+                                    {
+                                        labelValue = menuStripNodeInfoValues[x].source;
+                                    }
+
+
+                                    ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue);
+                                    incrementIndex++;
+
+                                }
+                                //--resetting incrementIndex
+                                incrementIndex = 0;
+                                if (menuStripNodeLineInfoValues.Count > 0)
+                                {
+
+
+                                    for (int x = 0; x < menuStripNodeLineInfoValues.Count; x++)
+                                    {
+                                        incrementIndex++;
+
+                                        //ReDrawLines(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue);
+                                        ReDrawLines(menuStripNodeLineInfoValues[x].ID, menuStripNodeLineInfoValues[x].prevNodeId, menuStripNodeLineInfoValues[x].nextNodeId, menuStripNodeLineInfoValues[x].lineSeriesID, menuStripNodeLineInfoValues[x].lineColorValue);
+
+                                    }
+
+                                }
+
+                                chart1.Invalidate();
+                                incrementIndex = 0;//reset the values again..
+
+
+                            }
+                            else if (Control.ModifierKeys == Keys.Shift)
+                            {
+                                //--This ctrl key is for moving along the y-  axis...
+
+                                //--THis function basically evolve when the shift key is pressed and mouse move.
+                                // MessageBox.Show("shift  is pressed for y  axis constant");
+
+                                menuStripNodeInfoValues[idSelected].xVal = xAxis1;
+                                //menuStripNodeInfoValues[idSelected].yVal = yAxis1;
+
+                                //label5.Text = "click past x =" + menuStripNodeInfoValues[idSelected].xVal + " y " + menuStripNodeInfoValues[idSelected].yVal;
+
+                                series1.Points.Clear();
+                                for (int i = 0; i < menuStripNodeLineInfoValues.Count; i++)//-- this -1 is done because for three points we have two line series..
+                                {
+                                    //chart1.Series.Remove(menuStripNodeLineInfoValues[i].lineSeriesID);
+                                    menuStripNodeLineInfoValues[i].lineSeriesID.Points.Clear();
+
+                                }
+                                //--this is redraw functionality
+                                //foreach(var values in menuStripNodeInfoValues)
+                                for (int x = 0; x < menuStripNodeInfoValues.Count; x++)
+                                {
+                                    string labelValue;
+                                    if (menuStripNodeInfoValues[x].showItemText == "Label")
+                                    {
+                                        labelValue = menuStripNodeInfoValues[x].label;
+                                    }
+                                    else if (menuStripNodeInfoValues[x].showItemText == "Name")
+                                    {
+                                        labelValue = menuStripNodeInfoValues[x].name;
+                                    }
+                                    else
+                                    {
+                                        labelValue = menuStripNodeInfoValues[x].source;
+                                    }
+
+
+                                    ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue);
+                                    incrementIndex++;
+
+                                }
+                                //--resetting incrementIndex
+                                incrementIndex = 0;
+                                if (menuStripNodeLineInfoValues.Count > 0)
+                                {
+                                    for (int x = 0; x < menuStripNodeLineInfoValues.Count; x++)
+                                    {
+                                        incrementIndex++;
+
+                                        ReDrawLines(menuStripNodeLineInfoValues[x].ID, menuStripNodeLineInfoValues[x].prevNodeId, menuStripNodeLineInfoValues[x].nextNodeId, menuStripNodeLineInfoValues[x].lineSeriesID, menuStripNodeLineInfoValues[x].lineColorValue);
+
+                                    }
+
+                                }
+
+                                chart1.Invalidate();
+                                incrementIndex = 0;//reset the values again..
+
+
+
+
+
                             }
                             else
                             {
-                                if (Cursor != Cursors.Cross)
-                                {
-                                    this.Cursor = Cursors.Arrow;
-                                    readyForMouseClick = 0;//dissable on click event.
 
+                                //--Show indicator
+                                ////--Lets clear the indicator point first.
+                                //seriesLineIndicator.Points.Clear();
+
+                                menuStripNodeInfoValues[idSelected].xVal = xAxis1;
+                                menuStripNodeInfoValues[idSelected].yVal = yAxis1;
+
+                                //label5.Text = "click past x =" + menuStripNodeInfoValues[idSelected].xVal + " y " + menuStripNodeInfoValues[idSelected].yVal;
+
+                                series1.Points.Clear();
+                                for (int i = 0; i < menuStripNodeLineInfoValues.Count; i++)//-- this -1 is done because for three points we have two line series..
+                                {
+                                    //chart1.Series.Remove(menuStripNodeLineInfoValues[i].lineSeriesID);
+                                    menuStripNodeLineInfoValues[i].lineSeriesID.Points.Clear();
                                 }
-
-                            }
-                        }
-                    }//close of if menuStripAllValue>0
-
-
-                    if (mouseClickAction == 1)
-                    {
-
-                        if (Control.ModifierKeys == Keys.Alt)
-                        {
-                            //--This alter key is for moving along constant x-axis ...
-                            // MessageBox.Show(" alt is pressed for x axis constant");
-                            
-
-                            //menuStripNodeInfoValues[idSelected].xVal = xAxis1;
-                            menuStripNodeInfoValues[idSelected].yVal = yAxis1;
-
-                            // label5.Text = "click past x =" + menuStripNodeInfoValues[idSelected].xVal + " y " + menuStripNodeInfoValues[idSelected].yVal;
-
-                            series1.Points.Clear();
-                            for (int i = 0; i < menuStripNodeLineInfoValues.Count ; i++)//-- this -1 is done because for three points we have two line series..
-                            {
-                                // chart1.Series.Remove(menuStripNodeLineInfoValues[i].lineSeriesID);//--removing line series that joins node..
-                                menuStripNodeLineInfoValues[i].lineSeriesID.Points.Clear();
-
-                            }
-                            //--this is redraw functionality
-                            //foreach(var values in menuStripNodeInfoValues)
-                            for (int x = 0; x < menuStripNodeInfoValues.Count; x++)
-                            {
-                                string labelValue;
-                                if (menuStripNodeInfoValues[x].showItemText == "Label")
+                                //--this is redraw functionality
+                                //foreach(var values in menuStripNodeInfoValues)
+                                for (int x = 0; x < menuStripNodeInfoValues.Count; x++)
                                 {
-                                    labelValue = menuStripNodeInfoValues[x].label;
-                                }
-                                else if (menuStripNodeInfoValues[x].showItemText == "Name")
-                                {
-                                    labelValue = menuStripNodeInfoValues[x].name;
-                                }
-                                else
-                                {
-                                    labelValue = menuStripNodeInfoValues[x].source;
-                                }
+                                    string labelValue;
+                                    if (menuStripNodeInfoValues[x].showItemText == "Label")
+                                    {
+                                        labelValue = menuStripNodeInfoValues[x].label;
+                                    }
+                                    else if (menuStripNodeInfoValues[x].showItemText == "Name")
+                                    {
+                                        labelValue = menuStripNodeInfoValues[x].name;
+                                    }
+                                    else
+                                    {
+                                        labelValue = menuStripNodeInfoValues[x].source;
+                                    }
 
 
-                                ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue);
-                                incrementIndex++;
-
-                            }
-                            //--resetting incrementIndex
-                            incrementIndex = 0;
-                            if (menuStripNodeLineInfoValues.Count > 0) {
-
-
-                                for (int x = 0; x < menuStripNodeLineInfoValues.Count; x++)
-                                {
+                                    ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue);
                                     incrementIndex++;
 
-                                    //ReDrawLines(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue);
-                                    ReDrawLines(menuStripNodeLineInfoValues[x].ID, menuStripNodeLineInfoValues[x].prevNodeId, menuStripNodeLineInfoValues[x].nextNodeId, menuStripNodeLineInfoValues[x].lineSeriesID, menuStripNodeLineInfoValues[x].lineColorValue);
-            
                                 }
-
-                            }
-
-                            chart1.Invalidate();
-                            incrementIndex = 0;//reset the values again..
-                            
-
-                        }
-                        else if (Control.ModifierKeys == Keys.Shift)
-                        {
-                            //--This ctrl key is for moving along the y-  axis...
-                            
-                            //--THis function basically evolve when the shift key is pressed and mouse move.
-                            // MessageBox.Show("shift  is pressed for y  axis constant");
-
-                            menuStripNodeInfoValues[idSelected].xVal = xAxis1;
-                            //menuStripNodeInfoValues[idSelected].yVal = yAxis1;
-
-                            //label5.Text = "click past x =" + menuStripNodeInfoValues[idSelected].xVal + " y " + menuStripNodeInfoValues[idSelected].yVal;
-
-                            series1.Points.Clear();
-                            for (int i = 0; i < menuStripNodeLineInfoValues.Count; i++)//-- this -1 is done because for three points we have two line series..
-                            {
-                                //chart1.Series.Remove(menuStripNodeLineInfoValues[i].lineSeriesID);
-                                menuStripNodeLineInfoValues[i].lineSeriesID.Points.Clear();
-
-                            }
-                            //--this is redraw functionality
-                            //foreach(var values in menuStripNodeInfoValues)
-                            for (int x = 0; x < menuStripNodeInfoValues.Count; x++)
-                            {
-                                string labelValue;
-                                if (menuStripNodeInfoValues[x].showItemText == "Label")
-                                {
-                                    labelValue = menuStripNodeInfoValues[x].label;
-                                }
-                                else if (menuStripNodeInfoValues[x].showItemText == "Name")
-                                {
-                                    labelValue = menuStripNodeInfoValues[x].name;
-                                }
-                                else
-                                {
-                                    labelValue = menuStripNodeInfoValues[x].source;
-                                }
-
-
-                                ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue);
-                                incrementIndex++;
-
-                            }
-                            //--resetting incrementIndex
-                            incrementIndex = 0;
-                            if (menuStripNodeLineInfoValues.Count > 0) { 
-                                for (int x = 0; x < menuStripNodeLineInfoValues.Count; x++)
-                                {
-                                    incrementIndex++;
-
-                                    ReDrawLines(menuStripNodeLineInfoValues[x].ID, menuStripNodeLineInfoValues[x].prevNodeId, menuStripNodeLineInfoValues[x].nextNodeId,menuStripNodeLineInfoValues[x].lineSeriesID,menuStripNodeLineInfoValues[x].lineColorValue);
-
-                                }
-
-                            }
-
-                            chart1.Invalidate();
-                            incrementIndex = 0;//reset the values again..
-
-
-
-
-
-                        }
-                        else
-                        {
-
-                            //--Show indicator
-                            ////--Lets clear the indicator point first.
-                            //seriesLineIndicator.Points.Clear();
-                            
-                            menuStripNodeInfoValues[idSelected].xVal = xAxis1;
-                            menuStripNodeInfoValues[idSelected].yVal = yAxis1;
-
-                            //label5.Text = "click past x =" + menuStripNodeInfoValues[idSelected].xVal + " y " + menuStripNodeInfoValues[idSelected].yVal;
-
-                            series1.Points.Clear();
-                            for (int i = 0; i < menuStripNodeLineInfoValues.Count; i++)//-- this -1 is done because for three points we have two line series..
-                            {
-                                //chart1.Series.Remove(menuStripNodeLineInfoValues[i].lineSeriesID);
-                                menuStripNodeLineInfoValues[i].lineSeriesID.Points.Clear();
-                            }
-                            //--this is redraw functionality
-                            //foreach(var values in menuStripNodeInfoValues)
-                            for (int x = 0; x < menuStripNodeInfoValues.Count; x++)
-                            {
-                                string labelValue;
-                                if (menuStripNodeInfoValues[x].showItemText == "Label")
-                                {
-                                    labelValue = menuStripNodeInfoValues[x].label;
-                                }
-                                else if (menuStripNodeInfoValues[x].showItemText == "Name")
-                                {
-                                    labelValue = menuStripNodeInfoValues[x].name;
-                                }
-                                else
-                                {
-                                    labelValue = menuStripNodeInfoValues[x].source;
-                                }
-
-
-                                ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue);
-                                incrementIndex++;
-
-                            }
-                            //--resetting incrementIndex
-                            incrementIndex = 0;
-                            if (menuStripNodeLineInfoValues.Count > 0)
-                            {
-                               // MessageBox.Show("MENUSTIRP NODE LINE INFO VALUE");
-
-                                for (int x = 0; x < menuStripNodeLineInfoValues.Count; x++)
+                                //--resetting incrementIndex
+                                incrementIndex = 0;
+                                if (menuStripNodeLineInfoValues.Count > 0)
                                 {
                                     // MessageBox.Show("MENUSTIRP NODE LINE INFO VALUE");
-                                    incrementIndex++;
 
-                                    //ReDrawLines(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue);
-                                    ReDrawLines(menuStripNodeLineInfoValues[x].ID, menuStripNodeLineInfoValues[x].prevNodeId, menuStripNodeLineInfoValues[x].nextNodeId, menuStripNodeLineInfoValues[x].lineSeriesID, menuStripNodeLineInfoValues[x].lineColorValue);
-                                  
+                                    for (int x = 0; x < menuStripNodeLineInfoValues.Count; x++)
+                                    {
+                                        // MessageBox.Show("MENUSTIRP NODE LINE INFO VALUE");
+                                        incrementIndex++;
+
+                                        //ReDrawLines(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue);
+                                        ReDrawLines(menuStripNodeLineInfoValues[x].ID, menuStripNodeLineInfoValues[x].prevNodeId, menuStripNodeLineInfoValues[x].nextNodeId, menuStripNodeLineInfoValues[x].lineSeriesID, menuStripNodeLineInfoValues[x].lineColorValue);
+
+                                    }
                                 }
-                            }
 
 
-                            chart1.Invalidate();
-                            incrementIndex = 0;//reset the values again..
+                                chart1.Invalidate();
+                                incrementIndex = 0;//reset the values again..
 
 
 
 
-                        }//closing of key else part
-                    }
+                            }//closing of key else part
+                        }
 
-                    
+                    }//This is the close of if  
 
                 }
                 catch (Exception ex)
@@ -1969,8 +1881,8 @@ namespace WFA_psychometric_chart
                 
         private void weatherServicesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Form3 f3 = new Form3();
-            f3.Show();
+            //Form3 f3 = new Form3();
+            //f3.Show();
 
 
         }
@@ -2343,8 +2255,8 @@ namespace WFA_psychometric_chart
             // this is the part of real time plotting where we try to plot the different previous values ...
             //Form5_real_time_plot f5 = new Form5_real_time_plot(this);
             //f5.Show();
-            form_app_timer f5 = new form_app_timer(this);
-            f5.Show();
+            //form_app_timer f5 = new form_app_timer(this);
+            //f5.Show();
 
         }
 
@@ -3118,6 +3030,82 @@ namespace WFA_psychometric_chart
             formhandler.Show();
         }
 
+        private void trendLogToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //--This part is the trend log
+            //GraphForTrendLog tf = new GraphForTrendLog();
+            //tf.Show();
+           
+        }
+
+        private void buildingChartConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+           
+
+
+
+        }
+
+        private void buildingChartToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //--This is for building chart setting pop up form
+            buildingChartSetting bcf = new buildingChartSetting();
+            bcf.Show();
+        }
+
+        private void weatherServicesToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            //Weather services form
+            Form3 f3 = new Form3();
+            f3.Show();
+
+
+        }
+
+        private void buildingChartToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            //--This is for building chart setting pop up form
+            buildingChartSetting bcf = new buildingChartSetting();
+            bcf.Show();
+        }
+
+        private void psychometricCalculatorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_Psychrometric_Calculator fpc = new Form_Psychrometric_Calculator();
+            fpc.Show();
+        }
+
+        private void airHandlerToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            //Air handler form
+            Form_handler formhandler = new Form_handler();
+            formhandler.Show();
+        }
+
+        private void exportDataToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            form_export_data formExportData = new form_export_data();
+            formExportData.Show();
+
+        }
+
+        private void historyPlotToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // this is the part of real time plotting where we try to plot the different previous values ...
+            //Form5_real_time_plot f5 = new Form5_real_time_plot(this);
+            //f5.Show();
+            form_app_timer f5 = new form_app_timer(this);
+            f5.Show();
+        }
+
+        private void nodeViewToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //--This will trigger the grid view in c# for viewing the datapoints and editing it...
+
+            DataGridViewDisplay d = new DataGridViewDisplay(this);
+            d.Show();
+        }
+
 
 
         //ArrayList temp_building_values = new ArrayList();
@@ -3302,8 +3290,7 @@ namespace WFA_psychometric_chart
                     //command1.Parameters.AddWithValue("@station_name", station_name);
                     reader1 = command1.ExecuteReader();
                     while (reader1.Read())
-                    {
-                        //station_name = reader["station_name"].ToString();
+                    {                                                       
                         hist_temp_hum_list.Add(
                             new data_type_hum_temp
                             {

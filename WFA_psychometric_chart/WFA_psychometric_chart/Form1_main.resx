@@ -148,7 +148,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;chart1.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>5</value>
   </data>
   <data name="button1.Location" type="System.Drawing.Point, System.Drawing">
     <value>96, 283</value>
@@ -163,7 +163,7 @@
     <value>1</value>
   </data>
   <data name="button1.Text" xml:space="preserve">
-    <value>Refresh Graph</value>
+    <value>Clear Chart</value>
   </data>
   <data name="&gt;&gt;button1.Name" xml:space="preserve">
     <value>button1</value>
@@ -175,7 +175,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;button1.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>4</value>
   </data>
   <data name="&gt;&gt;label5_H_unit.Name" xml:space="preserve">
     <value>label5_H_unit</value>
@@ -397,7 +397,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;groupBox4.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>3</value>
   </data>
   <data name="label5_H_unit.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -876,63 +876,69 @@
   <data name="&gt;&gt;label21.ZOrder" xml:space="preserve">
     <value>15</value>
   </data>
-  <data name="weatherServicesToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>203, 22</value>
-  </data>
-  <data name="weatherServicesToolStripMenuItem.Text" xml:space="preserve">
-    <value>Weather Services</value>
-  </data>
-  <data name="realTimePlottingToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>203, 22</value>
-  </data>
-  <data name="realTimePlottingToolStripMenuItem.Text" xml:space="preserve">
-    <value>History Plot</value>
-  </data>
-  <data name="exportDataToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>203, 22</value>
-  </data>
-  <data name="exportDataToolStripMenuItem.Text" xml:space="preserve">
-    <value>Export Data</value>
-  </data>
-  <data name="psychrometricCalculatorToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>203, 22</value>
-  </data>
-  <data name="psychrometricCalculatorToolStripMenuItem.Text" xml:space="preserve">
-    <value>Psychometric Calculator</value>
-  </data>
-  <data name="nodeGridViewToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>203, 22</value>
-  </data>
-  <data name="nodeGridViewToolStripMenuItem.Text" xml:space="preserve">
-    <value>Node Grid View</value>
-  </data>
-  <data name="airHandlerToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>203, 22</value>
-  </data>
-  <data name="airHandlerToolStripMenuItem.Text" xml:space="preserve">
-    <value>Air Handler</value>
-  </data>
   <data name="optionToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>56, 20</value>
   </data>
   <data name="optionToolStripMenuItem.Text" xml:space="preserve">
     <value>Option</value>
   </data>
+  <data name="realTimeMode.Size" type="System.Drawing.Size, System.Drawing">
+    <value>165, 22</value>
+  </data>
+  <data name="realTimeMode.Text" xml:space="preserve">
+    <value>Real Time Mode</value>
+  </data>
+  <data name="buildingChartToolStripMenuItem1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>163, 22</value>
+  </data>
+  <data name="buildingChartToolStripMenuItem1.Text" xml:space="preserve">
+    <value>Building Chart</value>
+  </data>
+  <data name="weatherServicesToolStripMenuItem1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>163, 22</value>
+  </data>
+  <data name="weatherServicesToolStripMenuItem1.Text" xml:space="preserve">
+    <value>Weather Services</value>
+  </data>
+  <data name="simulationMode.Size" type="System.Drawing.Size, System.Drawing">
+    <value>165, 22</value>
+  </data>
+  <data name="simulationMode.Text" xml:space="preserve">
+    <value>Simulation Mode</value>
+  </data>
+  <data name="psychometricCalculatorToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>203, 22</value>
+  </data>
+  <data name="psychometricCalculatorToolStripMenuItem.Text" xml:space="preserve">
+    <value>Psychometric Calculator</value>
+  </data>
+  <data name="airHandlerToolStripMenuItem1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>203, 22</value>
+  </data>
+  <data name="airHandlerToolStripMenuItem1.Text" xml:space="preserve">
+    <value>Air Handler</value>
+  </data>
+  <data name="exportDataToolStripMenuItem1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>203, 22</value>
+  </data>
+  <data name="exportDataToolStripMenuItem1.Text" xml:space="preserve">
+    <value>Export Data</value>
+  </data>
+  <data name="historyPlotToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>203, 22</value>
+  </data>
+  <data name="historyPlotToolStripMenuItem.Text" xml:space="preserve">
+    <value>History Plot</value>
+  </data>
+  <data name="nodeViewToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>203, 22</value>
+  </data>
+  <data name="nodeViewToolStripMenuItem.Text" xml:space="preserve">
+    <value>Node View</value>
+  </data>
   <metadata name="menuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
-  <data name="fileToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>37, 20</value>
-  </data>
-  <data name="fileToolStripMenuItem.Text" xml:space="preserve">
-    <value>File</value>
-  </data>
-  <data name="helpToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>44, 20</value>
-  </data>
-  <data name="helpToolStripMenuItem.Text" xml:space="preserve">
-    <value>Help</value>
-  </data>
   <data name="menuStrip1.Location" type="System.Drawing.Point, System.Drawing">
     <value>0, 0</value>
   </data>
@@ -955,7 +961,13 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;menuStrip1.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>6</value>
+  </data>
+  <data name="fileToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>37, 20</value>
+  </data>
+  <data name="fileToolStripMenuItem.Text" xml:space="preserve">
+    <value>File</value>
   </data>
   <data name="printToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>114, 22</value>
@@ -974,6 +986,12 @@
   </data>
   <data name="exitToolStripMenuItem.Text" xml:space="preserve">
     <value>Exit</value>
+  </data>
+  <data name="helpToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>44, 20</value>
+  </data>
+  <data name="helpToolStripMenuItem.Text" xml:space="preserve">
+    <value>Help</value>
   </data>
   <data name="helpPsychometricChartToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>176, 22</value>
@@ -1023,6 +1041,15 @@
   <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>381, 16</value>
   </metadata>
+  <data name="dtp_From.Location" type="System.Drawing.Point, System.Drawing">
+    <value>63, 33</value>
+  </data>
+  <data name="dtp_From.Size" type="System.Drawing.Size, System.Drawing">
+    <value>123, 20</value>
+  </data>
+  <data name="dtp_From.TabIndex" type="System.Int32, mscorlib">
+    <value>4</value>
+  </data>
   <data name="&gt;&gt;dtp_From.Name" xml:space="preserve">
     <value>dtp_From</value>
   </data>
@@ -1034,6 +1061,24 @@
   </data>
   <data name="&gt;&gt;dtp_From.ZOrder" xml:space="preserve">
     <value>0</value>
+  </data>
+  <data name="label1.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="label1.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="label1.Location" type="System.Drawing.Point, System.Drawing">
+    <value>21, 33</value>
+  </data>
+  <data name="label1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>37, 14</value>
+  </data>
+  <data name="label1.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="label1.Text" xml:space="preserve">
+    <value>From :</value>
   </data>
   <data name="&gt;&gt;label1.Name" xml:space="preserve">
     <value>label1</value>
@@ -1047,6 +1092,15 @@
   <data name="&gt;&gt;label1.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
+  <data name="dtp_To.Location" type="System.Drawing.Point, System.Drawing">
+    <value>63, 71</value>
+  </data>
+  <data name="dtp_To.Size" type="System.Drawing.Size, System.Drawing">
+    <value>123, 20</value>
+  </data>
+  <data name="dtp_To.TabIndex" type="System.Int32, mscorlib">
+    <value>5</value>
+  </data>
   <data name="&gt;&gt;dtp_To.Name" xml:space="preserve">
     <value>dtp_To</value>
   </data>
@@ -1059,6 +1113,24 @@
   <data name="&gt;&gt;dtp_To.ZOrder" xml:space="preserve">
     <value>2</value>
   </data>
+  <data name="label2.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="label2.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="label2.Location" type="System.Drawing.Point, System.Drawing">
+    <value>21, 71</value>
+  </data>
+  <data name="label2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>24, 14</value>
+  </data>
+  <data name="label2.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="label2.Text" xml:space="preserve">
+    <value>To :</value>
+  </data>
   <data name="&gt;&gt;label2.Name" xml:space="preserve">
     <value>label2</value>
   </data>
@@ -1070,6 +1142,21 @@
   </data>
   <data name="&gt;&gt;label2.ZOrder" xml:space="preserve">
     <value>3</value>
+  </data>
+  <data name="button2.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="button2.Location" type="System.Drawing.Point, System.Drawing">
+    <value>93, 103</value>
+  </data>
+  <data name="button2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>93, 25</value>
+  </data>
+  <data name="button2.TabIndex" type="System.Int32, mscorlib">
+    <value>3</value>
+  </data>
+  <data name="button2.Text" xml:space="preserve">
+    <value>Show Heat Map</value>
   </data>
   <data name="&gt;&gt;button2.Name" xml:space="preserve">
     <value>button2</value>
@@ -1105,136 +1192,34 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;gb_select_date.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>2</value>
   </data>
-  <data name="dtp_From.Location" type="System.Drawing.Point, System.Drawing">
-    <value>41, 33</value>
+  <data name="lb_unit_chosen.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
   </data>
-  <data name="dtp_From.Size" type="System.Drawing.Size, System.Drawing">
-    <value>123, 20</value>
+  <data name="lb_unit_chosen.Location" type="System.Drawing.Point, System.Drawing">
+    <value>1133, 9</value>
   </data>
-  <data name="dtp_From.TabIndex" type="System.Int32, mscorlib">
-    <value>4</value>
+  <data name="lb_unit_chosen.Size" type="System.Drawing.Size, System.Drawing">
+    <value>43, 14</value>
   </data>
-  <data name="&gt;&gt;dtp_From.Name" xml:space="preserve">
-    <value>dtp_From</value>
+  <data name="lb_unit_chosen.TabIndex" type="System.Int32, mscorlib">
+    <value>32</value>
   </data>
-  <data name="&gt;&gt;dtp_From.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DateTimePicker, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="lb_unit_chosen.Text" xml:space="preserve">
+    <value>Unit : SI</value>
   </data>
-  <data name="&gt;&gt;dtp_From.Parent" xml:space="preserve">
-    <value>gb_select_date</value>
+  <data name="&gt;&gt;lb_unit_chosen.Name" xml:space="preserve">
+    <value>lb_unit_chosen</value>
   </data>
-  <data name="&gt;&gt;dtp_From.ZOrder" xml:space="preserve">
+  <data name="&gt;&gt;lb_unit_chosen.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lb_unit_chosen.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;lb_unit_chosen.ZOrder" xml:space="preserve">
     <value>0</value>
-  </data>
-  <data name="label1.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="label1.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="label1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>-1, 33</value>
-  </data>
-  <data name="label1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>37, 14</value>
-  </data>
-  <data name="label1.TabIndex" type="System.Int32, mscorlib">
-    <value>1</value>
-  </data>
-  <data name="label1.Text" xml:space="preserve">
-    <value>From :</value>
-  </data>
-  <data name="&gt;&gt;label1.Name" xml:space="preserve">
-    <value>label1</value>
-  </data>
-  <data name="&gt;&gt;label1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;label1.Parent" xml:space="preserve">
-    <value>gb_select_date</value>
-  </data>
-  <data name="&gt;&gt;label1.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="dtp_To.Location" type="System.Drawing.Point, System.Drawing">
-    <value>41, 71</value>
-  </data>
-  <data name="dtp_To.Size" type="System.Drawing.Size, System.Drawing">
-    <value>123, 20</value>
-  </data>
-  <data name="dtp_To.TabIndex" type="System.Int32, mscorlib">
-    <value>5</value>
-  </data>
-  <data name="&gt;&gt;dtp_To.Name" xml:space="preserve">
-    <value>dtp_To</value>
-  </data>
-  <data name="&gt;&gt;dtp_To.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DateTimePicker, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;dtp_To.Parent" xml:space="preserve">
-    <value>gb_select_date</value>
-  </data>
-  <data name="&gt;&gt;dtp_To.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="label2.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="label2.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="label2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>-1, 71</value>
-  </data>
-  <data name="label2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>24, 14</value>
-  </data>
-  <data name="label2.TabIndex" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="label2.Text" xml:space="preserve">
-    <value>To :</value>
-  </data>
-  <data name="&gt;&gt;label2.Name" xml:space="preserve">
-    <value>label2</value>
-  </data>
-  <data name="&gt;&gt;label2.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;label2.Parent" xml:space="preserve">
-    <value>gb_select_date</value>
-  </data>
-  <data name="&gt;&gt;label2.ZOrder" xml:space="preserve">
-    <value>3</value>
-  </data>
-  <data name="button2.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="button2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>71, 103</value>
-  </data>
-  <data name="button2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>93, 25</value>
-  </data>
-  <data name="button2.TabIndex" type="System.Int32, mscorlib">
-    <value>3</value>
-  </data>
-  <data name="button2.Text" xml:space="preserve">
-    <value>Show Heat Map</value>
-  </data>
-  <data name="&gt;&gt;button2.Name" xml:space="preserve">
-    <value>button2</value>
-  </data>
-  <data name="&gt;&gt;button2.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;button2.Parent" xml:space="preserve">
-    <value>gb_select_date</value>
-  </data>
-  <data name="&gt;&gt;button2.ZOrder" xml:space="preserve">
-    <value>4</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -2932,34 +2917,58 @@
   <data name="&gt;&gt;optionToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;weatherServicesToolStripMenuItem.Name" xml:space="preserve">
-    <value>weatherServicesToolStripMenuItem</value>
+  <data name="&gt;&gt;realTimeMode.Name" xml:space="preserve">
+    <value>realTimeMode</value>
   </data>
-  <data name="&gt;&gt;weatherServicesToolStripMenuItem.Type" xml:space="preserve">
+  <data name="&gt;&gt;realTimeMode.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;realTimePlottingToolStripMenuItem.Name" xml:space="preserve">
-    <value>realTimePlottingToolStripMenuItem</value>
+  <data name="&gt;&gt;buildingChartToolStripMenuItem1.Name" xml:space="preserve">
+    <value>buildingChartToolStripMenuItem1</value>
   </data>
-  <data name="&gt;&gt;realTimePlottingToolStripMenuItem.Type" xml:space="preserve">
+  <data name="&gt;&gt;buildingChartToolStripMenuItem1.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;exportDataToolStripMenuItem.Name" xml:space="preserve">
-    <value>exportDataToolStripMenuItem</value>
+  <data name="&gt;&gt;weatherServicesToolStripMenuItem1.Name" xml:space="preserve">
+    <value>weatherServicesToolStripMenuItem1</value>
   </data>
-  <data name="&gt;&gt;exportDataToolStripMenuItem.Type" xml:space="preserve">
+  <data name="&gt;&gt;weatherServicesToolStripMenuItem1.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;psychrometricCalculatorToolStripMenuItem.Name" xml:space="preserve">
-    <value>psychrometricCalculatorToolStripMenuItem</value>
+  <data name="&gt;&gt;simulationMode.Name" xml:space="preserve">
+    <value>simulationMode</value>
   </data>
-  <data name="&gt;&gt;psychrometricCalculatorToolStripMenuItem.Type" xml:space="preserve">
+  <data name="&gt;&gt;simulationMode.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;nodeGridViewToolStripMenuItem.Name" xml:space="preserve">
-    <value>nodeGridViewToolStripMenuItem</value>
+  <data name="&gt;&gt;psychometricCalculatorToolStripMenuItem.Name" xml:space="preserve">
+    <value>psychometricCalculatorToolStripMenuItem</value>
   </data>
-  <data name="&gt;&gt;nodeGridViewToolStripMenuItem.Type" xml:space="preserve">
+  <data name="&gt;&gt;psychometricCalculatorToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;airHandlerToolStripMenuItem1.Name" xml:space="preserve">
+    <value>airHandlerToolStripMenuItem1</value>
+  </data>
+  <data name="&gt;&gt;airHandlerToolStripMenuItem1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;exportDataToolStripMenuItem1.Name" xml:space="preserve">
+    <value>exportDataToolStripMenuItem1</value>
+  </data>
+  <data name="&gt;&gt;exportDataToolStripMenuItem1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;historyPlotToolStripMenuItem.Name" xml:space="preserve">
+    <value>historyPlotToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;historyPlotToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;nodeViewToolStripMenuItem.Name" xml:space="preserve">
+    <value>nodeViewToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;nodeViewToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;fileToolStripMenuItem.Name" xml:space="preserve">
@@ -3027,12 +3036,6 @@
   </data>
   <data name="&gt;&gt;toolTip1.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolTip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;airHandlerToolStripMenuItem.Name" xml:space="preserve">
-    <value>airHandlerToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;airHandlerToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>Form1_main</value>

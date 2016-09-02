@@ -48,7 +48,7 @@
             // 
             this.label6.AutoSize = true;
             this.label6.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label6.Location = new System.Drawing.Point(145, 239);
+            this.label6.Location = new System.Drawing.Point(124, 200);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(107, 13);
             this.label6.TabIndex = 38;
@@ -57,7 +57,7 @@
             // btnSetNode
             // 
             this.btnSetNode.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.btnSetNode.Location = new System.Drawing.Point(129, 298);
+            this.btnSetNode.Location = new System.Drawing.Point(108, 259);
             this.btnSetNode.Name = "btnSetNode";
             this.btnSetNode.Size = new System.Drawing.Size(61, 25);
             this.btnSetNode.TabIndex = 37;
@@ -68,7 +68,7 @@
             // btnCancel
             // 
             this.btnCancel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.btnCancel.Location = new System.Drawing.Point(38, 298);
+            this.btnCancel.Location = new System.Drawing.Point(17, 259);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(61, 25);
             this.btnCancel.TabIndex = 36;
@@ -83,7 +83,7 @@
             "Label",
             "Name",
             "Source"});
-            this.comboBox1.Location = new System.Drawing.Point(93, 191);
+            this.comboBox1.Location = new System.Drawing.Point(72, 152);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(121, 21);
             this.comboBox1.TabIndex = 35;
@@ -91,7 +91,7 @@
             // btnColor
             // 
             this.btnColor.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.btnColor.Location = new System.Drawing.Point(93, 235);
+            this.btnColor.Location = new System.Drawing.Point(72, 196);
             this.btnColor.Name = "btnColor";
             this.btnColor.Size = new System.Drawing.Size(46, 23);
             this.btnColor.TabIndex = 34;
@@ -100,21 +100,21 @@
             // 
             // tbLabel
             // 
-            this.tbLabel.Location = new System.Drawing.Point(93, 149);
+            this.tbLabel.Location = new System.Drawing.Point(72, 110);
             this.tbLabel.Name = "tbLabel";
             this.tbLabel.Size = new System.Drawing.Size(121, 20);
             this.tbLabel.TabIndex = 33;
             // 
             // tbName
             // 
-            this.tbName.Location = new System.Drawing.Point(93, 107);
+            this.tbName.Location = new System.Drawing.Point(72, 68);
             this.tbName.Name = "tbName";
             this.tbName.Size = new System.Drawing.Size(121, 20);
             this.tbName.TabIndex = 32;
             // 
             // tbSource
             // 
-            this.tbSource.Location = new System.Drawing.Point(93, 62);
+            this.tbSource.Location = new System.Drawing.Point(72, 23);
             this.tbSource.Name = "tbSource";
             this.tbSource.Size = new System.Drawing.Size(121, 20);
             this.tbSource.TabIndex = 31;
@@ -123,7 +123,7 @@
             // 
             this.label5.AutoSize = true;
             this.label5.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label5.Location = new System.Drawing.Point(38, 239);
+            this.label5.Location = new System.Drawing.Point(17, 200);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(40, 13);
             this.label5.TabIndex = 30;
@@ -133,7 +133,7 @@
             // 
             this.label4.AutoSize = true;
             this.label4.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label4.Location = new System.Drawing.Point(35, 194);
+            this.label4.Location = new System.Drawing.Point(14, 155);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(43, 13);
             this.label4.TabIndex = 29;
@@ -143,7 +143,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label3.Location = new System.Drawing.Point(36, 156);
+            this.label3.Location = new System.Drawing.Point(15, 117);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(42, 13);
             this.label3.TabIndex = 28;
@@ -153,7 +153,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label2.Location = new System.Drawing.Point(37, 114);
+            this.label2.Location = new System.Drawing.Point(16, 75);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(44, 13);
             this.label2.TabIndex = 27;
@@ -163,7 +163,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label1.Location = new System.Drawing.Point(37, 62);
+            this.label1.Location = new System.Drawing.Point(16, 23);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(50, 13);
             this.label1.TabIndex = 26;
@@ -173,7 +173,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(287, 384);
+            this.ClientSize = new System.Drawing.Size(232, 303);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.btnSetNode);
             this.Controls.Add(this.btnCancel);
@@ -187,6 +187,7 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "Form_point_add";
             this.Text = "Form_point_add";
             this.Load += new System.EventHandler(this.Form_point_add_Load);
