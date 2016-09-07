@@ -17,7 +17,7 @@ namespace WFA_psychometric_chart
             InitializeComponent();
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        public void calculate()
         {
 
             //this is where the actual calculation begins ..
@@ -25,40 +25,42 @@ namespace WFA_psychometric_chart
 
             try
             {
+                if(textBox1.Text != "" && textBox2.Text != "") { 
 
-                if(radioButton1.Checked == true) { 
+                if (radioButton1.Checked == true)
+                {
 
-                //lets grab from the textbox input.
+                    //lets grab from the textbox input.
 
-                    if(textBox1.Text == "" || textBox2.Text == "" || tb_atm_pressure.Text == "")
+                    if (textBox1.Text == "" || textBox2.Text == "" || tb_atm_pressure.Text == "")
                     {
                         MessageBox.Show("Please enter all parameter properly");
                         return;
                     }
 
-                double     temperature = Double.Parse(textBox1.Text.Trim());
-            
-                double    humidity = Double.Parse(textBox2.Text.Trim());
-                 double   Patm = double.Parse(tb_atm_pressure.Text);
+                    double temperature = Double.Parse(textBox1.Text.Trim());
 
- 
-                // tb_atm_pressure.Text = Patm.ToString();
+                    double humidity = Double.Parse(textBox2.Text.Trim());
+                    double Patm = double.Parse(tb_atm_pressure.Text);
+
+
+                    // tb_atm_pressure.Text = Patm.ToString();
 
                     CalculatePsymetric(temperature, humidity, Patm);
 
 
                     //This one is dew point
-                    textBox4.Text = Math.Round(output_dew_point,4).ToString();
-                    textBox8.Text = Math.Round(output_partial_pressure_of_water,4).ToString();
-                    textBox10.Text = Math.Round(output_mixing_ratio,4).ToString();
-                    textBox11.Text = Math.Round(output_enthalpy,4).ToString();
-                    textBox9.Text = Math.Round(output_mol_mass_of_water,4).ToString();
+                    textBox4.Text = Math.Round(output_dew_point, 4).ToString();
+                    textBox8.Text = Math.Round(output_partial_pressure_of_water, 4).ToString();
+                    textBox10.Text = Math.Round(output_mixing_ratio, 4).ToString();
+                    textBox11.Text = Math.Round(output_enthalpy, 4).ToString();
+                    textBox9.Text = Math.Round(output_mol_mass_of_water, 4).ToString();
 
 
 
 
                 }
-                else   if(radioButton2.Checked == true)
+                else if (radioButton2.Checked == true)
                 {
 
                     if (textBox1.Text == "" || textBox2.Text == "" || tb_atm_pressure.Text == "")
@@ -95,21 +97,21 @@ namespace WFA_psychometric_chart
 
 
                     //now output need  to be converted too.
-                    double ip_dew_point = output_dew_point * 1.8 +32;//in Deg F
+                    double ip_dew_point = output_dew_point * 1.8 + 32;//in Deg F
                     double ip_partial_pressure = output_partial_pressure_of_water * 0.001;//in lb/lb
                     double ip_mixing_ratio = output_mixing_ratio * 0.001; //in lb/lb
                     double ip_enthalpy = output_enthalpy * 0.429923;// in btu/lb
                     double ip_mol_mass = output_mol_mass_of_water * 0.001;
                     //This one is dew point
-                    textBox4.Text = Math.Round(ip_dew_point,4).ToString();
-                    textBox8.Text = Math.Round(ip_partial_pressure,4).ToString();
-                    textBox10.Text =Math.Round( ip_mixing_ratio,4).ToString();
-                    textBox11.Text = Math.Round(ip_enthalpy,4).ToString();
-                    textBox9.Text =Math.Round(ip_mol_mass,4).ToString();
+                    textBox4.Text = Math.Round(ip_dew_point, 4).ToString();
+                    textBox8.Text = Math.Round(ip_partial_pressure, 4).ToString();
+                    textBox10.Text = Math.Round(ip_mixing_ratio, 4).ToString();
+                    textBox11.Text = Math.Round(ip_enthalpy, 4).ToString();
+                    textBox9.Text = Math.Round(ip_mol_mass, 4).ToString();
 
 
                 }
-
+                }//close of if
             }
             catch (Exception ex)
             {
@@ -130,10 +132,7 @@ namespace WFA_psychometric_chart
             //this values here...
 
 
-
-
         }
-
         private void Form_Psychrometric_Calculator_Load(object sender, EventArgs e)
         {
             radioButton1.Checked = true;
@@ -280,10 +279,24 @@ namespace WFA_psychometric_chart
 
         }
 
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            //we need to call something on text change....
+            if(textBox1.Text != "")
+            {
+                //if not empty then only do this function 
+                calculate();
+            }
+        }
 
-
-
-
-
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+            //On text change in 2 do this function
+            if(textBox2.Text != "")
+            {
+                //DO this
+                calculate();
+            }
+        }
     }
 }

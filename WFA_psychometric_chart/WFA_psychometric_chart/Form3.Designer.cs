@@ -107,7 +107,6 @@
             this.tb_cw_temp = new System.Windows.Forms.TextBox();
             this.label18 = new System.Windows.Forms.Label();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.lb_test = new System.Windows.Forms.Label();
             this.lbConnectionIssue = new System.Windows.Forms.Label();
             this.btnShowLogFile = new System.Windows.Forms.Button();
             this.label41 = new System.Windows.Forms.Label();
@@ -634,7 +633,6 @@
             // 
             // groupBox4
             // 
-            this.groupBox4.Controls.Add(this.lb_test);
             this.groupBox4.Controls.Add(this.lbConnectionIssue);
             this.groupBox4.Controls.Add(this.btnShowLogFile);
             this.groupBox4.Controls.Add(this.label41);
@@ -646,11 +644,6 @@
             resources.ApplyResources(this.groupBox4, "groupBox4");
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.TabStop = false;
-            // 
-            // lb_test
-            // 
-            resources.ApplyResources(this.lb_test, "lb_test");
-            this.lb_test.Name = "lb_test";
             // 
             // lbConnectionIssue
             // 
@@ -814,6 +807,5 @@
         private System.Windows.Forms.Label label43;
         private System.Windows.Forms.Label lb_device_status;
         private System.Windows.Forms.Label label44;
-        private System.Windows.Forms.Label lb_test;
     }
 }

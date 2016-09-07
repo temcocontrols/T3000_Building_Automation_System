@@ -287,6 +287,11 @@ namespace WFA_psychometric_chart
                       hist_temp_hum_list.Clear();
                       new_checked_item_index.Clear();
 
+                        form1.lb_title_display.Text = "Historical Plot";
+
+                        //if plotted then we need to dissable the insert node fxn
+                        form1.insertNodeToolStripMenuItem.Enabled = false;
+
 
 
                   }//close of comparision if

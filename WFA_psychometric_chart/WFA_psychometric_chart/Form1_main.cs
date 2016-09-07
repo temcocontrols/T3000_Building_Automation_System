@@ -30,6 +30,12 @@ namespace WFA_psychometric_chart
             InitializeComponent();
           //this.Disposed += new System.EventHandler ( this.Form1_main_Disposed );
         }
+
+        /// <summary>
+        /// This returns air pressure in pascal (pa)
+        /// </summary>
+      public  double AirPressureFromDB = 0;
+
         //--lets define the constanst..
         double temperature, humidity, Patm, TDewpoint, A, m, Tn, B, Pws, X, h;
         int index = 0;
@@ -200,7 +206,14 @@ namespace WFA_psychometric_chart
             // MessageBox.Show(""+s);
 
             //now we have the data lets do some ploting...
-            double patm = 101.235;//constant..we will make it take as input later...
+            //===========NOTE WE HAVE PRESSURE IN Pa but this chart users it in terms of kpa===//
+            /*
+            Later we need to user it in terms of HPa (heteropascal) in formula so we need conversion
+            */
+            double pressureConverted = AirPressureFromDB*0.001;//now in terms of kpa
+           // MessageBox.Show("pressure(kpa) = " + pressureConverted);
+            lb_pressure_display.Text = "Pressure : " +Math.Round(pressureConverted,2)+" KPa";//in terms of kpa
+            double patm = pressureConverted;//101.235;//constant..we will make it take as input later...   in KPa
             double rair = 0.287;//rideburg constant i guess
 
             //now we need array list to hold the values form calculation formula..
@@ -248,7 +261,12 @@ namespace WFA_psychometric_chart
                     double y = wg_calc;
                     x2 = double.Parse(t[i].ToString());
                     chart1.Series["Series" + ival].Points.AddXY(x2, y);
-                    s1 += x2 + "," + y + ";";
+
+                    //if (phi == 0.3)
+                    //{
+                    //    chart1.Series["Series" + ival].Points[15].Label = "Humidity Ratio";
+                    //}
+                   // s1 += x2 + "," + y + ";";
 
 
                     //index++;
@@ -257,10 +275,19 @@ namespace WFA_psychometric_chart
                 ival++;
                 //this is to print 10%,20,30,40% 
                 int c = int.Parse((phi * 10 + 1).ToString());
-                chart1.Series["Series" + c].Points[45].Label = phi * 100 + "%";
+                if(phi >= 0.30 && phi <0.4) {
+                    chart1.Series["Series" + c].Points[45].Label = phi * 100 + "%";
+                    chart1.Series["Series" + c].Points[42].Label = "Humidity Ratio";
+                   // MessageBox.Show("Hello");
+                }
+                else
+                {
+                    chart1.Series["Series" + c].Points[45].Label = phi * 100 + "%";
+                }
                 //chart1.Series["Series"+c].Points[46].LabelBackColor = Color.Blue;
 
-            }
+                //MessageBox.Show("hel1");
+            }    
 
             //for plotting 60%-80%  
             int ival2 = 6;
@@ -481,17 +508,82 @@ namespace WFA_psychometric_chart
             chart1.Invalidate();
            // chart1.Dispose();//--Releases all the resources used by the chart...
             plot_new_graph();
-
+            lb_title_display.Text = "";
             //--Reseting the menustrip values for new plotting....
             menuStripNodeLineInfoValues.Clear();
             menuStripNodeInfoValues.Clear();
             index = 0;
             incrementIndex = 0;
+            insertNodeToolStripMenuItem.Enabled = true;/*insert node will be dissable with historical plot so reenabling it*/
 
         }
+
         private void Form1_Load(object sender, EventArgs e)
         {
             //simulationMode.Text = WFA_psychometric_chart.Properties.Resources.Historical_Plot;
+            lb_title_display.Text = "";
+            //=====================================DATABASE OPERATION===============================//
+            string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            string databasePath1 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile1 = databasePath1 + @"\db_psychrometric_project.s3db";
+            if (File.Exists(databaseFile1))
+            {
+                //file exist so dont create the database
+               
+            }
+
+            else {
+                //--sqlite new databse creation
+                sqlite_database_creation();
+            }
+            //--This is the heat map protion initial data setting
+            //lets set the data time picker default values...
+            dtp_From.MinDate = new DateTime(DateTime.Now.Year, 1, 1);
+            dtp_To.MinDate = new DateTime(DateTime.Now.Year, 1, 1);
+            dtp_From.MaxDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+            dtp_To.MaxDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+            dtp_From.Value = new DateTime(DateTime.Now.Year, 1, 1);
+            dtp_To.Value = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+            PullLocationInformation();//this is for loading location information
+
+
+
+            //--This part is for checking the database and update the lat,long,elevation values in database...
+            if (CheckLatLongAvailable() != true)
+            {
+                FillLatLongValueAutomatically();//--Fill the lat long values...
+                                                //  MessageBox.Show("show filllat");
+            }
+
+            //Now here lets pull the values from the database...
+
+            /*
+            This is basically for pulling altitude value for calculating the pressure value.
+            */
+            get_stored_data_about_building();
+
+            //We have formula for altitude and pressure calculation
+            /*
+            P= 101325(1-2.25577*10^(-5)*h)^5.25588
+            where p = air pressure in pa 
+             h = altitude in meteres
+            
+            */
+            // AirPressureFromDB = 
+            double altitue = buildingList[0].elevation;
+            double P = 101325*Math.Pow((1 - (2.25577 * Math.Pow( 10 ,-5) * altitue)) , 5.25588);
+
+            if(P==0 || P.ToString() == "")
+            {
+                //if empty or null put a default value
+                AirPressureFromDB = 101325 ;//in terms of pa
+            }
+            else { 
+            AirPressureFromDB = P;
+            }
+            //=====================================END DB OPERATION=================================//
+
             //lets add the t and pg values
             add_t_pg();//Calling this method add the value...
 
@@ -514,38 +606,82 @@ namespace WFA_psychometric_chart
             //this is other part.
             //radioButton1.Checked = true;
 
-            string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            
-            string databasePath1 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string databaseFile1 = databasePath1 + @"\db_psychrometric_project.s3db";
-            if (File.Exists(databaseFile1))
-            {
-                //file exist so dont create the database
-            }
-
-            else { 
-            //--sqlite new databse creation
-            sqlite_database_creation();
-            }
-            //--This is the heat map protion initial data setting
-            //lets set the data time picker default values...
-            dtp_From.MinDate = new DateTime(DateTime.Now.Year, 1, 1);
-            dtp_To.MinDate = new DateTime(DateTime.Now.Year, 1, 1);
-            dtp_From.MaxDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-            dtp_To.MaxDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-            dtp_From.Value = new DateTime(DateTime.Now.Year, 1, 1);
-            dtp_To.Value = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-            PullLocationInformation();//this is for loading location information
-
-
-
-            //--This part is for checking the database and update the lat,long,elevation values in database...
-            if (CheckLatLongAvailable() != true)
-            {
-                FillLatLongValueAutomatically();//--Fill the lat long values...
-              //  MessageBox.Show("show filllat");
-            }
+          
         }
+        public class building_info_datatype
+        {
+            public int ID { get; set; }
+            public string country { get; set; }
+            public string state { get; set; }
+            public string city { get; set; }
+            public string street { get; set; }
+            public int ZIP { get; set; }
+            public string longitude { get; set; }
+            public string latitude { get; set; }
+            public int elevation { get; set; }
+            public string buildingName { get; set; }
+        }
+
+        public List<building_info_datatype> buildingList = new List<building_info_datatype>();
+
+        /// <summary>
+        /// it helps to pull the information of the building stored
+        /// </summary>
+        private void get_stored_data_about_building()
+        {
+            try {
+                buildingList.Clear();
+            //--changing all the database to the sqlite database...
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                SQLiteDataReader reader = null;
+                string queryString = "SELECT * from tbl_building_location WHERE selection=1";
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                        //ListboxItems.Add(reader[1].ToString()+","+reader[2].ToString());
+                        //tb_country.Text = reader["country"].ToString();
+                        //tb_state.Text = reader["state"].ToString();
+                        //tb_city.Text = reader["city"].ToString();
+                        //tb_street.Text = reader["street"].ToString();
+                        //tb_ZIP.Text = reader["ZIP"].ToString();
+                        //tb_latitude.Text = reader["latitude"].ToString();
+                        //tb_longitude.Text = reader["longitude"].ToString();
+                        //tb_elev.Text = reader["elevation"].ToString();
+                        //lb_building_name.Text = reader["BuildingName"].ToString();
+                        //buildingNameStore = reader["BuildingName"].ToString();//lets store the building name in a variable...
+                        //index_selected = int.Parse(reader["ID"].ToString()); //--This is added to check the select
+                        buildingList.Add(new building_info_datatype
+                    {
+                       ID = int.Parse(reader["ID"].ToString()),
+                       country = reader["country"].ToString(),
+                       state = reader["state"].ToString(),
+                       city = reader["city"].ToString(),
+                       street = reader["street"].ToString(),
+                       ZIP =    int.Parse(reader["ZIP"].ToString()),
+                       latitude = reader["latitude"].ToString(),
+                       longitude = reader["longitude"].ToString(),
+                       elevation = int.Parse(reader["elevation"].ToString()),
+                       buildingName = reader["BuildingName"].ToString()
+                    });
+
+                }
+
+
+            }
+
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+        }
+
         public bool CheckLatLongAvailable()
         {
             //--Lets do some connection checking and validating the data returned...
@@ -941,7 +1077,7 @@ namespace WFA_psychometric_chart
             //this is DBT 
             double x_axis = dbt;
             double h = enthalpy;
-            //          MessageBox.Show("h = " + h+" T = "+dbt);
+            // MessageBox.Show("h = " + h+" T = "+dbt);
 
             //lets fit this value in the curve...
             double x1 = (h - 12.5) / 3.5;
@@ -963,7 +1099,7 @@ namespace WFA_psychometric_chart
 
 
             chart1.Series.Add("SeriesDBT_enthalpy" + index);//this is already delceared in chart control so we dont need it
-            chart1.Series["SeriesDBT_enthalpy" + index].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
+            chart1.Series["SeriesDBT_enthalpy" + index].ChartType = SeriesChartType.Point;
             chart1.Series["SeriesDBT_enthalpy" + index].Color = Color.Blue;
             chart1.Series["SeriesDBT_enthalpy" + index].MarkerSize = 15;
             chart1.Series["SeriesDBT_enthalpy" + index].Label = "DBT = " + dbt + "degC ,enthalpy = " + enthalpy;
@@ -2025,7 +2161,12 @@ namespace WFA_psychometric_chart
 
                 if (oneTimeClick == 1)
                 {
-                    setItemSelectedID = idSelected;
+                    //this is for dissabling insert node when a node is selected
+                 
+                    //System.Windows.Forms.MouseButtons.Right = MouseButtons.None;
+                    CMSinsertNode.Enabled = false;
+                   // CMSinsertNode.Visible = false;
+                   setItemSelectedID = idSelected;
                     //  MessageBox.Show("Node grabbed - id=" + setItemSelectedID);
                     Cursor = Cursors.Cross;
                     oneTimeClick = 0;
@@ -2035,6 +2176,11 @@ namespace WFA_psychometric_chart
 
                 else
                 {
+
+                    //this is for re-enabling insert node when a node is selected
+                    //insertNodeToolStripMenuItem.Enabled = true;
+                    CMSinsertNode.Enabled = true;
+                   // CMSinsertNode.Visible = true;
                     mouseClickAction = 0;
                     //two time click 
                     oneTimeClick = 1;//again reset to oneTimeClick
@@ -2570,7 +2716,7 @@ namespace WFA_psychometric_chart
                         }
                     }//close of for
 
-                    double patm = 101.325;//this is constant...
+                    double patm = AirPressureFromDB * 0.001; // this is in terms of kpa //101.325;//this is constant...
                                           // double w = 622*phi*corres_pg_value/(patm-phi*corres_pg_value);
                                           //double w1 = 622*phi*pg/(patm-phi*pg);
                     double w = yVal;
@@ -2611,7 +2757,7 @@ namespace WFA_psychometric_chart
             //--Copying the ref temp and humidity to temporary arraylist
             temperature_value = t;
             pg_value_from_txtfile = pg;
-            double patm = 101.235;//constant..we will make it take as input later...
+            double patm = AirPressureFromDB * 0.001;//in terms of kpa //101.235;//constant..we will make it take as input later...
             //double rair = 0.287;//rideburg constant i guess
             double wg_calc = 0;
             double pg_value = 0.000000;
@@ -2682,7 +2828,6 @@ namespace WFA_psychometric_chart
                 {
                     //Name is selected
                     labelStringValue = tbName;
-
                 }
                 else
                 {
@@ -3026,7 +3171,7 @@ namespace WFA_psychometric_chart
 
         private void airHandlerToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Form_handler formhandler = new Form_handler();
+            Form_handler formhandler = new Form_handler(this);
             formhandler.Show();
         }
 
@@ -3049,7 +3194,7 @@ namespace WFA_psychometric_chart
         private void buildingChartToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //--This is for building chart setting pop up form
-            buildingChartSetting bcf = new buildingChartSetting();
+            buildingChartSetting bcf = new buildingChartSetting(this);
             bcf.Show();
         }
 
@@ -3065,7 +3210,7 @@ namespace WFA_psychometric_chart
         private void buildingChartToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             //--This is for building chart setting pop up form
-            buildingChartSetting bcf = new buildingChartSetting();
+            buildingChartSetting bcf = new buildingChartSetting(this);
             bcf.Show();
         }
 
@@ -3078,7 +3223,7 @@ namespace WFA_psychometric_chart
         private void airHandlerToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             //Air handler form
-            Form_handler formhandler = new Form_handler();
+            Form_handler formhandler = new Form_handler(this);
             formhandler.Show();
         }
 

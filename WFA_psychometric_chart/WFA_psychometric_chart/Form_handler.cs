@@ -14,8 +14,10 @@ namespace WFA_psychometric_chart
 {
     public partial class Form_handler : Form
     {
-        public Form_handler()
+        Form1_main form1Object;
+        public Form_handler(Form1_main f)
         {
+            this.form1Object = f;
             InitializeComponent();
         }
         ArrayList t = new ArrayList();//this stores the temperature(deg.cel)
@@ -254,7 +256,18 @@ namespace WFA_psychometric_chart
             // MessageBox.Show(""+s);
 
             //now we have the data lets do some ploting...
-            double patm = 101.235;//constant..we will make it take as input later...
+
+            //now we have the data lets do some ploting...
+            //===========NOTE WE HAVE PRESSURE IN Pa but this chart users it in terms of kpa===//
+            /*
+            Later we need to user it in terms of HPa (heteropascal) in formula so we need conversion
+            */
+            double pressureConverted =form1Object.AirPressureFromDB * 0.001;//now in terms of kpa
+                                                                 // MessageBox.Show("pressure(kpa) = " + pressureConverted);
+            lb_pressure_display.Text = "Pressure : " + Math.Round(pressureConverted, 2) + " KPa";//in terms of kpa
+            double patm = pressureConverted;//101.235;//constant..we will make it take as input later...   in 
+
+            //double patm = 101.235;//constant..we will make it take as input later...
             double rair = 0.287;//rideburg constant i guess
 
             //now we need array list to hold the values form calculation formula..
@@ -311,9 +324,18 @@ namespace WFA_psychometric_chart
                 ival++;
                 //this is to print 10%,20,30,40% 
                 int c = int.Parse((phi * 10 + 1).ToString());
-                chart1.Series["Series" + c].Points[45].Label = phi * 100 + "%";
+                //chart1.Series["Series" + c].Points[45].Label = phi * 100 + "%";
                 //chart1.Series["Series"+c].Points[46].LabelBackColor = Color.Blue;
-
+                if (phi >= 0.30 && phi < 0.4)
+                {
+                    chart1.Series["Series" + c].Points[45].Label = phi * 100 + "%";
+                    chart1.Series["Series" + c].Points[42].Label = "Humidity Ratio";
+                    // MessageBox.Show("Hello");
+                }
+                else
+                {
+                    chart1.Series["Series" + c].Points[45].Label = phi * 100 + "%";
+                }
             }
 
             //for plotting 60%-80%  
@@ -627,6 +649,10 @@ namespace WFA_psychometric_chart
 
                 if (oneTimeClick == 1)
                 {
+
+                    //this is for dissabling insert node when a node is selected
+                  CMSinsertNode.Enabled = false;
+
                     setItemSelectedID = idSelected;
                     //  MessageBox.Show("Node grabbed - id=" + setItemSelectedID);
                     Cursor = Cursors.Cross;
@@ -637,6 +663,10 @@ namespace WFA_psychometric_chart
 
                 else
                 {
+
+                    //this is for re-enabling insert node when a node is selected
+                    //insertNodeToolStripMenuItem.Enabled = true;
+                    CMSinsertNode.Enabled = true;
                     mouseClickAction = 0;
                     //two time click 
                     oneTimeClick = 1;//again reset to oneTimeClick
@@ -903,6 +933,16 @@ namespace WFA_psychometric_chart
 
                 //--This function is used for nodeSelection and releasing node to desired place 
                 //--This gets triggered based on mouse select and release..
+
+                if (flagForInsertOrUpdateDataToDB == 1)
+                {
+                    for (int x = 0; x < menuStripNodeInfoValues.Count; x++)
+                    {
+                        UpdateNodeInfoToDB(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].showItemText);
+                    }
+                }
+
+
                 NodeSelectionAndRelease(e);
 
             }
@@ -1344,7 +1384,11 @@ namespace WFA_psychometric_chart
                     double xValue = chart1.ChartAreas[0].AxisX.PixelPositionToValue(e.X);
                     double yValue = chart1.ChartAreas[0].AxisY.PixelPositionToValue(e.Y);
 
-                    xAxis1 = xValue;
+                    //add here 
+                    if ((xValue >= 0 && xValue <= 50) && (yValue >= 0 && yValue <= 30))
+                    {
+
+                        xAxis1 = xValue;
                     yAxis1 = yValue;
                     //Console.Write("xval = " + xValue + "yvalue = " + yValue);
                     if (menuStripNodeInfoValues.Count > 0)
@@ -1425,9 +1469,9 @@ namespace WFA_psychometric_chart
                                 ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue);
 
                                 //Updating values in database
-                                if(flagForInsertOrUpdateDataToDB == 1)
+                                if (flagForInsertOrUpdateDataToDB == 1)
                                 {
-                                    UpdateNodeInfoToDB(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].showItemText);
+                                   // UpdateNodeInfoToDB(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].showItemText);
                                 }
 
 
@@ -1499,7 +1543,7 @@ namespace WFA_psychometric_chart
                                 //Updating values in database...
                                 if (flagForInsertOrUpdateDataToDB == 1)
                                 {
-                                    UpdateNodeInfoToDB(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].showItemText);
+                                   // UpdateNodeInfoToDB(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].showItemText);
                                 }
 
                                 incrementIndex++;
@@ -1569,7 +1613,7 @@ namespace WFA_psychometric_chart
                                 //Updating values in database...
                                 if (flagForInsertOrUpdateDataToDB == 1)
                                 {
-                                    UpdateNodeInfoToDB(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].showItemText);
+                                    //UpdateNodeInfoToDB(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].showItemText);
                                 }
 
 
@@ -1603,7 +1647,8 @@ namespace WFA_psychometric_chart
                         }//closing of key else part
                     }
 
-
+                    //if ends here
+                }
 
                 }
                 catch (Exception ex)
@@ -1929,9 +1974,30 @@ namespace WFA_psychometric_chart
                    // MessageBox.Show("name= " + name);
                     if (regex.IsMatch(name))
                     {
+                        int length = name.Length;
+                        if (length > 30)
+                        {
+                            //}
+                            //else
+                            //{
+
+                            MessageBox.Show("You can only have name upto 30 characters");
+                            dataGridView1.Refresh();
+                            if (beginEditText == "")
+                            {
+                                dataGridView1.CurrentCell.Value = "";
+                            }
+                            else
+                            {
+                                dataGridView1.CurrentCell.Value = beginEditText;
+                            }
+                            return;
+                            // }
+
+                        }
 
                         //--Testing ..
-                        MessageBox.Show(" cell end edit ,name = "+name);
+                       // MessageBox.Show(" cell end edit ,name = "+name);
                         //--we need to check that the table name enter doesnot matches previous values
             
                         if(name != beginEditText) {      
@@ -2509,7 +2575,7 @@ namespace WFA_psychometric_chart
                         }
                     }//close of for
 
-                    double patm = 101.325;//this is constant...
+                    double patm = form1Object.AirPressureFromDB * 0.001;// in kpa//101.325;//this is constant...
                                           // double w = 622*phi*corres_pg_value/(patm-phi*corres_pg_value);
                                           //double w1 = 622*phi*pg/(patm-phi*pg);
                     double w = yVal;
@@ -2550,7 +2616,7 @@ namespace WFA_psychometric_chart
             //--Copying the ref temp and humidity to temporary arraylist
             temperature_value = t;
             pg_value_from_txtfile = pg;
-            double patm = 101.235;//constant..we will make it take as input later...
+            double patm = form1Object.AirPressureFromDB * 0.001;//in kpa//101.235;//constant..we will make it take as input later...
             //double rair = 0.287;//rideburg constant i guess
             double wg_calc = 0;
             double pg_value = 0.000000;
