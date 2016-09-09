@@ -659,7 +659,11 @@ namespace WFA_psychometric_chart
                 if (phi >= 0.30 && phi < 0.4)
                 {
                     chart1.Series["Series" + c].Points[45].Label = phi * 100 + "%";
+<<<<<<< HEAD
                     chart1.Series["Series" + c].Points[42].Label = "Relative Humidity";
+=======
+                    chart1.Series["Series" + c].Points[42].Label = "Humidity Ratio";
+>>>>>>> origin/master
                     // MessageBox.Show("Hello");
                 }
                 else
@@ -869,7 +873,11 @@ namespace WFA_psychometric_chart
                 t_plot1 += 10;
                 if (t_plot1 == 60)
                 {
+<<<<<<< HEAD
                     chart1.Series["Line_b" + hval].Points[1].Label = "Enthalpy kj/kg dry air";
+=======
+                    chart1.Series["Line_b" + hval].Points[1].Label = WFA_psychometric_chart.Properties.Resources.Enthalpy_kj_kg_dry_air;
+>>>>>>> origin/master
                 }
 
             }
@@ -1530,8 +1538,12 @@ namespace WFA_psychometric_chart
 
                 string sequenceDetected = temporaryNodeValueStore[0].name + " to " + temporaryNodeValueStore[1].name;
 
+<<<<<<< HEAD
                 string tooltipString = "Sequence :  " + sequenceDetected + " \n" + @"                 start             end 
 " + "Temp         :" + Math.Round(temporaryNodeValueStore[0].xVal, 2) + "               " + Math.Round(temporaryNodeValueStore[1].xVal, 2) + "\nHumidity :" + startHumidity1 + "           " + endHumidity1 + WFA_psychometric_chart.Properties.Resources._Enthalpy + startEnthalpy1 + "           " + endEnthalpy1 + "\nEnthalpy Change:" + enthalpyChange;
+=======
+                string tooltipString = "Sequence :  " + sequenceDetected + " \n" + WFA_psychometric_chart.Properties.Resources._start_end + "Temp         :" + Math.Round(temporaryNodeValueStore[0].xVal, 2) + "               " + Math.Round(temporaryNodeValueStore[1].xVal, 2) + "\nHumidity :" + startHumidity1 + "           " + endHumidity1 + WFA_psychometric_chart.Properties.Resources._Enthalpy + startEnthalpy1 + "           " + endEnthalpy1 + "\nEnthalpy Change:" + enthalpyChange;
+>>>>>>> origin/master
 
                 newLineSeries.ToolTip = tooltipString;
                 //newSeries.MarkerStyle = MarkerStyle.Circle;

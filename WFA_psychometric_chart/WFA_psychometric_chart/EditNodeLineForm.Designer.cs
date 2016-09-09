@@ -28,7 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
+<<<<<<< HEAD
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EditNodeLineForm));
+=======
+>>>>>>> origin/master
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.nodeID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.temp = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -71,15 +74,24 @@
             this.label,
             this.color,
             this.nodeSize});
+<<<<<<< HEAD
             resources.ApplyResources(this.dataGridView1, "dataGridView1");
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersVisible = false;
+=======
+            this.dataGridView1.Location = new System.Drawing.Point(3, 25);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.RowHeadersVisible = false;
+            this.dataGridView1.Size = new System.Drawing.Size(907, 220);
+            this.dataGridView1.TabIndex = 1;
+>>>>>>> origin/master
             this.dataGridView1.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dataGridView1_CellBeginEdit);
             this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick);
             this.dataGridView1.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellEndEdit);
             // 
             // nodeID
             // 
+<<<<<<< HEAD
             resources.ApplyResources(this.nodeID, "nodeID");
             this.nodeID.Name = "nodeID";
             this.nodeID.ReadOnly = true;
@@ -87,23 +99,45 @@
             // temp
             // 
             resources.ApplyResources(this.temp, "temp");
+=======
+            this.nodeID.HeaderText = "Node ID";
+            this.nodeID.Name = "nodeID";
+            this.nodeID.ReadOnly = true;
+            this.nodeID.Visible = false;
+            // 
+            // temp
+            // 
+            this.temp.HeaderText = "Temperature";
+>>>>>>> origin/master
             this.temp.Name = "temp";
             // 
             // humidity
             // 
+<<<<<<< HEAD
             resources.ApplyResources(this.humidity, "humidity");
+=======
+            this.humidity.HeaderText = "Humidity";
+>>>>>>> origin/master
             this.humidity.Name = "humidity";
             // 
             // equivalentEnthalpy
             // 
+<<<<<<< HEAD
             resources.ApplyResources(this.equivalentEnthalpy, "equivalentEnthalpy");
+=======
+            this.equivalentEnthalpy.HeaderText = "Equivalent Enthalpy";
+>>>>>>> origin/master
             this.equivalentEnthalpy.Name = "equivalentEnthalpy";
             this.equivalentEnthalpy.ReadOnly = true;
             // 
             // showText
             // 
             this.showText.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
+<<<<<<< HEAD
             resources.ApplyResources(this.showText, "showText");
+=======
+            this.showText.HeaderText = "Show Text";
+>>>>>>> origin/master
             this.showText.Items.AddRange(new object[] {
             "Name",
             "Source",
@@ -112,34 +146,55 @@
             // 
             // name
             // 
+<<<<<<< HEAD
             resources.ApplyResources(this.name, "name");
+=======
+            this.name.HeaderText = "Name";
+>>>>>>> origin/master
             this.name.Name = "name";
             // 
             // source
             // 
+<<<<<<< HEAD
             resources.ApplyResources(this.source, "source");
+=======
+            this.source.HeaderText = "Source";
+>>>>>>> origin/master
             this.source.Name = "source";
             this.source.ReadOnly = true;
             // 
             // label
             // 
+<<<<<<< HEAD
             resources.ApplyResources(this.label, "label");
+=======
+            this.label.HeaderText = "Label";
+>>>>>>> origin/master
             this.label.Name = "label";
             // 
             // color
             // 
+<<<<<<< HEAD
             resources.ApplyResources(this.color, "color");
+=======
+            this.color.HeaderText = "Color";
+>>>>>>> origin/master
             this.color.Name = "color";
             this.color.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.color.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             // 
             // nodeSize
             // 
+<<<<<<< HEAD
             resources.ApplyResources(this.nodeSize, "nodeSize");
+=======
+            this.nodeSize.HeaderText = "Node Size";
+>>>>>>> origin/master
             this.nodeSize.Name = "nodeSize";
             // 
             // label1
             // 
+<<<<<<< HEAD
             resources.ApplyResources(this.label1, "label1");
             this.label1.Name = "label1";
             // 
@@ -147,6 +202,23 @@
             // 
             resources.ApplyResources(this.label2, "label2");
             this.label2.Name = "label2";
+=======
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(12, 9);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(63, 13);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "Edit Node : ";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(21, 254);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(98, 13);
+            this.label2.TabIndex = 4;
+            this.label2.Text = "Edit Process Line : ";
+>>>>>>> origin/master
             // 
             // dataGridView2
             // 
@@ -157,59 +229,104 @@
             this.endNodeID,
             this.linecolor,
             this.thickness});
+<<<<<<< HEAD
             resources.ApplyResources(this.dataGridView2, "dataGridView2");
             this.dataGridView2.Name = "dataGridView2";
             this.dataGridView2.RowHeadersVisible = false;
+=======
+            this.dataGridView2.Location = new System.Drawing.Point(12, 276);
+            this.dataGridView2.Name = "dataGridView2";
+            this.dataGridView2.RowHeadersVisible = false;
+            this.dataGridView2.Size = new System.Drawing.Size(907, 220);
+            this.dataGridView2.TabIndex = 3;
+>>>>>>> origin/master
             this.dataGridView2.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dataGridView2_CellBeginEdit);
             this.dataGridView2.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView2_CellClick);
             this.dataGridView2.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView2_CellEndEdit);
             // 
             // lineName
             // 
+<<<<<<< HEAD
             resources.ApplyResources(this.lineName, "lineName");
+=======
+            this.lineName.HeaderText = "Line Name";
+>>>>>>> origin/master
             this.lineName.Name = "lineName";
             this.lineName.ReadOnly = true;
             // 
             // startNodeID
             // 
+<<<<<<< HEAD
             resources.ApplyResources(this.startNodeID, "startNodeID");
+=======
+            this.startNodeID.HeaderText = "Start Node ID";
+>>>>>>> origin/master
             this.startNodeID.Name = "startNodeID";
             this.startNodeID.ReadOnly = true;
             // 
             // endNodeID
             // 
+<<<<<<< HEAD
             resources.ApplyResources(this.endNodeID, "endNodeID");
+=======
+            this.endNodeID.HeaderText = "End Node ID";
+>>>>>>> origin/master
             this.endNodeID.Name = "endNodeID";
             this.endNodeID.ReadOnly = true;
             // 
             // linecolor
             // 
+<<<<<<< HEAD
             resources.ApplyResources(this.linecolor, "linecolor");
+=======
+            this.linecolor.HeaderText = "Color";
+>>>>>>> origin/master
             this.linecolor.Name = "linecolor";
             this.linecolor.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.linecolor.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             // 
             // thickness
             // 
+<<<<<<< HEAD
             resources.ApplyResources(this.thickness, "thickness");
+=======
+            this.thickness.HeaderText = "Thickness";
+>>>>>>> origin/master
             this.thickness.Name = "thickness";
             // 
             // button1
             // 
+<<<<<<< HEAD
             resources.ApplyResources(this.button1, "button1");
             this.button1.Name = "button1";
+=======
+            this.button1.Location = new System.Drawing.Point(777, 502);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(142, 36);
+            this.button1.TabIndex = 5;
+            this.button1.Text = "Save Edited Value";
+>>>>>>> origin/master
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // button2
             // 
+<<<<<<< HEAD
             resources.ApplyResources(this.button2, "button2");
             this.button2.Name = "button2";
+=======
+            this.button2.Location = new System.Drawing.Point(629, 502);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(142, 36);
+            this.button2.TabIndex = 6;
+            this.button2.Text = "Cancel";
+>>>>>>> origin/master
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // label3
             // 
+<<<<<<< HEAD
             resources.ApplyResources(this.label3, "label3");
             this.label3.Name = "label3";
             // 
@@ -222,6 +339,31 @@
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+=======
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(294, 9);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(388, 13);
+            this.label3.TabIndex = 7;
+            this.label3.Text = "Note : Node ID and Equivalent Enthalpy are non-editable other fields are editable" +
+    "";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(303, 254);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(435, 13);
+            this.label4.TabIndex = 8;
+            this.label4.Text = "Note : Line Name,Start Node ID and End Node ID are non-editable other fields are " +
+    "editable";
+            // 
+            // EditNodeLineForm
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(936, 538);
+>>>>>>> origin/master
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.button2);
@@ -234,6 +376,10 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "EditNodeLineForm";
+<<<<<<< HEAD
+=======
+            this.Text = "Edit Node Line";
+>>>>>>> origin/master
             this.Load += new System.EventHandler(this.EditNodeLineForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();

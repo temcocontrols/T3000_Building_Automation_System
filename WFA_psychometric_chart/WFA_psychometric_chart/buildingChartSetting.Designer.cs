@@ -29,7 +29,10 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+<<<<<<< HEAD
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(buildingChartSetting));
+=======
+>>>>>>> origin/master
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
@@ -110,6 +113,7 @@
             // 
             // lb_numberOfHandler
             // 
+<<<<<<< HEAD
             resources.ApplyResources(this.lb_numberOfHandler, "lb_numberOfHandler");
             this.lb_numberOfHandler.Name = "lb_numberOfHandler";
             // 
@@ -121,6 +125,31 @@
             // chart1
             // 
             resources.ApplyResources(this.chart1, "chart1");
+=======
+            this.lb_numberOfHandler.AutoSize = true;
+            this.lb_numberOfHandler.Location = new System.Drawing.Point(97, 556);
+            this.lb_numberOfHandler.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.lb_numberOfHandler.Name = "lb_numberOfHandler";
+            this.lb_numberOfHandler.Size = new System.Drawing.Size(12, 15);
+            this.lb_numberOfHandler.TabIndex = 12;
+            this.lb_numberOfHandler.Text = "0";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(5, 557);
+            this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(85, 15);
+            this.label2.TabIndex = 11;
+            this.label2.Text = "Number of chart  : ";
+            // 
+            // chart1
+            // 
+            this.chart1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+>>>>>>> origin/master
             chartArea1.AxisX.LabelAutoFitMinFontSize = 5;
             chartArea1.AxisY.LabelAutoFitMinFontSize = 5;
             chartArea1.CursorX.Interval = 5D;
@@ -130,6 +159,11 @@
             legend1.Enabled = false;
             legend1.Name = "Legend1";
             this.chart1.Legends.Add(legend1);
+<<<<<<< HEAD
+=======
+            this.chart1.Location = new System.Drawing.Point(152, 14);
+            this.chart1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+>>>>>>> origin/master
             this.chart1.Name = "chart1";
             series1.ChartArea = "ChartArea1";
             series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
@@ -276,6 +310,12 @@
             this.chart1.Series.Add(series34);
             this.chart1.Series.Add(series35);
             this.chart1.Series.Add(series36);
+<<<<<<< HEAD
+=======
+            this.chart1.Size = new System.Drawing.Size(824, 572);
+            this.chart1.TabIndex = 8;
+            this.chart1.Text = "chart1";
+>>>>>>> origin/master
             title1.Name = "Psychometric chart";
             this.chart1.Titles.Add(title1);
             this.chart1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseClick);
@@ -289,18 +329,34 @@
             this.disconnectLineToolStripMenuItem,
             this.showComfortZoneToolStripMenuItem});
             this.CMSinsertNode.Name = "contextMenuStrip2";
+<<<<<<< HEAD
             resources.ApplyResources(this.CMSinsertNode, "CMSinsertNode");
+=======
+            this.CMSinsertNode.Size = new System.Drawing.Size(159, 70);
+>>>>>>> origin/master
             // 
             // insertNodeToolStripMenuItem
             // 
             this.insertNodeToolStripMenuItem.Name = "insertNodeToolStripMenuItem";
+<<<<<<< HEAD
             resources.ApplyResources(this.insertNodeToolStripMenuItem, "insertNodeToolStripMenuItem");
+=======
+            this.insertNodeToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.insertNodeToolStripMenuItem.Text = "Insert Node";
+>>>>>>> origin/master
             this.insertNodeToolStripMenuItem.Click += new System.EventHandler(this.insertNodeToolStripMenuItem_Click_1);
             // 
             // disconnectLineToolStripMenuItem
             // 
+<<<<<<< HEAD
             resources.ApplyResources(this.disconnectLineToolStripMenuItem, "disconnectLineToolStripMenuItem");
             this.disconnectLineToolStripMenuItem.Name = "disconnectLineToolStripMenuItem";
+=======
+            this.disconnectLineToolStripMenuItem.Enabled = false;
+            this.disconnectLineToolStripMenuItem.Name = "disconnectLineToolStripMenuItem";
+            this.disconnectLineToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.disconnectLineToolStripMenuItem.Text = "Disconnect Line";
+>>>>>>> origin/master
             this.disconnectLineToolStripMenuItem.Click += new System.EventHandler(this.disconnectLineToolStripMenuItem_Click_1);
             // 
             // showComfortZoneToolStripMenuItem
@@ -309,18 +365,33 @@
             this.enableToolStripMenuItem,
             this.settingsToolStripMenuItem});
             this.showComfortZoneToolStripMenuItem.Name = "showComfortZoneToolStripMenuItem";
+<<<<<<< HEAD
             resources.ApplyResources(this.showComfortZoneToolStripMenuItem, "showComfortZoneToolStripMenuItem");
+=======
+            this.showComfortZoneToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.showComfortZoneToolStripMenuItem.Text = "Comfort Zone";
+>>>>>>> origin/master
             // 
             // enableToolStripMenuItem
             // 
             this.enableToolStripMenuItem.Name = "enableToolStripMenuItem";
+<<<<<<< HEAD
             resources.ApplyResources(this.enableToolStripMenuItem, "enableToolStripMenuItem");
+=======
+            this.enableToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+            this.enableToolStripMenuItem.Text = "Show";
+>>>>>>> origin/master
             this.enableToolStripMenuItem.Click += new System.EventHandler(this.enableToolStripMenuItem_Click);
             // 
             // settingsToolStripMenuItem
             // 
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+<<<<<<< HEAD
             resources.ApplyResources(this.settingsToolStripMenuItem, "settingsToolStripMenuItem");
+=======
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+            this.settingsToolStripMenuItem.Text = "Settings";
+>>>>>>> origin/master
             this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
             // 
             // contextMenuStrip1
@@ -328,16 +399,26 @@
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.deleteHandlerToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
+<<<<<<< HEAD
             resources.ApplyResources(this.contextMenuStrip1, "contextMenuStrip1");
+=======
+            this.contextMenuStrip1.Size = new System.Drawing.Size(140, 26);
+>>>>>>> origin/master
             // 
             // deleteHandlerToolStripMenuItem
             // 
             this.deleteHandlerToolStripMenuItem.Name = "deleteHandlerToolStripMenuItem";
+<<<<<<< HEAD
             resources.ApplyResources(this.deleteHandlerToolStripMenuItem, "deleteHandlerToolStripMenuItem");
+=======
+            this.deleteHandlerToolStripMenuItem.Size = new System.Drawing.Size(139, 22);
+            this.deleteHandlerToolStripMenuItem.Text = "Delete Chart";
+>>>>>>> origin/master
             this.deleteHandlerToolStripMenuItem.Click += new System.EventHandler(this.deleteHandlerToolStripMenuItem_Click);
             // 
             // label1
             // 
+<<<<<<< HEAD
             resources.ApplyResources(this.label1, "label1");
             this.label1.Name = "label1";
             // 
@@ -350,6 +431,37 @@
             // 
             resources.ApplyResources(this.button1, "button1");
             this.button1.Name = "button1";
+=======
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(8, 14);
+            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(82, 15);
+            this.label1.TabIndex = 13;
+            this.label1.Text = "Building selected: ";
+            // 
+            // lb_db_name
+            // 
+            this.lb_db_name.AutoSize = true;
+            this.lb_db_name.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lb_db_name.Location = new System.Drawing.Point(80, 14);
+            this.lb_db_name.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.lb_db_name.Name = "lb_db_name";
+            this.lb_db_name.Size = new System.Drawing.Size(52, 14);
+            this.lb_db_name.TabIndex = 14;
+            this.lb_db_name.Text = "dbName";
+            // 
+            // button1
+            // 
+            this.button1.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.button1.Enabled = false;
+            this.button1.Location = new System.Drawing.Point(5, 9);
+            this.button1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(99, 32);
+            this.button1.TabIndex = 15;
+            this.button1.Text = "Edit node and  line";
+>>>>>>> origin/master
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -360,9 +472,18 @@
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.id,
             this.name});
+<<<<<<< HEAD
             resources.ApplyResources(this.dataGridView1, "dataGridView1");
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersVisible = false;
+=======
+            this.dataGridView1.Location = new System.Drawing.Point(11, 43);
+            this.dataGridView1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.RowHeadersVisible = false;
+            this.dataGridView1.Size = new System.Drawing.Size(122, 474);
+            this.dataGridView1.TabIndex = 7;
+>>>>>>> origin/master
             this.dataGridView1.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dataGridView1_CellBeginEdit);
             this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick_1);
             this.dataGridView1.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellDoubleClick);
@@ -371,6 +492,7 @@
             // 
             // id
             // 
+<<<<<<< HEAD
             resources.ApplyResources(this.id, "id");
             this.id.Name = "id";
             this.id.ReadOnly = true;
@@ -378,38 +500,80 @@
             // name
             // 
             resources.ApplyResources(this.name, "name");
+=======
+            this.id.HeaderText = "id";
+            this.id.Name = "id";
+            this.id.ReadOnly = true;
+            this.id.Width = 30;
+            // 
+            // name
+            // 
+            this.name.HeaderText = "name";
+>>>>>>> origin/master
             this.name.Name = "name";
             this.name.ReadOnly = true;
             // 
             // btn_pull_data
             // 
+<<<<<<< HEAD
             resources.ApplyResources(this.btn_pull_data, "btn_pull_data");
             this.btn_pull_data.Name = "btn_pull_data";
+=======
+            this.btn_pull_data.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btn_pull_data.Enabled = false;
+            this.btn_pull_data.Location = new System.Drawing.Point(109, 9);
+            this.btn_pull_data.Name = "btn_pull_data";
+            this.btn_pull_data.Size = new System.Drawing.Size(99, 32);
+            this.btn_pull_data.TabIndex = 16;
+            this.btn_pull_data.Text = "Scan Hardware";
+>>>>>>> origin/master
             this.btn_pull_data.UseVisualStyleBackColor = true;
             this.btn_pull_data.Click += new System.EventHandler(this.btn_pull_data_Click);
             // 
             // groupBox1
             // 
+<<<<<<< HEAD
             resources.ApplyResources(this.groupBox1, "groupBox1");
             this.groupBox1.Controls.Add(this.button1);
             this.groupBox1.Controls.Add(this.btn_pull_data);
             this.groupBox1.Name = "groupBox1";
+=======
+            this.groupBox1.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.groupBox1.Controls.Add(this.button1);
+            this.groupBox1.Controls.Add(this.btn_pull_data);
+            this.groupBox1.Location = new System.Drawing.Point(8, 616);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(222, 44);
+            this.groupBox1.TabIndex = 17;
+>>>>>>> origin/master
             this.groupBox1.TabStop = false;
             // 
             // groupBox2
             // 
+<<<<<<< HEAD
             resources.ApplyResources(this.groupBox2, "groupBox2");
+=======
+            this.groupBox2.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+>>>>>>> origin/master
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Controls.Add(this.label6);
             this.groupBox2.Controls.Add(this.lb_web_status);
             this.groupBox2.Controls.Add(this.label5);
             this.groupBox2.Controls.Add(this.lb_device_status);
             this.groupBox2.Controls.Add(this.label3);
+<<<<<<< HEAD
             this.groupBox2.Name = "groupBox2";
+=======
+            this.groupBox2.Location = new System.Drawing.Point(236, 625);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(759, 32);
+            this.groupBox2.TabIndex = 18;
+>>>>>>> origin/master
             this.groupBox2.TabStop = false;
             // 
             // label4
             // 
+<<<<<<< HEAD
             resources.ApplyResources(this.label4, "label4");
             this.label4.Name = "label4";
             // 
@@ -457,6 +621,98 @@
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+=======
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(382, 13);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(50, 15);
+            this.label4.TabIndex = 5;
+            this.label4.Text = "Real Time";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(320, 14);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(39, 15);
+            this.label6.TabIndex = 4;
+            this.label6.Text = "Mode : ";
+            // 
+            // lb_web_status
+            // 
+            this.lb_web_status.AutoSize = true;
+            this.lb_web_status.Location = new System.Drawing.Point(238, 14);
+            this.lb_web_status.Name = "lb_web_status";
+            this.lb_web_status.Size = new System.Drawing.Size(39, 15);
+            this.lb_web_status.TabIndex = 3;
+            this.lb_web_status.Text = "inactive";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(165, 13);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(56, 15);
+            this.label5.TabIndex = 2;
+            this.label5.Text = "Web Status:";
+            // 
+            // lb_device_status
+            // 
+            this.lb_device_status.AutoSize = true;
+            this.lb_device_status.Location = new System.Drawing.Point(80, 13);
+            this.lb_device_status.Name = "lb_device_status";
+            this.lb_device_status.Size = new System.Drawing.Size(61, 15);
+            this.lb_device_status.TabIndex = 1;
+            this.lb_device_status.Text = "disconnected";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(7, 13);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(67, 15);
+            this.label3.TabIndex = 0;
+            this.label3.Text = "Device Status:";
+            // 
+            // lb_pressure_display
+            // 
+            this.lb_pressure_display.AutoSize = true;
+            this.lb_pressure_display.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Bold);
+            this.lb_pressure_display.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.lb_pressure_display.Location = new System.Drawing.Point(734, 24);
+            this.lb_pressure_display.Name = "lb_pressure_display";
+            this.lb_pressure_display.Size = new System.Drawing.Size(73, 18);
+            this.lb_pressure_display.TabIndex = 37;
+            this.lb_pressure_display.Text = "Pressure";
+            // 
+            // lb_unit_chosen_display
+            // 
+            this.lb_unit_chosen_display.AutoSize = true;
+            this.lb_unit_chosen_display.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Bold);
+            this.lb_unit_chosen_display.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.lb_unit_chosen_display.Location = new System.Drawing.Point(894, 24);
+            this.lb_unit_chosen_display.Name = "lb_unit_chosen_display";
+            this.lb_unit_chosen_display.Size = new System.Drawing.Size(63, 18);
+            this.lb_unit_chosen_display.TabIndex = 36;
+            this.lb_unit_chosen_display.Text = "Unit : SI";
+            // 
+            // lb_simulation_mode_display
+            // 
+            this.lb_simulation_mode_display.AutoSize = true;
+            this.lb_simulation_mode_display.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Bold);
+            this.lb_simulation_mode_display.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.lb_simulation_mode_display.Location = new System.Drawing.Point(734, 43);
+            this.lb_simulation_mode_display.Name = "lb_simulation_mode_display";
+            this.lb_simulation_mode_display.Size = new System.Drawing.Size(123, 18);
+            this.lb_simulation_mode_display.TabIndex = 38;
+            this.lb_simulation_mode_display.Text = "Real Time Mode";
+            // 
+            // buildingChartSetting
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(5F, 15F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(1007, 659);
+>>>>>>> origin/master
             this.Controls.Add(this.lb_simulation_mode_display);
             this.Controls.Add(this.lb_pressure_display);
             this.Controls.Add(this.lb_unit_chosen_display);
@@ -468,9 +724,19 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.chart1);
             this.Controls.Add(this.dataGridView1);
+<<<<<<< HEAD
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MinimizeBox = false;
             this.Name = "buildingChartSetting";
+=======
+            this.Font = new System.Drawing.Font("Arial Narrow", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.MinimizeBox = false;
+            this.Name = "buildingChartSetting";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Chart setting with building";
+>>>>>>> origin/master
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.buildingChartSetting_FormClosing);
             this.Load += new System.EventHandler(this.buildingChartSetting_Load);
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();

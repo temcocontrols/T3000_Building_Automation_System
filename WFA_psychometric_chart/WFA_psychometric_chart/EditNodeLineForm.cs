@@ -382,6 +382,7 @@ namespace WFA_psychometric_chart
 
         private void dataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
+<<<<<<< HEAD
 
             try {
 
@@ -537,6 +538,152 @@ namespace WFA_psychometric_chart
         {
 
             try { 
+=======
+            //Lets record previous data here 
+            if (dataGridView1.CurrentCell.ColumnIndex == 1)
+            {
+                try { 
+                //This one is temperature
+               double  finalTemp = double.Parse(dataGridView1.CurrentCell.Value.ToString());
+                    // Create the regular expression
+                    // string pattern = @"\w+_";
+                    // Regex regex = new Regex(pattern);
+
+                    // Compare a string against the regular expression
+                    // return regex.IsMatch(finalTemp);
+                }catch(Exception ex)
+                {
+                    MessageBox.Show("You can only input number values");
+
+                    dataGridView1.CurrentCell.Value = initialTemp;
+                }
+
+            }
+            else if (dataGridView1.CurrentCell.ColumnIndex == 2)
+            {
+                //This one is humidity
+                // initialHumidity = dataGridView1.CurrentCell.Value.ToString();
+                try
+                {
+                    
+                    double finalHum = double.Parse(dataGridView1.CurrentCell.Value.ToString());
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("You can only input number values");
+
+                    dataGridView1.CurrentCell.Value = initialHumidity;
+                }
+
+            }
+            else if (dataGridView1.CurrentCell.ColumnIndex == 5)
+            {
+                //This one is name
+                // initialName = dataGridView1.CurrentCell.Value.ToString();
+                try
+                {
+
+                    string finalName  = dataGridView1.CurrentCell.Value.ToString();
+
+                    string pattern = @"^\w+$"; //@"\b\w+es\b";
+                    Regex rgx = new Regex(pattern);
+                    //string sentence = "Who writes these notes?";
+                    if(rgx.IsMatch(finalName) == true)
+                    {
+                        //matched no need to edit 
+                    }
+                    else
+                    {
+                        MessageBox.Show("You can only input letters,numbers and underscores values");
+                        dataGridView1.CurrentCell.Value = initialName;
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("You can only input letters,numbers and underscores values");
+
+                    dataGridView1.CurrentCell.Value = initialName;
+                }
+
+
+
+            }
+            //else if (dataGridView1.CurrentCell.ColumnIndex == 6)
+            //{
+            //    //This one is source ==> non editable now
+            //}
+            else if (dataGridView1.CurrentCell.ColumnIndex == 7)
+            {
+                //This one is lable
+                //initialLabel = dataGridView1.CurrentCell.Value.ToString();
+
+                try
+                {
+
+                    string finalLabel = dataGridView1.CurrentCell.Value.ToString();
+
+                    string pattern = @"^\w+$";// @"^[a-zA-Z0-9\_]+$"; //for string 
+                    Regex rgx = new Regex(pattern);
+                    //string sentence = "Who writes these notes?";
+                    if (rgx.IsMatch(finalLabel) == true)
+                    {
+                        //matched no need to edit 
+                    }
+                    else
+                    {
+                        MessageBox.Show("You can only input letters,numbers and underscores values");
+                        dataGridView1.CurrentCell.Value = initialLabel;
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("You can only input letters,numbers and underscores values");
+
+                    dataGridView1.CurrentCell.Value = initialLabel;
+                }
+
+
+            }
+            else if (dataGridView1.CurrentCell.ColumnIndex == 9)
+            {
+                //This one is nodesize
+                // initialNodeSize = dataGridView1.CurrentCell.Value.ToString();
+                try
+                {
+
+                    string finalSize = dataGridView1.CurrentCell.Value.ToString();
+
+                    string pattern = @"^[0-9]+$"; //for integers only
+                    Regex rgx = new Regex(pattern);
+                    //string sentence = "Who writes these notes?";
+                    if (rgx.IsMatch(finalSize) == true)
+                    {
+                        //matched no need to edit 
+                    }
+                    else
+                    {
+                        MessageBox.Show("You can only input integer values");
+                        dataGridView1.CurrentCell.Value = initialNodeSize;
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("You can only input integer values");
+
+                    dataGridView1.CurrentCell.Value = initialNodeSize;
+                }
+
+
+
+            }
+        }
+
+        private void dataGridView1_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
+        {
+>>>>>>> origin/master
             //Lets record previous data here 
             if(dataGridView1.CurrentCell.ColumnIndex == 1)
             {
@@ -565,11 +712,15 @@ namespace WFA_psychometric_chart
                 //This one is nodesize
                 initialNodeSize = dataGridView1.CurrentCell.Value.ToString();
             }
+<<<<<<< HEAD
             }
             catch
             {
 
             }
+=======
+
+>>>>>>> origin/master
         }
     }
 }

@@ -277,7 +277,11 @@ namespace WFA_psychometric_chart
                 int c = int.Parse((phi * 10 + 1).ToString());
                 if(phi >= 0.30 && phi <0.4) {
                     chart1.Series["Series" + c].Points[45].Label = phi * 100 + "%";
+<<<<<<< HEAD
                     chart1.Series["Series" + c].Points[42].Label = "Relative Humidity";
+=======
+                    chart1.Series["Series" + c].Points[42].Label = "Humidity Ratio";
+>>>>>>> origin/master
                    // MessageBox.Show("Hello");
                 }
                 else

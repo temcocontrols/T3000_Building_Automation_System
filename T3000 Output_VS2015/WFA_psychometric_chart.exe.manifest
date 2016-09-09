@@ -114,14 +114,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="WFA_psychometric_chart.exe" size="615368">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="WFA_psychometric_chart.exe" size="596424">
       <assemblyIdentity name="WFA_psychometric_chart" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>8MpUXWrYh3UuXKSrolaAfpuRCuMtYylhIheCpRelsZU=</dsig:DigestValue>
+        <dsig:DigestValue>PQ77Uu/mGAJdpmi23zXsYQLPXAlKogMFC8FbhdDkykA=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -133,31 +133,31 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>oBee3ES7zEUYbqdQSWjRkYooPklLQ/5sxzbSi1goV6c=</dsig:DigestValue>
+        <dsig:DigestValue>BbCArzoLgath5luVzV8Zjk7b3GIDKUtJxQto7incJpA=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ko-KR\WFA_psychometric_chart.resources.dll" size="24576">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ko-KR\WFA_psychometric_chart.resources.dll" size="23040">
       <assemblyIdentity name="WFA_psychometric_chart.resources" version="1.0.0.0" language="ko-KR" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>we29XpuMcKxB6UiQ156kzH4u+raFzbXCU/4/87oT/bM=</dsig:DigestValue>
+        <dsig:DigestValue>Hrpech5+v6TMxXJYLqBZ1/eTRhvIuKIkoakk/1LJSqU=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="zh-CHS\WFA_psychometric_chart.resources.dll" size="24576">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="zh-CHS\WFA_psychometric_chart.resources.dll" size="23552">
       <assemblyIdentity name="WFA_psychometric_chart.resources" version="1.0.0.0" language="zh-CHS" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>YLk+ovTBZoc/YpCTfgIXrE6NXNDIpC8T0qmLVjXuPZA=</dsig:DigestValue>
+        <dsig:DigestValue>Y81TIsfiGJ6UdlZCSfMQ0HYiLAAJ5Pto+H3a9QryH7k=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -170,13 +170,13 @@
       <dsig:DigestValue>Qdmk9QVLCrLg4vobyODvZCmgCw1vyke4BQuWWx8XQ/E=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="WFA_psychometric_chart_ml.xml" size="263489" writeableType="applicationData">
+  <file name="WFA_psychometric_chart_ml.xml" size="239496" writeableType="applicationData">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>j8K6/P4wGfPVO3XI+7CU5Tx/QIsTYjnskGMKs0k569c=</dsig:DigestValue>
+      <dsig:DigestValue>NFlifQpbKu0qI0w7SCd14KmOM9jG1byzRFIR5dGb4bA=</dsig:DigestValue>
     </hash>
   </file>
 </asmv1:assembly>
