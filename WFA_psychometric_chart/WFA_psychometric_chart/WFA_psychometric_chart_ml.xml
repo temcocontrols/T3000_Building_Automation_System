@@ -270,7 +270,6 @@
   </GeneralIds>
   <GeneralIds>
     <StringID>89</StringID>
-    <Comment>Previous text: Real Time Plotting</Comment>
   </GeneralIds>
   <GeneralIds>
     <StringID>90</StringID>
@@ -286,7 +285,6 @@
   </GeneralIds>
   <GeneralIds>
     <StringID>94</StringID>
-    <Comment>Previous text: Add new location</Comment>
   </GeneralIds>
   <GeneralIds>
     <StringID>95</StringID>
@@ -296,12 +294,14 @@
   </GeneralIds>
   <GeneralIds>
     <StringID>97</StringID>
+    <Comment>Previous text: Update now</Comment>
   </GeneralIds>
   <GeneralIds>
     <StringID>98</StringID>
   </GeneralIds>
   <GeneralIds>
     <StringID>99</StringID>
+    <Comment>Previous text: Panel ID</Comment>
   </GeneralIds>
   <GeneralIds>
     <StringID>100</StringID>
@@ -617,14 +617,12 @@
   </GeneralIds>
   <GeneralIds>
     <StringID>204</StringID>
-    <Comment>Previous text: No</Comment>
   </GeneralIds>
   <GeneralIds>
     <StringID>205</StringID>
   </GeneralIds>
   <GeneralIds>
     <StringID>206</StringID>
-    <Comment>Previous text: Connection Error Issue? </Comment>
   </GeneralIds>
   <GeneralIds>
     <StringID>207</StringID>
@@ -766,7 +764,6 @@
   </GeneralIds>
   <GeneralIds>
     <StringID>253</StringID>
-    <Comment>Previous text: Psychrometric Calculator</Comment>
   </GeneralIds>
   <GeneralIds>
     <StringID>254</StringID>
@@ -785,7 +782,6 @@
   </GeneralIds>
   <GeneralIds>
     <StringID>259</StringID>
-    <Comment>Previous text: Calculate</Comment>
   </GeneralIds>
   <GeneralIds>
     <StringID>260</StringID>
@@ -796,7 +792,6 @@
   </GeneralIds>
   <GeneralIds>
     <StringID>262</StringID>
-    <Comment>Previous text: Station name :</Comment>
   </GeneralIds>
   <GeneralIds>
     <StringID>263</StringID>
@@ -837,6 +832,314 @@
   <GeneralIds>
     <StringID>275</StringID>
   </GeneralIds>
+  <GeneralIds>
+    <StringID>276</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>277</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>278</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>279</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>280</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>281</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>282</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>283</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>284</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>285</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>286</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>287</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>288</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>289</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>290</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>291</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>292</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>293</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>294</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>295</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>296</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>297</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>298</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>299</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>300</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>301</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>302</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>303</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>304</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>305</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>306</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>307</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>308</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>309</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>310</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>311</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>312</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>313</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>314</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>315</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>316</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>317</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>318</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>319</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>320</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>321</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>322</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>323</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>324</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>325</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>326</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>327</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>328</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>329</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>330</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>331</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>332</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>333</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>334</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>335</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>336</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>337</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>338</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>339</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>340</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>341</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>342</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>343</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>344</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>345</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>346</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>347</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>348</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>349</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>350</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>351</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>352</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>353</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>354</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>355</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>356</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>357</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>358</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>359</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>360</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>361</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>362</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>363</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>364</StringID>
+    <Comment>Previous text: Refresh Graph</Comment>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>365</StringID>
+    <Comment />
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>366</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>367</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>368</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>369</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>370</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>371</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>372</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>373</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>374</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>375</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>376</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>377</StringID>
+  </GeneralIds>
   <Languages>
     <LanguageID>1033</LanguageID>
     <LanguageName>English (United States)</LanguageName>
@@ -844,15 +1147,15 @@
     <ColumnNumber>0</ColumnNumber>
   </Languages>
   <Languages>
-    <LanguageID>4</LanguageID>
-    <LanguageName>Chinese (Simplified) Legacy</LanguageName>
-    <IetfLanguageTag>zh-CHS</IetfLanguageTag>
+    <LanguageID>30724</LanguageID>
+    <LanguageName>Chinese</LanguageName>
+    <IetfLanguageTag>zh</IetfLanguageTag>
     <ColumnNumber>1</ColumnNumber>
   </Languages>
   <Languages>
-    <LanguageID>1042</LanguageID>
-    <LanguageName>Korean (Korea)</LanguageName>
-    <IetfLanguageTag>ko-KR</IetfLanguageTag>
+    <LanguageID>18</LanguageID>
+    <LanguageName>Korean</LanguageName>
+    <IetfLanguageTag>ko</IetfLanguageTag>
     <ColumnNumber>2</ColumnNumber>
   </Languages>
   <GeneralTexts>
@@ -1344,20 +1647,20 @@
   <GeneralTexts>
     <StringID>82</StringID>
     <LanguageID>1033</LanguageID>
-    <LanguageText>H       :</LanguageText>
-    <Status>1</Status>
+    <LanguageText>H :</LanguageText>
+    <Status>6</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>83</StringID>
     <LanguageID>1033</LanguageID>
-    <LanguageText>DP     :</LanguageText>
-    <Status>1</Status>
+    <LanguageText>DP :</LanguageText>
+    <Status>6</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>84</StringID>
     <LanguageID>1033</LanguageID>
-    <LanguageText>RH     :</LanguageText>
-    <Status>1</Status>
+    <LanguageText>RH :</LanguageText>
+    <Status>6</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>85</StringID>
@@ -1368,8 +1671,8 @@
   <GeneralTexts>
     <StringID>86</StringID>
     <LanguageID>1033</LanguageID>
-    <LanguageText>DBT   :</LanguageText>
-    <Status>1</Status>
+    <LanguageText>DBT :</LanguageText>
+    <Status>6</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>87</StringID>
@@ -1435,7 +1738,7 @@
     <StringID>97</StringID>
     <LanguageID>1033</LanguageID>
     <LanguageText>Update now</LanguageText>
-    <Status>1</Status>
+    <Status>6</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>98</StringID>
@@ -1447,7 +1750,7 @@
     <StringID>99</StringID>
     <LanguageID>1033</LanguageID>
     <LanguageText>Panel ID</LanguageText>
-    <Status>1</Status>
+    <Status>6</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>100</StringID>
@@ -2308,2334 +2611,6 @@
     <Status>1</Status>
   </GeneralTexts>
   <GeneralTexts>
-    <StringID>15</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>取消</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>26</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>全选</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>143</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>标签</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>145</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>源</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>111</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>帮助</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>204</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>否</LanguageText>
-    <Status>7</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>13</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>确定</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>175</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>确定</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>230</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>是</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>17</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>应用 ︰ 湿度变化的影响</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>23</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>在关系图上绘制</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>20</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>温度与湿度</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>18</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>温度 （摄氏度） &gt;</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>22</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>摄氏度</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>19</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>湿度 （在 %）</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>24</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>历史数据绘图区</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>25</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>选择时间和日期</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>129</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>选择一个位置</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>53</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>从：</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>52</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>自：</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>51</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>选择小时 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>127</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>导出数据</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>135</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>提取物</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>130</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>日期</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>131</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>格式</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>136</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>选择建筑的位置</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>126</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>热图</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>55</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>图表 1</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>139</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>图表选项</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>140</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>选择日期</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>91</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>menustrip1</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>137</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>打印地图</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>138</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>另存为图像</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>141</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>节点详细信息</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>142</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>设置的节点</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>144</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>名称</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>150</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>资料来源 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>149</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>名称 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>148</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>标签 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>147</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>显示 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>146</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>颜色：</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>128</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>流程图</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>160</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>颜色：</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>161</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>单击以选择颜色</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>168</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>测量</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>169</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>指令</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>151</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>插入节点</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>166</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>Y 轴 （含湿量） ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>167</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>X-axis(DBT):</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>156</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>标签 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>154</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>名称 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>163</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>设置的数据</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>164</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>单击此处可设置以上值</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>158</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>显示 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>152</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>资料来源 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>159</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>选择要显示什么信息</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>162</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>选定的颜色</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>157</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>输入标签</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>155</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>请输入名称 (如.室外焓)</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>153</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>输入源 (如.openweathermaps.org)</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>203</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>干湿球计算器</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>77</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>计算</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>58</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>计算</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>66</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>混合的气体比例 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>65</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>焓 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>74</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>相对湿度 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>73</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>大气压力 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>72</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>由于点温度 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>71</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>答 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>68</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>氧分压水饱和度时 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>67</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>分子质量的水分子 wt。:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>62</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>无单位</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>61</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>自置居所津贴</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>63</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>℃</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>59</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>千焦/公斤</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>60</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>g/公斤</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>64</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>℃</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>54</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>心理测量学的图表</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>56</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>刷新图表</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>78</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>不同的参数值</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>88</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>湿度室的校准方法</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>86</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>DBT:</LanguageText>
-    <Status>7</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>85</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>某地 H:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>84</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>相对湿度 ︰</LanguageText>
-    <Status>7</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>83</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>DP:</LanguageText>
-    <Status>7</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>82</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>H:</LanguageText>
-    <Status>7</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>81</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>X-线 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>80</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>Y-线 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>79</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>则为 null</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>90</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>选项</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>89</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>实时绘制</LanguageText>
-    <Status>7</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>87</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>天气服务</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>205</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>显示日志文件</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>94</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>插入新的位置</LanguageText>
-    <Status>7</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>97</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>立即更新</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>105</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>[勾选启用服务]</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>92</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>建设位置</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>96</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>室外传感器</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>102</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>远程气象站服务</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>119</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>气象站</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>112</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>当前天气</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>107</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>湿度自标定</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>10</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>国家 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>100</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>湿度 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>99</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>小组 ID</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>98</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>价值</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>125</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>位置 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>124</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>建筑的距离 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>123</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>最后更新 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>101</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>温度 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>12</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>状态 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>118</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>晴雨表 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>117</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>二甘醇。C</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>116</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>自置居所津贴</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>115</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>风 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>114</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>方向 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>106</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>启用 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>110</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>每一天的最大调整 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>4</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>城市 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>207</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>状态 ︰ 无</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>109</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>当前偏移量的 %:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>121</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>公里</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>113</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>m/秒</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>93</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>选择一个位置 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>104</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>站名 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>103</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>站的距离 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>108</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>之间 (0-1%)</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>16</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>街道 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>14</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>米</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>206</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>连接错误问题？</LanguageText>
-    <Status>7</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>7</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>邮编 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>1</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>经度 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>8</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>纬度 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>95</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>标高 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>5</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>插入数据</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>6</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>海拔 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>9</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>= 由程序</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>11</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>= 所需的输入</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>173</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>下一次...</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>174</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>使用的默认语言</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>171</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>使用所选的语言</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>172</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>再次显示此窗体</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>177</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>在摄氏度输入一个有效的参考温度值</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>178</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>输入一个有效的参考湿度值 %</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>179</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>在以摄氏度的输入 boxex 输入一个有效的温度值</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>180</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>成功</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>185</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>湿度 （在 %）</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>187</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>经过筛选的小时值 =  
-</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>186</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>请输入有效的日期，选择在 '从' 节日期应该是比 '到' 节小</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>188</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>请选择一个或多个小时第一</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>189</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>建筑信息</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>236</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>Excel 将文件保存到</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>237</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>请选择一个有效的日期 (到 &gt; 从)</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>193</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>选择一个路径和文件名称</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>191</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>您的文件将被保存为</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>190</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>建筑信息:，</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>192</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>国家、 省份、 城市、 街道、 zip、 经度、 纬度、 elecation，</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>195</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>站的信息 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>194</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>位置，从建设、 最后更新日期、 温度、 湿度、 压力、 风、 方向，酒吧距离车站名称，</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>196</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>历史数据</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>197</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>日期，小时，分钟，温度，湿度，</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>240</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>请选择正确的日期格式 [从 &lt; 到]</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>239</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>最后的成功 ！</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>238</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>未找到数据库中的数据 ！</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>235</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>您的图表图像将被保存为</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>201</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>右键单击要插入新的节点。单击就可以选择你想要移动，并将鼠标悬停在要把它，请再次单击它的项目会那里修复。如果你想要使 x 轴保持恒定欺骗不断按 Alt 键移动节点移动节点。如果你想要使 y 轴常数移动时保持按 Shift 键并移动。您可以插入不同颜色节点基于选定的颜色。</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>234</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>请在图表中选择适当的区域</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>232</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>错误结束</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>233</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>可用的 Internet 连接</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>231</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>时间状态时间错误状态</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>229</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>检测到错误</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>228</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>互联网连接丢失 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>227</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>请先选择一个站。</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>209</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>请首先，执行以下步骤。 
- 1.选择一个位置  
- 2.拉存储建设数据  
- 3。获取地理价值 （我们需要地理价值）</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>218</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>请先选择一个位置 ！</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>219</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>错误</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>226</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>拉......</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>221</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>请先选择站到提取数据。</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>208</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>在本节中，您选择每一天的最大调整因素。如果偏离值你可以设置的最大调整因素值为 0.01，它会调整你按 0.01 %价值e 的湿度。总的当前偏移量用来显示百分之多少更新值的每一天，总从最后一组更改。</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>210</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>请有从传感器  
- 湿度传感器从执行 get 值选择适当的值</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>211</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>请先把当前天气值</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>212</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>请输入一个值调整因素</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>213</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>错误</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>214</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>请输入 0 到 1 之间的值 %</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>215</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>请输入有效的调整数如。1 %窝uld 是 0.01</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>216</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>请获取和设置当前的天气数据</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>217</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>请从传感器设置的值</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>220</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>状态 ︰ 正在更新数据...</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>222</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>请输入一个有效的数字 ︰</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>223</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>输入国家/地区名称 ！</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>224</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>请输入城市名称 ！</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>225</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>输入 ZIP 编号</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>241</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>成功插入的值 ！</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>176</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>请输入一个有效的邮编号码</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>198</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>该设置已保存。 
-</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>199</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>语言变化将生效满下次启动该程序。</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>200</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>选择语言</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>202</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>成功 ！</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>15</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>취소</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>26</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>모두 선택</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>143</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>레이블</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>145</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>원본</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>90</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>옵션</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>111</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>도움말</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>204</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>아니오</LanguageText>
-    <Status>7</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>13</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>확인</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>175</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>확인</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>230</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>예</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>17</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>습도의 변화에의 응용: 효과</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>23</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>그래프에 플롯</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>20</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>임시 대 습도</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>18</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>온도 (섭씨)-&gt;</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>22</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>° C</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>19</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>습도 (%에서)</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>24</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>기록 데이터 플롯</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>25</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>시간 및 날짜 선택</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>129</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>위치 선택</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>53</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>보낸 사람:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>52</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>받는 사람:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>51</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>시간을 선택 합니다.</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>127</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>데이터 내보내기</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>135</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>추출</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>130</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>날짜</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>131</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>형식</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>136</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>건물 위치 선택</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>126</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>열 지도</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>139</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>차트 옵션</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>140</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>날짜 선택 </LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>137</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>지도 인쇄</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>138</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>이미지로 저장</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>141</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>노드 정보</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>142</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>설정된 노드</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>144</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>이름</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>150</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>출처: </LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>149</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>이름: </LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>148</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>레이블: </LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>147</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>보기: </LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>146</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>색: </LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>128</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>프로세스 다이어그램</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>160</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>색:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>161</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>색상을 선택 하려면 클릭 하십시오</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>168</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>측정</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>169</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>명령</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>151</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>노드 삽입</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>166</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>Y 축 (습도 비율):</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>167</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>X-axis(DBT):</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>156</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>레이블:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>154</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>이름:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>163</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>설정된 데이터</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>164</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>값 설정을 클릭 합니다</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>158</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>보기:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>152</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>출처:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>159</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>어떤 정보 보기를 선택</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>162</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>선택 된 색상</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>157</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>레이블 입력</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>155</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>이름 입력 (예. 야외 엔 탈피)</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>153</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>소스를 입력 (예. openweathermaps.org)</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>203</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>심리 계산기</LanguageText>
-    <Status>2</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>77</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>계산</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>58</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>계산</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>66</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>혼합된 가스 비율:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>74</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>상대 습도:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>73</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>대기압:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>72</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>포인트 온도 때문:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>69</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>테네시:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>68</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>채도에서 물의 부분 압력:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>67</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>물 분자 wt의 분자 질량.:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>62</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>단위</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>64</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>정도 C</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>54</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>심리 측정 차트</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>56</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>그래프 새로 고침</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>78</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>다른 매개 변수 값</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>88</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>습도 챔버 교정</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>86</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>DBT:</LanguageText>
-    <Status>7</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>85</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>Sp. H:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>84</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>RH:</LanguageText>
-    <Status>7</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>83</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>DP는:</LanguageText>
-    <Status>7</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>82</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>H:</LanguageText>
-    <Status>7</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>81</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>X-코드:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>80</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>Y-코드:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>89</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>실시간으로 플롯</LanguageText>
-    <Status>7</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>87</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>날씨 서비스</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>205</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>로그 파일 보기</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>94</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>새 위치 삽입</LanguageText>
-    <Status>7</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>97</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>지금 업데이트</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>105</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>[서비스 있도록 틱]</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>92</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>건물 위치</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>96</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>야외 센서</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>102</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>원격 날씨 역 서비스</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>119</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>날씨 역</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>112</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>현재 날씨</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>107</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>습도 자기 교정</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>10</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>국가:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>100</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>습도:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>99</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>패널 ID</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>98</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>값</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>125</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>위치:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>124</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>건물에서 거리:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>123</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>마지막 업데이트:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>101</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>온도:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>12</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>상태:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>118</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>기압계:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>117</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>deg입니다. C</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>115</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>바람:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>114</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>방향:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>106</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>활성화:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>110</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>하루 최대 조정:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>4</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>도시:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>207</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>상태: 없음</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>109</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>현재 오프셋된 %:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>113</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>m/초</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>93</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>위치를 선택 합니다.</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>104</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>역 이름:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>103</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>역 거리:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>108</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>사이 (0-1%)</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>16</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>거리:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>14</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>미터</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>206</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>연결 오류 문제? </LanguageText>
-    <Status>7</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>7</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>우편 번호:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>1</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>경도:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>8</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>위도:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>95</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>Elev:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>5</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>데이터 삽입</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>6</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>해발 고도:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>9</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>= 프로그램 가득</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>11</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>= 필수 입력</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>173</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>다음 번에...</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>174</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>기본 언어를 사용 하 여</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>171</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>선택한 언어를 사용 하 여</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>172</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>이 폼을 다시 표시</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>177</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>학위 섭씨에 유효한 refrence 온도 값을 입력</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>178</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>%에 유효한 refrence 습도 값을 입력</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>179</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>학위 섭씨에 입력된 boxex에 유효한 온도 값을 입력</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>180</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>성공</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>185</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>습도 (%에서)</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>187</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>시간 값 필터링 후 =  
-</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>186</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>유효한 날짜를 입력, '에서' 섹션에서 선택 하는 날짜 'To' 섹션에서 그 보다 작아야 한다</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>188</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>하나 이상의 시간을 선택 하십시오 첫 번째</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>189</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>건물 정보</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>236</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>Excel 파일을 저장</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>237</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>유효한 날짜를 선택 하십시오 (에 &gt;에서)</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>193</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>경로 파일 이름 선택</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>191</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>파일 저장 됩니다. </LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>190</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>빌딩 정보:,</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>192</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>국가, 국가, 도시, 거리, zip, 경도, 위도, elecation,</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>195</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>역 정보:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>194</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>위치, 건물, 마지막 업데이트 날짜, 온도, 습도, 압력, 바람 방향, 바에서 거리 역 이름,</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>196</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>기록 데이터</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>197</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>날짜, 시간, 분, 온도, 습도,</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>240</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>올바른 날짜 형식을 선택 하십시오 [에서 &lt; 하]</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>239</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>최종 성공!</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>238</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>데이터가 데이터베이스에서 발견!</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>235</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText> 차트 이미지 저장 됩니다. </LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>201</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>오른쪽 클릭 새 노드를 삽입 합니다. 단일 클릭 하 여 선택 원하는 항목을 이동 하 고 그것을 넣어 하 고 다시 클릭을 가리키면 거기 해결 됩니다. X 축 일정 확인 하려면 지속적으로 Alt 키를 클릭 하 여 노드 이동 노드가 이동 책략. 만약 y 축 지속적인 이동 하는 동안 Shift 키를 누르면 계속 이동 하 게 하려는. 선택한 색상에 따라 다른 색상 노드를 삽입할 수 있습니다.</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>234</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>차트에서 적절 한 영역을 선택 하십시오</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>232</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>종료 오류               </LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>233</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>                인터넷 가능</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>231</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>시간 상태 시간 오류 상태</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>229</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>오류 감지               </LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>228</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>                인터넷 연결 손실:</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>227</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>먼저 역을 선택 하십시오.</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>209</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>먼저 다음 단계를 수행 하시기 바랍니다. 
- 1. 선택 위치  
- 2. 풀 데이터  
- 3 건물을 저장. 지리적 가치 (우리는 지리적 값 필요)</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>218</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>위치를 먼저 선택 하세요!</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>219</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>오류</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>226</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>당기...</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>221</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>선택 하십시오 역 먼저 데이터.</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>208</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>이 섹션에서는 하루 최대 조정 요소를 선택합니다. 값은 이탈 하는 경우 0.01 최대 조정 factore의 값을 설정할 수 있습니다 그리고 그것은 0.01 % 가치e에 의하여 습도 조정 합니다. 총 현재 오프셋 얼마나 % 값은 매일 업데이트 표시를 사용 하 고 마지막 세트에서 전체 변경.</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>210</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>센서  
- 습도 센서에서 수행 get 값에서에서 선택한 적절 한 값을가지고 하시기 바랍니다</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>211</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>먼저 현재 날씨 값을 당겨 주세요</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>212</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>조정 계수에 대 한 값을 입력 해 주시기 바랍니다</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>213</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>오류</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>214</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>0-1 사이의 값을 입력 하십시오 %</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>215</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>예를 들어 유효한 조정 번호를 반드시 입력 하십시오. 1 %wo자민련 수 0.01</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>216</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>제발 고 현재 날씨 데이터 설정</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>217</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>센서에서 값을 설정 하십시오</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>220</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>상태: 데이터 업데이트...</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>222</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>유효한 숫자를 입력 하십시오. </LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>223</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>국가 이름을 입력!</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>224</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>도시 이름을 입력!</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>225</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>우편 번호 입력</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>241</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>성공적으로 삽입 값!</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>176</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>유효한 우편 번호를 입력 하십시오</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>198</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>설정이 저장 되었습니다. 
-</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>199</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>언어 변경 다음에 프로그램을 시작할 때 완전 한 효과 소요 됩니다.</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>200</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>언어 선택</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>202</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>성공!</LanguageText>
-    <Status>5</Status>
-  </GeneralTexts>
-  <GeneralTexts>
     <StringID>242</StringID>
     <LanguageID>1033</LanguageID>
     <LanguageText>Click to change color</LanguageText>
@@ -4703,95 +2678,9 @@
   </GeneralTexts>
   <GeneralTexts>
     <StringID>253</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>干湿球计算器</LanguageText>
-    <Status>7</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>253</StringID>
     <LanguageID>1033</LanguageID>
     <LanguageText>Psychometric Calculator</LanguageText>
     <Status>1</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>253</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>
-습공기 계산기</LanguageText>
-    <Status>2</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>250</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>退出</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>250</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>끝내기</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>243</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>文件</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>243</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>파일</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>244</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>심리 차트</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>248</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>打印</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>248</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>인쇄</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>249</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>另存为</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>249</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>다른 이름으로 저장</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>252</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>건물 이름 :</LanguageText>
-    <Status>3</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>244</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>
-焓湿图</LanguageText>
-    <Status>2</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>252</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>建筑名称</LanguageText>
-    <Status>2</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>254</StringID>
@@ -4826,124 +2715,27 @@ Enthalpy : </LanguageText>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>259</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>计算</LanguageText>
-    <Status>7</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>259</StringID>
     <LanguageID>1033</LanguageID>
     <LanguageText>Show Heat Map</LanguageText>
     <Status>1</Status>
   </GeneralTexts>
   <GeneralTexts>
-    <StringID>259</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>계산</LanguageText>
-    <Status>7</Status>
-  </GeneralTexts>
-  <GeneralTexts>
     <StringID>260</StringID>
     <LanguageID>1033</LanguageID>
-    <LanguageText>From :</LanguageText>
-    <Status>1</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>261</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>相对湿度 ︰</LanguageText>
-    <Status>7</Status>
+    <LanguageText>Temperature(DBT):</LanguageText>
+    <Status>6</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>261</StringID>
     <LanguageID>1033</LanguageID>
-    <LanguageText>To :</LanguageText>
-    <Status>1</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>261</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>상대 습도:</LanguageText>
-    <Status>7</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>262</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>站名 ︰</LanguageText>
-    <Status>7</Status>
+    <LanguageText>Relative Humidity:</LanguageText>
+    <Status>6</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>262</StringID>
     <LanguageID>1033</LanguageID>
     <LanguageText>Select station name :</LanguageText>
     <Status>1</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>262</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>역 이름:</LanguageText>
-    <Status>7</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>242</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>点击变色</LanguageText>
-    <Status>2</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>242</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>색상을 변경하려면 클릭</LanguageText>
-    <Status>2</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>55</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>
-차트 1</LanguageText>
-    <Status>2</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>75</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>온도 (DBT) :</LanguageText>
-    <Status>2</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>75</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>温度 (DBT) :</LanguageText>
-    <Status>2</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>65</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>焓 :</LanguageText>
-    <Status>2</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>260</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>从 :</LanguageText>
-    <Status>2</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>260</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>에서 :</LanguageText>
-    <Status>2</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>245</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>단위 (SI)</LanguageText>
-    <Status>2</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>245</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>单位(SI)</LanguageText>
-    <Status>2</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>263</StringID>
@@ -4964,36 +2756,10 @@ Enthalpy : </LanguageText>
     <Status>1</Status>
   </GeneralTexts>
   <GeneralTexts>
-    <StringID>265</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>
-습구 온도</LanguageText>
-    <Status>2</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>265</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>
-湿球温度</LanguageText>
-    <Status>2</Status>
-  </GeneralTexts>
-  <GeneralTexts>
     <StringID>266</StringID>
     <LanguageID>1033</LanguageID>
     <LanguageText>Enthalpy kj/kg dry air</LanguageText>
     <Status>1</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>266</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>焓千焦/千克干空气</LanguageText>
-    <Status>2</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>266</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>엔탈피 KJ / kg 건조 공기</LanguageText>
-    <Status>2</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>267</StringID>
@@ -5034,18 +2800,6 @@ Enthalpy : </LanguageText>
     <Status>1</Status>
   </GeneralTexts>
   <GeneralTexts>
-    <StringID>272</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>역사적 음모</LanguageText>
-    <Status>2</Status>
-  </GeneralTexts>
-  <GeneralTexts>
-    <StringID>272</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>历史情节</LanguageText>
-    <Status>2</Status>
-  </GeneralTexts>
-  <GeneralTexts>
     <StringID>273</StringID>
     <LanguageID>1033</LanguageID>
     <LanguageText>Node Grid View</LanguageText>
@@ -5064,34 +2818,1307 @@ Enthalpy : </LanguageText>
     <Status>1</Status>
   </GeneralTexts>
   <GeneralTexts>
-    <StringID>274</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>断开线</LanguageText>
-    <Status>2</Status>
+    <StringID>276</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Unit :</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>277</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>IP</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>278</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Real Time Mode</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>279</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Building Chart</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>280</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Simulation Mode</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>281</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Air Handler</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>282</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Node View</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>283</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Unit : SI</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>284</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Pressure</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>285</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>title</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>286</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Chose a device :</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>287</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Real Time</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>288</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Mode : </LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>289</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Inactive</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>290</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Web Status:</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>291</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>disconnected</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>292</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Device Status:</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>293</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Chart setting with building</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>294</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Number of chart  : </LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>295</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Show</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>296</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Settings</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>297</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Comfort Zone</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>298</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Delete Chart</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>299</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Building selected: </LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>300</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>dbName</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>301</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Edit node and  line</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>302</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>id</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>303</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>name</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>304</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Scan Hardware</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>305</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>inactive</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>306</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>comfort zone setting</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>307</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Comfort zone settings</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>308</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Type of comfort zone :</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>309</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>max :</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>310</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>min : </LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>311</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Humidity (in %) :</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>312</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Temperature(in deg C) :</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>313</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>More Option :</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>314</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Edit comfort zone settings</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>315</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Delete</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>316</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Update</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>317</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Add</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>318</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Plants</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>319</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Museum</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>320</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Gym</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>321</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Winter</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>322</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Summer</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>323</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Computer</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>324</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Hospital</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>325</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Data Center</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>326</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Class Room</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>327</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Edit Node Line</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>328</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Node ID</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>329</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Temperature</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>330</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Humidity</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>331</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Equivalent Enthalpy</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>332</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Show Text</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>333</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Color</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>334</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Node Size</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>335</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Edit Node : </LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>336</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Edit Process Line : </LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>337</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Line Name</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>338</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Start Node ID</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>339</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>End Node ID</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>340</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Thickness</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>341</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Save Edited Value</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>342</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Note : Node ID and Equivalent Enthalpy are non-editable other fields are editable</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>343</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Note : Line Name,Start Node ID and End Node ID are non-editable other fields are editable</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>344</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Output Variable</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>345</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Output Variables</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>346</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Delete Handler</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>347</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Number of handler : </LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>348</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Form_point_add</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>349</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>TrendLogForm</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>350</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>10 minutes</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>351</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>1  hour</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>352</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>1 day</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>353</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>1 month</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>354</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>1 year</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>355</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Time Duration</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>356</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Set Node Info</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>357</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Web</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>358</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Device</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>359</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Data Source : </LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>360</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Device Detail Info</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>361</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Select Parameter (any two)</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>362</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Enthalpy :</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>363</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Select a device :</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>364</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Plot new graph</LanguageText>
+    <Status>6</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>365</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Device Status:</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>366</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Show Heat Map</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>367</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Refresh Building</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>368</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Select station name :</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>369</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Clear Chart</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>370</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>H       :</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>371</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>DP     :</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>372</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>RH     :</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>373</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>DBT   :</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>374</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>From :</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>375</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>To :</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>376</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Scan For Devices</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>377</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Chose Item</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>17</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>应用：湿度变化的影响。</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>23</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>情节上图</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>15</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>取消</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>20</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>温度湿度VS</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>18</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>温度（℃） - &gt;</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>22</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>摄氏度</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>21</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>％</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>19</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>湿度（单位：％）</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>293</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>图表设置与建设</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>304</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>硬件扫描</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>301</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>编辑节点和线路</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>298</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>删除表</LanguageText>
+    <Status>5</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>274</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>분리 라인</LanguageText>
-    <Status>2</Status>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>断开连接线</LanguageText>
+    <Status>5</Status>
   </GeneralTexts>
   <GeneralTexts>
-    <StringID>258</StringID>
-    <LanguageID>1042</LanguageID>
-    <LanguageText>안전 지대 를 표시</LanguageText>
-    <Status>2</Status>
+    <StringID>295</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>显示</LanguageText>
+    <Status>5</Status>
   </GeneralTexts>
   <GeneralTexts>
-    <StringID>258</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>显示安乐窝</LanguageText>
-    <Status>2</Status>
+    <StringID>302</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>ID</LanguageText>
+    <Status>5</Status>
   </GeneralTexts>
   <GeneralTexts>
-    <StringID>273</StringID>
-    <LanguageID>4</LanguageID>
-    <LanguageText>节点网格视图</LanguageText>
-    <Status>2</Status>
+    <StringID>151</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>插入节点</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>299</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>大厦选择：</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>294</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>图表的数量：</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>365</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>设备状态：</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>287</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>即时的</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>290</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>Web状态：</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>288</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>模式：</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>300</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>DBNAME</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>291</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>断开的</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>284</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>压力</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>278</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>实时模式</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>283</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>单位：SI</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>305</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>待用</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>303</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>名称</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>296</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>设置</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>297</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>舒适区</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>306</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>舒适区设置</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>317</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>加</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>315</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>删除</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>13</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>好</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>316</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>更新</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>318</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>植物</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>319</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>博物馆</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>320</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>健身房</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>321</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>冬季</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>322</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>夏季</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>323</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>电脑</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>324</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>醫院</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>325</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>数据中心</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>326</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>教室</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>307</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>舒适区设置</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>314</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>编辑舒适区设置</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>312</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>温度（℃）：</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>309</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>最大：</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>310</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>分：</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>311</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>湿度（单位：％）：</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>154</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>名称 ：</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>160</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>颜色：</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>308</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>舒适区类型：</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>313</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>更多选项：</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>327</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>编辑节点线</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>341</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>保存编辑的值</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>333</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>颜色</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>339</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>结束节点ID</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>331</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>等效热</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>330</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>湿度</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>143</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>标签</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>335</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>编辑节点：</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>336</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>编辑流程线：</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>342</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>注：节点ID和等效热不可编辑等领域是可编辑的</LanguageText>
+    <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>17</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>습도의 변화에의 응용: 효과</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>23</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>그래프에 플롯</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>15</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>취소</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>20</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>임시 대 습도</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>18</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>온도 (섭씨)-&gt;</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>22</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>° C</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>19</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>습도 (%에서)</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>55</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>
+차트 1</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>295</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>표시</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>151</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>노드 삽입</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>303</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>이름</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>315</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>지우기</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>13</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>확인</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>154</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>이름:</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>160</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>색:</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>143</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>레이블</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>144</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>이름</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>145</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>원본</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>24</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>기록 데이터 플롯</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>26</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>모두 선택</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>25</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>시간 및 날짜 선택</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>53</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>보낸 사람:</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>52</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>받는 사람:</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>51</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>시간을 선택 합니다.</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>127</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>데이터 내보내기</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>135</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>추출</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>130</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>날짜</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>131</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>형식</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>126</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>열 지도</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>139</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>차트 옵션</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>140</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>날짜 선택 </LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>137</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>지도 인쇄</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>138</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>이미지로 저장</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>141</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>노드 정보</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>142</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>설정된 노드</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>150</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>출처: </LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>149</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>이름: </LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>148</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>레이블: </LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>147</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>보기: </LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>146</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>색: </LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>242</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>색상을 변경하려면 클릭</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>128</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>프로세스 다이어그램</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>161</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>색상을 선택 하려면 클릭 하십시오</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>168</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>측정</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>169</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>명령</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>166</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>Y 축 (습도 비율):</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>167</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>X-axis(DBT):</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>156</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>레이블:</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>163</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>설정된 데이터</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>164</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>값 설정을 클릭 합니다</LanguageText>
+    <Status>3</Status>
   </GeneralTexts>
   <Properties>
     <Component>Form4_insert_data.cs</Component>
@@ -6095,7 +5122,7 @@ Enthalpy : </LanguageText>
   <Properties>
     <Component>Form3.cs</Component>
     <Name>button1.Text</Name>
-    <StringID>94</StringID>
+    <StringID>367</StringID>
     <Selected>true</Selected>
     <ResourceName>button1.Text</ResourceName>
     <Hidden>false</Hidden>
@@ -6175,7 +5202,7 @@ Enthalpy : </LanguageText>
   <Properties>
     <Component>Form3.cs</Component>
     <Name>button4.Text</Name>
-    <StringID>97</StringID>
+    <StringID>376</StringID>
     <Selected>true</Selected>
     <ResourceName>button4.Text</ResourceName>
     <Hidden>false</Hidden>
@@ -6207,7 +5234,7 @@ Enthalpy : </LanguageText>
   <Properties>
     <Component>Form3.cs</Component>
     <Name>label11.Text</Name>
-    <StringID>99</StringID>
+    <StringID>377</StringID>
     <Selected>true</Selected>
     <ResourceName>label11.Text</ResourceName>
     <Hidden>false</Hidden>
@@ -6247,7 +5274,7 @@ Enthalpy : </LanguageText>
   <Properties>
     <Component>Form3.cs</Component>
     <Name>label36.Text</Name>
-    <StringID>262</StringID>
+    <StringID>368</StringID>
     <Selected>true</Selected>
     <ResourceName>label36.Text</ResourceName>
     <Hidden>false</Hidden>
@@ -6511,7 +5538,7 @@ Enthalpy : </LanguageText>
   <Properties>
     <Component>Form1_main.cs</Component>
     <Name>button1.Text</Name>
-    <StringID>56</StringID>
+    <StringID>369</StringID>
     <Selected>true</Selected>
     <ResourceName>button1.Text</ResourceName>
     <Hidden>false</Hidden>
@@ -6687,7 +5714,7 @@ Enthalpy : </LanguageText>
   <Properties>
     <Component>Form1_main.cs</Component>
     <Name>label2.Text</Name>
-    <StringID>261</StringID>
+    <StringID>375</StringID>
     <Selected>true</Selected>
     <ResourceName>label2.Text</ResourceName>
     <Hidden>false</Hidden>
@@ -6695,7 +5722,7 @@ Enthalpy : </LanguageText>
   <Properties>
     <Component>Form1_main.cs</Component>
     <Name>label1.Text</Name>
-    <StringID>260</StringID>
+    <StringID>374</StringID>
     <Selected>true</Selected>
     <ResourceName>label1.Text</ResourceName>
     <Hidden>false</Hidden>
@@ -6719,7 +5746,7 @@ Enthalpy : </LanguageText>
   <Properties>
     <Component>Form1_main.cs</Component>
     <Name>button2.Text</Name>
-    <StringID>259</StringID>
+    <StringID>366</StringID>
     <Selected>true</Selected>
     <ResourceName>button2.Text</ResourceName>
     <Hidden>false</Hidden>
@@ -6767,7 +5794,7 @@ Enthalpy : </LanguageText>
   <Properties>
     <Component>Form1_main.cs</Component>
     <Name>label26.Text</Name>
-    <StringID>82</StringID>
+    <StringID>370</StringID>
     <Selected>true</Selected>
     <ResourceName>label26.Text</ResourceName>
     <Hidden>false</Hidden>
@@ -6783,7 +5810,7 @@ Enthalpy : </LanguageText>
   <Properties>
     <Component>Form1_main.cs</Component>
     <Name>label25.Text</Name>
-    <StringID>83</StringID>
+    <StringID>371</StringID>
     <Selected>true</Selected>
     <ResourceName>label25.Text</ResourceName>
     <Hidden>false</Hidden>
@@ -6799,7 +5826,7 @@ Enthalpy : </LanguageText>
   <Properties>
     <Component>Form1_main.cs</Component>
     <Name>label24.Text</Name>
-    <StringID>84</StringID>
+    <StringID>372</StringID>
     <Selected>true</Selected>
     <ResourceName>label24.Text</ResourceName>
     <Hidden>false</Hidden>
@@ -6831,7 +5858,7 @@ Enthalpy : </LanguageText>
   <Properties>
     <Component>Form1_main.cs</Component>
     <Name>label21.Text</Name>
-    <StringID>86</StringID>
+    <StringID>373</StringID>
     <Selected>true</Selected>
     <ResourceName>label21.Text</ResourceName>
     <Hidden>false</Hidden>
@@ -7458,86 +6485,6 @@ Enthalpy : </LanguageText>
     <StringID>176</StringID>
     <Selected>true</Selected>
     <ResourceName>Please_enter_a_valid_zip_numbe</ResourceName>
-    <Hidden>false</Hidden>
-  </Properties>
-  <Properties>
-    <Component>Resources.resx</Component>
-    <Name>Enter_a_valid_refrence_tempera</Name>
-    <StringID>177</StringID>
-    <Selected>true</Selected>
-    <ResourceName>Enter_a_valid_refrence_tempera</ResourceName>
-    <Hidden>false</Hidden>
-  </Properties>
-  <Properties>
-    <Component>Resources.resx</Component>
-    <Name>Enter_a_valid_refrence_humidit</Name>
-    <StringID>178</StringID>
-    <Selected>true</Selected>
-    <ResourceName>Enter_a_valid_refrence_humidit</ResourceName>
-    <Hidden>false</Hidden>
-  </Properties>
-  <Properties>
-    <Component>Resources.resx</Component>
-    <Name>Enter_a_valid_temperature_valu</Name>
-    <StringID>179</StringID>
-    <Selected>true</Selected>
-    <ResourceName>Enter_a_valid_temperature_valu</ResourceName>
-    <Hidden>false</Hidden>
-  </Properties>
-  <Properties>
-    <Component>Resources.resx</Component>
-    <Name>success</Name>
-    <StringID>180</StringID>
-    <Selected>true</Selected>
-    <ResourceName>success</ResourceName>
-    <Hidden>false</Hidden>
-  </Properties>
-  <Properties>
-    <Component>Resources.resx</Component>
-    <Name>_10</Name>
-    <StringID>36</StringID>
-    <Selected>true</Selected>
-    <ResourceName>_10</ResourceName>
-    <Hidden>false</Hidden>
-  </Properties>
-  <Properties>
-    <Component>Resources.resx</Component>
-    <Name>_25</Name>
-    <StringID>181</StringID>
-    <Selected>true</Selected>
-    <ResourceName>_25</ResourceName>
-    <Hidden>false</Hidden>
-  </Properties>
-  <Properties>
-    <Component>Resources.resx</Component>
-    <Name>_40</Name>
-    <StringID>182</StringID>
-    <Selected>true</Selected>
-    <ResourceName>_40</ResourceName>
-    <Hidden>false</Hidden>
-  </Properties>
-  <Properties>
-    <Component>Resources.resx</Component>
-    <Name>_50</Name>
-    <StringID>183</StringID>
-    <Selected>true</Selected>
-    <ResourceName>_50</ResourceName>
-    <Hidden>false</Hidden>
-  </Properties>
-  <Properties>
-    <Component>Resources.resx</Component>
-    <Name>_75</Name>
-    <StringID>184</StringID>
-    <Selected>true</Selected>
-    <ResourceName>_75</ResourceName>
-    <Hidden>false</Hidden>
-  </Properties>
-  <Properties>
-    <Component>Resources.resx</Component>
-    <Name>Humidity_in</Name>
-    <StringID>185</StringID>
-    <Selected>true</Selected>
-    <ResourceName>Humidity_in</ResourceName>
     <Hidden>false</Hidden>
   </Properties>
   <Properties>
@@ -8820,6 +7767,1750 @@ Enthalpy : </LanguageText>
     <ResourceName>$this.Text</ResourceName>
     <Hidden>false</Hidden>
   </Properties>
+  <Properties>
+    <Component>DataGridViewDisplay.cs</Component>
+    <Name>$this.Text</Name>
+    <StringID>275</StringID>
+    <Selected>true</Selected>
+    <ResourceName>$this.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_Psychrometric_Calculator.cs</Component>
+    <Name>label12.Text</Name>
+    <StringID>276</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label12.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_Psychrometric_Calculator.cs</Component>
+    <Name>radioButton1.Text</Name>
+    <StringID>57</StringID>
+    <Selected>true</Selected>
+    <ResourceName>radioButton1.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_Psychrometric_Calculator.cs</Component>
+    <Name>radioButton2.Text</Name>
+    <StringID>277</StringID>
+    <Selected>true</Selected>
+    <ResourceName>radioButton2.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>realTimeMode.Text</Name>
+    <StringID>278</StringID>
+    <Selected>true</Selected>
+    <ResourceName>realTimeMode.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>buildingChartToolStripMenuItem1.Text</Name>
+    <StringID>279</StringID>
+    <Selected>true</Selected>
+    <ResourceName>buildingChartToolStripMenuItem1.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>weatherServicesToolStripMenuItem1.Text</Name>
+    <StringID>87</StringID>
+    <Selected>true</Selected>
+    <ResourceName>weatherServicesToolStripMenuItem1.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>simulationMode.Text</Name>
+    <StringID>280</StringID>
+    <Selected>true</Selected>
+    <ResourceName>simulationMode.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>psychometricCalculatorToolStripMenuItem.Text</Name>
+    <StringID>253</StringID>
+    <Selected>true</Selected>
+    <ResourceName>psychometricCalculatorToolStripMenuItem.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>airHandlerToolStripMenuItem1.Text</Name>
+    <StringID>281</StringID>
+    <Selected>true</Selected>
+    <ResourceName>airHandlerToolStripMenuItem1.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>exportDataToolStripMenuItem1.Text</Name>
+    <StringID>127</StringID>
+    <Selected>true</Selected>
+    <ResourceName>exportDataToolStripMenuItem1.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>historyPlotToolStripMenuItem.Text</Name>
+    <StringID>89</StringID>
+    <Selected>true</Selected>
+    <ResourceName>historyPlotToolStripMenuItem.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>nodeViewToolStripMenuItem.Text</Name>
+    <StringID>282</StringID>
+    <Selected>true</Selected>
+    <ResourceName>nodeViewToolStripMenuItem.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>lb_unit_chosen_display.Text</Name>
+    <StringID>283</StringID>
+    <Selected>true</Selected>
+    <ResourceName>lb_unit_chosen_display.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>lb_pressure_display.Text</Name>
+    <StringID>284</StringID>
+    <Selected>true</Selected>
+    <ResourceName>lb_pressure_display.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>lb_title_display.Text</Name>
+    <StringID>285</StringID>
+    <Selected>true</Selected>
+    <ResourceName>lb_title_display.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>lb_simulation_mode_display.Text</Name>
+    <StringID>280</StringID>
+    <Selected>true</Selected>
+    <ResourceName>lb_simulation_mode_display.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form3.cs</Component>
+    <Name>lb_chose_a_device.Text</Name>
+    <StringID>286</StringID>
+    <Selected>true</Selected>
+    <ResourceName>lb_chose_a_device.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form3.cs</Component>
+    <Name>lb_real_time.Text</Name>
+    <StringID>287</StringID>
+    <Selected>true</Selected>
+    <ResourceName>lb_real_time.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form3.cs</Component>
+    <Name>lb_mode.Text</Name>
+    <StringID>288</StringID>
+    <Selected>true</Selected>
+    <ResourceName>lb_mode.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form3.cs</Component>
+    <Name>lb_web_status.Text</Name>
+    <StringID>289</StringID>
+    <Selected>true</Selected>
+    <ResourceName>lb_web_status.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form3.cs</Component>
+    <Name>label43.Text</Name>
+    <StringID>290</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label43.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form3.cs</Component>
+    <Name>lb_device_status.Text</Name>
+    <StringID>291</StringID>
+    <Selected>true</Selected>
+    <ResourceName>lb_device_status.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form3.cs</Component>
+    <Name>label44.Text</Name>
+    <StringID>292</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label44.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>buildingChartSetting.Text</Name>
+    <StringID>293</StringID>
+    <Selected>true</Selected>
+    <ResourceName>$this.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>lb_numberOfHandler.Text</Name>
+    <StringID>165</StringID>
+    <Selected>true</Selected>
+    <ResourceName>lb_numberOfHandler.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>label2.Text</Name>
+    <StringID>294</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label2.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>chart1.Text</Name>
+    <StringID>55</StringID>
+    <Selected>true</Selected>
+    <ResourceName>chart1.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>insertNodeToolStripMenuItem.Text</Name>
+    <StringID>151</StringID>
+    <Selected>true</Selected>
+    <ResourceName>insertNodeToolStripMenuItem.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>disconnectLineToolStripMenuItem.Text</Name>
+    <StringID>274</StringID>
+    <Selected>true</Selected>
+    <ResourceName>disconnectLineToolStripMenuItem.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>enableToolStripMenuItem.Text</Name>
+    <StringID>295</StringID>
+    <Selected>true</Selected>
+    <ResourceName>enableToolStripMenuItem.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>settingsToolStripMenuItem.Text</Name>
+    <StringID>296</StringID>
+    <Selected>true</Selected>
+    <ResourceName>settingsToolStripMenuItem.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>showComfortZoneToolStripMenuItem.Text</Name>
+    <StringID>297</StringID>
+    <Selected>true</Selected>
+    <ResourceName>showComfortZoneToolStripMenuItem.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>deleteHandlerToolStripMenuItem.Text</Name>
+    <StringID>298</StringID>
+    <Selected>true</Selected>
+    <ResourceName>deleteHandlerToolStripMenuItem.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>label1.Text</Name>
+    <StringID>299</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label1.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>lb_db_name.Text</Name>
+    <StringID>300</StringID>
+    <Selected>true</Selected>
+    <ResourceName>lb_db_name.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>button1.Text</Name>
+    <StringID>301</StringID>
+    <Selected>true</Selected>
+    <ResourceName>button1.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>id.HeaderText</Name>
+    <StringID>302</StringID>
+    <Selected>true</Selected>
+    <ResourceName>id.HeaderText</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>name.HeaderText</Name>
+    <StringID>303</StringID>
+    <Selected>true</Selected>
+    <ResourceName>name.HeaderText</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>btn_pull_data.Text</Name>
+    <StringID>304</StringID>
+    <Selected>true</Selected>
+    <ResourceName>btn_pull_data.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>label4.Text</Name>
+    <StringID>287</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label4.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>label6.Text</Name>
+    <StringID>288</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label6.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>lb_web_status.Text</Name>
+    <StringID>305</StringID>
+    <Selected>true</Selected>
+    <ResourceName>lb_web_status.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>label5.Text</Name>
+    <StringID>290</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label5.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>lb_device_status.Text</Name>
+    <StringID>291</StringID>
+    <Selected>true</Selected>
+    <ResourceName>lb_device_status.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>label3.Text</Name>
+    <StringID>365</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label3.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>lb_pressure_display.Text</Name>
+    <StringID>284</StringID>
+    <Selected>true</Selected>
+    <ResourceName>lb_pressure_display.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>lb_unit_chosen_display.Text</Name>
+    <StringID>283</StringID>
+    <Selected>true</Selected>
+    <ResourceName>lb_unit_chosen_display.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>lb_simulation_mode_display.Text</Name>
+    <StringID>278</StringID>
+    <Selected>true</Selected>
+    <ResourceName>lb_simulation_mode_display.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>comfort_zone.Text</Name>
+    <StringID>306</StringID>
+    <Selected>true</Selected>
+    <ResourceName>$this.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>groupBox1.Text</Name>
+    <StringID>307</StringID>
+    <Selected>true</Selected>
+    <ResourceName>groupBox1.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>label7.Text</Name>
+    <StringID>308</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label7.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>textBox4.Text</Name>
+    <StringID>165</StringID>
+    <Selected>true</Selected>
+    <ResourceName>textBox4.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>textBox4.Lines[0]</Name>
+    <StringID>165</StringID>
+    <Selected>true</Selected>
+    <ResourceName>textBox4.Lines[0]</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>textBox3.Text</Name>
+    <StringID>165</StringID>
+    <Selected>true</Selected>
+    <ResourceName>textBox3.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>textBox3.Lines[0]</Name>
+    <StringID>165</StringID>
+    <Selected>true</Selected>
+    <ResourceName>textBox3.Lines[0]</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>textBox2.Text</Name>
+    <StringID>165</StringID>
+    <Selected>true</Selected>
+    <ResourceName>textBox2.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>textBox2.Lines[0]</Name>
+    <StringID>165</StringID>
+    <Selected>true</Selected>
+    <ResourceName>textBox2.Lines[0]</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>textBox1.Text</Name>
+    <StringID>165</StringID>
+    <Selected>true</Selected>
+    <ResourceName>textBox1.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>textBox1.Lines[0]</Name>
+    <StringID>165</StringID>
+    <Selected>true</Selected>
+    <ResourceName>textBox1.Lines[0]</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>label4.Text</Name>
+    <StringID>309</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label4.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>label5.Text</Name>
+    <StringID>310</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label5.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>label6.Text</Name>
+    <StringID>311</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label6.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>label3.Text</Name>
+    <StringID>309</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label3.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>label2.Text</Name>
+    <StringID>310</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label2.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>label1.Text</Name>
+    <StringID>312</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label1.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>btn_ok.Text</Name>
+    <StringID>13</StringID>
+    <Selected>true</Selected>
+    <ResourceName>btn_ok.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>button2.Text</Name>
+    <StringID>15</StringID>
+    <Selected>true</Selected>
+    <ResourceName>button2.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>label8.Text</Name>
+    <StringID>313</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label8.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>groupBox2.Text</Name>
+    <StringID>314</StringID>
+    <Selected>true</Selected>
+    <ResourceName>groupBox2.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>label17.Text</Name>
+    <StringID>160</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label17.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>label16.Text</Name>
+    <StringID>154</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label16.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>btn_delete.Text</Name>
+    <StringID>315</StringID>
+    <Selected>true</Selected>
+    <ResourceName>btn_delete.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>btn_update.Text</Name>
+    <StringID>316</StringID>
+    <Selected>true</Selected>
+    <ResourceName>btn_update.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>btn_add.Text</Name>
+    <StringID>317</StringID>
+    <Selected>true</Selected>
+    <ResourceName>btn_add.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>comboBox2.Items[0]</Name>
+    <StringID>318</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox2.Items</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>comboBox2.Items[1]</Name>
+    <StringID>319</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox2.Items1</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>comboBox2.Items[2]</Name>
+    <StringID>320</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox2.Items2</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>comboBox2.Items[3]</Name>
+    <StringID>321</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox2.Items3</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>comboBox2.Items[4]</Name>
+    <StringID>322</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox2.Items4</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>comboBox2.Items[5]</Name>
+    <StringID>323</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox2.Items5</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>comboBox2.Items[6]</Name>
+    <StringID>324</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox2.Items6</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>comboBox2.Items[7]</Name>
+    <StringID>325</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox2.Items7</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>comboBox2.Items[8]</Name>
+    <StringID>326</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox2.Items8</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>label9.Text</Name>
+    <StringID>308</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label9.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>tb_maxhum.Text</Name>
+    <StringID>165</StringID>
+    <Selected>true</Selected>
+    <ResourceName>tb_maxhum.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>tb_maxhum.Lines[0]</Name>
+    <StringID>165</StringID>
+    <Selected>true</Selected>
+    <ResourceName>tb_maxhum.Lines[0]</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>tb_minhum.Text</Name>
+    <StringID>165</StringID>
+    <Selected>true</Selected>
+    <ResourceName>tb_minhum.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>tb_minhum.Lines[0]</Name>
+    <StringID>165</StringID>
+    <Selected>true</Selected>
+    <ResourceName>tb_minhum.Lines[0]</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>tb_maxtemp.Text</Name>
+    <StringID>165</StringID>
+    <Selected>true</Selected>
+    <ResourceName>tb_maxtemp.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>tb_maxtemp.Lines[0]</Name>
+    <StringID>165</StringID>
+    <Selected>true</Selected>
+    <ResourceName>tb_maxtemp.Lines[0]</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>tb_mintemp.Text</Name>
+    <StringID>165</StringID>
+    <Selected>true</Selected>
+    <ResourceName>tb_mintemp.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>tb_mintemp.Lines[0]</Name>
+    <StringID>165</StringID>
+    <Selected>true</Selected>
+    <ResourceName>tb_mintemp.Lines[0]</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>label10.Text</Name>
+    <StringID>309</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label10.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>label11.Text</Name>
+    <StringID>310</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label11.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>label12.Text</Name>
+    <StringID>311</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label12.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>label13.Text</Name>
+    <StringID>309</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label13.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>label14.Text</Name>
+    <StringID>310</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label14.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>label15.Text</Name>
+    <StringID>312</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label15.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>EditNodeLineForm.Text</Name>
+    <StringID>327</StringID>
+    <Selected>true</Selected>
+    <ResourceName>$this.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>nodeID.HeaderText</Name>
+    <StringID>328</StringID>
+    <Selected>true</Selected>
+    <ResourceName>nodeID.HeaderText</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>temp.HeaderText</Name>
+    <StringID>329</StringID>
+    <Selected>true</Selected>
+    <ResourceName>temp.HeaderText</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>humidity.HeaderText</Name>
+    <StringID>330</StringID>
+    <Selected>true</Selected>
+    <ResourceName>humidity.HeaderText</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>equivalentEnthalpy.HeaderText</Name>
+    <StringID>331</StringID>
+    <Selected>true</Selected>
+    <ResourceName>equivalentEnthalpy.HeaderText</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>showText.Items[0]</Name>
+    <StringID>144</StringID>
+    <Selected>true</Selected>
+    <ResourceName>showText.Items</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>showText.Items[1]</Name>
+    <StringID>145</StringID>
+    <Selected>true</Selected>
+    <ResourceName>showText.Items1</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>showText.Items[2]</Name>
+    <StringID>143</StringID>
+    <Selected>true</Selected>
+    <ResourceName>showText.Items2</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>showText.HeaderText</Name>
+    <StringID>332</StringID>
+    <Selected>true</Selected>
+    <ResourceName>showText.HeaderText</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>name.HeaderText</Name>
+    <StringID>144</StringID>
+    <Selected>true</Selected>
+    <ResourceName>name.HeaderText</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>source.HeaderText</Name>
+    <StringID>145</StringID>
+    <Selected>true</Selected>
+    <ResourceName>source.HeaderText</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>label.HeaderText</Name>
+    <StringID>143</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label.HeaderText</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>color.HeaderText</Name>
+    <StringID>333</StringID>
+    <Selected>true</Selected>
+    <ResourceName>color.HeaderText</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>nodeSize.HeaderText</Name>
+    <StringID>334</StringID>
+    <Selected>true</Selected>
+    <ResourceName>nodeSize.HeaderText</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>label1.Text</Name>
+    <StringID>335</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label1.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>label2.Text</Name>
+    <StringID>336</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label2.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>lineName.HeaderText</Name>
+    <StringID>337</StringID>
+    <Selected>true</Selected>
+    <ResourceName>lineName.HeaderText</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>startNodeID.HeaderText</Name>
+    <StringID>338</StringID>
+    <Selected>true</Selected>
+    <ResourceName>startNodeID.HeaderText</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>endNodeID.HeaderText</Name>
+    <StringID>339</StringID>
+    <Selected>true</Selected>
+    <ResourceName>endNodeID.HeaderText</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>linecolor.HeaderText</Name>
+    <StringID>333</StringID>
+    <Selected>true</Selected>
+    <ResourceName>linecolor.HeaderText</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>thickness.HeaderText</Name>
+    <StringID>340</StringID>
+    <Selected>true</Selected>
+    <ResourceName>thickness.HeaderText</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>button1.Text</Name>
+    <StringID>341</StringID>
+    <Selected>true</Selected>
+    <ResourceName>button1.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>button2.Text</Name>
+    <StringID>15</StringID>
+    <Selected>true</Selected>
+    <ResourceName>button2.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>label3.Text</Name>
+    <StringID>342</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label3.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>label4.Text</Name>
+    <StringID>343</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label4.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_handler.cs</Component>
+    <Name>Form_handler.Text</Name>
+    <StringID>281</StringID>
+    <Selected>true</Selected>
+    <ResourceName>$this.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_handler.cs</Component>
+    <Name>id.HeaderText</Name>
+    <StringID>302</StringID>
+    <Selected>true</Selected>
+    <ResourceName>id.HeaderText</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_handler.cs</Component>
+    <Name>name.HeaderText</Name>
+    <StringID>303</StringID>
+    <Selected>true</Selected>
+    <ResourceName>name.HeaderText</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_handler.cs</Component>
+    <Name>chart1.Text</Name>
+    <StringID>55</StringID>
+    <Selected>true</Selected>
+    <ResourceName>chart1.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_handler.cs</Component>
+    <Name>id_output.HeaderText</Name>
+    <StringID>302</StringID>
+    <Selected>true</Selected>
+    <ResourceName>id_output.HeaderText</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_handler.cs</Component>
+    <Name>output_variable.HeaderText</Name>
+    <StringID>344</StringID>
+    <Selected>true</Selected>
+    <ResourceName>output_variable.HeaderText</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_handler.cs</Component>
+    <Name>label1.Text</Name>
+    <StringID>345</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label1.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_handler.cs</Component>
+    <Name>insertNodeToolStripMenuItem.Text</Name>
+    <StringID>151</StringID>
+    <Selected>true</Selected>
+    <ResourceName>insertNodeToolStripMenuItem.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_handler.cs</Component>
+    <Name>disconnectLineToolStripMenuItem.Text</Name>
+    <StringID>274</StringID>
+    <Selected>true</Selected>
+    <ResourceName>disconnectLineToolStripMenuItem.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_handler.cs</Component>
+    <Name>deleteHandlerToolStripMenuItem.Text</Name>
+    <StringID>346</StringID>
+    <Selected>true</Selected>
+    <ResourceName>deleteHandlerToolStripMenuItem.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_handler.cs</Component>
+    <Name>label2.Text</Name>
+    <StringID>347</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label2.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_handler.cs</Component>
+    <Name>lb_numberOfHandler.Text</Name>
+    <StringID>165</StringID>
+    <Selected>true</Selected>
+    <ResourceName>lb_numberOfHandler.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_handler.cs</Component>
+    <Name>lb_pressure_display.Text</Name>
+    <StringID>284</StringID>
+    <Selected>true</Selected>
+    <ResourceName>lb_pressure_display.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_handler.cs</Component>
+    <Name>lb_unit_chosen_display.Text</Name>
+    <StringID>283</StringID>
+    <Selected>true</Selected>
+    <ResourceName>lb_unit_chosen_display.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_handler.cs</Component>
+    <Name>lb_simulation_mode_display.Text</Name>
+    <StringID>280</StringID>
+    <Selected>true</Selected>
+    <ResourceName>lb_simulation_mode_display.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_point_add.cs</Component>
+    <Name>Form_point_add.Text</Name>
+    <StringID>348</StringID>
+    <Selected>true</Selected>
+    <ResourceName>$this.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_point_add.cs</Component>
+    <Name>label6.Text</Name>
+    <StringID>242</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label6.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_point_add.cs</Component>
+    <Name>btnSetNode.Text</Name>
+    <StringID>142</StringID>
+    <Selected>true</Selected>
+    <ResourceName>btnSetNode.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_point_add.cs</Component>
+    <Name>btnCancel.Text</Name>
+    <StringID>15</StringID>
+    <Selected>true</Selected>
+    <ResourceName>btnCancel.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_point_add.cs</Component>
+    <Name>comboBox1.Items[0]</Name>
+    <StringID>143</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox1.Items</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_point_add.cs</Component>
+    <Name>comboBox1.Items[1]</Name>
+    <StringID>144</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox1.Items1</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_point_add.cs</Component>
+    <Name>comboBox1.Items[2]</Name>
+    <StringID>145</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox1.Items2</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_point_add.cs</Component>
+    <Name>label5.Text</Name>
+    <StringID>146</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label5.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_point_add.cs</Component>
+    <Name>label4.Text</Name>
+    <StringID>147</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label4.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_point_add.cs</Component>
+    <Name>label3.Text</Name>
+    <StringID>148</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label3.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_point_add.cs</Component>
+    <Name>label2.Text</Name>
+    <StringID>149</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label2.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_point_add.cs</Component>
+    <Name>label1.Text</Name>
+    <StringID>150</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label1.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>GraphForTrendLog.cs</Component>
+    <Name>GraphForTrendLog.Text</Name>
+    <StringID>349</StringID>
+    <Selected>true</Selected>
+    <ResourceName>$this.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>GraphForTrendLog.cs</Component>
+    <Name>comboBox1.Items[0]</Name>
+    <StringID>350</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox1.Items</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>GraphForTrendLog.cs</Component>
+    <Name>comboBox1.Items[1]</Name>
+    <StringID>351</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox1.Items1</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>GraphForTrendLog.cs</Component>
+    <Name>comboBox1.Items[2]</Name>
+    <StringID>352</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox1.Items2</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>GraphForTrendLog.cs</Component>
+    <Name>comboBox1.Items[3]</Name>
+    <StringID>353</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox1.Items3</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>GraphForTrendLog.cs</Component>
+    <Name>comboBox1.Items[4]</Name>
+    <StringID>354</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox1.Items4</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>GraphForTrendLog.cs</Component>
+    <Name>label1.Text</Name>
+    <StringID>355</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label1.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>GraphForTrendLog.cs</Component>
+    <Name>chart1.Text</Name>
+    <StringID>55</StringID>
+    <Selected>true</Selected>
+    <ResourceName>chart1.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>InsertNodeFormForBuildingChartSetting.Text</Name>
+    <StringID>356</StringID>
+    <Selected>true</Selected>
+    <ResourceName>$this.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>label6.Text</Name>
+    <StringID>242</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label6.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>btnSetNode.Text</Name>
+    <StringID>142</StringID>
+    <Selected>true</Selected>
+    <ResourceName>btnSetNode.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>btnCancel.Text</Name>
+    <StringID>15</StringID>
+    <Selected>true</Selected>
+    <ResourceName>btnCancel.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>comboBox1.Items[0]</Name>
+    <StringID>143</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox1.Items</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>comboBox1.Items[1]</Name>
+    <StringID>144</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox1.Items1</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>comboBox1.Items[2]</Name>
+    <StringID>145</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox1.Items2</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>label5.Text</Name>
+    <StringID>146</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label5.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>label4.Text</Name>
+    <StringID>147</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label4.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>label3.Text</Name>
+    <StringID>148</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label3.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>label2.Text</Name>
+    <StringID>149</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label2.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>CB_Device_Web.Items[0]</Name>
+    <StringID>357</StringID>
+    <Selected>true</Selected>
+    <ResourceName>CB_Device_Web.Items</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>CB_Device_Web.Items[1]</Name>
+    <StringID>358</StringID>
+    <Selected>true</Selected>
+    <ResourceName>CB_Device_Web.Items1</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>label7.Text</Name>
+    <StringID>359</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label7.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>groupBox1.Text</Name>
+    <StringID>360</StringID>
+    <Selected>true</Selected>
+    <ResourceName>groupBox1.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>groupBox3.Text</Name>
+    <StringID>361</StringID>
+    <Selected>true</Selected>
+    <ResourceName>groupBox3.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>label11.Text</Name>
+    <StringID>362</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label11.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>label10.Text</Name>
+    <StringID>100</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label10.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>label9.Text</Name>
+    <StringID>101</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label9.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>label8.Text</Name>
+    <StringID>363</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label8.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>buildingChartSetting.cs</Component>
+    <Name>$this.Text</Name>
+    <StringID>293</StringID>
+    <Selected>true</Selected>
+    <ResourceName>$this.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>comboBox2.Items</Name>
+    <StringID>318</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox2.Items</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>comboBox2.Items1</Name>
+    <StringID>319</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox2.Items1</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>comboBox2.Items2</Name>
+    <StringID>320</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox2.Items2</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>comboBox2.Items3</Name>
+    <StringID>321</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox2.Items3</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>comboBox2.Items4</Name>
+    <StringID>322</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox2.Items4</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>comboBox2.Items5</Name>
+    <StringID>323</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox2.Items5</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>comboBox2.Items6</Name>
+    <StringID>324</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox2.Items6</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>comboBox2.Items7</Name>
+    <StringID>325</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox2.Items7</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>comboBox2.Items8</Name>
+    <StringID>326</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox2.Items8</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>comfort_zone.cs</Component>
+    <Name>$this.Text</Name>
+    <StringID>306</StringID>
+    <Selected>true</Selected>
+    <ResourceName>$this.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>EditNodeLineForm.cs</Component>
+    <Name>$this.Text</Name>
+    <StringID>327</StringID>
+    <Selected>true</Selected>
+    <ResourceName>$this.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_handler.cs</Component>
+    <Name>$this.Text</Name>
+    <StringID>281</StringID>
+    <Selected>true</Selected>
+    <ResourceName>$this.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_point_add.cs</Component>
+    <Name>comboBox1.Items</Name>
+    <StringID>143</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox1.Items</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_point_add.cs</Component>
+    <Name>comboBox1.Items1</Name>
+    <StringID>144</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox1.Items1</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_point_add.cs</Component>
+    <Name>comboBox1.Items2</Name>
+    <StringID>145</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox1.Items2</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_point_add.cs</Component>
+    <Name>$this.Text</Name>
+    <StringID>348</StringID>
+    <Selected>true</Selected>
+    <ResourceName>$this.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>GraphForTrendLog.cs</Component>
+    <Name>comboBox1.Items</Name>
+    <StringID>350</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox1.Items</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>GraphForTrendLog.cs</Component>
+    <Name>comboBox1.Items1</Name>
+    <StringID>351</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox1.Items1</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>GraphForTrendLog.cs</Component>
+    <Name>comboBox1.Items2</Name>
+    <StringID>352</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox1.Items2</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>GraphForTrendLog.cs</Component>
+    <Name>comboBox1.Items3</Name>
+    <StringID>353</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox1.Items3</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>GraphForTrendLog.cs</Component>
+    <Name>comboBox1.Items4</Name>
+    <StringID>354</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox1.Items4</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>GraphForTrendLog.cs</Component>
+    <Name>$this.Text</Name>
+    <StringID>349</StringID>
+    <Selected>true</Selected>
+    <ResourceName>$this.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>comboBox1.Items</Name>
+    <StringID>143</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox1.Items</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>comboBox1.Items1</Name>
+    <StringID>144</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox1.Items1</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>comboBox1.Items2</Name>
+    <StringID>145</StringID>
+    <Selected>true</Selected>
+    <ResourceName>comboBox1.Items2</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>CB_Device_Web.Items</Name>
+    <StringID>357</StringID>
+    <Selected>true</Selected>
+    <ResourceName>CB_Device_Web.Items</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>CB_Device_Web.Items1</Name>
+    <StringID>358</StringID>
+    <Selected>true</Selected>
+    <ResourceName>CB_Device_Web.Items1</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>InsertNodeFormForBuildingChartSetting.cs</Component>
+    <Name>$this.Text</Name>
+    <StringID>356</StringID>
+    <Selected>true</Selected>
+    <ResourceName>$this.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Resources.resx</Component>
+    <Name>_10</Name>
+    <StringID>36</StringID>
+    <Selected>true</Selected>
+    <ResourceName>_10</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Resources.resx</Component>
+    <Name>_25</Name>
+    <StringID>181</StringID>
+    <Selected>true</Selected>
+    <ResourceName>_25</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Resources.resx</Component>
+    <Name>_40</Name>
+    <StringID>182</StringID>
+    <Selected>true</Selected>
+    <ResourceName>_40</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Resources.resx</Component>
+    <Name>_50</Name>
+    <StringID>183</StringID>
+    <Selected>true</Selected>
+    <ResourceName>_50</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Resources.resx</Component>
+    <Name>_75</Name>
+    <StringID>184</StringID>
+    <Selected>true</Selected>
+    <ResourceName>_75</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Resources.resx</Component>
+    <Name>Enter_a_valid_refrence_humidit</Name>
+    <StringID>178</StringID>
+    <Selected>true</Selected>
+    <ResourceName>Enter_a_valid_refrence_humidit</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Resources.resx</Component>
+    <Name>Enter_a_valid_refrence_tempera</Name>
+    <StringID>177</StringID>
+    <Selected>true</Selected>
+    <ResourceName>Enter_a_valid_refrence_tempera</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Resources.resx</Component>
+    <Name>Enter_a_valid_temperature_valu</Name>
+    <StringID>179</StringID>
+    <Selected>true</Selected>
+    <ResourceName>Enter_a_valid_temperature_valu</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Resources.resx</Component>
+    <Name>Humidity_in</Name>
+    <StringID>185</StringID>
+    <Selected>true</Selected>
+    <ResourceName>Humidity_in</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Resources.resx</Component>
+    <Name>success</Name>
+    <StringID>180</StringID>
+    <Selected>true</Selected>
+    <ResourceName>success</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
   <GeneralAttributes>
     <Name>XmlDatabaseVersion</Name>
     <TextValue>1</TextValue>
@@ -8827,7 +9518,7 @@ Enthalpy : </LanguageText>
   </GeneralAttributes>
   <GeneralAttributes>
     <Name>StatusHash</Name>
-    <TextValue>oha0Gg228VmEHIV7fjvoBdblnf0=</TextValue>
+    <TextValue>VsCohMFeDqkZOQxLcYA9ydM/UjQ=</TextValue>
     <NumValue>0</NumValue>
   </GeneralAttributes>
   <GeneralAttributes>

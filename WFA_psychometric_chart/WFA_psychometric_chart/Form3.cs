@@ -191,51 +191,67 @@ namespace WFA_psychometric_chart
         {
             mainControllerList.Clear();
             string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string databaseFile = databasePath + @"\Database\Buildings\Default_Building\Default_Building.mdb";
+            //string databaseFile = databasePath + @"\Database\Buildings\Default_Building\Default_Building.mdb";
             //String connection = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source="+ databaseFile+ @";Persist Security Info=True ";
             //C:\Program Files (x86)\T3000\Database\Buildings\Default_Building
-            String connection = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Program Files (x86)\T3000\Database\Buildings\Default_Building\Default_Building.mdb;Persist Security Info=True ";
+
+            if (BuildingSelected.Count > 0)
+            {
+                //MessageBox.Show("Building infor not found");
+                //return null;
+            
+            string path = databasePath;  //@"C:\Folder1\Folder2\Folder3\Folder4";
+            string newPath = Path.GetFullPath(Path.Combine(path, @"..\"));
+            string againDbPath = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + newPath + "" + BuildingSelected[0].Building_Path;
+
+              //  MessageBox.Show("Path to building = " + againDbPath);
+
+           // String connection = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Program Files (x86)\T3000\Database\Buildings\Default_Building\Default_Building.mdb;Persist Security Info=True ";
 
             string sql = "select * from ALL_NODE  where  Parent_SerialNum = '0'";//This will only show parent controller and not sub devices
-            //  MessageBox.Show("Connection = " + connection);
-            //  MessageBox.Show("sql = " + sql);
-            //DataSet myDataSet = new DataSet();
-            //try
-            //{
-                using (OleDbConnection conn = new OleDbConnection(connection))
+                                                                                 //  MessageBox.Show("Connection = " + connection);
+                                                                                 //  MessageBox.Show("sql = " + sql);
+                                                                                 //DataSet myDataSet = new DataSet();
+                                                                                 //try
+                                                                                 //{
+            using (OleDbConnection conn = new OleDbConnection(againDbPath))
+            {
+                using (OleDbCommand cmd = new OleDbCommand(sql, conn))
                 {
-                    using (OleDbCommand cmd = new OleDbCommand(sql, conn))
+                    conn.Open();
+                    OleDbDataReader reader = cmd.ExecuteReader();
+                    while (reader.Read())
                     {
-                        conn.Open();
-                        OleDbDataReader reader = cmd.ExecuteReader();
-                        while (reader.Read())
+                        //dataCheckList.Add((bool)reader["Online_Status"]);
+                        //if true then add the device or list the main controller
+                        if ((bool)reader["Online_Status"])
                         {
-                            //dataCheckList.Add((bool)reader["Online_Status"]);
-                            //if true then add the device or list the main controller
-                            if ((bool)reader["Online_Status"])
+                            mainControllerList.Add(new dataTypeForControllerList
                             {
-                                mainControllerList.Add(new dataTypeForControllerList
-                                {
-                                    controllerName = reader["Product_Name"].ToString(), //This is product name
-                                    controllerInstanceId = int.Parse(reader["Object_Instance"].ToString()),
-                                    controllerStatus   =(bool)reader["Online_Status"]                                               
-                                });
-
-                            }
-
+                                controllerName = reader["Product_Name"].ToString(), //This is product name
+                                controllerInstanceId = int.Parse(reader["Object_Instance"].ToString()),
+                                controllerStatus = (bool)reader["Online_Status"]
+                            });
 
                         }
 
+
                     }
 
-                    //MessageBox.Show("Count"+myDataSet[0])
-                    //  MessageBox.Show("Count the value = " + dataCheckList.Count+" , value = "+dataCheckList[0]);
                 }
+
+                //MessageBox.Show("Count"+myDataSet[0])
+                //  MessageBox.Show("Count the value = " + dataCheckList.Count+" , value = "+dataCheckList[0]);
+            }
+        }
             //}
             //catch (Exception ex)
             //{
             //    MessageBox.Show(ex.Message);
             //}
+         
+        
+
             return mainControllerList;
         }
 
@@ -1441,7 +1457,7 @@ namespace WFA_psychometric_chart
                 if (CheckLatLongAvailable() != true)
                 {
                     FillLatLongValueAutomatically();//--Fill the lat long values...
-                    MessageBox.Show("show filllat");
+                 //   MessageBox.Show("show filllat");
                 }
 
               get_stored_data();//--This will get the selected data form the database...
@@ -1483,15 +1499,66 @@ namespace WFA_psychometric_chart
 
 
 
+                //lets calculate the path to the building database folder
+
                 //--Close of the setting things...
+                FindPathOfBuildingDB();
 
 
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
+          
 
         }
+
+
+        public class SelectedBuildingDatatype
+        {
+           public   string Main_BuildingName { get; set; }
+            public string Building_Name { get; set; }
+            public string Building_Path { get; set; }
+        }
+        List<SelectedBuildingDatatype> BuildingSelected = new List<SelectedBuildingDatatype>();
+
+        public void FindPathOfBuildingDB()
+        {
+            BuildingSelected.Clear();
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+           // string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+          //  string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            string path = databasePath;  //@"C:\Folder1\Folder2\Folder3\Folder4";
+            string newPath = Path.GetFullPath(Path.Combine(path, @"..\"));
+            string againDbPath = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + newPath + @"Database\T3000.mdb";
+           // MessageBox.Show("New path : " + againDbPath);
+            // bool returnValue = false;
+            //string latValue = "";
+            using (OleDbConnection connection = new OleDbConnection(againDbPath))
+            {
+                connection.Open();
+                OleDbDataReader reader = null;
+                string queryString = "SELECT * from Building WHERE Default_SubBuilding = -1 ";//-1 or True  can be used
+                OleDbCommand command = new OleDbCommand(queryString, connection);
+               
+                reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+
+                    BuildingSelected.Add(new SelectedBuildingDatatype
+                    {
+                      Main_BuildingName = reader["Main_BuildingName"].ToString(),
+                      Building_Name = reader["Building_Name"].ToString(),
+                      Building_Path  = reader["Building_Path"].ToString()
+                    });
+                }
+            }
+
+          //  MessageBox.Show("count = " + BuildingSelected.Count);
+        }
+
 
         //--This is for the checking weather lat and long value is available in database or not.
         public bool CheckLatLongAvailable()
@@ -2194,7 +2261,7 @@ namespace WFA_psychometric_chart
         {
             //timer2 = new System.Windows.Forms.Timer();
             timer2.Tick += new EventHandler(timer2_Tick);
-            timer2.Interval = 1000 * 3; // in miliseconds //2min * 30 = 60 min minute ie every 1 hour
+            timer2.Interval = 1000 * 86400;//now this is 1 day // in miliseconds //2min * 30 = 60 min minute ie every 1 hour
 
             if (sensor_hum < initialHumWeatherSensor + 1 && sensor_hum > initialHumWeatherSensor - 1)
             {
@@ -2445,47 +2512,66 @@ namespace WFA_psychometric_chart
             //Resetting
             dataCheckList.Clear();
             string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string databaseFile = databasePath + @"\Database\Buildings\Default_Building\Default_Building.mdb";
+         //   string databaseFile = databasePath + @"\Database\Buildings\Default_Building\Default_Building.mdb";
           //String connection = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source="+ databaseFile+ @";Persist Security Info=True ";
             //C:\Program Files (x86)\T3000\Database\Buildings\Default_Building
-            String connection = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Program Files (x86)\T3000\Database\Buildings\Default_Building\Default_Building.mdb;Persist Security Info=True ";
+         //String connection = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Program Files (x86)\T3000\Database\Buildings\Default_Building\Default_Building.mdb;Persist Security Info=True ";
 
             string sql = "select * from ALL_NODE  where Object_Instance = '"+deviceID+"' and Parent_SerialNum = '"+Parent_SerialNum+"'";
-          //  MessageBox.Show("Connection = " + connection);
-          //  MessageBox.Show("sql = " + sql);
+            //  MessageBox.Show("Connection = " + connection);
+            //  MessageBox.Show("sql = " + sql);
             //DataSet myDataSet = new DataSet();
-            try { 
-            using (OleDbConnection conn = new OleDbConnection(connection))
+            bool status = false;
+            if (BuildingSelected.Count > 0)
             {
-                using (OleDbCommand cmd = new OleDbCommand(sql, conn))
+                //MessageBox.Show("Building infor not found");
+                //return null;
+
+                /*
+                This path is dynamic path we calculated based on this 
+                <installed directory of T3000 (not psycho)>\... where ... = Database\..value returned by files
+                */
+                string path = databasePath;  //@"C:\Folder1\Folder2\Folder3\Folder4";
+                string newPath = Path.GetFullPath(Path.Combine(path, @"..\"));
+                string againDbPath = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + newPath + "" + BuildingSelected[0].Building_Path;
+
+               // MessageBox.Show("Path to building = " + againDbPath);
+
+
+                try
                 {
-                    conn.Open();                      
-                        OleDbDataReader reader = cmd.ExecuteReader();
-                        while (reader.Read())
+                    using (OleDbConnection conn = new OleDbConnection(againDbPath))
+                    {
+                        using (OleDbCommand cmd = new OleDbCommand(sql, conn))
                         {
-                            dataCheckList.Add((bool)reader["Online_Status"]);
+                            conn.Open();
+                            OleDbDataReader reader = cmd.ExecuteReader();
+                            while (reader.Read())
+                            {
+                                dataCheckList.Add((bool)reader["Online_Status"]);
+                            }
+
                         }
-     
+
+                        //MessageBox.Show("Count"+myDataSet[0])
+                        //  MessageBox.Show("Count the value = " + dataCheckList.Count+" , value = "+dataCheckList[0]);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+             
+                if (dataCheckList.Count > 0)
+                {
+                    if (dataCheckList[0] == true)
+                    {
+                        status = true;
+                    }
                 }
 
-                    //MessageBox.Show("Count"+myDataSet[0])
-                  //  MessageBox.Show("Count the value = " + dataCheckList.Count+" , value = "+dataCheckList[0]);
+                // MessageBox.Show( "datacheckcount= " + dataCheckList.Count + " Status = " + status);
             }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-            bool status = false;
-            if (dataCheckList.Count > 0) { 
-               if(dataCheckList[0]==true)
-            {
-                status = true;
-             }
-            }
-
-            // MessageBox.Show( "datacheckcount= " + dataCheckList.Count + " Status = " + status);
-
             return status;
         }
 
@@ -2525,7 +2611,7 @@ namespace WFA_psychometric_chart
               int  indexSelectedDevice = CB_Device.SelectedIndex;
                     int instanceId = copyOfMainControllerList[indexSelectedDevice].controllerInstanceId;  //(int)device_info[indexSelectedDevice].deviceInstance;//Device instance selected.
 
-                    MessageBox.Show("Instaneid = " + instanceId);
+                 //   MessageBox.Show("Instaneid = " + instanceId);
                 //===============For regulare update=============//
                 deviceInstanceValuTemp = instanceId;//This one is for regular update
                                                     //================end of for regular update=====//
@@ -2534,7 +2620,7 @@ namespace WFA_psychometric_chart
                     //Checking if the device is online or offline
                     if (CheckDeviceOnlineOffline(deviceInstanceValuTemp, 0) == true)
                     {
-                        MessageBox.Show("Checking online status become true");
+                      //  MessageBox.Show("Checking online status become true");
 
                         //return;
 
@@ -2544,7 +2630,7 @@ namespace WFA_psychometric_chart
                         db.ScanForDevice();
                         //db.ScanForParameters(24649);
                         db.ScanForParameters(instanceId);//This will return the parameters
-                        MessageBox.Show("Count = " + db.parameterListValue.Count);       //Now we can use the value strored int  the db.parameterList1
+                       // MessageBox.Show("Count = " + db.parameterListValue.Count);       //Now we can use the value strored int  the db.parameterList1
                         string s = "";
                         foreach (var bac in db.parameterListValue)
                         {
@@ -2555,11 +2641,11 @@ namespace WFA_psychometric_chart
                                 presentValue = bac.presentValue
 
                             });
-                            s += bac.device_object_name + "," + bac.presentValue + "\n";
+                          //  s += bac.device_object_name + "," + bac.presentValue + "\n";
                         }
                        
 
-                    MessageBox.Show("value = " + s);
+                  //  MessageBox.Show("value = " + s);
 
                     //Now that we have the parameter list lets display the list in the combobox...
                     // string s = "";
@@ -2628,18 +2714,18 @@ namespace WFA_psychometric_chart
             getDataFromParameter(deviceInstanceValuTemp);
   
 
-            if (lb_test.InvokeRequired)
-            {
-                // lb_test.Invoke(new Action(() => CB_Device.Items.Clear()));
-                // CB_Device.Text = ""; 
-                lb_test.Invoke(new Action(() => lb_test.Text = "Test = " + c++ + " param count" + parameterValFromBacnet.Count));
-            }
-            else
-            {     //if invoke is not requred the do normal way
-                  // CB_Device.Items.Clear();
-                  // CB_Device.Text = "";
-                lb_test.Text = "Test = " + c++ + " param count" + parameterValFromBacnet.Count;
-            }
+            //if (lb_test.InvokeRequired)
+            //{
+            //    // lb_test.Invoke(new Action(() => CB_Device.Items.Clear()));
+            //    // CB_Device.Text = ""; 
+            //    lb_test.Invoke(new Action(() => lb_test.Text = "Test = " + c++ + " param count" + parameterValFromBacnet.Count));
+            //}
+            //else
+            //{     //if invoke is not requred the do normal way
+            //      // CB_Device.Items.Clear();
+            //      // CB_Device.Text = "";
+            //    lb_test.Text = "Test = " + c++ + " param count" + parameterValFromBacnet.Count;
+            //}
 
 
 

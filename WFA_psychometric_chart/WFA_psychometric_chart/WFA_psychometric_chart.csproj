@@ -243,165 +243,182 @@
     <EmbeddedResource Include="Application_Form4.en-US.resx">
       <DependentUpon>Application_Form4.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Application_Form4.ko-KR.resx">
+    <EmbeddedResource Include="Application_Form4.ko.resx">
       <DependentUpon>Application_Form4.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Application_Form4.resx">
       <DependentUpon>Application_Form4.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Application_Form4.zh-CHS.resx">
+    <EmbeddedResource Include="Application_Form4.zh.resx">
       <DependentUpon>Application_Form4.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="buildingChartSetting.ko.resx">
+      <DependentUpon>buildingChartSetting.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="buildingChartSetting.resx">
       <DependentUpon>buildingChartSetting.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="buildingChartSetting.zh.resx">
+      <DependentUpon>buildingChartSetting.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="comfort_zone.ko.resx">
+      <DependentUpon>comfort_zone.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="comfort_zone.resx">
+      <DependentUpon>comfort_zone.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="comfort_zone.zh.resx">
       <DependentUpon>comfort_zone.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DataGridViewDisplay.resx">
       <DependentUpon>DataGridViewDisplay.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="EditNodeLineForm.ko.resx">
+      <DependentUpon>EditNodeLineForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="EditNodeLineForm.resx">
+      <DependentUpon>EditNodeLineForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditNodeLineForm.zh.resx">
       <DependentUpon>EditNodeLineForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form1_main.en-US.resx">
       <DependentUpon>Form1_main.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form1_main.ko-KR.resx">
+    <EmbeddedResource Include="Form1_main.ko.resx">
       <DependentUpon>Form1_main.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form1_main.resx">
       <DependentUpon>Form1_main.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form1_main.zh-CHS.resx">
+    <EmbeddedResource Include="Form1_main.zh.resx">
       <DependentUpon>Form1_main.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form3.en-US.resx">
       <DependentUpon>Form3.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form3.ko-KR.resx">
+    <EmbeddedResource Include="Form3.ko.resx">
       <DependentUpon>Form3.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form3.resx">
       <DependentUpon>Form3.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form3.zh-CHS.resx">
+    <EmbeddedResource Include="Form3.zh.resx">
       <DependentUpon>Form3.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form4_insert_data.en-US.resx">
       <DependentUpon>Form4_insert_data.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form4_insert_data.ko-KR.resx">
+    <EmbeddedResource Include="Form4_insert_data.ko.resx">
       <DependentUpon>Form4_insert_data.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form4_insert_data.resx">
       <DependentUpon>Form4_insert_data.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form4_insert_data.zh-CHS.resx">
+    <EmbeddedResource Include="Form4_insert_data.zh.resx">
       <DependentUpon>Form4_insert_data.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="form_app_timer.en-US.resx">
       <DependentUpon>form_app_timer.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="form_app_timer.ko-KR.resx">
+    <EmbeddedResource Include="form_app_timer.ko.resx">
       <DependentUpon>form_app_timer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="form_app_timer.resx">
       <DependentUpon>form_app_timer.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="form_app_timer.zh-CHS.resx">
-      <DependentUpon>form_app_timer.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="form_export_data.en-US.resx">
       <DependentUpon>form_export_data.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="form_export_data.ko-KR.resx">
+    <EmbeddedResource Include="form_export_data.ko.resx">
       <DependentUpon>form_export_data.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="form_export_data.resx">
       <DependentUpon>form_export_data.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="form_export_data.zh-CHS.resx">
-      <DependentUpon>form_export_data.cs</DependentUpon>
+    <EmbeddedResource Include="Form_handler.ko.resx">
+      <DependentUpon>Form_handler.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form_handler.resx">
+      <DependentUpon>Form_handler.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_handler.zh.resx">
       <DependentUpon>Form_handler.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="form_heat_map.en-US.resx">
       <DependentUpon>form_heat_map.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="form_heat_map.ko-KR.resx">
+    <EmbeddedResource Include="form_heat_map.ko.resx">
       <DependentUpon>form_heat_map.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="form_heat_map.resx">
       <DependentUpon>form_heat_map.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="form_heat_map.zh-CHS.resx">
-      <DependentUpon>form_heat_map.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Form_Input_For_Seriespoint.en-US.resx">
       <DependentUpon>Form_Input_For_Seriespoint.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form_Input_For_Seriespoint.ko-KR.resx">
+    <EmbeddedResource Include="Form_Input_For_Seriespoint.ko.resx">
       <DependentUpon>Form_Input_For_Seriespoint.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form_Input_For_Seriespoint.resx">
       <DependentUpon>Form_Input_For_Seriespoint.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form_Input_For_Seriespoint.zh-CHS.resx">
+    <EmbeddedResource Include="Form_Input_For_Seriespoint.zh.resx">
       <DependentUpon>Form_Input_For_Seriespoint.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Form_point_add.ko.resx">
+      <DependentUpon>Form_point_add.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form_point_add.resx">
+      <DependentUpon>Form_point_add.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_point_add.zh.resx">
       <DependentUpon>Form_point_add.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="form_process_diagram.en-US.resx">
       <DependentUpon>form_process_diagram.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="form_process_diagram.ko-KR.resx">
+    <EmbeddedResource Include="form_process_diagram.ko.resx">
       <DependentUpon>form_process_diagram.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="form_process_diagram.resx">
       <DependentUpon>form_process_diagram.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="form_process_diagram.zh-CHS.resx">
+    <EmbeddedResource Include="form_process_diagram.zh.resx">
       <DependentUpon>form_process_diagram.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Form_Psychrometric_Calculator.ko-KR.resx">
-      <DependentUpon>Form_Psychrometric_Calculator.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form_Psychrometric_Calculator.resx">
       <DependentUpon>Form_Psychrometric_Calculator.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form_Psychrometric_Calculator.zh-CHS.resx">
+    <EmbeddedResource Include="Form_Psychrometric_Calculator.zh.resx">
       <DependentUpon>Form_Psychrometric_Calculator.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="GraphForTrendLog.ko.resx">
+      <DependentUpon>GraphForTrendLog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InsertNodeFormForBuildingChartSetting.ko.resx">
+      <DependentUpon>InsertNodeFormForBuildingChartSetting.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="InsertNodeFormForBuildingChartSetting.resx">
+      <DependentUpon>InsertNodeFormForBuildingChartSetting.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InsertNodeFormForBuildingChartSetting.zh.resx">
       <DependentUpon>InsertNodeFormForBuildingChartSetting.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.en-US.resx">
       <DependentUpon>Resources.resx</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.ko-KR.resx">
+    <EmbeddedResource Include="Properties\Resources.ko.resx">
       <DependentUpon>Resources.resx</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.zh-CHS.resx">
-      <DependentUpon>Resources.resx</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SelectLanguage.en-US.resx">
       <DependentUpon>SelectLanguage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="SelectLanguage.ko-KR.resx">
-      <DependentUpon>SelectLanguage.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="SelectLanguage.resx">
-      <DependentUpon>SelectLanguage.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="SelectLanguage.zh-CHS.resx">
       <DependentUpon>SelectLanguage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GraphForTrendLog.resx">

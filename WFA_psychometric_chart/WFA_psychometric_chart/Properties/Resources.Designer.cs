@@ -22,7 +22,7 @@ namespace WFA_psychometric_chart.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace WFA_psychometric_chart.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("WFA_psychometric_chart.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace WFA_psychometric_chart.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to 10.
         /// </summary>
-        internal static string _10 {
+        public static string _10 {
             get {
                 return ResourceManager.GetString("_10", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to 25.
         /// </summary>
-        internal static string _25 {
+        public static string _25 {
             get {
                 return ResourceManager.GetString("_25", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to 40.
         /// </summary>
-        internal static string _40 {
+        public static string _40 {
             get {
                 return ResourceManager.GetString("_40", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to 50.
         /// </summary>
-        internal static string _50 {
+        public static string _50 {
             get {
                 return ResourceManager.GetString("_50", resourceCulture);
             }
@@ -99,7 +99,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to 75.
         /// </summary>
-        internal static string _75 {
+        public static string _75 {
             get {
                 return ResourceManager.GetString("_75", resourceCulture);
             }
@@ -109,7 +109,7 @@ namespace WFA_psychometric_chart.Properties {
         ///   Looks up a localized string similar to 
         ///Enthalpy : .
         /// </summary>
-        internal static string _Enthalpy {
+        public static string _Enthalpy {
             get {
                 return ResourceManager.GetString("_Enthalpy", resourceCulture);
             }
@@ -118,7 +118,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to                 Internet Connection Available.
         /// </summary>
-        internal static string _Internet_Connection_Available {
+        public static string _Internet_Connection_Available {
             get {
                 return ResourceManager.GetString("_Internet_Connection_Available", resourceCulture);
             }
@@ -127,7 +127,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to                 Internet Connection Lost:.
         /// </summary>
-        internal static string _Internet_Connection_Lost {
+        public static string _Internet_Connection_Lost {
             get {
                 return ResourceManager.GetString("_Internet_Connection_Lost", resourceCulture);
             }
@@ -137,7 +137,7 @@ namespace WFA_psychometric_chart.Properties {
         ///   Looks up a localized string similar to 
         /// Please make sure you are connected to internet!.
         /// </summary>
-        internal static string _Please_make_sure_you_are_conn {
+        public static string _Please_make_sure_you_are_conn {
             get {
                 return ResourceManager.GetString("_Please_make_sure_you_are_conn", resourceCulture);
             }
@@ -147,7 +147,7 @@ namespace WFA_psychometric_chart.Properties {
         ///   Looks up a localized string similar to                  start             end 
         ///.
         /// </summary>
-        internal static string _start_end {
+        public static string _start_end {
             get {
                 return ResourceManager.GetString("_start_end", resourceCulture);
             }
@@ -156,7 +156,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to  Your chart image will be saved as .
         /// </summary>
-        internal static string _Your_chart_image_will_be_save {
+        public static string _Your_chart_image_will_be_save {
             get {
                 return ResourceManager.GetString("_Your_chart_image_will_be_save", resourceCulture);
             }
@@ -166,7 +166,7 @@ namespace WFA_psychometric_chart.Properties {
         ///   Looks up a localized string similar to after filtering the values of hour = 
         ///.
         /// </summary>
-        internal static string after_filtering_the_values_of_ {
+        public static string after_filtering_the_values_of_ {
             get {
                 return ResourceManager.GetString("after_filtering_the_values_of_", resourceCulture);
             }
@@ -175,7 +175,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Building Information.
         /// </summary>
-        internal static string Building_Information {
+        public static string Building_Information {
             get {
                 return ResourceManager.GetString("Building_Information", resourceCulture);
             }
@@ -184,7 +184,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Building Information :,.
         /// </summary>
-        internal static string Building_Information0 {
+        public static string Building_Information0 {
             get {
                 return ResourceManager.GetString("Building_Information0", resourceCulture);
             }
@@ -193,7 +193,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Chose a path and file name.
         /// </summary>
-        internal static string Chose_a_path_and_file_name {
+        public static string Chose_a_path_and_file_name {
             get {
                 return ResourceManager.GetString("Chose_a_path_and_file_name", resourceCulture);
             }
@@ -202,7 +202,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to country,state,city,street,zip,longitude,latitude,elecation,.
         /// </summary>
-        internal static string country_state_city_street_zip_ {
+        public static string country_state_city_street_zip_ {
             get {
                 return ResourceManager.GetString("country_state_city_street_zip_", resourceCulture);
             }
@@ -211,7 +211,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap d_arrow {
+        public static System.Drawing.Bitmap d_arrow {
             get {
                 object obj = ResourceManager.GetObject("d_arrow", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -221,7 +221,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to date,hour,minute,temperature,humidity,.
         /// </summary>
-        internal static string date_hour_minute_temperature_h {
+        public static string date_hour_minute_temperature_h {
             get {
                 return ResourceManager.GetString("date_hour_minute_temperature_h", resourceCulture);
             }
@@ -230,7 +230,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to db insertion : success !.
         /// </summary>
-        internal static string db_insertion_success {
+        public static string db_insertion_success {
             get {
                 return ResourceManager.GetString("db_insertion_success", resourceCulture);
             }
@@ -239,7 +239,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Enter a valid refrence humidity value in %.
         /// </summary>
-        internal static string Enter_a_valid_refrence_humidit {
+        public static string Enter_a_valid_refrence_humidit {
             get {
                 return ResourceManager.GetString("Enter_a_valid_refrence_humidit", resourceCulture);
             }
@@ -248,7 +248,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Enter a valid refrence temperature value in degree celcius.
         /// </summary>
-        internal static string Enter_a_valid_refrence_tempera {
+        public static string Enter_a_valid_refrence_tempera {
             get {
                 return ResourceManager.GetString("Enter_a_valid_refrence_tempera", resourceCulture);
             }
@@ -257,7 +257,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Enter a valid temperature value in the input boxex in degree celcius.
         /// </summary>
-        internal static string Enter_a_valid_temperature_valu {
+        public static string Enter_a_valid_temperature_valu {
             get {
                 return ResourceManager.GetString("Enter_a_valid_temperature_valu", resourceCulture);
             }
@@ -266,7 +266,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Enter city name!.
         /// </summary>
-        internal static string Enter_city_name {
+        public static string Enter_city_name {
             get {
                 return ResourceManager.GetString("Enter_city_name", resourceCulture);
             }
@@ -275,7 +275,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Enter country name!.
         /// </summary>
-        internal static string Enter_country_name {
+        public static string Enter_country_name {
             get {
                 return ResourceManager.GetString("Enter_country_name", resourceCulture);
             }
@@ -284,7 +284,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to enter ZIP number.
         /// </summary>
-        internal static string enter_ZIP_number {
+        public static string enter_ZIP_number {
             get {
                 return ResourceManager.GetString("enter_ZIP_number", resourceCulture);
             }
@@ -293,7 +293,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Enthalpy kj/kg dry air.
         /// </summary>
-        internal static string Enthalpy_kj_kg_dry_air {
+        public static string Enthalpy_kj_kg_dry_air {
             get {
                 return ResourceManager.GetString("Enthalpy_kj_kg_dry_air", resourceCulture);
             }
@@ -302,7 +302,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
-        internal static string Error {
+        public static string Error {
             get {
                 return ResourceManager.GetString("Error", resourceCulture);
             }
@@ -311,7 +311,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Error Detected               .
         /// </summary>
-        internal static string Error_Detected {
+        public static string Error_Detected {
             get {
                 return ResourceManager.GetString("Error_Detected", resourceCulture);
             }
@@ -320,7 +320,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Error Ended               .
         /// </summary>
-        internal static string Error_Ended {
+        public static string Error_Ended {
             get {
                 return ResourceManager.GetString("Error_Ended", resourceCulture);
             }
@@ -329,7 +329,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to error.
         /// </summary>
-        internal static string error0 {
+        public static string error0 {
             get {
                 return ResourceManager.GetString("error0", resourceCulture);
             }
@@ -338,7 +338,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to From :.
         /// </summary>
-        internal static string From {
+        public static string From {
             get {
                 return ResourceManager.GetString("From", resourceCulture);
             }
@@ -347,7 +347,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Help.
         /// </summary>
-        internal static string Help {
+        public static string Help {
             get {
                 return ResourceManager.GetString("Help", resourceCulture);
             }
@@ -356,7 +356,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Historical Data,.
         /// </summary>
-        internal static string Historical_Data {
+        public static string Historical_Data {
             get {
                 return ResourceManager.GetString("Historical_Data", resourceCulture);
             }
@@ -365,7 +365,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Historical Plot.
         /// </summary>
-        internal static string Historical_Plot {
+        public static string Historical_Plot {
             get {
                 return ResourceManager.GetString("Historical_Plot", resourceCulture);
             }
@@ -374,7 +374,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Humidity(in %).
         /// </summary>
-        internal static string Humidity_in {
+        public static string Humidity_in {
             get {
                 return ResourceManager.GetString("Humidity_in", resourceCulture);
             }
@@ -383,7 +383,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to In this section you select the maximum adjustment factor per day.If the value is deviated you could set the value of max adjustment factore as 0.01 and it will adjust your humidity as  per the 0.01% value. The total current offset is used to show by how much percent the value is updated every day and the total changed from last set..
         /// </summary>
-        internal static string In_this_section_you_select_the {
+        public static string In_this_section_you_select_the {
             get {
                 return ResourceManager.GetString("In_this_section_you_select_the", resourceCulture);
             }
@@ -392,7 +392,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to location,distance from building,last update date,temperature,humidity,bar pressure,wind,direction,station name,.
         /// </summary>
-        internal static string location_distance_from_buildin {
+        public static string location_distance_from_buildin {
             get {
                 return ResourceManager.GetString("location_distance_from_buildin", resourceCulture);
             }
@@ -401,7 +401,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to No data found in database !.
         /// </summary>
-        internal static string No_data_found_in_database {
+        public static string No_data_found_in_database {
             get {
                 return ResourceManager.GetString("No_data_found_in_database", resourceCulture);
             }
@@ -410,7 +410,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Please enter a valid adjustment number eg. 1% would be 0.01.
         /// </summary>
-        internal static string Please_enter_a_valid_adjustmen {
+        public static string Please_enter_a_valid_adjustmen {
             get {
                 return ResourceManager.GetString("Please_enter_a_valid_adjustmen", resourceCulture);
             }
@@ -419,7 +419,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Please enter a valid dates,Date chosen in &apos;From&apos; section should be smaller than that in &apos;To&apos; section.
         /// </summary>
-        internal static string Please_enter_a_valid_dates_Dat {
+        public static string Please_enter_a_valid_dates_Dat {
             get {
                 return ResourceManager.GetString("Please_enter_a_valid_dates_Dat", resourceCulture);
             }
@@ -428,7 +428,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Please enter a valid number : .
         /// </summary>
-        internal static string Please_enter_a_valid_number {
+        public static string Please_enter_a_valid_number {
             get {
                 return ResourceManager.GetString("Please_enter_a_valid_number", resourceCulture);
             }
@@ -437,7 +437,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Please enter a valid zip number.
         /// </summary>
-        internal static string Please_enter_a_valid_zip_numbe {
+        public static string Please_enter_a_valid_zip_numbe {
             get {
                 return ResourceManager.GetString("Please_enter_a_valid_zip_numbe", resourceCulture);
             }
@@ -446,7 +446,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Please enter a value for adjustment factor.
         /// </summary>
-        internal static string Please_enter_a_value_for_adjus {
+        public static string Please_enter_a_value_for_adjus {
             get {
                 return ResourceManager.GetString("Please_enter_a_value_for_adjus", resourceCulture);
             }
@@ -455,7 +455,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Please Enter proper pannel id field.
         /// </summary>
-        internal static string Please_Enter_proper_pannel_id_ {
+        public static string Please_Enter_proper_pannel_id_ {
             get {
                 return ResourceManager.GetString("Please_Enter_proper_pannel_id_", resourceCulture);
             }
@@ -464,7 +464,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Please enter value between 0-1%.
         /// </summary>
-        internal static string Please_enter_value_between_0_1 {
+        public static string Please_enter_value_between_0_1 {
             get {
                 return ResourceManager.GetString("Please_enter_value_between_0_1", resourceCulture);
             }
@@ -473,7 +473,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Please get and set the current weather data.
         /// </summary>
-        internal static string Please_get_and_set_the_current {
+        public static string Please_get_and_set_the_current {
             get {
                 return ResourceManager.GetString("Please_get_and_set_the_current", resourceCulture);
             }
@@ -483,7 +483,7 @@ namespace WFA_psychometric_chart.Properties {
         ///   Looks up a localized string similar to Please have a proper value selected from sensor 
         /// Perform get value for humidity from sensor.
         /// </summary>
-        internal static string Please_have_a_proper_value_sel {
+        public static string Please_have_a_proper_value_sel {
             get {
                 return ResourceManager.GetString("Please_have_a_proper_value_sel", resourceCulture);
             }
@@ -495,7 +495,7 @@ namespace WFA_psychometric_chart.Properties {
         /// 2.pull stored building data 
         /// 3. get geo value(we need geo value).
         /// </summary>
-        internal static string Please_perform_the_follwing_st {
+        public static string Please_perform_the_follwing_st {
             get {
                 return ResourceManager.GetString("Please_perform_the_follwing_st", resourceCulture);
             }
@@ -504,7 +504,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Please pull the current weather value first.
         /// </summary>
-        internal static string Please_pull_the_current_weathe {
+        public static string Please_pull_the_current_weathe {
             get {
                 return ResourceManager.GetString("Please_pull_the_current_weathe", resourceCulture);
             }
@@ -513,7 +513,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Please select a location .
         /// </summary>
-        internal static string Please_select_a_location {
+        public static string Please_select_a_location {
             get {
                 return ResourceManager.GetString("Please_select_a_location", resourceCulture);
             }
@@ -522,7 +522,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Please select a location first !.
         /// </summary>
-        internal static string Please_select_a_location_first {
+        public static string Please_select_a_location_first {
             get {
                 return ResourceManager.GetString("Please_select_a_location_first", resourceCulture);
             }
@@ -531,7 +531,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Please select a proper region in the chart.
         /// </summary>
-        internal static string Please_select_a_proper_region_ {
+        public static string Please_select_a_proper_region_ {
             get {
                 return ResourceManager.GetString("Please_select_a_proper_region_", resourceCulture);
             }
@@ -540,7 +540,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to please select a station first..
         /// </summary>
-        internal static string please_select_a_station_first {
+        public static string please_select_a_station_first {
             get {
                 return ResourceManager.GetString("please_select_a_station_first", resourceCulture);
             }
@@ -549,7 +549,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Please select a station first to pull data..
         /// </summary>
-        internal static string Please_select_a_station_first_ {
+        public static string Please_select_a_station_first_ {
             get {
                 return ResourceManager.GetString("Please_select_a_station_first_", resourceCulture);
             }
@@ -558,7 +558,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Please select a valid date (To&gt;From).
         /// </summary>
-        internal static string Please_select_a_valid_date_To_ {
+        public static string Please_select_a_valid_date_To_ {
             get {
                 return ResourceManager.GetString("Please_select_a_valid_date_To_", resourceCulture);
             }
@@ -567,7 +567,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Please select correct date format[From&lt;To].
         /// </summary>
-        internal static string Please_select_correct_date_for {
+        public static string Please_select_correct_date_for {
             get {
                 return ResourceManager.GetString("Please_select_correct_date_for", resourceCulture);
             }
@@ -576,7 +576,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Please Select one or more hours first.
         /// </summary>
-        internal static string Please_Select_one_or_more_hour {
+        public static string Please_Select_one_or_more_hour {
             get {
                 return ResourceManager.GetString("Please_Select_one_or_more_hour", resourceCulture);
             }
@@ -585,7 +585,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Please set the value from sensor.
         /// </summary>
-        internal static string Please_set_the_value_from_sens {
+        public static string Please_set_the_value_from_sens {
             get {
                 return ResourceManager.GetString("Please_set_the_value_from_sens", resourceCulture);
             }
@@ -594,7 +594,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to pulling....
         /// </summary>
-        internal static string pulling {
+        public static string pulling {
             get {
                 return ResourceManager.GetString("pulling", resourceCulture);
             }
@@ -603,7 +603,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Refresh Building.
         /// </summary>
-        internal static string Refresh_Building {
+        public static string Refresh_Building {
             get {
                 return ResourceManager.GetString("Refresh_Building", resourceCulture);
             }
@@ -612,7 +612,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Refresh Graph.
         /// </summary>
-        internal static string Refresh_Graph {
+        public static string Refresh_Graph {
             get {
                 return ResourceManager.GetString("Refresh_Graph", resourceCulture);
             }
@@ -621,7 +621,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Right click to insert a new node. single click to select the items you want to move and hover over where you want to put it and click again it will fix there. If you want to make x-axis constant wile moving the node move the node by constantly clicking the Alt key.If you want to make y-axis constant while moving keep pressing the Shift key and move. You can insert different color nodes based on the color selected..
         /// </summary>
-        internal static string Right_click_to_insert_a_new_no {
+        public static string Right_click_to_insert_a_new_no {
             get {
                 return ResourceManager.GetString("Right_click_to_insert_a_new_no", resourceCulture);
             }
@@ -630,7 +630,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Save Excel file to.
         /// </summary>
-        internal static string Save_Excel_file_to {
+        public static string Save_Excel_file_to {
             get {
                 return ResourceManager.GetString("Save_Excel_file_to", resourceCulture);
             }
@@ -639,7 +639,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Select language.
         /// </summary>
-        internal static string Select_language {
+        public static string Select_language {
             get {
                 return ResourceManager.GetString("Select_language", resourceCulture);
             }
@@ -648,7 +648,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Select station name :.
         /// </summary>
-        internal static string Select_station_name {
+        public static string Select_station_name {
             get {
                 return ResourceManager.GetString("Select_station_name", resourceCulture);
             }
@@ -657,7 +657,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Show Heat Map.
         /// </summary>
-        internal static string Show_Heat_Map {
+        public static string Show_Heat_Map {
             get {
                 return ResourceManager.GetString("Show_Heat_Map", resourceCulture);
             }
@@ -666,7 +666,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Station Information :.
         /// </summary>
-        internal static string Station_Information {
+        public static string Station_Information {
             get {
                 return ResourceManager.GetString("Station_Information", resourceCulture);
             }
@@ -675,7 +675,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Status : Updating data....
         /// </summary>
-        internal static string Status_Updating_data {
+        public static string Status_Updating_data {
             get {
                 return ResourceManager.GetString("Status_Updating_data", resourceCulture);
             }
@@ -684,7 +684,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to success.
         /// </summary>
-        internal static string success {
+        public static string success {
             get {
                 return ResourceManager.GetString("success", resourceCulture);
             }
@@ -693,7 +693,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Success final !.
         /// </summary>
-        internal static string Success_final {
+        public static string Success_final {
             get {
                 return ResourceManager.GetString("Success_final", resourceCulture);
             }
@@ -702,7 +702,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Success !.
         /// </summary>
-        internal static string Success0 {
+        public static string Success0 {
             get {
                 return ResourceManager.GetString("Success0", resourceCulture);
             }
@@ -711,7 +711,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to The language change will take full effect the next time you start the program..
         /// </summary>
-        internal static string The_language_change_will_take_ {
+        public static string The_language_change_will_take_ {
             get {
                 return ResourceManager.GetString("The_language_change_will_take_", resourceCulture);
             }
@@ -721,7 +721,7 @@ namespace WFA_psychometric_chart.Properties {
         ///   Looks up a localized string similar to The settings have been saved.
         ///.
         /// </summary>
-        internal static string The_settings_have_been_saved {
+        public static string The_settings_have_been_saved {
             get {
                 return ResourceManager.GetString("The_settings_have_been_saved", resourceCulture);
             }
@@ -730,7 +730,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Time Status                  Time                            Error Status.
         /// </summary>
-        internal static string Time_Status_Time_Error_Status {
+        public static string Time_Status_Time_Error_Status {
             get {
                 return ResourceManager.GetString("Time_Status_Time_Error_Status", resourceCulture);
             }
@@ -739,7 +739,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to To :.
         /// </summary>
-        internal static string To {
+        public static string To {
             get {
                 return ResourceManager.GetString("To", resourceCulture);
             }
@@ -748,7 +748,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap u_arrow {
+        public static System.Drawing.Bitmap u_arrow {
             get {
                 object obj = ResourceManager.GetObject("u_arrow", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -758,7 +758,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to value inserted successfully!.
         /// </summary>
-        internal static string value_inserted_successfully {
+        public static string value_inserted_successfully {
             get {
                 return ResourceManager.GetString("value_inserted_successfully", resourceCulture);
             }
@@ -767,7 +767,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Wet bulb temp.
         /// </summary>
-        internal static string Wet_bulb_temp {
+        public static string Wet_bulb_temp {
             get {
                 return ResourceManager.GetString("Wet_bulb_temp", resourceCulture);
             }
@@ -776,7 +776,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Yes.
         /// </summary>
-        internal static string Yes {
+        public static string Yes {
             get {
                 return ResourceManager.GetString("Yes", resourceCulture);
             }
@@ -785,7 +785,7 @@ namespace WFA_psychometric_chart.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Your file will be saved as .
         /// </summary>
-        internal static string Your_file_will_be_saved_as {
+        public static string Your_file_will_be_saved_as {
             get {
                 return ResourceManager.GetString("Your_file_will_be_saved_as", resourceCulture);
             }

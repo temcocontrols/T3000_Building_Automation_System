@@ -781,7 +781,7 @@
     <value>2</value>
   </data>
   <data name="CB_Device.Location" type="System.Drawing.Point, System.Drawing">
-    <value>97, 30</value>
+    <value>97, 31</value>
   </data>
   <data name="CB_Device.Size" type="System.Drawing.Size, System.Drawing">
     <value>153, 22</value>
@@ -2268,36 +2268,6 @@
   <data name="&gt;&gt;groupBox5.ZOrder" xml:space="preserve">
     <value>8</value>
   </data>
-  <data name="lb_test.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="lb_test.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="lb_test.Location" type="System.Drawing.Point, System.Drawing">
-    <value>484, 59</value>
-  </data>
-  <data name="lb_test.Size" type="System.Drawing.Size, System.Drawing">
-    <value>40, 14</value>
-  </data>
-  <data name="lb_test.TabIndex" type="System.Int32, mscorlib">
-    <value>25</value>
-  </data>
-  <data name="lb_test.Text" xml:space="preserve">
-    <value>tEST....</value>
-  </data>
-  <data name="&gt;&gt;lb_test.Name" xml:space="preserve">
-    <value>lb_test</value>
-  </data>
-  <data name="&gt;&gt;lb_test.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;lb_test.Parent" xml:space="preserve">
-    <value>groupBox4</value>
-  </data>
-  <data name="&gt;&gt;lb_test.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
   <data name="lbConnectionIssue.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -2329,7 +2299,7 @@
     <value>groupBox4</value>
   </data>
   <data name="&gt;&gt;lbConnectionIssue.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>0</value>
   </data>
   <data name="btnShowLogFile.Enabled" type="System.Boolean, mscorlib">
     <value>False</value>
@@ -2356,7 +2326,7 @@
     <value>groupBox4</value>
   </data>
   <data name="&gt;&gt;btnShowLogFile.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>1</value>
   </data>
   <data name="label41.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -2389,7 +2359,7 @@
     <value>groupBox4</value>
   </data>
   <data name="&gt;&gt;label41.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>2</value>
   </data>
   <data name="label30.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -2419,7 +2389,7 @@
     <value>groupBox4</value>
   </data>
   <data name="&gt;&gt;label30.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>3</value>
   </data>
   <data name="label17.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -2449,7 +2419,7 @@
     <value>groupBox4</value>
   </data>
   <data name="&gt;&gt;label17.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>4</value>
   </data>
   <data name="tb_last_updated.Enabled" type="System.Boolean, mscorlib">
     <value>False</value>
@@ -2476,7 +2446,7 @@
     <value>groupBox4</value>
   </data>
   <data name="&gt;&gt;tb_last_updated.ZOrder" xml:space="preserve">
-    <value>6</value>
+    <value>5</value>
   </data>
   <data name="tb_location.Enabled" type="System.Boolean, mscorlib">
     <value>False</value>
@@ -2503,7 +2473,7 @@
     <value>groupBox4</value>
   </data>
   <data name="&gt;&gt;tb_location.ZOrder" xml:space="preserve">
-    <value>7</value>
+    <value>6</value>
   </data>
   <data name="label15.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -2533,7 +2503,7 @@
     <value>groupBox4</value>
   </data>
   <data name="&gt;&gt;label15.ZOrder" xml:space="preserve">
-    <value>8</value>
+    <value>7</value>
   </data>
   <data name="groupBox4.Location" type="System.Drawing.Point, System.Drawing">
     <value>30, 55</value>

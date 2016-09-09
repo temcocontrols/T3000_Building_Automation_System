@@ -129,7 +129,7 @@
     <value>2, 3, 2, 3</value>
   </data>
   <data name="chart1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>967, 581</value>
+    <value>947, 581</value>
   </data>
   <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="chart1.TabIndex" type="System.Int32, mscorlib">
@@ -148,7 +148,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;chart1.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>8</value>
   </data>
   <data name="button1.Location" type="System.Drawing.Point, System.Drawing">
     <value>96, 283</value>
@@ -175,7 +175,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;button1.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>7</value>
   </data>
   <data name="&gt;&gt;label5_H_unit.Name" xml:space="preserve">
     <value>label5_H_unit</value>
@@ -397,7 +397,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;groupBox4.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>6</value>
   </data>
   <data name="label5_H_unit.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -943,7 +943,7 @@
     <value>0, 0</value>
   </data>
   <data name="menuStrip1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>1292, 24</value>
+    <value>1181, 24</value>
   </data>
   <data name="menuStrip1.TabIndex" type="System.Int32, mscorlib">
     <value>17</value>
@@ -961,7 +961,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;menuStrip1.ZOrder" xml:space="preserve">
-    <value>6</value>
+    <value>9</value>
   </data>
   <data name="fileToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>37, 20</value>
@@ -1041,6 +1041,90 @@
   <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>381, 16</value>
   </metadata>
+  <data name="&gt;&gt;dtp_From.Name" xml:space="preserve">
+    <value>dtp_From</value>
+  </data>
+  <data name="&gt;&gt;dtp_From.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DateTimePicker, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;dtp_From.Parent" xml:space="preserve">
+    <value>gb_select_date</value>
+  </data>
+  <data name="&gt;&gt;dtp_From.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;label1.Name" xml:space="preserve">
+    <value>label1</value>
+  </data>
+  <data name="&gt;&gt;label1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label1.Parent" xml:space="preserve">
+    <value>gb_select_date</value>
+  </data>
+  <data name="&gt;&gt;label1.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;dtp_To.Name" xml:space="preserve">
+    <value>dtp_To</value>
+  </data>
+  <data name="&gt;&gt;dtp_To.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DateTimePicker, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;dtp_To.Parent" xml:space="preserve">
+    <value>gb_select_date</value>
+  </data>
+  <data name="&gt;&gt;dtp_To.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="&gt;&gt;label2.Name" xml:space="preserve">
+    <value>label2</value>
+  </data>
+  <data name="&gt;&gt;label2.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label2.Parent" xml:space="preserve">
+    <value>gb_select_date</value>
+  </data>
+  <data name="&gt;&gt;label2.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="&gt;&gt;button2.Name" xml:space="preserve">
+    <value>button2</value>
+  </data>
+  <data name="&gt;&gt;button2.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;button2.Parent" xml:space="preserve">
+    <value>gb_select_date</value>
+  </data>
+  <data name="&gt;&gt;button2.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="gb_select_date.Location" type="System.Drawing.Point, System.Drawing">
+    <value>12, 312</value>
+  </data>
+  <data name="gb_select_date.Size" type="System.Drawing.Size, System.Drawing">
+    <value>198, 138</value>
+  </data>
+  <data name="gb_select_date.TabIndex" type="System.Int32, mscorlib">
+    <value>31</value>
+  </data>
+  <data name="gb_select_date.Text" xml:space="preserve">
+    <value>Heat Map</value>
+  </data>
+  <data name="&gt;&gt;gb_select_date.Name" xml:space="preserve">
+    <value>gb_select_date</value>
+  </data>
+  <data name="&gt;&gt;gb_select_date.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;gb_select_date.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;gb_select_date.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
   <data name="dtp_From.Location" type="System.Drawing.Point, System.Drawing">
     <value>63, 33</value>
   </data>
@@ -1170,55 +1254,133 @@
   <data name="&gt;&gt;button2.ZOrder" xml:space="preserve">
     <value>4</value>
   </data>
-  <data name="gb_select_date.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 312</value>
-  </data>
-  <data name="gb_select_date.Size" type="System.Drawing.Size, System.Drawing">
-    <value>198, 138</value>
-  </data>
-  <data name="gb_select_date.TabIndex" type="System.Int32, mscorlib">
-    <value>31</value>
-  </data>
-  <data name="gb_select_date.Text" xml:space="preserve">
-    <value>Heat Map</value>
-  </data>
-  <data name="&gt;&gt;gb_select_date.Name" xml:space="preserve">
-    <value>gb_select_date</value>
-  </data>
-  <data name="&gt;&gt;gb_select_date.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;gb_select_date.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;gb_select_date.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="lb_unit_chosen.AutoSize" type="System.Boolean, mscorlib">
+  <data name="lb_unit_chosen_display.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
-  <data name="lb_unit_chosen.Location" type="System.Drawing.Point, System.Drawing">
-    <value>1133, 9</value>
+  <data name="lb_unit_chosen_display.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Arial, 11.25pt, style=Bold</value>
   </data>
-  <data name="lb_unit_chosen.Size" type="System.Drawing.Size, System.Drawing">
-    <value>43, 14</value>
+  <data name="lb_unit_chosen_display.Location" type="System.Drawing.Point, System.Drawing">
+    <value>1084, 40</value>
   </data>
-  <data name="lb_unit_chosen.TabIndex" type="System.Int32, mscorlib">
+  <data name="lb_unit_chosen_display.Size" type="System.Drawing.Size, System.Drawing">
+    <value>63, 18</value>
+  </data>
+  <data name="lb_unit_chosen_display.TabIndex" type="System.Int32, mscorlib">
     <value>32</value>
   </data>
-  <data name="lb_unit_chosen.Text" xml:space="preserve">
+  <data name="lb_unit_chosen_display.Text" xml:space="preserve">
     <value>Unit : SI</value>
   </data>
-  <data name="&gt;&gt;lb_unit_chosen.Name" xml:space="preserve">
-    <value>lb_unit_chosen</value>
+  <data name="&gt;&gt;lb_unit_chosen_display.Name" xml:space="preserve">
+    <value>lb_unit_chosen_display</value>
   </data>
-  <data name="&gt;&gt;lb_unit_chosen.Type" xml:space="preserve">
+  <data name="&gt;&gt;lb_unit_chosen_display.Type" xml:space="preserve">
     <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;lb_unit_chosen.Parent" xml:space="preserve">
+  <data name="&gt;&gt;lb_unit_chosen_display.Parent" xml:space="preserve">
     <value>$this</value>
   </data>
-  <data name="&gt;&gt;lb_unit_chosen.ZOrder" xml:space="preserve">
+  <data name="&gt;&gt;lb_unit_chosen_display.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="lb_pressure_display.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="lb_pressure_display.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Arial, 11.25pt, style=Bold</value>
+  </data>
+  <data name="lb_pressure_display.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="lb_pressure_display.Location" type="System.Drawing.Point, System.Drawing">
+    <value>915, 40</value>
+  </data>
+  <data name="lb_pressure_display.Size" type="System.Drawing.Size, System.Drawing">
+    <value>73, 18</value>
+  </data>
+  <data name="lb_pressure_display.TabIndex" type="System.Int32, mscorlib">
+    <value>33</value>
+  </data>
+  <data name="lb_pressure_display.Text" xml:space="preserve">
+    <value>Pressure</value>
+  </data>
+  <data name="&gt;&gt;lb_pressure_display.Name" xml:space="preserve">
+    <value>lb_pressure_display</value>
+  </data>
+  <data name="&gt;&gt;lb_pressure_display.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lb_pressure_display.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;lb_pressure_display.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="lb_title_display.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="lb_title_display.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Arial, 14.25pt, style=Bold</value>
+  </data>
+  <data name="lb_title_display.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="lb_title_display.Location" type="System.Drawing.Point, System.Drawing">
+    <value>559, 40</value>
+  </data>
+  <data name="lb_title_display.Size" type="System.Drawing.Size, System.Drawing">
+    <value>43, 22</value>
+  </data>
+  <data name="lb_title_display.TabIndex" type="System.Int32, mscorlib">
+    <value>34</value>
+  </data>
+  <data name="lb_title_display.Text" xml:space="preserve">
+    <value>title</value>
+  </data>
+  <data name="&gt;&gt;lb_title_display.Name" xml:space="preserve">
+    <value>lb_title_display</value>
+  </data>
+  <data name="&gt;&gt;lb_title_display.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lb_title_display.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;lb_title_display.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="lb_simulation_mode_display.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="lb_simulation_mode_display.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Arial, 11.25pt, style=Bold</value>
+  </data>
+  <data name="lb_simulation_mode_display.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="lb_simulation_mode_display.Location" type="System.Drawing.Point, System.Drawing">
+    <value>915, 63</value>
+  </data>
+  <data name="lb_simulation_mode_display.Size" type="System.Drawing.Size, System.Drawing">
+    <value>126, 18</value>
+  </data>
+  <data name="lb_simulation_mode_display.TabIndex" type="System.Int32, mscorlib">
+    <value>35</value>
+  </data>
+  <data name="lb_simulation_mode_display.Text" xml:space="preserve">
+    <value>Simulation Mode</value>
+  </data>
+  <data name="&gt;&gt;lb_simulation_mode_display.Name" xml:space="preserve">
+    <value>lb_simulation_mode_display</value>
+  </data>
+  <data name="&gt;&gt;lb_simulation_mode_display.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lb_simulation_mode_display.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;lb_simulation_mode_display.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
@@ -1231,7 +1393,7 @@
     <value>6, 14</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>1292, 628</value>
+    <value>1181, 628</value>
   </data>
   <data name="$this.Font" type="System.Drawing.Font, System.Drawing">
     <value>Arial, 8.25pt</value>
@@ -2901,6 +3063,9 @@
         AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         AAAAAAAAAAAAAAAAAAAAAAAA
 </value>
+  </data>
+  <data name="$this.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
   </data>
   <data name="$this.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>2, 3, 2, 3</value>

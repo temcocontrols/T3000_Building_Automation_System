@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form_handler));
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
@@ -85,6 +86,9 @@
             this.deleteHandlerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.label2 = new System.Windows.Forms.Label();
             this.lb_numberOfHandler = new System.Windows.Forms.Label();
+            this.lb_pressure_display = new System.Windows.Forms.Label();
+            this.lb_unit_chosen_display = new System.Windows.Forms.Label();
+            this.lb_simulation_mode_display = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
@@ -99,11 +103,9 @@
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.id,
             this.name});
-            this.dataGridView1.Location = new System.Drawing.Point(11, 12);
+            resources.ApplyResources(this.dataGridView1, "dataGridView1");
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersVisible = false;
-            this.dataGridView1.Size = new System.Drawing.Size(139, 411);
-            this.dataGridView1.TabIndex = 1;
             this.dataGridView1.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dataGridView1_CellBeginEdit);
             this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick);
             this.dataGridView1.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellEndEdit_1);
@@ -111,21 +113,18 @@
             // 
             // id
             // 
-            this.id.HeaderText = "id";
+            resources.ApplyResources(this.id, "id");
             this.id.Name = "id";
             this.id.ReadOnly = true;
-            this.id.Width = 30;
             // 
             // name
             // 
-            this.name.HeaderText = "name";
+            resources.ApplyResources(this.name, "name");
             this.name.Name = "name";
             // 
             // chart1
             // 
-            this.chart1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            resources.ApplyResources(this.chart1, "chart1");
             chartArea1.AxisX.LabelAutoFitMinFontSize = 5;
             chartArea1.AxisY.LabelAutoFitMinFontSize = 5;
             chartArea1.CursorX.Interval = 5D;
@@ -135,8 +134,6 @@
             legend1.Enabled = false;
             legend1.Name = "Legend1";
             this.chart1.Legends.Add(legend1);
-            this.chart1.Location = new System.Drawing.Point(171, 12);
-            this.chart1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.chart1.Name = "chart1";
             series1.ChartArea = "ChartArea1";
             series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
@@ -283,9 +280,6 @@
             this.chart1.Series.Add(series34);
             this.chart1.Series.Add(series35);
             this.chart1.Series.Add(series36);
-            this.chart1.Size = new System.Drawing.Size(807, 593);
-            this.chart1.TabIndex = 2;
-            this.chart1.Text = "chart1";
             title1.Name = "Psychometric chart";
             this.chart1.Titles.Add(title1);
             this.chart1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseClick);
@@ -298,31 +292,24 @@
             this.dataGridView2.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.id_output,
             this.output_variable});
-            this.dataGridView2.Location = new System.Drawing.Point(983, 36);
+            resources.ApplyResources(this.dataGridView2, "dataGridView2");
             this.dataGridView2.Name = "dataGridView2";
             this.dataGridView2.RowHeadersVisible = false;
-            this.dataGridView2.Size = new System.Drawing.Size(141, 396);
-            this.dataGridView2.TabIndex = 3;
             // 
             // id_output
             // 
-            this.id_output.HeaderText = "id";
+            resources.ApplyResources(this.id_output, "id_output");
             this.id_output.Name = "id_output";
-            this.id_output.Width = 35;
             // 
             // output_variable
             // 
-            this.output_variable.HeaderText = "Output Variable";
+            resources.ApplyResources(this.output_variable, "output_variable");
             this.output_variable.Name = "output_variable";
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(1039, 20);
+            resources.ApplyResources(this.label1, "label1");
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(85, 13);
-            this.label1.TabIndex = 4;
-            this.label1.Text = "Output Variables";
             // 
             // CMSinsertNode
             // 
@@ -330,21 +317,18 @@
             this.insertNodeToolStripMenuItem,
             this.disconnectLineToolStripMenuItem});
             this.CMSinsertNode.Name = "contextMenuStrip2";
-            this.CMSinsertNode.Size = new System.Drawing.Size(159, 48);
+            resources.ApplyResources(this.CMSinsertNode, "CMSinsertNode");
             // 
             // insertNodeToolStripMenuItem
             // 
             this.insertNodeToolStripMenuItem.Name = "insertNodeToolStripMenuItem";
-            this.insertNodeToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
-            this.insertNodeToolStripMenuItem.Text = "Insert Node";
+            resources.ApplyResources(this.insertNodeToolStripMenuItem, "insertNodeToolStripMenuItem");
             this.insertNodeToolStripMenuItem.Click += new System.EventHandler(this.insertNodeToolStripMenuItem_Click);
             // 
             // disconnectLineToolStripMenuItem
             // 
-            this.disconnectLineToolStripMenuItem.Enabled = false;
+            resources.ApplyResources(this.disconnectLineToolStripMenuItem, "disconnectLineToolStripMenuItem");
             this.disconnectLineToolStripMenuItem.Name = "disconnectLineToolStripMenuItem";
-            this.disconnectLineToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
-            this.disconnectLineToolStripMenuItem.Text = "Disconnect Line";
             this.disconnectLineToolStripMenuItem.Click += new System.EventHandler(this.disconnectLineToolStripMenuItem_Click);
             // 
             // contextMenuStrip1
@@ -352,38 +336,46 @@
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.deleteHandlerToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(153, 26);
+            resources.ApplyResources(this.contextMenuStrip1, "contextMenuStrip1");
             // 
             // deleteHandlerToolStripMenuItem
             // 
             this.deleteHandlerToolStripMenuItem.Name = "deleteHandlerToolStripMenuItem";
-            this.deleteHandlerToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.deleteHandlerToolStripMenuItem.Text = "Delete Handler";
+            resources.ApplyResources(this.deleteHandlerToolStripMenuItem, "deleteHandlerToolStripMenuItem");
             this.deleteHandlerToolStripMenuItem.Click += new System.EventHandler(this.deleteHandlerToolStripMenuItem_Click);
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(8, 440);
+            resources.ApplyResources(this.label2, "label2");
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(103, 13);
-            this.label2.TabIndex = 5;
-            this.label2.Text = "Number of handler : ";
             // 
             // lb_numberOfHandler
             // 
-            this.lb_numberOfHandler.AutoSize = true;
-            this.lb_numberOfHandler.Location = new System.Drawing.Point(118, 439);
+            resources.ApplyResources(this.lb_numberOfHandler, "lb_numberOfHandler");
             this.lb_numberOfHandler.Name = "lb_numberOfHandler";
-            this.lb_numberOfHandler.Size = new System.Drawing.Size(13, 13);
-            this.lb_numberOfHandler.TabIndex = 6;
-            this.lb_numberOfHandler.Text = "0";
+            // 
+            // lb_pressure_display
+            // 
+            resources.ApplyResources(this.lb_pressure_display, "lb_pressure_display");
+            this.lb_pressure_display.Name = "lb_pressure_display";
+            // 
+            // lb_unit_chosen_display
+            // 
+            resources.ApplyResources(this.lb_unit_chosen_display, "lb_unit_chosen_display");
+            this.lb_unit_chosen_display.Name = "lb_unit_chosen_display";
+            // 
+            // lb_simulation_mode_display
+            // 
+            resources.ApplyResources(this.lb_simulation_mode_display, "lb_simulation_mode_display");
+            this.lb_simulation_mode_display.Name = "lb_simulation_mode_display";
             // 
             // Form_handler
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1148, 617);
+            this.Controls.Add(this.lb_simulation_mode_display);
+            this.Controls.Add(this.lb_pressure_display);
+            this.Controls.Add(this.lb_unit_chosen_display);
             this.Controls.Add(this.lb_numberOfHandler);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -392,8 +384,8 @@
             this.Controls.Add(this.dataGridView1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "Form_handler";
-            this.Text = "Air Handler";
             this.Load += new System.EventHandler(this.Form_handler_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
@@ -418,11 +410,14 @@
         private System.Windows.Forms.ToolStripMenuItem disconnectLineToolStripMenuItem;
         private System.Windows.Forms.SaveFileDialog saveFD;
         private System.Windows.Forms.ToolTip toolTip1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn id;
-        private System.Windows.Forms.DataGridViewTextBoxColumn name;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.ToolStripMenuItem deleteHandlerToolStripMenuItem;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label lb_numberOfHandler;
+        private System.Windows.Forms.Label lb_pressure_display;
+        private System.Windows.Forms.Label lb_unit_chosen_display;
+        public System.Windows.Forms.Label lb_simulation_mode_display;
+        private System.Windows.Forms.DataGridViewTextBoxColumn id;
+        private System.Windows.Forms.DataGridViewTextBoxColumn name;
     }
 }
