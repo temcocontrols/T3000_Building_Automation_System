@@ -1092,47 +1092,54 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 								 (int)m_analogorignpoint.Y + (m_Y_ASIX_HIGHT/m_yscale)*(1+i));
 		}
 
-
 		if(i!=m_yscale)
 		{
-			if(m_highvalue - m_lowvalue > 1)
-			{
-				Unit_value.Format(_T("%.1f"),((float)y_axis_total_value/m_yscale)*(m_yscale-i) + m_lowvalue);
-			}
-			else if(m_highvalue - m_lowvalue > 0.1)
-			{
-				Unit_value.Format(_T("%.2f"),((float)y_axis_total_value/m_yscale)*(m_yscale-i) + m_lowvalue);
-			}
-			else if(m_highvalue - m_lowvalue > 0.01)
-			{
-				Unit_value.Format(_T("%.3f"),((float)y_axis_total_value/m_yscale)*(m_yscale-i) + m_lowvalue);
-			}
-			else if(m_highvalue - m_lowvalue > 0.001)
-			{
-				Unit_value.Format(_T("%.4f"),((float)y_axis_total_value/m_yscale)*(m_yscale-i) + m_lowvalue);
-			}
-
+			Unit_value.Format(_T("%.0f"),((float)y_axis_total_value/m_yscale)*(m_yscale-i) + m_lowvalue);
 		}
 		else
 		{
-			if(m_highvalue - m_lowvalue > 1)
-			{
-				Unit_value.Format(_T("%.1f"),m_lowvalue);
-			}
-			else if(m_highvalue - m_lowvalue > 0.1)
-			{
-				Unit_value.Format(_T("%.2f"),m_lowvalue);
-			}
-			else if(m_highvalue - m_lowvalue > 0.01)
-			{
-				Unit_value.Format(_T("%.3f"),m_lowvalue);
-			}
-			else if(m_highvalue - m_lowvalue > 0.001)
-			{
-				Unit_value.Format(_T("%.4f"),m_lowvalue);
-			}
-			
+			Unit_value.Format(_T("%.0f"),m_lowvalue);
 		}
+		//if(i!=m_yscale)
+		//{
+		//	if(m_highvalue - m_lowvalue > 1)
+		//	{
+		//		Unit_value.Format(_T("%.1f"),((float)y_axis_total_value/m_yscale)*(m_yscale-i) + m_lowvalue);
+		//	}
+		//	else if(m_highvalue - m_lowvalue > 0.1)
+		//	{
+		//		Unit_value.Format(_T("%.2f"),((float)y_axis_total_value/m_yscale)*(m_yscale-i) + m_lowvalue);
+		//	}
+		//	else if(m_highvalue - m_lowvalue > 0.01)
+		//	{
+		//		Unit_value.Format(_T("%.3f"),((float)y_axis_total_value/m_yscale)*(m_yscale-i) + m_lowvalue);
+		//	}
+		//	else if(m_highvalue - m_lowvalue > 0.001)
+		//	{
+		//		Unit_value.Format(_T("%.4f"),((float)y_axis_total_value/m_yscale)*(m_yscale-i) + m_lowvalue);
+		//	}
+
+		//}
+		//else
+		//{
+		//	if(m_highvalue - m_lowvalue > 1)
+		//	{
+		//		Unit_value.Format(_T("%.1f"),m_lowvalue);
+		//	}
+		//	else if(m_highvalue - m_lowvalue > 0.1)
+		//	{
+		//		Unit_value.Format(_T("%.2f"),m_lowvalue);
+		//	}
+		//	else if(m_highvalue - m_lowvalue > 0.01)
+		//	{
+		//		Unit_value.Format(_T("%.3f"),m_lowvalue);
+		//	}
+		//	else if(m_highvalue - m_lowvalue > 0.001)
+		//	{
+		//		Unit_value.Format(_T("%.4f"),m_lowvalue);
+		//	}
+		//	
+		//}
 		int value_temp_length = Unit_value.GetLength();
 		pointF.X = (int)m_analogorignpoint.X - 38  - (value_temp_length-3)*4;	//动态调整 Y轴 显示的值 根据所带小数点的位数不同 调整位置;
 		
@@ -1175,7 +1182,7 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 		if(!StaticShow[i])
 			continue;
 		first_item[i] = m_pFirstItem[i];
-		DrawLinePen[i] = new Pen(Graphic_Color[i + 1],2.0f);
+		DrawLinePen[i] = new Pen(Graphic_Color[i + 1],3.0f);
 		if(i<monitor_analog_count)
 		{
 			if(first_item[i] != NULL)
@@ -1929,6 +1936,73 @@ void CBacnetGraphic::OnTimebase4days()
 	//Delete_Ram_Data();
 	b_has_create_point = false;
 }
+
+
+
+//向大方向规整
+int CBacnetGraphic::MaxMinRound(int Data,bool UP)
+{
+	while (true)
+	{
+		if (UP)
+		{
+			if ((Data % 5 == 0) || (Data % 10 == 0))
+			{
+				return Data;
+			}
+			else
+			{
+				Data++;
+			}
+		}
+		else
+		{
+			if ((Data % 5 == 0) || (Data % 10 == 0))
+			{
+				return Data;
+			}
+			else
+			{
+				Data--;
+			}
+		}
+
+	}
+}
+
+bool CBacnetGraphic::re_calc_max_and_min(int y_max,int y_min,int &ret_y_max,int &ret_y_min,int scale)
+{
+	y_min = MaxMinRound(y_min, false);
+	y_max = MaxMinRound(y_max, true);
+	bool temp_time = true;
+	while (true)
+	{
+		int temp_range = (y_max - y_min) / 5;
+		if ( temp_range % scale == 0)
+		{
+			break;
+		}
+		else
+		{	
+			if (temp_time)
+			{
+				y_max += 5;
+				temp_time = false;
+			}
+			else
+			{
+				y_min -= 5;
+				temp_time = true;
+			}
+		}
+	}
+	ret_y_max = y_max;
+	ret_y_min = y_min;
+	return 1;
+}
+
+
+
 void CBacnetGraphic::Reset_X_Y_Parameter()
 {
 	int temp_number_of_inputs = m_monitor_data.at(monitor_list_line).num_inputs;
@@ -1956,13 +2030,30 @@ void CBacnetGraphic::Reset_X_Y_Parameter()
 		//int total_y_max_value = 0;
 		//int total_y_min_value = 0;
 	}
+	int bef_max;
+	int bef_min;
+	//total_y_max_value = 189000;
+	//total_y_min_value = 123000;
+	bef_max = total_y_max_value / 1000 + 1;
+	bef_min = total_y_min_value /1000  - 1;	
+
+	int temp_max;
+	int temp_min;
+	re_calc_max_and_min(bef_max,bef_min,temp_max,temp_min);
+	total_y_max_value = temp_max * 1000;
+
+	if((total_y_min_value >= 0) && (total_y_min_value < 5000))
+		total_y_min_value = 0;
+	else
+		total_y_min_value = temp_min * 1000;
 
 
+#if 0
 	//针对 0 - 100 范围的Y轴 做出特殊处理;
 	unsigned int delta_value = 0;
 	delta_value = total_y_max_value - total_y_min_value;
-	int temp_max = total_y_max_value;
-	int temp_min = total_y_min_value;
+	 temp_max = total_y_max_value;
+	 temp_min = total_y_min_value;
 	if(delta_value == 0)
 	{
 		total_y_max_value = total_y_min_value + 10;
@@ -2023,9 +2114,15 @@ void CBacnetGraphic::Reset_X_Y_Parameter()
 		}
 
 	}
+	//暂时给郭少用
+	if((total_y_max_value > 100000) && (total_y_max_value < 150000))
+	{
+		if(total_y_min_value > 0)
+			total_y_min_value = 0;
+		total_y_max_value = 150000;
 
-
-
+	}
+#endif
 	switch(m_time_selected)
 	{
 	case TIME_ONE_MINUTE :

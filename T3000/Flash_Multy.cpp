@@ -353,6 +353,11 @@ void CFlash_Multy::Initial_List()
                     m_flash_multy_list.SetItemTextColor(i,-1,FLASH_COLOR_GREEN);
                     m_flash_multy_list.SetItemText(i,FLASH_RESULTS,_T("Sucessful"));
                 }
+				else if (Config_Result == 3)
+				{
+					m_flash_multy_list.SetItemTextColor(i,-1,FLASH_COLOR_GREEN);
+					m_flash_multy_list.SetItemText(i,FLASH_CONFIG_RESULTS,_T("Sucessful"));
+				}
                 else
                 {
                     // PostMessage(WM_MULTY_FLASH_MESSAGE,CHANGE_THE_ITEM_COLOR_DEFAULT,i);
@@ -1482,10 +1487,10 @@ LRESULT CFlash_Multy::MultyFlashMessage(WPARAM wParam,LPARAM lParam)
     case CHANGE_THE_ITEM_COLOR_MORE_GREEN:
     {
         m_flash_multy_list.SetItemTextColor(sub_parameter,-1,CONFIG_COLOR_CONFIG_FLASH_GOOD);
-        m_flash_multy_list.SetItemText(sub_parameter,FLASH_RESULTS,_T("Sucessful"));
+        //m_flash_multy_list.SetItemText(sub_parameter,FLASH_RESULTS,_T("Sucessful"));
         m_flash_multy_list.SetItemText(sub_parameter,FLASH_CONFIG_RESULTS,_T("Sucessful"));
-//             StrSql.Format(_T("Update BatchFlashResult Set ConfigResult = 3 Where SN = %d "),_wtoi(flash_device.at(sub_parameter-1).strSN));
-//             bado.OpenRecordset(StrSql);
+        StrSql.Format(_T("Update BatchFlashResult Set ConfigResult = 3 Where SN = %d "),_wtoi(flash_device.at(sub_parameter).strSN));
+        bado.OpenRecordset(StrSql);
     }
     break;
     case CHANGE_THE_ITEM_COLOR_LESS_RED:

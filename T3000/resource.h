@@ -276,6 +276,7 @@
 #define IDI_ICON_DEFAULT_SCHEDUAL       630
 #define IDI_ICON_DEFAULT_TRENDLOG       631
 #define IDI_ICON_DEFAULT_PID            632
+#define IDR_MFC16DLL1                   635
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -2039,6 +2040,7 @@
 #define IDC_BUTTON_MODEL5               2184
 #define IDC_STATIC_MODEL_NAME           2185
 #define IDC_HELP_HELP1                  3831
+#define IDC_BUTTON_SYNC_TIME            5716
 #define IDC_STATIC_BAC_SETTING_SD_CARD  5817
 #define IDC_MFCCOLORBUTTON_FUNCTION     5818
 #define IDC_MFCCOLORBUTTON_COMMAND      5819
@@ -2530,7 +2532,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        635
+#define _APS_NEXT_RESOURCE_VALUE        636
 #define _APS_NEXT_COMMAND_VALUE         34058
 #define _APS_NEXT_CONTROL_VALUE         2186
 #define _APS_NEXT_SYMED_VALUE           320

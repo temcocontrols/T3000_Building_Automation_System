@@ -83,7 +83,7 @@ BOOL CBuildingConfigration::OnInitDialog()
     m_building_config_list.SetExtendedStyle(m_building_config_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
     m_building_config_list.InsertColumn(BC_ITEM, _T(""), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
     m_building_config_list.InsertColumn(BC_MAINNAME, _T("Building"), 120, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-    m_building_config_list.InsertColumn(BC_PROTOCOL, _T("Connection Type"), 100, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+    m_building_config_list.InsertColumn(BC_PROTOCOL, _T("Protocol"), 100, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_building_config_list.InsertColumn(BC_IPADDRESS, _T("IP/Domain/Tel#/SerialNumber"), 150, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_building_config_list.InsertColumn(BC_IPPORT, _T("IP Port"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_building_config_list.InsertColumn(BC_COMPORT, _T("COM Port"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -1146,7 +1146,7 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 // 						 m_building_config_list.SetItemBkColor(last_new_item,x,LIST_ITEM_DEFAULT_BKCOLOR);
 // 					 else
 // 						 m_building_config_list.SetItemBkColor(last_new_item,x,LIST_ITEM_DEFAULT_BKCOLOR_GRAY);
-// 				 }毛紧皱眉头，与尼泊尔guys怒目而视，心急如焚的咆哮道：“每天你们都得用邮件更新下状态，心照不宣，理应如此，别想着在一直skype上糊弄我两句。”
+// 				 }
 
                 if(ListCtrlEx::ComboBox == m_building_config_list.GetColumnType(BC_PROTOCOL))
                 {
@@ -1257,13 +1257,13 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
             m_building_config_list.SetCellEnabled(Changed_Item,BC_BAUDRATE,0);
             if (!dbpath.IsEmpty())
             {
-                GetPrivateProfileString(m_BuildNameLst.at(Changed_Item).MainBuildingName,_T("Remote_IP"),_T("8.8.8.8"),IP.GetBuffer(MAX_PATH),MAX_PATH,g_achive_device_name_path);
-                GetPrivateProfileString(m_BuildNameLst.at(Changed_Item).MainBuildingName,_T("Remote_Port"),_T("502"),Port.GetBuffer(MAX_PATH),MAX_PATH,g_achive_device_name_path);
+                GetPrivateProfileString(m_BuildNameLst.at(Changed_Item).MainBuildingName,_T("Remote_IP"),_T("192.168.0.3"),IP.GetBuffer(MAX_PATH),MAX_PATH,g_achive_device_name_path);
+                GetPrivateProfileString(m_BuildNameLst.at(Changed_Item).MainBuildingName,_T("Remote_Port"),_T("10000"),Port.GetBuffer(MAX_PATH),MAX_PATH,g_achive_device_name_path);
             }
             else
             {
-                IP = _T("");
-                Port = _T("");
+                IP = _T("192.168.0.3");
+                Port = _T("10000");
             }
 
             m_building_config_list.SetItemText(m_changedRow,BC_COMPORT,NO_APPLICATION);
@@ -1331,7 +1331,6 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 					try_connect_serial =    _wtoi(temp_serial_number)  ;//  (unsigned int)atoi(temp_serial_number);
 					CConnectRemoteServer Connectdlg;
 					Connectdlg.DoModal();
-					 Update_Building();
 					return 0;
 				}
 			}
@@ -2327,11 +2326,6 @@ void CBuildingConfigration::OnBuildingconfigDelete()
         m_building_config_list.SetCellStringList(m_curRow, BC_COMPORT, strlist);
     }
 
-
-
-	
-
-
     m_bChanged=TRUE;
     // Fresh_List();
     //Initial_Building_List();
@@ -2391,7 +2385,6 @@ void CBuildingConfigration::OnNMDblclkListBuildingConfig(NMHDR *pNMHDR, LRESULT 
 		 
 		m_BuildNameLst.at(m_curRow) = dlg.m_currentBuilding;
 		CADO m_database_operator;
-		 
 
 		try
 		{
@@ -2437,6 +2430,10 @@ void CBuildingConfigration::OnNMDblclkListBuildingConfig(NMHDR *pNMHDR, LRESULT 
 				{
 					m_database_operator.m_pRecordset->PutCollect("Zip", (_variant_t)m_BuildNameLst.at(m_curRow).Zip);
 				}
+				if(!m_BuildNameLst.at(m_curRow).EngineeringUnits.IsEmpty())
+				{
+					m_database_operator.m_pRecordset->PutCollect("EngineeringUnits", (_variant_t)m_BuildNameLst.at(m_curRow).EngineeringUnits);
+				}
 				m_database_operator.m_pRecordset->Update();
 			}
 
@@ -2454,29 +2451,26 @@ void CBuildingConfigration::OnNMDblclkListBuildingConfig(NMHDR *pNMHDR, LRESULT 
 			 state = '%s' ,\
 			 city = '%s' ,\
 			 street = '%s' ,\
-			 longitude = '%s' ,\
-			 latitude = '%s' ,\
-			 elevation = '%s' \
-			 ZIP = %d\
+			 ZIP = %d ,\
+			 EngineeringUnits = '%s'\
 			 where ID = %d \
 			  "),
 			  m_BuildNameLst.at(m_curRow).country,
 			  m_BuildNameLst.at(m_curRow).state,
 			  m_BuildNameLst.at(m_curRow).city,
 			  m_BuildNameLst.at(m_curRow).street,
-			  m_BuildNameLst.at(m_curRow).Longitude,
-			  m_BuildNameLst.at(m_curRow).Latitude,
-			  m_BuildNameLst.at(m_curRow).Elevation,
 			  m_BuildNameLst.at(m_curRow).Zip,
+			  m_BuildNameLst.at(m_curRow).EngineeringUnits,
 			  m_BuildNameLst.at(m_curRow).ID
 			  );
 			  char charqltext[1024];
 			 
-			  memset(charqltext,0,1024);
-			  WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
+			memset(charqltext,0,1024);
+			WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
 
-			  SqliteDB.execDML(charqltext);
-       SqliteDB.close();
+			SqliteDB.execDML(charqltext);
+
+			SqliteDB.close();
 		 
 			AfxMessageBox(_T("Update Successfully"));
 

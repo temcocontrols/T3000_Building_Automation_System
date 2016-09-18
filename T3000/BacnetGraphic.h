@@ -105,6 +105,8 @@ public:
 
 	void Get_Input_Unit();
 	void Reset_X_Y_Parameter();
+	int MaxMinRound(int Data,bool UP);
+	bool re_calc_max_and_min(int y_max,int y_min,int &ret_y_max,int &ret_y_min,int scale=4);
 public:
 	PointF last_used_point;
 	bool StaticShow[15];

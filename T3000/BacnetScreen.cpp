@@ -193,6 +193,27 @@ BOOL BacnetScreen::PreTranslateMessage(MSG* pMsg)
 		m_screen_list.Get_clicked_mouse_position();
 		return TRUE;
 	}
+	if((pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_DELETE) ||
+		(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_BACK))
+	{
+		int temp_item = -1;
+		int temp_sub_item = -1;
+		m_screen_list.Get_Selected_Item(temp_item,temp_sub_item);
+		if((temp_item >=0) && (temp_item < BAC_SCREEN_COUNT))
+		{
+			if(temp_sub_item == SCREEN_PIC_FILE)
+			{
+				CString temp_task_info;
+				memset(&m_screen_data.at(temp_item).picture_file,0,11);
+				m_screen_list.SetItemText(temp_item,temp_sub_item,_T(""));
+					m_screen_list.SetItemBkColor(temp_item,temp_sub_item,LIST_ITEM_CHANGED_BKCOLOR);
+					temp_task_info.Format(_T("Write Screen List Item%d .Delete picture file "),temp_item + 1);
+					Post_Write_Message(g_bac_instance,WRITESCREEN_T3000,temp_item,temp_item,sizeof(Control_group_point),m_screen_dlg_hwnd ,temp_task_info,temp_item,temp_sub_item);
+
+			}
+		}
+	}
+	
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -636,11 +657,11 @@ void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 			}
 		}
 
-		if(h_get_pic_thread==NULL)
-		{
-			if(Device_Basic_Setting.reg.sd_exist)
-				h_get_pic_thread =CreateThread(NULL,NULL,GetPictureThread,this,NULL, NULL);
-		}
+		//if(h_get_pic_thread==NULL)
+		//{
+		//	if(Device_Basic_Setting.reg.sd_exist)
+		//		h_get_pic_thread =CreateThread(NULL,NULL,GetPictureThread,this,NULL, NULL);
+		//}
 
 		if(h_read_screenlabel_thread==NULL)
 		{
@@ -657,7 +678,7 @@ void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 	{
 		m_screen_list.SetItemBkColor(lRow,lCol,LIST_ITEM_CHANGED_BKCOLOR);
 		temp_task_info.Format(_T("Write Screen List Item%d .Changed to \"%s\" "),lRow + 1,New_CString);
-		Post_Write_Message(device_obj_instance,WRITESCREEN_T3000,lRow,lRow,sizeof(Control_group_point),m_screen_dlg_hwnd ,temp_task_info,lRow,lCol);
+		Post_Write_Message(g_bac_instance,WRITESCREEN_T3000,lRow,lRow,sizeof(Control_group_point),m_screen_dlg_hwnd ,temp_task_info,lRow,lCol);
 
 	}
 

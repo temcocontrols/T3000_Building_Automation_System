@@ -90,6 +90,7 @@ BEGIN_MESSAGE_MAP(CBacnetSetting, CDialogEx)
 
 	ON_BN_CLICKED(IDC_BUTTON_BAC_SETTING_OK, &CBacnetSetting::OnBnClickedButtonBacSettingOk)
 	ON_BN_CLICKED(IDC_BUTTON_BAC_SETTING_CANCEL, &CBacnetSetting::OnBnClickedButtonBacSettingCancel)
+	ON_BN_CLICKED(IDC_BUTTON_SYNC_TIME, &CBacnetSetting::OnBnClickedButtonSyncTime)
 END_MESSAGE_MAP()
 
 
@@ -474,16 +475,31 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->AddString(DDNS_Server_Name[2]);
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->AddString(DDNS_Server_Name[3]);
 
+				//if(Device_Basic_Setting.reg.dyndns_provider == 0)
+				//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(DDNS_Server_Name[0]);
+				//else if(Device_Basic_Setting.reg.dyndns_provider == 1)
+				//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(DDNS_Server_Name[1]);
+				//else if(Device_Basic_Setting.reg.dyndns_provider == 2)
+				//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(DDNS_Server_Name[2]);
+				//else if(Device_Basic_Setting.reg.dyndns_provider == 3)
+				//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(DDNS_Server_Name[3]);
+				//else
+				//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(_T(""));
+
 				if(Device_Basic_Setting.reg.dyndns_provider == 0)
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(DDNS_Server_Name[0]);
+					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetCurSel(0);
 				else if(Device_Basic_Setting.reg.dyndns_provider == 1)
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(DDNS_Server_Name[1]);
+					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetCurSel(1);
 				else if(Device_Basic_Setting.reg.dyndns_provider == 2)
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(DDNS_Server_Name[2]);
+					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetCurSel(2);
 				else if(Device_Basic_Setting.reg.dyndns_provider == 3)
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(DDNS_Server_Name[3]);
+					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetCurSel(3);
 				else
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(_T(""));
+				{
+					Device_Basic_Setting.reg.dyndns_provider = 3;
+					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetCurSel(3);
+				}
+
 
 				CString temp_time;
 				temp_time.Format(_T("%u"),Device_Basic_Setting.reg.dyndns_update_time);
@@ -536,33 +552,38 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				if(Device_Basic_Setting.reg.en_sntp == 1)	//disable
 				{
 					((CButton *)GetDlgItem(IDC_CHECK_SETTING_SYNC_TIME))->SetCheck(false);
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(Time_Server_Name[0]);
+					//((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(Time_Server_Name[0]);
+
+					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetCurSel(0);
 				}
 				else if(Device_Basic_Setting.reg.en_sntp == 2)
 				{
 					((CButton *)GetDlgItem(IDC_CHECK_SETTING_SYNC_TIME))->SetCheck(true);
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(Time_Server_Name[0]);
+					//((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(Time_Server_Name[0]);
+					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetCurSel(0);
 				}
 				else if(Device_Basic_Setting.reg.en_sntp == 3)
 				{
 					((CButton *)GetDlgItem(IDC_CHECK_SETTING_SYNC_TIME))->SetCheck(true);
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(Time_Server_Name[1]);
+					//((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(Time_Server_Name[1]);
+					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetCurSel(1);
 				}
 				else if(Device_Basic_Setting.reg.en_sntp == 4)
 				{
 					((CButton *)GetDlgItem(IDC_CHECK_SETTING_SYNC_TIME))->SetCheck(true);
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(Time_Server_Name[2]);
+					//((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(Time_Server_Name[2]);
+					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetCurSel(2);
 				}
-				else if(Device_Basic_Setting.reg.en_sntp == 5)
-				{
-					((CButton *)GetDlgItem(IDC_CHECK_SETTING_SYNC_TIME))->SetCheck(true);
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(Time_Server_Name[3]);
-				}
-				else if(Device_Basic_Setting.reg.en_sntp == 6)
-				{
-					((CButton *)GetDlgItem(IDC_CHECK_SETTING_SYNC_TIME))->SetCheck(true);
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(Time_Server_Name[4]);
-				}
+				//else if(Device_Basic_Setting.reg.en_sntp == 5)
+				//{
+				//	((CButton *)GetDlgItem(IDC_CHECK_SETTING_SYNC_TIME))->SetCheck(true);
+				//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(Time_Server_Name[3]);
+				//}
+				//else if(Device_Basic_Setting.reg.en_sntp == 6)
+				//{
+				//	((CButton *)GetDlgItem(IDC_CHECK_SETTING_SYNC_TIME))->SetCheck(true);
+				//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(Time_Server_Name[4]);
+				//}
 				else//如果里面的值错了 就自动复位为第一个 同步服务器;
 				{
 					Device_Basic_Setting.reg.en_sntp = 2;
@@ -680,21 +701,47 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->AddString(Baudrate_Array[UART_9600]);
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->AddString(Baudrate_Array[UART_19200]);
 
-				//((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->AddString(Baudrate_Array[UART_9600]);
+
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->AddString(Baudrate_Array[UART_19200]);
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->EnableWindow(FALSE);
 				for (int x=0;x< (sizeof(Baudrate_Array)/sizeof(Baudrate_Array[0]) - 1);x++)
 				{
 					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE2))->AddString(Baudrate_Array[x]);
 				}
-				if((Device_Basic_Setting.reg.com_baudrate0 == UART_9600) || (Device_Basic_Setting.reg.com_baudrate0 == UART_19200))
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->SetWindowTextW(Baudrate_Array[Device_Basic_Setting.reg.com_baudrate0]);
 
-				if((Device_Basic_Setting.reg.com_baudrate1 == UART_9600) || (Device_Basic_Setting.reg.com_baudrate0 == UART_19200))
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->SetWindowTextW(Baudrate_Array[Device_Basic_Setting.reg.com_baudrate1]);
 
+				if(Device_Basic_Setting.reg.com_baudrate0 == UART_9600)
+				{
+					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->SetCurSel(0);
+				}
+				else if(Device_Basic_Setting.reg.com_baudrate0 == UART_19200)
+				{
+					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->SetCurSel(1);
+				}
+
+
+				if(Device_Basic_Setting.reg.com_baudrate1 == UART_19200)
+				{
+					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->SetCurSel(0);
+				}
+				else
+				{
+					Device_Basic_Setting.reg.com_baudrate1 == UART_19200;
+				}
+					
 				if(Device_Basic_Setting.reg.com_baudrate2 < sizeof(Baudrate_Array)/sizeof(Baudrate_Array[0]))
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE2))->SetWindowTextW(Baudrate_Array[Device_Basic_Setting.reg.com_baudrate2]);
+					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE2))->SetCurSel(Device_Basic_Setting.reg.com_baudrate2);
+
+				//if((Device_Basic_Setting.reg.com_baudrate0 == UART_9600) || (Device_Basic_Setting.reg.com_baudrate0 == UART_19200))
+				//{					
+				//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->SetWindowTextW(Baudrate_Array[Device_Basic_Setting.reg.com_baudrate0]);
+				//}
+
+				//if((Device_Basic_Setting.reg.com_baudrate1 == UART_9600) || (Device_Basic_Setting.reg.com_baudrate1 == UART_19200))
+				//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->SetWindowTextW(Baudrate_Array[Device_Basic_Setting.reg.com_baudrate1]);
+
+				//if(Device_Basic_Setting.reg.com_baudrate2 < sizeof(Baudrate_Array)/sizeof(Baudrate_Array[0]))
+				//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE2))->SetWindowTextW(Baudrate_Array[Device_Basic_Setting.reg.com_baudrate2]);
 
 			}
 
@@ -1590,4 +1637,27 @@ void CBacnetSetting::OnBnClickedButtonBacSettingCancel()
 	// TODO: Add your control notification handler code here
 	 PostMessage(WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);
 	 PostMessage(WM_FRESH_SETTING_UI,TIME_COMMAND,NULL);
+}
+
+
+void CBacnetSetting::OnBnClickedButtonSyncTime()
+{
+	// TODO: Add your control notification handler code here
+
+	Device_Basic_Setting.reg.reset_default = 99;
+	CString temp_task_info;
+	temp_task_info.Format(_T("SYNC Time Server "));
+	((CButton *)GetDlgItem(IDC_BUTTON_SYNC_TIME))->EnableWindow(FALSE);
+	SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("SYNC Timer Server Now.Please Wait....."));
+	if(Write_Private_Data_Blocking(WRITE_SETTING_COMMAND,0,0) <= 0)
+	{
+		
+	}
+	else
+	{
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("SYNC time failed!"));
+	}
+
+	((CButton *)GetDlgItem(IDC_BUTTON_SYNC_TIME))->EnableWindow(TRUE);
+	
 }

@@ -4068,13 +4068,13 @@ OUTPUT bool open_com(int m_com)
 // 	ZeroMemory(lpComNum, )
 
     CString strCom;
-    if (m_com <=9 && m_com >0)
-    {
-        strCom.Format(_T("%d"),m_com);
-        strCom = _T("COM")+strCom+_T(":");
-    }
-    else if(m_com > 9)
-    {
+     if (m_com <=9 && m_com >0)
+     {
+         strCom.Format(_T("%d"),m_com);
+         strCom = _T("COM")+strCom+_T(":");
+     }
+     else if(m_com > 9)
+     {
         strCom.Format(_T("%d"),m_com);
         strCom = _T("\\\\.\\COM")+strCom;
     }

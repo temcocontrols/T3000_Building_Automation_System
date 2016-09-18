@@ -111,9 +111,9 @@ uint8_t Send_Read_Property_Request_Address(
                 datalink_send_pdu(dest, &npdu_data,
                 &Handler_Transmit_Buffer[0], pdu_len);
 #if PRINT_ENABLED
-            if (bytes_sent <= 0)
-                fprintf(stderr, "Failed to Send ReadProperty Request (%s)!\n",
-                    strerror(errno));
+			if (bytes_sent <= 0)
+				fprintf(stderr, "Failed to Send ReadProperty Request (%s)!\n",
+				strerror(errno));
 #endif
         } else {
             tsm_free_invoke_id(invoke_id);

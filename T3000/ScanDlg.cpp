@@ -132,12 +132,12 @@ void CScanDlg::GetIPMaskGetWay(CString &StrIP,CString &StrMask,CString &StrGetwa
 			//StrMask.Format(_T("%s"), pAdapter->IpAddressList.IpMask.String); 
 
 							MultiByteToWideChar( CP_ACP, 0,pAdapter->GatewayList.IpAddress.String, (int)strlen((char *)pAdapter->GatewayList.IpAddress.String)+1, 
-							StrGetway.GetBuffer(MAX_PATH), MAX_PATH );
+								StrGetway.GetBuffer(MAX_PATH), MAX_PATH );
 							StrGetway.ReleaseBuffer();
-			 				if (StrMask.CompareNoCase(_T("0.0.0.0"))!=0)
-			 				{
-			 					break;
-			 				}
+							if (StrMask.CompareNoCase(_T("0.0.0.0"))!=0)
+							{
+								break;
+							}
 					}
 
 			/*StrGetway.Format(_T("%s"), pAdapter->GatewayList.IpAddress.String); */

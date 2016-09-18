@@ -94,6 +94,7 @@ public:
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 	afx_msg void OnBnClickedButtonBacSettingOk();
 	afx_msg void OnBnClickedButtonBacSettingCancel();
+	afx_msg void OnBnClickedButtonSyncTime();
 };
 
 

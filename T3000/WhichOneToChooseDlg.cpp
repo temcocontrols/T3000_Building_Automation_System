@@ -21,6 +21,7 @@ CWhichOneToChooseDlg::CWhichOneToChooseDlg(CWnd* pParent /*=NULL*/)
 
 CWhichOneToChooseDlg::~CWhichOneToChooseDlg()
 {
+
 }
 
 void CWhichOneToChooseDlg::DoDataExchange(CDataExchange* pDX)

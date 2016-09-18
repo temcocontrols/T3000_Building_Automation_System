@@ -501,7 +501,7 @@ DWORD WINAPI   Dowmloadfile::DownLoadFileProcess(LPVOID lpVoid)
 				temp_info.HEAD_1 = 0x55;
 				temp_info.HEAD_2 = 0xff;
 				temp_info.length = sizeof(Download_Info) - 2;
-				temp_info.commad = DOWNLOAD_FILE;
+				temp_info.commad =  DOWNLOAD_NEW_FILE;
 				temp_info.product_id = m_product_isp_auto_flash.product_class_id;
 				temp_info.get_newest = 1;
 				temp_info.file_type = 2;
@@ -822,6 +822,14 @@ void Dowmloadfile::Start_Download()
 	int resualt=TCP_File_Socket.Create(0,SOCK_STREAM);//SOCK_STREAM
 	TCP_File_Socket.SetParentWindow(downloadfile_hwnd);
 
+	//int nRecvBufLen = 32 * 1024; //设置为32K
+	//TCP_File_Socket.SetSockOpt(  SO_RCVBUF, ( const char* )&nRecvBufLen, sizeof( int ) ,SOL_SOCKET);
+
+	////发送缓冲区
+	//int nSendBufLen = 32*1024; //设置为32K
+	//setsockopt( s, SOL_SOCKET, SO_SNDBUF, ( const char* )&nSendBufLen, sizeof( int ) );
+
+
 
 	CString temp_db_ini_folder;
 	temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
@@ -930,8 +938,7 @@ BOOL Dowmloadfile::IsNetDevice(int DevType)
 		|| DevType == PM_MINIPANEL
 		|| DevType == PM_CM5
 		|| DevType == PM_T322AI
-		|| DevType == PM_T38AI8AO6DO
-		|| DevType == STM32_CO2_NET)
+		|| DevType == PM_T38AI8AO6DO)
 	{
 		return TRUE;
 	}
@@ -1045,8 +1052,18 @@ void Dowmloadfile::OnBnClickedButtonFileDownloadOnly()
 void Dowmloadfile::OnBnClickedButtonUpdateT3000()
 {
 	// TODO: Add your control notification handler code here
-	m_product_isp_auto_flash.product_class_id =  199;
-	download_and_update = DOWNLOAD_ONLY;
-	Start_Download();
+
+	CString tempApplicationFolder;
+	GetModuleFileName(NULL, tempApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+	PathRemoveFileSpec(tempApplicationFolder.GetBuffer(MAX_PATH));
+	tempApplicationFolder.ReleaseBuffer();
+
+
+	ShellExecute(NULL,_T("open"),_T("Update.exe"),NULL,tempApplicationFolder,SW_SHOWNORMAL);
+
+
+	//m_product_isp_auto_flash.product_class_id =  199;
+	//download_and_update = DOWNLOAD_ONLY;
+	//Start_Download();
 	return;
 }

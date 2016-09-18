@@ -16,6 +16,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Modbus Poll", "Modbus Poll\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModbusDllforVc", "ModbusDllforVc\ModbusDllforVc\ModbusDllforVc.vcxproj", "{86C4A754-63F3-44A8-949D-E01D4FACA97A}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Update", "Update\Update.vcxproj", "{76CA38FC-61AC-4D71-B926-8F55406C9542}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -85,6 +87,16 @@ Global
 		{86C4A754-63F3-44A8-949D-E01D4FACA97A}.Unicode Debug|Win32.Build.0 = Debug|Win32
 		{86C4A754-63F3-44A8-949D-E01D4FACA97A}.Unicode Release|Win32.ActiveCfg = Release|Win32
 		{86C4A754-63F3-44A8-949D-E01D4FACA97A}.Unicode Release|Win32.Build.0 = Release|Win32
+		{76CA38FC-61AC-4D71-B926-8F55406C9542}.Debug|Win32.ActiveCfg = Debug|Win32
+		{76CA38FC-61AC-4D71-B926-8F55406C9542}.Debug|Win32.Build.0 = Debug|Win32
+		{76CA38FC-61AC-4D71-B926-8F55406C9542}.Release|Win32.ActiveCfg = Release|Win32
+		{76CA38FC-61AC-4D71-B926-8F55406C9542}.Release|Win32.Build.0 = Release|Win32
+		{76CA38FC-61AC-4D71-B926-8F55406C9542}.Template|Win32.ActiveCfg = Release|Win32
+		{76CA38FC-61AC-4D71-B926-8F55406C9542}.Template|Win32.Build.0 = Release|Win32
+		{76CA38FC-61AC-4D71-B926-8F55406C9542}.Unicode Debug|Win32.ActiveCfg = Debug|Win32
+		{76CA38FC-61AC-4D71-B926-8F55406C9542}.Unicode Debug|Win32.Build.0 = Debug|Win32
+		{76CA38FC-61AC-4D71-B926-8F55406C9542}.Unicode Release|Win32.ActiveCfg = Release|Win32
+		{76CA38FC-61AC-4D71-B926-8F55406C9542}.Unicode Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

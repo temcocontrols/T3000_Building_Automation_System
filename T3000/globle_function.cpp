@@ -4544,7 +4544,6 @@ bool Initial_bac(int comport,CString bind_local_ip)
 
 #if 1
     }
-
     else
     {
         HANDLE temphandle;

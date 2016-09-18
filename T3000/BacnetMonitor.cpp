@@ -838,17 +838,17 @@ void CBacnetMonitor::OnNMClickListMonitor(NMHDR *pNMHDR, LRESULT *pResult)
 		return;
 
 
-	if(lRow == BAC_MONITOR_COUNT - 1)
-	{
-		m_monitor_list.Set_Edit(false);
-		m_monitor_input_list.Set_Edit(false);
-		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Can't edit the last monitor , it is for trend log system value."));
-		return;
-	}
-	else
-	{
+	//if(lRow == BAC_MONITOR_COUNT - 1)
+	//{
+	//	m_monitor_list.Set_Edit(false);
+	//	m_monitor_input_list.Set_Edit(false);
+	//	SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Can't edit the last monitor , it is for trend log system value."));
+	//	return;
+	//}
+	//else
+	//{
 		m_monitor_input_list.Set_Edit(true);
-	}
+	//}
 
 	memcpy_s(&m_temp_monitor_data[lRow],sizeof(Str_monitor_point),&m_monitor_data.at(lRow),sizeof(Str_monitor_point));
 

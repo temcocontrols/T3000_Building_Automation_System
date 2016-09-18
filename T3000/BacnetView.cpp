@@ -1,7 +1,18 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
-2017 - 07 - 05
+2016 - 09 - 09
+1. Bacnet view Setting UI , 哪些下拉菜单  只有下拉功能，去掉编辑功能;
+2. Downloadfile 里面 传文件的 包大小  改为3.5K ，大大加快传输效率;
+
+
+2016 - 09 - 07
+1. 在其他设备的input 界面时,如果点击TSTAT的设备，需要跳转至TSTAT的input 界面.
+2. 允许删除screen 里面的picture.
+3. 支持T3 在多个设备之间切换INPUT , output.
+4. Trend Log Y轴 取整.
+
+2016 - 07 - 05
 1. 修复minipanel 时区与电脑时区不一致 引起的 trendlog 无法正常显示的问题;
 2. 在点击扫描的时候 ， 发送 FF 55 FF 55 命令，让Minipanel 立刻去扫描下面的 设备;
 3. 在选择range的时候 打开界面默认要选中字符串，以供客户修改;

@@ -10588,17 +10588,17 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                 {
                     UNION_INPUT_NAME inputname;
 
-                    inputname.char_name[0]=My_Write_Struct->RegValue[1];
-                    inputname.char_name[1]=My_Write_Struct->RegValue[0];
+					inputname.char_name[0]=My_Write_Struct->RegValue[1];
+					inputname.char_name[1]=My_Write_Struct->RegValue[0];
 
-                    inputname.char_name[2]=My_Write_Struct->RegValue[3];
-                    inputname.char_name[3]=My_Write_Struct->RegValue[2];
+					inputname.char_name[2]=My_Write_Struct->RegValue[3];
+					inputname.char_name[3]=My_Write_Struct->RegValue[2];
 
-                    inputname.char_name[4]=My_Write_Struct->RegValue[5];
-                    inputname.char_name[5]=My_Write_Struct->RegValue[4];
+					inputname.char_name[4]=My_Write_Struct->RegValue[5];
+					inputname.char_name[5]=My_Write_Struct->RegValue[4];
 
-                    inputname.char_name[6]=My_Write_Struct->RegValue[7];
-                    inputname.char_name[7]=My_Write_Struct->RegValue[6];
+					inputname.char_name[6]=My_Write_Struct->RegValue[7];
+					inputname.char_name[7]=My_Write_Struct->RegValue[6];
 
 
                     for (int i=0; i<4; i++)
@@ -12290,8 +12290,7 @@ void CMainFrame::OnControlTstat()
     }
     else
     {
-
-        MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+		 MessageBox(_T("This function don't support this product!\r\n"));
     }
 
 

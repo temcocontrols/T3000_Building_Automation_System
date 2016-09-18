@@ -40,8 +40,8 @@ END_MESSAGE_MAP()
 CT3000App::CT3000App()
 {
 	m_bHiColorIcons = TRUE;
-	CurrentT3000Version=_T("    2016.08.31 ");
-	T3000_Version = 10812;
+	CurrentT3000Version=_T("    2016.09.18 ");
+	T3000_Version = 10918;
 
 
 	m_lastinterface=19;
@@ -869,6 +869,12 @@ BOOL CT3000App::InitInstance()
 				product_sort_way = SORT_BY_CONNECTION;
 			}
 
+			CString temp_cs_version;
+			temp_cs_version.Format(_T("%d"),T3000_Version);
+
+			WritePrivateProfileStringW(_T("Version"),_T("T3000"),temp_cs_version,g_cstring_ini_path);
+
+
 			monitor_ignore_enable = GetPrivateProfileInt(_T("Setting"),_T("EnableMonitorValueIgnore"),0,g_cstring_ini_path);
 			if(monitor_ignore_enable == 0)
 			{
@@ -965,6 +971,24 @@ BOOL CT3000App::InitInstance()
 				::UnlockResource(hGlobal);   
 				::FreeResource(hGlobal);
 			}
+			//IDR_MFC16DLL1
+
+			CString MFC16DLLPath=GetExePath(true)+L"MFC16API.dll";
+			hFind = FindFirstFile(MFC16DLLPath, &wfd);
+			if (hFind==INVALID_HANDLE_VALUE)
+			{
+
+				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MFC16DLL1), _T("MFC16DLL"));   
+				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
+				LPVOID lpExe = LockResource(hGlobal);   
+				CFile file;
+				if(file.Open(MFC16DLLPath, CFile::modeCreate | CFile::modeWrite))    
+					file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
+				file.Close();    
+				::UnlockResource(hGlobal);   
+				::FreeResource(hGlobal);
+			}
+
 
 
 			CppSQLite3DB SqliteDB;

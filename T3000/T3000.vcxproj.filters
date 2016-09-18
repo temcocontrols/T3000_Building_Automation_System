@@ -985,6 +985,7 @@
     <None Include="res\default_icon\PID.ico">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="res\MFC16API.dll" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">

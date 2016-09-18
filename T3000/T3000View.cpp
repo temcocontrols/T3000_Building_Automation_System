@@ -1840,18 +1840,18 @@ void CT3000View::Fresh_In()
 
         g_strSensorName=_T("Internal Sensor");
 
-        m_Input_Grid.put_TextMatrix(1,1,g_strSensorName);
-        m_Input_Grid.put_TextMatrix(2,1,g_strInName1);
-        m_Input_Grid.put_TextMatrix(3,1,g_strInName2);
-        m_Input_Grid.put_TextMatrix(4,1,g_strInName3);
-        m_Input_Grid.put_TextMatrix(5,1,g_strInName4);
-        m_Input_Grid.put_TextMatrix(6,1,g_strInName5);
-        m_Input_Grid.put_TextMatrix(7,1,g_strInName6);
-        m_Input_Grid.put_TextMatrix(8,1,g_strInName7);
-        m_Input_Grid.put_TextMatrix(9,1,g_strInName8);
-        m_Input_Grid.put_TextMatrix(10,1,g_strInHumName);
-        m_Input_Grid.put_TextMatrix(11,1,g_strInCO2);
-        m_Input_Grid.put_TextMatrix(12,1,g_strLightingSensor);
+		m_Input_Grid.put_TextMatrix(1,1,g_strSensorName);
+		m_Input_Grid.put_TextMatrix(2,1,g_strInName1);
+		m_Input_Grid.put_TextMatrix(3,1,g_strInName2);
+		m_Input_Grid.put_TextMatrix(4,1,g_strInName3);
+		m_Input_Grid.put_TextMatrix(5,1,g_strInName4);
+		m_Input_Grid.put_TextMatrix(6,1,g_strInName5);
+		m_Input_Grid.put_TextMatrix(7,1,g_strInName6);
+		m_Input_Grid.put_TextMatrix(8,1,g_strInName7);
+		m_Input_Grid.put_TextMatrix(9,1,g_strInName8);
+		m_Input_Grid.put_TextMatrix(10,1,g_strInHumName);
+		m_Input_Grid.put_TextMatrix(11,1,g_strInCO2);
+		m_Input_Grid.put_TextMatrix(12,1,g_strLightingSensor);
         strTemp.Empty();
 // 		if (is_connect())
 // 		{
@@ -2944,14 +2944,9 @@ void CT3000View::FreshIOGridTable_Tstat6()
         strTemp.Format(_T("%d"),i+1);
         m_Output_Grid.put_TextMatrix(i+1,0,strTemp);
         m_Output_Grid.put_TextMatrix(i+  1,1,m_tstat_output_data.at(i).OutputName.StrValue);
-//           if (m_tstat_output_data.at(i).Unit.StrValue.CompareNoCase(NO_APPLICATION)==0)
-//           {
+
         strTemp.Format(_T("%s"),m_tstat_output_data.at(i).Value.StrValue);
-//           }
-//           else
-//           {
-//           strTemp.Format(_T("%s%s"),m_tstat_output_data.at(i).Value.StrValue,m_tstat_output_data.at(i).Unit.StrValue);
-//           }
+
 
         m_Output_Grid.put_TextMatrix(i+1,2,strTemp);
     }
@@ -3017,9 +3012,9 @@ void CT3000View::ClickInputMsflexgrid()
     CString strValue = m_Input_Grid.get_TextMatrix(lRow,lCol);
 
 
-    if(1==lCol && lRow != 1)
+    if(1==lCol && lRow <=8)
     {
-        return; // 2012.2.7老毛说不允许修改
+       // return; // 2012.2.7老毛说不允许修改
         m_inNameEdt.MoveWindow(&rcCell,1);
         m_inNameEdt.ShowWindow(SW_SHOW);
         m_inNameEdt.SetWindowText(strValue);
@@ -3064,7 +3059,7 @@ void CT3000View::ClickOutputMsflexgrid()
 
     if(1==lCol)
     {
-        return; // don not permit change by customer
+       // return; // don not permit change by customer
         m_outNameEdt.MoveWindow(&rcCell,1);
         m_outNameEdt.ShowWindow(SW_SHOW);
         m_outNameEdt.SetWindowText(strValue);
@@ -3087,43 +3082,70 @@ void CT3000View::OnEnKillfocusInputnameedit()
         return;
     switch (lRow)
     {
+
     case 1:
-        strInName=g_strSensorName;
-        break;
-    case 2:
         strInName=g_strInName1;
         break;
-    case 3:
+    case 2:
         strInName=g_strInName2;
         break;
-    case 4:
+    case 3:
         strInName=g_strInName3;
         break;
-    case 5:
+    case 4:
         strInName=g_strInName4;
         break;
-    case 6:
+    case 5:
         strInName=g_strInName5;
         break;
-    case 7:
+    case 6:
         strInName=g_strInName6;
         break;
-    case 8:
+    case 7:
         strInName=g_strInName7;
         break;
-    case 9:
+    case 8:
         strInName=g_strInName8;
         break;
+	case 9:
+		strInName=g_strSensorName;
+		break;
     case 10:
         strInName=g_strInHumName;
         break;
     }
     if(strText.CompareNoCase(strInName)==0)
         return;
-
+	if(strText.CompareNoCase(m_tstat_input_data.at(lRow-1).InputName.StrValue)==0)
+		return;
+		
 
     //if(g_serialNum>0&&product_register_value[6]>0)
-    if(product_register_value[6]>0)
+
+   
+
+
+	if (product_register_value[7]== PM_TSTAT6||product_register_value[7]==PM_TSTAT8||product_register_value[7]==PM_TSTAT7)
+	{
+	 
+		char cTemp1[8];
+		memset(cTemp1,0,8);
+		WideCharToMultiByte( CP_ACP, 0, strText.GetBuffer(), -1, cTemp1, 8, NULL, NULL );
+		unsigned char UChar[8];
+		for (int i=0;i<8;i++)
+		{
+			UChar[i]=cTemp1[i];
+		}
+		int ret = Write_Multi(g_tstat_id,UChar,m_tstat_input_data.at(lRow-1).InputName.regAddress,8);
+		if (ret>0)
+		{
+			m_tstat_input_data.at(lRow-1).InputName.StrValue=strText;
+		}
+		FreshIOGridTable_Tstat6();
+	}
+	else
+	{
+		 if(product_register_value[6]>0)
     {
         try
         {
@@ -3304,6 +3326,7 @@ void CT3000View::OnEnKillfocusInputnameedit()
 
         }
     }
+	}
 }
 
 void CT3000View::OnEnKillfocusOutputnameedit()
@@ -3344,10 +3367,34 @@ void CT3000View::OnEnKillfocusOutputnameedit()
     }
     if(strText.CompareNoCase(strInName)==0)
         return;
-
+	if(strText.CompareNoCase(m_tstat_output_data.at(lRow-1).OutputName.StrValue)==0)
+		return;
 
     //if(g_serialNum>0&&product_register_value[6]>0)
-    if(product_register_value[MODBUS_ADDRESS]>0)//6
+	if (  product_register_value[7]== PM_TSTAT6
+		||product_register_value[7]==PM_TSTAT8
+		||product_register_value[7]==PM_TSTAT7
+		||product_register_value[7]==PM_TSTAT5i
+		)
+	{
+		char cTemp1[8];
+		memset(cTemp1,0,8);
+		WideCharToMultiByte( CP_ACP, 0, strText.GetBuffer(), -1, cTemp1, 8, NULL, NULL );
+		unsigned char UChar[8];
+		for (int i=0;i<8;i++)
+		{
+			UChar[i]=cTemp1[i];
+		}
+		int ret = Write_Multi(g_tstat_id,UChar,m_tstat_output_data.at(lRow-1).OutputName.regAddress,8);
+		if (ret>0)
+		{
+			m_tstat_output_data.at(lRow-1).OutputName.StrValue=strText;
+		}
+		FreshIOGridTable_Tstat6();
+	}
+	else
+	{
+		if(product_register_value[MODBUS_ADDRESS]>0)//6
     {
 
         try
@@ -3437,27 +3484,27 @@ void CT3000View::OnEnKillfocusOutputnameedit()
                     break;
                 }
 
-                CString	str_temp;
-                str_temp.Format(_T("insert into IONAME values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"),
-                                strSerial,
-                                g_strInName1,
-                                g_strInName2,
-                                g_strInName3,
-                                g_strInName4,
-                                g_strInName5,
-                                g_strInName6,
-                                g_strInName7,
-                                g_strOutName1,
-                                g_strOutName2,
-                                g_strOutName3,
-                                g_strOutName4,
-                                g_strOutName5,
-                                g_strOutName6,
-                                g_strOutName7,
-                                g_strInName8,
-                                g_strInHumName,
-                                g_strSensorName
-                               );
+				CString	str_temp;
+				str_temp.Format(_T("insert into IONAME values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"),
+					strSerial,
+					g_strInName1,
+					g_strInName2,
+					g_strInName3,
+					g_strInName4,
+					g_strInName5,
+					g_strInName6,
+					g_strInName7,
+					g_strOutName1,
+					g_strOutName2,
+					g_strOutName3,
+					g_strOutName4,
+					g_strOutName5,
+					g_strOutName6,
+					g_strOutName7,
+					g_strInName8,
+					g_strInHumName,
+					g_strSensorName
+					);
                 try
                 {
 
@@ -3508,7 +3555,7 @@ void CT3000View::OnEnKillfocusOutputnameedit()
 
         }
     }
-
+	}
 
 }
 // void CT3000View::EnableToolTips(BOOL bEnable)
@@ -4590,7 +4637,8 @@ LRESULT CT3000View::OnFlexSlideCallBack(WPARAM wParam, LPARAM lParam)
         int Increment=product_register_value[MODBUS_SETPOINT_INCREASE];
         switch(wParam)
         {
-        case 1://右侧 晚上 2SP
+        
+		case 1://右侧 晚上 2SP
         {
             //350	1	Low byte	W/R	(Night)Unoccupied  setpoin.
             //352	1	Low byte	W/R	(Night)Unoccupied heating setpoint dead band , heating deadband for the night (OFF) mode. Units of 1 deg.
@@ -4602,7 +4650,9 @@ LRESULT CT3000View::OnFlexSlideCallBack(WPARAM wParam, LPARAM lParam)
 			int nHeatSP = szPos[0] + nMin;
 			int nCoolSP = szPos[1] + nMin;
             nSP =  product_register_value[MODBUS_NIGHT_SETPOINT];
-            if (nSP-nHeatSP < Increment)
+			//这里是严格的按照一个刻度一个刻度的移动
+			//不支持随意移动
+           /* if (nSP-nHeatSP < Increment)
             {
                 nHeatSP = nSP - Increment;
 
@@ -4610,11 +4660,19 @@ LRESULT CT3000View::OnFlexSlideCallBack(WPARAM wParam, LPARAM lParam)
             if (nCoolSP-nSP <Increment)
             {
                 nCoolSP = nSP + Increment;
-            }
+            }*/
 
+			//现在老毛要改成随意可以移动的
+			//甚至可以把heatsp移动到sp上面
+			//这就要求Tstat支持随意可以写动作
+			//这里就要把Deadband写入到寄存器
+			//让Tstat自动计算heatsetpoint,coolsetpoint
+			//
             nHDB=nSP-nHeatSP;
             nCDB=nCoolSP-nSP;
-
+			//直接写如sp，让Tstat自己计算他的Deadband和setpoint到底是多少
+			//在这里我们就要知道slider移动到那个地方了
+			//并且获取他的当前值，写到setpoint的寄存器去
             if ((nHDB<0&&nHDB>254)&&(nCDB<0&&nCDB>254))
             {
 
@@ -4634,6 +4692,8 @@ LRESULT CT3000View::OnFlexSlideCallBack(WPARAM wParam, LPARAM lParam)
             if (nHeatSP!=Tstat_nHeatSP)
             {
                 // nHDB=nSP-nHeatSP;
+
+
                 nHDB = Tstat_nSP - Tstat_nHeatSP;
                 if (nHeatSP>Tstat_nHeatSP)
                 {
@@ -4725,10 +4785,12 @@ LRESULT CT3000View::OnFlexSlideCallBack(WPARAM wParam, LPARAM lParam)
 
 
 
-            break;
+           
 
         }
-        case 2://右侧 晚上 1SP
+         break;
+
+		case 2://右侧 晚上 1SP
         {
             //350	1	Low byte	W/R	(Night)Unoccupied  setpoin.
             //354	2	Full	W/R	(Night)Unoccupied heating setpoint
@@ -4790,7 +4852,8 @@ LRESULT CT3000View::OnFlexSlideCallBack(WPARAM wParam, LPARAM lParam)
 
         }
         break;
-        case 3:
+        
+		case 3:
             //左侧 白天 2SP
         {
             // 		345	1	Low byte	W/R	(Day)Occupied   setpoint
@@ -4914,9 +4977,9 @@ LRESULT CT3000View::OnFlexSlideCallBack(WPARAM wParam, LPARAM lParam)
             EndWaitCursor();
 
         }
-
         break;
-        case 4://左侧 白天 1SP
+        
+		case 4://左侧 白天 1SP
         {
 
             //348	2	Full	W/R	(Day)Occupied  cooling setpoint (day cooling setpoint)

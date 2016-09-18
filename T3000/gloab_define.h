@@ -23,7 +23,8 @@ const int CHECK_MD5_VALUE = 6;
 const int SHOW_FTP_PATH = 7;
 const int THREAD_IDLE = 255;
 
-const int TFTP_SEND_LENGTH = 512;
+const int TFTP_SEND_LENGTH = 3 * 1024 + 512;
+//const int TFTP_SEND_LENGTH = 512;
 //const int TFTP_SEND_LENGTH = 1024;
 #pragma pack(push) //保存对齐状态 
 #pragma pack(1)
@@ -108,6 +109,7 @@ typedef enum
 	GET_SERIAL_NUMBER = 1,
 	DOWNLOAD_FILE	= 2,
 	UPLOAD_FILE = 3,
+	DOWNLOAD_NEW_FILE = 4,	//用于区别  DOWNLOAD_FILE ， 代表新的下载利用3K下载;
 	GET_MD5_VALUE = 99,
 
 	RETURN_SERIAL_NUMBER = 101,
@@ -883,8 +885,8 @@ const CString Variable_Analog_Units_Array[] =
 	_T("p/min"),
 	_T("Counts"),
 	_T("%Open"),
-	_T("CFH"),
-	_T("GPM"),
+	_T("Kg"),
+	_T("L/Hour"),
 	_T("GPH"),
 	_T("GAL"),
 	_T("CF"),

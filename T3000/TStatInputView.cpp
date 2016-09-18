@@ -153,12 +153,13 @@ void CTStatInputView::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CTStatInputView, CFormView)
-    ON_MESSAGE(MY_RESUME_DATA, InputMessageCallBack)
+    
+	ON_MESSAGE(MY_RESUME_DATA, InputMessageCallBack)
     ON_MESSAGE(WM_REFRESH_BAC_INPUT_LIST,Fresh_Input_List)
     ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_Input_Item)	
     ON_NOTIFY(NM_CLICK, IDC_LIST1, &CTStatInputView::OnNMClickList1)
-   
     ON_WM_SIZE()
+
 END_MESSAGE_MAP()
 
 
@@ -178,15 +179,15 @@ void CTStatInputView::Dump(CDumpContext& dc) const
 #endif
 #endif //_DEBUG
 void CTStatInputView::Fresh_One_Item(int row){
-    m_input_list.SetItemText(row,1,m_tstat_input_data.at(row).InputName.StrValue);
-    m_input_list.SetItemText(row,2,m_tstat_input_data.at(row).AM.StrValue);
-    m_input_list.SetItemText(row,3,m_tstat_input_data.at(row).Value.StrValue);
-    m_input_list.SetItemText(row,4,m_tstat_input_data.at(row).Unit.StrValue);
-    m_input_list.SetItemText(row,5,m_tstat_input_data.at(row).Range.StrValue);
-    m_input_list.SetItemText(row,6,_T("Adjust..."));
-    m_input_list.SetItemText(row,7,m_tstat_input_data.at(row).Filter.StrValue);
-    m_input_list.SetItemText(row,8,m_tstat_input_data.at(row).Function.StrValue);
-    m_input_list.SetItemText(row,9,m_tstat_input_data.at(row).CustomTable.StrValue);
+	m_input_list.SetItemText(row,1,m_tstat_input_data.at(row).InputName.StrValue);
+	m_input_list.SetItemText(row,2,m_tstat_input_data.at(row).AM.StrValue);
+	m_input_list.SetItemText(row,3,m_tstat_input_data.at(row).Value.StrValue);
+	m_input_list.SetItemText(row,4,m_tstat_input_data.at(row).Unit.StrValue);
+	m_input_list.SetItemText(row,5,m_tstat_input_data.at(row).Range.StrValue);
+	m_input_list.SetItemText(row,6,_T("Adjust..."));
+	m_input_list.SetItemText(row,7,m_tstat_input_data.at(row).Filter.StrValue);
+	m_input_list.SetItemText(row,8,m_tstat_input_data.at(row).Function.StrValue);
+	m_input_list.SetItemText(row,9,m_tstat_input_data.at(row).CustomTable.StrValue);
 }
 LRESULT  CTStatInputView::InputMessageCallBack(WPARAM wParam, LPARAM lParam)
 {
@@ -317,8 +318,8 @@ LRESULT CTStatInputView::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
             cs_temp.Delete(8,cs_temp.GetLength()-8);
 		}
 
-	   if (m_tstat_input_data.at(Changed_Item).InputName.StrValue.CompareNoCase(cs_temp)==0)
-	   {
+		if (m_tstat_input_data.at(Changed_Item).InputName.StrValue.CompareNoCase(cs_temp)==0)
+		{
 			PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
 			return 0; 
 		}
@@ -867,14 +868,14 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 }
 void CTStatInputView::Fresh()
 {
-         Initial_ListFor_Tstat();
-        PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
-        if (m_Fresh_BackgroundThreadHandle!=NULL)
-        {
-            BOOL bRet = TerminateThread(m_Fresh_BackgroundThreadHandle->m_hThread,0);
-            m_Fresh_BackgroundThreadHandle=NULL;
-        }
-        m_Fresh_BackgroundThreadHandle =    AfxBeginThread(BackMainUIFresh_TstatInput,this);
+  Initial_ListFor_Tstat();
+  PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
+  if (m_Fresh_BackgroundThreadHandle!=NULL)
+  {
+      BOOL bRet = TerminateThread(m_Fresh_BackgroundThreadHandle->m_hThread,0);
+      m_Fresh_BackgroundThreadHandle=NULL;
+  }
+  m_Fresh_BackgroundThreadHandle = AfxBeginThread(BackMainUIFresh_TstatInput,this);
 }
 void CTStatInputView::Initial_ListFor_Tstat(){
     m_input_list.ShowWindow(SW_HIDE);
