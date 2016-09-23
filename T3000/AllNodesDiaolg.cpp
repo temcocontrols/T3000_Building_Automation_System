@@ -123,9 +123,9 @@ void CAllNodesDiaolg::OnBnClickedDelallbutton()
 	CBADO bado;
 	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
 	bado.OnInitADOConn(); 
-
+	//where Custom is null or Custom = '0'
 	CString strSql;
-	strSql=_T("delete * from ALL_NODE where Custom is null or Custom = '0'");
+	strSql=_T("delete * from ALL_NODE ");
 	CString strTemp;
 	strTemp.Format(_T("Are you sure to delete all the sub node(s)"));
 	if(AfxMessageBox(strTemp,MB_OKCANCEL)==IDOK)

@@ -14,8 +14,10 @@ DWORD WINAPI _ReadMultiRegisters_CO2(LPVOID pParam)
 {
     CCO2NetView* pView=(CCO2NetView*)(pParam);
     BOOL bFirst=TRUE;
-    while(1)
+	return 0;
+    while(pView->IsWindowVisible())
     {
+	 
 		if (!is_connect())
 		{
 			Sleep(10);
@@ -55,8 +57,6 @@ DWORD WINAPI _ReadMultiRegisters_CO2(LPVOID pParam)
 
 
     }
-
-
 
     return 1;
 }

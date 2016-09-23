@@ -71,7 +71,7 @@ void SetPaneString(int nIndext,CString str);
 UINT get_serialnumber();
 bool can_be_writed_hex_file(int product_model,int hex_file_product_model);
 CString get_product_name_by_product_model(int product_model);
-
+BOOL IS_Temco_Product(int product_model);
 //CString GetTempUnit(int analog1_or_analog2=-1);
 CString GetTempUnit(int nRange=-1,int nPIDNO = 0);
 CString get_product_class_name_by_model_ID(int nModelID);

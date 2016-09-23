@@ -30,6 +30,7 @@ extern bool g_register_occuppied ; //Add by Alex
 extern			  BOOL g_bChamber;
 extern bool list_mouse_click;
 extern CString CurrentT3000Version;
+extern BOOL g_SelectChanged;
 //Fance_4
 extern unsigned short product_register_value[1024];
 extern int product_type ;

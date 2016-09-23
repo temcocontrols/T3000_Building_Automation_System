@@ -2175,7 +2175,9 @@ BOOL CComWriter::UpdataDeviceInformation_ex(unsigned short device_productID)
 
 	if (Temco_logo.Find(L"CO2")!=-1)
 	{
-		hexproductname = L"CO2";
+		Temco_logo.TrimRight();
+		Temco_logo.TrimLeft();
+		hexproductname = Temco_logo;
 	}
 
     //   if (hexproductname.CompareNoCase(_T("CO3"))==0)

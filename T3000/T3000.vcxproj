@@ -401,6 +401,7 @@
     <None Include="res\menu_imgeOwn.bmp" />
     <None Include="res\menu_imgeOwn16.bmp" />
     <None Include="res\MFC16API.dll" />
+    <None Include="res\mfc16dll.bin" />
     <None Include="res\MFouct.bmp" />
     <None Include="res\MonitorData.mdb" />
     <None Include="res\monitor_.bin" />

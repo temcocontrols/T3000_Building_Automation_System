@@ -367,6 +367,15 @@ public:
     afx_msg void OnBnClickedGrapic();
     afx_msg void OnBnClickedTempSensor();
     afx_msg void OnBnClickedHumSensor();
+	CButton m_button_onoff;
+	CEdit m_edit_nco2;
+	CEdit m_edit_rtime;
+	afx_msg void OnEnKillfocusEdit1Nco2();
+	afx_msg void OnEnKillfocusEditRtime();
+	void Fresh_CO2Node_Compensatin();
+	afx_msg void OnBnClickedButtonOnoff();
+	afx_msg void OnEnKillfocusEditRtime2();
+	CEdit m_edit_adjustment;
 };
 const int CO2_EXTERNAL_NUM = 0;
 const int CO2_EXTERNAL_DEVICE_ID = 1;

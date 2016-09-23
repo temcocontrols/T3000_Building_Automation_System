@@ -52,13 +52,13 @@ void CConnectRemoteServer::OnPaint()
 	memDC.GetDC().FillSolidRect(&rcClient,RGB(230,230,230));
 	//Graphics graphics(memDC.GetDC());
 	SolidBrush *BlackBrush;
-	SolidBrush *CharacterBlackBrush;
+	//SolidBrush *CharacterBlackBrush;
 
 	Graphics *mygraphics;
 	mygraphics = new Graphics(memDC.GetDC());
 	mygraphics->SetSmoothingMode(SmoothingModeAntiAlias);
 	BlackBrush =new  SolidBrush(MY_COLOR_RED) ;
-	CharacterBlackBrush = new SolidBrush(MY_COLOR_BLACK_CHARACTER);
+	//CharacterBlackBrush = new SolidBrush(MY_COLOR_BLACK_CHARACTER);
 
 
 	mygraphics->FillRectangle(BlackBrush,0,0,rcClient.Width(),40);

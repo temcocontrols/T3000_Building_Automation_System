@@ -276,7 +276,7 @@
 #define IDI_ICON_DEFAULT_SCHEDUAL       630
 #define IDI_ICON_DEFAULT_TRENDLOG       631
 #define IDI_ICON_DEFAULT_PID            632
-#define IDR_MFC16DLL1                   635
+#define IDR_MFC16DLL2                   636
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -2039,6 +2039,40 @@
 #define IDC_BUTTON_MODEL4               2183
 #define IDC_BUTTON_MODEL5               2184
 #define IDC_STATIC_MODEL_NAME           2185
+#define IDC_STATIC_VC_1                 2186
+#define IDC_STATIC_VALUE_1              2187
+#define IDC_STATIC_VC_2                 2188
+#define IDC_STATIC_VC_3                 2189
+#define IDC_STATIC_VC_4                 2190
+#define IDC_STATIC_VC_5                 2191
+#define IDC_STATIC_VC_6                 2192
+#define IDC_STATIC_VC_7                 2193
+#define IDC_STATIC_VC_8                 2194
+#define IDC_STATIC_VC_9                 2195
+#define IDC_STATIC_VC_10                2196
+#define IDC_STATIC_VC_11                2197
+#define IDC_STATIC_VALUE_2              2198
+#define IDC_STATIC_VALUE_3              2199
+#define IDC_STATIC_VALUE_4              2200
+#define IDC_STATIC_VALUE_5              2201
+#define IDC_STATIC_VALUE_6              2202
+#define IDC_STATIC_VALUE_7              2203
+#define IDC_STATIC_VALUE_8              2204
+#define IDC_STATIC_VALUE_9              2205
+#define IDC_STATIC_VALUE_10             2206
+#define IDC_STATIC_VALUE_11             2207
+#define IDC_STATIC_COMPENSATION         2208
+#define IDC_STATIC_NATURE_CO2           2209
+#define IDC_STATIC_UNIT_PPM             2210
+#define IDC_STATIC_NATURE_CO3           2211
+#define IDC_STATIC_UNIT_PPM2            2212
+#define IDC_EDIT1_NCO2                  2213
+#define IDC_EDIT_RTIME                  2214
+#define IDC_BUTTON_ONOFF                2215
+#define IDC_EDIT_RTIME2                 2216
+#define IDC_STATIC_NATURE_CO4           2217
+#define IDC_STATIC_UNIT_PPM3            2218
+#define IDC_COMBO_DATA_FORMAT           2219
 #define IDC_HELP_HELP1                  3831
 #define IDC_BUTTON_SYNC_TIME            5716
 #define IDC_STATIC_BAC_SETTING_SD_CARD  5817
@@ -2532,9 +2566,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        636
+#define _APS_NEXT_RESOURCE_VALUE        637
 #define _APS_NEXT_COMMAND_VALUE         34058
-#define _APS_NEXT_CONTROL_VALUE         2186
+#define _APS_NEXT_CONTROL_VALUE         2219
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

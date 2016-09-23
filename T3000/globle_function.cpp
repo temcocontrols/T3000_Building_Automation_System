@@ -799,7 +799,75 @@ CString get_product_name_by_product_model(int product_model)
     }
     return return_str;
 }
+BOOL IS_Temco_Product(int product_model)
+{
 
+	switch(product_model)
+	{
+		    case   PM_TSTAT5B				   :
+			case   PM_TSTAT5A				   :
+			case   PM_TSTAT5B2				   :
+			case   PM_TSTAT5C				   :
+			case   PM_TSTAT6				   :
+			case   PM_TSTAT7				   :
+			case   PM_TSTAT5i				   :
+			case   PM_TSTAT8				   :
+			case   PM_TSTAT5D				   :
+			case   PM_AirQuality			   :
+			case   PM_HUMTEMPSENSOR			   :
+			case   PM_TSTATRUNAR			   :
+			case   PM_TSTAT5E				   :
+			case   PM_TSTAT5F				   :
+			case   PM_TSTAT5G				   :
+			case   PM_TSTAT5H				   :
+			case   PM_T3PT10				   :
+			case   PM_T3IOA					   :
+			case   PM_T332AI				   :
+			case   PM_T38AI16O				   :
+			case   PM_T38I13O				   :
+			case   PM_T34AO					   :
+			case   PM_T36CT					   :
+			case   PM_ZIGBEE				   :
+			case   PM_FLEXDRIVER			   :
+			case   PM_T3PERFORMANCE			   :
+			case   PM_SOLAR					   :
+			case   PM_FWMTRANSDUCER			   :
+			case   PM_CO2_NET				   :
+			case   PM_CO2_RS485				   :
+			case   PM_CO2_NODE				   :
+			case   PM_MINIPANEL				   :
+			case   PM_CS_SM_AC				   :
+			case   PM_CS_SM_DC				   :
+			case   PM_CS_RSM_AC				   :
+			case   PM_CS_RSM_DC				   :
+			case   PM_PRESSURE				   :
+			case   PM_PM5E					   :
+			case   PM_HUM_R					   :
+			case   PM_T322AI				   :
+			case   PM_T38AI8AO6DO			   :
+			case   PM_PRESSURE_SENSOR		   :
+			case   PM_T3PT12				   :
+			case   PM_CM5					   :
+			case   PM_TSTAT6_HUM_Chamber	   :
+			case   PM_BEENY					   :
+			case   PM_WATER_SENSOR         	   :
+			case   PM_NC					   :
+			case   PM_LightingController	   :
+			case   PM_BTU_METER 			   :
+			case   PM_MINI_TOP				   :
+			case   PM_LABBATS				   :
+			case   PM_TESTER_JIG			   :
+			case   STM32_CO2_NET			   :
+			case   STM32_CO2_RS485			   :
+			case   STM32_HUM_NET			   :
+			case   STM32_HUM_RS485			   :
+			case   STM32_PRESSURE_NET		   :
+			case   STM32_PRESSURE_RS3485	   :
+			       return TRUE;
+			default:
+			       return FALSE;
+	}
+}
 // Function : 获得单位名称，此单位用于Input Grid，Output Grid，Output Set Grid，主界面的Grid等等。
 // Param: int nRange: 指示当前的Range的选择值。函数应该根据Range的选择以及TStat的型号，
 //					获得单位名称，如摄氏度，华氏度，百分比，自定义的单位等。
@@ -4655,7 +4723,7 @@ void Init_Service_Handlers(	void)
     apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_PRIVATE_TRANSFER,local_handler_conf_private_trans_ack);
     //apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_READ_PROPERTY,Read_Property_feed_back);
 
-    apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_READ_PROPERTY,	Localhandler_read_property_ack);
+    
     /* set the handler for all the services we don't implement */
     /* It is required to send the proper reject message... */
     apdu_set_unrecognized_service_handler_handler
@@ -4673,6 +4741,8 @@ void Init_Service_Handlers(	void)
 #endif
     apdu_set_confirmed_handler(SERVICE_CONFIRMED_SUBSCRIBE_COV,
                                handler_cov_subscribe);
+
+    apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_READ_PROPERTY,	Localhandler_read_property_ack);
 
     ////#if 0
     ////	/* Adding these handlers require the project(s) to change. */
@@ -4770,26 +4840,38 @@ void Localhandler_read_property_ack(
     BACNET_ADDRESS * src,
     BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data)
 {
-    int len = 0;
-    BACNET_READ_PROPERTY_DATA data;
+//    int len = 0;
+//    BACNET_READ_PROPERTY_DATA data;
+//
+//    (void) src;
+//    (void) service_data;        /* we could use these... */
+//    len = rp_ack_decode_service_request(service_request, service_len, &data);
+//    //char my_pro_name[100];
+//    //char * temp = get_prop_name();
+//    //strcpy_s(my_pro_name,100,temp);
+//
+//#if 0
+//    fprintf(stderr, "Received Read-Property Ack!\n");
+//#endif
+//    if (len > 0)
+//    {
+//        local_rp_ack_print_data(&data);
+//        //	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,WM_COMMAND_WHO_IS,NULL);
+//    }
 
-    (void) src;
-    (void) service_data;        /* we could use these... */
-    len = rp_ack_decode_service_request(service_request, service_len, &data);
-    //char my_pro_name[100];
-    //char * temp = get_prop_name();
-    //strcpy_s(my_pro_name,100,temp);
+	 int len = 0;
+	BACNET_READ_PROPERTY_DATA data;
 
-#if 0
-    fprintf(stderr, "Received Read-Property Ack!\n");
-#endif
-    if (len > 0)
-    {
-        local_rp_ack_print_data(&data);
-        //	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,WM_COMMAND_WHO_IS,NULL);
-    }
+ 
+	if(service_data->invoke_id == g_invoke_id) {
+		len =
+			rp_ack_decode_service_request(service_request, service_len, &data);
+		if (len > 0) {
+			//rp_ack_print_data(&data);
+		}
+
+	}
 }
-
 
 //This function add by Fance Du, used for changed the CString to hex
 //2013 12 02

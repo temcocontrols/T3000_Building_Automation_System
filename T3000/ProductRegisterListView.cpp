@@ -58,42 +58,110 @@
                     CString strTemp;
                     if (Parent->m_register_data_sheet.at(i).DataFormat.CompareNoCase(_T("Signed"))==0)
                     { 
-                        for (int len=0;len<Count_Number;len++)
-                        {
-                            strTemp.Format(_T("%d"),(short)DataBuffer[len]);
-                            strValue+=strTemp;
-                            if (len+1!=Count_Number)
-                            {
-                                strValue+=_T(",");
-                            } 
+						if (Parent->m_value_format == 2)//Raw
+						{
+							int datavalue = 0 ;
+							for (int len=0;len<Count_Number;len++)
+							{
+								datavalue+=((int)pow((long double)256,Count_Number-len-1))*(short)DataBuffer[len];
+							}	
+							strValue.Format(_T("%d"),datavalue);
 
-                        }
+						}
+						else if (Parent->m_value_format == 1)
+						{
+							int datavalue = 0 ;
+							for (int len=0;len<Count_Number;len++)
+							{
+								datavalue+=((int)pow((long double)256,len))*(short)DataBuffer[len];
+							}	
+							strValue.Format(_T("%d"),datavalue);
+						}
+						else
+						{
+							for (int len=0;len<Count_Number;len++)
+							{
+								strTemp.Format(_T("%d"),(short)DataBuffer[len]);
+								strValue+=strTemp;
+								if (len+1!=Count_Number)
+								{
+									strValue+=_T(",");
+								} 
+							}
+						}
+
+
+
                     }
                     else if (Parent->m_register_data_sheet.at(i).DataFormat.CompareNoCase(_T("Unsigned"))==0)
                     { 
-                        for (int len=0;len<Count_Number;len++)
-                        {
-                            strTemp.Format(_T("%d"),(unsigned short)DataBuffer[len]);
-                            strValue+=strTemp;
-                            if (len+1!=Count_Number)
-                            {
-                                strValue+=_T(",");
-                            } 
+						if (Parent->m_value_format == 2)//Raw
+						{
+							int datavalue = 0 ;
+							for (int len=0;len<Count_Number;len++)
+							{
+								datavalue+=((int)pow((long double)256,Count_Number-len-1))*DataBuffer[len];
+							}	
+							strValue.Format(_T("%d"),datavalue);
 
-                        }
+						}
+						else if (Parent->m_value_format == 1)
+						{
+							int datavalue = 0 ;
+							for (int len=0;len<Count_Number;len++)
+							{
+								datavalue+=((int)pow((long double)256,len))*DataBuffer[len];
+							}	
+							strValue.Format(_T("%d"),datavalue);
+						}
+						else
+						{
+							for (int len=0;len<Count_Number;len++)
+							{
+								strTemp.Format(_T("%d"),DataBuffer[len]);
+								strValue+=strTemp;
+								if (len+1!=Count_Number)
+								{
+									strValue+=_T(",");
+								} 
+							}
+						}
+
                     }
                     else if (Parent->m_register_data_sheet.at(i).DataFormat.CompareNoCase(_T("Hex"))==0)
                     { 
-                        for (int len=0;len<Count_Number;len++)
-                        {
-                            strTemp.Format(_T("0x%04X"),DataBuffer[len]);
-                            strValue+=strTemp;
-                            if (len+1!=Count_Number)
-                            {
-                                strValue+=_T(",");
-                            } 
+                        
+						if (Parent->m_value_format == 2)//Raw
+						{
+							int datavalue = 0 ;
+							for (int len=0;len<Count_Number;len++)
+							{
+								datavalue+=((int)pow((long double)256,Count_Number-len-1))*DataBuffer[len];
+							}	
+							strValue.Format(_T("0x%X"),datavalue);
 
-                        }
+						}
+						else if (Parent->m_value_format == 1)
+						{
+							int datavalue = 0 ;
+							for (int len=0;len<Count_Number;len++)
+							{
+								datavalue+=((int)pow((long double)256,len))*DataBuffer[len];
+							}	
+							strValue.Format(_T("0x%X"),datavalue);
+						}
+						else
+						{
+							for (int len=0;len<Count_Number;len++)
+							{
+								strTemp.Format(_T("0x%04X"),DataBuffer[len]);
+								strValue+=strTemp;
+								if (len+1!=Count_Number)
+								{
+									strValue+=_T(",");
+								} 
+							}
+						}
                     } 
                     else if (Parent->m_register_data_sheet.at(i).DataFormat.CompareNoCase(_T("Binary"))==0)
                     { 
@@ -166,6 +234,7 @@ CProductRegisterListView::CProductRegisterListView()
     m_short_counts = 1;
     m_string_paratypes = _T("");
     m_sort_type= 0;//Ä¬ÈÏÅÅÐò
+	m_value_format = 0;
 }
 
 CProductRegisterListView::~CProductRegisterListView()
@@ -174,30 +243,28 @@ CProductRegisterListView::~CProductRegisterListView()
 
 void CProductRegisterListView::DoDataExchange(CDataExchange* pDX)
 {
-    CFormView::DoDataExchange(pDX);
-    DDX_Control(pDX, IDC_LIST_CUSTOM_LIST, m_register_list);
-    DDX_Control(pDX, IDC_COMBO_DATAFORMAT, m_combox_dataformat);
-    DDX_Control(pDX, IDC_COMBO_PROPERTY, m_combox_property);
-    DDX_Control(pDX, IDC_EDIT_COUNTS, m_edit_counts);
-    DDX_CBString(pDX, IDC_COMBO_DATAFORMAT, m_string_dataformat);
-    DDX_CBString(pDX, IDC_COMBO_PROPERTY, m_string_property);
-    DDX_Text(pDX, IDC_EDIT_COUNTS, m_short_counts);
-    DDX_Control(pDX, IDC_COMBO_PARA_TYPES, m_combox_paratypes);
-    DDX_CBString(pDX, IDC_COMBO_PARA_TYPES, m_string_paratypes);
-    DDX_Control(pDX,IDC_UPBUTTON , m_upButton);
-    DDX_Control(pDX,IDC_DOWNBUTTON , m_downButton);
-    DDX_Text(pDX, IDC_EDIT_DELAY_LOOP, m_UINT_delay_loop);
-    DDX_Text(pDX, IDC_EDIT_DELAY_ITEMS, m_UINT_delay_items);
+	CFormView::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_LIST_CUSTOM_LIST, m_register_list);
+	DDX_Control(pDX, IDC_COMBO_DATAFORMAT, m_combox_dataformat);
+	DDX_Control(pDX, IDC_COMBO_PROPERTY, m_combox_property);
+	DDX_Control(pDX, IDC_EDIT_COUNTS, m_edit_counts);
+	DDX_CBString(pDX, IDC_COMBO_DATAFORMAT, m_string_dataformat);
+	DDX_CBString(pDX, IDC_COMBO_PROPERTY, m_string_property);
+	DDX_Text(pDX, IDC_EDIT_COUNTS, m_short_counts);
+	DDX_Control(pDX, IDC_COMBO_PARA_TYPES, m_combox_paratypes);
+	DDX_CBString(pDX, IDC_COMBO_PARA_TYPES, m_string_paratypes);
+	DDX_Control(pDX,IDC_UPBUTTON , m_upButton);
+	DDX_Control(pDX,IDC_DOWNBUTTON , m_downButton);
+	DDX_Text(pDX, IDC_EDIT_DELAY_LOOP, m_UINT_delay_loop);
+	DDX_Text(pDX, IDC_EDIT_DELAY_ITEMS, m_UINT_delay_items);
+	DDX_Control(pDX, IDC_COMBO_DATA_FORMAT, m_combox_valueformat);
 }
 
 BEGIN_MESSAGE_MAP(CProductRegisterListView, CFormView)
- 
     ON_WM_SIZE()
-
     ON_MESSAGE(WM_REFRESH_BAC_INPUT_LIST,Fresh_Input_List)
     ON_MESSAGE(WM_LIST_ITEM_CHANGED,Change_Input_Item)
     ON_NOTIFY(NM_CLICK, IDC_LIST_CUSTOM_LIST, &CProductRegisterListView::OnNMClickList_output)
-
     ON_WM_DESTROY()
     ON_BN_CLICKED(IDC_READ_DEVICE, &CProductRegisterListView::OnBnClickedReadDevice)
     ON_BN_CLICKED(IDC_BUTTON4, &CProductRegisterListView::OnBnClickedButton4)
@@ -206,6 +273,7 @@ BEGIN_MESSAGE_MAP(CProductRegisterListView, CFormView)
     ON_WM_TIMER()
     ON_EN_CHANGE(IDC_EDIT_DELAY_LOOP, &CProductRegisterListView::OnEnChangeEditDelayLoop)
     ON_EN_CHANGE(IDC_EDIT_DELAY_ITEMS, &CProductRegisterListView::OnEnChangeEditDelayItems)
+	ON_CBN_SELCHANGE(IDC_COMBO_DATA_FORMAT, &CProductRegisterListView::OnCbnSelchangeComboDataFormat)
 END_MESSAGE_MAP()
 
 
@@ -263,7 +331,11 @@ void CProductRegisterListView::Fresh(void)
     {
         GetDlgItem(IDC_READ_DEVICE)->SetWindowText(_T("Start Read"));
     }
-   
+	m_combox_valueformat.ResetContent();
+	m_combox_valueformat.AddString(L"Raw Data");
+	m_combox_valueformat.AddString(L"ASC");
+	m_combox_valueformat.AddString(L"DEC");
+	m_combox_valueformat.SetCurSel(0);
     LoadDataSheet();
     Initial_List();
     SetTimer(1,10,NULL);
@@ -835,4 +907,10 @@ void CProductRegisterListView::OnEnChangeEditDelayItems()
     // with the ENM_CHANGE flag ORed into the mask.
       UpdateData();
     // TODO:  Add your control notification handler code here
+}
+
+
+void CProductRegisterListView::OnCbnSelchangeComboDataFormat()
+{
+	 m_value_format=m_combox_valueformat.GetCurSel();
 }

@@ -139,6 +139,7 @@ CString g_strCurBuildingDatabasefilePath=L"";
 	CString m_str_curBuilding_Domain_IP;
 BOOL g_bEnableRefreshTreeView = TRUE;
 BOOL g_bPauseRefreshTree = FALSE;
+BOOL g_SelectChanged = TRUE;
 unsigned int g_llTxCount = 0;
 unsigned int g_llRxCount = 0;
 int g_llerrCount = 0;

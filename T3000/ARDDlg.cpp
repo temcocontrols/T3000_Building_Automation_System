@@ -32,6 +32,9 @@ BOOL CARDDlg::OnInitDialog()
 
 	m_add_device_baudrate.InsertString(0,_T("9600"));
 	m_add_device_baudrate.InsertString(1,_T("19200"));
+	m_add_device_baudrate.InsertString(2,_T("38400"));
+	m_add_device_baudrate.InsertString(3,_T("57600"));
+	m_add_device_baudrate.InsertString(4,_T("115200"));
 	m_add_device_baudrate.SetCurSel(1);
 	m_add_device_modbus_id.SetWindowText(_T("255"));
 	m_ipaddress.SetWindowText(_T("127.0.0.1"));
@@ -118,9 +121,9 @@ void CARDDlg::OnBnClickedOk()
    int nComport = 0;
    UpdateData(TRUE);
    int product_type_id = _wtoi(m_type_id);
-   if (product_type_id < 200 && product_type_id != 210)
+   if (product_type_id < 220 && product_type_id != 210)
    {
-       AfxMessageBox(_T(" In order to identify your product,Please Enter a number not less than 200!")) ;
+       AfxMessageBox(_T(" In order to identify your product,Please Enter a number not less than 220!")) ;
        return;
    }
    m_add_device_modbus_id.GetWindowTextW(temp_id);
@@ -164,12 +167,12 @@ void CARDDlg::OnBnClickedOk()
 		int nbaudrate = _wtoi(temp_baud);
 		
 
-		if((nbaudrate != 19200) && (nbaudrate != 9600))
-		{
-			is_open = false;
-		}
-		else
-		{
+// 		if((nbaudrate != 19200) && (nbaudrate != 9600))
+// 		{
+// 			is_open = false;
+// 		}
+// 		else
+// 		{
 			if(nComport > 0)
 			{
 				BOOL  bret = open_com(nComport);
@@ -183,7 +186,7 @@ void CARDDlg::OnBnClickedOk()
 			{
 				is_open = false;
 			}
-		}
+		/*}*/
           StrProtocol=_T("0");
 
 
@@ -582,7 +585,7 @@ void CARDDlg::OnCbnDropdownComboProductName()
     CADO bado;
     //bado.SetDBPath(g_strCurBuildingDatabasefilePath);
     bado.OnInitADOConn(); 
-    StrSql.Format(_T("Select * From ProductsTypeRegisterTables Where ProductType >=200"));
+    StrSql.Format(_T("Select * From ProductsTypeRegisterTables Where ProductType >=220"));
     bado.m_pRecordset=bado.OpenRecordset(StrSql);
     while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile){
         temp_variant=bado.m_pRecordset->GetCollect("ProductType");//

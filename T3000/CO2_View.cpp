@@ -67,40 +67,44 @@ CCO2_View::~CCO2_View()
 
 void CCO2_View::DoDataExchange(CDataExchange* pDX)
 {
-    CFormView::DoDataExchange(pDX);
-    DDX_Control(pDX, IDC_ID_CO2_EDIT, m_co2_idAdressEdit);
-    DDX_Control(pDX, IDC_CO2_BRAUDRATECOMBO, m_co2_braudRateCombox);
-    DDX_Text(pDX, IDC_FIRMWARV_CO2_EDIT, m_co2_firmwareversion);
-    DDX_Text(pDX, IDC_HARDWAREV_CO2_EDIT, m_co2_hardwareversion);
-    DDX_Text(pDX, IDC_SERIALNUM_CO2_EDIT, m_co2_serialNumber);
-    DDX_Control(pDX, IDC_CO2_TEMP_UNIT, m_co2_temp_unit);
-    DDX_Control(pDX, IDC_CO2_ALARM_STATE, m_co2_alarm_state);
-    DDX_Control(pDX, IDC_RADIO_ALARM_MANUAL, m_co2_alarm_mode_ctr);
-    DDX_Radio(pDX, IDC_RADIO_ALARM_MANUAL, m_alarm_ctrl_manual_auto);
-    DDX_Text(pDX, IDC_CO2_ALARM_ON_TIME, m_alarm_on_time);
-    DDX_Text(pDX, IDC_CO2_ALARM_OFF_TIME, m_alarm_off_time);
-    DDX_Text(pDX, IDC_CO2_PREPARE_ALARM_SETPOINT, m_edit_pre_alarm_setpoint);
-    DDX_Text(pDX, IDC_CO2_ALARM_SETPOINT, m_edit_alarm_setpoint);
-    DDX_Text(pDX, IDC_CO2_CALIBRATING_OFFSET, m_edit_calibrating_offset);
+	CFormView::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_ID_CO2_EDIT, m_co2_idAdressEdit);
+	DDX_Control(pDX, IDC_CO2_BRAUDRATECOMBO, m_co2_braudRateCombox);
+	DDX_Text(pDX, IDC_FIRMWARV_CO2_EDIT, m_co2_firmwareversion);
+	DDX_Text(pDX, IDC_HARDWAREV_CO2_EDIT, m_co2_hardwareversion);
+	DDX_Text(pDX, IDC_SERIALNUM_CO2_EDIT, m_co2_serialNumber);
+	DDX_Control(pDX, IDC_CO2_TEMP_UNIT, m_co2_temp_unit);
+	DDX_Control(pDX, IDC_CO2_ALARM_STATE, m_co2_alarm_state);
+	DDX_Control(pDX, IDC_RADIO_ALARM_MANUAL, m_co2_alarm_mode_ctr);
+	DDX_Radio(pDX, IDC_RADIO_ALARM_MANUAL, m_alarm_ctrl_manual_auto);
+	DDX_Text(pDX, IDC_CO2_ALARM_ON_TIME, m_alarm_on_time);
+	DDX_Text(pDX, IDC_CO2_ALARM_OFF_TIME, m_alarm_off_time);
+	DDX_Text(pDX, IDC_CO2_PREPARE_ALARM_SETPOINT, m_edit_pre_alarm_setpoint);
+	DDX_Text(pDX, IDC_CO2_ALARM_SETPOINT, m_edit_alarm_setpoint);
+	DDX_Text(pDX, IDC_CO2_CALIBRATING_OFFSET, m_edit_calibrating_offset);
 
-    DDX_Text(pDX, IDC_EDIT_INTERNAL_TEMP, m_f_internal_temp);
-    DDX_Text(pDX, IDC_EDIT_EXTERNAL_TEMP, m_f_external_temp);
-    DDX_Control(pDX, IDC_COMBO_CO2_SENSOR_SEL, m_sensor_sel);
-   // DDX_Control(pDX, IDC_LIST_CO2_EXTERNAL_SENSOR, m_co2_external_sensor_list);
-    DDX_Text(pDX, IDC_EDIT_CO2_HUMIDITY, m_humidity_value);
-    DDX_Control(pDX, IDC_CO2_DATETIMEPICKER1, m_co2_day_picker);
-    DDX_Control(pDX, IDC_CO2_DATETIMEPICKER_TIME, m_co2_time_picker);
-    DDX_Text(pDX, IDC_EDIT_CO2_PASSWOR, m_cs_password);
-    DDX_Text(pDX, IDC_EDIT_CO2_BLOCK_TIME, m_co2_block_time);
-    DDX_Text(pDX, IDC_EDIT_CO2_BACKLIGHT_TIME, m_co2_backlight_time);
-    DDX_Text(pDX, IDC_EDIT_CO2VALUE, m_co2_value);
-    DDX_Control(pDX, IDC_MSFLEXGRID_INPUT, m_grid_input);
-    DDX_Control(pDX, IDC_UPBUTTON, m_upButton);
-    DDX_Control(pDX, IDC_DOWNBUTTON, m_downButton);
-    DDX_Control(pDX, IDC_EDIT_VALUE_GRID, m_inValueEdit);
-    DDX_Control(pDX, IDC_EDIT1_TEST, m_test_edit);
-    DDX_Control(pDX, IDC_LIST_INPUT_AQ, m_input_list);
-    DDX_Control(pDX, IDC_LIST_OUTPUT_AQ, m_output_list);
+	DDX_Text(pDX, IDC_EDIT_INTERNAL_TEMP, m_f_internal_temp);
+	DDX_Text(pDX, IDC_EDIT_EXTERNAL_TEMP, m_f_external_temp);
+	DDX_Control(pDX, IDC_COMBO_CO2_SENSOR_SEL, m_sensor_sel);
+	// DDX_Control(pDX, IDC_LIST_CO2_EXTERNAL_SENSOR, m_co2_external_sensor_list);
+	DDX_Text(pDX, IDC_EDIT_CO2_HUMIDITY, m_humidity_value);
+	DDX_Control(pDX, IDC_CO2_DATETIMEPICKER1, m_co2_day_picker);
+	DDX_Control(pDX, IDC_CO2_DATETIMEPICKER_TIME, m_co2_time_picker);
+	DDX_Text(pDX, IDC_EDIT_CO2_PASSWOR, m_cs_password);
+	DDX_Text(pDX, IDC_EDIT_CO2_BLOCK_TIME, m_co2_block_time);
+	DDX_Text(pDX, IDC_EDIT_CO2_BACKLIGHT_TIME, m_co2_backlight_time);
+	DDX_Text(pDX, IDC_EDIT_CO2VALUE, m_co2_value);
+	DDX_Control(pDX, IDC_MSFLEXGRID_INPUT, m_grid_input);
+	DDX_Control(pDX, IDC_UPBUTTON, m_upButton);
+	DDX_Control(pDX, IDC_DOWNBUTTON, m_downButton);
+	DDX_Control(pDX, IDC_EDIT_VALUE_GRID, m_inValueEdit);
+	DDX_Control(pDX, IDC_EDIT1_TEST, m_test_edit);
+	DDX_Control(pDX, IDC_LIST_INPUT_AQ, m_input_list);
+	DDX_Control(pDX, IDC_LIST_OUTPUT_AQ, m_output_list);
+	DDX_Control(pDX, IDC_BUTTON_ONOFF, m_button_onoff);
+	DDX_Control(pDX, IDC_EDIT1_NCO2, m_edit_nco2);
+	DDX_Control(pDX, IDC_EDIT_RTIME, m_edit_rtime);
+	DDX_Control(pDX, IDC_EDIT_RTIME2, m_edit_adjustment);
 }
 
 BEGIN_MESSAGE_MAP(CCO2_View, CFormView)
@@ -148,6 +152,10 @@ BEGIN_MESSAGE_MAP(CCO2_View, CFormView)
     ON_BN_CLICKED(IDC_GRAPIC, &CCO2_View::OnBnClickedGrapic)
     ON_BN_CLICKED(IDC_TEMP_SENSOR, &CCO2_View::OnBnClickedTempSensor)
     ON_BN_CLICKED(IDC_HUM_SENSOR, &CCO2_View::OnBnClickedHumSensor)
+	ON_EN_KILLFOCUS(IDC_EDIT1_NCO2, &CCO2_View::OnEnKillfocusEdit1Nco2)
+	ON_EN_KILLFOCUS(IDC_EDIT_RTIME, &CCO2_View::OnEnKillfocusEditRtime)
+	ON_BN_CLICKED(IDC_BUTTON_ONOFF, &CCO2_View::OnBnClickedButtonOnoff)
+	ON_EN_KILLFOCUS(IDC_EDIT_RTIME2, &CCO2_View::OnEnKillfocusEditRtime2)
 END_MESSAGE_MAP()
 
 
@@ -246,6 +254,8 @@ void CCO2_View::Fresh()
 
       Initial_InputList();  
       Initial_OutputList();
+
+	  Fresh_CO2Node_Compensatin();
     }
    
     
@@ -349,8 +359,8 @@ void CCO2_View::SH_Window(){
         GetDlgItem(IDC_CO2_DATETIMEPICKER1)->ShowWindow(SW_SHOW);
         GetDlgItem(IDC_BUTTON_CO2_SYNC_TIME)->ShowWindow(SW_SHOW);
 
-        GetDlgItem(IDC_TEMP_SENSOR)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_HUM_SENSOR)->ShowWindow(SW_HIDE);
+//         GetDlgItem(IDC_TEMP_SENSOR)->ShowWindow(SW_HIDE);
+//         GetDlgItem(IDC_HUM_SENSOR)->ShowWindow(SW_HIDE);
 
          GetDlgItem(IDC_STATIC_BRAUDRATE)->ShowWindow(SW_SHOW);
         
@@ -426,8 +436,8 @@ void CCO2_View::SH_Window(){
     else
     {    
         GetDlgItem (IDC_PRODUCT_NAME)->SetWindowTextW(L"CO2 NODE"); 
-        GetDlgItem(IDC_TEMP_SENSOR)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_HUM_SENSOR)->ShowWindow(SW_SHOW);
+//         GetDlgItem(IDC_TEMP_SENSOR)->ShowWindow(SW_SHOW);
+//         GetDlgItem(IDC_HUM_SENSOR)->ShowWindow(SW_SHOW);
         GetDlgItem(IDC_STATIC_RELATIVE_HUMIDITY)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_EDIT_CO2_HUMIDITY)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_STATIC_PERCENT)->ShowWindow(SW_HIDE);
@@ -457,7 +467,7 @@ void CCO2_View::SH_Window(){
         GetDlgItem(IDC_STATIC_PRE_ALARM_SETPOINT)->ShowWindow(SW_SHOW);
         GetDlgItem(IDC_CO2_PREPARE_ALARM_SETPOINT)->ShowWindow(SW_SHOW);
         GetDlgItem(IDC_STATIC_ALARM_SETPOINT)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_CO2_CALIBRATING_OFFSET)->ShowWindow(SW_SHOW);
+        GetDlgItem(IDC_CO2_CALIBRATING_OFFSET)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_BTN_CO2_CLEAR_CAL)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_STATIC_ALARM_MENU)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_STATIC_ALON)->ShowWindow(SW_HIDE);
@@ -469,7 +479,7 @@ void CCO2_View::SH_Window(){
         GetDlgItem(IDC_EDIT_CO2_BLOCK_TIME)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_EDIT_CO2_BACKLIGHT_TIME)->ShowWindow(SW_HIDE);
 
-        GetDlgItem(IDC_STATIC_CALIBRATION_OFFSET)->ShowWindow(SW_SHOW);
+        GetDlgItem(IDC_STATIC_CALIBRATION_OFFSET)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_CO2_ALARM_SETPOINT)->ShowWindow(SW_SHOW);
 
         GetDlgItem(IDC_STATIC_INPUT_SETTING)->ShowWindow(SW_SHOW);
@@ -2851,7 +2861,7 @@ void CCO2_View::Initial_InputList(){
       m_input_list.InsertColumn(1, _T("Full Label"), 70, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
       m_input_list.InsertColumn(2, _T("Value"), 50, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
       m_input_list.InsertColumn(3, _T("Range"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-      m_input_list.InsertColumn(4, _T("Filter"), 60, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+      m_input_list.InsertColumn(4, _T("Calibration"), 60, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 
       g_hwnd_now = this->m_hWnd;
       m_input_list.InsertItem(0,_T("1"));
@@ -4433,4 +4443,101 @@ void CCO2_View::OnBnClickedHumSensor()
     }
     m_list_type = 0; 
     PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
+}
+
+void CCO2_View::Fresh_CO2Node_Compensatin()
+{
+	if (product_register_value[500] == 0)
+	{
+		m_button_onoff.SetWindowTextW(L"OFF");
+	}
+	else
+	{
+		m_button_onoff.SetWindowTextW(L"ON");
+	}
+
+	CString strTemp;
+	strTemp.Format(_T("%d"),product_register_value[501]);
+	m_edit_nco2.SetWindowTextW(strTemp);
+	strTemp.Format(_T("%d"),product_register_value[503]);
+	m_edit_rtime.SetWindowTextW(strTemp);
+	strTemp.Format(_T("%d"),product_register_value[502]);
+	m_edit_adjustment.SetWindowTextW(strTemp);
+}
+
+void CCO2_View::OnEnKillfocusEdit1Nco2()
+{
+	CString strTemp;
+	m_edit_nco2.GetWindowTextW(strTemp);
+	int co2value = _wtoi(strTemp);
+	if (co2value<390||co2value>500)
+	{
+		AfxMessageBox(_T("out of range"));
+	} 
+	 
+	int ret = write_one(g_tstat_id,501,co2value);
+	if (ret>0)
+	{
+		product_register_value[501] = co2value;
+	}
+	Fresh_CO2Node_Compensatin(); 
+}
+
+
+void CCO2_View::OnEnKillfocusEditRtime()
+{
+	CString strTemp;
+	m_edit_rtime.GetWindowText(strTemp);
+	int rtime = _wtoi(strTemp);
+	if (rtime<2||rtime>30)
+	{
+		AfxMessageBox(_T("out of range"));
+	} 
+	int ret = write_one(g_tstat_id,503,rtime);
+	if (ret>0)
+	{
+		product_register_value[503]=rtime;
+	}
+	Fresh_CO2Node_Compensatin();
+	 
+}
+
+
+void CCO2_View::OnBnClickedButtonOnoff()
+{
+	 if (product_register_value[500] == 0)
+	 {
+		int ret = write_one(g_tstat_id,500,1);
+		if (ret>0)
+		{
+			product_register_value[500]=1;
+		}
+	 } 
+	 else
+	 {
+		 int ret = write_one(g_tstat_id,500,0);
+		 if (ret>0)
+		 {
+			 product_register_value[500]=0;
+		 }
+	 }
+	 Fresh_CO2Node_Compensatin();
+}
+
+
+void CCO2_View::OnEnKillfocusEditRtime2()
+{
+	CString strTemp;
+	m_edit_adjustment.GetWindowText(strTemp);
+	int rtime = _wtoi(strTemp);
+	if (rtime<1||rtime>10)
+	{
+		AfxMessageBox(_T("out of range"));
+	} 
+	int ret = write_one(g_tstat_id,502,rtime);
+	if (ret>0)
+	{
+		product_register_value[502]=rtime;
+	}
+	Fresh_CO2Node_Compensatin();
 }

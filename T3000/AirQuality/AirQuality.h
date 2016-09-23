@@ -72,7 +72,7 @@ public:
 	 
 	//virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	CWinThread* m_pFreshBackground;
+	HANDLE hFirstThread;
 	void Fresh();
 	void Fresh_Window();
 	virtual void OnInitialUpdate();

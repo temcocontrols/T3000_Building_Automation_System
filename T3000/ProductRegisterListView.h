@@ -61,6 +61,7 @@ public:
     CString m_string_paratypes;
     BOOL m_isReading;
     int m_sort_type;
+	int m_value_format;
     afx_msg void OnBnClickedReadDevice();
     CMFCButton m_upButton;
     CMFCButton m_downButton;
@@ -73,6 +74,8 @@ public:
     afx_msg void OnTimer(UINT_PTR nIDEvent);
     afx_msg void OnEnChangeEditDelayLoop();
     afx_msg void OnEnChangeEditDelayItems();
+	CComboBox m_combox_valueformat;
+	afx_msg void OnCbnSelchangeComboDataFormat();
 };
 
 

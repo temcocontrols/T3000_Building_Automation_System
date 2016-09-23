@@ -674,7 +674,27 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 					temp_number.Format(_T("DO%d"),temp_sub_number + 1);
 
 
+				if(m_Output_data.at(i).hw_switch_status == HW_SW_OFF)
+				{
+					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("MAN-OFF"));		
+					//m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,0);
 
+					m_output_list.SetItemTextColor(i,-1,RGB(255,0,0),0);
+				}
+				else if(m_Output_data.at(i).hw_switch_status == HW_SW_HAND)
+				{
+					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("MAN-ON"));
+					//m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,0);
+
+					m_output_list.SetItemTextColor(i,-1,RGB(255,0,0),0);
+				}
+				else
+				{
+					m_output_list.SetItemTextColor(i,-1,RGB(0,0,0),0);
+
+					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("AUTO"));
+					//m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,1);
+				}
 
 				
 				m_output_list.SetItemText(i,OUTPUT_EXTERNAL,_T("External"));

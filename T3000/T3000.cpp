@@ -19,7 +19,7 @@
 #include "T3000DefaultView.h"
 #include "bado/BADO.h"
 #include "SqliteLib/CppSQLite3.h"
-const int g_versionNO=20160817;
+const int g_versionNO=20160923;
 
 
 #ifdef _DEBUG
@@ -40,10 +40,8 @@ END_MESSAGE_MAP()
 CT3000App::CT3000App()
 {
 	m_bHiColorIcons = TRUE;
-	CurrentT3000Version=_T("    2016.09.18 ");
-	T3000_Version = 10918;
-
-
+	CurrentT3000Version=_T("    2016.09.23 ");
+	T3000_Version = 10923;
 	m_lastinterface=19;
 }
 // The one and only CT3000App object
@@ -974,11 +972,12 @@ BOOL CT3000App::InitInstance()
 			//IDR_MFC16DLL1
 
 			CString MFC16DLLPath=GetExePath(true)+L"MFC16API.dll";
+			DeleteFileW(MFC16DLLPath);
 			hFind = FindFirstFile(MFC16DLLPath, &wfd);
 			if (hFind==INVALID_HANDLE_VALUE)
 			{
 
-				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MFC16DLL1), _T("MFC16DLL"));   
+				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MFC16DLL2), _T("MFC16DLL"));   
 				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
 				LPVOID lpExe = LockResource(hGlobal);   
 				CFile file;

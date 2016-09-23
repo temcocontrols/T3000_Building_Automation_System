@@ -1321,8 +1321,8 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 {
 
 
-
-    //g_bPauseRefreshTree = TRUE;
+     g_SelectChanged = TRUE;
+    g_bPauseRefreshTree = TRUE;
     Flexflash = TRUE;
     HTREEITEM hSelItem;//=m_pTreeViewCrl->GetSelectedItem();
 //   int nRet =read_one(g_tstat_id,6,1);
@@ -1504,7 +1504,7 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 
     EndWaitCursor();
     g_bPauseRefreshTree = FALSE;
-
+	 g_SelectChanged = FALSE;
 }
 
 
@@ -7066,7 +7066,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             }
 
             //if(1)//GSM  Ä£¿é
-            if((m_product.at(i).protocol != PROTOCOL_GSM) && (m_product.at(i).protocol != PROTOCOL_REMOTE_IP)&&(m_product.at(i).protocol!=MODBUS_RS485))
+            if((m_product.at(i).protocol != MODBUS_BACNET_MSTP) && (m_product.at(i).protocol != PROTOCOL_GSM) && (m_product.at(i).protocol != PROTOCOL_REMOTE_IP)&&(m_product.at(i).protocol!=MODBUS_RS485))
             {
                 if(!m_product.at(i).BuildingInfo.strIp.IsEmpty())
                 {
@@ -7364,7 +7364,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     g_protocol = MODBUS_BACNET_MSTP;
                     SEND_COMMAND_DELAY_TIME = 200;
                     SwitchToPruductType(DLG_BACNET_VIEW);
-
+					g_gloab_bac_comport = m_product.at(i).ncomport;
                     pDlg->ShowWindow(SW_HIDE);
                     if(pDlg)
                         delete pDlg;//20120220
@@ -7883,7 +7883,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     nSerialNumber=read_data[0]+read_data[1]*256+read_data[2]*256*256+read_data[3]*256*256*256;
                     Device_Type = read_data[7];
                     CString Temp_product_name = GetProductName(Device_Type);
-                    if(Temp_product_name.IsEmpty())
+                    if(!IS_Temco_Product(Device_Type))
                     {
                         CString tempcs;
                         tempcs.Format(_T("Product ID is invalid .Product id is %d \r\n"),Device_Type);
@@ -8075,7 +8075,14 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
                     if(product_type == T3000_6_ADDRESS)
                     {
-                        power_value = 1;
+						Use_zigee= read_one(g_tstat_id,120,5);
+						power_value = 1;
+						if (Use_zigee == 1)
+						{
+							/*power_value = 4;
+							length = 10;*/
+						}
+                        
                         register_critical_section.Lock();
                         int i;
                         it =0;
@@ -9077,13 +9084,13 @@ end_condition :
 
             str_serialid.Format(_T("%u"),m_refresh_net_device_data.at(y).nSerial);
             product_class_id.Format(_T("%u"),m_refresh_net_device_data.at(y).product_id);
-            if (m_refresh_net_device_data.at(y).product_id > 200)
+            if (IS_Temco_Product(m_refresh_net_device_data.at(y).product_id))
             {
-                is_custom = _T("1");
+                is_custom = _T("0");
             }
             else
             {
-                is_custom = _T("0");
+                is_custom = _T("1");
             }
 			if(m_refresh_net_device_data.at(y).show_label_name.IsEmpty())
 			{

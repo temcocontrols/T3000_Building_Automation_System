@@ -431,20 +431,35 @@ LRESULT CTStatInputView::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 	}
 	if (Changed_SubItem == 6)
 	{
-		if (New_CString.IsEmpty()||m_tstat_input_data.at(Changed_Item).Filter.StrValue.CompareNoCase(New_CString)==0)
+		if (New_CString.IsEmpty()||m_tstat_input_data.at(Changed_Item).Value.StrValue.CompareNoCase(New_CString)==0)
 		{
 		   m_input_list.Set_Edit(false);
 		   //m_input_list.SetItemText(Changed_Item,Changed_SubItem,L"Adjust...");
 		   return 0;
 		}
         int SendValue=0;
-        SendValue=_wtoi(New_CString);
-        pwrite_info->Changed_Name.Format(_T(" %s 's Filter,From %s to %s"),m_tstat_input_data.at(Changed_Item).InputName.StrValue,m_tstat_input_data.at(Changed_Item).Filter.StrValue,New_CString);
-        pwrite_info->address=m_tstat_input_data.at(Changed_Item).Filter.regAddress;
+        SendValue=_wtoi(New_CString)*10;
+        pwrite_info->Changed_Name.Format(_T(" %s 's Value,From %s to %s"),m_tstat_input_data.at(Changed_Item).InputName.StrValue,m_tstat_input_data.at(Changed_Item).Value.StrValue,New_CString);
+        pwrite_info->address=m_tstat_input_data.at(Changed_Item).Value.regAddress;
         pwrite_info->new_value=SendValue;
 		IS_SEND=TRUE;
 	}
 	if (Changed_SubItem == 7)
+	{
+		if (New_CString.IsEmpty()||m_tstat_input_data.at(Changed_Item).Filter.StrValue.CompareNoCase(New_CString)==0)
+		{
+			m_input_list.Set_Edit(false);
+			//m_input_list.SetItemText(Changed_Item,Changed_SubItem,L"Adjust...");
+			return 0;
+		}
+		int SendValue=0;
+		SendValue=_wtoi(New_CString);
+		pwrite_info->Changed_Name.Format(_T(" %s 's Filter,From %s to %s"),m_tstat_input_data.at(Changed_Item).InputName.StrValue,m_tstat_input_data.at(Changed_Item).Filter.StrValue,New_CString);
+		pwrite_info->address=m_tstat_input_data.at(Changed_Item).Filter.regAddress;
+		pwrite_info->new_value=SendValue;
+		IS_SEND=TRUE;
+	}
+	if (Changed_SubItem == 8)
 	{
 	     if (m_tstat_input_data.at(Changed_Item).Function.StrValue.CompareNoCase(New_CString)==0)
 	     {
