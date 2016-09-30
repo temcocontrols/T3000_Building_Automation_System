@@ -121,6 +121,8 @@
     <None Include="UserImages.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\T3000\ProductModel.h" />
+    <ClInclude Include="AddDeviceDlg.h" />
     <ClInclude Include="ADO\ADO.h" />
     <ClInclude Include="AutoRichEditCtrl.h" />
     <ClInclude Include="CApplication.h" />
@@ -165,6 +167,8 @@
     <ClInclude Include="CWorksheet.h" />
     <ClInclude Include="CWorksheets.h" />
     <ClInclude Include="DataMonitorDlg.h" />
+    <ClInclude Include="DeviceTestDlg.h" />
+    <ClInclude Include="DeviecTesterConfigDlg.h" />
     <ClInclude Include="EnterValueDlg.h" />
     <ClInclude Include="Enter_Value_BinaryDlg.h" />
     <ClInclude Include="excel9.h" />
@@ -190,8 +194,10 @@
     <ClInclude Include="WriteMultiRegistersDlg.h" />
     <ClInclude Include="WriteSingleRegisterDlg.h" />
     <ClInclude Include="WriteSingle_BinaryDlg.h" />
+    <ClInclude Include="Z:\Email\ProductModel.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AddDeviceDlg.cpp" />
     <ClCompile Include="ADO\ADO.cpp" />
     <ClCompile Include="AutoRichEditCtrl.cpp" />
     <ClCompile Include="ChartCtrl\ChartAxis.cpp" />
@@ -221,6 +227,8 @@
     <ClCompile Include="CommunicationTrafficDlg.cpp" />
     <ClCompile Include="ConnectionSetup.cpp" />
     <ClCompile Include="DataMonitorDlg.cpp" />
+    <ClCompile Include="DeviceTestDlg.cpp" />
+    <ClCompile Include="DeviecTesterConfigDlg.cpp" />
     <ClCompile Include="EnterValueDlg.cpp" />
     <ClCompile Include="Enter_Value_BinaryDlg.cpp" />
     <ClCompile Include="excel9.cpp" />

@@ -160,6 +160,7 @@
     <ClCompile Include="TstatFlashDlg.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\T3000\ProductModel.h" />
     <ClInclude Include="BinFileParser.h" />
     <ClInclude Include="ComWriter.h" />
     <ClInclude Include="ConfigFileHandler.h" />

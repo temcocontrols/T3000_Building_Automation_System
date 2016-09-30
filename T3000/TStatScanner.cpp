@@ -2668,7 +2668,7 @@ void CTStatScanner::WriteOneDevInfoToDB( _ComDeviceInfo* pInfo)
         strCom=pInfo->m_tstatport;
     }
     if (nClassID == PM_TSTAT6||nClassID == PM_TSTAT7||nClassID == PM_TSTAT8||nClassID == PM_TSTAT5i
-            ||nClassID == PM_HUMTEMPSENSOR||nClassID ==PM_AirQuality||nClassID ==PM_HUM_R||nClassID == PM_CO2_RS485)
+            ||nClassID == PM_HUMTEMPSENSOR||nClassID ==PM_AirQuality||nClassID ==PM_HUM_R||nClassID == PM_CO2_RS485||nClassID == PM_CO2_NODE)
     {
         BOOL Is_Open=FALSE;
         if (pInfo->m_pDev->m_nComPort==-1)
@@ -2693,7 +2693,7 @@ void CTStatScanner::WriteOneDevInfoToDB( _ComDeviceInfo* pInfo)
 
 
 
-            int ret=Read_Multi(nID,DataBuffer,714,10);
+            int ret=Read_Multi(nID,DataBuffer,714,20);
             if (ret>0)
             {
                 if (DataBuffer[0]==0x56)

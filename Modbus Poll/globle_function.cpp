@@ -227,15 +227,24 @@ void Traffic_Data(CString &nCString)
 	 case PM_MINIPANEL:
 		 strProductName="MiniPanel";
 		 break;
-		case  PM_PRESSURE:
+	case  PM_PRESSURE:
 		strProductName="Pressure Sensor";
 		break;
-		case PM_HUM_R:
+	case PM_HUM_R:
 		strProductName="HUM-R";
 		break;
-		case PM_RUNNAR:
+	case PM_TSTATRUNAR:
 			strProductName="TStatRunar";
 			break;
+	case PM_T322AIVG:
+		strProductName="T322AIVG";
+		break;
+	case PM_T38IOVG:
+		strProductName="T38IOVG";
+		break;
+	case PM_T3PTVG:
+		strProductName="T3PTVG";
+		break;
 	 default:
 		 strProductName="TStat";
 		 break;

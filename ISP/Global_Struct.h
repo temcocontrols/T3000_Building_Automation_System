@@ -10,7 +10,7 @@
 	purpose:	 全局常量，以及结构体的声明
 *********************************************************************/
 #pragma once
-
+#include "..\t3000\ProductModel.h"
 
 const	 int c_nSplashTime = 2000;	// splash window的显示时间
 const TCHAR c_strCfgFileName[] = _T("config.txt");				//	配置文件名称，用于保存用户设置
@@ -492,51 +492,51 @@ enum{
 // for product model file
 //////////////////////////////////////////////////////////////////////////
 // product model ID table
-int const PM_TSTAT5A = 2;//
-int const PM_TSTAT5B = 1;  //
-int const PM_TSTAT5B2 = 3;//
-int const PM_TSTAT5C = 4; //
-int const PM_TSTAT6 = 6;  //
-int const PM_TSTAT7 = 7;	//
-int const PM_TSTAT5I = 8;  //
-int const PM_TSTAT8 = 9 ;
-
-int const PM_TSTAT5D = 12;//
-const int PM_TSTAT5E = 16;	//
-int const PM_TSTAT5F = 17;	//
-int const PM_TSTAT5G = 18;	 //
-int const PM_TSTAT5H = 19;	 //
-int const PM_T38AIOD= 20;  //
-int const PM_T3IOA = 21;  //
-int const PM_T332AI = 22; //
-int const PM_T38AI16O = 23;
-int const PM_ZIGBEE = 24;
-int const PM_FLEXDRIVER = 25;
-int const PM_T3PT10 = 26;
-int const PM_T3PERFORMANCE = 27;
-int const PM_T34AO = 28;
-int const PM_T36CT = 29;
-int const PM_SOLAR = 30;
-int const PM_FWMTRANSDUCER = 31;
-int const PM_MINIPANEL = 35;
-int const PM_PRESSURE = 40;
-int const PM_CM5 = 50;	  //
-int const PM_NC = 100;	//
-int const PM_AirQuality = 13;
-int const PM_HUMTEMPSENSOR = 14;
-int const PM_LightingController = 103;	//
-int const PM_HUM_R=42;
-int const PM_RUNNAR=15;
-int const PM_CO2_NET = 32;
-int const PM_CO2_RS485 = 33;
-int const PM_CO2_NODE = 34;
-int const PM_PM5E = 41;
-int const PM_T322AI=43;
-int const PM_T38AI8AO6DO=44;
-int const PM_T3PT12 = 46;
-int const PM_BTU_METER=121;
-
-int const PM_PRESSURE_SENSOR=45;
+//int const PM_TSTAT5A = 2;//
+//int const PM_TSTAT5B = 1;  //
+//int const PM_TSTAT5B2 = 3;//
+//int const PM_TSTAT5C = 4; //
+//int const PM_TSTAT6 = 6;  //
+//int const PM_TSTAT7 = 7;	//
+//int const PM_TSTAT5I = 8;  //
+//int const PM_TSTAT8 = 9 ;
+//
+//int const PM_TSTAT5D = 12;//
+//const int PM_TSTAT5E = 16;	//
+//int const PM_TSTAT5F = 17;	//
+//int const PM_TSTAT5G = 18;	 //
+//int const PM_TSTAT5H = 19;	 //
+//int const PM_T38AIOD= 20;  //
+//int const PM_T3IOA = 21;  //
+//int const PM_T332AI = 22; //
+//int const PM_T38AI16O = 23;
+//int const PM_ZIGBEE = 24;
+//int const PM_FLEXDRIVER = 25;
+//int const PM_T3PT10 = 26;
+//int const PM_T3PERFORMANCE = 27;
+//int const PM_T34AO = 28;
+//int const PM_T36CT = 29;
+//int const PM_SOLAR = 30;
+//int const PM_FWMTRANSDUCER = 31;
+//int const PM_MINIPANEL = 35;
+//int const PM_PRESSURE = 40;
+//int const PM_CM5 = 50;	  //
+//int const PM_NC = 100;	//
+//int const PM_AirQuality = 13;
+//int const PM_HUMTEMPSENSOR = 14;
+//int const PM_LightingController = 103;	//
+//int const PM_HUM_R=42;
+//int const PM_RUNNAR=15;
+//int const PM_CO2_NET = 32;
+//int const PM_CO2_RS485 = 33;
+//int const PM_CO2_NODE = 34;
+//int const PM_PM5E = 41;
+//int const PM_T322AI=43;
+//int const PM_T38AI8AO6DO=44;
+//int const PM_T3PT12 = 46;
+//int const PM_BTU_METER=121;
+//
+//int const PM_PRESSURE_SENSOR=45;
 const TCHAR c_strProductModelFileName[] = _T("ProductModel.cfg");				//	Product Model 配置文件名称
 
 

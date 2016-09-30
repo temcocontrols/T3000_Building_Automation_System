@@ -84,6 +84,7 @@ public:
 	afx_msg void OnFunctionsTestcenter();
 	afx_msg void OnEditCopy();
 	 
+	afx_msg void OnToolsDevicetester();
 };
 
 

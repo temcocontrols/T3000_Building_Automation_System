@@ -239,7 +239,7 @@ public:
 	DWORD m_maxClients;
 	DWORD password;
 	BOOL JudgeDB();
-	void ImportData();
+ 
     BOOL Is_haveTable(CString TableName);
 	vector<ALL_NODE> m_AllNodes;
 

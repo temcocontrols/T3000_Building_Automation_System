@@ -336,13 +336,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "FileVersion", "4.8.6.0"
+            VALUE "FileVersion", "4.8.7.0"
             VALUE "InternalName", "ISP.exe"
-            VALUE "LegalCopyright", "Copyright 1999-2014 (c).  All rights reserved."
+            VALUE "TemcoCopyright", "Copyright 1999-2016 (c).  All rights reserved."
             VALUE "OriginalFilename", "ISP.exe"
             VALUE "ProductName", "ISP Tool"
-            VALUE "ProductVersion", "4.8.6.0"
-            VALUE "SpecialBuild", "4.8.6"
+            VALUE "ProductVersion", "4.8.7.0"
+            VALUE "SpecialBuild", "4.8.7"
         END
     END
     BLOCK "VarFileInfo"

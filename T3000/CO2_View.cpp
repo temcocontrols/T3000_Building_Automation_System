@@ -436,8 +436,7 @@ void CCO2_View::SH_Window(){
     else
     {    
         GetDlgItem (IDC_PRODUCT_NAME)->SetWindowTextW(L"CO2 NODE"); 
-//         GetDlgItem(IDC_TEMP_SENSOR)->ShowWindow(SW_SHOW);
-//         GetDlgItem(IDC_HUM_SENSOR)->ShowWindow(SW_SHOW);
+ 
         GetDlgItem(IDC_STATIC_RELATIVE_HUMIDITY)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_EDIT_CO2_HUMIDITY)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_STATIC_PERCENT)->ShowWindow(SW_HIDE);
@@ -445,7 +444,12 @@ void CCO2_View::SH_Window(){
         GetDlgItem(IDC_EDIT_CO2VALUE)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_STATIC_PPM)->ShowWindow(SW_HIDE);
 
-        GetDlgItem(IDC_CO2_BRAUDRATECOMBO)->ShowWindow(SW_HIDE);
+
+		 GetDlgItem(IDC_STATIC_BRAUDRATE)->ShowWindow(SW_SHOW);
+        GetDlgItem(IDC_CO2_BRAUDRATECOMBO)->ShowWindow(SW_SHOW);
+		m_co2_braudRateCombox.SetCurSel(product_register_value[15]);
+		 
+
         GetDlgItem(IDC_STATIC_PRE_ALARM_SETPOINT2)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_STATIC_PRE_ALARM_SETPOINT3)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_STATIC_ALARM_SETTING)->ShowWindow(SW_HIDE);
@@ -494,7 +498,7 @@ void CCO2_View::SH_Window(){
         GetDlgItem(IDC_CO2_DATETIMEPICKER1)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_BUTTON_CO2_SYNC_TIME)->ShowWindow(SW_HIDE); 
 
-        GetDlgItem(IDC_STATIC_BRAUDRATE)->ShowWindow(SW_HIDE);
+       
     }
 }
 
@@ -2727,7 +2731,17 @@ void CCO2_View::OnCbnSelchangeCo2Braudratecombo()
 {
     g_bPauseMultiRead = TRUE;
 	int temp_write_ret = 0;
-   temp_write_ret = write_one(g_tstat_id, CO2_485_MODBUS_BAUDRATE, m_co2_braudRateCombox.GetCurSel());
+
+	int RegAddress = CO2_485_MODBUS_BAUDRATE;
+	if (product_register_value[7] == PM_CO2_RS485)
+	{
+		RegAddress = CO2_485_MODBUS_BAUDRATE;
+	} 
+	else
+	{
+		RegAddress = 15;
+	}
+   temp_write_ret = write_one(g_tstat_id, RegAddress, m_co2_braudRateCombox.GetCurSel());
    if(temp_write_ret < 0)	//暂时不判断这玩意，设备是自己先切波特率在回，导致回不过来. 
    {
 	   MessageBox(_T("Write timeout."));

@@ -371,7 +371,7 @@ CString GetProductName(int ModelID)
 	case PM_TSTAT6:
 		strProductName=_T("TStat6");   //
 		break;
-	case PM_TSTAT5I:
+	case PM_TSTAT5i:
 		strProductName=_T("TStat5I");   //
 		break;
 	case PM_TSTAT7:
@@ -389,7 +389,7 @@ CString GetProductName(int ModelID)
 	case PM_LightingController:
 		strProductName = _T("LC");	  //
 		break;
-	case PM_T38AIOD:
+	case PM_T38I13O:
 		strProductName = _T("T3-8I13O");	  //
 		break;
 	case PM_T3IOA:
@@ -440,7 +440,7 @@ CString GetProductName(int ModelID)
 	case PM_HUM_R:
 		strProductName=_T("HUM-R");
 		break;
-	case PM_RUNNAR:
+	case PM_TSTATRUNAR:
 		strProductName="TStatRunar";
 		break;
 	case  PM_CO2_NET:
@@ -452,8 +452,9 @@ CString GetProductName(int ModelID)
     case  PM_PRESSURE_SENSOR:
         strProductName = "Pressure";
         break;
-		  case  PM_T3PT12:
+	case  PM_T3PT12:
         strProductName = "T3PT12";
+		break;
 	case  PM_CO2_NODE:
 		strProductName = "CO2 Node";
 		break;
@@ -465,6 +466,36 @@ CString GetProductName(int ModelID)
 		break;
 	case PM_BTU_METER:
 		strProductName="BTU METER";
+		break;
+	case PM_T322AIVG:
+		strProductName="T322AIVG";
+		break;
+	case PM_T38IOVG:
+		strProductName="T38IOVG";
+		break;
+	case PM_T3PTVG:
+		strProductName="T3PTVG";
+		break;
+	case STM32_CO2_NET:
+		strProductName="CO2NET";
+		break;
+	case STM32_CO2_RS485:
+		strProductName="CO2RS485";
+		break;
+	case STM32_HUM_NET:
+		strProductName="HUMNET";
+		break;
+	case STM32_HUM_RS485:
+		strProductName="HUMRS485";
+		break;
+	case STM32_PRESSURE_NET:
+		strProductName="PSNET";
+		break;
+	case STM32_PRESSURE_RS3485:
+		strProductName="PSRS485";
+		break;
+	case STM32_CO2_NODE:
+		strProductName="CO2NODE";
 		break;
 
 	default:

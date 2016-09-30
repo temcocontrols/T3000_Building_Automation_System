@@ -14,7 +14,7 @@ DWORD WINAPI _ReadMultiRegisters_CO2(LPVOID pParam)
 {
     CCO2NetView* pView=(CCO2NetView*)(pParam);
     BOOL bFirst=TRUE;
-	return 0;
+	//return 0;
     while(pView->IsWindowVisible())
     {
 	 
@@ -24,35 +24,35 @@ DWORD WINAPI _ReadMultiRegisters_CO2(LPVOID pParam)
 			continue;
 		}
         Sleep(5000);
-        register_critical_section.Lock();
-        for(int i=0; i<12; i++) //Modify
-        {
-            int multy_ret = 0;
-            multy_ret = Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100);
-        }
-        register_critical_section.Unlock();
+        //register_critical_section.Lock();
+        //for(int i=0; i<12; i++) //Modify
+        //{
+        //    int multy_ret = 0;
+        //    multy_ret = Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100);
+        //}
+        //register_critical_section.Unlock();
 
-		register_critical_section.Lock();
+	/*	register_critical_section.Lock();
 		for(int i=0; i<11; i++)
 		{
 			int multy_ret = 0;
 			multy_ret = Read_Multi(g_tstat_id,&pView->External_ArrayData[i*100],pView->CO2_NET_MODBUS_CO2_EXTERNAL_START+i*100,100);
 		}
-		register_critical_section.Unlock();
+		register_critical_section.Unlock();*/
 
-		register_critical_section.Lock();
+		/*register_critical_section.Lock();
 		for(int i=0; i<13; i++)
 		{
 			int multy_ret = 0;
 			multy_ret = Read_Multi(g_tstat_id,&pView->Scan_ArrayData[i*100],pView->CO2_NET_MODBUS_SCAN_START+i*100,100);
 		}
-		register_critical_section.Unlock();
+		register_critical_section.Unlock();*/
 
 
-        if(pView->m_hWnd!=NULL)
-        {
-            ::SendMessage(pView->m_hWnd,CO2NETVIEWFRESH,0,0);
-        }
+		//if(pView->m_hWnd!=NULL)
+		//{
+		//	::SendMessage(pView->m_hWnd,CO2NETVIEWFRESH,0,0);
+  //      }
 
 
 

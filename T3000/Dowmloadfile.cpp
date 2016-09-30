@@ -37,7 +37,6 @@ CString Folder_Path;
 CString HEX_BIN_FILE_PATH;
 extern char * receivefile_buffer;
 CString new_firmware_ip;
-int is_local_temco_net = false;
 
 IMPLEMENT_DYNAMIC(Dowmloadfile, CDialogEx)
 
@@ -746,7 +745,7 @@ BOOL Dowmloadfile::OnInitDialog()
 	CString temp_db_ini_folder;
 	temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
 
-	
+	int is_local_temco_net = false;
 	is_local_temco_net  = GetPrivateProfileInt(_T("Setting"),_T("LocalTemcoNet"),0,temp_db_ini_folder);
 	if(is_local_temco_net == false)
 	{
@@ -1053,25 +1052,18 @@ void Dowmloadfile::OnBnClickedButtonFileDownloadOnly()
 void Dowmloadfile::OnBnClickedButtonUpdateT3000()
 {
 	// TODO: Add your control notification handler code here
-	//if(is_local_temco_net == false)
-	//{
-		CString tempApplicationFolder;
-		GetModuleFileName(NULL, tempApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
-		PathRemoveFileSpec(tempApplicationFolder.GetBuffer(MAX_PATH));
-		tempApplicationFolder.ReleaseBuffer();
+
+	CString tempApplicationFolder;
+	GetModuleFileName(NULL, tempApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+	PathRemoveFileSpec(tempApplicationFolder.GetBuffer(MAX_PATH));
+	tempApplicationFolder.ReleaseBuffer();
 
 
-		ShellExecute(NULL,_T("open"),_T("Update.exe"),NULL,tempApplicationFolder,SW_SHOWNORMAL);
-	//}
-	//else
-	//{
-	//	m_product_isp_auto_flash.product_class_id =  199;
-	//	download_and_update = DOWNLOAD_ONLY;
-	//	Start_Download();
-	//}
+	ShellExecute(NULL,_T("open"),_T("Update.exe"),NULL,tempApplicationFolder,SW_SHOWNORMAL);
 
 
-
-
+	//m_product_isp_auto_flash.product_class_id =  199;
+	//download_and_update = DOWNLOAD_ONLY;
+	//Start_Download();
 	return;
 }

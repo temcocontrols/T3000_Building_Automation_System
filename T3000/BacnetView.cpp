@@ -649,7 +649,7 @@ Update by Fance
 #include "BacnetRemotePoint.h"
 //bool CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data);
 //bool need_to_read_description = true;
-int g_gloab_bac_comport = 1;
+int g_gloab_bac_comport = 3;
 CString temp_device_id,temp_mac,temp_vendor_id;
 HANDLE hwait_thread;
 CString Re_Initial_Bac_Socket_IP;
@@ -1918,6 +1918,8 @@ bool has_change_connect_ip = true;
 //INPUT int test_function_return_value();
 void CDialogCM5_BacNet::Fresh()
 {
+
+
 	g_bPauseMultiRead = true; // 只要在minipanel的界面 就暂停 读 寄存器的那个线程;
     if(initial_once)
     {
@@ -1937,6 +1939,8 @@ void CDialogCM5_BacNet::Fresh()
 		last_serial_number = pFrame->m_product.at(selected_product_index).serial_number;
 		need_read_bacnet_graphic_label_flag = true;
 	}
+
+
 
 	if(initial_once)
 	{
@@ -4244,7 +4248,7 @@ void CDialogCM5_BacNet::Set_remote_device_IP(LPCTSTR ipaddress)
 void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
-
+	CFormView::OnTimer(nIDEvent);
 	bool is_connected = false;
 	switch(nIDEvent)
 	{
@@ -5311,56 +5315,73 @@ DWORD WINAPI  Mstp_Connect_Thread(LPVOID lpVoid)
 {
 	set_datalink_protocol(2);
 	Initial_bac(g_gloab_bac_comport);
+	//    uint32_t Target_Device_Object_Instance = BACNET_MAX_INSTANCE;
+	//    uint32_t Target_Object_Instance = BACNET_MAX_INSTANCE;
+	//    BACNET_OBJECT_TYPE Target_Object_Type = OBJECT_ANALOG_INPUT;
+	//    BACNET_PROPERTY_ID Target_Object_Property = PROP_ACKED_TRANSITIONS;
+	//    int32_t Target_Object_Index = BACNET_ARRAY_ALL;
+	//bool find_exsit = false;
+	//for (int i=0;i<10;i++)
+	//{
+	//	/*if(g_bac_instance<=0)
+	//	{
+	//		connect_mstp_thread = NULL;
+	//		return 0;
+	//	}*/
+	//	Send_WhoIs_Global(12, 12);
+	//	 Sleep(1500);
 
-	bool find_exsit = false;
-	for (int i=0;i<10;i++)
-	{
-		if(g_bac_instance<=0)
-		{
-			connect_mstp_thread = NULL;
-			return 0;
-		}
-		Send_WhoIs_Global(-1, -1);
-		Sleep(1500);
+	//	if (g_invoke_id == 0) 
+	//	{
+	//		Target_Device_Object_Instance = 12;
+	//		Target_Object_Type = OBJECT_DEVICE;
+	//		Target_Object_Instance = 12;
+	//		Target_Object_Property = PROP_OBJECT_NAME;
 
-		for (int i=0;i<(int)m_bac_scan_com_data.size();i++)
-		{
-			if(m_bac_scan_com_data.at(i).device_id == g_bac_instance)
-			{
-				find_exsit = true;
-				break;
-			}
-		}
+	//		g_invoke_id =
+	//			Send_Read_Property_Request(Target_Device_Object_Instance,
+	//			Target_Object_Type, Target_Object_Instance,
+	//			Target_Object_Property, Target_Object_Index);
+	//	} 
 
-		if(find_exsit)
-			break;
-		else
-		{
-			CString temp_cs_2;
-			temp_cs_2.Format(_T("Wait for response.(%ds)"),10-i);
-			SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_cs_2);
-		}
-	}
+	//	for (int i=0;i<(int)m_bac_scan_com_data.size();i++)
+	//	{
+	//		if(m_bac_scan_com_data.at(i).device_id == g_bac_instance)
+	//		{
+	//			find_exsit = true;
+	//			break;
+	//		}
+	//	}
 
-	if(find_exsit == false)
-	{
-		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("No Who is response!"));
-		connect_mstp_thread = NULL;
-		return 0;
-	}
-	else
-	{
-		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Receive bacnet 'who is ' command!"));
-	}
+	//	if(find_exsit)
+	//		break;
+	//	else
+	//	{
+	//		CString temp_cs_2;
+	//		temp_cs_2.Format(_T("Wait for response.(%ds)"),10-i);
+	//		SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_cs_2);
+	//	}
+	//}
+
+	//if(find_exsit == false)
+	//{
+	//	SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("No Who is response!"));
+	//	connect_mstp_thread = NULL;
+	//	return 0;
+	//}
+	//else
+	//{
+	//	SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Receive bacnet 'who is ' command!"));
+	//}
 
 
-	if(GetPrivateData_Blocking(g_bac_instance,READ_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info)) > 0)
-	{
-		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read data success!"));
-	}
+	//if(GetPrivateData_Blocking(g_bac_instance,READ_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info)) > 0)
+	//{
+	//	SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read data success!"));
+	//}
 
-	
-	connect_mstp_thread = NULL;
+	//
+	// connect_mstp_thread = NULL;
 	return 1;
 }
 

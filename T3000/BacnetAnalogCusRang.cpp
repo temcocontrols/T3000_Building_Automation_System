@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 #include "globle_function.h"
 
-CString C_or_V;
+
 
 int max_unit = 0xffffffff;
 int min_unit = 0x7fffffff;
@@ -52,7 +52,6 @@ BEGIN_MESSAGE_MAP(CBacnetAnalogCusRang, CDialogEx)
 	ON_WM_CLOSE()
 	  ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)
 	  ON_EN_KILLFOCUS(IDC_EDIT_BAC_CUS_ANALOG_UNIT, &CBacnetAnalogCusRang::OnEnKillfocusEditBacCusAnalogUnit)
-	  ON_WM_PAINT()
 END_MESSAGE_MAP()
 
 
@@ -125,22 +124,18 @@ void CBacnetAnalogCusRang::Initial_List()
 	if(temp_jumper == 1)
 	{
 		Unit_temp.Format(_T("Current (4-20ma)"));
-		C_or_V.Format(_T("ma"));
 	}
 	else if(temp_jumper == 2)
 	{
 		Unit_temp.Format(_T("Voltage (0-5V)"));
-		C_or_V.Format(_T("V"));
 	}
 	else if(temp_jumper == 3)
 	{
 		Unit_temp.Format(_T("Voltage (0-10V)"));
-		C_or_V.Format(_T("V"));
 	}
 	else 
 	{
 		Unit_temp.Format(_T("Voltage"));
-		C_or_V.Format(_T("V"));
 	}
 
 
@@ -213,14 +208,9 @@ LRESULT CBacnetAnalogCusRang::Fresh_AnalogCusRange_Item(WPARAM wParam,LPARAM lPa
 			}
 			m_analog_custmer_range.at(analog_range_tbl_line).dat[i].value = (unsigned short)(temp_value * 10);
 
-			CString cs_temp1 = m_analog_cus_range_list.GetItemText(i,ANALOG_CUS_RANGE_RBL_UNIT);
-			int temp_value1 =_wtoi(cs_temp1);
+			cs_temp = m_analog_cus_range_list.GetItemText(i,ANALOG_CUS_RANGE_RBL_UNIT);
+			int temp_value1 =_wtoi(cs_temp);
 			m_analog_custmer_range.at(analog_range_tbl_line).dat[i].unit = temp_value1;
-			if(i==0)
-			{
-				GetDlgItem(IDC_STATIC_VC_1)->SetWindowText(cs_temp);
-				GetDlgItem(IDC_STATIC_VALUE_1)->SetWindowText(cs_temp1);
-			}
 	}
 
 
@@ -254,10 +244,8 @@ LRESULT CBacnetAnalogCusRang::Fresh_AnalogCusRange_List(WPARAM wParam,LPARAM lPa
 		CString n_unite_4byte;
 		if((i!=0) && (m_analog_custmer_range.at(analog_range_tbl_line).dat[i].value == 0))
 		{
-			//n_value_2byte.Format(_T("-"));
-			//n_unite_4byte.Format(_T("-"));
-			n_value_2byte.Empty();
-			n_unite_4byte.Empty();
+			n_value_2byte.Format(_T("-"));
+			n_unite_4byte.Format(_T("-"));
 		}
 		else
 		{
@@ -266,74 +254,6 @@ LRESULT CBacnetAnalogCusRang::Fresh_AnalogCusRange_List(WPARAM wParam,LPARAM lPa
 		}
 		m_analog_cus_range_list.SetItemText(i,0,n_value_2byte);
 		m_analog_cus_range_list.SetItemText(i,1,n_unite_4byte);
-
-		if(i==0)
-		{
-			if (!n_value_2byte.IsEmpty())
-				GetDlgItem(IDC_STATIC_VC_1)->SetWindowText(n_value_2byte+C_or_V);
-			GetDlgItem(IDC_STATIC_VALUE_1)->SetWindowText(n_unite_4byte);
-		}
-		else if(i==1)
-		{
-			if (!n_value_2byte.IsEmpty())
-			GetDlgItem(IDC_STATIC_VC_2)->SetWindowText(n_value_2byte+C_or_V);
-			GetDlgItem(IDC_STATIC_VALUE_2)->SetWindowText(n_unite_4byte);
-		}
-		else if(i==2)
-		{
-			if (!n_value_2byte.IsEmpty())
-			GetDlgItem(IDC_STATIC_VC_3)->SetWindowText(n_value_2byte+C_or_V);
-			GetDlgItem(IDC_STATIC_VALUE_3)->SetWindowText(n_unite_4byte);
-		}
-		else if(i==3)
-		{
-			if (!n_value_2byte.IsEmpty())
-			GetDlgItem(IDC_STATIC_VC_4)->SetWindowText(n_value_2byte+C_or_V);
-			GetDlgItem(IDC_STATIC_VALUE_4)->SetWindowText(n_unite_4byte);
-		}
-		else if(i==4)
-		{
-			if (!n_value_2byte.IsEmpty())
-			GetDlgItem(IDC_STATIC_VC_5)->SetWindowText(n_value_2byte+C_or_V);
-			GetDlgItem(IDC_STATIC_VALUE_5)->SetWindowText(n_unite_4byte);
-		}
-		else if(i==5)
-		{
-			if (!n_value_2byte.IsEmpty())
-			GetDlgItem(IDC_STATIC_VC_6)->SetWindowText(n_value_2byte+C_or_V);
-			GetDlgItem(IDC_STATIC_VALUE_6)->SetWindowText(n_unite_4byte);
-		}
-		else if(i==6)
-		{
-			if (!n_value_2byte.IsEmpty())
-			GetDlgItem(IDC_STATIC_VC_7)->SetWindowText(n_value_2byte+C_or_V);
-			GetDlgItem(IDC_STATIC_VALUE_7)->SetWindowText(n_unite_4byte);
-		}
-		else if(i==7)
-		{
-			if (!n_value_2byte.IsEmpty())
-			GetDlgItem(IDC_STATIC_VC_8)->SetWindowText(n_value_2byte+C_or_V);
-			GetDlgItem(IDC_STATIC_VALUE_8)->SetWindowText(n_unite_4byte);
-		}
-		else if(i==8)
-		{
-			if (!n_value_2byte.IsEmpty())
-			GetDlgItem(IDC_STATIC_VC_9)->SetWindowText(n_value_2byte+C_or_V);
-			GetDlgItem(IDC_STATIC_VALUE_9)->SetWindowText(n_unite_4byte);
-		}
-		else if(i==9)
-		{
-			if (!n_value_2byte.IsEmpty())
-			GetDlgItem(IDC_STATIC_VC_10)->SetWindowText(n_value_2byte+C_or_V);
-			GetDlgItem(IDC_STATIC_VALUE_10)->SetWindowText(n_unite_4byte);
-		}
-		else if(i==10)
-		{
-			if (!n_value_2byte.IsEmpty())
-			GetDlgItem(IDC_STATIC_VC_11)->SetWindowText(n_value_2byte+C_or_V);
-			GetDlgItem(IDC_STATIC_VALUE_11)->SetWindowText(n_unite_4byte);
-		}
-
 
 		if(m_analog_custmer_range.at(analog_range_tbl_line).dat[i].unit > max_unit)
 			max_unit = m_analog_custmer_range.at(analog_range_tbl_line).dat[i].unit;
@@ -391,9 +311,6 @@ void CBacnetAnalogCusRang::OnClose()
 BOOL CBacnetAnalogCusRang::PreTranslateMessage(MSG* pMsg)
 {
 	// TODO: Add your specialized code here and/or call the base class
-	CWnd * window_focus =	GetFocus();
-	if(window_focus == NULL)
-		return 0;
 	int temp_focus_id = GetFocus()->GetDlgCtrlID();
 	if(temp_focus_id == IDC_EDIT_BAC_CUS_ANALOG_UNIT )
 	{
@@ -435,15 +352,10 @@ void CBacnetAnalogCusRang::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrol
 	int CurPos;
 	int temp_value;
 	//float fvalue; 
-	CRect temp_1;
-	CRect temp_2;
-
-	int ret_top = 0;
 
 	if(pScrollBar->m_hWnd==m_cus_analog_range_ctrl_0.m_hWnd)
 	{
 		CurPos= m_cus_analog_range_ctrl_0.GetPos();
-
 		temp_value=max_unit + min_unit - CurPos;
 		CString strtext;
 		strtext.Format(_T("%d"),temp_value);
@@ -451,14 +363,6 @@ void CBacnetAnalogCusRang::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrol
 		m_analog_cus_range_list.SetItemText(0,1,strtext);
 		m_tooltips.SetParent(GetDlgItem(IDC_SLIDER_BAC_DEF_1));
 		m_tooltips.Update();
-		m_cus_analog_range_ctrl_0.GetWindowRect(temp_1);
-		GetDlgItem(IDC_STATIC_VALUE_1)->GetWindowRect(temp_2);
-		ScreenToClient(temp_1);
-		ScreenToClient(temp_2);
-		ret_top = temp_1.top  + (360 -36) * CurPos / 1000;
-		GetDlgItem(IDC_STATIC_VALUE_1)->SetWindowPos(NULL,temp_2.left,ret_top,0,0,SWP_NOZORDER|SWP_NOSIZE);
-		GetDlgItem(IDC_STATIC_VALUE_1)->SetWindowText(strtext);
-
 	}
 	if(pScrollBar->m_hWnd==m_cus_analog_range_ctrl_1.m_hWnd)
 	{
@@ -470,13 +374,6 @@ void CBacnetAnalogCusRang::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrol
 		m_analog_cus_range_list.SetItemText(1,1,strtext);
 		m_tooltips.SetParent(GetDlgItem(IDC_SLIDER_BAC_DEF_2));
 		m_tooltips.Update();
-		m_cus_analog_range_ctrl_1.GetWindowRect(temp_1);
-		GetDlgItem(IDC_STATIC_VALUE_2)->GetWindowRect(temp_2);
-		ScreenToClient(temp_1);
-		ScreenToClient(temp_2);
-		ret_top = temp_1.top  + (360 -36) * CurPos / 1000;
-		GetDlgItem(IDC_STATIC_VALUE_2)->SetWindowPos(NULL,temp_2.left,ret_top,0,0,SWP_NOZORDER|SWP_NOSIZE);
-		GetDlgItem(IDC_STATIC_VALUE_2)->SetWindowText(strtext);
 	}
 	if(pScrollBar->m_hWnd==m_cus_analog_range_ctrl_2.m_hWnd)
 	{
@@ -488,13 +385,6 @@ void CBacnetAnalogCusRang::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrol
 		m_analog_cus_range_list.SetItemText(2,1,strtext);
 		m_tooltips.SetParent(GetDlgItem(IDC_SLIDER_BAC_DEF_3));
 		m_tooltips.Update();
-		m_cus_analog_range_ctrl_2.GetWindowRect(temp_1);
-		GetDlgItem(IDC_STATIC_VALUE_3)->GetWindowRect(temp_2);
-		ScreenToClient(temp_1);
-		ScreenToClient(temp_2);
-		ret_top = temp_1.top  + (360 -36) * CurPos / 1000;
-		GetDlgItem(IDC_STATIC_VALUE_3)->SetWindowPos(NULL,temp_2.left,ret_top,0,0,SWP_NOZORDER|SWP_NOSIZE);
-		GetDlgItem(IDC_STATIC_VALUE_3)->SetWindowText(strtext);
 	}	
 	if(pScrollBar->m_hWnd==m_cus_analog_range_ctrl_3.m_hWnd)
 	{
@@ -506,13 +396,6 @@ void CBacnetAnalogCusRang::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrol
 		m_analog_cus_range_list.SetItemText(3,1,strtext);
 		m_tooltips.SetParent(GetDlgItem(IDC_SLIDER_BAC_DEF_4));
 		m_tooltips.Update();
-		m_cus_analog_range_ctrl_3.GetWindowRect(temp_1);
-		GetDlgItem(IDC_STATIC_VALUE_4)->GetWindowRect(temp_2);
-		ScreenToClient(temp_1);
-		ScreenToClient(temp_2);
-		ret_top = temp_1.top  + (360 -36) * CurPos / 1000;
-		GetDlgItem(IDC_STATIC_VALUE_4)->SetWindowPos(NULL,temp_2.left,ret_top,0,0,SWP_NOZORDER|SWP_NOSIZE);
-		GetDlgItem(IDC_STATIC_VALUE_4)->SetWindowText(strtext);
 	}
 	if(pScrollBar->m_hWnd==m_cus_analog_range_ctrl_4.m_hWnd)
 	{
@@ -524,13 +407,6 @@ void CBacnetAnalogCusRang::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrol
 		m_analog_cus_range_list.SetItemText(4,1,strtext);
 		m_tooltips.SetParent(GetDlgItem(IDC_SLIDER_BAC_DEF_5));
 		m_tooltips.Update();
-		m_cus_analog_range_ctrl_4.GetWindowRect(temp_1);
-		GetDlgItem(IDC_STATIC_VALUE_5)->GetWindowRect(temp_2);
-		ScreenToClient(temp_1);
-		ScreenToClient(temp_2);
-		ret_top = temp_1.top  + (360 -36) * CurPos / 1000;
-		GetDlgItem(IDC_STATIC_VALUE_5)->SetWindowPos(NULL,temp_2.left,ret_top,0,0,SWP_NOZORDER|SWP_NOSIZE);
-		GetDlgItem(IDC_STATIC_VALUE_5)->SetWindowText(strtext);
 	}
 	if(pScrollBar->m_hWnd==m_cus_analog_range_ctrl_5.m_hWnd)
 	{
@@ -542,13 +418,6 @@ void CBacnetAnalogCusRang::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrol
 		m_analog_cus_range_list.SetItemText(5,1,strtext);
 		m_tooltips.SetParent(GetDlgItem(IDC_SLIDER_BAC_DEF_6));
 		m_tooltips.Update();
-		m_cus_analog_range_ctrl_5.GetWindowRect(temp_1);
-		GetDlgItem(IDC_STATIC_VALUE_6)->GetWindowRect(temp_2);
-		ScreenToClient(temp_1);
-		ScreenToClient(temp_2);
-		ret_top = temp_1.top  + (360 -36) * CurPos / 1000;
-		GetDlgItem(IDC_STATIC_VALUE_6)->SetWindowPos(NULL,temp_2.left,ret_top,0,0,SWP_NOZORDER|SWP_NOSIZE);
-		GetDlgItem(IDC_STATIC_VALUE_6)->SetWindowText(strtext);
 	}
 	if(pScrollBar->m_hWnd==m_cus_analog_range_ctrl_6.m_hWnd)
 	{
@@ -560,13 +429,6 @@ void CBacnetAnalogCusRang::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrol
 		m_analog_cus_range_list.SetItemText(6,1,strtext);
 		m_tooltips.SetParent(GetDlgItem(IDC_SLIDER_BAC_DEF_7));
 		m_tooltips.Update();
-		m_cus_analog_range_ctrl_6.GetWindowRect(temp_1);
-		GetDlgItem(IDC_STATIC_VALUE_7)->GetWindowRect(temp_2);
-		ScreenToClient(temp_1);
-		ScreenToClient(temp_2);
-		ret_top = temp_1.top  + (360 -36) * CurPos / 1000;
-		GetDlgItem(IDC_STATIC_VALUE_7)->SetWindowPos(NULL,temp_2.left,ret_top,0,0,SWP_NOZORDER|SWP_NOSIZE);
-		GetDlgItem(IDC_STATIC_VALUE_7)->SetWindowText(strtext);
 	}
 	if(pScrollBar->m_hWnd==m_cus_analog_range_ctrl_7.m_hWnd)
 	{
@@ -578,13 +440,6 @@ void CBacnetAnalogCusRang::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrol
 		m_analog_cus_range_list.SetItemText(7,1,strtext);
 		m_tooltips.SetParent(GetDlgItem(IDC_SLIDER_BAC_DEF_8));
 		m_tooltips.Update();
-		m_cus_analog_range_ctrl_7.GetWindowRect(temp_1);
-		GetDlgItem(IDC_STATIC_VALUE_8)->GetWindowRect(temp_2);
-		ScreenToClient(temp_1);
-		ScreenToClient(temp_2);
-		ret_top = temp_1.top  + (360 -36) * CurPos / 1000;
-		GetDlgItem(IDC_STATIC_VALUE_8)->SetWindowPos(NULL,temp_2.left,ret_top,0,0,SWP_NOZORDER|SWP_NOSIZE);
-		GetDlgItem(IDC_STATIC_VALUE_8)->SetWindowText(strtext);
 	}
 	if(pScrollBar->m_hWnd==m_cus_analog_range_ctrl_8.m_hWnd)
 	{
@@ -596,13 +451,6 @@ void CBacnetAnalogCusRang::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrol
 		m_analog_cus_range_list.SetItemText(8,1,strtext);
 		m_tooltips.SetParent(GetDlgItem(IDC_SLIDER_BAC_DEF_9));
 		m_tooltips.Update();
-		m_cus_analog_range_ctrl_8.GetWindowRect(temp_1);
-		GetDlgItem(IDC_STATIC_VALUE_9)->GetWindowRect(temp_2);
-		ScreenToClient(temp_1);
-		ScreenToClient(temp_2);
-		ret_top = temp_1.top  + (360 -36) * CurPos / 1000;
-		GetDlgItem(IDC_STATIC_VALUE_9)->SetWindowPos(NULL,temp_2.left,ret_top,0,0,SWP_NOZORDER|SWP_NOSIZE);
-		GetDlgItem(IDC_STATIC_VALUE_9)->SetWindowText(strtext);
 	}
 	if(pScrollBar->m_hWnd==m_cus_analog_range_ctrl_9.m_hWnd)
 	{
@@ -614,13 +462,6 @@ void CBacnetAnalogCusRang::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrol
 		m_analog_cus_range_list.SetItemText(9,1,strtext);
 		m_tooltips.SetParent(GetDlgItem(IDC_SLIDER_BAC_DEF_10));
 		m_tooltips.Update();
-		m_cus_analog_range_ctrl_9.GetWindowRect(temp_1);
-		GetDlgItem(IDC_STATIC_VALUE_10)->GetWindowRect(temp_2);
-		ScreenToClient(temp_1);
-		ScreenToClient(temp_2);
-		ret_top = temp_1.top  + (360 -36) * CurPos / 1000;
-		GetDlgItem(IDC_STATIC_VALUE_10)->SetWindowPos(NULL,temp_2.left,ret_top,0,0,SWP_NOZORDER|SWP_NOSIZE);
-		GetDlgItem(IDC_STATIC_VALUE_10)->SetWindowText(strtext);
 	}
 	if(pScrollBar->m_hWnd==m_cus_analog_range_ctrl_10.m_hWnd)
 	{
@@ -632,13 +473,6 @@ void CBacnetAnalogCusRang::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrol
 		m_analog_cus_range_list.SetItemText(10,1,strtext);
 		m_tooltips.SetParent(GetDlgItem(IDC_SLIDER_BAC_DEF_11));
 		m_tooltips.Update();
-		m_cus_analog_range_ctrl_10.GetWindowRect(temp_1);
-		GetDlgItem(IDC_STATIC_VALUE_11)->GetWindowRect(temp_2);
-		ScreenToClient(temp_1);
-		ScreenToClient(temp_2);
-		ret_top = temp_1.top  + (360 -36) * CurPos / 1000;
-		GetDlgItem(IDC_STATIC_VALUE_11)->SetWindowPos(NULL,temp_2.left,ret_top,0,0,SWP_NOZORDER|SWP_NOSIZE);
-		GetDlgItem(IDC_STATIC_VALUE_11)->SetWindowText(strtext);
 	}
 
 
@@ -701,23 +535,4 @@ void CBacnetAnalogCusRang::UpdateCusAnalogUnit()
 	temp_task_info.Format(_T("Update Analog Range Unit : %s  "),temp_cs);
 	Post_Write_Message(g_bac_instance,WRITEANALOG_CUS_TABLE_T3000,analog_range_tbl_line,analog_range_tbl_line,sizeof(Str_table_point),analog_cus_range_dlg ,temp_task_info);
 
-}
-
-
-void CBacnetAnalogCusRang::OnPaint()
-{
-	CPaintDC dc(this); // device context for painting
-	// TODO: Add your message handler code here
-	// Do not call CDialogEx::OnPaint() for painting messages
-	//CMemDC memDC(dc,this);
-	//SolidBrush *CharacterBlackBrush;
-	//Graphics *mygraphics;
-	//mygraphics = new Graphics(memDC.GetDC());
-	//SolidBrush  TitleCharacterColor(Color(255,255,0,255));
-	//FontFamily  CharacterfontFamily(_T("Arial"));
-	//Gdiplus::Font  Scroll_font(&CharacterfontFamily, 28, FontStyleBold, UnitPixel);
-	//PointF     TitlepointF(20, 20);
-	//mygraphics->DrawString(_T("Test"), -1, &Scroll_font, TitlepointF,&TitleCharacterColor);
-	//delete mygraphics;
-	
 }

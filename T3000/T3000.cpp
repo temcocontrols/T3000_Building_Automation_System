@@ -41,7 +41,9 @@ CT3000App::CT3000App()
 {
 	m_bHiColorIcons = TRUE;
 	CurrentT3000Version=_T("    2016.09.23 ");
-	T3000_Version = 10923;
+	T3000_Version = 10918;
+
+
 	m_lastinterface=19;
 }
 // The one and only CT3000App object
@@ -114,40 +116,7 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
 	}
 	
 }
- void CT3000App::ImportData(){
-//   CADO ado;
-//   ado.OnInitADOConn();
-	 CBADO bado;
-	 bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-	 bado.OnInitADOConn(); 
-  CString sql=_T("select * from ALL_NODE");
-  bado.m_pRecordset=bado.OpenRecordset(sql);
-  ALL_NODE temp;
-  while(!bado.m_pRecordset->EndOfFile){
-	   temp.MainBuilding_Name=bado.m_pRecordset->GetCollect(_T("MainBuilding_Name"));
-	   temp.Building_Name=bado.m_pRecordset->GetCollect(_T("Building_Name"));
-	   temp.Serial_ID=bado.m_pRecordset->GetCollect(_T("Serial_ID"));
-	   temp.Floor_name=bado.m_pRecordset->GetCollect(_T("Floor_name"));
-	   temp.Room_name=bado.m_pRecordset->GetCollect(_T("Room_name"));
-	   temp.Product_name=bado.m_pRecordset->GetCollect(_T("Product_name"));
-	   temp.Product_class_ID=bado.m_pRecordset->GetCollect(_T("Product_class_ID"));
-	   temp.Product_ID=bado.m_pRecordset->GetCollect(_T("Product_ID"));
-	   temp.Screen_Name=bado.m_pRecordset->GetCollect(_T("Screen_Name"));
-	   temp.Bautrate=bado.m_pRecordset->GetCollect(_T("Bautrate"));
-	   temp.Background_imgID=bado.m_pRecordset->GetCollect(_T("Background_imgID"));
-	   temp.Hardware_Ver=bado.m_pRecordset->GetCollect(_T("Hardware_Ver"));
-	   temp.Software_Ver=bado.m_pRecordset->GetCollect(_T("Software_Ver"));
-	   temp.Com_Port=bado.m_pRecordset->GetCollect(_T("Com_Port"));
-	   temp.EPsize=bado.m_pRecordset->GetCollect(_T("EPsize"));
-	   temp.Protocol=bado.m_pRecordset->GetCollect(_T("Protocol"));
-      
-	   bado.m_pRecordset->MoveNext();
-
-	   m_AllNodes.push_back(temp);
-  }
-  bado.CloseRecordset();
-  bado.CloseConn();
- }
+ 
 
  BOOL CT3000App::Is_haveTable(CString TableName){
  CADO ado;
@@ -210,93 +179,9 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
          srcConTmp.CreateInstance("ADODB.Connection");
          srcRsTemp.CreateInstance("ADODB.Recordset");
          srcConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);//打开数据库
-         //这里是All_NODE
-         if (Is_haveTable(_T("ALL_NODE")))
-         {
-
-#if 1
-             srcRsTemp->Open(_T("select * from ALL_NODE"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);		
-             ALL_NODE temp;
-             while(!srcRsTemp->EndOfFile){
-                 temp.MainBuilding_Name=srcRsTemp->GetCollect(_T("MainBuilding_Name"));
-                 temp.Building_Name=srcRsTemp->GetCollect(_T("Building_Name"));
-                 temp.Serial_ID=srcRsTemp->GetCollect(_T("Serial_ID"));
-                 temp.Floor_name=srcRsTemp->GetCollect(_T("Floor_name"));
-                 temp.Room_name=srcRsTemp->GetCollect(_T("Room_name"));
-                 temp.Product_name=srcRsTemp->GetCollect(_T("Product_name"));
-                 temp.Product_class_ID=srcRsTemp->GetCollect(_T("Product_class_ID"));
-                 temp.Product_ID=srcRsTemp->GetCollect(_T("Product_ID"));
-                 temp.Screen_Name=srcRsTemp->GetCollect(_T("Screen_Name"));
-                 temp_var=srcRsTemp->GetCollect(_T("Bautrate"));
-                 temp.Custom = srcRsTemp->GetCollect(_T("Custom"));
-                 // temp.Com_Port = srcRsTemp->GetCollect(_T("Com_Port"));
-
-                 if (temp_var.vt!=VT_NULL)
-                 { temp.Bautrate=temp_var;
-                 }
-                 else
-                 {
-                     temp.Bautrate=_T("");
-                 }
-                 temp.Background_imgID=srcRsTemp->GetCollect(_T("Background_imgID"));
-                 temp_var=srcRsTemp->GetCollect(_T("Hardware_Ver"));
-                 if (temp_var.vt!=VT_NULL)
-                 { temp.Hardware_Ver=temp_var;
-                 }
-                 else
-                 {
-                     temp.Hardware_Ver=_T("");
-                 }
-                 temp_var=srcRsTemp->GetCollect(_T("Software_Ver"));
-                 if (temp_var.vt!=VT_NULL)
-                 { temp.Software_Ver=temp_var;
-                 }
-                 else
-                 {
-                     temp.Software_Ver=_T("");
-                 }
-                 temp_var=srcRsTemp->GetCollect(_T("Com_Port"));
-                 if (temp_var.vt!=VT_NULL)
-                 { 
-                     temp.Com_Port=temp_var;
-                 }
-                 else
-                 {
-                     temp.Com_Port=_T("");
-                 }
-                 temp_var=srcRsTemp->GetCollect(_T("EPsize"));
-                 if (temp_var.vt!=VT_NULL)
-                 { temp.EPsize=temp_var;
-                 }
-                 else
-                 {
-                     temp.EPsize=_T("");
-                 }
-                 temp_var=srcRsTemp->GetCollect(_T("Protocol"));
-                 if (temp_var.vt!=VT_NULL)
-                 { temp.Protocol=temp_var;
-                 }
-                 else
-                 {
-                     temp.Protocol=_T("");
-                 }
-                 srcRsTemp->MoveNext();
-                 m_AllNodes.push_back(temp);
-             }
-             srcRsTemp->Close();
-#endif
-         }
-         /*
-         vector<Building> m_Building;
-         vector<Building_ALL> m_Building_ALL;
-         vector<CustomProductTable>  m_CustomProductTable;
-         vector<IONAME> m_IONAME;
-         vector<IONAME_Config> m_IONAME_Config;
-         vector<LCNameConfig> m_LCNameConfig;
-         vector<LightingController_Name> m_LightingController_Name;
-         vector<Product_Data> m_Product_Data;
-         vector<Screen_Label> m_Screen_Label;
-         */
+         
+        
+        
          //Building_ALL
          if (Is_haveTable(_T("Building_ALL")))
          {
@@ -341,158 +226,7 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
          }
 
 
-         //CustomProductTable
-         if (Is_haveTable(_T("CustomProductTable")))
-         {
-#if 1
-             srcRsTemp->Open(_T("select * from CustomProductTable"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);		
-             CustomProductTable CustomProductTable_Temp;
-             while(!srcRsTemp->EndOfFile){
-                 CustomProductTable_Temp.ModelNo=srcRsTemp->GetCollect(_T("ModelNo"));
-                 CustomProductTable_Temp.Reg_Description=srcRsTemp->GetCollect(_T("Reg_Description"));
-                 CustomProductTable_Temp.Reg_ID=srcRsTemp->GetCollect(_T("Reg_ID"));
-
-                 m_CustomProductTable.push_back(CustomProductTable_Temp);
-                 srcRsTemp->MoveNext();
-             }
-             srcRsTemp->Close();
-#endif
-         }
-
-
-         //IONAME
-         if (Is_haveTable(_T("IONAME")))
-         {
-#if 1
-             srcRsTemp->Open(_T("select * from IONAME"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);		
-             IONAME IONAME_Temp;
-             while(!srcRsTemp->EndOfFile){
-                 IONAME_Temp.INPUT1=srcRsTemp->GetCollect(_T("INPUT1"));
-                 IONAME_Temp.INPUT2=srcRsTemp->GetCollect(_T("INPUT2"));
-                 IONAME_Temp.INPUT3=srcRsTemp->GetCollect(_T("INPUT3"));
-                 IONAME_Temp.INPUT4=srcRsTemp->GetCollect(_T("INPUT4"));
-                 IONAME_Temp.INPUT5=srcRsTemp->GetCollect(_T("INPUT5"));
-                 IONAME_Temp.INPUT6=srcRsTemp->GetCollect(_T("INPUT6"));
-                 IONAME_Temp.INPUT7=srcRsTemp->GetCollect(_T("INPUT7"));
-                 IONAME_Temp.INPUT8=srcRsTemp->GetCollect(_T("INPUT8"));
-                 IONAME_Temp.INPUT9=srcRsTemp->GetCollect(_T("INPUT9"));
-                 IONAME_Temp.OUTPUT1=srcRsTemp->GetCollect(_T("OUTPUT1"));
-                 IONAME_Temp.OUTPUT2=srcRsTemp->GetCollect(_T("OUTPUT2"));
-                 IONAME_Temp.OUTPUT3=srcRsTemp->GetCollect(_T("OUTPUT3"));
-                 IONAME_Temp.OUTPUT4=srcRsTemp->GetCollect(_T("OUTPUT4"));
-                 IONAME_Temp.OUTPUT5=srcRsTemp->GetCollect(_T("OUTPUT5"));
-                 IONAME_Temp.OUTPUT6=srcRsTemp->GetCollect(_T("OUTPUT6"));
-                 IONAME_Temp.OUTPUT7=srcRsTemp->GetCollect(_T("OUTPUT7"));
-                 IONAME_Temp.SENSORNAME=srcRsTemp->GetCollect(_T("SENSORNAME"));
-                 IONAME_Temp.SERIAL_ID=srcRsTemp->GetCollect(_T("SERIAL_ID"));
-
-
-                 m_IONAME.push_back(IONAME_Temp);
-                 srcRsTemp->MoveNext();
-             }
-             srcRsTemp->Close();
-#endif
-         }
-
-         //IONAME_Config
-         if (Is_haveTable(_T("IONAME_CONFIG"))) {
-#if 1
-             srcRsTemp->Open(_T("select * from IONAME_CONFIG"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);		
-             IONAME_Config IONAME_Config_Temp;
-             while(!srcRsTemp->EndOfFile){
-                 IONAME_Config_Temp.InOutName=srcRsTemp->GetCollect(_T("InOutName"));
-                 IONAME_Config_Temp.Row=srcRsTemp->GetCollect(_T("Row"));
-                 IONAME_Config_Temp.SerialNo=srcRsTemp->GetCollect(_T("SerialNo"));
-                 IONAME_Config_Temp.Type=srcRsTemp->GetCollect(_T("Type"));
-
-                 m_IONAME_Config.push_back(IONAME_Config_Temp);
-                 srcRsTemp->MoveNext();
-             }
-             srcRsTemp->Close();
-#endif
-
-         }
-
-         //LCNameConfig
-         if (Is_haveTable(_T("LCNameConfigure")))
-         {
-#if 1
-             srcRsTemp->Open(_T("select * from LCNameConfigure"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);		
-             LCNameConfigure LCNameConfigure_Temp;
-             while(!srcRsTemp->EndOfFile){
-                 LCNameConfigure_Temp.Card=srcRsTemp->GetCollect(_T("Card"));
-                 LCNameConfigure_Temp.Output=srcRsTemp->GetCollect(_T("Output"));
-                 LCNameConfigure_Temp.OutputName=srcRsTemp->GetCollect(_T("OutputName"));
-                 LCNameConfigure_Temp.SN=srcRsTemp->GetCollect(_T("SN"));
-                 m_LCNameConfigure.push_back(LCNameConfigure_Temp);
-                 srcRsTemp->MoveNext();
-             }
-             srcRsTemp->Close();
-#endif
-         }
-
-
-
-         //Product_Data
-         if (Is_haveTable(_T("Product_Data")))
-         {
-#if 1
-             srcRsTemp->Open(_T("select * from Product_Data"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);		
-             Product_Data Product_Data_Temp;
-             while(!srcRsTemp->EndOfFile){
-                 Product_Data_Temp.Serial_ID=srcRsTemp->GetCollect(_T("Serial_ID"));
-                 Product_Data_Temp.Register_Data=srcRsTemp->GetCollect(_T("Register_Data"));
-                 m_Product_Data.push_back(Product_Data_Temp);
-                 srcRsTemp->MoveNext();
-             }
-             srcRsTemp->Close();
-#endif
-         }
-
-         //Screen_Label
-         if (Is_haveTable(_T("Screen_Label")))
-         {
-#if 1
-             srcRsTemp->Open(_T("select * from Screen_Label"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);		
-             Screen_Label Screen_Label_Temp;
-             while(!srcRsTemp->EndOfFile){
-                 Screen_Label_Temp.Back_Color=srcRsTemp->GetCollect(_T("Back_Color"));
-                 Screen_Label_Temp.Cstatic_id=srcRsTemp->GetCollect(_T("Cstatic_id"));
-                 Screen_Label_Temp.Height=srcRsTemp->GetCollect(_T("Height"));
-                 Screen_Label_Temp.Input_or_Output=srcRsTemp->GetCollect(_T("Input_or_Output"));
-                 Screen_Label_Temp.Point_X=srcRsTemp->GetCollect(_T("Point_X"));
-                 Screen_Label_Temp.Point_Y=srcRsTemp->GetCollect(_T("Point_Y"));
-                 Screen_Label_Temp.Serial_Num=srcRsTemp->GetCollect(_T("Serial_Num"));
-                 Screen_Label_Temp.Status=srcRsTemp->GetCollect(_T("Status"));
-                 Screen_Label_Temp.Text_Color=srcRsTemp->GetCollect(_T("Text_Color"));
-                 Screen_Label_Temp.Tips=srcRsTemp->GetCollect(_T("Tips"));
-                 Screen_Label_Temp.Tstat_id=srcRsTemp->GetCollect(_T("Tstat_id"));
-                 Screen_Label_Temp.Width=srcRsTemp->GetCollect(_T("Width"));
-
-                 m_Screen_Label.push_back(Screen_Label_Temp);
-                 srcRsTemp->MoveNext();
-             }
-             srcRsTemp->Close();
-#endif
-         }
-
-
-         //Value_Range
-         if (Is_haveTable(_T("Value_Range")))
-         {
-#if 1
-             srcRsTemp->Open(_T("select * from Value_Range"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);		
-             Value_Range Value_Range_Temp;
-             while(!srcRsTemp->EndOfFile){
-                 Value_Range_Temp.SN=srcRsTemp->GetCollect(_T("SN"));
-                 Value_Range_Temp.CInputNo=srcRsTemp->GetCollect(_T("CInputNo"));
-                 Value_Range_Temp.CRange=srcRsTemp->GetCollect(_T("CRange"));
-                 srcRsTemp->MoveNext();
-                 m_Value_Range.push_back(Value_Range_Temp);
-             }
-             srcRsTemp->Close();
-#endif
-         }
+ 
 
 
 
@@ -579,27 +313,27 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
                      filebuildingPath+=(CString)m_Building.at(i).Main_BuildingName;//_T(".mdb");
                      filebuildingPath+=_T(".mdb");
 
-                     DeleteFile(filebuildingPath);
-                     // 	 HANDLE hFind;//
-                     // 	 WIN32_FIND_DATA wfd;//
-                     //create building db file
-
-                     hFind = FindFirstFile(filebuildingPath, &wfd);//
-                     if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
-                     {
-
-                         HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_BUILDING_DB2), _T("BUILDING_DB"));   
-                         HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
-
-
-                         LPVOID lpExe = LockResource(hGlobal);   
-                         CFile file;
-                         if(file.Open(filebuildingPath, CFile::modeCreate | CFile::modeWrite))    
-                             file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
-                         file.Close();    
-                         ::UnlockResource(hGlobal);   
-                         ::FreeResource(hGlobal);
-                     }//
+//                      DeleteFile(filebuildingPath);
+//                      // 	 HANDLE hFind;//
+//                      // 	 WIN32_FIND_DATA wfd;//
+//                      //create building db file
+// 
+//                      hFind = FindFirstFile(filebuildingPath, &wfd);//
+//                      if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
+//                      {
+// 
+//                          HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_BUILDING_DB2), _T("BUILDING_DB"));   
+//                          HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
+// 
+// 
+//                          LPVOID lpExe = LockResource(hGlobal);   
+//                          CFile file;
+//                          if(file.Open(filebuildingPath, CFile::modeCreate | CFile::modeWrite))    
+//                              file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
+//                          file.Close();    
+//                          ::UnlockResource(hGlobal);   
+//                          ::FreeResource(hGlobal);
+//                      }//
 
 #endif
 
@@ -651,16 +385,20 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
      }
 
 
-     int BuildingVersion;
-     CBADO bado;
-     bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-     bado.OnInitADOConn(); 
-     bado.m_pRecordset = bado.OpenRecordset(_T("Select * From Version"));
-     while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile){
-         BuildingVersion = bado.m_pRecordset->GetCollect(_T("VersionNO"));
-         bado.m_pRecordset->MoveNext();
-     }
-
+	 int BuildingVersion;
+	 int BuildingDBVersion = 20150623;//最新
+	 CBADO bado;
+	 bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	 bado.OnInitADOConn(); 
+	 bado.m_pRecordset = bado.OpenRecordset(_T("Select * From Version"));
+	 while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile){
+		 BuildingVersion = bado.m_pRecordset->GetCollect(_T("VersionNO"));
+		 bado.m_pRecordset->MoveNext();
+	 }
+	 if (BuildingVersion>=BuildingDBVersion)
+	 {
+		return TRUE;
+	 }
      if(BuildingVersion <20150105){
          StrSql=_T("ALTER TABLE ALL_NODE ADD COLUMN Custom varchar(255)"); 
          bado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
@@ -972,12 +710,11 @@ BOOL CT3000App::InitInstance()
 			//IDR_MFC16DLL1
 
 			CString MFC16DLLPath=GetExePath(true)+L"MFC16API.dll";
-			DeleteFileW(MFC16DLLPath);
 			hFind = FindFirstFile(MFC16DLLPath, &wfd);
 			if (hFind==INVALID_HANDLE_VALUE)
 			{
 
-				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MFC16DLL2), _T("MFC16DLL"));   
+				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MFC16DLL1), _T("MFC16DLL"));   
 				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
 				LPVOID lpExe = LockResource(hGlobal);   
 				CFile file;

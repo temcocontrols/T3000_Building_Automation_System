@@ -12,6 +12,7 @@
 #include "RegisterValueAnalyzerDlg.h"
 #include "CommunicationTrafficDlg.h"
 #include "Modbus PollView.h"
+#include "DeviecTesterConfigDlg.h"
 
 
  UINT _ReadMultiRegisters(LPVOID pParam)
@@ -56,6 +57,7 @@ ON_UPDATE_COMMAND_UI(IDS_CONNECTION, &CMainFrame::OnUpdateStatusBar)
 ON_COMMAND(ID_FUNCTIONS_TESTCENTER, &CMainFrame::OnFunctionsTestcenter)
 ON_COMMAND(ID_EDIT_COPY, &CMainFrame::OnEditCopy)
  
+ON_COMMAND(ID_TOOLS_DEVICETESTER, &CMainFrame::OnToolsDevicetester)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -881,4 +883,10 @@ void CMainFrame::OnEditCopy()
 }
 
 
- 
+
+
+void CMainFrame::OnToolsDevicetester()
+{
+	 CDeviecTesterConfigDlg dlg;
+	 dlg.DoModal();
+}

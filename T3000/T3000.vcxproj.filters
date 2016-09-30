@@ -986,9 +986,6 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\MFC16API.dll" />
-    <None Include="res\mfc16dll.bin">
-      <Filter>Resource Files</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">

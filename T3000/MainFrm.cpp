@@ -416,6 +416,7 @@ unsigned short tempchange[512];
 int index_Count=0;
 UINT _ReadMultiRegisters(LPVOID pParam)
 {
+return 0;
 
     CMainFrame* pFrame=(CMainFrame*)(pParam);
     BOOL bFirst=TRUE;
@@ -7850,7 +7851,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 SetLastCommunicationType(1);
                 g_protocol=MODBUS_TCPIP;
                 // SetResponseTime (2000);   For Kaiyin's TstatHUM
-                int nmultyRet=Read_Multi(g_tstat_id,&read_data[0],0,10,5);
+                int nmultyRet=Read_Multi(g_tstat_id,&read_data[0],0,10,1);
 
                 //
                 if(nmultyRet <0)
@@ -7898,9 +7899,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 //                         }
                         if (pDlg !=NULL)
                         {
-                            pDlg->ShowWindow(SW_HIDE);
-                            delete pDlg;
-                            pDlg=NULL;
+							pDlg->ShowWindow(SW_HIDE);
+							delete pDlg;
+							pDlg=NULL;
                         }
                         //MessageBox(tempcs);
 
@@ -8035,6 +8036,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 {
                     int Use_zigee = 0;
                     int power_value = 1;
+					
+					
                     int length = 10;
                     nFlag = Device_Type;
                     int it = 0;
@@ -8069,7 +8072,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     }
 
 
-
+					 
 
                     memset(&multi_register_value[0],0,sizeof(multi_register_value));
 
@@ -8150,7 +8153,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                         int i;
 						it = 0;
                         float progress;
-                        for(i=0; i<(length*power_value); i++)	//暂定为0 ，因为TSTAT6 目前为600多
+                        for(i=0; i<(length*power_value); i++)	 
                         {
                             int itemp = 0;
                             itemp = Read_Multi(g_tstat_id,&multi_register_value[i*(100/power_value)],i*(100/power_value),100/power_value,5);
@@ -8178,7 +8181,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
 
 
-                    if  ( product_register_value[714] == 0x56)
+                    if(product_register_value[714] == 0x56)
                     {
                         CString TstatName,TstatDBName;
 
@@ -8210,22 +8213,22 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             WideCharToMultiByte( CP_ACP, 0, newname.GetBuffer(), -1, cTemp1, 16, NULL, NULL );
                             unsigned char Databuffer[16];
                             memcpy_s(Databuffer,16,cTemp1,16);
-                            if (Write_Multi(g_tstat_id,Databuffer,715,16,3)>0)
-                            {
-                                for (int i=0; i<16; i++)
-                                {
-                                    product_register_value[715+i]=Databuffer[i];
-                                }
+							if (Write_Multi(g_tstat_id,Databuffer,715,16,3)>0)
+							{
+								for (int i=0; i<16; i++)
+								{
+									product_register_value[715+i]=Databuffer[i];
+								}
 
 
 
 
-                                strSql.Format(_T("update ALL_NODE set Product_name='%s' where Serial_ID='%s'"),newname,strSerial);
-                                bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+								strSql.Format(_T("update ALL_NODE set Product_name='%s' where Serial_ID='%s'"),newname,strSerial);
+								bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
 
-                                WritePrivateProfileStringW(temp_serial_number,_T("WriteFlag"),L"0",g_achive_device_name_path);
-                                PostMessage(WM_MYMSG_REFRESHBUILDING,0,0);
-                            }
+								WritePrivateProfileStringW(temp_serial_number,_T("WriteFlag"),L"0",g_achive_device_name_path);
+								PostMessage(WM_MYMSG_REFRESHBUILDING,0,0);
+							}
                         }
 
 
@@ -8545,7 +8548,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 SwitchToPruductType(DLG_DIALOG_PRESSURE_SENSOR);
             }
 
-			else if ((product_register_value[7]==PM_CO2_RS485&&product_register_value[14] == 6)||product_register_value[7]==PM_HUMTEMPSENSOR||product_register_value[7]==STM32_HUM_NET||product_register_value[7]==STM32_HUM_RS485)
+			else if ((product_register_value[7]==PM_CO2_RS485&&product_register_value[14] == 6)||nFlag==PM_AirQuality||nFlag==PM_HUM_R||product_register_value[7]==PM_HUMTEMPSENSOR||product_register_value[7]==STM32_HUM_NET||product_register_value[7]==STM32_HUM_RS485)
             //else if (nFlag==PM_AirQuality||nFlag==PM_HUM_R||nFlag==PM_HUMTEMPSENSOR)
             { 
                 SwitchToPruductType(DLG_AIRQUALITY_VIEW);
@@ -8613,7 +8616,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 bacnet_view_number = TYPE_TSTAT;
 
             }
-            if (Scan_Product_ID == 210)
+            if (Scan_Product_ID == 122)
             {
                 SwitchToPruductType(DLG_DIALOG_BOATMONITOR);
             }
@@ -15428,8 +15431,8 @@ void CMainFrame::OnHelpUsingUpdate()
 #include "BootFinderDlg.h"
 void CMainFrame::OnToolBootloader()
 {
-      CBootFinderDlg dlg;
-      dlg.DoModal ();
+	CBootFinderDlg dlg;
+	dlg.DoModal ();
 }
 
 
