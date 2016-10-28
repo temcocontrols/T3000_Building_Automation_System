@@ -65,8 +65,7 @@ public:
 
 	afx_msg void OnEnKillfocusEditSettingNodesLabelSetting();
 
-	_ConnectionPtr				m_pCon;//for ado connection
-	_RecordsetPtr				m_pRs;//for ado 
+ 
 
 	CStatic m_static_panel_title;
 	CEdit m_edit_panel;

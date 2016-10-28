@@ -2,7 +2,7 @@
 #include "resource.h"
 #include "RelayLabel.h"
 #include "afxwin.h"
-
+#include "../SQLiteDriver/CppSQLite3.h"
 
 // CGraphicView form view
 
@@ -60,8 +60,7 @@ public:
 
 	BOOL m_bImgExist;
 public:
-	_ConnectionPtr m_pCon;
-	_RecordsetPtr m_pRs;
+ 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
@@ -94,7 +93,8 @@ public:
 	CMFCButton m_bLockBtn;
 	CMFCMenuButton m_ImgConfigBtn;
 	CMenu m_ImgConfigmenu;
-
+	CppSQLite3DB SqliteDBT3000;
+	CppSQLite3Query q;
 	afx_msg void OnBnClickedImgcnfigbutton();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };

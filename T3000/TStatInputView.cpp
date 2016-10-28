@@ -11,7 +11,7 @@
 #include <bitset>
 #include "BuildTable1.h"
 #include "TstatRangeDlg.h"
-#include "bado/BADO.h"
+ 
 #include "MainFrm.h"
 // CTStatInputView
 UINT BackMainUIFresh_TstatInput(LPVOID pParam)

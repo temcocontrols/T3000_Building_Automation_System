@@ -1,5 +1,5 @@
 #pragma once
-
+#include "../SQLiteDriver/CppSQLite3.h"
 const int T3000_5ABCDFG_LED_ADDRESS = 1;
 const int T3000_5EH_LCD_ADDRESS = 2;
 const int T3000_6_ADDRESS = 3;
@@ -13,8 +13,9 @@ class T3000RegAddress
 public:
 	T3000RegAddress(void);
 	~T3000RegAddress(void);
-	_RecordsetPtr m_pRs;
-	_ConnectionPtr m_pCon;
+	CppSQLite3Table m_table;
+	CppSQLite3Query m_q;
+	CppSQLite3DB m_SqliteDBT3000;
 	bool MatchMoudleAddress(void);
 	bool Change_Register_Table(void);
 

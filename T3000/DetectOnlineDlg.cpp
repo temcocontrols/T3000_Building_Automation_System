@@ -9,7 +9,7 @@
 #include "MainFrm.h"
 #include "crc.h"
 #include <algorithm>
-#include "bado/BADO.h"
+#include "../SQLiteDriver/CppSQLite3.h"
 // CDetectOnlineDlg dialog
 const UINT WM_HTTPDOWNLOAD_THREAD_FINISHED = WM_APP + 1;
 
@@ -1508,29 +1508,16 @@ void CDetectOnlineDlg::FLEX_GRID1_PUT_STR(int row,int col)
 
 }//str must be declare
 void CDetectOnlineDlg::SaveToDB(){
- CADO m_ado;
-   m_ado.OnInitADOConn();
-   CBADO bado;
-   bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-   bado.OnInitADOConn();
- //CString temptable = _T("DetectTstatOnline");
-//CString createtable = _T("create table DetectTstatOnline(COM text,ModbusID text,ProductID text,RoomNo text,SerialNo text,Status text,TStatID text,FirmwareVer text)");//
+  CppSQLite3DB SqliteDBT3000;
+  SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+  CppSQLite3DB SqliteDBBuilding;
+  CppSQLite3Table table;
+  CppSQLite3Query q;
+
+  SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+  
 CString strSql ;
-//bool m_judge = m_ado.IsHaveTable(m_ado,temptable);
-//if (!m_judge)
-//{
-//m_ado.Createtable(createtable);
-//}
-//strSql=_T("delete * from DetectTstatOnline ");
-//try
-//{
-//	m_ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
-//}
-//catch(_com_error *e)
-//{
-// AfxMessageBox(_T("Error"));
-// return;
-//}
+ 
 vector_unique(m_allnodes);
 
 for (int i=0;i<m_allnodes.size();i++)
@@ -1538,7 +1525,7 @@ for (int i=0;i<m_allnodes.size();i++)
 	strSql.Format(_T("insert into DetectTstatOnline(COM,ModbusID,ProductID,RoomNo,SerialNo,Status,TStatID,FirmwareVer) values('"+m_allnodes[i].ComportNo+"','"+m_allnodes[i].ModbusID+"','"+m_allnodes[i].ProductID+"','"+m_allnodes[i].RoomNO+"','"+m_allnodes[i].SerialNO+"','"+m_allnodes[i].Status+"','"+m_allnodes[i].TstatID+"','"+m_allnodes[i].Firmware+"')"));
    try
    {
-	   m_ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+	   SqliteDBT3000.execDML((UTF8MBSTR)strSql);
    }
    catch(_com_error *e)
    {
@@ -1580,11 +1567,11 @@ for (int i=0;i<m_allnodes.size();i++)
 
 
 		   strSql.Format(_T("Select * from ALL_NODE where Product_name='%s'"),strProName);
-		   bado.m_pRecordset=bado.OpenRecordset(strSql);
-		   if (!bado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+		     q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+		   if (!q.eof())//有表但是没有对应序列号的值
 		   {
 			   strSql.Format(_T("update ALL_NODE set Software_Ver ='%s' where Serial_ID = '%s' "),m_allnodes.at(i).Firmware,m_allnodes.at(i).SerialNO);
-			   bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+			   SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 		   }
 		   strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('"
 			   +strMainBuildName+"','"
@@ -1602,8 +1589,8 @@ for (int i=0;i<m_allnodes.size();i++)
 			   +strStVersion+"','"
 			   +strCom+"','"
 			   +strEPSize+"')"));
-		   bado.m_pRecordset=m_ado.OpenRecordset(strSql);
-		   bado.CloseRecordset();
+		  SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+		    
 
 	   }
 
@@ -1615,9 +1602,8 @@ for (int i=0;i<m_allnodes.size();i++)
    }
 
 }
-bado.CloseRecordset();
-bado.CloseConn();
-m_ado.CloseConn();
+ SqliteDBBuilding.closedb();
+ SqliteDBT3000.closedb();
 }
 int CDetectOnlineDlg::vector_unique(vector<NODES_DETECTS> &vt)
 {
@@ -1635,24 +1621,24 @@ BOOL CDetectOnlineDlg::OnInitDialog()
 	m_combox_tf.AddString(_T("TRUE"));
 	m_allnodes.clear();
 	NODES_DETECTS TempNode;
-	CADO m_ado;
-	m_ado.OnInitADOConn();
+	CppSQLite3DB SqliteDBT3000;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 	CString temptable = _T("DetectTstatOnline");
 	CString createtable = _T("create table DetectTstatOnline(COM text,ModbusID text,ProductID text,RoomNo text,SerialNo text,Status text,TStatID text,FirmwareVer text)");//
 	CString strSql ;
-	bool m_judge = m_ado.IsHaveTable(m_ado,temptable);
+	bool m_judge = SqliteDBT3000.tableExists("DetectTstatOnline");
 	if (!m_judge)
 	{
-		m_ado.Createtable(createtable);
+		SqliteDBT3000.execDML((UTF8MBSTR)createtable);
 		//return TRUE;
 	}
-	m_ado.CloseConn();
-	Sleep(2000);
-	m_ado.OnInitADOConn();
+
 	strSql.Format(_T("select * from DetectTstatOnline"));
 	try
 	{
-		 m_ado.m_pRecordset=m_ado.OpenRecordset(strSql);	
+		 q=SqliteDBT3000.execQuery((UTF8MBSTR)strSql);	
 	}
 	catch(_com_error *e)
 	{
@@ -1661,76 +1647,19 @@ BOOL CDetectOnlineDlg::OnInitDialog()
 	}
 	_variant_t vartemp;
 	
-	while (!m_ado.m_pRecordset->EndOfFile)
+	while (!q.eof())
 	{
-	  // m_ado.m_pRecordset->MoveFirst();
-	   vartemp=m_ado.m_pRecordset->GetCollect(_T("COM"));
-	   if (vartemp.vt==VT_NULL){
-	   TempNode.ComportNo=_T("");
-	   }
-	   else{
-	    TempNode.ComportNo=vartemp;
-	   }
-	   vartemp=m_ado.m_pRecordset->GetCollect(_T("ModbusID"));
-	   if (vartemp.vt==VT_NULL){
-		    TempNode.ModbusID=_T("");
-	   }
-	   else{
-		    TempNode.ModbusID=vartemp;
-	   }
-	   vartemp=m_ado.m_pRecordset->GetCollect(_T("ProductID"));
-	   if (vartemp.vt==VT_NULL){
-		   TempNode.ProductID=_T("");
-	   }
-	   else{
-		   TempNode.ProductID=vartemp;
-	   }
-
-	   vartemp=m_ado.m_pRecordset->GetCollect(_T("RoomNo"));
-	   if (vartemp.vt==VT_NULL){
-		   TempNode.RoomNO=_T("");
-	   }
-	   else{
-		   TempNode.RoomNO=vartemp;
-	   }
-
-	   vartemp=m_ado.m_pRecordset->GetCollect(_T("SerialNo"));
-	   if (vartemp.vt==VT_NULL){
-		   TempNode.SerialNO=_T("");
-	   }
-	   else{
-		   TempNode.SerialNO=vartemp;
-	   }
-
-	   vartemp=m_ado.m_pRecordset->GetCollect(_T("Status"));
-	   if (vartemp.vt==VT_NULL){
-		    TempNode.Status =_T("");
-	   }
-	   else{
-		    TempNode.Status =vartemp;
-	   }
-
-	  vartemp=m_ado.m_pRecordset->GetCollect(_T("TStatID"));
-	   if (vartemp.vt==VT_NULL){
-		   TempNode.TstatID =_T("");
-	   }
-	   else{
-		   TempNode.TstatID =vartemp;
-	   }
-
-
-	   vartemp=m_ado.m_pRecordset->GetCollect(_T("FirmwareVer"));
-	   if (vartemp.vt==VT_NULL){
-		   TempNode.Firmware =_T("");
-	   }
-	   else{
-		   TempNode.Firmware =vartemp;
-	   }
-
-
-
+	   
+	 
+	   TempNode.ComportNo = q.getValuebyName(L"COM");
+	   TempNode.ModbusID = q.getValuebyName(L"ModbusID");
+	   TempNode.ProductID= q.getValuebyName(L"ProductID");
+	   TempNode.RoomNO=q.getValuebyName(L"RoomNo");
+	   TempNode.SerialNO = q.getValuebyName(L"SerialNo");
+	   TempNode.TstatID = q.getValuebyName(L"TStatID");
+	   TempNode.Firmware = q.getValuebyName(L"FirmwareVer");
 	   m_allnodes.push_back(TempNode);
-	   m_ado.m_pRecordset->MoveNext();
+	   q.nextRow();
 	}
 	int rows=m_allnodes.size();
 	m_detect_grid.put_Rows(rows+1);
@@ -2736,28 +2665,30 @@ else
 
 void CDetectOnlineDlg::OnBnClickedButtonClear()
 {
-   //清数据库
-	CADO m_ado;
-	m_ado.OnInitADOConn();
+ 
+	CppSQLite3DB SqliteDBT3000;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 	CString temptable = _T("DetectTstatOnline");
 	CString createtable = _T("create table DetectTstatOnline(COM text,ModbusID text,ProductID text,RoomNo text,SerialNo text,Status text,TStatID text,FirmwareVer text)");//
 	CString strSql ;
-	bool m_judge = m_ado.IsHaveTable(m_ado,temptable);
+	bool m_judge = SqliteDBT3000.tableExists("DetectTstatOnline");
 	if (!m_judge)
 	{
-		m_ado.Createtable(createtable);
+		SqliteDBT3000.execDML((UTF8MBSTR)createtable);
 	}
-	strSql=_T("delete * from DetectTstatOnline ");
+	strSql=_T("delete   from DetectTstatOnline ");
 	try
 	{
-		m_ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+		 	SqliteDBT3000.execDML((UTF8MBSTR)strSql);
 	}
 	catch(_com_error *e)
 	{
 		AfxMessageBox(_T("Error"));
 		return;
 	}
-	m_ado.CloseConn();
+	SqliteDBT3000.closedb();
 	//清buffer
 	m_allnodes.clear();
 	//清grid

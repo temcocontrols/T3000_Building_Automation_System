@@ -16,8 +16,8 @@
     <Filter Include="ChartCtrl">
       <UniqueIdentifier>{6ffa5f80-8d90-4384-a303-1907c8494c58}</UniqueIdentifier>
     </Filter>
-    <Filter Include="CADO">
-      <UniqueIdentifier>{ac051298-a5ea-4c53-8952-4af1cd5ab2d6}</UniqueIdentifier>
+    <Filter Include="SQLiteDriver">
+      <UniqueIdentifier>{0afdcd37-4cf0-4851-bdb5-8cd92f934880}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -232,9 +232,6 @@
     <ClInclude Include="AutoRichEditCtrl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ADO\ADO.h">
-      <Filter>CADO</Filter>
-    </ClInclude>
     <ClInclude Include="CApplication.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -282,6 +279,12 @@
     </ClInclude>
     <ClInclude Include="..\T3000\ProductModel.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SQLiteDriver\CppSQLite3.h">
+      <Filter>SQLiteDriver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SQLiteDriver\sqlite3.h">
+      <Filter>SQLiteDriver</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -411,9 +414,6 @@
     <ClCompile Include="AutoRichEditCtrl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ADO\ADO.cpp">
-      <Filter>CADO</Filter>
-    </ClCompile>
     <ClCompile Include="excel9.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -434,6 +434,9 @@
     </ClCompile>
     <ClCompile Include="AddDeviceDlg.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SQLiteDriver\CppSQLite3.cpp">
+      <Filter>SQLiteDriver</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

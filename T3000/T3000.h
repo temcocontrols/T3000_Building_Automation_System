@@ -238,9 +238,9 @@ public:
 	void SetLanguage(DWORD Last);
 	DWORD m_maxClients;
 	DWORD password;
-	BOOL JudgeDB();
  
-    BOOL Is_haveTable(CString TableName);
+ 
+    
 	vector<ALL_NODE> m_AllNodes;
 
 	vector<Building> m_Building;

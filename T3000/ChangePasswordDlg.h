@@ -27,6 +27,5 @@ public:
 	CEdit m_newPwEdt;
 	CEdit m_verifyPwEdt;
 
-	_ConnectionPtr m_pCon;
-	_RecordsetPtr m_pRs;
+ 
 };

@@ -14,7 +14,7 @@
 #include "TStat_Dev.h"
 #include "TStat_Net.h"
 #include "MainFrm.h"
-
+#include "../SQLiteDriver/CppSQLite3.h"
 
 #define WM_ADDTREENODE WM_USER + 2000
 
@@ -238,7 +238,9 @@ protected:
 	int									m_ScannedNum;
 
 
-
+	CppSQLite3DB m_SqliteDBBuilding;
+	CppSQLite3Table m_table;
+	CppSQLite3Query m_q;
 
 
 
@@ -259,8 +261,8 @@ protected:
 
 
 	//BOOL							m_bAllScanFinish;	
-//	_ConnectionPtr					t_pCon;
-	CBADO bado;
+ 
+ 
 	vector<Building_info>		m_szSubnetsInfo;
 	CString m_ip;
 	CString m_port;

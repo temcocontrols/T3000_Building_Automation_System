@@ -156,7 +156,7 @@ UINT RefreshNetWorkDeviceListByUDPFunc();
 void DFTrace(LPCTSTR lpCString);
 bool GetFileNameFromPath(CString ncstring,CString &cs_return);
 BOOL Ping(const CString& strIP, CWnd* pWndEcho);
-int Open_MonitorDataBase(WCHAR *DataSource);
+ 
 void Send_WhoIs_remote_ip(CString ipaddress);
 void SaveBacnetConfigFile(CString &SaveConfigFilePath);
 void SaveBacnetConfigFile_Cache(CString &SaveConfigFilePath);

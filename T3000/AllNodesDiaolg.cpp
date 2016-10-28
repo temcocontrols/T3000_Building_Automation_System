@@ -6,7 +6,7 @@
 #include "MainFrm.h"
 #include "AllNodesDiaolg.h"
 #include "ARDDlg.h"
-
+#include "../SQLiteDriver/CppSQLite3.h"
 
 // CAllNodesDiaolg dialog
 #define AN_MAINNAME 1
@@ -120,12 +120,14 @@ void CAllNodesDiaolg::SetBuildingMainName(CString strBuildName)
 void CAllNodesDiaolg::OnBnClickedDelallbutton()
 {
 
-	CBADO bado;
-	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-	bado.OnInitADOConn(); 
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 	//where Custom is null or Custom = '0'
 	CString strSql;
-	strSql=_T("delete * from ALL_NODE ");
+	strSql=_T("delete   from ALL_NODE ");
 	CString strTemp;
 	strTemp.Format(_T("Are you sure to delete all the sub node(s)"));
 	if(AfxMessageBox(strTemp,MB_OKCANCEL)==IDOK)
@@ -134,14 +136,14 @@ void CAllNodesDiaolg::OnBnClickedDelallbutton()
 		{
 
 
-			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+			SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 		}
 		catch(_com_error *e)
 		{
 			AfxMessageBox(e->ErrorMessage());
 		}
 	}
-	bado.CloseConn();
+	SqliteDBBuilding.closedb();
 	ReloadAddBuildingDB();
 	m_bChanged=TRUE;
 }
@@ -250,9 +252,11 @@ void CAllNodesDiaolg::ClickMsflexgrid1()
 			CopyFile(strImgFilePathName,strDestFileName,FALSE);
 			m_FlexGrid.put_TextMatrix(m_nCurRow,m_nCurCol,strImgFileName);
 			//update recorder;
-			CBADO bado;
-			bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-			bado.OnInitADOConn(); 
+			CppSQLite3DB SqliteDBBuilding;
+			CppSQLite3Table table;
+			CppSQLite3Query q;
+			SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 
 			if(m_nCurRow<m_FlexGrid.get_Rows())
 			{
@@ -265,7 +269,7 @@ void CAllNodesDiaolg::ClickMsflexgrid1()
 
 				CString strSql;
 				strSql.Format(_T("update ALL_NODE set Background_imgID ='%s' where Serial_ID = '%s' "/*and Building_Name = '%s'*/),strImgFileName,strSerial/*,m_strSubNetName*/);
-				bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+				SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 				m_bChanged=TRUE;
 				g_strImagePathName=strImgFileName;			
 				}
@@ -274,7 +278,7 @@ void CAllNodesDiaolg::ClickMsflexgrid1()
 					AfxMessageBox(e->ErrorMessage());
 				}
 			}
-			bado.CloseConn();
+			SqliteDBBuilding.closedb();
 		}
 	}
 }
@@ -303,9 +307,11 @@ void CAllNodesDiaolg::OnEnKillfocusTextedit()
 	CString strName;
 	m_InputTextEdt.GetWindowText(strName);
 
-	CBADO bado;
-	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-	bado.OnInitADOConn(); 
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 
 	if (m_nCurRow < m_FlexGrid.get_Rows()-1)
 	{
@@ -320,7 +326,7 @@ void CAllNodesDiaolg::OnEnKillfocusTextedit()
 
 
 			strSql.Format(_T("update ALL_NODE set Product_name ='%s' where Serial_ID = '%s' and Building_Name = '%s'"),strName,strSerial,m_strSubNetName);
-			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);		
+			SqliteDBBuilding.execDML((UTF8MBSTR)strSql);		
 			}
 			catch(_com_error *e)
 			{
@@ -339,7 +345,7 @@ void CAllNodesDiaolg::OnEnKillfocusTextedit()
 
 
 				strSql.Format(_T("update ALL_NODE set Product_class_ID ='%s' where Serial_ID = '%s' and Building_Name = '%s'"),strName,strSerial,m_strSubNetName);
-				bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);		
+				SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 			}
 			catch(_com_error *e)
 			{
@@ -353,19 +359,19 @@ void CAllNodesDiaolg::OnEnKillfocusTextedit()
 			if(strSerial.IsEmpty())
 				return;
 			CString strSql;
-			bado.OnInitADOConn(); 
+		 
 			try
 			{
 
 
 			strSql.Format(_T("update ALL_NODE set Room_name ='%s' where Serial_ID = '%s' and Building_Name = '%s'"),strName,strSerial,m_strSubNetName);
-			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+			SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 			}
 			catch(_com_error *e)
 			{
 				AfxMessageBox(e->ErrorMessage());
 			}
-			  bado.CloseConn();
+			 SqliteDBBuilding.closedb();
 			ReloadAddBuildingDB();
 		}
 		if(m_nCurCol==AN_FLOORNAME)
@@ -380,13 +386,13 @@ void CAllNodesDiaolg::OnEnKillfocusTextedit()
 			CString strSql;
 
 			strSql.Format(_T("update ALL_NODE set Floor_name ='%s' where Serial_ID = '%s' and Building_Name = '%s'"),strName,strSerial,m_strSubNetName);
-			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);		
+			SqliteDBBuilding.execDML((UTF8MBSTR)strSql);	
 			}
 			catch(_com_error *e)
 			{
 				AfxMessageBox(e->ErrorMessage());
 			}
-			  bado.CloseConn();
+			 SqliteDBBuilding.closedb();
 			ReloadAddBuildingDB();
 		}
 	}
@@ -550,9 +556,11 @@ void CAllNodesDiaolg::OnBnClickedAddbutton()
 	}
 
 	CString strCom = _T("0");
-	CBADO bado;
-	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-	bado.OnInitADOConn(); 
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 
 	strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('"+strMainBuildName+"','"+strSubBuildingName +"','"+strSID+"','"+strFloorName+"','"+strRoomName+"','"+strProName+"','"+strProType+"','"+strProID+"','"+strScreenID+"','"+strBaudrate+"','"+strGraphicID+"','"+strHdVersion+"','"+strStVersion+"','"+strCom+"','"+strEPSize+"')"));
 	//new nc//strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Mainnet_info) values('"+strMainBuildName+"','"+strSubBuildingName +"','"+strSID+"','"+strFloorName+"','"+strRoomName+"','"+strProName+"','"+strProType+"','"+strProID+"','"+strScreenID+"','"+strBaudrate+"','"+strGraphicID+"','"+strHdVersion+"','"+strStVersion+"','"+strCom+"','"+strEPSize+"','"+strMainnetInfo+"')"));
@@ -563,13 +571,13 @@ void CAllNodesDiaolg::OnBnClickedAddbutton()
 
 	TRACE(strSql);
 	
-	bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+	SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 	}
 	catch(_com_error *e)
 	{
 		AfxMessageBox(e->ErrorMessage());
 	}
-	bado.CloseConn();
+	SqliteDBBuilding.closedb();
 	ReloadAddBuildingDB();
 
 
@@ -635,21 +643,24 @@ void CAllNodesDiaolg::ReloadAddBuildingDB()
     m_FlexGrid.put_TextMatrix(0,AN_EPSIZE,_T("EPSize"));
     m_FlexGrid.put_ColWidth(AN_EPSIZE,800);
 
-    CBADO bado;
-    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-    bado.OnInitADOConn(); 
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 
     CString strSql;
     strSql.Format(_T("select * from ALL_NODE where MainBuilding_Name = '%s' ORDER BY Product_ID ASC"),m_strMainBuildingName);
     //m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);		
-    bado.m_pRecordset=bado.OpenRecordset(strSql);	
-    int recordcount= bado.GetRecordCount(bado.m_pRecordset);
+     q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+	 table = SqliteDBBuilding.getTable((UTF8MBSTR)strSql);
+    int recordcount= table.numRows();
     m_FlexGrid.put_Rows(recordcount+2);	
     int temp_row=0;
     CString str_temp;
     str_temp.Empty();
     _variant_t temp_variant;
-    while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+    while(!q.eof())
     {	
 
         //m_FlexGrid.put_TextMatrix(temp_row,AN_PRODUCTTYPE,m_strID);
@@ -659,100 +670,67 @@ void CAllNodesDiaolg::ReloadAddBuildingDB()
         m_FlexGrid.put_TextMatrix(temp_row,0,strIndex);
 
         m_FlexGrid.put_TextMatrix(temp_row,AN_MAINNAME,m_strMainBuildingName);
-        m_strSubNetName=bado.m_pRecordset->GetCollect("Building_Name");//
+        m_strSubNetName=q.getValuebyName(L"Building_Name");//
         m_FlexGrid.put_TextMatrix(temp_row,AN_NAME,m_strSubNetName);
-        temp_variant=bado.m_pRecordset->GetCollect("Serial_ID");//
-        if(temp_variant.vt!=VT_NULL)
-            m_strID=temp_variant;
-        else
-            m_strID=_T("");
+        m_strID=q.getValuebyName(L"Serial_ID");//
+         
         m_FlexGrid.put_TextMatrix(temp_row,AN_SerialID,m_strID);
 
-        temp_variant=bado.m_pRecordset->GetCollect("Floor_name");//
-        if(temp_variant.vt!=VT_NULL)
-            m_strID=temp_variant;
-        else
-            m_strID=_T("");
+        m_strID=q.getValuebyName(L"Floor_name");//
+         
         m_FlexGrid.put_TextMatrix(temp_row,AN_FLOORNAME,m_strID);
 
-        temp_variant=bado.m_pRecordset->GetCollect("Room_name");//
-        if(temp_variant.vt!=VT_NULL)
-            m_strID=temp_variant;
-        else
-            m_strID=_T("");
+        m_strID=q.getValuebyName(L"Room_name");//
+        
         m_FlexGrid.put_TextMatrix(temp_row,AN_ROOMNAME,m_strID);
 
-        temp_variant=bado.m_pRecordset->GetCollect("Product_name");//
-        if(temp_variant.vt!=VT_NULL)
-            m_strID=temp_variant;
-        else
-            m_strID=_T("");
+        m_strID=q.getValuebyName(L"Product_name");//
+        
         m_FlexGrid.put_TextMatrix(temp_row,AN_PRUDUCTNAME,m_strID);
 
-        temp_variant=bado.m_pRecordset->GetCollect("Product_class_ID");//
-        if(temp_variant.vt!=VT_NULL)
-            m_strID=temp_variant;
-        else
-            m_strID=_T("");
+        m_strID=q.getValuebyName(L"Product_class_ID");//
+       
         m_FlexGrid.put_TextMatrix(temp_row,AN_PRODUCTTYPE,m_strID);
 
-        temp_variant=bado.m_pRecordset->GetCollect("Product_ID");//
-        if(temp_variant.vt!=VT_NULL)
-            m_strID=temp_variant;
-        else
-            m_strID=_T("");
+        m_strID=q.getValuebyName(L"Product_ID");//
+        
         m_FlexGrid.put_TextMatrix(temp_row,AN_PRODUCTID,m_strID);
 
-        temp_variant=bado.m_pRecordset->GetCollect("Screen_Name");//
-        if(temp_variant.vt!=VT_NULL)
-            m_strID=temp_variant;
-        else
-            m_strID=_T("");
+        m_strID=q.getValuebyName(L"Screen_Name");//
+        
         m_FlexGrid.put_TextMatrix(temp_row,AN_SCREENID,m_strID);
 
 
 
-        temp_variant=bado.m_pRecordset->GetCollect("Bautrate");//
-        if(temp_variant.vt!=VT_NULL)
-            m_strID=temp_variant;
-        else
-            m_strID=_T("");
+        m_strID=q.getValuebyName(L"Bautrate");//
+       
         m_FlexGrid.put_TextMatrix(temp_row,AN_BAUDRATE,m_strID);
 
-        temp_variant=bado.m_pRecordset->GetCollect("Background_imgID");//
-        if(temp_variant.vt!=VT_NULL)
-            m_strID=temp_variant;
-        else
-            m_strID=_T("");
+       
+		m_strID=q.getValuebyName(L"Background_imgID");//
+       
         m_FlexGrid.put_TextMatrix(temp_row,AN_GRAPHICID,m_strID);
 
 
-        temp_variant=bado.m_pRecordset->GetCollect("Hardware_Ver");//
-        if(temp_variant.vt!=VT_NULL)
-            m_strID=temp_variant;
-        else
-            m_strID=_T("");
+        
+		m_strID=q.getValuebyName(L"Hardware_Ver");//
+       
         m_FlexGrid.put_TextMatrix(temp_row,AN_HDVERSION,m_strID);
 
 
-        temp_variant=bado.m_pRecordset->GetCollect("Software_Ver");//
-        if(temp_variant.vt!=VT_NULL)
-            m_strID=temp_variant;
-        else
-            m_strID=_T("");
+       
+		m_strID=q.getValuebyName(L"Software_Ver");//
+        
         m_FlexGrid.put_TextMatrix(temp_row,AN_SWVERSION,m_strID);
 
-        temp_variant=bado.m_pRecordset->GetCollect("EPsize");//
-        if(temp_variant.vt!=VT_NULL)
-            m_strID=temp_variant;
-        else
-            m_strID=_T("");
+        
+		m_strID=q.getValuebyName(L"EPsize");//
+      
         m_FlexGrid.put_TextMatrix(temp_row,AN_EPSIZE,m_strID);
-        bado.m_pRecordset->MoveNext();
+        q.nextRow();
     }
     //m_pRs->Close();
-    bado.CloseRecordset();
-    bado.CloseConn();
+     SqliteDBBuilding.closedb();
 }
 void CAllNodesDiaolg::OnBnClickedDelbutton()
 {
@@ -767,14 +745,16 @@ void CAllNodesDiaolg::OnBnClickedDelbutton()
     {
         AfxMessageBox(_T("No item Selected!"));
     }
-    CBADO bado;
-    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-    bado.OnInitADOConn(); 
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 
     CString strhw_version;
     strhw_version = m_FlexGrid.get_TextMatrix(m_nCurRow,AN_HDVERSION);
     CString strSql;
-    strSql.Format(_T("delete * from ALL_NODE where Serial_ID ='%s' and Hardware_Ver = '%s'"),strText,strhw_version);
+    strSql.Format(_T("delete   from ALL_NODE where Serial_ID ='%s' and Hardware_Ver = '%s'"),strText,strhw_version);
     CString strTemp;
     strTemp.Format(_T("Are you sure to delete thise item"));
     if(AfxMessageBox(strTemp,MB_OKCANCEL)==IDOK)
@@ -783,14 +763,14 @@ void CAllNodesDiaolg::OnBnClickedDelbutton()
         {
 
 
-            bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+            SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
         }
         catch(_com_error *e)
         {
             AfxMessageBox(e->ErrorMessage());
         }
     }
-    bado.CloseConn();
+    SqliteDBBuilding.closedb();
     ReloadAddBuildingDB();
     m_bChanged=TRUE;
 
@@ -808,14 +788,17 @@ void CAllNodesDiaolg::OnBnClickedDelbuttonOffline()
         m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T(""));
     }
 
-    CBADO bado;
-    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-    bado.OnInitADOConn(); 
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
     CString strSql;
     strSql.Format(_T("select * from ALL_NODE where MainBuilding_Name = '%s' ORDER BY Product_ID ASC"),m_strMainBuildingName);
     //m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);		
-    bado.m_pRecordset=bado.OpenRecordset(strSql);	
-    int recordcount= bado.GetRecordCount(bado.m_pRecordset);
+    q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+	 
+    
     //m_FlexGrid.put_Rows(recordcount+2);	
     int temp_row=0;
     CString str_temp;
@@ -828,19 +811,13 @@ void CAllNodesDiaolg::OnBnClickedDelbuttonOffline()
     CString Product_ID;
      BOOL Is_Online = FALSE;
 
-    while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+    while(!q.eof())
     {
-        temp_variant=bado.m_pRecordset->GetCollect("Protocol");//
-        if(temp_variant.vt!=VT_NULL)
-            Protocol=temp_variant;
-        else
-            Protocol=_T("");
-
-        temp_variant=bado.m_pRecordset->GetCollect("Serial_ID");//
-        if(temp_variant.vt!=VT_NULL)
-            Serial_Number=temp_variant;
-        else
-            Serial_Number=_T("");
+        
+            Protocol=q.getValuebyName(L"Protocol");
+          
+       
+            Serial_Number=q.getValuebyName(L"Serial_ID");
             str_temp.Format(_T("Checking Serial Number:%s"),Serial_Number);
         if (m_pDialogInfo->IsWindowVisible())
         {
@@ -848,23 +825,14 @@ void CAllNodesDiaolg::OnBnClickedDelbuttonOffline()
            /* m_pDialogInfo->ShowWindow(SW_SHOW);*/
         }
 
-        temp_variant=bado.m_pRecordset->GetCollect("Com_Port");//
-        if(temp_variant.vt!=VT_NULL)
-            Com_Port=temp_variant;
-        else
-            Com_Port=_T(""); 
+        
+            Com_Port=q.getValuebyName(L"Com_Port"); 
 
-        temp_variant=bado.m_pRecordset->GetCollect("Bautrate");//
-        if(temp_variant.vt!=VT_NULL)
-            Bautrate=temp_variant;
-        else
-            Bautrate=_T("");
+        
+            Bautrate=q.getValuebyName(L"Bautrate");
 
-        temp_variant=bado.m_pRecordset->GetCollect("Product_ID");//
-        if(temp_variant.vt!=VT_NULL)
-            Product_ID=temp_variant;
-        else
-            Product_ID=_T("");
+        
+            Product_ID=q.getValuebyName(L"Product_ID");
 
              close_com();
 
@@ -914,12 +882,12 @@ void CAllNodesDiaolg::OnBnClickedDelbuttonOffline()
 
             if (!Is_Online)
             {
-                   strSql.Format(_T("delete * from ALL_NODE where Serial_ID ='%s'"),Serial_Number);
+                   strSql.Format(_T("delete   from ALL_NODE where Serial_ID ='%s'"),Serial_Number);
                    try
                    {
 
 
-                       bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+                      SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
                    }
                    catch(_com_error *e)
                    {
@@ -928,11 +896,10 @@ void CAllNodesDiaolg::OnBnClickedDelbuttonOffline()
                     m_bChanged=TRUE;
             }
 
-            bado.m_pRecordset->MoveNext();	
+            q.nextRow();
     }
 
-    bado.CloseRecordset();
-    bado.CloseConn();
+    SqliteDBBuilding.closedb();
 
 
     ReloadAddBuildingDB();

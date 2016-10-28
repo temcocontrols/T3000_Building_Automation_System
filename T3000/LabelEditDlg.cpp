@@ -16,14 +16,14 @@ CLabelEditDlg::CLabelEditDlg(CWnd* pParent /*=NULL*/)
 	m_clrTxt=RGB(0,0,0);
 	m_bkColor=RGB(224, 232, 246);
 	m_strScreenName=_T("");
-	m_bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-	m_bado.OnInitADOConn();
+	m_SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 }
 
 CLabelEditDlg::~CLabelEditDlg()
 {
    
-   m_bado.CloseConn();
+   m_SqliteDBBuilding.closedb();
 }
 
 void CLabelEditDlg::DoDataExchange(CDataExchange* pDX)
@@ -188,7 +188,7 @@ void CLabelEditDlg::SaveEditValue()
 	strclrBk.Format(_T("%u"),m_bkColor);
 	strSql.Format(_T("update Screen_Label set Width=%i,Height=%i,Status=%i,Input_or_Output=%i,Text_Color='%s',Back_Color='%s' where Serial_Num =%i and Tstat_id=%i and  Cstatic_id=%i and Tips='%s'"),
 	m_nwidth,m_nheight,m_nstatus,m_input_or_output,strclrTxt,strclrBk,m_nSerialNum,m_id,m_nControlID,m_strScreenName);
-	m_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+	 m_SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 	}
 	catch(_com_error *e)
 	{
@@ -204,27 +204,25 @@ void CLabelEditDlg::AddLabel()
 	CString strSql;
 	strSql.Format(_T("select * from Screen_Label where Serial_Num =%i and Tstat_id=%i and Tips='%s'"),m_nSerialNum,m_id,m_strScreenName);
 	//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-	m_bado.m_pRecordset=m_bado.OpenRecordset(strSql);
+	m_q = m_SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+
 	CString strtemp;
 	strtemp.Empty();
 	_variant_t temp_variant;
 	int nTemp;
 	int nContyrolID=START_ID;
-	while(VARIANT_FALSE==m_bado.m_pRecordset->EndOfFile)
+	while(!m_q.eof())
 	{//find the ControlID;
-		temp_variant=m_bado.m_pRecordset->GetCollect("Cstatic_id");//
-		if(temp_variant.vt!=VT_NULL)
-			strtemp=temp_variant;
-		else
-			strtemp=_T("");
+		 
+        strtemp = m_q.getValuebyName(L"Cstatic_id");
 		nTemp=_wtoi(strtemp);
 		if(nTemp==nContyrolID)
 			nContyrolID=nContyrolID+1;
 		else
 			break;
-		m_bado.m_pRecordset->MoveNext();
+		m_q.nextRow();
 	}
-	 m_bado.CloseRecordset();
+	  
 
 
 	CString strclrTxt;
@@ -232,7 +230,7 @@ void CLabelEditDlg::AddLabel()
 	strclrTxt.Format(_T("%u"),m_clrTxt);
 	strclrBk.Format(_T("%u"),m_bkColor);
 	strSql.Format(_T("insert into Screen_Label values(%i,%i,%i,%i,%i,%i,%i,%i,'%s',%i,'%s','%s')"),nContyrolID,m_nSerialNum,50,50,m_nheight,m_nwidth,m_id,m_nstatus,m_strScreenName,m_input_or_output,strclrTxt,strclrBk);
-	m_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+	 m_SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 
 
 	}

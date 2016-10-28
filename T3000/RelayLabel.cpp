@@ -6,8 +6,8 @@
 #include "RelayLabel.h"
 #include "globle_function.h"
 #include "global_variable_extern.h"
-#include "ado/ADO.h"
-#include "bado/BADO.h"
+ #include "../SQLiteDriver/CppSQLite3.h"
+ 
 
 // CRelayLabel
 
@@ -364,21 +364,24 @@ void CRelayLabel::DispalyInputValue(int nStatus,COLORREF textClr,COLORREF bkClr)
 	      
 		  int  m_crange=0;
 		   int m_sn=m_sn=product_register_value[0]+product_register_value[1]*256+product_register_value[2]*256*256+product_register_value[3]*256*256*256;
-		   CBADO ado;
-		   ado.SetDBPath(g_strCurBuildingDatabasefilePath);
-		   ado.OnInitADOConn();
-		   if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
+		   CppSQLite3Table table;
+		   CppSQLite3Query q;
+
+		   CppSQLite3DB SqliteDBBuilding;
+		   SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
+		   if (SqliteDBBuilding.tableExists("Value_Range"))//有Version表
 		   {
 			   CString sql;
 			   sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),nStatus,m_sn);
-			   ado.m_pRecordset=ado.OpenRecordset(sql);
-			   if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+			  q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
+			   if (!q.eof())//有表但是没有对应序列号的值
 			   {    
-				   ado.m_pRecordset->MoveFirst();
-				   while (!ado.m_pRecordset->EndOfFile)
+				    
+				   while (!q.eof())
 				   {
-					   m_crange=ado.m_pRecordset->GetCollect(_T("CRange"));
-					   ado.m_pRecordset->MoveNext();
+					   m_crange=q.getIntField("CRange");
+					   q.nextRow();
 				   }
 				    
 			   } 
@@ -387,13 +390,13 @@ void CRelayLabel::DispalyInputValue(int nStatus,COLORREF textClr,COLORREF bkClr)
 				   m_crange=product_register_value[MODBUS_ANALOG1_RANGE+nStatus-1];	//189
 				   
 			   }
-			   ado.CloseRecordset();
+			   
 		   }
 		   else
 		   {
 			   m_crange=product_register_value[MODBUS_ANALOG1_RANGE+nStatus-1];
 		   }
-		   ado.CloseConn();
+		   SqliteDBBuilding.closedb();
 
 		    CString strValueUnit=GetTempUnit(product_register_value[MODBUS_ANALOG1_RANGE+nStatus-1], 1);
 		   int nValue;

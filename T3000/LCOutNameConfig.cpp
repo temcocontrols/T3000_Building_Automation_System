@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 #include "schedule.h"
 #include "globle_function.h"
-#include "ado/ADO.h"
+ #include "../SQLiteDriver/CppSQLite3.h"
 
 // CLCOutNameConfig dialog
  
@@ -184,32 +184,31 @@ void CLCOutNameConfig::OnEnKillfocusEdit1()
 
 BOOL CLCOutNameConfig::LoadFromDB(){
 BOOL ret=FALSE;
-//CADO ado;
-//ado.OnInitADOConn();
-CBADO ado;
-ado.SetDBPath(g_strCurBuildingDatabasefilePath);
-ado.OnInitADOConn();
-if (ado.IsHaveTable(ado,_T("LCNameConfigure")))
+ 
+CppSQLite3DB SqliteDBBuilding;
+CppSQLite3Table table;
+CppSQLite3Query q;
+SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+if (SqliteDBBuilding.tableExists("LCNameConfigure"))
 {
 	CString sql,temp;
 	struct_LCName tempstruct;
 	sql.Format(_T("Select * from LCNameConfigure where SN=%d"),m_sn);
-	ado.m_pRecordset=ado.OpenRecordset(sql);
-//	ado.m_pRecordset->MoveFirst();
-	while (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+	q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
+ 
+	while (!q.eof())//有表但是没有对应序列号的值
 	{
-	  tempstruct.name=ado.m_pRecordset->GetCollect(_T("OutputName"));
-	  temp=ado.m_pRecordset->GetCollect(_T("Card"));
+	  tempstruct.name=q.getValuebyName(_T("OutputName"));
+	  temp=q.getValuebyName(_T("Card"));
 	  tempstruct.card=_wtoi(temp);
-	  temp=ado.m_pRecordset->GetCollect(_T("Output"));
+	  temp=q.getValuebyName(_T("Output"));
 	  tempstruct.out=_wtoi(temp);
 	  m_vecLcName.push_back(tempstruct);
-	  ado.m_pRecordset->MoveNext();
+	  q.nextRow();
 	  ret=TRUE;
 	}
 } 
-ado.CloseRecordset();
-ado.CloseConn();
+SqliteDBBuilding.closedb();
 if(ret)
 {
 	CString name;
@@ -240,28 +239,29 @@ CString CLCOutNameConfig::get_OutputName(int card,int output){
 	return Table_Name;
 }
 void CLCOutNameConfig::Insert_Update_OutputName(int sn,int card,int output ,CString outputname){
-	//CADO ado;
-	//ado.OnInitADOConn();
-	CBADO ado;
-	ado.SetDBPath(g_strCurBuildingDatabasefilePath);
-	ado.OnInitADOConn();
+	 
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 	CString sql;
 	sql.Format(_T("Select * from LCNameConfigure where SN=%d and  Card=%d and Output=%d"),sn,card,output);
-	ado.m_pRecordset=ado.OpenRecordset(sql);
+	q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
 
-	if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+	if (!q.eof())//有表但是没有对应序列号的值
 	{
 		sql.Format(_T("update LCNameConfigure set OutputName = '%s' where SN=%d and  Card=%d and Output=%d "),outputname.GetBuffer(),sn,card,output);
-		ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+		 SqliteDBBuilding.execDML((UTF8MBSTR)sql);
 	}
 	else
 	{
-		ado.CloseRecordset();
+		 
 		sql.Format(_T("Insert into LCNameConfigure(SN,Card,Output,OutputName) values(%d,%d,%d,'%s')"),sn,card,output,outputname.GetBuffer());
-		ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+		SqliteDBBuilding.execDML((UTF8MBSTR)sql);
 	}
 
-	ado.CloseConn();
+	SqliteDBBuilding.closedb();
 }
 
 

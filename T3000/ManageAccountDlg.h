@@ -1,7 +1,7 @@
 #pragma once
 #include "msflexgrid1.h"
 #include "afxwin.h"
-
+#include "../SQLiteDriver/CppSQLite3.h"
 // CManageAccountDlg dialog
 typedef struct AccountNode
 {
@@ -32,8 +32,9 @@ public:
 	virtual BOOL OnInitDialog();
 	void ReloadUserDB();
 public:
-	_ConnectionPtr m_pCon;
-	_RecordsetPtr m_pRs;
+	CppSQLite3DB SqliteDBT3000;
+	CppSQLite3Query q;
+	CppSQLite3Table table;
 //	CString db_operation_str;
 	vector<Account_Node> m_AccountLst;
 	DECLARE_EVENTSINK_MAP()

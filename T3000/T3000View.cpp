@@ -30,13 +30,7 @@
 
 #include "DisplayConfig.h"
 #include "LedsDialog.h"
-// #define _CRTDBG_MAP_ALLOC
-// #include "stdlib.h"
-// #include "crtdbg.h"
-
-
-// #include <vector>
-// using namespace std;
+ #include "../SQLiteDriver/CppSQLite3.h"
 
 
 #ifdef _DEBUG
@@ -718,36 +712,37 @@ void CT3000View::Fresh()
     2>>output 11...88
     */
     int index;
-    CADO ado;
-    ado.OnInitADOConn();
-    if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
+	CppSQLite3DB SqliteDBT3000;
+	CppSQLite3Query q;
+	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+    if (SqliteDBT3000.tableExists("Value_Range"))//有Version表
     {
         CString sql;
         sql.Format(_T("Select * from Value_Range where SN=%d"),get_serialnumber());
-        ado.m_pRecordset=ado.OpenRecordset(sql);
+         q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
 
-        if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+        if (!q.eof())//有表但是没有对应序列号的值
         {
-            ado.m_pRecordset->MoveFirst();
-            while (!ado.m_pRecordset->EndOfFile)
+             
+            while (!q.eof())
             {
-                index=ado.m_pRecordset->GetCollect(_T("CInputNo"));
+                index=q.getIntField("CInputNo");
                 if (index>10)//说明是output
                 {
                     index%=10;
-                    m_OutRanges[index]=ado.m_pRecordset->GetCollect(_T("CRange"));
+                    m_OutRanges[index]=q.getIntField("CRange");
                 }
                 else
                 {
-                    m_InRanges[index]=ado.m_pRecordset->GetCollect(_T("CRange"));
+                    m_InRanges[index]=q.getIntField("CRange");
                 }
-                ado.m_pRecordset->MoveNext();
+                q.nextRow();
             }
         }
-        ado.CloseRecordset();
+       
     }
 
-    ado.CloseConn();
+   SqliteDBT3000.closedb();
 
 
 
@@ -3149,19 +3144,19 @@ void CT3000View::OnEnKillfocusInputnameedit()
     {
         try
         {
-            _ConnectionPtr m_ConTmp;
-            _RecordsetPtr m_RsTmp;
-            m_ConTmp.CreateInstance("ADODB.Connection");
-            m_RsTmp.CreateInstance("ADODB.Recordset");
-            m_ConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+			CppSQLite3Table table;
+			CppSQLite3Query q;
+
+			CppSQLite3DB SqliteDBBuilding;
+			SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
             CString strSerial;
             strSerial.Format(_T("%d"),g_serialNum);
 
-            CString strsql;
-            strsql.Format(_T("select * from IONAME where SERIAL_ID = '%s'"),strSerial);
-            m_RsTmp->Open((_variant_t)strsql,_variant_t((IDispatch *)m_ConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-            if(VARIANT_FALSE==m_RsTmp->EndOfFile)//update
+            CString StrSql;
+            StrSql.Format(_T("select * from IONAME where SERIAL_ID = '%s'"),strSerial);
+            q = SqliteDBBuilding.execQuery((UTF8MBSTR)StrSql);
+            if(!q.eof())//update
             {
 
                 CString strField;
@@ -3204,8 +3199,8 @@ void CT3000View::OnEnKillfocusInputnameedit()
 
                     CString str_temp;
                     str_temp.Format(_T("update IONAME set "+strField+" = '"+strText+"' where SERIAL_ID = '"+strSerial+"'"));
-                    //AfxMessageBox(str_temp );
-                    m_ConTmp->Execute(str_temp.GetString(),NULL,adCmdText);
+                   
+                    SqliteDBBuilding.execDML((UTF8MBSTR)str_temp);
                 }
                 catch(_com_error *e)
                 {
@@ -3274,7 +3269,8 @@ void CT3000View::OnEnKillfocusInputnameedit()
                 try
                 {
 
-                    m_ConTmp->Execute(str_temp.GetString(),NULL,adCmdText);
+                     
+					SqliteDBBuilding.execDML((UTF8MBSTR)str_temp);
                 }
                 catch(_com_error *e)
                 {
@@ -3316,10 +3312,7 @@ void CT3000View::OnEnKillfocusInputnameedit()
                 g_strInHumName=strText;
                 break;
             }
-            if(m_RsTmp->State)
-                m_RsTmp->Close();
-            if(m_ConTmp->State)
-                m_ConTmp->Close();
+           SqliteDBBuilding.closedb();
         }
         catch(...)
         {
@@ -3399,19 +3392,19 @@ void CT3000View::OnEnKillfocusOutputnameedit()
 
         try
         {
-            _ConnectionPtr m_ConTmp;
-            _RecordsetPtr m_RsTmp;
-            m_ConTmp.CreateInstance("ADODB.Connection");
-            m_RsTmp.CreateInstance("ADODB.Recordset");
-            m_ConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+			CppSQLite3Table table;
+			CppSQLite3Query q;
+
+			CppSQLite3DB SqliteDBBuilding;
+			SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
             CString strSerial;
             strSerial.Format(_T("%d"),g_serialNum);
 
-            CString strsql;
-            strsql.Format(_T("select * from IONAME where SERIAL_ID = '%s'"),strSerial);
-            m_RsTmp->Open((_variant_t)strsql,_variant_t((IDispatch *)m_ConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-            if(VARIANT_FALSE==m_RsTmp->EndOfFile)//update
+            CString StrSql;
+            StrSql.Format(_T("select * from IONAME where SERIAL_ID = '%s'"),strSerial);
+           q = SqliteDBBuilding.execQuery((UTF8MBSTR)StrSql);
+            if(!q.eof())//update
             {
 
                 CString strField;
@@ -3445,8 +3438,7 @@ void CT3000View::OnEnKillfocusOutputnameedit()
 
                     CString str_temp;
                     str_temp.Format(_T("update IONAME set "+strField+" = '"+strText+"' where SERIAL_ID = '"+strSerial+"'"));
-                    //AfxMessageBox(str_temp );
-                    m_ConTmp->Execute(str_temp.GetString(),NULL,adCmdText);
+                    SqliteDBBuilding.execDML((UTF8MBSTR)str_temp);
                 }
                 catch(_com_error *e)
                 {
@@ -3508,7 +3500,7 @@ void CT3000View::OnEnKillfocusOutputnameedit()
                 try
                 {
 
-                    m_ConTmp->Execute(str_temp.GetString(),NULL,adCmdText);
+                  SqliteDBBuilding.execDML((UTF8MBSTR)str_temp);
                 }
                 catch(_com_error *e)
                 {
@@ -3542,10 +3534,7 @@ void CT3000View::OnEnKillfocusOutputnameedit()
                 break;
             }
 
-            if(m_RsTmp->State)
-                m_RsTmp->Close();
-            if(m_ConTmp->State)
-                m_ConTmp->Close();
+            SqliteDBBuilding.closedb();
 
 
 

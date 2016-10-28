@@ -6,6 +6,7 @@
 #include "TroubleShootDlg.h"
 #include "afxdialogex.h"
  #include "ping.h"
+ #include "../SQLiteDriver/CppSQLite3.h"
 #define SHOW_TX_RX_TS 	g_llTxCount++;g_llRxCount++;if( AfxGetMainWnd()->GetActiveWindow() != NULL ) {CString str;str.Format(_T("Addr:255 [Tx=%d Rx=%d Err=%d]"), g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);((CMFCStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR))->SetPaneText(0,str.GetString());}
 
 // CTroubleShootDlg dialog
@@ -297,21 +298,23 @@ BOOL CTroubleShootDlg::ChangeNetDeviceIP(CString strIP){
 				ret=TRUE;
 				MessageBox(_T("Successfull"));
 				CString strSql;
-				CBADO bado;
-				bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-				bado.OnInitADOConn(); 
+				CppSQLite3DB SqliteDBBuilding;
+				CppSQLite3Table table;
+				CppSQLite3Query q;
+				SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 				CString temp_serial_cs;
 				temp_serial_cs.Format(_T("%u"),g_selected_serialnumber);
 				strSql.Format(_T("select * from ALL_NODE where Serial_ID = '%s' "),temp_serial_cs);
 				//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-				bado.m_pRecordset=bado.OpenRecordset(strSql);
-				while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+				q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+				while(!q.eof())
 				{
 					strSql.Format(_T("update ALL_NODE set Bautrate='%s' where Serial_ID= '%s'"),strnewipadress,temp_serial_cs);
-					bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
-					bado.m_pRecordset->MoveNext();
+					SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+					q.nextRow();
 				}
-				bado.CloseRecordset();
+			 
 				CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 				::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
 
@@ -389,9 +392,11 @@ END_CHANGEIP_SCAN:
 }	
 
 void CTroubleShootDlg::SaveNewIPAddress(CString newip,CString oldip){
-	CBADO bado;
-	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-	bado.OnInitADOConn(); 
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 
 	 
 	try 
@@ -404,14 +409,14 @@ void CTroubleShootDlg::SaveNewIPAddress(CString newip,CString oldip){
 	    
 		strSql.Format(_T("select * from ALL_NODE where Bautrate='%s' "),oldip);
 		//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-		bado.m_pRecordset=bado.OpenRecordset(strSql);
-		while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+		q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+		while(!q.eof())
 		{
 			strSql.Format(_T("update ALL_NODE set Bautrate='%s' where Bautrate='%s'"),newip,oldip);
-			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
-			bado.m_pRecordset->MoveNext();
+			SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+			q.nextRow();
 		}
-		bado.CloseRecordset();
+		 
 		CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 		::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
 	}
@@ -422,10 +427,10 @@ void CTroubleShootDlg::SaveNewIPAddress(CString newip,CString oldip){
 
 
 		//m_pCon->Close();
-		bado.CloseConn();
+		SqliteDBBuilding.closedb();
 	}
 	//m_pCon->Close(); 
-	bado.CloseConn();
+	 SqliteDBBuilding.closedb();
 }
 void CTroubleShootDlg::OnBnClickedOk()
 {

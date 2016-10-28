@@ -4,19 +4,20 @@
 #include "T3000.h"
 #include "BuildingConfigration.h"
 #include "afxdialogex.h"
-#include "ado/ADO.h"
-#include "bado/BADO.h"
+ 
+ 
 #include <iostream>
 #include <windows.h>
 #include <io.h>
 #include "FileOperations.h"
 #include "BuildingConfigEditDlg.h"
-#include "SqliteLib/CppSQLite3.h"
+
 #include "globle_function.h"
 #include "ConnectRemoteServer.h"
 #include <ctime>
 #include <iostream>
 using namespace std;
+ 
 // CBuildingConfigration dialog
 #define WM_FRESH_DB  WM_USER + 1014
 #define PATH_MAX 256
@@ -35,8 +36,8 @@ CBuildingConfigration::CBuildingConfigration(CWnd* pParent /*=NULL*/)
     : CDialogEx(CBuildingConfigration::IDD, pParent)
 {
     m_bChanged=FALSE;
-	CString temp = GetExePath(true) + L"Psychrometry\\db_psychrometric_project.s3db";
-	strcpy(m_sqlitepath,(CStringA)temp);
+	 
+	 
 }
 
 CBuildingConfigration::~CBuildingConfigration()
@@ -73,11 +74,10 @@ BOOL CBuildingConfigration::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
     Deal_BuildingPath();
-    m_building_pCon.CreateInstance(_T("ADODB.Connection"));
-    m_building_pRs.CreateInstance(_T("ADODB.Recordset"));
-    m_building_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+   
+    
     GetSerialComPortNumber1(m_szBuildingComs);
-
+	m_SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
     m_building_config_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
     //m_building_config_list.SetExtendedStyle(m_building_config_list.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
     m_building_config_list.SetExtendedStyle(m_building_config_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
@@ -132,7 +132,8 @@ BOOL CBuildingConfigration::PreTranslateMessage(MSG* pMsg)
 void CBuildingConfigration::Initial_Building_List()
 {
 
-    CBADO bado;
+    CppSQLite3DB SqliteDBBuilding;
+    CppSQLite3Query q;
     LoadBuildingConfigDB();
     TraverseFolder(g_strBuildingFolder,m_vecdbfile);
     for (int i=0; i<(int)m_vecdbfile.size(); i++)
@@ -177,30 +178,25 @@ void CBuildingConfigration::Initial_Building_List()
                 continue;
             }
 #if 1 //校驗一下看看是否是Building的Database
-            bado.SetDBPath(GetExePath(true)+m_vecdbfile.at(i));
-            bado.OnInitADOConn();
-            if (!bado.IsHaveTable(bado,_T("ALL_NODE")))
+            CString strpath = GetExePath(true)+m_vecdbfile.at(i);
+            SqliteDBBuilding.open((UTF8MBSTR)strpath);
+             
+            if (!SqliteDBBuilding.tableExists("ALL_NODE"))
             {
 
-                bado.CloseConn();
+                 SqliteDBBuilding.closedb();
                 continue;
             }
             else
             {
 
                 sql.Format(_T("Select  distinct mainbuilding_name  from  ALL_NODE"));
-                bado.m_pRecordset=bado.OpenRecordset(sql);
-                if(!bado.m_pRecordset->EndOfFile)
+                q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
+                if(!q.eof())
                 {
-                    temp_variant=bado.m_pRecordset->GetCollect(_T("MainBuilding_Name"));
-                    if (temp_variant.vt!=VT_NULL)
-                    {
-                        DB_Building_Name=temp_variant;
-                    }
-
-
+                        DB_Building_Name=q.getValuebyName(L"MainBuilding_Name");
                 }
-                bado.CloseRecordset();
+                 
 
             }
 #endif
@@ -214,19 +210,18 @@ void CBuildingConfigration::Initial_Building_List()
             if(DB_Building_Name.CompareNoCase(Building_Name)!=0)
             {
                 sql.Format(_T("Select * from ALL_NODE"));
-                bado.m_pRecordset=bado.OpenRecordset(sql);
-                while(!bado.m_pRecordset->EndOfFile)
+                q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
+                while(!q.eof())
                 {
 
                     sql.Format(_T("update ALL_NODE set MainBuilding_Name  = '%s' ,Building_Name = '%s'  where  MainBuilding_Name  = '%s'"),Building_Name,Building_Name,DB_Building_Name);
-                    //	bado.OpenRecordset(sql);
-                    bado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
-                    bado.m_pRecordset->MoveNext();
+                    SqliteDBBuilding.execDML((UTF8MBSTR)sql);
+                   q.nextRow();
 
                 }
-                bado.CloseRecordset();
+               
             }
-            bado.CloseConn();
+           SqliteDBBuilding.closedb();
 
 
             //}
@@ -238,15 +233,15 @@ void CBuildingConfigration::Initial_Building_List()
 
             //更新ALL_NODE 里面的数据
 
-
-            CADO ado;
-            ado.OnInitADOConn();
+			CppSQLite3DB SqliteDBT3000;
+			SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+            
 
             sql.Format(_T("Select *  from  Building  where  Main_BuildingName='%s' "),BCTemp.MainBuildingName);
-            ado.m_pRecordset=ado.OpenRecordset(sql);
-            if (ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+           q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
+            if (q.eof())//有表但是没有对应序列号的值
             {
-                ado.CloseRecordset();
+                 
                 for (int j=0; j<m_BuildNameLst.size(); j++)
                 {
                     if (BCTemp.MainBuildingName.CompareNoCase(m_BuildNameLst.at(j).MainBuildingName)==0)
@@ -262,42 +257,35 @@ void CBuildingConfigration::Initial_Building_List()
                 }
                 if (!Is_The_Same)
                 {
-                    sql.Format(_T("delete * from Building_ALL where Building_Name = '%s' "),BCTemp.MainBuildingName.GetBuffer());
-                    ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+                    sql.Format(_T("delete   from Building_ALL where Building_Name = '%s' "),BCTemp.MainBuildingName.GetBuffer());
+                    SqliteDBT3000.execDML((UTF8MBSTR)sql);
 
                     sql.Format(_T("Insert into Building_ALL(Building_Name,Default_Build) values('%s','%d')"),BCTemp.MainBuildingName.GetBuffer(),0);
-                    ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+                    SqliteDBT3000.execDML((UTF8MBSTR)sql);
 
                     sql.Format(_T("Insert into Building(Main_BuildingName,Building_Name,Default_SubBuilding,Building_Path) values('%s','%s','%d','%s')"),BCTemp.MainBuildingName.GetBuffer(),BCTemp.MainBuildingName.GetBuffer(),0,BCTemp.BuildingPath.GetBuffer());
-                    ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+                    SqliteDBT3000.execDML((UTF8MBSTR)sql);
                 }
                 else
                 {
-                    sql.Format(_T("delete * from Building_ALL where Building_Name = '%s' "),BCTemp.MainBuildingName.GetBuffer());
-                    ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+                    sql.Format(_T("delete   from Building_ALL where Building_Name = '%s' "),BCTemp.MainBuildingName.GetBuffer());
+                    SqliteDBT3000.execDML((UTF8MBSTR)sql);
 
                     sql.Format(_T("Insert into Building_ALL(Building_Name,Default_Build) values('%s','%d')"),BCTemp.MainBuildingName.GetBuffer(),0);
-                    ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+                    SqliteDBT3000.execDML((UTF8MBSTR)sql);
 
                     sql.Format(_T("update Building set Building_Path = '%s' ,Building_Name = '%s'  where  Main_BuildingName = '%s' "),BCTemp.BuildingPath.GetBuffer(),BCTemp.MainBuildingName.GetBuffer(),BCTemp.MainBuildingName.GetBuffer());
 
-                    ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+                    SqliteDBT3000.execDML((UTF8MBSTR)sql);
 
                 }
 
             }
             else
             {
-// 				sql.Format(_T("delete * from Building_ALL where Building_Name = '%s' "),BCTemp.MainBuildingName.GetBuffer());
-// 				ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
-//
-// 				sql.Format(_T("Insert into Building_ALL(Building_Name,Default_Build) values('%s','%d')"),BCTemp.MainBuildingName.GetBuffer(),0);
-// 				ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
-//
-// 				sql.Format(_T("Insert into Building(Main_BuildingName,Building_Name,Default_SubBuilding,Building_Path) values('%s','%s','%d','%s')"),BCTemp.MainBuildingName.GetBuffer(),BCTemp.MainBuildingName.GetBuffer(),0,BCTemp.BuildingPath.GetBuffer());
-// 				ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+ 
             }
-            ado.CloseConn();
+            SqliteDBT3000.closedb();
             //更新到数据库之后，加入到Vector列表
             m_BuildNameLst.push_back(BCTemp);
 
@@ -699,8 +687,8 @@ void CBuildingConfigration::Fresh_List_Row()
 void CBuildingConfigration::Update_Building()
 {
     Building_Config BuildingTemp;
-    CADO ado;
-    ado.OnInitADOConn();
+	CppSQLite3DB SqliteDBT3000;
+	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
     BuildingTemp.BuildingPath=m_building_config_list.GetItemText(m_changedRow,BC_BUILDINGPATH);
     BuildingTemp.Protocol=m_building_config_list.GetItemText(m_changedRow,BC_PROTOCOL);
     BuildingTemp.IPAddress_Domain=m_building_config_list.GetItemText(m_changedRow,BC_IPADDRESS);
@@ -712,14 +700,14 @@ void CBuildingConfigration::Update_Building()
         CString strSql;
         strSql.Format(_T("update Building set Protocal='%s',Ip_Address='%s',Ip_Port='%s',Com_Port='%s',Braudrate='%s' where Building_Path='%s'  "),
                       BuildingTemp.Protocol,BuildingTemp.IPAddress_Domain,BuildingTemp.IP_Port,BuildingTemp.Comport,BuildingTemp.BaudRate,BuildingTemp.BuildingPath);
-        ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+        SqliteDBT3000.execDML((UTF8MBSTR)strSql);
 
     }
     catch (...)
     {
         AfxMessageBox(_T("Failed"));
     }
-    ado.CloseConn();
+    SqliteDBT3000.closedb();
 
 
 
@@ -728,37 +716,35 @@ void CBuildingConfigration::Update_Building()
 }
 void CBuildingConfigration::Deal_BuildingPath()
 {
-    CADO ado;
-    ado.OnInitADOConn();
-    CString strSql;
-    strSql=_T("select * from Building");
-    ado.m_pRecordset = ado.OpenRecordset(strSql);
+	CppSQLite3DB SqliteDBT3000;
+	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+	CppSQLite3Query q;
+	CString strSql;
+	strSql=_T("select * from Building");
+    q = SqliteDBT3000.execQuery((UTF8MBSTR)strSql);
     _variant_t temp_variant;
     CString pathfull;
     CString pathnew;
     try
     {
-        while(VARIANT_FALSE==ado.m_pRecordset->EndOfFile)
+        while(!q.eof())
         {
-            temp_variant=ado.m_pRecordset->GetCollect("Building_Path");//
-            if(temp_variant.vt!=VT_NULL)
-                pathfull=temp_variant;
-            else
-                pathfull.Empty();
+            
+			pathfull = q.getValuebyName(L"Building_Path");
             pathnew=pathfull;
             int index=pathnew.Find(_T("Database"));
             pathnew.Delete(0,index);
 
             strSql.Format(_T("update Building set Building_Path='%s' where Building_Path='%s'"),pathnew,pathfull);
-            ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
-            ado.m_pRecordset->MoveNext();
+            SqliteDBT3000.execDML((UTF8MBSTR)strSql);
+            q.nextRow();
         }
     }
     catch (...)
     {
         AfxMessageBox(_T("Failed"));
     }
-    ado.CloseConn();
+    SqliteDBT3000.closedb();
 }
 
 
@@ -766,7 +752,8 @@ void CBuildingConfigration::Deal_BuildingPath()
 
 LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM lParam)
 {
-    CADO ado;
+	 
+
     int Changed_Item = (int)wParam;
     int Changed_SubItem = (int)lParam;
 	int sqlID;
@@ -843,7 +830,7 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
             filefoldSource = fileSource;
             PathRemoveFileSpec(filefoldSource.GetBuffer (256));
             filefoldSource.ReleaseBuffer ();
-            NewfileSource=filefoldSource+L"\\"+cs_temp+L".mdb";
+            NewfileSource=filefoldSource+L"\\"+cs_temp+L".db";
             filefoldSource= filefoldSource+L"\\";
 
             NewfilefoldSource = g_strExePth+CString("Database\\Buildings\\")+cs_temp+CString("\\");
@@ -855,32 +842,32 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
                 
             }
 
-            NewfileSource=NewfilefoldSource+cs_temp+L".mdb";
+            NewfileSource=NewfilefoldSource+cs_temp+L".db";
             NewfileSource.Delete (0,g_strExePth.GetLength ());
             CString sql;
             try
             {
-                CADO ado;
-                ado.OnInitADOConn();
-
+				CppSQLite3DB SqliteDBT3000;
+				SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+				CppSQLite3Query q;
                 sql.Format(_T("Select * from Building where Building_Path='%s'"),path);
-                ado.m_pRecordset=ado.OpenRecordset(sql);
-                if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+                q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
+                if (!q.eof())//有表但是没有对应序列号的值
                 {
-                    ado.CloseRecordset();
+                     
 
                     sql.Format(_T("Select * from Building "));
-                    ado.m_pRecordset=ado.OpenRecordset(sql);
-                    if (!ado.m_pRecordset->EndOfFile)
+                    q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);;
+                    if (!q.eof())
                     {
-                      /*  ado.m_pRecordset->MoveLast();*/
+                       
 
                         sql.Format(_T("update Building_ALL set Building_Name = '%s' where Building_Name = '%s' "),cs_temp,m_select_text);
-                        ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+                       SqliteDBT3000.execDML((UTF8MBSTR)sql);
 
                         sql.Format(_T("update Building set Main_BuildingName = '%s' ,Building_Name = '%s' , Building_Path = '%s'  where  Building_Path = '%s' "),cs_temp,cs_temp,NewfileSource,path);
-
-                        ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+						SqliteDBT3000.execDML((UTF8MBSTR)sql);
+                        
                     }
 
 
@@ -888,25 +875,14 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 
 
                 }
-                ado.CloseConn();
+                SqliteDBT3000.closedb();
 
 				m_BuildNameLst.at(m_curRow).MainBuildingName = cs_temp;
 				m_BuildNameLst.at(m_curRow).Sub_NetName = cs_temp;
 
-				CppSQLite3DB SqliteDB;
-				SqliteDB.open(m_sqlitepath);
-
-				CString SqlTemp;
-				SqlTemp.Format(_T("Update tbl_building_location set BuildingName = '%s' Where ID = %d "),cs_temp,sqlID);
-				
-				char charqltext[1024];
 				 
-				memset(charqltext,0,1024);
-				WideCharToMultiByte( CP_ACP, 0, SqlTemp.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
 
-				SqliteDB.execDML(charqltext);
-
-				 SqliteDB.close();
+				 
 			
 				
             }
@@ -920,35 +896,31 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
             _variant_t temp_variant;
 
             CString DB_Building_Name=L"";
-            CBADO bado;
+            CppSQLite3DB SqliteDBBuilding;
+			CppSQLite3Query q;
             //修改Building的数据库,也要更新,明天接着做吧..哈哈....完蛋
 #if 1 //校驗一下看看是否是Building的Database
             CString BuildingPath = GetExePath(true)+ NewfileSource;
-            bado.SetDBPath(BuildingPath);
-            bado.OnInitADOConn();
-            if (!bado.IsHaveTable(bado,_T("ALL_NODE")))
+             SqliteDBBuilding.open((UTF8MBSTR)BuildingPath);
+            
+            if (!SqliteDBBuilding.tableExists("ALL_NODE"))
             {
 
-                bado.CloseConn();
+                SqliteDBBuilding.closedb();
                 AfxMessageBox(_T("The Database of the building is error."));
                 return 0;
             }
             else
             {
 
-                sql.Format(_T("Select  distinct mainbuilding_name  from  ALL_NODE"));
-                bado.m_pRecordset=bado.OpenRecordset(sql);
-                if(!bado.m_pRecordset->EndOfFile)
-                {
-                    temp_variant=bado.m_pRecordset->GetCollect(_T("MainBuilding_Name"));
-                    if (temp_variant.vt!=VT_NULL)
-                    {
-                        DB_Building_Name=temp_variant;
-                    }
+                  sql.Format(_T("Select  distinct mainbuilding_name  from  ALL_NODE"));
+                  q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
+                   if(!q.eof())
+                   {
 
-
-                }
-                bado.CloseRecordset();
+				   	DB_Building_Name = q.getValuebyName(L"MainBuilding_Name");
+                   }
+            	   
 
             }
 #endif
@@ -957,19 +929,18 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 
 
             sql.Format(_T("Select * from ALL_NODE"));
-            bado.m_pRecordset=bado.OpenRecordset(sql);
-            while(!bado.m_pRecordset->EndOfFile)
+            q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
+            while(!q.eof())
             {
 
                 sql.Format(_T("update ALL_NODE set MainBuilding_Name  = '%s' ,Building_Name = '%s'  where  MainBuilding_Name  = '%s'"),cs_temp,cs_temp,DB_Building_Name);
-                //	bado.OpenRecordset(sql);
-                bado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
-                bado.m_pRecordset->MoveNext();
+                SqliteDBBuilding.execDML((UTF8MBSTR)sql);
+                q.nextRow();
 
             }
-            bado.CloseRecordset();
+           
 
-            bado.CloseConn();
+           SqliteDBBuilding.closedb();
 
 
         }
@@ -990,10 +961,10 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
             // m_building_config_list.SetItemText(Changed_Item,BC_SUBNAME,cs_temp);
 
 
-            CString filebuildingPath=g_strBuildingFolder+cs_temp+_T("\\");//+_T(".mdb");
+            CString filebuildingPath=g_strBuildingFolder+cs_temp+_T("\\");
             // CString strDestFileName=g_strBuildingFolder+BCTemp.MainBuildingName+_T("\\");
             CreateDirectory(filebuildingPath,NULL);
-            filebuildingPath+=cs_temp+_T(".mdb");
+            filebuildingPath+=cs_temp+_T(".db");
 
             DeleteFile(filebuildingPath);
             HANDLE hFind;//
@@ -1001,10 +972,10 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
             //create building db file
 
             hFind = FindFirstFile(filebuildingPath, &wfd);//
-            if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
+            if (hFind==INVALID_HANDLE_VALUE)
             {
 
-                HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_BUILDING_DB2), _T("BUILDING_DB"));
+                HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_BUILDINGDB1), _T("BUILDINGDB"));
                 HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);
 
 
@@ -1045,14 +1016,15 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
             try
             {
 				 
-                CADO ado;
-                ado.OnInitADOConn();
+				CppSQLite3DB SqliteDBT3000;
+				CppSQLite3Query q;
+				SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
                 CString sql;
                 sql.Format(_T("Select * from Building where Building_Path='%s'"),BCTemp.BuildingPath);
-                ado.m_pRecordset=ado.OpenRecordset(sql);
-                if (ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+                q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
+                if (q.eof())//有表但是没有对应序列号的值
                 {
-                    ado.CloseRecordset();
+                     
                     for (int j=0; j<m_BuildNameLst.size(); j++)
                     {
                         if (BCTemp.MainBuildingName.CompareNoCase(m_BuildNameLst.at(j).MainBuildingName)==0)
@@ -1068,11 +1040,11 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
                     }
                     if (!Is_The_Same)
                     {
-                        sql.Format(_T("delete * from Building_ALL where Building_Name = '%s' "),BCTemp.MainBuildingName.GetBuffer());
-                        ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+                        sql.Format(_T("delete   from Building_ALL where Building_Name = '%s' "),BCTemp.MainBuildingName.GetBuffer());
+                       SqliteDBT3000.execDML((UTF8MBSTR)sql);
 
                         sql.Format(_T("Insert into Building_ALL(Building_Name,Default_Build) values('%s','%d')"),BCTemp.MainBuildingName.GetBuffer(),0);
-                        ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+                        SqliteDBT3000.execDML((UTF8MBSTR)sql);
 
                         sql.Format(_T("Insert into Building(Main_BuildingName,Building_Name,Protocal,Default_SubBuilding,Building_Path,Com_Port,Ip_Address,IP_Port,Braudrate) values('%s','%s','%s','%d','%s' ,'%s','%s','%s','%s')"),
                                    BCTemp.MainBuildingName.GetBuffer(),BCTemp.MainBuildingName.GetBuffer(),BCTemp.Protocol.GetBuffer(),0,BCTemp.BuildingPath.GetBuffer(),
@@ -1080,50 +1052,39 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
                                    BCTemp.IPAddress_Domain,
                                    BCTemp.IP_Port,
                                    BCTemp.BaudRate);
-                        ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+                        SqliteDBT3000.execDML((UTF8MBSTR)sql);
 
                     }
                     else
                     {
-                        sql.Format(_T("delete * from Building_ALL where Building_Name = '%s' "),BCTemp.MainBuildingName.GetBuffer());
-                        ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+                        sql.Format(_T("delete   from Building_ALL where Building_Name = '%s' "),BCTemp.MainBuildingName.GetBuffer());
+                         
+						SqliteDBT3000.execDML((UTF8MBSTR)sql);
 
 
                         sql.Format(_T("Insert into Building_ALL(Building_Name,Default_Build) values('%s','%d')"),BCTemp.MainBuildingName.GetBuffer(),0);
-                        ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+                        SqliteDBT3000.execDML((UTF8MBSTR)sql);
 
 
                         sql.Format(_T("update Building set Building_Path = '%s' ,Building_Name = '%s' ,Protocal = '%s' where  Main_BuildingName = '%s' "),BCTemp.BuildingPath.GetBuffer(),BCTemp.MainBuildingName.GetBuffer(),BCTemp.Protocol,BCTemp.MainBuildingName.GetBuffer());
 
-                        ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+                        SqliteDBT3000.execDML((UTF8MBSTR)sql);
 
                     }
 
-                }
-                ado.CloseConn();
-
-				ado.OnInitADOConn();
-				sql.Format(_T("Select * from Building where Building_Path='%s'"),BCTemp.BuildingPath);
-				ado.m_pRecordset=ado.OpenRecordset(sql);
-				if (!ado.m_pRecordset->EndOfFile)
-				{
-				  sqlID = ado.m_pRecordset->GetCollect("ID");
 				}
-				ado.CloseRecordset();
-				ado.CloseConn();
+				
 
-				CppSQLite3DB SqliteDB;
-				SqliteDB.open(m_sqlitepath);
-
-				CString SqlTemp;
-				SqlTemp.Format(_T("insert into tbl_building_location(ID,BuildingName) Values(%d,'%s') "),sqlID,BCTemp.MainBuildingName);
-
-				char charqltext[1024];
 				 
-				memset(charqltext,0,1024);
-				WideCharToMultiByte( CP_ACP, 0, SqlTemp.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
-				SqliteDB.execDML(charqltext);
-				SqliteDB.close();
+				sql.Format(_T("Select * from Building where Building_Path='%s'"),BCTemp.BuildingPath);
+				q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
+				if (!q.eof())
+				{
+				  sqlID = q.getIntField("ID");
+				}
+				 
+
+			    SqliteDBT3000.closedb();
 				 
 			 
 				BCTemp.ID = sqlID;
@@ -1392,19 +1353,19 @@ void CBuildingConfigration::LoadBuildingConfigDB()
     CString strSql;
     //strSql.Format(_T("select * from Building where Main_BuildingName = '%s'"),m_strMainBuildingName); order by Main_BuildingName
     strSql.Format(_T("select * from Building "));
-    m_building_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_building_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+    m_q = m_SqliteDBT3000.execQuery((UTF8MBSTR)strSql);
 
     CString str_temp;
     str_temp.Empty();
 
 	int id =1;
     _variant_t temp_variant;
-    while(VARIANT_FALSE==m_building_pRs->EndOfFile)
+    while(!m_q.eof())
     {
         Building_Config temp_building; //先用临时building 接收新值;
         int temp_value=0;
-        temp_value=m_building_pRs->GetCollect(_T("Default_SubBuilding"));
-        if(temp_value==-1)//def building;
+        temp_value=m_q.getIntField("Default_SubBuilding");
+        if(temp_value==1)//def building;
         {
             temp_building.b_selected = true;
         }
@@ -1417,119 +1378,69 @@ void CBuildingConfigration::LoadBuildingConfigDB()
 		
 
 
-        temp_variant=m_building_pRs->GetCollect("Main_BuildingName");//
-        if(temp_variant.vt!=VT_NULL)
-            temp_building.MainBuildingName=temp_variant;
-        else
-            temp_building.MainBuildingName.Empty();
+        temp_building.MainBuildingName=m_q.getValuebyName(L"Main_BuildingName");//
+        
 
 		if (!temp_building.MainBuildingName.IsEmpty())
 		{
-			temp_variant=m_building_pRs->GetCollect("ID");//
-			if(temp_variant.vt!=VT_NULL)
-				temp_building.ID=temp_variant;
-			else
-				temp_building.ID=-1;
+			temp_building.ID=m_q.getIntField("ID");//
+			 
 		}
 
-        temp_variant=m_building_pRs->GetCollect("Building_Name");//
-        if(temp_variant.vt!=VT_NULL)
-            temp_building.Sub_NetName=temp_variant;
-        else
-            temp_building.Sub_NetName.Empty();
+        temp_building.Sub_NetName=m_q.getValuebyName(L"Building_Name");//
+         
 
-        temp_variant=m_building_pRs->GetCollect("Protocal");//
-        if(temp_variant.vt!=VT_NULL)
-        {
-            temp_building.Protocol=temp_variant;
-        }
-        else
-        {
-            temp_building.Protocol.Empty();
-        }
+        temp_building.Protocol=m_q.getValuebyName(L"Protocal");//
+         
 
 
 
-        temp_variant=m_building_pRs->GetCollect("Ip_Address");//
-        if(temp_variant.vt!=VT_NULL)
-            temp_building.IPAddress_Domain=temp_variant;
-        else
-            temp_building.IPAddress_Domain.Empty();
+         temp_building.IPAddress_Domain=m_q.getValuebyName(L"Ip_Address");//
+         
 
-        temp_variant=m_building_pRs->GetCollect("Ip_Port");//
-        if(temp_variant.vt!=VT_NULL)
-            temp_building.IP_Port=temp_variant;
-        else
-            temp_building.IP_Port.Empty();
+        temp_building.IP_Port=m_q.getValuebyName(L"Ip_Port");//
+       
 
-        temp_variant=m_building_pRs->GetCollect("Com_Port");//
-        if(temp_variant.vt!=VT_NULL)
-            temp_building.Comport=temp_variant;
-        else
-            temp_building.Comport.Empty();
+        temp_building.Comport=m_q.getValuebyName(L"Com_Port");//
+         
 
-        temp_variant=m_building_pRs->GetCollect("Braudrate");//
-        if(temp_variant.vt!=VT_NULL)
-            temp_building.BaudRate=temp_variant;
-        else
-            temp_building.BaudRate.Empty();
+        temp_building.BaudRate=m_q.getValuebyName(L"Braudrate");//
+        
         //Building_Path
-        temp_variant=m_building_pRs->GetCollect("Building_Path");//
-        if(temp_variant.vt!=VT_NULL)
-            temp_building.BuildingPath=temp_variant;
-        else
-            temp_building.BuildingPath.Empty();
+        temp_building.BuildingPath=m_q.getValuebyName(L"Building_Path");//
+         
         int index=temp_building.BuildingPath.Find(_T("Database"));
         temp_building.BuildingPath.Delete(0,index);
 
 
-		temp_variant=m_building_pRs->GetCollect("country");//
-		if(temp_variant.vt!=VT_NULL)
-			temp_building.country=temp_variant;
-		else
-			temp_building.country.Empty();
+		temp_building.country=m_q.getValuebyName(L"country");//
+		 
 
-		temp_variant=m_building_pRs->GetCollect("state");//
-		if(temp_variant.vt!=VT_NULL)
-			temp_building.state=temp_variant;
-		else
-			temp_building.state.Empty();
+		temp_building.state=m_q.getValuebyName(L"state");//
+		 
 
-		temp_variant=m_building_pRs->GetCollect("city");//
-		if(temp_variant.vt!=VT_NULL)
-			temp_building.city=temp_variant;
-		else
-			temp_building.city.Empty();
+		temp_building.city=m_q.getValuebyName(L"city");//
+		 
 
 
-		temp_variant=m_building_pRs->GetCollect("street");//
-		if(temp_variant.vt!=VT_NULL)
-			temp_building.street=temp_variant;
-		else
-			temp_building.street.Empty();
+		temp_building.street=m_q.getValuebyName(L"street");//
+	 
 
-		temp_variant=m_building_pRs->GetCollect("ZIP");//
-		if(temp_variant.vt!=VT_NULL)
-			temp_building.Zip=temp_variant;
-		else
-			temp_building.Zip=0;
+	
+	 
 
-		temp_variant=m_building_pRs->GetCollect("EngineeringUnits");//
-		if(temp_variant.vt!=VT_NULL)
-			temp_building.EngineeringUnits=temp_variant;
-		else
-			temp_building.EngineeringUnits.Empty();
+		temp_building.EngineeringUnits=m_q.getValuebyName(L"EngineeringUnits");//
+		 
 
 	 
 
 		 
         m_BuildNameLst.push_back(temp_building);
 
-        m_building_pRs->MoveNext();//
+        m_q.nextRow();//
     }
 
-    if(m_building_pRs->State)
-        m_building_pRs->Close();
+    
 }
 
 BOOL IsNum(CString str)
@@ -1676,22 +1587,20 @@ void CBuildingConfigration::OnBnClickedBuildingButtonAdd()
 
     CString strSql;
     strSql.Format(_T("Select * from Building_ALL where Building_Name = '%s'"),strMainBuildName);
-    m_building_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_building_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+   m_q = m_SqliteDBT3000.execQuery((UTF8MBSTR)strSql);
     _variant_t temp_variant_name;
     bool findMainBuilding=false;
-    if(VARIANT_FALSE==m_building_pRs->EndOfFile)		//If it's not empty , means the input Building has exist in Main Building.
+    if(!m_q.eof())		//If it's not empty , means the input Building has exist in Main Building.
     {
         findMainBuilding=true;
     }
 
-    if(m_building_pRs->State)
-        m_building_pRs->Close();
-
+   
 
     if(!findMainBuilding)
     {
         strSql.Format(_T("insert into Building_ALL (Building_Name,Telephone,Address) values('"+strMainBuildName+"','"+ _T("") +"','"+_T("") +"')"));
-        m_building_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+        m_SqliteDBT3000.execDML((UTF8MBSTR)strSql);
     }
     //---------------------------------------------------------------------------------------------
 
@@ -1701,7 +1610,7 @@ void CBuildingConfigration::OnBnClickedBuildingButtonAdd()
     {
         BOOL bDefault =FALSE;
         strSql.Format(_T("insert into Building (Main_BuildingName,Building_Name,Protocal,Com_Port,Ip_Address,Ip_Port,Braudrate) values('"+strMainBuildName+"','"+strSubBuildingName+"','"+strProtocol+"','"+strCOMPort+"','"+strIP+"','"+strIpPort+"','"+strCOMPortBraud+"')"));
-        m_building_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+        m_SqliteDBT3000.execDML((UTF8MBSTR)strSql);
     }
     catch(_com_error *e)
     {
@@ -1717,14 +1626,7 @@ void CBuildingConfigration::OnBnClickedBuildingButtonAdd()
 
 void CBuildingConfigration::OnBnClickedBuildingButtonDelete()
 {
-    if (m_building_pRs->State)
-    {
-        m_building_pRs->Close();
-    }
-    if (m_building_pCon->State)
-    {
-        m_building_pCon->Close();
-    }
+    m_SqliteDBT3000.closedb();
 
     CDialogEx::OnCancel();
 }
@@ -1784,8 +1686,8 @@ void CBuildingConfigration::OnNMClickListBuildingConfig(NMHDR *pNMHDR, LRESULT *
     CString New_CString;
     CString temp_task_info;
 
-    CBADO bado;
-
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Query q;
     CString temp1;
     CStringArray temparray;
     Building_Config BCTemp;
@@ -1795,17 +1697,7 @@ void CBuildingConfigration::OnNMClickListBuildingConfig(NMHDR *pNMHDR, LRESULT *
     CString Building_Name=L"";
     CString DB_Building_Name=L"";
 
-    //if (BC_ITEM==lCol)
-    //{
-    //    m_changedCol=m_curCol;
-    //    m_changedRow=m_curRow;
-    //    CMenu menu;
-    //    menu.LoadMenu(IDR_BUILDING_CONFIG);
-    //    CMenu *pmenu=menu.GetSubMenu(0);
-    //    CPoint point;
-    //    GetCursorPos(&point);
-    //    pmenu->TrackPopupMenu(TPM_LEFTBUTTON | TPM_LEFTALIGN ,point.x,point.y,this);
-    //}
+     
      if (BC_BUILDINGPATH==lCol)//当点击选择一个数据库的时候，把Building的名字已经数据库的信息都获取过来
     {
         m_building_config_list.Set_Edit(FALSE);
@@ -1818,26 +1710,26 @@ void CBuildingConfigration::OnNMClickListBuildingConfig(NMHDR *pNMHDR, LRESULT *
         }
 
         CStringArray  ArrayFileName;
-        CString strFilter = _T("Access Database file|*.mdb|all file|*.*||");
+        CString strFilter = _T("Access Database file|*.db|all file|*.*||");
         CFileDialog dlg(true,_T("Open image file"),NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER,strFilter);
         if(IDOK==dlg.DoModal())
         {
             CString strdatabasefile=dlg.GetPathName();
             CString databasefilename=dlg.GetFileName();
             SplitCStringA(ArrayFileName,strdatabasefile,L".");
-            if (ArrayFileName[ArrayFileName.GetSize()-1].CompareNoCase(L"mdb")!=0)
+            if (ArrayFileName[ArrayFileName.GetSize()-1].CompareNoCase(L"db")!=0)
             {
                 MessageBox(_T("Please select a access file"));
 
                 return;
             }
 #if 1 //校驗一下看看是否是Building的Database
-            bado.SetDBPath(strdatabasefile);
-            bado.OnInitADOConn();
-            if (!bado.IsHaveTable(bado,_T("ALL_NODE")))
+            
+			SqliteDBBuilding.open((UTF8MBSTR)strdatabasefile);
+            if (!SqliteDBBuilding.tableExists("ALL_NODE"))
             {
 
-                bado.CloseConn();
+                SqliteDBBuilding.closedb();
                 AfxMessageBox(_T("The file is not a correct building database."));
                 return;
                 //continue;
@@ -1846,18 +1738,15 @@ void CBuildingConfigration::OnNMClickListBuildingConfig(NMHDR *pNMHDR, LRESULT *
             {
 
                 sql.Format(_T("Select  distinct mainbuilding_name  from  ALL_NODE"));
-                bado.m_pRecordset=bado.OpenRecordset(sql);
-                if(!bado.m_pRecordset->EndOfFile)
+				q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
+
+                if(!q.eof())
                 {
-                    temp_variant=bado.m_pRecordset->GetCollect(_T("MainBuilding_Name"));
-                    if (temp_variant.vt!=VT_NULL)
-                    {
-                        DB_Building_Name=temp_variant;
-                    }
+                     
 
-
-                }
-                bado.CloseRecordset();
+					DB_Building_Name = q.getValuebyName(L"MainBuilding_Name");
+				}
+				 
 
             }
 #endif
@@ -1887,23 +1776,7 @@ void CBuildingConfigration::OnNMClickListBuildingConfig(NMHDR *pNMHDR, LRESULT *
                 MessageBox(_T("file path error"));
                 return;
             }
-// 			//
-// 			if(DB_Building_Name.CompareNoCase(Building_Name)!=0)
-// 			{
-// 				sql.Format(_T("Select * from ALL_NODE"));
-// 				bado.m_pRecordset=bado.OpenRecordset(sql);
-// 				while(!bado.m_pRecordset->EndOfFile)
-// 				{
-//
-// 					sql.Format(_T("update ALL_NODE set MainBuilding_Name  = '%s' ,Building_Name = '%s'  where  MainBuilding_Name  = '%s'"),Building_Name,Building_Name,DB_Building_Name);
-// 					//	bado.OpenRecordset(sql);
-// 					bado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
-// 					bado.m_pRecordset->MoveNext();
-//
-// 				}
-// 				bado.CloseRecordset();
-// 			}
-// 			bado.CloseConn();
+ 
 
             Building_Name=ArrayFileName[ArrayFileName.GetSize()-2];
             BCTemp.MainBuildingName=DB_Building_Name;
@@ -1944,14 +1817,15 @@ void CBuildingConfigration::OnNMClickListBuildingConfig(NMHDR *pNMHDR, LRESULT *
 #if 1
             try
             {
-                CADO ado;
-                ado.OnInitADOConn();
+				CppSQLite3DB SqliteDBT3000;
+				SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+				CppSQLite3Query q;
                 CString sql;
                 sql.Format(_T("Select * from Building where Building_Path='%s'"),BCTemp.BuildingPath);
-                ado.m_pRecordset=ado.OpenRecordset(sql);
-                if (ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+                q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
+                if (q.eof())//有表但是没有对应序列号的值
                 {
-                    ado.CloseRecordset();
+                   
                     for (int j=0; j<m_BuildNameLst.size(); j++)
                     {
                         if (BCTemp.MainBuildingName.CompareNoCase(m_BuildNameLst.at(j).MainBuildingName)==0)
@@ -1969,23 +1843,23 @@ void CBuildingConfigration::OnNMClickListBuildingConfig(NMHDR *pNMHDR, LRESULT *
                     {
                         sql.Format(_T("Insert into Building_ALL(Building_Name,Default_Build) values('%s','%d')"),
                                    BCTemp.MainBuildingName.GetBuffer(),0);
-                        ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+                       SqliteDBT3000.execDML((UTF8MBSTR)sql);
 
                         sql.Format(_T("Insert into Building(Main_BuildingName,Building_Name,Default_SubBuilding,Building_Path) values('%s','%s','%d','%s')"),
                                    BCTemp.MainBuildingName.GetBuffer(),BCTemp.MainBuildingName.GetBuffer(),0,BCTemp.BuildingPath.GetBuffer());
-                        ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+                        SqliteDBT3000.execDML((UTF8MBSTR)sql);
                     }
                     else
                     {
                         sql.Format(_T("update Building set Building_Path = '%s' ,Building_Name = '%s'  where  Main_BuildingName = '%s' "),
                                    BCTemp.BuildingPath.GetBuffer(),BCTemp.MainBuildingName.GetBuffer(),BCTemp.MainBuildingName.GetBuffer());
 
-                        ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+                        SqliteDBT3000.execDML((UTF8MBSTR)sql);
 
                     }
 
                 }
-                ado.CloseConn();
+                SqliteDBT3000.closedb();
                 m_BuildNameLst.push_back(BCTemp);
                 int last_new_item = (int)m_BuildNameLst.size();
                 CString temp_cs;
@@ -2137,40 +2011,25 @@ void CBuildingConfigration::OnBuildingconfigSelect()
         return;
 	}
 	
-    CADO ado;
-    ado.OnInitADOConn();
+	CppSQLite3DB SqliteDBT3000;
+	 
+	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
     try
     {
 
-        CString execute_str=_T("update Building set Default_SubBuilding = 0 where Default_SubBuilding = -1");
-        ado.m_pConnection->Execute(execute_str.GetString(),NULL,adCmdText);
-        execute_str.Format(_T("update Building set Default_SubBuilding = -1 where  Main_BuildingName= '%s'"),m_strMainBuildingName);
-        ado.m_pConnection->Execute(execute_str.GetString(),NULL,adCmdText);
+        CString execute_str=_T("update Building set Default_SubBuilding = 0 where Default_SubBuilding = 1");
+       SqliteDBT3000.execDML((UTF8MBSTR)execute_str);
+        execute_str.Format(_T("update Building set Default_SubBuilding =  1 where  Main_BuildingName= '%s'"),m_strMainBuildingName);
+        SqliteDBT3000.execDML((UTF8MBSTR)execute_str);
 	    
-		CppSQLite3DB SqliteDB;
-		SqliteDB.open(m_sqlitepath);
-	 
-		execute_str = _T("update tbl_building_location set Selection = 0 where Selection = 1");
-
-		char charqltext[1024];
-		memset(charqltext,0,1024);
-		WideCharToMultiByte( CP_ACP, 0, execute_str.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
-		SqliteDB.execDML(charqltext);
-
-		execute_str.Format(_T("update tbl_building_location set Selection = 1 where  ID = %d "),ID);
-
-		memset(charqltext,0,1024);
-		WideCharToMultiByte( CP_ACP, 0, execute_str.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
-		SqliteDB.execDML(charqltext);
-
-		SqliteDB.close();
+		 
 
     }
     catch (_com_error *e)
     {
         AfxMessageBox(_T("Operator Failed"));
     }
-    ado.CloseConn();
+    SqliteDBT3000.closedb();
     //int count=m_building_config_list.GetRowCount();
     for (int row=0; row<count-1; row++)
     {
@@ -2204,19 +2063,19 @@ void CBuildingConfigration::OnBuildingconfigUnselect()
         AfxMessageBox(_T("you have already Unselected.\ndon't need to unselect ,again!"));
         return;
     }
-    CADO ado;
-    ado.OnInitADOConn();
+   CppSQLite3DB SqliteDBT3000;
+   SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
     try
     {
 
-        CString execute_str=_T("update Building set Default_SubBuilding = 0 where Default_SubBuilding = -1");
-        ado.m_pConnection->Execute(execute_str.GetString(),NULL,adCmdText);
+        CString execute_str=_T("update Building set Default_SubBuilding = 0 where Default_SubBuilding =  1");
+       SqliteDBT3000.execDML((UTF8MBSTR)execute_str);
     }
     catch (_com_error *e)
     {
         AfxMessageBox(_T("Operator Failed"));
     }
-    ado.CloseConn();
+    SqliteDBT3000.closedb();
     m_bChanged=TRUE;
     //m_building_config_list.SetItemText(m_curRow,m_curCol,L"");
 //	Fresh_List();
@@ -2243,10 +2102,10 @@ void CBuildingConfigration::OnBuildingconfigDelete()
         return;
     }
 
-    CADO ado;
-    ado.OnInitADOConn();
+   CppSQLite3DB SqliteDBT3000;
+   SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
     CString strSql;
-    strSql.Format(_T("delete * from Building where  Main_BuildingName='%s'"),m_strMainBuildingName);
+    strSql.Format(_T("delete   from Building where  Main_BuildingName='%s'"),m_strMainBuildingName);
     try
     {
 
@@ -2255,28 +2114,18 @@ void CBuildingConfigration::OnBuildingconfigDelete()
         strTemp.Format(_T("Are you sure to delete the building:'%s'"),m_strMainBuildingName);
         if(AfxMessageBox(strTemp,MB_OKCANCEL)==IDOK)
         {
-            ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+             SqliteDBT3000.execDML((UTF8MBSTR)strSql);
         }
     }
     catch (_com_error *e)
     {
         AfxMessageBox(_T("Operator Failed"));
     }
-    ado.CloseConn();
+    SqliteDBT3000.closedb();
 
 	int ID = m_BuildNameLst.at(m_curRow).ID;
 
-	CppSQLite3DB SqliteDB;
-	SqliteDB.open(m_sqlitepath);
-	CString execute_str;
-	execute_str.Format(_T("delete   from tbl_building_location where ID = %d"),ID);
-
-	char charqltext[1024];
-	memset(charqltext,0,1024);
-	WideCharToMultiByte( CP_ACP, 0, execute_str.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
-	SqliteDB.execDML(charqltext);
-
-	SqliteDB.close();
+	 
 	 
 
     CString PathTemp;
@@ -2384,93 +2233,34 @@ void CBuildingConfigration::OnNMDblclkListBuildingConfig(NMHDR *pNMHDR, LRESULT 
 	 {
 		 
 		m_BuildNameLst.at(m_curRow) = dlg.m_currentBuilding;
-		CADO m_database_operator;
-
+		CppSQLite3DB SqliteDBT3000;
+		SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+	 
 		try
 		{
 			_variant_t temp_var;
-			m_database_operator.OnInitADOConn();
-			CString strSql;
-			strSql.Format(_T("Select * from Building Where ID = %d "), m_BuildNameLst.at(m_curRow).ID);
-			m_database_operator.m_pRecordset = m_database_operator.OpenRecordset(strSql);
-
-			if(!m_database_operator.m_pRecordset->EndOfFile)
-			{
-
-
-				if(!m_BuildNameLst.at(m_curRow).city.IsEmpty())
-				{
-					m_database_operator.m_pRecordset->PutCollect("city", (_variant_t)m_BuildNameLst.at(m_curRow).city);
-				}
-				if(!m_BuildNameLst.at(m_curRow).country.IsEmpty())
-				{
-					m_database_operator.m_pRecordset->PutCollect("country", (_variant_t)m_BuildNameLst.at(m_curRow).country);
-				} 
-				if(!m_BuildNameLst.at(m_curRow).Elevation.IsEmpty())
-				{
-					m_database_operator.m_pRecordset->PutCollect("Elevation", (_variant_t)m_BuildNameLst.at(m_curRow).Elevation);
-				}
-				if(!m_BuildNameLst.at(m_curRow).Latitude.IsEmpty())
-				{
-					m_database_operator.m_pRecordset->PutCollect("Latitude", (_variant_t)m_BuildNameLst.at(m_curRow).Latitude);
-				}
-				if(!m_BuildNameLst.at(m_curRow).Longitude.IsEmpty())
-				{
-					m_database_operator.m_pRecordset->PutCollect("Longitude", (_variant_t)m_BuildNameLst.at(m_curRow).Longitude);
-				}
-				if(!m_BuildNameLst.at(m_curRow).state.IsEmpty())
-				{
-					m_database_operator.m_pRecordset->PutCollect("state", (_variant_t)m_BuildNameLst.at(m_curRow).state);
-				}
-				if(!m_BuildNameLst.at(m_curRow).street.IsEmpty())
-				{
-					m_database_operator.m_pRecordset->PutCollect("street", (_variant_t)m_BuildNameLst.at(m_curRow).street);
-				}
-				if(m_BuildNameLst.at(m_curRow).Zip!=-1)
-				{
-					m_database_operator.m_pRecordset->PutCollect("Zip", (_variant_t)m_BuildNameLst.at(m_curRow).Zip);
-				}
-				if(!m_BuildNameLst.at(m_curRow).EngineeringUnits.IsEmpty())
-				{
-					m_database_operator.m_pRecordset->PutCollect("EngineeringUnits", (_variant_t)m_BuildNameLst.at(m_curRow).EngineeringUnits);
-				}
-				m_database_operator.m_pRecordset->Update();
-			}
-
-			m_database_operator.CloseRecordset();
-			m_database_operator.CloseConn();
-
-			 
-			CppSQLite3DB SqliteDB;
-			
-
-			SqliteDB.open(m_sqlitepath);
+		 
 			CString SqlText;
-			SqlText.Format(_T("Update tbl_building_location Set \
+			SqlText.Format(_T("Update Building Set \
 			 country = '%s' ,\
 			 state = '%s' ,\
 			 city = '%s' ,\
 			 street = '%s' ,\
-			 ZIP = %d ,\
 			 EngineeringUnits = '%s'\
-			 where ID = %d \
+			 where Building_Path = '%s' \
 			  "),
 			  m_BuildNameLst.at(m_curRow).country,
 			  m_BuildNameLst.at(m_curRow).state,
 			  m_BuildNameLst.at(m_curRow).city,
 			  m_BuildNameLst.at(m_curRow).street,
-			  m_BuildNameLst.at(m_curRow).Zip,
 			  m_BuildNameLst.at(m_curRow).EngineeringUnits,
-			  m_BuildNameLst.at(m_curRow).ID
+			  m_BuildNameLst.at(m_curRow).BuildingPath
 			  );
-			  char charqltext[1024];
-			 
-			memset(charqltext,0,1024);
-			WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
+			  
 
-			SqliteDB.execDML(charqltext);
+			SqliteDBT3000.execDML((UTF8MBSTR)SqlText);
 
-			SqliteDB.close();
+			SqliteDBT3000.closedb();
 		 
 			AfxMessageBox(_T("Update Successfully"));
 

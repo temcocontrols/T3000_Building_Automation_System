@@ -7,8 +7,9 @@
 #include "globle_function.h"
 #include "AfxMessageDialog.h"
 #include "MainFrm.h"
+#include "../SQLiteDriver/CppSQLite3.h"
 // COutPutDlg dialog
-#include "bado/BADO.h"
+ 
 IMPLEMENT_DYNAMIC(COutPutDlg, CDialog)
 CString heat_hand[6]={_T("Heat1"),_T("Heat2"),_T("Heat3"),_T("Heat4"),_T("Heat5"),_T("Heat6")};
 CString cool_hand[6]={_T("Cool1"),_T("Cool2"),_T("Cool3"),_T("Cool4"),_T("Cool5"),_T("Cool6")};
@@ -5965,23 +5966,20 @@ void COutPutDlg::OnEnKillfocusDescriptedit()
 	//if(g_serialNum>0&&multi_register_value[6]>0)
 	if(product_register_value[6]>0)
 	{
-		/*_ConnectionPtr m_ConTmp;
-		_RecordsetPtr m_RsTmp;
-		m_ConTmp.CreateInstance("ADODB.Connection");
-		m_RsTmp.CreateInstance("ADODB.Recordset");
-		m_ConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);*/
-		CBADO bado;
-		bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-		bado.OnInitADOConn(); 
+		CppSQLite3Table table;
+		CppSQLite3Query q;
+
+		CppSQLite3DB SqliteDBBuilding;
+		SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
 		CString strSerial;
 		strSerial.Format(_T("%d"),g_serialNum);
 
 		CString strsql;
 		strsql.Format(_T("select * from IONAME where SERIAL_ID = '%s'"),strSerial);
-		//m_RsTmp->Open((_variant_t)strsql,_variant_t((IDispatch *)m_ConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-		 bado.m_pRecordset=bado.OpenRecordset(strsql);
-		if(VARIANT_FALSE== bado.m_pRecordset->EndOfFile)//update
+		 
+		q = SqliteDBBuilding.execQuery((UTF8MBSTR)strsql);
+		if(!q.eof())//update
 		{
 			
 			CString strField;
@@ -6015,8 +6013,8 @@ void COutPutDlg::OnEnKillfocusDescriptedit()
 
 			CString str_temp;
 			str_temp.Format(_T("update IONAME set "+strField+" = '"+strText+"' where SERIAL_ID = '"+strSerial+"'"));
-
-			bado.m_pConnection->Execute(str_temp.GetString(),NULL,adCmdText);
+			SqliteDBBuilding.execDML((UTF8MBSTR)str_temp);
+			 
 			}
 			catch(_com_error *e)
 			{
@@ -6082,8 +6080,8 @@ void COutPutDlg::OnEnKillfocusDescriptedit()
 				g_strSensorName);
 			try
 			{
-
-				bado.m_pConnection->Execute(str_temp.GetString(),NULL,adCmdText);
+				SqliteDBBuilding.execDML((UTF8MBSTR)str_temp);
+			 
 			}
 			catch(_com_error *e)
 			{
@@ -6123,8 +6121,7 @@ void COutPutDlg::OnEnKillfocusDescriptedit()
 				g_strOutName7=strText;
 				break;
 		}
-	    bado.CloseRecordset();
-		bado.CloseConn();
+	    SqliteDBBuilding.closedb();
 		/*if(m_RsTmp->State) 
 			m_RsTmp->Close(); 
 		if(m_ConTmp->State)

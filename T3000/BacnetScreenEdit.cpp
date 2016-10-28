@@ -131,7 +131,7 @@ LRESULT  CBacnetScreenEdit::Edit_label_Handle(WPARAM wParam, LPARAM lParam)
 		CString strSql;
 		strSql.Format(_T("update Screen_Bacnet_Label set Display_Type=%i,Text_Color=%i ,Icon_Name='%s' ,Icon_Name_2='%s', Icon_Place=%i ,Icon_Size=%i where Serial_Num =%i and Screen_Index=%i and  Label_Index=%i"),
 			temp_info->nDisplay_Type,temp_info->nclrTxt,icon_name,icon_name_2,temp_info->ntext_place,temp_info->n_iconsize,temp_info->nSerialNum,temp_info->nScreen_index,temp_info->nLabel_index);
-		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+		SqliteDBT3000.execDML((UTF8MBSTR)strSql);
 
 	}
 	catch(_com_error *e)
@@ -164,9 +164,9 @@ LRESULT  CBacnetScreenEdit::Delete_Label_Handle(WPARAM wParam, LPARAM lParam)
 	try
 	{
 		CString strSql;
-		strSql.Format(_T("delete * from Screen_Bacnet_Label where Serial_Num =%i and Screen_Index=%i and  Label_Index=%i"),
+		strSql.Format(_T("delete   from Screen_Bacnet_Label where Serial_Num =%i and Screen_Index=%i and  Label_Index=%i"),
 			temp_info->nSerialNum,temp_info->nScreen_index,temp_info->nLabel_index);
-		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+		SqliteDBT3000.execDML((UTF8MBSTR)strSql);
 
 	}
 	catch(_com_error *e)
@@ -266,20 +266,17 @@ void CBacnetScreenEdit::AddLabel(unsigned char point_type,uint8_t point_number,u
 
 		CString strSql;
 		strSql.Format(_T("select * from Screen_Bacnet_Label where Serial_Num =%i and Screen_Index=%i"),m_nSerialNumber,screen_list_line);
-		m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+		q = SqliteDBT3000.execQuery((UTF8MBSTR)strSql);
 		CString strtemp;
 		strtemp.Empty();
 		_variant_t temp_variant;
 		int nTemp;
 
 		int Max_Control_ID = LABEL_START_ID;
-		while(VARIANT_FALSE==m_pRs->EndOfFile)
+		while(!q.eof())
 		{//find the ControlID;
-			temp_variant=m_pRs->GetCollect("Label_Index");//
-			if(temp_variant.vt!=VT_NULL)
-				strtemp=temp_variant;
-			else
-				strtemp=_T("");
+			strtemp=q.getValuebyName(L"Label_Index");//
+			 
 			nTemp=_wtoi(strtemp);
 			//if(nTemp==nContyrolID)
 			//	nContyrolID=nContyrolID+1;
@@ -287,10 +284,9 @@ void CBacnetScreenEdit::AddLabel(unsigned char point_type,uint8_t point_number,u
 			//	break;
 			if(Max_Control_ID <= nTemp)	//要加入的Label ID 要大于 目前检索出来的 最大的值;
 				Max_Control_ID = nTemp + 1; 
-			m_pRs->MoveNext();
+			q.nextRow();
 		}
-		if(m_pRs->State) 
-			m_pRs->Close();
+		 
 
 		int text_color = RGB(0,0,255);
 		int display_type = LABEL_SHOW_FULL_DESCRIPTION;
@@ -300,7 +296,7 @@ void CBacnetScreenEdit::AddLabel(unsigned char point_type,uint8_t point_number,u
 		}
 		strSql.Format(_T("insert into Screen_Bacnet_Label values(%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,'%s','%s',%i,%i)"),m_nSerialNumber,screen_list_line,Max_Control_ID,main_panel,sub_panel,point_type,point_number,point_x,point_y,text_color,display_type,_T(""),_T(""),LABEL_TEXT_BOTTOM,LABEL_ICON_SMALL);
 
-		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+		SqliteDBT3000.execDML((UTF8MBSTR)strSql);
 
 
 	}
@@ -708,9 +704,9 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 
 	//m_building_image_folder = ApplicationFolder + _T("\\Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
 
-	m_pCon.CreateInstance(_T("ADODB.Connection"));
-	m_pRs.CreateInstance(_T("ADODB.Recordset"));
-	m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+	 
+ 
+	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 	m_bac_select_label = -1;
 	m_bac_lbuttondown = false;
 	//暂时加入，到时候要删掉的，不在这加，debug;
@@ -810,8 +806,8 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 void CBacnetScreenEdit::UpdateT3000Database()
 {
 	CString strSql;
-	strSql.Format(_T("delete * from Screen_Bacnet_Label"));
-	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+	strSql.Format(_T("delete   from Screen_Bacnet_Label"));
+	 q = SqliteDBT3000.execQuery((UTF8MBSTR)strSql);
 	for (int i=0;i<m_graphic_label_data.size();i++)
 	{
 		if(m_graphic_label_data.at(i).reg.label_status != ENABLE_LABEL)
@@ -830,7 +826,7 @@ void CBacnetScreenEdit::UpdateT3000Database()
 		strSql.Format(_T("insert into Screen_Bacnet_Label values(%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,'%s','%s',%i,%i)"),m_graphic_label_data.at(i).reg.nSerialNum,m_graphic_label_data.at(i).reg.nScreen_index,m_graphic_label_data.at(i).reg.nLabel_index,
 			m_graphic_label_data.at(i).reg.nMain_Panel,m_graphic_label_data.at(i).reg.nSub_Panel,m_graphic_label_data.at(i).reg.nPoint_type,m_graphic_label_data.at(i).reg.nPoint_number,m_graphic_label_data.at(i).reg.nPoint_x,
 			m_graphic_label_data.at(i).reg.nPoint_y,m_graphic_label_data.at(i).reg.nclrTxt,m_graphic_label_data.at(i).reg.nDisplay_Type,temp_icon_1,temp_icon_2,m_graphic_label_data.at(i).reg.nIcon_place,m_graphic_label_data.at(i).reg.nIcon_size);
-		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+		 SqliteDBT3000.execDML((UTF8MBSTR)strSql);
 	}
 	
 }
@@ -910,7 +906,7 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
 	CString strSql;
 	//if(bac_cm5_graphic == false)
 	strSql.Format(_T("select * from Screen_Bacnet_Label where Serial_Num =%i and Screen_Index=%i"),m_nSerialNumber,screen_list_line);
-	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+	 q = SqliteDBT3000.execQuery((UTF8MBSTR)strSql);
 	CString strtemp;
 	strtemp.Empty();
 
@@ -920,7 +916,7 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
 	int nItem = 0;//用于记录有多少个需要刷新;
 	::GetWindowRect(BacNet_hwd,&mynew_rect);	//获取 view的窗体大小;
 
-	while(VARIANT_FALSE==m_pRs->EndOfFile)
+	while(!q.eof())
 	{	
 		Bacnet_Label_Info bac_label;
 		CString temp_icon_name;
@@ -929,16 +925,16 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
 		bac_label.nSerialNum = m_nSerialNumber;
 		bac_label.nScreen_index = screen_list_line;
 
-		bac_label.nLabel_index=m_pRs->GetCollect("Label_Index");//
-		bac_label.nMain_Panel = m_pRs->GetCollect("Main_Panel");
-		bac_label.nSub_Panel = m_pRs->GetCollect("Sub_Panel");
-		bac_label.nPoint_type = m_pRs->GetCollect("Point_Type");
+		bac_label.nLabel_index=q.getIntField("Label_Index");//
+		bac_label.nMain_Panel = q.getIntField("Main_Panel");
+		bac_label.nSub_Panel = q.getIntField("Sub_Panel");
+		bac_label.nPoint_type = q.getIntField("Point_Type");
 		if(bac_label.nPoint_type > 0)
 			bac_label.nPoint_type = bac_label.nPoint_type - 1;
-		bac_label.nPoint_number = m_pRs->GetCollect("Point_Number");
-		temp_x_persent = m_pRs->GetCollect("Point_X");
+		bac_label.nPoint_number = q.getIntField("Point_Number");
+		temp_x_persent = q.getIntField("Point_X");
 
-		temp_y_persent =  m_pRs->GetCollect("Point_Y");
+		temp_y_persent =  q.getIntField("Point_Y");
 		if(temp_x_persent > 1000)
 			temp_x_persent = 980;
 		if(temp_y_persent > 1000)
@@ -960,13 +956,13 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
 		//TRACE(_T("x_persent = %u  y_persent = %u\r\n"),temp_x_persent,temp_y_persent);
 		//TRACE(_T("nPoint_x = %u nPoint_y = %u\r\n"),bac_label.nPoint_x,bac_label.nPoint_y);
 		//TRACE(_T("temp_variant value"));
-		bac_label.nclrTxt = m_pRs->GetCollect("Text_Color");
-		bac_label.nDisplay_Type = m_pRs->GetCollect("Display_Type");
+		bac_label.nclrTxt = q.getIntField("Text_Color");
+		bac_label.nDisplay_Type = q.getIntField("Display_Type");
 
-		temp_variant=m_pRs->GetCollect("Icon_Name");//
-		if(temp_variant.vt!=VT_NULL)
+		temp_icon_name=q.getValuebyName(L"Icon_Name");//
+		if(!temp_icon_name.IsEmpty())
 		{
-			temp_icon_name=temp_variant;
+			 
 			char cTemp2[255];
 			WideCharToMultiByte( CP_ACP, 0, temp_icon_name.GetBuffer(), -1, cTemp2, 255, NULL, NULL );
 			memcpy(bac_label.ico_name,cTemp2,10);
@@ -977,10 +973,10 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
 			memset(bac_label.ico_name,0,10);
 		}
 
-		temp_variant=m_pRs->GetCollect("Icon_Name_2");//
+		temp_icon_name=q.getValuebyName(L"Icon_Name_2");//
 		if(temp_variant.vt!=VT_NULL)
 		{
-			temp_icon_name=temp_variant;
+		 
 			char cTemp2[255];
 			WideCharToMultiByte( CP_ACP, 0, temp_icon_name.GetBuffer(), -1, cTemp2, 255, NULL, NULL );
 			memcpy(bac_label.ico_name_2,cTemp2,10);
@@ -992,8 +988,8 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
 		}
 
 
-		bac_label.n_iconsize = m_pRs->GetCollect("Icon_Size");
-		bac_label.ntext_place = m_pRs->GetCollect("Icon_Place");
+		bac_label.n_iconsize = q.getIntField("Icon_Size");
+		bac_label.ntext_place = q.getIntField("Icon_Place");
 
 		if(bac_label.n_iconsize > 2)
 			bac_label.n_iconsize = 0;
@@ -1003,7 +999,7 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
 
 		bac_label.nMouse_Status = LABEL_MOUSE_NORMAL;
 		m_bac_label_vector.push_back(bac_label);
-		m_pRs->MoveNext();
+		q.nextRow();
 
 
 		_Graphic_Value_Info temp1;
@@ -1055,8 +1051,7 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
 		nItem ++;
 	}
 
-	if(m_pRs->State) 
-		m_pRs->Close(); 
+	  
 }
 
 
@@ -2228,7 +2223,7 @@ bool CBacnetScreenEdit::UpdateDeviceLabelFlash()
 	CString strSql;
 	//if(bac_cm5_graphic == false)
 	strSql.Format(_T("select * from Screen_Bacnet_Label where Serial_Num =%i"),m_nSerialNumber);
-	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+	q = SqliteDBT3000.execQuery((UTF8MBSTR)strSql);
 	CString strtemp;
 	strtemp.Empty();
 
@@ -2238,32 +2233,32 @@ bool CBacnetScreenEdit::UpdateDeviceLabelFlash()
 
 	int ncount = 0;
 
-	while(VARIANT_FALSE==m_pRs->EndOfFile)
+	while(!q.eof())
 	{	
 		Bacnet_Label_Info bac_label;
 		CString temp_icon_name;
 		int temp_x_persent;
 		int temp_y_persent;
-		bac_label.nSerialNum = m_pRs->GetCollect("Serial_Num");
-		bac_label.nScreen_index = m_pRs->GetCollect("Screen_Index");//;
+		bac_label.nSerialNum = q.getIntField("Serial_Num");
+		bac_label.nScreen_index = q.getIntField("Screen_Index");//;
 
-		bac_label.nLabel_index=m_pRs->GetCollect("Label_Index");//
-		bac_label.nMain_Panel = m_pRs->GetCollect("Main_Panel");
-		bac_label.nSub_Panel = m_pRs->GetCollect("Sub_Panel");
-		bac_label.nPoint_type = m_pRs->GetCollect("Point_Type");
-		bac_label.nPoint_number = m_pRs->GetCollect("Point_Number");
-		temp_x_persent = m_pRs->GetCollect("Point_X");
+		bac_label.nLabel_index=q.getIntField("Label_Index");//
+		bac_label.nMain_Panel = q.getIntField("Main_Panel");
+		bac_label.nSub_Panel = q.getIntField("Sub_Panel");
+		bac_label.nPoint_type = q.getIntField("Point_Type");
+		bac_label.nPoint_number = q.getIntField("Point_Number");
+		temp_x_persent = q.getIntField("Point_X");
 		bac_label.nPoint_x = (int)((temp_x_persent*m_paint_right_limit)/1000);
-		temp_y_persent =  m_pRs->GetCollect("Point_Y");
+		temp_y_persent =  q.getIntField("Point_Y");
 		bac_label.nPoint_y = (int)((temp_y_persent*m_paint_botton_limit)/1000);
 
-		bac_label.nclrTxt = m_pRs->GetCollect("Text_Color");
-		bac_label.nDisplay_Type = m_pRs->GetCollect("Display_Type");
+		bac_label.nclrTxt = q.getIntField("Text_Color");
+		bac_label.nDisplay_Type = q.getIntField("Display_Type");
 
-		temp_variant=m_pRs->GetCollect("Icon_Name");//
-		if(temp_variant.vt!=VT_NULL)
+		temp_icon_name=q.getValuebyName(L"Icon_Name");//
+		if(!temp_icon_name.IsEmpty())
 		{
-			temp_icon_name=temp_variant;
+			 
 			char cTemp2[255];
 			WideCharToMultiByte( CP_ACP, 0, temp_icon_name.GetBuffer(), -1, cTemp2, 255, NULL, NULL );
 			memcpy(bac_label.ico_name,cTemp2,10);
@@ -2274,10 +2269,10 @@ bool CBacnetScreenEdit::UpdateDeviceLabelFlash()
 			memset(bac_label.ico_name,0,10);
 		}
 
-		temp_variant=m_pRs->GetCollect("Icon_Name_2");//
-		if(temp_variant.vt!=VT_NULL)
+		temp_icon_name=q.getValuebyName(L"Icon_Name_2");//
+		if(!temp_icon_name)
 		{
-			temp_icon_name=temp_variant;
+			 
 			char cTemp2[255];
 			WideCharToMultiByte( CP_ACP, 0, temp_icon_name.GetBuffer(), -1, cTemp2, 255, NULL, NULL );
 			memcpy(bac_label.ico_name_2,cTemp2,10);
@@ -2289,8 +2284,8 @@ bool CBacnetScreenEdit::UpdateDeviceLabelFlash()
 		}
 
 
-		bac_label.n_iconsize = m_pRs->GetCollect("Icon_Size");
-		bac_label.ntext_place = m_pRs->GetCollect("Icon_Place");
+		bac_label.n_iconsize = q.getIntField("Icon_Size");
+		bac_label.ntext_place =q.getIntField("Icon_Place");
 
 		//for (int j=0;j<BAC_GRPHIC_LABEL_COUNT ; j++)
 		//{
@@ -2318,10 +2313,9 @@ bool CBacnetScreenEdit::UpdateDeviceLabelFlash()
 		m_graphic_label_data.at(ncount).reg.nSerialNum = bac_label.nSerialNum;
 		m_graphic_label_data.at(ncount).reg.nSub_Panel = bac_label.nSub_Panel;
 		ncount ++;
-		m_pRs->MoveNext();
+		q.nextRow();
 	}
-	if(m_pRs->State) 
-		m_pRs->Close();
+	 
 	for (int x=ncount;x< BAC_GRPHIC_LABEL_COUNT;x++)
 	{
 		memset(&m_graphic_label_data.at(x),0,sizeof(Str_label_point));
@@ -2484,24 +2478,22 @@ void CBacnetScreenEdit::OnBnClickedButtonDelete()
 
 	if(AfxMessageBox(_T("Do you really want to delete current label?"),MB_YESNO)==IDYES)
 	{
-		m_pCon.CreateInstance(_T("ADODB.Connection"));
-		m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
-
+		 
+		SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 		Label_information	label;
 		label=m_RelayLabelLst.at(m_nFoucsIndext);
 
 		try
 		{
 			CString strSql;
-			strSql.Format(_T("delete * from Screen_Label where Serial_Num =%i and Tstat_id=%i and  Cstatic_id=%i and Tips='%s'"),label.nSerialNum,label.tstat_id,label.cstatic_id,label.strTips);
-			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+			strSql.Format(_T("delete  from Screen_Label where Serial_Num =%i and Tstat_id=%i and  Cstatic_id=%i and Tips='%s'"),label.nSerialNum,label.tstat_id,label.cstatic_id,label.strTips);
+			SqliteDBT3000.execDML((UTF8MBSTR)strSql);
 		}
 		catch(_com_error *e)
 		{
 			AfxMessageBox(e->ErrorMessage());
 		}
-		if(m_pCon->State) 
-			m_pCon->Close(); 
+		SqliteDBT3000.closedb();
 
 		ReloadLabelsFromDB();
 		Invalidate();
@@ -2520,24 +2512,22 @@ void CBacnetScreenEdit::OnBnClickedButtonDeleteAll()
 		//m_pCon.CreateInstance(_T("ADODB.Connection"));
 		//m_pRs.CreateInstance(_T("ADODB.Recordset"));
 		//m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
-		m_pCon.CreateInstance(_T("ADODB.Connection"));
-		m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
-
+ 
+		SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 		Label_information	label;
 		label=m_RelayLabelLst.at(m_nFoucsIndext);
 
 		try
 		{
 			CString strSql;
-			strSql.Format(_T("delete * from Screen_Label where Serial_Num =%i and Tstat_id=%i and Tips='%s'"),label.nSerialNum,label.tstat_id,label.strTips);
-			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+			strSql.Format(_T("delete   from Screen_Label where Serial_Num =%i and Tstat_id=%i and Tips='%s'"),label.nSerialNum,label.tstat_id,label.strTips);
+			SqliteDBT3000.execDML((UTF8MBSTR)strSql);
 		}
 		catch(_com_error *e)
 		{
 			AfxMessageBox(e->ErrorMessage());
 		}
-		if(m_pCon->State) 
-			m_pCon->Close(); 
+		SqliteDBT3000.closedb();
 
 		ReloadLabelsFromDB();
 		Invalidate();
@@ -2571,7 +2561,7 @@ void CBacnetScreenEdit::SaveBacLabel(int nItem)
 		CString strSql;
 		strSql.Format(_T("update Screen_Bacnet_Label set Point_X=%i,Point_Y=%i where Serial_Num =%i and Screen_Index=%i and  Label_Index=%i"),
 			nLeft_persent,nTop_persent,temp_serial_number,temp_screen,temp_label_index);
-		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+		SqliteDBT3000.execDML((UTF8MBSTR)strSql);
 	}
 	catch(_com_error *e)
 	{

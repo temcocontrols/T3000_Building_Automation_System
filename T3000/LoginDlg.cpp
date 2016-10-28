@@ -47,12 +47,10 @@ void CLoginDlg::OnBnClickedOk()
 	m_psswordEdit.GetWindowText(strPasswordText);
 
 	CString strSql;
-//	str_temp="select * from users where user_name_login = '"+m_user_name
-//		+"' and password_login = '"+m_password+"'";
+     SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 	strSql.Format(_T("select * from users where user_name_login='%s'and password_login='%s'"),strText,strPasswordText);
-	m_pRs->Open(_variant_t(strSql),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);	
-	
-	if(VARIANT_FALSE==m_pRs->EndOfFile)
+	 q = SqliteDBT3000.execQuery((UTF8MBSTR)strSql);
+	if(!q.eof())
 	{//found
 		m_bOk=TRUE;
 		g_buser_log_in=TRUE;
@@ -61,8 +59,7 @@ void CLoginDlg::OnBnClickedOk()
 		else
 			g_UserLevel=1;
 
-	if(m_pRs->State) 
-		m_pRs->Close();
+	 
 	g_strLoginUserName=strText;
 	}
 	else
@@ -71,12 +68,11 @@ void CLoginDlg::OnBnClickedOk()
 		AfxMessageBox(_T("Erro account and passworld!"));
 		g_buser_log_in=FALSE;
 		m_bOk=FALSE;
-		if(m_pRs->State) 
-			m_pRs->Close();
+	 
 		return;
 	}
 
-
+	SqliteDBT3000.closedb();
 	OnOK();
 }
 
@@ -84,9 +80,7 @@ BOOL CLoginDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	m_pCon.CreateInstance("ADODB.Connection");
-	m_pRs.CreateInstance("ADODB.Recordset");//初始化环境
-	m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+	 
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -101,9 +95,6 @@ void CLoginDlg::OnBnClickedCancel()
 void CLoginDlg::OnDestroy()
 {
 	CDialog::OnDestroy();
-	if(m_pRs->State) 
-		m_pRs->Close(); 
-	if(m_pCon->State) 
-		m_pCon->Close();
+	 
 	// TODO: Add your message handler code here
 }

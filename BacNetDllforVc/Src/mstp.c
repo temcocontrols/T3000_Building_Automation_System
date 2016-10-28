@@ -255,12 +255,12 @@ void MSTP_Receive_Frame_FSM(
     volatile struct mstp_port_struct_t *mstp_port)
 {
     MSTP_RECEIVE_STATE receive_state = mstp_port->receive_state;
-    printf_receive
-        ("MSTP Rx: State=%s Data=%02X hCRC=%02X Index=%u EC=%u DateLen=%u Silence=%u\n",
-        mstptext_receive_state(mstp_port->receive_state),
-        mstp_port->DataRegister, mstp_port->HeaderCRC, mstp_port->Index,
-        mstp_port->EventCount, mstp_port->DataLength,
-        mstp_port->SilenceTimer((void *) mstp_port));
+	printf_receive
+		("MSTP Rx: State=%s Data=%02X hCRC=%02X Index=%u EC=%u DateLen=%u Silence=%u\n",
+		mstptext_receive_state(mstp_port->receive_state),
+		mstp_port->DataRegister, mstp_port->HeaderCRC, mstp_port->Index,
+		mstp_port->EventCount, mstp_port->DataLength,
+		mstp_port->SilenceTimer((void *) mstp_port));
     switch (mstp_port->receive_state) {
             /* In the IDLE state, the node waits for the beginning of a frame. */
         case MSTP_RECEIVE_STATE_IDLE:

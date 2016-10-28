@@ -63,7 +63,7 @@ BOOL CBADO::OnInitADOConn()
 	if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下没有building数据库的话，就创建一个
 	{
 
-		HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_BUILDING_DB2), _T("BUILDING_DB"));   
+		HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_BUILDINGDB1), _T("BUILDINGDB"));   
 		HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
 
 

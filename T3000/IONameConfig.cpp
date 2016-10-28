@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "IONameConfig.h"
 #include "afxdialogex.h"
-
+#include "../SQLiteDriver/CppSQLite3.h"
 
 // CIONameConfig dialog
 
@@ -111,23 +111,21 @@ void CIONameConfig::GetAllIOName()
 	{  
 	    m_IONametable.Clear();
 		m_IONametable.put_Cols(19);
-		//m_IONametable.put_Rows(2);
-// 		_ConnectionPtr m_ConTmp;
-// 		_RecordsetPtr m_RsTmp;
-// 		m_ConTmp.CreateInstance("ADODB.Connection");
-// 		m_RsTmp.CreateInstance("ADODB.Recordset");
-// 		m_ConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-		CBADO bado;
-		bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-		bado.OnInitADOConn(); 
+		
+		CppSQLite3DB SqliteDBBuilding;
+		CppSQLite3Table table;
+		CppSQLite3Query q;
+		SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 		/*CString strSerial;
 		strSerial.Format(_T("%d"),g_serialNum);
 		strSerial.Trim();*/
 		CString strsql;
 		strsql.Format(_T("select * from IONAME"));
 		//m_RsTmp->Open((_variant_t)strsql,_variant_t((IDispatch *)m_ConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);	
-		bado.m_pRecordset=bado.OpenRecordset(strsql);
-		int RecordCount=bado.GetRecordCount(bado.m_pRecordset);
+		q = SqliteDBBuilding.execQuery((UTF8MBSTR)strsql);
+		table = SqliteDBBuilding.getTable((UTF8MBSTR)strsql);
+		int RecordCount=table.numRows();
 		m_IONametable.put_Rows(RecordCount+1); 
 		m_IONametable.put_TextMatrix(0,0,_T("NO"));
 		m_IONametable.put_TextMatrix(0,1,_T("SERIAL_ID"));
@@ -152,7 +150,7 @@ void CIONameConfig::GetAllIOName()
 
 	
 		int row=0;	CString index;
-		while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+		while(!q.eof())
 		{
 		    index.Format(_T("%d"),++row);
 			m_IONametable.put_TextMatrix(row,0,index);
@@ -161,139 +159,86 @@ void CIONameConfig::GetAllIOName()
 			str_temp.Empty();
 			_variant_t temp_variant;
 
-			temp_variant=bado.m_pRecordset->GetCollect("SERIAL_ID");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("");
+		 
 			//g_strSensorName=str_temp;
+			str_temp = q.getValuebyName(L"SERIAL_ID");
 			m_IONametable.put_TextMatrix(row,1,str_temp);
 
 
-			temp_variant=bado.m_pRecordset->GetCollect("SENSORNAME");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("SENSORNAME");
+			 
+				str_temp = q.getValuebyName(L"SENSORNAME",L"SENSORNAME");
 			m_IONametable.put_TextMatrix(row,2,str_temp);
 
 
-			temp_variant=bado.m_pRecordset->GetCollect("INPUT1");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Input 1");
+			 
 			//g_strInName1=str_temp;
+			str_temp = q.getValuebyName(L"INPUT1",L"Input 1");
 			 m_IONametable.put_TextMatrix(row,3,str_temp);
 
-			temp_variant=bado.m_pRecordset->GetCollect("INPUT2");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Input 2");
-			//g_strInName2=str_temp;
+			  
+			str_temp = q.getValuebyName(L"INPUT2",L"Input 2");
 			 m_IONametable.put_TextMatrix(row,4,str_temp);
 
-			temp_variant=bado.m_pRecordset->GetCollect("INPUT3");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Input 3");
+			 
+
+				str_temp = q.getValuebyName(L"INPUT3",L"Input 3");
 			  m_IONametable.put_TextMatrix(row,5,str_temp);
 
-			temp_variant=bado.m_pRecordset->GetCollect("INPUT4");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Input 4");
+		 
+				str_temp = q.getValuebyName(L"INPUT4",L"Input 4");
 		  m_IONametable.put_TextMatrix(row,6,str_temp);
 
-			temp_variant=bado.m_pRecordset->GetCollect("INPUT5");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Input 5");
+		 
+				str_temp = q.getValuebyName(L"INPUT5",L"Input 5");
 		  m_IONametable.put_TextMatrix(row,7,str_temp);
 
-			temp_variant=bado.m_pRecordset->GetCollect("INPUT6");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Input 6");
+		 
+				str_temp = q.getValuebyName(L"INPUT6",L"Input 6");
 			  m_IONametable.put_TextMatrix(row,8,str_temp);
 
-			temp_variant=bado.m_pRecordset->GetCollect("INPUT7");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Input 7");
+			 
+				str_temp = q.getValuebyName(L"INPUT7",L"Input 7");
 		  m_IONametable.put_TextMatrix(row,9,str_temp);
 
-			temp_variant=bado.m_pRecordset->GetCollect("INPUT8");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Input 8");
+			 
+				str_temp = q.getValuebyName(L"INPUT8",L"Input 8");
 		  m_IONametable.put_TextMatrix(row,10,str_temp);
 
-			temp_variant=bado.m_pRecordset->GetCollect("INPUT9");
 		 
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Humidity Sensor");
+				str_temp = q.getValuebyName(L"INPUT9",L"Humidity Sensor");
 			  m_IONametable.put_TextMatrix(row,11,str_temp);
 
 			 
 
 
-			temp_variant=bado.m_pRecordset->GetCollect("OUTPUT1");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Output 1");
+		 
+
+			str_temp = q.getValuebyName(L"OUTPUT1",L"Output 1");
 			 m_IONametable.put_TextMatrix(row,12,str_temp);
 
-			temp_variant=bado.m_pRecordset->GetCollect("OUTPUT2");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Output 2");
+			 
+				str_temp = q.getValuebyName(L"OUTPUT2",L"Output 2");
 			 m_IONametable.put_TextMatrix(row,13,str_temp);
 
-			temp_variant=bado.m_pRecordset->GetCollect("OUTPUT3");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Output 3");
-			 m_IONametable.put_TextMatrix(row,14,str_temp);
+							
 
-			temp_variant=bado.m_pRecordset->GetCollect("OUTPUT4");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Output 4");
+	 
+				 str_temp = q.getValuebyName(L"OUTPUT3",L"Output 3");
+			 m_IONametable.put_TextMatrix(row,14,str_temp);
+			
+			 
+				str_temp = q.getValuebyName(L"OUTPUT4",L"Output 4");
 			 m_IONametable.put_TextMatrix(row,15,str_temp);
 
-			temp_variant=bado.m_pRecordset->GetCollect("OUTPUT5");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Output 5");
+			str_temp = q.getValuebyName(L"OUTPUT5",L"Output 5");
 			 m_IONametable.put_TextMatrix(row,16,str_temp);
 
-			temp_variant=bado.m_pRecordset->GetCollect("OUTPUT6");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Output 6");
+			 
+				str_temp = q.getValuebyName(L"OUTPUT6",L"Output 6");
 			 m_IONametable.put_TextMatrix(row,17,str_temp);
 
-			temp_variant=bado.m_pRecordset->GetCollect("OUTPUT7");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Output 7");
+			 
+				str_temp = q.getValuebyName(L"OUTPUT7",L"Output 7");
 			 m_IONametable.put_TextMatrix(row,18,str_temp);
 
 			 
@@ -304,16 +249,11 @@ void CIONameConfig::GetAllIOName()
 
 
 
-			 bado.m_pRecordset->MoveNext();
+			 q.nextRow();
 			
 		}
 		
-		/*if(m_RsTmp->State) 
-			m_RsTmp->Close(); 
-		if(m_ConTmp->State)
-			m_ConTmp->Close();	*/
-		bado.CloseRecordset();
-		bado.CloseConn();
+		 SqliteDBBuilding.closedb();
 	}
 	catch (...)
 	{
@@ -332,15 +272,11 @@ void CIONameConfig::OnEnKillfocusNameedit()
 	} 
 	else
 	{
-		//_ConnectionPtr m_pCon;
-		//_RecordsetPtr m_pRs;
-		//::CoInitialize(NULL);
-		//m_pCon.CreateInstance("ADODB.Connection");
-		//m_pRs.CreateInstance(_T("ADODB.Recordset"));
-		//m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-		CBADO bado;
-		bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-		bado.OnInitADOConn(); 
+		CppSQLite3DB SqliteDBBuilding;
+		CppSQLite3Table table;
+		CppSQLite3Query q;
+		SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 		try
 		{
 		    CString strSql;BOOL is_exist=FALSE;	  CString str_temp;
@@ -348,12 +284,13 @@ void CIONameConfig::OnEnKillfocusNameedit()
 			{
 			  strSql.Format(_T("select * from IONAME where SERIAL_ID='%s'"),m_newname);
 			 // m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-			 bado.m_pRecordset=bado.OpenRecordset(strSql);
-			  if(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+			  q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+
+			  if(q.eof())
 			  {
 			   is_exist=TRUE;
 			  }
-			  bado.CloseRecordset();
+			 
 				//m_pRs->Close();
 			  if (is_exist)
 			  {
@@ -365,7 +302,7 @@ void CIONameConfig::OnEnKillfocusNameedit()
 			  else
 			  {
 				  strSql.Format(_T("update IONAME set SERIAL_ID='%s' where SERIAL_ID='%s'"),m_newname,m_oldname);
-				  bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+				  SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 				  m_changed=TRUE;
 				// GetAllIOName();  
 			  }
@@ -393,7 +330,7 @@ void CIONameConfig::OnEnKillfocusNameedit()
 			   Output7=m_IONametable.get_TextMatrix(m_nCurRow,18);
 
 			   strSql.Format(_T("update IONAME set SENSORNAME='%s', INPUT1='%s',INPUT2='%s',INPUT3='%s',INPUT4='%s',INPUT5='%s',INPUT6='%s',INPUT7='%s',INPUT8='%s',INPUT9='%s',OUTPUT1='%s',OUTPUT2='%s',OUTPUT3='%s',OUTPUT4='%s',OUTPUT5='%s',OUTPUT6='%s',OUTPUT7='%s'  where SERIAL_ID='%s'"),SName,Input1,Input2,Input3,Input4,Input5,Input6,Input7,Input8,Input9,Output1,Output2,Output3,Output4,Output5,Output6,Output7,SerialNo);
-			   bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+			  SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 			   m_changed=TRUE;
 			   
 
@@ -404,11 +341,11 @@ void CIONameConfig::OnEnKillfocusNameedit()
 			/* AfxMessageBox(e.Description());*/
 			//MessageBox(m_name_new+_T("  has been here\n Please change another name!"));
 
-			bado.CloseConn();
+			SqliteDBBuilding.closedb();
 			//bado.m_pConnection->Close();
 			return ;
 		}
-		bado.CloseConn();
+		SqliteDBBuilding.closedb();
 	 	 GetAllIOName(); 
 	}
 }
@@ -432,9 +369,11 @@ void CIONameConfig::GetIOName()
 	{
 
 
-		CBADO bado;
-		bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-		bado.OnInitADOConn();
+		CppSQLite3DB SqliteDBBuilding;
+		CppSQLite3Table table;
+		CppSQLite3Query q;
+		SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 
 		CString strSerial;
 		strSerial.Format(_T("%d"),g_serialNum);
@@ -442,131 +381,85 @@ void CIONameConfig::GetIOName()
 		CString strsql;
 		strsql.Format(_T("select * from IONAME where SERIAL_ID = '%s'"),strSerial);
 		//m_RsTmp->Open((_variant_t)strsql,_variant_t((IDispatch *)m_ConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);	
-		bado.m_pRecordset=bado.OpenRecordset(strsql);
-		if(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+		q = SqliteDBBuilding.execQuery((UTF8MBSTR)strsql);
+		if(!q.eof())
 		{	
 			CString str_temp;
 			str_temp.Empty();
 			_variant_t temp_variant;
 
-			temp_variant=bado.m_pRecordset->GetCollect("SENSORNAME");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Internal Sensor");
-			g_strSensorName=str_temp;
+		 
+				str_temp = q.getValuebyName(L"SENSORNAME",L"Internal Sensor");
+			   g_strSensorName=str_temp;
 
-			temp_variant=bado.m_pRecordset->GetCollect("INPUT1");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Input 1");
+			 
+			str_temp = q.getValuebyName(L"INPUT1",L"Input 1");
 			g_strInName1=str_temp;
 
-			temp_variant=bado.m_pRecordset->GetCollect("INPUT2");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Input 2");
+		 
+				str_temp = q.getValuebyName(L"INPUT2",L"Input 2");
 			g_strInName2=str_temp;
 
-			temp_variant=bado.m_pRecordset->GetCollect("INPUT3");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Input 3");
+			 
+				str_temp = q.getValuebyName(L"INPUT3",L"Input 3");
 			g_strInName3=str_temp;
 
-			temp_variant=bado.m_pRecordset->GetCollect("INPUT4");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Input 4");
+			 
+				str_temp = q.getValuebyName(L"INPUT4",L"Input 4");
 			g_strInName4=str_temp;
 
-			temp_variant=bado.m_pRecordset->GetCollect("INPUT5");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Input 5");
+			 
+				str_temp = q.getValuebyName(L"INPUT5",L"Input 5");
 			g_strInName5=str_temp;
 
-			temp_variant=bado.m_pRecordset->GetCollect("INPUT6");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Input 6");
+			 
+				str_temp = q.getValuebyName(L"INPUT6",L"Input 6");
 			g_strInName6=str_temp;
 
-			temp_variant=bado.m_pRecordset->GetCollect("INPUT7");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Input 7");
+			 
+				str_temp = q.getValuebyName(L"INPUT7",L"Input 7");
 			g_strInName7=str_temp;
 
-			temp_variant=bado.m_pRecordset->GetCollect("INPUT8");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Input 8");
+			 
+				str_temp = q.getValuebyName(L"INPUT8",L"Input 8");
 			g_strInName8=str_temp;
 
-			temp_variant=bado.m_pRecordset->GetCollect("INPUT9");
-			//	temp_variant=m_RsTmp->GetCollect("Humidity Sensor");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Humidity Sensor");
+			 
+
+				str_temp = q.getValuebyName(L"INPUT9",L"Humidity Sensor");
 			g_strInHumName=str_temp;
 
-			temp_variant=bado.m_pRecordset->GetCollect("OUTPUT1");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Output 1");
+		 
+
+				str_temp = q.getValuebyName(L"OUTPUT1",L"Output 1");
 			g_strOutName1=str_temp;
 
-			temp_variant=bado.m_pRecordset->GetCollect("OUTPUT2");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Output 2");
+		 
+
+				str_temp = q.getValuebyName(L"OUTPUT2",L"Output 2");
 			g_strOutName2=str_temp;
 
-			temp_variant=bado.m_pRecordset->GetCollect("OUTPUT3");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Output 3");
+	 
+
+				str_temp = q.getValuebyName(L"OUTPUT3",L"Output 3");
 			g_strOutName3=str_temp;
 
-			temp_variant=bado.m_pRecordset->GetCollect("OUTPUT4");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Output 4");
+		 
+
+				str_temp = q.getValuebyName(L"OUTPUT4",L"Output 4");
 			g_strOutName4=str_temp;
 
-			temp_variant=bado.m_pRecordset->GetCollect("OUTPUT5");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Output 5");
+			 
+
+				str_temp = q.getValuebyName(L"OUTPUT5",L"Output 5");
 			g_strOutName5=str_temp;
 
-			temp_variant=bado.m_pRecordset->GetCollect("OUTPUT6");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Output 6");
+			 
+				str_temp = q.getValuebyName(L"OUTPUT6",L"Output 6");
 			g_strOutName6=str_temp;
 
-			temp_variant=bado.m_pRecordset->GetCollect("OUTPUT7");
-			if(temp_variant.vt!=VT_NULL)
-				str_temp=temp_variant;
-			else
-				str_temp=_T("Output 7");
+		 
+				str_temp = q.getValuebyName(L"OUTPUT7",L"Output 7");
 			g_strOutName7=str_temp;
 
 			g_strInHumName = _T("Humidity Sensor");
@@ -598,12 +491,8 @@ void CIONameConfig::GetIOName()
 
 
 		}
-		bado.CloseRecordset();
-		bado.CloseConn();
-		/*if(m_RsTmp->State) 
-			m_RsTmp->Close(); 
-		if(m_ConTmp->State)
-			m_ConTmp->Close();*/	
+		SqliteDBBuilding.closedb();
+		 	
 
 	}
 	catch (...)

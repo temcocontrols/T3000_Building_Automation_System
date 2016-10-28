@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "T38AI8AO.h"
-#include "ado/ADO.h"
+ #include "../SQLiteDriver/CppSQLite3.h"
  #include "Dialog_Progess.h"
 #include "globle_function.h"
 #include "MainFrm.h"
@@ -221,25 +221,22 @@ void T38AI8AO::OnInitialUpdate()
 void T38AI8AO::InitialRegister(){
     T3Register temp;
 	g_VectorT3Register.clear();
-	CADO m_ado;
-	m_ado.OnInitADOConn();
+	CppSQLite3DB SqliteDBT3000;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 #if 1
 	CString SQL = _T("select * from T3_RegisterList");
-	m_ado.m_pRecordset = m_ado.OpenRecordset(SQL);
+	q = SqliteDBT3000.execQuery((UTF8MBSTR)SQL);
 	_variant_t vartemp;
-	while(!m_ado.m_pRecordset->EndOfFile)
+	while(!q.eof())
 	{
-		temp.regID=m_ado.m_pRecordset->GetCollect(_T("RegID"));
-		vartemp =m_ado.m_pRecordset->GetCollect(_T("T3-8AI8AO"));
-		if (vartemp.vt==VT_NULL)
-			temp.regName=_T("");
-		else
-			temp.regName =vartemp;
-		m_ado.m_pRecordset->MoveNext();
+		temp.regID=q.getIntField("RegID");
+		temp.regName =q.getValuebyName(L"T3-8AI8AO");
+		q.nextRow();
 		g_VectorT3Register.push_back(temp);
 	}
-	m_ado.CloseRecordset();
-	m_ado.CloseConn();
+	SqliteDBT3000.closedb();
 	SN_LOW=Get_RegID(_T("SN_LOW"))	;
 	SN_HI=Get_RegID(_T("SN_HI"))	;
 	EPROM_VER_NUMBER=Get_RegID(_T("EPROM_VER_NUMBER"))	;

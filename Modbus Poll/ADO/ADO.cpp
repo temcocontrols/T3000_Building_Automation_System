@@ -3,6 +3,7 @@
 // #ifdef _DEBUG
 // #ifndef _WIN64
 #define FOR_DATABASE_CONNECT					_T("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=")
+#define SQLITE_DRIVER _T("DRIVER=SQLite3 ODBC Driver;LongNames=0;Timeout=1000;NoTXN=0;SyncPragma = NORMAL; StepAPI = 0;Database=")
 // #else
 // #pragma comment(lib,"json/json_mtd_x64.lib")
 // #define FOR_DATABASE_CONNECT					_T("Provider=Microsoft Office 12.0 Access Database Engine OLE DB Provider;Data Source=")
@@ -46,8 +47,10 @@ BOOL CADO::OnInitADOConn()
 		g_strDatabasefilepath=exeFullPath;
 		g_strExePth=g_strDatabasefilepath;
 		CreateDirectory(g_strExePth+_T("Database"),NULL);//creat database folder;
-		g_strOrigDatabaseFilePath=g_strExePth+_T("t3000.mdb");
-		g_strDatabasefilepath+=_T("Database\\t3000.mdb");
+		/*g_strOrigDatabaseFilePath=g_strExePth+_T("t3000.mdb");
+		g_strDatabasefilepath+=_T("Database\\t3000.mdb");*/
+		//g_strDatabasefilepath+=_T("Database\\T3000.db");
+
 
 
 		HANDLE hFind;
@@ -64,7 +67,8 @@ BOOL CADO::OnInitADOConn()
 		FindClose(hFind);
 
 
-		g_strDatabasefilepath=(CString)FOR_DATABASE_CONNECT+g_strDatabasefilepath;
+		//g_strDatabasefilepath=(CString)FOR_DATABASE_CONNECT+g_strDatabasefilepath;
+		g_strDatabasefilepath = (CString)SQLITE_DRIVER+g_strDatabasefilepath+L";";
 		g_strImgeFolder=g_strExePth+_T("Database\\image\\");
 		CreateDirectory(g_strImgeFolder,NULL);
 
@@ -73,12 +77,17 @@ BOOL CADO::OnInitADOConn()
 
 
 		m_pConnection.CreateInstance("ADODB.Connection");
-	 
-		m_pConnection->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+
+		//hRes = Conn->Open(TEXT("DRIVER=SQLite3 ODBC Driver;Database=d:\\test.db;LongNames=0;Timeout=1000;NoTXN=0;SyncPragma = NORMAL; StepAPI = 0;"), _bstr_t(""), _bstr_t(""), adOpenUnspecified);
+		//m_pConnection->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+	/*	Provider=MSDASQL.1;Persist Security Info=False;Extended Properties="Driver={SQLite3 ODBC Driver};Database=C:\\SQLLite\\demo.db;StepAPI=0;SyncPragma=;NoTXN=0;Timeout=;ShortNames=0;LongNames=0;NoCreat=0;NoWCHAR=1;FKSupport=0;JournalMode=;LoadExt=;" 
+*/
+       /*_bstr_t strConnect = "Provider=MSDASQL.1;Persist Security Info=False;User ID=admin;Extended Properties=\"Driver = { SQLite3 ODBC Driver }; Database = C:\\T3000.db; StepAPI = 0; SyncPragma = ; NoTXN = 0; Timeout = ; ShortNames = 0; LongNames = 0; NoCreat = 0; NoWCHAR = 1; FKSupport = 0; JournalMode = ; OEMCP = 0; LoadExt = ; BigInt = 0; JDConv = 0; \"";
+		m_pConnection->Open(strConnect,"","",adModeUnknown);*/
 	}
 	catch(_com_error e)
 	{
-		//AfxMessageBox(e.Description());
+		AfxMessageBox(e.Description());
         return FALSE;
 	}
 

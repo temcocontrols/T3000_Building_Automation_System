@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "ProductRegisterListView.h"
-#include "ado/ADO.h"
+ #include "../SQLiteDriver/CppSQLite3.h"
 #include <bitset>
 #include "WriteRegistersValueDlg.h"
    CustomProductTable_T g_current_Node;
@@ -431,8 +431,10 @@ void CProductRegisterListView::LoadDataSheet(){
     _variant_t temp_variant ;
    int ProductModel = m_current_tree_node.product_class_id;
    CustomProductTable_T Struc_Temp;
-   CADO ado;
-   ado.OnInitADOConn(); 
+   CppSQLite3DB SqliteDBT3000;
+   CppSQLite3Query q;
+   SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+
    if (m_sort_type == 0)
    {  
     StrSql.Format(_T("Select * From CustomProductTable Where ModelNo = %d  "),ProductModel);
@@ -451,59 +453,33 @@ void CProductRegisterListView::LoadDataSheet(){
                                                       // 
   
     m_register_data_sheet.clear();
-   ado.m_pRecordset = ado.OpenRecordset(StrSql);
-   
-   while(VARIANT_FALSE==ado.m_pRecordset->EndOfFile)
+  
+   q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
+   while(!q.eof())
    {
-       temp_variant=ado.m_pRecordset->GetCollect("ModelNo");//
-       if(temp_variant.vt!=VT_NULL)
-           Struc_Temp.ModelNo=temp_variant;
-       else
-           Struc_Temp.ModelNo=-1;
+       Struc_Temp.ModelNo=q.getIntField("ModelNo",-1);//
+       Struc_Temp.Reg_Description=q.getValuebyName(L"Reg_Description");//
+       Struc_Temp.Reg_ID=q.getIntField("Reg_ID",-1);//
+        
 
-       temp_variant=ado.m_pRecordset->GetCollect("Reg_Description");//
-       if(temp_variant.vt!=VT_NULL)
-           Struc_Temp.Reg_Description=temp_variant;
-       else
-           Struc_Temp.Reg_Description=_T("");
+       Struc_Temp.Para_Type=q.getValuebyName(L"Para_Type");//
+      
 
-       temp_variant=ado.m_pRecordset->GetCollect("Reg_ID");//
-       if(temp_variant.vt!=VT_NULL)
-           Struc_Temp.Reg_ID=temp_variant;
-       else
-           Struc_Temp.Reg_ID=-1;
+        Struc_Temp.Counts_Number=q.getIntField("Counts_Number");//
+       
 
-       temp_variant=ado.m_pRecordset->GetCollect("Para_Type");//
-       if(temp_variant.vt!=VT_NULL)
-           Struc_Temp.Para_Type=temp_variant;
-       else
-           Struc_Temp.Para_Type=_T("");
-
-       temp_variant=ado.m_pRecordset->GetCollect("Counts_Number");//
-       if(temp_variant.vt!=VT_NULL)
-           Struc_Temp.Counts_Number=temp_variant;
-       else
-           Struc_Temp.Counts_Number=-1;
-
-       temp_variant=ado.m_pRecordset->GetCollect("Property");//
-       if(temp_variant.vt!=VT_NULL)
-           Struc_Temp.Property=temp_variant;
-       else
-           Struc_Temp.Property=_T("");
+       Struc_Temp.Property=q.getValuebyName(L"Property");//
+     
             
-       temp_variant=ado.m_pRecordset->GetCollect("DataFormat");//
-       if(temp_variant.vt!=VT_NULL)
-           Struc_Temp.DataFormat=temp_variant;
-       else
-           Struc_Temp.DataFormat=_T("Unsigned");
+       Struc_Temp.DataFormat=q.getValuebyName(L"DataFormat");//
+       
                 
            m_register_data_sheet.push_back(Struc_Temp);
           
-           ado.m_pRecordset->MoveNext();
+           q.nextRow();
    }
 
-   ado.CloseRecordset();
-   ado.CloseConn();
+ SqliteDBT3000.closedb();
 }
 LRESULT CProductRegisterListView::Fresh_Input_List(WPARAM wParam,LPARAM lParam){
   	
@@ -634,8 +610,9 @@ LRESULT CProductRegisterListView::Change_Input_Item(WPARAM wParam,LPARAM lParam)
     CustomProductTable_T Struct_Temp;
   /*  if (lCol == 0)
     {*/
-    CADO ado;
-    ado.OnInitADOConn();
+	CppSQLite3DB SqliteDBT3000;
+	CppSQLite3Query q;
+	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
        if (is_last)
        {
           if (Reg_ID.IsEmpty())//最后一行，发现Address 是空的，就给出提示，确保Address必须存在，而且不能重复
@@ -648,20 +625,19 @@ LRESULT CProductRegisterListView::Change_Input_Item(WPARAM wParam,LPARAM lParam)
          if (lCol == 0){
             
              StrSql.Format(_T("Select * From CustomProductTable Where ModelNo = %d and Reg_ID = %d "),ProductModel,_wtoi(Reg_ID));
-             ado.m_pRecordset = ado.OpenRecordset(StrSql);
-             if(VARIANT_FALSE==ado.m_pRecordset->EndOfFile){
+             q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
+             if(!q.eof()){
                  CString strTips;
                  strTips.Format(_T("Address=%s,Exists!"),Reg_ID);
                  AfxMessageBox(strTips);
-                 ado.CloseRecordset();
-                 ado.CloseConn();
+                SqliteDBT3000.closedb();
                  m_register_list.SetItemText(lRow,lCol,_T(""));
                  return 0;
              }
-             ado.CloseRecordset();
+             
              StrSql.Format(_T("Insert INTO CustomProductTable(ModelNo,Reg_ID,Reg_Description,Para_Type,Property,Counts_Number,DataFormat) VALUES (%d,%d,'','','%s',%d,'%s')")
                                 ,ProductModel,_wtoi(Reg_ID),m_string_property,m_short_counts,m_string_dataformat);
-             ado.m_pConnection->Execute(StrSql.GetString(),NULL,adCmdText);
+             SqliteDBT3000.execDML((UTF8MBSTR)StrSql);
              
               Struct_Temp.ModelNo =  ProductModel;
               Struct_Temp.Reg_ID =  _wtoi(Reg_ID);
@@ -700,7 +676,7 @@ LRESULT CProductRegisterListView::Change_Input_Item(WPARAM wParam,LPARAM lParam)
             {
                 if (Reg_ID.IsEmpty())
                 {
-                     StrSql.Format(_T("Delete * From CustomProductTable Where ModelNo = %d and Reg_ID = %d"), ProductModel,m_register_data_sheet.at(lRow).Reg_ID); 
+                     StrSql.Format(_T("Delete   From CustomProductTable Where ModelNo = %d and Reg_ID = %d"), ProductModel,m_register_data_sheet.at(lRow).Reg_ID); 
                      m_ischange =FALSE;   
                 }
                 else
@@ -715,7 +691,7 @@ LRESULT CProductRegisterListView::Change_Input_Item(WPARAM wParam,LPARAM lParam)
                 StrSql.Format(_T("Update  CustomProductTable  Set Para_Type = '%s' ,Counts_Number = %d ,Property = '%s' ,Reg_Description = '%s',DataFormat='%s'  Where ModelNo = %d and Reg_ID = %d"),
                     Para_Type,_wtoi(Counts_Number),Property,Reg_Description,StrDataFormat,ProductModel,_wtoi(Reg_ID));
             }
-             ado.m_pConnection->Execute(StrSql.GetString(),NULL,adCmdText);
+             SqliteDBT3000.execDML((UTF8MBSTR)StrSql);
              if (m_ischange)
              {
                 m_register_data_sheet.at(lRow).Para_Type = Para_Type ;
@@ -732,7 +708,7 @@ LRESULT CProductRegisterListView::Change_Input_Item(WPARAM wParam,LPARAM lParam)
              }
                     
        }
-       ado.CloseConn();
+       SqliteDBT3000.closedb();
        //LoadDataSheet();
        
    

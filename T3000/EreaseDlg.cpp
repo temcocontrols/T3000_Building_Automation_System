@@ -5,7 +5,8 @@
 #include "T3000.h"
 #include "EreaseDlg.h"
 #include "globle_function.h"
-#include "ado/ADO.h"
+#include "../SQLiteDriver/CppSQLite3.h"
+
 #include "MainFrm.h"
 
 // CEreaseDlg dialog
@@ -69,13 +70,16 @@ void CEreaseDlg::OnBnClickedMyOk()
 
         if (ret>0)
         {
-            CBADO bado;
-            bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-            bado.OnInitADOConn();
+			CppSQLite3DB SqliteDBBuilding;
+			CppSQLite3Table table;
+			CppSQLite3Query q;
+			SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
             CString sql;
             sql.Format(_T("select * from ALL_NODE where Serial_ID='%d' "),serialno);
-            bado.m_pRecordset = bado.OpenRecordset(sql);
-            int Recount=bado.GetRecordCount(bado.m_pRecordset);
+			q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
+			table = SqliteDBBuilding.getTable((UTF8MBSTR)sql);
+            int Recount=table.numRows();
             if (Recount<=0)
             {
                 CString strTips;
@@ -83,9 +87,8 @@ void CEreaseDlg::OnBnClickedMyOk()
                 AfxMessageBox(strTips);
                 return;
             }
-            bado.m_pRecordset->MoveFirst();
-            while(!bado.m_pRecordset->EndOfFile)
-            {
+            
+            
                 CString prodcut_name,product_id,screen_name;
                 prodcut_name.Format(_T("%s:%d--%d"),GetProductName(product_register_value[7]),serialno,ID);
                 product_id.Format(_T("%d"),ID);
@@ -93,12 +96,15 @@ void CEreaseDlg::OnBnClickedMyOk()
 
 				  try 
 				  {
-					  bado.m_pRecordset->PutCollect("Product_name",(_bstr_t)(prodcut_name));
-					  bado.m_pRecordset->PutCollect("Product_ID",(_bstr_t)(product_id));
-					  bado.m_pRecordset->PutCollect("Screen_Name",(_bstr_t)(screen_name));
-					  bado.m_pRecordset->Update();
-					  bado.m_pRecordset->MoveNext();
-
+				 
+					  CString strSql;
+					  strSql.Format(_T("Update ALL_NODE set Product_name = '%s' ,Product_ID = '%s' ,Screen_Name = '%s'  where Serial_ID='%d' "),
+					                 prodcut_name,
+									  product_id,
+									  screen_name,
+									  serialno);
+					
+					SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 				  }
 				  catch(...)
 				  {
@@ -109,9 +115,8 @@ void CEreaseDlg::OnBnClickedMyOk()
 
 				  CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 				  ::PostMessage(pFrame->m_hWnd,WM_MYMSG_REFRESHBUILDING,0,0);
-			  }
-			  bado.CloseRecordset();
-			  bado.CloseConn();
+			 
+			SqliteDBBuilding.closedb();
 			} 
 			else
 			{

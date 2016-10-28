@@ -60,10 +60,10 @@ void CBuildingConfigEditDlg::OnBnClickedOk()
 {
 	 
 	 UpdateData(TRUE);
-	 if (m_strZip.IsEmpty())
-	 {
-		return ;
-	 }
+// 	 if (m_strZip.IsEmpty())
+// 	 {
+// 		return ;
+// 	 }
 	 
 	 m_currentBuilding.MainBuildingName = m_strBuildingName;
 	 m_currentBuilding.city = m_strCity;
@@ -73,7 +73,7 @@ void CBuildingConfigEditDlg::OnBnClickedOk()
 	 m_currentBuilding.Longitude = m_strlongitude;
 	 m_currentBuilding.state = m_strstate;
 	 m_currentBuilding.street = m_strstreet;
-	 m_currentBuilding.Zip = _wtoi(m_strZip);
+	
 	 m_currentBuilding.EngineeringUnits = m_strEngineeringUnits;
 	 CDialog::OnOK();
 }
@@ -88,7 +88,7 @@ void CBuildingConfigEditDlg::BoundDataUpdate()
 	m_strlongitude = m_currentBuilding.Longitude;
 	m_strstate = m_currentBuilding.state;
 	m_strstreet = m_currentBuilding.street;
-	m_strZip.Format(_T("%d"),m_currentBuilding.Zip);
+	
 	if(!m_currentBuilding.EngineeringUnits.IsEmpty())
 	{
 		m_strEngineeringUnits = m_currentBuilding.EngineeringUnits;

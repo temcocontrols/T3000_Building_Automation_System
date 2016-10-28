@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "T332AI.h"
 #include "Dialog_Progess.h"
-#include "ado/ADO.h"
+ 
 #include "globle_function.h"
 #include "MainFrm.h"
 // T332AI
@@ -170,141 +170,7 @@ void T332AI::Initial_RegisterList()
 	INPUT32	=	131	;
 
 #endif
-	T3Register temp;
-	CADO m_ado;
-	m_ado.OnInitADOConn();
-#if 1
-	CString SQL = _T("select * from T3_RegisterList");
-	m_ado.m_pRecordset = m_ado.OpenRecordset(SQL);
-	_variant_t vartemp;
-	while(!m_ado.m_pRecordset->EndOfFile)
-	{
-		temp.regID=m_ado.m_pRecordset->GetCollect(_T("RegID"));
-		vartemp =m_ado.m_pRecordset->GetCollect(_T("T3-32AI"));
-		if (vartemp.vt==VT_NULL)
-			temp.regName=_T("");
-		else
-			temp.regName =vartemp;
-		m_ado.m_pRecordset->MoveNext();
-		m_vecT3Register.push_back(temp);
-	}
-	m_ado.CloseRecordset();
-	m_ado.CloseConn();
-#endif 
-
-
-#if 1
-	SN_LOW	=	Get_RegID(_T("	SN_LOW	"))	;
-	SN_HI	=	Get_RegID(_T("	SN_HI	"))	;
-	EPROM_VER_NUMBER	=	Get_RegID(_T("	EPROM_VER_NUMBER	"))	;
-	FIRMWARE_VER_NUMBER	=	Get_RegID(_T("	FIRMWARE_VER_NUMBER	"))	;
-	MODBUS_ID	=	Get_RegID(_T("	MODBUS_ID	"))	;
-	PRODUCT_MODEL	=	Get_RegID(_T("	PRODUCT_MODEL	"))	;
-	HARDWARE_VER_NUMBER	=	Get_RegID(_T("	HARDWARE_VER_NUMBER	"))	;
-	PIC_VER_NUMBER	=	Get_RegID(_T("	PIC_VER_NUMBER	"))	;
-	CALIBRATION_OUTPUTS	=	Get_RegID(_T("	CALIBRATION_OUTPUTS	"))	;
-	BAUDRATE	=	Get_RegID(_T("	BAUDRATE	"))	;
-	RESPONSE_DELAY	=	Get_RegID(_T("	RESPONSE_DELAY	"))	;
-	INPUT1	=	Get_RegID(_T("	INPUT1	"))	;
-	INPUT2	=	Get_RegID(_T("	INPUT2	"))	;
-	INPUT3	=	Get_RegID(_T("	INPUT3	"))	;
-	INPUT4	=	Get_RegID(_T("	INPUT4	"))	;
-	INPUT5	=	Get_RegID(_T("	INPUT5	"))	;
-	INPUT6	=	Get_RegID(_T("	INPUT6	"))	;
-	INPUT7	=	Get_RegID(_T("	INPUT7	"))	;
-	INPUT8	=	Get_RegID(_T("	INPUT8	"))	;
-	INPUT9	=	Get_RegID(_T("	INPUT9	"))	;
-	INPUT10	=	Get_RegID(_T("	INPUT10	"))	;
-	INPUT11	=	Get_RegID(_T("	INPUT11	"))	;
-	INPUT12	=	Get_RegID(_T("	INPUT12	"))	;
-	INPUT13	=	Get_RegID(_T("	INPUT13	"))	;
-	INPUT14	=	Get_RegID(_T("	INPUT14	"))	;
-	INPUT15	=	Get_RegID(_T("	INPUT15	"))	;
-	INPUT16	=	Get_RegID(_T("	INPUT16	"))	;
-	INPUT17	=	Get_RegID(_T("	INPUT17	"))	;
-	INPUT18	=	Get_RegID(_T("	INPUT18	"))	;
-	INPUT19	=	Get_RegID(_T("	INPUT19	"))	;
-	INPUT20	=	Get_RegID(_T("	INPUT20	"))	;
-	INPUT21	=	Get_RegID(_T("	INPUT21	"))	;
-	INPUT22	=	Get_RegID(_T("	INPUT22	"))	;
-	INPUT23	=	Get_RegID(_T("	INPUT23	"))	;
-	INPUT24	=	Get_RegID(_T("	INPUT24	"))	;
-	INPUT25	=	Get_RegID(_T("	INPUT25	"))	;
-	INPUT26	=	Get_RegID(_T("	INPUT26	"))	;
-	INPUT27	=	Get_RegID(_T("	INPUT27	"))	;
-	INPUT28	=	Get_RegID(_T("	INPUT28	"))	;
-	INPUT29	=	Get_RegID(_T("	INPUT29	"))	;
-	INPUT30	=	Get_RegID(_T("	INPUT30	"))	;
-	INPUT31	=	Get_RegID(_T("	INPUT31	"))	;
-	INPUT32	=	Get_RegID(_T("	INPUT32	"))	;
-
-	Range1	=	Get_RegID(_T("	Range1		"))	;
-	Range2	=	Get_RegID(_T("	Range2		"))	;
-	Range3	=	Get_RegID(_T("	Range3		"))	;
-	Range4	=	Get_RegID(_T("	Range4		"))	;
-	Range5	=	Get_RegID(_T("	Range5		"))	;
-	Range6	=	Get_RegID(_T("	Range6		"))	;
-	Range7	=	Get_RegID(_T("	Range7		"))	;
-	Range8	=	Get_RegID(_T("	Range8		"))	;
-	Range9	=	Get_RegID(_T("	Range9		"))	;
-	Range10	=	Get_RegID(_T("	Range10	"))	;
-	Range11	=	Get_RegID(_T("	Range11	"))	;
-	Range12	=	Get_RegID(_T("	Range12	"))	;
-	Range13	=	Get_RegID(_T("	Range13	"))	;
-	Range14	=	Get_RegID(_T("	Range14	"))	;
-	Range15	=	Get_RegID(_T("	Range15	"))	;
-	Range16	=	Get_RegID(_T("	Range16	"))	;
-	Range17	=	Get_RegID(_T("	Range17	"))	;
-	Range18	=	Get_RegID(_T("	Range18	"))	;
-	Range19	=	Get_RegID(_T("	Range19	"))	;
-	Range20	=	Get_RegID(_T("	Range20	"))	;
-	Range21	=	Get_RegID(_T("	Range21	"))	;
-	Range22	=	Get_RegID(_T("	Range22	"))	;
-	Range23	=	Get_RegID(_T("	Range23	"))	;
-	Range24	=	Get_RegID(_T("	Range24	"))	;
-	Range25	=	Get_RegID(_T("	Range25	"))	;
-	Range26	=	Get_RegID(_T("	Range26	"))	;
-	Range27	=	Get_RegID(_T("	Range27	"))	;
-	Range28	=	Get_RegID(_T("	Range28	"))	;
-	Range29	=	Get_RegID(_T("	Range29	"))	;
-	Range30	=	Get_RegID(_T("	Range30	"))	;
-	Range31	=	Get_RegID(_T("	Range31	"))	;
-	Range32	=	Get_RegID(_T("	Range32	"))	;
-			 
-	Filter1	=	Get_RegID(_T("	Filter1		"))	;
-	Filter2	=	Get_RegID(_T("	Filter2		"))	;
-	Filter3	=	Get_RegID(_T("	Filter3		"))	;
-	Filter4	=	Get_RegID(_T("	Filter4		"))	;
-	Filter5	=	Get_RegID(_T("	Filter5		"))	;
-	Filter6	=	Get_RegID(_T("	Filter6		"))	;
-	Filter7	=	Get_RegID(_T("	Filter7		"))	;
-	Filter8	=	Get_RegID(_T("	Filter8		"))	;
-	Filter9	=	Get_RegID(_T("	Filter9		"))	;
-	Filter10	=	Get_RegID(_T("	Filter10	"))	;
-	Filter11	=	Get_RegID(_T("	Filter11	"))	;
-	Filter12	=	Get_RegID(_T("	Filter12	"))	;
-	Filter13	=	Get_RegID(_T("	Filter13	"))	;
-	Filter14	=	Get_RegID(_T("	Filter14	"))	;
-	Filter15	=	Get_RegID(_T("	Filter15	"))	;
-	Filter16	=	Get_RegID(_T("	Filter16	"))	;
-	Filter17	=	Get_RegID(_T("	Filter17	"))	;
-	Filter18	=	Get_RegID(_T("	Filter18	"))	;
-	Filter19	=	Get_RegID(_T("	Filter19	"))	;
-	Filter20	=	Get_RegID(_T("	Filter20	"))	;
-	Filter21	=	Get_RegID(_T("	Filter21	"))	;
-	Filter22	=	Get_RegID(_T("	Filter22	"))	;
-	Filter23	=	Get_RegID(_T("	Filter23	"))	;
-	Filter24	=	Get_RegID(_T("	Filter24	"))	;
-	Filter25	=	Get_RegID(_T("	Filter25	"))	;
-	Filter26	=	Get_RegID(_T("	Filter26	"))	;
-	Filter27	=	Get_RegID(_T("	Filter27	"))	;
-	Filter28	=	Get_RegID(_T("	Filter28	"))	;
-	Filter29	=	Get_RegID(_T("	Filter29	"))	;
-	Filter30	=	Get_RegID(_T("	Filter30	"))	;
-	Filter31	=	Get_RegID(_T("	Filter31	"))	;
-	Filter32	=	Get_RegID(_T("	Filter32	"))	;
-
-#endif
+	 
 
 
 

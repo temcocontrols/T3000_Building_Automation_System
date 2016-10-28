@@ -8,9 +8,6 @@
     <Filter Include="T3">
       <UniqueIdentifier>{04864613-5791-4496-a45f-a558636f058f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="CADO">
-      <UniqueIdentifier>{b1d039be-af63-4fdd-a8cf-e8638bd8a25e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="AirQuality">
       <UniqueIdentifier>{3757b5c7-f245-412e-bc02-5b9fe8cbf1a8}</UniqueIdentifier>
     </Filter>
@@ -23,9 +20,6 @@
     </Filter>
     <Filter Include="ClassInfo">
       <UniqueIdentifier>{c664f2cd-e719-4782-bcf4-c788a2753a9c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="BADO">
-      <UniqueIdentifier>{c4576a71-639c-4b70-a1ac-7b0688be04b3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Bacnet">
       <UniqueIdentifier>{47872dd0-6006-4513-92b4-d6258d979013}</UniqueIdentifier>
@@ -40,8 +34,11 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="SqliteLib">
-      <UniqueIdentifier>{9e13e331-913d-4218-8bde-ba65b01c0a56}</UniqueIdentifier>
+    <Filter Include="SQLiteDriver">
+      <UniqueIdentifier>{f5dd6a0a-ef09-4c01-9e96-3c87708d5311}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BADO">
+      <UniqueIdentifier>{9f3ef0ef-3b10-4087-81d2-8ab8b377a115}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -111,9 +108,6 @@
     <ClCompile Include="ImageTreeCtrl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ImportDatabaseDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="IniFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -142,9 +136,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ManageAccountDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MannageBuidingDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="monthview1.cpp">
@@ -254,9 +245,6 @@
     </ClCompile>
     <ClCompile Include="T3\DialogT3.cpp">
       <Filter>T3</Filter>
-    </ClCompile>
-    <ClCompile Include="ADO\ADO.cpp">
-      <Filter>CADO</Filter>
     </ClCompile>
     <ClCompile Include="CM5\SliderBoth.cpp">
       <Filter>Bacnet</Filter>
@@ -507,9 +495,6 @@
     <ClCompile Include="BuildingConfigration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BADO\BADO.cpp">
-      <Filter>BADO</Filter>
-    </ClCompile>
     <ClCompile Include="DetectOnlineDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -672,11 +657,14 @@
     <ClCompile Include="ConnectRemoteServer.cpp">
       <Filter>Bacnet</Filter>
     </ClCompile>
-    <ClCompile Include="SqliteLib\CppSQLite3.cpp">
-      <Filter>SqliteLib</Filter>
-    </ClCompile>
     <ClCompile Include="T3000Option.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SQLiteDriver\CppSQLite3.cpp">
+      <Filter>SQLiteDriver</Filter>
+    </ClCompile>
+    <ClCompile Include="BADO\BADO.cpp">
+      <Filter>BADO</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -846,8 +834,6 @@
     <None Include="res\bitmap_v_Connected.bmp">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\t3000.mdb" />
-    <None Include="res\T3000.mdb" />
     <None Include="res\temco_logo.bmp">
       <Filter>Resource Files</Filter>
     </None>
@@ -860,7 +846,6 @@
     <None Include="res\default view.bmp">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\t3000.mdb" />
     <None Include="res\Scan.ico">
       <Filter>Resource Files</Filter>
     </None>
@@ -889,7 +874,6 @@
     <None Include="res\T3000_DEFAULT.bmp">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\Building.mdb" />
     <None Include="res\bmp_bacnet.bmp">
       <Filter>Resource Files</Filter>
     </None>
@@ -986,6 +970,8 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\MFC16API.dll" />
+    <None Include="res\Building.db" />
+    <None Include="res\T3000.db" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">
@@ -1072,9 +1058,6 @@
     <ClInclude Include="ImageTreeCtrl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ImportDatabaseDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="IniFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1103,9 +1086,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ManageAccountDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MannageBuidingDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="modbus.h">
@@ -1230,9 +1210,6 @@
     </ClInclude>
     <ClInclude Include="T3\DialogT3.h">
       <Filter>T3</Filter>
-    </ClInclude>
-    <ClInclude Include="ADO\ADO.h">
-      <Filter>CADO</Filter>
     </ClInclude>
     <ClInclude Include="singleslider\MacSliderCtrl.h">
       <Filter>singleslider</Filter>
@@ -1489,9 +1466,6 @@
     <ClInclude Include="BacnetATCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BADO\BADO.h">
-      <Filter>BADO</Filter>
-    </ClInclude>
     <ClInclude Include="DetectOnlineDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1669,9 +1643,6 @@
     <ClInclude Include="BuildingConfigEditDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SqliteLib\CppSQLite3.h">
-      <Filter>SqliteLib</Filter>
-    </ClInclude>
     <ClInclude Include="ProductModel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1680,6 +1651,15 @@
     </ClInclude>
     <ClInclude Include="CommandWindow.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SQLiteDriver\CppSQLite3.h">
+      <Filter>SQLiteDriver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SQLiteDriver\sqlite3.h">
+      <Filter>SQLiteDriver</Filter>
+    </ClInclude>
+    <ClInclude Include="BADO\BADO.h">
+      <Filter>BADO</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -6,6 +6,7 @@
 #include "InputSetDlg.h"
 #include "globle_function.h"
 #include "BuildTable1.h"
+#include "../SQLiteDriver/CppSQLite3.h"
 
 #define INDEX_FIELD 0
 #define NAME_FIELD 1
@@ -973,22 +974,25 @@ void CInputSetDlg::Fresh_Grid()
 	    
        nValue=product_register_value[545];
 
-	   CBADO ado;
-	   ado.SetDBPath(g_strCurBuildingDatabasefilePath);
-	   ado.OnInitADOConn();
-	   if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
+	   CppSQLite3DB SqliteDBBuilding;
+	   CppSQLite3Table table;
+	   CppSQLite3Query q;
+	   SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
+	   if (SqliteDBBuilding.tableExists("Value_Range"))//有Version表
 	   {
 		   CString sql;
 		   sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),m_FlexGrid.get_Row()-1,m_sn);
-		   ado.m_pRecordset=ado.OpenRecordset(sql);
+		   q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
 
-		   if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
-		   {    ado.m_pRecordset->MoveFirst();
-		   while (!ado.m_pRecordset->EndOfFile)
+		   if (!q.eof())//有表但是没有对应序列号的值
+		   {   
+		    
+		   while (!q.eof())
 		   {
 
-			   m_crange=ado.m_pRecordset->GetCollect(_T("CRange"));
-			   ado.m_pRecordset->MoveNext();
+			   m_crange=q.getIntField("CRange");
+			  q.nextRow();
 		   }
 		  
 		   if (nValue==0)//Auto Model
@@ -1188,7 +1192,7 @@ void CInputSetDlg::Fresh_Grid()
 			   m_FlexGrid.put_TextMatrix(4,VALUE_FIELD,strTemp);
 		   }
 
-		   ado.CloseRecordset();
+		    
 	   }
 	   else
 	   { 
@@ -1245,7 +1249,7 @@ strTemp=_T("");
 
 		   m_FlexGrid.put_TextMatrix(4,VALUE_FIELD,strTemp);
 	   }
-	   ado.CloseConn();
+	  SqliteDBBuilding.closedb();
 
 	
 	    
@@ -1632,25 +1636,29 @@ void CInputSetDlg::Fresh_GridForAll(){
 
 		nValue=product_register_value[545];
 
-		CADO ado;
-		ado.OnInitADOConn();
-		if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
+		CppSQLite3DB SqliteDBT3000;
+		CppSQLite3Table table;
+		CppSQLite3Query q;
+		SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+
+		if (SqliteDBT3000.tableExists("Value_Range"))//有Version表
 		{
 			CString sql;
 			sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),m_FlexGrid.get_Row()-1,m_sn);
-			ado.m_pRecordset=ado.OpenRecordset(sql);
+			q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
 
-			if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
-			{    ado.m_pRecordset->MoveFirst();
-			while (!ado.m_pRecordset->EndOfFile)
-			{
+			if (!q.eof())//有表但是没有对应序列号的值
+			{   
+				while (!q.eof())
+				{
 
-				m_crange=ado.m_pRecordset->GetCollect(_T("CRange"));
-				ado.m_pRecordset->MoveNext();
-			}
+					m_crange=q.getIntField("CRange");
+					q.nextRow();
+				}
 
 			if (nValue==0)//Auto Model
-			{ strTemp=_T("");
+			{ 
+			strTemp=_T("");
 			if((product_register_value[MODBUS_DIGITAL_IN1]==0)&&(m_crange==0))//546
 			{
 				CString strTemp2;
@@ -1846,7 +1854,7 @@ void CInputSetDlg::Fresh_GridForAll(){
 				m_FlexGrid.put_TextMatrix(4,VALUE_FIELD,strTemp);
 			}
 
-			ado.CloseRecordset();
+			 
 		}
 		else
 		{ 
@@ -1903,7 +1911,7 @@ void CInputSetDlg::Fresh_GridForAll(){
 
 			m_FlexGrid.put_TextMatrix(4,VALUE_FIELD,strTemp);
 		}
-		ado.CloseConn();
+		 SqliteDBT3000.closedb();
 
 
 
@@ -2008,22 +2016,25 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 		if(lRow==2 && (wAM & 0x01))
 		{
 			
-			CBADO ado;
-			ado.SetDBPath(g_strCurBuildingDatabasefilePath);
-			ado.OnInitADOConn();
-			if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
+			CppSQLite3DB SqliteDBBuilding;
+			CppSQLite3Table table;
+			CppSQLite3Query q;
+			SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
+			if (SqliteDBBuilding.tableExists("Value_Range"))//有Version表
 			{
 				CString sql;
 				sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),1,get_serialnumber());
-				ado.m_pRecordset=ado.OpenRecordset(sql);
+				q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
 
-				if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+
+				if (!q.eof())//有表但是没有对应序列号的值
 				{    
-					ado.m_pRecordset->MoveFirst();
-					while (!ado.m_pRecordset->EndOfFile)
+					 
+					while (!q.eof())
 					{
-						m_crange=ado.m_pRecordset->GetCollect(_T("CRange"));
-						ado.m_pRecordset->MoveNext();
+						m_crange=q.getIntField("CRange");
+						q.nextRow();
 					}
 						if(product_register_value[MODBUS_ANALOG_IN1]==3||product_register_value[MODBUS_ANALOG_IN1]==5)//On OFF
 						{  	m_valueCombx.ResetContent();
@@ -2100,8 +2111,7 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 					}
 				}
 
-				ado.CloseRecordset();
-				ado.CloseConn();
+				SqliteDBBuilding.closedb();
 			}
 			else
 			{
@@ -2144,22 +2154,25 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 
 
 
-			CBADO ado;
-			ado.SetDBPath(g_strCurBuildingDatabasefilePath);
-			ado.OnInitADOConn();
-			if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
+			CppSQLite3DB SqliteDBBuilding;
+			CppSQLite3Table table;
+			CppSQLite3Query q;
+			SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
+			if (SqliteDBBuilding.tableExists("Value_Range"))//有Version表
 			{
 				CString sql;
 				sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),2,get_serialnumber());
-				ado.m_pRecordset=ado.OpenRecordset(sql);
+				q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
 
-				if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+
+				if (!q.eof())//有表但是没有对应序列号的值
 				{    
-					ado.m_pRecordset->MoveFirst();
-					while (!ado.m_pRecordset->EndOfFile)
+					 
+					while (!q.eof())
 					{
-						m_crange=ado.m_pRecordset->GetCollect(_T("CRange"));
-						ado.m_pRecordset->MoveNext();
+						m_crange=q.getIntField("CRange");
+						q.nextRow();
 					}
 
 				 
@@ -2249,10 +2262,10 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 					}
 				}
 
-				ado.CloseRecordset();
+				 
 			}
 
-			ado.CloseConn();
+			 SqliteDBBuilding.closedb();
 
 
 
@@ -2263,22 +2276,25 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 			m_valueCombx.ResetContent();
 
 
-			 CBADO ado;
-			 ado.SetDBPath(g_strCurBuildingDatabasefilePath);
-			ado.OnInitADOConn();
-			if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
+			CppSQLite3DB SqliteDBBuilding;
+			CppSQLite3Table table;
+			CppSQLite3Query q;
+			SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
+			if (SqliteDBBuilding.tableExists("Value_Range"))//有Version表
 			{
 				CString sql;
 				sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),3,get_serialnumber());
-				ado.m_pRecordset=ado.OpenRecordset(sql);
+				q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
 
-				if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+
+				if (!q.eof())//有表但是没有对应序列号的值
 				{    
-					ado.m_pRecordset->MoveFirst();
-					while (!ado.m_pRecordset->EndOfFile)
+					 
+					while (!q.eof())
 					{
-						m_crange=ado.m_pRecordset->GetCollect(_T("CRange"));
-						ado.m_pRecordset->MoveNext();
+						m_crange=q.getIntField("CRange");
+						q.nextRow();
 					}
 
 					if((product_register_value[546]==0)&&(m_crange==0))//On/OFF
@@ -2323,7 +2339,7 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 
 				}
 
-				ado.CloseRecordset();
+				 
 			}
 			else
 			{
@@ -2340,7 +2356,7 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 				}
 
 			}
-			ado.CloseConn();
+			 SqliteDBBuilding.closedb();
 				m_valueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
 				m_valueCombx.ShowWindow(SW_SHOW);
 				m_valueCombx.BringWindowToTop();
@@ -2594,25 +2610,26 @@ void CInputSetDlg::OnCbnSelchangeRangCombo()
 		{
 			product_register_value[MODBUS_ANALOG_IN2]=nindext;
 
-			CBADO ado;
-			ado.SetDBPath(g_strCurBuildingDatabasefilePath);
-			ado.OnInitADOConn();
+			CppSQLite3DB SqliteDBBuilding;
+			CppSQLite3Table table;
+			CppSQLite3Query q;
+			SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 			CString sql;
 			sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),m_nCurRow-1,m_sn);
-			ado.m_pRecordset=ado.OpenRecordset(sql);
+			q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
 
-			if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+			if (!q.eof())//有表但是没有对应序列号的值
 			{
 				sql.Format(_T("update Value_Range set CRange = %d where CInputNo=%d and SN=%d "),m_crange,m_nCurRow-1,m_sn);
-				ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+				SqliteDBBuilding.execDML((UTF8MBSTR)sql);
 			}
 			else
 			{
 				sql.Format(_T("Insert into Value_Range ( SN,CInputNo,CRange) values('%d','%d','%d')"),m_sn,m_nCurRow-1,m_crange);
-				ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+				SqliteDBBuilding.execDML((UTF8MBSTR)sql);
 			}
-			ado.CloseRecordset();
-			ado.CloseConn();
+			SqliteDBBuilding.closedb();
 
 		if(product_register_value[MODBUS_ANALOG_IN2]==4)
 		{
@@ -2648,27 +2665,30 @@ void CInputSetDlg::OnCbnSelchangeRangCombo()
 		product_register_value[MODBUS_DIGITAL_IN1]=nindext;
 
 
-		CBADO ado;
-		ado.SetDBPath(g_strCurBuildingDatabasefilePath);
-		ado.OnInitADOConn();
+		CppSQLite3DB SqliteDBBuilding;
+		CppSQLite3Table table;
+		CppSQLite3Query q;
+		SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
+
 		CString sql;
 		sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),m_nCurRow-1,m_sn);
-		ado.m_pRecordset=ado.OpenRecordset(sql);
+		q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
+
 		 
-		if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+		if (!q.eof())//有表但是没有对应序列号的值
 		{
 
 			sql.Format(_T("update Value_Range set CRange = %d where CInputNo=%d and SN=%d "),m_crange,m_nCurRow-1,m_sn);
-			ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+			SqliteDBBuilding.execDML((UTF8MBSTR)sql);
 		}
 		else
 		{
 			
 			sql.Format(_T("Insert into Value_Range ( SN,CInputNo,CRange) values('%d','%d','%d')"),m_sn,m_nCurRow-1,m_crange);
-			ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+		SqliteDBBuilding.execDML((UTF8MBSTR)sql);
 		}
-		ado.CloseRecordset();
-		ado.CloseConn();
+		 SqliteDBBuilding.closedb();
 		}
 		else
 		{
@@ -3105,22 +3125,22 @@ void CInputSetDlg::OnEnKillfocusInputnameedit()
 		//if(g_serialNum>0&&product_register_value[6]>0)
 		if(product_register_value[6]>0)
 		{
-// 			_ConnectionPtr m_ConTmp;
-// 			_RecordsetPtr m_RsTmp;
-// 			m_ConTmp.CreateInstance("ADODB.Connection");
-// 			m_RsTmp.CreateInstance("ADODB.Recordset");
-		//	m_ConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-			CBADO bado;
-			bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-			bado.OnInitADOConn();
+
+			CppSQLite3DB SqliteDBBuilding;
+			CppSQLite3Table table;
+			CppSQLite3Query q;
+			SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+;
 			CString strSerial;
 			strSerial.Format(_T("%d"),g_serialNum);
 
 			CString strsql;
 			strsql.Format(_T("select * from IONAME where SERIAL_ID = '%s'"),strSerial);
 			//m_RsTmp->Open((_variant_t)strsql,_variant_t((IDispatch *)m_ConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-			bado.m_pRecordset=bado.OpenRecordset(strsql);
-			if(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)//update
+			q = SqliteDBBuilding.execQuery((UTF8MBSTR)strsql);
+
+
+			if(!q.eof())//update
 			{			
 				CString strField;
 				switch (lRow)
@@ -3158,7 +3178,7 @@ void CInputSetDlg::OnEnKillfocusInputnameedit()
 					CString str_temp;
 					str_temp.Format(_T("update IONAME set "+strField+" = '"+strText+"' where SERIAL_ID = '"+strSerial+"'"));
 					//AfxMessageBox(str_temp );
-					bado.m_pConnection->Execute(str_temp.GetString(),NULL,adCmdText);
+					SqliteDBBuilding.execDML((UTF8MBSTR)str_temp);
 					m_FlexGrid.put_TextMatrix(lRow,lCol,strText);
 				}
 				catch(_com_error *e)
@@ -3224,7 +3244,7 @@ void CInputSetDlg::OnEnKillfocusInputnameedit()
 				try
 				{
 
-					bado.m_pConnection->Execute(str_temp.GetString(),NULL,adCmdText);
+					SqliteDBBuilding.execDML((UTF8MBSTR)str_temp);
 					m_FlexGrid.put_TextMatrix(lRow,lCol,strText);
 				}
 				catch(_com_error *e)
@@ -3260,8 +3280,7 @@ void CInputSetDlg::OnEnKillfocusInputnameedit()
 				g_strInName8=strText;
 				break;
 			}
-			bado.CloseRecordset();
-			bado.CloseConn();
+			SqliteDBBuilding.closedb();
 // 			if(m_RsTmp->State) 
 // 				m_RsTmp->Close(); 
 // 			if(m_ConTmp->State)
@@ -4153,204 +4172,7 @@ void CInputSetDlg::Init_not_5ABCD_Grid()
 
 
 
-			//////////////////////////////////////////////////////////////////////////
-			// column 1  Value
-
-
-			// 
-			// 						359	122	1	Low byte	W/R	ANALOG INPUT1 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
-			// 						2	123	1	Low byte	W/R	ANALOG INPUT2 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
-			// 						3	124	1	Low byte	W/R	ANALOG INPUT3 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
-			// 						4	125	1	Low byte	W/R	ANALOG INPUT4 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
-			// 						5	126	1	Low byte	W/R	ANALOG INPUT5 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
-			// 						6	127	1	Low byte	W/R	ANALOG INPUT6 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
-			// 						7	128	1	Low byte	W/R	ANALOG INPUT7 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
-			// 						8	129	1	Low byte	W/R	ANALOG INPUT8 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
-
-
-			// 
-			// 						367	131	2	Full	W/R	Analog input1 value
-			// 						10	132	2	Full	W/R	Analog input2 value
-			// 						11	133	2	Full	W/R	Analog input3 value
-			// 						12	134	2	Full	W/R	Analog input4 value
-			// 						13	135	2	Full	W/R	Analog input5 value
-			// 						14	136	2	Full	W/R	Analog input6 value
-			// 						15	137	2	Full	W/R	Analog input7 value
-			// 						16	138	2	Full	W/R	Analog input8 value
-
-
-			//m_crange=0;
-			//CADO ado;
-			//ado.OnInitADOConn();
-			//if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
-			//{
-			//	CString sql;
-			//	sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),1,m_sn);
-			//	ado.m_pRecordset=ado.OpenRecordset(sql);
-
-			//	if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
-			//	{    
-			//		ado.m_pRecordset->MoveFirst();
-			//		while (!ado.m_pRecordset->EndOfFile)
-			//		{
-			//			m_crange=ado.m_pRecordset->GetCollect(_T("CRange"));
-			//			ado.m_pRecordset->MoveNext();
-			//		}
-
-			//		nValue=m_crange;	 
-			//		if(nValue>=0)
-			//		{
-
-			//			if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
-			//			{
-			//				strTemp=analog_range[nValue];
-			//			}
-			//			else
-			//			{
-			//				strTemp=analog_range[nValue];
-			//			}
-			//			m_FlexGrid.put_TextMatrix(2,RANG_FIELD,strTemp);
-			//		}
-			//	} 
-			//	else
-			//	{
-			//		nValue=product_register_value[MODBUS_ANALOG_IN1];	//189
-			//		if(nValue>=0)
-			//		{
-
-			//			if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
-			//			{
-			//				strTemp=analog_range[nValue];
-			//			}
-			//			else
-			//			{
-			//				strTemp=analog_range[nValue];
-			//			}
-			//			m_FlexGrid.put_TextMatrix(2,RANG_FIELD,strTemp);
-			//		}
-			//	}
-
-			//	ado.CloseRecordset();
-			//}
-			//else
-			//{
-			//	nValue=product_register_value[MODBUS_ANALOG_IN1];	//189
-			//	if(nValue>=0)
-			//	{
-
-			//		if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
-			//		{
-			//			strTemp=analog_range[nValue];
-			//		}
-			//		else
-			//		{
-			//			strTemp=analog_range[nValue];
-			//		}
-			//		m_FlexGrid.put_TextMatrix(2,RANG_FIELD,strTemp);
-			//	}
-			//}
-			//ado.CloseConn();
-
-
-
-
-
-// 			strTemp.Empty();
-// 			strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN1], 1);//188
-// 			if(product_register_value[MODBUS_ANALOG_IN1]==4||product_register_value[MODBUS_ANALOG_IN1]==1)//188
-// 			{	
-// 				strTemp.Format(_T("%.1f"),(float)product_register_value[MODBUS_EXTERNAL_SENSOR_0]/10);	//180
-// 				strTemp=strTemp+strUnit;
-// 			}
-// 			if(product_register_value[MODBUS_ANALOG_IN1]==0)
-// 			{
-// 				// 		strTemp.Format(_T("%d"),product_register_value[180]);
-// 				// 		strTemp=strTemp;
-// 				strTemp=_T("UNUSED");//2.5.0.98
-// 			}
-// 			if(product_register_value[MODBUS_ANALOG_IN1]==2)
-// 			{
-// 				strTemp.Format(_T("%d"),product_register_value[MODBUS_EXTERNAL_SENSOR_0]);//180
-// 				strTemp=strTemp+_T("%");
-// 			}
-
-// 			if ((nValue & 0x01)==1)//Auto Model
-// 			{
-// 
-// 				if(product_register_value[MODBUS_ANALOG_IN1]==3 || product_register_value[MODBUS_ANALOG_IN1]==5)
-// 				{
-// 
-// 					if (m_crange==6||m_crange==7)
-// 					{
-// 
-// 						if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//181
-// 							strTemp=_T("Occupied");
-// 						if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//181
-// 							strTemp=_T("Unoccupied");
-// 
-// 
-// 					} 
-// 					else
-// 					{
-// 
-// 						if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//181
-// 							strTemp=_T("Off");
-// 						if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//181
-// 							strTemp=_T("On");
-// 
-// 					}
-// 
-// 
-// 				}
-// 
-// 
-// 			}
-			//else//Mannul
-			//{
-			//	if(product_register_value[MODBUS_ANALOG_IN1]==3 || product_register_value[MODBUS_ANALOG_IN1]==5)
-			//	{
-
-			//		if (m_crange==6||m_crange==7)
-			//		{
-			//			if (m_crange==6)
-			//			{
-			//				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//181
-			//					strTemp=_T("Occupied");
-			//				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//181
-			//					strTemp=_T("Unoccupied");
-			//			} 
-			//			else
-			//			{
-			//				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//181
-			//					strTemp=_T("Unoccupied");
-			//				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//181
-			//					strTemp=_T("Occupied");
-
-
-			//			}
-
-			//		} 
-			//		else
-			//		{
-			//			if (product_register_value[MODBUS_ANALOG_IN1]==3)
-			//			{
-			//				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//181
-			//					strTemp=_T("Off");
-			//				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//181
-			//					strTemp=_T("On");
-			//			} 
-			//			else
-			//			{
-			//				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//181
-			//					strTemp=_T("On");
-			//				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//181
-			//					strTemp=_T("Off");
-			//			}
-			//		}
-
-
-			//	}
-			//}
+			 
 
 			CString strValueUnit=GetTempUnit(product_register_value[MODBUS_ANALOG1_RANGE+i-2], i-1); //5e=359   122
 			{
@@ -4588,207 +4410,6 @@ void CInputSetDlg::Fresh_GridForTstat5E(){
 				m_FlexGrid.put_TextMatrix(1,CUST_FIELD,NO_APPLICATION);
 				continue;
 			}
-
-
-
-			//////////////////////////////////////////////////////////////////////////
-			// column 1  Value
-
-
-			// 
-			// 						359	122	1	Low byte	W/R	ANALOG INPUT1 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
-			// 						2	123	1	Low byte	W/R	ANALOG INPUT2 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
-			// 						3	124	1	Low byte	W/R	ANALOG INPUT3 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
-			// 						4	125	1	Low byte	W/R	ANALOG INPUT4 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
-			// 						5	126	1	Low byte	W/R	ANALOG INPUT5 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
-			// 						6	127	1	Low byte	W/R	ANALOG INPUT6 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
-			// 						7	128	1	Low byte	W/R	ANALOG INPUT7 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
-			// 						8	129	1	Low byte	W/R	ANALOG INPUT8 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
-
-
-			// 
-			// 						367	131	2	Full	W/R	Analog input1 value
-			// 						10	132	2	Full	W/R	Analog input2 value
-			// 						11	133	2	Full	W/R	Analog input3 value
-			// 						12	134	2	Full	W/R	Analog input4 value
-			// 						13	135	2	Full	W/R	Analog input5 value
-			// 						14	136	2	Full	W/R	Analog input6 value
-			// 						15	137	2	Full	W/R	Analog input7 value
-			// 						16	138	2	Full	W/R	Analog input8 value
-
-
-			//m_crange=0;
-			//CADO ado;
-			//ado.OnInitADOConn();
-			//if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
-			//{
-			//	CString sql;
-			//	sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),1,m_sn);
-			//	ado.m_pRecordset=ado.OpenRecordset(sql);
-
-			//	if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
-			//	{    
-			//		ado.m_pRecordset->MoveFirst();
-			//		while (!ado.m_pRecordset->EndOfFile)
-			//		{
-			//			m_crange=ado.m_pRecordset->GetCollect(_T("CRange"));
-			//			ado.m_pRecordset->MoveNext();
-			//		}
-
-			//		nValue=m_crange;	 
-			//		if(nValue>=0)
-			//		{
-
-			//			if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
-			//			{
-			//				strTemp=analog_range[nValue];
-			//			}
-			//			else
-			//			{
-			//				strTemp=analog_range[nValue];
-			//			}
-			//			m_FlexGrid.put_TextMatrix(2,RANG_FIELD,strTemp);
-			//		}
-			//	} 
-			//	else
-			//	{
-			//		nValue=product_register_value[MODBUS_ANALOG_IN1];	//189
-			//		if(nValue>=0)
-			//		{
-
-			//			if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
-			//			{
-			//				strTemp=analog_range[nValue];
-			//			}
-			//			else
-			//			{
-			//				strTemp=analog_range[nValue];
-			//			}
-			//			m_FlexGrid.put_TextMatrix(2,RANG_FIELD,strTemp);
-			//		}
-			//	}
-
-			//	ado.CloseRecordset();
-			//}
-			//else
-			//{
-			//	nValue=product_register_value[MODBUS_ANALOG_IN1];	//189
-			//	if(nValue>=0)
-			//	{
-
-			//		if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
-			//		{
-			//			strTemp=analog_range[nValue];
-			//		}
-			//		else
-			//		{
-			//			strTemp=analog_range[nValue];
-			//		}
-			//		m_FlexGrid.put_TextMatrix(2,RANG_FIELD,strTemp);
-			//	}
-			//}
-			//ado.CloseConn();
-
-
-
-
-
-			// 			strTemp.Empty();
-			// 			strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN1], 1);//188
-			// 			if(product_register_value[MODBUS_ANALOG_IN1]==4||product_register_value[MODBUS_ANALOG_IN1]==1)//188
-			// 			{	
-			// 				strTemp.Format(_T("%.1f"),(float)product_register_value[MODBUS_EXTERNAL_SENSOR_0]/10);	//180
-			// 				strTemp=strTemp+strUnit;
-			// 			}
-			// 			if(product_register_value[MODBUS_ANALOG_IN1]==0)
-			// 			{
-			// 				// 		strTemp.Format(_T("%d"),product_register_value[180]);
-			// 				// 		strTemp=strTemp;
-			// 				strTemp=_T("UNUSED");//2.5.0.98
-			// 			}
-			// 			if(product_register_value[MODBUS_ANALOG_IN1]==2)
-			// 			{
-			// 				strTemp.Format(_T("%d"),product_register_value[MODBUS_EXTERNAL_SENSOR_0]);//180
-			// 				strTemp=strTemp+_T("%");
-			// 			}
-
-			// 			if ((nValue & 0x01)==1)//Auto Model
-			// 			{
-			// 
-			// 				if(product_register_value[MODBUS_ANALOG_IN1]==3 || product_register_value[MODBUS_ANALOG_IN1]==5)
-			// 				{
-			// 
-			// 					if (m_crange==6||m_crange==7)
-			// 					{
-			// 
-			// 						if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//181
-			// 							strTemp=_T("Occupied");
-			// 						if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//181
-			// 							strTemp=_T("Unoccupied");
-			// 
-			// 
-			// 					} 
-			// 					else
-			// 					{
-			// 
-			// 						if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//181
-			// 							strTemp=_T("Off");
-			// 						if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//181
-			// 							strTemp=_T("On");
-			// 
-			// 					}
-			// 
-			// 
-			// 				}
-			// 
-			// 
-			// 			}
-			//else//Mannul
-			//{
-			//	if(product_register_value[MODBUS_ANALOG_IN1]==3 || product_register_value[MODBUS_ANALOG_IN1]==5)
-			//	{
-
-			//		if (m_crange==6||m_crange==7)
-			//		{
-			//			if (m_crange==6)
-			//			{
-			//				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//181
-			//					strTemp=_T("Occupied");
-			//				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//181
-			//					strTemp=_T("Unoccupied");
-			//			} 
-			//			else
-			//			{
-			//				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//181
-			//					strTemp=_T("Unoccupied");
-			//				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//181
-			//					strTemp=_T("Occupied");
-
-
-			//			}
-
-			//		} 
-			//		else
-			//		{
-			//			if (product_register_value[MODBUS_ANALOG_IN1]==3)
-			//			{
-			//				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//181
-			//					strTemp=_T("Off");
-			//				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//181
-			//					strTemp=_T("On");
-			//			} 
-			//			else
-			//			{
-			//				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//181
-			//					strTemp=_T("On");
-			//				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//181
-			//					strTemp=_T("Off");
-			//			}
-			//		}
-
-
-			//	}
-			//}
 
 			CString strValueUnit=GetTempUnit(product_register_value[MODBUS_ANALOG1_RANGE+i-2], i-1); //5e=359   122
 			{
@@ -6563,26 +6184,29 @@ void CInputSetDlg::OnCbnSelendokRangCombo()
 		 product_register_value[MODBUS_ANALOG_IN1]=nindext;
 
 
-		 CADO ado;
-		 ado.OnInitADOConn();
+		 CppSQLite3DB SqliteDBT3000;
+		 CppSQLite3Table table;
+		 CppSQLite3Query q;
+		 SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+
 		 CString sql;
 		 sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),m_nCurRow-1,m_sn);
-		 ado.m_pRecordset=ado.OpenRecordset(sql);
+		 q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
 
-		 if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+		 if (!q.eof())//有表但是没有对应序列号的值
 		 {
 
 			 sql.Format(_T("update Value_Range set CRange = %d where CInputNo=%d and SN=%d "),m_crange,m_nCurRow-1,m_sn);
-			 ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+			 SqliteDBT3000.execDML((UTF8MBSTR)sql);
 		 }
 		 else
 		 {
-		     ado.CloseRecordset();
+		    
 			 sql.Format(_T("Insert into Value_Range( SN,CInputNo,CRange) values('%d','%d','%d')"),m_sn,m_nCurRow-1,m_crange);
-			 ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+			SqliteDBT3000.execDML((UTF8MBSTR)sql);
 		 }
 		 
-		 ado.CloseConn();
+		 SqliteDBT3000.closedb();
 
 
 		 if(product_register_value[MODBUS_ANALOG_IN1]==4)
@@ -6620,24 +6244,27 @@ void CInputSetDlg::OnCbnSelendokRangCombo()
 		{
 			product_register_value[MODBUS_ANALOG_IN2]=nindext;
 
-			CADO ado;
-			ado.OnInitADOConn();
+			CppSQLite3DB SqliteDBT3000;
+			CppSQLite3Table table;
+			CppSQLite3Query q;
+			SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+
 			CString sql;
 			sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),m_nCurRow-1,m_sn);
-			ado.m_pRecordset=ado.OpenRecordset(sql);
+			q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
 
-			if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+			if (!q.eof())//有表但是没有对应序列号的值
 			{
 				sql.Format(_T("update Value_Range set CRange = %d where CInputNo=%d and SN=%d "),m_crange,m_nCurRow-1,m_sn);
-				ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+				SqliteDBT3000.execDML((UTF8MBSTR)sql);
 			}
 			else
 			{
 				sql.Format(_T("Insert into Value_Range ( SN,CInputNo,CRange) values('%d','%d','%d')"),m_sn,m_nCurRow-1,m_crange);
-				ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+				SqliteDBT3000.execDML((UTF8MBSTR)sql);
 			}
-			ado.CloseRecordset();
-			ado.CloseConn();
+		 
+			 SqliteDBT3000.closedb();
 
 		if(product_register_value[MODBUS_ANALOG_IN2]==4)
 		{

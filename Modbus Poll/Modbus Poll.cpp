@@ -59,7 +59,9 @@
 #include "CVBDataObject.h"
 #include "CDMSChart.h"
 
+#include "ado/ADO.h"
 
+#include "../SQLiteDriver/CppSQLite3.h"
 //#include "global_variable_extern.h"
 //#include "globle_Function.h"
 //#include "ModbusDllforVC.h"
@@ -134,6 +136,26 @@ BOOL CModbusPollApp::InitInstance()
 		return FALSE;//
 	}
 	get_ExePath();
+	CString g_strExePth;
+	CString g_strImgeFolder;
+
+	TCHAR exeFullPath[MAX_PATH+1]; //
+	GetModuleFileName(NULL, exeFullPath, MAX_PATH); 
+	(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;
+	g_strDatabasefilepath=exeFullPath;
+	g_strExePth=g_strDatabasefilepath;
+	CreateDirectory(g_strExePth+_T("Database"),NULL);//creat database folder;
+	g_strDatabasefilepath=g_strExePth+_T("Database\\T3000.db");
+
+	CppSQLite3DB SqliteDBT3000;
+	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+	CString SqlText;
+	SqlText.Format(_T("Select * from Building ;"));
+	if (!SqliteDBT3000.tableExists("Building"))
+	{
+		AfxMessageBox(L"Building is not there!");
+		return FALSE;
+	}
 	// Initialize OLE libraries
 	if (!AfxOleInit())
 	{
@@ -212,10 +234,9 @@ BOOL CModbusPollApp::InitInstance()
 	// The main window has been initialized, so show and update it
 	pMainFrame->ShowWindow(m_nCmdShow);
 	pMainFrame->UpdateWindow();
-	 
-
-
+ 
 	
+
 	return TRUE;
 }
 

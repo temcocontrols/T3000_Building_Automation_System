@@ -1,6 +1,6 @@
 #pragma once
 #include "afxwin.h"
-
+#include "../SQLiteDriver/CppSQLite3.h"
 
 // CLoginDlg dialog
 
@@ -20,8 +20,7 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
-	_ConnectionPtr m_pCon;
-	_RecordsetPtr m_pRs;
+ 
 	CEdit m_userEdit;
 	CEdit m_psswordEdit;
 	afx_msg void OnBnClickedOk();
@@ -29,4 +28,6 @@ public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnBnClickedCancel();
 	afx_msg void OnDestroy();
+	CppSQLite3DB SqliteDBT3000;
+	CppSQLite3Query q;
 };

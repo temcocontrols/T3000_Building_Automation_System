@@ -73,8 +73,7 @@ public:
 	void InserProductToUserSetDB();
 public:
 	CString m_strUserName;
-	_ConnectionPtr m_pCon;
-	_RecordsetPtr m_pRs;
+ 
 	vector<USERLEVEL> m_UserLevelLst;
 	vector<VERYPRODCT> m_VeryProdctLst;
 	CString m_strMainBuilding;

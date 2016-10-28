@@ -4,10 +4,10 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "T36CT.h"
- 
+ #include "../SQLiteDriver/CppSQLite3.h"
  
 #include "Dialog_Progess.h"
-#include "ado/ADO.h"
+ 
 #include "globle_function.h"
 #include "MainFrm.h"
 
@@ -185,99 +185,10 @@ void T36CT::Initial_RegisterList()
 
 
 #endif
-    T3Register temp;
-    CADO m_ado;
-    m_ado.OnInitADOConn();
-#if 1
-    CString SQL = _T("select * from T3_RegisterList");
-    m_ado.m_pRecordset = m_ado.OpenRecordset(SQL);
-    _variant_t vartemp;
-    while(!m_ado.m_pRecordset->EndOfFile)
-    {
-        temp.regID=m_ado.m_pRecordset->GetCollect(_T("RegID"));
-        vartemp =m_ado.m_pRecordset->GetCollect(_T("T3-6CT"));
-        if (vartemp.vt==VT_NULL)
-            temp.regName=_T("");
-        else
-            temp.regName =vartemp;
-        m_ado.m_pRecordset->MoveNext();
-        m_vecT3Register.push_back(temp);
-    }
-    m_ado.CloseRecordset();
-    m_ado.CloseConn();
-#endif 
+   
 
 
-#if 1
-        SN_LOW	=	Get_RegID(_T("	SN_LOW	"))	;
-        SN_HI	=	Get_RegID(_T("	SN_HI	"))	;
-        EPROM_VER_NUMBER	=	Get_RegID(_T("	EPROM_VER_NUMBER	"))	;
-        FIRMWARE_VER_NUMBER	=	Get_RegID(_T("	FIRMWARE_VER_NUMBER	"))	;
-        MODBUS_ID	=	Get_RegID(_T("	MODBUS_ID	"))	;
-        PRODUCT_MODEL	=	Get_RegID(_T("	PRODUCT_MODEL	"))	;
-        HARDWARE_VER_NUMBER	=	Get_RegID(_T("	HARDWARE_VER_NUMBER	"))	;
-        PIC_VER_NUMBER	=	Get_RegID(_T("	PIC_VER_NUMBER	"))	;
-        CALIBRATION_OUTPUTS	=	Get_RegID(_T("	CALIBRATION_OUTPUTS	"))	;
-        BAUDRATE	=	Get_RegID(_T("	BAUDRATE	"))	;
-        DEADMASTER_TIME	=	Get_RegID(_T("	DEADMASTER_TIME	"))	;
-        REAL_STATUS	=	Get_RegID(_T("	REAL_STATUS	"))	;
-        RESPONSE_DELAY	=	Get_RegID(_T("	RESPONSE_DELAY	"))	;
-        OUTPUT1	=	Get_RegID(_T("	OUTPUT1	"))	;
-        OUTPUT2	=	Get_RegID(_T("	OUTPUT2	"))	;
-        OUTPUT3	=	Get_RegID(_T("	OUTPUT3	"))	;
-        OUTPUT4	=	Get_RegID(_T("	OUTPUT4	"))	;
-        OUTPUT5	=	Get_RegID(_T("	OUTPUT5	"))	;
-        INPUT1_CT	=	Get_RegID(_T("	INPUT1_CT	"))	;
-        INPUT2_CT	=	Get_RegID(_T("	INPUT2_CT	"))	;
-        INPUT3_CT	=	Get_RegID(_T("	INPUT3_CT	"))	;
-        INPUT4_CT	=	Get_RegID(_T("	INPUT4_CT	"))	;
-        INPUT5_CT	=	Get_RegID(_T("	INPUT5_CT	"))	;
-        INPUT6_CT	=	Get_RegID(_T("	INPUT6_CT	"))	;
-        INPUT1	=	Get_RegID(_T("	INPUT1	"))	;
-        INPUT2	=	Get_RegID(_T("	INPUT2	"))	;
-        INPUT3	=	Get_RegID(_T("	INPUT3	"))	;
-        INPUT4	=	Get_RegID(_T("	INPUT4	"))	;
-        INPUT5	=	Get_RegID(_T("	INPUT5	"))	;
-        INPUT6	=	Get_RegID(_T("	INPUT6	"))	;
-        INPUT7	=	Get_RegID(_T("	INPUT7	"))	;
-        INPUT8	=	Get_RegID(_T("	INPUT8	"))	;
-        INPUT9	=	Get_RegID(_T("	INPUT9	"))	;
-        INPUT10	=	Get_RegID(_T("	INPUT10	"))	;
-        SWITCH1_BANK	=	Get_RegID(_T("	SWITCH1_BANK	"))	;
-        SWITCH2_BANK	=	Get_RegID(_T("	SWITCH2_BANK	"))	;
-        RANGE_INPUT1	=	Get_RegID(_T("	RANGE_INPUT1	"))	;
-        RANGE_INPUT2	=	Get_RegID(_T("	RANGE_INPUT2	"))	;
-        RANGE_INPUT3	=	Get_RegID(_T("	RANGE_INPUT3	"))	;
-        RANGE_INPUT4	=	Get_RegID(_T("	RANGE_INPUT4	"))	;
-        RANGE_INPUT5	=	Get_RegID(_T("	RANGE_INPUT5	"))	;
-        RANGE_INPUT6	=	Get_RegID(_T("	RANGE_INPUT6	"))	;
-        RANGE_INPUT7	=	Get_RegID(_T("	RANGE_INPUT7	"))	;
-        RANGE_INPUT8	=	Get_RegID(_T("	RANGE_INPUT8	"))	;
-        RANGE_INPUT9	=	Get_RegID(_T("	RANGE_INPUT9	"))	;
-        RANGE_INPUT10	=	Get_RegID(_T("	RANGE_INPUT10	"))	;
-        RANGE_INPUT11	=	Get_RegID(_T("	RANGE_INPUT11	"))	;
-        RANGE_INPUT12	=	Get_RegID(_T("	RANGE_INPUT12	"))	;
-        RANGE_INPUT13	=	Get_RegID(_T("	RANGE_INPUT13	"))	;
-        RANGE_INPUT14	=	Get_RegID(_T("	RANGE_INPUT14	"))	;
-        RANGE_INPUT15	=	Get_RegID(_T("	RANGE_INPUT15	"))	;
-        RANGE_INPUT16	=	Get_RegID(_T("	RANGE_INPUT16	"))	;
-        FILTER_INPUT1	=	Get_RegID(_T("	FILTER_INPUT1	"))	;
-        FILTER_INPUT2	=	Get_RegID(_T("	FILTER_INPUT2	"))	;
-        FILTER_INPUT3	=	Get_RegID(_T("	FILTER_INPUT3	"))	;
-        FILTER_INPUT4	=	Get_RegID(_T("	FILTER_INPUT4	"))	;
-        FILTER_INPUT5	=	Get_RegID(_T("	FILTER_INPUT5	"))	;
-        FILTER_INPUT6	=	Get_RegID(_T("	FILTER_INPUT6	"))	;
-        FILTER_INPUT7	=	Get_RegID(_T("	FILTER_INPUT7	"))	;
-        FILTER_INPUT8	=	Get_RegID(_T("	FILTER_INPUT8	"))	;
-        FILTER_INPUT9	=	Get_RegID(_T("	FILTER_INPUT9	"))	;
-        FILTER_INPUT10	=	Get_RegID(_T("	FILTER_INPUT10	"))	;
-        FILTER_INPUT11	=	Get_RegID(_T("	FILTER_INPUT11	"))	;
-        FILTER_INPUT12	=	Get_RegID(_T("	FILTER_INPUT12	"))	;
-        FILTER_INPUT13	=	Get_RegID(_T("	FILTER_INPUT13	"))	;
-        FILTER_INPUT14	=	Get_RegID(_T("	FILTER_INPUT14	"))	;
-        FILTER_INPUT15	=	Get_RegID(_T("	FILTER_INPUT15	"))	;
-        FILTER_INPUT16	=	Get_RegID(_T("	FILTER_INPUT16	"))	;
-#endif
+ 
 }
 // T36CT message handlers
 int  T36CT::Get_RegID(CString Name)
@@ -1270,18 +1181,19 @@ void T36CT::OnCbnSelchangeBraudratecombo()
 		}
 		
 	    product_register_value[BAUDRATE] = sel;
-		CADO ado;
-		ado.OnInitADOConn();
+		CppSQLite3DB SqliteDBT3000;
+		CppSQLite3Query q;
+		SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 		CString sql;
 		sql.Format(_T("Select * from ALL_NODE where Serial_ID = '%d' "),m_sn);
-		ado.m_pRecordset=ado.OpenRecordset(sql);
-		if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+		q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
+		if (!q.eof())//有表但是没有对应序列号的值
 		{
 			sql.Format(_T("update ALL_NODE set Bautrate = '%d' where Serial_ID = '%d'"),bandrate,m_sn);
-			ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+			 SqliteDBT3000.execDML((UTF8MBSTR)sql);
 		}
-		ado.CloseRecordset();
-		ado.CloseConn();
+		 SqliteDBT3000.closedb();
+		 
 		InitialDialog();
 		CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 		::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);

@@ -17,7 +17,7 @@
 #include "AddBuilding.h"
 #include "ScanSelectDlg.h"
 
-#include "MannageBuidingDlg.h"
+
 #include "AllNodesDiaolg.h"
 #include "GridLoad.h"
 #include "GridFlashDlg.h"
@@ -26,7 +26,7 @@
 #include "ManageAccountDlg.h"
 #include "LoginDlg.h"
 #include "AfxMessageDialog.h"
-#include "ImportDatabaseDlg.h"
+ 
 
 #include "EreaseDlg.h"
 
@@ -83,7 +83,7 @@ extern CString AutoFlashConfigPath;
 #include "PressureSensorForm.h"
 #include "TroubleShootDlg.h"
 #include "TempHumSensorForm.h"
-#include "bado/BADO.h"
+ 
 
 #include <algorithm>
 #include "BacnetMonitor.h"
@@ -95,6 +95,8 @@ extern CString AutoFlashConfigPath;
 
 #include "BoatMonitorViewer.h"
 #include "Class/md5.h"
+#include "../SQLiteDriver/CppSQLite3.h"
+
 bool b_create_status = false;
 const TCHAR c_strCfgFileName[] = _T("config.txt");
 //	配置文件名称，用于保存用户设置
@@ -288,7 +290,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
     ON_COMMAND(ID_ALLNODESDATABASE,OnAllNodeDatabase)
     ON_COMMAND( ID_FILE_LOADCONFIGFILE,OnLoadConfigFile)
     ON_COMMAND(ID_FILE_BATCHBURNHEX,OnBatchFlashHex)
-    ON_COMMAND(ID_FILE_IMPORTDATAFROMDATABASEFILE,OnImportDatase)
+    
 
     ON_COMMAND(ID_RW_INFO, OnLabel)
     ON_COMMAND(ID_BUILDING_INFO, OnLabe2)
@@ -848,30 +850,15 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     SetTimer(REFRESH_TIMER, REFRESH_TIMER_VALUE, NULL);
     SetTimer(SAVE_PRODYCT_STATUS, 30000, NULL);
 
-    m_pRefreshThread =(CRefreshTreeThread*) AfxBeginThread(RUNTIME_CLASS(CRefreshTreeThread));
-    m_pRefreshThread->SetMainWnd(this);
-
-
-    //tstat6
-    Tstat6_func();//为TSTST6新寄存器用的。
+     m_pRefreshThread =(CRefreshTreeThread*) AfxBeginThread(RUNTIME_CLASS(CRefreshTreeThread));
+     m_pRefreshThread->SetMainWnd(this);
 
 
 
-    //检测Tstat6数据库中的这个表是否存在
-    CString temptable = _T("Tstat6");
-    CString tempsql = _T("create table Tstat6(Block TEXT,Address TEXT,Data TEXT,Description TEXT)");
-    JudgeTstat6dbExist(temptable,tempsql);
-    temptable = _T("Tstat7");
-    tempsql = _T("create table Tstat7(Block TEXT,Address TEXT,Data TEXT,Description TEXT)");
-    JudgeTstat6dbExist(temptable,tempsql);
 
-    CString tempslider = _T("Sliderdb");
-    CString tempsqlslider = _T("create table Sliderdb(Block Number,Address Number)");
-    JudgeTstat6SliderExist(tempslider,tempsqlslider);
 
-    //读取Sliderdb的值。
-    ReadSlider();
 
+   
     BuildingComportConfig();//用于 更改 Config里面的 Comport项;
 
 
@@ -1137,12 +1124,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     }
 
 #endif
-    //m_pThread =NULL;// AfxBeginThread(_DownloadThread, this, THREAD_PRIORITY_NORMAL, CREATE_SUSPENDED);
-// 		if (m_pThread == NULL)
-// 		{
-// 			TRACE(_T("Failed to create download thread, dialog is aborting\n"));
-//
-// 		}
+ 
     PostMessage(WM_CREATE_STATUSBAR,0,0);
     CString image_fordor;
     image_fordor = temp_ApplicationFolder + _T("\\Database\\Buildings\\") + m_strCurMainBuildingName + _T("\\image");
@@ -1594,9 +1576,11 @@ void CMainFrame::DeleteConflictInDB()
 {
     bool find_conflict = false;
     int temp_item_count = (int)m_product.size();
-    CBADO bado;
-    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-    bado.OnInitADOConn();
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+
+	CppSQLite3DB SqliteDBBuilding;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
     for (int i=0; i<(int)m_product.size(); i++)
     {
@@ -1611,8 +1595,8 @@ void CMainFrame::DeleteConflictInDB()
                 mtemp_serial_number.Format(_T("%u"),m_product.at(i).serial_number);
                 try
                 {
-                    strSql.Format(_T("delete * from ALL_NODE where Serial_ID ='%s'"), mtemp_serial_number);
-                    bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+                    strSql.Format(_T("delete   from ALL_NODE where Serial_ID ='%s'"), mtemp_serial_number);
+                    SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
                 }
                 catch(_com_error *e)
                 {
@@ -1624,44 +1608,46 @@ void CMainFrame::DeleteConflictInDB()
             }
         }
     }
-    bado.CloseConn();
+    SqliteDBBuilding.closedb();
     if(find_conflict)
         PostMessage(WM_MYMSG_REFRESHBUILDING,0,0);
 }
-
-
 
 void CMainFrame::LoadProductFromDB()
 {
     ClearBuilding();
 	m_pTreeViewCrl->DeleteAllItems();
-    CADO ado;
-    ado.OnInitADOConn();
+	CppSQLite3DB SqliteDBT3000;
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+
     m_product.clear();
     CString strSql;
-    strSql.Format(_T("select * from Building where Default_SubBuilding=-1"));
-    ado.m_pRecordset=ado.OpenRecordset(strSql);
-    int count =ado.GetRecordCount(ado.m_pRecordset);
+    strSql.Format(_T("select * from Building where Default_SubBuilding=1"));
+    q = SqliteDBT3000.execQuery((UTF8MBSTR)strSql);
+	table = SqliteDBT3000.getTable((UTF8MBSTR)strSql);
+    int count =table.numRows();
     _variant_t temp_variant;
     if(count<=0)
     {
-        ado.CloseRecordset();
-        ado.CloseConn();
+         SqliteDBT3000.closedb();
         AfxMessageBox(_T("There is no default building, please select a building Firstly!"));
         return;
     }
 	
-    m_strCurMainBuildingName=ado.m_pRecordset->GetCollect("Main_BuildingName");
+    m_strCurMainBuildingName=q.getValuebyName(L"Main_BuildingName");
     CString cs_temp_protocol;
     CString cs_temp_baudrate;
-    temp_variant=ado.m_pRecordset->GetCollect("Protocal");//
-    if(temp_variant.vt!=VT_NULL)
+    cs_temp_protocol=q.getValuebyName(L"Protocal");//
+    if(!cs_temp_protocol.IsEmpty())
         cs_temp_protocol=temp_variant;
     else
     {
         cs_temp_protocol=_T("Auto");
         strSql.Format(_T("update Building set Protocal='Auto' where Main_BuildingName ='%s'"), m_strCurMainBuildingName);
-        ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+        SqliteDBT3000.execDML((UTF8MBSTR)strSql);
     }
 	if(cs_temp_protocol.CompareNoCase(_T("Remote Device")) == 0)
 	{
@@ -1671,27 +1657,7 @@ void CMainFrame::LoadProductFromDB()
 	{
 		b_remote_connection = false;
 	}
-    //if(cs_temp_protocol.CompareNoCase(_T("Modbus 485")) == 0 )
-    //{
-    //    current_building_protocol = P_MODBUS_485;
-    //}
-    //else if(cs_temp_protocol.CompareNoCase(_T("Modbus TCP")) == 0 )
-    //{
-    //    current_building_protocol = P_MODBUS_TCP;
-    //}
-    //else if(cs_temp_protocol.CompareNoCase(_T("Bacnet MSTP")) == 0 )
-    //{
-    //    current_building_protocol = P_BACNET_MSTP;
-    //}
-    //else if(cs_temp_protocol.CompareNoCase(_T("Bacnet IP")) == 0 )
-    //{
-    //    current_building_protocol = P_REMOTE_DEVICE;
-    //}
-    //else
-    //{
-    //    current_building_protocol = P_AUTO;
-    //}
-	//简直是脑残，老毛.要求这样瞎几把改. //不管客户选什么鸡吧协议 ， 都要能扫到所有设备.那不就是TMD只有Auto 了吗？还选个P啊;
+     
 	current_building_protocol = P_AUTO;
 
     CString StrComport;
@@ -1703,9 +1669,9 @@ void CMainFrame::LoadProductFromDB()
     {
 
 
-        temp_variant=ado.m_pRecordset->GetCollect("Braudrate");//
+        cs_temp_baudrate=q.getValuebyName(L"Braudrate");//
 
-        if(temp_variant.vt!=VT_NULL)
+        if(!cs_temp_baudrate.IsEmpty())
         {
             cs_temp_baudrate = temp_variant;
         }
@@ -1713,13 +1679,13 @@ void CMainFrame::LoadProductFromDB()
         {
             cs_temp_protocol=_T("19200");
             strSql.Format(_T("update Building set Braudrate='19200' where Main_BuildingName ='%s'"), m_strCurMainBuildingName);
-            ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+            SqliteDBT3000.execDML((UTF8MBSTR)strSql);
         }
 
         current_building_baudrate = _wtoi(cs_temp_baudrate);
  
-        temp_variant = ado.m_pRecordset->GetCollect(_T("Com_Port"));
-        if(temp_variant.vt!=VT_NULL)
+        StrComport =q.getValuebyName(_T("Com_Port"));
+        if(!StrComport.IsEmpty())
         {
             StrComport=temp_variant;
             current_building_comport = _wtoi(StrComport.Mid(3));
@@ -1730,10 +1696,9 @@ void CMainFrame::LoadProductFromDB()
         }
 
     }
-   // if (current_building_protocol == P_MODBUS_TCP || current_building_protocol == P_BACNET_IP || current_building_protocol == P_REMOTE_DEVICE)
-   // {
-        temp_variant=ado.m_pRecordset->GetCollect("Ip_Address");//
-        if(temp_variant.vt!=VT_NULL)
+  
+        StrIp=q.getValuebyName(L"Ip_Address");//
+        if(!StrIp.IsEmpty())
         {
             StrIp = temp_variant;
             m_str_curBuilding_Domain_IP = StrIp;
@@ -1743,109 +1708,71 @@ void CMainFrame::LoadProductFromDB()
             m_str_curBuilding_Domain_IP.Empty();
         }
 
-   // }
-  //  else
-  //      m_str_curBuilding_Domain_IP.Empty();
-    /*if(m_pRs->State)
-    m_pRs->Close();*/
-    ado.CloseRecordset();
+ 
+ 
     m_subNetLst.clear();
 
     strSql.Format(_T("select * from Building where Main_BuildingName ='%s'"),m_strCurMainBuildingName);
-    //m_pRs->Open(_variant_t(strSql),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-    ado.m_pRecordset=ado.OpenRecordset(strSql);
+    q = SqliteDBT3000.execQuery((UTF8MBSTR)strSql);
     m_nCurSubBuildingIndex=-1;
     int nTemp=-1;
-    while(VARIANT_FALSE==ado.m_pRecordset->EndOfFile)
+    while(!q.eof())
     {
         nTemp++;
         int nDefault=0;
         Building_info temBuildingInfo;
-        //memset(&temBuildingInfo,0,sizeof(temBuildingInfo));
-        temp_variant=ado.m_pRecordset->GetCollect("Building_Name");//
-        if(temp_variant.vt!=VT_NULL)
-            temBuildingInfo.strBuildingName=temp_variant;
-        else
-            temBuildingInfo.strBuildingName=_T("");
+   
+      temBuildingInfo.strBuildingName=q.getValuebyName(L"Building_Name");
 
 
 
-        temp_variant=ado.m_pRecordset->GetCollect("Protocal");//
-        if(temp_variant.vt!=VT_NULL)
-            temBuildingInfo.strProtocol=temp_variant;
-        else
-            temBuildingInfo.strProtocol=_T("");
+       
+            temBuildingInfo.strProtocol=q.getValuebyName(L"Protocal");
 
-        temp_variant=ado.m_pRecordset->GetCollect("Ip_Address");//
-        if(temp_variant.vt!=VT_NULL)
-            temBuildingInfo.strIp=temp_variant;
-        else
-            temBuildingInfo.strIp=_T("");
+        
+            temBuildingInfo.strIp=q.getValuebyName(L"Ip_Address");
 
 
-        temp_variant=ado.m_pRecordset->GetCollect("Com_Port");//
-        if(temp_variant.vt!=VT_NULL)
-            temBuildingInfo.strComPort=temp_variant;
-        else
-            temBuildingInfo.strComPort=_T("");
+      
+            temBuildingInfo.strComPort=q.getValuebyName(L"Com_Port");
 
-
-        temp_variant=ado.m_pRecordset->GetCollect("Ip_Port");//
-        if(temp_variant.vt!=VT_NULL)
-            temBuildingInfo.strIpPort=temp_variant;
-        else
-            temBuildingInfo.strIpPort=_T("");
+ 
+            temBuildingInfo.strIpPort=q.getValuebyName(L"Ip_Port");
 
 
 
 
         temBuildingInfo.hCommunication=NULL;
 
-        temp_variant=ado.m_pRecordset->GetCollect("Main_BuildingName");//
-        if(temp_variant.vt!=VT_NULL)
-            temBuildingInfo.strMainBuildingname=temp_variant;
-        else
-            temBuildingInfo.strMainBuildingname=temp_variant;
+   
+            temBuildingInfo.strMainBuildingname=q.getValuebyName(L"Main_BuildingName");
 
 
 
-        temp_variant=ado.m_pRecordset->GetCollect("Braudrate");//
-        if(temp_variant.vt!=VT_NULL)
-            temBuildingInfo.strBaudRate=temp_variant;
-        else
-            temBuildingInfo.strBaudRate=_T("");
+       
+            temBuildingInfo.strBaudRate=q.getValuebyName(L"Braudrate");
 
 
 
         CString Building_DBpath;
-        nDefault=ado.m_pRecordset->GetCollect("Default_SubBuilding");
-        if(nDefault==-1)
+        nDefault=q.getIntField("Default_SubBuilding");
+        if(nDefault==1)
         {
             m_nCurSubBuildingIndex=nTemp;
         }
-        Building_DBpath=ado.m_pRecordset->GetCollect("Building_Path");
+        Building_DBpath=q.getValuebyName(L"Building_Path");
+		 
+		 
+		g_strCurBuildingDatabasefilePath  = g_strExePth+ Building_DBpath;
 
-        int index= Building_DBpath.Find(_T("Database"));
-        Building_DBpath.Delete(0,index);
-
-        g_strCurBuildingDatabasefilePath=GetExePath(true)+  Building_DBpath;
-
-
-
-        //nDefault=ado.m_pRecordset->GetCollect("Default_SubBuilding");
-        //if(nDefault==-1)
-        //{
-        //	m_nCurSubBuildingIndex=nTemp;
-        //}
-        //g_strCurBuildingDatabasefilePath=ado.m_pRecordset->GetCollect("Building_Path");
-
-        ado.m_pRecordset->MoveNext();
+ 		 
+        q.nextRow();
         m_subNetLst.push_back(temBuildingInfo);
     }
     if(m_subNetLst.size()<=0)
         AfxMessageBox(_T("There is no default building,please select a building First！"));
 
-    ado.CloseRecordset();
+     
 
     TV_INSERTSTRUCT tvInsert;////added
 
@@ -1866,10 +1793,8 @@ void CMainFrame::LoadProductFromDB()
         m_pTreeViewCrl->Expand(hParent, TVE_EXPAND);
 
 
-
-    CBADO bado;
-    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-    bado.OnInitADOConn();
+		SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+    
     HTREEITEM hlocalnetwork=NULL;
 	//老毛个神经病 ，改来改去 ，出尔反尔. 要求选择远程连接的时候 不显示 本地的设备.
 	//潜在问题是客户一不小心选中remote 后 ，这样改会出现 扫描不到的情况.即使扫描到了 ，老毛要求不显示本地的设备，客户会抱怨 扫不到.
@@ -1945,15 +1870,15 @@ void CMainFrame::LoadProductFromDB()
             if((z == COM_SERIAL_PORT) && (b_remote_connection == false))
             {
                 strSql.Format(_T("select DISTINCT Com_Port from ALL_NODE where Building_Name = '%s' ORDER BY Com_Port ASC"),strBuilding);
-                bado.m_pRecordset=bado.OpenRecordset(strSql);
-                nTemp3 = bado.GetRecordCount(bado.m_pRecordset);
-                while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)//所有楼层。
+                q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+				 
+                while(!q.eof())//所有楼层。
                 {
-                    PortName= bado.m_pRecordset->GetCollect("Com_Port");
+                    PortName= q.getValuebyName(L"Com_Port");
                     int comport_value = _wtoi(PortName);
                     if(comport_value > 50)
                     {
-                        bado.m_pRecordset->MoveNext();
+                        q.nextRow();
                         continue;
                     }
 
@@ -1974,9 +1899,9 @@ void CMainFrame::LoadProductFromDB()
                     m_comport_temp.each_port_item = hcomport;
                     m_comport_temp.strComPortName=PortName;
                     m_comportlist.push_back(m_comport_temp);
-                    bado.m_pRecordset->MoveNext();
+                    q.nextRow();
                 }
-                bado.CloseRecordset();
+                 
             }
 			if(hrootserialport != NULL)
 				m_pTreeViewCrl->Expand(hrootserialport, TVE_EXPAND);
@@ -2014,37 +1939,34 @@ void CMainFrame::LoadProductFromDB()
 					strSql.Format(_T("select * from ALL_NODE where Building_Name = '%s' and Protocol = '%s'"),strBuilding,temp_cs);
 				}
 
-                bado.m_pRecordset=bado.OpenRecordset(strSql);
-                int temp_count = bado.GetRecordCount(bado.m_pRecordset);
-                if(temp_count > 0)
+                q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+                
+                if(!q.eof())
                 {
-                    while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)//次Com port 下面的所有 设备;
+                    while(!q.eof())//次Com port 下面的所有 设备;
                     {
                         if(z == LOCAL_NETWORK_PORT)
                         {
-                            PortName= bado.m_pRecordset->GetCollect("Com_Port");
+                            PortName=q.getValuebyName(L"Com_Port");
                             int comport_value = _wtoi(PortName);
                             if(comport_value <= 50)
                             {
-                                bado.m_pRecordset->MoveNext();
+                                q.nextRow();
                                 continue;
                             }
                         }
 
-                        temp_variant=bado.m_pRecordset->GetCollect("Parent_SerialNum");
-                        if(temp_variant.vt!=VT_NULL)
-                            temp_parent_serialnum=temp_variant;
-                        else
-                            temp_parent_serialnum=_T("");
+                      
+                            temp_parent_serialnum=q.getValuebyName(L"Parent_SerialNum");
                         unsigned int temp_int_serial;
                         temp_int_serial = (unsigned int)_wtoi(temp_parent_serialnum);
                         if((!temp_parent_serialnum.IsEmpty()) && (temp_int_serial != 0))	//说明有父节点;先插入父节点
                         {
-                            bado.m_pRecordset->MoveNext();
+                            q.nextRow();
                             continue;
                         }
 
-                        CString strProdcut=bado.m_pRecordset->GetCollect("Product_name");
+                        CString strProdcut=q.getValuebyName(L"Product_name");
                         if(z == COM_SERIAL_PORT)
                         {
                             tvInsert.hParent = m_comportlist.at(j).each_port_item ; // 指定父句柄
@@ -2061,7 +1983,7 @@ void CMainFrame::LoadProductFromDB()
                         tvInsert.item.pszText =(LPTSTR)(LPCTSTR) strProdcut;
                         //TRACE(strProdcut);
                         tvInsert.hInsertAfter =TVI_SORT;// TVI_LAST; // 项目插入方式
-                        int temp_product_class_id=bado.m_pRecordset->GetCollect("Product_class_ID");
+                        int temp_product_class_id=q.getIntField("Product_class_ID");
                         if(temp_product_class_id==PM_NC)
                             TVINSERV_NET_WORK
                             else if(temp_product_class_id==LED_PRODUCT_MODEL)
@@ -2110,11 +2032,8 @@ void CMainFrame::LoadProductFromDB()
                         tree_product m_product_temp;
                         m_product_temp.product_item  =hProductItem;
 
-                        temp_variant=bado.m_pRecordset->GetCollect("Serial_ID");//
-                        if(temp_variant.vt!=VT_NULL)
-                            strSql=temp_variant;
-                        else
-                            strSql=_T("");
+                       
+                            strSql=q.getValuebyName(L"Serial_ID");
 
                         long temp_serial_id = (long)(_wtoi64(strSql));
                         unsigned int correct_id = (DWORD)(_wtoi64(strSql));
@@ -2129,7 +2048,7 @@ void CMainFrame::LoadProductFromDB()
                             try
                             {
                                 str_temp.Format(_T("update ALL_NODE set Serial_ID ='%s' where Serial_ID = '%s'"),correct_serial_id, wrong_serial_id);
-                                bado.m_pConnection->Execute(str_temp.GetString(),NULL,adCmdText);
+                                SqliteDBBuilding.execDML((UTF8MBSTR)str_temp);
                             }
                             catch(_com_error *e)
                             {
@@ -2137,59 +2056,34 @@ void CMainFrame::LoadProductFromDB()
                             }
                         }
                         m_product_temp.serial_number= correct_id;
-
-                        temp_variant=bado.m_pRecordset->GetCollect("Product_ID");//
-                        if(temp_variant.vt!=VT_NULL)
-                            strSql=temp_variant;
-                        else
-                            strSql=_T("");
+						 
+                        strSql=q.getValuebyName(L"Product_ID");
                         m_product_temp.product_id=_wtoi(strSql);
 
-                        temp_variant=bado.m_pRecordset->GetCollect("NetworkCard_Address");//
-                        if(temp_variant.vt!=VT_NULL)
-                            strSql=temp_variant;
-                        else
-                            strSql=_T("");
+                        
+                            strSql=q.getValuebyName(L"NetworkCard_Address");
                         m_product_temp.NetworkCard_Address=strSql;
-                        temp_variant=bado.m_pRecordset->GetCollect("Product_class_ID");//
-                        if(temp_variant.vt!=VT_NULL)
-                            strSql=temp_variant;
-                        else
-                            strSql=_T("");
+                        
+                            strSql=q.getValuebyName(L"Product_class_ID");
                         m_product_temp.product_class_id=_wtoi(strSql);
-                        temp_variant=bado.m_pRecordset->GetCollect("Hardware_Ver");//
-                        if(temp_variant.vt!=VT_NULL)
-                            strSql=temp_variant;
-                        else
-                            strSql=_T("");
+                      
+                            strSql=q.getValuebyName(L"Hardware_Ver");
                         m_product_temp.hardware_version=(float)_wtof(strSql);
 
-                        temp_variant=bado.m_pRecordset->GetCollect("Software_Ver");//
-                        if(temp_variant.vt!=VT_NULL)
-                            strSql=temp_variant;
-                        else
-                            strSql=_T("");
+                        
+                            strSql=q.getValuebyName(L"Software_Ver");
                         m_product_temp.software_version=(float)_wtof(strSql);
 
-                        temp_variant=bado.m_pRecordset->GetCollect("EPsize");//
-                        if(temp_variant.vt!=VT_NULL)
-                            strSql=temp_variant;
-                        else
-                            strSql=_T("");
+                       
+                            strSql=q.getValuebyName(L"EPsize");
                         m_product_temp.nEPsize=(int)_wtol(strSql);
 
-                        temp_variant=bado.m_pRecordset->GetCollect("Protocol");//
-                        if(temp_variant.vt!=VT_NULL)
-                            strSql=temp_variant;
-                        else
-                            strSql=_T("");
+                    
+                            strSql=q.getValuebyName(L"Protocol");
                         m_product_temp.protocol = (int)_wtoi(strSql);
 
-                        temp_variant=bado.m_pRecordset->GetCollect("Bautrate");//
-                        if(temp_variant.vt!=VT_NULL)
-                            strSql=temp_variant;
-                        else
-                            strSql=_T("");
+                      
+                            strSql=q.getValuebyName(L"Bautrate");
                         if(_wtoi(strSql) !=0)
                             m_product_temp.baudrate = _wtoi(strSql);
                         else
@@ -2210,10 +2104,10 @@ void CMainFrame::LoadProductFromDB()
                             m_product_temp.baudrate = 19200;
                         }
                         ////
-                        temp_variant=bado.m_pRecordset->GetCollect("Online_Status");//
-                        if(temp_variant.vt!=VT_NULL)
+                        int is_online=q.getIntField("Online_Status");//
+                        if(is_online == 1)
                         {
-                            m_product_temp.status = temp_variant;
+                            m_product_temp.status = is_online;
                             m_product_temp.status_last_time[0] = m_product_temp.status;
                             m_product_temp.status_last_time[1] = false;
                             m_product_temp.status_last_time[2] = false;
@@ -2225,22 +2119,13 @@ void CMainFrame::LoadProductFromDB()
                             m_product_temp.status_last_time[1] = false;
                             m_product_temp.status_last_time[2] = false;
                         }
-                        temp_variant=bado.m_pRecordset->GetCollect("Custom");//
-                        if(temp_variant.vt!=VT_NULL)
-                            m_product_temp.Custom=temp_variant;
-                        else
-                            m_product_temp.Custom=_T("");
+                       
+                            m_product_temp.Custom=q.getValuebyName(L"Custom");
 
-                        temp_variant=bado.m_pRecordset->GetCollect("Product_name");//
-                        if(temp_variant.vt!=VT_NULL)
-                        {
-                            m_product_temp.NameShowOnTree = temp_variant;
-                        }
-                        else
-                        {
-                            m_product_temp.NameShowOnTree = _T("");
+                       
+                            m_product_temp.NameShowOnTree =  q.getValuebyName(L"Product_name");
 
-                        }
+                      
 
 
                         m_product_temp.BuildingInfo=m_subNetLst.at(m_nCurSubBuildingIndex);
@@ -2255,64 +2140,26 @@ void CMainFrame::LoadProductFromDB()
                             m_product_temp.BuildingInfo.strIp = strSql;
                         }
 
-                        temp_variant=bado.m_pRecordset->GetCollect("Com_Port");//
-                        if(temp_variant.vt!=VT_NULL)
-                        {
-                            strSql=temp_variant;
-                            m_product_temp.ncomport = _wtoi(strSql);
-                        }
-                        else
-                        {
-                            strSql=_T("");
-                            m_product_temp.ncomport = 0;
-                        }
+                        m_product_temp.ncomport=q.getIntField("Com_Port");//
+                         
                         m_product_temp.BuildingInfo.strIpPort = _T("10000");
-                        temp_variant=bado.m_pRecordset->GetCollect("Background_imgID");
-                        if(temp_variant.vt!=VT_NULL)
-                            m_product_temp.strImgPathName=temp_variant;
-                        else
-                            m_product_temp.strImgPathName=_T("");
+                        m_product_temp.strImgPathName=q.getValuebyName(L"Background_imgID");
 
+                        m_product_temp.note_parent_serial_number=q.getIntField("Parent_SerialNum");
 
-                        temp_variant=bado.m_pRecordset->GetCollect("Parent_SerialNum");
-                        if(temp_variant.vt!=VT_NULL)
-                        {
-                            CString temp_value1;
-                            temp_value1 = temp_variant;
-                            m_product_temp.note_parent_serial_number=(unsigned int)_wtoi(temp_value1);
-                        }
-                        else
-                            m_product_temp.note_parent_serial_number=0;
+                        m_product_temp.panel_number=q.getIntField("Panal_Number");
+                       
 
-
-
-                        temp_variant=bado.m_pRecordset->GetCollect("Panal_Number");
-                        if(temp_variant.vt!=VT_NULL)
-                        {
-                            CString temp_value1;
-                            temp_value1 = temp_variant;
-                            m_product_temp.panel_number=(unsigned char)_wtoi(temp_value1);
-                        }
-                        else
-                            m_product_temp.panel_number=0;
-
-                        temp_variant=bado.m_pRecordset->GetCollect("Object_Instance");
-                        if(temp_variant.vt!=VT_NULL)
-                        {
-                            CString temp_value1;
-                            temp_value1 = temp_variant;
-                            m_product_temp.object_instance=(unsigned int)_wtoi(temp_value1);
-                        }
-                        else
-                            m_product_temp.object_instance=0;
+                        m_product_temp.object_instance=q.getIntField("Object_Instance");
+                        
 
 
                         m_product.push_back(m_product_temp);
-                        bado.m_pRecordset->MoveNext();
+                        q.nextRow();
 
                     }
                 }
-                bado.CloseRecordset();
+                
 
                 if(z == COM_SERIAL_PORT)
                 {
@@ -2327,35 +2174,20 @@ void CMainFrame::LoadProductFromDB()
 					 strSql.Format(_T("select * from ALL_NODE where Building_Name = '%s' and Parent_SerialNum <> '0' and Parent_SerialNum <> '' and Protocol ='6'"),strBuilding);
 				}
 
-				//if(z == COM_SERIAL_PORT)
-				//{
-				//	strSql.Format(_T("select * from ALL_NODE where Building_Name = '%s' and Com_Port = '%s' and Parent_SerialNum <> '0' "),strBuilding,temp_cs);
-				//}
-				//else if(z == LOCAL_NETWORK_PORT)
-				//{
-				//	strSql.Format(_T("select * from ALL_NODE where Building_Name = '%s' and Parent_SerialNum <> '0'"),strBuilding);
-				//}
+			 
 
-                bado.m_pRecordset=bado.OpenRecordset(strSql);
-                int temp_child_note_count = bado.GetRecordCount(bado.m_pRecordset);
-                if(temp_child_note_count > 0)//就说明这个节点下面有 挂在父节点下面的;
+                 
+				q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+
+               
+                if(!q.eof())//就说明这个节点下面有 挂在父节点下面的;
                 {
-                    while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+                    while(!q.eof())
                     {
 						    _variant_t temp_variant_parent;
                         CString cs_parents_serial_number;
                         unsigned int uint_p_serial_number;
-                        temp_variant_parent=bado.m_pRecordset->GetCollect("Parent_SerialNum");
-
-
-						if(temp_variant_parent.vt!=VT_NULL)
-						{
-							CString temp_value1;
-							cs_parents_serial_number = temp_variant_parent;
-						}
-						else
-							cs_parents_serial_number = _T("0");
-
+                        cs_parents_serial_number=q.getValuebyName(L"Parent_SerialNum");
 
                         uint_p_serial_number = _wtoi(cs_parents_serial_number);
                         bool find_parents = false;
@@ -2372,7 +2204,7 @@ void CMainFrame::LoadProductFromDB()
 
                         if(find_parents)
                         {
-                            CString strProdcut=bado.m_pRecordset->GetCollect("Product_name");
+                            CString strProdcut=q.getValuebyName(L"Product_name");
                             tvInsert.hParent = parents_item ; // 指定父句柄
                             tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
                             tvInsert.item.pszText =(LPTSTR)(LPCTSTR) strProdcut;
@@ -2380,7 +2212,7 @@ void CMainFrame::LoadProductFromDB()
                             tvInsert.hInsertAfter =TVI_SORT;// TVI_LAST; // 项目插入方式
 
 
-                            int temp_product_class_id=bado.m_pRecordset->GetCollect("Product_class_ID");
+                            int temp_product_class_id=q.getIntField("Product_class_ID");
                             if(temp_product_class_id==PM_NC)
                                 TVINSERV_NET_WORK
                                 else if(temp_product_class_id==LED_PRODUCT_MODEL)
@@ -2429,11 +2261,8 @@ void CMainFrame::LoadProductFromDB()
                             tree_product m_product_temp;
                             m_product_temp.product_item  =hSubItem;
 
-                            temp_variant=bado.m_pRecordset->GetCollect("Serial_ID");//
-                            if(temp_variant.vt!=VT_NULL)
-                                strSql=temp_variant;
-                            else
-                                strSql=_T("");
+                         
+                                strSql=q.getValuebyName(L"Serial_ID");
 
                             long temp_serial_id = (long)(_wtoi64(strSql));
                             unsigned int correct_id = (DWORD)(_wtoi64(strSql));
@@ -2448,7 +2277,7 @@ void CMainFrame::LoadProductFromDB()
                                 try
                                 {
                                     str_temp.Format(_T("update ALL_NODE set Serial_ID ='%s' where Serial_ID = '%s'"),correct_serial_id, wrong_serial_id);
-                                    bado.m_pConnection->Execute(str_temp.GetString(),NULL,adCmdText);
+                                    SqliteDBBuilding.execDML((UTF8MBSTR)str_temp);
                                 }
                                 catch(_com_error *e)
                                 {
@@ -2457,63 +2286,36 @@ void CMainFrame::LoadProductFromDB()
                             }
                             m_product_temp.serial_number= correct_id;
 
-                            temp_variant=bado.m_pRecordset->GetCollect("Product_ID");//
-                            if(temp_variant.vt!=VT_NULL)
-                                strSql=temp_variant;
-                            else
-                                strSql=_T("");
+                           
+                                strSql=q.getValuebyName(_T("Product_ID"));
                             m_product_temp.product_id=_wtoi(strSql);
-                            temp_variant=bado.m_pRecordset->GetCollect("Custom");//
-                            if(temp_variant.vt!=VT_NULL)
-                                strSql=temp_variant;
-                            else
-                                strSql=_T("");
+                           
+                                strSql=q.getValuebyName(_T("Custom"));
                             m_product_temp.Custom=strSql;
-                            temp_variant=bado.m_pRecordset->GetCollect("NetworkCard_Address");//
-                            if(temp_variant.vt!=VT_NULL)
-                                strSql=temp_variant;
-                            else
-                                strSql=_T("");
+                             
+                                strSql=q.getValuebyName(_T("NetworkCard_Address"));
                             m_product_temp.NetworkCard_Address=strSql;
-                            temp_variant=bado.m_pRecordset->GetCollect("Product_class_ID");//
-                            if(temp_variant.vt!=VT_NULL)
-                                strSql=temp_variant;
-                            else
-                                strSql=_T("");
+                           
+                                strSql=q.getValuebyName(L"Product_class_ID");
                             m_product_temp.product_class_id=_wtoi(strSql);
-                            temp_variant=bado.m_pRecordset->GetCollect("Hardware_Ver");//
-                            if(temp_variant.vt!=VT_NULL)
-                                strSql=temp_variant;
-                            else
-                                strSql=_T("");
+                           
+                                strSql=q.getValuebyName(L"Hardware_Ver");
                             m_product_temp.hardware_version=(float)_wtof(strSql);
 
-                            temp_variant=bado.m_pRecordset->GetCollect("Software_Ver");//
-                            if(temp_variant.vt!=VT_NULL)
-                                strSql=temp_variant;
-                            else
-                                strSql=_T("");
+                            
+                                strSql=q.getValuebyName(L"Software_Ver");
                             m_product_temp.software_version=(float)_wtof(strSql);
 
-                            temp_variant=bado.m_pRecordset->GetCollect("EPsize");//
-                            if(temp_variant.vt!=VT_NULL)
-                                strSql=temp_variant;
-                            else
-                                strSql=_T("");
+                            
+                                strSql=q.getValuebyName(L"EPsize");
                             m_product_temp.nEPsize=(int)_wtol(strSql);
 
-                            temp_variant=bado.m_pRecordset->GetCollect("Protocol");//
-                            if(temp_variant.vt!=VT_NULL)
-                                strSql=temp_variant;
-                            else
-                                strSql=_T("");
+                            
+                                strSql=q.getValuebyName(L"Protocol");
                             m_product_temp.protocol = (int)_wtoi(strSql);
 
-                            temp_variant=bado.m_pRecordset->GetCollect("Bautrate");//
-                            if(temp_variant.vt!=VT_NULL)
-                                strSql=temp_variant;
-                            else
-                                strSql=_T("");
+                          
+                                strSql=q.getValuebyName(L"Bautrate");
                             if(_wtoi(strSql) !=0)
                                 m_product_temp.baudrate = _wtoi(strSql);
                             else
@@ -2534,10 +2336,10 @@ void CMainFrame::LoadProductFromDB()
                                 m_product_temp.baudrate = 19200;
                             }
                             ////
-                            temp_variant=bado.m_pRecordset->GetCollect("Online_Status");//
-                            if(temp_variant.vt!=VT_NULL)
+                            int is_online=q.getIntField("Online_Status");//
+                            if(is_online == 1)
                             {
-                                m_product_temp.status = temp_variant;
+                                m_product_temp.status = is_online;
                                 m_product_temp.status_last_time[0] = m_product_temp.status;
                                 m_product_temp.status_last_time[1] = false;
                                 m_product_temp.status_last_time[2] = false;
@@ -2550,16 +2352,8 @@ void CMainFrame::LoadProductFromDB()
                                 m_product_temp.status_last_time[2] = false;
                             }
 
-                            temp_variant=bado.m_pRecordset->GetCollect("Product_name");//
-                            if(temp_variant.vt!=VT_NULL)
-                            {
-                                m_product_temp.NameShowOnTree = temp_variant;
-                            }
-                            else
-                            {
-                                m_product_temp.NameShowOnTree = _T("");
-
-                            }
+                             m_product_temp.NameShowOnTree=q.getValuebyName(L"Product_name");//
+              
 
 
                             m_product_temp.BuildingInfo=m_subNetLst.at(m_nCurSubBuildingIndex);
@@ -2574,66 +2368,771 @@ void CMainFrame::LoadProductFromDB()
                                 m_product_temp.BuildingInfo.strIp = strSql;
                             }
 
-                            temp_variant=bado.m_pRecordset->GetCollect("Com_Port");//
-                            if(temp_variant.vt!=VT_NULL)
-                            {
-                                strSql=temp_variant;
-                                m_product_temp.ncomport = _wtoi(strSql);
-                            }
-                            else
-                            {
-                                strSql=_T("");
-                                m_product_temp.ncomport = 0;
-                            }
+                            
+							 m_product_temp.ncomport = q.getIntField("Com_Port");
                             m_product_temp.BuildingInfo.strIpPort = _T("10000");
-                            temp_variant=bado.m_pRecordset->GetCollect("Background_imgID");
-                            if(temp_variant.vt!=VT_NULL)
-                                m_product_temp.strImgPathName=temp_variant;
-                            else
-                                m_product_temp.strImgPathName=_T("");
+                            m_product_temp.strImgPathName=q.getValuebyName(L"Background_imgID");
+                            
 
-                            temp_variant=bado.m_pRecordset->GetCollect("Parent_SerialNum");
-                            if(temp_variant.vt!=VT_NULL)
-                            {
-                                CString temp_value1;
-                                temp_value1 = temp_variant;
-                                m_product_temp.note_parent_serial_number=(unsigned int)_wtoi(temp_value1);
-                            }
-                            else
-                                m_product_temp.note_parent_serial_number=0;
+                            m_product_temp.note_parent_serial_number=q.getIntField("Parent_SerialNum");
+                            
 
-                            temp_variant=bado.m_pRecordset->GetCollect("Panal_Number");
-                            if(temp_variant.vt!=VT_NULL)
-                            {
-                                CString temp_value1;
-                                temp_value1 = temp_variant;
-                                m_product_temp.panel_number=(unsigned char)_wtoi(temp_value1);
-                            }
-                            else
-                                m_product_temp.panel_number=0;
+                            m_product_temp.panel_number=q.getIntField("Panal_Number");
+                       
 
-                            temp_variant=bado.m_pRecordset->GetCollect("Object_Instance");
-                            if(temp_variant.vt!=VT_NULL)
-                            {
-                                CString temp_value1;
-                                temp_value1 = temp_variant;
-                                m_product_temp.object_instance=(unsigned int)_wtoi(temp_value1);
-                            }
-                            else
-                                m_product_temp.object_instance=0;
+                            m_product_temp.object_instance=q.getIntField("Object_Instance");
+                          
 
                             m_product.push_back(m_product_temp);
 
                         }
-                        bado.m_pRecordset->MoveNext();
+                        q.nextRow();
                     }
                 }
-                bado.CloseRecordset();
+                 
             }
         }
     }
     m_pTreeViewCrl->Expand(hTreeSubbuilding, TVE_EXPAND);
+
+	SqliteDBT3000.closedb();
+	SqliteDBBuilding.closedb();
 }
+
+//void CMainFrame::LoadProductFromDB()
+//{
+//    ClearBuilding();
+//	m_pTreeViewCrl->DeleteAllItems();
+//
+//	CppSQLite3DB SqliteDB;
+//	CppSQLite3Table table;
+//	SqliteDB.open((UTF8MBSTR)g_strDatabasefilepath);
+//    m_product.clear();
+//    CString strSql;
+//    strSql.Format(_T("select * from Building where Default_SubBuilding=1"));
+//	/*  Table recordtable =SqliteDB.QuerySQL(strSql);
+//	int count =recordtable.GetRowCount();*/
+//	CppSQLite3Query q = SqliteDB.execQuery((UTF8MBSTR)strSql);
+//	
+//    /*_variant_t temp_variant;*/
+//    if(q.eof())
+//    {
+//        /*ado.CloseRecordset();
+//        ado.CloseConn();*/
+//		SqliteDB.closedb();
+//        AfxMessageBox(_T("There is no default building, please select a building Firstly!"));
+//        return;
+//    }
+//	
+//    m_strCurMainBuildingName=q.getValuebyName(L"Main_BuildingName");
+//    CString cs_temp_protocol;
+//    CString cs_temp_baudrate;
+//    cs_temp_protocol=q.getValuebyName(L"Protocal");
+//  
+//	if (cs_temp_protocol.IsEmpty())
+//	{
+//		cs_temp_protocol=_T("Auto");
+//		strSql.Format(_T("update Building set Protocal='Auto' where Main_BuildingName ='%s'"), m_strCurMainBuildingName);
+//		SqliteDB.execDML((UTF8MBSTR)strSql);
+//		//ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+//	}
+//	if(cs_temp_protocol.CompareNoCase(_T("Remote Device")) == 0)
+//	{
+//		b_remote_connection = true;
+//	}
+//	else
+//	{
+//		b_remote_connection = false;
+//	}
+//     
+//	current_building_protocol = P_AUTO;
+//
+//    CString StrComport;
+//    CString StrBaudrate;
+//
+//
+//    CString StrIp;
+//    if((current_building_protocol == P_MODBUS_485) || (current_building_protocol == P_BACNET_MSTP))
+//    {
+//
+//
+//        
+//		cs_temp_baudrate = q.getValuebyName(L"Braudrate");
+//		if (cs_temp_baudrate.IsEmpty())
+//		{
+//			cs_temp_protocol=_T("19200");
+//			strSql.Format(_T("update Building set Braudrate='19200' where Main_BuildingName ='%s'"), m_strCurMainBuildingName);
+//			SqliteDB.execDML((UTF8MBSTR)strSql);
+//			
+//		}
+//        current_building_baudrate = _wtoi(cs_temp_baudrate);
+// 
+//      
+//		StrComport = q.getValuebyName(L"Com_Port");
+//		if (StrComport.IsEmpty())
+//		{
+//			current_building_comport=-1;
+//		}
+//		else
+//		{
+//		    current_building_comport = _wtoi(StrComport.Mid(3));
+//		}
+//
+//    }
+//    
+//
+//	StrIp = q.getValuebyName(L"Ip_Address");
+//	if (StrIp.IsEmpty())
+//	{
+//		m_str_curBuilding_Domain_IP.Empty();
+//	}
+//	else
+//	{
+//		m_str_curBuilding_Domain_IP = StrIp;
+//	}
+//  
+//     
+//    m_subNetLst.clear();
+//
+//	strSql.Format(_T("select * from Building where Main_BuildingName ='%s'"),m_strCurMainBuildingName);
+//    q = SqliteDB.execQuery((UTF8MBSTR)strSql);
+//    
+//    m_nCurSubBuildingIndex=-1;
+//    int nTemp=-1;
+//    while(!q.eof())
+//    {
+//        nTemp++;
+//        int nDefault=0;
+//        Building_info temBuildingInfo;
+//        memset(&temBuildingInfo,0,sizeof(temBuildingInfo));
+//     
+//	    temBuildingInfo.strMainBuildingname = q.getValuebyName(L"Main_BuildingName");
+//		temBuildingInfo.strBuildingName = q.getValuebyName(L"Building_Name");
+//		temBuildingInfo.strProtocol = q.getValuebyName(L"Protocal");
+//        temBuildingInfo.strIp = q.getValuebyName(L"Ip_Address");
+//        temBuildingInfo.strComPort = q.getValuebyName(L"Com_Port");
+//		temBuildingInfo.strIpPort = q.getValuebyName(L"Ip_Port");
+//		temBuildingInfo.strBaudRate = q.getValuebyName(L"Braudrate");
+//
+//        temBuildingInfo.hCommunication=NULL;
+//
+//        CString Building_DBpath;
+//        nDefault=q.getIntField("Default_SubBuilding");
+//
+//        if(nDefault==1)
+//        {
+//            m_nCurSubBuildingIndex=nTemp;
+//        }
+//        Building_DBpath=q.getValuebyName(L"Building_Path");
+//
+//        int index= Building_DBpath.Find(_T("Database"));
+//        Building_DBpath.Delete(0,index);
+//
+//        g_strCurBuildingDatabasefilePath=GetExePath(true)+  Building_DBpath;
+// 
+//        q.nextRow();
+//        m_subNetLst.push_back(temBuildingInfo);
+//    }
+//
+//	 SqliteDB.closedb();
+//    if(m_subNetLst.size()<=0)
+//        AfxMessageBox(_T("There is no default building,please select a building First！"));
+//   
+//    
+//
+//    TV_INSERTSTRUCT tvInsert;////added
+//
+//    m_strCurSubBuldingName=m_subNetLst.at(m_nCurSubBuildingIndex).strBuildingName;
+//
+//    CString strBuilding=m_strCurSubBuldingName;//m_subNetLst.at(k).strBuildingName;
+//
+//    tvInsert.hParent = TVI_ROOT; // 指定父句柄
+//    tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
+//    tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strBuilding;
+//    tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
+//    TVINSERV_BUILDING
+//    HTREEITEM hTreeSubbuilding=NULL;
+//    hTreeSubbuilding=m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//插入subbuilding。
+//    // Expand the parent, if possible.
+//    HTREEITEM hParent = m_pTreeViewCrl->GetParentItem(hTreeSubbuilding);
+//    if (hParent != NULL)
+//        m_pTreeViewCrl->Expand(hParent, TVE_EXPAND);
+//
+//
+//
+// 
+//	SqliteDB.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+//	
+//    HTREEITEM hlocalnetwork=NULL;
+//	//老毛个神经病 ，改来改去 ，出尔反尔. 要求选择远程连接的时候 不显示 本地的设备.
+//	//潜在问题是客户一不小心选中remote 后 ，这样改会出现 扫描不到的情况.即使扫描到了 ，老毛要求不显示本地的设备，客户会抱怨 扫不到.
+//	if(b_remote_connection == false)
+//	{
+//		if((current_building_protocol == P_MODBUS_TCP) || (current_building_protocol == P_AUTO))
+//		{
+//			CString strNetWrokName= _T("Local Network");
+//			///*********tree***********************************
+//			tvInsert.hParent = hTreeSubbuilding; // 指定父句柄
+//			tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
+//
+//			tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strNetWrokName;
+//			tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
+//			TVINSERV_FLOOR
+//
+//
+//				hlocalnetwork=m_pTreeViewCrl->InsertItem(&tvInsert);//返回楼层的句柄
+//		}
+//	}
+//
+//    HTREEITEM hrootserialport=NULL;
+//	if(b_remote_connection == false)
+//	{
+//		if((current_building_protocol == P_MODBUS_485) || (current_building_protocol == P_BACNET_MSTP) || (current_building_protocol == P_AUTO))
+//		{
+//			CString strSerialRootName= _T("Serial Port");
+//			///*********tree***********************************
+//			tvInsert.hParent = hTreeSubbuilding; // 指定父句柄
+//			tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
+//
+//			tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strSerialRootName;
+//			tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
+//			TVINSERV_FLOOR
+//
+//
+//				hrootserialport=m_pTreeViewCrl->InsertItem(&tvInsert);
+//		}
+//	}
+//
+//	HTREEITEM hrootremote=NULL;
+//	if(b_remote_connection)
+//	{
+//		if((current_building_protocol == P_REMOTE_DEVICE)|| (current_building_protocol == P_AUTO))
+//		{
+//			CString strRemoteNetworkName= _T("Remote Network Device");
+//			///*********tree***********************************
+//			tvInsert.hParent = hTreeSubbuilding; // 指定父句柄
+//			tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
+//
+//			tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strRemoteNetworkName;
+//			tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
+//			TVINSERV_FLOOR
+//
+//
+//				hrootremote=m_pTreeViewCrl->InsertItem(&tvInsert);
+//		}
+//	}
+//
+//
+//
+//    const int COM_SERIAL_PORT = 0;
+//    const int LOCAL_NETWORK_PORT = 1;
+//	const int REMOTE_CONNECTION = 2;
+//    for (int z=0; z<3; z++)
+//    {
+//        
+//        CString PortName;
+//        CString temp_show;
+//        HTREEITEM hcomport=NULL;
+//        if((current_building_protocol == P_MODBUS_485) || (current_building_protocol == P_BACNET_MSTP) || (current_building_protocol == P_AUTO))
+//        {
+//            if((z == COM_SERIAL_PORT) && (b_remote_connection == false))
+//            {
+//                strSql.Format(_T("select DISTINCT Com_Port from ALL_NODE where Building_Name = '%s' ORDER BY Com_Port ASC"),strBuilding);
+//				q = SqliteDB.execQuery((UTF8MBSTR)strSql);
+//                
+//               
+//                while(!q.eof())//所有楼层。
+//                {
+//                    PortName= q.getValuebyName(L"Com_Port");
+//                    int comport_value = _wtoi(PortName);
+//                    if(comport_value > 50)
+//                    {
+//                        q.nextRow();
+//                        continue;
+//                    }
+//
+//                    temp_show = _T("Com") + PortName;
+//                    tvInsert.hParent = hrootserialport; // 指定父句柄
+//                    tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
+//
+//                    tvInsert.item.pszText = (LPTSTR)(LPCTSTR)temp_show;
+//                    tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
+//                    TVINSERV_FLOOR
+//
+//
+//                    hcomport=m_pTreeViewCrl->InsertItem(&tvInsert);
+//
+//                    _com_port_tree m_comport_temp;
+//                    m_comport_temp.building_item=hTreeSubbuilding;
+//                    m_comport_temp.serial_port_item =hrootserialport;
+//                    m_comport_temp.each_port_item = hcomport;
+//                    m_comport_temp.strComPortName=PortName;
+//                    m_comportlist.push_back(m_comport_temp);
+//                    q.nextRow();
+//                }
+//                
+//            }
+//			if(hrootserialport != NULL)
+//				m_pTreeViewCrl->Expand(hrootserialport, TVE_EXPAND);
+//
+//            int loop_count = 0;
+//            if((z == COM_SERIAL_PORT) && (b_remote_connection == false))
+//            {
+//                loop_count = m_comportlist.size();
+//            }
+//            else if((b_remote_connection == false) && (z == LOCAL_NETWORK_PORT) && ((current_building_protocol == P_AUTO) || (current_building_protocol == P_MODBUS_TCP) || (current_building_protocol == P_BACNET_IP)))
+//            {
+//                loop_count = 1;
+//            }
+//			else if((z == REMOTE_CONNECTION) && (b_remote_connection))
+//			{
+//				 loop_count = 1;
+//			}
+//
+//            for (int j=0; j<loop_count; j++)
+//            {
+//                CString temp_cs;
+//                CString temp_parent_serialnum;
+//                if(z == COM_SERIAL_PORT)
+//                {
+//                    temp_cs = m_comportlist.at(j).strComPortName;
+//                    strSql.Format(_T("select * from ALL_NODE where Building_Name = '%s' and Com_Port = '%s'"),strBuilding,temp_cs);
+//                }
+//                else if(z == LOCAL_NETWORK_PORT)
+//                {
+//                    strSql.Format(_T("select * from ALL_NODE where Building_Name = '%s' and Protocol <>'6'"),strBuilding);
+//                }
+//				else if(z == REMOTE_CONNECTION)
+//				{
+//					temp_cs.Format(_T("%u"),PROTOCOL_REMOTE_IP);
+//					strSql.Format(_T("select * from ALL_NODE where Building_Name = '%s' and Protocol = '%s'"),strBuilding,temp_cs);
+//				}
+//
+//               /* bado.m_pRecordset=bado.OpenRecordset(strSql);*/
+//			    q= SqliteDB.execQuery((UTF8MBSTR)strSql);
+//			    table = SqliteDB.getTable((UTF8MBSTR)strSql);
+//                int temp_count = table.numRows();
+//                if(temp_count > 0)
+//                {
+//                    while(!q.eof())//次Com port 下面的所有 设备;
+//                    {
+//                        if(z == LOCAL_NETWORK_PORT)
+//                        {
+//                            PortName= q.getValuebyName(L"Com_Port");
+//                            int comport_value = _wtoi(PortName);
+//                            if(comport_value <= 50)
+//                            {
+//                                //bado.m_pRecordset->MoveNext();
+//                                 q.nextRow();
+//								continue;
+//                            }
+//                        }
+//						temp_parent_serialnum = q.getValuebyName(L"Parent_SerialNum");
+//                        unsigned int temp_int_serial;
+//                        temp_int_serial = (unsigned int)_wtoi(temp_parent_serialnum);
+//                        if((!temp_parent_serialnum.IsEmpty()) && (temp_int_serial != 0))	//说明有父节点;先插入父节点
+//                        {
+//                            q.nextRow();
+//                            continue;
+//                        }
+//
+//                        CString strProdcut=q.getValuebyName(L"Product_name");
+//                        if(z == COM_SERIAL_PORT)
+//                        {
+//                            tvInsert.hParent = m_comportlist.at(j).each_port_item ; // 指定父句柄
+//                        }
+//                        else if(z == LOCAL_NETWORK_PORT)
+//                        {
+//                            tvInsert.hParent = hlocalnetwork;// 指定父句柄 为本地网络;
+//                        }
+//						else if(z == REMOTE_CONNECTION)
+//						{
+//							tvInsert.hParent = hrootremote;// 指定父句柄 为本地网络;
+//						}
+//                        tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
+//                        tvInsert.item.pszText =(LPTSTR)(LPCTSTR) strProdcut;
+//                        //TRACE(strProdcut);
+//                        tvInsert.hInsertAfter =TVI_SORT;// TVI_LAST; // 项目插入方式
+//                        
+//						int temp_product_class_id = q.getIntField("Product_class_ID");
+//                        if(temp_product_class_id==PM_NC)
+//                            TVINSERV_NET_WORK
+//                            else if(temp_product_class_id==LED_PRODUCT_MODEL)
+//                                TVINSERV_LED
+//                                else if(temp_product_class_id==PM_SOLAR)
+//                                    TVINSERV_SOLAR
+//                                    else if (temp_product_class_id == PM_CM5 ) //CM5
+//                                        TVINSERV_CMFIVE
+//                                        else if (temp_product_class_id == PM_T3PT10||
+//                                                 temp_product_class_id == PM_T3IOA||
+//                                                 temp_product_class_id == PM_T332AI||
+//                                                 temp_product_class_id ==  PM_T38AI16O||
+//                                                 temp_product_class_id == PM_T38I13O||
+//                                                 temp_product_class_id == PM_T34AO||
+//                                                 temp_product_class_id == PM_T36CT||
+//                                                 temp_product_class_id == PM_T322AI||
+//												 temp_product_class_id == PM_T3PT12||
+//                                                 temp_product_class_id == PM_T38AI8AO6DO) //T3
+//                                            TVINSERV_NET_WORK
+//                                            else if (temp_product_class_id ==PM_MINIPANEL )//Mini Panel
+//                                                TVINSERV_MINIPANEL
+//                                                else if (temp_product_class_id == PM_AirQuality) //AirQuality
+//                                                    TVINSERV_TSTAT6
+//                                                    else if (temp_product_class_id == PM_LightingController)//Lightingcontroller
+//                                                        TVINSERV_LC          //tree0412
+//                                                        else if (temp_product_class_id == PM_TSTAT7)//TSTAT7 &TSTAT6 //tree0412
+//                                                            TVINSERV_LED //tree0412
+//                                                            else if(temp_product_class_id == PM_TSTAT6||temp_product_class_id == PM_TSTAT7||temp_product_class_id == PM_TSTAT5i||temp_product_class_id == PM_TSTAT8)
+//                                                                TVINSERV_TSTAT6
+//                                                                else if((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485)||(temp_product_class_id == PM_PRESSURE_SENSOR)|| (temp_product_class_id == STM32_CO2_NET)||(temp_product_class_id == STM32_CO2_RS485))
+//                                                                    TVINSERV_CO2
+//                                                                    else if (temp_product_class_id == PM_CS_SM_AC||temp_product_class_id == PM_CS_SM_DC||temp_product_class_id == PM_CS_RSM_AC||temp_product_class_id == PM_CS_RSM_DC)
+//                                                                    {
+//                                                                        TVINSERV_CS3000
+//                                                                    }
+//                                                                    else
+//
+//                                                                        TVINSERV_TSTAT
+//
+//                                                                        HTREEITEM hProductItem=m_pTreeViewCrl->InsertItem(&tvInsert);
+//
+//                        HTREEITEM hParent = m_pTreeViewCrl->GetParentItem(hProductItem);
+//                        if (hParent != NULL)
+//                            m_pTreeViewCrl->Expand(hParent, TVE_EXPAND);
+//
+//                        tree_product m_product_temp;
+//                        m_product_temp.product_item  =hProductItem;
+//
+//                     
+//						strSql = q.getValuebyName(L"Serial_ID");
+//                        long temp_serial_id = (long)(_wtoi64(strSql));
+//                        unsigned int correct_id = (DWORD)(_wtoi64(strSql));
+//                        //用于将以前数据库中的 负的序列号 修改为正的;Add by Fance
+//                        if(temp_serial_id < 0)
+//                        {
+//                            CString wrong_serial_id;
+//                            wrong_serial_id = strSql;
+//                            CString correct_serial_id;
+//                            CString str_temp;
+//                            correct_serial_id.Format(_T("%u"),correct_id);
+//                            try
+//                            {
+//                                str_temp.Format(_T("update ALL_NODE set Serial_ID ='%s' where Serial_ID = '%s'"),correct_serial_id, wrong_serial_id);
+//                                
+//								SqliteDB.execDML((UTF8MBSTR)str_temp);
+//                            }
+//                            catch(_com_error *e)
+//                            {
+//                                AfxMessageBox(e->ErrorMessage());
+//                            }
+//                        }
+//                        m_product_temp.serial_number= correct_id;
+//
+//                         
+//                        m_product_temp.product_id=q.getIntField("Product_ID");
+//                        m_product_temp.NetworkCard_Address=q.getValuebyName(L"NetworkCard_Address");
+//
+//                         
+//                        m_product_temp.product_class_id=q.getIntField("Product_class_ID");
+//                        m_product_temp.hardware_version=q.getFloatField("Hardware_Ver");//(float)_wtof(strSql);
+//                        m_product_temp.software_version=q.getFloatField("Software_Ver");
+//                        m_product_temp.nEPsize=q.getIntField("EPsize");
+//                        m_product_temp.protocol = q.getIntField("Protocol");
+//                        
+//						
+//						strSql = q.getValuebyName(L"Bautrate");
+//                        if(m_product_temp.protocol == PROTOCOL_BACNET_IP)
+//                        {
+//                            char cTemp1[255];
+//                            memset(cTemp1,0,255);
+//                            WideCharToMultiByte( CP_ACP, 0, strSql.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+//                            DWORD dwIP = inet_addr(cTemp1);
+//
+//                            m_product_temp.baudrate=dwIP;//_wtoi(strTemp);
+//                        }
+//                        else
+//                            m_product_temp.baudrate=_wtoi(strSql);
+//                        if (m_product_temp.product_class_id == PM_NC)
+//                        {
+//                            m_product_temp.baudrate = 19200;
+//                        }
+//                        ////
+//
+//                         
+//						int temp_status = q.getIntField("Online_Status");
+//                        if(temp_status == 1)
+//                        {
+//                            m_product_temp.status = temp_status;
+//                            m_product_temp.status_last_time[0] = m_product_temp.status;
+//                            m_product_temp.status_last_time[1] = false;
+//                            m_product_temp.status_last_time[2] = false;
+//                        }
+//                        else
+//                        {
+//                            m_product_temp.status = false;
+//                            m_product_temp.status_last_time[0] = false;
+//                            m_product_temp.status_last_time[1] = false;
+//                            m_product_temp.status_last_time[2] = false;
+//                        }
+//                      
+//							m_product_temp.Custom = q.getValuebyName(L"Custom");
+//                         
+//						m_product_temp.NameShowOnTree = q.getValuebyName(L"Product_name");
+//                        
+//
+//
+//                        m_product_temp.BuildingInfo=m_subNetLst.at(m_nCurSubBuildingIndex);
+//                        //20120423
+//						if(((strSql.CompareNoCase(_T("9600")) == 0))
+//							|| (strSql.CompareNoCase(_T("19200")) == 0)  
+//							|| (strSql.CompareNoCase(_T("38400")) == 0) 
+//							|| (strSql.CompareNoCase(_T("57600")) == 0) 
+//							|| ((strSql.CompareNoCase(_T("115200")) == 0)))
+//						{
+//							m_product_temp.BuildingInfo.strIp.Empty();
+//							m_product_temp.BuildingInfo.strBaudRate = strSql;
+//							m_product_temp.baudrate = _wtoi(strSql);
+//						}
+//						else
+//						{
+//							m_product_temp.BuildingInfo.strIp = strSql;
+//						}
+//						m_product_isp_auto_flash.ncomport = q.getIntField("Com_Port");
+//                        m_product_temp.BuildingInfo.strIpPort = _T("10000");
+//					    m_product_temp.strImgPathName = q.getValuebyName(L"Background_imgID");
+//                        m_product_temp.note_parent_serial_number = q.getIntField("Parent_SerialNum") ;
+//						m_product_temp.panel_number = q.getIntField("Panal_Number") ;
+//						m_product_temp.object_instance = q.getIntField("Object_Instance") ;
+//                    
+//                        m_product.push_back(m_product_temp);
+//                        q.nextRow();
+//
+//                    }
+//                }
+//               
+//
+//                if(z == COM_SERIAL_PORT)
+//                {
+//                    strSql.Format(_T("select * from ALL_NODE where Building_Name = '%s' and Com_Port = '%s' and Parent_SerialNum <> '0' and Parent_SerialNum <> ''"),strBuilding,temp_cs);
+//                }
+//                else if((z == LOCAL_NETWORK_PORT) )
+//                {
+//                    strSql.Format(_T("select * from ALL_NODE where Building_Name = '%s' and Parent_SerialNum <> '0' and Parent_SerialNum <> ''"),strBuilding);
+//                }
+//				else if(z == REMOTE_CONNECTION)
+//				{
+//					 strSql.Format(_T("select * from ALL_NODE where Building_Name = '%s' and Parent_SerialNum <> '0' and Parent_SerialNum <> '' and Protocol ='6'"),strBuilding);
+//				}
+//
+//			 
+//
+//                
+//				q = SqliteDB.execQuery((UTF8MBSTR)strSql);
+//				table = SqliteDB.getTable((UTF8MBSTR)strSql);
+//                int temp_child_note_count = table.numRows();
+//                if(temp_child_note_count > 0)//就说明这个节点下面有 挂在父节点下面的;
+//                {
+//                    while(!q.eof())
+//                    {
+//						    _variant_t temp_variant_parent;
+//                        CString cs_parents_serial_number;
+//                        unsigned int uint_p_serial_number;
+//                         
+//						cs_parents_serial_number = q.getValuebyName(L"Parent_SerialNum");
+//
+//                        uint_p_serial_number = _wtoi(cs_parents_serial_number);
+//                        bool find_parents = false;
+//                        HTREEITEM parents_item;
+//                        for (int z=0; z<m_product.size(); z++)
+//                        {
+//                            if(uint_p_serial_number == m_product.at(z).serial_number)
+//                            {
+//                                find_parents = true;
+//                                parents_item = m_product.at(z).product_item;
+//                                break;
+//                            }
+//                        }
+//
+//                        if(find_parents)
+//                        {
+//                            CString strProdcut=q.getValuebyName(L"Product_name"); 
+//                            tvInsert.hParent = parents_item ; // 指定父句柄
+//                            tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
+//                            tvInsert.item.pszText =(LPTSTR)(LPCTSTR) strProdcut;
+//                            //TRACE(strProdcut);
+//                            tvInsert.hInsertAfter =TVI_SORT;// TVI_LAST; // 项目插入方式
+//
+//
+//                            int temp_product_class_id=q.getIntField("Product_class_ID");
+//
+//                            if(temp_product_class_id==PM_NC)
+//                                TVINSERV_NET_WORK
+//                                else if(temp_product_class_id==LED_PRODUCT_MODEL)
+//                                    TVINSERV_LED
+//                                    else if(temp_product_class_id==PM_SOLAR)
+//                                        TVINSERV_SOLAR
+//                                        else if (temp_product_class_id == PM_CM5 ) //CM5
+//                                            TVINSERV_CMFIVE
+//                                            else if (temp_product_class_id == PM_T3PT10||
+//                                                     temp_product_class_id == PM_T3IOA||
+//                                                     temp_product_class_id == PM_T332AI||
+//                                                     temp_product_class_id ==  PM_T38AI16O||
+//                                                     temp_product_class_id == PM_T38I13O||
+//                                                     temp_product_class_id == PM_T34AO||
+//                                                     temp_product_class_id == PM_T36CT||
+//                                                     temp_product_class_id == PM_T322AI||
+//													  temp_product_class_id == PM_T3PT12||
+//                                                     temp_product_class_id == PM_T38AI8AO6DO) //T3
+//                                                TVINSERV_NET_WORK
+//                                                else if (temp_product_class_id ==PM_MINIPANEL )//Mini Panel
+//                                                    TVINSERV_MINIPANEL
+//                                                    else if (temp_product_class_id == PM_AirQuality) //AirQuality
+//                                                        TVINSERV_TSTAT6
+//                                                        else if (temp_product_class_id == PM_LightingController)//Lightingcontroller
+//                                                            TVINSERV_LC          //tree0412
+//                                                            else if (temp_product_class_id == PM_TSTAT7)//TSTAT7 &TSTAT6 //tree0412
+//                                                                TVINSERV_LED //tree0412
+//                                                                else if(temp_product_class_id == PM_TSTAT6||temp_product_class_id == PM_TSTAT7||temp_product_class_id == PM_TSTAT5i||temp_product_class_id == PM_TSTAT8)
+//                                                                    TVINSERV_TSTAT6
+//                                                                    else if((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485)||(temp_product_class_id == PM_PRESSURE_SENSOR)|| (temp_product_class_id == STM32_CO2_NET)||(temp_product_class_id == STM32_CO2_RS485))
+//                                                                        TVINSERV_CO2
+//                                                                        else if (temp_product_class_id == PM_CS_SM_AC||temp_product_class_id == PM_CS_SM_DC||temp_product_class_id == PM_CS_RSM_AC||temp_product_class_id == PM_CS_RSM_DC)
+//                                                                        {
+//                                                                            TVINSERV_CS3000
+//                                                                        }
+//                                                                        else
+//
+//                                                                            TVINSERV_TSTAT
+//
+//                                                                            HTREEITEM hSubItem=m_pTreeViewCrl->InsertItem(&tvInsert);
+//
+//                            HTREEITEM hParent = m_pTreeViewCrl->GetParentItem(hSubItem);
+//                            if (hParent != NULL)
+//                                m_pTreeViewCrl->Expand(hParent, TVE_EXPAND);
+//
+//                            tree_product m_product_temp;
+//                            m_product_temp.product_item  =hSubItem;
+//
+//                            long temp_serial_id =q.getInt64Field("Serial_ID");
+//                            unsigned int correct_id = (DWORD)(temp_serial_id);
+//                            //用于将以前数据库中的 负的序列号 修改为正的;Add by Fance
+//                            if(temp_serial_id < 0)
+//                            {
+//                                CString wrong_serial_id;
+//                                wrong_serial_id = strSql;
+//                                CString correct_serial_id;
+//                                CString str_temp;
+//                                correct_serial_id.Format(_T("%u"),correct_id);
+//                                try
+//                                {
+//                                    str_temp.Format(_T("update ALL_NODE set Serial_ID ='%s' where Serial_ID = '%s'"),correct_serial_id, wrong_serial_id);
+//                                    SqliteDB.execDML((UTF8MBSTR)str_temp);
+//                                }
+//                                catch(_com_error *e)
+//                                {
+//                                    AfxMessageBox(e->ErrorMessage());
+//                                }
+//                            }
+//                            m_product_temp.serial_number= correct_id;
+//
+//                            
+//                            m_product_temp.product_id=q.getIntField("Product_ID");
+//                           
+//                            m_product_temp.Custom=q.getValuebyName(L"Custom");
+//
+//                           
+//							m_product_temp.NetworkCard_Address=q.getValuebyName(L"NetworkCard_Address");
+//                           
+//                            m_product_temp.product_class_id=q.getIntField("Product_class_ID");
+//                            
+//                            m_product_temp.hardware_version=q.getFloatField("Hardware_Ver");
+// 
+//                            m_product_temp.software_version=q.getFloatField("Software_Ver");
+//
+//                            
+//                            m_product_temp.nEPsize=(int)_wtol(strSql);
+//							 m_product_temp.nEPsize = q.getFloatField("EPsize");
+//                            
+//                            m_product_temp.protocol = q.getIntField("Protocol");
+//
+//                             
+//                            m_product_temp.baudrate = q.getIntField("Bautrate",19200);
+//                            if(m_product_temp.protocol == PROTOCOL_BACNET_IP)
+//                            {
+//                                char cTemp1[255];
+//                                memset(cTemp1,0,255);
+//                                WideCharToMultiByte( CP_ACP, 0, strSql.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+//                                DWORD dwIP = inet_addr(cTemp1);
+//
+//                                m_product_temp.baudrate=dwIP;//_wtoi(strTemp);
+//                            }
+//                            else
+//                                m_product_temp.baudrate=_wtoi(strSql);
+//                            if (m_product_temp.product_class_id == PM_NC)
+//                            {
+//                                m_product_temp.baudrate = 19200;
+//                            }
+//                            ////
+//                            
+//							int temp_status = q.getIntField("Online_Status");
+//                            if(temp_status == 1)
+//                            {
+//                                m_product_temp.status = temp_status;
+//                                m_product_temp.status_last_time[0] = m_product_temp.status;
+//                                m_product_temp.status_last_time[1] = false;
+//                                m_product_temp.status_last_time[2] = false;
+//                            }
+//                            else
+//                            {
+//                                m_product_temp.status = false;
+//                                m_product_temp.status_last_time[0] = false;
+//                                m_product_temp.status_last_time[1] = false;
+//                                m_product_temp.status_last_time[2] = false;
+//                            }
+//
+//                            m_product_temp.NameShowOnTree=q.getValuebyName(L"Product_name");//
+//                            
+//
+//
+//                            m_product_temp.BuildingInfo=m_subNetLst.at(m_nCurSubBuildingIndex);
+//                            //20120423
+//                            if(((strSql.CompareNoCase(_T("19200")) == 0)) || (strSql.CompareNoCase(_T("9600")) == 0) || ((strSql.CompareNoCase(_T("38400")) == 0)))
+//                            {
+//                                m_product_temp.BuildingInfo.strIp.Empty();
+//                                m_product_temp.BuildingInfo.strBaudRate = strSql;
+//                            }
+//                            else
+//                            {
+//                                m_product_temp.BuildingInfo.strIp = strSql;
+//                            }
+//
+//                            m_product_temp.ncomport=q.getIntField("Com_Port");//
+//                            
+//                            m_product_temp.BuildingInfo.strIpPort = _T("10000");
+//                            m_product_temp.strImgPathName=q.getValuebyName(L"Background_imgID");
+//                             
+//
+//                            m_product_temp.note_parent_serial_number=q.getIntField("Parent_SerialNum");
+//                             
+//
+//                            m_product_temp.panel_number=q.getIntField("Panal_Number");
+//                            
+//
+//                            m_product_temp.object_instance=q.getIntField("Object_Instance");
+//                           
+//
+//                            m_product.push_back(m_product_temp);
+//
+//                        }
+//                        q.nextRow();
+//                    }
+//                }
+//                
+//            }
+//        }
+//    }
+//    m_pTreeViewCrl->Expand(hTreeSubbuilding, TVE_EXPAND);
+//}
 // scan Tstats in database
 void CMainFrame::ScanTstatInDB(void)
 {
@@ -2643,8 +3142,10 @@ void CMainFrame::ScanTstatInDB(void)
         PostMessage(WM_REFRESH_TREEVIEW_MAP,0,0);
         return;
     }
-    CADO ado;
-    ado.OnInitADOConn();
+	CppSQLite3DB SqliteDB;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+    SqliteDB.open((UTF8MBSTR)g_strDatabasefilepath);
     try
     {
 
@@ -2652,66 +3153,36 @@ void CMainFrame::ScanTstatInDB(void)
 #if 1
         ClearBuilding();
         m_product.clear();
-
-// 	m_pCon.CreateInstance(_T("ADODB.Connection"));
-// 	m_pRs.CreateInstance(_T("ADODB.Recordset"));
-// 	m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
-        CString strSql;
-        //strSql.Format(_T("select * from Building where Main_BuildingName = '%s'"),m_strMainBuildingName);
-        //strSql.Format(_T("select * from Building order by Main_BuildingName where Default_SubBuilding=-1"));
-        strSql.Format(_T("select * from Building where Default_SubBuilding=-1"));
+		CString strSql;
+ 
+        strSql.Format(_T("select * from Building where Default_SubBuilding=1"));
         //m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-        ado.m_pRecordset=ado.OpenRecordset(strSql);
-        int count =ado.GetRecordCount(ado.m_pRecordset); //ado.m_pRecordset->GetRecordCount();
+        table = SqliteDB.getTable("select * from Building where Default_SubBuilding=1");
+        int count =table.numRows(); //ado.m_pRecordset->GetRecordCount();
         _variant_t temp_variant;
         if(count<=0)
         {
-            /*if(m_pRs->State)
-            m_pRs->Close();
-            if(m_pCon->State)
-            m_pCon->Close();*/
-            //	PostMessage(ID_NODEFAULTMAINBUILDING_MSG,0,0);
-            ado.CloseRecordset();
-            ado.CloseConn();
+            SqliteDB.closedb();
             AfxMessageBox(_T("There is no default building, please select a building Firstly!"));
 
             return;
         }
 
-        m_strCurMainBuildingName=ado.m_pRecordset->GetCollect("Main_BuildingName");
+		
+        m_strCurMainBuildingName=table.getValuebyName("Main_BuildingName");
 
         CString cs_temp_protocol;
         CString cs_temp_baudrate;
-        temp_variant=ado.m_pRecordset->GetCollect("Protocal");//
-        if(temp_variant.vt!=VT_NULL)
-            cs_temp_protocol=temp_variant;
-        else
+         
+		cs_temp_protocol = table.getValuebyName("Protocal");
+        if(cs_temp_protocol.IsEmpty())
         {
             cs_temp_protocol=_T("Auto");
             strSql.Format(_T("update Building set Protocal='Auto' where Main_BuildingName ='%s'"), m_strCurMainBuildingName);
-            ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+            SqliteDB.execDML((UTF8MBSTR)strSql);
         }
 
-        //if(cs_temp_protocol.CompareNoCase(_T("Modbus 485")) == 0 )
-        //{
-        //    current_building_protocol = P_MODBUS_485;
-        //}
-        //else if(cs_temp_protocol.CompareNoCase(_T("Modbus TCP")) == 0 )
-        //{
-        //    current_building_protocol = P_MODBUS_TCP;
-        //}
-        //else if(cs_temp_protocol.CompareNoCase(_T("Bacnet MSTP")) == 0 )
-        //{
-        //    current_building_protocol = P_BACNET_MSTP;
-        //}
-        //else if(cs_temp_protocol.CompareNoCase(_T("Remote Device")) == 0 )
-        //{
-        //    current_building_protocol = P_REMOTE_DEVICE;
-        //}
-        //else
-        //{
-        //    current_building_protocol = P_AUTO;
-        //}
+        
 				
 		current_building_protocol = P_AUTO;
 		//简直是脑残，老毛.要求这样瞎几把改. //不管客户选什么鸡吧协议 ， 都要能扫到所有设备.那不就是TMD只有Auto 了吗？还选个P啊;
@@ -2726,16 +3197,13 @@ void CMainFrame::ScanTstatInDB(void)
         {
 
 
-            temp_variant=ado.m_pRecordset->GetCollect("Braudrate");//
-            if(temp_variant.vt!=VT_NULL)
-            {
-                cs_temp_baudrate = temp_variant;
-            }
-            else
+           
+			cs_temp_baudrate = table.getValuebyName("Braudrate");
+            if(cs_temp_baudrate.IsEmpty())
             {
                 cs_temp_protocol=_T("19200");
                 strSql.Format(_T("update Building set Braudrate='19200' where Main_BuildingName ='%s'"), m_strCurMainBuildingName);
-                ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+                SqliteDB.execDML((UTF8MBSTR)strSql);
             }
 
             current_building_baudrate = _wtoi(cs_temp_baudrate);
@@ -2745,124 +3213,62 @@ void CMainFrame::ScanTstatInDB(void)
             }
 
             //current_building_comport
-            temp_variant = ado.m_pRecordset->GetCollect(_T("Com_Port"));
-            if(temp_variant.vt!=VT_NULL)
-            {
-                StrComport=temp_variant;
-                current_building_comport = _wtoi(StrComport.Mid(3));
-            }
-            else
-            {
-                current_building_comport=-1;
-            }
+			current_building_comport = table.getIntField("Com_Port",-1);
 
         }
         if (current_building_protocol == P_MODBUS_TCP || current_building_protocol == P_BACNET_IP || current_building_protocol == P_REMOTE_DEVICE)
         {
-            temp_variant=ado.m_pRecordset->GetCollect("Ip_Address");//
-            if(temp_variant.vt!=VT_NULL)
-            {
-                StrIp = temp_variant;
-                m_str_curBuilding_Domain_IP = StrIp;
-            }
-            else
-            {
-                m_str_curBuilding_Domain_IP.Empty();
-            }
+           
+			m_str_curBuilding_Domain_IP = table.getValuebyName("Ip_Address");
 
         }
         else
             m_str_curBuilding_Domain_IP.Empty();
-        /*if(m_pRs->State)
-        	m_pRs->Close();*/
-        ado.CloseRecordset();
+        
         m_subNetLst.clear();
 
 
         strSql.Format(_T("select * from Building where Main_BuildingName ='%s'"),m_strCurMainBuildingName);
-        //m_pRs->Open(_variant_t(strSql),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-        ado.m_pRecordset=ado.OpenRecordset(strSql);
+        q = SqliteDB.execQuery((UTF8MBSTR)strSql);
         m_nCurSubBuildingIndex=-1;
         int nTemp=-1;
-        while(VARIANT_FALSE==ado.m_pRecordset->EndOfFile)
+        while(q.eof())
         {
             nTemp++;
             int nDefault=0;
             Building_info temBuildingInfo;
-            //memset(&temBuildingInfo,0,sizeof(temBuildingInfo));
-            temp_variant=ado.m_pRecordset->GetCollect("Building_Name");//
-            if(temp_variant.vt!=VT_NULL)
-                temBuildingInfo.strBuildingName=temp_variant;
-            else
-                temBuildingInfo.strBuildingName=_T("");
+            
+            
 
-
-
-            temp_variant=ado.m_pRecordset->GetCollect("Protocal");//
-            if(temp_variant.vt!=VT_NULL)
-                temBuildingInfo.strProtocol=temp_variant;
-            else
-                temBuildingInfo.strProtocol=_T("");
-
-            temp_variant=ado.m_pRecordset->GetCollect("Ip_Address");//
-            if(temp_variant.vt!=VT_NULL)
-                temBuildingInfo.strIp=temp_variant;
-            else
-                temBuildingInfo.strIp=_T("");
-
-
-            temp_variant=ado.m_pRecordset->GetCollect("Com_Port");//
-            if(temp_variant.vt!=VT_NULL)
-                temBuildingInfo.strComPort=temp_variant;
-            else
-                temBuildingInfo.strComPort=_T("");
-
-
-            temp_variant=ado.m_pRecordset->GetCollect("Ip_Port");//
-            if(temp_variant.vt!=VT_NULL)
-                temBuildingInfo.strIpPort=temp_variant;
-            else
-                temBuildingInfo.strIpPort=_T("");
-
-
-
-
+			temBuildingInfo.strBuildingName = q.getValuebyName(L"Building_Name");
+			temBuildingInfo.strProtocol = q.getValuebyName(L"Protocal");
+            temBuildingInfo.strIp  = q.getValuebyName(L"Ip_Address"); 
+			temBuildingInfo.strComPort = q.getValuebyName(L"Com_Port");
+            temBuildingInfo.strIpPort = q.getValuebyName(L"Ip_Port");
             temBuildingInfo.hCommunication=NULL;
-
-            temp_variant=ado.m_pRecordset->GetCollect("Main_BuildingName");//
-            if(temp_variant.vt!=VT_NULL)
-                temBuildingInfo.strMainBuildingname=temp_variant;
-            else
-                temBuildingInfo.strMainBuildingname=temp_variant;
-
-
-
-            temp_variant=ado.m_pRecordset->GetCollect("Braudrate");//
-            if(temp_variant.vt!=VT_NULL)
-                temBuildingInfo.strBaudRate=temp_variant;
-            else
-                temBuildingInfo.strBaudRate=_T("");
-
+			temBuildingInfo.strMainBuildingname = q.getValuebyName(L"Main_BuildingName");
+            temBuildingInfo.strBaudRate = q.getValuebyName(L"Braudrate"); 
 
             CString Building_DBpath;
-            nDefault=ado.m_pRecordset->GetCollect("Default_SubBuilding");
-            if(nDefault==-1)
+            nDefault=q.getIntField("Default_SubBuilding");
+
+            if(nDefault==1)
             {
                 m_nCurSubBuildingIndex=nTemp;
             }
-            Building_DBpath=ado.m_pRecordset->GetCollect("Building_Path");
+            Building_DBpath=q.getValuebyName(L"Building_Path");
 
             int index= Building_DBpath.Find(_T("Database"));
             Building_DBpath.Delete(0,index);
 
             g_strCurBuildingDatabasefilePath=GetExePath(true)+  Building_DBpath;
-            ado.m_pRecordset->MoveNext();
+            q.nextRow();
             m_subNetLst.push_back(temBuildingInfo);
         }
         if(m_subNetLst.size()<=0)
             AfxMessageBox(_T("There is no default building,please select a building First！"));
 
-        ado.CloseRecordset();
+        
 
 
         TV_INSERTSTRUCT tvInsert;////added
@@ -2894,11 +3300,9 @@ void CMainFrame::ScanTstatInDB(void)
             {
                 //	m_subNetLst.at(k).hbuilding_item=hTreeSubbuilding;
             }
-            CBADO bado;
-            bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-            bado.OnInitADOConn();
-            //	m_pRs->Close();
-            ////begin floor nodes///////////////////////////////////////////////////////////////
+         
+			SqliteDB.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+         
 
             if((current_building_protocol == P_MODBUS_485) || (current_building_protocol == P_BACNET_MSTP))
             {
@@ -2916,16 +3320,14 @@ void CMainFrame::ScanTstatInDB(void)
             {
                 strSql.Format(_T("select DISTINCT Floor_name from ALL_NODE where Building_Name = '%s'"),strBuilding);
             }
-
-            //HRESULT hR=bado.m_pRecordset->Open(_variant_t(strSql),_variant_t((IDispatch *),true),adOpenStatic,adLockOptimistic,adCmdText);
-            bado.m_pRecordset=bado.OpenRecordset(strSql);
-            //int nTemp2 = m_pRs->RecordCount;
-            int nTemp2 = bado.m_pRecordset->RecordCount;
+ 
+			q = SqliteDB.execQuery((UTF8MBSTR)strSql);
+             
             vector <tree_floor> tmpfloorLst;//
             tmpfloorLst.empty();
-            while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)//所有楼层。
+            while(!q.eof())//所有楼层。
             {
-                CString strFloorName= bado.m_pRecordset->GetCollect("Floor_name");
+                CString strFloorName=q.getValuebyName(L"Floor_name");
                 ///*********tree***********************************
                 tvInsert.hParent = hTreeSubbuilding; // 指定父句柄
                 tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
@@ -2950,16 +3352,13 @@ void CMainFrame::ScanTstatInDB(void)
                 m_floorLst.push_back(m_floor_temp);
                 tmpfloorLst.push_back(m_floor_temp);
 
-                bado.m_pRecordset->MoveNext();
+				q.nextRow();
+                 
             }
 
-
-            /*if(m_pRs->State)
-            m_pRs->Close(); */
-            bado.CloseRecordset();
+ 
             vector <tree_room> tmproomLst;
-            ////end floor nodes/////////////////////////////////////////////////////////////////
-            ///begin room nodes///////////////////////////////////////////////////////////////////////
+            
             for(unsigned int i=0; i<tmpfloorLst.size(); i++)
             {
                 //loop for Room Name f
@@ -2988,12 +3387,12 @@ void CMainFrame::ScanTstatInDB(void)
                     temp_str.Format(_T("select DISTINCT Room_name from ALL_NODE where Building_Name = '"+strBuilding+"' and Floor_name='"+strFloorName+"'"));
                 }
 
-                bado.m_pRecordset=bado.OpenRecordset(temp_str);
+                q = SqliteDB.execQuery((UTF8MBSTR)temp_str);
                 //插入每个房间到相关的楼层。
-                while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+                while(!q.eof())
                 {
                     CString strRoomName;
-                    strRoomName=bado.m_pRecordset->GetCollect("Room_name");
+                    strRoomName=q.getValuebyName(L"Room_name");
                     tvInsert.hParent = tmpfloorLst.at(i).floor_item ; // 指定父句柄
                     tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
                     tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strRoomName;
@@ -3015,11 +3414,9 @@ void CMainFrame::ScanTstatInDB(void)
                     m_room_temp.strRoomName=strRoomName;
                     m_roomLst.push_back(m_room_temp);
                     tmproomLst.push_back(m_room_temp);
-                    bado.m_pRecordset->MoveNext();
+                    q.nextRow();
                 }
-                /* if(m_pRs->State)
-                m_pRs->Close(); */
-                bado.CloseRecordset();
+                 
             }
             ///////end room nodes//////////////////////////////////////////////////////////////////////
             //////Begin product node/////////////////////////////////////////////////////////////////
@@ -3052,19 +3449,18 @@ void CMainFrame::ScanTstatInDB(void)
 																							  Room_name = '"+strRoomName+"'and Building_Name = '"+strBuilding+"'  ORDER BY Product_ID ASC "));
                 }
 
-                //m_pRs->Open(_variant_t(str_temp),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-                //插入每个产品到相关的房间。
-                bado.m_pRecordset=bado.OpenRecordset(str_temp);
-                int count = bado.GetRecordCount(bado.m_pRecordset);
-                while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+                
+                q = SqliteDB.execQuery((UTF8MBSTR)str_temp);
+                
+                while(q.eof())
                 {
-                    CString strProdcut=bado.m_pRecordset->GetCollect("Product_name");
+                    CString strProdcut=q.getValuebyName(L"Product_name");
                     tvInsert.hParent = tmproomLst.at(i).room_item ; // 指定父句柄
                     tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
                     tvInsert.item.pszText =(LPTSTR)(LPCTSTR) strProdcut;
                     //TRACE(strProdcut);
                     tvInsert.hInsertAfter =TVI_SORT;// TVI_LAST; // 项目插入方式
-                    int temp_product_class_id=bado.m_pRecordset->GetCollect("Product_class_ID");
+                    int temp_product_class_id=q.getIntField("Product_class_ID");
 
                     /*
                     int const PM_T3PT10= 26;
@@ -3139,16 +3535,11 @@ void CMainFrame::ScanTstatInDB(void)
                     tree_product m_product_temp;
                     m_product_temp.product_item  =hTreeRoom;
 
-                    //m_product_temp.serial_number = m_pRs->GetCollect("Serial_ID");
-                    temp_variant=bado.m_pRecordset->GetCollect("Serial_ID");//
-                    if(temp_variant.vt!=VT_NULL)
-                        strSql=temp_variant;
-                    else
-                        strSql=_T("");
+                     
 
 
-                    long temp_serial_id = (long)(_wtoi64(strSql));
-                    unsigned int correct_id = (DWORD)(_wtoi64(strSql));
+                    long temp_serial_id = q.getInt64Field("Serial_ID");
+                    unsigned int correct_id = (DWORD)(temp_serial_id);
 
                     //long temp_serial_id = _wtol(strSql);
                     //unsigned int correct_id = (DWORD)(_wtol(strSql));
@@ -3162,7 +3553,8 @@ void CMainFrame::ScanTstatInDB(void)
                         try
                         {
                             str_temp.Format(_T("update ALL_NODE set Serial_ID ='%s' where Serial_ID = '%s'"),correct_serial_id, wrong_serial_id);
-                            bado.m_pConnection->Execute(str_temp.GetString(),NULL,adCmdText);
+                            /*bado.m_pConnection->Execute(str_temp.GetString(),NULL,adCmdText);*/
+							SqliteDB.execDML((UTF8MBSTR)str_temp);
                         }
                         catch(_com_error *e)
                         {
@@ -3171,69 +3563,18 @@ void CMainFrame::ScanTstatInDB(void)
                     }
                     m_product_temp.serial_number= correct_id;
 
-                    //m_product_temp.product_id =m_pRs->GetCollect("Product_ID");
-                    temp_variant=bado.m_pRecordset->GetCollect("Product_ID");//
-                    if(temp_variant.vt!=VT_NULL)
-                        strSql=temp_variant;
-                    else
-                        strSql=_T("");
-                    m_product_temp.product_id=_wtoi(strSql);
+                    m_product_temp.product_id=q.getIntField("Product_ID");
 
-                    temp_variant=bado.m_pRecordset->GetCollect("NetworkCard_Address");//
-                    if(temp_variant.vt!=VT_NULL)
-                        strSql=temp_variant;
-                    else
-                        strSql=_T("");
-                    m_product_temp.NetworkCard_Address=strSql;
-                    //	m_product_temp.product_class_id = m_pRs->GetCollect("Product_class_ID");
-                    temp_variant=bado.m_pRecordset->GetCollect("Product_class_ID");//
-                    if(temp_variant.vt!=VT_NULL)
-                        strSql=temp_variant;
-                    else
-                        strSql=_T("");
-                    m_product_temp.product_class_id=_wtoi(strSql);
+                    m_product_temp.NetworkCard_Address=q.getValuebyName(L"NetworkCard_Address");
+                 
+                    m_product_temp.product_class_id=q.getIntField("Product_class_ID");
 
-                    //	m_product_temp.hardware_version= m_pRs->GetCollect("Hardware_Ver");
-                    temp_variant=bado.m_pRecordset->GetCollect("Hardware_Ver");//
-                    if(temp_variant.vt!=VT_NULL)
-                        strSql=temp_variant;
-                    else
-                        strSql=_T("");
-                    m_product_temp.hardware_version=(float)_wtof(strSql);
-
-                    //
-                    temp_variant=bado.m_pRecordset->GetCollect("Software_Ver");//
-                    if(temp_variant.vt!=VT_NULL)
-                        strSql=temp_variant;
-                    else
-                        strSql=_T("");
-                    m_product_temp.software_version=(float)_wtof(strSql);
-
-                    //
-                    temp_variant=bado.m_pRecordset->GetCollect("EPsize");//
-                    if(temp_variant.vt!=VT_NULL)
-                        strSql=temp_variant;
-                    else
-                        strSql=_T("");
-                    m_product_temp.nEPsize=(int)_wtol(strSql);
-
-                    //m_product_temp.baudrate=m_pRs->GetCollect("Bautrate");
-                    temp_variant=bado.m_pRecordset->GetCollect("Protocol");//
-                    if(temp_variant.vt!=VT_NULL)
-                        strSql=temp_variant;
-                    else
-                        strSql=_T("");
-                    m_product_temp.protocol = (int)_wtoi(strSql);
-
-                    temp_variant=bado.m_pRecordset->GetCollect("Bautrate");//
-                    if(temp_variant.vt!=VT_NULL)
-                        strSql=temp_variant;
-                    else
-                        strSql=_T("");
-                    if(_wtoi(strSql) !=0)
-                        m_product_temp.baudrate = _wtoi(strSql);
-                    else
-                        m_product_temp.baudrate = 19200;
+                    m_product_temp.hardware_version=q.getFloatField("Hardware_Ver");
+                    m_product_temp.software_version=q.getFloatField("Software_Ver");
+                    m_product_temp.nEPsize=q.getIntField("EPsize");
+                    m_product_temp.protocol = q.getIntField("Protocol");
+					 strSql= q.getValuebyName(L"Bautrate");
+					
                     if(m_product_temp.protocol == PROTOCOL_BACNET_IP)
                     {
                         char cTemp1[255];
@@ -3250,10 +3591,11 @@ void CMainFrame::ScanTstatInDB(void)
                         m_product_temp.baudrate = 19200;
                     }
                     ////
-                    temp_variant=bado.m_pRecordset->GetCollect("Online_Status");//
-                    if(temp_variant.vt!=VT_NULL)
+					int temp_status = q.getIntField("Online_Status");
+                    
+                    if(temp_status == 1)
                     {
-                        m_product_temp.status = temp_variant;
+                        m_product_temp.status = temp_status;
                         m_product_temp.status_last_time[0] = m_product_temp.status;
                         m_product_temp.status_last_time[1] = false;
                         m_product_temp.status_last_time[2] = false;
@@ -3266,21 +3608,15 @@ void CMainFrame::ScanTstatInDB(void)
                         m_product_temp.status_last_time[2] = false;
                     }
 
-                    temp_variant=bado.m_pRecordset->GetCollect("Product_name");//
-                    if(temp_variant.vt!=VT_NULL)
-                    {
-                        m_product_temp.NameShowOnTree = temp_variant;
-                    }
-                    else
-                    {
-                        m_product_temp.NameShowOnTree = _T("");
-
-                    }
-
+					m_product_temp.NameShowOnTree = q.getValuebyName(L"Product_name");
 
                     m_product_temp.BuildingInfo=m_subNetLst.at(m_nCurSubBuildingIndex);
 //20120423
-                    if(((strSql.CompareNoCase(_T("19200")) == 0)) || (strSql.CompareNoCase(_T("9600")) == 0) || ((strSql.CompareNoCase(_T("38400")) == 0)))
+					if(((strSql.CompareNoCase(_T("9600")) == 0))
+						|| (strSql.CompareNoCase(_T("19200")) == 0)  
+						|| (strSql.CompareNoCase(_T("38400")) == 0) 
+						|| (strSql.CompareNoCase(_T("57600")) == 0) 
+						|| ((strSql.CompareNoCase(_T("115200")) == 0)))
                     {
                         m_product_temp.BuildingInfo.strIp.Empty();
                         m_product_temp.BuildingInfo.strBaudRate = strSql;
@@ -3290,36 +3626,14 @@ void CMainFrame::ScanTstatInDB(void)
                         m_product_temp.BuildingInfo.strIp = strSql;
                     }
 
-#if 0
-                    m_product_temp.BuildingInfo.strIp = strSql;
-#endif
-                    temp_variant=bado.m_pRecordset->GetCollect("Com_Port");//
-                    if(temp_variant.vt!=VT_NULL)
-                    {
-                        strSql=temp_variant;
-                        m_product_temp.ncomport = _wtoi(strSql);
-                    }
-                    else
-                    {
-                        strSql=_T("");
-                        m_product_temp.ncomport = 0;
-                    }
 
+                     
+					m_product_temp.ncomport = q.getIntField("Com_Port");
                     //m_product_temp.BuildingInfo.strIpPort=strSql;
                     m_product_temp.BuildingInfo.strIpPort = _T("10000");
 
-
-                    temp_variant=bado.m_pRecordset->GetCollect("Background_imgID");
-                    if(temp_variant.vt!=VT_NULL)
-                        m_product_temp.strImgPathName=temp_variant;
-                    else
-                        m_product_temp.strImgPathName=_T("");
-
-                    temp_variant=bado.m_pRecordset->GetCollect("Custom");
-                    if(temp_variant.vt!=VT_NULL)
-                        m_product_temp.Custom=temp_variant;
-                    else
-                        m_product_temp.Custom=_T("");
+					m_product_temp.strImgPathName = q.getValuebyName(L"Background_imgID");
+                     m_product_temp.Custom =    q.getValuebyName(L"Custom");
 
                     if (g_selected_serialnumber == m_product_temp.serial_number)
                     {
@@ -3329,56 +3643,23 @@ void CMainFrame::ScanTstatInDB(void)
                         m_current_tree_node =   m_product_temp;
                         /*g_selected_serialnumber = m_product.at(i).serial_number;*/
                     }
-
-                    temp_variant=bado.m_pRecordset->GetCollect("Parent_SerialNum");
-                    if(temp_variant.vt!=VT_NULL)
-                    {
-                        CString temp_value1;
-                        temp_value1 = temp_variant;
-                        m_product_temp.note_parent_serial_number=(unsigned int)_wtoi(temp_value1);
-                    }
-                    else
-                        m_product_temp.note_parent_serial_number=0;
-
-                    temp_variant=bado.m_pRecordset->GetCollect("Panal_Number");
-                    if(temp_variant.vt!=VT_NULL)
-                    {
-                        CString temp_value1;
-                        temp_value1 = temp_variant;
-                        m_product_temp.panel_number=(unsigned char)_wtoi(temp_value1);
-                    }
-                    else
-                        m_product_temp.panel_number=0;
-
-                    temp_variant=bado.m_pRecordset->GetCollect("Object_Instance");
-                    if(temp_variant.vt!=VT_NULL)
-                    {
-                        CString temp_value1;
-                        temp_value1 = temp_variant;
-                        m_product_temp.object_instance=(unsigned int)_wtoi(temp_value1);
-                    }
-                    else
-                        m_product_temp.object_instance=0;
+					m_product_temp.note_parent_serial_number = q.getIntField("Parent_SerialNum");
+                    m_product_temp.panel_number = q.getIntField("Panal_Number");
+					m_product_temp.object_instance = q.getIntField("Object_Instance");
 
                     m_product.push_back(m_product_temp);
-                    bado.m_pRecordset->MoveNext();
+                    q.nextRow();
                 }
 
-                /*	if(m_pRs->State)
-                	m_pRs->Close(); */
-                bado.CloseRecordset();
+          
 
             }
 
 
-            bado.CloseConn();
+            SqliteDB.closedb();
         }
 
-        /*if(m_pRs->State)
-        m_pRs->Close();
-        if(m_pCon->State)
-        m_pCon->Close();*/
-        ado.CloseConn();
+         
 #endif
 
 
@@ -4184,14 +4465,7 @@ void CMainFrame::OnAddBuildingConfig()
         dlg.DoModal();
         return;
     }
-    /*
-    CMannageBuidingDlg Dlg;
-    if(Dlg.DoModal()==IDOK)
-    {
-    //	CAddBuilding Dlg;
-    //	Dlg.DoModal();
-    }
-    */
+ 
 
     bool temp_value = 	b_pause_refresh_tree;	//如果在Config界面选择building的时候就不要刷新Tree了.
     b_pause_refresh_tree = true;
@@ -4299,13 +4573,11 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 
     if(SAVE_PRODYCT_STATUS == nIDEvent)
     {
-        //TRACE(_T("Main timer SAVE_PRODYCT_STATUS\r\n"));
+		 
 
-        //m_pCon.CreateInstance(_T("ADODB.Connection"));
-        //m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
-        CBADO bado;
-        bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-        bado.OnInitADOConn();
+		CppSQLite3DB SqliteDBBuilding;
+		SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 
         for(int i=0; i<m_product.size(); i++) //用于更新 产品的状态，以便下次打开的时候直接显示上次关闭的时候的状态;
         {
@@ -4316,7 +4588,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
             {
 
                 execute_str.Format(_T("update ALL_NODE set Online_Status = %d where Serial_ID = '%s'"),m_product.at(i).status,serial_number_temp);
-                bado.m_pConnection->Execute(execute_str.GetString(),NULL,adCmdText);
+                SqliteDBBuilding.execDML((UTF8MBSTR)execute_str);
             }
             catch(_com_error *e)
             {
@@ -4324,7 +4596,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
             }
 
         }
-        bado.CloseConn();
+      SqliteDBBuilding.closedb();
         //if(m_pCon->State)
         //	m_pCon->Close();
 
@@ -6274,9 +6546,8 @@ void CMainFrame::OnDestroy()
 
     OnDisconnect();
 
-    CBADO bado;
-    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-    bado.OnInitADOConn();
+	CppSQLite3DB SqliteDBBuilding;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 #if 1
     g_mstp_flag=FALSE;
     for(int i=0; i<m_product.size(); i++) //用于更新 产品的状态，以便下次打开的时候直接显示上次关闭的时候的状态;
@@ -6288,7 +6559,7 @@ void CMainFrame::OnDestroy()
         {
 
             execute_str.Format(_T("update ALL_NODE set Online_Status = %d where Serial_ID = '%s'"),m_product.at(i).status,serial_number_temp);
-            bado.m_pConnection->Execute(execute_str.GetString(),NULL,adCmdText);
+             SqliteDBBuilding.execDML((UTF8MBSTR)execute_str);
         }
         catch(_com_error *e)
         {
@@ -6296,7 +6567,7 @@ void CMainFrame::OnDestroy()
         }
 
     }
-    bado.CloseConn();
+    SqliteDBBuilding.closedb();
 
 
     //close_T3000_log_file();
@@ -6548,153 +6819,62 @@ void CMainFrame::OnUserMannageMentUpdate(CCmdUI *pCmdUI)
 
 void CMainFrame::GetIONanme()
 {
+	CppSQLite3DB SqliteDB;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
     try
     {
 
 
-        /*_ConnectionPtr m_ConTmp;
-        _RecordsetPtr m_RsTmp;
-        m_ConTmp.CreateInstance("ADODB.Connection");
-        m_RsTmp.CreateInstance("ADODB.Recordset");
-        m_ConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-        */
-
-        CBADO bado;
-        bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-        bado.OnInitADOConn();
+        SqliteDB.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
         CString strSerial;
         strSerial.Format(_T("%u"),g_selected_serialnumber);
         strSerial.Trim();
         CString strsql;
         strsql.Format(_T("select * from IONAME where SERIAL_ID = '%s'"),strSerial);
-        //m_RsTmp->Open((_variant_t)strsql,_variant_t((IDispatch *)m_ConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-        bado.m_pRecordset=bado.OpenRecordset(strsql);
-        if(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+        
+        q = SqliteDB.execQuery((UTF8MBSTR)strsql);
+        if(!q.eof())
         {
             CString str_temp;
             str_temp.Empty();
             _variant_t temp_variant;
 
-            temp_variant=bado.m_pRecordset->GetCollect("SENSORNAME");
-            if(temp_variant.vt!=VT_NULL)
-                str_temp=temp_variant;
-            else
-                str_temp=_T("Internal Sensor");
-            g_strSensorName=str_temp;
+            
+            g_strSensorName=q.getValuebyName(L"SENSORNAME",L"Internal Sensor");
 
-            temp_variant=bado.m_pRecordset->GetCollect("INPUT1");
-            if(temp_variant.vt!=VT_NULL)
-                str_temp=temp_variant;
-            else
-                str_temp=_T("Input 1");
-            g_strInName1=str_temp;
+             
+            g_strInName1=q.getValuebyName(L"INPUT1",L"Input 1");
 
-            temp_variant=bado.m_pRecordset->GetCollect("INPUT2");
-            if(temp_variant.vt!=VT_NULL)
-                str_temp=temp_variant;
-            else
-                str_temp=_T("Input 2");
-            g_strInName2=str_temp;
+            
+            g_strInName2=q.getValuebyName(L"INPUT2",L"Input 2");
 
-            temp_variant=bado.m_pRecordset->GetCollect("INPUT3");
-            if(temp_variant.vt!=VT_NULL)
-                str_temp=temp_variant;
-            else
-                str_temp=_T("Input 3");
-            g_strInName3=str_temp;
+            g_strInName3=q.getValuebyName(L"INPUT3",L"Input 3");
 
-            temp_variant=bado.m_pRecordset->GetCollect("INPUT4");
-            if(temp_variant.vt!=VT_NULL)
-                str_temp=temp_variant;
-            else
-                str_temp=_T("Input 4");
-            g_strInName4=str_temp;
+           g_strInName4=q.getValuebyName(L"INPUT4",L"Input 4");
+           g_strInName5=q.getValuebyName(L"INPUT5",L"Input 5");
+           g_strInName6=q.getValuebyName(L"INPUT6",L"Input 6");  
+		   g_strInName7=q.getValuebyName(L"INPUT7",L"Input 7");
+           g_strInName8=q.getValuebyName(L"INPUT8",L"Input 8");
+           g_strInHumName=q.getValuebyName(L"INPUT9",L"Input 9");
 
-            temp_variant=bado.m_pRecordset->GetCollect("INPUT5");
-            if(temp_variant.vt!=VT_NULL)
-                str_temp=temp_variant;
-            else
-                str_temp=_T("Input 5");
-            g_strInName5=str_temp;
+         
 
-            temp_variant=bado.m_pRecordset->GetCollect("INPUT6");
-            if(temp_variant.vt!=VT_NULL)
-                str_temp=temp_variant;
-            else
-                str_temp=_T("Input 6");
-            g_strInName6=str_temp;
+             
+            g_strOutName1=q.getValuebyName(L"OUTPUT1",L"Output 1");
+			 
 
-            temp_variant=bado.m_pRecordset->GetCollect("INPUT7");
-            if(temp_variant.vt!=VT_NULL)
-                str_temp=temp_variant;
-            else
-                str_temp=_T("Input 7");
-            g_strInName7=str_temp;
 
-            temp_variant=bado.m_pRecordset->GetCollect("INPUT8");
-            if(temp_variant.vt!=VT_NULL)
-                str_temp=temp_variant;
-            else
-                str_temp=_T("Input 8");
-            g_strInName8=str_temp;
+			g_strOutName2=q.getValuebyName(L"OUTPUT2",L"Output 2");
 
-            temp_variant=bado.m_pRecordset->GetCollect("INPUT9");
-            //	temp_variant=m_RsTmp->GetCollect("Humidity Sensor");
-            if(temp_variant.vt!=VT_NULL)
-                str_temp=temp_variant;
-            else
-                str_temp=_T("Humidity Sensor");
-            g_strInHumName=str_temp;
+			g_strOutName3=q.getValuebyName(L"OUTPUT3",L"Output 3");
 
-            temp_variant=bado.m_pRecordset->GetCollect("OUTPUT1");
-            if(temp_variant.vt!=VT_NULL)
-                str_temp=temp_variant;
-            else
-                str_temp=_T("Output 1");
-            g_strOutName1=str_temp;
-
-            temp_variant=bado.m_pRecordset->GetCollect("OUTPUT2");
-            if(temp_variant.vt!=VT_NULL)
-                str_temp=temp_variant;
-            else
-                str_temp=_T("Output 2");
-            g_strOutName2=str_temp;
-
-            temp_variant=bado.m_pRecordset->GetCollect("OUTPUT3");
-            if(temp_variant.vt!=VT_NULL)
-                str_temp=temp_variant;
-            else
-                str_temp=_T("Output 3");
-            g_strOutName3=str_temp;
-
-            temp_variant=bado.m_pRecordset->GetCollect("OUTPUT4");
-            if(temp_variant.vt!=VT_NULL)
-                str_temp=temp_variant;
-            else
-                str_temp=_T("Output 4");
-            g_strOutName4=str_temp;
-
-            temp_variant=bado.m_pRecordset->GetCollect("OUTPUT5");
-            if(temp_variant.vt!=VT_NULL)
-                str_temp=temp_variant;
-            else
-                str_temp=_T("Output 5");
-            g_strOutName5=str_temp;
-
-            temp_variant=bado.m_pRecordset->GetCollect("OUTPUT6");
-            if(temp_variant.vt!=VT_NULL)
-                str_temp=temp_variant;
-            else
-                str_temp=_T("Output 6");
-            g_strOutName6=str_temp;
-
-            temp_variant=bado.m_pRecordset->GetCollect("OUTPUT7");
-            if(temp_variant.vt!=VT_NULL)
-                str_temp=temp_variant;
-            else
-                str_temp=_T("Output 7");
-            g_strOutName7=str_temp;
+			g_strOutName4=q.getValuebyName(L"OUTPUT4",L"Output 4");
+			g_strOutName5=q.getValuebyName(L"OUTPUT5",L"Output 5");
+			g_strOutName6=q.getValuebyName(L"OUTPUT6",L"Output 6");  
+			g_strOutName7=q.getValuebyName(L"OUTPUT7",L"Output 7");
+		 
 
             g_strInHumName = _T("Humidity Sensor");
             g_strInCO2=_T("CO2 Sensor");
@@ -6726,12 +6906,8 @@ void CMainFrame::GetIONanme()
 
 
         }
-        bado.CloseRecordset();
-        bado.CloseConn();
-        /*if(m_RsTmp->State)
-        	m_RsTmp->Close();
-        if(m_ConTmp->State)
-        	m_ConTmp->Close();	*/
+       
+     
 
     }
     catch (...)
@@ -6753,18 +6929,10 @@ void CMainFrame::OnHelp()
 //  	if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
 //  	else
     hWnd =  ::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
-    //return (hWnd != NULL);
-
-//      CGraphicModelDlg dlg;
-//      dlg.DoModal();
+     
 
 }
-void CMainFrame::OnImportDatase()
-{
-    CImportDatabaseDlg Dlg;
-    Dlg.DoModal();
-
-}
+ 
 
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 {
@@ -6941,9 +7109,13 @@ void CMainFrame::OnToolRefreshLeftTreee()
 #include "ScanDlg.h"
 void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 {
-    CADO ado;
-    ado.OnInitADOConn();
-
+     
+	CppSQLite3DB SqliteDBT3000;
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
     m_strCfgFilePath = g_strExePth + c_strCfgFileName;
     //m_cfgFileHandler.CreateConfigFile(m_strCfgFilePath);
 	m_cfgFileHandler.CreateConfigFile();
@@ -7824,8 +7996,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                                     strSql.Format(_T("update Building set Com_Port='%s' where Building_Name='%s' and Main_BuildingName='%s'"),temp_cs_port,m_strCurSubBuldingName,m_strCurMainBuildingName);
                                     //m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
 
-                                    ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
-
+                                   // ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+								   SqliteDBT3000.execDML((UTF8MBSTR)strSql);
 
                                     m_subNetLst.at(0).strComPort = temp_cs_port;
                                 }
@@ -8185,9 +8357,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     {
                         CString TstatName,TstatDBName;
 
-                        CBADO bado;
-                        bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-                        bado.OnInitADOConn();
+                       
                         CString strSerial;
                         strSerial.Format(_T("%d"),get_serialnumber());
 
@@ -8224,7 +8394,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 
 								strSql.Format(_T("update ALL_NODE set Product_name='%s' where Serial_ID='%s'"),newname,strSerial);
-								bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+								SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 
 								WritePrivateProfileStringW(temp_serial_number,_T("WriteFlag"),L"0",g_achive_device_name_path);
 								PostMessage(WM_MYMSG_REFRESHBUILDING,0,0);
@@ -8233,12 +8403,12 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 
                         strSql.Format(_T("select * from  ALL_NODE  where Serial_ID='%s'"),strSerial);
-                        bado.m_pRecordset = bado.OpenRecordset(strSql);
-                        if (!bado.m_pRecordset->EndOfFile)
+                        q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+                        if (!q.eof())
                         {
-                            TstatDBName = bado.m_pRecordset->GetCollect(_T("Product_name"));
+                            TstatDBName =q.getValuebyName(L"Product_name");
                         }
-                        bado.CloseRecordset();
+                        
                         CString StrDefaultName;
                         if (TstatDBName.IsEmpty ())
                         {
@@ -8252,16 +8422,16 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                         if (TstatName.CompareNoCase(TstatDBName)!=0&&(!TstatName.IsEmpty ()))
                         {
                             strSql.Format(_T("update ALL_NODE set Product_name='%s' where Serial_ID='%s'"),TstatName,strSerial);
-                            bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+                            SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
                             PostMessage(WM_MYMSG_REFRESHBUILDING,0,0);
                         }
                         else if (TstatName.IsEmpty ()&&TstatDBName.IsEmpty ())
                         {
                             strSql.Format(_T("update ALL_NODE set Product_name='%s' where Serial_ID='%s'"),StrDefaultName,strSerial);
-                            bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+                            SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
                             PostMessage(WM_MYMSG_REFRESHBUILDING,0,0); 
                         }
-                        bado.CloseConn();
+                        SqliteDBBuilding.closedb();
 #endif
                     }
 
@@ -8374,22 +8544,22 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             strSerial.Trim();
                             CString strsql;
                             strsql.Format(_T("select * from user_level where MainBuilding_Name='%s' and Building_Name='%s' and username = '%s' and serial_number = %d"),m_strCurMainBuildingName,m_strCurSubBuldingName,g_strLoginUserName,g_serialNum);
-                            ado.m_pRecordset=ado.OpenRecordset(strsql);
+                            q = SqliteDBT3000.execQuery((UTF8MBSTR)strsql);
 
-                            if(VARIANT_FALSE==ado.m_pRecordset->EndOfFile)
+                            if(!q.eof())
                             {
                                 //获取权限：
-                                g_AllscreensetLevel=ado.m_pRecordset->GetCollect("allscreen_level");
+                                g_AllscreensetLevel=q.getIntField("allscreen_level");
                                 if(g_AllscreensetLevel!=1)
                                 {
-                                    g_MainScreenLevel=ado.m_pRecordset->GetCollect("mainscreen_level");//
-                                    g_ParamLevel=ado.m_pRecordset->GetCollect("parameter_level");
-                                    g_OutPutLevel=ado.m_pRecordset->GetCollect("outputtable_level");
-                                    g_NetWorkLevel=ado.m_pRecordset->GetCollect("networkcontrol_level");//
-                                    g_GraphicModelevel=ado.m_pRecordset->GetCollect("graphic_level");//
-                                    g_BurnHexLevel=ado.m_pRecordset->GetCollect("burnhex_level");
-                                    g_LoadConfigLevel=ado.m_pRecordset->GetCollect("loadconfig_level");
-                                    g_BuildingsetLevel=ado.m_pRecordset->GetCollect("building_level");
+                                    g_MainScreenLevel=q.getIntField("mainscreen_level");//
+                                    g_ParamLevel=q.getIntField("parameter_level");
+                                    g_OutPutLevel=q.getIntField("outputtable_level");
+                                    g_NetWorkLevel=q.getIntField("networkcontrol_level");//
+                                    g_GraphicModelevel=q.getIntField("graphic_level");//
+                                    g_BurnHexLevel=q.getIntField("burnhex_level");
+                                    g_LoadConfigLevel=q.getIntField("loadconfig_level");
+                                    g_BuildingsetLevel=q.getIntField("building_level");
                                 }
                                 else
                                 {
@@ -8409,26 +8579,17 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
                             }
 
-                            ado.CloseRecordset();
-
-
-
                             strSerial.Format(_T("%d"),g_serialNum);
                             strSerial.Trim();
 
                             strsql.Format(_T("select * from UserLevelSingleSet where MainBuilding_Name='%s' and Building_Name='%s' and username = '%s'"),m_strCurMainBuildingName,m_strCurSubBuldingName,g_strLoginUserName);
-                            ado.m_pRecordset=ado.OpenRecordset(strsql);
-                            if(VARIANT_FALSE==ado.m_pRecordset->EndOfFile)
+                            q = SqliteDBT3000.execQuery((UTF8MBSTR)strsql);
+                            if(!q.eof())
                             {
                                 //获取权限：
-                                g_NetWorkLevel=ado.m_pRecordset->GetCollect("networkcontroller");//
-                                g_BuildingsetLevel=ado.m_pRecordset->GetCollect("database_limition");
+                                g_NetWorkLevel=q.getIntField("networkcontroller");//
+                                g_BuildingsetLevel=q.getIntField("database_limition");
                             }
-
-                            ado.CloseRecordset();
-
-
-
                         }
                         catch (...)
                         {
@@ -8622,7 +8783,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             }
         }
     }
-    ado.CloseConn();
+    SqliteDBT3000.closedb();
 
     g_bPauseMultiRead = FALSE;
 }
@@ -8946,9 +9107,8 @@ end_condition :
     }
 
 
-    CBADO bado;
-    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-    bado.OnInitADOConn();
+	CppSQLite3DB SqliteDBBuilding;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
     //This function add by Fance
     //If the Database not contain the device wo scaned , then added into the database or update it;
@@ -9050,8 +9210,8 @@ end_condition :
                     else
                         strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s', Product_class_ID = '%s', Object_Instance = '%s' , Panal_Number = '%s' ,  Bautrate ='%s',Software_Ver = '%s' ,Com_Port ='%s',Product_ID ='%s', Protocol ='1',Product_name = '%s',Online_Status = 1,Parent_SerialNum = '%s' where Serial_ID = '%s'"),NetwordCard_Address,temp_product_class_id,str_object_instance,str_panel_number,str_ip_address_exist,str_fw_version,str_n_port,str_modbus_id,str_Product_name_view,str_parents_serial,str_serialid);
                     find_new_device = true;
-
-                    bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+					SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+                     
                 }
                 catch(_com_error *e)
                 {
@@ -9160,7 +9320,7 @@ end_condition :
             try
             {
 
-                bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+             SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
             }
             catch(_com_error *e)
             {
@@ -9170,7 +9330,7 @@ end_condition :
         }
 
     }
-    bado.CloseConn();
+    SqliteDBBuilding.closedb();
     if(find_new_device)
         PostMessage(WM_MYMSG_REFRESHBUILDING,0,0);
     return TRUE;
@@ -10014,340 +10174,9 @@ void CMainFrame::ReadExcel()
 #endif
 }
 
-void CMainFrame::Tstat6_func()
-{
-    int num =0;
-    for (int i =0; i<512; i++)
-    {
-        num = reg_tstat6[i];
-        reg_tststold[num] = i;
-    }
 
-}
 
-void CMainFrame::JudgeTstat6dbExist( CString strtable,CString strsql )
-{
-    CADO m_cado;
-    m_cado.OnInitADOConn();
-    bool ret = m_cado.IsHaveTable(m_cado,strtable);
 
-    //不存在 创建数据库表
-    if (!ret)
-    {
-        m_cado.m_pRecordset = m_cado.OpenRecordset(strsql);
-        //初始化表
-        //如果不初始化，则会有很多问题
-        CString sql;
-        sql.Format(_T("select * from %s"),strtable);
-        m_cado.m_pRecordset = m_cado.OpenRecordset(sql);
-        if (m_cado.m_pRecordset->EndOfFile)
-        {
-
-            for(int i = 0; i<512; i++)
-            {
-                try
-                {
-                    m_cado.m_pRecordset->AddNew();
-
-
-                    m_cado.m_pRecordset->PutCollect("Block",(_bstr_t)(charr[i][0]));
-                    m_cado.m_pRecordset->PutCollect("Address",(_bstr_t)(i+1));
-                    //	m_cado.m_pRecordset->PutCollect("Data",(_bstr_t)(i+1));
-
-                    m_cado.m_pRecordset->PutCollect("Description",(_bstr_t)(charr[i][1]));
-
-
-
-                    m_cado.m_pRecordset->Update();
-
-                }
-
-                catch(...)
-                {
-
-                }
-            }
-        }
-
-
-
-
-    }
-    m_cado.CloseConn();
-
-}
-
-void CMainFrame::Updata_db_tstat6( unsigned short imodel )
-{
-    CString strtable;
-    if (imodel == PM_TSTAT6||imodel == PM_TSTAT5i||imodel == PM_TSTAT8)
-        strtable = _T("Tstat6");
-//     if (imodel == PM_TSTAT5i)
-//         strtable = _T("Tstat5i");
-    else if(imodel == PM_TSTAT7)
-        strtable = _T("Tstat7");
-    //CString strsql = _T("select * from Tstat6");
-    //strtemp.Format(_T("update %s set name='%s' where num='%s'"),m_database,m_name,m_num);
-
-    CADO m_cado;
-    m_cado.OnInitADOConn();
-//	bool ret = m_cado.IsHaveTable(m_cado,strtable);
-
-    //不存在 创建数据库表
-//	if (!ret)
-//	{
-    //	m_cado.m_pRecordset = m_cado.OpenRecordset(strsql);
-    //初始化表
-    //如果不初始化，则会有很多问题
-    CString sql;
-    sql.Format(_T("select * from %s"),strtable);
-    m_cado.m_pRecordset = m_cado.OpenRecordset(sql);
-
-    //	if (m_cado.m_pRecordset->EndOfFile)
-    {
-
-        for(int i = 0; i<512; i++)
-        {
-            try
-            {
-//					m_cado.m_pRecordset->AddNew();
-
-
-//					m_cado.m_pRecordset->PutCollect("Block",(_bstr_t)(charr[i][0]));
-//					m_cado.m_pRecordset->PutCollect("Address",(_bstr_t)(i+1));
-                m_cado.m_pRecordset->PutCollect("Data",(_bstr_t)(multi_register_value[i]));
-
-//					m_cado.m_pRecordset->PutCollect("Description",(_bstr_t)(charr[i][1]));
-                m_cado.m_pRecordset->MoveNext();
-
-
-                m_cado.m_pRecordset->Update();
-
-            }
-
-            catch(...)
-            {
-
-            }
-        }
-    }
-#if 0
-    else if(m_cado.m_pRecordset->FirstOfFile)
-    {
-        for(int i = 0; i<512; i++)
-        {
-            try
-            {
-                //					m_cado.m_pRecordset->AddNew();
-
-
-                //					m_cado.m_pRecordset->PutCollect("Block",(_bstr_t)(charr[i][0]));
-                //					m_cado.m_pRecordset->PutCollect("Address",(_bstr_t)(i+1));
-                m_cado.m_pRecordset->PutCollect("Data",(_bstr_t)(multi_register_value[i]));
-
-                //					m_cado.m_pRecordset->PutCollect("Description",(_bstr_t)(charr[i][1]));
-
-
-                m_cado.m_pRecordset->Update();
-
-            }
-
-            catch(...)
-            {
-
-            }
-
-        }
-
-
-
-    }
-#endif
-    m_cado.CloseConn();
-
-}
-
-
-void CMainFrame::JudgeTstat6SliderExist( CString strtable,CString strsql )
-{
-
-    CADO m_cado;
-    m_cado.OnInitADOConn();
-    bool ret = m_cado.IsHaveTable(m_cado,strtable);
-
-    //不存在 创建数据库表
-    if (!ret)
-    {
-        m_cado.m_pRecordset = m_cado.OpenRecordset(strsql);
-        //初始化表
-        //如果不初始化，则会有很多问题
-        CString sql;
-        sql.Format(_T("select * from %s"),strtable);
-        m_cado.m_pRecordset = m_cado.OpenRecordset(sql);
-        int m_flag =0;
-        if (m_cado.m_pRecordset->EndOfFile)
-        {
-
-            for(int i = 0; i<12; i++)
-            {
-                try
-                {
-                    m_cado.m_pRecordset->AddNew();
-
-
-                    m_cado.m_pRecordset->PutCollect("Block",(_bstr_t)(m_flag));
-                    m_cado.m_pRecordset->PutCollect("Address",(_bstr_t)(m_slidertsta6[i]));
-                    m_cado.m_pRecordset->Update();
-                }
-
-                catch(...)
-                {
-
-                }
-            }
-        }
-
-
-
-
-    }
-    m_cado.CloseConn();
-}
-
-void CMainFrame::UpdataSlider( int Flag )
-{
-    CString strtable;
-// 	if (imodel == PM_TSTAT6)
-// 		strtable = _T("Tstat6");
-// 	else if(imodel == PM_TSTAT7)
-// 		strtable = _T("Tstat7");
-// 	//CString strsql = _T("select * from Tstat6");
-// 	//strtemp.Format(_T("update %s set name='%s' where num='%s'"),m_database,m_name,m_num);
-
-    strtable = _T("Sliderdb");
-    CADO m_cado;
-    m_cado.OnInitADOConn();
-    //	bool ret = m_cado.IsHaveTable(m_cado,strtable);
-
-    //不存在 创建数据库表
-    //	if (!ret)
-    //	{
-    //	m_cado.m_pRecordset = m_cado.OpenRecordset(strsql);
-    //初始化表
-    //如果不初始化，则会有很多问题
-    CString sql;
-    sql.Format(_T("select * from %s"),strtable);
-    m_cado.m_pRecordset = m_cado.OpenRecordset(sql);
-    //if (m_cado.m_pRecordset->EndOfFile)
-    {
-
-        for(int i = 0; i<12; i++)
-        {
-            try
-            {
-                m_cado.m_pRecordset->PutCollect("Block",(_bstr_t)(Flag));
-                m_cado.m_pRecordset->PutCollect("Address",(_bstr_t)(tstat6flex[i]));
-                m_cado.m_pRecordset->MoveNext();
-
-
-                m_cado.m_pRecordset->Update();
-
-            }
-
-            catch(...)
-            {
-
-				Sleep(1);	//Fance mark  每次结束 i == 11 时 都会溢出 First-chance exception at 0x75d3d36f in T3000.exe: Microsoft C++ exception: _com_error at memory location 0x0028e530..
-            }
-
-
-// 			int tstat6flex[12]={
-// 				30,
-// 				20,
-// 				40,
-// 				20,
-// 				40,
-// 				30,
-// 				40,
-// 				20,
-// 				40,
-// 				20,
-// 				50,
-// 				15
-// 			};
-
-
-// 			for(int i = 6;i<10;i++)
-// 			{
-// 				try
-// 				{
-// 					m_cado.m_pRecordset->PutCollect("Block",(_bstr_t)(Flag));
-// 					m_cado.m_pRecordset->PutCollect("Address",(_bstr_t)(newtstat6[352+i]));
-// 					m_cado.m_pRecordset->MoveNext();
-//
-//
-// 					m_cado.m_pRecordset->Update();
-//
-// 				}
-//
-// 				catch(...)
-// 				{
-//
-// 				}
-// 			}
-        }
-    }
-
-    m_cado.CloseConn();
-
-}
-
-void CMainFrame::ReadSlider()
-{
-    CString strtable;
-    strtable = _T("Sliderdb");
-    CADO m_cado;
-    m_cado.OnInitADOConn();
-    CString sql;
-    sql.Format(_T("select * from %s"),strtable);
-    m_cado.m_pRecordset = m_cado.OpenRecordset(sql);
-    {
-
-        for(int i = 0; i<12; i++)
-        {
-            try
-            {
-                m_cado.m_pRecordset->GetCollect("Block");
-                m_slidertsta6[i] = m_cado.m_pRecordset->GetCollect("Address");
-// 				m_cado.m_pRecordset->PutCollect("Block",(_bstr_t)(Flag));
-// 				m_cado.m_pRecordset->PutCollect("Address",(_bstr_t)(newtstat6[345+i]));
-                m_cado.m_pRecordset->MoveNext();
-
-
-//				m_cado.m_pRecordset->Update();
-
-            }
-
-            catch(...)
-            {
-
-            }
-
-
-
-        }
-    }
-
-    m_cado.CloseConn();
-
-
-}
-
-void CMainFrame::Treestatus()
-{
-
-
-}
 
 //Code by Fance
 //Used for receive all message from all dlg
@@ -12372,8 +12201,11 @@ void CMainFrame::OnTestPing(const CString& strIP)
 //
 void CMainFrame::BuildingComportConfig()
 {
-    CADO ado;
-    ado.OnInitADOConn();
+   
+	CppSQLite3DB SqliteDBT3000;
+	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+ 
+
     bool n_building_port = false;
     if(m_subNetLst.size()<=0)
     {
@@ -12421,18 +12253,12 @@ void CMainFrame::BuildingComportConfig()
                         temp_port = temp_port.Right(temp_port.GetLength() - 3);
                         m_building_com_port = _wtoi(temp_port);
 
-
-
                         try
                         {
 
                             CString strSql;
                             strSql.Format(_T("update Building set Com_Port='%s' where Building_Name='%s' and Main_BuildingName='%s'"),m_vector_comport.at(0),m_strCurSubBuldingName,m_strCurMainBuildingName);
-
-
-                            ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
-
-
+                            SqliteDBT3000.execDML((UTF8MBSTR)strSql);
                             m_subNetLst.at(0).strComPort = m_vector_comport.at(0);
                         }
                         catch (...)
@@ -12450,7 +12276,7 @@ void CMainFrame::BuildingComportConfig()
         }
     }
 
-    ado.CloseConn();
+    SqliteDBT3000.closedb();
 }
 
 
@@ -12606,16 +12432,7 @@ LRESULT CMainFrame::OnThreadFinished(WPARAM wParam, LPARAM /*lParam*/)
     return 0L;
 }
 
-UINT CMainFrame::_DownloadThread(LPVOID pParam)
-{
-    //Convert from the SDK world to the C++ world
-    return 0;
-    CMainFrame* pDlg =(CMainFrame*) pParam;
-    ASSERT(pDlg);
-    ASSERT(pDlg->IsKindOf(RUNTIME_CLASS(CMainFrame)));
-    pDlg->DownloadAllThread();
-    return 0;
-}
+ 
 
 BOOL CMainFrame::DownloadThread()
 {
@@ -12816,145 +12633,7 @@ resend:
 	 handle = NULL; \
 } while (FALSE)
 
-void CMainFrame::DownloadAllThread()
-{
-    CString StrTemp;
-    CString ProductHexBinName;
-    CString WebFileSize;
-    CString ProductName;
-    //CADO ado;
-    //ado.OnInitADOConn();
-    CBADO bado;
-    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-    bado.OnInitADOConn();
-
-    CString strSql;
-    strSql=_T("select  distinct Product_class_ID from ALL_NODE");
-    bado.m_pRecordset=bado.OpenRecordset(strSql);
-    //ado.m_pRecordset->MoveFirst();
-    while(!bado.m_pRecordset->EndOfFile)
-    {
-        if(m_bSafeToClose)
-        {
-
-            if (m_hHttpFile)
-            {
-                ::InternetCloseHandle(m_hHttpFile);
-                m_hHttpFile = NULL;
-            }
-            if (m_hHttpConnection)
-            {
-                ::InternetCloseHandle(m_hHttpConnection);
-                m_hHttpConnection = NULL;
-            }
-            if (m_hInternetSession)
-            {
-                ::InternetCloseHandle(m_hInternetSession);
-                m_hInternetSession = NULL;
-
-            }
-
-
-            StrTemp=bado.m_pRecordset->GetCollect(_T("Product_class_ID"));
-            int ModelID=_wtoi(StrTemp);
-            GetProductFPTAndLocalPath(ModelID,m_sURLToDownload,ProductHexBinName);
-            CString StrTips=_T("");
-            CString StrBinHexPath;
-            CString ProductFirmwareTime,ProductFirmwareSize,WebProductFirmwareTime;
-            CString FirmwareDirectoryURL,FirmwareName;
-            GetProductFirmwareFTPDirectory(ModelID,FirmwareDirectoryURL,FirmwareName);
-            ProductName=GetProductName(ModelID);
-            WebProductFirmwareTime=GetProductFirmwareTimeFromTemcoWebsite(FirmwareDirectoryURL,FirmwareName,WebFileSize);
-            StrBinHexPath = g_strExePth;
-            StrBinHexPath+=_T("firmware\\");
-
-            StrTemp.Format(_T("%s\\"),ProductName);
-            //m_file_firmware_Size
-            GetPrivateProfileStringW(_T("Setting"),ProductName+_T("-Time"),_T(""),ProductFirmwareTime.GetBuffer(MAX_PATH),MAX_PATH,m_file_firmware_Time);
-            GetPrivateProfileStringW(_T("Setting"),ProductName+_T("-Size"),_T(""),ProductFirmwareSize.GetBuffer(MAX_PATH),MAX_PATH,m_file_firmware_Time);
-            StrBinHexPath+=StrTemp;
-            StrBinHexPath+=ProductHexBinName;
-
-            HANDLE hFind;//
-            WIN32_FIND_DATA wfd;//
-            hFind = FindFirstFile(StrBinHexPath, &wfd);//
-
-
-//			HANDLE hFile = ::CreateFile(StrBinHexPath, GENERIC_READ | FILE_SHARE_READ, 0,
-//				NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-//			if (hFile!= INVALID_HANDLE_VALUE)
-//			{
-//				//_tprintf_s(_T("Failed to create file handle: %s ! error code:%d\n"), szFileName, GetLastError());
-//				//return -1;
-//
-//				UINT64 uFileSize = 0;
-//				::GetFileSizeEx(hFile, reinterpret_cast<PLARGE_INTEGER>(&uFileSize));
-//
-//				FILE_STANDARD_INFO fsi = {0};
-//				if (!::GetFileInformationByHandleEx(hFile, FileStandardInfo, &fsi, sizeof(FILE_STANDARD_INFO)))
-//				{
-//					_tprintf_s(_T("Failed to get file info! error code:%d\n"), GetLastError());
-//					CLOSE_HANDLE(hFile);
-//					return -1;
-//				}
-//
-//// 				_tprintf_s(_T("FileName : %s\n"), szFileName);
-//// 				_tprintf_s(_T("FileSize : %I64u Byte\n"), uFileSize);
-//// 				_tprintf_s(_T("FileSpacesSize : %I64u Byte\n"), fsi.AllocationSize);
-//                ProductFirmwareSize.Format(_T("%0.1fK"),uFileSize/1024);
-//				CLOSE_HANDLE(hFile);
-//
-//			}
-
-
-
-            if (hFind!=INVALID_HANDLE_VALUE)
-            {
-                DWORD nfilesize=wfd.nFileSizeLow;
-                if (nfilesize<1024*1024)
-                {
-                    ProductFirmwareSize.Format(_T("%0.1fK"),nfilesize/1024);
-                }
-
-            }
-
-            if (((WebProductFirmwareTime.CompareNoCase(ProductFirmwareTime)!=0)&&(!m_sURLToDownload.IsEmpty()))||(hFind==INVALID_HANDLE_VALUE))//说明当前目录下无t3000.mdb
-            {
-                if (!m_sURLToDownload.IsEmpty())
-                {
-                    //WritePrivateProfileStringW(_T("Setting"),_T("DB_IPADDRESS"),_T("192.168.0.202"),SettingPath);
-                    WritePrivateProfileStringW(_T("Setting"),ProductName+_T("-Time"),WebProductFirmwareTime,m_file_firmware_Time);
-                    WritePrivateProfileStringW(_T("Setting"),ProductName+_T("-Size"),WebFileSize,m_file_firmware_Time);
-                    //SetPaneString(3,GetProductName(ModelID));
-                    m_sFileToDownloadInto = g_strExePth;
-                    m_sFileToDownloadInto+=_T("firmware\\");
-                    CreateDirectory(m_sFileToDownloadInto,NULL);
-                    StrTemp.Format(_T("%s\\"),GetProductName(ModelID));
-                    StrTips.Format(_T("%s's frimware is downloading....."),GetProductName(ModelID));
-                    CString* pstrInfo = new CString(StrTips);
-                    ::SendMessage(this->m_hWnd,WM_SHOW_PANNELINFOR,WPARAM(pstrInfo),LPARAM(3));
-
-                    m_sFileToDownloadInto+=StrTemp;
-                    CreateDirectory(m_sFileToDownloadInto,NULL);
-                    m_sFileToDownloadInto+=ProductHexBinName;
-                    m_bSafeToClose=FALSE;
-                    DownloadFromFTP();
-                    Sleep(15000);
-                }
-            }
-
-
-
-            bado.m_pRecordset->MoveNext();
-        }
-        else
-        {
-            Sleep(20000);
-            continue;
-        }
-    }
-    bado.CloseConn();
-}
+ 
 void CMainFrame::HandleThreadErrorWithLastError(UINT nIDError, DWORD dwLastError)
 {
     //Form the error string to report
@@ -13712,8 +13391,9 @@ BOOL CMainFrame::OnHelpInfo(HELPINFO* pHelpInfo)
 void CMainFrame::OnFileExportregiseterslist()
 {
     CStdioFile* m_pFile;
-
-
+	CppSQLite3DB SqliteDBT3000;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
     CString  Product_Head_File_Name;
     CString strFilter;
     CString strFilename;
@@ -13778,23 +13458,18 @@ void CMainFrame::OnFileExportregiseterslist()
     range.SetItem(_variant_t((long)(1)),_variant_t((long)(2)),_variant_t(_T("Register Name")));
     range.SetItem(_variant_t((long)(1)),_variant_t((long)(3)),_variant_t(_T("Register Description")));
     int Rows=2;
-    CADO ado;
-    ado.OnInitADOConn();
+     
+	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
     CString StrSql;
     StrSql=_T("Select * from CS3000 ");
-    ado.m_pRecordset = ado.OpenRecordset(StrSql);
-    int RecordCount=ado.GetRecordCount(ado.m_pRecordset);
-    ado.m_pRecordset->MoveFirst();
-    while(!ado.m_pRecordset->EndOfFile)
+    q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
+   
+    
+    while(!q.eof())
     {
 
-        temp_variant=ado.m_pRecordset->GetCollect("RegName");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+         
+		strTemp = q.getValuebyName(L"RegName");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(2)),_variant_t(strTemp));
         strTemp.TrimRight();
         strTemp.TrimLeft();
@@ -13810,25 +13485,12 @@ void CMainFrame::OnFileExportregiseterslist()
 
 
 
-        temp_variant=ado.m_pRecordset->GetCollect("RegID");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+         
+		strTemp = q.getValuebyName(L"RegID");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(1)),_variant_t(strTemp));
         RegisterID = strTemp;
 
-
-
-        temp_variant=ado.m_pRecordset->GetCollect("RegDiscription");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+		strTemp = q.getValuebyName(L"RegDiscription");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(3)),_variant_t(strTemp));
 
         if (IS_Write)
@@ -13842,12 +13504,12 @@ void CMainFrame::OnFileExportregiseterslist()
 
         Rows++;
 
-        ado.m_pRecordset->MoveNext();
+        q.nextRow();
 
     }
     m_pFile->Flush();
     m_pFile->Close();
-    ado.CloseRecordset();
+    
 #endif
 
 
@@ -13879,29 +13541,17 @@ void CMainFrame::OnFileExportregiseterslist()
 
 
     StrSql=_T("Select * from AirQuanlity_Reglist ");
-    ado.m_pRecordset = ado.OpenRecordset(StrSql);
-    RecordCount=ado.GetRecordCount(ado.m_pRecordset);
-    ado.m_pRecordset->MoveFirst();
-    while(!ado.m_pRecordset->EndOfFile)
+    q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
+    while(!q.eof())
     {
-        temp_variant=ado.m_pRecordset->GetCollect("RegID");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+         
+		strTemp = q.getValuebyName(L"RegID");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(1)),_variant_t(strTemp));
 
         RegisterID = strTemp;
 
-        temp_variant=ado.m_pRecordset->GetCollect("RegName");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+
+		strTemp = q.getValuebyName(L"RegName");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(2)),_variant_t(strTemp));
 
         strTemp.TrimRight();
@@ -13917,13 +13567,9 @@ void CMainFrame::OnFileExportregiseterslist()
         }
 
 
-        temp_variant=ado.m_pRecordset->GetCollect("RegFullDescription");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+       
+
+		strTemp = q.getValuebyName(L"RegFullDescription");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(3)),_variant_t(strTemp));
 
         Rows++;
@@ -13936,7 +13582,7 @@ void CMainFrame::OnFileExportregiseterslist()
         }
 
 
-        ado.m_pRecordset->MoveNext();
+        q.nextRow();
 
     }
 
@@ -13944,7 +13590,7 @@ void CMainFrame::OnFileExportregiseterslist()
     m_pFile->Close();
 
 
-    ado.CloseRecordset();
+    
 
 
 #endif
@@ -14061,28 +13707,18 @@ void CMainFrame::OnFileExportregiseterslist()
 
 
     StrSql=_T("Select * from T3_RegisterList ");
-    ado.m_pRecordset = ado.OpenRecordset(StrSql);
-    RecordCount=ado.GetRecordCount(ado.m_pRecordset);
-    ado.m_pRecordset->MoveFirst();
-    while(!ado.m_pRecordset->EndOfFile)
+	q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
+	 
+ 
+    while(!q.eof())
     {
-        temp_variant=ado.m_pRecordset->GetCollect("RegID");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+        
+		strTemp = q.getValuebyName(L"RegID");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(1)),_variant_t(strTemp));
         RegisterID = strTemp;
 
-        temp_variant=ado.m_pRecordset->GetCollect("T3-8AI8AO");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+        
+		strTemp = q.getValuebyName(L"T3-8AI8AO");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(2)),_variant_t(strTemp));
         strTemp.TrimRight();
         strTemp.TrimLeft();
@@ -14103,24 +13739,13 @@ void CMainFrame::OnFileExportregiseterslist()
             m_pFile_8AI8AO->WriteString(logstr.GetBuffer());
         }
 
-        temp_variant=ado.m_pRecordset->GetCollect("T3-8AI8AO_DESCRIPTION");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+         
+		strTemp = q.getValuebyName(L"T3-8AI8AO_DESCRIPTION");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(3)),_variant_t(strTemp));
 
 
-
-        temp_variant=ado.m_pRecordset->GetCollect("T3-8AI16O");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+ 
+		strTemp = q.getValuebyName(L"T3-8AI16O");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(4)),_variant_t(strTemp));
         strTemp.TrimRight();
         strTemp.TrimLeft();
@@ -14142,23 +13767,12 @@ void CMainFrame::OnFileExportregiseterslist()
         }
 
 
-        temp_variant=ado.m_pRecordset->GetCollect("T3-8AI16O_DESCRIPTION");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+         
+		strTemp = q.getValuebyName(L"T3-8AI16O_DESCRIPTION");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(5)),_variant_t(strTemp));
 
-
-        temp_variant=ado.m_pRecordset->GetCollect("T3-8I13O");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+		 
+		strTemp = q.getValuebyName(L"T3-8I13O");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(6)),_variant_t(strTemp));
         strTemp.TrimRight();
         strTemp.TrimLeft();
@@ -14180,22 +13794,12 @@ void CMainFrame::OnFileExportregiseterslist()
         }
 
 
-        temp_variant=ado.m_pRecordset->GetCollect("T3-8I13O_DESCRIPTION");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+         
+		strTemp = q.getValuebyName(L"T3-8I13O_DESCRIPTION");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(7)),_variant_t(strTemp));
 
-        temp_variant=ado.m_pRecordset->GetCollect("T3-32AI");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+        
+		strTemp = q.getValuebyName(L"T3-32AI");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(8)),_variant_t(strTemp));
         strTemp.TrimRight();
         strTemp.TrimLeft();
@@ -14217,22 +13821,12 @@ void CMainFrame::OnFileExportregiseterslist()
         }
 
 
-        temp_variant=ado.m_pRecordset->GetCollect("T3-32AI_DESCRIPTION");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+         
+		strTemp = q.getValuebyName(L"T3-32AI_DESCRIPTION");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(9)),_variant_t(strTemp));
 
-        temp_variant=ado.m_pRecordset->GetCollect("T3-4AO");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+        
+		strTemp = q.getValuebyName(L"T3-4AO");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(10)),_variant_t(strTemp));
         strTemp.TrimRight();
         strTemp.TrimLeft();
@@ -14253,23 +13847,13 @@ void CMainFrame::OnFileExportregiseterslist()
             m_pFile_4AO->WriteString(logstr.GetBuffer());
         }
 
-        temp_variant=ado.m_pRecordset->GetCollect("T3-4AO_DESCRIPTION");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+        
+		strTemp = q.getValuebyName(L"T3-4AO_DESCRIPTION");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(11)),_variant_t(strTemp));
 
 
-        temp_variant=ado.m_pRecordset->GetCollect("T3-6CT");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+        
+		strTemp = q.getValuebyName(L"T3-6CT");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(12)),_variant_t(strTemp));
         strTemp.TrimRight();
         strTemp.TrimLeft();
@@ -14291,23 +13875,13 @@ void CMainFrame::OnFileExportregiseterslist()
         }
 
 
-        temp_variant=ado.m_pRecordset->GetCollect("T3-6CT_DESCRIPTION");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+       
+		strTemp = q.getValuebyName(L"T3-6CT_DESCRIPTION");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(13)),_variant_t(strTemp));
 
 
-        temp_variant=ado.m_pRecordset->GetCollect("T3-28IN");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+       
+			strTemp = q.getValuebyName(L"T3-28IN");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(14)),_variant_t(strTemp));
 
         strTemp.TrimRight();
@@ -14329,23 +13903,13 @@ void CMainFrame::OnFileExportregiseterslist()
             m_pFile_28IN->WriteString(logstr.GetBuffer());
         }
 
-        temp_variant=ado.m_pRecordset->GetCollect("T3-28IN_DESCRIPTION");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+        
+		strTemp = q.getValuebyName(L"T3-28IN_DESCRIPTION");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(15)),_variant_t(strTemp));
 
 
-        temp_variant=ado.m_pRecordset->GetCollect("T3-RTD");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+        
+		strTemp = q.getValuebyName(L"T3-RTD");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(16)),_variant_t(strTemp));
 
         strTemp.TrimRight();
@@ -14368,13 +13932,8 @@ void CMainFrame::OnFileExportregiseterslist()
         }
 
 
-        temp_variant=ado.m_pRecordset->GetCollect("T3-RTD_DESCRIPTION");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+         
+		strTemp = q.getValuebyName(L"T3-RTD_DESCRIPTION");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(17)),_variant_t(strTemp));
 
 
@@ -14382,11 +13941,11 @@ void CMainFrame::OnFileExportregiseterslist()
 
         Rows++;
 
-        ado.m_pRecordset->MoveNext();
+        q.nextRow();
 
     }
 
-    ado.CloseRecordset();
+  
 
     m_pFile_8AI8AO->Flush();
     m_pFile_8AI16O->Flush();
@@ -14444,28 +14003,17 @@ void CMainFrame::OnFileExportregiseterslist()
 
 
     StrSql=_T("Select * from PS_Registerlist ");
-    ado.m_pRecordset = ado.OpenRecordset(StrSql);
-    RecordCount=ado.GetRecordCount(ado.m_pRecordset);
-    ado.m_pRecordset->MoveFirst();
-    while(!ado.m_pRecordset->EndOfFile)
+	q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
+    
+    while(!q.eof())
     {
-        temp_variant=ado.m_pRecordset->GetCollect("RegID");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+         
+		strTemp = q.getValuebyName(L"RegID");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(1)),_variant_t(strTemp));
         RegisterID = strTemp;
 
-        temp_variant=ado.m_pRecordset->GetCollect("Reg_Name");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+       
+		strTemp = q.getValuebyName(L"Reg_Name");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(2)),_variant_t(strTemp));
         strTemp.TrimRight();
         strTemp.TrimLeft();
@@ -14487,24 +14035,19 @@ void CMainFrame::OnFileExportregiseterslist()
         }
 
 
-        temp_variant=ado.m_pRecordset->GetCollect("Reg_FulDescription");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+         
+		strTemp = q.getValuebyName(L"Reg_FulDescription");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(3)),_variant_t(strTemp));
 
         Rows++;
 
-        ado.m_pRecordset->MoveNext();
+        q.nextRow();
 
     }
 
     m_pFile->Flush();
     m_pFile->Close();
-    ado.CloseRecordset();
+     
 #endif
 
     //MiniPanel
@@ -14532,28 +14075,16 @@ void CMainFrame::OnFileExportregiseterslist()
 
 
     StrSql=_T("Select * from MiniPanel_Registerlist ");
-    ado.m_pRecordset = ado.OpenRecordset(StrSql);
-    RecordCount=ado.GetRecordCount(ado.m_pRecordset);
-    ado.m_pRecordset->MoveFirst();
-    while(!ado.m_pRecordset->EndOfFile)
+     q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
+    while(!q.eof())
     {
-        temp_variant=ado.m_pRecordset->GetCollect("RegID");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+     
+		strTemp = q.getValuebyName(L"RegID");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(1)),_variant_t(strTemp));
         RegisterID = strTemp;
 
-        temp_variant=ado.m_pRecordset->GetCollect("Reg_Name");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+        
+		strTemp = q.getValuebyName(L"Reg_Name");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(2)),_variant_t(strTemp));
 
         if (strTemp.CompareNoCase(_T("RESERVED"))!=0&&!strTemp.IsEmpty())
@@ -14573,25 +14104,20 @@ void CMainFrame::OnFileExportregiseterslist()
             m_pFile->WriteString(logstr.GetBuffer());
         }
 
-        temp_variant=ado.m_pRecordset->GetCollect("Register_Description");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+        
+		strTemp = q.getValuebyName(L"Register_Description");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(3)),_variant_t(strTemp));
 
         Rows++;
 
-        ado.m_pRecordset->MoveNext();
+        q.nextRow();
 
     }
 
     m_pFile->Flush();
     m_pFile->Close();
 
-    ado.CloseRecordset();
+    
 #endif
 
     //Humidity_Sensor
@@ -14618,28 +14144,16 @@ void CMainFrame::OnFileExportregiseterslist()
 
 
     StrSql=_T("Select * from Humidity_Sensor ");
-    ado.m_pRecordset = ado.OpenRecordset(StrSql);
-    RecordCount=ado.GetRecordCount(ado.m_pRecordset);
-    ado.m_pRecordset->MoveFirst();
-    while(!ado.m_pRecordset->EndOfFile)
+     q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
+    while(!q.eof())
     {
-        temp_variant=ado.m_pRecordset->GetCollect("RegID");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+         
+		strTemp = q.getValuebyName(L"RegID");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(1)),_variant_t(strTemp));
         RegisterID = strTemp ;
 
-        temp_variant=ado.m_pRecordset->GetCollect("Reg_Name");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+       
+		strTemp = q.getValuebyName(L"Reg_Name");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(2)),_variant_t(strTemp));
 
         strTemp.TrimRight();
@@ -14662,23 +14176,18 @@ void CMainFrame::OnFileExportregiseterslist()
         }
 
 
-        temp_variant=ado.m_pRecordset->GetCollect("Reg_Full_Description");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+      
+		strTemp = q.getValuebyName(L"Reg_Full_Description");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(3)),_variant_t(strTemp));
 
         Rows++;
 
-        ado.m_pRecordset->MoveNext();
+        q.nextRow();
 
     }
     m_pFile->Flush();
     m_pFile->Close();
-    ado.CloseRecordset();
+    
 #endif
 //Tstat5
 #if 1
@@ -14721,28 +14230,16 @@ void CMainFrame::OnFileExportregiseterslist()
 
 
     StrSql=_T("Select * from T3000_Register_Address_By_ID ");
-    ado.m_pRecordset = ado.OpenRecordset(StrSql);
-    RecordCount=ado.GetRecordCount(ado.m_pRecordset);
-    ado.m_pRecordset->MoveFirst();
-    while(!ado.m_pRecordset->EndOfFile)
+       q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
+    while(!q.eof())
     {
-        temp_variant=ado.m_pRecordset->GetCollect("Register_Address");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+      
+		strTemp = q.getValuebyName(L"Register_Address");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(1)),_variant_t(strTemp));
         RegisterID = strTemp;
 
-        temp_variant=ado.m_pRecordset->GetCollect("TSTAT5_LED_AddressName");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+         
+		strTemp = q.getValuebyName(L"TSTAT5_LED_AddressName");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(2)),_variant_t(strTemp));
         strTemp.TrimRight();
         strTemp.TrimLeft();
@@ -14764,22 +14261,12 @@ void CMainFrame::OnFileExportregiseterslist()
         }
 
 
-        temp_variant=ado.m_pRecordset->GetCollect("TSTAT5_LED_INSTRUCTION");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+      
+		strTemp = q.getValuebyName(L"TSTAT5_LED_INSTRUCTION");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(3)),_variant_t(strTemp));
 
-        temp_variant=ado.m_pRecordset->GetCollect("TSTAT5_LCD_AddressName");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+      
+		strTemp = q.getValuebyName(L"TSTAT5_LCD_AddressName");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(4)),_variant_t(strTemp));
         strTemp.TrimRight();
         strTemp.TrimLeft();
@@ -14801,18 +14288,13 @@ void CMainFrame::OnFileExportregiseterslist()
         }
 
 
-        temp_variant=ado.m_pRecordset->GetCollect("TSTAT5_LCD_INSTRUCTION");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+        
+		strTemp = q.getValuebyName(L"TSTAT5_LCD_INSTRUCTION");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(5)),_variant_t(strTemp));
 
         Rows++;
 
-        ado.m_pRecordset->MoveNext();
+        q.nextRow();
 
     }
 
@@ -14824,7 +14306,7 @@ void CMainFrame::OnFileExportregiseterslist()
     m_pFile_Tstat5LED->Close();
     delete m_pFile_Tstat5LED;
 
-    ado.CloseRecordset();
+ 
 #endif
     //Tstat 5 I-6-7
 #if 1
@@ -14852,29 +14334,17 @@ void CMainFrame::OnFileExportregiseterslist()
 
 
     StrSql=_T("Select * from T3000_Register_Address_By_ID ");
-    ado.m_pRecordset = ado.OpenRecordset(StrSql);
-    RecordCount=ado.GetRecordCount(ado.m_pRecordset);
-    ado.m_pRecordset->MoveFirst();
-    while(!ado.m_pRecordset->EndOfFile)
+   q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
+    while(!q.eof())
     {
-        temp_variant=ado.m_pRecordset->GetCollect("Register_Address");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+         
+		strTemp = q.getValuebyName(L"Register_Address");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(1)),_variant_t(strTemp));
 
         RegisterID = strTemp;
 
-        temp_variant=ado.m_pRecordset->GetCollect("TSTAT6_AddressName");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+      
+		strTemp = q.getValuebyName(L"TSTAT6_AddressName");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(2)),_variant_t(strTemp));
         strTemp.TrimRight();
         strTemp.TrimLeft();
@@ -14895,25 +14365,20 @@ void CMainFrame::OnFileExportregiseterslist()
             m_pFile->WriteString(logstr.GetBuffer());
         }
 
-        temp_variant=ado.m_pRecordset->GetCollect("TSTAT6_INSTRUCTION");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+     
+		strTemp = q.getValuebyName(L"TSTAT6_INSTRUCTION");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(3)),_variant_t(strTemp));
 
         Rows++;
 
-        ado.m_pRecordset->MoveNext();
+       q.nextRow();
 
     }
 
     m_pFile->Flush();
     m_pFile->Close();
 
-    ado.CloseRecordset();
+    
 #endif
 
     //CO2-W
@@ -14942,29 +14407,17 @@ void CMainFrame::OnFileExportregiseterslist()
 
 
     StrSql=_T("Select * from CO2RS485RegList ");
-    ado.m_pRecordset = ado.OpenRecordset(StrSql);
-    RecordCount=ado.GetRecordCount(ado.m_pRecordset);
-    ado.m_pRecordset->MoveFirst();
-    while(!ado.m_pRecordset->EndOfFile)
+   q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
+    while(!q.eof())
     {
-        temp_variant=ado.m_pRecordset->GetCollect("RegID");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+        
+		strTemp = q.getValuebyName(L"RegID");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(1)),_variant_t(strTemp));
 
         RegisterID = strTemp ;
 
-        temp_variant=ado.m_pRecordset->GetCollect("485_Name_V3");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+      
+		strTemp = q.getValuebyName(L"485_Name_V3");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(2)),_variant_t(strTemp));
         strTemp.TrimRight();
         strTemp.TrimLeft();
@@ -14986,25 +14439,19 @@ void CMainFrame::OnFileExportregiseterslist()
         }
 
 
-        temp_variant=ado.m_pRecordset->GetCollect("485_INSTRUCTION_V3");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+      
+		strTemp = q.getValuebyName(L"485_INSTRUCTION_V3");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(3)),_variant_t(strTemp));
 
         Rows++;
 
-        ado.m_pRecordset->MoveNext();
+        q.nextRow();
 
     }
 
     m_pFile->Flush();
     m_pFile->Close();
-
-    ado.CloseRecordset();
+ 
 #endif
 
     //CO2-W+Ethernet
@@ -15033,27 +14480,15 @@ void CMainFrame::OnFileExportregiseterslist()
 
 
     StrSql=_T("Select * from CO2NETRegList ");
-    ado.m_pRecordset = ado.OpenRecordset(StrSql);
-    RecordCount=ado.GetRecordCount(ado.m_pRecordset);
-    ado.m_pRecordset->MoveFirst();
-    while(!ado.m_pRecordset->EndOfFile)
+    q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
+    while(!q.eof())
     {
-        temp_variant=ado.m_pRecordset->GetCollect("RegID");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+     
+		strTemp = q.getValuebyName(L"RegID");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(1)),_variant_t(strTemp));
         RegisterID = strTemp;
-        temp_variant=ado.m_pRecordset->GetCollect("NET_Name");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+        
+		strTemp = q.getValuebyName(L"NET_Name");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(2)),_variant_t(strTemp));
         strTemp.TrimRight();
         strTemp.TrimLeft();
@@ -15075,30 +14510,25 @@ void CMainFrame::OnFileExportregiseterslist()
         }
 
 
-        temp_variant=ado.m_pRecordset->GetCollect("NET_Description");//
-        if(temp_variant.vt!=VT_NULL)
-            strTemp=temp_variant;
-        else
-        {
-            strTemp=_T("");
-        }
+         
+		strTemp = q.getValuebyName(L"NET_Description");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(3)),_variant_t(strTemp));
 
         Rows++;
 
-        ado.m_pRecordset->MoveNext();
+        q.nextRow();
 
     }
     m_pFile->Flush();
 
-    ado.CloseRecordset();
+ 
 #endif
 
 
     m_pFile->Close();
     delete m_pFile;
 
-    ado.CloseConn();
+    SqliteDBT3000.closedb();
     app.SetVisible(true);
     range.ReleaseDispatch();
     sheet.ReleaseDispatch();
@@ -15128,8 +14558,8 @@ void CMainFrame::OnToolRegistersmaintenancesystem()
     4>寄存器信息修改
     5>产品的添加
     */
-    CString strHistotyFile=g_strExePth+_T("RegisterListManager.exe");
-    ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);
+  /*  CString strHistotyFile=g_strExePth+_T("RegisterListManager.exe");
+    ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);*/
 }
 
 

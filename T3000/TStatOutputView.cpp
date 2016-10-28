@@ -8,7 +8,7 @@
 #include "afxdialogex.h"
 #include "globle_function.h"
 #include "gloab_define.h"
-#include "bado/BADO.h"
+ 
 #include <bitset>
 #include "MainFrm.h"
 // CTStatOutputView

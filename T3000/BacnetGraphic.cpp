@@ -32,7 +32,8 @@
 using namespace Gdiplus;
 #include "globle_function.h"
 #include "BacnetMonitor.h"
-#include "BADO/BADO.h"
+#include "bado/BADO.h"
+ 
 #include "BacnetGraphicSetting.h"
 #define  WM_MONITOR_USER_MESSAGE WM_USER + 902
 CString InputLable[15];

@@ -8,6 +8,7 @@
 #include "MainFrm.h"
 #include "globle_function.h"
 #include "Dowmloadfile.h"
+#include "../SQLiteDriver/CppSQLite3.h"
 // CFlash_Multy dialog
 CString ApplicationFolder;
 CString MultyISPtool_path;
@@ -240,9 +241,11 @@ void CFlash_Multy::Initial_List()
     //m_flash_multy_list.Set_My_WindowRect(win_rect);
     //m_flash_multy_list.Set_My_ListRect(list_rect);
 
-    CBADO bado;
-    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-    bado.OnInitADOConn();
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 
     CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
     m_flash_multy_list.DeleteAllItems();
@@ -307,37 +310,22 @@ void CFlash_Multy::Initial_List()
         m_flash_multy_list.SetItemText(i,FLASH_PRODUCT_ID,nproduct_id);
 
         strSql.Format(_T("Select * from BatchFlashResult where SN=%d"),pFrame->m_product.at(i).serial_number);
-        bado.m_pRecordset=bado.OpenRecordset(strSql);
-        if (!bado.m_pRecordset->EndOfFile)
+        q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+        if (!q.eof())
         {
 
-            temp_variant=bado.m_pRecordset->GetCollect("FirmwarePath");//
-            if(temp_variant.vt!=VT_NULL)
-                StrTemp=temp_variant;
-            else
-                StrTemp=_T("");
+            
+
+			StrTemp = q.getValuebyName(L"FirmwarePath");
             m_flash_multy_list.SetItemText(i,FLASH_FILE_POSITION,StrTemp);
 
-            temp_variant=bado.m_pRecordset->GetCollect("ConfigPath");//
-            if(temp_variant.vt!=VT_NULL)
-                StrTemp=temp_variant;
-            else
-                StrTemp=_T("");
+             
+            StrTemp = q.getValuebyName(L"ConfigPath");
             m_flash_multy_list.SetItemText(i,FLASH_CONFIG_FILE_POSITION,StrTemp);
 
-            temp_variant=bado.m_pRecordset->GetCollect("FirmwareResult");//
-            if(temp_variant.vt!=VT_NULL)
-                Firmware_Result=temp_variant;
-            else
-                Firmware_Result=-1;
-
-
-            temp_variant=bado.m_pRecordset->GetCollect("ConfigResult");//
-            if(temp_variant.vt!=VT_NULL)
-                Config_Result=temp_variant;
-            else
-                Config_Result=-1;
-
+          
+				Firmware_Result = q.getIntField("FirmwareResult");
+         
             if (Firmware_Result ==3 && Config_Result == 3)
             {
                 //PostMessage(WM_MULTY_FLASH_MESSAGE,CHANGE_THE_ITEM_COLOR_MORE_GREEN,i);
@@ -383,7 +371,7 @@ void CFlash_Multy::Initial_List()
         }
 
     }
-    bado.CloseConn();
+    SqliteDBBuilding.closedb();
     Initial_Parameter();
     return;
 }
@@ -811,9 +799,11 @@ void CFlash_Multy::OnBnClickedButtonStatrt()
 
 void CFlash_Multy::ParameterSaveToDB()
 {
-    CBADO bado;
-    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-    bado.OnInitADOConn();
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
     CString StrSql;
     CString StrHexPath;
     CString StrConfigPath;
@@ -823,8 +813,9 @@ void CFlash_Multy::ParameterSaveToDB()
         StrHexPath = m_flash_multy_list.GetItemText(i,FLASH_FILE_POSITION);
         StrConfigPath =  m_flash_multy_list.GetItemText(i,FLASH_CONFIG_FILE_POSITION);
         StrSql.Format(_T("Select * From BatchFlashResult Where SN = %d"),SN);
-        bado.m_pRecordset = bado.OpenRecordset(StrSql);
-        if (!bado.m_pRecordset->EndOfFile)
+		q = SqliteDBBuilding.execQuery((UTF8MBSTR)StrSql);
+
+        if (!q.eof())
         {
             StrSql.Format(_T("Update BatchFlashResult Set FirmwarePath = '%s' , ConfigPath ='%s' ,FirmwareResult = 0,ConfigResult=0 Where SN = %d "),StrHexPath,StrConfigPath,SN);
 
@@ -833,9 +824,9 @@ void CFlash_Multy::ParameterSaveToDB()
         {
             StrSql.Format(_T("Insert Into BatchFlashResult (SN,FirmwarePath,ConfigPath,FirmwareResult,ConfigResult)  Values (%d,'%s','%s',0,0)"),SN,StrHexPath,StrConfigPath);
         }
-        bado.m_pRecordset = bado.OpenRecordset(StrSql);
+        SqliteDBBuilding.execDML((UTF8MBSTR)StrSql);
     }
-    bado.CloseConn();
+    SqliteDBBuilding.closedb();
 }
 
 /*
@@ -1451,9 +1442,11 @@ LRESULT CFlash_Multy::MultyFlashMessage(WPARAM wParam,LPARAM lParam)
         m_flash_multy_list.SetItemText(sub_parameter,FLASH_FILE_REV,flash_device.at(sub_parameter).file_rev);
 
     }
-    CBADO bado;
-    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-    bado.OnInitADOConn();
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
     CString StrSql;
     switch(main_command)
     {
@@ -1468,7 +1461,8 @@ LRESULT CFlash_Multy::MultyFlashMessage(WPARAM wParam,LPARAM lParam)
         m_flash_multy_list.SetItemTextColor(sub_parameter,-1,FLASH_COLOR_GREEN);
         m_flash_multy_list.SetItemText(sub_parameter,FLASH_RESULTS,_T("Sucessful"));
         StrSql.Format(_T("Update BatchFlashResult Set FirmwareResult = 3 Where SN = %d "),_wtoi(flash_device.at(sub_parameter).strSN));
-        bado.OpenRecordset(StrSql);
+        //bado.OpenRecordset(StrSql);
+		SqliteDBBuilding.execDML((UTF8MBSTR)StrSql);
     }
     break;
     case CHANGE_THE_ITEM_COLOR_RED:
@@ -1490,7 +1484,7 @@ LRESULT CFlash_Multy::MultyFlashMessage(WPARAM wParam,LPARAM lParam)
         //m_flash_multy_list.SetItemText(sub_parameter,FLASH_RESULTS,_T("Sucessful"));
         m_flash_multy_list.SetItemText(sub_parameter,FLASH_CONFIG_RESULTS,_T("Sucessful"));
         StrSql.Format(_T("Update BatchFlashResult Set ConfigResult = 3 Where SN = %d "),_wtoi(flash_device.at(sub_parameter).strSN));
-        bado.OpenRecordset(StrSql);
+        SqliteDBBuilding.execDML((UTF8MBSTR)StrSql);
     }
     break;
     case CHANGE_THE_ITEM_COLOR_LESS_RED:
@@ -1501,7 +1495,7 @@ LRESULT CFlash_Multy::MultyFlashMessage(WPARAM wParam,LPARAM lParam)
     }
     break;
     }
-    bado.CloseConn();
+    SqliteDBBuilding.closedb();
     return 0;
 }
 

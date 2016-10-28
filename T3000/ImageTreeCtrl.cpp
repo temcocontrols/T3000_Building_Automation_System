@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "ImageTreeCtrl.h"
-
+#include "../SQLiteDriver/CppSQLite3.h"
 #include "MainFrm.h"
 #include "globle_function.h"
 // CImageTreeCtrl
@@ -243,15 +243,14 @@ bool CImageTreeCtrl::SortByFloor(HTREEITEM hItem)
 BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
 	
     
-    CADO ado;
-	ado.OnInitADOConn();
+	CppSQLite3DB SqliteDBT3000;
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+    SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
-	CBADO bado;
-	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-	bado.OnInitADOConn(); 
-
-
-	::CoInitialize(NULL);
+ 
 	try 
 	{
 		////////////////////////////////////////////////////////////////////////////////////////////
@@ -269,48 +268,42 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
 				//strSql.Format(_T("select * from Building where Main_BuildingName = '%s'"),m_strMainBuildingName);
 				strSql.Format(_T("select * from Building order by Main_BuildingName"));
 				//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-				ado.m_pRecordset=ado.OpenRecordset(strSql);
-				while(VARIANT_FALSE==ado.m_pRecordset->EndOfFile)
+				q = SqliteDBT3000.execQuery((UTF8MBSTR)strSql);
+				while(!q.eof())
 				{	   	
 				str_temp.Empty();
-				str_temp=ado.m_pRecordset->GetCollect("Building_Name");
+				str_temp=q.getValuebyName(L"Building_Name");
 				if (str_temp.Compare(m_name_new)==0)
 				{	   
 					is_exist=TRUE;
 					break;
 				}			
-				ado.m_pRecordset->MoveNext();
+				q.nextRow();
 				}
-				//ado.m_pRecordset->Close();
-				ado.CloseRecordset();
+				 
 				if (!is_exist)	 //更新的名字在数据库中查找不到的
 				{
-					////////////先更新Building表/////////////////////
-					//CString strSql;
-
-// 					strSql.Format(_T("delete * from Building_ALL where Building_Name = '%s' "),m_name_old);
-// 					ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText
+ 
 					 strSql.Format(_T("update Building_ALL set Building_Name='%s' where Building_Name='%s' "),m_name_new,m_name_old);
 
-					ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+					SqliteDBT3000.execDML((UTF8MBSTR)strSql);
 
 					strSql.Format(_T("update Building set Building_Name='%s',Main_BuildingName='%s' where Building_Name='%s'"),m_name_new,m_name_new,m_name_old);
 					//MessageBox(strSql);
-					ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+					SqliteDBT3000.execDML((UTF8MBSTR)strSql);
 
 
 					strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' order by Building_Name"),m_name_old);
-				 
-				   bado.m_pRecordset=bado.OpenRecordset(strSql);
-					while(VARIANT_FALSE== bado.m_pRecordset->EndOfFile)
+				     q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+				   
+					while(!q.eof())
 					{
 						strSql.Format(_T("update ALL_NODE set Building_Name='%s',MainBuilding_Name='%s' where Building_Name='%s'"),m_name_new,m_name_new,m_name_old);
-						bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
-						bado.m_pRecordset->MoveNext();
+						SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+						q.nextRow();
 					}
 
-					//m_pRs->Close();
-					bado.CloseRecordset();
+				 
 				
 				}
 				else
@@ -324,53 +317,43 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
 		case 1:		//Floor
 			{	 
 			CString subnetname;
-			     strSql=_T("select * from Building where Default_SubBuilding=-1");
-				// m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-				 ado.m_pRecordset=ado.OpenRecordset(strSql);
-				 while(VARIANT_FALSE== ado.m_pRecordset->EndOfFile)
+			     strSql=_T("select * from Building where Default_SubBuilding=1");
+				 
+				q = SqliteDBT3000.execQuery((UTF8MBSTR)strSql);
+				 while(!q.eof())
 				 {	   	
 				  subnetname.Empty();
-				 subnetname= ado.m_pRecordset->GetCollect("Building_Name");	
-				  ado.m_pRecordset->MoveNext();
+				  subnetname= q.getValuebyName(L"Building_Name");	
+				  q.nextRow();
 				 }
-				// m_pRs->Close();
-				ado.CloseRecordset();
-// 				HTREEITEM parentnode=GetParentItem(m_hSelItem);
-// 
-// 				CString subnetname=GetItemText(parentnode);//m_pRs->GetCollect("Building_Name");
-
-				//  m_pRs->Close();
+				 
+				 
+ 
 				strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' order by Building_Name"),subnetname,m_name_new);
 				//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-				 bado.m_pRecordset=bado.OpenRecordset(strSql);
-				while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+				 
+				 q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+				while(!q.eof())
 				{	   	 str_temp.Empty();
-				str_temp=bado.m_pRecordset->GetCollect("Floor_name");
+				str_temp=q.getValuebyName(L"Floor_name");
 				if (str_temp.Compare(m_name_new)==0)
 				{is_exist=TRUE;
 				break;
 				}			
-				bado.m_pRecordset->MoveNext();
+				q.nextRow();
 				}
-				//m_pRs->Close();
-				bado.CloseRecordset();
-				/*if (is_exist)
-				{
-					return FALSE;
-				} 
-				else*/
+				 
 				{  
 				strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' order by Building_Name"),subnetname,m_name_old);
-				//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-				bado.m_pRecordset=bado.OpenRecordset(strSql);
-				while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+			 
+				 q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+				while(!q.eof())
 				{
 					strSql.Format(_T("update ALL_NODE set Floor_name='%s' where Floor_name='%s'"),m_name_new,m_name_old);
-					bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
-					bado.m_pRecordset->MoveNext();
+					SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+					q.nextRow();
 				}
-				//m_pRs->Close();
-				bado.CloseRecordset(); 
+				 
 				}
 
 				 
@@ -384,40 +367,20 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
 				//Floor
 				HTREEITEM parentnode=GetParentItem(m_hSelItem);
 				CString Floorname=GetItemText(parentnode);
-				/*strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' and Room_name='%s' order by Building_Name"),subnetname,Floorname,m_name_new);
-				m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-
-				while(VARIANT_FALSE==m_pRs->EndOfFile)
-				{	   	 str_temp.Empty();
-				str_temp=m_pRs->GetCollect("Room_name");
-				if (str_temp.Compare(m_name_new)==0)
-				{	   is_exist=TRUE;
-				break;
-				}			
-				m_pRs->MoveNext();
-				}
-				m_pRs->Close();
-
-
-				if (is_exist)
-				{
-					return FALSE;
-				} 
-				else*/
-				{
+				 
+			 
 				strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' and Room_name='%s' order by Building_Name"),subnetname,Floorname,m_name_old);
-				//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-				bado.m_pRecordset=bado.OpenRecordset(strSql);
-				while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+				 q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+				while(!q.eof())
 				{
 					strSql.Format(_T("update ALL_NODE set Room_name='%s' where Room_name='%s'"),m_name_new,m_name_old);
-					bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
-					bado.m_pRecordset->MoveNext();
+					 
+					SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+					q.nextRow();
 				}
-				//m_pRs->Close();
-				bado.CloseRecordset();
+		 
 				 
-				}
+				 
 
 
 				break;
@@ -517,12 +480,10 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
 
                             }
                         }            
-                        CBADO bado;
-                        bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-                        bado.OnInitADOConn(); 
+                        
                         strSql.Format(_T("update ALL_NODE set Product_name='%s' where Product_name='%s' and Serial_ID='%s'"),m_name_new,m_name_old,temp_serial);
-                        bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
-                        bado.CloseConn();
+                        
+                         SqliteDBT3000.execDML((UTF8MBSTR)strSql);
                         
                         if (product_register_value[714]==0x56)
                         {
@@ -546,14 +507,12 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
 	}
 	catch(_com_error e)
 	{
-		/* AfxMessageBox(e.Description());*/
-		//MessageBox(m_name_new+_T("  has been here\n Please change another name!"));
-		bado.CloseConn();
+		 
 		return FALSE;
 		//m_pCon->Close();
 	}
-	//m_pCon->Close();  
-	bado.CloseConn();
+	 SqliteDBT3000.closedb();
+	 SqliteDBBuilding.closedb();
 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 	::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
 
@@ -654,12 +613,14 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
                       
                 }
             }
-            CBADO bado;
-            bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-            bado.OnInitADOConn(); 
+			CppSQLite3DB SqliteDBBuilding;
+			CppSQLite3Table table;
+			CppSQLite3Query q;
+			SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
             strSql.Format(_T("update ALL_NODE set Product_name='%s' where Product_name='%s' and Serial_ID='%s'"),m_name_new,m_name_old,temp_serial);
-            bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
-            bado.CloseConn();
+             SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+            SqliteDBBuilding.closedb();
 
             if( product_register_value[714] == 0x56) 
             {
@@ -682,12 +643,12 @@ bool CImageTreeCtrl::DoDeleteItem(HTREEITEM hItem)
 {
          m_level=get_item_level(hItem);
          m_name_old=GetItemText(hItem);
-    CBADO bado;
-    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-    bado.OnInitADOConn(); 
+		 CppSQLite3DB SqliteDBBuilding;
+		 CppSQLite3Table table;
+		 CppSQLite3Query q;
+		 SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
-
-    ::CoInitialize(NULL);
+ 
     try 
     {
         ////////////////////////////////////////////////////////////////////////////////////////////
@@ -711,19 +672,20 @@ bool CImageTreeCtrl::DoDeleteItem(HTREEITEM hItem)
 
                 strSql.Format(_T("select * from ALL_NODE where  Product_name='%s' order by Building_Name"),m_name_old);
                 //m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-                bado.m_pRecordset=bado.OpenRecordset(strSql);
-                while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+				q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+
+                while(!q.eof())
                 {
                     CString temp_serial;
                   
-                    temp_serial = bado.m_pRecordset->GetCollect("Serial_ID");
+                    temp_serial = q.getValuebyName(L"Serial_ID");
                 
-                    strSql.Format(_T("delete * from ALL_NODE  where  Serial_ID='%s'"),temp_serial);
-                    bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
-                    bado.m_pRecordset->MoveNext();
+                    strSql.Format(_T("delete   from ALL_NODE  where  Serial_ID='%s'"),temp_serial);
+                    SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+                    q.nextRow();
                 }
                 
-                bado.CloseRecordset();
+               
               
         }
         
@@ -731,12 +693,11 @@ bool CImageTreeCtrl::DoDeleteItem(HTREEITEM hItem)
         catch(_com_error e)
         {
              
-            bado.CloseConn();
+            SqliteDBBuilding.closedb();
             return FALSE;
             //m_pCon->Close();
         }
-        //m_pCon->Close();  
-        bado.CloseConn();
+		SqliteDBBuilding.closedb();
         CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
         ::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
     return true;

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "msflexgrid1.h"
-// CDete#include "../ado/ADO.h"ctOnlineDlg dialog
-#include "ado/ADO.h"
+ 
+ 
 #include "afxwin.h"
 struct NODES_DETECTS 
 {

@@ -2304,22 +2304,24 @@ void CDialogCM5_BacNet::Fresh()
 					str_serialid.Format(_T("%d"),pFrame->m_product.at(selected_product_index).serial_number);
 					str_baudrate =pFrame->m_product.at(selected_product_index).BuildingInfo.strIp;
 					//TRACE(_T("update ALL_NODE set Software_Ver =\r\n"));
-					CBADO bado;
-					bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-					bado.OnInitADOConn(); 
+					CppSQLite3DB SqliteDBBuilding;
+					CppSQLite3Table table;
+					CppSQLite3Query q;
+					SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 
 					try
 					{
 						strSql.Format(_T("update ALL_NODE set Object_Instance ='%s' where Serial_ID = '%s' and Bautrate = '%s'"),hw_instance,str_serialid,str_baudrate);
-						bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);		
+						SqliteDBBuilding.execDML((UTF8MBSTR)strSql);	
 						strSql.Format(_T("update ALL_NODE set Panal_Number ='%s' where Serial_ID = '%s' and Bautrate = '%s'"),sw_mac,str_serialid,str_baudrate);
-						bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);		
+						SqliteDBBuilding.execDML((UTF8MBSTR)strSql);	
 					}
 					catch(_com_error *e)
 					{
 						AfxMessageBox(e->ErrorMessage());
 					}
-					bado.CloseConn();
+					SqliteDBBuilding.closedb();
 					::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
 				}
 				::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,START_BACNET_TIMER,0);
@@ -4661,14 +4663,16 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 			{
 				if(temp_device_panel_name.CompareNoCase(pFrame->m_product.at(selected_product_index).NameShowOnTree) != 0)
 				{
-					CBADO bado;
-					bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-					bado.OnInitADOConn(); 
+					CppSQLite3DB SqliteDBBuilding;
+					CppSQLite3Table table;
+					CppSQLite3Query q;
+					SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 
 
 					CString strSql;
 					strSql.Format(_T("update ALL_NODE set Product_name='%s' where Serial_ID ='%s'"),temp_device_panel_name,temp_serial_number);
-					 bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+					SqliteDBBuilding.execDML((UTF8MBSTR)strSql); 
 
 	
 					if(selected_product_index < pFrame->m_product.size())
@@ -4677,7 +4681,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 						pFrame->m_product.at(selected_product_index).NameShowOnTree = temp_device_panel_name;
 					}
 
-					bado.CloseConn();
+					SqliteDBBuilding.closedb();
 				}
 			}
 
@@ -5233,14 +5237,16 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
 		 // 同步 本地数据库 的资料 ， panel number 和 实例号需与设备匹配;
 		 if((temp_panel_number != pFrame->m_product.at(selected_product_index).panel_number) || (temp_object_instance != pFrame->m_product.at(selected_product_index).object_instance))
 		 {
-			 CBADO bado;
-			 bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-			 bado.OnInitADOConn();
+			 CppSQLite3DB SqliteDBBuilding;
+			 CppSQLite3Table table;
+			 CppSQLite3Query q;
+			 SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 			 CString temp_pro;
 			 temp_pro.Format(_T("%u"),PROTOCOL_BIP_TO_MSTP);
 			 strSql.Format(_T("update ALL_NODE set  Object_Instance = '%s' , Panal_Number = '%s' ,Online_Status = 1  where Serial_ID = '%s'"),str_object_instance,str_panel_number,str_serialid);
 			 temp_update = true;
-			 bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+			 SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 		 }
 	 }
 

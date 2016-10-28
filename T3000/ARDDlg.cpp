@@ -5,8 +5,8 @@
 #include "T3000.h"
 #include "ARDDlg.h"
 #include "afxdialogex.h"
-#include "ado/ADO.h"
-
+ 
+#include "../SQLiteDriver/CppSQLite3.h"
 // CARDDlg dialog
 
 IMPLEMENT_DYNAMIC(CARDDlg, CDialogEx)
@@ -237,12 +237,15 @@ void CARDDlg::OnBnClickedOk()
 	   strEPSize=_T("0.0");
 	   try
 	   {
-		   CBADO bado;
-		   bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-		   bado.OnInitADOConn(); 
+		   CppSQLite3DB SqliteDBBuilding;
+		   CppSQLite3Table table;
+		   CppSQLite3Query q;
+		   SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+ 
            strSql.Format(_T("Select * from ALL_NODE where Product_name='%s'"),strProName.GetBuffer());
-           bado.m_pRecordset=bado.OpenRecordset(strSql);
-           if (!bado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+		   q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+
+           if (!q.eof())//有表但是没有对应序列号的值
            {
             AfxMessageBox(_T("Already Exists!"));
             return;
@@ -376,8 +379,8 @@ void CARDDlg::OnBnClickedOk()
                        +strCustomer+"','"
                        +strEPSize+"')"));
                }
-		   bado.m_pRecordset=bado.OpenRecordset(strSql);
-		   bado.CloseConn();
+		   SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+		   SqliteDBBuilding.closedb();
 		   AfxMessageBox(_T("Add OK!"));
            CDialogEx::OnOK();
 	   }
@@ -414,9 +417,11 @@ void CARDDlg::OnBnClickedRadio2()
 void CARDDlg::OnBnClickedButtonLocalMstpDevice()
 {
 	// TODO: Add your control notification handler code here
-	CBADO bado;
-	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-	bado.OnInitADOConn(); 
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 
 	MessageBox(_T("Scan device may take a few minutes , Please wait!!"));
 	vector<CString>				m_szComs;
@@ -542,21 +547,20 @@ void CARDDlg::OnBnClickedButtonLocalMstpDevice()
 					{
 						 
 						strSql.Format(_T("update ALL_NODE set Bautrate ='%s' where Serial_ID = '%s'"),str_ip_address,str_serialid);
-						bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);		
+						 
 						strSql.Format(_T("update ALL_NODE set Com_Port ='%s' where Serial_ID = '%s'"),str_n_port,str_serialid);
-						bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);		
+						SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 						strSql.Format(_T("update ALL_NODE set Product_ID ='%s' where Serial_ID = '%s'"),modbusid,str_serialid);
-						bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+						SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 						strSql.Format(_T("update ALL_NODE set Hardware_Ver ='%s' where Serial_ID = '%s'"),instance_value,str_serialid);
-						bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+						SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 					}
 					catch(_com_error *e)
 					{
 						AfxMessageBox(e->ErrorMessage());
 					}
 					 
-					 bado.CloseRecordset();
-					 bado.CloseConn();
+					SqliteDBBuilding.closedb();
 
 					pFrame->m_product.at(m_product_count).ncomport = m_bac_scan_result_data.at(scan_count).modbus_port;
 					pFrame->m_product.at(m_product_count).BuildingInfo.strIp = str_ip_address;
@@ -582,29 +586,19 @@ void CARDDlg::OnCbnDropdownComboProductName()
     Custom_Product_Node product_node;
     m_Custom_Product.clear();
     m_combox_productname.ResetContent();
-    CADO bado;
-    //bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-    bado.OnInitADOConn(); 
+	CppSQLite3DB SqliteDBT3000;
+	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+	CppSQLite3Query q;
     StrSql.Format(_T("Select * From ProductsTypeRegisterTables Where ProductType >=220"));
-    bado.m_pRecordset=bado.OpenRecordset(StrSql);
-    while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile){
-        temp_variant=bado.m_pRecordset->GetCollect("ProductType");//
-        if(temp_variant.vt!=VT_NULL)
-            product_node.Product_Type=temp_variant;
-        else
-            product_node.Product_Type=0;
-
-        temp_variant=bado.m_pRecordset->GetCollect("ProductName");//
-        if(temp_variant.vt!=VT_NULL)
-            product_node.Product_Name=temp_variant;
-        else
-            product_node.Product_Name=_T("");
-
+    q=SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
+    while(!q.eof()){
+       
+         product_node.Product_Type = q.getIntField("ProductType");
+		 product_node.Product_Name = q.getValuebyName(L"ProductName");
             m_Custom_Product.push_back(product_node);
-            bado.m_pRecordset->MoveNext();
+            q.nextRow();
     }
-    bado.CloseRecordset();
-    bado.CloseConn();
+    SqliteDBT3000.closedb();
 
     for(int i=0;i<(int)m_Custom_Product.size();i++){
         m_combox_productname.AddString(m_Custom_Product.at(i).Product_Name);
@@ -667,13 +661,13 @@ void CARDDlg::OnEnKillfocusEditTypeId()
          _variant_t temp_variant;
          Custom_Product_Node product_node;
          m_Custom_Product.clear();
-         CADO bado;
-         //bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-         bado.OnInitADOConn(); 
+		 CppSQLite3DB SqliteDBT3000;
+		 SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+        
          StrSql.Format(_T("Insert into ProductsTypeRegisterTables(ProductType,ProductName) Values(%d,'%s')"),ProductID,ProductName);
-         bado.m_pRecordset=bado.OpenRecordset(StrSql);
-         /*bado.CloseRecordset();*/
-         bado.CloseConn();
+         SqliteDBT3000.execDML((UTF8MBSTR)StrSql);
+          
+          SqliteDBT3000.closedb();
      }
      
 

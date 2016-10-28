@@ -85,37 +85,21 @@ int _P(char *str,int mMdb_Adress_Map)
 bool T3000RegAddress::MatchMoudleAddress(void)
 {
 
-	//Open_MonitorDataBase1(_T("\\Database\\Data.mdb"));
-
-	_tcscpy_s(m_mdb_path_t3000,sizeof(m_mdb_path_t3000),_T("Provider=Microsoft.Jet.OLEDB.4.0;Data Source="));
-	GetModuleFileName(NULL, m_ini_path_t3000, MAX_PATH);
-	PathRemoveFileSpec(m_ini_path_t3000);
-
-	_tcscat_s(m_mdb_path_t3000,sizeof(m_ini_path_t3000),m_ini_path_t3000);
-	_tcscat_s(m_mdb_path_t3000,sizeof(m_mdb_path_t3000),_T("\\Database\\t3000.mdb"));
-	HRESULT hr;
-	m_pCon.CreateInstance(_T("ADODB.Connection"));
-	hr=m_pRs.CreateInstance(_T("ADODB.Recordset"));
-	if(FAILED(hr))
-	{
-		AfxMessageBox(_T("Load msado12.dll erro"));
-		return FALSE;
-	}
-	m_pCon->Open(m_mdb_path_t3000,_T(""),_T(""),adModeUnknown);
-	_variant_t temp_variant_item;
-	_variant_t temp_variant;
-	_variant_t temp_variant_value;
+	 
+	int temp_variant_item;
+	CString temp_variant;
+	 
 	CString strSql;
-
+	m_SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 	strSql.Format(_T("select * from T3000_Register_Address_By_ID order by Register_Address"));
-	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-	while(VARIANT_FALSE==m_pRs->EndOfFile)
+	m_q = m_SqliteDBT3000.execQuery((UTF8MBSTR)strSql); 
+	while(!m_q.eof())
 	{
 		char cTemp[256];
 		memset(cTemp,0,256);
-		temp_variant_item = m_pRs->GetCollect(_T("Register_Address"));
+		temp_variant_item = m_q.getIntField("Register_Address");
 
-		temp_variant=m_pRs->GetCollect(_T("TSTAT5_LED_AddressName"));
+		temp_variant  =  m_q.getValuebyName(_T("TSTAT5_LED_AddressName"));
 		CString cs_temp=temp_variant;
 		cs_temp = cs_temp.Trim();
 
@@ -123,7 +107,7 @@ bool T3000RegAddress::MatchMoudleAddress(void)
 		strcpy_s(TSTAT_5ABCDFG_LED_ADDRESS[temp_variant_item].AddressName,MAX_PATH,cTemp);
 		TSTAT_5ABCDFG_LED_ADDRESS[temp_variant_item].AddressValue = temp_variant_item;
 
-		temp_variant=m_pRs->GetCollect(_T("TSTAT5_LCD_AddressName"));
+		temp_variant=m_q.getValuebyName(_T("TSTAT5_LCD_AddressName"));
 		cs_temp.Empty();
 		cs_temp=temp_variant;
 		cs_temp = cs_temp.Trim();
@@ -133,7 +117,7 @@ bool T3000RegAddress::MatchMoudleAddress(void)
 		strcpy_s(TSTAT_5EH_LCD_ADDRESS[temp_variant_item].AddressName,MAX_PATH,cTemp_5e);
 		TSTAT_5EH_LCD_ADDRESS[temp_variant_item].AddressValue = temp_variant_item;
 
-		temp_variant=m_pRs->GetCollect(_T("TSTAT6_AddressName"));
+		temp_variant=m_q.getValuebyName(_T("TSTAT6_AddressName"));
 		cs_temp.Empty();
 		cs_temp=temp_variant;
 		cs_temp = cs_temp.Trim();
@@ -143,20 +127,19 @@ bool T3000RegAddress::MatchMoudleAddress(void)
 		strcpy_s(TSTAT_6_ADDRESS[temp_variant_item].AddressName,MAX_PATH,cTemp_6_7);
 		TSTAT_6_ADDRESS[temp_variant_item].AddressValue = temp_variant_item;
 
-		m_pRs->MoveNext();
+		m_q.nextRow();
 	}
-	if(m_pRs->State)
-		m_pRs->Close();
+	 
 #if 1
 	strSql.Format(_T("select * from T3_RegisterList order by RegID"));
-	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-	while(VARIANT_FALSE==m_pRs->EndOfFile)
+	m_q = m_SqliteDBT3000.execQuery((UTF8MBSTR)strSql);
+	while(!m_q.eof())
 	{
 		unsigned char nlength;
 		char cTemp[256];
 		memset(cTemp,0,256);
 		CString cs_temp;
-		temp_variant_item = m_pRs->GetCollect(_T("RegID"));
+		temp_variant_item = m_q.getIntField("RegID");
 		T3_8AI8AO[temp_variant_item].AddressValue = temp_variant_item;
 		T3_8AI16O[temp_variant_item].AddressValue = temp_variant_item;
 		T3_32AI[temp_variant_item].AddressValue = temp_variant_item;
@@ -166,14 +149,14 @@ bool T3000RegAddress::MatchMoudleAddress(void)
 		T3_28IN[temp_variant_item].AddressValue = temp_variant_item;
 		T3_RTD[temp_variant_item].AddressValue = temp_variant_item;
 
-		temp_variant=m_pRs->GetCollect(_T("T3-8AI8AO"));
+		temp_variant=m_q.getValuebyName(_T("T3-8AI8AO"));
 		cs_temp=temp_variant;
 		cs_temp = cs_temp.Trim();
 		nlength = cs_temp.GetLength() + 1;
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
 		strcpy_s(T3_8AI8AO[temp_variant_item].AddressName,nlength,cTemp);
 
-		temp_variant=m_pRs->GetCollect(_T("T3-8AI16O"));
+		temp_variant=m_q.getValuebyName(_T("T3-8AI16O"));
 		memset(cTemp,0,256);
 		cs_temp=temp_variant;
 		cs_temp = cs_temp.Trim();
@@ -181,7 +164,7 @@ bool T3000RegAddress::MatchMoudleAddress(void)
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
 		strcpy_s(T3_8AI16O[temp_variant_item].AddressName,nlength,cTemp);
 
-		temp_variant=m_pRs->GetCollect(_T("T3-32AI"));
+		temp_variant=m_q.getValuebyName(_T("T3-32AI"));
 		memset(cTemp,0,256);
 		cs_temp=temp_variant;
 		cs_temp = cs_temp.Trim();
@@ -189,7 +172,7 @@ bool T3000RegAddress::MatchMoudleAddress(void)
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
 		strcpy_s(T3_32AI[temp_variant_item].AddressName,nlength,cTemp);
 
-		temp_variant=m_pRs->GetCollect(_T("T3-Performance"));
+		temp_variant=m_q.getValuebyName(_T("T3-Performance"));
 		memset(cTemp,0,256);
 		cs_temp=temp_variant;
 		cs_temp = cs_temp.Trim();
@@ -197,7 +180,7 @@ bool T3000RegAddress::MatchMoudleAddress(void)
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
 		strcpy_s(T3_Performance[temp_variant_item].AddressName,nlength,cTemp);
 
-		temp_variant=m_pRs->GetCollect(_T("T3-4AO"));
+		temp_variant=m_q.getValuebyName(_T("T3-4AO"));
 		memset(cTemp,0,256);
 		cs_temp=temp_variant;
 		cs_temp = cs_temp.Trim();
@@ -205,7 +188,7 @@ bool T3000RegAddress::MatchMoudleAddress(void)
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
 		strcpy_s(T3_4AO[temp_variant_item].AddressName,nlength,cTemp);
 
-		temp_variant=m_pRs->GetCollect(_T("T3-6CT"));
+		temp_variant=m_q.getValuebyName(_T("T3-6CT"));
 		memset(cTemp,0,256);
 		cs_temp=temp_variant;
 		cs_temp = cs_temp.Trim();
@@ -213,7 +196,7 @@ bool T3000RegAddress::MatchMoudleAddress(void)
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
 		strcpy_s(T3_6CT[temp_variant_item].AddressName,nlength,cTemp);
 
-		temp_variant=m_pRs->GetCollect(_T("T3-28IN"));
+		temp_variant=m_q.getValuebyName(_T("T3-28IN"));
 		memset(cTemp,0,256);
 		cs_temp=temp_variant;
 		cs_temp = cs_temp.Trim();
@@ -221,7 +204,7 @@ bool T3000RegAddress::MatchMoudleAddress(void)
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
 		strcpy_s(T3_28IN[temp_variant_item].AddressName,nlength,cTemp);
 
-		temp_variant=m_pRs->GetCollect(_T("T3-RTD"));
+		temp_variant=m_q.getValuebyName(_T("T3-RTD"));
 		memset(cTemp,0,256);
 		cs_temp=temp_variant;
 		cs_temp = cs_temp.Trim();
@@ -229,7 +212,7 @@ bool T3000RegAddress::MatchMoudleAddress(void)
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
 		strcpy_s(T3_RTD[temp_variant_item].AddressName,nlength,cTemp);
 
-		temp_variant=m_pRs->GetCollect(_T("T3-8I13O"));
+		temp_variant=m_q.getValuebyName(_T("T3-8I13O"));
 		memset(cTemp,0,256);
 		cs_temp=temp_variant;
 		cs_temp = cs_temp.Trim();
@@ -239,14 +222,11 @@ bool T3000RegAddress::MatchMoudleAddress(void)
 
 		
 
-		m_pRs->MoveNext();
+		m_q.nextRow();
 	}
 #endif
 
-	if(m_pRs->State)
-		m_pRs->Close();
-	if(m_pCon->State)
-		m_pCon->Close();
+	m_SqliteDBT3000.closedb();
 
 	return true;
 }

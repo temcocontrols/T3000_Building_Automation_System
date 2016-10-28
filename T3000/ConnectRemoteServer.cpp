@@ -7,6 +7,7 @@
 #include "afxdialogex.h"
 #include "globle_function.h"
 #include "MainFrm.h"
+#include "../SQLiteDriver/CppSQLite3.h"
 int static_step = 0;
 CString ConnectMessage[20];
 char dyndns_ipaddress[20];
@@ -350,9 +351,11 @@ DWORD WINAPI  TcpClient_Connect_Thread(LPVOID lpVoid)
 	if(device_is_connected)
 	{
 
-		CBADO bado;
-		bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-		bado.OnInitADOConn();
+		CppSQLite3DB SqliteDBBuilding;
+		CppSQLite3Table table;
+		CppSQLite3Query q;
+		SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 
 		CString str_serialid;
 		CString product_name;
@@ -381,8 +384,8 @@ DWORD WINAPI  TcpClient_Connect_Thread(LPVOID lpVoid)
 
 			CString strSql;
 
-			strSql.Format(_T("Delete * From  ALL_NODE Where Serial_ID = '%d' "),temp_rm.sn);
-			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+			strSql.Format(_T("Delete  From  ALL_NODE Where Serial_ID = '%d' "),temp_rm.sn);
+			SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 		}
 		catch (...)
 		{
@@ -393,8 +396,8 @@ DWORD WINAPI  TcpClient_Connect_Thread(LPVOID lpVoid)
 		temp_pro3.Format(_T("%u"),PROTOCOL_REMOTE_IP);
 		CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 		strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('"+pFrame->m_strCurMainBuildingName+"','"+pFrame->m_strCurSubBuldingName+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','""','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','"+str_hw_version+"','"+str_fw_version+"','"+str_n_port+"','0','"+temp_pro3+"','1','"+str_parents_serial +"' ,'"+str_panel_number +"' ,'"+str_object_instance +"' ,'"+is_custom +"' )"));
-		 bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
-		 bado.CloseConn();
+		 SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+		 SqliteDBBuilding.closedb();
 		::PostMessage(pFrame->m_hWnd,   WM_MYMSG_REFRESHBUILDING,0,0);
 
 	}

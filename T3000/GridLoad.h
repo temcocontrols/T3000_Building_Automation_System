@@ -42,7 +42,7 @@ public:
 	afx_msg void OnBnClickedOpenbutton();
 	afx_msg void OnBnClickedConfigbutton();
 	afx_msg void OnBnClickedAllcheck();
-	afx_msg void OnCbnSelchangeSublist();
+	//afx_msg void OnCbnSelchangeSublist();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);	
 	afx_msg void OnBnClickedBrowsetlogbtn();
 	afx_msg void OnBnClickedCancelloadbutton();

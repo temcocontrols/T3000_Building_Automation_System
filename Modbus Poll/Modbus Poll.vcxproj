@@ -65,6 +65,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\T3000 Output\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(SolutionDir)SQLiteDriver\sqlite3.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -121,9 +122,10 @@
     <None Include="UserImages.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\SQLiteDriver\CppSQLite3.h" />
+    <ClInclude Include="..\SQLiteDriver\sqlite3.h" />
     <ClInclude Include="..\T3000\ProductModel.h" />
     <ClInclude Include="AddDeviceDlg.h" />
-    <ClInclude Include="ADO\ADO.h" />
     <ClInclude Include="AutoRichEditCtrl.h" />
     <ClInclude Include="CApplication.h" />
     <ClInclude Include="ChartCtrl\ChartAxis.h" />
@@ -197,8 +199,8 @@
     <ClInclude Include="Z:\Email\ProductModel.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\SQLiteDriver\CppSQLite3.cpp" />
     <ClCompile Include="AddDeviceDlg.cpp" />
-    <ClCompile Include="ADO\ADO.cpp" />
     <ClCompile Include="AutoRichEditCtrl.cpp" />
     <ClCompile Include="ChartCtrl\ChartAxis.cpp" />
     <ClCompile Include="ChartCtrl\ChartAxisLabel.cpp" />

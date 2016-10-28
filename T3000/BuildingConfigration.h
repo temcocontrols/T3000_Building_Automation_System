@@ -4,6 +4,7 @@
 #include "afxcmn.h"
 #include "globle_function.h"
 #include "afxwin.h"
+#include "../SQLiteDriver/CppSQLite3.h"
 // CBuildingConfigration dialog
 
 typedef struct Building_Config 
@@ -16,7 +17,7 @@ typedef struct Building_Config
 	CString state;
 	CString city;
 	CString street;
-	    int Zip;
+	
 	CString Protocol;
 	CString IPAddress_Domain;
 	CString IP_Port;
@@ -54,8 +55,8 @@ public:
 	void LoadBuildingConfigDB();
 	afx_msg LRESULT Fresh_Building_Config_Item(WPARAM wParam,LPARAM lParam);
 	ListCtrlEx::CListCtrlEx m_building_config_list;
-	_ConnectionPtr m_building_pCon;
-	_RecordsetPtr m_building_pRs;
+	CppSQLite3DB m_SqliteDBT3000;
+	CppSQLite3Query m_q;
 	vector<Building_Config> m_BuildNameLst;
 	vector<CString>				m_szBuildingComs;
 	afx_msg void OnBnClickedBuildingButtonAdd();
@@ -77,7 +78,7 @@ public:
 	int m_changedCol;
 	BOOL m_bChanged;
 	CString m_select_text;
-	char m_sqlitepath[256];
+ 
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnNMDblclkListBuildingConfig(NMHDR *pNMHDR, LRESULT *pResult);

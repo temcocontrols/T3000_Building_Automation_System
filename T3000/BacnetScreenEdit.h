@@ -1,7 +1,7 @@
 #pragma once
 #include "RelayLabel.h"
 #include "GraphicView.h"
-// CBacnetScreenEdit dialog
+#include "../SQLiteDriver/CppSQLite3.h"
 
 class CBacnetScreenEdit : public CDialogEx
 {
@@ -56,8 +56,8 @@ public:
 	unsigned short m_Mac;
 	CRelayLabel m_Label;
 	BOOL m_bImgExist;
-	_ConnectionPtr m_pCon;
-	_RecordsetPtr m_pRs;
+	CppSQLite3DB SqliteDBT3000;
+	CppSQLite3Query q;
 	int m_cxScreen;
 	int m_cyScreen;
 	afx_msg void OnPaint();

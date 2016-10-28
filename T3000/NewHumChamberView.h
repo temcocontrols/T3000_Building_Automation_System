@@ -1,7 +1,7 @@
 #pragma once
 
 #include "msflexgrid1.h"
-#include "ado/ADO.h"
+ 
 #include "MainFrm.h"
 #include "afxwin.h"
 #include "global_struct.h"

@@ -10,6 +10,7 @@
 #include "BacnetATCommand.h"
 #include "BacnetSettingHealth.h"
 #include "MainFrm.h"
+#include "../SQLiteDriver/CppSQLite3.h"
 // CBacnetSetting dialog
 extern bool cancle_send ;
 bool show_user_list_window = false;
@@ -295,21 +296,23 @@ void CBacnetSetting::OnBnClickedBtnBacIPChange()
 			temp_task_info.Format(_T("Change IP Address Information OK!"));
 
 			CString strSql;
-			CBADO bado;
-			bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-			bado.OnInitADOConn(); 
+			CppSQLite3DB SqliteDBBuilding;
+			CppSQLite3Table table;
+			CppSQLite3Query q;
+			SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 			CString temp_serial_cs;
 			temp_serial_cs.Format(_T("%u"),g_selected_serialnumber);
 			strSql.Format(_T("select * from ALL_NODE where Serial_ID = '%s' "),temp_serial_cs);
 			//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-			bado.m_pRecordset=bado.OpenRecordset(strSql);
-			while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+			q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+			while(!q.eof())
 			{
 				strSql.Format(_T("update ALL_NODE set Bautrate='%s' where Serial_ID= '%s'"),strnewipadress,temp_serial_cs);
-				bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
-				bado.m_pRecordset->MoveNext();
+				SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+			    q.nextRow();
 			}
-			bado.CloseRecordset();
+			 
 			CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 			pFrame->m_product.at(selected_product_index).BuildingInfo.strIp = strnewipadress;
 			MessageBox(temp_task_info);
@@ -1243,27 +1246,29 @@ void CBacnetSetting::OnEnKillfocusEditSettingNodesLabelSetting()
 			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Change Nodes label success!"));
 
 
-			CBADO bado;
-			bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-			bado.OnInitADOConn(); 
+			CppSQLite3DB SqliteDBBuilding;
+			CppSQLite3Table table;
+			CppSQLite3Query q;
+			SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 
 			CString temp_serial;
 			CString strSql;
 			temp_serial.Format(_T("%u"),g_selected_serialnumber);
 			strSql.Format(_T("select * from ALL_NODE where Serial_ID='%s'"),temp_serial);
 			
-			bado.m_pRecordset=bado.OpenRecordset(strSql);	
+			q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
 			//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
 
-			while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+			while(!q.eof())
 			{
 				strSql.Format(_T("update ALL_NODE set Product_name='%s' where Serial_ID='%s'"),temp_cstring,temp_serial);
-				bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
-				bado.m_pRecordset->MoveNext();
+				SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+				q.nextRow();
+				 
 			}
 
-			bado.CloseRecordset();
-			bado.CloseConn();
+			SqliteDBBuilding.closedb();
 			CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 			if(selected_product_index < pFrame->m_product.size())
 			{

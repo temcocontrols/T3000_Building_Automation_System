@@ -50,7 +50,7 @@ int g_language=0;
 CString g_strImagePathName=_T("");
 int now_tstat_id =0;//for batch load /flash.
 
-CString g_strOrigDatabaseFilePath=_T("");
+ 
 CString	g_strDatabasefilepath=_T("");
 CString g_strExePth=_T("");
 CString g_strImgeFolder=_T("");
@@ -2025,8 +2025,7 @@ SOCKET h_Broad=NULL;
 SOCKADDR_IN h_siBind;
 SOCKADDR_IN h_bcast;
 
-_RecordsetPtr m_global_pRs;
-_ConnectionPtr m_global_pCon;
+ 
 
 Point_Data_str digital_last_data[MAX_POINTS_IN_MONITOR];//用来存 数字量 没变化的情况下又 不在时间轴范围内的值;
 Data_Time_Match * digital_data_point[MAX_POINTS_IN_MONITOR];

@@ -6,10 +6,10 @@
 #include "T3000Option.h"
 #include "afxdialogex.h"
 
-#include "SqliteLib/CppSQLite3.h"
+#include "../SQLiteDriver/CppSQLite3.h"
 #include "globle_function.h"
 // CT3000Option dialog
-
+ 
 IMPLEMENT_DYNAMIC(CT3000Option, CDialogEx)
 
 CT3000Option::CT3000Option(CWnd* pParent /*=NULL*/)
@@ -55,30 +55,21 @@ void CT3000Option::OnCbnSelchangeComboLanguage()
 {
 	int Lan_ID = m_combox_language.GetCurSel();
 	
-	CppSQLite3DB SqliteDB;
-	CString tempDB = GetExePath(true) + L"Psychrometry\\db_psychrometric_project.s3db";
-	char m_sqlitepath[256];
-	strcpy( m_sqlitepath, (CStringA)tempDB);
-	SqliteDB.open(m_sqlitepath);
+	//CppSQLite3DB SqliteDB;
+	//CString m_sqlitepath = GetExePath(true) + L"Psychrometry\\db_psychrometric_project.s3db";
+	// 
+	//SqliteDB.open((UTF8MBSTR)m_sqlitepath);
 
-	CString SqlText;
-	
-	SqlText.Format(_T("Update tbl_language_option set language_id = 0  where  language_id = 1"));
+	//CString SqlText;
+	//
+	//SqlText.Format(_T("Update tbl_language_option set language_id = 0  where  language_id = 1"));
 
-	char charqltext[1024];
-	memset(charqltext,0,1024);
-	WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
-	 
+	//SqliteDB.execDML((UTF8MBSTR)SqlText);
 
-	SqliteDB.execDML(charqltext);
+	//SqlText.Format(_T("Update tbl_language_option set language_id = 1  where  ID = %d"),Lan_ID+1);
 
-	SqlText.Format(_T("Update tbl_language_option set language_id = 1  where  ID = %d"),Lan_ID+1);
+	//SqliteDB.execDML((UTF8MBSTR)SqlText);
 
-	memset(charqltext,0,1024);
-	WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
-
-	SqliteDB.execDML(charqltext);
-
-	SqliteDB.close();
+	//SqliteDB.closedb();
 
 }

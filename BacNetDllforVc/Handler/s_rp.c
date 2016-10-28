@@ -155,12 +155,12 @@ uint8_t Send_Read_Property_Request(
     bool status = false;
 
     /* is the device bound? */
-    status = address_get_by_device(device_id, &max_apdu, &dest);
-    if (status) {
-        invoke_id =
-            Send_Read_Property_Request_Address(&dest, max_apdu, object_type,
-            object_instance, object_property, array_index);
-    }
+	status = address_get_by_device(device_id, &max_apdu, &dest);
+	if (status) {
+		invoke_id =
+			Send_Read_Property_Request_Address(&dest, max_apdu, object_type,
+			object_instance, object_property, array_index);
+	}
 
     return invoke_id;
 }

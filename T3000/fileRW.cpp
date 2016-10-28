@@ -8,10 +8,10 @@
 #include "schedule.h"
 #include "global_variable_extern.h"
 #include "globle_function.h"
-#include "ado/ADO.h"
+#include "../SQLiteDriver/CppSQLite3.h"
 #include "Global_Struct.h"
 #include "define.h"
-#include "bado/BADO.h"
+ 
 //#include "Weekly_Routines.h"
 //#define TSTAT26_VAR_NUM 75
 //#define TSTAT26_VAR_NUM 80
@@ -3526,9 +3526,12 @@ void write_input_output_var(wifstream & inf,float tstat_version,CStdioFile *p_lo
 		get_write_var_line_output(buf,tstat_version,outputno,p_log_file,p_log_file_one_time);//get a line ,one register value,
 		outputno++;
 	}
-	CBADO ado;
-	ado.SetDBPath(g_strCurBuildingDatabasefilePath);
-	ado.OnInitADOConn();
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 	while(!inf.eof())
 	{
 		inf.getline(buf,1024);
@@ -3545,21 +3548,21 @@ void write_input_output_var(wifstream & inf,float tstat_version,CStdioFile *p_lo
 		int m_sn=product_register_value[0]+product_register_value[1]*256+product_register_value[2]*256*256+product_register_value[3]*256*256*256;
 		CString sql;
 		sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),inputno,m_sn);
-		ado.m_pRecordset=ado.OpenRecordset(sql);
-		if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+		q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
+		if (!q.eof())//有表但是没有对应序列号的值
 		{
 
 			sql.Format(_T("update Value_Range set CRange = %d where CInputNo=%d and SN=%d "),rangeno,inputno,m_sn);
-			ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+			SqliteDBBuilding.execDML((UTF8MBSTR)sql);
 		}
 		else
 		{
-			ado.CloseRecordset();
+		 
 			sql.Format(_T("Insert into Value_Range( SN,CInputNo,CRange) values('%d','%d','%d')"),m_sn,inputno,rangeno);
-			ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+			SqliteDBBuilding.execDML((UTF8MBSTR)sql);
 		}
 	}
-	ado.CloseConn();
+	SqliteDBBuilding.closedb();
 
 	while(!inf.eof())
 	{
@@ -3775,9 +3778,10 @@ void get_write_var_line_input_output(TCHAR *buf,float tstat_version,int inputno,
 		   Read_Multi(now_tstat_id,&num[0],0,4);
 		   g_serialNum=num[0]+num[1]*256+num[2]*256*256+num[3]*256*256;
 		  
-		   CBADO bado;
-		   bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-		   bado.OnInitADOConn(); 
+		   CppSQLite3DB SqliteDBBuilding;
+		   CppSQLite3Table table;
+		   CppSQLite3Query q;
+		   SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
 			CString strSerial;
 			strSerial.Format(_T("%d"),g_serialNum);
@@ -3785,8 +3789,8 @@ void get_write_var_line_input_output(TCHAR *buf,float tstat_version,int inputno,
 			CString strsql;
 			strsql.Format(_T("select * from IONAME where SERIAL_ID = '%s'"),strSerial);
 			//m_RsTmp->Open((_variant_t)strsql,_variant_t((IDispatch *)m_ConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-			 bado.m_pRecordset=bado.OpenRecordset(strsql);
-			if(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)//update
+			 q = SqliteDBBuilding.execQuery((UTF8MBSTR)strsql);
+			if(!q.eof())//update
 			{			
 				CString strField;
 				switch (lRow)
@@ -3823,9 +3827,7 @@ void get_write_var_line_input_output(TCHAR *buf,float tstat_version,int inputno,
 
 					CString str_temp;
 					str_temp.Format(_T("update IONAME set "+strField+" = '"+strText+"' where SERIAL_ID = '"+strSerial+"'"));
-					//AfxMessageBox(str_temp );
-					bado.m_pConnection->Execute(str_temp.GetString(),NULL,adCmdText);
-					//m_FlexGrid.put_TextMatrix(lRow,lCol,strText);
+					SqliteDBBuilding.execDML((UTF8MBSTR)str_temp);
 				}
 				catch(_com_error *e)
 				{
@@ -3889,9 +3891,8 @@ void get_write_var_line_input_output(TCHAR *buf,float tstat_version,int inputno,
 					);
 				try
 				{
-
-					bado.m_pConnection->Execute(str_temp.GetString(),NULL,adCmdText);
-				//	m_FlexGrid.put_TextMatrix(lRow,lCol,strText);
+				   SqliteDBBuilding.execDML((UTF8MBSTR)str_temp);
+					 
 				}
 				catch(_com_error *e)
 				{
@@ -3928,8 +3929,7 @@ void get_write_var_line_input_output(TCHAR *buf,float tstat_version,int inputno,
 			}
 			 
 
-			 bado.CloseRecordset();
-			 bado.CloseConn();
+		 SqliteDBBuilding.closedb();
 		}	
         
 	}
@@ -4040,22 +4040,20 @@ void get_write_var_line_output(TCHAR *buf,float tstat_version,int outputno,CStdi
 		{  unsigned short num[4];  
 		   Read_Multi(now_tstat_id,&num[0],0,4);
 		   g_serialNum=num[0]+num[1]*256+num[2]*256*256+num[3]*256*256;
-// 		   _ConnectionPtr m_ConTmp;
-// 		   _RecordsetPtr m_RsTmp;
-// 			m_ConTmp.CreateInstance("ADODB.Connection");
-// 			m_RsTmp.CreateInstance("ADODB.Recordset");
-// 			m_ConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-		   CBADO bado;
-		   bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-		   bado.OnInitADOConn(); 
+
+		   CppSQLite3DB SqliteDBBuilding;
+		   CppSQLite3Table table;
+		   CppSQLite3Query q;
+		   SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 			CString strSerial;
 			strSerial.Format(_T("%d"),g_serialNum);
 
 			CString strsql;
 			strsql.Format(_T("select * from IONAME where SERIAL_ID = '%s'"),strSerial);
 			//m_RsTmp->Open((_variant_t)strsql,_variant_t((IDispatch *)m_ConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-			bado.m_pRecordset=bado.OpenRecordset(strsql);
-			if(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)//update
+			q = SqliteDBBuilding.execQuery((UTF8MBSTR)strsql);
+			if(q.eof())//update
 			{			
 				CString strField;
 				switch (lRow)
@@ -4090,7 +4088,7 @@ void get_write_var_line_output(TCHAR *buf,float tstat_version,int outputno,CStdi
 					CString str_temp;
 					str_temp.Format(_T("update IONAME set "+strField+" = '"+strText+"' where SERIAL_ID = '"+strSerial+"'"));
 					//AfxMessageBox(str_temp );
-					bado.m_pConnection->Execute(str_temp.GetString(),NULL,adCmdText);
+					SqliteDBBuilding.execDML((UTF8MBSTR)str_temp);
 					//m_FlexGrid.put_TextMatrix(lRow,lCol,strText);
 				}
 				catch(_com_error *e)
@@ -4140,8 +4138,7 @@ void get_write_var_line_output(TCHAR *buf,float tstat_version,int outputno,CStdi
 				try
 				{
 
-					bado.m_pConnection->Execute(str_temp.GetString(),NULL,adCmdText);
-				//	m_FlexGrid.put_TextMatrix(lRow,lCol,strText);
+					 SqliteDBBuilding.execDML((UTF8MBSTR)str_temp);
 				}
 				catch(_com_error *e)
 				{
@@ -4176,12 +4173,7 @@ void get_write_var_line_output(TCHAR *buf,float tstat_version,int outputno,CStdi
 				g_strOutName8=strText;
 				break;
 			}
-// 			if(m_RsTmp->State) 
-// 				m_RsTmp->Close(); 
-// 			if(m_ConTmp->State)
-// 				m_ConTmp->Close();	
-            bado.CloseRecordset();
-			bado.CloseConn();
+		SqliteDBBuilding.closedb();
 		}	
 
 	}
@@ -5938,27 +5930,25 @@ if(default_file.Open(fn,CFile::modeCreate | CFile::modeWrite)!=0){
 	T3Register temp;
 	vector<T3Register>VectorT3Register;
 	VectorT3Register.clear();
-	CADO m_ado;
-	m_ado.OnInitADOConn();
+	CppSQLite3DB SqliteDBT3000;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 #if 1
 	CString SQL = _T("select * from T3_RegisterList");
-	m_ado.m_pRecordset = m_ado.OpenRecordset(SQL);
+	q = SqliteDBT3000.execQuery((UTF8MBSTR)SQL);
 	_variant_t vartemp;
-	while(!m_ado.m_pRecordset->EndOfFile)
+	while(!q.eof())
 	{
-		temp.regID=m_ado.m_pRecordset->GetCollect(_T("RegID"));
-		vartemp =m_ado.m_pRecordset->GetCollect(productname.GetString());
-		if (vartemp.vt==VT_NULL)
-			temp.regName=_T("");
-		else
-			temp.regName =vartemp;
-		m_ado.m_pRecordset->MoveNext();
+		temp.regID=q.getIntField("RegID");
+	 
+		temp.regName =q.getValuebyName(productname);
+		q.nextRow();
 		if (temp.regName.CompareNoCase(_T("RESERVED"))==0)
 		continue;
 		VectorT3Register.push_back(temp);
 	}
-	m_ado.CloseRecordset();
-	m_ado.CloseConn();
+	SqliteDBT3000.closedb();
 #endif 
     default_file.WriteString(_T("Reg No,Reg Value,Reg Name\n"));
 	vector<T3Register>::iterator iter;
@@ -7694,35 +7684,35 @@ _Twrite_to_file_a_line(out,_T("//Input Name Config"));//space
 
  int m_sn=product_register_value[0]+product_register_value[1]*256+product_register_value[2]*256*256+product_register_value[3]*256*256*256;
 int  m_crange,inoutputno;
- CBADO ado;
- ado.SetDBPath(g_strCurBuildingDatabasefilePath);
- ado.OnInitADOConn();
- if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
+CppSQLite3DB SqliteDBBuilding;
+CppSQLite3Table table;
+CppSQLite3Query q;
+ if (SqliteDBBuilding.tableExists("Value_Range"))//有Version表
  {
 	 CString sql;
 	 sql.Format(_T("Select * from Value_Range where SN=%d"),m_sn);
-	 ado.m_pRecordset=ado.OpenRecordset(sql);
+	 q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
 
-	 if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+	 if (!q.eof())//有表但是没有对应序列号的值
 	 {    
-		 ado.m_pRecordset->MoveFirst();
-		 while (!ado.m_pRecordset->EndOfFile)
+		 
+		 while (!q.eof())
 		 {
-			 m_crange=ado.m_pRecordset->GetCollect(_T("CRange"));
-			 inoutputno=ado.m_pRecordset->GetCollect(_T("CInputNo"));
+			 m_crange=q.getIntField("CRange");
+			 inoutputno=q.getIntField("CInputNo");
 			  
-				 str1.Format(_T("%d:%d"),inoutputno,m_crange);
+			 str1.Format(_T("%d:%d"),inoutputno,m_crange);
 			 
 			 
 			 _Twrite_to_file_a_line(out,str1);
-			 ado.m_pRecordset->MoveNext();
+			 q.nextRow();
 		 }
 	 } 
 	 
 
-	 ado.CloseRecordset();
+ 
  }
- ado.CloseConn();
+SqliteDBBuilding.closedb();
  CString strTips;
  _Twrite_to_file_a_line(out,_T("//END"));//space
  strTips = _T("Config file saved 100%...");
@@ -7750,343 +7740,3 @@ int  m_crange,inoutputno;
 	 _Twrite_to_file_a_line(out,str1);
 	 _Twrite_to_file_a_line(out,_T("//Model Name Config END"));
  }
-#if 0
-CString Show_load_file_result_message(load_file_every_step temppp,bool show_message_dialog)
-{//true show message box ,false no 
-	CString showing_message;
-	showing_message= _T("^^^^^^^^^^Summary^^^^^^^^^^\r\n");
-	if(temppp.first_step ==true)
-		showing_message=showing_message+LOAD_FAILURE_ONE+STEP_FINISH;
-	else
-		showing_message=showing_message+LOAD_FAILURE_ONE+STEP_FAILURE;
-	if(temppp.second_step ==true)
-		showing_message=showing_message+LOAD_FAILURE_TWO+STEP_FINISH;
-	else
-		showing_message=showing_message+LOAD_FAILURE_TWO+STEP_FAILURE;
-	if(temppp.third_step ==true)
-		showing_message=showing_message+LOAD_FAILURE_THREE+STEP_FINISH;
-	else
-		showing_message=showing_message+LOAD_FAILURE_THREE+STEP_FAILURE;
-	if(temppp.thurth_step ==true)
-		showing_message=showing_message+LOAD_FAILURE_FOUR+STEP_FINISH;
-	else
-		showing_message=showing_message+LOAD_FAILURE_FOUR+STEP_FAILURE;
-	if(temppp.fifth_step ==true)
-		showing_message=showing_message+LOAD_FAILURE_FIVE+STEP_FINISH;
-	else
-		showing_message=showing_message+LOAD_FAILURE_FIVE+STEP_FAILURE;
-	if(temppp.sixth_step ==true)
-		showing_message=showing_message+LOAD_FAILURE_SIX+STEP_FINISH;
-	else
-		showing_message=showing_message+LOAD_FAILURE_SIX+STEP_FAILURE;
-	if(temppp.seven_step==true)
-		showing_message=showing_message+LOAD_FAILURE_SEVEN+STEP_FINISH;
-	else
-		showing_message=showing_message+LOAD_FAILURE_SEVEN+STEP_FAILURE;
-	if(show_message_dialog==true)
-	{
-		if(temppp.seven_step==true)
-			MessageBox(NULL,showing_message,_T("Finish"));
-		else
-			AfxMessageBox(showing_message);
-	}
-	return showing_message;
-
-}
-
-void weekly_write(CStdioFile &default_file,int schedule_id)
-{
-	CString a_line;	
-	int i=0;
-	a_line=_T("WEEKLY ROUTINES\n");
-	default_file.WriteString(a_line.GetString());
-
-	a_line=_T("Num\tFULL_LABEL\t\tA/M\tOutput\tHoliday1 State1\tHoliday2 State2\tLabel\n");
-	default_file.WriteString(a_line.GetString());
-	unsigned short temp_buffer[WR_DESCRIPTION_SIZE]={0};
-	memset(&temp_buffer[0],0,sizeof(temp_buffer));
-	for(i=0;i<MAX_WR;i++)
-	{
-		a_line=_T("");//clear
-		Read_Multi(schedule_id,temp_buffer,MODBUS_WR_DESCRIP_FIRST+i*WR_DESCRIPTION_SIZE,WR_DESCRIPTION_SIZE);
-		if(temp_buffer[0]==255)
-		{
-			for(int itt=0;itt<WR_DESCRIPTION_SIZE;itt++)
-				temp_buffer[itt]=0;
-		}			
-		description temp_description;
-		memset(&temp_description,0,sizeof(description));
-		TCHAR *p=NULL;
-		p=(char *)&temp_description;///////////////*****pointer   attention
-		for(int j=0;j<WR_DESCRIPTION_SIZE;j++)
-			(*(p++))=temp_buffer[j];
-		CString a_m,output,state1,state2;
-		if(temp_description.flag & 128)
-			a_m=_T("MAN");
-		else
-			a_m=_T("AUTO");
-		if(temp_description.flag & 64)
-			output=_T("ON");
-		else
-			output=_T("OFF");
-		if(temp_description.flag & 32)
-			state1=_T("ON");
-		else
-			state1=_T("OFF");
-		if(temp_description.flag & 16)
-			state2=_T("ON");
-		else
-			state2=_T("OFF");			
-		if(strlen(temp_description.full_label)<8)
-			a_line.Format(_T("\t%s\t\t\t"),temp_description.full_label);
-		else if(strlen(temp_description.full_label)<16)
-			a_line.Format(_T("\t%s\t\t"),temp_description.full_label);
-		else if(strlen(temp_description.full_label)<20)
-			a_line.Format(_T("\t%s\t"),temp_description.full_label);
-		CString temp;
-		a_line=a_line+a_m+_T("\t");
-		a_line=a_line+output+_T("\t");
-		temp.Format(_T("%d"),temp_description.holiday1);
-		a_line=a_line+temp+_T("\t");
-		a_line=a_line+state1+_T("\t");
-		temp.Format(_T("%d"),temp_description.holiday2);
-		a_line=a_line+temp+_T("\t");
-		a_line=a_line+state2+_T("\t");
-		temp.Format(_T("%s\n"),temp_description.label);
-		a_line=a_line+temp;
-		temp.Format(_T("%d:"),i+1);
-		a_line=temp+a_line;
-		default_file.WriteString(a_line.GetString());////////////////write
-		weekly_routines_insert_write(default_file,schedule_id,i);
-	}
-}
-void weekly_routines_insert_write(CStdioFile &default_file,int schedule_id,int weekly_row_number)
-{
-	CString a_line;	
-	int i=0;
-//	a_line="WEEKLY ROUTINES INSERT\n";
-//	default_file.WriteString(a_line.GetString());
-	a_line=_T("\tMon\tTue\tWed\tThu\tFri\tSat\tSun\tHoliday1Holiday2\n");
-	default_file.WriteString(a_line.GetString());
-	unsigned short on[72]={0};
-	unsigned short off[72]={0};
-//	for(i=0;i<MAX_WR;i++)
-//	{
-		Read_Multi(schedule_id,on,MODBUS_WR_ONTIME_FIRST + WR_TIME_SIZE*weekly_row_number,0x48);
-		//由上到下，由左到右，from up to lower ,from left to right
-		Read_Multi(schedule_id,off,MODBUS_WR_OFFTIME_FIRST + WR_TIME_SIZE*weekly_row_number,0x48);
-		//由上到下，由左到右，from up to lower ,from left to right
-		for(int i=0;i<0x48;i++)
-		{
-			if(on[i]==255)
-				on[i]=0;
-			if(off[i]==255)
-				off[i]=0;
-		}
-		for(int w=0;w<4;w++)
-		{
-			int itemp=w*2;
-			a_line.Format(_T("ON:\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\n"),on[itemp+0*8],on[itemp+0*8+1],on[itemp+1*8],on[itemp+1*8+1],on[itemp+2*8],on[itemp+2*8+1],on[itemp+3*8],on[itemp+3*8+1],on[itemp+4*8],on[itemp+4*8+1],on[itemp+5*8],on[itemp+5*8+1],on[itemp+6*8],on[itemp+6*8+1],on[itemp+7*8],on[itemp+7*8+1],on[itemp+8*8],on[itemp+8*8+1]);
-			default_file.WriteString(a_line.GetString());
-			a_line.Format(_T("OFF:\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\n"),off[itemp+0*8],off[itemp+0*8+1],off[itemp+1*8],off[itemp+1*8+1],off[itemp+2*8],off[itemp+2*8+1],off[itemp+3*8],off[itemp+3*8+1],off[itemp+4*8],off[itemp+4*8+1],off[itemp+5*8],off[itemp+5*8+1],off[itemp+6*8],off[itemp+6*8+1],off[itemp+7*8],off[itemp+7*8+1],off[itemp+8*8],off[itemp+8*8+1]);
-			default_file.WriteString(a_line.GetString());
-		}
-		default_file.WriteString(_T("\n"));
-//	}
-}
-
-void annual_write(CStdioFile &default_file,int schedule_id)
-{
-	CString a_line;	
-	int i=0;
-	a_line=_T("ANNUAL ROUTINES\n");
-	default_file.WriteString(a_line.GetString());
-
-	a_line=_T("Num\tFULL_LABEL\t\tA/M\tValue\tLabel\n");
-	default_file.WriteString(a_line.GetString());
-	unsigned short temp_buffer[AR_DESCRIPTION_SIZE]={0};
-	memset(&temp_buffer[0],0,sizeof(temp_buffer));
-	for(i=0;i<MAX_AR;i++)
-	{
-		a_line="";//clear
-		Read_Multi(schedule_id,temp_buffer,MODBUS_AR_DESCRIP_FIRST+i*AR_DESCRIPTION_SIZE,AR_DESCRIPTION_SIZE);
-		if(temp_buffer[0]==255)
-		{
-			for(int itt=0;itt<AR_DESCRIPTION_SIZE;itt++)
-				temp_buffer[itt]=0;
-		}			
-		description2 temp_description;
-
-		memset(&temp_description,0,sizeof(description2));
-		char *p;
-		p=(char *)&temp_description;///////////////*****pointer   attention
-		for(int j=0;j<AR_DESCRIPTION_SIZE;j++)
-			(*(p++))=temp_buffer[j];
-		CString a_m,value;
-		if(temp_description.flag & 128)
-			a_m=_T("MAN");
-		else
-			a_m=_T("AUTO");
-		if(temp_description.flag & 64)
-			value=_T("ON");
-		else
-			value=_T("OFF");
-		if(strlen(temp_description.full_label)<8)
-			a_line.Format(_T("%s\t\t\t"),temp_description.full_label);
-		else if(strlen(temp_description.full_label)<16)
-			a_line.Format(_T("\t%s\t\t"),temp_description.full_label);
-		else if(strlen(temp_description.full_label)<20)
-			a_line.Format(_T("\t%s\t"),temp_description.full_label);
-		a_line=a_line+a_m+_T("\t");
-		a_line=a_line+value+_T("\t");	
-		CString temp;
-		temp.Format(_T("%s\n"),temp_description.label);
-		a_line=a_line+temp;
-		temp.Format(_T("%d:\t"),i+1);
-		a_line=temp+a_line;
-		default_file.WriteString(a_line.GetString());////////////////write
-		annual_routines_insert_write(default_file,schedule_id,i);
-	}
-}
-void annual_routines_insert_write(CStdioFile &default_file,int schedule_id,int weekly_row_number)
-{
-	unsigned short the_days[AR_TIME_SIZE];
-	CString a_line=_T("\t"),temp=_T("");	
-    Read_Multi(schedule_id,the_days,MODBUS_AR_TIME_FIRST + AR_TIME_SIZE*weekly_row_number,AR_TIME_SIZE);//get from network
-	for(int i=0;i<AR_TIME_SIZE;i++)
-	{
-		int j;
-		for(j=0;j<AR_TIME_SIZE;j++)
-		{
-			if(the_days[j]!=255)
-				break;
-		}
-		if(j==AR_TIME_SIZE)
-		{
-			for(j=0;j<AR_TIME_SIZE;j++)
-				the_days[j]=0;
-		}
-		temp.Format(_T("%d,"),the_days[i]);
-		a_line+=temp;
-	}
-	a_line+=_T('\n');
-	default_file.WriteString(a_line.GetString());////////////////write
-}
-void configure_write(CStdioFile &default_file,int schedule_id)
-{
-	CString a_line;	
-	int i=0;
-	a_line=_T("ID ROUTINES\n");
-	default_file.WriteString(a_line.GetString());
-
-	a_line=_T("Num\tA/M\tValue\tSchedule1\tstate1\tSchedule2\tstate2\n");
-	default_file.WriteString(a_line.GetString());
-	unsigned short temp_buffer[ID_SIZE]={0};
-	for(i=0;i<MAX_ID;i++)
-	{
-		a_line=_T("");//clear
-		Read_Multi(schedule_id,temp_buffer,MODBUS_ID_FIRST+i*ID_SIZE,ID_SIZE);
-		if(temp_buffer[0]==255)
-		{
-			for(int itt=0;itt<ID_SIZE;itt++)
-				temp_buffer[itt]=0;
-		}			
-		description3 temp_description;
-		char *p;
-		p=(char *)&temp_description;///////////////*****pointer   attention
-		for(int j=0;j<ID_SIZE;j++)
-			(*(p++))=temp_buffer[j];
-		CString state1,state2,a_m,value;
-		if(temp_description.flag & 128)
-			a_m=_T("MAN\t");
-		else
-			a_m=_T("AUTO\t");
-		if(temp_description.flag & 64)
-			value=_T("ON\t");
-		else
-			value=_T("OFF\t");
-		if(temp_description.flag & 32)
-			state1=_T("ON\t");
-		else
-			state1=_T("OFF\t");
-		if(temp_description.flag & 16)
-			state2=_T("ON\n");
-		else
-			state2=_T("OFF\n");
-		a_line.Format(_T("%d:\t"),i+1);
-		a_line+=a_m;
-		a_line+=value;
-		CString temp;		
-		temp.Format(_T("%d\t\t"),temp_description.schedul1);
-		a_line+=temp;
-		a_line+=state1;
-		temp.Format(_T("%d\t\t"),temp_description.schedul2);
-		a_line+=temp;
-		a_line+=state2;
-		default_file.WriteString(a_line.GetString());
-	}
-}
-void variable_write(CStdioFile &default_file,int schedule_id)
-{
-	CString a_line;	
-	a_line=_T("VARIABLE LIST\n");
-	default_file.WriteString(a_line.GetString());
-	unsigned short varliable[NET_WORK_CONTROLLER_NUM+1]={0};
-	Read_Multi(schedule_id,varliable,106,NET_WORK_CONTROLLER_NUM+1);
-	a_line.Format(_T("\t%d"),varliable[0]);
-	a_line=NET_WORK_CONTROLLER[0]+a_line+_T("\n");
-	default_file.WriteString(a_line);
-	a_line.Format(_T("\t%d:%d:%d:%d"),varliable[1],varliable[2],varliable[3],varliable[4]);
-	a_line=NET_WORK_CONTROLLER[1]+a_line+_T("\n");
-	default_file.WriteString(a_line);
-	a_line.Format(_T("\t%d:%d:%d:%d"),varliable[5],varliable[6],varliable[7],varliable[8]);
-	a_line=NET_WORK_CONTROLLER[2]+a_line+_T("\n");
-	default_file.WriteString(a_line);
-	a_line.Format(_T("\t%d:%d:%d:%d"),varliable[9],varliable[10],varliable[11],varliable[12]);
-	a_line=NET_WORK_CONTROLLER[3]+a_line+_T("\n");
-	default_file.WriteString(a_line);
-	a_line.Format(_T("\t%d"),varliable[13]);
-	a_line=NET_WORK_CONTROLLER[4]+a_line+_T("\n");
-	default_file.WriteString(a_line);
-	a_line.Format(_T("\t%d"),varliable[14]);
-	a_line=NET_WORK_CONTROLLER[5]+a_line+_T("\n");////////Listenning Port
-	default_file.WriteString(a_line);
-	a_line.Format(_T("\t%d"),varliable[21]);
-	a_line=NET_WORK_CONTROLLER[6]+a_line+_T("\n");////////Inactivity Timeout
-	default_file.WriteString(a_line);
-	a_line.Format(_T("\t%d:%d:%d:%d"),varliable[15],varliable[16],varliable[17],varliable[18]);
-	a_line=NET_WORK_CONTROLLER[7]+a_line+_T("\n");
-	default_file.WriteString(a_line);
-	a_line.Format(_T("\t%d"),varliable[19]);
-	a_line=NET_WORK_CONTROLLER[8]+a_line+_T("\n");////////Listenning Port
-	default_file.WriteString(a_line);
-	a_line.Format(_T("\t%d"),varliable[20]);
-	a_line=NET_WORK_CONTROLLER[9]+a_line+_T("\n");////////Listenning Port
-	default_file.WriteString(a_line);
-	a_line.Format(_T("\t%d"),varliable[23]);
-	a_line=NET_WORK_CONTROLLER[10]+a_line+_T("\n");////////Listenning Port
-	default_file.WriteString(a_line);
-	a_line.Format(_T("\t%d"),varliable[24]);
-	a_line=NET_WORK_CONTROLLER[11]+a_line+_T("\n");////////Listenning Port
-	default_file.WriteString(a_line);	
-}
-void save_schedule_2_file(const char* fn,int schedule_id)
-{
-	CStdioFile default_file;
-	if(default_file.Open(_T(fn),CFile::modeCreate | CFile::modeWrite)!=0)
-	{
-		default_file.WriteString(NET_WORK_DEFFERENT_TSTAT_FILE);
-		weekly_write(default_file,schedule_id);
-		annual_write(default_file,schedule_id);
-		configure_write(default_file,schedule_id);
-		variable_write(default_file,schedule_id);
-		/////////////////////////////////////////////last work
-		default_file.Flush();
-		default_file.Close();
-	}
-	else
-		AfxMessageBox(_T("Open file failure!"));
-	
-}
-
-#endif

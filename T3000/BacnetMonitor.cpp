@@ -10,10 +10,10 @@
 #include "Bacnet_Include.h"
 #include "globle_function.h"
 #include "gloab_define.h"
-
+#include "bado/BADO.h"
 #include "BacnetGraphic.h"
 #include "BacnetWait.h"
-#include "BADO/BADO.h"
+ 
 #define  WM_MONITOR_USER_MESSAGE WM_USER + 902
 extern char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network,unsigned char & sub_panel, byte panel , int *netpresent);
 extern char *look_label_ex(int panel,int sub_panel, int point_type, int num, int network);

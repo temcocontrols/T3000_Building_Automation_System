@@ -18,6 +18,7 @@ CManageAccountDlg::CManageAccountDlg(CWnd* pParent /*=NULL*/)
 
 CManageAccountDlg::~CManageAccountDlg()
 {
+	SqliteDBT3000.closedb();
 }
 
 void CManageAccountDlg::DoDataExchange(CDataExchange* pDX)
@@ -59,26 +60,18 @@ BOOL CManageAccountDlg::OnInitDialog()
 	CDialog::OnInitDialog();
 	m_valueEdit.ShowWindow(SW_HIDE);
 
-	_ConnectionPtr m_pConTmp;
-	_RecordsetPtr m_pRsTemp;
-	m_pConTmp.CreateInstance("ADODB.Connection");
-	m_pRsTemp.CreateInstance("ADODB.Recordset");
-
-	m_pConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+	 SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 	CString strSql;
 	strSql.Format(_T("select * from Userlogin"));
-	m_pRsTemp->Open((_variant_t)(strSql),_variant_t((IDispatch *)m_pConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);	
-	_variant_t temp_variant;
+	q = SqliteDBT3000.execQuery((UTF8MBSTR)strSql);
+	 _variant_t temp_variant;
 	BOOL b_useLogin=false;
 	int nTemp=0;
-	while(VARIANT_FALSE==m_pRsTemp->EndOfFile)
+	while(!q.eof())
 	{
-		temp_variant=m_pRsTemp->GetCollect("USE_PASSWORD");//
-		if(temp_variant.vt!=VT_NULL)
-			nTemp=temp_variant;
-		else
-			nTemp=-1;
-		m_pRsTemp->MoveNext();
+		nTemp=q.getIntField("USE_PASSWORD");//
+		 
+		q.nextRow();
 	}
 	if(nTemp==-1)	
 	{
@@ -92,16 +85,11 @@ BOOL CManageAccountDlg::OnInitDialog()
 		m_usePrivilegeCheck.SetCheck(BST_UNCHECKED);
 		b_useLogin=FALSE;
 	}
-	if(m_pConTmp->State) 
-		m_pConTmp->Close(); 
-	if(m_pRsTemp->State) 
-		m_pRsTemp->Close(); 
+	 
 
 	m_FlexGrid.put_ColWidth(1,1500);
 	m_FlexGrid.put_ColWidth(2,1500);
-	m_pCon.CreateInstance(_T("ADODB.Connection"));
-	m_pRs.CreateInstance(_T("ADODB.Recordset"));
-	m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+	 
 
 	ReloadUserDB();
 
@@ -118,48 +106,42 @@ void CManageAccountDlg::ReloadUserDB()
 	m_FlexGrid.put_TextMatrix(0,1,_T("User"));
 
 	m_FlexGrid.put_TextMatrix(0,2,_T("Password"));
-	m_pRs->Open("select * from users",_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);		
-	_variant_t temp_variant;
+	q = SqliteDBT3000.execQuery("select * from users");
+	table = SqliteDBT3000.getTable("select * from users");
+	 
+	 _variant_t temp_variant;
 	int temp_row=0;
 	CString strTemp;
 	m_FlexGrid.put_Cols(3);
 	
 
-	m_FlexGrid.put_Rows(m_pRs->RecordCount+2);	
+	m_FlexGrid.put_Rows(table.numRows()+2);	
 	//for(int k=0;k++;k<3)
 	//{
 			//m_FlexGrid.put_Row(temp_row);m_FlexGrid.put_Col(k);
 	//	m_FlexGrid.put_ColAlignment(k,4);
 	//}m_AccountLst
-	while(VARIANT_FALSE==m_pRs->EndOfFile)
+	while(!q.eof())
 	{	
 		Account_Node Item;
 		++temp_row;
-		temp_variant=m_pRs->GetCollect("user_name_login");//
-		if(temp_variant.vt!=VT_NULL)
-			strTemp=temp_variant;
-		else
-			strTemp=_T("");
+		strTemp=q.getValuebyName(L"user_name_login");//
+		 
 		m_FlexGrid.put_ColAlignment(1,4);
 		Item.strName=strTemp;
 		m_FlexGrid.put_TextMatrix(temp_row,1,strTemp);
 
-		temp_variant=m_pRs->GetCollect("password_login");//
-		if(temp_variant.vt!=VT_NULL)
-			strTemp=temp_variant;
-		else
-			strTemp=_T("");
+		strTemp=q.getValuebyName(L"password_login");//
+		 
 		m_FlexGrid.put_ColAlignment(2,4);
 		Item.strpassword=strTemp;
 		m_FlexGrid.put_TextMatrix(temp_row,2,strTemp);
 
 		m_AccountLst.push_back(Item);
-		m_pRs->MoveNext();//
-		//user_name_login
-		//password_login
+		q.nextRow();//
+ 
 	}
-	if(m_pRs->State) 
-		m_pRs->Close(); 
+	 
 
 
 }
@@ -316,11 +298,9 @@ void CManageAccountDlg::Update_Recorder()
 	CString strOldUser;
 	strOldUser=m_AccountLst.at(m_nCurRow-1).strName;
 	strSql.Format(_T("update users set user_name_login='%s',password_login='%s' where user_name_login='%s'"),m_strUserName,m_strPassword,strOldUser);
-	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);	
-	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+	 SqliteDBT3000.execDML((UTF8MBSTR)strSql);
 
-	if(m_pRs->State) 
-		m_pRs->Close(); 
+	 
 	}
 	catch(_com_error *e)
 	{
@@ -386,7 +366,7 @@ void CManageAccountDlg::OnBnClickedDelbutton()
 		return;
 	}
 	CString strSql;
-	strSql.Format(_T("delete * from users where user_name_login='%s'"),m_strUserName);
+	strSql.Format(_T("delete   from users where user_name_login='%s'"),m_strUserName);
 
 	
 	CString strTemp;
@@ -396,8 +376,8 @@ void CManageAccountDlg::OnBnClickedDelbutton()
 		try
 		{
 
-
-			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+		    SqliteDBT3000.execDML((UTF8MBSTR)strSql);
+			 
 		}
 		catch(_com_error *e)
 		{
@@ -420,7 +400,7 @@ void CManageAccountDlg::OnBnClickedButton1()
 
 	CString strSql;
 	strSql.Format(_T("insert into users values('%s','%s')"),strUserName,strPassword);		
-	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+	SqliteDBT3000.execDML((UTF8MBSTR)strSql);
 	}
 	catch(_com_error *e)
 	{
@@ -431,9 +411,7 @@ void CManageAccountDlg::OnBnClickedButton1()
 
 void CManageAccountDlg::OnBnClickedUseprivilegecheck()
 {
-	_ConnectionPtr m_pConTmp;
-	m_pConTmp.CreateInstance("ADODB.Connection");
-	m_pConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+	 
 	CString strSql;
 
 	if(m_usePrivilegeCheck.GetCheck()==BST_UNCHECKED)
@@ -450,13 +428,13 @@ void CManageAccountDlg::OnBnClickedUseprivilegecheck()
 	try
 	{
 
-	m_pConTmp->Execute(strSql.GetString(),NULL,adCmdText);
-	if(m_pConTmp->State) 
-		m_pConTmp->Close(); 
-}
-catch(_com_error *e)
-{
-	AfxMessageBox(e->ErrorMessage());
+		 
+		SqliteDBT3000.execDML((UTF8MBSTR)strSql);
+	 
+	}
+	catch(_com_error *e)
+	{
+		AfxMessageBox(e->ErrorMessage());
 
-}
+	}
 }

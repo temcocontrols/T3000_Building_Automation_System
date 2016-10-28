@@ -69,7 +69,7 @@ extern  CString g_achive_folder_temp_db;
 extern  CString g_achive_device_name_path;
 extern  CString g_strImgeFolder;
 extern  CString g_strBuildingFolder;
-extern  CString g_strOrigDatabaseFilePath;
+ 
 extern  CString g_achive_monitor_datatbase_path ;
 
 extern BOOL g_mstp_flag;
@@ -1122,8 +1122,7 @@ extern SOCKET h_Broad;
 extern SOCKADDR_IN h_siBind;
 extern SOCKADDR_IN h_bcast;
 
-extern _RecordsetPtr m_global_pRs;
-extern _ConnectionPtr m_global_pCon;
+ 
 extern Point_Data_str digital_last_data[MAX_POINTS_IN_MONITOR];
 extern Data_Time_Match * digital_data_point[MAX_POINTS_IN_MONITOR];
 extern Data_Time_Match * analog_data_point[MAX_POINTS_IN_MONITOR];

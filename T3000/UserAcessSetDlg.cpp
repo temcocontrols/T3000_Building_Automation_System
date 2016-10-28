@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "MainFrm.h"
 #include "UserAcessSetDlg.h"
-
+#include "../SQLiteDriver/CppSQLite3.h"
 
 // CUserAcessSetDlg dialog
 
@@ -103,118 +103,84 @@ void CUserAcessSetDlg::SetConfigUserName(CString strUserName)
 }
 void CUserAcessSetDlg::InserProductToUserSetDB()
 {
-	_ConnectionPtr m_pConTmp;
- 	_RecordsetPtr m_pRsTemp;
-	m_pConTmp.CreateInstance("ADODB.Connection");
-	m_pRsTemp.CreateInstance("ADODB.Recordset");
-	
-	m_pConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+	CppSQLite3Table table;
+	CppSQLite3Query q;
 
-//	m_pRsTemp->Open((_variant_t)(_T("select * from user_level where username = '"+m_strUserName+"'")),_variant_t((IDispatch *)m_pConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);	
+	CppSQLite3DB SqliteDBBuilding;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
 	CString strSql;
 	strSql.Format(_T("select * from user_level where MainBuilding_Name='%s' and Building_Name='%s'and username='%s'"),m_strMainBuilding,m_strSubNetName,m_strUserName);	
-	//m_pRsTemp->Open((_variant_t)(strSql),adOpenStatic,adLockOptimistic,adCmdText);	
-	m_pRsTemp->Open((_variant_t)(strSql),_variant_t((IDispatch *)m_pConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);	
-	USERLEVEL UserLevelV;
+	 q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+	 USERLEVEL UserLevelV;
 	_variant_t temp_variant;
 	CString strTemp;
 	int nTemp;
 	m_UserLevelLst.clear();
-	while(VARIANT_FALSE==m_pRsTemp->EndOfFile)
+	while(!q.eof())
 	{
 		
-		temp_variant=m_pRsTemp->GetCollect("username");//
-		if(temp_variant.vt!=VT_NULL)
-			strTemp=temp_variant;
-		else
-			strTemp=_T("");
+		strTemp=q.getValuebyName(L"username");//
+		 
 		UserLevelV.strUserName=strTemp;
 		
-		temp_variant=m_pRsTemp->GetCollect("serial_number");//
-		if(temp_variant.vt!=VT_NULL)
-			nTemp=temp_variant;
-		else
-			nTemp=0;
+		nTemp=q.getIntField("serial_number");//
+		
 		UserLevelV.nSerialNumber=nTemp;
 
 		m_UserLevelLst.push_back(UserLevelV);
-		m_pRsTemp->MoveNext();
+		q.nextRow();
 	}
 
-	/*m_pCon.CreateInstance("ADODB.Connection");
-	m_pRs.CreateInstance("ADODB.Recordset");
-	m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);*/
-	CBADO bado;
-	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-	bado.OnInitADOConn(); 
+	 
+
+
 
 	VERYPRODCT veryProduct;
 	//strSql=_T("select * from ALL_NODE where ");///MainBuilding_Name
 	strSql.Format(_T("select * from ALL_NODE where MainBuilding_Name='%s' and Building_Name='%s'"),m_strMainBuilding,m_strSubNetName);
 
 //	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);	
-	 bado.m_pRecordset=bado.OpenRecordset(strSql);
+	q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
 	m_VeryProdctLst.clear();
-	while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+	while(!q.eof())
 	{
 		//veryProduct.strMainBuildingName=m_pRs->GetCollect("MainBuilding_Name");//
-		temp_variant=bado.m_pRecordset->GetCollect("MainBuilding_Name");//
-		if(temp_variant.vt!=VT_NULL)
-			strTemp=temp_variant;
-		else
-			strTemp=_T("");
+		strTemp=q.getValuebyName(L"MainBuilding_Name");//
+	 
 		veryProduct.strMainBuildingName=strTemp;
 		
 		//veryProduct.strBuildingName=m_pRs->GetCollect("Building_Name");//
-		temp_variant=bado.m_pRecordset->GetCollect("Building_Name");//
-		if(temp_variant.vt!=VT_NULL)
-			strTemp=temp_variant;
-		else
-			strTemp=_T("");
+		strTemp=q.getValuebyName(L"Building_Name");//
+		 
 		veryProduct.strBuildingName=strTemp;
 
 	//	veryProduct.nSerialNumber=m_pRs->GetCollect("Serial_ID");
-		temp_variant=bado.m_pRecordset->GetCollect("Serial_ID");//
-		if(temp_variant.vt!=VT_NULL)
-			strTemp=temp_variant;
-		else
-			strTemp=_T("");
+		strTemp=q.getValuebyName(L"Serial_ID");//
+	 
 		veryProduct.nSerialNumber=_wtol(strTemp);
 
 		//veryProduct.ProductID=m_pRs->GetCollect("Product_ID");
-		temp_variant=bado.m_pRecordset->GetCollect("Product_ID");//
-		if(temp_variant.vt!=VT_NULL)
-			strTemp=temp_variant;
-		else
-			strTemp=_T("");
+		strTemp=q.getValuebyName(L"Product_ID");//
+		 
 		veryProduct.ProductID=_wtoi(strTemp);
 
 		//veryProduct.product_class_id=m_pRs->GetCollect("Product_class_ID");
-		temp_variant=bado.m_pRecordset->GetCollect("Product_class_ID");//
-		if(temp_variant.vt!=VT_NULL)
-			strTemp=temp_variant;
-		else
-			strTemp=_T("");
+		strTemp=q.getValuebyName(L"Product_class_ID");//
+		 
 		veryProduct.product_class_id=_wtoi(strTemp);
 
 		//veryProduct.strFloorName=m_pRs->GetCollect("Floor_name");
-		temp_variant=bado.m_pRecordset->GetCollect("Floor_name");//
-		if(temp_variant.vt!=VT_NULL)
-			strTemp=temp_variant;
-		else
-			strTemp=_T("");
+		strTemp=q.getValuebyName(L"Floor_name");//
+		 
 		veryProduct.strFloorName=strTemp;
 
 	//	veryProduct.strRoomName=m_pRs->GetCollect("Room_name");
-		temp_variant=bado.m_pRecordset->GetCollect("Room_name");//
-		if(temp_variant.vt!=VT_NULL)
-			strTemp=temp_variant;
-		else
-			strTemp=_T("");
+		strTemp=q.getValuebyName(L"Room_name");//
+		 
 		veryProduct.strRoomName=strTemp;
 		m_VeryProdctLst.push_back(veryProduct);
-		bado.m_pRecordset->MoveNext();
+		q.nextRow();
 	}
 	int nVerySerialNum;
 	int nUserlevelSerial;
@@ -264,7 +230,7 @@ void CUserAcessSetDlg::InserProductToUserSetDB()
 			0,
 			0
 			);				
-			m_pConTmp->Execute(strSql.GetString(),NULL,adCmdText);
+			SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 			}
 			catch(_com_error *e)
 			{
@@ -275,15 +241,8 @@ void CUserAcessSetDlg::InserProductToUserSetDB()
 	
 		
 	}
-	if(m_pRs->State) 
-	m_pRs->Close(); 
-	if(m_pCon->State)
-	m_pCon->Close(); 
-
-	if(m_pRsTemp->State) 
-	m_pRsTemp->Close(); 
-	if(m_pConTmp->State)
-	m_pConTmp->Close(); 
+	
+	SqliteDBBuilding.closedb();
 
 }
 void CUserAcessSetDlg::OnCbnSelchangeCombo1()
@@ -350,28 +309,28 @@ void CUserAcessSetDlg::ReloadUserLevelDB()
 	}
 
 
-	_ConnectionPtr m_pConTmp;
-	_RecordsetPtr m_pRsTemp;
-	m_pConTmp.CreateInstance("ADODB.Connection");
-	m_pRsTemp.CreateInstance("ADODB.Recordset");
+	CppSQLite3Table table;
+	CppSQLite3Query q;
 
-	m_pConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+	CppSQLite3DB SqliteDBBuilding;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+	 
 	CString strSql;
 
 	//m_pRsTemp->Open((_variant_t)("select * from user_level where username = '"+m_strUserName+"'"),_variant_t((IDispatch *)m_pConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);	
 	//	strSql.Format(_T("select * from user_level where MainBuilding_Name='%s' and Building_Name='%s'"),m_strMainBuilding,m_strSubNetName);
 	strSql.Format(_T("select * from user_level where MainBuilding_Name='%s' and Building_Name='%s' and username='%s'"),m_strMainBuilding,m_strSubNetName,m_strUserName);
-
-	m_pRsTemp->Open((_variant_t)(strSql),_variant_t((IDispatch *)m_pConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);	
-	USERLEVEL UserLevelV;
+	q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+	table = SqliteDBBuilding.getTable((UTF8MBSTR)strSql);
+	 USERLEVEL UserLevelV;
 	int temp_row=0;
 	int nTemp;
 	CString strTemp;
 	_variant_t temp_variant;
 
-	m_FlexGrid.put_Rows(m_pRsTemp->RecordCount+1);
+	m_FlexGrid.put_Rows(table.numRows()+1);
 
-	for(int i=1;i<m_pRsTemp->RecordCount+1;i++)
+	for(int i=1;i<table.numRows()+1;i++)
 	{	
 		for(int k=0;k<=12;k++)
 		{
@@ -382,114 +341,65 @@ void CUserAcessSetDlg::ReloadUserLevelDB()
 		}
 	}
 
-	while(VARIANT_FALSE==m_pRsTemp->EndOfFile)
+	while(!q.eof())
 	{
 		++temp_row;
-		temp_variant=m_pRsTemp->GetCollect("MainBuilding_Name");//
-		if(temp_variant.vt!=VT_NULL)
-			strTemp=temp_variant;
-		else
-			strTemp=_T("");
+		 
+			strTemp=q.getValuebyName(L"MainBuilding_Name");
 		UserLevelV.strMainBuildingName=strTemp;
 
-		temp_variant=m_pRsTemp->GetCollect("Building_Name");//
-		if(temp_variant.vt!=VT_NULL)
-			strTemp=temp_variant;
-		else
-			strTemp=_T("");
+		 
+			strTemp=q.getValuebyName(L"Building_Name");
 		UserLevelV.strSubBuildingName=strTemp;
 
-		temp_variant=m_pRsTemp->GetCollect("username");//
-		if(temp_variant.vt!=VT_NULL)
-			strTemp=temp_variant;
-		else
-			strTemp=_T("");
+		 
+			strTemp=q.getValuebyName(L"username");
 		UserLevelV.strUserName=strTemp;
 
-		temp_variant=m_pRsTemp->GetCollect("serial_number");//
-		if(temp_variant.vt!=VT_NULL)
-			nTemp=temp_variant;
-		else
-			nTemp=0;
+		 
+			nTemp=q.getIntField("serial_number");
 		UserLevelV.nSerialNumber=nTemp;
 
-		temp_variant=m_pRsTemp->GetCollect("product_id");//
-		if(temp_variant.vt!=VT_NULL)
-			nTemp=temp_variant;
-		else
-			nTemp=0;
+		 
+			nTemp=q.getIntField("product_id");
 		UserLevelV.ProductID=nTemp;
 
-		temp_variant=m_pRsTemp->GetCollect("floorname");//
-		if(temp_variant.vt!=VT_NULL)
-			strTemp=temp_variant;
-		else
-			strTemp=_T("");
+	 
+			strTemp=q.getValuebyName(L"floorname");
 		UserLevelV.strFloorName=strTemp;
 
-		temp_variant=m_pRsTemp->GetCollect("roomname");//
-		if(temp_variant.vt!=VT_NULL)
-			strTemp=temp_variant;
-		else
-			strTemp=_T("");
+	 
+			strTemp=q.getValuebyName(L"roomname");
 		UserLevelV.strRoomName=strTemp;
 
-		temp_variant=m_pRsTemp->GetCollect("mainscreen_level");//
-		if(temp_variant.vt!=VT_NULL)
-			nTemp=temp_variant;
-		else
-			nTemp=0;
+		 
+		nTemp=q.getIntField("mainscreen_level");
 		UserLevelV.MainLevel=nTemp;
 
-		temp_variant=m_pRsTemp->GetCollect("parameter_level");//
-		if(temp_variant.vt!=VT_NULL)
-			strTemp=temp_variant;
-		else
-			nTemp=0;
+		 
+			nTemp=q.getIntField("parameter_level");
 		UserLevelV.ParamerLevel=nTemp;
 
-		temp_variant=m_pRsTemp->GetCollect("outputtable_level");//
-		if(temp_variant.vt!=VT_NULL)
-			nTemp=temp_variant;
-		else
-			nTemp=0;
+		 
+			nTemp=q.getIntField("outputtable_level");
 		UserLevelV.Outputtable_level=nTemp;
 
-		temp_variant=m_pRsTemp->GetCollect("graphic_level");//
-		if(temp_variant.vt!=VT_NULL)
-			nTemp=temp_variant;
-		else
-			nTemp=0;
+	 
+			nTemp=q.getIntField("graphic_level");
 		UserLevelV.Graphic_level=nTemp;
 
-		temp_variant=m_pRsTemp->GetCollect("burnhex_level");//
-		if(temp_variant.vt!=VT_NULL)
-			nTemp=temp_variant;
-		else
-			nTemp=0;
+	 
+			nTemp=q.getIntField("burnhex_level");
 		UserLevelV.Burnhex_level=nTemp;
 
-		temp_variant=m_pRsTemp->GetCollect("loadconfig_level");//
-		if(temp_variant.vt!=VT_NULL)
-			nTemp=temp_variant;
-		else
-			nTemp=0;
+		 
+		nTemp=q.getIntField("loadconfig_level");
 		UserLevelV.Loadconfig_level=nTemp;
 
-		/*
-		temp_variant=m_pRsTemp->GetCollect("building_level");//
-		if(temp_variant.vt!=VT_NULL)
-			nTemp=temp_variant;
-		else
-			nTemp=0;
-		UserLevelV.Buildingset_level=nTemp;
-		*/
+		 
 
-		temp_variant=m_pRsTemp->GetCollect("allscreen_level");//
-		if(temp_variant.vt!=VT_NULL)
-			nTemp=temp_variant;
-		else
-			nTemp=0;
+		 
+			nTemp=q.getIntField("allscreen_level");
 		UserLevelV.Allscreen_level=nTemp;
 
 		
@@ -520,7 +430,7 @@ void CUserAcessSetDlg::ReloadUserLevelDB()
 		}
 		
 
-		m_pRsTemp->MoveNext();
+		q.nextRow();
 
 
 		m_FlexGrid.put_TextMatrix(temp_row,1,UserLevelV.strUserName);
@@ -562,15 +472,7 @@ void CUserAcessSetDlg::ReloadUserLevelDB()
 		}
 		m_FlexGrid.put_TextMatrix(temp_row,9,strTemp);
 
-		/*
-		switch (UserLevelV.Buildingset_level)
-		{
-			case 0:strTemp=_T("Enable");break;
-			case 1:strTemp=_T("Unenable");break;
-			default:strTemp=_T("Enable");
-		}
-		m_FlexGrid.put_TextMatrix(temp_row,10,strTemp);
-		*/
+		 
 
 
 
@@ -599,11 +501,10 @@ void CUserAcessSetDlg::ReloadUserLevelDB()
 	}
 
 
-	if(m_pRsTemp->State) 
-		m_pRsTemp->Close(); 
-	if(m_pConTmp->State)
-		m_pConTmp->Close(); 
-}BEGIN_EVENTSINK_MAP(CUserAcessSetDlg, CDialog)
+	SqliteDBBuilding.closedb();
+}
+
+BEGIN_EVENTSINK_MAP(CUserAcessSetDlg, CDialog)
 ON_EVENT(CUserAcessSetDlg, IDC_ADDBUILDING_MSFLEXGRID, DISPID_CLICK, CUserAcessSetDlg::ClickAddbuildingMsflexgrid, VTS_NONE)
 ON_EVENT(CUserAcessSetDlg, IDC_ADDBUILDING_MSFLEXGRID2, DISPID_CLICK, CUserAcessSetDlg::ClickAddbuildingMsflexgrid2, VTS_NONE)
 END_EVENTSINK_MAP()
@@ -712,18 +613,15 @@ void CUserAcessSetDlg::OnCbnSelchangeLevelsetcombo()
 			try
 			{
 
-			_ConnectionPtr m_pConTmp;
-			_RecordsetPtr m_pRsTemp;
-			m_pConTmp.CreateInstance("ADODB.Connection");
-			m_pRsTemp.CreateInstance("ADODB.Recordset");
-			m_pConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+				CppSQLite3DB SqliteDBBuilding;
+				SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 			CString strSql;
 
 			strSql.Format(_T("update user_level set "+strField+" = %i where serial_number = %i and username ='%s' and MainBuilding_Name='%s' and Building_Name='%s'"),nNewValue,nSerial,m_strUserName,m_strMainBuilding,m_strSubNetName);
-			m_pConTmp->Execute(strSql.GetString(),NULL,adCmdText);
+			 SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 
-			if(m_pConTmp->State)
-				m_pConTmp->Close();
+		     SqliteDBBuilding.closedb();
 			}
 			catch(_com_error *e)
 			{
@@ -768,33 +666,7 @@ void CUserAcessSetDlg::OnCbnKillfocusLevelsetcombo()
 }
 
 
-/*
-
-void CUserAcessSetDlg::OnCbnSelchangeNcprivilegcombo()
-{
-	_ConnectionPtr m_pConTmp;
-	m_pConTmp.CreateInstance("ADODB.Connection");
-	m_pConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-	CString strSql;
-	int nSel=0;
-	nSel=m_ncPrivilegeCombx.GetCurSel();
-
-	if(nSel==1)
-	{
-		 strSql.Format(_T("update NcEnable set NC_ENABLE = 0"));
-	
-	}
-	else
-	{
-		 strSql.Format(_T("update NcEnable set NC_ENABLE = -1"));
-	
-	}
-	m_pConTmp->Execute(strSql.GetString(),NULL,adCmdText);
-	if(m_pConTmp->State) 
-		m_pConTmp->Close(); 
-}
-
-*/
+ 
 void CUserAcessSetDlg::OnBnClickedCancel()
 {
 	// TODO: Add your control notification handler code here
@@ -849,30 +721,28 @@ void CUserAcessSetDlg::ClickAddbuildingMsflexgrid2()
 void CUserAcessSetDlg::InserSingleSetConfig()
 {
 
-	_ConnectionPtr m_pConTmp;
-	_RecordsetPtr m_pRsTemp;
-	m_pConTmp.CreateInstance("ADODB.Connection");
-	m_pRsTemp.CreateInstance("ADODB.Recordset");
+	CppSQLite3Table table;
+	CppSQLite3Query q;
 
-	m_pConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+	CppSQLite3DB SqliteDBBuilding;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 	CString strSql;
 	strSql.Format(_T("select * from UserLevelSingleSet where MainBuilding_Name='%s' and Building_Name='%s' and username='%s'"),m_strMainBuilding,m_strSubNetName,m_strUserName);
-	m_pRsTemp->Open((_variant_t)(strSql),_variant_t((IDispatch *)m_pConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);	
+	q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
 	_variant_t temp_variant;
 	BOOL b_useLogin=false;
 
 	try
 	{
 
-	if(m_pRsTemp->GetRecordCount()<=0)
-	{
-		strSql.Format(_T("insert into UserLevelSingleSet values('%s','%s','%s',%i,%i)"),m_strMainBuilding,m_strSubNetName,m_strUserName,0,0);		
-		m_pConTmp->Execute(strSql.GetString(),NULL,adCmdText);
-	}
-	if(m_pConTmp->State) 
-		m_pConTmp->Close(); 
-	if(m_pRsTemp->State) 
-		m_pRsTemp->Close(); 
+		if(q.eof())
+		{
+			strSql.Format(_T("insert into UserLevelSingleSet values('%s','%s','%s',%i,%i)"),m_strMainBuilding,m_strSubNetName,m_strUserName,0,0);		
+			SqliteDBBuilding.execDML((UTF8MBSTR)strSql); 
+		}
+
+		SqliteDBBuilding.closedb();
 	}
 	catch(_com_error *e)
 	{
@@ -900,37 +770,32 @@ void CUserAcessSetDlg::ReloadSingleLevelSetDB()
 		m_FlexGrid2.put_ColAlignment(i,4);
 	}
 
-	_ConnectionPtr m_pConTmp;
-	_RecordsetPtr m_pRsTemp;
-	m_pConTmp.CreateInstance("ADODB.Connection");
-	m_pRsTemp.CreateInstance("ADODB.Recordset");
+	CppSQLite3Table table;
+	CppSQLite3Query q;
 
-	m_pConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+	CppSQLite3DB SqliteDBBuilding;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 	CString strSql;
 	strSql.Format(_T("select * from UserLevelSingleSet where MainBuilding_Name='%s' and Building_Name='%s' and username='%s'"),m_strMainBuilding,m_strSubNetName,m_strUserName);
-	m_pRsTemp->Open((_variant_t)(strSql),_variant_t((IDispatch *)m_pConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);	
+	q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+
 	_variant_t temp_variant;
 	BOOL b_useLogin=false;
 	int temp_row=0;
 	CString strTemp;
 	int nTemp;
-	while(VARIANT_FALSE==m_pRsTemp->EndOfFile)
+	while(!q.eof())
 	{
 
 		++temp_row;
 		
-		temp_variant=m_pRsTemp->GetCollect("username");//
-		if(temp_variant.vt!=VT_NULL)
-			strTemp=temp_variant;
-		else
-			strTemp=_T("");
+		 
+			strTemp=q.getValuebyName(L"username");
 		m_FlexGrid2.put_TextMatrix(temp_row,1,strTemp);
 
-		temp_variant=m_pRsTemp->GetCollect("networkcontroller");//
-		if(temp_variant.vt!=VT_NULL)
-			nTemp=temp_variant;
-		else
-			nTemp=0;
+		 
+			nTemp=q.getIntField("networkcontroller");
 		switch (nTemp)
 		{
 			case 0:strTemp=_T("Read & write");break;
@@ -939,11 +804,8 @@ void CUserAcessSetDlg::ReloadSingleLevelSetDB()
 		}
 		m_FlexGrid2.put_TextMatrix(temp_row,2,strTemp);
 
-		temp_variant=m_pRsTemp->GetCollect("database_limition");//
-		if(temp_variant.vt!=VT_NULL)
-			nTemp=temp_variant;
-		else
-			nTemp=0;
+		nTemp=q.getIntField("database_limition");//
+	 
 		switch (nTemp)
 		{
 			case 0:strTemp=_T("Read & write");break;
@@ -952,12 +814,9 @@ void CUserAcessSetDlg::ReloadSingleLevelSetDB()
 		}
 		m_FlexGrid2.put_TextMatrix(temp_row,3,strTemp);
 
-		m_pRsTemp->MoveNext();
+		q.nextRow();
 	}
-	if(m_pConTmp->State) 
-		m_pConTmp->Close(); 
-	if(m_pRsTemp->State) 
-		m_pRsTemp->Close(); 
+	SqliteDBBuilding.closedb();
 }
 void CUserAcessSetDlg::OnCbnSelchangeSinglesetcombo()
 {
@@ -992,18 +851,15 @@ void CUserAcessSetDlg::OnCbnSelchangeSinglesetcombo()
 			{
 
 	
-			_ConnectionPtr m_pConTmp;
-			_RecordsetPtr m_pRsTemp;
-			m_pConTmp.CreateInstance("ADODB.Connection");
-			m_pRsTemp.CreateInstance("ADODB.Recordset");
-			m_pConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+				CppSQLite3DB SqliteDBBuilding;
+				SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 			CString strSql;
 
 			strSql.Format(_T("update UserLevelSingleSet set "+strField+" = %i where username ='%s' and MainBuilding_Name='%s' and Building_Name='%s'"),nNewValue,m_strUserName,m_strMainBuilding,m_strSubNetName);
-			m_pConTmp->Execute(strSql.GetString(),NULL,adCmdText);
-
-			if(m_pConTmp->State)
-				m_pConTmp->Close(); 
+			 
+              SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+			SqliteDBBuilding.closedb();
 			}
 			catch(_com_error *e)
 			{

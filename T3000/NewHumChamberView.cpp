@@ -13,7 +13,7 @@
 #include "WriteSingleRegDlg.h"
 #include "DllFunction.h"
 #include "excel9.h"
-
+#include "../SQLiteDriver/CppSQLite3.h"
 int use_minipanel_controller = 0; //是否用Minipanel 来控制  校准的箱子;  //1:enable         2: disable
  
 CString HUM_Minipanel_IP;
@@ -1041,31 +1041,27 @@ void CNewHumChamberView::Initial_RegisterList(){
 	MODBUS_REGISTER_END	=	1012	;
 #endif
 	T3Register temp;
-	CADO m_ado;
-	m_ado.OnInitADOConn();
+	CppSQLite3DB SqliteDBT3000;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 #if 1
-	if (!m_ado.IsHaveTable(m_ado,_T("HumChamber_Reglist")))
+	if (!SqliteDBT3000.tableExists("HumChamber_Reglist"))
 	{
 		return;
 	}
 	CString SQL = _T("select * from HumChamber_Reglist");
-	m_ado.m_pRecordset = m_ado.OpenRecordset(SQL);
+	q = SqliteDBT3000.execQuery((UTF8MBSTR)SQL);
+	 
 	_variant_t vartemp;
-	while(!m_ado.m_pRecordset->EndOfFile)
+	while(!q.eof())
 	{
-		temp.regID=m_ado.m_pRecordset->GetCollect(_T("RegID"));
-		vartemp =m_ado.m_pRecordset->GetCollect(_T("RegName"));
-		if (vartemp.vt==VT_NULL)
-			temp.regName=_T("");
-		else
-			{temp.regName =vartemp;
-			temp.regName.TrimLeft();
-			temp.regName.TrimRight();}
-		m_ado.m_pRecordset->MoveNext();
+		temp.regID=q.getIntField("RegID"); 
+		temp.regName = q.getValuebyName(L"RegName");
+		q.nextRow();
 		m_vecT3Register.push_back(temp);
 	}
-	m_ado.CloseRecordset();
-	m_ado.CloseConn();
+	SqliteDBT3000.closedb();
 #endif 
 #if 1
 	MODBUS_SERIALNUMBER_LOWORD	=	Get_RegID(_T("	MODBUS_SERIALNUMBER_LOWORD	"))	;

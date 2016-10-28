@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "PressureSensorForm.h"
-#include "ado/ADO.h"
+ #include "../SQLiteDriver/CppSQLite3.h"
 #include "globle_function.h"
 #include "OutPutDlg.h"
 #include "MainFrm.h"
@@ -814,24 +814,21 @@ void CPressureSensorForm::Initial_RegisterList(){
  
 #if 1
 	T3Register temp;
-	CADO m_ado;
-	m_ado.OnInitADOConn();
+	CppSQLite3DB SqliteDBT3000;
+	CppSQLite3Query q;
+	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 	CString SQL = _T("select * from PS_Registerlist");
-	m_ado.m_pRecordset = m_ado.OpenRecordset(SQL);
+	q = SqliteDBT3000.execQuery((UTF8MBSTR)SQL);
 	_variant_t vartemp;
-	while(!m_ado.m_pRecordset->EndOfFile)
+	while(!q.eof())
 	{
-		temp.regID=m_ado.m_pRecordset->GetCollect(_T("RegID"));
-		vartemp =m_ado.m_pRecordset->GetCollect(_T("Reg_Name"));
-		if (vartemp.vt==VT_NULL)
-			temp.regName=_T("");
-		else
-			temp.regName =vartemp;
-		m_ado.m_pRecordset->MoveNext();
+		temp.regID=q.getIntField("RegID");
+		temp.regName =q.getValuebyName(_T("Reg_Name"));
+		 
+		q.nextRow();
 		m_vecT3Register.push_back(temp);
 	}
-	m_ado.CloseRecordset();
-	m_ado.CloseConn();
+	SqliteDBT3000.closedb();
 #endif 
  
 #if 1

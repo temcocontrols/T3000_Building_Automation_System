@@ -2574,18 +2574,18 @@ BEGIN
     EDITTEXT        IDC_EDIT_CITY,68,65,124,14,ES_AUTOHSCROLL
     LTEXT           "Street:",IDC_STATIC,39,90,24,8
     EDITTEXT        IDC_EDIT_STREET1,68,87,124,14,ES_AUTOHSCROLL
-    LTEXT           "Zip:",IDC_STATIC,50,108,13,8
-    EDITTEXT        IDC_EDIT_ZIP,68,106,124,14,ES_AUTOHSCROLL
-    LTEXT           "Latitude:",IDC_STATIC,33,131,30,8
-    EDITTEXT        IDC_EDIT_LAT,66,129,126,14,ES_AUTOHSCROLL | ES_READONLY
-    LTEXT           "Longitude:",IDC_STATIC,28,153,35,8
-    EDITTEXT        IDC_EDIT_LON,66,150,126,14,ES_AUTOHSCROLL | ES_READONLY
-    LTEXT           "Elevation:",IDC_STATIC,29,172,33,8
-    EDITTEXT        IDC_EDIT_ELE,66,170,126,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Zip:",IDC_STATIC,50,108,13,8,NOT WS_VISIBLE
+    EDITTEXT        IDC_EDIT_ZIP,68,106,124,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "Latitude:",IDC_STATIC,33,109,30,8
+    EDITTEXT        IDC_EDIT_LAT,66,107,126,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Longitude:",IDC_STATIC,28,131,35,8
+    EDITTEXT        IDC_EDIT_LON,66,128,126,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Elevation:",IDC_STATIC,29,150,33,8
+    EDITTEXT        IDC_EDIT_ELE,66,148,126,14,ES_AUTOHSCROLL | ES_READONLY
     LTEXT           "*",IDC_STATIC,197,11,8,8
     EDITTEXT        IDC_EDIT_BUILDINGNAME,66,9,126,14,ES_AUTOHSCROLL | ES_READONLY
-    LTEXT           "Engineering Units:",IDC_STATIC,7,192,59,8
-    EDITTEXT        IDC_EDIT_EUNITS,67,190,124,14,ES_AUTOHSCROLL
+    LTEXT           "Engineering Units:",IDC_STATIC,7,170,59,8
+    EDITTEXT        IDC_EDIT_EUNITS,67,168,124,14,ES_AUTOHSCROLL
 END
 
 IDD_DIALOG_OPTION DIALOGEX 0, 0, 189, 58
@@ -4656,31 +4656,24 @@ IDR_MONITOR_DB1         MONITOR_DB              "res\\MonitorData.mdb"
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// BUILDING_DB
-//
-
-IDR_BUILDING_DB2        BUILDING_DB             "res\\Building.mdb"
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// T3000_NEW_DB
-//
-
-IDR_T3000_NEW_DB1       T3000_NEW_DB            "res\\t3000.mdb"
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// SQLITE3DLL
-//
-
-IDR_SQLITE3DLL1         SQLITE3DLL              "res\\sqlite3.dll"
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // MFC16DLL
 //
 
 IDR_MFC16DLL1           MFC16DLL                "res\\MFC16API.dll"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// BUILDINGDB
+//
+
+IDR_BUILDINGDB1         BUILDINGDB              "res\\Building.db"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// T3000DB
+//
+
+IDR_T3000DB1            T3000DB                 "res\\T3000.db"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -5205,22 +5198,6 @@ BEGIN
     PUSHBUTTON      "Clear one Row",IDC_BUTTON1,131,356,50,14
 END
 
-IDD_BUILDING_MANAGE_DLG DIALOGEX 0, 0, 331, 205
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Building mannagement Dialog"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,178,184,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,137,16,50,14
-    PUSHBUTTON      "Delete",IDC_DELBUTTON,79,16,50,14
-    PUSHBUTTON      "Add",IDC_ADDBUTTON,22,16,50,14
-    PUSHBUTTON      "Next>>",IDC_NEXT,106,184,50,14
-    CONTROL         "Check1",IDC_DEFAULTBUILDING_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,24,167,210,12
-    CONTROL         "",IDC_MSFLEXGRID1,
-                    "{6262D3A0-531B-11CF-91F6-C2863C385E30}",WS_TABSTOP,14,37,310,111
-    EDITTEXT        IDC_EDIT1,241,20,49,14,ES_AUTOHSCROLL
-END
-
 IDD_ALLNODESDIALOG DIALOGEX 0, 0, 679, 344
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "All Nodes Dialog"
@@ -5742,22 +5719,6 @@ BEGIN
     COMBOBOX        IDC_COMBO1,75,13,89,30,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
 END
 
-IDD_INPORTDATADIALOG DIALOGEX 0, 0, 314, 127
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Import Database"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,161,106,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,230,106,50,14
-    EDITTEXT        IDC_EDIT1,86,20,171,14,ES_AUTOHSCROLL
-    LTEXT           "Database File Path:",IDC_STATIC,12,23,69,11
-    PUSHBUTTON      "Browse...",IDC_BROWSE_BUTTON,260,21,42,14
-    CONTROL         "Import data from database of T3000 version LOWER than ver2.5.0.0.",IDC_RADIO1,
-                    "Button",BS_AUTORADIOBUTTON,14,43,276,13
-    CONTROL         "Import data from database of T3000 version UPPER than ver2.5.0.0.",IDC_RADIO2,
-                    "Button",BS_AUTORADIOBUTTON,13,66,273,12
-END
-
 IDD_TRENDLOGFORMVIEW DIALOGEX 0, 0, 489, 280
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x0
@@ -6153,14 +6114,6 @@ BEGIN
         BOTTOMMARGIN, 370
     END
 
-    IDD_BUILDING_MANAGE_DLG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 324
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 198
-    END
-
     IDD_ALLNODESDIALOG, DIALOG
     BEGIN
         LEFTMARGIN, 7
@@ -6280,14 +6233,6 @@ BEGIN
         VERTGUIDE, 75
         TOPMARGIN, 7
         BOTTOMMARGIN, 271
-    END
-
-    IDD_INPORTDATADIALOG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 307
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 120
     END
 
     IDD_TRENDLOGFORMVIEW, DIALOG
@@ -6682,30 +6627,6 @@ BEGIN
 0x0000, 0x0100, 0x0400, 0x0000, 0x0000, 0x0000, 0x0300, 0xe352, 0x910b, 
 0xce8f, 0x9d11, 0x00e3, 0x00aa, 0xb84b, 0x0151, 0x0000, 0x9000, 0xf801, 
 0x0124, 0x0600, 0x6154, 0x6f68, 0x616d, 0x5204, 0x0be3, 0x8f91, 0x11ce, 
-0xe39d, 0xaa00, 0x4b00, 0x51b8, 0x746c, 0x0000, 0x0000, 0x0000, 
-    0
-END
-
-IDD_BUILDING_MANAGE_DLG DLGINIT
-BEGIN
-    IDC_MSFLEXGRID1, 0x37a, 322, 0
-0x0024, 0x0000, 0x0037, 0x0032, 0x0045, 0x0036, 0x0037, 0x0031, 0x0032, 
-0x0030, 0x002d, 0x0035, 0x0039, 0x0035, 0x0039, 0x002d, 0x0031, 0x0031, 
-0x0063, 0x0066, 0x002d, 0x0039, 0x0031, 0x0046, 0x0036, 0x002d, 0x0043, 
-0x0032, 0x0038, 0x0036, 0x0033, 0x0043, 0x0033, 0x0038, 0x0035, 0x0045, 
-0x0033, 0x0030, 0x0029, 0x0000, 0x0001, 0x0000, 0x0021, 0x0000, 0x004c, 
-0x0000, 0x0000, 0x0001, 0x8001, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 
-0x0002, 0x8001, 0x0001, 0x0000, 0x2100, 0x3443, 0x0812, 0x0000, 0xe600, 
-0x002c, 0x5b00, 0x0012, 0x4200, 0x6f6f, 0x0050, 0x0600, 0x8000, 0x0000, 
-0x0200, 0x0000, 0x0400, 0x0000, 0x0100, 0x0000, 0x0000, 0x0000, 0x0000, 
-0x0000, 0x0500, 0x0000, 0x0880, 0x0000, 0x0f80, 0x0000, 0x1280, 0x0000, 
-0x0d80, 0x0000, 0x0e80, 0x0000, 0x8080, 0x8080, 0xc000, 0xc0c0, 0x0000, 
-0x0000, 0x0000, 0x0000, 0x0100, 0x0000, 0x0100, 0x0000, 0x0000, 0x0000, 
-0xff00, 0xffff, 0x00ff, 0x0000, 0x0000, 0x0000, 0x0100, 0x0100, 0x0000, 
-0x0100, 0x0200, 0x0300, 0x0000, 0x0000, 0x0000, 0x0000, 0x0100, 0x0100, 
-0x0000, 0x0100, 0x0400, 0x0000, 0x0000, 0x0000, 0x0300, 0xe352, 0x910b, 
-0xce8f, 0x9d11, 0x00e3, 0x00aa, 0xb84b, 0x0151, 0x0000, 0x9000, 0xb001, 
-0x0130, 0x0600, 0x6154, 0x6f68, 0x616d, 0x5204, 0x0be3, 0x8f91, 0x11ce, 
 0xe39d, 0xaa00, 0x4b00, 0x51b8, 0x746c, 0x0000, 0x0000, 0x0000, 
     0
 END
@@ -7807,7 +7728,6 @@ BEGIN
     BEGIN
         MENUITEM "&Save As... \tCtrl+S",        ID_CONFIGFILE_SAVE_AS
         MENUITEM "&Load File\tCtrl+L",          ID_FILE_LOADCONFIGFILE
-        MENUITEM "&Import...\tCtrl+I",          ID_FILE_IMPORTDATAFROMDATABASEFILE
         MENUITEM "E&xit",                       ID_APP_EXIT
     END
     POPUP "&Tools"
@@ -8245,7 +8165,6 @@ END
 STRINGTABLE
 BEGIN
     ID_DISCONNECT2          "Disconnect COM Port"
-    ID_FILE_IMPORTDATAFROMDATABASEFILE "Import data from database"
 END
 
 STRINGTABLE

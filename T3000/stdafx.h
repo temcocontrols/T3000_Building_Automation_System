@@ -42,6 +42,7 @@
 #include <afxinet.h>    // MFC Internet support
 #include <afxmt.h>      // MFC multithreading support
 #include <bitset>
+
 //#define  test_ptp
 
 #ifndef _AFX_NO_OLE_SUPPORT
@@ -69,6 +70,7 @@ using namespace Gdiplus;
 
 #pragma  comment(lib,"HtmlHelp.lib")
 #pragma  comment(lib,"Iphlpapi.lib")
+//#pragma comment(lib,"sqlite.lib")
 
  
 #include "HtmlHelp.h"

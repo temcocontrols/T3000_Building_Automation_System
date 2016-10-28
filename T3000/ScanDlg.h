@@ -95,9 +95,7 @@ protected:
 	// 读出所有存在数据库中的设备节点。准备与搜索到的设备比较
 	int GetAllNodeFromDataBase();
 	void SetGridCellColor(int nRow, int nCol, COLORREF clr);
-
-	// 打开原来的端口
-	void OpenDefaultCom();
+ 
 
 	tree_product m_net_product_node;
 	BOOL m_IsScan;
@@ -164,8 +162,7 @@ protected:
 
 	CSize								m_szGridEditPos;
 
-	_RecordsetPtr m_pRs;
-	_ConnectionPtr m_pCon;
+ 
 	
 public:
 	afx_msg void OnClose();

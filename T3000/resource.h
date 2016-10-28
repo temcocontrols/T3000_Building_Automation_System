@@ -68,7 +68,6 @@
 #define IDD_WEEKLY_ROUTINES_INSERT_DIA  332
 #define IDD_ANNUAL_ROUTINES             334
 #define IDD_CONFIG_ROUTINES             338
-#define IDD_BUILDING_MANAGE_DLG         340
 #define IDD_ALLNODESDIALOG              342
 #define IDD_OUTPUTDIALOG                344
 #define IDR_BUILDINGPOPMENU             345
@@ -108,7 +107,6 @@
 #define IDR_IMGCONFIGMENU               396
 #define IDD_DIALOG3                     397
 #define IDD_DIA_Timer_Calibrate         397
-#define IDD_INPORTDATADIALOG            398
 #define IDD_LEDS_DIALOG                 402
 #define IDB_BITMAP2                     403
 #define IDD_DELAY                       405
@@ -221,7 +219,6 @@
 #define IDB_BITMAP_BUILDING_DEFAULT     548
 #define IDB_BITMAP6                     549
 #define IDR_BUILDING_CONFIG             549
-#define IDR_BUILDING_DB2                550
 #define IDD_DIALOG_TSTAT_RANGES         557
 #define IDD_DIALOG_MAIN_DEFAULT         558
 #define IDD_DIALOG_DEFAULT_MAIN_VIEW    560
@@ -257,10 +254,8 @@
 #define IDD_DIALOG_BOOTFINDER           597
 #define IDD_DIALOG_CONNECT_NEWFIRMWARE  598
 #define IDR_BUILDING_DB                 600
-#define IDR_T3000_NEW_DB1               601
 #define IDD_DIALOG_BUILDING_CONFIG      602
 #define IDD_DIALOG_OPTION               603
-#define IDR_SQLITE3DLL1                 604
 #define IDB_BITMAP_ALARM_BROWN          605
 #define IDB_BITMAP_ALARM_GREEN          606
 #define IDB_BITMAP8                     608
@@ -277,6 +272,8 @@
 #define IDI_ICON_DEFAULT_TRENDLOG       631
 #define IDI_ICON_DEFAULT_PID            632
 #define IDR_MFC16DLL1                   635
+#define IDR_BUILDINGDB1                 636
+#define IDR_T3000DB1                    637
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -643,12 +640,10 @@
 #define IDC_CHECK38                     1119
 #define IDC_CHECK_H6                    1119
 #define IDC_CHECK39                     1120
-#define IDC_NEXT                        1121
 #define IDC_CHECK40                     1121
 #define IDC_CHECK_C0                    1121
 #define IDC_CHECK41                     1122
 #define IDC_CHECK_C1                    1122
-#define IDC_DEFAULTBUILDING_CHECK       1123
 #define IDC_CHECK50                     1123
 #define IDC_CHECK_C2                    1123
 #define IDC_STATIC1                     1124
@@ -910,7 +905,6 @@
 #define IDC_OUTPUTNAMEEDIT              1242
 #define IDC_5EVALUEEDIT                 1244
 #define IDC_IMGCNFIGBUTTON              1246
-#define IDC_BROWSE_BUTTON               1247
 #define IDC_MONTHVIEW1                  1251
 #define IDC_SHOCKWAVEFLASH1             1252
 #define IDC_MONTHVIEW2                  1255
@@ -2355,7 +2349,6 @@
 #define ID_IDR_UNSELECT                 32826
 #define ID_IMGCONFIG_DELETE             32827
 #define ID_IMGCONFIG_AND                32828
-#define ID_FILE_IMPORTDATAFROMDATABASEFILE 32829
 #define ID_TOOL_CALIBRATE               32830
 #define ID_TOOL_GLOABALOVERRIDE         32831
 #define ID_BUILDINGSEL_DELETE           32832
@@ -2544,7 +2537,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        636
+#define _APS_NEXT_RESOURCE_VALUE        638
 #define _APS_NEXT_COMMAND_VALUE         34058
 #define _APS_NEXT_CONTROL_VALUE         2195
 #define _APS_NEXT_SYMED_VALUE           320

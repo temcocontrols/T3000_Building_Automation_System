@@ -8,6 +8,7 @@
 #include "MainFrm.h"
 #include "bip.h"
 #include "datalink.h"
+#include "../SQLiteDriver/CppSQLite3.h"
 void CALLBACK Listen(SOCKET s, int ServerPort, const char *ClientIP);
 extern void  init_info_table( void );
 extern void Init_table_bank();
@@ -173,9 +174,11 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char *ClientIP)
 	//Sleep(1);
 	//wsk1.Close();
 	//return;
-	CBADO bado;
-	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-	bado.OnInitADOConn(); 
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 	int client_object_instance = 0;
 	int nRet;
 	char buf[1000];
@@ -346,7 +349,7 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char *ClientIP)
 		str_hinstance.Format(_T("%u"),m_bac_scan_result_data.at(0).device_id);
 		str_panelnumber.Format(_T("%u"),m_bac_scan_result_data.at(0).panel_number);
 		strSql.Format(_T("update ALL_NODE set Protocol ='5' , Product_name ='%s',Hardware_Ver ='%s',Software_Ver ='%s' where Serial_ID = '%s'"),str_screen_name,str_hinstance,str_panelnumber,str_serialid);	//5对应的是GSM协议;
-		bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+		SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 
 		 
 
@@ -377,12 +380,12 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char *ClientIP)
         +pFrame->m_strCurMainBuildingName+"','"+pFrame->m_strCurSubBuldingName+"','"+str_serialid+"','floor1','room1','"
         +str_screen_name+"','"+product_class_id+"','"+strmodbusid+"','""','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','"
         +str_hinstance+"','"+str_panelnumber+"','"+str_n_port+"','0','5','0')"));
-		bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+		SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 
 		 
 		//
 	}
-	bado.CloseConn();
+    SqliteDBBuilding.closedb();
 	::PostMessage(MainFram_hwd,WM_MYMSG_REFRESHBUILDING,0,0);
 
 #pragma endregion Save_To_DB
@@ -398,31 +401,7 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char *ClientIP)
 		{
 			break;
 		}
-		//m_bac_scan_result_data.clear();
-		//for (int j=0;j<5;j++)
-		//{
-
-		//		int	resend_count = 0;
-		//		do 
-		//		{
-		//			resend_count ++;
-		//			if(resend_count>3)
-		//				break;
-		//			g_invoke_id = GetPrivateData(
-		//				client_object_instance,
-		//				GETSERIALNUMBERINFO,
-		//				0,
-		//				0,
-		//				sizeof(Str_Serial_info));		
-
-		//			Sleep(3000);
-		//		} while (g_invoke_id<0);
-
-		//}
-		//Sleep(1);
-		//if(m_bac_scan_result_data.size() == 0)
-		//{
-		//}
+		 
 
 	}
 

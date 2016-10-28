@@ -10,7 +10,7 @@
 #include "bip.h"
 #include "rs485.h" // For call Get_RS485_Handle() function
 #include "WhichOneToChooseDlg.h"
-//#include "global_variable.h"
+
 
 //AB means Add Building
 #define AB_MAINNAME	1
@@ -87,11 +87,9 @@ CTStatScanner::CTStatScanner(void)
     m_strFloorName = _T("");
     m_strRoomName = _T("");
 
-//
-// 	t_pCon.CreateInstance(_T("ADODB.Connection"));
-// 	t_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
-    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-    bado.OnInitADOConn();
+ 
+	m_SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
     m_nComPort = 1;
     m_scantype = 0;
     m_thesamesubnet=TRUE;
@@ -145,8 +143,7 @@ CTStatScanner::~CTStatScanner(void)
 // delete	m_eScanComOneByOneEnd;
 // 	}
 
-    //bado.CloseRecordset();
-    bado.CloseConn();
+   m_SqliteDBBuilding.closedb();
     //t_pCon->Close();
     Release();
 
@@ -1838,9 +1835,7 @@ void CTStatScanner::ResetRepeatedID()
 int CTStatScanner::GetAllNodeFromDataBase()
 {
 
-    CBADO bado;
-    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-    bado.OnInitADOConn();
+     
     try
     {
 
@@ -1851,16 +1846,16 @@ int CTStatScanner::GetAllNodeFromDataBase()
 
         CString temp_str=_T("select * from ALL_NODE");
         //m_pRs->Open(_variant_t(temp_str),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-        bado.m_pRecordset=bado.OpenRecordset(temp_str);
+        m_q = m_SqliteDBBuilding.execQuery((UTF8MBSTR)temp_str);
         //return m_pRs->get_RecordCount();
         /*   m_szComNodes.clear();
            m_szNetNodes.clear();*/
         int nTemp = 0;
-        while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+        while(!m_q.eof())
         {
             nTemp++;
             int nDefault=0;
-            CString strDevType = bado.m_pRecordset->GetCollect("Product_class_ID");
+            CString strDevType = m_q.getValuebyName(L"Product_class_ID");
 
             CTStatBase* pNode = NULL;
             //if (strDevType.CompareNoCase(_T("100")) == 0)	 //100 =  NC
@@ -1869,31 +1864,21 @@ int CTStatScanner::GetAllNodeFromDataBase()
                 pNode = new CTStat_Net;
                 // Port
                 CString strPort;
-                temp_variant = bado.m_pRecordset->GetCollect("Com_Port");
-                if(temp_variant.vt!=VT_NULL)
-                    strPort=temp_variant;
-                else
-                    strPort=_T("");
+                strPort=m_q.getValuebyName(L"Com_Port");
 
 
                 ((CTStat_Net*)(pNode))->SetIPPort(_wtoi(strPort));
 
                 CString str_product_id ;
-                temp_variant = bado.m_pRecordset->GetCollect("Product_class_ID");
-                if(temp_variant.vt!=VT_NULL)
-                    str_product_id=temp_variant;
-                else
-                    str_product_id=_T("");
+                
+                    str_product_id=m_q.getValuebyName(L"Product_class_ID");
 
                 if((_wtoi(str_product_id) == PM_MINIPANEL) ||(_wtoi(str_product_id) == PM_CM5))
                 {
                     CString strprotocol;
 
-                    temp_variant=bado.m_pRecordset->GetCollect("Protocol");
-                    if(temp_variant.vt!=VT_NULL)
-                        strprotocol=temp_variant;
-                    else
-                        strprotocol=_T("");
+                   
+                        strprotocol=m_q.getValuebyName(L"Protocol");
 
                     ((CTStat_Net*)(pNode))->SetProtocol(_wtoi(strprotocol));
                 }
@@ -1905,11 +1890,8 @@ int CTStatScanner::GetAllNodeFromDataBase()
 
                 // IP Addr
                 CString strIP ;
-                temp_variant = bado.m_pRecordset->GetCollect("Bautrate");
-                if(temp_variant.vt!=VT_NULL)
-                    strIP=temp_variant;
-                else
-                    strIP=_T("");
+              
+                    strIP=m_q.getValuebyName(L"Bautrate");
                 //char temp_char[50];
                 //memset(temp_char,0,255);
                 //WideCharToMultiByte( CP_ACP, 0, strIP.GetBuffer(), -1, temp_char, 50, NULL, NULL );
@@ -1927,66 +1909,48 @@ int CTStatScanner::GetAllNodeFromDataBase()
                 pNode = new CTStat_Dev;
                 // BaudRate
                 CString strBaudRate ;
-                temp_variant = bado.m_pRecordset->GetCollect("Bautrate");
-                if(temp_variant.vt!=VT_NULL)
-                    strBaudRate=temp_variant;
-                else
-                    strBaudRate=_T("");
+                
+                    strBaudRate=  m_q.getValuebyName(L"Bautrate");
 
                 ((CTStat_Dev*)(pNode))->SetBaudRate(_wtoi(strBaudRate));
 
                 m_szComNodes.push_back(((CTStat_Dev*)(pNode)));
 
                 CString strComPort ;
-                temp_variant = bado.m_pRecordset->GetCollect("Com_Port");
-                if(temp_variant.vt!=VT_NULL)
-                    strComPort=temp_variant;
-                else
-                    strComPort=_T("");
+               
+                    strComPort=m_q.getValuebyName(L"Com_Port");
                 strComPort = strComPort.Mid(3);
                 ((CTStat_Dev*)(pNode))->SetComPort(_wtoi(strComPort));
             }
             pNode->SetProductType(_wtoi(strDevType));
 
-            pNode->SetBuildingName(bado.m_pRecordset->GetCollect("MainBuilding_Name"));
-            pNode->SetFloorName(bado.m_pRecordset->GetCollect("Floor_Name"));
-            pNode->SetRoomName(bado.m_pRecordset->GetCollect("Room_Name"));
-            pNode->SetSubnetName(bado.m_pRecordset->GetCollect("Building_Name"));
+			pNode->SetBuildingName(m_q.getValuebyName(L"MainBuilding_Name"));
+			pNode->SetFloorName(m_q.getValuebyName(L"Floor_Name"));
+			pNode->SetRoomName(m_q.getValuebyName(L"Room_Name"));
+			pNode->SetSubnetName(m_q.getValuebyName(L"Building_Name"));
 
-            CString strID ;
-            temp_variant = bado.m_pRecordset->GetCollect("Product_ID");
-            if(temp_variant.vt!=VT_NULL)
-                strID=temp_variant;
-            else
-                strID=_T("");
-            pNode->SetDevID(_wtoi(strID));
+			CString strID ;
+
+			strID=m_q.getValuebyName(L"Product_ID");
+			pNode->SetDevID(_wtoi(strID));
 
             CString strHwv ;
-            temp_variant = bado.m_pRecordset->GetCollect("Hardware_Ver");
-            if(temp_variant.vt!=VT_NULL)
-                strHwv=temp_variant;
-            else
-                strHwv=_T("");
+         
+                strHwv=m_q.getValuebyName(L"Hardware_Ver");
             pNode->SetHardwareVersion(float(_wtof(strHwv)));
 
             CString strSwv;
-            temp_variant = bado.m_pRecordset->GetCollect("Software_Ver");
-            if(temp_variant.vt!=VT_NULL)
-                strSwv=temp_variant;
-            else
-                strSwv=_T("");
+         
+                strSwv=m_q.getValuebyName(L"Software_Ver");
             pNode->SetSoftwareVersion(float(_wtof(strSwv)));
 
             CString strSerialID;
-            temp_variant = bado.m_pRecordset->GetCollect("Serial_ID");
-            if(temp_variant.vt!=VT_NULL)
-                strSerialID=temp_variant;
-            else
-                strSerialID=_T("");
+         
+                strSerialID=m_q.getValuebyName(L"Serial_ID");
             unsigned int temp_serial = _wtoi64(strSerialID);
             (pNode)->SetSerialID(temp_serial);
 
-            bado.m_pRecordset->MoveNext();
+           m_q.nextRow();
         }
 
     }
@@ -1994,8 +1958,7 @@ int CTStatScanner::GetAllNodeFromDataBase()
     {
 
     }
-    bado.CloseRecordset();
-    bado.CloseConn();
+  
     return m_szNetNodes.size() + m_szComNodes.size();
 }
 
@@ -2039,14 +2002,7 @@ void CTStatScanner::FindComConflict()
 
 // 解决冲突
 void  CTStatScanner::ResolveComConflict()
-{
-// 	_ConnectionPtr t_pCon;//for ado connection
-// 	//_RecordsetPtr t_pRs;//for ado
-// 	t_pCon.CreateInstance(_T("ADODB.Connection"));
-// 	t_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
-    /*CBADO bado;
-    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-    bado.OnInitADOConn(); */
+{ 
     for (UINT  i = 0; i  < m_szComConfNodes.size(); i++)
     {
         //changed the id ,
@@ -2099,7 +2055,7 @@ void  CTStatScanner::ResolveComConflict()
                 {
 
                     strSql.Format(_T("update ALL_NODE set Product_ID ='%s' where Serial_ID = '%s'"),strID,strSerial);
-                    bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+                     m_SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
                 }
                 catch(_com_error *e)
                 {
@@ -2264,10 +2220,7 @@ void CTStatScanner::CompareNetToComConflict()
 // 如果Serial ID相同，而IP不同，那么修改数据库中的ID
 void  CTStatScanner::ResolveNetConflict()
 {
-// 	_ConnectionPtr t_pCon;//for ado connection
-// 	//_RecordsetPtr t_pRs;//for ado
-// 	t_pCon.CreateInstance(_T("ADODB.Connection"));
-// 	t_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+ 
 
     for (UINT  i = 0; i  < m_szNetConfNodes.size(); i++)
     {
@@ -2306,19 +2259,19 @@ void  CTStatScanner::ResolveNetConflict()
             {
 
                 strSql.Format(_T("update ALL_NODE set Hardware_Ver ='%s' where Serial_ID = '%s'"),hw_instance,strSerial);
-                bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
-
+                
+				m_SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
                 strSql.Format(_T("update ALL_NODE set Software_Ver ='%s' where Serial_ID = '%s'"),sw_panelnamber,strSerial);
-                bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+                m_SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 
                 strSql.Format(_T("update ALL_NODE set Bautrate ='%s' where Serial_ID = '%s'"),str_IPaddr,strSerial);
-                bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+                m_SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 
                 strSql.Format(_T("update ALL_NODE set Com_Port ='%s' where Serial_ID = '%s'"),str_port,strSerial);
-                bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+                m_SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 
                 strSql.Format(_T("update ALL_NODE set Product_ID ='%s' where Serial_ID = '%s'"),str_modbus_id,strSerial);
-                bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+               m_SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 
 
             }
@@ -2345,17 +2298,7 @@ void  CTStatScanner::ResolveNetConflict()
 
 
 
-            //try
-            //{
-
-            ////strSql.Format(_T("delete ALL_NODE set Product_ID ='%s' where Serial_ID = '%s'"),strID,strSerial);
-            //strSql.Format(_T("delete * from ALL_NODE where Serial_ID ='%s'"), strSerial);
-            //t_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-            //}
-            //catch(_com_error *e)
-            //{
-            //	AfxMessageBox(e->ErrorMessage());
-            //}
+             
         }
     }
 }
@@ -2374,8 +2317,8 @@ void CTStatScanner::AddNewTStatToDB()
 
             CString strSql;
 
-            strSql.Format(_T("Delete * From  ALL_NODE Where Serial_ID = '%d' "),nSID);
-            bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+            strSql.Format(_T("Delete   From  ALL_NODE Where Serial_ID = '%d' "),nSID);
+            m_SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
         }
         catch (...)
         {
@@ -2412,60 +2355,7 @@ void CTStatScanner::AddNewNetToDB()
         if(!IsNetDevice(temp_cs))
             continue;
 
-//         for (UINT j = 0; j < m_szNetNodes.size(); j++)
-//         {
-//             unsigned int nNodeSID = m_szNetNodes[j]->GetSerialID();
-//             //Comment by Fance
-//             //if the scan device is CM5 or minipanel, this products has 3 protocol, BacnetIP modbus485 modbus tcp;
-//             //So when scan bacnet ip and midbus tcp ,the or replay to t3000,
-//             //So I display the device in two format,judge to 2 decvice;
-//             if((pInfo->m_pNet->GetProductType() == PM_CM5) || (pInfo->m_pNet->GetProductType() == PM_MINIPANEL))
-//             {
-//                 unsigned int nNodeSID = m_szNetNodes[j]->GetSerialID();
-//                 int nNodeProtocol = m_szNetNodes[j]->GetProtocol();
-//                 if (nSID == nNodeSID)
-//                 {
-//                     if(nSProtocol == nNodeProtocol)
-//                     {
-//                         bIsNew = FALSE;
-//                         break;
-//                     }
-//                     else
-//                     {
-//                         CString strSql;
-//                         CString strText;
-//                         strText.Format(_T("%u"),nNodeSID);
-//                         strSql.Format(_T("delete * from ALL_NODE where Serial_ID ='%s'"),strText);
-//                         CString strTemp;
-//                         strTemp.Format(_T("Are you sure to delete thise item"));
-//                         //if(AfxMessageBox(strTemp,MB_OKCANCEL)==IDOK)
-//                         //{
-//                         try
-//                         {
-//                             bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
-//                         }
-//                         catch(_com_error *e)
-//                         {
-//                             AfxMessageBox(e->ErrorMessage());
-//                         }
-//                         //}
-//                         bIsNew = TRUE;
-//                         break;
-//                     }
-//                 }
-//             }
-//             else
-//             {
-//                 if (nSID == nNodeSID)
-//                 {
-//                     bIsNew = FALSE;
-//                     break;
-//                 }
-//             }
-//         }
-
-		//不加这句话能解决扫描后 名字会变掉
-		//但是加了 会出现 DB是空的时候  明明扫描到了 设备，却要等很长时间 靠后台扫描 才显示出来;
+ 
 #if 1
 
 
@@ -2476,12 +2366,13 @@ void CTStatScanner::AddNewNetToDB()
             CString strSql;
 			 strSql.Format(_T("Select * From  ALL_NODE Where Serial_ID = '%d' "),nSID);
 			  
-			   bado.m_pRecordset=bado.OpenRecordset(strSql);
-			  int nTemp3 = bado.GetRecordCount(bado.m_pRecordset);
+			  
+			   m_q = m_SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+			   m_table = m_SqliteDBBuilding.getTable((UTF8MBSTR)strSql);
+			  int nTemp3 = m_table.numRows();
 			  if(nTemp3 >= 1)
 			  {
-				   bado.CloseRecordset();	//数据库里面有就不用管了，后台会自动刷新的;
-				   continue;
+				   				   continue;
 			  }
         }
         catch (...)
@@ -2591,12 +2482,11 @@ void CTStatScanner::WriteOneNetInfoToDB( _NetDeviceInfo* pInfo)
         strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Custom,Online_Status)					  values('"
                          +m_strBuildingName+"','"+m_strSubNet+"','"+NetwordCard_Address+"','"+strSerialID+"','"+m_strFloorName+"','"+m_strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strIP+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strPort+"','"+strEPSize+"','"+temp_pro+"','0',1)"));
     }
-    //strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize)					  values('"+m_strBuildingName+"','"+m_strSubNet+"','"+strSerialID+"','"+m_strFloorName+"','"+m_strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strIP+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strPort+"','"+strEPSize+"')"));
-//new nc//  strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize, Mainnet_info) values('"+m_strBuildingName+"','"+m_strSubNet+"','"+strSerialID+"','"+m_strFloorName+"','"+m_strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strIP+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strPort+"','"+strEpSize+"','"+strMainnetInfo+"')"));
+
     try
     {
 
-        bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+        m_SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
     }
     catch(_com_error *e)
     {
@@ -2607,14 +2497,7 @@ void CTStatScanner::WriteOneNetInfoToDB( _NetDeviceInfo* pInfo)
 void CTStatScanner::WriteOneDevInfoToDB( _ComDeviceInfo* pInfo)
 {
     ASSERT(pInfo);
-// 	_ConnectionPtr t_pCon;//for ado connection
-// 	//_RecordsetPtr t_pRs;//for ado
-// 	t_pCon.CreateInstance(_T("ADODB.Connection"));
-// 	t_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
-
-// 	CString strBuildingName = pInfo->m_pDev->GetBuildingName();
-// 	CString strFloorName = pInfo->m_pDev->GetFloorName();
-// 	CString strRoomName = pInfo->m_pDev->GetRoomName();
+ 
 
 
     CString strID;
@@ -2736,7 +2619,7 @@ void CTStatScanner::WriteOneDevInfoToDB( _ComDeviceInfo* pInfo)
         strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Online_Status,Protocol,Custom) values('"
                          +m_strBuildingName+"','"+m_strSubNet+"','"+strSerialID+"','"+m_strFloorName+"','"+m_strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strBaudRate+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strCom+"','"+strEpSize+"',1,0,'0')"));
         //new nc// strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize, Mainnet_info) values('"+m_strBuildingName+"','"+m_strSubNet+"','"+strSerialID+"','"+m_strFloorName+"','"+m_strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strBaudRate+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strCom+"','"+strEpSize+"','"+strMainnetInfo+"')"));
-        bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+        m_SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
     }
     catch (...)
     {
@@ -2748,64 +2631,44 @@ void CTStatScanner::WriteOneDevInfoToDB( _ComDeviceInfo* pInfo)
 
 void CTStatScanner::GetBuildingName()
 {
-    _RecordsetPtr m_pRs;
-    _ConnectionPtr m_pCon;
+    CppSQLite3DB SqliteDBT3000;
 
-    m_pCon.CreateInstance("ADODB.Connection");
-    m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-    m_pRs.CreateInstance("ADODB.Recordset");
+	CString strSql;
+	strSql.Format(_T("select * from Building order by Main_BuildingName"));
+	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath); 
+	m_q = SqliteDBT3000.execQuery((UTF8MBSTR)strSql);
+	 
+	int temp_row=0;
+	CString str_temp;
+	str_temp.Empty();
+	_variant_t temp_variant;
+	while(!m_q.eof())
+	{
+		++temp_row;
 
-    CString strSql;
-    strSql.Format(_T("select * from Building order by Main_BuildingName"));
-
-    m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-//	m_AddBuiding_FlexGrid.put_Rows(m_pRs->RecordCount+2);
-    int temp_row=0;
-    CString str_temp;
-    str_temp.Empty();
-    _variant_t temp_variant;
-    while(VARIANT_FALSE==m_pRs->EndOfFile)
-    {
-        ++temp_row;
-
-        int bdef=0;
-        bdef=m_pRs->GetCollect(_T("Default_SubBuilding"));
-        if(bdef == -1)//def building;
-        {
-            //m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,0,_T("Select"));
-            temp_variant=m_pRs->GetCollect("Main_BuildingName");
-            if(temp_variant.vt!=VT_NULL)
-                m_strBuildingName = temp_variant;
-            else
-                m_strBuildingName  = _T("");
+		int bdef=0;
+		bdef=m_q.getIntField("Default_SubBuilding");
+		if(bdef == 1)//def building;
+		{
+			 
+			 
+				m_strBuildingName  = m_q.getValuebyName(L"Main_BuildingName");
 
 
-            temp_variant=m_pRs->GetCollect("Building_Name");
-            if(temp_variant.vt!=VT_NULL)
-                m_strSubNet = temp_variant;
-            else
-                m_strSubNet = _T("");
+		 
+				m_strSubNet = m_q.getValuebyName(L"Building_Name");
 
-// 			temp_variant=m_pRs->GetCollect("Floor_name");
-// 			if(temp_variant.vt!=VT_NULL)
-// 				m_strFloorName = temp_variant;
-// 			else
-            m_strFloorName = _T("floor1");
+			 
+			m_strFloorName = _T("floor1");
 
+ 
+			m_strRoomName = _T("room1");
 
-// 			temp_variant=m_pRs->GetCollect("Room_Name");
-// 			if(temp_variant.vt!=VT_NULL)
-// 				m_strRoomName = temp_variant;
-// 			else
-            m_strRoomName = _T("room1");
+		}
 
-        }
-
-        m_pRs->MoveNext();
-    }
-
-    if(m_pRs->State)
-        m_pRs->Close();
+		m_q.nextRow();
+	}
+ 
 }
 
 BOOL CTStatScanner::IsAllScanFinished()
@@ -4164,9 +4027,11 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
     }
     m_scan_info.at(scan_remote_ip_item).scan_status = SCAN_STATUS_RUNNING;
     CString Remote_IP_Address;
-    CBADO bado;
-    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-    bado.OnInitADOConn();
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 
     m_bac_scan_result_data.clear();
     m_bac_scan_com_data.clear();
@@ -4338,9 +4203,10 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
 
         CString strSql;
         strSql.Format(_T("select * from ALL_NODE where Serial_ID='%s'"),device_serial_number);
-        bado.m_pRecordset=bado.OpenRecordset(strSql);
-        int count =bado.GetRecordCount(bado.m_pRecordset); //ado.m_pRecordset->GetRecordCount();
-        bado.CloseRecordset();
+		q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+        table = SqliteDBBuilding.getTable((UTF8MBSTR)strSql);
+        int count =table.numRows(); //ado.m_pRecordset->GetRecordCount();
+      
         if(count >= 1)
             find_exsit = true;
 
@@ -4358,7 +4224,7 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
             {
 
                 TRACE(strSql);
-                bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+                SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
             }
             catch(_com_error *e)
             {
@@ -4373,7 +4239,7 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
             try
             {
                 strSql.Format(_T("update ALL_NODE set MainBuilding_Name = '%s' , Building_Name = '%s' , Protocol = '6' , Product_name ='%s' , Product_class_ID = '%s' , Product_ID = '%s' , Bautrate = '%s' , Hardware_Ver = '%s' , Software_Ver = '%s' ,Online_Status = '1'  where Serial_ID = '%s'"),pFrame->m_strCurMainBuildingName,pFrame->m_strCurMainBuildingName,priduct_name,device_type,device_modbus_address,device_ip_address,device_instance_id,device_panel_number,device_serial_number);
-                bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+                SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
             }
             catch(_com_error *e)
             {
@@ -4431,9 +4297,10 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
 
         CString strSql;
         strSql.Format(_T("select * from ALL_NODE where Serial_ID='%s'"),device_serial_number);
-        bado.m_pRecordset=bado.OpenRecordset(strSql);
-        int count =bado.GetRecordCount(bado.m_pRecordset); //ado.m_pRecordset->GetRecordCount();
-        bado.CloseRecordset();
+		q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+		table = SqliteDBBuilding.getTable((UTF8MBSTR)strSql);
+        int count =table.numRows(); //ado.m_pRecordset->GetRecordCount();
+        
         if(count >= 1)
             find_exsit = true;
 
@@ -4450,7 +4317,7 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
             {
 
                 TRACE(strSql);
-                bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+                SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
             }
             catch(_com_error *e)
             {
@@ -4465,7 +4332,7 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
             try
             {
                 strSql.Format(_T("update ALL_NODE set MainBuilding_Name = '%s' , Building_Name = '%s' , Protocol = '%s' , Product_name ='%s' , Product_class_ID = '%s' , Product_ID = '%s' , Bautrate = '%s' , Hardware_Ver = '%s' , Software_Ver = '%s' , Com_Port = '%s' ,Online_Status = '1'  where Serial_ID = '%s'"),pFrame->m_strCurMainBuildingName,pFrame->m_strCurMainBuildingName,m_protocol_temp,priduct_name,device_type,device_modbus_address,device_ip_address,device_instance_id,device_panel_number,device_port,device_serial_number);
-                bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+               SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
             }
             catch(_com_error *e)
             {
@@ -4476,7 +4343,7 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
 
 
     }
-    bado.CloseConn();
+    SqliteDBBuilding.closedb();
     m_scan_info.at(scan_remote_ip_item).scan_status = SCAN_STATUS_FINISHED;
 
 
@@ -4594,9 +4461,11 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
 
     //}
 #endif
-    CBADO bado;
-    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-    bado.OnInitADOConn();
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 
     int ret_3 = 0;
     if(m_bac_scan_com_data.size()==0)
@@ -4642,9 +4511,10 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
         temp_baud.Format(_T("%u"),current_building_baudrate);
 
 
-        bado.m_pRecordset=bado.OpenRecordset(str_temp);
-        int count = bado.GetRecordCount(bado.m_pRecordset);
-        bado.CloseRecordset();
+		q = SqliteDBBuilding.execQuery((UTF8MBSTR)str_temp);
+		table = SqliteDBBuilding.getTable((UTF8MBSTR)str_temp);
+        int count =table.numRows();
+         
 
         CString temp_pname;
         temp_pname = GetProductName(m_bac_scan_result_data.at(l).product_type);
@@ -4677,7 +4547,7 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
                                +pFrame->m_strCurMainBuildingName+"','"+pFrame->m_strCurSubBuldingName+"','""','"+temp_serial_number+"','floor1','room1','"+temp_view_name+"','"+temp_product_id_string+"','"+temp_modbusid+"','""','"+temp_baud+"','Default_Building_PIC.bmp','"+temp_object_instance+"','"+temp_panel_number+"','"+temp_port_string+"','0','"+temp_protocol+"','1','0')"));
 
         }
-        bado.m_pConnection->Execute(str_temp.GetString(),NULL,adCmdText);
+         SqliteDBBuilding.execDML((UTF8MBSTR)str_temp);
     }
 
 #if 0
@@ -4711,110 +4581,7 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
     WideCharToMultiByte( CP_ACP, 0, bac_strInfo.GetBuffer(), -1, temp_char, 250, NULL, NULL );
     memcpy(m_scan_info.at(scan_bacnet_ip_item).scan_notes,temp_char,250);*/
 
-//endbacnetthread:
-#if 0
-
-
-
-    int	resend_count = 0;
-    do
-    {
-        resend_count ++;
-        if(resend_count>50)
-            break;
-        g_invoke_id = GetPrivateData(
-                          m_bac_scan_result_data.at(0).device_id,
-                          READ_REMOTE_DEVICE_DB,
-                          0,
-                          0,
-                          sizeof(Str_Remote_TstDB));
-
-        Sleep(SEND_COMMAND_DELAY_TIME);
-    }
-    while (g_invoke_id<0);
-
-
-    Sleep(500);
-
-    for (int i=0; i<(int)m_remote_device_db.size(); i++)
-    {
-        CString device_instance_id;
-        CString device_ip_address;
-        CString device_panel_number;
-        CString device_serial_number;
-        CString device_name;
-        CString priduct_name;
-        CString device_modbus_address;
-        CString device_type;
-        CString device_port;
-        device_modbus_address.Format(_T("%d"),m_remote_device_db.at(i).modbus_id);
-        //device_ip_address = Remote_IP_Address;
-        device_ip_address.Format(_T("%d.%d.%d.%d"),(unsigned char)m_bac_scan_result_data.at(i).ipaddress[0],
-                                 (unsigned char)m_bac_scan_result_data.at(i).ipaddress[1],
-                                 (unsigned char)m_bac_scan_result_data.at(i).ipaddress[2],
-                                 (unsigned char)m_bac_scan_result_data.at(i).ipaddress[3]);
-
-        device_serial_number.Format(_T("%d"),m_remote_device_db.at(i).sn);
-        device_type.Format(_T("%d"),m_remote_device_db.at(i).product_type);
-        device_name = GetProductName(m_remote_device_db.at(i).product_type);
-        priduct_name = device_name + _T(":") + device_serial_number + _T("--") + device_modbus_address;
-        device_port.Format(_T("%d"), m_remote_device_db.at(i).port);
-        bool find_exsit = false;
-        int nitems = -1;
-        int changed_items;
-        //for (int x=1;x<(temp1-1);x++)
-        //{
-        //	CString temp_serial_number;
-
-        //	temp_serial_number = m_FlexGrid.get_TextMatrix(x,AN_SerialID);
-        //	if(temp_serial_number.CompareNoCase(device_serial_number) == 0)
-        //	{
-        //		nitems = x;
-        //		find_exsit = true;
-        //		break;
-        //	}
-        //}
-
-        if(!find_exsit)//没有发现相同的序列号就插入;
-        {
-//			changed_items = temp1 -1;
-
-            CString strSql;
-            strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol) values('Building_1','Sub_net1','"+device_serial_number+"','floor1','room1','"+priduct_name+"','"+device_type+"','"+device_modbus_address+"','""','"+device_ip_address+"','""','""','""','"+device_port+"','0','254')"));
-            //new nc//strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Mainnet_info) values('"+strMainBuildName+"','"+strSubBuildingName +"','"+strSID+"','"+strFloorName+"','"+strRoomName+"','"+strProName+"','"+strProType+"','"+strProID+"','"+strScreenID+"','"+strBaudrate+"','"+strGraphicID+"','"+strHdVersion+"','"+strStVersion+"','"+strCom+"','"+strEPSize+"','"+strMainnetInfo+"')"));
-            try
-            {
-
-                TRACE(strSql);
-                bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
-            }
-            catch(_com_error *e)
-            {
-                AfxMessageBox(e->ErrorMessage());
-            }
-            //m_FlexGrid.put_Rows(changed_items + 2);
-
-        }
-        else
-        {
-            changed_items = nitems;
-            CString strSql;
-            try
-            {
-                strSql.Format(_T("update ALL_NODE set Protocol = '254' , Product_name ='%s' , Product_class_ID = '%s' , Product_ID = '%s' , Bautrate = '%s' , Hardware_Ver = '%s' , Software_Ver = '%s' , Com_Port = '%s'  where Serial_ID = '%s'"),priduct_name,device_type,device_modbus_address,device_ip_address,device_instance_id,device_panel_number,device_port,device_serial_number);
-                bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
-            }
-            catch(_com_error *e)
-            {
-                AfxMessageBox(e->ErrorMessage());
-            }
-
-        }
-
-    }
-    bado.CloseRecordset();
-    bado.CloseConn();
-#endif
+ 
 
 end_mstp_thread:
     if (pScan->m_eScanBacnetIpEnd->m_hObject)

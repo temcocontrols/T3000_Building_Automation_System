@@ -16,8 +16,7 @@ public:
 	enum { IDD = IDD_ALLNODESDIALOG };
 	BOOL m_bChanged;
 private:
-// 	_ConnectionPtr m_pCon;
-// 	_RecordsetPtr m_pRs;
+ 
 	int m_nCurRow;
 	int m_nCurCol;
 	CMsflexgrid m_FlexGrid;

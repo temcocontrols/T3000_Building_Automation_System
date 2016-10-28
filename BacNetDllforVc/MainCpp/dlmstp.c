@@ -179,7 +179,8 @@ static void dlmstp_receive_fsm_task(
             (MSTP_Port.ReceivedInvalidFrame == false)) {
             do {
 
-                RS485_Check_UART_Data(&MSTP_Port);
+                RS485_Check_UART_Data(&MSTP_Port);//接收RS485总线的数据
+
                 MSTP_Receive_Frame_FSM(&MSTP_Port);
                 received_frame = MSTP_Port.ReceivedValidFrame ||
                     MSTP_Port.ReceivedInvalidFrame;

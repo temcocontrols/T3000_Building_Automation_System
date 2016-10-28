@@ -6,7 +6,7 @@
 #include "RegisterViewerDlg.h"
 #include "afxdialogex.h"
 #include "MainFrm.h"
-#include "ado/ADO.h"
+ #include "../SQLiteDriver/CppSQLite3.h"
 #include "globle_function.h"
 #include "TemcoDataGrid.h"
 
@@ -94,577 +94,359 @@ void CRegisterViewerDlg::LoadDataFromDB()
     _variant_t temp_var;
     if (product_type==T3000_5ABCDFG_LED_ADDRESS||product_type==T3000_5EH_LCD_ADDRESS||product_type==T3000_6_ADDRESS)//Tstat serial
     {
-        CADO ado;
-        ado.OnInitADOConn();
-        if (ado.IsHaveTable(ado,_T("T3000_Register_Address_By_ID")))
+		CppSQLite3DB SqliteDBT3000;
+		CppSQLite3Query q;
+		SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+        if (SqliteDBT3000.tableExists("T3000_Register_Address_By_ID"))
         {
             CString sql,temp;
             DBRegister tempstruct;
             sql.Format(_T("Select * from T3000_Register_Address_By_ID order by Register_Address"));
-            ado.m_pRecordset=ado.OpenRecordset(sql);
+            q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
 
 
 
-            while (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+            while (!q.eof())//有表但是没有对应序列号的值
             {
                 if (product_type==T3000_5ABCDFG_LED_ADDRESS)
                 {
-                    tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("Register_Address"));
-                    tempstruct.AddressName=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_AddressName"));
+                    tempstruct.Register_Address=q.getIntField("Register_Address");
+                    tempstruct.AddressName=q.getValuebyName(_T("TSTAT5_LED_AddressName"));
 					if (tempstruct.AddressName.CompareNoCase(L"MODBUS_INFO_BYTE") == 0)
 					{
 						tempstruct.AddressName = L"MODBUS_OCC_COMDELAY";
 					}
-                    tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_DATATYPE"));
-                    tempstruct.length=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_LEN"));
-                    temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_INSTRUCTION"));
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.Description=_T("");
-                    }
-                    else
-                    {
-                        tempstruct.Description=temp_var;
-                    }
-                    temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_Operation"));
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.Description=_T("");
-                    }
-                    else
-                    {
-                        tempstruct.Operation=temp_var;
-                    }
-                    /*	tempstruct.Description=(CString)ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_DESCRIPTION"));*/
-
+                    tempstruct.DataType=q.getValuebyName(_T("TSTAT5_LED_DATATYPE"));
+                    tempstruct.length=q.getIntField("TSTAT5_LED_LEN");
+                    tempstruct.Description=q.getValuebyName(_T("TSTAT5_LED_INSTRUCTION"));
+                    
+                    tempstruct.Operation=q.getValuebyName(_T("TSTAT5_LED_Operation"));
+                    
+                   
                 }
                 else if (product_type==T3000_5EH_LCD_ADDRESS)
                 {
                     _variant_t vartemp;
-                    tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("Register_Address"));
-                    tempstruct.AddressName=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_AddressName"));
-                    tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_DATATYPE"));
-                    tempstruct.length=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_LEN"));
+                    tempstruct.Register_Address=q.getIntField("Register_Address");
+                    tempstruct.AddressName=q.getValuebyName(_T("TSTAT5_LCD_AddressName"));
+                    tempstruct.DataType=q.getValuebyName(_T("TSTAT5_LCD_DATATYPE"));
+                    tempstruct.length=q.getIntField("TSTAT5_LCD_LEN");
                     //tempstruct.Description=(CString)ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_DESCRIPTION"));
-                    vartemp=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_INSTRUCTION"));
-                    if (vartemp.vt==VT_NULL)
-                    {
-                        tempstruct.Description=_T("");
-                    }
-                    else
-                    {
-                        tempstruct.Description=vartemp;
-                    }
-                    temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_Operation"));
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.Description=_T("");
-                    }
-                    else
-                    {
-                        tempstruct.Operation=temp_var;
-                    }
+                    tempstruct.Description=q.getValuebyName(_T("TSTAT5_LCD_INSTRUCTION"));
+                  tempstruct.Operation =  q.getValuebyName(_T("TSTAT5_LCD_Operation"));
+                                          
                 }
                 else if (product_type==T3000_6_ADDRESS)
-                {
-                    temp_var=ado.m_pRecordset->GetCollect(_T("Register_Address"));
+				{
+					 
 
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.Register_Address=-1;
-                    }
-                    else
-                    {
-                        tempstruct.Register_Address=temp_var;
-                    }
+					 
+						tempstruct.Register_Address=q.getIntField("Register_Address");
+					 
 
-                    temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT6_AddressName"));
+                    
+                        tempstruct.AddressName=q.getValuebyName(_T("TSTAT6_AddressName"));
+                    
 
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.AddressName=_T("");
-                    }
-                    else
-                    {
-                        tempstruct.AddressName=temp_var;
-                    }
-
-                    temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT6_DATATYPE"));
-
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.DataType=_T("");
-                    }
-                    else
-                    {
-                        tempstruct.DataType=temp_var;
-                    }
+                  
+                        tempstruct.DataType=q.getValuebyName(_T("TSTAT6_DATATYPE"));
+                  
 
 
-                    temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT6_LEN"));
+                  
+                        tempstruct.length=q.getIntField("TSTAT6_LEN");
+                   
 
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.length=-1;
-                    }
-                    else
-                    {
-                        tempstruct.length=temp_var;
-                    }
-
-                    temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT6_INSTRUCTION"));
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.Description=_T("");
-                    }
-                    else
-                    {
-						tempstruct.Description=temp_var;
-					}
-					temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT6_Operation"));
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.Description=_T("");
-                    }
-                    else
-                    {
-                        tempstruct.Operation=temp_var;
-                    }
+                     
+                        tempstruct.Description=q.getValuebyName(_T("TSTAT6_INSTRUCTION"));
+                     
+				 
+                        tempstruct.Operation=q.getValuebyName(_T("TSTAT6_Operation"));
+                   
                 }
 
 
                 if (tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)
                 {
-                    ado.m_pRecordset->MoveNext();
+                    q.nextRow();
                     continue;
                 }
                 m_VecregisterData.push_back(tempstruct);
                 m_recordcount++;
-                ado.m_pRecordset->MoveNext();
+                q.nextRow();
             }
         }
-        ado.CloseRecordset();
-        ado.CloseConn();
+        SqliteDBT3000.closedb();
     }
     else if (product_type==T3000_T3_MODULES)//T3 Serial
     {
-        CADO ado;
-        ado.OnInitADOConn();
-        if (ado.IsHaveTable(ado,_T("T3_RegisterList")))
+		CppSQLite3DB SqliteDBT3000;
+		CppSQLite3Query q;
+		SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+		
+        if (SqliteDBT3000.tableExists("T3_RegisterList"))
         {
             CString sql,temp;
             DBRegister tempstruct;
             sql.Format(_T("Select * from T3_RegisterList order by RegID"));
-            ado.m_pRecordset=ado.OpenRecordset(sql);
+            q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
             if (m_modelno==PM_T3PT10)
             {
-                while(!ado.m_pRecordset->EndOfFile)
+                while(!q.eof())
                 {
-                    tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("RegID"));
-                    temp_var=ado.m_pRecordset->GetCollect(_T("T3-RTD"));
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.AddressName=_T("");
-                    }
-                    else
-                    {
-                        tempstruct.AddressName=temp_var;
-                    }
+                    tempstruct.Register_Address=q.getIntField("RegID");
+                    tempstruct.AddressName=q.getValuebyName(_T("T3-RTD"));
+                   
                     if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
                     {
-                        ado.m_pRecordset->MoveNext();
+                        q.nextRow();
                         continue;
                     }
-                    tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("T3-8AI8AO_DATATYPE"));
-                    tempstruct.length=ado.m_pRecordset->GetCollect(_T("T3-8AI8AO_LEN"));
-                    temp_var=ado.m_pRecordset->GetCollect(_T("T3-8AI8AO_DESCRIPTION"));
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.Description=_T("");
-                    }
-                    else
-                    {
-                        tempstruct.Description=temp_var;
-                    }
-                    temp_var=ado.m_pRecordset->GetCollect(_T("T3-8AI8AO_OPERATION"));
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.Description=_T("");
-                    }
-                    else
-                    {
-                        tempstruct.Operation=temp_var;
-                    }
+                    tempstruct.DataType=q.getValuebyName(_T("T3-8AI8AO_DATATYPE"));
+                    tempstruct.length=q.getIntField("T3-8AI8AO_LEN");
+                    tempstruct.Description=q.getValuebyName(L"T3-8AI8AO_DESCRIPTION");
+                  
+                    
+                        tempstruct.Operation=q.getValuebyName(_T("T3-8AI8AO_OPERATION"));
+                    
                     m_VecregisterData.push_back(tempstruct);
                     m_recordcount++;
-                    ado.m_pRecordset->MoveNext();
+                    q.nextRow();
                 }
             }
             else if (m_modelno==PM_T38AI16O)
             {
-                while(!ado.m_pRecordset->EndOfFile)
+                while(!q.eof())
                 {
-                    tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("RegID"));
-                    temp_var=ado.m_pRecordset->GetCollect(_T("T3-8AI16O"));
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.AddressName=_T("");
-                    }
-                    else
-                    {
-                        tempstruct.AddressName=temp_var;
-                    }
+                    tempstruct.Register_Address=q.getIntField("RegID");
+                   
+                    tempstruct.AddressName=q.getValuebyName(L"T3-8AI16O");
+                    
                     if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
                     {
-                        ado.m_pRecordset->MoveNext();
+                       q.nextRow();
                         continue;
                     }
-                    tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("T3-8AI16O_DATATYPE"));
-                    tempstruct.length=ado.m_pRecordset->GetCollect(_T("T3-8AI16O_LEN"));
-                    temp_var=ado.m_pRecordset->GetCollect(_T("T3-8AI16O_DESCRIPTION"));
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.Description=_T("");
-                    }
-                    else
-                    {
-                        tempstruct.Description=temp_var;
-                    }
-                    temp_var=ado.m_pRecordset->GetCollect(_T("T3-8AI16O_OPERATION"));
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.Description=_T("");
-                    }
-                    else
-                    {
-                        tempstruct.Operation=temp_var;
-                    }
+                    tempstruct.DataType=q.getValuebyName(_T("T3-8AI16O_DATATYPE"));
+                    tempstruct.length=q.getIntField("T3-8AI16O_LEN");
+                    
+                        tempstruct.Description=q.getValuebyName(_T("T3-8AI16O_DESCRIPTION"));;
+                   
+                  
+                        tempstruct.Operation=q.getValuebyName(_T("T3-8AI16O_OPERATION"));;
+                   
                     m_VecregisterData.push_back(tempstruct);
                     m_recordcount++;
-                    ado.m_pRecordset->MoveNext();
+                    q.nextRow();
                 }
             }
             else if (m_modelno==PM_T3IOA)
             {
-                while(!ado.m_pRecordset->EndOfFile)
+                while(!q.eof())
                 {
-                    tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("RegID"));
-                    temp_var=ado.m_pRecordset->GetCollect(_T("T3-8AI8AO"));
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.AddressName=_T("");
-                    }
-                    else
-                    {
-                        tempstruct.AddressName=temp_var;
-                    }
+                    tempstruct.Register_Address=q.getIntField("RegID");
+                    
+                        tempstruct.AddressName=q.getValuebyName(_T("T3-8AI8AO"));
+                   
                     if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
                     {
-                        ado.m_pRecordset->MoveNext();
+                       q.nextRow();
                         continue;
                     }
-                    tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("T3-8AI8AO_DATATYPE"));
-                    tempstruct.length=ado.m_pRecordset->GetCollect(_T("T3-8AI8AO_LEN"));
-                    temp_var=ado.m_pRecordset->GetCollect(_T("T3-8AI8AO_DESCRIPTION"));
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.Description=_T("");
-                    }
-                    else
-                    {
-                        tempstruct.Description=temp_var;
-                    }
-                    temp_var=ado.m_pRecordset->GetCollect(_T("T3-8AI8AO_OPERATION"));
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.Description=_T("");
-                    }
-                    else
-                    {
-                        tempstruct.Operation=temp_var;
-                    }
+                    tempstruct.DataType=q.getValuebyName(_T("T3-8AI8AO_DATATYPE"));
+                    tempstruct.length=q.getIntField("T3-8AI8AO_LEN");
+                     
+                        tempstruct.Description=q.getValuebyName(_T("T3-8AI8AO_DESCRIPTION"));
+                     
+                   
+                        tempstruct.Operation=q.getValuebyName(_T("T3-8AI8AO_OPERATION"));
+                    
                     m_VecregisterData.push_back(tempstruct);
-                    m_recordcount++;
-                    ado.m_pRecordset->MoveNext();
+                    m_recordcount++; 
+                   q.nextRow();
                 }
             }
             else if (m_modelno==PM_T332AI)
             {
-                while(!ado.m_pRecordset->EndOfFile)
+                while(!q.eof())
                 {
-                    tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("RegID"));
-                    temp_var=ado.m_pRecordset->GetCollect(_T("T3-32AI"));
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.AddressName=_T("");
-                    }
-                    else
-                    {
-                        tempstruct.AddressName=temp_var;
-                    }
+                    tempstruct.Register_Address=q.getIntField("RegID");
+                    tempstruct.AddressName=q.getValuebyName(_T("T3-32AI"));
                     if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
                     {
-                        ado.m_pRecordset->MoveNext();
+                       q.nextRow();
                         continue;
                     }
-                    tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("T3-32AI_DATATYPE"));
-                    tempstruct.length=ado.m_pRecordset->GetCollect(_T("T3-32AI_LEN"));
-                    temp_var=ado.m_pRecordset->GetCollect(_T("T3-32AI_DESCRIPTION"));
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.Description=_T("");
-                    }
-                    else
-                    {
-                        tempstruct.Description=temp_var;
-                    }
-                    temp_var=ado.m_pRecordset->GetCollect(_T("T3-32AI_OPERATION"));
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.Description=_T("");
-                    }
-                    else
-                    {
-                        tempstruct.Operation=temp_var;
-                    }
+                    tempstruct.DataType=q.getValuebyName(_T("T3-32AI_DATATYPE"));
+                    tempstruct.length=q.getIntField("T3-32AI_LEN");
+                    tempstruct.Description=q.getValuebyName(_T("T3-32AI_DESCRIPTION"));
+                    
+                    tempstruct.Operation=q.getValuebyName(_T("T3-32AI_OPERATION"));
+                     
                     m_VecregisterData.push_back(tempstruct);
                     m_recordcount++;
-                    ado.m_pRecordset->MoveNext();
+                    q.nextRow();
                 }
             }
             else if (m_modelno==PM_T34AO)
             {
-                while(!ado.m_pRecordset->EndOfFile)
+                while(!q.eof())
                 {
-                    tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("RegID"));
-                    temp_var=ado.m_pRecordset->GetCollect(_T("T3-4AO"));
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.AddressName=_T("");
-                    }
-                    else
-                    {
-                        tempstruct.AddressName=temp_var;
-                    }
+                    tempstruct.Register_Address=q.getIntField("RegID");
+                    tempstruct.AddressName=q.getValuebyName(_T("T3-4AO"));
+                   
                     if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
                     {
-                        ado.m_pRecordset->MoveNext();
+                        q.nextRow();
                         continue;
                     }
-                    tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("T3-4AO_DATATYPE"));
-                    tempstruct.length=ado.m_pRecordset->GetCollect(_T("T3-4AO_LEN"));
-                    temp_var=ado.m_pRecordset->GetCollect(_T("T3-4AO_DESCRIPTION"));
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.Description=_T("");
-                    }
-                    else
-                    {
-                        tempstruct.Description=temp_var;
-                    }
-                    temp_var=ado.m_pRecordset->GetCollect(_T("T3-4AO_OPERATION"));
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.Description=_T("");
-                    }
-                    else
-                    {
-                        tempstruct.Operation=temp_var;
-                    }
+                    tempstruct.DataType=q.getValuebyName(_T("T3-4AO_DATATYPE"));
+                    tempstruct.length=q.getIntField("T3-4AO_LEN");
+                     tempstruct.Description=q.getValuebyName(_T("T3-4AO_DESCRIPTION"));
+                     
+                    tempstruct.Operation=q.getValuebyName(_T("T3-4AO_OPERATION"));
+                  
                     m_VecregisterData.push_back(tempstruct);
                     m_recordcount++;
-                    ado.m_pRecordset->MoveNext();
+                    q.nextRow();
 
                 }
             }
             else if (m_modelno==PM_T36CT)
             {
-                while(!ado.m_pRecordset->EndOfFile)
+                while(!q.eof())
                 {
-                    tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("RegID"));
-                    temp_var=ado.m_pRecordset->GetCollect(_T("T3-6CT"));
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.AddressName=_T("");
-                    }
-                    else
-                    {
-                        tempstruct.AddressName=temp_var;
-                    }
+                    tempstruct.Register_Address=q.getIntField("RegID");
+                    tempstruct.AddressName=q.getValuebyName(_T("T3-6CT"));
+                    
                     if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
                     {
-                        ado.m_pRecordset->MoveNext();
+                       q.nextRow();
                         continue;
                     }
-                    tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("T3-6CT_DATATYPE"));
-                    tempstruct.length=ado.m_pRecordset->GetCollect(_T("T3-6CT_LEN"));
-                    temp_var=ado.m_pRecordset->GetCollect(_T("T3-6CT_DESCRIPTION"));
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.Description=_T("");
-                    }
-                    else
-                    {
-                        tempstruct.Description=temp_var;
-                    }
-                    temp_var=ado.m_pRecordset->GetCollect(_T("T3-6CT_OPERATION"));
-                    if (temp_var.vt==VT_NULL)
-                    {
-                        tempstruct.Description=_T("");
-                    }
-                    else
-                    {
-                        tempstruct.Operation=temp_var;
-                    }
+                    tempstruct.DataType=q.getValuebyName(_T("T3-6CT_DATATYPE"));
+                    tempstruct.length=q.getIntField("T3-6CT_LEN");
+                    tempstruct.Description=q.getValuebyName(_T("T3-6CT_DESCRIPTION"));
+                    
+                     tempstruct.Operation=q.getValuebyName(_T("T3-6CT_OPERATION"));
+                     
                     m_VecregisterData.push_back(tempstruct);
                     m_recordcount++;
-                    ado.m_pRecordset->MoveNext();
+                    q.nextRow();
                 }
             }
 
         }
-        ado.CloseRecordset();
-        ado.CloseConn();
+        SqliteDBT3000.closedb();
     }
     else if (product_type == PM_AirQuality||product_type == PM_HUM_R)
     {
-        CADO ado;
-        ado.OnInitADOConn();
-        if (ado.IsHaveTable(ado,_T("AirQuanlity_Reglist")))
+		CppSQLite3DB SqliteDBT3000;
+		CppSQLite3Query q;
+		SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+
+        if (SqliteDBT3000.tableExists("AirQuanlity_Reglist"))
         {
             CString sql,temp;
             DBRegister tempstruct;
             sql.Format(_T("Select * from AirQuanlity_Reglist order by RegID"));
-            ado.m_pRecordset=ado.OpenRecordset(sql);
+           q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
 
-            while(!ado.m_pRecordset->EndOfFile)
+            while(!q.eof())
             {
-                tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("RegID"));
-                temp_var=ado.m_pRecordset->GetCollect(_T("RegName"));
-                if (temp_var.vt==VT_NULL)
-                {
-                    tempstruct.AddressName=_T("");
-                }
-                else
-                {
-                    tempstruct.AddressName=temp_var;
-                }
+                tempstruct.Register_Address=q.getIntField("RegID");
+                tempstruct.AddressName=q.getValuebyName(_T("RegName"));
+              
                 if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
                 {
-                    ado.m_pRecordset->MoveNext();
+                    q.nextRow();
                     continue;
                 }
                 tempstruct.DataType=L"Unsigned";
                 tempstruct.length=1;
-                temp_var=ado.m_pRecordset->GetCollect(_T("RegDescription"));
-                if (temp_var.vt==VT_NULL)
-                {
-                    tempstruct.Description=_T("");
-                }
-                else
-                {
-                    tempstruct.Description=temp_var;
-                }
+                tempstruct.Description=q.getValuebyName(_T("RegDescription"));
+               
 
                 tempstruct.Operation=L"R";
 
                 m_VecregisterData.push_back(tempstruct);
                 m_recordcount++;
-                ado.m_pRecordset->MoveNext();
+               q.nextRow();
             }
 
 
         }
-        ado.CloseRecordset();
-        ado.CloseConn();
+        SqliteDBT3000.closedb();
 
     }
     else if (product_type == PM_CM5)
     {
-        CADO ado;
-        ado.OnInitADOConn();
-        if (ado.IsHaveTable(ado,_T("CM5")))
+		CppSQLite3DB SqliteDBT3000;
+		CppSQLite3Query q;
+		SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+
+        if (SqliteDBT3000.tableExists("CM5"))
         {
             CString sql,temp;
             DBRegister tempstruct;
             sql.Format(_T("Select * from CM5 order by RegID"));
-            ado.m_pRecordset=ado.OpenRecordset(sql);
+          q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
 
-            while(!ado.m_pRecordset->EndOfFile)
+            while(!q.eof())
             {
-                tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("RegID"));
-                temp_var=ado.m_pRecordset->GetCollect(_T("T3000_ID"));
-                if (temp_var.vt==VT_NULL)
-                {
-                    tempstruct.AddressName=_T("");
-                }
-                else
-                {
-                    tempstruct.AddressName=temp_var;
-                }
+                tempstruct.Register_Address=q.getIntField("RegID");
+                tempstruct.AddressName=q.getValuebyName(_T("T3000_ID"));
+              
                 if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
                 {
-                    ado.m_pRecordset->MoveNext();
+                   q.nextRow();
                     continue;
                 }
                 tempstruct.DataType=L"Unsigned";
 
-                tempstruct.length=ado.m_pRecordset->GetCollect(_T("Length"));
+                tempstruct.length=q.getIntField("Length");
 
 
-                temp_var=ado.m_pRecordset->GetCollect(_T("Description"));
-                if (temp_var.vt==VT_NULL)
-                {
-                    tempstruct.Description=_T("");
-                }
-                else
-                {
-                    tempstruct.Description=temp_var;
-                }
+                tempstruct.Description=q.getValuebyName(_T("Description"));
+                
 
                 tempstruct.Operation=L"R";
 
                 m_VecregisterData.push_back(tempstruct);
                 m_recordcount++;
-                ado.m_pRecordset->MoveNext();
+                q.nextRow();
             }
 
 
         }
-        ado.CloseRecordset();
-        ado.CloseConn();
+        SqliteDBT3000.closedb();
     }
     else if (product_type == PM_MINIPANEL)
     {
-        CADO ado;
-        ado.OnInitADOConn();
-        if (ado.IsHaveTable(ado,_T("MiniPanel_Registerlist")))
+		CppSQLite3DB SqliteDBT3000;
+		CppSQLite3Query q;
+		SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+
+        if (SqliteDBT3000.tableExists("MiniPanel_Registerlist"))
         {
             CString sql,temp;
             DBRegister tempstruct;
             sql.Format(_T("Select * from MiniPanel_Registerlist order by RegID"));
-            ado.m_pRecordset=ado.OpenRecordset(sql);
+           SqliteDBT3000.execDML((UTF8MBSTR)sql);
 
-            while(!ado.m_pRecordset->EndOfFile)
+            while(!q.eof())
             {
-                tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("RegID"));
-                temp_var=ado.m_pRecordset->GetCollect(_T("Reg_Name"));
-                if (temp_var.vt==VT_NULL)
-                {
-                    tempstruct.AddressName=_T("");
-                }
-                else
-                {
-                    tempstruct.AddressName=temp_var;
-                }
+                tempstruct.Register_Address=q.getIntField("RegID");
+                tempstruct.AddressName=q.getValuebyName(_T("Reg_Name"));
+               
                 if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
                 {
-                    ado.m_pRecordset->MoveNext();
+                    q.nextRow();
                     continue;
                 }
                 tempstruct.DataType=L"Unsigned";
                 tempstruct.length=1;
-                temp_var=ado.m_pRecordset->GetCollect(_T("Register_Description"));
+                temp_var=q.getValuebyName(_T("Register_Description"));
                 if (temp_var.vt==VT_NULL)
                 {
                     tempstruct.Description=_T("");
@@ -678,117 +460,89 @@ void CRegisterViewerDlg::LoadDataFromDB()
 
                 m_VecregisterData.push_back(tempstruct);
                 m_recordcount++;
-                ado.m_pRecordset->MoveNext();
+                q.nextRow();
             }
 
 
         }
-        ado.CloseRecordset();
-        ado.CloseConn();
+        SqliteDBT3000.closedb();
     }
     else if (product_type == CS3000)
     {
-        CADO ado;
-        ado.OnInitADOConn();
-        if (ado.IsHaveTable(ado,_T("CS3000")))
+		CppSQLite3DB SqliteDBT3000;
+		CppSQLite3Query q;
+		SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+
+        if (SqliteDBT3000.tableExists("CS3000"))
         {
             CString sql,temp;
             DBRegister tempstruct;
             sql.Format(_T("Select * from CS3000 order by RegID"));
-            ado.m_pRecordset=ado.OpenRecordset(sql);
-
-            while(!ado.m_pRecordset->EndOfFile)
+            
+			q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
+            while(!q.eof())
             {
-                tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("RegID"));
-                temp_var=ado.m_pRecordset->GetCollect(_T("RegName"));
-                if (temp_var.vt==VT_NULL)
-                {
-                    tempstruct.AddressName=_T("");
-                }
-                else
-                {
-                    tempstruct.AddressName=temp_var;
-                }
+                tempstruct.Register_Address=q.getIntField("RegID");
+                tempstruct.AddressName=q.getValuebyName(_T("RegName"));
+                
                 if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
                 {
-                    ado.m_pRecordset->MoveNext();
+                   q.nextRow();
                     continue;
                 }
                 tempstruct.DataType=L"Unsigned";
                 tempstruct.length=1;
-                temp_var=ado.m_pRecordset->GetCollect(_T("RegDiscription"));
-                if (temp_var.vt==VT_NULL)
-                {
-                    tempstruct.Description=_T("");
-                }
-                else
-                {
-                    tempstruct.Description=temp_var;
-                }
+                tempstruct.Description=q.getValuebyName(_T("RegDiscription"));
+             
 
                 tempstruct.Operation=L"R";
 
                 m_VecregisterData.push_back(tempstruct);
                 m_recordcount++;
-                ado.m_pRecordset->MoveNext();
+                q.nextRow();
             }
 
 
         }
-        ado.CloseRecordset();
-        ado.CloseConn();
+        SqliteDBT3000.closedb();
     }
     else if (product_type == PM_PRESSURE_SENSOR)
     {
-        CADO ado;
-        ado.OnInitADOConn();
-        if (ado.IsHaveTable(ado,_T("PS_Registerlist")))
+		CppSQLite3DB SqliteDBT3000;
+		CppSQLite3Query q;
+		SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+        if (SqliteDBT3000.tableExists("PS_Registerlist"))
         {
             CString sql,temp;
             DBRegister tempstruct;
             sql.Format(_T("Select * from PS_Registerlist order by RegID"));
-            ado.m_pRecordset=ado.OpenRecordset(sql);
+            q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
 
-            while(!ado.m_pRecordset->EndOfFile)
+            while(!q.eof())
             {
-                tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("RegID"));
-                temp_var=ado.m_pRecordset->GetCollect(_T("Reg_Name"));
-                if (temp_var.vt==VT_NULL)
-                {
-                    tempstruct.AddressName=_T("");
-                }
-                else
-                {
-                    tempstruct.AddressName=temp_var;
-                }
+                tempstruct.Register_Address=q.getIntField("RegID");
+                tempstruct.AddressName=q.getValuebyName(_T("Reg_Name"));
+               
                 if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
                 {
-                    ado.m_pRecordset->MoveNext();
+                    q.nextRow();
                     continue;
                 }
                 tempstruct.DataType=L"Unsigned";
                 tempstruct.length=1;
-                temp_var=ado.m_pRecordset->GetCollect(_T("Reg_Description"));
-                if (temp_var.vt==VT_NULL)
-                {
-                    tempstruct.Description=_T("");
-                }
-                else
-                {
-                    tempstruct.Description=temp_var;
-                }
+                 tempstruct.Description=q.getValuebyName(_T("Reg_Description"));
+                
 
                 tempstruct.Operation=L"R";
 
                 m_VecregisterData.push_back(tempstruct);
                 m_recordcount++;
-                ado.m_pRecordset->MoveNext();
+               q.nextRow();
             }
 
 
         }
-        ado.CloseRecordset();
-        ado.CloseConn();
+        SqliteDBT3000.closedb();
     }
     /* else if (product_type == PM_TSTAT6_HUM_Chamber)
      {

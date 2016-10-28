@@ -7,7 +7,7 @@
 #include "GridButton.h"
 #include "TStatScanner.h"
 #include "MainFrm.h"
-#include "bado/BADO.h"
+ 
 #define STATUS_FAILED 0xFFFF 
 #define DEF_PACKET_SIZE    32
 #define DEF_PACKET_NUMBER  4    /* 发送数据报的个数 */
@@ -1245,84 +1245,72 @@ for (UINT i=0;i<m_pScanner->m_szNCScanRet.size();i++)
 }
 }
 void CScanDlg::SaveNewIPAddress(CString newip,CString oldip){
-// 	_ConnectionPtr m_pCon;
-// 	_RecordsetPtr m_pRs;
-// 	::CoInitialize(NULL);
-	CBADO bado;
-	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-	bado.OnInitADOConn(); 
+ 
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+
+	CppSQLite3DB SqliteDBBuilding;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 	try 
 	{
 		CString strSql;
-		////////////////////////////////////////////////////////////////////////////////////////////
-		//获取数据库名称及路径
-		/////////////////////////////////////////////////////////////////////////////////////////////////
-		//连接数据库
-// 		m_pCon.CreateInstance("ADODB.Connection");
-// 		m_pRs.CreateInstance(_T("ADODB.Recordset"));
-		//m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+		 
 		strSql.Format(_T("select * from ALL_NODE where Bautrate='%s' "),oldip);
-		//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-		bado.m_pRecordset=bado.OpenRecordset(strSql);
-		while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+ 
+		q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+		while(!q.eof())
 		{
 			strSql.Format(_T("update ALL_NODE set Bautrate='%s' where Bautrate='%s'"),newip,oldip);
-			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
-			m_pRs->MoveNext();
+			 SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+			q.nextRow();
 		}
-		//m_pRs->Close();
-		bado.CloseRecordset();
+		 
 
 		CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 		::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
 	}
 	catch(_com_error e)
 	{
-		/* AfxMessageBox(e.Description());*/
-		//MessageBox(m_name_new+_T("  has been here\n Please change another name!"));
-
 		 
-		//m_pCon->Close();
 	}
-	//m_pCon->Close(); 
-	bado.CloseConn();
+	SqliteDBBuilding.closedb();
 }
 int CScanDlg::GetAllNodeFromDataBase()
 {
-	//_ConnectionPtr m_pCon;//for ado connection
-	//_RecordsetPtr m_pRs;//for ado 
+	 
+	CppSQLite3Table table;
+	CppSQLite3Query q;
 
-// 	m_pCon.CreateInstance("ADODB.Connection");
-// 	m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-// 	m_pRs.CreateInstance("ADODB.Recordset");
-	CBADO bado;
-	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-	bado.OnInitADOConn();
+	CppSQLite3DB SqliteDBBuilding;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+	
+
 	_variant_t temp_variant;
 	CString strTemp;
 
 	CString temp_str=_T("select * from ALL_NODE");
-//	m_pRs->Open(_variant_t(temp_str),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);	
-    bado.m_pRecordset=bado.OpenRecordset(temp_str);
+    q = SqliteDBBuilding.execQuery((UTF8MBSTR)temp_str);
+
 	//return m_pRs->get_RecordCount();
 
 	int nTemp = 0;
-	while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+	while(!q.eof())
 	{
 		nTemp++;
 		int nDefault=0;
-		CString strDevType = bado.m_pRecordset->GetCollect("Product_class_ID");
+		CString strDevType = q.getValuebyName(L"Product_class_ID");
 
 		CTStatBase* pNode = NULL;
 		if (strDevType.CompareNoCase(_T("100")) == 0)	 //100 =  NC
 		{
 			pNode = new CTStat_Net;
 			// IP Addr
-			CString strIP = bado.m_pRecordset->GetCollect("Product_ID");
+			CString strIP = q.getValuebyName(L"Product_ID");
 			//((CTStat_Net*)(pNode))->SetIPAddr(strIP);
 			
 			// Port
-			CString strPort = bado.m_pRecordset->GetCollect("Bautrate");
+			CString strPort = q.getValuebyName(L"Bautrate");
 			((CTStat_Net*)(pNode))->SetIPAddr(_wtoi(strPort));
 
 			m_szNetNodes.push_back(((CTStat_Net*)(pNode)));
@@ -1331,46 +1319,45 @@ int CScanDlg::GetAllNodeFromDataBase()
 		{
 			pNode = new CTStat_Dev;
 			// BaudRate
-			CString strBaudRate = bado.m_pRecordset->GetCollect("Bautrate");
+			CString strBaudRate = q.getValuebyName(L"Bautrate");
 			((CTStat_Dev*)(pNode))->SetBaudRate(_wtoi(strBaudRate));
 
 			m_szComNodes.push_back(((CTStat_Dev*)(pNode)));
 
-			CString strComPort = bado.m_pRecordset->GetCollect("Com_Port");
+			CString strComPort = q.getValuebyName(L"Com_Port");
 			strComPort = strComPort.Mid(3);
 			((CTStat_Dev*)(pNode))->SetComPort(_wtoi(strComPort));
 
-			CString strEPSize = bado.m_pRecordset->GetCollect("EPsize");
+			CString strEPSize = q.getValuebyName(L"EPsize");
 			((CTStat_Dev*)(pNode))->SetEPSize(int(_wtoi(strEPSize)));
 
 		}
 		pNode->SetProductType(_wtoi(strDevType));
 
-		pNode->SetBuildingName(bado.m_pRecordset->GetCollect("MainBuilding_Name"));
-		pNode->SetSubnetName(bado.m_pRecordset->GetCollect("Building_Name"));
+		pNode->SetBuildingName(q.getValuebyName(L"MainBuilding_Name"));
+		pNode->SetSubnetName(q.getValuebyName(L"Building_Name"));
 
-		pNode->SetFloorName(bado.m_pRecordset->GetCollect("Floor_Name"));
-		pNode->SetRoomName(bado.m_pRecordset->GetCollect("Room_Name"));
+		pNode->SetFloorName(q.getValuebyName(L"Floor_Name"));
+		pNode->SetRoomName(q.getValuebyName(L"Room_Name"));
 
-		CString strID = bado.m_pRecordset->GetCollect("Product_ID");		
+		CString strID = q.getValuebyName(L"Product_ID");		
 		pNode->SetDevID(_wtoi(strID));
 		
-		CString strHwv = bado.m_pRecordset->GetCollect("Hardware_Ver");
+		CString strHwv = q.getValuebyName(L"Hardware_Ver");
 		pNode->SetHardwareVersion(float(_wtof(strHwv)));
-		CString strSwv = bado.m_pRecordset->GetCollect("Software_Ver");
+		CString strSwv = q.getValuebyName(L"Software_Ver");
 		pNode->SetSoftwareVersion(float(_wtof(strSwv)));
 	
 
 
 
 
-		CString strSerialID = bado.m_pRecordset->GetCollect("Serial_ID");		
+		CString strSerialID =q.getValuebyName(L"Serial_ID");		
 		(pNode)->SetSerialID(_wtoi(strSerialID));
 		
-		bado.m_pRecordset->MoveNext();		
+		q.nextRow();		
 	}
-	bado.CloseRecordset();
-	bado.CloseConn();
+	SqliteDBBuilding.closedb();
 	return m_szNetNodes.size() + m_szComNodes.size();
 }
 
@@ -1400,7 +1387,7 @@ LRESULT CScanDlg::OnScanFinish(WPARAM wParam, LPARAM lParam)
 	AddComDeviceToGrid(m_pScanner->m_szTstatScandRet);
 	AddNetDeviceToGrid(m_pScanner->m_szNCScanRet);
 
-	//OpenDefaultCom();
+ 
 	return 1;
 }
 
@@ -1446,41 +1433,7 @@ void CScanDlg::Release()
 }
 
 
-void CScanDlg::OpenDefaultCom()
-{	
-	CString strSql;
-	strSql.Format(_T("select * from Building order by Main_BuildingName"));
-	//_RecordsetPtr pRs;
-	//_ConnectionPtr pCon;
-	
-	//pCon.CreateInstance("ADODB.Connection");
-	//pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-	//pRs.CreateInstance("ADODB.Recordset");
-
-	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);			
-	_variant_t temp_variant;
-	CString strDefaultCom = 0;		
-	while(VARIANT_FALSE==m_pRs->EndOfFile)
-	{	
-		int bSel = 0;
-		bSel=m_pRs->GetCollect(_T("Default_SubBuilding"));
-		if(bSel==-1)//def building;
-		{
-			strDefaultCom=m_pRs->GetCollect(_T("Com_Port"));
-		}			
-	}
-
-	if (strDefaultCom.GetLength() == 0)
-	{
-		return;
-	}
-	int nCom = _wtoi(strDefaultCom.Right(1));
-	open_com(nCom);
-	m_pCon->Close();
-	
-}
-
-
+ 
 
 CTStat_Dev* CScanDlg::FindComDeviceBySerialIDInDB(DWORD dwSerialID)
 {
@@ -1829,21 +1782,17 @@ void CScanDlg::SaveAllNodeToDB()
 	GetDataFromGrid();	
 	CombineDBandScanRet();
 
-// 	m_pCon.CreateInstance("ADODB.Connection");
-// 	m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+ 
 
-	// 先删除数据库 // maurice说不要删
-
-	CBADO bado;
-	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-	bado.OnInitADOConn(); 
+	CppSQLite3DB SqliteDBBuilding;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
 	try
 	{
 
 	CString strSql;
-	strSql.Format(_T("delete * from ALL_NODE"));
-	bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+	strSql.Format(_T("delete   from ALL_NODE"));
+	SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 
 	}
 	catch(_com_error *e)
@@ -1876,8 +1825,8 @@ void CScanDlg::SaveAllNodeToDB()
 		WriteOneNetInfoToDB(pNetInfo);
 	}
 
-	bado.CloseConn();
-	//m_pCon->Close();
+	SqliteDBBuilding.closedb();
+ 
 }
 
 // 合并数据库和scan结果，以便存入数据库
@@ -1943,9 +1892,9 @@ void CScanDlg::CombineDBandScanRet()
 void CScanDlg::WriteOneDevInfoToDB( CTStat_Dev* pDev)
 {
 	ASSERT(pDev);
-	CBADO bado;
-	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-	bado.OnInitADOConn(); 
+	CppSQLite3DB SqliteDBBuilding;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 	CString strBuildingName = pDev->GetBuildingName();
 
 	CString strFloorName = pDev->GetFloorName();
@@ -1997,25 +1946,21 @@ void CScanDlg::WriteOneDevInfoToDB( CTStat_Dev* pDev)
 
 	strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,Custom,EPsize) values('"
     +strBuildingName+"','"+strSubNetName+"','"+strSerialID+"','"+strFloorName+"','"+strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strBaudRate+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strCom+_T(",'0'")+"','"+strEpSize+"')"));
-	//new nc // strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('"+strBuildingName+"','"+strSubNetName+"','"+strSerialID+"','"+strFloorName+"','"+strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strBaudRate+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strCom+"','"+strEPSize+"','"+strMainnetInfo+"')"));
-	bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+	SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 	}
 	catch(_com_error *e)
 	{
 		AfxMessageBox(e->ErrorMessage());
 	}
-	bado.CloseConn();
+	SqliteDBBuilding.closedb();
 }
 
 void CScanDlg::WriteOneNetInfoToDB( CTStat_Net* pNet)
 {
  	ASSERT(pNet);
-// 	_ConnectionPtr t_pCon;//for ado connection
-// 	t_pCon.CreateInstance(_T("ADODB.Connection"));
-// 	t_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
-	CBADO bado;
-	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-	bado.OnInitADOConn(); 
+ 
+	CppSQLite3DB SqliteDBBuilding;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
 	CString strBuildingName = pNet->GetBuildingName();
 
@@ -2076,13 +2021,13 @@ void CScanDlg::WriteOneNetInfoToDB( CTStat_Net* pNet)
 	try
 	{
 
-		bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+		SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 	}
 	catch(_com_error *e)
 	{
 		AfxMessageBox(e->ErrorMessage());
 	}
-  bado.CloseConn();
+  SqliteDBBuilding.closedb();
 }
 
 

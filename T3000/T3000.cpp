@@ -17,8 +17,9 @@
 #include "iniFile.h"
 #include "afxinet.h"
 #include "T3000DefaultView.h"
-#include "bado/BADO.h"
-#include "SqliteLib/CppSQLite3.h"
+ 
+#include "../SQLiteDriver/CppSQLite3.h"
+ 
 const int g_versionNO=20160923;
 
 
@@ -118,329 +119,9 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
 }
  
 
- BOOL CT3000App::Is_haveTable(CString TableName){
- CADO ado;
- BOOL Ret=ado.OnInitADOConn();
- if (!Ret)
- {
-	 return Ret;
- }
- if (ado.IsHaveTable(ado,TableName))//有Version表
- {
- return TRUE;
- }
-
- return FALSE;
- }
-
- BOOL CT3000App::JudgeDB(){
-     int versionno=0;
-     CString StrSql;
-     CADO ado;
-     BOOL Ret=ado.OnInitADOConn();
-
-     if (!Ret)
-     {
-         return Ret;
-     }
-
-     if (ado.IsHaveTable(ado,_T("Version")))//有Version表
-     {
-         CString sql=_T("Select * from Version");
-         ado.m_pRecordset=ado.OpenRecordset(sql);
-         ado.m_pRecordset->MoveFirst();
-         while (!ado.m_pRecordset->EndOfFile)
-         {
-             versionno=ado.m_pRecordset->GetCollect(_T("VersionNO"));
-             ado.m_pRecordset->MoveNext();
-         }
-         ado.CloseRecordset();
-
-
-     } 
-     CString Builing_DBPath;
-     StrSql=_T("Select * From Building Where Default_SubBuilding = -1");
-     ado.m_pRecordset = ado.OpenRecordset(StrSql);
-     if (!ado.m_pRecordset->EndOfFile)
-     {
-         Builing_DBPath = ado.m_pRecordset->GetCollect(_T("Building_Path"));
-     }
-     ado.CloseConn();
-     int index=Builing_DBPath.Find(_T("Database"));
-     Builing_DBPath.Delete(0,index);
-
-     g_strCurBuildingDatabasefilePath = GetExePath(true)+ Builing_DBPath;
-     if ((g_versionNO>versionno)/*&&(versionno<=20141116)*/)                 //版本过低
-     {
-         //SetPaneString(0,_T("The version of DB is lower,Updating....."));
-         _variant_t temp_var;
-         _ConnectionPtr srcConTmp;
-         _RecordsetPtr srcRsTemp;
-         srcConTmp.CreateInstance("ADODB.Connection");
-         srcRsTemp.CreateInstance("ADODB.Recordset");
-         srcConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);//打开数据库
-         
-        
-        
-         //Building_ALL
-         if (Is_haveTable(_T("Building_ALL")))
-         {
-#if 1
-
-             srcRsTemp->Open(_T("select * from Building_ALL"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);		
-             Building_ALL Building_ALL_Temp;
-             while(!srcRsTemp->EndOfFile){
-                 Building_ALL_Temp.Building_Name=srcRsTemp->GetCollect(_T("Building_Name"));
-                 Building_ALL_Temp.Address=srcRsTemp->GetCollect(_T("Address"));
-                 Building_ALL_Temp.Telephone=srcRsTemp->GetCollect(_T("Telephone"));
-                 Building_ALL_Temp.Default_Building=srcRsTemp->GetCollect(_T("Default_Build"));
-                 m_Building_ALL.push_back(Building_ALL_Temp);
-                 srcRsTemp->MoveNext();
-             }
-             srcRsTemp->Close();
-#endif
-         }
-
-
-         //Building
-         if (Is_haveTable(_T("Building")))
-         {
-#if 1
-             srcRsTemp->Open(_T("select * from Building"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);		
-             Building Building_Temp;
-             while(!srcRsTemp->EndOfFile){
-
-                 Building_Temp.Braudrate=srcRsTemp->GetCollect(_T("Braudrate"));
-                 Building_Temp.Building_Name=srcRsTemp->GetCollect(_T("Building_Name"));
-                 Building_Temp.Com_Port=srcRsTemp->GetCollect(_T("Com_Port"));
-                 Building_Temp.Default_SubBuilding=srcRsTemp->GetCollect(_T("Default_SubBuilding"));
-                 Building_Temp.Ip_Address=srcRsTemp->GetCollect(_T("Ip_Address"));
-                 Building_Temp.Ip_Port=srcRsTemp->GetCollect(_T("Ip_Port"));
-                 Building_Temp.Main_BuildingName=srcRsTemp->GetCollect(_T("Main_BuildingName"));
-                 Building_Temp.Protocal=srcRsTemp->GetCollect(_T("Protocal"));
-                 m_Building.push_back(Building_Temp);
-                 srcRsTemp->MoveNext();
-             }
-             srcRsTemp->Close();
-#endif
-         }
-
-
  
 
-
-
-         if (srcConTmp->State)
-         {srcConTmp->Close();
-         }
-
-
-
-
-#if 1//刪除老的T3000.mdb ，拷貝一個新的到當前目錄
-         CString filePath=g_strExePth+_T("Database\\T3000.mdb");
-         DeleteFile(filePath);
-         HANDLE hFind;//
-         WIN32_FIND_DATA wfd;//
-         hFind = FindFirstFile(filePath, &wfd);//
-         if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
-         {
-             //CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);//
-             //没有找到就创建一个默认的数据库
-             filePath=g_strExePth+_T("Database\\T3000.mdb");
-             HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000_NEW_DB1), _T("T3000_NEW_DB"));   
-             HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
-
-
-             LPVOID lpExe = LockResource(hGlobal);   
-             CFile file;
-             if(file.Open(filePath, CFile::modeCreate | CFile::modeWrite))    
-                 file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
-             file.Close();    
-             ::UnlockResource(hGlobal);   
-             ::FreeResource(hGlobal);
-         }//
-#endif
-
-
-
-
-
-
-#if 1		//把原来T3000 里面的老数据导入到Building的数据表中
-
-         CString strsql;
-         srcConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-         try
-         {
-
-             //Building_ALL
-#if 1
-             srcConTmp->Execute(_T("delete * from Building_ALL"),NULL,adCmdText);	
-             srcRsTemp->Open(_T("select * from Building_ALL"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-             try{
-                 for (int i=0;i<m_Building_ALL.size();i++)
-                 {
-                     srcRsTemp->AddNew();
-                     srcRsTemp->PutCollect("Building_Name",m_Building_ALL[i].Building_Name);
-                     srcRsTemp->PutCollect("Default_Build",m_Building_ALL[i].Default_Building);
-                     srcRsTemp->PutCollect("Telephone",m_Building_ALL[i].Telephone);
-                     srcRsTemp->PutCollect("Address",m_Building_ALL[i].Address);
-
-
-                     srcRsTemp->Update();
-                 }
-             }
-             catch(_com_error &e){
-				  AfxMessageBox(_T(" Error number 12"));
-                 AfxMessageBox(e.Description());
-             }
-             srcRsTemp->Close();
-#endif
-
-             //Building   Building_Path
-#if 1
-             srcConTmp->Execute(_T("delete * from Building"),NULL,adCmdText);
-             srcRsTemp->Open(_T("select * from Building"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-             try{
-                 for (int i=0;i<m_Building.size();i++)
-                 {
-#if 1//創建一個默認的Building:DefaultBuilding
-                     CString filebuildingPath;//=g_strBuildingFolder+m_Building.at(i).Main_BuildingName+_T("\\"); 
-                     filebuildingPath.Format(_T("%s%s\\"),g_strBuildingFolder,(CString)m_Building.at(i).Main_BuildingName);
-                     CreateDirectory(g_strBuildingFolder,NULL);
-                     CreateDirectory(filebuildingPath,NULL);
-                     filebuildingPath+=(CString)m_Building.at(i).Main_BuildingName;//_T(".mdb");
-                     filebuildingPath+=_T(".mdb");
-
-//                      DeleteFile(filebuildingPath);
-//                      // 	 HANDLE hFind;//
-//                      // 	 WIN32_FIND_DATA wfd;//
-//                      //create building db file
-// 
-//                      hFind = FindFirstFile(filebuildingPath, &wfd);//
-//                      if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
-//                      {
-// 
-//                          HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_BUILDING_DB2), _T("BUILDING_DB"));   
-//                          HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
-// 
-// 
-//                          LPVOID lpExe = LockResource(hGlobal);   
-//                          CFile file;
-//                          if(file.Open(filebuildingPath, CFile::modeCreate | CFile::modeWrite))    
-//                              file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
-//                          file.Close();    
-//                          ::UnlockResource(hGlobal);   
-//                          ::FreeResource(hGlobal);
-//                      }//
-
-#endif
-
-                     int index= filebuildingPath.Find(_T("Database"));
-                     filebuildingPath.Delete(0,index);
-                     if (m_Building.at(i).Default_SubBuilding)
-                     {
-                         g_strCurBuildingDatabasefilePath=GetExePath(true)+filebuildingPath;
-                     }
-                     m_Building.at(i).Building_Path=(_variant_t)filebuildingPath;
-                     srcRsTemp->AddNew();
-                     srcRsTemp->PutCollect("Main_BuildingName",m_Building[i].Main_BuildingName);
-                     srcRsTemp->PutCollect("Building_Name",m_Building[i].Main_BuildingName);
-                     srcRsTemp->PutCollect("Protocal",m_Building[i].Protocal);
-                     srcRsTemp->PutCollect("Com_Port",m_Building[i].Com_Port);
-                     srcRsTemp->PutCollect("Ip_Address",m_Building[i].Ip_Address);
-                     srcRsTemp->PutCollect("Ip_Port",m_Building[i].Ip_Port);
-                     srcRsTemp->PutCollect("Braudrate",m_Building[i].Braudrate);
-                     srcRsTemp->PutCollect("Default_SubBuilding",m_Building[i].Default_SubBuilding);
-                     srcRsTemp->PutCollect("Building_Path", m_Building.at(i).Building_Path);
-                     srcRsTemp->Update();
-                 }
-             }
-             catch(_com_error &e){
-				
-					  AfxMessageBox(_T(" Error number 11"));
-                 AfxMessageBox(e.Description());
-             }
-             srcRsTemp->Close();
-#endif
-
-
-
-         }
-         catch(_com_error *e)
-         {
-			 AfxMessageBox(_T("Error_2"));
-             AfxMessageBox(e->ErrorMessage());
-         }
-
-
-
-         if (srcConTmp->State)
-         {srcConTmp->Close();
-         }
-         srcConTmp=NULL;
-#endif
-
-     }
-
-
-	 int BuildingVersion;
-	 int BuildingDBVersion = 20150623;//最新
-	 CBADO bado;
-	 bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-	 bado.OnInitADOConn(); 
-	 bado.m_pRecordset = bado.OpenRecordset(_T("Select * From Version"));
-	 while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile){
-		 BuildingVersion = bado.m_pRecordset->GetCollect(_T("VersionNO"));
-		 bado.m_pRecordset->MoveNext();
-	 }
-	 if (BuildingVersion>=BuildingDBVersion)
-	 {
-		return TRUE;
-	 }
-     if(BuildingVersion <20150105){
-         StrSql=_T("ALTER TABLE ALL_NODE ADD COLUMN Custom varchar(255)"); 
-         bado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
-         StrSql=_T("Update ALL_NODE Set Custom = '0' ");
-         bado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
-         StrSql=_T("Create Table BatchFlashResult(SN integer,FirmwarePath varchar(255),ConfigPath varchar(255),FirmwareResult tinyint,ConfigResult tinyint)");
-         bado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
-         StrSql=_T("INSERT INTO Version VALUES(20150605,'更新ALL_NODE,创建BatchFlashResult')");
-         bado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
-     }
-     if (BuildingVersion <20150605)
-     {
-         StrSql=_T("ALTER TABLE ALL_NODE ADD COLUMN Parent_SerialNum varchar(255)"); 
-         bado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
-         StrSql=_T("Update ALL_NODE Set Parent_SerialNum = '0' ");
-         bado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
-
-         StrSql=_T("INSERT INTO Version VALUES(20150617,'更新ALL_NODE ,添加Parent_SerialNum')");
-         bado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);  
-     }
-     if (BuildingVersion <=20150617)
-     {
-         StrSql=_T("ALTER TABLE ALL_NODE ADD COLUMN Panal_Number varchar(255)"); 
-         bado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
-         StrSql=_T("Update ALL_NODE Set Panal_Number = '0' ");
-         bado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
-
-         StrSql=_T("ALTER TABLE ALL_NODE ADD COLUMN Object_Instance varchar(255)"); 
-         bado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
-         StrSql=_T("Update ALL_NODE Set Object_Instance = '0' ");
-         bado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
-
-
-         StrSql=_T("INSERT INTO Version VALUES(20150623,'更新ALL_NODE ,添加Panal_Number,Object_Instance')");
-         bado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);  
-     }
-     if (BuildingVersion <=20160219)
-     {
-     }
-     bado.CloseConn();
-     return TRUE;
- }
+ 
 
 
 
@@ -692,21 +373,21 @@ BOOL CT3000App::InitInstance()
 			HANDLE hFind;
 			WIN32_FIND_DATA wfd;
 
-			CString SqliteDLLPath=GetExePath(true)+L"sqlite3.dll";
-			hFind = FindFirstFile(SqliteDLLPath, &wfd);
-			if (hFind==INVALID_HANDLE_VALUE)
-			{
-
-				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_SQLITE3DLL1), _T("SQLITE3DLL"));   
-				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
-				LPVOID lpExe = LockResource(hGlobal);   
-				CFile file;
-				if(file.Open(SqliteDLLPath, CFile::modeCreate | CFile::modeWrite))    
-					file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
-				file.Close();    
-				::UnlockResource(hGlobal);   
-				::FreeResource(hGlobal);
-			}
+// 			CString SqliteDLLPath=GetExePath(true)+L"sqlite3.dll";
+// 			hFind = FindFirstFile(SqliteDLLPath, &wfd);
+// 			if (hFind==INVALID_HANDLE_VALUE)
+// 			{
+// 
+// 				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_SQLITE3DLL1), _T("SQLITE3DLL"));   
+// 				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
+// 				LPVOID lpExe = LockResource(hGlobal);   
+// 				CFile file;
+// 				if(file.Open(SqliteDLLPath, CFile::modeCreate | CFile::modeWrite))    
+// 					file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
+// 				file.Close();    
+// 				::UnlockResource(hGlobal);   
+// 				::FreeResource(hGlobal);
+// 			}
 			//IDR_MFC16DLL1
 
 			CString MFC16DLLPath=GetExePath(true)+L"MFC16API.dll";
@@ -726,116 +407,27 @@ BOOL CT3000App::InitInstance()
 			}
 
 
-
-			CppSQLite3DB SqliteDB;
-			CString tempDB = GetExePath(true) + L"Psychrometry\\db_psychrometric_project.s3db";
-			
-			hFind = FindFirstFile(tempDB, &wfd);
-			if (hFind==INVALID_HANDLE_VALUE)
-			{
-				CreateDirectory(GetExePath(true)+L"Psychrometry\\");
-				char m_sqlitepath[256];
-				strcpy( m_sqlitepath, (CStringA)tempDB);
-				SqliteDB.open(m_sqlitepath);
-
-				CString SqlText;
- 
-				SqlText = _T("create table tbl_building_location (Selection int DEFAULT ( 0 ),ID INTEGER PRIMARY KEY AUTOINCREMENT ,country varchar(255),\
-				state varchar(255),city varchar(255),street varchar(255), ZIP int,longitude varchar(255),latitude varchar(255),elevation varchar(255),\
-				BuildingName VARCHAR(255),EngineeringUnits VARCHAR(255) )");
-				
-				char charqltext[1024];
-				memset(charqltext,0,1024);
-				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
-				//sprintf(charqltext, "%s", CW2A(SqlText));
-				//strcpy( charqltext, (CStringA)SqlText);
-				
-				SqliteDB.execDML(charqltext);
-				 
-				 
-				//SqlText =_T("create table tbl_geo_location_value (ID int ,longitude varchar(255),latitude varchar(255),elevation varchar(255))");
-				//      // _T("create table tbl_geo_location_value (ID int ,longitude varchar(255),latitude varchar(255),elevation varchar(255))");
-				//memset(charqltext,0,1024);
-				//WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
-
-				//SqliteDB.execDML(charqltext);
-				 
-// 				SqlText = _T("create table tbl_historical_data (ID int ,date_current datetime,hour_current int,minute_current int,temperature varchar(255),\
-// 					humidity varchar(255),station_name varchar(255))");
-				SqlText = _T("create table tbl_historical_data (ID INTEGER,date_current datetime,hour_current int,minute_current int,distance_from_building varchar(255),temperature varchar(255),humidity varchar(255),bar_pressure varchar(255),wind varchar(255),direction varchar(255),station_name varchar(255))");
-				memset(charqltext,0,1024);
-				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
-				SqliteDB.execDML(charqltext);
-				 
-				SqlText = L"create table tbl_weather_related_values (ID INTEGER PRIMARY KEY AUTOINCREMENT ,location varchar(255),distance_from_building varchar(255),last_update_date varchar(255),temp varchar(255),humidity varchar(255),bar_pressure varchar(255),wind varchar(255),direction varchar(255),station_name varchar(255))";
-				memset(charqltext,0,1024);
-				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
-
-				SqliteDB.execDML(charqltext);
-				 
-// 				SqlText = L"create table tbl_temp_humidity (temp int,humidity int)";
-// 				memset(charqltext,0,1024);
-// 				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
-// 
-// 				SqliteDB.execDML(charqltext);
-
-
-				SqlText = L"Insert into tbl_building_location values(1,1,'China','','ShangHai','HongXinRoad,#35',200000,'121','31','3.5','DefaultBuilding')";
-				memset(charqltext,0,1024);
-				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
-
-				SqliteDB.execDML(charqltext);
-
-				SqlText = L"create table tbl_language_option (ID int,language_id int)";
-				memset(charqltext,0,1024);
-				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
-
-				SqliteDB.execDML(charqltext);
-
-				 
-				SqlText = L"Insert into tbl_language_option values(1,1)";
-				memset(charqltext,0,1024);
-				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
-
-				SqliteDB.execDML(charqltext);
-
-				SqlText = L"Insert into tbl_language_option values(2,0)";
-				memset(charqltext,0,1024);
-				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
-
-				SqliteDB.execDML(charqltext);
-
-
-				SqlText = L"Insert into tbl_language_option values(3,0)";
-				memset(charqltext,0,1024);
-				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
-
-				SqliteDB.execDML(charqltext);
-				SqliteDB.close();
-			}
-
-			FindClose(hFind);
-
+		 
+			 
 			
 
 
-			g_strOrigDatabaseFilePath=g_strExePth+_T("T3000.mdb");//
-			g_strDatabasefilepath+=_T("Database\\T3000.mdb");//
+		 
+			g_strDatabasefilepath+=_T("Database\\T3000.db");//
 
 
 
 #if 1//如果沒有T3000 的情況下
 
 			CString FilePath;
-			//HANDLE hFind;//
-//			WIN32_FIND_DATA wfd;//
+ 
 			hFind = FindFirstFile(g_strDatabasefilepath, &wfd);//
 			if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
 			{
 				//CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);//
 				//没有找到就创建一个默认的数据库
-				FilePath=g_strExePth+_T("Database\\T3000.mdb");
-				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000_NEW_DB1), _T("T3000_NEW_DB"));   
+				FilePath=g_strExePth+_T("Database\\T3000.db");
+				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000DB1), _T("T3000DB"));   
 				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
 				LPVOID lpExe = LockResource(hGlobal);   
 				CFile file;
@@ -915,7 +507,7 @@ BOOL CT3000App::InitInstance()
 
 
 
-			g_strDatabasefilepath=(CString)FOR_DATABASE_CONNECT+g_strDatabasefilepath;//
+		//	g_strDatabasefilepath=(CString)FOR_DATABASE_CONNECT+g_strDatabasefilepath;//
 			g_strImgeFolder=g_strExePth+_T("Database\\image\\");//
 			CreateDirectory(g_strImgeFolder,NULL);//
 			g_strBuildingFolder=g_strExePth+_T("Database\\Buildings\\");
@@ -932,7 +524,7 @@ BOOL CT3000App::InitInstance()
 				CreateDirectory(filebuildingPath,NULL);
 
 				filebuildingPath+=(CString)"Default_Building";//_T(".mdb");
-				filebuildingPath+=_T(".mdb");
+				filebuildingPath+=_T(".db");
 
 				DeleteFile(filebuildingPath);
 				// 	 HANDLE hFind;//
@@ -943,7 +535,7 @@ BOOL CT3000App::InitInstance()
 				if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
 				{
 
-					HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_BUILDING_DB2), _T("BUILDING_DB"));   
+					HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_BUILDINGDB1), _T("BUILDINGDB"));   
 					HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
 
 
@@ -960,14 +552,16 @@ BOOL CT3000App::InitInstance()
 				filebuildingPath.Delete(0,index);
 
 				CString sql;
-				CADO ado; 
+				/*CADO ado; 
 				ado.OnInitADOConn();
 
 				sql.Format(_T("update Building set Building_Path = '%s'  where  Main_BuildingName = 'Default_Building' "),filebuildingPath);
 
 				ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
 
-				ado.CloseConn();
+				ado.CloseConn();*/
+
+
 			}
 
 
@@ -996,12 +590,12 @@ BOOL CT3000App::InitInstance()
 
 			//先不考虑升级的情况
 #if 1
-			int Ret=JudgeDB();
+		/*	int Ret=JudgeDB();
 			if (!Ret)
 			{
-				FilePath=g_strExePth+_T("Database\\t3000.mdb");
+				FilePath=g_strExePth+_T("Database\\T3000.db");
 				DeleteFile(FilePath.GetBuffer());
-				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000_NEW_DB1), _T("T3000_NEW_DB"));   
+				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000DB1), _T("T3000DB"));   
 				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
 
 
@@ -1014,7 +608,7 @@ BOOL CT3000App::InitInstance()
 				::FreeResource(hGlobal);
 				JudgeDB();
 
-			}
+			}*/
 
 #endif
 
@@ -1062,7 +656,7 @@ BOOL CT3000App::InitInstance()
 		{
 			CFileFind temp_find;
 			CString temp_123;
-			temp_123 = g_strExePth +  _T("Database\\T3000.mdb");
+			temp_123 = g_strExePth +  _T("Database\\T3000.db");
 			BOOL	nret = temp_find.FindFile(temp_123);
 			if(nret)
 			{
@@ -1102,55 +696,19 @@ BOOL CT3000App::InitInstance()
 		GdiplusStartup(&g_gdiplusToken, &gdiplusStartupInput, NULL);//
 
 #if 1
-		////////////////////////////////////////////////////////
-		_ConnectionPtr m_pCon;
-		_RecordsetPtr m_pRs;
-		m_pCon.CreateInstance(_T("ADODB.Connection"));
-		hr=m_pRs.CreateInstance(_T("ADODB.Recordset"));
-		if(FAILED(hr)) 	
-		{
-			AfxMessageBox(_T("Load msado12.dll erro"));
-			return FALSE;
-		}
-		m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-		m_pRs->Open(_T("select * from Userlogin"),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);		
-		int nRecord=m_pRs->GetRecordCount();
-		if (nRecord<=0)
-		{
-			g_bPrivilegeMannage=FALSE;
-		}
-		else
-		{
-			int nUse;
-			_variant_t temp_variant;
-			temp_variant=m_pRs->GetCollect("USE_PASSWORD");//
-			if(temp_variant.vt!=VT_NULL)
-				nUse=temp_variant;
-			else
-				nUse=0;
-			if(nUse==-1)
-			{
-				g_bPrivilegeMannage=TRUE;
-			}
-			else
-			{
-				g_bPrivilegeMannage=FALSE;
-			}
-		}
-		m_pRs->Close();
-		m_pCon->Close();
+ 
 
 
 
-		if (g_bPrivilegeMannage)
-		{//for just quick debug,only on this computer
-			if(!user_login())
-			{
-				AfxMessageBox(_T("Error password!"));	
-				return false;
-			}
+		//if (g_bPrivilegeMannage)
+		//{//for just quick debug,only on this computer
+		//	if(!user_login())
+		//	{
+		//		AfxMessageBox(_T("Error password!"));	
+		//		return false;
+		//	}
 
-		}
+		//}
 
 #endif
 
@@ -1181,54 +739,7 @@ BOOL CT3000App::InitInstance()
 	}
 	catch (...)
 	{
-		//int error_value  = GetLastError();
-		//CString value_temp;
-		//value_temp.Format(_T("%d"),error_value);
-		//AfxMessageBox(value_temp);
-		CFileFind temp_find;
-		CString temp_123;
-		temp_123 = g_strExePth +  _T("Database\\T3000.mdb");
-		BOOL	nret = temp_find.FindFile(temp_123);
-		if(nret)
-		{
-			DeleteFile(temp_123);
-		}
-		//	AfxMessageBox(_T("Double click 'REG_msado15.dll',Please!\nAt C:\\Program Files\\Temcocontrols\\T3000"));
-
-		// 		CString strFilter = _T("hex File;bin File|*.hex;*.bin|all File|*.*||");
-		// 		CFileDialog dlg(true,_T("hex"),NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER,strFilter);
-		// 		dlg.DoModal();
-
-		//		CFileDialog dlg(true,NULL,_T("C:\Program Files\Common Files\System\ado"));
-		//dlg.lpstrInitialDir = "..\\hisdata";
-		//dlg.op
-		////
-		//		OPENFILENAME
-
-
-		//		if (dlg.DoModal()==IDOK)
-		//		{
-		// 			path = dlg.GetPathName();
-		// 			pLogFile = fopen("Log.txt", "wt+");   
-		// 			fprintf(pLogFile, "%s", (LPCSTR)path); 
-		// 			fclose(pLogFile);
-		// 			pLogFile = NULL; 
-		//		}
-
-
-		// 		CFileDialog fileDlg(TRUE,NULL,NULL,OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT,
-		// 			NULL,NULL);//_T("工作表(*.xls)|*.xls|文本文件(*.txt)|*.txt||")
-		// 		fileDlg.m_ofn.lpstrInitialDir = _T("C:\\Program Files\\Temcocontrols\\T3000\\REG_msado15.dll.bat");
-		// 		fileDlg.DoModal();
-
-
-
-		//::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\REG_msado15.dll.bat"), _T(""), _T(""), SW_SHOW);
-		//vcredist_x86.zip
-
-		//	::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\vcredist_x86.zip"), _T(""), _T(""), SW_SHOW);
-		//这个要先试试，当电脑没有安装这个文件时，如何捕获这个信息，然后再执行这个。
-		// http://www.temcocontrols.com/ftp/software/AccessDatabaseEngine.zip
+		 
 		CString str_msado;
 		str_msado.Format(_T("%sREG_MSFLXGRD.bat"),g_strExePth.GetBuffer());
 		::ShellExecute(NULL, _T("open"),str_msado.GetBuffer(), _T(""), _T(""), SW_SHOW);
@@ -1391,7 +902,7 @@ void CT3000App::CopyDirectory(CString strSrcPath,CString strDstPath)
 		AfxMessageBox(_T("Success"));
 	else
 		AfxMessageBox(_T("Failed"));
-  }
+}
 void CT3000App::OnVersionInfo()
 {
 	CString strHistotyFile=g_strExePth+_T("history.txt");

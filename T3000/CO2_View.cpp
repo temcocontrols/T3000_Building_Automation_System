@@ -7,7 +7,7 @@
 #include "CO2_View.h"
 #include "globle_function.h"
 #include "CM5\MyOwnListCtrl.h"
-#include "bado\BADO.h"
+#include "../SQLiteDriver/CppSQLite3.h"
 #include <bitset>
 #include "GraphicMode.h"
 // CCO2_View
@@ -2765,10 +2765,11 @@ void CCO2_View::OnCbnSelchangeCo2Braudratecombo()
         SqlText.Format(_T("update ALL_NODE set Bautrate = '19200' where Serial_ID='%d'"),get_serialnumber());
          Change_BaudRate(19200);
     }
-    CBADO bado;
-    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-    bado.OnInitADOConn(); 
-    bado.m_pConnection->Execute(SqlText.GetString(),NULL,adCmdText);
+	CppSQLite3DB SqliteDBBuilding;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+	SqliteDBBuilding.execDML((UTF8MBSTR)SqlText);
+
+    SqliteDBBuilding.closedb();
 
 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 	::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);

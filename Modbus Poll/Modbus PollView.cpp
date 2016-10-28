@@ -14,7 +14,7 @@
 #include "WriteSingleRegisterDlg.h"
 #include "WriteSingle_BinaryDlg.h"
 #include "RegisterValueAnalyzerDlg.h"
-#include "ado/ADO.h"
+#include "../SQLiteDriver/CppSQLite3.h"
 #include "WriteFunctionDlg.h"
  
 // #include "CApplication.h"
@@ -409,7 +409,7 @@ void CModbusPollView::Fresh_Data(){
 	{
 	  m_ischangedAddress=TRUE;
 	}
-	Initial_RegName();
+	 Initial_RegName();
 	COLORREF  cf=RGB(255,255,255);
 /*	m_modelname=GetProductName(m_modeldata[1]);*/
 	if (m_modelname.IsEmpty())
@@ -1714,108 +1714,67 @@ void CModbusPollView::Initial_RegName(){
 		m_Alias[i]=_T("");
 	}
 	CString TableName,RegName,RegAddress;
-	CADO ado;
-	ado.OnInitADOConn();
-	if(ado.IsHaveTable(ado,_T("ProductsTypeRegisterTables")))
+	CppSQLite3DB SqliteDBT3000;
+	CppSQLite3Query q;
+	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+	if(SqliteDBT3000.tableExists("ProductsTypeRegisterTables"))
 	{  
 		CString sql,temp;
 		sql.Format(_T("Select * from ProductsTypeRegisterTables where ProductType=%d"),m_modeldata[1]);
 		m_cur_modelNo=m_modeldata[1];
-		ado.m_pRecordset=ado.OpenRecordset(sql);
-		if (!ado.m_pRecordset->EndOfFile)
+		 q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
+		if (!q.eof())
 		{
-            temp_var=ado.m_pRecordset->GetCollect(_T("TableName"));
-            if (temp_var.vt!=VT_NULL)
-            {
-                TableName=temp_var;
-            }
-            else
-            {
-                TableName=_T("");
-            }
+            
+			TableName = q.getValuebyName(L"TableName");
 			m_cur_TableName=TableName;
-			temp_var=ado.m_pRecordset->GetCollect(_T("Col_RegName"));
-			if (temp_var.vt!=VT_NULL)
-			{
-				RegName=temp_var;
-			}
-			else
-			{
-				RegName=_T("");
-			}
+			 
+			RegName =  q.getValuebyName(L"Col_RegName");
 			m_cur_Col_RegName=RegName;
-			temp_var=ado.m_pRecordset->GetCollect(_T("Col_RegAddress"));
-			if (temp_var.vt!=VT_NULL)
-			{
-				RegAddress=temp_var;
-			}
-			else
-			{
-				RegAddress=_T("");
-			}
+		 
+			RegAddress = q.getValuebyName(L"Col_RegAddress");
 			m_cur_col_RegAddress=RegAddress;
-			temp_var=ado.m_pRecordset->GetCollect(_T("ProductName"));
-			if (temp_var.vt!=VT_NULL)
-			{
-				m_modelname=temp_var;
-			}
-			else
-			{
-				m_modelname=_T("");
-			}
+			 
+			m_modelname = q.getValuebyName(L"ProductName");
 			m_cur_modelName=m_modelname;
 		}
 	 
 	}
-	ado.CloseRecordset();
+	 
 	if (TableName.GetLength()!=0)
 	{
-		if (ado.IsHaveTable(ado,TableName))
+		if (SqliteDBT3000.tableExists((UTF8MBSTR)TableName))
 		{
 			DBRegister tempstuct;
 			CString sql;
 		    if (TableName.CompareNoCase(_T("CustomProductTable"))==0)
 		    {
 				sql.Format(_T("Select [%s],[%s] from %s where ModelNo=%d "),RegName.GetBuffer(),RegAddress.GetBuffer(),TableName.GetBuffer(),m_cur_modelNo);
-				ado.m_pRecordset=ado.OpenRecordset(sql);
-				while (!ado.m_pRecordset->EndOfFile)
+				q=SqliteDBT3000.execQuery((UTF8MBSTR)sql);
+				while (!q.eof())
 				{
 
-					temp_var=ado.m_pRecordset->GetCollect(RegAddress.GetBuffer());
-					if (temp_var.vt!=VT_NULL)
-					{
-						tempstuct.RegAddress=temp_var;
-					}
-					temp_var=ado.m_pRecordset->GetCollect(RegName.GetBuffer());
-
-					if (temp_var.vt!=VT_NULL)
-					{
-						tempstuct.RegName=temp_var;
-					}
+				 
+					tempstuct.RegAddress = q.getIntField((UTF8MBSTR)RegAddress);
+					 
+					tempstuct.RegName = q.getValuebyName(RegName);
 					m_VecregisterData.push_back(tempstuct);
-					ado.m_pRecordset->MoveNext();
+					q.nextRow();
 				}
 		    } 
 		    else
 		    {
 				sql.Format(_T("Select [%s],[%s] from %s "),RegName.GetBuffer(),RegAddress.GetBuffer(),TableName.GetBuffer());
-				ado.m_pRecordset=ado.OpenRecordset(sql);
-				while (!ado.m_pRecordset->EndOfFile)
+				q=SqliteDBT3000.execQuery((UTF8MBSTR)sql);
+				while (!q.eof())
 				{
 
-					temp_var=ado.m_pRecordset->GetCollect(RegAddress.GetBuffer());
-					if (temp_var.vt!=VT_NULL)
-					{
-						tempstuct.RegAddress=temp_var;
-					}
-					temp_var=ado.m_pRecordset->GetCollect(RegName.GetBuffer());
-
-					if (temp_var.vt!=VT_NULL)
-					{
-						tempstuct.RegName=temp_var;
-					}
+					 
+					tempstuct.RegAddress = q.getIntField((UTF8MBSTR)RegAddress);
+					 
+					tempstuct.RegName = q.getValuebyName(RegName);
 					m_VecregisterData.push_back(tempstuct);
-					ado.m_pRecordset->MoveNext();
+					q.nextRow();
 				}
 		    }
 		
@@ -1847,10 +1806,10 @@ void CModbusPollView::Initial_RegName(){
  			m_Alias[i]=_T("");
  		}
  	}
-	ado.CloseConn();
+	SqliteDBT3000.closedb();
 
 
-	/*m_ischangeModelName=FALSE;*/
+	 
 }
 
 void CModbusPollView::OnEnKillfocusModelname()
@@ -1865,143 +1824,143 @@ void CModbusPollView::OnEnKillfocusModelname()
 // 	showmodelname.Format(_T("%s"),m_modelname.GetBuffer());
 // 	m_ModelNameRichEdit.SetWindowText(showmodelname);
 // 	m_ModelNameRichEdit.SetStringFontSize(13);
-if (ModelName.CompareNoCase(m_cur_modelName)==0)
-{
-return;
-}
-    
-   if (m_isnewmodel)
-   {
-    int ret=   AfxMessageBox(_T("This is a new product model!\nDo you want to add it to Database?"),MB_OKCANCEL,0);
-
-	if (ret==1)
-	{
-		CADO ado;
-		ado.OnInitADOConn();
-		if(ado.IsHaveTable(ado,_T("ProductsTypeRegisterTables")))
-		{  
-			CString sql;
-			sql.Format(_T("Insert into ProductsTypeRegisterTables(ProductType,TableName,ProductName,Col_RegName,Col_RegAddress) values('%d','CustomProductTable','%s','Reg_Description','Reg_ID')"),m_modeldata[1],ModelName);
-			try
-			{
-				ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
-			}
-			catch (_com_error *e)
-			{
-				AfxMessageBox(e->ErrorMessage());
-			}
-		}
-	} 
-	 
-   }
-   if (m_ischangeModelName)
-   {
-      int ret=   AfxMessageBox(_T("Are you sure to change the name of the unit?"),MB_OKCANCEL,0);
-	   
-		  if (ret==1)
-		  {
-			  CADO ado;
-			  ado.OnInitADOConn();
-			  if(ado.IsHaveTable(ado,_T("ProductsTypeRegisterTables")))
-			  {  
-				  CString sql;
-				  sql.Format(_T("update  ProductsTypeRegisterTables Set ProductName='%s'  where ProductType=%d"),ModelName,m_cur_modelNo);
-				  try
-				  {
-					  ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
-				  }
-				  catch (_com_error *e)
-				  {
-					  AfxMessageBox(e->ErrorMessage());
-				  }
-			  }
-		  } 
-
-	  }
-    
- COLORREF  cf=RGB(212,208,200);
-   m_ModelNameRichEdit.SetReadOnly(TRUE);
-   m_ModelNameRichEdit.SetBackgroundColor(FALSE,cf);
-   CString showmodelname;
-   showmodelname.Format(_T("%s"),ModelName.GetBuffer());
-   m_ModelNameRichEdit.SetWindowText(showmodelname);
-   m_ModelNameRichEdit.SetStringFontSize(13);
-   m_ischangeModelName=FALSE;
+//if (ModelName.CompareNoCase(m_cur_modelName)==0)
+//{
+//return;
+//}
+//    
+//if (m_isnewmodel)
+//{
+//	int ret=   AfxMessageBox(_T("This is a new product model!\nDo you want to add it to Database?"),MB_OKCANCEL,0);
+//
+//	if (ret==1)
+//	{
+//		CADO ado;
+//		ado.OnInitADOConn();
+//		if(ado.IsHaveTable(ado,_T("ProductsTypeRegisterTables")))
+//		{  
+//			CString sql;
+//			sql.Format(_T("Insert into ProductsTypeRegisterTables(ProductType,TableName,ProductName,Col_RegName,Col_RegAddress) values('%d','CustomProductTable','%s','Reg_Description','Reg_ID')"),m_modeldata[1],ModelName);
+//			try
+//			{
+//				ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+//			}
+//			catch (_com_error *e)
+//			{
+//				AfxMessageBox(e->ErrorMessage());
+//			}
+//		}
+//	} 
+//
+//}
+//if (m_ischangeModelName)
+//{
+//	int ret=   AfxMessageBox(_T("Are you sure to change the name of the unit?"),MB_OKCANCEL,0);
+//
+//	if (ret==1)
+//	{
+//		CADO ado;
+//		ado.OnInitADOConn();
+//		if(ado.IsHaveTable(ado,_T("ProductsTypeRegisterTables")))
+//		{  
+//			CString sql;
+//			sql.Format(_T("update  ProductsTypeRegisterTables Set ProductName='%s'  where ProductType=%d"),ModelName,m_cur_modelNo);
+//			try
+//			{
+//				ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+//			}
+//			catch (_com_error *e)
+//			{
+//				AfxMessageBox(e->ErrorMessage());
+//			}
+//		}
+//	} 
+//
+//}
+//
+//COLORREF  cf=RGB(212,208,200);
+//m_ModelNameRichEdit.SetReadOnly(TRUE);
+//m_ModelNameRichEdit.SetBackgroundColor(FALSE,cf);
+//CString showmodelname;
+//showmodelname.Format(_T("%s"),ModelName.GetBuffer());
+//m_ModelNameRichEdit.SetWindowText(showmodelname);
+//m_ModelNameRichEdit.SetStringFontSize(13);
+//m_ischangeModelName=FALSE;
 }
 void CModbusPollView::OnEnKillfocusEditName()
 {
-	CString strText;
-	m_edit_name.GetWindowTextW(strText);
-	if (strText.IsEmpty())
-	{
-		return;
-	}
-	m_MsDataGrid.put_TextMatrix(m_Current_Row,m_Current_Col,strText);
-	int Index;
-	if (m_Current_Col%3==0)
-	{
+	//CString strText;
+	//m_edit_name.GetWindowTextW(strText);
+	//if (strText.IsEmpty())
+	//{
+	//	return;
+	//}
+	//m_MsDataGrid.put_TextMatrix(m_Current_Row,m_Current_Col,strText);
+	//int Index;
+	//if (m_Current_Col%3==0)
+	//{
 
-		Index=(m_Current_Col/3-1)*(m_MsDataGrid.get_Rows()-1)+(m_Current_Row-1);
-	} 
-	else
-	{
-		Index=(m_Current_Col/3)*(m_MsDataGrid.get_Rows()-1)+(m_Current_Row-1);
-	}
-	m_Alias[Index]=strText;
-	int RegAddress=Get_Reg_Add(Index);
-	CADO ado;
-	ado.OnInitADOConn();
-	CString SqlText;
-	if (m_cur_TableName.CompareNoCase(_T("CustomProductTable"))==0)
-	{
-	SqlText.Format(_T("Select * from CustomProductTable where ModelNo=%d and Reg_ID=%d"),m_cur_modelNo,RegAddress);
-	ado.m_pRecordset=ado.OpenRecordset(SqlText);
-	if (!ado.m_pRecordset->EndOfFile)
-	{
-		//strSql.Format(_T("update ALL_NODE set Hardware_Ver ='%s' where Serial_ID = '%s' and Bautrate = '%s'"),hw_instance,str_serialid,str_baudrate);
-		//m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-		SqlText.Format(_T("update CustomProductTable set Reg_Description='%s' where ModelNo=%d and Reg_ID=%d "),strText.GetBuffer(),m_cur_modelNo,RegAddress);
-		try
-		{
-		ado.m_pConnection->Execute(SqlText.GetString(),NULL,adCmdText);
-		}
-		catch (_com_error *e)
-		{
-			AfxMessageBox(e->ErrorMessage());
-		}
-	} 
-	else
-	{
-		SqlText.Format(_T("Insert into CustomProductTable(Reg_Description,ModelNo,Reg_ID) values('%s',%d,%d)"),strText.GetBuffer(),m_cur_modelNo,RegAddress);
-		try
-		{
-			ado.m_pConnection->Execute(SqlText.GetString(),NULL,adCmdText);
-		}
-		catch (_com_error *e)
-		{
-			AfxMessageBox(e->ErrorMessage());
-		}
-	}
-	   
-	} 
-	else
-	{
-	   SqlText.Format(_T("Select * from %s where %s=%d"),m_cur_TableName,m_cur_col_RegAddress,RegAddress);
-	   ado.m_pRecordset=ado.OpenRecordset(SqlText);
-	   if (!ado.m_pRecordset->EndOfFile)
-	   {
-	     SqlText.Format(_T("update %s set %s ='%s' where %s =%d "),m_cur_TableName,m_cur_Col_RegName,strText.GetBuffer(),m_cur_col_RegAddress,RegAddress);
-		 try
-		 {
-		 ado.m_pConnection->Execute(SqlText.GetString(),NULL,adCmdText);
-		 }
-		 catch (_com_error *e)
-		 {
-		 	AfxMessageBox(e->ErrorMessage());
-		 }
-		 
-	   }
-	}
+	//	Index=(m_Current_Col/3-1)*(m_MsDataGrid.get_Rows()-1)+(m_Current_Row-1);
+	//} 
+	//else
+	//{
+	//	Index=(m_Current_Col/3)*(m_MsDataGrid.get_Rows()-1)+(m_Current_Row-1);
+	//}
+	//m_Alias[Index]=strText;
+	//int RegAddress=Get_Reg_Add(Index);
+	// CADO ado;
+	//ado.OnInitADOConn();
+	//CString SqlText;
+	//if (m_cur_TableName.CompareNoCase(_T("CustomProductTable"))==0)
+	//{
+	//SqlText.Format(_T("Select * from CustomProductTable where ModelNo=%d and Reg_ID=%d"),m_cur_modelNo,RegAddress);
+	//ado.m_pRecordset=ado.OpenRecordset(SqlText);
+	//if (!ado.m_pRecordset->EndOfFile)
+	//{
+	//	//strSql.Format(_T("update ALL_NODE set Hardware_Ver ='%s' where Serial_ID = '%s' and Bautrate = '%s'"),hw_instance,str_serialid,str_baudrate);
+	//	//m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+	//	SqlText.Format(_T("update CustomProductTable set Reg_Description='%s' where ModelNo=%d and Reg_ID=%d "),strText.GetBuffer(),m_cur_modelNo,RegAddress);
+	//	try
+	//	{
+	//	ado.m_pConnection->Execute(SqlText.GetString(),NULL,adCmdText);
+	//	}
+	//	catch (_com_error *e)
+	//	{
+	//		AfxMessageBox(e->ErrorMessage());
+	//	}
+	//} 
+	//else
+	//{
+	//	SqlText.Format(_T("Insert into CustomProductTable(Reg_Description,ModelNo,Reg_ID) values('%s',%d,%d)"),strText.GetBuffer(),m_cur_modelNo,RegAddress);
+	//	try
+	//	{
+	//		ado.m_pConnection->Execute(SqlText.GetString(),NULL,adCmdText);
+	//	}
+	//	catch (_com_error *e)
+	//	{
+	//		AfxMessageBox(e->ErrorMessage());
+	//	}
+	//}
+	//   
+	//} 
+	//else
+	//{
+	//   SqlText.Format(_T("Select * from %s where %s=%d"),m_cur_TableName,m_cur_col_RegAddress,RegAddress);
+	//   ado.m_pRecordset=ado.OpenRecordset(SqlText);
+	//   if (!ado.m_pRecordset->EndOfFile)
+	//   {
+	//     SqlText.Format(_T("update %s set %s ='%s' where %s =%d "),m_cur_TableName,m_cur_Col_RegName,strText.GetBuffer(),m_cur_col_RegAddress,RegAddress);
+	//	 try
+	//	 {
+	//	 ado.m_pConnection->Execute(SqlText.GetString(),NULL,adCmdText);
+	//	 }
+	//	 catch (_com_error *e)
+	//	 {
+	//	 	AfxMessageBox(e->ErrorMessage());
+	//	 }
+	//	 
+	//   }
+	//}
 
 }
 

@@ -4,7 +4,7 @@
 #include "globle_function.h"
 #include "Windows.h"
 #include "T3000.h"
-#include "ado/ADO.h"
+ 
 
 
 #include "T3000RegAddress.h"
@@ -43,6 +43,7 @@
 #include "MainFrm.h"
 #include "modbus_read_write.cpp"
 #include "ptp.h"
+#include "../SQLiteDriver/CppSQLite3.h"
 //#include "CM5\PTP\ptp.h"
 #pragma region For_Bacnet_program_Use
 
@@ -4200,25 +4201,25 @@ CString GetProductName(int ModelID)
 
 CString Get_Table_Name(int SerialNo,CString Type ,int Row)
 {
-    //	CADO ado;
+    
     CString Table_Name;
-    //ado.OnInitADOConn();
-    CBADO bado;
-    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-    bado.OnInitADOConn();
-
-    if (bado.IsHaveTable(bado,_T("IONAME_CONFIG")))//有Version表
+    CppSQLite3DB SqliteDBBuilding;
+    SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+    if (SqliteDBBuilding.tableExists("IONAME_CONFIG"))//有Version表
     {
         CString sql;
         sql.Format(_T("Select * from IONAME_CONFIG where Type='%s' and  Row=%d and SerialNo=%d"),Type.GetBuffer(),Row,SerialNo);
-        bado.m_pRecordset=bado.OpenRecordset(sql);
-        if (!bado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+        q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
+        if (!q.eof())//有表但是没有对应序列号的值
         {
-            bado.m_pRecordset->MoveFirst();
-            while (!bado.m_pRecordset->EndOfFile)
+            
+            while (!q.eof())
             {
-                Table_Name=bado.m_pRecordset->GetCollect(_T("InOutName"));
-                bado.m_pRecordset->MoveNext();
+                 
+				Table_Name=q.getValuebyName(L"InOutName");
+                q.nextRow();
             }
         }
         else
@@ -4230,33 +4231,32 @@ CString Get_Table_Name(int SerialNo,CString Type ,int Row)
     {
         Table_Name.Format(_T("%s%d"),Type.GetBuffer(),Row);
     }
-    bado.CloseRecordset();
-    bado.CloseConn();
+    SqliteDBBuilding.closedb();
     return Table_Name;
 }
 void    Insert_Update_Table_Name(int SerialNo,CString Type,int Row,CString TableName)
 {
-    CBADO ado;
-    ado.SetDBPath(g_strCurBuildingDatabasefilePath);
-    ado.OnInitADOConn();
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
     CString sql;
     sql.Format(_T("Select * from IONAME_CONFIG where Type='%s' and  Row=%d and SerialNo=%d"),Type.GetBuffer(),Row,SerialNo);
-    ado.m_pRecordset=ado.OpenRecordset(sql);
+    q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
 
-    if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+    if (!q.eof())//有表但是没有对应序列号的值
     {
 
         sql.Format(_T("update IONAME_CONFIG set InOutName = '%s' where Type='%s' and  Row=%d and SerialNo=%d "),TableName.GetBuffer(),Type.GetBuffer(),Row,SerialNo);
-        ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+        SqliteDBBuilding.execDML((UTF8MBSTR)sql);
     }
     else
     {
-        ado.CloseRecordset();
+         
         sql.Format(_T("Insert into IONAME_CONFIG(InOutName,Type,Row,SerialNo) values('%s','%s','%d','%d')"),TableName.GetBuffer(),Type.GetBuffer(),Row,SerialNo);
-        ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+         SqliteDBBuilding.execDML((UTF8MBSTR)sql);
     }
-
-    ado.CloseConn();
+	SqliteDBBuilding.closedb();
 }
 
 int Get_Unit_Process(CString Unit)
@@ -6213,30 +6213,7 @@ void Send_WhoIs_remote_ip(CString ipaddress_temp)
 
 
 
-int Open_MonitorDataBase(CString DataSource)
-{
-    CString locol_path;
-    CString m_mdb_path_t3000;
-    CString m_application_path;
-    m_mdb_path_t3000 = _T("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=");
-    GetModuleFileName(NULL, m_application_path.GetBuffer(MAX_PATH), MAX_PATH);
-    PathRemoveFileSpec(m_application_path.GetBuffer(MAX_PATH));
-    m_application_path.ReleaseBuffer();
-    m_mdb_path_t3000 = m_mdb_path_t3000 + m_application_path;
-    m_mdb_path_t3000 = m_mdb_path_t3000 + DataSource;
-
-    HRESULT hr;
-    m_global_pCon.CreateInstance(_T("ADODB.Connection"));
-    hr=m_global_pRs.CreateInstance(_T("ADODB.Recordset"));
-    if(FAILED(hr))
-    {
-        AfxMessageBox(_T("Load msado12.dll erro"));
-        return FALSE;
-    }
-    int ret = m_global_pCon->Open(m_mdb_path_t3000.GetString(),_T(""),_T(""),adModeUnknown);
-    return ret;
-}
-
+ 
 int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
 {
     if((g_mac!=0) &&(g_bac_instance!=0))
@@ -9066,8 +9043,8 @@ void LoadTstat_InputData()
             m_tstat_input_data.at(i-1).AM.StrValue=strAuto;
         }
         //Filter
-        strTemp.Format(_T("%d"),product_register_value[141+i]);
-        m_tstat_input_data.at(i-1).Filter.regAddress=141+i;
+        strTemp.Format(_T("%d"),product_register_value[142+i]);
+        m_tstat_input_data.at(i-1).Filter.regAddress=142+i;
         m_tstat_input_data.at(i-1).Filter.StrValue=strTemp;
 
         //Range
@@ -9626,20 +9603,24 @@ void LoadTstat_OutputData()
 
         if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
         {
-            CADO ado;
-            ado.OnInitADOConn();
-            if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
+			CppSQLite3DB SqliteDBT3000;
+			CppSQLite3Table table;
+			CppSQLite3Query q;
+			SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+            
+            if (SqliteDBT3000.tableExists("Value_Range"))//有Version表
             {
                 CString sql;
                 sql.Format(_T("Select * from Value_Range where CInputNo=%d%d and SN=%d"),i,i,m_sn);
-                ado.m_pRecordset=ado.OpenRecordset(sql);
-                if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+                q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
+                if (!q.eof())//有表但是没有对应序列号的值
                 {
-                    ado.m_pRecordset->MoveFirst();
-                    while (!ado.m_pRecordset->EndOfFile)
+                   
+                    while (!q.eof())
                     {
-                        m_crange=ado.m_pRecordset->GetCollect(_T("CRange"));
-                        ado.m_pRecordset->MoveNext();
+                         
+						m_crange = q.getIntField("CRange");
+                       q.nextRow();
                     }
                     nRange=m_crange;
                     if(nRange>=0)
@@ -9655,7 +9636,7 @@ void LoadTstat_OutputData()
                         strTemp=OUTPUT_RANGE45[nRange];
                     }
                 }
-                ado.CloseRecordset();
+                
             }
             else
             {
@@ -9665,7 +9646,7 @@ void LoadTstat_OutputData()
                     strTemp=OUTPUT_RANGE45[nRange];
                 }
             }
-            ado.CloseConn();
+            SqliteDBT3000.closedb();
 
             if(nRange>=0&&nRange<7)
             {
@@ -9765,20 +9746,22 @@ void LoadTstat_OutputData()
     nRange = product_register_value[MODBUS_MODE_OUTPUT4];//283  205
     if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
     {
-        CADO ado;
-        ado.OnInitADOConn();
-        if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
+		CppSQLite3DB SqliteDBT3000;
+		CppSQLite3Table table;
+		CppSQLite3Query q;
+		SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+        if (SqliteDBT3000.tableExists("Value_Range"))//有Version表
         {
             CString sql;
             sql.Format(_T("Select * from Value_Range where CInputNo=%d%d and SN=%d"),4,4,m_sn);
-            ado.m_pRecordset=ado.OpenRecordset(sql);
-            if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+             q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
+            if (!q.eof())//有表但是没有对应序列号的值
             {
-                ado.m_pRecordset->MoveFirst();
-                while (!ado.m_pRecordset->EndOfFile)
+                 
+                while (!q.eof())
                 {
-                    m_crange=ado.m_pRecordset->GetCollect(_T("CRange"));
-                    ado.m_pRecordset->MoveNext();
+                    m_crange= q.getIntField("CRange");
+                    q.nextRow();
                 }
                 nRange=m_crange;
                 if(nRange>=0)
@@ -9794,7 +9777,7 @@ void LoadTstat_OutputData()
                     strTemp=OUTPUT_RANGE45[nRange];
                 }
             }
-            ado.CloseRecordset();
+             
         }
         else
         {
@@ -9804,7 +9787,7 @@ void LoadTstat_OutputData()
                 strTemp=OUTPUT_RANGE45[nRange];
             }
         }
-        ado.CloseConn();
+        SqliteDBT3000.closedb();
 
         if(nRange>=0&&nRange<7)
         {
@@ -9886,20 +9869,22 @@ void LoadTstat_OutputData()
     nRange = product_register_value[MODBUS_MODE_OUTPUT5];
     if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
     {
-        CADO ado;
-        ado.OnInitADOConn();
-        if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
+		CppSQLite3DB SqliteDBT3000;
+		CppSQLite3Table table;
+		CppSQLite3Query q;
+		SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+        if (SqliteDBT3000.tableExists("Value_Range"))//有Version表
         {
             CString sql;
             sql.Format(_T("Select * from Value_Range where CInputNo=%d%d and SN=%d"),5,5,m_sn);
-            ado.m_pRecordset=ado.OpenRecordset(sql);
-            if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+            q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
+            if (!q.eof())//有表但是没有对应序列号的值
             {
-                ado.m_pRecordset->MoveFirst();
-                while (!ado.m_pRecordset->EndOfFile)
+				 
+				while (!q.eof())
                 {
-                    m_crange=ado.m_pRecordset->GetCollect(_T("CRange"));
-                    ado.m_pRecordset->MoveNext();
+                    m_crange=q.getIntField("CRange");
+                    q.nextRow();
                 }
                 nRange=m_crange;
                 if(nRange>=0)
@@ -9915,7 +9900,7 @@ void LoadTstat_OutputData()
                     strTemp=OUTPUT_RANGE45[nRange];
                 }
             }
-            ado.CloseRecordset();
+            
         }
         else
         {
@@ -9925,7 +9910,7 @@ void LoadTstat_OutputData()
                 strTemp=OUTPUT_RANGE45[nRange];
             }
         }
-        ado.CloseConn();
+       SqliteDBT3000.closedb();
 
         if(nRange>=0&&nRange<7)
         {

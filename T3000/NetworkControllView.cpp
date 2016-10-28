@@ -469,15 +469,7 @@ return;
 	//Sleep(5000);	//Sleep(5000); // wait for nc restart
 
 	CMainFrame* pPraent=(CMainFrame*)GetParent();
-	//pPraent->ReFresh();
-
-	 
-	//unsigned short variable[13]={0};
-	//int nRet=Read_Multi(g_tstat_id,variable,106,13,3);/////////////////////////read
-	//m_ipModelComBox.SetCurSel(variable[0]);
-	//m_ip_addressCtrl.SetAddress(variable[1],variable[2],variable[3],variable[4]);
-	//m_subnet_addressCtrl.SetAddress(variable[5],variable[6],variable[7],variable[8]);
-	//m_gateway_addressCtrl.SetAddress(variable[9],variable[10],variable[11],variable[12]);
+	
 
  
 	
@@ -506,22 +498,21 @@ return;
 			try
 			{
 
-			_ConnectionPtr t_pCon;//for ado connection
-			t_pCon.CreateInstance(_T("ADODB.Connection"));
-			t_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
-			CString strSql;
-			strSql.Format(_T("update Building set Ip_Address='%s' where Ip_Address='%s'"),strIP,pPraent->m_strIP);
-			t_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+				CppSQLite3DB SqliteDBBuilding;
+				CppSQLite3Query q;
+				SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+				 
+			 
 
 			// 改node
 			CString strSID;
+			CString strSql;
 			strSID.Format(_T("%d"), m_nSerialNum);
 			strSql.Format(_T("update ALL_NODE set Bautrate='%s' where Serial_ID='%s'"),strIP, strSID); //bautrate 放IP
-			t_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+			SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 
 
-			if(t_pCon->State)
-				t_pCon->Close();
+			 SqliteDBBuilding.closedb();
 			}
 			catch(_com_error *e)
 			{
@@ -537,17 +528,7 @@ return;
 		}
 
 
-/*
-		_ConnectionPtr t_pCon;//for ado connection
-		t_pCon.CreateInstance(_T("ADODB.Connection"));
-		t_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
-		CString strSql;
-		strSql.Format(_T("update Building set Ip_Address='%s',Ip_Port='%s' where Main_BuildingName='%s' and Building_Name='%s'"),strIP,strPort,strBuilding,strSubBuilding);
-		t_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-		if(t_pCon->State)
-			t_pCon->Close();
-		pPraent->OnConnect();
-		*/
+ 
 	}
 	//write_one(g_tstat_id,131,1);
 	//Fresh();
@@ -626,39 +607,37 @@ void CNetworkControllView::OnEnKillfocusIdaddressEdit()
 	}
 	if(g_tstat_id==nID)
 		return;
-	_ConnectionPtr m_pConTmp;
-	_RecordsetPtr m_pRsTemp;
-	m_pConTmp.CreateInstance("ADODB.Connection");
-	m_pRsTemp.CreateInstance("ADODB.Recordset");
-	m_pConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-	
+	 
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+
+	CppSQLite3DB SqliteDBBuilding;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
+
 	CString strSql;
 	strSql.Format(_T("select * from ALL_NODE where Product_ID ='%s'"),strModbusID);
-	m_pRsTemp->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-	if(m_pRsTemp->GetRecordCount()>0)
+	q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql); 
+	if(!q.eof())
 	{
-		while(VARIANT_FALSE==m_pRsTemp->EndOfFile)
+		while(!q.eof())
 		{			
-			CString strSID=m_pRsTemp->GetCollect("Serial_ID");
-			CString strPID=m_pRsTemp->GetCollect("Product_ID");
+			CString strSID=q.getValuebyName(L"Serial_ID");
+			CString strPID=q.getValuebyName(L"Product_ID");
 		
 			if( strSID.CompareNoCase(strSerialNum)!=0 && strPID.CompareNoCase(strModbusID)==0 )
 			{
 				CString strPop;
-			//	strPop.Format(_T("There is another device(Serial#=%s) has the ID ='%s', Please input a new one!"), strSID, strModbusID);//scan 点击NC后，再点击它下面的TSTAT
-			//	AfxMessageBox(strPop);//scan
-				if(m_pRsTemp->State)
-					m_pRsTemp->Close();		
+			 	
 				return;	
 
 			}
 
-			m_pRsTemp->MoveNext();
+			 q.nextRow();
 		}
 	}
 
-	if(m_pRsTemp->State)
-		m_pRsTemp->Close();
+	 
 	int nRet=0;
 	nRet=write_one(g_tstat_id, 6,nID);
 	if(nRet>0)
@@ -671,7 +650,7 @@ void CNetworkControllView::OnEnKillfocusIdaddressEdit()
 		strSerial.Format(_T("%d"),m_nSerialNum);
 		strSerial.Trim();
 		strSql.Format(_T("update ALL_NODE set Product_ID ='%s' where Serial_ID ='%s'"),strModbusID,strSerial);
-		m_pConTmp->Execute(strSql.GetString(),NULL,adCmdText);
+		 SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 		}
 		catch(_com_error *e)
 		{
@@ -679,8 +658,7 @@ void CNetworkControllView::OnEnKillfocusIdaddressEdit()
 		}
 	
 	}
-	if(m_pConTmp->State)
-		m_pConTmp->Close();
+	 
 	CMainFrame* pPraent=(CMainFrame*)GetParent();
 	pPraent->ScanTstatInDB();
 	Fresh();

@@ -22,6 +22,7 @@
 #include "T3000RegAddress.h"
 #include "CustomSTable.h"
 #include "AirflowSettingDlg.h"
+#include "../SQLiteDriver/CppSQLite3.h"
 extern int Mdb_Adress_Map;
 // CParameterDlg dialog
 //#define PID_INTERNAL_TEMPERATURE									   2
@@ -945,31 +946,28 @@ void CParameterDlg::OnEnKillfocusIdaddressedit()
     if(g_tstat_id==nID)
         return;
 
-// 	_ConnectionPtr m_pConTmp;
-// 	_RecordsetPtr m_pRsTemp;
-// 	m_pConTmp.CreateInstance("ADODB.Connection");
-// 	m_pRsTemp.CreateInstance("ADODB.Recordset");
-// 	m_pConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-    CBADO bado;
-    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-    bado.OnInitADOConn();
+ 
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 
     CString strSql;
     strSql.Format(_T("select * from ALL_NODE where Product_ID ='%s'"),strTemp);
     //m_pRsTemp->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-    bado.m_pRecordset=bado.OpenRecordset(strSql);
-    if(bado.m_pRecordset->GetRecordCount()>0)
+   q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+    if(!q.eof())
     {
         CString strPop;
         strPop.Format(_T("There is another TSTAT has the ID ='%s', Please input a new one!"),strTemp);
         AfxMessageBox(strPop);
 // 		if(m_pRsTemp->State)
 // 			m_pRsTemp->Close();
-        bado.CloseRecordset();
-        bado.CloseConn();
+        SqliteDBBuilding.closedb();
         return;
     }
-    bado.CloseRecordset();
+   
 
     int nRet=0;
     g_bPauseMultiRead = TRUE;
@@ -1012,7 +1010,7 @@ void CParameterDlg::OnEnKillfocusIdaddressedit()
         {
 
             strSql.Format(_T("update ALL_NODE set Product_ID ='%s', Product_name = '%s', Screen_Name = '%s' where Serial_ID = '%s'"),strNewID,strProductName,strScreenName,strSerial);
-            bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+            SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
         }
         catch(_com_error *e)
         {
@@ -1025,7 +1023,7 @@ void CParameterDlg::OnEnKillfocusIdaddressedit()
     }
     g_bPauseMultiRead = FALSE;
 
-    bado.CloseConn();
+    SqliteDBBuilding.closedb();
 
     //Sleep(1000);
     pPraent->ScanTstatInDB();
@@ -1234,11 +1232,14 @@ void CParameterDlg::OnCbnSelendcancelBraudratecombo()
         SqlText.Format(_T("update ALL_NODE set Bautrate = '%d' where Serial_ID='%d'"),brandrate,get_serialnumber());
         Change_BaudRate(brandrate);
     
-    CBADO bado;
-    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-    bado.OnInitADOConn();
-    bado.m_pConnection->Execute(SqlText.GetString(),NULL,adCmdText);
 
+		CppSQLite3DB SqliteDBBuilding;
+		CppSQLite3Table table;
+		CppSQLite3Query q;
+		SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
+		 SqliteDBBuilding.execDML((UTF8MBSTR)SqlText);
+		 SqliteDBBuilding.closedb();
     CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
     pFrame->ScanTstatInDB();
 
@@ -5818,12 +5819,14 @@ void CParameterDlg::OnEnKillfocusEditTstatName()
             product_register_value[715+i]=Databuffer[i];
         }
         GetDlgItem(IDC_EDIT_TSTAT_NAME)->GetWindowText(newname);
-        CBADO bado;
-        bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-        bado.OnInitADOConn();
+		CppSQLite3DB SqliteDBBuilding;
+		CppSQLite3Table table;
+		CppSQLite3Query q;
+		SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
         strSql.Format(_T("update ALL_NODE set Product_name='%s' where Serial_ID='%s'"),newname,strSerial);
-        bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
-        bado.CloseConn();
+        SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+        SqliteDBBuilding.closedb();
         CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
         // 这里就是用来刷新产品树结构,刷新树的产品的名字，以及名字产品的装填
         ::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);

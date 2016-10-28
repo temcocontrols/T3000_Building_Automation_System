@@ -38,8 +38,7 @@ public:
 	bool m_is_net_device;
 	afx_msg void OnBnClickedButtonLocalMstpDevice();
 
-// 	_ConnectionPtr				m_pCon;//for ado connection
-// 	_RecordsetPtr				m_pRs;//for ado 
+ 
     int m_Serial_Number;
     CString m_type_id;
     CComboBox m_combox_productname;

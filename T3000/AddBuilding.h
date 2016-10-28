@@ -29,8 +29,7 @@ public:
 	afx_msg void OnBnClickedAddbuiding();
 	virtual BOOL OnInitDialog();
 private:
-	_ConnectionPtr m_pCon;
-	_RecordsetPtr m_pRs;
+ 
 	int m_nCurRow;
 	int m_nCurCol;
 

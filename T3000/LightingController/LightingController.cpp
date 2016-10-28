@@ -12,6 +12,7 @@
 #include "..\Config_Routines.h"
 #include "..\Weekly_Routines.h"
 #include "..\Annual_Routines.h"
+
 static BOOL ifLCdb = TRUE;
 static BOOL ifUpdatedb = TRUE;
 
@@ -667,71 +668,7 @@ return flag;
 
 
  
-BOOL CLightingController::UpdateDBALL()
-{
-	TRACE(_T("Updatedatabase()start!\n"));
-	KillTimer(LIGHTINGCONTROLLERTIMER);
-	//存入数据库中
-	CADO saveADO;
-	saveADO.OnInitADOConn();
-	CString sql = _T("select * from LightingController");
-	saveADO.m_pRecordset = saveADO.OpenRecordset(sql);
-	if (!saveADO.m_pRecordset->EndOfFile)
-	{
-		saveADO.m_pRecordset->MoveFirst();
-
-		for(int i = 0;i<400;i++)
-		{
-			try 
-			{
-
-				saveADO.m_pRecordset->PutCollect("Address",(_bstr_t)veclightingcontroller.at(i).iaddress);
-				saveADO.m_pRecordset->PutCollect("Data",(_bstr_t)veclightingcontroller.at(i).CStvalue);
-
-
-				saveADO.m_pRecordset->Update();
-				saveADO.m_pRecordset->MoveNext();
-			}
-
-
-			catch(...)
-			{
-				SetPaneString(1,_T("Write dababase false!"));
-				return FALSE;
-			}
-		}
-	}
-	else
-	{
-		for(int i = 0;i<400;i++)
-		{
-			try 
-			{
-
-				saveADO.m_pRecordset->AddNew();
-				saveADO.m_pRecordset->PutCollect("Address",(_bstr_t)veclightingcontroller.at(i).iaddress);
-				saveADO.m_pRecordset->PutCollect("Data",(_bstr_t)veclightingcontroller.at(i).CStvalue);
-
-				saveADO.m_pRecordset->Update();
-
-			}
-
-
-			catch(...)
-			{
-				SetPaneString(1,_T("Write dababase false!"));
-				return FALSE;
-			}
-		}
-
-	}
-
-	saveADO.CloseRecordset();
-	saveADO.CloseConn(); 
-
-	SetTimer(LIGHTINGCONTROLLERTIMER,1000,NULL);
-	return TRUE;
-}
+ 
 
 void CLightingController::OnLbnDblclkListInput()
 {
@@ -1103,76 +1040,7 @@ WORD* CLightingController::ConvertOutput()
 }
 
 
-BOOL CLightingController::UpdateDBPART( int startnum,int endnum,WORD*savedata )
-{
-	KillTimer(LIGHTINGCONTROLLERTIMER);
-	//存入数据库中
-	CADO saveADO;
-	saveADO.OnInitADOConn();
-	CString sql = _T("select * from LightingController");
-	saveADO.m_pRecordset = saveADO.OpenRecordset(sql);
-	if (!saveADO.m_pRecordset->EndOfFile)
-	{
-		//saveADO.m_pRecordset->MoveFirst();
-
-//		inline HRESULT Recordset15::Move ( ADO_LONGPTR NumRecords, const _variant_t & Start ) 
-		saveADO.m_pRecordset->Move(startnum);
-
-
-		for(int i = startnum;i<=endnum;i++)
-		{
-			try 
-			{
-
-				//saveADO.m_pRecordset->PutCollect("Address",(_bstr_t)veclightingcontroller.at(i).iaddress);
-				WORD temp = savedata[i-startnum];
-				saveADO.m_pRecordset->PutCollect("Data",(_bstr_t)temp);
-
-
-				saveADO.m_pRecordset->Update();
-		 		saveADO.m_pRecordset->MoveNext();
-			}
-
-
-			catch(...)
-			{
-				SetPaneString(1,_T("Write dababase false!"));
-				return FALSE;
-			}
-		}
-	}
-	else
-	{
-		for(int i = 0;i<400;i++)
-		{
-			try 
-			{
-
-				saveADO.m_pRecordset->AddNew();
-				saveADO.m_pRecordset->PutCollect("Address",(_bstr_t)i);
-				saveADO.m_pRecordset->PutCollect("Data",(_bstr_t)savedata[0]);
-
-				saveADO.m_pRecordset->Update();
-
-			}
-
-
-			catch(...)
-			{
-				SetPaneString(1,_T("Write dababase false!"));
-				return FALSE;
-			}
-		}
-
-	}
-
-	saveADO.CloseRecordset();
-	saveADO.CloseConn(); 
-
-	SetTimer(LIGHTINGCONTROLLERTIMER,1000,NULL);
-	return TRUE;
-
-}
+ 
 
 BOOL CLightingController::InitializeArray( BOOL*ARRAY )
 {
@@ -2458,58 +2326,7 @@ LRESULT CLightingController::OnWriteMessage( WPARAM wParam,LPARAM lParam)
 	return TRUE;
 }
 
-void CLightingController::readSerial()
-{
-	CADO m_ado;
-	m_ado.OnInitADOConn();
-
-// 	CString SQL = _T("select * from LightingController"); 
-// 	m_ado.m_pRecordset = m_ado.OpenRecordset(SQL);
-// 	int num =0;
-// 	_variant_t vartemp;
-// 	veclightingcontroller.clear();
-// 	while(!m_ado.m_pRecordset->EndOfFile)
-// 	{
-// 		m_veclightingcontroller.iaddress =m_ado.m_pRecordset->GetCollect(_T("Address"));
-// 
-// 
-// 		vartemp =m_ado.m_pRecordset->GetCollect(_T("Data"));
-// 		if (vartemp.vt==VT_NULL)
-// 			m_veclightingcontroller.CStvalue =_T("");
-// 		else
-// 			m_veclightingcontroller.CStvalue =vartemp;
-// 
-// 
-// 		m_ado.m_pRecordset->MoveNext();
-// 
-// 		veclightingcontroller.push_back(m_veclightingcontroller);
-// 	}
-
-	//读取本电脑当前正在使用的串口。
-#if 1//会出问题，就是如果在数据存的这个串口与电脑的串口号不对应，则本类永远无法有正确数据采集？
-	CString CSTcompot;
-	BOOL BOdefault;
-	CString SQL = _T("select * from Building");
-	m_ado.m_pRecordset = m_ado.OpenRecordset(SQL);
-	while(!m_ado.m_pRecordset->EndOfFile)
-	{
-		CSTcompot =(_variant_t)m_ado.m_pRecordset->GetCollect(_T("Com_Port"));
-		BOdefault =(_variant_t)m_ado.m_pRecordset->GetCollect(_T("Default_SubBuilding"));//TRUE = -1即非0，FALSE就是0
-		m_ado.m_pRecordset->MoveNext();
-
-		if (BOdefault)
-		{
-			comnum = _wtoi(CSTcompot.Mid(3));
-		}
-
-	}
-
-#endif
-
-	m_ado.CloseRecordset();
-	m_ado.CloseConn();
-
-}
+ 
 
 void CLightingController::OnBnClickedButtonApply()
 {
@@ -2599,20 +2416,19 @@ void CLightingController::OnBnClickedButtonApply()
 		{
 
 
-			_ConnectionPtr t_pCon;//for ado connection
-			t_pCon.CreateInstance(_T("ADODB.Connection"));
-			t_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+			CppSQLite3DB SqliteDBT3000;
+			CppSQLite3Query q;
+			SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 			CString strSql;
 			strSql.Format(_T("update Building set Ip_Address='%s' where Ip_Address='%s'"),strIP,pPraent->m_strIP);
-			t_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-
+			 
+			SqliteDBT3000.execDML((UTF8MBSTR)strSql);
 			// 改node
 			CString strSID;
 			strSID.Format(_T("%d"), m_inaddress);
 			strSql.Format(_T("update ALL_NODE set Bautrate='%s' where Serial_ID='%s'"),strIP, strSID); //bautrate 放IP
-			t_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-			if(t_pCon->State)
-				t_pCon->Close();
+			SqliteDBT3000.execDML((UTF8MBSTR)strSql);
+			SqliteDBT3000.closedb();
 
 		}
 		catch(_com_error *e)
@@ -2634,17 +2450,7 @@ void CLightingController::OnBnClickedButtonApply()
 
 
 
-		/*
-		_ConnectionPtr t_pCon;//for ado connection
-		t_pCon.CreateInstance(_T("ADODB.Connection"));
-		t_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
-		CString strSql;
-		strSql.Format(_T("update Building set Ip_Address='%s',Ip_Port='%s' where Main_BuildingName='%s' and Building_Name='%s'"),strIP,strPort,strBuilding,strSubBuilding);
-		t_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-		if(t_pCon->State)
-		t_pCon->Close();
-		pPraent->OnConnect();
-		*/
+		 
 	}
 	//write_one(g_tstat_id,131,1);
 	Fresh();
@@ -3259,19 +3065,7 @@ dlg.DoModal();
 
 CString CLightingController::get_OutputName(int card,int output){
 	CString sql ,outputname;
-// CADO ado;
-// 	ado.OnInitADOConn();
-//  
-// 	sql.Format(_T("Select * from LCNameConfigure where SN=%d and  Card=%d and Output=%d"),m_sn,card,output);
-// 	ado.m_pRecordset=ado.OpenRecordset(sql);
-// 	 
-//  
-// 	if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
-// 	{
-// 	  outputname=ado.m_pRecordset->GetCollect(_T("OutputName"));
-// 	}
-// 	else
-// 	{
+ 
 	 
 		unsigned short temp_buffer_out[INPUT_DESCRIPTION_LENGTH]={0};
 		unsigned char temp_charbuffer_out[INPUT_DESCRIPTION_LENGTH];

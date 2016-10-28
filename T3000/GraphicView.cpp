@@ -66,36 +66,7 @@ void CGraphicView::AssertValid() const
 
 void CGraphicView::InitGraphic(int nSerialNum,int nTstatID)
 {
-//	register_critical_section.Lock();
-//	memcpy((unsigned short*)&(multi_register_value[0]),(unsigned short*)&multi_register_value[0],sizeof(multi_register_value));
-//	register_critical_section.Unlock();
-	//m_strImgPathName=g_strImagePathName;
-	//if(bac_cm5_graphic == true)
-	//{
-	//	m_pCon.CreateInstance(_T("ADODB.Connection"));
-	//	m_pRs.CreateInstance(_T("ADODB.Recordset"));
-	//	m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
-	//	CString strSql;
-	//	//if(bac_cm5_graphic == false)
-	//	strSql.Format(_T("select * from All_NODE where Serial_Num = '%d'"),nSerialNum);
-	//	//else
-	//	//strSql.Format(_T("select * from Screen_Label where Serial_Num =%i and Tstat_id=%i"),g_bac_instance,g_mac);
-	//	//strSql.Format(_T("select * from Screen_Label where Tstat_id=%i"),m_nTstatID);
-	//	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-	//	CString strtemp;
-	//	strtemp.Empty();
-
-	//	_variant_t temp_variant;
-	//	int nTemp;
-	//	CString strTemp;
-	//	while(VARIANT_FALSE==m_pRs->EndOfFile)
-	//	{	
-
-	//		strTemp=m_pRs->GetCollect("Background_imgID");//
-	//		g_strImagePathName=strTemp;
-	//		m_pRs->MoveNext();
-	//	}
-	//}
+ 
 
 
 	m_strImgPathName=g_strImgeFolder+g_strImagePathName;
@@ -399,6 +370,8 @@ void CGraphicView::OnBnClickedDelbutton()
 {
 	if(g_GraphicModelevel==1)
 		return;
+
+		SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 	switch (m_delMenuBtn.m_nMenuResult)
 	{
 	case ID_DELLABEL:
@@ -413,9 +386,7 @@ void CGraphicView::OnBnClickedDelbutton()
 			{
 					//AfxMessageBox(_T("Delete it"));
 
-				m_pCon.CreateInstance(_T("ADODB.Connection"));
-				m_pRs.CreateInstance(_T("ADODB.Recordset"));
-				m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+				
 
 				Label_information	label;
 				label=m_RelayLabelLst.at(m_nFoucsIndext);
@@ -426,15 +397,14 @@ void CGraphicView::OnBnClickedDelbutton()
 
 
 				CString strSql;
-				strSql.Format(_T("delete * from Screen_Label where Serial_Num =%i and Tstat_id=%i and  Cstatic_id=%i"),label.nSerialNum,label.tstat_id,label.cstatic_id);
-				m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+				strSql.Format(_T("delete   from Screen_Label where Serial_Num =%i and Tstat_id=%i and  Cstatic_id=%i"),label.nSerialNum,label.tstat_id,label.cstatic_id);
+				 SqliteDBT3000.execDML((UTF8MBSTR)strSql);
 				}
 				catch(_com_error *e)
 				{
 					AfxMessageBox(e->ErrorMessage());
 				}
-				if(m_pRs->State) 
-				m_pRs->Close(); 
+			 
 
 				ReloadLabelsFromDB();
 				Invalidate();
@@ -446,24 +416,21 @@ void CGraphicView::OnBnClickedDelbutton()
 
 	case ID_DELALLLABELS:
 		{		
-			m_pCon.CreateInstance(_T("ADODB.Connection"));
-			m_pRs.CreateInstance(_T("ADODB.Recordset"));
-			m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+			
 
 			try
 			{
 
 
 			CString strSql;
-			strSql.Format(_T("delete * from Screen_Label where Serial_Num =%i and Tstat_id=%i"),m_nSerialNumber,m_nTstatID);
-			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+			strSql.Format(_T("delete   from Screen_Label where Serial_Num =%i and Tstat_id=%i"),m_nSerialNumber,m_nTstatID);
+			 SqliteDBT3000.execDML((UTF8MBSTR)strSql);
 			}
 			catch(_com_error *e)
 			{
 				AfxMessageBox(e->ErrorMessage());
 			}		
-			if(m_pRs->State) 
-				m_pRs->Close(); 
+			 
 
 			ReloadLabelsFromDB();
 			Invalidate();
@@ -471,7 +438,7 @@ void CGraphicView::OnBnClickedDelbutton()
 		}
 		break;
 	}
-
+	SqliteDBT3000.closedb();
 	// TODO: Add your control notification handler code here
 }
 
@@ -509,16 +476,12 @@ void CGraphicView::ReloadLabelsFromDB()
 {
 	ClearAllLabels();
 	
-	m_pCon.CreateInstance(_T("ADODB.Connection"));
-	m_pRs.CreateInstance(_T("ADODB.Recordset"));
-	m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 	CString strSql;
 	//if(bac_cm5_graphic == false)
 	strSql.Format(_T("select * from Screen_Label where Serial_Num =%i and Tstat_id=%i"),m_nSerialNumber,m_nTstatID);
-	//else
-	//strSql.Format(_T("select * from Screen_Label where Serial_Num =%i and Tstat_id=%i"),g_bac_instance,g_mac);
-	//strSql.Format(_T("select * from Screen_Label where Tstat_id=%i"),m_nTstatID);
-	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+	 
+	q = SqliteDBT3000.execQuery((UTF8MBSTR)strSql);
 	CString strtemp;
 	strtemp.Empty();
 
@@ -526,7 +489,7 @@ void CGraphicView::ReloadLabelsFromDB()
 	int nTemp;
 	CString strTemp;
 	int nItem = 0;//用于记录有多少个需要刷新;
-	while(VARIANT_FALSE==m_pRs->EndOfFile)
+	while(!q.eof())
 	{	
 		Label_information label;
 
@@ -534,46 +497,36 @@ void CGraphicView::ReloadLabelsFromDB()
 		label.tstat_id=m_nTstatID;
 		label.strScreenName=m_strScreenName;
 
-		nTemp=m_pRs->GetCollect("Cstatic_id");//
+		nTemp=q.getIntField("Cstatic_id");//
 		label.cstatic_id=nTemp;
 
-		nTemp=m_pRs->GetCollect("Point_X");//
+		nTemp=q.getIntField("Point_X");//
 		label.point.x=nTemp;
 
-		nTemp=m_pRs->GetCollect("Point_Y");//
+		nTemp=q.getIntField("Point_Y");//
 		label.point.y=nTemp;
 
-		nTemp=m_pRs->GetCollect("Height");//
+		nTemp=q.getIntField("Height");//
 		label.height=nTemp;
 
-		nTemp=m_pRs->GetCollect("Width");//
+		nTemp=q.getIntField("Width");//
 		label.width=nTemp;
 
-		nTemp=m_pRs->GetCollect("Status");//
+		nTemp=q.getIntField("Status");//
 		label.status=nTemp;
 		
-		temp_variant=m_pRs->GetCollect("Tips");//
-		if(temp_variant.vt!=VT_NULL)
-			strtemp=temp_variant;
-		else
-			strtemp=_T("");
+		strtemp=q.getValuebyName(L"Tips");//
+	 
 		label.strTips=strtemp;
 		
-		/*
-		temp_variant=m_pRs->GetCollect("Tips");//
-		if(temp_variant.vt!=VT_NULL)
-			strtemp=temp_variant;
-		else
-			strtemp=_T("");
-		label.strTips=strtemp;
-		*/
+		 
 
 
-		nTemp=m_pRs->GetCollect("Input_or_Output");//
+		nTemp=q.getIntField("Input_or_Output");//
 		label.input_or_output=nTemp;
 
 		
-		strTemp=m_pRs->GetCollect("Text_Color");//
+		strTemp=q.getValuebyName(L"Text_Color");//
 		if(strTemp.IsEmpty())
 		{
 			label.clrTxt=0;
@@ -584,7 +537,7 @@ void CGraphicView::ReloadLabelsFromDB()
 		}
 		
 		
-		strTemp=m_pRs->GetCollect("Back_Color");//
+		strTemp=q.getValuebyName(L"Back_Color");//
 		if(strTemp.IsEmpty())
 		{
 			label.bkColor=254*255*255;
@@ -603,7 +556,7 @@ void CGraphicView::ReloadLabelsFromDB()
 		label.plabelCtrl=pLabel;
 		m_RelayLabelLst.push_back(label);
 
-		m_pRs->MoveNext();
+		q.nextRow();
 		_Graphic_Value_Info temp1;
 		m_graphic_refresh_data.push_back(temp1);
 		m_graphic_refresh_data.at(nItem).deviceid = label.tstat_id;
@@ -629,10 +582,7 @@ void CGraphicView::ReloadLabelsFromDB()
 		nItem ++;
 	}
 
-	if(m_pRs->State) 
-		m_pRs->Close(); 
-	if(m_pCon->State)
-		m_pCon->Close();
+	SqliteDBT3000.closedb();
 	
 }
 void CGraphicView::OnDestroy()
@@ -686,8 +636,7 @@ void CGraphicView::saveLabelInfo(int nItem)
 		return;
 	if(nItem>=(int)m_RelayLabelLst.size())
 		return;
-	m_pCon.CreateInstance(_T("ADODB.Connection"));
-	m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 
 	Label_information label;
 	label=m_RelayLabelLst.at(nItem);
@@ -704,14 +653,13 @@ void CGraphicView::saveLabelInfo(int nItem)
 	CString strSql;
 	strSql.Format(_T("update Screen_Label set Point_X=%i,Point_Y=%i where Serial_Num =%i and Tstat_id=%i and  Cstatic_id=%i"),
 		nLeft,nTop,label.nSerialNum,label.tstat_id,label.cstatic_id);
-	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+	SqliteDBT3000.execDML((UTF8MBSTR)strSql);
 	}
 	catch(_com_error *e)
 	{
 		AfxMessageBox(e->ErrorMessage());
 	}
-	if(m_pCon->State)
-		m_pCon->Close();
+	 SqliteDBT3000.closedb();
 }
 
 void CGraphicView::OnBnClickedImgcnfigbutton()
@@ -735,14 +683,12 @@ void CGraphicView::OnBnClickedImgcnfigbutton()
 			}	
 			FindClose(hFile);
 
-// 			_ConnectionPtr tmpCon;
-// 			_RecordsetPtr tmppRs;
-// 			tmpCon.CreateInstance(_T("ADODB.Connection"));
-// 			tmppRs.CreateInstance(_T("ADODB.Recordset"));
-// 			tmpCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
-			CBADO bado;
-			bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-			bado.OnInitADOConn(); 
+
+			CppSQLite3DB SqliteDBBuilding;
+			CppSQLite3Table table;
+			CppSQLite3Query q;
+			SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 
 			try
 			{
@@ -752,8 +698,8 @@ void CGraphicView::OnBnClickedImgcnfigbutton()
 			strImgFileName=_T("");
 			CString strSql;
 			strSql.Format(_T("update ALL_NODE set Background_imgID ='%s' where Serial_ID = '%d'"),strImgFileName,m_nSerialNumber);
-			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
-			bado.CloseConn();
+			SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+			SqliteDBBuilding.closedb();
 			g_strImagePathName=strImgFileName;
 			m_strImgPathName=g_strImgeFolder+g_strImagePathName;
 			InitGraphic(m_nSerialNumber,m_nTstatID);
@@ -796,17 +742,19 @@ void CGraphicView::OnBnClickedImgcnfigbutton()
 
 			CopyFile(strImgFilePathName,strDestFileName,FALSE);
 			 
-			CBADO bado;
-			bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-			bado.OnInitADOConn(); 
+			CppSQLite3DB SqliteDBBuilding;
+			CppSQLite3Table table;
+			CppSQLite3Query q;
+			SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 			try
 			{
 
 			CString strSql;
 			strSql.Format(_T("update ALL_NODE set Background_imgID ='%s' where Serial_ID = '%d'"),strImgFileName,m_nSerialNumber);
-			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+			SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 			 
-			 bado.CloseConn();
+			 SqliteDBBuilding.closedb();
 			}
 			catch(_com_error *e)
 			{

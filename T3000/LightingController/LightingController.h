@@ -89,8 +89,8 @@ public:
 	BOOL prodtopcData();//采集数据
 	BOOL checkDB(CString DBname,CString strSQL);//决定是否创建数据库
 	 
-	BOOL UpdateDBALL();
-	BOOL UpdateDBPART(int startnum,int endnum,WORD*savedata);
+ 
+ 
 
 	int comnum;//读取串口号
 	vector<lightingcontroller>veclightingcontroller;
@@ -240,7 +240,7 @@ public:
 
 	int outputno;//output端口号
 
-	 void readSerial();
+	 
 
 
 

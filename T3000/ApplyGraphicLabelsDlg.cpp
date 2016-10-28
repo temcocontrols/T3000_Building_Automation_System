@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "MainFrm.h"
 #include "ApplyGraphicLabelsDlg.h"
-
+#include "../SQLiteDriver/CppSQLite3.h"
 
 // ApplyGraphicLabelsDlg dialog
 
@@ -202,9 +202,11 @@ void ApplyGraphicLabelsDlg::ReloadAddBuildingDB()
 	m_FlexGrid.Clear();
 	
 	//m_FlexGrid.put_ColAlignment(0,4);
-	CBADO bado;
-	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-	bado.OnInitADOConn(); 
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 
 	m_FlexGrid.put_TextMatrix(0,1,_T("Serial ID"));
 	m_FlexGrid.put_ColWidth(1,1000);
@@ -223,23 +225,21 @@ void ApplyGraphicLabelsDlg::ReloadAddBuildingDB()
 	CString strSql;
 	strSql.Format(_T("select * from ALL_NODE where MainBuilding_Name = '%s'and Building_Name='%s'"),m_strMainBuilding,m_strSubNetName);
 	//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);			
-	bado.m_pRecordset=bado.OpenRecordset(strSql);
-	m_nTotalRecoders=bado.m_pRecordset->RecordCount;
-	m_FlexGrid.put_Rows(bado.m_pRecordset->RecordCount+1);	
+	q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+	table = SqliteDBBuilding.getTable((UTF8MBSTR)strSql);
+	m_nTotalRecoders=table.numRows();
+	m_FlexGrid.put_Rows(m_nTotalRecoders+1);	
 	int temp_row=0;
 	CString str_temp;
 	str_temp.Empty();
 	_variant_t temp_variant;
-	while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+	while(!q.eof())
 	{	
-		temp_variant=bado.m_pRecordset->GetCollect("Product_class_ID");//
-		if(temp_variant.vt!=VT_NULL)
-			m_strID=temp_variant;
-		else
-			m_strID=_T("");
+		 
+			m_strID = q.getValuebyName(L"Product_class_ID");
 		if(_wtoi(m_strID)==100)// not include NC
 		{
-				bado.m_pRecordset->MoveNext();
+				q.nextRow();
 				continue;
 		}
 			
@@ -249,49 +249,32 @@ void ApplyGraphicLabelsDlg::ReloadAddBuildingDB()
 		
 		m_FlexGrid.put_TextMatrix(temp_row,0,_T("Select"));
 
-		temp_variant=bado.m_pRecordset->GetCollect("Serial_ID");//
-		if(temp_variant.vt!=VT_NULL)
-			m_strID=temp_variant;
-		else
-			m_strID=_T("");
+	 
+			m_strID = q.getValuebyName(L"Serial_ID");
 		m_FlexGrid.put_ColAlignment(1,4);
 		m_FlexGrid.put_TextMatrix(temp_row,1,m_strID);
 	
-		temp_variant=bado.m_pRecordset->GetCollect("Product_ID");//
-		if(temp_variant.vt!=VT_NULL)
-			m_strID=temp_variant;
-		else
-			m_strID=_T("");
+		 
+			m_strID = q.getValuebyName(L"Product_ID");
 		m_FlexGrid.put_ColAlignment(2,4);
 		m_FlexGrid.put_TextMatrix(temp_row,2,m_strID);
-		temp_variant=bado.m_pRecordset->GetCollect("Floor_name");//
-		if(temp_variant.vt!=VT_NULL)
-			m_strID=temp_variant;
-		else
-			m_strID=_T("");
+	 
+			m_strID = q.getValuebyName(L"Floor_name");
 		m_FlexGrid.put_ColAlignment(3,4);
 		m_FlexGrid.put_TextMatrix(temp_row,3,m_strID);
 
-		temp_variant=bado.m_pRecordset->GetCollect("Room_name");//
-		if(temp_variant.vt!=VT_NULL)
-			m_strID=temp_variant;
-		else
-			m_strID=_T("");
+		 
+			m_strID = q.getValuebyName(L"Room_name");
 		m_FlexGrid.put_ColAlignment(4,4);
 		m_FlexGrid.put_TextMatrix(temp_row,4,m_strID);
 		
-			temp_variant=bado.m_pRecordset->GetCollect("Product_name");//
-		if(temp_variant.vt!=VT_NULL)
-			m_strID=temp_variant;
-		else
-			m_strID=_T("");
+			 
+			m_strID = q.getValuebyName(L"Product_name");
 		m_FlexGrid.put_ColAlignment(5,4);
 		m_FlexGrid.put_TextMatrix(temp_row,5,m_strID);
-		bado.m_pRecordset->MoveNext();
+		q.nextRow();
 	}
-	//m_pRs->Close();
-	bado.CloseRecordset();
-	bado.CloseRecordset();
+	SqliteDBBuilding.closedb();
 }
 void ApplyGraphicLabelsDlg::ApplyTo()
 {
@@ -304,9 +287,11 @@ void ApplyGraphicLabelsDlg::ApplyTo()
 	else
 		return;
 	
-	CBADO bado;
-	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-	bado.OnInitADOConn(); 
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
 
 	CString strSelect;
 	CString strSerialID;
@@ -335,8 +320,8 @@ void ApplyGraphicLabelsDlg::ApplyTo()
 
 
 			CString strSql;
-			strSql.Format(_T("delete * from Screen_Label where Serial_Num=%i and Tstat_id=%i"),nSerialID,nProductID);
-			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+			strSql.Format(_T("delete   from Screen_Label where Serial_Num=%i and Tstat_id=%i"),nSerialID,nProductID);
+			SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 			}
 			catch(_com_error *e)
 			{
@@ -394,7 +379,7 @@ void ApplyGraphicLabelsDlg::ApplyTo()
 
 
 
-					bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);		
+					 SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 				}
 				catch(_com_error *e)
 				{
@@ -405,7 +390,7 @@ void ApplyGraphicLabelsDlg::ApplyTo()
 
 		}
 	}
-	bado.CloseConn();
+	 SqliteDBBuilding.closedb();
 }
 LRESULT ApplyGraphicLabelsDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {

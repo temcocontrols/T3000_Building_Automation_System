@@ -20,7 +20,7 @@
 #include "T3/DialogT3.h"	//T3
 
 #include "AirQuality/AirQuality.h"//AirQuality
-#include "bado/BADO.h"
+
 //#include "Class/MulitithreadSocket.h"
 // #include "MBP.h"
 // #include "MbPoll.h"
@@ -217,8 +217,7 @@ public:
 	vector <tree_room>		m_roomLst;//for every room name	
 	vector <background_infor> m_backgroundLst;
 	vector <tree_product>	m_product;//for every product leaf
-// 	_ConnectionPtr				m_pCon;//for ado connection
-// 	_RecordsetPtr				m_pRs;//for ado 
+ 
 	 
     tree_product m_current_tree_node ;
     tree_product m_lasttime_tree_node;
@@ -354,7 +353,7 @@ public:
 	void OnUserMannageMent();
 	void OnUserLogin();
 	void GetIONanme();
-	void OnImportDatase();
+	 
 	void ReFresh();
 
 	CString GetFWVersionFromFTP(CString ProductName);
@@ -416,17 +415,15 @@ public:
 	unsigned short temptstat6[512];
 	unsigned short nFlag;
 	
-	void Tstat6_func();
-	void JudgeTstat6dbExist(CString strtable,CString strsql);
-	void Updata_db_tstat6(unsigned short imodel);
+	 
+	
 	BOOL FistWdb;
 	//afx_msg void OnFileIsptool();
-	void JudgeTstat6SliderExist(CString strtable,CString strsql);
-	void UpdataSlider(int Flag);
-	void ReadSlider();
+
+	
 
 	UINT FlagSerialNumber;
-	void Treestatus();
+
 	static	DWORD WINAPI Get_All_Dlg_Message(LPVOID lpVoid);
 	static	DWORD WINAPI Translate_My_Message(LPVOID lpVoid);
  //   static DWORD WINAPI ConnectToTreeNode(LPVOID);
@@ -511,11 +508,11 @@ public:
 		LPVOID lpvStatusInformation, DWORD dwStatusInformationLength);
 	void OnStatusCallBack(HINTERNET hInternet, DWORD dwInternetStatus, 
 		LPVOID lpvStatusInformation, DWORD dwStatusInformationLength);
-	static UINT _DownloadThread(LPVOID pParam);
+	 
 	void HandleThreadErrorWithLastError(UINT nIDError, DWORD dwLastError=0);
 	void HandleThreadError(UINT nIDError);
 	BOOL DownloadThread();
-	void DownloadAllThread();
+	 
 	afx_msg LRESULT OnThreadFinished(WPARAM wParam, LPARAM lParam);
 	void GetProductFPTAndLocalPath(int ProductModel,CString &FtpPath,CString &ProductFileName); 
 	void GetProductFirmwareFTPDirectory(int ProductModel,CString &FtpPath,CString &ProductFileName);

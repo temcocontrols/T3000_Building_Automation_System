@@ -7,8 +7,8 @@
 #include "afxdialogex.h"
 #include "MainFrm.h"
 #include "globle_function.h"
-#include "ado/ADO.h"
-
+ 
+ #include "../SQLiteDriver/CppSQLite3.h"
 IMPLEMENT_DYNAMIC(CRegisterWriteValueDlg, CDialog)
 
 CRegisterWriteValueDlg::CRegisterWriteValueDlg(CWnd* pParent /*=NULL*/)
@@ -123,15 +123,16 @@ void CRegisterWriteValueDlg::OnBnClickedOk()
    int Address=_wtoi(m_no);
    CString description;
    m_descriptionEdit.GetWindowText(description);
-   CADO ado;
-   ado.OnInitADOConn();
+   CppSQLite3DB SqliteDBT3000;
+   CppSQLite3Query q;
+   SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
    CString sql;
    if (product_type==T3000_5ABCDFG_LED_ADDRESS)
    {
        try
        {
 		   sql.Format(_T("update T3000_Register_Address_By_ID set TSTAT5_LED_DESCRIPTION='%s' where Register_Address=%d"),description.GetBuffer(),Address);
-		   ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+		   SqliteDBT3000.execDML((UTF8MBSTR)sql);
 		   AfxMessageBox(_T("Save OK"));
        }
        catch (CException* e)
@@ -145,7 +146,7 @@ void CRegisterWriteValueDlg::OnBnClickedOk()
 	   try
 	   {
 		   sql.Format(_T("update T3000_Register_Address_By_ID set TSTAT5_LCD_DESCRIPTION='%s' where Register_Address=%d"),description.GetBuffer(),Address);
-		   ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+		   SqliteDBT3000.execDML((UTF8MBSTR)sql);
 		   AfxMessageBox(_T("Save OK"));
 	   }
 	   catch (CException* e)
@@ -158,7 +159,7 @@ void CRegisterWriteValueDlg::OnBnClickedOk()
 	   try
 	   {
 		   sql.Format(_T("update T3000_Register_Address_By_ID set TSTAT6_DESCRIPTION='%s' where Register_Address=%d"),description.GetBuffer(),Address);
-		   ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+		   SqliteDBT3000.execDML((UTF8MBSTR)sql);
 		   AfxMessageBox(_T("Save OK"));
 	   }
 	   catch (CException* e)

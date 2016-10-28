@@ -5,6 +5,7 @@
 #include "MainFrm.h"
 
 #include "AddBuilding.h"
+#include "../SQLiteDriver/CppSQLite3.h"
 
 //AB means Add Building
 #define AB_MAINNAME	1		// main building
@@ -47,8 +48,7 @@ IMPLEMENT_DYNAMIC(CAddBuilding, CDialog)
 CAddBuilding::CAddBuilding(CWnd* pParent /*=NULL*/)
 	: CDialog(CAddBuilding::IDD, pParent)
 {
-	m_pRs=NULL;
-	m_pCon=NULL;
+ 
 	m_nCurRow=-1;
 	m_nCurCol=-1;
 	pNCScanThread=NULL;
@@ -97,140 +97,7 @@ BEGIN_MESSAGE_MAP(CAddBuilding, CDialog)
 END_MESSAGE_MAP()
 
 
-// CAddBuilding message handlers
-/* 2011-10-08; 因为老毛要自动填入，所以注释掉，换另一个版本
-void CAddBuilding::OnBnClickedAddbuiding()
-{
-	CString strSql;
-	int nMaxRowIndext=m_AddBuiding_FlexGrid.get_Rows()-1;
-
-	CString strMainBuildName=_T("222");	
-	CString strSubBuildingName=_T("333");
-
-	strMainBuildName=m_AddBuiding_FlexGrid.get_TextMatrix(nMaxRowIndext,AB_MAINNAME);
-	if(strMainBuildName.IsEmpty())
-	{
-		AfxMessageBox(_T("Input the building info in the last row of grid, the building and sub building NAME can not be empty."));
-		return ;
-	}
-
-	strSubBuildingName=m_AddBuiding_FlexGrid.get_TextMatrix(nMaxRowIndext,AB_NAME);
-	if(strSubBuildingName.IsEmpty())
-	{
-		AfxMessageBox(_T("The new sub net's NAME can not be empty, please input."));
-		return ;
-	}
-	for(UINT i=0;i<m_BuildNameLst.size();i++)
-	{
-		if(strSubBuildingName.CollateNoCase(m_BuildNameLst.at(i).strSubBuildName)==0&&strMainBuildName.CompareNoCase(m_BuildNameLst.at(i).strMainBuildName)==0)
-		{
-			AfxMessageBox(_T("There is already sub net in Building , please change it."));
-			return;
-		}			
-	}
-
-
-	CString strProtocol;
-	strProtocol=m_AddBuiding_FlexGrid.get_TextMatrix(nMaxRowIndext,AB_PROTOCOL);
-	if(strProtocol.IsEmpty())
-	{
-		AfxMessageBox(_T("The new sub net's PROTOCOL can not be empty, please input."));
-		return ;
-	}
-	
-	CString strIP;
-	strIP=m_AddBuiding_FlexGrid.get_TextMatrix(nMaxRowIndext,AB_IPADDRESS);
-	if(strProtocol.CompareNoCase(_T("Modbus TCP"))==0)
-	{
-		if(strIP.IsEmpty())
-		{
-			AfxMessageBox(_T("The new sub net's Ip address can not be empty, please input."));
-			return ;
-		}
-	}
-	if(strProtocol.CompareNoCase(_T("Modbus 485"))==0)
-	{
-		if(strIP.IsEmpty())
-			strIP=_T("N/A");
-	}
-	
-	CString strIpPort;
-	strIpPort=m_AddBuiding_FlexGrid.get_TextMatrix(nMaxRowIndext,AB_IPPORT);
-	strIpPort = _T("N/A");
-	if(strProtocol.CompareNoCase(_T("Modbus TCP"))==0)
-	{
-		if(strIpPort.IsEmpty())
-		{
-			strIpPort=_T("6001");
-		}
-	}
-	if(strProtocol.CompareNoCase(_T("Modbus 485"))==0)
-	{
-		if(strIP.IsEmpty())
-			strIpPort=_T("N/A");
-	}
-//	#define	AB_COMPORT	6
-//#define	AB_BAUDRAT	7
-	CString strCOMPort;
-	strCOMPort=m_AddBuiding_FlexGrid.get_TextMatrix(nMaxRowIndext,AB_COMPORT);
-	if(strCOMPort.IsEmpty())
-	{
-		strCOMPort=_T("COM1");
-	}
-	CString strCOMPortBraud;
-	strCOMPortBraud=m_AddBuiding_FlexGrid.get_TextMatrix(nMaxRowIndext,AB_BAUDRAT);
-	if(strCOMPortBraud.IsEmpty())
-	{
-		strCOMPortBraud=_T("19200");
-	}
-	BOOL bDefault =FALSE;
-	strSql.Format(_T("insert into Building (Main_BuildingName,Building_Name,Protocal,Com_Port,Ip_Address,Ip_Port,Braudrate) values('"+strMainBuildName+"','"+strSubBuildingName+"','"+strProtocol+"','"+strCOMPort+"','"+strIP+"','"+strIpPort+"','"+strCOMPortBraud+"')"));
-	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-
-	Update_Recorder();
-}
-*/
-
-/*
-void CAddBuilding::OnBnClickedDelbuilding()
-{
-
-	if(m_nCurRow>=(m_AddBuiding_FlexGrid.get_Rows()-1) || m_nCurRow <1 )
-	{
-		AfxMessageBox(_T("Please select a sub net first!"));
-		return;
-	}
-	CString strSql;
-	strSql.Format(_T("delete * from Building where Building_Name='%s' and Main_BuildingName='%s'"),m_strBuilding_Name2,m_strMainBuildingName);
-
-	
-	CString strTemp;
-	strTemp.Format(_T("Are you sure to delete the sub net:'%s'"),m_strBuilding_Name2);
-	if(AfxMessageBox(strTemp,MB_OKCANCEL)==IDOK)
-	{
-		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-	}
-	//Update_Recorder();
-	ReloadAddBuildingDB();
-	
-}
-*/
-
-/*
-void CAddBuilding::OnBnClickedDeleteallbuilding()
-{
-	CString strSql;
-	strSql.Format(_T("delete * from Building where Main_BuildingName='%s'"),m_strMainBuildingName);
-	CString strTemp;
-	strTemp.Format(_T("Are you sure to delete all the sub net(s)"));
-	if(AfxMessageBox(strTemp,MB_OKCANCEL)==IDOK)
-	{
-		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-	}
-	Update_Recorder();
-
-}
-*/
+ 
 
 BOOL CAddBuilding::OnInitDialog()
 {
@@ -263,9 +130,7 @@ BOOL CAddBuilding::OnInitDialog()
 	m_AddBuiding_FlexGrid.put_ColWidth(AB_BAUDRAT,1000);
 
 
-	m_pCon.CreateInstance(_T("ADODB.Connection"));
-	m_pRs.CreateInstance(_T("ADODB.Recordset"));
-	m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+ 
 
 	ReloadAddBuildingDB();
 
@@ -455,194 +320,7 @@ void CAddBuilding::ReloadAddBuildingDB()
 	
 	//m_buildNameLst.clear();
 	m_BuildNameLst.clear();
-	CString strSql;
-	//strSql.Format(_T("select * from Building where Main_BuildingName = '%s'"),m_strMainBuildingName);
-	strSql.Format(_T("select * from Building order by Main_BuildingName"));
-	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);			
-	m_AddBuiding_FlexGrid.put_Rows(m_pRs->RecordCount+2);	
-	int temp_row=0;
-	CString str_temp;
-	str_temp.Empty();
-
-	_variant_t temp_variant;
-	while(VARIANT_FALSE==m_pRs->EndOfFile)
-	{	
-		++temp_row;
-			
-		int bdef=0;
-		bdef=m_pRs->GetCollect(_T("Default_SubBuilding"));
-		if(bdef==-1)//def building;
-		{
-			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,0,_T("Select"));
-		}
-		else
-		{
-			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,0,_T(""));
-
-		}
-		_buildName BuildNameNode;
-		//m_mainBuildNameLst
-		m_strMainBuildingName=m_pRs->GetCollect("Main_BuildingName");//
-	//	m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_NAME,m_strMainBuildingName);
-	//	m_mainBuildNameLst.push_back(m_strMainBuildingName);
-		if(m_BuildNameLst.size()==0)
-		{
-			//m_mainBuildNameLst.push_back(m_strMainBuildingName);
-			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_MAINNAME,m_strMainBuildingName);
-		}
-			
-		else
-		{
-			if(m_BuildNameLst.at(m_BuildNameLst.size()-1).strMainBuildName.CompareNoCase(m_strMainBuildingName)!=0)
-			{
-			//	m_mainBuildNameLst.push_back(m_strMainBuildingName);
-				m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_MAINNAME,m_strMainBuildingName);
-			}
-			else
-			{
-				m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_MAINNAME,_T(""));
-			}		
-		}
-		BuildNameNode.strMainBuildName=m_strMainBuildingName;
-
-
-		//m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_MAINNAME,m_strMainBuildingName);
-
-		m_strBuildingName=m_pRs->GetCollect("Building_Name");//
-	//	m_strBuilding_Name2=m_strBuildingName;
-		m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_NAME,m_strBuildingName);
-		BuildNameNode.strSubBuildName=m_strBuildingName;
-		m_BuildNameLst.push_back(BuildNameNode);
-	//	m_buildNameLst.push_back(m_strBuildingName);
-
-		/*
-		temp_variant=m_pRs->GetCollect("ConnectType");//
-		if(temp_variant.vt!=VT_NULL)
-			m_strConnetion=temp_variant;
-		else
-			m_strConnetion=_T("");
-		m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_CONNECTION,m_strConnetion);
-
-		*/
-
-		temp_variant=m_pRs->GetCollect("Protocal");
-		if(temp_variant.vt!=VT_NULL)
-		{
-			m_strProtocol=temp_variant;
-			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_PROTOCOL,m_strProtocol);
-		}			
-		else
-		{
-			m_strProtocol=_T("");
-			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_PROTOCOL,_T(""));
-		}
-
-		temp_variant=m_pRs->GetCollect("Ip_Address");
-		if(temp_variant.vt!=VT_NULL)
-			m_strIpAddress=temp_variant;
-		else
-			m_strIpAddress=_T("");
-		
-		if(m_strProtocol.CompareNoCase(_T("Modbus TCP"))==0)
-		{
-			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_IPADDRESS,m_strIpAddress);
-
-
-		}
-		else
-		{   str_temp=NO_APPLICATION;//
-			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_IPADDRESS,str_temp);
-		}
-	
-
-		temp_variant=m_pRs->GetCollect("Ip_Port");
-		if(temp_variant.vt!=VT_NULL)
-			m_strIpPort=temp_variant;
-		else
-			m_strIpPort=_T("");
-
-		temp_variant=m_pRs->GetCollect("Com_Port");
-		if(temp_variant.vt!=VT_NULL)
-			m_strComPort=temp_variant;
-		else
-			m_strComPort=_T("");
-
-		
-		if(m_strProtocol.CompareNoCase(_T("Modbus TCP"))==0)
-		{
-			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_IPPORT,m_strIpPort);
-
-
-		}
-		else
-		{   str_temp=NO_APPLICATION;//
-			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_IPPORT,str_temp);
-		}
-		
-		///////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-#if 0
-		if(m_strProtocol.CompareNoCase(_T("Modbus 485"))==0)
-		{
-			if(IsValidCOM(m_strComPort))
-			{
-				m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_COMPORT,m_strComPort);
-			}
-			else if(m_szComm.size()>0)
-			{
-				m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_COMPORT,m_szComm[0]);
-			}
-		}
-		else
-		{
-			str_temp=NO_APPLICATION;//
-			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_COMPORT,str_temp);
-		}
-#endif
-		if(IsValidCOM(m_strComPort))
-		{
-			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_COMPORT,m_strComPort);
-		}
-		else if(m_szComm.size()>0)
-		{
-			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_COMPORT,m_szComm[0]);
-		}
-
-		//Baudrate
-		temp_variant=m_pRs->GetCollect("Braudrate");
-		if(temp_variant.vt!=VT_NULL)
-			m_strBaudrat=temp_variant;
-		else
-			m_strBaudrat=_T("");
-#if 0		
-		if(m_strProtocol.CompareNoCase(_T("Modbus 485"))==0)
-		{
-			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_BAUDRAT,m_strBaudrat);
-		}
-		else
-		{
-			str_temp=NO_APPLICATION;//
-			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_BAUDRAT,str_temp);
-		}
-#endif
-		m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_BAUDRAT,m_strBaudrat);
-
-		m_pRs->MoveNext();//
-	}	
-		++temp_row;	
-		m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,0,_T(""));
-		m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,1,_T(""));
-		m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,2,_T(""));
-		m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,3,_T(""));
-		m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,4,_T(""));
-		m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,5,_T(""));
-		m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,6,_T(""));
-		m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,7,_T(""));
-		//m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,8,_T(""));
-
-	if(m_pRs->State) 
-		m_pRs->Close(); 
+	 
 }
 
 
@@ -900,15 +578,7 @@ void CAddBuilding::Update_Recorder()
 {
 	try
 	{
-		CString strSql;
-		strSql.Format(_T("update Building set Main_BuildingName='%s',Building_Name='%s',Protocal='%s',Ip_Address='%s',Ip_Port='%s',Com_Port='%s',Braudrate='%s' where Building_Name='%s' and Main_BuildingName='%s'"),m_strMainBuildingName,m_strBuildingName,m_strProtocol,m_strIpAddress,m_strIpPort,m_strComPort,m_strBaudrat,m_strBuilding_Name2,m_strMainBuildingName2);
-		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-		if(m_nCurCol==AB_NAME)
-		{
-			m_strBuilding_Name2=m_strBuildingName;
-		}
-		if(m_pRs->State) 
-			m_pRs->Close();
+		 
 	}
 	catch (...)
 	{
@@ -993,33 +663,13 @@ void CAddBuilding::SetBuildingMainName(CString strBuildName)
 
 void CAddBuilding::OnMainBuildingSelect()
 {
-try
-{
-
-	CString execute_str=_T("update Building set Default_SubBuilding = 0 where Default_SubBuilding = -1");
-	m_pCon->Execute(execute_str.GetString(),NULL,adCmdText);	
-	execute_str.Format(_T("update Building set Default_SubBuilding = -1 where Building_Name = '%s'and Main_BuildingName= '%s'"),m_strBuildingName,m_strMainBuildingName);
-	m_pCon->Execute(execute_str.GetString(),NULL,adCmdText);
-}
-catch (...)
-{
-
-}
+ 
 
 	ReloadAddBuildingDB();
 }
 void CAddBuilding::OnMainBuildingUnSelect()
 {
-	try
-	{
-
-		CString execute_str=_T("update Building set Default_SubBuilding = 0 where Default_SubBuilding = -1");
-		m_pCon->Execute(execute_str.GetString(),NULL,adCmdText);	
-	}
-	catch (...)
-	{
-
-	}
+	 
 
 	ReloadAddBuildingDB();
 }
@@ -1030,17 +680,12 @@ void CAddBuilding::OnBuildingDelete()
 		return;
 	}
 	CString strSql;
-	strSql.Format(_T("delete * from Building where Building_Name='%s' and Main_BuildingName='%s'"),m_strBuilding_Name2,m_strMainBuildingName);
+	strSql.Format(_T("delete   from Building where Building_Name='%s' and Main_BuildingName='%s'"),m_strBuilding_Name2,m_strMainBuildingName);
 	try
 	{
 
 
-		CString strTemp;
-		strTemp.Format(_T("Are you sure to delete the building:'%s->%s'"),m_strMainBuildingName,m_strBuilding_Name2);
-		if(AfxMessageBox(strTemp,MB_OKCANCEL)==IDOK)
-		{
-			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-		}
+		 
 	}
 	catch (...)
 	{
@@ -1612,104 +1257,7 @@ BOOL CAddBuilding::GetIPbyHostName(CString strHostName,CString &strIP)
 }
 void CAddBuilding::OnBnClickedSavebutton()
 {
-	/*
-	_ConnectionPtr srcConTmp;
-	_RecordsetPtr srcRsTemp;
-	srcConTmp.CreateInstance("ADODB.Connection");
-	srcRsTemp.CreateInstance("ADODB.Recordset");
-	CString strSourceDatabasefilepath=g_strDatabasefilepath;
-	srcConTmp->Open(strSourceDatabasefilepath.GetString(),"","",adModeUnknown);
-	srcRsTemp	=srcConTmp->OpenSchema(adSchemaTables);
-	_variant_t	l_vDBTableName;
-	_bstr_t	bstrTableType;
-	vector<CString> tabNameVector;
-	 while(!srcRsTemp->EndOfFile)   
-	 {   
-       l_vDBTableName = srcRsTemp->GetCollect("TABLE_NAME"); 
-       bstrTableType  =srcRsTemp->GetCollect("TABLE_TYPE");   
-       if((bstrTableType ==(_bstr_t)"TABLE")||(bstrTableType==(_bstr_t)("VIEWS")))  
-	   {   
-		  tabNameVector.push_back(l_vDBTableName);   
-		}   
-		 srcRsTemp->MoveNext();   
-	}   
-  	if(srcRsTemp->State)
-		srcRsTemp->Close();
-	for(int i=0;i<tabNameVector.size();i++)
-	{
-	  CString strtemp=tabNameVector.at(i);
-	  if(strtemp.CompareNoCase(_T("Every_product"))==0)
-	  {
-		  break;
-	  }
-	}
-	*/
-
-/*
-	CString temp_str=_T("select * from Building where Default_SubBuilding=-1");
-	m_pRs->Open(_variant_t(temp_str),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);	
-	if(m_pRs->GetRecordCount()<=0)
-	{
-		AfxMessageBox(_T("There is no default building,please select a building First."));
-		return;
-	}
-	if(m_pRs->State)
-		m_pRs->Close(); 
-	_ConnectionPtr t_pCon;//for ado connection
-	t_pCon.CreateInstance(_T("ADODB.Connection"));
-	t_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
-
-	CString strfloor_name;//
-	CString strroom_name;//
-	CString strproduct_name;
-	CString strproduct_class_id;
-	CString strproduct_id;
-	CString strscreen_name;
-	CString strbackground_bmp;
-	CString strSerialnumber;
-	CString strmainBuildName;
-	CString strSubBuildName;
-	CString strIPAddress;
-	CString strIPPortNum;
-
-
-	CString stemp;
-	
-	CString strBaudRate=_T("0");
-	CString strHardVersion=_T("0");
-	CString strSoftwareVersion=_T("");
-	CString strEpSize("");
-//	CString strIspVersion("");
-
-	strmainBuildName=m_strMainBuildingName;
-	strSubBuildName=m_strBuilding_Name2;
-
-	for(int j=0;j<g_NCList.size();j++)
-	{
-		strfloor_name=_T("Floor_xx");
-		strroom_name=_T("Room_xx");
-		stemp=_T("WiFiTstat5E");
-		strproduct_name.Format(_T("%s:%d--%d"),stemp,g_NCList.at(j).nSerial,g_NCList.at(j).modbusID);
-		strproduct_class_id.Format(_T("%d"),g_NCList.at(j).nProductID);
-		strproduct_id.Format(_T("%d"),g_NCList.at(j).modbusID);
-        strscreen_name.Format(_T("Sceen(S:%d--%d)"),g_NCList.at(j).nSerial,g_NCList.at(j).modbusID);
-		strbackground_bmp=_T("Clicking here to add a image...");
-		strSerialnumber.Format(_T("%d"), g_NCList.at(j).nSerial);
-		strIPAddress=g_NCList.at(j).strIP;
-		strIPPortNum.Format(_T("%d"),g_NCList.at(j).nPort);
-
-		CString strSql;
-		strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,EPsize，IP_ADDRESS，IP_PORTNUMBER) values('"+strmainBuildName+"','"+strSubBuildName+"','"+strSerialnumber+"','"+strfloor_name+"','"+strroom_name+"','"+strproduct_name+"','"+strproduct_class_id+"','"+strproduct_id+"','"+strscreen_name+"','"+strBaudRate+"','"+strbackground_bmp+"','"+strHardVersion+"','"+strSoftwareVersion+"','"+strEpSize+"','"+strIPAddress+"','"+strIPPortNum+"')"));
-		try
-		{
-			t_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-		}
-		catch(_com_error *e)
-		{
-			AfxMessageBox(e->ErrorMessage());
-		}
-	}
-	*/
+	 
 }
 
 
@@ -1720,70 +1268,9 @@ void CAddBuilding::OnBnClickedSavebutton()
 //
 void CAddBuilding::SaveAll()
 {
-	CString temp_str=_T("select * from Building where Default_SubBuilding=-1");
-	m_pRs->Open(_variant_t(temp_str),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);	
-	if(m_pRs->GetRecordCount()<=0)
-	{
-		AfxMessageBox(_T("There is no default building,please select a building First."));
-		return;
-	}
-	if(m_pRs->State)
-		m_pRs->Close(); 
-	_ConnectionPtr t_pCon;//for ado connection
-	t_pCon.CreateInstance(_T("ADODB.Connection"));
-	t_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+	 
 
-	CString strfloor_name;//
-	CString strroom_name;//
-	CString strproduct_name;
-	CString strproduct_class_id;
-	CString strproduct_id;
-	CString strscreen_name;
-	CString strbackground_bmp;
-	CString strSerialnumber;
-	CString strmainBuildName;
-	CString strSubBuildName;
-	CString strIPAddress;
-	CString strIPPortNum;
-
-
-	CString stemp;
-
-	CString strBaudRate=_T("0");
-	CString strHardVersion=_T("0");
-	CString strSoftwareVersion=_T("");
-	CString strEpSize("");
-	//	CString strIspVersion("");
-
-	strmainBuildName=m_strMainBuildingName;
-	strSubBuildName=m_strBuilding_Name2;
-
-	for(UINT j=0;j<g_NCList.size();j++)
-	{
-		strfloor_name=_T("Floor_xx");
-		strroom_name=_T("Room_xx");
-		stemp=_T("WiFiTstat5E");
-		strproduct_name.Format(_T("%s:%d--%d"),stemp,g_NCList.at(j).nSerial,g_NCList.at(j).modbusID);
-		strproduct_class_id.Format(_T("%d"),g_NCList.at(j).nProductID);
-		strproduct_id.Format(_T("%d"),g_NCList.at(j).modbusID);
-		strscreen_name.Format(_T("Sceen(S:%d--%d)"),g_NCList.at(j).nSerial,g_NCList.at(j).modbusID);
-		strbackground_bmp=_T("T3000_Default_Building_PIC.bmp");
-		strSerialnumber.Format(_T("%d"), g_NCList.at(j).nSerial);
-		strIPAddress=g_NCList.at(j).strIP;
-		strIPPortNum.Format(_T("%d"),g_NCList.at(j).nPort);
-
-		CString strSql;
-		strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,EPsize，IP_ADDRESS，IP_PORTNUMBER) values('"+strmainBuildName+"','"+strSubBuildName+"','"+strSerialnumber+"','"+strfloor_name+"','"+strroom_name+"','"+strproduct_name+"','"+strproduct_class_id+"','"+strproduct_id+"','"+strscreen_name+"','"+strBaudRate+"','"+strbackground_bmp+"','"+strHardVersion+"','"+strSoftwareVersion+"','"+strEpSize+"','"+strIPAddress+"','"+strIPPortNum+"')"));
-		//new nc// strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,EPsize，IP_ADDRESS，IP_PORTNUMBER) values('"+strmainBuildName+"','"+strSubBuildName+"','"+strSerialnumber+"','"+strfloor_name+"','"+strroom_name+"','"+strproduct_name+"','"+strproduct_class_id+"','"+strproduct_id+"','"+strscreen_name+"','"+strBaudRate+"','"+strbackground_bmp+"','"+strHardVersion+"','"+strSoftwareVersion+"','"+strEpSize+"','"+strIPAddress+"','"+strIPPortNum+"')"));
-		try
-		{
-			t_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-		}
-		catch(_com_error *e)
-		{
-			AfxMessageBox(e->ErrorMessage());
-		}
-	}
+ 
 }
 
 
@@ -1855,138 +1342,7 @@ BOOL CAddBuilding::IsValidCOM(const CString& strComPort)
 
 void CAddBuilding::OnBnClickedAddbuiding()
 {
-	CString strSql;
-	int nMaxRowIndext=m_AddBuiding_FlexGrid.get_Rows()-1;
-
-// 	CString strMBuildNameTemp;
-// 	strMBuildNameTemp.Format(_T("Building_%d"), nMaxRowIndext);	
-	CString strSBuildingNameTemp;
-	strSBuildingNameTemp.Format(_T("Subnet_%d"), nMaxRowIndext);	
-
-	CString strMainBuildName=m_AddBuiding_FlexGrid.get_TextMatrix(nMaxRowIndext,AB_MAINNAME);
-	if(strMainBuildName.IsEmpty())
-	{
-		//AfxMessageBox(_T("Input the building info in the last row of grid, the building and sub building NAME can not be empty."));
-		return ;
-	}
-
-	CString strSubBuildingName=m_AddBuiding_FlexGrid.get_TextMatrix(nMaxRowIndext,AB_NAME);
-	if(strSubBuildingName.IsEmpty())
-	{
-		//AfxMessageBox(_T("The new sub net's NAME can not be empty, please input."));
-		//return ;
-		strSubBuildingName = strSBuildingNameTemp;
-	}
-	for(UINT i=0;i<m_BuildNameLst.size();i++)
-	{
-		if(strSubBuildingName.CollateNoCase(m_BuildNameLst.at(i).strSubBuildName)==0&&strMainBuildName.CompareNoCase(m_BuildNameLst.at(i).strMainBuildName)==0)
-		{
-			AfxMessageBox(_T("There is already sub net in Building , please change it."));
-			return;
-		}			
-	}
-
-
-	CString strProtocol;
-	strProtocol=m_AddBuiding_FlexGrid.get_TextMatrix(nMaxRowIndext,AB_PROTOCOL);
-	if(strProtocol.IsEmpty())
-	{
-		//AfxMessageBox(_T("The new sub net's PROTOCOL can not be empty, please input."));
-		//return ;
-		strProtocol = _T("Modbus 485");
-
-	}
-
-	CString strIP;
-	strIP=m_AddBuiding_FlexGrid.get_TextMatrix(nMaxRowIndext,AB_IPADDRESS);
-	if(strProtocol.CompareNoCase(_T("Modbus TCP"))==0)
-	{
-		if(strIP.IsEmpty())
-		{
-			strIP = _T("192.168.0.3");
-		}
-	}
-	if(strProtocol.CompareNoCase(_T("Modbus 485"))==0)
-	{
-		if(strIP.IsEmpty())
-			strIP=_T("N/A");
-	}
-
-	CString strIpPort;
-	strIpPort=m_AddBuiding_FlexGrid.get_TextMatrix(nMaxRowIndext,AB_IPPORT);
-	if(strProtocol.CompareNoCase(_T("Modbus TCP"))==0)
-	{
-		if(strIpPort.IsEmpty())
-		{
-			strIpPort=_T("6001");
-		}
-	}
-	if(strProtocol.CompareNoCase(_T("Modbus 485"))==0)
-	{
-		if(strIP.IsEmpty())
-			strIpPort=_T("N/A");
-	}
-	//	#define	AB_COMPORT	6
-	//#define	AB_BAUDRAT	7
-	CString strCOMPort;
-	strCOMPort=m_AddBuiding_FlexGrid.get_TextMatrix(nMaxRowIndext,AB_COMPORT);
-	if(strCOMPort.IsEmpty())
-	{
-		if(m_szComm.size() > 0)
-		{
-			strCOMPort=m_szComm[0];
-		}
-		else
-		{
-			strCOMPort=_T("No Com");
-		}
-	}
-	CString strCOMPortBraud;
-	strCOMPortBraud=m_AddBuiding_FlexGrid.get_TextMatrix(nMaxRowIndext,AB_BAUDRAT);
-	if(strCOMPortBraud.IsEmpty())
-	{
-		strCOMPortBraud=_T("19200");
-	}
-
-	//----------------------Add by Fance 2013 04 23-------------------------------------------------------
-	//judge whether the building name you added is exist
-	//if not exist we need to add this building in table Building_ALL in t3000.mdb
-	//and then we can insert this building into table Building.if not ,it will crash when insert data into Building
-	//Because the table Building is associated with  Building_ALL 
-	strSql.Format(_T("Select * from Building_ALL where Building_Name = '%s'"),strMainBuildName);
-	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-	_variant_t temp_variant_name;
-	bool findMainBuilding=false;
-	if(VARIANT_FALSE==m_pRs->EndOfFile)		//If it's not empty , means the input Building has exist in Main Building.
-	{
-		findMainBuilding=true;
-	}
-
-	if(m_pRs->State)
-		m_pRs->Close();
-
-
-	if(!findMainBuilding)
-	{
-		strSql.Format(_T("insert into Building_ALL (Building_Name,Telephone,Address) values('"+strMainBuildName+"','"+ _T("") +"','"+_T("") +"')"));
-		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-	}
-	//---------------------------------------------------------------------------------------------
-
-
-
-	try
-	{
-	BOOL bDefault =FALSE;
-	strSql.Format(_T("insert into Building (Main_BuildingName,Building_Name,Protocal,Com_Port,Ip_Address,Ip_Port,Braudrate) values('"+strMainBuildName+"','"+strSubBuildingName+"','"+strProtocol+"','"+strCOMPort+"','"+strIP+"','"+strIpPort+"','"+strCOMPortBraud+"')"));
-	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-	}
-	catch(_com_error *e)
-	{
-		AfxMessageBox(e->ErrorMessage());
-	}
-	Update_Recorder();
-	m_Changed=TRUE;
+ 
 
 
 }
