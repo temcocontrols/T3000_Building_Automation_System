@@ -207,7 +207,7 @@ void CBacnetTool::InitialBacnetConnection()
 
 
 	if(CM5_hThread==NULL)
-		CM5_hThread =CreateThread(NULL,NULL,MSTP_Receive,this,NULL, &nThreadID);
+		CM5_hThread =CreateThread(NULL,NULL,MSTP_Receive,this,NULL, &nThreadID_mstp);
 	Send_WhoIs_Global(-1, -1);
 }
 

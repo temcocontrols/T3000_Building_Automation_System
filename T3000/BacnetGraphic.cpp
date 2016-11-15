@@ -32,7 +32,7 @@
 using namespace Gdiplus;
 #include "globle_function.h"
 #include "BacnetMonitor.h"
-#include "bado/BADO.h"
+#include "../SQLiteDriver/CppSQLite3.h"
  
 #include "BacnetGraphicSetting.h"
 #define  WM_MONITOR_USER_MESSAGE WM_USER + 902
@@ -377,9 +377,10 @@ int CBacnetGraphic::Search_data_from_db()
 	get_data_count = temp_number_of_inputs;
 	monitor_analog_count = temp_number_of_analog;
 	monitor_digital_count = temp_number_of_digital;
-	CBADO monitor_bado;
-	monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
-	monitor_bado.OnInitADOConn(); 
+	CppSQLite3DB SqliteMonitor;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteMonitor.open((UTF8MBSTR)g_achive_monitor_datatbase_path);
 
 	for (int i=0;i<temp_number_of_inputs;i++)
 	{
@@ -405,13 +406,14 @@ int CBacnetGraphic::Search_data_from_db()
 			CString strSql;
 			//strSql.Format(_T("select * from MonitorData where Input_Index = '%s' and SerialNumber = %i and Monitor_Index = %i and Analog_Digital = 1 and Record_Time >= %i and Record_Time <= %i ORDER BY Record_Time ASC"),cs_temp_input_index,temp_serial_number,temp_monitor_index,temp_time_start,temp_time_end);	
 			strSql.Format(_T("select * from MonitorData where Index_ = '%s'   and Time_Since1970 >= %i and Time_Since1970 <= %i and Analog_Digital = -1 ORDER BY Time_Since1970 ASC"),cs_temp_input_index,m_starttime,m_endtime);	
-			monitor_bado.m_pRecordset=monitor_bado.OpenRecordset(strSql);
-			temp_record_count = monitor_bado.GetRecordCount(monitor_bado.m_pRecordset);
-			if(temp_record_count <= 0)
+			 q=SqliteMonitor.execQuery((UTF8MBSTR)strSql);
+			/*temp_record_count = monitor_bado.GetRecordCount(monitor_bado.m_pRecordset);*/
+			table = SqliteMonitor.getTable((UTF8MBSTR)strSql);
+			if(table.numRows() <= 0)
 			{
 				analog_data_max_value[i] = 100000;
 				analog_data_min_value[i] = 0;
-				monitor_bado.CloseRecordset();//Ffff add
+				 
 				continue;
 			}
 			analog_data_point[i] = new Data_Time_Match[temp_record_count];
@@ -420,28 +422,23 @@ int CBacnetGraphic::Search_data_from_db()
 			_variant_t temp_variant;
 			unsigned int logging_time = 0;
 			int monitor_value = 0;
-			while(VARIANT_FALSE==monitor_bado.m_pRecordset->EndOfFile)
+			while(!q.eof())
 			{
-				temp_variant=monitor_bado.m_pRecordset->GetCollect("Time_Since1970");//
-				if(temp_variant.vt!=VT_NULL)
-					logging_time = temp_variant;
-				else
+			 
+				logging_time= q.getIntField("Time_Since1970");
+				if (logging_time == 0)
 				{
-					logging_time = 0;
-					monitor_bado.m_pRecordset->MoveNext();
+					q.nextRow();
 					continue;
 				}
 
-				temp_variant=monitor_bado.m_pRecordset->GetCollect("Value_");//
-				if(temp_variant.vt!=VT_NULL)
-					monitor_value = temp_variant;
-				else
+				 
+				monitor_value = q.getIntField("Value_");
+				if (monitor_value == 0)
 				{
-					monitor_value = 0;
-					monitor_bado.m_pRecordset->MoveNext();
+					q.nextRow();
 					continue;
 				}
-
 				analog_data_point[i][temp_count].loggingtime = logging_time;
 				analog_data_point[i][temp_count].analogdata = monitor_value;
 
@@ -449,7 +446,7 @@ int CBacnetGraphic::Search_data_from_db()
 				{
 					if((analog_data_point[i][temp_count].analogdata < monitor_ignore_min_value) || (analog_data_point[i][temp_count].analogdata > monitor_ignore_max_value))
 					{
-						monitor_bado.m_pRecordset->MoveNext();
+						q.nextRow();
 						continue;
 					}
 				}
@@ -460,9 +457,9 @@ int CBacnetGraphic::Search_data_from_db()
 					analog_data_min_value[i] = analog_data_point[i][temp_count].analogdata;
 
 				temp_count ++;
-				monitor_bado.m_pRecordset->MoveNext();
+				q.nextRow();
 			}
-			monitor_bado.CloseRecordset();//Ffff add
+			 
 			analog_data_count[i] = temp_count;
 		}
 		else if((i >=temp_number_of_analog) && temp_number_of_digital>0)
@@ -470,9 +467,13 @@ int CBacnetGraphic::Search_data_from_db()
 			CString strSql;
 			//strSql.Format(_T("select * from MonitorData where Index_ = '%s'  and Analog_Digital = 0 and Time_Since1970 >= %i and Time_Since1970 <= %i ORDER BY Time_Since1970 ASC"),cs_temp_input_index,m_starttime,m_endtime);	
 			strSql.Format(_T("select * from MonitorData where Index_ = '%s'  and Analog_Digital = 0 and Time_Since1970 <= %i  ORDER BY Time_Since1970 ASC"),cs_temp_input_index,m_endtime);	
-			monitor_bado.m_pRecordset=monitor_bado.OpenRecordset(strSql);
-			temp_record_count = monitor_bado.GetRecordCount(monitor_bado.m_pRecordset);
-			if(temp_record_count <= 0)
+		 
+
+			q=SqliteMonitor.execQuery((UTF8MBSTR)strSql);
+			 
+			table = SqliteMonitor.getTable((UTF8MBSTR)strSql);
+
+			if(table.numRows() <= 0)
 			{
 				continue;
 			}
@@ -483,25 +484,21 @@ int CBacnetGraphic::Search_data_from_db()
 			_variant_t temp_variant;
 			unsigned int logging_time = 0;
 			int monitor_value = 0;
-			while(VARIANT_FALSE==monitor_bado.m_pRecordset->EndOfFile)
+			while(!q.eof())
 			{
-				temp_variant=monitor_bado.m_pRecordset->GetCollect("Time_Since1970");//
-				if(temp_variant.vt!=VT_NULL)
-					logging_time = temp_variant;
-				else
+				 
+				logging_time = q.getIntField("Time_Since1970");
+				if (logging_time == 0)
 				{
-					logging_time = 0;
-					monitor_bado.m_pRecordset->MoveNext();
+					q.nextRow();
 					continue;
 				}
 
-				temp_variant=monitor_bado.m_pRecordset->GetCollect("Value_");//
-				if(temp_variant.vt!=VT_NULL)
-					monitor_value = temp_variant;
-				else
+				 
+				monitor_value = q.getIntField("Value_");
+				if (monitor_value == 0)
 				{
-					monitor_value = 0;
-					monitor_bado.m_pRecordset->MoveNext();
+					q.nextRow();
 					continue;
 				}
 
@@ -511,7 +508,7 @@ int CBacnetGraphic::Search_data_from_db()
 					digital_data_point[i][temp_count].analogdata = 1;
 
 				temp_count ++;
-				monitor_bado.m_pRecordset->MoveNext();
+				q.nextRow();
 			}
 			digital_data_count[i] = temp_count;
 
@@ -519,7 +516,7 @@ int CBacnetGraphic::Search_data_from_db()
 		}
 
 	}
-	monitor_bado.CloseConn();
+	SqliteMonitor.closedb();
 
 	return 0;
 }

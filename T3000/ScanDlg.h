@@ -85,7 +85,8 @@ public:
 	void InitScanGrid();
 
 	void AddComDeviceToGrid(vector<_ComDeviceInfo*>& szList);
-	void AddNetDeviceToGrid(vector<_NetDeviceInfo*>& szList);
+//	void AddNetDeviceToGrid(vector<_NetDeviceInfo*>& szList);
+	void AddNetDeviceToGrid();
 
 	void SetScanner(CTStatScanner* pScanner);
 	void SetNode(tree_product product_Node);

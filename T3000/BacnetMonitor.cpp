@@ -10,7 +10,7 @@
 #include "Bacnet_Include.h"
 #include "globle_function.h"
 #include "gloab_define.h"
-#include "bado/BADO.h"
+ 
 #include "BacnetGraphic.h"
 #include "BacnetWait.h"
  
@@ -1047,7 +1047,7 @@ void CBacnetMonitor::Check_New_DB()
 
 
 	CString mdb_name;
-	mdb_name.Format(_T("\\%u_%u_%u_monitor%u.mdb"),g_selected_serialnumber,tm.GetYear(),tm.GetMonth(),monitor_list_line);
+	mdb_name.Format(_T("\\%u_%u_%u_monitor%u.db"),g_selected_serialnumber,tm.GetYear(),tm.GetMonth(),monitor_list_line);
 	g_achive_monitor_datatbase_path = temp_folder + mdb_name;
 
 
@@ -1055,7 +1055,7 @@ void CBacnetMonitor::Check_New_DB()
 	HANDLE hFind_Monitor;//
 	WIN32_FIND_DATA wfd_monitor;//
 	hFind_Monitor = FindFirstFile(g_achive_monitor_datatbase_path, &wfd_monitor);//
-	if (hFind_Monitor==INVALID_HANDLE_VALUE)//说明当前目录下无MonitorData.mdb
+	if (hFind_Monitor==INVALID_HANDLE_VALUE)//说明当前目录下无MonitorData.db
 	{
 		//没有找到就创建一个默认的数据库
 		FilePath_Monitor= g_achive_monitor_datatbase_path;
@@ -1136,12 +1136,12 @@ void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
 
 
 		CString strSql;
-		CBADO monitor_bado;
-		monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//删除里面的临时数据;
-		monitor_bado.OnInitADOConn(); 
-		strSql.Format(_T("delete * from MonitorData where Flag=1"),g_selected_serialnumber,monitor_list_line);
-		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
-		monitor_bado.CloseConn();
+	 
+		CppSQLite3DB SqliteMonitor;
+		SqliteMonitor.open((UTF8MBSTR)g_achive_monitor_datatbase_path);
+		strSql.Format(_T("delete   from MonitorData where Flag=1"),g_selected_serialnumber,monitor_list_line);
+		SqliteMonitor.execDML((UTF8MBSTR)strSql);
+		SqliteMonitor.closedb();
 
 		//WritePrivateProfileString(_T("Setting"),_T("MonitorValueIgnoreMax"),_T("10000000"),g_cstring_ini_path);
 
@@ -1173,12 +1173,11 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteAll()
 		//	WritePrivateProfileString(temp_serial,temp_monitor_digital_index,NULL,g_cstring_ini_path);
 		//}
 		CString strSql;
-		CBADO monitor_bado;
-		monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
-		monitor_bado.OnInitADOConn(); 
-		strSql=_T("delete * from MonitorData");
-		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
-		monitor_bado.CloseConn();
+		CppSQLite3DB SqliteMonitor;
+		SqliteMonitor.open((UTF8MBSTR)g_achive_monitor_datatbase_path);
+		strSql=_T("delete   from MonitorData");
+		SqliteMonitor.closedb();
+		 
 
 		for (int z=0;z<12;z++)
 		{
@@ -1209,12 +1208,11 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteLocal()
 
 
 	CString strSql;
-	CBADO monitor_bado;
-	monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
-	monitor_bado.OnInitADOConn(); 
-	strSql=_T("delete * from MonitorData");
-	monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
-	monitor_bado.CloseConn();
+	CppSQLite3DB SqliteMonitor;
+    SqliteMonitor.open((UTF8MBSTR)g_achive_monitor_datatbase_path);
+	strSql=_T("delete   from MonitorData");
+	SqliteMonitor.execDML((UTF8MBSTR)strSql);
+	SqliteMonitor.closedb();
 	MessageBox(_T("Delete Monitor Data : OK !"));
 }
 void CBacnetMonitor::OnBnClickedBtnMonitorDeleteSelected()
@@ -1243,13 +1241,12 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteSelected()
 			temp_serial.Format(_T("%u"),g_selected_serialnumber);
 
 			CString strSql;
-			CBADO monitor_bado;
-			monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
-			monitor_bado.OnInitADOConn(); 
-			strSql=_T("delete * from MonitorData");
-			monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
-			monitor_bado.CloseConn();
-
+		
+			CppSQLite3DB SqliteMonitor;
+			SqliteMonitor.open((UTF8MBSTR)g_achive_monitor_datatbase_path);
+			strSql=_T("delete   from MonitorData");
+			SqliteMonitor.execDML((UTF8MBSTR)strSql);
+			SqliteMonitor.closedb();
 
 			WritePrivateProfileString(temp_serial,temp_monitor_index,NULL,g_cstring_ini_path);
 			WritePrivateProfileString(temp_serial,temp_monitor_digital_index,NULL,g_cstring_ini_path);
@@ -1697,9 +1694,9 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 	if(temp_index >= m_monitor_head.total_seg)	//如果数据库里面的 index 已经比设备里面的 多，就说明已经读过了;不需要再往数据库里面存了;
 		return 1;
 
-	CBADO monitor_bado;
-	monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
-	monitor_bado.OnInitADOConn(); 
+	CppSQLite3DB SqliteMonitor;
+	SqliteMonitor.open((UTF8MBSTR)g_achive_monitor_datatbase_path);
+	
 	int loop_count = 400/(sizeof(Str_mon_element));
 	for (int i=0;i<loop_count;i++)
 	{
@@ -1845,9 +1842,9 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 
 		CString strSql;
 		strSql.Format(_T("insert into MonitorData values('%s',#%s#,%u,%d,%u,%u,'%s')"),temp_type,display_time,temp_data.time,temp_data.value,  analog_data ,temp_flag,Label_Des);
-		//strSql.Format(_T("insert into MonitorData values('%s',%d,%u,%u,%u,'%s','%s')"),temp_type,temp_data.value,temp_data.time , analog_data ,temp_flag,display_time,Label_Des);
-		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
-
+		 
+		SqliteMonitor.execDML((UTF8MBSTR)strSql);
+		
 		
 
 	}
@@ -1879,21 +1876,23 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 		//DFTrace(temp_write_index);
 	}
 
-
-	monitor_bado.CloseConn();
+	SqliteMonitor.closedb();
+	 
 
 	if(delete_temp_db_data)
 	{
 		CString strSql;
-		CBADO monitor_bado;
-		monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库 
-		monitor_bado.OnInitADOConn(); 
+	   CppSQLite3DB SqliteMonitor;
+	   SqliteMonitor.open((UTF8MBSTR)g_achive_monitor_datatbase_path);
 		if(analog_data)
-			strSql.Format(_T("delete * from MonitorData where Flag=1 and Analog_Digital=1"));
+			strSql.Format(_T("delete   from MonitorData where Flag=1 and Analog_Digital=1"));
 		else
-			strSql.Format(_T("delete * from MonitorData where Flag=1 and Analog_Digital=0"));
-		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
-		monitor_bado.CloseConn();
+			strSql.Format(_T("delete   from MonitorData where Flag=1 and Analog_Digital=0"));
+
+			
+
+	   SqliteMonitor.execDML((UTF8MBSTR)strSql);
+	   SqliteMonitor.closedb();
 
 	}
 

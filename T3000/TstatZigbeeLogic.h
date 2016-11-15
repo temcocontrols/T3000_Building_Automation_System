@@ -24,8 +24,10 @@ public:
 	virtual BOOL OnInitDialog();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	void AddTSTAT_ID(unsigned short * npoint , int nlength,unsigned char nId);
+	void AddMinipanel_ID(unsigned short * npoint , int nlength,unsigned char nId);
    static	UINT   GetZigbeeInfo(LPVOID lpVoid);
 	void HandleOneTSTAT(unsigned char nId);
+	void HandleOneMinipanel(unsigned char nId);
 	afx_msg LRESULT  HandleMessage(WPARAM wParam, LPARAM lParam);
 	void Initial_ID_List();
 	void MainListRefresh();
@@ -40,6 +42,11 @@ public:
 
 };
 
+
+
+
+const int  MINIPANEL_ZIGBEE_RSSI_COUNT = 5030;
+const int  MINIPANEL_ZIGBEE_FIRST_ID = 5031;
 
 const int TSTAT_ZIGBEE_RSSI_COUNT = 51;
 const int TSTAT_ZIGBEE_FIRST_ID = 52;

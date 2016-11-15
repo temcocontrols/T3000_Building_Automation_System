@@ -203,7 +203,7 @@ void BacnetWeeklyRoutine::Initial_List()
 			ListCtrlEx::CStrList strlist;
 			CString temp1;
 			strlist.push_back(_T(" "));
-			for (int x=1;x<=8;x++)
+			for (int x=1;x<=BAC_HOLIDAY_COUNT;x++)
 			{
 				temp1.Format(_T("AR%d"),x);
 				strlist.push_back(temp1);
@@ -216,7 +216,7 @@ void BacnetWeeklyRoutine::Initial_List()
 			ListCtrlEx::CStrList strlist;
 			CString temp1;
 			strlist.push_back(_T(" "));
-			for (int x=1;x<=8;x++)
+			for (int x=1;x<=BAC_HOLIDAY_COUNT;x++)
 			{
 				temp1.Format(_T("AR%d"),x);
 				strlist.push_back(temp1);

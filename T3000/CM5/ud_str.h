@@ -636,7 +636,7 @@ typedef struct
 	uint16_t soft_version;
 	uint8_t hardware_version;
 	uint8_t n_protocol;
-
+	uint16_t instance_hi;
 }Str_Serial_info;
 
 typedef struct
@@ -729,6 +729,10 @@ typedef union
 		 unsigned char modbus_id;
 		 unsigned int object_instance ;
 		 unsigned int time_update_since_1970;
+		 unsigned char time_zone_summer_daytime;
+
+		 char sntp_server[30];
+		 unsigned char zegbee_exsit;
 	}reg;
 }Str_Setting_Info;
 

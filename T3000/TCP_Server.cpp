@@ -199,8 +199,7 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char *ClientIP)
 	int time_out=0;
 	BOOL bTimeOut = FALSE;
 	m_bac_scan_com_data.clear();
-	//Sleep(1);
-	//Initial_bac(0);
+
 
 
 	while(!bTimeOut)//!pScanner->m_bNetScanFinish)  // ³¬Ê±½áÊø

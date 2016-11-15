@@ -9,7 +9,7 @@
 #include "MainFrm.h"
 #include "../SQLiteDriver/CppSQLite3.h"
 int static_step = 0;
-CString ConnectMessage[20];
+CString ConnectMessage[100];
 char dyndns_ipaddress[20];
 // CConnectRemoteServer dialog
 unsigned int try_connect_serial = 0;
@@ -53,13 +53,13 @@ void CConnectRemoteServer::OnPaint()
 	memDC.GetDC().FillSolidRect(&rcClient,RGB(230,230,230));
 	//Graphics graphics(memDC.GetDC());
 	SolidBrush *BlackBrush;
-	SolidBrush *CharacterBlackBrush;
+	//SolidBrush *CharacterBlackBrush;
 
 	Graphics *mygraphics;
 	mygraphics = new Graphics(memDC.GetDC());
 	mygraphics->SetSmoothingMode(SmoothingModeAntiAlias);
 	BlackBrush =new  SolidBrush(MY_COLOR_RED) ;
-	CharacterBlackBrush = new SolidBrush(MY_COLOR_BLACK_CHARACTER);
+	//CharacterBlackBrush = new SolidBrush(MY_COLOR_BLACK_CHARACTER);
 
 
 	mygraphics->FillRectangle(BlackBrush,0,0,rcClient.Width(),40);
@@ -78,6 +78,18 @@ void CConnectRemoteServer::OnPaint()
 	SolidBrush  MessageRetColor(Color(255,0,255,255));
 
 	//CString step1_message;
+
+	if(static_step >=15)
+	{
+		CString temp_cs;
+
+		for (int j=0;j<static_step;j++)
+		{
+			ConnectMessage[j] = ConnectMessage[j+1];
+		}
+
+		static_step = 14;
+	}
 
 	for (int z=0;z<static_step ;z++)
 	{
@@ -129,12 +141,13 @@ end_connect_paint:
 #endif
 }
 HANDLE tcp_client_thread = NULL; // 连接server 的 TCP状态 线程;
-
+HANDLE udp_ptp_client_thread = NULL; // UDP 打洞 线程;
 BOOL CConnectRemoteServer::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	static_step = 0;
 	// TODO:  Add extra initialization here
+#if 0
 	if(tcp_client_thread == NULL)
 		tcp_client_thread = CreateThread(NULL,NULL,TcpClient_Connect_Thread,this,NULL, NULL);
 	else
@@ -142,8 +155,210 @@ BOOL CConnectRemoteServer::OnInitDialog()
 		TerminateThread(tcp_client_thread,0);
 		tcp_client_thread = CreateThread(NULL,NULL,TcpClient_Connect_Thread,this,NULL, NULL);
 	}
+#endif
+
+	if(udp_ptp_client_thread == NULL)
+		udp_ptp_client_thread = CreateThread(NULL,NULL,UDP_ptp_Thread,this,NULL, NULL);
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
+}
+
+DWORD WINAPI UDP_ptp_Thread(LPVOID lpVoid)
+{
+	CConnectRemoteServer *pParent = (CConnectRemoteServer *)lpVoid;
+#if 1
+	hostent* host = gethostbyname("newfirmware.com");
+	if(host == NULL)
+	{
+		ConnectMessage[static_step].Format(_T("Can't access Firmware server.Please check your internet connection!"));
+		static_step ++ ;
+		tcp_client_thread = 0;
+		pParent->Invalidate(1);
+		return 1;
+	}
+#endif
+	char* pszIP  = (char *)inet_ntoa(*(struct in_addr *)(host->h_addr)); 
+	memset(dyndns_ipaddress,0,20);
+	memcpy_s((char *)dyndns_ipaddress,20,pszIP,20);
+
+	//memcpy_s((char *)dyndns_ipaddress,20,"127.0.0.1",20);
+	//memcpy_s((char *)dyndns_ipaddress,20,"192.168.0.99",20);
+	ConnectMessage[static_step].Format(_T("Connect to Temco Sever!"));
+	static_step ++ ;
+	pParent->Invalidate(1);
+
+	SOCKET sockClient=socket(AF_INET,SOCK_DGRAM,0);
+	sockaddr_in addrServer;
+	addrServer.sin_addr.S_un.S_addr=inet_addr(dyndns_ipaddress);
+	addrServer.sin_family=AF_INET;
+	addrServer.sin_port=htons(SERVER_T3000_PORT);
+
+	char send_buffer[1000];
+	memset(send_buffer,0,1000);
+
+	send_buffer[0] = 0x55;
+	send_buffer[1] = 0xff;
+	send_buffer[2] = COMMAND_T3000_REQUEST;
+
+	Str_T3000_Connect temp_data;
+	temp_data.reg_date.m_serial_number = remote_connect_serial_number;
+	memcpy(temp_data.reg_date.login_message.userName,ptpLoginName,30);
+	memcpy(temp_data.reg_date.login_message.password,ptpLoginPassword,20);
+	
+	memcpy(&send_buffer[3],&temp_data,T3000_CONNECT_LENGTH);
+
+	
+	//for (int i=0;i<30;i++)
+	//{
+	//	CString temp_test;
+	//	ConnectMessage[static_step].Format(_T("Test Count %d"),i+1);
+	//	static_step ++ ;
+	//	pParent->Invalidate(1);
+	//	Sleep(500);
+	//}
+
+
+	char receive_buffer[1000];
+	
+	int temp_len=sizeof(sockaddr);
+	int ret_rec = 0;
+
+	while(1)
+	{
+
+		ConnectMessage[static_step].Format(_T("Request connection to the server!"));
+		static_step ++ ;
+		pParent->Invalidate(1);
+
+		sendto(sockClient,send_buffer,T3000_CONNECT_DATA_LENGTH,0,(sockaddr*)&addrServer,sizeof(sockaddr));
+		memset(receive_buffer,0,1000);
+		ret_rec = recvfrom(sockClient,receive_buffer,1000,0,(sockaddr *)&addrServer,&temp_len);
+
+		if(ret_rec <=0 )
+		{
+			Sleep(1000);  //接收出错 延时等待;
+			ConnectMessage[static_step].Format(_T("Recvfrom server error!"));
+			static_step ++ ;
+			pParent->Invalidate(1);
+			continue;
+		}
+		//接收到服务器发来的 minipanel 的 信息; 209 个字节
+		if(((unsigned char)receive_buffer[0] == 0x55) && ((unsigned char)receive_buffer[1] == 0xff) )
+		{
+			if((unsigned char)receive_buffer[2] ==  COMMAND_COMMAND_UNKNOWN)
+			{
+				//收到的命令格式不正确;
+				ConnectMessage[static_step].Format(_T("Command type error!"));
+				static_step ++ ;
+				continue;
+			}
+			else if((unsigned char)receive_buffer[2] == COMMAND_PASSWORD_ERROR)
+			{
+				//账号密码错误;
+				ConnectMessage[static_step].Format(_T("Username and password error!"));
+				static_step ++ ;
+				continue;
+			}
+			else if((unsigned char)receive_buffer[2] == COMMAND_DEVICE_NOT_CONNECT_ERROR)
+			{
+				//账号密码错误;
+				ConnectMessage[static_step].Format(_T("Device not connect to the server yet!"));
+				static_step ++ ;
+				continue;
+			}
+			else if((unsigned char)receive_buffer[2] == COMMAND_DEVICE_NO_HEARTBEAT_ERROR)
+			{
+				//账号密码错误;
+				ConnectMessage[static_step].Format(_T("No heartbeat package from device!"));
+				static_step ++ ;
+				continue;
+			}		
+		}
+
+		if(ret_rec != T3000_MINI_HEARTBEAT_LENGTH_WITH_MINI_PORT)
+		{
+			//不是收到的minipanel 的端口信息 + minipanel 的 所有信息 ;
+			continue;
+
+		}
+		ConnectMessage[static_step].Format(_T("Get device ip address information from server success!"));
+		static_step ++ ;
+		pParent->Invalidate(1);
+		break;
+	}
+
+
+	char c_ip[16];
+	unsigned long temp_ip = 0;
+	memcpy(&temp_ip,&receive_buffer[3],4);
+	sockaddr_in addr_device_address;
+	addr_device_address.sin_addr.S_un.S_addr=    temp_ip    ;//  inet_addr(c_ip);
+	addr_device_address.sin_family=AF_INET;
+	addr_device_address.sin_port =  ((unsigned char)receive_buffer[8])*256 + (unsigned char)receive_buffer[7] ;
+	int test_miniport = ((unsigned char)receive_buffer[7])*256 + (unsigned char)receive_buffer[8] ;
+	char test_ip[4];
+	test_ip[0] = receive_buffer[3];
+	test_ip[1] = receive_buffer[4];
+	test_ip[2] = receive_buffer[5];
+	test_ip[3] = receive_buffer[6];
+	memset(send_buffer,0,1000);
+
+	send_buffer[0] = 0x55;
+	send_buffer[1] = 0xff;
+	send_buffer[2] = COMMAND_T3000_SEND_TO_DEVICE_MAKEHOLE;
+	
+	int nNetTimeout = 3000; //1秒
+	setsockopt( sockClient, SOL_SOCKET, SO_RCVTIMEO, ( char * )&nNetTimeout, sizeof( int ) );
+
+	while(1)
+	{
+
+
+
+		sendto(sockClient,send_buffer,3,0,(sockaddr*)&addr_device_address,sizeof(sockaddr));
+		ConnectMessage[static_step].Format(_T("Send PTP connection to IP: %d.%d.%d.%d. Port : %u ."),(unsigned char)test_ip[0],(unsigned char)test_ip[1],(unsigned char)test_ip[2],(unsigned char)test_ip[3],test_miniport);
+		static_step ++ ;
+		pParent->Invalidate(1);
+		memset(receive_buffer,0,1000);
+
+		sockaddr_in temp_receive_addr;
+		ret_rec = recvfrom(sockClient,receive_buffer,1000,0,(sockaddr *)&temp_receive_addr,&temp_len);
+		if(ret_rec > 0)
+		{
+			if(addr_device_address.sin_port != temp_receive_addr.sin_port)
+				continue;
+			if( memcmp(&addr_device_address.sin_addr,&temp_receive_addr.sin_addr,sizeof(IN_ADDR)) != 0 )
+				continue;
+
+			ConnectMessage[static_step].Format(_T("Receive message from device. PTP connection OK!"));
+			static_step ++ ;
+			pParent->Invalidate(1);
+			CString total_char_test;
+			total_char_test = _T("Receive from minipanel: ");
+			char * temp_print_test = NULL;
+			temp_print_test = receive_buffer;
+			for (int i = 0; i< ret_rec ; i++)
+			{
+				CString temp_char_test;
+				temp_char_test.Format(_T("%02x"),(unsigned char)*temp_print_test);
+				temp_char_test.MakeUpper();
+				temp_print_test ++;
+				total_char_test = total_char_test + temp_char_test + _T(" ");
+			}
+			DFTrace(total_char_test);
+			break;
+		}
+	}
+
+
+	//取消接收时限
+	nNetTimeout = 0;
+	setsockopt( sockClient, SOL_SOCKET, SO_RCVTIMEO, ( char * )&nNetTimeout, sizeof( int ) );
+	ret_rec = recvfrom(sockClient,receive_buffer,1000,0,(sockaddr *)&addr_device_address,&temp_len);
+
+	Sleep(1);
+	return 1;
 }
 
 DWORD WINAPI  TcpClient_Connect_Thread(LPVOID lpVoid)
@@ -174,6 +389,7 @@ DWORD WINAPI  TcpClient_Connect_Thread(LPVOID lpVoid)
 				ConnectMessage[static_step].Format(_T("Can't access Firmware server.Please check your internet connection!"));
 				static_step ++ ;
 				tcp_client_thread = 0;
+				pParent->Invalidate(1);
 				return 1;
 			}
 			char* pszIP  = (char *)inet_ntoa(*(struct in_addr *)(host->h_addr)); 
@@ -220,7 +436,7 @@ DWORD WINAPI  TcpClient_Connect_Thread(LPVOID lpVoid)
     }
     sockaddr_in servAddr;
     servAddr.sin_family = AF_INET;
-    servAddr.sin_port = htons(31234);
+    servAddr.sin_port = htons(TEMCO_SERVER_PORT);
     USES_CONVERSION;
     servAddr.sin_addr.S_un.S_addr = (inet_addr(dyndns_ipaddress));
     //发送时限
@@ -278,6 +494,7 @@ DWORD WINAPI  TcpClient_Connect_Thread(LPVOID lpVoid)
 		ConnectMessage[static_step].Format(_T("Connect newfirmware.com failed!"));
 		static_step ++ ;
 		tcp_client_thread = 0;
+		pParent->Invalidate(1);
 		return 1;
     }
 
@@ -307,6 +524,7 @@ DWORD WINAPI  TcpClient_Connect_Thread(LPVOID lpVoid)
 		{
 			ConnectMessage[static_step].Format(_T("Device donesn't connect to the server yet!"));
 			static_step ++ ;
+			pParent->Invalidate(1);
 		}
 		else if(receiver_buffer[2] == RETURN_MINI_DATA)
 		{
@@ -346,6 +564,7 @@ DWORD WINAPI  TcpClient_Connect_Thread(LPVOID lpVoid)
 			ConnectMessage[static_step].Format(_T("Update Time : %s"),strTime);
 			static_step ++ ;
 			device_is_connected = true;
+			pParent->Invalidate(1);
 		}
 	}
 	if(device_is_connected)

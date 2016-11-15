@@ -69,6 +69,7 @@ void CGraphicView::InitGraphic(int nSerialNum,int nTstatID)
  
 
 
+
 	m_strImgPathName=g_strImgeFolder+g_strImagePathName;
 
 	WIN32_FIND_DATA fData;

@@ -19,6 +19,7 @@ const int WRITE_MULTI_FAIL_LIST =4 ;
 int g_invoke_id;
 HANDLE hThread;
 DWORD nThreadID;
+DWORD nThreadID_mstp;
 HWND hMbpollWnd;
 HWND hMbpollWritePopWnd;
 int regDetailsOpenedFrom = 0;	// 0 = MbPoll.cpp; 1 = mbpollFunctions.cpp
@@ -50,7 +51,7 @@ int g_language=0;
 CString g_strImagePathName=_T("");
 int now_tstat_id =0;//for batch load /flash.
 
- 
+CString g_strOrigDatabaseFilePath=_T("");
 CString	g_strDatabasefilepath=_T("");
 CString g_strExePth=_T("");
 CString g_strImgeFolder=_T("");
@@ -2025,8 +2026,6 @@ SOCKET h_Broad=NULL;
 SOCKADDR_IN h_siBind;
 SOCKADDR_IN h_bcast;
 
- 
-
 Point_Data_str digital_last_data[MAX_POINTS_IN_MONITOR];//用来存 数字量 没变化的情况下又 不在时间轴范围内的值;
 Data_Time_Match * digital_data_point[MAX_POINTS_IN_MONITOR];
 Data_Time_Match * analog_data_point[MAX_POINTS_IN_MONITOR];
@@ -2072,11 +2071,11 @@ bool read_write_bacnet_config = false;	//读写Bacnet config 的时候禁止刷新 List;
 
  CString OUTPUT_ANRANGE6[5]={_T("On/Off"),_T("0-10V(100%)"),_T("0-5V(100%)"),_T("2-10V(100%)"),_T("PWM(0-100%)")};
 
-  CString OUTPUT_ANRANGE[18]={_T("On/Off"),_T("0-10V(100%)"),_T("0-5V(100%)"),_T("2-10V(100%)"),_T("10-0V(100%)"),_T("Internal Sensor"),_T("Setpoint"),
+ CString OUTPUT_ANRANGE[18]={_T("On/Off"),_T("0-10V(100%)"),_T("0-5V(100%)"),_T("2-10V(100%)"),_T("10-0V(100%)"),_T("Internal Sensor"),_T("Setpoint"),
  	 _T("AI1"),_T("AI2"),_T("AI3"),_T("AI4"),_T("AI5"),_T("AI6"),_T("AI7"),_T("AI8"),_T("Hum Sensor"),_T("CO2 Sensor"),_T("PWM(0-100%)")};
- //CString OUTPUT_ANRANGE[22]={_T("On/Off"),_T("0-10V(100%)"),_T("0-5V(100%)"),_T("2-10V(100%)"),_T("10-0V(100%)"),_T("Internal Sensor"),_T("Setpoint"),
-	//                          _T("AI1"),_T("AI2"),_T("AI3"),_T("AI4"),_T("AI5"),_T("AI6"),_T("AI7"),_T("AI8"),_T("Hum Sensor"),_T("CO2 Sensor"),
- //                             _T("Avg Temperature"),_T("Avg AI1ToAI2"),_T("Avg AI1ToAI3"),_T("Avg AI1ToAI4"),_T("PWM(0-100%)")};
+
+
+
 AddressMap TSTAT_6_ADDRESS[2000];
 AddressMap TSTAT_5EH_LCD_ADDRESS[2000];
 AddressMap TSTAT_5ABCDFG_LED_ADDRESS[2000];
@@ -2104,6 +2103,7 @@ int current_building_ipport;
 // 需要刷新--在MainFrm.cpp中的线程中需要判断这个变量
 //主要是两个地方
 //1>T3000View-Fresh()--进入到这里说明是需要刷新的因为这个是Tstat
+
 BOOL g_NEED_MULTI_READ = FALSE;
 
 //AC.0:0~10A,1:0~20A.2:0~50A. DC.10:0-100A
@@ -2172,6 +2172,16 @@ const CString c_strBaudate[NUMBER_BAUDRATE] =
 };
 #pragma endregion For_bacnet
 
+int global_interface = 1; //用来标识全局的界面在哪？主要是 Input 和 output;
 
 bool b_remote_connection = false;  //全局的 用来判断 对远程设备的 特殊处理;
 bool refresh_tree_status_immediately = false;	//如果置为treu了，就会立即调用 刷新 ，不用等待一个周期，用于 某些IP或状态变了，立即刷新;
+unsigned int remote_connect_serial_number = 0; // 远程连接的序列号;
+char ptpLoginName[30];	//远程连接的账号和密码;
+char ptpLoginPassword[20];
+refresh_net_device device_id_data_1;
+refresh_net_device device_id_data_2;
+
+bool edit_confilct_mode = false;
+
+bool scaning_mode = false;

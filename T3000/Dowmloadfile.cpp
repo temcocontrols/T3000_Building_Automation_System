@@ -37,6 +37,7 @@ CString Folder_Path;
 CString HEX_BIN_FILE_PATH;
 extern char * receivefile_buffer;
 CString new_firmware_ip;
+int is_local_temco_net = false;
 
 IMPLEMENT_DYNAMIC(Dowmloadfile, CDialogEx)
 
@@ -195,14 +196,18 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 
 
 		WritePrivateProfileStringW(_T("Data"),_T("Command"),_T("1"),AutoFlashConfigPath);
-		if(m_product_isp_auto_flash.BuildingInfo.strIp.IsEmpty())//´®¿Ú
+		if(m_product_isp_auto_flash.BuildingInfo.strIp.IsEmpty() || 
+			(m_product_isp_auto_flash.baudrate == 19200) || 
+			(m_product_isp_auto_flash.baudrate == 115200))//´®¿Ú
 		{
-			
+			CString temp_baudrate;
+			temp_baudrate.Format(_T("%d"),m_product_isp_auto_flash.baudrate);
 			 WritePrivateProfileStringW(_T("Data"),_T("COM_OR_NET"),_T("COM"),AutoFlashConfigPath);
 			 CString cs_comport;
 			 cs_comport.Format(_T("COM%d"), m_product_isp_auto_flash.ncomport);
 			 WritePrivateProfileStringW(_T("Data"),_T("COMPORT"),cs_comport,AutoFlashConfigPath);
-			 WritePrivateProfileStringW(_T("Data"),_T("Baudrate"),_T("19200"),AutoFlashConfigPath);
+			 //WritePrivateProfileStringW(_T("Data"),_T("Baudrate"),_T("19200"),AutoFlashConfigPath);
+			  WritePrivateProfileStringW(_T("Data"),_T("Baudrate"),temp_baudrate,AutoFlashConfigPath);
 
 			 CString nflash_id;
 			 nflash_id.Format(_T("%d"),m_product_isp_auto_flash.product_id);
@@ -211,7 +216,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 			 temp_isp_info.Format(_T("ISP via : "));
 			 temp_isp_info = temp_isp_info + cs_comport;
 			 m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
-			 temp_isp_info.Format(_T("ISP baudrate : 19200"));
+			 temp_isp_info.Format(_T("ISP baudrate : %d"),m_product_isp_auto_flash.baudrate);
 			 m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
 			 temp_isp_info.Format(_T("Device ID :"));
 			 temp_isp_info = temp_isp_info + nflash_id;
@@ -501,7 +506,7 @@ DWORD WINAPI   Dowmloadfile::DownLoadFileProcess(LPVOID lpVoid)
 				temp_info.HEAD_1 = 0x55;
 				temp_info.HEAD_2 = 0xff;
 				temp_info.length = sizeof(Download_Info) - 2;
-				temp_info.commad =  DOWNLOAD_NEW_FILE;
+				temp_info.commad =  DOWNLOAD_FILE;
 				temp_info.product_id = m_product_isp_auto_flash.product_class_id;
 				temp_info.get_newest = 1;
 				temp_info.file_type = 2;
@@ -738,14 +743,14 @@ BOOL Dowmloadfile::OnInitDialog()
 	}
 
 	m_download_product_type = (unsigned char)m_product_isp_auto_flash.product_class_id;
-	if((m_download_product_type == 0) || (m_download_product_type >= 200))
+	if(m_download_product_type == 0)
 	{
 		PostMessage(WM_CLOSE,NULL,NULL);
 	}
 	CString temp_db_ini_folder;
 	temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
 
-	int is_local_temco_net = false;
+	
 	is_local_temco_net  = GetPrivateProfileInt(_T("Setting"),_T("LocalTemcoNet"),0,temp_db_ini_folder);
 	if(is_local_temco_net == false)
 	{
@@ -1052,18 +1057,25 @@ void Dowmloadfile::OnBnClickedButtonFileDownloadOnly()
 void Dowmloadfile::OnBnClickedButtonUpdateT3000()
 {
 	// TODO: Add your control notification handler code here
-
-	CString tempApplicationFolder;
-	GetModuleFileName(NULL, tempApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
-	PathRemoveFileSpec(tempApplicationFolder.GetBuffer(MAX_PATH));
-	tempApplicationFolder.ReleaseBuffer();
-
-
-	ShellExecute(NULL,_T("open"),_T("Update.exe"),NULL,tempApplicationFolder,SW_SHOWNORMAL);
+	//if(is_local_temco_net == false)
+	//{
+		CString tempApplicationFolder;
+		GetModuleFileName(NULL, tempApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+		PathRemoveFileSpec(tempApplicationFolder.GetBuffer(MAX_PATH));
+		tempApplicationFolder.ReleaseBuffer();
 
 
-	//m_product_isp_auto_flash.product_class_id =  199;
-	//download_and_update = DOWNLOAD_ONLY;
-	//Start_Download();
+		ShellExecute(NULL,_T("open"),_T("Update.exe"),NULL,tempApplicationFolder,SW_SHOWNORMAL);
+	//}
+	//else
+	//{
+	//	m_product_isp_auto_flash.product_class_id =  199;
+	//	download_and_update = DOWNLOAD_ONLY;
+	//	Start_Download();
+	//}
+
+
+
+
 	return;
 }

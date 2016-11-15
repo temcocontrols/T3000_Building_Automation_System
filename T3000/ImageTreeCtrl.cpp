@@ -548,11 +548,10 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
             WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("1"),g_achive_device_name_path);
             }
             return TRUE;*/
-            if((int_product_type == PM_MINIPANEL) || (int_product_type == PM_CM5) )//  ||(int_product_type == PM_TSTAT6 )
-            {
-                WritePrivateProfileStringW(temp_serial,_T("NewName"),m_name_new,g_achive_device_name_path);
-                WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("1"),g_achive_device_name_path);
-            }
+
+             WritePrivateProfileStringW(temp_serial,_T("NewName"),m_name_new,g_achive_device_name_path);
+             WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("1"),g_achive_device_name_path);
+
             
              // int_product_type == PM_TSTAT6
             if (FALSE)
@@ -603,11 +602,9 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
                         memcpy_s(Databuffer,16,cTemp1,16);
                         if (Write_Multi(ModbusID,Databuffer,715,16,10)<0)
                         {
-                            if( int_product_type == PM_TSTAT6) 
-                            {
                                 WritePrivateProfileStringW(temp_serial,_T("NewName"),m_name_new,g_achive_device_name_path);
                                 WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("1"),g_achive_device_name_path);
-                            }
+                          
                         }
                     }
                       

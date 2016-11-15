@@ -15,6 +15,7 @@
 
 //extern int Station_NUM;
 // BacnetController dialog
+int PID_CONTROLLER_LIMITE_ITEM_COUNT = 0;
 
 
 extern int pointtotext_for_controller(char *buf,Point_T3000 *point);
@@ -189,6 +190,15 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 	CString temp_set_unit;
 	int Fresh_Item;
 	int isFreshOne = (int)lParam;
+
+	if(bacnet_device_type == STM32_HUM_NET)
+	{
+		PID_CONTROLLER_LIMITE_ITEM_COUNT = 3;
+	}
+	else
+		PID_CONTROLLER_LIMITE_ITEM_COUNT = BAC_PID_COUNT;
+
+
 	if(isFreshOne == REFRESH_ON_ITEM)
 	{
 		Fresh_Item = (int)wParam;
@@ -220,9 +230,20 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 			i = Fresh_Item;
 		}
 
+
+		if(i>= PID_CONTROLLER_LIMITE_ITEM_COUNT)
+		{
+			for (int a=0;a<CONTROLLER_COL_NUMBER; a++)
+			{
+				m_controller_list.SetItemText(i,a,_T(""));
+			}
+			continue;
+		}
+
+
 		temp_des2.Empty();
 
-		if(2 == m_controller_data.at(i).input.point_type)
+		if( (BAC_IN + 1) == m_controller_data.at(i).input.point_type)
 		{
 			if(m_controller_data.at(i).input.number< BAC_INPUT_ITEM_COUNT)
 			{	
@@ -231,11 +252,17 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 						temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
 					temp_des2.ReleaseBuffer();	
 
+					//如果是小叶的设备,因为没有input 就直接显示in2之类.
+					if(bacnet_device_type == STM32_HUM_NET)
+					{
+						temp_des2.Empty();
+					}
+
 
 					if(temp_des2.GetLength()>9)
-						temp_des2.Format(_T("%d-IN%d"),m_controller_data.at(i).input.panel,m_controller_data.at(i).input.number);
+						temp_des2.Format(_T("%d-IN%d"),m_controller_data.at(i).input.panel,m_controller_data.at(i).input.number + 1);
 					if(temp_des2.IsEmpty())
-						temp_des2.Format(_T("%d-IN%d"),m_controller_data.at(i).input.panel,m_controller_data.at(i).input.number);
+						temp_des2.Format(_T("%d-IN%d"),m_controller_data.at(i).input.panel,m_controller_data.at(i).input.number + 1);
 
 					//temp_des3.Format(_T("%d"),m_Input_data.at(m_controller_data.at(i).input.number - 1).value);	
 					CString cstemp_value;
@@ -253,10 +280,19 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 					{
 						m_controller_list.SetItemText(i,CONTROLLER_INPUTUNITS,Input_List_Analog_Units[m_Input_data.at(x).range]);
 					}
+
+					//如果是小叶的设备,因为没有input 就直接显示rang 对应的值.
+					if(bacnet_device_type == STM32_HUM_NET)
+					{
+						if(m_controller_data.at(i).units < sizeof(Input_List_Analog_Units)/sizeof(Input_List_Analog_Units[0]))
+						{
+							m_controller_list.SetItemText(i,CONTROLLER_INPUTUNITS,Input_List_Analog_Units[m_controller_data.at(i).units]);
+						}
+					}
 			
 			}
 		}
-		else if(3 == m_controller_data.at(i).input.point_type)
+		else if((BAC_VAR + 1) == m_controller_data.at(i).input.point_type)
 		{
 			if(m_controller_data.at(i).input.number< BAC_VARIABLE_ITEM_COUNT)
 			{	
@@ -268,9 +304,9 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 
 
 					if(temp_des2.GetLength()>9)
-						temp_des2.Format(_T("%d-VAR%d"),m_controller_data.at(i).input.panel,m_controller_data.at(i).input.number);
+						temp_des2.Format(_T("%d-VAR%d"),m_controller_data.at(i).input.panel,m_controller_data.at(i).input.number + 1);
 					if(temp_des2.IsEmpty())
-						temp_des2.Format(_T("%d-VAR%d"),m_controller_data.at(i).input.panel,m_controller_data.at(i).input.number);
+						temp_des2.Format(_T("%d-VAR%d"),m_controller_data.at(i).input.panel,m_controller_data.at(i).input.number + 1);
 
 					//temp_des3.Format(_T("%d"),m_Input_data.at(m_controller_data.at(i).input.number - 1).value);	
 					CString cstemp_value;
@@ -324,14 +360,14 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 		temp_des2.Empty();
 		temp_des3.Empty();
 		temp_set_unit.Empty();
-		if(m_controller_data.at(i).setpoint.point_type == 1) 
+		if(m_controller_data.at(i).setpoint.point_type == (BAC_OUT + 1)) 
 		{
 			if(m_controller_data.at(i).setpoint.number< BAC_OUTPUT_ITEM_COUNT)
 			{
 
 			}
 		}
-		else if(m_controller_data.at(i).setpoint.point_type == 2) 
+		else if(m_controller_data.at(i).setpoint.point_type == (BAC_IN + 1)) 
 		{
 			if(m_controller_data.at(i).setpoint.number< BAC_INPUT_ITEM_COUNT)
 			{
@@ -378,7 +414,7 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 				
 			}
 		}
-		else if(m_controller_data.at(i).setpoint.point_type == 3)	//Variable
+		else if(m_controller_data.at(i).setpoint.point_type == (BAC_VAR + 1))	//Variable
 		{
 			if(m_controller_data.at(i).setpoint.number< BAC_VARIABLE_ITEM_COUNT)
 			{
@@ -556,6 +592,12 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 			
 		}
 #endif
+
+		if(bacnet_device_type == STM32_HUM_NET)
+		{
+			temp_des3.Format(_T("%.2f"),((float)m_controller_data.at(i).setpoint_value)/1000);
+		}
+
 		m_controller_list.SetItemText(i,CONTROLLER_SETPOINT,temp_des2);
 		m_controller_list.SetItemText(i,CONTROLLER_SETVALUE,temp_des3);
 		m_controller_list.SetItemText(i,CONTROLLER_SETPOINTUNITS,temp_set_unit);
@@ -641,6 +683,12 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 	int Changed_Item = (int)wParam;
 	int Changed_SubItem = (int)lParam;
 
+	if(Changed_Item>= PID_CONTROLLER_LIMITE_ITEM_COUNT)
+	{
+		m_controller_list.SetItemText(Changed_Item,Changed_SubItem,_T(""));
+		return 0;
+	}
+
 
 	CString temp_task_info;
 	CString New_CString =  m_controller_list.GetItemText(Changed_Item,Changed_SubItem);
@@ -652,6 +700,10 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 
 	if(Changed_SubItem == CONTROLLER_INPUT)
 	{
+		if(bacnet_device_type == STM32_HUM_NET) //小叶的设备不支持修改
+		{
+			return 0;
+		}
 		CString cs_temp = m_controller_list.GetItemText(Changed_Item,Changed_SubItem);
 		if(cs_temp.IsEmpty() == false)
 		{
@@ -761,6 +813,10 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 
 	if(Changed_SubItem == CONTROLLER_INPUTVALUE)
 	{
+		if(bacnet_device_type == STM32_HUM_NET) //STM32_HUM_NET的设备不支持修改
+		{
+			return 0;
+		}
 		//int temp_value = _wtoi(New_CString);
 		int temp_value = (int)(_wtof(New_CString) * 1000);
 
@@ -779,16 +835,27 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 
 	if(Changed_SubItem == CONTROLLER_SETVALUE)
 	{
-	//	int temp_value = _wtoi(New_CString);
-		int temp_value = (int)(_wtof(New_CString) * 1000);
-		if(m_controller_data.at(Changed_Item).setpoint.number == 0 )
-			return 0;
-		if((m_controller_data.at(Changed_Item).setpoint.number -1 )< BAC_VARIABLE_ITEM_COUNT)
-			m_Variable_data.at(m_controller_data.at(Changed_Item).setpoint.number - 1).value = temp_value;
+		if(bacnet_device_type == STM32_HUM_NET) //STM32_HUM_NET的设备不支持修改
+		{
+			int temp_proportional=0;
+			CString cs_temp = m_controller_list.GetItemText(Changed_Item,Changed_SubItem);
+			m_controller_data.at(Changed_Item).setpoint_value = _wtoi(cs_temp)* 1000;
 
-		temp_task_info.Format(_T("Write Controllers List Item%d .Changed the variable value to \"%s\" "),Changed_Item + 1,New_CString);
-		Post_Write_Message(g_bac_instance,WRITEVARIABLE_T3000,Changed_Item,Changed_Item,sizeof(Str_in_point),BacNet_hwd ,temp_task_info);
-		return 0;
+		}
+		else
+		{
+			int temp_value = (int)(_wtof(New_CString) * 1000);
+			if(m_controller_data.at(Changed_Item).setpoint.number == 0 )
+				return 0;
+			if((m_controller_data.at(Changed_Item).setpoint.number -1 )< BAC_VARIABLE_ITEM_COUNT)
+				m_Variable_data.at(m_controller_data.at(Changed_Item).setpoint.number - 1).value = temp_value;
+
+			temp_task_info.Format(_T("Write Controllers List Item%d .Changed the variable value to \"%s\" "),Changed_Item + 1,New_CString);
+			Post_Write_Message(g_bac_instance,WRITEVARIABLE_T3000,Changed_Item,Changed_Item,sizeof(Str_in_point),BacNet_hwd ,temp_task_info);
+			return 0;
+		}
+
+
 	}
 
 	if(Changed_SubItem == CONTROLLER_AUTO_MANUAL)
@@ -999,6 +1066,8 @@ void BacnetController::OnNMClickListController(NMHDR *pNMHDR, LRESULT *pResult)
 	lRow = lvinfo.iItem;
 	lCol = lvinfo.iSubItem;
 
+	if(lRow>= PID_CONTROLLER_LIMITE_ITEM_COUNT)
+		return;
 
 	if(lRow>m_controller_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
 		return;
@@ -1150,7 +1219,7 @@ BOOL BacnetController::OnHelpInfo(HELPINFO* pHelpInfo)
 			theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
 		else
 			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, 			
-			HH_HELP_CONTEXT, IDH_TOPIC_6_6_PID_LOOPS);
+			HH_HELP_CONTEXT, IDH_TOPIC_PID_LOOPS_INTRODUCTION_1);
 		return (hWnd != NULL);
 	}
 	else{

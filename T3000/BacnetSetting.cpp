@@ -9,11 +9,15 @@
 #include "Bacnetaddintodb.h"
 #include "BacnetATCommand.h"
 #include "BacnetSettingHealth.h"
+#include "TstatZigbeeLogic.h"
 #include "MainFrm.h"
 #include "../SQLiteDriver/CppSQLite3.h"
 // CBacnetSetting dialog
 extern bool cancle_send ;
 bool show_user_list_window = false;
+
+#define TIMER_SYNC_TIMER    1
+
 IMPLEMENT_DYNAMIC(CBacnetSetting, CDialogEx)
 
 CBacnetSetting::CBacnetSetting(CWnd* pParent /*=NULL*/)
@@ -92,6 +96,9 @@ BEGIN_MESSAGE_MAP(CBacnetSetting, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_BAC_SETTING_OK, &CBacnetSetting::OnBnClickedButtonBacSettingOk)
 	ON_BN_CLICKED(IDC_BUTTON_BAC_SETTING_CANCEL, &CBacnetSetting::OnBnClickedButtonBacSettingCancel)
 	ON_BN_CLICKED(IDC_BUTTON_SYNC_TIME, &CBacnetSetting::OnBnClickedButtonSyncTime)
+	ON_BN_CLICKED(IDC_CHECK_SETTING_ZONE_DAYLIGHT_TIME, &CBacnetSetting::OnBnClickedCheckSettingZoneDaylightTime)
+	ON_BN_CLICKED(IDC_BUTTON_BAC_SHOW_ZIGBEE, &CBacnetSetting::OnBnClickedButtonBacShowZigbee)
+	ON_CBN_KILLFOCUS(IDC_COMBO_BACNET_SETTING_TIME_SERVER, &CBacnetSetting::OnCbnKillfocusComboBacnetSettingTimeServer)
 END_MESSAGE_MAP()
 
 
@@ -459,7 +466,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				}
 				if((Device_Basic_Setting.reg.time_update_since_1970 < 1420041600)  || (Device_Basic_Setting.reg.time_update_since_1970 > 1735660800))
 				{
-					((CEdit *)GetDlgItem(IDC_EDIT_SETTING_LAST_UPDATE_TIME))->SetWindowTextW(_T("N/A"));
+					((CEdit *)GetDlgItem(IDC_EDIT_SETTING_LAST_UPDATE_TIME))->SetWindowTextW(_T("No Reply"));
 				}
 				else
 				{
@@ -522,6 +529,26 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				m_dyndns_domain.SetWindowTextW(temp_dyndns_domain);
 			}
 
+			if(Device_Basic_Setting.reg.time_zone_summer_daytime == 0)
+			{
+				((CButton *)GetDlgItem(IDC_CHECK_SETTING_ZONE_DAYLIGHT_TIME))->SetCheck(false);
+			}
+			else
+			{
+				Device_Basic_Setting.reg.time_zone_summer_daytime = 1;
+				((CButton *)GetDlgItem(IDC_CHECK_SETTING_ZONE_DAYLIGHT_TIME))->SetCheck(true);
+			}
+
+			if(Device_Basic_Setting.reg.zegbee_exsit == 0x74)
+			{
+				((CButton *)GetDlgItem(IDC_BUTTON_BAC_SHOW_ZIGBEE))->EnableWindow(TRUE);
+			}
+			else
+			{
+				((CButton *)GetDlgItem(IDC_BUTTON_BAC_SHOW_ZIGBEE))->EnableWindow(FALSE);
+			}
+			
+
 			if(Device_Basic_Setting.reg.en_sntp == 0)
 			{
 				GetDlgItem(IDC_STATIC_SETTING_TIMER_SERVER)->ShowWindow(FALSE);
@@ -577,11 +604,17 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 					//((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(Time_Server_Name[2]);
 					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetCurSel(2);
 				}
-				//else if(Device_Basic_Setting.reg.en_sntp == 5)
-				//{
-				//	((CButton *)GetDlgItem(IDC_CHECK_SETTING_SYNC_TIME))->SetCheck(true);
-				//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(Time_Server_Name[3]);
-				//}
+				else if(Device_Basic_Setting.reg.en_sntp == 5)
+				{
+					((CButton *)GetDlgItem(IDC_CHECK_SETTING_SYNC_TIME))->SetCheck(true);
+
+					CString temp_cs1;
+					MultiByteToWideChar( CP_ACP, 0, Device_Basic_Setting.reg.sntp_server, (int)strlen((char *)Device_Basic_Setting.reg.sntp_server)+1, 
+						temp_cs1.GetBuffer(MAX_PATH), MAX_PATH );
+					temp_cs1.ReleaseBuffer();
+				
+					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(temp_cs1);
+				}
 				//else if(Device_Basic_Setting.reg.en_sntp == 6)
 				//{
 				//	((CButton *)GetDlgItem(IDC_CHECK_SETTING_SYNC_TIME))->SetCheck(true);
@@ -898,7 +931,8 @@ BOOL CBacnetSetting::PreTranslateMessage(MSG* pMsg)
 			(temp_focus_id == IDC_EDIT_DYNDNS_DOMAIN) ||
 			(temp_focus_id == IDC_EDIT_TIME_UPDATE) ||
 			(temp_focus_id == IDC_EDIT_SETTING_PORT) ||
-			(temp_focus_id == IDC_EDIT_SETTING_OBJ_INSTANCE))
+			(temp_focus_id == IDC_EDIT_SETTING_OBJ_INSTANCE) ||
+			(temp_focus_id == IDC_COMBO_BACNET_SETTING_TIME_SERVER))
 		{
 
 			GetDlgItem(IDC_BUTTON_BAC_SETTING_OK)->SetFocus();
@@ -912,7 +946,17 @@ BOOL CBacnetSetting::PreTranslateMessage(MSG* pMsg)
 void CBacnetSetting::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
-
+	switch(nIDEvent)
+	{
+	case TIMER_SYNC_TIMER:
+		{
+			   ::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_SETTING);
+			   KillTimer(TIMER_SYNC_TIMER);
+		}
+		break;
+	default:
+		break;
+	}
 
 	CDialogEx::OnTimer(nIDEvent);
 }
@@ -1615,7 +1659,7 @@ BOOL CBacnetSetting::OnHelpInfo(HELPINFO* pHelpInfo)
 
 	if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
 	else
-		hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_IP_SETTINGS);
+		hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_PANEL_CONFIGURATION);
 	return (hWnd != NULL);
 	// 	}
 	// 	else{
@@ -1656,13 +1700,72 @@ void CBacnetSetting::OnBnClickedButtonSyncTime()
 	SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("SYNC Timer Server Now.Please Wait....."));
 	if(Write_Private_Data_Blocking(WRITE_SETTING_COMMAND,0,0) <= 0)
 	{
-		
+		Sleep(1);
 	}
 	else
 	{
-		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("SYNC time failed!"));
+		SetTimer(TIMER_SYNC_TIMER,3000,NULL);
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Send SYNC time success!"));
 	}
 
 	((CButton *)GetDlgItem(IDC_BUTTON_SYNC_TIME))->EnableWindow(TRUE);
 	
+}
+
+
+void CBacnetSetting::OnBnClickedCheckSettingZoneDaylightTime()
+{
+	// TODO: Add your control notification handler code here
+	// TODO: Add your control notification handler code here 
+	CString temp_task_info;
+	if(Device_Basic_Setting.reg.time_zone_summer_daytime == 1)
+	{
+		Device_Basic_Setting.reg.time_zone_summer_daytime = 0;
+		temp_task_info.Format(_T("Disable Automatically adjust clock for Daylight Saving Time "));
+	}
+	else
+	{
+		Device_Basic_Setting.reg.time_zone_summer_daytime = 1;
+		temp_task_info.Format(_T("Enable Automatically adjust clock for Daylight Saving Time"));
+	}
+
+	Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
+
+}
+
+
+void CBacnetSetting::OnBnClickedButtonBacShowZigbee()
+{
+	// TODO: Add your control notification handler code here
+	CTstatZigbeeLogic dlg;
+	dlg.DoModal();
+}
+
+
+void CBacnetSetting::OnCbnKillfocusComboBacnetSettingTimeServer()
+{
+	// TODO: Add your control notification handler code here
+	CString temp_string;
+	GetDlgItemText(IDC_COMBO_BACNET_SETTING_TIME_SERVER,temp_string);
+	if(!temp_string.IsEmpty())
+	{
+		if((temp_string.CompareNoCase(Time_Server_Name[0])  == 0) ||
+			(temp_string.CompareNoCase(Time_Server_Name[1])  == 0) ||
+			(temp_string.CompareNoCase(Time_Server_Name[2])  == 0))
+		{
+
+		}
+		else
+		{
+			Device_Basic_Setting.reg.en_sntp = 5;
+			WideCharToMultiByte(CP_ACP,NULL,temp_string.GetBuffer(),-1,Device_Basic_Setting.reg.sntp_server,30,NULL,NULL);
+			CString temp_task_info;
+			temp_task_info.Format(_T("Change sntp server to "));
+			temp_task_info = temp_task_info + temp_string;
+			Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
+		}
+	}
+
+
+
 }

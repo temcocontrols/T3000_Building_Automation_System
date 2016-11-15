@@ -61,8 +61,10 @@ extern CDialog_Progess *WaitRead_Data_Dlg;
 extern CBacnetAddLabel * Add_Label_Window;
 extern CBacnetUserlogin * User_Login_Window;
 
+HANDLE hretryThread = NULL;
 extern CString AutoFlashConfigPath;
-
+HTREEITEM  hTreeItem_retry =NULL;
+HTREEITEM  hLastTreeItem =NULL;
 #include "T38AI8AO.h"
 #include "rs485.h" // For call Get_RS485_Handle() function
 #include "BacnetWait.h"
@@ -92,11 +94,11 @@ extern CString AutoFlashConfigPath;
 #include "T3ModulesOutputDlg.h"
 #include "ProductRegisterListView.h"
 #include "TStatInputView.h"
-
+#include "DuplicateIdDetected.h"
 #include "BoatMonitorViewer.h"
 #include "Class/md5.h"
+#include "NewTstatSchedulesDlg.h"
 #include "../SQLiteDriver/CppSQLite3.h"
-
 bool b_create_status = false;
 const TCHAR c_strCfgFileName[] = _T("config.txt");
 //	配置文件名称，用于保存用户设置
@@ -262,10 +264,12 @@ const UINT uiLastUserToolBarId = uiFirstUserToolBarId + iMaxUserToolbars - 1;
 BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
     ON_NOTIFY_EX(TTN_NEEDTEXT,0,OnToolTipNotify)
     ON_MESSAGE(WM_REFRESH_TREEVIEW_MAP, RefreshTreeViewMap)
+	 ON_MESSAGE(WM_HADNLE_DUPLICATE_ID, HandleDuplicateID)
     ON_MESSAGE(WM_SCAN_PRODUCT, Message_Scan_Product)
     ON_MESSAGE(MY_BAC_CONFIG_READ_RESULTS, ReadConfigFromDeviceMessageCallBack)
     ON_MESSAGE(MY_RESUME_DATA, AllWriteMessageCallBack)
     ON_MESSAGE(MY_RX_TX_COUNT, Refresh_RX_TX_Count)
+	ON_MESSAGE(MY_RETRY_MESSAGE, Retry_Connect_Message)
     //ON_MESSAGE(WM_SHOW_PANNELINFOR,Show_Panel)
     ON_MESSAGE(WM_DELETE_NEW_MESSAGE_DLG,Delete_Write_New_Dlg)
     ON_MESSAGE(WM_HOTKEY,&CMainFrame::OnHotKey)
@@ -418,8 +422,8 @@ unsigned short tempchange[512];
 int index_Count=0;
 UINT _ReadMultiRegisters(LPVOID pParam)
 {
-return 0;
 
+ 
     CMainFrame* pFrame=(CMainFrame*)(pParam);
     BOOL bFirst=TRUE;
     Read_Mutex=CreateMutex(NULL,TRUE,_T("Read_Multi_Reg"));
@@ -1124,7 +1128,12 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     }
 
 #endif
- 
+    //m_pThread =NULL;// AfxBeginThread(_DownloadThread, this, THREAD_PRIORITY_NORMAL, CREATE_SUSPENDED);
+// 		if (m_pThread == NULL)
+// 		{
+// 			TRACE(_T("Failed to create download thread, dialog is aborting\n"));
+//
+// 		}
     PostMessage(WM_CREATE_STATUSBAR,0,0);
     CString image_fordor;
     image_fordor = temp_ApplicationFolder + _T("\\Database\\Buildings\\") + m_strCurMainBuildingName + _T("\\image");
@@ -1660,6 +1669,11 @@ void CMainFrame::LoadProductFromDB()
      
 	current_building_protocol = P_AUTO;
 
+	if(cs_temp_protocol.CompareNoCase(_T("Bacnet MSTP")) == 0 )
+	{
+		current_building_protocol = P_BACNET_MSTP;
+	}
+
     CString StrComport;
     CString StrBaudrate;
 
@@ -1793,7 +1807,7 @@ void CMainFrame::LoadProductFromDB()
         m_pTreeViewCrl->Expand(hParent, TVE_EXPAND);
 
 
-		SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+		
     
     HTREEITEM hlocalnetwork=NULL;
 	//老毛个神经病 ，改来改去 ，出尔反尔. 要求选择远程连接的时候 不显示 本地的设备.
@@ -1854,7 +1868,7 @@ void CMainFrame::LoadProductFromDB()
 		}
 	}
 
-
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
     const int COM_SERIAL_PORT = 0;
     const int LOCAL_NETWORK_PORT = 1;
@@ -4571,9 +4585,9 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
     }
 
 
-    if(SAVE_PRODYCT_STATUS == nIDEvent)
+    if((SAVE_PRODYCT_STATUS == nIDEvent) && (scaning_mode == false))
     {
-		 
+
 
 		CppSQLite3DB SqliteDBBuilding;
 		SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
@@ -4663,13 +4677,13 @@ void CMainFrame::SwitchToPruductType(int nIndex)
 here:
     g_bPauseMultiRead = FALSE;//恢复主线程的刷新
 
-    CString g_configfile_path =g_strExePth + g_strStartInterface_config;
-    // 	//WrPrivateProfileInt(_T("Setting"),_T("Interface"),19,g_configfile_path);
-    CString strInfo;
-    strInfo.Format(_T("%d"),m_nCurView);
-    WritePrivateProfileStringW(_T("T3000_START"),_T("Interface"),strInfo,g_configfile_path);
-    strInfo.Format(_T("%u"),g_selected_serialnumber);
-    WritePrivateProfileStringW(_T("T3000_START"),_T("SerialNumber"),strInfo,g_configfile_path);
+    //CString g_configfile_path =g_strExePth + g_strStartInterface_config;
+    //// 	//WrPrivateProfileInt(_T("Setting"),_T("Interface"),19,g_configfile_path);
+    //CString strInfo;
+    //strInfo.Format(_T("%d"),m_nCurView);
+    //WritePrivateProfileStringW(_T("T3000_START"),_T("Interface"),strInfo,g_configfile_path);
+    //strInfo.Format(_T("%u"),g_selected_serialnumber);
+    //WritePrivateProfileStringW(_T("T3000_START"),_T("SerialNumber"),strInfo,g_configfile_path);
     /* CString achive_file_path;
     CString temp_serial;
     temp_serial.Format(_T("%d.prg"),g_selected_serialnumber);
@@ -4815,6 +4829,18 @@ here:
     {
         m_nCurView=DLG_DIALOG_DEFAULT_T3000_VIEW;
         ((T3000_Default_MainView*)m_pViews[m_nCurView])->Fresh();
+// 		if(global_interface == BAC_IN)
+// 		{
+// 			SendMessage(WM_COMMAND,MAKEWPARAM(ID_CONTROL_INPUTS,BN_CLICKED),NULL);
+// 		}
+// 		else if(global_interface == BAC_OUT)
+// 		{
+// 			SendMessage(WM_COMMAND,MAKEWPARAM(ID_CONTROL_OUTPUTS,BN_CLICKED),NULL);
+// 		}
+// 		else if(global_interface == BAC_MAIN)
+// 		{
+// 			SendMessage(WM_COMMAND,MAKEWPARAM(ID_CONTROL_MAIN,BN_CLICKED),NULL);
+// 		}
     }
     break;
     case DLG_DIALOG_T3_INPUTS_VIEW:
@@ -4952,6 +4978,8 @@ void CMainFrame::Scan_Product()
         delete m_pScanner;
         m_pScanner = NULL;
     }
+	m_refresh_net_device_data.clear();
+	scaning_mode = true;
     m_pScanner = new CTStatScanner;
     g_ScnnedNum=0;
     m_pScanner->SetParentWnd(this);
@@ -4986,6 +5014,7 @@ void CMainFrame::Scan_Product()
     //m_bScanFinished = FALSE;
     delete m_pWaitScanDlg;
     m_pWaitScanDlg = NULL;
+	scaning_mode = false;
 //*/
 }
 
@@ -6132,6 +6161,14 @@ LRESULT CMainFrame::Refresh_RX_TX_Count(WPARAM wParam, LPARAM lParam)
 
     return 0;
 }
+LRESULT CMainFrame::Retry_Connect_Message(WPARAM wParam, LPARAM lParam)
+{
+	
+	DoConnectToANode( hTreeItem_retry );
+		hretryThread = NULL;
+	return 0;
+}
+
 
 LRESULT  CMainFrame::AllWriteMessageCallBack(WPARAM wParam, LPARAM lParam)
 {
@@ -6937,7 +6974,7 @@ void CMainFrame::OnHelp()
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 {
 
-    if (m_pDialogInfo->IsWindowVisible())
+    if (m_pDialogInfo!=NULL&&m_pDialogInfo->IsWindowVisible())
     {
         if (pMsg->message == WM_LBUTTONDOWN||pMsg->message == WM_RBUTTONDOWN)
         {
@@ -7180,7 +7217,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
     //pDlg->MoveWindow(100,100,500,1000);
     pDlg->ShowProgress(0,0);
     //显示对话框窗口
-    g_llerrCount = g_llTxCount = g_llRxCount = 0;//click tree, clear all count;
+   // g_llerrCount = g_llTxCount = g_llRxCount = 0;//click tree, clear all count;
     old_tx_count = persent_array_count = 0;
     //::SetWindowPos(pDlg->m_hWnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
     RECT RECT_SET1;
@@ -7200,7 +7237,19 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
     {
         if(hSelItem==m_product.at(i).product_item )
         {
+			hTreeItem_retry = hTreeItem;
+			if(hLastTreeItem != hSelItem)
+			{
+				g_llerrCount = g_llTxCount = g_llRxCount = 0;//click tree, clear all count;
+				hLastTreeItem = hSelItem;
+			}
 
+			m_pTreeViewCrl->SetSelectItem(hTreeItem);//在线的时候才将颜色变红;
+			m_pTreeViewCrl->SetSelectSerialNumber(product_Node.serial_number);
+			g_selected_serialnumber = m_product.at(i).serial_number;
+			g_bac_instance = NULL;
+
+			g_llTxCount = g_llTxCount + 1;
             int Scan_Product_ID=m_product.at(i).product_class_id;
             g_strT3000LogString.Format(_T("Trying to connect to %s:%d"),GetProductName(m_product.at(i).product_class_id),m_product.at(i).serial_number);
             //write_T3000_log_file(g_strT3000LogString);
@@ -7293,8 +7342,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             }
                             else
                             {
-                                g_llTxCount ++;
-                                g_llerrCount ++;
+                                g_llTxCount = g_llTxCount + 4;
+                                g_llerrCount = g_llerrCount + 4;
                                 bac_select_device_online = false;
                                 m_pTreeViewCrl->turn_item_image(hSelItem ,false);//Can't connect to the device , it will show disconnection;
                                 m_product.at(i).status_last_time[0] = false;
@@ -7312,14 +7361,17 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                                 Sleep(50);
                                 continue;
                                 }*/
+
+								goto do_conncet_failed;
+
                                 return;
                             }
 
                         }
                         else
                         {
-                            g_llTxCount ++;
-                            g_llerrCount ++;
+							g_llTxCount = g_llTxCount + 4;
+							g_llerrCount = g_llerrCount + 4;
                             bac_select_device_online = false;
                             m_pTreeViewCrl->turn_item_image(hSelItem ,false);//Can't connect to the device , it will show disconnection;
                             m_product.at(i).status_last_time[0] = false;
@@ -7336,6 +7388,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             //                                 Sleep(50);
                             //                                 continue;
                             //                             }
+							goto do_conncet_failed;
                             return;
                         }
                         if (!is_OK)
@@ -7347,8 +7400,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             m_product.at(i).status_last_time[1] = false;
                             m_product.at(i).status_last_time[2] = false;
                             m_product.at(i).status = false;
-                            g_llTxCount ++;
-                            g_llerrCount ++;
+							g_llTxCount = g_llTxCount + 4;
+							g_llerrCount = g_llerrCount + 4;
                             bac_select_device_online = false;
                             //MessageBox(strTitle);
                             if (!m_pDialogInfo->IsWindowVisible())
@@ -7360,12 +7413,13 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             //                                 Sleep(50);
                             //                                 continue;
                             //                             }
+							goto do_conncet_failed;
                             return;
                         }
                         else
                         {
-                            g_llTxCount ++;
-                            g_llRxCount ++;
+							g_llTxCount = g_llTxCount + 4;
+							g_llerrCount = g_llerrCount + 4;
                             bac_select_device_online = true;
                             m_pTreeViewCrl->turn_item_image(hSelItem ,TRUE);//Can't connect to the device , it will show disconnection;
                             m_product.at(i).status_last_time[0] = TRUE;
@@ -7377,7 +7431,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 
 
-
+						goto do_conncet_failed;
                         return;
                     }
                     else
@@ -7388,8 +7442,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                         SetCommunicationType(1);
                         if (!Open_Socket2(IP,Port))
                         {
-                            g_llTxCount ++;
-                            g_llerrCount ++;
+							g_llTxCount = g_llTxCount + 4;
+							g_llerrCount = g_llerrCount + 4;
                             bac_select_device_online = false;
                             // MessageBox(_T("Connect failed!Please try again!"));
                             if (!m_pDialogInfo->IsWindowVisible())
@@ -7406,6 +7460,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 							m_product.at(i).status_last_time[1] = false;
 							m_product.at(i).status_last_time[2] = false;
 							 m_product.at(i).status = false;
+							 goto do_conncet_failed;
 							return;
 
                         }
@@ -7424,6 +7479,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				bacnet_device_type = PID_T322AI;
 			else if(product_Node.product_class_id == PM_T3PT12)
 				bacnet_device_type = PID_T3PT12;
+			else if(product_Node.product_class_id == STM32_HUM_NET)
+				bacnet_device_type = STM32_HUM_NET;
 
             g_serialNum = product_Node.serial_number;
             if((product_Node.product_class_id == PM_CM5) || 
@@ -7490,6 +7547,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             delete pDlg;//20120220
                         pDlg = NULL;
                         MessageBox(_T("Trying to connect a device with GSM module ,Please start the server!\r\nMenu -> Miscellaneous -> Gsmconnection"),_T("Information"),MB_OK | MB_ICONINFORMATION);
+						goto do_conncet_failed;
                         return;
                     }
                     else
@@ -7500,6 +7558,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                                 delete pDlg;//20120220
                             pDlg = NULL;
                             MessageBox(_T("This device does't connect to T3000 server yet."),_T("Information"),MB_OK | MB_ICONINFORMATION);
+							goto do_conncet_failed;
                             return;
                         }
                         else
@@ -7524,6 +7583,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                                     delete pDlg;//20120220
                                 pDlg = NULL;
                                 MessageBox(_T("This device does't connect to T3000 server yet."),_T("Information"),MB_OK | MB_ICONINFORMATION);
+								goto do_conncet_failed;
                                 return;
                             }
 
@@ -7545,6 +7605,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     m_pTreeViewCrl->SetSelectItem(hTreeItem);//在线的时候才将颜色变红;
                     m_pTreeViewCrl->SetSelectSerialNumber(product_Node.serial_number);
                     g_selected_serialnumber = m_product.at(i).serial_number;
+					goto do_connect_success;
                     return;
 
                 }
@@ -7562,6 +7623,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					m_pTreeViewCrl->SetSelectItem(hTreeItem);//在线的时候才将颜色变红;
 					m_pTreeViewCrl->SetSelectSerialNumber(product_Node.serial_number);
 					g_selected_serialnumber = m_product.at(i).serial_number;
+					goto do_conncet_failed;
 					return;
 				}
                 else
@@ -7646,6 +7708,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 m_pTreeViewCrl->SetSelectSerialNumber(product_Node.serial_number);
                 g_selected_serialnumber = m_product.at(i).serial_number;
                 g_bPauseMultiRead = true;
+				goto do_connect_success;
                 return;
                 //}
             }
@@ -7766,6 +7829,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             delete pDlg;
                             pDlg=NULL;
                         }
+						goto do_conncet_failed;
                         return;
                     }
                     //SetPaneCommunicationPrompt(strInfo);
@@ -7956,6 +8020,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     m_product.at(i).status_last_time[0] = false;
                     m_product.at(i).status_last_time[1] = false;
                     m_product.at(i).status_last_time[2] = false;
+					goto do_conncet_failed;
                     return;
                 }
                 else
@@ -8023,7 +8088,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 SetLastCommunicationType(1);
                 g_protocol=MODBUS_TCPIP;
                 // SetResponseTime (2000);   For Kaiyin's TstatHUM
-                int nmultyRet=Read_Multi(g_tstat_id,&read_data[0],0,10,1);
+                int nmultyRet=Read_Multi(g_tstat_id,&read_data[0],0,10,2);
 
                 //
                 if(nmultyRet <0)
@@ -8076,7 +8141,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 							pDlg=NULL;
                         }
                         //MessageBox(tempcs);
-
+						goto do_conncet_failed;
                         return;
 
                     }
@@ -8624,6 +8689,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     delete pDlg;
                     pDlg=NULL;
                 }
+				goto do_conncet_failed;
                 return;
             }
             //------------------------------------------------------------------
@@ -8703,18 +8769,19 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             {
                 SwitchToPruductType(DLG_CO2_NET_VIEW);
             }
+			else if ((product_register_value[7]==PM_CO2_RS485&&product_register_value[14] == 6)||nFlag==PM_AirQuality||nFlag==PM_HUM_R||product_register_value[7]==PM_HUMTEMPSENSOR||product_register_value[7]==STM32_HUM_NET||product_register_value[7]==STM32_HUM_RS485)
+				//else if (nFlag==PM_AirQuality||nFlag==PM_HUM_R||nFlag==PM_HUMTEMPSENSOR)
+			{ 
+				SwitchToPruductType(DLG_AIRQUALITY_VIEW);
+			}
 
             else if (nFlag==PM_PRESSURE)
             {
                 SwitchToPruductType(DLG_DIALOG_PRESSURE_SENSOR);
             }
 
-			else if ((product_register_value[7]==PM_CO2_RS485&&product_register_value[14] == 6)||nFlag==PM_AirQuality||nFlag==PM_HUM_R||product_register_value[7]==PM_HUMTEMPSENSOR||product_register_value[7]==STM32_HUM_NET||product_register_value[7]==STM32_HUM_RS485)
-            //else if (nFlag==PM_AirQuality||nFlag==PM_HUM_R||nFlag==PM_HUMTEMPSENSOR)
-            { 
-                SwitchToPruductType(DLG_AIRQUALITY_VIEW);
-            }
-            else if (nFlag==PM_TSTAT6||nFlag==PM_TSTAT7||nFlag==PM_TSTAT5i||nFlag==PM_TSTAT8)
+		
+			else if (nFlag==PM_TSTAT6||nFlag==PM_TSTAT7||nFlag==PM_TSTAT5i||nFlag==PM_TSTAT8)
             {
                 CString g_configfile_path =g_strExePth + g_strStartInterface_config;
                 int m_lastinterface=GetPrivateProfileInt(_T("T3000_START"),_T("Interface"),19,g_configfile_path);
@@ -8786,8 +8853,31 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
     SqliteDBT3000.closedb();
 
     g_bPauseMultiRead = FALSE;
+
+
+do_connect_success:
+		hTreeItem_retry = NULL;
+		g_llRxCount = g_llRxCount + 4;
+		Sleep(1);
+		return;
+do_conncet_failed:
+		if(hretryThread == NULL)
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("T3000 can't connect to your device ,it will try again in 20 seconds."));
+			hretryThread =CreateThread(NULL,NULL,retry_connect,this,NULL, NULL);
+		}
+		Sleep(1);
+		return;
 }
 
+DWORD WINAPI   CMainFrame::retry_connect(LPVOID lpVoid)
+{
+		 CMainFrame *pParent = (CMainFrame *)lpVoid;
+	Sleep(20000);
+	::PostMessage(pParent->m_hWnd,MY_RETRY_MESSAGE ,NULL,NULL);
+
+	return 1;
+}
 
 ///////////////////////////////////////////////////////////////////////////
 //  Added by zgq;2010-11-29;添加初始化TreeCtrl，希望在程序初始化完成后
@@ -9336,6 +9426,27 @@ end_condition :
     return TRUE;
 }
 
+LRESULT  CMainFrame::HandleDuplicateID(WPARAM wParam, LPARAM lParam)
+{
+	static int  bool_show_duplicated_window_lim = 0;
+	if(bool_show_duplicated_window_lim++ > 5)
+	{
+		edit_confilct_mode = true;
+		return 1;
+	}
+
+	int temp_type =  GetCommunicationType();
+
+	b_pause_refresh_tree = true;
+	CDuplicateIdDetected Dlg;
+	Dlg.DoModal();
+	edit_confilct_mode = false;
+	b_pause_refresh_tree = false;
+
+	SetCommunicationType(temp_type);
+	return 1;
+}
+
 
 LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
 {
@@ -9424,6 +9535,11 @@ UINT _FreshTreeView(LPVOID pParam )
     int int_refresh_com = 0;
     while(1)
     {
+		if(scaning_mode)
+		{
+			Sleep(1000);
+			continue;
+		}
 
         if (!pMain->m_frist_start)
         {
@@ -9477,7 +9593,7 @@ UINT _FreshTreeView(LPVOID pParam )
 
 
         //continue;
-        m_refresh_net_device_data.clear();
+
 
 
 
@@ -9500,6 +9616,7 @@ UINT _FreshTreeView(LPVOID pParam )
         //    ReleaseMutex(Read_Mutex);
         //    continue;
         //}
+		    m_refresh_net_device_data.clear();
         //if((current_building_protocol == P_AUTO) || (current_building_protocol == P_MODBUS_TCP) || (current_building_protocol == P_BACNET_IP))
         //{//简直是脑残，老毛.要求这样瞎几把改. //不管客户选什么鸡吧协议 ， 都要能扫到所有设备.那不就是TMD只有Auto 了吗？还选个P啊;
             RefreshNetWorkDeviceListByUDPFunc();
@@ -9515,6 +9632,45 @@ UINT _FreshTreeView(LPVOID pParam )
             ReleaseMutex(Read_Mutex);
             continue;
         }
+
+		if(!edit_confilct_mode)
+		{
+			int m_datasize = m_refresh_net_device_data.size(); 
+			bool find_confilicat_id = false;
+			for (int x=0;x<m_datasize;x++)
+			{
+				if(m_refresh_net_device_data.at(x).parent_serial_number != 0)
+				{
+					for(int y=x+1;y<m_datasize;y++)
+					{
+						if(m_refresh_net_device_data.at(y).parent_serial_number != 0)
+						{
+							if((m_refresh_net_device_data.at(x).parent_serial_number == m_refresh_net_device_data.at(y).parent_serial_number) &&
+								(m_refresh_net_device_data.at(x).modbusID == m_refresh_net_device_data.at(y).modbusID))
+							{
+								device_id_data_1 = m_refresh_net_device_data.at(x);
+								device_id_data_2 = m_refresh_net_device_data.at(y);
+
+
+								find_confilicat_id = true;
+								edit_confilct_mode = true;
+
+								::PostMessageW(MainFram_hwd,WM_HADNLE_DUPLICATE_ID,NULL,NULL);
+								break;
+							}
+						}
+					}
+
+					if(find_confilicat_id)
+						break;
+				}
+			}
+
+
+		}
+
+
+		
         //if(no_mouse_keyboard_event_enable_refresh == false)
         //{
         //    ReleaseMutex(Read_Mutex);
@@ -10520,7 +10676,7 @@ loop1:
 							{
 								write_buffer[j] = htons(write_buffer[j]);
 							}
-							test_value1 = Write_Multi_org_short(g_tstat_id,write_buffer,10000 + 23 * My_WriteList_Struct->start_instance , 23, 4);
+							test_value1 = Write_Multi_org_short(g_tstat_id,write_buffer,BAC_OUT_START_REG + 23 * My_WriteList_Struct->start_instance , 23, 4);
 
 							_MessageInvokeIDInfo *pMy_Invoke_id = new _MessageInvokeIDInfo;
 							pMy_Invoke_id->hwnd = My_WriteList_Struct->hWnd;
@@ -10545,7 +10701,34 @@ loop1:
 							{
 								write_buffer[j] = htons(write_buffer[j]);
 							}
-							test_value1 = Write_Multi_org_short(g_tstat_id,write_buffer,11472 + 23 * My_WriteList_Struct->start_instance , 23, 4);
+							test_value1 = Write_Multi_org_short(g_tstat_id,write_buffer,BAC_IN_START_REG + 23 * My_WriteList_Struct->start_instance , 23, 4);
+
+							_MessageInvokeIDInfo *pMy_Invoke_id = new _MessageInvokeIDInfo;
+							pMy_Invoke_id->hwnd = My_WriteList_Struct->hWnd;
+							pMy_Invoke_id->mCol = My_WriteList_Struct->ItemInfo.nCol;
+							pMy_Invoke_id->mRow = My_WriteList_Struct->ItemInfo.nRow;
+							pMy_Invoke_id->task_info = My_WriteList_Struct->Write_Info;
+							if(test_value1 > 0)
+							{
+								//CString temp_message;
+								//temp_message = My_WriteList_Struct->Write_Info + _T("  : OK!");
+								//SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_message);
+								::PostMessage(pMy_Invoke_id->hwnd,MY_RESUME_DATA,(WPARAM)WRITE_SUCCESS,(LPARAM)pMy_Invoke_id);
+							}
+							else
+							{
+								::PostMessage(pMy_Invoke_id->hwnd,MY_RESUME_DATA,(WPARAM)WRITE_FAIL,(LPARAM)pMy_Invoke_id);
+							}
+						}
+						break;
+					case WRITEPID_T3000:
+						{
+							memcpy( write_buffer,&m_controller_data.at(My_WriteList_Struct->start_instance),sizeof(Str_controller_point));//因为IN只有46个字节，两个byte放到1个 modbus的寄存器里面;
+							for (int j=0;j<200;j++)
+							{
+								write_buffer[j] = htons(write_buffer[j]);
+							}
+							test_value1 = Write_Multi_org_short(g_tstat_id,write_buffer,BAC_PID_CONTROL_START_REG + 14 * My_WriteList_Struct->start_instance , 14, 4);
 
 							_MessageInvokeIDInfo *pMy_Invoke_id = new _MessageInvokeIDInfo;
 							pMy_Invoke_id->hwnd = My_WriteList_Struct->hWnd;
@@ -10919,7 +11102,9 @@ void CMainFrame::OnControlMain()
         }
         else if (product_type == CS3000||product_register_value[7]==PM_T322AI||product_register_value[7]==PM_T38AI8AO6DO || product_register_value[7]==PM_T3PT12)
         {
+		 
             bacnet_view_number = TYPE_TSTAT;
+			global_interface = BAC_MAIN;
             SwitchToPruductType(DLG_DIALOG_DEFAULT_T3000_VIEW);
         }
         else if (product_register_value[7] == PM_T3IOA)
@@ -10961,8 +11146,30 @@ void CMainFrame::OnControlMain()
         {
             SwitchToPruductType(DLG_DIALOGT38AI8AO);
         }
+		else if(product_register_value[7] == PM_CO2_RS485||product_register_value[7] == PM_PRESSURE_SENSOR||product_register_value[7] == PM_CO2_NODE)//(nFlag == PM_CO2_NET)||
+		{
+			if (product_register_value[14] == 6)
+			{
+				SwitchToPruductType(DLG_AIRQUALITY_VIEW);
+			} 
+			else
+			{
+				SwitchToPruductType(DLG_CO2_VIEW);
+			}
+
+		}
+		else if(product_register_value[7] == PM_CO2_NET||product_register_value[7] == STM32_CO2_RS485|| product_register_value[7] == STM32_CO2_NET)//(nFlag == PM_CO2_NET)||
+		{
+			SwitchToPruductType(DLG_CO2_NET_VIEW);
+		}
+		else if ((product_register_value[7]==PM_CO2_RS485&&product_register_value[14] == 6)||product_register_value[7]==PM_AirQuality||product_register_value[7]==PM_HUM_R||product_register_value[7]==PM_HUMTEMPSENSOR||product_register_value[7]==STM32_HUM_NET||product_register_value[7]==STM32_HUM_RS485)
+			//else if (nFlag==PM_AirQuality||nFlag==PM_HUM_R||nFlag==PM_HUMTEMPSENSOR)
+		{ 
+			SwitchToPruductType(DLG_AIRQUALITY_VIEW);
+		} 
     }
-    bacnet_view_number = TYPE_MAIN		;
+     bacnet_view_number = TYPE_MAIN		;
+ 	global_interface = BAC_MAIN;
 }
 
 void CMainFrame::OnControlInputs()
@@ -11109,11 +11316,12 @@ void CMainFrame::OnControlInputs()
         }
         else
         {
-            MessageBox(_T("This function don't support this product!\r\n"));
+           MessageBox(_T("This feature is not supported by this product."));
         }
 
     }
     bacnet_view_number = TYPE_INPUT		;
+		global_interface = BAC_IN;
 }
 
 
@@ -11174,7 +11382,7 @@ void CMainFrame::OnControlPrograms()
     }
     else
     {
-        MessageBox(_T("This function don't support this product!\r\n"));
+       MessageBox(_T("This feature is not supported by this product."));
     }
 }
 
@@ -11287,10 +11495,11 @@ void CMainFrame::OnControlOutputs()
         }
         else
         {
-            MessageBox(_T("This function don't support this product!\r\n"));
+			MessageBox(_T("This feature is not supported by this product."));
         }
         //MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
     }
+		global_interface = BAC_OUT	;
 }
 
 
@@ -11349,7 +11558,7 @@ void CMainFrame::OnControlVariables()
     }
     else
     {
-        MessageBox(_T("This function don't support this product!\r\n"));
+       MessageBox(_T("This feature is not supported by this product."));
     }
 }
 
@@ -11409,7 +11618,7 @@ void CMainFrame::OnControlWeekly()
     }
     else
     {
-        MessageBox(_T("This function don't support this product!\r\n"));
+       MessageBox(_T("This feature is not supported by this product."));
     }
 }
 
@@ -11478,7 +11687,7 @@ void CMainFrame::OnControlAnnualroutines()
             g_bPauseMultiRead = FALSE;
         }
         else
-            MessageBox(_T("This function don't support this product!\r\n"));
+           MessageBox(_T("This feature is not supported by this product."));
     }
 }
 #include "ParameterDlg.h"
@@ -11535,9 +11744,12 @@ void CMainFrame::OnControlSettings()
                 ::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_SETTING);
         }
     }
-	else if (product_type == CS3000||product_register_value[7]==PM_T322AI||product_register_value[7]==PM_T38AI8AO6DO||product_register_value[7]==PM_T3PT12)
+	
+	else if (product_type == CS3000||product_register_value[7]==PM_T322AI||product_register_value[7]==PM_T38AI8AO6DO||product_register_value[7]==PM_T3PT12
+	             ||product_register_value[7]==STM32_HUM_NET )
 	{
 		bacnet_view_number = TYPE_TSTAT;
+		                   
 		SwitchToPruductType(DLG_DIALOG_DEFAULT_T3000_VIEW);
 	}
     else
@@ -11548,7 +11760,7 @@ void CMainFrame::OnControlSettings()
             dlg.DoModal();
         }
         else
-            MessageBox(_T("This function don't support this product!\r\n"));
+           MessageBox(_T("This feature is not supported by this product."));
     }
 }
 
@@ -11565,7 +11777,7 @@ void CMainFrame::OnMiscellaneousLoaddescriptors()
     }
     else
     {
-        MessageBox(_T("This function don't support this product!\r\n"));
+       MessageBox(_T("This feature is not supported by this product."));
     }
 }
 
@@ -11584,7 +11796,7 @@ void CMainFrame::OnMiscellaneousUpdatemini()
     }
     else
     {
-        MessageBox(_T("This function don't support this product!\r\n"));
+        MessageBox(_T("This feature is not supported by this product."));
     }
 }
 
@@ -11593,8 +11805,41 @@ void CMainFrame::OnControlControllers()
 {
     // TODO: Add your command handler code here
 
-    if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
+    if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP) ||
+		( ((g_protocol == MODBUS_TCPIP ) || (g_protocol == MODBUS_RS485)) &&   (bacnet_device_type == STM32_HUM_NET)))
     {
+
+		if(BacNet_hwd == NULL)
+		{
+			SwitchToPruductType(DLG_BACNET_VIEW);
+		}
+		else
+		{
+			CView* pNewView = m_pViews[DLG_BACNET_VIEW];
+			if (!pNewView)
+				return;
+			CView* pActiveView =GetActiveView();
+			if ( !pActiveView )    // No currently active view
+				return;
+
+			if ( pNewView!= pActiveView )    // Already there
+			{
+				m_nCurView = DLG_BACNET_VIEW;    // Store the new current view's index
+
+
+				UINT temp = ::GetWindowLong(pActiveView->m_hWnd, GWL_ID);
+				::SetWindowLong(pActiveView->m_hWnd, GWL_ID,
+					::GetWindowLong(pNewView->m_hWnd, GWL_ID));
+				::SetWindowLong(pNewView->m_hWnd, GWL_ID, temp);
+				pActiveView->ShowWindow(SW_HIDE);
+				pNewView->ShowWindow(SW_SHOW);
+				SetActiveView(pNewView);
+				RecalcLayout();
+				pNewView->Invalidate();
+			}
+		}
+
+
         if((m_user_level ==	LOGIN_SUCCESS_GRAPHIC_MODE) ||
                 (m_user_level == LOGIN_SUCCESS_ROUTINE_MODE))
         {
@@ -11632,6 +11877,12 @@ void CMainFrame::OnControlControllers()
         {
             Create_Thread_Read_Item(TYPE_CONTROLLER);
         }
+		else if((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP))
+		{
+			hide_485_progress = false;
+			::PostMessage(m_controller_dlg_hwnd,WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
+			::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type,BAC_PID);//第二个参数 In
+		}
         else
         {
             if(bac_select_device_online)
@@ -11642,7 +11893,7 @@ void CMainFrame::OnControlControllers()
     }
     else
     {
-        MessageBox(_T("This function don't support this product!\r\n"));
+       MessageBox(_T("This feature is not supported by this product."));
     }
 }
 
@@ -11810,7 +12061,7 @@ void CMainFrame::OnControlMonitors()
     }
     else
     {
-        MessageBox(_T("This function don't support this product!\r\n"));
+        MessageBox(_T("This feature is not supported by this product."));
     }
 
     //CBacnetMonitor Dlg;
@@ -11915,7 +12166,7 @@ void CMainFrame::OnControlAlarmLog()
     }
     else
     {
-        MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+       MessageBox(_T("This feature is not supported by this product."));
     }
 }
 
@@ -11938,7 +12189,7 @@ void CMainFrame::OnControlCustomerunits()
     }
     else
     {
-        MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+       MessageBox(_T("This feature is not supported by this product."));
     }
 #endif
 }
@@ -12129,7 +12380,7 @@ void CMainFrame::OnControlTstat()
     }
     else
     {
-		 MessageBox(_T("This function don't support this product!\r\n"));
+		MessageBox(_T("This feature is not supported by this product."));
     }
 
 
@@ -12252,6 +12503,8 @@ void CMainFrame::BuildingComportConfig()
                         temp_port = m_vector_comport.at(0);
                         temp_port = temp_port.Right(temp_port.GetLength() - 3);
                         m_building_com_port = _wtoi(temp_port);
+
+
 
                         try
                         {

@@ -57,10 +57,12 @@ CString INPUT_SETTING_T7[NUM_INPUT_SETTING_T7]=
     _T("AI1"),_T("AI2"),_T("AI3"),_T("AI4"),_T("AI5"),_T("AI6"),_T("AI7"),_T("AI8"),
     _T("CO2 Sensor"),_T("HUM Sensor")
 };
-CString INPUT_SETTING_LCD[6]= {_T("Internal Sensor"),
-                               _T("Avg Temperature"),
+CString INPUT_SETTING_LCD[6]= {
+                               
+                               _T("Internal Sensor"),
                                //_T(""),
                                _T("AI1"),
+							   _T("Avg Temperature")
                                /*_T("AI2"),_T("AI3"),_T("AI4"),_T("AI5"),_T("AI6"),_T("AI7"),_T("AI8"),
                                _T("CO2 Sensor"),_T("HUM Sensor"),_T("Airflow Sensor"),*/
                                _T("Avg AI1ToAI2"),_T("Avg AI1ToAI3"),_T("Avg AI1ToAI4")
@@ -1725,7 +1727,12 @@ void CParameterDlg::OnCbnSelchangeInputselect1()
 // 		{
 // 				TempValue = sel;
 // 		}
-    sel+=2;
+   
+	sel+=2;
+	if (product_type == T3000_5EH_LCD_ADDRESS)
+	{
+		sel +=1;
+	}
     if(product_register_value[MODBUS_TEMP_SELECT]==sel)//Add this to judge weather this value need to change.
         return;
 
@@ -3271,13 +3278,6 @@ void CParameterDlg::Reflesh_ParameterDlg()
     m_timerSelectCombox.SetCurSel(sel);	//327  408->409才对
 
 
-
-
-
-
-
-
-
     //211	111	1	Low byte	W/R	Unoccupied Override Timer, Ort. 0=disabled, >0=number of minutes manual override is allowed
     //212	112	1	Low byte	W/R	"OVERRIDE_TIMER_DOWN_COUNT - Number of minutes remaining on the timer when
 
@@ -3286,35 +3286,27 @@ void CParameterDlg::Reflesh_ParameterDlg()
     m_TimeEdit.SetWindowText(strTemp);
     strTemp.Format(_T("%d"),product_register_value[MODBUS_OVERRIDE_TIMER]);	//111
     m_OverRideEdit.SetWindowText(strTemp);
-    //tstat6
-    //111	382	1	Low byte	W/R	Sensor to be used for the PID calculations,  1= external sensor analog input 1 , 2 = internal thermistor, 3 = average the internal thermistor and analog input1
-// 	if (product_register_value[MODBUS_TEMP_SELECT]<3)	//382
-// 	{
-// 		m_InputSelect1.SetCurSel(0);
-// 	}
-// 	else if (product_register_value[MODBUS_TEMP_SELECT]>4)//382
-// 	{
-    //int
-    //m_InputSelect1.SetCurSel(product_register_value[MODBUS_TEMP_SELECT]-2);
+ 
     sel =product_register_value[MODBUS_TEMP_SELECT]-2;
     if (sel<0)
     {
         sel =0;
     }
 
-    //m_InputSelect1.SetWindowText(strTemp);
-    m_InputSelect1.SetCurSel(sel);
+   
+
+	if (product_type == T3000_5EH_LCD_ADDRESS)
+	{
+		sel +=1;
+	}
+
     sel =product_register_value[MODBUS_INPUT1_SELECT]-2;
     if (sel<0)
     {
         sel =0;
     }
     m_inputSelect2.SetCurSel(sel);
-// 	}
-// 	else
-// 	{
-// 		 m_inputSelect2.SetCurSel(0);
-// 	}
+
 
 
     strTemp.Format(_T("%0.1f"),product_register_value[MODBUS_TEMPRATURE_CHIP]/10.0);	//121

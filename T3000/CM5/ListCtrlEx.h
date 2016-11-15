@@ -141,7 +141,7 @@ namespace ListCtrlEx
 		BOOL				DeleteItem( int nItem );
 
 
-			int InsertItem(int nIndex, LPCTSTR lpText);
+		int InsertItem(int nIndex, LPCTSTR lpText);
 
 // operations
 	public:
@@ -202,8 +202,10 @@ namespace ListCtrlEx
 		CellIndex			Point2Cell(const CPoint &point);
 		void SetItemTextColor(int nItem = -1, int nSubItem = -1, COLORREF color = COLOR_INVALID, BOOL bRedraw = TRUE);
 		void SetItemBkColor(int nItem = -1, int nSubItem = -1, COLORREF color = COLOR_INVALID, BOOL bRedraw = TRUE);
+		 
 	protected:
 		virtual void		PreSubclassWindow();
+		 
 		DECLARE_MESSAGE_MAP()
 		// message handlers
 		afx_msg void	OnNMCustomdraw(NMHDR *pNMHDR, LRESULT *pResult);
@@ -215,7 +217,7 @@ namespace ListCtrlEx
 		afx_msg void	OnLvnColumnclick(NMHDR *pNMHDR, LRESULT *pResult);
 		afx_msg void	OnDestroy();
 		afx_msg void	OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
-	
+	    
 		void _AllocItemMemory(int nItem);
 		BOOL _IsValidIndex(int nIndex) const;
 		void _UpdateColumn(int nColumn, BOOL bInsert);
@@ -267,6 +269,7 @@ namespace ListCtrlEx
 		bool			m_show_bk_color;//记录是否显示选中背景颜色;
 		bool			m_support_key;
 		bool			m_support_col0_edit;  //第0列是否允许编辑.默认是不许编辑;
+		int m_nItemHeight;
 	protected:
 		struct _ColumnSort_t
 		{

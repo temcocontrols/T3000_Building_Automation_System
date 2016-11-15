@@ -1,5 +1,26 @@
 #pragma once
 #include "RelayLabel.h"
+
+//minipanel 寄存器表
+//  9800	-	9999    200个寄存器   setting
+//  10000	-   11471   1472		  OUT
+//  11472   -   12943   1472		  IN
+//	12943   -   15502	2560		  VAR					sizeof(Str_variable_point)= 39
+//	15503   -  	15806	16*19=304	  PRG	                sizeof(Str_program_point) = 37
+//  15807   -   15974	21*8=336	  SCH			sizeof(Str_weekly_routine_point) = 42
+//	15975   -	16043		17*4=68		  HOL				sizeof(Str_annual_routine_point) = 33
+//  32712   - 32753		 14*16 =224								sizeof(Str_controller_point)	= 28
+#define BAC_SETTING_START_REG		9800
+#define BAC_OUT_START_REG			10000
+#define BAC_IN_START_REG			11472
+#define BAC_VAR_START_REG			12943
+#define BAC_PRG_START_REG			15503
+#define BAC_SCH_START_REG			15807
+#define BAC_HOL_START_REG			15975
+#define BAC_PID_CONTROL_START_REG   32712
+
+
+
 const int SORT_UNKNOW = 0;
 const int SORT_BY_CONNECTION = 1;
 const int SORT_BY_BUILDING_FLOOR = 2;
@@ -23,8 +44,8 @@ const int CHECK_MD5_VALUE = 6;
 const int SHOW_FTP_PATH = 7;
 const int THREAD_IDLE = 255;
 
-const int TFTP_SEND_LENGTH = 3 * 1024 + 512;
-//const int TFTP_SEND_LENGTH = 512;
+//const int TFTP_SEND_LENGTH = 3 * 1024 + 512;
+const int TFTP_SEND_LENGTH = 512;
 //const int TFTP_SEND_LENGTH = 1024;
 #pragma pack(push) //保存对齐状态 
 #pragma pack(1)
@@ -168,6 +189,7 @@ const int DOWNLOAD_MD5_CHECK_PASS = 21;
 
 #define  MY_FRESH_DRAW_GRAPHIC      WM_USER + 2003
 #define  MY_FRESH_TESTO_GRAPHIC      WM_USER + 2004
+#define  WM_HADNLE_DUPLICATE_ID  WM_USER + 2005
 #define  WM_LIST_MONITOR_CHANGED WM_USER+ 976
 #define  WM_LIST_MONITOR_INPUT_CHANGED WM_USER+ 977
 #define WM_SCREENEDIT_CLOSE WM_USER + 1232
@@ -426,6 +448,7 @@ const int SCHEDULE_TIME_HOLIDAY2 = 9;
 
 const int WEEKLY_SCHEDULE_SIZE = 144;
 const int ANNUAL_CODE_SIZE = 46;
+
 struct _Bac_Scan_Com_Info
 {
 	int device_id;
@@ -433,7 +456,7 @@ struct _Bac_Scan_Com_Info
 };
 struct _Bac_Scan_results_Info
 {
-	int device_id;
+	unsigned int device_id;
 	char ipaddress[6];
 	unsigned char modbus_addr;
 	unsigned char product_type;
@@ -983,6 +1006,12 @@ enum
 
 };
 
+const CString PANEL_SUBNET_NAME[] =
+{
+	_T("RS485 Sub"),
+	_T("Cellular ZIGB"),
+	_T("RS485 Main")
+};
 
 const CString Baudrate_Array[] = 
 {
@@ -992,10 +1021,10 @@ const CString Baudrate_Array[] =
 	_T("4800"),
 	_T("7200"),
 	_T("9600"),
-	_T("19200"),
+	_T("19200"), //6
 	_T("38400"),
 	_T("76800"),
-	_T("115200"),
+	_T("115200"),	//9
 	_T("921600"),
 };
 
@@ -1495,7 +1524,7 @@ const int LENGTH_MODBUS_HOLIDAY_CODE = ANNUAL_CODE_SIZE /2 ;
 
 
 //以下是 bacnet 寄存器 映射到modbus的位置;
-const int REG_SETTING_START_ADDRESS  = 9800;
+const int REG_SETTING_START_ADDRESS  = BAC_SETTING_START_REG;
 const int REG_OUTPUT_START_ADDRESS = REG_SETTING_START_ADDRESS + LENGTH_MODBUS_SETTING; //10000
 const int REG_INPUT_START_ADDRESS = REG_OUTPUT_START_ADDRESS + LENGTH_MODBUS_OUTPUT;	//11472
 const int REG_VARIABLE_START_ADDRESS  = REG_INPUT_START_ADDRESS + LENGTH_MODBUS_INPUT;	//12944
@@ -1526,6 +1555,7 @@ const int REG_SCHEDULE_START_ADDRESS = REG_PRG_START_ADDRESS + LENGTH_MODBUS_PRG
 #define BAC_ALARMS    15
 #define BAC_WR_TIME   16
 #define BAC_AR_Y      17
+#define BAC_MAIN		255
 
 
 #define MAX_OBJ_INSTANCE  4194303
@@ -1623,4 +1653,103 @@ const int day_in_this_year[] =
 	day_of_month[0] + day_of_month[1] + day_of_month[2] +day_of_month[3] + +day_of_month[4] + day_of_month[5] + day_of_month[6] + day_of_month[7] + day_of_month[8] + day_of_month[9],
 	day_of_month[0] + day_of_month[1] + day_of_month[2] +day_of_month[3] + +day_of_month[4] + day_of_month[5] + day_of_month[6] + day_of_month[7] + day_of_month[8] + day_of_month[9] + day_of_month[10],
 };
+
+
+#define SERVER_MINI_PORT 33333
+#define SERVER_T3000_PORT 33334
+#define SERVER_HEARTBEAT_PORT 33335
+
+#define  T3000_CONNECT_LENGTH  100
+#define  T3000_CONNECT_DATA_LENGTH  (T3000_CONNECT_LENGTH+3)
+
+#define HEARTBEAT_LENGTH	200
+#define  T3000_MINI_HEARTBEAT_LENGTH_WITH_MINI_PORT  (9 + HEARTBEAT_LENGTH)
+
+#pragma pack(push) //保存对齐状态 
+#pragma pack(1)
+struct stLoginMessage
+{
+	char userName[30];
+	char password[20];
+};
+
+typedef union
+{
+	unsigned char all_data[T3000_CONNECT_LENGTH];
+	struct  
+	{
+		unsigned int m_serial_number; //T3000想要连接的 序列号;
+		stLoginMessage login_message;
+		unsigned char reserved_reg[46];
+	}reg_date;
+}Str_T3000_Connect;
+
+#pragma pack(pop)//恢复对齐状态 
+
+enum PTP_COMMAND_TYPE{
+	COMMAND_RECEIVE_HEART_BEAT				= 0x01,
+	COMMAND_RECEIVE_SERIAL					= 0x02,
+	COMMAND_REPLY_DEVICE_INFO				= 0x03,
+	COMMAND_REPLY_T3000_INFO				= 0x04,
+	COMMAND_T3000_REQUEST					= 0x05,
+	COMMAND_DEVICE_SEND_SERIAL_TO_SERVER	= 0x06,
+	COMMAND_DEVICE_SEND_HEART_BEAT_TO_SERVER= 0x07,
+	COMMAND_T3000_SEND_TO_DEVICE_MAKEHOLE   = 0x08,
+	COMMAND_DEVICE_SEND_TO_T3000_MAKEHOLE   = 0x09,
+	COMMAND_COMMUNICATION_VERSION_ERROR     = 0x64,
+	COMMAND_COMMAND_UNKNOWN					= 0x65,
+	COMMAND_DEVICE_NOT_CONNECT_ERROR		= 0x66,
+	COMMAND_DEVICE_NO_HEARTBEAT_ERROR		= 0x67,
+	COMMAND_PASSWORD_ERROR					= 0x68
+};
+
+
+#define  CONTROLLER_DUPLICATE_ID         5100
+
+
+typedef union
+{
+	uint8_t all[400];
+	struct 
+	{  
+		UCHAR command;
+		UCHAR command_reserve;
+		UCHAR length;
+		UCHAR length_reserve;
+		UCHAR serial_low;
+		UCHAR serial_low_reserve;
+		UCHAR serial_low_2;
+		UCHAR serial_low_2_reserve;
+		UCHAR serial_low_3;
+		UCHAR serial_low_3_reserve;
+		UCHAR serial_low_4;
+		UCHAR serial_low_4_reserve;
+		UCHAR product_id;
+		UCHAR product_id_reserve;
+		UCHAR modbus_id;
+		UCHAR modbus_id_reserve;
+		UCHAR ip_address_1;
+		UCHAR ip_address_1_reserve;
+		UCHAR ip_address_2;
+		UCHAR ip_address_2_reserve;
+		UCHAR ip_address_3;
+		UCHAR ip_address_3_reserve;
+		UCHAR ip_address_4;
+		UCHAR ip_address_4_reserve;
+		USHORT modbus_port;
+		USHORT sw_version;
+		USHORT hw_version;
+		unsigned int parent_serial_number;
+		UCHAR object_instance_2;
+		UCHAR object_instance_1;
+		UCHAR station_number;
+		char panel_name[20];
+		UCHAR object_instance_4;
+		UCHAR object_instance_3;
+		UCHAR isp_mode;  //非0 在isp mode   , 0 在应用代码;    第60个字节
+	}reg;
+}Str_UPD_SCAN;
+
+
+
 

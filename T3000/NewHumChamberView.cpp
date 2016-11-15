@@ -2906,28 +2906,40 @@ void CNewHumChamberView::read_testo(){
 		m_value[i] = 0;
 	}
 	ReadTestoDeviceData(m_value);
-	if (m_value[0]<=1.0)
-	{
-	  return;
-	}
-	unsigned short temp_value[4];
-	temp_value[0] = temp_value[1]=temp_value[2]=temp_value[3]=0;
-	temp_value[0]=(unsigned short)m_value[0];
-	temp_value[3]=(unsigned short)m_value[1];
-	temp_value[1]=(unsigned short)(m_value[3]*10);  //物業
-	temp_value[2]=(unsigned short)(m_value[2]*10);	//梁業
+	//if (m_value[0]<=1.0)
+	//{
+	//  return;
+	//}
+	//unsigned short temp_value[4];
+	//temp_value[0] = temp_value[1]=temp_value[2]=temp_value[3]=0;
+	//temp_value[0]=(unsigned short)m_value[0];
+	//temp_value[3]=(unsigned short)m_value[1];
+	//temp_value[1]=(unsigned short)(m_value[3]*10);  //物業
+	//temp_value[2]=(unsigned short)(m_value[2]*10);	//梁業
 
-	if((m_value[2] > 100) || (m_value[2] < 0)  || (m_value[3] < -40) || (m_value[3] > 200) || (m_value[0] == 0) )
-	{
-		return;
-	}
+	short temp_value[4];
+	temp_value[0] = temp_value[1]=temp_value[2]=temp_value[3]=0;
+	temp_value[0]=(short)m_value[0];
+	temp_value[3]=(short)m_value[1];
+	temp_value[1]=(short)(m_value[3]*10);  //物業
+	temp_value[2]=(short)(m_value[2]*10);	//梁業
+
+    if(  (m_value[2] == m_value[3])  && (m_value[2] == m_value[4] )&& (m_value[2] == m_value[1]))
+    {
+        return;
+    }
+
+	//if((m_value[2] > 100) || (m_value[2] < -20)  || (m_value[3] < -40) || (m_value[3] > 200) || (m_value[0] == 0) )
+	//{
+	//	return;
+	//}
 	if(save_date_into_ini == 1)  // 1 enable  2 disable
 	{
 		for (int z=0;z<4;z++)
 		{
 			CString key_word_temp;CString temp_value_cstring;
 			key_word_temp.Format(_T("VALUE_%d"),z);
-			temp_value_cstring.Format(_T("%u"),temp_value[z]);
+			temp_value_cstring.Format(_T("%d"),temp_value[z]);
 			WritePrivateProfileStringW(_T("EnhancedRegister"),key_word_temp,temp_value_cstring,save_data_ini_file_path);
 		}
 		
@@ -2986,7 +2998,7 @@ void CNewHumChamberView::read_testo(){
  /*Sleep(10000);*/
  /*int ret = 1;*/
 	g_tstat_id=m_tstatID;
- 	int ret=Write_Multi_org_short(m_tstatID,temp_value,MODBUS_TESTO_CO2,4);
+ 	int ret=Write_Multi_org_short(m_tstatID,(unsigned short *)temp_value,MODBUS_TESTO_CO2,4);
  	/*register_critical_section.Unlock();*/
  	if (ret>0)
  	{

@@ -7930,7 +7930,7 @@ BOOL CT3000View::OnHelpInfo(HELPINFO* pHelpInfo)
 {
     // TODO: Add your message handler code here and/or call default
     /* T3000_help.chm::/T3000_Help/How%20to%20use%20T3000/How%20to%20use%20T3000,basicly.htm*/
-    CString filename=g_strExePth+_T("T3000_help.chm::/T3000_Help/How to use T3000/How to use T3000,basicly.htm");
+    CString filename=g_strExePth+_T("T3000_help.chm");
     ::HtmlHelp(
         NULL,
         filename.GetBuffer(),

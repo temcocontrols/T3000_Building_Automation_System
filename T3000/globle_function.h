@@ -235,7 +235,7 @@ bool Input_data_to_string(unsigned char  temp_input_index ,
 	CString &temp_in_decon,
 	CString &temp_in_jumper,
 	CString &temp_in_label);
-
+	bool Save_InputData_to_db(unsigned char  temp_input_index );
 bool Output_data_to_string(unsigned char  temp_output_index,
 	CString &temp_out_panel,
 	CString &temp_out_des,
@@ -246,5 +246,5 @@ bool Output_data_to_string(unsigned char  temp_output_index,
 	CString &temp_out_pwm_period,
 	CString &temp_out_decom,
 	CString &temp_out_label);
-
+	bool Save_OutputData_to_db(unsigned char  temp_output_index );
 #endif

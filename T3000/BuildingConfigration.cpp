@@ -14,10 +14,10 @@
 
 #include "globle_function.h"
 #include "ConnectRemoteServer.h"
+#include "RemotePtpLogin.h"
 #include <ctime>
 #include <iostream>
 using namespace std;
- 
 // CBuildingConfigration dialog
 #define WM_FRESH_DB  WM_USER + 1014
 #define PATH_MAX 256
@@ -30,7 +30,7 @@ const int INDEX_BACNET_MSTP = 2;
 const int INDEX_REMOTE_DEVICE = 3;
 const int INDEX_AUTO = 4;
 extern unsigned int try_connect_serial;
-
+bool ptp_cancel_login = false;
 
 CBuildingConfigration::CBuildingConfigration(CWnd* pParent /*=NULL*/)
     : CDialogEx(CBuildingConfigration::IDD, pParent)
@@ -1226,7 +1226,7 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
                 IP = _T("192.168.0.3");
                 Port = _T("10000");
             }
-
+			  WritePrivateProfileStringW(m_BuildNameLst.at(Changed_Item).MainBuildingName,_T("Remote_IP"),IP,g_achive_device_name_path);
             m_building_config_list.SetItemText(m_changedRow,BC_COMPORT,NO_APPLICATION);
             m_building_config_list.SetItemText(m_changedRow,BC_BAUDRATE,NO_APPLICATION);
 
@@ -1283,13 +1283,19 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 			int input_length  =	temp_serial_number.GetLength();
 
 			bool  serial_is_all_digital = AllCharactorIsDigital(temp_serial_number);
-			if((input_length <=6) && (serial_is_all_digital))	//说明输入的全是数字，是序列号.
+			 WritePrivateProfileStringW(m_BuildNameLst.at(Changed_Item).MainBuildingName,_T("Remote_IP"),temp_serial_number,g_achive_device_name_path);
+			if((input_length <=8) && (serial_is_all_digital))	//说明输入的全是数字，是序列号.
 			{
 				CString temp_message;
 				temp_message.Format(_T("Do you want to connect the remote device (serial number is %s)") ,temp_serial_number);
 				if(IDYES == MessageBox(temp_message,_T("Notice"),MB_YESNO | MB_ICONINFORMATION))
 				{
 					try_connect_serial =    _wtoi(temp_serial_number)  ;//  (unsigned int)atoi(temp_serial_number);
+					ptp_cancel_login = false;
+					CRemotePtpLogin ptplogin;
+					ptplogin.DoModal();
+					if(ptp_cancel_login)
+						return 0;
 					CConnectRemoteServer Connectdlg;
 					Connectdlg.DoModal();
 					return 0;

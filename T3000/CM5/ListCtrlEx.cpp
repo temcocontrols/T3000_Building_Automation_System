@@ -97,6 +97,7 @@ BEGIN_MESSAGE_MAP(CListCtrlEx, CListCtrl)
 	ON_NOTIFY_REFLECT(LVN_ENDLABELEDIT, &CListCtrlEx::OnLvnEndlabeledit)
 	ON_NOTIFY_REFLECT(LVN_COLUMNCLICK, &CListCtrlEx::OnLvnColumnclick)
 	ON_WM_DESTROY()
+	ON_WM_DRAWITEM()
 END_MESSAGE_MAP()
 
 //////////////////////////////////////////////////////////////////////////
@@ -1907,7 +1908,9 @@ void ListCtrlEx::CListCtrlEx::OnDestroy()
 	}
 
 }
+ 
 
+ 
+ 
 
-
-
+ 

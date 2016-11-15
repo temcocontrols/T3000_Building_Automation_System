@@ -17,7 +17,7 @@ const int FRESH_MAIN_LIST = 2;
 
 DWORD  nZigbeeInfoThreadID;
 unsigned short zigbee_register_value[1024]={-1};
-int NC_ID;
+int MODBUS_ID;
 static int loop_count = 0;
 signed char RSSI[256][256];
 // CTstatZigbeeLogic dialog
@@ -117,8 +117,22 @@ UINT   CTstatZigbeeLogic::GetZigbeeInfo(LPVOID lpVoid)
 	{
 	return 0;
 	}
-	NC_ID = read_one(255,6,2);	//读到NC 的ID， NC 的表里面也没有NC和其他的 RSSI 的值;
-	mparent->HandleOneTSTAT(g_tstat_id);
+	MODBUS_ID = read_one(255,6,2);	//读到NC 的ID， NC 的表里面也没有NC和其他的 RSSI 的值;
+	if(MODBUS_ID < 0)
+	{
+		return 0;
+	}
+	int product_id = read_one(255,7,2);
+	if(product_id < 0)
+	{
+		return 0;
+	}
+	if(product_id == PM_MINIPANEL)
+	{
+		mparent->HandleOneMinipanel(g_tstat_id);
+	}
+	else
+		mparent->HandleOneTSTAT(g_tstat_id);
 	mparent->SendMessage(WM_SHOW_ID_LIST,FRESH_MAIN_LIST,NULL);	//处理完成后更新 List ;
 	if (mparent->m_abort)
 	{
@@ -141,6 +155,60 @@ UINT   CTstatZigbeeLogic::GetZigbeeInfo(LPVOID lpVoid)
 	//hGetZigbeeInfo = NULL;
 	return 0;
 }
+
+
+//两个线程同时操作一个vector可能会出问题，稍后修改;
+void CTstatZigbeeLogic::HandleOneMinipanel(unsigned char nId)
+{
+	int nRetsingle = 0;
+	int nRetMulty = 0;
+	if (m_abort)
+	{
+		return;
+	}
+
+	nRetsingle = read_one(nId,MINIPANEL_ZIGBEE_RSSI_COUNT,5);	
+	//if(nRetsingle<0)
+	//{
+	//	AfxMessageBox(_T("Read error!Please try again!"));
+	//	PostMessage(WM_CLOSE,NULL,NULL);
+	//}
+	memset(zigbee_register_value,0,sizeof(zigbee_register_value));
+	if(nRetsingle>0)
+	{
+		nRetMulty = Read_Multi(nId,zigbee_register_value,MINIPANEL_ZIGBEE_FIRST_ID,nRetsingle,3);
+		if(nRetMulty > 0)
+			AddMinipanel_ID(zigbee_register_value,nRetsingle,nId);
+	}
+
+	for (int i=loop_count;i<(int)Zigbee_Tstat_Id.size();i++)
+	{
+		if (m_abort)
+		{
+			break;
+		}
+		//if((nId == Zigbee_Tstat_Id.at(i)) && ((i+1) < (int)Zigbee_Tstat_Id.size()))
+		if((i+1) < (int)Zigbee_Tstat_Id.size())
+		{
+			unsigned char ntemp_id = Zigbee_Tstat_Id.at(i + 1);
+			loop_count ++;
+			if((ntemp_id == MODBUS_ID) || (nId == ntemp_id))
+			{
+				//i++;
+				continue;
+			}
+			if (m_abort)
+			{
+				break;
+			}
+			HandleOneTSTAT(ntemp_id);
+			//SendMessage(WM_SHOW_ID_LIST,FRESH_MAIN_LIST,NULL);
+			return;
+		}
+	}
+}
+
+
 //两个线程同时操作一个vector可能会出问题，稍后修改;
 void CTstatZigbeeLogic::HandleOneTSTAT(unsigned char nId)
 {
@@ -176,7 +244,7 @@ void CTstatZigbeeLogic::HandleOneTSTAT(unsigned char nId)
 		{
 			unsigned char ntemp_id = Zigbee_Tstat_Id.at(i + 1);
 			loop_count ++;
-			if((ntemp_id == NC_ID) || (nId == ntemp_id))
+			if((ntemp_id == MODBUS_ID) || (nId == ntemp_id))
 			{
 				//i++;
 				continue;
@@ -191,6 +259,61 @@ void CTstatZigbeeLogic::HandleOneTSTAT(unsigned char nId)
 		}
 	}
 }
+
+void CTstatZigbeeLogic::AddMinipanel_ID(unsigned short * npoint , int nlength,unsigned char nId)
+{
+	unsigned char ntemp_id = 0;
+	unsigned short temp_rssi = 0;
+	if (m_abort)
+	{
+		return;
+	}
+	for (int i=0;i<nlength;i++)
+	{
+		if (m_abort)
+		{
+			break;
+		}
+		ntemp_id = npoint[i] >> 8;
+		if(ntemp_id == 0)
+			continue;
+		temp_rssi = npoint[i]& 0x00ff;
+
+		//temp_rssi = npoint[i+nlength];
+		RSSI[nId][ntemp_id] = (signed char)temp_rssi;
+		bool is_exist = false;
+		for (int j=0;j<(int)Zigbee_Tstat_Id.size();j++)
+		{
+			if (m_abort)
+			{
+				break;
+			}
+			if(Zigbee_Tstat_Id.at(j) == ntemp_id)
+			{
+				is_exist = true;
+				break;
+			}
+		}
+		if(!is_exist)
+		{
+			Zigbee_Tstat_Id.push_back(ntemp_id);
+			Zigbee_Show_Tstat_Id.push_back(ntemp_id);
+			if (m_abort)
+			{
+				break;
+			}
+			SendMessage(WM_SHOW_ID_LIST,FRESH_ID_LIST,NULL);
+			SendMessage(WM_SHOW_ID_LIST,FRESH_MAIN_LIST,NULL);
+		}
+	}
+
+	if (m_abort)
+	{
+		return;
+	}
+
+}
+
 
 void CTstatZigbeeLogic::AddTSTAT_ID(unsigned short * npoint , int nlength,unsigned char nId)
 {

@@ -2604,7 +2604,7 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 
             //temp_out.delay_timer = *(my_temp_point++);  Output 这个Delay time先不管 清0
             m_Output_data.at(i).pwm_period = *(my_temp_point++);
-            //m_Output_data.push_back(temp_out);
+           //Save_OutputData_to_db(i);
         }
         return READOUTPUT_T3000;
     }
@@ -2676,7 +2676,7 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
             m_Input_data.at(i).calibration_h = *(my_temp_point++);
             m_Input_data.at(i).calibration_l = *(my_temp_point++);
             m_Input_data.at(i).range = *(my_temp_point++);
-            //m_Input_data.push_back(temp_in);
+           //Save_InputData_to_db(i);
         }
         return READINPUT_T3000;
     }
@@ -3554,7 +3554,10 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 		my_temp_point = my_temp_point + 4;
 		Device_Basic_Setting.reg.time_update_since_1970 = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
 		my_temp_point = my_temp_point + 4;
-		
+		Device_Basic_Setting.reg.time_zone_summer_daytime = *(my_temp_point++);
+		memcpy_s(Device_Basic_Setting.reg.sntp_server,30,my_temp_point,30);
+		my_temp_point = my_temp_point + 30;
+		Device_Basic_Setting.reg.zegbee_exsit = *(my_temp_point++);
         return READ_SETTING_COMMAND;
     }
     break;
@@ -3615,8 +3618,9 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
     {
         if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Str_Serial_info))!=0)
             return -1;
-
-
+		
+		unsigned short device_id_low = 0;
+		unsigned short device_id_high = 0;
         _Bac_Scan_results_Info temp_struct;
         my_temp_point = (char *)Temp_CS.value + 3;
         start_instance = *my_temp_point;
@@ -3624,7 +3628,7 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
         end_instance = *my_temp_point;
         my_temp_point++;
         my_temp_point = my_temp_point + 2;
-        temp_struct.device_id	= ((unsigned char)my_temp_point[1]<<8) | ((unsigned char)my_temp_point[0]);
+         device_id_low	= ((unsigned char)my_temp_point[1]<<8) | ((unsigned char)my_temp_point[0]);
 
         my_temp_point = my_temp_point +2;
         memcpy_s(temp_struct.ipaddress,6,my_temp_point,6);
@@ -3643,10 +3647,14 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
         my_temp_point = my_temp_point + 2;
         temp_struct.hardware_version =  *(my_temp_point++);
         temp_struct.m_protocol = *(my_temp_point++);
+
+		device_id_high = ((unsigned char)my_temp_point[1]<<8) | ((unsigned char)my_temp_point[0]);
+
+		temp_struct.device_id = ((unsigned int)device_id_high) *65536 + device_id_low;
         int find_exsit = false;
         TRACE(_T("serialnumber = %d ,modbus_addr = %d , product_type = %d ,ip = %u.%u.%u.%u , instance = %d\r\n"),temp_struct.serialnumber,
-              temp_struct.modbus_addr,temp_struct.product_type,temp_struct.ipaddress[0],temp_struct.ipaddress[1] ,
-              temp_struct.ipaddress[2],temp_struct.ipaddress[3],temp_struct.device_id);
+              temp_struct.modbus_addr,temp_struct.product_type,(unsigned char)temp_struct.ipaddress[0],(unsigned char)temp_struct.ipaddress[1] ,
+              (unsigned char)temp_struct.ipaddress[2],(unsigned char)temp_struct.ipaddress[3],temp_struct.device_id);
         for (int x=0; x<(int)m_bac_scan_result_data.size(); x++)
         {
             if(temp_struct.serialnumber == m_bac_scan_result_data.at(x).serialnumber)
@@ -5287,47 +5295,7 @@ BOOL CheckForUpdate(
 
 
 
-typedef union
-{
-	uint8_t all[400];
-	struct 
-	{  
-		UCHAR command;
-		UCHAR command_reserve;
-		UCHAR length;
-		UCHAR length_reserve;
-		UCHAR serial_low;
-		UCHAR serial_low_reserve;
-		UCHAR serial_low_2;
-		UCHAR serial_low_2_reserve;
-		UCHAR serial_low_3;
-		UCHAR serial_low_3_reserve;
-		UCHAR serial_low_4;
-		UCHAR serial_low_4_reserve;
-		UCHAR product_id;
-		UCHAR product_id_reserve;
-		UCHAR modbus_id;
-		UCHAR modbus_id_reserve;
-		UCHAR ip_address_1;
-		UCHAR ip_address_1_reserve;
-		UCHAR ip_address_2;
-		UCHAR ip_address_2_reserve;
-		UCHAR ip_address_3;
-		UCHAR ip_address_3_reserve;
-		UCHAR ip_address_4;
-		UCHAR ip_address_4_reserve;
-		USHORT modbus_port;
-		USHORT sw_version;
-		USHORT hw_version;
-		unsigned int parent_serial_number;
-		UCHAR object_instance_2;
-		UCHAR object_instance_1;
-		UCHAR station_number;
-		char panel_name[20];
-		UCHAR object_instance_4;
-		UCHAR object_instance_3;
-	}reg;
-}Str_UPD_SCAN;
+
 #if 1
 int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 {
@@ -5387,7 +5355,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	my_temp_point = my_temp_point + 20;
 	temp_data.reg.object_instance_4 = *(my_temp_point++);
 	temp_data.reg.object_instance_3 = *(my_temp_point++);
-
+	temp_data.reg.isp_mode = *(my_temp_point++);	//isp_mode = 0 表示在应用代码 ，非0 表示在bootload.
 
 	DWORD nSerial=temp_data.reg.serial_low + temp_data.reg.serial_low_2 *256+temp_data.reg.serial_low_3*256*256+temp_data.reg.serial_low_4*256*256*256;
 	CString nip_address;
@@ -5395,7 +5363,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	CString nproduct_name = GetProductName(temp_data.reg.product_id);
 	if(nproduct_name.IsEmpty())	//如果产品号 没定义过，不认识这个产品 就exit;
 	{
-		if (temp_data.reg.product_id<200)
+		if (temp_data.reg.product_id<220)
 		{
 			return m_refresh_net_device_data.size();
 		}
@@ -5420,11 +5388,15 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 
 	if((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
 	{
-		g_Print.Format(_T("Serial = %u     ID = %d ,ip = %s  , Product name : %s ,obj = %u ,panel = %u"),nSerial,temp_data.reg.modbus_id,nip_address ,nproduct_name,temp.object_instance,temp.panal_number);
+		g_Print.Format(_T("Serial = %u     ID = %d ,ip = %s  , Product name : %s ,obj = %u ,panel = %u,isp_mode = %d"),nSerial,temp_data.reg.modbus_id,nip_address ,nproduct_name,temp.object_instance,temp.panal_number,temp_data.reg.isp_mode);
 		DFTrace(g_Print);
 	}
 
-
+	if(temp_data.reg.isp_mode != 0)
+	{
+		//记录这个的信息,如果短时间多次出现 就判定在bootload下面，只是偶尔出现一次表示只是恰好开机收到的.
+		return	 0;
+	}
 
 
 	bool find_exsit = false;
@@ -5970,8 +5942,12 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
                         FD_ZERO(&fdSocket);
                         if(buffer[0]==RESPONSE_MSG)
                         {
-                            g_llTxCount++;
-                            g_llRxCount++;
+							if(scaning_mode)
+							{
+								g_llTxCount++;
+								g_llRxCount++;
+							}
+
                             nLen=buffer[2]+buffer[3]*256;
                             unsigned short dataPackage[32]= {0};
                             memcpy(dataPackage,buffer+2,nLen*sizeof(unsigned short));
@@ -7030,7 +7006,7 @@ int LoadMiniModbusConfigFile(LPCTSTR tem_read_path)
 		{
 			write_buffer[Z] = htons(write_buffer[Z]);
 		}
-		if(Write_Multi_org_short(g_tstat_id,write_buffer,11472 + 23 * j , 23, 10)>0)
+		if(Write_Multi_org_short(g_tstat_id,write_buffer,BAC_IN_START_REG + 23 * j , 23, 10)>0)
 		{
 			resent_count ++ ;
 			g_progress_persent = (resent_count*100) / total_count;	
@@ -7324,7 +7300,7 @@ int SaveModbusConfigFile(CString &SaveConfigFilePath)
 		//register_critical_section.Lock();
 		//int nStart = GetTickCount();
 		int itemp = 0;
-		itemp = Read_Multi(read_device_id,&read_data_buffer[i*100],9800+i*100,100,4);
+		itemp = Read_Multi(read_device_id,&read_data_buffer[i*100],BAC_SETTING_START_REG+i*100,100,4);
 		if(itemp < 0 )
 		{
 			read_result = false;
@@ -11479,3 +11455,389 @@ bool Input_data_to_string(unsigned char  temp_input_index ,CString &temp_main_pa
 							CString &temp_in_filter,CString &temp_in_decon,CString &temp_in_jumper,CString &temp_in_label)
 */
 
+bool Save_InputData_to_db(unsigned char  temp_input_index )
+{
+
+	CString temp_in_main_panel;
+	CString temp_in_des;
+	CString temp_in_auto_manual;
+	CString temp_in_value;
+	CString temp_in_units;
+	CString temp_in_range;
+	CString temp_in_cal;
+	CString temp_cacl_sign;
+	CString temp_in_filter;
+	CString temp_in_decon;
+	CString temp_in_jumper;
+	CString temp_in_label;
+
+	Str_in_point temp_input_data;
+
+	if(temp_input_index >= BAC_INPUT_ITEM_COUNT)
+		return false;
+
+	memcpy_s(&temp_input_data,sizeof(Str_in_point),&m_Input_data.at(temp_input_index),sizeof(Str_in_point));
+
+	temp_in_main_panel.Format(_T("%d"),(unsigned char)Station_NUM);
+
+
+	MultiByteToWideChar( CP_ACP, 0, (char *)temp_input_data.description, (int)strlen((char *)temp_input_data.description)+1, 
+		temp_in_des.GetBuffer(MAX_PATH), MAX_PATH );
+	temp_in_des.ReleaseBuffer();
+
+	if(temp_input_data.auto_manual==0)
+	{
+		temp_in_auto_manual.Format(_T("Auto"));
+	}
+	else
+	{
+		temp_in_auto_manual.Format(_T("Manual"));
+	}
+
+	if(temp_input_data.digital_analog == BAC_UNITS_ANALOG)
+	{
+		if(temp_input_data.range <  (sizeof(Input_List_Analog_Units)/sizeof(Input_List_Analog_Units[0])))
+			temp_in_units = Input_List_Analog_Units[temp_input_data.range];
+		else if(temp_input_data.range < (sizeof(Input_Analog_Units_Array)/sizeof(Input_Analog_Units_Array[0])))
+			temp_in_units.Empty();
+		else
+			temp_in_range = _T("Unused");
+
+		if(temp_input_data.range == 0)
+			temp_in_range = _T("Unused");
+		else if(temp_input_data.range <  (sizeof(Input_Analog_Units_Array)/sizeof(Input_Analog_Units_Array[0])))
+			temp_in_range = Input_Analog_Units_Array[temp_input_data.range];
+		else
+			temp_in_range = _T("Out of range");
+
+		CString cstemp_value;
+		float temp_float_value;
+		temp_float_value = ((float)temp_input_data.value) / 1000;
+		temp_in_value.Format(_T("%.2f"),temp_float_value);
+
+		unsigned short temp_cal_value = ((unsigned char)(temp_input_data.calibration_h)) *256 + (unsigned char)temp_input_data.calibration_l;
+
+		temp_in_cal.Format(_T("%.1f"),((float)temp_cal_value)/10);
+		if(temp_input_data.calibration_sign == 0)
+		{
+			temp_cacl_sign = _T("+");
+		}
+		else
+		{
+			temp_cacl_sign = _T("-");
+		}
+	}
+	else if(temp_input_data.digital_analog == BAC_UNITS_DIGITAL)
+	{
+		temp_in_cal.Empty();
+		if(temp_input_data.range == 0)
+		{
+			CString cstemp_value1;
+			float temp_float_value1;
+			temp_float_value1 = ((float)temp_input_data.value) / 1000;
+			temp_in_value.Format(_T("%.2f"),temp_float_value1);
+			temp_in_range = Digital_Units_Array[0];
+		}
+		else if(temp_input_data.range<=22)
+		{
+			temp_in_range = Digital_Units_Array[temp_input_data.range];
+		}
+		else if((temp_input_data.range >= 23) && (temp_input_data.range <= 30))
+		{
+			if(receive_customer_unit)
+			{
+				temp_in_range = temp_unit_no_index[temp_input_data.range - 23];
+			}
+			else
+				temp_in_range = Digital_Units_Array[0];
+		}
+		else
+		{
+			temp_in_range = Digital_Units_Array[0];
+		}
+		temp_in_units = _T("");
+
+		if((temp_input_data.range>30)  || (temp_input_data.range == 0))
+		{
+
+		}
+		else
+		{
+
+			CStringArray temparray;
+			CString temp1;
+			if((temp_input_data.range < 23) &&(temp_input_data.range !=0))
+				temp1 = Digital_Units_Array[temp_input_data.range];
+			else if((temp_input_data.range >=23) && (temp_input_data.range <= 30))
+			{
+				if(receive_customer_unit)
+					temp1 = temp_unit_no_index[temp_input_data.range - 23];
+			}
+
+			SplitCStringA(temparray,temp1,_T("/"));
+			if((temparray.GetSize()==2))
+			{
+				if(temp_input_data.control == 0)
+					temp_in_value = temparray.GetAt(0);
+				else
+					temp_in_value = temparray.GetAt(1);
+			}
+		}
+
+	}
+
+
+	temp_in_filter.Format(_T("%d"),(unsigned char)temp_input_data.filter);
+	//m_input_list.SetItemText(i,INPUT_FITLER,temp_filter);
+
+	int temp_decom = 0;
+	int temp_jumper = 0;
+	temp_decom =temp_input_data.decom & 0x0f;
+	temp_jumper = (temp_input_data.decom & 0xf0 ) >> 4;
+	CString temp_status;
+	//如果range 是0 或者 不在正常范围内，就不要显示 open short 的报警 状态;
+	if((temp_decom==0) || (temp_input_data.range == 0) || (temp_input_data.range > 30))
+	{
+		temp_status.Format(Decom_Array[0]);
+	}
+	else if(temp_decom==1)
+	{
+		temp_status.Format(Decom_Array[1]);
+	}
+	else if(temp_decom==2)
+	{
+		temp_status.Format(Decom_Array[2]);
+	}
+	else
+	{
+		temp_status.Empty();
+	}
+	temp_in_decon = temp_status;
+
+
+	if(temp_jumper == 1)
+	{
+		temp_status.Format(JumperStatus[1]);
+	}
+	else if(temp_jumper == 2)
+	{
+		temp_status.Format(JumperStatus[2]);
+	}
+	else if(temp_jumper == 3)
+	{
+		temp_status.Format(JumperStatus[3]);
+	}
+	else if(temp_jumper == 4)
+	{
+		temp_status.Format(JumperStatus[4]);
+	}
+	else if(temp_jumper == 0)
+	{
+		temp_status.Format(JumperStatus[0]);
+	}
+
+	temp_in_jumper = temp_status;
+
+
+	MultiByteToWideChar( CP_ACP, 0, (char *)temp_input_data.label, (int)strlen((char *)temp_input_data.label)+1, 
+		temp_in_label.GetBuffer(MAX_PATH), MAX_PATH );
+	temp_in_label.ReleaseBuffer();
+
+	TRACE(temp_in_main_panel + _T(" ") +temp_in_des + _T(" ") +temp_in_auto_manual+ _T(" ") + temp_in_value + _T(" ")+  temp_in_units + _T(" ")+ temp_in_range+ _T(" ") +  temp_in_cal + _T(" ") +  temp_cacl_sign+ _T(" ") + temp_in_filter+ _T(" ") + temp_in_decon + _T(" ")+ temp_in_jumper+ _T(" ") + temp_in_label + _T("\n"));
+	CppSQLite3DB SqliteDBBuilding;
+	CString strSql;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+	if (!SqliteDBBuilding.tableExists("INPUTable"))
+	{
+
+		strSql.Format(_T("CREATE TABLE [INPUTable] ([PanelID] CHAR(255), [InputIndex] CHAR(255), [InputDescription] CHAR(255), [InputAM] CHAR(255), [InputValue] CHAR(255), [InputUnit] CHAR(255), [InputRange] CHAR(255), [InputCalibration] CHAR(255), [InputCalSign] CHAR(255), [InputFilter] CHAR(255), [InputDecon] CHAR(255), [InputJumper] CHAR(255), [InputLabel] CHAR(255));"));
+		SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+
+	}
+	CString StrTemp;
+	StrTemp.Format(_T("%d"),temp_input_index);
+	strSql.Format(_T("delete from INPUTable where PanelID = '%s' and InputIndex = '%s' "),temp_in_main_panel,StrTemp);
+	SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+
+
+
+	strSql.Format(_T("Insert Into INPUTable (PanelID,InputIndex,InputDescription,InputAM,InputValue,InputUnit,InputRange,InputCalibration,InputCalSign,InputFilter,InputDecon,InputJumper,InputLabel) Values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"),
+		temp_in_main_panel,
+		StrTemp,
+		temp_in_des,
+		temp_in_auto_manual,
+		temp_in_value,
+		temp_in_units,
+		temp_in_range,
+		temp_in_cal,
+		temp_cacl_sign,
+		temp_in_filter,
+		temp_in_decon,
+		temp_in_jumper,
+		temp_in_label);
+
+	SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+	SqliteDBBuilding.closedb();
+	return true;
+}
+
+
+bool Save_OutputData_to_db(unsigned char  temp_output_index)
+{
+
+	CString  temp_out_panel;
+	CString  temp_out_des;
+	CString  temp_out_auto_manual;
+	CString  temp_out_value;
+	CString  temp_out_units;
+	CString  temp_out_range;
+	CString  temp_out_pwm_period;
+	CString  temp_out_decom;
+	CString  temp_out_label ;
+	Str_out_point temp_output_data;
+
+	if(temp_output_index >= BAC_OUTPUT_ITEM_COUNT)
+		return false;
+	memcpy_s(&temp_output_data,sizeof(Str_out_point),&m_Output_data.at(temp_output_index),sizeof(Str_out_point));
+
+	MultiByteToWideChar( CP_ACP, 0, (char *)temp_output_data.description, (int)strlen((char *)temp_output_data.description)+1, 
+		temp_out_des.GetBuffer(MAX_PATH), MAX_PATH );
+	temp_out_des.ReleaseBuffer();
+
+
+	if(temp_output_data.auto_manual==0)	//In output table if it is auto ,the value can't be edit by user
+	{
+		temp_out_auto_manual = _T("Auto");
+	}
+	else
+	{
+		temp_out_auto_manual = _T("Manual");
+	}
+
+
+
+	if(temp_output_data.digital_analog == BAC_UNITS_ANALOG)
+	{
+		if(temp_output_data.range == 0)
+		{
+			temp_out_range = _T("Unused");
+		}
+		else if(temp_output_data.range < (sizeof(OutPut_List_Analog_Range)/sizeof(OutPut_List_Analog_Range[0])))
+			temp_out_range = OutPut_List_Analog_Range[temp_output_data.range];
+		else
+			temp_out_range = _T("Out of range");
+
+		if(temp_output_data.range < (sizeof(OutPut_List_Analog_Units)/sizeof(OutPut_List_Analog_Units[0])))
+			temp_out_units = OutPut_List_Analog_Units[temp_output_data.range];
+		else
+			temp_out_units = _T("Unused");
+
+		CString temp_low,temp_high;
+		temp_low.Format(_T("%d"),0);
+		temp_high.Format(_T("%d"),0);
+
+		temp_out_value.Format(_T("%.2f"),((float)temp_output_data.value) / 1000);
+	}
+	else if(temp_output_data.digital_analog == BAC_UNITS_DIGITAL)
+	{
+		temp_out_units = _T("");
+
+		if(temp_output_data.range == 0)
+		{
+			CString temp_value2;
+			temp_out_value.Format(_T("%.2f"),((float)temp_output_data.value) / 1000);
+			temp_out_range = Digital_Units_Array[0];
+		}
+		else if(temp_output_data.range<=22)
+			temp_out_range = Digital_Units_Array[temp_output_data.range];
+		else if((temp_output_data.range >= 23) && (temp_output_data.range <= 30))
+		{
+			if(receive_customer_unit)
+				temp_out_range = temp_unit_no_index[temp_output_data.range - 23];
+			else
+				temp_out_range = Digital_Units_Array[0];
+		}
+		else
+			temp_out_range = Digital_Units_Array[0];
+
+		if((temp_output_data.range>30) || (temp_output_data.range == 0))
+		{
+		}
+		else
+		{
+
+			CStringArray temparray;
+			CString temp1;
+			if((temp_output_data.range < 23) &&(temp_output_data.range !=0))
+				temp1 = Digital_Units_Array[temp_output_data.range];
+			else if((temp_output_data.range >=23) && (temp_output_data.range <= 30))
+			{
+				if(receive_customer_unit)
+					temp1 = temp_unit_no_index[temp_output_data.range - 23];
+			}
+			else
+			{
+				temp_out_value.Empty();
+			}
+			SplitCStringA(temparray,temp1,_T("/"));
+			if((temparray.GetSize()==2))
+			{
+				if(temp_output_data.control == 0)
+					temp_out_range = temparray.GetAt(0);
+				else
+					temp_out_range = temparray.GetAt(1);
+			}
+		}
+	}
+
+	temp_out_panel.Format(_T("%d"),(unsigned char)Station_NUM);
+
+
+	if(temp_output_data.decom==0)
+		temp_out_decom.Format(Output_Decom_Array[0]);
+	else if(temp_output_data.decom==1)
+		temp_out_decom.Format(Output_Decom_Array[1]);
+	else
+		temp_out_decom.Empty();
+
+
+
+	temp_out_pwm_period.Format(_T("%u"),(unsigned char)temp_output_data.pwm_period);
+
+
+	MultiByteToWideChar( CP_ACP, 0, (char *)temp_output_data.label, (int)strlen((char *)temp_output_data.label)+1, 
+		temp_out_label.GetBuffer(MAX_PATH), MAX_PATH );
+	temp_out_label.ReleaseBuffer();
+
+	TRACE(temp_out_panel + _T(" ") +temp_out_des + _T(" ") +temp_out_auto_manual+ _T(" ") + temp_out_value + _T(" ")+  temp_out_units + _T(" ")+ temp_out_range+ _T(" ") +  temp_out_pwm_period + _T(" ") +  temp_out_decom+ _T(" ") + temp_out_label+ _T(" ")  + _T("\n"));
+	CppSQLite3DB SqliteDBBuilding;
+	CString strSql;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+	if (!SqliteDBBuilding.tableExists("OUTPUTable"))
+	{
+
+		strSql.Format(_T("CREATE TABLE [OUTPUTable] ([out_panel] CHAR(255),[out_index] CHAR(255),[out_am] CHAR(255),[out_value] CHAR(255),[out_units] CHAR(255),[out_range] CHAR(255),[out_pwm_period] CHAR(255),[out_decom] CHAR(255),[out_label] CHAR(255));"));
+		SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+
+	}
+	CString StrTemp;
+	StrTemp.Format(_T("%d"),temp_output_index);
+	strSql.Format(_T("delete from OUTPUTable where out_panel = '%s' and out_index = '%s' "),temp_out_panel,StrTemp);
+	SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+
+
+	strSql.Format(_T("Insert INTO OUTPUTable(out_panel,out_index,out_am,out_value,out_units,out_range,out_pwm_period,out_decom,out_label) Values('%s','%s','%s','%s','%s','%s','%s','%s','%s' )"),
+		temp_out_panel,
+		StrTemp,
+		temp_out_des,
+		temp_out_auto_manual,
+		temp_out_value,
+		temp_out_units,
+		temp_out_range,
+		temp_out_pwm_period,
+		temp_out_decom,
+		temp_out_label);
+
+	SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+	SqliteDBBuilding.closedb();	
+}

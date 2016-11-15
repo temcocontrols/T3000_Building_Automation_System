@@ -74,6 +74,7 @@ void CScanDbWaitDlg::OnBnClickedExitbutton()
     OnCancel();
     CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
     ::PostMessage(pFrame->m_hWnd,WM_MYMSG_REFRESHBUILDING,0,0);
+	//scaning_mode = false;
 }
 
 BOOL CScanDbWaitDlg::OnInitDialog()
@@ -303,7 +304,7 @@ void CScanDbWaitDlg::Initial_List()
     m_scan_com_list.InsertColumn(SCAN_SKIP, _T("Skip"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_scan_com_list.InsertColumn(SCAN_STATUS, _T("Status"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_scan_com_list.InsertColumn(SCAN_FOUND, _T("Reply"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-    m_scan_com_list.InsertColumn(SCAN_NOTES, _T("Notes"), 280, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+    m_scan_com_list.InsertColumn(SCAN_NOTES, _T("Notes"), 480, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 
     m_scan_dlg_hwnd = this->m_hWnd;
     g_hwnd_now = m_scan_dlg_hwnd;
@@ -391,18 +392,31 @@ void CScanDbWaitDlg::Initial_List()
     }
 
   
-    scan_mode = _T("Bacnet MSTP");
-    m_scan_com_list.InsertItem(ncount*NUMBER_BAUDRATE + 1,scan_mode);
-    //m_scan_com_list.SetItemText(i*2,SCAN_BAUDRATE,_T("9600"));
-    m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 1,SCAN_SKIP,_T("No"));
-    m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 1,SCAN_STATUS,_T("Wait"));
-    m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 1,SCAN_FOUND,_T("0"));
+    //scan_mode = _T("Bacnet MSTP");
+    //m_scan_com_list.InsertItem(ncount*NUMBER_BAUDRATE + 1,scan_mode);
+    ////m_scan_com_list.SetItemText(i*2,SCAN_BAUDRATE,_T("9600"));
+    //m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 1,SCAN_SKIP,_T("No"));
+    //m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 1,SCAN_STATUS,_T("Wait"));
+    //m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 1,SCAN_FOUND,_T("0"));
 
-    scan_mode = _T("Remote Device");
-    m_scan_com_list.InsertItem(ncount*NUMBER_BAUDRATE + 2,scan_mode);
-    m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 2,SCAN_SKIP,_T("No"));
-    m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 2,SCAN_STATUS,_T("Wait"));
-    m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 2,SCAN_FOUND,_T("0"));
+    //scan_mode = _T("Remote Device");
+    //m_scan_com_list.InsertItem(ncount*NUMBER_BAUDRATE + 2,scan_mode);
+    //m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 2,SCAN_SKIP,_T("No"));
+    //m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 2,SCAN_STATUS,_T("Wait"));
+    //m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 2,SCAN_FOUND,_T("0"));
+
+	scan_mode = _T(" ");
+	m_scan_com_list.InsertItem(ncount*NUMBER_BAUDRATE + 1,scan_mode);
+	//m_scan_com_list.SetItemText(i*2,SCAN_BAUDRATE,_T("9600"));
+	m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 1,SCAN_SKIP,_T(" "));
+	m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 1,SCAN_STATUS,_T(" "));
+	m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 1,SCAN_FOUND,_T(" "));
+
+	scan_mode = _T(" ");
+	m_scan_com_list.InsertItem(ncount*NUMBER_BAUDRATE + 2,scan_mode);
+	m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 2,SCAN_SKIP,_T(" "));
+	m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 2,SCAN_STATUS,_T(" "));
+	m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 2,SCAN_FOUND,_T(" "));
 
 
     for (int x=0; x<m_scan_info.size(); x++)
@@ -422,9 +436,9 @@ void CScanDbWaitDlg::Initial_List()
         {
             m_scan_com_list.SetItemText(x,SCAN_SKIP,_T("No"));
         }
-#endif
-		m_scan_com_list.SetItemText(x,SCAN_SKIP,_T("No"));
 
+		m_scan_com_list.SetItemText(x,SCAN_SKIP,_T("No"));
+#endif
     }
 
 

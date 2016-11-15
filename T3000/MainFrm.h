@@ -217,7 +217,8 @@ public:
 	vector <tree_room>		m_roomLst;//for every room name	
 	vector <background_infor> m_backgroundLst;
 	vector <tree_product>	m_product;//for every product leaf
- 
+// 	_ConnectionPtr				m_pCon;//for ado connection
+// 	_RecordsetPtr				m_pRs;//for ado 
 	 
     tree_product m_current_tree_node ;
     tree_product m_lasttime_tree_node;
@@ -294,6 +295,7 @@ protected:
 	afx_msg LRESULT OnAddTreeNode(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT  AllWriteMessageCallBack(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT Refresh_RX_TX_Count(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT Retry_Connect_Message(WPARAM wParam, LPARAM lParam);
 	//afx_msg LRESULT Show_Panel(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT Delete_Write_New_Dlg(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT  ReadConfigFromDeviceMessageCallBack(WPARAM wParam, LPARAM lParam);
@@ -374,7 +376,7 @@ public:
 	//void EnableRefreshTreeView(BOOL bEnable);
 	void DoFreshAll();
 	//void RefreshTreeView();
-
+	LRESULT  CMainFrame::HandleDuplicateID(WPARAM wParam, LPARAM lParam);
 	LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam);
 	LRESULT  CMainFrame::Message_Scan_Product(WPARAM wParam,LPARAM lParam);
 	// suspend refresh tree view thread, when flash or other operation need read or write large data by Modbus.
@@ -426,6 +428,8 @@ public:
 
 	static	DWORD WINAPI Get_All_Dlg_Message(LPVOID lpVoid);
 	static	DWORD WINAPI Translate_My_Message(LPVOID lpVoid);
+
+	static DWORD WINAPI   retry_connect(LPVOID lpVoid);
  //   static DWORD WINAPI ConnectToTreeNode(LPVOID);
 	afx_msg void OnDatabaseIonameconfig();
 	afx_msg void OnDatabaseMbpoll();

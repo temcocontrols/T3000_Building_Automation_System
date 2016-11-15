@@ -37,9 +37,6 @@
     <Filter Include="SQLiteDriver">
       <UniqueIdentifier>{f5dd6a0a-ef09-4c01-9e96-3c87708d5311}</UniqueIdentifier>
     </Filter>
-    <Filter Include="BADO">
-      <UniqueIdentifier>{9f3ef0ef-3b10-4087-81d2-8ab8b377a115}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AddBuilding.cpp">
@@ -663,8 +660,14 @@
     <ClCompile Include="..\SQLiteDriver\CppSQLite3.cpp">
       <Filter>SQLiteDriver</Filter>
     </ClCompile>
-    <ClCompile Include="BADO\BADO.cpp">
-      <Filter>BADO</Filter>
+    <ClCompile Include="RemotePtpLogin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NewTstatSchedulesDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DuplicateIdDetected.cpp">
+      <Filter>Bacnet</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -886,7 +889,6 @@
     <None Include="res\monitor_.bin">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\MonitorData.mdb" />
     <None Include="ChartCtrl\ChartBalloonLabel.inl">
       <Filter>ChartCtrl</Filter>
     </None>
@@ -972,6 +974,7 @@
     <None Include="res\MFC16API.dll" />
     <None Include="res\Building.db" />
     <None Include="res\T3000.db" />
+    <None Include="res\MonitorData.db" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">
@@ -1056,6 +1059,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ImageTreeCtrl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImportDatabaseDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IniFile.h">
@@ -1652,14 +1658,20 @@
     <ClInclude Include="CommandWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RemotePtpLogin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\SQLiteDriver\CppSQLite3.h">
       <Filter>SQLiteDriver</Filter>
     </ClInclude>
     <ClInclude Include="..\SQLiteDriver\sqlite3.h">
       <Filter>SQLiteDriver</Filter>
     </ClInclude>
-    <ClInclude Include="BADO\BADO.h">
-      <Filter>BADO</Filter>
+    <ClInclude Include="NewTstatSchedulesDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DuplicateIdDetected.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
