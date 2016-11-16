@@ -123,7 +123,6 @@ public:
 	CEdit m_edit_temp_output;
 	CComboBox m_combox_units;
 	CEdit m_edit_model;
-	 
 public:
 	int	MODBUS_SERIALNUMBER_LOWORD	;
 	int	MODBUS_SERIALNUMBER_HIWORD	;
