@@ -190,6 +190,7 @@ using namespace std;  // Ensure that the namespace is set to std
 #define		WM_REFRESH_BAC_AT_COMMAND					WM_USER + 221
 #define		WM_REFRESH_BAC_REMOTE_POINT_LIST					WM_USER + 222
 #define		WM_REFRESH_BAC_ANALOGCUSRANGE_LIST					WM_USER + 223
+#define WM_SHOW_SCANN_RESULTS WM_USER + 2691
 //#pragma warning(disable:4244)
 //#pragma warning(disable:4018)
 //#pragma warning(disable:4800)

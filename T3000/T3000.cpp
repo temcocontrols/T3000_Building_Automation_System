@@ -17,7 +17,7 @@
 #include "iniFile.h"
 #include "afxinet.h"
 #include "T3000DefaultView.h"
-#include "Dowmloadfile.h"
+ 
 #include "../SQLiteDriver/CppSQLite3.h"
  
 const int g_versionNO=20160923;
@@ -41,8 +41,8 @@ END_MESSAGE_MAP()
 CT3000App::CT3000App()
 {
 	m_bHiColorIcons = TRUE;
-	CurrentT3000Version=_T("    2016.11.14 ");
-	T3000_Version = 11114;
+	CurrentT3000Version=_T("    2016.11.16 ");
+	T3000_Version = 11116;
 
 
 	m_lastinterface=19;
@@ -721,8 +721,8 @@ BOOL CT3000App::InitInstance()
 		m_pMainWnd->UpdateWindow();
 	   ((CMainFrame*)m_pMainWnd)->SwitchToPruductType(DLG_DIALOG_DEFAULT_BUILDING); 
 
-  		m_szAppPath  = g_strExePth;
-  		m_szHelpFile = theApp.m_szAppPath + L"T3000_Help.chm";
+       m_szAppPath  = g_strExePth;
+       m_szHelpFile = theApp.m_szAppPath + L"T3000_Help.chm";
 // 		CString g_configfile_path =g_strExePth + g_strStartInterface_config;
 // 		m_lastinterface= 19 ;//GetPrivateProfileInt(_T("T3000_START"),_T("Interface"),19,g_configfile_path); //由 杜帆 16-03-17屏蔽；进入不同的界面引起 T3000打开时报错。
 // 		g_selected_serialnumber=GetPrivateProfileInt(_T("T3000_START"),_T("SerialNumber"),0,g_configfile_path);
@@ -780,7 +780,8 @@ protected:
 public:
 	afx_msg void OnBnClickedButton1();
 	afx_msg void OnBnClickedOk();
-	};
+	virtual BOOL OnInitDialog();
+};
 
 CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD)
 {
@@ -870,12 +871,16 @@ void CT3000App::InitModeName()
 void CAboutDlg::OnBnClickedButton1()
 {
 	
- 
-
- 
-	Dowmloadfile Dlg;
-	Dlg.DoModal();
- 
+	CString m_strWebLinker;
+	m_strWebLinker.Format(_T("mailto:alex@temcocontrols.com?subject=feedback to temco &body=please add the attachment in the \n%sT3000.log "),g_strExePth);
+	try{
+          ShellExecute(GetSafeHwnd(), NULL,m_strWebLinker,   NULL, NULL,   SW_SHOWNORMAL);
+	}
+	catch(...)
+	{
+		AfxMessageBox(_T("Error:Can't find the email client in your pc!"));
+	}
+	
 }
 int CT3000App::ExitInstance()
 {
@@ -1039,9 +1044,30 @@ void CT3000App::SetLanguage(DWORD Last){
 	key.Open(HKEY_LOCAL_MACHINE,data_Set);
 	WriteNumber(key,_T("T3000"),Last);
 }
-
+#include "Dowmloadfile.h"
+extern tree_product	m_product_isp_auto_flash;
+bool update_t3000_only = false;
 void CAboutDlg::OnBnClickedOk()
 {
 // TODO: Add your control notification handler code here
+	update_t3000_only = true;
+	m_product_isp_auto_flash.product_class_id =  199;
+	Dowmloadfile Dlg;
+	Dlg.DoModal();
+	update_t3000_only = false;
 CDialog::OnOK();
+}
+
+
+BOOL CAboutDlg::OnInitDialog()
+{
+	CDialog::OnInitDialog();
+
+	// TODO:  Add extra initialization here
+	CString temp_version;
+	temp_version = _T("T3000 Building Automation System") + CurrentT3000Version;
+	
+	GetDlgItem(IDC_STATIC_ABOUT_INFO)->SetWindowText(temp_version);
+	return TRUE;  // return TRUE unless you set the focus to a control
+	// EXCEPTION: OCX Property Pages should return FALSE
 }

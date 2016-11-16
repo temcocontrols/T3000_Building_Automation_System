@@ -66,17 +66,23 @@ void CScanDbWaitDlg::OnBnClickedCancel()
     ;
 }
 
+
 void CScanDbWaitDlg::OnBnClickedExitbutton()
 {
     // TODO: Add your control notification handler code here
     g_bCancelScan=TRUE;
     m_pScaner->StopScan();
+
+	//pScanner->m_bNetScanFinish = TRUE; // at this time, two thread end, all scan end
+	TerminateThread(hwait_scan_thread, 0);
+	m_pScaner->SendScanEndMsg();
+
     OnCancel();
     CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
     ::PostMessage(pFrame->m_hWnd,WM_MYMSG_REFRESHBUILDING,0,0);
 	//scaning_mode = false;
 }
-
+HWND scan_wait_dlg;
 BOOL CScanDbWaitDlg::OnInitDialog()
 {
     CDialog::OnInitDialog();
@@ -86,7 +92,7 @@ BOOL CScanDbWaitDlg::OnInitDialog()
     Initial_List();
     GetDlgItem(IDC_STATIC_SCAN_PIC)->GetWindowRect(Scan_rect);
     ScreenToClient(Scan_rect);
-
+	scan_wait_dlg = this->m_hWnd;
     return TRUE;  // return TRUE unless you set the focus to a control
     // EXCEPTION: OCX Property Pages should return FALSE
 }

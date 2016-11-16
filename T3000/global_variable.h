@@ -2111,7 +2111,8 @@ CString CS3000_INPUT_RANGE[4]={L"0-10A",L"0-20A",L"0-50A",L"0-100A"};
 CString STRING_SWITCH_STATUS[3]={_T("Off"),_T("Hand"),_T("Auto")};
 int m_user_level = 2;
 
-
+vector <IspModeInfo> g_isp_device_info;
+IspModeInfo need_isp_device;
 
 vector<Registers_Infor> g_vectRegisters;
 
@@ -2185,3 +2186,9 @@ refresh_net_device device_id_data_2;
 bool edit_confilct_mode = false;
 
 bool scaning_mode = false;
+
+bool isp_mode_is_cancel = true;
+bool isp_mode_firmware_auto;
+CString isp_mode_detect_firmware_path;
+
+	HANDLE hwait_scan_thread;

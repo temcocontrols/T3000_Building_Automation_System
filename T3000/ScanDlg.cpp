@@ -65,6 +65,7 @@ BEGIN_MESSAGE_MAP(CScanDlg, CDialog)
 	ON_MESSAGE(WM_ADDCOMSCAN, 	OnAddComScanRet)
 	ON_MESSAGE(WM_ADDNETSCAN, 	OnAddNetScanRet)
 
+	
 	ON_WM_CLOSE()
 	ON_EN_KILLFOCUS(IDC_EDIT_GRIDEDIT, &CScanDlg::OnEnKillfocusEditGridedit)
 
@@ -1524,6 +1525,8 @@ LRESULT CScanDlg::OnAddNetScanRet(WPARAM wParam, LPARAM lParam)
 	//AddNetDeviceToGrid(m_pScanner->m_szNCScanRet);
 	return 1;
 }
+
+
 
 
 LRESULT CScanDlg::OnScanFinish(WPARAM wParam, LPARAM lParam)

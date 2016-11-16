@@ -31,6 +31,7 @@ int scan_bacnet_ip_item = -1;
 int scan_remote_ip_item = -1;
 int scan_baudrate =0;
 vector <refresh_net_device> m_tstat_net_device_data;
+int reply_count = 0;
 
 const int TCP_COMM_PORT = 6001;
 extern int g_ScnnedNum;
@@ -59,7 +60,8 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam);
 UINT _ScanNCByUDPFunc(LPVOID pParam);
 //UINT _ScanTstatThread(LPVOID pParam);
 UINT _ScanTstatThread2(LPVOID pParam);
-UINT _WaitScanThread(LPVOID pParam);
+//UINT _WaitScanThread(LPVOID pParam);
+DWORD WINAPI  _WaitScanThread(LPVOID lpVoid);
 
 UINT _ScanOldNC(LPVOID pParam);
 void Show_Scan_Data(LPCTSTR nstrInfo ,unsigned int nitem);
@@ -1482,7 +1484,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
     //g_nStartID = -1; // this is a flag for udp scan.
     GetIPMaskGetWayForScan();
     CTStatScanner* pScanner = (CTStatScanner*)pParam;
-
+	                   reply_count = 0;
     if(m_scan_info.at(scan_udp_item).scan_skip == false)
     {
         for (int index=0; index<g_Scan_Vector_Subnet.size(); index++)
@@ -1632,7 +1634,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
                 if(nSelRet > 0)
                 {
                     ZeroMemory(buffer, 512);
-                    int reply_count = 0;
+ 
                     do
                     {
                         int nRet = ::recvfrom(h_scan_Broad,(char*)buffer, 512, 0,(sockaddr*)&h_scan_siBind, &nLen);
@@ -1663,7 +1665,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
                                     // 								pScanner->m_bCheckSubnetFinish=pScanner->m_thesamesubnet;
                                     // 							}
                                 }
-                                reply_count ++;
+
                                 memset(m_scan_info.at(scan_udp_item).scan_notes,0,250);
                                 temp_str.Format(_T("Receive reply :%u"),reply_count);
                                 char temp_char[250];
@@ -1695,8 +1697,10 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
                                 bFlag = FALSE;
                                 if (!bFlag)	//不判断 Ip是否重复，因为 Minipanel能挂载TSTAT的设备 会将底下的设备也回复过来;
                                 {
-                                    m_scan_info.at(scan_udp_item).scan_found ++;
+                                    
                                     pScanner->AddNCToList(buffer, nRet, h_scan_siBind);
+									m_scan_info.at(scan_udp_item).scan_found  = reply_count;
+
                                     //############################
                                     strScanInfo = _T("Find Network device...");
                                     pScanner->ShowNetScanInfo(strScanInfo);
@@ -1907,6 +1911,7 @@ int CTStatScanner::AddNCToList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 
 	if(!find_exsit)
 	{
+		reply_count ++;
 		m_refresh_net_device_data.push_back(temp);
 	}
 
@@ -2179,7 +2184,7 @@ void CTStatScanner::AddComDeviceToGrid()
 //	m_pParent->PostMessage(WM_ADDCOMSCAN);
 }
 
-
+extern HWND scan_wait_dlg;
 void CTStatScanner::SendScanEndMsg()
 {
     //m_pParent->PostMessage(WM_SCANFINISH, 0, 0);
@@ -2229,15 +2234,18 @@ void CTStatScanner::SendScanEndMsg()
         try
         {
 
-            CScanDlg dlg;
-            dlg.SetScanner(this);
-            Sleep(1000);
-            //dlg.AddComDeviceToGrid(m_szTsatScandRet);
-            dlg.DoModal();
-            if(IsWindow(dlg.m_hWnd))
-            {
-                WaitForSingleObject(dlg.m_hWnd, 200);  // 为了线程安全。
-            }
+			//::PostMessage(scan_wait_dlg,WM_SHOW_SCANN_RESULTS,NULL,NULL);
+			return;
+            //CScanDlg dlg;
+            //dlg.SetScanner(this);
+            Sleep(1000000);
+
+            
+//            dlg.DoModal();
+            //if(IsWindow(dlg.m_hWnd))
+            //{
+            //    WaitForSingleObject(dlg.m_hWnd, 200);  // 为了线程安全。
+            //}
 
         }
         catch (...)
@@ -3505,13 +3513,37 @@ void CTStatScanner::GetTstatInfoFromID(int nTstatID)
 void CTStatScanner::ScanSubnetFromEthernetDevice()//scan 
 {
 	m_tstat_net_device_data.clear();
-	
+	int controller_counter = 0;
 	for (int i=0;i<m_refresh_net_device_data.size();i++)
 	{
 		if((m_refresh_net_device_data.at(i).product_id != PM_MINIPANEL) && (m_refresh_net_device_data.at(i).product_id != PM_CM5))
 		{
 			continue;
 		}
+
+		controller_counter ++ ;
+	}
+
+	if(controller_counter > 0)
+	{
+		CString show_cstring;
+		show_cstring.Format(_T("Find %d T3 Panel(s) ,Do you want to scan the subnet?\r\n'RS485 Main' 9600\r\n'RS485 Main' 19200\r\n'RS485 Main' 384000\r\n'RS485 Main' 76800\r\n'RS485 Main' 115200\r\n'RS485 Sub' 9600\r\n'RS485 Sub' 19200\r\n"),controller_counter);
+		if(AfxMessageBox(show_cstring,MB_YESNO)==IDNO)
+		{
+			return;
+		}
+	}
+
+	for (int i=0;i<m_refresh_net_device_data.size();i++)
+	{
+		if((m_refresh_net_device_data.at(i).product_id != PM_MINIPANEL) && (m_refresh_net_device_data.at(i).product_id != PM_CM5))
+		{
+			continue;
+		}
+
+
+
+
 		 CString strIP;
 		 int net_port;
 		 strIP = m_refresh_net_device_data.at(i).ip_address;
@@ -4248,7 +4280,9 @@ void CTStatScanner::ScanAll()
 
     ScanRemoteIPDevice();
 
-    AfxBeginThread(_WaitScanThread, this);
+	hwait_scan_thread =CreateThread(NULL,NULL,_WaitScanThread,this,NULL, NULL);
+
+    //AfxBeginThread(_WaitScanThread, this);
 
 
 
@@ -4257,12 +4291,13 @@ void CTStatScanner::ScanAll()
 
 
 
-
-UINT _WaitScanThread(PVOID pParam)
+DWORD WINAPI  _WaitScanThread(LPVOID lpVoid)
+//UINT _WaitScanThread(PVOID pParam)
 {
     Sleep(1000);
     BOOL Flag = FALSE;
-    CTStatScanner* pScanner = (CTStatScanner*)(pParam);
+    //CTStatScanner* pScanner = (CTStatScanner*)(pParam);
+	 CTStatScanner* pScanner = (CTStatScanner*)(lpVoid);
     switch(pScanner->m_scantype)
     {
     case 1:
@@ -4349,6 +4384,7 @@ UINT _WaitScanThread(PVOID pParam)
 #endif
 
         pScanner->m_bNetScanFinish = TRUE; // at this time, two thread end, all scan end
+
         pScanner->SendScanEndMsg();
 
     }
@@ -4788,7 +4824,8 @@ BOOL CTStatScanner::IsNetDevice(const CString& strDevType)
 
 void CTStatScanner::WaitScan()
 {
-    AfxBeginThread(_WaitScanThread, this);
+    //AfxBeginThread(_WaitScanThread, this);
+	hwait_scan_thread =CreateThread(NULL,NULL,_WaitScanThread,this,NULL, NULL);
 }
 
 void CTStatScanner::writetxt()

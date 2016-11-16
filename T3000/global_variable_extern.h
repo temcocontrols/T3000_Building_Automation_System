@@ -1191,6 +1191,8 @@ extern CString CS3000_INPUT_RANGE[4];
 extern BOOL g_NEED_MULTI_READ;
 extern CString STRING_SWITCH_STATUS[3];
 
+extern vector <IspModeInfo> g_isp_device_info;
+extern IspModeInfo need_isp_device;
 extern vector<Registers_Infor> g_vectRegisters;
 extern CString g_cstring_ini_path;
 extern unsigned char product_sort_way;		//0 default   1 by connection      2 bu floor
@@ -1251,3 +1253,9 @@ extern refresh_net_device device_id_data_2;
 extern bool edit_confilct_mode ;
 
 extern bool scaning_mode ;
+
+extern		bool isp_mode_is_cancel ;
+extern bool isp_mode_firmware_auto;
+extern CString isp_mode_detect_firmware_path;
+
+extern HANDLE hwait_scan_thread;

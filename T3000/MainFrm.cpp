@@ -17,7 +17,7 @@
 #include "AddBuilding.h"
 #include "ScanSelectDlg.h"
 
-
+#include "ISPModeSlove.h"
 #include "AllNodesDiaolg.h"
 #include "GridLoad.h"
 #include "GridFlashDlg.h"
@@ -265,6 +265,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
     ON_NOTIFY_EX(TTN_NEEDTEXT,0,OnToolTipNotify)
     ON_MESSAGE(WM_REFRESH_TREEVIEW_MAP, RefreshTreeViewMap)
 	 ON_MESSAGE(WM_HADNLE_DUPLICATE_ID, HandleDuplicateID)
+	 ON_MESSAGE(WM_HADNLE_ISP_MODE_DEVICE, HandleIspModedivice)
     ON_MESSAGE(WM_SCAN_PRODUCT, Message_Scan_Product)
     ON_MESSAGE(MY_BAC_CONFIG_READ_RESULTS, ReadConfigFromDeviceMessageCallBack)
     ON_MESSAGE(MY_RESUME_DATA, AllWriteMessageCallBack)
@@ -595,7 +596,7 @@ CMainFrame::CMainFrame()
     m_bSafeToClose = TRUE;
     m_pDialogInfo = NULL;
 
-
+	isp_mode_is_cancel = true;
 }
 
 
@@ -4516,7 +4517,11 @@ void CMainFrame::OnScanDevice()
     m_nStyle=3;
     Invalidate();
     Scan_Product();
-
+	if (m_pScanner != NULL)
+	{
+		delete m_pScanner;
+		m_pScanner = NULL;
+	}
 }
 
 void CMainFrame::OnTimer(UINT_PTR nIDEvent)
@@ -4587,7 +4592,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 
     if((SAVE_PRODYCT_STATUS == nIDEvent) && (scaning_mode == false))
     {
-
+#if 0
 
 		CppSQLite3DB SqliteDBBuilding;
 		SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
@@ -4613,6 +4618,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
       SqliteDBBuilding.closedb();
         //if(m_pCon->State)
         //	m_pCon->Close();
+#endif
 
     }
 
@@ -4913,6 +4919,7 @@ void CMainFrame::OnAllNodeDatabase()
     g_bPauseRefreshTree = temp_status;
     b_pause_refresh_tree = temp_status;
 }
+#include "ScanDlg.h"
 void CMainFrame::Scan_Product()
 {
     /*
@@ -5008,6 +5015,10 @@ void CMainFrame::Scan_Product()
     m_pScanner->m_scantype = 3;
     m_pWaitScanDlg->DoModal();
 
+	CScanDlg dlg;
+	dlg.SetScanner(m_pScanner);
+	dlg.DoModal();
+
     m_bScanALL = TRUE;
 	refresh_tree_status_immediately = true; //立即刷新 树形结构;
 //	close_com();
@@ -5015,6 +5026,7 @@ void CMainFrame::Scan_Product()
     delete m_pWaitScanDlg;
     m_pWaitScanDlg = NULL;
 	scaning_mode = false;
+	PostMessage(WM_MYMSG_REFRESHBUILDING,0,0);
 //*/
 }
 
@@ -6582,11 +6594,13 @@ void CMainFrame::OnDestroy()
 {
 
     OnDisconnect();
+	g_mstp_flag=FALSE;
 
+#if 0
 	CppSQLite3DB SqliteDBBuilding;
 	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
-#if 1
-    g_mstp_flag=FALSE;
+
+
     for(int i=0; i<m_product.size(); i++) //用于更新 产品的状态，以便下次打开的时候直接显示上次关闭的时候的状态;
     {
         CString serial_number_temp;
@@ -6605,8 +6619,8 @@ void CMainFrame::OnDestroy()
 
     }
     SqliteDBBuilding.closedb();
-
-
+#endif
+#if 1
     //close_T3000_log_file();
     m_Input_data.clear();
     m_Variable_data.clear();
@@ -8769,19 +8783,18 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             {
                 SwitchToPruductType(DLG_CO2_NET_VIEW);
             }
-			else if ((product_register_value[7]==PM_CO2_RS485&&product_register_value[14] == 6)||nFlag==PM_AirQuality||nFlag==PM_HUM_R||product_register_value[7]==PM_HUMTEMPSENSOR||product_register_value[7]==STM32_HUM_NET||product_register_value[7]==STM32_HUM_RS485)
+	else if ((product_register_value[7]==PM_CO2_RS485&&product_register_value[14] == 6)||nFlag==PM_AirQuality||nFlag==PM_HUM_R||product_register_value[7]==PM_HUMTEMPSENSOR||product_register_value[7]==STM32_HUM_NET||product_register_value[7]==STM32_HUM_RS485)
 				//else if (nFlag==PM_AirQuality||nFlag==PM_HUM_R||nFlag==PM_HUMTEMPSENSOR)
 			{ 
 				SwitchToPruductType(DLG_AIRQUALITY_VIEW);
 			}
-
             else if (nFlag==PM_PRESSURE)
             {
                 SwitchToPruductType(DLG_DIALOG_PRESSURE_SENSOR);
             }
 
-		
-			else if (nFlag==PM_TSTAT6||nFlag==PM_TSTAT7||nFlag==PM_TSTAT5i||nFlag==PM_TSTAT8)
+		 
+            else if (nFlag==PM_TSTAT6||nFlag==PM_TSTAT7||nFlag==PM_TSTAT5i||nFlag==PM_TSTAT8)
             {
                 CString g_configfile_path =g_strExePth + g_strStartInterface_config;
                 int m_lastinterface=GetPrivateProfileInt(_T("T3000_START"),_T("Interface"),19,g_configfile_path);
@@ -9426,6 +9439,105 @@ end_condition :
     return TRUE;
 }
 
+
+LRESULT  CMainFrame::HandleIspModedivice(WPARAM wParam, LPARAM lParam)
+{
+	CString ApplicationFolder;
+	GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+	PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
+	ApplicationFolder.ReleaseBuffer();
+	CString temp_AutoFlashConfigPath = ApplicationFolder + _T("//AutoFlashFile.ini");
+	CFileFind fFind;
+	if(fFind.FindFile(temp_AutoFlashConfigPath))
+	{
+		DeleteFile(temp_AutoFlashConfigPath);
+	}
+
+	int temp_product_count = m_product.size();
+
+
+
+	b_pause_refresh_tree = true;
+	bool temp_status = g_bPauseMultiRead;
+	g_bPauseMultiRead = true;
+	int temp_type = GetCommunicationType();
+
+
+	BOOL bDontLinger = FALSE;
+	setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
+	closesocket(h_Broad);
+
+	CString temp_ipaddress;
+	temp_ipaddress.Format(_T("%u.%u.%u.%u"),need_isp_device.ipaddress[0],need_isp_device.ipaddress[1],need_isp_device.ipaddress[2],need_isp_device.ipaddress[3]);
+
+		m_product_isp_auto_flash.baudrate = 0;
+		m_product_isp_auto_flash.BuildingInfo.strIp = temp_ipaddress;
+		m_product_isp_auto_flash.ncomport =  502;
+
+		m_product_isp_auto_flash.product_class_id =  need_isp_device.product_id;
+		m_product_isp_auto_flash.product_id =  255;
+		m_product_isp_auto_flash.note_parent_serial_number = 0;
+		m_product_isp_auto_flash.software_version = 0;
+
+
+		isp_mode_is_cancel = true;
+		isp_mode_firmware_auto = true;
+
+		CISPModeSlove dlg;
+		dlg.DoModal();
+			Dowmloadfile Dlg;
+		if(isp_mode_is_cancel)
+		{
+			goto finished_detect;
+		}
+
+	//	isp_product_id = m_product.at(selected_product_index).product_class_id;
+	//	if (!((product_Node.BuildingInfo.strIp.CompareNoCase(_T("9600")) ==0)||(product_Node.BuildingInfo.strIp.CompareNoCase(_T("19200"))==0) ||(product_Node.BuildingInfo.strIp.CompareNoCase(_T(""))) == 0))
+	SetCommunicationType(0);//关闭串口，供ISP 使用;
+	close_com();
+
+	Dlg.DoModal();
+
+
+finished_detect:
+
+	if(temp_type == 0)
+	{
+		int comport = GetLastOpenedComport();
+		open_com(comport);
+	}
+	else
+	{
+
+	}
+	SetCommunicationType(temp_type);
+
+	//Fance Add. 在ISP 用完1234 4321 的端口之后，T3000 在重新打开使用，刷新listview 的网络设备要使用;
+	h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+	BOOL bBroadcast=TRUE;
+	::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
+	int iMode=1;
+	ioctlsocket(h_Broad,FIONBIO, (u_long FAR*) &iMode);
+
+	//SOCKADDR_IN bcast;
+	h_bcast.sin_family=AF_INET;
+	//bcast.sin_addr.s_addr=nBroadCastIP;
+	h_bcast.sin_addr.s_addr=INADDR_BROADCAST;
+	h_bcast.sin_port=htons(UDP_BROADCAST_PORT);
+
+	//SOCKADDR_IN siBind;
+	h_siBind.sin_family=AF_INET;
+	h_siBind.sin_addr.s_addr=INADDR_ANY;
+	h_siBind.sin_port=htons(RECV_RESPONSE_PORT);
+	::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
+	b_pause_refresh_tree = false;
+	g_bPauseMultiRead = temp_status;
+
+	isp_mode_is_cancel = true;
+	isp_mode_firmware_auto = true;
+	return TRUE;
+}
+
 LRESULT  CMainFrame::HandleDuplicateID(WPARAM wParam, LPARAM lParam)
 {
 	static int  bool_show_duplicated_window_lim = 0;
@@ -9552,8 +9664,12 @@ UINT _FreshTreeView(LPVOID pParam )
 				}
 				if((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
 				{
-					g_Print.Format(_T("Send scan command after %d(s)"),30 - x);
-					DFTrace(g_Print);
+					if(x%3 == 0)
+					{
+						g_Print.Format(_T("Send scan command after %d(s)"),30 - x);
+						DFTrace(g_Print);
+					}
+
 				}
 
 				Sleep(1000);
@@ -11174,6 +11290,7 @@ void CMainFrame::OnControlMain()
 
 void CMainFrame::OnControlInputs()
 {
+
     // TODO: Add your command handler code here
 	//UCHAR m_point_type;
 	//UCHAR m_main_panel;
@@ -11749,7 +11866,6 @@ void CMainFrame::OnControlSettings()
 	             ||product_register_value[7]==STM32_HUM_NET )
 	{
 		bacnet_view_number = TYPE_TSTAT;
-		                   
 		SwitchToPruductType(DLG_DIALOG_DEFAULT_T3000_VIEW);
 	}
     else

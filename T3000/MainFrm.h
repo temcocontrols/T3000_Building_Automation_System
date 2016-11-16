@@ -376,6 +376,7 @@ public:
 	//void EnableRefreshTreeView(BOOL bEnable);
 	void DoFreshAll();
 	//void RefreshTreeView();
+	LRESULT  CMainFrame::HandleIspModedivice(WPARAM wParam, LPARAM lParam);
 	LRESULT  CMainFrame::HandleDuplicateID(WPARAM wParam, LPARAM lParam);
 	LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam);
 	LRESULT  CMainFrame::Message_Scan_Product(WPARAM wParam,LPARAM lParam);

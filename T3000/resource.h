@@ -278,6 +278,7 @@
 #define IDD_DIALOG_PTP_LOGIN            637
 #define IDD_DIALOG_DUPLICATE_ID         638
 #define IDR_MONITOR_DB1                 640
+#define IDD_DIALOG_ISP_MODE_SOLVE       641
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -2108,8 +2109,22 @@
 #define IDC_BUTTON_DUPLICATE_DONE       2251
 #define IDC_BUTTON_DUPLICATE_CANCEL     2252
 #define IDC_STATIC_DUPLICATE_INFO       2253
-#define IDC_RADIO_TRANDUCER             2254
-#define IDC_RADIO_pid                   2255
+#define IDC_STATIC_ISP_TITLE            2254
+#define IDC_STATIC_DEVICE_MODULE        2255
+#define IDC_STATIC_ISP_FIRMWARE         2256
+#define IDC_STATIC_ISP_FIRMWARE_PATH    2257
+#define IDC_BUTTON_ISP_CANCEL           2259
+#define IDC_STATIC_EDIT_DEVICE_IP       2260
+#define IDC_STATIC_EDIT_PRODUCT_NAME    2261
+#define IDC_STATIC_DEVICE_IP            2262
+#define IDC_BUTTON_ISP_CHOOSE_FIRMWARE  2263
+#define IDC_RADIO_FROM_SERVER           2265
+#define IDC_RADIO_FROM_HARDISK          2266
+#define IDC_STATIC_ABOUT_INFO           2266
+
+#define IDC_RADIO_TRANDUCER             2267
+#define IDC_RADIO_pid                   2268
+
 #define IDC_HELP_HELP1                  3831
 #define IDC_CHECK_SETTING_ZONE_DAYLIGHT_TIME 3832
 #define IDC_BUTTON_SYNC_TIME            5716
@@ -2604,9 +2619,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        641
+#define _APS_NEXT_RESOURCE_VALUE        642
 #define _APS_NEXT_COMMAND_VALUE         34058
-#define _APS_NEXT_CONTROL_VALUE         2256
+#define _APS_NEXT_CONTROL_VALUE         2267
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

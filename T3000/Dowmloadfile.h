@@ -41,6 +41,7 @@ public:
 	void Start_Download();
 	unsigned char m_download_product_type;
 	afx_msg void OnBnClickedButtonUpdateT3000();
+	void AutoFlashFirmware();
 };
 
 

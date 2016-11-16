@@ -669,6 +669,9 @@
     <ClCompile Include="DuplicateIdDetected.cpp">
       <Filter>Bacnet</Filter>
     </ClCompile>
+    <ClCompile Include="ISPModeSlove.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -1671,6 +1674,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DuplicateIdDetected.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ISPModeSlove.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

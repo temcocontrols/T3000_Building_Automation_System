@@ -226,6 +226,7 @@
     <ClCompile Include="Flash_Multy.cpp" />
     <ClCompile Include="GraphicMode.cpp" />
     <ClCompile Include="IONameConfig.cpp" />
+    <ClCompile Include="ISPModeSlove.cpp" />
     <ClCompile Include="LanguageLocale.cpp" />
     <ClCompile Include="LCOutNameConfig.cpp" />
     <ClCompile Include="LightingController\configure.cpp" />
@@ -549,6 +550,7 @@
     <ClInclude Include="global_struct.h" />
     <ClInclude Include="GraphicMode.h" />
     <ClInclude Include="IONameConfig.h" />
+    <ClInclude Include="ISPModeSlove.h" />
     <ClInclude Include="LanguageLocale.h" />
     <ClInclude Include="LCOutNameConfig.h" />
     <ClInclude Include="NewHumChamberView.h" />

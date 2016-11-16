@@ -190,6 +190,7 @@ const int DOWNLOAD_MD5_CHECK_PASS = 21;
 #define  MY_FRESH_DRAW_GRAPHIC      WM_USER + 2003
 #define  MY_FRESH_TESTO_GRAPHIC      WM_USER + 2004
 #define  WM_HADNLE_DUPLICATE_ID  WM_USER + 2005
+#define  WM_HADNLE_ISP_MODE_DEVICE  WM_USER + 2006
 #define  WM_LIST_MONITOR_CHANGED WM_USER+ 976
 #define  WM_LIST_MONITOR_INPUT_CHANGED WM_USER+ 977
 #define WM_SCREENEDIT_CLOSE WM_USER + 1232
@@ -1703,6 +1704,12 @@ enum PTP_COMMAND_TYPE{
 	COMMAND_PASSWORD_ERROR					= 0x68
 };
 
+typedef struct IspModeInfo
+{
+	unsigned char ipaddress[4];
+	unsigned char product_id;
+	unsigned int first_time;
+};
 
 #define  CONTROLLER_DUPLICATE_ID         5100
 

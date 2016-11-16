@@ -5395,6 +5395,48 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	if(temp_data.reg.isp_mode != 0)
 	{
 		//记录这个的信息,如果短时间多次出现 就判定在bootload下面，只是偶尔出现一次表示只是恰好开机收到的.
+		IspModeInfo temp_info;
+		temp_info.ipaddress[0] = temp_data.reg.ip_address_1;
+		temp_info.ipaddress[1] = temp_data.reg.ip_address_2;
+		temp_info.ipaddress[2] = temp_data.reg.ip_address_3;
+		temp_info.ipaddress[3] = temp_data.reg.ip_address_4;
+		temp_info.product_id = temp_data.reg.product_id;
+		CTime temp_time_now = CTime::GetCurrentTime();
+		temp_info.first_time = temp_time_now.GetTime();
+	
+		bool find_ip_pid_match = false;
+		int temp_index = 0;
+		for (int x=0;x<g_isp_device_info.size();x++)
+		{
+			int ip_cmp_ret =	memcmp(g_isp_device_info.at(x).ipaddress,temp_info.ipaddress,4); 
+			if((temp_info.product_id == g_isp_device_info.at(x).product_id ) &&
+				(ip_cmp_ret == 0))
+			{
+				find_ip_pid_match = true;
+				temp_index = x;
+			}
+		}
+
+		if(find_ip_pid_match)
+		{
+			if(( temp_info.first_time >  g_isp_device_info.at(temp_index).first_time  + 30 ) && 
+				(temp_info.first_time <  g_isp_device_info.at(temp_index).first_time  + 120))
+			{
+				g_isp_device_info.at(temp_index).first_time = temp_info.first_time;
+				need_isp_device = g_isp_device_info.at(temp_index);
+				::PostMessageW(MainFram_hwd,WM_HADNLE_ISP_MODE_DEVICE,NULL,NULL);
+			}
+			else
+			{
+				g_isp_device_info.at(temp_index).first_time = temp_info.first_time;
+			}
+		}
+		else
+		{
+			g_isp_device_info.push_back(temp_info);
+		}
+
+
 		return	 0;
 	}
 
