@@ -2227,7 +2227,11 @@ void CTStatScanner::SendScanEndMsg()
         {
             //AfxMessageBox(_T("Can't find any device. Please check configure and connection, then try again."));//scan,在有些机子上，总提示这个，但来会继续进行扫描
 
-            m_pParent->PostMessage(WM_ADDTREENODE);
+           // m_pParent->PostMessage(WM_ADDTREENODE);
+			SetCommunicationType(1);
+			close_com();
+			SetCommunicationType(0);
+			close_com();
             return ;
         }
 

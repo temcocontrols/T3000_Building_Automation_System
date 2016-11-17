@@ -1709,7 +1709,7 @@ typedef struct IspModeInfo
 	unsigned char ipaddress[4];
 	unsigned char product_id;
 	unsigned int first_time;
-};
+}_IspModeInfo;
 
 #define  CONTROLLER_DUPLICATE_ID         5100
 

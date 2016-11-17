@@ -41,8 +41,8 @@ END_MESSAGE_MAP()
 CT3000App::CT3000App()
 {
 	m_bHiColorIcons = TRUE;
-	CurrentT3000Version=_T("    2016.11.16 ");
-	T3000_Version = 11116;
+	CurrentT3000Version=_T("    2016.11.17 ");
+	T3000_Version = 11117;
 
 
 	m_lastinterface=19;

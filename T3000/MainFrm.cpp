@@ -5026,6 +5026,7 @@ void CMainFrame::Scan_Product()
     delete m_pWaitScanDlg;
     m_pWaitScanDlg = NULL;
 	scaning_mode = false;
+	b_pause_refresh_tree = false;
 	PostMessage(WM_MYMSG_REFRESHBUILDING,0,0);
 //*/
 }
