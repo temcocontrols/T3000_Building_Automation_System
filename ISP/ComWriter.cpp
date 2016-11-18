@@ -101,7 +101,7 @@ int CComWriter::BeginWirteByCom()
             strTemp.Format(_T("COM%d"), m_nComPort);
             CString strTips = _T("|Open ") +  strTemp + _T(" successful.");
             OutPutsStatusInfo(strTips, FALSE);
-            // AddStringToOutPuts(strTips);
+          Change_BaudRate(m_nBautrate);
 
         }
 
@@ -2173,12 +2173,12 @@ BOOL CComWriter::UpdataDeviceInformation_ex(unsigned short device_productID)
 	Temco_logo.ReleaseBuffer();
 	Temco_logo.MakeUpper();
 
-	if (Temco_logo.Find(L"CO2")!=-1)
-	{
-		Temco_logo.TrimRight();
-		Temco_logo.TrimLeft();
-		hexproductname = Temco_logo;
-	}
+	//if (Temco_logo.Find(L"CO2")!=-1)
+	//{
+	//	Temco_logo.TrimRight();
+	//	Temco_logo.TrimLeft();
+	//	hexproductname = Temco_logo;
+	//}
 
     //   if (hexproductname.CompareNoCase(_T("CO3"))==0)
     //   {
@@ -2279,10 +2279,10 @@ BOOL CComWriter::UpdataDeviceInformation(int& ID)
 	Temco_logo.ReleaseBuffer();
 	Temco_logo.MakeUpper();
 
-	if (Temco_logo.Find(L"CO2")!=-1)
-	{
-		hexproductname = Temco_logo;
-	}
+// 	if (Temco_logo.Find(L"CO2")!=-1)
+// 	{
+// 		hexproductname = Temco_logo;
+// 	}
 
     prodcutname.MakeLower();
 

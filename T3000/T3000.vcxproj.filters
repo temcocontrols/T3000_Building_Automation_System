@@ -672,6 +672,12 @@
     <ClCompile Include="ISPModeSlove.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="HexFileParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BinFileParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -1677,6 +1683,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ISPModeSlove.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HexFileParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BinFileParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

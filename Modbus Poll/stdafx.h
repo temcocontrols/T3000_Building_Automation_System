@@ -47,7 +47,6 @@ using namespace std;  // Ensure that the namespace is set to std
 
 #define WM_TRAFFIC_DATA_WINDOW  WM_USER + 111
 
-#import "C:\Program Files\Common Files\System\ado\msado15.dll" no_namespace rename("EOF","EndOfFile") rename("BOF","FirstOfFile")
 // 除要将 bMultiInstance 参数的 TRUE 
 // 传递给 COleObjectFactory 构造函数之外，此宏与 IMPLEMENT_OLECREATE 相同。
 // 对于自动化控制器所请求的每一个自动化代理对象,

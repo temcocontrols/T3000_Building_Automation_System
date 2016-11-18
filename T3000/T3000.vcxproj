@@ -166,6 +166,7 @@
     <ClCompile Include="BacnetWait.cpp" />
     <ClCompile Include="BacnetWeeklyRoutine.cpp" />
     <ClCompile Include="BatchSNDlg.cpp" />
+    <ClCompile Include="BinFileParser.cpp" />
     <ClCompile Include="BoatMonitorViewer.cpp" />
     <ClCompile Include="BootFinderDlg.cpp" />
     <ClCompile Include="BuildingConfigEditDlg.cpp" />
@@ -225,6 +226,7 @@
     <ClCompile Include="fileRW.cpp" />
     <ClCompile Include="Flash_Multy.cpp" />
     <ClCompile Include="GraphicMode.cpp" />
+    <ClCompile Include="HexFileParser.cpp" />
     <ClCompile Include="IONameConfig.cpp" />
     <ClCompile Include="ISPModeSlove.cpp" />
     <ClCompile Include="LanguageLocale.cpp" />
@@ -480,6 +482,7 @@
     <ClInclude Include="BacnetWait.h" />
     <ClInclude Include="Bacnet_Include.h" />
     <ClInclude Include="BatchSNDlg.h" />
+    <ClInclude Include="BinFileParser.h" />
     <ClInclude Include="BoatMonitorViewer.h" />
     <ClInclude Include="BootFinderDlg.h" />
     <ClInclude Include="BuildingConfigEditDlg.h" />
@@ -549,6 +552,7 @@
     <ClInclude Include="gloab_define.h" />
     <ClInclude Include="global_struct.h" />
     <ClInclude Include="GraphicMode.h" />
+    <ClInclude Include="HexFileParser.h" />
     <ClInclude Include="IONameConfig.h" />
     <ClInclude Include="ISPModeSlove.h" />
     <ClInclude Include="LanguageLocale.h" />

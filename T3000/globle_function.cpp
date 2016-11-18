@@ -10694,14 +10694,8 @@ int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
         while(ReadLineFromHexFile(hexfile, readbuffer))
         {
             nLineNum++;						//the line number that the wrong hex file;
-            CString bufferlen;
-            CString bufferaddress;
-            bufferlen.Format(_T("%c%c"),readbuffer[1],readbuffer[2]);
-            bufferaddress.Format(_T("%c%c%c%c"),readbuffer[3],readbuffer[4],readbuffer[5],readbuffer[6]);
-            if (bufferaddress.CompareNoCase(_T("0100"))!=0)
-            {
-                continue;
-            }
+           
+          
             unsigned char get_hex[128]= {0};
             //get hex data,it is get from the line char
             //the number is (i-1)
@@ -10721,114 +10715,6 @@ int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
             turn_int_to_unsigned_char(readbuffer,nLen,get_hex);//turn to hex
             if(get_hex[3]==1)	//for to seektobegin() function,because to end of the file
                 break;
-// 				if(!DoHEXCRC( get_hex, nLen/2))
-// 				{
-// 					return BAD_HEX_FILE;
-// 				}
-            char TempChar[32];
-            for (int i=0; i<31; i++)
-            {
-                TempChar[i]=get_hex[i+4];
-            }
-            TempChar[31]='\0';
-
-
-            CString Product_String;
-            MultiByteToWideChar( CP_ACP, 0, (char *)TempChar,
-                                 (int)strlen(TempChar)+1,
-                                 Product_String.GetBuffer(MAX_PATH), MAX_PATH );
-            Product_String.ReleaseBuffer();
-            Product_String.MakeUpper();
-
-
-
-            if(Product_String.Find(_T("CO2")) !=-1)
-            {
-                ret_bin_Info.company[0]='T';
-                ret_bin_Info.company[1]='E';
-                ret_bin_Info.company[2]='M';
-                ret_bin_Info.company[3]='C';
-                ret_bin_Info.company[4]='O';
-                ret_bin_Info.product_name[0]='C';
-                ret_bin_Info.product_name[1]='O';
-                ret_bin_Info.product_name[2]='2';
-                ret_bin_Info.product_name[3]=0;
-                ret_bin_Info.product_name[4]=0;
-                ret_bin_Info.product_name[5]=0;
-                ret_bin_Info.product_name[6]=0;
-                ret_bin_Info.product_name[7]=0;
-                ret_bin_Info.product_name[8]=0;
-                ret_bin_Info.product_name[9]=0;
-
-                ret_bin_Info.software_high=TempChar[5];
-                ret_bin_Info.software_low=TempChar[4];
-
-                return READ_SUCCESS;
-            }
-
-
-
-            int temp;
-            char temp_buf[64];
-            memset(temp_buf,0,64);
-
-            if (bufferlen.CompareNoCase(_T("20"))==0)
-            {
-                for (int i=0; i<64; i++)
-                {
-                    temp_buf[i]=readbuffer[i+8];
-                }
-            }
-
-            if (bufferlen.CompareNoCase(_T("10"))==0)
-            {
-                for (int i=0; i<32; i++)
-                {
-                    temp_buf[i]=readbuffer[i+8];
-                }
-                hexfile.Seek(0, CFile::begin);
-                while(ReadLineFromHexFile(hexfile, readbuffer))
-                {
-                    bufferlen.Format(_T("%c%c"),readbuffer[1],readbuffer[2]);
-                    bufferaddress.Format(_T("%c%c%c%c"),readbuffer[3],readbuffer[4],readbuffer[5],readbuffer[6]);
-                    if (bufferaddress.CompareNoCase(_T("0110"))!=0)
-                    {
-                        continue;
-                    }
-                    for(UINT i=0; i<strlen(readbuffer); i++) // 去掉冒号
-                    {
-                        readbuffer[i]=readbuffer[i+1];
-                    }
-                    int nLen = strlen(readbuffer)-2; // 不算回车换行的长度
-                    if(strlen(readbuffer)%2==0)
-                        turn_hex_file_line_to_unsigned_char(readbuffer);//turn every char to int
-                    else
-                    {
-                        return BAD_HEX_FILE;
-                    }
-                    turn_int_to_unsigned_char(readbuffer,nLen,get_hex);//turn to hex
-
-                    int bufferlength=_wtoi(bufferlen);
-
-                    int i=32;
-                    for (int j=0; j<2*bufferlength; j++)
-                    {
-                        temp_buf[i]=readbuffer[j+8];
-                        i++;
-                    }
-
-                }
-
-            }
-
-
-            for (int i=0; i<20; i++)
-            {
-                temp=temp_buf[2*i]*16+temp_buf[2*i+1];
-                m_DeviceInfor[i]=temp;
-            }
-            memcpy_s(&ret_bin_Info,20,m_DeviceInfor,20);
-
             if(strlen(ret_bin_Info.product_name) > 200)
                 return NO_VERSION_INFO;
 

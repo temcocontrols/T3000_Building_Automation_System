@@ -42,12 +42,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>..\T3000 Output\debug\</OutDir>
-    <IntDir>..\T3000 Output\T3000 object\debug\</IntDir>
+    <IntDir>..\T3000 Output\Update object\debug\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>..\T3000 Output\release\</OutDir>
-    <IntDir>..\T3000 Output\T3000 object\release\</IntDir>
+    <IntDir>..\T3000 Output\Update object\release\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

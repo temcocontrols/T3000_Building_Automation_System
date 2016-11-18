@@ -1,5 +1,5 @@
 #pragma once
-
+#include "global_struct.h"
 enum HEXFILE_FORMAT
 {
 	HEXFILE_DATA = 0,
@@ -27,6 +27,7 @@ public:
 	// 获得扩展hex 文件的段长度集合。
 	int	GetExtendHexFileSectionFlag(vector<int>& szFlags);
 	void Get_DeviceInfor(UINT &ProductModel,float &SoftwareVersion,CString &ProductName,CString &ChipName,UINT &Chipsize);
+	Bin_Info        global_fileInfor;
 protected:
 	// 获得hex文件的类型
 	HEXFILE_FORMAT	GetHexFileType(CFile& hexFile);
@@ -44,7 +45,7 @@ protected:
 	// 扩展线性模式的
 	int ReadExtLinearHexFile(CFile& hexFile, char* pBuf, int nBufLen);	
     
-
+	
 private:
 
 	CString				m_strFileName;

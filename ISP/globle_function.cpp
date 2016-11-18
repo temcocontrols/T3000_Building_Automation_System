@@ -495,7 +495,7 @@ CString GetProductName(int ModelID)
 		strProductName="PSRS485";
 		break;
 	case STM32_CO2_NODE:
-		strProductName="CO2NODE";
+		strProductName="CO2 NODE";
 		break;
 
 	default:
