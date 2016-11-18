@@ -64,8 +64,8 @@ public:
 	 
 	afx_msg void OnCbnSelchangeComboDisplay();
 	afx_msg void OnCbnSelchangeComboBacklight();
-
- 
+	afx_msg void OnBnClickedButton_Tranducer();
+    afx_msg void OnBnClickedButton_PID();
 	 void ShowChecks();
 	afx_msg void OnBnClickedUser();
 	afx_msg void OnBnClickedDefault();

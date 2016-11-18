@@ -65,6 +65,7 @@ BEGIN_MESSAGE_MAP(CScanDlg, CDialog)
 	ON_MESSAGE(WM_ADDCOMSCAN, 	OnAddComScanRet)
 	ON_MESSAGE(WM_ADDNETSCAN, 	OnAddNetScanRet)
 
+	
 	ON_WM_CLOSE()
 	ON_EN_KILLFOCUS(IDC_EDIT_GRIDEDIT, &CScanDlg::OnEnKillfocusEditGridedit)
 
@@ -232,7 +233,8 @@ BOOL CScanDlg::OnInitDialog()
 	if (m_IsScan)
 	{
 		AddComDeviceToGrid(m_pScanner->m_szTstatScandRet);
-		AddNetDeviceToGrid(m_pScanner->m_szNCScanRet);
+		//AddNetDeviceToGrid(m_pScanner->m_szNCScanRet);
+		AddNetDeviceToGrid();
 	}
 	else
 	{
@@ -1120,6 +1122,149 @@ void CScanDlg::FLEX_GRID_PUT_COLOR_STR(int row,int col,CString str)
 	m_flexGrid.put_Col(col);
 	m_flexGrid.put_CellBackColor(ref);
 }
+
+void CScanDlg::AddNetDeviceToGrid()
+{
+	//EnterCriticalSection(&m_csGrid);
+	int nRSize = m_flexGrid.get_Rows();
+	int nSize = m_refresh_net_device_data.size();// szList.size();
+
+	m_flexGrid.put_Rows(nSize + nRSize);
+
+	for (UINT i = 0; i < m_refresh_net_device_data.size(); i++)
+	{
+		CString strType = m_refresh_net_device_data.at(i).show_label_name;		
+		FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_TYPE,strType); 
+
+		CString strbuilding = _T("Default_Building");		
+		FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_BUILDING,strbuilding); 
+
+		CString strfloor = _T("Floor1");		
+		FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_FLOOR,strfloor); 
+
+		CString strroom = _T("Room1");		
+		FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_ROOM,strroom); 
+
+
+		CString strsubnet = _T("Sub_net1");		
+		FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_SUBNET,strsubnet); 
+
+		CString strserialnum;
+		strserialnum.Format(_T("%u"),m_refresh_net_device_data.at(i).nSerial);
+		FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_SERIALID,strserialnum); 
+
+		CString strip = m_refresh_net_device_data.at(i).ip_address;
+		FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_ADDRESS,strip); 
+		
+		CString strport;
+		strport.Format(_T("%u"),m_refresh_net_device_data.at(i).nport);
+		FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_COMPORT,strport); 
+
+		CString strprotocol;
+		strprotocol = _T("TCP/IP");
+		FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_PROTOCOL,strprotocol); 
+	}
+#if 0
+		_NetDeviceInfo* pNetInfo = szList[i];
+		DWORD dwIP =pNetInfo->m_pNet->GetIPAddr();	
+		in_addr ad;
+		ad.S_un.S_addr = dwIP;
+		CString strAddr(inet_ntoa(ad));
+		BOOL thesamesubnet=CheckTheSameSubnet(strAddr);
+		if (!thesamesubnet)
+		{   
+			CString anewip;
+			if (GetNewIP(anewip))
+			{
+				FLEX_GRID_PUT_COLOR_STR(i+nRSize,NEW_IPADRESS,anewip); 
+			}
+			FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_ADDRESS,strAddr); 
+			CString strType = pNetInfo->m_pNet->GetProductName();		
+			FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_TYPE,strType); 
+
+			CString strBuilding = pNetInfo->m_pNet->GetBuildingName();		
+			FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_BUILDING,strBuilding); 
+
+			CString strFloor = pNetInfo->m_pNet->GetFloorName();
+			FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_FLOOR,strFloor); 
+
+			CString strRoom = pNetInfo->m_pNet->GetRoomName();
+			FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_ROOM,strRoom); 
+
+			CString strSubnet = pNetInfo->m_pNet->GetSubnetName();
+			FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_SUBNET,strSubnet); 
+
+			CString strSerailID;
+			int nSID = pNetInfo->m_pNet->GetSerialID();
+			strSerailID.Format(_T("%d"), nSID);
+			FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_SERIALID,strSerailID); 
+			/////
+
+			/////
+			CString strPort;
+			int nPort = pNetInfo->m_pNet->GetIPPort();
+			strPort.Format(_T("%d"), nPort);
+			FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_COMPORT,strPort); 
+			////
+			CString strProtocol;		
+			if(pNetInfo->m_pNet->GetProtocol() == 3)
+			{
+				strProtocol.Format(_T("BacnetIP"));
+			}
+			else
+				strProtocol.Format(_T("TCP/IP"));
+			FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_PROTOCOL,strProtocol); 
+			return;
+		} 
+
+		m_flexGrid.put_TextMatrix(i+nRSize,SCAN_TABLE_ADDRESS,strAddr); 
+		CString strType = pNetInfo->m_pNet->GetProductName();		
+		m_flexGrid.put_TextMatrix(i+nRSize,SCAN_TABLE_TYPE,strType); 
+
+		CString strBuilding = pNetInfo->m_pNet->GetBuildingName();		
+		m_flexGrid.put_TextMatrix(i+nRSize,SCAN_TABLE_BUILDING,strBuilding); 
+
+		CString strFloor = pNetInfo->m_pNet->GetFloorName();
+		m_flexGrid.put_TextMatrix(i+nRSize,SCAN_TABLE_FLOOR,strFloor); 
+
+		CString strRoom = pNetInfo->m_pNet->GetRoomName();
+		m_flexGrid.put_TextMatrix(i+nRSize,SCAN_TABLE_ROOM,strRoom); 
+
+		CString strSubnet = pNetInfo->m_pNet->GetSubnetName();
+		m_flexGrid.put_TextMatrix(i+nRSize,SCAN_TABLE_SUBNET,strSubnet); 
+
+		CString strSerailID;
+		int nSID = pNetInfo->m_pNet->GetSerialID();
+		strSerailID.Format(_T("%d"), nSID);
+		m_flexGrid.put_TextMatrix(i+nRSize,SCAN_TABLE_SERIALID,strSerailID); 
+		/////
+		dwIP =pNetInfo->m_pNet->GetIPAddr();				
+
+		ad.S_un.S_addr = dwIP;
+		CString Addr(inet_ntoa(ad));
+		m_flexGrid.put_TextMatrix(i+nRSize,SCAN_TABLE_ADDRESS,Addr); 
+		/////
+		CString strPort;
+		int nPort = pNetInfo->m_pNet->GetIPPort();
+		strPort.Format(_T("%d"), nPort);
+		m_flexGrid.put_TextMatrix(i+nRSize,SCAN_TABLE_COMPORT,strPort); 
+		////
+		CString strProtocol;		
+		if(pNetInfo->m_pNet->GetProtocol() == 3)
+		{
+			strProtocol.Format(_T("BacnetIP"));
+		}
+		else
+			strProtocol.Format(_T("TCP/IP"));
+		m_flexGrid.put_TextMatrix(i+nRSize,SCAN_TABLE_PROTOCOL,strProtocol); 
+		////
+		// CString strConflict;
+	}
+#endif
+	//LeaveCriticalSection(&m_csGrid);
+}
+
+#if 0
 void CScanDlg::AddNetDeviceToGrid(vector<_NetDeviceInfo*>& szList)
 {
 	//EnterCriticalSection(&m_csGrid);
@@ -1228,6 +1373,7 @@ void CScanDlg::AddNetDeviceToGrid(vector<_NetDeviceInfo*>& szList)
 
 	//LeaveCriticalSection(&m_csGrid);
 }
+#endif
 void CScanDlg::ChangeIPAddress(CString newip,CString oldip){
 	USES_CONVERSION;
 for (UINT i=0;i<m_pScanner->m_szNCScanRet.size();i++)
@@ -1381,13 +1527,16 @@ LRESULT CScanDlg::OnAddNetScanRet(WPARAM wParam, LPARAM lParam)
 }
 
 
+
+
 LRESULT CScanDlg::OnScanFinish(WPARAM wParam, LPARAM lParam)
 {
 
 	AddComDeviceToGrid(m_pScanner->m_szTstatScandRet);
-	AddNetDeviceToGrid(m_pScanner->m_szNCScanRet);
+	//AddNetDeviceToGrid(m_pScanner->m_szNCScanRet);
+	AddNetDeviceToGrid();
 
- 
+	//OpenDefaultCom();
 	return 1;
 }
 

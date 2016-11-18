@@ -47,6 +47,7 @@ public:
 	  int m_tipvalue;
 	  afx_msg void OnEnKillfocusEditBacCusAnalogUnit();
 	  void UpdateCusAnalogUnit();
+	  afx_msg void OnPaint();
 };
 
 const int ANALOG_CUS_RANGE_RBL_VALUE = 0;

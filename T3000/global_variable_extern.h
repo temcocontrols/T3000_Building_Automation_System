@@ -19,6 +19,7 @@ extern int g_invoke_id;
 extern vector <int> Change_Color_ID;
 extern HANDLE hThread;
 extern DWORD nThreadID;
+extern DWORD nThreadID_mstp;
 extern HWND hMbpollWnd;
 extern HWND hMbpollWritePopWnd;
 extern int regDetailsOpenedFrom;	// 0 = MbPoll.cpp; 1 = mbpollFunctions.cpp
@@ -69,7 +70,7 @@ extern  CString g_achive_folder_temp_db;
 extern  CString g_achive_device_name_path;
 extern  CString g_strImgeFolder;
 extern  CString g_strBuildingFolder;
- 
+extern  CString g_strOrigDatabaseFilePath;
 extern  CString g_achive_monitor_datatbase_path ;
 
 extern BOOL g_mstp_flag;
@@ -1190,6 +1191,8 @@ extern CString CS3000_INPUT_RANGE[4];
 extern BOOL g_NEED_MULTI_READ;
 extern CString STRING_SWITCH_STATUS[3];
 
+extern vector <IspModeInfo> g_isp_device_info;
+extern IspModeInfo need_isp_device;
 extern vector<Registers_Infor> g_vectRegisters;
 extern CString g_cstring_ini_path;
 extern unsigned char product_sort_way;		//0 default   1 by connection      2 bu floor
@@ -1237,5 +1240,22 @@ extern unsigned int graphic_last_time_value; //x轴上次查看的时间;
 extern const CString c_strBaudate[NUMBER_BAUDRATE];
 #pragma endregion For_bacnet
 
+extern int global_interface; //用来标识全局的界面在哪？主要是 Input 和 output;
 extern bool b_remote_connection;  //全局的 用来判断 对远程设备的 特殊处理;
 extern bool refresh_tree_status_immediately ;	//如果置为true了，就会立即调用 刷新 ，不用等待一个周期，用于 某些IP或状态变了，立即刷新;
+extern unsigned int remote_connect_serial_number; // 远程连接的序列号;
+extern char ptpLoginName[30];	//远程连接的账号和密码;
+extern char ptpLoginPassword[20];
+
+
+extern refresh_net_device device_id_data_1;
+extern refresh_net_device device_id_data_2;
+extern bool edit_confilct_mode ;
+
+extern bool scaning_mode ;
+
+extern		bool isp_mode_is_cancel ;
+extern bool isp_mode_firmware_auto;
+extern CString isp_mode_detect_firmware_path;
+
+extern HANDLE hwait_scan_thread;

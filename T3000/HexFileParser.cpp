@@ -3,8 +3,7 @@
 #include "globle_function.h"
 
 
-extern bool auto_flash_mode;
- extern Bin_Info        global_fileInfor;
+ 
 CHexFileParser::CHexFileParser(void)
 {
     m_nHexFileType = HEXFILE_DATA;
@@ -146,7 +145,7 @@ int CHexFileParser::ReadNormalHexFile( CFile& hexFile,  char* pBuf, int nBufLen)
 #endif
 
 		nLineNum++;						//the line number that the wrong hex file;
-		TS_UC get_hex[128]={0};		//get hex data,it is get from the line char
+		unsigned char get_hex[128]={0};		//get hex data,it is get from the line char
 	
 		UINT i = 0;
 		for( i=0;i<strlen(a); i++)		//get a line//去掉第一个
@@ -161,8 +160,7 @@ int CHexFileParser::ReadNormalHexFile( CFile& hexFile,  char* pBuf, int nBufLen)
 			wchar_t p_c_temp[74]={'\0'};
 			swprintf_s(p_c_temp,_T("Error: the hex file had error at %d line!"),nLineNum);
 			nBufCount = 0;
- 			if(!auto_flash_mode)
- 				AfxMessageBox(p_c_temp);
+ 		 
 			//close_com();
 			return 0;
 		}
@@ -170,7 +168,7 @@ int CHexFileParser::ReadNormalHexFile( CFile& hexFile,  char* pBuf, int nBufLen)
 		if(get_hex[3]==1)	//for to seektobegin() function,because to end of the file
 			break;
 
-		TS_UC uctemp2=0;
+		unsigned char uctemp2=0;
 		for(int j=0;j<(nLen/2);j++)
 			uctemp2+=get_hex[j];
 		if(uctemp2%256!=0)
@@ -178,8 +176,7 @@ int CHexFileParser::ReadNormalHexFile( CFile& hexFile,  char* pBuf, int nBufLen)
 			wchar_t p_c_temp[74]={'\0'};
 			swprintf_s(p_c_temp,_T("Error: the hex file had error at %d line!"),nLineNum);
 			nBufCount = 0;
-			if(!auto_flash_mode)
-				AfxMessageBox(p_c_temp,MB_OK);
+			 
 			//close_com();
 			return 0;
 		}
@@ -209,9 +206,9 @@ int CHexFileParser::ReadNormalHexFile( CFile& hexFile,  char* pBuf, int nBufLen)
 
 
 
-BOOL CHexFileParser::DoCRC( TS_UC* szBuf, int nLen)
+BOOL CHexFileParser::DoCRC( unsigned char* szBuf, int nLen)
 {
-	TS_UC uctemp=0;
+	unsigned char uctemp=0;
 	for(int j=0; j < nLen; j++)
 		uctemp+=szBuf[j];
 
@@ -232,7 +229,7 @@ WORD CHexFileParser::GetHighAddrFromFile(const CString& strLine)
 		ch[i-1] = (char)strLine.GetAt(i);
 	}
 	turn_hex_file_line_to_unsigned_char(ch);
-	TS_UC szBuf[64] = {0};
+	unsigned char szBuf[64] = {0};
 	turn_int_to_unsigned_char(ch, strLine.GetLength()-1, szBuf);
 	dwTemp = szBuf[4]*0x100 + szBuf[5];
     if (dwTemp>=800)
@@ -269,8 +266,7 @@ BOOL CHexFileParser::ReadLineFromFile(CFile& file, char* pBuffer)
 		 }
 		 else
 		 {
-			 if(!auto_flash_mode)
-				 AfxMessageBox(_T("The Hex File is broken"));
+			  
 			 return FALSE;
 		 }
 		
@@ -311,7 +307,7 @@ int CHexFileParser::ReadExtendHexFile(CFile& hexFile, char* pBuf, int nBufLen)
 #endif
 
 		nLineNum++;						//the line number that the wrong hex file;
-		TS_UC get_hex[128]={0};		//get hex data,it is get from the line char
+		unsigned char get_hex[128]={0};		//get hex data,it is get from the line char
 	
 		UINT i = 0;
 		for( i=0;i<strlen(a); i++)		//get a line
@@ -334,7 +330,7 @@ int CHexFileParser::ReadExtendHexFile(CFile& hexFile, char* pBuf, int nBufLen)
 		if(get_hex[3]==1)	//for to seektobegin() function,because to end of the file
 			break;
 
-		TS_UC uctemp2=0;
+		unsigned char uctemp2=0;
 		for(int j=0;j<(nLen/2);j++)
 			uctemp2+=get_hex[j];
 		if(uctemp2%256!=0)
@@ -420,7 +416,7 @@ BOOL CHexFileParser::ReadExtLinearHexFile(CFile& hexfile, char* pBuf, int nBufLe
 
 		//get a line from the file,check "crc" for total file
 		nLineNumErr++;	//the line number that the wrong hex file;
-		TS_UC get_hex[128]={0};//get hex data,it is get from the line char
+		unsigned char get_hex[128]={0};//get hex data,it is get from the line char
 		//the number is (i-1)
 		//int nLen = strGetData.GetLength();
 		for(UINT i=0; i<strlen(a); i++) // 去掉冒号

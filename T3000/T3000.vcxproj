@@ -109,7 +109,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>setupapi.lib;SqliteLib\sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>setupapi.lib.;$(SolutionDir)SQLiteDriver\sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\T3000 Output\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -165,8 +165,8 @@
     <ClCompile Include="BacnetVariable.cpp" />
     <ClCompile Include="BacnetWait.cpp" />
     <ClCompile Include="BacnetWeeklyRoutine.cpp" />
-    <ClCompile Include="BADO\BADO.cpp" />
     <ClCompile Include="BatchSNDlg.cpp" />
+    <ClCompile Include="BinFileParser.cpp" />
     <ClCompile Include="BoatMonitorViewer.cpp" />
     <ClCompile Include="BootFinderDlg.cpp" />
     <ClCompile Include="BuildingConfigEditDlg.cpp" />
@@ -219,13 +219,16 @@
     <ClCompile Include="DllFunction.cpp" />
     <ClCompile Include="Dowmloadfile.cpp" />
     <ClCompile Include="DownloadSocket.cpp" />
+    <ClCompile Include="DuplicateIdDetected.cpp" />
     <ClCompile Include="EnterValueDlg.cpp" />
     <ClCompile Include="Enter_Value_BinaryDlg.cpp" />
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="fileRW.cpp" />
     <ClCompile Include="Flash_Multy.cpp" />
     <ClCompile Include="GraphicMode.cpp" />
+    <ClCompile Include="HexFileParser.cpp" />
     <ClCompile Include="IONameConfig.cpp" />
+    <ClCompile Include="ISPModeSlove.cpp" />
     <ClCompile Include="LanguageLocale.cpp" />
     <ClCompile Include="LCOutNameConfig.cpp" />
     <ClCompile Include="LightingController\configure.cpp" />
@@ -256,6 +259,7 @@
     <ClCompile Include="MySocket.cpp" />
     <ClCompile Include="NetworkControllView.cpp" />
     <ClCompile Include="NewHumChamberView.cpp" />
+    <ClCompile Include="NewTstatSchedulesDlg.cpp" />
     <ClCompile Include="OfficeStPtDlg.cpp" />
     <ClCompile Include="OutPutDlg.cpp" />
     <ClCompile Include="OutputSetDlg.cpp" />
@@ -269,6 +273,7 @@
     <ClCompile Include="RegisterViewerDlg.cpp" />
     <ClCompile Include="RegisterWriteValueDlg.cpp" />
     <ClCompile Include="RelayLabel.cpp" />
+    <ClCompile Include="RemotePtpLogin.cpp" />
     <ClCompile Include="ScanDbWaitDlg.cpp" />
     <ClCompile Include="ScanDlg.cpp" />
     <ClCompile Include="ScanSelectDlg.cpp" />
@@ -399,7 +404,7 @@
     <None Include="res\menu_imgeOwn16.bmp" />
     <None Include="res\MFC16API.dll" />
     <None Include="res\MFouct.bmp" />
-    <None Include="res\MonitorData.mdb" />
+    <None Include="res\MonitorData.db" />
     <None Include="res\monitor_.bin" />
     <None Include="res\MUp.bmp" />
     <None Include="C:\Documents and Settings\lee\桌面\NWT3000.ico" />
@@ -476,8 +481,8 @@
     <ClInclude Include="BacnetVariable.h" />
     <ClInclude Include="BacnetWait.h" />
     <ClInclude Include="Bacnet_Include.h" />
-    <ClInclude Include="BADO\BADO.h" />
     <ClInclude Include="BatchSNDlg.h" />
+    <ClInclude Include="BinFileParser.h" />
     <ClInclude Include="BoatMonitorViewer.h" />
     <ClInclude Include="BootFinderDlg.h" />
     <ClInclude Include="BuildingConfigEditDlg.h" />
@@ -538,6 +543,7 @@
     <ClInclude Include="DllFunction.h" />
     <ClInclude Include="Dowmloadfile.h" />
     <ClInclude Include="DownloadSocket.h" />
+    <ClInclude Include="DuplicateIdDetected.h" />
     <ClInclude Include="EnterValueDlg.h" />
     <ClInclude Include="Enter_Value_BinaryDlg.h" />
     <ClInclude Include="FileOperations.h" />
@@ -546,10 +552,13 @@
     <ClInclude Include="gloab_define.h" />
     <ClInclude Include="global_struct.h" />
     <ClInclude Include="GraphicMode.h" />
+    <ClInclude Include="HexFileParser.h" />
     <ClInclude Include="IONameConfig.h" />
+    <ClInclude Include="ISPModeSlove.h" />
     <ClInclude Include="LanguageLocale.h" />
     <ClInclude Include="LCOutNameConfig.h" />
     <ClInclude Include="NewHumChamberView.h" />
+    <ClInclude Include="NewTstatSchedulesDlg.h" />
     <ClInclude Include="ping.h" />
     <ClInclude Include="PressureSensorForm.h" />
     <ClInclude Include="ProductModel.h" />
@@ -557,6 +566,7 @@
     <ClInclude Include="PVDlg.h" />
     <ClInclude Include="RegisterViewerDlg.h" />
     <ClInclude Include="RegisterWriteValueDlg.h" />
+    <ClInclude Include="RemotePtpLogin.h" />
     <ClInclude Include="Scanwaydlg.h" />
     <ClInclude Include="StaticDlg.h" />
     <ClInclude Include="StatusbarCtrl.h" />
@@ -612,6 +622,7 @@
     <ClInclude Include="hangeIDDlg.h" />
     <ClInclude Include="HumChamber.h" />
     <ClInclude Include="ImageTreeCtrl.h" />
+    <ClInclude Include="ImportDatabaseDlg.h" />
     <ClInclude Include="IniFile.h" />
     <ClInclude Include="InputSetDlg.h" />
     <ClInclude Include="IODisplayBar.h" />

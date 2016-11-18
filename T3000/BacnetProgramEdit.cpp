@@ -896,7 +896,7 @@ BOOL CBacnetProgramEdit::OnHelpInfo(HELPINFO* pHelpInfo)
 
 		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle,theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
 		else
-			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile,HH_HELP_CONTEXT, IDH_TOPIC_EXPORT_TO_BITMAPS);
+			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile,HH_HELP_CONTEXT, IDH_TOPIC_9_PROGRAMMING_A_CONTROLLER);
 		return (hWnd != NULL);
 	}
 	else{

@@ -103,6 +103,9 @@ public:
 	BOOL		IsComScanRunning();
 	// ËÑË÷º¯Êý
 	void		background_binarysearch(int nComPort);
+
+	void modbusip_to_modbus485(int nComPort,int nBaudrate, BYTE devLo, BYTE devHi);
+
 	// bForTstat = TRUE : scan tstat, = FALSE : scan NC
 	void		binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo=1, BYTE devHi=254);
 	// bForTstat = TRUE : scan tstat, = FALSE : scan  MINI Pannel
@@ -171,6 +174,7 @@ public:
 	 
 	void BinaryScanNCByComPort(BYTE devLo = 1, BYTE devHi = 254);
 	void ScanTstatFromNCForAuto();
+	void ScanSubnetFromEthernetDevice();
 	void GetTstatInfoFromID(int nTstatID);
 
 	void Initial_Scan_Info();
@@ -233,6 +237,13 @@ public:
 	CString						m_strSubNet;
 	CString						m_strFloorName;
 	CString						m_strRoomName;
+
+
+	CString                     m_device_ip_address;
+	int							m_device_ip_port;
+	int							m_device_baudrate;
+	int							m_device_com_port;
+	unsigned int				m_parent_serialnum;
 protected:
 	BOOL								m_bComScanRunning;		// ÊÇ·ñÊÇCom scan, TRUE = scan com, FALSE = scan net
 	int									m_ScannedNum;

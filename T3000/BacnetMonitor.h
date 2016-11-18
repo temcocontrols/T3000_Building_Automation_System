@@ -61,8 +61,7 @@ public:
 	afx_msg LRESULT OnHotKey(WPARAM wParam,LPARAM lParam);
 	int read_type;
 
-	_ConnectionPtr m_monitor_pCon;
-	_RecordsetPtr m_monitor_pRec;
+
 
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 	void Check_New_DB();

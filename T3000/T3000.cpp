@@ -41,8 +41,8 @@ END_MESSAGE_MAP()
 CT3000App::CT3000App()
 {
 	m_bHiColorIcons = TRUE;
-	CurrentT3000Version=_T("    2016.09.23 ");
-	T3000_Version = 10918;
+	CurrentT3000Version=_T("    2016.11.17 ");
+	T3000_Version = 11117;
 
 
 	m_lastinterface=19;
@@ -309,7 +309,7 @@ BOOL CT3000App::InitInstance()
 
 
 			g_achive_monitor_datatbase_path = g_achive_folder;
-			g_achive_monitor_datatbase_path = g_achive_monitor_datatbase_path + _T("\\MonitorData.mdb");
+			g_achive_monitor_datatbase_path = g_achive_monitor_datatbase_path + _T("\\MonitorData.db");
 
 			WIN32_FIND_DATA fd;
 			BOOL ret = FALSE;
@@ -450,7 +450,7 @@ BOOL CT3000App::InitInstance()
 			HANDLE hFind_Monitor;//
 			WIN32_FIND_DATA wfd_monitor;//
 			hFind_Monitor = FindFirstFile(g_achive_monitor_datatbase_path, &wfd_monitor);//
-			if (hFind_Monitor==INVALID_HANDLE_VALUE)//说明当前目录下无MonitorData.mdb
+			if (hFind_Monitor==INVALID_HANDLE_VALUE)//说明当前目录下无MonitorData.db
 			{
 				//没有找到就创建一个默认的数据库
 				FilePath_Monitor= g_achive_monitor_datatbase_path;
@@ -721,8 +721,8 @@ BOOL CT3000App::InitInstance()
 		m_pMainWnd->UpdateWindow();
 	   ((CMainFrame*)m_pMainWnd)->SwitchToPruductType(DLG_DIALOG_DEFAULT_BUILDING); 
 
-// 		m_szAppPath  = g_strExePth;
-// 		m_szHelpFile = theApp.m_szAppPath + L"T3000_Help.chm";
+       m_szAppPath  = g_strExePth;
+       m_szHelpFile = theApp.m_szAppPath + L"T3000_Help.chm";
 // 		CString g_configfile_path =g_strExePth + g_strStartInterface_config;
 // 		m_lastinterface= 19 ;//GetPrivateProfileInt(_T("T3000_START"),_T("Interface"),19,g_configfile_path); //由 杜帆 16-03-17屏蔽；进入不同的界面引起 T3000打开时报错。
 // 		g_selected_serialnumber=GetPrivateProfileInt(_T("T3000_START"),_T("SerialNumber"),0,g_configfile_path);
@@ -780,7 +780,8 @@ protected:
 public:
 	afx_msg void OnBnClickedButton1();
 	afx_msg void OnBnClickedOk();
-	};
+	virtual BOOL OnInitDialog();
+};
 
 CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD)
 {
@@ -902,7 +903,7 @@ void CT3000App::CopyDirectory(CString strSrcPath,CString strDstPath)
 		AfxMessageBox(_T("Success"));
 	else
 		AfxMessageBox(_T("Failed"));
-}
+  }
 void CT3000App::OnVersionInfo()
 {
 	CString strHistotyFile=g_strExePth+_T("history.txt");
@@ -1043,9 +1044,30 @@ void CT3000App::SetLanguage(DWORD Last){
 	key.Open(HKEY_LOCAL_MACHINE,data_Set);
 	WriteNumber(key,_T("T3000"),Last);
 }
-
+#include "Dowmloadfile.h"
+extern tree_product	m_product_isp_auto_flash;
+bool update_t3000_only = false;
 void CAboutDlg::OnBnClickedOk()
 {
 // TODO: Add your control notification handler code here
+	update_t3000_only = true;
+	m_product_isp_auto_flash.product_class_id =  199;
+	Dowmloadfile Dlg;
+	Dlg.DoModal();
+	update_t3000_only = false;
 CDialog::OnOK();
+}
+
+
+BOOL CAboutDlg::OnInitDialog()
+{
+	CDialog::OnInitDialog();
+
+	// TODO:  Add extra initialization here
+	CString temp_version;
+	temp_version = _T("T3000 Building Automation System") + CurrentT3000Version;
+	
+	GetDlgItem(IDC_STATIC_ABOUT_INFO)->SetWindowText(temp_version);
+	return TRUE;  // return TRUE unless you set the focus to a control
+	// EXCEPTION: OCX Property Pages should return FALSE
 }

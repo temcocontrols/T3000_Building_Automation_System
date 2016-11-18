@@ -15,6 +15,7 @@
 #include "..\\Update\\MFC16API.h"
 #pragma comment(lib,"..\\Update\\MFC16API.lib")
 
+bool run_t3000 = true;
 
 HANDLE getftpthread = NULL;
 HANDLE unzipthread = NULL;
@@ -33,6 +34,7 @@ CString T3000_ini_file_path;
 int PC_T3000_Version = 0;
 int T3000_FTP_Version = 0;
 	int is_local_temco_net = false;
+	int local_persent = 0;
 //#pragma comment(lib,"..\\Debug\\MSVC10APIW.lib")
 
 // CAboutDlg dialog used for App About
@@ -97,6 +99,7 @@ BEGIN_MESSAGE_MAP(CUpdateDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_BUTTON_CANCEL, &CUpdateDlg::OnBnClickedButtonCancel)
+	ON_BN_CLICKED(IDC_CHECK_OPEN_T3000, &CUpdateDlg::OnBnClickedCheckOpenT3000)
 END_MESSAGE_MAP()
 
 
@@ -161,7 +164,9 @@ BOOL CUpdateDlg::OnInitDialog()
 			pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
 		}
 	}
-	
+	CString m_strVersion;
+	m_strVersion.LoadString(IDS_UPDATE_VERSION);
+	SetWindowTextW(m_strVersion);
 
 	//APP_RUN_FOLDER
 	CString tempFilePath;
@@ -204,7 +209,7 @@ BOOL CUpdateDlg::OnInitDialog()
 	InitialStatic();
 
 
-	
+	((CButton *)GetDlgItem(IDC_CHECK_OPEN_T3000))->SetCheck(true);
 
 
 	Sleep(1);
@@ -234,43 +239,43 @@ void CUpdateDlg::InitialStatic()
 {
 	
 	m_static_cs_info.SetWindowTextW(_T(""));
-	m_static_cs_info.textColor(RGB(255,0,100));
+	m_static_cs_info.textColor(RGB(0,0,0));
 	//m_static_cs_info.bkColor(RGB(255,255,255));
-	m_static_cs_info.setFont(20,15,NULL,_T("Arial"));
+	m_static_cs_info.setFont(20,15,NULL,_T("Times New Roman"));
 
 	m_static_checkupdate.SetWindowTextW(_T("Check Update"));
-	m_static_checkupdate.textColor(RGB(0,0,255));
+	m_static_checkupdate.textColor(RGB(0,0,0));
 	//m_static_download.bkColor(RGB(255,255,255));
-	m_static_checkupdate.setFont(20,15,NULL,_T("Arial"));
+	m_static_checkupdate.setFont(20,15,NULL,_T("Times New Roman"));
 
 	m_static_download.SetWindowTextW(_T("Download"));
-	m_static_download.textColor(RGB(0,0,255));
+	m_static_download.textColor(RGB(0,0,0));
 	//m_static_download.bkColor(RGB(255,255,255));
-	m_static_download.setFont(20,15,NULL,_T("Arial"));
+	m_static_download.setFont(20,15,NULL,_T("Times New Roman"));
 
 
 
 	m_static_uncompress.SetWindowTextW(_T("Extracting"));
-	m_static_uncompress.textColor(RGB(0,0,255));
+	m_static_uncompress.textColor(RGB(0,0,0));
 	//m_static_uncompress.bkColor(RGB(255,255,255));
-	m_static_uncompress.setFont(20,15,NULL,_T("Arial"));
+	m_static_uncompress.setFont(20,15,NULL,_T("Times New Roman"));
 
 	m_static_install.SetWindowTextW(_T("Install"));
-	m_static_install.textColor(RGB(0,0,255));
+	m_static_install.textColor(RGB(0,0,0));
 	//m_static_install.bkColor(RGB(255,255,255));
-	m_static_install.setFont(20,15,NULL,_T("Arial"));
+	m_static_install.setFont(20,15,NULL,_T("Times New Roman"));
 
 	m_static_finish.SetWindowTextW(_T("Done"));
-	m_static_finish.textColor(RGB(0,0,255));
+	m_static_finish.textColor(RGB(0,0,0));
 	//m_static_finish.bkColor(RGB(255,255,255));
-	m_static_finish.setFont(20,15,NULL,_T("Arial"));
+	m_static_finish.setFont(20,15,NULL,_T("Times New Roman"));
 
 
 	
 	m_static_persent.SetWindowTextW(_T(""));
-	m_static_persent.textColor(RGB(0,0,255));
+	m_static_persent.textColor(RGB(0,0,0));
 	//m_static_finish.bkColor(RGB(255,255,255));
-	m_static_persent.setFont(20,15,NULL,_T("Arial"));
+	m_static_persent.setFont(20,15,NULL,_T("Times New Roman"));
 	//m_static_pic_step.SetWindowPos( NULL,252,165 + 45*(input_step-1),0,0,SWP_NOZORDER | SWP_NOSIZE );    
 }
 
@@ -330,6 +335,7 @@ DWORD WINAPI InstallFileThread(LPVOID lPvoid)
 	CUpdateDlg * mparent = (CUpdateDlg *)lPvoid;
 
 	bool copy_ret = false;
+	SetCurrentDirectoryW(APP_RUN_FOLDER);
 	copy_ret = CopyDirW(UnzipFileFolder,APP_RUN_FOLDER,FALSE);
 	if(copy_ret)
 	{
@@ -466,43 +472,83 @@ BOOL KillProcessFromName(CString strProcessName)
 
 DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
 {
+
 	CUpdateDlg * mparent = (CUpdateDlg *)lPvoid;
-	CS_Info.Format(_T("Connecting to server...."));
-	ConnectToFtp(_T("server139.web-hosting.com"),_T("temcoftp@temcocontrols.com"),_T("BwpNXWPgE7hg"));
-	CS_Info.Format(_T("Downloading ...."));
-
-	DownloadFileFromFtp(_T("//software//T3000Version.ini") ,DownloadFileFolder);
-	DownloadIniFilePath = DownloadFileFolder + _T("//T3000Version.ini");
-	T3000_FTP_Version = GetPrivateProfileIntW(_T("Version"),_T("T3000Version"),0,DownloadIniFilePath);
-	if(T3000_FTP_Version == 0)
-	{
-		CS_Info.Format(_T("Connect to server failded!"));
-		m_static_step = UPDATE_STEP_READY_TO_CLOASE;
-		getftpthread = NULL;
-		return 0;
-	}
 
 
-	if((PC_T3000_Version < T3000_FTP_Version) || (PC_T3000_Version == 0 ))
+	if(is_local_temco_net == FALSE)
 	{
-		CS_Info.Format(_T("Find new version , ready to update."));
+		CS_Info.Format(_T("Connecting to server...."));
+		bool conncect_ret = ConnectToFtp(_T("server139.web-hosting.com"),_T("temcoftp@temcocontrols.com"),_T("BwpNXWPgE7hg"));
+		if(conncect_ret == false)
+		{
+			CS_Info.Format(_T("Connect to server failed.Please check your network."));
+			Sleep(3000);
+			m_static_step = UPDATE_STEP_READY_TO_CLOASE;
+			getftpthread = NULL;
+			return 0;
+		}
+		CS_Info.Format(_T("Checking for updates ...."));
+		bool download_ret = false;
+		download_ret = DownloadFileFromFtp(_T("//software//T3000Version.ini") ,DownloadFileFolder);
+		if(download_ret == false)
+		{
+			CS_Info.Format(_T("Check version  from FTP Server failed."));
+			Sleep(2000);
+			DisconnectFtp();
+			getftpthread = NULL;
+			m_static_step = UPDATE_STEP_READY_TO_CLOASE;
+			return 0;
+		}
+		DownloadIniFilePath = DownloadFileFolder + _T("//T3000Version.ini");
+		T3000_FTP_Version = GetPrivateProfileIntW(_T("Version"),_T("T3000Version"),0,DownloadIniFilePath);
+		if(T3000_FTP_Version == 0)
+		{
+			CS_Info.Format(_T("Connect to server failded!"));
+			m_static_step = UPDATE_STEP_READY_TO_CLOASE;
+			getftpthread = NULL;
+			return 0;
+		}
+
+
+		if((PC_T3000_Version < T3000_FTP_Version) || (PC_T3000_Version == 0 ))
+		{
+			CS_Info.Format(_T("Find new version , ready to update."));
+		}
+		else
+		{
+			CS_Info.Format(_T("Your T3000.exe is up-to-date"));
+			m_static_step = UPDATE_STEP_READY_TO_CLOASE;
+			getftpthread = NULL;
+			return 0;
+		}
 	}
-	else
-	{
-		CS_Info.Format(_T("Your T3000.exe is up-to-date"));
-		m_static_step = UPDATE_STEP_READY_TO_CLOASE;
-		getftpthread = NULL;
-		return 0;
-	}
+
 	KillProcessFromName(_T("T3000.exe")) ;
 	KillProcessFromName(_T("ISP.exe")) ;
 	m_static_step = UPDATE_STEP_DOWNLOAD;
 
 	if(is_local_temco_net == FALSE)
 	{
-		DownloadFileFromFtp(_T("//software//T3000Update.zip") ,DownloadFileFolder);
-		//DownloadFileFromFtp(_T("//software//ISPTool_NoCheckingHex.zip") ,_T("G:\\Temp"));
-		CS_Info.Format(_T("Download finished."));
+		bool download_ret = false;
+		download_ret = DownloadFileFromFtp(_T("//software//T3000Update.zip") ,DownloadFileFolder);
+
+		if(download_ret)
+			CS_Info.Format(_T("Download finished."));
+		else
+		{
+			//bool http_download_ret;
+			//CS_Info.Format(_T("Trying download from http server."));
+			//http_download_ret = mparent->DownloadFileHttp(_T("http://www.temcocontrols.com/ftp/software/T3000Update.zip"),DownloadFileFolder + _T("\\T3000Update.zip"));
+			//
+
+			CS_Info.Format(_T("Download from FTP Server failed."));
+			Sleep(2000);
+			DisconnectFtp();
+			getftpthread = NULL;
+			 m_static_step = UPDATE_STEP_READY_TO_CLOASE;
+			return 0;
+		}
 		DisconnectFtp();
 		CS_Info.Format(_T("Disconnect with server."));
 		DesDownloadFilePath = DownloadFileFolder + _T("\\T3000Update.zip");
@@ -517,12 +563,19 @@ DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
 		//copy_ret = CopyDirW(_T("Z:\\TemcoSoftware\\Release\\T3000ForInstallation\\T3000Update.zip"),DownloadFileFolder,FALSE);
 		if(copy_ret)
 		{
+			for (int j=1 ;j<=10;j++)
+			{
+				local_persent = j*10;
+				CS_Info.Format(_T("Downloading (%d%%)"),local_persent);
+				Sleep(800);
+			}
 			CS_Info.Format(_T("Install success!"));
 
 		}
 		else
 		{
 			CS_Info.Format(_T("Install failed!"));
+			return 0;
 		}
 	}
 
@@ -530,7 +583,7 @@ DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
 	//这里要检测是否下载完毕;
 
 
-
+download_pass:
 
 	if(unzipthread == NULL)
 	{
@@ -625,7 +678,7 @@ static	int pic_static_step = 0;
 		break;
 	case UPDATE_STEP_DOWNLOAD :
 		{
-			m_static_checkupdate.textColor(RGB(0,255,0));
+			m_static_checkupdate.textColor(RGB(0,0,255));
 			if(pic_static_step == 1)
 			{
 				pic_static_step = 0;
@@ -642,15 +695,27 @@ static	int pic_static_step = 0;
 			unsigned int finished_bye = 0;
 
 			int finished_persent = 0;
-			GetFtpTransferPersent(&total_byte,&finished_bye,&finished_persent);
-			temp_cs.Format(_T("%d/%d (Kb)   %d%%"),finished_bye/1024,total_byte/1024,finished_persent);
-			m_static_persent.SetWindowTextW(temp_cs);
-			m_progress.SetPos(finished_persent);
+			if(is_local_temco_net == false)
+			{
+				GetFtpTransferPersent(&total_byte,&finished_bye,&finished_persent);
+				temp_cs.Format(_T("%d/%d (Kb)   %d%%"),finished_bye/1024,total_byte/1024,finished_persent);
+				m_static_persent.SetWindowTextW(temp_cs);
+				m_progress.SetPos(finished_persent);
+			}
+			else
+			{
+				
+				temp_cs.Format(_T("%d%%"),local_persent);
+				m_static_persent.SetWindowTextW(temp_cs);
+				m_progress.SetPos(local_persent);
+			}
+			
+
 		}
 		break;
 	case UPDATE_STEP_UNCOMPRESS:
 		{
-			m_static_download.textColor(RGB(0,255,0));
+			m_static_download.textColor(RGB(0,0,255));
 			if(pic_static_step == 1)
 			{
 				pic_static_step = 0;
@@ -668,8 +733,8 @@ static	int pic_static_step = 0;
 		break;
 	case UPDATE_STEP_INSTALL:
 		{
-			m_static_download.textColor(RGB(0,255,0));
-			m_static_uncompress.textColor(RGB(0,255,0));
+			m_static_download.textColor(RGB(0,0,255));
+			m_static_uncompress.textColor(RGB(0,0,255));
 			if(pic_static_step == 1)
 			{
 				pic_static_step = 0;
@@ -685,8 +750,8 @@ static	int pic_static_step = 0;
 		break;
 	case UPDATE_STEP_DONE:
 		{
-			m_static_install.textColor(RGB(0,255,0));
-			m_static_finish.textColor(RGB(0,255,0));
+			m_static_install.textColor(RGB(0,0,255));
+			m_static_finish.textColor(RGB(0,0,255));
 			pic_static_step = 0;
 
 			m_static_pic_step.SetWindowPos( NULL,10 + 14*(1- pic_static_step),185 ,0,0,SWP_NOZORDER | SWP_NOSIZE );   
@@ -702,6 +767,15 @@ static	int pic_static_step = 0;
 			static int ncount = 0;
 			if(++ncount > 10)
 			{
+
+				CString tempApplicationFolder;
+				GetModuleFileName(NULL, tempApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+				PathRemoveFileSpec(tempApplicationFolder.GetBuffer(MAX_PATH));
+				tempApplicationFolder.ReleaseBuffer();
+
+				if(run_t3000)
+					ShellExecute(NULL,_T("open"),_T("T3000.exe"),NULL,tempApplicationFolder,SW_SHOWNORMAL);
+
 				PostMessage(WM_CLOSE,NULL,NULL);
 			}
 		}
@@ -749,4 +823,127 @@ BOOL CUpdateDlg::PreTranslateMessage(MSG* pMsg)
 		return 1;
 	}
 	return CDialogEx::PreTranslateMessage(pMsg);
+}
+
+BOOL CUpdateDlg::DownloadFileHttp(const CString& strFileURLInServer, //待下载文件的URL
+	const CString & strFileLocalFullPath)//存放到本地的路径
+{
+	ASSERT(strFileURLInServer != "");
+	ASSERT(strFileLocalFullPath != "");
+	CInternetSession session;
+	CHttpConnection* pHttpConnection = NULL;
+	CHttpFile* pHttpFile = NULL;
+	CString strServer, strObject;
+	INTERNET_PORT wPort;
+
+	DWORD dwType;
+	const int nTimeOut = 2000;
+	session.SetOption(INTERNET_OPTION_CONNECT_TIMEOUT, nTimeOut); //重试之间的等待延时
+	session.SetOption(INTERNET_OPTION_CONNECT_RETRIES, 1);   //重试次数
+	char* pszBuffer = NULL;  
+
+	try
+	{
+		AfxParseURL(strFileURLInServer, dwType, strServer, strObject, wPort);
+		pHttpConnection = session.GetHttpConnection(strServer, wPort);
+		pHttpFile = pHttpConnection->OpenRequest(CHttpConnection::HTTP_VERB_GET, strObject);
+		if(pHttpFile->SendRequest() == FALSE)
+			return false;
+		DWORD dwStateCode;
+
+		pHttpFile->QueryInfoStatusCode(dwStateCode);
+		if(dwStateCode == HTTP_STATUS_OK)
+		{
+			HANDLE hFile = CreateFile(strFileLocalFullPath, GENERIC_WRITE,
+				FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL,
+				NULL);  //创建本地文件
+			if(hFile == INVALID_HANDLE_VALUE)
+			{
+				pHttpFile->Close();
+				pHttpConnection->Close();
+				session.Close();
+				return false;
+			}
+
+			char szInfoBuffer[1000];  //返回消息
+			DWORD dwFileSize = 0;   //文件长度
+			DWORD dwInfoBufferSize = sizeof(szInfoBuffer);
+			BOOL bResult = FALSE;
+			bResult = pHttpFile->QueryInfo(HTTP_QUERY_CONTENT_LENGTH,
+				(void*)szInfoBuffer,&dwInfoBufferSize,NULL);
+
+			dwFileSize = atoi(szInfoBuffer);
+			const int BUFFER_LENGTH = 1024 * 10;
+			pszBuffer = new char[BUFFER_LENGTH];  //读取文件的缓冲
+			DWORD dwWrite, dwTotalWrite;
+			dwWrite = dwTotalWrite = 0;
+			UINT nRead = pHttpFile->Read(pszBuffer, BUFFER_LENGTH); //读取服务器上数据
+
+			while(nRead > 0)
+			{
+				WriteFile(hFile, pszBuffer, nRead, &dwWrite, NULL);  //写到本地文件
+				dwTotalWrite += dwWrite;
+				nRead = pHttpFile->Read(pszBuffer, BUFFER_LENGTH);
+			}
+
+			delete[]pszBuffer;
+			pszBuffer = NULL;
+			CloseHandle(hFile);
+		}
+		else
+		{
+			delete[]pszBuffer;
+			pszBuffer = NULL;
+			if(pHttpFile != NULL)
+			{
+				pHttpFile->Close();
+				delete pHttpFile;
+				pHttpFile = NULL;
+			}
+			if(pHttpConnection != NULL)
+			{
+				pHttpConnection->Close();
+				delete pHttpConnection;
+				pHttpConnection = NULL;
+			}
+			session.Close();
+			return false;
+		}
+	}
+	catch(...)
+	{
+		delete[]pszBuffer;
+		pszBuffer = NULL;
+		if(pHttpFile != NULL)
+		{
+			pHttpFile->Close();
+			delete pHttpFile;
+			pHttpFile = NULL;
+		}
+		if(pHttpConnection != NULL)
+		{
+			pHttpConnection->Close();
+			delete pHttpConnection;
+			pHttpConnection = NULL;
+		}
+		session.Close();
+		return false;
+	}
+
+	if(pHttpFile != NULL)
+		pHttpFile->Close();
+	if(pHttpConnection != NULL)
+		pHttpConnection->Close();
+	session.Close();
+	return true;
+}
+
+
+
+
+
+void CUpdateDlg::OnBnClickedCheckOpenT3000()
+{
+	// TODO: Add your control notification handler code here
+	run_t3000 =  ((CButton *)GetDlgItem(IDC_CHECK_OPEN_T3000))->GetCheck();
 }

@@ -338,11 +338,11 @@ BEGIN
         BEGIN
             VALUE "FileVersion", "4.8.7.0"
             VALUE "InternalName", "ISP.exe"
-            VALUE "TemcoCopyright", "Copyright 1999-2016 (c).  All rights reserved."
             VALUE "OriginalFilename", "ISP.exe"
             VALUE "ProductName", "ISP Tool"
             VALUE "ProductVersion", "4.8.7.0"
             VALUE "SpecialBuild", "4.8.7"
+            VALUE "TemcoCopyright", "Copyright 1999-2016 (c).  All rights reserved."
         END
     END
     BLOCK "VarFileInfo"
@@ -415,7 +415,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_ABOUTBOX            "&About NEWISP..."
-    IDS_STR_VIRSIONNUM      "Version 4.9.6"
+    IDS_STR_VIRSIONNUM      "Version 4.9.7"
     IDP_SOCKETS_INIT_FAILED "Windows sockets initialization failed."
 END
 

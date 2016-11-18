@@ -94,6 +94,9 @@ public:
 	afx_msg void OnBnClickedButtonBacSettingOk();
 	afx_msg void OnBnClickedButtonBacSettingCancel();
 	afx_msg void OnBnClickedButtonSyncTime();
+	afx_msg void OnBnClickedCheckSettingZoneDaylightTime();
+	afx_msg void OnBnClickedButtonBacShowZigbee();
+	afx_msg void OnCbnKillfocusComboBacnetSettingTimeServer();
 };
 
 

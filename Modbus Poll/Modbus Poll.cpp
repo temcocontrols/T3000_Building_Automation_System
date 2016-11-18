@@ -59,7 +59,7 @@
 #include "CVBDataObject.h"
 #include "CDMSChart.h"
 
-#include "ado/ADO.h"
+
 
 #include "../SQLiteDriver/CppSQLite3.h"
 //#include "global_variable_extern.h"

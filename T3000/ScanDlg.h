@@ -68,6 +68,7 @@ public:
 	afx_msg LRESULT OnScanFinish(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnAddComScanRet(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnAddNetScanRet(WPARAM wParam, LPARAM lParam);
+
 BOOL	CheckTheSameSubnet(CString strIP);
 BOOL    ChangeNetDeviceIP(CString strIP,int row_flags);
 void FLEX_GRID_PUT_COLOR_STR(int row,int col,CString str);
@@ -85,7 +86,8 @@ public:
 	void InitScanGrid();
 
 	void AddComDeviceToGrid(vector<_ComDeviceInfo*>& szList);
-	void AddNetDeviceToGrid(vector<_NetDeviceInfo*>& szList);
+//	void AddNetDeviceToGrid(vector<_NetDeviceInfo*>& szList);
+	void AddNetDeviceToGrid();
 
 	void SetScanner(CTStatScanner* pScanner);
 	void SetNode(tree_product product_Node);

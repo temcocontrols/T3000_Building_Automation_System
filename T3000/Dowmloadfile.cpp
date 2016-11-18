@@ -37,7 +37,8 @@ CString Folder_Path;
 CString HEX_BIN_FILE_PATH;
 extern char * receivefile_buffer;
 CString new_firmware_ip;
-
+int is_local_temco_net = false;
+extern bool update_t3000_only ;
 IMPLEMENT_DYNAMIC(Dowmloadfile, CDialogEx)
 
 Dowmloadfile::Dowmloadfile(CWnd* pParent /*=NULL*/)
@@ -195,14 +196,18 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 
 
 		WritePrivateProfileStringW(_T("Data"),_T("Command"),_T("1"),AutoFlashConfigPath);
-		if(m_product_isp_auto_flash.BuildingInfo.strIp.IsEmpty())//串口
+		if(m_product_isp_auto_flash.BuildingInfo.strIp.IsEmpty() || 
+			(m_product_isp_auto_flash.baudrate == 19200) || 
+			(m_product_isp_auto_flash.baudrate == 115200))//串口
 		{
-			
+			CString temp_baudrate;
+			temp_baudrate.Format(_T("%d"),m_product_isp_auto_flash.baudrate);
 			 WritePrivateProfileStringW(_T("Data"),_T("COM_OR_NET"),_T("COM"),AutoFlashConfigPath);
 			 CString cs_comport;
 			 cs_comport.Format(_T("COM%d"), m_product_isp_auto_flash.ncomport);
 			 WritePrivateProfileStringW(_T("Data"),_T("COMPORT"),cs_comport,AutoFlashConfigPath);
-			 WritePrivateProfileStringW(_T("Data"),_T("Baudrate"),_T("19200"),AutoFlashConfigPath);
+			 //WritePrivateProfileStringW(_T("Data"),_T("Baudrate"),_T("19200"),AutoFlashConfigPath);
+			  WritePrivateProfileStringW(_T("Data"),_T("Baudrate"),temp_baudrate,AutoFlashConfigPath);
 
 			 CString nflash_id;
 			 nflash_id.Format(_T("%d"),m_product_isp_auto_flash.product_id);
@@ -211,7 +216,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 			 temp_isp_info.Format(_T("ISP via : "));
 			 temp_isp_info = temp_isp_info + cs_comport;
 			 m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
-			 temp_isp_info.Format(_T("ISP baudrate : 19200"));
+			 temp_isp_info.Format(_T("ISP baudrate : %d"),m_product_isp_auto_flash.baudrate);
 			 m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
 			 temp_isp_info.Format(_T("Device ID :"));
 			 temp_isp_info = temp_isp_info + nflash_id;
@@ -501,7 +506,7 @@ DWORD WINAPI   Dowmloadfile::DownLoadFileProcess(LPVOID lpVoid)
 				temp_info.HEAD_1 = 0x55;
 				temp_info.HEAD_2 = 0xff;
 				temp_info.length = sizeof(Download_Info) - 2;
-				temp_info.commad =  DOWNLOAD_NEW_FILE;
+				temp_info.commad =  DOWNLOAD_FILE;
 				temp_info.product_id = m_product_isp_auto_flash.product_class_id;
 				temp_info.get_newest = 1;
 				temp_info.file_type = 2;
@@ -738,14 +743,14 @@ BOOL Dowmloadfile::OnInitDialog()
 	}
 
 	m_download_product_type = (unsigned char)m_product_isp_auto_flash.product_class_id;
-	if((m_download_product_type == 0) || (m_download_product_type >= 200))
+	if(m_download_product_type == 0)
 	{
 		PostMessage(WM_CLOSE,NULL,NULL);
 	}
 	CString temp_db_ini_folder;
 	temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
 
-	int is_local_temco_net = false;
+	
 	is_local_temco_net  = GetPrivateProfileInt(_T("Setting"),_T("LocalTemcoNet"),0,temp_db_ini_folder);
 	if(is_local_temco_net == false)
 	{
@@ -755,6 +760,23 @@ BOOL Dowmloadfile::OnInitDialog()
 
 	//hostent* host = gethostbyname("www.temcocontrols.poweredbyclear.com");  //这是以前的域名 
 	//hostent* host = gethostbyname("14i5f38013.iok.la");
+
+	if((isp_mode_firmware_auto == false) && (isp_mode_is_cancel == false))
+	{
+		GetDlgItem(IDC_BUTTON_UPDATE_T3000)->EnableWindow(FALSE);
+		GetDlgItem(IDC_BUTTON_FILE_DOWNLOAD_ONLY)->EnableWindow(FALSE);
+		GetDlgItem(IDC_BUTTON_START_DOWNLOAD)->EnableWindow(FALSE);
+		SetTimer(5,2000,NULL);
+		return TRUE;
+	}
+	else if((isp_mode_firmware_auto == true) && (isp_mode_is_cancel == false))
+	{
+		SetTimer(6,2000,NULL);
+	}
+	else if(update_t3000_only)
+	{
+		SetTimer(7,1000,NULL);
+	}
 
 	if(is_local_temco_net == false)
 	{
@@ -991,8 +1013,26 @@ void Dowmloadfile::OnTimer(UINT_PTR nIDEvent)
 		break;
 	case 2:
 		{
-			OnBnClickedButtonFileDownloadOnly();
 			KillTimer(2);
+			OnBnClickedButtonFileDownloadOnly();
+		}
+		break;
+	case 5:
+		{
+			KillTimer(5);
+			AutoFlashFirmware();
+		}
+		break;
+	case 6:
+		{
+			KillTimer(6);
+			OnBnClickedButtonStartDownload();
+		}
+		break;
+	case 7:
+		{
+			KillTimer(7);
+			OnBnClickedButtonUpdateT3000();
 		}
 		break;
 	default:
@@ -1048,22 +1088,148 @@ void Dowmloadfile::OnBnClickedButtonFileDownloadOnly()
 	Start_Download();
 }
 
+void Dowmloadfile::AutoFlashFirmware()
+{
+	CString ApplicationFolder;
+	GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+	PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
+	ApplicationFolder.ReleaseBuffer();
+	ISPtool_path = ApplicationFolder + _T("\\ISP.exe");
+
+	AutoFlashConfigPath = ApplicationFolder + _T("//AutoFlashFile.ini");
+
+	CString temp_isp_info;
+	CString exe_folder;
+	GetModuleFileName(NULL, exe_folder.GetBuffer(MAX_PATH), MAX_PATH);
+	PathRemoveFileSpec(exe_folder.GetBuffer(MAX_PATH));
+	exe_folder.ReleaseBuffer();
+
+
+	WritePrivateProfileStringW(_T("Data"),_T("FirmwarePath"),isp_mode_detect_firmware_path,AutoFlashConfigPath);
+
+
+	temp_isp_info.Format(_T("FirmwarePath = "));
+	temp_isp_info = temp_isp_info + isp_mode_detect_firmware_path;
+	m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
+	m_download_info.SetTopIndex(m_download_info.GetCount()-1);
+
+	
+
+
+	bool is_sub_device = false;
+	//CString temp_deal_ip =	m_product_isp_auto_flash.BuildingInfo.strIp;
+	//if(!temp_deal_ip.IsEmpty())
+	//{
+	//	CStringArray temparray;
+	//	SplitCStringA(temparray,temp_deal_ip,_T("."));
+	//	if(temparray.GetSize()==4)
+	//	{
+	//		if(m_product_isp_auto_flash.note_parent_serial_number == 0)
+	//			is_sub_device  = false;
+	//		else
+	//			is_sub_device = true;
+	//	}
+	//}
+
+
+	//bool is_sub_device = (bool)IsNetDevice(m_product_isp_auto_flash.product_class_id);
+
+
+	WritePrivateProfileStringW(_T("Data"),_T("Command"),_T("1"),AutoFlashConfigPath);
+	//if(m_product_isp_auto_flash.BuildingInfo.strIp.IsEmpty() || 
+	//	(m_product_isp_auto_flash.baudrate == 19200) || 
+	//	(m_product_isp_auto_flash.baudrate == 115200))//串口
+	//{
+	//	CString temp_baudrate;
+	//	temp_baudrate.Format(_T("%d"),m_product_isp_auto_flash.baudrate);
+	//	WritePrivateProfileStringW(_T("Data"),_T("COM_OR_NET"),_T("COM"),AutoFlashConfigPath);
+	//	CString cs_comport;
+	//	cs_comport.Format(_T("COM%d"), m_product_isp_auto_flash.ncomport);
+	//	WritePrivateProfileStringW(_T("Data"),_T("COMPORT"),cs_comport,AutoFlashConfigPath);
+	//	//WritePrivateProfileStringW(_T("Data"),_T("Baudrate"),_T("19200"),AutoFlashConfigPath);
+	//	WritePrivateProfileStringW(_T("Data"),_T("Baudrate"),temp_baudrate,AutoFlashConfigPath);
+
+	//	CString nflash_id;
+	//	nflash_id.Format(_T("%d"),m_product_isp_auto_flash.product_id);
+	//	WritePrivateProfileStringW(_T("Data"),_T("ID"),nflash_id,AutoFlashConfigPath);
+
+	//	temp_isp_info.Format(_T("ISP via : "));
+	//	temp_isp_info = temp_isp_info + cs_comport;
+	//	m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
+	//	temp_isp_info.Format(_T("ISP baudrate : %d"),m_product_isp_auto_flash.baudrate);
+	//	m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
+	//	temp_isp_info.Format(_T("Device ID :"));
+	//	temp_isp_info = temp_isp_info + nflash_id;
+	//	m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
+	//}
+	//else
+	//{
+		WritePrivateProfileStringW(_T("Data"),_T("COM_OR_NET"),_T("NET"),AutoFlashConfigPath);
+		WritePrivateProfileStringW(_T("Data"),_T("IPAddress"),m_product_isp_auto_flash.BuildingInfo.strIp,AutoFlashConfigPath);
+		if((m_product_isp_auto_flash.ncomport == 0) || (m_product_isp_auto_flash.ncomport == 47808))
+		{
+			m_product_isp_auto_flash.ncomport = 502;
+		}
+		temp_isp_info.Format(_T("ISP via : network"));
+		m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
+		temp_isp_info.Format(_T("IP Address : "));
+		temp_isp_info = temp_isp_info + m_product_isp_auto_flash.BuildingInfo.strIp;
+		m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
+
+
+		CString n_tcpport;
+		n_tcpport.Format(_T("%d"),m_product_isp_auto_flash.ncomport);
+
+		temp_isp_info.Format(_T("Port : "));
+		temp_isp_info = temp_isp_info + n_tcpport;
+		m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
+
+		WritePrivateProfileStringW(_T("Data"),_T("IPPort"),n_tcpport,AutoFlashConfigPath);
+		if(is_sub_device)
+		{
+			WritePrivateProfileStringW(_T("Data"),_T("Subnote"),_T("1"),AutoFlashConfigPath);
+			CString nsub_id;
+			nsub_id.Format(_T("%d"),m_product_isp_auto_flash.product_id);
+			WritePrivateProfileStringW(_T("Data"),_T("SubID"),nsub_id,AutoFlashConfigPath);
+
+			temp_isp_info.Format(_T("Device is subnote."));
+			m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
+		}
+		else
+		{
+			WritePrivateProfileStringW(_T("Data"),_T("Subnote"),_T("0"),AutoFlashConfigPath);
+		}
+
+		temp_isp_info.Format(_T("Please wait!ISP is running!"));
+		m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
+	//}
+SetTimer(1,200,NULL);
+	HANDLE Call_ISP_Application = NULL;
+	Call_ISP_Application =CreateThread(NULL,NULL,isp_thread,this,NULL, NULL);
+}
 
 void Dowmloadfile::OnBnClickedButtonUpdateT3000()
 {
 	// TODO: Add your control notification handler code here
-
-	CString tempApplicationFolder;
-	GetModuleFileName(NULL, tempApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
-	PathRemoveFileSpec(tempApplicationFolder.GetBuffer(MAX_PATH));
-	tempApplicationFolder.ReleaseBuffer();
-
-
-	ShellExecute(NULL,_T("open"),_T("Update.exe"),NULL,tempApplicationFolder,SW_SHOWNORMAL);
+	//if(is_local_temco_net == false)
+	//{
+		CString tempApplicationFolder;
+		GetModuleFileName(NULL, tempApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+		PathRemoveFileSpec(tempApplicationFolder.GetBuffer(MAX_PATH));
+		tempApplicationFolder.ReleaseBuffer();
 
 
-	//m_product_isp_auto_flash.product_class_id =  199;
-	//download_and_update = DOWNLOAD_ONLY;
-	//Start_Download();
+		ShellExecute(NULL,_T("open"),_T("Update.exe"),NULL,tempApplicationFolder,SW_SHOWNORMAL);
+	//}
+	//else
+	//{
+	//	m_product_isp_auto_flash.product_class_id =  199;
+	//	download_and_update = DOWNLOAD_ONLY;
+	//	Start_Download();
+	//}
+
+
+
+
 	return;
 }

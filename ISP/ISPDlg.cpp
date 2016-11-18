@@ -1410,13 +1410,13 @@ BOOL CISPDlg::FlashTstat(void)
     }
     if (GetCommunicationType () == 0)
     {
-        if (!DetectBraudrate ())
-        {
-            UpdateStatusInfo(_T("Detecting your Braudrate ,Failed"), FALSE);
-            return FALSE;
-        }
+//         if (!DetectBraudrate ())
+//         {
+//             UpdateStatusInfo(_T("Detecting your Braudrate ,Failed"), FALSE);
+//             return FALSE;
+//         }
 
-		SetResponseTime(60);
+		//SetResponseTime(60);
     }
     if(!FileValidation(m_strHexFileName))
     {
@@ -1435,129 +1435,129 @@ BOOL CISPDlg::FlashTstat(void)
         {
             return FALSE;
         }
-        BOOL flag=open_com(nPort);
-		Change_BaudRate (m_Brandrate);
-        if (flag)
-        {
-            if (m_szMdbIDs.size()<=1)
-            {
-                TempID=m_szMdbIDs[0];
-                if (TempID!=255)
-                {
-                    int realID=-1;
-                    realID=Read_One(TempID,6);
-                    while(realID<0) //the return value == -1 ,no connecting
-                    {
-                        if(times<5)
-                        {
-                            times++;
-                            realID=Read_One(TempID,6);
-                            continue;
-                        }
-                        else
-                        {
-                            break;
-                        }
+  //      BOOL flag=open_com(nPort);
+		//Change_BaudRate (m_Brandrate);
+  //      if (flag)
+  //      {
+  //          if (m_szMdbIDs.size()<=1)
+  //          {
+  //              TempID=m_szMdbIDs[0];
+  //              if (TempID!=255)
+  //              {
+  //                  int realID=-1;
+  //                  realID=Read_One(TempID,6);
+  //                  while(realID<0) //the return value == -1 ,no connecting
+  //                  {
+  //                      if(times<5)
+  //                      {
+  //                          times++;
+  //                          realID=Read_One(TempID,6);
+  //                          continue;
+  //                      }
+  //                      else
+  //                      {
+  //                          break;
+  //                      }
 
-                    }
-                    if (times>=5)
-                    {
-                        temp.Format(_T("ISPTool Can't connect to %d,device maybe offline!\n"),TempID);
-                        UpdateStatusInfo(temp,false);
-                        if(auto_flash_mode)
-                        {
-                            PostMessage(WM_FLASH_FINISH, 0, LPARAM(0));
-                        }
-                        /*int ret=AfxMessageBox(temp,MB_OKCANCEL);
-                        if(ret==IDOK)
-                        {
-                        	TempID=255;
-                        	m_szMdbIDs[0]=255;
-                        	temp.Format(_T("%d"),TempID);
-                        	id.SetWindowText(temp);
-                        }*/
-                        return FALSE;
+  //                  }
+  //                  if (times>=5)
+  //                  {
+  //                      temp.Format(_T("ISPTool Can't connect to %d,device maybe offline!\n"),TempID);
+  //                      UpdateStatusInfo(temp,false);
+  //                      if(auto_flash_mode)
+  //                      {
+  //                          PostMessage(WM_FLASH_FINISH, 0, LPARAM(0));
+  //                      }
+  //                      /*int ret=AfxMessageBox(temp,MB_OKCANCEL);
+  //                      if(ret==IDOK)
+  //                      {
+  //                      	TempID=255;
+  //                      	m_szMdbIDs[0]=255;
+  //                      	temp.Format(_T("%d"),TempID);
+  //                      	id.SetWindowText(temp);
+  //                      }*/
+  //                      return FALSE;
 
-                    }
-                    else
-                    {
-                        if (realID<0)
-                        {
-                            if(!auto_flash_mode)
-                                AfxMessageBox(_T("Can't read the device ID,please check the connection."));
-                            else
-                            {
-                                temp.Format(_T("Can't read the device ID,please check the connection."));
-                                UpdateStatusInfo(temp,false);
-                                PostMessage(WM_FLASH_FINISH, 0, LPARAM(0));
-                            }
-                            return FALSE;
-                        }
-                        if (realID!=TempID)
-                        {
-                            temp.Format(_T("The ID is %d,retry to flash it !\n"),realID);
-                            if(!auto_flash_mode)
-                                AfxMessageBox(temp);
-                            UpdateStatusInfo(temp,false);
-                            temp.Format(_T("%d"),realID);
-                            id.SetWindowText(temp);
-                            if(auto_flash_mode)
-                            {
-                                FlashByCom();
-                                return TRUE;
-                            }
-                            return FALSE;
+  //                  }
+  //                  else
+  //                  {
+  //                      if (realID<0)
+  //                      {
+  //                          if(!auto_flash_mode)
+  //                              AfxMessageBox(_T("Can't read the device ID,please check the connection."));
+  //                          else
+  //                          {
+  //                              temp.Format(_T("Can't read the device ID,please check the connection."));
+  //                              UpdateStatusInfo(temp,false);
+  //                              PostMessage(WM_FLASH_FINISH, 0, LPARAM(0));
+  //                          }
+  //                          return FALSE;
+  //                      }
+  //                      if (realID!=TempID)
+  //                      {
+  //                          temp.Format(_T("The ID is %d,retry to flash it !\n"),realID);
+  //                          if(!auto_flash_mode)
+  //                              AfxMessageBox(temp);
+  //                          UpdateStatusInfo(temp,false);
+  //                          temp.Format(_T("%d"),realID);
+  //                          id.SetWindowText(temp);
+  //                          if(auto_flash_mode)
+  //                          {
+  //                              FlashByCom();
+  //                              return TRUE;
+  //                          }
+  //                          return FALSE;
 
-                        }
+  //                      }
 
 
 
-                    }
-                }
+  //                  }
+  //              }
 
-            }
-            else
-            {
-                for (UINT i=0; i<m_szMdbIDs.size(); i++)
-                {
-                    TempID=m_szMdbIDs[i];
-                    while(Read_One(TempID,0xee10)<0) //the return value == -1 ,no connecting
-                    {
-                        if(times<5)
-                        {
-                            times++;
-                            continue;
-                        }
-                        else
-                        {
-                            break;
-                        }
+  //          }
+  //          else
+  //          {
+  //              for (UINT i=0; i<m_szMdbIDs.size(); i++)
+  //              {
+  //                  TempID=m_szMdbIDs[i];
+  //                  while(Read_One(TempID,0xee10)<0) //the return value == -1 ,no connecting
+  //                  {
+  //                      if(times<5)
+  //                      {
+  //                          times++;
+  //                          continue;
+  //                      }
+  //                      else
+  //                      {
+  //                          break;
+  //                      }
 
-                    }
-                    if (times>=5)
-                    {
-                        temp.Format(_T("ISP   Tool Can't connect to %d\n"),TempID);
-                        continue;
-                        UpdateStatusInfo(temp,false);
-                    }
-                }
-            }
-            close_com();
-        }
-        else
-        {
-            UpdateStatusInfo(_T("Com Occupied"),false);
-            if(!auto_flash_mode)
-                AfxMessageBox(_T("Com Occupied"));
-            else
-            {
-                WritePrivateProfileStringW(_T("Data"),_T("Command"),_T("4"),AutoFlashConfigPath);	//FAILED_UNKNOW_ERROR
-                auto_flash_mode = false;//设置为false后 不在为自动模式，退出程序;
-                PostMessage(WM_CLOSE,NULL,NULL);
-                return FALSE;
-            }
-            return FALSE;
-        }
+  //                  }
+  //                  if (times>=5)
+  //                  {
+  //                      temp.Format(_T("ISP   Tool Can't connect to %d\n"),TempID);
+  //                      continue;
+  //                      UpdateStatusInfo(temp,false);
+  //                  }
+  //              }
+  //          }
+  //          close_com();
+  //      }
+  //      else
+  //      {
+  //          UpdateStatusInfo(_T("Com Occupied"),false);
+  //          if(!auto_flash_mode)
+  //              AfxMessageBox(_T("Com Occupied"));
+  //          else
+  //          {
+  //              WritePrivateProfileStringW(_T("Data"),_T("Command"),_T("4"),AutoFlashConfigPath);	//FAILED_UNKNOW_ERROR
+  //              auto_flash_mode = false;//设置为false后 不在为自动模式，退出程序;
+  //              PostMessage(WM_CLOSE,NULL,NULL);
+  //              return FALSE;
+  //          }
+  //          return FALSE;
+  //      }
 
 
 

@@ -71,7 +71,7 @@ LRESULT  CBacnetOutput::OutputMessageCallBack(WPARAM wParam, LPARAM lParam)
 				pInvoke->mRow,pInvoke->mRow,sizeof(Str_out_point));
 			SetTimer(2,2000,NULL);
 		}
-		//MessageBox(_T("Bacnet operation success!"));
+		//Save_OutputData_to_db(pInvoke->mRow);
 	}
 	else
 	{
@@ -373,6 +373,11 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 	{
 		OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
 	}
+	else if((bacnet_device_type == PID_T322AI) ||
+		    (bacnet_device_type == PID_T3PT12))
+	{
+		OUTPUT_LIMITE_ITEM_COUNT = 0;
+	}
 	else
 	{
 		OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
@@ -382,7 +387,10 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 	for (int z= 0 ;z < (int)m_Output_data.size();z++)
 	{
 		if(z>= OUTPUT_LIMITE_ITEM_COUNT)
-			break;
+		{
+			m_output_list.SetItemText(z,0,_T(""));
+			continue;
+		}
 		if((m_Output_data.at(z).sub_id !=0) &&
 			(m_Output_data.at(z).sub_product !=0))
 		{
@@ -674,7 +682,27 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 					temp_number.Format(_T("DO%d"),temp_sub_number + 1);
 
 
+				if(m_Output_data.at(i).hw_switch_status == HW_SW_OFF)
+				{
+					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("MAN-OFF"));		
+					//m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,0);
 
+					m_output_list.SetItemTextColor(i,-1,RGB(255,0,0),0);
+				}
+				else if(m_Output_data.at(i).hw_switch_status == HW_SW_HAND)
+				{
+					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("MAN-ON"));
+					//m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,0);
+
+					m_output_list.SetItemTextColor(i,-1,RGB(255,0,0),0);
+				}
+				else
+				{
+					m_output_list.SetItemTextColor(i,-1,RGB(0,0,0),0);
+
+					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("AUTO"));
+					//m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,1);
+				}
 
 				
 				m_output_list.SetItemText(i,OUTPUT_EXTERNAL,_T("External"));

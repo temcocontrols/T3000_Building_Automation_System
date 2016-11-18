@@ -42,7 +42,6 @@
 #include <afxinet.h>    // MFC Internet support
 #include <afxmt.h>      // MFC multithreading support
 #include <bitset>
-
 //#define  test_ptp
 
 #ifndef _AFX_NO_OLE_SUPPORT
@@ -70,7 +69,6 @@ using namespace Gdiplus;
 
 #pragma  comment(lib,"HtmlHelp.lib")
 #pragma  comment(lib,"Iphlpapi.lib")
-//#pragma comment(lib,"sqlite.lib")
 
  
 #include "HtmlHelp.h"
@@ -79,7 +77,6 @@ using namespace Gdiplus;
 
 //#pragma  comment(lib,"ISP.lib")
 //#pragma  comment(lib,"RegisterMonitor.lib")
-#import "C:\Program Files\Common Files\System\ado\msado15.dll" no_namespace rename("EOF","EndOfFile") rename("BOF","FirstOfFile")
 //**********************************link to dll*********************
 #define INPUT extern "C" __declspec(dllimport)
 #pragma comment(lib, "WS2_32")
@@ -193,6 +190,7 @@ using namespace std;  // Ensure that the namespace is set to std
 #define		WM_REFRESH_BAC_AT_COMMAND					WM_USER + 221
 #define		WM_REFRESH_BAC_REMOTE_POINT_LIST					WM_USER + 222
 #define		WM_REFRESH_BAC_ANALOGCUSRANGE_LIST					WM_USER + 223
+#define WM_SHOW_SCANN_RESULTS WM_USER + 2691
 //#pragma warning(disable:4244)
 //#pragma warning(disable:4018)
 //#pragma warning(disable:4800)
@@ -235,6 +233,7 @@ typedef struct _STATUSBARINFO
 #define MY_READ_DATA_CALLBACK WM_USER+301
 #define MY_RX_TX_COUNT WM_USER + 302
 #define WM_ADD_DEBUG_CSTRING WM_USER + 303
+#define MY_RETRY_MESSAGE WM_USER + 304
 #define  WM_SCAN_PRODUCT WM_USER+2014
 #define  WM_SHOW_PANNELINFOR WM_USER + 2222
 

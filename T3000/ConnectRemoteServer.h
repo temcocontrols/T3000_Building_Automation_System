@@ -25,3 +25,4 @@ public:
 	afx_msg void OnClose();
 };
 DWORD WINAPI  TcpClient_Connect_Thread(LPVOID lpVoid);
+DWORD WINAPI UDP_ptp_Thread(LPVOID lpVoid);

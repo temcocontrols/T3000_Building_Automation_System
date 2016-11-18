@@ -395,8 +395,8 @@ void CCO2NetView::Initial_Window()
     strTemp.Format(_T("%d"),IntTemp);
     m_edit_IDAddress.SetWindowText(strTemp);
 
-    IntTemp=product_register_value[CO2_NET_MODBUS_SERIALNUMBER_LOWORD]+product_register_value[CO2_NET_MODBUS_SERIALNUMBER_LOWORD+1]*255+
-            product_register_value[CO2_NET_MODBUS_SERIALNUMBER_HIWORD]*255*255+product_register_value[CO2_NET_MODBUS_SERIALNUMBER_HIWORD+1]*255*255*255;
+    IntTemp=product_register_value[CO2_NET_MODBUS_SERIALNUMBER_LOWORD]+product_register_value[CO2_NET_MODBUS_SERIALNUMBER_LOWORD+1]*256+
+            product_register_value[CO2_NET_MODBUS_SERIALNUMBER_HIWORD]*256*256+product_register_value[CO2_NET_MODBUS_SERIALNUMBER_HIWORD+1]*256*256*256;
     strTemp.Format(_T("%d"),IntTemp);
     m_edit_SN.SetWindowText(strTemp);
     strTemp.Format(_T("%0.1f"),((float)(product_register_value[CO2_NET_MODBUS_SOFTWARE_VERSION_HI]*256+product_register_value[CO2_NET_MODBUS_SOFTWARE_VERSION_LO]))/10);

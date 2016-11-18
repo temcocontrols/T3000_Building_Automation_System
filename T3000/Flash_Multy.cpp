@@ -9,6 +9,11 @@
 #include "globle_function.h"
 #include "Dowmloadfile.h"
 #include "../SQLiteDriver/CppSQLite3.h"
+#include "BinFileParser.h"
+#include "HexFileParser.h"
+
+const DWORD c_nHexFileBufLen = 0x7FFFF;
+
 // CFlash_Multy dialog
 CString ApplicationFolder;
 CString MultyISPtool_path;
@@ -464,34 +469,53 @@ BOOL CFlash_Multy::Product_Firmware_Check(CString ProductName,CString FirmwareFi
     Bin_Info file_infor;
     CString hexproductname=_T("");
     BOOL is_good;
+	char* m_pFileBuf;
     if (HexFileValidation(FirmwareFilePath))
     {
+		 CHexFileParser* pHexFile = new CHexFileParser;
+		pHexFile->SetFileName(FirmwareFilePath);
 
-        if(READ_SUCCESS != Get_HexFile_Information(FirmwareFilePath,file_infor))
-        {
-            is_good = FALSE;
-        }
-        else
-        {
-            is_good = TRUE;
-        }
+		m_pFileBuf = new char[c_nHexFileBufLen];
+		memset(m_pFileBuf, 0xFF, c_nHexFileBufLen);
+		int nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuf, c_nHexFileBufLen); 
+		file_infor = pHexFile->global_fileInfor;
+
+		if (pHexFile)
+		{
+			delete pHexFile;
+			pHexFile = NULL;
+		}
+		 
 
     }
     if (BinFileValidation(FirmwareFilePath))
     {
 //         Get_Binfile_Information(FirmwareFilePath,file_infor);
 //         is_good = TRUE;
-        if(READ_SUCCESS != Get_Binfile_Information(FirmwareFilePath,file_infor))
+      /*  if(READ_SUCCESS != Get_Binfile_Information(FirmwareFilePath,file_infor))
         {
             is_good = FALSE ;
         }
         else
         {
             is_good = TRUE;
-        }
+        }*/
+
+ 
+
+		CBinFileParser* pBinFile=new CBinFileParser;
+		pBinFile->SetBinFileName(FirmwareFilePath);
+		m_pFileBuf=new char[c_nHexFileBufLen];
+		memset(m_pFileBuf, 0xFF, c_nHexFileBufLen);
+		int nDataSize=pBinFile->GetBinFileBuffer(m_pFileBuf,c_nHexFileBufLen);
+		 file_infor = pBinFile->global_fileInfor;
+		delete pBinFile;
+		pBinFile = NULL;
+
+
     }
     BOOL Ret_Result = TRUE;
-    if (is_good)
+    if (TRUE)
     {
         for (int i=0; i<10; i++)
         {

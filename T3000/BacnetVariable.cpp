@@ -1121,7 +1121,7 @@ BOOL CBacnetVariable::OnHelpInfo(HELPINFO* pHelpInfo)
 		HWND hWnd;
 		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
 		else
-			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_VARIABLES);
+			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_6_5_VARIABLES);
 		return (hWnd != NULL);
 // 	}
 // 	else{

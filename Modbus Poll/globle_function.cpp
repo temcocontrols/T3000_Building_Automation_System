@@ -4,7 +4,7 @@
 #include "Windows.h"
 #include "ModbusDllForVC.h"
 #include "gloab_define.h"
-#include "ado/ADO.h"
+ 
 #include "global_variable.h"
 #define DELAY_TIME	 10	//MS
 #define Modbus_Serial	0

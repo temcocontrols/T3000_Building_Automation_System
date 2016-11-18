@@ -74,7 +74,7 @@ LRESULT  CBacnetInput::InputMessageCallBack(WPARAM wParam, LPARAM lParam)
 				pInvoke->mRow,pInvoke->mRow,sizeof(Str_in_point));
 			SetTimer(2,2000,NULL);
 		}
-		
+		//Save_InputData_to_db(pInvoke->mRow);
 	}
 	else
 	{
@@ -511,6 +511,10 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 	{
 		INPUT_LIMITE_ITEM_COUNT = 22;
 	}
+	else if(bacnet_device_type == PID_T3PT12)
+	{
+		INPUT_LIMITE_ITEM_COUNT = 12;
+	}
 	else
 	{
 		INPUT_LIMITE_ITEM_COUNT = BAC_INPUT_ITEM_COUNT;
@@ -653,6 +657,12 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 						m_input_list.SetItemText(i,INPUT_RANGE,_T("PT-1000 Deg.C"));
 					else if(m_Input_data.at(i).range == 6)
 						m_input_list.SetItemText(i,INPUT_RANGE,_T("PT-1000 Deg.F"));
+					else
+					{
+						if(m_Input_data.at(i).range <= (sizeof(Input_Analog_Units_Array) / sizeof(Input_Analog_Units_Array[0])))
+							m_input_list.SetItemText(i,INPUT_RANGE,Input_Analog_Units_Array[m_Input_data.at(i).range]);	
+					}
+
 				}
 				else
 					m_input_list.SetItemText(i,INPUT_RANGE,Input_Analog_Units_Array[m_Input_data.at(i).range]);
@@ -1156,6 +1166,12 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 						m_input_list.SetItemText(lRow,INPUT_RANGE,_T("PT-1000 Deg.C"));
 					else if(m_Input_data.at(lRow).range == 6)
 						m_input_list.SetItemText(lRow,INPUT_RANGE,_T("PT-1000 Deg.F"));
+					else
+					{
+						if(bac_range_number_choose <= (sizeof(Input_Analog_Units_Array) / sizeof(Input_Analog_Units_Array[0])))
+							m_input_list.SetItemText(lRow,INPUT_RANGE,Input_Analog_Units_Array[bac_range_number_choose]);	
+					}
+
 
 					New_CString = _T("PT Type ");
 				}

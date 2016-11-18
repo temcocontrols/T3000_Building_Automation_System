@@ -34,7 +34,6 @@ public:
 	afx_msg LRESULT OnComScanInfo(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnBacnetComScanInfo(WPARAM wParam, LPARAM lParam);
 
-
 	void SetPromtText(CString strInfo);
 	void SetTStatScaner(CTStatScanner* pScanner);
 	void Initial_List();

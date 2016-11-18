@@ -12,5 +12,37 @@ Maurice Duteau
 General Manager    
 [Temco Controls](http://www.temcocontrols.com/)    
 maurice (at) temcocontrols (dot) com
+
+[T3000_Building_Automation_System Screen Capture_1](http://is200.imagesocket.com/images/2013/05/22/2613961-tt4c.jpg)
+
+
+[T3000_Building_Automation_System Screen Capture_Tstat](http://is200.imagesocket.com/images/2013/05/22/2613968-bkdu.jpg)
+
+
+[T3000_Building_Automation_System Screen Capture_Tstat_Parameter](http://is100.imagesocket.com/images/2013/05/22/2613976-ddhj.jpg)
+
+
+[T3000_Building_Automation_System Screen Capture_NC](http://is200.imagesocket.com/images/2013/05/22/2613977-u9dw.jpg)
+
+![T3000_screen_capture_1](http://www.4shared.com/download/2HDba9or/1_online.bmp)     
+
+![T3000_screen_capture_2](http://www.4shared.com/download/NF9J9Kxq/2_online.bmp)     
+
+![T3000_screen_capture_3](http://www.4shared.com/download/lADm6SHp/3_online.bmp)     
+
+![T3000_screen_capture_4](http://www.4shared.com/download/ZQNKCZh4/4_online.bmp)     
+
+![T3000_screen_capture_5](http://www.4shared.com/download/HxPi2ZG-/5_online.bmp)     
+
+![T3000_screen_capture_6](http://www.4shared.com/download/e5UYnrBu/6_online.bmp)     
+
+![T3000_screen_capture_7](http://www.4shared.com/download/Zrxsrpt1/7_online.bmp)     
+
+![T3000_screen_capture_11](http://www.4shared.com/download/vu8fHhq5/11_online.bmp)     
+
+![T3000_screen_capture_12](http://www.4shared.com/download/JtrqZSYn/12_online.bmp)     
+
+![T3000_screen_capture_13](http://www.4shared.com/download/kDjeOQpR/13_online.bmp)      
+
 Have a look at our website and products!!!     
 

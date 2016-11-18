@@ -78,11 +78,46 @@ BOOL BacnetRange::OnInitDialog()
 
 	if(bacnet_device_type == PM_T3PT12)
 	{
-		GetDlgItem(IDC_RADIO55)->SetWindowTextW(_T("PT-100 Deg.C"));
-		GetDlgItem(IDC_RADIO56)->SetWindowTextW(_T("PT-100 Deg.F"));
 
-		GetDlgItem(IDC_RADIO59)->SetWindowTextW(_T("PT-1000 Deg.C"));
-		GetDlgItem(IDC_RADIO60)->SetWindowTextW(_T("PT-1000 Deg.F"));
+		GetDlgItem(IDC_RADIO55)->SetWindowTextW(_T("31.  PT100 -40 to 150 Deg.C"));
+		GetDlgItem(IDC_RADIO56)->SetWindowTextW(_T("32.  PT100 -40 to 250 Deg.F"));
+		GetDlgItem(IDC_RADIO59)->SetWindowTextW(_T("35.  PT1000 -40 to 150 Deg.C"));
+		GetDlgItem(IDC_RADIO60)->SetWindowTextW(_T("36.  PT1000 -40 to 250 Deg.F"));
+
+		//先禁用所有的选项;
+		for (int i=IDC_RADIO54;i<=IDC_RADIO72;i++)
+		{
+			((CButton *)GetDlgItem(i))->EnableWindow(FALSE);
+		}
+		for (int i=IDC_RADIO81;i<=IDC_RADIO88;i++)
+		{
+			((CButton *)GetDlgItem(i))->EnableWindow(FALSE);
+		}
+
+		for (int i=IDC_RADIO35;i<=IDC_RADIO46;i++)
+		{
+			((CButton *)GetDlgItem(i))->EnableWindow(FALSE);
+		}
+		for (int i=IDC_RADIO89;i<=IDC_RADIO99;i++)
+		{
+			((CButton *)GetDlgItem(i))->EnableWindow(FALSE);
+		}
+		for (int i=IDC_RADIO73;i<=IDC_RADIO80;i++)
+		{
+			((CButton *)GetDlgItem(i))->EnableWindow(FALSE);
+		}
+		((CButton *)GetDlgItem(IDC_BTN_EDIT_CUSTOMER_RANGE))->EnableWindow(FALSE);
+		
+		//使能PT12有的选项
+		((CButton *)GetDlgItem(IDC_RADIO55))->EnableWindow(1);
+		((CButton *)GetDlgItem(IDC_RADIO56))->EnableWindow(1);
+		((CButton *)GetDlgItem(IDC_RADIO57))->EnableWindow(1);
+		((CButton *)GetDlgItem(IDC_RADIO58))->EnableWindow(1);
+		((CButton *)GetDlgItem(IDC_RADIO59))->EnableWindow(1);
+		((CButton *)GetDlgItem(IDC_RADIO60))->EnableWindow(1);
+
+		((CButton *)GetDlgItem(IDC_RADIO61))->EnableWindow(1);
+		((CButton *)GetDlgItem(IDC_RADIO62))->EnableWindow(1);
 	}
 	return FALSE;
 	//return TRUE;  // return TRUE unless you set the focus to a control
@@ -548,9 +583,31 @@ BOOL BacnetRange::PreTranslateMessage(MSG* pMsg)
 void BacnetRange::OnOK()
 {
 	// TODO: Add your specialized code here and/or call the base class
-	range_cancel = false;
 	CString temp;
 	GetDlgItemText(IDC_EDIT_RANGE_SELECT,temp);
+	if(bacnet_device_type == PM_T3PT12)
+	{
+		if(!temp.IsEmpty())
+		{
+			int temp_value_pt12 = _wtoi(temp);
+			if((temp_value_pt12 != 31) &&
+				(temp_value_pt12 != 32) &&
+				(temp_value_pt12 != 33) &&
+				(temp_value_pt12 != 34) &&
+				(temp_value_pt12 != 35) &&
+				(temp_value_pt12 != 36) &&
+				(temp_value_pt12 != 37) &&
+				(temp_value_pt12 != 38))
+			{
+				MessageBox(_T("Please select a available range!"));
+				return;
+			}
+		}
+	}
+
+	range_cancel = false;
+	
+	
 	if(!temp.IsEmpty())
 	{
 		int temp_value = _wtoi(temp);
@@ -905,8 +962,27 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 							break;
 
 						bac_range_number_choose = m_input_Analog_select;
-
-						m_show_unit.SetWindowTextW(Input_Analog_Units_Array[bac_range_number_choose]);
+						if(bacnet_device_type == PM_T3PT12)
+						{
+							if(bac_range_number_choose == 1)
+							{
+								m_show_unit.SetWindowTextW(_T("PT100 -40 to 150"));
+							}
+							if(bac_range_number_choose == 2)
+							{
+								m_show_unit.SetWindowTextW(_T("PT100 -40 to 250"));
+							}
+							if(bac_range_number_choose == 5)
+							{
+								m_show_unit.SetWindowTextW(_T("PT1000 -40 to 150"));
+							}
+							if(bac_range_number_choose == 6)
+							{
+								m_show_unit.SetWindowTextW(_T("PT1000 -40 to 250"));
+							}
+						}
+						else
+							m_show_unit.SetWindowTextW(Input_Analog_Units_Array[bac_range_number_choose]);
 
 						if(nfocusid != IDC_EDIT_RANGE_SELECT)
 						{
