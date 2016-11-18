@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace WFA_psychometric_chart
 {
@@ -23,9 +24,10 @@ namespace WFA_psychometric_chart
             this.form1Object = f;
             InitializeComponent();
         }
+
         ArrayList t = new ArrayList();//this stores the temperature(deg.cel)
         ArrayList pg = new ArrayList();//this stores the saturated vapour pressure(kpa).
-          
+
         //this array list is used in the web part where we pull the value from an api and store in this array list
         ArrayList temp_AL = new ArrayList();
         ArrayList hum_AL = new ArrayList();
@@ -38,10 +40,10 @@ namespace WFA_psychometric_chart
         int index = 0;
         ToolTip tp = new ToolTip();
 
-         //--Flags are defined here...
+        //--Flags are defined here...
         int flagForDisconnectClick = 0;//0 means false it is used to see if the disconnect option is clicked or not.
         int flagNodeSelectedForConnect = 0;
- 
+
         //--variable for storing the indexOfThePoints so that we can gather other properties..
         string indexOfPrevPointForLineMovement;
 
@@ -52,11 +54,11 @@ namespace WFA_psychometric_chart
         //int incrementIndex = 0;
         int mouseClickAction = 0;
 
-        string idSelected ;
+        string idSelected;
         int readyForMouseClick = 0;//this event will be true only when the cursor is in hand mode..
 
         bool arrowOn = false;
-                                     
+
         //--All the series decleared here..
         Series series1 = new Series("My Series");
 
@@ -66,7 +68,7 @@ namespace WFA_psychometric_chart
 
         //--id of the node selected, this is used when line is detached and for reconnecting we need to know which node we are connecting to.
         string idOfNodeSelected;//--initially it represents nothing...
-   
+
         double xAxis1;
         double yAxis1;
 
@@ -103,7 +105,7 @@ namespace WFA_psychometric_chart
 
         private void buildingChartSetting_Load(object sender, EventArgs e)
         {
-                        
+
             chart1.Series.Add(series1);
             chart1.Series.Add(series1xx);
             chart1.Series.Add(seriesLineIndicator);
@@ -133,7 +135,7 @@ namespace WFA_psychometric_chart
             string buildingNameValue = selectedBuildingList[0].BuildingName;
             lb_db_name.Text = buildingNameValue;
             CreateRequireTableIfNotPresent(buildingNameValue);
-            
+
             DataGridView_Show_Data();
             dataGridView1.Rows.Add();
             //loading the comfortzone when set             
@@ -157,38 +159,46 @@ namespace WFA_psychometric_chart
 
         public void FindPathOfBuildingDB()
         {
-            BuildingSelected.Clear();
-            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            // string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
-            //  string connString = @"Data Source=" + databaseFile + ";Version=3;";
-
-            string path = databasePath;  //@"C:\Folder1\Folder2\Folder3\Folder4";
-            string newPath = Path.GetFullPath(Path.Combine(path, @"..\"));
-            string againDbPath = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + newPath + @"Database\T3000.mdb";
-            // MessageBox.Show("New path : " + againDbPath);
-            // bool returnValue = false;
-            //string latValue = "";
-            using (OleDbConnection connection = new OleDbConnection(againDbPath))
+            try
             {
-                connection.Open();
-                OleDbDataReader reader = null;
-                string queryString = "SELECT * from Building WHERE Default_SubBuilding = -1 ";//-1 or True  can be used
-                OleDbCommand command = new OleDbCommand(queryString, connection);
+                BuildingSelected.Clear();
+                string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                // string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+                //  string connString = @"Data Source=" + databaseFile + ";Version=3;";
 
-                reader = command.ExecuteReader();
-                while (reader.Read())
+                string path = databasePath;  //@"C:\Folder1\Folder2\Folder3\Folder4";
+                string newPath = Path.GetFullPath(Path.Combine(path, @"..\"));
+                string againDbPath = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + newPath + @"Database\T3000.mdb";
+                // MessageBox.Show("New path : " + againDbPath);
+                // bool returnValue = false;
+                //string latValue = "";
+                using (OleDbConnection connection = new OleDbConnection(againDbPath))
                 {
+                    connection.Open();
+                    OleDbDataReader reader = null;
+                    string queryString = "SELECT * from Building WHERE Default_SubBuilding = -1 ";//-1 or True  can be used
+                    OleDbCommand command = new OleDbCommand(queryString, connection);
 
-                    BuildingSelected.Add(new SelectedBuildingDatatype
+                    reader = command.ExecuteReader();
+                    while (reader.Read())
                     {
-                        Main_BuildingName = reader["Main_BuildingName"].ToString(),
-                        Building_Name = reader["Building_Name"].ToString(),
-                        Building_Path = reader["Building_Path"].ToString()
-                    });
-                }
-            }
 
-             //MessageBox.Show("count = " + BuildingSelected.Count);
+                        BuildingSelected.Add(new SelectedBuildingDatatype
+                        {
+                            Main_BuildingName = reader["Main_BuildingName"].ToString(),
+                            Building_Name = reader["Building_Name"].ToString(),
+                            Building_Path = reader["Building_Path"].ToString()
+                        });
+                    }
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            //MessageBox.Show("count = " + BuildingSelected.Count);
         }
 
 
@@ -198,16 +208,16 @@ namespace WFA_psychometric_chart
         /// </summary>
         private class SelectedBuildingDT
         {
-            public  int ID { get; set; }
-            public    string country { get; set; }
-            
-            public   string state { get; set; }
-            public   string city { get; set; }
-            public       string street { get; set; }
-            public   int ZIP { get; set; }
+            public int ID { get; set; }
+            public string country { get; set; }
+
+            public string state { get; set; }
+            public string city { get; set; }
+            public string street { get; set; }
+            public int ZIP { get; set; }
             public double longitude { get; set; }
-            public    double latitude { get; set; }
-            public    double elevation { get; set; }
+            public double latitude { get; set; }
+            public double elevation { get; set; }
             public string BuildingName { get; set; }  //This one is what we are interested in ....
         }
         List<SelectedBuildingDT> selectedBuildingList = new List<SelectedBuildingDT>();
@@ -224,9 +234,9 @@ namespace WFA_psychometric_chart
             {
                 connection.Open();
                 SQLiteDataReader reader = null;
-                string queryString = "SELECT *  from tbl_building_location where selection = 1 ";        
+                string queryString = "SELECT *  from tbl_building_location where selection = 1 ";
                 SQLiteCommand command = new SQLiteCommand(queryString, connection);
-               // command.Parameters.AddWithValue("@selection_value", id);
+                // command.Parameters.AddWithValue("@selection_value", id);
                 //SqlDataAdapter dataAdapter = new SqlDataAdapter(queryString, connection.ConnectionString); //connection.ConnectionString is the connection string
 
                 reader = command.ExecuteReader();
@@ -252,7 +262,7 @@ namespace WFA_psychometric_chart
 
 
 
-    public void CreateRequireTableIfNotPresent(string buildingName)
+        public void CreateRequireTableIfNotPresent(string buildingName)
         {
             string tableForChartDetail = "tbl_" + buildingName + "_chart_detail";
             string tableForNode = "tbl_" + buildingName + "_node_value";
@@ -270,24 +280,24 @@ namespace WFA_psychometric_chart
             using (SQLiteConnection connection = new SQLiteConnection(connString))
             {
                 connection.Open();
-               
+
                 //--We also need to create table for particular data added..
                 string sql3 = "create table IF NOT EXISTS " + tableForChartDetail + "(count INTEGER PRIMARY KEY AUTOINCREMENT ,chartID VARCHAR(255),chartName varchar(255),chart_respective_nodeID varchar(255),chart_respective_lineID varchar(255))";
                 SQLiteCommand command3 = new SQLiteCommand(sql3, connection);
                 command3.ExecuteNonQuery();
 
-                   //for node info
+                //for node info
                 string sql = "create table IF NOT EXISTS " + tableForNode + "(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),source varchar(255),name varchar(255),label varchar(255),colorValue varchar(255),showTextItem varchar(255),nodeSize varchar(255))";
                 SQLiteCommand command = new SQLiteCommand(sql, connection);
                 command.ExecuteNonQuery();
 
-                 //for line info
+                //for line info
                 string sql4 = "create table IF NOT EXISTS " + tableForLine + "(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_lineID varchar(255) ,lineID string,prevNodeID varchar(255),nextNodeID varchar(255),lineColorValue varchar(255),lineSeriesID varchar(255),thickness varchar(255))";
                 SQLiteCommand command4 = new SQLiteCommand(sql4, connection);
                 command4.ExecuteNonQuery();
 
                 //for device info
-                string sql5 = "create table IF NOT EXISTS  " + tableFordevice + "  ( count INTEGER PRIMARY KEY AUTOINCREMENT,nodeID varchar(255) ,device_instanceID varchar(255),IP varchar(255),param1ID varchar(255),param2ID varchar(255), param1_info  varchar(255) ,param2_info varchar(255)  )";
+                string sql5 = "create table IF NOT EXISTS  " + tableFordevice + "  ( count INTEGER PRIMARY KEY AUTOINCREMENT,nodeID varchar(255) ,device_instanceID varchar(255),IP varchar(255),param1ID varchar(255),param2ID varchar(255), param1_info  varchar(255) ,param2_info varchar(255),param1_identifier_type varchar(255),param2_identifier_type varchar(255)  )";
                 SQLiteCommand command5 = new SQLiteCommand(sql5, connection);
                 command5.ExecuteNonQuery();
 
@@ -314,9 +324,10 @@ namespace WFA_psychometric_chart
             public string chart_respective_nodeID { get; set; }
             public string chart_respective_lineID { get; set; }
         }
-      public  List<chartDetailDT> chartDetailList = new List<chartDetailDT>();//This is used for storing the chart detail ids
+        public List<chartDetailDT> chartDetailList = new List<chartDetailDT>();//This is used for storing the chart detail ids
 
-        public void  PullChartList(string buildingName){
+        public void PullChartList(string buildingName)
+        {
 
             chartDetailList.Clear();//resetting the chart list value..
             string tableForChartDetail = "tbl_" + buildingName + "_chart_detail";
@@ -333,8 +344,8 @@ namespace WFA_psychometric_chart
                 string sql = "select * from " + tableForChartDetail + " ";
 
                 SQLiteCommand command = new SQLiteCommand(sql, connection);
-     
-              SQLiteDataReader  reader = command.ExecuteReader();
+
+                SQLiteDataReader reader = command.ExecuteReader();
                 while (reader.Read())
                 {
                     //This is the reading part of the data...
@@ -346,7 +357,7 @@ namespace WFA_psychometric_chart
                         chart_respective_nodeID = reader["chart_respective_nodeID"].ToString(),
                         chart_respective_lineID = reader["chart_respective_lineID"].ToString()
 
-                    });                   
+                    });
                 }
             }
 
@@ -357,17 +368,17 @@ namespace WFA_psychometric_chart
         {
             public int count { get; set; }
             public string chart_respective_nodeID { get; set; } //This is the chartID for grouping the node for single node values.
-            public string  nodeID { get; set; }  //This is the individual node id for each node 
-            public double xValue{ get; set; }
-            public double yValue{ get; set; }
-            public string source{ get; set; }
-            public string name{ get; set; }
-            public string label{ get; set; }
-            public string colorValue{ get; set; }
-            public string showTextItem{ get; set; }
-            public int nodeSize{ get; set; }
+            public string nodeID { get; set; }  //This is the individual node id for each node 
+            public double xValue { get; set; }
+            public double yValue { get; set; }
+            public string source { get; set; }
+            public string name { get; set; }
+            public string label { get; set; }
+            public string colorValue { get; set; }
+            public string showTextItem { get; set; }
+            public int nodeSize { get; set; }
 
-    }
+        }
 
         List<nodeDataType> nodeList = new List<nodeDataType>();
 
@@ -381,15 +392,15 @@ namespace WFA_psychometric_chart
             public string lineColorValue { get; set; }
             public string lineSeriesID { get; set; }
             public string thickness { get; set; }
-           
+
         }
         List<lineDataType> lineList = new List<lineDataType>();
 
 
-    /// <summary>
-    /// Getting the values of the database on the chartID
-    /// </summary>
-    public void ReadNodeAndLineDetails(string chart_respective_node_id,string chart_respective_line_id,string buildingName)
+        /// <summary>
+        /// Getting the values of the database on the chartID
+        /// </summary>
+        public void ReadNodeAndLineDetails(string chart_respective_node_id, string chart_respective_line_id, string buildingName)
         {
             nodeList.Clear();//resetting the node value
             lineList.Clear();//Resetting the line value
@@ -406,10 +417,10 @@ namespace WFA_psychometric_chart
                 connection.Open();
 
                 //--We also need to create table for particular data added..
-                
+
                 //This is done because for each different building we need different
                 // tables and also we need to all the chart of single building in a s single table .
-                string sql = "select * from " + tableForNode + " where chart_respective_nodeID = "+chart_respective_node_id;
+                string sql = "select * from " + tableForNode + " where chart_respective_nodeID = " + chart_respective_node_id;
                 SQLiteCommand command = new SQLiteCommand(sql, connection);
                 SQLiteDataReader reader = command.ExecuteReader();
                 while (reader.Read())
@@ -420,8 +431,8 @@ namespace WFA_psychometric_chart
                         count = int.Parse(reader["count"].ToString()),
                         chart_respective_nodeID = reader["chart_respective_nodeID"].ToString(),
                         nodeID = reader["nodeID"].ToString(),
-                        xValue  = double.Parse(reader["xValue"].ToString()),
-                        yValue =double.Parse( reader["yValue"].ToString()),
+                        xValue = double.Parse(reader["xValue"].ToString()),
+                        yValue = double.Parse(reader["yValue"].ToString()),
                         source = reader["source"].ToString(),
                         name = reader["name"].ToString(),
                         label = reader["label"].ToString(),
@@ -449,8 +460,8 @@ namespace WFA_psychometric_chart
                         nextNodeID = reader1["nextNodeID"].ToString(),
                         lineColorValue = reader1["lineColorValue"].ToString(),
                         lineSeriesID = reader1["lineSeriesID"].ToString(),
-                        thickness= reader1["thickness"].ToString()
-                        
+                        thickness = reader1["thickness"].ToString()
+
                     });
                 }
 
@@ -659,11 +670,7 @@ namespace WFA_psychometric_chart
                 if (phi >= 0.30 && phi < 0.4)
                 {
                     chart1.Series["Series" + c].Points[45].Label = phi * 100 + "%";
-<<<<<<< HEAD
                     chart1.Series["Series" + c].Points[42].Label = "Relative Humidity";
-=======
-                    chart1.Series["Series" + c].Points[42].Label = "Humidity Ratio";
->>>>>>> origin/master
                     // MessageBox.Show("Hello");
                 }
                 else
@@ -873,11 +880,7 @@ namespace WFA_psychometric_chart
                 t_plot1 += 10;
                 if (t_plot1 == 60)
                 {
-<<<<<<< HEAD
                     chart1.Series["Line_b" + hval].Points[1].Label = "Enthalpy kj/kg dry air";
-=======
-                    chart1.Series["Line_b" + hval].Points[1].Label = WFA_psychometric_chart.Properties.Resources.Enthalpy_kj_kg_dry_air;
->>>>>>> origin/master
                 }
 
             }
@@ -900,11 +903,11 @@ namespace WFA_psychometric_chart
             PullChartList(selectedBuildingList[0].BuildingName);//This is the list of the building present ...
 
 
-//            MessageBox.Show("datapulled ,count =  " + listForDataFromDB.Count);
+            //            MessageBox.Show("datapulled ,count =  " + listForDataFromDB.Count);
 
-//This fills the datagridview
-    fillDataGridView();
-       //     fillDataGridView_WithChartList();
+            //This fills the datagridview
+            fillDataGridView();
+            //     fillDataGridView_WithChartList();
 
         }
 
@@ -937,7 +940,7 @@ namespace WFA_psychometric_chart
             //    string queryString = "SELECT *  from tbl_air_handler_details";
             //    SQLiteCommand command = new SQLiteCommand(queryString, connection);
             //    //SqlDataAdapter dataAdapter = new SqlDataAdapter(queryString, connection.ConnectionString); //connection.ConnectionString is the connection string
-              
+
             //    reader = command.ExecuteReader();
             //    while (reader.Read())
             //    {
@@ -1063,7 +1066,7 @@ namespace WFA_psychometric_chart
                             }
 
 
-                            ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue,menuStripNodeInfoValues[x].marker_Size);
+                            ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue, menuStripNodeInfoValues[x].marker_Size);
                             //incrementIndex++;
                             indexForSeriesNodePoint++;
 
@@ -1075,9 +1078,9 @@ namespace WFA_psychometric_chart
 
                             for (int x = 0; x < menuStripNodeLineInfoValues.Count; x++)
                             {
-                              //  incrementIndex++;
+                                //  incrementIndex++;
 
-                                ReDrawLines(menuStripNodeLineInfoValues[x].ID, menuStripNodeLineInfoValues[x].prevNodeId, menuStripNodeLineInfoValues[x].nextNodeId, menuStripNodeLineInfoValues[x].lineSeriesID, menuStripNodeLineInfoValues[x].lineColorValue,menuStripNodeLineInfoValues[x].lineThickness);
+                                ReDrawLines(menuStripNodeLineInfoValues[x].ID, menuStripNodeLineInfoValues[x].prevNodeId, menuStripNodeLineInfoValues[x].nextNodeId, menuStripNodeLineInfoValues[x].lineSeriesID, menuStripNodeLineInfoValues[x].lineColorValue, menuStripNodeLineInfoValues[x].lineThickness);
 
                             }
 
@@ -1129,7 +1132,7 @@ namespace WFA_psychometric_chart
                             }
 
 
-                            ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue,menuStripNodeInfoValues[x].marker_Size);
+                            ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue, menuStripNodeInfoValues[x].marker_Size);
                             // incrementIndex++;
                             indexForSeriesNodePoint++;
                         }
@@ -1140,10 +1143,10 @@ namespace WFA_psychometric_chart
 
                             for (int x = 0; x < menuStripNodeLineInfoValues.Count; x++)
                             {
-                              //  incrementIndex++;
+                                //  incrementIndex++;
 
                                 // ReDrawLines(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue);
-                                ReDrawLines(menuStripNodeLineInfoValues[x].ID, menuStripNodeLineInfoValues[x].prevNodeId, menuStripNodeLineInfoValues[x].nextNodeId, menuStripNodeLineInfoValues[x].lineSeriesID, menuStripNodeLineInfoValues[x].lineColorValue,menuStripNodeLineInfoValues[x].lineThickness);
+                                ReDrawLines(menuStripNodeLineInfoValues[x].ID, menuStripNodeLineInfoValues[x].prevNodeId, menuStripNodeLineInfoValues[x].nextNodeId, menuStripNodeLineInfoValues[x].lineSeriesID, menuStripNodeLineInfoValues[x].lineColorValue, menuStripNodeLineInfoValues[x].lineThickness);
 
 
                             }
@@ -1198,7 +1201,7 @@ namespace WFA_psychometric_chart
                             }
 
 
-                            ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue,menuStripNodeInfoValues[x].marker_Size);
+                            ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue, menuStripNodeInfoValues[x].marker_Size);
                             //  incrementIndex++;
                             indexForSeriesNodePoint++;//incrementing the values
 
@@ -1214,7 +1217,7 @@ namespace WFA_psychometric_chart
                                 incrementIndex++;
 
                                 // ReDrawLines(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue);
-                                ReDrawLines(menuStripNodeLineInfoValues[x].ID, menuStripNodeLineInfoValues[x].prevNodeId, menuStripNodeLineInfoValues[x].nextNodeId, menuStripNodeLineInfoValues[x].lineSeriesID, menuStripNodeLineInfoValues[x].lineColorValue,menuStripNodeLineInfoValues[x].lineThickness);
+                                ReDrawLines(menuStripNodeLineInfoValues[x].ID, menuStripNodeLineInfoValues[x].prevNodeId, menuStripNodeLineInfoValues[x].nextNodeId, menuStripNodeLineInfoValues[x].lineSeriesID, menuStripNodeLineInfoValues[x].lineColorValue, menuStripNodeLineInfoValues[x].lineThickness);
 
 
                             }
@@ -1258,70 +1261,71 @@ namespace WFA_psychometric_chart
 
         //This is for the index of replotting the node
         int indexForSeriesNodePoint = 0;
-       // int indexForSeriesLine = 0;
+        // int indexForSeriesLine = 0;
         public void ReDrawingLineAndNode()
         {
-            if (menuStripNodeInfoValues.Count > 0) { 
-            //--This is for replotting all the things again...
-            series1.Points.Clear();
-            for (int i = 0; i < menuStripNodeLineInfoValues.Count; i++)//-- this -1 is done because for three points we have two line series..
+            if (menuStripNodeInfoValues.Count > 0)
             {
-                //chart1.Series.Remove(menuStripNodeLineInfoValues[i].lineSeriesID);
-                menuStripNodeLineInfoValues[i].lineSeriesID.Points.Clear();
-            }
-            //--this is redraw functionality
-            //foreach(var values in menuStripNodeInfoValues)
-            //--Resetting the index value
-            indexForSeriesNodePoint = 0;
-            for (int x = 0; x < menuStripNodeInfoValues.Count; x++)
-            {
-                string labelValue;
-                if (menuStripNodeInfoValues[x].showItemText == "Label")
+                //--This is for replotting all the things again...
+                series1.Points.Clear();
+                for (int i = 0; i < menuStripNodeLineInfoValues.Count; i++)//-- this -1 is done because for three points we have two line series..
                 {
-                    labelValue = menuStripNodeInfoValues[x].label;
+                    //chart1.Series.Remove(menuStripNodeLineInfoValues[i].lineSeriesID);
+                    menuStripNodeLineInfoValues[i].lineSeriesID.Points.Clear();
                 }
-                else if (menuStripNodeInfoValues[x].showItemText == "Name")
+                //--this is redraw functionality
+                //foreach(var values in menuStripNodeInfoValues)
+                //--Resetting the index value
+                indexForSeriesNodePoint = 0;
+                for (int x = 0; x < menuStripNodeInfoValues.Count; x++)
                 {
-                    labelValue = menuStripNodeInfoValues[x].name;
-                }
-                else
-                {
-                    labelValue = menuStripNodeInfoValues[x].source;
-                }
+                    string labelValue;
+                    if (menuStripNodeInfoValues[x].showItemText == "Label")
+                    {
+                        labelValue = menuStripNodeInfoValues[x].label;
+                    }
+                    else if (menuStripNodeInfoValues[x].showItemText == "Name")
+                    {
+                        labelValue = menuStripNodeInfoValues[x].name;
+                    }
+                    else
+                    {
+                        labelValue = menuStripNodeInfoValues[x].source;
+                    }
 
 
-                //--Redefined code bbk305
-                ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue, menuStripNodeInfoValues[x].marker_Size);
+                    //--Redefined code bbk305
+                    ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue, menuStripNodeInfoValues[x].marker_Size);
 
-                //CODE : BBK305A
-                //--incrementIndex++;
-                indexForSeriesNodePoint++;
-
-            }
-            //--resetting incrementIndex
-       //CODE: BBK305A  
-       // incrementIndex = 0;
-
-            if (menuStripNodeLineInfoValues.Count > 0)
-            {
-
-                for (int x = 0; x < menuStripNodeLineInfoValues.Count; x++)
-                {
-                  //  incrementIndex++;
-
-
-                    //--tHIS IS REDEFINED code bbk305
-                    ReDrawLines(menuStripNodeLineInfoValues[x].ID, menuStripNodeLineInfoValues[x].prevNodeId, menuStripNodeLineInfoValues[x].nextNodeId, menuStripNodeLineInfoValues[x].lineSeriesID, menuStripNodeLineInfoValues[x].lineColorValue,menuStripNodeLineInfoValues[x].lineThickness);
+                    //CODE : BBK305A
+                    //--incrementIndex++;
+                    indexForSeriesNodePoint++;
 
                 }
+                //--resetting incrementIndex
+                //CODE: BBK305A  
+                // incrementIndex = 0;
 
-            }
+                if (menuStripNodeLineInfoValues.Count > 0)
+                {
 
-            chart1.Invalidate();//--Invalidates the entire surface of the Chart and causes the Chart control to be redrawn.
-        
-             //CODE :BBK305A \\
-            //incrementIndex = 0;//reset the values again..
-            indexForSeriesNodePoint = 0;//Resetting the value
+                    for (int x = 0; x < menuStripNodeLineInfoValues.Count; x++)
+                    {
+                        //  incrementIndex++;
+
+
+                        //--tHIS IS REDEFINED code bbk305
+                        ReDrawLines(menuStripNodeLineInfoValues[x].ID, menuStripNodeLineInfoValues[x].prevNodeId, menuStripNodeLineInfoValues[x].nextNodeId, menuStripNodeLineInfoValues[x].lineSeriesID, menuStripNodeLineInfoValues[x].lineColorValue, menuStripNodeLineInfoValues[x].lineThickness);
+
+                    }
+
+                }
+
+                chart1.Invalidate();//--Invalidates the entire surface of the Chart and causes the Chart control to be redrawn.
+
+                //CODE :BBK305A \\
+                //incrementIndex = 0;//reset the values again..
+                indexForSeriesNodePoint = 0;//Resetting the value
             }//Close of if menustripnodeinfovalues
 
         }//--Close of the actual function....
@@ -1344,13 +1348,16 @@ namespace WFA_psychometric_chart
             public Color colorValue { get; set; }
             public string showItemText { get; set; }
             public int marker_Size { get; set; }
+
+
+
         }
         public List<TempDataType> menuStripNodeInfoValues = new List<TempDataType>();
         //--This one right here is for editing the lines...
 
-            /// <summary>
-            /// This also need to be changed we need individual unique id of the line 
-            /// </summary>
+        /// <summary>
+        /// This also need to be changed we need individual unique id of the line 
+        /// </summary>
         public class lineNodeDataType
         {
             //--Line ID
@@ -1365,11 +1372,12 @@ namespace WFA_psychometric_chart
 
         public List<lineNodeDataType> menuStripNodeLineInfoValues = new List<lineNodeDataType>();
 
-        public void ReDrawPoints(Series s1, double x, double y, Color c, string source1, string name1, string label1x, string labelValueText,int marker_size_value)
+        public void ReDrawPoints(Series s1, double x, double y, Color c, string source1, string name1, string label1x, string labelValueText, int marker_size_value)
         {
 
             //s1.ChartType = SeriesChartType.Point;
-            string s = "source : " + source1 + "\n Name : " + name1 + "\nLable : " + label1x + "\nindex="+ indexForSeriesNodePoint;
+            
+            string s = "source : " + source1 + "\n Name : " + name1 + "\nLable : " + label1x + "\nindex=" + indexForSeriesNodePoint;
             s1.ChartType = SeriesChartType.Point;
             s1.MarkerSize = marker_size_value;//= 20;
             s1.MarkerStyle = MarkerStyle.Circle;
@@ -1380,185 +1388,232 @@ namespace WFA_psychometric_chart
 
             s1.Points.AddXY(x, y);
             //s1.Points[1].
-
-            //   chart1.Series["My Series"].Points[incrementIndex].ToolTip = s;
-            //   chart1.Series["My Series"].Points[incrementIndex].Label = labelValueText;
-            //  s1.Points[incrementIndex].Color = c;
-
+                     
 
             chart1.Series["My Series"].Points[indexForSeriesNodePoint].ToolTip = s;
             chart1.Series["My Series"].Points[indexForSeriesNodePoint].Label = labelValueText;
-           // s1.Points[indexForSeriesNodePoint].Color = c;
+            // s1.Points[indexForSeriesNodePoint].Color = c;
             chart1.Series["My Series"].Points[indexForSeriesNodePoint].Color = c;
             s1.Points[indexForSeriesNodePoint].MarkerStyle = MarkerStyle.Circle;
             s1.Points[indexForSeriesNodePoint].Color = c;
             // chart1.Series["My Series"].Points[indexForSeriesNodePoint].MarkerColor = c;
         }
 
+          /// <summary>
+          /// This function helps to draw the points before loading
+          /// </summary>
+          /// <param name="s1"></param>
+          /// <param name="x"></param>
+          /// <param name="y"></param>
+          /// <param name="c"></param>
+          /// <param name="source1"></param>
+          /// <param name="name1"></param>
+          /// <param name="label1x"></param>
+          /// <param name="labelValueText"></param>
+          /// <param name="marker_size_value"></param>
+        public void ReDrawPointsForHardware(Series s1, double x, double y, Color c, string source1, string name1, string label1x, string labelValueText, int marker_size_value)
+        {
+
+            string s = "source : " + source1 + "\n Name : " + name1 + "\nLable : " + label1x + "\nindex=" + indexForSeriesNodePoint;
+            if (chart1.InvokeRequired)
+            {
+                chart1.Invoke(new Action(() =>s1.ChartType = SeriesChartType.Point ));
+                chart1.Invoke(new Action(() => s1.MarkerSize = marker_size_value));
+                chart1.Invoke(new Action(() => s1.MarkerStyle = MarkerStyle.Circle));
+                chart1.Invoke(new Action(() => s1.Points.AddXY(x, y)));
+                chart1.Invoke(new Action(() => chart1.Series["My Series"].Points[indexForSeriesNodePoint].ToolTip = s));
+                chart1.Invoke(new Action(() => chart1.Series["My Series"].Points[indexForSeriesNodePoint].Label = labelValueText));
+                chart1.Invoke(new Action(() => chart1.Series["My Series"].Points[indexForSeriesNodePoint].Color = c));
+                chart1.Invoke(new Action(() => s1.Points[indexForSeriesNodePoint].MarkerStyle = MarkerStyle.Circle));
+                chart1.Invoke(new Action(() => s1.Points[indexForSeriesNodePoint].Color = c));
+ 
+              //  ));
+            }
+            else
+            {
+                // lb_device_status.Text = "connected";
+              
+                s1.ChartType = SeriesChartType.Point;
+                s1.MarkerSize = marker_size_value;//= 20;
+                s1.MarkerStyle = MarkerStyle.Circle;
+                s1.Points.AddXY(x, y);
+                chart1.Series["My Series"].Points[indexForSeriesNodePoint].ToolTip = s;
+                chart1.Series["My Series"].Points[indexForSeriesNodePoint].Label = labelValueText;
+                chart1.Series["My Series"].Points[indexForSeriesNodePoint].Color = c;
+                s1.Points[indexForSeriesNodePoint].MarkerStyle = MarkerStyle.Circle;
+                s1.Points[indexForSeriesNodePoint].Color = c;
+
+            }
+
+
+            // string s = "source : " + source1 + "\n Name : " + name1 + "\nLable : " + label1x + "\nindex=" + indexForSeriesNodePoint;
+           
+            //s1.ChartType = SeriesChartType.Point;
+            //s1.MarkerSize = marker_size_value;//= 20;
+            //s1.MarkerStyle = MarkerStyle.Circle;                                              
+            //s1.Points.AddXY(x, y);                                                            
+            //chart1.Series["My Series"].Points[indexForSeriesNodePoint].ToolTip = s;
+            //chart1.Series["My Series"].Points[indexForSeriesNodePoint].Label = labelValueText;            
+            //chart1.Series["My Series"].Points[indexForSeriesNodePoint].Color = c;
+            //s1.Points[indexForSeriesNodePoint].MarkerStyle = MarkerStyle.Circle;
+            //s1.Points[indexForSeriesNodePoint].Color = c;
+            
+
+        }
+
+
+
+
+
+
+
+
+
+
 
         //This is used to stroe node info in 0 index (for start)       
         //and in 1 index for end
         List<TempDataType> temporaryNodeValueStore = new List<TempDataType>();
         //--Redraw line function
-        public void ReDrawLines(string id, string prevNodeID, string nextNodeID, Series lineSeriesID, Color c,int thickness_value)
+        public void ReDrawLines(string id, string prevNodeID, string nextNodeID, Series lineSeriesID, Color c, int thickness_value)
         {
 
-           // if (incrementIndex > 0)
-           //  if(indexForSeriesNodePoint>0) //This index is resetted later
+            // if (incrementIndex > 0)
+            //  if(indexForSeriesNodePoint>0) //This index is resetted later
 
-         //   {
-                temporaryNodeValueStore.Clear();//Clearing the values of the list
-                // MessageBox.Show("ReDrawLines FRIST LINE");
-
-
-                double startHumidity1 = 0;
-                double startEnthalpy1 = 0;
-                double endHumidity1 = 0;//--this is for the start and end humidity print in the tooltip
-                double endEnthalpy1 = 0;
-                //now lets plot lines between tow points...
-
-                newLineSeries = lineSeriesID;//new Series("LineSeries" + incrementIndex); //lineSeriesID; 
-                //--If the line series is present remove the line series first
-                if (chart1.Series.IndexOf(newLineSeries.Name) != -1)
-                {
-                    //MessageBox.Show("Series exits");
-                    //--This  means the series is present....
-                    chart1.Series.RemoveAt(chart1.Series.IndexOf(newLineSeries.Name));
-                }
+            //   {
+            temporaryNodeValueStore.Clear();//Clearing the values of the list
+                                            // MessageBox.Show("ReDrawLines FRIST LINE");
 
 
-                //new Series("LineSeries"+incrementIndex);
-                // newLineSeries.Points.Clear();//--Clearing out the points
+            double startHumidity1 = 0;
+            double startEnthalpy1 = 0;
+            double endHumidity1 = 0;//--this is for the start and end humidity print in the tooltip
+            double endEnthalpy1 = 0;
+            //now lets plot lines between tow points...
 
-                newLineSeries.MarkerSize = 1;
-                //newSeries.MarkerStyle = MarkerStyle.Triangle;
-                newLineSeries.ChartType = SeriesChartType.Line;
-                if(thickness_value <= 0) { 
+            newLineSeries = lineSeriesID;//new Series("LineSeries" + incrementIndex); //lineSeriesID; 
+                                         //--If the line series is present remove the line series first
+            if (chart1.Series.IndexOf(newLineSeries.Name) != -1)
+            {
+                //MessageBox.Show("Series exits");
+                //--This  means the series is present....
+                chart1.Series.RemoveAt(chart1.Series.IndexOf(newLineSeries.Name));
+            }
+
+
+            //new Series("LineSeries"+incrementIndex);
+            // newLineSeries.Points.Clear();//--Clearing out the points
+
+            newLineSeries.MarkerSize = 1;
+            //newSeries.MarkerStyle = MarkerStyle.Triangle;
+            newLineSeries.ChartType = SeriesChartType.Line;
+            if (thickness_value <= 0)
+            {
                 newLineSeries.BorderWidth = 3;
-                }
-                else
+            }
+            else
+            {
+                newLineSeries.BorderWidth = thickness_value;//This is the thickness of lines
+            }
+            //newSeries.ToolTip = 
+            newLineSeries.Color = c;
+            /*
+            We need to calculate the previous node id values and the next node id values.
+            */
+            //First for previous node id
+            for (int i = 0; i < menuStripNodeInfoValues.Count; i++)
+            {
+                if (prevNodeID == menuStripNodeInfoValues[i].id)
                 {
-                    newLineSeries.BorderWidth = thickness_value;//This is the thickness of lines
-                }
-                //newSeries.ToolTip = 
-                newLineSeries.Color = c;
-                /*
-                We need to calculate the previous node id values and the next node id values.
-                */
-                //First for previous node id
-                for(int i=0;i<menuStripNodeInfoValues.Count;i++)
-                {
-                    if(prevNodeID == menuStripNodeInfoValues[i].id)
+                    //This is a node : i.e start end of the node
+                    //We need to store the node every information in 0 index.
+
+                    // temporaryNodeValueStore =  menuStripNodeInfoValues.GetRange(i,1);  //This is for copying the value.
+                    //Copying the values on index 0 assumption 
+                    temporaryNodeValueStore.Add(new TempDataType
                     {
-                        //This is a node : i.e start end of the node
-                        //We need to store the node every information in 0 index.
+                        id = menuStripNodeInfoValues[i].id,
+                        xVal = menuStripNodeInfoValues[i].xVal,
+                        yVal = menuStripNodeInfoValues[i].yVal,
+                        source = menuStripNodeInfoValues[i].source,
+                        name = menuStripNodeInfoValues[i].name,
+                        label = menuStripNodeInfoValues[i].label,
+                        showItemText = menuStripNodeInfoValues[i].showItemText,
+                        colorValue = menuStripNodeInfoValues[i].colorValue,
+                        marker_Size = menuStripNodeInfoValues[i].marker_Size
 
-                        // temporaryNodeValueStore =  menuStripNodeInfoValues.GetRange(i,1);  //This is for copying the value.
-                        //Copying the values on index 0 assumption 
-                        temporaryNodeValueStore.Add(new TempDataType
-                        {
-                            id = menuStripNodeInfoValues[i].id,
-                            xVal = menuStripNodeInfoValues[i].xVal,
-                            yVal = menuStripNodeInfoValues[i].yVal,
-                            source = menuStripNodeInfoValues[i].source,
-                            name = menuStripNodeInfoValues[i].name,
-                            label = menuStripNodeInfoValues[i].label,
-                            showItemText = menuStripNodeInfoValues[i].showItemText,
-                            colorValue = menuStripNodeInfoValues[i].colorValue,
-                            marker_Size = menuStripNodeInfoValues[i].marker_Size
+                    });                                                                               
 
-                        });
-                        //temporaryNodeValueStore[0].id = menuStripNodeInfoValues[i].id; //0 index will hold the i index value 
-                        //temporaryNodeValueStore[0].name = menuStripNodeInfoValues[i].name;
-                        //temporaryNodeValueStore[0].xVal = menuStripNodeInfoValues[i].xVal;
-                        //temporaryNodeValueStore[0].yVal = menuStripNodeInfoValues[i].yVal;
-                        //temporaryNodeValueStore[0].source = menuStripNodeInfoValues[i].source;
-                        //temporaryNodeValueStore[0].showItemText = menuStripNodeInfoValues[i].showItemText;
-                        //temporaryNodeValueStore[0].label = menuStripNodeInfoValues[i].label;
-                        //temporaryNodeValueStore[0].marker_Size = menuStripNodeInfoValues[i].marker_Size;
-                        //temporaryNodeValueStore[0].colorValue = menuStripNodeInfoValues[i].colorValue;
-
-                        break;//Break form loop
-                    }
+                    break;//Break form loop
                 }
+            }
 
-                //Second for the next node id
-                for (int i = 0; i < menuStripNodeInfoValues.Count; i++)
+            //Second for the next node id
+            for (int i = 0; i < menuStripNodeInfoValues.Count; i++)
+            {
+                if (nextNodeID == menuStripNodeInfoValues[i].id)
                 {
-                    if (nextNodeID == menuStripNodeInfoValues[i].id)
+                    //This is a node : i.e start end of the node
+                    //We need to store the node every information in 0 index.
+
+                    // temporaryNodeValueStore[1].Equals(menuStripNodeInfoValues[i]);
+
+                    //temporaryNodeValueStore = menuStripNodeInfoValues.GetRange(i, 1);
+                    //The index of this values will be temporaryNodeValueStore[1] ==> 1
+                    temporaryNodeValueStore.Add(new TempDataType
                     {
-                        //This is a node : i.e start end of the node
-                        //We need to store the node every information in 0 index.
+                        id = menuStripNodeInfoValues[i].id,
+                        xVal = menuStripNodeInfoValues[i].xVal,
+                        yVal = menuStripNodeInfoValues[i].yVal,
+                        source = menuStripNodeInfoValues[i].source,
+                        name = menuStripNodeInfoValues[i].name,
+                        label = menuStripNodeInfoValues[i].label,
+                        showItemText = menuStripNodeInfoValues[i].showItemText,
+                        colorValue = menuStripNodeInfoValues[i].colorValue,
+                        marker_Size = menuStripNodeInfoValues[i].marker_Size
 
-                        // temporaryNodeValueStore[1].Equals(menuStripNodeInfoValues[i]);
+                    });
 
-                        //temporaryNodeValueStore = menuStripNodeInfoValues.GetRange(i, 1);
-                        //The index of this values will be temporaryNodeValueStore[1] ==> 1
-                        temporaryNodeValueStore.Add(new TempDataType
-                        {
-                            id = menuStripNodeInfoValues[i].id,
-                            xVal = menuStripNodeInfoValues[i].xVal,
-                            yVal = menuStripNodeInfoValues[i].yVal,
-                            source = menuStripNodeInfoValues[i].source,
-                            name = menuStripNodeInfoValues[i].name,
-                            label = menuStripNodeInfoValues[i].label,
-                            showItemText = menuStripNodeInfoValues[i].showItemText,
-                            colorValue = menuStripNodeInfoValues[i].colorValue,
-                            marker_Size = menuStripNodeInfoValues[i].marker_Size
-
-                        });
-                        //  temporaryNodeValueStore[1] = menuStripNodeInfoValues[i]; //1 index will hold the next node info
-                        //temporaryNodeValueStore[1].id = menuStripNodeInfoValues[i].id; //0 index will hold the i index value 
-                        //temporaryNodeValueStore[1].name = menuStripNodeInfoValues[i].name;
-                        //temporaryNodeValueStore[1].xVal = menuStripNodeInfoValues[i].xVal;
-                        //temporaryNodeValueStore[1].yVal = menuStripNodeInfoValues[i].yVal;
-                        //temporaryNodeValueStore[1].source = menuStripNodeInfoValues[i].source;
-                        //temporaryNodeValueStore[1].showItemText = menuStripNodeInfoValues[i].showItemText;
-                        //temporaryNodeValueStore[1].label = menuStripNodeInfoValues[i].label;
-                        //temporaryNodeValueStore[1].marker_Size = menuStripNodeInfoValues[i].marker_Size;
-                        //temporaryNodeValueStore[1].colorValue = menuStripNodeInfoValues[i].colorValue;
-                        break;//Break form loop
-                    }
+                    break;//Break form loop
                 }
+            }
 
+            if (temporaryNodeValueStore.Count > 0) { 
 
-                //--this sets the initial values of humidity and enthalpy
-                CalculateHumidityEnthalpy(temporaryNodeValueStore[0].xVal, temporaryNodeValueStore[0].yVal);
-                startHumidity1 = Math.Round(humidityCalculated, 2);
-                startEnthalpy1 = Math.Round(enthalpyCalculated, 2);
-                //--This calculates the end humidity and the enthalpy values..
-                CalculateHumidityEnthalpy((double)temporaryNodeValueStore[1].xVal, (double)temporaryNodeValueStore[1].yVal);
-                endHumidity1 = Math.Round(humidityCalculated, 2);
-                endEnthalpy1 = Math.Round(enthalpyCalculated, 2);
+            //--this sets the initial values of humidity and enthalpy
+            CalculateHumidityEnthalpy(temporaryNodeValueStore[0].xVal, temporaryNodeValueStore[0].yVal);
+            startHumidity1 = Math.Round(humidityCalculated, 2);
+            startEnthalpy1 = Math.Round(enthalpyCalculated, 2);
+            //--This calculates the end humidity and the enthalpy values..
+            CalculateHumidityEnthalpy((double)temporaryNodeValueStore[1].xVal, (double)temporaryNodeValueStore[1].yVal);
+            endHumidity1 = Math.Round(humidityCalculated, 2);
+            endEnthalpy1 = Math.Round(enthalpyCalculated, 2);
 
-                // MessageBox.Show("Start hum" + startHumidity1 + " end enth" + endEnthalpy1);
-                //MessageBox.Show("menustripinfovalues[prevNodeID].xVal=" + menuStripNodeInfoValues[prevNodeID].xVal + "menuStripNodeInfoValues[nextNodeID].yVal=" + menuStripNodeInfoValues[nextNodeID].yVal + "menuStripNodeInfoValues[nextNodeID].xVal = "+ menuStripNodeInfoValues[nextNodeID].xVal + " menuStripNodeInfoValues[nextNodeID].yVal" + menuStripNodeInfoValues[nextNodeID].yVal);
+            // MessageBox.Show("Start hum" + startHumidity1 + " end enth" + endEnthalpy1);
+            //MessageBox.Show("menustripinfovalues[prevNodeID].xVal=" + menuStripNodeInfoValues[prevNodeID].xVal + "menuStripNodeInfoValues[nextNodeID].yVal=" + menuStripNodeInfoValues[nextNodeID].yVal + "menuStripNodeInfoValues[nextNodeID].xVal = "+ menuStripNodeInfoValues[nextNodeID].xVal + " menuStripNodeInfoValues[nextNodeID].yVal" + menuStripNodeInfoValues[nextNodeID].yVal);
 
-                double enthalpyChange = endEnthalpy1 - startEnthalpy1;
+            double enthalpyChange = endEnthalpy1 - startEnthalpy1;
 
-                string sequenceDetected = temporaryNodeValueStore[0].name + " to " + temporaryNodeValueStore[1].name;
+            string sequenceDetected = temporaryNodeValueStore[0].name + " to " + temporaryNodeValueStore[1].name;
 
-<<<<<<< HEAD
-                string tooltipString = "Sequence :  " + sequenceDetected + " \n" + @"                 start             end 
+            string tooltipString = "Sequence :  " + sequenceDetected + " \n" + @"                 start             end 
 " + "Temp         :" + Math.Round(temporaryNodeValueStore[0].xVal, 2) + "               " + Math.Round(temporaryNodeValueStore[1].xVal, 2) + "\nHumidity :" + startHumidity1 + "           " + endHumidity1 + WFA_psychometric_chart.Properties.Resources._Enthalpy + startEnthalpy1 + "           " + endEnthalpy1 + "\nEnthalpy Change:" + enthalpyChange;
-=======
-                string tooltipString = "Sequence :  " + sequenceDetected + " \n" + WFA_psychometric_chart.Properties.Resources._start_end + "Temp         :" + Math.Round(temporaryNodeValueStore[0].xVal, 2) + "               " + Math.Round(temporaryNodeValueStore[1].xVal, 2) + "\nHumidity :" + startHumidity1 + "           " + endHumidity1 + WFA_psychometric_chart.Properties.Resources._Enthalpy + startEnthalpy1 + "           " + endEnthalpy1 + "\nEnthalpy Change:" + enthalpyChange;
->>>>>>> origin/master
 
-                newLineSeries.ToolTip = tooltipString;
-                //newSeries.MarkerStyle = MarkerStyle.Circle;
-                //newSeries.Points.AddXY(menuStripNodeInfoValues[index - 1].xVal, menuStripNodeInfoValues[index].xVal, menuStripNodeInfoValues[index - 1].yVal, menuStripNodeInfoValues[index].yVal);
-                newLineSeries.Points.Add(new DataPoint(temporaryNodeValueStore[0].xVal, temporaryNodeValueStore[0].yVal));   //for prevnodeid
-                newLineSeries.Points.Add(new DataPoint(temporaryNodeValueStore[1].xVal, temporaryNodeValueStore[1].yVal));   //for nextnodeid
+            newLineSeries.ToolTip = tooltipString;
+            //newSeries.MarkerStyle = MarkerStyle.Circle;
+            //newSeries.Points.AddXY(menuStripNodeInfoValues[index - 1].xVal, menuStripNodeInfoValues[index].xVal, menuStripNodeInfoValues[index - 1].yVal, menuStripNodeInfoValues[index].yVal);
+            newLineSeries.Points.Add(new DataPoint(temporaryNodeValueStore[0].xVal, temporaryNodeValueStore[0].yVal));   //for prevnodeid
+            newLineSeries.Points.Add(new DataPoint(temporaryNodeValueStore[1].xVal, temporaryNodeValueStore[1].yVal));   //for nextnodeid
 
 
-                chart1.Series.Add(newLineSeries);
-                temporaryNodeValueStore.Clear();//--Lets reset the value CODE:BBK305A
+            chart1.Series.Add(newLineSeries);
+            temporaryNodeValueStore.Clear();//--Lets reset the value CODE:BBK305A
 
-         //   }  //close of if incrementindex
+                //   }  //close of if incrementindex
 
 
-
+            }//close of temporary node value
 
         }
 
@@ -1622,6 +1677,7 @@ namespace WFA_psychometric_chart
             double Tn = 240.7263;
             double B = 621.9907;
 
+
             double Pws = A * Math.Pow(10, (m * TD) / (TD + Tn));
 
             double X = B * Pws / (Patm - Pws);
@@ -1637,7 +1693,7 @@ namespace WFA_psychometric_chart
             //upon this click the form should pop up
 
             //Form_point_add form_point_input = new Form_point_add(this);
-           // form_point_input.Show();
+            // form_point_input.Show();
         }
 
         int yCoord = 0;
@@ -1647,7 +1703,7 @@ namespace WFA_psychometric_chart
         string tbSource;
 
 
-        int tempIndexForNode=0;
+        int tempIndexForNode = 0;
 
         private void ProcessDiagramMouseMoveFunction(MouseEventArgs e)
         {
@@ -1672,274 +1728,274 @@ namespace WFA_psychometric_chart
                     {
 
                         xAxis1 = xValue;
-                    yAxis1 = yValue;
-                    //Console.Write("xval = " + xValue + "yvalue = " + yValue);
-                    if (menuStripNodeInfoValues.Count > 0)
-                    {
-                        //foreach(var values in menuStripNodeInfoValues)
-
-                        for (int i = 0; i < menuStripNodeInfoValues.Count; i++)
+                        yAxis1 = yValue;
+                        //Console.Write("xval = " + xValue + "yvalue = " + yValue);
+                        if (menuStripNodeInfoValues.Count > 0)
                         {
+                            //foreach(var values in menuStripNodeInfoValues)
 
-                            if ((xValue > menuStripNodeInfoValues[i].xVal - 0.25 && xValue < menuStripNodeInfoValues[i].xVal + 0.25) && (yValue > menuStripNodeInfoValues[i].yVal - 0.25 && yValue < menuStripNodeInfoValues[i].yVal + 0.25))
+                            for (int i = 0; i < menuStripNodeInfoValues.Count; i++)
                             {
 
-                                //--This is changed from int to string  code bbk305
-                                idSelected = menuStripNodeInfoValues[i].id; //Now this is a string 
-                                tempIndexForNode = i;//This is for finding other values with searching for this we need index
-                                if (Cursor != Cursors.Cross)
+                                if ((xValue > menuStripNodeInfoValues[i].xVal - 0.25 && xValue < menuStripNodeInfoValues[i].xVal + 0.25) && (yValue > menuStripNodeInfoValues[i].yVal - 0.25 && yValue < menuStripNodeInfoValues[i].yVal + 0.25))
                                 {
-                                    Cursor = Cursors.Hand;
-                                }
-                                //this.Cursor = Cursors.Hand;
-                                //now this works so lets move forward.
-                                readyForMouseClick = 1;//enable on click event
 
-                                break;//this break is for if found the value no longer loop increases the perfomances..
+                                    //--This is changed from int to string  code bbk305
+                                    idSelected = menuStripNodeInfoValues[i].id; //Now this is a string 
+                                    tempIndexForNode = i;//This is for finding other values with searching for this we need index
+                                    if (Cursor != Cursors.Cross)
+                                    {
+                                        Cursor = Cursors.Hand;
+                                    }
+                                    //this.Cursor = Cursors.Hand;
+                                    //now this works so lets move forward.
+                                    readyForMouseClick = 1;//enable on click event
+
+                                    break;//this break is for if found the value no longer loop increases the perfomances..
+                                }
+                                else
+                                {
+                                    if (Cursor != Cursors.Cross)
+                                    {
+                                        this.Cursor = Cursors.Arrow;
+                                        readyForMouseClick = 0;//dissable on click event.
+
+                                    }
+
+                                }
+                            }
+                        }//close of if menuStripAllValue>0
+
+
+                        if (mouseClickAction == 1)
+                        {
+
+                            if (Control.ModifierKeys == Keys.Alt)
+                            {
+                                //--This alter key is for moving along constant x-axis ...
+                                // MessageBox.Show(" alt is pressed for x axis constant");
+
+
+                                //menuStripNodeInfoValues[idSelected].xVal = xAxis1;
+                                menuStripNodeInfoValues[tempIndexForNode].yVal = yAxis1;//This value is changed...
+
+
+                                // label5.Text = "click past x =" + menuStripNodeInfoValues[idSelected].xVal + " y " + menuStripNodeInfoValues[idSelected].yVal;
+
+                                series1.Points.Clear();
+                                for (int i = 0; i < menuStripNodeLineInfoValues.Count; i++)//-- this -1 is done because for three points we have two line series..
+                                {
+                                    // chart1.Series.Remove(menuStripNodeLineInfoValues[i].lineSeriesID);//--removing line series that joins node..
+                                    menuStripNodeLineInfoValues[i].lineSeriesID.Points.Clear();
+
+                                }
+                                //--this is redraw functionality
+                                //foreach(var values in menuStripNodeInfoValues)
+                                indexForSeriesNodePoint = 0;
+                                for (int x = 0; x < menuStripNodeInfoValues.Count; x++)
+                                {
+                                    string labelValue;
+                                    if (menuStripNodeInfoValues[x].showItemText == "Label")
+                                    {
+                                        labelValue = menuStripNodeInfoValues[x].label;
+                                    }
+                                    else if (menuStripNodeInfoValues[x].showItemText == "Name")
+                                    {
+                                        labelValue = menuStripNodeInfoValues[x].name;
+                                    }
+                                    else
+                                    {
+                                        labelValue = menuStripNodeInfoValues[x].source;
+                                    }
+
+                                    //--this is changed as well code :bbk305
+                                    ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue, menuStripNodeInfoValues[x].marker_Size);
+
+                                    //Updating values in database
+                                    if (flagForInsertOrUpdateDataToDB == 1)
+                                    {
+                                        //   UpdateNodeInfoToDB(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].showItemText, menuStripNodeInfoValues[x].marker_Size);
+                                    }
+
+
+                                    // incrementIndex++;
+                                    indexForSeriesNodePoint++;//Incrementing the index values
+                                                              //--Every time it redraws the point we need to update to database the node values
+                                }
+                                //--resetting incrementIndex
+                                //incrementIndex = 0;
+                                if (menuStripNodeLineInfoValues.Count > 0)
+                                {
+
+
+                                    for (int x = 0; x < menuStripNodeLineInfoValues.Count; x++)
+                                    {
+                                        // incrementIndex++;
+
+                                        //ReDrawLines(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue);
+                                        ReDrawLines(menuStripNodeLineInfoValues[x].ID, menuStripNodeLineInfoValues[x].prevNodeId, menuStripNodeLineInfoValues[x].nextNodeId, menuStripNodeLineInfoValues[x].lineSeriesID, menuStripNodeLineInfoValues[x].lineColorValue, menuStripNodeLineInfoValues[x].lineThickness);
+
+                                    }
+
+                                }
+
+                                chart1.Invalidate();
+                                // incrementIndex = 0;//reset the values again..
+                                //  indexForSeriesNodePoint = 0;//Resetting the index value BBK305A
+
+                            }
+                            else if (Control.ModifierKeys == Keys.Shift)
+                            {
+                                //--This ctrl key is for moving along the y-  axis...
+
+                                //--THis function basically evolve when the shift key is pressed and mouse move.
+                                // MessageBox.Show("shift  is pressed for y  axis constant");
+
+                                //menuStripNodeInfoValues[idSelected].xVal = xAxis1;
+                                menuStripNodeInfoValues[tempIndexForNode].xVal = xAxis1;//--This value is just changed 
+                                                                                        //menuStripNodeInfoValues[idSelected].yVal = yAxis1;
+
+                                //label5.Text = "click past x =" + menuStripNodeInfoValues[idSelected].xVal + " y " + menuStripNodeInfoValues[idSelected].yVal;
+
+                                series1.Points.Clear();
+                                for (int i = 0; i < menuStripNodeLineInfoValues.Count; i++)//-- this -1 is done because for three points we have two line series..
+                                {
+                                    //chart1.Series.Remove(menuStripNodeLineInfoValues[i].lineSeriesID);
+                                    menuStripNodeLineInfoValues[i].lineSeriesID.Points.Clear();
+
+                                }
+                                //--this is redraw functionality
+                                //foreach(var values in menuStripNodeInfoValues)
+                                indexForSeriesNodePoint = 0;
+                                for (int x = 0; x < menuStripNodeInfoValues.Count; x++)
+                                {
+                                    string labelValue;
+                                    if (menuStripNodeInfoValues[x].showItemText == "Label")
+                                    {
+                                        labelValue = menuStripNodeInfoValues[x].label;
+                                    }
+                                    else if (menuStripNodeInfoValues[x].showItemText == "Name")
+                                    {
+                                        labelValue = menuStripNodeInfoValues[x].name;
+                                    }
+                                    else
+                                    {
+                                        labelValue = menuStripNodeInfoValues[x].source;
+                                    }
+
+
+                                    ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue, menuStripNodeInfoValues[x].marker_Size);
+
+                                    //Updating values in database...
+                                    if (flagForInsertOrUpdateDataToDB == 1)
+                                    {
+                                        //UpdateNodeInfoToDB(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].showItemText, menuStripNodeInfoValues[x].marker_Size);
+                                    }
+
+                                    // incrementIndex++;
+                                    indexForSeriesNodePoint++;
+                                }
+                                //--resetting incrementIndex
+                                incrementIndex = 0;
+                                if (menuStripNodeLineInfoValues.Count > 0)
+                                {
+                                    for (int x = 0; x < menuStripNodeLineInfoValues.Count; x++)
+                                    {
+                                        incrementIndex++;
+
+                                        ReDrawLines(menuStripNodeLineInfoValues[x].ID, menuStripNodeLineInfoValues[x].prevNodeId, menuStripNodeLineInfoValues[x].nextNodeId, menuStripNodeLineInfoValues[x].lineSeriesID, menuStripNodeLineInfoValues[x].lineColorValue, menuStripNodeLineInfoValues[x].lineThickness);
+
+                                    }
+
+                                }
+
+                                chart1.Invalidate();
+                                // incrementIndex = 0;//reset the values again..
+                                // indexForSeriesNodePoint = 0;
+
                             }
                             else
                             {
-                                if (Cursor != Cursors.Cross)
-                                {
-                                    this.Cursor = Cursors.Arrow;
-                                    readyForMouseClick = 0;//dissable on click event.
 
+                                //--Show indicator
+                                ////--Lets clear the indicator point first.
+                                //seriesLineIndicator.Points.Clear();
+
+                                //menuStripNodeInfoValues[idSelected].xVal = xAxis1;
+                                //menuStripNodeInfoValues[idSelected].yVal = yAxis1;
+
+                                menuStripNodeInfoValues[tempIndexForNode].xVal = xAxis1;
+                                menuStripNodeInfoValues[tempIndexForNode].yVal = yAxis1;
+
+                                //label5.Text = "click past x =" + menuStripNodeInfoValues[idSelected].xVal + " y " + menuStripNodeInfoValues[idSelected].yVal;
+
+                                series1.Points.Clear();
+                                for (int i = 0; i < menuStripNodeLineInfoValues.Count; i++)//-- this -1 is done because for three points we have two line series..
+                                {
+                                    //chart1.Series.Remove(menuStripNodeLineInfoValues[i].lineSeriesID);
+                                    menuStripNodeLineInfoValues[i].lineSeriesID.Points.Clear();
                                 }
-
-                            }
-                        }
-                    }//close of if menuStripAllValue>0
-
-
-                    if (mouseClickAction == 1)
-                    {
-
-                        if (Control.ModifierKeys == Keys.Alt)
-                        {
-                            //--This alter key is for moving along constant x-axis ...
-                            // MessageBox.Show(" alt is pressed for x axis constant");
-
-
-                            //menuStripNodeInfoValues[idSelected].xVal = xAxis1;
-                            menuStripNodeInfoValues[tempIndexForNode].yVal = yAxis1;//This value is changed...
-
-
-                            // label5.Text = "click past x =" + menuStripNodeInfoValues[idSelected].xVal + " y " + menuStripNodeInfoValues[idSelected].yVal;
-
-                            series1.Points.Clear();
-                            for (int i = 0; i < menuStripNodeLineInfoValues.Count; i++)//-- this -1 is done because for three points we have two line series..
-                            {
-                                // chart1.Series.Remove(menuStripNodeLineInfoValues[i].lineSeriesID);//--removing line series that joins node..
-                                menuStripNodeLineInfoValues[i].lineSeriesID.Points.Clear();
-
-                            }
-                            //--this is redraw functionality
-                            //foreach(var values in menuStripNodeInfoValues)
-                            indexForSeriesNodePoint = 0;
-                            for (int x = 0; x < menuStripNodeInfoValues.Count; x++)
-                            {
-                                string labelValue;
-                                if (menuStripNodeInfoValues[x].showItemText == "Label")
+                                //--this is redraw functionality
+                                //foreach(var values in menuStripNodeInfoValues)
+                                indexForSeriesNodePoint = 0;
+                                for (int x = 0; x < menuStripNodeInfoValues.Count; x++)
                                 {
-                                    labelValue = menuStripNodeInfoValues[x].label;
-                                }
-                                else if (menuStripNodeInfoValues[x].showItemText == "Name")
-                                {
-                                    labelValue = menuStripNodeInfoValues[x].name;
-                                }
-                                else
-                                {
-                                    labelValue = menuStripNodeInfoValues[x].source;
-                                }
-
-                                //--this is changed as well code :bbk305
-                                ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue, menuStripNodeInfoValues[x].marker_Size);
-
-                                //Updating values in database
-                                if (flagForInsertOrUpdateDataToDB == 1)
-                                {
-                                    //   UpdateNodeInfoToDB(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].showItemText, menuStripNodeInfoValues[x].marker_Size);
-                                }
+                                    string labelValue;
+                                    if (menuStripNodeInfoValues[x].showItemText == "Label")
+                                    {
+                                        labelValue = menuStripNodeInfoValues[x].label;
+                                    }
+                                    else if (menuStripNodeInfoValues[x].showItemText == "Name")
+                                    {
+                                        labelValue = menuStripNodeInfoValues[x].name;
+                                    }
+                                    else
+                                    {
+                                        labelValue = menuStripNodeInfoValues[x].source;
+                                    }
 
 
-                                // incrementIndex++;
-                                indexForSeriesNodePoint++;//Incrementing the index values
-                                //--Every time it redraws the point we need to update to database the node values
-                            }
-                            //--resetting incrementIndex
-                            //incrementIndex = 0;
-                            if (menuStripNodeLineInfoValues.Count > 0)
-                            {
+                                    ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue, menuStripNodeInfoValues[x].marker_Size);
+
+                                    //Updating values in database...
+                                    if (flagForInsertOrUpdateDataToDB == 1)
+                                    {
+                                        //UpdateNodeInfoToDB(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].showItemText, menuStripNodeInfoValues[x].marker_Size);
+                                    }
 
 
-                                for (int x = 0; x < menuStripNodeLineInfoValues.Count; x++)
-                                {
                                     // incrementIndex++;
-
-                                    //ReDrawLines(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue);
-                                    ReDrawLines(menuStripNodeLineInfoValues[x].ID, menuStripNodeLineInfoValues[x].prevNodeId, menuStripNodeLineInfoValues[x].nextNodeId, menuStripNodeLineInfoValues[x].lineSeriesID, menuStripNodeLineInfoValues[x].lineColorValue, menuStripNodeLineInfoValues[x].lineThickness);
-
+                                    indexForSeriesNodePoint++;
                                 }
-
-                            }
-
-                            chart1.Invalidate();
-                            // incrementIndex = 0;//reset the values again..
-                            //  indexForSeriesNodePoint = 0;//Resetting the index value BBK305A
-
-                        }
-                        else if (Control.ModifierKeys == Keys.Shift)
-                        {
-                            //--This ctrl key is for moving along the y-  axis...
-
-                            //--THis function basically evolve when the shift key is pressed and mouse move.
-                            // MessageBox.Show("shift  is pressed for y  axis constant");
-
-                            //menuStripNodeInfoValues[idSelected].xVal = xAxis1;
-                            menuStripNodeInfoValues[tempIndexForNode].xVal = xAxis1;//--This value is just changed 
-                            //menuStripNodeInfoValues[idSelected].yVal = yAxis1;
-
-                            //label5.Text = "click past x =" + menuStripNodeInfoValues[idSelected].xVal + " y " + menuStripNodeInfoValues[idSelected].yVal;
-
-                            series1.Points.Clear();
-                            for (int i = 0; i < menuStripNodeLineInfoValues.Count; i++)//-- this -1 is done because for three points we have two line series..
-                            {
-                                //chart1.Series.Remove(menuStripNodeLineInfoValues[i].lineSeriesID);
-                                menuStripNodeLineInfoValues[i].lineSeriesID.Points.Clear();
-
-                            }
-                            //--this is redraw functionality
-                            //foreach(var values in menuStripNodeInfoValues)
-                            indexForSeriesNodePoint = 0;
-                            for (int x = 0; x < menuStripNodeInfoValues.Count; x++)
-                            {
-                                string labelValue;
-                                if (menuStripNodeInfoValues[x].showItemText == "Label")
-                                {
-                                    labelValue = menuStripNodeInfoValues[x].label;
-                                }
-                                else if (menuStripNodeInfoValues[x].showItemText == "Name")
-                                {
-                                    labelValue = menuStripNodeInfoValues[x].name;
-                                }
-                                else
-                                {
-                                    labelValue = menuStripNodeInfoValues[x].source;
-                                }
-
-
-                                ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue, menuStripNodeInfoValues[x].marker_Size);
-
-                                //Updating values in database...
-                                if (flagForInsertOrUpdateDataToDB == 1)
-                                {
-                                    //  UpdateNodeInfoToDB(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].showItemText, menuStripNodeInfoValues[x].marker_Size);
-                                }
-
-                                // incrementIndex++;
-                                indexForSeriesNodePoint++;
-                            }
-                            //--resetting incrementIndex
-                            incrementIndex = 0;
-                            if (menuStripNodeLineInfoValues.Count > 0)
-                            {
-                                for (int x = 0; x < menuStripNodeLineInfoValues.Count; x++)
-                                {
-                                    incrementIndex++;
-
-                                    ReDrawLines(menuStripNodeLineInfoValues[x].ID, menuStripNodeLineInfoValues[x].prevNodeId, menuStripNodeLineInfoValues[x].nextNodeId, menuStripNodeLineInfoValues[x].lineSeriesID, menuStripNodeLineInfoValues[x].lineColorValue, menuStripNodeLineInfoValues[x].lineThickness);
-
-                                }
-
-                            }
-
-                            chart1.Invalidate();
-                            // incrementIndex = 0;//reset the values again..
-                            // indexForSeriesNodePoint = 0;
-
-                        }
-                        else
-                        {
-
-                            //--Show indicator
-                            ////--Lets clear the indicator point first.
-                            //seriesLineIndicator.Points.Clear();
-
-                            //menuStripNodeInfoValues[idSelected].xVal = xAxis1;
-                            //menuStripNodeInfoValues[idSelected].yVal = yAxis1;
-
-                            menuStripNodeInfoValues[tempIndexForNode].xVal = xAxis1;
-                            menuStripNodeInfoValues[tempIndexForNode].yVal = yAxis1;
-
-                            //label5.Text = "click past x =" + menuStripNodeInfoValues[idSelected].xVal + " y " + menuStripNodeInfoValues[idSelected].yVal;
-
-                            series1.Points.Clear();
-                            for (int i = 0; i < menuStripNodeLineInfoValues.Count; i++)//-- this -1 is done because for three points we have two line series..
-                            {
-                                //chart1.Series.Remove(menuStripNodeLineInfoValues[i].lineSeriesID);
-                                menuStripNodeLineInfoValues[i].lineSeriesID.Points.Clear();
-                            }
-                            //--this is redraw functionality
-                            //foreach(var values in menuStripNodeInfoValues)
-                            indexForSeriesNodePoint = 0;
-                            for (int x = 0; x < menuStripNodeInfoValues.Count; x++)
-                            {
-                                string labelValue;
-                                if (menuStripNodeInfoValues[x].showItemText == "Label")
-                                {
-                                    labelValue = menuStripNodeInfoValues[x].label;
-                                }
-                                else if (menuStripNodeInfoValues[x].showItemText == "Name")
-                                {
-                                    labelValue = menuStripNodeInfoValues[x].name;
-                                }
-                                else
-                                {
-                                    labelValue = menuStripNodeInfoValues[x].source;
-                                }
-
-
-                                ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue, menuStripNodeInfoValues[x].marker_Size);
-
-                                //Updating values in database...
-                                if (flagForInsertOrUpdateDataToDB == 1)
-                                {
-                                    //UpdateNodeInfoToDB(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].showItemText, menuStripNodeInfoValues[x].marker_Size);
-                                }
-
-
-                                // incrementIndex++;
-                                indexForSeriesNodePoint++;
-                            }
-                            //--resetting incrementIndex
-                            // incrementIndex = 0;
-                            if (menuStripNodeLineInfoValues.Count > 0)
-                            {
-                                // MessageBox.Show("MENUSTIRP NODE LINE INFO VALUE");
-
-                                for (int x = 0; x < menuStripNodeLineInfoValues.Count; x++)
+                                //--resetting incrementIndex
+                                // incrementIndex = 0;
+                                if (menuStripNodeLineInfoValues.Count > 0)
                                 {
                                     // MessageBox.Show("MENUSTIRP NODE LINE INFO VALUE");
-                                    // incrementIndex++;
 
-                                    //ReDrawLines(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue);
-                                    ReDrawLines(menuStripNodeLineInfoValues[x].ID, menuStripNodeLineInfoValues[x].prevNodeId, menuStripNodeLineInfoValues[x].nextNodeId, menuStripNodeLineInfoValues[x].lineSeriesID, menuStripNodeLineInfoValues[x].lineColorValue, menuStripNodeLineInfoValues[x].lineThickness);
+                                    for (int x = 0; x < menuStripNodeLineInfoValues.Count; x++)
+                                    {
+                                        // MessageBox.Show("MENUSTIRP NODE LINE INFO VALUE");
+                                        // incrementIndex++;
 
+                                        //ReDrawLines(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue);
+                                        ReDrawLines(menuStripNodeLineInfoValues[x].ID, menuStripNodeLineInfoValues[x].prevNodeId, menuStripNodeLineInfoValues[x].nextNodeId, menuStripNodeLineInfoValues[x].lineSeriesID, menuStripNodeLineInfoValues[x].lineColorValue, menuStripNodeLineInfoValues[x].lineThickness);
+
+                                    }
                                 }
-                            }
 
 
-                            chart1.Invalidate();
-                            //incrementIndex = 0;//reset the values again..
-                            //   indexForSeriesNodePoint = 0;
+                                chart1.Invalidate();
+                                //incrementIndex = 0;//reset the values again..
+                                //   indexForSeriesNodePoint = 0;
 
-                            //indexForSeriesNodePoint = 0;
+                                //indexForSeriesNodePoint = 0;
 
-                        }//closing of key else part
+                            }//closing of key else part
+                        }
+
+                        //Need to add here
                     }
-
-                    //Need to add here
-                }
 
                 }
                 catch (Exception ex)
@@ -2031,9 +2087,9 @@ namespace WFA_psychometric_chart
             double xAxisValue = 0.00;
             double yAxisvalue = 0.00;
             //We need to find the previous point
-            for(int i = 0; i < menuStripNodeInfoValues.Count; i++)
+            for (int i = 0; i < menuStripNodeInfoValues.Count; i++)
             {
-                if(menuStripNodeInfoValues[i].id == indexOfPrevPointForLineMovement)
+                if (menuStripNodeInfoValues[i].id == indexOfPrevPointForLineMovement)
                 {
                     //This is the node of previous point we need to find the x and y coordinate of
                     xAxisValue = menuStripNodeInfoValues[i].xVal;
@@ -2058,7 +2114,7 @@ namespace WFA_psychometric_chart
 
         //--Lets store the series for futher processing...
         Series tempSeries;
-        int indexOfLineInTheList=0; //This holds the id of the line selected.
+        int indexOfLineInTheList = 0; //This holds the id of the line selected.
         private void LineDeterctOnMouseMove(MouseEventArgs e)
         {
 
@@ -2168,10 +2224,10 @@ namespace WFA_psychometric_chart
             {
                 connection.Open();
                 //SQLiteDataReader reader = null;
-                string sql_string = "insert into  "+ tableNameOfChart + " (chartID,chartName,chart_respective_nodeID,chart_respective_lineID) VALUES(@chartID_value,@nodeName_value,@nodeRespectiveID,@lineRespectiveID)";
+                string sql_string = "insert into  " + tableNameOfChart + " (chartID,chartName,chart_respective_nodeID,chart_respective_lineID) VALUES(@chartID_value,@nodeName_value,@nodeRespectiveID,@lineRespectiveID)";
                 SQLiteCommand command = new SQLiteCommand(sql_string, connection);
                 command.CommandType = CommandType.Text;
-                command.Parameters.AddWithValue("@chartID_value",chartIDValue);
+                command.Parameters.AddWithValue("@chartID_value", chartIDValue);
                 command.Parameters.AddWithValue("@nodeName_value", name);
                 command.Parameters.AddWithValue("@nodeRespectiveID", chart_resp_nodes_group_ID);
                 command.Parameters.
@@ -2196,7 +2252,7 @@ namespace WFA_psychometric_chart
 
         }
 
-        public void UpdateNewDataFromDGV(string name, string  chartID)
+        public void UpdateNewDataFromDGV(string name, string chartID)
         {
             //string newTableNodeName = "tbl_" + name + "_node";
             //string newTableLineName = "tbl_" + name + "_line";
@@ -2210,19 +2266,19 @@ namespace WFA_psychometric_chart
             using (SQLiteConnection connection = new SQLiteConnection(connString))
             {
                 connection.Open();
-      
+
 
                 //SQLiteDataReader reader = null;
-                string sql_string = "update "+tableNameOfChart +"   set  chartName=@chartName_value  where chartID = @chartID_value;";
+                string sql_string = "update " + tableNameOfChart + "   set  chartName=@chartName_value  where chartID = @chartID_value;";
                 SQLiteCommand command = new SQLiteCommand(sql_string, connection);
                 command.CommandType = CommandType.Text;
                 command.Parameters.AddWithValue("@chartName_value", name);
                 command.Parameters.AddWithValue("@chartID_value", chartID);
-               // command.Parameters.AddWithValue("@line_table_value", newTableLineName);
-               // command.Parameters.AddWithValue("@id_provided", id);
+                // command.Parameters.AddWithValue("@line_table_value", newTableLineName);
+                // command.Parameters.AddWithValue("@id_provided", id);
                 //MessageBox.Show("selected value = " + cb_station_names.SelectedItem.ToString());
                 command.ExecuteNonQuery();
-   
+
             }
 
 
@@ -2234,18 +2290,20 @@ namespace WFA_psychometric_chart
 
         public void RefreshGraph()
         {
-            try { 
-            this.Invalidate();
-            chart1.Invalidate();
-            // chart1.Dispose();//--Releases all the resources used by the chart...
-            plot_new_graph();
+            try
+            {
+                this.Invalidate();
+                chart1.Invalidate();
+                // chart1.Dispose();//--Releases all the resources used by the chart...
+                plot_new_graph();
 
-            //--Reseting the menustrip values for new plotting....
-            menuStripNodeLineInfoValues.Clear();
-            menuStripNodeInfoValues.Clear();
-            index = 0;  //This is resetting the index values
-            incrementIndex = 0;
-            }catch(Exception ex)
+                //--Reseting the menustrip values for new plotting....
+                menuStripNodeLineInfoValues.Clear();
+                menuStripNodeInfoValues.Clear();
+                index = 0;  //This is resetting the index values
+                incrementIndex = 0;
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
@@ -2290,7 +2348,7 @@ namespace WFA_psychometric_chart
         /// <param name="chartnodeid">This is the id that will identify different nodes in single node table</param>
         /// <param name="chartlineid">This is the id that will identify different lines in single line table</param>
         /// Lets pass the index alue
-        
+
         public void LoadNodeAndLineFromDB(int indexValue)
         {
             //Based on this row index we need to update the values and redraw lines..
@@ -2307,12 +2365,16 @@ namespace WFA_psychometric_chart
             string chartNodeGroupID = chartDetailList[id].chart_respective_nodeID;//This is for the node
             string chartLineGroupID = chartDetailList[id].chart_respective_lineID;//This is for the line
 
+            //--Reset the context menu stip first..
+            menuStripNodeInfoValues.Clear();
+            //--Reset the context menu stip first..
+            menuStripNodeLineInfoValues.Clear();
 
 
             string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
             string connString = @"Data Source=" + databaseFile + ";Version=3;";
-                                          
+
             /*
             Table name for line and node values...
             ie: 
@@ -2323,91 +2385,292 @@ namespace WFA_psychometric_chart
             string lineTableName = "tbl_" + selectedBuildingList[0].BuildingName + "_line_value";
 
             using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+
+
+
+                SQLiteDataReader reader = null;
+                string queryString = "SELECT *  from " + nodeTableName + " WHERE chart_respective_nodeID = @chartnodeID";
+
+
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                command.Parameters.AddWithValue("@chartnodeID", chartNodeGroupID);//This is the group id that is used to identify each node
+
+
+            
+                int count = 0;
+                reader = command.ExecuteReader();
+                while (reader.Read())
                 {
-                    connection.Open();
-
-
-
-                    SQLiteDataReader reader = null;
-                    string queryString = "SELECT *  from " + nodeTableName + " WHERE chart_respective_nodeID = @chartnodeID";
-
-
-                    SQLiteCommand command = new SQLiteCommand(queryString, connection);
-                     command.Parameters.AddWithValue("@chartnodeID", chartNodeGroupID);//This is the group id that is used to identify each node
-
-
-                //--Reset the context menu stip first..
-                menuStripNodeInfoValues.Clear();
-
-                    int count = 0;
-                    reader = command.ExecuteReader();
-                    while (reader.Read())
+                    menuStripNodeInfoValues.Add(new TempDataType
                     {
-                        menuStripNodeInfoValues.Add(new TempDataType
-                        {
-                            id = reader["nodeID"].ToString(), //This is just changed code : bbk305
-                            xVal = double.Parse(reader["xValue"].ToString()),
-                            yVal = double.Parse(reader["yValue"].ToString()),
-                            source = reader["source"].ToString(),
-                            name = reader["name"].ToString(),
-                            label = reader["label"].ToString(),
-                            colorValue = ColorTranslator.FromHtml(reader["colorValue"].ToString()),
-                            showItemText = reader["showTextItem"].ToString(),
-                            marker_Size = int.Parse(reader["nodeSize"].ToString())
-                              
+                        id = reader["nodeID"].ToString(), //This is just changed code : bbk305
+                        xVal = double.Parse(reader["xValue"].ToString()),
+                        yVal = double.Parse(reader["yValue"].ToString()),
+                        source = reader["source"].ToString(),
+                        name = reader["name"].ToString(),
+                        label = reader["label"].ToString(),
+                        colorValue = ColorTranslator.FromHtml(reader["colorValue"].ToString()),
+                        showItemText = reader["showTextItem"].ToString(),
+                        marker_Size = int.Parse(reader["nodeSize"].ToString())
 
-                        });
 
-                    }
+                    });
 
-                    //--Resetting the index value...
+                }
 
-                    if (menuStripNodeInfoValues.Count > 0)
-                    {
-                        count = menuStripNodeInfoValues.Count;//--This is used for udpdating the index values..
-                    }
-                    else
-                    {
-                        count = 0;
-                    }
-                    //--Resetting the actual index value
-                    index = count; //Index is set to the count values of the node
+                //--Resetting the index value...
 
-                    //--Adding data form the line node values...
-                    SQLiteDataReader reader2x = null;
-                    string queryString2x = "SELECT *  from  " + lineTableName + " WHERE chart_respective_lineID = @lineID";
-                    //--Testing..
-                    //   MessageBox.Show("CurrentLineTableFromDB = " + currentLineTableFromDB);
+                if (menuStripNodeInfoValues.Count > 0)
+                {
+                    count = menuStripNodeInfoValues.Count;//--This is used for udpdating the index values..
+                }
+                else
+                {
+                    count = 0;
+                }
+                //--Resetting the actual index value
+                index = count; //Index is set to the count values of the node
 
-                    SQLiteCommand command2x = new SQLiteCommand(queryString2x, connection);
+                //--Adding data form the line node values...
+                SQLiteDataReader reader2x = null;
+                string queryString2x = "SELECT *  from  " + lineTableName + " WHERE chart_respective_lineID = @lineID";
+                //--Testing..
+                //   MessageBox.Show("CurrentLineTableFromDB = " + currentLineTableFromDB);
+
+                SQLiteCommand command2x = new SQLiteCommand(queryString2x, connection);
                 command2x.Parameters.AddWithValue("@lineID", chartLineGroupID);//This is the group id that is used to identify each node
 
-                //--Reset the context menu stip first..
-                menuStripNodeLineInfoValues.Clear();
-
-                    //int count2 = 0;
-                    reader2x = command2x.ExecuteReader();
-                    while (reader2x.Read())
+                //int count2 = 0;
+                reader2x = command2x.ExecuteReader();
+                while (reader2x.Read())
+                {
+                    menuStripNodeLineInfoValues.Add(new lineNodeDataType
                     {
-                        menuStripNodeLineInfoValues.Add(new lineNodeDataType
-                        {
-                            ID = reader2x["lineID"].ToString(),//This is just change code :bbk305
-                            prevNodeId = reader2x["prevNodeId"].ToString(),
-                            nextNodeId = reader2x["nextNodeId"].ToString(),
-                            lineColorValue = ColorTranslator.FromHtml(reader2x["lineColorValue"].ToString()),
-                            lineSeriesID = new Series(reader2x["lineSeriesId"].ToString()),
-                            lineThickness = int.Parse(reader2x["thickness"].ToString())
-                        });
+                        ID = reader2x["lineID"].ToString(),//This is just change code :bbk305
+                        prevNodeId = reader2x["prevNodeId"].ToString(),
+                        nextNodeId = reader2x["nextNodeId"].ToString(),
+                        lineColorValue = ColorTranslator.FromHtml(reader2x["lineColorValue"].ToString()),
+                        lineSeriesID = new Series(reader2x["lineSeriesId"].ToString()),
+                        lineThickness = int.Parse(reader2x["thickness"].ToString())
+                    });
 
-                    }
-                    //count2 = menuStripNodeLineInfoValues.Count-1; //--This is used for udpdating the index values..
+                }
+                //count2 = menuStripNodeLineInfoValues.Count-1; //--This is used for udpdating the index values..
 
-                    //   MessageBox.Show("count line data in menuStripNodeLineInfoValues = " + menuStripNodeLineInfoValues.Count);
+                //   MessageBox.Show("count line data in menuStripNodeLineInfoValues = " + menuStripNodeLineInfoValues.Count);
 
-                }//close of using..
-     
+            }//close of using..
+
         }
-                                          
+            
+        //lets make three list for replaing these : 
+        //1.menustipnodeinfovalue ==> nodeInfoForSavingToXML
+        //2.menustriplineinfovalue ==> lineInfoForSavingToXML
+        //3.deviceInfoForSavingToXML
+
+        public List<TempDataType> nodeInfoForSavingToXML = new List<TempDataType>();
+
+        public List<lineNodeDataType> lineInfoForSavingToXML = new List<lineNodeDataType>();
+
+
+        public class dt_for_device_info   //datatype for device info
+        {
+
+            public string nodeID { get; set; } //--for identifying which point is selected..
+            public string device_instance_id { get; set; }//--this is the values that represent the point in a chart
+            public string ip { get; set; }
+            public string param1id { get; set; }
+            public string param2id { get; set; }
+            public string param1info { get; set; }
+            public string param2info { get; set; }
+            public string param1_id_type { get; set; }
+            public string param2_id_type { get; set; }
+
+        }
+
+        public List<dt_for_device_info> deviceInfoForSavingToXML = new List<dt_for_device_info>();
+        /// <summary>
+        /// This function is for getting node info , correspoing device info for particular node,and line info
+        /// this is required for saving in xml formate.
+        /// </summary>
+        /// <param name="indexValue">index of the chart selected</param>
+
+        public void LoadNode_LineAndDeviceInfoFromDB(int indexValue)
+        {
+            //Based on this row index we need to update the values and redraw lines..
+
+            // listForDataFromDB.Clear();//Lets clear the node...
+
+            //Lets identify the node
+            // int id = int.Parse(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString());
+            //int id = e.RowIndex;//This index is used to identify which cell or chart is clicked.
+            int id = indexValue;//This index is used to identify which cell or chart is clicked.
+            /*
+            Now lets find the chart line id and chart node id 
+            */
+            string chartNodeGroupID = chartDetailList[id].chart_respective_nodeID;//This is for the node
+            string chartLineGroupID = chartDetailList[id].chart_respective_lineID;//This is for the line
+
+
+            //--Reset the context menu stip first..
+            lineInfoForSavingToXML.Clear();
+            //--Reset the context menu stip first..
+            nodeInfoForSavingToXML.Clear();
+
+
+
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            /*
+            Table name for line and node values...
+            ie: 
+            "tbl_"+ buildingname+ "_node_value"
+            "tbl_"+ buildingname+ "_line_value"
+            */
+            string nodeTableName = "tbl_" + selectedBuildingList[0].BuildingName + "_node_value";
+            string lineTableName = "tbl_" + selectedBuildingList[0].BuildingName + "_line_value";
+            string deviceTableName = "tbl_" + selectedBuildingList[0].BuildingName + "_device_info_for_node";
+
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+
+
+
+                SQLiteDataReader reader = null;
+                string queryString = "SELECT *  from " + nodeTableName + " WHERE chart_respective_nodeID = @chartnodeID";
+
+
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                command.Parameters.AddWithValue("@chartnodeID", chartNodeGroupID);//This is the group id that is used to identify each node
+
+
+               
+                int count = 0;
+                reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    nodeInfoForSavingToXML.Add(new TempDataType
+                    {
+                        id = reader["nodeID"].ToString(), //This is just changed code : bbk305
+                        xVal = double.Parse(reader["xValue"].ToString()),
+                        yVal = double.Parse(reader["yValue"].ToString()),
+                        source = reader["source"].ToString(),
+                        name = reader["name"].ToString(),
+                        label = reader["label"].ToString(),
+                        colorValue = ColorTranslator.FromHtml(reader["colorValue"].ToString()),
+                        showItemText = reader["showTextItem"].ToString(),
+                        marker_Size = int.Parse(reader["nodeSize"].ToString())
+
+
+                    });
+
+                }
+
+                //--Resetting the index value...
+
+                if (nodeInfoForSavingToXML.Count > 0)
+                {
+                    count = nodeInfoForSavingToXML.Count;//--This is used for udpdating the index values..
+                }
+                else
+                {
+                    count = 0;
+                }
+                //--Resetting the actual index value
+                index = count; //Index is set to the count values of the node
+
+                //--Adding data form the line node values...
+                SQLiteDataReader reader2x = null;
+                string queryString2x = "SELECT *  from  " + lineTableName + " WHERE chart_respective_lineID = @lineID";
+                //--Testing..
+                //   MessageBox.Show("CurrentLineTableFromDB = " + currentLineTableFromDB);
+
+                SQLiteCommand command2x = new SQLiteCommand(queryString2x, connection);
+                command2x.Parameters.AddWithValue("@lineID", chartLineGroupID);//This is the group id that is used to identify each node
+
+              
+                //int count2 = 0;
+                reader2x = command2x.ExecuteReader();
+                while (reader2x.Read())
+                {
+                    lineInfoForSavingToXML.Add(new lineNodeDataType
+                    {
+                        ID = reader2x["lineID"].ToString(),//This is just change code :bbk305
+                        prevNodeId = reader2x["prevNodeId"].ToString(),
+                        nextNodeId = reader2x["nextNodeId"].ToString(),
+                        lineColorValue = ColorTranslator.FromHtml(reader2x["lineColorValue"].ToString()),
+                        lineSeriesID = new Series(reader2x["lineSeriesId"].ToString()),
+                        lineThickness = int.Parse(reader2x["thickness"].ToString())
+                    });
+
+                }
+                //count2 = menuStripNodeLineInfoValues.Count-1; //--This is used for udpdating the index values..
+
+                //   MessageBox.Show("count line data in menuStripNodeLineInfoValues = " + menuStripNodeLineInfoValues.Count);
+
+            }//close of using..
+
+            //***********************************************thsi one if for pulling device info*************************************//
+
+            //--Reset the context menu stip first..
+            deviceInfoForSavingToXML.Clear();
+
+            foreach (var node in nodeInfoForSavingToXML)
+            {
+                if (node.source == "Device")
+                { 
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+
+                SQLiteDataReader reader = null;
+                string queryString = "SELECT *  from " + deviceTableName + " WHERE nodeID = @nodeID";
+
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                command.Parameters.AddWithValue("@nodeID", node.id);//This is the group id that is used to identify each node
+
+
+               
+                //int count = 0;
+                reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    deviceInfoForSavingToXML.Add(new dt_for_device_info
+                    {                  
+                        nodeID = reader["nodeID"].ToString(),
+                        device_instance_id = reader["device_instanceID"].ToString(),
+                        ip = reader["IP"].ToString(),
+                        param1id = reader["param1ID"].ToString(),
+                        param2id = reader["param2ID"].ToString(),
+                        param1info = reader["param1_info"].ToString(),
+                        param2info = reader["param2_info"].ToString(),
+                        param1_id_type  = reader["param1_identifier_type"].ToString(),
+                        param2_id_type = reader["param2_identifier_type"].ToString()
+
+                    });
+                }
+          }//close of using..
+
+
+                } //close of if
+
+
+            }//close of foreach
+
+
+
+
+
+        }
+            
+
         string tbName;
         string tbLabel;
         Color colorValue;
@@ -2661,16 +2924,16 @@ namespace WFA_psychometric_chart
         private void insertNodeToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
             //This is the insert node part...
-            InsertNodeFormForBuildingChartSetting insertF = new InsertNodeFormForBuildingChartSetting(this);
-            insertF.Show();
+            //InsertNodeFormForBuildingChartSetting insertF = new InsertNodeFormForBuildingChartSetting(this);
+            //insertF.Show();
 
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             //This should show the line editing part of the chart 
-            EditNodeLineForm f = new EditNodeLineForm(this);
-            f.Show();
+         //EditNodeLineForm f = new EditNodeLineForm(this);
+         // f.Show();
         }
 
         private void dataGridView1_CellEndEdit_1(object sender, DataGridViewCellEventArgs e)
@@ -3067,27 +3330,59 @@ namespace WFA_psychometric_chart
 
         }
 
-        /// <summary>
-        /// This inserts the device id value
-        /// </summary>       
-        /// <param name="source">Source </param>
-        /// <param name="name"></param>
-        /// <param name="label"></param>
-        /// <param name="c1">color</param>
-        /// <param name="comboboxItemText1">Which to select</param>
-        /// <param name="marker_size">size fo the marker</param>
-        /// <param name="deviceInstance">int value of instance of device</param>
-        /// <param name="port">port of the device</param>
-        /// <param name="param1ID">int value of param 1 ie deice port number ANALOG_VALUE :[PORT]</param>
-        /// <param name="param2ID">ANALOG_VALUE PORT for param2</param>
-        string deviceInstanceValue = "";
+
+
+        //public Tuple<int, int> plot_by_DBT_Enthalpy(double dbt, double enthalpy)
+        public int plot_by_DBT_Enthalpy(double dbt, double enthalpy)
+        {
+            //this is DBT 
+            double x_axis = dbt;
+            double h = enthalpy;
+            // MessageBox.Show("h = " + h+" T = "+dbt);
+
+            //lets fit this value in the curve...
+            double x1 = (h - 12.5) / 3.5;
+            //        MessageBox.Show("X1= " + x1);
+            double y1 = x1 + 5;//this is given temp..
+            //      MessageBox.Show("y1= " + y1);
+            double x2 = h;
+            double y2 = 0;
+
+            //    MessageBox.Show("x2= " + x2+" y2  = "+y2);
+
+            double x = dbt;
+            double y = y1 + (((y2 - y1) * (x - x1) / (x2 - x1)));
+
+            double y_axis = y;
+
+            //return Tuple.Create((int)Math.Round( x_axis,0),(int)Math.Round(y_axis));
+            return (int)Math.Round(y_axis);
+        }
+
+
+            /// <summary>
+            /// This inserts the device id value
+            /// </summary>       
+            /// <param name="source">Source </param>
+            /// <param name="name"></param>
+            /// <param name="label"></param>
+            /// <param name="c1">color</param>
+            /// <param name="comboboxItemText1">Which to select</param>
+            /// <param name="marker_size">size fo the marker</param>
+            /// <param name="deviceInstance">int value of instance of device</param>
+            /// <param name="port">port of the device</param>
+            /// <param name="param1ID">int value of param 1 ie deice port number ANALOG_VALUE :[PORT]</param>
+            /// <param name="param2ID">ANALOG_VALUE PORT for param2</param>
+            string deviceInstanceValue = "";
         string deviceIP = "";
         string deviceParam1ID = "";
         string deviceParam2ID = "";
         string device_param1_info_for_node = "";
         string device_param2_info_for_node = "";
+        string object_param1_identifier_type = ""; //for identifying different analog inputs.
+        string object_param2_identifier_type = "";
 
-        public void SetNodeForDeviceUsingTempAndHum(string source, string name, string label, Color c1, string comboboxItemText1, int marker_size,string deviceInstance,string IP,string param1ID,string param2ID,string param1_info,string param2_info,string param1_value,string param2_value)
+        public void SetNodeForDeviceUsingTempAndHum(string source, string name, string label, Color c1, string comboboxItemText1, int marker_size,string deviceInstance,string IP,string param1ID,string param2ID,string param1_info,string param2_info,string param1_value,string param2_value,string  object_identifier_type_param1, string object_identifier_type_param2)
         {
 
             markerSize = marker_size; //This is for changing the marker size 
@@ -3101,7 +3396,14 @@ namespace WFA_psychometric_chart
             deviceParam1ID = param1ID;
             deviceParam2ID = param2ID;
             device_param1_info_for_node = param1_info;
+
             device_param2_info_for_node = param2_info;
+            //MessageBox.Show("param2 infor=="+param2_info);
+
+            //--These parameter identifiy which section the node belongs to ie analog_input, analog_output,analog_value 
+            object_param1_identifier_type = object_identifier_type_param1;
+            object_param2_identifier_type = object_identifier_type_param2;
+
            // medium_device_or_web_value = device_or_web;
            //Temp and humidity value 
 
@@ -3153,13 +3455,26 @@ namespace WFA_psychometric_chart
                 else if(param1_info == "temp"&& param2_info == "enthalpy")
                 {
                     //temperature and enthalpy
-                }
-                else if(param1_info == "hum" && param2_info =="enthalpy")
-                {
-                    //humidity and enthalpy selected
-                }
+                    /*
+                    Steps :1.get temp and enthalpy =>done
+                           2. convert to x and y values => done
+                           3. convert to x                      
+                    */
+
+                    // Tuple<int,int> x = plot_by_DBT_Enthalpy(double.Parse(param1_value),double.Parse(param2_value));
+
+                    double x_value = double.Parse(param1_value);
+                    double y_value = plot_by_DBT_Enthalpy(x_value, double.Parse(param2_value));
 
 
+                    plot_on_graph_values_process_diagram(x_value, y_value);
+
+
+
+
+
+                }
+                
                                                   
             }
 
@@ -3180,16 +3495,13 @@ namespace WFA_psychometric_chart
 
                     var xVal = result.ChartArea.AxisX.PixelPositionToValue(xCoord);
                     var yVal = result.ChartArea.AxisY.PixelPositionToValue(yCoord);
-
-
+        
                     /*
                      we need to calc phi value given by ycord/30 as the max value is 30..
                      * second pg which is calculated by temperature pulled from the text file we need to fist 
                      * calculate the round up value of x coord to an integer...
                      */
-
                     //this part is not correct yet we need to do this again....
-
                     double phi = 0.00000;
                     //double y_axis = yVal;
                     //now for pg..
@@ -3379,9 +3691,9 @@ namespace WFA_psychometric_chart
             if (flagForInsertOrUpdateDataToDB == 1)
             {
                 //do only if the  flag is raised.
-                //--Adding these values to the database....
-                //InsertNodeInfoToDB(index, xval, yval, tbSource, tbName, tbLabel, colorValue, comboboxItemText,markerSize);
-                InsertNodeInfoToDB(unique_id_for_node, xval, yval, tbSource, tbName, tbLabel, colorValue, comboboxItemText, markerSize);
+   
+
+                InsertNodeInfoToDB(unique_id_for_node, xval, yval, tbSource, tbName, tbLabel, colorValue, comboboxItemText, markerSize,deviceInstanceValue,deviceIP,deviceParam1ID,deviceParam2ID,device_param1_info_for_node,device_param2_info_for_node,object_param1_identifier_type,object_param2_identifier_type);
             }
 
             //the liine plot part is only done when ther is two points or more
@@ -3438,7 +3750,7 @@ namespace WFA_psychometric_chart
                 newLineSeries.ChartType = SeriesChartType.Line;
                 //newLineSeries.MarkerStyle = MarkerStyle.Circle;
                 //newLineSeries.MarkerStyle = MarkerStyle.Star6;
-       //newLineSeries.MarkerBorderWidth.Equals(15);
+                //newLineSeries.MarkerBorderWidth.Equals(15);
                 newLineSeries.MarkerSize.Equals(1);
                 newLineSeries.BorderWidth.Equals(lineBorderThickness);
                 // newLineSeries.SetCustomProperty(newLineSeries.MarkerSize.ToString(),newLineSeries.MarkerSize.Equals(25).ToString());
@@ -3497,7 +3809,7 @@ namespace WFA_psychometric_chart
              /// <summary>
              /// helps to pull the data from the hardware of the device
              /// </summary>
-        public void ReadDataFromDevice(int deviceID,uint temp_panID,uint hum_panID)
+        public void ReadDataFromDevice(int deviceID,uint temp_panID,uint hum_panID,string param1_identifier_type,string param2_identifier_type)
         {
             //lets do some operation regarding the pannel id and stuff
                                       
@@ -3510,11 +3822,11 @@ namespace WFA_psychometric_chart
                 BACnetClass b = new BACnetClass();
 
                 //for temperature value
-                b.StartProgram(deviceID, panID_1);
+                b.StartProgramForScanHardware(deviceID, panID_1,param1_identifier_type);
                 double  temperary1 = double.Parse(b.PresentValueFromBacnet.ToString());
                 //tb_temp_panel_value.Text = temp;
                 //For humidity value
-                b.StartProgram(deviceID, panID_2);
+                b.StartProgramForScanHardware(deviceID, panID_2,param2_identifier_type);
                 double temperary2 = double.Parse(b.PresentValueFromBacnet.ToString());
                 //tb_hum_panel_value.Text = humidity;
                 hardwareValue1 = temperary1;
@@ -3551,6 +3863,7 @@ namespace WFA_psychometric_chart
             //Read 
             LoadNodeAndLineFromDB(indexOfChartSelected);//indexOfChartSelected= index chosen
 
+          //  try { 
            //Read each node and then perform the following fxn
            foreach(var node in menuStripNodeInfoValues)
             {
@@ -3580,7 +3893,7 @@ namespace WFA_psychometric_chart
                             {
                             //This meand the value is humidity and temperature so we process like wise
                             //This gets the value
-                            ReadDataFromDevice(int.Parse(device_info_list[0].device_instance_id),uint.Parse(device_info_list[0].param1_id), uint.Parse(device_info_list[0].param2_id));
+                            ReadDataFromDevice(int.Parse(device_info_list[0].device_instance_id),uint.Parse(device_info_list[0].param1_id), uint.Parse(device_info_list[0].param2_id),device_info_list[0].param1_identifier_type,device_info_list[0].param2_identifier_type);
                             //we have recent value in hardwareValue1 and hardwareValue2 so lets calc corresponding x and y value
                             //now temp itself is x value we need to calculate y value
                             double x_Value = hardwareValue1;
@@ -3619,8 +3932,38 @@ namespace WFA_psychometric_chart
                         else if(device_info_list[0].param1_info == "temp" && device_info_list[0].param2_info == "enthalpy")
                         {
                             //First is temp and second is enthalpy
-                        }
-                        else
+
+
+                            //2nd step calc x and y
+                            //The value will always be unique and always be in the 0 index  
+                           // if (device_info_list[0].param1_info == "temp" && device_info_list[0].param2_info == "hum")
+                            //{
+                                //This meand the value is humidity and temperature so we process like wise
+                                //This gets the value
+                                ReadDataFromDevice(int.Parse(device_info_list[0].device_instance_id), uint.Parse(device_info_list[0].param1_id), uint.Parse(device_info_list[0].param2_id), device_info_list[0].param1_identifier_type, device_info_list[0].param2_identifier_type);
+                                //we have recent value in hardwareValue1 and hardwareValue2 so lets calc corresponding x and y value
+                                //now temp itself is x value we need to calculate y value
+                                double x_Value = hardwareValue1;
+                                double y_value = plot_by_DBT_Enthalpy(x_Value, hardwareValue2); //CalculateYFromXandHumidity(hardwareValue1, hardwareValue2 / 100);
+
+                                //   MessageBox.Show("x val /temp/hardwareValue1 = "+x_Value+"\nhardwareValue2"+hardwareValue2+"\ny value hardware= " + y_value);
+                                //Now lets update the values in db
+
+
+                                UpdateNodeInfoToDB(node.id, x_Value, y_value, node.source, node.name, node.label, node.colorValue, node.showItemText, node.marker_Size);
+
+                                //=============STATUS SHOWING ONLINE OR DEVICE OFFLINE=================
+                                if (lb_device_status.InvokeRequired)
+                                {
+                                    lb_device_status.Invoke(new Action(() => lb_device_status.Text = "connected"));
+                                }
+                                else
+                                {
+                                    lb_device_status.Text = "connected";
+                                }
+
+                            }
+                            else
                         {
                             //First is humidity and second is enthalpy
                         }
@@ -3656,8 +3999,12 @@ namespace WFA_psychometric_chart
                   //  lb_web_status.Text = "active";                            
                     //=====================END OF ONLINE OFFLINE============           
                 }
-            }  //Close of for each now lets plot the values..
+            }  //Close of foreach now lets plot the values..
 
+            //}catch(Exception ex)
+            //{
+            //    //Show nothingelse
+            //}
             //now lets call the plot function...
             RefreshGraph();
             if (chartDetailList.Count > 0)
@@ -3667,23 +4014,121 @@ namespace WFA_psychometric_chart
 
                 // flagForInsertOrUpdateDataToDB = 1;
                 //--This is also completed..
-                ReDrawingLineAndNode();
+                // ReDrawingLineAndNode();
+
+                if (InvokeRequired) {
+                    this.Invoke(new MethodInvoker(ReDrawingLineAndNodeForScanHardware));
+               // ReDrawingLineAndNodeForScanHardware();
+                }
+                else
+                {
+                    ReDrawingLineAndNodeForScanHardware();
+                }
 
             }
 
-            // MessageBox.Show("count  default comfort= " + default_comfort_zone_of_chart.Count);
-            //load comfort zone
+            
+    } //Close of the fxn
 
-            //LoadComfortZone(chartDetailList[indexForWhichChartIsSelected].chartID);
-       // LoadComfortZoneIfOn(chartDetailList[indexForWhichChartIsSelected].chartID);
 
-           // lb_test.Text = countX++.ToString();
 
-        } //Close of the fxn
-       // int countX = 0;
-          /// <summary>
-          ///This info is about the nodes 
-          /// </summary>
+        public void ReDrawingLineAndNodeForScanHardware()
+        {
+            if (menuStripNodeInfoValues.Count > 0)
+            {
+                //--This is for replotting all the things again...
+
+             // series1.Points.Clear();
+
+                if (chart1.InvokeRequired)
+                {
+                    chart1.Invoke(new Action(() => series1.Points.Clear() ));
+
+                }
+                else
+                {
+                    // lb_device_status.Text = "connected";
+                    series1.Points.Clear();
+                }
+
+
+                for (int i = 0; i < menuStripNodeLineInfoValues.Count; i++)//-- this -1 is done because for three points we have two line series..
+                {
+                    //chart1.Series.Remove(menuStripNodeLineInfoValues[i].lineSeriesID);
+                    menuStripNodeLineInfoValues[i].lineSeriesID.Points.Clear();
+                }
+                //--this is redraw functionality
+                //foreach(var values in menuStripNodeInfoValues)
+                //--Resetting the index value
+                indexForSeriesNodePoint = 0;
+                for (int x = 0; x < menuStripNodeInfoValues.Count; x++)
+                {
+                    string labelValue;
+                    if (menuStripNodeInfoValues[x].showItemText == "Label")
+                    {
+                        labelValue = menuStripNodeInfoValues[x].label;
+                    }
+                    else if (menuStripNodeInfoValues[x].showItemText == "Name")
+                    {
+                        labelValue = menuStripNodeInfoValues[x].name;
+                    }
+                    else
+                    {
+                        labelValue = menuStripNodeInfoValues[x].source;
+                    }
+
+
+                    //   //--Redefined code bbk305
+                    //   if (InvokeRequired) { 
+
+                    //// this.Invoke(new MethodInvoker(ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue, menuStripNodeInfoValues[x].marker_Size) ));
+
+                    //   }
+
+                     ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue, menuStripNodeInfoValues[x].marker_Size);
+                   // ReDrawPointsForHardware(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue, menuStripNodeInfoValues[x].marker_Size);
+
+                   //CODE : BBK305A
+                   //--incrementIndex++;
+                   indexForSeriesNodePoint++;
+
+                }
+                //--resetting incrementIndex
+                //CODE: BBK305A  
+                // incrementIndex = 0;
+
+                if (menuStripNodeLineInfoValues.Count > 0)
+                {
+
+                    for (int x = 0; x < menuStripNodeLineInfoValues.Count; x++)
+                    {
+                        //  incrementIndex++;
+
+
+                        //--tHIS IS REDEFINED code bbk305
+                        ReDrawLines(menuStripNodeLineInfoValues[x].ID, menuStripNodeLineInfoValues[x].prevNodeId, menuStripNodeLineInfoValues[x].nextNodeId, menuStripNodeLineInfoValues[x].lineSeriesID, menuStripNodeLineInfoValues[x].lineColorValue, menuStripNodeLineInfoValues[x].lineThickness);
+
+                    }
+
+                }
+
+                chart1.Invalidate();//--Invalidates the entire surface of the Chart and causes the Chart control to be redrawn.
+
+                //CODE :BBK305A \\
+                //incrementIndex = 0;//reset the values again..
+                indexForSeriesNodePoint = 0;//Resetting the value
+            }//Close of if menustripnodeinfovalues
+
+        }//--Close of the actual function....
+
+
+
+
+
+        // int countX = 0;
+        /// <summary>
+        ///This info is about the nodes 
+        /// </summary>
         //Lets build a dynaic list
         public class device_info_class
         {
@@ -3694,8 +4139,17 @@ namespace WFA_psychometric_chart
             public string param2_id { get; set; }
             public string param1_info { get; set; }
             public string param2_info { get; set; }
+
+            public string param1_identifier_type { get; set; }
+            public string param2_identifier_type { get; set; }
+            
         }
         List<device_info_class> device_info_list = new List<device_info_class>();//This list will store the values of device info
+
+        /// <summary>
+        /// This get the device info values form the database 
+        /// </summary>
+        /// <param name="nodeID1">the node id selected to search for </param>
         public void ReadDeviceInfoForNode(string nodeID1)
         {
             device_info_list.Clear();//Resetting list
@@ -3716,9 +4170,7 @@ namespace WFA_psychometric_chart
                 SQLiteCommand cmd = new SQLiteCommand(sql1, thisConnection);
                 
                     thisConnection.Open();
-
-                // SQLiteDataReader reader = null;
-
+                           
                 SQLiteDataReader reader = cmd.ExecuteReader();
 
             //    MessageBox.Show("cmd error= " + cmd.CommandText);
@@ -3734,7 +4186,10 @@ namespace WFA_psychometric_chart
                            param1_id = reader["param1ID"].ToString(),
                            param2_id = reader["param2ID"].ToString(),
                            param1_info = reader["param1_info"].ToString(),
-                           param2_info = reader["param2_info"].ToString()
+                           param2_info = reader["param2_info"].ToString()  ,
+                           param1_identifier_type = reader["param1_identifier_type"].ToString(),
+                           param2_identifier_type = reader["param2_identifier_type"].ToString()
+                           
 
                         });
                     }
@@ -3784,29 +4239,37 @@ namespace WFA_psychometric_chart
         //}
         public async Task AsyncMethod1ForPullingData()
         {
+            try { 
             // Do asynchronous work.
             await Task.Run(() => RefreshDataFromDeviceAndWeb());
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
         public void timer1_Tick_For_Device(object sender, EventArgs e)
         {
 
             try { 
-            if (InvokeRequired)
-            {
-                //this.Invoke(new Action(() => RefreshDataFromDeviceAndWeb()));
-                this.Invoke(new Action(() => AsyncMethod1ForPullingData()));
-                return;
-            }
-            else
-            {
-                AsyncMethod1ForPullingData();
-            }
+                if (InvokeRequired)
+                {
+                    //this.Invoke(new Action(() => RefreshDataFromDeviceAndWeb()));
+                    this.Invoke(new Action(() => AsyncMethod1ForPullingData()));
+                    return;
+                }
+                else
+                {
+                    AsyncMethod1ForPullingData();
+                }
 
             }
             catch
             {
 
             }
+          
+                
         }
 
 
@@ -4161,8 +4624,8 @@ namespace WFA_psychometric_chart
             3.plot on graph base on those values.
             */
             //Lets show the comfortzone option
-            comfort_zone cf = new comfort_zone(this);
-            cf.Show();
+           // comfort_zone cf = new comfort_zone(this);
+            //cf.Show();
         }
 
 
@@ -4706,8 +5169,8 @@ namespace WFA_psychometric_chart
             3.plot on graph base on those values.
             */
             //Lets show the comfortzone option
-            comfort_zone cf = new comfort_zone(this);
-            cf.Show();
+         // comfort_zone cf = new comfort_zone(this);
+         // cf.Show();
         }
 
         int flagShow = 1; //means on
@@ -4752,7 +5215,7 @@ namespace WFA_psychometric_chart
                 enableToolStripMenuItem.Checked = false;
                 flagShow = 0; //Enable on flag for next time
                 //When dissable hide comfort zone
-                string status = "disable";
+                string status = "disable";                                             
                 //==================end enable this if require============//
                 //MessageBox.Show("disable ");
                 //default_comfort_zone_of_chart already contains the loaded value
@@ -5072,12 +5535,661 @@ namespace WFA_psychometric_chart
             RefreshGraph();
 
             //dataGridView2.Rows.Clear();
-            MessageBox.Show("Handler deleted successfully !");
+            MessageBox.Show("Chart deleted successfully !");
 
         }
 
+
+        public void SaveConfiguration()
+        {
+
+            LoadNode_LineAndDeviceInfoFromDB(indexOfChartSelected);
+
+           //--test
+           // MessageBox.Show("count both = " + deviceInfoForSavingToXML.Count + "," + nodeInfoForSavingToXML.Count);
+            //string sx=null;
+            //foreach (var node in nodeInfoForSavingToXML)
+            //{
+            //    sx += node.id+",\t";
+            //}
+            //sx += "\n";
+            //foreach (var node in deviceInfoForSavingToXML)
+            //{
+            //    sx += node.nodeID + ",\t";
+            //}
+            //MessageBox.Show("values = " + sx);
+
+            XmlDocument xmlDoc = new XmlDocument();
+            //XmlWriter xw = new XmlWriter();
+            //lets create an xml document using a string in xml formate
+                                     
+            XmlNode r_node = xmlDoc.CreateElement("RootNode");
+
+            xmlDoc.AppendChild(r_node);
+
+            XmlNode identifier = xmlDoc.CreateElement("identifier");
+            identifier.InnerText = "BuildingSetting";
+
+            r_node.AppendChild(identifier);
+
+
+            XmlNode rootNode = xmlDoc.CreateElement("nodes");
+            // xmlDoc.AppendChild(rootNode);
+            r_node.AppendChild(rootNode);
+            string s = null;
+            //loading the string ...
+
+            if (nodeInfoForSavingToXML.Count > 0) { 
+
+            foreach (var node in nodeInfoForSavingToXML)
+            {
+               if(node.source == "Device") { 
+
+                XmlNode userNode = xmlDoc.CreateElement("node");
+     
+                rootNode.AppendChild(userNode);
+
+
+                        //now append name
+                        XmlNode nodeID = xmlDoc.CreateElement("nodeID");
+                        nodeID.InnerText = node.id.ToString();
+                        userNode.AppendChild(nodeID);
+
+
+
+
+                        //now append name
+                        XmlNode userNodeName = xmlDoc.CreateElement("name");                
+                userNodeName.InnerText = node.name.ToString();
+                userNode.AppendChild(userNodeName);
+
+
+                //now append the label
+                XmlNode userNodeLable = xmlDoc.CreateElement("label");
+                userNodeLable.InnerText = node.label.ToString();//'"' + node.label + '"';
+                userNode.AppendChild(userNodeLable);
+
+                //now append the source
+                XmlNode userNodeSource = xmlDoc.CreateElement("source");
+                userNodeSource.InnerText = node.source.ToString();  //'"' + node.source + '"';
+                userNode.AppendChild(userNodeSource);
+
+                //now append the color
+                XmlNode userNodeColor = xmlDoc.CreateElement("color");
+                userNodeColor.InnerText = ColorTranslator.ToHtml(node.colorValue).ToString();//'"' + ColorTranslator.ToHtml(node.colorValue).ToString() + '"';
+                userNode.AppendChild(userNodeColor);
+
+                //now append the xvalue
+                XmlNode userNodeXValue = xmlDoc.CreateElement("xvalue");
+                userNodeXValue.InnerText = node.xVal.ToString();//'"' + node.xVal.ToString() + '"';
+                userNode.AppendChild(userNodeXValue);
+
+                //now append the yvalue
+                XmlNode userNodeYValue = xmlDoc.CreateElement("yvalue");
+                userNodeYValue.InnerText = node.yVal.ToString(); //'"' + node.yVal.ToString() + '"';
+                userNode.AppendChild(userNodeYValue);
+
+
+                //now append the showTextItem
+                XmlNode userNodeShowTextItem = xmlDoc.CreateElement("showTextItem");
+                userNodeShowTextItem.InnerText = node.showItemText.ToString(); //'"' + node.showItemText.ToString() + '"';
+                userNode.AppendChild(userNodeShowTextItem);
+
+                        //--node size
+                 XmlNode nodesize = xmlDoc.CreateElement("nodesize");
+                 nodesize.InnerText = node.marker_Size.ToString(); //'"' + node.showItemText.ToString() + '"';
+                 userNode.AppendChild(nodesize);
+
+
+                        //--WE ALSO need to add the user information.
+
+                        foreach (var node_device_info in deviceInfoForSavingToXML)
+                    {
+                        if(node.id == node_device_info.nodeID)
+                        {
+                            //for instance id
+                            XmlNode deviceinstance = xmlDoc.CreateElement("deviceInstance");
+                            deviceinstance.InnerText = node_device_info.device_instance_id.ToString(); //'"' + node.showItemText.ToString() + '"';
+                            userNode.AppendChild(deviceinstance);
+
+                            //for ip 
+                            XmlNode ip = xmlDoc.CreateElement("ip");
+                            ip.InnerText = node_device_info.ip.ToString(); //'"' + node.showItemText.ToString() + '"';
+                            userNode.AppendChild(ip);
+
+                            //for param1id
+                            XmlNode param1id = xmlDoc.CreateElement("param1id");
+                            param1id.InnerText = node_device_info.param1id.ToString(); //'"' + node.showItemText.ToString() + '"';
+                            userNode.AppendChild(param1id);
+
+                            //for param2id
+                            XmlNode param2id = xmlDoc.CreateElement("param2id");
+                            param2id.InnerText = node_device_info.param2id.ToString(); //'"' + node.showItemText.ToString() + '"';
+                            userNode.AppendChild(param2id);
+
+                            //for param1info
+                            XmlNode param1info = xmlDoc.CreateElement("param1info");
+                            param1info.InnerText = node_device_info.param1info.ToString(); //'"' + node.showItemText.ToString() + '"';
+                            userNode.AppendChild(param1info);
+
+                            //for param2info
+                            XmlNode param2info = xmlDoc.CreateElement("param2info");
+                            param2info.InnerText = node_device_info.param2info.ToString(); //'"' + node.showItemText.ToString() + '"';
+                            userNode.AppendChild(param2info);
+
+                            //for param1id_type
+                            XmlNode param1id_type = xmlDoc.CreateElement("param1id_type");
+                            param1id_type.InnerText = node_device_info.param1_id_type.ToString(); //'"' + node.showItemText.ToString() + '"';
+                            userNode.AppendChild(param1id_type);
+
+                            //for param2id_type
+                            XmlNode param2id_type = xmlDoc.CreateElement("param2id_type");
+                            param2id_type.InnerText = node_device_info.param2_id_type.ToString(); //'"' + node.showItemText.ToString() + '"';
+                            userNode.AppendChild(param2id_type);
+
+                                                       
+
+                        }
+
+
+                    }
+
+                    }//clsoe of 
+                    else
+                    {
+                        //the node is form the web so do not load
+
+
+                        XmlNode userNode = xmlDoc.CreateElement("node");
+
+                        rootNode.AppendChild(userNode);
+
+
+                        //now append nodeid
+                        XmlNode nodeID = xmlDoc.CreateElement("nodeID");
+                        nodeID.InnerText = node.id.ToString();
+                        userNode.AppendChild(nodeID);
+
+
+                        //now append name
+                        XmlNode userNodeName = xmlDoc.CreateElement("name");
+                        // XmlAttribute attribute = xmlDoc.CreateAttribute("value");
+                        //attribute.Value = '"' + node.name + '"';
+                        //userNodeName.Attributes.Append(attribute);
+                        userNodeName.InnerText = node.name.ToString();
+                        userNode.AppendChild(userNodeName);
+
+
+                        //now append the label
+                        XmlNode userNodeLable = xmlDoc.CreateElement("label");
+                        userNodeLable.InnerText = node.label.ToString();//'"' + node.label + '"';
+                        userNode.AppendChild(userNodeLable);
+
+                        //now append the source
+                        XmlNode userNodeSource = xmlDoc.CreateElement("source");
+                        userNodeSource.InnerText = node.source.ToString();  //'"' + node.source + '"';
+                        userNode.AppendChild(userNodeSource);
+
+                        //now append the color
+                        XmlNode userNodeColor = xmlDoc.CreateElement("color");
+                        userNodeColor.InnerText = ColorTranslator.ToHtml(node.colorValue).ToString();//'"' + ColorTranslator.ToHtml(node.colorValue).ToString() + '"';
+                        userNode.AppendChild(userNodeColor);
+
+                        //now append the xvalue
+                        XmlNode userNodeXValue = xmlDoc.CreateElement("xvalue");
+                        userNodeXValue.InnerText = node.xVal.ToString();//'"' + node.xVal.ToString() + '"';
+                        userNode.AppendChild(userNodeXValue);
+
+                        //now append the yvalue
+                        XmlNode userNodeYValue = xmlDoc.CreateElement("yvalue");
+                        userNodeYValue.InnerText = node.yVal.ToString(); //'"' + node.yVal.ToString() + '"';
+                        userNode.AppendChild(userNodeYValue);
+
+
+                        //now append the showTextItem
+                        XmlNode userNodeShowTextItem = xmlDoc.CreateElement("showTextItem");
+                        userNodeShowTextItem.InnerText = node.showItemText.ToString(); //'"' + node.showItemText.ToString() + '"';
+                        userNode.AppendChild(userNodeShowTextItem);
+
+                        //--node size
+                        XmlNode nodesize = xmlDoc.CreateElement("nodesize");
+                        nodesize.InnerText = node.marker_Size.ToString(); //'"' + node.showItemText.ToString() + '"';
+                        userNode.AppendChild(nodesize);
+
+                        //--WE ALSO need to add the user information.
+                        
+                        //for instance id
+                        XmlNode deviceinstance = xmlDoc.CreateElement("deviceInstance");
+                        deviceinstance.InnerText = "";// node_device_info.device_instance_id.ToString(); //'"' + node.showItemText.ToString() + '"';
+                                userNode.AppendChild(deviceinstance);
+
+                                //for ip 
+                                XmlNode ip = xmlDoc.CreateElement("ip");
+                                ip.InnerText = "";// node_device_info.ip.ToString(); //'"' + node.showItemText.ToString() + '"';
+                                userNode.AppendChild(ip);
+
+                                //for param1id
+                                XmlNode param1id = xmlDoc.CreateElement("param1id");
+                                param1id.InnerText = "";//node_device_info.param1id.ToString(); //'"' + node.showItemText.ToString() + '"';
+                                userNode.AppendChild(param1id);
+
+                                //for param2id
+                                XmlNode param2id = xmlDoc.CreateElement("param2id");
+                                param2id.InnerText =  "";// node_device_info.param2id.ToString(); //'"' + node.showItemText.ToString() + '"';
+                                userNode.AppendChild(param2id);
+
+                                //for param1info
+                                XmlNode param1info = xmlDoc.CreateElement("param1info");
+                                param1info.InnerText = "";//node_device_info.param1info.ToString(); //'"' + node.showItemText.ToString() + '"';
+                                userNode.AppendChild(param1info);
+
+                                //for param2info
+                                XmlNode param2info = xmlDoc.CreateElement("param2info");
+                                param2info.InnerText = "";// node_device_info.param2info.ToString(); //'"' + node.showItemText.ToString() + '"';
+                                userNode.AppendChild(param2info);
+
+                                //for param1id_type
+                                XmlNode param1id_type = xmlDoc.CreateElement("param1id_type");
+                                param1id_type.InnerText = "";//node_device_info.param1_id_type.ToString(); //'"' + node.showItemText.ToString() + '"';
+                                userNode.AppendChild(param1id_type);
+
+                                //for param2id_type
+                                XmlNode param2id_type = xmlDoc.CreateElement("param2id_type");
+                                param2id_type.InnerText = "";//node_device_info.param2_id_type.ToString(); //'"' + node.showItemText.ToString() + '"';
+                                userNode.AppendChild(param2id_type);
+
+                        
+                        }
+
+
+                    }//This one is for each node in the section
+
+            }//close of if
+
+            //--Now lets append the line information...
+            XmlNode lineNode = xmlDoc.CreateElement("lines");
+            // xmlDoc.AppendChild(rootNode);
+            r_node.AppendChild(lineNode);
+
+        
+            if (lineInfoForSavingToXML.Count > 0)
+            {
+                //--if present ie value do following.
+
+                foreach(var line in lineInfoForSavingToXML)
+                {
+
+                    XmlNode singleLine = xmlDoc.CreateElement("line");
+                    lineNode.AppendChild(singleLine);
+
+
+                    //for id
+                    XmlNode lineID = xmlDoc.CreateElement("ID");
+                    lineID.InnerText = line.ID;
+                    singleLine.AppendChild(lineID);
+
+                    //--for prev node id
+                    XmlNode prevNodeID = xmlDoc.CreateElement("prevNodeID");
+                    prevNodeID.InnerText = line.prevNodeId;
+                    singleLine.AppendChild(prevNodeID);
+
+
+                    //for next nodeid
+                    XmlNode nextNodeID = xmlDoc.CreateElement("nextNodeID");
+                    nextNodeID.InnerText = line.nextNodeId;
+                    singleLine.AppendChild(nextNodeID);
+
+                    //--for thickness
+                    XmlNode thickness = xmlDoc.CreateElement("linethickness");
+                    thickness.InnerText = line.lineThickness.ToString();
+                    singleLine.AppendChild(thickness);
+
+
+                    //--for series id
+                    XmlNode seriesname = xmlDoc.CreateElement("seriesname");
+                    seriesname.InnerText = line.lineSeriesID.Name.ToString();//This prints the line series name
+                    singleLine.AppendChild(seriesname);
+
+
+                    //--for color value
+                    XmlNode linecolor = xmlDoc.CreateElement("linecolor");
+                    linecolor.InnerText = ColorTranslator.ToHtml(line.lineColorValue).ToString();
+                    singleLine.AppendChild(linecolor);
+
+
+
+                }//close of foreach
+
+
+
+
+            }
+
+
+
+
+
+
+
+            //now saving the doucment 
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+            saveFileDialog1.Filter = "xml file|*.xml";  //|Bitmap Image|*.bmp|Gif Image|*.gif";
+            saveFileDialog1.Title = "Save an Image File";
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                string name = saveFileDialog1.FileName;
+                xmlDoc.Save(name);
+            }
+
+
+        }
+
+        private void saveSettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //This will save the settings..
+
+            //try
+            //{
+            //    //We need to get the configuration for load here 
+                SaveConfiguration();
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show(ex.Message);
+            //}
+        }
+        public class Tempdt
+        {
+             public string id { get; set; } //--for identifying which point is selected..
+            public double xVal { get; set; }//--this is the values that represent the point in a chart
+            public double yVal { get; set; }
+            public string source { get; set; }
+            public string name { get; set; }
+            public string label { get; set; }
+            public Color colorValue { get; set; }
+            public string showItemText { get; set; }
+            public string nodeSize { get; set; }
+
+             //--THIS REPRESENTS THE DEVICE INFO
+            //public string nodeID { get; set; } //--for identifying which point is selected..
+            public string device_instance_id { get; set; }//--this is the values that represent the point in a chart
+            public string ip { get; set; }
+            public string param1id { get; set; }
+            public string param2id { get; set; }
+            public string param1info { get; set; }
+            public string param2info { get; set; }
+            public string param1_id_type { get; set; }
+            public string param2_id_type { get; set; }
+        }
+
+
+        public List<Tempdt> nodeInfoFromXMLfile = new List<Tempdt>();
+
+        public List<lineNodeDataType> lineInfoFromXMLfile = new List<lineNodeDataType>();
+
+   
+        public void loadXMLDoc()
+        {
+            nodeInfoFromXMLfile.Clear();
+            lineInfoFromXMLfile.Clear();
+            OpenFileDialog saveFileDialog1 = new OpenFileDialog();
+            saveFileDialog1.Filter = "xml file|*.xml";  //|Bitmap Image|*.bmp|Gif Image|*.gif";
+            saveFileDialog1.Title = "Load an Image File";
+            string path = null;
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                path = saveFileDialog1.FileName;
+                //xmlDoc.Save(name);
+            }
+
+            if (path == "")
+            {
+                return;
+            }
+
+
+            //now lets read the data from the file
+            XmlDocument xmlDoc = new XmlDocument();
+            try { 
+            xmlDoc.Load(path);
+            }catch(Exception ex)
+            {
+                MessageBox.Show("File could not be loaded : "+ex.Message);
+                return;
+            }
+
+            XmlNodeList identifierList = xmlDoc.SelectNodes("RootNode/identifier");
+
+            //because if the node is empty it returns null
+            if(identifierList == null)
+            {
+                MessageBox.Show("This file can not be loaded.");
+                return;
+
+
+            }
+            else
+            {
+                if (identifierList.Count > 0)
+                {
+                    string identifierSignature = identifierList[0].InnerText;
+
+                    if(identifierSignature == "")
+                    {
+                        MessageBox.Show("File contains is edited outside,can not load");
+                        return;
+
+                    }
+                    else if(identifierSignature == "MainForm")
+                    {
+                        MessageBox.Show("This file belongs to offline mode Load in main section");
+                        return;
+                    }
+                    else if(identifierSignature == "AirHandler")
+                    {
+                        MessageBox.Show("This file belongs to air handler. Please load in air handler section");
+                        return;
+                    }
+                  
+                }
+            }
+
+
+            XmlNodeList xnList = xmlDoc.SelectNodes("RootNode/nodes/node");
+            foreach (XmlNode xn in xnList)
+            {
+
+                string nodeID = xn["nodeID"].InnerText; 
+                string name = xn["name"].InnerText;
+                string label = xn["label"].InnerText;
+                string source = xn["source"].InnerText;
+                string color = xn["color"].InnerText;
+                string xvalue = xn["xvalue"].InnerText;
+                string yvalue = xn["yvalue"].InnerText;
+                string showTextItem = xn["showTextItem"].InnerText;
+                string nodeSize = xn["nodesize"].InnerText;
+                string deviceInstanceVal = xn["deviceInstance"].InnerText;
+                string ipVal = xn["ip"].InnerText;
+                string param1idVal = xn["param1id"].InnerText;
+                string param2idVal = xn["param2id"].InnerText;
+                string param1infoVal = xn["param1info"].InnerText;
+                string param2infoVal = xn["param2info"].InnerText;
+                string param1typeVal = xn["param1id_type"].InnerText;
+                string param2typeVal = xn["param2id_type"].InnerText;
+
+                //now lets add these values to list
+                nodeInfoFromXMLfile.Add(new Tempdt
+                {
+                    id = nodeID,
+                    name = name,
+                    label = label,
+                    source = source,
+                    colorValue = ColorTranslator.FromHtml(color),
+                    xVal = double.Parse(xvalue),
+                    yVal = double.Parse(yvalue),
+                    showItemText = showTextItem ,
+                      nodeSize = nodeSize,
+                    device_instance_id = deviceInstanceVal,
+                    ip = ipVal,
+                    param1id = param1idVal,
+                    param2id = param2idVal,
+                    param1info = param1infoVal,
+                    param2info = param2infoVal,
+                    param1_id_type = param1typeVal,
+                    param2_id_type = param2typeVal
+                });
+            }//close of foreach
+
+
+            //--loading the line info from the doc
+            XmlNodeList xlList = xmlDoc.SelectNodes("RootNode/lines/line");
+
+            foreach (XmlNode xn in xlList)
+            {
+                string idVal = xn["ID"].InnerText;
+                string prevNodeIDVal = xn["prevNodeID"].InnerText;
+                string nextNodeIDVal = xn["nextNodeID"].InnerText;
+                string lineThicknessVal = xn["linethickness"].InnerText;
+                string serieNameIDval = xn["seriesname"].InnerText;
+                string linecolor = xn["linecolor"].InnerText;               
+                //now lets add these values to list
+                lineInfoFromXMLfile.Add(new lineNodeDataType
+                {                   
+                    ID = idVal,
+                    prevNodeId = prevNodeIDVal,
+                    nextNodeId = nextNodeIDVal,
+                    lineThickness  =int.Parse(lineThicknessVal),
+                    lineSeriesID = new Series( serieNameIDval),
+                    lineColorValue = ColorTranslator.FromHtml(linecolor)
+                });
+            }//close of foreach
+           // MessageBox.Show("count node values " + nodeInfoFromXMLfile.Count + ",line count" + lineInfoFromXMLfile.Count);
+            //--now since both value is added we need to insert these values to db now
+            //-- and reload them
+            /*
+            Task : 
+            0.Replace the previous id with new ids so there is no conflict in ids if present in db.
+              0.1 also change the series id so that there is no conflict between them        
+            1.insert value
+            2.Relaod value
+            */
+
+            //FIRST change the ids in both node and line section
+           //================================start of the id conversion====================================// 
+            foreach (var nodex in nodeInfoFromXMLfile)
+            {
+                //get new id ,
+                //identify old id 
+                
+                //replace it first and then replace in line as well
+                string newID = GetGUID();
+                string oldID = nodex.id;
+               // MessageBox.Show("old id=" + oldID + "new id = " + newID);
+                //replace node id
+                nodex.id = newID;
+                //for line section replace with new id             
+               foreach(var line in lineInfoFromXMLfile)
+                {
+                    //we need to replace it with the new id
+                    if (oldID == line.prevNodeId)
+                    {
+                        line.prevNodeId = newID;//setting with the new node id
+                    // MessageBox.Show("prev node id one match, prevnode id = " + line.prevNodeId+",oldid ="+oldID+",new id= "+newID);
+                    }
+                    if(oldID == line.nextNodeId)
+                    {
+                        line.nextNodeId = newID;
+                       // MessageBox.Show("next nodeid one match,nex nodeid =" + line.nextNodeId + ",oldid =" + oldID + ",new id= " + newID);
+                    }
+                }
+
+            }
+
+
+
+             //---This part is done to not conflict the xml file when loaded in same page. the node
+             //will be duplicated.
+            foreach (var line in lineInfoFromXMLfile)
+            {    
+                string ln= GetGUID();
+                Series s = new Series(ln);
+                line.lineSeriesID = s;//This change is done to not conflict when loaded in same page   
+            }
+
+           
+            //==================================end of the id conversion================================//
+
+            //===================================inserting into db=====================================//
+            foreach (var node in nodeInfoFromXMLfile)
+            {
+                //we need to inset it to db but if the node id is already present then dont inset just load....
+                InsertNodeInfoToDB(node.id, node.xVal, node.yVal, node.source, node.name, node.label, node.colorValue, node.showItemText,int.Parse(node.nodeSize), node.device_instance_id, node.ip, node.param1id, node.param2id, node.param1info, node.param2info, node.param1_id_type, node.param2_id_type);
+            }
+
+            foreach(var line in lineInfoFromXMLfile)
+            {
+                InsertLineInfoToDB(line.ID, line.prevNodeId, line.nextNodeId, line.lineColorValue, line.lineSeriesID, line.lineThickness);
+            }
+          //=====================================end of inserting in db=============================//
+            //now lets load the data back again..
+             //--helps in loading in redrawing the parts.
+            LoadNodeAndLineFromDB(indexOfChartSelected);   //Lets make it passing the stirngs       
+            ReDrawingLineAndNode();
+
+            MessageBox.Show("Load success");
+ 
+
+        }
+
+        void ClearChart()
+        {
+            this.Invalidate();
+            chart1.Invalidate();
+            // chart1.Dispose();//--Releases all the resources used by the chart...
+            plot_new_graph();
+           // lb_title_display.Text = "";
+            //--Reseting the menustrip values for new plotting....
+            menuStripNodeLineInfoValues.Clear();
+            menuStripNodeInfoValues.Clear();
+            index = 0;
+            incrementIndex = 0;
+            insertNodeToolStripMenuItem.Enabled = true;/*insert node will be dissable with historical plot so reenabling it*/
+
+        }
+
+
+        public void SetNodeWithValuesXYCoord(string source, string name, string label, Color c1, string comboboxItemText1, double xvalue, double yvalue)
+        {
+
+            tbSource = source;
+            tbName = name;
+            tbLabel = label;
+            colorValue = c1;
+            comboboxItemText = comboboxItemText1;
+            //lets do the processing 
+            //lets count how many items were inserted
+            countNumberOfPoints += 1;
+
+            plot_on_graph_values_process_diagram(xvalue, yvalue);
+
+
+        }
+
+
+        private void loadSettingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //try
+            //{
+               loadXMLDoc();
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show(ex.Message);
+            //}
+        }
+
         //--Insert node to database....
-        public void InsertNodeInfoToDB(string id, double xVal, double yVal, string source, string name, string label, Color colorValue, string showItemText,int nodeSizeValue)
+        public void InsertNodeInfoToDB(string id, double xVal, double yVal, string source, string name, string label, Color colorValue, string showItemText,int nodeSizeValue,string deviceinstance,string deviceip,string param1id,string param2id,string param1info,string param2info,string param1type,string param2type)
         {
             //This is the name of the table that stores the node information...
             string tableName = "tbl_" + selectedBuildingList[0].BuildingName + "_node_value";//currentNodeTableFromDB;  
@@ -5103,8 +6215,6 @@ namespace WFA_psychometric_chart
                 command.Parameters.AddWithValue("@colorVal", ColorTranslator.ToHtml(colorValue));
                 command.Parameters.AddWithValue("@text", showItemText);
                 command.Parameters.AddWithValue("@node_size_value", nodeSizeValue);
-                //command.Parameters.AddWithValue("@device_or_web", medium_device_or_web1);
-                //MessageBox.Show("selected value = " + cb_station_names.SelectedItem.ToString());
                 command.ExecuteNonQuery();
             }
 
@@ -5113,23 +6223,29 @@ namespace WFA_psychometric_chart
 
             if(source == "Device")
             {
+
+               // MessageBox.Show("param2 info" + device_param2_info_for_node);
                 //Device is selected so insert devcie to corresponding able
                 string tableNameDevice = "tbl_" + selectedBuildingList[0].BuildingName + "_device_info_for_node";//currentNodeTableFromDB; 
                 using (SQLiteConnection connection = new SQLiteConnection(connString))
                 {
                     connection.Open();
                     //SQLiteDataReader reader = null;
-                    string sql_string = "insert into " + tableNameDevice + "(nodeID,device_instanceID,IP,param1ID,param2ID,param1_info,param2_info) VALUES(@id,@instanceID,@IP,@param1,@param2,@param1info,@param2info)";
+                    string sql_string = "insert into " + tableNameDevice + "(nodeID,device_instanceID,IP,param1ID,param2ID,param1_info,param2_info,param1_identifier_type,param2_identifier_type) VALUES(@id,@instanceID,@IP,@param1,@param2,@param1info, @param2info, @param1_iden_type, @param2_iden_type)";
                     SQLiteCommand command = new SQLiteCommand(sql_string, connection);
                     command.CommandType = CommandType.Text;
                    
                     command.Parameters.AddWithValue("@id", id);
-                    command.Parameters.AddWithValue("@instanceID", deviceInstanceValue.ToString());
-                    command.Parameters.AddWithValue("@IP", deviceIP.ToString());
-                    command.Parameters.AddWithValue("@param1", deviceParam1ID);
-                    command.Parameters.AddWithValue("@param2", deviceParam2ID);
-                    command.Parameters.AddWithValue("@param1info", device_param1_info_for_node);
-                    command.Parameters.AddWithValue("@param2info", device_param2_info_for_node);
+                    command.Parameters.AddWithValue("@instanceID", deviceinstance);
+                    command.Parameters.AddWithValue("@IP", deviceip);
+                    command.Parameters.AddWithValue("@param1", param1id);
+                    command.Parameters.AddWithValue("@param2", param2id);
+                    command.Parameters.AddWithValue("@param1info", param1info);
+                    command.Parameters.AddWithValue("@param2info", param2info);
+                    command.Parameters.AddWithValue("@param1_iden_type", param1type);
+                    command.Parameters.AddWithValue("@param2_iden_type", param2type);
+
+                    //MessageBox.Show("SQL = " + sql_string);
                     //MessageBox.Show("selected value = " + cb_station_names.SelectedItem.ToString());
                     command.ExecuteNonQuery();
                 }
@@ -5149,9 +6265,8 @@ namespace WFA_psychometric_chart
 
             using (SQLiteConnection connection = new SQLiteConnection(connString))
             {
-                connection.Open();
-                //SQLiteDataReader reader = null;
-                string sql_string = "UPDATE " + tableName + "   set  xValue =@xVal ,  yValue=@yVal, source=@source, name=@name, label=@label , colorValue=@colorVal, showTextItem=@text , nodeSize=@node_size_value  where nodeID  =@id ";
+                connection.Open();                
+                string sql_string = "UPDATE " + tableName + "   set  xValue =@xVal ,  yValue=@yVal, source=@source, name=@name, label=@label , colorValue=@colorVal, showTextItem=@text , nodeSize=@node_size_value  where nodeID  =@id";
                 SQLiteCommand command = new SQLiteCommand(sql_string, connection);
                 command.CommandType = CommandType.Text;
                 command.Parameters.AddWithValue("@xVal", xVal.ToString());
@@ -5181,8 +6296,7 @@ namespace WFA_psychometric_chart
 
             using (SQLiteConnection connection = new SQLiteConnection(connString))
             {
-                connection.Open();
-                //SQLiteDataReader reader = null;
+                connection.Open();               
                 string sql_string = "insert into " + tableName + "(chart_respective_lineID,lineID,prevNodeId,nextNodeId,lineColorValue,lineSeriesId,thickness) VALUES(@chartid,@id,@pn,@nn,@lc,@ls,@thicknessValue)";
                 SQLiteCommand command = new SQLiteCommand(sql_string, connection);                                                                      
                 command.CommandType = CommandType.Text;
@@ -5193,7 +6307,6 @@ namespace WFA_psychometric_chart
                 command.Parameters.AddWithValue("@lc", ColorTranslator.ToHtml(lineColor));
                 command.Parameters.AddWithValue("@ls", lineSeriesName);
                 command.Parameters.AddWithValue("@thicknessValue", linethickness);
-
                 command.ExecuteNonQuery();
             }
 
@@ -5227,7 +6340,6 @@ namespace WFA_psychometric_chart
                 string sql_string = "update " + tableName + " set prevNodeId=@pn,nextNodeId=@nn,lineColorValue=@lc,lineSeriesId=@ls ,thickness = @linethickness where   lineID=@id ";
                 SQLiteCommand command = new SQLiteCommand(sql_string, connection);
                 command.CommandType = CommandType.Text;
-
                 command.Parameters.AddWithValue("@pn", prevNodeId);
                 command.Parameters.AddWithValue("@nn", nextNodeId);
                 command.Parameters.AddWithValue("@lc", ColorTranslator.ToHtml(lineColor));

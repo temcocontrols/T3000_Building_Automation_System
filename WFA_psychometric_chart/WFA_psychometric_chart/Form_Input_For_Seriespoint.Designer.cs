@@ -43,6 +43,12 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
+            this.tb_line_name = new System.Windows.Forms.TextBox();
+            this.lb_line_name = new System.Windows.Forms.Label();
+            this.lb_line_enabled = new System.Windows.Forms.Label();
+            this.cb_line_enabled = new System.Windows.Forms.CheckBox();
+            this.gb_line_info = new System.Windows.Forms.GroupBox();
+            this.gb_line_info.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnSetNode
@@ -90,6 +96,7 @@
             // 
             resources.ApplyResources(this.tbSource, "tbSource");
             this.tbSource.Name = "tbSource";
+            this.tbSource.ReadOnly = true;
             // 
             // label5
             // 
@@ -121,10 +128,42 @@
             resources.ApplyResources(this.label6, "label6");
             this.label6.Name = "label6";
             // 
+            // tb_line_name
+            // 
+            resources.ApplyResources(this.tb_line_name, "tb_line_name");
+            this.tb_line_name.Name = "tb_line_name";
+            // 
+            // lb_line_name
+            // 
+            resources.ApplyResources(this.lb_line_name, "lb_line_name");
+            this.lb_line_name.Name = "lb_line_name";
+            // 
+            // lb_line_enabled
+            // 
+            resources.ApplyResources(this.lb_line_enabled, "lb_line_enabled");
+            this.lb_line_enabled.Name = "lb_line_enabled";
+            // 
+            // cb_line_enabled
+            // 
+            resources.ApplyResources(this.cb_line_enabled, "cb_line_enabled");
+            this.cb_line_enabled.Name = "cb_line_enabled";
+            this.cb_line_enabled.UseVisualStyleBackColor = true;
+            // 
+            // gb_line_info
+            // 
+            this.gb_line_info.Controls.Add(this.lb_line_name);
+            this.gb_line_info.Controls.Add(this.cb_line_enabled);
+            this.gb_line_info.Controls.Add(this.tb_line_name);
+            this.gb_line_info.Controls.Add(this.lb_line_enabled);
+            resources.ApplyResources(this.gb_line_info, "gb_line_info");
+            this.gb_line_info.Name = "gb_line_info";
+            this.gb_line_info.TabStop = false;
+            // 
             // Form_Input_For_Seriespoint
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.gb_line_info);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.btnSetNode);
             this.Controls.Add(this.btnCancel);
@@ -143,6 +182,8 @@
             this.MinimizeBox = false;
             this.Name = "Form_Input_For_Seriespoint";
             this.Load += new System.EventHandler(this.Form_Input_For_Seriespoint_Load);
+            this.gb_line_info.ResumeLayout(false);
+            this.gb_line_info.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -163,5 +204,10 @@
         private System.Windows.Forms.TextBox tbName;
         private System.Windows.Forms.TextBox tbLabel;
         private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.TextBox tb_line_name;
+        private System.Windows.Forms.Label lb_line_name;
+        private System.Windows.Forms.Label lb_line_enabled;
+        private System.Windows.Forms.CheckBox cb_line_enabled;
+        private System.Windows.Forms.GroupBox gb_line_info;
     }
 }

@@ -24,12 +24,74 @@ namespace WFA_psychometric_chart
         {
             colorDialog1.ShowDialog();
         }
-
+        int indexRun = 1;
         private void Form_Input_For_Seriespoint_Load(object sender, EventArgs e)
         {
             btnColor.BackColor = Color.Blue;
-            comboBox1.SelectedIndex = 0;
+            comboBox1.SelectedIndex = 1;
 
+            //This will help in quick insertion
+            
+            int t = F1.menuStripNodeInfoValues.Count;
+            if (t > 0)
+            {
+                indexRun = 1 + t;
+            }
+
+            int indNodeCount = indexRun;
+            string nodeName = "Node" + indNodeCount;//This is the node name 
+
+            for (int i = 0; i < F1.menuStripNodeInfoValues.Count; i++)
+            {
+                if (F1.menuStripNodeInfoValues[i].name == nodeName)
+                {
+                    indNodeCount++;
+                    nodeName = "Node" + indNodeCount;
+                    i = 0;
+                }
+
+            }
+
+
+            
+            //string nodeLabel = "Label" + indNodeCount;
+
+            //for (int i = 0; i < F1.menuStripNodeInfoValues.Count; i++)
+            //{
+            //    if (F1.menuStripNodeInfoValues[i].label == nodeLabel)
+            //    {
+            //        indNodeCount++;
+            //        nodeLabel = "Node" + indNodeCount;
+            //        i = 0;
+            //    }
+
+            //}
+
+            int indLineCount = indexRun-1;
+            //This one is for line Name
+            string lineName = "Line" + indLineCount;
+            for (int i = 0; i < F1.menuStripNodeLineInfoValues.Count; i++)
+            {
+                if (F1.menuStripNodeLineInfoValues[i].name == lineName)
+                {
+                    indLineCount++;
+                    lineName = "Line" + indLineCount;
+                    i = 0;
+                }
+
+            }
+
+
+            tbName.Text = nodeName;
+           // tbLabel.Text = nodeLabel;
+            gb_line_info.Enabled = false;
+            if (F1.menuStripNodeInfoValues.Count > 0)
+            {
+                gb_line_info.Enabled = true;
+                tb_line_name.Text = lineName;
+                cb_line_enabled.Checked = true;
+               
+            }
 
 
         }
@@ -41,18 +103,57 @@ namespace WFA_psychometric_chart
             1. Insert a point by calling a function 
             2. It should input the values in menuStripNodeInfoValues
             */
-            string source = tbSource.Text;
-            string name = tbName.Text;
-            string label = tbLabel.Text;
-            string cbItemSelected = comboBox1.Text;
+            //string source = tbSource.Text;
+            //string name = tbName.Text;
+            //string label = tbLabel.Text;
+            //string cbItemSelected = comboBox1.Text;
+            //string lineName = "";
+            //int status = 0;//dissabled 
+            //if (cb_line_enabled.Checked == true)
+            //{
+            //    status = 1;
+            //}
+            //if(tb_line_name.Text == "")
+            //{
+            //    int t = F1.menuStripNodeInfoValues.Count;
+            //    if (t > 0)
+            //    {
+            //        indexRun = t;
+            //    }
 
 
-            //MessageBox.Show("items index " + cbItemSelected);
+            //    int indLineCount = indexRun;
+            //    //This one is for line Name
+            //    for (int i = 0; i < F1.menuStripNodeLineInfoValues.Count; i++)
+            //    {
+            //        if (F1.menuStripNodeLineInfoValues[i].name == lineName)
+            //        {
+            //            indLineCount++;
+            //            lineName = "Line" + indLineCount;
+            //            i = 0;
+            //        }
 
+            //    }
 
-            F1.SetNode(source, name, label, btnColor.BackColor, cbItemSelected);
-            //MessageBox.Show(Properties.Resources.Success0);
-            this.Close();
+            //}
+            //else
+            //{
+            //    lineName = tb_line_name.Text;
+            //}
+
+            ////MessageBox.Show("items index " + cbItemSelected);
+            //if (F1.menuStripNodeInfoValues.Count > 0) { 
+
+            //F1.SetNode(source, name, label, btnColor.BackColor, cbItemSelected,20,lineName,status);
+
+            //}
+            //else
+            //{
+            //    //--For first input
+            //    F1.SetNode(source, name, label, btnColor.BackColor, cbItemSelected, 20, lineName, status);
+            //}
+            ////MessageBox.Show(Properties.Resources.Success0);
+            //this.Close();
 
         }
 

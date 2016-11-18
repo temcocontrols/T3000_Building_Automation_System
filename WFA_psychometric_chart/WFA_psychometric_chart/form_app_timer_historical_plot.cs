@@ -16,10 +16,10 @@ using System.Data.SQLite;
 
 namespace WFA_psychometric_chart
 {
-    public partial class form_app_timer : Form
+    public partial class form_app_timer_historical_plot : Form
     {
         private Form1_main form1;
-        public form_app_timer(Form1_main form1)
+        public form_app_timer_historical_plot(Form1_main form1)
         {
             this.form1 = form1;
             InitializeComponent();
@@ -290,7 +290,7 @@ namespace WFA_psychometric_chart
                         form1.lb_title_display.Text = "Historical Plot";
 
                         //if plotted then we need to dissable the insert node fxn
-                        form1.insertNodeToolStripMenuItem.Enabled = false;
+                    //  insertNodeToolStripMenuItem.Enabled = false;
 
 
 

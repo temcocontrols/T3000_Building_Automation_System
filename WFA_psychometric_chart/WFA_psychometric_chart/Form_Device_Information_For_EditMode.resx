@@ -117,19 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="btOK.Text" xml:space="preserve">
-    <value>확인</value>
-  </data>
-  <data name="lblStartup.Text" xml:space="preserve">
-    <value>다음 번에...</value>
-  </data>
-  <data name="rbDefault.Text" xml:space="preserve">
-    <value>기본 언어를 사용 하 여</value>
-  </data>
-  <data name="rbSelected.Text" xml:space="preserve">
-    <value>선택한 언어를 사용 하 여</value>
-  </data>
-  <data name="rbShow.Text" xml:space="preserve">
-    <value>이 폼을 다시 표시</value>
-  </data>
 </root>

@@ -135,11 +135,18 @@
     <Compile Include="buildingChartSetting.Designer.cs">
       <DependentUpon>buildingChartSetting.cs</DependentUpon>
     </Compile>
+    <Compile Include="ChartOperations.cs" />
     <Compile Include="comfort_zone.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="comfort_zone.Designer.cs">
       <DependentUpon>comfort_zone.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DatabaseOperations.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DatabaseOperationsForEditNodeClass.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="DataGridViewDisplay.cs">
       <SubType>Form</SubType>
@@ -160,11 +167,11 @@
     <Compile Include="Form1_main.Designer.cs">
       <DependentUpon>Form1_main.cs</DependentUpon>
     </Compile>
-    <Compile Include="Form3.cs">
+    <Compile Include="Form3_WeatherService.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form3.Designer.cs">
-      <DependentUpon>Form3.cs</DependentUpon>
+    <Compile Include="Form3_WeatherService.Designer.cs">
+      <DependentUpon>Form3_WeatherService.cs</DependentUpon>
     </Compile>
     <Compile Include="Form4_insert_data.cs">
       <SubType>Form</SubType>
@@ -172,11 +179,17 @@
     <Compile Include="Form4_insert_data.Designer.cs">
       <DependentUpon>Form4_insert_data.cs</DependentUpon>
     </Compile>
-    <Compile Include="form_app_timer.cs">
+    <Compile Include="form_app_timer_historical_plot.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="form_app_timer.Designer.cs">
-      <DependentUpon>form_app_timer.cs</DependentUpon>
+    <Compile Include="form_app_timer_historical_plot.Designer.cs">
+      <DependentUpon>form_app_timer_historical_plot.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_Device_Information_For_EditMode.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_Device_Information_For_EditMode.Designer.cs">
+      <DependentUpon>Form_Device_Information_For_EditMode.cs</DependentUpon>
     </Compile>
     <Compile Include="form_export_data.cs">
       <SubType>Form</SubType>
@@ -195,6 +208,18 @@
     </Compile>
     <Compile Include="form_heat_map.Designer.cs">
       <DependentUpon>form_heat_map.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_HumiditySourceDeviceInput.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_HumiditySourceDeviceInput.Designer.cs">
+      <DependentUpon>Form_HumiditySourceDeviceInput.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_input_by_temp_hum_for_main.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_input_by_temp_hum_for_main.Designer.cs">
+      <DependentUpon>Form_input_by_temp_hum_for_main.cs</DependentUpon>
     </Compile>
     <Compile Include="Form_Input_For_Seriespoint.cs">
       <SubType>Form</SubType>
@@ -219,6 +244,18 @@
     </Compile>
     <Compile Include="Form_Psychrometric_Calculator.Designer.cs">
       <DependentUpon>Form_Psychrometric_Calculator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="form_state_point_management.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="form_state_point_management.Designer.cs">
+      <DependentUpon>form_state_point_management.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_TemperatureSourceDeviceInput.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_TemperatureSourceDeviceInput.Designer.cs">
+      <DependentUpon>Form_TemperatureSourceDeviceInput.cs</DependentUpon>
     </Compile>
     <Compile Include="InsertNodeFormForBuildingChartSetting.cs">
       <SubType>Form</SubType>
@@ -294,17 +331,17 @@
     <EmbeddedResource Include="Form1_main.zh.resx">
       <DependentUpon>Form1_main.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form3.en-US.resx">
-      <DependentUpon>Form3.cs</DependentUpon>
+    <EmbeddedResource Include="Form3_WeatherService.en-US.resx">
+      <DependentUpon>Form3_WeatherService.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form3.ko.resx">
-      <DependentUpon>Form3.cs</DependentUpon>
+    <EmbeddedResource Include="Form3_WeatherService.ko.resx">
+      <DependentUpon>Form3_WeatherService.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form3.resx">
-      <DependentUpon>Form3.cs</DependentUpon>
+    <EmbeddedResource Include="Form3_WeatherService.resx">
+      <DependentUpon>Form3_WeatherService.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form3.zh.resx">
-      <DependentUpon>Form3.cs</DependentUpon>
+    <EmbeddedResource Include="Form3_WeatherService.zh.resx">
+      <DependentUpon>Form3_WeatherService.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form4_insert_data.en-US.resx">
       <DependentUpon>Form4_insert_data.cs</DependentUpon>
@@ -318,14 +355,17 @@
     <EmbeddedResource Include="Form4_insert_data.zh.resx">
       <DependentUpon>Form4_insert_data.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="form_app_timer.en-US.resx">
-      <DependentUpon>form_app_timer.cs</DependentUpon>
+    <EmbeddedResource Include="form_app_timer_historical_plot.en-US.resx">
+      <DependentUpon>form_app_timer_historical_plot.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="form_app_timer.ko.resx">
-      <DependentUpon>form_app_timer.cs</DependentUpon>
+    <EmbeddedResource Include="form_app_timer_historical_plot.ko.resx">
+      <DependentUpon>form_app_timer_historical_plot.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="form_app_timer.resx">
-      <DependentUpon>form_app_timer.cs</DependentUpon>
+    <EmbeddedResource Include="form_app_timer_historical_plot.resx">
+      <DependentUpon>form_app_timer_historical_plot.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_Device_Information_For_EditMode.resx">
+      <DependentUpon>Form_Device_Information_For_EditMode.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="form_export_data.en-US.resx">
       <DependentUpon>form_export_data.cs</DependentUpon>
@@ -353,6 +393,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="form_heat_map.resx">
       <DependentUpon>form_heat_map.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_HumiditySourceDeviceInput.resx">
+      <DependentUpon>Form_HumiditySourceDeviceInput.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_input_by_temp_hum_for_main.resx">
+      <DependentUpon>Form_input_by_temp_hum_for_main.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form_Input_For_Seriespoint.en-US.resx">
       <DependentUpon>Form_Input_For_Seriespoint.cs</DependentUpon>
@@ -392,6 +438,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Form_Psychrometric_Calculator.zh.resx">
       <DependentUpon>Form_Psychrometric_Calculator.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_state_point_management.resx">
+      <DependentUpon>form_state_point_management.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_TemperatureSourceDeviceInput.resx">
+      <DependentUpon>Form_TemperatureSourceDeviceInput.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GraphForTrendLog.ko.resx">
       <DependentUpon>GraphForTrendLog.cs</DependentUpon>

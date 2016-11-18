@@ -47,7 +47,7 @@ namespace WFA_psychometric_chart
             public string state { get; set; }
             public string city { get; set; }
             public string street { get; set; }
-            public string zip { get; set; }
+           // public string zip { get; set; }
             public string longitude { get; set; }
             public string latitude { get; set; }
             public string elevation { get; set; }
@@ -66,7 +66,7 @@ namespace WFA_psychometric_chart
             public string humidity { get; set; }
             public string bar_pressure { get; set; }
             public string wind { get; set; }
-            public string directioin { get; set; }
+            public string direction { get; set; }
             public string station_name { get; set; }
 
 
@@ -78,11 +78,7 @@ namespace WFA_psychometric_chart
 
         //THIS IS  A CONNECTION STRING TO CONNECT TO DATABASE
        // string connString1 = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
-
-        
-
-
-
+  
         private void button1_Click(object sender, EventArgs e)
         {
 
@@ -120,116 +116,19 @@ namespace WFA_psychometric_chart
                 //now lets move ont to pringting the values
                 if(rb1_excel.Checked== true)
                 {
-                    try { 
-
-                    //excel is checked..
-                    Excel.Application oApp;
-                    Excel.Workbook oBook;
-                    Excel.Worksheet oSheet;
-
-                    oApp = new Excel.Application();
-                    oBook = oApp.Workbooks.Add();
-                    oSheet = (Excel.Worksheet)oBook.Worksheets.get_Item(1);
-
-                    //printing the building information..
-                    oSheet.Cells[1, 1] = WFA_psychometric_chart.Properties.Resources.Building_Information;
-                    oSheet.Cells[2, 1] = "Country";
-                    oSheet.Cells[2, 2] = building_info[0].country.ToString();
-                    oSheet.Cells[3, 1] = "State";
-                    oSheet.Cells[3, 2] = building_info[0].state.ToString();
-                    oSheet.Cells[4, 1] = "City";
-                    oSheet.Cells[4, 2] = building_info[0].city.ToString();
-                    oSheet.Cells[5, 1] = "Zip";
-                    oSheet.Cells[5, 2] = building_info[0].zip.ToString();
-                    oSheet.Cells[6, 1] = "Longitude";
-                    oSheet.Cells[6, 2] = building_info[0].longitude.ToString();
-                    oSheet.Cells[7, 1] = "Latitude";
-                    oSheet.Cells[7, 2] = building_info[0].latitude.ToString();
-                    oSheet.Cells[8, 1] = "Elevation";
-                    oSheet.Cells[8, 2] = building_info[0].elevation.ToString();
-
-                    //for station 
-                    oSheet.Cells[9, 1] = "Station Information";
-                    oSheet.Cells[10, 1] = "Location";
-                    oSheet.Cells[10, 2] = stationInfo[0].location.ToString();
-                    oSheet.Cells[11, 1] = "Distance from building";
-                    oSheet.Cells[11, 2] = stationInfo[0].distance_from_building.ToString();
-                    oSheet.Cells[12, 1] = "Last updated date";
-                    oSheet.Cells[12, 2] = stationInfo[0].last_update_date.ToString();
-                    oSheet.Cells[13, 1] = "Temperature";
-                    oSheet.Cells[13, 2] = stationInfo[0].temp.ToString();
-                    oSheet.Cells[14, 1] = "Humidity";
-                    oSheet.Cells[14, 2] = stationInfo[0].humidity.ToString();
-                    oSheet.Cells[15, 1] = "Bar Pressure";
-                    oSheet.Cells[15, 2] = stationInfo[0].bar_pressure.ToString();
-                    oSheet.Cells[16, 1] = "Wind";
-                    oSheet.Cells[16, 2] = stationInfo[0].wind.ToString();
-                    oSheet.Cells[17, 1] = "Direction";
-                    oSheet.Cells[17, 2] = stationInfo[0].directioin.ToString();
-                    oSheet.Cells[18, 1] = "Station Name";
-                    oSheet.Cells[18, 2] = stationInfo[0].station_name.ToString();
-
-                    //now printing the value of historical datas..
-                    oSheet.Cells[19, 1] = "Past History";
-                    oSheet.Cells[20, 1] = "Date";
-                    oSheet.Cells[20, 2] = "Hour";
-                    oSheet.Cells[20, 3] = "Minute";
-                    oSheet.Cells[20, 4] = "Distance form building";                        
-                    oSheet.Cells[20, 5] = "Temperature";
-                    oSheet.Cells[20, 6] = "Humidity";
-                    oSheet.Cells[20, 7] = "Bar Pressure";
-                    oSheet.Cells[20, 8] = "Wind Speed";
-                    oSheet.Cells[20, 9] = "Wind Direction";
-                    oSheet.Cells[20, 10] = "Station Name";
-                        //now lets print the value in loop
-                        for (int i = 0; i < hist_temp_hum_list.Count; i++)
-                    {
-                        oSheet.Cells[21+i, 1] = hist_temp_hum_list[i].date.ToString();
-                        oSheet.Cells[21+i, 2] = hist_temp_hum_list[i].hour.ToString();
-                        oSheet.Cells[21+i, 3] = hist_temp_hum_list[i].minute.ToString();
-                            oSheet.Cells[21 + i, 4] = hist_temp_hum_list[i].distance_from_building.ToString();
-                            oSheet.Cells[21+i, 5] = hist_temp_hum_list[i].temp.ToString();
-                        oSheet.Cells[21+i, 6] = hist_temp_hum_list[i].hum.ToString();
-                            oSheet.Cells[21 + i, 7] = hist_temp_hum_list[i].bar_pressure.ToString();
-                            oSheet.Cells[21 + i, 8] = hist_temp_hum_list[i].wind.ToString();
-                            oSheet.Cells[21 + i, 9] = hist_temp_hum_list[i].direction.ToString();
-                            oSheet.Cells[21 + i, 10] = hist_temp_hum_list[i].station_name.ToString();
-                        }
-
-                    //now lets open the save dialog box and the save it there..
-
-                    String fileName = "";
-
-                    saveFD.InitialDirectory ="C:";
-                    saveFD.FileName = "Excelfile";
-                    saveFD.Title = WFA_psychometric_chart.Properties.Resources.Save_Excel_file_to;
-                    saveFD.Filter = "Excel file|*.xls";
-                        if (saveFD.ShowDialog() == DialogResult.OK)
-                        {
-                            //save the file..
-                            fileName = saveFD.FileName;
-                            oBook.SaveAs(fileName);                        
-
-                        }                        
-                     oBook.Close();                      
-                    oApp.Quit();                       
-                    }
-                    catch(Exception ex)
-                    {
-                        MessageBox.Show(ex.Message);
-                    }
+                    CreatingExcelFileWithData();
                 }
                 else if (rb2_csv.Checked == true)
                 {
                     //csv button is checked..
 
-                    CreatingCsvFiles();
+                    CreatingCsvFilesWithData();
 
                 }
                 else
                 {
                     //txt button is checked..
-                    CreatngTxtFile();
+                    CreatngTxtFileWithData();
 
                 }
 
@@ -246,9 +145,121 @@ namespace WFA_psychometric_chart
         }//closing of the button btnExtract
 
 
-        public void CreatingCsvFiles()
+        /// <summary>
+        /// Fxn that creates an excel file for data present in it
+        /// </summary>
+        public void CreatingExcelFileWithData()
         {
-            try { 
+
+            try
+            {
+
+                //excel is checked..
+                Excel.Application oApp;
+                Excel.Workbook oBook;
+                Excel.Worksheet oSheet;
+
+                oApp = new Excel.Application();
+                oBook = oApp.Workbooks.Add();
+                oSheet = (Excel.Worksheet)oBook.Worksheets.get_Item(1);
+
+                //printing the building information..
+                oSheet.Cells[1, 1] = WFA_psychometric_chart.Properties.Resources.Building_Information;
+                oSheet.Cells[2, 1] = "Country";
+                oSheet.Cells[2, 2] = building_info[0].country.ToString();
+                oSheet.Cells[3, 1] = "State";
+                oSheet.Cells[3, 2] = building_info[0].state.ToString();
+                oSheet.Cells[4, 1] = "City";
+                oSheet.Cells[4, 2] = building_info[0].city.ToString();
+                oSheet.Cells[5, 1] = "Zip";
+                oSheet.Cells[5, 2] = "";// building_info[0].zip.ToString();  //zip doesnot exist now
+                oSheet.Cells[6, 1] = "Longitude";
+                oSheet.Cells[6, 2] = building_info[0].longitude.ToString();
+                oSheet.Cells[7, 1] = "Latitude";
+                oSheet.Cells[7, 2] = building_info[0].latitude.ToString();
+                oSheet.Cells[8, 1] = "Elevation";
+                oSheet.Cells[8, 2] = building_info[0].elevation.ToString();
+
+                if (stationInfo.Count > 0)
+                { 
+                //for station 
+                oSheet.Cells[9, 1] = "Station Information";
+                oSheet.Cells[10, 1] = "Location";
+                oSheet.Cells[10, 2] = stationInfo[0].location.ToString();
+                oSheet.Cells[11, 1] = "Distance from building";
+                oSheet.Cells[11, 2] = stationInfo[0].distance_from_building.ToString();
+                oSheet.Cells[12, 1] = "Last updated date";
+                oSheet.Cells[12, 2] = stationInfo[0].last_update_date.ToString();
+                oSheet.Cells[13, 1] = "Temperature";
+                oSheet.Cells[13, 2] = stationInfo[0].temp.ToString();
+                oSheet.Cells[14, 1] = "Humidity";
+                oSheet.Cells[14, 2] = stationInfo[0].humidity.ToString();
+                oSheet.Cells[15, 1] = "Bar Pressure";
+                oSheet.Cells[15, 2] = stationInfo[0].bar_pressure.ToString();
+                oSheet.Cells[16, 1] = "Wind";
+                oSheet.Cells[16, 2] = stationInfo[0].wind.ToString();
+                oSheet.Cells[17, 1] = "Direction";
+                oSheet.Cells[17, 2] = stationInfo[0].direction.ToString();
+                oSheet.Cells[18, 1] = "Station Name";
+                oSheet.Cells[18, 2] = stationInfo[0].station_name.ToString();
+                }
+                //now printing the value of historical datas..
+                oSheet.Cells[19, 1] = "Past History";
+                oSheet.Cells[20, 1] = "Date";
+                oSheet.Cells[20, 2] = "Hour";
+                oSheet.Cells[20, 3] = "Minute";
+                oSheet.Cells[20, 4] = "Distance form building";
+                oSheet.Cells[20, 5] = "Temperature";
+                oSheet.Cells[20, 6] = "Humidity";
+                oSheet.Cells[20, 7] = "Bar Pressure";
+                oSheet.Cells[20, 8] = "Wind Speed";
+                oSheet.Cells[20, 9] = "Wind Direction";
+                oSheet.Cells[20, 10] = "Station Name";
+                //now lets print the value in loop
+                for (int i = 0; i < hist_temp_hum_list.Count; i++)
+                {
+                    oSheet.Cells[21 + i, 1] = hist_temp_hum_list[i].date.ToString();
+                    oSheet.Cells[21 + i, 2] = hist_temp_hum_list[i].hour.ToString();
+                    oSheet.Cells[21 + i, 3] = hist_temp_hum_list[i].minute.ToString();
+                    oSheet.Cells[21 + i, 4] = hist_temp_hum_list[i].distance_from_building.ToString();
+                    oSheet.Cells[21 + i, 5] = hist_temp_hum_list[i].temp.ToString();
+                    oSheet.Cells[21 + i, 6] = hist_temp_hum_list[i].hum.ToString();
+                    oSheet.Cells[21 + i, 7] = hist_temp_hum_list[i].bar_pressure.ToString();
+                    oSheet.Cells[21 + i, 8] = hist_temp_hum_list[i].wind.ToString();
+                    oSheet.Cells[21 + i, 9] = hist_temp_hum_list[i].direction.ToString();
+                    oSheet.Cells[21 + i, 10] = hist_temp_hum_list[i].station_name.ToString();
+                }
+
+                //now lets open the save dialog box and the save it there..
+
+                String fileName = "";
+
+                saveFD.InitialDirectory = "C:";
+                saveFD.FileName = "Excelfile";
+                saveFD.Title = WFA_psychometric_chart.Properties.Resources.Save_Excel_file_to;
+                saveFD.Filter = "Excel file|*.xls";
+                if (saveFD.ShowDialog() == DialogResult.OK)
+                {
+                    //save the file..
+                    fileName = saveFD.FileName;
+                    oBook.SaveAs(fileName);
+
+                }
+                oBook.Close();
+                oApp.Quit();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// creates comma sepreated file for the values
+        /// </summary>
+        public void CreatingCsvFilesWithData()
+        {
+            //try { 
             string filePath = ""; //"Your path of the location" + "filename.csv";
 
             saveFD.Title = WFA_psychometric_chart.Properties.Resources.Chose_a_path_and_file_name;
@@ -285,12 +296,15 @@ namespace WFA_psychometric_chart
             StringBuilder sb = new StringBuilder();
             string locationBuilding = WFA_psychometric_chart.Properties.Resources.Building_Information0;
             string locBuildingTopic = WFA_psychometric_chart.Properties.Resources.country_state_city_street_zip_;
-            string locBuildingValues = building_info[0].country + "," + building_info[0].state + "," + building_info[0].city + "," + building_info[0].street + "," + building_info[0].zip + "," + building_info[0].longitude + "," + building_info[0].latitude + "," + building_info[0].elevation;
+            string locBuildingValues = building_info[0].country + "," + building_info[0].state + "," + building_info[0].city + "," + building_info[0].street + "," +/* building_info[0].zip*/"" + "," + building_info[0].longitude + "," + building_info[0].latitude + "," + building_info[0].elevation;
 
             string locationStation = WFA_psychometric_chart.Properties.Resources.Station_Information;
             string locStationTopic = WFA_psychometric_chart.Properties.Resources.location_distance_from_buildin;
-            string locStationValue = stationInfo[0].location+","+ stationInfo[0].distance_from_building+","+stationInfo[0].last_update_date + "," + stationInfo[0].temp + "," + stationInfo[0].humidity + "," + stationInfo[0].bar_pressure + "," + stationInfo[0].wind + "," + stationInfo[0].directioin + "," + stationInfo[0].station_name+",";
-
+            string locStationValue = "";
+            if (stationInfo.Count > 0)
+            {
+             locStationValue = stationInfo[0].location+","+ stationInfo[0].distance_from_building+","+stationInfo[0].last_update_date + "," + stationInfo[0].temp + "," + stationInfo[0].humidity + "," + stationInfo[0].bar_pressure + "," + stationInfo[0].wind + "," + stationInfo[0].direction + "," + stationInfo[0].station_name+",";
+            }
             sb.AppendLine(locationBuilding);
             sb.AppendLine(locBuildingTopic);
             sb.AppendLine(locBuildingValues);
@@ -312,13 +326,16 @@ namespace WFA_psychometric_chart
               }
 
             File.WriteAllText(filePath, sb.ToString());
-            }catch(Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            //}catch(Exception ex)
+            //{
+            //    MessageBox.Show(ex.Message);
+            //}
             }//close of function CSVfil...
 
-        private void CreatngTxtFile()
+        /// <summary>
+        /// This files creates a csv file with certain data in it
+        /// </summary>
+        private void CreatngTxtFileWithData()
         {
 
             try
@@ -350,12 +367,16 @@ namespace WFA_psychometric_chart
                 StringBuilder sb = new StringBuilder();
                 string locationBuilding = WFA_psychometric_chart.Properties.Resources.Building_Information0;
                 string locBuildingTopic = WFA_psychometric_chart.Properties.Resources.country_state_city_street_zip_;
-                string locBuildingValues = building_info[0].country + "," + building_info[0].state + "," + building_info[0].city + "," + building_info[0].street + "," + building_info[0].zip + "," + building_info[0].longitude + "," + building_info[0].latitude + "," + building_info[0].elevation;
+                string locBuildingValues = building_info[0].country + "," + building_info[0].state + "," + building_info[0].city + "," + building_info[0].street + "," + /* building_info[0].zip */ ""+ "," + building_info[0].longitude + "," + building_info[0].latitude + "," + building_info[0].elevation;
 
                 string locationStation = WFA_psychometric_chart.Properties.Resources.Station_Information;
                 string locStationTopic = WFA_psychometric_chart.Properties.Resources.location_distance_from_buildin;
-                string locStationValue = stationInfo[0].location + "," + stationInfo[0].distance_from_building + "," + stationInfo[0].last_update_date + "," + stationInfo[0].temp + "," + stationInfo[0].humidity + "," + stationInfo[0].bar_pressure + "," + stationInfo[0].wind + "," + stationInfo[0].directioin + "," + stationInfo[0].station_name + ",";
-
+                //string locStationValue = stationInfo[0].location + "," + stationInfo[0].distance_from_building + "," + stationInfo[0].last_update_date + "," + stationInfo[0].temp + "," + stationInfo[0].humidity + "," + stationInfo[0].bar_pressure + "," + stationInfo[0].wind + "," + stationInfo[0].direction + "," + stationInfo[0].station_name + ",";
+                string locStationValue = "";
+                if (stationInfo.Count > 0)
+                {
+                    locStationValue = stationInfo[0].location + "," + stationInfo[0].distance_from_building + "," + stationInfo[0].last_update_date + "," + stationInfo[0].temp + "," + stationInfo[0].humidity + "," + stationInfo[0].bar_pressure + "," + stationInfo[0].wind + "," + stationInfo[0].direction + "," + stationInfo[0].station_name + ",";
+                }
                 sb.AppendLine(locationBuilding);
                 sb.AppendLine(locBuildingTopic);
                 sb.AppendLine(locBuildingValues);
@@ -385,6 +406,9 @@ namespace WFA_psychometric_chart
 
         }
 
+        /// <summary>
+        /// Pulls the historical value between particular data and id value
+        /// </summary>
         public void HistoricalDataInfo()
         {
 
@@ -443,6 +467,10 @@ namespace WFA_psychometric_chart
 
 
         }
+
+        /// <summary>
+        /// Pulls the building info country,state,city,elevation,etc
+        /// </summary>
         public void BuildingDataInfo()
         {
 
@@ -474,7 +502,7 @@ namespace WFA_psychometric_chart
                             country = reader1["country"].ToString(),
                             state = reader1["state"].ToString(),
                             city = reader1["city"].ToString(),
-                            zip = reader1["zip"].ToString(),
+                          //  zip = reader1["zip"].ToString(),
                             longitude = reader1["longitude"].ToString(),
                             latitude = reader1["latitude"].ToString(),
                             elevation = reader1["elevation"].ToString()
@@ -494,6 +522,10 @@ namespace WFA_psychometric_chart
 
 
         }
+        /// <summary>
+        /// Pulls the data info from the selected station,station name containst  
+        /// nearest station weather data 
+        /// </summary>
 
         private void StationDataInfo()
         {
@@ -531,7 +563,7 @@ namespace WFA_psychometric_chart
                             humidity = reader1["humidity"].ToString(),
                             bar_pressure = reader1["bar_pressure"].ToString(),
                             wind = reader1["wind"].ToString(),
-                            directioin = reader1["direction"].ToString(),
+                            direction = reader1["direction"].ToString(),
                             station_name = reader1["station_name"].ToString()
                         });
                 }//close of while loop       

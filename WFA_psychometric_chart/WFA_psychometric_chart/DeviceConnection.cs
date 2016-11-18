@@ -54,8 +54,8 @@ namespace WFA_psychometric_chart
         public List<BACnetClass.parameter_class> ScanForParameters(int deviceID)
         {
             parameterListValue.Clear();//Resetting the values
-            parameterListValue = BACnetClass.ReadParameterUsingBacnetID(deviceID);
-
+           //parameterListValue =   BACnetClass.ReadParameterUsingBacnetID(deviceID);
+            parameterListValue = BACnetClass.ReadParameterUsingBacnetIDForTemperatureAndHumidityBoth(deviceID);
             return parameterListValue;     
         }
 

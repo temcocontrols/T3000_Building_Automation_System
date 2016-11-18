@@ -20,8 +20,8 @@ namespace WFA_psychometric_chart
 {
     public partial class Form4_insert_data : Form
     {
-        private Form3 form3;
-        public Form4_insert_data(Form3 form3)
+        private Form3_WeatherService form3;
+        public Form4_insert_data(Form3_WeatherService form3)
         {
             this.form3 = form3;
             InitializeComponent();

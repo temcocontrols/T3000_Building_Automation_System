@@ -117,31 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="$this.Text" xml:space="preserve">
-    <value>습도의 변화에의 응용: 효과</value>
-  </data>
-  <data name="button1.Text" xml:space="preserve">
-    <value>그래프에 플롯</value>
-  </data>
-  <data name="button2.Text" xml:space="preserve">
-    <value>취소</value>
-  </data>
-  <data name="groupBox1.Text" xml:space="preserve">
-    <value>임시 대 습도</value>
-  </data>
-  <data name="label1.Text" xml:space="preserve">
-    <value>온도 (섭씨)-&gt;</value>
-  </data>
-  <data name="label10.Text" xml:space="preserve">
-    <value>° C</value>
-  </data>
-  <data name="label14.Text" xml:space="preserve">
-    <value>° C</value>
-  </data>
-  <data name="label2.Text" xml:space="preserve">
-    <value>습도 (%에서)</value>
-  </data>
-  <data name="label3.Text" xml:space="preserve">
-    <value>° C</value>
-  </data>
 </root>
