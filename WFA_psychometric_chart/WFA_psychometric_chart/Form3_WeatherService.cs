@@ -16,10 +16,10 @@ using System.Data.OleDb;
 
 namespace WFA_psychometric_chart
 {
-    public partial class Form3 : Form
+    public partial class Form3_WeatherService : Form
     {
 
-        public Form3()
+        public Form3_WeatherService()
         {
             InitializeComponent();
           this.Disposed += new System.EventHandler ( this.Form3_Disposed );
@@ -385,7 +385,24 @@ namespace WFA_psychometric_chart
                                 string station_distance = result["distance"].ToString();
                                 string station_id = result["station"]["id"].ToString();
                                 string latitude = result["station"]["coord"]["lat"].ToString();
-                                string longitude = result["station"]["coord"]["lon"].ToString();
+
+                                string longitude = "";
+
+                                //if (result["station"]["coord"]["lon"].ToString() != "")
+                                //{
+                                //    longitude = result["station"]["coord"]["lon"].ToString();
+                                //}
+                                if (result["station"]["coord"]["lng"].ToString() != "")
+                                {
+                                    longitude = result["station"]["coord"]["lng"].ToString();
+                                }
+
+                                if(longitude == "")
+                                {
+                                    MessageBox.Show("Some error in calling api");
+                                    return;
+                                }
+
                                 store_station_list.Add(new station_data
                                 {
                                     name = station_name,
@@ -831,10 +848,10 @@ namespace WFA_psychometric_chart
                         tb_state.Text = reader["state"].ToString();
                         tb_city.Text = reader["city"].ToString();
                         tb_street.Text = reader["street"].ToString();
-                        tb_ZIP.Text = reader["ZIP"].ToString();
-                        tb_latitude.Text = reader["latitude"].ToString();
-                        tb_longitude.Text = reader["longitude"].ToString();
-                        tb_elev.Text = reader["elevation"].ToString();
+                       // tb_ZIP.Text = reader["ZIP"].ToString();
+                        tb_latitude.Text =Math.Round(double.Parse(reader["latitude"].ToString()),4).ToString();
+                        tb_longitude.Text = Math.Round(double.Parse(reader["longitude"].ToString()), 4).ToString();//reader["longitude"].ToString();
+                    tb_elev.Text = reader["elevation"].ToString();
                         lb_building_name.Text = reader["BuildingName"].ToString();
                     buildingNameStore = reader["BuildingName"].ToString();//lets store the building name in a variable...
                         index_selected =int.Parse( reader["ID"].ToString()); //--This is added to check the select
@@ -1569,6 +1586,7 @@ namespace WFA_psychometric_chart
             string connString = @"Data Source=" + databaseFile + ";Version=3;";
             bool returnValue = false;
             string latValue = "";
+            string lngValue = "";
             using (SQLiteConnection connection = new SQLiteConnection(connString))
             {
                 connection.Open();
@@ -1584,9 +1602,10 @@ namespace WFA_psychometric_chart
                 {
                     //ListboxItems.Add(reader[1].ToString()+","+reader[2].ToString());
                     latValue =   reader["latitude"].ToString();
+                    lngValue = reader["longitude"].ToString();
                 }
             }
-            if (latValue != "")
+            if (latValue != "" && lngValue != "" )
             {
                 returnValue = true;
             }
@@ -1628,7 +1647,7 @@ namespace WFA_psychometric_chart
                     state = reader["state"].ToString();
                     city = reader["city"].ToString();
                     street = reader["street"].ToString();
-                    zip =  reader["zip"].ToString();
+                   // zip =  reader["zip"].ToString();
                 }
             }
 
@@ -1669,8 +1688,8 @@ namespace WFA_psychometric_chart
             string street = street1;
             string zip = zip1;
             int value;
-            if (int.TryParse(zip, out value))
-            {
+          //  if (int.TryParse(zip, out value))
+           // {
 
                 if (country != "" && city != "")
                 {
@@ -1739,7 +1758,7 @@ namespace WFA_psychometric_chart
 
 
                 }//close of if...
-            }//close of if int try parse.
+            //}//close of if int try parse.
             else
             {
                 MessageBox.Show(WFA_psychometric_chart.Properties.Resources.Please_enter_a_valid_zip_numbe);

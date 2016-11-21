@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using System.Xml;
 
 namespace WFA_psychometric_chart
 {
@@ -329,11 +330,7 @@ namespace WFA_psychometric_chart
                 if (phi >= 0.30 && phi < 0.4)
                 {
                     chart1.Series["Series" + c].Points[45].Label = phi * 100 + "%";
-<<<<<<< HEAD
                     chart1.Series["Series" + c].Points[42].Label = "Relative Humidity";
-=======
-                    chart1.Series["Series" + c].Points[42].Label = "Humidity Ratio";
->>>>>>> origin/master
                     // MessageBox.Show("Hello");
                 }
                 else
@@ -956,6 +953,7 @@ namespace WFA_psychometric_chart
 
         public void ReDrawingLineAndNode()
         {
+            index = 0;//Reset the index as fresh data is going to be inserted
             //--This is for replotting all the things again...
             series1.Points.Clear();
             for (int i = 0; i < menuStripNodeLineInfoValues.Count; i++)//-- this -1 is done because for three points we have two line series..
@@ -984,7 +982,7 @@ namespace WFA_psychometric_chart
 
                 ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue);
                 incrementIndex++;
-
+                index++;
             }
             //--resetting incrementIndex
             incrementIndex = 0;
@@ -2068,6 +2066,7 @@ namespace WFA_psychometric_chart
         /// <param name="e"></param>
         int flagSinglCellClick = 0;
 
+        public int idSelectedOfChart = 0;
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             //--Showing the data on cell selected...
@@ -2091,7 +2090,8 @@ namespace WFA_psychometric_chart
                         //if match found load
                         //data_load();
                         RefreshGraph();
-                        LoadNodeAndLineFromDB(e);
+                            idOfNodeSelected = int.Parse(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString());
+                            LoadNodeAndLineFromDB(idOfNodeSelected);
                         flagForInsertOrUpdateDataToDB = 1;
                         ReDrawingLineAndNode();
                         flagSinglCellClick = 1;
@@ -2219,14 +2219,14 @@ namespace WFA_psychometric_chart
         }
 
 
-        private void LoadNodeAndLineFromDB( DataGridViewCellEventArgs e)
+        private void LoadNodeAndLineFromDB( int idOfChart)
         {
             //Based on this row index we need to update the values and redraw lines..
 
             // listForDataFromDB.Clear();//Lets clear the node...
 
             //Lets identify the node
-            int id = int.Parse(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString());
+            int id = idOfChart;//int.Parse(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString());
 
             string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
@@ -2334,26 +2334,13 @@ namespace WFA_psychometric_chart
                     });
 
                 }
-                    //count2 = menuStripNodeLineInfoValues.Count-1; //--This is used for udpdating the index values..
-
-                 //   MessageBox.Show("count line data in menuStripNodeLineInfoValues = " + menuStripNodeLineInfoValues.Count);
-                
+                 
             }//close of using..
 
             }//closing here...
-            //--==================================Close of the if stat=====================================//
-
-
+            //--==================================Close of the if stat=====================================//                 
         }
-
-        //private voidView1.CellBeginEdit += dataGridView1_CellBeginEdit;
-        //    MessageBox.Show("begin edit complete");
-        //   // dataGridView1.CellValidating += dataGridView1_CellValidating;
-        //   // MessageBox.Show("validating.. complete");
-        //    dataGridView1.CellEndEdit += dataGridView1_CellEndEdit;
-        //    MessageBox.Show("end edit complete");
-        //}
-
+           
         string tbName;
         string tbLabel;
         Color colorValue;
@@ -2490,6 +2477,438 @@ namespace WFA_psychometric_chart
                 command.ExecuteNonQuery();
             }
         }
+
+        private void statePointsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+             //This pop up the node information for editing .
+        }
+
+        private void saveSettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //--This section helps to save the settings.
+
+            SaveConfiguration();
+
+        }
+
+
+        public void SaveConfiguration()
+        {
+
+           // LoadNode_LineAndDeviceInfoFromDB(indexOfChartSelected);
+
+
+            XmlDocument xmlDoc = new XmlDocument();
+            //XmlWriter xw = new XmlWriter();
+            //lets create an xml document using a string in xml formate
+
+            XmlNode r_node = xmlDoc.CreateElement("RootNode");
+
+            xmlDoc.AppendChild(r_node);
+
+            XmlNode identifier = xmlDoc.CreateElement("identifier");
+            identifier.InnerText = "AirHandler";
+
+            r_node.AppendChild(identifier);
+
+
+            XmlNode rootNode = xmlDoc.CreateElement("nodes");
+            // xmlDoc.AppendChild(rootNode);
+            r_node.AppendChild(rootNode);
+            string s = null;
+            //loading the string ...
+
+            if (menuStripNodeInfoValues.Count > 0)
+            {
+
+                foreach (var node in menuStripNodeInfoValues)
+                {
+                   
+                        XmlNode userNode = xmlDoc.CreateElement("node");
+
+                        rootNode.AppendChild(userNode);
+
+
+                        //now append name
+                        XmlNode nodeID = xmlDoc.CreateElement("nodeID");
+                        nodeID.InnerText = node.id.ToString();
+                        userNode.AppendChild(nodeID);
+
+
+
+
+                        //now append name
+                        XmlNode userNodeName = xmlDoc.CreateElement("name");
+                        userNodeName.InnerText = node.name.ToString();
+                        userNode.AppendChild(userNodeName);
+
+
+                        //now append the label
+                        XmlNode userNodeLable = xmlDoc.CreateElement("label");
+                        userNodeLable.InnerText = node.label.ToString();//'"' + node.label + '"';
+                        userNode.AppendChild(userNodeLable);
+
+                        //now append the source
+                        XmlNode userNodeSource = xmlDoc.CreateElement("source");
+                        userNodeSource.InnerText = node.source.ToString();  //'"' + node.source + '"';
+                        userNode.AppendChild(userNodeSource);
+
+                        //now append the color
+                        XmlNode userNodeColor = xmlDoc.CreateElement("color");
+                        userNodeColor.InnerText = ColorTranslator.ToHtml(node.colorValue).ToString();//'"' + ColorTranslator.ToHtml(node.colorValue).ToString() + '"';
+                        userNode.AppendChild(userNodeColor);
+
+                        //now append the xvalue
+                        XmlNode userNodeXValue = xmlDoc.CreateElement("xvalue");
+                        userNodeXValue.InnerText = node.xVal.ToString();//'"' + node.xVal.ToString() + '"';
+                        userNode.AppendChild(userNodeXValue);
+
+                        //now append the yvalue
+                        XmlNode userNodeYValue = xmlDoc.CreateElement("yvalue");
+                        userNodeYValue.InnerText = node.yVal.ToString(); //'"' + node.yVal.ToString() + '"';
+                        userNode.AppendChild(userNodeYValue);
+
+
+                        //now append the showTextItem
+                        XmlNode userNodeShowTextItem = xmlDoc.CreateElement("showTextItem");
+                        userNodeShowTextItem.InnerText = node.showItemText.ToString(); //'"' + node.showItemText.ToString() + '"';
+                        userNode.AppendChild(userNodeShowTextItem);
+
+                        //--node size
+                        //XmlNode nodesize = xmlDoc.CreateElement("nodesize");
+                        //nodesize.InnerText = node.marker_Size.ToString(); //'"' + node.showItemText.ToString() + '"';
+                        //userNode.AppendChild(nodesize);
+
+
+                        //--WE ALSO need to add the user information.
+
+                      
+                         
+                 
+
+                }//This one is foreach node in the section
+
+            }//close of if
+
+            //--Now lets append the line information...
+            XmlNode lineNode = xmlDoc.CreateElement("lines");
+            // xmlDoc.AppendChild(rootNode);
+            r_node.AppendChild(lineNode);
+
+
+            if (menuStripNodeLineInfoValues.Count > 0)
+            {
+                //--if present ie value do following.
+
+                foreach (var line in menuStripNodeLineInfoValues)
+                {
+
+                    XmlNode singleLine = xmlDoc.CreateElement("line");
+                    lineNode.AppendChild(singleLine);
+
+
+                    //for id
+                    XmlNode lineID = xmlDoc.CreateElement("ID");
+                    lineID.InnerText = line.ID.ToString();
+                    singleLine.AppendChild(lineID);
+
+                    //--for prev node id
+                    XmlNode prevNodeID = xmlDoc.CreateElement("prevNodeID");
+                    prevNodeID.InnerText = line.prevNodeId.ToString();
+                    singleLine.AppendChild(prevNodeID);
+
+
+                    //for next nodeid
+                    XmlNode nextNodeID = xmlDoc.CreateElement("nextNodeID");
+                    nextNodeID.InnerText = line.nextNodeId.ToString();
+                    singleLine.AppendChild(nextNodeID);
+
+                    ////--for thickness
+                    //XmlNode thickness = xmlDoc.CreateElement("linethickness");
+                    //thickness.InnerText = line.lineThickness.ToString();
+                    //singleLine.AppendChild(thickness);
+
+
+                    //--for series id
+                    XmlNode seriesname = xmlDoc.CreateElement("seriesname");
+                    seriesname.InnerText = line.lineSeriesID.Name.ToString();//This prints the line series name
+                    singleLine.AppendChild(seriesname);
+
+
+                    //--for color value
+                    XmlNode linecolor = xmlDoc.CreateElement("linecolor");
+                    linecolor.InnerText = ColorTranslator.ToHtml(line.lineColorValue).ToString();
+                    singleLine.AppendChild(linecolor);
+                                   
+
+                }//close of foreach
+            }
+
+
+            //now saving the doucment 
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+            saveFileDialog1.Filter = "xml file|*.xml";  //|Bitmap Image|*.bmp|Gif Image|*.gif";
+            saveFileDialog1.Title = "Save an Image File";
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                string name = saveFileDialog1.FileName;
+                xmlDoc.Save(name);
+            }
+
+
+        }
+
+
+
+        private void loadSettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //--This section helps to load the setting for handler
+            //try
+            //{
+            loadXMLDoc();
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show(ex.Message);
+            //}
+
+        }
+        /// <summary>
+        /// This load the file and inserts the data in database as well 
+        /// </summary>
+
+
+        public List<TempDataType> nodeInformationFromXML = new List<TempDataType>();
+        //--This one right here is for editing the lines...
+   
+        public List<lineNodeDataType> lineInformationFromXML = new List<lineNodeDataType>();
+
+
+        public void loadXMLDoc()
+        {
+            // nodeInfoFromXMLfile.Clear();
+            // lineInfoFromXMLfile.Clear();
+            nodeInformationFromXML.Clear();
+            lineInformationFromXML.Clear();
+
+             OpenFileDialog saveFileDialog1 = new OpenFileDialog();
+            saveFileDialog1.Filter = "xml file|*.xml";  //|Bitmap Image|*.bmp|Gif Image|*.gif";
+            saveFileDialog1.Title = "Load an Image File";
+            string path = null;
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                path = saveFileDialog1.FileName;
+                //xmlDoc.Save(name);
+            }
+
+            if (path == "")
+            {
+                return;
+            }
+
+
+            //now lets read the data from the file
+            XmlDocument xmlDoc = new XmlDocument();
+            try
+            {
+                xmlDoc.Load(path);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("File could not be loaded : " + ex.Message);
+                return;
+            }
+
+            XmlNodeList identifierList = xmlDoc.SelectNodes("RootNode/identifier");
+
+            //because if the node is empty it returns null
+            if (identifierList == null)
+            {
+                MessageBox.Show("This file can not be loaded.");
+                return;
+
+
+            }
+            else
+            {
+                if (identifierList.Count > 0)
+                {
+                    string identifierSignature = identifierList[0].InnerText;
+
+                    if (identifierSignature == "")
+                    {
+                        MessageBox.Show("File contains is edited outside,can not load");
+                        return;
+
+                    }
+                    else if (identifierSignature == "MainForm")
+                    {
+                        MessageBox.Show("This file belongs to offline mode Load in main section");
+                        return;
+                    }
+                    else if (identifierSignature == "BuildingSetting")
+                    {
+                        MessageBox.Show("This file belongs to buidding setting . Please load in online mode building setting section");
+                        return;
+                    }
+
+                }
+            }
+
+
+            XmlNodeList xnList = xmlDoc.SelectNodes("RootNode/nodes/node");
+            foreach (XmlNode xn in xnList)
+            {
+
+                string nodeID = xn["nodeID"].InnerText;
+                string name = xn["name"].InnerText;
+                string label = xn["label"].InnerText;
+                string source = xn["source"].InnerText;
+                string color = xn["color"].InnerText;
+                string xvalue = xn["xvalue"].InnerText;
+                string yvalue = xn["yvalue"].InnerText;
+                string showTextItem = xn["showTextItem"].InnerText;
+
+                //=============================comment now,not required===================//
+                //string nodeSize = xn["nodesize"].InnerText;
+                //string deviceInstanceVal = xn["deviceInstance"].InnerText;
+                //string ipVal = xn["ip"].InnerText;
+                //string param1idVal = xn["param1id"].InnerText;
+                //string param2idVal = xn["param2id"].InnerText;
+                //string param1infoVal = xn["param1info"].InnerText;
+                //string param2infoVal = xn["param2info"].InnerText;
+                //string param1typeVal = xn["param1id_type"].InnerText;
+                //string param2typeVal = xn["param2id_type"].InnerText;
+
+              //=================no required============================================//
+
+                //now lets add these values to list
+                nodeInformationFromXML.Add(new TempDataType
+                {
+                    id = int.Parse( nodeID),
+                    name = name,
+                    label = label,
+                    source = source,
+                    colorValue = ColorTranslator.FromHtml(color),
+                    xVal = double.Parse(xvalue),
+                    yVal = double.Parse(yvalue),
+                    showItemText = showTextItem,
+                    //nodeSize = nodeSize,
+                    //device_instance_id = deviceInstanceVal,
+                    //ip = ipVal,
+                    //param1id = param1idVal,
+                    //param2id = param2idVal,
+                    //param1info = param1infoVal,
+                    //param2info = param2infoVal,
+                    //param1_id_type = param1typeVal,
+                    //param2_id_type = param2typeVal
+                });
+            }//close of foreach
+
+
+            //--loading the line info from the doc
+            XmlNodeList xlList = xmlDoc.SelectNodes("RootNode/lines/line");
+
+            foreach (XmlNode xn in xlList)
+            {
+                string idVal = xn["ID"].InnerText;
+                string prevNodeIDVal = xn["prevNodeID"].InnerText;
+                string nextNodeIDVal = xn["nextNodeID"].InnerText;
+              //  string lineThicknessVal = xn["linethickness"].InnerText;
+                string serieNameIDval = xn["seriesname"].InnerText;
+                string linecolor = xn["linecolor"].InnerText;
+                //now lets add these values to list
+                lineInformationFromXML.Add(new lineNodeDataType
+                {
+                    ID = int.Parse(idVal),
+                    prevNodeId =int.Parse( prevNodeIDVal),
+                    nextNodeId =int.Parse( nextNodeIDVal),
+                   // lineThickness = int.Parse(lineThicknessVal),
+                    lineSeriesID = new Series(serieNameIDval),
+                    lineColorValue = ColorTranslator.FromHtml(linecolor)
+                });
+            }//close of foreach
+             // MessageBox.Show("count node values " + nodeInfoFromXMLfile.Count + ",line count" + lineInfoFromXMLfile.Count);
+             //--now since both value is added we need to insert these values to db now
+             //-- and reload them
+             /*
+             Task : 
+              1. delete the existing value first 
+              2. insert the existing file value form file
+             
+             */
+
+            //First lets check if the chart is selected or not.
+            if(currentNodeTableFromDB == "" || currentLineTableFromDB == "")
+            {
+                MessageBox.Show("Please select a chart properly first");
+                return;
+            }
+
+
+
+            //===============================Delete the line and node value================//
+
+            if(currentNodeTableFromDB != null && currentLineTableFromDB != null)
+            { 
+            //First delete the node values 
+            DeleteAllTableData(currentNodeTableFromDB);
+                //Delete all data form line table
+            DeleteAllTableData(currentLineTableFromDB);
+
+            }
+            //===============================end of the delete===========================//
+
+
+
+
+            //===================================inserting data form xml into db=====================================//
+            foreach (var node in nodeInformationFromXML)
+            {
+                //we need to inset it to db but if the node id is already present then dont inset just load....
+                InsertNodeInfoToDB(node.id, node.xVal, node.yVal, node.source, node.name, node.label, node.colorValue, node.showItemText);
+            }
+
+            foreach (var line in lineInformationFromXML)
+            {
+                InsertLineInfoToDB(line.ID, line.prevNodeId, line.nextNodeId, line.lineColorValue, line.lineSeriesID);
+            }
+            //=====================================end of inserting in db=============================//
+            //now lets load the data back again..
+            //--helps in loading in redrawing the parts.
+            RefreshGraph();
+            LoadNodeAndLineFromDB(idSelectedOfChart);   //Lets make it passing the stirngs       
+            ReDrawingLineAndNode();
+
+            MessageBox.Show("Load success");
+
+
+        }
+
+        public void DeleteAllTableData(string tableName)
+        {
+
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                //SQLiteDataReader reader = null;
+                string queryString = "DELETE   FROM  "+tableName;
+
+
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                //  command.Parameters.AddWithValue("@id_value", id);
+                //SqlDataAdapter dataAdapter = new SqlDataAdapter(queryString, connection.ConnectionString); //connection.ConnectionString is the connection string
+                command.ExecuteNonQuery();
+       
+            }//close of using..
+
+        }
+
+
         public void SetNode(string source, string name, string label, Color c1, string comboboxItemText1)
         {
 
@@ -2896,7 +3315,9 @@ namespace WFA_psychometric_chart
         {
             //--Note for series the series.name property will be stored in databse and later it will be converted.
             string lineSeriesName = lineSeriesVal.Name;
-            string tableName = currentLineTableFromDB;
+            string tableNamex = currentLineTableFromDB;
+
+          //  MessageBox.Show("Table name for line =" + tableNamex);
 
             string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
@@ -2906,7 +3327,7 @@ namespace WFA_psychometric_chart
             {
                 connection.Open();
                 //SQLiteDataReader reader = null;
-                string sql_string = "insert into " + tableName + "(id,prevNodeId,nextNodeId,lineColorValue,lineSeriesId) VALUES(@id,@pn,@nn,@lc,@ls)";
+                string sql_string = "insert into " + tableNamex + "(id,prevNodeId,nextNodeId,lineColorValue,lineSeriesId) VALUES(@id,@pn,@nn,@lc,@ls)";
                 SQLiteCommand command = new SQLiteCommand(sql_string, connection);
                 command.CommandType = CommandType.Text;
                 command.Parameters.AddWithValue("@id", id);

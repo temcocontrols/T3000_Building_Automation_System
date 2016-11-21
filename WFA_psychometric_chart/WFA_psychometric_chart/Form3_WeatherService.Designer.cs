@@ -1,6 +1,6 @@
 ﻿namespace WFA_psychometric_chart
 {
-    partial class Form3
+    partial class Form3_WeatherService
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form3));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form3_WeatherService));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.lb_building_name = new System.Windows.Forms.Label();
             this.label42 = new System.Windows.Forms.Label();
@@ -37,7 +37,6 @@
             this.tb_latitude = new System.Windows.Forms.TextBox();
             this.tb_longitude = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
-            this.tb_ZIP = new System.Windows.Forms.TextBox();
             this.tb_street = new System.Windows.Forms.TextBox();
             this.tb_city = new System.Windows.Forms.TextBox();
             this.tb_state = new System.Windows.Forms.TextBox();
@@ -45,7 +44,6 @@
             this.label8 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -133,7 +131,6 @@
             this.groupBox1.Controls.Add(this.tb_latitude);
             this.groupBox1.Controls.Add(this.tb_longitude);
             this.groupBox1.Controls.Add(this.button1);
-            this.groupBox1.Controls.Add(this.tb_ZIP);
             this.groupBox1.Controls.Add(this.tb_street);
             this.groupBox1.Controls.Add(this.tb_city);
             this.groupBox1.Controls.Add(this.tb_state);
@@ -141,7 +138,6 @@
             this.groupBox1.Controls.Add(this.label8);
             this.groupBox1.Controls.Add(this.label6);
             this.groupBox1.Controls.Add(this.label7);
-            this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.label2);
@@ -190,12 +186,6 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // tb_ZIP
-            // 
-            resources.ApplyResources(this.tb_ZIP, "tb_ZIP");
-            this.tb_ZIP.Name = "tb_ZIP";
-            this.tb_ZIP.ReadOnly = true;
-            // 
             // tb_street
             // 
             resources.ApplyResources(this.tb_street, "tb_street");
@@ -234,11 +224,6 @@
             // 
             resources.ApplyResources(this.label7, "label7");
             this.label7.Name = "label7";
-            // 
-            // label5
-            // 
-            resources.ApplyResources(this.label5, "label5");
-            this.label5.Name = "label5";
             // 
             // label4
             // 
@@ -689,7 +674,7 @@
             resources.ApplyResources(this.label15, "label15");
             this.label15.Name = "label15";
             // 
-            // Form3
+            // Form3_WeatherService
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -698,7 +683,7 @@
             this.Controls.Add(this.groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
-            this.Name = "Form3";
+            this.Name = "Form3_WeatherService";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form3_ClosingForm);
             this.Load += new System.EventHandler(this.Form3_Load);
             this.groupBox1.ResumeLayout(false);
@@ -725,7 +710,6 @@
         private System.Windows.Forms.TextBox tb_elev;
         private System.Windows.Forms.TextBox tb_latitude;
         private System.Windows.Forms.TextBox tb_longitude;
-        private System.Windows.Forms.TextBox tb_ZIP;
         private System.Windows.Forms.TextBox tb_street;
         private System.Windows.Forms.TextBox tb_city;
         private System.Windows.Forms.TextBox tb_state;
@@ -733,7 +717,6 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;

@@ -11,55 +11,73 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-
-
 namespace WFA_psychometric_chart
 {
-    public partial class InsertNodeFormForBuildingChartSetting : Form
-    {    //EditNodeLineForm
-         // private buildingChartSetting F1;
-        private EditNodeLineForm F1;
-        //public InsertNodeFormForBuildingChartSetting(buildingChartSetting f)
-        public InsertNodeFormForBuildingChartSetting(EditNodeLineForm f)
+    public partial class Form_Device_Information_For_EditMode : Form
+    {
+        EditNodeLineForm f1;
+        public Form_Device_Information_For_EditMode(EditNodeLineForm f)
         {
-            this.F1 = f;
+            f1 = f;
             InitializeComponent();
+        }
+
+        private void Form_Device_Information_For_EditMode_Load(object sender, EventArgs e)
+        {
+            //This load method should load the values for the given functions
+            cb_enthalpy_or_humidity_input.SelectedIndex = 0;
+
+            FindPathOfBuildingDB();
+
+            //--Now lets load the values
+            PullDeviceInfoFromAccessDB();
+
+
+        }
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
 
         private void btnSetNode_Click(object sender, EventArgs e)
         {
+            //--Here we are going to implement the code required...
+            //Yo functionality lekda lekda gain6 ke kya ho 
             /*
-            This set node should do two task 
-            1. Insert a point by calling a function 
-            2. It should input the values in menuStripNodeInfoValues
+             --These should do following task:
+             --1.Should get the values of the parameter such as instanceID,IPadress,temp,hum/enthalpy [which one is selected ],
+             --  param1ID,param2ID,param1_identifier_type,and param2_identifier_type.
+             --2.and the update to the data base 
+                  1. in device info table 
+                  2.main node the selected value to be device  
             */
-            string source = CB_Device_Web.Text;//tbSource.Text;
-            string name = tbName.Text;
-            string label = tbLabel.Text;
-            string cbItemSelected = comboBox1.Text;
-            //  string deviceOrWeb = CB_Device_Web.Text;
+            //0k now lets start the task
 
-            //MessageBox.Show("items index " + cbItemSelected);
+            InputDeviceInfoAndValue();
+        }
 
-            if (source == "Device")
+        /// <summary>
+        /// This function will input the device information as well as update the node table
+        /// </summary>
+        public void InputDeviceInfoAndValue()
+        {
+
+            if (checkBox1.Checked = true && checkBox2.Checked == true)
             {
-                //Device is selected
-                //  F1.SetNode( source, name, label, btnColor.BackColor, cbItemSelected, 20);   //20 is the marker size 
 
-                if (checkBox1.Checked = true && checkBox2.Checked == true)
+                if (CB_param_temp.SelectedIndex >= 0 && CB_param_hum.SelectedIndex >= 0)
                 {
-
-                    if (CB_param_temp.SelectedIndex >= 0 && CB_param_hum.SelectedIndex >=0) { 
                     //Temp and hum is selected
                     //now param1 will be temperature and param2 wil be humidity
                     //we have id name and present values.
-
-
                     string device_instance = copyOfMainControllerList[CB_Device.SelectedIndex].controllerInstanceId.ToString();
                     string deviceIP = "";
                     //For device info form device
-                    foreach (var device in device_info) {
-                        if (device_instance == device.deviceInstance.ToString()) {
+                    foreach (var device in device_info)
+                    {
+                        if (device_instance == device.deviceInstance.ToString())
+                        {
                             deviceIP = device.deviceIP;//device_info[CB_Device.SelectedIndex].deviceIP.ToString();
                         }
                     }
@@ -75,156 +93,48 @@ namespace WFA_psychometric_chart
 
                     string param1_object_identifier_type = parameterValFromBacnet[CB_param_temp.SelectedIndex].object_identifier_type.ToString();
                     string param2_object_identifier_type = parameterValFromBacnet[CB_param_hum.SelectedIndex].object_identifier_type.ToString();
-            
+
 
                     if (cb_enthalpy_or_humidity_input.SelectedIndex == 0)
                     {
                         //info has to be temp and hum
                         //uncomment this after this ............BBK
-                        F1.SetNodeForDeviceUsingTempAndHum(source, name, label, btnColor.BackColor, cbItemSelected, 20, device_instance, deviceIP, temp_param_id, second_param_id, "temp", "hum", temp_present_value, second_present_value, param1_object_identifier_type, param2_object_identifier_type);
+                        //F1.SetNodeForDeviceUsingTempAndHum(source, name, label, btnColor.BackColor, cbItemSelected, 20, device_instance, deviceIP, temp_param_id, second_param_id, "temp", "hum", temp_present_value, second_present_value, param1_object_identifier_type, param2_object_identifier_type);
+                        //--Now lets find the node id
+                       // MessageBox.Show("id is " + f1.tempNodeID);
+                        f1.UpdateNodeInfoForDeviceSelection(f1.tempNodeID, device_instance, deviceIP, temp_param_id, second_param_id, "temp", "hum", temp_present_value, second_present_value, param1_object_identifier_type, param2_object_identifier_type);
+
                     }
                     else
                     {
                         //Temperature and enthalpy select bhayeako 6 ....:) :) ;p 
                         ///UNCOMMENT THIS LATERE
-                        F1.SetNodeForDeviceUsingTempAndHum(source, name, label, btnColor.BackColor, cbItemSelected, 20, device_instance, deviceIP, temp_param_id, second_param_id, "temp", "enthalpy", temp_present_value, second_present_value, param1_object_identifier_type, param2_object_identifier_type);
+                        // F1.SetNodeForDeviceUsingTempAndHum(source, name, label, btnColor.BackColor, cbItemSelected, 20, device_instance, deviceIP, temp_param_id, second_param_id, "temp", "enthalpy", temp_present_value, second_present_value, param1_object_identifier_type, param2_object_identifier_type);
+                        f1.UpdateNodeInfoForDeviceSelection(f1.tempNodeID, device_instance, deviceIP, temp_param_id, second_param_id, "temp", "enthalpy", temp_present_value, second_present_value, param1_object_identifier_type, param2_object_identifier_type);
                     }
 
 
-                        this.Close();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Please select two parameters properly from dropdown box");
-                    }
-
-                }  //--close of if checkbox                    
-            }
-            else {
-                //else web is selected
-                //  F1.SetNode( source, name, label, btnColor.BackColor, cbItemSelected,20);   //20 is the marker size 
-                F1.SetNodeForWeb(source, name, label, btnColor.BackColor, cbItemSelected, 20);
-                //MessageBox.Show(Properties.Resources.Success0);
-                this.Close();
-            }
-
-
-
-
-         
-
-        }
-
-        private void btnCancel_Click(object sender, EventArgs e)
-        {
-            //close window...
-            this.Close();
-        }
-
-        private void btnColor_Click(object sender, EventArgs e)
-        {
-            if (colorDialog1.ShowDialog() == DialogResult.OK)
-            {
-                btnColor.BackColor = colorDialog1.Color;
-
-            }
-
-        }
-
-
-        public class SelectedBuildingDatatype
-        {
-            public string Main_BuildingName { get; set; }
-            public string Building_Name { get; set; }
-            public string Building_Path { get; set; }
-        }
-        List<SelectedBuildingDatatype> BuildingSelected = new List<SelectedBuildingDatatype>();
-
-        public void FindPathOfBuildingDB()
-        {
-            BuildingSelected.Clear();
-            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            // string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
-            //  string connString = @"Data Source=" + databaseFile + ";Version=3;";
-
-            string path = databasePath;  //@"C:\Folder1\Folder2\Folder3\Folder4";
-            string newPath = Path.GetFullPath(Path.Combine(path, @"..\"));
-            string againDbPath = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + newPath + @"Database\T3000.mdb";
-           //  MessageBox.Show("New path : " + againDbPath);
-            // bool returnValue = false;
-            //string latValue = "";
-            using (OleDbConnection connection = new OleDbConnection(againDbPath))
-            {
-                connection.Open();
-                OleDbDataReader reader = null;
-                string queryString = "SELECT * from Building WHERE Default_SubBuilding = -1 ";//-1 or True  can be used
-                OleDbCommand command = new OleDbCommand(queryString, connection);
-
-                reader = command.ExecuteReader();
-                while (reader.Read())
-                {
-
-                    BuildingSelected.Add(new SelectedBuildingDatatype
-                    {
-                        Main_BuildingName = reader["Main_BuildingName"].ToString(),
-                        Building_Name = reader["Building_Name"].ToString(),
-                        Building_Path = reader["Building_Path"].ToString()
-                    });
+                    this.Close();
                 }
-            }
+                else
+                {
+                    MessageBox.Show("Please select two parameters properly from dropdown box");
+                }
 
-          //  MessageBox.Show("count = " + BuildingSelected.Count);
+            }  //--close of if checkbox  
         }
-        private void InsertNodeFormForBuildingChartSetting_Load(object sender, EventArgs e)
+
+
+
+        public class DeviceClass
         {
-            try {
+            public string deviceIP { get; set; }
+            public uint deviceInstance { get; set; }//device id 
 
-                //tbName.Text = F1.temporarySelectedName;
-                //tbLabel.Text = F1.temporarySelectedLabel;
-              //  comboBox1.Text = F1.temporarySelectedShowText;
-
-              //  if (F1.temporarySelectedShowText == "Label")
-              //  {
-              //      comboBox1.SelectedIndex = 0;
-
-              //  }
-              //  else
-              //  if (F1.temporarySelectedShowText == "Name")
-              //  {
-              //      comboBox1.SelectedIndex = 1;
-
-              //  }
-
-              //else  if (F1.temporarySelectedShowText == "Source")
-              //  {
-              //      comboBox1.SelectedIndex = 2;
-
-              //  }
-
-                btnColor.BackColor = Color.Blue;
-                comboBox1.SelectedIndex = 0;
-                //comboBox1.Enabled = false;
-            CB_Device_Web.SelectedIndex = 0;
-            groupBox2.Location = new Point(9, 148);
-            groupBox1.Visible = false;
-            this.Height = 290;
-
-            //setting the index to be humidity initially
-           cb_enthalpy_or_humidity_input.SelectedIndex = 0;
-
-            FindPathOfBuildingDB();
-            }catch(Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
         }
+        List<DeviceClass> device_info = new List<DeviceClass>();
+        public int indexSelectedDevice = 0;//We can declar this here now
 
-         /// <summary>
-         /// this show what is the type of the data that is presented
-         /// ControllerName = controller name value
-        /// controllerInstanceId = instance id
-        /// controllerStatus = 
-        /// </summary>
         public class dataTypeForControllerList
         {
             public string controllerName { get; set; }
@@ -284,7 +194,7 @@ namespace WFA_psychometric_chart
                                     controllerInstanceId = int.Parse(reader["Object_Instance"].ToString()),
                                     controllerStatus = (bool)reader["Online_Status"]
                                 });
-                            }                        
+                            }
                         }
 
                     }
@@ -299,102 +209,85 @@ namespace WFA_psychometric_chart
         }
 
 
-
-        public class DeviceClass
+        public class SelectedBuildingDatatype
         {
-            public string deviceIP { get; set; }
-            public uint deviceInstance { get; set; }//device id 
-          
+            public string Main_BuildingName { get; set; }
+            public string Building_Name { get; set; }
+            public string Building_Path { get; set; }
         }
-        List<DeviceClass> device_info =new List<DeviceClass>();
-        public int indexSelectedDevice = 0;
-        private void CB_Device_Web_SelectedIndexChanged(object sender, EventArgs e)
+        List<SelectedBuildingDatatype> BuildingSelected = new List<SelectedBuildingDatatype>();
+
+        public void FindPathOfBuildingDB()
         {
-            if(CB_Device_Web.SelectedIndex == 1)   //1 MEANS device is selected
+            BuildingSelected.Clear();
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            // string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            //  string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            string path = databasePath;  //@"C:\Folder1\Folder2\Folder3\Folder4";
+            string newPath = Path.GetFullPath(Path.Combine(path, @"..\"));
+            string againDbPath = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + newPath + @"Database\T3000.mdb";
+            //  MessageBox.Show("New path : " + againDbPath);
+            // bool returnValue = false;
+            //string latValue = "";
+            using (OleDbConnection connection = new OleDbConnection(againDbPath))
             {
-                device_info.Clear();//Resetting the values
-                CB_Device.Items.Clear();//Clearing the combobox
-                btnSetNode.Enabled = false;
-                //The selected index is this so.
-                this.Height = 470;
-                groupBox2.Location = new Point(12, 300);
-                groupBox1.Visible = true;
+                connection.Open();
+                OleDbDataReader reader = null;
+                string queryString = "SELECT * from Building WHERE Default_SubBuilding = -1 ";//-1 or True  can be used
+                OleDbCommand command = new OleDbCommand(queryString, connection);
 
-                // DeviceConnection dc = new DeviceConnection();
-                // dc.ScanForDevice();//Scan the device
-
-                // //Now we need to scan the device and fill the values.
-                //  foreach(var bn in BACnetClass.DevicesList)
-                // {
-                //     device_info.Add(new DeviceClass
-                //     {
-                //         deviceInstance = bn.device_id,
-                //         deviceIP = bn.device_id + "." +bn.adr.adr[0] + "." +bn.adr.adr[1] + "." +bn.adr.adr[2] + "." +bn.adr.adr[3] 
-
-                //     });
-                // }
-
-                ////MessageBox.Show("success :bacnetclass count= " + BACnetClass.DevicesList.Count);
-                //  //Now lets fill the combobox value
-                //  foreach(var b in device_info)
-                // {
-                //     CB_Device.Items.Add("Device : "+b.deviceInstance + " ip :" + b.deviceIP);
-                // }
-
-                //   indexSelectedDevice = CB_Device.SelectedIndex;//This is the index selected based on this index which item is selected we will know
-                //   MessageBox.Show("index selected : " + indexSelectedDevice + "Device info count" + device_info.Count+"instance id:");
-
-                //=================================pulling data form alex database and inserting==============//
-
-                copyOfMainControllerList.Clear();//tHSI IS RESETTING 
-                copyOfMainControllerList = ControllerList();//This returns the miancontroller and copy those in copyof...
-                //device_info = copyOfMainControllerList;
-
-                //Test 
-                //MessageBox.Show("Device list num =" + BACnetClass.DevicesList.Count+ ",device infor num= "+device_info.Count);
-
-                //if device infor shows 0 item the retunr immediately
-                //if (device_info.Count <= 0)
-                //{
-                //    return;
-                //}
-                if (copyOfMainControllerList.Count < 0)
+                reader = command.ExecuteReader();
+                while (reader.Read())
                 {
-                    
-                    return;
+
+                    BuildingSelected.Add(new SelectedBuildingDatatype
+                    {
+                        Main_BuildingName = reader["Main_BuildingName"].ToString(),
+                        Building_Name = reader["Building_Name"].ToString(),
+                        Building_Path = reader["Building_Path"].ToString()
+                    });
                 }
-                //MessageBox.Show("success :bacnetclass count= " + BACnetClass.DevicesList.Count);
-                //Now lets fill the combobox value
-                foreach (var b in copyOfMainControllerList)
-                {
-                    CB_Device.Items.Add("Device: " + b.controllerName);
-                    // MessageBox.Show("device");
-                }
-
-                //=================================end of pulling data form alex=============================//
-
-
             }
-            else
-            {
-                this.Height = 290;
-                groupBox2.Location = new Point(9, 148);
-                groupBox1.Visible = false;
-                btnSetNode.Enabled = true;
-                CB_Device.Items.Clear();
-                CB_param_temp.Items.Clear();
-                CB_param_hum.Items.Clear();
-                //CB_param_enthalpy.Items.Clear();
-                //CB_Device.SelectedIndex = -1;
-                CB_Device.Text = "";
-                ///CB_param_enthalpy.Text = "";
-                CB_param_hum.Text = "";
-                CB_param_temp.Text = "";
-                checkBox1.Checked = false;
-                checkBox2.Checked = false;
-     
-            }
+
+            //  MessageBox.Show("count = " + BuildingSelected.Count);
         }
+
+        public void PullDeviceInfoFromAccessDB()
+        {
+
+            device_info.Clear();//Resetting the values
+            CB_Device.Items.Clear();//Clearing the combobox
+            btnSetNode.Enabled = false;
+
+            copyOfMainControllerList.Clear();//tHSI IS RESETTING 
+            copyOfMainControllerList = ControllerList();//This returns the miancontroller and copy those in copyof...
+             //device_info = copyOfMainControllerList;
+
+            //Test 
+            //MessageBox.Show("Device list num =" + BACnetClass.DevicesList.Count+ ",device infor num= "+device_info.Count);
+
+            //if device infor shows 0 item the retunr immediately
+            //if (device_info.Count <= 0)
+            //{
+            //    return;
+            //}
+            if (copyOfMainControllerList.Count < 0)
+            {
+
+                return;
+            }
+            //MessageBox.Show("success :bacnetclass count= " + BACnetClass.DevicesList.Count);
+            //Now lets fill the combobox value
+            foreach (var b in copyOfMainControllerList)
+            {
+                CB_Device.Items.Add("Device: " + b.controllerName);
+                // MessageBox.Show("device");
+            }
+
+
+        }
+
 
         public class parameter_class1
         {
@@ -407,8 +300,13 @@ namespace WFA_psychometric_chart
         int deviceInstanceValuTemp = 0;//This for particular device
         private void CB_Device_SelectedIndexChanged(object sender, EventArgs e)
         {
-
-
+            //--This load the data form the device rather then access db
+            /*
+            
+            Steps :
+            1. Get the data and then pull the value
+            
+            */
 
             groupBox3.Enabled = true;
             //Lets clear the combobox first
@@ -416,15 +314,16 @@ namespace WFA_psychometric_chart
             CB_param_hum.Items.Clear();
             parameterValFromBacnet.Clear();//Clearing the list value
 
-            if (CB_Device.SelectedIndex > -1) {
+            if (CB_Device.SelectedIndex > -1)
+            {
                 //On this index change the we need to get the values from the 
-             indexSelectedDevice = CB_Device.SelectedIndex;
-            int instanceId = (int)copyOfMainControllerList[indexSelectedDevice].controllerInstanceId;//Device instance selected.
+                indexSelectedDevice = CB_Device.SelectedIndex;
+                int instanceId = (int)copyOfMainControllerList[indexSelectedDevice].controllerInstanceId;//Device instance selected.
 
                 deviceInstanceValuTemp = instanceId;
 
-               // MessageBox.Show("instance id = " + instanceId);
-               // MessageBox.Show("Device checkonline offline = " + CheckDeviceOnlineOffline(deviceInstanceValuTemp, 0));
+                // MessageBox.Show("instance id = " + instanceId);
+                // MessageBox.Show("Device checkonline offline = " + CheckDeviceOnlineOffline(deviceInstanceValuTemp, 0));
                 if (CheckDeviceOnlineOffline(deviceInstanceValuTemp, 0) == true)
                 {
 
@@ -433,7 +332,7 @@ namespace WFA_psychometric_chart
                     DeviceConnection db = new DeviceConnection();
                     db.ScanForDevice();
                     db.ScanForParameters(instanceId);//This will return the parameters
-                        //resert first 
+                                                     //resert first 
                     device_info.Clear();
                     foreach (var bn in BACnetClass.DevicesList)
                     {
@@ -454,14 +353,14 @@ namespace WFA_psychometric_chart
                             device_object_name = bac.device_object_name,
                             indexID = bac.indexID,
                             presentValue = bac.presentValue,
-                            object_identifier_type = bac.object_identifier_type 
-                           
+                            object_identifier_type = bac.object_identifier_type
+
 
                         });
-                    //    s += bac.device_object_name + "," + bac.presentValue;
+                        //    s += bac.device_object_name + "," + bac.presentValue;
                     }
 
-                  //  MessageBox.Show("value = " + s);
+                    //  MessageBox.Show("value = " + s);
 
                     //Now that we have the parameter list lets display the list in the combobox...
                     // string s = "";
@@ -469,7 +368,7 @@ namespace WFA_psychometric_chart
                     {
                         CB_param_temp.Items.Add(item.device_object_name + ":" + item.indexID);
                         CB_param_hum.Items.Add(item.device_object_name + ":" + item.indexID);
-                 //  CB_param_enthalpy.Items.Add(item.device_object_name + ":" + item.indexID);
+                        //  CB_param_enthalpy.Items.Add(item.device_object_name + ":" + item.indexID);
                         //     s += item.device_object_name + ":" + item.indexID + " value = " + item.presentValue+"\n";
 
                     }
@@ -478,12 +377,12 @@ namespace WFA_psychometric_chart
                 {
                     MessageBox.Show("Device is offline");
                 }
-            //TEST
-               // MessageBox.Show("s = " + s);
+                //TEST
+                // MessageBox.Show("s = " + s);
             }//Close of if
         }
 
-        public int indexForParameter1=0;
+        public int indexForParameter1 = 0;
 
         List<bool> dataCheckList = new List<bool>();
         /// <summary>
@@ -560,31 +459,7 @@ namespace WFA_psychometric_chart
             return status;
         }
 
-
-        private void CB_Parameter_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            //On this the selected index is changed and we need to plot the values here..
-            if (CB_param_temp.SelectedIndex > -1)
-            {
-                //We need to enable set node 
-               // btnSetNode.Enabled = true;
-
-                indexForParameter1 = CB_param_temp.SelectedIndex;
-            }
-        }
-        public int indexForParameter2 = 0;
-        private void CB_Parameter2_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-            if (CB_param_hum.SelectedIndex > -1)
-            {
-                //We need to enable set node 
-                btnSetNode.Enabled = true;
-
-                indexForParameter2 = CB_param_temp.SelectedIndex;
-            }
-        }
-        int countFlag = 0;//This is used for checking weather this is checked or not.
+        int countFlag = 0;
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             //on checked enable the parameter
@@ -606,7 +481,6 @@ namespace WFA_psychometric_chart
                 countFlag--;//Decrement the count
                 Checkbox_Enable_Dissable();
             }
-
 
         }
 
@@ -633,85 +507,74 @@ namespace WFA_psychometric_chart
 
         }
 
-        //private void checkBox3_CheckedChanged(object sender, EventArgs e)
-        //{
-        //    //on checked enable the parameter
-        //    if (checkBox3.Checked == true)
-        //    {
-        //        //then enable the combobox else dissable and 
-        //   //CB_param_enthalpy.Enabled = true;
-        //        //check if other are checked or not if so do following task
-
-        //        countFlag++;//Increment the value
-
-        //        Checkbox_Enable_Dissable();
-
-        //    }
-        //    else {
-        //        //dissable the combobox...
-        //  // CB_param_enthalpy.Enabled = false;
-        //        countFlag--;
-        //        Checkbox_Enable_Dissable();
-
-        //    }
-
-        //}
-
         public void Checkbox_Enable_Dissable()
         {
 
             if (countFlag == 2)
             {
-                if(checkBox1.Checked ==true && checkBox2.Checked == true)
+                if (checkBox1.Checked == true && checkBox2.Checked == true)
                 {
-                    //Dissable the 3rd checkbox
-                 //checkBox3.Checked = false;
-                // checkBox3.Enabled = false;
-
+              
                 }
-
-                //else if (checkBox1.Checked == true && checkBox3.Checked == true)
-                //{
-                //    //2nd
-                //    checkBox2.Checked = false;
-                //    checkBox2.Enabled = false;
-
-                //}
-                //else if (checkBox2.Checked == true && checkBox3.Checked == true)
-                //{
-                //    checkBox1.Checked = false;
-                //    checkBox1.Enabled = false;
-                //}
-
+              
             }
             else
             {
                 //This is if the cont is 1
-                    if(checkBox1 .Checked== true)
+                if (checkBox1.Checked == true)
                 {
                     //2nd and 3rd free it
                     checkBox2.Checked = false;
                     checkBox2.Enabled = true;
-                   // checkBox3.Checked = false;
-                   // checkBox3.Enabled = true;
                 }
-                else if(checkBox2.Checked == true){
+                else if (checkBox2.Checked == true)
+                {
                     checkBox1.Checked = false;
                     checkBox1.Enabled = true;
-                   // checkBox3.Checked = false;
-                   // checkBox3.Enabled = true;
                 }
-                //else if(checkBox3.Checked == true)
-                //{
-                //    checkBox1.Checked = false;
-                //    checkBox1.Enabled = true;
-                //    checkBox2.Checked = false;
-                //    checkBox2.Enabled = true;
-
-                //}
-
+            
 
             }
         }     //close of the function
+
+        private void CB_param_temp_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (CB_param_temp.SelectedIndex > -1)
+            {
+                //We need to enable set node 
+                // btnSetNode.Enabled = true;
+                //enableDissableOKButton();
+
+                indexForParameter1 = CB_param_temp.SelectedIndex;
+            }
+        }
+
+        public int indexForParameter2 = 0;
+        private void CB_param_hum_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+            if (CB_param_hum.SelectedIndex > -1)
+            {
+                //We need to enable set node 
+
+
+                 btnSetNode.Enabled = true;
+                //enableDissableOKButton();
+
+                indexForParameter2 = CB_param_temp.SelectedIndex;
+            }
+        }
+
+        public void enableDissableOKButton()
+        {
+            if (indexForParameter1 > -1 && indexForParameter2 > -1)
+            {
+                btnSetNode.Enabled = true;
+            }
+            else
+            {
+                btnSetNode.Enabled = false;
+            }             
+        }
     }
 }

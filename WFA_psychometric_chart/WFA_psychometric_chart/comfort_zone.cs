@@ -12,8 +12,8 @@ namespace WFA_psychometric_chart
 {
     public partial class comfort_zone : Form
     {
-        buildingChartSetting bs;
-        public comfort_zone(buildingChartSetting b)
+        Form1_main bs;
+        public comfort_zone(Form1_main b)
         {
             InitializeComponent();
             this.bs = b;

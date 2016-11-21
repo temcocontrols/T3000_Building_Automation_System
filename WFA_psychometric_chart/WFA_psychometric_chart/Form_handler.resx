@@ -120,20 +120,9 @@
   <metadata name="id.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="id.HeaderText" xml:space="preserve">
-    <value>id</value>
-  </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="id.Width" type="System.Int32, mscorlib">
-    <value>30</value>
-  </data>
   <metadata name="name.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-<<<<<<< HEAD
-  <data name="name.HeaderText" xml:space="preserve">
-    <value>name</value>
-  </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="dataGridView1.Location" type="System.Drawing.Point, System.Drawing">
     <value>11, 12</value>
@@ -141,6 +130,7 @@
   <data name="dataGridView1.Size" type="System.Drawing.Size, System.Drawing">
     <value>139, 411</value>
   </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="dataGridView1.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
   </data>
@@ -155,6 +145,21 @@
   </data>
   <data name="&gt;&gt;dataGridView1.ZOrder" xml:space="preserve">
     <value>10</value>
+  </data>
+  <metadata name="id.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="id.HeaderText" xml:space="preserve">
+    <value>id</value>
+  </data>
+  <data name="id.Width" type="System.Int32, mscorlib">
+    <value>30</value>
+  </data>
+  <metadata name="name.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="name.HeaderText" xml:space="preserve">
+    <value>name</value>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="chart1.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
@@ -187,35 +192,12 @@
   <data name="&gt;&gt;chart1.ZOrder" xml:space="preserve">
     <value>9</value>
   </data>
-=======
-  <metadata name="id.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="name.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
   <metadata name="id_output.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <metadata name="output_variable.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
->>>>>>> origin/master
-  <metadata name="id_output.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <data name="id_output.HeaderText" xml:space="preserve">
-    <value>id</value>
-  </data>
-  <data name="id_output.Width" type="System.Int32, mscorlib">
-    <value>35</value>
-  </data>
-  <metadata name="output_variable.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <data name="output_variable.HeaderText" xml:space="preserve">
-    <value>Output Variable</value>
-  </data>
   <data name="dataGridView2.Location" type="System.Drawing.Point, System.Drawing">
     <value>983, 36</value>
   </data>
@@ -236,6 +218,21 @@
   </data>
   <data name="&gt;&gt;dataGridView2.ZOrder" xml:space="preserve">
     <value>8</value>
+  </data>
+  <metadata name="id_output.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="id_output.HeaderText" xml:space="preserve">
+    <value>id</value>
+  </data>
+  <data name="id_output.Width" type="System.Int32, mscorlib">
+    <value>35</value>
+  </data>
+  <metadata name="output_variable.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="output_variable.HeaderText" xml:space="preserve">
+    <value>Output Variable</value>
   </data>
   <data name="label1.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -282,8 +279,26 @@
   <data name="disconnectLineToolStripMenuItem.Text" xml:space="preserve">
     <value>Disconnect Line</value>
   </data>
+  <data name="statePointsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>158, 22</value>
+  </data>
+  <data name="statePointsToolStripMenuItem.Text" xml:space="preserve">
+    <value>State Points</value>
+  </data>
+  <data name="saveSettingsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>158, 22</value>
+  </data>
+  <data name="saveSettingsToolStripMenuItem.Text" xml:space="preserve">
+    <value>Save Settings</value>
+  </data>
+  <data name="loadSettingsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>158, 22</value>
+  </data>
+  <data name="loadSettingsToolStripMenuItem.Text" xml:space="preserve">
+    <value>Load Settings</value>
+  </data>
   <data name="CMSinsertNode.Size" type="System.Drawing.Size, System.Drawing">
-    <value>159, 48</value>
+    <value>159, 136</value>
   </data>
   <data name="&gt;&gt;CMSinsertNode.Name" xml:space="preserve">
     <value>CMSinsertNode</value>
@@ -300,13 +315,6 @@
   <metadata name="contextMenuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>365, 21</value>
   </metadata>
-<<<<<<< HEAD
-  <data name="deleteHandlerToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>152, 22</value>
-  </data>
-  <data name="deleteHandlerToolStripMenuItem.Text" xml:space="preserve">
-    <value>Delete Handler</value>
-  </data>
   <data name="contextMenuStrip1.Size" type="System.Drawing.Size, System.Drawing">
     <value>153, 26</value>
   </data>
@@ -315,6 +323,12 @@
   </data>
   <data name="&gt;&gt;contextMenuStrip1.Type" xml:space="preserve">
     <value>System.Windows.Forms.ContextMenuStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="deleteHandlerToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>152, 22</value>
+  </data>
+  <data name="deleteHandlerToolStripMenuItem.Text" xml:space="preserve">
+    <value>Delete Handler</value>
   </data>
   <data name="label2.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -520,6 +534,12 @@
   <data name="&gt;&gt;disconnectLineToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;statePointsToolStripMenuItem.Name" xml:space="preserve">
+    <value>statePointsToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;statePointsToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;saveFD.Name" xml:space="preserve">
     <value>saveFD</value>
   </data>
@@ -538,15 +558,22 @@
   <data name="&gt;&gt;deleteHandlerToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;saveSettingsToolStripMenuItem.Name" xml:space="preserve">
+    <value>saveSettingsToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;saveSettingsToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;loadSettingsToolStripMenuItem.Name" xml:space="preserve">
+    <value>loadSettingsToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;loadSettingsToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>Form_handler</value>
   </data>
   <data name="&gt;&gt;$this.Type" xml:space="preserve">
     <value>System.Windows.Forms.Form, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-=======
-  <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>57</value>
-  </metadata>
->>>>>>> origin/master
 </root>

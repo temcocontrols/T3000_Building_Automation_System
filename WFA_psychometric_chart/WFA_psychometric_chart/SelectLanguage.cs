@@ -275,9 +275,21 @@ namespace MultiLang
         //--This function returns the values of the ID based on the data present in database...
        public int DatabaseOperation()
         {
+
             int id_return = 1;
+            try { 
             string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+
+            if (File.Exists(databaseFile)==false)
+            {
+                //database file doesnot exist exit the application
+                MessageBox.Show("Internal database file not found ");
+                this.Close();
+                Application.Exit();
+
+            }
+
 
             string connString = @"Data Source=" + databaseFile + ";Version=3;";
             
@@ -300,7 +312,10 @@ namespace MultiLang
             reader.Dispose();
             connection.Close();
 
-
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
 
             return id_return;
         }
