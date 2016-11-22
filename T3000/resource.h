@@ -2121,10 +2121,8 @@
 #define IDC_RADIO_FROM_SERVER           2265
 #define IDC_RADIO_FROM_HARDISK          2266
 #define IDC_STATIC_ABOUT_INFO           2266
-
 #define IDC_RADIO_TRANDUCER             2267
 #define IDC_RADIO_pid                   2268
-
 #define IDC_HELP_HELP1                  3831
 #define IDC_CHECK_SETTING_ZONE_DAYLIGHT_TIME 3832
 #define IDC_BUTTON_SYNC_TIME            5716

@@ -11741,10 +11741,12 @@ void CMainFrame::OnControlWeekly()
 }
 
 #include "TStatScheduleDlg.h"
+#include "NewTstatSchedulesDlg.h"
 void CMainFrame::OnControlAnnualroutines()
 {
     // TODO: Add your command handler code here
 
+	 
     if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
     {
         if((m_user_level !=	LOGIN_SUCCESS_ROUTINE_MODE) &&
@@ -11800,8 +11802,10 @@ void CMainFrame::OnControlAnnualroutines()
         {
 
             g_bPauseMultiRead = TRUE;
-            CTStatScheduleDlg dlg;
-            dlg.DoModal();
+          /*  CTStatScheduleDlg dlg;
+            dlg.DoModal();*/
+			CNewTstatSchedulesDlg dlg;
+			dlg.DoModal();
             g_bPauseMultiRead = FALSE;
         }
         else

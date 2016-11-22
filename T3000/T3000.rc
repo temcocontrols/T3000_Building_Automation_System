@@ -71,6 +71,7 @@ END
 
 IDR_HTML_OUTPUTTABLEDLG HTML                    "OutputTableDlg.htm"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
@@ -269,7 +270,7 @@ IDD_WEEKLY_SCHEDULE DIALOGEX 0, 0, 348, 234
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         438,IDC_STATIC11,"Static",SS_BITMAP | SS_REALSIZEIMAGE | WS_DISABLED,0,0,15,13
+    CONTROL         IDB_BITMAP_SCHEDULE,IDC_STATIC11,"Static",SS_BITMAP | SS_REALSIZEIMAGE | WS_DISABLED,0,0,15,13
     CONTROL         "APPLY",IDC_BUTTON_APPLY,"Button",BS_OWNERDRAW | WS_TABSTOP,270,11,50,14
     CONTROL         "CLEAR",IDC_BUTTON_CLEAR,"Button",BS_OWNERDRAW | WS_TABSTOP,270,33,50,14
     CONTROL         "M->F",IDC_BUTTON_MF,"Button",BS_OWNERDRAW | WS_TABSTOP,270,55,50,14
@@ -1105,7 +1106,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,205,190,50,14,NOT WS_VISIBLE
     PUSHBUTTON      "Cancel",IDCANCEL,471,190,50,14,NOT WS_VISIBLE
     CONTROL         "",IDC_LIST_SCHEDULE_TIME,"SysListView32",LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,7,514,167
-    CONTROL         "",IDC_DATETIMEPICKER1_SCHEDUAL,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | NOT WS_VISIBLE | WS_TABSTOP | 0x8,29,192,67,12
+    CONTROL         "",IDC_DATETIMEPICKER1_SCHEDUAL,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | NOT WS_VISIBLE | WS_TABSTOP | 0x8,123,180,67,12
     PUSHBUTTON      "Copy To Monday-Friday",IDC_BUTTON_SCHEDULE_COPY_BTN,10,180,98,23
 END
 
@@ -1133,7 +1134,7 @@ BEGIN
     LTEXT           "MIN Airflow",IDC_STATIC_MINAIRFLOW,19,88,38,8
     EDITTEXT        IDC_EDIT_PID2OFFSETPOINT4,12,70,59,12,ES_AUTOHSCROLL
     EDITTEXT        IDC_EDIT_PID2OFFSETPOINT5,10,97,60,12,ES_AUTOHSCROLL
-    CONTROL         1655,IDC_5EVALUEEDIT,"Static",SS_BITMAP,99,16,300,115
+    CONTROL         IDC_AIR_FLOW_BACK,IDC_5EVALUEEDIT,"Static",SS_BITMAP,99,16,300,115
     GROUPBOX        "",IDC_STATIC,10,14,63,39,BS_LEFT
     LTEXT           "------->",IDC_STATIC,74,45,25,8
     LTEXT           "MAX Supply",IDC_STATIC,20,19,38,8
@@ -1652,7 +1653,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "Download",IDOK_DOWNLOAD,37,159,50,14
     PUSHBUTTON      "Exit",IDCANCEL,251,159,50,14
-    CONTROL         509,IDC_STATIC,"Static",SS_BITMAP,0,1,314,52
+    CONTROL         IDB_BITMAP_TEMCOLOGO,IDC_STATIC,"Static",SS_BITMAP,0,1,314,52
     EDITTEXT        IDC_EDIT1,1,56,313,58,ES_AUTOHSCROLL | ES_READONLY
 END
 
@@ -2642,24 +2643,19 @@ BEGIN
     PUSHBUTTON      "Cancel",IDC_BUTTON_LOGIN_CANCEL,103,106,50,14
 END
 
-IDD_DIALOG_SCHEDULE DIALOGEX 0, 0, 460, 276
+IDD_DIALOG_SCHEDULE DIALOGEX 0, 0, 569, 271
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Schedules"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "Save",IDOK,7,253,50,14
-    PUSHBUTTON      "Exit",IDCANCEL,398,253,50,14
-    CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,3,11,456,206
+    PUSHBUTTON      "Exit",IDCANCEL,500,229,68,30
+    CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,3,11,565,206
     LTEXT           "Weekly Routine",IDC_STATIC,4,1,51,8
-    LTEXT           "Holiday",IDC_STATIC,5,237,24,8
-    LTEXT           "Start:",IDC_STATIC,40,238,20,8
-    CONTROL         "",IDC_DATETIMEPICKER1,"SysDateTimePick32",DTS_RIGHTALIGN | WS_TABSTOP,59,235,100,15
-    LTEXT           "End:",IDC_STATIC,161,239,16,8
-    CONTROL         "",IDC_DATETIMEPICKER2,"SysDateTimePick32",DTS_RIGHTALIGN | WS_TABSTOP,181,236,100,15
     PUSHBUTTON      "Insert",IDC_BUTTON_INSERT,14,218,55,16
     PUSHBUTTON      "Delete",IDC_BUTTON_DELETE,159,218,55,17
-    CONTROL         "",IDC_DATETIMEPICKER1_SCHEDUAL,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | NOT WS_VISIBLE | WS_TABSTOP | 0x8,308,232,67,12
-    PUSHBUTTON      "Copy To Monday-Friday",IDC_BUTTON_SCHEDULE_COPY_BTN,74,218,79,16
+    CONTROL         "",IDC_DATETIMEPICKER1_SCHEDUAL,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | NOT WS_VISIBLE | WS_TABSTOP | 0x8,237,219,67,12
+    PUSHBUTTON      "Copy To Monday-Friday",IDC_BUTTON_SCHEDULE_COPY_BTN,74,218,82,16
+    DEFPUSHBUTTON   "Save",IDOK,7,235,95,29
 END
 
 IDD_DIALOG_DUPLICATE_ID DIALOGEX 0, 0, 754, 420
@@ -3533,7 +3529,8 @@ BEGIN
 
     IDD_DIALOG_SCHEDULE, DIALOG
     BEGIN
-        BOTTOMMARGIN, 271
+        RIGHTMARGIN, 568
+        BOTTOMMARGIN, 266
     END
 
     IDD_DIALOG_DUPLICATE_ID, DIALOG
@@ -4628,38 +4625,71 @@ END
 //
 
 IDB_BITMAP48            BITMAP                  "res\\Toolbar-48.bmp"
+
 IDB_MENUBAROWN_BITMAP16 BITMAP                  "res\\menu_imgeOwn16.bmp"
+
 IDR_TOOLBAR_VER25049    BITMAP                  "res\\toolbar1.bmp"
+
 IDB_BITMAP_V25049       BITMAP                  "res\\Toolbar_V25049.bmp"
+
 M->FF                   BITMAP                  "res\\MFouct.bmp"
+
 M->FU                   BITMAP                  "res\\MUp.bmp"
+
 APPLYX                  BITMAP                  "res\\ApplyDisable.bmp"
+
 APPLYD                  BITMAP                  "res\\ApplyDown.bmp"
+
 APPLYF                  BITMAP                  "res\\ApplyFouct.bmp"
+
 APPLYU                  BITMAP                  "res\\ApplyUp.bmp"
+
 CLEARX                  BITMAP                  "res\\ClearDisable.bmp"
+
 CLEARD                  BITMAP                  "res\\ClearDown.bmp"
+
 CLEARF                  BITMAP                  "res\\ClearFouct.bmp"
+
 CLEARU                  BITMAP                  "res\\ClearUp.bmp"
+
 M->FX                   BITMAP                  "res\\MDisable.bmp"
+
 M->FD                   BITMAP                  "res\\MDown.bmp"
+
 IDB_BITMAP_SCHEDULE     BITMAP                  "res\\Schedule0607.bmp"
+
 IDC_AIR_FLOW_BACK       BITMAP                  "res\\Back.bmp"
+
 IDB_BITMAP_TMCO_LOGO    BITMAP                  "res\\temcologo.bmp"
+
 IDB_LED                 BITMAP                  "res\\LED Table Button.bmp"
+
 IDB_LCD                 BITMAP                  "res\\LCD Table Button.bmp"
+
 IDB_BITMAP_V25050_CONNECTED BITMAP                  "res\\bitmap_v_Connected.bmp"
+
 IDB_BITMAP_TEMCOLOGO    BITMAP                  "res\\temco_logo.bmp"
+
 IDB_BITMAP5             BITMAP                  "res\\default view.bmp"
+
 IDB_BITMAP_LOGIN        BITMAP                  "res\\Login.bmp"
+
 IDB_BITMAP_BUILDING_DEFAULT BITMAP                  "res\\T3000Building.bmp"
+
 IDR_TOOLBAR_BACNET      BITMAP                  "res\\bmp_bacnet.bmp"
+
 IDB_BITMAP7             BITMAP                  "res\\bmp00001.bmp"
+
 IDB_BITMAP_BACNET_MENU_BIT BITMAP                  "res\\bacnet_menu_bit.bmp"
+
 IDB_BITMAP_ALARM_BROWN  BITMAP                  "res\\AlarmsBrown.bmp"
+
 IDB_BITMAP_ALARM_GREEN  BITMAP                  "res\\AlarmsGreen.bmp"
+
 IDB_BITMAP_ALARM_RED    BITMAP                  "res\\AlarmsRed.bmp"
+
 IDB_BITMAP9             BITMAP                  "res\\bitmap9.bmp"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -4780,25 +4810,45 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_ICON_REFRESH        ICON                    "res\\Refresh.ico"
+
 IDI_ICON_EXIT           ICON                    "res\\Exit.ico"
+
 IDI_ICON_INPUT          ICON                    "res\\Input.ico"
+
 IDI_ICON_OK             ICON                    "res\\OK.ico"
+
 IDI_ICON_SCAN_PRODUCT   ICON                    "res\\Scan.ico"
+
 IDI_ICON_DEFAULT_ICON   ICON                    "res\\relay.ico"
+
 IDI_ICON_SWITCH_ON      ICON                    "res\\switch_on.ico"
+
 IDI_ICON_SWITCH_OFF     ICON                    "res\\switch_off.ico"
+
 IDI_ICON_SELECT         ICON                    "res\\Select.ico"
+
 IDI_ICON_LABEL_LOCK     ICON                    "res\\lock.ico"
+
 IDI_ICON_LABEL_UNLOCK   ICON                    "res\\unlock.ico"
+
 IDI_ICON_INPUT_DEFAULT  ICON                    "res\\Input_Icon_Default.ico"
+
 IDI_ICON_DEFAULT_OUTPUT ICON                    "res\\default_icon\\outputs.ico"
+
 IDI_ICON_DEFAULT_VARIABLE ICON                    "res\\default_icon\\Variables.ico"
+
 IDI_ICON_DEFAULT_PROGRAM ICON                    "res\\default_icon\\Programs.ico"
+
 IDI_ICON_DEFAULT_GRAPHIC ICON                    "res\\default_icon\\Graphics.ico"
+
 IDI_ICON_DEFAULT_HOLIDAY ICON                    "res\\default_icon\\Holidays.ico"
+
 IDI_ICON_DEFAULT_SCHEDUAL ICON                    "res\\default_icon\\schedual.ico"
+
 IDI_ICON_DEFAULT_TRENDLOG ICON                    "res\\default_icon\\TrendLogs.ico"
+
 IDI_ICON_DEFAULT_PID    ICON                    "res\\default_icon\\PID.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -4807,12 +4857,14 @@ IDI_ICON_DEFAULT_PID    ICON                    "res\\default_icon\\PID.ico"
 
 IDR_SQLITE3DLL1         SQLITE3DLL              "res\\sqlite3.dll"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // MFC16DLL
 //
 
 IDR_MFC16DLL1           MFC16DLL                "res\\MFC16API.dll"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -4821,6 +4873,7 @@ IDR_MFC16DLL1           MFC16DLL                "res\\MFC16API.dll"
 
 IDR_T3000DB1            T3000DB                 "res\\T3000.db"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // BUILDINGDB
@@ -4828,12 +4881,30 @@ IDR_T3000DB1            T3000DB                 "res\\T3000.db"
 
 IDR_BUILDINGDB1         BUILDINGDB              "res\\Building.db"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // MONITOR_DB
 //
 
 IDR_MONITOR_DB1         MONITOR_DB              "res\\MonitorData.db"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_DIALOG_SCHEDULE AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_DIALOG_BACNET_SCHEDULE_TIME AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -5919,9 +5990,9 @@ BEGIN
     COMBOBOX        IDC_LED5_COMBO,140,105,85,98,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_LED6_COMBO,226,105,92,97,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_LED7_COMBO,320,105,92,97,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
-    CONTROL         403,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,154,44,56,54
-    CONTROL         403,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,245,45,56,54
-    CONTROL         403,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,337,46,56,54
+    CONTROL         IDB_BITMAP2,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,154,44,56,54
+    CONTROL         IDB_BITMAP2,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,245,45,56,54
+    CONTROL         IDB_BITMAP2,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,337,46,56,54
     LTEXT           "LED1",IDC_STATIC,16,52,17,8
     LTEXT           "LED2",IDC_STATIC,17,71,17,8
     LTEXT           "LED4",IDC_STATIC,16,105,17,8
@@ -7841,20 +7912,35 @@ END
 //
 
 IDB_HOTTOOLBAR          BITMAP                  "res\\hottool.bmp"
+
 IDB_COLDTOOLBAR         BITMAP                  "res\\coldtool.bmp"
+
 IDB_MENUBAR             BITMAP                  "res\\menu_img.bmp"
+
 IDR_MAINFRAME           BITMAP                  "res\\Toolbar.bmp"
+
 IDR_MAINFRAME_256       BITMAP                  "res\\Toolbar256.bmp"
+
 IDR_MYTOOLBAR           BITMAP                  "res\\toolbar2.bmp"
+
 IDB_TREENODE_BMP        BITMAP                  "res\\treenode.bmp"
+
 IDB_DOWNBMP             BITMAP                  "res\\bmp_down.bmp"
+
 IDB_UPBMP               BITMAP                  "res\\bmp_up.bmp"
+
 IDB_CUSTM_TOOLBARBITMAP BITMAP                  "res\\ToolbarOwn.bmp"
+
 IDB_CUSTM_COLDBITMAP    BITMAP                  "res\\ToolbarOwn.bmp"
+
 IDB_MENUBAROWN_BITMAP   BITMAP                  "res\\menu_imgeOwn.bmp"
+
 IDB_CHECKNO_BITMAP      BITMAP                  "res\\checkno.bmp"
+
 IDB_CHECK_BITMAP        BITMAP                  "res\\check.bmp"
+
 IDB_BITMAP2             BITMAP                  "res\\bitmap2.bmp"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -8117,7 +8203,9 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\serialnum.ico"
+
 IDR_T3000TYPE           ICON                    "res\\T3000Doc.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
