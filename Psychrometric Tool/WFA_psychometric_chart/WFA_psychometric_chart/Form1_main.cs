@@ -8016,16 +8016,16 @@ namespace WFA_psychometric_chart
 
         private void saveConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            try {
+           // try {
                 //We need to get the configuration for load here 
                 // SaveConfiguration();
                 //  SaveConfigurationForBuildingSetting();//--This actual saving the data
                 SQLiteSaveConfigurationSetting();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show(ex.Message);
+            //}
         }
 
 
@@ -8039,12 +8039,16 @@ namespace WFA_psychometric_chart
             public string nodeID { get; set; }  //This is the individual node id for each node 
             public double xValue { get; set; }
             public double yValue { get; set; }
-            public string source { get; set; }
+            // public string source { get; set; }
+            public string temperature_source { get; set; }
+            public string humidity_source { get; set; }
             public string name { get; set; }
-            public string label { get; set; }
+           // public string label { get; set; }
             public string colorValue { get; set; }
-            public string showTextItem { get; set; }
+            //public string showTextItem { get; set; }
             public int nodeSize { get; set; }
+            public int airFlow { get; set; }
+            public string lastUpdatedDate { get; set; }
 
         }
 
@@ -8059,6 +8063,7 @@ namespace WFA_psychometric_chart
             public string chartName { get; set; }
             public string chart_respective_nodeID { get; set; }
             public string chart_respective_lineID { get; set; }
+            public string enableChartStatus { get; set; }
         }
 
 
@@ -8153,7 +8158,8 @@ namespace WFA_psychometric_chart
                         chartID = reader["chartID"].ToString(),
                         chartName = reader["chartName"].ToString(),
                         chart_respective_nodeID = reader["chart_respective_nodeID"].ToString(),
-                        chart_respective_lineID = reader["chart_respective_lineID"].ToString()
+                        chart_respective_lineID = reader["chart_respective_lineID"].ToString() ,
+                        enableChartStatus = reader["enableChartStatus"].ToString()
 
                     });
                     }
@@ -8176,12 +8182,16 @@ namespace WFA_psychometric_chart
                         nodeID = reader1["nodeID"].ToString(),
                         xValue = double.Parse(reader1["xValue"].ToString()),
                         yValue = double.Parse(reader1["yValue"].ToString()),
-                        source = reader1["source"].ToString(),
+                       temperature_source = reader1["temperature_source"].ToString(),
+                        humidity_source = reader1["humidity_source"].ToString(),
                         name = reader1["name"].ToString(),
-                        label = reader1["label"].ToString(),
+                       // label = reader1["label"].ToString(),
                         colorValue = reader1["colorValue"].ToString(),
-                        showTextItem = reader1["showTextItem"].ToString(),
-                        nodeSize = int.Parse(reader1["nodeSize"].ToString())
+                       // showTextItem = reader1["showTextItem"].ToString(),
+                        nodeSize = int.Parse(reader1["nodeSize"].ToString()),
+                        airFlow = int.Parse(reader1["airFlow"].ToString()),
+                       lastUpdatedDate = reader1["lastUpdatedDate"].ToString()
+
                     });
                 }
 
@@ -8228,8 +8238,12 @@ namespace WFA_psychometric_chart
                         deviceInfoPulledForSaving.Add(new dt_for_device_info
                         {
                             nodeID = reader3["nodeID"].ToString(),
-                            device_instance_id = reader3["device_instanceID"].ToString(),
-                            ip = reader3["IP"].ToString(),
+                            device_instance_id_for_param1 = reader3["device_instanceID_for_param1"].ToString(),
+                            ip_for_param1 = reader3["IP_for_param1"].ToString(),
+
+                            device_instance_id_for_param2 = reader3["device_instanceID_for_param2"].ToString(),
+                            ip_for_param2 = reader3["IP_for_param2"].ToString(),
+
                             param1id = reader3["param1ID"].ToString(),
                             param2id = reader3["param2ID"].ToString(),
                             param1info = reader3["param1_info"].ToString(),
@@ -8404,17 +8418,19 @@ namespace WFA_psychometric_chart
                             nodeInfoPulledForSaving_For_Load.Add(new nodeDataTypeForSaving
                             {
 
-                                //count = int.Parse(reader1["count"].ToString()),
-                                chart_respective_nodeID = reader1["chart_respective_nodeID"].ToString(),
-                                nodeID = reader1["nodeID"].ToString(),
-                                xValue = double.Parse(reader1["xValue"].ToString()),
-                                yValue = double.Parse(reader1["yValue"].ToString()),
-                                source = reader1["source"].ToString(),
-                                name = reader1["name"].ToString(),
-                                label = reader1["label"].ToString(),
-                                colorValue = reader1["colorValue"].ToString(),
-                                showTextItem = reader1["showTextItem"].ToString(),
-                                nodeSize = int.Parse(reader1["nodeSize"].ToString())
+                                ////--count = int.Parse(reader1["count"].ToString()),
+
+
+                                //chart_respective_nodeID = reader1["chart_respective_nodeID"].ToString(),
+                                //nodeID = reader1["nodeID"].ToString(),
+                                //xValue = double.Parse(reader1["xValue"].ToString()),
+                                //yValue = double.Parse(reader1["yValue"].ToString()),
+                                //source = reader1["source"].ToString(),
+                                //name = reader1["name"].ToString(),
+                                //label = reader1["label"].ToString(),
+                                //colorValue = reader1["colorValue"].ToString(),
+                                //showTextItem = reader1["showTextItem"].ToString(),
+                                //nodeSize = int.Parse(reader1["nodeSize"].ToString())
                             });
                         }
 
@@ -8503,15 +8519,15 @@ namespace WFA_psychometric_chart
 
                             deviceInfoPulledForSaving_For_Load.Add(new dt_for_device_info
                             {
-                                nodeID = reader3["nodeID"].ToString(),
-                                device_instance_id = reader3["device_instanceID"].ToString(),
-                                ip = reader3["IP"].ToString(),
-                                param1id = reader3["param1ID"].ToString(),
-                                param2id = reader3["param2ID"].ToString(),
-                                param1info = reader3["param1_info"].ToString(),
-                                param2info = reader3["param2_info"].ToString(),
-                                param1_id_type = reader3["param1_identifier_type"].ToString(),
-                                param2_id_type = reader3["param2_identifier_type"].ToString()
+                                //nodeID = reader3["nodeID"].ToString(),
+                                //device_instance_id = reader3["device_instanceID"].ToString(),
+                                //ip = reader3["IP"].ToString(),
+                                //param1id = reader3["param1ID"].ToString(),
+                                //param2id = reader3["param2ID"].ToString(),
+                                //param1info = reader3["param1_info"].ToString(),
+                                //param2info = reader3["param2_info"].ToString(),
+                                //param1_id_type = reader3["param1_identifier_type"].ToString(),
+                                //param2_id_type = reader3["param2_identifier_type"].ToString()
 
                             });
                         }
@@ -8626,33 +8642,37 @@ namespace WFA_psychometric_chart
             string sql_input1 = null;
             foreach (var ch in chartInfoPulledForSaving)
             {
-                sql_input1 = "INSERT INTO "+ chartTableName + " (chartID,chartName,chart_respective_nodeID,chart_respective_lineID) VALUES(@id,@chartname,@cnid,@clid) ";
+                sql_input1 = "INSERT INTO "+ chartTableName + " (chartID,chartName,chart_respective_nodeID,chart_respective_lineID,enableChartStatus) VALUES(@id,@chartname,@cnid,@clid,@enableChartSt) ";
                 SQLiteCommand cmd = new SQLiteCommand(sql_input1, m_dbConnection);
                 cmd.Parameters.AddWithValue("@id", ch.chartID);
                 cmd.Parameters.AddWithValue("@chartname", ch.chartName);
                 cmd.Parameters.AddWithValue("@cnid", ch.chart_respective_nodeID);
                 cmd.Parameters.AddWithValue("@clid", ch.chart_respective_lineID);
-                cmd.ExecuteNonQuery();
+                cmd.Parameters.AddWithValue("@enableChartSt", ch.enableChartStatus);
+                    cmd.ExecuteNonQuery();
             }
 
 
             //--Now lest input the node id
             foreach (var ch in nodeInfoPulledForSaving)
             {
-                string sql_string = "insert into "+ nodeTableName + " (chart_respective_nodeID,nodeID,xValue,yValue,source,name,label,colorValue,showTextItem,nodeSize) VALUES(@chartid,@id,@xVal,@yVal,@source,@name,@label,@colorVal,@text,@node_size_value)";
+                string sql_string = "insert into "+ nodeTableName + " (chart_respective_nodeID,nodeID,xValue,yValue,temperature_source,humidity_source,name,colorValue,nodeSize,airFlow,lastUpdatedDate) VALUES(@chartid,@id,@xVal,@yVal,@tempsource,@humsource,@name,@colorVal,@node_size_value,@airflow,@lastUpdatedValue)";
                 SQLiteCommand command = new SQLiteCommand(sql_string, m_dbConnection);
                 command.CommandType = CommandType.Text;
                 command.Parameters.AddWithValue("@chartid", ch.chart_respective_nodeID);
                 command.Parameters.AddWithValue("@id", ch.nodeID);
                 command.Parameters.AddWithValue("@xVal", ch.xValue.ToString());
                 command.Parameters.AddWithValue("@yVal", ch.yValue.ToString());
-                command.Parameters.AddWithValue("@source", ch.source);
-                command.Parameters.AddWithValue("@name", ch.name);
-                command.Parameters.AddWithValue("@label", ch.label);
+                command.Parameters.AddWithValue("@tempsource", ch.temperature_source);
+                    command.Parameters.AddWithValue("@humsource", ch.humidity_source);
+                    command.Parameters.AddWithValue("@name", ch.name);
+                //command.Parameters.AddWithValue("@label", ch.label);
                 command.Parameters.AddWithValue("@colorVal", ch.colorValue);
-                command.Parameters.AddWithValue("@text", ch.showTextItem);
+                //command.Parameters.AddWithValue("@text", ch.showTextItem);
                 command.Parameters.AddWithValue("@node_size_value", ch.nodeSize);
-                command.ExecuteNonQuery();
+                    command.Parameters.AddWithValue("@airflow", ch.airFlow);
+                    command.Parameters.AddWithValue("@lastUpdatedValue", ch.lastUpdatedDate);
+                    command.ExecuteNonQuery();
             }
 
 
@@ -8682,12 +8702,14 @@ namespace WFA_psychometric_chart
             //--This one is for device input  
             foreach (var ch in deviceInfoPulledForSaving)
             {
-            string sql_string = "insert into  "+ tableNameDevice + " ( nodeID,device_instanceID,IP,param1ID,param2ID,param1_info,param2_info,param1_identifier_type,param2_identifier_type) VALUES(@id,@instanceID,@IP,@param1,@param2,@param1info, @param2info, @param1_iden_type, @param2_iden_type)";
+            string sql_string = "insert into  "+ tableNameDevice + " ( nodeID,device_instanceID_for_param1,IP_for_param1,device_instanceID_for_param2,IP_for_param2,param1ID,param2ID,param1_info,param2_info,param1_identifier_type,param2_identifier_type) VALUES(@id,@instanceID_param1,@IP_param1,@instanceID_param2,@IP_param2,@param1,@param2,@param1info, @param2info, @param1_iden_type, @param2_iden_type)";
             SQLiteCommand command = new SQLiteCommand(sql_string, m_dbConnection);
             command.CommandType = CommandType.Text;
             command.Parameters.AddWithValue("@id", ch.nodeID);
-            command.Parameters.AddWithValue("@instanceID", ch.device_instance_id);
-            command.Parameters.AddWithValue("@IP",ch.ip);
+            command.Parameters.AddWithValue("@instanceID_param1", ch.device_instance_id_for_param1);
+            command.Parameters.AddWithValue("@IP_param1",ch.ip_for_param1);
+            command.Parameters.AddWithValue("@instanceID_param2", ch.device_instance_id_for_param2);
+            command.Parameters.AddWithValue("@IP_param2", ch.ip_for_param2);
             command.Parameters.AddWithValue("@param1", ch.param1id);
             command.Parameters.AddWithValue("@param2", ch.param2id);
             command.Parameters.AddWithValue("@param1info", ch.param1info);
@@ -8777,20 +8799,20 @@ namespace WFA_psychometric_chart
             //--Now lest input the node id
             foreach (var ch in nodeInfoPulledForSaving_For_Load)
             {
-                string sql_string = "insert into " + nodeTableName + " (chart_respective_nodeID,nodeID,xValue,yValue,source,name,label,colorValue,showTextItem,nodeSize) VALUES(@chartid,@id,@xVal,@yVal,@source,@name,@label,@colorVal,@text,@node_size_value)";
-                SQLiteCommand command = new SQLiteCommand(sql_string, m_dbConnection);
-                command.CommandType = CommandType.Text;
-                command.Parameters.AddWithValue("@chartid", ch.chart_respective_nodeID);
-                command.Parameters.AddWithValue("@id", ch.nodeID);
-                command.Parameters.AddWithValue("@xVal", ch.xValue.ToString());
-                command.Parameters.AddWithValue("@yVal", ch.yValue.ToString());
-                command.Parameters.AddWithValue("@source", ch.source);
-                command.Parameters.AddWithValue("@name", ch.name);
-                command.Parameters.AddWithValue("@label", ch.label);
-                command.Parameters.AddWithValue("@colorVal", ch.colorValue);
-                command.Parameters.AddWithValue("@text", ch.showTextItem);
-                command.Parameters.AddWithValue("@node_size_value", ch.nodeSize);
-                command.ExecuteNonQuery();
+                //string sql_string = "insert into " + nodeTableName + " (chart_respective_nodeID,nodeID,xValue,yValue,source,name,label,colorValue,showTextItem,nodeSize) VALUES(@chartid,@id,@xVal,@yVal,@source,@name,@label,@colorVal,@text,@node_size_value)";
+                //SQLiteCommand command = new SQLiteCommand(sql_string, m_dbConnection);
+                //command.CommandType = CommandType.Text;
+                //command.Parameters.AddWithValue("@chartid", ch.chart_respective_nodeID);
+                //command.Parameters.AddWithValue("@id", ch.nodeID);
+                //command.Parameters.AddWithValue("@xVal", ch.xValue.ToString());
+                //command.Parameters.AddWithValue("@yVal", ch.yValue.ToString());
+                //command.Parameters.AddWithValue("@source", ch.source);
+                //command.Parameters.AddWithValue("@name", ch.name);
+                //command.Parameters.AddWithValue("@label", ch.label);
+                //command.Parameters.AddWithValue("@colorVal", ch.colorValue);
+                //command.Parameters.AddWithValue("@text", ch.showTextItem);
+                //command.Parameters.AddWithValue("@node_size_value", ch.nodeSize);
+                //command.ExecuteNonQuery();
             }
 
 
@@ -8820,19 +8842,19 @@ namespace WFA_psychometric_chart
             //--This one is for device input  
             foreach (var ch in deviceInfoPulledForSaving_For_Load)
             {
-                string sql_string = "insert into  " + tableNameDevice + "(nodeID,device_instanceID,IP,param1ID,param2ID,param1_info,param2_info,param1_identifier_type,param2_identifier_type) VALUES(@id,@instanceID,@IP,@param1,@param2,@param1info, @param2info, @param1_iden_type, @param2_iden_type)";
-                SQLiteCommand command = new SQLiteCommand(sql_string, m_dbConnection);
-                command.CommandType = CommandType.Text;
-                command.Parameters.AddWithValue("@id", ch.nodeID);
-                command.Parameters.AddWithValue("@instanceID", ch.device_instance_id);
-                command.Parameters.AddWithValue("@IP", ch.ip);
-                command.Parameters.AddWithValue("@param1", ch.param1id);
-                command.Parameters.AddWithValue("@param2", ch.param2id);
-                command.Parameters.AddWithValue("@param1info", ch.param1info);
-                command.Parameters.AddWithValue("@param2info", ch.param2info);
-                command.Parameters.AddWithValue("@param1_iden_type", ch.param1_id_type);
-                command.Parameters.AddWithValue("@param2_iden_type", ch.param2_id_type);
-                command.ExecuteNonQuery();
+                //string sql_string = "insert into  " + tableNameDevice + "(nodeID,device_instanceID,IP,param1ID,param2ID,param1_info,param2_info,param1_identifier_type,param2_identifier_type) VALUES(@id,@instanceID,@IP,@param1,@param2,@param1info, @param2info, @param1_iden_type, @param2_iden_type)";
+                //SQLiteCommand command = new SQLiteCommand(sql_string, m_dbConnection);
+                //command.CommandType = CommandType.Text;
+                //command.Parameters.AddWithValue("@id", ch.nodeID);
+                //command.Parameters.AddWithValue("@instanceID", ch.device_instance_id);
+                //command.Parameters.AddWithValue("@IP", ch.ip);
+                //command.Parameters.AddWithValue("@param1", ch.param1id);
+                //command.Parameters.AddWithValue("@param2", ch.param2id);
+                //command.Parameters.AddWithValue("@param1info", ch.param1info);
+                //command.Parameters.AddWithValue("@param2info", ch.param2info);
+                //command.Parameters.AddWithValue("@param1_iden_type", ch.param1_id_type);
+                //command.Parameters.AddWithValue("@param2_iden_type", ch.param2_id_type);
+                //command.ExecuteNonQuery();
             }
 
 
@@ -8897,12 +8919,12 @@ namespace WFA_psychometric_chart
                 connection.Open();
 
                 //--We also need to create table for particular data added..
-                string sql3 = "create table IF NOT EXISTS " + tableForChartDetail + "(count INTEGER PRIMARY KEY AUTOINCREMENT ,chartID VARCHAR(255),chartName varchar(255),chart_respective_nodeID varchar(255),chart_respective_lineID varchar(255))";
+                string sql3 = "create table IF NOT EXISTS " + tableForChartDetail + "(count INTEGER PRIMARY KEY AUTOINCREMENT ,chartID VARCHAR(255),chartName varchar(255),chart_respective_nodeID varchar(255),chart_respective_lineID varchar(255),enableChartStatus varchar(255))";
                 SQLiteCommand command3 = new SQLiteCommand(sql3, connection);
                 command3.ExecuteNonQuery();
 
                 //for node info
-                string sql = "create table IF NOT EXISTS " + tableForNode + "(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),source varchar(255),name varchar(255),label varchar(255),colorValue varchar(255),showTextItem varchar(255),nodeSize varchar(255))";
+                string sql = "create table IF NOT EXISTS " + tableForNode + "(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),temperature_source varchar(255),humidity_source varchar(255),name varchar(255),colorValue varchar(255),nodeSize varchar(255),airFlow varchar(255),lastUpdatedDate varchar(255))";
                 SQLiteCommand command = new SQLiteCommand(sql, connection);
                 command.ExecuteNonQuery();
 
@@ -8912,7 +8934,7 @@ namespace WFA_psychometric_chart
                 command4.ExecuteNonQuery();
 
                 //for device info
-                string sql5 = "create table IF NOT EXISTS  " + tableFordevice + "  ( count INTEGER PRIMARY KEY AUTOINCREMENT,nodeID varchar(255) ,device_instanceID varchar(255),IP varchar(255),param1ID varchar(255),param2ID varchar(255), param1_info  varchar(255) ,param2_info varchar(255),param1_identifier_type varchar(255),param2_identifier_type varchar(255)  )";
+                string sql5 = "create table IF NOT EXISTS  " + tableFordevice + "  ( count INTEGER PRIMARY KEY AUTOINCREMENT,nodeID varchar(255) ,device_instanceID_for_param1 varchar(255),IP_for_param1 varchar(255),device_instanceID_for_param2 varchar(255),IP_for_param2 varchar(255),param1ID varchar(255),param2ID varchar(255), param1_info  varchar(255) ,param2_info varchar(255),param1_identifier_type varchar(255),param2_identifier_type varchar(255)  )";
                 SQLiteCommand command5 = new SQLiteCommand(sql5, connection);
                 command5.ExecuteNonQuery();
 
@@ -9027,8 +9049,10 @@ namespace WFA_psychometric_chart
         {
 
             public string nodeID { get; set; } //--for identifying which point is selected..
-            public string device_instance_id { get; set; }//--this is the values that represent the point in a chart
-            public string ip { get; set; }
+            public string device_instance_id_for_param1 { get; set; }//--this is the values that represent the point in a chart
+            public string ip_for_param1 { get; set; }
+            public string device_instance_id_for_param2 { get; set; }//--this is the values that represent the point in a chart
+            public string ip_for_param2 { get; set; }
             public string param1id { get; set; }
             public string param2id { get; set; }
             public string param1info { get; set; }
