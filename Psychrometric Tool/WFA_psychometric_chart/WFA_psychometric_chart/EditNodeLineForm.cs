@@ -421,7 +421,7 @@ namespace WFA_psychometric_chart
             //Pulling data form web it will always be in temp and humidity form
             bcs.GetDataFromWeb(latitudeVal, longitudeVal);
 
-            double temperature_Val = bcs.temp_pulled_from_web;
+            double temperature_Val = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[3].Value.ToString()); // bcs.temp_pulled_from_web;
             double humidity_Val = double.Parse(bcs.hum_pulled);
             double y_value = bcs.CalculateYFromXandHumidity(temperature_Val, humidity_Val / 100);
 
@@ -466,7 +466,7 @@ namespace WFA_psychometric_chart
             bcs.GetDataFromWeb(latitudeVal, longitudeVal);
 
             double temperature_Val = bcs.temp_pulled_from_web;
-            double humidity_Val = double.Parse(bcs.hum_pulled);
+            double humidity_Val = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());//double.Parse(bcs.hum_pulled);
             double y_value = bcs.CalculateYFromXandHumidity(temperature_Val, humidity_Val / 100);
 
              xVal = temperature_Val;

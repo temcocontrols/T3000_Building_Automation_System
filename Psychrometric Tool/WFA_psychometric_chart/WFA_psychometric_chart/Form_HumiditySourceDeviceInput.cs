@@ -32,7 +32,7 @@ namespace WFA_psychometric_chart
 
 
 
-            MessageBox.Show("BBK tEST : Count = " + BuildingSelected.Count);
+           // MessageBox.Show("BBK tEST : Count = " + BuildingSelected.Count);
             PullDeviceInfoFromAccessDB();
 
      
@@ -59,7 +59,7 @@ namespace WFA_psychometric_chart
             string newPath = Path.GetFullPath(Path.Combine(path, @"..\"));
             //string againDbPath = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + newPath + @"Database\T3000.mdb";
             string againDbPath = @"Data Source=" + newPath + @"Database\T3000.db;Version=3;";
-            MessageBox.Show("reutn from here : New path : " + againDbPath);
+           // MessageBox.Show("reutn from here : New path : " + againDbPath);
 
             // return;//This to return
             // bool returnValue = false;
@@ -271,7 +271,7 @@ namespace WFA_psychometric_chart
                         });
                     }
 
-                    MessageBox.Show("parameterListValue count option  = " + db.parameterListValue.Count);
+                   // MessageBox.Show("parameterListValue count option  = " + db.parameterListValue.Count);
                     //Now we can use the value strored int  the db.parameterList1
                     string s = "";
                     foreach (var bac in db.parameterListValue)
@@ -287,7 +287,7 @@ namespace WFA_psychometric_chart
                         s += "\n" + bac.device_object_name + ",[" + bac.indexID + "]" + bac.presentValue + ",TYPE = " + bac.object_identifier_type;
                     }
 
-                    MessageBox.Show("Data returned from backnet  value =\n " + s);
+                   // MessageBox.Show("Data returned from backnet  value =\n " + s);
                     //--Here we need to scan form th    e  T3000 database and then publish the list which is there 
                     /*
                     Task :

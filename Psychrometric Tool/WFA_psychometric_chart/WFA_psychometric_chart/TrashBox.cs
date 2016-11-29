@@ -50,7 +50,7 @@ namespace WFA_psychometric_chart
             // f1.CurrentSelectedBuilding;//f1.selectedBuildingList[0].BuildingName;
             buildingNameGlobal = buildingName;
 
-            MessageBox.Show("BuildingName = " + buildingNameGlobal);
+           // MessageBox.Show("BuildingName = " + buildingNameGlobal);
             if(buildingNameGlobal == "")
             {
                 //If no building is selected then do not go futher 
@@ -58,7 +58,7 @@ namespace WFA_psychometric_chart
             }
 
             PullChartList(buildingName);
-            MessageBox.Show("number of list value items =  " + chartDetailListForDissabledValue.Count);
+           // MessageBox.Show("number of list value items =  " + chartDetailListForDissabledValue.Count);
 
             //--Now lets load the values in the database
 
@@ -173,11 +173,11 @@ namespace WFA_psychometric_chart
                 {
                     arrayList.Add(dataGridView1.Rows[i].Cells[1].Value.ToString());//Insert the chart id values
                     //storeRestoreList.Add(chartDetailListForDissabledValue[i].chartID);
-                    MessageBox.Show("Value = " + dataGridView1.Rows[i].Cells[1].Value.ToString());
+                   // MessageBox.Show("Value = " + dataGridView1.Rows[i].Cells[1].Value.ToString());
                 }        
             }
 
-            MessageBox.Show("StoreRestoreList count =" + arrayList.Count);
+            //MessageBox.Show("StoreRestoreList count =" + arrayList.Count);
             //--Now lets remove the checked values form the database sections
 
             //string buildingName = 
@@ -189,15 +189,15 @@ namespace WFA_psychometric_chart
             //--Now after updating call the datagridview_show_Data function in main chart and close the 
             //window
 
-            Form1_main f1 = new Form1_main();
+           // Form1_main f1 = new Form1_main();
             //Form1_main f1 = new Form1_main();
             //f1.CheckSelectedBuilding();
 
             //--We are claling the dataGridView_Show_Data is called
-            MessageBox.Show("DataGridView_show_Data Calls");
+          //  MessageBox.Show("DataGridView_show_Data Calls");
 
-           f1.Form1_Load(sender, e);
-           // f1.LoadFunctionForTrash();
+            // f1.Form1_Load(sender, e);
+            // f1.LoadFunctionForTrash();
             //f1.chart1RefreshCustom();
             //f1.dataGridView1.Rows.Clear();
             //f1.DataGridView_Show_Data();
@@ -206,6 +206,10 @@ namespace WFA_psychometric_chart
             //f1.Refresh();
             //f1.RefreshGraph();//Refresh the graph
             //--Now close this form 
+
+            f1.RefreshingEverythingChartAndContent(sender);//Calling the function for refresh
+
+
             this.Close();
 
               
