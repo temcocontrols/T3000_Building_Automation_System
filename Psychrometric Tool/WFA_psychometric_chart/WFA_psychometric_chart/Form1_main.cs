@@ -639,7 +639,7 @@ namespace WFA_psychometric_chart
             */
             // AirPressureFromDB = 
 
-           // MessageBox.Show("Two");
+           //MessageBox.Show("Two");
             double altitue = buildingList[0].elevation;
             double P = 101325 * Math.Pow((1 - (2.25577 * Math.Pow(10, -5) * altitue)), 5.25588);
 
@@ -662,6 +662,9 @@ namespace WFA_psychometric_chart
             //label1.Text = WFA_psychometric_chart.Properties.Resources.From;
             //label2.Text = WFA_psychometric_chart.Properties.Resources.To;
             //button2.Text = WFA_psychometric_chart.Properties.Resources.Show_Heat_Map;
+
+
+            
 
 
             //lets plot the graph as soon as the form loads.
@@ -2264,12 +2267,12 @@ namespace WFA_psychometric_chart
 
                 try
                 {
-                    using (OleDbConnection conn = new OleDbConnection(againDbPath))
+                    using (SQLiteConnection conn = new SQLiteConnection(againDbPath))
                     {
-                        using (OleDbCommand cmd = new OleDbCommand(sql, conn))
+                        using (SQLiteCommand cmd = new SQLiteCommand(sql, conn))
                         {
                             conn.Open();
-                            OleDbDataReader reader = cmd.ExecuteReader();
+                            SQLiteDataReader reader = cmd.ExecuteReader();
                             while (reader.Read())
                             {
                                 dataCheckList.Add((bool)reader["Online_Status"]);
@@ -2291,7 +2294,7 @@ namespace WFA_psychometric_chart
                         status = true;
                     }
                 }
-             // MessageBox.Show( "datacheckcount= " + dataCheckList.Count + " Status = " + status);
+             //MessageBox.Show( "datacheckcount= " + dataCheckList.Count + " Status = " + status);
             }
             return status;
         }
@@ -4138,6 +4141,10 @@ namespace WFA_psychometric_chart
         }
 
 
+
+        public int previousNodeIndexForLineInput = 0;
+
+
         /// <summary>
         /// We need have three parameters
         /// </summary>
@@ -4999,7 +5006,8 @@ namespace WFA_psychometric_chart
                 //disconnectLineFromBToolStripMenuItem.Enabled = false;
 
                 nodeAToolStripMenuItem.Enabled = false;
-                nodeBToolStripMenuItem.Enabled = false;                                      
+                nodeBToolStripMenuItem.Enabled = false;
+                addMixNodeToolStripMenuItem.Enabled = false;//Dissable add mix node
                 //---End of two side of line disconnection section
 
                 //--This is for the weather the line is moverover or not...
@@ -5399,10 +5407,11 @@ namespace WFA_psychometric_chart
                                 2. We have node info in this->indexOfPrevPointForLineMovement and  this->indexOfNextNodeForLineMovement
                                 */
                                 disconnectLineFromAToolStripMenuItem.Enabled = true;
-                                //disconnectLineFromBToolStripMenuItem.Enabled = true;
+                               //disconnectLineFromBToolStripMenuItem.Enabled = true;
 
                                 nodeAToolStripMenuItem.Enabled = true;
                                 nodeBToolStripMenuItem.Enabled = true;
+                                addMixNodeToolStripMenuItem.Enabled = true;//For adding mix node
 
                                 FlagForDisconnectingLineChoice = 1;                              
                                 //---End of line deteachment section --------------------//
@@ -7558,11 +7567,12 @@ namespace WFA_psychometric_chart
                     //--lets dissable the line
                     nodeAToolStripMenuItem.Enabled = false;
                     nodeBToolStripMenuItem.Enabled = false;
+                    addMixNodeToolStripMenuItem.Enabled = false;//For dissabling the add mix node
 
 
                     //--Lets dissbale
-                    nodeAToolStripMenuItem.Enabled = false;
-                    nodeBToolStripMenuItem.Enabled = false;
+                    //nodeAToolStripMenuItem.Enabled = false;
+                    //nodeBToolStripMenuItem.Enabled = false;
 
 
 
@@ -8029,7 +8039,8 @@ namespace WFA_psychometric_chart
                 if (flagForInsertOrUpdateDataToDB == 1)
                 {
                     //--Insert the values when the flag is raised.
-                    InsertLineInfoToDB(unique_id_for_line, menuStripNodeInfoValues[index - 1].id, menuStripNodeInfoValues[index].id, menuStripNodeInfoValues[index - 1].colorValue, newLineSeries, menuStripNodeLineInfoValues[index - 1].lineThickness);
+                    //InsertLineInfoToDB(unique_id_for_line, menuStripNodeInfoValues[index - 1].id, menuStripNodeInfoValues[index].id, menuStripNodeInfoValues[index - 1].colorValue, newLineSeries, menuStripNodeLineInfoValues[index - 1].lineThickness);
+                    InsertLineInfoToDB(unique_id_for_line, menuStripNodeInfoValues[index - 1].id, menuStripNodeInfoValues[index].id, menuStripNodeInfoValues[index - 1].colorValue, newLineSeries,3);
                 }
 
 
@@ -12566,6 +12577,205 @@ namespace WFA_psychometric_chart
             TrashBox tb = new TrashBox(this);
             tb.ShowDialog();
         }
+
+        private void addMixNodeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //--This oneis mixing part of the node 
+
+            /*
+            Steps : Identify the node 1 and node 2 for respective line selected
+            
+            */
+            AddMixNodeBetweenTwoNodes();
+
+        }
+
+          /// <summary>
+          /// Contains node1 and node2 details for mixing 
+          /// </summary>
+        public List<TempDataType> mixCorrespondingNodeValuesList = new List<TempDataType>();
+        public void AddMixNodeBetweenTwoNodes()
+        {
+            //Steps: 
+            /*
+            1.Identify node1 and node2,
+            2. CALCULATE THE mid point using section  formula
+           (x1,y1)-------------------------------(x2,y2)
+                  <------m-->P(x,y)<------n----->  
+
+           P(x,y) = [(m*x2+n*x1)/(m+n),(m*y2+n*y1)/(m+n)]
+
+            */
+
+            //============Lets check first=======
+
+            if(indexOfPrevPointForLineMovement == ""|| indexOfNextNodeForLineMovement == "")
+            {
+                return;//If index seleted is empty return
+            }
+
+
+
+
+
+            mixCorrespondingNodeValuesList.Clear();
+
+            //--ADDING NODE1 info
+            foreach(var node in menuStripNodeInfoValues)
+            {
+                //--Now lets find which node is being found
+              if(node.id == indexOfPrevPointForLineMovement)
+                {
+                    //Previous node is found ie node1
+
+                    mixCorrespondingNodeValuesList.Add(new TempDataType
+                    {
+                        id = node.id,
+                        name= node.name,
+                        xVal = node.xVal,
+                        yVal = node.yVal,
+                        temperature_source = node.temperature_source ,
+                        humidity_source = node.humidity_source,
+                        colorValue = node.colorValue ,
+                        airFlow =  node.airFlow,
+                        marker_Size =  node.marker_Size,
+                        lastUpdatedDate =  node.lastUpdatedDate
+
+                    });//This is the node of previous node found
+                    break;
+                }
+              
+            }
+
+            //Adding node2 info
+            foreach (var node in menuStripNodeInfoValues)
+            {
+                //--Now lets find which node is being found
+                if (node.id == indexOfNextNodeForLineMovement)
+                {
+                    //Previous node is found ie node1
+
+                    mixCorrespondingNodeValuesList.Add(new TempDataType
+                    {
+                        id = node.id,
+                        name = node.name,
+                        xVal = node.xVal,
+                        yVal = node.yVal,
+                        temperature_source = node.temperature_source,
+                        humidity_source = node.humidity_source,
+                        colorValue = node.colorValue,
+                        airFlow = node.airFlow,
+                        marker_Size = node.marker_Size,
+                        lastUpdatedDate = node.lastUpdatedDate
+
+                    });//This is the node of previous node found
+                    break;
+                }
+
+            }//Close of for each..
+
+
+            //Now let x_mix,y_mix contain the mix value of node
+            double m = mixCorrespondingNodeValuesList[0].airFlow;
+            double n = mixCorrespondingNodeValuesList[1].airFlow;
+            double x1 = mixCorrespondingNodeValuesList[0].xVal;
+            double y1 = mixCorrespondingNodeValuesList[0].yVal;
+
+            //x2,y2;
+            double x2 = mixCorrespondingNodeValuesList[1].xVal;
+            double y2 = mixCorrespondingNodeValuesList[1].yVal;
+
+
+
+
+
+            double x_mix = ((m * x2) + (n * x1)) / (m + n);
+            double y_mix = ((m * y2) + (n * y1)) / (m + n);
+            //Now we know the coordinates we need to plot now..
+
+            string idForNode = GetGUID();//This get the id
+            int mixAirFlowContent = (int)(m + n);
+
+
+            //Finding appropriate name
+            string mixNodeName = UniqueMixName();
+
+
+            //--Now insert into db first then only plot the values
+
+
+
+            //--Now lets update the values 
+            DatabaseOperations ObjDbOperation = new DatabaseOperations();
+            //  MessageBox.Show("Building Name= " + selectedBuildingList[0].BuildingName);
+            // MessageBox.Show(unique_id_for_node+"xval = "+ xval+" yval"+ yval+"temp "+ temperature_sourceGlobal+"hum="+ humidity_sourceGlobal+",name="+ tbName+",col="+ colorValue+",size=" +markerSize +",air="+airFlowValueGlobal.ToString());
+            ObjDbOperation.InsertNodeInfoToDBWithoutDeviceInfo(CurrentSelectedBuilding, chartDetailList[indexForWhichChartIsSelected].chart_respective_nodeID, idForNode, x_mix, y_mix, "Mix","Mix", mixNodeName, Color.Blue, 20, mixAirFlowContent.ToString());
+
+            //Now plotting the values
+
+            //=================Now refreshing the data =======================//
+            //indexOfChartSelected = e.RowIndex;    //This value is changed 
+            LoadNodeAndLineFromDB(indexOfChartSelected);   //Lets make it passing the stirngs 
+
+            //flagForInsertOrUpdateDataToDB = 1;
+            //--This is also completed..
+            ReDrawingLineAndNode();  //Done checking bbk modif: changing to alex db 
+
+             //====================End of data refresh
+
+        }
+
+
+        int indexRun1 = 1;
+        public string UniqueMixName()
+        {
+            int t = menuStripNodeInfoValues.Count;
+            //if (t > 0)
+            //{
+            //    indexRun1 = t + 1;
+            //}
+            //else 
+            
+            if (t == 0)
+            {
+                indexRun1 = 1;
+            }
+            else
+            { 
+                foreach(var node in menuStripNodeInfoValues)
+                {
+                    if (node.temperature_source == "Mix")//either temperature or humidity source will have mix as property
+                    {
+                        indexRun1++;
+                    }
+
+                }
+            }
+
+            //We also need to check if the value is present or not after setting 
+
+
+            int indNodeRun1 = indexRun1;
+            string nodeName = "Mix" + indNodeRun1;//This is the node name
+            for (int i = 0; i < menuStripNodeInfoValues.Count; i++)
+            {
+                if (menuStripNodeInfoValues[i].name == nodeName)
+                {
+                    indNodeRun1++;
+                    nodeName = "Mix" + indNodeRun1;
+                    i = 0;
+                }
+
+            }
+
+
+            return nodeName;
+        }
+
+
+
+
+
 
 
         //=========================end of the deleting of node,line and ....===================================================//
