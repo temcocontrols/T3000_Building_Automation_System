@@ -115,6 +115,40 @@ namespace WFA_psychometric_chart
 
 
 
+        public void InsertMixNodeInfo(string buildingName, string chartID,string node_id, string prevNodeID, string nextNodeID)
+        {
+            //This is the name of the table that stores the node information...
+            if (buildingName == "")
+            {
+                return;
+            }
+
+            //string tableName = "tbl_" + selectedBuildingList[0].BuildingName + "_node_value";//currentNodeTableFromDB;  
+            string tableName = "tbl_" + buildingName + "_mix_node_info";//currentNodeTableFromDB;  
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                string sql_string = "insert into " + tableName + "(nodeID,chartID,previousNodeID,nextNodeID) VALUES(@nodeid,@chart_id,@prevnodeid,@nextnodeid)";
+                SQLiteCommand command = new SQLiteCommand(sql_string, connection);
+                command.CommandType = CommandType.Text;
+                command.Parameters.AddWithValue("@nodeid", node_id);
+                command.Parameters.AddWithValue("@chart_id", chartID);
+                command.Parameters.AddWithValue("@prevnodeid", prevNodeID);
+                command.Parameters.AddWithValue("@nextnodeid", nextNodeID);
+         
+                command.ExecuteNonQuery();
+            }
+
+        }//--close of insertnodeinfotodb fxn
+
+
+
+
+
 
     }//Close of  Class
 }

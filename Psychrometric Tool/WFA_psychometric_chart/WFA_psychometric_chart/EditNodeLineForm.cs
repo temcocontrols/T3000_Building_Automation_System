@@ -851,10 +851,15 @@ namespace WFA_psychometric_chart
                         temperature_value = "Web";
                         temperature_indexValue = 1;
                     }
-                    else
+                    else  if(bcs.menuStripNodeInfoValues[i].temperature_source == "Device")
                     {
                         temperature_value = "Device";
                         temperature_indexValue = 2;
+                    }
+                    else if (bcs.menuStripNodeInfoValues[i].temperature_source == "Mix")
+                    {
+                        temperature_value = "Mix";
+                        //temperature_indexValue = 2;//No need for this one
                     }
 
 
@@ -875,18 +880,40 @@ namespace WFA_psychometric_chart
                     {
                         humidity_sourceValue = "Web";
                         indexForSource = 1;
+
                     }
-                    else
+                    else if (bcs.menuStripNodeInfoValues[i].humidity_source == "Device")
                     {
                         humidity_sourceValue = "Device";
                         indexForSource = 2;
+                    }
+                    else if (bcs.menuStripNodeInfoValues[i].humidity_source == "Mix")
+                    {
+                        humidity_sourceValue = "Mix";
+                      //  indexForSource = 2;
                     }
 
                     // DataGridViewComboBoxColumn cb = (DataGridViewComboBoxColumn)showText;
                     //cb.Items[0].ToString();
                     // MessageBox.Show("source VALUE MEMBER= " + CB_DGV_Source.Items[indexForSource]);
                     bcs.enthalpyHumidityCalculatorForXYvalue(bcs.menuStripNodeInfoValues[i].xVal, bcs.menuStripNodeInfoValues[i].yVal);
-                    string[] row = new string[] { bcs.menuStripNodeInfoValues[i].name,  CB_DGV_Temperature_Source.Items[temperature_indexValue].ToString(), bcs.menuStripNodeInfoValues[i].id, Math.Round(bcs.menuStripNodeInfoValues[i].xVal, 2).ToString(),CB_DGV_Humidity_Source.Items[indexForSource].ToString() ,Math.Round(bcs.humDataGridValue, 2).ToString(), Math.Round(bcs.enthalpyDataGridView, 2).ToString(), " ", bcs.menuStripNodeInfoValues[i].marker_Size.ToString(),bcs.menuStripNodeInfoValues[i].airFlow.ToString() };
+                    if (bcs.menuStripNodeInfoValues[i].humidity_source == "Mix")
+                    {
+                        string[] row = new string[] { bcs.menuStripNodeInfoValues[i].name,"Manual", bcs.menuStripNodeInfoValues[i].id, Math.Round(bcs.menuStripNodeInfoValues[i].xVal, 2).ToString(),"Manual", Math.Round(bcs.humDataGridValue, 2).ToString(), Math.Round(bcs.enthalpyDataGridView, 2).ToString(), " ", bcs.menuStripNodeInfoValues[i].marker_Size.ToString(), bcs.menuStripNodeInfoValues[i].airFlow.ToString() };
+                        dataGridView1.Rows.Add(row);
+                        //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].ReadOnly = false;
+                        //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].ReadOnly = false;
+                        //indexForParticularRow
+                        dataGridView1.Rows[indexForParticularRow].Cells[1].ReadOnly = true;
+                        dataGridView1.Rows[indexForParticularRow].Cells[3].ReadOnly = true;                   
+                        dataGridView1.Rows[indexForParticularRow].Cells[4].ReadOnly = true;
+                        dataGridView1.Rows[indexForParticularRow].Cells[5].ReadOnly = true;
+                        dataGridView1.Rows[indexForParticularRow].Cells[6].ReadOnly = true;
+
+                    }
+                    else { 
+
+                        string[] row = new string[] { bcs.menuStripNodeInfoValues[i].name,  CB_DGV_Temperature_Source.Items[temperature_indexValue].ToString(), bcs.menuStripNodeInfoValues[i].id, Math.Round(bcs.menuStripNodeInfoValues[i].xVal, 2).ToString(),CB_DGV_Humidity_Source.Items[indexForSource].ToString() ,Math.Round(bcs.humDataGridValue, 2).ToString(), Math.Round(bcs.enthalpyDataGridView, 2).ToString(), " ", bcs.menuStripNodeInfoValues[i].marker_Size.ToString(),bcs.menuStripNodeInfoValues[i].airFlow.ToString() };
 
                     //--This one is for enabling or dissabling a particualr row
                     if (bcs.menuStripNodeInfoValues[i].temperature_source == "Manual")
@@ -944,6 +971,8 @@ namespace WFA_psychometric_chart
                             dataGridView1.Rows[indexForParticularRow].Cells[5].ReadOnly = false;
 
 
+
+
                         }
                         else if (bcs.menuStripNodeInfoValues[i].temperature_source == "Web")
                         {                                 
@@ -986,7 +1015,7 @@ namespace WFA_psychometric_chart
 
                     }
 
-                                                                                                             
+                    }//Close of else function for mix
 
                     indexForParticularRow++;
 
@@ -1952,85 +1981,149 @@ namespace WFA_psychometric_chart
                 {
                     //This one is name
                     // initialName = dataGridView1.CurrentCell.Value.ToString();
-                    try
+
+                    /*
+                     STEPS : Check for the temperature value using the inex value and the update based on that
+                     */
+                    int index = dataGridView1.CurrentCell.RowIndex;//This is the index
+                    string temperature_source = bcs.menuStripNodeInfoValues[index].temperature_source;
+                    if (temperature_source != "Mix")
                     {
 
-                        string finalName = dataGridView1.CurrentCell.Value.ToString();
 
-                        string pattern = @"^\w+$"; //@"\b\w+es\b";
-                        Regex rgx = new Regex(pattern);
-                        //string sentence = "Who writes these notes?";
-                        if (rgx.IsMatch(finalName) == true)
+                        try
                         {
-                            //matched no need to edit 
+
+
+
+
+                            string finalName = dataGridView1.CurrentCell.Value.ToString();
+
+                            string pattern = @"^\w+$"; //@"\b\w+es\b";
+                            Regex rgx = new Regex(pattern);
+                            //string sentence = "Who writes these notes?";
+                            if (rgx.IsMatch(finalName) == true)
+                            {
+                                //matched no need to edit 
+                            }
+                            else
+                            {
+                                MessageBox.Show("You can only input letters,numbers and underscores values");
+                                dataGridView1.CurrentCell.Value = initialName;
+                                return;
+
+                            }
+
+
                         }
-                        else
+                        catch (Exception ex)
                         {
                             MessageBox.Show("You can only input letters,numbers and underscores values");
+
                             dataGridView1.CurrentCell.Value = initialName;
                             return;
-                                
+                        }
+
+                        try
+                        {
+                            //UpdateDataValueAndRefreshDGV(nodeIDVal, xVal, yVal, sourceVal, nameVal, labelVal, colorVal, showTextVal, nodeSizeVal);
+
+                            string nodeIDVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[2].Value.ToString();
+                            string nameVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value.ToString();//--This contains the name
+                            string temperature_Source = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();//--This contains the name
+                            string humidity_Souce = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString();//--This contains the name
+                            double xVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[3].Value.ToString());
+                            // double yVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
+                            double humidity = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
+                            bcs.CalculateYFromXandHumidity(xVal, humidity / 100);
+                            double yVal = bcs.y_coord_value;
+
+                            // string showTextVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[7].Value.ToString();
+                            //Color colorVal = colorDialog1.Color;   //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[8].Style.BackColor;
+                            Color colorVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[7].Style.BackColor;
+                            int nodeSizeVal = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[8].Value.ToString());
+                            int AirFlow = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[9].Value.ToString());
+
+                            // UpdateDataValueAndRefreshDGV(nodeIDVal, xVal, yVal, sourceVal, nameVal, labelVal, colorVal, showTextVal, nodeSizeVal);
+                            updateNodeInfoBasedOnPresentValue(nodeIDVal, xVal, yVal, temperature_Source, humidity_Souce, nameVal, colorVal, nodeSizeVal, AirFlow);
+
+
+
+
+
+                        }
+                        catch { }
+
+
+                    }
+                    else
+                    {
+                        //Do it for the mix section
+
+                        try
+                        {
+
+
+
+
+                            string finalName = dataGridView1.CurrentCell.Value.ToString();
+
+                            string pattern = @"^\w+$"; //@"\b\w+es\b";
+                            Regex rgx = new Regex(pattern);
+                            //string sentence = "Who writes these notes?";
+                            if (rgx.IsMatch(finalName) == true)
+                            {
+                                //matched no need to edit 
+                            }
+                            else
+                            {
+                                MessageBox.Show("You can only input letters,numbers and underscores values");
+                                dataGridView1.CurrentCell.Value = initialName;
+                                return;
+
+                            }
+
+
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("You can only input letters,numbers and underscores values");
+
+                            dataGridView1.CurrentCell.Value = initialName;
+                            return;
+                        }
+
+                        //try
+                        //{
+                            //UpdateDataValueAndRefreshDGV(nodeIDVal, xVal, yVal, sourceVal, nameVal, labelVal, colorVal, showTextVal, nodeSizeVal);
+
+                            string nodeIDVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[2].Value.ToString();
+                            string nameVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value.ToString();//--This contains the name
+                            string temperature_Source = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();//--This contains the name
+                            string humidity_Souce = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString();//--This contains the name
+                            double xVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[3].Value.ToString());
+                            // double yVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
+                            double humidity = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
+                            bcs.CalculateYFromXandHumidity(xVal, humidity / 100);
+                            double yVal = bcs.y_coord_value;
+
+                            // string showTextVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[7].Value.ToString();
+                            //Color colorVal = colorDialog1.Color;   //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[8].Style.BackColor;
+                            Color colorVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[7].Style.BackColor;
+                            int nodeSizeVal = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[8].Value.ToString());
+                            int AirFlow = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[9].Value.ToString());
+
+                            // UpdateDataValueAndRefreshDGV(nodeIDVal, xVal, yVal, sourceVal, nameVal, labelVal, colorVal, showTextVal, nodeSizeVal);
+                            updateNodeInfoBasedOnPresentValue(nodeIDVal, xVal, yVal, "Mix", "Mix", nameVal, colorVal, nodeSizeVal, AirFlow);
+
+
+
+
                         }
 
 
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("You can only input letters,numbers and underscores values");
 
-                        dataGridView1.CurrentCell.Value = initialName;
-                        return;
-                    }
-
-                    try
-                    {
-                        //--Once the name is changed it has to save the changes
-                        //string finalName = dataGridView1.CurrentCell.Value.ToString();
-                        //string nodeIDVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[3].Value.ToString();
-                        //string nameVal = finalName; //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value.ToString();//--This contains the name
-                        //string labelVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();//--This contains the name
-                        //string sourceVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[2].Value.ToString();//--This contains the name
-                        //double xVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString());
-                        //// double yVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
-                        //double humidity = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
-                        //bcs.CalculateYFromXandHumidity(xVal, humidity / 100);
-
-                        //double yVal = bcs.y_coord_value;
-
-                        //string showTextVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[7].Value.ToString();
-                        //Color colorVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[8].Style.BackColor;
-                        //int nodeSizeVal = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[9].Value.ToString());
-
-                        //UpdateDataValueAndRefreshDGV(nodeIDVal, xVal, yVal, sourceVal, nameVal, labelVal, colorVal, showTextVal, nodeSizeVal);
-
-                        string nodeIDVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[2].Value.ToString();
-                        string nameVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value.ToString();//--This contains the name
-                        string temperature_Source = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();//--This contains the name
-                        string humidity_Souce = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString();//--This contains the name
-                        double xVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[3].Value.ToString());
-                        // double yVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
-                        double humidity = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
-                        bcs.CalculateYFromXandHumidity(xVal, humidity / 100);
-                        double yVal = bcs.y_coord_value;
-
-                        // string showTextVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[7].Value.ToString();
-                        //Color colorVal = colorDialog1.Color;   //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[8].Style.BackColor;
-                        Color colorVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[7].Style.BackColor;
-                        int nodeSizeVal = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[8].Value.ToString());
-                        int AirFlow = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[9].Value.ToString());
-
-                        // UpdateDataValueAndRefreshDGV(nodeIDVal, xVal, yVal, sourceVal, nameVal, labelVal, colorVal, showTextVal, nodeSizeVal);
-                        updateNodeInfoBasedOnPresentValue(nodeIDVal, xVal, yVal, temperature_Source, humidity_Souce, nameVal, colorVal, nodeSizeVal, AirFlow);
-
-
-                    }
-                    catch { }
-
-
-
-
-
-                }
+            }
                 //else if (dataGridView1.CurrentCell.ColumnIndex == 6)
                 //{
                 //    //This one is source ==> non editable now
@@ -2101,121 +2194,261 @@ namespace WFA_psychometric_chart
                 {
                     //This one is nodesize
                     // initialNodeSize = dataGridView1.CurrentCell.Value.ToString();
-                    try
+
+                    int index = dataGridView1.CurrentCell.RowIndex;//This is the index
+                    string temperature_source = bcs.menuStripNodeInfoValues[index].temperature_source;
+                    if (temperature_source != "Mix")
                     {
 
-                        string finalSize = dataGridView1.CurrentCell.Value.ToString();
 
-                        string pattern = @"^[0-9]+$"; //for integers only
-                        Regex rgx = new Regex(pattern);
-                        //string sentence = "Who writes these notes?";
-                        if (rgx.IsMatch(finalSize) == true)
+                        try
                         {
-                            //matched no need to edit 
+
+                            string finalSize = dataGridView1.CurrentCell.Value.ToString();
+
+                            string pattern = @"^[0-9]+$"; //for integers only
+                            Regex rgx = new Regex(pattern);
+                            //string sentence = "Who writes these notes?";
+                            if (rgx.IsMatch(finalSize) == true)
+                            {
+                                //matched no need to edit 
+                            }
+                            else
+                            {
+                                MessageBox.Show("You can only input integer values");
+                                dataGridView1.CurrentCell.Value = initialNodeSize;
+                                return;
+                            }
+
                         }
-                        else
+                        catch (Exception ex)
                         {
                             MessageBox.Show("You can only input integer values");
+
                             dataGridView1.CurrentCell.Value = initialNodeSize;
                             return;
                         }
 
+                        try
+                        {
+                            //--Once the name is changed it has to save the changes
+                            // string finalSize = dataGridView1.CurrentCell.Value.ToString();
+
+                            string nodeIDVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[2].Value.ToString();
+                            string nameVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value.ToString();//--This contains the name
+                            string temperature_Source = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();//--This contains the name
+                            string humidity_Souce = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString();//--This contains the name
+                            double xVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[3].Value.ToString());
+                            // double yVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
+                            double humidity = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
+                            bcs.CalculateYFromXandHumidity(xVal, humidity / 100);
+                            double yVal = bcs.y_coord_value;
+
+                            // string showTextVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[7].Value.ToString();
+                            // Color colorVal = colorDialog1.Color;   //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[8].Style.BackColor;
+                            Color colorVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[7].Style.BackColor;
+                            int nodeSizeVal = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[8].Value.ToString());
+                            int AirFlow = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[9].Value.ToString());
+
+                            // UpdateDataValueAndRefreshDGV(nodeIDVal, xVal, yVal, sourceVal, nameVal, labelVal, colorVal, showTextVal, nodeSizeVal);
+                            updateNodeInfoBasedOnPresentValue(nodeIDVal, xVal, yVal, temperature_Source, humidity_Souce, nameVal, colorVal, nodeSizeVal, AirFlow);
+
+                        }
+                        catch { }
+
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        MessageBox.Show("You can only input integer values");
+                        //========================mixing section ==============================//
 
-                        dataGridView1.CurrentCell.Value = initialNodeSize;
-                        return;
+                        try
+                        {
+
+                            string finalSize = dataGridView1.CurrentCell.Value.ToString();
+
+                            string pattern = @"^[0-9]+$"; //for integers only
+                            Regex rgx = new Regex(pattern);
+                            //string sentence = "Who writes these notes?";
+                            if (rgx.IsMatch(finalSize) == true)
+                            {
+                                //matched no need to edit 
+                            }
+                            else
+                            {
+                                MessageBox.Show("You can only input integer values");
+                                dataGridView1.CurrentCell.Value = initialNodeSize;
+                                return;
+                            }
+
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("You can only input integer values");
+
+                            dataGridView1.CurrentCell.Value = initialNodeSize;
+                            return;
+                        }
+
+                        try
+                        {
+                            //--Once the name is changed it has to save the changes
+                            // string finalSize = dataGridView1.CurrentCell.Value.ToString();
+
+                            string nodeIDVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[2].Value.ToString();
+                            string nameVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value.ToString();//--This contains the name
+                            string temperature_Source = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();//--This contains the name
+                            string humidity_Souce = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString();//--This contains the name
+                            double xVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[3].Value.ToString());
+                            // double yVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
+                            double humidity = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
+                            bcs.CalculateYFromXandHumidity(xVal, humidity / 100);
+                            double yVal = bcs.y_coord_value;
+
+                            // string showTextVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[7].Value.ToString();
+                            // Color colorVal = colorDialog1.Color;   //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[8].Style.BackColor;
+                            Color colorVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[7].Style.BackColor;
+                            int nodeSizeVal = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[8].Value.ToString());
+                            int AirFlow = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[9].Value.ToString());
+
+                            // UpdateDataValueAndRefreshDGV(nodeIDVal, xVal, yVal, sourceVal, nameVal, labelVal, colorVal, showTextVal, nodeSizeVal);
+                            updateNodeInfoBasedOnPresentValue(nodeIDVal, xVal, yVal, "Mix", "Mix", nameVal, colorVal, nodeSizeVal, AirFlow);
+
+                        }
+                        catch { }
+
+
+                        //========================end of mixing =================================//
                     }
-
-                    try
-                    {
-                        //--Once the name is changed it has to save the changes
-                        // string finalSize = dataGridView1.CurrentCell.Value.ToString();
-                          
-                        string nodeIDVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[2].Value.ToString();
-                        string nameVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value.ToString();//--This contains the name
-                        string temperature_Source = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();//--This contains the name
-                        string humidity_Souce = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString();//--This contains the name
-                        double xVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[3].Value.ToString());
-                        // double yVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
-                        double humidity = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
-                        bcs.CalculateYFromXandHumidity(xVal, humidity / 100);
-                        double yVal = bcs.y_coord_value;
-
-                        // string showTextVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[7].Value.ToString();
-                        // Color colorVal = colorDialog1.Color;   //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[8].Style.BackColor;
-                        Color colorVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[7].Style.BackColor;
-                        int nodeSizeVal = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[8].Value.ToString());
-                        int AirFlow = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[9].Value.ToString());
-
-                        // UpdateDataValueAndRefreshDGV(nodeIDVal, xVal, yVal, sourceVal, nameVal, labelVal, colorVal, showTextVal, nodeSizeVal);
-                        updateNodeInfoBasedOnPresentValue(nodeIDVal, xVal, yVal, temperature_Source, humidity_Souce, nameVal, colorVal, nodeSizeVal, AirFlow);
-
-                    }
-                    catch { }
-    
-                }
+                } //Close of 8
                 else if (dataGridView1.CurrentCell.ColumnIndex == 9)
                 {
                     //This one is nodesize
                     // initialNodeSize = dataGridView1.CurrentCell.Value.ToString();
-                    try
+
+
+                    int index = dataGridView1.CurrentCell.RowIndex;//This is the index
+                    string temperature_source = bcs.menuStripNodeInfoValues[index].temperature_source;
+                    if (temperature_source != "Mix")
                     {
 
-                        string finalAirflow = dataGridView1.CurrentCell.Value.ToString();
 
-                        string pattern = @"^[0-9]+$"; //for integers only
-                        Regex rgx = new Regex(pattern);
-                        //string sentence = "Who writes these notes?";
-                        if (rgx.IsMatch(finalAirflow) == true)
+                        try
                         {
-                            //matched no need to edit 
+
+                            string finalAirflow = dataGridView1.CurrentCell.Value.ToString();
+
+                            string pattern = @"^[0-9]+$"; //for integers only
+                            Regex rgx = new Regex(pattern);
+                            //string sentence = "Who writes these notes?";
+                            if (rgx.IsMatch(finalAirflow) == true)
+                            {
+                                //matched no need to edit 
+                            }
+                            else
+                            {
+                                MessageBox.Show("You can only input integer values");
+                                dataGridView1.CurrentCell.Value = initialAirFlow;
+                                return;
+                            }
+
                         }
-                        else
+                        catch (Exception ex)
                         {
                             MessageBox.Show("You can only input integer values");
+
                             dataGridView1.CurrentCell.Value = initialAirFlow;
                             return;
                         }
 
+                        try
+                        {
+                            //--Once the name is changed it has to save the changes
+                            // string finalSize = dataGridView1.CurrentCell.Value.ToString();
+
+                            string nodeIDVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[2].Value.ToString();
+                            string nameVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value.ToString();//--This contains the name
+                            string temperature_Source = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();//--This contains the name
+                            string humidity_Souce = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString();//--This contains the name
+                            double xVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[3].Value.ToString());
+                            // double yVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
+                            double humidity = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
+                            bcs.CalculateYFromXandHumidity(xVal, humidity / 100);
+                            double yVal = bcs.y_coord_value;
+
+                            // string showTextVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[7].Value.ToString();
+                            Color colorVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[7].Style.BackColor;
+                            int nodeSizeVal = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[8].Value.ToString());
+                            int AirFlow = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[9].Value.ToString());
+
+                            // UpdateDataValueAndRefreshDGV(nodeIDVal, xVal, yVal, sourceVal, nameVal, labelVal, colorVal, showTextVal, nodeSizeVal);
+                            updateNodeInfoBasedOnPresentValue(nodeIDVal, xVal, yVal, temperature_Source, humidity_Souce, nameVal, colorVal, nodeSizeVal, AirFlow);
+
+                        }
+                        catch { }
+
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        MessageBox.Show("You can only input integer values");
+                        //--MIXING SECTION
 
-                        dataGridView1.CurrentCell.Value = initialAirFlow;
-                        return;
+                        try
+                        {
+
+                            string finalAirflow = dataGridView1.CurrentCell.Value.ToString();
+
+                            string pattern = @"^[0-9]+$"; //for integers only
+                            Regex rgx = new Regex(pattern);
+                            //string sentence = "Who writes these notes?";
+                            if (rgx.IsMatch(finalAirflow) == true)
+                            {
+                                //matched no need to edit 
+                            }
+                            else
+                            {
+                                MessageBox.Show("You can only input integer values");
+                                dataGridView1.CurrentCell.Value = initialAirFlow;
+                                return;
+                            }
+
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("You can only input integer values");
+
+                            dataGridView1.CurrentCell.Value = initialAirFlow;
+                            return;
+                        }
+
+                        try
+                        {
+                            //--Once the name is changed it has to save the changes
+                            // string finalSize = dataGridView1.CurrentCell.Value.ToString();
+
+                            string nodeIDVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[2].Value.ToString();
+                            string nameVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value.ToString();//--This contains the name
+                            string temperature_Source = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();//--This contains the name
+                            string humidity_Souce = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString();//--This contains the name
+                            double xVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[3].Value.ToString());
+                            // double yVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
+                            double humidity = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
+                            bcs.CalculateYFromXandHumidity(xVal, humidity / 100);
+                            double yVal = bcs.y_coord_value;
+
+                            // string showTextVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[7].Value.ToString();
+                            Color colorVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[7].Style.BackColor;
+                            int nodeSizeVal = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[8].Value.ToString());
+                            int AirFlow = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[9].Value.ToString());
+
+                            // UpdateDataValueAndRefreshDGV(nodeIDVal, xVal, yVal, sourceVal, nameVal, labelVal, colorVal, showTextVal, nodeSizeVal);
+                            updateNodeInfoBasedOnPresentValue(nodeIDVal, xVal, yVal, "Mix", "Mix", nameVal, colorVal, nodeSizeVal, AirFlow);
+
+                        }
+                        catch { }
+
+
                     }
 
-                    try
-                    {
-                        //--Once the name is changed it has to save the changes
-                        // string finalSize = dataGridView1.CurrentCell.Value.ToString();
-
-                        string nodeIDVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[2].Value.ToString();
-                        string nameVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value.ToString();//--This contains the name
-                        string temperature_Source = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();//--This contains the name
-                        string humidity_Souce = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString();//--This contains the name
-                        double xVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[3].Value.ToString());
-                        // double yVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
-                        double humidity = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
-                        bcs.CalculateYFromXandHumidity(xVal, humidity / 100);
-                        double yVal = bcs.y_coord_value;
-
-                        // string showTextVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[7].Value.ToString();
-                        Color colorVal =dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[7].Style.BackColor;
-                        int nodeSizeVal = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[8].Value.ToString());
-                        int AirFlow = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[9].Value.ToString());
-
-                        // UpdateDataValueAndRefreshDGV(nodeIDVal, xVal, yVal, sourceVal, nameVal, labelVal, colorVal, showTextVal, nodeSizeVal);
-                        updateNodeInfoBasedOnPresentValue(nodeIDVal, xVal, yVal, temperature_Source, humidity_Souce, nameVal, colorVal, nodeSizeVal, AirFlow);
-
-                    }
-                    catch { }
-
-                }
+                }//Close of 9
             }
             catch
             {

@@ -3388,6 +3388,7 @@ namespace WFA_psychometric_chart
             string tableFordevice = "tbl_" + buildingName + "_device_info_for_node";
             string tableForInputStorageFromT3000 = "tbl_" + buildingName + "_input_storage_from_T3000";
             string tableForValuesFromT3000 = "tbl_" + buildingName + "_node_data_related_T3000";
+            string tableMixNode = "tbl_" + buildingName + "_mix_node_info";
 
 
             //These two tables are for comfort zone 
@@ -3454,6 +3455,11 @@ namespace WFA_psychometric_chart
                 SQLiteCommand command8 = new SQLiteCommand(sql8, connection);
                 command8.ExecuteNonQuery();
 
+
+                //tableMixNode
+                string sql9 = "create table IF NOT EXISTS  " + tableMixNode + "  ( count INTEGER PRIMARY KEY AUTOINCREMENT,nodeID varchar(255),chartID varchar(255),previousNodeID varchar(255),nextNodeID varchar(255) )";
+                SQLiteCommand command9 = new SQLiteCommand(sql9, connection);
+                command9.ExecuteNonQuery();
 
 
 
@@ -4142,6 +4148,20 @@ namespace WFA_psychometric_chart
 
 
 
+        public class TempDataTypeForMixNode
+        {
+            public string chartID { get; set; } //--for identifying which point is selected..
+            public string nodeID { get; set; }//--this is the values that represent the point in a chart
+            public string previousNodeID { get; set; }
+            // public string source { get; set; }
+
+            public string nextNodeID { get; set; }
+           
+        }
+        public List<TempDataTypeForMixNode> mixNodeInfoList = new List<TempDataTypeForMixNode>();
+        public List<TempDataTypeForMixNode> temporaryMixNodeList = new List<TempDataTypeForMixNode>();
+
+
         public int previousNodeIndexForLineInput = 0;
 
 
@@ -4169,10 +4189,14 @@ namespace WFA_psychometric_chart
             string chartNodeGroupID = chartDetailList[id].chart_respective_nodeID;//This is for the node
             string chartLineGroupID = chartDetailList[id].chart_respective_lineID;//This is for the line
 
+            string selectedChartID = chartDetailList[id].chartID;
+
             //--Reset the context menu stip first..
             menuStripNodeInfoValues.Clear();
             //--Reset the context menu stip first..
             menuStripNodeLineInfoValues.Clear();
+            //--Now lets clear the mix node list first and then refill agiain
+            mixNodeInfoList.Clear();
 
 
             string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -4187,6 +4211,7 @@ namespace WFA_psychometric_chart
             */
             string nodeTableName = "tbl_" + selectedBuildingList[0].BuildingName + "_node_value";
             string lineTableName = "tbl_" + selectedBuildingList[0].BuildingName + "_line_value";
+            string tableMixNode = "tbl_" + selectedBuildingList[0].BuildingName + "_mix_node_info";
 
             using (SQLiteConnection connection = new SQLiteConnection(connString))
             {
@@ -4238,6 +4263,12 @@ namespace WFA_psychometric_chart
                 //--Resetting the actual index value
                 index = count; //Index is set to the count values of the node
 
+                //--Now we can find the previous id values as follows:
+                //=====================================Finding previous id value=================================//
+
+                previousNodeIndexForLineInput= IndexOfPreviousNodeForLineFunction();
+                //==================================End of previous id=======================================//
+
                 //--Adding data form the line node values...
                 SQLiteDataReader reader2x = null;
                 string queryString2x = "SELECT *  from  " + lineTableName + " WHERE chart_respective_lineID = @lineID";
@@ -4268,10 +4299,90 @@ namespace WFA_psychometric_chart
 
                 //   MessageBox.Show("count line data in menuStripNodeLineInfoValues = " + menuStripNodeLineInfoValues.Count);
 
+
+                //===============================Loading Mix NODE info===================================//
+
+
+                SQLiteDataReader readerMix = null;
+                string queryStringMix = "SELECT *  from " + tableMixNode + " WHERE chartID = @chartID";
+
+                SQLiteCommand commandMix = new SQLiteCommand(queryStringMix, connection);
+                commandMix.Parameters.AddWithValue("@chartID",selectedChartID );//This is the group id that is used to identify each node
+
+
+
+                // int count = 0;
+                readerMix = commandMix.ExecuteReader();
+                while (readerMix.Read())
+                {
+                    //editied for reading from alex db
+                    mixNodeInfoList.Add(new  TempDataTypeForMixNode
+                    {
+                        chartID = readerMix["chartID"].ToString(),
+                         nodeID = readerMix["nodeID"].ToString(), //This is just changed code : bbk305
+                        previousNodeID = readerMix["previousNodeID"].ToString(),
+                        nextNodeID = readerMix["nextNodeID"].ToString(),
+                       
+
+                    });
+
+                }
+
+
+
+                //=================================End of loading mix node============================//
+
+
+
+
+
+
+
+
+
+
             }//close of using..
 
         }
 
+
+
+
+        public int IndexOfPreviousNodeForLineFunction()
+        {
+            int indCountForPrevIdOfLine = 0;
+            string idValue = "";
+            int indexX = 0;
+            for (int i = 0; i < menuStripNodeInfoValues.Count; i++)
+            {
+                //--Now we need to count the valus
+                if (menuStripNodeInfoValues[i].temperature_source == "Mix")
+                {
+                    //Do not count 
+                }
+                else
+                {
+                    //Its not mix node so count every other nodes
+                    //indCountForPrevIdOfLine++;
+                    idValue = menuStripNodeInfoValues[i].id;
+                }
+            }
+            //--Now lets identify the node value
+            for (int i = 0; i < menuStripNodeInfoValues.Count; i++)
+                
+            {
+                /*
+               indCountForPrevIdOfLine-1 this -1 is done because 
+                          indCountForPrevIdOfLine 1 means index is 0 
+               */
+                if (idValue == menuStripNodeInfoValues[i].id)
+                {
+                    indexX = i;
+                    break;
+                }
+            }
+            return indexX;
+        }
 
         //****************************************end of the functions and code from buiding setting******************//
 
@@ -5466,6 +5577,8 @@ namespace WFA_psychometric_chart
                             for (int i = 0; i < menuStripNodeInfoValues.Count; i++)
                             {
 
+                                if(menuStripNodeInfoValues[i].temperature_source != "Mix") { 
+
                                 if ((xValue > menuStripNodeInfoValues[i].xVal - 0.25 && xValue < menuStripNodeInfoValues[i].xVal + 0.25) && (yValue > menuStripNodeInfoValues[i].yVal - 0.25 && yValue < menuStripNodeInfoValues[i].yVal + 0.25))
                                 {
 
@@ -5506,7 +5619,11 @@ namespace WFA_psychometric_chart
                                     }
 
                                 }
-                            }
+                                    //--Lets filter out the mix nodes---
+
+                                }//Close of if section
+
+                            }//Close of for loop
                         }//close of if menuStripAllValue>0
 
 
@@ -5522,6 +5639,12 @@ namespace WFA_psychometric_chart
                                 //menuStripNodeInfoValues[idSelected].xVal = xAxis1;
                                 menuStripNodeInfoValues[tempIndexForNode].yVal = yAxis1;//This value is changed...
 
+
+                                //====================For mix node movement = ===============//
+
+                                UpdateMixPointOnNodeMovement();
+
+                                //=====================End of mix node movemnt===================//
 
                                 // label5.Text = "click past x =" + menuStripNodeInfoValues[idSelected].xVal + " y " + menuStripNodeInfoValues[idSelected].yVal;
 
@@ -5598,6 +5721,11 @@ namespace WFA_psychometric_chart
                                 menuStripNodeInfoValues[tempIndexForNode].xVal = xAxis1;//--This value is just changed 
                                                                                         //menuStripNodeInfoValues[idSelected].yVal = yAxis1;
 
+                                //====================For mix node movement = ===============//
+
+                                UpdateMixPointOnNodeMovement();
+
+                                //=====================End of mix node movemnt===================//
                                 //label5.Text = "click past x =" + menuStripNodeInfoValues[idSelected].xVal + " y " + menuStripNodeInfoValues[idSelected].yVal;
 
                                 series1.Points.Clear();
@@ -5670,6 +5798,12 @@ namespace WFA_psychometric_chart
                                 menuStripNodeInfoValues[tempIndexForNode].xVal = xAxis1;
                                 menuStripNodeInfoValues[tempIndexForNode].yVal = yAxis1;
 
+
+                                //***********************For mix node section functions******************//
+
+                                //Function helps in updating the mix point x and y value when other node are moved
+                                UpdateMixPointOnNodeMovement();
+                                //************************End of the mix node ************************//
                                 //label5.Text = "click past x =" + menuStripNodeInfoValues[idSelected].xVal + " y " + menuStripNodeInfoValues[idSelected].yVal;
 
                                 series1.Points.Clear();
@@ -5750,6 +5884,121 @@ namespace WFA_psychometric_chart
 
 
         }
+
+
+
+        /// <summary>
+        /// Function update the mix values and helps in movement when the mouse 
+        /// movement is done related values
+        /// Function helps in updating the mix point x and y value when other node are moved
+        /// </summary>
+        public void UpdateMixPointOnNodeMovement()
+        {
+            /*
+                         1.Identify the node that has been changed
+                         2. Find the corresponding node and change its x and y coordinate accordingly
+
+                         */
+
+            string nodeID = menuStripNodeInfoValues[tempIndexForNode].id;//This node has change
+
+            temporaryMixNodeList.Clear();//Clearing the mix node
+          //  for (int j = 0; j < menuStripNodeInfoValues.Count; j++)
+            //{
+                //if (nodeID == menuStripNodeInfoValues[j].id)
+                //{
+                    //For every node we need to check ok 
+                    //if (menuStripNodeInfoValues[j].temperature_source == "Mix")
+                    //{
+                        //Only for mix hai
+                        string mixNodePrevNodeId = "";
+                        string mixNodeNextNodeId = "";
+                        for (int i = 0; i < mixNodeInfoList.Count; i++)
+                        {
+                            //--we need to identify mix node
+                            if (nodeID == mixNodeInfoList[i].previousNodeID)
+                            {
+                                // mixNodePrevNodeId = mixNodeInfoList[i].previousNodeID;
+                                temporaryMixNodeList.Add(new TempDataTypeForMixNode
+                                {
+                                    chartID = mixNodeInfoList[i].chartID,
+                                    nodeID = mixNodeInfoList[i].nodeID,
+                                    nextNodeID = mixNodeInfoList[i].nextNodeID,
+                                    previousNodeID = mixNodeInfoList[i].previousNodeID
+                                });
+                            }
+                            else if (nodeID == mixNodeInfoList[i].nextNodeID)
+                            {
+                                //mixNodeNextNodeId = mixNodeInfoList[i].nextNodeID;
+                                temporaryMixNodeList.Add(new TempDataTypeForMixNode
+                                {
+                                    chartID = mixNodeInfoList[i].chartID,
+                                    nodeID = mixNodeInfoList[i].nodeID,
+                                    nextNodeID = mixNodeInfoList[i].nextNodeID,
+                                    previousNodeID = mixNodeInfoList[i].previousNodeID
+                                });
+                            }
+
+                        }
+
+                        //--Found mix node and previous node id 
+                        //--Now lets get x1,y1 ,x2,y2, and m and n value
+
+                       // break;//Exit form the loop no need to do more
+                    //}//close of if mix value
+               // }//Close of if
+           // } //Close of for loop
+
+            //Now lets update the node info form temporary mix nodelists
+            for (int i = 0; i < temporaryMixNodeList.Count; i++)
+            {
+                string previousNodeID = temporaryMixNodeList[i].previousNodeID;
+                string nextNodeID = temporaryMixNodeList[i].nextNodeID;
+                double n = 0;//from next nodeid
+                double m = 0;//from previous node id
+                double x1 = 0;  //x1,y1 is for previous node id 
+                double y1 = 0;
+                double x2 = 0; //For next node id
+                double y2 = 0;
+                //Start the updating here
+                for (int x = 0; x < menuStripNodeInfoValues.Count; x++)
+                {
+                    if (previousNodeID == menuStripNodeInfoValues[x].id)
+                    {
+                        //Previous node id update
+                        m = menuStripNodeInfoValues[x].airFlow;
+                        x1 = menuStripNodeInfoValues[x].xVal;
+                        y1 = menuStripNodeInfoValues[x].yVal;
+                    }
+                    else if (nextNodeID == menuStripNodeInfoValues[x].id)
+                    {
+                        //Previous node id update
+                        n = menuStripNodeInfoValues[x].airFlow;
+                        x2 = menuStripNodeInfoValues[x].xVal;
+                        y2 = menuStripNodeInfoValues[x].yVal;
+                    }
+                }
+
+                double x_mix = ((n * x2) + (m * x1)) / (m + n);
+                double y_mix = ((n * y2) + (m * y1)) / (m + n);
+
+                //Now lets update the values in 
+                for (int x = 0; x < menuStripNodeInfoValues.Count; x++)
+                {
+                    if (temporaryMixNodeList[i].nodeID == menuStripNodeInfoValues[x].id)
+                    {
+                        //update and break
+
+                        menuStripNodeInfoValues[x].xVal = x_mix;
+                        menuStripNodeInfoValues[x].yVal = y_mix;    //Update complete
+                        break;
+                    }
+                }
+
+            }//Close of for
+
+        }
+
 
         //--This is for the indicator showing part but it not implemented right now.
         private void IndicatorLineForNodeMovement(int idSelected, double x11, double y11, double x22, double y22)
@@ -8024,9 +8273,10 @@ namespace WFA_psychometric_chart
                 {
                     //--Id of this ..
                     ID = unique_id_for_line,
-                    prevNodeId = menuStripNodeInfoValues[index - 1].id,
+                    // prevNodeId = menuStripNodeInfoValues[index - 1].id, //previousNodeIndexForLineInput
+                    prevNodeId = menuStripNodeInfoValues[previousNodeIndexForLineInput].id,
                     nextNodeId = menuStripNodeInfoValues[index].id,
-                    lineColorValue = menuStripNodeInfoValues[index - 1].colorValue,
+                    lineColorValue = menuStripNodeInfoValues[previousNodeIndexForLineInput].colorValue,
                     lineSeriesID = newLineSeries,
                     lineThickness = 3, //default thickness is 3
                     name = lineName,
@@ -8040,7 +8290,8 @@ namespace WFA_psychometric_chart
                 {
                     //--Insert the values when the flag is raised.
                     //InsertLineInfoToDB(unique_id_for_line, menuStripNodeInfoValues[index - 1].id, menuStripNodeInfoValues[index].id, menuStripNodeInfoValues[index - 1].colorValue, newLineSeries, menuStripNodeLineInfoValues[index - 1].lineThickness);
-                    InsertLineInfoToDB(unique_id_for_line, menuStripNodeInfoValues[index - 1].id, menuStripNodeInfoValues[index].id, menuStripNodeInfoValues[index - 1].colorValue, newLineSeries,3);
+                    // InsertLineInfoToDB(unique_id_for_line, menuStripNodeInfoValues[index - 1].id, menuStripNodeInfoValues[index].id, menuStripNodeInfoValues[index - 1].colorValue, newLineSeries,3);
+                    InsertLineInfoToDB(unique_id_for_line, menuStripNodeInfoValues[previousNodeIndexForLineInput].id, menuStripNodeInfoValues[index].id, menuStripNodeInfoValues[previousNodeIndexForLineInput].colorValue, newLineSeries, 3);
                 }
 
 
@@ -8056,7 +8307,8 @@ namespace WFA_psychometric_chart
                 newLineSeries.Color = menuStripNodeInfoValues[index].colorValue;
 
                 //--this sets the initial values of humidity and enthalpy
-                CalculateHumidityEnthalpy((double)menuStripNodeInfoValues[index - 1].xVal, (double)menuStripNodeInfoValues[index - 1].yVal);
+                //CalculateHumidityEnthalpy((double)menuStripNodeInfoValues[index - 1].xVal, (double)menuStripNodeInfoValues[index - 1].yVal);//previousNodeIndexForLineInput
+                CalculateHumidityEnthalpy((double)menuStripNodeInfoValues[previousNodeIndexForLineInput].xVal, (double)menuStripNodeInfoValues[previousNodeIndexForLineInput].yVal);//previousNodeIndexForLineInput
                 startHumidity1 = Math.Round(humidityCalculated, 2);//--Fro showing only up to 2 dec. eg."34.52"
                 startEnthalpy1 = Math.Round(enthalpyCalculated, 2);
                 //--This calculates the end humidity and the enthalpy values..
@@ -8065,16 +8317,21 @@ namespace WFA_psychometric_chart
                 endEnthalpy1 = Math.Round(enthalpyCalculated, 2);
                 double enthalpyChange = endEnthalpy1 - startEnthalpy1;
 
-                string sequenceDetected = menuStripNodeInfoValues[index - 1].name + " to " + menuStripNodeInfoValues[index].name;
+                // string sequenceDetected = menuStripNodeInfoValues[index - 1].name + " to " + menuStripNodeInfoValues[index].name;
+                string sequenceDetected = menuStripNodeInfoValues[previousNodeIndexForLineInput].name + " to " + menuStripNodeInfoValues[index].name;
 
 
                 string tooltipString = "Sequence :  " + sequenceDetected + " \n" + "                 start             end \n" + "Temp         :" + Math.Round(menuStripNodeInfoValues[index - 1].xVal, 2) + "               " + Math.Round(menuStripNodeInfoValues[index].xVal, 2) + "\nHumidity :" + startHumidity1 + "           " + endHumidity1 + "\nEnthalpy : " + startEnthalpy1 + "           " + endEnthalpy1 + "\nEnthalpy Change:" + enthalpyChange;
                 newLineSeries.ToolTip = tooltipString;
                 //newSeries.MarkerStyle = MarkerStyle.Circle;
                 //newSeries.Points.AddXY(menuStripNodeInfoValues[index - 1].xVal, menuStripNodeInfoValues[index].xVal, menuStripNodeInfoValues[index - 1].yVal, menuStripNodeInfoValues[index].yVal);
-                newLineSeries.Points.Add(new DataPoint(menuStripNodeInfoValues[index - 1].xVal, menuStripNodeInfoValues[index - 1].yVal));
-                double mid_point_XValue = (menuStripNodeInfoValues[index - 1].xVal + menuStripNodeInfoValues[index].xVal)/ 2;
-                double mid_point_YValue = (menuStripNodeInfoValues[index - 1].yVal + menuStripNodeInfoValues[index].yVal) / 2;
+                //newLineSeries.Points.Add(new DataPoint(menuStripNodeInfoValues[index - 1].xVal, menuStripNodeInfoValues[index - 1].yVal));
+                newLineSeries.Points.Add(new DataPoint(menuStripNodeInfoValues[previousNodeIndexForLineInput].xVal, menuStripNodeInfoValues[previousNodeIndexForLineInput].yVal));
+                //double mid_point_XValue = (menuStripNodeInfoValues[index - 1].xVal + menuStripNodeInfoValues[index].xVal)/ 2;
+                //double mid_point_YValue = (menuStripNodeInfoValues[index - 1].yVal + menuStripNodeInfoValues[index].yVal) / 2;
+                double mid_point_XValue = (menuStripNodeInfoValues[previousNodeIndexForLineInput].xVal + menuStripNodeInfoValues[index].xVal) / 2;
+                double mid_point_YValue = (menuStripNodeInfoValues[previousNodeIndexForLineInput].yVal + menuStripNodeInfoValues[index].yVal) / 2;
+
                 newLineSeries.Points.Add(new DataPoint(mid_point_XValue, mid_point_YValue));
                 newLineSeries.Points.Add(new DataPoint(menuStripNodeInfoValues[index].xVal, menuStripNodeInfoValues[index].yVal));
 
@@ -8092,6 +8349,7 @@ namespace WFA_psychometric_chart
 
 
             index++;
+            previousNodeIndexForLineInput = IndexOfPreviousNodeForLineFunction();
 
 
         }//close of buttons
@@ -11132,13 +11390,33 @@ namespace WFA_psychometric_chart
         {
             //This will help in quick insertion           
             int t = menuStripNodeInfoValues.Count;
-            if (t > 0)
-            {
-                indexRun = t+1; 
-            } else if(t == 0)
+            indexRun = 1;
+            //if (t > 0)
+            //{
+            //    indexRun = t+1; 
+            //} else if(t == 0)
+            //{
+            //    indexRun = 1;
+            //}
+
+
+
+            if (t == 0)
             {
                 indexRun = 1;
             }
+            else
+            {
+                foreach (var node in menuStripNodeInfoValues)
+                {
+                    if (node.temperature_source != "Mix")//either temperature or humidity source will have mix as property
+                    {
+                        indexRun++;
+                    }
+
+                }
+            }
+
 
             //We also need to check if the value is present or not after setting 
 
@@ -12684,17 +12962,17 @@ namespace WFA_psychometric_chart
             //x2,y2;
             double x2 = mixCorrespondingNodeValuesList[1].xVal;
             double y2 = mixCorrespondingNodeValuesList[1].yVal;
+                                                          
 
 
-
-
-
-            double x_mix = ((m * x2) + (n * x1)) / (m + n);
-            double y_mix = ((m * y2) + (n * y1)) / (m + n);
+            double x_mix = ((n * x2) + (m * x1)) / (m + n);
+            double y_mix = ((n * y2) + (m * y1)) / (m + n);
             //Now we know the coordinates we need to plot now..
 
             string idForNode = GetGUID();//This get the id
             int mixAirFlowContent = (int)(m + n);
+
+
 
 
             //Finding appropriate name
@@ -12711,8 +12989,11 @@ namespace WFA_psychometric_chart
             // MessageBox.Show(unique_id_for_node+"xval = "+ xval+" yval"+ yval+"temp "+ temperature_sourceGlobal+"hum="+ humidity_sourceGlobal+",name="+ tbName+",col="+ colorValue+",size=" +markerSize +",air="+airFlowValueGlobal.ToString());
             ObjDbOperation.InsertNodeInfoToDBWithoutDeviceInfo(CurrentSelectedBuilding, chartDetailList[indexForWhichChartIsSelected].chart_respective_nodeID, idForNode, x_mix, y_mix, "Mix","Mix", mixNodeName, Color.Blue, 20, mixAirFlowContent.ToString());
 
-            //Now plotting the values
+            //--Now inserting the node info
+            ObjDbOperation.InsertMixNodeInfo(CurrentSelectedBuilding,chartDetailList[indexForWhichChartIsSelected].chartID, idForNode, indexOfPrevPointForLineMovement, indexOfNextNodeForLineMovement);//Insertion operation
 
+            //Now plotting the values
+                             
             //=================Now refreshing the data =======================//
             //indexOfChartSelected = e.RowIndex;    //This value is changed 
             LoadNodeAndLineFromDB(indexOfChartSelected);   //Lets make it passing the stirngs 
@@ -12726,19 +13007,20 @@ namespace WFA_psychometric_chart
         }
 
 
-        int indexRun1 = 1;
+        int indexRun1x = 1;
         public string UniqueMixName()
         {
-            int t = menuStripNodeInfoValues.Count;
+            indexRun1x = 1;
+            int tx = menuStripNodeInfoValues.Count;
             //if (t > 0)
             //{
             //    indexRun1 = t + 1;
             //}
             //else 
             
-            if (t == 0)
+            if (tx == 0)
             {
-                indexRun1 = 1;
+                indexRun1x = 1;
             }
             else
             { 
@@ -12746,7 +13028,7 @@ namespace WFA_psychometric_chart
                 {
                     if (node.temperature_source == "Mix")//either temperature or humidity source will have mix as property
                     {
-                        indexRun1++;
+                        indexRun1x++;
                     }
 
                 }
@@ -12755,7 +13037,7 @@ namespace WFA_psychometric_chart
             //We also need to check if the value is present or not after setting 
 
 
-            int indNodeRun1 = indexRun1;
+            int indNodeRun1 = indexRun1x;
             string nodeName = "Mix" + indNodeRun1;//This is the node name
             for (int i = 0; i < menuStripNodeInfoValues.Count; i++)
             {
