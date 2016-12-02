@@ -370,7 +370,13 @@
     <EmbeddedResource Include="form_app_timer_historical_plot.resx">
       <DependentUpon>form_app_timer_historical_plot.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Form_Device_Information_For_EditMode.ko.resx">
+      <DependentUpon>Form_Device_Information_For_EditMode.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form_Device_Information_For_EditMode.resx">
+      <DependentUpon>Form_Device_Information_For_EditMode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_Device_Information_For_EditMode.zh.resx">
       <DependentUpon>Form_Device_Information_For_EditMode.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="form_export_data.en-US.resx">
@@ -400,10 +406,25 @@
     <EmbeddedResource Include="form_heat_map.resx">
       <DependentUpon>form_heat_map.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="form_heat_map.zh.resx">
+      <DependentUpon>form_heat_map.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_HumiditySourceDeviceInput.ko.resx">
+      <DependentUpon>Form_HumiditySourceDeviceInput.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form_HumiditySourceDeviceInput.resx">
       <DependentUpon>Form_HumiditySourceDeviceInput.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Form_HumiditySourceDeviceInput.zh.resx">
+      <DependentUpon>Form_HumiditySourceDeviceInput.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_input_by_temp_hum_for_main.ko.resx">
+      <DependentUpon>Form_input_by_temp_hum_for_main.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form_input_by_temp_hum_for_main.resx">
+      <DependentUpon>Form_input_by_temp_hum_for_main.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_input_by_temp_hum_for_main.zh.resx">
       <DependentUpon>Form_input_by_temp_hum_for_main.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form_Input_For_Seriespoint.en-US.resx">
@@ -439,6 +460,9 @@
     <EmbeddedResource Include="form_process_diagram.zh.resx">
       <DependentUpon>form_process_diagram.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Form_Psychrometric_Calculator.ko.resx">
+      <DependentUpon>Form_Psychrometric_Calculator.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form_Psychrometric_Calculator.resx">
       <DependentUpon>Form_Psychrometric_Calculator.cs</DependentUpon>
     </EmbeddedResource>
@@ -448,7 +472,13 @@
     <EmbeddedResource Include="form_state_point_management.resx">
       <DependentUpon>form_state_point_management.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Form_TemperatureSourceDeviceInput.ko.resx">
+      <DependentUpon>Form_TemperatureSourceDeviceInput.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form_TemperatureSourceDeviceInput.resx">
+      <DependentUpon>Form_TemperatureSourceDeviceInput.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_TemperatureSourceDeviceInput.zh.resx">
       <DependentUpon>Form_TemperatureSourceDeviceInput.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GraphForTrendLog.ko.resx">
@@ -476,13 +506,22 @@
     <EmbeddedResource Include="SelectLanguage.en-US.resx">
       <DependentUpon>SelectLanguage.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="SelectLanguage.ko.resx">
+      <DependentUpon>SelectLanguage.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="SelectLanguage.resx">
       <DependentUpon>SelectLanguage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GraphForTrendLog.resx">
       <DependentUpon>GraphForTrendLog.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="TrashBox.ko.resx">
+      <DependentUpon>TrashBox.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="TrashBox.resx">
+      <DependentUpon>TrashBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TrashBox.zh.resx">
       <DependentUpon>TrashBox.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />

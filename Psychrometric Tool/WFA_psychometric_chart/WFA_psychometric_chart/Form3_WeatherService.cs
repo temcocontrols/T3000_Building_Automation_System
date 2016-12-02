@@ -1549,16 +1549,16 @@ namespace WFA_psychometric_chart
 
             string path = databasePath;  //@"C:\Folder1\Folder2\Folder3\Folder4";
             string newPath = Path.GetFullPath(Path.Combine(path, @"..\"));
-            string againDbPath = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + newPath + @"Database\T3000.mdb";
+            string againDbPath = @"Data Source=" + newPath + @"Database\T3000.db";
            // MessageBox.Show("New path : " + againDbPath);
             // bool returnValue = false;
             //string latValue = "";
-            using (OleDbConnection connection = new OleDbConnection(againDbPath))
+            using (SQLiteConnection connection = new SQLiteConnection(againDbPath))
             {
                 connection.Open();
-                OleDbDataReader reader = null;
-                string queryString = "SELECT * from Building WHERE Default_SubBuilding = -1 ";//-1 or True  can be used
-                OleDbCommand command = new OleDbCommand(queryString, connection);
+                SQLiteDataReader reader = null;
+                string queryString = "SELECT * from Building WHERE Default_SubBuilding = 1 ";//-1 or True  can be used
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
                
                 reader = command.ExecuteReader();
                 while (reader.Read())

@@ -117,17 +117,79 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="$this.Text" xml:space="preserve">
+    <value>심리 측정 차트</value>
+  </data>
   <data name="chart1.Text" xml:space="preserve">
     <value>
 차트 1</value>
   </data>
-  <data name="exportDataToolStripMenuItem1.Text" xml:space="preserve">
+  <data name="clearChartToolStripMenuItem.Text" xml:space="preserve">
+    <value>명확한 도표</value>
+  </data>
+  <data name="deleteNodeToolStripMenuItem.Text" xml:space="preserve">
+    <value>노드 삭제</value>
+  </data>
+  <data name="deleteToolStripMenuItem.Text" xml:space="preserve">
+    <value>차트 삭제</value>
+  </data>
+  <data name="disconnectLineFromAToolStripMenuItem.Text" xml:space="preserve">
+    <value>라인 연결을 끊다</value>
+  </data>
+  <data name="editComfortzoneToolStripMenuItem.Text" xml:space="preserve">
+    <value>편안한 영역 편집</value>
+  </data>
+  <data name="editNodeToolStripMenuItem.Text" xml:space="preserve">
+    <value>편집 노드</value>
+  </data>
+  <data name="enableToolStripMenuItem.Text" xml:space="preserve">
+    <value>표시</value>
+  </data>
+  <data name="exitToolStripMenuItem.Text" xml:space="preserve">
+    <value>끝내기</value>
+  </data>
+  <data name="exportDataToolStripMenuItem.Text" xml:space="preserve">
     <value>데이터 내보내기</value>
   </data>
-  <data name="gb_select_date.Text" xml:space="preserve">
-    <value>열 지도</value>
+  <data name="fileToolStripMenuItem.Text" xml:space="preserve">
+    <value>파일</value>
+  </data>
+  <data name="helpPsychometricChartToolStripMenuItem.Text" xml:space="preserve">
+    <value>심리 측정 차트</value>
+  </data>
+  <data name="helpToolStripMenuItem.Text" xml:space="preserve">
+    <value>도움말</value>
+  </data>
+  <data name="historyPlotToolStripMenuItem1.Text" xml:space="preserve">
+    <value>실시간으로 플롯</value>
   </data>
   <data name="insertNodeToolStripMenuItem.Text" xml:space="preserve">
     <value>노드 삽입</value>
+  </data>
+  <data name="label3.Text" xml:space="preserve">
+    <value>대기압:</value>
+  </data>
+  <data name="label4.Text" xml:space="preserve">
+    <value>포인트 온도 때문:</value>
+  </data>
+  <data name="name.HeaderText" xml:space="preserve">
+    <value>이름</value>
+  </data>
+  <data name="optionToolStripMenuItem.Text" xml:space="preserve">
+    <value>옵션</value>
+  </data>
+  <data name="printToolStripMenuItem.Text" xml:space="preserve">
+    <value>인쇄</value>
+  </data>
+  <data name="realTimeMode.Text" xml:space="preserve">
+    <value>날씨 서비스</value>
+    <comment>Previous text: Real Time Mode</comment>
+  </data>
+  <data name="saveAsToolStripMenuItem.Text" xml:space="preserve">
+    <value>다른 이름으로 저장</value>
+  </data>
+  <data name="simulationMode.Text" xml:space="preserve">
+    <value>
+습공기 계산기</value>
   </data>
 </root>

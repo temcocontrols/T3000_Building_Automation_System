@@ -114,7 +114,7 @@ namespace WFA_psychometric_chart
             string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
             string connString = @"Data Source=" + databaseFile + ";Version=3;";
-            MessageBox.Show("connection string " + connString);
+          //  MessageBox.Show("connection string " + connString);
 
             using (SQLiteConnection connection = new SQLiteConnection(connString))
             {
@@ -236,7 +236,7 @@ namespace WFA_psychometric_chart
                 command.CommandText = sql;
                // command.Parameters.AddWithValue("@enable", "true");
                // command.Parameters.AddWithValue("@chartid", chartID);
-                MessageBox.Show("Sql= " + sql);
+               // MessageBox.Show("Sql= " + sql);
                 command.ExecuteNonQuery();
                 //SQLiteDataReader reader = command.ExecuteReader();
                 //while (reader.Read())

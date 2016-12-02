@@ -28,15 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(form_state_point_management));
             this.SuspendLayout();
             // 
             // form_state_point_management
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(940, 523);
             this.Name = "form_state_point_management";
-            this.Text = "form_state_point_management";
             this.ResumeLayout(false);
 
         }

@@ -144,9 +144,6 @@
   <data name="label1.Text" xml:space="preserve">
     <value>大厦选择：</value>
   </data>
-  <data name="label2.Text" xml:space="preserve">
-    <value>图表的数量：</value>
-  </data>
   <data name="label3.Text" xml:space="preserve">
     <value>设备状态：</value>
   </data>
@@ -164,6 +161,9 @@
   </data>
   <data name="lb_device_status.Text" xml:space="preserve">
     <value>断开的</value>
+  </data>
+  <data name="lb_number_of_chart_label.Text" xml:space="preserve">
+    <value>图表的数量：</value>
   </data>
   <data name="lb_pressure_display.Text" xml:space="preserve">
     <value>压力</value>

@@ -117,49 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="$this.Text" xml:space="preserve">
-    <value>데이터 삽입</value>
+  <data name="btnCancel.Text" xml:space="preserve">
+    <value>取消</value>
   </data>
-  <data name="btn_insert_data.Text" xml:space="preserve">
-    <value>확인</value>
+  <data name="btnSetNode.Text" xml:space="preserve">
+    <value>好</value>
   </data>
-  <data name="label1.Text" xml:space="preserve">
-    <value>국가:</value>
-  </data>
-  <data name="label10.Text" xml:space="preserve">
-    <value>해발 고도:</value>
-  </data>
-  <data name="label11.Text" xml:space="preserve">
-    <value>경도:</value>
-  </data>
-  <data name="label12.Text" xml:space="preserve">
-    <value>위도:</value>
-  </data>
-  <data name="label18.Text" xml:space="preserve">
-    <value>= 프로그램 가득</value>
-  </data>
-  <data name="label19.Text" xml:space="preserve">
-    <value>미터</value>
-  </data>
-  <data name="label2.Text" xml:space="preserve">
-    <value>상태:</value>
-  </data>
-  <data name="label20.Text" xml:space="preserve">
-    <value>건물 이름 :</value>
-  </data>
-  <data name="label3.Text" xml:space="preserve">
-    <value>도시:</value>
-  </data>
-  <data name="label4.Text" xml:space="preserve">
-    <value>거리:</value>
-  </data>
-  <data name="label5.Text" xml:space="preserve">
-    <value>우편 번호:</value>
-  </data>
-  <data name="label9.Text" xml:space="preserve">
-    <value>= 필수 입력</value>
-  </data>
-  <data name="tbn_cancel.Text" xml:space="preserve">
-    <value>취소</value>
+  <data name="cb_enthalpy_or_humidity_input.Items" xml:space="preserve">
+    <value>湿度</value>
   </data>
 </root>

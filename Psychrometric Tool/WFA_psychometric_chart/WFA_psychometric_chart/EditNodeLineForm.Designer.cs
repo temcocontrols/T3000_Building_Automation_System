@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EditNodeLineForm));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -80,10 +81,8 @@
             this.color,
             this.nodeSize,
             this.airFlow});
-            this.dataGridView1.Location = new System.Drawing.Point(3, 25);
+            resources.ApplyResources(this.dataGridView1, "dataGridView1");
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(907, 220);
-            this.dataGridView1.TabIndex = 1;
             this.dataGridView1.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dataGridView1_CellBeginEdit);
             this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick);
             this.dataGridView1.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellEndEdit);
@@ -93,7 +92,7 @@
             // 
             dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
             this.name.DefaultCellStyle = dataGridViewCellStyle1;
-            this.name.HeaderText = "Name";
+            resources.ApplyResources(this.name, "name");
             this.name.Name = "name";
             this.name.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
@@ -102,7 +101,7 @@
             dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
             this.CB_DGV_Temperature_Source.DefaultCellStyle = dataGridViewCellStyle2;
             this.CB_DGV_Temperature_Source.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
-            this.CB_DGV_Temperature_Source.HeaderText = "Temperature Source";
+            resources.ApplyResources(this.CB_DGV_Temperature_Source, "CB_DGV_Temperature_Source");
             this.CB_DGV_Temperature_Source.Items.AddRange(new object[] {
             "Manual",
             "Web",
@@ -112,23 +111,22 @@
             // 
             // nodeID
             // 
-            this.nodeID.HeaderText = "Node ID";
+            resources.ApplyResources(this.nodeID, "nodeID");
             this.nodeID.Name = "nodeID";
             this.nodeID.ReadOnly = true;
             this.nodeID.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.nodeID.Visible = false;
             // 
             // temp
             // 
             dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
             this.temp.DefaultCellStyle = dataGridViewCellStyle3;
-            this.temp.HeaderText = "Temperature";
+            resources.ApplyResources(this.temp, "temp");
             this.temp.Name = "temp";
             this.temp.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // CB_DGV_Humidity_Source
             // 
-            this.CB_DGV_Humidity_Source.HeaderText = "Humidity Source";
+            resources.ApplyResources(this.CB_DGV_Humidity_Source, "CB_DGV_Humidity_Source");
             this.CB_DGV_Humidity_Source.Items.AddRange(new object[] {
             "Manual",
             "Web",
@@ -139,7 +137,7 @@
             // 
             dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
             this.humidity.DefaultCellStyle = dataGridViewCellStyle4;
-            this.humidity.HeaderText = "Humidity";
+            resources.ApplyResources(this.humidity, "humidity");
             this.humidity.Name = "humidity";
             this.humidity.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
@@ -147,7 +145,7 @@
             // 
             dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
             this.equivalentEnthalpy.DefaultCellStyle = dataGridViewCellStyle5;
-            this.equivalentEnthalpy.HeaderText = "Equivalent Enthalpy";
+            resources.ApplyResources(this.equivalentEnthalpy, "equivalentEnthalpy");
             this.equivalentEnthalpy.Name = "equivalentEnthalpy";
             this.equivalentEnthalpy.ReadOnly = true;
             this.equivalentEnthalpy.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
@@ -157,7 +155,7 @@
             dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
             this.color.DefaultCellStyle = dataGridViewCellStyle6;
-            this.color.HeaderText = "Color";
+            resources.ApplyResources(this.color, "color");
             this.color.Name = "color";
             this.color.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             // 
@@ -165,32 +163,24 @@
             // 
             dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
             this.nodeSize.DefaultCellStyle = dataGridViewCellStyle7;
-            this.nodeSize.HeaderText = "Node Size";
+            resources.ApplyResources(this.nodeSize, "nodeSize");
             this.nodeSize.Name = "nodeSize";
             this.nodeSize.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // airFlow
             // 
-            this.airFlow.HeaderText = "Air Flow";
+            resources.ApplyResources(this.airFlow, "airFlow");
             this.airFlow.Name = "airFlow";
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 9);
+            resources.ApplyResources(this.label1, "label1");
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(63, 13);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "Edit Node : ";
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(21, 254);
+            resources.ApplyResources(this.label2, "label2");
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(98, 13);
-            this.label2.TabIndex = 4;
-            this.label2.Text = "Edit Process Line : ";
             // 
             // dataGridView2
             // 
@@ -206,11 +196,9 @@
             this.nextNodeID,
             this.lineSeriesValue,
             this.lineStatus});
-            this.dataGridView2.Location = new System.Drawing.Point(12, 276);
+            resources.ApplyResources(this.dataGridView2, "dataGridView2");
             this.dataGridView2.Name = "dataGridView2";
             this.dataGridView2.RowHeadersVisible = false;
-            this.dataGridView2.Size = new System.Drawing.Size(907, 220);
-            this.dataGridView2.TabIndex = 3;
             this.dataGridView2.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dataGridView2_CellBeginEdit);
             this.dataGridView2.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView2_CellClick);
             this.dataGridView2.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView2_CellContentClick);
@@ -218,93 +206,79 @@
             // 
             // lineID
             // 
-            this.lineID.HeaderText = "Line ID";
+            resources.ApplyResources(this.lineID, "lineID");
             this.lineID.Name = "lineID";
             this.lineID.ReadOnly = true;
             this.lineID.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.lineID.Visible = false;
             // 
             // lineName
             // 
-            this.lineName.HeaderText = "Line Name";
+            resources.ApplyResources(this.lineName, "lineName");
             this.lineName.Name = "lineName";
             // 
             // startNodeID
             // 
-            this.startNodeID.HeaderText = "Start Node Name";
+            resources.ApplyResources(this.startNodeID, "startNodeID");
             this.startNodeID.Name = "startNodeID";
             this.startNodeID.ReadOnly = true;
             this.startNodeID.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // endNodeID
             // 
-            this.endNodeID.HeaderText = "End Node Name";
+            resources.ApplyResources(this.endNodeID, "endNodeID");
             this.endNodeID.Name = "endNodeID";
             this.endNodeID.ReadOnly = true;
             this.endNodeID.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // linecolor
             // 
-            this.linecolor.HeaderText = "Color";
+            resources.ApplyResources(this.linecolor, "linecolor");
             this.linecolor.Name = "linecolor";
             this.linecolor.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             // 
             // thickness
             // 
-            this.thickness.HeaderText = "Thickness";
+            resources.ApplyResources(this.thickness, "thickness");
             this.thickness.Name = "thickness";
             this.thickness.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // prevNodeID
             // 
-            this.prevNodeID.HeaderText = "Prev node id";
+            resources.ApplyResources(this.prevNodeID, "prevNodeID");
             this.prevNodeID.Name = "prevNodeID";
-            this.prevNodeID.Visible = false;
             // 
             // nextNodeID
             // 
-            this.nextNodeID.HeaderText = "Next node id";
+            resources.ApplyResources(this.nextNodeID, "nextNodeID");
             this.nextNodeID.Name = "nextNodeID";
             this.nextNodeID.ReadOnly = true;
-            this.nextNodeID.Visible = false;
             // 
             // lineSeriesValue
             // 
-            this.lineSeriesValue.HeaderText = "line series";
+            resources.ApplyResources(this.lineSeriesValue, "lineSeriesValue");
             this.lineSeriesValue.Name = "lineSeriesValue";
             this.lineSeriesValue.ReadOnly = true;
-            this.lineSeriesValue.Visible = false;
             // 
             // lineStatus
             // 
-            this.lineStatus.HeaderText = "Show Name";
+            resources.ApplyResources(this.lineStatus, "lineStatus");
             this.lineStatus.Name = "lineStatus";
             this.lineStatus.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(294, 9);
+            resources.ApplyResources(this.label3, "label3");
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(316, 13);
-            this.label3.TabIndex = 7;
-            this.label3.Text = "Note : Equivalent Enthalpy is non-editable other fields are editable";
             // 
             // label4
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(303, 254);
+            resources.ApplyResources(this.label4, "label4");
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(415, 13);
-            this.label4.TabIndex = 8;
-            this.label4.Text = "Note : Start Node Name and End Node Name are non-editable other fields are editab" +
-    "le";
             // 
             // EditNodeLineForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(927, 501);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
@@ -314,8 +288,6 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "EditNodeLineForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Edit Node Line";
             this.Load += new System.EventHandler(this.EditNodeLineForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();

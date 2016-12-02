@@ -157,6 +157,12 @@
   <data name="setDataToolStripMenuItem.ToolTipText" xml:space="preserve">
     <value>값 설정을 클릭 합니다</value>
   </data>
+  <data name="showToolStripMenuItem.Text" xml:space="preserve">
+    <value>보기:</value>
+  </data>
+  <data name="sourceToolStripMenuItem.Text" xml:space="preserve">
+    <value>출처:</value>
+  </data>
   <data name="toolStripComboBoxShow.Items" xml:space="preserve">
     <value>레이블</value>
   </data>
@@ -165,5 +171,20 @@
   </data>
   <data name="toolStripComboBoxShow.Items2" xml:space="preserve">
     <value>원본</value>
+  </data>
+  <data name="toolStripComboBoxShow.ToolTipText" xml:space="preserve">
+    <value>어떤 정보 보기를 선택</value>
+  </data>
+  <data name="toolStripTextBoxColor.ToolTipText" xml:space="preserve">
+    <value>선택 된 색상</value>
+  </data>
+  <data name="toolStripTextBoxLabel.ToolTipText" xml:space="preserve">
+    <value>레이블 입력</value>
+  </data>
+  <data name="toolStripTextBoxName.ToolTipText" xml:space="preserve">
+    <value>이름 입력 (예. 야외 엔 탈피)</value>
+  </data>
+  <data name="toolStripTextBoxSource.ToolTipText" xml:space="preserve">
+    <value>소스를 입력 (예. openweathermaps.org)</value>
   </data>
 </root>

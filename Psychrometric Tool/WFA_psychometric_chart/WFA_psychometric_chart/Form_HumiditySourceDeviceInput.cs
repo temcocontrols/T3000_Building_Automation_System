@@ -157,7 +157,7 @@ namespace WFA_psychometric_chart
 
             if (BuildingSelected.Count > 0)
             {
-                MessageBox.Show("Building info found");
+               // MessageBox.Show("Building info found");
                 //return null;
 
                 string path = databasePath;  //@"C:\Folder1\Folder2\Folder3\Folder4";
@@ -166,9 +166,9 @@ namespace WFA_psychometric_chart
                 string againDbPath = @"Data Source=" + newPath + "" + BuildingSelected[0].Building_Path;
 
                 //C:\Program Files (x86)\T3000\
-                // string againDbPath = @"Data Source=" + newPath + @"Database\T3000.db;Version=3;";
+               // string againDbPath = @"Data Source=" + newPath + @"Database\T3000.db;Version=3;";
                 //string againDbPath = @"Data Source=C:\Program Files (x86)\T3000\Database\T3000.db;Version=3;";
-                MessageBox.Show("Path to building = " + againDbPath);
+               // MessageBox.Show("Path to building = " + againDbPath);
 
                 // String connection = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Program Files (x86)\T3000\Database\Buildings\Default_Building\Default_Building.mdb;Persist Security Info=True ";
 
@@ -284,7 +284,7 @@ namespace WFA_psychometric_chart
                             object_identifier_type = bac.object_identifier_type
 
                         });
-                        s += "\n" + bac.device_object_name + ",[" + bac.indexID + "]" + bac.presentValue + ",TYPE = " + bac.object_identifier_type;
+                      //  s += "\n" + bac.device_object_name + ",[" + bac.indexID + "]" + bac.presentValue + ",TYPE = " + bac.object_identifier_type;
                     }
 
                    // MessageBox.Show("Data returned from backnet  value =\n " + s);
@@ -390,7 +390,7 @@ namespace WFA_psychometric_chart
                 //}
             }
 
-            MessageBox.Show("Filtered temperature value form alex db should be 3 , count  = " + FilteredHumidityValueList.Count);
+           // MessageBox.Show("Filtered temperature value form alex db should be 3 , count  = " + FilteredHumidityValueList.Count);
 
         }
 
@@ -448,12 +448,12 @@ namespace WFA_psychometric_chart
                         }//Close of if functions
                     } //--Close of for loop 
                 }
-                MessageBox.Show("Test for compared value \n " + test);
+               // MessageBox.Show("Test for compared value \n " + test);
 
             }
 
 
-            MessageBox.Show("value filter form decive and alex tmeperature filter value count = " + AfterFilteringFromAlexValueListOfValues.Count);
+            //MessageBox.Show("value filter form decive and alex tmeperature filter value count = " + AfterFilteringFromAlexValueListOfValues.Count);
 
         }
 
@@ -509,7 +509,7 @@ namespace WFA_psychometric_chart
             string againDbPath = @"Data Source=" + newPath + "" + BuildingSelected[0].Building_Path;
 
 
-            MessageBox.Show("aLEX DB PATH : INPUTable New path : " + againDbPath + "\n db name  = " + TableName);
+           // MessageBox.Show("aLEX DB PATH : INPUTable New path : " + againDbPath + "\n db name  = " + TableName);
             // bool returnValue = false;
             //string latValue = "";
             using (SQLiteConnection connection = new SQLiteConnection(againDbPath))
@@ -556,7 +556,7 @@ namespace WFA_psychometric_chart
                 }
             }
 
-            MessageBox.Show("All data form alex db count = " + InputFromT3000.Count);
+           // MessageBox.Show("All data form alex db count = " + InputFromT3000.Count);
 
         }
 
@@ -751,6 +751,7 @@ namespace WFA_psychometric_chart
                 //    f1.UpdateNodeInfoForDeviceSelection(f1.tempNodeID, device_instance, deviceIP, temp_param_id, second_param_id, "temp", "enthalpy", temp_present_value, second_present_value, param1_object_identifier_type, param2_object_identifier_type);
                 //}
 
+                f1.CallFromTemperatureAndHumidtyFormForMixNodeFxn(f1.tempNodeID);
 
                 this.Close();
             }

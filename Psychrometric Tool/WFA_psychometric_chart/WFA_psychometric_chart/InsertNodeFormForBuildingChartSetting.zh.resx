@@ -120,6 +120,9 @@
   <data name="btnCancel.Text" xml:space="preserve">
     <value>取消</value>
   </data>
+  <data name="cb_enthalpy_or_humidity_input.Items" xml:space="preserve">
+    <value>湿度</value>
+  </data>
   <data name="comboBox1.Items" xml:space="preserve">
     <value>标签</value>
   </data>

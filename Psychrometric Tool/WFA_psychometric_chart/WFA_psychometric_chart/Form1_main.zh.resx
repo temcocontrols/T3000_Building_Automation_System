@@ -117,22 +117,94 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="$this.Text" xml:space="preserve">
+    <value>
+心理图</value>
+  </data>
+  <data name="clearChartToolStripMenuItem.Text" xml:space="preserve">
+    <value>清晰的图表</value>
+  </data>
+  <data name="deleteNodeToolStripMenuItem.Text" xml:space="preserve">
+    <value>
+删除节点</value>
+  </data>
+  <data name="deleteToolStripMenuItem.Text" xml:space="preserve">
+    <value>删除表</value>
+  </data>
+  <data name="disconnectLineFromAToolStripMenuItem.Text" xml:space="preserve">
+    <value>
+断开线路</value>
+  </data>
   <data name="disconnectLineToolStripMenuItem.Text" xml:space="preserve">
     <value>断开连接线</value>
+  </data>
+  <data name="editComfortzoneToolStripMenuItem.Text" xml:space="preserve">
+    <value>编辑舒适区</value>
+  </data>
+  <data name="editNodeToolStripMenuItem.Text" xml:space="preserve">
+    <value>编辑节点</value>
+  </data>
+  <data name="enableToolStripMenuItem.Text" xml:space="preserve">
+    <value>显示</value>
+  </data>
+  <data name="exitToolStripMenuItem.Text" xml:space="preserve">
+    <value>
+出口</value>
+  </data>
+  <data name="exportDataToolStripMenuItem.Text" xml:space="preserve">
+    <value>
+导出数据</value>
+  </data>
+  <data name="fileToolStripMenuItem.Text" xml:space="preserve">
+    <value>文件</value>
+  </data>
+  <data name="helpPsychometricChartToolStripMenuItem.Text" xml:space="preserve">
+    <value>心理图</value>
+  </data>
+  <data name="helpToolStripMenuItem.Text" xml:space="preserve">
+    <value>帮帮我</value>
+  </data>
+  <data name="id.HeaderText" xml:space="preserve">
+    <value>ID</value>
   </data>
   <data name="insertNodeToolStripMenuItem.Text" xml:space="preserve">
     <value>插入节点</value>
   </data>
-  <data name="label4_RH_unit.Text" xml:space="preserve">
-    <value>％</value>
+  <data name="lb_db_name.Text" xml:space="preserve">
+    <value>DBNAME</value>
+  </data>
+  <data name="lb_device_status.Text" xml:space="preserve">
+    <value>断开的</value>
+  </data>
+  <data name="lb_modeshow.Text" xml:space="preserve">
+    <value>模式：</value>
+  </data>
+  <data name="lb_number_of_chart_label.Text" xml:space="preserve">
+    <value>图表的数量：</value>
   </data>
   <data name="lb_pressure_display.Text" xml:space="preserve">
     <value>压力</value>
   </data>
+  <data name="lb_realtimeshow.Text" xml:space="preserve">
+    <value>即时的</value>
+  </data>
   <data name="lb_unit_chosen_display.Text" xml:space="preserve">
     <value>单位：SI</value>
   </data>
+  <data name="lb_web_status.Text" xml:space="preserve">
+    <value>待用</value>
+  </data>
+  <data name="lb_webstatusshow.Text" xml:space="preserve">
+    <value>Web状态：</value>
+  </data>
+  <data name="name.HeaderText" xml:space="preserve">
+    <value>名称</value>
+  </data>
   <data name="realTimeMode.Text" xml:space="preserve">
     <value>实时模式</value>
+    <comment>Previous text: Real Time Mode</comment>
+  </data>
+  <data name="settingsToolStripMenuItem.Text" xml:space="preserve">
+    <value>设置</value>
   </data>
 </root>

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form_HumiditySourceDeviceInput));
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnSetNode = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -42,23 +43,15 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.btnCancel.Location = new System.Drawing.Point(136, 195);
+            resources.ApplyResources(this.btnCancel, "btnCancel");
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(61, 25);
-            this.btnCancel.TabIndex = 59;
-            this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
             // btnSetNode
             // 
-            this.btnSetNode.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.btnSetNode.Location = new System.Drawing.Point(214, 195);
+            resources.ApplyResources(this.btnSetNode, "btnSetNode");
             this.btnSetNode.Name = "btnSetNode";
-            this.btnSetNode.Size = new System.Drawing.Size(61, 25);
-            this.btnSetNode.TabIndex = 60;
-            this.btnSetNode.Text = "Ok";
             this.btnSetNode.UseVisualStyleBackColor = true;
             this.btnSetNode.Click += new System.EventHandler(this.btnSetNode_Click);
             // 
@@ -67,76 +60,52 @@
             this.groupBox1.Controls.Add(this.groupBox3);
             this.groupBox1.Controls.Add(this.CB_Device);
             this.groupBox1.Controls.Add(this.label8);
-            this.groupBox1.Location = new System.Drawing.Point(-6, 41);
+            resources.ApplyResources(this.groupBox1, "groupBox1");
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(296, 148);
-            this.groupBox1.TabIndex = 58;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Device Detail Info";
             // 
             // groupBox3
             // 
             this.groupBox3.Controls.Add(this.CB_param_hum);
             this.groupBox3.Controls.Add(this.label9);
-            this.groupBox3.Enabled = false;
-            this.groupBox3.Location = new System.Drawing.Point(6, 42);
+            resources.ApplyResources(this.groupBox3, "groupBox3");
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(289, 100);
-            this.groupBox3.TabIndex = 6;
             this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Select Parameter (any two)";
             // 
             // CB_param_hum
             // 
             this.CB_param_hum.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.CB_param_hum.Enabled = false;
+            resources.ApplyResources(this.CB_param_hum, "CB_param_hum");
             this.CB_param_hum.FormattingEnabled = true;
-            this.CB_param_hum.Location = new System.Drawing.Point(96, 29);
             this.CB_param_hum.Name = "CB_param_hum";
-            this.CB_param_hum.Size = new System.Drawing.Size(160, 21);
-            this.CB_param_hum.TabIndex = 5;
             this.CB_param_hum.SelectedIndexChanged += new System.EventHandler(this.CB_param_hum_SelectedIndexChanged);
             // 
             // label9
             // 
-            this.label9.AutoSize = true;
-            this.label9.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label9.Location = new System.Drawing.Point(34, 37);
+            resources.ApplyResources(this.label9, "label9");
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(56, 13);
-            this.label9.TabIndex = 1;
-            this.label9.Text = "Humidity : ";
             // 
             // CB_Device
             // 
             this.CB_Device.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.CB_Device.FormattingEnabled = true;
-            this.CB_Device.Location = new System.Drawing.Point(121, 19);
+            resources.ApplyResources(this.CB_Device, "CB_Device");
             this.CB_Device.Name = "CB_Device";
-            this.CB_Device.Size = new System.Drawing.Size(160, 21);
-            this.CB_Device.TabIndex = 2;
             this.CB_Device.SelectedIndexChanged += new System.EventHandler(this.CB_Device_SelectedIndexChanged);
             // 
             // label8
             // 
-            this.label8.AutoSize = true;
-            this.label8.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label8.Location = new System.Drawing.Point(28, 19);
+            resources.ApplyResources(this.label8, "label8");
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(87, 13);
-            this.label8.TabIndex = 0;
-            this.label8.Text = "Select a device :";
             // 
             // Form_HumiditySourceDeviceInput
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 261);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnSetNode);
             this.Controls.Add(this.groupBox1);
             this.Name = "Form_HumiditySourceDeviceInput";
-            this.Text = "Form_HumiditySourceDeviceInput";
             this.Load += new System.EventHandler(this.Form_HumiditySourceDeviceInput_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();

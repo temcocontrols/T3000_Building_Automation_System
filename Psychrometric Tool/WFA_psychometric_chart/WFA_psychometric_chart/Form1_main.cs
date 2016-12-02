@@ -5898,7 +5898,7 @@ namespace WFA_psychometric_chart
                          1.Identify the node that has been changed
                          2. Find the corresponding node and change its x and y coordinate accordingly
 
-                         */
+            */
 
             string nodeID = menuStripNodeInfoValues[tempIndexForNode].id;//This node has change
 
@@ -5998,6 +5998,153 @@ namespace WFA_psychometric_chart
             }//Close of for
 
         }
+
+
+        /// <summary>
+        /// Function for making changes in mix nodes value
+        /// </summary>
+        /// <param name="NodeIDOfChangedNode">NodeID of the node changed</param>
+        public void DBUpdateMixPointOnNodeValueChange(string NodeIDOfChangedNode)
+        {
+            /*
+                         1.Identify the node that has been changed
+                         2. Find the corresponding node and change its x and y coordinate accordingly
+
+            */
+
+            string nodeID = NodeIDOfChangedNode; //menuStripNodeInfoValues[tempIndexForNode].id;//This node has change
+
+            temporaryMixNodeList.Clear();//Clearing the mix node
+                                         //  for (int j = 0; j < menuStripNodeInfoValues.Count; j++)
+                                         //{
+                                         //if (nodeID == menuStripNodeInfoValues[j].id)
+                                         //{
+                                         //For every node we need to check ok 
+                                         //if (menuStripNodeInfoValues[j].temperature_source == "Mix")
+                                         //{
+                                         //Only for mix hai
+            string mixNodePrevNodeId = "";
+            string mixNodeNextNodeId = "";
+            for (int i = 0; i < mixNodeInfoList.Count; i++)
+            {
+                //--we need to identify mix node
+                if (nodeID == mixNodeInfoList[i].previousNodeID)
+                {
+                    // mixNodePrevNodeId = mixNodeInfoList[i].previousNodeID;
+                    temporaryMixNodeList.Add(new TempDataTypeForMixNode
+                    {
+                        chartID = mixNodeInfoList[i].chartID,
+                        nodeID = mixNodeInfoList[i].nodeID,
+                        nextNodeID = mixNodeInfoList[i].nextNodeID,
+                        previousNodeID = mixNodeInfoList[i].previousNodeID
+                    });
+                }
+                else if (nodeID == mixNodeInfoList[i].nextNodeID)
+                {
+                    //mixNodeNextNodeId = mixNodeInfoList[i].nextNodeID;
+                    temporaryMixNodeList.Add(new TempDataTypeForMixNode
+                    {
+                        chartID = mixNodeInfoList[i].chartID,
+                        nodeID = mixNodeInfoList[i].nodeID,
+                        nextNodeID = mixNodeInfoList[i].nextNodeID,
+                        previousNodeID = mixNodeInfoList[i].previousNodeID
+                    });
+                }
+
+            }
+
+            //--Found mix node and previous node id 
+            //--Now lets get x1,y1 ,x2,y2, and m and n value
+
+            // break;//Exit form the loop no need to do more
+            //}//close of if mix value
+            // }//Close of if
+            // } //Close of for loop
+
+            //Now lets update the node info form temporary mix nodelists
+            for (int i = 0; i < temporaryMixNodeList.Count; i++)
+            {
+                string previousNodeID = temporaryMixNodeList[i].previousNodeID;
+                string nextNodeID = temporaryMixNodeList[i].nextNodeID;
+                double n = 0;//from next nodeid
+                double m = 0;//from previous node id
+                double x1 = 0;  //x1,y1 is for previous node id 
+                double y1 = 0;
+                double x2 = 0; //For next node id
+                double y2 = 0;
+                //Start the updating here
+                for (int x = 0; x < menuStripNodeInfoValues.Count; x++)
+                {
+                    if (previousNodeID == menuStripNodeInfoValues[x].id)
+                    {
+                        //Previous node id update
+                        m = menuStripNodeInfoValues[x].airFlow;
+                        x1 = menuStripNodeInfoValues[x].xVal;
+                        y1 = menuStripNodeInfoValues[x].yVal;
+                    }
+                    else if (nextNodeID == menuStripNodeInfoValues[x].id)
+                    {
+                        //Previous node id update
+                        n = menuStripNodeInfoValues[x].airFlow;
+                        x2 = menuStripNodeInfoValues[x].xVal;
+                        y2 = menuStripNodeInfoValues[x].yVal;
+                    }
+                }
+
+                double x_mix = ((n * x2) + (m * x1)) / (m + n);
+                double y_mix = ((n * y2) + (m * y1)) / (m + n);
+
+                int mixAirFlowValue = (int)(m + n);
+
+                //Now lets update the values in 
+                for (int x = 0; x < menuStripNodeInfoValues.Count; x++)
+                {
+                    if (temporaryMixNodeList[i].nodeID == menuStripNodeInfoValues[x].id)
+                    {
+                        //update and break
+
+                        menuStripNodeInfoValues[x].xVal = x_mix;
+                        menuStripNodeInfoValues[x].yVal = y_mix;    //Update complete
+
+                        //--Here also update the node values to database...
+                        //UpdateMixNodeValuesToDB()
+                       // MessageBox.Show("Mix node value change = " + menuStripNodeInfoValues[x].name + "\n xval" + x_mix + "\n yval= " + y_mix+"\n airflow = "+ mixAirFlowValue);
+                        UpdateMixNodeValuesToDB(temporaryMixNodeList[i].nodeID, x_mix, y_mix, mixAirFlowValue);//==m+n 
+                        break;
+                    }
+                }
+
+            }//Close of for
+
+        }
+
+        public void UpdateMixNodeValuesToDB(string NodeID,double xValue,double yValue,int AirFlowValue)
+        {
+            //We need to be able to change the air flows as well                      
+            // string tableName = "tbl_" + buildingName + "_node_value";//currentNodeTableFromDB;  
+            string tableName = "tbl_" + selectedBuildingList[0].BuildingName + "_node_value";//currentNodeTableFromDB;  
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+           // MessageBox.Show("HERE WE ARE"+ NodeID+"\n xValue = "+ xValue+"\n yval ="+yValue+"\n air flow= "+AirFlowValue);
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                string sql_string = "UPDATE " + tableName + "   set  xValue =@xVal ,  yValue=@yVal, airFlow=@airflow   where nodeID  =@id";
+                SQLiteCommand command = new SQLiteCommand(sql_string, connection);
+                command.CommandType = CommandType.Text;
+                command.Parameters.AddWithValue("@xVal", xValue.ToString());
+                command.Parameters.AddWithValue("@yVal", yValue.ToString());       
+                command.Parameters.AddWithValue("@airflow", AirFlowValue);
+                command.Parameters.AddWithValue("@id", NodeID);            
+                command.ExecuteNonQuery();
+            }
+
+        }
+           
+
 
 
         //--This is for the indicator showing part but it not implemented right now.
@@ -11681,6 +11828,21 @@ namespace WFA_psychometric_chart
                 command.ExecuteNonQuery();
 
             }//Close of using
+
+
+            ///===========This one is for deleting the mix node information form chart==========//
+            string tableNameForMixValue= "tbl_" + selectedBuildingList[0].BuildingName + "_mix_node_info";
+            using (SQLiteConnection connection = new SQLiteConnection(connString1))
+            {
+                connection.Open();
+                string queryString = "delete from " + tableNameForMixValue + " where chartID = @id_value_x";
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                command.Parameters.AddWithValue("@id_value_x", chartID);
+                command.ExecuteNonQuery();
+
+            }//Close of using
+
+
 
 
             ////--Now lets delete the chart actual content for the tbl_..._chart_detail table

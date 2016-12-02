@@ -117,25 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="button2.Text" xml:space="preserve">
-    <value>취소</value>
+  <data name="CB_DGV_Humidity_Source.Items1" xml:space="preserve">
+    <value>웹</value>
   </data>
-  <data name="label.HeaderText" xml:space="preserve">
-    <value>레이블</value>
+  <data name="CB_DGV_Temperature_Source.Items1" xml:space="preserve">
+    <value>웹</value>
   </data>
   <data name="name.HeaderText" xml:space="preserve">
     <value>이름</value>
-  </data>
-  <data name="showText.Items" xml:space="preserve">
-    <value>이름</value>
-  </data>
-  <data name="showText.Items1" xml:space="preserve">
-    <value>원본</value>
-  </data>
-  <data name="showText.Items2" xml:space="preserve">
-    <value>레이블</value>
-  </data>
-  <data name="source.HeaderText" xml:space="preserve">
-    <value>원본</value>
   </data>
 </root>

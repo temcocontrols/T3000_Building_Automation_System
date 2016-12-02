@@ -123,6 +123,9 @@
   <data name="btnSetNode.Text" xml:space="preserve">
     <value>설정된 노드</value>
   </data>
+  <data name="CB_Device_Web.Items" xml:space="preserve">
+    <value>웹</value>
+  </data>
   <data name="comboBox1.Items" xml:space="preserve">
     <value>레이블</value>
   </data>
@@ -146,5 +149,8 @@
   </data>
   <data name="label6.Text" xml:space="preserve">
     <value>색상을 변경하려면 클릭</value>
+  </data>
+  <data name="label9.Text" xml:space="preserve">
+    <value>온도:</value>
   </data>
 </root>

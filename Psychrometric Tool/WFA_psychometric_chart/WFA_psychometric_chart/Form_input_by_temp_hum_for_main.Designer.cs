@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form_input_by_temp_hum_for_main));
             this.label6 = new System.Windows.Forms.Label();
             this.btnSetNode = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
@@ -52,33 +53,20 @@
             // 
             // label6
             // 
-            this.label6.AutoSize = true;
-            this.label6.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label6.Location = new System.Drawing.Point(121, 225);
+            resources.ApplyResources(this.label6, "label6");
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(107, 13);
-            this.label6.TabIndex = 38;
-            this.label6.Text = "Click to change color";
             // 
             // btnSetNode
             // 
-            this.btnSetNode.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.btnSetNode.Location = new System.Drawing.Point(145, 259);
+            resources.ApplyResources(this.btnSetNode, "btnSetNode");
             this.btnSetNode.Name = "btnSetNode";
-            this.btnSetNode.Size = new System.Drawing.Size(61, 25);
-            this.btnSetNode.TabIndex = 37;
-            this.btnSetNode.Text = "Set Node";
             this.btnSetNode.UseVisualStyleBackColor = true;
             this.btnSetNode.Click += new System.EventHandler(this.btnSetNode_Click);
             // 
             // btnCancel
             // 
-            this.btnCancel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.btnCancel.Location = new System.Drawing.Point(54, 259);
+            resources.ApplyResources(this.btnCancel, "btnCancel");
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(61, 25);
-            this.btnCancel.TabIndex = 36;
-            this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
@@ -86,158 +74,95 @@
             // 
             this.comboBox1.FormattingEnabled = true;
             this.comboBox1.Items.AddRange(new object[] {
-            "Label",
-            "Name",
-            "Source"});
-            this.comboBox1.Location = new System.Drawing.Point(69, 120);
+            resources.GetString("comboBox1.Items"),
+            resources.GetString("comboBox1.Items1"),
+            resources.GetString("comboBox1.Items2")});
+            resources.ApplyResources(this.comboBox1, "comboBox1");
             this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(121, 21);
-            this.comboBox1.TabIndex = 35;
             // 
             // btnColor
             // 
-            this.btnColor.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.btnColor.Location = new System.Drawing.Point(69, 221);
+            resources.ApplyResources(this.btnColor, "btnColor");
             this.btnColor.Name = "btnColor";
-            this.btnColor.Size = new System.Drawing.Size(46, 23);
-            this.btnColor.TabIndex = 34;
             this.btnColor.UseVisualStyleBackColor = true;
             this.btnColor.Click += new System.EventHandler(this.btnColor_Click);
             // 
             // tbLabel
             // 
-            this.tbLabel.Location = new System.Drawing.Point(69, 84);
+            resources.ApplyResources(this.tbLabel, "tbLabel");
             this.tbLabel.Name = "tbLabel";
-            this.tbLabel.Size = new System.Drawing.Size(121, 20);
-            this.tbLabel.TabIndex = 33;
             // 
             // tbName
             // 
-            this.tbName.Location = new System.Drawing.Point(68, 51);
+            resources.ApplyResources(this.tbName, "tbName");
             this.tbName.Name = "tbName";
-            this.tbName.Size = new System.Drawing.Size(121, 20);
-            this.tbName.TabIndex = 32;
             // 
             // tbSource
             // 
-            this.tbSource.Location = new System.Drawing.Point(68, 20);
+            resources.ApplyResources(this.tbSource, "tbSource");
             this.tbSource.Name = "tbSource";
-            this.tbSource.Size = new System.Drawing.Size(121, 20);
-            this.tbSource.TabIndex = 31;
             // 
             // label5
             // 
-            this.label5.AutoSize = true;
-            this.label5.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label5.Location = new System.Drawing.Point(14, 225);
+            resources.ApplyResources(this.label5, "label5");
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(40, 13);
-            this.label5.TabIndex = 30;
-            this.label5.Text = "Color : ";
             // 
             // label4
             // 
-            this.label4.AutoSize = true;
-            this.label4.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label4.Location = new System.Drawing.Point(11, 123);
+            resources.ApplyResources(this.label4, "label4");
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(43, 13);
-            this.label4.TabIndex = 29;
-            this.label4.Text = "Show : ";
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label3.Location = new System.Drawing.Point(12, 91);
+            resources.ApplyResources(this.label3, "label3");
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(42, 13);
-            this.label3.TabIndex = 28;
-            this.label3.Text = "Label : ";
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label2.Location = new System.Drawing.Point(12, 58);
+            resources.ApplyResources(this.label2, "label2");
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(44, 13);
-            this.label2.TabIndex = 27;
-            this.label2.Text = "Name : ";
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label1.Location = new System.Drawing.Point(12, 20);
+            resources.ApplyResources(this.label1, "label1");
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(50, 13);
-            this.label1.TabIndex = 26;
-            this.label1.Text = "Source : ";
             // 
             // tb_humidity_input
             // 
-            this.tb_humidity_input.Location = new System.Drawing.Point(69, 189);
+            resources.ApplyResources(this.tb_humidity_input, "tb_humidity_input");
             this.tb_humidity_input.Name = "tb_humidity_input";
-            this.tb_humidity_input.Size = new System.Drawing.Size(121, 20);
-            this.tb_humidity_input.TabIndex = 42;
-            this.tb_humidity_input.Text = "0";
             this.tb_humidity_input.TextChanged += new System.EventHandler(this.tb_humidity_input_TextChanged);
             // 
             // tb_temperature_input
             // 
-            this.tb_temperature_input.Location = new System.Drawing.Point(69, 153);
+            resources.ApplyResources(this.tb_temperature_input, "tb_temperature_input");
             this.tb_temperature_input.Name = "tb_temperature_input";
-            this.tb_temperature_input.Size = new System.Drawing.Size(121, 20);
-            this.tb_temperature_input.TabIndex = 41;
-            this.tb_temperature_input.Text = "0";
             this.tb_temperature_input.TextChanged += new System.EventHandler(this.textBox2_TextChanged);
             // 
             // label7
             // 
-            this.label7.AutoSize = true;
-            this.label7.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label7.Location = new System.Drawing.Point(11, 192);
+            resources.ApplyResources(this.label7, "label7");
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(56, 13);
-            this.label7.TabIndex = 40;
-            this.label7.Text = "Humidity : ";
             // 
             // label8
             // 
-            this.label8.AutoSize = true;
-            this.label8.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label8.Location = new System.Drawing.Point(2, 156);
+            resources.ApplyResources(this.label8, "label8");
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(76, 13);
-            this.label8.TabIndex = 39;
-            this.label8.Text = "Temperature : ";
             // 
             // label9
             // 
-            this.label9.AutoSize = true;
-            this.label9.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label9.Location = new System.Drawing.Point(196, 156);
+            resources.ApplyResources(this.label9, "label9");
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(40, 13);
-            this.label9.TabIndex = 43;
-            this.label9.Text = "Deg C ";
             // 
             // label10
             // 
-            this.label10.AutoSize = true;
-            this.label10.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label10.Location = new System.Drawing.Point(196, 192);
+            resources.ApplyResources(this.label10, "label10");
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(15, 13);
-            this.label10.TabIndex = 44;
-            this.label10.Text = "%";
             // 
             // Form_input_by_temp_hum_for_main
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(240, 320);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.tb_humidity_input);
@@ -258,7 +183,6 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Name = "Form_input_by_temp_hum_for_main";
-            this.Text = "Input node info";
             this.Load += new System.EventHandler(this.Form_input_by_temp_hum_for_main_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

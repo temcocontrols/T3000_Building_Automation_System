@@ -750,7 +750,7 @@ namespace WFA_psychometric_chart
             //We got temperature and humidity
 
             bcs.CalculateYFromXandHumidity(double.Parse(TemperatureValue), humValue / 100);//This will get the y value
-            MessageBox.Show("Temperature Error print = " + TemperatureValue);
+           // MessageBox.Show("Temperature Error print = " + TemperatureValue);
 
             xVal = (int)double.Parse(TemperatureValue);
             yVal = bcs.y_coord_value;//This value will be updated
@@ -781,15 +781,21 @@ namespace WFA_psychometric_chart
             //------------------------------end this------------------------------------------------------//
 
             //--Refreshing data
-            RefreshDataFromDBAndChart();
+            //  RefreshDataFromDBAndChart();
             //--After refreshing
-            LoadNodeAndLine();//--Loading the data 
-
+            // LoadNodeAndLine();//--Loading the data 
+            RefreshChartAndDGVForMixNodeFunction();
         }
 
 
 
-
+         public void RefreshChartAndDGVForMixNodeFunction()
+        {
+            //--Refreshing data
+            RefreshDataFromDBAndChart();
+            //--After refreshing
+            LoadNodeAndLine();//--Loading the data 
+        }
 
 
 
@@ -909,6 +915,7 @@ namespace WFA_psychometric_chart
                         dataGridView1.Rows[indexForParticularRow].Cells[4].ReadOnly = true;
                         dataGridView1.Rows[indexForParticularRow].Cells[5].ReadOnly = true;
                         dataGridView1.Rows[indexForParticularRow].Cells[6].ReadOnly = true;
+                        dataGridView1.Rows[indexForParticularRow].Cells[9].ReadOnly = true;
 
                     }
                     else { 
@@ -1841,6 +1848,16 @@ namespace WFA_psychometric_chart
 
         }
 
+
+
+        public void CallFromTemperatureAndHumidtyFormForMixNodeFxn(string nodeID)
+        {
+
+            bcs.DBUpdateMixPointOnNodeValueChange(nodeID);
+
+            RefreshChartAndDGVForMixNodeFunction();
+        }
+
         /// <summary>
         /// This is triggered when the editing is completed
         /// 
@@ -1866,7 +1883,7 @@ namespace WFA_psychometric_chart
                         // Compare a string against the regular expression
                         // return regex.IsMatch(finalTemp);
                         //--Now lets insert the values
-                       // .                     
+                       //.                     
 
                     } catch (Exception ex)
                     {
@@ -1905,8 +1922,12 @@ namespace WFA_psychometric_chart
                         //  UpdateDataValueAndRefreshDGV(nodeIDVal, xVal, yVal, sourceVal, nameVal, labelVal, colorVal, showTextVal, nodeSizeVal);
                         updateNodeInfoBasedOnPresentValue(nodeIDVal, xVal, yVal, Temperature_sourceVal, Humidity_sourceVal, nameVal, colorVal, nodeSizeVal, airFlow);
                         // dataGridView1.CurrentCell.Style.BackColor = Color.SteelBlue;
+                        //=============================For mix node refresh function===========//
+                      //  MessageBox.Show("HERE WE ARE");
+                        bcs.DBUpdateMixPointOnNodeValueChange(nodeIDVal);
 
-
+                        RefreshChartAndDGVForMixNodeFunction();
+                         //=================================End of : For mix node section==============//
                     }
                     catch { }
 
@@ -1969,7 +1990,11 @@ namespace WFA_psychometric_chart
                         // UpdateDataValueAndRefreshDGV(nodeIDVal, xVal, yVal, sourceVal, nameVal, labelVal, colorVal, showTextVal, nodeSizeVal);
                         updateNodeInfoBasedOnPresentValue(nodeIDVal, xVal, yVal, temperature_Source, humidity_Souce, nameVal, colorVal, nodeSizeVal, AirFlow);
 
+                        //=============================For mix node refresh function===========//
+                        bcs.DBUpdateMixPointOnNodeValueChange(nodeIDVal);
 
+                        RefreshChartAndDGVForMixNodeFunction();
+                        //=================================End of : For mix node section==============//
 
                     }
                     catch { }
@@ -1994,9 +2019,7 @@ namespace WFA_psychometric_chart
                         try
                         {
 
-
-
-
+              
                             string finalName = dataGridView1.CurrentCell.Value.ToString();
 
                             string pattern = @"^\w+$"; //@"\b\w+es\b";
@@ -2382,6 +2405,11 @@ namespace WFA_psychometric_chart
 
                             // UpdateDataValueAndRefreshDGV(nodeIDVal, xVal, yVal, sourceVal, nameVal, labelVal, colorVal, showTextVal, nodeSizeVal);
                             updateNodeInfoBasedOnPresentValue(nodeIDVal, xVal, yVal, temperature_Source, humidity_Souce, nameVal, colorVal, nodeSizeVal, AirFlow);
+                            //=============================For mix node refresh function===========//
+                            bcs.DBUpdateMixPointOnNodeValueChange(nodeIDVal);
+
+                            RefreshChartAndDGVForMixNodeFunction();
+                            //=================================End of : For mix node section==============//
 
                         }
                         catch { }
