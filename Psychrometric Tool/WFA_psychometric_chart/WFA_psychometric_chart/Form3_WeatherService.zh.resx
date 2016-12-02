@@ -117,8 +117,50 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="$this.Text" xml:space="preserve">
+    <value>天气服务</value>
+  </data>
   <data name="btn_help.Text" xml:space="preserve">
     <value>帮帮我</value>
+  </data>
+  <data name="btnShowLogFile.Text" xml:space="preserve">
+    <value>显示日志文件</value>
+  </data>
+  <data name="button1.Text" xml:space="preserve">
+    <value>刷新建筑</value>
+  </data>
+  <data name="button4.Text" xml:space="preserve">
+    <value>扫描设备</value>
+  </data>
+  <data name="groupBox1.Text" xml:space="preserve">
+    <value>建筑位置</value>
+  </data>
+  <data name="groupBox2.Text" xml:space="preserve">
+    <value>室外传感器</value>
+  </data>
+  <data name="groupBox3.Text" xml:space="preserve">
+    <value>远程气象站服务</value>
+  </data>
+  <data name="groupBox4.Text" xml:space="preserve">
+    <value>气象站</value>
+  </data>
+  <data name="groupBox5.Text" xml:space="preserve">
+    <value>当前天气</value>
+  </data>
+  <data name="groupBox6.Text" xml:space="preserve">
+    <value>湿度自校准</value>
+  </data>
+  <data name="label1.Text" xml:space="preserve">
+    <value>国家：</value>
+  </data>
+  <data name="label10.Text" xml:space="preserve">
+    <value>湿度：</value>
+  </data>
+  <data name="label11.Text" xml:space="preserve">
+    <value>选择项目</value>
+  </data>
+  <data name="label12.Text" xml:space="preserve">
+    <value>值</value>
   </data>
   <data name="label13.Text" xml:space="preserve">
     <value>摄氏度</value>
@@ -126,17 +168,104 @@
   <data name="label14.Text" xml:space="preserve">
     <value>％</value>
   </data>
+  <data name="label15.Text" xml:space="preserve">
+    <value>位置：</value>
+  </data>
+  <data name="label17.Text" xml:space="preserve">
+    <value>最近更新时间：</value>
+  </data>
+  <data name="label18.Text" xml:space="preserve">
+    <value>温度：</value>
+  </data>
+  <data name="label19.Text" xml:space="preserve">
+    <value>湿度：</value>
+  </data>
+  <data name="label2.Text" xml:space="preserve">
+    <value>州：</value>
+  </data>
+  <data name="label20.Text" xml:space="preserve">
+    <value>晴雨表：</value>
+  </data>
+  <data name="label21.Text" xml:space="preserve">
+    <value>摄氏度</value>
+  </data>
   <data name="label22.Text" xml:space="preserve">
     <value>％</value>
+  </data>
+  <data name="label24.Text" xml:space="preserve">
+    <value>风：</value>
+  </data>
+  <data name="label25.Text" xml:space="preserve">
+    <value>方向：</value>
+  </data>
+  <data name="label26.Text" xml:space="preserve">
+    <value>启用：</value>
+  </data>
+  <data name="label27.Text" xml:space="preserve">
+    <value>启用：</value>
+  </data>
+  <data name="label28.Text" xml:space="preserve">
+    <value>每天最高调整：</value>
   </data>
   <data name="label29.Text" xml:space="preserve">
     <value>％</value>
   </data>
+  <data name="label3.Text" xml:space="preserve">
+    <value>市：</value>
+  </data>
+  <data name="label30.Text" xml:space="preserve">
+    <value>状态：无</value>
+  </data>
+  <data name="label31.Text" xml:space="preserve">
+    <value>电流偏移％：</value>
+  </data>
   <data name="label35.Text" xml:space="preserve">
     <value>％</value>
   </data>
+  <data name="label36.Text" xml:space="preserve">
+    <value>选择电台名称:</value>
+  </data>
+  <data name="label37.Text" xml:space="preserve">
+    <value>站距离</value>
+  </data>
+  <data name="label38.Text" xml:space="preserve">
+    <value>站名:</value>
+  </data>
+  <data name="label39.Text" xml:space="preserve">
+    <value>之间（0-1％）</value>
+  </data>
+  <data name="label4.Text" xml:space="preserve">
+    <value>街：</value>
+  </data>
+  <data name="label40.Text" xml:space="preserve">
+    <value>仪表</value>
+  </data>
+  <data name="label41.Text" xml:space="preserve">
+    <value>连接：</value>
+  </data>
+  <data name="label42.Text" xml:space="preserve">
+    <value>建筑名称：</value>
+  </data>
   <data name="label43.Text" xml:space="preserve">
-    <value>Web状态：</value>
+    <value>网络状态：</value>
+  </data>
+  <data name="label44.Text" xml:space="preserve">
+    <value>设备状态：</value>
+  </data>
+  <data name="label6.Text" xml:space="preserve">
+    <value>经度：</value>
+  </data>
+  <data name="label7.Text" xml:space="preserve">
+    <value>纬度：</value>
+  </data>
+  <data name="label8.Text" xml:space="preserve">
+    <value>高架：</value>
+  </data>
+  <data name="label9.Text" xml:space="preserve">
+    <value>温度：</value>
+  </data>
+  <data name="lb_chose_a_device.Text" xml:space="preserve">
+    <value>选择设备：</value>
   </data>
   <data name="lb_device_status.Text" xml:space="preserve">
     <value>断开的</value>
@@ -146,5 +275,11 @@
   </data>
   <data name="lb_real_time.Text" xml:space="preserve">
     <value>即时的</value>
+  </data>
+  <data name="lb_web_status.Text" xml:space="preserve">
+    <value>非活动</value>
+  </data>
+  <data name="lbConnectionIssue.Text" xml:space="preserve">
+    <value>好</value>
   </data>
 </root>

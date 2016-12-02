@@ -126,6 +126,9 @@
   <data name="CB_Device_Web.Items" xml:space="preserve">
     <value>웹</value>
   </data>
+  <data name="cb_enthalpy_or_humidity_input.Items" xml:space="preserve">
+    <value>습기</value>
+  </data>
   <data name="comboBox1.Items" xml:space="preserve">
     <value>레이블</value>
   </data>
@@ -134,6 +137,13 @@
   </data>
   <data name="comboBox1.Items2" xml:space="preserve">
     <value>원본</value>
+  </data>
+  <data name="groupBox1.Text" xml:space="preserve">
+    <value>장치 세부 정보</value>
+  </data>
+  <data name="groupBox3.Text" xml:space="preserve">
+    <value>매개 변수 선택</value>
+    <comment>Previous text: Select Parameter (any two)</comment>
   </data>
   <data name="label2.Text" xml:space="preserve">
     <value>이름: </value>
@@ -149,6 +159,9 @@
   </data>
   <data name="label6.Text" xml:space="preserve">
     <value>색상을 변경하려면 클릭</value>
+  </data>
+  <data name="label8.Text" xml:space="preserve">
+    <value>장치 선택 :</value>
   </data>
   <data name="label9.Text" xml:space="preserve">
     <value>온도:</value>

@@ -63067,7 +63067,7 @@ Enthalpy Change:</OriginalText>
     <ModuleName>Form3_WeatherService.cs</ModuleName>
     <LineNumber>1552</LineNumber>
     <ColumnNumber>36</ColumnNumber>
-    <OriginalText>Provider=Microsoft.Jet.OLEDB.4.0;Data Source=</OriginalText>
+    <OriginalText>Data Source=</OriginalText>
     <IsHidden>false</IsHidden>
     <IndexOnLine>0</IndexOnLine>
     <StartOfStatement>1552</StartOfStatement>
@@ -63083,8 +63083,8 @@ Enthalpy Change:</OriginalText>
     <SourceScanID>3702</SourceScanID>
     <ModuleName>Form3_WeatherService.cs</ModuleName>
     <LineNumber>1552</LineNumber>
-    <ColumnNumber>97</ColumnNumber>
-    <OriginalText>Database\T3000.mdb</OriginalText>
+    <ColumnNumber>64</ColumnNumber>
+    <OriginalText>Database\T3000.db</OriginalText>
     <IsHidden>false</IsHidden>
     <IndexOnLine>1</IndexOnLine>
     <StartOfStatement>1552</StartOfStatement>
@@ -63101,7 +63101,7 @@ Enthalpy Change:</OriginalText>
     <ModuleName>Form3_WeatherService.cs</ModuleName>
     <LineNumber>1560</LineNumber>
     <ColumnNumber>39</ColumnNumber>
-    <OriginalText>SELECT * from Building WHERE Default_SubBuilding = -1 </OriginalText>
+    <OriginalText>SELECT * from Building WHERE Default_SubBuilding = 1 </OriginalText>
     <IsHidden>false</IsHidden>
     <IndexOnLine>0</IndexOnLine>
     <StartOfStatement>1560</StartOfStatement>

@@ -136,7 +136,7 @@
     <value>显示</value>
   </data>
   <data name="id.HeaderText" xml:space="preserve">
-    <value>ID</value>
+    <value>识别</value>
   </data>
   <data name="insertNodeToolStripMenuItem.Text" xml:space="preserve">
     <value>插入节点</value>
@@ -151,7 +151,7 @@
     <value>即时的</value>
   </data>
   <data name="label5.Text" xml:space="preserve">
-    <value>Web状态：</value>
+    <value>网络状态：</value>
   </data>
   <data name="label6.Text" xml:space="preserve">
     <value>模式：</value>

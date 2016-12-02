@@ -117,6 +117,43 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="$this.Text" xml:space="preserve">
+    <value>空气计算器</value>
+  </data>
+  <data name="groupBox1.Text" xml:space="preserve">
+    <value>计算</value>
+  </data>
+  <data name="label1.Text" xml:space="preserve">
+    <value>温度（DBT）：</value>
+  </data>
+  <data name="label10.Text" xml:space="preserve">
+    <value>
+混合气体比：</value>
+  </data>
+  <data name="label11.Text" xml:space="preserve">
+    <value>焓：</value>
+  </data>
+  <data name="label12.Text" xml:space="preserve">
+    <value>单位：</value>
+  </data>
+  <data name="label2.Text" xml:space="preserve">
+    <value>相对湿度：</value>
+  </data>
+  <data name="label3.Text" xml:space="preserve">
+    <value>气压：</value>
+  </data>
+  <data name="label4.Text" xml:space="preserve">
+    <value>原点温度：</value>
+  </data>
+  <data name="label8.Text" xml:space="preserve">
+    <value>饱和水分压：</value>
+  </data>
+  <data name="label9.Text" xml:space="preserve">
+    <value>水分子量的分子量。 ：</value>
+  </data>
+  <data name="unit_dp.Text" xml:space="preserve">
+    <value>摄氏度</value>
+  </data>
   <data name="unit_humidity.Text" xml:space="preserve">
     <value>％</value>
   </data>

@@ -130,7 +130,13 @@
     <value>혼합된 가스 비율:</value>
   </data>
   <data name="label11.Text" xml:space="preserve">
-    <value>焓 :</value>
+    <value>엔탈피:</value>
+  </data>
+  <data name="label12.Text" xml:space="preserve">
+    <value>단위 :</value>
+  </data>
+  <data name="label2.Text" xml:space="preserve">
+    <value>상대 습도 :</value>
   </data>
   <data name="label3.Text" xml:space="preserve">
     <value>대기압:</value>

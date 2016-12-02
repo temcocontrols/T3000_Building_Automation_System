@@ -117,13 +117,65 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="airFlow.HeaderText" xml:space="preserve">
+    <value>기류</value>
+  </data>
+  <data name="CB_DGV_Humidity_Source.HeaderText" xml:space="preserve">
+    <value>습도 원</value>
+  </data>
   <data name="CB_DGV_Humidity_Source.Items1" xml:space="preserve">
     <value>웹</value>
+  </data>
+  <data name="CB_DGV_Temperature_Source.HeaderText" xml:space="preserve">
+    <value>온도 소스</value>
   </data>
   <data name="CB_DGV_Temperature_Source.Items1" xml:space="preserve">
     <value>웹</value>
   </data>
+  <data name="color.HeaderText" xml:space="preserve">
+    <value>색</value>
+  </data>
+  <data name="endNodeID.HeaderText" xml:space="preserve">
+    <value>끝 노드 이름</value>
+    <comment>Previous text: End Node ID</comment>
+  </data>
+  <data name="equivalentEnthalpy.HeaderText" xml:space="preserve">
+    <value>등가 엔탈피</value>
+  </data>
+  <data name="humidity.HeaderText" xml:space="preserve">
+    <value>습기</value>
+  </data>
+  <data name="label1.Text" xml:space="preserve">
+    <value>편집 노드 :</value>
+  </data>
+  <data name="linecolor.HeaderText" xml:space="preserve">
+    <value>색</value>
+  </data>
+  <data name="lineID.HeaderText" xml:space="preserve">
+    <value>라인 신분증</value>
+  </data>
+  <data name="lineName.HeaderText" xml:space="preserve">
+    <value>행 이름</value>
+  </data>
+  <data name="lineSeriesValue.HeaderText" xml:space="preserve">
+    <value>라인 시리즈</value>
+  </data>
+  <data name="lineStatus.HeaderText" xml:space="preserve">
+    <value>이름 표시</value>
+  </data>
   <data name="name.HeaderText" xml:space="preserve">
     <value>이름</value>
+  </data>
+  <data name="nodeSize.HeaderText" xml:space="preserve">
+    <value>노드 크기</value>
+  </data>
+  <data name="startNodeID.HeaderText" xml:space="preserve">
+    <value>시작 노드 이름</value>
+  </data>
+  <data name="temp.HeaderText" xml:space="preserve">
+    <value>온도</value>
+  </data>
+  <data name="thickness.HeaderText" xml:space="preserve">
+    <value>두께</value>
   </data>
 </root>

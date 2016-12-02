@@ -10,7 +10,7 @@
     <OriginalText />
     <SortKey>Application_Form4.cs</SortKey>
     <NodeType>0</NodeType>
-    <Expanded>true</Expanded>
+    <Expanded>false</Expanded>
     <ItemLevel>0</ItemLevel>
     <ArrayIndexOrCount>-1</ArrayIndexOrCount>
     <CompilerName />
@@ -655,7 +655,7 @@
     <OriginalText />
     <SortKey>buildingChartSetting.cs</SortKey>
     <NodeType>0</NodeType>
-    <Expanded>true</Expanded>
+    <Expanded>false</Expanded>
     <ItemLevel>0</ItemLevel>
     <ArrayIndexOrCount>-1</ArrayIndexOrCount>
     <CompilerName />
@@ -1525,7 +1525,7 @@
     <OriginalText />
     <SortKey>comfort_zone.cs</SortKey>
     <NodeType>0</NodeType>
-    <Expanded>true</Expanded>
+    <Expanded>false</Expanded>
     <ItemLevel>0</ItemLevel>
     <ArrayIndexOrCount>-1</ArrayIndexOrCount>
     <CompilerName />
@@ -2920,7 +2920,7 @@
     <OriginalText />
     <SortKey>DataGridViewDisplay.cs</SortKey>
     <NodeType>0</NodeType>
-    <Expanded>true</Expanded>
+    <Expanded>false</Expanded>
     <ItemLevel>0</ItemLevel>
     <ArrayIndexOrCount>-1</ArrayIndexOrCount>
     <CompilerName />
@@ -2965,7 +2965,7 @@
     <OriginalText />
     <SortKey>EditNodeLineForm.cs</SortKey>
     <NodeType>0</NodeType>
-    <Expanded>true</Expanded>
+    <Expanded>false</Expanded>
     <ItemLevel>0</ItemLevel>
     <ArrayIndexOrCount>-1</ArrayIndexOrCount>
     <CompilerName />
@@ -3850,7 +3850,7 @@
     <OriginalText />
     <SortKey>form_app_timer_historical_plot.cs</SortKey>
     <NodeType>0</NodeType>
-    <Expanded>true</Expanded>
+    <Expanded>false</Expanded>
     <ItemLevel>0</ItemLevel>
     <ArrayIndexOrCount>-1</ArrayIndexOrCount>
     <CompilerName />
@@ -4405,7 +4405,7 @@
     <OriginalText />
     <SortKey>Form_Device_Information_For_EditMode.cs</SortKey>
     <NodeType>0</NodeType>
-    <Expanded>true</Expanded>
+    <Expanded>false</Expanded>
     <ItemLevel>0</ItemLevel>
     <ArrayIndexOrCount>-1</ArrayIndexOrCount>
     <CompilerName />
@@ -4597,7 +4597,7 @@
     <ShortName>Text</ShortName>
     <XPath />
     <ProgID>System.Windows.Forms.GroupBox</ProgID>
-    <OriginalText>Select Parameter (any two)</OriginalText>
+    <OriginalText>Select Parameter </OriginalText>
     <SortKey>BAgroupBox3.Text</SortKey>
     <NodeType>8963</NodeType>
     <Expanded>false</Expanded>
@@ -4675,7 +4675,7 @@
     <OriginalText />
     <SortKey>form_export_data.cs</SortKey>
     <NodeType>0</NodeType>
-    <Expanded>true</Expanded>
+    <Expanded>false</Expanded>
     <ItemLevel>0</ItemLevel>
     <ArrayIndexOrCount>-1</ArrayIndexOrCount>
     <CompilerName />
@@ -4960,7 +4960,7 @@
     <OriginalText />
     <SortKey>Form_handler.cs</SortKey>
     <NodeType>0</NodeType>
-    <Expanded>true</Expanded>
+    <Expanded>false</Expanded>
     <ItemLevel>0</ItemLevel>
     <ArrayIndexOrCount>-1</ArrayIndexOrCount>
     <CompilerName />
@@ -5575,7 +5575,7 @@
     <OriginalText />
     <SortKey>form_heat_map.cs</SortKey>
     <NodeType>0</NodeType>
-    <Expanded>true</Expanded>
+    <Expanded>false</Expanded>
     <ItemLevel>0</ItemLevel>
     <ArrayIndexOrCount>-1</ArrayIndexOrCount>
     <CompilerName />
@@ -5860,7 +5860,7 @@
     <OriginalText />
     <SortKey>Form_HumiditySourceDeviceInput.cs</SortKey>
     <NodeType>0</NodeType>
-    <Expanded>true</Expanded>
+    <Expanded>false</Expanded>
     <ItemLevel>0</ItemLevel>
     <ArrayIndexOrCount>-1</ArrayIndexOrCount>
     <CompilerName />
@@ -5887,7 +5887,7 @@
     <ShortName>Text</ShortName>
     <XPath />
     <ProgID>System.Windows.Forms.Form</ProgID>
-    <OriginalText>Form_HumiditySourceDeviceInput</OriginalText>
+    <OriginalText>Humidity Source</OriginalText>
     <SortKey>AAForm_HumiditySourceDeviceInput.Text</SortKey>
     <NodeType>8963</NodeType>
     <Expanded>false</Expanded>
@@ -6007,7 +6007,7 @@
     <ShortName>Text</ShortName>
     <XPath />
     <ProgID>System.Windows.Forms.GroupBox</ProgID>
-    <OriginalText>Select Parameter (any two)</OriginalText>
+    <OriginalText>Select Parameter </OriginalText>
     <SortKey>BAgroupBox3.Text</SortKey>
     <NodeType>8963</NodeType>
     <Expanded>false</Expanded>
@@ -6085,7 +6085,7 @@
     <OriginalText />
     <SortKey>Form_input_by_temp_hum_for_main.cs</SortKey>
     <NodeType>0</NodeType>
-    <Expanded>true</Expanded>
+    <Expanded>false</Expanded>
     <ItemLevel>0</ItemLevel>
     <ArrayIndexOrCount>-1</ArrayIndexOrCount>
     <CompilerName />
@@ -6670,7 +6670,7 @@
     <OriginalText />
     <SortKey>Form_Input_For_Seriespoint.cs</SortKey>
     <NodeType>0</NodeType>
-    <Expanded>true</Expanded>
+    <Expanded>false</Expanded>
     <ItemLevel>0</ItemLevel>
     <ArrayIndexOrCount>-1</ArrayIndexOrCount>
     <CompilerName />
@@ -7135,7 +7135,7 @@
     <OriginalText />
     <SortKey>Form_point_add.cs</SortKey>
     <NodeType>0</NodeType>
-    <Expanded>true</Expanded>
+    <Expanded>false</Expanded>
     <ItemLevel>0</ItemLevel>
     <ArrayIndexOrCount>-1</ArrayIndexOrCount>
     <CompilerName />
@@ -7480,7 +7480,7 @@
     <OriginalText />
     <SortKey>form_process_diagram.cs</SortKey>
     <NodeType>0</NodeType>
-    <Expanded>true</Expanded>
+    <Expanded>false</Expanded>
     <ItemLevel>0</ItemLevel>
     <ArrayIndexOrCount>-1</ArrayIndexOrCount>
     <CompilerName />
@@ -8200,7 +8200,7 @@
     <OriginalText />
     <SortKey>Form_Psychrometric_Calculator.cs</SortKey>
     <NodeType>0</NodeType>
-    <Expanded>true</Expanded>
+    <Expanded>false</Expanded>
     <ItemLevel>0</ItemLevel>
     <ArrayIndexOrCount>-1</ArrayIndexOrCount>
     <CompilerName />
@@ -8905,7 +8905,7 @@
     <OriginalText />
     <SortKey>form_state_point_management.cs</SortKey>
     <NodeType>0</NodeType>
-    <Expanded>true</Expanded>
+    <Expanded>false</Expanded>
     <ItemLevel>0</ItemLevel>
     <ArrayIndexOrCount>-1</ArrayIndexOrCount>
     <CompilerName />
@@ -8950,7 +8950,7 @@
     <OriginalText />
     <SortKey>Form_TemperatureSourceDeviceInput.cs</SortKey>
     <NodeType>0</NodeType>
-    <Expanded>true</Expanded>
+    <Expanded>false</Expanded>
     <ItemLevel>0</ItemLevel>
     <ArrayIndexOrCount>-1</ArrayIndexOrCount>
     <CompilerName />
@@ -9097,7 +9097,7 @@
     <ShortName>Text</ShortName>
     <XPath />
     <ProgID>System.Windows.Forms.GroupBox</ProgID>
-    <OriginalText>Select Parameter (any two)</OriginalText>
+    <OriginalText>Select Parameter </OriginalText>
     <SortKey>BAgroupBox3.Text</SortKey>
     <NodeType>8963</NodeType>
     <Expanded>false</Expanded>
@@ -11035,7 +11035,7 @@
     <OriginalText />
     <SortKey>Form3_WeatherService.cs</SortKey>
     <NodeType>0</NodeType>
-    <Expanded>true</Expanded>
+    <Expanded>false</Expanded>
     <ItemLevel>0</ItemLevel>
     <ArrayIndexOrCount>-1</ArrayIndexOrCount>
     <CompilerName />
@@ -12850,7 +12850,7 @@
     <OriginalText />
     <SortKey>Form4_insert_data.cs</SortKey>
     <NodeType>0</NodeType>
-    <Expanded>true</Expanded>
+    <Expanded>false</Expanded>
     <ItemLevel>0</ItemLevel>
     <ArrayIndexOrCount>-1</ArrayIndexOrCount>
     <CompilerName />
@@ -13585,7 +13585,7 @@
     <OriginalText />
     <SortKey>GraphForTrendLog.cs</SortKey>
     <NodeType>0</NodeType>
-    <Expanded>true</Expanded>
+    <Expanded>false</Expanded>
     <ItemLevel>0</ItemLevel>
     <ArrayIndexOrCount>-1</ArrayIndexOrCount>
     <CompilerName />
@@ -13780,7 +13780,7 @@
     <OriginalText />
     <SortKey>InsertNodeFormForBuildingChartSetting.cs</SortKey>
     <NodeType>0</NodeType>
-    <Expanded>true</Expanded>
+    <Expanded>false</Expanded>
     <ItemLevel>0</ItemLevel>
     <ArrayIndexOrCount>-1</ArrayIndexOrCount>
     <CompilerName />
@@ -14077,7 +14077,7 @@
     <ShortName>Text</ShortName>
     <XPath />
     <ProgID>System.Windows.Forms.GroupBox</ProgID>
-    <OriginalText>Select Parameter (any two)</OriginalText>
+    <OriginalText>Select Parameter </OriginalText>
     <SortKey>BAgroupBox3.Text</SortKey>
     <NodeType>8963</NodeType>
     <Expanded>false</Expanded>
@@ -14335,7 +14335,7 @@
     <OriginalText />
     <SortKey>SelectLanguage.cs</SortKey>
     <NodeType>0</NodeType>
-    <Expanded>true</Expanded>
+    <Expanded>false</Expanded>
     <ItemLevel>0</ItemLevel>
     <ArrayIndexOrCount>-1</ArrayIndexOrCount>
     <CompilerName />
@@ -14530,7 +14530,7 @@
     <OriginalText />
     <SortKey>TrashBox.cs</SortKey>
     <NodeType>0</NodeType>
-    <Expanded>true</Expanded>
+    <Expanded>false</Expanded>
     <ItemLevel>0</ItemLevel>
     <ArrayIndexOrCount>-1</ArrayIndexOrCount>
     <CompilerName />

@@ -123,4 +123,7 @@
   <data name="comboBox1.Items" xml:space="preserve">
     <value>标签</value>
   </data>
+  <data name="comboBox1.Items1" xml:space="preserve">
+    <value>名称</value>
+  </data>
 </root>

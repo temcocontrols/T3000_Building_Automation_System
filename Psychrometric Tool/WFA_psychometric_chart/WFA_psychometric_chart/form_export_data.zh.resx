@@ -117,29 +117,22 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="btnCancel.Text" xml:space="preserve">
-    <value>取消</value>
+  <data name="$this.Text" xml:space="preserve">
+    <value>导出数据</value>
   </data>
-  <data name="cb_enthalpy_or_humidity_input.Items" xml:space="preserve">
-    <value>湿度</value>
-  </data>
-  <data name="comboBox1.Items" xml:space="preserve">
-    <value>标签</value>
-  </data>
-  <data name="comboBox1.Items1" xml:space="preserve">
-    <value>名称</value>
+  <data name="btnExtract.Text" xml:space="preserve">
+    <value>提取</value>
   </data>
   <data name="groupBox1.Text" xml:space="preserve">
-    <value>设备详细信息</value>
+    <value>日期</value>
   </data>
-  <data name="groupBox3.Text" xml:space="preserve">
-    <value>选择参数</value>
-    <comment>Previous text: Select Parameter (any two)</comment>
+  <data name="groupBox2.Text" xml:space="preserve">
+    <value>格式</value>
   </data>
-  <data name="label8.Text" xml:space="preserve">
-    <value>选择设备：</value>
+  <data name="label1.Text" xml:space="preserve">
+    <value>从：</value>
   </data>
-  <data name="label9.Text" xml:space="preserve">
-    <value>温度：</value>
+  <data name="label2.Text" xml:space="preserve">
+    <value>至 ：</value>
   </data>
 </root>

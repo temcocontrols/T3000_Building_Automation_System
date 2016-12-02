@@ -121,10 +121,10 @@
     <value>断开连接线</value>
   </data>
   <data name="id.HeaderText" xml:space="preserve">
-    <value>ID</value>
+    <value>识别</value>
   </data>
   <data name="id_output.HeaderText" xml:space="preserve">
-    <value>ID</value>
+    <value>识别</value>
   </data>
   <data name="insertNodeToolStripMenuItem.Text" xml:space="preserve">
     <value>插入节点</value>

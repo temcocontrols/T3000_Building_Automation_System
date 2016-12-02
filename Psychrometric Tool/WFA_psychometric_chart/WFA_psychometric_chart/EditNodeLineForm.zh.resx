@@ -120,26 +120,27 @@
   <data name="$this.Text" xml:space="preserve">
     <value>编辑节点线</value>
   </data>
-  <data name="button1.Text" xml:space="preserve">
-    <value>保存编辑的值</value>
+  <data name="airFlow.HeaderText" xml:space="preserve">
+    <value>气流</value>
   </data>
-  <data name="button2.Text" xml:space="preserve">
-    <value>取消</value>
+  <data name="CB_DGV_Humidity_Source.HeaderText" xml:space="preserve">
+    <value>湿度源</value>
+  </data>
+  <data name="CB_DGV_Temperature_Source.HeaderText" xml:space="preserve">
+    <value>温度源</value>
   </data>
   <data name="color.HeaderText" xml:space="preserve">
     <value>颜色</value>
   </data>
   <data name="endNodeID.HeaderText" xml:space="preserve">
     <value>结束节点ID</value>
+    <comment>Previous text: End Node ID</comment>
   </data>
   <data name="equivalentEnthalpy.HeaderText" xml:space="preserve">
     <value>等效热</value>
   </data>
   <data name="humidity.HeaderText" xml:space="preserve">
     <value>湿度</value>
-  </data>
-  <data name="label.HeaderText" xml:space="preserve">
-    <value>标签</value>
   </data>
   <data name="label1.Text" xml:space="preserve">
     <value>编辑节点：</value>
@@ -149,11 +150,36 @@
   </data>
   <data name="label3.Text" xml:space="preserve">
     <value>注：节点ID和等效热不可编辑等领域是可编辑的</value>
+    <comment>Previous text: Note : Node ID and Equivalent Enthalpy are non-editable other fields are editable</comment>
   </data>
   <data name="linecolor.HeaderText" xml:space="preserve">
     <value>颜色</value>
   </data>
-  <data name="showText.Items2" xml:space="preserve">
-    <value>标签</value>
+  <data name="lineID.HeaderText" xml:space="preserve">
+    <value>线 识别</value>
+  </data>
+  <data name="lineName.HeaderText" xml:space="preserve">
+    <value>行名称</value>
+  </data>
+  <data name="lineSeriesValue.HeaderText" xml:space="preserve">
+    <value>线系列</value>
+  </data>
+  <data name="lineStatus.HeaderText" xml:space="preserve">
+    <value>显示名称</value>
+  </data>
+  <data name="name.HeaderText" xml:space="preserve">
+    <value>名称</value>
+  </data>
+  <data name="nodeSize.HeaderText" xml:space="preserve">
+    <value>节点大小</value>
+  </data>
+  <data name="startNodeID.HeaderText" xml:space="preserve">
+    <value>起始节点名</value>
+  </data>
+  <data name="temp.HeaderText" xml:space="preserve">
+    <value>温度</value>
+  </data>
+  <data name="thickness.HeaderText" xml:space="preserve">
+    <value>厚度</value>
   </data>
 </root>

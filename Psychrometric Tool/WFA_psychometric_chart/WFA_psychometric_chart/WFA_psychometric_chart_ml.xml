@@ -1091,6 +1091,7 @@
   </GeneralIds>
   <GeneralIds>
     <StringID>361</StringID>
+    <Comment>Previous text: Select Parameter (any two)</Comment>
   </GeneralIds>
   <GeneralIds>
     <StringID>362</StringID>
@@ -1231,6 +1232,7 @@
   </GeneralIds>
   <GeneralIds>
     <StringID>407</StringID>
+    <Comment>Previous text: Form_HumiditySourceDeviceInput</Comment>
   </GeneralIds>
   <GeneralIds>
     <StringID>408</StringID>
@@ -3465,8 +3467,8 @@ Enthalpy : </LanguageText>
   <GeneralTexts>
     <StringID>361</StringID>
     <LanguageID>1033</LanguageID>
-    <LanguageText>Select Parameter (any two)</LanguageText>
-    <Status>1</Status>
+    <LanguageText>Select Parameter </LanguageText>
+    <Status>2</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>362</StringID>
@@ -3651,8 +3653,8 @@ Enthalpy : </LanguageText>
   <GeneralTexts>
     <StringID>302</StringID>
     <LanguageID>30724</LanguageID>
-    <LanguageText>ID</LanguageText>
-    <Status>5</Status>
+    <LanguageText>识别</LanguageText>
+    <Status>2</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>151</StringID>
@@ -3687,8 +3689,8 @@ Enthalpy : </LanguageText>
   <GeneralTexts>
     <StringID>290</StringID>
     <LanguageID>30724</LanguageID>
-    <LanguageText>Web状态：</LanguageText>
-    <Status>5</Status>
+    <LanguageText>网络状态：</LanguageText>
+    <Status>2</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>288</StringID>
@@ -3999,9 +4001,8 @@ Enthalpy : </LanguageText>
   <GeneralTexts>
     <StringID>55</StringID>
     <LanguageID>18</LanguageID>
-    <LanguageText>
-차트 1</LanguageText>
-    <Status>3</Status>
+    <LanguageText>차트 1</LanguageText>
+    <Status>2</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>295</StringID>
@@ -4432,8 +4433,8 @@ Enthalpy : </LanguageText>
   <GeneralTexts>
     <StringID>407</StringID>
     <LanguageID>1033</LanguageID>
-    <LanguageText>Form_HumiditySourceDeviceInput</LanguageText>
-    <Status>1</Status>
+    <LanguageText>Humidity Source</LanguageText>
+    <Status>2</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>408</StringID>
@@ -4606,8 +4607,8 @@ Enthalpy : </LanguageText>
   <GeneralTexts>
     <StringID>65</StringID>
     <LanguageID>18</LanguageID>
-    <LanguageText>焓 :</LanguageText>
-    <Status>3</Status>
+    <LanguageText>엔탈피:</LanguageText>
+    <Status>2</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>73</StringID>
@@ -4708,9 +4709,8 @@ Enthalpy : </LanguageText>
   <GeneralTexts>
     <StringID>421</StringID>
     <LanguageID>18</LanguageID>
-    <LanguageText>
-습공기 계산기</LanguageText>
-    <Status>3</Status>
+    <LanguageText>습공기 계산기</LanguageText>
+    <Status>2</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>87</StringID>
@@ -5382,8 +5382,7 @@ Enthalpy : </LanguageText>
   <GeneralTexts>
     <StringID>54</StringID>
     <LanguageID>30724</LanguageID>
-    <LanguageText>
-心理图</LanguageText>
+    <LanguageText>心理图</LanguageText>
     <Status>2</Status>
   </GeneralTexts>
   <GeneralTexts>
@@ -5401,8 +5400,7 @@ Enthalpy : </LanguageText>
   <GeneralTexts>
     <StringID>391</StringID>
     <LanguageID>30724</LanguageID>
-    <LanguageText>
-删除节点</LanguageText>
+    <LanguageText>删除节点</LanguageText>
     <Status>2</Status>
   </GeneralTexts>
   <GeneralTexts>
@@ -5426,8 +5424,7 @@ Enthalpy : </LanguageText>
   <GeneralTexts>
     <StringID>392</StringID>
     <LanguageID>30724</LanguageID>
-    <LanguageText>
-断开线路</LanguageText>
+    <LanguageText>断开线路</LanguageText>
     <Status>2</Status>
   </GeneralTexts>
   <GeneralTexts>
@@ -5457,15 +5454,13 @@ Enthalpy : </LanguageText>
   <GeneralTexts>
     <StringID>250</StringID>
     <LanguageID>30724</LanguageID>
-    <LanguageText>
-出口</LanguageText>
+    <LanguageText>出口</LanguageText>
     <Status>2</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>127</StringID>
     <LanguageID>30724</LanguageID>
-    <LanguageText>
-导出数据</LanguageText>
+    <LanguageText>导出数据</LanguageText>
     <Status>2</Status>
   </GeneralTexts>
   <GeneralTexts>
@@ -5484,6 +5479,970 @@ Enthalpy : </LanguageText>
     <StringID>244</StringID>
     <LanguageID>30724</LanguageID>
     <LanguageText>心理图</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>89</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>历史情节</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>388</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>当前建筑：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>388</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>현재 건물 :</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>291</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>연결이 끊긴</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>292</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>장치 상태 :</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>292</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>设备状态：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>285</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>标题</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>285</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>표제</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>283</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>단위 : SI</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>305</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>비활성</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>395</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>节点A.</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>395</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>노드 A</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>396</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>노드 B</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>396</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>节点B.</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>90</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>选项</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>248</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>打印</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>389</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>快速节点插入</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>389</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>빠른 노드 삽입</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>249</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>另存为</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>386</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>保存配置</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>386</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>구성 저장</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>296</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>환경</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>258</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>안전 지대</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>258</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>舒适区</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>421</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>心理测量计算器</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>385</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>垃圾箱</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>385</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>휴지통</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>87</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>天气服务</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>376</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>扫描设备</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>376</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>장치 스캔</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>205</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>显示日志文件</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>94</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>刷新建筑</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>92</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>建筑位置</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>96</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>室外传感器</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>365</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>장치 상태 :</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>297</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>안전 지대</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>289</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>비활성</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>387</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>구성로드</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>387</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>负载配置</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>5</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>插入数据</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>10</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>国家：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>6</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>海拔：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>1</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>经度：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>8</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>纬度：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>14</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>仪表</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>252</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>建筑名称：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>12</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>州：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>4</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>市：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>16</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>街：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>7</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>
+压缩：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>414</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>垃圾箱</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>414</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>휴지통</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>419</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>恢复 </LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>416</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>图表ID</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>416</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>
+차트 ID</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>417</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>图表名称</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>417</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>차트 이름</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>415</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>计数</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>415</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>카운트</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>418</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>恢复</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>418</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>다시 실행</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>102</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>远程气象站服务</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>119</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>气象站</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>112</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>当前天气</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>107</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>湿度自校准</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>100</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>湿度：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>377</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>选择项目</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>377</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>항목 선택</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>98</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>值</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>125</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>位置：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>123</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>最近更新时间：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>101</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>温度：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>118</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>晴雨表：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>115</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>风：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>114</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>方向：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>106</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>启用：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>110</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>每天最高调整：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>207</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>状态：无</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>109</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>电流偏移％：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>262</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>选择电台名称:</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>103</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>站距离</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>104</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>站名:</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>206</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>连接：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>286</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>选择设备：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>286</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>
+장치 선택 :</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>288</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>방법: </LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>287</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>실시간</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>290</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>웹 상태 :</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>95</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>高架：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>289</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>非活动</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>204</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>好</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>108</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>之间（0-1％）</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>117</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>摄氏度</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>302</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>신분증</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>393</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>添加混合节点</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>393</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>믹스 노드 추가</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>63</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>摄氏度</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>67</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>水分子量的分子量。 ：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>68</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>饱和水分压：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>72</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>原点温度：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>73</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>气压：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>74</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>相对湿度：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>74</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>상대 습도 :</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>276</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>单位：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>276</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>단위 :</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>65</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>焓：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>66</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>
+混合气体比：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>75</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>温度（DBT）：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>58</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>计算</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>203</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>空气计算器</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>360</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>设备详细信息</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>360</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>장치 세부 정보</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>361</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>选择参数</LanguageText>
+    <Status>7</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>361</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>매개 변수 선택</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>363</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>选择设备：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>363</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>장치 선택 :</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>408</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>湿度：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>408</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>습기:</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>407</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>湿度源</LanguageText>
+    <Status>7</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>407</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>습도 소스</LanguageText>
+    <Status>7</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>126</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>热图</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>139</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>图表选项</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>140</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>选择日期</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>53</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>从：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>52</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>至 ：</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>137</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>打印地图</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>135</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>提取</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>130</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>日期</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>131</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>格式</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>400</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>气流</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>400</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>기류</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>399</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>湿度源</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>399</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>습도 원</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>398</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>温度源</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>398</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>온도 소스</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>331</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>등가 엔탈피</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>330</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>습기</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>335</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>편집 노드 :</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>401</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>라인 신분증</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>401</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>线 识别</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>337</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>行名称</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>337</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>행 이름</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>404</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>线系列</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>404</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>라인 시리즈</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>405</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>显示名称</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>405</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>이름 표시</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>144</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>名称</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>334</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>节点大小</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>334</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>노드 크기</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>338</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>起始节点名</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>338</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>시작 노드 이름</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>329</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>温度</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>329</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>온도</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>340</StringID>
+    <LanguageID>30724</LanguageID>
+    <LanguageText>厚度</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>340</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>두께</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>339</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>끝 노드 이름</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>333</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>색</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>306</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>안락 영역 설정</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>317</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>더하다</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>316</StringID>
+    <LanguageID>18</LanguageID>
+    <LanguageText>최신 정보</LanguageText>
     <Status>2</Status>
   </GeneralTexts>
   <Properties>

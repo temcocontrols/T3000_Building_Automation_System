@@ -120,9 +120,11 @@
   <data name="$this.Text" xml:space="preserve">
     <value>심리 측정 차트</value>
   </data>
+  <data name="addMixNodeToolStripMenuItem.Text" xml:space="preserve">
+    <value>믹스 노드 추가</value>
+  </data>
   <data name="chart1.Text" xml:space="preserve">
-    <value>
-차트 1</value>
+    <value>차트 1</value>
   </data>
   <data name="clearChartToolStripMenuItem.Text" xml:space="preserve">
     <value>명확한 도표</value>
@@ -163,6 +165,9 @@
   <data name="historyPlotToolStripMenuItem1.Text" xml:space="preserve">
     <value>실시간으로 플롯</value>
   </data>
+  <data name="id.HeaderText" xml:space="preserve">
+    <value>신분증</value>
+  </data>
   <data name="insertNodeToolStripMenuItem.Text" xml:space="preserve">
     <value>노드 삽입</value>
   </data>
@@ -172,14 +177,53 @@
   <data name="label4.Text" xml:space="preserve">
     <value>포인트 온도 때문:</value>
   </data>
+  <data name="lb_buildingselectedShow.Text" xml:space="preserve">
+    <value>현재 건물 :</value>
+  </data>
+  <data name="lb_device_status.Text" xml:space="preserve">
+    <value>연결이 끊긴</value>
+  </data>
+  <data name="lb_devicestatusshow.Text" xml:space="preserve">
+    <value>장치 상태 :</value>
+  </data>
+  <data name="lb_modeshow.Text" xml:space="preserve">
+    <value>방법: </value>
+  </data>
+  <data name="lb_realtimeshow.Text" xml:space="preserve">
+    <value>실시간</value>
+  </data>
+  <data name="lb_title_display.Text" xml:space="preserve">
+    <value>표제</value>
+  </data>
+  <data name="lb_unit_chosen_display.Text" xml:space="preserve">
+    <value>단위 : SI</value>
+  </data>
+  <data name="lb_web_status.Text" xml:space="preserve">
+    <value>비활성</value>
+  </data>
+  <data name="lb_webstatusshow.Text" xml:space="preserve">
+    <value>웹 상태 :</value>
+  </data>
+  <data name="loadConfigurationToolStripMenuItem.Text" xml:space="preserve">
+    <value>구성로드</value>
+  </data>
   <data name="name.HeaderText" xml:space="preserve">
     <value>이름</value>
+  </data>
+  <data name="nodeAToolStripMenuItem.Text" xml:space="preserve">
+    <value>노드 A</value>
+  </data>
+  <data name="nodeBToolStripMenuItem.Text" xml:space="preserve">
+    <value>노드 B</value>
   </data>
   <data name="optionToolStripMenuItem.Text" xml:space="preserve">
     <value>옵션</value>
   </data>
   <data name="printToolStripMenuItem.Text" xml:space="preserve">
     <value>인쇄</value>
+  </data>
+  <data name="quickNodeInsertToolStripMenuItem.Text" xml:space="preserve">
+    <value>빠른 노드 삽입</value>
   </data>
   <data name="realTimeMode.Text" xml:space="preserve">
     <value>날씨 서비스</value>
@@ -188,8 +232,19 @@
   <data name="saveAsToolStripMenuItem.Text" xml:space="preserve">
     <value>다른 이름으로 저장</value>
   </data>
+  <data name="saveConfigurationToolStripMenuItem.Text" xml:space="preserve">
+    <value>구성 저장</value>
+  </data>
+  <data name="settingsToolStripMenuItem.Text" xml:space="preserve">
+    <value>환경</value>
+  </data>
+  <data name="showComfortZoneToolStripMenuItem.Text" xml:space="preserve">
+    <value>안전 지대</value>
+  </data>
   <data name="simulationMode.Text" xml:space="preserve">
-    <value>
-습공기 계산기</value>
+    <value>습공기 계산기</value>
+  </data>
+  <data name="trashBoxToolStripMenuItem.Text" xml:space="preserve">
+    <value>휴지통</value>
   </data>
 </root>

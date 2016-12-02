@@ -8893,11 +8893,25 @@ namespace WFA_psychometric_chart
         //Now for storing the actual confort zone values
         public List<dataTypeForCF> ComfortZonesDetailForSaving = new List<dataTypeForCF>();  //This one contains the comfortzone setting
 
+        public class dataTypeFor_mix_node_info
+        {
+            public string ChartID { get; set; }
+
+            public string nodeID { get; set; }
+            //public string min_temp { get; set; }
+           // public string max_temp { get; set; }
+            public string previousNodeID { get; set; }
+            public string nextNodeID { get; set; }
+            //public Color colorValue { get; set; }
+        }
+
+        public List<dataTypeFor_mix_node_info> mixNodeInfoListForSaveConfiguration = new List<dataTypeFor_mix_node_info>();  //This one contains the comfortzone setting
+
         /// <summary>
         /// Read data form db to save as SQLite file
         /// </summary>
 
-        public void ReadDataForSavingConfiguration(string path,string chartTableName,string nodeTableName,string lineTableName,string tableNameDevice,string tableForComfortZoneSetting,string tableForCF_Detail)
+        public void ReadDataForSavingConfiguration(string path,string chartTableName,string nodeTableName,string lineTableName,string tableNameDevice,string tableForComfortZoneSetting,string tableForCF_Detail,string mixnodeInfoTable)
         {
 
             //--Resetting values first
@@ -8907,7 +8921,7 @@ namespace WFA_psychometric_chart
             deviceInfoPulledForSaving.Clear();
             comfortZoneInforForEachChartForSaving.Clear();
             ComfortZonesDetailForSaving.Clear();
-
+            mixNodeInfoListForSaveConfiguration.Clear();
 
             ////--This reads the value of data form db lets use list for storing the data
             //string chartTableName = "tbl_" + selectedBuildingList[0].BuildingName + "_chart_detail";
@@ -8929,6 +8943,8 @@ namespace WFA_psychometric_chart
             string sql_forDevice = "SELECT * From  " + tableNameDevice;
             string sql_for_CF_Setting = "SELECT * From  " + tableForComfortZoneSetting;
             string sql_for_CF_Detail = "SELECT * From  " + tableForCF_Detail;
+            string sql_for_mix_node_info = "SELECT * From  " + mixnodeInfoTable;
+                ;
 
 
 
@@ -9089,16 +9105,42 @@ namespace WFA_psychometric_chart
 
 
 
+                //==For mix node loading up 
+                SQLiteCommand cmd6 = new SQLiteCommand(sql_for_mix_node_info, conx);
+                SQLiteDataReader reader6 = cmd6.ExecuteReader();
+
+                while (reader6.Read())
+                {
+                    if (reader6["chartID"].ToString() != "")
+                    {
+                        //This is the reading part of the data...
+                        mixNodeInfoListForSaveConfiguration.Add(new dataTypeFor_mix_node_info
+                        {
+                            ChartID = reader6["chartID"].ToString(),//reader["chartID"].ToString(),
+                            nodeID = reader6["nodeID"].ToString(),
+                            previousNodeID = reader6["previousNodeID"].ToString(),
+                            nextNodeID = reader6["nextNodeID"].ToString(), 
+                        });
+                    }
+                }
+
+
 
             } //close of using statement 
 
-               
-        }
 
 
 
-        //Lets have a list for chartDetailList
-        public List<chartDetailDT_X> chartInfoPulledForSaving_For_Load = new List<chartDetailDT_X>();//This is used for storing the chart detail ids
+        //} //close of using statement 
+
+
+
+    }
+
+
+
+    //Lets have a list for chartDetailList
+    public List<chartDetailDT_X> chartInfoPulledForSaving_For_Load = new List<chartDetailDT_X>();//This is used for storing the chart detail ids
 
         //Nowlets have the node information ==>> all node information
         public List<nodeDataTypeForSaving> nodeInfoPulledForSaving_For_Load = new List<nodeDataTypeForSaving>();
@@ -9115,8 +9157,10 @@ namespace WFA_psychometric_chart
         //Now for storing the actual confort zone values
         public List<dataTypeForCF> ComfortZonesDetailForSaving_For_Load = new List<dataTypeForCF>();  //This one contains the comfortzone setting
 
+        public List<dataTypeFor_mix_node_info> mixNodeList_For_Load = new List<dataTypeFor_mix_node_info>();  //This one contains the comfortzone setting
 
-        public void ReadDataForSavingConfiguration_For_Load(string DB_String_path, string chartTableName, string nodeTableName, string lineTableName, string tableNameDevice, string tableForComfortZoneSetting, string tableForCF_Detail)
+
+        public void ReadDataForSavingConfiguration_For_Load(string DB_String_path, string chartTableName, string nodeTableName, string lineTableName, string tableNameDevice, string tableForComfortZoneSetting, string tableForCF_Detail,string tableForMixNode)
         {
 
             //--Resetting values first
@@ -9126,6 +9170,7 @@ namespace WFA_psychometric_chart
             deviceInfoPulledForSaving_For_Load.Clear();
             comfortZoneInforForEachChartForSaving_For_Load.Clear();
             ComfortZonesDetailForSaving_For_Load.Clear();
+            mixNodeList_For_Load.Clear();
 
             string connectionString = DB_String_path;// @"Data Source=" + path + ";Version=3;";
            
@@ -9135,6 +9180,7 @@ namespace WFA_psychometric_chart
             string sql_forDevice = "SELECT * From  " + tableNameDevice;
             string sql_for_CF_Setting = "SELECT * From  " + tableForComfortZoneSetting;
             string sql_for_CF_Detail = "SELECT * From  " + tableForCF_Detail;
+            string sql_for_mix_node = "SELECT * From  " + tableForMixNode;
 
 
 
@@ -9417,6 +9463,50 @@ namespace WFA_psychometric_chart
 
             }
 
+            //=============For MXING PART====================//
+
+
+
+
+            using (SQLiteConnection conName = new SQLiteConnection(connectionString))
+            {
+                conName.Open();
+                //--Now reading the chart info
+                using (SQLiteCommand cmd5 = new SQLiteCommand(sql_for_mix_node, conName))
+                {
+                    SQLiteDataReader reader5 = cmd5.ExecuteReader();
+                    while (reader5.Read())
+                    {
+
+                        if (reader5["chartID"].ToString() != "")
+                        {
+                            foreach (var items in mixNodeList_For_Load)
+                            {
+                                if (items.ChartID == reader5["chartID"].ToString())
+                                {
+                                    //if contain do not add
+                                    return;
+                                }
+                            }
+
+                            mixNodeList_For_Load.Add(new dataTypeFor_mix_node_info
+                            {                                                                             
+                                ChartID = reader5["chartID"].ToString(),
+                                nodeID = reader5["nodeID"].ToString(),
+                                previousNodeID = reader5["previousNodeID"].ToString(),
+                                nextNodeID = reader5["nextNodeID"].ToString()
+
+                            });
+                        }
+                    }
+                    reader5.Close();
+                }
+            }
+
+          //=======================END MIXING=========================//
+
+
+
         }
 
 
@@ -9426,7 +9516,7 @@ namespace WFA_psychometric_chart
         /// <param name="fileWithPath">file name with path</param>
 
 
-        public void InsertForSavingConfiguration(string fileWithPath, string chartTableName, string nodeTableName, string lineTableName, string tableNameDevice, string tableForComfortZoneSetting, string tableForCF_Detail)
+        public void InsertForSavingConfiguration(string fileWithPath, string chartTableName, string nodeTableName, string lineTableName, string tableNameDevice, string tableForComfortZoneSetting, string tableForCF_Detail,string tableForMixNode)
         {
 
             //--This is where we are going to create all the database  and tables of sqlite
@@ -9557,7 +9647,31 @@ namespace WFA_psychometric_chart
 
 
             }
-            }
+
+                //================MixNodeInfo=====================//
+                foreach (var ch in mixNodeInfoListForSaveConfiguration)
+                {
+
+                    string sql_string1 = "insert into " + tableForMixNode + "(chartID,nodeID,previousNodeID,nextNodeID) VALUES(@chartid,@nodeid,@prevnodeid,@nextnodeid)";
+                    SQLiteCommand command = new SQLiteCommand(sql_string1, m_dbConnection);
+                    command.CommandType = CommandType.Text;
+
+                    command.Parameters.AddWithValue("@chartid", ch.ChartID);
+                    command.Parameters.AddWithValue("@nodeid", ch.nodeID);
+                    command.Parameters.AddWithValue("@prevnodeid", ch.previousNodeID.ToString());
+                    command.Parameters.AddWithValue("@nextnodeid", ch.nextNodeID.ToString());
+                    //command.Parameters.AddWithValue("@min_h", ch.min_hum.ToString());
+                    //command.Parameters.AddWithValue("@max_h", ch.max_hum.ToString());
+                    //command.Parameters.AddWithValue("@color", ColorTranslator.ToHtml(ch.colorValue));
+                    command.ExecuteNonQuery();
+
+
+
+                }
+
+
+            } //Close of using
+
 
 
 
@@ -9570,7 +9684,7 @@ namespace WFA_psychometric_chart
         /// <param name="fileWithPath">file name with path</param>
 
 
-        public void InsertForSavingConfiguration_For_Load(string fileWithPath, string chartTableName, string nodeTableName, string lineTableName, string tableNameDevice, string tableForComfortZoneSetting, string tableForCF_Detail)
+        public void InsertForSavingConfiguration_For_Load(string fileWithPath, string chartTableName, string nodeTableName, string lineTableName, string tableNameDevice, string tableForComfortZoneSetting, string tableForCF_Detail,string tableMixNode)
         {
 
             //--This is where we are going to create all the database  and tables of sqlite
@@ -9581,19 +9695,20 @@ namespace WFA_psychometric_chart
 
 
             //--now lets create the tables
-            SQLiteConnection m_dbConnection = new SQLiteConnection("Data Source=" + fileWithPath + ";Version=3;");
-            m_dbConnection.Open();
+            using (SQLiteConnection m_dbConnection = new SQLiteConnection("Data Source=" + fileWithPath + ";Version=3;")) { 
+                m_dbConnection.Open();
 
             //Lets input chart detail id...if we are inserting we need to clear first
             string sql_input1 = null;
             foreach (var ch in chartInfoPulledForSaving_For_Load)
             {
-                sql_input1 = "INSERT INTO " + chartTableName + " (chartID,chartName,chart_respective_nodeID,chart_respective_lineID) VALUES(@id,@chartname,@cnid,@clid) ";
+                sql_input1 = "INSERT INTO " + chartTableName + " (chartID,chartName,chart_respective_nodeID,chart_respective_lineID,enableChartStatus) VALUES(@id,@chartname,@cnid,@clid,@enablestatus) ";
                 SQLiteCommand cmd = new SQLiteCommand(sql_input1, m_dbConnection);
                 cmd.Parameters.AddWithValue("@id", ch.chartID);
                 cmd.Parameters.AddWithValue("@chartname", ch.chartName);
                 cmd.Parameters.AddWithValue("@cnid", ch.chart_respective_nodeID);
                 cmd.Parameters.AddWithValue("@clid", ch.chart_respective_lineID);
+                 cmd.Parameters.AddWithValue("@enablestatus", ch.enableChartStatus);
                 cmd.ExecuteNonQuery();
             }
 
@@ -9688,7 +9803,6 @@ namespace WFA_psychometric_chart
                 string sql_string = "insert into " + tableForCF_Detail + "(id,name,min_temp,max_temp,min_hum,max_hum,colorValue) VALUES(@id,@name,@min_t,@max_t,@min_h,@max_h,@color)";
                 SQLiteCommand command = new SQLiteCommand(sql_string, m_dbConnection);
                 command.CommandType = CommandType.Text;
-
                 command.Parameters.AddWithValue("@id", ch.id);
                 command.Parameters.AddWithValue("@name", ch.name);
                 command.Parameters.AddWithValue("@min_t", ch.min_temp.ToString());
@@ -9697,13 +9811,22 @@ namespace WFA_psychometric_chart
                 command.Parameters.AddWithValue("@max_h", ch.max_hum.ToString());
                 command.Parameters.AddWithValue("@color", ColorTranslator.ToHtml(ch.colorValue));
                 command.ExecuteNonQuery();
-
-
-
+        
             }
 
 
+            foreach (var ch in mixNodeList_For_Load)
+            {
+                string sql_input1x = "insert into  " + tableMixNode + " (chartID,nodeID,previousNodeID,nextNodeID) VALUES(@chartid,@nodeid,@cnid,@clid) ";
+                SQLiteCommand cmdx = new SQLiteCommand(sql_input1x, m_dbConnection);
+                cmdx.Parameters.AddWithValue("@chartid", ch.ChartID);
+                cmdx.Parameters.AddWithValue("@nodeid", ch.nodeID);
+                cmdx.Parameters.AddWithValue("@cnid", ch.previousNodeID);
+                cmdx.Parameters.AddWithValue("@clid", ch.nextNodeID);
+                cmdx.ExecuteNonQuery();
+            }
 
+            }//cLOSE OF USING
 
         }
 
@@ -9713,6 +9836,8 @@ namespace WFA_psychometric_chart
             string tableForNode = "tbl_node_value";
             string tableForLine = "tbl_line_value";
             string tableFordevice = "tbl_device_info_for_node";
+            string tableFormixNodeInfo = "tbl_mix_node_info";
+
 
             //These two tables are for comfort zone 
             string tableforComfortZoneDetail = "tbl_comfort_zone_detail";
@@ -9756,6 +9881,10 @@ namespace WFA_psychometric_chart
                 SQLiteCommand command7 = new SQLiteCommand(sql7, connection);
                 command7.ExecuteNonQuery();
 
+                string sql8 = "create table IF NOT EXISTS  " + tableFormixNodeInfo + "  ( count INTEGER PRIMARY KEY AUTOINCREMENT,chartID varchar(255) ,nodeID varchar(255),previousNodeID varchar(255),nextNodeID varchar(255) )";
+                SQLiteCommand command8 = new SQLiteCommand(sql8, connection);
+                command8.ExecuteNonQuery();
+
 
             }
 
@@ -9781,13 +9910,14 @@ namespace WFA_psychometric_chart
             string tableNameDevice = "tbl_" + selectedBuildingList[0].BuildingName + "_device_info_for_node";//currentNodeTableFromDB; 
             string tableForComfortZoneSetting = "tbl_" + selectedBuildingList[0].BuildingName + "_chart_comfort_zone_setting";
             string tableForCF_Detail = "tbl_" + selectedBuildingList[0].BuildingName + "_comfort_zone_detail";
+            string tableFor_mix_node_info= "tbl_" + selectedBuildingList[0].BuildingName + "_mix_node_info";
 
             //lets get the id values...
             string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string databaseFile_x = databasePath + @"\db_psychrometric_project.s3db";
 
             //Reading the data form SQLite DB
-            ReadDataForSavingConfiguration(databaseFile_x,  chartTableName, nodeTableName, lineTableName,tableNameDevice, tableForComfortZoneSetting,  tableForCF_Detail);//This reads all the data
+            ReadDataForSavingConfiguration(databaseFile_x,  chartTableName, nodeTableName, lineTableName,tableNameDevice, tableForComfortZoneSetting,  tableForCF_Detail, tableFor_mix_node_info);//This reads all the data
 
             string fileName = "";
             saveFD.InitialDirectory = "C:";
@@ -9829,9 +9959,10 @@ namespace WFA_psychometric_chart
                 string tableNameDevicex= "tbl_device_info_for_node";//currentNodeTableFromDB; 
                 string tableForComfortZoneSettingx = "tbl_chart_comfort_zone_setting";
                 string tableForCF_Detailx = "tbl_comfort_zone_detail";
+                string tableForMixNode = "tbl_mix_node_info";
 
                
-                InsertForSavingConfiguration(databaseFile, chartTableNamex, nodeTableNamex, lineTableNamex, tableNameDevicex, tableForComfortZoneSettingx, tableForCF_Detailx);
+                InsertForSavingConfiguration(databaseFile, chartTableNamex, nodeTableNamex, lineTableNamex, tableNameDevicex, tableForComfortZoneSettingx, tableForCF_Detailx, tableForMixNode);
 
                // SQLiteConnection.ClearPool();//This helps in 
             }
@@ -10616,6 +10747,7 @@ namespace WFA_psychometric_chart
             string tableNameDevice = "tbl_device_info_for_node";//currentNodeTableFromDB; 
             string tableForComfortZoneSetting = "tbl_chart_comfort_zone_setting";
             string tableForCF_Detail = "tbl_comfort_zone_detail";
+            string tableForMixNode = "tbl_mix_node_info";
 
            
             OpenFileDialog theDialog = new OpenFileDialog();
@@ -10632,21 +10764,24 @@ namespace WFA_psychometric_chart
                 string databaseFile = theDialog.FileName;
                 string pathToFile =@"Data Source=" + databaseFile + ";Version=3;";
 
-               // MessageBox.Show("BBK TEST Hellow,PATH = "+pathToFile);
+                // MessageBox.Show("BBK TEST Hellow,PATH = "+pathToFile);
 
 
                 //Test(pathToFile);
                 //return;
-                
+
                 //--This function reads the data
                 //####### TASK1 :Read data
-                // try { 
-                ReadDataForSavingConfiguration_For_Load(pathToFile, chartTableName, nodeTableName, lineTableName, tableNameDevice, tableForComfortZoneSetting, tableForCF_Detail);//This reads all the data
+                // try {
+               // MessageBox.Show("read data"); 
+                ReadDataForSavingConfiguration_For_Load(pathToFile, chartTableName, nodeTableName, lineTableName, tableNameDevice, tableForComfortZoneSetting, tableForCF_Detail, tableForMixNode);//This reads all the data
+
+               // MessageBox.Show("finish read data");
                 //}catch(Exception ex)
                 //{
                 //    MessageBox.Show("Exception data : " + ex.Data + ",\nexp mess:" + ex.Message + "\nexp source" + ex.Source + "exp " + ex);
                 //}
-               // MessageBox.Show("Hellow END");
+                // MessageBox.Show("Hellow END");
 
                 //######### TASK2: Delete data
                 //--Now removing the table datas form db 
@@ -10661,6 +10796,7 @@ namespace WFA_psychometric_chart
                 string tableNameDevice1 = "tbl_" + selectedBuildingList[0].BuildingName + "_device_info_for_node";//currentNodeTableFromDB; 
                 string tableForComfortZoneSetting1 = "tbl_" + selectedBuildingList[0].BuildingName + "_chart_comfort_zone_setting";
                 string tableForCF_Detail1 = "tbl_" + selectedBuildingList[0].BuildingName + "_comfort_zone_detail";
+                string tableformixnode = "tbl_" + selectedBuildingList[0].BuildingName + "_mix_node_info";
 
                 DeleteAllDataFromTable(databaseFileName1, chartTableName1);
                 DeleteAllDataFromTable(databaseFileName1, nodeTableName1);
@@ -10668,6 +10804,7 @@ namespace WFA_psychometric_chart
                 DeleteAllDataFromTable(databaseFileName1, tableNameDevice1);
                 DeleteAllDataFromTable(databaseFileName1, tableForComfortZoneSetting1);
                 DeleteAllDataFromTable(databaseFileName1, tableForCF_Detail1);
+                DeleteAllDataFromTable(databaseFileName1, tableformixnode);
 
                 //####### TASK3 : Writing to db 
                 //Now writing the data to db
@@ -10678,14 +10815,18 @@ namespace WFA_psychometric_chart
                 string tableNameDevicex = "tbl_" + selectedBuildingList[0].BuildingName + "_device_info_for_node";//currentNodeTableFromDB; 
                 string tableForComfortZoneSettingx = "tbl_" + selectedBuildingList[0].BuildingName + "_chart_comfort_zone_setting";
                 string tableForCF_Detailx = "tbl_" + selectedBuildingList[0].BuildingName + "_comfort_zone_detail";
+                string tableformixnodex = "tbl_" + selectedBuildingList[0].BuildingName + "_mix_node_info";
+
+               // MessageBox.Show("Loading Here mix table "+ tableformixnodex+"dbfILE NAME"+ databaseFileName1);
+
+                InsertForSavingConfiguration_For_Load(databaseFileName1, chartTableNamex, nodeTableNamex, lineTableNamex, tableNameDevicex, tableForComfortZoneSettingx, tableForCF_Detailx, tableformixnodex);
 
 
-                InsertForSavingConfiguration_For_Load(databaseFileName1, chartTableNamex, nodeTableNamex, lineTableNamex, tableNameDevicex, tableForComfortZoneSettingx, tableForCF_Detailx);
-
-
-
+               // MessageBox.Show("InsertioncOMPLETE");
+                //--Pulling data and plotting values--
+                //DataGridView_Show_Data();
                 //Now reloading the data 
-                PullDataAndPlot();
+               PullDataAndPlot();
 
             }
         }
@@ -10792,7 +10933,7 @@ namespace WFA_psychometric_chart
             using (SQLiteConnection connection = new SQLiteConnection(connString))
             {
                 connection.Open();
-                SQLiteDataReader reader = null;
+                //SQLiteDataReader reader = null;
                 string queryString = "delete   from  " + tableName;
                 SQLiteCommand command = new SQLiteCommand(queryString, connection);
                 command.ExecuteNonQuery();

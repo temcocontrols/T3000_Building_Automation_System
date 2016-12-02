@@ -117,29 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="btnCancel.Text" xml:space="preserve">
-    <value>取消</value>
-  </data>
-  <data name="cb_enthalpy_or_humidity_input.Items" xml:space="preserve">
-    <value>湿度</value>
-  </data>
-  <data name="comboBox1.Items" xml:space="preserve">
-    <value>标签</value>
-  </data>
-  <data name="comboBox1.Items1" xml:space="preserve">
-    <value>名称</value>
-  </data>
-  <data name="groupBox1.Text" xml:space="preserve">
-    <value>设备详细信息</value>
-  </data>
-  <data name="groupBox3.Text" xml:space="preserve">
-    <value>选择参数</value>
-    <comment>Previous text: Select Parameter (any two)</comment>
+  <data name="label7.Text" xml:space="preserve">
+    <value>从：</value>
   </data>
   <data name="label8.Text" xml:space="preserve">
-    <value>选择设备：</value>
-  </data>
-  <data name="label9.Text" xml:space="preserve">
-    <value>温度：</value>
+    <value>至 ：</value>
   </data>
 </root>

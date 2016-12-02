@@ -123,4 +123,17 @@
   <data name="btnSetNode.Text" xml:space="preserve">
     <value>好</value>
   </data>
+  <data name="groupBox1.Text" xml:space="preserve">
+    <value>设备详细信息</value>
+  </data>
+  <data name="groupBox3.Text" xml:space="preserve">
+    <value>选择参数</value>
+    <comment>Previous text: Select Parameter (any two)</comment>
+  </data>
+  <data name="label8.Text" xml:space="preserve">
+    <value>选择设备：</value>
+  </data>
+  <data name="label9.Text" xml:space="preserve">
+    <value>温度：</value>
+  </data>
 </root>

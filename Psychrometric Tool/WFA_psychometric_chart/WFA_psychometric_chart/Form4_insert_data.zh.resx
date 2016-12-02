@@ -117,8 +117,42 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="$this.Text" xml:space="preserve">
+    <value>插入数据</value>
+  </data>
   <data name="btn_insert_data.Text" xml:space="preserve">
     <value>好</value>
+  </data>
+  <data name="label1.Text" xml:space="preserve">
+    <value>国家：</value>
+  </data>
+  <data name="label10.Text" xml:space="preserve">
+    <value>海拔：</value>
+  </data>
+  <data name="label11.Text" xml:space="preserve">
+    <value>经度：</value>
+  </data>
+  <data name="label12.Text" xml:space="preserve">
+    <value>纬度：</value>
+  </data>
+  <data name="label19.Text" xml:space="preserve">
+    <value>仪表</value>
+  </data>
+  <data name="label2.Text" xml:space="preserve">
+    <value>州：</value>
+  </data>
+  <data name="label20.Text" xml:space="preserve">
+    <value>建筑名称：</value>
+  </data>
+  <data name="label3.Text" xml:space="preserve">
+    <value>市：</value>
+  </data>
+  <data name="label4.Text" xml:space="preserve">
+    <value>街：</value>
+  </data>
+  <data name="label5.Text" xml:space="preserve">
+    <value>
+压缩：</value>
   </data>
   <data name="tbn_cancel.Text" xml:space="preserve">
     <value>取消</value>

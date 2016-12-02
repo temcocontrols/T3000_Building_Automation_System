@@ -123,6 +123,19 @@
   <data name="btnSetNode.Text" xml:space="preserve">
     <value>확인</value>
   </data>
+  <data name="cb_enthalpy_or_humidity_input.Items" xml:space="preserve">
+    <value>습기</value>
+  </data>
+  <data name="groupBox1.Text" xml:space="preserve">
+    <value>장치 세부 정보</value>
+  </data>
+  <data name="groupBox3.Text" xml:space="preserve">
+    <value>매개 변수 선택</value>
+    <comment>Previous text: Select Parameter (any two)</comment>
+  </data>
+  <data name="label8.Text" xml:space="preserve">
+    <value>장치 선택 :</value>
+  </data>
   <data name="label9.Text" xml:space="preserve">
     <value>온도:</value>
   </data>

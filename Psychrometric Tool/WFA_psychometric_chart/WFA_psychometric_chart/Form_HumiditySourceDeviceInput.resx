@@ -241,7 +241,7 @@
     <value>6</value>
   </data>
   <data name="groupBox3.Text" xml:space="preserve">
-    <value>Select Parameter (any two)</value>
+    <value>Select Parameter </value>
   </data>
   <data name="&gt;&gt;groupBox3.Name" xml:space="preserve">
     <value>groupBox3</value>
@@ -340,7 +340,7 @@
     <value>284, 186</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
-    <value>Form_HumiditySourceDeviceInput</value>
+    <value>Humidity Source</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>Form_HumiditySourceDeviceInput</value>

@@ -117,10 +117,26 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="$this.Text" xml:space="preserve">
+    <value>휴지통</value>
+  </data>
   <data name="button1.Text" xml:space="preserve">
     <value>다시 실행</value>
   </data>
   <data name="button2.Text" xml:space="preserve">
     <value>취소</value>
+  </data>
+  <data name="chartID.HeaderText" xml:space="preserve">
+    <value>
+차트 ID</value>
+  </data>
+  <data name="ChartName.HeaderText" xml:space="preserve">
+    <value>차트 이름</value>
+  </data>
+  <data name="Count.HeaderText" xml:space="preserve">
+    <value>카운트</value>
+  </data>
+  <data name="RestoreChartCheckBox.HeaderText" xml:space="preserve">
+    <value>다시 실행</value>
   </data>
 </root>

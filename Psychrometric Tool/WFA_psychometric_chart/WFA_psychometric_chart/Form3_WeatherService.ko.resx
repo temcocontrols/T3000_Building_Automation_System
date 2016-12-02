@@ -129,6 +129,9 @@
   <data name="button1.Text" xml:space="preserve">
     <value>새 위치 삽입</value>
   </data>
+  <data name="button4.Text" xml:space="preserve">
+    <value>장치 스캔</value>
+  </data>
   <data name="cb_enable_disable.Text" xml:space="preserve">
     <value>[서비스 있도록 틱]</value>
   </data>
@@ -158,6 +161,9 @@
   </data>
   <data name="label10.Text" xml:space="preserve">
     <value>습도:</value>
+  </data>
+  <data name="label11.Text" xml:space="preserve">
+    <value>항목 선택</value>
   </data>
   <data name="label12.Text" xml:space="preserve">
     <value>값</value>
@@ -237,6 +243,12 @@
   <data name="label42.Text" xml:space="preserve">
     <value>건물 이름 :</value>
   </data>
+  <data name="label43.Text" xml:space="preserve">
+    <value>웹 상태 :</value>
+  </data>
+  <data name="label44.Text" xml:space="preserve">
+    <value>장치 상태 :</value>
+  </data>
   <data name="label6.Text" xml:space="preserve">
     <value>경도:</value>
   </data>
@@ -248,6 +260,22 @@
   </data>
   <data name="label9.Text" xml:space="preserve">
     <value>온도:</value>
+  </data>
+  <data name="lb_chose_a_device.Text" xml:space="preserve">
+    <value>
+장치 선택 :</value>
+  </data>
+  <data name="lb_device_status.Text" xml:space="preserve">
+    <value>연결이 끊긴</value>
+  </data>
+  <data name="lb_mode.Text" xml:space="preserve">
+    <value>방법: </value>
+  </data>
+  <data name="lb_real_time.Text" xml:space="preserve">
+    <value>실시간</value>
+  </data>
+  <data name="lb_web_status.Text" xml:space="preserve">
+    <value>비활성</value>
   </data>
   <data name="lbConnectionIssue.Text" xml:space="preserve">
     <value>아니오</value>

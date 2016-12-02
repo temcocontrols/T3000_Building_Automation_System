@@ -370,6 +370,9 @@
     <EmbeddedResource Include="form_app_timer_historical_plot.resx">
       <DependentUpon>form_app_timer_historical_plot.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="form_app_timer_historical_plot.zh.resx">
+      <DependentUpon>form_app_timer_historical_plot.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form_Device_Information_For_EditMode.ko.resx">
       <DependentUpon>Form_Device_Information_For_EditMode.cs</DependentUpon>
     </EmbeddedResource>
@@ -386,6 +389,9 @@
       <DependentUpon>form_export_data.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="form_export_data.resx">
+      <DependentUpon>form_export_data.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_export_data.zh.resx">
       <DependentUpon>form_export_data.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form_handler.ko.resx">
@@ -502,6 +508,9 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.zh.resx">
+      <DependentUpon>Resources.resx</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SelectLanguage.en-US.resx">
       <DependentUpon>SelectLanguage.cs</DependentUpon>
