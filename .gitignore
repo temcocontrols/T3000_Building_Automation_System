@@ -1,7 +1,7 @@
 # Next For T3000 ignore
 /T3000 Output
 /T3000 Output_VS2015
-**/*.db
+
 **/Debug/
 /**/.svn
 *.pdb
