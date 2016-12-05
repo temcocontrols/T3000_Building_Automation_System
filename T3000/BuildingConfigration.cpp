@@ -173,7 +173,7 @@ void CBuildingConfigration::Initial_Building_List()
         if (!Is_The_Same)
         {
             SplitCStringA(ArrayFileName,m_vecdbfile.at(i),L".");
-            if (ArrayFileName[ArrayFileName.GetSize()-1].CompareNoCase(L"mdb")!=0)
+            if (ArrayFileName[ArrayFileName.GetSize()-1].CompareNoCase(L"db")!=0)
             {
                 continue;
             }

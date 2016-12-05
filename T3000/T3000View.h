@@ -118,6 +118,7 @@ public:
 	void FreshIOGridTable();
     void FreshIOGridTable_Tstat6();
     int GetRoundMM(BOOL is_max,int num1,int num2,float rate);
+	int GetRoundNumber(int number);
 
 
 
