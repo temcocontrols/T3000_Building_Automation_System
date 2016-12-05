@@ -1,0 +1,322 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="_Internet_Connection_Available" xml:space="preserve">
+    <value>                인터넷 가능</value>
+  </data>
+  <data name="_Internet_Connection_Lost" xml:space="preserve">
+    <value>                인터넷 연결 손실:</value>
+  </data>
+  <data name="_Your_chart_image_will_be_save" xml:space="preserve">
+    <value> 차트 이미지 저장 됩니다. </value>
+  </data>
+  <data name="after_filtering_the_values_of_" xml:space="preserve">
+    <value>시간 값 필터링 후 =  
+</value>
+  </data>
+  <data name="Building_Information" xml:space="preserve">
+    <value>건물 정보</value>
+  </data>
+  <data name="Building_Information0" xml:space="preserve">
+    <value>빌딩 정보:,</value>
+  </data>
+  <data name="Chose_a_path_and_file_name" xml:space="preserve">
+    <value>경로 파일 이름 선택</value>
+  </data>
+  <data name="country_state_city_street_zip_" xml:space="preserve">
+    <value>국가, 국가, 도시, 거리, zip, 경도, 위도, elecation,</value>
+  </data>
+  <data name="date_hour_minute_temperature_h" xml:space="preserve">
+    <value>날짜, 시간, 분, 온도, 습도,</value>
+  </data>
+  <data name="Enter_a_valid_refrence_humidit" xml:space="preserve">
+    <value>%에 유효한 refrence 습도 값을 입력</value>
+  </data>
+  <data name="Enter_a_valid_refrence_tempera" xml:space="preserve">
+    <value>학위 섭씨에 유효한 refrence 온도 값을 입력</value>
+  </data>
+  <data name="Enter_a_valid_temperature_valu" xml:space="preserve">
+    <value>학위 섭씨에 입력된 boxex에 유효한 온도 값을 입력</value>
+  </data>
+  <data name="Enter_city_name" xml:space="preserve">
+    <value>도시 이름을 입력!</value>
+  </data>
+  <data name="Enter_country_name" xml:space="preserve">
+    <value>국가 이름을 입력!</value>
+  </data>
+  <data name="enter_ZIP_number" xml:space="preserve">
+    <value>우편 번호 입력</value>
+  </data>
+  <data name="Enthalpy_kj_kg_dry_air" xml:space="preserve">
+    <value>엔탈피 KJ / kg 건조 공기</value>
+  </data>
+  <data name="Error_Detected" xml:space="preserve">
+    <value>오류 감지</value>
+  </data>
+  <data name="Error_Ended" xml:space="preserve">
+    <value>종료 오류</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>보낸 사람:</value>
+  </data>
+  <data name="Help" xml:space="preserve">
+    <value>도움말</value>
+  </data>
+  <data name="Historical_Data" xml:space="preserve">
+    <value>기록 데이터</value>
+  </data>
+  <data name="Historical_Plot" xml:space="preserve">
+    <value>역사적 음모</value>
+  </data>
+  <data name="Humidity_in" xml:space="preserve">
+    <value>습도 (%에서)</value>
+  </data>
+  <data name="In_this_section_you_select_the" xml:space="preserve">
+    <value>이 섹션에서는 하루 최대 조정 요소를 선택합니다. 값은 이탈 하는 경우 0.01 최대 조정 factore의 값을 설정할 수 있습니다 그리고 그것은 0.01 % 가치e에 의하여 습도 조정 합니다. 총 현재 오프셋 얼마나 % 값은 매일 업데이트 표시를 사용 하 고 마지막 세트에서 전체 변경.</value>
+  </data>
+  <data name="location_distance_from_buildin" xml:space="preserve">
+    <value>위치, 건물, 마지막 업데이트 날짜, 온도, 습도, 압력, 바람 방향, 바에서 거리 역 이름,</value>
+  </data>
+  <data name="No_data_found_in_database" xml:space="preserve">
+    <value>데이터가 데이터베이스에서 발견!</value>
+  </data>
+  <data name="Please_enter_a_valid_adjustmen" xml:space="preserve">
+    <value>예를 들어 유효한 조정 번호를 반드시 입력 하십시오. 1 %wo자민련 수 0.01</value>
+  </data>
+  <data name="Please_enter_a_valid_dates_Dat" xml:space="preserve">
+    <value>유효한 날짜를 입력, '에서' 섹션에서 선택 하는 날짜 'To' 섹션에서 그 보다 작아야 한다</value>
+  </data>
+  <data name="Please_enter_a_valid_number" xml:space="preserve">
+    <value>유효한 숫자를 입력 하십시오. </value>
+  </data>
+  <data name="Please_enter_a_valid_zip_numbe" xml:space="preserve">
+    <value>유효한 우편 번호를 입력 하십시오</value>
+  </data>
+  <data name="Please_enter_a_value_for_adjus" xml:space="preserve">
+    <value>조정 계수에 대 한 값을 입력 해 주시기 바랍니다</value>
+  </data>
+  <data name="Please_enter_value_between_0_1" xml:space="preserve">
+    <value>0-1 사이의 값을 입력 하십시오 %</value>
+  </data>
+  <data name="Please_get_and_set_the_current" xml:space="preserve">
+    <value>제발 고 현재 날씨 데이터 설정</value>
+  </data>
+  <data name="Please_have_a_proper_value_sel" xml:space="preserve">
+    <value>센서  
+ 습도 센서에서 수행 get 값에서에서 선택한 적절 한 값을가지고 하시기 바랍니다</value>
+  </data>
+  <data name="Please_perform_the_follwing_st" xml:space="preserve">
+    <value>먼저 다음 단계를 수행 하시기 바랍니다. 
+ 1. 선택 위치  
+ 2. 풀 데이터  
+ 3 건물을 저장. 지리적 가치 (우리는 지리적 값 필요)</value>
+  </data>
+  <data name="Please_pull_the_current_weathe" xml:space="preserve">
+    <value>먼저 현재 날씨 값을 당겨 주세요</value>
+  </data>
+  <data name="Please_select_a_location_first" xml:space="preserve">
+    <value>위치를 먼저 선택 하세요!</value>
+  </data>
+  <data name="Please_select_a_proper_region_" xml:space="preserve">
+    <value>차트에서 적절 한 영역을 선택 하십시오</value>
+  </data>
+  <data name="please_select_a_station_first" xml:space="preserve">
+    <value>먼저 역을 선택 하십시오.</value>
+  </data>
+  <data name="Please_select_a_station_first_" xml:space="preserve">
+    <value>선택 하십시오 역 먼저 데이터.</value>
+  </data>
+  <data name="Please_select_a_valid_date_To_" xml:space="preserve">
+    <value>유효한 날짜를 선택 하십시오 (에 &gt;에서)</value>
+  </data>
+  <data name="Please_select_correct_date_for" xml:space="preserve">
+    <value>올바른 날짜 형식을 선택 하십시오 [에서 &lt; 하]</value>
+  </data>
+  <data name="Please_Select_one_or_more_hour" xml:space="preserve">
+    <value>하나 이상의 시간을 선택 하십시오 첫 번째</value>
+  </data>
+  <data name="Please_set_the_value_from_sens" xml:space="preserve">
+    <value>센서에서 값을 설정 하십시오</value>
+  </data>
+  <data name="pulling" xml:space="preserve">
+    <value>당기...</value>
+  </data>
+  <data name="Refresh_Building" xml:space="preserve">
+    <value>새 위치 삽입</value>
+  </data>
+  <data name="Refresh_Graph" xml:space="preserve">
+    <value>그래프 새로 고침</value>
+  </data>
+  <data name="Right_click_to_insert_a_new_no" xml:space="preserve">
+    <value>오른쪽 클릭 새 노드를 삽입 합니다. 단일 클릭 하 여 선택 원하는 항목을 이동 하 고 그것을 넣어 하 고 다시 클릭을 가리키면 거기 해결 됩니다. X 축 일정 확인 하려면 지속적으로 Alt 키를 클릭 하 여 노드 이동 노드가 이동 책략. 만약 y 축 지속적인 이동 하는 동안 Shift 키를 누르면 계속 이동 하 게 하려는. 선택한 색상에 따라 다른 색상 노드를 삽입할 수 있습니다.</value>
+  </data>
+  <data name="Save_Excel_file_to" xml:space="preserve">
+    <value>Excel 파일을 저장</value>
+  </data>
+  <data name="Select_language" xml:space="preserve">
+    <value>언어 선택</value>
+  </data>
+  <data name="Select_station_name" xml:space="preserve">
+    <value>역 이름:</value>
+  </data>
+  <data name="Show_Heat_Map" xml:space="preserve">
+    <value>계산</value>
+  </data>
+  <data name="Station_Information" xml:space="preserve">
+    <value>역 정보:</value>
+  </data>
+  <data name="Status_Updating_data" xml:space="preserve">
+    <value>상태: 데이터 업데이트...</value>
+  </data>
+  <data name="success" xml:space="preserve">
+    <value>성공</value>
+  </data>
+  <data name="Success_final" xml:space="preserve">
+    <value>최종 성공!</value>
+  </data>
+  <data name="Success0" xml:space="preserve">
+    <value>성공!</value>
+  </data>
+  <data name="The_language_change_will_take_" xml:space="preserve">
+    <value>언어 변경 다음에 프로그램을 시작할 때 완전 한 효과 소요 됩니다.</value>
+  </data>
+  <data name="The_settings_have_been_saved" xml:space="preserve">
+    <value>설정이 저장 되었습니다. 
+</value>
+  </data>
+  <data name="Time_Status_Time_Error_Status" xml:space="preserve">
+    <value>시간 상태 시간 오류 상태</value>
+  </data>
+  <data name="To" xml:space="preserve">
+    <value>받는 사람:</value>
+  </data>
+  <data name="value_inserted_successfully" xml:space="preserve">
+    <value>성공적으로 삽입 값!</value>
+  </data>
+  <data name="Wet_bulb_temp" xml:space="preserve">
+    <value>
+습구 온도</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>예</value>
+  </data>
+  <data name="Your_file_will_be_saved_as" xml:space="preserve">
+    <value>파일 저장 됩니다. </value>
+  </data>
+</root>
