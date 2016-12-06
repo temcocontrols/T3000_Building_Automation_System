@@ -21,7 +21,7 @@ maurice (at) temcocontrols (dot) com
 ![t3000_2](https://cloud.githubusercontent.com/assets/1852568/20915178/47e46690-bbac-11e6-9f9d-8904dcdbc105.jpg)
 ![t3000_3](https://cloud.githubusercontent.com/assets/1852568/20915179/47e4b19a-bbac-11e6-8579-53475dd37948.jpg)
 ![t3000_4](https://cloud.githubusercontent.com/assets/1852568/20915180/47e4e660-bbac-11e6-97b9-ccf9cf4e5c46.jpg)
-
+![t3000_image -](https://cloud.githubusercontent.com/assets/1852568/20915312/3b8f1f7e-bbad-11e6-9b44-669d7106a918.gif)
 
 
 Have a look at our website and products!!!     
