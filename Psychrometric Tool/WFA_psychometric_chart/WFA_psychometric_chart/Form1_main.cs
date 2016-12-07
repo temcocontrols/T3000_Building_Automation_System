@@ -841,7 +841,7 @@ namespace WFA_psychometric_chart
             //==========================For building infor==========//
 
             FindPathOfBuildingDB();
-            MessageBox.Show("Test :Shows path of the building " + BuildingSelected[0].Building_Path + ",Building Name= " + BuildingSelected[0].Building_Name);
+           // MessageBox.Show("Test :Shows path of the building " + BuildingSelected[0].Building_Path + ",Building Name= " + BuildingSelected[0].Building_Name);
             //==========================end of building info========//
 
 
@@ -7443,7 +7443,10 @@ namespace WFA_psychometric_chart
             double startEnthalpy1 = 0;
             double endHumidity1 = 0;//--this is for the start and end humidity print in the tooltip
             double endEnthalpy1 = 0;
-         
+            double startSpecificVolume1 = 0;//--specific volume
+            double endSpecificVolume1 = 0;
+
+
             if (chart1.InvokeRequired) {
                     //now lets plot lines between tow points...
                     chart1.Invoke(new Action(() => newLineSeries = lineSeriesID));//new Series("LineSeries" + incrementIndex); //lineSeriesID; 
@@ -7567,10 +7570,12 @@ namespace WFA_psychometric_chart
                 CalculateHumidityEnthalpy(temporaryNodeValueStoreForRedrawLine[0].xVal, temporaryNodeValueStoreForRedrawLine[0].yVal);
                 startHumidity1 = Math.Round(humidityCalculated, 2);
                 startEnthalpy1 = Math.Round(enthalpyCalculated, 2);
+                startSpecificVolume1 = SpecificVolumeReturn;
                 //--This calculates the end humidity and the enthalpy values..
                 CalculateHumidityEnthalpy((double)temporaryNodeValueStoreForRedrawLine[1].xVal, (double)temporaryNodeValueStoreForRedrawLine[1].yVal);
                 endHumidity1 = Math.Round(humidityCalculated, 2);
                 endEnthalpy1 = Math.Round(enthalpyCalculated, 2);
+                endSpecificVolume1 = SpecificVolumeReturn;
 
                 // MessageBox.Show("Start hum" + startHumidity1 + " end enth" + endEnthalpy1);
                 //MessageBox.Show("menustripinfovalues[prevNodeID].xVal=" + menuStripNodeInfoValues[prevNodeID].xVal + "menuStripNodeInfoValues[nextNodeID].yVal=" + menuStripNodeInfoValues[nextNodeID].yVal + "menuStripNodeInfoValues[nextNodeID].xVal = "+ menuStripNodeInfoValues[nextNodeID].xVal + " menuStripNodeInfoValues[nextNodeID].yVal" + menuStripNodeInfoValues[nextNodeID].yVal);
@@ -7579,8 +7584,31 @@ namespace WFA_psychometric_chart
 
                 string sequenceDetected = temporaryNodeValueStoreForRedrawLine[0].name + " to " + temporaryNodeValueStoreForRedrawLine[1].name;
 
-                string tooltipString = "Sequence :  " + sequenceDetected + " \n" + @"                 start             end 
-" + "Temp         :" + Math.Round(temporaryNodeValueStoreForRedrawLine[0].xVal, 2) + "               " + Math.Round(temporaryNodeValueStoreForRedrawLine[1].xVal, 2) + "\nHumidity :" + startHumidity1 + "           " + endHumidity1 + WFA_psychometric_chart.Properties.Resources._Enthalpy + startEnthalpy1 + "           " + endEnthalpy1 + "\nEnthalpy Change:" + enthalpyChange;
+                //                string tooltipString = "Sequence :  " + sequenceDetected + " \n" + @"                 start             end 
+                //" + "Temp         :" + Math.Round(temporaryNodeValueStoreForRedrawLine[0].xVal, 2) + "               " + Math.Round(temporaryNodeValueStoreForRedrawLine[1].xVal, 2) + "\nHumidity :" + startHumidity1 + "           " + endHumidity1 + WFA_psychometric_chart.Properties.Resources._Enthalpy + startEnthalpy1 + "           " + endEnthalpy1 + "\nEnthalpy Change:" + enthalpyChange;
+
+                string tooltipString = "";
+                //"            " + sequenceDetected + " \n" + @"                 "+ temporaryNodeValueStoreForRedrawLine[0].name + "             end 
+                //" + "Temp         :" + Math.Round(temporaryNodeValueStoreForRedrawLine[0].xVal, 2) + "               " + Math.Round(temporaryNodeValueStoreForRedrawLine[1].xVal, 2) + "\nHumidity :" + startHumidity1 + "           " + endHumidity1 + WFA_psychometric_chart.Properties.Resources._Enthalpy + startEnthalpy1 + "           " + endEnthalpy1 + "\nEnthalpy Change:" + enthalpyChange;
+
+                string FirstLine = @"|                                        | " + "Units             | " + temporaryNodeValueStoreForRedrawLine[0].name + "                        |" + temporaryNodeValueStoreForRedrawLine[1].name;
+                string SecondLine = @"DBT                                  |" + "\x00B0 C                  |" + Math.Round(temporaryNodeValueStoreForRedrawLine[0].xVal, 2) + "                       |" + Math.Round(temporaryNodeValueStoreForRedrawLine[1].xVal, 2);
+                string ThirdLine = @"Relative Humidity          |" + "%                    |" + startHumidity1 + "                      |" + endHumidity1;
+                string FourthLine = @"Humidity Ratio               |" + "Kg/Kg dryair |" + Math.Round(temporaryNodeValueStoreForRedrawLine[0].yVal, 2) + "                       |" + Math.Round(temporaryNodeValueStoreForRedrawLine[1].yVal, 2);
+                string FifthLine = "Volume Flow Rate           |" + "m\xB3/s             |" + Math.Round(temporaryNodeValueStoreForRedrawLine[0].airFlow, 2) + "                          |" + Math.Round(temporaryNodeValueStoreForRedrawLine[1].airFlow, 2);
+
+                string SixthLine = "Specific Volume              |" + "m\xB3/Kg         |" + startSpecificVolume1 + "                          |" + endSpecificVolume1;
+                double massFlowRate1 = temporaryNodeValueStoreForRedrawLine[0].airFlow / startSpecificVolume1;
+                double massFlowRate2 = temporaryNodeValueStoreForRedrawLine[1].airFlow / endSpecificVolume1;
+
+                string SeventhLine = @"Mass flow rate(dry air)   |" + "Kg(dry air)/s|" +Math.Round(massFlowRate1,2) + "                         |" +Math.Round( massFlowRate2,2);
+                string EighthLine = @"Enthalpy                          |" + "KJ/Kg         |" + startEnthalpy1 + "                       | " + endEnthalpy1;
+                double totalEnthalpyFlow1 = massFlowRate1 * startEnthalpy1;
+                double totalEnthalpyFlow2 = massFlowRate2 * endEnthalpy1;
+                string NinthLine = @"Total Enthalpy Flow        |" + "KJ/s          |" +Math.Round( totalEnthalpyFlow1,2) + "                       | " +Math.Round( totalEnthalpyFlow2,2);
+                double heatChange = totalEnthalpyFlow2 - totalEnthalpyFlow1;
+                string TenthLine = @"Heat Change                 |" + "KW             |" +Math.Round(heatChange,2) + "                     ";
+                tooltipString = FirstLine + "\n" + SecondLine + "\n" + ThirdLine + "\n" + FourthLine + "\n" + FifthLine + "\n" + SixthLine + "\n" + SeventhLine + "\n" + EighthLine + "\n" + NinthLine + "\n" + TenthLine;
 
                 if (chart1.InvokeRequired) {
 
@@ -7629,6 +7657,12 @@ namespace WFA_psychometric_chart
             }//close of temporary node value
 
            // }//--Close of LOCK
+        }
+
+        public double CalculateSpecificVolume(double xVal,double yVal)
+        {
+
+            return 0.00;
         }
 
 
@@ -7805,8 +7839,13 @@ namespace WFA_psychometric_chart
         }
 
 
+        public double SpecificVolumeReturn = 0;
 
-
+         /// <summary>
+         /// Calculates humidity , enthalpy and specific volume form temperature and humidity ratio
+         /// </summary>
+         /// <param name="xVal">Temperature(deg cel)</param>
+         /// <param name="yVal">Humidity Ratio(unitless)</param>
 
         private void CalculateHumidityEnthalpy(double xVal, double yVal)
         {
@@ -7843,6 +7882,7 @@ namespace WFA_psychometric_chart
                 }
             }//close of for
 
+            //double patm = pressureConverted;//This should be the value
             double patm = 101.325;//this is constant...
                                   // double w = 622*phi*corres_pg_value/(patm-phi*corres_pg_value);
                                   //double w1 = 622*phi*pg/(patm-phi*pg);
@@ -7875,6 +7915,9 @@ namespace WFA_psychometric_chart
             double h = temperature * (1.01 + (0.00189 * X)) + 2.5 * X;
             //now lets display this value ..
             enthalpyCalculated = h;//--this is the enthalpy calculated value 
+
+            double V = (287.1 * (xVal + 273.15) * (1 + (1.6078 * humidity))) / (patm * 100);
+            SpecificVolumeReturn = Math.Round(V, 2);
 
         }
         //--this is used by set data button
