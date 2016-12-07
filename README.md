@@ -19,8 +19,6 @@ maurice (at) temcocontrols (dot) com
 ![t3000_wiring_series_800](https://cloud.githubusercontent.com/assets/1852568/20915181/4813633c-bbac-11e6-87a2-62ab927e0e1b.jpg)
 ![t3000_1](https://cloud.githubusercontent.com/assets/1852568/20915177/47e387c0-bbac-11e6-9916-6c92fd5ebe83.jpg)
 ![t3000_2](https://cloud.githubusercontent.com/assets/1852568/20915178/47e46690-bbac-11e6-9f9d-8904dcdbc105.jpg)
-![t3000_3](https://cloud.githubusercontent.com/assets/1852568/20915179/47e4b19a-bbac-11e6-8579-53475dd37948.jpg)
-![t3000_4](https://cloud.githubusercontent.com/assets/1852568/20915180/47e4e660-bbac-11e6-97b9-ccf9cf4e5c46.jpg)
 ![t3000_image -](https://cloud.githubusercontent.com/assets/1852568/20915312/3b8f1f7e-bbad-11e6-9b44-669d7106a918.gif)
 
 
