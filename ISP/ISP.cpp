@@ -6,12 +6,12 @@
 #include "ISP.h"
 #include "ISPDlg.h"
 #include "Global_Struct.h"
-
+#include "globle_function.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
-
+extern bool auto_flash_mode;
 // CISPApp
 
 BEGIN_MESSAGE_MAP(CISPApp, CWinAppEx)
@@ -53,7 +53,8 @@ BOOL CISPApp::InitInstance()
 
 	if (!AfxSocketInit())
 	{
-		AfxMessageBox(IDP_SOCKETS_INIT_FAILED);
+		if(!auto_flash_mode)
+			AfxMessageBox(IDP_SOCKETS_INIT_FAILED);
 		return FALSE;
 	}
 
@@ -67,7 +68,7 @@ BOOL CISPApp::InitInstance()
 	// TODO: You should modify this string to be something appropriate
 	// such as the name of your company or organization
 	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
-    c_strSNRecordFileName = GetExePath (true)+ L"serial_records.txt";
+    c_strSNRecordFileName = GetExePath(true)+ L"serial_records.txt";
 	CISPDlg dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();

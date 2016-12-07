@@ -63,6 +63,7 @@
 #define PM_WATER_SENSOR                         71
 
 #define PM_NC               100  
+#define PWM_TRANSDUCER         104
 #define PM_LightingController         120
 #define PM_BTU_METER             121
 #define PM_BOATMONITOR           122
@@ -73,13 +74,19 @@
 
 
 #define STM32_CO2_NET            210
+//CO2NET
 #define STM32_CO2_RS485            211
+//CO2RS485
 #define STM32_HUM_NET            212
+//HUMNET
 #define STM32_HUM_RS485            213
+//HUMRS485
 #define STM32_PRESSURE_NET         214
+//PSNET
 #define STM32_PRESSURE_RS3485         215
-
-#define STM32_CO2_NODE            216         
+//PSRS485
+#define STM32_CO2_NODE            216 
+//CO2NODE        
 
 
 

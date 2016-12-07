@@ -32,12 +32,13 @@
 using namespace Gdiplus;
 #include "globle_function.h"
 #include "BacnetMonitor.h"
-#include "../SQLiteDriver/CppSQLite3.h"
- 
+#include "BADO/BADO.h"
+#include "BacnetMessageInput.h"
 #include "BacnetGraphicSetting.h"
 #define  WM_MONITOR_USER_MESSAGE WM_USER + 902
 CString InputLable[15];
 CString InputUnit[15];
+bool StaticShow[15];
 int total_y_max_value = 0x80000001;
 int total_y_min_value = 0x7fffffff;
 
@@ -91,7 +92,7 @@ PointF      RclickValueTime(0, 0);
 //#define  MY_COLOR_PEN_RECTANGLE_BORD    Color(255,0,255,255)
 //#define  MY_COLOR_PEN_INLINE_PEN        Color(255,220,220,220)
 //#define  MY_COLOR_UNIT_PEN              Color(255,255,255,255)
-
+#define  MY_COLOR_VIEW123				Color(255,0,0,0)
 #define  MY_COLOR_BACKGRAND				Color(255,192,192,192)
 #define  MY_COLOR_AUTOSCROLL			Color(255,255,255,0)
 #define  MY_COLOR_ON_OFF				Color(255,255,0,0)
@@ -106,7 +107,8 @@ PointF      RclickValueTime(0, 0);
 #define  MY_COLOR_UNIT_PEN              Color(255,0,0,0)
 #define  MY_COLOR_RIGHTCLICK_VALUE_COLOR		Color(255,255,0,255)
 
-
+#define  MY_COLOR_VIEW_SELECT			Color(255,255,255,255)
+#define  MY_COLOR_VIEW_UNSELECT			Color(255,192,192,192)
 
 
 
@@ -122,6 +124,8 @@ CBacnetGraphic::CBacnetGraphic(CWnd* pParent /*=NULL*/)
 	, m_highvalue(100)
 	, m_time_selected(TIME_TEN_MINUTE)
 	, m_analogorignpoint(200,30)
+	, mdigital_count_intervel(30)
+	, mdigital_height(20)
 {
 
 }
@@ -278,8 +282,10 @@ BOOL CBacnetGraphic::OnInitDialog()
 		for(int m=0;m< (sizeof(System_Unit) / sizeof(System_Unit[0]));m++)
 			InputUnit[m]= System_Unit[m];
 	}
+#if 0
 	for(int i=0;i<14;i++)
 		StaticShow[i] = true;	//初始化时都让显示,显示第一次的时候这些值会被自动的修改;
+#endif
 	InitialParameter(scale_type);
 	if(mythread == NULL)
 	{
@@ -377,10 +383,37 @@ int CBacnetGraphic::Search_data_from_db()
 	get_data_count = temp_number_of_inputs;
 	monitor_analog_count = temp_number_of_analog;
 	monitor_digital_count = temp_number_of_digital;
-	CppSQLite3DB SqliteMonitor;
-	CppSQLite3Table table;
-	CppSQLite3Query q;
-	SqliteMonitor.open((UTF8MBSTR)g_achive_monitor_datatbase_path);
+	if(monitor_digital_count >= 6)
+	{
+		mdigital_count_intervel = 30;
+		mdigital_height = 20;
+	}
+	else if(monitor_digital_count >= 4)
+	{
+		mdigital_count_intervel = 40;
+		mdigital_height = 30;
+	}
+	else if(monitor_digital_count >= 2)
+	{
+		mdigital_count_intervel = 60;
+		mdigital_height = 45;
+	}
+	else if(monitor_digital_count == 1)
+	{
+		mdigital_count_intervel = 80;
+		mdigital_height = 70;
+	}
+
+	for (int i=0;i< monitor_digital_count;i++)
+	{
+		SetDigitalYLabelPos(i);
+		//mDigitalYLabelPoint[i].X = m_digitalorignpoint.X - 30;
+		//mDigitalYLabelPoint[i].Y = m_digitalorignpoint.Y + mdigital_count_intervel*(i+1)  -(mdigital_height);
+	}
+
+	CBADO monitor_bado;
+	monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
+	monitor_bado.OnInitADOConn(); 
 
 	for (int i=0;i<temp_number_of_inputs;i++)
 	{
@@ -406,14 +439,13 @@ int CBacnetGraphic::Search_data_from_db()
 			CString strSql;
 			//strSql.Format(_T("select * from MonitorData where Input_Index = '%s' and SerialNumber = %i and Monitor_Index = %i and Analog_Digital = 1 and Record_Time >= %i and Record_Time <= %i ORDER BY Record_Time ASC"),cs_temp_input_index,temp_serial_number,temp_monitor_index,temp_time_start,temp_time_end);	
 			strSql.Format(_T("select * from MonitorData where Index_ = '%s'   and Time_Since1970 >= %i and Time_Since1970 <= %i and Analog_Digital = -1 ORDER BY Time_Since1970 ASC"),cs_temp_input_index,m_starttime,m_endtime);	
-			 q=SqliteMonitor.execQuery((UTF8MBSTR)strSql);
-			/*temp_record_count = monitor_bado.GetRecordCount(monitor_bado.m_pRecordset);*/
-			table = SqliteMonitor.getTable((UTF8MBSTR)strSql);
-			if(table.numRows() <= 0)
+			monitor_bado.m_pRecordset=monitor_bado.OpenRecordset(strSql);
+			temp_record_count = monitor_bado.GetRecordCount(monitor_bado.m_pRecordset);
+			if(temp_record_count <= 0)
 			{
 				analog_data_max_value[i] = 100000;
 				analog_data_min_value[i] = 0;
-				 
+				monitor_bado.CloseRecordset();//Ffff add
 				continue;
 			}
 			analog_data_point[i] = new Data_Time_Match[temp_record_count];
@@ -422,21 +454,25 @@ int CBacnetGraphic::Search_data_from_db()
 			_variant_t temp_variant;
 			unsigned int logging_time = 0;
 			int monitor_value = 0;
-			while(!q.eof())
+			while(VARIANT_FALSE==monitor_bado.m_pRecordset->EndOfFile)
 			{
-			 
-				logging_time= q.getIntField("Time_Since1970");
-				if (logging_time == 0)
+				temp_variant=monitor_bado.m_pRecordset->GetCollect("Time_Since1970");//
+				if(temp_variant.vt!=VT_NULL)
+					logging_time = temp_variant;
+				else
 				{
-					q.nextRow();
+					logging_time = 0;
+					monitor_bado.m_pRecordset->MoveNext();
 					continue;
 				}
 
-				 
-				monitor_value = q.getIntField("Value_");
-				if (monitor_value == 0)
+				temp_variant=monitor_bado.m_pRecordset->GetCollect("Value_");//
+				if(temp_variant.vt!=VT_NULL)
+					monitor_value = temp_variant;
+				else
 				{
-					q.nextRow();
+					monitor_value = 0;
+					monitor_bado.m_pRecordset->MoveNext();
 					continue;
 				}
 				analog_data_point[i][temp_count].loggingtime = logging_time;
@@ -446,7 +482,7 @@ int CBacnetGraphic::Search_data_from_db()
 				{
 					if((analog_data_point[i][temp_count].analogdata < monitor_ignore_min_value) || (analog_data_point[i][temp_count].analogdata > monitor_ignore_max_value))
 					{
-						q.nextRow();
+						monitor_bado.m_pRecordset->MoveNext();
 						continue;
 					}
 				}
@@ -457,9 +493,9 @@ int CBacnetGraphic::Search_data_from_db()
 					analog_data_min_value[i] = analog_data_point[i][temp_count].analogdata;
 
 				temp_count ++;
-				q.nextRow();
+				monitor_bado.m_pRecordset->MoveNext();
 			}
-			 
+			monitor_bado.CloseRecordset();//Ffff add
 			analog_data_count[i] = temp_count;
 		}
 		else if((i >=temp_number_of_analog) && temp_number_of_digital>0)
@@ -467,13 +503,9 @@ int CBacnetGraphic::Search_data_from_db()
 			CString strSql;
 			//strSql.Format(_T("select * from MonitorData where Index_ = '%s'  and Analog_Digital = 0 and Time_Since1970 >= %i and Time_Since1970 <= %i ORDER BY Time_Since1970 ASC"),cs_temp_input_index,m_starttime,m_endtime);	
 			strSql.Format(_T("select * from MonitorData where Index_ = '%s'  and Analog_Digital = 0 and Time_Since1970 <= %i  ORDER BY Time_Since1970 ASC"),cs_temp_input_index,m_endtime);	
-		 
-
-			q=SqliteMonitor.execQuery((UTF8MBSTR)strSql);
-			 
-			table = SqliteMonitor.getTable((UTF8MBSTR)strSql);
-
-			if(table.numRows() <= 0)
+			monitor_bado.m_pRecordset=monitor_bado.OpenRecordset(strSql);
+			temp_record_count = monitor_bado.GetRecordCount(monitor_bado.m_pRecordset);
+			if(temp_record_count <= 0)
 			{
 				continue;
 			}
@@ -484,21 +516,25 @@ int CBacnetGraphic::Search_data_from_db()
 			_variant_t temp_variant;
 			unsigned int logging_time = 0;
 			int monitor_value = 0;
-			while(!q.eof())
+			while(VARIANT_FALSE==monitor_bado.m_pRecordset->EndOfFile)
 			{
-				 
-				logging_time = q.getIntField("Time_Since1970");
-				if (logging_time == 0)
+				temp_variant=monitor_bado.m_pRecordset->GetCollect("Time_Since1970");//
+				if(temp_variant.vt!=VT_NULL)
+					logging_time = temp_variant;
+				else
 				{
-					q.nextRow();
+					logging_time = 0;
+					monitor_bado.m_pRecordset->MoveNext();
 					continue;
 				}
 
-				 
-				monitor_value = q.getIntField("Value_");
-				if (monitor_value == 0)
+				temp_variant=monitor_bado.m_pRecordset->GetCollect("Value_");//
+				if(temp_variant.vt!=VT_NULL)
+					monitor_value = temp_variant;
+				else
 				{
-					q.nextRow();
+					monitor_value = 0;
+					monitor_bado.m_pRecordset->MoveNext();
 					continue;
 				}
 
@@ -508,7 +544,7 @@ int CBacnetGraphic::Search_data_from_db()
 					digital_data_point[i][temp_count].analogdata = 1;
 
 				temp_count ++;
-				q.nextRow();
+				monitor_bado.m_pRecordset->MoveNext();
 			}
 			digital_data_count[i] = temp_count;
 
@@ -516,7 +552,7 @@ int CBacnetGraphic::Search_data_from_db()
 		}
 
 	}
-	SqliteMonitor.closedb();
+	monitor_bado.CloseConn();
 
 	return 0;
 }
@@ -532,7 +568,7 @@ void CBacnetGraphic::Create_Line_Point()
 		m_pFirstItem[i] = NULL;
 	}
 
-
+	int digital_index = 0;
 	point_error_2 = 0;
 	for (int x = 0 ;x<get_data_count;x++)
 	{
@@ -604,28 +640,41 @@ void CBacnetGraphic::Create_Line_Point()
 			pPrevItem = NULL;
 			if(digital_data_point[x] == NULL)
 				continue;
+			digital_index ++;
 			for (int i=0 ; i<digital_data_count[x];i++)
 			{
 				pTempItem = new CPointItem();
 				PointF mytemppoint(0,0);
 				if(digital_data_point[x] == NULL)
-					return;
+					continue;
+
+
 				bool b_ret = false;
-				b_ret = DigitalTimeValueToPoint(digital_data_point[x][i].loggingtime,digital_data_point[x][i].analogdata,mytemppoint);
+				b_ret = DigitalTimeValueToPoint(digital_data_point[x][i].loggingtime,digital_data_point[x][i].analogdata,mytemppoint,digital_index);
 				if(digital_data_point[x][i].loggingtime    < m_starttime)
 				{
 					digital_last_data[x].analogdata = digital_data_point[x][i].analogdata;
 					digital_last_data[x].data_point.X = m_analogorignpoint.X;
+
 					if(digital_last_data[x].analogdata == 1)
 					{
-						digital_last_data[x].data_point.Y =m_digitalorignpoint.Y + 30;
+						mytemppoint.Y =m_digitalorignpoint.Y + 30*digital_index  - 20;
 					}
 					else
-					{
-						digital_last_data[x].data_point.Y = m_digitalorignpoint.Y  + 110;
-					}
+						mytemppoint.Y = m_digitalorignpoint.Y  + 30*digital_index +20 - 20;
+
+
+					//if(digital_last_data[x].analogdata == 1)
+					//{
+					//	digital_last_data[x].data_point.Y =m_digitalorignpoint.Y + 30;
+					//}
+					//else
+					//{
+					//	digital_last_data[x].data_point.Y = m_digitalorignpoint.Y  + 110;
+					//}
 					continue;
 				}
+				SetDigitalYLabelPos(digital_index);
 
 
 				//TRACE(_T("X = %d , Y = %d \r\n"),(int)mytemppoint.X,(int)mytemppoint.Y);
@@ -906,6 +955,50 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 
 	delete Static_scroll_blackground_Brush;
 
+#pragma region Show_Three_View
+//#define  MY_COLOR_VIEW_SELECT			Color(255,255,255,255)
+//#define  MY_COLOR_VIEW_UNSELECT			Color(255,192,192,192)
+
+	SolidBrush  View_Font_brush_temp(MY_COLOR_VIEW123);
+	SolidBrush *Static_view_Brush;
+	SolidBrush *Static_view_unselect_Brush;
+	Static_view_Brush =new SolidBrush(MY_COLOR_VIEW_SELECT);	
+	Static_view_unselect_Brush =new SolidBrush(MY_COLOR_VIEW_UNSELECT);
+
+	if(graphic_view_index == 0)
+		mygraphics->FillRectangle(Static_view_Brush,850,6,120,20);
+	else
+		mygraphics->FillRectangle(Static_view_unselect_Brush,850,6,120,20);
+
+	mygraphics->DrawRectangle(mystaticRectangle_pen,850,6,120,20);
+	scrollpointF.X = 850;
+	scrollpointF.Y = 6;
+	mygraphics->DrawString(grapgic_view_name[0], -1, &Scroll_font, scrollpointF,&View_Font_brush_temp);
+
+	if(graphic_view_index == 1)
+		mygraphics->FillRectangle(Static_view_Brush,1000,6,120,20);
+	else
+		mygraphics->FillRectangle(Static_view_unselect_Brush,1000,6,120,20);
+	mygraphics->DrawRectangle(mystaticRectangle_pen,1000,6,120,20);
+	scrollpointF.X = 1000;
+	scrollpointF.Y = 6;
+	mygraphics->DrawString(grapgic_view_name[1], -1, &Scroll_font, scrollpointF,&View_Font_brush_temp);
+
+	if(graphic_view_index == 2)
+		mygraphics->FillRectangle(Static_view_Brush,1150,6,120,20);
+	else
+		mygraphics->FillRectangle(Static_view_unselect_Brush,1150,6,120,20);
+	mygraphics->DrawRectangle(mystaticRectangle_pen,1150,6,120,20);
+	scrollpointF.X = 1150;
+	scrollpointF.Y = 6;
+	mygraphics->DrawString(grapgic_view_name[2], -1, &Scroll_font, scrollpointF,&View_Font_brush_temp);
+
+	delete Static_view_unselect_Brush;
+	delete Static_view_Brush;
+	Static_view_Brush = NULL;
+	Static_view_unselect_Brush = NULL;
+#pragma endregion Show_Three_View
+
 	Gdiplus::Font  TimeTopShow_font(&ScrollfontFamily, 24, FontStyleRegular, UnitPixel);
 	scrollpointF.X = 700;
 	scrollpointF.Y = 2;
@@ -1001,8 +1094,8 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 
 		CString temp_cs_label_unit;
 		temp_cs_label_unit =  InputUnit[i];// _T("AAAAAA");
-
-		mygraphics->DrawString(temp_cs_label_unit, -1, &Input_font, UnitpointF, &Font_brush);
+		if(i<get_data_count)
+			mygraphics->DrawString(temp_cs_label_unit, -1, &Input_font, UnitpointF, &Font_brush);
 		delete pen_unit_brush;
 		pen_unit_brush = NULL;
 
@@ -1152,6 +1245,9 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 			mygraphics->DrawString(Unit_value, -1, &unitfont, pointF, &unit_brush);
 		}
 	}
+
+
+#if 0
 	//****************************************************************
 	//画 Digital  的 横着的 两条线内 网格;
 	mygraphics->DrawLine(my_inline_pen,(int)m_digitalorignpoint.X,
@@ -1164,7 +1260,7 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 		(int)m_digitalorignpoint.X + m_Digital_X_WIDTH ,
 		(int)m_digitalorignpoint.Y + 110);
 	//****************************************************************
-
+#endif
 	CPointItem *first_item[INPUT_NUMBER];
 	CPointItem *second_item[INPUT_NUMBER];
 	Pen * DrawLinePen[INPUT_NUMBER];
@@ -1199,6 +1295,31 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 		}
 		else if(monitor_digital_count > 0)
 		{
+			CString temp_cs_label;
+			temp_cs_label = InputLable[i];
+
+			SolidBrush  Font_brush(STATIC_FONT_COLOR);
+			//FontFamily  UnitfontFamily(_T("Arial"));
+			//FontFamily  StaticfontFamily(_T("Times New Roman"));
+			FontFamily  StaticfontFamily(_T("Arial"));
+
+			Gdiplus::Font        DiInputFont(&StaticfontFamily, 10, FontStyleRegular, UnitPixel);
+
+			PointF      staticpointF(0, 0);
+			//SolidBrush *   pen_unit_brush = new SolidBrush(Graphic_Color[i+1]);//
+			//PointF      UnitpointF(0, 0);
+
+			//staticpointF.X = m_digitalorignpoint.X - 30;
+			staticpointF = (PointF)GetDigitalYLabelPos(i-monitor_analog_count);// m_digitalorignpoint.Y + 30*(i-monitor_analog_count)  ;
+
+
+			
+			if(first_item[i] != NULL)
+			{
+				staticpointF.Y =  first_item[i]->GetPoint().y;
+				mygraphics->DrawString(temp_cs_label, -1, &DiInputFont, staticpointF,&Font_brush);
+			}
+
 			if(first_item[i] != NULL)
 			{
 				if((digital_last_data[i].data_point.X != 0) && (digital_last_data[i].data_point.Y != 0))	//有可能确实出现前面所有一个点都没有，这种情况就不要从前面拉线了;
@@ -1288,6 +1409,7 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 	delete static_write_bord;
 	delete static_black_bord;
 	delete static_auto_scroll_pen;
+	delete mystaticRectangle_pen;
 }
 
 
@@ -1298,9 +1420,19 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 void CBacnetGraphic::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
-	KillTimer(2);
-	b_has_create_point = false;
-	draw_graphic_finished = false;
+	switch(nIDEvent)
+	{
+	case 2:
+		{
+			KillTimer(2);
+			b_has_create_point = false;
+			draw_graphic_finished = false;
+		}
+		break;
+	default:
+		break;
+	}
+
 	CDialogEx::OnTimer(nIDEvent);
 }
 
@@ -1370,7 +1502,7 @@ void CBacnetGraphic::OnLButtonDown(UINT nFlags, CPoint point)
 				StaticShow[i] = true;
 
 			SetTimer(2,5000,NULL);
-
+			WriteViewInfoIntoConfig();
 			break;
 		}
 	}
@@ -1396,8 +1528,85 @@ void CBacnetGraphic::OnLButtonDown(UINT nFlags, CPoint point)
 			flag_auto_scroll = true;
 		}
 	}
+	else if((point.x > 850) &&
+		(point.x <970) &&
+		(point.y > 6) &&
+		(point.y < 26))
+	{
+		//按下的是第一个View 的按钮;
+		CString temp_cs;
+		graphic_view_index = 0;
+		CString temp_serial;
+		temp_serial.Format(_T("%u"),g_selected_serialnumber);
+		WritePrivateProfileStringW(temp_serial,_T("GraphicView"),_T("0"),g_cstring_ini_path);
+
+		for (int i=0;i<14;i++)
+		{
+			temp_cs.Format(_T("Static%d_label%d"),graphic_view_index,i+1);
+			StaticShow[i] = GetPrivateProfileInt(temp_serial,temp_cs,1,g_cstring_ini_path);
+		}
+	}
+	else if((point.x > 1000) &&
+		(point.x <1120) &&
+		(point.y > 6) &&
+		(point.y < 26))
+	{
+		//按下的是第二个View 的按钮;
+		CString temp_cs;
+		graphic_view_index = 1;
+		CString temp_serial;
+		temp_serial.Format(_T("%u"),g_selected_serialnumber);
+		WritePrivateProfileStringW(temp_serial,_T("GraphicView"),_T("1"),g_cstring_ini_path);
+		for (int i=0;i<14;i++)
+		{
+			temp_cs.Format(_T("Static%d_label%d"),graphic_view_index,i+1);
+			StaticShow[i] = GetPrivateProfileInt(temp_serial,temp_cs,1,g_cstring_ini_path);
+		}
+	}
+	else if((point.x > 1150) &&
+		(point.x <1270) &&
+		(point.y > 6) &&
+		(point.y < 26))
+	{
+		//按下的是第三个View 的按钮;
+		CString temp_cs;
+		graphic_view_index = 2;
+		CString temp_serial;
+		temp_serial.Format(_T("%u"),g_selected_serialnumber);
+		WritePrivateProfileStringW(temp_serial,_T("GraphicView"),_T("2"),g_cstring_ini_path);
+		for (int i=0;i<14;i++)
+		{
+			temp_cs.Format(_T("Static%d_label%d"),graphic_view_index,i+1);
+			StaticShow[i] = GetPrivateProfileInt(temp_serial,temp_cs,1,g_cstring_ini_path);
+		}
+	}
 
 	CDialogEx::OnLButtonDown(nFlags, point);
+}
+
+
+
+void CBacnetGraphic::WriteViewInfoIntoConfig()
+{
+	CString temp_serial;
+	CString temp_cs;
+	CString view_name_index;
+	temp_serial.Format(_T("%u"),g_selected_serialnumber);
+
+	view_name_index.Format(_T("GraphicView%d_Name"),graphic_view_index);
+	WritePrivateProfileStringW(temp_serial,view_name_index,grapgic_view_name[graphic_view_index],g_cstring_ini_path);
+	for (int i=0;i<14;i++)
+	{
+		temp_cs.Format(_T("Static%d_label%d"),graphic_view_index,i+1);
+		if(StaticShow[i] || (InputLable[i].IsEmpty()))
+		{
+			WritePrivateProfileStringW(temp_serial,temp_cs,_T("1"),g_cstring_ini_path);
+		}
+		else
+		{
+			WritePrivateProfileStringW(temp_serial,temp_cs,_T("0"),g_cstring_ini_path);
+		}
+	}
 }
 
 void CBacnetGraphic::SetXaxisTime(unsigned long nstarttime,unsigned long nendtime)
@@ -1563,15 +1772,35 @@ void CBacnetGraphic::CalcOnePixelTime()
 	m_onepixeltime =  (float)(x_axis_total_time) / (float)m_X_ASIX_WIDTH;
 }
 
-bool CBacnetGraphic::DigitalTimeValueToPoint(unsigned long ntime , int nvalue ,PointF &returnpoint)
+bool CBacnetGraphic::SetDigitalYLabelPos(int ndigital_index)
 {
+	mDigitalYLabelPoint[ndigital_index].X = m_digitalorignpoint.X - 30;
+	mDigitalYLabelPoint[ndigital_index].Y = m_digitalorignpoint.Y + mdigital_count_intervel*ndigital_index  -(mdigital_height);
+	return 1;
+}
+
+PointF CBacnetGraphic::GetDigitalYLabelPos(int ndigital_index)
+{
+
+	return mDigitalYLabelPoint[ndigital_index];
+}
+
+bool CBacnetGraphic::DigitalTimeValueToPoint(unsigned long ntime , int nvalue ,PointF &returnpoint,int n_index)
+{
+	//if(nvalue != 0)
+	//{
+	//	nvalue = 1;
+	//	returnpoint.Y =m_digitalorignpoint.Y + 30;
+	//}
+	//else
+	//	returnpoint.Y = m_digitalorignpoint.Y  + 110;
 	if(nvalue != 0)
 	{
 		nvalue = 1;
-		returnpoint.Y =m_digitalorignpoint.Y + 30;
+		returnpoint.Y =m_digitalorignpoint.Y + mdigital_count_intervel*n_index - (mdigital_height);
 	}
 	else
-		returnpoint.Y = m_digitalorignpoint.Y  + 110;
+		returnpoint.Y = m_digitalorignpoint.Y  + mdigital_count_intervel*n_index ;
 
 	long delta_time = ntime - m_starttime;
 
@@ -1730,7 +1959,8 @@ void CBacnetGraphic::InitialParameter(int base_time,float y_min_value,float y_ma
 		Set_XAxis_Length(1000);
 		Set_YAxis_Length(500);
 		SetDigital_X_WIDTH(1000);
-		SetDigital_Y_Hight(150);
+		//SetDigital_Y_Hight(150);
+		SetDigital_Y_Hight(180);
 	}
 
 
@@ -2482,7 +2712,7 @@ void CBacnetGraphic::OnRButtonDown(UINT nFlags, CPoint point)
 	if((point.x > 252) &&
 		(point.x < 1445) &&
 		(point.y > 32) &&
-		(point.y <525))
+		(point.y <679))
 	{
 		RclickValueTime.X = point.x;
 		RclickValueTime.Y = point.y;
@@ -2492,5 +2722,54 @@ void CBacnetGraphic::OnRButtonDown(UINT nFlags, CPoint point)
 		RclickValueTime.X = 0;
 		RclickValueTime.Y = 0;
 	}
+
+	if((point.x > 850) &&
+		(point.x <970) &&
+		(point.y > 6) &&
+		(point.y < 26))
+	{
+		//按下的是第一个View 的按钮;
+		bacnet_message_input_title.Format(_T("Please input a new name "));
+		CBacnetMessageInput temp_dlg;
+		temp_dlg.DoModal();
+		if(!bacnet_message_return_string.IsEmpty())
+		{
+			grapgic_view_name[0] = bacnet_message_return_string;
+			WriteViewInfoIntoConfig();
+		}
+	}
+	else if((point.x > 1000) &&
+		(point.x <1120) &&
+		(point.y > 6) &&
+		(point.y < 26))
+	{
+		//按下的是第二个View 的按钮;
+		bacnet_message_input_title.Format(_T("Please input a new name "));
+		CBacnetMessageInput temp_dlg;
+		temp_dlg.DoModal();
+		if(!bacnet_message_return_string.IsEmpty())
+		{
+			grapgic_view_name[1] = bacnet_message_return_string;
+			WriteViewInfoIntoConfig();
+		}
+		
+	}
+	else if((point.x > 1150) &&
+		(point.x <1270) &&
+		(point.y > 6) &&
+		(point.y < 26))
+	{
+		//按下的是第三个View 的按钮;
+		bacnet_message_input_title.Format(_T("Please input a new name "));
+		CBacnetMessageInput temp_dlg;
+		temp_dlg.DoModal();
+		if(!bacnet_message_return_string.IsEmpty())
+		{
+			grapgic_view_name[2] = bacnet_message_return_string;
+			WriteViewInfoIntoConfig();
+		}
+	}
+
+
 	CDialogEx::OnRButtonDown(nFlags, point);
 }

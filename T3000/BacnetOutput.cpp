@@ -340,6 +340,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
      
 	int Fresh_Item;
 	int isFreshOne = (int)lParam;
+	int  Minipanel_device = 1;
 
 	int digital_special_output_count = 0;
 	int analog_special_output_count = 0;
@@ -347,26 +348,31 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 	{
 		digital_special_output_count = BIG_MINIPANEL_OUT_D;
 		analog_special_output_count = BIG_MINIPANEL_OUT_A;
+		Minipanel_device = 1;
 	}
 	else if(bacnet_device_type == SMALL_MINIPANEL)
 	{
 		digital_special_output_count = SMALL_MINIPANEL_OUT_D;
 		analog_special_output_count = SMALL_MINIPANEL_OUT_A;
+		Minipanel_device = 1;
 	}
 	else if(bacnet_device_type == TINY_MINIPANEL)
 	{
 		digital_special_output_count = TINY_MINIPANEL_OUT_D;
 		analog_special_output_count = TINY_MINIPANEL_OUT_A;
+		Minipanel_device = 1;
 	}
 	else if(bacnet_device_type == T38AI8AO6DO)
 	{
 		digital_special_output_count = T38AI8AO6DO_OUT_D;
 		analog_special_output_count = T38AI8AO6DO_OUT_A;
+		Minipanel_device = 0;
 	}
 	else if(bacnet_device_type == PID_T322AI)
 	{
 		digital_special_output_count = T322AI_OUT_D;
 		analog_special_output_count = T322AI_OUT_A;
+		Minipanel_device = 1;
 	}
 	if((bacnet_device_type == T38AI8AO6DO) ||
 		(bacnet_device_type == PID_T322AI))
@@ -426,7 +432,18 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			m_output_list.SetColumnWidth(OUTPUT_EXT_NUMBER,0);
 		}
 	}
+	if(Minipanel_device == 0)	//如果不是minipanel的界面就隐藏扩展行;
+	{
+		CRect temp_rect;
+		temp_rect = Output_rect;
+		temp_rect.right = 950;
+		temp_rect.top = temp_rect.top + 24;
+		m_output_list.MoveWindow(temp_rect);
 
+		m_output_list.SetColumnWidth(OUTPUT_EXTERNAL,0);
+		m_output_list.SetColumnWidth(OUTPUT_PRODUCT,0);
+		m_output_list.SetColumnWidth(OUTPUT_EXT_NUMBER,0);
+	}
 
 	if(isFreshOne == REFRESH_ON_ITEM)
 	{
@@ -648,7 +665,8 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 #pragma region External info
 		if((m_Output_data.at(i).sub_id !=0) &&
 			//(m_Input_data.at(input_list_line).sub_number !=0) &&
-			(m_Output_data.at(i).sub_product !=0))
+			(m_Output_data.at(i).sub_product !=0) &&
+			Minipanel_device == 1)
 		{
 			unsigned char temp_pid = m_Output_data.at(i).sub_product;
 			if((temp_pid == PM_T3PT10) ||
@@ -724,8 +742,14 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		}
 		else
 		{
-			main_sub_panel.Format(_T("%d"),(unsigned char)Station_NUM);
-			m_output_list.SetItemText(i,OUTPUT_PANEL,main_sub_panel);
+			
+			m_output_list.SetItemText(i,OUTPUT_PANEL,Statuspanel);
+			//main_sub_panel.Format(_T("%d"),(unsigned char)Station_NUM);
+			//m_output_list.SetItemText(i,OUTPUT_PANEL,main_sub_panel);
+
+			m_output_list.SetItemText(i,OUTPUT_EXTERNAL,_T(""));
+			m_output_list.SetItemText(i,OUTPUT_PRODUCT,_T(""));
+			m_output_list.SetItemText(i,OUTPUT_EXT_NUMBER,_T(""));
 		}
 
 #pragma endregion External info
@@ -1304,7 +1328,7 @@ BOOL CBacnetOutput::PreTranslateMessage(MSG* pMsg)
 		return TRUE;
 	}
     CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-    if (pFrame->m_pDialogInfo->IsWindowVisible())
+    if (pFrame->m_pDialogInfo != NULL&&pFrame->m_pDialogInfo->IsWindowVisible())
     {
         if (pMsg->message == WM_LBUTTONDOWN||pMsg->message == WM_RBUTTONDOWN)
         {

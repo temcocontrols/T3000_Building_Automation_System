@@ -47,7 +47,7 @@ int turn_hex_str_to_ten_num(char *source)
 			default: 
 				{
 					if(!auto_flash_mode)
-					AfxMessageBox(_T("wrong input!\nin the turn_hex_str_to_ten_num function!"), MB_ICONWARNING);
+						AfxMessageBox(_T("wrong input!\nin the turn_hex_str_to_ten_num function!"), MB_ICONWARNING);
 					return -1;//2
 				}
 			}
@@ -71,7 +71,7 @@ unsigned short turn_4_hex_char_to_unsigned_short(char *source)
 	if(a>4)
 	{
 		if(!auto_flash_mode)
-		AfxMessageBox(_T("wrong input!\nthat the length of the input string !=2!"), MB_ICONWARNING);
+			AfxMessageBox(_T("wrong input!\nthat the length of the input string !=2!"), MB_ICONWARNING);
 		for(int i=0;i<a;i++)
 			*source='\0';
 		return -1;//input wrong 1
@@ -487,6 +487,9 @@ CString GetProductName(int ModelID)
 		break;
 	case STM32_HUM_RS485:
 		strProductName="HUMRS485";
+		break;
+	case PWM_TRANSDUCER:
+		strProductName = _T("PWMTRANX");	  //
 		break;
 	case STM32_PRESSURE_NET:
 		strProductName="PSNET";

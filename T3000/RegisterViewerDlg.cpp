@@ -195,19 +195,19 @@ void CRegisterViewerDlg::LoadDataFromDB()
                 while(!q.eof())
                 {
                     tempstruct.Register_Address=q.getIntField("RegID");
-                    tempstruct.AddressName=q.getValuebyName(_T("T3-RTD"));
+                    tempstruct.AddressName=q.getValuebyName(_T("T3_RTD"));
                    
                     if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
                     {
                         q.nextRow();
                         continue;
                     }
-                    tempstruct.DataType=q.getValuebyName(_T("T3-8AI8AO_DATATYPE"));
+                    tempstruct.DataType=q.getValuebyName(_T("T3_8AI8AO_DATATYPE"));
                     tempstruct.length=q.getIntField("T3-8AI8AO_LEN");
                     tempstruct.Description=q.getValuebyName(L"T3-8AI8AO_DESCRIPTION");
                   
                     
-                        tempstruct.Operation=q.getValuebyName(_T("T3-8AI8AO_OPERATION"));
+                        tempstruct.Operation=q.getValuebyName(_T("T3_8AI8AO_OPERATION"));
                     
                     m_VecregisterData.push_back(tempstruct);
                     m_recordcount++;
@@ -227,13 +227,13 @@ void CRegisterViewerDlg::LoadDataFromDB()
                        q.nextRow();
                         continue;
                     }
-                    tempstruct.DataType=q.getValuebyName(_T("T3-8AI16O_DATATYPE"));
+                    tempstruct.DataType=q.getValuebyName(_T("T3_8AI16O_DATATYPE"));
                     tempstruct.length=q.getIntField("T3-8AI16O_LEN");
                     
-                        tempstruct.Description=q.getValuebyName(_T("T3-8AI16O_DESCRIPTION"));;
+                        tempstruct.Description=q.getValuebyName(_T("T3_8AI16O_DESCRIPTION"));;
                    
                   
-                        tempstruct.Operation=q.getValuebyName(_T("T3-8AI16O_OPERATION"));;
+                        tempstruct.Operation=q.getValuebyName(_T("T3_8AI16O_OPERATION"));;
                    
                     m_VecregisterData.push_back(tempstruct);
                     m_recordcount++;
@@ -246,20 +246,20 @@ void CRegisterViewerDlg::LoadDataFromDB()
                 {
                     tempstruct.Register_Address=q.getIntField("RegID");
                     
-                        tempstruct.AddressName=q.getValuebyName(_T("T3-8AI8AO"));
+                        tempstruct.AddressName=q.getValuebyName(_T("T3_8AI8AO"));
                    
                     if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
                     {
                        q.nextRow();
                         continue;
                     }
-                    tempstruct.DataType=q.getValuebyName(_T("T3-8AI8AO_DATATYPE"));
-                    tempstruct.length=q.getIntField("T3-8AI8AO_LEN");
+                    tempstruct.DataType=q.getValuebyName(_T("T3_8AI8AO_DATATYPE"));
+                    tempstruct.length=q.getIntField("T3_8AI8AO_LEN");
                      
-                        tempstruct.Description=q.getValuebyName(_T("T3-8AI8AO_DESCRIPTION"));
+                        tempstruct.Description=q.getValuebyName(_T("T3_8AI8AO_DESCRIPTION"));
                      
                    
-                        tempstruct.Operation=q.getValuebyName(_T("T3-8AI8AO_OPERATION"));
+                        tempstruct.Operation=q.getValuebyName(_T("T3_8AI8AO_OPERATION"));
                     
                     m_VecregisterData.push_back(tempstruct);
                     m_recordcount++; 
@@ -271,17 +271,17 @@ void CRegisterViewerDlg::LoadDataFromDB()
                 while(!q.eof())
                 {
                     tempstruct.Register_Address=q.getIntField("RegID");
-                    tempstruct.AddressName=q.getValuebyName(_T("T3-32AI"));
+                    tempstruct.AddressName=q.getValuebyName(_T("T3_32AI"));
                     if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
                     {
                        q.nextRow();
                         continue;
                     }
-                    tempstruct.DataType=q.getValuebyName(_T("T3-32AI_DATATYPE"));
-                    tempstruct.length=q.getIntField("T3-32AI_LEN");
-                    tempstruct.Description=q.getValuebyName(_T("T3-32AI_DESCRIPTION"));
+                    tempstruct.DataType=q.getValuebyName(_T("T3_32AI_DATATYPE"));
+                    tempstruct.length=q.getIntField("T3_32AI_LEN");
+                    tempstruct.Description=q.getValuebyName(_T("T3_32AI_DESCRIPTION"));
                     
-                    tempstruct.Operation=q.getValuebyName(_T("T3-32AI_OPERATION"));
+                    tempstruct.Operation=q.getValuebyName(_T("T3_32AI_OPERATION"));
                      
                     m_VecregisterData.push_back(tempstruct);
                     m_recordcount++;
@@ -293,18 +293,18 @@ void CRegisterViewerDlg::LoadDataFromDB()
                 while(!q.eof())
                 {
                     tempstruct.Register_Address=q.getIntField("RegID");
-                    tempstruct.AddressName=q.getValuebyName(_T("T3-4AO"));
+                    tempstruct.AddressName=q.getValuebyName(_T("T3_4AO"));
                    
                     if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
                     {
                         q.nextRow();
                         continue;
                     }
-                    tempstruct.DataType=q.getValuebyName(_T("T3-4AO_DATATYPE"));
-                    tempstruct.length=q.getIntField("T3-4AO_LEN");
-                     tempstruct.Description=q.getValuebyName(_T("T3-4AO_DESCRIPTION"));
+                    tempstruct.DataType=q.getValuebyName(_T("T3_4AO_DATATYPE"));
+                    tempstruct.length=q.getIntField("T3_4AO_LEN");
+                     tempstruct.Description=q.getValuebyName(_T("T3_4AO_DESCRIPTION"));
                      
-                    tempstruct.Operation=q.getValuebyName(_T("T3-4AO_OPERATION"));
+                    tempstruct.Operation=q.getValuebyName(_T("T3_4AO_OPERATION"));
                   
                     m_VecregisterData.push_back(tempstruct);
                     m_recordcount++;
@@ -317,18 +317,18 @@ void CRegisterViewerDlg::LoadDataFromDB()
                 while(!q.eof())
                 {
                     tempstruct.Register_Address=q.getIntField("RegID");
-                    tempstruct.AddressName=q.getValuebyName(_T("T3-6CT"));
+                    tempstruct.AddressName=q.getValuebyName(_T("T3_6CT"));
                     
                     if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
                     {
                        q.nextRow();
                         continue;
                     }
-                    tempstruct.DataType=q.getValuebyName(_T("T3-6CT_DATATYPE"));
-                    tempstruct.length=q.getIntField("T3-6CT_LEN");
-                    tempstruct.Description=q.getValuebyName(_T("T3-6CT_DESCRIPTION"));
+                    tempstruct.DataType=q.getValuebyName(_T("T3_6CT_DATATYPE"));
+                    tempstruct.length=q.getIntField("T3_6CT_LEN");
+                    tempstruct.Description=q.getValuebyName(_T("T3_6CT_DESCRIPTION"));
                     
-                     tempstruct.Operation=q.getValuebyName(_T("T3-6CT_OPERATION"));
+                     tempstruct.Operation=q.getValuebyName(_T("T3_6CT_OPERATION"));
                      
                     m_VecregisterData.push_back(tempstruct);
                     m_recordcount++;

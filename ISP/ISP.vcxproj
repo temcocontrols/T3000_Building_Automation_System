@@ -25,13 +25,13 @@
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
     <PlatformToolset>v140</PlatformToolset>
@@ -142,7 +142,6 @@
     <ClCompile Include="FlashBase.cpp" />
     <ClCompile Include="FlashSN.cpp" />
     <ClCompile Include="globle_function.cpp" />
-    <ClCompile Include="Hex386Writer.cpp" />
     <ClCompile Include="HexFileParser.cpp" />
     <ClCompile Include="ISP.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -150,12 +149,8 @@
     <ClCompile Include="ISPDlg.cpp" />
     <ClCompile Include="ISPSetting.cpp" />
     <ClCompile Include="JPGLoader.cpp" />
-    <ClCompile Include="LightCtrlFlashDlg.cpp" />
     <ClCompile Include="MyPing.cpp" />
     <ClCompile Include="MySocket.cpp" />
-    <ClCompile Include="NCFinder.cpp" />
-    <ClCompile Include="NCFlashDlg.cpp" />
-    <ClCompile Include="NetWriter.cpp" />
     <ClCompile Include="Splash.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -173,18 +168,13 @@
     <ClInclude Include="FlashSN.h" />
     <ClInclude Include="Global_Struct.h" />
     <ClInclude Include="globle_function.h" />
-    <ClInclude Include="Hex386Writer.h" />
     <ClInclude Include="HexFileParser.h" />
     <ClInclude Include="ISP.h" />
     <ClInclude Include="ISPDlg.h" />
     <ClInclude Include="ISPSetting.h" />
     <ClInclude Include="JPGLoader.h" />
-    <ClInclude Include="LightCtrlFlashDlg.h" />
     <ClInclude Include="MyPing.h" />
     <ClInclude Include="MySocket.h" />
-    <ClInclude Include="NCFinder.h" />
-    <ClInclude Include="NCFlashDlg.h" />
-    <ClInclude Include="NetWriter.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Splash.h" />
     <ClInclude Include="stdafx.h" />

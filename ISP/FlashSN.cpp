@@ -2,7 +2,7 @@
 #include "FlashSN.h"
 #include "Global_Struct.h"
 #include <fstream>
-
+extern bool auto_flash_mode;
 extern CString Auto_flash_SN_connect_IP;
 extern CString    c_strSNRecordFileName;
 CFlashSN::CFlashSN(void)
@@ -89,7 +89,8 @@ unsigned long CFlashSN::Get_SerialNumber_From_Server(CString nipaddress,
 	bool ret_connect = Connect_To_Server(nipaddress,nipport);
 	if(!ret_connect)
 	{
-		AfxMessageBox(_T("Connect to the Server failed!"));
+		if(!auto_flash_mode)
+			AfxMessageBox(_T("Connect to the Server failed!"));
 		return -1;
 	}
 	int rec_index =0;
@@ -356,7 +357,8 @@ unsigned long CFlashSN::GetNewSerialNumber()
 			
 	if(!file.Open(c_strSNRecordFileName, CFile::shareDenyNone|CFile::modeReadWrite))
 	{
-		 AfxMessageBox(_T("Error: Cannot find serial records file.\n Check Z:\Serial_Records\serial_records.txt"));
+		if(!auto_flash_mode)
+			AfxMessageBox(_T("Error: Cannot find serial records file.\n Check Z:\Serial_Records\serial_records.txt"));
 		return -1;
 	}
 
@@ -389,7 +391,8 @@ void CFlashSN::FlashTstatSN()
 	m_nSerialNumber=GetNewSerialNumber();// get last serialnumber of the file
 	if(m_nSerialNumber<=0)//can't fine the serialnumber file on z drive
 	{
-		AfxMessageBox(_T("WARNING : Get serial number from server failed."));
+		if(!auto_flash_mode)
+			AfxMessageBox(_T("WARNING : Get serial number from server failed."));
 		return;
 	}
 // 	CString serial_id;
@@ -504,7 +507,8 @@ void CFlashSN::FlashTstatSN()
 		}
 		CString index;
 		index.Format(_T("SN=%d have been written,sucessfully."),m_nSerialNumber);
-		AfxMessageBox(index);
+		if(!auto_flash_mode)
+			AfxMessageBox(index);
 	}
 	else
 	{
@@ -515,14 +519,16 @@ void CFlashSN::FlashTstatSN()
 			Read_One(m_nMBID , 3) * 16777216 ;// 256 *256 *256
 		CString index;
 		index.Format(_T("SN:%d have not been overwritten."),m_nSerialNumber);
-		AfxMessageBox(index);
+		if(!auto_flash_mode)
+			AfxMessageBox(index);
 	}
 	
 	close_com();
 	}
 	else
 	{
-		AfxMessageBox(_T("COM Can't Open"));
+		if(!auto_flash_mode)
+			AfxMessageBox(_T("COM Can't Open"));
 	}
 
 	 
@@ -538,12 +544,14 @@ void CFlashSN::FlashNCSN()
 	m_nSerialNumber=Get_SerialNumber_From_Server(Auto_flash_SN_connect_IP,31234,m_strProductModel,m_nProductModel,m_nsoftversion,m_nHardWareVersion,m_username);
 	if(m_nSerialNumber<=0)//can't fine the serialnumber file on z drive
 	{
-		AfxMessageBox(_T("WARNING : Get serial number from server failed."));
+		if(!auto_flash_mode)
+			AfxMessageBox(_T("WARNING : Get serial number from server failed."));
 		return;
 	}
 	CString serial_id;
 	serial_id.Format(_T("Get Serial number from server : %u"),m_nSerialNumber);
-	AfxMessageBox(serial_id);
+	if(!auto_flash_mode)
+		AfxMessageBox(serial_id);
 	//m_nSerialNumber=GetNewSerialNumber();// get last serialnumber of the file
 	unsigned int loword,hiword,loword0,loword1,hiword2,hiword3;
 	loword=m_nSerialNumber & 0xffff;
@@ -557,7 +565,8 @@ void CFlashSN::FlashNCSN()
 	hiword3=(hiword>>8)&0xff;
 	if(m_nSerialNumber==-1)//can't fine the serialnumber file on z drive
 	{
-		AfxMessageBox(_T("WARNING : Can't find serial number file on Z driver."));
+		if(!auto_flash_mode)
+			AfxMessageBox(_T("WARNING : Can't find serial number file on Z driver."));
 		return;
 	}
 	
@@ -565,7 +574,8 @@ void CFlashSN::FlashNCSN()
 	{
 	  CString strmessage;
 	  strmessage.Format(_T("Can't Open %s:%d"),m_dwIPAddr,m_nIPPort);
-	  AfxMessageBox(strmessage);
+	  if(!auto_flash_mode)
+		AfxMessageBox(strmessage);
 	} 
 	
 	else
@@ -648,7 +658,8 @@ void CFlashSN::FlashNCSN()
 			}
 			CString index;
 			index.Format(_T("SN=%d have been written,sucessfully."),m_nSerialNumber);
-			AfxMessageBox(index);
+			if(!auto_flash_mode)
+				AfxMessageBox(index);
 		}
 		else
 		{
@@ -659,7 +670,8 @@ void CFlashSN::FlashNCSN()
 				Read_One(255 , 3) * 16777216 ;// 256 *256 *256
 			CString index;
 			index.Format(_T("SN:%d have not been overwritten."),m_nSerialNumber);
-			AfxMessageBox(index);
+			if(!auto_flash_mode)
+				AfxMessageBox(index);
 		}
 #pragma endregion Save_SerialNumber
 			

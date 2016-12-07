@@ -21,6 +21,9 @@
     <Filter Include="ClassInfo">
       <UniqueIdentifier>{c664f2cd-e719-4782-bcf4-c788a2753a9c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="BADO">
+      <UniqueIdentifier>{c4576a71-639c-4b70-a1ac-7b0688be04b3}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Bacnet">
       <UniqueIdentifier>{47872dd0-6006-4513-92b4-d6258d979013}</UniqueIdentifier>
     </Filter>
@@ -378,9 +381,6 @@
     <ClCompile Include="RegisterWriteValueDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PVDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ARDDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -594,9 +594,6 @@
     <ClCompile Include="T3ModulesOutputDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="StatusbarCtrl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="BatchSNDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -670,12 +667,33 @@
       <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="ISPModeSlove.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="StatusbarCtrl.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetMessageInput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="HexFileParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BinFileParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OXBitmapButton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OXToolTipCtrl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ZigbeeInformationDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BADO\BADO.cpp">
+      <Filter>BADO</Filter>
+    </ClCompile>
+    <ClCompile Include="SetTimeDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -984,6 +1002,10 @@
     <None Include="res\Building.db" />
     <None Include="res\T3000.db" />
     <None Include="res\MonitorData.db" />
+    <None Include="res\PIDBUTTON.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\MonitorData.mdb" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">
@@ -1376,9 +1398,6 @@
     <ClInclude Include="BacnetAlarmWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PVDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ARDDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1685,10 +1704,31 @@
     <ClInclude Include="ISPModeSlove.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BacnetMessageInput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="HexFileParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BinFileParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OXBitmapButton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OXDllExt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OXMainRes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OXToolTipCtrl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ZigbeeInformationDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SetTimeDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

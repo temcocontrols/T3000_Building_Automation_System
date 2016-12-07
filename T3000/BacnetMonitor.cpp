@@ -13,12 +13,13 @@
  
 #include "BacnetGraphic.h"
 #include "BacnetWait.h"
- 
+#include "BADO/BADO.h"
 #define  WM_MONITOR_USER_MESSAGE WM_USER + 902
 extern char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network,unsigned char & sub_panel, byte panel , int *netpresent);
 extern char *look_label_ex(int panel,int sub_panel, int point_type, int num, int network);
 CBacnetGraphic * GraphicWindow = NULL;
 extern CString InputLable[15];
+extern bool StaticShow[15];
 
 // CBacnetMonitor dialog
 static int old_monitor_line = -1;
@@ -1047,7 +1048,7 @@ void CBacnetMonitor::Check_New_DB()
 
 
 	CString mdb_name;
-	mdb_name.Format(_T("\\%u_%u_%u_monitor%u.db"),g_selected_serialnumber,tm.GetYear(),tm.GetMonth(),monitor_list_line);
+	mdb_name.Format(_T("\\%u_%u_%u_monitor%u.mdb"),g_selected_serialnumber,tm.GetYear(),tm.GetMonth(),monitor_list_line);
 	g_achive_monitor_datatbase_path = temp_folder + mdb_name;
 
 
@@ -1055,11 +1056,11 @@ void CBacnetMonitor::Check_New_DB()
 	HANDLE hFind_Monitor;//
 	WIN32_FIND_DATA wfd_monitor;//
 	hFind_Monitor = FindFirstFile(g_achive_monitor_datatbase_path, &wfd_monitor);//
-	if (hFind_Monitor==INVALID_HANDLE_VALUE)//说明当前目录下无MonitorData.db
+	if (hFind_Monitor==INVALID_HANDLE_VALUE)//说明当前目录下无MonitorData.mdb
 	{
 		//没有找到就创建一个默认的数据库
 		FilePath_Monitor= g_achive_monitor_datatbase_path;
-		HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MONITOR_DB1), _T("MONITOR_DB"));   
+		HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MONITOR_DB2), _T("MONITOR_DB"));   
 		HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
 		LPVOID lpExe = LockResource(hGlobal);   
 		CFile file;
@@ -1109,9 +1110,36 @@ void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
 
 		CString temp_db_ini_folder;
 		temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
-
+	
 		int temp_time_num;
 		temp_time_num = GetPrivateProfileInt(temp_serial,temp_cs_modify_index,0,temp_db_ini_folder);
+
+
+
+		CString temp_cs;
+
+		graphic_view_index = GetPrivateProfileInt(temp_serial,_T("GraphicView"),0,g_cstring_ini_path);
+		CString view_name_index0;
+		CString view_name_index1;
+		CString view_name_index2;
+		view_name_index0.Format(_T("GraphicView%d_Name"),0);
+		view_name_index1.Format(_T("GraphicView%d_Name"),1);
+		view_name_index2.Format(_T("GraphicView%d_Name"),2);
+		GetPrivateProfileString(temp_serial,view_name_index0,_T("View 1"),grapgic_view_name[0].GetBuffer(MAX_PATH),MAX_PATH,g_cstring_ini_path);
+		grapgic_view_name[0].ReleaseBuffer();
+
+		GetPrivateProfileString(temp_serial,view_name_index1,_T("View 2"),grapgic_view_name[1].GetBuffer(MAX_PATH),MAX_PATH,g_cstring_ini_path);
+		grapgic_view_name[1].ReleaseBuffer();
+
+		GetPrivateProfileString(temp_serial,view_name_index2,_T("View 3"),grapgic_view_name[2].GetBuffer(MAX_PATH),MAX_PATH,g_cstring_ini_path);
+		grapgic_view_name[2].ReleaseBuffer();
+		for (int i=0;i<14;i++)
+		{
+			temp_cs.Format(_T("Static%d_label%d"),graphic_view_index,i+1);
+			StaticShow[i] = GetPrivateProfileInt(temp_serial,temp_cs,1,g_cstring_ini_path);
+		}
+
+
 
 		if(temp_time_num < Device_Misc_Data.reg.operation_time[monitor_list_line])
 		{
@@ -1136,12 +1164,12 @@ void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
 
 
 		CString strSql;
-	 
-		CppSQLite3DB SqliteMonitor;
-		SqliteMonitor.open((UTF8MBSTR)g_achive_monitor_datatbase_path);
-		strSql.Format(_T("delete   from MonitorData where Flag=1"),g_selected_serialnumber,monitor_list_line);
-		SqliteMonitor.execDML((UTF8MBSTR)strSql);
-		SqliteMonitor.closedb();
+		CBADO monitor_bado;
+		monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//删除里面的临时数据;
+		monitor_bado.OnInitADOConn(); 
+		strSql.Format(_T("delete * from MonitorData where Flag=1"),g_selected_serialnumber,monitor_list_line);
+		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+		monitor_bado.CloseConn();
 
 		//WritePrivateProfileString(_T("Setting"),_T("MonitorValueIgnoreMax"),_T("10000000"),g_cstring_ini_path);
 
@@ -1173,11 +1201,12 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteAll()
 		//	WritePrivateProfileString(temp_serial,temp_monitor_digital_index,NULL,g_cstring_ini_path);
 		//}
 		CString strSql;
-		CppSQLite3DB SqliteMonitor;
-		SqliteMonitor.open((UTF8MBSTR)g_achive_monitor_datatbase_path);
-		strSql=_T("delete   from MonitorData");
-		SqliteMonitor.closedb();
-		 
+		CBADO monitor_bado;
+		monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
+		monitor_bado.OnInitADOConn(); 
+		strSql=_T("delete * from MonitorData");
+		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+		monitor_bado.CloseConn();
 
 		for (int z=0;z<12;z++)
 		{
@@ -1208,11 +1237,12 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteLocal()
 
 
 	CString strSql;
-	CppSQLite3DB SqliteMonitor;
-    SqliteMonitor.open((UTF8MBSTR)g_achive_monitor_datatbase_path);
-	strSql=_T("delete   from MonitorData");
-	SqliteMonitor.execDML((UTF8MBSTR)strSql);
-	SqliteMonitor.closedb();
+	CBADO monitor_bado;
+	monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
+	monitor_bado.OnInitADOConn(); 
+	strSql=_T("delete * from MonitorData");
+	monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+	monitor_bado.CloseConn();
 	MessageBox(_T("Delete Monitor Data : OK !"));
 }
 void CBacnetMonitor::OnBnClickedBtnMonitorDeleteSelected()
@@ -1241,12 +1271,12 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteSelected()
 			temp_serial.Format(_T("%u"),g_selected_serialnumber);
 
 			CString strSql;
-		
-			CppSQLite3DB SqliteMonitor;
-			SqliteMonitor.open((UTF8MBSTR)g_achive_monitor_datatbase_path);
-			strSql=_T("delete   from MonitorData");
-			SqliteMonitor.execDML((UTF8MBSTR)strSql);
-			SqliteMonitor.closedb();
+			CBADO monitor_bado;
+			monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
+			monitor_bado.OnInitADOConn(); 
+			strSql=_T("delete * from MonitorData");
+			monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+			monitor_bado.CloseConn();
 
 			WritePrivateProfileString(temp_serial,temp_monitor_index,NULL,g_cstring_ini_path);
 			WritePrivateProfileString(temp_serial,temp_monitor_digital_index,NULL,g_cstring_ini_path);
@@ -1259,7 +1289,6 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteSelected()
 			//每次读完Monitor的 值 记录下读写的时间,和Minipanel 比对 ,若minipanel 有进行删减的动作
 			CString temp_db_ini_folder;
 			temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
-
 			CTime temp_start = CTime::GetCurrentTime();
 			unsigned long end_long_time = temp_start.GetTime();
 			CString temp_time_num;
@@ -1694,9 +1723,9 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 	if(temp_index >= m_monitor_head.total_seg)	//如果数据库里面的 index 已经比设备里面的 多，就说明已经读过了;不需要再往数据库里面存了;
 		return 1;
 
-	CppSQLite3DB SqliteMonitor;
-	SqliteMonitor.open((UTF8MBSTR)g_achive_monitor_datatbase_path);
-	
+	CBADO monitor_bado;
+	monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
+	monitor_bado.OnInitADOConn(); 
 	int loop_count = 400/(sizeof(Str_mon_element));
 	for (int i=0;i<loop_count;i++)
 	{
@@ -1842,9 +1871,9 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 
 		CString strSql;
 		strSql.Format(_T("insert into MonitorData values('%s',#%s#,%u,%d,%u,%u,'%s')"),temp_type,display_time,temp_data.time,temp_data.value,  analog_data ,temp_flag,Label_Des);
-		 
-		SqliteMonitor.execDML((UTF8MBSTR)strSql);
-		
+		//strSql.Format(_T("insert into MonitorData values('%s',%d,%u,%u,%u,'%s','%s')"),temp_type,temp_data.value,temp_data.time , analog_data ,temp_flag,display_time,Label_Des);
+		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+
 		
 
 	}
@@ -1876,23 +1905,21 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 		//DFTrace(temp_write_index);
 	}
 
-	SqliteMonitor.closedb();
-	 
+
+	monitor_bado.CloseConn();
 
 	if(delete_temp_db_data)
 	{
 		CString strSql;
-	   CppSQLite3DB SqliteMonitor;
-	   SqliteMonitor.open((UTF8MBSTR)g_achive_monitor_datatbase_path);
+		CBADO monitor_bado;
+		monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库 
+		monitor_bado.OnInitADOConn(); 
 		if(analog_data)
-			strSql.Format(_T("delete   from MonitorData where Flag=1 and Analog_Digital=1"));
+			strSql.Format(_T("delete * from MonitorData where Flag=1 and Analog_Digital=1"));
 		else
-			strSql.Format(_T("delete   from MonitorData where Flag=1 and Analog_Digital=0"));
-
-			
-
-	   SqliteMonitor.execDML((UTF8MBSTR)strSql);
-	   SqliteMonitor.closedb();
+			strSql.Format(_T("delete * from MonitorData where Flag=1 and Analog_Digital=0"));
+		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+		monitor_bado.CloseConn();
 
 	}
 

@@ -250,4 +250,8 @@ public:
 	afx_msg void OnEnKillfocusEditTranducerMin();
     afx_msg void OnEnKillfocusEditChangeOverTime();
     afx_msg void OnEnKillfocusEditTstatName();
+	afx_msg void OnCbnSelchangeComboMrd();
+	CComboBox m_combox_mrd;
+	afx_msg void OnBnClickedButtonApplyAll();
+	afx_msg void OnBnClickedButtonZigbee();
 };

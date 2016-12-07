@@ -2189,6 +2189,15 @@ bool scaning_mode = false;
 
 bool isp_mode_is_cancel = true;
 bool isp_mode_firmware_auto;
+
+int isp_mode_error_code = 0;
+
 CString isp_mode_detect_firmware_path;
 
 	HANDLE hwait_scan_thread;
+
+int graphic_view_index ;
+CString grapgic_view_name[3];
+bool graphic_view_visible[14];
+CString bacnet_message_input_title;	//输入的提示信息
+CString bacnet_message_return_string;  //得到的输入字符串

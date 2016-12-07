@@ -295,7 +295,7 @@ public:
     // BOOL OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult);
 	 int DayMax;
 	 int DayMin;
-     CStaticEx m_isp;
+    // CStaticEx m_isp;
      CToolTipCtrl m_tooltips;
      afx_msg void OnEnKillfocusDayEdit();
      

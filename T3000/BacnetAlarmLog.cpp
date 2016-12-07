@@ -220,10 +220,18 @@ LRESULT CBacnetAlarmLog::Fresh_Alarmlog_List(WPARAM wParam,LPARAM lParam)
 
 
 			time_t tempalarm_time ;
-			tempalarm_time = m_alarmlog_data.at(i).alarm_time;
-			CTime time_alarmtime;
-			time_alarmtime = tempalarm_time;
-			temp_time = time_alarmtime.Format("%y/%m/%d %H:%M:%S");
+			tempalarm_time = (unsigned int)m_alarmlog_data.at(i).alarm_time;
+			if((tempalarm_time < 1420041600)  || (tempalarm_time > 1735660800))	//时间范围 2015-1-1  ->2049-12-30  ，不在此时间的数据无效;
+			{
+				temp_time.Empty();
+			}
+			else
+			{
+				CTime time_alarmtime;
+				time_alarmtime = tempalarm_time;
+				temp_time = time_alarmtime.Format("%y/%m/%d %H:%M:%S");
+			}
+
 
 			if(m_alarmlog_data.at(i).acknowledged == 1)
 			{

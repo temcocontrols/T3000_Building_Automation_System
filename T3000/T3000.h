@@ -48,21 +48,32 @@ struct ALL_NODE {
 };
 
 struct Building{
-_variant_t Main_BuildingName;
-_variant_t Building_Name;
-_variant_t Protocal;
-_variant_t Com_Port;
-_variant_t Ip_Address;
-_variant_t Ip_Port;
-_variant_t Braudrate;
-_variant_t Default_SubBuilding;
-_variant_t Building_Path;
+CString Main_BuildingName;
+CString Building_Name;
+CString Protocal;
+CString Com_Port;
+CString Ip_Address;
+CString Ip_Port;
+CString Braudrate;
+BOOL Default_SubBuilding;
+CString Building_Path;
+CString Longitude;
+CString Latitude;
+CString Elevation;
+int  ID;
+CString country;
+CString state;
+CString city;
+CString street;
+CString ZIP;
+CString EngineeringUnits;
+
 };
 struct Building_ALL{
-_variant_t Building_Name;
-_variant_t Default_Building;
-_variant_t Telephone;
-_variant_t Address;
+CString Building_Name;
+BOOL Default_Building;
+CString Telephone;
+CString Address;
 };
 
 struct CustomProductTable{
@@ -235,6 +246,7 @@ public:
 	void Judgestore();
 	void ReadREG();
 	int  GetLanguage();
+    void UpdateDB();
 	void SetLanguage(DWORD Last);
 	DWORD m_maxClients;
 	DWORD password;

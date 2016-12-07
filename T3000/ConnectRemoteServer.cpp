@@ -159,7 +159,11 @@ BOOL CConnectRemoteServer::OnInitDialog()
 
 	if(udp_ptp_client_thread == NULL)
 		udp_ptp_client_thread = CreateThread(NULL,NULL,UDP_ptp_Thread,this,NULL, NULL);
-
+	else
+	{
+		TerminateThread(udp_ptp_client_thread,NULL);
+		udp_ptp_client_thread = CreateThread(NULL,NULL,UDP_ptp_Thread,this,NULL, NULL);
+	}
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -167,6 +171,7 @@ BOOL CConnectRemoteServer::OnInitDialog()
 DWORD WINAPI UDP_ptp_Thread(LPVOID lpVoid)
 {
 	CConnectRemoteServer *pParent = (CConnectRemoteServer *)lpVoid;
+
 #if 1
 	hostent* host = gethostbyname("newfirmware.com");
 	if(host == NULL)
@@ -177,10 +182,12 @@ DWORD WINAPI UDP_ptp_Thread(LPVOID lpVoid)
 		pParent->Invalidate(1);
 		return 1;
 	}
-#endif
 	char* pszIP  = (char *)inet_ntoa(*(struct in_addr *)(host->h_addr)); 
 	memset(dyndns_ipaddress,0,20);
 	memcpy_s((char *)dyndns_ipaddress,20,pszIP,20);
+#endif
+	
+
 
 	//memcpy_s((char *)dyndns_ipaddress,20,"127.0.0.1",20);
 	//memcpy_s((char *)dyndns_ipaddress,20,"192.168.0.99",20);
@@ -192,21 +199,23 @@ DWORD WINAPI UDP_ptp_Thread(LPVOID lpVoid)
 	sockaddr_in addrServer;
 	addrServer.sin_addr.S_un.S_addr=inet_addr(dyndns_ipaddress);
 	addrServer.sin_family=AF_INET;
-	addrServer.sin_port=htons(SERVER_T3000_PORT);
+	addrServer.sin_port=htons(SERVER_MINI_PORT);
 
 	char send_buffer[1000];
 	memset(send_buffer,0,1000);
 
-	send_buffer[0] = 0x55;
-	send_buffer[1] = 0xff;
-	send_buffer[2] = COMMAND_T3000_REQUEST;
+	
+	send_buffer[0] = COMMAND_FROM_T3000;
+	send_buffer[1] = 0x55;
+	send_buffer[2] = 0xff;
+	send_buffer[3] = COMMAND_T3000_REQUEST;
 
 	Str_T3000_Connect temp_data;
 	temp_data.reg_date.m_serial_number = remote_connect_serial_number;
 	memcpy(temp_data.reg_date.login_message.userName,ptpLoginName,30);
 	memcpy(temp_data.reg_date.login_message.password,ptpLoginPassword,20);
 	
-	memcpy(&send_buffer[3],&temp_data,T3000_CONNECT_LENGTH);
+	memcpy(&send_buffer[4],&temp_data,T3000_CONNECT_LENGTH);
 
 	
 	//for (int i=0;i<30;i++)
@@ -224,8 +233,8 @@ DWORD WINAPI UDP_ptp_Thread(LPVOID lpVoid)
 	int temp_len=sizeof(sockaddr);
 	int ret_rec = 0;
 
-	while(1)
-	{
+	//while(1)
+	//{
 
 		ConnectMessage[static_step].Format(_T("Request connection to the server!"));
 		static_step ++ ;
@@ -241,7 +250,8 @@ DWORD WINAPI UDP_ptp_Thread(LPVOID lpVoid)
 			ConnectMessage[static_step].Format(_T("Recvfrom server error!"));
 			static_step ++ ;
 			pParent->Invalidate(1);
-			continue;
+			goto end_udp_hole_thread;
+			//continue;
 		}
 		//接收到服务器发来的 minipanel 的 信息; 209 个字节
 		if(((unsigned char)receive_buffer[0] == 0x55) && ((unsigned char)receive_buffer[1] == 0xff) )
@@ -251,42 +261,44 @@ DWORD WINAPI UDP_ptp_Thread(LPVOID lpVoid)
 				//收到的命令格式不正确;
 				ConnectMessage[static_step].Format(_T("Command type error!"));
 				static_step ++ ;
-				continue;
+				goto end_udp_hole_thread;
 			}
 			else if((unsigned char)receive_buffer[2] == COMMAND_PASSWORD_ERROR)
 			{
 				//账号密码错误;
 				ConnectMessage[static_step].Format(_T("Username and password error!"));
 				static_step ++ ;
-				continue;
+				goto end_udp_hole_thread;
 			}
 			else if((unsigned char)receive_buffer[2] == COMMAND_DEVICE_NOT_CONNECT_ERROR)
 			{
 				//账号密码错误;
 				ConnectMessage[static_step].Format(_T("Device not connect to the server yet!"));
 				static_step ++ ;
-				continue;
+				goto end_udp_hole_thread;
 			}
 			else if((unsigned char)receive_buffer[2] == COMMAND_DEVICE_NO_HEARTBEAT_ERROR)
 			{
 				//账号密码错误;
 				ConnectMessage[static_step].Format(_T("No heartbeat package from device!"));
 				static_step ++ ;
-				continue;
+				goto end_udp_hole_thread;
 			}		
 		}
 
 		if(ret_rec != T3000_MINI_HEARTBEAT_LENGTH_WITH_MINI_PORT)
 		{
 			//不是收到的minipanel 的端口信息 + minipanel 的 所有信息 ;
-			continue;
+			ConnectMessage[static_step].Format(_T("Error comand receive!"));
+			static_step ++ ;
+			goto end_udp_hole_thread;
 
 		}
 		ConnectMessage[static_step].Format(_T("Get device ip address information from server success!"));
 		static_step ++ ;
 		pParent->Invalidate(1);
-		break;
-	}
+		//break;
+	//}
 
 
 	char c_ip[16];
@@ -308,18 +320,83 @@ DWORD WINAPI UDP_ptp_Thread(LPVOID lpVoid)
 	send_buffer[1] = 0xff;
 	send_buffer[2] = COMMAND_T3000_SEND_TO_DEVICE_MAKEHOLE;
 	
-	int nNetTimeout = 3000; //1秒
+	//int nNetTimeout = 5000; //1秒
+	//setsockopt( sockClient, SOL_SOCKET, SO_RCVTIMEO, ( char * )&nNetTimeout, sizeof( int ) );
+
+	memset(receive_buffer,0,1000);
+	ret_rec = recvfrom(sockClient,receive_buffer,1000,0,(sockaddr *)&addrServer,&temp_len);
+	if(ret_rec <= 0)
+	{
+		Sleep(1000);  //接收出错 延时等待;
+		ConnectMessage[static_step].Format(_T("Recvfrom server error , No suuccess COMMAND_MINI_SEDN_T3000_DONE 10  receive!"));
+		static_step ++ ;
+		pParent->Invalidate(1);
+		goto end_udp_hole_thread;
+	}
+
+	if(((unsigned char)receive_buffer[0] != 0x55) || ((unsigned char)receive_buffer[1] != 0xff) || ((unsigned char)receive_buffer[2] != COMMAND_T3000_KEYI_FA_MESSAGE))
+	{
+		Sleep(1000);  //接收出错 延时等待;
+		ConnectMessage[static_step].Format(_T("Not 0x10  received!"));
+		static_step ++ ;
+		pParent->Invalidate(1);
+		goto end_udp_hole_thread;
+	}
+
+
+
+	Sleep(2000);
+
+
+	send_buffer[0] = 0x55;
+	send_buffer[1] = 0xFF;
+	send_buffer[2] = COMMAND_T3000_HOLE_SUCCESS_OR_NOT;
+	sendto(sockClient,send_buffer,3,0,(sockaddr*)&addr_device_address,sizeof(sockaddr));
+
+
+	int nNetTimeout = 5000; //1秒
 	setsockopt( sockClient, SOL_SOCKET, SO_RCVTIMEO, ( char * )&nNetTimeout, sizeof( int ) );
+
+	memset(receive_buffer,0,1000);
+	ret_rec = recvfrom(sockClient,receive_buffer,1000,0,(sockaddr *)&addr_device_address,&temp_len);
+	if(ret_rec <= 0)
+	{
+		ConnectMessage[static_step].Format(_T("No device reply . Make UDP Hole failed!"));
+		static_step ++ ;
+		pParent->Invalidate(1);
+		////取消接收时限
+		nNetTimeout = 0;
+		setsockopt( sockClient, SOL_SOCKET, SO_RCVTIMEO, ( char * )&nNetTimeout, sizeof( int ) );
+		ret_rec = recvfrom(sockClient,receive_buffer,1000,0,(sockaddr *)&addr_device_address,&temp_len);
+		goto end_udp_hole_thread;
+	}
+
+	if(((unsigned char)receive_buffer[0] != 0x55) || ((unsigned char)receive_buffer[1] != 0xff) || ((unsigned char)receive_buffer[2] != COMMAND_REPLY_MK_HOLE_SUCCESS))
+	{
+		ConnectMessage[static_step].Format(_T("Receive Command Error,Make UDP Hole failed!"));
+		static_step ++ ;
+		pParent->Invalidate(1);
+
+
+		goto end_udp_hole_thread;
+		//goto end_udp_hole_thread;
+	}
+
 
 	while(1)
 	{
+		send_buffer[0] = 0x31;
+		send_buffer[1] = 0x32;
+		send_buffer[2] = 0x33;
+		send_buffer[3] = 0;
 
-
-
-		sendto(sockClient,send_buffer,3,0,(sockaddr*)&addr_device_address,sizeof(sockaddr));
-		ConnectMessage[static_step].Format(_T("Send PTP connection to IP: %d.%d.%d.%d. Port : %u ."),(unsigned char)test_ip[0],(unsigned char)test_ip[1],(unsigned char)test_ip[2],(unsigned char)test_ip[3],test_miniport);
+		sendto(sockClient,send_buffer,4,0,(sockaddr*)&addr_device_address,sizeof(sockaddr));
+		ConnectMessage[static_step].Format(_T("Send message 123 to minipanel"),(unsigned char)test_ip[0],(unsigned char)test_ip[1],(unsigned char)test_ip[2],(unsigned char)test_ip[3],test_miniport);
 		static_step ++ ;
 		pParent->Invalidate(1);
+		Sleep(2000);
+
+#if 0
 		memset(receive_buffer,0,1000);
 
 		sockaddr_in temp_receive_addr;
@@ -349,16 +426,27 @@ DWORD WINAPI UDP_ptp_Thread(LPVOID lpVoid)
 			DFTrace(total_char_test);
 			break;
 		}
+#endif
 	}
 
 
-	//取消接收时限
-	nNetTimeout = 0;
-	setsockopt( sockClient, SOL_SOCKET, SO_RCVTIMEO, ( char * )&nNetTimeout, sizeof( int ) );
-	ret_rec = recvfrom(sockClient,receive_buffer,1000,0,(sockaddr *)&addr_device_address,&temp_len);
+	////取消接收时限
+	//nNetTimeout = 0;
+	//setsockopt( sockClient, SOL_SOCKET, SO_RCVTIMEO, ( char * )&nNetTimeout, sizeof( int ) );
+	//ret_rec = recvfrom(sockClient,receive_buffer,1000,0,(sockaddr *)&addr_device_address,&temp_len);
+
 
 	Sleep(1);
+	udp_ptp_client_thread = NULL;
 	return 1;
+
+end_udp_hole_thread:
+	ConnectMessage[static_step].Format(_T("PTP connection Failed!"));
+	static_step ++ ;
+	pParent->Invalidate(1);
+
+	udp_ptp_client_thread = NULL;
+	return 2;
 }
 
 DWORD WINAPI  TcpClient_Connect_Thread(LPVOID lpVoid)
@@ -369,7 +457,6 @@ DWORD WINAPI  TcpClient_Connect_Thread(LPVOID lpVoid)
 	//{
 		CString temp_db_ini_folder;
 		temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
-
 		int is_local_temco_net = false;
 		is_local_temco_net  = GetPrivateProfileInt(_T("Setting"),_T("LocalTemcoNet"),0,temp_db_ini_folder);
 		if(is_local_temco_net == false)

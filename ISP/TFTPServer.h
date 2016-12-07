@@ -93,11 +93,16 @@ public:
 
 	BOOL StartServer_Old_Protocol();
 	 
+
+	void GetIPMaskGetWay();
+	UINT RefreshNetWorkDeviceListByUDPFunc();
+	unsigned short AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind);
+	int					m_nClientPort;
 protected:
 	BYTE*			m_szDataBuf;			// 要发送到数据
 	int					m_nDataBufLen;
 	DWORD			m_dwClientIP;
-	int					m_nClientPort;
+	
 	int					m_nBlkNum;			// 块号
 	
 	CString			m_strFileName;

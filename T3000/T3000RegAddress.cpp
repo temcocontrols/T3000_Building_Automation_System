@@ -149,14 +149,14 @@ bool T3000RegAddress::MatchMoudleAddress(void)
 		T3_28IN[temp_variant_item].AddressValue = temp_variant_item;
 		T3_RTD[temp_variant_item].AddressValue = temp_variant_item;
 
-		temp_variant=m_q.getValuebyName(_T("T3-8AI8AO"));
+		temp_variant=m_q.getValuebyName(_T("T3_8AI8AO"));
 		cs_temp=temp_variant;
 		cs_temp = cs_temp.Trim();
 		nlength = cs_temp.GetLength() + 1;
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
 		strcpy_s(T3_8AI8AO[temp_variant_item].AddressName,nlength,cTemp);
 
-		temp_variant=m_q.getValuebyName(_T("T3-8AI16O"));
+		temp_variant=m_q.getValuebyName(_T("T3_8AI16O"));
 		memset(cTemp,0,256);
 		cs_temp=temp_variant;
 		cs_temp = cs_temp.Trim();
@@ -164,7 +164,7 @@ bool T3000RegAddress::MatchMoudleAddress(void)
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
 		strcpy_s(T3_8AI16O[temp_variant_item].AddressName,nlength,cTemp);
 
-		temp_variant=m_q.getValuebyName(_T("T3-32AI"));
+		temp_variant=m_q.getValuebyName(_T("T3_32AI"));
 		memset(cTemp,0,256);
 		cs_temp=temp_variant;
 		cs_temp = cs_temp.Trim();
@@ -172,7 +172,7 @@ bool T3000RegAddress::MatchMoudleAddress(void)
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
 		strcpy_s(T3_32AI[temp_variant_item].AddressName,nlength,cTemp);
 
-		temp_variant=m_q.getValuebyName(_T("T3-Performance"));
+		temp_variant=m_q.getValuebyName(_T("T3_Performance"));
 		memset(cTemp,0,256);
 		cs_temp=temp_variant;
 		cs_temp = cs_temp.Trim();
@@ -180,7 +180,7 @@ bool T3000RegAddress::MatchMoudleAddress(void)
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
 		strcpy_s(T3_Performance[temp_variant_item].AddressName,nlength,cTemp);
 
-		temp_variant=m_q.getValuebyName(_T("T3-4AO"));
+		temp_variant=m_q.getValuebyName(_T("T3_4AO"));
 		memset(cTemp,0,256);
 		cs_temp=temp_variant;
 		cs_temp = cs_temp.Trim();
@@ -188,7 +188,7 @@ bool T3000RegAddress::MatchMoudleAddress(void)
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
 		strcpy_s(T3_4AO[temp_variant_item].AddressName,nlength,cTemp);
 
-		temp_variant=m_q.getValuebyName(_T("T3-6CT"));
+		temp_variant=m_q.getValuebyName(_T("T3_6CT"));
 		memset(cTemp,0,256);
 		cs_temp=temp_variant;
 		cs_temp = cs_temp.Trim();
@@ -196,7 +196,7 @@ bool T3000RegAddress::MatchMoudleAddress(void)
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
 		strcpy_s(T3_6CT[temp_variant_item].AddressName,nlength,cTemp);
 
-		temp_variant=m_q.getValuebyName(_T("T3-28IN"));
+		temp_variant=m_q.getValuebyName(_T("T3_28IN"));
 		memset(cTemp,0,256);
 		cs_temp=temp_variant;
 		cs_temp = cs_temp.Trim();
@@ -204,7 +204,7 @@ bool T3000RegAddress::MatchMoudleAddress(void)
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
 		strcpy_s(T3_28IN[temp_variant_item].AddressName,nlength,cTemp);
 
-		temp_variant=m_q.getValuebyName(_T("T3-RTD"));
+		temp_variant=m_q.getValuebyName(_T("T3_RTD"));
 		memset(cTemp,0,256);
 		cs_temp=temp_variant;
 		cs_temp = cs_temp.Trim();
@@ -212,7 +212,7 @@ bool T3000RegAddress::MatchMoudleAddress(void)
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
 		strcpy_s(T3_RTD[temp_variant_item].AddressName,nlength,cTemp);
 
-		temp_variant=m_q.getValuebyName(_T("T3-8I13O"));
+		temp_variant=m_q.getValuebyName(_T("T3_8I13O"));
 		memset(cTemp,0,256);
 		cs_temp=temp_variant;
 		cs_temp = cs_temp.Trim();

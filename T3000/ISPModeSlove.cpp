@@ -8,7 +8,7 @@
 #include "globle_function.h"
 
 // CISPModeSlove dialog
-
+int timer_count = 30;
 IMPLEMENT_DYNAMIC(CISPModeSlove, CDialogEx)
 
 CISPModeSlove::CISPModeSlove(CWnd* pParent /*=NULL*/)
@@ -39,6 +39,7 @@ BEGIN_MESSAGE_MAP(CISPModeSlove, CDialogEx)
 
 	ON_BN_CLICKED(IDC_RADIO_FROM_SERVER, &CISPModeSlove::OnBnClickedRadioFromServer)
 	ON_BN_CLICKED(IDC_RADIO_FROM_HARDISK, &CISPModeSlove::OnBnClickedRadioFromHardisk)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -51,6 +52,8 @@ BOOL CISPModeSlove::OnInitDialog()
 
 	// TODO:  Add extra initialization here
 	Initial_static();
+	timer_count = 30;
+	SetTimer(1,1000,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -63,46 +66,64 @@ CStaticEx m_isp_mode_title;
 
 void CISPModeSlove::Initial_static()
 {
-	m_isp_mode_title.SetWindowTextW(_T("Your device is in ISP mode !\r\n\
-We suggest you to update your firmware."));
-	m_isp_mode_title.textColor(RGB(0,0,0));
-	//m_isp_mode_title.bkColor(RGB(0,255,255));
-	m_isp_mode_title.setFont(28,16,NULL,_T("Arial"));
 
-	//m_device_ip_title.SetWindowTextW(_T(""));
-	m_device_ip_title.textColor(RGB(0,0,0));
-	//m_device_ip_title.bkColor(RGB(0,255,255));
-	m_device_ip_title.setFont(22,16,NULL,_T("Arial"));
+	//m_isp_mode_title.textColor(RGB(0,0,0));
+	////m_isp_mode_title.bkColor(RGB(0,255,255));
+	//m_isp_mode_title.setFont(28,16,NULL,_T("Arial"));
 
-	//m_product_name_title.SetWindowTextW(_T(""));
-	m_product_name_title.textColor(RGB(0,0,0));
-	//m_product_name_title.bkColor(RGB(0,255,255));
-	m_product_name_title.setFont(22,16,NULL,_T("Arial"));
+	////m_device_ip_title.SetWindowTextW(_T(""));
+	//m_device_ip_title.textColor(RGB(0,0,0));
+	////m_device_ip_title.bkColor(RGB(0,255,255));
+	//m_device_ip_title.setFont(22,16,NULL,_T("Arial"));
+
+	////m_product_name_title.SetWindowTextW(_T(""));
+	//m_product_name_title.textColor(RGB(0,0,0));
+	////m_product_name_title.bkColor(RGB(0,255,255));
+	//m_product_name_title.setFont(22,16,NULL,_T("Arial"));
 
 	CString temp_ip;
 	temp_ip.Format(_T("%u.%u.%u.%u"),need_isp_device.ipaddress[0],need_isp_device.ipaddress[1],need_isp_device.ipaddress[2],need_isp_device.ipaddress[3]);
 
 	m_device_ip_edit.SetWindowTextW(temp_ip);
-	m_device_ip_edit.textColor(RGB(0,0,255));
-	//m_device_ip_edit.bkColor(RGB(0,255,255));
-	m_device_ip_edit.setFont(22,16,NULL,_T("Arial"));
+	//m_device_ip_edit.textColor(RGB(0,0,255));
+	////m_device_ip_edit.bkColor(RGB(0,255,255));
+	//m_device_ip_edit.setFont(22,16,NULL,_T("Arial"));
 
 
 	CString temp_device_name;
 	temp_device_name = GetProductName(need_isp_device.product_id);
 
 	m_device_name_edit.SetWindowTextW(temp_device_name);
-	m_device_name_edit.textColor(RGB(0,0,255));
-	//m_device_name_edit.bkColor(RGB(0,255,255));
-	m_device_name_edit.setFont(22,16,NULL,_T("Arial"));
+	//m_device_name_edit.textColor(RGB(0,0,255));
+	////m_device_name_edit.bkColor(RGB(0,255,255));
+	//m_device_name_edit.setFont(22,16,NULL,_T("Arial"));
 
 	GetDlgItem(IDC_STATIC_ISP_FIRMWARE_PATH)->SetWindowTextW(_T(""));
 	((CButton *)GetDlgItem(IDC_RADIO_FROM_SERVER))->SetCheck(true);
 
 	
-	GetDlgItem(IDC_STATIC_ISP_FIRMWARE)->EnableWindow(0);
-	GetDlgItem(IDC_STATIC_ISP_FIRMWARE_PATH)->EnableWindow(0);
-	GetDlgItem(IDC_BUTTON_ISP_CHOOSE_FIRMWARE)->EnableWindow(0);
+
+
+	if(isp_mode_error_code == 2)
+	{
+		m_isp_mode_title.SetWindowTextW(_T("Your device is in ISP mode !\r\n\And your bootloader is broken.\r\nPlease update your bootloader.\r\n\
+We suggest you to update your firmware."));
+		((CButton *)GetDlgItem(IDC_RADIO_FROM_SERVER))->SetCheck(false);
+		((CButton *)GetDlgItem(IDC_RADIO_FROM_HARDISK))->SetCheck(true);
+
+		(CButton *)GetDlgItem(IDC_RADIO_FROM_SERVER)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC_ISP_FIRMWARE)->EnableWindow(1);
+		GetDlgItem(IDC_STATIC_ISP_FIRMWARE_PATH)->EnableWindow(1);
+		GetDlgItem(IDC_BUTTON_ISP_CHOOSE_FIRMWARE)->EnableWindow(1);
+
+	}
+	else
+	{
+		m_isp_mode_title.SetWindowTextW(_T("Your device is in ISP mode !\r\n\We suggest you to update your firmware."));
+		GetDlgItem(IDC_STATIC_ISP_FIRMWARE)->EnableWindow(0);
+		GetDlgItem(IDC_STATIC_ISP_FIRMWARE_PATH)->EnableWindow(0);
+		GetDlgItem(IDC_BUTTON_ISP_CHOOSE_FIRMWARE)->EnableWindow(0);
+	}
 }
 
 
@@ -118,6 +139,7 @@ BOOL CISPModeSlove::PreTranslateMessage(MSG* pMsg)
 void CISPModeSlove::OnBnClickedButtonIspChooseFirmware()
 {
 	// TODO: Add your control notification handler code here
+	KillTimer(1);
 	CFileDialog dlg(true,_T(""),_T(" "),OFN_HIDEREADONLY ,_T("hex File;bin File|*.hex;*.bin|all File|*.*||"),NULL,0);
 	if(IDOK!=dlg.DoModal())
 		return ;
@@ -163,4 +185,30 @@ void CISPModeSlove::OnBnClickedRadioFromHardisk()
 	GetDlgItem(IDC_STATIC_ISP_FIRMWARE)->EnableWindow(1);
 	GetDlgItem(IDC_STATIC_ISP_FIRMWARE_PATH)->EnableWindow(1);
 	GetDlgItem(IDC_BUTTON_ISP_CHOOSE_FIRMWARE)->EnableWindow(1);
+}
+
+
+void CISPModeSlove::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: Add your message handler code here and/or call default
+	switch(nIDEvent)
+	{
+	case 1:
+		{
+			timer_count --;
+			if(timer_count == 0)
+			{
+				KillTimer(1);
+				isp_mode_is_cancel = true;
+				PostMessage(WM_CLOSE,NULL,NULL);
+			}
+			CString temp_cs;
+			temp_cs.Format(_T("Cancel (%d)"),timer_count);
+			GetDlgItem(IDC_BUTTON_ISP_CANCEL)->SetWindowTextW(temp_cs);
+		}
+		break;
+	default:
+		break;
+	}
+	CDialogEx::OnTimer(nIDEvent);
 }

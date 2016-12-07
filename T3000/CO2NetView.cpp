@@ -1939,30 +1939,72 @@ void CCO2NetView::OnEnKillfocusEditName()
 {
 	CString strTemp;
 	GetDlgItem(IDC_EDIT_NAME)->GetWindowText(strTemp);
-	int Value=_wtoi(strTemp);
-	if (strTemp.Compare(m_oldname)==0)
-	{
-		return;
-	}
+	float Value=_wtof(strTemp);
+// 	if (strTemp.Compare(m_oldname)==0)
+// 	{
+// 		return;
+// 	}
+	int Internal_Address = 0;
+	int External_Address = 0;
 	if (m_isinput)
 	{
 		 
 		if (m_curcol==5)
 		{
-// 			int regvalue=product_register_value[LIGHTING_ZONE_TIME_INPUT1+m_currow-1];
-// 			if (Value!=regvalue)
-// 			{
-// 				int ret1=write_one(g_tstat_id,LIGHTING_ZONE_TIME_INPUT1+m_currow-1,Value);
-// 				if (ret1>0)
-// 				{
-// 					product_register_value[LIGHTING_ZONE_TIME_INPUT1+m_currow-1]=Value;
-// 					InitialDialog();
-// 				}
-// 				else
-// 				{
-// 					AfxMessageBox(_T("Try again"));
-// 				}
-// 			}
+ 
+			if (m_currow == 1)
+			{
+				if (product_register_value[CO2_NET_MODBUS_TEMPERATURE_DEGREE_C_OR_F] == 0)
+				{
+					Internal_Address = CO2_NET_MODBUS_INTERNAL_TEMPERATURE_CELSIUS;
+					External_Address = CO2_NET_MODBUS_EXTERNAL_TEMPERATURE_CELSIUS;
+
+
+				}
+				else if ((product_register_value[CO2_NET_MODBUS_TEMPERATURE_DEGREE_C_OR_F] == 1))
+				{
+					Internal_Address = CO2_NET_MODBUS_INTERNAL_TEMPERATURE_FAHRENHEIT;
+					External_Address = CO2_NET_MODBUS_EXTERNAL_TEMPERATURE_FAHRENHEIT;
+
+
+				}
+
+				int RegAddress = 0;
+
+				if (product_register_value[CO2_NET_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//ÄÚ²¿
+				{
+					RegAddress = Internal_Address;
+
+				}
+				else
+				{
+					RegAddress = External_Address;
+				}
+				write_one(g_tstat_id, RegAddress, Value * 10);
+				product_register_value[RegAddress] = Value * 10;
+				
+			}
+
+			//int	CO2_NET_MODBUS_OUTPUT_MANUAL_VALUE_TEM;
+			//int	CO2_NET_MODBUS_OUTPUT_MANUAL_VALUE_HUM;
+			//int	CO2_NET_MODBUS_OUTPUT_MANUAL_VALUE_CO2;
+
+// 		   if (m_currow == 2)
+// 		   {
+// 			   strHUM.Format(_T("%0.1f"), (float)(product_register_value[CO2_NET_MODBUS_HUMIDITY]) / 10.0);
+// 			   m_grid_input.put_TextMatrix(2, 4, strHUM);
+// 			   strCO2.Format(_T("%d"), product_register_value[CO2_NET_MODBUS_CO2_INTERNAL]);
+// 			   m_grid_input.put_TextMatrix(3, 4, strCO2);
+// 		   }
+// 		   if (m_currow == 3)
+// 		   {
+// 			   strHUM.Format(_T("%0.1f"), (float)(product_register_value[CO2_NET_MODBUS_HUMIDITY]) / 10.0);
+// 			   m_grid_input.put_TextMatrix(2, 4, strHUM);
+// 			   strCO2.Format(_T("%d"), product_register_value[CO2_NET_MODBUS_CO2_INTERNAL]);
+// 			   m_grid_input.put_TextMatrix(3, 4, strCO2);
+// 		   }
+			
+		   Show_InputList();
 		}
 
 	}

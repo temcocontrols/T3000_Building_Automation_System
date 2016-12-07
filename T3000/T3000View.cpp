@@ -337,7 +337,7 @@ void CT3000View::DoDataExchange(CDataExchange* pDX)
 
 
 
-    DDX_Control(pDX, IDC_STATIC_ISP, m_isp);
+  /*  DDX_Control(pDX, IDC_STATIC_ISP, m_isp);*/
 }
 
 BOOL CT3000View::PreCreateWindow(CREATESTRUCT& cs)
@@ -462,7 +462,7 @@ void CT3000View::CreateFlexSilde()
 // 		m_pNightTwoSP->SetThumbColor(RGB(255,128,128));
 
         m_pNightTwoSP->SetChannelColor(RGB(192,192,192));
-        m_pNightTwoSP->SetThumbColor(RGB(0,0,255)); //改变上面滑块的颜色
+        m_pNightTwoSP->SetThumbColor(RGB(0,255,255)); //改变上面滑块的颜色
         m_pNightTwoSP->SetPageLength(5);
         m_pNightTwoSP->SetChannelWidth(20);//中间的坚状条大小
         m_pNightTwoSP->SetThumbWidth(34);//滑块的大小
@@ -568,7 +568,7 @@ void CT3000View::CreateFlexSilde()
 // 		m_pDayTwoSP->SetThumbColor(RGB(255,128,128));
 
         m_pDayTwoSP->SetChannelColor(RGB(192,192,192));
-        m_pDayTwoSP->SetThumbColor(RGB(0,0,255));
+        m_pDayTwoSP->SetThumbColor(RGB(0,255,255));
         m_pDayTwoSP->SetPageLength(5);
         m_pDayTwoSP->SetChannelWidth(20);
         m_pDayTwoSP->SetThumbWidth(34);
@@ -802,20 +802,20 @@ void CT3000View::Fresh()
         m_pFreshBackground = AfxBeginThread(BackMainUIFresh,this);
     }
 
-    if (product_register_value[11]!=0)
-    {
-        m_isp.ShowWindow(TRUE);
-        CString StrTemp;
-        StrTemp = _T("Your device may be in ISP Model,Please check your device");
-        m_isp.SetWindowTextW(StrTemp);
-        m_isp.textColor(RGB(255,0,0));
-        //m_current_product.bkColor(RGB(255,255,255));
-        m_isp.setFont(30,10,NULL,_T("Arial"));
-    }
-    else
-    {
-        m_isp.ShowWindow(FALSE);
-    }
+    //if (product_register_value[11]!=0)
+    //{
+    //    m_isp.ShowWindow(TRUE);
+    //    CString StrTemp;
+    //    StrTemp = _T("Your device may be in ISP Model,Please check your device");
+    //    m_isp.SetWindowTextW(StrTemp);
+    //    m_isp.textColor(RGB(255,0,0));
+    //    //m_current_product.bkColor(RGB(255,255,255));
+    //    m_isp.setFont(30,10,NULL,_T("Arial"));
+    //}
+    //else
+    //{
+    //    m_isp.ShowWindow(FALSE);
+    //}
     if (product_register_value[714]==0x56)
     {
         GetDlgItem(IDC_STATIC_NAME_TSTAT)->ShowWindow(TRUE);
@@ -3566,7 +3566,7 @@ BOOL CT3000View::PreTranslateMessage(MSG* pMsg)
         }
     }
     CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-    if (pFrame->m_pDialogInfo->IsWindowVisible())
+    if (pFrame->m_pDialogInfo != NULL && pFrame->m_pDialogInfo->IsWindowVisible())
     {
 
         if (pMsg->message == WM_LBUTTONDOWN||pMsg->message == WM_RBUTTONDOWN)
@@ -4221,6 +4221,11 @@ void CT3000View::OnBnClickedBtnSynctime()
 
     szTime[0] =(BYTE)(time.GetYear()%100);
     int nRet = write_one(g_tstat_id,MODBUS_YEAR, szTime[0]);
+	if (product_register_value[7] == PM_TSTAT8) 
+	{
+		 
+		write_one(g_tstat_id, MODBUS_YEAR, time.GetYear());
+	}
     Sleep(1000);
     szTime[1] = (BYTE)(time.GetMonth());
     nRet = write_one(g_tstat_id, MODBUS_MONTH, szTime[1]);
@@ -4793,6 +4798,9 @@ LRESULT CT3000View::OnFlexSlideCallBack(WPARAM wParam, LPARAM lParam)
                     return 0;
                 }
                 product_register_value[MODBUS_NIGHT_SETPOINT]=NightSP;
+				product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]=nCoolSP;
+				product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]=nHeatSP;
+
 				CString strTemp;
 				BOOL bRetSP = m_pNightSingleSP->SetPos_tstat6_3pos(nHeatSP, nSP, nCoolSP);
 				HandleSliderSetPos(bRetSP);//tstat6
@@ -4986,7 +4994,8 @@ LRESULT CT3000View::OnFlexSlideCallBack(WPARAM wParam, LPARAM lParam)
                 }
                 product_register_value[MODBUS_DAY_SETPOINT]=DaySP;
 
-
+				product_register_value[MODBUS_DAY_COOLING_SETPOINT]=nCoolSP;
+				product_register_value[MODBUS_DAY_HEATING_SETPOINT]=nHeatSP;
 
 				BOOL bRetSP = m_pDaySingleSP->SetPos_tstat6_3pos(nHeatSP, nSP, nCoolSP);//tstat6
 
@@ -6475,7 +6484,7 @@ void CT3000View::InitFlexSliderBars_tstat6()
             GetDlgItem(IDC_STATIC_MAX_NIGHT)->SetWindowText(strInfo);
             strInfo.Format(_T("%d"),DayMin);
             GetDlgItem(IDC_STATIC_MIN_NIGHT)->SetWindowText(strInfo);
-            if (NightHeatingSP<NightSP&&NightSP<NightCoolingSP)
+            if (NightHeatingSP<=NightSP&&NightSP<=NightCoolingSP)
             {
             }
             else

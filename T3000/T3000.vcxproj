@@ -26,13 +26,13 @@
     <UseOfAtl>false</UseOfAtl>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
     <PlatformToolset>v140</PlatformToolset>
@@ -117,12 +117,13 @@
     <Link>
       <AdditionalDependencies>setupapi.lib.;$(SolutionDir)SQLiteDriver\sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\T3000 Output\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <UACExecutionLevel>AsInvoker</UACExecutionLevel>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -150,6 +151,7 @@
     <ClCompile Include="BacnetGraphic.cpp" />
     <ClCompile Include="BacnetGraphicSetting.cpp" />
     <ClCompile Include="BacnetInput.cpp" />
+    <ClCompile Include="BacnetMessageInput.cpp" />
     <ClCompile Include="BacnetMonitor.cpp" />
     <ClCompile Include="BacnetOutput.cpp" />
     <ClCompile Include="BacnetProgram.cpp" />
@@ -171,6 +173,7 @@
     <ClCompile Include="BacnetVariable.cpp" />
     <ClCompile Include="BacnetWait.cpp" />
     <ClCompile Include="BacnetWeeklyRoutine.cpp" />
+    <ClCompile Include="BADO\BADO.cpp" />
     <ClCompile Include="BatchSNDlg.cpp" />
     <ClCompile Include="BinFileParser.cpp" />
     <ClCompile Include="BoatMonitorViewer.cpp" />
@@ -270,11 +273,12 @@
     <ClCompile Include="OutPutDlg.cpp" />
     <ClCompile Include="OutputSetDlg.cpp" />
     <ClCompile Include="OutsidDailog.cpp" />
+    <ClCompile Include="OXBitmapButton.cpp" />
+    <ClCompile Include="OXToolTipCtrl.cpp" />
     <ClCompile Include="ParameterDlg.cpp" />
     <ClCompile Include="ping.cpp" />
     <ClCompile Include="PressureSensorForm.cpp" />
     <ClCompile Include="ProductRegisterListView.cpp" />
-    <ClCompile Include="PVDlg.cpp" />
     <ClCompile Include="RefreshTreeThread.cpp" />
     <ClCompile Include="RegisterViewerDlg.cpp" />
     <ClCompile Include="RegisterWriteValueDlg.cpp" />
@@ -286,6 +290,7 @@
     <ClCompile Include="Scanwaydlg.cpp" />
     <ClCompile Include="SetPtDayDlg.cpp" />
     <ClCompile Include="SetptGraphicBar.cpp" />
+    <ClCompile Include="SetTimeDlg.cpp" />
     <ClCompile Include="StaticDlg.cpp" />
     <ClCompile Include="StatusbarCtrl.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -341,6 +346,7 @@
     <ClCompile Include="singleslider\MacSliderCtrl.cpp" />
     <ClCompile Include="WriteRegistersValueDlg.cpp" />
     <ClCompile Include="WriteSingleRegDlg.cpp" />
+    <ClCompile Include="ZigbeeInformationDlg.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ChartCtrl\ChartBalloonLabel.inl" />
@@ -411,10 +417,12 @@
     <None Include="res\MFC16API.dll" />
     <None Include="res\MFouct.bmp" />
     <None Include="res\MonitorData.db" />
+    <None Include="res\MonitorData.mdb" />
     <None Include="res\monitor_.bin" />
     <None Include="res\MUp.bmp" />
     <None Include="C:\Documents and Settings\lee\桌面\NWT3000.ico" />
     <None Include="res\OK.ico" />
+    <None Include="res\PIDBUTTON.bmp" />
     <None Include="res\Refresh.ico" />
     <None Include="res\relay.ico" />
     <None Include="res\Scan.ico" />
@@ -469,6 +477,7 @@
     <ClInclude Include="BacnetGraphic.h" />
     <ClInclude Include="BacnetGraphicSetting.h" />
     <ClInclude Include="BacnetInput.h" />
+    <ClInclude Include="BacnetMessageInput.h" />
     <ClInclude Include="BacnetOutput.h" />
     <ClInclude Include="BacnetProgram.h" />
     <ClInclude Include="BacnetProgramDebug.h" />
@@ -565,15 +574,19 @@
     <ClInclude Include="LCOutNameConfig.h" />
     <ClInclude Include="NewHumChamberView.h" />
     <ClInclude Include="NewTstatSchedulesDlg.h" />
+    <ClInclude Include="OXBitmapButton.h" />
+    <ClInclude Include="OXDllExt.h" />
+    <ClInclude Include="OXMainRes.h" />
+    <ClInclude Include="OXToolTipCtrl.h" />
     <ClInclude Include="ping.h" />
     <ClInclude Include="PressureSensorForm.h" />
     <ClInclude Include="ProductModel.h" />
     <ClInclude Include="ProductRegisterListView.h" />
-    <ClInclude Include="PVDlg.h" />
     <ClInclude Include="RegisterViewerDlg.h" />
     <ClInclude Include="RegisterWriteValueDlg.h" />
     <ClInclude Include="RemotePtpLogin.h" />
     <ClInclude Include="Scanwaydlg.h" />
+    <ClInclude Include="SetTimeDlg.h" />
     <ClInclude Include="StaticDlg.h" />
     <ClInclude Include="StatusbarCtrl.h" />
     <ClInclude Include="T3000DefaultView.h" />
@@ -687,6 +700,7 @@
     <ClInclude Include="singleslider\MacSliderCtrl.h" />
     <ClInclude Include="WriteRegistersValueDlg.h" />
     <ClInclude Include="WriteSingleRegDlg.h" />
+    <ClInclude Include="ZigbeeInformationDlg.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="T3000.rc" />

@@ -31,7 +31,7 @@ protected:
 	// 获得hex文件的类型
 	HEXFILE_FORMAT	GetHexFileType(CFile& hexFile);
 	// CRC 校验
-	BOOL DoCRC( unsigned char* szBuf, int nLen);
+	BOOL DoCRC( TS_UC* szBuf, int nLen);
 	// 辅助函数，获得高位地址
 	WORD GetHighAddrFromFile(const CString& strLine);
 	// 从文件中读取一行，放到缓冲区

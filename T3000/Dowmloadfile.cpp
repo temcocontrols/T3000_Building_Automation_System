@@ -88,6 +88,11 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
 		if(Downloadfile_Thread == NULL)
 			Downloadfile_Thread = CreateThread(NULL,NULL,DownLoadFileProcess,this,NULL, &download_threadid);
+		else
+		{
+			TerminateThread(Downloadfile_Thread,0);
+			Downloadfile_Thread = CreateThread(NULL,NULL,DownLoadFileProcess,this,NULL, &download_threadid);
+		}
 
 	}
 	else if(ncommand == DOWNLOAD_DISCONNEC)
@@ -354,7 +359,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 		case NO_COMMAND:
 		case START_AUTO_FLASH_COMMAND:
 		case FAILED_NORESPONSED:
-			ret_message.Format(_T("The device not response ,please try again!"));
+			ret_message.Format(_T("No response from device,please try again!"));
 			m_download_info.InsertString(m_download_info.GetCount(),ret_message);
 			m_download_info.SetTopIndex(m_download_info.GetCount()-1);
 			break;
@@ -367,7 +372,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 			break;
 		case FAILED_UNKNOW_ERROR:
 			{
-				ret_message.Format(_T("Unknown error! More details please reference Log_info.txt !"));
+				ret_message.Format(_T("Download error! "));
 				m_download_info.InsertString(m_download_info.GetCount(),ret_message);
 				m_download_info.SetTopIndex(m_download_info.GetCount()-1);
 			}
@@ -749,7 +754,6 @@ BOOL Dowmloadfile::OnInitDialog()
 	}
 	CString temp_db_ini_folder;
 	temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
-
 	
 	is_local_temco_net  = GetPrivateProfileInt(_T("Setting"),_T("LocalTemcoNet"),0,temp_db_ini_folder);
 	if(is_local_temco_net == false)
@@ -855,7 +859,6 @@ void Dowmloadfile::Start_Download()
 
 	CString temp_db_ini_folder;
 	temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
-
 	int is_local_temco_net = false;
 	is_local_temco_net  = GetPrivateProfileInt(_T("Setting"),_T("LocalTemcoNet"),0,temp_db_ini_folder);
 	if(is_local_temco_net == false)

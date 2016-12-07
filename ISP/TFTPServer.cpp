@@ -5,7 +5,8 @@
 #include "ISPDlg.h"
 #include "Iphlpapi.h"
 #include "MySocket.h"
-
+#include "globle_function.h"
+CString local_enthernet_ip;
  Bin_Info        global_fileInfor;
 ////#include <vector>			//矢量模板
 ////using  std::vector;			//命名空间
@@ -25,7 +26,7 @@ const int TFTP_PORT = 69;
 
 const int nLocalDhcp_Port = 67;			// Server本地67
 const int nSendDhcp_Port = 68;			// client目的68
-
+CString Failed_Message;
 
 typedef struct _Product_IP_ID
 {
@@ -257,7 +258,7 @@ int TFTPServer::SendProcess()
         nCount+= 512;
 
         CString strTips;
-        strTips.Format(_T("Programming finished %d byte."), nCount);
+        strTips.Format(_T("Programming finished %d bytes."), nCount);
         OutPutsStatusInfo(strTips, TRUE);
 
         if (nRet == SOCKET_ERROR)
@@ -587,9 +588,510 @@ void TFTPServer::SetDHCP_Data()
     memcpy_s(sendbuf+29,16,reserved,16);
 }
 
+struct ALL_LOCAL_SUBNET_NODE{
+	CString StrIP;
+	CString StrMask;
+	CString StrGetway;
+	int NetworkCardType;
+};
+
+vector<ALL_LOCAL_SUBNET_NODE> g_Vector_Subnet;
+
+void TFTPServer::GetIPMaskGetWay()
+{
+	g_Vector_Subnet.clear();
+	PIP_ADAPTER_INFO pAdapterInfo;
+	PIP_ADAPTER_INFO pAdapter = NULL;
+	DWORD dwRetVal = 0;
+	ULONG ulOutBufLen;
+	pAdapterInfo=(PIP_ADAPTER_INFO)malloc(sizeof(IP_ADAPTER_INFO));
+	ulOutBufLen = sizeof(IP_ADAPTER_INFO);
+	ALL_LOCAL_SUBNET_NODE  Temp_Node;
+	// 第一次调用GetAdapterInfo获取ulOutBufLen大小
+	if (GetAdaptersInfo( pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW)
+	{
+		free(pAdapterInfo);
+		pAdapterInfo = (IP_ADAPTER_INFO *) malloc (ulOutBufLen);
+	}
+
+	if ((dwRetVal = GetAdaptersInfo( pAdapterInfo, &ulOutBufLen)) == NO_ERROR)
+	{
+		pAdapter = pAdapterInfo;
+		while (pAdapter)
+		{
+			//             CString Name;//=pAdapter->AdapterName;
+			// 			MultiByteToWideChar( CP_ACP, 0, pAdapter->AdapterName, (int)strlen((char *)pAdapter->AdapterName)+1,
+			// 				Name.GetBuffer(MAX_PATH), MAX_PATH );
+			// 			Name.ReleaseBuffer();
+
+			MultiByteToWideChar( CP_ACP, 0, pAdapter->IpAddressList.IpAddress.String, (int)strlen((char *)pAdapter->IpAddressList.IpAddress.String)+1,
+				Temp_Node.StrIP.GetBuffer(MAX_PATH), MAX_PATH );
+			Temp_Node.StrIP.ReleaseBuffer();
+			//StrIP.Format(_T("%s"),pAdapter->IpAddressList.IpAddress.String);
+			MultiByteToWideChar( CP_ACP, 0,pAdapter->IpAddressList.IpMask.String, (int)strlen((char *)pAdapter->IpAddressList.IpMask.String)+1,
+				Temp_Node.StrMask.GetBuffer(MAX_PATH), MAX_PATH );
+			Temp_Node.StrMask.ReleaseBuffer();
+
+			//StrMask.Format(_T("%s"), pAdapter->IpAddressList.IpMask.String);
+
+			MultiByteToWideChar( CP_ACP, 0,pAdapter->GatewayList.IpAddress.String, (int)strlen((char *)pAdapter->GatewayList.IpAddress.String)+1,
+				Temp_Node.StrGetway.GetBuffer(MAX_PATH), MAX_PATH );
+			Temp_Node.StrGetway.ReleaseBuffer();
+
+			Temp_Node.NetworkCardType=pAdapter->Type;
+
+			g_Vector_Subnet.push_back(Temp_Node);
+
+			/*StrGetway.Format(_T("%s"), pAdapter->GatewayList.IpAddress.String); */
+			pAdapter = pAdapter->Next;
+		}
+	}
+	else
+	{
+
+	}
+	if(pAdapterInfo !=NULL)	//Add by Fance . 如果不释放，会内存泄露 ，引起程序崩溃; 2015-10-22
+		free(pAdapterInfo);
+}
+
+
+UINT TFTPServer::RefreshNetWorkDeviceListByUDPFunc()
+{
+			
+
+	int nRet = 0;
+
+	GetIPMaskGetWay();
+	short nmsgType= 100;
+
+	//////////////////////////////////////////////////////////////////////////
+	const DWORD END_FLAG = 0x00000000;
+	TIMEVAL time;
+	time.tv_sec =1;
+	time.tv_usec = 0;
+
+	fd_set fdSocket;
+	BYTE buffer[512] = {0};
+
+	BYTE pSendBuf[1024];
+	for (int index=0; index<g_Vector_Subnet.size(); index++)
+	{
+		if (g_Vector_Subnet[index].StrIP.Find(_T("0.0."))!=-1)
+		{
+			continue;
+		}
+		char local_network_ip[255];
+		memset(local_network_ip,0,255);
+		SOCKADDR_IN h_siBind;
+		SOCKET h_Broad=NULL;
+		SOCKADDR_IN h_bcast;
+		h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+		BOOL bBroadcast=TRUE;
+		::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
+		int iMode=1;
+		ioctlsocket(h_Broad,FIONBIO, (u_long FAR*) &iMode);
+
+		BOOL bDontLinger = FALSE;
+		setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
+
+
+		ZeroMemory(pSendBuf, 255);
+		pSendBuf[0] = 100;
+		memcpy(pSendBuf + 1, (BYTE*)&END_FLAG, 4);
+		int nSendLen = 5;
+
+
+		local_enthernet_ip=g_Vector_Subnet[index].StrIP;
+		WideCharToMultiByte( CP_ACP, 0, local_enthernet_ip.GetBuffer(), -1, local_network_ip, 255, NULL, NULL );
+		h_siBind.sin_family=AF_INET;
+		h_siBind.sin_addr.s_addr =  inet_addr(local_network_ip);
+		//h_siBind.sin_addr.s_addr=INADDR_ANY;
+		h_siBind.sin_port= htons(11115);
+
+		h_bcast.sin_family=AF_INET;
+		//bcast.sin_addr.s_addr=nBroadCastIP;
+		h_bcast.sin_addr.s_addr=INADDR_BROADCAST;
+		h_bcast.sin_port=htons(UDP_BROADCAST_PORT);
+
+		// h_siBind.sin_port=AF_INET;
+		//   ::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
+		if( -1 == bind(h_Broad,(SOCKADDR*)&h_siBind,sizeof(h_siBind)))//把网卡地址强行绑定到Socket
+		{
+			goto END_REFRESH_SCAN;
+		}
+		int time_out=0;
+		BOOL bTimeOut = FALSE;
+		while(!bTimeOut)//!pScanner->m_bNetScanFinish)  // 超时结束
+		{
+			time_out++;
+			if(time_out>1)
+				bTimeOut = TRUE;
+
+			FD_ZERO(&fdSocket);
+			FD_SET(h_Broad, &fdSocket);
+
+			nRet = ::sendto(h_Broad,(char*)pSendBuf,nSendLen,0,(sockaddr*)&h_bcast,sizeof(h_bcast));
+
+			//DFTrace(local_enthernet_ip);
+			if (nRet == SOCKET_ERROR)
+			{
+				int  nError = WSAGetLastError();
+				goto END_REFRESH_SCAN;
+				return 0;
+			}
+			int nLen = sizeof(h_siBind);
+			fd_set fdRead = fdSocket;
+			int nSelRet = ::select(0, &fdRead, NULL, NULL, &time);//TRACE("recv nc info == %d\n", nSelRet);
+			if (nSelRet == SOCKET_ERROR)
+			{
+				int nError = WSAGetLastError();
+				goto END_REFRESH_SCAN;
+				return 0;
+			}
+
+			if(nSelRet > 0)
+			{
+				ZeroMemory(buffer, 512);
+				int nRet ;
+				int nSelRet;
+				do
+				{
+					nRet = ::recvfrom(h_Broad,(char*)buffer, 512, 0, (sockaddr*)&h_siBind, &nLen);
+
+					BYTE szIPAddr[4] = {0};
+					if(nRet > 0)
+					{
+						FD_ZERO(&fdSocket);
+						if(buffer[0]==101)
+						{
+
+							nLen=buffer[2]+buffer[3]*256;
+							unsigned short dataPackage[32]= {0};
+							memcpy(dataPackage,buffer+2,nLen*sizeof(unsigned short));
+							szIPAddr[0]= (BYTE)dataPackage[7];
+							szIPAddr[1]= (BYTE)dataPackage[8];
+							szIPAddr[2]= (BYTE)dataPackage[9];
+							szIPAddr[3]= (BYTE)dataPackage[10];
+							CString temp_rec_ip;
+							temp_rec_ip.Format(_T("%u.%u.%u.%u"),szIPAddr[0],szIPAddr[1],szIPAddr[2],szIPAddr[3]);
+							if(temp_rec_ip.CompareNoCase(ISP_Device_IP) == 0)
+							{
+								unsigned short real_port = AddNetDeviceForRefreshList(buffer, nRet, h_siBind);
+								if(real_port == m_nClientPort)
+								{
+									closesocket(h_Broad);
+									return 1;
+								}
+								else if((real_port != m_nClientPort) && (real_port != 0))
+								{
+									CString temp_1234;
+									CString strTips;
+									temp_1234.Format(_T("%u"),real_port);
+									closesocket(h_Broad);
+									m_nClientPort = real_port;
+									CISPDlg* pFrame=(CISPDlg*)(AfxGetApp()->m_pMainWnd);
+									pFrame->GetDlgItem(IDC_EDIT_NCPORT)->SetWindowTextW(temp_1234);
+
+									strTips.Format(_T("The Device Port is %u"),real_port);
+									OutPutsStatusInfo(strTips, FALSE);
+									return 0;
+								}
+								Sleep(1);	//Find;
+							}
+							//ISP_Device_IP
+							int n = 1;
+							BOOL bFlag=FALSE;
+							//////////////////////////////////////////////////////////////////////////
+							// 检测IP重复
+							DWORD dwValidIP = 0;
+							memcpy((BYTE*)&dwValidIP, pSendBuf+n, 4);
+							while(dwValidIP != END_FLAG)
+							{
+								DWORD dwRecvIP=0;
+								memcpy((BYTE*)&dwRecvIP, szIPAddr, 4);
+								memcpy((BYTE*)&dwValidIP, pSendBuf+n, 4);
+								if(dwRecvIP == dwValidIP)
+								{
+									bFlag = TRUE;
+									break;
+								}
+								n+=4;
+							}
+#if 0
+							//////////////////////////////////////////////////////////////////////////
+							if (!bFlag)
+							{
+								AddNetDeviceForRefreshList(buffer, nRet, h_siBind);
+
+								//pSendBuf[nSendLen-1] = (BYTE)(modbusID);
+								pSendBuf[nSendLen-4] = szIPAddr[0];
+								pSendBuf[nSendLen-3] = szIPAddr[1];
+								pSendBuf[nSendLen-2] = szIPAddr[2];
+								pSendBuf[nSendLen-1] = szIPAddr[3];
+								memcpy(pSendBuf + nSendLen, (BYTE*)&END_FLAG, 4);
+								//////////////////////////////////////////////////////////////////////////
+
+								//pSendBuf[nSendLen+3] = 0xFF;
+								nSendLen+=4;
+							}
+							else
+							{
+								AddNetDeviceForRefreshList(buffer, nRet, h_siBind);
+							}
+#endif
+						}
+					}
+					else
+					{
+
+						break;
+					}
+
+
+					FD_ZERO(&fdSocket);
+					FD_SET(h_Broad, &fdSocket);
+					nLen = sizeof(h_siBind);
+					fdRead = fdSocket;
+					nSelRet = ::select(0, &fdRead, NULL, NULL, &time);//TRACE("recv nc info == %d\n", nSelRet);
+				}
+				while (nSelRet);
+
+				//int nRet = ::recvfrom(h_Broad,(char*)buffer, 512, 0, (sockaddr*)&h_siBind, &nLen);
+
+			}
+			else
+			{
+				bTimeOut = TRUE;
+			}
+		}//end of while
+
+END_REFRESH_SCAN:
+
+		closesocket(h_Broad);
+	}
+	return 1;
+}
+struct refresh_net_device
+{
+	DWORD nSerial;
+	int modbusID;
+	unsigned short product_id;
+	CString ip_address;
+	int nport;
+	float sw_version;
+	float hw_version;
+	unsigned int object_instance;
+	unsigned char panal_number;
+	DWORD parent_serial_number;
+	CString NetCard_Address;
+	CString show_label_name;
+};
+
+
+typedef union
+{
+	unsigned char all[400];
+	struct 
+	{  
+		UCHAR command;
+		UCHAR command_reserve;
+		UCHAR length;
+		UCHAR length_reserve;
+		UCHAR serial_low;
+		UCHAR serial_low_reserve;
+		UCHAR serial_low_2;
+		UCHAR serial_low_2_reserve;
+		UCHAR serial_low_3;
+		UCHAR serial_low_3_reserve;
+		UCHAR serial_low_4;
+		UCHAR serial_low_4_reserve;
+		UCHAR product_id;
+		UCHAR product_id_reserve;
+		UCHAR modbus_id;
+		UCHAR modbus_id_reserve;
+		UCHAR ip_address_1;
+		UCHAR ip_address_1_reserve;
+		UCHAR ip_address_2;
+		UCHAR ip_address_2_reserve;
+		UCHAR ip_address_3;
+		UCHAR ip_address_3_reserve;
+		UCHAR ip_address_4;
+		UCHAR ip_address_4_reserve;
+		USHORT modbus_port;
+		USHORT sw_version;
+		USHORT hw_version;
+		unsigned int parent_serial_number;
+		UCHAR object_instance_2;
+		UCHAR object_instance_1;
+		UCHAR station_number;
+		char panel_name[20];
+		UCHAR object_instance_4;
+		UCHAR object_instance_3;
+		UCHAR isp_mode;  //非0 在isp mode   , 0 在应用代码;    第60个字节
+	}reg;
+}Str_UPD_SCAN;
+unsigned short TFTPServer::AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
+{
+	refresh_net_device temp;
+	Str_UPD_SCAN temp_data;
+	memset(&temp_data,0,400);
+	unsigned char * my_temp_point = buffer;
+	temp_data.reg.command = *(my_temp_point++);
+	temp_data.reg.command_reserve = *(my_temp_point++);
+
+	temp_data.reg.length = *(my_temp_point++);
+	temp_data.reg.length_reserve = *(my_temp_point++);
+
+
+	temp_data.reg.serial_low = *(my_temp_point++);
+	temp_data.reg.serial_low_reserve = *(my_temp_point++);
+
+	temp_data.reg.serial_low_2 = *(my_temp_point++);
+	temp_data.reg.serial_low_2_reserve = *(my_temp_point++);
+
+	temp_data.reg.serial_low_3 = *(my_temp_point++);
+	temp_data.reg.serial_low_3_reserve = *(my_temp_point++);
+
+	temp_data.reg.serial_low_4 = *(my_temp_point++);
+	temp_data.reg.serial_low_4_reserve = *(my_temp_point++);
+
+	temp_data.reg.product_id =  *(my_temp_point++);
+	temp_data.reg.product_id_reserve =  *(my_temp_point++);
+
+
+	temp_data.reg.modbus_id =  *(my_temp_point++);
+	temp_data.reg.modbus_id_reserve =  *(my_temp_point++);
+
+	temp_data.reg.ip_address_1 =  *(my_temp_point++);
+	temp_data.reg.ip_address_1_reserve =  *(my_temp_point++);
+	temp_data.reg.ip_address_2 =  *(my_temp_point++);
+	temp_data.reg.ip_address_2_reserve =  *(my_temp_point++);
+	temp_data.reg.ip_address_3 =  *(my_temp_point++);
+	temp_data.reg.ip_address_3_reserve =  *(my_temp_point++);
+	temp_data.reg.ip_address_4 =  *(my_temp_point++);
+	temp_data.reg.ip_address_4_reserve =  *(my_temp_point++);
+
+	temp_data.reg.modbus_port =  ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+	my_temp_point= my_temp_point + 2;
+	temp_data.reg.sw_version =  ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+	my_temp_point= my_temp_point + 2;
+	temp_data.reg.hw_version =  ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+	my_temp_point= my_temp_point + 2;
+
+	temp_data.reg.parent_serial_number =  ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+	my_temp_point= my_temp_point + 4;
+
+	temp_data.reg.object_instance_2 = *(my_temp_point++);
+	temp_data.reg.object_instance_1 = *(my_temp_point++);
+	temp_data.reg.station_number = *(my_temp_point++);
+	memcpy(temp_data.reg.panel_name,my_temp_point,20);
+	my_temp_point = my_temp_point + 20;
+	temp_data.reg.object_instance_4 = *(my_temp_point++);
+	temp_data.reg.object_instance_3 = *(my_temp_point++);
+	temp_data.reg.isp_mode = *(my_temp_point++);	//isp_mode = 0 表示在应用代码 ，非0 表示在bootload.
+
+	DWORD nSerial=temp_data.reg.serial_low + temp_data.reg.serial_low_2 *256+temp_data.reg.serial_low_3*256*256+temp_data.reg.serial_low_4*256*256*256;
+	CString nip_address;
+	nip_address.Format(_T("%u.%u.%u.%u"),temp_data.reg.ip_address_1,temp_data.reg.ip_address_2,temp_data.reg.ip_address_3,temp_data.reg.ip_address_4);
+	CString nproduct_name = GetProductName(temp_data.reg.product_id);
+	if(nproduct_name.IsEmpty())	//如果产品号 没定义过，不认识这个产品 就exit;
+	{
+		if (temp_data.reg.product_id<220)
+		{
+			return temp_data.reg.modbus_port;
+		}
+	}
+
+	temp.nport = temp_data.reg.modbus_port;
+	temp.sw_version = temp_data.reg.sw_version;
+	temp.hw_version = temp_data.reg.hw_version;
+	temp.ip_address = nip_address;
+	temp.product_id = temp_data.reg.product_id;
+	temp.modbusID = temp_data.reg.modbus_id;
+	temp.nSerial = nSerial;
+	temp.NetCard_Address=_T("");
+
+	temp.parent_serial_number = temp_data.reg.parent_serial_number ;
+
+	temp.object_instance = temp_data.reg.object_instance_1 + temp_data.reg.object_instance_2 *256+temp_data.reg.object_instance_3*256*256+temp_data.reg.object_instance_4*256*256*256;
+	temp.panal_number = temp_data.reg.station_number;
+
+
+
+
+	//if((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
+	//{
+	//	g_Print.Format(_T("Serial = %u     ID = %d ,ip = %s  , Product name : %s ,obj = %u ,panel = %u,isp_mode = %d"),nSerial,temp_data.reg.modbus_id,nip_address ,nproduct_name,temp.object_instance,temp.panal_number,temp_data.reg.isp_mode);
+	//	DFTrace(g_Print);
+	//}
+
+	if(temp_data.reg.isp_mode != 0)
+	{
+		//记录这个的信息,如果短时间多次出现 就判定在bootload下面，只是偶尔出现一次表示只是恰好开机收到的.
+#if 0
+		IspModeInfo temp_info;
+		temp_info.ipaddress[0] = temp_data.reg.ip_address_1;
+		temp_info.ipaddress[1] = temp_data.reg.ip_address_2;
+		temp_info.ipaddress[2] = temp_data.reg.ip_address_3;
+		temp_info.ipaddress[3] = temp_data.reg.ip_address_4;
+		temp_info.product_id = temp_data.reg.product_id;
+		CTime temp_time_now = CTime::GetCurrentTime();
+		temp_info.first_time = temp_time_now.GetTime();
+
+		bool find_ip_pid_match = false;
+		int temp_index = 0;
+		for (int x=0;x<g_isp_device_info.size();x++)
+		{
+			int ip_cmp_ret =	memcmp(g_isp_device_info.at(x).ipaddress,temp_info.ipaddress,4); 
+			if((temp_info.product_id == g_isp_device_info.at(x).product_id ) &&
+				(ip_cmp_ret == 0))
+			{
+				find_ip_pid_match = true;
+				temp_index = x;
+			}
+		}
+
+		if(find_ip_pid_match)
+		{
+			if(( temp_info.first_time >  g_isp_device_info.at(temp_index).first_time  + 60 ) && 
+				(temp_info.first_time <  g_isp_device_info.at(temp_index).first_time  + 120))
+			{
+				g_isp_device_info.at(temp_index).first_time = temp_info.first_time;
+				need_isp_device = g_isp_device_info.at(temp_index);
+				if(temp_data.reg.isp_mode == 2) //Minipanel 会回传特殊的 bootloader 坏掉的信息
+				{
+					isp_mode_error_code = 2;
+					::PostMessageW(MainFram_hwd,WM_HADNLE_ISP_MODE_DEVICE,2,NULL);
+				}
+				else
+					::PostMessageW(MainFram_hwd,WM_HADNLE_ISP_MODE_DEVICE,NULL,NULL);
+			}
+			else
+			{
+				if(temp_info.first_time > g_isp_device_info.at(temp_index).first_time  + 120)
+					g_isp_device_info.at(temp_index).first_time = temp_info.first_time;
+			}
+		}
+		else
+		{
+			g_isp_device_info.push_back(temp_info);
+		}
+		//TRACE(_T("ip:%s time:%d g_isp:%d\r\n"),nip_address,temp_info.first_time,g_isp_device_info.at(temp_index).first_time);
+#endif
+		return	 0;
+	}
+
+
+	return temp_data.reg.modbus_port;
+}
+
 
 BOOL TFTPServer::StartServer()
 {
+	RefreshNetWorkDeviceListByUDPFunc();
+	   TCP_Flash_CMD_Socket.Connect(ISP_Device_IP,m_nClientPort);
+	   Sleep(2000);
+
    //  for (int i = 0; i<m_FlashTimes ; i++)
    // { 
 		CString strTips;
@@ -640,6 +1142,7 @@ BOOL TFTPServer::StartServer()
             switch(ISP_STEP)
             {
             case ISP_SEND_FLASH_COMMAND:
+				nRet = 0;
                 if((mode_send_flash_try_time++)<10)
                 {
 
@@ -651,7 +1154,7 @@ BOOL TFTPServer::StartServer()
                     //TRACE(_T("%d"),send_ret);
                     if(send_ret<0)	//如果发送失败 就尝试 再次进行TCP连接
                     {
-						TRACE(_T("Send ee10 failed!"));
+						//TRACE(_T("Send ee10 failed!"));
                         //TCP_Flash_CMD_Socket.Connect(ISP_Device_IP,m_nClientPort);
                     }
                     SetDHCP_Data();
@@ -814,6 +1317,11 @@ BOOL TFTPServer::StartServer()
                 nRet = 1;
                 goto StopServer;
                 break;
+			case ISP_Flash_FAILED:
+				OutPutsStatusInfo(Failed_Message, FALSE);
+				nRet = 0;
+				goto StopServer;
+				break;
             default:
                 break;
             }
@@ -891,7 +1399,7 @@ bool TFTPServer::Send_Tftp_File()
             //{
             if(retry>0)
                 total_retry++;
-            strTips.Format(_T("Programming finished %d byte.(%d%%).Retry(%d)"), nCount,persent_finished,total_retry);
+            strTips.Format(_T("Programming finished %d Kb.(%d%%).Retry(%d)"), nCount/1024,persent_finished,total_retry);
             OutPutsStatusInfo(strTips, TRUE);
             //}
             nRet = SendDataNew(pBuf, nSendNum);
@@ -1355,8 +1863,8 @@ void TFTPServer::FlashByEthernet()
         PostMessage(m_pDlg->m_hWnd, WM_FLASH_FINISH, 0, LPARAM(0));
         return;
     }
-     TCP_Flash_CMD_Socket.Connect(ISP_Device_IP,m_nClientPort);
-	 Sleep(3000);
+  //   TCP_Flash_CMD_Socket.Connect(ISP_Device_IP,m_nClientPort);
+	 //Sleep(3000);
    // TCP_Flash_CMD_Socket.m_hex_bin_filepath=m_strFileName;
  
     m_pThread = AfxBeginThread(_StartSeverFunc, this);

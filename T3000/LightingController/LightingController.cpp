@@ -2553,8 +2553,6 @@ HBRUSH CLightingController::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 			pDC->SetTextColor(RGB(0,255,255));
 			pDC->SetBkColor(RGB(0,255,255));
 			pDC->SetBkMode(TRANSPARENT);
-
-
 			HBRUSH B = CreateSolidBrush(RGB(0,255,255));
 			return (HBRUSH)B;
 		} 

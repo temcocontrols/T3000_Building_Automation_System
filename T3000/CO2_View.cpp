@@ -21,7 +21,7 @@ enum
     P_inHg = 4,
     P_Kg_cm2 = 5,
     P_atmosphere = 6,
-    P_bar = 7, 
+    P_bar = 7,
     P_Unit_End,
 };
 int decimal_num[2][8] = {
@@ -121,7 +121,7 @@ BEGIN_MESSAGE_MAP(CCO2_View, CFormView)
     ON_BN_CLICKED(IDC_RADIO_ALARM_MANUAL, &CCO2_View::OnBnClickedRadioAlarmManual)
     ON_BN_CLICKED(IDC_RADIO_ALARM_AUTO, &CCO2_View::OnBnClickedRadioAlarmAuto)
     ON_CBN_SELCHANGE(IDC_CO2_ALARM_STATE, &CCO2_View::OnCbnSelchangeCo2AlarmState)
-   // ON_MESSAGE(WM_LIST_ITEM_CHANGED,Save_List_Item)	
+   // ON_MESSAGE(WM_LIST_ITEM_CHANGED,Save_List_Item)
     ON_NOTIFY(NM_KILLFOCUS, IDC_CO2_DATETIMEPICKER1, &CCO2_View::OnNMKillfocusCo2Datetimepicker1)
     ON_NOTIFY(NM_KILLFOCUS, IDC_CO2_DATETIMEPICKER_TIME, &CCO2_View::OnNMKillfocusCo2DatetimepickerTime)
     ON_BN_CLICKED(IDC_BUTTON_CO2_SYNC_TIME, &CCO2_View::OnBnClickedButtonCo2SyncTime)
@@ -152,10 +152,10 @@ BEGIN_MESSAGE_MAP(CCO2_View, CFormView)
     ON_BN_CLICKED(IDC_GRAPIC, &CCO2_View::OnBnClickedGrapic)
     ON_BN_CLICKED(IDC_TEMP_SENSOR, &CCO2_View::OnBnClickedTempSensor)
     ON_BN_CLICKED(IDC_HUM_SENSOR, &CCO2_View::OnBnClickedHumSensor)
-	ON_EN_KILLFOCUS(IDC_EDIT1_NCO2, &CCO2_View::OnEnKillfocusEdit1Nco2)
-	ON_EN_KILLFOCUS(IDC_EDIT_RTIME, &CCO2_View::OnEnKillfocusEditRtime)
-	ON_BN_CLICKED(IDC_BUTTON_ONOFF, &CCO2_View::OnBnClickedButtonOnoff)
-	ON_EN_KILLFOCUS(IDC_EDIT_RTIME2, &CCO2_View::OnEnKillfocusEditRtime2)
+	  ON_EN_KILLFOCUS(IDC_EDIT1_NCO2, &CCO2_View::OnEnKillfocusEdit1Nco2)
+	  ON_EN_KILLFOCUS(IDC_EDIT_RTIME, &CCO2_View::OnEnKillfocusEditRtime)
+	  ON_BN_CLICKED(IDC_BUTTON_ONOFF, &CCO2_View::OnBnClickedButtonOnoff)
+	  ON_EN_KILLFOCUS(IDC_EDIT_RTIME2, &CCO2_View::OnEnKillfocusEditRtime2)
 END_MESSAGE_MAP()
 
 
@@ -203,14 +203,14 @@ void CCO2_View::Fresh()
         }
         else
         {
-            m_product_type = 2; 
+            m_product_type = 2;
         }
     }
-   
+
 
 
     SH_Window();
-    
+
 
     if (m_product_type == 1)
     {
@@ -226,11 +226,11 @@ void CCO2_View::Fresh()
     {
       CString strTemp;
       strTemp.Format (_T("%d"),product_register_value[112]);
-      GetDlgItem (IDC_CO2_PREPARE_ALARM_SETPOINT)->SetWindowTextW(strTemp); 
+      GetDlgItem (IDC_CO2_PREPARE_ALARM_SETPOINT)->SetWindowTextW(strTemp);
       strTemp.Format (_T("%d"),product_register_value[113]);
-       GetDlgItem (IDC_CO2_ALARM_SETPOINT)->SetWindowTextW(strTemp); 
+       GetDlgItem (IDC_CO2_ALARM_SETPOINT)->SetWindowTextW(strTemp);
       strTemp.Format (_T("%d"),product_register_value[109]);
-      GetDlgItem (IDC_CO2_CALIBRATING_OFFSET)->SetWindowTextW(strTemp); 
+      GetDlgItem (IDC_CO2_CALIBRATING_OFFSET)->SetWindowTextW(strTemp);
 
       if (product_register_value[124] == 0)
       {
@@ -252,20 +252,20 @@ void CCO2_View::Fresh()
           pTempButton->SetCheck (1);
       }
 
-      Initial_InputList();  
+      Initial_InputList();
       Initial_OutputList();
 
 	  Fresh_CO2Node_Compensatin();
     }
-   
-    
+
+
         GetDlgItem(IDC_BTN_CO2_REFRESH)->EnableWindow(FALSE);
 
-		 
+
 
 //         if(RefreshThread==NULL)
 //             RefreshThread = CreateThread(NULL,NULL,StartRefresh,this,NULL,NULL);
- 
+
 
 
 }
@@ -278,7 +278,7 @@ void CCO2_View::SH_Window(){
     temp_id.Format(_T("%d"),product_register_value[6]);
     m_co2_idAdressEdit.SetWindowTextW(temp_id);
 
-   
+
 
     CString temp_firmversion;
     temp_firmversion.Format(_T("%0.2f"),((float)(product_register_value[5]*256+product_register_value[4]))/10.0);
@@ -287,11 +287,11 @@ void CCO2_View::SH_Window(){
     m_co2_serialNumber=get_serialnumber();
     m_co2_hardwareversion=product_register_value[8];//8
     UpdateData(FALSE);
-   
+
     if (m_product_type == 1)
     {
        GetDlgItem (IDC_PRODUCT_NAME)->SetWindowTextW(L"CO2");
-        if(product_register_value[CO2_485_MODBUS_BAUDRATE]>=0&&product_register_value[CO2_485_MODBUS_BAUDRATE]<=1)	
+        if(product_register_value[CO2_485_MODBUS_BAUDRATE]>=0&&product_register_value[CO2_485_MODBUS_BAUDRATE]<=1)
             m_co2_braudRateCombox.SetCurSel(product_register_value[CO2_485_MODBUS_BAUDRATE]);
         else
             m_co2_braudRateCombox.SetCurSel(0);
@@ -363,9 +363,9 @@ void CCO2_View::SH_Window(){
 //         GetDlgItem(IDC_HUM_SENSOR)->ShowWindow(SW_HIDE);
 
          GetDlgItem(IDC_STATIC_BRAUDRATE)->ShowWindow(SW_SHOW);
-        
 
-    } 
+
+    }
     else if (m_product_type == 2)
     {
           GetDlgItem (IDC_PRODUCT_NAME)->SetWindowTextW(L"Pressure");
@@ -375,7 +375,7 @@ void CCO2_View::SH_Window(){
           GetDlgItem(IDC_STATIC_PRE_ALARM_SETPOINT2)->ShowWindow(SW_HIDE);
           GetDlgItem(IDC_STATIC_PRE_ALARM_SETPOINT3)->ShowWindow(SW_HIDE);
 
-          if(product_register_value[CO2_485_MODBUS_BAUDRATE]>=0&&product_register_value[CO2_485_MODBUS_BAUDRATE]<=1)	
+          if(product_register_value[CO2_485_MODBUS_BAUDRATE]>=0&&product_register_value[CO2_485_MODBUS_BAUDRATE]<=1)
               m_co2_braudRateCombox.SetCurSel(product_register_value[CO2_485_MODBUS_BAUDRATE]);
           else
               m_co2_braudRateCombox.SetCurSel(0);
@@ -389,7 +389,7 @@ void CCO2_View::SH_Window(){
         GetDlgItem(IDC_LIST_INPUT_AQ)->ShowWindow(SW_SHOW);
         GetDlgItem(IDC_LIST_OUTPUT_AQ)->ShowWindow(SW_SHOW);
         GetDlgItem(IDC_STATIC_OUTPUT_SETTING)->ShowWindow(SW_SHOW);
-       
+
 
         GetDlgItem(IDC_STATIC_RELATIVE_HUMIDITY)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_EDIT_CO2_HUMIDITY)->ShowWindow(SW_HIDE);
@@ -434,9 +434,9 @@ void CCO2_View::SH_Window(){
         GetDlgItem(IDC_STATIC_BRAUDRATE)->ShowWindow(SW_SHOW);
     }
     else
-    {    
-        GetDlgItem (IDC_PRODUCT_NAME)->SetWindowTextW(L"CO2 NODE"); 
- 
+    {
+        GetDlgItem (IDC_PRODUCT_NAME)->SetWindowTextW(L"CO2 NODE");
+
         GetDlgItem(IDC_STATIC_RELATIVE_HUMIDITY)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_EDIT_CO2_HUMIDITY)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_STATIC_PERCENT)->ShowWindow(SW_HIDE);
@@ -448,7 +448,7 @@ void CCO2_View::SH_Window(){
 		 GetDlgItem(IDC_STATIC_BRAUDRATE)->ShowWindow(SW_SHOW);
         GetDlgItem(IDC_CO2_BRAUDRATECOMBO)->ShowWindow(SW_SHOW);
 		m_co2_braudRateCombox.SetCurSel(product_register_value[15]);
-		 
+
 
         GetDlgItem(IDC_STATIC_PRE_ALARM_SETPOINT2)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_STATIC_PRE_ALARM_SETPOINT3)->ShowWindow(SW_HIDE);
@@ -496,15 +496,15 @@ void CCO2_View::SH_Window(){
         GetDlgItem(IDC_STATIC_TIME)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_CO2_DATETIMEPICKER_TIME)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_CO2_DATETIMEPICKER1)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_BUTTON_CO2_SYNC_TIME)->ShowWindow(SW_HIDE); 
+        GetDlgItem(IDC_BUTTON_CO2_SYNC_TIME)->ShowWindow(SW_HIDE);
 
-       
+
     }
 }
 
 void CCO2_View::Fresh_CO2(){
      Initial_List();
-     C02_SHOW_TEMP(); 
+     C02_SHOW_TEMP();
 
     m_humidity_value = (float)(product_register_value[CO2_485_MODBUS_HUMIDITY_RH])/10.0;
     if(m_humidity_value>100)
@@ -520,7 +520,7 @@ void CCO2_View::Fresh_CO2(){
     //CO2_Grid_init();
 	Initial_InputList();
   Initial_OutputList();
- 
+
    // Fresh_External_List();
 
 
@@ -629,18 +629,18 @@ void CCO2_View::C02_SHOW_TEMP()
     // 	m_co2_temp_unit.AddString(strTemp2);
 
 
-    if(product_register_value[CO2_485_MODBUS_DEG_C_OR_F] == 0)		
+    if(product_register_value[CO2_485_MODBUS_DEG_C_OR_F] == 0)
     {
 		i_internal_temp = product_register_value[CO2_485_MODBUS_TEMPERATURE_C_INTERNAL];
 		i_external_temp = product_register_value[CO2_485_MODBUS_TEMPERATURE_C_EXTERNAL];
-       
+
         strUnit=strTemp1;
     }
     else if((product_register_value[CO2_485_MODBUS_DEG_C_OR_F] == 1))
     {
         i_internal_temp = product_register_value[CO2_485_MODBUS_TEMPERATURE_F_INTERNAL];
         i_external_temp = product_register_value[CO2_485_MODBUS_TEMPERATURE_F_EXTERNAL];
-      
+
         strUnit=strTemp2;
     }
     else
@@ -652,22 +652,22 @@ void CCO2_View::C02_SHOW_TEMP()
     CString  TempValue,StrAM;
     m_grid_input.put_TextMatrix(1,2,strUnit);
 
-//      if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//ÄÚ²¿
+//      if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//ï¿½Ú²ï¿½
 //      {
 //          TempValue.Format(_T("%0.1f"),f_internal_temp);
 //      }
 //      else
 //      {
 //         TempValue.Format(_T("%0.1f"),f_external_temp);
-//      } 
-   
+//      }
+
 
 	BOOL AM=Get_Bit_FromRegister(product_register_value[CO2_485_MODBUS_OUTPUT_AUTO_MANUAL],1);
 	if (AM)
 	{
 		StrAM=_T("Manual");
 		TempValue.Format(_T("%0.1f"),(float)((short)product_register_value[CO2_485_MODBUS_OUTPUT_MANUAL_VALUE_TEM])/10);
-	} 
+	}
 	else
 	{
 		StrAM=_T("Auto");
@@ -680,7 +680,7 @@ void CCO2_View::C02_SHOW_TEMP()
 	{
 		StrAM=_T("Manual");
 		TempValue.Format(_T("%0.1f"),(float)((short)product_register_value[CO2_485_MODBUS_OUTPUT_MANUAL_VALUE_HUM])/10);
-	} 
+	}
 	else
 	{
 		StrAM=_T("Auto");
@@ -693,15 +693,15 @@ void CCO2_View::C02_SHOW_TEMP()
 	{
 		StrAM=_T("Manual");
 		TempValue.Format(_T("%d"),(short)product_register_value[CO2_485_MODBUS_OUTPUT_MANUAL_VALUE_CO2]);
-	} 
+	}
 	else
 	{
 		StrAM=_T("Auto");
-		TempValue.Format(_T("%d"),product_register_value[CO2_485_MODBUS_INTERNAL_CO2_PPM]);	 
+		TempValue.Format(_T("%d"),product_register_value[CO2_485_MODBUS_INTERNAL_CO2_PPM]);
 	}
 	m_grid_input.put_TextMatrix(3,3,StrAM);
 	m_grid_input.put_TextMatrix(3,4,TempValue);
-   
+
 
 }
 
@@ -712,7 +712,7 @@ void CCO2_View::Node_SHOW_TEMP()
     float f_internal_temp = 0;
     float f_external_temp = 0;
     CString temp_internal_value,temp_external_value;
-    
+
 
 
     CString strTemp1,strTemp2,strUnit,strHUM,strCO2;
@@ -720,10 +720,10 @@ void CCO2_View::Node_SHOW_TEMP()
     strTemp2.Format(_T("%cF"),176);
 
 
-   
 
 
-    if(product_register_value[125] == 0)		
+
+    if(product_register_value[125] == 0)
     {
         i_internal_temp = product_register_value[119];
         i_external_temp = product_register_value[121];
@@ -746,7 +746,7 @@ void CCO2_View::Node_SHOW_TEMP()
     CString  TempValue,StrAM;
     m_grid_input.put_TextMatrix(1,2,strUnit);
 
-    if(product_register_value[124] == 0)//ÄÚ²¿
+    if(product_register_value[124] == 0)//ï¿½Ú²ï¿½
     {
         TempValue.Format(_T("%0.1f"),f_internal_temp);
     }
@@ -763,7 +763,7 @@ void CCO2_View::Node_SHOW_TEMP()
     if (AM)
     {
         StrAM=_T("Manual");
-    } 
+    }
     else
     {
         StrAM=_T("Auto");
@@ -774,7 +774,7 @@ void CCO2_View::Node_SHOW_TEMP()
     if (AM)
     {
         StrAM=_T("Manual");
-    } 
+    }
     else
     {
         StrAM=_T("Auto");
@@ -785,7 +785,7 @@ void CCO2_View::Node_SHOW_TEMP()
     if (AM)
     {
         StrAM=_T("Manual");
-    } 
+    }
     else
     {
         StrAM=_T("Auto");
@@ -802,7 +802,7 @@ void CCO2_View::Initial_List()
  {
 //      m_co2_external_sensor_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 //      m_co2_external_sensor_list.SetExtendedStyle(m_co2_external_sensor_list.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
-//  
+//
 //      m_co2_external_sensor_list.InsertColumn(CO2_EXTERNAL_NUM, _T("NUM"), 40, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
 //      m_co2_external_sensor_list.InsertColumn(CO2_EXTERNAL_DEVICE_ID, _T("Device ID"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 //      m_co2_external_sensor_list.InsertColumn(CO2_EXTERNAL_SERIAL_NUM, _T("Serial Number"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -889,11 +889,11 @@ void CCO2_View::Get_CO2_Temperature_unit(CString &strTemp)
         //Chinese.
         if(product_register_value[CO2_485_MODBUS_DEG_C_OR_F]==0)//121
         {
-            strTemp=_T("¡æ");
+            strTemp=_T("ï¿½ï¿½");
         }
         else
         {
-            strTemp=_T("¨H");
+            strTemp=_T("ï¿½H");
         }
     }
 }
@@ -1048,7 +1048,7 @@ void CCO2_View::OnCbnSelchangeCo2TempUnit()
         }
         else
         {
-            if (Get_Bit_FromRegister(product_register_value[CO2_485_MODBUS_OUTPUT_AUTO_MANUAL],m_nCurRow))//µ±Ç°ÊÇ1   Ñ¡ÔñÊÇ0
+            if (Get_Bit_FromRegister(product_register_value[CO2_485_MODBUS_OUTPUT_AUTO_MANUAL],m_nCurRow))//ï¿½ï¿½Ç°ï¿½ï¿½1   Ñ¡ï¿½ï¿½ï¿½ï¿½0
             {
                 m_write_value=product_register_value[CO2_485_MODBUS_OUTPUT_AUTO_MANUAL]-m_value;
             }
@@ -1190,11 +1190,11 @@ HBRUSH CCO2_View::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
     // TODO:  Change any attributes of the DC here
     for (int i=0;i<(int)Change_Color_ID.size();i++)
     {
-        if(/*nCtlColor==CTLCOLOR_EDIT &&*/pWnd->GetDlgCtrlID()==Change_Color_ID.at(i))//×¢Òâ´Ë´¦µÄ£¨pWnd->£©£¬·ñÔòÃ»Ð§¹û
+        if(/*nCtlColor==CTLCOLOR_EDIT &&*/pWnd->GetDlgCtrlID()==Change_Color_ID.at(i))//×¢ï¿½ï¿½ï¿½Ë´ï¿½ï¿½Ä£ï¿½pWnd->ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã»Ð§ï¿½ï¿½
         {
             pDC->SetTextColor(RGB(0,0,0));
-            pDC->SetBkColor(RGB(255,0,0));	//ÉèÖÃÎÄ±¾±³¾°É«
-            pDC->SetBkMode(TRANSPARENT);	//ÉèÖÃ±³¾°Í¸Ã÷
+            pDC->SetBkColor(RGB(255,0,0));	//ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½ï¿½ï¿½ï¿½ï¿½É«
+            pDC->SetBkMode(TRANSPARENT);	//ï¿½ï¿½ï¿½Ã±ï¿½ï¿½ï¿½Í¸ï¿½ï¿½
             hbr = (HBRUSH)m_brush;
         }
 
@@ -1237,12 +1237,12 @@ void CCO2_View::OnEnKillfocusCo2PrepareAlarmSetpoint()
         {
             Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,112,m_edit_pre_alarm_setpoint,
                 product_register_value[112],this->m_hWnd,IDC_CO2_PREPARE_ALARM_SETPOINT,_T("Prepare Alarm Setpoint"));
-        } 
+        }
     }
     else
     {
 
-       
+
 
         if(m_edit_pre_alarm_setpoint != product_register_value[CO2_485_MODBUS_INT_PRE_ALARM_SETPOINT])
         {
@@ -1273,7 +1273,7 @@ void CCO2_View::OnEnKillfocusCo2AlarmSetpoint()
                 product_register_value[CO2_485_MODBUS_INT_ALARM_SETPOINT],this->m_hWnd,IDC_CO2_ALARM_SETPOINT,_T("Alarm Setpoint"));
         }
     }
-   
+
 }
 
 
@@ -1297,7 +1297,7 @@ void CCO2_View::OnEnKillfocusCo2CalibratingOffset()
                 product_register_value[CO2_485_MODBUS_INT_CO2_OFFSET],this->m_hWnd,IDC_CO2_CALIBRATING_OFFSET,_T("Calibrating Offset"));
         }
     }
-   
+
 }
 
 
@@ -1366,31 +1366,31 @@ void CCO2_View::OnCbnSelchangeCo2AlarmState()
 //     else if(Changed_SubItem == CO2_EXTERNAL_ALARM_SP)
 //     {
 //         temp_write_reg = CO2_485_MODBUS_EXT_ALARM_SETPOINT_START + Changed_Item;
-//         temp_cs_change_info.Format(_T("Alarm Setpoint"));	
+//         temp_cs_change_info.Format(_T("Alarm Setpoint"));
 //     }
 //     else if(Changed_SubItem == CO2_EXTERNAL_CAL_OFFSET)
 //     {
 //         temp_write_reg = CO2_485_MODBUS_EXT_CO2_OFFSET_START + Changed_Item;
-//         temp_cs_change_info.Format(_T("Calibrating Offset"));	
+//         temp_cs_change_info.Format(_T("Calibrating Offset"));
 //     }
 //     else
 //     {
 //         return -2;
 //     }
-// 
+//
 //     if(temp_reg_value != product_register_value[temp_write_reg])
 //     {
 //       //  Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,temp_write_reg,temp_reg_value,
 //        //     product_register_value[temp_write_reg],this->m_hWnd,IDC_LIST_CO2_EXTERNAL_SENSOR,temp_cs_change_info);
 //     }
-// 
+//
 //     return 0;
 // }
 
 bool CheckString( CString str )
 {
 
-    int nCount = str.GetLength(); // »ñµÃ×Ö·û¸öÊý
+    int nCount = str.GetLength(); // ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½
     for ( int i = 0; i < nCount; i ++ )
     {
         if(i==0)
@@ -1400,10 +1400,10 @@ bool CheckString( CString str )
         }
 
 
-        if ( 0 == isdigit( str.GetAt(i) ) ) // ²»ÊÇÊý×Ö¾ÍÖÃ±êÖ¾Î»
+        if ( 0 == isdigit( str.GetAt(i) ) ) // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ï¿½ï¿½Ã±ï¿½Ö¾Î»
         {
             return FALSE;
-            //break;// ÍË³ö
+            //break;// ï¿½Ë³ï¿½
         }
     }
 
@@ -1415,17 +1415,17 @@ bool CheckString( CString str )
 void CCO2_View::OnInitialUpdate()
 {
     CFormView::OnInitialUpdate();
-    
+
     m_start_tip=TRUE;
-    HICON hIcon = NULL; 
+    HICON hIcon = NULL;
     //hIcon   = AfxGetApp()->LoadIcon(IDI_ICON_INPUT);
     //((CButton *)GetDlgItem(IDC_BUTTON_CM5_ADVANCE))->SetIcon(hIcon);
-    HINSTANCE hInstResource    = NULL; 
-    hInstResource = AfxFindResourceHandle(MAKEINTRESOURCE(IDI_ICON_REFRESH), RT_GROUP_ICON); 
-    hIcon = (HICON)::LoadImage(hInstResource, MAKEINTRESOURCE(IDI_ICON_REFRESH), IMAGE_ICON, 32, 32, 0); 
+    HINSTANCE hInstResource    = NULL;
+    hInstResource = AfxFindResourceHandle(MAKEINTRESOURCE(IDI_ICON_REFRESH), RT_GROUP_ICON);
+    hIcon = (HICON)::LoadImage(hInstResource, MAKEINTRESOURCE(IDI_ICON_REFRESH), IMAGE_ICON, 32, 32, 0);
     ((CButton *)GetDlgItem(IDC_BTN_CO2_REFRESH))->SetIcon(hIcon);
     RefreshThread = NULL;
-    //CO2_Thread=AfxBeginThread(_ReadCo2MultiRegisters,this,THREAD_PRIORITY_NORMAL,0,0,NULL ); 
+    //CO2_Thread=AfxBeginThread(_ReadCo2MultiRegisters,this,THREAD_PRIORITY_NORMAL,0,0,NULL );
     //CO2_Thread->SuspendThread();
 
     // TODO: Add your specialized code here and/or call the base class
@@ -1441,7 +1441,7 @@ void CCO2_View::OnNMKillfocusCo2Datetimepicker1(NMHDR *pNMHDR, LRESULT *pResult)
 void CCO2_View::OnNMKillfocusCo2DatetimepickerTime(NMHDR *pNMHDR, LRESULT *pResult)
 {
     // TODO: Add your control notification handler code here
-    *pResult = 0;	
+    *pResult = 0;
     Check_HourTime();
 }
 
@@ -1656,7 +1656,7 @@ DWORD WINAPI CCO2_View::StartRefresh(LPVOID lpVoid)
     CCO2_View *pParent = (CCO2_View *)lpVoid;
 
     while(TRUE){
-	     
+
 		 if (g_bPauseRefreshTree)
 		 {
 			Sleep(1000);
@@ -1669,11 +1669,11 @@ DWORD WINAPI CCO2_View::StartRefresh(LPVOID lpVoid)
             if(pParent->IsWindowVisible())
             {
                 CString strTemp ;
-               
-              
-               
+
+
+
                bitset<16> AM(product_register_value[280]);
-               
+
                if (!AM[2])
                {
                   Read_Multi(g_tstat_id,&product_register_value[710],710,10);
@@ -1682,11 +1682,11 @@ DWORD WINAPI CCO2_View::StartRefresh(LPVOID lpVoid)
                else
                {
                  //  Read_Multi(g_tstat_id,&product_register_value[280],280,10);
-               }  
-             
+               }
 
 
-               
+
+
 
 //                 bitset<16> AM(product_register_value[280]);
 //                 int Input_Value = -1;
@@ -1700,7 +1700,7 @@ DWORD WINAPI CCO2_View::StartRefresh(LPVOID lpVoid)
 //                     pParent->m_input_list.SetItemText(0,2,Global_String_MANUAL);
 //                     Input_Value = (short)product_register_value[283] ;
 //                 }
-// 
+//
 //                 unsigned char default_unit = product_register_value[702];
 //                 unsigned char current_unit = product_register_value[701];
 //                 float input_rate   = pParent->get_units_ratio(current_unit,default_unit);
@@ -1714,12 +1714,12 @@ DWORD WINAPI CCO2_View::StartRefresh(LPVOID lpVoid)
 //                 {
 //                     decimal_x = 1;
 //                 }
-//                 int decimal_number = decimal_num[decimal_x][current_unit]; 
+//                 int decimal_number = decimal_num[decimal_x][current_unit];
 //                 if (default_unit == 0)
 //                 {
 //                     input_value=input_rate*Input_Value ;
 //                     input_value =input_value/100;
-//                 } 
+//                 }
 //                 else
 //                 {
 //                     input_value=input_rate*Input_Value ;
@@ -1760,7 +1760,7 @@ DWORD WINAPI CCO2_View::StartRefresh(LPVOID lpVoid)
             continue;
         }
 
-        if(!no_mouse_keyboard_event_enable_refresh) 
+        if(!no_mouse_keyboard_event_enable_refresh)
         {
             Sleep(3000);
             continue ;
@@ -1770,14 +1770,14 @@ DWORD WINAPI CCO2_View::StartRefresh(LPVOID lpVoid)
             Sleep(2000);
         }
 
-       
+
 
 
         int read_ret=0;
         register_critical_section.Lock();
         for(int i=0;i<7;i++)
         {
-            if(!no_mouse_keyboard_event_enable_refresh) 
+            if(!no_mouse_keyboard_event_enable_refresh)
             {break ;}
             if (!pParent->m_fresh_Grid)
             {
@@ -1788,7 +1788,7 @@ DWORD WINAPI CCO2_View::StartRefresh(LPVOID lpVoid)
         }
 		Read_Multi(g_tstat_id,pParent->ValueData,10000,10);
         register_critical_section.Unlock();
-        if(!no_mouse_keyboard_event_enable_refresh) 
+        if(!no_mouse_keyboard_event_enable_refresh)
         {continue ;}
         if (!pParent->m_fresh_Grid)
         {
@@ -1802,7 +1802,7 @@ DWORD WINAPI CCO2_View::StartRefresh(LPVOID lpVoid)
         {
             pParent->PostMessage(WM_REFRESH_CO2_DLG,REFRESH_DLG,0);
             pParent->PostMessage(WM_REFRESH_CO2_DLG,ENABLE_REFRESH_BUTTON,0);
-            
+
             pParent->PostMessage(WM_REFRESH_BAC_INPUT_LIST,1,0);
         }
 
@@ -1862,7 +1862,7 @@ void CCO2_View::OnEnKillfocusCo2AlarmOffTime()
 
 // void CCO2_View::OnBnClickedBtnCo2ClearCal()
 // {
-//  
+//
 // }
 
 void CCO2_View::OnBnClickedRadioHumidityHeatEnable()
@@ -1891,7 +1891,7 @@ void CCO2_View::Initial_Registerlist(){
     {
         if (fv<3.0)
         {
-            //AfxMessageBox(_T("Your Firmware is old,please update it!"));       
+            //AfxMessageBox(_T("Your Firmware is old,please update it!"));
         }
 
     }
@@ -2240,33 +2240,33 @@ void CCO2_View::ClickMsflexgridInput()
 {
     m_grid_input.SetFocus();
     long lRow,lCol;
-    lRow = m_grid_input.get_RowSel();//»ñÈ¡µã»÷µÄÐÐºÅ	
-    lCol = m_grid_input.get_ColSel(); //»ñÈ¡µã»÷µÄÁÐºÅ
-    if(lRow>m_grid_input.get_Rows()) //Èç¹ûµã»÷Çø³¬¹ý×î´óÐÐºÅ£¬Ôòµã»÷ÊÇÎÞÐ§µÄ
+    lRow = m_grid_input.get_RowSel();//ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ðºï¿½
+    lCol = m_grid_input.get_ColSel(); //ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ðºï¿½
+    if(lRow>m_grid_input.get_Rows()) //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÐºÅ£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½
         return;
-    if(lRow == 0) //Èç¹ûµã»÷±êÌâÐÐ£¬Ò²ÎÞÐ§
+    if(lRow == 0) //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð£ï¿½Ò²ï¿½ï¿½Ð§
         return;
     CRect rect;
-    m_grid_input.GetWindowRect(rect); //»ñÈ¡±í¸ñ¿Ø¼þµÄ´°¿Ú¾ØÐÎ
-    ScreenToClient(rect); 
-    //×ª»»Îª¿Í»§Çø¾ØÐÎ	
-    // MSFlexGrid¿Ø¼þµÄº¯ÊýµÄ³¤¶Èµ¥Î»ÊÇ"ç¾(twips)"£¬
-    //ÐèÒª½«Æä×ª»¯ÎªÏñËØ£¬1440ç¾= 1Ó¢´ç
+    m_grid_input.GetWindowRect(rect); //ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½Ø¼ï¿½ï¿½Ä´ï¿½ï¿½Ú¾ï¿½ï¿½ï¿½
+    ScreenToClient(rect);
+    //×ªï¿½ï¿½Îªï¿½Í»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    // MSFlexGridï¿½Ø¼ï¿½ï¿½Äºï¿½ï¿½ï¿½ï¿½Ä³ï¿½ï¿½Èµï¿½Î»ï¿½ï¿½"ï¿½ï¿½(twips)"ï¿½ï¿½
+    //ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½Îªï¿½ï¿½ï¿½Ø£ï¿½1440ï¿½ï¿½= 1Ó¢ï¿½ï¿½
     CDC* pDC =GetDC();
-    //¼ÆËãÏóËØµãºÍç¾µÄ×ª»»±ÈÀý
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ç¾µï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
     int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-    //¼ÆËãÑ¡ÖÐ¸ñµÄ×óÉÏ½ÇµÄ×ø±ê(ÏóËØÎªµ¥Î»)
+    //ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½Ð¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï½Çµï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½Î»)
     long y = m_grid_input.get_RowPos(lRow)/nTwipsPerDotY;
     long x = m_grid_input.get_ColPos(lCol)/nTwipsPerDotX;
-    //¼ÆËãÑ¡ÖÐ¸ñµÄ³ß´ç(ÏóËØÎªµ¥Î»)¡£¼Ó1ÊÇÊµ¼Êµ÷ÊÔÖÐ£¬·¢ÏÖ¼Ó1ºóÐ§¹û¸üºÃ
+    //ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½Ð¸ï¿½ï¿½Ä³ß´ï¿½(ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½Î»)ï¿½ï¿½ï¿½ï¿½1ï¿½ï¿½Êµï¿½Êµï¿½ï¿½ï¿½ï¿½Ð£ï¿½ï¿½ï¿½ï¿½Ö¼ï¿½1ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     long width = m_grid_input.get_ColWidth(lCol)/nTwipsPerDotX+1;
     long height = m_grid_input.get_RowHeight(lRow)/nTwipsPerDotY+1;
-    //ÐÎ³ÉÑ¡ÖÐ¸öËùÔÚµÄ¾ØÐÎÇøÓò
+    //ï¿½Î³ï¿½Ñ¡ï¿½Ð¸ï¿½ï¿½ï¿½ï¿½ÚµÄ¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     CRect rc(x,y,x+width,y+height);
-    //×ª»»³ÉÏà¶Ô¶Ô»°¿òµÄ×ø±ê
+    //×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶Ô»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     rc.OffsetRect(rect.left+1,rect.top+1);
-    //»ñÈ¡Ñ¡ÖÐ¸ñµÄÎÄ±¾ÐÅÏ¢
+    //ï¿½ï¿½È¡Ñ¡ï¿½Ð¸ï¿½ï¿½ï¿½ï¿½Ä±ï¿½ï¿½ï¿½Ï¢
     CString strValue = m_grid_input.get_TextMatrix(lRow,lCol);
     m_nCurRow=lRow;
     m_nCurCol=lCol;
@@ -2286,10 +2286,10 @@ void CCO2_View::ClickMsflexgridInput()
         m_co2_temp_unit.AddString(strTemp2);
         m_co2_temp_unit.ShowWindow(SW_SHOW);
 
-        m_co2_temp_unit.MoveWindow(rc);			//ÒÆ¶¯µ½Ñ¡ÖÐ¸ñµÄÎ»ÖÃ£¬¸²¸Ç
+        m_co2_temp_unit.MoveWindow(rc);			//ï¿½Æ¶ï¿½ï¿½ï¿½Ñ¡ï¿½Ð¸ï¿½ï¿½ï¿½Î»ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½
         m_co2_temp_unit.BringWindowToTop();
         m_co2_temp_unit.SelectString(-1,strValue);
-        m_co2_temp_unit.SetFocus();	
+        m_co2_temp_unit.SetFocus();
     }
     if (lCol==5)//Calibration
     {
@@ -2320,10 +2320,10 @@ void CCO2_View::ClickMsflexgridInput()
         m_co2_temp_unit.AddString(_T("Manual"));
         m_co2_temp_unit.ShowWindow(SW_SHOW);
 
-        m_co2_temp_unit.MoveWindow(rc);			//ÒÆ¶¯µ½Ñ¡ÖÐ¸ñµÄÎ»ÖÃ£¬¸²¸Ç
+        m_co2_temp_unit.MoveWindow(rc);			//ï¿½Æ¶ï¿½ï¿½ï¿½Ñ¡ï¿½Ð¸ï¿½ï¿½ï¿½Î»ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½
         m_co2_temp_unit.BringWindowToTop();
         m_co2_temp_unit.SelectString(-1,strValue);
-        m_co2_temp_unit.SetFocus();	
+        m_co2_temp_unit.SetFocus();
     }
     if (lCol==4)
     {
@@ -2334,13 +2334,13 @@ void CCO2_View::ClickMsflexgridInput()
             m_upButton.ShowWindow(SW_HIDE);
             m_downButton.ShowWindow(SW_HIDE);
             m_inValueEdit.ShowWindow(SW_SHOW);
-            m_inValueEdit.MoveWindow(rc); //ÒÆ¶¯µ½Ñ¡ÖÐ¸ñµÄÎ»ÖÃ£¬¸²¸Ç
+            m_inValueEdit.MoveWindow(rc); //ï¿½Æ¶ï¿½ï¿½ï¿½Ñ¡ï¿½Ð¸ï¿½ï¿½ï¿½Î»ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½
             m_inValueEdit.ShowWindow(SW_SHOW);
 
             m_inValueEdit.BringWindowToTop();
             //m_RangCombox.SelectString(-1,strValue);
             m_inValueEdit.SetWindowText(strValue);
-            m_inValueEdit.SetFocus(); //»ñÈ¡½¹µã
+            m_inValueEdit.SetFocus(); //ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½
         }
 
 
@@ -2356,7 +2356,7 @@ void CCO2_View::OnEnKillfocusEditValueGrid()
     int RegAdd_Ex,RegAdd_IN;
     if (m_nCurRow==1)
     {
-        if(product_register_value[CO2_485_MODBUS_DEG_C_OR_F] == 0)		
+        if(product_register_value[CO2_485_MODBUS_DEG_C_OR_F] == 0)
         {
             RegAdd_IN=CO2_485_MODBUS_TEMPERATURE_C_INTERNAL;
             RegAdd_Ex=CO2_485_MODBUS_TEMPERATURE_C_EXTERNAL;
@@ -2375,7 +2375,7 @@ void CCO2_View::OnEnKillfocusEditValueGrid()
 
         int RegAdd=0;
         unsigned short m_value=(unsigned short)(_wtof(TempValue)*10);
-        //if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//ÄÚ²¿
+        //if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//ï¿½Ú²ï¿½
         //{
         //	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,RegAdd_IN,m_value,
         //		product_register_value[RegAdd_IN],this->m_hWnd,IDC_EDIT_VALUE_GRID,_T("Calibrate Value"));
@@ -2394,7 +2394,7 @@ void CCO2_View::OnEnKillfocusEditValueGrid()
         }
         else
         {
-//             if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//ÄÚ²¿
+//             if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//ï¿½Ú²ï¿½
 //             {
 //                 RegAdd=RegAdd_IN;
 //             }
@@ -2412,9 +2412,9 @@ void CCO2_View::OnEnKillfocusEditValueGrid()
         unsigned short m_value=(unsigned short)(_wtof(TempValue)*10);
         if (Get_Bit_FromRegister(product_register_value[CO2_485_MODBUS_OUTPUT_AUTO_MANUAL],m_nCurRow))
         {
-          
 
-			 RegAdd_IN=CO2_485_MODBUS_OUTPUT_MANUAL_VALUE_HUM;	
+
+			 RegAdd_IN=CO2_485_MODBUS_OUTPUT_MANUAL_VALUE_HUM;
         }
         else
         {
@@ -2446,17 +2446,17 @@ void CCO2_View::OnEnKillfocusEditValueGrid()
 }
 
 void CCO2_View::OnLButtonDown(CPoint point)
-{ 
+{
 
 
     int RegAdd_IN,RegAdd_Ex;
     CRect lRect;
-    m_downButton.GetWindowRect(lRect); //»ñÈ¡±í¸ñ¿Ø¼þµÄ´°¿Ú¾ØÐÎ
+    m_downButton.GetWindowRect(lRect); //ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½Ø¼ï¿½ï¿½Ä´ï¿½ï¿½Ú¾ï¿½ï¿½ï¿½
     if((point.x>=lRect.left && point.x<=lRect.right) && (point.y>=lRect.top && point.y<=lRect.bottom))
     {
         if (m_nCurRow==1)
         {
-            if(product_register_value[CO2_485_MODBUS_DEG_C_OR_F] == 0)		
+            if(product_register_value[CO2_485_MODBUS_DEG_C_OR_F] == 0)
             {
                 RegAdd_IN=CO2_485_MODBUS_TEMPERATURE_C_INTERNAL;
                 RegAdd_Ex=CO2_485_MODBUS_TEMPERATURE_C_EXTERNAL;
@@ -2472,7 +2472,7 @@ void CCO2_View::OnLButtonDown(CPoint point)
             }
             CString  TempValue;
             m_value=product_register_value[RegAdd_IN]-1;
-            if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//ÄÚ²¿
+            if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//ï¿½Ú²ï¿½
             {
                 m_value=product_register_value[RegAdd_IN];
                 m_address=RegAdd_IN;
@@ -2500,7 +2500,7 @@ void CCO2_View::OnLButtonDown(CPoint point)
     {
         if (m_nCurRow==1)
         {
-            if(product_register_value[CO2_485_MODBUS_DEG_C_OR_F] == 0)		
+            if(product_register_value[CO2_485_MODBUS_DEG_C_OR_F] == 0)
             {
                 RegAdd_IN=CO2_485_MODBUS_TEMPERATURE_C_INTERNAL;
                 RegAdd_Ex=CO2_485_MODBUS_TEMPERATURE_C_EXTERNAL;
@@ -2516,7 +2516,7 @@ void CCO2_View::OnLButtonDown(CPoint point)
             }
             CString  TempValue;
             m_value=product_register_value[RegAdd_IN]-1;
-            if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//ÄÚ²¿
+            if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//ï¿½Ú²ï¿½
             {
                 m_value=product_register_value[RegAdd_IN];
                 m_address=RegAdd_IN;
@@ -2557,7 +2557,7 @@ void CCO2_View::OnBnClickedUpbutton()
     if (m_nCurRow==1)
     {
 
-        if(product_register_value[CO2_485_MODBUS_DEG_C_OR_F] == 0)		
+        if(product_register_value[CO2_485_MODBUS_DEG_C_OR_F] == 0)
         {
             RegAdd_IN=CO2_485_MODBUS_TEMPERATURE_C_INTERNAL;
             RegAdd_Ex=CO2_485_MODBUS_TEMPERATURE_C_EXTERNAL;
@@ -2577,7 +2577,7 @@ void CCO2_View::OnBnClickedUpbutton()
         CString  TempValue;
         m_inValueEdit.GetWindowTextW(TempValue);
         unsigned short m_value=product_register_value[RegAdd_IN]+1;
-        if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//ÄÚ²¿
+        if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//ï¿½Ú²ï¿½
         {
             /*Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,RegAdd_IN,m_value,
             product_register_value[RegAdd_IN],this->m_hWnd,IDC_DOWNBUTTON,_T("Calibrate Value"));*/
@@ -2656,7 +2656,7 @@ void CCO2_View::OnTimer(UINT_PTR nIDEvent)
     CString TempValue;
 
     if (m_message_up==WM_LBUTTONDOWN)
-    { 
+    {
         ++m_times;
         if (m_times<=40)
         {
@@ -2736,13 +2736,13 @@ void CCO2_View::OnCbnSelchangeCo2Braudratecombo()
 	if (product_register_value[7] == PM_CO2_RS485)
 	{
 		RegAddress = CO2_485_MODBUS_BAUDRATE;
-	} 
+	}
 	else
 	{
 		RegAddress = 15;
 	}
    temp_write_ret = write_one(g_tstat_id, RegAddress, m_co2_braudRateCombox.GetCurSel());
-   if(temp_write_ret < 0)	//ÔÝÊ±²»ÅÐ¶ÏÕâÍæÒâ£¬Éè±¸ÊÇ×Ô¼ºÏÈÇÐ²¨ÌØÂÊÔÚ»Ø£¬µ¼ÖÂ»Ø²»¹ýÀ´. 
+   if(temp_write_ret < 0)	//ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½â£¬ï¿½è±¸ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½Ð²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú»Ø£ï¿½ï¿½ï¿½ï¿½Â»Ø²ï¿½ï¿½ï¿½ï¿½ï¿½.
    {
 	   MessageBox(_T("Write timeout."));
 	   return;
@@ -2759,7 +2759,7 @@ void CCO2_View::OnCbnSelchangeCo2Braudratecombo()
     {
         SqlText.Format(_T("update ALL_NODE set Bautrate = '9600' where Serial_ID='%d'"),get_serialnumber());
          Change_BaudRate(9600);
-    } 
+    }
     else
     {
         SqlText.Format(_T("update ALL_NODE set Bautrate = '19200' where Serial_ID='%d'"),get_serialnumber());
@@ -2774,7 +2774,7 @@ void CCO2_View::OnCbnSelchangeCo2Braudratecombo()
 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 	::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
 
-    
+
    // pFrame->ScanTstatInDB();
     g_bPauseMultiRead = FALSE;
 }
@@ -2790,7 +2790,7 @@ void CCO2_View::Initial_InputList(){
       while ( m_input_list.DeleteColumn (0)) ;
 
       m_input_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
-      m_input_list.SetExtendedStyle(m_input_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));	
+      m_input_list.SetExtendedStyle(m_input_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));
       m_input_list.InsertColumn(0, _T("NUM"), 50, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
       m_input_list.InsertColumn(1, _T("Full Label"), 70, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
       m_input_list.InsertColumn(2, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -2809,7 +2809,7 @@ void CCO2_View::Initial_InputList(){
           {
               strlist.push_back(Pressure_Units[i]);
           }
-          m_input_list.SetCellStringList(0, 4, strlist);		
+          m_input_list.SetCellStringList(0, 4, strlist);
       }
 
 
@@ -2839,12 +2839,12 @@ void CCO2_View::Initial_InputList(){
       {
           decimal_x = 1;
       }
-      int decimal_number = decimal_num[decimal_x][current_unit]; 
+      int decimal_number = decimal_num[decimal_x][current_unit];
       if (default_unit == 0)
       {
           input_value=input_rate*Input_Value ;
           input_value =input_value/100;
-      } 
+      }
       else
       {
           input_value=input_rate*Input_Value ;
@@ -2871,7 +2871,7 @@ void CCO2_View::Initial_InputList(){
       while ( m_input_list.DeleteColumn (0)) ;
 
       m_input_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
-      m_input_list.SetExtendedStyle(m_input_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));	
+      m_input_list.SetExtendedStyle(m_input_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));
       m_input_list.InsertColumn(0, _T("NUM"), 50, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
       m_input_list.InsertColumn(1, _T("Full Label"), 70, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
       m_input_list.InsertColumn(2, _T("Value"), 50, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -2887,13 +2887,13 @@ void CCO2_View::Initial_InputList(){
       m_input_list.SetItemText(1,1,_T("Hum"));
       m_input_list.SetItemText(2,1,_T("CO2"));
 
-      
- 
-
-      
 
 
-     
+
+
+
+
+
       int i_internal_temp = 0;
       int i_external_temp = 0;
       float f_internal_temp = 0;
@@ -2906,7 +2906,7 @@ void CCO2_View::Initial_InputList(){
       strTemp1.Format(_T("%cC"),176);
       strTemp2.Format(_T("%cF"),176);
 
-      if(product_register_value[125] == 0)		
+      if(product_register_value[125] == 0)
       {
           i_internal_temp = product_register_value[119];
           i_external_temp = product_register_value[121];
@@ -2928,8 +2928,8 @@ void CCO2_View::Initial_InputList(){
       f_external_temp = (float)i_external_temp / 10;
       CString  TempValue,StrAM;
 
-     
-      if(product_register_value[124] == 0)//ÄÚ²¿
+
+      if(product_register_value[124] == 0)//ï¿½Ú²ï¿½
       {
           TempValue.Format(_T("%0.1f"),f_internal_temp);
       }
@@ -2940,28 +2940,28 @@ void CCO2_View::Initial_InputList(){
 
       m_input_list.SetItemText(0,2,TempValue);
       strHUM.Format(_T("%0.1f"),(float)(product_register_value[116])/10.0);
-      
+
        m_input_list.SetItemText(1,2,strHUM);
        strCO2.Format(_T("%d"),product_register_value[108]);
-        
+
        m_input_list.SetItemText(2,2,strCO2);
 
         m_input_list.SetItemText(0,3,strUnit);
         m_input_list.SetItemText(1,3,_T("%"));
         m_input_list.SetItemText(2,3,_T("ppm"));
-        
+
         m_input_list.SetItemText(0,4,_T("UNUSED"));
         m_input_list.SetItemText(1,4,_T("UNUSED"));
         strTemp.Format (_T("%d"),product_register_value[111]);
         m_input_list.SetItemText(2,4,strTemp);
 
 
-     
 
-     
-       
+
+
+
   }
-   
+
 }
 
 void CCO2_View::Initial_OutputList(){
@@ -2974,7 +2974,7 @@ if (m_product_type == 1)
 	while ( m_output_list.DeleteColumn (0)) ;
 
 	m_output_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
-	m_output_list.SetExtendedStyle(m_output_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));	
+	m_output_list.SetExtendedStyle(m_output_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));
 	m_output_list.InsertColumn(0, _T("NUM"), 40, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
 	m_output_list.InsertColumn(1, _T("Full Label"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_output_list.InsertColumn(2, _T("Value"), 45, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -3013,7 +3013,7 @@ if (m_product_type == 1)
 	m_output_list.SetItemText(1,3,strTemp);
 	m_output_list.SetItemText(2,3,strTemp);
 	float FloatValue = 0;
-	
+
 	if (output_range == 1)
 	{
 		AddressValue =10003 ;
@@ -3030,7 +3030,7 @@ if (m_product_type == 1)
 		flValue = (((float)((short)ValueData[AddressValue-10000]))/1024)*25;
 		strTemp.Format (_T("%0.2f"),flValue);
 		m_output_list.SetItemText(2,2,strTemp);
-	} 
+	}
 	else
 	{
 		AddressValue =10000 ;
@@ -3042,7 +3042,7 @@ if (m_product_type == 1)
 		AddressValue =10001 ;
 		FloatValue = (short)ValueData[AddressValue-10000];
 		flValue = (FloatValue/1024)*10;
-		 
+
 		strTemp.Format (_T("%0.2f"),flValue);
 		m_output_list.SetItemText(1,2,strTemp);
 
@@ -3053,30 +3053,30 @@ if (m_product_type == 1)
 		m_output_list.SetItemText(2,2,strTemp);
 	}
 
-	
 
-	
 
-	 
+
+
+
 	FloatValue = (short)product_register_value[287];
 	flValue = (FloatValue)/10;
 	strTemp.Format (_T("%0.1f"),flValue);
 	m_output_list.SetItemText(0,4,strTemp);
 
-	 
+
 
 	FloatValue = (short)product_register_value[288];
 	flValue = (FloatValue)/10;
 	strTemp.Format (_T("%0.1f"),flValue);
 	m_output_list.SetItemText(0,5,strTemp);
-	 
+
 
 	FloatValue = (short)product_register_value[285];
 	flValue = (FloatValue)/10;
 	strTemp.Format (_T("%0.1f"),flValue);
 
 	m_output_list.SetItemText(1,4,strTemp);
-	 
+
 
 	FloatValue = (short)product_register_value[286];
 	flValue = (FloatValue)/10;
@@ -3095,7 +3095,7 @@ if (m_product_type == 1)
 	strTemp1.Format(_T("%cC"),176);
 	strTemp2.Format(_T("%cF"),176);
 
-	if(product_register_value[CO2_485_MODBUS_DEG_C_OR_F] == 0)		
+	if(product_register_value[CO2_485_MODBUS_DEG_C_OR_F] == 0)
 	{
 
 
@@ -3120,15 +3120,15 @@ else if (m_product_type == 3)
 {
     int AddressValue = -1;
     CString strTemp;
-    
+
     m_output_list.DeleteAllItems();
     while ( m_output_list.DeleteColumn (0)) ;
 
     m_output_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
-    m_output_list.SetExtendedStyle(m_output_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));	
+    m_output_list.SetExtendedStyle(m_output_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));
     m_output_list.InsertColumn(0, _T("NUM"), 40, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
     m_output_list.InsertColumn(1, _T("Full Label"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-   
+
     m_output_list.InsertColumn(2, _T("Range"), 45, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_output_list.InsertColumn(3, _T("Min Out Scale"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_output_list.InsertColumn(4, _T("Max Out Scale"), 85, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -3190,7 +3190,7 @@ else
     while ( m_output_list.DeleteColumn (0)) ;
 
     m_output_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
-    m_output_list.SetExtendedStyle(m_output_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));	
+    m_output_list.SetExtendedStyle(m_output_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));
     m_output_list.InsertColumn(0, _T("NUM"), 40, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
     m_output_list.InsertColumn(1, _T("Full Label"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_output_list.InsertColumn(2, _T("Value"), 45, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -3200,7 +3200,7 @@ else
     g_hwnd_now = this->m_hWnd;
     m_output_list.InsertItem(0,_T("1"));
     m_output_list.SetItemText(0,1,_T("Pressure"));
-    //Range 
+    //Range
     AddressValue =284 ;
 
 
@@ -3234,21 +3234,21 @@ else
         {
             product_register_value[1005] = ret;
         }
-  
-    
+
+
         if (output_range==1||output_range==2)
         {
             strTemp.Format(_T("%.2f v"),((float)((short)product_register_value[1002]))*1.024);
         }
         else if (output_range==3)
         {
-            
+
             strTemp.Format(_T("%.2f ma"),((float)((short)product_register_value[1005]))*2.5*1.024);
         }
         else{
             strTemp=_T("0");
         }
-  
+
     m_output_list.SetItemText(0,2,strTemp);
 
     //Min out scale
@@ -3268,38 +3268,38 @@ else
 // 	input: input the unit type
 //	output: get the  ratio
 //  get the ratio on the mmhg and the ratio by 10^7.
-// ************************************************************************************* 
+// *************************************************************************************
 float CCO2_View::get_mmhg_ratio(unsigned char unit)  //rate = unit/mmhg*10^7
 {
 
     float Ftemp;  //10^7
 
     switch (unit)
-    {													   
-    case P_inWC:         //W.C				0.01		 0	
+    {
+    case P_inWC:         //W.C				0.01		 0
         Ftemp = 5353000;
         break;
-    case P_KPa:          //KPa 			0.0001		 0	
+    case P_KPa:          //KPa 			0.0001		 0
         Ftemp = 1332800;
-        break;  
+        break;
     case P_Psi:          //Psi				0.00001		0.1
-        Ftemp = 193400;				
-        break; 
+        Ftemp = 193400;
+        break;
     case P_mmHg:         //mmHg			0.01		0
-        Ftemp = 10000000;			
+        Ftemp = 10000000;
         break;
     case P_inHg:         //inches of Hg	0.00001		0.01
-        Ftemp = 393700;				
+        Ftemp = 393700;
         break;
     case P_Kg_cm2:       //Kg/cm2			0.000001	0.001
         Ftemp = 13595;
-        break;  
+        break;
     case P_atmosphere:   //atmosphere		0.000001	0.001
         Ftemp = 13158;
         break;
     case P_bar:          //bar				0.000001	0.001
-        Ftemp = 13328;				
-        break; 
+        Ftemp = 13328;
+        break;
 
     }
     return Ftemp;
@@ -3307,11 +3307,11 @@ float CCO2_View::get_mmhg_ratio(unsigned char unit)  //rate = unit/mmhg*10^7
 
 // *************************************************************************************
 // 	input: new unit   default unit
-//	output: get the  ratio between the two unit 
-// ************************************************************************************* 
+//	output: get the  ratio between the two unit
+// *************************************************************************************
 float CCO2_View::get_units_ratio(unsigned char new_unit,unsigned char default_unit)
-{  
-    float Ftemp; 
+{
+    float Ftemp;
     Ftemp = get_mmhg_ratio(new_unit)/get_mmhg_ratio(default_unit);
     return Ftemp;
 }
@@ -3319,8 +3319,8 @@ float CCO2_View::get_units_ratio(unsigned char new_unit,unsigned char default_un
 LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
 
     int Changed_Item = (int)wParam;
-    int Changed_SubItem = (int)lParam; 
-    int AddressValue = -1; 
+    int Changed_SubItem = (int)lParam;
+    int AddressValue = -1;
     CString temp_task_info;
      int RegAddress_INT,RegAddress_EXT,RegAddress;
       if (m_list_type == 0)
@@ -3332,32 +3332,32 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
         {
               if (Changed_SubItem ==2)
               {
-                
+
                   if (Changed_Item == 0)
                   {
-                     
 
-                      if(product_register_value[125] == 0)		
+
+                      if(product_register_value[125] == 0)
                       {
                           RegAddress_INT = 119;
                           RegAddress_EXT = 121;
 
-                          
+
                       }
                       else if((product_register_value[125] == 1))
                       {
                           RegAddress_INT  =  120 ;
                           RegAddress_EXT  =  122 ;
 
-                         
+
                       }
                       else
                       {
                           /*return;*/
                       }
-                      
 
-                      if(product_register_value[124] == 0)//ÄÚ²¿
+
+                      if(product_register_value[124] == 0)//ï¿½Ú²ï¿½
                       {
                          RegAddress = RegAddress_INT;
                       }
@@ -3375,7 +3375,7 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
                               product_register_value[RegAddress]=ItemValue;
                               PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
                           }
-                      } 
+                      }
                   }
                  /* m_input_list.SetItemText(0,2,TempValue);
                   strHUM.Format(_T("%0.1f"),(float)(product_register_value[116])/10.0);
@@ -3414,7 +3414,7 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
                   }
 
               }
-               
+
               if (Changed_SubItem == 4)
               {
                 if (Changed_Item == 2)
@@ -3440,7 +3440,7 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
         }
         else
         {
-            //Value 
+            //Value
             if (Changed_SubItem == 3)//Value
             {
 
@@ -3458,7 +3458,7 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
                 {
                     f_input_value =ItemValue*100;
                     Input_Value=(int)(f_input_value/input_rate);
-                } 
+                }
                 else
                 {
                     f_input_value =ItemValue*10;
@@ -3490,7 +3490,7 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
                     {
                         if (Changed_Item == 0)
                         {
-                            AddressValue =283;	
+                            AddressValue =283;
                             if (product_register_value[AddressValue]!=Input_Value)
                             {
                                 int ret = write_one(g_tstat_id,AddressValue,Input_Value);
@@ -3515,7 +3515,7 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
                 int ItemValue = _wtoi(New_CString);
                 if (Changed_Item == 0)
                 {
-                    AddressValue =705;	
+                    AddressValue =705;
                     if (product_register_value[AddressValue]!=ItemValue)
                     {
                         int ret = write_one(g_tstat_id,AddressValue,ItemValue);
@@ -3525,7 +3525,7 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
                         }
                     }
 
-                }  
+                }
             }
             //Range
             int Int_NewRange = 0;
@@ -3539,7 +3539,7 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
                         break;
                     }
 
-                } 
+                }
                 unsigned char current_unit = product_register_value[701];
                 if (current_unit != Int_NewRange)
                 {
@@ -3552,12 +3552,12 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
 
             }
         }
-       
+
 
         PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
-    } 
+    }
     else if(m_list_type == 1)
-    {	
+    {
         if (m_product_type == 3)
         {
             CString New_CString =  m_output_list.GetItemText(Changed_Item,Changed_SubItem);
@@ -3577,7 +3577,7 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
                         }
 
                     }
-                
+
 
             }
             if (Changed_SubItem == 4)
@@ -3603,7 +3603,7 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
 			int ItemValue = (int)(_wtof(New_CString)*10);
 			if (Changed_SubItem == 4)
 			{
-  				if (Changed_Item == 0)	
+  				if (Changed_Item == 0)
  				{
 				     RegAddress = 287;
 				     int RegValue = (short)product_register_value[RegAddress];
@@ -3616,9 +3616,9 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
 				     		PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
 				     	}
 				     }
-				 } 
+				 }
 
-				if (Changed_Item == 1)	
+				if (Changed_Item == 1)
 				{
 					RegAddress = 285;
 					int RegValue = (short)product_register_value[RegAddress];
@@ -3633,7 +3633,7 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
 					}
 				}
 
-				if (Changed_Item == 2)	
+				if (Changed_Item == 2)
 				{
 					RegAddress = 289;
 					int RegValue = (short)product_register_value[RegAddress];
@@ -3652,7 +3652,7 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
 			}
 			if (Changed_SubItem == 5)
 			{
-				if (Changed_Item == 0)	   
+				if (Changed_Item == 0)
 				{
 					RegAddress = 288;
 					int RegValue = (short)product_register_value[RegAddress];
@@ -3665,8 +3665,8 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
 							PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
 						}
 					}
-				}   
-				if (Changed_Item == 1)	   
+				}
+				if (Changed_Item == 1)
 				{
 					RegAddress = 286;
 					int RegValue = (short)product_register_value[RegAddress];
@@ -3679,8 +3679,8 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
 							PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
 						}
 					}
-				}   
-				if (Changed_Item == 2)	   
+				}
+				if (Changed_Item == 2)
 				{
 					RegAddress = 290;
 					int RegValue = (short)product_register_value[RegAddress];
@@ -3694,7 +3694,7 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
 							PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
 						}
 					}
-				}   
+				}
 			}
 		}
         else
@@ -3704,7 +3704,7 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
 
             if (Changed_SubItem == 4)
             {
-                if (Changed_Item == 0)	
+                if (Changed_Item == 0)
                 {
                     int RegValue = (short)product_register_value[289];
                     if (RegValue!=ItemValue)
@@ -3722,7 +3722,7 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
             }
             if (Changed_SubItem == 5)
             {
-                if (Changed_Item == 0)	   
+                if (Changed_Item == 0)
                 {
                     int RegValue = (short)product_register_value[290];
                     if (RegValue!=ItemValue)
@@ -3734,11 +3734,11 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
                             PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
                         }
                     }
-                }  
+                }
             }
         }
-        
-      
+
+
 
     }
     else
@@ -3753,7 +3753,7 @@ void CCO2_View::OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult){
     LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
     HWND TEMP = g_hwnd_now;
     HWND TEMP1  = this->m_hWnd;
-    int AddressValue = -1; 
+    int AddressValue = -1;
     CString temp_cstring;
     long lRow,lCol;
     m_input_list.Set_Edit(true);
@@ -3769,7 +3769,7 @@ void CCO2_View::OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult){
     lCol = lvinfo.iSubItem;
 
 
-    if(lRow>m_input_list.GetItemCount()) //Èç¹ûµã»÷Çø³¬¹ý×î´óÐÐºÅ£¬Ôòµã»÷ÊÇÎÞÐ§µÄ
+    if(lRow>m_input_list.GetItemCount()) //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÐºÅ£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½
         return;
     if(lRow<0)
         return;
@@ -3791,7 +3791,7 @@ void CCO2_View::OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult){
                     {
                         product_register_value[125] = 1;
                     }
-                } 
+                }
                 else
                 {
                     if (write_one (g_tstat_id,125,0)>0)
@@ -3822,7 +3822,7 @@ void CCO2_View::OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult){
      {
          if (lCol == 2)	//	A/M
          {
-             AddressValue =280;	
+             AddressValue =280;
              bitset<16> AM(product_register_value[AddressValue]);
              if(AM[2])
              {
@@ -3846,7 +3846,7 @@ void CCO2_View::OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult){
          }
          if (lCol == 3)
          {
-             AddressValue =280;	
+             AddressValue =280;
              bitset<16> AM(product_register_value[AddressValue]);
              if(!AM[2])
              {
@@ -3855,7 +3855,7 @@ void CCO2_View::OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult){
              }
          }
      }
-    
+
 
     m_list_type = 0;
 }
@@ -3879,7 +3879,7 @@ void CCO2_View::OnNMClickList_Output(NMHDR *pNMHDR, LRESULT *pResult){
 }
 // void CCO2_View::OnNMClickList_CO2List(NMHDR *pNMHDR, LRESULT *pResult){
 //     LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-// 
+//
 //     CString temp_cstring;
 //     long lRow,lCol;
 //     m_co2_external_sensor_list.Set_Edit(true);
@@ -3890,17 +3890,17 @@ void CCO2_View::OnNMClickList_Output(NMHDR *pNMHDR, LRESULT *pResult){
 //     lvinfo.pt=point;
 //     lvinfo.flags=LVHT_ABOVE;
 //     int nItem=m_co2_external_sensor_list.SubItemHitTest(&lvinfo);
-// 
+//
 //     lRow = lvinfo.iItem;
 //     lCol = lvinfo.iSubItem;
-// 
-//     if(lRow>m_co2_external_sensor_list.GetItemCount()) //Èç¹ûµã»÷Çø³¬¹ý×î´óÐÐºÅ£¬Ôòµã»÷ÊÇÎÞÐ§µÄ
+//
+//     if(lRow>m_co2_external_sensor_list.GetItemCount()) //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÐºÅ£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½
 //         return;
 //     if(lRow<0)
 //         return;
-// 
-//     m_list_type = 3; 
-// 
+//
+//     m_list_type = 3;
+//
 // }
 
 LRESULT CCO2_View::Fresh_Lists(WPARAM wParam,LPARAM lParam){
@@ -3937,12 +3937,12 @@ LRESULT CCO2_View::Fresh_Lists(WPARAM wParam,LPARAM lParam){
              {
                  decimal_x = 1;
              }
-             int decimal_number = decimal_num[decimal_x][current_unit]; 
+             int decimal_number = decimal_num[decimal_x][current_unit];
              if (default_unit == 0)
              {
                  input_value=input_rate*Input_Value ;
                  input_value =input_value/100;
-             } 
+             }
              else
              {
                  input_value=input_rate*Input_Value ;
@@ -3956,8 +3956,8 @@ LRESULT CCO2_View::Fresh_Lists(WPARAM wParam,LPARAM lParam){
              return 1;
          }
      }
-     
-     
+
+
 
     if (m_list_type == 0)
     {
@@ -3967,7 +3967,7 @@ LRESULT CCO2_View::Fresh_Lists(WPARAM wParam,LPARAM lParam){
             CString strTemp;
             //m_input_list.ShowWindow(SW_HIDE);
             m_input_list.DeleteAllItems();
-            
+
 
             g_hwnd_now = this->m_hWnd;
             m_input_list.InsertItem(0,_T("1"));
@@ -3997,7 +3997,7 @@ LRESULT CCO2_View::Fresh_Lists(WPARAM wParam,LPARAM lParam){
             strTemp1.Format(_T("%cC"),176);
             strTemp2.Format(_T("%cF"),176);
 
-            if(product_register_value[125] == 0)		
+            if(product_register_value[125] == 0)
             {
                 i_internal_temp = product_register_value[119];
                 i_external_temp = product_register_value[121];
@@ -4020,7 +4020,7 @@ LRESULT CCO2_View::Fresh_Lists(WPARAM wParam,LPARAM lParam){
             CString  TempValue,StrAM;
 
 
-            if(product_register_value[124] == 0)//ÄÚ²¿
+            if(product_register_value[124] == 0)//ï¿½Ú²ï¿½
             {
                 TempValue.Format(_T("%0.1f"),f_internal_temp);
             }
@@ -4045,7 +4045,7 @@ LRESULT CCO2_View::Fresh_Lists(WPARAM wParam,LPARAM lParam){
             m_input_list.SetItemText(1,4,_T("UNUSED"));
             strTemp.Format (_T("%d"),product_register_value[111]);
             m_input_list.SetItemText(2,4,strTemp);
-        } 
+        }
         else
         {
             m_input_list.DeleteAllItems();
@@ -4059,7 +4059,7 @@ LRESULT CCO2_View::Fresh_Lists(WPARAM wParam,LPARAM lParam){
                 {
                     strlist.push_back(Pressure_Units[i]);
                 }
-                m_input_list.SetCellStringList(0, 4, strlist);		
+                m_input_list.SetCellStringList(0, 4, strlist);
             }
 
             bitset<16> AM(product_register_value[280]);
@@ -4088,12 +4088,12 @@ LRESULT CCO2_View::Fresh_Lists(WPARAM wParam,LPARAM lParam){
             {
                 decimal_x = 1;
             }
-            int decimal_number = decimal_num[decimal_x][current_unit]; 
+            int decimal_number = decimal_num[decimal_x][current_unit];
             if (default_unit == 0)
             {
                 input_value=input_rate*Input_Value ;
                 input_value =input_value/100;
-            } 
+            }
             else
             {
                 input_value=input_rate*Input_Value ;
@@ -4109,9 +4109,9 @@ LRESULT CCO2_View::Fresh_Lists(WPARAM wParam,LPARAM lParam){
             strTemp.Format(_T("%d"),product_register_value[705]);
             m_input_list.SetItemText(0,5,strTemp);
         }
-       
 
-    } 
+
+    }
     else if (m_list_type == 1)
     {
         if (m_product_type == 3)
@@ -4120,7 +4120,7 @@ LRESULT CCO2_View::Fresh_Lists(WPARAM wParam,LPARAM lParam){
             CString strTemp;
 
             m_output_list.DeleteAllItems();
-            
+
             g_hwnd_now = this->m_hWnd;
 
             m_output_list.InsertItem(0,_T("1"));
@@ -4168,12 +4168,12 @@ LRESULT CCO2_View::Fresh_Lists(WPARAM wParam,LPARAM lParam){
             m_output_list.SetItemText(2,4,strTemp);
 
             m_output_list.ShowWindow (SW_SHOW);
-        } 
+        }
 
 		else if (m_product_type == 1)
 		{
 		   float flValue = 0;
-			
+
 			m_output_list.DeleteAllItems();
 
 			g_hwnd_now = this->m_hWnd;
@@ -4224,7 +4224,7 @@ LRESULT CCO2_View::Fresh_Lists(WPARAM wParam,LPARAM lParam){
 				flValue = (((float)((short)ValueData[AddressValue-10000]))/1024)*0.025;
 				strTemp.Format (_T("%0.2f"),flValue);
 				m_output_list.SetItemText(2,2,strTemp);
-			} 
+			}
 			else
 			{
 				AddressValue =10000 ;
@@ -4289,7 +4289,7 @@ LRESULT CCO2_View::Fresh_Lists(WPARAM wParam,LPARAM lParam){
 			strTemp1.Format(_T("%cC"),176);
 			strTemp2.Format(_T("%cF"),176);
 
-			if(product_register_value[CO2_485_MODBUS_DEG_C_OR_F] == 0)		
+			if(product_register_value[CO2_485_MODBUS_DEG_C_OR_F] == 0)
 			{
 
 
@@ -4318,7 +4318,7 @@ LRESULT CCO2_View::Fresh_Lists(WPARAM wParam,LPARAM lParam){
 
             m_output_list.InsertItem(0,_T("1"));
             m_output_list.SetItemText(0,1,_T("Pressure"));
-            //Range 
+            //Range
             AddressValue =284 ;
             int output_range=product_register_value[AddressValue];
             if (output_range==1){
@@ -4376,7 +4376,7 @@ LRESULT CCO2_View::Fresh_Lists(WPARAM wParam,LPARAM lParam){
             strTemp.Format(_T("%0.1f"),(float)(short)product_register_value[AddressValue]/10.0);
             m_output_list.SetItemText(0,5,strTemp);
         }
-        
+
     }
     return 0;
 }
@@ -4394,14 +4394,14 @@ void CCO2_View::OnBnClickedTempSensor()
 {
     if (product_register_value[124] == 0)
     {
-        return ; 
+        return ;
     }
     int ret = write_one (g_tstat_id,124,0);
     if(ret>0)
     {
         product_register_value[124] = 0;
     }
-     
+
     if (product_register_value[124] == 0)
     {
         CButton *pTempButton;
@@ -4421,7 +4421,7 @@ void CCO2_View::OnBnClickedTempSensor()
         pTempButton = (CButton *)(GetDlgItem (IDC_HUM_SENSOR)) ;
         pTempButton->SetCheck (1);
     }
-    m_list_type = 0; 
+    m_list_type = 0;
     PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
 }
 
@@ -4430,7 +4430,7 @@ void CCO2_View::OnBnClickedHumSensor()
 {
     if (product_register_value[124] == 1)
     {
-        return ; 
+        return ;
     }
     int ret = write_one (g_tstat_id,124,1);
     if(ret>0)
@@ -4456,7 +4456,7 @@ void CCO2_View::OnBnClickedHumSensor()
         pTempButton = (CButton *)(GetDlgItem (IDC_HUM_SENSOR)) ;
         pTempButton->SetCheck (1);
     }
-    m_list_type = 0; 
+    m_list_type = 0;
     PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
 }
 
@@ -4488,14 +4488,14 @@ void CCO2_View::OnEnKillfocusEdit1Nco2()
 	if (co2value<390||co2value>500)
 	{
 		AfxMessageBox(_T("out of range"));
-	} 
-	 
+	}
+
 	int ret = write_one(g_tstat_id,501,co2value);
 	if (ret>0)
 	{
 		product_register_value[501] = co2value;
 	}
-	Fresh_CO2Node_Compensatin(); 
+	Fresh_CO2Node_Compensatin();
 }
 
 
@@ -4507,14 +4507,14 @@ void CCO2_View::OnEnKillfocusEditRtime()
 	if (rtime<2||rtime>30)
 	{
 		AfxMessageBox(_T("out of range"));
-	} 
+	}
 	int ret = write_one(g_tstat_id,503,rtime);
 	if (ret>0)
 	{
 		product_register_value[503]=rtime;
 	}
 	Fresh_CO2Node_Compensatin();
-	 
+
 }
 
 
@@ -4527,7 +4527,7 @@ void CCO2_View::OnBnClickedButtonOnoff()
 		{
 			product_register_value[500]=1;
 		}
-	 } 
+	 }
 	 else
 	 {
 		 int ret = write_one(g_tstat_id,500,0);
@@ -4548,7 +4548,7 @@ void CCO2_View::OnEnKillfocusEditRtime2()
 	if (rtime<1||rtime>10)
 	{
 		AfxMessageBox(_T("out of range"));
-	} 
+	}
 	int ret = write_one(g_tstat_id,502,rtime);
 	if (ret>0)
 	{

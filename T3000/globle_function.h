@@ -6,7 +6,7 @@
 #include "Bacnet_Include.h"
 #include "T3000RegAddress.h"
 #include "msflexgrid1.h"
-
+ 
 #pragma endregion For_Bacnet
 
 
@@ -247,4 +247,5 @@ bool Output_data_to_string(unsigned char  temp_output_index,
 	CString &temp_out_decom,
 	CString &temp_out_label);
 	bool Save_OutputData_to_db(unsigned char  temp_output_index );
+	CString GetGUID();
 #endif

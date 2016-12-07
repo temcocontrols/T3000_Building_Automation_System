@@ -245,7 +245,6 @@
 #define IDD_DIALOG_BACNET_TOOL          583
 #define IDB_BITMAP_TMCO_LOGO            584
 #define IDD_DIALOG_BACNET_TOOL_READ_PRP 585
-#define IDD_PARTS_VENDORS               586
 #define IDD_REMOTE_CONNECTION           587
 #define IDD_DIALOG_BACNET_RANGES_ANALOG_DEF 588
 #define IDD_DIALOG_BACNET_PROGRAM_DEBUG 589
@@ -277,8 +276,13 @@
 #define IDD_DIALOG_SCHEDULE             636
 #define IDD_DIALOG_PTP_LOGIN            637
 #define IDD_DIALOG_DUPLICATE_ID         638
-#define IDR_MONITOR_DB1                 640
 #define IDD_DIALOG_ISP_MODE_SOLVE       641
+#define IDD_DIALOG_BACNET_MESSAGE_INPUT 642
+#define IDB_BITMAP10                    648
+#define IDB_BITMAP_TSTAT_PID_MODEL      648
+#define IDD_DIALOG_ZIGBEE               649
+#define IDR_MONITOR_DB2                 653
+#define IDD_DIALOG_SETTIME              654
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -518,6 +522,7 @@
 #define IDC_BUTTON1                     1073
 #define IDD_TRENDLOGFORMVIEW            1073
 #define IDC_SLIDER8                     1073
+#define IDC_NIGHT_EDIT2                 1073
 #define IDC_BUTTON2                     1074
 #define IDC_SLIDER9                     1074
 #define IDC_EDIT_CUR_SP                 1074
@@ -537,8 +542,10 @@
 #define IDD_DIALOG_CM5_BACNET           1076
 #define IDC_EDIT5                       1077
 #define IDC_CO22                        1077
+#define IDC_NIGHTHEAT_EDIT3             1077
 #define IDC_EDIT6                       1078
 #define IDC_RH2                         1078
+#define IDC_EDIT_CUR_SP2                1078
 #define IDC_EDIT7                       1079
 #define IDC_FREQ3                       1079
 #define IDC_CHARTCTRL                   1079
@@ -995,6 +1002,7 @@
 #define IDC_EDIT_DATE                   1337
 #define IDC_STATIC_SPMODE               1337
 #define IDC_SLIDER_TEST                 1337
+#define IDC_FSB_OFFICE2                 1337
 #define IDC_EDIT_TIME                   1338
 #define IDC_OCCUPIED_MARK               1338
 #define IDC_FSB_DAYHOTEL                1338
@@ -1004,6 +1012,7 @@
 #define IDC_EDIT_COOL                   1340
 #define IDC_STATIC_SPMODE2              1340
 #define IDC_STATIC_DAYSPMODE            1340
+#define IDC_FSB_HOTEL2                  1340
 #define IDC_EDIT_COAST                  1341
 #define IDC_BUTTON_CLEAR                1341
 #define IDC_STATIC_DATSP                1341
@@ -1153,6 +1162,7 @@
 #define IDC_STATIC2SP                   1540
 #define IDC_STATIC1SP                   1541
 #define IDC_TEMPERSET                   1542
+#define IDC_STATIC1SP2                  1542
 #define IDC_STATIC1t                    1543
 #define IDC_COMBO5                      1546
 #define IDC_STATIC_SETPOINTN            1547
@@ -1703,9 +1713,11 @@
 #define IDC_STATIC_RH                   1884
 #define IDC_STATIC_NO_1                 1885
 #define IDC_COMBO_RANGE2                1885
+#define IDC_STATIC_MAX_NIGHT2           1885
 #define IDC_EDIT_FV                     1886
 #define IDC_STATIC_NO_2                 1886
 #define IDC_COMBO_AM1                   1886
+#define IDC_STATIC_MIN_NIGHT2           1886
 #define IDC_EDIT_HV                     1887
 #define IDC_STATIC_NO_3                 1887
 #define IDC_COMBO_AM2                   1887
@@ -2123,6 +2135,12 @@
 #define IDC_STATIC_ABOUT_INFO           2266
 #define IDC_RADIO_TRANDUCER             2267
 #define IDC_RADIO_pid                   2268
+#define IDC_COMBO_MRD                   2268
+#define IDC_CHECK_ENABLE_SCHEDULE       2269
+#define IDC_BUTTON_ZIGBEE               2270
+#define IDC_BUTTON_APPLY_ALL            2271
+#define IDC_STATIC_BACNET_INPUT_TITLE   3829
+#define IDC_EDIT_BACNET_MESSAGE_INPUT   3830
 #define IDC_HELP_HELP1                  3831
 #define IDC_CHECK_SETTING_ZONE_DAYLIGHT_TIME 3832
 #define IDC_BUTTON_SYNC_TIME            5716
@@ -2617,9 +2635,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        642
+#define _APS_NEXT_RESOURCE_VALUE        656
 #define _APS_NEXT_COMMAND_VALUE         34058
-#define _APS_NEXT_CONTROL_VALUE         2267
+#define _APS_NEXT_CONTROL_VALUE         2270
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

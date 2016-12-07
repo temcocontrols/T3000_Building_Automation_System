@@ -67,7 +67,7 @@ extern CBacnetTstat *Tstat_Window ;
 extern CBacnetSetting * Setting_Window ;
 extern CBacnetUserlogin* User_Login_Window ;
 extern CBacnetRemotePoint* Remote_Point_Window ;
-
+ 
 int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length)
 {
     int retVal;
@@ -5419,23 +5419,30 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 
 		if(find_ip_pid_match)
 		{
-			if(( temp_info.first_time >  g_isp_device_info.at(temp_index).first_time  + 30 ) && 
-				(temp_info.first_time <  g_isp_device_info.at(temp_index).first_time  + 120))
+			if(( temp_info.first_time >  g_isp_device_info.at(temp_index).first_time  + 120 ) && 
+				(temp_info.first_time <  g_isp_device_info.at(temp_index).first_time  + 180))
 			{
 				g_isp_device_info.at(temp_index).first_time = temp_info.first_time;
 				need_isp_device = g_isp_device_info.at(temp_index);
-				::PostMessageW(MainFram_hwd,WM_HADNLE_ISP_MODE_DEVICE,NULL,NULL);
+				if(temp_data.reg.isp_mode == 2) //Minipanel 会回传特殊的 bootloader 坏掉的信息
+				{
+					isp_mode_error_code = 2;
+					::PostMessageW(MainFram_hwd,WM_HADNLE_ISP_MODE_DEVICE,2,NULL);
+				}
+				else
+					::PostMessageW(MainFram_hwd,WM_HADNLE_ISP_MODE_DEVICE,NULL,NULL);
 			}
 			else
 			{
-				g_isp_device_info.at(temp_index).first_time = temp_info.first_time;
+				if(temp_info.first_time > g_isp_device_info.at(temp_index).first_time  + 180)
+					g_isp_device_info.at(temp_index).first_time = temp_info.first_time;
 			}
 		}
 		else
 		{
 			g_isp_device_info.push_back(temp_info);
 		}
-
+		//TRACE(_T("ip:%s time:%d g_isp:%d\r\n"),nip_address,temp_info.first_time,g_isp_device_info.at(temp_index).first_time);
 
 		return	 0;
 	}
@@ -11769,3 +11776,23 @@ bool Save_OutputData_to_db(unsigned char  temp_output_index)
 	SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 	SqliteDBBuilding.closedb();	
 }
+
+CString GetGUID()
+{
+	GUID guid;
+	CString strGUID;
+	if (CoCreateGuid(&guid))
+	{
+// 		fprintf(stderr, "create guid error\n");
+// 		return -1;
+	}
+
+	strGUID.Format(_T("%08X-%04X-%04x-%02X%02X-%02X%02X%02X%02X%02X%02X"), guid.Data1
+		, guid.Data2
+		, guid.Data3
+		, guid.Data4[0], guid.Data4[1]
+		, guid.Data4[2], guid.Data4[3], guid.Data4[4], guid.Data4[5]
+		, guid.Data4[6], guid.Data4[7]);
+	return strGUID;
+}
+
