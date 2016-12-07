@@ -70,6 +70,7 @@ END
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\ISP.ico"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
@@ -86,36 +87,6 @@ BEGIN
     LTEXT           "ID:",IDC_STATIC,13,21,14,9
     LTEXT           "Com Port:",IDC_STATIC,13,38,39,9
     LTEXT           "Baudrate:",IDC_STATIC,13,58,41,9
-END
-
-IDD_DIALOG_LIGHTCTRL DIALOGEX 0, 0, 149, 150
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    CONTROL         "",IDC_IPADDRESS_LC,"SysIPAddress32",WS_TABSTOP,49,20,86,14
-    EDITTEXT        IDC_EDIT_LCIPPORT,49,41,86,14,ES_AUTOHSCROLL
-    CONTROL         "Main controller",IDC_RADIO_MAIN,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,18,65,65,10
-    CONTROL         "Input board",IDC_RADIO_INPUT,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,18,81,54,10
-    CONTROL         "Output board",IDC_RADIO_OUTPUT,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,18,97,59,10
-    EDITTEXT        IDC_EDIT_MDBID,47,117,40,14,ES_AUTOHSCROLL
-    GROUPBOX        "Setting",IDC_STATIC,5,5,138,136
-    LTEXT           "IP Addr:",IDC_STATIC,11,22,28,8
-    LTEXT           "IP Port:",IDC_STATIC,11,44,26,8
-    LTEXT           "Mdb ID:",IDC_STATIC,15,119,27,8
-    LTEXT           "(for sub board)",IDC_STATIC,88,118,53,8
-    GROUPBOX        "",IDC_STATIC,12,58,123,54
-END
-
-IDD_DIALOG_NETCTRL DIALOGEX 0, 0, 149, 150
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    CONTROL         "",IDC_IPADDRESS_NC,"SysIPAddress32",WS_TABSTOP,48,19,86,14
-    EDITTEXT        IDC_EDIT_NCPORT,48,40,86,14,ES_AUTOHSCROLL
-    GROUPBOX        "Net Controller:",IDC_STATIC,7,10,139,139
-    LTEXT           "IP Addr:",IDC_STATIC,12,20,32,9
-    LTEXT           "IP Port:",IDC_STATIC,12,42,30,9
-    PUSHBUTTON      "PING",IDC_BUTTON_PING,47,123,50,14
 END
 
 IDD_DIALOG_SETTING DIALOGEX 0, 0, 198, 60
@@ -142,14 +113,6 @@ BEGIN
     IDD_DIALOG_TSTAT, DIALOG
     BEGIN
         TOPMARGIN, 1
-    END
-
-    IDD_DIALOG_LIGHTCTRL, DIALOG
-    BEGIN
-    END
-
-    IDD_DIALOG_NETCTRL, DIALOG
-    BEGIN
     END
 
     IDD_DIALOG_SETTING, DIALOG
@@ -415,7 +378,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_ABOUTBOX            "&About NEWISP..."
-    IDS_STR_VIRSIONNUM      "Version 4.9.7"
+    IDS_STR_VIRSIONNUM      "Version 5.0.2"
     IDP_SOCKETS_INIT_FAILED "Windows sockets initialization failed."
 END
 

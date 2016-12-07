@@ -188,7 +188,7 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 		temp_reg_value.Format(_T("%d"),(m_remote_point_data.at(i).point_value));
 
 
-
+#if 0
 		if(dev_reg == 0)
 		{
 			m_remote_point_list.SetItemText(i,REMOTE_DEVICE_ID,_T(""));
@@ -198,7 +198,7 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 			m_remote_point_list.SetItemText(i,REMOTE_DESCRIPTION,_T(""));
 			continue;
 		}
-
+#endif
 
 		
 

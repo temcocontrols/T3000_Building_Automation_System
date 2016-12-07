@@ -502,18 +502,21 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 
 	int Fresh_Item;
 	int isFreshOne = (int)lParam;
-
+	int  Minipanel_device = 1;
 	if(bacnet_device_type == T38AI8AO6DO)
 	{
 		INPUT_LIMITE_ITEM_COUNT = 8;
+			Minipanel_device = 0;
 	}
 	else if(bacnet_device_type == PID_T322AI)
 	{
 		INPUT_LIMITE_ITEM_COUNT = 22;
+			Minipanel_device = 0;
 	}
 	else if(bacnet_device_type == PID_T3PT12)
 	{
 		INPUT_LIMITE_ITEM_COUNT = 12;
+			Minipanel_device = 0;
 	}
 	else
 	{
@@ -534,32 +537,71 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		}
 		
 	}
-	if(show_external != temp_need_show_external)
-	{
-		show_external = temp_need_show_external;
-		if(temp_need_show_external)
-		{
-			CRect temp_rect;
-			temp_rect = Input_rect;
-			temp_rect.right = 1250;
-			temp_rect.top = temp_rect.top + 22;
-			m_input_list.MoveWindow(temp_rect);
-			m_input_list.SetColumnWidth(INPUT_EXTERNAL,60);
-			m_input_list.SetColumnWidth(INPUT_PRODUCT,80);
-			m_input_list.SetColumnWidth(INPUT_EXT_NUMBER,80);
-		}
-		else
-		{
-			CRect temp_rect;
-			temp_rect = Input_rect;
-			temp_rect.right = 975;
-			temp_rect.top = temp_rect.top + 22;
-			m_input_list.MoveWindow(temp_rect);
+	//if(show_external != temp_need_show_external)
+	//{
+	//	show_external = temp_need_show_external;
+	//	if(temp_need_show_external)
+	//	{
+	//		CRect temp_rect;
+	//		temp_rect = Input_rect;
+	//		temp_rect.right = 1250;
+	//		temp_rect.top = temp_rect.top + 22;
+	//		m_input_list.MoveWindow(temp_rect);
+	//		m_input_list.SetColumnWidth(INPUT_EXTERNAL,60);
+	//		m_input_list.SetColumnWidth(INPUT_PRODUCT,80);
+	//		m_input_list.SetColumnWidth(INPUT_EXT_NUMBER,80);
+	//	}
+	//	else
+	//	{
+	//		CRect temp_rect;
+	//		temp_rect = Input_rect;
+	//		temp_rect.right = 975;
+	//		temp_rect.top = temp_rect.top + 22;
+	//		m_input_list.MoveWindow(temp_rect);
 
-			m_input_list.SetColumnWidth(INPUT_EXTERNAL,0);
-			m_input_list.SetColumnWidth(INPUT_PRODUCT,0);
-			m_input_list.SetColumnWidth(INPUT_EXT_NUMBER,0);
-		}
+	//		m_input_list.SetColumnWidth(INPUT_EXTERNAL,0);
+	//		m_input_list.SetColumnWidth(INPUT_PRODUCT,0);
+	//		m_input_list.SetColumnWidth(INPUT_EXT_NUMBER,0);
+	//	}
+	//}
+
+	if(Minipanel_device == 0)	//如果不是minipanel的界面就隐藏扩展行;
+	{
+		CRect temp_rect;
+		temp_rect = Input_rect;
+		temp_rect.right = 975;
+		temp_rect.top = temp_rect.top + 22;
+		m_input_list.MoveWindow(temp_rect);
+
+		m_input_list.SetColumnWidth(INPUT_EXTERNAL,0);
+		m_input_list.SetColumnWidth(INPUT_PRODUCT,0);
+		m_input_list.SetColumnWidth(INPUT_EXT_NUMBER,0);
+	}
+	else
+	{
+			if(temp_need_show_external)
+			{
+				CRect temp_rect;
+				temp_rect = Input_rect;
+				temp_rect.right = 1200;
+				temp_rect.top = temp_rect.top + 22;
+				m_input_list.MoveWindow(temp_rect);
+				m_input_list.SetColumnWidth(INPUT_EXTERNAL,60);
+				m_input_list.SetColumnWidth(INPUT_PRODUCT,80);
+				m_input_list.SetColumnWidth(INPUT_EXT_NUMBER,80);
+			}
+			else
+			{
+				CRect temp_rect;
+				temp_rect = Input_rect;
+				temp_rect.right = 975;
+				temp_rect.top = temp_rect.top + 22;
+				m_input_list.MoveWindow(temp_rect);
+
+				m_input_list.SetColumnWidth(INPUT_EXTERNAL,0);
+				m_input_list.SetColumnWidth(INPUT_PRODUCT,0);
+				m_input_list.SetColumnWidth(INPUT_EXT_NUMBER,0);
+			}
 	}
 
 
@@ -815,7 +857,8 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 #pragma region External info
 		if((m_Input_data.at(i).sub_id !=0) &&
 			//(m_Input_data.at(input_list_line).sub_number !=0) &&
-			(m_Input_data.at(i).sub_product !=0))
+			(m_Input_data.at(i).sub_product !=0)&&
+			Minipanel_device == 1)
 		{
 			unsigned char temp_pid = m_Input_data.at(i).sub_product;
 			if((temp_pid == PM_T3PT10) ||
@@ -855,8 +898,11 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		}
 		else
 		{
-			main_sub_panel.Format(_T("%d"),(unsigned char)Station_NUM);
-			m_input_list.SetItemText(i,INPUT_PANEL,main_sub_panel);
+
+			m_input_list.SetItemText(i,INPUT_PANEL,Statuspanel);
+
+			//main_sub_panel.Format(_T("%d"),(unsigned char)Station_NUM);
+			//m_input_list.SetItemText(i,INPUT_PANEL,main_sub_panel);
 
 			m_input_list.SetItemText(i,INPUT_EXTERNAL,_T(""));
 			m_input_list.SetItemText(i,INPUT_PRODUCT,_T(""));
@@ -1456,7 +1502,7 @@ BOOL CBacnetInput::PreTranslateMessage(MSG* pMsg)
 	}
 
     CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-    if (pFrame->m_pDialogInfo->IsWindowVisible())
+    if (pFrame->m_pDialogInfo!=NULL&&pFrame->m_pDialogInfo->IsWindowVisible())
     {
         if (pMsg->message == WM_LBUTTONDOWN||pMsg->message == WM_RBUTTONDOWN)
         {

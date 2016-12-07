@@ -132,4 +132,6 @@ public:
 	DayEvent m_Holiday;
 	 
 	 
+	afx_msg void OnBnClickedCheckEnableSchedule();
+	afx_msg void OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult);
 };

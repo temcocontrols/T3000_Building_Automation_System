@@ -77,6 +77,7 @@ using namespace Gdiplus;
 
 //#pragma  comment(lib,"ISP.lib")
 //#pragma  comment(lib,"RegisterMonitor.lib")
+#import "C:\Program Files\Common Files\System\ado\msado15.dll" no_namespace rename("EOF","EndOfFile") rename("BOF","FirstOfFile")
 //**********************************link to dll*********************
 #define INPUT extern "C" __declspec(dllimport)
 #pragma comment(lib, "WS2_32")
@@ -94,7 +95,7 @@ INPUT int Write_One_tap(unsigned char device_var,unsigned short address,unsigned
 INPUT int Read_One_tap(unsigned char device_var,unsigned short address);
 INPUT int write_multi_tap(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
 INPUT int read_multi_tap(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
-
+INPUT int Modbus_Standard_Read(unsigned char device_var, unsigned short *put_data_into_here, int function_code,unsigned short start_address, int length);
 INPUT bool open_com(int m_com);
 INPUT void close_com();
 INPUT bool is_connect();

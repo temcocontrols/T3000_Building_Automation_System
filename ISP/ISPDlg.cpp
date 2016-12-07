@@ -13,7 +13,6 @@
 #include "BinFileParser.h"
 #include "ComWriter.h"
 #include "TFTPServer.h"
-#include "NCFinder.h"
 #include "FlashSN.h"
 #include "ISPSetting.h"
 
@@ -1410,11 +1409,11 @@ BOOL CISPDlg::FlashTstat(void)
     }
     if (GetCommunicationType () == 0)
     {
-//         if (!DetectBraudrate ())
-//         {
-//             UpdateStatusInfo(_T("Detecting your Braudrate ,Failed"), FALSE);
-//             return FALSE;
-//         }
+		if (!DetectBraudrate())
+		{
+			UpdateStatusInfo(_T("Detecting your Braudrate ,Failed"), FALSE);
+			return FALSE;
+		}
 
 		//SetResponseTime(60);
     }
@@ -1656,7 +1655,8 @@ BOOL CISPDlg::ValidMdbIDStringSUBID()
                 {
                     CString strTips =_T("Error: Modbus ID invalidation.");
                     UpdateStatusInfo(strTips, FALSE);
-                    AfxMessageBox(strTips);
+					if(!auto_flash_mode)
+					 AfxMessageBox(strTips);
                     return FALSE;
                 }
             }

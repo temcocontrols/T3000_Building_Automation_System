@@ -109,6 +109,7 @@ BOOL BacnetRange::OnInitDialog()
 		((CButton *)GetDlgItem(IDC_BTN_EDIT_CUSTOMER_RANGE))->EnableWindow(FALSE);
 		
 		//使能PT12有的选项
+		((CButton *)GetDlgItem(IDC_RADIO35))->EnableWindow(1);
 		((CButton *)GetDlgItem(IDC_RADIO55))->EnableWindow(1);
 		((CButton *)GetDlgItem(IDC_RADIO56))->EnableWindow(1);
 		((CButton *)GetDlgItem(IDC_RADIO57))->EnableWindow(1);
@@ -590,7 +591,8 @@ void BacnetRange::OnOK()
 		if(!temp.IsEmpty())
 		{
 			int temp_value_pt12 = _wtoi(temp);
-			if((temp_value_pt12 != 31) &&
+			if((temp_value_pt12 != 0) &&
+				(temp_value_pt12 != 31) &&
 				(temp_value_pt12 != 32) &&
 				(temp_value_pt12 != 33) &&
 				(temp_value_pt12 != 34) &&

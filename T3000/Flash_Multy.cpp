@@ -331,7 +331,7 @@ void CFlash_Multy::Initial_List()
           
 				Firmware_Result = q.getIntField("FirmwareResult");
          
-            if (Firmware_Result ==3 && Config_Result == 3)
+            if (Firmware_Result ==3 )//&& Config_Result == 3
             {
                 //PostMessage(WM_MULTY_FLASH_MESSAGE,CHANGE_THE_ITEM_COLOR_MORE_GREEN,i);
                 m_flash_multy_list.SetItemTextColor(i,-1,CONFIG_COLOR_CONFIG_FLASH_GOOD);
@@ -346,11 +346,11 @@ void CFlash_Multy::Initial_List()
                     m_flash_multy_list.SetItemTextColor(i,-1,FLASH_COLOR_GREEN);
                     m_flash_multy_list.SetItemText(i,FLASH_RESULTS,_T("Sucessful"));
                 }
-				else if (Config_Result == 3)
+				/*else if (Config_Result == 3)
 				{
 					m_flash_multy_list.SetItemTextColor(i,-1,FLASH_COLOR_GREEN);
 					m_flash_multy_list.SetItemText(i,FLASH_CONFIG_RESULTS,_T("Sucessful"));
-				}
+				}*/
                 else
                 {
                     // PostMessage(WM_MULTY_FLASH_MESSAGE,CHANGE_THE_ITEM_COLOR_DEFAULT,i);
@@ -789,7 +789,7 @@ void CFlash_Multy::OnBnClickedButtonStatrt()
         {
             temp.need_flash = true;
         }
-
+		temp.need_flash = true;
         StrTemp = m_flash_multy_list.GetItemText(i,FLASH_ONLINE);
         if (StrTemp.CompareNoCase(_T("Online"))!=0)
         {

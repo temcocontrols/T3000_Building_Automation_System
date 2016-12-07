@@ -743,7 +743,7 @@ public:
 	byte								       lock[MAX_INFO_TYPE];
 	//fance In_aux							       in_aux[MAX_INS];
 	//fance Con_aux							       con_aux[MAX_PIDS];
-	Info_Table					       info[19];
+	Info_Table					       info[26];
 	//	Str_grp_element				group_elements[MAX_ELEM];
 	Str_out_point   				   outputs[MAX_OUTS];
 	Str_in_point    				   inputs[MAX_INS];
@@ -3425,10 +3425,12 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 {
 
 	int /*i,j*/k,l;
-	char pc[11],*p,*q,buf[21],*tok;
-	char fance_sub_pc[11];
+	char pc[30],*p,*q,buf[30],*tok;
+	char fance_sub_pc[30];
 	char *fance_tok;
-	memset(fance_sub_pc,0,11);
+	memset(fance_sub_pc,0,30);
+	memset(pc,0,30);
+	memset(buf,0,30);
 	tok = token;
 	if(netpresent) *netpresent = 0;
 	*num_net = network;
@@ -3527,7 +3529,7 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 	{
 		memcpy(pc,q,p-q);
 		pc[p-q]=0;
-		for(k=OUT;k<=AR_Y;k++)
+		for(k=OUT;k<=25;k++)
 		{
 			if(k!=DMON)
 			{
@@ -3544,7 +3546,7 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 				//if (!strcmp(pc,my_info_panel[k].name))
 				//	break;
 
-		if (k<=AR_Y)
+		if (k<=25)
 		{
 			if (p==NULL) 
 			{
@@ -6511,7 +6513,7 @@ void ftoa(float f, int length, int ndec, char *buf)
 
 int desvar(void)
 {
- char *b,q[17], *p/*, *r*/;
+ char *b,q[30], *p/*, *r*/;
  Point_T3000 point;
  byte point_type,var_type;
  int num_point,num_panel,num_net,k;
@@ -6728,7 +6730,7 @@ int pointtotext_for_controller(char *buf,Point_T3000 *point)
 		strcat(buf,"-");
 #endif
 	//strcat(buf,lin);
-	if(point_type>19)
+	if(point_type>26)
 		return 0;
 
 	//	ptr_panel.info[point_type-1].name = "VAR";
@@ -6791,7 +6793,7 @@ int pointtotext(char *buf,Point_Net *point)
 	panel=point->panel;
 	point_type= (point->point_type ) & 0x1F;
 	sub_panel = point->sub_panel;
-	if(point_type > 0x13)
+	if(point_type > 26)
 	{
 		error = -6;
 		return -6;
@@ -7288,7 +7290,7 @@ void init_info_table( void )
 {
 	int i;
 	memset( ptr_panel.info, 0, 18*sizeof( Info_Table ) );
-	for( i=0; i<19; i++ )
+	for( i=0; i<26; i++ )
 	//for( i=0; i<18; i++ )
 	{
 		switch( i )
@@ -7423,6 +7425,20 @@ void init_info_table( void )
 			//	//ptr_panel.info[i].str_size = 46;
 			//	ptr_panel.info[i].name = "REG";
 			//	break;
+			case COIL_REG:
+				ptr_panel.info[i].name = "MB_COIL";
+				break;
+			case DIS_INPUT_REG:
+				ptr_panel.info[i].name = "MB_DISINPUT";
+				break;
+			case INPUT_REG:
+				ptr_panel.info[i].name = "MB_INPUTREG";
+				break;
+			default:
+				{
+					ptr_panel.info[i].name = "DEFAULT_NAME";
+				}
+				break;
 		}
 	}
 }

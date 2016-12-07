@@ -1254,8 +1254,16 @@ extern bool edit_confilct_mode ;
 
 extern bool scaning_mode ;
 
+extern int isp_mode_error_code ;
+
 extern		bool isp_mode_is_cancel ;
 extern bool isp_mode_firmware_auto;
 extern CString isp_mode_detect_firmware_path;
 
 extern HANDLE hwait_scan_thread;
+
+extern int graphic_view_index ;
+extern CString grapgic_view_name[3];
+extern bool graphic_view_visible[14];
+extern CString bacnet_message_input_title;
+extern CString bacnet_message_return_string;  //得到的输入字符串

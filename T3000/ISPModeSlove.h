@@ -23,15 +23,16 @@ public:
 	virtual BOOL OnInitDialog();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	void Initial_static();
-	CStaticEx m_device_ip_title;
-	CStaticEx m_product_name_title;
-	CStaticEx m_device_ip_edit;
-	CStaticEx m_device_name_edit;
-	CStaticEx m_isp_mode_title;
+	CStatic m_device_ip_title;
+	CStatic m_product_name_title;
+	CStatic m_device_ip_edit;
+	CStatic m_device_name_edit;
+	CStatic m_isp_mode_title;
 
 	afx_msg void OnBnClickedButtonIspChooseFirmware();
 	afx_msg void OnBnClickedButtonUpdateFirmware();
 	afx_msg void OnBnClickedButtonIspCancel();
 	afx_msg void OnBnClickedRadioFromServer();
 	afx_msg void OnBnClickedRadioFromHardisk();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };

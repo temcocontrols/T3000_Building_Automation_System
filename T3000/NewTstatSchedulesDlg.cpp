@@ -7,6 +7,7 @@
 #include "afxdialogex.h"
 #include "globle_function.h"
 #include <bitset>
+#include "SetTimeDlg.h"
 
 // CNewTstatSchedulesDlg dialog
 
@@ -43,6 +44,8 @@ BEGIN_MESSAGE_MAP(CNewTstatSchedulesDlg, CDialogEx)
 	ON_NOTIFY(NM_KILLFOCUS, IDC_DATETIMEPICKER1_SCHEDUAL, &CNewTstatSchedulesDlg::OnNMKillfocusDatetimepicker1Schedual)
 	ON_BN_CLICKED(IDC_BUTTON_SCHEDULE_COPY_BTN, &CNewTstatSchedulesDlg::OnBnClickedButtonScheduleCopyBtn)
 	ON_BN_CLICKED(IDOK, &CNewTstatSchedulesDlg::OnBnClickedOk)
+	ON_BN_CLICKED(IDC_CHECK_ENABLE_SCHEDULE, &CNewTstatSchedulesDlg::OnBnClickedCheckEnableSchedule)
+	ON_NOTIFY(NM_DBLCLK, IDC_LIST1, &CNewTstatSchedulesDlg::OnNMDblclkList1)
 END_MESSAGE_MAP()
 
 
@@ -55,7 +58,7 @@ int CNewTstatSchedulesDlg::GetEventNumber(int DayIndex)
 	int Position = DayIndex % 6;
 	std::bitset<16> RegBits(m_SchduleBuffer[96+RegNumber]);
 	
-	int eventNumber = 2 * RegBits[Position + 1] + RegBits[Position];
+	int eventNumber = 2 * RegBits[2*Position + 1] + RegBits[2*Position];
 
 	return eventNumber;
 }
@@ -280,10 +283,19 @@ BOOL CNewTstatSchedulesDlg::OnInitDialog()
 	 
 	}
 	
+	if (product_register_value[MODBUS_SCHEDULE_ON_OFF] == 1)
+	{
+		 
+			((CButton *)GetDlgItem(IDC_CHECK_ENABLE_SCHEDULE))->SetCheck(1);
+	}
+	else
+	{
+
+		   ((CButton *)GetDlgItem(IDC_CHECK_ENABLE_SCHEDULE))->SetCheck(0);
+	}
 	
-	
-	
-	return TRUE;  // return TRUE unless you set the focus to a control
+	WeeeklyList.GetFocus();
+	return FALSE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 void CNewTstatSchedulesDlg::Fresh_List()
@@ -665,16 +677,23 @@ BOOL CNewTstatSchedulesDlg::Insert_Schdule(Schedule_Node SR,int POS)
 	{
 		for (list<Schedule_Node>::iterator index = m_ScheduleList.begin();index !=m_ScheduleList.end() ;++index)
 		{
-			if (position == POS)
+			if (position == POS)//找到了要插入的位置
 			{
 			    m_ScheduleList.insert(index,SR);
-				return TRUE;
+				/*return TRUE;*/
 			}
 			position++;
 		} 
+		
+	}
+	if (position!=POS)//没有找到要插入的位置，就直接添加到列表里面
+	{
+		m_ScheduleList.push_back(SR);
 	}
 
-	return FALSE;
+
+	m_ScheduleList.sort();
+	return TRUE;
 }
 
 BOOL CNewTstatSchedulesDlg::InsertAndUpdate_Schdule(Schedule_Node SR)
@@ -740,7 +759,7 @@ BOOL CNewTstatSchedulesDlg::InsertAndUpdate_Schdule(Schedule_Node SR)
  	 
  	}
 	
-
+	m_ScheduleList.sort();
 	return FALSE;
 }
 BOOL CNewTstatSchedulesDlg::Delete_Schdule(int POS)
@@ -777,59 +796,34 @@ list<Schedule_Node>::iterator CNewTstatSchedulesDlg::GetNode(int POS){
 }  
 void CNewTstatSchedulesDlg::OnBnClickedButtonInsert()
 {
-	/*if (WeeeklyList.GetRowCount()>=6)
-	{
-		AfxMessageBox(_T("Can't insert!"));
-	}
-	else
-	{*/
-		
-		Schedule_Node temp_node ;
-		list<Schedule_Node>::iterator it_node = GetNode(m_curRow);
-		if (it_node != m_ScheduleList.end())
+
+ 
+
+
+ 
+		CSetTimeDlg dlg;
+		if (dlg.DoModal() == IDOK)
 		{
-			int min = it_node->Hour*60+it_node->Minite;
-			min-=30;
-			temp_node.Hour = min/60;
-			temp_node.Minite = min - temp_node.Hour*60;
-			 
-			
-			temp_node.Monday		=0;
-			temp_node.Tuesday		=0;
-			temp_node.Wednesday		=0;
-			temp_node.Thursday		=0;
-			temp_node.Friday		=0;
-			temp_node.Saturday		=0;
-			temp_node.Sunday		=0;
-			temp_node.Holiday = 0;
-			if(!Insert_Schdule(temp_node,m_curRow))
+			CString temp = dlg.m_strTime;
+			Schedule_Node sr;
+			CStringArray aaa;
+			SplitCStringA(aaa, temp, L":");
+			if (aaa.GetSize() >= 2)
 			{
-				CString strTemp;
-				strTemp.Format(_T("Time %02d:%02d existed!"),temp_node.Hour,temp_node.Minite);
-				AfxMessageBox(strTemp);
-				return;
+				sr.Hour = _wtoi(aaa[0]);
+				sr.Minite = _wtoi(aaa[1]);
+				InsertAndUpdate_Schdule(sr);
+
+				WeeeklyList.InsertItem(WeeeklyList.GetRowCount(), L"");
 			}
 
+			Fresh_List();
 
 		}
-		else
-		{
-			temp_node.Hour = 6;
-			temp_node.Minite = 30;
+
+ 
 
 
-			temp_node.Monday		=0;
-			temp_node.Tuesday		=0;
-			temp_node.Wednesday		=0;
-			temp_node.Thursday		=0;
-			temp_node.Friday		=0;
-			temp_node.Saturday		=0;
-			temp_node.Sunday		=0;
-			m_ScheduleList.push_back(temp_node);
-		}
-		WeeeklyList.InsertItem(m_curRow,L"");
-		Fresh_List();
-	/*}*/
 
 }
 
@@ -954,19 +948,19 @@ BOOL CNewTstatSchedulesDlg::PreTranslateMessage(MSG* pMsg)
 				OnBnClickedButtonInsert();
 				return TRUE;
 			}
-			else if (pMsg->wParam == VK_RETURN)
-			{
-				 
-					CRect list_rect,win_rect;
-					WeeeklyList.GetWindowRect(list_rect);
-					ScreenToClient(&list_rect);
-					::GetWindowRect(this->m_hWnd,win_rect);
-					WeeeklyList.Set_My_WindowRect(win_rect);
-					WeeeklyList.Set_My_ListRect(list_rect);
-					WeeeklyList.Get_clicked_mouse_position();
-				 
-				return TRUE;
-			}
+// 			else if (pMsg->wParam == VK_RETURN)
+// 			{
+// 				 
+// 				CRect list_rect, win_rect;
+// 				WeeeklyList.GetWindowRect(list_rect);
+// 				ScreenToClient(&list_rect);
+// 				::GetWindowRect(this->m_hWnd, win_rect);
+// 				WeeeklyList.Set_My_WindowRect(win_rect);
+// 				WeeeklyList.Set_My_ListRect(list_rect);
+// 				WeeeklyList.Get_clicked_mouse_position();
+// 				 
+// 				return TRUE;
+// 			}
 		}
 		
 
@@ -1192,4 +1186,80 @@ void CNewTstatSchedulesDlg::OnBnClickedOk()
 	Write_Multi_short(g_tstat_id, TimeBuffer, 813 + 12 * 7, 12);
 	write_one(g_tstat_id, 916, EventNumber);
 
+
+	AfxMessageBox(_T("Write Successfully"));
+}
+
+
+void CNewTstatSchedulesDlg::OnBnClickedCheckEnableSchedule()
+{
+	int ret = 0;
+	if (product_register_value[MODBUS_SCHEDULE_ON_OFF] == 0)
+	{
+		ret = write_one(g_tstat_id, MODBUS_SCHEDULE_ON_OFF, 1);
+		if (ret > 0)
+		{
+			product_register_value[MODBUS_SCHEDULE_ON_OFF] = 1;
+			((CButton *)GetDlgItem(IDC_CHECK_ENABLE_SCHEDULE))->SetCheck(1);
+		} 
+	}
+	else
+	{
+		ret = write_one(g_tstat_id, MODBUS_SCHEDULE_ON_OFF, 0);
+		if (ret > 0)
+		{
+			product_register_value[MODBUS_SCHEDULE_ON_OFF] = 0;
+			((CButton *)GetDlgItem(IDC_CHECK_ENABLE_SCHEDULE))->SetCheck(0);
+		}
+	}
+	
+}
+
+
+void CNewTstatSchedulesDlg::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	 
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	CString temp_cstring;
+	long lRow, lCol;
+
+	DWORD dwPos = GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
+	CPoint point(LOWORD(dwPos), HIWORD(dwPos));
+	WeeeklyList.ScreenToClient(&point);
+	LVHITTESTINFO lvinfo;
+	lvinfo.pt = point;
+	lvinfo.flags = LVHT_ABOVE;
+	int nItem = WeeeklyList.SubItemHitTest(&lvinfo);
+
+	lRow = lvinfo.iItem;
+	lCol = lvinfo.iSubItem;
+
+
+ 
+		 CSetTimeDlg dlg;
+		 if (dlg.DoModal() == IDOK)
+		 {
+			 CString temp = dlg.m_strTime;
+			 Schedule_Node sr;
+			 CStringArray aaa;
+			 SplitCStringA(aaa, temp, L":");
+			 if (aaa.GetSize() >= 2)
+			 {
+				 sr.Hour = _wtoi(aaa[0]);
+				 sr.Minite = _wtoi(aaa[1]);
+				 InsertAndUpdate_Schdule(sr);
+				 
+				 WeeeklyList.InsertItem(WeeeklyList.GetRowCount(), L"");
+			 }
+			 
+			 Fresh_List();
+
+		 }
+		 
+	 
+	
+	
+	if (lRow < 0)
+		return;
+	*pResult = 0;
 }

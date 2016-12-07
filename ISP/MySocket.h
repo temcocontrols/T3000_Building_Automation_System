@@ -16,7 +16,7 @@ const int ISP_SEND_DHCP_COMMAND_HAS_LANIP = 2;
 const int ISP_Send_TFTP_PAKAGE = 3;
 const int ISP_Send_TFTP_OVER = 4;
 const int ISP_Flash_Done = 5;
-
+const int ISP_Flash_FAILED = 6;
 /////////////////////////////////////////////////////////////////////////////
 // CFanceSocket command target
 

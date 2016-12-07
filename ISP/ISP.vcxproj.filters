@@ -33,9 +33,6 @@
     <ClCompile Include="globle_function.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Hex386Writer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="HexFileParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -46,18 +43,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="JPGLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LightCtrlFlashDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="NCFinder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="NCFlashDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="NetWriter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Splash.cpp">
@@ -107,9 +92,6 @@
     <ClInclude Include="globle_function.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Hex386Writer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="HexFileParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -120,18 +102,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="JPGLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LightCtrlFlashDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NCFinder.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NCFlashDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NetWriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">

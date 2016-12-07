@@ -819,7 +819,7 @@ void CAllNodesDiaolg::OnBnClickedDelbuttonOffline()
        
             Serial_Number=q.getValuebyName(L"Serial_ID");
             str_temp.Format(_T("Checking Serial Number:%s"),Serial_Number);
-        if (m_pDialogInfo->IsWindowVisible())
+        if (m_pDialogInfo != NULL&&m_pDialogInfo->IsWindowVisible())
         {
             m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(str_temp);
            /* m_pDialogInfo->ShowWindow(SW_SHOW);*/

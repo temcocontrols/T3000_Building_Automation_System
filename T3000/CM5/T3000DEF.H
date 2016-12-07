@@ -145,6 +145,10 @@
 #define WR_TIME   16
 #define AR_Y      17
 
+#define COIL_REG  23
+#define DIS_INPUT_REG 24
+#define INPUT_REG    25
+
 #define PASS    USER_NAME
 
 //#define STAT	11

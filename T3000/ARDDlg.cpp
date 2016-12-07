@@ -37,8 +37,16 @@ BOOL CARDDlg::OnInitDialog()
 	m_add_device_baudrate.InsertString(4,_T("115200"));
 	m_add_device_baudrate.SetCurSel(1);
 	m_add_device_modbus_id.SetWindowText(_T("255"));
-	m_ipaddress.SetWindowText(_T("127.0.0.1"));
-	m_porteditor.SetWindowText(_T("502"));
+
+	CString	g_configfile_path = g_strExePth + _T("T3000_config.ini");
+	CString strIP;
+	int IPPort;
+	GetPrivateProfileString(_T("MBPOLL_Setting"), _T("IP Address"), _T("127.0.0.1"), strIP.GetBuffer(MAX_PATH), MAX_PATH, g_configfile_path);
+	IPPort = GetPrivateProfileInt(_T("MBPOLL_Setting"), _T("IP Port"), 6001, g_configfile_path);
+
+	m_ipaddress.SetWindowText(strIP);
+	strIP.Format(_T("%d"), IPPort);
+	m_porteditor.SetWindowText(strIP);
     m_minipanel_comport.SetCurSel(0);
 	((CButton *)GetDlgItem(IDC_RADIO_NET_DEVICE))->SetCheck(TRUE);//я║ио
 	Enable_Net_UI(true);

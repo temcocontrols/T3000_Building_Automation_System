@@ -72,7 +72,7 @@ HTREEITEM  hLastTreeItem =NULL;
 #include "LanguageLocale.h"
 #include "RegisterViewerDlg.h"
 #include "DebugWindow.h"
-#include "PVDlg.h"
+
 #include "T36CT.h"
 #include "T3RTDView.h"
 #include "CO2NetView.h"
@@ -348,7 +348,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
     ON_COMMAND(ID_DATABASE_BACNETTOOL, &CMainFrame::OnDatabaseBacnettool)
     ON_COMMAND(ID_CONTROL_ALARM_LOG, &CMainFrame::OnControlAlarmLog)
     ON_COMMAND(ID_Menu_CHECKUPDATE, &CMainFrame::OnMenuCheckupdate)
-    ON_COMMAND(ID_DATABASE_PV, &CMainFrame::OnDatabasePv)
+  //  ON_COMMAND(ID_DATABASE_PV, &CMainFrame::OnDatabasePv)
     ON_COMMAND(ID_CONTROL_TSTAT, &CMainFrame::OnControlTstat)
 
 
@@ -563,6 +563,7 @@ CMainFrame::CMainFrame()
     // TODO: add member initialization code here
     theApp.m_nAppLook = theApp.GetInt(_T("ApplicationLook"), ID_VIEW_APPLOOK_VS_2005);
     m_nStyle=0;
+	m_pFreshTree = NULL;
     m_strCurSubBuldingName.Empty();
     m_strCurMainBuildingName.Empty();
     m_nBaudrate=19200;
@@ -701,7 +702,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
     if (CFrameWndEx::OnCreate(lpCreateStruct) == -1)
         return -1;
-    /*g_testmultiReadtraffic_dlg = NULL;*/
+
+
+
     BOOL bNameValid;
     // set the visual manager and style based on persisted value
     OnApplicationLook(theApp.m_nAppLook);
@@ -882,8 +885,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     m_pTreeViewCrl->Expand(hChilder1,TVE_EXPAND);
 
 
-    hThread =CreateThread(NULL,NULL,Get_All_Dlg_Message,this,NULL, &nThreadID);
-    hDeal_thread =CreateThread(NULL,NULL,Translate_My_Message,this,NULL, &nThreadID_Do);
+
 
 
     //Register热键
@@ -1143,7 +1145,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     {
         CreateDirectory(image_fordor,NULL);
     }
-
+	hThread = CreateThread(NULL, NULL, Get_All_Dlg_Message, this, NULL, &nThreadID);
+	hDeal_thread = CreateThread(NULL, NULL, Translate_My_Message, this, NULL, &nThreadID_Do);
 	m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
 	m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
 
@@ -4128,7 +4131,12 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
         CloseHandle(m_hCurCommunication);
         m_hCurCommunication=NULL;
     }
-    if (!((tree_node.BuildingInfo.strIp.CompareNoCase(_T("9600")) ==0)||(tree_node.BuildingInfo.strIp.CompareNoCase(_T("19200"))==0) ||(tree_node.BuildingInfo.strIp.CompareNoCase(_T(""))) == 0))
+    if (!((tree_node.BuildingInfo.strIp.CompareNoCase(_T("9600")) ==0)
+		||(tree_node.BuildingInfo.strIp.CompareNoCase(_T("19200"))==0)
+		|| (tree_node.BuildingInfo.strIp.CompareNoCase(_T("38400")) == 0)
+		|| (tree_node.BuildingInfo.strIp.CompareNoCase(_T("57600")) == 0)
+		|| (tree_node.BuildingInfo.strIp.CompareNoCase(_T("115200")) == 0)
+		||(tree_node.BuildingInfo.strIp.CompareNoCase(_T(""))) == 0))
     {
 
         /*}
@@ -4592,7 +4600,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 
     if((SAVE_PRODYCT_STATUS == nIDEvent) && (scaning_mode == false))
     {
-#if 0
+#if 1
 
 		CppSQLite3DB SqliteDBBuilding;
 		SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
@@ -6098,7 +6106,7 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 
 	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,WRITEPRGFLASH_COMMAND);
 
-	if (!pParent->m_pDialogInfo->IsWindowVisible())
+	if (pParent->m_pDialogInfo != NULL && !pParent->m_pDialogInfo->IsWindowVisible())
 	{
 		pParent->m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Please don't poweroff the device, wait a few seconds to update data!"));
 		pParent->m_pDialogInfo->ShowWindow(SW_SHOW);
@@ -6597,7 +6605,7 @@ void CMainFrame::OnDestroy()
     OnDisconnect();
 	g_mstp_flag=FALSE;
 
-#if 0
+#if 1
 	CppSQLite3DB SqliteDBBuilding;
 	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
@@ -7367,7 +7375,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                                 m_product.at(i).status = false;
                                 //MessageBox(_T("Device is offline!"));	//Ping 不通 ， 还在一个网段 ， 还显示在线; 其实不在线;
 
-                                if (!m_pDialogInfo->IsWindowVisible())
+                                if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
                                 {
                                     m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Device is offline!"));
                                     m_pDialogInfo->ShowWindow(SW_SHOW);
@@ -7394,7 +7402,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             m_product.at(i).status_last_time[2] = false;
                             m_product.at(i).status = false;
                             //MessageBox(_T("Device is offline!"));
-                            if (!m_pDialogInfo->IsWindowVisible())
+                            if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
                             {
                                 m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Device is offline!"));
                                 m_pDialogInfo->ShowWindow(SW_SHOW);
@@ -7419,7 +7427,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 							g_llerrCount = g_llerrCount + 4;
                             bac_select_device_online = false;
                             //MessageBox(strTitle);
-                            if (!m_pDialogInfo->IsWindowVisible())
+                            if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
                             {
                                 m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(strTitle);
                                 m_pDialogInfo->ShowWindow(SW_SHOW);
@@ -7461,7 +7469,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 							g_llerrCount = g_llerrCount + 4;
                             bac_select_device_online = false;
                             // MessageBox(_T("Connect failed!Please try again!"));
-                            if (!m_pDialogInfo->IsWindowVisible())
+                            if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
                             {
                                 m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Connect failed!Please try again!"));
                                 m_pDialogInfo->ShowWindow(SW_SHOW);
@@ -7829,7 +7837,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     {
                         //nComPort = _wtoi(product_Node.BuildingInfo.strComPort.Mid(3));
                         // AfxMessageBox(_T("Comport is 0,Error"));
-                        if (!m_pDialogInfo->IsWindowVisible())
+                        if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
                         {
                             m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Comport is 0,Error"));
                             m_pDialogInfo->ShowWindow(SW_SHOW);
@@ -7863,7 +7871,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     {
                         strTemp.Format(_T("Open COM%d  Failed,Try again!"),nComPort);
                         //AfxMessageBox(strTemp);
-                        if (!m_pDialogInfo->IsWindowVisible())
+                        if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
                         {
                             m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(strTemp);
                             m_pDialogInfo->ShowWindow(SW_SHOW);
@@ -8014,7 +8022,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 {
                     //AfxMessageBox(_T("Your comport is open ,but T3000 can't read your device."));//\nDatabase->Building config Database
 					bac_select_device_online = false;
-                    if (!m_pDialogInfo->IsWindowVisible())
+                    if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
                     {
 						m_product.at(i).status = false;
                         m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Device is Offline!"));
@@ -8111,7 +8119,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     //AfxMessageBox(_T("Device is offline,Please check the connection!"));//\nDatabase->Building config Database
 					m_product.at(i).status = false;
 					bac_select_device_online = false;
-                    if (!m_pDialogInfo->IsWindowVisible())
+                    if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
                     {
                         m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Device is offline,Please check the connection!"));
                         m_pDialogInfo->ShowWindow(SW_SHOW);
@@ -8140,7 +8148,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     {
                         CString tempcs;
                         tempcs.Format(_T("Product ID is invalid .Product id is %d \r\n"),Device_Type);
-                        if (!m_pDialogInfo->IsWindowVisible())
+                        if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
                         {
                             m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(tempcs);
                             m_pDialogInfo->ShowWindow(SW_SHOW);
@@ -8257,7 +8265,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     if (it<12)
                     {
                         //AfxMessageBox(_T("Reading abnormal \n Try again!"));
-                        if (!m_pDialogInfo->IsWindowVisible())
+                        if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
                         {
                             m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Reading abnormal \n Try again!"));
                             m_pDialogInfo->ShowWindow(SW_SHOW);
@@ -8556,7 +8564,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     if (it<length)
                     {
                         //AfxMessageBox(_T("Reading abnormal \n Try again!"));
-                        if (!m_pDialogInfo->IsWindowVisible())
+                        if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
                         {
                             m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Reading abnormal \n Try again!"));
                             m_pDialogInfo->ShowWindow(SW_SHOW);
@@ -8689,7 +8697,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             {
 
                 //AfxMessageBox(_T("Reading product model abnormal \n Try again!"));
-                if (!m_pDialogInfo->IsWindowVisible())
+                if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
                 {
                     m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Reading abnormal \n Try again!"));
                     m_pDialogInfo->ShowWindow(SW_SHOW);
@@ -9588,7 +9596,7 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
 				 m_pTreeViewCrl->turn_item_image(tp.product_item ,false);
 			 else if((g_selected_serialnumber == m_product.at(i).serial_number) && (tp.product_class_id	== PM_MINIPANEL))
 			 {
-				 TRACE(_T("Select panel offline \n"));
+				// TRACE(_T("Select panel offline \n"));
 			 }
             // 				if(nID==g_tstat_id)
             // 					memset(&multi_register_value[0],0,sizeof(multi_register_value));
@@ -11075,7 +11083,7 @@ void CMainFrame::OnDatabaseMbpoll()
         {
             OnDisconnect();
         }
-        CString strHistotyFile=g_strExePth+_T("Modbus Poll.exe");
+        CString strHistotyFile=g_strExePth+_T("ModbusPoll.exe");
         ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);
     }
     else
@@ -11434,7 +11442,7 @@ void CMainFrame::OnControlInputs()
         }
         else
         {
-           MessageBox(_T("This feature is not supported by this product."));
+           MessageBox(_T("This device doesn’t have a input menu item"));
         }
 
     }
@@ -11500,7 +11508,7 @@ void CMainFrame::OnControlPrograms()
     }
     else
     {
-       MessageBox(_T("This feature is not supported by this product."));
+       MessageBox(_T("This device doesn’t have a programs menu item"));
     }
 }
 
@@ -11613,7 +11621,7 @@ void CMainFrame::OnControlOutputs()
         }
         else
         {
-			MessageBox(_T("This feature is not supported by this product."));
+			MessageBox(_T("This device doesn’t have a output menu item"));
         }
         //MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
     }
@@ -11676,11 +11684,12 @@ void CMainFrame::OnControlVariables()
     }
     else
     {
-       MessageBox(_T("This feature is not supported by this product."));
+       MessageBox(_T("This device doesn’t have a variable menu item"));
     }
 }
 
-
+#include "TStatScheduleDlg.h"
+#include "NewTstatSchedulesDlg.h"
 void CMainFrame::OnControlWeekly()
 {
     // TODO: Add your command handler code here
@@ -11734,14 +11743,44 @@ void CMainFrame::OnControlWeekly()
 
 
     }
+	
     else
     {
-       MessageBox(_T("This feature is not supported by this product."));
+		if (product_register_value[7] == PM_TSTAT8)
+		{
+
+			g_bPauseMultiRead = TRUE;
+			/*  CTStatScheduleDlg dlg;
+			dlg.DoModal();*/
+			CNewTstatSchedulesDlg dlg;
+			dlg.DoModal();
+
+
+
+			 
+
+			g_bPauseMultiRead = FALSE;
+		}
+		else if(product_register_value[7] == PM_TSTAT5i || product_register_value[7] == PM_TSTAT6 || product_register_value[7] == PM_TSTAT7)
+		{
+			g_bPauseMultiRead = TRUE;
+			   CTStatScheduleDlg dlg;
+			dlg.DoModal(); 
+		 
+
+
+
+
+
+			g_bPauseMultiRead = FALSE;
+		}
+		else
+			MessageBox(_T("This feature is not supported by this product."));
     }
 }
 
-#include "TStatScheduleDlg.h"
-#include "NewTstatSchedulesDlg.h"
+#include "AnnualRout_InsertDia.h"
+
 void CMainFrame::OnControlAnnualroutines()
 {
     // TODO: Add your command handler code here
@@ -11798,18 +11837,21 @@ void CMainFrame::OnControlAnnualroutines()
     else
     {
 
-        if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8)
+        if(product_register_value[7]==PM_TSTAT8)
         {
 
             g_bPauseMultiRead = TRUE;
-          /*  CTStatScheduleDlg dlg;
-            dlg.DoModal();*/
-			CNewTstatSchedulesDlg dlg;
+        
+
+
+			AnnualRout_InsertDia dlg;
 			dlg.DoModal();
+
             g_bPauseMultiRead = FALSE;
         }
+		 
         else
-           MessageBox(_T("This feature is not supported by this product."));
+			MessageBox(_T("This device doesn’t have a holidays menu item"));
     }
 }
 #include "ParameterDlg.h"
@@ -11881,7 +11923,7 @@ void CMainFrame::OnControlSettings()
             dlg.DoModal();
         }
         else
-           MessageBox(_T("This feature is not supported by this product."));
+           MessageBox(_T("This device doesn’t have a configuration menu item"));
     }
 }
 
@@ -11898,7 +11940,7 @@ void CMainFrame::OnMiscellaneousLoaddescriptors()
     }
     else
     {
-       MessageBox(_T("This feature is not supported by this product."));
+		 MessageBox(_T("This device doesn’t have a menu item"));
     }
 }
 
@@ -11917,7 +11959,7 @@ void CMainFrame::OnMiscellaneousUpdatemini()
     }
     else
     {
-        MessageBox(_T("This feature is not supported by this product."));
+        MessageBox(_T("This device doesn’t have a  menu item"));
     }
 }
 
@@ -12014,7 +12056,7 @@ void CMainFrame::OnControlControllers()
     }
     else
     {
-       MessageBox(_T("This feature is not supported by this product."));
+       MessageBox(_T("This device doesn’t have a pid menu item"));
     }
 }
 
@@ -12182,7 +12224,7 @@ void CMainFrame::OnControlMonitors()
     }
     else
     {
-        MessageBox(_T("This feature is not supported by this product."));
+        MessageBox(_T("This device doesn’t have a trendlog menu item"));
     }
 
     //CBacnetMonitor Dlg;
@@ -12197,8 +12239,10 @@ void CMainFrame::OnSizing(UINT fwSide, LPRECT pRect)
 void CMainFrame::OnToolRegisterviewer()
 {
     // TODO: Add your command handler code here
-    CRegisterViewerDlg dlg;
-    dlg.DoModal();
+   /* CRegisterViewerDlg dlg;
+	dlg.DoModal();*/
+	SwitchToPruductType(DLG_DIALOG_CUSTOM_VIEW);
+
 }
 
 #include "CM5/mygdiplus.h"
@@ -12287,7 +12331,7 @@ void CMainFrame::OnControlAlarmLog()
     }
     else
     {
-       MessageBox(_T("This feature is not supported by this product."));
+       MessageBox(_T("This device doesn’t have a alarms menu item"));
     }
 }
 
@@ -12310,7 +12354,7 @@ void CMainFrame::OnControlCustomerunits()
     }
     else
     {
-       MessageBox(_T("This feature is not supported by this product."));
+       MessageBox(_T("This device doesn’t have a customer units menu item"));
     }
 #endif
 }
@@ -12324,25 +12368,25 @@ void CMainFrame::OnMenuCheckupdate()
 }
 
 
-void CMainFrame::OnDatabasePv()
-{
-    // TODO: Add your command handler code here
-    //AfxMessageBox(_T("Developing....."));
-    //return;
-    CLoginDlg Dlg(g_buser_log_in);
-    if (IDOK== Dlg.DoModal())
-    {
-        CPVDlg dlg;
-        dlg.DoModal();
-    }
-    else
-    {
-        AfxMessageBox(_T("Loging.....fail!"));
-    }
-
-
-
-}
+// void CMainFrame::OnDatabasePv()
+// {
+//     // TODO: Add your command handler code here
+//     //AfxMessageBox(_T("Developing....."));
+//     //return;
+//     CLoginDlg Dlg(g_buser_log_in);
+//     if (IDOK== Dlg.DoModal())
+//     {
+//         CPVDlg dlg;
+//         dlg.DoModal();
+//     }
+//     else
+//     {
+//         AfxMessageBox(_T("Loging.....fail!"));
+//     }
+// 
+// 
+// 
+// }
 
 
 //Add by Fance 14/05/21
@@ -12501,7 +12545,7 @@ void CMainFrame::OnControlTstat()
     }
     else
     {
-		MessageBox(_T("This feature is not supported by this product."));
+		MessageBox(_T("This device doesn’t have a menu item"));
     }
 
 
@@ -14092,7 +14136,7 @@ void CMainFrame::OnFileExportregiseterslist()
         RegisterID = strTemp;
 
         
-		strTemp = q.getValuebyName(L"T3-8AI8AO");
+		strTemp = q.getValuebyName(L"T3_8AI8AO");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(2)),_variant_t(strTemp));
         strTemp.TrimRight();
         strTemp.TrimLeft();
@@ -14114,7 +14158,7 @@ void CMainFrame::OnFileExportregiseterslist()
         }
 
          
-		strTemp = q.getValuebyName(L"T3-8AI8AO_DESCRIPTION");
+		strTemp = q.getValuebyName(L"T3_8AI8AO_DESCRIPTION");
         range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(3)),_variant_t(strTemp));
 
 

@@ -2,7 +2,7 @@
 #include "afxwin.h"
 #include "msflexgrid1.h"
 #include "PressureSensorForm.h"
- 
+#include "OXBitmapButton.h"
 
 class COutPutDlg : public CDialog
 {
@@ -138,4 +138,16 @@ public:
 	afx_msg void OnBnClickedButtonModel3();
 	afx_msg void OnBnClickedButtonModel4();
 	afx_msg void OnBnClickedButtonModel5();
+	void SetModelButton();
+	 
+	//COXBitmapButton m_model1;
+	//COXBitmapButton m_model2;
+	//COXBitmapButton m_model3;
+	//COXBitmapButton m_model4;
+	//COXBitmapButton m_model5;
+	CButton m_model1;
+	CButton m_model2;
+	CButton m_model3;
+	CButton m_model4;
+	CButton m_model5;
 };

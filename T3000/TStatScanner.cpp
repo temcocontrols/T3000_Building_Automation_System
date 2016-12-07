@@ -3531,7 +3531,7 @@ void CTStatScanner::ScanSubnetFromEthernetDevice()//scan
 	if(controller_counter > 0)
 	{
 		CString show_cstring;
-		show_cstring.Format(_T("Find %d T3 Panel(s) ,Do you want to scan the subnet?\r\n'RS485 Main' 9600\r\n'RS485 Main' 19200\r\n'RS485 Main' 384000\r\n'RS485 Main' 76800\r\n'RS485 Main' 115200\r\n'RS485 Sub' 9600\r\n'RS485 Sub' 19200\r\n"),controller_counter);
+		show_cstring.Format(_T("Find %d T3 Controller(s) ,Do you want to scan the subnet?\r\n'RS485 Main' 9600\r\n'RS485 Main' 19200\r\n'RS485 Main' 384000\r\n'RS485 Main' 76800\r\n'RS485 Main' 115200\r\n'RS485 Sub' 9600\r\n'RS485 Sub' 19200\r\n"),controller_counter);
 		if(AfxMessageBox(show_cstring,MB_YESNO)==IDNO)
 		{
 			return;
@@ -4368,24 +4368,6 @@ DWORD WINAPI  _WaitScanThread(LPVOID lpVoid)
 		pScanner->ScanSubnetFromEthernetDevice();
 
 
-
-#if 0
-
-		Sleep(1000000);
-        //////////////////////////////////////////////////////////////////////////
-        g_nStartID = 1;
-        //Alex_Flag
-        if (!pScanner->m_bStopScan)
-        {
-            if((current_building_protocol == P_AUTO) || (current_building_protocol == P_MODBUS_TCP))
-            {
-                g_strScanInfoPrompt = _T("TStat connected with NC");
-                CString* pstrInfo = new CString(g_strScanInfoPrompt);
-                ::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,WPARAM(pstrInfo),LPARAM(3));
-                //pScanner->ScanTstatFromNCForAuto();
-            }
-        }
-#endif
 
         pScanner->m_bNetScanFinish = TRUE; // at this time, two thread end, all scan end
 

@@ -1,6 +1,23 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
+2016 - 12 - 02
+Update by Fance
+1. ISP slove 界面恢复初始.
+
+2016 - 12 - 01
+Update by Fance
+1. 解决ISP tool 通过网络可能将A 的固件烧入B 的问题;
+2. 在Trendlog 里面 的digital 不在叠加在一起，错开显示,并在最前面显示Label.
+3. 修复 在Alarm 界面 由于接收到的时间错误引起的  弹窗  参数错误的问题.
+4. 加入自动关闭 ISP_SLOVE 窗口 和 ID重复窗口.
+
+2016 - 11 - 22
+2.  修改input 的扩展属性的显示
+3. Download file 中修改  自动烧写 解决设备一直在isp中的问题.
+4. 修改TSTAT Scan , 需要选择是否扫描Minipanel 下面的所有口的 各个波特率;
+5. Update.exe 中加入 默认更新完成后打开T3000.
+
 2016 - 11 - 04
 1. Setting界面点击update 3秒后自动刷新 setting 界面
 2. 新增解决id冲突的显示界面.

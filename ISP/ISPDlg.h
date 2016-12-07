@@ -7,8 +7,7 @@
 #include "afxwin.h"
 #include "TstatFlashDlg.h"
 #include "ConfigFileHandler.h"
-#include "LightCtrlFlashDlg.h"
-#include "NCFlashDlg.h"
+
 
 enum NC_FLASH_TYPE
 {

@@ -117,82 +117,83 @@ CParameterDlg::~CParameterDlg()
 
 void CParameterDlg::DoDataExchange(CDataExchange* pDX)
 {
-    CDialog::DoDataExchange(pDX);
-    DDX_Control(pDX, IDC_IDADDRESSEDIT, m_idAdressEdit);
-    DDX_Control(pDX, IDC_BRAUDRATECOMBO, m_braudRateCombox);
-    DDX_Control(pDX, IDC_COMBO2, m_keySelectCombox);
-    DDX_Control(pDX, IDC_POWERMODELCOMBO, m_powerupModelCombox);
-    DDX_Control(pDX, IDC_DISPLAYCOMBO, m_displayCombox);
-    DDX_Control(pDX, IDC_KEYPADLOCKCOMBO, m_keyLockCombox);
-    DDX_Control(pDX, IDC_SEQUENCECOMBOX, m_SequenceCombox);
-    //DDX_Control(pDX, IDC_AUTOONLYCOMBO, m_autoOnlyCombox);
-    DDX_Control(pDX, IDC_VALUPOSEDIT, m_value_percentEdit);
-    DDX_Control(pDX, IDC_VALVEEDIT, m_valveEdit);
-    DDX_Control(pDX, IDC_HCCHANGECOMBO, m_hcChangeCombox);
-    DDX_Control(pDX, IDC_POWSETPOMITEDIT, m_powerSetPointEdit);
-    DDX_Control(pDX, IDC_STINCREAEDIT, m_setpointIncreasement);
-    DDX_Control(pDX, IDC_DEF_SETPOINT_EDT, m_defSetPointEdit);
-    DDX_Control(pDX, IDC_SETPOINTCTLEDIT, m_setPointCtrlEdit);
-    DDX_Control(pDX, IDC_INFILEREDIT, m_inputFilterEdit);
-    DDX_Control(pDX, IDC_CYCLEEDIT, m_cycledlayEdit);
-    DDX_Control(pDX, IDC_TEMPALARMEDIT, m_tempAlarmEdit);
-    DDX_Control(pDX, IDC_TIMERONEDIT, m_timerOnEdit);
-    DDX_Control(pDX, IDC_EDIT12, m_timerOffEdit);
-    DDX_Control(pDX, IDC_UNITCOMBO, m_uniteCombox);
-    DDX_Control(pDX, IDC_TIMERLEFT, m_timerLeft);
-    DDX_Control(pDX, IDC_TIMERDELECTCOMBO, m_timerSelectCombox);
-    DDX_Control(pDX, IDC_TIMEEDIT, m_TimeEdit);
-    DDX_Control(pDX, IDC_OVERRIDETIMEEDIT, m_OverRideEdit);
-    DDX_Control(pDX, IDC_INPUTSELECT1, m_InputSelect1);
-    DDX_Control(pDX, IDC_INPUTSELECT2, m_inputSelect2);
-    DDX_Control(pDX, IDC_INPUTVALUE1, m_inputvalue1);
-    DDX_Control(pDX, IDC_INPUTVALUE2, m_inputValue2);
-    DDX_Control(pDX, IDC_EAPPLICATION, m_application_ctrl);
-    DDX_Control(pDX, IDC_ENIGNTCOOLING1, m_nightcooling);
-    DDX_Control(pDX, IDC_ENIGNTHEATING, m_nightheating);
-    //	DDX_Control(pDX, IDC_ENIGNTCOOLING2, m_hotelCoolEdt);
-    DDX_Control(pDX, IDC_SETVALUE1, m_pid_setptEdt1);
-    DDX_Control(pDX, IDC_SETVALUE2, m_pid_setptEdt2);
-    DDX_Control(pDX, IDC_OUTPUT1, m_pid_outputEdt1);
-    DDX_Control(pDX, IDC_OUTPUT2, m_pid_outputEdt2);
-    DDX_Control(pDX, IDC_ECOOLINGPTERM1, m_pternEdt1);
-    DDX_Control(pDX, IDC_ECOOLINGPTERM2, m_ptermEdt2);
-    DDX_Control(pDX, IDC_EDIT26, m_coolingPitemEdt1);
-    DDX_Control(pDX, IDC_EDIT27, m_pidPitemEdt2);
-    DDX_Control(pDX, IDC_SPSET1, m_dayOccEdt1);
-    DDX_Control(pDX, IDC_SPSET2, m_dayOccEdt2);
-    DDX_Control(pDX, IDC_ESETPOINTHI, m_setptHiEdit);
-    DDX_Control(pDX, IDC_ESETPOINTLO, m_setptLoEdit);
-    DDX_Control(pDX, IDC_ECOOLDEADBAND1, m_setptCDDEdt1);
-    DDX_Control(pDX, IDC_ECOOLDEADBAND2, m_setptCCDEdt2);
-    DDX_Control(pDX, IDC_ECOOLINGITERM1, m_HeadDEdt1);
-    DDX_Control(pDX, IDC_ECOOLINGITERM2, m_HeadDEdt2);
-    DDX_Control(pDX, IDC_OCCUPIEDMODECOMBO, m_occupiedSetPointModeCmbox);
+	CDialog::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_IDADDRESSEDIT, m_idAdressEdit);
+	DDX_Control(pDX, IDC_BRAUDRATECOMBO, m_braudRateCombox);
+	DDX_Control(pDX, IDC_COMBO2, m_keySelectCombox);
+	DDX_Control(pDX, IDC_POWERMODELCOMBO, m_powerupModelCombox);
+	DDX_Control(pDX, IDC_DISPLAYCOMBO, m_displayCombox);
+	DDX_Control(pDX, IDC_KEYPADLOCKCOMBO, m_keyLockCombox);
+	DDX_Control(pDX, IDC_SEQUENCECOMBOX, m_SequenceCombox);
+	//DDX_Control(pDX, IDC_AUTOONLYCOMBO, m_autoOnlyCombox);
+	DDX_Control(pDX, IDC_VALUPOSEDIT, m_value_percentEdit);
+	DDX_Control(pDX, IDC_VALVEEDIT, m_valveEdit);
+	DDX_Control(pDX, IDC_HCCHANGECOMBO, m_hcChangeCombox);
+	DDX_Control(pDX, IDC_POWSETPOMITEDIT, m_powerSetPointEdit);
+	DDX_Control(pDX, IDC_STINCREAEDIT, m_setpointIncreasement);
+	DDX_Control(pDX, IDC_DEF_SETPOINT_EDT, m_defSetPointEdit);
+	DDX_Control(pDX, IDC_SETPOINTCTLEDIT, m_setPointCtrlEdit);
+	DDX_Control(pDX, IDC_INFILEREDIT, m_inputFilterEdit);
+	DDX_Control(pDX, IDC_CYCLEEDIT, m_cycledlayEdit);
+	DDX_Control(pDX, IDC_TEMPALARMEDIT, m_tempAlarmEdit);
+	DDX_Control(pDX, IDC_TIMERONEDIT, m_timerOnEdit);
+	DDX_Control(pDX, IDC_EDIT12, m_timerOffEdit);
+	DDX_Control(pDX, IDC_UNITCOMBO, m_uniteCombox);
+	DDX_Control(pDX, IDC_TIMERLEFT, m_timerLeft);
+	DDX_Control(pDX, IDC_TIMERDELECTCOMBO, m_timerSelectCombox);
+	DDX_Control(pDX, IDC_TIMEEDIT, m_TimeEdit);
+	DDX_Control(pDX, IDC_OVERRIDETIMEEDIT, m_OverRideEdit);
+	DDX_Control(pDX, IDC_INPUTSELECT1, m_InputSelect1);
+	DDX_Control(pDX, IDC_INPUTSELECT2, m_inputSelect2);
+	DDX_Control(pDX, IDC_INPUTVALUE1, m_inputvalue1);
+	DDX_Control(pDX, IDC_INPUTVALUE2, m_inputValue2);
+	DDX_Control(pDX, IDC_EAPPLICATION, m_application_ctrl);
+	DDX_Control(pDX, IDC_ENIGNTCOOLING1, m_nightcooling);
+	DDX_Control(pDX, IDC_ENIGNTHEATING, m_nightheating);
+	//	DDX_Control(pDX, IDC_ENIGNTCOOLING2, m_hotelCoolEdt);
+	DDX_Control(pDX, IDC_SETVALUE1, m_pid_setptEdt1);
+	DDX_Control(pDX, IDC_SETVALUE2, m_pid_setptEdt2);
+	DDX_Control(pDX, IDC_OUTPUT1, m_pid_outputEdt1);
+	DDX_Control(pDX, IDC_OUTPUT2, m_pid_outputEdt2);
+	DDX_Control(pDX, IDC_ECOOLINGPTERM1, m_pternEdt1);
+	DDX_Control(pDX, IDC_ECOOLINGPTERM2, m_ptermEdt2);
+	DDX_Control(pDX, IDC_EDIT26, m_coolingPitemEdt1);
+	DDX_Control(pDX, IDC_EDIT27, m_pidPitemEdt2);
+	DDX_Control(pDX, IDC_SPSET1, m_dayOccEdt1);
+	DDX_Control(pDX, IDC_SPSET2, m_dayOccEdt2);
+	DDX_Control(pDX, IDC_ESETPOINTHI, m_setptHiEdit);
+	DDX_Control(pDX, IDC_ESETPOINTLO, m_setptLoEdit);
+	DDX_Control(pDX, IDC_ECOOLDEADBAND1, m_setptCDDEdt1);
+	DDX_Control(pDX, IDC_ECOOLDEADBAND2, m_setptCCDEdt2);
+	DDX_Control(pDX, IDC_ECOOLINGITERM1, m_HeadDEdt1);
+	DDX_Control(pDX, IDC_ECOOLINGITERM2, m_HeadDEdt2);
+	DDX_Control(pDX, IDC_OCCUPIEDMODECOMBO, m_occupiedSetPointModeCmbox);
 
-    DDX_Text(pDX, IDC_EDIT_CSPD, m_coolsp);
-    DDX_Text(pDX, IDC_EDIT_CDBDN, m_cooldb);
-    DDX_Text(pDX, IDC_EDIT31, m_setpoint);
-    DDX_Text(pDX, IDC_EDIT34, m_heatdb);
-    DDX_Text(pDX, IDC_EDIT37, m_heatsp);
-    DDX_Text(pDX, IDC_EDIT_CSPNN, m_coolspN);
-    DDX_Text(pDX, IDC_EDIT_CDBNN, m_cooldbN);
-    DDX_Text(pDX, IDC_EDIT32, m_setpointN);
-    DDX_Text(pDX, IDC_EDIT35, m_heatdbN);
-    DDX_Text(pDX, IDC_EDIT38, m_heatspN);
-    DDX_Control(pDX, IDC_STATICUNINT2, m_gUnit);
-    DDX_Control(pDX, IDC_INPUTSELECT3_PID3, m_inputSelect3);
-    DDX_Control(pDX, IDC_INPUTVALUE3_PID3, m_inputValue3);
-    DDX_Control(pDX, IDC_EDIT_BACKLIGHT_TIME, m_edit_backlighttime);
-    DDX_Control(pDX, IDC_CHECK2, m_check_occupiedenable);
-    DDX_Control(pDX, IDC_EDIT_OCCUPIED_TIMER, m_occupied_timer);
-    DDX_Control(pDX, IDC_COMBO_ENABLE_DIS, m_combox_pir_endisable);
-    DDX_Control(pDX, IDC_EDIT_SENSITIVTY, m_sensitivity_editor);
-    DDX_Control(pDX, IDC_COMBO_SETPOINTDISPLAY, m_combox_setpointdisplay);
-    DDX_Control(pDX, IDC_COMBO_ZIGBEETYPE, m_combox_zigbee);
-    DDX_Control(pDX, IDC_COMBO_CHANNEL, m_combox_channel);
-    DDX_Control(pDX, IDC_ZIGBEE_TSTATS_TABLE, m_zigbee_tstat_table);
-    DDX_Control(pDX, IDC_COMBO1, m_day_combox);
-    DDX_Control(pDX, IDC_COMBO4, m_night_combox);
+	DDX_Text(pDX, IDC_EDIT_CSPD, m_coolsp);
+	DDX_Text(pDX, IDC_EDIT_CDBDN, m_cooldb);
+	DDX_Text(pDX, IDC_EDIT31, m_setpoint);
+	DDX_Text(pDX, IDC_EDIT34, m_heatdb);
+	DDX_Text(pDX, IDC_EDIT37, m_heatsp);
+	DDX_Text(pDX, IDC_EDIT_CSPNN, m_coolspN);
+	DDX_Text(pDX, IDC_EDIT_CDBNN, m_cooldbN);
+	DDX_Text(pDX, IDC_EDIT32, m_setpointN);
+	DDX_Text(pDX, IDC_EDIT35, m_heatdbN);
+	DDX_Text(pDX, IDC_EDIT38, m_heatspN);
+	DDX_Control(pDX, IDC_STATICUNINT2, m_gUnit);
+	DDX_Control(pDX, IDC_INPUTSELECT3_PID3, m_inputSelect3);
+	DDX_Control(pDX, IDC_INPUTVALUE3_PID3, m_inputValue3);
+	DDX_Control(pDX, IDC_EDIT_BACKLIGHT_TIME, m_edit_backlighttime);
+	DDX_Control(pDX, IDC_CHECK2, m_check_occupiedenable);
+	DDX_Control(pDX, IDC_EDIT_OCCUPIED_TIMER, m_occupied_timer);
+	DDX_Control(pDX, IDC_COMBO_ENABLE_DIS, m_combox_pir_endisable);
+	DDX_Control(pDX, IDC_EDIT_SENSITIVTY, m_sensitivity_editor);
+	DDX_Control(pDX, IDC_COMBO_SETPOINTDISPLAY, m_combox_setpointdisplay);
+	DDX_Control(pDX, IDC_COMBO_ZIGBEETYPE, m_combox_zigbee);
+	DDX_Control(pDX, IDC_COMBO_CHANNEL, m_combox_channel);
+	DDX_Control(pDX, IDC_ZIGBEE_TSTATS_TABLE, m_zigbee_tstat_table);
+	DDX_Control(pDX, IDC_COMBO1, m_day_combox);
+	DDX_Control(pDX, IDC_COMBO4, m_night_combox);
+	DDX_Control(pDX, IDC_COMBO_MRD, m_combox_mrd);
 }
 
 BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
@@ -319,7 +320,10 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
     ON_EN_KILLFOCUS(IDC_EDIT_TRANDUCER_MIN, &CParameterDlg::OnEnKillfocusEditTranducerMin)
     ON_EN_KILLFOCUS(IDC_EDIT_CHANGE_OVER_TIME, &CParameterDlg::OnEnKillfocusEditChangeOverTime)
     ON_EN_KILLFOCUS(IDC_EDIT_TSTAT_NAME, &CParameterDlg::OnEnKillfocusEditTstatName)
-END_MESSAGE_MAP()
+		ON_CBN_SELCHANGE(IDC_COMBO_MRD, &CParameterDlg::OnCbnSelchangeComboMrd)
+		ON_BN_CLICKED(IDC_BUTTON_APPLY_ALL, &CParameterDlg::OnBnClickedButtonApplyAll)
+		ON_BN_CLICKED(IDC_BUTTON_ZIGBEE, &CParameterDlg::OnBnClickedButtonZigbee)
+		END_MESSAGE_MAP()
 
 
 DWORD WINAPI BackparaFreshProc(LPVOID pParam)
@@ -551,9 +555,16 @@ BOOL CParameterDlg::OnInitDialog()
 	CRect rect;
 	GetClientRect(&rect);
 	CString strTemp;
-
+	if ((product_register_value[7] == PM_TSTAT6 || product_register_value[7] == PM_TSTAT8) && product_register_value[MODBUS_RS485_MODE] == 1)
+	{
+		GetDlgItem(IDC_BUTTON_ZIGBEE)->ShowWindow(1);
+	}
+	else
+	{
+		GetDlgItem(IDC_BUTTON_ZIGBEE)->ShowWindow(0);
+	}
 #if 1//Zigbee		  
-    if ((product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT8)&&product_register_value[MODBUS_RS485_MODE]==1)
+  /*  if ((product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT8)&&product_register_value[MODBUS_RS485_MODE]==1)
     {
 
         WINDOWPLACEMENT wp;
@@ -726,7 +737,7 @@ BOOL CParameterDlg::OnInitDialog()
 
 
     }
-    else
+    else*/
     {
         WINDOWPLACEMENT wp;
         GetWindowPlacement(&wp);
@@ -769,7 +780,15 @@ BOOL CParameterDlg::OnInitDialog()
         GetDlgItem(IDC_INPUTSBUTTON)->ShowWindow(SW_SHOW);
         GetDlgItem(IDC_OutPutsBUTTON)->ShowWindow(SW_SHOW);
     }
-
+	// && product_register_value[MODBUS_RS485_MODE] == 1
+	if ((product_register_value[7] == PM_TSTAT6 || product_register_value[7] == PM_TSTAT8))
+	{
+		GetDlgItem(IDC_BUTTON_ZIGBEE)->ShowWindow(TRUE);
+	}
+	else
+	{
+		GetDlgItem(IDC_BUTTON_ZIGBEE)->ShowWindow(FALSE);
+	}
 
     Reflesh_ParameterDlg();
 
@@ -2853,8 +2872,44 @@ void CParameterDlg::OnEnKillfocusEditCspd()
     UpdateData();
     if(product_register_value[MODBUS_DAY_COOLING_SETPOINT]==m_coolsp*10)	//Add this to judge weather this value need to change.
         return;
-    Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_DAY_COOLING_SETPOINT,m_coolsp*10,
-                        product_register_value[MODBUS_DAY_COOLING_SETPOINT],this->m_hWnd,IDC_EDIT_CSPD,_T("DAY COOLING SETPOINT"));
+
+	int nheatsp = m_heatsp * 10;
+	int nsetpoint = m_setpoint * 10;
+	int ncoolsp = m_coolsp * 10;
+
+
+	if (ncoolsp <= nsetpoint && ncoolsp > nheatsp)
+	{
+		m_setpoint = (m_coolsp + m_heatsp) / 2;
+		m_cooldb = m_coolsp - m_setpoint;
+		m_heatdb = m_setpoint - m_heatsp;
+
+		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_DAY_SETPOINT, m_setpoint * 10,
+			product_register_value[MODBUS_DAY_SETPOINT], this->m_hWnd, IDC_EDIT31, _T("DAY SETPOINT"));
+		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_DAY_COOLING_DEADBAND, m_cooldb * 10,
+			product_register_value[MODBUS_DAY_COOLING_DEADBAND], this->m_hWnd, IDC_EDIT_CDBDN, _T("DAY COOLING DEADBAND"));
+
+		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_DAY_HEATING_DEADBAND, m_heatdb * 10,
+			product_register_value[MODBUS_DAY_HEATING_DEADBAND], this->m_hWnd, IDC_EDIT34, _T("DAY HEATING DEADBAND"));
+
+
+	}
+	else if(ncoolsp<=nheatsp)
+	{
+		m_setpoint = m_coolsp - m_cooldb;
+		m_heatsp = m_setpoint - m_heatdb;
+		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_DAY_SETPOINT, m_setpoint * 10,
+			product_register_value[MODBUS_DAY_SETPOINT], this->m_hWnd, IDC_EDIT31, _T("DAY SETPOINT"));
+
+	}
+	else
+	{
+		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_DAY_COOLING_SETPOINT, m_coolsp * 10,
+			product_register_value[MODBUS_DAY_COOLING_SETPOINT], this->m_hWnd, IDC_EDIT_CSPD, _T("DAY COOLING SETPOINT"));
+
+	}
+	UpdateData(FALSE);
+ 
 }
 
 void CParameterDlg::OnEnKillfocusEditCdbdn()
@@ -2864,8 +2919,9 @@ void CParameterDlg::OnEnKillfocusEditCdbdn()
         return;
     Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_DAY_COOLING_DEADBAND,m_cooldb*10,
                         product_register_value[MODBUS_DAY_COOLING_DEADBAND],this->m_hWnd,IDC_EDIT_CDBDN,_T("DAY COOLING DEADBAND"));
+	m_coolsp = m_cooldb + m_setpoint;
 
-    Read_SliderData();
+	UpdateData(FALSE);
 }
 
 void CParameterDlg::OnEnKillfocusEdit31()
@@ -2875,7 +2931,9 @@ void CParameterDlg::OnEnKillfocusEdit31()
         return;
     Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_DAY_SETPOINT,m_setpoint*10,
                         product_register_value[MODBUS_DAY_SETPOINT],this->m_hWnd,IDC_EDIT31,_T("DAY SETPOINT"));
-    Read_SliderData();
+	m_coolsp = m_setpoint + m_cooldb;
+	m_heatsp = m_setpoint - m_heatdb;
+	UpdateData(FALSE);
 }
 
 void CParameterDlg::OnEnKillfocusEdit34()
@@ -2885,8 +2943,8 @@ void CParameterDlg::OnEnKillfocusEdit34()
         MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
     else
         product_register_value[MODBUS_DAY_HEATING_DEADBAND] = m_heatdb*10;
-
-    Read_SliderData();
+	m_heatsp = m_setpoint - m_heatdb;
+	UpdateData(FALSE);
 }
 
 void CParameterDlg::OnEnKillfocusEdit37()
@@ -2894,10 +2952,43 @@ void CParameterDlg::OnEnKillfocusEdit37()
     UpdateData();
     if(product_register_value[MODBUS_DAY_HEATING_SETPOINT]==m_heatsp*10)	//Add this to judge weather this value need to change.
         return;
-    Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_DAY_HEATING_SETPOINT,m_heatsp*10,
-                        product_register_value[MODBUS_DAY_HEATING_SETPOINT],this->m_hWnd,IDC_EDIT37,_T("DAY HEATING SETPOINT"));
+	int nheatsp = m_heatsp * 10;
+	int nsetpoint = m_setpoint * 10;
+	int ncoolsp = m_coolsp * 10;
 
-    Read_SliderData();
+	if (nheatsp >= nsetpoint&&nheatsp<ncoolsp)
+	{
+		m_setpoint = (m_coolsp + m_heatsp) / 2;
+		m_cooldb = m_coolsp - m_setpoint;
+		m_heatdb = m_setpoint - m_heatsp;
+
+		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_DAY_SETPOINT, m_setpoint * 10,
+			product_register_value[MODBUS_DAY_SETPOINT], this->m_hWnd, IDC_EDIT31, _T("DAY SETPOINT"));
+		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_DAY_COOLING_DEADBAND, m_cooldb * 10,
+			product_register_value[MODBUS_DAY_COOLING_DEADBAND], this->m_hWnd, IDC_EDIT_CDBDN, _T("DAY COOLING DEADBAND"));
+
+		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_DAY_HEATING_DEADBAND, m_heatdb * 10,
+			product_register_value[MODBUS_DAY_HEATING_DEADBAND], this->m_hWnd, IDC_EDIT34, _T("DAY HEATING DEADBAND"));
+		 
+
+	}
+	else if (nheatsp>=ncoolsp)
+	{
+		m_setpoint = m_heatsp + m_heatdb;
+		m_coolsp = m_setpoint + m_cooldb;
+		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_DAY_SETPOINT, m_setpoint * 10,
+			product_register_value[MODBUS_DAY_SETPOINT], this->m_hWnd, IDC_EDIT31, _T("DAY SETPOINT"));
+
+	}
+	 
+	else
+	{
+		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_DAY_HEATING_SETPOINT, m_heatsp * 10,
+			product_register_value[MODBUS_DAY_HEATING_SETPOINT], this->m_hWnd, IDC_EDIT37, _T("DAY HEATING SETPOINT"));
+
+	}
+
+	UpdateData(FALSE);
 }
 
 void CParameterDlg::OnEnKillfocusEditCspnn()
@@ -2905,10 +2996,38 @@ void CParameterDlg::OnEnKillfocusEditCspnn()
     UpdateData();
     if(product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]==m_coolspN*10)	//Add this to judge weather this value need to change.
         return;
-    Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_COOLING_SETPOINT,m_coolspN*10,
-                        product_register_value[MODBUS_NIGHT_COOLING_SETPOINT],this->m_hWnd,IDC_EDIT_CSPNN,_T("NIGHT COOLING SETPOINT"));
 
-    Read_SliderData();
+	int nheatsp = m_heatspN * 10;
+	int nsetpoint = m_setpointN * 10;
+	int ncoolsp = m_cooldbN * 10;
+
+	if (ncoolsp <= nsetpoint && ncoolsp>nheatsp)
+	{
+		m_setpointN = (m_heatspN + m_coolspN) / 2;
+		m_heatdbN = m_setpointN - m_heatspN;
+		m_cooldbN = m_coolspN - m_setpointN;
+		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_NIGHT_SETPOINT, m_setpointN * 10,
+			product_register_value[MODBUS_NIGHT_SETPOINT], this->m_hWnd, IDC_EDIT32, _T("NIGHT SETPOINT"));
+		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_NIGHT_HEATING_DEADBAND, m_heatdbN * 10,
+			product_register_value[MODBUS_NIGHT_HEATING_DEADBAND], this->m_hWnd, IDC_EDIT35, _T("NIGHT HEATING DEADBAND"));
+		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_NIGHT_COOLING_DEADBAND, m_cooldbN * 10,
+			product_register_value[MODBUS_NIGHT_COOLING_DEADBAND], this->m_hWnd, IDC_EDIT_CDBNN, _T("NIGHT COOLING DEADBAND"));
+
+	}
+	else if(ncoolsp <= nheatsp)
+	{
+		m_setpointN = m_coolspN - m_cooldbN;
+		m_heatspN = m_setpointN - m_heatdbN;
+		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_NIGHT_SETPOINT, m_setpointN * 10,
+			product_register_value[MODBUS_NIGHT_SETPOINT], this->m_hWnd, IDC_EDIT32, _T("NIGHT SETPOINT"));
+	}
+	else
+	{
+		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_NIGHT_COOLING_SETPOINT, m_coolspN * 10,
+			product_register_value[MODBUS_NIGHT_COOLING_SETPOINT], this->m_hWnd, IDC_EDIT_CSPNN, _T("NIGHT COOLING SETPOINT"));
+	}
+
+	UpdateData(FALSE);
 }
 
 //Recode by Fance
@@ -2920,7 +3039,8 @@ void CParameterDlg::OnEnKillfocusEditCdbnn()
         return;
     Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_COOLING_DEADBAND,m_cooldbN*10,
                         product_register_value[MODBUS_NIGHT_COOLING_DEADBAND],this->m_hWnd,IDC_EDIT_CDBNN,_T("NIGHT COOLING DEADBAND"));
-    Read_SliderData();
+	m_coolspN = m_setpointN + m_cooldbN;
+	UpdateData(FALSE);
 }
 
 
@@ -2948,7 +3068,9 @@ void CParameterDlg::OnEnKillfocusEdit32()
     Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_SETPOINT,m_setpointN*10,
                         product_register_value[MODBUS_NIGHT_SETPOINT],this->m_hWnd,IDC_EDIT32,_T("NIGHT SETPOINT"));
 
-    Read_SliderData();
+	m_coolspN = m_setpointN + m_cooldbN;
+	m_heatspN = m_setpointN - m_heatdbN;
+	UpdateData(FALSE);
 }
 
 void CParameterDlg::OnEnKillfocusEdit35()
@@ -2960,7 +3082,8 @@ void CParameterDlg::OnEnKillfocusEdit35()
     Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_HEATING_DEADBAND,m_heatdbN*10,
                         product_register_value[MODBUS_NIGHT_HEATING_DEADBAND],this->m_hWnd,IDC_EDIT35,_T("NIGHT HEATING DEADBAND"));
 
-    Read_SliderData();
+	m_heatdbN = m_setpointN + m_heatdbN;
+	UpdateData(FALSE);
 }
 
 void CParameterDlg::OnEnKillfocusEdit38()
@@ -2968,10 +3091,40 @@ void CParameterDlg::OnEnKillfocusEdit38()
     UpdateData();
     if(product_register_value[MODBUS_NIGHT_HEATING_SETPOINT] == m_heatspN*10)
         return;
-    Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_HEATING_SETPOINT,m_heatspN*10,
-                        product_register_value[MODBUS_NIGHT_HEATING_SETPOINT],this->m_hWnd,IDC_EDIT38,_T("NIGHT HEATING SETPOINT"));
 
-    Read_SliderData();
+	int nheatsp = m_heatspN * 10;
+	int nsetpoint = m_setpointN * 10;
+	int ncoolsp = m_cooldbN * 10;
+
+	if (nheatsp >= nsetpoint && nheatsp<ncoolsp)
+	{
+		m_setpointN = (m_heatspN + m_coolspN) / 2;
+		m_heatdbN = m_setpointN - m_heatspN;
+		m_cooldbN = m_coolspN - m_setpointN;
+		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_NIGHT_SETPOINT, m_setpointN * 10,
+			product_register_value[MODBUS_NIGHT_SETPOINT], this->m_hWnd, IDC_EDIT32, _T("NIGHT SETPOINT"));
+		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_NIGHT_HEATING_DEADBAND, m_heatdbN * 10,
+			product_register_value[MODBUS_NIGHT_HEATING_DEADBAND], this->m_hWnd, IDC_EDIT35, _T("NIGHT HEATING DEADBAND"));
+		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_NIGHT_COOLING_DEADBAND, m_cooldbN * 10,
+			product_register_value[MODBUS_NIGHT_COOLING_DEADBAND], this->m_hWnd, IDC_EDIT_CDBNN, _T("NIGHT COOLING DEADBAND"));
+
+	}
+	else if(nheatsp>=ncoolsp)
+	{
+		m_setpointN = m_heatspN + m_heatdbN;
+		m_coolspN = m_setpointN + m_cooldbN;
+		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_NIGHT_SETPOINT, m_setpointN * 10,
+			product_register_value[MODBUS_NIGHT_SETPOINT], this->m_hWnd, IDC_EDIT32, _T("NIGHT SETPOINT"));
+
+	}
+	else
+	{
+		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_NIGHT_HEATING_SETPOINT, m_heatspN * 10,
+			product_register_value[MODBUS_NIGHT_HEATING_SETPOINT], this->m_hWnd, IDC_EDIT38, _T("NIGHT HEATING SETPOINT"));
+	}
+
+
+	UpdateData(FALSE);
 }
 CString CParameterDlg::GetInputValue(int InputNo) //这个是行号，如果是Input的话，要在这个基础上加1
 {
@@ -3517,6 +3670,22 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 
         //}
+
+		if (product_register_value[7] == PM_TSTAT5i
+			|| product_register_value[7] == PM_TSTAT6
+			|| product_register_value[7] == PM_TSTAT7
+			|| product_register_value[7] == PM_TSTAT8)
+		{
+			bitset<16>  value109(product_register_value[109]);
+			int sel = value109[4];//第五位
+			m_combox_mrd.SetCurSel(sel);
+		}
+		else
+		{
+			bitset<16>  value184(product_register_value[184]);
+			int sel = value184[4];//第五位
+			m_combox_mrd.SetCurSel(sel);
+		}
         if(product_register_value[383]>=5&&product_register_value[383]<=14) // input1
         {
 
@@ -4599,90 +4768,33 @@ void CParameterDlg::OnBnClickedCs2()
 
 void CParameterDlg::Read_SliderData()
 {
+    m_coolsp= (float)((short)product_register_value[MODBUS_DAY_COOLING_SETPOINT])/10;//348
+
+    m_cooldb= (float)((short)product_register_value[MODBUS_DAY_COOLING_DEADBAND]) /10;//346
+    m_setpoint = (float)((short)product_register_value[MODBUS_DAY_SETPOINT]) /10;//345
+    m_heatdb = (float)((short)product_register_value[MODBUS_DAY_HEATING_DEADBAND]) /10;//347
+    m_heatsp = (float)((short)product_register_value[MODBUS_DAY_HEATING_SETPOINT]) /10;//349
+
+    m_coolspN= (float)((short)product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]) /10;//355
+    m_cooldbN= (float)((short)product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]) /10;//353
+    m_setpointN= (float)((short)product_register_value[MODBUS_NIGHT_SETPOINT]) /10;//350
+    m_heatdbN= (float)((short)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]) /10;//352
+    m_heatspN= (float)((short)product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]) /10;
 
 
-//   int ret=read_one(g_tstat_id,MODBUS_DAY_COOLING_SETPOINT);
-    //if (ret>0)
-    //{
-    //product_register_value[MODBUS_DAY_COOLING_SETPOINT]=ret;
-    //}
+ 	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+ 	{
+ 	 Read_Multi(g_tstat_id,&product_register_value[MODBUS_DAY_SETPOINT],MODBUS_DAY_SETPOINT,20);
+ 	}
+ 	else
+ 	{
+ 	Read_Multi(g_tstat_id,&product_register_value[MODBUS_COOLING_DEADBAND],MODBUS_COOLING_DEADBAND,2);
+ 	Read_Multi(g_tstat_id,&product_register_value[MODBUS_NIGHT_HEATING_DEADBAND],MODBUS_NIGHT_HEATING_DEADBAND,2);
 
-    // ret=read_one(g_tstat_id,MODBUS_DAY_COOLING_DEADBAND);
-    //if (ret>0)
-    //{
-    //	product_register_value[MODBUS_DAY_COOLING_DEADBAND]=ret;
-    //}
+ 	Read_Multi(g_tstat_id,&product_register_value[MODBUS_COOLING_SETPOINT],MODBUS_COOLING_SETPOINT,2);
 
-    // ret=read_one(g_tstat_id,MODBUS_DAY_SETPOINT);
-    //if (ret>0)
-    //{
-    //	product_register_value[MODBUS_DAY_SETPOINT]=ret;
-    //}
-
-    // ret=read_one(g_tstat_id,MODBUS_DAY_HEATING_DEADBAND);
-    //if (ret>0)
-    //{
-    //	product_register_value[MODBUS_DAY_HEATING_DEADBAND]=ret;
-    //}
-    // ret=read_one(g_tstat_id,MODBUS_DAY_HEATING_SETPOINT);
-    //if (ret>0)
-    //{
-    //	product_register_value[MODBUS_DAY_HEATING_SETPOINT]=ret;
-    //}
-    // ret=read_one(g_tstat_id,MODBUS_NIGHT_COOLING_DEADBAND);
-    //if (ret>0)
-    //{
-    //	product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]=ret;
-    //}
-    // ret=read_one(g_tstat_id,MODBUS_NIGHT_SETPOINT);
-    //if (ret>0)
-    //{
-    //	product_register_value[MODBUS_NIGHT_SETPOINT]=ret;
-    //}
-
-
-    // ret=read_one(g_tstat_id,MODBUS_NIGHT_HEATING_DEADBAND);
-    //if (ret>0)
-    //{
-    //	product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]=ret;
-    //}
-
-
-    // ret=read_one(g_tstat_id,MODBUS_DAY_HEATING_SETPOINT);
-    //if (ret>0)
-    //{
-    //	product_register_value[MODBUS_DAY_HEATING_SETPOINT]=ret;
-    //}
-
-
-
-    //m_coolsp= product_register_value[MODBUS_DAY_COOLING_SETPOINT]/10;//348
-
-    //m_cooldb=product_register_value[MODBUS_DAY_COOLING_DEADBAND]/10;//346
-    //m_setpoint =product_register_value[MODBUS_DAY_SETPOINT]/10;//345
-    //m_heatdb =product_register_value[MODBUS_DAY_HEATING_DEADBAND]/10;//347
-    //m_heatsp =product_register_value[MODBUS_DAY_HEATING_SETPOINT]/10;//349
-
-    //m_coolspN=product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]/10;//355
-    //m_cooldbN=product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]/10;//353
-    //m_setpointN=product_register_value[MODBUS_NIGHT_SETPOINT]/10;//350
-    //m_heatdbN=product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10;//352
-    //m_heatspN=product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10;
-
-
-// 	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
-// 	{
-// 	Read_Multi(g_tstat_id,&product_register_value[MODBUS_DAY_SETPOINT],MODBUS_DAY_SETPOINT,20);
-// 	}
-// 	else
-// 	{
-// 	Read_Multi(g_tstat_id,&product_register_value[MODBUS_COOLING_DEADBAND],MODBUS_COOLING_DEADBAND,2);
-// 	Read_Multi(g_tstat_id,&product_register_value[MODBUS_NIGHT_HEATING_DEADBAND],MODBUS_NIGHT_HEATING_DEADBAND,2);
-//
-// 	Read_Multi(g_tstat_id,&product_register_value[MODBUS_COOLING_SETPOINT],MODBUS_COOLING_SETPOINT,2);
-//
-// 	Read_Multi(g_tstat_id,&product_register_value[MODBUS_NIGHT_HEATING_SETPOINT],MODBUS_NIGHT_HEATING_SETPOINT,2);
-// 	}
+ 	Read_Multi(g_tstat_id,&product_register_value[MODBUS_NIGHT_HEATING_SETPOINT],MODBUS_NIGHT_HEATING_SETPOINT,2);
+ 	}
 }
 void CParameterDlg::OnBnClickedAirflowSetting()
 {
@@ -5827,4 +5939,65 @@ void CParameterDlg::OnEnKillfocusEditTstatName()
      {
         GetDlgItem(IDC_EDIT_TSTAT_NAME)->GetWindowText(oldname);
      }*/
+}
+
+
+void CParameterDlg::OnCbnSelchangeComboMrd()
+{
+	int sel =  m_combox_mrd.GetCurSel();
+	int write_Value = 0;
+	if (product_register_value[7] == PM_TSTAT5i 
+		|| product_register_value[7] == PM_TSTAT6 
+		|| product_register_value[7] == PM_TSTAT7
+		|| product_register_value[7] == PM_TSTAT8)
+	{
+
+		 if (sel == 0)
+		 {
+			 write_Value = product_register_value[109] & 0xffef;
+		 }
+		 else
+		 {
+			 write_Value = product_register_value[109] | 0x10;
+		 }
+		int ret = write_one(g_tstat_id, 109, write_Value);
+		if (ret>0)
+		{
+			product_register_value[109] = write_Value;
+		}
+	}
+	else
+	{
+		if (sel == 0)
+		{
+			write_Value = product_register_value[184] & 0xffef;
+		}
+		else
+		{
+			write_Value = product_register_value[184] | 0x10;
+		}
+
+		int ret = write_one(g_tstat_id, 184, write_Value);
+		if (ret > 0)
+		{
+			product_register_value[184] = write_Value;
+		}
+	}
+	
+	Reflesh_ParameterDlg();
+		
+}
+
+
+void CParameterDlg::OnBnClickedButtonApplyAll()
+{
+	 
+}
+
+#include "ZigbeeInformationDlg.h"
+void CParameterDlg::OnBnClickedButtonZigbee()
+{
+	CZigbeeInformationDlg dlg;
+	dlg.DoModal();
+	 
 }

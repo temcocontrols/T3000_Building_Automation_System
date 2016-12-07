@@ -1045,7 +1045,7 @@ BOOL CTStatInputView::PreTranslateMessage(MSG* pMsg)
         return TRUE;
     }
     CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-    if (pFrame->m_pDialogInfo->IsWindowVisible())
+    if (pFrame->m_pDialogInfo != NULL &&pFrame->m_pDialogInfo->IsWindowVisible())
     {
         if (pMsg->message == WM_LBUTTONDOWN||pMsg->message == WM_RBUTTONDOWN)
         {

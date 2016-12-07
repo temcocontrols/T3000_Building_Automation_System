@@ -290,10 +290,16 @@ void CBacnetScreenEdit::AddLabel(unsigned char point_type,uint8_t point_number,u
 
 		int text_color = RGB(0,0,255);
 		int display_type = LABEL_SHOW_FULL_DESCRIPTION;
-		if(point_type == 11)	//GRP
+		if((point_type == BAC_GRP + 1) ||	//GRP
+			(point_type == BAC_SCH + 1) ||
+			(point_type == BAC_PRG + 1) ||
+			(point_type == BAC_HOL + 1) ||
+			(point_type == BAC_AMON + 1) ||
+			(point_type == BAC_PID + 1))
 		{
-			display_type = LABEL_ICON_FULL_DESCRIPTION;
+			display_type = LABEL_ICON_LABEL;
 		}
+
 		strSql.Format(_T("insert into Screen_Bacnet_Label values(%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,'%s','%s',%i,%i)"),m_nSerialNumber,screen_list_line,Max_Control_ID,main_panel,sub_panel,point_type,point_number,point_x,point_y,text_color,display_type,_T(""),_T(""),LABEL_TEXT_BOTTOM,LABEL_ICON_SMALL);
 
 		SqliteDBT3000.execDML((UTF8MBSTR)strSql);
@@ -1635,7 +1641,7 @@ void CBacnetScreenEdit::OnPaint()
 			}
 		}
 		cs_show_info = cs_show_info.Trim();
-		if(cs_show_info.IsEmpty())
+		if((cs_show_info.IsEmpty()) && (m_bac_label_vector.at(i).nDisplay_Type != LABEL_ICON_VALUE))
 		{
 			if(m_bac_label_vector.at(i).nPoint_type == BAC_PRG)
 				cs_show_info.Format(_T("PRG%u"),m_bac_label_vector.at(i).nPoint_number + 1);

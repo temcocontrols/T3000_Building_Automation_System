@@ -9,10 +9,13 @@ struct CustomProductTable_T{
     CString  Reg_Description;
     int Reg_ID;
     CString Para_Type;
+	int function_code;
     int  Counts_Number;
     CString  Property;
     CString Value;
     CString DataFormat;
+	CString SN;
+	int caculate;
 };
 class CProductRegisterListView : public CFormView
 {
@@ -40,9 +43,11 @@ public:
     afx_msg void OnSize(UINT nType, int cx, int cy);
     ListCtrlEx::CListCtrlEx m_register_list;
     void Fresh(void);
+	void SetStart(BOOL Start);
     void Initial_List(void);
     virtual void OnInitialUpdate();
     void LoadDataSheet();
+	void Import_CustomProductTable();
     tree_product m_current_tree_node ;
     vector<CustomProductTable_T> m_register_data_sheet;
     afx_msg LRESULT Fresh_Input_List(WPARAM wParam,LPARAM lParam);
@@ -74,8 +79,16 @@ public:
     afx_msg void OnTimer(UINT_PTR nIDEvent);
     afx_msg void OnEnChangeEditDelayLoop();
     afx_msg void OnEnChangeEditDelayItems();
-	CComboBox m_combox_valueformat;
-	afx_msg void OnCbnSelchangeComboDataFormat();
+	 
+	 
+	int GetFunctionCode(CString FunctionName);
+	CString GetFunctionName(int  FunctionCode);
+	int GetCaculateCode(CString CalName);
+	CString GetCalName(int calcode);
+	CString m_array_modbus_function[8];
+	CString m_array_caculate[3];
+	
+	 
 };
 
 

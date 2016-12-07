@@ -78,7 +78,7 @@ public:
 	void Set_Time_Scale(int n_time_scale);
 	void SetDigital_X_WIDTH(int n_dig_x_width);
 	void SetDigital_Y_Hight(int n_dig_hight);
-
+	void WriteViewInfoIntoConfig();
 	
 
 	void CalcOnePixelTime();
@@ -86,8 +86,9 @@ public:
 
 
 	bool TimeValueToPoint(unsigned long ntime , int nvalue ,PointF &returnpoint);
-	bool DigitalTimeValueToPoint(unsigned long ntime , int nvalue ,PointF &returnpoint);
-
+	bool DigitalTimeValueToPoint(unsigned long ntime , int nvalue ,PointF &returnpoint,int n_index);
+	bool SetDigitalYLabelPos(int ndigital_index);
+	PointF GetDigitalYLabelPos(int ndigital_index);
 	void InitialParameter(int base_time,float y_min_value = 0,float y_max_value = 100000);
 	//void InitialParameter(int base_time);
 	void GetAnalogOrignPoint(PointF &returnpoint);
@@ -109,7 +110,7 @@ public:
 	bool re_calc_max_and_min(int y_max,int y_min,int &ret_y_max,int &ret_y_min,int scale=4);
 public:
 	PointF last_used_point;
-	bool StaticShow[15];
+	PointF mDigitalYLabelPoint[14];
 	long m_starttime;
 	long m_endtime;
 	float m_lowvalue;
@@ -125,6 +126,8 @@ public:
 	float m_onepiexlvalue;
 	int m_Digital_X_WIDTH;
 	int m_Digital_Y_HIGHT;
+	int mdigital_count_intervel;
+	int mdigital_height;
 protected:
 	int x_axis_total_time ;//x轴 总共 目前的时间;
 	float y_axis_total_value;//y轴 总共 目前最大值 减最小值;

@@ -17,10 +17,10 @@
 #include "iniFile.h"
 #include "afxinet.h"
 #include "T3000DefaultView.h"
- 
+#include "bado/BADO.h"
 #include "../SQLiteDriver/CppSQLite3.h"
  
-const int g_versionNO=20160923;
+const int g_versionNO=20161205;
 
 
 #ifdef _DEBUG
@@ -41,8 +41,8 @@ END_MESSAGE_MAP()
 CT3000App::CT3000App()
 {
 	m_bHiColorIcons = TRUE;
-	CurrentT3000Version=_T("    2016.11.17 ");
-	T3000_Version = 11117;
+	CurrentT3000Version=_T("    2016.12.02 ");
+	T3000_Version = 11202;
 
 
 	m_lastinterface=19;
@@ -143,6 +143,143 @@ return TRUE;
 }
 return FALSE;
 
+}
+
+void CT3000App::UpdateDB()
+{
+    BOOL is_update = FALSE;
+    CppSQLite3DB SqliteDBT3000;
+    SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath); 
+    CppSQLite3Query q;
+    q = SqliteDBT3000.execQuery("Select * from Version");
+    int version =0;
+    while(!q.eof())
+    {
+        int tempversion = q.getIntField("VersionNO");
+        if (tempversion !=0)
+        {
+            version = tempversion;
+        }
+        q.nextRow();
+    }
+    q.finalize();
+    SqliteDBT3000.closedb();
+    if (version <g_versionNO)
+    {
+        is_update = TRUE;
+    }
+    if (is_update)
+    {
+		CppSQLite3DB SqliteDBT3000;
+		SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+		CppSQLite3Query q;
+		q = SqliteDBT3000.execQuery("Select * from Building_ALL");
+		Building_ALL stemp_building_all;
+		while (!q.eof())
+		{
+			stemp_building_all.Building_Name = q.getValuebyName(L"Building_Name");
+			stemp_building_all.Default_Building = q.getIntField("Default_Build");
+			stemp_building_all.Address = q.getValuebyName(L"Address");
+			stemp_building_all.Telephone = q.getValuebyName(L"Telephone");
+			m_Building_ALL.push_back(stemp_building_all);
+			q.nextRow();
+		}
+		q.finalize();  
+		q = SqliteDBT3000.execQuery("Select * from Building");
+		Building stemp_building;
+		while (!q.eof())
+		{
+			    stemp_building.Main_BuildingName = q.getValuebyName(L"Main_BuildingName");
+				stemp_building.Building_Name = q.getValuebyName(L"Building_Name");
+				stemp_building.Protocal = q.getValuebyName(L"Protocal");
+				stemp_building.Com_Port = q.getValuebyName(L"Com_Port");
+				stemp_building.Ip_Address = q.getValuebyName(L"Ip_Address");
+				stemp_building.Ip_Port = q.getValuebyName(L"Ip_Port");
+				stemp_building.Braudrate = q.getValuebyName(L"Braudrate");
+				stemp_building.Default_SubBuilding = q.getIntField("Default_SubBuilding");
+				stemp_building.Building_Path = q.getValuebyName(L"Building_Path");
+				stemp_building.Longitude = q.getValuebyName(L"Longitude");
+				stemp_building.Latitude = q.getValuebyName(L"Latitude");
+				stemp_building.Elevation = q.getValuebyName(L"Elevation");
+				stemp_building.ID = q.getIntField("ID");
+				stemp_building.country = q.getValuebyName(L"country");
+				stemp_building.state = q.getValuebyName(L"state");
+				stemp_building.city = q.getValuebyName(L"city");
+				stemp_building.street = q.getValuebyName(L"street");
+			    stemp_building.ZIP = q.getValuebyName(L"ZIP");
+				stemp_building.EngineeringUnits = q.getValuebyName(L"EngineeringUnits");
+
+				q.nextRow();
+			m_Building.push_back(stemp_building);
+		 
+		}
+		q.finalize();
+		SqliteDBT3000.closedb();
+
+        remove((UTF8MBSTR)g_strDatabasefilepath);//删掉原有的数据库
+
+        CString FilePath;
+        HANDLE hFind;
+        WIN32_FIND_DATA wfd;
+        hFind = FindFirstFile(g_strDatabasefilepath, &wfd);//
+        if (hFind==INVALID_HANDLE_VALUE)//不存在该文件
+        {
+           
+            FilePath=g_strExePth+_T("Database\\T3000.db");
+            HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000DB1), _T("T3000DB"));   
+            HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
+            LPVOID lpExe = LockResource(hGlobal);   
+            CFile file;
+            if(file.Open(FilePath, CFile::modeCreate | CFile::modeWrite))    
+                file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
+            file.Close();    
+            ::UnlockResource(hGlobal);   
+            ::FreeResource(hGlobal);
+          
+        }  
+
+		SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+		CString StrSql;
+		StrSql = L"Delete from Building_ALL";
+		SqliteDBT3000.execDML((UTF8MBSTR)StrSql);
+		for (int i = 0 ;i<m_Building_ALL.size();i++)
+		{
+			StrSql.Format(_T("Insert Into Building_ALL(Building_Name,Default_Build,Telephone,Address)  Values('%s',%d,'%s','%s')"),
+				m_Building_ALL.at(i).Building_Name
+				, m_Building_ALL.at(i).Default_Building
+				, m_Building_ALL.at(i).Telephone
+				, m_Building_ALL.at(i).Address);
+			SqliteDBT3000.execDML((UTF8MBSTR)StrSql);
+		}
+
+		StrSql = L"Delete from Building";
+		SqliteDBT3000.execDML((UTF8MBSTR)StrSql);
+
+		for (int j=0;j<m_Building.size();j++)
+		{
+			StrSql.Format(_T("Insert Into Building(Main_BuildingName,Building_Name,Protocal,Com_Port,Ip_Address,Ip_Port,Braudrate,Default_SubBuilding,Building_Path,Longitude,Elevation,ID,country,state,city,street,ZIP,EngineeringUnits) Values('%s','%s','%s','%s','%s','%s','%s',%d,'%s','%s','%s',%d,'%s','%s','%s','%s','%s','%s')"),
+				m_Building.at(j).Main_BuildingName,
+				m_Building.at(j).Building_Name,
+				m_Building.at(j).Protocal,
+				m_Building.at(j).Com_Port,
+				m_Building.at(j).Ip_Address,
+				m_Building.at(j).Ip_Port,
+				m_Building.at(j).Braudrate,
+				m_Building.at(j).Default_SubBuilding,
+				m_Building.at(j).Building_Path,
+				m_Building.at(j).Longitude,
+				m_Building.at(j).Elevation,
+				m_Building.at(j).ID,
+				m_Building.at(j).country,
+				m_Building.at(j).state,
+				m_Building.at(j).city,
+				m_Building.at(j).street,
+				m_Building.at(j).ZIP,
+				m_Building.at(j).EngineeringUnits);
+			SqliteDBT3000.execDML((UTF8MBSTR)StrSql);
+		}
+		SqliteDBT3000.closedb();
+    }
 }
 BOOL CT3000App::InitInstance()
 {
@@ -309,7 +446,7 @@ BOOL CT3000App::InitInstance()
 
 
 			g_achive_monitor_datatbase_path = g_achive_folder;
-			g_achive_monitor_datatbase_path = g_achive_monitor_datatbase_path + _T("\\MonitorData.db");
+			g_achive_monitor_datatbase_path = g_achive_monitor_datatbase_path + _T("\\MonitorData.mdb");
 
 			WIN32_FIND_DATA fd;
 			BOOL ret = FALSE;
@@ -454,7 +591,7 @@ BOOL CT3000App::InitInstance()
 			{
 				//没有找到就创建一个默认的数据库
 				FilePath_Monitor= g_achive_monitor_datatbase_path;
-				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MONITOR_DB1), _T("MONITOR_DB"));   
+				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MONITOR_DB2), _T("MONITOR_DB"));   
 				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
 				LPVOID lpExe = LockResource(hGlobal);   
 				CFile file;
@@ -589,8 +726,8 @@ BOOL CT3000App::InitInstance()
 
 
 			//先不考虑升级的情况
-#if 1
-		/*	int Ret=JudgeDB();
+#if 0
+		 	int Ret=JudgeDB();
 			if (!Ret)
 			{
 				FilePath=g_strExePth+_T("Database\\T3000.db");
@@ -606,12 +743,12 @@ BOOL CT3000App::InitInstance()
 				file.Close();    
 				::UnlockResource(hGlobal);   
 				::FreeResource(hGlobal);
-				JudgeDB();
+				//JudgeDB();
 
-			}*/
+			}
 
 #endif
-
+              UpdateDB();
 
 			//Sleep(1000);
 
@@ -739,7 +876,21 @@ BOOL CT3000App::InitInstance()
 	}
 	catch (...)
 	{
-		 
+        CString FilePath;
+        HANDLE hFind;
+        WIN32_FIND_DATA wfd;
+
+        remove((UTF8MBSTR)g_strDatabasefilepath);
+     //g_strDatabasefilepath   =g_strExePth+_T("Database\\T3000.db");
+        HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000DB1), _T("T3000DB"));   
+        HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
+        LPVOID lpExe = LockResource(hGlobal);   
+        CFile file;
+        if(file.Open(FilePath, CFile::modeCreate | CFile::modeWrite))    
+            file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
+        file.Close();    
+        ::UnlockResource(hGlobal);   
+        ::FreeResource(hGlobal);
 		CString str_msado;
 		str_msado.Format(_T("%sREG_MSFLXGRD.bat"),g_strExePth.GetBuffer());
 		::ShellExecute(NULL, _T("open"),str_msado.GetBuffer(), _T(""), _T(""), SW_SHOW);
@@ -750,7 +901,7 @@ BOOL CT3000App::InitInstance()
 
 
 		AfxMessageBox(_T("Database error! Please restart again ."));
-		::ShellExecute(NULL, _T("open"), _T("www.temcocontrols.com/ftp/software/AccessDatabaseEngine.zip"), _T(""), _T(""), SW_SHOW);
+		//::ShellExecute(NULL, _T("open"), _T("www.temcocontrols.com/ftp/software/AccessDatabaseEngine.zip"), _T(""), _T(""), SW_SHOW);
 		//AfxMessageBox(_T("Open'T3000'Again,Please!"));
 
 

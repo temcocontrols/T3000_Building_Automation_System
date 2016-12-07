@@ -161,8 +161,8 @@ int CHexFileParser::ReadNormalHexFile( CFile& hexFile,  char* pBuf, int nBufLen)
 			wchar_t p_c_temp[74]={'\0'};
 			swprintf_s(p_c_temp,_T("Error: the hex file had error at %d line!"),nLineNum);
 			nBufCount = 0;
- 			if(!auto_flash_mode)
- 				AfxMessageBox(p_c_temp);
+			if(!auto_flash_mode)
+				AfxMessageBox(p_c_temp);
 			//close_com();
 			return 0;
 		}
@@ -326,7 +326,8 @@ int CHexFileParser::ReadExtendHexFile(CFile& hexFile, char* pBuf, int nBufLen)
 			wchar_t p_c_temp[74]={'\0'};
 			swprintf_s(p_c_temp,_T("Error: the hex file had error at %d line!"),nLineNum);
 			nBufCount = 0;
-			AfxMessageBox(p_c_temp);
+			if(!auto_flash_mode)
+				AfxMessageBox(p_c_temp);
 			//close_com();
 			return 0;
 		}
@@ -342,7 +343,8 @@ int CHexFileParser::ReadExtendHexFile(CFile& hexFile, char* pBuf, int nBufLen)
 			wchar_t p_c_temp[74]={'\0'};
 			nBufCount = 0;
 			swprintf_s(p_c_temp,_T("Error: the hex file had error at %d line!"),nLineNum);
-			AfxMessageBox(p_c_temp,MB_OK);
+			if(!auto_flash_mode)
+				AfxMessageBox(p_c_temp,MB_OK);
 			//close_com();
 			return 0;
 		}
@@ -438,7 +440,8 @@ BOOL CHexFileParser::ReadExtLinearHexFile(CFile& hexfile, char* pBuf, int nBufLe
 			
 			//AddStringToOutPuts(p_c_temp);
 			nBufCount = 0;
-			AfxMessageBox(p_c_temp);
+			if(!auto_flash_mode)
+				AfxMessageBox(p_c_temp);
 			//close_com();
 			goto END;
 			return 0;
@@ -454,7 +457,8 @@ BOOL CHexFileParser::ReadExtLinearHexFile(CFile& hexfile, char* pBuf, int nBufLe
 			swprintf_s(p_c_temp,_T("Error: the hex file had error at %d line!"),nLineNumErr);
 			//AddStringToOutPuts(p_c_temp);	
 			nBufCount = 0;	
-			AfxMessageBox(p_c_temp, MB_OK);
+			if(!auto_flash_mode)
+				AfxMessageBox(p_c_temp, MB_OK);
 			
 			//close_com();
 			goto END;

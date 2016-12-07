@@ -21,7 +21,7 @@
 #include "TFTPServer.h"
 #include "globle_function.h"
 #include "Global_Struct.h"
-
+extern CString Failed_Message;
 extern Bin_Info        global_fileInfor;
 typedef struct _Product_IP_ID 
 {
@@ -153,17 +153,18 @@ void MySocket::OnReceive(int nErrorCode)
 				}
 				FileProductName.Trim();
 				DeviceProductName.Trim();
-				if (DeviceProductName.CompareNoCase(FileProductName)!=0)
+				if ((DeviceProductName.CompareNoCase(FileProductName)!=0) && (!DeviceProductName.IsEmpty()))
 				{
-					CString strTip;
-					strTip.Format(_T("Your device is %s,but your bin file is fit for %s"),DeviceProductName.GetBuffer(),FileProductName.GetBuffer());
-
+					Failed_Message.Format(_T("Your device is %s,but your bin file is fit for %s"),DeviceProductName.GetBuffer(),FileProductName.GetBuffer());
+					ISP_STEP =ISP_Flash_FAILED;
+					return;
 					CAsyncSocket::OnReceive(nErrorCode);
 				}
-
-
-
-				ISP_STEP =ISP_Send_TFTP_PAKAGE;
+				else if(!DeviceProductName.IsEmpty())
+				{
+					ISP_STEP =ISP_Send_TFTP_PAKAGE;
+				}
+				
 			}
 		}
 	}

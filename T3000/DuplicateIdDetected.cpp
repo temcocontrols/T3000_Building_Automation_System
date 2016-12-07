@@ -14,7 +14,7 @@ int controller_port = 0;
 bool first_need_changed = false;
 bool second_need_changed = false;
 CString cs_show_info;
-
+int auto_close_seconds = 30;
 int first_propose_id = 0;
 int second_propose_id = 0;
 
@@ -79,10 +79,12 @@ BOOL CDuplicateIdDetected::OnInitDialog()
 	CDialogEx::OnInitDialog();
 	first_need_changed = false;
 	second_need_changed = false;
+	auto_close_seconds = 30;
 	cs_show_info.Empty();
 	// TODO:  Add extra initialization here
 	Initial_static();
 	SetTimer(1,500,NULL);
+	SetTimer(2,1000,NULL);
 	GetDlgItem(IDC_EDIT_DEVICE_2)->SetFocus();
 	return FALSE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -460,6 +462,7 @@ void CDuplicateIdDetected::Initial_static()
 void CDuplicateIdDetected::OnBnClickedButtonDuplicateDone()
 {
 	// TODO: Add your control notification handler code here
+	KillTimer(2);
 	GetDlgItem(IDC_BUTTON_DUPLICATE_DONE)->EnableWindow(FALSE);
 	GetDlgItem(IDC_BUTTON_DUPLICATE_CANCEL)->EnableWindow(FALSE);
 	CString original_id;
@@ -493,6 +496,7 @@ void CDuplicateIdDetected::OnBnClickedButtonDuplicateDone()
 void CDuplicateIdDetected::OnBnClickedButtonDuplicateCancel()
 {
 	// TODO: Add your control notification handler code here
+	KillTimer(2);
 	edit_confilct_mode = false;
 	PostMessage(WM_CLOSE,NULL,NULL);
 }
@@ -505,6 +509,21 @@ void CDuplicateIdDetected::OnTimer(UINT_PTR nIDEvent)
 	{
 	case 1:
 		m_duplicate_ret_info.SetWindowTextW(cs_show_info);
+		break;
+	case 2:
+		{
+			if(auto_close_seconds == 0)
+			{
+				KillTimer(2);
+				PostMessage(WM_CLOSE,NULL,NULL);
+			}
+			else
+			{
+				auto_close_seconds --;
+				cs_show_info.Format(_T("Close after (%d)"),auto_close_seconds);
+			}
+			
+		}
 		break;
 	default:
 		break;
