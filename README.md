@@ -18,7 +18,8 @@ maurice (at) temcocontrols (dot) com
 ![t3000_building_system_800](https://cloud.githubusercontent.com/assets/1852568/20915182/48135f54-bbac-11e6-8373-25d2435bdc45.jpg)
 ![t3000_wiring_series_800](https://cloud.githubusercontent.com/assets/1852568/20915181/4813633c-bbac-11e6-87a2-62ab927e0e1b.jpg)
 ![t3000_image -](https://cloud.githubusercontent.com/assets/1852568/20915312/3b8f1f7e-bbad-11e6-9b44-669d7106a918.gif)
-![image](https://cloud.githubusercontent.com/assets/1852568/20957799/0cf15f4c-bc7a-11e6-842d-9ea368607571.png)
-![image](https://cloud.githubusercontent.com/assets/1852568/20955939/f5733378-bc6e-11e6-9b10-ea27d3b3361b.png)
+![image1](https://cloud.githubusercontent.com/assets/1852568/20957799/0cf15f4c-bc7a-11e6-842d-9ea368607571.png)
+![image2](https://cloud.githubusercontent.com/assets/1852568/20955939/f5733378-bc6e-11e6-9b10-ea27d3b3361b.png)
+
 Have a look at our website and products!!!     
 
