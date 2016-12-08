@@ -3243,7 +3243,7 @@ namespace WFA_psychometric_chart
 
                 DeviceConnection db = new DeviceConnection();
               //  db.parameterListValue.Clear();//This will scan the paramter list first
-                db.ScanForParameters(device_instance_id);//This will return the parameters
+               // db.ScanForParameters(device_instance_id);//This will return the parameters
                                                          //Now we can use the value strored int  the db.parameterList1
 
                 if (db.parameterListValue.Count > 0)
@@ -3273,16 +3273,41 @@ namespace WFA_psychometric_chart
                     double humidityValue = 0;
 
                     //==For Temperature 
+                    try { 
+
+                    ReadDataFromDeviceForTemperature(device_instance_id, AfterFilteringFromAlexValueListOfValues[parameterID_ForTemp].indexID, AfterFilteringFromAlexValueListOfValues[parameterID_ForTemp].object_identifier_type);
+                    //we have recent value in hardwareValue1 and hardwareValue2 so lets calc corresponding x and y value
+                    //now temp itself is x value we need to calculate y value
+
+                    // if ((hardwareValue1.ToString() == null || hardwareValue1 == 0.00) || (hardwareValue2.ToString() == null || hardwareValue2 == 0.00))
+                    if ((hardwareValue1.ToString() == null || hardwareValue1 == 0.00))
+                    {
+                        return;
+                    }
+                    temperatureValue = hardwareValue1;
+
+                   //==For humidity====
+
+                    //tb_hum_panel_value.Text = AfterFilteringFromAlexValueListOfValuesForHumidityOnly[CB_param_hum.SelectedIndex].presentValue.ToString();
+                    //parameterID_ForHum = CB_param_hum.SelectedIndex;//Setting the index value for constant update
 
 
+                    ReadDataFromDeviceForHumidity(device_instance_id, AfterFilteringFromAlexValueListOfValuesForHumidityOnly[parameterID_ForHum].indexID, AfterFilteringFromAlexValueListOfValuesForHumidityOnly[parameterID_ForHum].object_identifier_type);
+                    //we have recent value in hardwareValue1 and hardwareValue2 so lets calc corresponding x and y value
+                    //now temp itself is x value we need to calculate y value
+
+                    // if ((hardwareValue1.ToString() == null || hardwareValue1 == 0.00) || (hardwareValue2.ToString() == null || hardwareValue2 == 0.00))
+                    if ((hardwareValue2.ToString() == null || hardwareValue2 == 0.00))
+                    {
+                        return;
+                    }
 
 
-                    //==For humidity====
-
-
-
-
-
+                    humidityValue = hardwareValue2;
+                    }catch(Exception ex)
+                    {
+                        MessageBox.Show("Exception :\n" + ex.Message);
+                    }
 
                     //MessageBox.Show()
                     // MessageBox.Show("count everytime " + parameterValFromBacnet.Count);
@@ -3352,8 +3377,8 @@ namespace WFA_psychometric_chart
                                 {
                                     //RefreshDataFromDeviceAndWeb();
                                     //MessageBox.Show("Temp value methodinvoker bhitra");     
-                                    try { 
-                                                tb_temp_panel_value.Text = parameterValFromBacnet[parameterID_ForTemp].presentValue.ToString();
+                                    try {
+                                        tb_temp_panel_value.Text = temperatureValue.ToString(); //parameterValFromBacnet[parameterID_ForTemp].presentValue.ToString();
                                     }
                                     catch { }
                                 }));
@@ -3364,7 +3389,7 @@ namespace WFA_psychometric_chart
                                 //tb_temp_panel_value.Text = parameterValFromBacnet[parameterID_ForTemp].presentValue.ToString();
                                 try
                                 {
-                                    tb_temp_panel_value.Text = parameterValFromBacnet[parameterID_ForTemp].presentValue.ToString();
+                                    tb_temp_panel_value.Text = temperatureValue.ToString(); //parameterValFromBacnet[parameterID_ForTemp].presentValue.ToString();
                                 }
                                 catch { }
                             }
@@ -3381,8 +3406,8 @@ namespace WFA_psychometric_chart
                                 tb_hum_panel_value.Invoke(new MethodInvoker(() =>
                                 {
                                     //RefreshDataFromDeviceAndWeb();
-                                    try { 
-                                                tb_hum_panel_value.Text = parameterValFromBacnet[parameterID_ForHum].presentValue.ToString();
+                                    try {
+                                        tb_hum_panel_value.Text = humidityValue.ToString();//parameterValFromBacnet[parameterID_ForHum].presentValue.ToString();
                                     }
                                     catch { }
                                 }));
@@ -3393,7 +3418,7 @@ namespace WFA_psychometric_chart
                                 // tb_hum_panel_value.Text = parameterValFromBacnet[parameterID_ForHum].presentValue.ToString();
                                 try
                                 {
-                                    tb_hum_panel_value.Text = parameterValFromBacnet[parameterID_ForHum].presentValue.ToString();
+                                    tb_hum_panel_value.Text = humidityValue.ToString();//parameterValFromBacnet[parameterID_ForHum].presentValue.ToString();
                                 }
                                 catch { }
 
@@ -3618,6 +3643,7 @@ namespace WFA_psychometric_chart
                 //tb_hum_panel_value.Text = parameterValFromBacnet[CB_param_hum.SelectedIndex].presentValue.ToString();
                 tb_hum_panel_value.Text = AfterFilteringFromAlexValueListOfValuesForHumidityOnly[CB_param_hum.SelectedIndex].presentValue.ToString();
                 parameterID_ForHum = CB_param_hum.SelectedIndex;//Setting the index value for constant update
+                
                 if (flagForTimer == 1)
                 {
                     //Timer is already set so dissable it first and then reenable...
