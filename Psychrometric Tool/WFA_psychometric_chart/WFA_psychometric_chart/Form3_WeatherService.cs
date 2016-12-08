@@ -184,6 +184,7 @@ namespace WFA_psychometric_chart
         List<dataTypeForControllerList> copyOfMainControllerList = new List<dataTypeForControllerList>();
 
 
+
         /// <summary>
         /// This function return a controller list that is ONLINE only
         /// </summary>
@@ -197,63 +198,132 @@ namespace WFA_psychometric_chart
 
             if (BuildingSelected.Count > 0)
             {
-                //MessageBox.Show("Building infor not found");
+                // MessageBox.Show("Building info found");
                 //return null;
-            
-            string path = databasePath;  //@"C:\Folder1\Folder2\Folder3\Folder4";
-            string newPath = Path.GetFullPath(Path.Combine(path, @"..\"));
-            string againDbPath = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + newPath + "" + BuildingSelected[0].Building_Path;
 
-              //  MessageBox.Show("Path to building = " + againDbPath);
+                string path = databasePath;  //@"C:\Folder1\Folder2\Folder3\Folder4";
+                string newPath = Path.GetFullPath(Path.Combine(path, @"..\"));
+                //  string againDbPath = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + newPath + "" + BuildingSelected[0].Building_Path;
+                string againDbPath = @"Data Source=" + newPath + "" + BuildingSelected[0].Building_Path;
 
-           // String connection = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Program Files (x86)\T3000\Database\Buildings\Default_Building\Default_Building.mdb;Persist Security Info=True ";
+                //C:\Program Files (x86)\T3000\
+                // string againDbPath = @"Data Source=" + newPath + @"Database\T3000.db;Version=3;";
+                //string againDbPath = @"Data Source=C:\Program Files (x86)\T3000\Database\T3000.db;Version=3;";
+                // MessageBox.Show("Path to building = " + againDbPath);
 
-            string sql = "select * from ALL_NODE  where  Parent_SerialNum = '0'";//This will only show parent controller and not sub devices
-                                                                                 //  MessageBox.Show("Connection = " + connection);
-                                                                                 //  MessageBox.Show("sql = " + sql);
-                                                                                 //DataSet myDataSet = new DataSet();
-                                                                                 //try
-                                                                                 //{
-            using (OleDbConnection conn = new OleDbConnection(againDbPath))
-            {
-                using (OleDbCommand cmd = new OleDbCommand(sql, conn))
+                // String connection = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Program Files (x86)\T3000\Database\Buildings\Default_Building\Default_Building.mdb;Persist Security Info=True ";
+
+                string sql = "select * from ALL_NODE  where  Parent_SerialNum = '0'";//This will only show parent controller and not sub devices
+
+                //     MessageBox.Show("Connection = " + connection);
+                //  MessageBox.Show("sql = " + sql);
+                //DataSet myDataSet = new DataSet();
+                //try
+                //{
+                using (SQLiteConnection conn = new SQLiteConnection(againDbPath))
                 {
-                    conn.Open();
-                    OleDbDataReader reader = cmd.ExecuteReader();
-                    while (reader.Read())
+                    using (SQLiteCommand cmd = new SQLiteCommand(sql, conn))
                     {
-                        //dataCheckList.Add((bool)reader["Online_Status"]);
-                        //if true then add the device or list the main controller
-                        if ((bool)reader["Online_Status"])
+                        conn.Open();
+                        SQLiteDataReader reader = cmd.ExecuteReader();
+                        while (reader.Read())
                         {
-                            mainControllerList.Add(new dataTypeForControllerList
+                            //dataCheckList.Add((bool)reader["Online_Status"]);
+                            //if true then add the device or list the main controller
+                            if ((bool)reader["Online_Status"])
                             {
-                                controllerName = reader["Product_Name"].ToString(), //This is product name
-                                controllerInstanceId = int.Parse(reader["Object_Instance"].ToString()),
-                                controllerStatus = (bool)reader["Online_Status"]
-                            });
-
+                                mainControllerList.Add(new dataTypeForControllerList
+                                {
+                                    controllerName = reader["Product_Name"].ToString(), //This is product name
+                                    controllerInstanceId = int.Parse(reader["Object_Instance"].ToString()),
+                                    controllerStatus = (bool)reader["Online_Status"]
+                                });
+                            }
                         }
 
-
                     }
-
                 }
-
-                //MessageBox.Show("Count"+myDataSet[0])
-                //  MessageBox.Show("Count the value = " + dataCheckList.Count+" , value = "+dataCheckList[0]);
             }
-        }
             //}
             //catch (Exception ex)
             //{
-            //    MessageBox.Show(ex.Message);
-            //}
-         
-        
-
+            //MessageBox.Show(ex.Message);
+            //}                                          
             return mainControllerList;
         }
+
+
+
+        ///// <summary>
+        ///// This function return a controller list that is ONLINE only
+        ///// </summary>
+        //public List<dataTypeForControllerList> ControllerList()
+        //{
+        //    mainControllerList.Clear();
+        //    string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        //    //string databaseFile = databasePath + @"\Database\Buildings\Default_Building\Default_Building.mdb";
+        //    //String connection = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source="+ databaseFile+ @";Persist Security Info=True ";
+        //    //C:\Program Files (x86)\T3000\Database\Buildings\Default_Building
+
+        //    if (BuildingSelected.Count > 0)
+        //    {
+        //        //MessageBox.Show("Building infor not found");
+        //        //return null;
+
+        //    string path = databasePath;  //@"C:\Folder1\Folder2\Folder3\Folder4";
+        //    string newPath = Path.GetFullPath(Path.Combine(path, @"..\"));
+        //    string againDbPath = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + newPath + "" + BuildingSelected[0].Building_Path;
+
+        //      //  MessageBox.Show("Path to building = " + againDbPath);
+
+        //   // String connection = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Program Files (x86)\T3000\Database\Buildings\Default_Building\Default_Building.mdb;Persist Security Info=True ";
+
+        //    string sql = "select * from ALL_NODE  where  Parent_SerialNum = '0'";//This will only show parent controller and not sub devices
+        //                                                                         //  MessageBox.Show("Connection = " + connection);
+        //                                                                         //  MessageBox.Show("sql = " + sql);
+        //                                                                         //DataSet myDataSet = new DataSet();
+        //                                                                         //try
+        //                                                                         //{
+        //    using (OleDbConnection conn = new OleDbConnection(againDbPath))
+        //    {
+        //        using (OleDbCommand cmd = new OleDbCommand(sql, conn))
+        //        {
+        //            conn.Open();
+        //            OleDbDataReader reader = cmd.ExecuteReader();
+        //            while (reader.Read())
+        //            {
+        //                //dataCheckList.Add((bool)reader["Online_Status"]);
+        //                //if true then add the device or list the main controller
+        //                if ((bool)reader["Online_Status"])
+        //                {
+        //                    mainControllerList.Add(new dataTypeForControllerList
+        //                    {
+        //                        controllerName = reader["Product_Name"].ToString(), //This is product name
+        //                        controllerInstanceId = int.Parse(reader["Object_Instance"].ToString()),
+        //                        controllerStatus = (bool)reader["Online_Status"]
+        //                    });
+
+        //                }
+
+
+        //            }
+
+        //        }
+
+        //        //MessageBox.Show("Count"+myDataSet[0])
+        //        //  MessageBox.Show("Count the value = " + dataCheckList.Count+" , value = "+dataCheckList[0]);
+        //    }
+        //}
+        //    //}
+        //    //catch (Exception ex)
+        //    //{
+        //    //    MessageBox.Show(ex.Message);
+        //    //}
+
+
+
+        //    return mainControllerList;
+        //}
 
 
 
@@ -2552,19 +2622,20 @@ namespace WFA_psychometric_chart
                 */
                 string path = databasePath;  //@"C:\Folder1\Folder2\Folder3\Folder4";
                 string newPath = Path.GetFullPath(Path.Combine(path, @"..\"));
-                string againDbPath = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + newPath + "" + BuildingSelected[0].Building_Path;
+                //string againDbPath = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + newPath + "" + BuildingSelected[0].Building_Path;
+                string againDbPath = @"Data Source=" + newPath + "" + BuildingSelected[0].Building_Path;
 
-               // MessageBox.Show("Path to building = " + againDbPath);
+                // MessageBox.Show("Path to building = " + againDbPath);
 
 
                 try
                 {
-                    using (OleDbConnection conn = new OleDbConnection(againDbPath))
+                    using (SQLiteConnection conn = new SQLiteConnection(againDbPath))
                     {
-                        using (OleDbCommand cmd = new OleDbCommand(sql, conn))
+                        using (SQLiteCommand cmd = new SQLiteCommand(sql, conn))
                         {
                             conn.Open();
-                            OleDbDataReader reader = cmd.ExecuteReader();
+                            SQLiteDataReader reader = cmd.ExecuteReader();
                             while (reader.Read())
                             {
                                 dataCheckList.Add((bool)reader["Online_Status"]);
@@ -2600,6 +2671,7 @@ namespace WFA_psychometric_chart
             public double presentValue { get; set; }
             public uint indexID { get; set; }
             public string device_object_name { get; set; }
+            public string object_identifier_type { get; set; }
         }
         public List<parameter_class1> parameterValFromBacnet = new List<parameter_class1>();
 
@@ -2657,27 +2729,97 @@ namespace WFA_psychometric_chart
                             {
                                 device_object_name = bac.device_object_name,
                                 indexID = bac.indexID,
-                                presentValue = bac.presentValue
+                                presentValue = bac.presentValue ,
+                                object_identifier_type = bac.object_identifier_type
+
 
                             });
                           //  s += bac.device_object_name + "," + bac.presentValue + "\n";
                         }
-                       
 
-                  //  MessageBox.Show("value = " + s);
 
-                    //Now that we have the parameter list lets display the list in the combobox...
-                    // string s = "";
-                    foreach (var item in parameterValFromBacnet)
-                    {
-                        CB_param_temp.Items.Add(item.device_object_name + ":" + item.indexID);
-                        CB_param_hum.Items.Add(item.device_object_name + ":" + item.indexID);
-                        // CB_param_enthalpy.Items.Add(item.device_object_name + ":" + item.indexID);
-                        //     s += item.device_object_name + ":" + item.indexID + " value = " + item.presentValue+"\n";
+                        //  MessageBox.Show("value = " + s);
 
-                    }
+                        //Now that we have the parameter list lets display the list in the combobox...
+                        // string s = "";
+                        //foreach (var item in parameterValFromBacnet)
+                        //{
+                        //    CB_param_temp.Items.Add(item.device_object_name + ":" + item.indexID);
+                        //    CB_param_hum.Items.Add(item.device_object_name + ":" + item.indexID);
+                        //    // CB_param_enthalpy.Items.Add(item.device_object_name + ":" + item.indexID);
+                        //    //     s += item.device_object_name + ":" + item.indexID + " value = " + item.presentValue+"\n";
 
-                    CB_param_temp.Enabled = true;
+                        //}
+
+                        //======================Temperature and humidity filtering here========================//
+                        //**************************First Temperature filtering*******************************//
+
+
+                        //--Here we need to scan form th    e  T3000 database and then publish the list which is there 
+                        /*
+                        Task :
+                        1.Read the data from the alex db 
+                        2.Find only TEMPERATURE VALUE
+                        3.Filter and display only temperature values
+                        */
+                        Form1_main f = new Form1_main();
+                        string path_to_alexdb = f.PathToT3000BuildingDB;// PathToT3000BuildingDB;
+                        ReadDataFromAlexDatabase("INPUTable");
+
+
+                        //--Now the actual temperature filtering Starts here========================//
+                        //--This only filteres temperature inside alex db 
+                        FilterOnlyTemperatureAndHumidityFromAlexDBValue();//Returns FilteredTemperatureValueList as a result
+
+                        //--Returns AfterFilteringFromAlexValueListOfValues
+                        FilterDataForDisplayInList();//Filteres value form alex db and give new value to insert to list teurns:AfterFilteringFromAlexValueListOfValues
+
+
+                        foreach (var item in AfterFilteringFromAlexValueListOfValues)
+                        {
+                            CB_param_temp.Items.Add(item.device_object_name + ":" + item.indexID + "[Value = " + item.presentValue + "]");
+                            // CB_param_hum.Items.Add(item.device_object_name + ":" + item.indexID);
+                            //  CB_param_enthalpy.Items.Add(item.device_object_name + ":" + item.indexID);
+                            // s += item.device_object_name + ":" + item.indexID + " value = " + item.presentValue+"\n";
+
+                        }
+
+
+
+
+                        //*************************End of temperature filtering****************************//
+                        //************************Humidity Filtering***************************************//
+
+
+
+                        //--This only filteres temperature inside alex db 
+                        FilterOnlyHumidityFromAlexDBValue();//Returns FilteredTemperatureValueList as a result
+
+                        //--Returns AfterFilteringFromAlexValueListOfValues
+                        FilterDataForDisplayInListForHumidity();//Filteres value form alex db and give new value to insert to list teurns:AfterFilteringFromAlexValueListOfValues
+
+
+                        foreach (var item in AfterFilteringFromAlexValueListOfValuesForHumidityOnly)
+                        {
+                            //CB_param_temp.Items.Add(item.device_object_name + ":" + item.indexID + "[" + item.presentValue + "]");
+                            CB_param_hum.Items.Add(item.device_object_name + ":" + item.indexID + "[Value = " + item.presentValue + "]");
+
+
+                            // CB_param_hum.Items.Add(item.device_object_name + ":" + item.indexID);
+                            //  CB_param_enthalpy.Items.Add(item.device_object_name + ":" + item.indexID);
+                            // s += item.device_object_name + ":" + item.indexID + " value = " + item.presentValue+"\n";
+
+                        }
+
+
+
+
+
+                        //************************End of humidity filtering****************************//
+
+
+
+                        CB_param_temp.Enabled = true;
                     CB_param_hum.Enabled = true;
                       //MessageBox.Show("ENd of the true");
                     //TEST
@@ -2697,6 +2839,341 @@ namespace WFA_psychometric_chart
             }
 
         }
+
+
+
+
+        /// <summary>
+        /// Stores the value obtained form hardware and filtered form alex database
+        /// </summary>
+
+        public List<parameter_class1> AfterFilteringFromAlexValueListOfValuesForHumidityOnly = new List<parameter_class1>();
+
+        /// <summary>
+        /// Filters the temperature value form alex database and form 
+        /// Hardware pulled 
+        /// </summary>
+
+        public void FilterDataForDisplayInListForHumidity()
+        {
+            AfterFilteringFromAlexValueListOfValuesForHumidityOnly.Clear();
+
+
+            //--This filters the temperature 
+            if (FilteredHumidityValueList.Count > 0)
+            {
+
+                //--Then we need to filter the values from the dbatabse 
+
+                string test = "";
+                for (int item = 0; item < parameterValFromBacnet.Count; item++)
+                {
+
+
+                    if (parameterValFromBacnet[item].object_identifier_type == "OBJECT_ANALOG_INPUT")
+                    {
+                        int indexToCompare = (int)parameterValFromBacnet[item].indexID;
+                        for (int v = 0; v < FilteredHumidityValueList.Count; v++)
+                        {
+                            if (indexToCompare == int.Parse(FilteredHumidityValueList[v].InputIndex))
+                            {
+                                //--Index is mached we need to compare inser it to new list
+                                //--Lets add the values
+                                //AfterFilteringFromAlexValueListOfValues.GetRange(v, 1);
+                                //AfterFilteringFromAlexValueListOfValues.AddRange()
+                                AfterFilteringFromAlexValueListOfValuesForHumidityOnly.Add(new parameter_class1
+                                {
+                                    indexID = parameterValFromBacnet[item].indexID,
+                                    device_object_name = parameterValFromBacnet[item].device_object_name,
+                                    object_identifier_type = parameterValFromBacnet[item].object_identifier_type,
+                                    presentValue = parameterValFromBacnet[item].presentValue
+                                });
+                                test += "\n" + parameterValFromBacnet[item].indexID + ",val" + parameterValFromBacnet[item].presentValue;
+                                break;//After the value is found break form this loop
+                            }
+
+                        }//Close of if functions
+                    } //--Close of for loop 
+                }
+                // MessageBox.Show("Test for compared value \n " + test);
+
+            }
+
+
+            //MessageBox.Show("value filter form decive and alex tmeperature filter value count = " + AfterFilteringFromAlexValueListOfValues.Count);
+
+        }
+
+
+        // List<T3000DataType> FilteredTemperatureValueList = new List<T3000DataType>();
+        List<T3000DataType> FilteredHumidityValueList = new List<T3000DataType>();
+
+        public void FilterOnlyHumidityFromAlexDBValue()
+        {
+            // FilteredHumidityValueList.Clear();
+            FilteredHumidityValueList.Clear();
+            for (int i = 0; i < InputFromT3000.Count; i++)
+            {
+                // if (InputFromT3000[i].InputUnit == "Deg.C")
+                if (InputFromT3000[i].InputUnit.Contains("%"))
+                {
+                    //--The item is temperature no need to check for humidity
+                    //FilteredTemperatureValueList.Add(new T3000DataType (item));
+                    //----Her problem arised out of bound error
+                    //FilteredTemperatureValueList = InputFromT3000.GetRange(i, 1);  //Copys the items for main list to new list
+
+                    FilteredHumidityValueList.Add(new T3000DataType
+                    {
+                        PanelID = InputFromT3000[i].PanelID,
+                        InputIndex = InputFromT3000[i].InputIndex,
+
+                        InputDescription = InputFromT3000[i].InputDescription,
+                        InputAM = InputFromT3000[i].InputAM,
+
+                        InputValue = InputFromT3000[i].InputValue,
+                        InputUnit = InputFromT3000[i].InputUnit,
+
+                        InputRange = InputFromT3000[i].InputRange,
+                        InputCalibration = InputFromT3000[i].InputCalibration,
+
+
+                        InputCalSign = InputFromT3000[i].InputCalSign,
+                        InputFilter = InputFromT3000[i].InputFilter,
+
+                        InputDecon = InputFromT3000[i].InputDecon,
+                        InputJumper = InputFromT3000[i].InputJumper,
+                        InputLabel = InputFromT3000[i].InputLabel
+
+                    });
+                }
+                //else if (InputFromT3000[i].InputUnit.Contains("%"))
+                //{
+                //    //--This is humidity  
+                //    FilteredHumidityValueList.GetRange(i, 1);
+                //}
+            }
+
+            // MessageBox.Show("Filtered temperature value form alex db should be 3 , count  = " + FilteredHumidityValueList.Count);
+
+        }
+
+
+
+
+        public List<parameter_class1> AfterFilteringFromAlexValueListOfValues = new List<parameter_class1>();
+
+        /// <summary>
+        /// Filters the temperature value form alex database and form 
+        /// Hardware pulled 
+        /// </summary>
+
+        public void FilterDataForDisplayInList()
+        {
+            AfterFilteringFromAlexValueListOfValues.Clear();
+
+
+            //--This filters the temperature 
+            if (FilteredTemperatureValueList.Count > 0)
+            {
+
+                //--Then we need to filter the values from the dbatabse 
+
+                string test = "";
+                for (int item = 0; item < parameterValFromBacnet.Count; item++)
+                {
+
+
+                    if (parameterValFromBacnet[item].object_identifier_type == "OBJECT_ANALOG_INPUT")
+                    {
+                        int indexToCompare = (int)parameterValFromBacnet[item].indexID;
+                        for (int v = 0; v < FilteredTemperatureValueList.Count; v++)
+                        {
+                            if (indexToCompare == int.Parse(FilteredTemperatureValueList[v].InputIndex))
+                            {
+                                //--Index is mached we need to compare inser it to new list
+                                //--Lets add the values
+                                //AfterFilteringFromAlexValueListOfValues.GetRange(v, 1);
+                                //AfterFilteringFromAlexValueListOfValues.AddRange()
+                                AfterFilteringFromAlexValueListOfValues.Add(new parameter_class1
+                                {
+                                    indexID = parameterValFromBacnet[item].indexID,
+                                    device_object_name = parameterValFromBacnet[item].device_object_name,
+                                    object_identifier_type = parameterValFromBacnet[item].object_identifier_type,
+                                    presentValue = parameterValFromBacnet[item].presentValue
+                                });
+                                // test += "\n" + parameterValFromBacnet[item].indexID + ",val" + parameterValFromBacnet[item].presentValue;
+                                break;//After the value is found break form this loop
+                            }
+
+                        }//Close of if functions
+                    } //--Close of for loop 
+                }
+                //   MessageBox.Show("Test for compared value \n " + test);
+
+            }
+
+
+            //  MessageBox.Show("value filter form decive and alex tmeperature filter value count = " + AfterFilteringFromAlexValueListOfValues.Count);
+
+        }
+
+
+
+        List<T3000DataType> FilteredTemperatureValueList = new List<T3000DataType>();
+        //  List<T3000DataType> FilteredHumidityValueList = new List<T3000DataType>();
+
+        public void FilterOnlyTemperatureAndHumidityFromAlexDBValue()
+        {
+            // FilteredHumidityValueList.Clear();
+            FilteredTemperatureValueList.Clear();
+            for (int i = 0; i < InputFromT3000.Count; i++)
+            {
+                if (InputFromT3000[i].InputUnit == "Deg.C")
+                {
+                    //--The item is temperature no need to check for humidity
+                    //FilteredTemperatureValueList.Add(new T3000DataType (item));
+                    //----Her problem arised out of bound error
+                    //FilteredTemperatureValueList = InputFromT3000.GetRange(i, 1);  //Copys the items for main list to new list
+
+                    FilteredTemperatureValueList.Add(new T3000DataType
+                    {
+                        PanelID = InputFromT3000[i].PanelID,
+                        InputIndex = InputFromT3000[i].InputIndex,
+
+                        InputDescription = InputFromT3000[i].InputDescription,
+                        InputAM = InputFromT3000[i].InputAM,
+
+                        InputValue = InputFromT3000[i].InputValue,
+                        InputUnit = InputFromT3000[i].InputUnit,
+
+                        InputRange = InputFromT3000[i].InputRange,
+                        InputCalibration = InputFromT3000[i].InputCalibration,
+
+
+                        InputCalSign = InputFromT3000[i].InputCalSign,
+                        InputFilter = InputFromT3000[i].InputFilter,
+
+                        InputDecon = InputFromT3000[i].InputDecon,
+                        InputJumper = InputFromT3000[i].InputJumper,
+                        InputLabel = InputFromT3000[i].InputLabel
+
+                    });
+                }
+                //else if (InputFromT3000[i].InputUnit.Contains("%"))
+                //{
+                //    //--This is humidity  
+                //    FilteredHumidityValueList.GetRange(i, 1);
+                //}
+            }
+
+            // MessageBox.Show("Filtered temperature value form alex db should be 3 , count  = "+FilteredTemperatureValueList.Count);
+
+        }
+
+
+
+        public class T3000DataType
+        {
+            public string PanelID { get; set; }
+            public string InputIndex { get; set; }
+            public string InputDescription { get; set; }
+
+            public string InputAM { get; set; }
+            public string InputValue { get; set; }
+            public string InputUnit { get; set; }
+
+            public string InputRange { get; set; }
+            public string InputCalibration { get; set; }
+            public string InputCalSign { get; set; }
+
+            public string InputFilter { get; set; }
+            public string InputDecon { get; set; }
+            public string InputJumper { get; set; }
+            public string InputLabel { get; set; }
+
+        }
+        List<T3000DataType> InputFromT3000 = new List<T3000DataType>();
+
+        /// <summary>
+        ///       
+        /// Read the data from alex db ..
+        /// This will be loaded when first loaded values        
+        /// </summary>
+        /// <param name="databasePathWithFileName">DB path path to Inputables tableie. [buildingname].db path in alex db</param>
+        /// <param name="TableName">name of the table i.2 inputables</param>
+
+        public void ReadDataFromAlexDatabase(string TableName)
+        {
+            //--Now lets start reading the data from alex database
+            InputFromT3000.Clear();
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            // string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            //  string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            string path = databasePath;  //@"C:\Folder1\Folder2\Folder3\Folder4";
+            //string newPath = Path.GetFullPath(Path.Combine(path, @"..\"));
+            ////string againDbPath = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + newPath + @"Database\T3000.mdb";
+            //// string againDbPath = @"Data Source=" + newPath + @"Database\T3000.db;Version=3;";
+            //string againDbPath = @"Data Source=" + databasePathWithFileName + ";Version=3;";
+
+            string newPath = Path.GetFullPath(Path.Combine(path, @"..\"));
+            //  string againDbPath = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + newPath + "" + BuildingSelected[0].Building_Path;
+            string againDbPath = @"Data Source=" + newPath + "" + BuildingSelected[0].Building_Path;
+
+
+            // MessageBox.Show("aLEX DB PATH : INPUTable New path : " + againDbPath+"\n db name  = "+TableName);
+            // bool returnValue = false;
+            //string latValue = "";
+            using (SQLiteConnection connection = new SQLiteConnection(againDbPath))
+            {
+                connection.Open();
+                SQLiteDataReader reader = null;
+                string queryString = "SELECT * from  " + TableName; //Building WHERE Default_SubBuilding = -1 ";//-1 or True  can be used
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+
+                reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+
+                    InputFromT3000.Add(new T3000DataType
+                    {
+                        //Main_BuildingName = reader["Main_BuildingName"].ToString(),
+                        //Building_Name = reader["Building_Name"].ToString(),
+                        //Building_Path = reader["Building_Path"].ToString()
+
+                        PanelID = reader["PanelID"].ToString(),
+                        InputIndex = reader["InputIndex"].ToString(),
+
+                        InputDescription = reader["InputDescription"].ToString(),
+                        InputAM = reader["InputAM"].ToString(),
+
+                        InputValue = reader["InputValue"].ToString(),
+                        InputUnit = reader["InputUnit"].ToString(),
+
+                        InputRange = reader["InputRange"].ToString(),
+                        InputCalibration = reader["InputCalibration"].ToString(),
+
+
+                        InputCalSign = reader["InputCalSign"].ToString(),
+                        InputFilter = reader["InputFilter"].ToString(),
+
+                        InputDecon = reader["InputDecon"].ToString(),
+                        InputJumper = reader["InputJumper"].ToString(),
+                        InputLabel = reader["InputLabel"].ToString()
+
+                    });
+
+
+
+                }
+            }
+
+            // MessageBox.Show("All data form alex db count = " + InputFromT3000.Count);
+
+        }
+
+
+
 
         //Don't use System.Window.Timer
         private System.Timers.Timer _Timer = null;
@@ -2775,18 +3252,37 @@ namespace WFA_psychometric_chart
                     ///WE NEED TO REENABLE BOTH DORPDOWN IE FOR TEMP AND HUM IF THE SYSTEM IS ONLINE
                     //temp
                     //  string s = "";
-                    parameterValFromBacnet.Clear();
-                    foreach (var bac in db.parameterListValue)
-                    {
-                        parameterValFromBacnet.Add(new parameter_class1
-                        {
-                            device_object_name = bac.device_object_name,
-                            indexID = bac.indexID,
-                            presentValue = bac.presentValue
+                    //parameterValFromBacnet.Clear();
+                    //foreach (var bac in db.parameterListValue)
+                    //{
+                    //    parameterValFromBacnet.Add(new parameter_class1
+                    //    {
+                    //        device_object_name = bac.device_object_name,
+                    //        indexID = bac.indexID,
+                    //        presentValue = bac.presentValue ,
+                    //        object_identifier_type = bac.object_identifier_type
 
-                        });
-                        // s += bac.device_object_name + "," + bac.presentValue;
-                    }
+                    //    });
+                    //    // s += bac.device_object_name + "," + bac.presentValue;
+                    //}
+
+
+
+                    //Reading values for temperature and humidity 
+                    double temperatureValue = 0;
+                    double humidityValue = 0;
+
+                    //==For Temperature 
+
+
+
+
+                    //==For humidity====
+
+
+
+
+
 
                     //MessageBox.Show()
                     // MessageBox.Show("count everytime " + parameterValFromBacnet.Count);
@@ -3003,12 +3499,86 @@ namespace WFA_psychometric_chart
         }//Close maine fxn getdatafromparameter
 
 
+       public double hardwareValue1=0;
+       public double hardwareValue2=0;
+
+        public void ReadDataFromDeviceForHumidity(int deviceID, uint hum_panID, string param2_identifier_type)
+        {
+            //lets do some operation regarding the pannel id and stuff
+
+            //then perform this task 
+            try
+            {
+                // uint panID_1 = temp_panID;//0; //uint.Parse(panelID1);
+
+                uint panID_2 = hum_panID;//1;//uint.Parse(panelID2);
+                BACnetClass b = new BACnetClass();
+
+                //for temperature value
+                // b.StartProgramForScanHardware(deviceID, panID_1, param1_identifier_type);
+                // double temperary1 = double.Parse(b.PresentValueFromBacnet.ToString());
+                //tb_temp_panel_value.Text = temp;
+                //For humidity value
+                b.StartProgramForScanHardware(deviceID, panID_2, param2_identifier_type);
+                double temperary2 = double.Parse(b.PresentValueFromBacnet.ToString());
+                //tb_hum_panel_value.Text = humidity;
+                //hardwareValue1 = temperary1;//--This value contains the temperature values
+                hardwareValue2 = temperary2; //This one is humidity
+                //lets store these two values in a temporary list
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+
+            }
+
+        }
+
+        public void ReadDataFromDeviceForTemperature(int deviceID, uint temp_panID, string param1_identifier_type)
+        {
+            //lets do some operation regarding the pannel id and stuff
+
+            //then perform this task 
+            try
+            {
+                uint panID_1 = temp_panID;//0; //uint.Parse(panelID1);
+
+                // uint panID_2 = hum_panID;//1;//uint.Parse(panelID2);
+                BACnetClass b = new BACnetClass();
+
+                //for temperature value
+                b.StartProgramForScanHardware(deviceID, panID_1, param1_identifier_type);
+                double temperary1 = double.Parse(b.PresentValueFromBacnet.ToString());
+                //tb_temp_panel_value.Text = temp;
+                //For humidity value
+                //  b.StartProgramForScanHardware(deviceID, panID_2, param2_identifier_type);
+                //double temperary2 = double.Parse(b.PresentValueFromBacnet.ToString());
+                //tb_hum_panel_value.Text = humidity;
+                hardwareValue1 = temperary1;  //--This one is temperature 
+                                              // hardwareValue2 = temperary2;
+                                              //lets store these two values in a temporary list
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+
+            }
+
+        }
+
+
+
         private void CB_param_temp_SelectedIndexChanged(object sender, EventArgs e)
         {
             if(CB_param_temp.SelectedIndex >= 0)
-            { 
-            //on this index is selected the value should be displayed to text box
-            tb_temp_panel_value.Text = parameterValFromBacnet[CB_param_temp.SelectedIndex].presentValue.ToString() ;
+            {
+
+                //AfterFilteringFromAlexValueListOfValues 
+                //on this index is selected the value should be displayed to text box
+                //tb_temp_panel_value.Text = parameterValFromBacnet[CB_param_temp.SelectedIndex].presentValue.ToString() ;
+                tb_temp_panel_value.Text = AfterFilteringFromAlexValueListOfValues[CB_param_temp.SelectedIndex].presentValue.ToString();
 
                 //lets set the timer
                 //first if the timer is already set then stop that and start new ...
@@ -3045,8 +3615,8 @@ namespace WFA_psychometric_chart
             if (CB_param_hum.SelectedIndex >= 0)
             {
 
-                tb_hum_panel_value.Text = parameterValFromBacnet[CB_param_hum.SelectedIndex].presentValue.ToString();
-
+                //tb_hum_panel_value.Text = parameterValFromBacnet[CB_param_hum.SelectedIndex].presentValue.ToString();
+                tb_hum_panel_value.Text = AfterFilteringFromAlexValueListOfValuesForHumidityOnly[CB_param_hum.SelectedIndex].presentValue.ToString();
                 parameterID_ForHum = CB_param_hum.SelectedIndex;//Setting the index value for constant update
                 if (flagForTimer == 1)
                 {

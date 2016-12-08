@@ -7591,25 +7591,47 @@ namespace WFA_psychometric_chart
                 //"            " + sequenceDetected + " \n" + @"                 "+ temporaryNodeValueStoreForRedrawLine[0].name + "             end 
                 //" + "Temp         :" + Math.Round(temporaryNodeValueStoreForRedrawLine[0].xVal, 2) + "               " + Math.Round(temporaryNodeValueStoreForRedrawLine[1].xVal, 2) + "\nHumidity :" + startHumidity1 + "           " + endHumidity1 + WFA_psychometric_chart.Properties.Resources._Enthalpy + startEnthalpy1 + "           " + endEnthalpy1 + "\nEnthalpy Change:" + enthalpyChange;
 
-                string FirstLine = @"|                                        | " + "Units             | " + temporaryNodeValueStoreForRedrawLine[0].name + "                        |" + temporaryNodeValueStoreForRedrawLine[1].name;
-                string SecondLine = @"DBT                                  |" + "\x00B0 C                  |" + Math.Round(temporaryNodeValueStoreForRedrawLine[0].xVal, 2) + "                       |" + Math.Round(temporaryNodeValueStoreForRedrawLine[1].xVal, 2);
-                string ThirdLine = @"Relative Humidity          |" + "%                    |" + startHumidity1 + "                      |" + endHumidity1;
-                string FourthLine = @"Humidity Ratio               |" + "Kg/Kg dryair |" + Math.Round(temporaryNodeValueStoreForRedrawLine[0].yVal, 2) + "                       |" + Math.Round(temporaryNodeValueStoreForRedrawLine[1].yVal, 2);
-                string FifthLine = "Volume Flow Rate           |" + "m\xB3/s             |" + Math.Round(temporaryNodeValueStoreForRedrawLine[0].airFlow, 2) + "                          |" + Math.Round(temporaryNodeValueStoreForRedrawLine[1].airFlow, 2);
 
-                string SixthLine = "Specific Volume              |" + "m\xB3/Kg         |" + startSpecificVolume1 + "                          |" + endSpecificVolume1;
+                string ZeroLine = "Process:  " + name + " ";
+                string FirstLine = @"Parameters                      " + "Units               " + temporaryNodeValueStoreForRedrawLine[0].name + "                  " + temporaryNodeValueStoreForRedrawLine[1].name;
+                string SecondLine = @"DBT                                   " + "\x00B0 C                   " + Math.Round(temporaryNodeValueStoreForRedrawLine[0].xVal, 2) + "                           " + Math.Round(temporaryNodeValueStoreForRedrawLine[1].xVal, 2);
+                string ThirdLine = @"Relative Humidity           " + "%                     " + startHumidity1 + "                     " + endHumidity1;
+                string FourthLine = @"Humidity Ratio                " + "Kg/Kg dryair  " + Math.Round(temporaryNodeValueStoreForRedrawLine[0].yVal, 2) + "                       " + Math.Round(temporaryNodeValueStoreForRedrawLine[1].yVal, 2);
+                string FifthLine = "Volume Flow Rate           " + "m\xB3/s                " + Math.Round(temporaryNodeValueStoreForRedrawLine[0].airFlow, 2) + "                      " + Math.Round(temporaryNodeValueStoreForRedrawLine[1].airFlow, 2);
+
+                string SixthLine = "Specific Volume              " + "m\xB3/Kg             " + startSpecificVolume1 + "                    " + endSpecificVolume1;
                 double massFlowRate1 = temporaryNodeValueStoreForRedrawLine[0].airFlow / startSpecificVolume1;
                 double massFlowRate2 = temporaryNodeValueStoreForRedrawLine[1].airFlow / endSpecificVolume1;
 
-                string SeventhLine = @"Mass flow rate(dry air)   |" + "Kg(dry air)/s|" +Math.Round(massFlowRate1,2) + "                         |" +Math.Round( massFlowRate2,2);
-                string EighthLine = @"Enthalpy                          |" + "KJ/Kg         |" + startEnthalpy1 + "                       | " + endEnthalpy1;
+                string SeventhLine = @"Mass flow rate(dry air)   " + "Kg(dry air)/s   " +Math.Round(massFlowRate1,2) + "                        " +Math.Round( massFlowRate2,2);
+                string EighthLine = @"Enthalpy                           " + "KJ/Kg              " + startEnthalpy1 + "                       " + endEnthalpy1;
                 double totalEnthalpyFlow1 = massFlowRate1 * startEnthalpy1;
                 double totalEnthalpyFlow2 = massFlowRate2 * endEnthalpy1;
-                string NinthLine = @"Total Enthalpy Flow        |" + "KJ/s          |" +Math.Round( totalEnthalpyFlow1,2) + "                       | " +Math.Round( totalEnthalpyFlow2,2);
+                string NinthLine = @"Total Enthalpy Flow         " + "KJ/s                " +Math.Round( totalEnthalpyFlow1,2) + "                      " +Math.Round( totalEnthalpyFlow2,2);
                 double heatChange = totalEnthalpyFlow2 - totalEnthalpyFlow1;
-                string TenthLine = @"Heat Change                 |" + "KW             |" +Math.Round(heatChange,2) + "                     ";
-                tooltipString = FirstLine + "\n" + SecondLine + "\n" + ThirdLine + "\n" + FourthLine + "\n" + FifthLine + "\n" + SixthLine + "\n" + SeventhLine + "\n" + EighthLine + "\n" + NinthLine + "\n" + TenthLine;
+                string TenthLine = @"Heat Change                    " + "KW                  " +Math.Round(heatChange,2) + "                     ";
+                tooltipString = ZeroLine+"\n"+ FirstLine + "\n" + SecondLine + "\n" + ThirdLine + "\n" + FourthLine + "\n" + FifthLine + "\n" + SixthLine + "\n" + SeventhLine + "\n" + EighthLine + "\n" + NinthLine + "\n" + TenthLine;
 
+
+                //===============This one is for datatable======================================================//
+                //DataTable table = new DataTable();
+                //table.Columns.Add("Parameters", typeof(string));
+                //table.Columns.Add("Units", typeof(string));
+                //table.Columns.Add(temporaryNodeValueStoreForRedrawLine[0].name.ToString(), typeof(string));
+                //table.Columns.Add(temporaryNodeValueStoreForRedrawLine[1].name.ToString(), typeof(string));
+
+                //table.Rows.Add("DBT", "\x00B0 C", Math.Round(temporaryNodeValueStoreForRedrawLine[0].xVal, 2).ToString(), Math.Round(temporaryNodeValueStoreForRedrawLine[1].xVal, 2).ToString());
+                //table.Rows.Add("Relative Humidity", "%  ", startHumidity1.ToString(), endHumidity1.ToString());
+                //table.Rows.Add("Humidity Ratio", "Kg/Kg dryair", Math.Round(temporaryNodeValueStoreForRedrawLine[0].yVal, 2).ToString(), Math.Round(temporaryNodeValueStoreForRedrawLine[1].yVal, 2).ToString());
+                //table.Rows.Add("Volume flow rate", "m\xB3/s ", Math.Round(temporaryNodeValueStoreForRedrawLine[0].airFlow, 2).ToString(), Math.Round(temporaryNodeValueStoreForRedrawLine[1].airFlow, 2).ToString());
+                //table.Rows.Add("Sp. Volume", "m\xB3/Kg", startSpecificVolume1.ToString(), endSpecificVolume1.ToString());
+                //table.Rows.Add("Mass Flow rate(dry air)", "Kg(dry air)/s", Math.Round(massFlowRate1, 2).ToString(), Math.Round(massFlowRate2, 2).ToString());
+                //table.Rows.Add("Enthalpy", "KJ/Kg ", startEnthalpy1.ToString(), endEnthalpy1.ToString());
+                //table.Rows.Add("Total Energy Flow", "KJ/s", Math.Round(totalEnthalpyFlow1, 2).ToString(), Math.Round(totalEnthalpyFlow2, 2).ToString());
+                //table.Rows.Add("Heat Change", "KW ", Math.Round(heatChange, 2).ToString(), "");
+               // MessageBox.Show("Table \n" + table.Columns[2].Rows[3].ToString());
+                //tooltipString = table.ToString();
+                 //================================datatable close==============================================//
                 if (chart1.InvokeRequired) {
 
                     chart1.Invoke(new Action(() => newLineSeries.ToolTip = tooltipString));
