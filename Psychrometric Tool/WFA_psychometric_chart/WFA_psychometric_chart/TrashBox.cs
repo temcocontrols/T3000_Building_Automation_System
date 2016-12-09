@@ -83,8 +83,10 @@ namespace WFA_psychometric_chart
                         dataGridView1.Rows[i].Cells["Count"].Value = ++xCount;//chartDetailList[i].;
                         dataGridView1.Rows[i].Cells["chartID"].Value = chartDetailListForDissabledValue[i].chartID; //++xCount;//chartDetailList[i].;
                         dataGridView1.Rows[i].Cells["ChartName"].Value = chartDetailListForDissabledValue[i].chartName;
-                       // dataGridView1.Rows[i].Cells["RestoreChartCheckBox"].Value = "";
-                       // MessageBox.Show("entered " + i);
+                        dataGridView1.Rows[i].Cells["chart_respective_nodeID"].Value = chartDetailListForDissabledValue[i].chart_respective_nodeID;
+                        dataGridView1.Rows[i].Cells["chart_respective_lineID"].Value = chartDetailListForDissabledValue[i].chart_respective_lineID;
+                        // dataGridView1.Rows[i].Cells["RestoreChartCheckBox"].Value = "";
+                        // MessageBox.Show("entered " + i);
                     }
                 }
             }//--if close
@@ -256,6 +258,106 @@ namespace WFA_psychometric_chart
             }
 
         }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            //--This function deletes permanently the values form the database
+
+            if (MessageBox.Show("Are you sure you want to delete this chart Permanently?", "Delete chart Permanently", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
+           
+            {
+
+                if (dataGridView1.RowCount <= 0)
+                {
+                    //--If there is no data don't need to do futher processing
+                    return;
+                }
+
+                //--Delete function 
+                //--This is the delete operation for the handler.....
+                /*
+                Steps: 1. delete the row  of the table using the id portion.
+                2. Delete the corresponding tables related to the row.             
+                */
+
+                //=========================================================This code is commented for not deleting the values===============//
+
+                ArrayList arrList = new ArrayList();
+                for (int i = 0; i < dataGridView1.RowCount; i++)
+                {
+                    //--In rows we are looping .
+                    if (Convert.ToBoolean(dataGridView1.Rows[i].Cells[3].Value)) //Will be true if checkedd  
+                    {
+                        arrList.Add(i);//Lets add the index value
+
+                    }
+                }
+
+
+                for (int i = 0; i < arrList.Count; i++)
+                {
+                    //Now lets delete all the chart values
+                    int indexVal = int.Parse(arrList[i].ToString());
+                    deleteChartAndItsContent(dataGridView1.Rows[indexVal].Cells[1].Value.ToString(), dataGridView1.Rows[indexVal].Cells[4].Value.ToString(), dataGridView1.Rows[indexVal].Cells[5].Value.ToString());
+                }
+
+                this.Close();
+            }//close of the chart delete
+
+        }
+
+
+        public void deleteChartAndItsContent(string chartID1,string chart_resp_nodeid,string chart_resp_lineID)
+        {
+
+            //if (dataGridView1.CurrentCell.RowIndex > -1 && dataGridView1.CurrentCell.RowIndex < f1.chartDetailList.Count)//Header is selected..
+            if (dataGridView1.CurrentCell.RowIndex > -1)//Header is selected..
+            {
+                //int selectedItemIndex = index;//dataGridView1.CurrentCell.RowIndex; //int.Parse(dataGridView1.Rows[indexSelectedForDeletion].Cells[0].Value.ToString());
+
+                //we need to find the corresponding tables for deletion.
+
+                //int id = selectedItemIndex;
+
+                string chartID = chartID1;//f1.chartDetailList[selectedItemIndex].chartID;
+                string chart_respective_node_ID = chart_resp_nodeid; //f1.chartDetailList[selectedItemIndex].chart_respective_nodeID;
+                string chart_respective_line_ID = chart_resp_lineID;//f1.chartDetailList[selectedItemIndex].chart_respective_lineID;
+                //First read the node values for particular chart 
+                f1.ReadNodeInfoToDelete(chart_respective_node_ID);
+
+                //For all node delete the device list
+                if (f1.deleteNodeDetailList.Count > 0)
+                {
+                    //if there is data then delete the device infor
+                    foreach (var item in f1.deleteNodeDetailList)
+                    {
+                        if ((item.temperature_source == "Device")||(item.humidity_source == "Device"))
+                        {
+                            f1.DeleteNodeDeviceInfo(item.id);
+                        }
+                    }
+                }
+
+                //After this deletion lets delete the line info
+                f1.DeleteLine(chart_respective_line_ID);//This deletes the line
+
+                //now delete comfort zone..
+                f1.DeleteComfortZoneSettingForChart(chartID);
+
+                //now delete the node value
+                f1.DeleteNode(chart_respective_node_ID);
+
+                //Delete the mix node info
+                f1.DeleteMixNodeInfo(chartID);
+
+                //Now delete the chart itself
+                f1.DeleteChart(chartID);
+
+
+            }//Close of if
+
+        }
+
 
     }
 }

@@ -187,7 +187,7 @@ namespace WFA_psychometric_chart
             public string object_identifier_type { get; set; }
         }
         
-     public   static List<parameter_class> ReadParameterUsingBacnetID(int bacnetid)
+     public   static List<parameter_class> ReadParameterUsigBacnetID(int bacnetid)
         {
           
                 List<parameter_class> parameterList = new List<parameter_class>();

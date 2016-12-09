@@ -138,14 +138,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="WFA_psychometric_chart.exe" size="1478088">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="WFA_psychometric_chart.exe" size="1569224">
       <assemblyIdentity name="WFA_psychometric_chart" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>KsPaJet2iYV4xWc6QIoKmnvnfbihbu0APYVBPcHWpg0=</dsig:DigestValue>
+        <dsig:DigestValue>K8vbmBVFMZa7vPjhYF+i+dknWfvB5M8e8ciKsXQcWAE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -157,7 +157,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>HywZXfcMjWzrvkYZaPzbje2pWTdOpEjz0EUt41exMa4=</dsig:DigestValue>
+        <dsig:DigestValue>GmR/WSsP9KOgel1yWkGF+oMN5Iit+PBgNkxb9QZ1EGM=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -169,7 +169,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>vtPojYP+dRyPgel+0zRtbUYnhpZydjt3y+N7uuZKX2g=</dsig:DigestValue>
+        <dsig:DigestValue>sPAjHlte15+RQPC+ezJf5QODp8k+OUt4kqNPzvpPrNU=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -181,7 +181,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>b0EX5iPOt3BOa/xBWGKxXSjLyJ1FognGfm4tfQMiGLw=</dsig:DigestValue>
+        <dsig:DigestValue>O1eO1jK6VU+HUJkBDzwZ4Si7uS9Zu9j7f9SaYPz8QHY=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

@@ -336,6 +336,20 @@ namespace WFA_psychometric_chart
             //dataGridView1.Rows[bcs.menuStripNodeInfoValues.Count].Visible = false;
             dataGridView1.AllowUserToAddRows = false;
             dataGridView2.AllowUserToAddRows = false;
+            //--This one is for speical characters print in process energy calculation
+            lb_unit_degCelcius.Text = "\x00B0 C";
+            lb_unit_vol_flow_rate.Text = "m\xB3/s";
+            lb_unit_sp_vol.Text = "m\xB3/Kg";
+
+            if (dataGridView2.Rows.Count > 0)  //If there is data then only do this one
+            {
+                //set parameters of your event args
+                var eventArgs = new DataGridViewCellEventArgs(1, 0);
+                // or setting the selected cells manually before executing the function
+                dataGridView2.Rows[0].Cells[1].Selected = true;
+                dataGridView2_CellClick(sender, eventArgs);
+            }
+
         }
 
 
@@ -1382,7 +1396,219 @@ namespace WFA_psychometric_chart
 
             }
 
+            //==Cell clicked function is triggered
+            DataGridViewRow row = dataGridView2.Rows[e.RowIndex];
+            EnergyCalculationForProcess(row);//SELECTED ROW
+
         }
+
+        public void EnergyCalculationForProcess(DataGridViewRow dgv_row)
+        {
+            //now lets calculate every parameters...
+            string id = dgv_row.Cells[0].Value.ToString();
+            string LineName= dgv_row.Cells[1].Value.ToString();
+            Color LineColorValue = dgv_row.Cells[4].Style.BackColor;//dgv_row.Cells[1].Value.ToString();
+            string prevNodeID = dgv_row.Cells[6].Value.ToString();
+            string nextNodeID = dgv_row.Cells[7].Value.ToString();
+            Series lineseriesID = new Series(dgv_row.Cells[8].Value.ToString());
+            int thickness =int.Parse(dgv_row.Cells[5].Value.ToString());
+
+
+            CalculateProcessParameterForEnergy(id, prevNodeID, nextNodeID, lineseriesID, LineColorValue, thickness, LineName);
+
+        }
+
+        public class TempDataType1
+        {
+            public string id { get; set; } //--for identifying which point is selected..
+            public double xVal { get; set; }//--this is the values that represent the point in a chart
+            public double yVal { get; set; }
+            // public string source { get; set; }
+
+            public string temperature_source { get; set; }
+            public string humidity_source { get; set; }
+
+            public string name { get; set; }
+            //public string label { get; set; }
+            public Color colorValue { get; set; }
+            // public string showItemText { get; set; } //--No need now for this one
+            public int marker_Size { get; set; }
+
+            public double airFlow { get; set; }
+            public string lastUpdatedDate { get; set; }
+
+        }
+        List<TempDataType1> temporaryNodeValueStoreForRedrawLine = new List<TempDataType1>();
+        //--Redraw line function
+        public void CalculateProcessParameterForEnergy(string id, string prevNodeID, string nextNodeID, Series lineSeriesID, Color colorVal, int thickness_value, string name)
+        {
+            // lock (this) { 
+
+            // if (incrementIndex > 0)
+            //  if(indexForSeriesNodePoint>0) //This index is resetted later
+
+            //   {
+            temporaryNodeValueStoreForRedrawLine.Clear();//Clearing the values of the list
+                                                         // MessageBox.Show("ReDrawLines FRIST LINE");
+
+
+            double startHumidity1 = 0;
+            double startEnthalpy1 = 0;
+            double endHumidity1 = 0;//--this is for the start and end humidity print in the tooltip
+            double endEnthalpy1 = 0;
+            double startSpecificVolume1 = 0;//--specific volume
+            double endSpecificVolume1 = 0;
+
+
+            /*
+            We need to calculate the previous node id values and the next node id values.
+            */
+            //First for previous node id
+            for (int i = 0; i <bcs.menuStripNodeInfoValues.Count; i++)
+            {
+                if (prevNodeID == bcs.menuStripNodeInfoValues[i].id)
+                {
+                    //This is a node : i.e start end of the node
+                    //We need to store the node every information in 0 index.
+
+                    // temporaryNodeValueStore =  menuStripNodeInfoValues.GetRange(i,1);  //This is for copying the value.
+                    //Copying the values on index 0 assumption 
+                    temporaryNodeValueStoreForRedrawLine.Add(new TempDataType1
+                    {
+                        id = bcs.menuStripNodeInfoValues[i].id,
+                        xVal = bcs.menuStripNodeInfoValues[i].xVal,
+                        yVal = bcs.menuStripNodeInfoValues[i].yVal,
+                        // source = menuStripNodeInfoValues[i].source,
+                        temperature_source = bcs.menuStripNodeInfoValues[i].temperature_source,
+                        humidity_source = bcs.menuStripNodeInfoValues[i].humidity_source,
+                        name = bcs.menuStripNodeInfoValues[i].name,
+                        // label = menuStripNodeInfoValues[i].label,
+                        // showItemText = menuStripNodeInfoValues[i].showItemText,
+                        colorValue = bcs.menuStripNodeInfoValues[i].colorValue,
+                        marker_Size = bcs.menuStripNodeInfoValues[i].marker_Size,
+                        airFlow = bcs.menuStripNodeInfoValues[i].airFlow
+
+                    });
+
+                    break;//Break form loop
+                }
+            }
+
+            //Second for the next node id
+            for (int i = 0; i < bcs.menuStripNodeInfoValues.Count; i++)
+            {
+                if (nextNodeID == bcs.menuStripNodeInfoValues[i].id)
+                {
+                    //This is a node : i.e start end of the node
+                    //We need to store the node every information in 0 index.
+
+                    // temporaryNodeValueStore[1].Equals(menuStripNodeInfoValues[i]);
+
+                    //temporaryNodeValueStore = menuStripNodeInfoValues.GetRange(i, 1);
+                    //The index of this values will be temporaryNodeValueStore[1] ==> 1
+                    temporaryNodeValueStoreForRedrawLine.Add(new TempDataType1
+                    {
+                        id = bcs.menuStripNodeInfoValues[i].id,
+                        xVal = bcs.menuStripNodeInfoValues[i].xVal,
+                        yVal = bcs.menuStripNodeInfoValues[i].yVal,
+                        // source = menuStripNodeInfoValues[i].source,
+                        temperature_source = bcs.menuStripNodeInfoValues[i].temperature_source,
+                        humidity_source = bcs.menuStripNodeInfoValues[i].humidity_source,
+                        name = bcs.menuStripNodeInfoValues[i].name,
+                        // label = menuStripNodeInfoValues[i].label,
+                        // showItemText = menuStripNodeInfoValues[i].showItemText,
+                        colorValue = bcs.menuStripNodeInfoValues[i].colorValue,
+                        marker_Size = bcs.menuStripNodeInfoValues[i].marker_Size,
+                        airFlow = bcs.menuStripNodeInfoValues[i].airFlow
+
+                    });
+
+                    break;//Break form loop
+                }
+            }
+
+            if (temporaryNodeValueStoreForRedrawLine.Count > 0)
+            {
+
+                //--this sets the initial values of humidity and enthalpy
+                bcs.CalculateHumidityEnthalpy(temporaryNodeValueStoreForRedrawLine[0].xVal, temporaryNodeValueStoreForRedrawLine[0].yVal);
+                startHumidity1 = Math.Round(bcs.humidityCalculated, 2);
+                startEnthalpy1 = Math.Round(bcs.enthalpyCalculated, 2);
+                startSpecificVolume1 = bcs.SpecificVolumeReturn;
+                //--This calculates the end humidity and the enthalpy values..
+                bcs.CalculateHumidityEnthalpy((double)temporaryNodeValueStoreForRedrawLine[1].xVal, (double)temporaryNodeValueStoreForRedrawLine[1].yVal);
+                endHumidity1 = Math.Round(bcs.humidityCalculated, 2);
+                endEnthalpy1 = Math.Round(bcs.enthalpyCalculated, 2);
+                endSpecificVolume1 = bcs.SpecificVolumeReturn;
+
+                double enthalpyChange = endEnthalpy1 - startEnthalpy1;
+
+                string sequenceDetected = temporaryNodeValueStoreForRedrawLine[0].name + " to " + temporaryNodeValueStoreForRedrawLine[1].name;
+
+              
+               // string tooltipString = "";
+                
+               // string ZeroLine = "Process:  " + name + " ";
+               // string FirstLine = @"Parameters                      " + "Units               " + temporaryNodeValueStoreForRedrawLine[0].name + "                  " + temporaryNodeValueStoreForRedrawLine[1].name;
+               // string SecondLine = @"DBT                                   " + "\x00B0 C                   " + Math.Round(temporaryNodeValueStoreForRedrawLine[0].xVal, 2) + "                           " + Math.Round(temporaryNodeValueStoreForRedrawLine[1].xVal, 2);
+                //string ThirdLine = @"Relative Humidity           " + "%                     " + startHumidity1 + "                     " + endHumidity1;
+                //string FourthLine = @"Humidity Ratio                " + "Kg/Kg dryair  " + Math.Round(temporaryNodeValueStoreForRedrawLine[0].yVal, 2) + "                       " + Math.Round(temporaryNodeValueStoreForRedrawLine[1].yVal, 2);
+                //string FifthLine = "Volume Flow Rate           " + "m\xB3/s                " + Math.Round(temporaryNodeValueStoreForRedrawLine[0].airFlow, 2) + "                      " + Math.Round(temporaryNodeValueStoreForRedrawLine[1].airFlow, 2);
+
+                //string SixthLine = "Specific Volume              " + "m\xB3/Kg             " + startSpecificVolume1 + "                    " + endSpecificVolume1;
+                double massFlowRate1 = temporaryNodeValueStoreForRedrawLine[0].airFlow / startSpecificVolume1;
+                double massFlowRate2 = temporaryNodeValueStoreForRedrawLine[1].airFlow / endSpecificVolume1;
+
+                //string SeventhLine = @"Mass flow rate(dry air)   " + "Kg(dry air)/s   " + Math.Round(massFlowRate1, 2) + "                        " + Math.Round(massFlowRate2, 2);
+                //string EighthLine = @"Enthalpy                           " + "KJ/Kg              " + startEnthalpy1 + "                       " + endEnthalpy1;
+                double totalEnthalpyFlow1 = massFlowRate1 * startEnthalpy1;
+                double totalEnthalpyFlow2 = massFlowRate2 * endEnthalpy1;
+                //string NinthLine = @"Total Enthalpy Flow         " + "KJ/s                " + Math.Round(totalEnthalpyFlow1, 2) + "                      " + Math.Round(totalEnthalpyFlow2, 2);
+                double heatChange = totalEnthalpyFlow2 - totalEnthalpyFlow1;
+                //string TenthLine = @"Heat Change                    " + "KW                  " + Math.Round(heatChange, 2) + "                     ";
+                //tooltipString = ZeroLine + "\n" + FirstLine + "\n" + SecondLine + "\n" + ThirdLine + "\n" + FourthLine + "\n" + FifthLine + "\n" + SixthLine + "\n" + SeventhLine + "\n" + EighthLine + "\n" + NinthLine + "\n" + TenthLine;
+
+
+                lb_process.Text = name;
+                lb_process.ForeColor = colorVal;
+                lb_process.BackColor = Color.White;
+                lb_node_one_name.Text = temporaryNodeValueStoreForRedrawLine[0].name.ToString();
+                lb_node_one_name.ForeColor = temporaryNodeValueStoreForRedrawLine[0].colorValue;
+                lb_node_one_name.BackColor = Color.White;
+
+                lb_node_two_name.Text = temporaryNodeValueStoreForRedrawLine[1].name.ToString();
+                lb_node_two_name.ForeColor = temporaryNodeValueStoreForRedrawLine[1].colorValue;
+                lb_node_two_name.BackColor = Color.White;
+
+                lb_dbt_node1_value.Text = Math.Round(temporaryNodeValueStoreForRedrawLine[0].xVal, 2).ToString();
+                lb_dbt_node2_value.Text = Math.Round(temporaryNodeValueStoreForRedrawLine[1].xVal, 2).ToString();
+                lb_RH_node1_value.Text = startHumidity1.ToString();
+                lb_RH_node2_value.Text = endHumidity1.ToString();
+                lb_HR_node1_value.Text = Math.Round(temporaryNodeValueStoreForRedrawLine[0].yVal, 2).ToString();
+                lb_HR_node2_value.Text = Math.Round(temporaryNodeValueStoreForRedrawLine[1].yVal, 2).ToString();
+                lb_VFR_node1_value.Text = Math.Round(temporaryNodeValueStoreForRedrawLine[0].airFlow, 2).ToString();
+                lb_VFR_node2_value.Text = Math.Round(temporaryNodeValueStoreForRedrawLine[1].airFlow, 2).ToString();
+                lb_SV_node1_value.Text = startSpecificVolume1.ToString();
+                lb_SV_node2_value.Text = endSpecificVolume1.ToString();
+                lb_MFR_node1_value.Text = Math.Round(massFlowRate1, 2).ToString();
+                lb_MFR_node2_value.Text = Math.Round(massFlowRate2, 2).ToString();
+                lb_enthalpy_node1_value.Text = startEnthalpy1.ToString();
+                lb_enthalpy_node2_value.Text = endEnthalpy1.ToString();
+                lb_TEF_node1_value.Text = Math.Round(totalEnthalpyFlow1, 2).ToString();
+                lb_TEF_node2_value.Text = Math.Round(totalEnthalpyFlow2, 2).ToString();
+                lb_HC_value.Text = Math.Round(heatChange, 2).ToString();
+
+
+
+
+
+
+            }//close of temporary node value
+
+            // }//--Close of LOCK
+        }
+
+
 
         /*
         Lets define the datatype first for the same thing
@@ -1392,7 +1618,7 @@ namespace WFA_psychometric_chart
         {
             public string id { get; set; } //--for identifying which point is selected..
             public double xVal { get; set; }//--this is the values that represent the point in a chart
-            //public double yVal { get; set; }
+           // public double yVal { get; set; }
             public double humidity { get; set; } //This humidity need to be converted to yValue...
             public string source { get; set; }
             public string name { get; set; }
@@ -1680,6 +1906,25 @@ namespace WFA_psychometric_chart
 
         }
 
+        private void dataGridView2_SelectionChanged(object sender, EventArgs e)
+        {
+            var cellCopy = dataGridView2.CurrentCell;
+
+            if (cellCopy != null)
+            {
+                if (dataGridView2.CurrentCell.ColumnIndex.ToString() != "" && dataGridView2.CurrentCell.RowIndex.ToString() != "")
+                {
+                    //set parameters of your event args
+                    var eventArgs = new DataGridViewCellEventArgs(dataGridView2.CurrentCell.ColumnIndex, dataGridView2.CurrentCell.RowIndex);
+                    //or setting the selected cells manually before executing the function
+                    dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[dataGridView2.CurrentCell.ColumnIndex].Selected = true;
+                    dataGridView2_CellClick(sender, eventArgs);
+                }
+
+            }
+        }
+
+       
 
         private void dataGridView2_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {

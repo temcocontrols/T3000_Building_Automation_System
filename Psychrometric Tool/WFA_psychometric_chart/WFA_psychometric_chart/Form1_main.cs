@@ -841,7 +841,7 @@ namespace WFA_psychometric_chart
             //==========================For building infor==========//
 
             FindPathOfBuildingDB();
-            MessageBox.Show("Test :Shows path of the building " + BuildingSelected[0].Building_Path + ",Building Name= " + BuildingSelected[0].Building_Name);
+           // MessageBox.Show("Test :Shows path of the building " + BuildingSelected[0].Building_Path + ",Building Name= " + BuildingSelected[0].Building_Name);
             //==========================end of building info========//
 
 
@@ -1456,17 +1456,7 @@ namespace WFA_psychometric_chart
 
                     ///==========================================end of second parameter value==============================//
 
-
-
-
-
-
-
-
-
-
-
-
+   
 
                     //else
                     //{
@@ -1559,9 +1549,40 @@ namespace WFA_psychometric_chart
 
 
 
+            //===========================Redraw the comfortzones as well =======================================//
+
+
+            //MessageBox.Show("Here we are");
+            ReloadComfortZoneForBackGroundWorker();
+
+
+            //==========================End of comfort zone redraw==============================================//
+
+
+
+
+
 
 
         } //Close of the fxn
+
+
+        public void ReloadComfortZoneForBackGroundWorker()
+        {
+            if (listchartComfortZoneInfoSingle.Count > 0)
+            {
+                if(flagShow == 1)
+                { 
+                //Then we need to plot comfort zone 
+                PlotComfortZoneForBackGroundWorker(double.Parse(listchartComfortZoneInfoSingle[0].min_temp), double.Parse(listchartComfortZoneInfoSingle[0].max_temp), double.Parse(listchartComfortZoneInfoSingle[0].min_hum), double.Parse(listchartComfortZoneInfoSingle[0].max_hum), listchartComfortZoneInfoSingle[0].colorValue, listchartComfortZoneInfoSingle[0].name);
+
+                }
+                // flagShow = 1;//lets enable flag
+                // MessageBox.Show("Enable flowshow =1");
+            }
+        }
+
+
 
 
         public class datatypeForT300InputTable
@@ -2523,9 +2544,10 @@ namespace WFA_psychometric_chart
             }
         }
 
+        //public class nodeDataType
 
         //This list holds the detail of the chart to be deleted
-        List<nodeDataType> deleteNodeDetailList = new List<nodeDataType>();
+      public  List<TempDataType> deleteNodeDetailList = new List<TempDataType>();
 
         //Read node Values
         /// <summary>
@@ -2554,19 +2576,34 @@ namespace WFA_psychometric_chart
                 reader = command.ExecuteReader();
                 while (reader.Read())
                 {
-                    deleteNodeDetailList.Add(new nodeDataType
+                    deleteNodeDetailList.Add(new TempDataType
                     {
-                        count = int.Parse(reader["count"].ToString()),
-                        chart_respective_nodeID = reader["chart_respective_nodeID"].ToString(),
-                        nodeID = reader["nodeID"].ToString(),
-                        xValue = double.Parse(reader["xValue"].ToString()),
-                        yValue = double.Parse(reader["yValue"].ToString()),
-                        source = reader["source"].ToString(),
+                        //count = int.Parse(reader["count"].ToString()),
+                        //chart_respective_nodeID = reader["chart_respective_nodeID"].ToString(),
+                        //nodeID = reader["nodeID"].ToString(),
+                        //xValue = double.Parse(reader["xValue"].ToString()),
+                        //yValue = double.Parse(reader["yValue"].ToString()),
+                        //source = reader["source"].ToString(),
+                        //name = reader["name"].ToString(),
+                        //label = reader["label"].ToString(),
+                        //colorValue = reader["colorValue"].ToString(),
+                        //showTextItem = reader["showTextItem"].ToString(),
+                        //nodeSize = int.Parse(reader["nodeSize"].ToString())
+                        id = reader["nodeID"].ToString(), //This is just changed code : bbk305
+                        xVal = double.Parse(reader["xValue"].ToString()),
+                        yVal = double.Parse(reader["yValue"].ToString()),
+                        temperature_source = reader["temperature_source"].ToString(),
+                        humidity_source = reader["humidity_source"].ToString(),
                         name = reader["name"].ToString(),
-                        label = reader["label"].ToString(),
-                        colorValue = reader["colorValue"].ToString(),
-                        showTextItem = reader["showTextItem"].ToString(),
-                        nodeSize = int.Parse(reader["nodeSize"].ToString())
+
+                        // label = reader["label"].ToString(),
+                        colorValue = ColorTranslator.FromHtml(reader["colorValue"].ToString()),
+                        // showItemText = reader["showTextItem"].ToString(),
+                        marker_Size = int.Parse(reader["nodeSize"].ToString()),
+                        airFlow = int.Parse(reader["airFlow"].ToString()),
+                        lastUpdatedDate = reader["lastUpdatedDate"].ToString()
+
+
                     });
                 }
             }//Close of using 
@@ -2619,6 +2656,28 @@ namespace WFA_psychometric_chart
 
             }//Close of using 
         }
+
+        public void DeleteMixNodeInfo(string chartID)
+        {
+            string tableName = "tbl_" + selectedBuildingList[0].BuildingName + "_mix_node_info";// "tbl_" ++"_node_value";
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                SQLiteDataReader reader = null;
+                string queryString = "delete   from  " + tableName + "  where chartID = @id_value";
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                command.Parameters.AddWithValue("@id_value", chartID);
+                //SqlDataAdapter dataAdapter = new SqlDataAdapter(queryString, connection.ConnectionString); //connection.ConnectionString is the connection string
+                reader = command.ExecuteReader();
+
+
+            }//Close of using 
+        }
+
 
         public void DeleteComfortZoneSettingForChart(string chartID)
         {
@@ -3146,6 +3205,221 @@ namespace WFA_psychometric_chart
             }//close of for                                                 
 
         } //Close of our function
+
+
+        public void PlotComfortZoneForBackGroundWorker(double Tmin, double Tmax, double Hmin, double Hmax, Color c, string name)
+        {
+            //This function will help to plot the values in the chart.
+            for (int i = (int)Tmin; i <= (int)Tmax; i++)
+            //for (double i = Tmin; i <= Tmax; i+=0.25)
+            {
+                //First reset the series if present and the re add them
+
+                Series s = new Series("vertical_temp" + i);
+
+                if (chart1.Series.IndexOf(s.Name) != -1)
+                {
+                    //MessageBox.Show("Series exits");
+                    //--This  means the series is present....
+                    if (chart1.InvokeRequired)
+                    {
+                        chart1.Invoke(new Action(() => chart1.Series.RemoveAt(chart1.Series.IndexOf(s.Name))));
+                    }
+                    else
+                    {
+                        //lb_device_status.Text = "connected";
+                        //  series1.Points.Clear();
+                        chart1.Series.RemoveAt(chart1.Series.IndexOf(s.Name));
+                    }
+                    //chart1.Series.RemoveAt(chart1.Series.IndexOf(s.Name));
+                }
+
+
+            }
+
+            //MessageBox.Show("Plot comfort zone");
+
+            //NOw add horizontal series.
+            for (int i = (int)Hmin; i <= (int)Hmax; i += 1)
+            {
+                //   for (double i = Hmin; i <= Hmax; i += 0.25)
+                //{
+                //remove if first present
+
+                Series s = new Series("horizontal_hum" + i);
+
+                if (chart1.Series.IndexOf(s.Name) != -1)
+                {
+                    //--This  means the series is present....
+                    if (chart1.InvokeRequired)
+                    {
+                        chart1.Invoke(new Action(() => chart1.Series.RemoveAt(chart1.Series.IndexOf(s.Name))));
+                    }
+                    else
+                    {
+                        //lb_device_status.Text = "connected";
+                        //  series1.Points.Clear();
+                        chart1.Series.RemoveAt(chart1.Series.IndexOf(s.Name));
+                    }
+                    //chart1.Series.RemoveAt(chart1.Series.IndexOf(s.Name));
+                }
+
+            }
+
+
+            //add both types of series
+            for (int i = (int)Tmin; i <= (int)Tmax; i++)
+            {
+                //    for (double i = Tmin; i <= Tmax; i += 0.25)
+                //{
+                Series s = new Series("vertical_temp" + i);
+                s.Color = c;
+                s.ChartType = SeriesChartType.Line;
+                // s.MarkerSize = 5;
+                //s.BorderWidth = 10;
+                if (chart1.InvokeRequired)
+                {
+                    chart1.Invoke(new Action(() => chart1.Series.Add(s)));
+                }
+                else
+                {
+                    chart1.Series.Add(s);
+                }
+                //chart1.Series.Add(s);
+            }
+
+            //Refresh  the chart now
+
+            if (chart1.InvokeRequired)
+            {
+                chart1.Invoke(new Action(() => chart1.Invalidate()));
+            }
+            else
+            {
+                //chart1.Series.Add(s);
+                chart1.Invalidate();
+            }
+            //chart1.Invalidate();
+
+            if (chart1.InvokeRequired)
+            {
+                chart1.Invoke(new Action(() => chart1.Refresh()));
+            }
+            else
+            {
+                chart1.Refresh();
+            }
+            //chart1.Refresh();//This is for refresh
+
+            for (int i = (int)Hmin; i <= (int)Hmax; i += 1)
+            {
+                //    for (double i = Hmin; i <= Hmax; i += 0.25)
+                // {
+                //add now
+                Series s = new Series("horizontal_hum" + i);
+                s.Color = c;
+                s.ChartType = SeriesChartType.Spline;
+                //s.MarkerSize = 15;
+                s.BorderWidth = 5;
+                if (chart1.InvokeRequired)
+                {
+                    chart1.Invoke(new Action(() => chart1.Series.Add(s)));
+                }
+                else
+                {
+                    chart1.Series.Add(s);
+                }
+                //chart1.Series.Add(s);
+            }
+
+            //Now lets do the actual plotting part.
+
+
+            double phi_min = Hmin / 100;//need to change to decimal
+            double phi_max = Hmax / 100;
+
+
+            //This one is for adding horizontal lines 
+            double phi = phi_min; //0.1;            
+            double x2 = 0;
+            // int ival = 2;
+            //int indexValue = (int)Hmin;
+            double indexValue = Hmin;
+            double patm = AirPressureFromDB * 0.001;//101.325; ;//thsi need tochange
+            for (phi = phi_min; phi <= phi_max; phi += 0.01) //increment by 2 value
+                                                             // for (phi = phi_min; phi <= phi_max; phi += 0.0025) //increment by 2 value
+            {
+                for (int temp = (int)Tmin; temp <= (int)Tmax; temp++)
+                //for (double temp = Tmin; temp <Tmax;temp+=0.25)
+                {
+
+                    double pg_value = Double.Parse(pg[temp].ToString());
+                    double wg_calc = (622 * phi * pg_value / (patm - phi * pg_value));
+                    double y = wg_calc;
+                    x2 = temp;//double.Parse(t[i].ToString());
+
+                    if (chart1.InvokeRequired)
+                    {
+                        chart1.Invoke(new Action(() => chart1.Series["horizontal_hum" + indexValue].Points.AddXY(x2, y)));
+                    }
+                    else
+                    {
+                        // chart1.Series.Add(s);
+                        chart1.Series["horizontal_hum" + indexValue].Points.AddXY(x2, y);
+                    }
+                    //chart1.Series["horizontal_hum" + indexValue].Points.AddXY(x2, y);
+
+                }//close of for
+                 //MessageBox.Show(s1);
+                indexValue += 1;
+                //indexValue += 0.25;
+            }  //close fo the second for loop
+
+
+            //Now this one is for adding vertical line for lines
+            for (int temp = (int)Tmin; temp <= (int)Tmax; temp++)
+            // for (double temp =Tmin; temp < Tmax; temp+=0.25)
+            {
+                double xx1, yy1, xx2, yy2;
+                double pg_value = Double.Parse(pg[temp].ToString());
+                double wg_calc = (622 * phi_min * pg_value / (patm - phi_min * pg_value));
+                yy1 = wg_calc;
+                xx1 = temp;//double.Parse(t[i].ToString());
+
+
+                xx2 = xx1; //here xx1 =xx2 same ony y value changes
+                double wg_calc2 = (622 * phi_max * pg_value / (patm - phi_max * pg_value));
+                yy2 = wg_calc2;
+
+                // chart1.Series["vertical_temp" + temp].Points.AddXY(xx1, yy1);
+                if (chart1.InvokeRequired)
+                {
+                    chart1.Invoke(new Action(() => chart1.Series["vertical_temp" + temp].Points.AddXY(xx1, yy1)));
+                }
+                else
+                {
+                    // chart1.Series.Add(s);
+                    //chart1.Series["horizontal_hum" + indexValue].Points.AddXY(x2, y);
+                    chart1.Series["vertical_temp" + temp].Points.AddXY(xx1, yy1);
+                }
+
+                if (chart1.InvokeRequired)
+                {
+                    chart1.Invoke(new Action(() => chart1.Series["vertical_temp" + temp].Points.AddXY(xx2, yy2)));
+                }
+                else
+                {
+                    chart1.Series["vertical_temp" + temp].Points.AddXY(xx2, yy2);
+                }
+                //chart1.Series["vertical_temp" + temp].Points.AddXY(xx2, yy2);
+
+            }//close of for                                                 
+
+        } //Close of our function
+
+
+
+
 
         /// <summary>
         /// This variable store comfort zone id which is used for updating comfortzone info
@@ -4243,7 +4517,8 @@ namespace WFA_psychometric_chart
                         colorValue = ColorTranslator.FromHtml(reader["colorValue"].ToString()),
                        // showItemText = reader["showTextItem"].ToString(),
                         marker_Size = int.Parse(reader["nodeSize"].ToString()),
-                        airFlow = int.Parse(reader["airFlow"].ToString())
+                        airFlow = int.Parse(reader["airFlow"].ToString()),
+                        lastUpdatedDate = reader["lastUpdatedDate"].ToString()
 
 
                     });
@@ -6727,6 +7002,16 @@ namespace WFA_psychometric_chart
                         if (((minTemperatureForNewComfortZoneCreate == minTempOfPrevComfortzone) && (maxTemperatureForNewComfortZoneCreate == maxTempOfPrevComfortzone) && (minHumidityForNewComfortZoneCreate == minHumidityOfPrevComfortzone) && (maxHumidityForNewComfortZoneCreate == maxHumidityOfPrevComfortzone)))
                         {
                             //If equal do not do any thing 
+                            //Refreshing the chart
+                            if (dataGridView1.Rows.Count > 0)  //If there is data then only do this one
+                            {
+                                //set parameters of your event args
+                                var eventArgs = new DataGridViewCellEventArgs(1, dataGridView1.CurrentCell.RowIndex);
+                                // or setting the selected cells manually before executing the function
+                                dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Selected = true;
+                                dataGridView1_CellClick(sender, eventArgs);
+                            }
+
                         }
                         else {
                             //If they do not match then only create new comfort zone and assign them the value
@@ -6766,7 +7051,21 @@ namespace WFA_psychometric_chart
 
                             //After inserting updating the comfort zone info as well
                             insertOrUpdateComfortChartSetting(chartDetailList[indexOfChartSelected].chartID, temporaryComfortZoneID_Store);
-                          
+
+
+                            //--Refresh the comfort zone
+
+                            if (dataGridView1.Rows.Count > 0)  //If there is data then only do this one
+                            {
+                                //set parameters of your event args
+                                var eventArgs = new DataGridViewCellEventArgs(1, dataGridView1.CurrentCell.RowIndex);
+                                // or setting the selected cells manually before executing the function
+                                dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Selected = true;
+                                dataGridView1_CellClick(sender, eventArgs);
+                            }
+
+
+
                         }
                         flagForEditComfortZoneGraphically = 0;//Resetting flag
 
@@ -7417,8 +7716,8 @@ namespace WFA_psychometric_chart
 
         }
 
-        double humidityCalculated = 0;
-        double enthalpyCalculated = 0;
+       public  double humidityCalculated = 0;
+       public double enthalpyCalculated = 0;
 
         Series newLineSeries;//--This is temporary for storing series name
 
@@ -7443,7 +7742,10 @@ namespace WFA_psychometric_chart
             double startEnthalpy1 = 0;
             double endHumidity1 = 0;//--this is for the start and end humidity print in the tooltip
             double endEnthalpy1 = 0;
-         
+            double startSpecificVolume1 = 0;//--specific volume
+            double endSpecificVolume1 = 0;
+
+
             if (chart1.InvokeRequired) {
                     //now lets plot lines between tow points...
                     chart1.Invoke(new Action(() => newLineSeries = lineSeriesID));//new Series("LineSeries" + incrementIndex); //lineSeriesID; 
@@ -7567,10 +7869,12 @@ namespace WFA_psychometric_chart
                 CalculateHumidityEnthalpy(temporaryNodeValueStoreForRedrawLine[0].xVal, temporaryNodeValueStoreForRedrawLine[0].yVal);
                 startHumidity1 = Math.Round(humidityCalculated, 2);
                 startEnthalpy1 = Math.Round(enthalpyCalculated, 2);
+                startSpecificVolume1 = SpecificVolumeReturn;
                 //--This calculates the end humidity and the enthalpy values..
                 CalculateHumidityEnthalpy((double)temporaryNodeValueStoreForRedrawLine[1].xVal, (double)temporaryNodeValueStoreForRedrawLine[1].yVal);
                 endHumidity1 = Math.Round(humidityCalculated, 2);
                 endEnthalpy1 = Math.Round(enthalpyCalculated, 2);
+                endSpecificVolume1 = SpecificVolumeReturn;
 
                 // MessageBox.Show("Start hum" + startHumidity1 + " end enth" + endEnthalpy1);
                 //MessageBox.Show("menustripinfovalues[prevNodeID].xVal=" + menuStripNodeInfoValues[prevNodeID].xVal + "menuStripNodeInfoValues[nextNodeID].yVal=" + menuStripNodeInfoValues[nextNodeID].yVal + "menuStripNodeInfoValues[nextNodeID].xVal = "+ menuStripNodeInfoValues[nextNodeID].xVal + " menuStripNodeInfoValues[nextNodeID].yVal" + menuStripNodeInfoValues[nextNodeID].yVal);
@@ -7579,9 +7883,54 @@ namespace WFA_psychometric_chart
 
                 string sequenceDetected = temporaryNodeValueStoreForRedrawLine[0].name + " to " + temporaryNodeValueStoreForRedrawLine[1].name;
 
-                string tooltipString = "Sequence :  " + sequenceDetected + " \n" + @"                 start             end 
-" + "Temp         :" + Math.Round(temporaryNodeValueStoreForRedrawLine[0].xVal, 2) + "               " + Math.Round(temporaryNodeValueStoreForRedrawLine[1].xVal, 2) + "\nHumidity :" + startHumidity1 + "           " + endHumidity1 + WFA_psychometric_chart.Properties.Resources._Enthalpy + startEnthalpy1 + "           " + endEnthalpy1 + "\nEnthalpy Change:" + enthalpyChange;
+                //                string tooltipString = "Sequence :  " + sequenceDetected + " \n" + @"                 start             end 
+                //" + "Temp         :" + Math.Round(temporaryNodeValueStoreForRedrawLine[0].xVal, 2) + "               " + Math.Round(temporaryNodeValueStoreForRedrawLine[1].xVal, 2) + "\nHumidity :" + startHumidity1 + "           " + endHumidity1 + WFA_psychometric_chart.Properties.Resources._Enthalpy + startEnthalpy1 + "           " + endEnthalpy1 + "\nEnthalpy Change:" + enthalpyChange;
 
+                string tooltipString = "";
+                //"            " + sequenceDetected + " \n" + @"                 "+ temporaryNodeValueStoreForRedrawLine[0].name + "             end 
+                //" + "Temp         :" + Math.Round(temporaryNodeValueStoreForRedrawLine[0].xVal, 2) + "               " + Math.Round(temporaryNodeValueStoreForRedrawLine[1].xVal, 2) + "\nHumidity :" + startHumidity1 + "           " + endHumidity1 + WFA_psychometric_chart.Properties.Resources._Enthalpy + startEnthalpy1 + "           " + endEnthalpy1 + "\nEnthalpy Change:" + enthalpyChange;
+
+
+                string ZeroLine = "Process:  " + name + " ";
+                string FirstLine = @"Parameters                      " + "Units               " + temporaryNodeValueStoreForRedrawLine[0].name + "                  " + temporaryNodeValueStoreForRedrawLine[1].name;
+                string SecondLine = @"DBT                                   " + "\x00B0 C                   " + Math.Round(temporaryNodeValueStoreForRedrawLine[0].xVal, 2) + "                           " + Math.Round(temporaryNodeValueStoreForRedrawLine[1].xVal, 2);
+                string ThirdLine = @"Relative Humidity           " + "%                     " + startHumidity1 + "                     " + endHumidity1;
+                string FourthLine = @"Humidity Ratio                " + "Kg/Kg dryair  " + Math.Round(temporaryNodeValueStoreForRedrawLine[0].yVal, 2) + "                       " + Math.Round(temporaryNodeValueStoreForRedrawLine[1].yVal, 2);
+                string FifthLine = "Volume Flow Rate           " + "m\xB3/s                " + Math.Round(temporaryNodeValueStoreForRedrawLine[0].airFlow, 2) + "                      " + Math.Round(temporaryNodeValueStoreForRedrawLine[1].airFlow, 2);
+
+                string SixthLine = "Specific Volume              " + "m\xB3/Kg             " + startSpecificVolume1 + "                    " + endSpecificVolume1;
+                double massFlowRate1 = temporaryNodeValueStoreForRedrawLine[0].airFlow / startSpecificVolume1;
+                double massFlowRate2 = temporaryNodeValueStoreForRedrawLine[1].airFlow / endSpecificVolume1;
+
+                string SeventhLine = @"Mass flow rate(dry air)   " + "Kg(dry air)/s   " +Math.Round(massFlowRate1,2) + "                        " +Math.Round( massFlowRate2,2);
+                string EighthLine = @"Enthalpy                           " + "KJ/Kg              " + startEnthalpy1 + "                       " + endEnthalpy1;
+                double totalEnthalpyFlow1 = massFlowRate1 * startEnthalpy1;
+                double totalEnthalpyFlow2 = massFlowRate2 * endEnthalpy1;
+                string NinthLine = @"Total Enthalpy Flow         " + "KJ/s                " +Math.Round( totalEnthalpyFlow1,2) + "                      " +Math.Round( totalEnthalpyFlow2,2);
+                double heatChange = totalEnthalpyFlow2 - totalEnthalpyFlow1;
+                string TenthLine = @"Heat Change                    " + "KW                  " +Math.Round(heatChange,2) + "                     ";
+                tooltipString = ZeroLine+"\n"+ FirstLine + "\n" + SecondLine + "\n" + ThirdLine + "\n" + FourthLine + "\n" + FifthLine + "\n" + SixthLine + "\n" + SeventhLine + "\n" + EighthLine + "\n" + NinthLine + "\n" + TenthLine;
+
+
+                //===============This one is for datatable======================================================//
+                //DataTable table = new DataTable();
+                //table.Columns.Add("Parameters", typeof(string));
+                //table.Columns.Add("Units", typeof(string));
+                //table.Columns.Add(temporaryNodeValueStoreForRedrawLine[0].name.ToString(), typeof(string));
+                //table.Columns.Add(temporaryNodeValueStoreForRedrawLine[1].name.ToString(), typeof(string));
+
+                //table.Rows.Add("DBT", "\x00B0 C", Math.Round(temporaryNodeValueStoreForRedrawLine[0].xVal, 2).ToString(), Math.Round(temporaryNodeValueStoreForRedrawLine[1].xVal, 2).ToString());
+                //table.Rows.Add("Relative Humidity", "%  ", startHumidity1.ToString(), endHumidity1.ToString());
+                //table.Rows.Add("Humidity Ratio", "Kg/Kg dryair", Math.Round(temporaryNodeValueStoreForRedrawLine[0].yVal, 2).ToString(), Math.Round(temporaryNodeValueStoreForRedrawLine[1].yVal, 2).ToString());
+                //table.Rows.Add("Volume flow rate", "m\xB3/s ", Math.Round(temporaryNodeValueStoreForRedrawLine[0].airFlow, 2).ToString(), Math.Round(temporaryNodeValueStoreForRedrawLine[1].airFlow, 2).ToString());
+                //table.Rows.Add("Sp. Volume", "m\xB3/Kg", startSpecificVolume1.ToString(), endSpecificVolume1.ToString());
+                //table.Rows.Add("Mass Flow rate(dry air)", "Kg(dry air)/s", Math.Round(massFlowRate1, 2).ToString(), Math.Round(massFlowRate2, 2).ToString());
+                //table.Rows.Add("Enthalpy", "KJ/Kg ", startEnthalpy1.ToString(), endEnthalpy1.ToString());
+                //table.Rows.Add("Total Energy Flow", "KJ/s", Math.Round(totalEnthalpyFlow1, 2).ToString(), Math.Round(totalEnthalpyFlow2, 2).ToString());
+                //table.Rows.Add("Heat Change", "KW ", Math.Round(heatChange, 2).ToString(), "");
+               // MessageBox.Show("Table \n" + table.Columns[2].Rows[3].ToString());
+                //tooltipString = table.ToString();
+                 //================================datatable close==============================================//
                 if (chart1.InvokeRequired) {
 
                     chart1.Invoke(new Action(() => newLineSeries.ToolTip = tooltipString));
@@ -7629,6 +7978,12 @@ namespace WFA_psychometric_chart
             }//close of temporary node value
 
            // }//--Close of LOCK
+        }
+
+        public double CalculateSpecificVolume(double xVal,double yVal)
+        {
+
+            return 0.00;
         }
 
 
@@ -7805,10 +8160,15 @@ namespace WFA_psychometric_chart
         }
 
 
+        public double SpecificVolumeReturn = 0;
 
+         /// <summary>
+         /// Calculates humidity , enthalpy and specific volume form temperature and humidity ratio
+         /// </summary>
+         /// <param name="xVal">Temperature(deg cel)</param>
+         /// <param name="yVal">Humidity Ratio(unitless)</param>
 
-
-        private void CalculateHumidityEnthalpy(double xVal, double yVal)
+        public void CalculateHumidityEnthalpy(double xVal, double yVal)
         {
             //now lets move towards printing the relative humidity at that position and dew point and enthalpy also wbt
             //first Relative humidity...
@@ -7843,6 +8203,7 @@ namespace WFA_psychometric_chart
                 }
             }//close of for
 
+            //double patm = pressureConverted;//This should be the value
             double patm = 101.325;//this is constant...
                                   // double w = 622*phi*corres_pg_value/(patm-phi*corres_pg_value);
                                   //double w1 = 622*phi*pg/(patm-phi*pg);
@@ -7875,6 +8236,9 @@ namespace WFA_psychometric_chart
             double h = temperature * (1.01 + (0.00189 * X)) + 2.5 * X;
             //now lets display this value ..
             enthalpyCalculated = h;//--this is the enthalpy calculated value 
+
+            double V = (287.1 * (xVal + 273.15) * (1 + (1.6078 * humidity))) / (patm * 100);
+            SpecificVolumeReturn = Math.Round(V, 2);
 
         }
         //--this is used by set data button
