@@ -4771,7 +4771,7 @@ namespace WFA_psychometric_chart
         public void FillLatLongValueAutomatically()
         {
 
-            string country = null, state = null, city = null, street = null, zip = null;
+            string country = null, state = null, city = null, street = null;//, zip = null;
             //--This portion fill the lat,long and elevation value is not present in the database by users..
             //--Lets do some connection checking and validating the data returned...
             string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
