@@ -84,5 +84,6 @@ OUTPUT int MINI_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type,int
 OUTPUT void SetCommunicationType(int nType);
 OUTPUT int GetCommunicationType(void);
 OUTPUT void SetResponseTime(TS_US Time);
+OUTPUT int Modbus_Standard_Read(TS_UC device_var, TS_US *put_data_into_here,int function_code, TS_US start_address, int length);
 OUTPUT int SendData(TS_US *to_write,TS_US length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here,int* sendDataLength, int* recvDataLength,BOOL CHECK_CRC) ;
 #endif
