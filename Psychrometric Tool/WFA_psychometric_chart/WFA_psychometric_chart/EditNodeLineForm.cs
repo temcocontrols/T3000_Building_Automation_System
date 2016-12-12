@@ -426,6 +426,7 @@ namespace WFA_psychometric_chart
             // LoadNodeAndLine();//--Loading the data 
             UpdateDataValueAndRefreshDGV(nodeIDVal, xVal, yVal, sourceVal, nameVal, labelVal, colorVal, showTextVal, nodeSizeVal);
 
+           
             flagForWeb = true;
 
         }
@@ -490,6 +491,10 @@ namespace WFA_psychometric_chart
 
             updateNodeInfoBasedOnPresentValue(nodeIDVal, xVal, yVal, temperature_Source, humidity_Souce, nameVal, colorVal, nodeSizeVal, AirFlow);
 
+            //==For mix node update
+            bcs.DBUpdateMixPointOnNodeValueChange(nodeIDVal);
+
+            RefreshChartAndDGVForMixNodeFunction();
 
 
 
@@ -531,6 +536,11 @@ namespace WFA_psychometric_chart
 
             updateNodeInfoBasedOnPresentValue(nodeIDVal, xVal, yVal, temperature_Source, humidity_Souce, nameVal, colorVal, nodeSizeVal, AirFlow);
 
+
+            //==For mix node update
+            bcs.DBUpdateMixPointOnNodeValueChange(nodeIDVal);
+
+            RefreshChartAndDGVForMixNodeFunction();
 
             flagForWeb = true;
 

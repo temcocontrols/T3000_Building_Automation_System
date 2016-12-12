@@ -680,10 +680,17 @@ namespace WFA_psychometric_chart
             try { 
             InputDeviceInfoAndValue();
 
-            //f1.dataGridView1_CellEndEdit(sender, );//Calling end edit after this one
+                //==For mix node update
+               // f1.DBUpdateMixPointOnNodeValueChange(f1.tempNodeID);
 
-           // f1.dataGridView1.EndEdit(true);
-            f1.dataGridView1.EndEdit();  //Calls the end edit section
+                //f1.RefreshChartAndDGVForMixNodeFunction();
+
+
+                //f1.dataGridView1_CellEndEdit(sender, );//Calling end edit after this one
+
+
+                // f1.dataGridView1.EndEdit(true);
+                f1.dataGridView1.EndEdit();  //Calls the end edit section
             }
             catch (Exception ex)
             {
