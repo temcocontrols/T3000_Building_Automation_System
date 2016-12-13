@@ -751,7 +751,7 @@ namespace WFA_psychometric_chart
 
                 //------------------------------------Working here -------------------------------------------------------//
                // f1.UpdateNodeInfoForTemperatureDeviceSelection(f1.tempNodeID, device_instance, deviceIP, temp_param_id, "temp", temp_present_value, param1_object_identifier_type);
-
+               
                 f1.UpdateNodeInfoForHumidityDeviceSelection(f1.tempNodeID, device_instance, deviceIP, temp_param2_id, "hum", temp_param2_present_value, param2_object_identifier_type);
                 //------------------------------------End of working here------------------------------------------------//
 

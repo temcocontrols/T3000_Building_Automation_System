@@ -214,12 +214,22 @@ namespace WFA_psychometric_chart
                     WebUpdateSelectionForHumidity();
                 }
 
+                //this.Refresh();
+
+                //dataGridView1.Refresh();
+                ////--Now Refresh Data...
+                //RefreshDataFromDBAndChart();
+                ////--After refreshing
+                //LoadNodeAndLine();//--Loading the data 
+
+                //RefreshChartAndDGVForMixNodeFunction();
+                // dataGridView1.EditMode = DataGridViewEditMode.EditOnEnter;
                 // dataGridView1.EditMode(false);//This one is for setting form edit mode to normal mode
                 // Put the cells in edit mode when user enters them.
                 //dataGridView1.EditMode = DataGridViewEditMode.EditOnEnter;
-                dataGridView1.Refresh();
+                //dataGridView1.EndEdit();  
 
-            }                                           
+            }
             else if(item == "Device")
             {
                 if (dataGridView1.CurrentCell.RowIndex < bcs.menuStripNodeInfoValues.Count)
