@@ -106,6 +106,7 @@
             this.label7 = new System.Windows.Forms.Label();
             this.lb_process = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
+            this.colorDialog2 = new System.Windows.Forms.ColorDialog();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -674,5 +675,6 @@
         private System.Windows.Forms.Label lb_process;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label lb_horizontal_line;
+        private System.Windows.Forms.ColorDialog colorDialog2;
     }
 }

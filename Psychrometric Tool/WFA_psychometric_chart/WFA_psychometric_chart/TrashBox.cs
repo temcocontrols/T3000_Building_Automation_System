@@ -44,7 +44,9 @@ namespace WFA_psychometric_chart
         {
 
             //--We need to  pass the buildingName value
+            
             Form1_main f1 = new Form1_main();
+          
             f1.CheckSelectedBuilding();
             string buildingName = f1.selectedBuildingList[0].BuildingName;
             // f1.CurrentSelectedBuilding;//f1.selectedBuildingList[0].BuildingName;
@@ -64,7 +66,7 @@ namespace WFA_psychometric_chart
 
             fillDataGridView();//This will load the values form db
 
-
+           // }
 
         }
 
@@ -152,6 +154,8 @@ namespace WFA_psychometric_chart
         ArrayList arrayList = new ArrayList();
         private void button1_Click(object sender, EventArgs e)
         {
+
+            try { 
             //--After applying ok we will restore all the data that has been 
             //--triggered as false as to be true and load the value again 
             //--Also close the window as soon as  it is set
@@ -159,7 +163,7 @@ namespace WFA_psychometric_chart
            Steps : 
            1.Check for all the check boxes and restore
            */
-           if(dataGridView1.RowCount<= 0)
+           if(dataGridView1.Rows.Count <= 0)
             {
                 //--If there is no data don't need to do futher processing
                 return;
@@ -213,8 +217,12 @@ namespace WFA_psychometric_chart
 
 
             this.Close();
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
 
-              
+
         }
 
        public void updateValueInDatabaseToTrue(string buildingName,string chartID)
@@ -263,25 +271,27 @@ namespace WFA_psychometric_chart
         {
             //--This function deletes permanently the values form the database
 
+            try { 
             if (MessageBox.Show("Are you sure you want to delete this chart Permanently?", "Delete chart Permanently", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
            
             {
 
-                if (dataGridView1.RowCount <= 0)
+                if (dataGridView1.Rows.Count <= 0)
                 {
                     //--If there is no data don't need to do futher processing
                     return;
                 }
 
-                //--Delete function 
-                //--This is the delete operation for the handler.....
-                /*
-                Steps: 1. delete the row  of the table using the id portion.
-                2. Delete the corresponding tables related to the row.             
-                */
+                    //--Delete function 
+                    //--This is the delete operation for the handler.....
+                    /*
+                    Steps: 1. delete the row  of the table using the id portion.
+                    2. Delete the corresponding tables related to the row.             
+                    */
 
-                //=========================================================This code is commented for not deleting the values===============//
+                    //=========================================================This code is commented for not deleting the values===============//
 
+                   // MessageBox.Show("Here we are 293ln");
                 ArrayList arrList = new ArrayList();
                 for (int i = 0; i < dataGridView1.RowCount; i++)
                 {
@@ -301,9 +311,15 @@ namespace WFA_psychometric_chart
                     deleteChartAndItsContent(dataGridView1.Rows[indexVal].Cells[1].Value.ToString(), dataGridView1.Rows[indexVal].Cells[4].Value.ToString(), dataGridView1.Rows[indexVal].Cells[5].Value.ToString());
                 }
 
-                this.Close();
+                   // MessageBox.Show("Here we are  end 310ln");
+                    this.Close();
             }//close of the chart delete
 
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
 
@@ -311,7 +327,7 @@ namespace WFA_psychometric_chart
         {
 
             //if (dataGridView1.CurrentCell.RowIndex > -1 && dataGridView1.CurrentCell.RowIndex < f1.chartDetailList.Count)//Header is selected..
-            if (dataGridView1.CurrentCell.RowIndex > -1)//Header is selected..
+            if ( chartID1 !="" && chart_resp_nodeid != "" && chart_resp_lineID!= "")//Header is selected..
             {
                 //int selectedItemIndex = index;//dataGridView1.CurrentCell.RowIndex; //int.Parse(dataGridView1.Rows[indexSelectedForDeletion].Cells[0].Value.ToString());
 

@@ -4429,13 +4429,25 @@ namespace WFA_psychometric_chart
         /// <param name="chartnodeid">This is the id that will identify different nodes in single node table</param>
         /// <param name="chartlineid">This is the id that will identify different lines in single line table</param>
         /// Lets pass the index alue
-
         public void LoadNodeAndLineFromDB(int indexValue)
         {
             //Based on this row index we need to update the values and redraw lines..
 
+            try { 
             // listForDataFromDB.Clear();//Lets clear the node...
+            if(indexValue < 0)
+            {
+                return;
+            }
+            if(chartDetailList.Count <= 0)
+                {
+                    return;
+                }
 
+            if(selectedBuildingList.Count <= 0)
+                {
+                    return;
+                }
             //Lets identify the node
             // int id = int.Parse(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString());
             //int id = e.RowIndex;//This index is used to identify which cell or chart is clicked.
@@ -4600,6 +4612,10 @@ namespace WFA_psychometric_chart
 
 
             }//close of using..
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
 
         }
 
@@ -11759,6 +11775,11 @@ namespace WFA_psychometric_chart
         public void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
 
+            if(dataGridView1.Rows.Count <= 0)
+            {
+                return;
+            }
+
             if (flagForTimer == 1)
             {
                 if (atimer.Enabled) // Check if the timer is running
@@ -12244,7 +12265,7 @@ namespace WFA_psychometric_chart
         {
 
 
-
+            try { 
 
             if (MessageBox.Show("Are you sure you want to clear this chart?", "Clear chart", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
             //if (dialogResult == DialogResult.Yes)
@@ -12282,8 +12303,26 @@ namespace WFA_psychometric_chart
 
                 }
 
+                //if (dataGridView1.CurrentCell.RowIndex.ToString() != "")
+                //{
+                //    //set parameters of your event args
+                //    var eventArgs = new DataGridViewCellEventArgs(1, dataGridView1.CurrentCell.RowIndex);
+                //    //or setting the selected cells manually before executing the function
+                //    //dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[dataGridView2.CurrentCell.ColumnIndex].Selected = true;
+                //    dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Selected = true;
+                //    dataGridView1_CellClick(sender, eventArgs);
+                //}
+
+
+
+
+
             }//Close of clear chart
 
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
 
@@ -12848,6 +12887,23 @@ namespace WFA_psychometric_chart
                             int id = indexOfChartSelected;    //This value is changed 
                             LoadNodeAndLineFromDB(id);   //Lets make it passing the stirngs 
                            // MessageBox.Show("Let me be loading in backgoundworker1_");
+
+                            //====Once loaded we need to check and update for mix nodes as they have not been updated and
+                            //=======again we need to load the data form db and then redraw okie
+                            foreach(var node in menuStripNodeInfoValues)
+                            {
+                                if(node.temperature_source != "Mix")
+                                {
+                                    //==Then only update the values
+                                    DBUpdateMixPointOnNodeValueChange(node.id);
+
+                                }
+
+                            }
+
+                            //==Now again load the data 
+                            LoadNodeAndLineFromDB(id);
+
                             // flagForInsertOrUpdateDataToDB = 1;
                             //--This is also completed..
                             ReDrawingLineAndNode();
@@ -13634,9 +13690,16 @@ namespace WFA_psychometric_chart
         private void trashBoxToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //==This section shows the trash
-            TrashBox tb = new TrashBox(this);
-            tb.ShowDialog();
-        }
+            try
+            {
+                TrashBox tb = new TrashBox(this);
+                tb.ShowDialog();
+
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+       }
 
         private void addMixNodeToolStripMenuItem_Click(object sender, EventArgs e)
         {

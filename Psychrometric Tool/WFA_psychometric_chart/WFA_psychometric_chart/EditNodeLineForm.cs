@@ -214,6 +214,8 @@ namespace WFA_psychometric_chart
                     WebUpdateSelectionForHumidity();
                 }
 
+                //RefreshDataFromDBAndChart();
+                RefreshChartAndDGVForMixNodeFunction();
                 //this.Refresh();
 
                 //dataGridView1.Refresh();
@@ -226,8 +228,8 @@ namespace WFA_psychometric_chart
                 // dataGridView1.EditMode = DataGridViewEditMode.EditOnEnter;
                 // dataGridView1.EditMode(false);//This one is for setting form edit mode to normal mode
                 // Put the cells in edit mode when user enters them.
-                //dataGridView1.EditMode = DataGridViewEditMode.EditOnEnter;
-                //dataGridView1.EndEdit();  
+                dataGridView1.EditMode = DataGridViewEditMode.EditOnEnter;
+                dataGridView1.EndEdit();
 
             }
             else if(item == "Device")
@@ -504,7 +506,7 @@ namespace WFA_psychometric_chart
             //==For mix node update
             bcs.DBUpdateMixPointOnNodeValueChange(nodeIDVal);
 
-            RefreshChartAndDGVForMixNodeFunction();
+           // RefreshChartAndDGVForMixNodeFunction();
 
 
 
@@ -550,7 +552,7 @@ namespace WFA_psychometric_chart
             //==For mix node update
             bcs.DBUpdateMixPointOnNodeValueChange(nodeIDVal);
 
-            RefreshChartAndDGVForMixNodeFunction();
+            //RefreshChartAndDGVForMixNodeFunction();
 
             flagForWeb = true;
 
@@ -898,7 +900,7 @@ namespace WFA_psychometric_chart
             //--First lets do for the node
             //--Lets clear the rows first 
             //--This one for handling null refrence error
-            dataGridView1.Enabled = false;
+          //dataGridView1.Enabled = false;
 
 
             dataGridView1.Rows.Clear();
@@ -1165,7 +1167,7 @@ namespace WFA_psychometric_chart
             }
 
 
-            dataGridView1.Enabled = true;
+          //  dataGridView1.Enabled = true;
 
         }
 
@@ -1375,12 +1377,12 @@ namespace WFA_psychometric_chart
         {
             if ((e.RowIndex >= 0 && e.RowIndex < bcs.menuStripNodeLineInfoValues.Count) && (e.ColumnIndex == 4))
             {
-                if (colorDialog1.ShowDialog() == DialogResult.OK)
+                if (colorDialog2.ShowDialog() == DialogResult.OK)
                 {   
 
                     DataGridViewButtonCell buttonCell = (DataGridViewButtonCell)dataGridView2.Rows[e.RowIndex].Cells[4];
                     buttonCell.FlatStyle = FlatStyle.Popup;
-                    buttonCell.Style.BackColor = colorDialog1.Color;//System.Drawing.Color.Red;
+                    buttonCell.Style.BackColor = colorDialog2.Color;//System.Drawing.Color.Red;
 
 
 
@@ -1394,7 +1396,7 @@ namespace WFA_psychometric_chart
                         string lineid = Convert.ToString(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[0].Value);
                         string prevNodeID = Convert.ToString(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[6].Value);
                         string nextNodeID = Convert.ToString(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[7].Value);
-                        Color color = colorDialog1.Color;  //dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[3].Style.BackColor;
+                        Color color = colorDialog2.Color;  //dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[3].Style.BackColor;
                         int thickness = int.Parse(Convert.ToString(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[5].Value));//finalThickness
                         Series s = new Series(Convert.ToString(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[8].Value));
                         string lineName = Convert.ToString(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[1].Value);
@@ -1414,11 +1416,12 @@ namespace WFA_psychometric_chart
                         LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status);
 
                     }
-                    catch
-                    { //MessageBox.Show("exception  at line :1391");
+                    catch(Exception ex)
+                    {
+                       // MessageBox.Show("exception  at line :1391"+ex.Message);
                     }
                  
-                }
+                }//Close of if
             }
 
            else if ((e.RowIndex >= 0 && e.RowIndex < bcs.menuStripNodeLineInfoValues.Count) && e.ColumnIndex == 9)
@@ -1449,10 +1452,14 @@ namespace WFA_psychometric_chart
 
             }
 
-            //==Cell clicked function is triggered
+
+            ////==Cell clicked function is triggered
+            
+            if(e.RowIndex >= 0)
+            { 
             DataGridViewRow row = dataGridView2.Rows[e.RowIndex];
             EnergyCalculationForProcess(row);//SELECTED ROW
-
+            }
         }
 
         public void EnergyCalculationForProcess(DataGridViewRow dgv_row)
@@ -1907,10 +1914,10 @@ namespace WFA_psychometric_chart
         private void dataGridView2_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             //This is for doing soem work
-            if (e.ColumnIndex == 9)
-            {
-              // dataGridView2.CommitEdit(DataGridViewDataErrorContexts.Commit);
-            }
+            //if (e.ColumnIndex == 9)
+            //{
+            //  // dataGridView2.CommitEdit(DataGridViewDataErrorContexts.Commit);
+            //}
 
         }
 
@@ -1951,10 +1958,10 @@ namespace WFA_psychometric_chart
             bcs.UpdateLineInfoToDB(lineid, prevNodeID, nextNodeID, color, lineseries, thickness,name,status);
 
             //==Now lets refresh the data and 
-            RefreshDataFromDBAndChart();
+            //RefreshDataFromDBAndChart();
             //--After refreshing
-            LoadNodeAndLine();//--Loading the data 
-
+            //LoadNodeAndLine();//--Loading the data 
+            RefreshChartAndDGVForMixNodeFunction();
 
 
         }
@@ -1963,14 +1970,20 @@ namespace WFA_psychometric_chart
         {
             var cellCopy = dataGridView2.CurrentCell;
 
+            if(dataGridView2.Rows.Count <= 0)
+            {
+                return;
+            }
+
             if (cellCopy != null)
             {
-                if (dataGridView2.CurrentCell.ColumnIndex.ToString() != "" && dataGridView2.CurrentCell.RowIndex.ToString() != "")
+                if ( dataGridView2.CurrentCell.RowIndex.ToString() != "")
                 {
                     //set parameters of your event args
-                    var eventArgs = new DataGridViewCellEventArgs(dataGridView2.CurrentCell.ColumnIndex, dataGridView2.CurrentCell.RowIndex);
+                    var eventArgs = new DataGridViewCellEventArgs(0, dataGridView2.CurrentCell.RowIndex);
                     //or setting the selected cells manually before executing the function
-                    dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[dataGridView2.CurrentCell.ColumnIndex].Selected = true;
+                    //dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[dataGridView2.CurrentCell.ColumnIndex].Selected = true;
+                    dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[0].Selected = true;
                     dataGridView2_CellClick(sender, eventArgs);
                 }
 
@@ -1989,19 +2002,19 @@ namespace WFA_psychometric_chart
             //else {
             //    dgv.EditMode = DataGridViewEditMode.EditOnEnter;
             //}
-            try { 
-            if(sender == null || e == null)
-            {
-                return;
-            }
-            else if(dataGridView1.CurrentCell.Value == null)
-            {
-                return;
-            }
-            }catch(NullReferenceException ex)
-            {
-               //MessageBox.Show("Line 2011 : " + ex.Message);
-            }
+            //try { 
+            //if(sender == null || e == null)
+            //{
+            //    return;
+            //}
+            //else if(dataGridView1.CurrentCell.Value == null)
+            //{
+            //    return;
+            //}
+            //}catch(NullReferenceException ex)
+            //{
+            //   //MessageBox.Show("Line 2011 : " + ex.Message);
+            //}
 
 
         }
