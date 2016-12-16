@@ -106,6 +106,7 @@
             this.Controls.Add(this.btnSetNode);
             this.Controls.Add(this.groupBox1);
             this.Name = "Form_TemperatureSourceDeviceInput";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form_TemperatureSourceDeviceInput_FormClosing);
             this.Load += new System.EventHandler(this.Form_TemperatureSourceDeviceInput_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();

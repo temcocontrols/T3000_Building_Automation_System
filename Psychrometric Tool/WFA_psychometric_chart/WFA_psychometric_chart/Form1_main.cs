@@ -1479,25 +1479,25 @@ namespace WFA_psychometric_chart
 
             //--Commented for some time later uncomment-----//
 
-            if (InvokeRequired)
-            {
-                Invoke(new MethodInvoker(RefreshGraph));
-            }
-            else
-            {
-                RefreshGraph();
-            }
-            if (chartDetailList.Count > 0)
-            {
-                int id = indexOfChartSelected;    //This value is changed 
-                LoadNodeAndLineFromDB(id);   //Lets make it passing the stirngs 
+            //if (InvokeRequired)
+            //{
+            //    Invoke(new MethodInvoker(RefreshGraph));
+            //}
+            //else
+            //{
+            //    RefreshGraph();
+            //}
+            //if (chartDetailList.Count > 0)
+            //{
+            //    int id = indexOfChartSelected;    //This value is changed 
+            //    LoadNodeAndLineFromDB(id);   //Lets make it passing the stirngs 
 
-                // flagForInsertOrUpdateDataToDB = 1;
-                //--This is also completed..
-                ReDrawingLineAndNode();
+            //    // flagForInsertOrUpdateDataToDB = 1;
+            //    //--This is also completed..
+            //    ReDrawingLineAndNode();
 
 
-            }
+            //}
             //-----Comment for sometime close--------------//
 
             // }//--CLose of lock
@@ -1519,25 +1519,6 @@ namespace WFA_psychometric_chart
 
             //======================================New code added nove 29th,2016====================================//
 
-            ////Task1 : pasth is in listForInputFromT3000     PathToT3000BuildingDB
-
-            //PullingDataFromT3000BuildingDB(PathToT3000BuildingDB);//This is the database path
-
-
-            //foreach(var data in listForInputFromT3000)
-            //{
-            // InsertingInputDataOfT3000ToPsychroDB(data.panelID, data.inputIndex, data.inputDescription, data.inputAM, data.inputValue, data.inputUnit, data.inputRange, data.inputCalibration, data.inputCalSign, data.inputFilter, data.inputDecon, data.inputJumper, data.inputLabel);
-            //}
-
-            ////--We will directly use the value only no need to update the values
-
-            ////--TableName for pulling data
-            //string tableNameValue = "tbl_" + selectedBuildingList[0].BuildingName + "_input_storage_from_T3000";
-
-            //PullingDataFromPsychrometricDB(tableNameValue);//This is the table name we are concern about puts value in : listForInputFromPsychoDB
-
-            ////After pulling we need to update the data in menustripnodeinfovalue
-
             ///*steps:
             //1.Reading data from nodetable
             //2.Updating in the list first 
@@ -1553,7 +1534,8 @@ namespace WFA_psychometric_chart
 
 
             //MessageBox.Show("Here we are");
-            ReloadComfortZoneForBackGroundWorker();
+            //=====Uncomment lateer=============//
+            //ReloadComfortZoneForBackGroundWorker();
 
 
             //==========================End of comfort zone redraw==============================================//
@@ -4027,12 +4009,13 @@ namespace WFA_psychometric_chart
                 menuStripNodeInfoValues.Clear();
                 index = 0;  //This is resetting the index values
                 incrementIndex = 0;
-           // }
+            ReloadComfortZoneForBackGroundWorker();
+            // }
             //catch (Exception ex)
             //{
             //    MessageBox.Show(ex.Message);
             //}
-           // }//--Close of lock
+            // }//--Close of lock
         }
 
         public void InsertNodeInfoToDB(string id, double xVal, double yVal, string source, string name, string label, Color colorValue, string showItemText, int nodeSizeValue, string deviceinstance, string deviceip, string param1id, string param2id, string param1info, string param2info, string param1type, string param2type)
@@ -4446,13 +4429,25 @@ namespace WFA_psychometric_chart
         /// <param name="chartnodeid">This is the id that will identify different nodes in single node table</param>
         /// <param name="chartlineid">This is the id that will identify different lines in single line table</param>
         /// Lets pass the index alue
-
         public void LoadNodeAndLineFromDB(int indexValue)
         {
             //Based on this row index we need to update the values and redraw lines..
 
+            try { 
             // listForDataFromDB.Clear();//Lets clear the node...
+            if(indexValue < 0)
+            {
+                return;
+            }
+            if(chartDetailList.Count <= 0)
+                {
+                    return;
+                }
 
+            if(selectedBuildingList.Count <= 0)
+                {
+                    return;
+                }
             //Lets identify the node
             // int id = int.Parse(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString());
             //int id = e.RowIndex;//This index is used to identify which cell or chart is clicked.
@@ -4617,6 +4612,10 @@ namespace WFA_psychometric_chart
 
 
             }//close of using..
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
 
         }
 
@@ -4771,7 +4770,7 @@ namespace WFA_psychometric_chart
         public void FillLatLongValueAutomatically()
         {
 
-            string country = null, state = null, city = null, street = null, zip = null;
+            string country = null, state = null, city = null, street = null;//, zip = null;
             //--This portion fill the lat,long and elevation value is not present in the database by users..
             //--Lets do some connection checking and validating the data returned...
             string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -5896,7 +5895,55 @@ namespace WFA_psychometric_chart
                                 }
                                     //--Lets filter out the mix nodes---
 
-                                }//Close of if section
+                                }//Close of if section Mix section
+
+                                //==This one is special case for mix node only
+                                else if (menuStripNodeInfoValues[i].temperature_source == "Mix")
+                                {
+                                    if ((xValue > menuStripNodeInfoValues[i].xVal - 0.25 && xValue < menuStripNodeInfoValues[i].xVal + 0.25) && (yValue > menuStripNodeInfoValues[i].yVal - 0.25 && yValue < menuStripNodeInfoValues[i].yVal + 0.25))
+                                    {
+
+                                        //--This is changed from int to string  code bbk305
+                                        idSelected = menuStripNodeInfoValues[i].id; //Now this is a string 
+                                        tempIndexForNode = i;//This is for finding other values with searching for this we need index
+                                        if (Cursor != Cursors.Cross)
+                                        {
+                                            Cursor = Cursors.Hand;
+                                            //====This flag is for deleting the node===========//
+
+                                            FlagForNodeDelete = 1;//flag is ready on Node selected
+                                            nodeID_ForDeletingNode = idSelected;
+                                            deleteNodeToolStripMenuItem.Enabled = true; //Turn on the delete buttton
+                                                                                        //=============end of flag for deleting===========//
+                                        }
+                                        //this.Cursor = Cursors.Hand;
+                                        //now this works so lets move forward.
+                                        //===This should be dissabled
+                                        // readyForMouseClick = 1;//enable on click event
+
+
+                                        break;//this break is for if found the value no longer loop increases the perfomances..
+                                    }
+                                    else
+                                    {
+                                        if (Cursor != Cursors.Cross)
+                                        {
+                                            this.Cursor = Cursors.Arrow;
+                                           /// readyForMouseClick = 0;//dissable on click event.
+
+                                            //====This flag is for deleting the node===========//
+
+                                            FlagForNodeDelete = 0;//flag is ready OFF , Node NOT SELECTED
+                                            deleteNodeToolStripMenuItem.Enabled = false;//Turn of the delet button
+                                                                                        //nodeID_ForDeletingNode = idSelected;
+                                                                                        //=============end of flag for deleting===========//
+
+                                        }
+
+                                    }
+
+                                }
+
 
                             }//Close of for loop
                         }//close of if menuStripAllValue>0
@@ -6360,7 +6407,7 @@ namespace WFA_psychometric_chart
                     else if (nextNodeID == menuStripNodeInfoValues[x].id)
                     {
                         //Previous node id update
-                        n = menuStripNodeInfoValues[x].airFlow;
+                         n = menuStripNodeInfoValues[x].airFlow;
                         x2 = menuStripNodeInfoValues[x].xVal;
                         y2 = menuStripNodeInfoValues[x].yVal;
                     }
@@ -6437,8 +6484,8 @@ namespace WFA_psychometric_chart
             seriesLineIndicator.ChartType = SeriesChartType.FastLine;
             seriesLineIndicator.MarkerSize = 10;
             seriesLineIndicator.MarkerColor = Color.FromArgb(0, 255, 0);//--Light blue color....
-                                                                        //seriesLineIndicator.BorderWidth = 3;
-                                                                        //seriesLineIndicator.BorderDashStyle = ChartDashStyle.Dash;
+            //seriesLineIndicator.BorderWidth = 3;
+            //seriesLineIndicator.BorderDashStyle = ChartDashStyle.Dash;
 
 
             seriesLineIndicator.Points.Add(x1, y1);
@@ -8819,21 +8866,69 @@ namespace WFA_psychometric_chart
 
                 //--this sets the initial values of humidity and enthalpy
                 //CalculateHumidityEnthalpy((double)menuStripNodeInfoValues[index - 1].xVal, (double)menuStripNodeInfoValues[index - 1].yVal);//previousNodeIndexForLineInput
+
+
                 CalculateHumidityEnthalpy((double)menuStripNodeInfoValues[previousNodeIndexForLineInput].xVal, (double)menuStripNodeInfoValues[previousNodeIndexForLineInput].yVal);//previousNodeIndexForLineInput
                 startHumidity1 = Math.Round(humidityCalculated, 2);//--Fro showing only up to 2 dec. eg."34.52"
                 startEnthalpy1 = Math.Round(enthalpyCalculated, 2);
+                double startSpecificVolume1 = SpecificVolumeReturn;
                 //--This calculates the end humidity and the enthalpy values..
                 CalculateHumidityEnthalpy((double)menuStripNodeInfoValues[index].xVal, (double)menuStripNodeInfoValues[index].yVal);
                 endHumidity1 = Math.Round(humidityCalculated, 2);
                 endEnthalpy1 = Math.Round(enthalpyCalculated, 2);
+                double endSpecificVolume1 = SpecificVolumeReturn;
                 double enthalpyChange = endEnthalpy1 - startEnthalpy1;
 
                 // string sequenceDetected = menuStripNodeInfoValues[index - 1].name + " to " + menuStripNodeInfoValues[index].name;
                 string sequenceDetected = menuStripNodeInfoValues[previousNodeIndexForLineInput].name + " to " + menuStripNodeInfoValues[index].name;
 
 
-                string tooltipString = "Sequence :  " + sequenceDetected + " \n" + "                 start             end \n" + "Temp         :" + Math.Round(menuStripNodeInfoValues[index - 1].xVal, 2) + "               " + Math.Round(menuStripNodeInfoValues[index].xVal, 2) + "\nHumidity :" + startHumidity1 + "           " + endHumidity1 + "\nEnthalpy : " + startEnthalpy1 + "           " + endEnthalpy1 + "\nEnthalpy Change:" + enthalpyChange;
+                //string tooltipString = "Sequence :  " + sequenceDetected + " \n" + "                 start             end \n" + "Temp         :" + Math.Round(menuStripNodeInfoValues[index - 1].xVal, 2) + "               " + Math.Round(menuStripNodeInfoValues[index].xVal, 2) + "\nHumidity :" + startHumidity1 + "           " + endHumidity1 + "\nEnthalpy : " + startEnthalpy1 + "           " + endEnthalpy1 + "\nEnthalpy Change:" + enthalpyChange;
+                
+                //=====================================THisi used========================//
+
+                //--this sets the initial values of humidity and enthalpy
+                //CalculateHumidityEnthalpy(temporaryNodeValueStoreForRedrawLine[0].xVal, temporaryNodeValueStoreForRedrawLine[0].yVal);
+                //startHumidity1 = Math.Round(humidityCalculated, 2);
+                //startEnthalpy1 = Math.Round(enthalpyCalculated, 2);
+              
+                //--This calculates the end humidity and the enthalpy values..
+                //CalculateHumidityEnthalpy((double)temporaryNodeValueStoreForRedrawLine[1].xVal, (double)temporaryNodeValueStoreForRedrawLine[1].yVal);
+                //endHumidity1 = Math.Round(humidityCalculated, 2);
+                //endEnthalpy1 = Math.Round(enthalpyCalculated, 2);
+              
+
+                // MessageBox.Show("Start hum" + startHumidity1 + " end enth" + endEnthalpy1);
+                //MessageBox.Show("menustripinfovalues[prevNodeID].xVal=" + menuStripNodeInfoValues[prevNodeID].xVal + "menuStripNodeInfoValues[nextNodeID].yVal=" + menuStripNodeInfoValues[nextNodeID].yVal + "menuStripNodeInfoValues[nextNodeID].xVal = "+ menuStripNodeInfoValues[nextNodeID].xVal + " menuStripNodeInfoValues[nextNodeID].yVal" + menuStripNodeInfoValues[nextNodeID].yVal);
+
+               // double enthalpyChange = endEnthalpy1 - startEnthalpy1;
+
+               // string sequenceDetected = temporaryNodeValueStoreForRedrawLine[0].name + " to " + temporaryNodeValueStoreForRedrawLine[1].name;
+
+               // string tooltipString = "";
+                string ZeroLine = "Process:  " + lineName + " ";
+                string FirstLine = @"Parameters                      " + "Units               " + menuStripNodeInfoValues[previousNodeIndexForLineInput].name + "                  " + menuStripNodeInfoValues[index].name;
+                string SecondLine = @"DBT                                   " + "\x00B0 C                   " + Math.Round(menuStripNodeInfoValues[previousNodeIndexForLineInput].xVal, 2) + "                           " + Math.Round(menuStripNodeInfoValues[index].xVal, 2);
+                string ThirdLine = @"Relative Humidity           " + "%                     " + startHumidity1 + "                     " + endHumidity1;
+                string FourthLine = @"Humidity Ratio                " + "Kg/Kg dryair  " + Math.Round(menuStripNodeInfoValues[previousNodeIndexForLineInput].yVal, 2) + "                       " + Math.Round(menuStripNodeInfoValues[index].yVal, 2);
+                string FifthLine = "Volume Flow Rate           " + "m\xB3/s                " + Math.Round(menuStripNodeInfoValues[previousNodeIndexForLineInput].airFlow, 2) + "                      " + Math.Round(menuStripNodeInfoValues[index].airFlow, 2);
+
+                string SixthLine = "Specific Volume              " + "m\xB3/Kg             " + startSpecificVolume1 + "                    " + endSpecificVolume1;
+                double massFlowRate1 = menuStripNodeInfoValues[previousNodeIndexForLineInput].airFlow / startSpecificVolume1;
+                double massFlowRate2 = menuStripNodeInfoValues[index].airFlow / endSpecificVolume1;
+
+                string SeventhLine = @"Mass flow rate(dry air)   " + "Kg(dry air)/s   " + Math.Round(massFlowRate1, 2) + "                        " + Math.Round(massFlowRate2, 2);
+                string EighthLine = @"Enthalpy                           " + "KJ/Kg              " + startEnthalpy1 + "                       " + endEnthalpy1;
+                double totalEnthalpyFlow1 = massFlowRate1 * startEnthalpy1;
+                double totalEnthalpyFlow2 = massFlowRate2 * endEnthalpy1;
+                string NinthLine = @"Total Enthalpy Flow         " + "KJ/s                " + Math.Round(totalEnthalpyFlow1, 2) + "                      " + Math.Round(totalEnthalpyFlow2, 2);
+                double heatChange = totalEnthalpyFlow2 - totalEnthalpyFlow1;
+                string TenthLine = @"Heat Change                    " + "KW                  " + Math.Round(heatChange, 2) + "                     ";
+               string tooltipString = ZeroLine + "\n" + FirstLine + "\n" + SecondLine + "\n" + ThirdLine + "\n" + FourthLine + "\n" + FifthLine + "\n" + SixthLine + "\n" + SeventhLine + "\n" + EighthLine + "\n" + NinthLine + "\n" + TenthLine;
                 newLineSeries.ToolTip = tooltipString;
+
+                //=============================end of this is used======================//
+
                 //newSeries.MarkerStyle = MarkerStyle.Circle;
                 //newSeries.Points.AddXY(menuStripNodeInfoValues[index - 1].xVal, menuStripNodeInfoValues[index].xVal, menuStripNodeInfoValues[index - 1].yVal, menuStripNodeInfoValues[index].yVal);
                 //newLineSeries.Points.Add(new DataPoint(menuStripNodeInfoValues[index - 1].xVal, menuStripNodeInfoValues[index - 1].yVal));
@@ -11677,8 +11772,13 @@ namespace WFA_psychometric_chart
         BackgroundWorker bgWorker; //--This is the background worker for hevay lifting works
 
 
-        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+        public void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
+
+            if(dataGridView1.Rows.Count <= 0)
+            {
+                return;
+            }
 
             if (flagForTimer == 1)
             {
@@ -11958,6 +12058,8 @@ namespace WFA_psychometric_chart
             else
             {
                 //--The actual task
+
+
             }
 
         }
@@ -12163,7 +12265,7 @@ namespace WFA_psychometric_chart
         {
 
 
-
+            try { 
 
             if (MessageBox.Show("Are you sure you want to clear this chart?", "Clear chart", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
             //if (dialogResult == DialogResult.Yes)
@@ -12201,8 +12303,26 @@ namespace WFA_psychometric_chart
 
                 }
 
+                //if (dataGridView1.CurrentCell.RowIndex.ToString() != "")
+                //{
+                //    //set parameters of your event args
+                //    var eventArgs = new DataGridViewCellEventArgs(1, dataGridView1.CurrentCell.RowIndex);
+                //    //or setting the selected cells manually before executing the function
+                //    //dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[dataGridView2.CurrentCell.ColumnIndex].Selected = true;
+                //    dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Selected = true;
+                //    dataGridView1_CellClick(sender, eventArgs);
+                //}
+
+
+
+
+
             }//Close of clear chart
 
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
 
@@ -12238,6 +12358,8 @@ namespace WFA_psychometric_chart
             nodeInfoContainingDevice.Clear();//Resetting list
             string nodeTableName = "tbl_" + selectedBuildingList[0].BuildingName + "_node_value";
             string tableNameDevice = "tbl_" + selectedBuildingList[0].BuildingName + "_device_info_for_node";//currentNodeTableFromDB; 
+            string tableComfortZone = "tbl_" + selectedBuildingList[0].BuildingName + "_chart_comfort_zone_setting";//currentNodeTableFromDB; 
+
             //lets get the id values...
             string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
@@ -12322,6 +12444,20 @@ namespace WFA_psychometric_chart
                 command.ExecuteNonQuery();
 
             }//Close of using
+
+
+            //===Deleting comfort zone setting for clear chart
+            using (SQLiteConnection connection = new SQLiteConnection(connString1))
+            {
+                connection.Open();
+                string queryString = "delete from " + tableComfortZone + " where chartID = @id_value";
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                command.Parameters.AddWithValue("@id_value", chartID);
+                command.ExecuteNonQuery();
+
+            }//Close of using
+
+
 
             //--now deleting the node info from the main node info
             using (SQLiteConnection connection = new SQLiteConnection(connString1))
@@ -12707,7 +12843,9 @@ namespace WFA_psychometric_chart
 
             if (e.Cancelled)
             {
-                //--we cancel the worker 
+                    //--we cancel the worker 
+                   // MessageBox.Show("Cancled : ln :12759");
+
 
             }
             else if (e.Error != null)
@@ -12719,7 +12857,6 @@ namespace WFA_psychometric_chart
             else
             {
                     ////--The actual task
-
                     //if (chart1.InvokeRequired)
                     //{ 
                     // chart1.Invoke(new Action(()=>  chart1.Enabled = true));
@@ -12738,6 +12875,7 @@ namespace WFA_psychometric_chart
 
                         if (InvokeRequired)
                         {
+                           // MessageBox.Show("Let me crash in here");
                             Invoke(new MethodInvoker(RefreshGraph));
                         }
                         else
@@ -12748,11 +12886,28 @@ namespace WFA_psychometric_chart
                         {
                             int id = indexOfChartSelected;    //This value is changed 
                             LoadNodeAndLineFromDB(id);   //Lets make it passing the stirngs 
+                           // MessageBox.Show("Let me be loading in backgoundworker1_");
+
+                            //====Once loaded we need to check and update for mix nodes as they have not been updated and
+                            //=======again we need to load the data form db and then redraw okie
+                            foreach(var node in menuStripNodeInfoValues)
+                            {
+                                if(node.temperature_source != "Mix")
+                                {
+                                    //==Then only update the values
+                                    DBUpdateMixPointOnNodeValueChange(node.id);
+
+                                }
+
+                            }
+
+                            //==Now again load the data 
+                            LoadNodeAndLineFromDB(id);
 
                             // flagForInsertOrUpdateDataToDB = 1;
                             //--This is also completed..
                             ReDrawingLineAndNode();
-
+                           // ReloadComfortZoneForBackGroundWorker();
 
                         }
                         //} //close of lock
@@ -12923,6 +13078,22 @@ namespace WFA_psychometric_chart
 
 
             }//Close of using 
+
+            //==This one is for deleting mix node info if present 
+            string tableMixNodeInfo = "tbl_" + selectedBuildingList[0].BuildingName + "_mix_node_info";// "tbl_" ++"_node_value";
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                SQLiteDataReader reader = null;
+                string queryString = "delete   from  " + tableMixNodeInfo + "  where nodeID = @id_value";
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                command.Parameters.AddWithValue("@id_value", nodeID);
+                //SqlDataAdapter dataAdapter = new SqlDataAdapter(queryString, connection.ConnectionString); //connection.ConnectionString is the connection string
+                reader = command.ExecuteReader();
+                   
+            }//Close of using 
+
+
         }
 
         public void DeleteLineUsingNodeID(string nodeID)
@@ -13519,9 +13690,16 @@ namespace WFA_psychometric_chart
         private void trashBoxToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //==This section shows the trash
-            TrashBox tb = new TrashBox(this);
-            tb.ShowDialog();
-        }
+            try
+            {
+                TrashBox tb = new TrashBox(this);
+                tb.ShowDialog();
+
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+       }
 
         private void addMixNodeToolStripMenuItem_Click(object sender, EventArgs e)
         {

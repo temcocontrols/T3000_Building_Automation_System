@@ -673,7 +673,14 @@ namespace WFA_psychometric_chart
             1. 
             */
             //--This does all the updating and insertion function
+            try { 
             InputDeviceInfoAndValue();
+                f1.dataGridView1.EndEdit();
+
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
        
@@ -764,9 +771,16 @@ namespace WFA_psychometric_chart
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
+            //Before we close we need to refresh as well 
 
+            f1.RefreshChartAndDGVForMixNodeFunction();
             //--If we are closed then before closing we need to rese the values to previous values
             this.Close();//--This form will be closed by this action
+        }
+
+        private void Form_TemperatureSourceDeviceInput_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            f1.RefreshChartAndDGVForMixNodeFunction();
         }
     }
 }

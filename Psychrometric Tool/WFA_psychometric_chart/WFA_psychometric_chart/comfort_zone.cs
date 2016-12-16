@@ -236,6 +236,17 @@ namespace WFA_psychometric_chart
                 //insert of update database value 
                 bs.insertOrUpdateComfortChartSetting(chartid, comfortzoneid);
 
+                if (bs.dataGridView1.Rows.Count > 0)  //If there is data then only do this one
+                {
+                    //set parameters of your event args
+                    var eventArgs = new DataGridViewCellEventArgs(1, bs.dataGridView1.CurrentCell.RowIndex);
+                    // or setting the selected cells manually before executing the function
+                    bs.dataGridView1.Rows[bs.dataGridView1.CurrentCell.RowIndex].Cells[1].Selected = true;
+                    bs.dataGridView1_CellClick(sender, eventArgs);
+                }
+
+                this.Close();
+
             }//close of if
 
 

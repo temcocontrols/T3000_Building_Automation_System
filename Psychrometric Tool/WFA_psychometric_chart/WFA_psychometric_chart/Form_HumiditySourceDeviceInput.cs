@@ -665,6 +665,11 @@ namespace WFA_psychometric_chart
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
+
+            //First refresh the data while closing
+            f1.RefreshChartAndDGVForMixNodeFunction();
+
+
             this.Close();//Closing how is this so so confused please be mearciful to humankind
         }
 
@@ -672,17 +677,25 @@ namespace WFA_psychometric_chart
         {
             //--Ok button is clicked we need to do somethings
 
-           // try { 
+            try { 
             InputDeviceInfoAndValue();
 
-            //f1.dataGridView1_CellEndEdit(sender, );//Calling end edit after this one
+                //==For mix node update
+               // f1.DBUpdateMixPointOnNodeValueChange(f1.tempNodeID);
 
-           // f1.dataGridView1.EndEdit(true);
-            f1.dataGridView1.EndEdit();  //Calls the end edit section
-            //}catch(Exception ex)
-            //{
-            //    MessageBox.Show(ex.Message);
-            //}
+                //f1.RefreshChartAndDGVForMixNodeFunction();
+
+
+                //f1.dataGridView1_CellEndEdit(sender, );//Calling end edit after this one
+
+
+                // f1.dataGridView1.EndEdit(true);
+                f1.dataGridView1.EndEdit();  //Calls the end edit section
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         //--Now lets make the functions required by this OK button 
@@ -738,7 +751,7 @@ namespace WFA_psychometric_chart
 
                 //------------------------------------Working here -------------------------------------------------------//
                // f1.UpdateNodeInfoForTemperatureDeviceSelection(f1.tempNodeID, device_instance, deviceIP, temp_param_id, "temp", temp_present_value, param1_object_identifier_type);
-
+               
                 f1.UpdateNodeInfoForHumidityDeviceSelection(f1.tempNodeID, device_instance, deviceIP, temp_param2_id, "hum", temp_param2_present_value, param2_object_identifier_type);
                 //------------------------------------End of working here------------------------------------------------//
 
@@ -763,11 +776,10 @@ namespace WFA_psychometric_chart
             // }  //--close of if checkbox  
         }
 
-
-
-
-
-
+        private void Form_HumiditySourceDeviceInput_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            f1.RefreshChartAndDGVForMixNodeFunction();
+        }
     }
 
 }
