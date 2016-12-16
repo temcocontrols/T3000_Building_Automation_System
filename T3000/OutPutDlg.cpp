@@ -196,6 +196,7 @@ BEGIN_MESSAGE_MAP(COutPutDlg, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON_MODEL4, &COutPutDlg::OnBnClickedButtonModel4)
 	ON_BN_CLICKED(IDC_BUTTON_MODEL5, &COutPutDlg::OnBnClickedButtonModel5)
  
+	 
 END_MESSAGE_MAP()
 
 BOOL COutPutDlg::OnInitDialog()
@@ -271,23 +272,23 @@ BOOL COutPutDlg::OnInitDialog()
           strdemo=_T("");
           strdemo=GetTextFromReg(737);
           m_edit_off.SetWindowText(strdemo);
-		  GetDlgItem(IDC_BUTTON_MODEL1)->SetWindowText(strdemo);
+		  
           strdemo=_T("");
           strdemo=GetTextFromReg(741);
           m_edit_model1.SetWindowText(strdemo);
-		   GetDlgItem(IDC_BUTTON_MODEL2)->SetWindowText(strdemo);
+		 
           strdemo=_T("");
           strdemo=GetTextFromReg(745);
           m_edit_model2.SetWindowText(strdemo);
-		   GetDlgItem(IDC_BUTTON_MODEL3)->SetWindowText(strdemo);
+		  
           strdemo=_T("");
           strdemo=GetTextFromReg(749);
           m_edit_model3.SetWindowText(strdemo);
-		   GetDlgItem(IDC_BUTTON_MODEL4)->SetWindowText(strdemo);
+		 
           strdemo=_T("");
           strdemo=GetTextFromReg(753);
           m_edit_auto.SetWindowText(strdemo);
-		   GetDlgItem(IDC_BUTTON_MODEL5)->SetWindowText(strdemo);
+		 
 //           strdemo=_T("");
 //           strdemo=GetTextFromReg(757);
 //           m_edit_heat.SetWindowText(strdemo);
@@ -373,23 +374,23 @@ BOOL COutPutDlg::OnInitDialog()
 		strdemo = _T("");
 		strdemo = GetTextFromReg(737);
 		m_edit_off.SetWindowText(strdemo);
-		GetDlgItem(IDC_BUTTON_MODEL1)->SetWindowText(strdemo);
+		 
 		strdemo = _T("");
 		strdemo = GetTextFromReg(741);
 		m_edit_model1.SetWindowText(strdemo);
-		GetDlgItem(IDC_BUTTON_MODEL2)->SetWindowText(strdemo);
+	 
 		strdemo = _T("");
 		strdemo = GetTextFromReg(745);
 		m_edit_model2.SetWindowText(strdemo);
-		GetDlgItem(IDC_BUTTON_MODEL3)->SetWindowText(strdemo);
+		 
 		strdemo = _T("");
 		strdemo = GetTextFromReg(749);
 		m_edit_model3.SetWindowText(strdemo);
-		GetDlgItem(IDC_BUTTON_MODEL4)->SetWindowText(strdemo);
+	 
 		strdemo = _T("");
 		strdemo = GetTextFromReg(753);
 		m_edit_auto.SetWindowText(strdemo);
-		GetDlgItem(IDC_BUTTON_MODEL5)->SetWindowText(strdemo);
+	 
 		 
 
 	}
@@ -808,8 +809,10 @@ void COutPutDlg::put_fan_variable()
 	  CString strText;
 	  m_fan.GetWindowText(strText);
 	  m_fan.ShowWindow(SW_HIDE);
-	  GetDlgItem(IDC_STATIC_MODEL_NAME)->SetWindowTextW(strText);
+	 
 	  SetModelButton();
+
+	  
 	  if (product_register_value[7] == PM_TSTAT8)
 	  {
 		  strdemo = _T("1-4-0-1,");
@@ -932,6 +935,7 @@ void COutPutDlg::put_fan_variable()
 			  }
 			  m_fan_mode_ctrl.EnableWindow(TRUE);
 
+			  GetDlgItem(IDC_STATIC_MODEL_NAME)->SetWindowTextW(p[g_ifanStatus]);
 	 
 			  if (product_register_value[MODBUS_FAN_MODE] >= 0)
 				  m_fan_mode_ctrl.SetCurSel(product_register_value[MODBUS_FAN_MODE]);
@@ -1018,7 +1022,8 @@ void COutPutDlg::OnCbnSelchangeFanmode()
 {
 	 if (product_register_value[7] == PM_TSTAT8)
 	 {
-		 int ret = write_one(g_tstat_id, MODBUS_FAN_MODE, m_fan_mode_ctrl.GetCurSel() );
+		 int sel = m_fan_mode_ctrl.GetCurSel();
+		 int ret = write_one(g_tstat_id, MODBUS_FAN_MODE, sel);
 		 if (ret > 0)
 		 {
 			 product_register_value[MODBUS_FAN_MODE] = m_fan_mode_ctrl.GetCurSel() ;
@@ -6371,10 +6376,10 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 
 	//122	105	1	Low byte	W/R	FAN MODE, number of fan speeds. Single speed = 1 up to three speed fan = 3
 
-	if(product_register_value[MODBUS_FAN_MODE]>0)
+	/*if(product_register_value[MODBUS_FAN_MODE]>0)
 		m_fan_mode_ctrl.SetCurSel(product_register_value[MODBUS_FAN_MODE]-1);
 	else
-		m_fan_mode_ctrl.SetCurSel(0);
+		m_fan_mode_ctrl.SetCurSel(0);*/
 
 
 
@@ -8792,7 +8797,7 @@ void COutPutDlg::OnEnKillfocusEditFanCoolName()
     }   
 }
 
-
+                  
 void COutPutDlg::OnBnClickedButtonModel1()
 {
 	g_ifanStatus=0;
@@ -8863,48 +8868,49 @@ void COutPutDlg::SetModelButton()
 	{
 	    case 0:
 	    {
-			m_model1.EnableWindow(FALSE);
-			m_model2.EnableWindow(TRUE);
-			m_model3.EnableWindow(TRUE);
-			m_model4.EnableWindow(TRUE);
-			m_model5.EnableWindow(TRUE);
+			m_model1.SetCheck(1);
+			m_model2.SetCheck(0);
+			m_model3.SetCheck(0);
+			m_model4.SetCheck(0);
+			m_model5.SetCheck(0);
+			 
 
 	    }break;
 	    case 1:
 	    {
-			m_model1.EnableWindow(TRUE);
-			m_model2.EnableWindow(FALSE);
-			m_model3.EnableWindow(TRUE);
-			m_model4.EnableWindow(TRUE);
-			m_model5.EnableWindow(TRUE);
+			m_model1.SetCheck(0);
+			m_model2.SetCheck(1);
+			m_model3.SetCheck(0);
+			m_model4.SetCheck(0);
+			m_model5.SetCheck(0);
 
 			
 	    }break;
 	    case 2:
 	    {
-			m_model1.EnableWindow(TRUE);
-			m_model2.EnableWindow(TRUE);
-			m_model3.EnableWindow(FALSE);
-			m_model4.EnableWindow(TRUE);
-			m_model5.EnableWindow(TRUE);
+			m_model1.SetCheck(0);
+			m_model2.SetCheck(0);
+			m_model3.SetCheck(1);
+			m_model4.SetCheck(0);
+			m_model5.SetCheck(0);
 	    }break;
 	    case 3:
 	    {
 
-			m_model1.EnableWindow(TRUE);
-			m_model2.EnableWindow(TRUE);
-			m_model3.EnableWindow(TRUE);
-			m_model4.EnableWindow(FALSE);
-			m_model5.EnableWindow(TRUE);
+			m_model1.SetCheck(0);
+			m_model2.SetCheck(0);
+			m_model3.SetCheck(0);
+			m_model4.SetCheck(1);
+			m_model5.SetCheck(0);
 		
 	    }break;
 	    case 4:
 	    {
-			m_model1.EnableWindow(TRUE);
-			m_model2.EnableWindow(TRUE);
-			m_model3.EnableWindow(TRUE);
-			m_model4.EnableWindow(TRUE);
-			m_model5.EnableWindow(FALSE);
+			m_model1.SetCheck(0);
+			m_model2.SetCheck(0);
+			m_model3.SetCheck(0);
+			m_model4.SetCheck(0);
+			m_model5.SetCheck(1);
 	    }break;
 	    
 	    default:
@@ -8913,3 +8919,9 @@ void COutPutDlg::SetModelButton()
 }
 
 
+
+
+void COutPutDlg::OnBnClickedButtonModel11()
+{
+	// TODO: Add your control notification handler code here
+}

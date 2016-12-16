@@ -150,4 +150,5 @@ public:
 	CButton m_model3;
 	CButton m_model4;
 	CButton m_model5;
+	afx_msg void OnBnClickedButtonModel11();
 };

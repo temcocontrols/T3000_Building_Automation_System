@@ -3505,6 +3505,7 @@ void CMainFrame::ScanTstatInDB(void)
                                              temp_product_class_id == PM_T38I13O||
                                              temp_product_class_id == PM_T34AO||
                                              temp_product_class_id == PM_T36CT||
+										     temp_product_class_id == PWM_TRANSDUCER ||
                                              temp_product_class_id == PM_T322AI||
 											  temp_product_class_id == PM_T3PT12||
                                              temp_product_class_id == PM_T38AI8AO6DO) //T3
@@ -3713,7 +3714,7 @@ void CMainFrame::OnLoadConfigFile()
         return;
     }
 	else if(((g_protocol == MODBUS_RS485) || (g_protocol ==MODBUS_TCPIP)) &&  
-		((bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI)))
+		((bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PWM_TRANSDUCER)))
 	{
 		CFileDialog dlg(true,_T("*.prg"),_T(" "),OFN_HIDEREADONLY ,_T("Prg files (*.prg)|*.prg||"),NULL,0);
 		if(IDOK!=dlg.DoModal())
@@ -6402,7 +6403,7 @@ void CMainFrame::SaveConfigFile()
         return;
     }
 	else if(((g_protocol == MODBUS_RS485) || (g_protocol ==MODBUS_TCPIP)) &&  
-		    ((bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI)))
+		    ((bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PWM_TRANSDUCER)))
 	{
 		//T3的设备支持minipanel的 input output 就读10000以后的寄存器;
 		MainFram_hwd = this->m_hWnd;
@@ -7500,6 +7501,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					bacnet_device_type = T38AI8AO6DO;
 			else if(product_Node.product_class_id == PM_T322AI)
 				bacnet_device_type = PID_T322AI;
+			else if (product_Node.product_class_id == PWM_TRANSDUCER)
+				bacnet_device_type = PWM_TRANSDUCER;
 			else if(product_Node.product_class_id == PM_T3PT12)
 				bacnet_device_type = PID_T3PT12;
 			else if(product_Node.product_class_id == STM32_HUM_NET)
@@ -7549,6 +7552,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					bacnet_device_type = T38AI8AO6DO;
 				else if(product_Node.product_class_id == PM_T322AI)
 					bacnet_device_type = PID_T322AI;
+				else if (product_Node.product_class_id == PWM_TRANSDUCER)
+					bacnet_device_type = PWM_TRANSDUCER;
 				else if(product_Node.product_class_id == PM_T3PT12)
 					bacnet_device_type = PID_T3PT12;
                 CString temp_csa;
@@ -8818,7 +8823,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
                 SwitchToPruductType(DLG_DIALOG_TSTAT_INPUT_VIEW);
             }
-            else if (nFlag == PM_T322AI || nFlag == CS3000 || nFlag == PM_T38AI8AO6DO || nFlag == PM_T3PT12 )
+            else if (nFlag == PM_T322AI || nFlag == CS3000 || nFlag == PWM_TRANSDUCER || nFlag == PM_T38AI8AO6DO || nFlag == PM_T3PT12 )
             {
 				//就说明是加了minipanel 10000以后寄存器的; 否则的话就跳转至以前的界面;
 				new_device_support_mini_ui = true;
@@ -11225,7 +11230,7 @@ void CMainFrame::OnControlMain()
             bacnet_view_number = TYPE_TSTAT;
             SwitchToPruductType(DLG_T3000_VIEW);
         }
-        else if (product_type == CS3000||product_register_value[7]==PM_T322AI||product_register_value[7]==PM_T38AI8AO6DO || product_register_value[7]==PM_T3PT12)
+        else if (product_type == CS3000||product_register_value[7]==PM_T322AI || product_register_value[7] == PWM_TRANSDUCER ||product_register_value[7]==PM_T38AI8AO6DO || product_register_value[7]==PM_T3PT12)
         {
 		 
             bacnet_view_number = TYPE_TSTAT;
@@ -11333,7 +11338,7 @@ void CMainFrame::OnControlInputs()
     if((g_protocol == PROTOCOL_BACNET_IP) || 
 		(g_protocol == MODBUS_BACNET_MSTP) || 
 		(g_protocol == PROTOCOL_BIP_TO_MSTP)||
-		((g_protocol == MODBUS_RS485 ) && ((product_type == PM_MINIPANEL)  || ( ( (bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PID_T3PT12) )  && new_device_support_mini_ui ) ) ) ||
+		((g_protocol == MODBUS_RS485 ) && ((product_type == PM_MINIPANEL)  || ( ( (bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PID_T3PT12) || (bacnet_device_type == PWM_TRANSDUCER))  && new_device_support_mini_ui ) ) ) ||
 		((g_protocol == MODBUS_TCPIP ) && ( ( (bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PID_T3PT12) ) && new_device_support_mini_ui  )  ))
     {
 
@@ -11521,7 +11526,7 @@ void CMainFrame::OnControlOutputs()
     if((g_protocol == PROTOCOL_BACNET_IP) || 
 		(g_protocol == MODBUS_BACNET_MSTP) || 
 		(g_protocol == PROTOCOL_BIP_TO_MSTP) || 
-		((g_protocol == MODBUS_RS485 ) && ((product_type == PM_MINIPANEL)  || ( ( (bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PID_T3PT12)  )  && new_device_support_mini_ui ) ) ) ||
+		((g_protocol == MODBUS_RS485 ) && ((product_type == PM_MINIPANEL)  || ( ( (bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PWM_TRANSDUCER) || (bacnet_device_type == PID_T3PT12)  )  && new_device_support_mini_ui ) ) ) ||
 		((g_protocol == MODBUS_TCPIP ) && ( ( (bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PID_T3PT12) ) && new_device_support_mini_ui  )  ))
 	{
 
@@ -11909,7 +11914,7 @@ void CMainFrame::OnControlSettings()
         }
     }
 	
-	else if (product_type == CS3000||product_register_value[7]==PM_T322AI||product_register_value[7]==PM_T38AI8AO6DO||product_register_value[7]==PM_T3PT12
+	else if (product_type == CS3000||product_register_value[7]==PM_T322AI || product_register_value[7] == PWM_TRANSDUCER ||product_register_value[7]==PM_T38AI8AO6DO||product_register_value[7]==PM_T3PT12
 	             ||product_register_value[7]==STM32_HUM_NET )
 	{
 		bacnet_view_number = TYPE_TSTAT;

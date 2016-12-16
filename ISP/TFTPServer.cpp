@@ -579,7 +579,7 @@ void TFTPServer::SetDHCP_Data()
         memcpy_s(sendbuf+25,4,Byte_ISP_Device_IP,4);	//ISP_Device_IP is the device ip address and read in runtime.
     else
     {
-        memset(Byte_ISP_Device_IP,0,4);
+        //memset(Byte_ISP_Device_IP,0,4);
         memcpy_s(sendbuf+25,4,Byte_ISP_Device_IP,4);
     }
 
@@ -768,10 +768,10 @@ UINT TFTPServer::RefreshNetWorkDeviceListByUDPFunc()
 							nLen=buffer[2]+buffer[3]*256;
 							unsigned short dataPackage[32]= {0};
 							memcpy(dataPackage,buffer+2,nLen*sizeof(unsigned short));
-							szIPAddr[0]= (BYTE)dataPackage[7];
-							szIPAddr[1]= (BYTE)dataPackage[8];
-							szIPAddr[2]= (BYTE)dataPackage[9];
-							szIPAddr[3]= (BYTE)dataPackage[10];
+							szIPAddr[0]= buffer[16];// (BYTE)dataPackage[7];
+							szIPAddr[1]= buffer[18];//(BYTE)dataPackage[8];
+							szIPAddr[2]= buffer[20];// (BYTE)dataPackage[9];
+							szIPAddr[3]= buffer[22];// (BYTE)dataPackage[10];
 							CString temp_rec_ip;
 							temp_rec_ip.Format(_T("%u.%u.%u.%u"),szIPAddr[0],szIPAddr[1],szIPAddr[2],szIPAddr[3]);
 							if(temp_rec_ip.CompareNoCase(ISP_Device_IP) == 0)
@@ -1117,7 +1117,7 @@ BOOL TFTPServer::StartServer()
         BYTE szBuf[512];
         ZeroMemory(szBuf, 512);
         //int nLen = sizeof(m_test_siClient);
-
+		 memset(Byte_ISP_Device_IP,0,4);
         GetDeviceIP_String();
         SetDHCP_Data();
         ISP_STEP = ISP_SEND_FLASH_COMMAND;
@@ -1151,12 +1151,13 @@ BOOL TFTPServer::StartServer()
 
 					int send_ret=TCP_Flash_CMD_Socket.Send(byCommand,sizeof(byCommand),0);
                    // int send_ret=TCP_Flash_CMD_Socket.SendTo(byCommand,sizeof(byCommand),m_nClientPort,ISP_Device_IP,0);
-                    //TRACE(_T("%d"),send_ret);
+                    TRACE(_T("send_ret = %d\r\n"),send_ret);
                     if(send_ret<0)	//如果发送失败 就尝试 再次进行TCP连接
                     {
 						//TRACE(_T("Send ee10 failed!"));
                         //TCP_Flash_CMD_Socket.Connect(ISP_Device_IP,m_nClientPort);
                     }
+
                     SetDHCP_Data();
 
 
@@ -1263,14 +1264,29 @@ BOOL TFTPServer::StartServer()
 						ProductName.TrimRight();
 						m_StrProductName.TrimLeft();
 						m_StrProductName.TrimRight();
-						if (ProductName.CompareNoCase(m_StrProductName)!=0)
+						if (ProductName.CompareNoCase(m_StrProductName)!=0) 						
 						{
-							nRet=0;
-							strTips.Format(_T("Your Device is %s,Your Hex is fit for %s"),m_StrProductName,ProductName);
-							OutPutsStatusInfo(strTips, TRUE);
+							if(((ProductName.CompareNoCase(_T("Minipanel")) == 0) && m_StrProductName.CompareNoCase(_T("MINI")) == 0) ||
+								((ProductName.CompareNoCase(_T("MINI")) == 0) && m_StrProductName.CompareNoCase(_T("Minipanel")) == 0))
+							{
+								Sleep(1);
+							}
+							else if((m_StrProductName.CompareNoCase(_T("HUMNET")) == 0) ||
+								(m_StrProductName.CompareNoCase(_T("CO2NET")) == 0) ||
+								(m_StrProductName.CompareNoCase(_T("PSNET")) == 0))
+							{
+								Sleep(1);
+							}
+							else
+							{
+								nRet=0;
+								strTips.Format(_T("Your Device is %s,Your Hex is fit for %s"),m_StrProductName,ProductName);
+								OutPutsStatusInfo(strTips, TRUE);
 
-							goto StopServer;
-							break;
+								goto StopServer;
+								break;
+							}
+
 						}
 					}
 				}
@@ -1399,7 +1415,7 @@ bool TFTPServer::Send_Tftp_File()
             //{
             if(retry>0)
                 total_retry++;
-            strTips.Format(_T("Programming finished %d Kb.(%d%%).Retry(%d)"), nCount/1024,persent_finished,total_retry);
+            strTips.Format(_T("Programming finished %d KB.(%d%%).Retry(%d)"), nCount/1024,persent_finished,total_retry);
             OutPutsStatusInfo(strTips, TRUE);
             //}
             nRet = SendDataNew(pBuf, nSendNum);

@@ -342,7 +342,7 @@ void CProductRegisterListView::Fresh(void)
     m_current_tree_node = pFrame->m_current_tree_node; 
     /* m_isReading=*/
 	pFrame->ConnectDevice(m_current_tree_node);
-    m_isReading = FALSE;
+    m_isReading = TRUE;
     if (m_isReading)
     {
         GetDlgItem(IDC_READ_DEVICE)->SetWindowText(_T("Stop Read"));

@@ -312,7 +312,7 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 
 LRESULT CBacnetProgramEdit::Fresh_Program_RichEdit(WPARAM wParam,LPARAM lParam)
 {
-	//return 0;
+	
 	//	CString temp2;
 	char * temp_point;
  	temp_point = desassembler_program();

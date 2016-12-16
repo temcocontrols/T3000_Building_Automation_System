@@ -30,7 +30,7 @@ public:
 	virtual void OnInitialUpdate();
 	void Fresh();
 	afx_msg void OnBnClickedEditId();
-    afx_msg void OnBnClickedButtonGoToInput();
+//    afx_msg void OnBnClickedButtonGoToInput();
     CComboBox m_ip_model;
     CIPAddressCtrl m_ipaddress;
     CIPAddressCtrl m_Subnet_Mask;
@@ -39,6 +39,14 @@ public:
     CEdit m_ListenPort;
     afx_msg void OnBnClickedApplybutton();
     afx_msg void OnCbnSelchangeIpmodelCombo();
+	CComboBox m_brandrate_combox;
+	CEdit m_Editor_macmstp;
+	CComboBox m_mstpmodbus_combox;
+	CEdit m_BipPort_Edit;
+	afx_msg void OnEnKillfocusEditBipport();
+	afx_msg void OnCbnSelchangeComboMstpModbus();
+	afx_msg void OnEnKillfocusEditMstpMac();
+	afx_msg void OnCbnKillfocusBraudratecombo();
 };
 
 

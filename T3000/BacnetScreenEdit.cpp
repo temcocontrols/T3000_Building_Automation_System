@@ -260,6 +260,15 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
 
 void CBacnetScreenEdit::AddLabel(unsigned char point_type,uint8_t point_number,uint8_t main_panel,uint8_t sub_panel,unsigned int point_x,unsigned int point_y)
 {
+	nDefaultDisplayType = GetPrivateProfileInt(_T("Setting"),_T("AddLabelDefaultDisplay"),LABEL_SHOW_VALUE,g_cstring_ini_path);
+	nDefaultclrTxt = GetPrivateProfileInt(_T("Setting"),_T("AddLabelDefaultColor"),RGB(0,0,255),g_cstring_ini_path);
+	nDefaultTextPlace = GetPrivateProfileInt(_T("Setting"),_T("AddLabelDefaultTextPlace"),LABEL_TEXT_BOTTOM,g_cstring_ini_path);
+	nDefaultIconSize = GetPrivateProfileInt(_T("Setting"),_T("AddLabelDefaultIconSize"),LABEL_ICON_NORMAL,g_cstring_ini_path);
+
+	//WritePrivateProfileStringW(_T("Setting"),_T("AddLabelDefaultDisplay"),temp_cs,g_cstring_ini_path);
+	//WritePrivateProfileStringW(_T("Setting"),_T("AddLabelDefaultColor"),temp_cs,g_cstring_ini_path);
+	//WritePrivateProfileStringW(_T("Setting"),_T("AddLabelDefaultTextPlace"),temp_cs,g_cstring_ini_path);
+
 	try
 	{
 
@@ -297,10 +306,12 @@ void CBacnetScreenEdit::AddLabel(unsigned char point_type,uint8_t point_number,u
 			(point_type == BAC_AMON + 1) ||
 			(point_type == BAC_PID + 1))
 		{
-			display_type = LABEL_ICON_LABEL;
+			//if(nDefaultDisplayType == LABEL_SHOW_VALUE)
+			//	nDefaultDisplayType = LABEL_ICON_VALUE;
 		}
 
-		strSql.Format(_T("insert into Screen_Bacnet_Label values(%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,'%s','%s',%i,%i)"),m_nSerialNumber,screen_list_line,Max_Control_ID,main_panel,sub_panel,point_type,point_number,point_x,point_y,text_color,display_type,_T(""),_T(""),LABEL_TEXT_BOTTOM,LABEL_ICON_SMALL);
+		//strSql.Format(_T("insert into Screen_Bacnet_Label values(%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,'%s','%s',%i,%i)"),m_nSerialNumber,screen_list_line,Max_Control_ID,main_panel,sub_panel,point_type,point_number,point_x,point_y,text_color,display_type,_T(""),_T(""),LABEL_TEXT_BOTTOM,LABEL_ICON_SMALL);
+		strSql.Format(_T("insert into Screen_Bacnet_Label values(%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,'%s','%s',%i,%i)"),m_nSerialNumber,screen_list_line,Max_Control_ID,main_panel,sub_panel,point_type,point_number,point_x,point_y,nDefaultclrTxt,nDefaultDisplayType,_T(""),_T(""),nDefaultTextPlace,nDefaultIconSize);
 
 		SqliteDBT3000.execDML((UTF8MBSTR)strSql);
 
@@ -1960,6 +1971,11 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 		int rect_y = m_bac_label_vector.at(i).nPoint_y;
 		int rect_y_botton = rect_y + 30;
 
+		int x_l_exp_value = 10;
+		int x_r_exp_value = 10;
+		int y_top_exp_value = 10;
+		int y_btn_exp_value = 10;
+
 		if((point.x > 0 ) && (point.x < LOCK_ICON_SIZE_X) && (point.y > 0) && (point.y < LOCK_ICON_SIZE_Y))
 		{
 			if(screen_lock_label)
@@ -1975,6 +1991,10 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 			Invalidate(1);
 			break;
 		}
+		rect_x = rect_x - x_l_exp_value;
+		rect_x_right = rect_x_right + x_r_exp_value;
+		rect_y = rect_y - y_top_exp_value;
+		rect_y_botton = rect_y_botton + y_btn_exp_value;
 
 		if((point.x > rect_x ) && (point.x < rect_x_right) && (point.y > rect_y) && (point.y < rect_y_botton) && (screen_lock_label == false))
 		{
@@ -2015,6 +2035,11 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 				rect_y = m_bac_label_vector.at(i).nPoint_y - delt_y;
 				rect_x_right = m_bac_label_vector.at(i).nPoint_x + delt_x;
 				rect_y_botton = m_bac_label_vector.at(i).nPoint_y;
+
+				rect_x = rect_x - x_l_exp_value;
+				rect_x_right = rect_x_right + x_r_exp_value;
+				rect_y = rect_y - y_top_exp_value;
+				rect_y_botton = rect_y_botton + y_btn_exp_value;
 			}
 			else if(m_bac_label_vector.at(i).ntext_place == LABEL_TEXT_RIGHT)
 			{
@@ -2022,6 +2047,11 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 				rect_y = m_bac_label_vector.at(i).nPoint_y ;
 				rect_x_right = m_bac_label_vector.at(i).nPoint_x ;
 				rect_y_botton = m_bac_label_vector.at(i).nPoint_y + delt_y;
+
+				rect_x = rect_x - x_l_exp_value;
+				rect_x_right = rect_x_right + x_r_exp_value;
+				rect_y = rect_y - y_top_exp_value;
+				rect_y_botton = rect_y_botton + y_btn_exp_value;
 			}
 			else if(m_bac_label_vector.at(i).ntext_place == LABEL_TEXT_TOP)
 			{
@@ -2029,6 +2059,11 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 				rect_y = m_bac_label_vector.at(i).nPoint_y  + 30;
 				rect_x_right = m_bac_label_vector.at(i).nPoint_x + delt_x;
 				rect_y_botton = m_bac_label_vector.at(i).nPoint_y + delt_y;
+
+				rect_x = rect_x - x_l_exp_value;
+				rect_x_right = rect_x_right + x_r_exp_value;
+				rect_y = rect_y - y_top_exp_value;
+				rect_y_botton = rect_y_botton + y_btn_exp_value;
 			}
 
 			//for (int j=i+1; j<m_bac_label_vector.size();j++)
@@ -2557,6 +2592,7 @@ void CBacnetScreenEdit::SaveBacLabel(int nItem)
 	int nLeft_persent,nTop_persent;
 	nLeft_persent = (m_bac_label_vector.at(nItem).nPoint_x * 1000)/m_paint_right_limit;
 	nTop_persent = (m_bac_label_vector.at(nItem).nPoint_y * 1000)/m_paint_botton_limit;
+	TRACE(_T("nLeft_persent = %d , nTop_persent = %d\r\n"),nLeft_persent,nTop_persent);
 	int temp_serial_number =  m_bac_label_vector.at(nItem).nSerialNum;
 	int temp_screen = m_bac_label_vector.at(nItem).nScreen_index;
 	int temp_label_index = m_bac_label_vector.at(nItem).nLabel_index;

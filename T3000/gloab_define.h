@@ -520,6 +520,7 @@ struct refresh_net_device
 	DWORD parent_serial_number;
 	CString NetCard_Address;
 	CString show_label_name;
+	unsigned short bacnetip_port;
 };
 
 struct refresh_net_label_info
@@ -963,6 +964,7 @@ typedef enum
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,
 	PID_T3PT12 = 46
+	 
 };
 
 const int BIG_MINIPANEL_IN_A = 32;
@@ -991,6 +993,8 @@ const int T38AI8AO6DO_OUT_A = 8;
 const int T322AI_OUT_D = 0;
 const int T322AI_OUT_A = 0;
 
+const int PWM_TRANSDUCER_OUT_D = 0;
+const int PWM_TRANSDUCER_OUT_A = 6;
 enum
 {
 	UART_1200 = 0,
@@ -1763,6 +1767,8 @@ typedef union
 		UCHAR object_instance_4;
 		UCHAR object_instance_3;
 		UCHAR isp_mode;  //非0 在isp mode   , 0 在应用代码;    第60个字节
+		USHORT bacnetip_port;	//bacnet 的端口号;
+		UCHAR  zigbee_exsit;	// 1 代表有zigbee模块;
 	}reg;
 }Str_UPD_SCAN;
 

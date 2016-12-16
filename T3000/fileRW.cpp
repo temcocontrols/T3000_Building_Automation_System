@@ -4839,6 +4839,7 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 ////LoadFile2Tstat_twofile(load_file_one_time,fn,p_log_file);
 
 }
+
 void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFile*p_log_file)
 {
    //int nSpecialValue=read_one(now_tstat_id,326);

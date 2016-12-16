@@ -1262,6 +1262,11 @@ extern CString isp_mode_detect_firmware_path;
 
 extern HANDLE hwait_scan_thread;
 
+extern unsigned char nDefaultDisplayType;
+extern unsigned char nDefaultTextPlace;
+extern unsigned char nDefaultIconSize;
+extern COLORREF	  nDefaultclrTxt;
+
 extern int graphic_view_index ;
 extern CString grapgic_view_name[3];
 extern bool graphic_view_visible[14];
