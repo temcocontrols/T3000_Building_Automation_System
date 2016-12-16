@@ -616,14 +616,15 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 		CString Temp_CString =  m_variable_list.GetItemText(lRow,lCol);
 
 		CStringArray TEMPCS;
-		int temp_hour,temp_minute;
+		int temp_hour,temp_minute,temp_second;
 		SplitCStringA(TEMPCS, Temp_CString, _T(":"));
-		if((int)TEMPCS.GetSize() <2)
+		if((int)TEMPCS.GetSize() <3)
 		{
 			temp_hour = 0;
 			temp_minute = 0;
+			temp_second = 0;
 			CTime TimeTemp(2016,1,1,temp_hour,temp_minute,0);
-			m_variable_time_picker.SetFormat(_T("HH:mm"));
+			m_variable_time_picker.SetFormat(_T("HH:mm:ss"));
 			m_variable_time_picker.SetTime(&TimeTemp);
 			m_variable_time_picker.SetFocus();
 		}
@@ -631,8 +632,15 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 		{
 			temp_hour = _wtoi(TEMPCS.GetAt(0));
 			temp_minute = _wtoi(TEMPCS.GetAt(1));
-			CTime TimeTemp(2016,1,1,temp_hour,temp_minute,0);
-			m_variable_time_picker.SetFormat(_T("HH:mm"));
+			temp_second = _wtoi(TEMPCS.GetAt(2));
+			if(temp_hour >=24)
+				temp_hour = 0;
+			if(temp_minute >=60)
+				temp_minute = 0;
+			if(temp_second >= 60)
+				temp_second = 0;
+			CTime TimeTemp(2016,1,1,temp_hour,temp_minute,temp_second);
+			m_variable_time_picker.SetFormat(_T("HH:mm:ss"));
 			m_variable_time_picker.SetTime(&TimeTemp);
 			m_variable_time_picker.SetFocus();
 		}
@@ -888,25 +896,25 @@ void CBacnetVariable::OnNMKillfocusDatetimepicker2Variable(NMHDR *pNMHDR, LRESUL
 {
 	// TODO: Add your control notification handler code here
 	CTime temp_time;CString temp_cs;
-	int chour,cmin;
+	int chour,cmin,csend;
 	m_variable_time_picker.GetTime(temp_time);
 	chour = temp_time.GetHour();
 	cmin = temp_time.GetMinute();
+	csend = temp_time.GetSecond();
 
 
-
-	if((chour == 0) &&(cmin	==0))
+	if((chour == 0) &&(cmin	==0) && (csend == 0))
 	{
 		temp_cs.Empty();
 	}
 	else
-		temp_cs.Format(_T("%02d:%02d"),chour,cmin);
+		temp_cs.Format(_T("%02d:%02d:%02d"),chour,cmin,csend);
 	m_variable_list.SetItemText(m_row,m_col,temp_cs);
 
 	m_variable_time_picker.ShowWindow(SW_HIDE);
 
 	int write_value;
-	write_value =( chour*3600 + cmin * 60) * 1000;
+	write_value =( chour*3600 + cmin * 60 + csend) * 1000;
 	m_Variable_data.at(m_row).value = write_value;
 	CString temp_task_info;
 	temp_task_info.Format(_T("Write Variable Time Item%d .Changed Time to \"%s\" "),m_row + 1,temp_cs);

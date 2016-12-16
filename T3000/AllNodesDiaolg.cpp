@@ -779,14 +779,7 @@ void CAllNodesDiaolg::OnBnClickedDelbuttonOffline()
 {
 
 
-    if(m_pDialogInfo==NULL)
-    {
-        m_pDialogInfo = new CDialogInfo;
-        m_pDialogInfo->Create(IDD_DIALOG_INFO,this);
-        m_pDialogInfo->ShowWindow(SW_SHOW); 
-        m_pDialogInfo->CenterWindow();
-        m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T(""));
-    }
+ 
 
 	CppSQLite3DB SqliteDBBuilding;
 	CppSQLite3Table table;
@@ -794,120 +787,19 @@ void CAllNodesDiaolg::OnBnClickedDelbuttonOffline()
 	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
     CString strSql;
-    strSql.Format(_T("select * from ALL_NODE where MainBuilding_Name = '%s' ORDER BY Product_ID ASC"),m_strMainBuildingName);
-    //m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);		
-    q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
-	 
-    
-    //m_FlexGrid.put_Rows(recordcount+2);	
-    int temp_row=0;
-    CString str_temp;
-    str_temp.Empty();
-    _variant_t temp_variant;
-    CString Serial_Number;
-    CString Protocol;
-    CString Bautrate;
-    CString Com_Port;
-    CString Product_ID;
-     BOOL Is_Online = FALSE;
+    strSql.Format(_T("Delete from ALL_NODE Where Online_Status = 0 And MainBuilding_Name = '%s' "),m_strMainBuildingName);
+ 
+     SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 
-    while(!q.eof())
-    {
-        
-            Protocol=q.getValuebyName(L"Protocol");
-          
-       
-            Serial_Number=q.getValuebyName(L"Serial_ID");
-            str_temp.Format(_T("Checking Serial Number:%s"),Serial_Number);
-        if (m_pDialogInfo != NULL&&m_pDialogInfo->IsWindowVisible())
-        {
-            m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(str_temp);
-           /* m_pDialogInfo->ShowWindow(SW_SHOW);*/
-        }
-
-        
-            Com_Port=q.getValuebyName(L"Com_Port"); 
-
-        
-            Bautrate=q.getValuebyName(L"Bautrate");
-
-        
-            Product_ID=q.getValuebyName(L"Product_ID");
-
-             close_com();
-
-           int modbusid = _wtoi(Product_ID);
-
-            if (Protocol.CompareNoCase(L"0")==0)
-            {
-                 int comport = _wtoi(Com_Port);
-                 int brandrate = _wtoi(Bautrate);
-                 
-                if(open_com(comport))
-                {
-                    Change_BaudRate(brandrate);
-                      
-                      SetCommunicationType(0);
-                    
-                    int ret = read_one(modbusid,7);
-                    if (ret>0)
-                    {
-                      Is_Online = TRUE;  
-                    }
-                    else
-                    {
-                       Is_Online = FALSE;
-                    }
-                }     
-                       
-            }
-            else
-            {
-                int port = _wtoi(Com_Port);
-                if (Open_Socket2(Bautrate,port))
-                {
-                    SetCommunicationType(1);
-                    int ret = read_one(modbusid,7);
-                    if (ret>0)
-                    {
-                        Is_Online = TRUE;  
-                    }
-                    else
-                    {
-                        Is_Online = FALSE;
-                    } 
-                }
-                  
-            }
-
-            if (!Is_Online)
-            {
-                   strSql.Format(_T("delete   from ALL_NODE where Serial_ID ='%s'"),Serial_Number);
-                   try
-                   {
-
-
-                      SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
-                   }
-                   catch(_com_error *e)
-                   {
-                       AfxMessageBox(e->ErrorMessage());
-                   }
-                    m_bChanged=TRUE;
-            }
-
-            q.nextRow();
-    }
+     
 
     SqliteDBBuilding.closedb();
 
 
     ReloadAddBuildingDB();
+	m_bChanged = TRUE;
 
+	AfxMessageBox(L"Delete all off line devices ,successfully!");
 
-    if (m_pDialogInfo!=NULL)
-    {
-        delete m_pDialogInfo;
-        m_pDialogInfo = NULL;
-    }
+   
 }

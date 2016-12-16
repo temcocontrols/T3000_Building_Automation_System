@@ -155,7 +155,7 @@ void CBacnetSetting::Get_Time_Edit_By_Control()
 	m_cm5_time_picker.GetTime(temp_time);
 	Device_time.ti_hour = temp_time.GetHour();
 	Device_time.ti_min = temp_time.GetMinute();
-	Device_time.ti_sec = temp_time.GetMinute();
+	Device_time.ti_sec = temp_time.GetSecond();
 	CString temp_task_info;
 	temp_task_info.Format(_T("Write Device Time.Changed to %02d-%02d %02d:%02d  "),
 		Device_time.month,Device_time.dayofmonth,

@@ -161,14 +161,22 @@ BOOL CFlash_Multy::OnInitDialog()
         {
             temp.cofnigresult = 0;
         }
-
+		StrTemp = m_flash_multy_list.GetItemText(i, FLASH_ONLINE);
+		if (StrTemp.CompareNoCase(L"Online") == 0)
+		{
+			temp.online = true;
+		} 
+		else
+		{
+			temp.online = false;
+		}
         flash_device.push_back(temp);
     }
 
-     if(Check_Online_Thread != NULL)
+   /*  if(Check_Online_Thread != NULL)
          TerminateThread(Check_Online_Thread, 0);
      Check_Online_Thread=NULL;
-     Check_Online_Thread =CreateThread(NULL,NULL,multy_check_online,this,NULL, NULL);
+     Check_Online_Thread =CreateThread(NULL,NULL,multy_check_online,this,NULL, NULL);*/
     return TRUE;  // return TRUE unless you set the focus to a control
     // EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -228,8 +236,8 @@ void CFlash_Multy::Initial_List()
     m_flash_multy_list.InsertColumn(FLASH_IPPORT, _T("Port"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_flash_multy_list.InsertColumn(FLASH_SUB_NOTE, _T("Is Sub"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_flash_multy_list.InsertColumn(FLASH_ONLINE, _T("Is Online"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-    m_flash_multy_list.InsertColumn(FLASH_CURRENT_FIRMWARE, _T("Current Firmware"), 100, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-    m_flash_multy_list.InsertColumn(FLASH_FILE_REV, _T("Latest Firmware"), 100, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+    m_flash_multy_list.InsertColumn(FLASH_CURRENT_FIRMWARE, _T("Current Firmware"), 0, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+    m_flash_multy_list.InsertColumn(FLASH_FILE_REV, _T("Latest Firmware"), 0, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_flash_multy_list.InsertColumn(FLASH_FILE_POSITION, _T("Hex Bin File"), 120, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
     m_flash_multy_list.InsertColumn(FLASH_CONFIG_FILE_POSITION, _T("Configuration file"), 120, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
     m_flash_multy_list.InsertColumn(FLASH_RESULTS, _T("Firmware Results"), 100, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -279,31 +287,41 @@ void CFlash_Multy::Initial_List()
         nID.Format(_T("%d"),pFrame->m_product.at(i).product_id);
         nProductName = GetProductName(pFrame->m_product.at(i).product_class_id);
         nproduct_id.Format(_T("%u"),(unsigned char)pFrame->m_product.at(i).product_class_id);
-		if(pFrame->m_product.at(i).protocol == 0)
+		if(pFrame->m_product.at(i).note_parent_serial_number == 0)
 		{
-			nComport.Format(_T("%d"),pFrame->m_product.at(i).ncomport);
-			nBraudrate.Format(_T("%d"),pFrame->m_product.at(i).baudrate);
+			if(pFrame->m_product.at(i).BuildingInfo.strIp.FindOneOf(_T(".")))
+			{
+				nComport.Empty();
+				nIPAddress = pFrame->m_product.at(i).BuildingInfo.strIp;
+				nIP_Port.Format(_T("%d"),pFrame->m_product.at(i).ncomport);
+			}
+			else
+			{
+				nComport.Format(_T("%d"),pFrame->m_product.at(i).ncomport);
+				nBraudrate.Format(_T("%d"),pFrame->m_product.at(i).baudrate);			
+				nIP_Port.Empty();
+				nIPAddress.Empty();
+			}
 			n_is_sub = _T("NO");
-			nIP_Port.Empty();
-			nIPAddress.Empty();
+
 		}
         else
         {
             nComport.Empty();
             nIPAddress = pFrame->m_product.at(i).BuildingInfo.strIp;
             nIP_Port.Format(_T("%d"),pFrame->m_product.at(i).ncomport);
-            if(IsOurNetDevice(pFrame->m_product.at(i).product_class_id) == false)//如果不是网络设备就说明是TSTAT类的串口设备;
-            {
+            //if(IsOurNetDevice(pFrame->m_product.at(i).product_class_id) == false)//如果不是网络设备就说明是TSTAT类的串口设备;
+           // {
                 n_is_sub = _T("YES");
-            }
-            else
-            {
-                n_is_sub = _T("NO");
-            }
+           // }
+           // else
+           // {
+           //     n_is_sub = _T("NO");
+           // }
         }
 
         m_flash_multy_list.InsertItem(i,nitem);
-        m_flash_multy_list.SetCellChecked(i,0,TRUE);
+       
         m_flash_multy_list.SetItemText(i,FLASH_SERIAL_NUMBER,nSerialNum);
         m_flash_multy_list.SetItemText(i,FLASH_ID,nID);
         m_flash_multy_list.SetItemText(i,FLASH_PRODUCT_NAME,nProductName);
@@ -313,7 +331,17 @@ void CFlash_Multy::Initial_List()
         m_flash_multy_list.SetItemText(i,FLASH_IPPORT,nIP_Port);
         m_flash_multy_list.SetItemText(i,FLASH_SUB_NOTE,n_is_sub);
         m_flash_multy_list.SetItemText(i,FLASH_PRODUCT_ID,nproduct_id);
-
+		if (pFrame->m_product.at(i).status)
+		{
+			m_flash_multy_list.SetItemText(i, FLASH_ONLINE, _T("Online"));
+			m_flash_multy_list.SetCellChecked(i, 0, TRUE);
+		} 
+		else
+		{
+			m_flash_multy_list.SetItemText(i, FLASH_ONLINE, _T("Offline"));
+			m_flash_multy_list.SetCellChecked(i, 0, FALSE);
+		}
+		
         strSql.Format(_T("Select * from BatchFlashResult where SN=%d"),pFrame->m_product.at(i).serial_number);
         q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
         if (!q.eof())
@@ -517,10 +545,15 @@ BOOL CFlash_Multy::Product_Firmware_Check(CString ProductName,CString FirmwareFi
     BOOL Ret_Result = TRUE;
     if (TRUE)
     {
-        for (int i=0; i<10; i++)
-        {
-            hexproductname.AppendFormat(_T("%c"),file_infor.product_name[i]);
-        }
+
+		MultiByteToWideChar( CP_ACP, 0, file_infor.product_name, (int)strlen(file_infor.product_name)+1,hexproductname.GetBuffer(MAX_PATH), MAX_PATH );
+		hexproductname.ReleaseBuffer();
+		hexproductname = hexproductname.Left(10);
+		hexproductname.Trim();
+        //for (int i=0; i<10; i++)
+        //{
+        //    hexproductname.AppendFormat(_T("%c"),file_infor.product_name[i]);
+        //}
 
 
 
@@ -553,6 +586,19 @@ BOOL CFlash_Multy::Product_Firmware_Check(CString ProductName,CString FirmwareFi
         {
             Ret_Result= TRUE;
         }
+		else if ((hexproductname.CompareNoCase(_T("T322I"))==0)&&(ProductName.CompareNoCase(_T("T3-22I"))==0))
+		{
+			Ret_Result= TRUE;
+		}
+		else if ((hexproductname.CompareNoCase(_T("MiniPanel"))==0)&&(ProductName.CompareNoCase(_T("T3-8AI8AO6DO"))==0))
+		{
+			Ret_Result= TRUE;
+		}	
+		else if ((hexproductname.CompareNoCase(_T("T38IO"))==0)&&(ProductName.CompareNoCase(_T("T3-BB/LB/TB"))==0))
+		{
+			Ret_Result= TRUE;
+		}	
+		
         else
         {
 //             strtips.Format(_T("Your device is %s   Your hex file is fit for %s "),prodcutname.GetBuffer(),hexproductname.GetBuffer());
@@ -616,7 +662,7 @@ void CFlash_Multy::SetAutoConfig(Str_flash_device ndevice_info)
 
         WritePrivateProfileStringW(_T("Data"),_T("ID"),nflash_id,AutoFlashConfigPath);
 
-        temp_isp_info.Format(_T("ISP via : "));
+        temp_isp_info.Format(_T("Communications port : "));
         temp_isp_info = temp_isp_info + cs_comport;
         m_multy_flash_listbox.InsertString(m_multy_flash_listbox.GetCount(),temp_isp_info);
         temp_isp_info.Format(_T("ISP baudrate : %s"),ndevice_info.nipport);
@@ -655,7 +701,7 @@ void CFlash_Multy::SetAutoConfig(Str_flash_device ndevice_info)
 //            // m_product_isp_auto_flash.ncomport = 10000;
 //            ndevice_info.nipport = L"10000";
 //         }
-        temp_isp_info.Format(_T("ISP via : network"));
+        temp_isp_info.Format(_T("Communications port : network"));
         m_multy_flash_listbox.InsertString(m_multy_flash_listbox.GetCount(),temp_isp_info);
         temp_isp_info.Format(_T("IP Address : "));
         temp_isp_info = temp_isp_info + ndevice_info.nIPaddress;
@@ -891,11 +937,12 @@ DWORD WINAPI  CFlash_Multy::multy_isp_thread(LPVOID lpVoid)
     bool log_file_opened=false;
     for(int i=0; i<nflashdevicecount; i++)
     {
-        if (!flash_device.at(i).need_flash&&flash_device.at(i).config_file_position.IsEmpty())
-        {
-            continue;
-        }
-        if (flash_device.at(i).need_flash)
+//         if (!flash_device.at(i).need_flash&&flash_device.at(i).config_file_position.IsEmpty())
+//         {
+//             continue;
+//         }
+		//flash_device.at(i).need_flash
+        if (true)
         {
             if (flash_device.at(i).nresult != 3)
             {

@@ -283,6 +283,7 @@
 #define IDD_DIALOG_ZIGBEE               649
 #define IDR_MONITOR_DB2                 653
 #define IDD_DIALOG_SETTIME              654
+#define IDD_DIALOG_BTUMETER             657
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -332,6 +333,7 @@
 #define IDC_CUR_HUM                     1029
 #define IDC_EDIT_PROPERTY               1029
 #define IDC_EDIT_CITY                   1029
+#define IDC_EDIT57                      1029
 #define IDC_OUTPUT4_DELAY_OFF_EDIT      1030
 #define IDC_HUM1                        1030
 #define IDC_EDIT43                      1030
@@ -691,6 +693,7 @@
 #define IDC_COMBO_BACNET_SETTING_BAUDRATE1 1129
 #define IDC_COMBO_OUTPUTTYPE            1129
 #define IDC_COMBO_SETTING_CO2           1129
+#define IDC_COMBO_MSTP_MODBUS           1129
 #define IDC_POWERMODELCOMBO             1130
 #define IDC_CHECK56                     1130
 #define IDC_COMBO_TIMESERVERLIST2       1130
@@ -2026,6 +2029,7 @@
 #define IDC_STATICMACADDRESS            2167
 #define IDC_EDIT_ID_COLLISION_1         2168
 #define IDC_BUTTON_FILE_DOWNLOAD_ONLY   2168
+#define IDC_STATIC_BIPPORT              2168
 #define IDC_EDIT_ID_COLLISION_2         2169
 #define IDC_BUTTON_UPDATE_FIRMWARE      2169
 #define IDC_EDIT_ID_COLLISION_3         2170
@@ -2045,11 +2049,11 @@
 #define IDC_BUTTON_BAC_SETTING_CANCEL   2177
 #define IDC_STATIC_INPUT_PIC            2178
 #define IDC_BUTTON_HEALTH_CLEAR         2179
-#define IDC_BUTTON_MODEL1               2180
-#define IDC_BUTTON_MODEL2               2181
-#define IDC_BUTTON_MODEL3               2182
-#define IDC_BUTTON_MODEL4               2183
-#define IDC_BUTTON_MODEL5               2184
+#define IDC_BUTTON_MODEL1_1             2180
+#define IDC_BUTTON_MODEL2_1             2181
+#define IDC_BUTTON_MODEL3_1             2182
+#define IDC_BUTTON_MODEL4_1             2183
+#define IDC_BUTTON_MODEL5_1             2184
 #define IDC_STATIC_MODEL_NAME           2185
 #define IDC_COMBO_DATA_FORMAT           2186
 #define IDC_STATIC_VC_1                 2186
@@ -2139,6 +2143,19 @@
 #define IDC_CHECK_ENABLE_SCHEDULE       2269
 #define IDC_BUTTON_ZIGBEE               2270
 #define IDC_BUTTON_APPLY_ALL            2271
+#define IDC_EDIT_MSTP_MAC               2275
+#define IDC_STATIC_MAC_MSTP             2276
+#define IDC_STATIC_MSTP_MODBUS          2277
+#define IDC_BUTTON_MODEL11              3000
+#define IDC_BUTTON_MODEL1               3000
+#define IDC_BUTTON_MODEL12              3001
+#define IDC_BUTTON_MODEL2               3001
+#define IDC_BUTTON_MODEL13              3002
+#define IDC_BUTTON_MODEL3               3002
+#define IDC_BUTTON_MODEL14              3003
+#define IDC_BUTTON_MODEL4               3003
+#define IDC_BUTTON_MODEL15              3004
+#define IDC_BUTTON_MODEL5               3004
 #define IDC_STATIC_BACNET_INPUT_TITLE   3829
 #define IDC_EDIT_BACNET_MESSAGE_INPUT   3830
 #define IDC_HELP_HELP1                  3831
@@ -2625,6 +2642,7 @@
 #define IDC_BUTTON_WRITE_SERIAL_NO      60039
 #define IDC_EDIT_LISTENPORT             60040
 #define IDC_STATIC_IP_INFOR             60041
+#define IDC_EDIT_BIPPORT                60041
 #define IDC_STATIC_IP_MODEL             60043
 #define IDC_STATIC_MAC_ADDRESS          60044
 #define IDC_STATIC_GATEWAY_ADDRESS      60045
@@ -2635,9 +2653,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        656
+#define _APS_NEXT_RESOURCE_VALUE        659
 #define _APS_NEXT_COMMAND_VALUE         34058
-#define _APS_NEXT_CONTROL_VALUE         2270
+#define _APS_NEXT_CONTROL_VALUE         2278
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

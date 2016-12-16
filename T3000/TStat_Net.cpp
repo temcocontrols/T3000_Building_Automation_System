@@ -229,6 +229,12 @@ CString CTStat_Net::GetProductName()
 	case PM_T322AI:
 		strProductName="T3-22I";
 		break;
+	case PWM_TRANSDUCER:
+		strProductName = "PWM_Transducer";
+		break;
+	case PM_BTU_METER:
+		strProductName = "BTU_Meter";
+		break;
 	case PM_T3PT12:
 		strProductName="T3-PT12";
 		break;
