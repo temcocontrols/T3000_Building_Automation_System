@@ -29,7 +29,7 @@ extern int program_code_length[BAC_PROGRAM_ITEM_COUNT];
 extern int program_list_line ;
 
 char *index_stack;
-char stack[300];
+char stack[150];
 
 extern char editbuf[25000];//For Bacnet Program use
  static int time_count = 0; //Fance add for wait function.
@@ -60,9 +60,6 @@ int varoffsetlast(int cur);
 int checkonlyarray(char *tok);
 int Encode_Program ( /*GEdit *ppedit*/);
 void put_line_num( int line_value );
-
-unsigned int line_array[200][2];
-int ind_line_array;
 
 extern int mode_text;
 extern int ipxport, rs485port;
@@ -746,7 +743,7 @@ public:
 	byte								       lock[MAX_INFO_TYPE];
 	//fance In_aux							       in_aux[MAX_INS];
 	//fance Con_aux							       con_aux[MAX_PIDS];
-	Info_Table					       info[27];
+	Info_Table					       info[26];
 	//	Str_grp_element				group_elements[MAX_ELEM];
 	Str_out_point   				   outputs[MAX_OUTS];
 	Str_in_point    				   inputs[MAX_INS];
@@ -1253,7 +1250,6 @@ int Encode_Program ( /*GEdit *ppedit*/)
 	ncod/*=error*/=n_var=n_var1=for_count=then_else=ind_cod_line=next_then_else=0;//Fance marked error
 	next_else_else=ret_value=index_vars_table=lline=index_buf=index_op=type_eval=0;
 	index_wait=index_go_to=index_dalarm=ind_renum=0;
-	ind_line_array = 0;
 //	index_position_table=ind_renum=0;
 	id=res=0;
 	ind_code=0;
@@ -2242,14 +2238,14 @@ int get_token(void)
 					break ;
 					*/
 				case '<':
-					if ((unsigned char)*(prog+1) =='=') {
+					if (*(prog+1) =='=') {
 						prog += 2;
 						*temp = LE ;
 						temp++ ;
 					}
 					else
 					{
-						if ((unsigned char)*(prog+1) =='>')
+						if (*(prog+1) =='>')
 						{
 							prog += 2;
 							*temp = NE ;
@@ -2265,7 +2261,7 @@ int get_token(void)
 					temp = '\0' ;
 					break ;
 
-				case '>': if ((unsigned char)*(prog+1) =='=') {
+				case '>': if (*(prog+1) =='=') {
 					prog += 2;
 					*temp = GE ;
 					temp++ ;
@@ -2333,7 +2329,6 @@ int get_token(void)
 					}
 					ttime += time1 / 36;
 					return (token_type = TTIME );
-
 				}
 				if (*(prog-1)=='e' || *(prog-1)=='E')
 				{
@@ -3530,11 +3525,11 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 	}
 	//	strcpy_s(my_info_panel[0].name,4,"VAR");
 
-	if ((p=strpbrk(q, "0123456789"))!=NULL)
+	if ((p=strpbrk(q, "123456789"))!=NULL)
 	{
 		memcpy(pc,q,p-q);
 		pc[p-q]=0;
-		for(k=OUT;k<=26;k++)
+		for(k=OUT;k<=25;k++)
 		{
 			if(k!=DMON)
 			{
@@ -3551,7 +3546,7 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 				//if (!strcmp(pc,my_info_panel[k].name))
 				//	break;
 
-		if (k<=26)
+		if (k<=25)
 		{
 			if (p==NULL) 
 			{
@@ -3563,7 +3558,7 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 				//												fprintf(pmes,"error line %d\n",line);
 				error=1;return 0;
 			}
-			else  if (((strlen(p)==1) && (*p=='0')) && ((k!= COIL_REG) && (k!= DIS_INPUT_REG) && (k!= INPUT_REG) && (k!= MB_REG)))
+			else  if ((strlen(p)==1) && (*p=='0'))
 			{
 				memcpy(pmes,"error line : ",13);
 				pmes += 13;
@@ -5770,29 +5765,20 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 						}
 						else if(( (unsigned char)vars_table[cur_index].panel == Station_NUM ) && ((unsigned char)vars_table[cur_index].sub_panel != Station_NUM ))	//Minipanel 下面的TSTAT
 						{
-							unsigned char high_3bit = 0;
 							cod_line[Byte++]=REMOTE_POINT_PRG;
-							if(((unsigned char)vars_table[cur_index].point_type == COIL_REG) ||
-								((unsigned char)vars_table[cur_index].point_type == DIS_INPUT_REG) ||
-								((unsigned char)vars_table[cur_index].point_type == INPUT_REG) ||
-								((unsigned char)vars_table[cur_index].point_type == MB_REG) )
-							{
-								point.number     = (unsigned char)((vars_table[cur_index].num_point) & 0x00ff);
-								high_3bit = ((vars_table[cur_index].num_point) & 0xff00) >> 3;
-							}
+							point.number     = (unsigned char)((vars_table[cur_index].num_point-1) & 0x00ff);
+
+							unsigned char high_3bit = 0;
+							if(vars_table[cur_index].num_point > 0)
+								high_3bit = ((vars_table[cur_index].num_point-1) & 0xff00) >> 3;
 							else
 							{
-								point.number     = (unsigned char)((vars_table[cur_index].num_point-1) & 0x00ff);
-								if(vars_table[cur_index].num_point > 0)
-									high_3bit = ((vars_table[cur_index].num_point-1) & 0xff00) >> 3;
-								else
-								{
 
-								}
-								
 							}
-							point.point_type = (vars_table[cur_index].point_type+1) | high_3bit ;
 							//*point_type = *point_type | high_3bit;
+
+
+							point.point_type = (vars_table[cur_index].point_type+1) | high_3bit ;
 							point.panel = vars_table[cur_index].panel;
 							point.sub_panel = vars_table[cur_index].sub_panel ;
 							point.network = 1;
@@ -5801,31 +5787,18 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 						}
 						else
 						{
-							unsigned char high_3bit;
 							cod_line[Byte++]=REMOTE_POINT_PRG;
-							if(((unsigned char)vars_table[cur_index].point_type == COIL_REG) ||
-								((unsigned char)vars_table[cur_index].point_type == DIS_INPUT_REG) ||
-								((unsigned char)vars_table[cur_index].point_type == INPUT_REG) ||
-								((unsigned char)vars_table[cur_index].point_type == MB_REG) )
-							{
-								point.number     = (unsigned char)((vars_table[cur_index].num_point) & 0x00ff);
-								high_3bit = ((vars_table[cur_index].num_point) & 0xff00) >> 3;
-							}
-							else
-							{
-								point.number     = (unsigned char)((vars_table[cur_index].num_point-1) & 0x00ff);
-								high_3bit = ((vars_table[cur_index].num_point-1) & 0xff00) >> 3;
-								
-							}
-						
-							point.point_type = (vars_table[cur_index].point_type+1) | high_3bit ;
+							point.number     = (unsigned char)((vars_table[cur_index].num_point-1) & 0x00ff);
+
+							unsigned char high_3bit = ((vars_table[cur_index].num_point-1) & 0xff00) >> 3;
+
 							//*point_type = *point_type | high_3bit;
 
 
-
+							point.point_type = (vars_table[cur_index].point_type+1) | high_3bit ;
 							point.panel = vars_table[cur_index].panel;
 							point.sub_panel = vars_table[cur_index].sub_panel ;
-							point.network = 1;
+							point.network = 0xff;
 							memcpy(&cod_line[Byte],&point,sizeof(Point_Net));
 							Byte += sizeof(Point_Net);
 						}
@@ -6011,9 +5984,7 @@ unsigned char cod;//,xtemp[15];
  int /*point,*//*type_var,*//*ind,*/i;
  int len,nitem;//lvar;
  long lval;
- eoi=0;
- ind_line_array = 0;
- index_wait=0;
+
  code = mycode;
 //Edit by Fance
  buf = my_display;
@@ -6031,7 +6002,6 @@ unsigned char cod;//,xtemp[15];
  pcode=code+2;
  memcpy(&bytes,code,2);
 // adjustint(&bytes, ptrprg->type);
- 
  bytes += 2+3;
  code += bytes;
 #ifndef Fance
@@ -6092,7 +6062,7 @@ unsigned char cod;//,xtemp[15];
 			*buf++=' ';
 	}
 
-	switch ((unsigned char)*code++) {
+	switch (*code++) {
 			case ASSIGNARRAY_1:
 			case ASSIGNARRAY_2:
 			case ASSIGNAR:
@@ -6163,7 +6133,7 @@ unsigned char cod;//,xtemp[15];
 									i=0;
 									for(int j=0;j<nitem;j++)
 									 {
-										switch ((unsigned char)*code++) {
+										switch (*code++) {
 											case _DATE:
 																strcpy(buf,"DATE;");
 																buf += 5;
@@ -6221,7 +6191,7 @@ unsigned char cod;//,xtemp[15];
 									code++;
 									break;
 			case RUN_MACRO:
-									itoa((unsigned char)*code,buf,10);
+									itoa(*code,buf,10);
 									buf += strlen(buf);
 									code++;
 									break;
@@ -6230,7 +6200,7 @@ unsigned char cod;//,xtemp[15];
 									buf += strlen(buf);
 									*buf++ = ' ';
 //									if (*code++==0x0c)   //gosub
-									if ((unsigned char)*code++==GOSUB)   //gosub
+									if (*code++==GOSUB)   //gosub
 									{
 											strcat(buf,"GOSUB");
 											buf += 5;
@@ -6368,11 +6338,11 @@ unsigned char cod;//,xtemp[15];
 			case CALLB:
 									strcpy(buf,"PRG");
 									buf += strlen("PRG");
-									itoa(((unsigned char)*code++)+1,buf,10);
+									itoa((*code++)+1,buf,10);
 									buf += strlen(buf);
 									strcpy(buf," = ");
 									buf += strlen(buf);
-									nitem = (unsigned char)*code++;
+									nitem = *code++;
 									for(i=0;i<nitem;i++)
 									 {
 										desexpr();
@@ -6385,7 +6355,7 @@ unsigned char cod;//,xtemp[15];
 									 }
 									break;
 			case DECLARE:
-									nitem = (unsigned char)*code++;
+									nitem = *code++;
 									for(i=0; i<nitem; i++)
 									 {
 										desvar();
@@ -6425,7 +6395,7 @@ unsigned char cod;//,xtemp[15];
 									code=pcode+n-2+4;
 									desvar();
 									buf += strlen(buf);
-									code = p + 2;
+									code = p + 2;;
 									break;
 			case IF:
 			case IFP:
@@ -6760,7 +6730,7 @@ int pointtotext_for_controller(char *buf,Point_T3000 *point)
 		strcat(buf,"-");
 #endif
 	//strcat(buf,lin);
-	if(point_type>27)
+	if(point_type>26)
 		return 0;
 
 	//	ptr_panel.info[point_type-1].name = "VAR";
@@ -6823,7 +6793,7 @@ int pointtotext(char *buf,Point_Net *point)
 	panel=point->panel;
 	point_type= (point->point_type ) & 0x1F;
 	sub_panel = point->sub_panel;
-	if(point_type > 27)
+	if(point_type > 26)
 	{
 		error = -6;
 		return -6;
@@ -6871,16 +6841,7 @@ int pointtotext(char *buf,Point_Net *point)
 		strcat(buf,"REG");//Fance	曰了狗了 ，3-25-VAR100  非要支持  3-25-REG100.
 	else
 		strcat(buf,ptr_panel.info[point_type].name);//Fance
-	//这4个比较特别  是0基址;
-	if((point->point_type == COIL_REG) ||
-		(point->point_type == DIS_INPUT_REG) ||
-		(point->point_type == INPUT_REG) ||
-		(point->point_type == MB_REG))
-	{
-		strcat(buf,itoa(num,x,10));
-	}
-	else
-		strcat(buf,itoa(num+1,x,10));
+	strcat(buf,itoa(num+1,x,10));
 	return 0;
 }
 
@@ -6918,14 +6879,15 @@ return "" ; /* unkown command */
 }
 
 
-
+unsigned int line_array[50][2];
+int ind_line_array;
 int	desexpr(void)
 {
  char *op1,*op2,*op;
  char oper[10],last_oper,par,opar;
  int /*point,*/i;
  char n;
- char stack_par[300];
+ char stack_par[30];
  char ind_par;
 // index_stack = stack;
 // set_semaphore_dos();Fance
@@ -7079,13 +7041,10 @@ int	desexpr(void)
 							 oldcode = code;
 							 oldbuf = buf;
 							// code = ptimebuf+ *((int *)code);
-							 code = ptimebuf+ (unsigned char)*((char *)code);//Fance Chagned
+							 code = ptimebuf+ *((char *)code);//Fance Chagned
 							 code -= 3;
-							 
 							 while( ((unsigned char)*code) != 0xff && code >= ptimebuf)
-							 {
 								 code--;
-							 }
 							 if (code < ptimebuf) code = ptimebuf;
 							 else code += 6;
 							 buf = op2;
@@ -7331,7 +7290,7 @@ void init_info_table( void )
 {
 	int i;
 	memset( ptr_panel.info, 0, 18*sizeof( Info_Table ) );
-	for( i=0; i<27; i++ )
+	for( i=0; i<26; i++ )
 	//for( i=0; i<18; i++ )
 	{
 		switch( i )
@@ -7474,9 +7433,6 @@ void init_info_table( void )
 				break;
 			case INPUT_REG:
 				ptr_panel.info[i].name = "MB_INPUTREG";
-				break;
-			case MB_REG:
-				ptr_panel.info[i].name = "MB_REG";
 				break;
 			default:
 				{

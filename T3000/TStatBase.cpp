@@ -114,17 +114,6 @@ void CTStatBase::SetSubnetName(const CString& strSubnetName)
 	m_strSubnetName = strSubnetName;
 }
 
-CString CTStatBase::GetProductCusName() const
-{
-	return m_product_cus_name;
-}
-
-void CTStatBase::SetProductCusName(const CString& strProductCusName)
-{
-	m_product_cus_name = strProductCusName;
-}
-
-
 
 Mainnet_info::Mainnet_info()
 {

@@ -119,24 +119,9 @@ void MySocket::OnReceive(int nErrorCode)
 				if (DeviceProductName.CompareNoCase(FileProductName)!=0)
 				{
 					CString strTip;
+					strTip.Format(_T("Your device is %s,but your bin file is fit for %s"),DeviceProductName.GetBuffer(),FileProductName.GetBuffer());
 
-					if((FileProductName.CompareNoCase(_T("HUMNET")) == 0) ||
-						(FileProductName.CompareNoCase(_T("CO2NET")) == 0) ||
-						(FileProductName.CompareNoCase(_T("PSNET")) == 0))
-					{
-
-					}
-					else if(((DeviceProductName.CompareNoCase(_T("MINI")) == 0) && (FileProductName.CompareNoCase(_T("Minipanel")) == 0)) ||
-						((DeviceProductName.CompareNoCase(_T("Minipanel")) == 0) && (FileProductName.CompareNoCase(_T("MINI")) == 0 )))
-					{
-
-					}
-					else
-					{
-						strTip.Format(_T("Your device is %s,but your bin file is fit for %s"),DeviceProductName.GetBuffer(),FileProductName.GetBuffer());
-						CAsyncSocket::OnReceive(nErrorCode);
-						return;
-					}
+					CAsyncSocket::OnReceive(nErrorCode);
 				}
 
 				device_has_replay_lan_IP = true;
@@ -170,26 +155,9 @@ void MySocket::OnReceive(int nErrorCode)
 				DeviceProductName.Trim();
 				if ((DeviceProductName.CompareNoCase(FileProductName)!=0) && (!DeviceProductName.IsEmpty()))
 				{
-					if((FileProductName.CompareNoCase(_T("HUMNET")) == 0) ||
-						(FileProductName.CompareNoCase(_T("CO2NET")) == 0) ||
-						(FileProductName.CompareNoCase(_T("PSNET")) == 0))
-					{
-						device_has_replay_lan_IP = true;
-						ISP_STEP =ISP_Send_TFTP_PAKAGE;
-						return;
-					}
-					else if(((DeviceProductName.CompareNoCase(_T("MINI")) == 0) && (FileProductName.CompareNoCase(_T("Minipanel")) == 0)) ||
-						((DeviceProductName.CompareNoCase(_T("Minipanel")) == 0) && (FileProductName.CompareNoCase(_T("MINI")) == 0)))
-					{
-						ISP_STEP =ISP_Send_TFTP_PAKAGE;
-					}
-					else
-					{
-						Failed_Message.Format(_T("Your device is %s,but your bin file is fit for %s"),DeviceProductName.GetBuffer(),FileProductName.GetBuffer());
-						ISP_STEP =ISP_Flash_FAILED;
-						return;
-					}
-
+					Failed_Message.Format(_T("Your device is %s,but your bin file is fit for %s"),DeviceProductName.GetBuffer(),FileProductName.GetBuffer());
+					ISP_STEP =ISP_Flash_FAILED;
+					return;
 					CAsyncSocket::OnReceive(nErrorCode);
 				}
 				else if(!DeviceProductName.IsEmpty())

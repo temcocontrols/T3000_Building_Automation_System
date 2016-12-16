@@ -638,11 +638,6 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
 }
 bool CImageTreeCtrl::DoDeleteItem(HTREEITEM hItem)
 {
-	    CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
-
-
-
-
          m_level=get_item_level(hItem);
          m_name_old=GetItemText(hItem);
 		 CppSQLite3DB SqliteDBBuilding;
@@ -651,7 +646,7 @@ bool CImageTreeCtrl::DoDeleteItem(HTREEITEM hItem)
 		 SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
  
-        try 
+    try 
     {
         ////////////////////////////////////////////////////////////////////////////////////////////
         //获取数据库名称及路径
@@ -670,19 +665,10 @@ bool CImageTreeCtrl::DoDeleteItem(HTREEITEM hItem)
             HTREEITEM floornode=GetParentItem(parentnode);
             CString Floorname=GetItemText(floornode);
              
-			for (int i = 0; i < pFrame->m_product.size(); i++) {
-				if (hItem == pFrame->m_product.at(i).product_item)
-				{
-					CString strSql, temp_serial;
-					int sn = pFrame->m_product.at(i).serial_number;
-					temp_serial.Format(_T("%d"), sn); 
-					strSql.Format(_T("delete   from ALL_NODE  where  Serial_ID='%s' "), temp_serial);
-					SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
-				}
-			}
+            
 
-           /*strSql.Format(_T("select * from ALL_NODE where  Product_name='%s' order by Building_Name"),m_name_old);
-                
+                strSql.Format(_T("select * from ALL_NODE where  Product_name='%s' order by Building_Name"),m_name_old);
+                //m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
 				q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
 
                 while(!q.eof())
@@ -694,7 +680,7 @@ bool CImageTreeCtrl::DoDeleteItem(HTREEITEM hItem)
                     strSql.Format(_T("delete   from ALL_NODE  where  Serial_ID='%s'"),temp_serial);
                     SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
                     q.nextRow();
-                }*/
+                }
                 
                
               
@@ -709,13 +695,9 @@ bool CImageTreeCtrl::DoDeleteItem(HTREEITEM hItem)
             //m_pCon->Close();
         }
 		SqliteDBBuilding.closedb();
-       
-		
-		
-		
-		
+        CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
         ::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
-        return true;
+    return true;
 }
 // CImageTreeCtrl 消息处理程序
 bool CImageTreeCtrl::HandleKeyDown(WPARAM wParam, LPARAM lParam) {

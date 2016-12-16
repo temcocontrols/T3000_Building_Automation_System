@@ -745,7 +745,6 @@ void Update_ViewData(CView* MBPollView){
 			else
 			{
 				ret=read_multi_log(ID,&DataBuffer[0],startAdd,quantity,&send_data[0],&rev_back_rawData[0],&Send_length,&Rev_length);
-			//	ret = Modbus_Standard_Read(ID, DataBuffer, startAdd, quantity);
 			}
 			register_critical_section.Unlock();
 		} 

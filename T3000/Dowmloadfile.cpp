@@ -218,7 +218,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 			 nflash_id.Format(_T("%d"),m_product_isp_auto_flash.product_id);
 			 WritePrivateProfileStringW(_T("Data"),_T("ID"),nflash_id,AutoFlashConfigPath);
 
-			 temp_isp_info.Format(_T("Communications port : "));
+			 temp_isp_info.Format(_T("ISP via : "));
 			 temp_isp_info = temp_isp_info + cs_comport;
 			 m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
 			 temp_isp_info.Format(_T("ISP baudrate : %d"),m_product_isp_auto_flash.baudrate);
@@ -235,7 +235,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 			 {
 				 m_product_isp_auto_flash.ncomport = 10000;
 			 }
-			 temp_isp_info.Format(_T("Communications port : network"));
+			 temp_isp_info.Format(_T("ISP via : network"));
 			 m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
 			  temp_isp_info.Format(_T("IP Address : "));
 			  temp_isp_info = temp_isp_info + m_product_isp_auto_flash.BuildingInfo.strIp;
@@ -307,7 +307,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 		CString nfile_size;
 		MultiByteToWideChar( CP_ACP, 0, download_filename, (int)strlen((char *)download_filename)+1, nfile_name.GetBuffer(MAX_PATH), MAX_PATH );
 		nfile_name.ReleaseBuffer();
-		nfile_size.Format(_T("File size about %d KB "),malloc_download_memory_size/1024);
+		nfile_size.Format(_T("File size about %d Bytes "),malloc_download_memory_size);
 		CString show_message;
 		show_message = _T("File name  ") + nfile_name + _T("   .") + nfile_size;
 		m_download_info.InsertString(m_download_info.GetCount(),show_message);
@@ -1173,7 +1173,7 @@ void Dowmloadfile::AutoFlashFirmware()
 		{
 			m_product_isp_auto_flash.ncomport = 502;
 		}
-		temp_isp_info.Format(_T("Communications port : network"));
+		temp_isp_info.Format(_T("ISP via : network"));
 		m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
 		temp_isp_info.Format(_T("IP Address : "));
 		temp_isp_info = temp_isp_info + m_product_isp_auto_flash.BuildingInfo.strIp;

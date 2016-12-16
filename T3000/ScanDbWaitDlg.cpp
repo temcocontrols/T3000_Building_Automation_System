@@ -39,6 +39,9 @@ BEGIN_MESSAGE_MAP(CScanDbWaitDlg, CDialog)
     ON_BN_CLICKED(IDCANCEL, &CScanDbWaitDlg::OnBnClickedCancel)
     ON_BN_CLICKED(IDC_EXITBUTTON, &CScanDbWaitDlg::OnBnClickedExitbutton)
     ON_WM_TIMER()
+    ON_MESSAGE(WM_NETSCANINFO, OnNetScanInfo)
+    ON_MESSAGE(WM_COMSCANINFO, OnComScanInfo)
+    ON_MESSAGE(WM_BACNETCOMSCANINFO, OnBacnetComScanInfo)
 
 END_MESSAGE_MAP()
 
@@ -75,8 +78,8 @@ void CScanDbWaitDlg::OnBnClickedExitbutton()
 	m_pScaner->SendScanEndMsg();
 
     OnCancel();
-    //CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-    //::PostMessage(pFrame->m_hWnd,WM_MYMSG_REFRESHBUILDING,0,0);
+    CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+    ::PostMessage(pFrame->m_hWnd,WM_MYMSG_REFRESHBUILDING,0,0);
 	//scaning_mode = false;
 }
 HWND scan_wait_dlg;
@@ -253,6 +256,48 @@ void CScanDbWaitDlg::SetPromtText(CString strInfo)
     UpdateData(FALSE);
 }
 
+
+LRESULT CScanDbWaitDlg::OnNetScanInfo(WPARAM wParam, LPARAM lParam)
+{
+    CString* pStr = (CString*)(wParam);
+    m_strNetScanInfo = _T("Net Scan : ")  + *pStr;
+
+
+    CWnd* pWnd = GetDlgItem(IDC_INFO_NET);
+    pWnd->SetWindowText(m_strNetScanInfo);
+
+
+    delete pStr;
+    return 1;
+}
+
+
+LRESULT CScanDbWaitDlg::OnBacnetComScanInfo(WPARAM wParam, LPARAM lParam)
+{
+    CString* pStr = (CString*)(wParam);
+    m_strComScanInfo = _T("BacnetIP Scan : ") + *pStr;
+
+    //UpdateData(FALSE);
+
+    CWnd* pWnd = GetDlgItem(IDC_INFO_MSTP);
+    pWnd->SetWindowText(m_strComScanInfo);
+
+    delete pStr;
+    return 1;
+}
+LRESULT CScanDbWaitDlg::OnComScanInfo(WPARAM wParam, LPARAM lParam)
+{
+    CString* pStr = (CString*)(wParam);
+    m_strComScanInfo = _T("Com Port Scan : ") + *pStr;
+
+    //UpdateData(FALSE);
+
+    CWnd* pWnd = GetDlgItem(IDC_INFO_COM);
+    pWnd->SetWindowText(m_strComScanInfo);
+
+    delete pStr;
+    return 1;
+}
 
 
 void CScanDbWaitDlg::Initial_List()

@@ -52,7 +52,7 @@ public:
 	COleDateTime m_date_time;
 	afx_msg void OnBnClickedButton2();
 	afx_msg void OnDestroy();
-	//afx_msg void OnBnClickedButton3();
+	afx_msg void OnBnClickedButton3();
 	CMonthCalCtrl m_month_ctrl;
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);

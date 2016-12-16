@@ -696,9 +696,6 @@
     <ClCompile Include="SetTimeDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BTUMeterDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -1732,12 +1729,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SetTimeDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BADO\BADO.h">
-      <Filter>BADO</Filter>
-    </ClInclude>
-    <ClInclude Include="BTUMeterDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

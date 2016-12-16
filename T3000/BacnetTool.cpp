@@ -180,7 +180,7 @@ void CBacnetTool::InitialBacnetConnection()
 	Init_Service_Handlers_Tool();
 	int ret_1 = Open_bacnetSocket2(_T(""),BACNETIP_PORT,my_sokect);
 	bip_set_socket(my_sokect);
-	bip_set_port(htons(47808));
+	bip_set_port(49338);
 	static in_addr BIP_Broadcast_Address;
 	BIP_Broadcast_Address.S_un.S_addr =  inet_addr("255.255.255.255");
 	bip_set_broadcast_addr((uint32_t)BIP_Broadcast_Address.S_un.S_addr);

@@ -2209,17 +2209,9 @@ void CScanDlg::AddComDeviceToGrid(vector<_ComDeviceInfo*>& szList)
 		// 		CString strNO;
 		// 		strNO.Format(_T("%d"), i);
 		// 		m_flexGrid.put_TextMatrix(i+nSize,0,strNO); 
-		CString strType;
-		if(pDevInfo->m_pDev->m_cus_name)
-		{
-			strType= pDevInfo->m_pDev->m_product_cus_name;
-		}
-		else
-		{
-			strType = pDevInfo->m_pDev->GetProductName();
-			strType = strType.Left(strType.Find(_T(":")));
-		}
 
+		CString strType = pDevInfo->m_pDev->GetProductName();
+		strType = strType.Left(strType.Find(_T(":")));
 		m_flexGrid.put_TextMatrix(i+nSize,SCAN_TABLE_TYPE,strType); 
 
 		CString strBuilding = pDevInfo->m_pDev->GetBuildingName();

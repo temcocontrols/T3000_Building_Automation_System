@@ -54,7 +54,7 @@ void AnnualRout_InsertDia::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(AnnualRout_InsertDia, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedButton2)
 	ON_WM_DESTROY()
-	//ON_BN_CLICKED(IDC_BUTTON3, OnBnClickedButton3)
+	ON_BN_CLICKED(IDC_BUTTON3, OnBnClickedButton3)
 	ON_WM_RBUTTONDOWN()
 	ON_LBN_SELCHANGE(IDC_LIST1, OnLbnSelchangeList1)
 	ON_COMMAND(ID_ANNUALROUT_ADD, OnAnnualroutAdd)
@@ -619,17 +619,17 @@ void AnnualRout_InsertDia::OnDestroy()
 	}
 }
 
-//void AnnualRout_InsertDia::OnBnClickedButton3()
-//{
-//	// TODO: 在此添加控件通知处理程序代码
-//	//clear button
-//	unsigned char ttt[ONE_YEAR_BETYS];
-//	for(int i=0;i<ONE_YEAR_BETYS;i++)
-//		ttt[i]=0;
-//	Write_Multi(g_tstat_id,ttt,MODBUS_AR_TIME_FIRST + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);
-//	NET_WORK_SLEEP_BETWEEN_WRITE_READ
-//	load();
-//}
+void AnnualRout_InsertDia::OnBnClickedButton3()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	//clear button
+	unsigned char ttt[ONE_YEAR_BETYS];
+	for(int i=0;i<ONE_YEAR_BETYS;i++)
+		ttt[i]=0;
+	Write_Multi(g_tstat_id,ttt,MODBUS_AR_TIME_FIRST + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);
+	NET_WORK_SLEEP_BETWEEN_WRITE_READ
+	load();
+}
 
 void AnnualRout_InsertDia::OnRButtonDown(UINT nFlags, CPoint point)
 {

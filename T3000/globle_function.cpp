@@ -845,7 +845,6 @@ BOOL IS_Temco_Product(int product_model)
 			case   PM_PM5E					   :
 			case   PM_HUM_R					   :
 			case   PM_T322AI				   :
-			case   PWM_TRANSDUCER				:
 			case   PM_T38AI8AO6DO			   :
 			case   PM_PRESSURE_SENSOR		   :
 			case   PM_T3PT12				   :
@@ -4177,12 +4176,6 @@ CString GetProductName(int ModelID)
     case PM_T322AI:
         strProductName="T3-22I";
         break;
-	case PWM_TRANSDUCER:
-		strProductName = "PWM_Tranducer";
-		break;
-	case PM_BTU_METER:
-		strProductName = "BTU_Meter";
-		break;
 	case PM_T3PT12:
 		strProductName="T3-PT12";
 		break;
@@ -4190,6 +4183,8 @@ CString GetProductName(int ModelID)
         strProductName="T3-8AI8AO6DO";
         break;
 
+
+     
     case PM_CS_SM_AC:
         strProductName="CS-SM-AC";
         break;
@@ -4564,9 +4559,7 @@ bool Initial_bac(int comport,CString bind_local_ip)
         //	Open_Socket2(_T("127.0.0.1"),6002);
         //	 = (int)GetCommunicationHandle();
         bip_set_socket(my_sokect);
-        //bip_set_port(49338);
-		bip_set_port(htons(47808));
-		
+        bip_set_port(49338);
         //	int test_port = bip_get_port();
 #if 1
         static in_addr BIP_Broadcast_Address;
@@ -5363,9 +5356,6 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	temp_data.reg.object_instance_4 = *(my_temp_point++);
 	temp_data.reg.object_instance_3 = *(my_temp_point++);
 	temp_data.reg.isp_mode = *(my_temp_point++);	//isp_mode = 0 表示在应用代码 ，非0 表示在bootload.
-	temp_data.reg.bacnetip_port =  ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
-	my_temp_point= my_temp_point + 2;
-	temp_data.reg.zigbee_exsit =  *(my_temp_point++); // 1 代表存在，其他任何代表不存在;
 
 	DWORD nSerial=temp_data.reg.serial_low + temp_data.reg.serial_low_2 *256+temp_data.reg.serial_low_3*256*256+temp_data.reg.serial_low_4*256*256*256;
 	CString nip_address;
@@ -5393,7 +5383,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	temp.object_instance = temp_data.reg.object_instance_1 + temp_data.reg.object_instance_2 *256+temp_data.reg.object_instance_3*256*256+temp_data.reg.object_instance_4*256*256*256;
 	temp.panal_number = temp_data.reg.station_number;
 
-	temp.bacnetip_port = temp_data.reg.bacnetip_port;
+
 
 
 	if((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
@@ -5521,7 +5511,137 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 }
 #endif
 
- 
+#if 0
+int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
+{
+    int nLen=buffer[2]+buffer[3]*256;
+    //int n =sizeof(char)+sizeof(unsigned char)+sizeof( unsigned short)*9;
+    unsigned short usDataPackage[400]= {0};
+    if(nLen>=0)
+    {
+        refresh_net_device temp;
+        memcpy(usDataPackage,buffer+4,nLen*sizeof(unsigned short));
+
+        DWORD nSerial=usDataPackage[0]+usDataPackage[1]*256+usDataPackage[2]*256*256+usDataPackage[3]*256*256*256;
+        int nproduct_id = usDataPackage[4];
+        CString nproduct_name = GetProductName(nproduct_id);
+        if(nproduct_name.IsEmpty())	//如果产品号 没定义过，不认识这个产品 就exit;
+        {
+            if (nproduct_id<200)
+            {
+                return m_refresh_net_device_data.size();
+            }
+
+        }
+        CString nip_address;
+        nip_address.Format(_T("%d.%d.%d.%d"),usDataPackage[6],usDataPackage[7],usDataPackage[8],usDataPackage[9]);
+
+        int nport = usDataPackage[10];
+
+
+        int nsw_version = usDataPackage[11];
+        int nhw_version = usDataPackage[12];
+
+        int modbusID=usDataPackage[5];
+        //TRACE(_T("Serial = %u     ID = %d\r\n"),nSerial,modbusID);
+
+        g_Print.Format(_T("Refresh list :Serial = %u     ID = %d ,ip = %s  , Product name : %s"),nSerial,modbusID,nip_address ,nproduct_name);
+        //DFTrace(g_Print);
+        temp.nport = nport;
+        temp.sw_version = nsw_version;
+        temp.hw_version = nhw_version;
+        temp.ip_address = nip_address;
+        temp.product_id = nproduct_id;
+        temp.modbusID = modbusID;
+        temp.nSerial = nSerial;
+        temp.NetCard_Address=local_enthernet_ip;
+
+        temp.sw_version = usDataPackage[11];
+        temp.hw_version = usDataPackage[12];
+        temp.parent_serial_number = usDataPackage[13] + usDataPackage[14]*65536;
+        unsigned char temp_obj[2];
+        unsigned char temp_panel[2];
+        memcpy(temp_obj,&usDataPackage[15],2);
+        memcpy(temp_panel,&usDataPackage[16],2);
+        temp.object_instance = temp_obj[0]*256 + temp_obj[1];
+        temp.panal_number = temp_panel[0];
+        //	temp.object_instance = usDataPackage[15] >>8 + (usDataPackage[15]&0x00ff)<<8;
+
+        if((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
+        {
+            g_Print.Format(_T("Serial = %u     ID = %d ,ip = %s  , Product name : %s ,obj = %u ,panel = %u"),nSerial,modbusID,nip_address ,nproduct_name,temp.object_instance,temp.panal_number);
+            DFTrace(g_Print);
+        }
+
+
+
+        bool find_exsit = false;
+
+        for (int i=0; i<(int)m_refresh_net_device_data.size(); i++)
+        {
+            if(m_refresh_net_device_data.at(i).nSerial == nSerial)
+            {
+                find_exsit = true;
+                break;
+            }
+        }
+
+        if(!find_exsit)
+        {
+            m_refresh_net_device_data.push_back(temp);
+        }
+
+
+        char * temp_point = NULL;
+        refresh_net_label_info temp_label;
+        temp_point = (char *)&usDataPackage[16]  + 1;
+        if(( (unsigned char)temp_point[0] != 0xff) && ((unsigned char)temp_point[1] != 0xff) && ((unsigned char)temp_point[0] != 0x00))
+        {
+            memcpy(temp_label.label_name,&temp_point[0],20);
+            temp_point = temp_point + 20;
+            CString cs_temp_label;
+            MultiByteToWideChar( CP_ACP, 0, (char *)temp_label.label_name, (int)strlen((char *)temp_label.label_name)+1,
+                                 cs_temp_label.GetBuffer(MAX_PATH), MAX_PATH );
+            cs_temp_label.ReleaseBuffer();
+            if(cs_temp_label.GetLength() > 20)
+                cs_temp_label = cs_temp_label.Left(20);
+            temp_label.serial_number = (unsigned int)nSerial;
+            CString temp_serial_number;
+            temp_serial_number.Format(_T("%u"),temp_label.serial_number);
+            int need_to_write_into_device = GetPrivateProfileInt(temp_serial_number,_T("WriteFlag"),0,g_achive_device_name_path);
+            if(need_to_write_into_device == 0)
+            {
+                bool found_device = false;
+                bool found_device_new_name = false;
+                for (int i=0; i<m_refresh_net_device_data.size(); i++)
+                {
+                    if(temp_label.serial_number == m_refresh_net_device_data.at(i).nSerial)
+                    {
+                        if(cs_temp_label.CompareNoCase( m_refresh_net_device_data.at(i).show_label_name) == 0)
+                        {
+                            found_device_new_name = false;
+                        }
+                        else
+                        {
+                            m_refresh_net_device_data.at(i).show_label_name = cs_temp_label;
+                            found_device_new_name = true;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+
+
+
+
+
+    }
+    return m_refresh_net_device_data.size();
+}
+
+#endif
 
 int GetHostAdaptersInfo(CString &IP_address_local)
 {
@@ -5880,10 +6000,10 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
                             nLen=buffer[2]+buffer[3]*256;
                             unsigned short dataPackage[32]= {0};
                             memcpy(dataPackage,buffer+2,nLen*sizeof(unsigned short));
-                            szIPAddr[0]=  buffer[16];// (BYTE)dataPackage[7];
-                            szIPAddr[1]=   buffer[18];//	(BYTE)dataPackage[8];
-                            szIPAddr[2]=  buffer[20];//(BYTE)dataPackage[9];
-                            szIPAddr[3]=  buffer[22];//(BYTE)dataPackage[10];
+                            szIPAddr[0]= (BYTE)dataPackage[7];
+                            szIPAddr[1]= (BYTE)dataPackage[8];
+                            szIPAddr[2]= (BYTE)dataPackage[9];
+                            szIPAddr[3]= (BYTE)dataPackage[10];
 
                             int n = 1;
                             BOOL bFlag=FALSE;

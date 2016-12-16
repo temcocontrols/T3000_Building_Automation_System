@@ -217,20 +217,11 @@ BOOL BacnetScreen::PreTranslateMessage(MSG* pMsg)
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
-
-//在删除这个对话框之前 先尝试保存 操作中的 label;
 LRESULT BacnetScreen::Screeenedit_close_handle(WPARAM wParam,LPARAM lParam)
 {
 	Reg_Hotkey();
 	if(ScreenEdit_Window)
 	{
-		bool saving_ret = false;
-		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Saving data , please wait!"));
-		saving_ret = ScreenEdit_Window->UpdateDeviceLabelFlash();
-		if(saving_ret)
-			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Saving data success!"));
-		else
-			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Saving data failed!"));
 		delete ScreenEdit_Window;
 		ScreenEdit_Window = NULL;
 	}

@@ -2196,11 +2196,6 @@ CString isp_mode_detect_firmware_path;
 
 	HANDLE hwait_scan_thread;
 
-unsigned char nDefaultDisplayType;
-unsigned char nDefaultTextPlace;
-unsigned char nDefaultIconSize;
-COLORREF	  nDefaultclrTxt;
-
 int graphic_view_index ;
 CString grapgic_view_name[3];
 bool graphic_view_visible[14];

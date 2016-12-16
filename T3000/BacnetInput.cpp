@@ -513,11 +513,6 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		INPUT_LIMITE_ITEM_COUNT = 22;
 			Minipanel_device = 0;
 	}
-	else if (bacnet_device_type == PWM_TRANSDUCER)
-	{
-		INPUT_LIMITE_ITEM_COUNT = 6;
-		Minipanel_device = 0;
-	}
 	else if(bacnet_device_type == PID_T3PT12)
 	{
 		INPUT_LIMITE_ITEM_COUNT = 12;

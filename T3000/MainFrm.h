@@ -16,11 +16,14 @@
 #define	ID_PROTOCOL_INFO	102
 */
 #include "globle_function.h"
+//#include "CM5/DialogCM5.h"  //CM5
 #include "T3/DialogT3.h"	//T3
 
 #include "AirQuality/AirQuality.h"//AirQuality
 
-
+//#include "Class/MulitithreadSocket.h"
+// #include "MBP.h"
+// #include "MbPoll.h"
 #include "ConfigFileHandler.h"
 #include "DialogInfo.h"
 
