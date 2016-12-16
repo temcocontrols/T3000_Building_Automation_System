@@ -113,8 +113,7 @@ public:
 	void        OneByOneSearchforComDevice(int nComPort, bool bForTStat=FALSE, BYTE devLo=1, BYTE devHi=254);
 	// 校验
 	BOOL		binary_search_crc(int a);
-	// 搜索NC的函数
-	int _ScanNCFunc();
+
 	BOOL m_thesamesubnet;
 	// 获得计算机上的所有串口,返回串口数量
 	//int GetAllComPort();
@@ -165,17 +164,13 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////
 	// 搜索到的设备	写入数据库时，给他们写上subnet name这一项，在tree node显示时有用
-	CString GetNetDevSubnetName(const CString& strIP);
-	CString GetTstatSubnetName(const CString& strComPort);
-	CString GetTstatMBuildingName(const CString& strComPort);
+	
+
+	
 	void SetSubnetInfo(vector<Building_info>& szSubnets);
 	void SetBaudRate(const CString& strBaudrate);
 	
-	 
-	void BinaryScanNCByComPort(BYTE devLo = 1, BYTE devHi = 254);
-	void ScanTstatFromNCForAuto();
-	void ScanSubnetFromEthernetDevice();
-	void GetTstatInfoFromID(int nTstatID);
+	void ScanSubnetFromEthernetDevice(); //当检测到minipanel 后,在结束所有串口的网络扫描后，单独对此类设备扫描下面是否有连接其他设备;
 
 	void Initial_Scan_Info();
 	void ScanAll();
@@ -190,9 +185,9 @@ public:
 	void  ReadNCTable(_NetDeviceInfo* pNCInfo);
 	
 	void  AddNodeToTable(_NetDeviceInfo* pNCInfo, unsigned short* pNode);
-	void GetTstatFromNCTable();
-	void GetTstatFromNCTable2();
-	void GetTstatFromNCTableByComport();
+
+
+
 
 	BOOL ReadOneCheckOnline(int nCOMPort); // 读255，确定是否只有一个Tstat连接。
 

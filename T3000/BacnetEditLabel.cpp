@@ -599,6 +599,10 @@ void CBacnetEditLabel::OnBnClickedMfccolorbuttonColor()
 		}
 		m_bkColor=color;
 		label_info.nclrTxt = color;
+		CString temp_cs;
+		temp_cs.Format(_T("%u"),label_info.nclrTxt);
+		nDefaultclrTxt = label_info.nclrTxt;
+		WritePrivateProfileStringW(_T("Setting"),_T("AddLabelDefaultColor"),temp_cs,g_cstring_ini_path);
 }
 
 void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
@@ -710,7 +714,10 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 	}
 	CRect add_temprect;
 	::GetWindowRect(m_edit_label,&add_temprect);	
-
+	if((lpPoint.y + 250 > add_temprect.bottom  ) && (lpPoint.y > 250))
+		lpPoint.y = lpPoint.y - 210;
+	else if(lpPoint.y < 250)
+		lpPoint.y = 250;
 	MoveWindow(lpPoint.x,lpPoint.y,add_temprect.Width(),add_temprect.Height(),1);
 	GetDlgItem(IDC_EDIT_LABEL_VALUE)->SetFocus();
 
@@ -1221,6 +1228,7 @@ void CBacnetEditLabel::OnStnClickedStaticEditLabelDisplay()
 		m_edit_display.SetWindowTextW(Label_Display_Array[label_info.nDisplay_Type]);
 		ChangeWindowPos(0);
 	}
+	nDefaultDisplayType  = label_info.nDisplay_Type ;
 	temp_cs.Format(_T("%u"),label_info.nDisplay_Type);
 	WritePrivateProfileStringW(_T("Setting"),_T("AddLabelDefaultDisplay"),temp_cs,g_cstring_ini_path);
 }
@@ -1299,7 +1307,10 @@ void CBacnetEditLabel::OnStnClickedStaticEditTextPlace()
 		label_info.ntext_place = LABEL_TEXT_BOTTOM;
 		m_edit_text_place.SetWindowTextW(Label_Text_Place[label_info.ntext_place]);
 	}
-
+	CString temp_cs;
+	nDefaultTextPlace = label_info.ntext_place;
+	temp_cs.Format(_T("%u"),label_info.ntext_place);
+	WritePrivateProfileStringW(_T("Setting"),_T("AddLabelDefaultTextPlace"),temp_cs,g_cstring_ini_path);
 }
 
 
@@ -1321,6 +1332,10 @@ void CBacnetEditLabel::OnStnClickedStaticEditIconSize()
 		label_info.n_iconsize = LABEL_ICON_SMALL;
 		m_edit_icon_size.SetWindowTextW(Label_ICON_SIZE[label_info.n_iconsize]);
 	}
+	CString temp_cs;
+	nDefaultIconSize = label_info.n_iconsize;
+	temp_cs.Format(_T("%u"),label_info.n_iconsize);
+	WritePrivateProfileStringW(_T("Setting"),_T("AddLabelDefaultIconSize"),temp_cs,g_cstring_ini_path);
 }
 
 #if 0

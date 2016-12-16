@@ -1,6 +1,15 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
+2016 - 12 - 15
+1. 解决在program 时 TIME-ON 或者 TIME-OFF  个数超过30个以上后 TIME-ON( ) 里面的的值显示异常的问题;
+
+2016 - 12 - 14
+1. 修改program 里面的时间  12：30  传值为1250.000;
+
+2016 - 12 - 12
+1. 修复bug Setting将 
+
 2016 - 12 - 02
 Update by Fance
 1. ISP slove 界面恢复初始.
@@ -706,6 +715,9 @@ bool m_is_remote_device = false;
 HANDLE hconnect_modbus_thread = NULL;
 static int old_selected_item = WINDOW_PROGRAM; // 用于保存 上一个选中的 TAB; 用于 快捷键的操作;
 extern CBacnetAlarmWindow * AlarmWindow_Window;
+CBacnetProgramEdit *ProgramEdit_Window = NULL;
+CBacnetScheduleTime *ScheduleEdit_Window = NULL;
+AnnualRout_InsertDia *HolidayEdit_Window = NULL;
 
 extern char mycode[2000];
 int click_resend_time = 0;//当点击的时候，要切换device时 发送whois的次数;
@@ -1371,8 +1383,18 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 			{
 				if(bac_weeklycode_read_results)
 				{
-					CBacnetScheduleTime Dlg;
-					Dlg.DoModal();
+					//显示非模态对话框;
+					if(ScheduleEdit_Window != NULL)
+					{
+						delete ScheduleEdit_Window;
+						ScheduleEdit_Window = NULL;
+					}
+					ScheduleEdit_Window = new CBacnetScheduleTime;
+					ScheduleEdit_Window->Create(IDD_DIALOG_BACNET_SCHEDULE_TIME,this);	
+					ScheduleEdit_Window->ShowWindow(SW_SHOW);
+
+					//CBacnetScheduleTime Dlg;
+					//Dlg.DoModal();
 				}
 				else
 				{
@@ -1387,8 +1409,19 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 			{
 				if(bac_annualcode_read_results)
 				{
-					AnnualRout_InsertDia Dlg;
-					Dlg.DoModal();
+					//AnnualRout_InsertDia *HolidayEdit_Window = NULL;
+					if(HolidayEdit_Window != NULL)
+					{
+						delete HolidayEdit_Window;
+						HolidayEdit_Window = NULL;
+					}
+					HolidayEdit_Window = new AnnualRout_InsertDia;
+					HolidayEdit_Window->Create(IDD_ANNUAL_ROUTINES_INSERT_DIA,this);	
+					HolidayEdit_Window->ShowWindow(SW_SHOW);
+
+
+					//AnnualRout_InsertDia Dlg;
+					//Dlg.DoModal();
 				}
 				else
 				{
@@ -1462,10 +1495,23 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 				{
 					bac_read_which_list = -1;
 					bac_programcode_read_results = false;
-					CBacnetProgramEdit Dlg;
-					Sleep(200);
-					Dlg.DoModal();	
-					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T(" "));
+
+					//显示非模态对话框;
+					if(ProgramEdit_Window != NULL)
+					{
+						delete ProgramEdit_Window;
+						ProgramEdit_Window = NULL;
+					}
+					ProgramEdit_Window = new CBacnetProgramEdit;
+					ProgramEdit_Window->Create(IDD_DIALOG_BACNET_PROGRAM_EDIT,this);	
+					ProgramEdit_Window->ShowWindow(SW_SHOW);
+
+
+
+					//CBacnetProgramEdit Dlg;
+					//Sleep(200);
+					//Dlg.DoModal();	
+					//SetPaneString(BAC_SHOW_MISSION_RESULTS,_T(" "));
 				}
 
 				return 0;
@@ -2027,6 +2073,7 @@ void CDialogCM5_BacNet::Fresh()
 	else if((pFrame->m_product.at(selected_product_index).protocol == MODBUS_TCPIP) && 
 		((pFrame->m_product.at(selected_product_index).product_class_id == T38AI8AO6DO) ||
 		 (pFrame->m_product.at(selected_product_index).product_class_id == PID_T322AI) ||
+			(pFrame->m_product.at(selected_product_index).product_class_id == PWM_TRANSDUCER) ||
 		 (pFrame->m_product.at(selected_product_index).product_class_id == PID_T3PT12)) ||
 		 (pFrame->m_product.at(selected_product_index).product_class_id == STM32_HUM_NET))
 	{
@@ -2067,7 +2114,7 @@ void CDialogCM5_BacNet::Fresh()
 		}
 
 		bip_set_socket(my_sokect);
-		  bip_set_port(49338);
+		 bip_set_port(htons(47808));
 		in_addr BIP_Address;
 		char temp_ip_2[100];
 		memset(temp_ip_2,0,100);
@@ -2171,6 +2218,8 @@ void CDialogCM5_BacNet::Fresh()
 				bacnet_device_type = T38AI8AO6DO;
 			else if(pFrame->m_product.at(selected_product_index).product_class_id == PID_T322AI)
 				bacnet_device_type = PID_T322AI;	
+			else if (pFrame->m_product.at(selected_product_index).product_class_id == PWM_TRANSDUCER)
+				bacnet_device_type = PWM_TRANSDUCER;
 			else if(pFrame->m_product.at(selected_product_index).product_class_id == STM32_HUM_NET)
 				bacnet_device_type = STM32_HUM_NET;	
 			else
@@ -4455,35 +4504,35 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 						click_resend_time = 10;
 						already_retry = true;
 					}
-					else
-					{
-						bac_select_device_online = false;
-						KillTimer(4);
-						//SetPaneString(2,_T("Offline"));
-						CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-						pFrame->m_pTreeViewCrl->turn_item_image(selected_tree_item ,false);
-						pFrame->m_product.at(selected_product_index).status_last_time[0] = false;
-						pFrame->m_product.at(selected_product_index).status_last_time[1] = false;
-						pFrame->m_product.at(selected_product_index).status_last_time[2] = false;
+					//else
+					//{
+					//	bac_select_device_online = false;
+					//	KillTimer(4);
+					//	//SetPaneString(2,_T("Offline"));
+					//	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+					//	pFrame->m_pTreeViewCrl->turn_item_image(selected_tree_item ,false);
+					//	pFrame->m_product.at(selected_product_index).status_last_time[0] = false;
+					//	pFrame->m_product.at(selected_product_index).status_last_time[1] = false;
+					//	pFrame->m_product.at(selected_product_index).status_last_time[2] = false;
 
-						HKEY hkey;
-						char sz[256];
-						DWORD dwtype, sl = 256;
+					//	HKEY hkey;
+					//	char sz[256];
+					//	DWORD dwtype, sl = 256;
 
-						RegOpenKeyEx(HKEY_LOCAL_MACHINE,	_T("SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\StandardProfile"),	NULL, KEY_READ, &hkey);
-						RegQueryValueEx(hkey, _T("EnableFirewall"), NULL, &dwtype, (LPBYTE)sz, &sl);
-						DWORD dw_firewall;
-						dw_firewall = sz[0] + sz[1] * 256 + sz[2] * 256*256 + sz[3] * 256*256*256;
-						if(dw_firewall != 0 )
-						{
-							//AfxMessageBox(_T("Please turn off your firewall .If not , some broadcast communication may fail."));
-							pFrame->m_pDialogInfo->ShowWindow(SW_SHOW);
-							pFrame->m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Please turn off your firewall or add 'T3000.exe' to firewall exception list.\r\nIf not , some broadcast communication may fail."));
-						}
+					//	RegOpenKeyEx(HKEY_LOCAL_MACHINE,	_T("SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\StandardProfile"),	NULL, KEY_READ, &hkey);
+					//	RegQueryValueEx(hkey, _T("EnableFirewall"), NULL, &dwtype, (LPBYTE)sz, &sl);
+					//	DWORD dw_firewall;
+					//	dw_firewall = sz[0] + sz[1] * 256 + sz[2] * 256*256 + sz[3] * 256*256*256;
+					//	if(dw_firewall != 0 )
+					//	{
+					//		//AfxMessageBox(_T("Please turn off your firewall .If not , some broadcast communication may fail."));
+					//		pFrame->m_pDialogInfo->ShowWindow(SW_SHOW);
+					//		pFrame->m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Please turn off your firewall or add 'T3000.exe' to firewall exception list.\r\nIf not , some broadcast communication may fail."));
+					//	}
 
-						RegCloseKey(hkey);
+					//	RegCloseKey(hkey);
 
-					}
+					//}
 
 					
 				}
@@ -5043,6 +5092,11 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 	{
 		output_reg = 0; // (6+8)*23 = 322
 		input_reg =  6; //  23 * 22 = 506
+	}
+	else if (n_read_product_type == PWM_TRANSDUCER)
+	{
+		output_reg = 6; // (6+8)*23 = 322
+		input_reg = 6; //  23 * 22 = 506
 	}
 	else if(n_read_product_type == PID_T3PT12)
 	{

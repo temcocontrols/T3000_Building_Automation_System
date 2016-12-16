@@ -66,6 +66,9 @@ public:
 	CString GetSubnetName() const;
 	void SetSubnetName(const CString& strSubnetName);
 	
+	CString GetProductCusName() const;
+	void SetProductCusName(const CString& strProductCusName);
+	
 	
 	Mainnet_info	m_mainnet_info;
 public:
@@ -75,7 +78,8 @@ public:
 	int			m_nProductType;			//	产品型号，由此判断5A，5B。。。等等，或者是否是NC
 	float		m_fHardware_version;	//  硬件版本号
 	float		m_fSoftware_version;	//  软件版本号
-	
+	bool		m_cus_name;				//1 代表有客户自己的名字;
+	CString m_product_cus_name; //客户自定义的名字;
 	CString	m_strBuildingName;		// 所属建筑
 	CString	m_strFloorName;			// 所属楼层
 	CString	m_strRoomName;		// 所属房间

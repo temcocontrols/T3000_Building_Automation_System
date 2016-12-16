@@ -696,12 +696,12 @@ BOOL CFlexSlideWnd::SetPos_tstat6_2pos( int nMinPos, int nMidPos, int nMaxPos )
 
 BOOL CFlexSlideWnd::SetPos_tstat6_3pos( int nMinPos, int nMidPos, int nMaxPos )
 {
-	ASSERT(nMinPos < nMidPos && nMidPos < nMaxPos);//tstat6
+	ASSERT(nMinPos <= nMidPos && nMidPos <= nMaxPos);//tstat6
 	ASSERT(m_pThumbOpter);
 
 	ASSERT(nMinPos-m_nMin >=0&& nMidPos-m_nMin >=0 && nMaxPos-m_nMin >= 0);
 
-	if (!(nMinPos < nMidPos && nMidPos < nMaxPos))//tstat6
+	if (!(nMinPos <= nMidPos && nMidPos <= nMaxPos))//tstat6
 	{
 		return FALSE;
 
