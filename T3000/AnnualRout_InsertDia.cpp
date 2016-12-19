@@ -48,6 +48,7 @@ void AnnualRout_InsertDia::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_MONTHCALENDAR1, m_month_ctrl);
 	//DDX_Control(pDX, IDC_MONTHVIEW1, m_monthViewCtrl);
 	DDX_Control(pDX, IDC_COMBO1, m_yearComBox);
+	m_month_ctrl.SetOriginalColors();
 }
 
 
