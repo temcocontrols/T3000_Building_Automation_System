@@ -8,6 +8,8 @@
 #include <uxtheme.h>
 #include "unicode.h"
 
+#pragma comment(lib, "uxtheme")
+
 #define Alloc(s) malloc((s))
 #define ReAlloc(s,t) realloc((s),(t))
 #define Free(s) free((s))
