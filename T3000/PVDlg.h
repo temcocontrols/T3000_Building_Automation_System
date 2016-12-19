@@ -1,7 +1,7 @@
 #pragma once
 #include "afxcmn.h"
 
-
+#define IDD_PARTS_VENDORS 1777
 // CPVDlg dialog
 
 class CPVDlg : public CDialog

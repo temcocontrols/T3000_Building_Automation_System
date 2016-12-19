@@ -280,6 +280,7 @@
     <ClCompile Include="ping.cpp" />
     <ClCompile Include="PressureSensorForm.cpp" />
     <ClCompile Include="ProductRegisterListView.cpp" />
+    <ClCompile Include="PVDlg.cpp" />
     <ClCompile Include="RefreshTreeThread.cpp" />
     <ClCompile Include="RegisterViewerDlg.cpp" />
     <ClCompile Include="RegisterWriteValueDlg.cpp" />
@@ -584,6 +585,7 @@
     <ClInclude Include="PressureSensorForm.h" />
     <ClInclude Include="ProductModel.h" />
     <ClInclude Include="ProductRegisterListView.h" />
+    <ClInclude Include="PVDlg.h" />
     <ClInclude Include="RegisterViewerDlg.h" />
     <ClInclude Include="RegisterWriteValueDlg.h" />
     <ClInclude Include="RemotePtpLogin.h" />

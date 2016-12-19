@@ -23,7 +23,7 @@
 
 typedef struct tagSELECTION_ITEM
 {
-	SYSTEMTIME          time;
+	SYSTEMTIME          date;
 	tagSELECTION_ITEM * next;
 } SELECTION_ITEM, *LPSELECTION_ITEM;
 

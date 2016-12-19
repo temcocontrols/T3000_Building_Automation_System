@@ -464,7 +464,7 @@ public:
 	afx_msg void OnPaint();
 	afx_msg void OnControlAlarmLog();
 	afx_msg void OnMenuCheckupdate();
-/*	afx_msg void OnDatabasePv();*/
+	afx_msg void OnDatabasePv();
 	afx_msg void OnControlTstat();
 
     afx_msg void OnUpdateConnect2(CCmdUI *pCmdUI);
