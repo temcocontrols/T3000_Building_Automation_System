@@ -814,22 +814,19 @@ static void MONTHCAL_CircleDay(const MONTHCAL_INFO *infoPtr, HDC hdc,
 
 static BOOL MONTHCAL_IsDateEquals(const SYSTEMTIME * first, const SYSTEMTIME * second)
 {
-	VERIFY(first);
-	VERIFY(second);
-
 	return first->wDay == second->wDay &&
-		first->wMonth == second->wMonth &&
-		first->wYear == second->wYear;
+		   first->wMonth == second->wMonth &&
+		   first->wYear == second->wYear;
 }
 
-static BOOL MONTHCAL_IsDaySelected(const MONTHCAL_INFO *infoPtr, const SYSTEMTIME * date)
+static BOOL MONTHCAL_IsDaySelected(const MONTHCAL_INFO *infoPtr, const SYSTEMTIME * time)
 {
-	VERIFY(date);
+	VERIFY(time);
 
 	LPSELECTION_ITEM info = infoPtr->selectionInfo.first;
 	while (info)
 	{
-		if (MONTHCAL_IsDateEquals(&info->date, date))
+		if (MONTHCAL_IsDateEquals(&info->time, time))
 		{
 			return TRUE;
 		}
@@ -853,35 +850,34 @@ MONTHCAL_RemoveFromSelection(MONTHCAL_INFO * infoPtr, const SYSTEMTIME * date)
 {
 	VERIFY(date);
 
-	LPSELECTION_ITEM prevItem = NULL;
-	LPSELECTION_ITEM item = infoPtr->selectionInfo.first;
-	while (item)
+	LPSELECTION_ITEM prevInfo = NULL;
+	LPSELECTION_ITEM info = infoPtr->selectionInfo.first;
+	while (info)
 	{
-		if (MONTHCAL_IsDateEquals(&item->date, date))
+		if (MONTHCAL_IsDateEquals(&info->time, date))
 		{
-			if (prevItem)
+			if (prevInfo)
 			{
-				prevItem->next = item->next;
+				prevInfo->next = info->next;
 			}
 			else
 			{
-				infoPtr->selectionInfo.first = item->next;
+				infoPtr->selectionInfo.first = info->next;
 			}
 
 			MONTHCAL_RedrawDayRect(infoPtr, date);
+			LPSELECTION_ITEM temp = info->next;
+			Free(info);
+			info = temp;
 			--infoPtr->selectionInfo.size;
-			LPSELECTION_ITEM temp = item;
-			item = item->next;
-			Free(temp);
 			continue;
 		}
 
-		prevItem = item;
-		item = item->next;
+		prevInfo = info;
+		info = info->next;
 	}
 
 	MONTHCAL_NotifySelectionChange(infoPtr);
-	MONTHCAL_RedrawDayRect(infoPtr, date);
 }
 
 static VOID
@@ -890,7 +886,7 @@ MONTHCAL_AddToSelection(MONTHCAL_INFO * infoPtr, const SYSTEMTIME * date)
 	VERIFY(date);
 
 	LPSELECTION_ITEM newInfo = (LPSELECTION_ITEM)Alloc(sizeof(SELECTION_ITEM));
-	newInfo->date = *date;
+	newInfo->time = *date;
 	newInfo->next = NULL;
 
 	LPSELECTION_ITEM info = infoPtr->selectionInfo.first;
@@ -912,12 +908,10 @@ added:
 	++infoPtr->selectionInfo.size;
 	if (infoPtr->maxSelCount > 0 && infoPtr->selectionInfo.size > infoPtr->maxSelCount)
 	{
-		MONTHCAL_RemoveFromSelection(infoPtr, &infoPtr->selectionInfo.first->date);
+		MONTHCAL_RemoveFromSelection(infoPtr, &infoPtr->selectionInfo.first->time);
 		return;
 	}
 	MONTHCAL_NotifySelect(infoPtr);
-	MONTHCAL_NotifySelectionChange(infoPtr);
-	MONTHCAL_RedrawDayRect(infoPtr, date);
 }
 
 static void MONTHCAL_ChangeSelection(MONTHCAL_INFO * infoPtr, const SYSTEMTIME * date)
@@ -930,18 +924,9 @@ static void MONTHCAL_ChangeSelection(MONTHCAL_INFO * infoPtr, const SYSTEMTIME *
 	{
 		MONTHCAL_AddToSelection(infoPtr, date);
 	}
-}
-
-static void MONTHCAL_UnselectAll(MONTHCAL_INFO * infoPtr)
-{
-	LPSELECTION_ITEM item = infoPtr->selectionInfo.first;
-	while (item) 
-	{
-		MONTHCAL_RemoveFromSelection(infoPtr, &item->date);
-		item = infoPtr->selectionInfo.first;
-	}
-
+	//InvalidateRect(infoPtr->hwndSelf, NULL, FALSE);
 	MONTHCAL_NotifySelectionChange(infoPtr);
+	MONTHCAL_RedrawDayRect(infoPtr, date);
 }
 
 static void MONTHCAL_DrawDay(const MONTHCAL_INFO *infoPtr, HDC hdc, const SYSTEMTIME *st,
@@ -1681,7 +1666,6 @@ MONTHCAL_SetCurSel(MONTHCAL_INFO *infoPtr, SYSTEMTIME *curSel)
 {
   if (!curSel || !MONTHCAL_ValidateDate(curSel))
   {
-	  MONTHCAL_UnselectAll(infoPtr);
 	  return FALSE;
   }
 

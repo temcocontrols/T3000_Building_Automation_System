@@ -72,7 +72,7 @@ HTREEITEM  hLastTreeItem =NULL;
 #include "LanguageLocale.h"
 #include "RegisterViewerDlg.h"
 #include "DebugWindow.h"
-#include "PVDlg.h"
+
 #include "T36CT.h"
 #include "T3RTDView.h"
 #include "CO2NetView.h"
@@ -348,7 +348,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
     ON_COMMAND(ID_DATABASE_BACNETTOOL, &CMainFrame::OnDatabaseBacnettool)
     ON_COMMAND(ID_CONTROL_ALARM_LOG, &CMainFrame::OnControlAlarmLog)
     ON_COMMAND(ID_Menu_CHECKUPDATE, &CMainFrame::OnMenuCheckupdate)
-    ON_COMMAND(ID_DATABASE_PV, &CMainFrame::OnDatabasePv)
+  //  ON_COMMAND(ID_DATABASE_PV, &CMainFrame::OnDatabasePv)
     ON_COMMAND(ID_CONTROL_TSTAT, &CMainFrame::OnControlTstat)
 
 
@@ -6403,7 +6403,7 @@ void CMainFrame::SaveConfigFile()
         return;
     }
 	else if(((g_protocol == MODBUS_RS485) || (g_protocol ==MODBUS_TCPIP)) &&  
-		((bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PWM_TRANSDUCER)))
+		    ((bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PWM_TRANSDUCER)))
 	{
 		//T3的设备支持minipanel的 input output 就读10000以后的寄存器;
 		MainFram_hwd = this->m_hWnd;
@@ -8823,7 +8823,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
                 SwitchToPruductType(DLG_DIALOG_TSTAT_INPUT_VIEW);
             }
-			else if (nFlag == PM_T322AI || nFlag == CS3000 || nFlag == PWM_TRANSDUCER || nFlag == PM_T38AI8AO6DO || nFlag == PM_T3PT12 )
+            else if (nFlag == PM_T322AI || nFlag == CS3000 || nFlag == PWM_TRANSDUCER || nFlag == PM_T38AI8AO6DO || nFlag == PM_T3PT12 )
             {
 				//就说明是加了minipanel 10000以后寄存器的; 否则的话就跳转至以前的界面;
 				new_device_support_mini_ui = true;
@@ -11789,8 +11789,7 @@ void CMainFrame::OnControlWeekly()
 void CMainFrame::OnControlAnnualroutines()
 {
     // TODO: Add your command handler code here
-	AnnualRout_InsertDia Dlg;
-	Dlg.DoModal();
+
 	 
     if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
     {
@@ -11915,7 +11914,7 @@ void CMainFrame::OnControlSettings()
         }
     }
 	
-    else if (product_type == CS3000||product_register_value[7]==PM_T322AI || product_register_value[7] == PWM_TRANSDUCER ||product_register_value[7]==PM_T38AI8AO6DO||product_register_value[7]==PM_T3PT12
+	else if (product_type == CS3000||product_register_value[7]==PM_T322AI || product_register_value[7] == PWM_TRANSDUCER ||product_register_value[7]==PM_T38AI8AO6DO||product_register_value[7]==PM_T3PT12
 	             ||product_register_value[7]==STM32_HUM_NET )
 	{
 		bacnet_view_number = TYPE_TSTAT;
@@ -12374,25 +12373,25 @@ void CMainFrame::OnMenuCheckupdate()
 }
 
 
-void CMainFrame::OnDatabasePv()
-{
-    // TODO: Add your command handler code here
-    //AfxMessageBox(_T("Developing....."));
-    //return;
-    CLoginDlg Dlg(g_buser_log_in);
-    if (IDOK== Dlg.DoModal())
-    {
-        CPVDlg dlg;
-        dlg.DoModal();
-    }
-    else
-    {
-        AfxMessageBox(_T("Loging.....fail!"));
-    }
-
-
-
-}
+// void CMainFrame::OnDatabasePv()
+// {
+//     // TODO: Add your command handler code here
+//     //AfxMessageBox(_T("Developing....."));
+//     //return;
+//     CLoginDlg Dlg(g_buser_log_in);
+//     if (IDOK== Dlg.DoModal())
+//     {
+//         CPVDlg dlg;
+//         dlg.DoModal();
+//     }
+//     else
+//     {
+//         AfxMessageBox(_T("Loging.....fail!"));
+//     }
+// 
+// 
+// 
+// }
 
 
 //Add by Fance 14/05/21

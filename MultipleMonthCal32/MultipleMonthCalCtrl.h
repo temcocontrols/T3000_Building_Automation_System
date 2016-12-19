@@ -25,9 +25,7 @@ public:
 	/* This method set last date as first month in calendar.
 	 * Use SetRange() after for select need range.
 	 */
-	void	SelectDate(const SYSTEMTIME & date);
-	void	SelectDates(const std::vector<SYSTEMTIME> & dates);
-	void	UnselectAll();
+	void	SetSelection(const std::vector<SYSTEMTIME> & dates);
 
 protected:
 

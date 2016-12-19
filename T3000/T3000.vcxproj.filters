@@ -699,9 +699,6 @@
     <ClCompile Include="BTUMeterDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PVDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -1737,10 +1734,10 @@
     <ClInclude Include="SetTimeDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BTUMeterDlg.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="BADO\BADO.h">
+      <Filter>BADO</Filter>
     </ClInclude>
-    <ClInclude Include="PVDlg.h">
+    <ClInclude Include="BTUMeterDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
