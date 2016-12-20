@@ -45,3 +45,5 @@
 **/*.OLBlck
 **/*.MNL
 **/*.MAX
+/T3000.VC.db
+/T3000.VC.VC.opendb
