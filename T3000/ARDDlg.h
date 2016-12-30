@@ -45,7 +45,9 @@ public:
     vector<Custom_Product_Node> m_Custom_Product;
     afx_msg void OnCbnDropdownComboProductName();
     afx_msg void OnCbnSelchangeComboProductName();
-    afx_msg void OnEnKillfocusEditTypeId();
+      void OnEnKillfocusEditTypeId();
 //    afx_msg void OnEnKillfocusEditAddDeviceModbusId();
     CComboBox m_minipanel_comport;
+	int GetNewProductID();
+	int GetNewSerialNumber();
 };

@@ -5,6 +5,8 @@
 #include "T3000.h"
 #include "ARDDlg.h"
 #include "afxdialogex.h"
+
+#include "timer.h"
  
 #include "../SQLiteDriver/CppSQLite3.h"
 // CARDDlg dialog
@@ -51,7 +53,10 @@ BOOL CARDDlg::OnInitDialog()
 	((CButton *)GetDlgItem(IDC_RADIO_NET_DEVICE))->SetCheck(TRUE);//选上
 	Enable_Net_UI(true);
     OnCbnDropdownComboProductName();
-
+	((CEdit*)GetDlgItem(IDC_EDIT_TYPE_ID))->SetReadOnly(TRUE);
+	((CEdit*)GetDlgItem(IDC_EDIT_SERIAL_NUMBER))->SetReadOnly(TRUE);
+	strIP.Format(_T("%d"), GetNewSerialNumber());
+	GetDlgItem(IDC_EDIT_SERIAL_NUMBER)->SetWindowText(strIP);
 	return TRUE; 
 }
 
@@ -104,7 +109,7 @@ BEGIN_MESSAGE_MAP(CARDDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_LOCAL_MSTP_DEVICE, &CARDDlg::OnBnClickedButtonLocalMstpDevice)
     ON_CBN_DROPDOWN(IDC_COMBO_PRODUCT_NAME, &CARDDlg::OnCbnDropdownComboProductName)
     ON_CBN_SELCHANGE(IDC_COMBO_PRODUCT_NAME, &CARDDlg::OnCbnSelchangeComboProductName)
-    ON_EN_KILLFOCUS(IDC_EDIT_TYPE_ID, &CARDDlg::OnEnKillfocusEditTypeId)
+ //   ON_EN_KILLFOCUS(IDC_EDIT_TYPE_ID, &CARDDlg::OnEnKillfocusEditTypeId)
 //    ON_EN_KILLFOCUS(IDC_EDIT_ADD_DEVICE_MODBUS_ID, &CARDDlg::OnEnKillfocusEditAddDeviceModbusId)
 END_MESSAGE_MAP()
 
@@ -205,16 +210,28 @@ void CARDDlg::OnBnClickedOk()
 
    if (is_open)
    {
+	  
 	   CString strSql;
 	   CString strMainBuildName,strSubBuildingName,strSID,strFloorName,strRoomName,strProID;
 	   CString strProName,strProType,strScreenID,strBaudrate,strGraphicID,strHdVersion,strStVersion,strCom,strEPSize;
        CString Product_Name;
        CString strCustomer;
-       
+	   CString New_Product_Name;
        int ParnetModbusID=0;
       
        m_combox_productname.GetWindowText(Product_Name); 
-
+	   GetDlgItem(IDC_PRODUCTNAME_EDITOR)->GetWindowTextW(New_Product_Name);
+	   if (Product_Name.CompareNoCase(L"Add New") == 0 &&New_Product_Name.IsEmpty())
+	   {
+		   MessageBox(L"Please input a product name!");
+		   GetDlgItem(IDC_PRODUCTNAME_EDITOR)->SetFocus();
+		   return;
+	   }
+	   else if(Product_Name.CompareNoCase(L"Add New") == 0)
+	   {
+		   Product_Name = New_Product_Name;
+	   }
+	   OnEnKillfocusEditTypeId();
 	   CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 	   strMainBuildName= pFrame->m_strCurMainBuildingName;
 	   strSubBuildingName= pFrame->m_strCurSubBuldingName;
@@ -607,19 +624,96 @@ void CARDDlg::OnCbnDropdownComboProductName()
             q.nextRow();
     }
     SqliteDBT3000.closedb();
-
+	
     for(int i=0;i<(int)m_Custom_Product.size();i++){
         m_combox_productname.AddString(m_Custom_Product.at(i).Product_Name);
     }
+	m_combox_productname.AddString(L"Add New");
 }
+int CARDDlg::GetNewProductID()
+{
+	CppSQLite3DB SqliteDBT3000;
+	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+	CppSQLite3Query q;
+	CString StrSql;
 
+	int NewID = -1;
+	for (int id = 220;  id<256;id++)
+	{
+		StrSql.Format(_T("Select * From ProductsTypeRegisterTables Where ProductType = %d"),id);
+		q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
+		if (q.eof())
+		{
+			NewID = id;
+			break;
+		}
+	}
+	SqliteDBT3000.closedb();
+	return NewID;
+}
+int CARDDlg::GetNewSerialNumber()
+{	
+	int NewSerialNumber = -1;
+
+	time_t t;
+	srand((unsigned)time(&t));
+
+	CppSQLite3DB SqliteBuildingDB;
+	SqliteBuildingDB.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+	CppSQLite3Query q;
+	CString StrSql;
+
+ 
+
+	int trytime = 3000;
+	while (trytime > 0)
+	{
+		int tempid = rand();
+		StrSql.Format(_T("Select * From ALL_NODE Where Serial_ID = '%d' "), tempid);
+		q = SqliteBuildingDB.execQuery((UTF8MBSTR)StrSql);
+		if (q.eof())
+		{
+			NewSerialNumber = tempid;
+			break;
+		}
+		--trytime;
+	}
+	SqliteBuildingDB.closedb();
+	return NewSerialNumber;
+}
 
 void CARDDlg::OnCbnSelchangeComboProductName()
 {
-        int sel = m_combox_productname.GetCurSel();
-        CString TypeID;
-        TypeID.Format(_T("%d"),m_Custom_Product.at(sel).Product_Type); 
-        GetDlgItem(IDC_EDIT_TYPE_ID)->SetWindowText(TypeID);
+     	int sel = m_combox_productname.GetCurSel();
+	    if (sel == m_combox_productname.GetCount() -1)//最后一个New
+	    {
+			GetDlgItem(IDC_PRODUCTNAME_EDITOR)->ShowWindow(TRUE);
+			 CString TypeID;
+			 int NewID = GetNewProductID();
+			 if (NewID != -1)
+			 {
+				 TypeID.Format(_T("%d"), NewID);
+				 GetDlgItem(IDC_EDIT_TYPE_ID)->SetWindowText(TypeID);
+			 }
+			 else
+			 {
+				 AfxMessageBox(L"Can't get a useful product id for you");
+			 }
+			
+
+			//
+
+	    } 
+	    else
+	    {
+			GetDlgItem(IDC_PRODUCTNAME_EDITOR)->ShowWindow(FALSE);
+			CString TypeID;
+			TypeID.Format(_T("%d"), m_Custom_Product.at(sel).Product_Type);
+			GetDlgItem(IDC_EDIT_TYPE_ID)->SetWindowText(TypeID);
+	    }
+		
+       
+		
 }
 
 
@@ -632,8 +726,22 @@ void CARDDlg::OnEnKillfocusEditTypeId()
           return;
      }
      
-     CString ProductName ;
+     CString ProductName , New_Product_Name;
      GetDlgItem(IDC_COMBO_PRODUCT_NAME)->GetWindowText(ProductName);
+
+	 GetDlgItem(IDC_PRODUCTNAME_EDITOR)->GetWindowTextW(New_Product_Name);
+	 if (ProductName.CompareNoCase(L"Add New") == 0 && New_Product_Name.IsEmpty())
+	 {
+		 MessageBox(L"Please input a product name!");
+		 GetDlgItem(IDC_PRODUCTNAME_EDITOR)->SetFocus();
+		 return;
+	 }
+	 else if (ProductName.CompareNoCase(L"Add New") == 0)
+	 {
+		 ProductName = New_Product_Name;
+	 }
+
+
      int ProductID;
      ProductID = _wtoi(TypeID);
      BOOL Check_Input = FALSE;

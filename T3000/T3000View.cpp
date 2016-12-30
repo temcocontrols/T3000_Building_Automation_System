@@ -3886,6 +3886,7 @@ int CT3000View::get_real_fan_select()
 {
 
     int fan_i=m_FanComBox.GetCurSel();
+	
     if(product_register_value[MODBUS_AUTO_ONLY]==BST_CHECKED)
     {
         if(fan_i==0)
@@ -3937,6 +3938,61 @@ int CT3000View::get_real_fan_select()
             break;
         }
     }
+
+	 
+		if (product_register_value[7] == PM_TSTAT8)
+		{
+
+
+			int fan_mode_i = product_register_value[MODBUS_FAN_MODE];
+			switch (fan_mode_i)
+			{
+			case 0:
+				if (fan_i == 0)fan_i = 0;
+				if (fan_i == 1)fan_i = 4;
+				break;
+			case 1:
+				if (fan_i == 0)fan_i = 0;
+				if (fan_i == 1)fan_i = 1;
+				if (fan_i == 2)fan_i = 4;
+
+				break;
+			case 2:
+				if (fan_i == 0)fan_i = 0;
+				if (fan_i == 1)fan_i = 1;
+				if (fan_i == 2)fan_i = 2;
+				if (fan_i == 3)fan_i = 4;
+				break;
+			case 3:
+				if (fan_i == 0)fan_i = 0;
+				if (fan_i == 1)fan_i = 1;
+				if (fan_i == 2)fan_i = 2;
+				if (fan_i == 3)fan_i = 3;
+				if (fan_i == 4)fan_i = 4;
+				break;
+			case 4:
+				if (fan_i == 0)fan_i = 0;
+				if (fan_i == 1)fan_i = 1;
+				if (fan_i == 2)fan_i = 2;
+				if (fan_i == 3)fan_i = 3;
+				if (fan_i == 4)fan_i = 4;
+				break;
+			 
+			default:
+				if (fan_i == 0)fan_i = 0;
+				if (fan_i == 1)fan_i = 1;
+				if (fan_i == 2)fan_i = 2;
+				if (fan_i == 3)fan_i = 3;
+				if (fan_i == 4)fan_i = 4;
+				if (fan_i == 5)fan_i = 5;
+				if (fan_i == 6)fan_i = 6;
+				break;
+			}
+
+		}
+
+	 
+
     return fan_i;
 }
 int CT3000View::set_real_fan_select()
@@ -4058,6 +4114,13 @@ void CT3000View::OnCbnSelchangeFanspeedcombo()
     //}
 
     //»Ö¸´T3000Ö÷Ïß³Ì
+
+
+	if (product_register_value[8] = PM_TSTAT8)
+	{
+		int sel = m_FanComBox.GetCurSel();
+
+	}
     pMain->m_pFreshMultiRegisters->ResumeThread();
     pMain->m_pRefreshThread->ResumeThread();//
 }
@@ -6076,8 +6139,6 @@ void CT3000View::InitFanSpeed()
     {
         m_FanComBox.AddString(p[0]);
         m_FanComBox.AddString(p[5]);
-//         m_FanComBox.AddString(p[6]);
-//         m_FanComBox.AddString(p[7]);
     }
     else
     {
@@ -6123,6 +6184,61 @@ void CT3000View::InitFanSpeed()
     int sel = set_real_fan_select();
     m_FanComBox.SetCurSel(sel);
 
+	m_FanComBox.ResetContent();
+
+	if (product_register_value[7] == PM_TSTAT8)
+	{
+		switch (product_register_value[MODBUS_FAN_MODE])		//122   105
+		{
+		case 0:
+			m_FanComBox.AddString(p[0]);
+			 
+			m_FanComBox.AddString(p[5]);
+		 
+			break;
+		case 1:
+			m_FanComBox.AddString(p[0]);
+			m_FanComBox.AddString(p[1]);
+		 
+			m_FanComBox.AddString(p[5]);
+		 
+			break;
+		case 2:
+			m_FanComBox.AddString(p[0]);
+			m_FanComBox.AddString(p[1]);
+			m_FanComBox.AddString(p[2]);
+		 
+			m_FanComBox.AddString(p[5]);
+	 
+			break;
+		case 3:
+			m_FanComBox.AddString(p[0]);
+			m_FanComBox.AddString(p[1]);
+			m_FanComBox.AddString(p[2]);
+			m_FanComBox.AddString(p[3]);
+			m_FanComBox.AddString(p[5]);
+			break;
+		case 4:
+			m_FanComBox.AddString(p[0]);
+			m_FanComBox.AddString(p[1]);
+			m_FanComBox.AddString(p[2]);
+			m_FanComBox.AddString(p[3]);
+			m_FanComBox.AddString(p[4]);
+			m_FanComBox.AddString(p[5]);
+			break;
+		default:
+			m_FanComBox.AddString(p[0]);
+			m_FanComBox.AddString(p[2]);
+			m_FanComBox.AddString(p[3]);
+			m_FanComBox.AddString(p[4]);
+			m_FanComBox.AddString(p[5]);
+			m_FanComBox.AddString(p[6]);
+			m_FanComBox.AddString(p[7]);
+			break;
+		}
+	}
+ 
+	m_FanComBox.SetCurSel(product_register_value[MODBUS_FAN_MODE]);
 }
 
 void CT3000View::HandleSliderSetPos( BOOL bRight )
@@ -7667,8 +7783,8 @@ void CT3000View::FreshCtrl()
         {
 
             //GetDlgItem(IDC_DAYSTATIC)->ShowWindow(SW_HIDE);
-            //GetDlgItem(IDC_OCCUPACHECK)->ShowWindow(SW_HIDE);
-            //GetDlgItem(IDC_UNOCCUPIED_MARK)->ShowWindow(SW_HIDE);
+           GetDlgItem(IDC_OCCUPACHECK)->ShowWindow(SW_SHOW);
+           GetDlgItem(IDC_UNOCCUPIED_MARK)->ShowWindow(SW_SHOW);
 
 
             GetDlgItem(IDC_STATIC2SP)->ShowWindow(SW_SHOW);

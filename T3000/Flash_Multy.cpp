@@ -289,7 +289,7 @@ void CFlash_Multy::Initial_List()
         nproduct_id.Format(_T("%u"),(unsigned char)pFrame->m_product.at(i).product_class_id);
 		if(pFrame->m_product.at(i).note_parent_serial_number == 0)
 		{
-			if(pFrame->m_product.at(i).BuildingInfo.strIp.FindOneOf(_T(".")))
+			if(pFrame->m_product.at(i).BuildingInfo.strIp.FindOneOf(_T("."))!=-1)
 			{
 				nComport.Empty();
 				nIPAddress = pFrame->m_product.at(i).BuildingInfo.strIp;
@@ -1103,11 +1103,11 @@ DWORD WINAPI  CFlash_Multy::multy_isp_thread(LPVOID lpVoid)
                  nFlag==PM_T38AI8AO6DO
                 )
         {
-            product_type =T3000_T3_MODULES;
+            product_type = T3000_T3_MODULES;
         }
         else
         {
-            product_type=nFlag;
+            product_type = nFlag;
         }
 
 

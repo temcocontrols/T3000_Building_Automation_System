@@ -2146,6 +2146,7 @@
 #define IDC_EDIT_MSTP_MAC               2275
 #define IDC_STATIC_MAC_MSTP             2276
 #define IDC_STATIC_MSTP_MODBUS          2277
+#define IDC_PRODUCTNAME_EDITOR          2278
 #define IDC_BUTTON_MODEL11              3000
 #define IDC_BUTTON_MODEL1               3000
 #define IDC_BUTTON_MODEL12              3001
@@ -2653,9 +2654,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        659
+#define _APS_NEXT_RESOURCE_VALUE        660
 #define _APS_NEXT_COMMAND_VALUE         34058
-#define _APS_NEXT_CONTROL_VALUE         2278
+#define _APS_NEXT_CONTROL_VALUE         2279
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

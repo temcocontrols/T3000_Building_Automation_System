@@ -7,7 +7,6 @@
 #include "atlcomtime.h"
 #include "afxdtctl.h"
 #include "monthview1.h"
-#include "../MultipleMonthCal32/MultipleMonthCalCtrl.h"
 using namespace std;
 
 //#define NTDDI_LONGHORN  0x051
@@ -54,7 +53,7 @@ public:
 	afx_msg void OnBnClickedButton2();
 	afx_msg void OnDestroy();
 	//afx_msg void OnBnClickedButton3();
-	CMultipleMonthCalCtrl m_month_ctrl;
+	CMonthCalCtrl m_month_ctrl;
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnLbnSelchangeList1();

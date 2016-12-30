@@ -8957,10 +8957,14 @@ void LoadTstat_InputData()
 
         nValue=product_register_value[MODBUS_ANALOG1_RANGE+i-1];	//189
         nValue &= 0x7F;//去掉最高位
-        if(nValue>=0)
+        if(nValue>=0&&nValue<13)
         {
             strTemp=analog_range_TSTAT6[nValue];
         }
+		else
+		{
+			strTemp = L"0";
+		}
         m_crange=nValue;
 
         m_tstat_input_data.at(i-1).Range.StrValue=strTemp;
