@@ -150,6 +150,7 @@
             // 
             resources.ApplyResources(this.lb_building_name, "lb_building_name");
             this.lb_building_name.Name = "lb_building_name";
+            this.lb_building_name.Click += new System.EventHandler(this.lb_building_name_Click);
             // 
             // label42
             // 

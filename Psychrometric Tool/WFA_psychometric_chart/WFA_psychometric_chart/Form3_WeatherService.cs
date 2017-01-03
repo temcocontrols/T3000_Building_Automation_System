@@ -3662,6 +3662,11 @@ namespace WFA_psychometric_chart
        
         }
 
+        private void lb_building_name_Click(object sender, EventArgs e)
+        {
+
+        }
+
         private void tb_max_adjust_TextChanged(object sender, EventArgs e)
         {
            //this is where we are going to call the function ...

@@ -41,7 +41,8 @@ namespace WFA_psychometric_chart
             InitializeComponent();
             //this.Disposed += new System.EventHandler ( this.Form1_main_Disposed );
             //this is done to copy the instance of form1 to be reusable in DatabaseOperations
-          //  dbClientClass = new DatabaseOperations(this);
+            //  dbClientClass = new DatabaseOperations(this);
+            
         }
 
 
@@ -50,6 +51,7 @@ namespace WFA_psychometric_chart
         /// This returns air pressure in pascal (pa)
         /// </summary>
         public double AirPressureFromDB = 0;
+
 
         //--lets define the constanst..
         double temperature, humidity, Patm, TDewpoint, A, m, Tn, B, Pws, X, h;
@@ -155,7 +157,7 @@ namespace WFA_psychometric_chart
         int countIndexForChart = 0;
         public void plot_new_graph()
         {
-
+           
             /*
               steps:
               * 1.set x and y axis in graph
@@ -577,7 +579,7 @@ namespace WFA_psychometric_chart
             return returnValue;
         }
 
-
+       
         public string PathToT3000BuildingDB = "";
         public string CurrentSelectedBuilding = "";
         public void Form1_Load(object sender, EventArgs e)
@@ -585,17 +587,20 @@ namespace WFA_psychometric_chart
 
 
 
-
+         //   MessageBox.Show("Hi");
             //simulationMode.Text = WFA_psychometric_chart.Properties.Resources.Historical_Plot;
             lb_title_display.Text = "";
             //=====================================DATABASE OPERATION===============================//
             string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             string databasePath1 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string databaseFile1 = databasePath1 + @"\db_psychrometric_project.s3db";
+            //string databaseFile1 = databasePath1 + @"\db_psychrometric_project.s3db";
+            string databaseFile1 = @"C:\Program Files (x86)\T3000\Database\T3000.db";
             if (File.Exists(databaseFile1))
             {
-                //file exist so dont create the database      
+                //file exist so dont create the database 
+               // MessageBox.Show("Internal database Found");
+                //copySelectedBuildingInfoFromT3000(databaseFile1);
             }
             else {
                 MessageBox.Show("Internal database not found");
@@ -613,6 +618,8 @@ namespace WFA_psychometric_chart
                 this.Close();
                 return;
             }
+
+           
             //--This pulls the location info form alex db
             PullLocationInformation();//this is for loading location information
 
@@ -700,8 +707,10 @@ namespace WFA_psychometric_chart
               //===============================Building Selection starts=========================//
               CheckSelectedBuilding();
             string buildingNameValue = selectedBuildingList[0].BuildingName;
-            lb_unit_chosen_display.Text = "Unit : " + buildingList[0].EngineeringUnits;
+            //lb_unit_chosen_display.Text = "Unit : " + buildingList[0].EngineeringUnits;
+            lb_unit_chosen_display.Text = "Unit : " + selectedBuildingList[0].EngineeringUnits;
             lb_db_name.Text = buildingNameValue;
+
 
             //--Storing the currently selected building in a variable
             CurrentSelectedBuilding = selectedBuildingList[0].BuildingName;
@@ -739,18 +748,20 @@ namespace WFA_psychometric_chart
             string againNewPath = newPath+@"Database\Buildings\"+ buildingNameValue +@"\"+buildingNameValue+".db";  //psychopath+ database\Buildings\"BuildingName"\"BuildingName.db" 
             PathToT3000BuildingDB = againNewPath;
             //MessageBox.Show(againNewPath);
+
+            
             
         }  //Close of the laod function
 
+        
+        //***************************************Codes from building settings*********************************************//
 
-    //***************************************Codes from building settings*********************************************//
 
-
-            /// <summary>
-            /// This function is used by trash section 
-            /// and helps in refreshing everything
-            /// </summary>
-            public void LoadFunctionForTrash()
+        /// <summary>
+        /// This function is used by trash section 
+        /// and helps in refreshing everything
+        /// </summary>
+        public void LoadFunctionForTrash()
         {
             //simulationMode.Text = WFA_psychometric_chart.Properties.Resources.Historical_Plot;
             lb_title_display.Text = "";
@@ -857,7 +868,8 @@ namespace WFA_psychometric_chart
             //===============================Building Selection starts=========================//
             CheckSelectedBuilding();
             string buildingNameValue = selectedBuildingList[0].BuildingName;
-            lb_unit_chosen_display.Text = "Unit : " + buildingList[0].EngineeringUnits;
+            //lb_unit_chosen_display.Text = "Unit : " + buildingList[0].EngineeringUnits;
+            lb_unit_chosen_display.Text = "Unit : " + selectedBuildingList[0].EngineeringUnits;
             lb_db_name.Text = buildingNameValue;
 
             //--Storing the currently selected building in a variable
@@ -874,6 +886,14 @@ namespace WFA_psychometric_chart
            // chart1.Enabled = false;
 
         }
+
+
+
+
+
+
+
+
 
 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Section for hardware%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%//
@@ -1751,7 +1771,7 @@ namespace WFA_psychometric_chart
         }
 
 
-            double hardwareTemperatureRead = 0;
+        double hardwareTemperatureRead = 0;
         double hardwareHumidityRead = 0;
 
         double hardwareValue1 = 0;
@@ -3839,6 +3859,8 @@ namespace WFA_psychometric_chart
             public double latitude { get; set; }
             public double elevation { get; set; }
             public string BuildingName { get; set; }  //This one is what we are interested in ....
+
+            public string EngineeringUnits { get; set; }
         }
       public List<SelectedBuildingDT> selectedBuildingList = new List<SelectedBuildingDT>();
         public void CheckSelectedBuilding()
@@ -3847,14 +3869,16 @@ namespace WFA_psychometric_chart
 
             selectedBuildingList.Clear();//Reset the values first ...
             string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string databaseFile = @"C:\Program Files (x86)\T3000\Database\T3000.db";
             string connString = @"Data Source=" + databaseFile + ";Version=3;";
+            string country = null,state=null,city=null,street=null,BuildingName=null, EngineeringUnits =null;
 
             using (SQLiteConnection connection = new SQLiteConnection(connString))
             {
                 connection.Open();
                 SQLiteDataReader reader = null;
-                string queryString = "SELECT *  from tbl_building_location where selection = 1 ";
+                string queryString = "SELECT *  from Building where Default_SubBuilding = 1 ";
                 SQLiteCommand command = new SQLiteCommand(queryString, connection);
                 // command.Parameters.AddWithValue("@selection_value", id);
                 //SqlDataAdapter dataAdapter = new SqlDataAdapter(queryString, connection.ConnectionString); //connection.ConnectionString is the connection string
@@ -3862,22 +3886,40 @@ namespace WFA_psychometric_chart
                 reader = command.ExecuteReader();
                 while (reader.Read())
                 {
+
+                    country = reader["country"].ToString();
+                    state = reader["street"].ToString();
+                    city = reader["city"].ToString();
+                    street = reader["street"].ToString();
+                    BuildingName = reader["Building_Name"].ToString();
+                    EngineeringUnits = reader["EngineeringUnits"].ToString();                   
                     //Now lets add to the list 
-                    selectedBuildingList.Add(new SelectedBuildingDT
-                    {
-                        ID = int.Parse(reader["id"].ToString()),
-                        country = reader["country"].ToString(),
-                        state = reader["state"].ToString(),
-                        city = reader["city"].ToString(),
-                        street = reader["street"].ToString(),
-                       // ZIP = int.Parse(reader["ZIP"].ToString()),  //--tHIS HAS BEEN REMOVED
-                        longitude = double.Parse(reader["longitude"].ToString()),
-                        latitude = double.Parse(reader["latitude"].ToString()),
-                        elevation = double.Parse(reader["elevation"].ToString()),
-                        BuildingName = reader["BuildingName"].ToString()
-                    });
+                  
                 }
             }//close of using..
+
+            
+            selectedBuildingList.Add(new SelectedBuildingDT
+            {
+                //ID = int.Parse(reader["id"].ToString()),
+                country = country,
+                // country = country["country"].ToString(),
+                state = state,
+               // state = reader["state"].ToString(),
+               city=city,
+               // city = reader["city"].ToString(),
+               street=street,
+                //street = reader["street"].ToString(),
+                //ZIP = int.Parse(reader["ZIP"].ToString()),
+                //longitude = double.Parse(reader["longitude"].ToString()),
+                //latitude = double.Parse(reader["latitude"].ToString()),
+                //elevation = double.Parse(reader["elevation"].ToString()),
+                BuildingName=BuildingName,
+               // BuildingName = reader["BuildingName"].ToString()
+               EngineeringUnits=EngineeringUnits
+
+            });
+
         }
 
         public string GetGUID()
@@ -5033,6 +5075,60 @@ namespace WFA_psychometric_chart
 
 
         }
+
+
+        private void sqlite_addForSelectedBildingFromT3000()
+        {
+
+            //--lets do try catch
+            try
+            {
+                //--This is where we are going to create all the database  and tables of sqlite
+                string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+
+                //--new database file 
+                SQLiteConnection.CreateFile(databaseFile);
+
+                //--now lets create the tables
+                SQLiteConnection m_dbConnection = new SQLiteConnection("Data Source=" + databaseFile + ";Version=3;");
+                m_dbConnection.Open();
+
+                //--building location table : tbl_building_location
+                //--This one is with the zip code later zip code is removed
+                //string sql = "create table tbl_building_location (selection int,ID INTEGER PRIMARY KEY AUTOINCREMENT ,country varchar(255),state varchar(255),city varchar(255),street varchar(255), ZIP int,longitude varchar(255),latitude varchar(255),elevation varchar(255),BuildingName varchar(255),EngineeringUnits varchar(255))";
+                string sql = "create table tbl_building_location (selection int,ID INTEGER PRIMARY KEY AUTOINCREMENT ,country varchar(255),state varchar(255),city varchar(255),street varchar(255) ,longitude varchar(255),latitude varchar(255),elevation varchar(255),BuildingName varchar(255),EngineeringUnits varchar(255))";
+
+                SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+                command.ExecuteNonQuery();
+                
+                //--Lets input some values in the tbl_building_location and in tbl_language_option default 
+
+                string sql_input1 = "INSERT INTO tbl_building_location (selection,country,state,city,street,BuildingName,EngineeringUnits) VALUES(1, 'china,'SangHai','SangHai','No.35,yi yuan garden','Default_Building','SI') ";
+                SQLiteCommand commandINput5 = new SQLiteCommand(sql_input1, m_dbConnection);
+                commandINput5.ExecuteNonQuery();
+
+                m_dbConnection.Close();//--closing the connection
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+
+
+        }
+
+
+
+
+
+
+
+
+
 
 
         /*This is the function that plots the graph 
@@ -13897,6 +13993,11 @@ namespace WFA_psychometric_chart
 
 
             return nodeName;
+        }
+
+        private void lb_db_name_Click(object sender, EventArgs e)
+        {
+
         }
 
 
