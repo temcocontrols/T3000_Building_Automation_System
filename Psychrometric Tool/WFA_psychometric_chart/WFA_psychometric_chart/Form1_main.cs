@@ -619,7 +619,24 @@ namespace WFA_psychometric_chart
                 return;
             }
 
-           
+
+            CheckSelectedBuilding();
+            string buildingNameValue = selectedBuildingList[0].BuildingName;
+            //lb_unit_chosen_display.Text = "Unit : " + buildingList[0].EngineeringUnits;
+            lb_unit_chosen_display.Text = "Unit : " + selectedBuildingList[0].EngineeringUnits;
+            lb_db_name.Text = buildingNameValue;
+
+
+            //--Storing the currently selected building in a variable
+            CurrentSelectedBuilding = selectedBuildingList[0].BuildingName;
+            // MessageBox.Show("Current Building Selected" + CurrentSelectedBuilding);
+
+            //--This is where the table creation is done
+            CreateRequireTableIfNotPresent(buildingNameValue);
+
+            UpdateDatabasewithT3000SelectedBuilding(selectedBuildingList);
+
+
             //--This pulls the location info form alex db
             PullLocationInformation();//this is for loading location information
 
@@ -705,20 +722,7 @@ namespace WFA_psychometric_chart
               */
 
               //===============================Building Selection starts=========================//
-              CheckSelectedBuilding();
-            string buildingNameValue = selectedBuildingList[0].BuildingName;
-            //lb_unit_chosen_display.Text = "Unit : " + buildingList[0].EngineeringUnits;
-            lb_unit_chosen_display.Text = "Unit : " + selectedBuildingList[0].EngineeringUnits;
-            lb_db_name.Text = buildingNameValue;
-
-
-            //--Storing the currently selected building in a variable
-            CurrentSelectedBuilding = selectedBuildingList[0].BuildingName;
-           // MessageBox.Show("Current Building Selected" + CurrentSelectedBuilding);
-
-            //--This is where the table creation is done
-            CreateRequireTableIfNotPresent(buildingNameValue);
-
+            
             DataGridView_Show_Data();
             dataGridView1.Rows.Add();
             //loading the comfortzone when set             
@@ -3743,7 +3747,92 @@ namespace WFA_psychometric_chart
 
         }
 
-        public class chartDetailDT
+        public void UpdateDatabasewithT3000SelectedBuilding(List<SelectedBuildingDT> selectedBuildingList)
+        {
+           
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            SQLiteConnection m_dbConnection = new SQLiteConnection("Data Source=" + databaseFile + ";Version=3;");
+            m_dbConnection.Open();
+
+            string selectedCountry = selectedBuildingList[0].country;
+            string selectedState = selectedBuildingList[0].state;
+            string selectedCity = selectedBuildingList[0].city;
+            string selectedStreet = selectedBuildingList[0].street;
+            string selectedLongitude = "";
+            string selectedLatitude = "";
+            string selectedEngineeringUnits = selectedBuildingList[0].EngineeringUnits;
+            string selectedBuildingName = selectedBuildingList[0].BuildingName;
+
+            // MessageBox.Show(selectedCity);
+
+
+           // string sql_string = "UPDATE tbl_building_location SET  latitude=@latitude_value,longitude=@longitude_value,elevation=@elevation  where selection=1;";
+           // SQLiteCommand command = new SQLiteCommand(sql_string, connection);
+            //command.CommandType = CommandType.Text;
+            //command.Parameters.AddWithValue("@latitude_value", latPulledValue.ToString());
+            //command.Parameters.AddWithValue("@longitude_value", longPulledValue.ToString());
+            //command.Parameters.AddWithValue("@elevation", elevationPulledValue.ToString());
+            //command.ExecuteNonQuery();
+
+
+            
+
+            SQLiteDataReader reader = null;
+            string queryString = "SELECT * from tbl_building_location WHERE BuildingName= @selectedBuildingName ";
+            SQLiteCommand command = new SQLiteCommand(queryString, m_dbConnection);
+            command.CommandType = CommandType.Text;
+            command.Parameters.AddWithValue("@selectedBuildingName", selectedBuildingName);
+
+            string id = "";
+            reader = command.ExecuteReader();
+            while (reader.Read())
+                {
+                    id = reader["ID"].ToString();
+                }
+
+
+            string sql_input1 = "UPDATE tbl_building_location SET selection = 0";
+            SQLiteCommand cmd1 = new SQLiteCommand(sql_input1, m_dbConnection);
+            cmd1.ExecuteNonQuery();
+
+            if (id!="")
+            {
+                string sql_input2 = "UPDATE tbl_building_location SET selection = 1,country=@selectedCountry,state= @selectedState,city= @selectedCity,street= @selectedStreet,longitude=0,latitude=0,EngineeringUnits= @selectedEngineeringUnits WHERE BuildingName= @selectedBuildingName";
+                SQLiteCommand cmd2 = new SQLiteCommand(sql_input2, m_dbConnection);
+                cmd2.CommandType = CommandType.Text;
+                cmd2.Parameters.AddWithValue("@selectedBuildingName", selectedBuildingName);
+                cmd2.Parameters.AddWithValue("@selectedCountry", selectedCountry);
+                cmd2.Parameters.AddWithValue("@selectedState", selectedState);
+                cmd2.Parameters.AddWithValue("@selectedCity", selectedCity);
+                cmd2.Parameters.AddWithValue("@selectedStreet", selectedStreet);
+                cmd2.Parameters.AddWithValue("@selectedEngineeringUnits", selectedEngineeringUnits);
+                cmd2.ExecuteNonQuery();
+
+
+            }
+            else
+            {
+                string sql_input = "INSERT INTO tbl_building_location (selection,country,state,city,street,BuildingName,EngineeringUnits) VALUES(1, @selectedCountry, @selectedState,@selectedCity,@selectedStreet,@selectedBuildingName,@selectedEngineeringUnits) ";
+                SQLiteCommand cmd = new SQLiteCommand(sql_input, m_dbConnection);
+                cmd.CommandType = CommandType.Text;
+                cmd.Parameters.AddWithValue("@selectedBuildingName", selectedBuildingName);
+                cmd.Parameters.AddWithValue("@selectedBuildingName", selectedBuildingName);
+                cmd.Parameters.AddWithValue("@selectedCountry", selectedCountry);
+                cmd.Parameters.AddWithValue("@selectedState", selectedState);
+                cmd.Parameters.AddWithValue("@selectedCity", selectedCity);
+                cmd.Parameters.AddWithValue("@selectedStreet", selectedStreet);
+                cmd.Parameters.AddWithValue("@selectedEngineeringUnits", selectedEngineeringUnits);
+                cmd.ExecuteNonQuery();
+                
+            }
+
+         m_dbConnection.Close();//--closing the connection
+
+        }
+         
+
+public class chartDetailDT
         {
             public int count { get; set; }
             public string chartID { get; set; }
@@ -3888,7 +3977,7 @@ namespace WFA_psychometric_chart
                 {
 
                     country = reader["country"].ToString();
-                    state = reader["street"].ToString();
+                    state = reader["state"].ToString();
                     city = reader["city"].ToString();
                     street = reader["street"].ToString();
                     BuildingName = reader["Building_Name"].ToString();
@@ -3901,22 +3990,12 @@ namespace WFA_psychometric_chart
             
             selectedBuildingList.Add(new SelectedBuildingDT
             {
-                //ID = int.Parse(reader["id"].ToString()),
                 country = country,
-                // country = country["country"].ToString(),
                 state = state,
-               // state = reader["state"].ToString(),
-               city=city,
-               // city = reader["city"].ToString(),
-               street=street,
-                //street = reader["street"].ToString(),
-                //ZIP = int.Parse(reader["ZIP"].ToString()),
-                //longitude = double.Parse(reader["longitude"].ToString()),
-                //latitude = double.Parse(reader["latitude"].ToString()),
-                //elevation = double.Parse(reader["elevation"].ToString()),
-                BuildingName=BuildingName,
-               // BuildingName = reader["BuildingName"].ToString()
-               EngineeringUnits=EngineeringUnits
+                city =city,
+                street =street,
+                BuildingName =BuildingName,
+                EngineeringUnits =EngineeringUnits
 
             });
 

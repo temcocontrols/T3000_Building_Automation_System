@@ -1816,11 +1816,6 @@ namespace WFA_psychometric_chart
 
         }
 
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-
-        }
         string initialThickness;
         string initialLineName;
 
