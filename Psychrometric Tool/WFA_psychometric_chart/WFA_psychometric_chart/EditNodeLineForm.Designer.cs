@@ -60,6 +60,23 @@
             this.nextNodeID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.lineSeriesValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.lineStatus = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.DBT1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.RH1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.HR1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.VFR1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.SPV1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.MFR1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.E1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.TEF1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.DBT2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.RH2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.HR2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.VFR2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.SPV2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.MFR2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.E2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.TEF2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.HeatChange = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
@@ -241,7 +258,24 @@
             this.prevNodeID,
             this.nextNodeID,
             this.lineSeriesValue,
-            this.lineStatus});
+            this.lineStatus,
+            this.DBT1,
+            this.RH1,
+            this.HR1,
+            this.VFR1,
+            this.SPV1,
+            this.MFR1,
+            this.E1,
+            this.TEF1,
+            this.DBT2,
+            this.RH2,
+            this.HR2,
+            this.VFR2,
+            this.SPV2,
+            this.MFR2,
+            this.E2,
+            this.TEF2,
+            this.HeatChange});
             resources.ApplyResources(this.dataGridView2, "dataGridView2");
             this.dataGridView2.Name = "dataGridView2";
             this.dataGridView2.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dataGridView2_CellBeginEdit);
@@ -310,6 +344,108 @@
             resources.ApplyResources(this.lineStatus, "lineStatus");
             this.lineStatus.Name = "lineStatus";
             this.lineStatus.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            // 
+            // DBT1
+            // 
+            this.DBT1.Name = "DBT1";
+            this.DBT1.ReadOnly = true;
+            this.DBT1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // RH1
+            // 
+            this.RH1.Name = "RH1";
+            this.RH1.ReadOnly = true;
+            this.RH1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // HR1
+            // 
+            this.HR1.Name = "HR1";
+            this.HR1.ReadOnly = true;
+            this.HR1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // VFR1
+            // 
+            this.VFR1.Name = "VFR1";
+            this.VFR1.ReadOnly = true;
+            this.VFR1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // SPV1
+            // 
+            this.SPV1.Name = "SPV1";
+            this.SPV1.ReadOnly = true;
+            this.SPV1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // MFR1
+            // 
+            this.MFR1.Name = "MFR1";
+            this.MFR1.ReadOnly = true;
+            this.MFR1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // E1
+            // 
+            this.E1.Name = "E1";
+            this.E1.ReadOnly = true;
+            this.E1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // TEF1
+            // 
+            this.TEF1.Name = "TEF1";
+            this.TEF1.ReadOnly = true;
+            this.TEF1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // DBT2
+            // 
+            this.DBT2.Name = "DBT2";
+            this.DBT2.ReadOnly = true;
+            this.DBT2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // RH2
+            // 
+            this.RH2.Name = "RH2";
+            this.RH2.ReadOnly = true;
+            this.RH2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // HR2
+            // 
+            this.HR2.Name = "HR2";
+            this.HR2.ReadOnly = true;
+            this.HR2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // VFR2
+            // 
+            this.VFR2.Name = "VFR2";
+            this.VFR2.ReadOnly = true;
+            this.VFR2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // SPV2
+            // 
+            this.SPV2.Name = "SPV2";
+            this.SPV2.ReadOnly = true;
+            this.SPV2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // MFR2
+            // 
+            this.MFR2.Name = "MFR2";
+            this.MFR2.ReadOnly = true;
+            this.MFR2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // E2
+            // 
+            this.E2.Name = "E2";
+            this.E2.ReadOnly = true;
+            this.E2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // TEF2
+            // 
+            this.TEF2.Name = "TEF2";
+            this.TEF2.ReadOnly = true;
+            this.TEF2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // HeatChange
+            // 
+            this.HeatChange.Name = "HeatChange";
+            this.HeatChange.ReadOnly = true;
+            this.HeatChange.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // label3
             // 
@@ -632,6 +768,24 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn nextNodeID;
         private System.Windows.Forms.DataGridViewTextBoxColumn lineSeriesValue;
         private System.Windows.Forms.DataGridViewCheckBoxColumn lineStatus;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dbt1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn rh1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn hr1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn vfr1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn spv1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn mfr1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn e1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn tef1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dbt2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn rh2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn hr2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn vfr2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn spv2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn mfr2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn e2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn tef2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn heatchange;
+
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label lb_HC_value;
         private System.Windows.Forms.Label label45;
@@ -676,5 +830,22 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label lb_horizontal_line;
         private System.Windows.Forms.ColorDialog colorDialog2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn DBT1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn RH1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn HR1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn VFR1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn SPV1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn MFR1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn E1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn TEF1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn DBT2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn RH2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn HR2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn VFR2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn SPV2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn MFR2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn E2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn TEF2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn HeatChange;
     }
 }

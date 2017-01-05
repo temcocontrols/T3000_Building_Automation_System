@@ -386,6 +386,7 @@ namespace WFA_psychometric_chart
             lb_unit_vol_flow_rate.Text = "m\xB3/s";
             lb_unit_sp_vol.Text = "m\xB3/Kg";
 
+            
             if (dataGridView2.Rows.Count > 0)  //If there is data then only do this one
             {
                 //set parameters of your event args
@@ -558,14 +559,7 @@ namespace WFA_psychometric_chart
 
         }
 
-
-
-
-
-
-
-
-
+        
         public void UpdateDataValueAndRefreshDGV(string NodeID,double xVal,double yVal,string source,string name,string label,Color color,string showtext,int nodesize)
         {
             string nodeIDVal = NodeID;
@@ -866,13 +860,7 @@ namespace WFA_psychometric_chart
             LoadNodeAndLine();//--Loading the data 
         }
 
-
-
-
-
-
-
-
+        
 
         public void RefreshDataFromDBAndChart()
         {
@@ -900,8 +888,7 @@ namespace WFA_psychometric_chart
             //--First lets do for the node
             //--Lets clear the rows first 
             //--This one for handling null refrence error
-          //dataGridView1.Enabled = false;
-
+            //dataGridView1.Enabled = false;
 
             dataGridView1.Rows.Clear();
             dataGridView2.Rows.Clear();
@@ -1116,6 +1103,8 @@ namespace WFA_psychometric_chart
 
                     string startNodeName = "";
                     string endNodeName = "";
+                    
+
                     //Now lets calculate the startNodeName and endNodeName
                     for (int x = 0; x < bcs.menuStripNodeInfoValues.Count; x++)
                     {
@@ -1138,10 +1127,11 @@ namespace WFA_psychometric_chart
 
                     }
 
+                    
+               //now lets display...                    
+                   // string[] row = new string[] { bcs.menuStripNodeLineInfoValues[i].ID, bcs.menuStripNodeLineInfoValues[i].name, startNodeName, endNodeName, "", bcs.menuStripNodeLineInfoValues[i].lineThickness.ToString(),DBT1, bcs.menuStripNodeLineInfoValues[i].prevNodeId.ToString(), bcs.menuStripNodeLineInfoValues[i].nextNodeId.ToString(), bcs.menuStripNodeLineInfoValues[i].lineSeriesID.ToString(), };
+                    string[] row = new string[] { bcs.menuStripNodeLineInfoValues[i].ID, bcs.menuStripNodeLineInfoValues[i].name, startNodeName, endNodeName, "", bcs.menuStripNodeLineInfoValues[i].lineThickness.ToString(),bcs.menuStripNodeLineInfoValues[i].prevNodeId.ToString(), bcs.menuStripNodeLineInfoValues[i].nextNodeId.ToString(), bcs.menuStripNodeLineInfoValues[i].lineSeriesID.ToString(), };
 
-
-                    //now lets display...                    
-                    string[] row = new string[] { bcs.menuStripNodeLineInfoValues[i].ID, bcs.menuStripNodeLineInfoValues[i].name, startNodeName, endNodeName, "", bcs.menuStripNodeLineInfoValues[i].lineThickness.ToString(), bcs.menuStripNodeLineInfoValues[i].prevNodeId.ToString(), bcs.menuStripNodeLineInfoValues[i].nextNodeId.ToString(), bcs.menuStripNodeLineInfoValues[i].lineSeriesID.ToString(), };
                     dataGridView2.Rows.Add(row);
 
                     DataGridViewButtonCell buttonCell = (DataGridViewButtonCell)dataGridView2.Rows[i].Cells[4];
@@ -1403,6 +1393,8 @@ namespace WFA_psychometric_chart
 
                         int status = 0;//0 means dissable 1 means enabled
 
+                        
+
                         DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9];
 
                         if (cbCell.Value.ToString() == "true")
@@ -1473,6 +1465,9 @@ namespace WFA_psychometric_chart
             Series lineseriesID = new Series(dgv_row.Cells[8].Value.ToString());
             int thickness =int.Parse(dgv_row.Cells[5].Value.ToString());
 
+            
+            //MessageBox.Show(LineName);
+
 
             CalculateProcessParameterForEnergy(id, prevNodeID, nextNodeID, lineseriesID, LineColorValue, thickness, LineName);
 
@@ -1519,7 +1514,7 @@ namespace WFA_psychometric_chart
             double startSpecificVolume1 = 0;//--specific volume
             double endSpecificVolume1 = 0;
 
-
+            
             /*
             We need to calculate the previous node id values and the next node id values.
             */
@@ -2061,6 +2056,7 @@ namespace WFA_psychometric_chart
                 Series s = new Series(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[8].Value.ToString());
                  string lineName = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[1].Value.ToString();
                     int status = 0;//0 means dissable 1 means enabled
+                    
 
          DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9];
                     if (cbCell.Value.ToString() == "true")//cbCell.TrueValue
@@ -2153,6 +2149,7 @@ namespace WFA_psychometric_chart
                     string lineName = finalLineName; //dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[1].Value.ToString();
                     int status = 0;//0 means dissable 1 means enabled
 
+                    
                     DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9];
                     if (cbCell.Value.ToString() == "true")//cbCell.TrueValue
                     {
@@ -2199,7 +2196,6 @@ namespace WFA_psychometric_chart
         /// <param name="e"> event value</param>
         public void dataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-
 
             
              

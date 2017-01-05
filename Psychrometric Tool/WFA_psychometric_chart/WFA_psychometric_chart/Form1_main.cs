@@ -3759,25 +3759,11 @@ namespace WFA_psychometric_chart
             string selectedState = selectedBuildingList[0].state;
             string selectedCity = selectedBuildingList[0].city;
             string selectedStreet = selectedBuildingList[0].street;
-            string selectedLongitude = "";
-            string selectedLatitude = "";
+          //  string selectedLongitude = ""; //Longitude is directly set to "0"
+           // string selectedLatitude = "";  // Latitude is directly set to "0"
             string selectedEngineeringUnits = selectedBuildingList[0].EngineeringUnits;
             string selectedBuildingName = selectedBuildingList[0].BuildingName;
-
-            // MessageBox.Show(selectedCity);
-
-
-           // string sql_string = "UPDATE tbl_building_location SET  latitude=@latitude_value,longitude=@longitude_value,elevation=@elevation  where selection=1;";
-           // SQLiteCommand command = new SQLiteCommand(sql_string, connection);
-            //command.CommandType = CommandType.Text;
-            //command.Parameters.AddWithValue("@latitude_value", latPulledValue.ToString());
-            //command.Parameters.AddWithValue("@longitude_value", longPulledValue.ToString());
-            //command.Parameters.AddWithValue("@elevation", elevationPulledValue.ToString());
-            //command.ExecuteNonQuery();
-
-
             
-
             SQLiteDataReader reader = null;
             string queryString = "SELECT * from tbl_building_location WHERE BuildingName= @selectedBuildingName ";
             SQLiteCommand command = new SQLiteCommand(queryString, m_dbConnection);
