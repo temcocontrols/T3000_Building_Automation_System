@@ -5008,7 +5008,10 @@ public class chartDetailDT
            // }//close of if int try parse.
             else
             {
-                MessageBox.Show(WFA_psychometric_chart.Properties.Resources.Please_enter_a_valid_zip_numbe);
+                //MessageBox.Show(WFA_psychometric_chart.Properties.Resources.Please_enter_a_valid_zip_numbe);
+                latPulledValue = "0";
+                longPulledValue = "0";
+                elevationPulledValue = "0";
             }
 
         }

@@ -989,7 +989,7 @@ namespace WFA_psychometric_chart
                         //indexForSource = 0;
 
                         dataGridView1.Rows.Add(row);
-                        //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].ReadOnly = false;
+//dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].ReadOnly = false;
                         //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].ReadOnly = false;
                         //indexForParticularRow
                         dataGridView1.Rows[indexForParticularRow].Cells[3].ReadOnly = false;
@@ -1095,7 +1095,7 @@ namespace WFA_psychometric_chart
                 }
             }//clsoe of if value
 
-            //--Second : This is for the line to show in the datagridview2
+           //--Second : This is for the line to show in the datagridview2
             if (bcs.menuStripNodeLineInfoValues.Count > 0)
             {
                 for (int i = 0; i < bcs.menuStripNodeLineInfoValues.Count; i++)
@@ -1103,6 +1103,9 @@ namespace WFA_psychometric_chart
 
                     string startNodeName = "";
                     string endNodeName = "";
+                    string DBT1 = Convert.ToString(lb_dbt_node1_value);
+                    //string DBT1 = "Raju";
+                  //  MessageBox.Show(DBT1);
                     
 
                     //Now lets calculate the startNodeName and endNodeName
@@ -1127,10 +1130,12 @@ namespace WFA_psychometric_chart
 
                     }
 
+                   // MessageBox.Show(DBT1);
+
                     
                //now lets display...                    
                    // string[] row = new string[] { bcs.menuStripNodeLineInfoValues[i].ID, bcs.menuStripNodeLineInfoValues[i].name, startNodeName, endNodeName, "", bcs.menuStripNodeLineInfoValues[i].lineThickness.ToString(),DBT1, bcs.menuStripNodeLineInfoValues[i].prevNodeId.ToString(), bcs.menuStripNodeLineInfoValues[i].nextNodeId.ToString(), bcs.menuStripNodeLineInfoValues[i].lineSeriesID.ToString(), };
-                    string[] row = new string[] { bcs.menuStripNodeLineInfoValues[i].ID, bcs.menuStripNodeLineInfoValues[i].name, startNodeName, endNodeName, "", bcs.menuStripNodeLineInfoValues[i].lineThickness.ToString(),bcs.menuStripNodeLineInfoValues[i].prevNodeId.ToString(), bcs.menuStripNodeLineInfoValues[i].nextNodeId.ToString(), bcs.menuStripNodeLineInfoValues[i].lineSeriesID.ToString(), };
+                    string[] row = new string[] { bcs.menuStripNodeLineInfoValues[i].ID, bcs.menuStripNodeLineInfoValues[i].name, startNodeName, endNodeName,"", bcs.menuStripNodeLineInfoValues[i].lineThickness.ToString(),bcs.menuStripNodeLineInfoValues[i].prevNodeId.ToString(), bcs.menuStripNodeLineInfoValues[i].nextNodeId.ToString(), bcs.menuStripNodeLineInfoValues[i].lineSeriesID.ToString(), DBT1 };
 
                     dataGridView2.Rows.Add(row);
 
@@ -1393,6 +1398,8 @@ namespace WFA_psychometric_chart
 
                         int status = 0;//0 means dissable 1 means enabled
 
+                        string DBT1 = Convert.ToString(lb_dbt_node1_value);
+
                         
 
                         DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9];
@@ -1405,7 +1412,7 @@ namespace WFA_psychometric_chart
                         {
                             status = 0;
                         }
-                        LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status);
+                        LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status, DBT1);
 
                     }
                     catch(Exception ex)
@@ -1430,6 +1437,8 @@ namespace WFA_psychometric_chart
                 string lineName = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[1].Value.ToString();
                 int status = 0;//0 means dissable 1 means enabled
 
+                string DBT1 = Convert.ToString(lb_dbt_node1_value);
+
                 DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9];
                 if (cbCell.Value == cbCell.TrueValue) // .ToString() == "true"
                 {
@@ -1439,7 +1448,7 @@ namespace WFA_psychometric_chart
                 {
                     status = 0;
                 }
-                LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status);
+                LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status,DBT1);
 
 
             }
@@ -1465,11 +1474,15 @@ namespace WFA_psychometric_chart
             Series lineseriesID = new Series(dgv_row.Cells[8].Value.ToString());
             int thickness =int.Parse(dgv_row.Cells[5].Value.ToString());
 
+            string DBT1 = lb_dbt_node1_value.ToString();
+
+            // MessageBox.Show("Raju"+DBT1 + " " +LineName);
+
             
             //MessageBox.Show(LineName);
 
 
-            CalculateProcessParameterForEnergy(id, prevNodeID, nextNodeID, lineseriesID, LineColorValue, thickness, LineName);
+            CalculateProcessParameterForEnergy(id, prevNodeID, nextNodeID, lineseriesID, LineColorValue, thickness, LineName, DBT1);
 
         }
 
@@ -1495,7 +1508,7 @@ namespace WFA_psychometric_chart
         }
         List<TempDataType1> temporaryNodeValueStoreForRedrawLine = new List<TempDataType1>();
         //--Redraw line function
-        public void CalculateProcessParameterForEnergy(string id, string prevNodeID, string nextNodeID, Series lineSeriesID, Color colorVal, int thickness_value, string name)
+        public void CalculateProcessParameterForEnergy(string id, string prevNodeID, string nextNodeID, Series lineSeriesID, Color colorVal, int thickness_value, string name, string DBT1)
         {
             // lock (this) { 
 
@@ -1636,6 +1649,8 @@ namespace WFA_psychometric_chart
                 lb_node_two_name.BackColor = Color.White;
 
                 lb_dbt_node1_value.Text = Math.Round(temporaryNodeValueStoreForRedrawLine[0].xVal, 2).ToString();
+
+                MessageBox.Show("Here  " + lb_dbt_node1_value.ToString());
                 lb_dbt_node2_value.Text = Math.Round(temporaryNodeValueStoreForRedrawLine[1].xVal, 2).ToString();
                 lb_RH_node1_value.Text = startHumidity1.ToString();
                 lb_RH_node2_value.Text = endHumidity1.ToString();
@@ -1698,6 +1713,8 @@ namespace WFA_psychometric_chart
           // public Series lineSeriesID { get; set; }
             public int lineThickness { get; set; }
 
+            public string DBT1 { get; set; }
+
         }
 
         public List<lineDataType> lineInfo = new List<lineDataType>();
@@ -1745,12 +1762,16 @@ namespace WFA_psychometric_chart
                 {
                     ID = dataGridView2.Rows[i].Cells[0].Value.ToString(),
                     prevNodeId = dataGridView2.Rows[i].Cells[1].Value.ToString(),
+                    DBT1 =dataGridView2.Rows[i].Cells[9].ToString(),
                     nextNodeId = dataGridView2.Rows[i].Cells[2].Value.ToString(),
                     lineColorValue = dataGridView2.Rows[i].Cells[3].Style.BackColor,
-                    lineThickness = int.Parse(dataGridView2.Rows[i].Cells[4].Value.ToString())
+                    lineThickness = int.Parse(dataGridView2.Rows[i].Cells[4].Value.ToString()
+                    )
                 });
 
             }
+
+            
 
             //==Now lets check we get the real value or not
             //Test...
@@ -1942,7 +1963,7 @@ namespace WFA_psychometric_chart
             //}
         }
 
-        public void LineUpdateAndReload(string lineid,string prevNodeID,string nextNodeID,Color color,int thickness,Series lineseries,string name,int status)
+        public void LineUpdateAndReload(string lineid,string prevNodeID,string nextNodeID,Color color,int thickness,Series lineseries,string name,int status,string DBT1)
         {
 
             bcs.UpdateLineInfoToDB(lineid, prevNodeID, nextNodeID, color, lineseries, thickness,name,status);
@@ -2056,8 +2077,9 @@ namespace WFA_psychometric_chart
                 Series s = new Series(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[8].Value.ToString());
                  string lineName = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[1].Value.ToString();
                     int status = 0;//0 means dissable 1 means enabled
-                    
 
+                   // string DBT1 = lb_dbt_node1_value.ToString();
+                    string DBT1 = Convert.ToString(lb_dbt_node1_value);
          DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9];
                     if (cbCell.Value.ToString() == "true")//cbCell.TrueValue
                     {                        
@@ -2068,7 +2090,7 @@ namespace WFA_psychometric_chart
                         status = 0;
                     }
 
-                    LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s,lineName,status);
+                    LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s,lineName,status,DBT1);
 
             }
             catch
@@ -2149,7 +2171,9 @@ namespace WFA_psychometric_chart
                     string lineName = finalLineName; //dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[1].Value.ToString();
                     int status = 0;//0 means dissable 1 means enabled
 
-                    
+                    string DBT1 = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9].Value.ToString();
+
+
                     DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9];
                     if (cbCell.Value.ToString() == "true")//cbCell.TrueValue
                     {
@@ -2160,7 +2184,7 @@ namespace WFA_psychometric_chart
                         status = 0;
                     }
                    // MessageBox.Show("Status 1means true , 0 means false = " + status);
-                    LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status);
+                    LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status,DBT1);
 
                 }
                 catch
