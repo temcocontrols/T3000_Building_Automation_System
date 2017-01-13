@@ -1734,9 +1734,6 @@
     <ClInclude Include="SetTimeDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BADO\BADO.h">
-      <Filter>BADO</Filter>
-    </ClInclude>
     <ClInclude Include="BTUMeterDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>

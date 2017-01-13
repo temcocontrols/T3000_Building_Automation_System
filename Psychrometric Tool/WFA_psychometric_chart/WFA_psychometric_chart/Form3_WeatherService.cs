@@ -1721,7 +1721,7 @@ namespace WFA_psychometric_chart
                 }
             }
 
-            MessageBox.Show("Country = "+country+",city "+city);
+           // MessageBox.Show("Country = "+country+",city "+city);
 
             pull_data_online(country,state,city,street,zip);//--This will fill the online values form the database
                                                             //--After pulling above we get three values we need to push it to database...

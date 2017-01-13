@@ -594,8 +594,8 @@ namespace WFA_psychometric_chart
             string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             string databasePath1 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            //string databaseFile1 = databasePath1 + @"\db_psychrometric_project.s3db";
-            string databaseFile1 = @"C:\Program Files (x86)\T3000\Database\T3000.db";
+            string databaseFile1 = databasePath1 + @"\db_psychrometric_project.s3db";
+            //string databaseFile1 = @"C:\Program Files (x86)\T3000\Database\T3000.db";
             if (File.Exists(databaseFile1))
             {
                 //file exist so dont create the database 
@@ -603,10 +603,11 @@ namespace WFA_psychometric_chart
                 //copySelectedBuildingInfoFromT3000(databaseFile1);
             }
             else {
-                MessageBox.Show("Internal database not found");
-                this.Close();
+               // MessageBox.Show("Internal database not found");
+                //this.Close();
                 //--sqlite new databse creation
-                sqlite_database_creation(); 
+                sqlite_database_creation();
+             //   sqlite_addForSelectedBildingFromT3000();
             }
 
             //first lets check for the data and then give user a message if a building is not create and selected.
@@ -779,7 +780,7 @@ namespace WFA_psychometric_chart
                 //file exist so dont create the database      
             }
             else {
-                MessageBox.Show("Internal database not found");
+                //MessageBox.Show("Internal database not found");
                 this.Close();
                 //--sqlite new databse creation
                 sqlite_database_creation();
@@ -878,7 +879,7 @@ namespace WFA_psychometric_chart
 
             //--Storing the currently selected building in a variable
             CurrentSelectedBuilding = selectedBuildingList[0].BuildingName;
-            MessageBox.Show("Current Building Selected" + CurrentSelectedBuilding);
+           // MessageBox.Show("Current Building Selected" + CurrentSelectedBuilding);
 
             //--This is where the table creation is done
         //CreateRequireTableIfNotPresent(buildingNameValue);
@@ -3944,8 +3945,11 @@ public class chartDetailDT
 
             selectedBuildingList.Clear();//Reset the values first ...
             string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string NewDirectory = Path.GetFullPath(Path.Combine(databasePath, @"..\"));
             //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
-            string databaseFile = @"C:\Program Files (x86)\T3000\Database\T3000.db";
+            string databaseFile = NewDirectory + @"Database\T3000.db";
+            //string databaseFile = @"C:\Program Files (x86)\T3000\Database\T3000.db";
+
             string connString = @"Data Source=" + databaseFile + ";Version=3;";
             string country = null,state=null,city=null,street=null,BuildingName=null, EngineeringUnits =null;
 
@@ -4991,13 +4995,14 @@ public class chartDetailDT
                             string elevationAPI_URL = "http://dev.virtualearth.net/REST/v1/Elevation/List?pts=" + latVal + "," + longVal + "&key=AgMVAaLqK8vvJe6OTRRu57wu0x2zBX1bUaqSizo0QhE32fqEK5fN8Ek4wWmO4QR4&output=xml";
 
                             var elevationData = wc.DownloadString(elevationAPI_URL);
-                            // MessageBox.Show("elev data = " + elevationData);
+                             //MessageBox.Show("elev data = " + elevationData);
                             //--Now lets do the parsing...
                             //xml parsing...
                             XmlDocument xmlElevation = new XmlDocument();
                             xmlElevation.LoadXml(elevationData);
                             elevationPulledValue = elevationProcess(xmlElevation).ToString();//--This gives the elevation...
                                                                                              // MessageBox.Show("Pulled elevation");
+                        
                         }
                     }
                     catch (Exception ex)
@@ -5072,6 +5077,7 @@ public class chartDetailDT
                 string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
 
+                //MessageBox.Show(databaseFile);
                 //--new database file 
                 SQLiteConnection.CreateFile(databaseFile);
 
@@ -13146,7 +13152,7 @@ public class chartDetailDT
                 string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
                 string NewDirectory = Path.GetFullPath(Path.Combine(dir, @"..\"));
-                string file = NewDirectory + @"Images\lock.png";
+                string file = NewDirectory + @"Database\image\lock.png";
                 Bitmap SOME = new Bitmap(Image.FromFile(file));
                 Bitmap bp = new Bitmap(SOME, pb_lock_unlock.Width, pb_lock_unlock.Height);
                 pb_lock_unlock.Image = bp;//Image.FromFile(file);
@@ -13165,7 +13171,7 @@ public class chartDetailDT
                 string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
                 string NewDirectory = Path.GetFullPath(Path.Combine(dir, @"..\"));
-                string file = NewDirectory + @"Images\unlock.png";
+                string file = NewDirectory + @"Database\image\unlock.png";
                  Bitmap SOME = new Bitmap(Image.FromFile(file));
                 Bitmap bp = new Bitmap(SOME, pb_lock_unlock.Width, pb_lock_unlock.Height);
 

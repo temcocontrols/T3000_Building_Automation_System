@@ -1650,7 +1650,7 @@ namespace WFA_psychometric_chart
 
                 lb_dbt_node1_value.Text = Math.Round(temporaryNodeValueStoreForRedrawLine[0].xVal, 2).ToString();
 
-                MessageBox.Show("Here  " + lb_dbt_node1_value.ToString());
+               // MessageBox.Show("Here  " + lb_dbt_node1_value.ToString());
                 lb_dbt_node2_value.Text = Math.Round(temporaryNodeValueStoreForRedrawLine[1].xVal, 2).ToString();
                 lb_RH_node1_value.Text = startHumidity1.ToString();
                 lb_RH_node2_value.Text = endHumidity1.ToString();
