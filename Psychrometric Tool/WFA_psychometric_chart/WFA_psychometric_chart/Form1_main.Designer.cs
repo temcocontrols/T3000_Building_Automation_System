@@ -118,6 +118,8 @@
             this.lb_number_of_chart_label = new System.Windows.Forms.Label();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveAsTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.CMSinsertNode = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.quickNodeInsertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.insertNodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -428,6 +430,10 @@
             resources.ApplyResources(this.helpPsychometricChartToolStripMenuItem, "helpPsychometricChartToolStripMenuItem");
             this.helpPsychometricChartToolStripMenuItem.Click += new System.EventHandler(this.helpPsychometricChartToolStripMenuItem_Click);
             // 
+            // saveFD
+            // 
+            this.saveFD.RestoreDirectory = true;
+            // 
             // lb_unit_chosen_display
             // 
             resources.ApplyResources(this.lb_unit_chosen_display, "lb_unit_chosen_display");
@@ -597,7 +603,6 @@
             // 
             resources.ApplyResources(this.lb_db_name, "lb_db_name");
             this.lb_db_name.Name = "lb_db_name";
-            this.lb_db_name.Click += new System.EventHandler(this.lb_db_name_Click);
             // 
             // lb_buildingselectedShow
             // 
@@ -617,7 +622,9 @@
             // contextMenuStrip1
             // 
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.deleteToolStripMenuItem});
+            this.deleteToolStripMenuItem,
+            this.saveAsTemplateToolStripMenuItem,
+            this.loadTemplateToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             resources.ApplyResources(this.contextMenuStrip1, "contextMenuStrip1");
             // 
@@ -626,6 +633,18 @@
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
             resources.ApplyResources(this.deleteToolStripMenuItem, "deleteToolStripMenuItem");
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click_1);
+            // 
+            // saveAsTemplateToolStripMenuItem
+            // 
+            this.saveAsTemplateToolStripMenuItem.Name = "saveAsTemplateToolStripMenuItem";
+            resources.ApplyResources(this.saveAsTemplateToolStripMenuItem, "saveAsTemplateToolStripMenuItem");
+            this.saveAsTemplateToolStripMenuItem.Click += new System.EventHandler(this.saveAsTemplateToolStripMenuItem_Click);
+            // 
+            // loadTemplateToolStripMenuItem
+            // 
+            this.loadTemplateToolStripMenuItem.Name = "loadTemplateToolStripMenuItem";
+            resources.ApplyResources(this.loadTemplateToolStripMenuItem, "loadTemplateToolStripMenuItem");
+            this.loadTemplateToolStripMenuItem.Click += new System.EventHandler(this.loadTemplateToolStripMenuItem_Click);
             // 
             // CMSinsertNode
             // 
@@ -913,6 +932,8 @@
         private System.Windows.Forms.ToolStripMenuItem trashBoxToolStripMenuItem;
         public System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.ToolStripMenuItem addMixNodeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveAsTemplateToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem loadTemplateToolStripMenuItem;
     }
 }
 

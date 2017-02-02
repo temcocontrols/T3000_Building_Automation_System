@@ -1,0 +1,46 @@
+Error Detected               5/23/2016 12:14:23 PM                Internet Connection Lost:The request was aborted: The operation has timed out.
+Error Ended               5/23/2016 12:14:46 PM                Internet Connection Available
+Error Detected               5/27/2016 3:37:57 PM                Internet Connection Lost:Object reference not set to an instance of an object.
+Error Ended               5/27/2016 3:38:08 PM                Internet Connection Available
+Error Detected               8/8/2016 1:30:17 PM                Internet Connection Lost:The remote server returned an error: (500) Internal Server Error.
+Error Detected               8/8/2016 1:30:20 PM                Internet Connection Lost:The remote server returned an error: (511).
+Error Detected               8/8/2016 1:30:43 PM                Internet Connection Lost:The remote server returned an error: (500) Internal Server Error.
+Error Detected               8/8/2016 1:31:44 PM                Internet Connection Lost:The remote server returned an error: (500) Internal Server Error.
+Error Detected               9/1/2016 10:36:45 AM                Internet Connection Lost:The request was aborted: The operation has timed out.
+Error Detected               9/1/2016 10:36:45 AM                Internet Connection Lost:Unable to connect to the remote server
+Error Detected               9/1/2016 10:36:48 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:36:50 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:36:52 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:36:54 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:36:54 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:36:54 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:36:55 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:36:57 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:36:59 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:00 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:00 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:00 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:00 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:00 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:00 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:02 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:04 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:06 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:06 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:06 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:06 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:06 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:06 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:06 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:06 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:06 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:06 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:12 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:12 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:12 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:12 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:12 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:12 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:12 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:12 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'
+Error Detected               9/1/2016 10:37:12 AM                Internet Connection Lost:The remote name could not be resolved: 'api.openweathermap.org'

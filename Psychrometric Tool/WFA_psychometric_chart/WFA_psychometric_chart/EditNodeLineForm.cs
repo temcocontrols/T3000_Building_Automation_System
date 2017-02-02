@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace WFA_psychometric_chart
 {
@@ -378,6 +379,15 @@ namespace WFA_psychometric_chart
         {
             //This on load we need to laod the data from the other form
            LoadNodeAndLine();//load values
+            if(bcs.flagShow == 1)
+            {
+                //Means the data is on so
+                checkBox1.Checked = true;
+            }
+            else
+            {
+                checkBox1.Checked = false;
+            }
             //dataGridView1.Rows[bcs.menuStripNodeInfoValues.Count].Visible = false;
             dataGridView1.AllowUserToAddRows = false;
             dataGridView2.AllowUserToAddRows = false;
@@ -386,7 +396,6 @@ namespace WFA_psychometric_chart
             lb_unit_vol_flow_rate.Text = "m\xB3/s";
             lb_unit_sp_vol.Text = "m\xB3/Kg";
 
-            
             if (dataGridView2.Rows.Count > 0)  //If there is data then only do this one
             {
                 //set parameters of your event args
@@ -396,7 +405,29 @@ namespace WFA_psychometric_chart
                 dataGridView2_CellClick(sender, eventArgs);
             }
 
+            //--This setting is for comfortzone 
+            //==========================HERE COMFORTZONE LOAD=============================//
+            
+            //on load it need to pull the data form database and it need to reset the values as well
+            groupBox2.Enabled = false;
+            groupBox2.Visible = false;
+            //this.Height = 280;
+            //pull data form database.. first            
+            bcs.PullComfortZoneData();//This will load the listComfortZoneDetail
+            btn_color.BackColor = Color.LightGreen;
+            //Now lets load the values int combobox1.items.add()
+            comboBox1.Items.Clear();
+            foreach (var item in bcs.listComfortZoneDetail)
+            {
+                comboBox1.Items.Add(item.name);
+            }
+                                                   
+         //================================END OF COMFORT ZONE SETTING=========================//
+
+
         }
+
+
 
 
 
@@ -559,7 +590,14 @@ namespace WFA_psychometric_chart
 
         }
 
-        
+
+
+
+
+
+
+
+
         public void UpdateDataValueAndRefreshDGV(string NodeID,double xVal,double yVal,string source,string name,string label,Color color,string showtext,int nodesize)
         {
             string nodeIDVal = NodeID;
@@ -860,7 +898,13 @@ namespace WFA_psychometric_chart
             LoadNodeAndLine();//--Loading the data 
         }
 
-        
+
+
+
+
+
+
+
 
         public void RefreshDataFromDBAndChart()
         {
@@ -888,7 +932,8 @@ namespace WFA_psychometric_chart
             //--First lets do for the node
             //--Lets clear the rows first 
             //--This one for handling null refrence error
-            //dataGridView1.Enabled = false;
+          //dataGridView1.Enabled = false;
+
 
             dataGridView1.Rows.Clear();
             dataGridView2.Rows.Clear();
@@ -989,7 +1034,7 @@ namespace WFA_psychometric_chart
                         //indexForSource = 0;
 
                         dataGridView1.Rows.Add(row);
-//dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].ReadOnly = false;
+                        //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].ReadOnly = false;
                         //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].ReadOnly = false;
                         //indexForParticularRow
                         dataGridView1.Rows[indexForParticularRow].Cells[3].ReadOnly = false;
@@ -1095,7 +1140,18 @@ namespace WFA_psychometric_chart
                 }
             }//clsoe of if value
 
-           //--Second : This is for the line to show in the datagridview2
+            //--Second : This is for the line to show in the datagridview2
+            /*
+             Lets store the node1 and node2 parameters in variables.
+             */
+             //--variables to store info of two nodes
+            string idNode1="", lastUpdatedDateNode1 = "", humiditySourceNode1 = "", temperatureSourceNode1 = "", nameNode1 = "";
+            string idNode2 = "", lastUpdatedDateNode2 = "", humiditySourceNode2 = "", temperatureSourceNode2 = "", nameNode2 = "";
+            double xValueNode1=0, yValueNode1=0;
+            double xValueNode2=0, yValueNode2=0;
+            int airFlowNode1=0, airFlowNode2=0;
+
+            //--Scanning for the values
             if (bcs.menuStripNodeLineInfoValues.Count > 0)
             {
                 for (int i = 0; i < bcs.menuStripNodeLineInfoValues.Count; i++)
@@ -1103,17 +1159,20 @@ namespace WFA_psychometric_chart
 
                     string startNodeName = "";
                     string endNodeName = "";
-                    string DBT1 = Convert.ToString(lb_dbt_node1_value);
-                    //string DBT1 = "Raju";
-                  //  MessageBox.Show(DBT1);
-                    
-
                     //Now lets calculate the startNodeName and endNodeName
                     for (int x = 0; x < bcs.menuStripNodeInfoValues.Count; x++)
                     {
                         if (bcs.menuStripNodeLineInfoValues[i].prevNodeId == bcs.menuStripNodeInfoValues[x].id)
                         {
-                            startNodeName = bcs.menuStripNodeInfoValues[x].name;
+                            nameNode1 = startNodeName = bcs.menuStripNodeInfoValues[x].name;
+                            idNode1 = bcs.menuStripNodeInfoValues[x].id;
+                            lastUpdatedDateNode1 = bcs.menuStripNodeInfoValues[x].lastUpdatedDate;
+                            humiditySourceNode1 = bcs.menuStripNodeInfoValues[x].humidity_source;
+                            temperatureSourceNode1 = bcs.menuStripNodeInfoValues[x].temperature_source;
+                            //nameNode1 =
+                            xValueNode1 = bcs.menuStripNodeInfoValues[x].xVal;
+                            yValueNode1 = bcs.menuStripNodeInfoValues[x].yVal;
+                            airFlowNode1 = (int)bcs.menuStripNodeInfoValues[x].airFlow;
                             break;
                         }
 
@@ -1124,19 +1183,28 @@ namespace WFA_psychometric_chart
                     {
                         if (bcs.menuStripNodeLineInfoValues[i].nextNodeId == bcs.menuStripNodeInfoValues[v].id)
                         {
-                            endNodeName = bcs.menuStripNodeInfoValues[v].name;
+                            nameNode2 = endNodeName = bcs.menuStripNodeInfoValues[v].name;
+                            idNode2 = bcs.menuStripNodeInfoValues[v].id;
+                            lastUpdatedDateNode2 = bcs.menuStripNodeInfoValues[v].lastUpdatedDate;
+                            humiditySourceNode2 = bcs.menuStripNodeInfoValues[v].humidity_source;
+                            temperatureSourceNode2 = bcs.menuStripNodeInfoValues[v].temperature_source;
+                            //nameNode1 =
+                            xValueNode2 = bcs.menuStripNodeInfoValues[v].xVal;
+                            yValueNode2 = bcs.menuStripNodeInfoValues[v].yVal;
+                            airFlowNode2 = (int)bcs.menuStripNodeInfoValues[v].airFlow;
                             break;
                         }
 
                     }
 
-                   // MessageBox.Show(DBT1);
+                    //Lets calculate some energy parameters such as DBT, Relative humidity,humidity ratio,,
+                    //specific volume, mass flow rate,enthalpy, Total energy flow, and heat change.
 
-                    
-               //now lets display...                    
-                   // string[] row = new string[] { bcs.menuStripNodeLineInfoValues[i].ID, bcs.menuStripNodeLineInfoValues[i].name, startNodeName, endNodeName, "", bcs.menuStripNodeLineInfoValues[i].lineThickness.ToString(),DBT1, bcs.menuStripNodeLineInfoValues[i].prevNodeId.ToString(), bcs.menuStripNodeLineInfoValues[i].nextNodeId.ToString(), bcs.menuStripNodeLineInfoValues[i].lineSeriesID.ToString(), };
-                    string[] row = new string[] { bcs.menuStripNodeLineInfoValues[i].ID, bcs.menuStripNodeLineInfoValues[i].name, startNodeName, endNodeName,"", bcs.menuStripNodeLineInfoValues[i].lineThickness.ToString(),bcs.menuStripNodeLineInfoValues[i].prevNodeId.ToString(), bcs.menuStripNodeLineInfoValues[i].nextNodeId.ToString(), bcs.menuStripNodeLineInfoValues[i].lineSeriesID.ToString(), DBT1 };
-
+                    //--Lets make a function which returns all the other values
+                    EnergyParameterCalculationForTwoNodes(xValueNode1,yValueNode1,airFlowNode1,xValueNode2,yValueNode2,airFlowNode2);
+                    //double relativeHumidity1, relativeHumidity2, spVol1, spVol2, massFlowRate1, massFlowRate2, enthalpy1, enthalpy2, totalEnergyFlow1, totalEnergyFlow2, heatChange;
+                    //now lets display...                    
+                    string[] row = new string[] { bcs.menuStripNodeLineInfoValues[i].ID, bcs.menuStripNodeLineInfoValues[i].name, startNodeName, endNodeName, "", bcs.menuStripNodeLineInfoValues[i].lineThickness.ToString(), bcs.menuStripNodeLineInfoValues[i].prevNodeId.ToString(), bcs.menuStripNodeLineInfoValues[i].nextNodeId.ToString(), bcs.menuStripNodeLineInfoValues[i].lineSeriesID.ToString(),"",Math.Round(xValueNode1,2).ToString(),Math.Round(relativeHumidity1,2).ToString(),Math.Round(yValueNode1,2).ToString(),Math.Round(spVol1,2).ToString(),Math.Round(massFlowRate1,2).ToString(),Math.Round(enthalpy1,2).ToString(),Math.Round(totalEnergyFlow1,2).ToString(), Math.Round(xValueNode2, 2).ToString(), Math.Round(relativeHumidity2, 2).ToString(), Math.Round(yValueNode2, 2).ToString(), Math.Round(spVol2, 2).ToString(), Math.Round(massFlowRate2, 2).ToString(), Math.Round(enthalpy2, 2).ToString(), Math.Round(totalEnergyFlow2, 2).ToString(),Math.Round(heatChangeForBoth, 2).ToString() };
                     dataGridView2.Rows.Add(row);
 
                     DataGridViewButtonCell buttonCell = (DataGridViewButtonCell)dataGridView2.Rows[i].Cells[4];
@@ -1165,6 +1233,38 @@ namespace WFA_psychometric_chart
           //  dataGridView1.Enabled = true;
 
         }
+
+
+        double relativeHumidity1, relativeHumidity2, spVol1, spVol2, massFlowRate1, massFlowRate2, enthalpy1, enthalpy2, totalEnergyFlow1, totalEnergyFlow2, heatChangeForBoth;
+
+             
+        public void EnergyParameterCalculationForTwoNodes(double node1_X_Value,double node1_Y_Value,int node1_air_flow, double node2_X_Value, double node2_Y_Value, int node2_air_flow)
+        {
+
+            bcs.CalculateHumidityEnthalpy(node1_X_Value, node1_Y_Value);
+            relativeHumidity1 = Math.Round(bcs.humidityCalculated, 2);
+            enthalpy1 = Math.Round(bcs.enthalpyCalculated, 2);
+            spVol1 = bcs.SpecificVolumeReturn;
+            //--This calculates the end humidity and the enthalpy values..
+            bcs.CalculateHumidityEnthalpy(node2_X_Value, node2_Y_Value);
+            relativeHumidity2 = Math.Round(bcs.humidityCalculated, 2);
+            enthalpy2 = Math.Round(bcs.enthalpyCalculated, 2);
+            spVol2 = bcs.SpecificVolumeReturn;
+
+            double enthalpyChange = enthalpy2 - enthalpy1;
+           
+            //string SixthLine = "Specific Volume              " + "m\xB3/Kg             " + startSpecificVolume1 + "                    " + endSpecificVolume1;
+            massFlowRate1 = node1_air_flow / spVol1;
+            massFlowRate2 = node2_air_flow / spVol2;
+
+            totalEnergyFlow1 = massFlowRate1 *enthalpy1;
+            totalEnergyFlow2 = massFlowRate2 * enthalpy2;
+            //string NinthLine = @"Total Enthalpy Flow         " + "KJ/s                " + Math.Round(totalEnthalpyFlow1, 2) + "                      " + Math.Round(totalEnthalpyFlow2, 2);
+            heatChangeForBoth = totalEnergyFlow2 - totalEnergyFlow1;
+           
+
+        }
+
 
 
 
@@ -1398,10 +1498,6 @@ namespace WFA_psychometric_chart
 
                         int status = 0;//0 means dissable 1 means enabled
 
-                        string DBT1 = Convert.ToString(lb_dbt_node1_value);
-
-                        
-
                         DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9];
 
                         if (cbCell.Value.ToString() == "true")
@@ -1412,7 +1508,7 @@ namespace WFA_psychometric_chart
                         {
                             status = 0;
                         }
-                        LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status, DBT1);
+                        LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status);
 
                     }
                     catch(Exception ex)
@@ -1437,8 +1533,6 @@ namespace WFA_psychometric_chart
                 string lineName = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[1].Value.ToString();
                 int status = 0;//0 means dissable 1 means enabled
 
-                string DBT1 = Convert.ToString(lb_dbt_node1_value);
-
                 DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9];
                 if (cbCell.Value == cbCell.TrueValue) // .ToString() == "true"
                 {
@@ -1448,7 +1542,7 @@ namespace WFA_psychometric_chart
                 {
                     status = 0;
                 }
-                LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status,DBT1);
+                LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status);
 
 
             }
@@ -1474,15 +1568,8 @@ namespace WFA_psychometric_chart
             Series lineseriesID = new Series(dgv_row.Cells[8].Value.ToString());
             int thickness =int.Parse(dgv_row.Cells[5].Value.ToString());
 
-            string DBT1 = lb_dbt_node1_value.ToString();
 
-            // MessageBox.Show("Raju"+DBT1 + " " +LineName);
-
-            
-            //MessageBox.Show(LineName);
-
-
-            CalculateProcessParameterForEnergy(id, prevNodeID, nextNodeID, lineseriesID, LineColorValue, thickness, LineName, DBT1);
+            CalculateProcessParameterForEnergy(id, prevNodeID, nextNodeID, lineseriesID, LineColorValue, thickness, LineName);
 
         }
 
@@ -1508,7 +1595,7 @@ namespace WFA_psychometric_chart
         }
         List<TempDataType1> temporaryNodeValueStoreForRedrawLine = new List<TempDataType1>();
         //--Redraw line function
-        public void CalculateProcessParameterForEnergy(string id, string prevNodeID, string nextNodeID, Series lineSeriesID, Color colorVal, int thickness_value, string name, string DBT1)
+        public void CalculateProcessParameterForEnergy(string id, string prevNodeID, string nextNodeID, Series lineSeriesID, Color colorVal, int thickness_value, string name)
         {
             // lock (this) { 
 
@@ -1527,7 +1614,7 @@ namespace WFA_psychometric_chart
             double startSpecificVolume1 = 0;//--specific volume
             double endSpecificVolume1 = 0;
 
-            
+
             /*
             We need to calculate the previous node id values and the next node id values.
             */
@@ -1649,8 +1736,6 @@ namespace WFA_psychometric_chart
                 lb_node_two_name.BackColor = Color.White;
 
                 lb_dbt_node1_value.Text = Math.Round(temporaryNodeValueStoreForRedrawLine[0].xVal, 2).ToString();
-
-               // MessageBox.Show("Here  " + lb_dbt_node1_value.ToString());
                 lb_dbt_node2_value.Text = Math.Round(temporaryNodeValueStoreForRedrawLine[1].xVal, 2).ToString();
                 lb_RH_node1_value.Text = startHumidity1.ToString();
                 lb_RH_node2_value.Text = endHumidity1.ToString();
@@ -1713,8 +1798,6 @@ namespace WFA_psychometric_chart
           // public Series lineSeriesID { get; set; }
             public int lineThickness { get; set; }
 
-            public string DBT1 { get; set; }
-
         }
 
         public List<lineDataType> lineInfo = new List<lineDataType>();
@@ -1762,16 +1845,12 @@ namespace WFA_psychometric_chart
                 {
                     ID = dataGridView2.Rows[i].Cells[0].Value.ToString(),
                     prevNodeId = dataGridView2.Rows[i].Cells[1].Value.ToString(),
-                    DBT1 =dataGridView2.Rows[i].Cells[9].ToString(),
                     nextNodeId = dataGridView2.Rows[i].Cells[2].Value.ToString(),
                     lineColorValue = dataGridView2.Rows[i].Cells[3].Style.BackColor,
-                    lineThickness = int.Parse(dataGridView2.Rows[i].Cells[4].Value.ToString()
-                    )
+                    lineThickness = int.Parse(dataGridView2.Rows[i].Cells[4].Value.ToString())
                 });
 
             }
-
-            
 
             //==Now lets check we get the real value or not
             //Test...
@@ -1853,6 +1932,514 @@ namespace WFA_psychometric_chart
         }
 
         string initialTemp, initialHumidity, initialName, initialLabel, initialNodeSize, initialAirFlow;
+
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+            //--Export data to excel
+            CreatingExcelFileWithData();
+        }
+
+        private void btn_ok_Click(object sender, EventArgs e)
+        {
+
+            //--F this little code
+            //--Lets program..
+
+            //When ok button is clicked the there should be plotting of the comfort zone.
+            //This has basically two function...
+            /*
+            1.insert the comfort zone info to database 
+            2. Plot the comfort zone based on the value passed.
+            */
+            if (textBox1.Text != "" && textBox2.Text != "" && textBox3.Text != "" && textBox4.Text != "")
+            {
+                //chart id
+                string chartid = bcs.chartDetailList[bcs.indexOfChartSelected].chartID;
+                string comfortzoneid = bcs.listComfortZoneDetail[comboBox1.SelectedIndex].id;
+                bcs.InsertChartComfortzoneInfo(chartid, comfortzoneid);
+
+                //now second part call the plot function 
+                // bs.PlotComfortZone()
+                double mint = double.Parse(textBox1.Text);
+                double maxt = double.Parse(textBox2.Text);
+                double minh = double.Parse(textBox3.Text);
+                double maxh = double.Parse(textBox4.Text);
+                Color c = bcs.listComfortZoneDetail[comboBox1.SelectedIndex].colorValue;
+                string name = bcs.listComfortZoneDetail[comboBox1.SelectedIndex].name;
+                if (bcs.default_comfort_zone_of_chart.Count > 0)
+                {
+                    if (bcs.listchartComfortZoneInfoSingle.Count > 0)
+                    {
+                        //If default comfort zone is present then 
+                        //Clear previous one 
+                        //MessageBox.Show("Clear previous comfortzone");
+                        bcs.ClearComfortZone(double.Parse(bcs.listchartComfortZoneInfoSingle[0].min_temp), double.Parse(bcs.listchartComfortZoneInfoSingle[0].max_temp), double.Parse(bcs.listchartComfortZoneInfoSingle[0].min_hum), double.Parse(bcs.listchartComfortZoneInfoSingle[0].max_hum));
+                    }
+                }
+
+                bcs.PlotComfortZone(mint, maxt, minh, maxh, c, name);
+
+                //insert of update database value 
+                bcs.insertOrUpdateComfortChartSetting(chartid, comfortzoneid);
+
+                if (bcs.dataGridView1.Rows.Count > 0)  //If there is data then only do this one
+                {
+                    //set parameters of your event args
+                    var eventArgs = new DataGridViewCellEventArgs(1, bcs.dataGridView1.CurrentCell.RowIndex);
+                    // or setting the selected cells manually before executing the function
+                    bcs.dataGridView1.Rows[bcs.dataGridView1.CurrentCell.RowIndex].Cells[1].Selected = true;
+                    bcs.dataGridView1_CellClick(sender, eventArgs);
+                }
+
+               // this.Close();
+
+            }//close of if
+
+
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //--When a chart is selected then 
+            int index = comboBox1.SelectedIndex;
+            if (index >= 0)
+            {
+                //put the values in the combobox
+                textBox1.Text = bcs.listComfortZoneDetail[index].min_temp;
+                textBox2.Text = bcs.listComfortZoneDetail[index].max_temp;
+                textBox3.Text = bcs.listComfortZoneDetail[index].min_hum;
+                textBox4.Text = bcs.listComfortZoneDetail[index].max_hum;
+                btn_ok.Enabled = true;
+            }
+
+        }
+
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //--For updating things
+            int index = comboBox2.SelectedIndex;
+            if (index >= 0)
+            {
+                //We need to enable the button update.
+                btn_update.Enabled = true;
+                btn_delete.Enabled = true;
+                btn_add.Enabled = false;
+                //Next we need to fulfil the text boxes base on the combobox selected
+                tb_name.Text = bcs.listComfortZoneDetail[index].name;
+                tb_mintemp.Text = bcs.listComfortZoneDetail[index].min_temp;
+                tb_maxtemp.Text = bcs.listComfortZoneDetail[index].max_temp;
+                tb_minhum.Text = bcs.listComfortZoneDetail[index].min_hum;
+                tb_maxhum.Text = bcs.listComfortZoneDetail[index].max_hum;
+                btn_color.BackColor = bcs.listComfortZoneDetail[index].colorValue;
+
+            }
+
+        }
+
+        private void btn_color_Click(object sender, EventArgs e)
+        {
+            //--This one is for color change
+            ColorDialog colorDialog1 = new ColorDialog();
+            if (colorDialog1.ShowDialog() == DialogResult.OK)
+            {
+                btn_color.BackColor = colorDialog1.Color;
+
+            }
+        }
+
+        private void btn_add_Click(object sender, EventArgs e)
+        {
+            //We can add new value in thsi function 
+            //now lets do the somethings.
+            if (tb_name.Text != "")
+            {
+
+                if (tb_mintemp.Text != "" && tb_maxtemp.Text != "" && tb_minhum.Text != "" && tb_maxhum.Text != "")
+                {
+                    //we need to grab the value and insert it
+                    double minT = double.Parse(tb_mintemp.Text);
+                    double maxT = double.Parse(tb_maxtemp.Text);
+                    double minH = double.Parse(tb_minhum.Text);
+                    double maxH = double.Parse(tb_maxhum.Text);
+                    string name = tb_name.Text;
+                    Color c = btn_color.BackColor;
+                    bcs.InsertComfortZoneValue(name, minT, maxT, minH, maxH, c);
+                    MessageBox.Show("Add success");
+
+                    //NOW LEST REFRESH THE FORM
+                    refreshAfterEdit();
+
+                }
+                else
+                {
+                    MessageBox.Show("Please fill the temperature and humidity accurately");
+
+                }
+            }
+            else
+            {
+                MessageBox.Show("Enter the name of the comfortzone");
+            }
+            //Inserted message
+            //MessageBox.Show("insert end");
+        }
+
+
+        public void refreshAfterEdit()
+        {
+            //Now lets do some of the refreshing task
+            bcs.PullComfortZoneData();//This will pull the co
+
+            //Now lets load the values int combobox1.items.add()
+            comboBox1.Items.Clear();
+            foreach (var item in bcs.listComfortZoneDetail)
+            {
+                comboBox1.Items.Add(item.name);
+            }
+
+
+            //Now lets load the values int combobox1.items.add()
+            comboBox2.Items.Clear();
+            foreach (var item in bcs.listComfortZoneDetail)
+            {
+                comboBox2.Items.Add(item.name);
+            }
+
+            tb_name.Text = "";
+            tb_mintemp.Text = "";
+            tb_maxtemp.Text = "";
+            tb_minhum.Text = "";
+            tb_maxhum.Text = "";
+
+            //Also first text boxes need to be refreshed
+            textBox1.Text = "";
+            textBox2.Text = "";
+            textBox3.Text = "";
+            textBox4.Text = "";
+            btn_ok.Enabled = false;
+            btn_update.Enabled = false;
+            btn_delete.Enabled = false;
+            btn_add.Enabled = true;
+
+        }
+
+        private void btn_update_Click(object sender, EventArgs e)
+        {
+            //now we can update at this point the previous values.
+            if (tb_name.Text != "")
+            {
+
+                if (tb_mintemp.Text != "" && tb_maxtemp.Text != "" && tb_minhum.Text != "" && tb_maxhum.Text != "")
+                {
+                    //we need to grab the value and insert it
+                    double minT = double.Parse(tb_mintemp.Text);
+                    double maxT = double.Parse(tb_maxtemp.Text);
+                    double minH = double.Parse(tb_minhum.Text);
+                    double maxH = double.Parse(tb_maxhum.Text);
+                    string name = tb_name.Text;
+                    Color c = btn_color.BackColor;
+                    string id = bcs.listComfortZoneDetail[comboBox2.SelectedIndex].id;
+                    //bs.InsertComfortZoneValue(name, minT, maxT, minH, maxH, c);
+                    bcs.UpdateComfortZoneValue(id, name, minT, maxT, minH, maxH, c);
+                    MessageBox.Show("Value updated succefully");
+                    //NOW LEST REFRESH THE FORM
+                    refreshAfterEdit();
+                }
+                else
+                {
+                    MessageBox.Show("Please fill the temperature and humidity accurately");
+
+                }
+            }
+            else
+            {
+                MessageBox.Show("Enter the name of the comfortzone");
+            }
+
+        }
+
+        private void btn_delete_Click(object sender, EventArgs e)
+        {
+            //--This one is for deleting purpose
+            //This one is for deletion operation
+            int index = comboBox2.SelectedIndex;
+            if (index >= 0)
+            {
+                //WE need to call the index value as well as send the id parameter
+                //This will delete the value form both the comfortDetail and chartcomfortzonesetting table.
+                DialogResult dialogResult = MessageBox.Show("are you sure you want to delete :" + bcs.listComfortZoneDetail[index].name, "Delete", MessageBoxButtons.YesNo);
+                if (dialogResult == DialogResult.Yes)
+                {
+                    bcs.DeleteComfortZoneData(bcs.listComfortZoneDetail[index].id);
+                    MessageBox.Show("value deleted successfully");
+                    //Refresh the values
+                    refreshAfterEdit();
+                }
+
+
+            }
+        }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            //--Edit option is clicked
+            //On check box checked...
+            if (checkBox2.Checked == true)
+            {
+                //it is checked 
+                //this.Height = 506;
+                groupBox2.Enabled = true;
+                btn_add.Enabled = true;
+                tb_name.Text = "";
+                tb_mintemp.Text = "";
+                tb_maxtemp.Text = "";
+                tb_minhum.Text = "";
+                tb_maxhum.Text = "";
+                btn_update.Enabled = false;
+                btn_delete.Enabled = false;
+                btn_color.BackColor = Color.LightGreen;
+
+                //when checked we need to fulfill the combobox2 as well
+                //Now lets load the values int combobox1.items.add()
+                //we need to reset first
+                comboBox2.Items.Clear();
+                comboBox2.Refresh();
+                foreach (var item in bcs.listComfortZoneDetail)
+                {
+                    comboBox2.Items.Add(item.name);
+                }
+
+                groupBox2.Enabled = true;
+                groupBox2.Visible = true;
+            }
+            else
+            {
+                //It is not checked
+                tb_name.Text = "";
+                tb_mintemp.Text = "";
+                tb_maxtemp.Text = "";
+                tb_minhum.Text = "";
+                tb_maxhum.Text = "";
+                //groupBox2.Enabled = false;
+                btn_add.Enabled = false;
+                groupBox2.Enabled = false;
+                groupBox2.Visible = false;
+                //this.Height = 280;
+            }
+        }
+
+        public void CreatingExcelFileWithData()
+        {
+
+            try
+            {
+
+                if(dataGridView1.RowCount <= 0 && dataGridView2.RowCount <= 0)
+                {
+                    //Do not proceed futher 
+                    MessageBox.Show("No data to save");
+                    return;
+                }
+
+                //excel is checked..
+                Excel.Application oApp;
+                Excel.Workbook oBook;
+                Excel.Worksheet oSheet;
+
+                oApp = new Excel.Application();
+                oBook = oApp.Workbooks.Add();
+                oSheet = (Excel.Worksheet)oBook.Worksheets.get_Item(1);
+                Cursor = Cursors.WaitCursor;
+
+                //printing the building information..
+                oSheet.Cells[1, 1] = "Node Information";//WFA_psychometric_chart.Properties.Resources.Building_Information;
+                oSheet.Cells[2, 1] = "Name";
+                oSheet.Cells[2, 2] = "Temperature Source";
+                oSheet.Cells[2, 3] = "Temperature";
+                oSheet.Cells[2, 4] = "Humidity Source";
+                oSheet.Cells[2, 5] = "Humidity";
+                oSheet.Cells[2, 6] = "Equivalent Enthalpy";
+                oSheet.Cells[2, 7] = "Color";
+                oSheet.Cells[2, 8] = "Node Size";// building_info[0].zip.ToString();  //zip doesnot exist now
+                oSheet.Cells[2, 9] = "Air Flow";
+
+                int count = 3;
+
+                for(int i =0;i<dataGridView1.RowCount;i++) {
+                    //for station 
+                    //oSheet.Cells[count+i, 1] = "Node Information";//WFA_psychometric_chart.Properties.Resources.Building_Information;
+                    oSheet.Cells[count + i, 1] = dataGridView1.Rows[i].Cells[0].Value.ToString();
+                    oSheet.Cells[count + i, 2] = dataGridView1.Rows[i].Cells[1].Value.ToString();//"Temperature Source";
+                    oSheet.Cells[count + i, 3] = dataGridView1.Rows[i].Cells[3].Value.ToString();//"Temperature";
+                    oSheet.Cells[count + i, 4] = dataGridView1.Rows[i].Cells[4].Value.ToString();//"Humidity Source";
+                    oSheet.Cells[count + i, 5] = dataGridView1.Rows[i].Cells[5].Value.ToString(); //"Humidity";
+                    oSheet.Cells[count + i, 6] = dataGridView1.Rows[i].Cells[6].Value.ToString(); //"Equivalent Enthalpy";
+                    //--For color value
+                    DataGridViewButtonCell buttonCell = (DataGridViewButtonCell)dataGridView1.Rows[i].Cells[7];
+                    buttonCell.FlatStyle = FlatStyle.Popup;
+                    Color c = buttonCell.Style.BackColor;//= colorDialog1.Color;//System.Drawing.Color.Red;
+                   
+                    oSheet.Cells[count + i, 7] = c.ToString();
+                    oSheet.Cells[count + i, 8] = dataGridView1.Rows[i].Cells[8].Value.ToString(); // building_info[0].zip.ToString();  //zip doesnot exist now
+                    oSheet.Cells[count + i, 9] = dataGridView1.Rows[i].Cells[9].Value.ToString(); ;
+
+                } //Close of for loop
+
+                int NewLineCount =count+ dataGridView1.RowCount +2 ;
+
+
+                //now printing the value of historical datas..
+                oSheet.Cells[NewLineCount, 1] = "Line Information";
+
+                oSheet.Cells[NewLineCount + 1, 1] = "Line Name";
+                oSheet.Cells[NewLineCount + 1, 2] = "Start Node Name";                
+                oSheet.Cells[NewLineCount + 1, 3] = "End Node Name";
+                oSheet.Cells[NewLineCount + 1, 4] = "Color";
+                oSheet.Cells[NewLineCount + 1, 5] = "Thickness";
+                oSheet.Cells[NewLineCount + 1, 6] = "Show Name";
+                oSheet.Cells[NewLineCount + 1, 7] = "DBT1";
+                oSheet.Cells[NewLineCount + 1, 8] = "RH1";
+                oSheet.Cells[NewLineCount + 1, 9] = "HR1";
+                oSheet.Cells[NewLineCount + 1, 10] = "SV1";
+
+                
+                oSheet.Cells[NewLineCount + 1, 11] = "MFR1";
+                oSheet.Cells[NewLineCount + 1, 12] = "enthalpy1";
+                oSheet.Cells[NewLineCount + 1, 13] = "TEF1";
+                oSheet.Cells[NewLineCount + 1, 14] = "DBT2";
+                oSheet.Cells[NewLineCount + 1, 15] = "RH2";
+                oSheet.Cells[NewLineCount + 1, 16] = "HR2";
+                oSheet.Cells[NewLineCount + 1, 17] = "SV2";
+                oSheet.Cells[NewLineCount + 1, 18] = "MFR2";
+                oSheet.Cells[NewLineCount + 1, 19] = "Enthalpy2";
+                oSheet.Cells[NewLineCount + 1, 20] = "TEF2";
+                oSheet.Cells[NewLineCount + 1, 21] = "heat change";
+
+
+
+
+                //now lets print the value in loop
+                for (int i = 0; i < dataGridView2.RowCount; i++)
+                {
+                    oSheet.Cells[NewLineCount + 2 + i, 1] = dataGridView2.Rows[i].Cells[1].Value.ToString();
+                    oSheet.Cells[NewLineCount + 2+i, 2] = dataGridView2.Rows[i].Cells[2].Value.ToString();//"Start Node Name";
+
+                    oSheet.Cells[NewLineCount + 2+i, 3] = dataGridView2.Rows[i].Cells[3].Value.ToString();//"End Node Name";
+                    DataGridViewButtonCell buttonCell = (DataGridViewButtonCell)dataGridView2.Rows[i].Cells[4];
+                    buttonCell.FlatStyle = FlatStyle.Popup;
+                    Color col = buttonCell.Style.BackColor;//= colorDialog1.Color;//System.Drawing.Color.Red;
+
+                    oSheet.Cells[NewLineCount + 2+i, 4] = col.ToString();
+                    oSheet.Cells[NewLineCount + 2+i, 5] = dataGridView2.Rows[i].Cells[5].Value.ToString(); //"Thickness";
+                    DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[i].Cells[9];
+
+                    string status = "false";
+                    if (cbCell.Value.ToString() == "true")
+                    {
+                        status = "true";
+                    }
+                    else
+                    {
+                        status = "false";
+                    }
+
+                    oSheet.Cells[NewLineCount + 2+i, 6] = status; //"Show Name";
+                    oSheet.Cells[NewLineCount + 2+i, 7] = dataGridView2.Rows[i].Cells[10].Value.ToString(); //"DBT1";
+                    oSheet.Cells[NewLineCount + 2+i, 8] = dataGridView2.Rows[i].Cells[11].Value.ToString();//"RH1";
+                    oSheet.Cells[NewLineCount + 2+i, 9] = dataGridView2.Rows[i].Cells[12].Value.ToString(); //"HR1";
+                    oSheet.Cells[NewLineCount + 2+i, 10] = dataGridView2.Rows[i].Cells[13].Value.ToString(); //"SV1";
+
+
+                    oSheet.Cells[NewLineCount + 2+i, 11] = dataGridView2.Rows[i].Cells[14].Value.ToString(); //"MFR1";
+                    oSheet.Cells[NewLineCount + 2+i, 12] = dataGridView2.Rows[i].Cells[15].Value.ToString(); //"enthalpy1";
+
+                    oSheet.Cells[NewLineCount + 2+i, 13] = dataGridView2.Rows[i].Cells[16].Value.ToString(); //"TEF1";
+                    oSheet.Cells[NewLineCount + 2+i, 14] = dataGridView2.Rows[i].Cells[17].Value.ToString(); //"DBT2";
+                    oSheet.Cells[NewLineCount + 2+i, 15] = dataGridView2.Rows[i].Cells[18].Value.ToString();// "RH2";
+                    oSheet.Cells[NewLineCount + 2+i, 16] = dataGridView2.Rows[i].Cells[19].Value.ToString(); //"HR2";
+                    oSheet.Cells[NewLineCount + 2+i, 17] = dataGridView2.Rows[i].Cells[20].Value.ToString(); //"SV2";
+                    oSheet.Cells[NewLineCount + 2+i, 18] = dataGridView2.Rows[i].Cells[21].Value.ToString(); //"MFR2";
+                    oSheet.Cells[NewLineCount + 2+i, 19] = dataGridView2.Rows[i].Cells[22].Value.ToString(); //"Enthalpy2";
+                    oSheet.Cells[NewLineCount + 2+i, 20] = dataGridView2.Rows[i].Cells[23].Value.ToString();// "TEF2";
+                    oSheet.Cells[NewLineCount + 2+i, 21] = dataGridView2.Rows[i].Cells[24].Value.ToString(); //"heat change";
+
+
+                }
+
+                //now lets open the save dialog box and the save it there..
+
+                Cursor = Cursors.Default;
+                String fileName = "";
+
+                saveFD.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);// "C:";
+                saveFD.FileName = "Excelfile";
+                saveFD.Title = WFA_psychometric_chart.Properties.Resources.Save_Excel_file_to;
+                saveFD.Filter = "Excel file|*.xls";
+                if (saveFD.ShowDialog() == DialogResult.OK)
+                {
+                    //save the file..
+                    fileName = saveFD.FileName;
+                    oBook.SaveAs(fileName);
+
+                }
+                oBook.Close();
+                oApp.Quit();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+
+
+        /// <summary>
+        /// Exports two data grid value to excell
+        /// </summary>
+        public void ExportDataToExcelFile()
+        {
+            //--These functions do the export work
+        }
+
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            //--click or unclick 
+            if(checkBox1.Checked == true)
+            {
+                if (bcs.default_comfort_zone_of_chart.Count > 0)
+                {
+                    bcs.ShowOrHideForComfortZoneFromEditNode(1);
+                }
+                else
+                {
+                    MessageBox.Show("Please set a comfort zone for this chart first !");
+                    checkBox1.Checked = false;
+                }
+            }
+            else
+            {
+              //  bcs.ShowOrHideForComfortZoneFromEditNode(0);
+                if (bcs.default_comfort_zone_of_chart.Count > 0)
+                {
+                    bcs.ShowOrHideForComfortZoneFromEditNode(0);
+                }
+                //else
+                //{
+                //    MessageBox.Show("Please set a comfort zone for this chart first !");
+                //    checkBox1.Checked = false;
+                //}
+            }
+
+        }
+
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            //--This click should trigger the other click in the form
+            //Should show the comfortzone formate
+           // bcs.SettingChartOpen();
+        }
 
         private void dataGridView1_CellValueChanged_1(object sender, DataGridViewCellEventArgs e)
         {
@@ -1963,7 +2550,7 @@ namespace WFA_psychometric_chart
             //}
         }
 
-        public void LineUpdateAndReload(string lineid,string prevNodeID,string nextNodeID,Color color,int thickness,Series lineseries,string name,int status,string DBT1)
+        public void LineUpdateAndReload(string lineid,string prevNodeID,string nextNodeID,Color color,int thickness,Series lineseries,string name,int status)
         {
 
             bcs.UpdateLineInfoToDB(lineid, prevNodeID, nextNodeID, color, lineseries, thickness,name,status);
@@ -2078,8 +2665,6 @@ namespace WFA_psychometric_chart
                  string lineName = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[1].Value.ToString();
                     int status = 0;//0 means dissable 1 means enabled
 
-                   // string DBT1 = lb_dbt_node1_value.ToString();
-                    string DBT1 = Convert.ToString(lb_dbt_node1_value);
          DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9];
                     if (cbCell.Value.ToString() == "true")//cbCell.TrueValue
                     {                        
@@ -2090,7 +2675,7 @@ namespace WFA_psychometric_chart
                         status = 0;
                     }
 
-                    LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s,lineName,status,DBT1);
+                    LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s,lineName,status);
 
             }
             catch
@@ -2171,9 +2756,6 @@ namespace WFA_psychometric_chart
                     string lineName = finalLineName; //dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[1].Value.ToString();
                     int status = 0;//0 means dissable 1 means enabled
 
-                    string DBT1 = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9].Value.ToString();
-
-
                     DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9];
                     if (cbCell.Value.ToString() == "true")//cbCell.TrueValue
                     {
@@ -2184,7 +2766,7 @@ namespace WFA_psychometric_chart
                         status = 0;
                     }
                    // MessageBox.Show("Status 1means true , 0 means false = " + status);
-                    LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status,DBT1);
+                    LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status);
 
                 }
                 catch
@@ -2220,6 +2802,7 @@ namespace WFA_psychometric_chart
         /// <param name="e"> event value</param>
         public void dataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
+
 
             
              
