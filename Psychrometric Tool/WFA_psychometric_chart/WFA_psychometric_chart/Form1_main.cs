@@ -13964,7 +13964,7 @@ namespace WFA_psychometric_chart
                 string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
                 string NewDirectory = Path.GetFullPath(Path.Combine(dir, @"..\"));
-                string file = NewDirectory + @"Images\lock.png";
+                string file = NewDirectory + @"Database\image\lock.png";
                 Bitmap SOME = new Bitmap(Image.FromFile(file));
                 Bitmap bp = new Bitmap(SOME, pb_lock_unlock.Width, pb_lock_unlock.Height);
                 pb_lock_unlock.Image = bp;//Image.FromFile(file);
@@ -13983,7 +13983,7 @@ namespace WFA_psychometric_chart
                 string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
                 string NewDirectory = Path.GetFullPath(Path.Combine(dir, @"..\"));
-                string file = NewDirectory + @"Images\unlock.png";
+                string file = NewDirectory + @"Database\image\unlock.png";
                  Bitmap SOME = new Bitmap(Image.FromFile(file));
                 Bitmap bp = new Bitmap(SOME, pb_lock_unlock.Width, pb_lock_unlock.Height);
 
