@@ -2413,8 +2413,36 @@ namespace WFA_psychometric_chart
                 }
                 else
                 {
-                    MessageBox.Show("Please set a comfort zone for this chart first !");
-                    checkBox1.Checked = false;
+
+                    // MessageBox.Show("Please set a comfort zone for this chart first !");
+                    // checkBox1.Checked = false;
+
+
+                    //--We need to write some function which will set the comfortzone by itself
+                    //--steps: 1. if data present selecte default comfort zone else throw message
+                    if (comboBox1.Items.Count > 0)
+                    {
+                        comboBox1.SelectedIndex = 0;
+                        btn_ok_Click(sender, e);
+                        //bcs.ShowOrHideForComfortZoneFromEditNode(1);
+                        bcs.PullComfortZoneData();//This will load the listComfortZoneDetail
+                        //btn_color.BackColor = Color.LightGreen;
+                        //Now lets load the values int combobox1.items.add()
+                        comboBox1.Items.Clear();
+                        foreach (var item in bcs.listComfortZoneDetail)
+                        {
+                            comboBox1.Items.Add(item.name);
+                        }
+
+                    }
+                    else
+                    {
+                        //--No data present
+                        MessageBox.Show("Comfortzone data not present. Make some comfortzone first!");
+                        checkBox1.Checked = false;
+
+                    }
+
                 }
             }
             else
@@ -2422,6 +2450,7 @@ namespace WFA_psychometric_chart
               //  bcs.ShowOrHideForComfortZoneFromEditNode(0);
                 if (bcs.default_comfort_zone_of_chart.Count > 0)
                 {
+                    //MessageBox.Show("false clicked");
                     bcs.ShowOrHideForComfortZoneFromEditNode(0);
                 }
                 //else

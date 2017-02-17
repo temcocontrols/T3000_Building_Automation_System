@@ -747,10 +747,34 @@ namespace WFA_psychometric_chart
             if (dataGridView1.Rows.Count > 0)  //If there is data then only do this one
             {
                 //set parameters of your event args
-                var eventArgs = new DataGridViewCellEventArgs(1, 0);
-               // or setting the selected cells manually before executing the function
-                dataGridView1.Rows[0].Cells[1].Selected = true;
-                dataGridView1_CellClick(sender, eventArgs);
+                // var eventArgs = new DataGridViewCellEventArgs(1, 0);
+                //// or setting the selected cells manually before executing the function
+                // dataGridView1.Rows[0].Cells[1].Selected = true;
+                // dataGridView1_CellClick(sender, eventArgs);
+                //if (dataGridView1.CurrentCell.RowIndex >= 0 && dataGridView1.CurrentCell.RowIndex < chartDetailList.Count)
+                //{
+                //    var eventArgs = new DataGridViewCellEventArgs(1, 0);
+                //    // or setting the selected cells manually before executing the function
+                //    dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Selected = true;
+                //    dataGridView1_CellClick(sender, eventArgs);
+
+                //}
+                if (dataGridView1.CurrentCell.RowIndex >= 0 && dataGridView1.CurrentCell.RowIndex < chartDetailList.Count)
+                {
+                    var eventArgs = new DataGridViewCellEventArgs(dataGridView1.CurrentCell.ColumnIndex, dataGridView1.CurrentCell.RowIndex);
+                    //or setting the selected cells manually before executing the function
+                    dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[dataGridView1.CurrentCell.ColumnIndex].Selected = true;
+                    dataGridView1_CellClick(sender, eventArgs);
+                    //MessageBox.Show("selecteion change clicked");
+                }
+                else
+                {
+                    var eventArgs = new DataGridViewCellEventArgs(1, 0);
+                    // or setting the selected cells manually before executing the function
+                    dataGridView1.Rows[0].Cells[1].Selected = true;
+                    dataGridView1_CellClick(sender, eventArgs);
+                    // }
+                }
             }
 
 
@@ -3948,7 +3972,7 @@ namespace WFA_psychometric_chart
         private void fillDataGridView()
         {
 
-
+            //dataGridView1.Rows.Clear();
             int xCount = 0;
             if (chartDetailList.Count > 0)
             {
@@ -3961,7 +3985,10 @@ namespace WFA_psychometric_chart
                     dataGridView1.Rows[i].Cells["Name"].Value = chartDetailList[i].chartName;
                     }
                 }
+                //dataGridView1.DataBindingComplete += new DataGridViewBindingCompleteEventHandler(dataGridView1.DataBindingComplete);
+                
             }//--if close
+            //dataGridView1.ClearSelection();
 
             lb_numberOfHandler.Text = chartDetailList.Count.ToString();
 
@@ -3974,6 +4001,7 @@ namespace WFA_psychometric_chart
             //check to see if the data is present in the database or not...
             //--Pulls and fills in a dynamic list
             //   PullDataFromDB();
+            //dataGridView1.ClearSelection();//--this one is for clearing the selection
             if (selectedBuildingList.Count <= 0)
             {
                 //We no need to proceed futher 
@@ -3988,6 +4016,10 @@ namespace WFA_psychometric_chart
             //This fills the datagridview
             fillDataGridView();
             //     fillDataGridView_WithChartList();
+            //DataGridView_AutoSelectSuppressed fx = new DataGridView_AutoSelectSuppressed();
+            //fx.ClearSelectionAndResetSuppression();
+            //dataGridView1.ClearSelection();
+            //dataGridView1.SelectionChanged -= new EventHandler(dataGridView1.SelectionChanged);
 
         }
 
@@ -5261,10 +5293,53 @@ namespace WFA_psychometric_chart
                 command9.ExecuteNonQuery();
 
                 //==Now lets make a single default comfort zone in our database.
+                //--This one is for default value.
                 string id = GetGUID();
                 string sql_data_for_comfortzone = "INSERT INTO tbl_"+ buildingNameSelected + "_comfort_zone_detail( id ,name,min_temp ,max_temp,min_hum , max_hum  ,colorValue   )   VALUES('"+id+"', 'Default_comfort_zone','22','28','60','80','GREEN')";
                 SQLiteCommand cmddata = new SQLiteCommand(sql_data_for_comfortzone, m_dbConnection);
                 cmddata.ExecuteNonQuery();
+
+                //--comfortzone airport.
+                string id_airport = GetGUID();
+                string sql_comfortzone_airport = "INSERT INTO tbl_" + buildingNameSelected + "_comfort_zone_detail( id ,name,min_temp ,max_temp,min_hum , max_hum  ,colorValue   )   VALUES('" + id_airport + "', 'Airport','22','28','35','65','Blue')";
+                SQLiteCommand cmd_airport = new SQLiteCommand(sql_comfortzone_airport, m_dbConnection);
+                cmd_airport.ExecuteNonQuery();
+
+                //--comfortzone club.
+                string id_club = GetGUID();
+                string sql_comfortzone_club = "INSERT INTO tbl_" + buildingNameSelected + "_comfort_zone_detail( id ,name,min_temp ,max_temp,min_hum , max_hum  ,colorValue   )   VALUES('" + id_club + "', 'Club','22','28','35','65','Blueviolet')";
+                SQLiteCommand cmd_club = new SQLiteCommand(sql_comfortzone_club, m_dbConnection);
+                cmd_club.ExecuteNonQuery();
+
+                //--comfortzone computer.
+                string id_computer = GetGUID();
+                string sql_comfortzone_computer = "INSERT INTO tbl_" + buildingNameSelected + "_comfort_zone_detail( id ,name,min_temp ,max_temp,min_hum , max_hum  ,colorValue   )   VALUES('" + id_computer + "', 'Computer','22','28','35','65','Turquoise')";
+                SQLiteCommand cmd_computer = new SQLiteCommand(sql_comfortzone_computer, m_dbConnection);
+                cmd_computer.ExecuteNonQuery();
+
+                //--comfortzone datacenter.
+                string id_datacenter = GetGUID();
+                string sql_comfortzone_datacenter = "INSERT INTO tbl_" + buildingNameSelected + "_comfort_zone_detail( id ,name,min_temp ,max_temp,min_hum , max_hum  ,colorValue   )   VALUES('" + id_datacenter + "', 'Data Center','22','28','35','65','Lightgreen')";
+                SQLiteCommand cmd_datacenter = new SQLiteCommand(sql_comfortzone_datacenter, m_dbConnection);
+                cmd_datacenter.ExecuteNonQuery();
+
+                //--comfortzone gym.
+                string id_gym = GetGUID();
+                string sql_comfortzone_gym = "INSERT INTO tbl_" + buildingNameSelected + "_comfort_zone_detail( id ,name,min_temp ,max_temp,min_hum , max_hum  ,colorValue   )   VALUES('" + id_gym + "', 'Gym','22','28','35','65','Lightgray')";
+                SQLiteCommand cmd_gym = new SQLiteCommand(sql_comfortzone_gym, m_dbConnection);
+                cmd_gym.ExecuteNonQuery();
+
+                //--comfortzone Hospital.
+                string id_Hospital = GetGUID();
+                string sql_comfortzone_Hospital = "INSERT INTO tbl_" + buildingNameSelected + "_comfort_zone_detail( id ,name,min_temp ,max_temp,min_hum , max_hum  ,colorValue   )   VALUES('" + id_Hospital + "', 'Hospital','22','28','35','65','Red')";
+                SQLiteCommand cmd_Hospital = new SQLiteCommand(sql_comfortzone_Hospital, m_dbConnection);
+                cmd_Hospital.ExecuteNonQuery();
+
+                //--comfortzone Music.
+                string id_Music = GetGUID();
+                string sql_comfortzone_Music = "INSERT INTO tbl_" + buildingNameSelected + "_comfort_zone_detail( id ,name,min_temp ,max_temp,min_hum , max_hum  ,colorValue   )   VALUES('" + id_Music + "', 'Music','22','28','35','65','Orangered')";
+                SQLiteCommand cmd_Music = new SQLiteCommand(sql_comfortzone_Music, m_dbConnection);
+                cmd_Music.ExecuteNonQuery();
 
 
                 //===============END OF THE NEW CODE ADDED IN THIS SECTION==========================//
@@ -8748,7 +8823,9 @@ namespace WFA_psychometric_chart
                     {
                         //now lets calculate the humidity because we can only make comparision with the humidity values....
                         HumTempCalcByCoordinate();//This will return humidityValue AND TemperatureValue by mouse coordinate
-                        //MessageBox.Show("check min temp = " + listchartComfortZoneInfoSingle[0].min_temp + "\n max temp = " + listchartComfortZoneInfoSingle[0].max_temp + "\n min hum= " + listchartComfortZoneInfoSingle[0].min_hum + "\n max hum=" + listchartComfortZoneInfoSingle[0].max_hum);
+                                                  //MessageBox.Show("check min temp = " + listchartComfortZoneInfoSingle[0].min_temp + "\n max temp = " + listchartComfortZoneInfoSingle[0].max_temp + "\n min hum= " + listchartComfortZoneInfoSingle[0].min_hum + "\n max hum=" + listchartComfortZoneInfoSingle[0].max_hum);
+
+                        if (listchartComfortZoneInfoSingle.Count > 0) { 
                         if ((temperatureValue > double.Parse(listchartComfortZoneInfoSingle[0].min_temp) && temperatureValue < double.Parse(listchartComfortZoneInfoSingle[0].max_temp)) && (humidityValue > double.Parse(listchartComfortZoneInfoSingle[0].min_hum) && humidityValue < double.Parse(listchartComfortZoneInfoSingle[0].max_hum)))
                         {
                             if (showComfortZoneToolStripMenuItem.Enabled == true)
@@ -8764,8 +8841,9 @@ namespace WFA_psychometric_chart
                         {
                             showComfortZoneToolStripMenuItem.Visible = false;
                         }
-                        //--Chart is enable futher processing is needed
-                }
+                            //--Chart is enable futher processing is needed
+                        }//close of if listchartComfortZoneInfoSingle
+                    }
                 else
                 {
                     //--Hide the comfort zone
@@ -12688,6 +12766,7 @@ namespace WFA_psychometric_chart
                                 //MessageBox.Show("Clicked here row index: " + e.RowIndex);
                                 var eventArgs = new DataGridViewCellEventArgs(1, e.RowIndex);
                                 // or setting the selected cells manually before executing the function
+                               // MessageBox.Show("END edit = " + e.RowIndex);
                                 dataGridView1.Rows[e.RowIndex].Cells[1].Selected = true;
                                 dataGridView1_CellClick(sender, eventArgs);
                                 // }
@@ -13265,41 +13344,52 @@ namespace WFA_psychometric_chart
                 string chart_resp_nodeIDX = chartDetailList[indexOfChartSelected].chart_respective_nodeID;
                 string chart_resp_lineIDX = chartDetailList[indexOfChartSelected].chart_respective_lineID;
 
+                    //MessageBox.Show("DELETE CHART CONT..");
                 //Deleting the content of the chart 
                 DeleteChartContent(chartidsel, chart_resp_nodeIDX, chart_resp_lineIDX);//This deletes the content of chart
 
-                ClearChart();
-                /*
-                clear chart will erase the the menustrip info of line and node so replotting it again
-                */
-                dataGridView1.Rows.Clear();
-                DataGridView_Show_Data();
-                dataGridView1.Rows.Add();
+                   // MessageBox.Show("CLEAR CHART..");
+                    ClearChart();
+                    /*
+                    clear chart will erase the the menustrip info of line and node so replotting it again
+                    */
+                   // MessageBox.Show("row clear..");
+                    dataGridView1.Rows.Clear();
+                   // MessageBox.Show("DataGridView_Show_Data..");
+                    DataGridView_Show_Data();
+                   //MessageBox.Show("row add..");
 
-                //Select the chart with was selected
-                if (chartDetailList.Count > indexOfChartSelected)
+                    dataGridView1.Rows.Add();
+                    //dataGridView1_DataBindingComplete(sender,(DataGridViewBindingCompleteEventArgs)e);
+                    ////dataGridView1.ClearSelection();
+                    ////dataGridView1.ClearSelection();
+                    //MessageBox.Show("IF >SELECTED..");
+                    //Select the chart with was selected
+                    if (chartDetailList.Count > indexOfChartSelected)
                 {
-                    //We need to select the particular index 
-                    //--I hope this will do the replotting thing as well
-                    dataGridView1.Rows[indexOfChartSelected].Selected = true;//The row is selected 
+                        //We need to select the particular index 
+                        //--I hope this will do the replotting thing as well
+                        // dataGridView1.Rows[indexOfChartSelected].Selected = true;//The row is selected 
+                     //   MessageBox.Show("indexOfChartSelected= " + indexOfChartSelected);
+                        dataGridView1.Rows[indexOfChartSelected].Selected = true;//The row is selected 
 
-                }
+                 }
 
-                //if (dataGridView1.CurrentCell.RowIndex.ToString() != "")
-                //{
-                //    //set parameters of your event args
-                //    var eventArgs = new DataGridViewCellEventArgs(1, dataGridView1.CurrentCell.RowIndex);
-                //    //or setting the selected cells manually before executing the function
-                //    //dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[dataGridView2.CurrentCell.ColumnIndex].Selected = true;
-                //    dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Selected = true;
-                //    dataGridView1_CellClick(sender, eventArgs);
-                //}
-
-
+                    //if (dataGridView1.CurrentCell.RowIndex.ToString() != "")
+                    //{
+                    //    //set parameters of your event args
+                    //    var eventArgs = new DataGridViewCellEventArgs(1, dataGridView1.CurrentCell.RowIndex);
+                    //    //or setting the selected cells manually before executing the function
+                    //    //dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[dataGridView2.CurrentCell.ColumnIndex].Selected = true;
+                    //    dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Selected = true;
+                    //    dataGridView1_CellClick(sender, eventArgs);
+                    //}
 
 
 
-            }//Close of clear chart
+
+
+                }//Close of clear chart
 
             }catch(Exception ex)
             {
@@ -13651,11 +13741,16 @@ namespace WFA_psychometric_chart
                     //} else
                     //{ 
                     //set parameters of your event args
+
+
                     var eventArgs = new DataGridViewCellEventArgs(1, 0);
                     // or setting the selected cells manually before executing the function
-              dataGridView1.Rows[0].Cells[1].Selected = true;
-             dataGridView1_CellClick(sender, eventArgs);
-                   // }
+                    dataGridView1.Rows[0].Cells[1].Selected = true;
+                    dataGridView1_CellClick(sender, eventArgs);
+
+
+
+                    // }
                 }
 
 
@@ -13710,11 +13805,21 @@ namespace WFA_psychometric_chart
                 //} else
                 //{ 
                 //set parameters of your event args
+                if(indexOfChartSelected >= 0 && indexOfChartSelected < chartDetailList.Count)
+                {
+                    var eventArgs = new DataGridViewCellEventArgs(1, indexOfChartSelected);
+                    // or setting the selected cells manually before executing the function
+                    dataGridView1.Rows[indexOfChartSelected].Cells[1].Selected = true;
+                    dataGridView1_CellClick(sender, eventArgs);
+
+                }
+                else { 
                 var eventArgs = new DataGridViewCellEventArgs(1, 0);
                 // or setting the selected cells manually before executing the function
                 dataGridView1.Rows[0].Cells[1].Selected = true;
                 dataGridView1_CellClick(sender, eventArgs);
-                // }
+                    // }
+                }
             }
 
         }
@@ -13772,6 +13877,7 @@ namespace WFA_psychometric_chart
         {
             //--This need to fire an event when the selection is done 
 
+           
 
             //dataGridView1_CellClick(sender, e);
             if (chartDetailList.Count > 0)
@@ -13782,13 +13888,25 @@ namespace WFA_psychometric_chart
                 if(cellCopy != null)
                 { 
                 if (dataGridView1.CurrentCell.ColumnIndex.ToString() != "" && dataGridView1.CurrentCell.RowIndex.ToString() != "")
-                { 
-                //set parameters of your event args
-                var eventArgs = new DataGridViewCellEventArgs(dataGridView1.CurrentCell.ColumnIndex, dataGridView1.CurrentCell.RowIndex);
-                //or setting the selected cells manually before executing the function
-                dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[dataGridView1.CurrentCell.ColumnIndex].Selected = true;
-                dataGridView1_CellClick(sender, eventArgs);
-                }
+                {
+                        //set parameters of your event args
+                        //if(dataGridView1.CurrentCell.RowIndex >=0 && dataGridView1.CurrentCell.RowIndex < chartDetailList.Count)
+                        //        { 
+                        //var eventArgs = new DataGridViewCellEventArgs(dataGridView1.CurrentCell.ColumnIndex, dataGridView1.CurrentCell.RowIndex);
+                        ////or setting the selected cells manually before executing the function
+                        //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[dataGridView1.CurrentCell.ColumnIndex].Selected = true;
+                        //dataGridView1_CellClick(sender, eventArgs);
+                        //            //MessageBox.Show("selecteion change clicked");
+                        //        }
+                        if (dataGridView1.CurrentCell.RowIndex >= 0 && dataGridView1.CurrentCell.RowIndex < chartDetailList.Count)
+                        {
+                            var eventArgs = new DataGridViewCellEventArgs(dataGridView1.CurrentCell.ColumnIndex, dataGridView1.CurrentCell.RowIndex);
+                            //or setting the selected cells manually before executing the function
+                            dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[dataGridView1.CurrentCell.ColumnIndex].Selected = true;
+                            dataGridView1_CellClick(sender, eventArgs);
+                            //MessageBox.Show("selecteion change clicked");
+                        }
+                    }
                   
                 }
                 //}catch(Exception ex)
@@ -14924,6 +15042,15 @@ namespace WFA_psychometric_chart
 
         }
 
+        //int flagDataBindingCompleteForSelection = 0;
+        private void dataGridView1_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        {
+            dataGridView1.ClearSelection();
+            //MessageBox.Show("Databinding");
+           
+           // flagDataBindingCompleteForSelection = 1;
+        }
+
 
 
 
@@ -15550,6 +15677,71 @@ namespace WFA_psychometric_chart
 
 
         }
+
+        //======================This code is for not selecting first element when binding data============================================//
+
+       
+        //=================End of binding data =============================================================//
+
     }//close of btn4
 
+
+    //==========================class==========
+
+
+    public class DataGridView_AutoSelectSuppressed : DataGridView
+    {
+        private bool SuppressAutoSelection { get; set; }
+
+        public DataGridView_AutoSelectSuppressed() : base()
+        {
+            SuppressAutoSelection = true;
+        }
+
+        public new /*shadowing*/ object DataSource
+        {
+            get
+            {
+                return base.DataSource;
+            }
+            set
+            {
+                SuppressAutoSelection = true;
+                Form parent = this.FindForm();
+
+                // Either the selection gets cleared on form load....
+                parent.Load -= parent_Load;
+                parent.Load += parent_Load;
+
+                base.DataSource = value;
+
+                // ...or it gets cleared straight after the DataSource is set
+                ClearSelectionAndResetSuppression();
+            }
+        }
+
+        protected override void OnSelectionChanged(EventArgs e)
+        {
+            if (SuppressAutoSelection)
+                return;
+
+            base.OnSelectionChanged(e);
+        }
+
+        public void ClearSelectionAndResetSuppression()
+        {
+            if (this.SelectedRows.Count > 0 || this.SelectedCells.Count > 0)
+            {
+                this.ClearSelection();
+                SuppressAutoSelection = false;
+            }
+        }
+
+        private void parent_Load(object sender, EventArgs e)
+        {
+            ClearSelectionAndResetSuppression();
+        }
+    }
+
+    //=====================================end ==============================================//
 }

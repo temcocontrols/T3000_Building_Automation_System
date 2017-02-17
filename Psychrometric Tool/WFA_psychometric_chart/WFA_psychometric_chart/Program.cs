@@ -21,6 +21,7 @@ namespace WFA_psychometric_chart
             Application.SetCompatibleTextRenderingDefault(false);
 
 
+           
             //==Before any thign lets run this code because we need language values which is set by this =================//
             Form1_main f1 = new Form1_main();
             f1.FindPathOfBuildingDBNewVersion();

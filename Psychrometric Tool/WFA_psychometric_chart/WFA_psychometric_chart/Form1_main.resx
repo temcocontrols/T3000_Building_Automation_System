@@ -1090,7 +1090,7 @@
     <value>192, 22</value>
   </data>
   <data name="quickNodeInsertToolStripMenuItem.Text" xml:space="preserve">
-    <value>Quick Node Insert</value>
+    <value>Insert Node</value>
   </data>
   <data name="insertNodeToolStripMenuItem.Enabled" type="System.Boolean, mscorlib">
     <value>False</value>
