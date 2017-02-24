@@ -1235,7 +1235,7 @@ namespace WFA_psychometric_chart
         }
 
 
-        double relativeHumidity1, relativeHumidity2, spVol1, spVol2, massFlowRate1, massFlowRate2, enthalpy1, enthalpy2, totalEnergyFlow1, totalEnergyFlow2, heatChangeForBoth;
+     public double relativeHumidity1, relativeHumidity2, spVol1, spVol2, massFlowRate1, massFlowRate2, enthalpy1, enthalpy2, totalEnergyFlow1, totalEnergyFlow2, heatChangeForBoth;
 
              
         public void EnergyParameterCalculationForTwoNodes(double node1_X_Value,double node1_Y_Value,int node1_air_flow, double node2_X_Value, double node2_Y_Value, int node2_air_flow)

@@ -19,6 +19,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.ComponentModel;
 
+using Excel = Microsoft.Office.Interop.Excel;
+
 namespace WFA_psychometric_chart
 {
     //-- this line is for com visibility...
@@ -8691,11 +8693,11 @@ namespace WFA_psychometric_chart
             {
 
                 //--Check of enable or dissable the cell click
-                if (FlagForDissableLeftAndRightClicksInChart == 1)
-                {
-                    //FlagForDissableLeftAndRightClicksInChart = 0;
-                    return;//DO not proceed forward
-                }
+                //if (FlagForDissableLeftAndRightClicksInChart == 1)
+                //{
+                //    //FlagForDissableLeftAndRightClicksInChart = 0;
+                //    return;//DO not proceed forward
+                //}
 
 
                 //we need to show context menu strip
@@ -8858,14 +8860,34 @@ namespace WFA_psychometric_chart
 
 
                 //===End of the reset the values=========// 
+                this.quickNodeInsertToolStripMenuItem.Image = null;
+                if (FlagForDissableLeftAndRightClicksInChart == 1)
+                {
+                    //FlagForDissableLeftAndRightClicksInChart = 0;
+                    CMSinsertNode.Enabled = false;
+                    string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-                //==This shows the contextmenustrip on right click
-                CMSinsertNode.Show(MousePosition);//-- this mouse position is used to show the menustrip in mouse pointer
+                    string NewDirectory = Path.GetFullPath(Path.Combine(dir, @"..\"));
+                    string file = NewDirectory + @"Database\image\lock.png";
+                    this.quickNodeInsertToolStripMenuItem.Image = Bitmap.FromFile(file);
+                   this.quickNodeInsertToolStripMenuItem.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+                   // this.quickNodeInsertToolStripMenuItem.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+                    //quickNodeInsertToolStripMenuItem.ImageAlign = 
+                    this.quickNodeInsertToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
+                    
+                    CMSinsertNode.Show(MousePosition);//-- this mouse position is used to show the menustrip in mouse pointer
 
+                    //return;//DO not proceed forward
+                }
+                else {
+                    //==This shows the contextmenustrip on right click
+                    CMSinsertNode.Enabled =true;
+                    CMSinsertNode.Show(MousePosition);//-- this mouse position is used to show the menustrip in mouse pointer
+                }
 
             }
 
-        }
+        } //close of mouse down
         public int yCoord = 0;
         public double humidityValue; //--This is universal used to calculate humidityValue
         public double temperatureValue; //--This is universal used to calculate temperatureValue
@@ -12727,13 +12749,17 @@ namespace WFA_psychometric_chart
                                     //--The value is ok 
                                     //--Now lets do the insert opeation for the data...
 
+                             
+
                                     AddOrUpdateNewRecord(name, e);
 
                                     //  MessageBox.Show("regx name");
                                     //--now lets add new rows..
                                     dataGridView1.Refresh();
-                                    //dataGridView1.Rows.Clear();//Remove the rows
-                                    // BeginInvoke(new MethodInvoker(PopulateControl));
+                            //dataGridView1.Rows.Clear();//Remove the rows
+                            // BeginInvoke(new MethodInvoker(PopulateControl));
+                            //This flag is raised so that first coloumn is not selected everytime we do update
+                            flagResistingForDGVChangeSelection = 1;//enable cell edit
                                     dataGridView1.Rows.Clear();
 
                                     //--Lets get the data and refill the data in datagridview.
@@ -12745,7 +12771,8 @@ namespace WFA_psychometric_chart
                                     DataGridView_Show_Data();//This will do both pulling data and filing the data...
 
                                     dataGridView1.Rows.Add();
-
+                            dataGridView1.CurrentCell.Selected = false;
+                          
                             //===============This one for refreshing the chart and selecting new created chart===//
 
                             //if (chartDetailList.Count > 0)
@@ -12772,9 +12799,10 @@ namespace WFA_psychometric_chart
                                 // }
                             }
 
+                            flagResistingForDGVChangeSelection = 0;//close enable of dgv_selectionChange event 
 
                             //===================end of selection of new created chart =======================//
-                            
+
 
                         }
                         else
@@ -13322,6 +13350,8 @@ namespace WFA_psychometric_chart
             cf.ShowDialog();
         }
 
+        int flagResistingForDGVChangeSelection = 0;//disENABLE;
+
         private void clearChartToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
@@ -13344,27 +13374,41 @@ namespace WFA_psychometric_chart
                 string chart_resp_nodeIDX = chartDetailList[indexOfChartSelected].chart_respective_nodeID;
                 string chart_resp_lineIDX = chartDetailList[indexOfChartSelected].chart_respective_lineID;
 
+                    flagResistingForDGVChangeSelection = 1;//ENABLE;
+
+
+
                     //MessageBox.Show("DELETE CHART CONT..");
-                //Deleting the content of the chart 
-                DeleteChartContent(chartidsel, chart_resp_nodeIDX, chart_resp_lineIDX);//This deletes the content of chart
+                    //Deleting the content of the chart 
+                    DeleteChartContent(chartidsel, chart_resp_nodeIDX, chart_resp_lineIDX);//This deletes the content of chart
 
                    // MessageBox.Show("CLEAR CHART..");
                     ClearChart();
                     /*
                     clear chart will erase the the menustrip info of line and node so replotting it again
                     */
-                   // MessageBox.Show("row clear..");
+                    // MessageBox.Show("row clear..");
+                    //dataGridView1.DataBindingComplete += this.dataGridView1_DataBindingComplete;
+                    //MessageBox.Show("");
+                   // MessageBox.Show("Before clear  =" + flagResistingForDGVChangeSelection);
+
                     dataGridView1.Rows.Clear();
                    // MessageBox.Show("DataGridView_Show_Data..");
                     DataGridView_Show_Data();
                    //MessageBox.Show("row add..");
 
                     dataGridView1.Rows.Add();
+                    //if (dataGridView1.Rows.Count > 0)
+                    //{
+                    //    dataGridView1.Rows[0].Selected = false;
+                    //}
                     //dataGridView1_DataBindingComplete(sender,(DataGridViewBindingCompleteEventArgs)e);
                     ////dataGridView1.ClearSelection();
                     ////dataGridView1.ClearSelection();
                     //MessageBox.Show("IF >SELECTED..");
                     //Select the chart with was selected
+                    dataGridView1.CurrentCell.Selected = false;
+                  
                     if (chartDetailList.Count > indexOfChartSelected)
                 {
                         //We need to select the particular index 
@@ -13375,6 +13419,7 @@ namespace WFA_psychometric_chart
 
                  }
 
+                    flagResistingForDGVChangeSelection = 0;//DISENABLE;
                     //if (dataGridView1.CurrentCell.RowIndex.ToString() != "")
                     //{
                     //    //set parameters of your event args
@@ -13865,7 +13910,7 @@ namespace WFA_psychometric_chart
                     s += reader["NAME"].ToString()+"\n";
                 }
 
-                MessageBox.Show("TABLE NAME = " + s);
+              //  MessageBox.Show("TABLE NAME = " + s);
 
    
             } //close of using statement 
@@ -13877,8 +13922,11 @@ namespace WFA_psychometric_chart
         {
             //--This need to fire an event when the selection is done 
 
-           
-
+            if (flagResistingForDGVChangeSelection == 1)
+            {
+               // MessageBox.Show("Test");
+                return;
+            }
             //dataGridView1_CellClick(sender, e);
             if (chartDetailList.Count > 0)
             {
@@ -15045,11 +15093,280 @@ namespace WFA_psychometric_chart
         //int flagDataBindingCompleteForSelection = 0;
         private void dataGridView1_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
         {
+            MessageBox.Show("ok");
             dataGridView1.ClearSelection();
             //MessageBox.Show("Databinding");
-           
+            dataGridView1.SelectionChanged -= this.dataGridView1_SelectionChanged_1;
+
            // flagDataBindingCompleteForSelection = 1;
         }
+
+        private void gridViewToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //--This grid view will call the edit node functions 
+            //This section contains the edit node section
+            try
+            {
+                EditNodeLineForm f = new EditNodeLineForm(this);
+                f.ShowDialog();//This will help to wait for second dialog to be closed first.
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+        }
+
+        private void excelExportToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            //--Lets create a function which helps to export the data 
+
+            try { 
+            ExcelExport();
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        /// <summary>
+        /// Hleps in excel export of the data 
+        /// along with the values present in it
+        /// </summary>
+    
+
+        public void ExcelExport()
+        {
+            /*
+            2 steps : 
+            1. pull the data 
+            2. convert the data 
+            3. place it in excel files
+
+            */
+            try
+            {
+                if(menuStripNodeInfoValues.Count <=0)
+                {
+                    MessageBox.Show("No data present to export");
+                }
+
+                if (chartDetailList.Count <= 0)
+                {
+                    //Do not proceed futher 
+                    MessageBox.Show("No data present to save!");
+                    return;
+                }
+
+                //excel is checked..
+                Excel.Application oApp;
+                Excel.Workbook oBook;
+                Excel.Worksheet oSheet;
+
+                oApp = new Excel.Application();
+                oBook = oApp.Workbooks.Add();
+                oSheet = (Excel.Worksheet)oBook.Worksheets.get_Item(1);
+                Cursor = Cursors.WaitCursor;
+
+                //printing the building information..
+                oSheet.Cells[1, 1] = "Node Information";//WFA_psychometric_chart.Properties.Resources.Building_Information;
+                oSheet.Cells[2, 1] = "Name";
+                oSheet.Cells[2, 2] = "Temperature Source";
+                oSheet.Cells[2, 3] = "Temperature";
+                oSheet.Cells[2, 4] = "Humidity Source";
+                oSheet.Cells[2, 5] = "Humidity";
+                oSheet.Cells[2, 6] = "Equivalent Enthalpy";
+                oSheet.Cells[2, 7] = "Color";
+                oSheet.Cells[2, 8] = "Node Size";// building_info[0].zip.ToString();  //zip doesnot exist now
+                oSheet.Cells[2, 9] = "Air Flow";
+
+                int count = 3;
+
+                for (int i = 0; i < menuStripNodeInfoValues.Count; i++)
+                {
+
+
+
+                    //for station 
+                    //--This function return humDataGridValue and enthalpyDataGridValue
+                    enthalpyHumidityCalculatorForXYvalue(menuStripNodeInfoValues[i].xVal, menuStripNodeInfoValues[i].yVal);
+
+                    //double humValReturn  =  
+                    //oSheet.Cells[count+i, 1] = "Node Information";//WFA_psychometric_chart.Properties.Resources.Building_Information;
+                    oSheet.Cells[count + i, 1] = menuStripNodeInfoValues[i].name;//dataGridView1.Rows[i].Cells[0].Value.ToString();
+                    oSheet.Cells[count + i, 2] = menuStripNodeInfoValues[i].temperature_source;//dataGridView1.Rows[i].Cells[1].Value.ToString();//"Temperature Source";
+                    oSheet.Cells[count + i, 3] = menuStripNodeInfoValues[i].xVal;//dataGridView1.Rows[i].Cells[3].Value.ToString();//"Temperature";
+
+                    oSheet.Cells[count + i, 4] = menuStripNodeInfoValues[i].humidity_source;//dataGridView1.Rows[i].Cells[4].Value.ToString();//"Humidity Source";
+                    oSheet.Cells[count + i, 5] =Math.Round( humDataGridValue,2);//dataGridView1.Rows[i].Cells[5].Value.ToString(); //"Humidity";
+                    oSheet.Cells[count + i, 6] = Math.Round(enthalpyDataGridView, 2); //dataGridView1.Rows[i].Cells[6].Value.ToString(); //"Equivalent Enthalpy";
+                    //--For color value
+                    //DataGridViewButtonCell buttonCell = (DataGridViewButtonCell)menuStripNodeInfoValues[i].colorValue;//dataGridView1.Rows[i].Cells[7];
+                    //buttonCell.FlatStyle = FlatStyle.Popup;
+                    //Color c = buttonCell.Style.BackColor;//= colorDialog1.Color;//System.Drawing.Color.Red;
+
+                    oSheet.Cells[count + i, 7] = menuStripNodeInfoValues[i].colorValue;//c.ToString();
+                    oSheet.Cells[count + i, 8] = menuStripNodeInfoValues[i].marker_Size;//dataGridView1.Rows[i].Cells[8].Value.ToString(); // building_info[0].zip.ToString();  //zip doesnot exist now
+                    oSheet.Cells[count + i, 9] = menuStripNodeInfoValues[i].airFlow;// dataGridView1.Rows[i].Cells[9].Value.ToString(); ;
+
+                } //Close of for loop
+
+                int NewLineCount = count + dataGridView1.RowCount + 2;
+
+
+                //now printing the value of historical datas..
+                oSheet.Cells[NewLineCount, 1] = "Line Information";
+
+                oSheet.Cells[NewLineCount + 1, 1] = "Line Name";
+                oSheet.Cells[NewLineCount + 1, 2] = "Start Node Name";
+                oSheet.Cells[NewLineCount + 1, 3] = "End Node Name";
+                oSheet.Cells[NewLineCount + 1, 4] = "Color";
+                oSheet.Cells[NewLineCount + 1, 5] = "Thickness";
+                oSheet.Cells[NewLineCount + 1, 6] = "Show Name";
+                oSheet.Cells[NewLineCount + 1, 7] = "DBT1";
+                oSheet.Cells[NewLineCount + 1, 8] = "RH1";
+                oSheet.Cells[NewLineCount + 1, 9] = "HR1";
+                oSheet.Cells[NewLineCount + 1, 10] = "SV1";
+
+                oSheet.Cells[NewLineCount + 1, 11] = "MFR1";
+                oSheet.Cells[NewLineCount + 1, 12] = "enthalpy1";
+                oSheet.Cells[NewLineCount + 1, 13] = "TEF1";
+                oSheet.Cells[NewLineCount + 1, 14] = "DBT2";
+                oSheet.Cells[NewLineCount + 1, 15] = "RH2";
+                oSheet.Cells[NewLineCount + 1, 16] = "HR2";
+                oSheet.Cells[NewLineCount + 1, 17] = "SV2";
+                oSheet.Cells[NewLineCount + 1, 18] = "MFR2";
+                oSheet.Cells[NewLineCount + 1, 19] = "Enthalpy2";
+                oSheet.Cells[NewLineCount + 1, 20] = "TEF2";
+                oSheet.Cells[NewLineCount + 1, 21] = "heat change";
+
+
+
+
+                //now lets print the value in loop
+                for (int i1 = 0; i1 < menuStripNodeLineInfoValues.Count; i1++)
+                {
+
+
+
+
+                    //===========================Copied here of the code=========================//
+
+
+                    string idNode1 = "", lastUpdatedDateNode1 = "", humiditySourceNode1 = "", temperatureSourceNode1 = "", nameNode1 = "";
+                    string idNode2 = "", lastUpdatedDateNode2 = "", humiditySourceNode2 = "", temperatureSourceNode2 = "", nameNode2 = "";
+                    double xValueNode1 = 0, yValueNode1 = 0;
+                    double xValueNode2 = 0, yValueNode2 = 0;
+                    int airFlowNode1 = 0, airFlowNode2 = 0;
+
+                    //--Scanning for the values
+                   
+                            string startNodeName = "";
+                            string endNodeName = "";
+                            //Now lets calculate the startNodeName and endNodeName
+                            for (int x = 0; x < menuStripNodeInfoValues.Count; x++)
+                            {
+                                if (menuStripNodeLineInfoValues[i1].prevNodeId == menuStripNodeInfoValues[x].id)
+                                {
+                                    nameNode1 = startNodeName =menuStripNodeInfoValues[x].name;
+                                    idNode1 = menuStripNodeInfoValues[x].id;
+                                    lastUpdatedDateNode1 = menuStripNodeInfoValues[x].lastUpdatedDate;
+                                    humiditySourceNode1 = menuStripNodeInfoValues[x].humidity_source;
+                                    temperatureSourceNode1 = menuStripNodeInfoValues[x].temperature_source;
+                                    //nameNode1 =
+                                    xValueNode1 = menuStripNodeInfoValues[x].xVal;
+                                    yValueNode1 = menuStripNodeInfoValues[x].yVal;
+                                    airFlowNode1 = (int)menuStripNodeInfoValues[x].airFlow;
+                                    break;
+                                }
+
+                            }
+
+                            //--This one is for end nodename
+                            for (int v = 0; v <menuStripNodeInfoValues.Count; v++)
+                            {
+                                if (menuStripNodeLineInfoValues[i1].nextNodeId ==menuStripNodeInfoValues[v].id)
+                                {
+                                    nameNode2 = endNodeName = menuStripNodeInfoValues[v].name;
+                                    idNode2 = menuStripNodeInfoValues[v].id;
+                                    lastUpdatedDateNode2 = menuStripNodeInfoValues[v].lastUpdatedDate;
+                                    humiditySourceNode2 = menuStripNodeInfoValues[v].humidity_source;
+                                    temperatureSourceNode2 = menuStripNodeInfoValues[v].temperature_source;
+                                    //nameNode1 =
+                                    xValueNode2 = menuStripNodeInfoValues[v].xVal;
+                                    yValueNode2 = menuStripNodeInfoValues[v].yVal;
+                                    airFlowNode2 = (int)menuStripNodeInfoValues[v].airFlow;
+                                    break;
+                                }
+
+                            }
+                            
+                          //--Lets make a function which returns all the other values
+                          EditNodeLineForm ed_form = new EditNodeLineForm(this);
+                    ed_form.EnergyParameterCalculationForTwoNodes(xValueNode1, yValueNode1, airFlowNode1, xValueNode2, yValueNode2, airFlowNode2);
+                    
+                    //===========================End : Copied here of the code=========================//
+
+                    
+                    oSheet.Cells[NewLineCount + 2 + i1, 1] = menuStripNodeLineInfoValues[i1].name;//dataGridView2.Rows[i].Cells[1].Value.ToString();
+                    oSheet.Cells[NewLineCount + 2 + i1, 2] = //dataGridView2.Rows[i].Cells[2].Value.ToString();//"Start Node Name";
+
+                    oSheet.Cells[NewLineCount + 2 + i1, 3] = startNodeName;//dataGridView2.Rows[i].Cells[3].Value.ToString();//"End Node Name";
+                  
+                    oSheet.Cells[NewLineCount + 2 + i1, 4] = menuStripNodeLineInfoValues[i1].lineColorValue;// col.ToString();
+                    oSheet.Cells[NewLineCount + 2 + i1, 5] = menuStripNodeLineInfoValues[i1].lineThickness;//dataGridView2.Rows[i].Cells[5].Value.ToString(); //"Thickness";
+                    //DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[i].Cells[9];
+                    
+                    oSheet.Cells[NewLineCount + 2 + i1, 6] = menuStripNodeLineInfoValues[i1].status;//status; //"Show Name";
+                    oSheet.Cells[NewLineCount + 2 + i1, 7] = xValueNode1; //dataGridView2.Rows[i].Cells[10].Value.ToString(); //"DBT1";
+                    oSheet.Cells[NewLineCount + 2 + i1, 8] = ed_form.relativeHumidity1;//dataGridView2.Rows[i].Cells[11].Value.ToString();//"RH1";
+                    oSheet.Cells[NewLineCount + 2 + i1, 9] = yValueNode1;//dataGridView2.Rows[i].Cells[12].Value.ToString(); //"HR1";
+                    oSheet.Cells[NewLineCount + 2 + i1, 10] = ed_form.spVol1; //dataGridView2.Rows[i].Cells[13].Value.ToString(); //"SV1";
+
+
+                    oSheet.Cells[NewLineCount + 2 + i1, 11] = ed_form.massFlowRate1;//dataGridView2.Rows[i].Cells[14].Value.ToString(); //"MFR1";
+                    oSheet.Cells[NewLineCount + 2 + i1, 12] = ed_form.enthalpy1;//dataGridView2.Rows[i].Cells[15].Value.ToString(); //"enthalpy1";
+
+                    oSheet.Cells[NewLineCount + 2 + i1, 13] = ed_form.totalEnergyFlow1;// dataGridView2.Rows[i].Cells[16].Value.ToString(); //"TEF1";
+                    oSheet.Cells[NewLineCount + 2 + i1, 14] = xValueNode2;//dataGridView2.Rows[i].Cells[17].Value.ToString(); //"DBT2";
+                    oSheet.Cells[NewLineCount + 2 + i1, 15] = ed_form.relativeHumidity2;//dataGridView2.Rows[i].Cells[18].Value.ToString();// "RH2";
+                    oSheet.Cells[NewLineCount + 2 + i1, 16] = yValueNode2;//dataGridView2.Rows[i].Cells[19].Value.ToString(); //"HR2";
+                    oSheet.Cells[NewLineCount + 2 + i1, 17] = ed_form.spVol2;//dataGridView2.Rows[i].Cells[20].Value.ToString(); //"SV2";
+                    oSheet.Cells[NewLineCount + 2 + i1, 18] = ed_form.massFlowRate2;//  dataGridView2.Rows[i].Cells[21].Value.ToString(); //"MFR2";
+                    oSheet.Cells[NewLineCount + 2 + i1, 19] = ed_form.enthalpy2; //dataGridView2.Rows[i].Cells[22].Value.ToString(); //"Enthalpy2";
+                    oSheet.Cells[NewLineCount + 2 + i1, 20] = ed_form.totalEnergyFlow2;// dataGridView2.Rows[i].Cells[23].Value.ToString();// "TEF2";
+                    oSheet.Cells[NewLineCount + 2 + i1, 21] = ed_form.heatChangeForBoth;//dataGridView2.Rows[i].Cells[24].Value.ToString(); //"heat change";
+
+
+                }
+
+                //now lets open the save dialog box and the save it there..
+
+                Cursor = Cursors.Default;
+                String fileName = "";
+
+                saveFD.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);// "C:";
+                saveFD.FileName = "ExcelSave";
+                saveFD.Title = Properties.Resources.Save_Excel_file_to;
+                saveFD.Filter = "Excel file|*.xls";
+                if (saveFD.ShowDialog() == DialogResult.OK)
+                {
+                    //save the file..
+                    fileName = saveFD.FileName;
+                    oBook.SaveAs(fileName);
+
+                }
+                oBook.Close();
+                oApp.Quit();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+
+
 
 
 
