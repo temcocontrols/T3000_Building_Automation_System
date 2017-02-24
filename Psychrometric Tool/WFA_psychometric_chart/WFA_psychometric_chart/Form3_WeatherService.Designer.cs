@@ -42,7 +42,7 @@
             this.tb_state = new System.Windows.Forms.TextBox();
             this.tb_country = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
+            this.lb_longitude = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -113,6 +113,10 @@
             this.tb_last_updated = new System.Windows.Forms.TextBox();
             this.tb_location = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
+            this.lb_unit_latitude = new System.Windows.Forms.Label();
+            this.lb_unit_longitude = new System.Windows.Forms.Label();
+            this.lb_unit_elevation = new System.Windows.Forms.Label();
+            this.lb_station_distance_unit = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -124,6 +128,9 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.lb_unit_elevation);
+            this.groupBox1.Controls.Add(this.lb_unit_longitude);
+            this.groupBox1.Controls.Add(this.lb_unit_latitude);
             this.groupBox1.Controls.Add(this.lb_building_name);
             this.groupBox1.Controls.Add(this.label42);
             this.groupBox1.Controls.Add(this.label40);
@@ -136,7 +143,7 @@
             this.groupBox1.Controls.Add(this.tb_state);
             this.groupBox1.Controls.Add(this.tb_country);
             this.groupBox1.Controls.Add(this.label8);
-            this.groupBox1.Controls.Add(this.label6);
+            this.groupBox1.Controls.Add(this.lb_longitude);
             this.groupBox1.Controls.Add(this.label7);
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.label3);
@@ -215,10 +222,10 @@
             resources.ApplyResources(this.label8, "label8");
             this.label8.Name = "label8";
             // 
-            // label6
+            // lb_longitude
             // 
-            resources.ApplyResources(this.label6, "label6");
-            this.label6.Name = "label6";
+            resources.ApplyResources(this.lb_longitude, "lb_longitude");
+            this.lb_longitude.Name = "lb_longitude";
             // 
             // label7
             // 
@@ -344,6 +351,7 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.lb_station_distance_unit);
             this.groupBox3.Controls.Add(this.groupBox7);
             this.groupBox3.Controls.Add(this.tb_station_distance);
             this.groupBox3.Controls.Add(this.label37);
@@ -674,6 +682,26 @@
             resources.ApplyResources(this.label15, "label15");
             this.label15.Name = "label15";
             // 
+            // lb_unit_latitude
+            // 
+            resources.ApplyResources(this.lb_unit_latitude, "lb_unit_latitude");
+            this.lb_unit_latitude.Name = "lb_unit_latitude";
+            // 
+            // lb_unit_longitude
+            // 
+            resources.ApplyResources(this.lb_unit_longitude, "lb_unit_longitude");
+            this.lb_unit_longitude.Name = "lb_unit_longitude";
+            // 
+            // lb_unit_elevation
+            // 
+            resources.ApplyResources(this.lb_unit_elevation, "lb_unit_elevation");
+            this.lb_unit_elevation.Name = "lb_unit_elevation";
+            // 
+            // lb_station_distance_unit
+            // 
+            resources.ApplyResources(this.lb_station_distance_unit, "lb_station_distance_unit");
+            this.lb_station_distance_unit.Name = "lb_station_distance_unit";
+            // 
             // Form3_WeatherService
             // 
             resources.ApplyResources(this, "$this");
@@ -716,7 +744,7 @@
         private System.Windows.Forms.TextBox tb_country;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label lb_longitude;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
@@ -790,5 +818,9 @@
         private System.Windows.Forms.Label label43;
         private System.Windows.Forms.Label lb_device_status;
         private System.Windows.Forms.Label label44;
+        private System.Windows.Forms.Label lb_unit_elevation;
+        private System.Windows.Forms.Label lb_unit_longitude;
+        private System.Windows.Forms.Label lb_unit_latitude;
+        private System.Windows.Forms.Label lb_station_distance_unit;
     }
 }

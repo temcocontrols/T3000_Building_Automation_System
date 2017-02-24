@@ -850,9 +850,9 @@ namespace WFA_psychometric_chart
                             tb_location.Text = reader["location"].ToString();
                            // tb_distance_from_build.Text = Math.Round(double.Parse(reader["distance_from_building"].ToString()), 2).ToString();
                             tb_last_updated.Text = reader["last_update_date"].ToString();
-                            tb_cw_temp.Text = reader["temp"].ToString();
-                            tb_cw_hum.Text = reader["humidity"].ToString();
-                            tb_cw_barometer_value.Text = reader["bar_pressure"].ToString();
+                            tb_cw_temp.Text = Math.Round(double.Parse( reader["temp"].ToString()),2).ToString();
+                            tb_cw_hum.Text = Math.Round(double.Parse(reader["humidity"].ToString()), 2).ToString();
+                            tb_cw_barometer_value.Text = Math.Round(double.Parse(reader["bar_pressure"].ToString()),2).ToString();
                             tb_cw_wind.Text = reader["wind"].ToString();
                             tb_cw_direction.Text = reader["direction"].ToString();
                             tb_station_name.Text = reader["station_name"].ToString();
@@ -1148,7 +1148,7 @@ namespace WFA_psychometric_chart
                                 double a = Math.Pow((Math.Sin(dlat / 2)), 2) + Math.Cos(lat_val) * Math.Cos(double.Parse(lat_pulled.ToString())) * Math.Pow((Math.Sin(dlon / 2)), 2);
                                 double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
                                 d = R * c;//This is the distance
-                                loc_value = country_name_pulled + "," + city_name_pulled;
+                                loc_value = country_name_pulled + "," + city_name_pulled;//Km   
                                 //lets check a simple thing if the index is pressent then update else insert the data...
 
                                 /*steps.. count the number of items in a column 
@@ -2764,6 +2764,7 @@ namespace WFA_psychometric_chart
                         */
                         Form1_main f = new Form1_main();
                         string path_to_alexdb = f.PathToT3000BuildingDB;// PathToT3000BuildingDB;
+
                         ReadDataFromAlexDatabase("INPUTable");
 
 
@@ -3121,7 +3122,7 @@ namespace WFA_psychometric_chart
             string againDbPath = @"Data Source=" + newPath + "" + BuildingSelected[0].Building_Path;
 
 
-            // MessageBox.Show("aLEX DB PATH : INPUTable New path : " + againDbPath+"\n db name  = "+TableName);
+            //MessageBox.Show("aLEX DB PATH : INPUTable New path : " + againDbPath+"\n db name  = "+TableName);
             // bool returnValue = false;
             //string latValue = "";
             using (SQLiteConnection connection = new SQLiteConnection(againDbPath))

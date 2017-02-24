@@ -78,30 +78,6 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="PacketDotNet.dll" size="196608">
-      <assemblyIdentity name="PacketDotNet" version="0.13.0.0" language="neutral" processorArchitecture="msil" />
-      <hash>
-        <dsig:Transforms>
-          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
-        </dsig:Transforms>
-        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>H/mpDwTG1ejOcY6yoEf5gMdAdUYueqG54XKz8blVvxU=</dsig:DigestValue>
-      </hash>
-    </dependentAssembly>
-  </dependency>
-  <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="SharpPcap.dll" size="72704">
-      <assemblyIdentity name="SharpPcap" version="4.2.0.0" language="neutral" processorArchitecture="msil" />
-      <hash>
-        <dsig:Transforms>
-          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
-        </dsig:Transforms>
-        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>koLMf7cKd0YuEY0gpQpcvtqG9vt3f83iqNTzi1ZWpZI=</dsig:DigestValue>
-      </hash>
-    </dependentAssembly>
-  </dependency>
-  <dependency>
     <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="System.Data.SQLite.dll" size="301056">
       <assemblyIdentity name="System.Data.SQLite" version="1.0.101.0" publicKeyToken="DB937BC2D44FF139" language="neutral" processorArchitecture="msil" />
       <hash>
@@ -145,7 +121,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>K6KIj6KGrripYOPSGsDhH+C8P+YUsSJbtDehu43+8xs=</dsig:DigestValue>
+        <dsig:DigestValue>pk7VBWboDFbCmbS1i79q6OooSdRR6gt5J9ybm760NlI=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -157,7 +133,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>hQii9D67/I2CY2ow/WzvhmqtmvlnyJPC3LsWb5nndB4=</dsig:DigestValue>
+        <dsig:DigestValue>67QP3lU8eAoxBDGm0xqqZrkstpKrPxnGcmWdWyd9jV4=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -169,7 +145,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>nRVu6Zjya8smljyzTOLs6+wqFE2WkX0ir1s4hwfx5+I=</dsig:DigestValue>
+        <dsig:DigestValue>Cy02pRfPm2YNQwf54K+AN/ElaaWQ8pKeNAkz1qaap9s=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -181,7 +157,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>6IupnOYDiGRlXeHfxnmp5wn3HANPZLLZqriy3OIAOyo=</dsig:DigestValue>
+        <dsig:DigestValue>HJa5l1ZfBeLmAZC9z1X5s74wjCAzKzdr+0rmIklw6bo=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
