@@ -1,14 +1,42 @@
 T3000 Release  History
+ver 2017.03.02
+1>Show Modbus ID for Tstat
+2>Input,output ,variables,and other views can support to see at the same
+time .
+3>Modbus Tool updated ,it is more easier to use .
+4>ISPTool updated. to make it support more products ,
+      TSTAT8_WIFI
+      TSTAT8_OCC
+      TSTAT7_ARM
+      TSTAT8_220V
 
+ver 2016.12.30
+1>Updated T3000 UI
+2>Updated Custom Devices
+3>Updated HUM
+4>Updated Flash Config file
+ver 2016.11.22
+1>Building config
+2>Schedule Tstat
+3>Slider
+ver 2016.11.21
+Fixed the issues compiling ,using VS2015.
+ver 2016.11.18
+1>Updated Multi-flash .
+2>Updated"About T3000"
+3>Updated Modbus Poll
+ver 2016.11.17
+Fixed the bug ,when scan finish ,nothing to show .T3000 crash .
 Ver 2016.11.16
 1.Fixed the bug that when scaning all devices,db broken .
 2.Updated the About(Version,Check for Updates)
-  
+3.Updated HUM for PID and Tranducer
 Ver 2016.11.15
 1.Migrated access database to sqlite database.
 2.Updated help system.
 3.Updated CO2 Sensor.
 4.Input/Output in DB.
+ 
 
 
 Ver2016.11.7
@@ -545,7 +573,7 @@ Ver 2013.20,date released:2013-9-22
 1>to show NC's MAC Address
 2>Change ISPTool some tips
 "Hex file matches the chip. "
-"Hex file doesn°Øt match the chip. "
+"Hex file doesn‚Äôt match the chip. "
 "Begin Time" -> Change to "Start time"
 *************************************************************************************
 
@@ -722,7 +750,7 @@ ver2.5.0.106, date released: 2013/1/18
 <4>Add the "Freeze Function" in the Advanced Setup
 <5>remove the column of Rotation in output table.
 <6>Fix "Save as.." the register list of The Tstat5E and 5C
-<7>°∞Database°±, the Exit botton and Delete botton 
+<7>‚ÄúDatabase‚Äù, the Exit botton and Delete botton 
 <8>Fix the out table 
 <9>Change "NC Config"->"Apply" botton.
 <10> Change the setting of "Fan Model" 
@@ -735,8 +763,8 @@ ver2.5.0.104, date released: 2013/1/5
 *************************************************************************************
 <1>Fix the error that input1 can input value, in the Advanced Model line "Input value" 
 <2>Add the reminder of PID2 Off Setpoint "Input value" 
-   if >=100 °∞out of range°± ,if can°Øt fail to write to the 275 register ,
-   °±please try again.°±If write sucessfully,°±Write ok°±
+   if >=100 ‚Äúout of range‚Äù ,if can‚Äôt fail to write to the 275 register ,
+   ‚Äùplease try again.‚ÄùIf write sucessfully,‚ÄùWrite ok‚Äù
 <3>Keep the steps both Heating Set Point and the set Bars in the first page.
  
 *************************************************************************************
@@ -822,7 +850,7 @@ ver2.5.0.93, date released:2012-10-15
 
 ver2.5.0.92, date released:2012-10-8
 *************************************************************************************
-(1)fixed "value for °∞PID2 off set point°± shows wrong and not auto updated"for TSTAT5G
+(1)fixed "value for ‚ÄúPID2 off set point‚Äù shows wrong and not auto updated"for TSTAT5G
 (2)fixed Output Table-Out6 and Out7 
 *************************************************************************************
 
@@ -848,7 +876,7 @@ ver2.5.0.89, date released:2012-9-14
 *************************************************************************************
 Update TSTAT5G
 Update item:
-(1)Input value°± for Loop2.
+(1)Input value‚Äù for Loop2.
 (2)fixed deadband and night setpoint.
 *************************************************************************************
 
