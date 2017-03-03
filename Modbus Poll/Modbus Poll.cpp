@@ -65,6 +65,10 @@
 //#include "global_variable_extern.h"
 //#include "globle_Function.h"
 //#include "ModbusDllforVC.h"
+#include <objbase.h>
+#include <initguid.h>
+#include <Setupapi.h>
+ 
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -232,6 +236,7 @@ BOOL CModbusPollApp::InitInstance()
 	if (!ProcessShellCommand(cmdInfo))
 		return FALSE;
 	// The main window has been initialized, so show and update it
+
 	pMainFrame->ShowWindow(m_nCmdShow);
 	pMainFrame->UpdateWindow();
  

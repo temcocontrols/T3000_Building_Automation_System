@@ -59,10 +59,15 @@ public:
 	void Unreg_Hotkey();
 	static	DWORD WINAPI  Readmonitorthreadfun(LPVOID lpVoid);
 	afx_msg LRESULT OnHotKey(WPARAM wParam,LPARAM lParam);
+	void Reset_Monitor_Rect();
+	void OnSize(UINT nType, int cx, int cy);
+	void OnSysCommand(UINT nID, LPARAM lParam);
+	bool window_max; // 标记是否已经最大化;
 	int read_type;
 
-
-
+	CString flash_ctring;
+	unsigned int flash_count;
+	unsigned int flash_step;//闪烁的颜色控制;
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 	void Check_New_DB();
 };

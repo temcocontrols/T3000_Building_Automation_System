@@ -3556,18 +3556,24 @@ void CTStatScanner::Initial_Scan_Info()
 
     temp_scan_info.scan_com_port = 0;
     temp_scan_info.scan_mode = SCAN_BY_REMOTE_IP;
-    if(current_building_protocol == P_REMOTE_DEVICE)
-    {
-        temp_scan_info.scan_skip = false;
-        temp_scan_info.scan_status = SCAN_STATUS_WAIT;
-        temp_scan_info.scan_baudrate = current_building_baudrate;
-    }
-    else
-    {
-        temp_scan_info.scan_skip = true;
-       temp_scan_info.scan_status = SCAN_STATUS_SKIP;
-        temp_scan_info.scan_baudrate = 0;
-    }
+	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	//pFrame->m_CurSubBuldingInfo.
+	if(b_remote_connection)
+	{
+		//if(current_building_protocol == P_REMOTE_DEVICE)
+		//{
+			temp_scan_info.scan_skip = false;
+			temp_scan_info.scan_status = SCAN_STATUS_WAIT;
+			temp_scan_info.scan_baudrate = current_building_baudrate;
+		//}
+		//else
+		//{
+		//	temp_scan_info.scan_skip = true;
+		//	temp_scan_info.scan_status = SCAN_STATUS_SKIP;
+		//	temp_scan_info.scan_baudrate = 0;
+		//}
+	}
+
 
     temp_scan_info.scan_found = 0;
 
@@ -4102,19 +4108,19 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
     }
 
     int ready_to_read_count = 0;
-    for (int j=0; j<5; j++)
+    for (int j=0; j<10; j++)
     {
         Send_WhoIs_remote_ip(Remote_IP_Address);
         Sleep(2000);
         ready_to_read_count =	m_bac_scan_com_data.size();
 
 
-        strInfo.Format(_T("Scan  Remote device.Found device"));
+        strInfo.Format(_T("Scan  Remote device.(%d+1)"),j);
         Show_Scan_Data(strInfo,scan_remote_ip_item);
         if(ready_to_read_count == 0)
         {
-            strInfo.Format(_T("No remote device response!"));
-            Show_Scan_Data(strInfo,scan_remote_ip_item);
+            //strInfo.Format(_T("No remote device response!"));
+            //Show_Scan_Data(strInfo,scan_remote_ip_item);
             continue;
         }
         //DFTrace(strInfo);
@@ -4171,6 +4177,8 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
         }
         return 0;
     }
+	 m_scan_info.at(scan_remote_ip_item).scan_found = m_bac_scan_result_data.size();
+	  Show_Scan_Data(_T("Found remote device."),scan_remote_ip_item);
 
     CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
     //unsigned int temp_serial_number = pFrame->m_product.at(selected_product_index).serial_number;//以序列号的文件名保存;
@@ -4622,10 +4630,14 @@ void Show_Scan_Data(LPCTSTR nstrInfo ,unsigned int nitem)
     char temp_char[250];
     WideCharToMultiByte( CP_ACP, 0, strInfo.GetBuffer(), -1, temp_char, 250, NULL, NULL );
     memcpy(m_scan_info.at(nitem).scan_notes,temp_char,250);
-    //strInfo.Format(_T("Try to send command to "));
-    //strInfo = strInfo + m_str_curBuilding_Domain_IP;
-    //memset(m_scan_info.at(scan_remote_ip_item).scan_notes,0,250);
-    //char temp_char[250];
-    //WideCharToMultiByte( CP_ACP, 0, strInfo.GetBuffer(), -1, temp_char, 250, NULL, NULL );
-    //memcpy(m_scan_info.at(scan_remote_ip_item).scan_notes,temp_char,250);
+	if(b_remote_connection)
+	{
+		//strInfo.Format(_T("Try to send command to "));
+		//strInfo = strInfo + m_str_curBuilding_Domain_IP;
+		memset(m_scan_info.at(scan_remote_ip_item).scan_notes,0,250);
+		char temp_char[250];
+		WideCharToMultiByte( CP_ACP, 0, strInfo.GetBuffer(), -1, temp_char, 250, NULL, NULL );
+		memcpy(m_scan_info.at(scan_remote_ip_item).scan_notes,temp_char,250);
+	}
+
 }

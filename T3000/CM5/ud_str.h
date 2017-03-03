@@ -57,16 +57,21 @@ typedef enum {
 		 READANNUALSCHEDULE_T3000  = ENUM_AR_DATA+1,    /* read annual schedule*/
 		 READPROGRAMCODE_T3000     = 16,           /* read program code   */
 		 READGROUPELEMENTS_T3000   = 19,           /* read group elements */
-		 READPOINTINFOTABLE_T3000  = 24,           /* read pointinfo table*/
-		
-		 READMONITORDATA_T3000     = 22,           /* read monitor data   */
+
+	
+
 		 READINDIVIDUALPOINT_T3000 = 20,           /* read individual point*/
-		 READGROUPELEMENT_T3000    = 25,           /* read point info      */
 		 TIME_COMMAND              = 21,           /* read time            */
+		 READMONITORDATA_T3000     = 22,           /* read monitor data   */
+		 READPOINTINFOTABLE_T3000  = 24,           /* read pointinfo table*/
+		 READGROUPELEMENT_T3000    = 25,           /* read point info      */
+
 		 CLEARPANEL_T3000          = 28,           /* clear panel          */
 		 SEND_ALARM_COMMAND        = 32,
 		 READTSTAT_T3000		   = 33,
 		 READANALOG_CUS_TABLE_T3000    = 34,           /* read monitor updates*/
+		 READVARUNIT_T3000			= 36,
+		 READEXT_IO_T3000			= 37,
 		 READ_REMOTE_POINT         = 40,
 
 
@@ -93,20 +98,7 @@ typedef enum {
 		 COMMAND_50                = 50,
 		 READ_COMMAND_50           = 50,
 		 WRITE_COMMAND_50          = 150,
-		 STATION_LIST_COMMAND      = 21,
-		 SAVEPROGRAM_COMMAND       = 30,
-		 LOADPROGRAM_COMMAND       = 31,
-		 DEFAULT_PRG_COMMAND       = 32, 
-
-
-
-		 ALARM_NOTIFY_COMMAND       = 51,
-		 SEND_INFO_COMMAND          = 52,
-		 SEND_WANTPOINTS_COMMAND    = 72,
-		 SEND_NETWORKPOINTS_COMMAND = 73,
-
-
-		 TABLEPOINTS_COMMAND       = 75,
+		 
 
 		 READ_AT_COMMAND			= 90,	//450 length
 		 READ_GRPHIC_LABEL_COMMAND  = 91,
@@ -128,6 +120,8 @@ typedef enum {
 		 RESTARTMINI_COMMAND       = 121,
 		 WRITEPRGFLASH_COMMAND     = 122,
 		 WRITEANALOG_CUS_TABLE_T3000	       = 134,
+		 WRITEVARUNIT_T3000			= 136,
+		 WRITEEXT_IO_T3000			= 137,
 		 WRITE_REMOTE_POINT         = 140,
 		 WRITE_AT_COMMAND			= 190,	//100 length
 		 WRITE_GRPHIC_LABEL_COMMAND  = 191,
@@ -181,9 +175,30 @@ typedef enum {
 
 #pragma pack(push) //±£´æ¶ÔÆë×´Ì¬ 
 #pragma pack(1)
+
+typedef union
+{
+		uint8_t all[30];
+		struct
+		{
+			uint8_t product_id;
+			uint8_t port;  //0 sub     1->zigbee      2->main
+			uint8_t modbus_id;
+			unsigned int last_contact_time;
+			uint8_t input_start;
+			uint8_t input_end;
+			uint8_t output_start;
+			uint8_t output_end;
+			unsigned int serialnumber;
+			char reserved_reg[15];
+		}reg;
+}Str_Extio_point;
+
 typedef struct
 {
-	int8_t description[STR_OUT_DESCRIPTION_LENGTH]; 	       /* (21 bytes; string)*/
+	int8_t description[STR_OUT_DESCRIPTION_LENGTH-2]; 	       /* (21 bytes; string)*/
+	uint8_t low_voltage;
+	uint8_t high_voltage;
 	int8_t label[STR_OUT_LABEL];		       /* (9 bytes; string)*/
 
 	int32_t value;		       /* (4 bytes; int32_t) */
@@ -203,6 +218,10 @@ typedef struct
 	uint8_t pwm_period;
 } Str_out_point;  /* 21+9+4+2+2+2 = 40 */
 
+typedef struct
+{
+	int8_t variable_cus_unite[20]; 	       /* (21 bytes; string)*/
+} Str_variable_uint_point;  /* 21+9+4+2+2+2 = 40 */
 
 typedef  struct
 {

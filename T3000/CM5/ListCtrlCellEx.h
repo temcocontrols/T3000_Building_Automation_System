@@ -53,7 +53,7 @@ namespace ListCtrlEx
 			UINT uiResourceID, int iRowIndex, int iColumnIndex,
 			CString& strValidChars, CString& rstrCurSelection);
 		virtual BOOL PreTranslateMessage(MSG* pMsg);
-
+		void SetEditLimit(int ncount);
 	protected:	
 		// Generated message map functions
 		//{{AFX_MSG(CInPlaceEdit)
@@ -78,7 +78,7 @@ namespace ListCtrlEx
 		CString m_strWindowText;
 		// To indicate whether ESC key was pressed
 		BOOL m_bESC;
-		
+		int m_charlimit;
 	};
 
 	//////////////////////////////////////////////////////////////////////////

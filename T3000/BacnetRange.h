@@ -40,6 +40,7 @@ public:
 	CStatic m_rang_pic;
 	void Timer2_handle();
 	afx_msg void OnBnClickedBtnEditCustomerRange();
+	afx_msg void OnBnClickedBtnEditCustomerVarRange();
 };
 
 const CString Range_Type[] =

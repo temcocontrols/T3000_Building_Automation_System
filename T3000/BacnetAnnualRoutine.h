@@ -38,6 +38,11 @@ public:
 	afx_msg void OnNMDblclkListAnnuleList(NMHDR *pNMHDR, LRESULT *pResult);
 
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
+	void Reset_Annual_Rect();
+	void OnSize(UINT nType, int cx, int cy);
+	void OnSysCommand(UINT nID, LPARAM lParam);
+
+	bool window_max; // 标记是否已经最大化;
 	//afx_msg LRESULT AnnualResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
 };
 

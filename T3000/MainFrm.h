@@ -55,7 +55,8 @@ const int DLG_DIALOG_CUSTOM_VIEW = 24;
 const int DLG_DIALOG_TSTAT_INPUT_VIEW=25;
 const int DLG_DIALOG_TSTAT_OUTPUT_VIEW = 26;
 const int DLG_DIALOG_BOATMONITOR = 27;
-const int NUMVIEWS = 28;
+const int DLG_DIALOG_BTUMETER = 28;
+const int NUMVIEWS = 29;
 
 
 extern int g_gloab_bac_comport;
@@ -300,6 +301,7 @@ protected:
 
 public:
 	BOOL  CheckDeviceStatus(int refresh_com);
+	void  CheckDuplicate();
 	//void	SaveBacnetConfigFile();
 	//void	LoadBacnetConfigFile();
 	void  Show_Wait_Dialog_And_SendConfigMessage();
@@ -465,7 +467,7 @@ public:
 	afx_msg void OnControlAlarmLog();
 	afx_msg void OnMenuCheckupdate();
 /*	afx_msg void OnDatabasePv();*/
-	afx_msg void OnControlTstat();
+	afx_msg void OnControlRemotePoint();
 
     afx_msg void OnUpdateConnect2(CCmdUI *pCmdUI);
     afx_msg void OnUpdateDisconnect2(CCmdUI *pCmdUI);
@@ -505,6 +507,7 @@ public:
 public:
 	void Create_Thread_Read_Item(int n_item);
 	void Check_Local_TemcoUpdate();
+	void Reset_Window_Pos();
     BOOL DownloadFromFTP();
 	static void CALLBACK _OnStatusCallBack(HINTERNET hInternet, DWORD dwContext, DWORD dwInternetStatus, 
 		LPVOID lpvStatusInformation, DWORD dwStatusInformationLength);
@@ -549,4 +552,6 @@ public:
 		afx_msg void OnHelpUsingUpdate();
 		afx_msg void OnToolsPsychrometry();
 		afx_msg void OnToolsOption();
+		afx_msg void OnSize(UINT nType, int cx, int cy);
+		void HideBacnetWindow();
 };

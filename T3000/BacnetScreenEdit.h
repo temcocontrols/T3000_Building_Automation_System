@@ -29,7 +29,6 @@ public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual BOOL OnInitDialog();
 
-	void UpdateT3000Database();
 	bool UpdateDeviceLabelFlash();
 
 	void InitGraphic(int nSerialNum,int nInstanceID,unsigned char screen_number);
@@ -50,7 +49,7 @@ public:
 	vector<CRelayLabel> m_labelCtrlLst;
 	CString m_strImgPathName;
 	CString m_strScreenName;
-	int m_nSerialNumber;
+	unsigned int m_nSerialNumber;
 	int m_nTstatID;
 	int m_InstanceID;
 	unsigned short m_Mac;
@@ -73,7 +72,6 @@ public:
 	afx_msg void OnBnClickedButtonAdd();
 	afx_msg void OnBnClickedButtonScreenExit();
 	afx_msg void OnBnClickedButtonDelete();
-	afx_msg void OnBnClickedButtonDeleteAll();
 	void AddLabel(unsigned char point_type,uint8_t point_number,uint8_t main_panel,uint8_t sub_panel,unsigned int point_x,unsigned int point_y);
 	void SaveBacLabel(int nItem);
 

@@ -81,7 +81,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>setupapi.lib;$(SolutionDir)SQLiteDriver\sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>setupapi.lib;$(SolutionDir)SQLiteDriver\sqlite3.lib;MultipleMonthCal32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\T3000 Output\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -115,7 +115,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>setupapi.lib.;$(SolutionDir)SQLiteDriver\sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>setupapi.lib.;$(SolutionDir)SQLiteDriver\sqlite3.lib;MultipleMonthCal32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\T3000 Output\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -151,6 +151,7 @@
     <ClCompile Include="BacnetGraphic.cpp" />
     <ClCompile Include="BacnetGraphicSetting.cpp" />
     <ClCompile Include="BacnetInput.cpp" />
+    <ClCompile Include="BacnetIOConfig.cpp" />
     <ClCompile Include="BacnetMessageInput.cpp" />
     <ClCompile Include="BacnetMonitor.cpp" />
     <ClCompile Include="BacnetOutput.cpp" />
@@ -170,6 +171,7 @@
     <ClCompile Include="BacnetTstat.cpp" />
     <ClCompile Include="BacnetUserConfig.cpp" />
     <ClCompile Include="BacnetUserlogin.cpp" />
+    <ClCompile Include="BacnetVarCusRang.cpp" />
     <ClCompile Include="BacnetVariable.cpp" />
     <ClCompile Include="BacnetWait.cpp" />
     <ClCompile Include="BacnetWeeklyRoutine.cpp" />
@@ -390,11 +392,14 @@
     <None Include="res\coldtool.bmp" />
     <None Include="res\default view.bmp" />
     <None Include="res\default view.jpg" />
+    <None Include="res\default_icon\Alarms.ico" />
+    <None Include="res\default_icon\Configuration.ico" />
     <None Include="res\default_icon\Graphics.ico" />
     <None Include="res\default_icon\Holidays.ico" />
     <None Include="res\default_icon\outputs.ico" />
     <None Include="res\default_icon\PID.ico" />
     <None Include="res\default_icon\Programs.ico" />
+    <None Include="res\default_icon\RemotePoints.ico" />
     <None Include="res\default_icon\schedual.ico" />
     <None Include="res\default_icon\TrendLogs.ico" />
     <None Include="res\default_icon\Variables.ico" />
@@ -405,6 +410,12 @@
     <None Include="res\Input_Icon_Default.ico" />
     <None Include="res\LCD Table Button.bmp" />
     <None Include="res\LED Table Button.bmp" />
+    <None Include="res\loading_icon\Step1.ico" />
+    <None Include="res\loading_icon\Step2.ico" />
+    <None Include="res\loading_icon\Step3.ico" />
+    <None Include="res\loading_icon\Step4.ico" />
+    <None Include="res\loading_icon\Step5.ico" />
+    <None Include="res\loading_icon\Step6.ico" />
     <None Include="res\lock.ico" />
     <None Include="res\Login" />
     <None Include="res\Login.bmp" />
@@ -433,7 +444,6 @@
     <None Include="res\Select.ico" />
     <None Include="res\serialnum.ico" />
     <None Include="C:\Documents and Settings\lee\桌面\serialnum.ico" />
-    <None Include="res\sqlite3.dll" />
     <None Include="res\switch_off.ico" />
     <None Include="res\switch_on.ico" />
     <None Include="res\T3000.db" />
@@ -478,6 +488,7 @@
     <ClInclude Include="BacnetGraphic.h" />
     <ClInclude Include="BacnetGraphicSetting.h" />
     <ClInclude Include="BacnetInput.h" />
+    <ClInclude Include="BacnetIOConfig.h" />
     <ClInclude Include="BacnetMessageInput.h" />
     <ClInclude Include="BacnetOutput.h" />
     <ClInclude Include="BacnetProgram.h" />
@@ -494,6 +505,7 @@
     <ClInclude Include="BacnetTstat.h" />
     <ClInclude Include="BacnetUserConfig.h" />
     <ClInclude Include="BacnetUserlogin.h" />
+    <ClInclude Include="BacnetVarCusRang.h" />
     <ClInclude Include="BacnetVariable.h" />
     <ClInclude Include="BacnetWait.h" />
     <ClInclude Include="Bacnet_Include.h" />
@@ -574,6 +586,7 @@
     <ClInclude Include="ISPModeSlove.h" />
     <ClInclude Include="LanguageLocale.h" />
     <ClInclude Include="LCOutNameConfig.h" />
+    <ClInclude Include="Modbus_LIB.h" />
     <ClInclude Include="NewHumChamberView.h" />
     <ClInclude Include="NewTstatSchedulesDlg.h" />
     <ClInclude Include="OXBitmapButton.h" />
@@ -706,6 +719,9 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="T3000.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\SQLiteDriver\sqlite3.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

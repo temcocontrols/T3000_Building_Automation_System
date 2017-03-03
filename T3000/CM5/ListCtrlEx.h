@@ -123,6 +123,8 @@ namespace ListCtrlEx
 			
 		};
 
+		typedef map<int, int> ColLimitMap; // column to column type
+
 		typedef CellType ColumnType;
 		typedef map<int, ColumnType> ColMap; // column to column type
 		typedef pair<int, int> CellIndex; // row, column
@@ -156,7 +158,8 @@ namespace ListCtrlEx
 		void				Set_Selected_Item(int nRAW,int nCol);
 		void				Get_Selected_Item(int &my_select_raw,int &my_select_col);
 		void				SetWhetherShowBkCol(bool nshow=true);
-
+		void				SetListHwnd(HWND n_hwnd);
+		HWND				GetListHwnd();
 		void				Set_My_WindowRect(CRect nRect);
 		void				Set_My_ListRect(CRect nRect);
 		//POINT				Get_clicked_mouse_position(int nRAW,int nCol);
@@ -169,6 +172,10 @@ namespace ListCtrlEx
 		BOOL				GetColRect(int nCol, CRect &rcCol);
 		int					GetColumnCount() { return GetHeaderCtrl()->GetItemCount(); }
 		int					GetRowCount() { return GetItemCount(); }
+
+		int CListCtrlEx::GetColumnLimitChar(int nColIndex);
+		void CListCtrlEx::SetColumnLimitChar(int nColIndex, int nlimitchar);
+		void CListCtrlEx::Setlistcolcharlimit(unsigned char ncol,unsigned char nlimitchar);
 
 		ColumnType	GetColumnType(int nColIndex);
 		void				SetColumnType(int nColIndex, ColumnType eColType);
@@ -254,6 +261,7 @@ namespace ListCtrlEx
 		CellData&		FindCellData(CellIndex ix);
 		CellData&		FindCellData(int nRow, int nCol);
 		CellDataMap	m_mapCell2Data;
+		ColLimitMap     m_limit_char;
 		ColMap			m_mapCol2ColType;
 		DWORD			m_dwEditStyle;
 		DWORD			m_dwComboStyle;
@@ -270,6 +278,7 @@ namespace ListCtrlEx
 		bool			m_support_key;
 		bool			m_support_col0_edit;  //第0列是否允许编辑.默认是不许编辑;
 		int m_nItemHeight;
+		HWND			m_window_hwnd; //用于记录每个表格自己要回传的Hwnd;
 	protected:
 		struct _ColumnSort_t
 		{

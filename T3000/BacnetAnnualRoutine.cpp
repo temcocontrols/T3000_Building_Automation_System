@@ -22,6 +22,7 @@ BacnetAnnualRoutine::BacnetAnnualRoutine(CWnd* pParent /*=NULL*/)
 	: CDialogEx(BacnetAnnualRoutine::IDD, pParent)
 {
 	annual_list_line = 0;
+	window_max = true;
 }
 
 BacnetAnnualRoutine::~BacnetAnnualRoutine()
@@ -47,6 +48,8 @@ BEGIN_MESSAGE_MAP(BacnetAnnualRoutine, CDialogEx)
 //	ON_MESSAGE(MY_RESUME_DATA, AnnualResumeMessageCallBack)
 	ON_WM_HELPINFO()
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST_BAC_ANNULE_LIST, &BacnetAnnualRoutine::OnNMDblclkListAnnuleList)
+	ON_WM_SIZE()
+	ON_WM_SYSCOMMAND()
 END_MESSAGE_MAP()
 
 
@@ -103,6 +106,25 @@ BOOL BacnetAnnualRoutine::PreTranslateMessage(MSG* pMsg)
 		m_annualr_list.Get_clicked_mouse_position();
 		return TRUE;
 	}
+	else if(pMsg->message==WM_NCLBUTTONDBLCLK)
+	{
+		if(!window_max)
+		{
+			window_max = true;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
+		}
+		else
+		{
+			window_max = false;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 120 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
+		}
+
+		return 1; 
+	}
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -124,9 +146,11 @@ LRESULT BacnetAnnualRoutine::OnHotKey(WPARAM wParam,LPARAM lParam)
 BOOL BacnetAnnualRoutine::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-
+	SetWindowTextW(_T("HOLIDAY"));
 	// TODO:  Add extra initialization here
 	Initial_List();
+	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_HOLIDAY);
+	SetIcon(m_hIcon,TRUE);
 //	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);
 	PostMessage(WM_REFRESH_BAC_ANNUAL_LIST,NULL,NULL);
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
@@ -147,8 +171,14 @@ void BacnetAnnualRoutine::Initial_List()
 	m_annualr_list.InsertColumn(ANNUAL_ROUTINE_AUTO_MANUAL, _T("Auto/Manual"), 90, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_annualr_list.InsertColumn(ANNUAL_ROUTINE_VALUE, _T("Value"), 80, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_annualr_list.InsertColumn(ANNUAL_ROUTINE_LABLE, _T("Label"), 90, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+
+	m_annualr_list.Setlistcolcharlimit(ANNUAL_ROUTINE_FULL_LABEL,STR_ANNUAL_DESCRIPTION_LENGTH -1);
+	m_annualr_list.Setlistcolcharlimit(ANNUAL_ROUTINE_LABLE,STR_ANNUAL_LABEL_LENGTH-1);
+
 	m_annual_dlg_hwnd = this->m_hWnd;
-	g_hwnd_now = m_annual_dlg_hwnd;
+
+	m_annualr_list.SetListHwnd(this->m_hWnd);
+	//g_hwnd_now = m_annual_dlg_hwnd;
 
 	CRect list_rect,win_rect;
 	m_annualr_list.GetWindowRect(list_rect);
@@ -201,6 +231,8 @@ void BacnetAnnualRoutine::Initial_List()
 void BacnetAnnualRoutine::OnClose()
 {
 	// TODO: Add your message handler code here and/or call default
+	ShowWindow(FALSE);
+	return;
 	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
 	KillTimer(1);
@@ -447,7 +479,7 @@ LRESULT BacnetAnnualRoutine::Fresh_Annual_Routine_Item(WPARAM wParam,LPARAM lPar
 void BacnetAnnualRoutine::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
-	if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
+	if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_ANNUAL))  )	//GSM连接时不要刷新;
 	{
 	PostMessage(WM_REFRESH_BAC_ANNUAL_LIST,NULL,NULL);
 	if(bac_select_device_online)
@@ -511,6 +543,78 @@ BOOL BacnetAnnualRoutine::OnHelpInfo(HELPINFO* pHelpInfo)
 
 	return CDialogEx::OnHelpInfo(pHelpInfo);
 }
+
+void BacnetAnnualRoutine::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	// TODO: Add your message handler code here
+	CRect rc;
+	GetClientRect(rc);
+	if(m_annualr_list.m_hWnd != NULL)
+	{
+		::SetWindowPos(this->m_hWnd, HWND_TOP, 0,0, 0,0,  SWP_NOSIZE | SWP_NOMOVE);
+		//m_program_list.MoveWindow(&rc);
+		m_annualr_list.MoveWindow(rc.left,rc.top,rc.Width(),rc.Height() - 80);
+
+		GetDlgItem(IDC_BUTTON_ANNUAL_EDIT)->MoveWindow(rc.left + 20 ,rc.bottom - 60 , 120,50);
+	}
+}
+
+
+void BacnetAnnualRoutine::OnSysCommand(UINT nID, LPARAM lParam)
+{
+	// TODO: Add your message handler code here and/or call default
+	if(nID == SC_MAXIMIZE)
+	{
+		if(window_max == false)
+		{
+			window_max = true;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
+		}
+		else
+		{
+			window_max = false;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 120 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
+		}
+		return;
+	}
+
+	CDialogEx::OnSysCommand(nID, lParam);
+}
+
+
+void BacnetAnnualRoutine::Reset_Annual_Rect()
+{
+
+	CRect temp_mynew_rect;
+	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+
+	CRect temp_window;
+	GetWindowRect(&temp_window);
+
+	if(window_max)
+	{
+		CRect temp_mynew_rect;
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), NULL);
+	}
+	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
+	{
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,0,0,SWP_NOSIZE );
+	}
+	else
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left + 90,temp_mynew_rect.top + 70,500,700, NULL);
+
+
+	return;
+
+}
+
 
 int GetHolidayLabel(int index,CString &ret_label)
 {

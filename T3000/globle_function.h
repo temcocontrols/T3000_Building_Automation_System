@@ -158,6 +158,7 @@ bool GetFileNameFromPath(CString ncstring,CString &cs_return);
 BOOL Ping(const CString& strIP, CWnd* pWndEcho);
  
 void Send_WhoIs_remote_ip(CString ipaddress);
+void SaveBacnetBinaryFile(CString &SaveConfigFilePath);
 void SaveBacnetConfigFile(CString &SaveConfigFilePath);
 void SaveBacnetConfigFile_Cache(CString &SaveConfigFilePath);
 int SaveModbusConfigFile(CString &SaveConfigFilePath);
@@ -247,5 +248,6 @@ bool Output_data_to_string(unsigned char  temp_output_index,
 	CString &temp_out_decom,
 	CString &temp_out_label);
 	bool Save_OutputData_to_db(unsigned char  temp_output_index );
+	bool Save_AVData_to_db();
 	CString GetGUID();
 #endif

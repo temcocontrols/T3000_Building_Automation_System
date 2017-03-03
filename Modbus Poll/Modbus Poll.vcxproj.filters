@@ -19,6 +19,18 @@
     <Filter Include="SQLiteDriver">
       <UniqueIdentifier>{0afdcd37-4cf0-4851-bdb5-8cd92f934880}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GridCtrl Head">
+      <UniqueIdentifier>{bc7fccb1-3098-43a4-985d-22b6c53faabd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GridCtrl_Source">
+      <UniqueIdentifier>{2393f8b5-15e7-440c-b07a-84388577e8dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CellType_Head">
+      <UniqueIdentifier>{d30620cd-d92d-4cec-8e1e-77014ade588f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CellType_Source">
+      <UniqueIdentifier>{d322f414-cc33-4821-b68b-ad580f5127fd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -59,6 +71,18 @@
     <None Include="ChartCtrl\ChartSerieBase.inl">
       <Filter>ChartCtrl</Filter>
     </None>
+    <None Include="res\fileview.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\explorer.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\explorer_hc.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\fileview_hc.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Modbus Poll.h">
@@ -83,9 +107,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="msflexgrid1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ModbusDllForVC.h">
@@ -286,6 +307,63 @@
     <ClInclude Include="..\SQLiteDriver\sqlite3.h">
       <Filter>SQLiteDriver</Filter>
     </ClInclude>
+    <ClInclude Include="EnumSerial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GridCtrl_src\CellRange.h">
+      <Filter>GridCtrl Head</Filter>
+    </ClInclude>
+    <ClInclude Include="GridCtrl_src\GridCell.h">
+      <Filter>GridCtrl Head</Filter>
+    </ClInclude>
+    <ClInclude Include="GridCtrl_src\GridCellBase.h">
+      <Filter>GridCtrl Head</Filter>
+    </ClInclude>
+    <ClInclude Include="GridCtrl_src\GridCtrl.h">
+      <Filter>GridCtrl Head</Filter>
+    </ClInclude>
+    <ClInclude Include="GridCtrl_src\GridDropTarget.h">
+      <Filter>GridCtrl Head</Filter>
+    </ClInclude>
+    <ClInclude Include="GridCtrl_src\InPlaceEdit.h">
+      <Filter>GridCtrl Head</Filter>
+    </ClInclude>
+    <ClInclude Include="GridCtrl_src\MemDC.h">
+      <Filter>GridCtrl Head</Filter>
+    </ClInclude>
+    <ClInclude Include="GridCtrl_src\TitleTip.h">
+      <Filter>GridCtrl Head</Filter>
+    </ClInclude>
+    <ClInclude Include="NewCellTypes\GridCellCheck.h">
+      <Filter>CellType_Head</Filter>
+    </ClInclude>
+    <ClInclude Include="NewCellTypes\GridCellCombo.h">
+      <Filter>CellType_Head</Filter>
+    </ClInclude>
+    <ClInclude Include="NewCellTypes\GridCellDateTime.h">
+      <Filter>CellType_Head</Filter>
+    </ClInclude>
+    <ClInclude Include="NewCellTypes\GridCellNumeric.h">
+      <Filter>CellType_Head</Filter>
+    </ClInclude>
+    <ClInclude Include="NewCellTypes\GridURLCell.h">
+      <Filter>CellType_Head</Filter>
+    </ClInclude>
+    <ClInclude Include="WriteSingleCoilDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WriteMultipleCoilsDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ClassView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ViewTree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Modbus Poll.cpp">
@@ -304,9 +382,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Modbus PollView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="msflexgrid1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ConnectionSetup.cpp">
@@ -438,10 +513,61 @@
     <ClCompile Include="..\SQLiteDriver\CppSQLite3.cpp">
       <Filter>SQLiteDriver</Filter>
     </ClCompile>
+    <ClCompile Include="EnumSerial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GridCtrl_src\GridCell.cpp">
+      <Filter>GridCtrl_Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GridCtrl_src\GridCellBase.cpp">
+      <Filter>GridCtrl_Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GridCtrl_src\GridCtrl.cpp">
+      <Filter>GridCtrl_Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GridCtrl_src\GridDropTarget.cpp">
+      <Filter>GridCtrl_Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GridCtrl_src\InPlaceEdit.cpp">
+      <Filter>GridCtrl_Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GridCtrl_src\TitleTip.cpp">
+      <Filter>GridCtrl_Source</Filter>
+    </ClCompile>
+    <ClCompile Include="NewCellTypes\GridCellCheck.cpp">
+      <Filter>CellType_Source</Filter>
+    </ClCompile>
+    <ClCompile Include="NewCellTypes\GridCellCombo.cpp">
+      <Filter>CellType_Source</Filter>
+    </ClCompile>
+    <ClCompile Include="NewCellTypes\GridCellDateTime.cpp">
+      <Filter>CellType_Source</Filter>
+    </ClCompile>
+    <ClCompile Include="NewCellTypes\GridCellNumeric.cpp">
+      <Filter>CellType_Source</Filter>
+    </ClCompile>
+    <ClCompile Include="NewCellTypes\GridURLCell.cpp">
+      <Filter>CellType_Source</Filter>
+    </ClCompile>
+    <ClCompile Include="WriteSingleCoilDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WriteMultipleCoilsDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewTree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Modbus Poll.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="版本信息.txt" />
   </ItemGroup>
 </Project>

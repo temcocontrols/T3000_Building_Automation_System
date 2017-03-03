@@ -1093,7 +1093,7 @@ void CNewTstatSchedulesDlg::OnBnClickedOk()
 
 
 	}
-	unsigned short TimeBuffer[12];
+	unsigned short TimeBuffer[100];
 	int EventNumber=0;
 	int i = 0;
 	memset(TimeBuffer, 0xff, sizeof(unsigned short) * 12);

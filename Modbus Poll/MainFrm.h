@@ -3,7 +3,7 @@
 //
 
 #pragma once
-
+#include "FileView.h"
 class CMainFrame : public CMDIFrameWndEx
 {
 	DECLARE_DYNAMIC(CMainFrame)
@@ -34,7 +34,9 @@ protected:  // control bar embedded members
 	CMFCMenuBar       m_wndMenuBar;
 	CMFCToolBar       m_wndToolBar;
 	CMFCStatusBar     m_wndStatusBar;
-	CMFCToolBarImages m_UserImages;
+	CFileView         m_wndFileView;
+	 
+	 
 
 	int m_communication_type;
 	int m_comport;
@@ -82,9 +84,11 @@ public:
      afx_msg void OnUpdateStatusBar(CCmdUI *pCmdUI);
 	afx_msg void OnViewRegistervalueanalyzer();
 	afx_msg void OnFunctionsTestcenter();
-	afx_msg void OnEditCopy();
+	 
 	 
 	afx_msg void OnToolsDevicetester();
+	BOOL CreateDockingWindows();
+	void SetDockingWindowIcons(BOOL bHiColorIcons);
 };
 
 

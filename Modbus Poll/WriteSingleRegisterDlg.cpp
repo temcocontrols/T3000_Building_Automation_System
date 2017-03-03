@@ -288,3 +288,4 @@ void CWriteSingleRegisterDlg::OnPaint()
 	m_editor_value.SetFocus();
 	//GetDlgItem(IDC_EDIT_VALUE)->SetCaretPos()
 }
+

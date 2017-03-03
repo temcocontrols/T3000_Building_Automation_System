@@ -81,4 +81,6 @@ public:
 	afx_msg void OnFunctions16();
 	afx_msg void OnFunctions23();
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+	afx_msg void OnFunctions05();
+	afx_msg void OnFunctions15();
 };

@@ -29,7 +29,7 @@
 #define MAX_ATTRIB 10
 #define MAX_LINE  512
 
-#define MAX_Var 100
+#define MAX_Var 500
 
 #define MAX_ANNUAL_ARRAY 50
 

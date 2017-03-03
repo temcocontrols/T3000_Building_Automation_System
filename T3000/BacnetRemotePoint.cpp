@@ -19,7 +19,7 @@ IMPLEMENT_DYNAMIC(CBacnetRemotePoint, CDialogEx)
 CBacnetRemotePoint::CBacnetRemotePoint(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CBacnetRemotePoint::IDD, pParent)
 {
-
+	window_max = true;
 }
 
 CBacnetRemotePoint::~CBacnetRemotePoint()
@@ -39,6 +39,8 @@ BEGIN_MESSAGE_MAP(CBacnetRemotePoint, CDialogEx)
 	//ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_Remote_Item)
 	ON_WM_CLOSE()
 	ON_WM_TIMER()
+	ON_WM_SIZE()
+	ON_WM_SYSCOMMAND()
 END_MESSAGE_MAP()
 
 
@@ -48,8 +50,10 @@ END_MESSAGE_MAP()
 BOOL CBacnetRemotePoint::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-
+	SetWindowTextW(_T("Network Point"));
 	Initial_List();
+	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_NETWORKPOINT);
+	SetIcon(m_hIcon,TRUE);
 	//	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//F2键
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
 
@@ -73,6 +77,7 @@ void CBacnetRemotePoint::Initial_List()
 	m_remote_point_list.InsertColumn(REMOTE_DESCRIPTION, _T("Description"), 200, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	
 	m_remote_point_hwnd = this->m_hWnd;
+	m_remote_point_list.SetListHwnd(this->m_hWnd);
 	//g_hwnd_now = m_screen_dlg_hwnd;
 
 	CRect list_rect,win_rect;
@@ -110,7 +115,24 @@ void CBacnetRemotePoint::Initial_List()
 BOOL CBacnetRemotePoint::PreTranslateMessage(MSG* pMsg)
 {
 	// TODO: Add your specialized code here and/or call the base class
-
+	if(pMsg->message==WM_NCLBUTTONDBLCLK)
+	{
+		if(!window_max)
+		{
+			window_max = true;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
+		}
+		else
+		{
+			window_max = false;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
+		}
+			return 1; 
+	}
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
@@ -126,7 +148,8 @@ void CBacnetRemotePoint::OnCancel()
 void CBacnetRemotePoint::OnClose()
 {
 	// TODO: Add your message handler code here and/or call default
-
+	ShowWindow(FALSE);
+	return;
 	CDialogEx::OnClose();
 }
 
@@ -326,6 +349,77 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 }
 
 
+void CBacnetRemotePoint::Reset_RemotePoint_Rect()
+{
+
+	CRect temp_mynew_rect;
+	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+
+	CRect temp_window;
+	GetWindowRect(&temp_window);
+
+	if(window_max)
+	{
+		CRect temp_mynew_rect;
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), NULL);
+	}
+	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
+	{
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,0,0,SWP_NOSIZE );
+	}
+	else
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left + 95,temp_mynew_rect.top + 60,500,700, NULL);
+
+
+	return;
+
+}
+
+
+
+void CBacnetRemotePoint::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	// TODO: Add your message handler code here
+	CRect rc;
+	GetClientRect(rc);
+	if(m_remote_point_list.m_hWnd != NULL)
+	{
+		::SetWindowPos(this->m_hWnd, HWND_TOP, 0,0, 0,0,  SWP_NOSIZE | SWP_NOMOVE);
+		//m_program_list.MoveWindow(&rc);
+		m_remote_point_list.MoveWindow(rc.left,rc.top,rc.Width(),rc.Height() - 80);
+
+	}
+}
+
+
+void CBacnetRemotePoint::OnSysCommand(UINT nID, LPARAM lParam)
+{
+	// TODO: Add your message handler code here and/or call default
+	if(nID == SC_MAXIMIZE)
+	{
+		if(window_max == false)
+		{
+			window_max = true;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
+		}
+		else
+		{
+			window_max = false;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
+		}
+		return;
+	}
+
+	CDialogEx::OnSysCommand(nID, lParam);
+}
+
 void CBacnetRemotePoint::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
@@ -333,7 +427,7 @@ void CBacnetRemotePoint::OnTimer(UINT_PTR nIDEvent)
 	{
 	case 1:
 		{
-			if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
+			if((this->IsWindowVisible()) && (Gsm_communication == false) &&  (this->m_hWnd  == ::GetActiveWindow())  )	//GSM连接时不要刷新;
 			{
 				PostMessage(WM_REFRESH_BAC_REMOTE_POINT_LIST,NULL,NULL);
 				if(bac_select_device_online)

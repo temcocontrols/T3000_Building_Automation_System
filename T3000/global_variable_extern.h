@@ -85,7 +85,7 @@ extern CString g_strScanInfoPrompt;
 extern int gCommunicationType;
 extern CString g_strCurBuildingDatabasefilePath;
 extern CString m_str_curBuilding_Domain_IP;
-
+extern CString m_str_curBuilding_Domain_Port;
 extern CString g_strTstat5a;
 extern CString g_strTstat5b;
 extern CString g_strTstat5b2;
@@ -959,11 +959,12 @@ extern CString temp_off[BAC_CUSTOMER_UNITS_COUNT];		//ÓÃÓÚ ±£´æ ¿Í»§×Ô¶¨ÒåµÄ µ¥Î
 extern CString temp_on[BAC_CUSTOMER_UNITS_COUNT];
 extern CString temp_unit[BAC_CUSTOMER_UNITS_COUNT];
 extern CString temp_unit_no_index[BAC_CUSTOMER_UNITS_COUNT];
-
+extern bool read_var_analog_cus_units;          //Var Cus units ×Ô¶¨Òå
 extern bool read_customer_unit;	//Èç¹ûÕâ¸öÉè±¸Ã»ÓÐ¶Á¹ý customer unitÕâÒ»Ïî,¾ÍÒª³¢ÊÔÈ¥¶Á£¬ÒÔÇ°ÀÏ°æ±¾µÄÃ»ÓÐ;
 extern bool receive_customer_unit; //ÊÕµ½»Ø¸´£¬flag¾ÍÖÃ true;
 extern bool read_analog_customer_unit;  // Õâ¸öÊÇÄ£ÄâµÄcus tabel ;
 extern CString Analog_Customer_Units[BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT];
+extern CString Analog_Variable_Units[BAC_VARIABLE_CUS_UNIT_COUNT];
 extern unsigned char bacnet_add_id[254];
 extern int bacnet_device_type;
 extern int g_bac_instance;
@@ -1013,6 +1014,7 @@ extern int screen_list_line ;
 extern int monitor_list_line;
 extern int analog_range_tbl_line;
 extern Time_block_mini Device_time;
+extern int ext_io_list_line;
 
 extern HWND      g_hwnd_now;
 extern HWND      m_input_dlg_hwnd;
@@ -1043,8 +1045,10 @@ extern HWND      m_edit_label;
 extern HWND      m_at_command_hwnd;
 extern HWND      m_remote_point_hwnd;
 extern HWND		 m_program_debug_list_hwnd;
-extern HWND		m_statusbar_hwnd ;
-extern HWND		analog_cus_range_dlg;
+extern HWND		 m_statusbar_hwnd ;
+extern HWND	     m_ext_io_dlg_hwmd ;
+extern HWND		 analog_cus_range_dlg;
+
 extern vector <Str_out_point> m_Output_data;
 extern vector <Str_in_point>  m_Input_data;
 extern vector <Str_program_point>  m_Program_data;
@@ -1065,6 +1069,8 @@ extern vector <Str_Remote_TstDB> m_remote_device_db;
 extern vector <Str_Units_element> m_customer_unit_data;
 extern vector <Str_userlogin_point> m_user_login_data;
 extern vector <Str_table_point> m_analog_custmer_range;
+extern vector <Str_variable_uint_point> m_variable_analog_unite;
+extern vector <Str_Extio_point> m_extio_config_data;
 
 extern vector <GSM_connection_info> m_gsm_connect_info;
 extern vector <Scan_Info> m_scan_info;
@@ -1123,6 +1129,7 @@ extern SOCKET h_Broad;
 extern SOCKADDR_IN h_siBind;
 extern SOCKADDR_IN h_bcast;
 
+extern vector <int> exsit_panel_number;
  
 extern Point_Data_str digital_last_data[MAX_POINTS_IN_MONITOR];
 extern Data_Time_Match * digital_data_point[MAX_POINTS_IN_MONITOR];
@@ -1147,7 +1154,7 @@ extern CString g_strStartInterface_config;
 extern bool need_read_bacnet_graphic_label_flag;
 extern bool read_write_bacnet_config ;	//¶ÁÐ´Bacnet config µÄÊ±ºò½ûÖ¹Ë¢ÐÂ List;
 
-
+extern int g_SleepTimeForConfig;
 extern vector <Tstat_Input_Struct> m_tstat_input_data;
 
 extern vector <Tstat_Output_Struct> m_tstat_output_data;
@@ -1247,6 +1254,8 @@ extern unsigned int remote_connect_serial_number; // Ô¶³ÌÁ¬½ÓµÄÐòÁÐºÅ;
 extern char ptpLoginName[30];	//Ô¶³ÌÁ¬½ÓµÄÕËºÅºÍÃÜÂë;
 extern char ptpLoginPassword[20];
 
+extern refresh_net_device device_same_panel_1;
+extern refresh_net_device device_same_panel_2;
 
 extern refresh_net_device device_id_data_1;
 extern refresh_net_device device_id_data_2;
@@ -1266,6 +1275,8 @@ extern unsigned char nDefaultDisplayType;
 extern unsigned char nDefaultTextPlace;
 extern unsigned char nDefaultIconSize;
 extern COLORREF	  nDefaultclrTxt;
+
+extern int bacnet_view_number;
 
 extern int graphic_view_index ;
 extern CString grapgic_view_name[3];

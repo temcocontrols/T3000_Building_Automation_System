@@ -813,7 +813,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 						Bacnet_Refresh_Info.Read_Customer_unit_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
 
 						CString temp_cs_show;
-						temp_cs_show.Format(_T("Read Customer units "));
+						temp_cs_show.Format(_T("Read Custom units "));
 						Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs_show);
 					}
 				}

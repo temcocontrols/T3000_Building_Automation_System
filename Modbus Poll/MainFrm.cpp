@@ -55,7 +55,7 @@ ON_UPDATE_COMMAND_UI(ID_DISPALY_COMMUNICATION, &CMainFrame::OnUpdateDispalyCommu
 ON_COMMAND(ID_VIEW_REGISTERVALUEANALYZER, &CMainFrame::OnViewRegistervalueanalyzer)
 ON_UPDATE_COMMAND_UI(IDS_CONNECTION, &CMainFrame::OnUpdateStatusBar)
 ON_COMMAND(ID_FUNCTIONS_TESTCENTER, &CMainFrame::OnFunctionsTestcenter)
-ON_COMMAND(ID_EDIT_COPY, &CMainFrame::OnEditCopy)
+ 
  
 ON_COMMAND(ID_TOOLS_DEVICETESTER, &CMainFrame::OnToolsDevicetester)
 END_MESSAGE_MAP()
@@ -151,16 +151,16 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	EnablePaneMenu(TRUE, ID_VIEW_CUSTOMIZE, strCustomize, ID_VIEW_TOOLBAR);
 
 	// enable quick (Alt+drag) toolbar customization
-	CMFCToolBar::EnableQuickCustomization();
-
-	if (CMFCToolBar::GetUserImages() == NULL)
-	{
-		// load user-defined toolbar images
-		if (m_UserImages.Load(_T(".\\UserImages.bmp")))
-		{
-			CMFCToolBar::SetUserImages(&m_UserImages);
-		}
-	}
+// 	CMFCToolBar::EnableQuickCustomization();
+// 
+// 	if (CMFCToolBar::GetUserImages() == NULL)
+// 	{
+// 		// load user-defined toolbar images
+// 		if (m_UserImages.Load(_T(".\\UserImages.bmp")))
+// 		{
+// 			CMFCToolBar::SetUserImages(&m_UserImages);
+// 		}
+// 	}
 
 	// enable menu personalization (most-recently used commands)
 	// TODO: define your own basic commands, ensuring that each pulldown menu has at least one basic command.
@@ -189,18 +189,27 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
   	  //m_wndStatusBar.SetPaneInfo(0,ID_SEPARATOR,SBPS_NOBORDERS,   300);
   	    m_wndStatusBar.SetPaneInfo(1,IDS_CONNECTION,SBPS_NOBORDERS,   300);
-	 // m_wndStatusBar.SetPaneInfo(1,ID_BUILDING_INFO,SBPS_NOBORDERS, 300);
-	     //OnConnectionQuickconnectf5();
+// m_wndStatusBar.SetPaneInfo(1,ID_BUILDING_INFO,SBPS_NOBORDERS, 300);
+//OnConnectionQuickconnectf5();
+
+// 		if (!CreateDockingWindows())
+// 		{
+// 			TRACE0("Failed to create docking windows\n");
+// 			return -1;
+// 		}
+// 
+// 		m_wndFileView.EnableDocking(CBRS_ALIGN_ANY);
+// 		DockPane(&m_wndFileView);
 	    AfxBeginThread(_ReadMultiRegisters,this);
 
 
 
-		if(m_MultiRead_handle != NULL)
+		if (m_MultiRead_handle != NULL)
 			TerminateThread(m_MultiRead_handle, 0);
-		m_MultiRead_handle=NULL;
+		m_MultiRead_handle = NULL;
 		if (!m_MultiRead_handle)
 		{
-			m_MultiRead_handle = CreateThread(NULL,NULL,_Multi_Read_Fun03_MF,this,NULL,0);
+			m_MultiRead_handle = CreateThread(NULL, NULL, _Multi_Read_Fun03_MF, this, NULL, 0);
 		}
 
 
@@ -669,15 +678,21 @@ DWORD WINAPI _Multi_Read_Fun03_MF(LPVOID pParam){
 					CDocument *pDoc=pTemplate->GetNextDoc(pos);
 					if (pDoc!=NULL)
 					{
-						POSITION pos=pDoc->GetFirstViewPosition();
-						while(pos){
-							CView *pMBPollView=pDoc->GetNextView(pos);
-							if (pMBPollView!=NULL)
+						 
+						  
+						 POSITION pos = pDoc->GetFirstViewPosition();
+						  
+						  while (pos) {
+							CView *pMBPollView = pDoc->GetNextView(pos);
+							if (pMBPollView != NULL)
 							{
-								Update_ViewData(pMBPollView);
+  								Update_ViewData(pMBPollView);
+  								TRACE("Update_ViewData\n");
 							}
-							
-						}
+
+						   }
+						
+						
 					}
 				}
 			}
@@ -696,6 +711,7 @@ void Update_ViewData(CView* MBPollView){
 	unsigned short startAdd;
 	unsigned short quantity;
 	int sleep;
+	int functioncode;
 
 	int Send_length;
 	int Rev_length;
@@ -708,17 +724,17 @@ void Update_ViewData(CView* MBPollView){
 	 
 		if (pMBPollView->m_hWnd==NULL)
 		{
-			Sleep(1000);
+			Sleep(30);
 			return;
 		}
 
 
 		if (!g_online)
 		{
-			Sleep(1000);
+			Sleep(30);
 			if (pMBPollView->m_hWnd!=NULL)
 			{
-				::PostMessage(pMBPollView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
+				::SendMessage(pMBPollView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
 			}
 			return;
 		}
@@ -727,7 +743,7 @@ void Update_ViewData(CView* MBPollView){
 		startAdd=pMBPollView->m_address;
 		quantity=pMBPollView->m_Quantity;
 		sleep=pMBPollView->m_Scan_Rate;
-
+		functioncode = pMBPollView->m_MBPoll_Function;
 
 		 
 		//read_multi_log(ID,&pMBPollView->m_DataBuffer[0],startAdd,quantity,&send_data[0],&rev_back_rawData[0],&Send_length,&Rev_length);
@@ -736,16 +752,19 @@ void Update_ViewData(CView* MBPollView){
 		int ret=0;
 		if (pMBPollView->m_apply)
 		{
-			 
+			memset(DataBuffer, 0, 127);
 			register_critical_section.Lock();
 			if (pMBPollView->m_PLC_Addresses==1)
 			{
-				ret=read_multi_log(ID,&DataBuffer[0],startAdd-1,quantity,&send_data[0],&rev_back_rawData[0],&Send_length,&Rev_length);
+				//ret=read_multi_log(ID,&DataBuffer[0],startAdd-1,quantity,&send_data[0],&rev_back_rawData[0],&Send_length,&Rev_length);
+				ret = Modbus_Standard_Read(ID, &DataBuffer[0], functioncode,startAdd - 1, quantity, &send_data[0], &rev_back_rawData[0], &Send_length, &Rev_length);
+
 			}
 			else
 			{
-				ret=read_multi_log(ID,&DataBuffer[0],startAdd,quantity,&send_data[0],&rev_back_rawData[0],&Send_length,&Rev_length);
-			//	ret = Modbus_Standard_Read(ID, DataBuffer, startAdd, quantity);
+				//ret = read_multi_log(ID,&DataBuffer[0],startAdd,quantity,&send_data[0],&rev_back_rawData[0],&Send_length,&Rev_length);
+				ret = Modbus_Standard_Read(ID, &DataBuffer[0], functioncode,startAdd, quantity, &send_data[0], &rev_back_rawData[0], &Send_length, &Rev_length);
+
 			}
 			register_critical_section.Unlock();
 		} 
@@ -754,6 +773,7 @@ void Update_ViewData(CView* MBPollView){
 
 		  if (pMBPollView->m_wronce)
 		  {
+			  memset(DataBuffer, 0, 127);
 			  register_critical_section.Lock();
 			  if (pMBPollView->m_PLC_Addresses==1)
 			  {
@@ -795,7 +815,7 @@ void Update_ViewData(CView* MBPollView){
 			temp.Format(_T("%02X "),send_data[i]);
 			m_Tx+=temp;
 		}
- 	  Traffic_Data(m_Tx);
+ 	    Traffic_Data(m_Tx);
 
 
 		++g_Tx_Rx;
@@ -817,9 +837,12 @@ void Update_ViewData(CView* MBPollView){
 		}
 		else
 		{
+			pMBPollView->m_modeldata[0] = 0;
+			pMBPollView->m_modeldata[1] = 0;
 			pMBPollView->m_isgetmodel=FALSE;
 		}
 		register_critical_section.Unlock();
+
 		if (ret>0)//读的正确之后，我们才把值传给view显示
 		{
 			memcpy_s(pMBPollView->m_DataBuffer,sizeof(pMBPollView->m_DataBuffer),DataBuffer,sizeof(DataBuffer));
@@ -827,14 +850,17 @@ void Update_ViewData(CView* MBPollView){
 		} 
 		else
 		{
+			memset(DataBuffer, 0, 127);
+			memcpy_s(pMBPollView->m_DataBuffer, sizeof(pMBPollView->m_DataBuffer), DataBuffer, sizeof(DataBuffer));
 			++pMBPollView->m_Tx;
 			++pMBPollView->m_Err;
+
 		}
 		Sleep(sleep);
 		
 		if (pMBPollView->m_hWnd!=NULL)
 		{
-			::PostMessage(pMBPollView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
+			::SendMessage(pMBPollView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
 		}
 
 	 
@@ -878,10 +904,7 @@ void CMainFrame::OnFunctionsTestcenter()
 }
 
 
-void CMainFrame::OnEditCopy()
-{
-	// OnConnectionDisconnect();
-}
+ 
 
 
 
@@ -891,3 +914,36 @@ void CMainFrame::OnToolsDevicetester()
 	 CDeviecTesterConfigDlg dlg;
 	 dlg.DoModal();
 }
+
+BOOL CMainFrame::CreateDockingWindows()
+{
+	BOOL bNameValid;
+
+	 
+	 
+
+	// Create file view
+	CString strFileView;
+	bNameValid = strFileView.LoadString(IDS_FILE_VIEW);
+	ASSERT(bNameValid);
+	if (!m_wndFileView.Create(strFileView, this, CRect(0, 0, 200, 200), TRUE, ID_VIEW_FILEVIEW, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CBRS_LEFT | CBRS_FLOAT_MULTI))
+	{
+		TRACE0("Failed to create File View window\n");
+		return FALSE; // failed to create
+	}
+
+ 
+
+	SetDockingWindowIcons(theApp.m_bHiColorIcons);
+	return TRUE;
+}
+
+void CMainFrame::SetDockingWindowIcons(BOOL bHiColorIcons)
+{
+	HICON hFileViewIcon = (HICON) ::LoadImage(::AfxGetResourceHandle(), MAKEINTRESOURCE(bHiColorIcons ? IDI_FILE_VIEW_HC : IDI_FILE_VIEW), IMAGE_ICON, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), 0);
+	m_wndFileView.SetIcon(hFileViewIcon, FALSE);
+
+	 
+
+}
+

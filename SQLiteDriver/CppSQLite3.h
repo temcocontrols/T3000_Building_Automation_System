@@ -251,7 +251,17 @@ public:
     CppSQLite3DB();
 
     virtual ~CppSQLite3DB();
+	
+	/*
+	SQLITE_OPEN_READONLY
+Open the file read-only. The file must already exist.
 
+SQLITE_OPEN_READWRITE
+Attempt to open the file read/write. If this is not possible, open the file read-only. Opening the file read-only will not result in an error. The file must already exist.
+
+SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE
+
+	*/
     void open(const char* szFile);
 
     void closedb();

@@ -57,6 +57,8 @@ ON_WM_CREATE()
 ON_COMMAND(ID_FUNCTIONS_06, &CChildFrame::OnFunctions06)
 ON_COMMAND(ID_FUNCTIONS_16, &CChildFrame::OnFunctions16)
 ON_COMMAND(ID_FUNCTIONS_23, &CChildFrame::OnFunctions23)
+ON_COMMAND(ID_FUNCTIONS_05, &CChildFrame::OnFunctions05)
+ON_COMMAND(ID_FUNCTIONS_15, &CChildFrame::OnFunctions15)
 END_MESSAGE_MAP()
 
 // CChildFrame construction/destruction
@@ -146,7 +148,7 @@ void CChildFrame::OnSetupRead()
 
  pModbusView->m_apply=m_apply;
  pModbusView->m_wronce=m_wronce;
-::PostMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
+::SendMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
  //pModbusView->OnInitialUpdate();
  pModbusView=NULL;
 }
@@ -157,7 +159,7 @@ void CChildFrame::OnSetupRead32783()
 	  CModbusPollView* pModbusView=(CModbusPollView*)GetActiveView();
 	  pModbusView->m_Tx=0;
 	  pModbusView->m_Err=0;
-	  ::PostMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
+	  ::SendMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
 	  pModbusView=NULL;
 
 }
@@ -170,7 +172,7 @@ void CChildFrame::OnDispalySigned()
 	CModbusPollView* pModbusView=(CModbusPollView*)GetActiveView();
 	pModbusView->m_Display=0;
 	m_Display=0;
-	::PostMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
+	::SendMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
 	pModbusView=NULL;
 }
 
@@ -180,7 +182,7 @@ void CChildFrame::OnDispalyUnsigned()
 	CModbusPollView* pModbusView=(CModbusPollView*)GetActiveView();
 	pModbusView->m_Display=1;
 	m_Display=1;
-	::PostMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
+	::SendMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
 	pModbusView=NULL;
 }
 
@@ -190,7 +192,7 @@ void CChildFrame::OnDispalyHex()
 	CModbusPollView* pModbusView=(CModbusPollView*)GetActiveView();
 	pModbusView->m_Display=2;
 	m_Display=2;
-	::PostMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
+	::SendMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
 	pModbusView=NULL;
 }
 
@@ -200,7 +202,7 @@ void CChildFrame::OnDispalyLong()
 	CModbusPollView* pModbusView=(CModbusPollView*)GetActiveView();
 	pModbusView->m_Display=4;
 	m_Display=4;
-	::PostMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
+	::SendMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
 	pModbusView=NULL;
 }
 
@@ -210,7 +212,7 @@ void CChildFrame::OnDispalyLonginverse()
 	CModbusPollView* pModbusView=(CModbusPollView*)GetActiveView();
 	pModbusView->m_Display=5;
 	m_Display=5;
-	::PostMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
+	::SendMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
 	pModbusView=NULL;
 }
 
@@ -220,7 +222,7 @@ void CChildFrame::OnDispalyFloatinverse()
 	CModbusPollView* pModbusView=(CModbusPollView*)GetActiveView();
 	pModbusView->m_Display=7;
 	m_Display=7;
-	::PostMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
+	::SendMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
 	pModbusView=NULL;
 }
 
@@ -230,7 +232,7 @@ void CChildFrame::OnDispalyFloat()
 	CModbusPollView* pModbusView=(CModbusPollView*)GetActiveView();
 	pModbusView->m_Display=6;
 	m_Display=6;
-	::PostMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
+	::SendMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
 	pModbusView=NULL;
 }
 
@@ -240,7 +242,7 @@ void CChildFrame::OnDispalyDoubleinverse()
 	CModbusPollView* pModbusView=(CModbusPollView*)GetActiveView();
 	pModbusView->m_Display=9;
 	m_Display=9;
-	::PostMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
+	::SendMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
 	pModbusView=NULL; 
 }
 
@@ -250,7 +252,7 @@ void CChildFrame::OnDispalyDouble()
 	CModbusPollView* pModbusView=(CModbusPollView*)GetActiveView();
 	pModbusView->m_Display=8;
 	m_Display=8;
-	::PostMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
+	::SendMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
 	pModbusView=NULL;
 }
 
@@ -260,7 +262,7 @@ void CChildFrame::OnDispalyBinary()
 	CModbusPollView* pModbusView=(CModbusPollView*)GetActiveView();
 	pModbusView->m_Display=3;
 	m_Display=3;
-	::PostMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
+	::SendMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
 	pModbusView=NULL;
 }
 
@@ -334,7 +336,7 @@ void CChildFrame::OnDispalyPlcaddress()
 	++m_address;
 	pModbusView->m_address=m_address;
 	
-	::PostMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
+	::SendMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
 	pModbusView=NULL;
 }
 
@@ -416,7 +418,7 @@ void CChildFrame::OnFunctions06()
 		 }
 		 
 
-		 //Index=(lCol/2-1)*(m_MsDataGrid.get_Rows()-1)+(lRow-1);
+	 
 	 }
 	 if (Show_Name)
 	 {
@@ -465,7 +467,9 @@ void CChildFrame::OnFunctions16()
 {
 	CModbusPollView* pModbusView=(CModbusPollView*)GetActiveView();
      
-	 CWriteMultiRegistersDlg dlg(m_Slave_ID,m_address,m_Quantity,pModbusView->m_DataBuffer,m_Display,m_PLC_Adresses,NULL);
+	 CWriteMultiRegistersDlg dlg(m_Slave_ID,m_address,m_Quantity,
+		                         pModbusView->m_DataBuffer,m_Display,
+		                         m_PLC_Adresses,NULL);
 	 dlg.DoModal();
 }
 
@@ -505,4 +509,84 @@ LRESULT CChildFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
 
 	return CMDIChildWndEx::WindowProc(message, wParam, lParam);
+}
+
+#include "WriteSingleCoilDlg.h"
+
+void CChildFrame::OnFunctions05()
+{
+	CModbusPollView* pModbusView = (CModbusPollView*)GetActiveView();
+	BOOL Show_Name = FALSE;
+	int Index;
+	UINT Address;
+	int lCol = pModbusView->m_Current_Col;
+	int lRow = pModbusView->m_Current_Row;
+	if (m_Hide_Alias_Columns != 0)//都是数值的
+	{
+		Index = (lCol - 1)*(pModbusView->m_data_rows) + (lRow - 1);
+		Show_Name = FALSE;
+	}
+	else//含义名字的
+	{
+		if (lCol % 2 != 0)
+		{
+			Show_Name = FALSE;
+			Index = (lCol + 1 / 2 - 1)*(pModbusView->m_data_rows) + (lRow - 1);
+		}
+		else
+		{
+			Show_Name = FALSE;
+			Index = (lCol / 2 - 1)*(pModbusView->m_data_rows) + (lRow - 1);
+		}
+
+
+
+	}
+	if (Show_Name)
+	{
+
+
+	}
+	else
+	{
+		Address = pModbusView->Get_Reg_Add(Index);
+		CString Value = pModbusView->Get_Data_No_Address(Index);
+		//CWriteSingleRegisterDlg(UINT Slave_ID=255,UINT Address=0,BOOL Close_Dlg=FALSE,BOOL Single_Function=FALSE,UINT DataFormat=0,int value=0,CWnd* pParent = NULL)
+		 
+// 			CWriteSingleRegisterDlg dlg(m_Slave_ID, Address, pModbusView->m_close_dlg, pModbusView->m_function, m_Display, m_PLC_Adresses, Value, NULL);
+// 			if (IDOK == dlg.DoModal())
+// 			{
+// 				pModbusView->m_close_dlg = dlg.m_close_dlg;
+// 				pModbusView->m_function = dlg.m_function;
+// 			}
+
+			CWriteSingleCoilDlg dlg(m_Slave_ID, Address, pModbusView->m_close_dlg, pModbusView->m_function, m_PLC_Adresses, _wtoi(Value), NULL);
+
+			if (IDOK == dlg.DoModal())
+			{
+				pModbusView->m_close_dlg = dlg.m_close_dlg;
+				pModbusView->m_function = dlg.m_function15;
+
+			}
+
+		 
+		 
+	}
+	pModbusView = NULL;
+}
+
+#include "WriteMultipleCoilsDlg.h"
+void CChildFrame::OnFunctions15()
+{
+	/*CWriteMultipleCoilsDlg dlg;
+	dlg.DoModal();*/
+
+	CModbusPollView* pModbusView = (CModbusPollView*)GetActiveView();
+
+	  CWriteMultipleCoilsDlg dlg(m_Slave_ID, m_address, m_Quantity,
+		pModbusView->m_DataBuffer, m_Display,
+		m_PLC_Adresses, NULL);
+	   dlg.DoModal();
+
+	 
 }

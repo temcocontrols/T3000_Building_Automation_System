@@ -10,6 +10,7 @@
 #include "BacnetATCommand.h"
 #include "BacnetSettingHealth.h"
 #include "TstatZigbeeLogic.h"
+#include "BacnetIOConfig.h"
 #include "MainFrm.h"
 #include "../SQLiteDriver/CppSQLite3.h"
 // CBacnetSetting dialog
@@ -23,7 +24,7 @@ IMPLEMENT_DYNAMIC(CBacnetSetting, CDialogEx)
 CBacnetSetting::CBacnetSetting(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CBacnetSetting::IDD, pParent)
 {
-
+		window_max = true;
 }
 
 CBacnetSetting::~CBacnetSetting()
@@ -46,6 +47,7 @@ void CBacnetSetting::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_TIME_UPDATE, m_edit_ddns_update_time);
 	DDX_Control(pDX, IDC_EDIT_SETTING_PORT, m_edit_port);
 	DDX_Control(pDX, IDC_EDIT_SETTING_OBJ_INSTANCE, m_setting_obj_instance);
+	DDX_Control(pDX, IDC_EDIT_SETTING_MODBUS_ID, m_edit_modbus_id);
 }
 
 
@@ -99,6 +101,12 @@ BEGIN_MESSAGE_MAP(CBacnetSetting, CDialogEx)
 	ON_BN_CLICKED(IDC_CHECK_SETTING_ZONE_DAYLIGHT_TIME, &CBacnetSetting::OnBnClickedCheckSettingZoneDaylightTime)
 	ON_BN_CLICKED(IDC_BUTTON_BAC_SHOW_ZIGBEE, &CBacnetSetting::OnBnClickedButtonBacShowZigbee)
 	ON_CBN_KILLFOCUS(IDC_COMBO_BACNET_SETTING_TIME_SERVER, &CBacnetSetting::OnCbnKillfocusComboBacnetSettingTimeServer)
+	ON_WM_SIZE()
+	ON_WM_SYSCOMMAND()
+	ON_EN_KILLFOCUS(IDC_EDIT_SETTING_MODBUS_ID, &CBacnetSetting::OnEnKillfocusEditSettingModbusId)
+	ON_WM_HSCROLL()
+	ON_BN_CLICKED(IDC_BUTTON_SETTING_IO_CONFIG, &CBacnetSetting::OnBnClickedButtonSettingIoConfig)
+	ON_BN_CLICKED(IDC_BUTTON_REBOOT_DEVICE, &CBacnetSetting::OnBnClickedButtonRebootDevice)
 END_MESSAGE_MAP()
 
 
@@ -396,6 +404,15 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(true);
 			}
 
+			//硬件版本大于 26 代表是arm的版本. 
+			if(Device_Basic_Setting.reg.pro_info.harware_rev >= 26)
+			{
+				GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1)->EnableWindow(FALSE);
+			}
+			else
+			{
+				GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1)->EnableWindow(TRUE);
+			}
 
 			//版本大于38.6 的才有在setting 里面改port 的功能
 			if(Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 +Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 386)
@@ -679,20 +696,6 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				((CStatic *)GetDlgItem(IDC_STATIC_BAC_SETTING_SD_CARD))->SetWindowTextW(_T("unknown"));
 			}
 
-			//if(bacnet_device_type == PRODUCT_CM5)
-			//{
-			//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->EnableWindow(TRUE);
-			//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->EnableWindow(TRUE);
-			//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->EnableWindow(TRUE);
-			//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->SetWindowTextW(Device_Serial_Port_Status[SUB_MODBUS]);
-			//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->SetWindowTextW(Device_Serial_Port_Status[MAIN_MODBUS]);
-			//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->SetWindowTextW(Device_Serial_Port_Status[NOUSE]);
-
-			//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->EnableWindow(TRUE);
-			//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->EnableWindow(TRUE);
-			//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE2))->EnableWindow(TRUE);
-			//}
-			//else 
 			if((bacnet_device_type == BIG_MINIPANEL) || (bacnet_device_type == SMALL_MINIPANEL) || (bacnet_device_type == TINY_MINIPANEL) || (bacnet_device_type == PRODUCT_CM5))
 			{
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->ResetContent();
@@ -762,22 +765,11 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				}
 				else
 				{
-					Device_Basic_Setting.reg.com_baudrate1 == UART_19200;
+					Device_Basic_Setting.reg.com_baudrate1 = UART_19200;
 				}
 					
 				if(Device_Basic_Setting.reg.com_baudrate2 < sizeof(Baudrate_Array)/sizeof(Baudrate_Array[0]))
 					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE2))->SetCurSel(Device_Basic_Setting.reg.com_baudrate2);
-
-				//if((Device_Basic_Setting.reg.com_baudrate0 == UART_9600) || (Device_Basic_Setting.reg.com_baudrate0 == UART_19200))
-				//{					
-				//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->SetWindowTextW(Baudrate_Array[Device_Basic_Setting.reg.com_baudrate0]);
-				//}
-
-				//if((Device_Basic_Setting.reg.com_baudrate1 == UART_9600) || (Device_Basic_Setting.reg.com_baudrate1 == UART_19200))
-				//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->SetWindowTextW(Baudrate_Array[Device_Basic_Setting.reg.com_baudrate1]);
-
-				//if(Device_Basic_Setting.reg.com_baudrate2 < sizeof(Baudrate_Array)/sizeof(Baudrate_Array[0]))
-				//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE2))->SetWindowTextW(Baudrate_Array[Device_Basic_Setting.reg.com_baudrate2]);
 
 			}
 
@@ -897,6 +889,7 @@ BOOL CBacnetSetting::OnInitDialog()
 	CDialogEx::OnInitDialog();
 
 	// TODO:  Add extra initialization here
+	SetWindowTextW(_T("Setting"));
 	m_setting_dlg_hwnd = this->m_hWnd;
 	g_hwnd_now = m_setting_dlg_hwnd;
 	m_cm5_date_picker.EnableWindow(1);
@@ -911,9 +904,11 @@ BOOL CBacnetSetting::OnInitDialog()
 	hIcon = (HICON)::LoadImage(hInstResource, MAKEINTRESOURCE(IDI_ICON_OK), IMAGE_ICON, 24, 24, 0); 
 	((CButton *)GetDlgItem(IDC_BUTTON_BAC_IP_CHANGED))->SetIcon(hIcon);
 
-
+	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_SETTING);
+	SetIcon(m_hIcon,TRUE);
 	
-	return false;  // return TRUE unless you set the focus to a control
+	GetDlgItem(IDC_BUTTON_BAC_SETTING_OK)->SetFocus();
+	return FALSE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
@@ -939,6 +934,25 @@ BOOL CBacnetSetting::PreTranslateMessage(MSG* pMsg)
 		}
 		return 1;
 	}
+	else if(pMsg->message==WM_NCLBUTTONDBLCLK)
+	{
+		if(!window_max)
+		{
+			window_max = true;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
+		}
+		else
+		{
+			window_max = false;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 100,500,700,SWP_SHOWWINDOW);
+		}
+
+		return 1; 
+	}
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
@@ -952,6 +966,22 @@ void CBacnetSetting::OnTimer(UINT_PTR nIDEvent)
 		{
 			   ::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_SETTING);
 			   KillTimer(TIMER_SYNC_TIMER);
+
+			   if((Device_Basic_Setting.reg.time_update_since_1970 < 1420041600)  || (Device_Basic_Setting.reg.time_update_since_1970 > 1735660800))
+			   {
+				   MessageBox(_T("SYNC time failed , No Reply from server"));
+				   //SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("SYNC time failed , No Reply from server")); 
+			   }
+			   else
+			   {
+				   CTime time_scaletime;
+				   CString strTime;
+				   time_t scale_time  = Device_Basic_Setting.reg.time_update_since_1970;
+				   time_scaletime = scale_time;
+				   strTime = time_scaletime.Format("%y/%m/%d %H:%M:%S");
+				    SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("SYNC time sucess")); 
+			   }
+
 		}
 		break;
 	default:
@@ -976,8 +1006,6 @@ LRESULT  CBacnetSetting::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
 		Show_Results = temp_cs + _T("Success!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 
-		//Post_Refresh_Message(g_bac_instance,READINPUT_T3000,pInvoke->mRow,pInvoke->mRow,sizeof(Str_in_point), BAC_INPUT_GROUP);
-		//MessageBox(_T("Bacnet operation success!"));
 	}
 	else
 	{
@@ -986,8 +1014,6 @@ LRESULT  CBacnetSetting::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
 		Show_Results = temp_cs + _T("Fail!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 
-		//AfxMessageBox(Show_Results);
-		//MessageBox(_T("Bacnet operation fail!"));
 	}
 
 	if(pInvoke)
@@ -1154,7 +1180,7 @@ void CBacnetSetting::OnBnClickedButtonSettingCleanDb()
 	{
 		Device_Basic_Setting.reg.reset_default = 150;
 		CString temp_task_info;
-		temp_task_info.Format(_T("Load Factory Default "));
+		temp_task_info.Format(_T("Clear device "));
 		Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
 	}
 }
@@ -1224,7 +1250,8 @@ void CBacnetSetting::OnBnClickedButtonSettingGsmModual()
 void CBacnetSetting::OnClose()
 {
 	// TODO: Add your message handler code here and/or call default
-
+	ShowWindow(FALSE);
+	return;
 	CDialogEx::OnClose();
 }
 
@@ -1705,7 +1732,7 @@ void CBacnetSetting::OnBnClickedButtonSyncTime()
 	else
 	{
 		SetTimer(TIMER_SYNC_TIMER,3000,NULL);
-		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Send SYNC time success!"));
+		//SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Send SYNC time success!"));
 	}
 
 	((CButton *)GetDlgItem(IDC_BUTTON_SYNC_TIME))->EnableWindow(TRUE);
@@ -1767,5 +1794,165 @@ void CBacnetSetting::OnCbnKillfocusComboBacnetSettingTimeServer()
 	}
 
 
+
+}
+
+
+
+void CBacnetSetting::Reset_Setting_Rect()
+{
+
+	CRect temp_mynew_rect;
+	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+
+	CRect temp_window;
+	GetWindowRect(&temp_window);
+
+	if(window_max)
+	{
+		CRect temp_mynew_rect;
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), NULL);
+	}
+	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
+	{
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,0,0,SWP_NOSIZE );
+	}
+	else
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left + 90,temp_mynew_rect.top + 70,500,700, NULL);
+
+
+	return;
+
+}
+
+
+
+void CBacnetSetting::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	// TODO: Add your message handler code here
+	CRect rc;
+	GetClientRect(rc);
+	if(this->m_hWnd != NULL)
+	{
+		::SetWindowPos(this->m_hWnd, HWND_TOP, 0,0, 0,0,  SWP_NOSIZE | SWP_NOMOVE);
+	}
+}
+
+
+void CBacnetSetting::OnSysCommand(UINT nID, LPARAM lParam)
+{
+	// TODO: Add your message handler code here and/or call default
+	if(nID == SC_MAXIMIZE)
+	{
+		if(window_max == false)
+		{
+			window_max = true;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
+		}
+		else
+		{
+			window_max = false;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 100,500,700,SWP_SHOWWINDOW);
+		}
+		return;
+	}
+
+	CDialogEx::OnSysCommand(nID, lParam);
+}
+
+
+
+
+void CBacnetSetting::OnEnKillfocusEditSettingModbusId()
+{
+	// TODO: Add your control notification handler code here
+	CString temp_cstring;
+	m_edit_modbus_id.GetWindowTextW(temp_cstring);
+	unsigned int temp_modbusid = unsigned int(_wtoi(temp_cstring));
+	if((temp_modbusid<1) || (temp_modbusid >254))
+	{
+		MessageBox(_T("Invalid value."));
+		return;
+	}
+	if((temp_modbusid >0) && (temp_modbusid <= 254) && (temp_modbusid != Device_Basic_Setting.reg.modbus_id))
+	{
+		CString temp_warning;
+		temp_warning.Format(_T("Do you really want to change the modbus ID to %u ?"),temp_modbusid);
+		if(IDYES == MessageBox(temp_warning,_T("Notoce"),MB_YESNO))
+		{
+			unsigned char old_modbusid = Device_Basic_Setting.reg.modbus_id;	//写之前先保存起来；写失败 恢复原值;
+			Device_Basic_Setting.reg.modbus_id = (unsigned char)temp_modbusid;
+			if(Write_Private_Data_Blocking(WRITE_SETTING_COMMAND,0,0) <= 0)
+			{
+				SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Change object instance failed!"));
+				Device_Basic_Setting.reg.modbus_id = old_modbusid;
+				PostMessage(WM_FRESH_CM_LIST,READ_SETTING_COMMAND,NULL);
+			}
+			else
+			{
+				SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Change object instance success!"));
+			}
+		}
+		else
+		{
+			PostMessage(WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);//这里调用 刷新线程重新刷新会方便一点;
+		}
+	}
+}
+
+
+void CBacnetSetting::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+{
+	// TODO: Add your message handler code here and/or call default
+	CDialogEx::OnHScroll(nSBCode, nPos, pScrollBar);
+}
+
+
+void CBacnetSetting::OnBnClickedButtonSettingIoConfig()
+{
+	// TODO: Add your control notification handler code here
+	//版本大于38.6 的才有在setting 里面改port 的功能
+	if(Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 +Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 438)
+	{
+		MessageBox(_T("This feature need the newest firmware."));
+		return;
+	}
+
+
+	if(GetPrivateData_Blocking(g_bac_instance,READEXT_IO_T3000,0,BAC_EXTIO_COUNT - 1,sizeof(Str_Extio_point)) < 0)
+	{
+		MessageBox(_T("Read data timeout"));
+		return;
+	}
+	CBacnetIOConfig IOdlg;
+	IOdlg.DoModal();
+}
+
+
+void CBacnetSetting::OnBnClickedButtonRebootDevice()
+{
+	// TODO: Add your control notification handler code here
+	//版本大于38.6 的才有在setting 里面改port 的功能
+	if(Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 +Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 441)
+	{
+		if(IDYES == MessageBox(_T("Are you sure you want reboot device"),_T("Warning"),MB_YESNOCANCEL | MB_ICONINFORMATION))
+		{
+			Device_Basic_Setting.reg.reset_default = 111;
+			CString temp_task_info;
+			temp_task_info.Format(_T("Reboot device "));
+			Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
+		}
+	}
+	else
+	{
+		MessageBox(_T("Your panel version is too old."),_T("Notice"),MB_OK);
+	}
 
 }

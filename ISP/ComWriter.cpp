@@ -1654,7 +1654,10 @@ BOOL CComWriter::UpdataDeviceInformation(int& ID)
 
 
     hexproductname.MakeLower();
-
+	if (hexproductname.CompareNoCase(L"mini_arm") == 0)
+	{
+		hexproductname = L"Minipanel";
+	}
     prodcutname.MakeUpper();
     hexproductname.MakeUpper();
 	hexproductname.TrimLeft();
@@ -1803,11 +1806,13 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
             {
                 Flag_HEX_BIN =TRUE;
                 int  nRet = Write_One(pWriter->m_szMdbIDs[i],16,127);   // 进入ISP模式
+
                 Sleep (2000);
-                nRet = Read_One(pWriter->m_szMdbIDs[i],11);//等待设备进入ISP 模式,有的设备跳转比较慢，没读到的情况下 休眠后再次尝试;
+                nRet = Read_One(pWriter->m_szMdbIDs[i],11);
+				//等待设备进入ISP 模式,有的设备跳转比较慢，没读到的情况下 休眠后再次尝试;
                 if (nRet <= 0)
                 {
-					Sleep(3000);
+					 Sleep(3000);
 					 nRet = Read_One(pWriter->m_szMdbIDs[i],11);
 					 if(nRet<= 0)
 					 {
@@ -1837,11 +1842,11 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 
        //         }
 				 
-                Sleep (500);
+              //  Sleep (500);--
 
                 int m_ID=pWriter->m_szMdbIDs[i];
 
-                Sleep(2000);
+              //  Sleep(2000);--
 
 
 #if 1

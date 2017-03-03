@@ -26,7 +26,7 @@ IMPLEMENT_DYNAMIC(BacnetController, CDialogEx)
 BacnetController::BacnetController(CWnd* pParent /*=NULL*/)
 	: CDialogEx(BacnetController::IDD, pParent)
 {
-
+	window_max = true;
 }
 
 BacnetController::~BacnetController()
@@ -48,7 +48,8 @@ BEGIN_MESSAGE_MAP(BacnetController, CDialogEx)
 		ON_WM_TIMER()
 		ON_WM_CLOSE()
 		ON_WM_HELPINFO()
-
+		ON_WM_SIZE()
+		ON_WM_SYSCOMMAND()
 END_MESSAGE_MAP()
 
 
@@ -65,6 +66,13 @@ LRESULT  BacnetController::ControllerMessageCallBack(WPARAM wParam, LPARAM lPara
 	{
 		Show_Results = temp_cs + _T("Success!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
+		if((pInvoke->mRow < BAC_PID_COUNT) && (pInvoke->mRow >= 0))
+		{
+			Post_Refresh_One_Message(g_bac_instance,READCONTROLLER_T3000,
+				pInvoke->mRow,pInvoke->mRow,sizeof(Str_controller_point));
+			TRACE(_T("Controller receive \r\n"));
+			SetTimer(2,2000,NULL);
+		}
 		//MessageBox(_T("Bacnet operation success!"));
 	}
 	else
@@ -90,7 +98,10 @@ LRESULT  BacnetController::ControllerMessageCallBack(WPARAM wParam, LPARAM lPara
 BOOL BacnetController::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
+	SetWindowTextW(_T("PID"));
 	Initial_List();
+	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_PID);
+	SetIcon(m_hIcon,TRUE);
 	PostMessage(WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
 	SetTimer(1,CONTROLLOR_REFRESH_TIME,NULL);
 	// TODO:  Add extra initialization here
@@ -114,6 +125,26 @@ BOOL BacnetController::PreTranslateMessage(MSG* pMsg)
 
 		m_controller_list.Get_clicked_mouse_position();
 		return TRUE;
+	}
+	else if(pMsg->message==WM_NCLBUTTONDBLCLK)
+	{
+		if(!window_max)
+		{
+			window_max = true;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
+		}
+		else
+		{
+			window_max = false;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
+		}
+
+
+		return 1; 
 	}
 
 	return CDialogEx::PreTranslateMessage(pMsg);
@@ -139,12 +170,14 @@ void BacnetController::Initial_List()
 	m_controller_list.InsertColumn(CONTROLLER_ACTION, _T("Action"), 50, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_controller_list.InsertColumn(CONTROLLER_PROPORTIONAL, _T("Prop"), 50, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_controller_list.InsertColumn(CONTROLLER_RESET, _T("Int"), 50, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_controller_list.InsertColumn(CONTROLLER_I_TIME, _T("Time"), 50, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_controller_list.InsertColumn(CONTROLLER_RATE, _T("Der"), 50, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_controller_list.InsertColumn(CONTROLLER_BIAS, _T("Bias"), 50, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	
 	
 	m_controller_dlg_hwnd = this->m_hWnd;
 	//g_hwnd_now = m_controller_dlg_hwnd;
+	m_controller_list.SetListHwnd(this->m_hWnd);
 
 	CRect list_rect,win_rect;
 	m_controller_list.GetWindowRect(list_rect);
@@ -168,6 +201,17 @@ void BacnetController::Initial_List()
 		m_controller_list.InsertItem(i,temp_item);
 		m_controller_list.SetCellEnabled(i,CONTROLLER_INPUTUNITS,0);
 		m_controller_list.SetCellEnabled(i,CONTROLLER_SETPOINTUNITS,0);
+
+		if(ListCtrlEx::ComboBox == m_controller_list.GetColumnType(CONTROLLER_I_TIME))
+		{
+			ListCtrlEx::CStrList strlist;
+
+			for (int i=0;i<(int)sizeof(PID_Time_Type)/sizeof(PID_Time_Type[0]);i++)
+			{
+				strlist.push_back(PID_Time_Type[i]);
+			}
+			m_controller_list.SetCellStringList(i, CONTROLLER_I_TIME, strlist);		
+		}
 
 
 		for (int x=0;x<CONTROLLER_COL_NUMBER;x++)
@@ -341,21 +385,6 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 		CString temp_output_value;
 		temp_output_value.Format(_T("%.1f%%"),persend_data);
 		m_controller_list.SetItemText(i,CONTROLLER_OUTPUT,temp_output_value);
-
-		//CString temp_sample_time;
-		//temp_sample_time.Format(_T("%u"),m_controller_data.at(i).sample_time);
-		//m_controller_list.SetItemText(i,CONTROLLER_SAMPLE_TIME,temp_sample_time);
-		//temp_des2.Format(_T("%d"),m_controller_data.at(i).input_value);
-		//m_controller_list.SetItemText(i,CONTROLLER_INPUTVALUE,temp_des2);
-
-		//if(m_controller_data.at(i).input.number < BAC_INPUT_ITEM_COUNT)
-		//{
-		//	if(m_Input_data.at(m_controller_data.at(i).input.number).range < INPUT_ANOLAG_UNITE_COUNT)
-		//		m_controller_list.SetItemText(i,CONTROLLER_INPUTUNITS,Input_List_Analog_Units[m_Input_data.at(m_controller_data.at(i).input.number).range]);
-		//	else
-		//		m_controller_list.SetItemText(i,CONTROLLER_INPUTUNITS,_T(""));
-		//}
-		
 			
 		temp_des2.Empty();
 		temp_des3.Empty();
@@ -521,77 +550,7 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 				}
 			}
 		}
-#if 0
-		if(m_controller_data.at(i).setpoint.number< BAC_VARIABLE_ITEM_COUNT)
-		{	
-			if(m_controller_data.at(i).setpoint.point_type == 0 )
-				temp_des2.Empty();
-			else
-			{
-				int num_point,num_panel,num_net,k;
-				Point_T3000 point;
-				point.number = m_controller_data.at(i).setpoint.number;
-				point.number = point.number + 1;	//input setpoint 是从 0 开始计数的 ，但是要去找point label 要从1开始;
-				point.panel = m_controller_data.at(i).setpoint.panel;
-				point.point_type = m_controller_data.at(i).setpoint.point_type;
-				byte point_type,var_type;
-				
-				int temp_network = 0;
-				char buf[255];
-				char q[17];
-				pointtotext_for_controller(q, &point);
 
-				char * temp1 = ispoint(q,&num_point,&var_type, &point_type, &num_panel, &num_net, temp_network, point.panel, &k);
-				if(temp1!=NULL)
-				{
-					if(strlen(temp1) < 255)
-					{
-						strcpy(buf,temp1);
-
-						MultiByteToWideChar( CP_ACP, 0, (char *)buf,(int)strlen((char *)buf)+1, 
-							temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
-						temp_des2.ReleaseBuffer();	
-					}
-				}
-
-#if 0
-				MultiByteToWideChar( CP_ACP, 0, (char *)m_Variable_data.at(m_controller_data.at(i).setpoint.number - 1).label, 
-					(int)strlen((char *)m_Variable_data.at(m_controller_data.at(i).setpoint.number - 1).label)+1, 
-					temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
-				temp_des2.ReleaseBuffer();	
-				if(temp_des2.GetLength()>9)//如果获取的Var长度大于9，说明获取的Label不对，也要重置;
-				{
-					temp_des2.Empty();
-					temp_des3.Empty();
-				}
-				else
-				{
-					CString cstemp_value;
-					float temp_float_value;
-					temp_float_value = ((float)m_Variable_data.at(m_controller_data.at(i).setpoint.number - 1).value) / 1000;
-					temp_des3.Format(_T("%.1f"),temp_float_value);
-					
-
-					//temp_des3.Format(_T("%d"),m_Variable_data.at(m_controller_data.at(i).setpoint.number - 1).value);
-				}
-				if(m_Variable_data.at(i).digital_analog == BAC_UNITS_ANALOG)
-				{
-					if(m_Variable_data.at(i).range<=sizeof(Variable_Analog_Units_Array)/sizeof(Variable_Analog_Units_Array[0]))
-					{
-						m_controller_list.SetItemText(i,CONTROLLER_SETPOINTUNITS,Variable_Analog_Units_Array[m_Variable_data.at(m_controller_data.at(i).setpoint.number - 1).range]);
-						//temp_value.Format(_T("%d"),m_Variable_data.at(i).value);
-						//m_variable_list.SetItemText(i,VARIABLE_VALUE,temp_value);
-					}
-				}
-#endif
-			}
-
-
-			
-
-			
-		}
-#endif
 
 		if(bacnet_device_type == STM32_HUM_NET)
 		{
@@ -602,11 +561,14 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 		m_controller_list.SetItemText(i,CONTROLLER_SETVALUE,temp_des3);
 		m_controller_list.SetItemText(i,CONTROLLER_SETPOINTUNITS,temp_set_unit);
 	
-		//if(m_controller_data.at(i).units < VARIABLE_ANALOG_UNITE_COUNT)
-		//	m_controller_list.SetItemText(i,CONTROLLER_SETPOINTUNITS,Variable_Analog_Units_Array[m_controller_data.at(i).units]);
-		//else
-		//	m_controller_list.SetItemText(i,CONTROLLER_SETPOINTUNITS,_T(""));
-
+		if(m_controller_data.at(i).repeats_per_min == 0)
+		{
+			m_controller_list.SetItemText(i,CONTROLLER_I_TIME,PID_Time_Type[0]);
+		}
+		else
+		{
+			m_controller_list.SetItemText(i,CONTROLLER_I_TIME,PID_Time_Type[1]);
+		}
 
 		if(m_controller_data.at(i).action == 0)
 		{
@@ -804,6 +766,7 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 				
 				MessageBox(temp_message,_T("Information"),MB_OK |MB_ICONINFORMATION);
 				m_controller_list.SetItemText(Changed_Item,Changed_SubItem,_T(""));
+
 				return 0;
 			}
 		}
@@ -887,6 +850,7 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 		char cTemp1[255];
 		char temp_setpoint[250];
 		char * tempcs=NULL;
+		cs_temp = cs_temp.MakeUpper();
 		memset(cTemp1,0,255);
 		memset(temp_setpoint,0,250);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
@@ -1031,7 +995,23 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 		}
 	}
 
-
+	if(Changed_SubItem == CONTROLLER_I_TIME)
+	{
+		CString cs_temp = m_controller_list.GetItemText(Changed_Item,Changed_SubItem);
+		New_CString = cs_temp;
+		if(cs_temp.CompareNoCase(PID_Time_Type[0]) == 0)
+		{
+			m_controller_data.at(Changed_Item).repeats_per_min = 0;
+		}
+		else if(cs_temp.CompareNoCase(PID_Time_Type[1]) == 0)
+		{
+			m_controller_data.at(Changed_Item).repeats_per_min = 1;
+		}
+		else
+		{
+			m_controller_data.at(Changed_Item).repeats_per_min = 0;
+		}
+	}
 
 	cmp_ret = memcmp(&m_temp_controller_data[Changed_Item],&m_controller_data.at(Changed_Item),sizeof(Str_controller_point));
 	if(cmp_ret!=0)
@@ -1039,7 +1019,6 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 		m_controller_list.SetItemBkColor(Changed_Item,Changed_SubItem,LIST_ITEM_CHANGED_BKCOLOR);
 		temp_task_info.Format(_T("Write Controllers List Item%d .Changed to \"%s\" "),Changed_Item + 1,New_CString);
 		Post_Write_Message(g_bac_instance,WRITEPID_T3000,Changed_Item,Changed_Item,sizeof(Str_controller_point),m_controller_dlg_hwnd ,temp_task_info,Changed_Item,Changed_SubItem);
-
 	}
 
 
@@ -1133,7 +1112,6 @@ void BacnetController::OnNMClickListController(NMHDR *pNMHDR, LRESULT *pResult)
 		m_controller_list.SetItemBkColor(lRow,lCol,LIST_ITEM_CHANGED_BKCOLOR);
 		temp_task_info.Format(_T("Write Controller List Item%d .Changed to \"%s\" "),lRow + 1,New_CString);
 		Post_Write_Message(g_bac_instance,WRITEPID_T3000,(int8_t)lRow,(int8_t)lRow,sizeof(Str_controller_point),m_controller_dlg_hwnd,temp_task_info,lRow,lCol);
-
 	}
 
 
@@ -1144,24 +1122,43 @@ void BacnetController::OnNMClickListController(NMHDR *pNMHDR, LRESULT *pResult)
 void BacnetController::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
-	if(g_protocol == PROTOCOL_BIP_TO_MSTP)
+	switch(nIDEvent)
 	{
-		PostMessage(WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
-	}
-	else if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
-	{
-		if(bac_select_device_online)
+	case 1:
 		{
-			PostMessage(WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
-			Post_Refresh_Message(g_bac_instance,READCONTROLLER_T3000,0,BAC_PID_COUNT - 1,sizeof(Str_controller_point),BAC_PID_GROUP);
+			if(g_protocol == PROTOCOL_BIP_TO_MSTP)
+			{
+				PostMessage(WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
+			}
+			else if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
+			{
+				if(bac_select_device_online)
+				{
+					PostMessage(WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
+					Post_Refresh_Message(g_bac_instance,READCONTROLLER_T3000,0,BAC_PID_COUNT - 1,sizeof(Str_controller_point),BAC_PID_GROUP);
+				}
+			}
 		}
+		break;
+	case 2:
+		{
+			KillTimer(2);
+			if(this->IsWindowVisible())
+				PostMessage(WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
+		}
+		break;
+	default :
+		break;
 	}
+
 	CDialogEx::OnTimer(nIDEvent);
 }
 
 void BacnetController::OnClose()
 {
 	// TODO: Add your message handler code here and/or call default
+	ShowWindow(FALSE);
+	return;
 	KillTimer(1);
 	m_controller_dlg_hwnd = NULL;
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
@@ -1206,7 +1203,74 @@ int GetPidValue(int index,CString &Auto_M,CString &persend_data)
 	return 1;
 }
 
+void BacnetController::OnSysCommand(UINT nID, LPARAM lParam)
+{
+	// TODO: Add your message handler code here and/or call default
 
+	if(nID == SC_MAXIMIZE)
+	{
+		if(window_max == false)
+		{
+			window_max = true;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
+		}
+		else
+		{
+			window_max = false;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
+		}
+		return;
+	}
+
+	CDialogEx::OnSysCommand(nID, lParam);
+}
+
+
+void BacnetController::Reset_Controller_Rect()
+{
+
+	CRect temp_mynew_rect;
+	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+
+	CRect temp_window;
+	GetWindowRect(&temp_window);
+
+	if(window_max)
+	{
+		CRect temp_mynew_rect;
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), NULL);
+	}
+	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
+	{
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,0,0,SWP_NOSIZE );
+	}
+	else
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left + 90,temp_mynew_rect.top + 70,500,700, NULL);
+
+
+	return;
+
+}
+
+void BacnetController::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	// TODO: Add your message handler code here
+	CRect rc;
+	GetClientRect(rc);
+	if(m_controller_list.m_hWnd != NULL)
+	{
+		::SetWindowPos(this->m_hWnd, HWND_TOP, 0,0, 0,0,  SWP_NOSIZE | SWP_NOMOVE);
+		//m_program_list.MoveWindow(&rc);
+		m_controller_list.MoveWindow(rc.left,rc.top,rc.Width(),rc.Height() - 80);
+	}
+}
 
 
 BOOL BacnetController::OnHelpInfo(HELPINFO* pHelpInfo)

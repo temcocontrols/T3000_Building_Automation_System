@@ -639,9 +639,6 @@
     <ClCompile Include="T3000_Default_MainView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BacnetSettingHealth.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MySocket.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -672,9 +669,6 @@
     <ClCompile Include="StatusbarCtrl.cpp">
       <Filter>Bacnet</Filter>
     </ClCompile>
-    <ClCompile Include="BacnetMessageInput.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="HexFileParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -698,6 +692,18 @@
     </ClCompile>
     <ClCompile Include="BTUMeterDlg.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetIOConfig.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetMessageInput.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetSettingHealth.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetVarCusRang.cpp">
+      <Filter>Bacnet</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -940,7 +946,6 @@
     <None Include="res\unlock.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\sqlite3.dll" />
     <None Include="res\AlarmsBrown.bmp">
       <Filter>Resource Files</Filter>
     </None>
@@ -1009,6 +1014,33 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\MonitorData.mdb" />
+    <None Include="res\loading_icon\Step1.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\loading_icon\Step2.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\loading_icon\Step3.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\loading_icon\Step4.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\loading_icon\Step5.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\loading_icon\Step6.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\default_icon\Alarms.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\default_icon\RemotePoints.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\default_icon\Configuration.ico">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">
@@ -1734,10 +1766,16 @@
     <ClInclude Include="SetTimeDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BADO\BADO.h">
-      <Filter>BADO</Filter>
-    </ClInclude>
     <ClInclude Include="BTUMeterDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Modbus_LIB.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetVarCusRang.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetIOConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1745,5 +1783,8 @@
     <ResourceCompile Include="T3000.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\SQLiteDriver\sqlite3.lib" />
   </ItemGroup>
 </Project>

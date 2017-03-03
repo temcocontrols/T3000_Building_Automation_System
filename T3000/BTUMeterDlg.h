@@ -1,4 +1,5 @@
 #pragma once
+#include "afxwin.h"
 
 
 
@@ -7,11 +8,9 @@
 class CBTUMeterDlg : public CFormView
 {
 	DECLARE_DYNCREATE(CBTUMeterDlg)
-
-protected:
+public:
 	CBTUMeterDlg();           // protected constructor used by dynamic creation
 	virtual ~CBTUMeterDlg();
-
 public:
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG_BTUMETER };
@@ -27,6 +26,15 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
+public:
+	virtual void OnInitialUpdate();
+	void Fresh();
+	CEdit m_editor_address;
+	CEdit m_edit_sn;
+	CEdit m_edit_model;
+	CEdit m_edit_fv;
+	CEdit m_edit_hv;
+	CComboBox m_combox_baudrate;
 };
 
 

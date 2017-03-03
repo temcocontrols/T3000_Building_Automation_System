@@ -9,6 +9,8 @@ class CDuplicateIdDetected : public CDialogEx
 	DECLARE_DYNAMIC(CDuplicateIdDetected)
 
 public:
+	CDuplicateIdDetected(int temp,CWnd* pParent = NULL);
+
 	CDuplicateIdDetected(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CDuplicateIdDetected();
 
@@ -57,4 +59,7 @@ public:
     CppSQLite3DB m_SqliteDBBuilding;
     CppSQLite3Table m_table;
     CppSQLite3Query m_q;
+
+	int duplicate_mode;
+	afx_msg void OnStnClickedStaticNetworkTitle();
 };

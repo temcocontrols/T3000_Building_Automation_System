@@ -22,7 +22,7 @@ IMPLEMENT_DYNAMIC(CBacnetVariable, CDialogEx)
 CBacnetVariable::CBacnetVariable(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CBacnetVariable::IDD, pParent)
 {
-
+	window_max = true;
 }
 
 CBacnetVariable::~CBacnetVariable()
@@ -49,6 +49,8 @@ BEGIN_MESSAGE_MAP(CBacnetVariable, CDialogEx)
 	ON_NOTIFY(NM_KILLFOCUS, IDC_DATETIMEPICKER2_VARIABLE, &CBacnetVariable::OnNMKillfocusDatetimepicker2Variable)
 	ON_WM_CLOSE()
 	ON_WM_HELPINFO()
+	ON_WM_SIZE()
+	ON_WM_SYSCOMMAND()
 END_MESSAGE_MAP()
 
 
@@ -93,7 +95,7 @@ LRESULT  CBacnetVariable::VariableMessageCallBack(WPARAM wParam, LPARAM lParam)
 BOOL CBacnetVariable::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-
+	SetWindowTextW(_T("VARIABLE"));
 	// TODO:  Add extra initialization here
 	Initial_List();	//Initial the list of Variable,read from device;
 	PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
@@ -102,7 +104,14 @@ BOOL CBacnetVariable::OnInitDialog()
 	((CButton *)GetDlgItem(IDC_BUTTON_VARIABLE_READ))->SetIcon(hIcon);	
 	hIcon   = AfxGetApp()->LoadIcon(IDI_ICON_OK);
 	((CButton *)GetDlgItem(IDC_BUTTON_VARIABLE_APPLY))->SetIcon(hIcon);
+
+	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_VARIABLE);
+	SetIcon(m_hIcon,TRUE);
+
 	SetTimer(1,BAC_LIST_REFRESH_TIME + 5000,NULL);
+
+	//SetTimer(6,250,NULL);
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -130,9 +139,12 @@ void CBacnetVariable::Initial_List()
 	m_variable_list.InsertColumn(VARIABLE_VALUE, _T("Value"), 120, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_variable_list.InsertColumn(VARIABLE_UNITE, _T("Units"), 120, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_variable_list.InsertColumn(VARIABLE_LABLE, _T("Label"), 130, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_variable_list.Setlistcolcharlimit(VARIABLE_FULL_LABLE,STR_VARIABLE_DESCRIPTION_LENGTH -1);
+	m_variable_list.Setlistcolcharlimit(VARIABLE_LABLE,STR_VARIABLE_LABEL-1);
+
 	m_variable_dlg_hwnd = this->m_hWnd;
 	//g_hwnd_now = m_variable_dlg_hwnd;
-
+	m_variable_list.SetListHwnd(this->m_hWnd);
 	CRect list_rect,win_rect;
 	m_variable_list.GetWindowRect(list_rect);
 	ScreenToClient(&list_rect);
@@ -140,7 +152,7 @@ void CBacnetVariable::Initial_List()
 	m_variable_list.Set_My_WindowRect(win_rect);
 	m_variable_list.Set_My_ListRect(list_rect);
 
-	CTime TimeTemp(2016,1,1,0,0,0);
+	CTime TimeTemp(2017,1,1,0,0,0);
 	m_variable_time_picker.SetFormat(_T("HH:mm"));
 	m_variable_time_picker.SetTime(&TimeTemp);
 	m_variable_time_picker.ShowWindow(SW_HIDE);
@@ -330,7 +342,7 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 			//{
 			//	m_variable_list.SetItemText(i,VARIABLE_UNITE,Variable_Analog_Units_Array[0]);
 			//}
-			else if(m_Variable_data.at(i).range<=sizeof(Variable_Analog_Units_Array)/sizeof(Variable_Analog_Units_Array[0]))
+			else if(m_Variable_data.at(i).range<sizeof(Variable_Analog_Units_Array)/sizeof(Variable_Analog_Units_Array[0]))
 			{
 			m_variable_list.SetItemText(i,VARIABLE_UNITE,Variable_Analog_Units_Array[m_Variable_data.at(i).range]);
 
@@ -342,6 +354,16 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 
 			//temp_value.Format(_T("%d"),m_Variable_data.at(i).value);
 			//m_variable_list.SetItemText(i,VARIABLE_VALUE,temp_value);
+			}
+			else if((m_Variable_data.at(i).range >= 34 ) && (m_Variable_data.at(i).range <= 38))
+			{
+				m_variable_list.SetItemText(i,VARIABLE_UNITE,Analog_Variable_Units[m_Variable_data.at(i).range - 34]);
+
+				CString cstemp_value;
+				float temp_float_value;
+				temp_float_value = ((float)m_Variable_data.at(i).value) / 1000;
+				cstemp_value.Format(_T("%.3f"),temp_float_value);
+				m_variable_list.SetItemText(i,VARIABLE_VALUE,cstemp_value);
 			}
 			else
 			{
@@ -370,7 +392,13 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 
 	}
 	copy_data_to_ptrpanel(TYPE_VARIABLE);
-
+	CString g_configfile_path = g_strExePth + g_strStartInterface_config;
+	int savetodb = GetPrivateProfileInt(_T("SaveToDB"), _T("VAR"), 0, g_configfile_path);
+	if (savetodb == 1)
+	{
+		Save_AVData_to_db();
+	}
+	//Save_AVData_to_db();
 	return 0;
 }
 LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)
@@ -605,10 +633,10 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 		m_variable_list.GetSubItemRect(lRow,lCol,LVIR_BOUNDS,myrect);
 
 
-		myrect.left = myrect.left + list_rect.left - win_rect.left  +2 ;
-		myrect.right = myrect.right + list_rect.left - win_rect.left + 2;
-		myrect.top = myrect.top + 24;
-		myrect.bottom = myrect.bottom + 26;
+		myrect.left = myrect.left + list_rect.left - win_rect.left  - 6 ;
+		myrect.right = myrect.right + list_rect.left - win_rect.left - 6;
+		myrect.top = myrect.top -1 ;
+		myrect.bottom = myrect.bottom + 3;
 		m_variable_time_picker.BringWindowToTop();
 		m_variable_time_picker.MoveWindow(myrect);
 
@@ -623,7 +651,7 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 			temp_hour = 0;
 			temp_minute = 0;
 			temp_second = 0;
-			CTime TimeTemp(2016,1,1,temp_hour,temp_minute,0);
+			CTime TimeTemp(2017,1,1,temp_hour,temp_minute,0);
 			m_variable_time_picker.SetFormat(_T("HH:mm:ss"));
 			m_variable_time_picker.SetTime(&TimeTemp);
 			m_variable_time_picker.SetFocus();
@@ -639,7 +667,7 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 				temp_minute = 0;
 			if(temp_second >= 60)
 				temp_second = 0;
-			CTime TimeTemp(2016,1,1,temp_hour,temp_minute,temp_second);
+			CTime TimeTemp(2017,1,1,temp_hour,temp_minute,temp_second);
 			m_variable_time_picker.SetFormat(_T("HH:mm:ss"));
 			m_variable_time_picker.SetTime(&TimeTemp);
 			m_variable_time_picker.SetFocus();
@@ -724,6 +752,19 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 			}
 
 		}
+
+		CString temp_info;
+		if(GetPrivateData_Blocking(g_bac_instance,READVARIABLE_T3000,0,4,sizeof(Str_variable_uint_point)) > 0)
+		{
+			temp_info.Format(_T("Read variable custmer units success."));
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_info);
+		}
+		else
+		{
+			temp_info.Format(_T("Read variable custmer units success."));
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_info);
+		}
+
 		if(m_Variable_data.at(lRow).digital_analog == BAC_UNITS_ANALOG)
 		{
 			bac_ranges_type = VARIABLE_RANGE_ANALOG_TYPE;
@@ -762,6 +803,11 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 			{
 				m_Variable_data.at(lRow).digital_analog = BAC_UNITS_ANALOG;
 				m_Variable_data.at(lRow).range = bac_range_number_choose;
+				if((bac_range_number_choose >= 34) && (bac_range_number_choose <= 38))
+				{
+					m_variable_list.SetItemText(lRow,lCol,Analog_Variable_Units[bac_range_number_choose - 34]);
+				}
+				else
 				m_variable_list.SetItemText(lRow,lCol,Variable_Analog_Units_Array[bac_range_number_choose]);
 
 
@@ -860,7 +906,7 @@ void CBacnetVariable::OnTimer(UINT_PTR nIDEvent)
 			{
 				PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
 			}
-			else if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
+			else if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_VARIABLE))  )	//GSM连接时不要刷新;
 			{
 			::PostMessage(m_variable_dlg_hwnd,WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
 			if(bac_select_device_online)
@@ -949,6 +995,26 @@ BOOL CBacnetVariable::PreTranslateMessage(MSG* pMsg)
 			return 1;
 		}
 	}
+	else if(pMsg->message==WM_NCLBUTTONDBLCLK)
+	{
+		if(!window_max)
+		{
+			window_max = true;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
+		}
+		else
+		{
+			window_max = false;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 60 ,temp_mynew_rect.top + 60,500,700,SWP_SHOWWINDOW);
+		}
+
+
+		return 1; 
+	}
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
@@ -956,6 +1022,8 @@ BOOL CBacnetVariable::PreTranslateMessage(MSG* pMsg)
 void CBacnetVariable::OnClose()
 {
 	// TODO: Add your message handler code here and/or call default
+	ShowWindow(FALSE);
+	return;
 	KillTimer(1);
 	m_variable_dlg_hwnd = NULL;
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
@@ -1102,9 +1170,11 @@ int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &
 			digital_value = 2;
 
 		}
-		else if((m_Variable_data.at(i).range<=sizeof(Variable_Analog_Units_Array)/sizeof(Variable_Analog_Units_Array[0])) && (m_Variable_data.at(i).range != 0))
+		else if((m_Variable_data.at(i).range<=sizeof(Variable_Analog_Units_Array)/sizeof(Variable_Analog_Units_Array[0]))/* && (m_Variable_data.at(i).range != 0)*/)
 		{
 			ret_unit = Variable_Analog_Units_Array[m_Variable_data.at(i).range];
+			if(m_Variable_data.at(i).range == 0)
+				ret_unit.Empty();
 			CString cstemp_value;
 			float temp_float_value;
 			temp_float_value = ((float)m_Variable_data.at(i).value) / 1000;
@@ -1137,4 +1207,74 @@ BOOL CBacnetVariable::OnHelpInfo(HELPINFO* pHelpInfo)
 // 	}
 
 	return CDialogEx::OnHelpInfo(pHelpInfo);
+}
+
+
+void CBacnetVariable::Reset_Variable_Rect()
+{
+
+	CRect temp_mynew_rect;
+	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+
+	CRect temp_window;
+	GetWindowRect(&temp_window);
+
+	if(window_max)
+	{
+		CRect temp_mynew_rect;
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), NULL);
+	}
+	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
+	{
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,0,0,SWP_NOSIZE );
+	}
+	else
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left + 60,temp_mynew_rect.top + 60,700,700, NULL);
+
+
+	return;
+
+}
+
+
+void CBacnetVariable::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	// TODO: Add your message handler code here
+	CRect rc;
+	GetClientRect(rc);
+	if(m_variable_list.m_hWnd != NULL)
+	{
+		::SetWindowPos(this->m_hWnd, HWND_TOP, 0,0, 0,0,  SWP_NOSIZE | SWP_NOMOVE);
+		m_variable_list.MoveWindow(&rc);
+	}
+}
+
+
+void CBacnetVariable::OnSysCommand(UINT nID, LPARAM lParam)
+{
+	// TODO: Add your message handler code here and/or call default
+
+	if(nID == SC_MAXIMIZE)
+	{
+		if(window_max == false)
+		{
+			window_max = true;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
+		}
+		else
+		{
+			window_max = false;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 60 ,temp_mynew_rect.top + 60,500,700,SWP_SHOWWINDOW);
+		}
+		return;
+	}
+
+	CDialogEx::OnSysCommand(nID, lParam);
 }

@@ -99,6 +99,7 @@ HTREEITEM  hLastTreeItem =NULL;
 #include "Class/md5.h"
 #include "NewTstatSchedulesDlg.h"
 #include "../SQLiteDriver/CppSQLite3.h"
+#include "BTUMeterDlg.h"
 bool b_create_status = false;
 const TCHAR c_strCfgFileName[] = _T("config.txt");
 //	配置文件名称，用于保存用户设置
@@ -142,6 +143,7 @@ extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure t
 #include "BacnetAlarmLog.h"
 #include "BacnetTstat.h"
 #include "BacnetRemotePoint.h"
+#include "BacnetSetting.h"
 extern BacnetScreen *Screen_Window;
 extern CBacnetProgram *Program_Window;
 extern CBacnetInput *Input_Window ;
@@ -155,6 +157,7 @@ extern CBacnetAlarmLog *AlarmLog_Window ;
 extern CBacnetTstat *Tstat_Window ;
 extern CBacnetRemotePoint* Remote_Point_Window ;
 extern int bacnet_view_number;
+extern CBacnetSetting *Setting_Window;
 
 CCriticalSection MyCriticalSection;
 
@@ -212,6 +215,7 @@ T3000RegAddress MyRegAddress;
 #define SCAN_TIMER 2
 #define MONITOR_MOUSE_KEYBOARD_TIMER 3
 #define SAVE_PRODYCT_STATUS  4
+#define FOR_LAST_VIEW_TIMER 5
 
 #define MESSAGE_INFORMATION_DEAL 5
 
@@ -349,7 +353,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
     ON_COMMAND(ID_CONTROL_ALARM_LOG, &CMainFrame::OnControlAlarmLog)
     ON_COMMAND(ID_Menu_CHECKUPDATE, &CMainFrame::OnMenuCheckupdate)
   //  ON_COMMAND(ID_DATABASE_PV, &CMainFrame::OnDatabasePv)
-    ON_COMMAND(ID_CONTROL_TSTAT, &CMainFrame::OnControlTstat)
+    ON_COMMAND(ID_CONTROL_TSTAT, &CMainFrame::OnControlRemotePoint)
 
 
     ON_COMMAND(ID_CONNECT2,OnConnect)
@@ -407,7 +411,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_COMMAND(ID_HELP_USING_UPDATE, &CMainFrame::OnHelpUsingUpdate)
 
 	 ON_MESSAGE(6677,PingDevice)
-	END_MESSAGE_MAP()
+	 ON_WM_SIZE()
+	 END_MESSAGE_MAP()
 
 static UINT indicators[] =
 {
@@ -418,6 +423,16 @@ static UINT indicators[] =
     IDS_SHOW_RESULTS,
 
 };
+
+bool sort_by_minipanel_panelnumber(refresh_net_device object1,refresh_net_device object2)
+{
+	return object1.panal_number < object2.panal_number;
+}
+
+bool sort_by_minipanel_pid(refresh_net_device object1,refresh_net_device object2)
+{
+	return object1.product_id > object2.product_id;
+}
 
 unsigned short tempchange[512];
 int index_Count=0;
@@ -649,6 +664,7 @@ void CMainFrame::InitViews()
     m_pViews[DLG_DIALOG_TSTAT_INPUT_VIEW]=(CView *)new CTStatInputView;
     m_pViews[DLG_DIALOG_TSTAT_OUTPUT_VIEW]=(CView *)new CTStatOutputView;
     m_pViews[DLG_DIALOG_BOATMONITOR] = (CView *)new CBoatMonitorViewer;
+	m_pViews[DLG_DIALOG_BTUMETER] = (CView *)new CBTUMeterDlg;
     CDocument* pCurrentDoc = GetActiveDocument();
     CCreateContext newContext;
     newContext.m_pNewViewClass = NULL;
@@ -694,14 +710,321 @@ void getLocalIp(void)
     }
 }
 
+//void MyUpperCase( char str[] ) // 将str 中的小写字母转换成大写字母
+//{
+//	int abc = sizeof(str)/sizeof(str[0]);
+//	int xxx = sizeof(str);
+//	int bbb = sizeof(str[0]);
+//	for( size_t i=0; i<sizeof(str)/sizeof(str[0]); ++i )
+//	{
+//		if( 'a'<=str[i] && str[i]<='z' )
+//		{
+//			str[i] -= ('a'-'A' );
+//		}
+//	}
+//}
 
 
+//bool sort_by_id( refresh_net_device obj1, refresh_net_device obj2)
+//{
+//	return obj1.modbusID > obj2.modbusID;
+//}
+#if 0
+#include <map> 
+#include <string> 
+#include <iostream> 
+using namespace std;
+
+
+typedef struct
+{
+	int vendorid;
+	char vendor_name[30];
+	int modbusid;
+}my_str_info;
+
+
+typedef list<my_str_info> INTLISTT; 
+
+
+typedef std::map <int ,string>  _persennal;
+
+void my_map_insert(_persennal *pointstu,string stdindex,int index)
+{
+	pointstu->insert(map <int,string>::value_type(index,stdindex));
+}
+
+int test_my_map_function()
+{
+	map <int,string> mymapdata;
+	my_map_insert(&mymapdata,"Temco",30);
+	my_map_insert(&mymapdata,"Alex",29);
+
+	my_map_insert(&mymapdata,"Junye",13);
+
+	int find_key = 13;
+
+	map <int,string>::iterator itter;
+
+	itter = mymapdata.find(find_key);
+	mymapdata.erase(itter);
+// 
+// 	itter = mymapdata.find("Alex");
+// 	mymapdata.erase(itter);
+
+	Sleep(1);
+	return 1;
+}
+#endif
+
+#if 1
+void map_insert(map < string, string > *mapStudent, string index, string x) 
+{ 
+	mapStudent->insert(map < string, string >::value_type(index, x)); 
+}
+int test_map_function() 
+{ 
+#if 0
+	map <int,string> mymaps;
+
+	mymaps.insert(map <int,string>::value_type(1,"1111"));
+	mymaps.insert(map <int,string>::value_type(2,"2222"));
+	mymaps.insert(map <int,string>::value_type(3,"3333"));
+	map <int ,string>::iterator test_itt;
+	test_itt = mymaps.find(2);
+	mymaps.erase(test_itt);
+	Sleep(1);
+#endif
+
+#if 0
+	char tmp[32] = ""; 
+	map < string, string > mapS;
+	//insert element 
+	map_insert(&mapS, "192.168.0.128", "xiong"); 
+	map_insert(&mapS, "192.168.200.3", "feng"); 
+	map_insert(&mapS, "192.168.200.33", "xiongfeng");
+	map < string, string >::iterator iter;
+	TRACE("We Have Third Element:\r\n");
+	TRACE("-----------------------------\r\n");
+	//find element 
+	iter = mapS.find("192.168.0.33"); 
+	if (iter != mapS.end()) 
+	{ 
+		TRACE("find the element\r\n");
+		TRACE("It is: %s\r\n",iter->second);
+	} else 
+	{ 
+		TRACE("not find the element\r\n");
+	}
+	//see element 
+	for (iter = mapS.begin(); iter != mapS.end(); iter++ ) 
+	{
+		TRACE("|%s|%s|\r\n",iter->first.data(),iter->second.data());
+	} 
+	cout << "-----------------------------" << endl;
+	map_insert(&mapS, "192.168.30.23", "xf");
+	TRACE("After We Insert One Element:\r\n"); 
+	TRACE("-----------------------------\r\n"); 
+	for (iter = mapS.begin(); iter != mapS.end(); iter++ ) 
+	{
+		TRACE("|%s|%s|\r\n",iter->first.data(),iter->second.data());
+	}
+	cout << "-----------------------------" << endl;
+	//delete element 
+	iter = mapS.find("192.168.200.33"); 
+	if (iter != mapS.end()) 
+	{ 
+		TRACE("find the element %s\r\n",iter->first);
+		TRACE("delete element: %s\r\n",iter->first);
+		TRACE("================================="); 
+		mapS.erase(iter); 
+	} 
+	/*
+
+	*/
+	else 
+	{ 
+		TRACE("not find the element\r\n");
+	} 
+	for (iter = mapS.begin(); iter != mapS.end(); iter++ ) 
+	{
+		TRACE("|%s|%s|\r\n",iter->first.data(),iter->second.data());
+	} 
+#endif
+	return 0; 
+}
+#endif
 #include "StatusbarCtrl.h"
 CMyStatusbarCtrl * statusbar = NULL;
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
     if (CFrameWndEx::OnCreate(lpCreateStruct) == -1)
         return -1;
+
+
+
+	test_map_function();
+	//char testchar[] = {11,22,33,44,55,66};
+	//char * temp = testchar;
+
+	//char abc = ++*temp;// *temp++;
+	//char ddd = *temp;
+	//Sleep(1);
+
+#if 0
+	my_str_info temp1;
+	temp1.modbusid = 1;
+	temp1.vendorid = 2;
+	strcpy(temp1.vendor_name,"Temco");
+	//INTLISTT list1; 
+	//list2对象最初有10个值为6的元素 
+	INTLISTT list2(10,temp1); 
+	//list3对象最初有3个值为6的元素 
+	//INTLISTT list3(list2.begin(),--list2.end()); 
+
+	//声明一个名为i的双向迭代器 
+	INTLISTT::iterator myiter; 
+
+
+	myiter =list2.begin();
+	
+	for (int i=0;i<4&&myiter!=list2.end();++i)
+	{
+		++ myiter;
+	}
+	temp1.modbusid = 11;
+	temp1.vendorid = 22;
+	strcpy(temp1.vendor_name,"Cao......");
+	list2.insert(myiter,2,temp1);
+	list2.pop_back();
+	list2.pop_front();
+	list2.remove();
+//	list2.remove(temp1);
+
+
+	//从前向后显示各list对象的元素 
+	//put_list(list1,"list1"); 
+	//put_list(list2,"list2"); 
+	//put_list(list3,"list3"); 
+
+	//从list1序列后面添加两个元素 
+	//list1.push_back(2); 
+	//list1.push_back(4); 
+	//list2.assign()
+	//list2.back();
+#endif
+#if 0
+给list赋值 
+返回最后一个元素 
+返回指向第一个元素的迭代器 
+ 删除所有元素 
+如果list是空的则返回true 
+返回末尾的迭代器 
+ 删除一个元素 
+返回第一个元素 
+		get_allocator() 返回list的配置器 
+插入一个元素到list中 
+		max_size() 返回list能容纳的最大元素数量 
+		merge() 合并两个list 
+		pop_back() 删除最后一个元素 
+		pop_front() 删除第一个元素 
+		push_back() 在list的末尾添加一个元素 
+		push_front() 在list的头部添加一个元素 
+		rbegin() 返回指向第一个元素的逆向迭代器 
+		remove() 从list删除元素 
+		remove_if() 按指定条件删除元素 
+		rend() 指向list末尾的逆向迭代器 
+		resize() 改变list的大小 
+		reverse() 把list的元素倒转 
+		size() 返回list中的元素个数 
+		sort() 给list排序 
+		splice() 合并两个list 
+		swap() 交换两个list 
+		unique() 删除list中重复的元素
+#endif
+	//test_my_map_function();
+	//int main(void)
+	//{
+		//vector<int> array;
+		//array.push_back(1);
+		//array.push_back(2);
+		//array.push_back(2);
+		//array.push_back(2);
+		//array.push_back(3);
+
+		//unique(array.begin(),array.end());
+	//	for(int i = array.size() - 1 ; i >= 0 ; --i)
+	//		cout<<array[i]<<endl;
+	//	return 0;
+	//}
+
+	//int main(void)
+	//{
+	//	vector array;
+
+	//	array.push_back( 1 );
+	//	array.push_back( 2 );
+	//	array.push_back( 3 );
+	//	for( vector::size_type i=array.size()-1; i>=0; --i )    // 反向遍历array数组
+	//	{
+	//		cout << array[i] << endl;
+	//	}
+	//	return 0;
+	//}
+
+
+	//int test_a = 5;
+	//int test_b = 0;
+	//test_a = test_a ++ ;
+	////
+
+	//char str[] = "aBcDe";
+	//int abc = sizeof(str);
+	//int ccc = sizeof(str[0]);
+	//int ddd = sizeof(str) /  sizeof(str[0]);
+	//cout << "str字符长度为: " << sizeof(str)/sizeof(str[0]) << endl;
+
+	//MyUpperCase( str );
+
+
+	//int aaa[7] = {3,2,3,4,6,2,1};
+	//vector <int> test_vector(aaa,aaa+7);
+	//vector<int>::iterator itt;
+	//
+	//for(itt =test_vector.begin();itt<test_vector.end();itt++)
+	//{
+	//	if(*itt == 2)
+	//	{
+	//		itt = test_vector.erase(itt);
+	//	}
+	//}
+	//
+#if 0
+	vector <refresh_net_device> temp_1;
+
+	refresh_net_device test1;
+	test1.modbusID = 13;
+	temp_1.push_back(test1);
+
+	for(int i=0;i<10;i++)
+	{
+		refresh_net_device test1;
+		test1.modbusID = i;
+		temp_1.push_back(test1);
+	}
+
+
+
+	sort(temp_1.begin(),temp_1.end(),sort_by_id);
+
+	vector <refresh_net_device>::iterator test_iterator;
+
+	for (test_iterator = temp_1.begin();test_iterator<temp_1.end();++test_iterator)
+	{
+		if(test_iterator->modbusID == 3)
+			test_iterator = temp_1.erase(test_iterator);
+	}
+#endif
 
 
 
@@ -747,7 +1070,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     uiToolbarHotID =  IDB_BITMAP7 ;
     uiToolbarColdID = IDB_BITMAP7 ;
     uiMenuID =	IDB_BITMAP_BACNET_MENU_BIT ;//
-
+	
 
 
     if (!m_testtoolbar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP | CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC,CRect(1,1,1,1),IDR_TOOLBAR_BACNET) ||
@@ -1150,6 +1473,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
 	m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
 
+	SetTimer(FOR_LAST_VIEW_TIMER,2000,NULL);
     return 0;
 }
 
@@ -1655,7 +1979,9 @@ void CMainFrame::LoadProductFromDB()
     CString cs_temp_baudrate;
     cs_temp_protocol=q.getValuebyName(L"Protocal");//
     if(!cs_temp_protocol.IsEmpty())
-        cs_temp_protocol=temp_variant;
+	{
+     //   cs_temp_protocol=temp_variant;
+	}
     else
     {
         cs_temp_protocol=_T("Auto");
@@ -1683,6 +2009,7 @@ void CMainFrame::LoadProductFromDB()
 
 
     CString StrIp;
+	CString StrPort;
     if((current_building_protocol == P_MODBUS_485) || (current_building_protocol == P_BACNET_MSTP))
     {
 
@@ -1718,7 +2045,7 @@ void CMainFrame::LoadProductFromDB()
         StrIp=q.getValuebyName(L"Ip_Address");//
         if(!StrIp.IsEmpty())
         {
-            StrIp = temp_variant;
+            //StrIp = temp_variant;
             m_str_curBuilding_Domain_IP = StrIp;
         }
         else
@@ -1727,6 +2054,16 @@ void CMainFrame::LoadProductFromDB()
         }
 
  
+		StrPort=q.getValuebyName(L"Ip_Port");//
+		if(!StrPort.IsEmpty())
+		{
+			//StrIp = temp_variant;
+			m_str_curBuilding_Domain_Port = StrPort;
+		}
+		else
+		{
+			m_str_curBuilding_Domain_Port.Empty();
+		}
  
     m_subNetLst.clear();
 
@@ -3714,7 +4051,7 @@ void CMainFrame::OnLoadConfigFile()
         return;
     }
 	else if(((g_protocol == MODBUS_RS485) || (g_protocol ==MODBUS_TCPIP)) &&  
-		((bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PWM_TRANSDUCER)))
+		((bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PID_T3PT12) || (bacnet_device_type == PWM_TRANSDUCER)))
 	{
 		CFileDialog dlg(true,_T("*.prg"),_T(" "),OFN_HIDEREADONLY ,_T("Prg files (*.prg)|*.prg||"),NULL,0);
 		if(IDOK!=dlg.DoModal())
@@ -4497,7 +4834,7 @@ void CMainFrame::OnAddBuildingConfig()
     Invalidate();
     CBuildingConfigration Dlg;
 
-    //CAddBuilding Dlg;
+     
     Dlg.DoModal();
 
     if(Dlg.m_bChanged)
@@ -4531,6 +4868,9 @@ void CMainFrame::OnScanDevice()
 		delete m_pScanner;
 		m_pScanner = NULL;
 	}
+	 
+
+	
 }
 
 void CMainFrame::OnTimer(UINT_PTR nIDEvent)
@@ -4601,7 +4941,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 
     if((SAVE_PRODYCT_STATUS == nIDEvent) && (scaning_mode == false))
     {
-#if 1
+#if 0
 
 		CppSQLite3DB SqliteDBBuilding;
 		SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
@@ -4630,6 +4970,37 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 #endif
 
     }
+
+
+	if(FOR_LAST_VIEW_TIMER == nIDEvent)
+	{
+		KillTimer(FOR_LAST_VIEW_TIMER);
+		int temp_pid;
+		unsigned int serial_number = 0;
+		int first_view_ui = 0 ;
+		temp_pid = GetPrivateProfileInt(_T("LastView"),_T("ViewPid"),0,g_cstring_ini_path);
+		serial_number = (unsigned int)GetPrivateProfileInt(_T("LastView"),_T("ViewSerialNumber"),0,g_cstring_ini_path);
+		first_view_ui = GetPrivateProfileInt(_T("LastView"),_T("FistLevelViewUI"),0,g_cstring_ini_path);
+
+		if((serial_number != 0) && (temp_pid == PM_MINIPANEL))
+		{
+			bool find_product = false;
+			vector <tree_product>::iterator temp_it;
+			for (temp_it = m_product.begin();temp_it!= m_product.end();++temp_it)
+			{
+				if((temp_it->serial_number == serial_number) &&
+					(temp_it->product_class_id == PM_MINIPANEL))
+				{
+					DoConnectToANode(temp_it->product_item);
+				}
+			}
+			
+		}
+		//CString temp_serial;
+		//temp_serial.Format(_T("%u"),g_selected_serialnumber);
+		//WritePrivateProfileStringW(_T("LastView"),_T("ViewSerialNumber"),temp_serial,g_cstring_ini_path);
+		//WritePrivateProfileStringW(_T("LastView"),_T("ViewPid"),_T("35"),g_cstring_ini_path);
+	}
 
     CString str;
     str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d]"), g_tstat_id, g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
@@ -4778,6 +5149,12 @@ here:
         ((CCO2_View*)m_pViews[m_nCurView])->Fresh();
     }
     break;
+	case  DLG_DIALOG_BTUMETER:
+	{
+		m_nCurView = DLG_DIALOG_BTUMETER;
+		((CBTUMeterDlg*)m_pViews[m_nCurView])->Fresh();
+	}
+	break;
     case  PM_CO2_NODE:
     {
         m_nCurView = DLG_CO2_VIEW;
@@ -5225,7 +5602,8 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 		  BAC_USER_LOGIN_GROUP +
 		  BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT +
 		  BAC_PROGRAM_ITEM_COUNT*5 +   //乘以5 是因为每个program都有5包，共2000个字节要读;
-		  1;	//这个1是Setting
+		  1 +		//这个1是Setting
+		  1;		//这个1是Variable Custmer Units.	
 
 
 	  int read_all_step = 1000 / read_total_count;
@@ -5549,27 +5927,25 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 	 }
 	  g_progress_persent = read_success_count * 100 /read_total_count;
 
-	 //for (int i=0; i<BAC_CUSTOMER_UNIT_GROUP; i++)
-	 //{
-		// end_temp_instance = BAC_READ_CUSTOMER_UNITS_REMAINDER + (BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i ;
-		// if(end_temp_instance >= BAC_GRPHIC_LABEL_COUNT)
-		//	 end_temp_instance = BAC_GRPHIC_LABEL_COUNT - 1;
-		// if(GetPrivateData_Blocking(g_bac_instance,READUNIT_T3000,(BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_Units_element)) > 0)
-		// {
-		//	 Mession_ret.Format(_T("Read screen data form %d to %d success."),(BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i,end_temp_instance);
-		//	 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
-		//	 read_success_count ++ ;
-		//	 Sleep(SEND_COMMAND_DELAY_TIME);
-		// }
-		// else
-		// {
-		//	 Mession_ret.Format(_T("Read screen data table form %d to %d timeout."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
-		//	 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
-		//	 goto read_end_thread;
-		// }
-		// g_progress_persent = read_success_count * 100 /read_total_count;
-	 //}
-
+#if 1 ////////////////////////// 改为var cus units
+	  for (int i=0; i<1; i++)
+	  {
+		  if(GetPrivateData_Blocking(g_bac_instance,READVARIABLE_T3000,0,4,sizeof(Str_variable_uint_point)) > 0)
+		  {
+			  Mession_ret.Format(_T("Read variable custmer units form success."));
+			  SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			  read_success_count ++ ;
+			  Sleep(SEND_COMMAND_DELAY_TIME);
+		  }
+		  else
+		  {
+			  Mession_ret.Format(_T("Read variable custmer units form timeout."));
+			  SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			  goto read_end_thread;
+		  }
+		  g_progress_persent = read_success_count * 100 /read_total_count;
+	  }
+#endif
 
 	 for (int i=0; i<BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT; i++)
 	 {
@@ -5704,7 +6080,7 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 			BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT ;//+
 			//BAC_PROGRAM_ITEM_COUNT*5;//乘以5 是因为每个program都有5包，共2000个字节要读;
 	}
-	else if(temp_prg_version == 4)
+	else if((temp_prg_version >= 4) && (temp_prg_version <= 5))
 	{
 		write_total_count =  BAC_INPUT_GROUP +
 			BAC_OUTPUT_GROUP +
@@ -5724,12 +6100,62 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 			BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT //BAC_PROGRAM_ITEM_COUNT*5;//乘以5 是因为每个program都有5包，共2000个字节要读;
 			+ 1 ;   //Setting
 	}
+	else if(temp_prg_version == 6)
+	{
+		write_total_count =  BAC_INPUT_GROUP +
+			BAC_OUTPUT_GROUP +
+			BAC_PROGRAM_GROUP +
+			BAC_VARIABLE_GROUP +
+			BAC_PID_GROUP +
+			BAC_PROGRAMCODE_GROUP +
+			BAC_SCREEN_GROUP +
+			BAC_MONITOR_GROUP +
+			BAC_SCHEDULE_GROUP +
+			BAC_HOLIDAY_GROUP +
+			BAC_SCHEDULECODE_GOUP +
+			BAC_HOLIDAYCODE_GROUP +
+			BAC_GRPHIC_LABEL_GROUP + 
+			BAC_CUSTOMER_UNIT_GROUP +
+			BAC_USER_LOGIN_GROUP +
+			BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT //BAC_PROGRAM_ITEM_COUNT*5;//乘以5 是因为每个program都有5包，共2000个字节要读;
+			+ 1		//Setting
+			+ 1;    //Variable_Cus_Units
+	}
+	else
+	{
+		Mession_ret.Format(_T("prg is broken."));
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+		goto write_end_thread;
+		return false;
+	}
+
+
 
 
 
     int write_all_step = 1000 / write_total_count;
     int write_success_count = 0;
     int write_pos = 0;
+	if(temp_prg_version >= 6)	 // version 6 中才加的这玩意;
+	{
+
+			if(Write_Private_Data_Blocking(WRITEVARUNIT_T3000,0,4) > 0)
+			{
+				Mession_ret.Format(_T("Write variable analog custmer units success."));
+				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+				write_success_count ++ ;
+				Sleep(SEND_COMMAND_DELAY_TIME);
+			}
+			else
+			{
+				Mession_ret.Format(_T("Write variable analog custmer units timeout."),0,4);
+				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+				goto write_end_thread;
+			}
+			g_progress_persent = write_success_count * 100 /write_total_count;
+
+	}
+
 
     for (int i=0; i<BAC_INPUT_GROUP; i++)
     {
@@ -6024,14 +6450,14 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 				end_temp_instance = BAC_GRPHIC_LABEL_COUNT - 1;
 			if(Write_Private_Data_Blocking(WRITE_GRPHIC_LABEL_COMMAND,(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance) > 0)
 			{
-				Mession_ret.Format(_T("Write graphic lable form %d to %d success."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
+				Mession_ret.Format(_T("Write graphic label form %d to %d success."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
 				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 				write_success_count ++ ;
 				Sleep(SEND_COMMAND_DELAY_TIME);
 			}
 			else
 			{
-				Mession_ret.Format(_T("Write graphic lable form %d to %d timeout."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
+				Mession_ret.Format(_T("Write graphic label form %d to %d timeout."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
 				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 				goto write_end_thread;
 			}
@@ -6084,7 +6510,7 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 			g_progress_persent = write_success_count * 100 /write_total_count;
 		}
 
-		if(temp_prg_version == 4)
+		if(temp_prg_version >= 4)
 		{
 			if(Write_Private_Data_Blocking(WRITE_SETTING_COMMAND,0,0) > 0)
 			{
@@ -6163,7 +6589,8 @@ LRESULT  CMainFrame::ReadConfigFromDeviceMessageCallBack(WPARAM wParam, LPARAM l
     msg_result = MKBOOL(wParam);
     if(msg_result)
     {
-        SaveBacnetConfigFile(SaveConfigFilePath);
+		SaveBacnetBinaryFile(SaveConfigFilePath);
+        //SaveBacnetConfigFile(SaveConfigFilePath);
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Save config file success!"));
     }
     return 0;
@@ -6403,7 +6830,7 @@ void CMainFrame::SaveConfigFile()
         return;
     }
 	else if(((g_protocol == MODBUS_RS485) || (g_protocol ==MODBUS_TCPIP)) &&  
-		    ((bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PWM_TRANSDUCER)))
+		    ((bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PID_T3PT12) || (bacnet_device_type == PWM_TRANSDUCER)))
 	{
 		//T3的设备支持minipanel的 input output 就读10000以后的寄存器;
 		MainFram_hwd = this->m_hWnd;
@@ -7513,6 +7940,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				(product_Node.product_class_id == PM_MINIPANEL) /*|| */
 				/*(product_Node.product_class_id == PM_T38AI8AO6DO) */  )	//如果是CM5或者MINIPANEL 才有 bacnet协议;
             {
+				
 				 product_type = product_Node.product_class_id;
 #if 1//Modbus Poll Config 
                 m_nStyle=1;
@@ -7740,6 +8168,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 return;
                 //}
             }
+
+			HideBacnetWindow();
+
 
             HANDLE temphandle;
             if(bac_net_initial_once)
@@ -8772,6 +9203,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             {
                 SwitchToPruductType(DLG_DIALOGT38AI8AO);
             }
+			else if (nFlag == PM_BTU_METER)
+			{
+				SwitchToPruductType(DLG_DIALOG_BTUMETER);
+			}
             else if (nFlag == PM_MINIPANEL)
             {
                 SwitchToPruductType(DLG_DIALOGMINIPANEL_VIEW);
@@ -8957,7 +9392,93 @@ void CMainFrame::GetAllTreeItems( HTREEITEM hItem, vector<HTREEITEM>& szTreeItem
         }
     }
 }
+void CMainFrame::CheckDuplicate()
+{
 
+	sort(m_refresh_net_device_data.begin(),m_refresh_net_device_data.end(),sort_by_minipanel_pid	);
+
+	vector <refresh_net_device> temp_device;
+	temp_device.clear();
+	for (int y=0;y<m_refresh_net_device_data.size();y++)
+	{
+		if(m_refresh_net_device_data.at(y).product_id == PM_MINIPANEL )
+		{
+			temp_device.push_back(m_refresh_net_device_data.at(y));
+			continue;
+		}
+	}
+	if(temp_device.size()>0)
+	{
+		bool find_same_panel = false;
+		sort(temp_device.begin(),temp_device.end(),sort_by_minipanel_panelnumber);
+		exsit_panel_number.clear();
+		for (int i=0;i<temp_device.size();i++)
+		{
+
+			exsit_panel_number.push_back((int)temp_device.at(i).panal_number);
+			for (int j=i+1;j<temp_device.size();j++)
+			{
+				if(temp_device.at(i).panal_number == temp_device.at(j).panal_number)
+				{
+					device_id_data_1 = temp_device.at(i);
+					device_id_data_2 = temp_device.at(j);
+					find_same_panel = true;
+					break;
+				}
+			}
+		}
+
+		if(find_same_panel)
+		{
+			vector<int>::iterator pos;
+			pos = unique(exsit_panel_number.begin(),exsit_panel_number.end());
+			exsit_panel_number.erase(pos,exsit_panel_number.end());     
+
+			edit_confilct_mode = true;
+
+			::PostMessageW(MainFram_hwd,WM_HADNLE_DUPLICATE_ID,1,NULL);
+			return;
+		}
+
+
+
+	}
+	if(!edit_confilct_mode)
+	{
+		int m_datasize = m_refresh_net_device_data.size(); 
+		bool find_confilicat_id = false;
+		for (int x=0;x<m_datasize;x++)
+		{
+			if(m_refresh_net_device_data.at(x).parent_serial_number != 0)
+			{
+				for(int y=x+1;y<m_datasize;y++)
+				{
+					if(m_refresh_net_device_data.at(y).parent_serial_number != 0)
+					{
+						if((m_refresh_net_device_data.at(x).parent_serial_number == m_refresh_net_device_data.at(y).parent_serial_number) &&
+							(m_refresh_net_device_data.at(x).modbusID == m_refresh_net_device_data.at(y).modbusID))
+						{
+							device_id_data_1 = m_refresh_net_device_data.at(x);
+							device_id_data_2 = m_refresh_net_device_data.at(y);
+
+
+							find_confilicat_id = true;
+							edit_confilct_mode = true;
+
+							::PostMessageW(MainFram_hwd,WM_HADNLE_DUPLICATE_ID,NULL,NULL);
+							break;
+						}
+					}
+				}
+
+				if(find_confilicat_id)
+					break;
+			}
+		}
+
+
+	}
+}
 // refresh_com 只有当这个值为0的时候才刷新串口那部分的状态,因为网络广播的 很快;可以频繁扫描，串口太慢了;
 BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
 {
@@ -9555,6 +10076,7 @@ finished_detect:
 LRESULT  CMainFrame::HandleDuplicateID(WPARAM wParam, LPARAM lParam)
 {
 	static int  bool_show_duplicated_window_lim = 0;
+	int duplicate_mode = (int)wParam;
 	if(bool_show_duplicated_window_lim++ > 5)
 	{
 		edit_confilct_mode = true;
@@ -9564,8 +10086,17 @@ LRESULT  CMainFrame::HandleDuplicateID(WPARAM wParam, LPARAM lParam)
 	int temp_type =  GetCommunicationType();
 
 	b_pause_refresh_tree = true;
-	CDuplicateIdDetected Dlg;
-	Dlg.DoModal();
+	if(duplicate_mode == 0)
+	{
+		CDuplicateIdDetected Dlg(0);
+		Dlg.DoModal();
+	}
+	else
+	{
+		CDuplicateIdDetected Dlg(1);
+		Dlg.DoModal();
+	}
+
 	edit_confilct_mode = false;
 	b_pause_refresh_tree = false;
 
@@ -9597,12 +10128,12 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
             {
                 //SetPaneConnectionPrompt(_T("Offline!"));
             }
-			 if(g_selected_serialnumber != m_product.at(i).serial_number)
+			// if(g_selected_serialnumber != m_product.at(i).serial_number)
 				 m_pTreeViewCrl->turn_item_image(tp.product_item ,false);
-			 else if((g_selected_serialnumber == m_product.at(i).serial_number) && (tp.product_class_id	== PM_MINIPANEL))
-			 {
+			 //else if((g_selected_serialnumber == m_product.at(i).serial_number) && (tp.product_class_id	== PM_MINIPANEL))
+			 //{
 				// TRACE(_T("Select panel offline \n"));
-			 }
+			 //}
             // 				if(nID==g_tstat_id)
             // 					memset(&multi_register_value[0],0,sizeof(multi_register_value));
         }
@@ -9612,7 +10143,7 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
                 bac_select_device_online = true;
             else
 			{
-			if(tp.product_class_id	!= PM_MINIPANEL)
+			//if(tp.product_class_id	!= PM_MINIPANEL)
                bac_select_device_online = false; //对minipanel特殊处理, 被选中的设备不回 64 ，而其他通信又正常，头疼;
 			}
         }
@@ -9651,6 +10182,7 @@ void CMainFrame::DoFreshAll()
     }
 
 }
+
 
 
 UINT _FreshTreeView(LPVOID pParam )
@@ -9763,41 +10295,8 @@ UINT _FreshTreeView(LPVOID pParam )
             continue;
         }
 
-		if(!edit_confilct_mode)
-		{
-			int m_datasize = m_refresh_net_device_data.size(); 
-			bool find_confilicat_id = false;
-			for (int x=0;x<m_datasize;x++)
-			{
-				if(m_refresh_net_device_data.at(x).parent_serial_number != 0)
-				{
-					for(int y=x+1;y<m_datasize;y++)
-					{
-						if(m_refresh_net_device_data.at(y).parent_serial_number != 0)
-						{
-							if((m_refresh_net_device_data.at(x).parent_serial_number == m_refresh_net_device_data.at(y).parent_serial_number) &&
-								(m_refresh_net_device_data.at(x).modbusID == m_refresh_net_device_data.at(y).modbusID))
-							{
-								device_id_data_1 = m_refresh_net_device_data.at(x);
-								device_id_data_2 = m_refresh_net_device_data.at(y);
-
-
-								find_confilicat_id = true;
-								edit_confilct_mode = true;
-
-								::PostMessageW(MainFram_hwd,WM_HADNLE_DUPLICATE_ID,NULL,NULL);
-								break;
-							}
-						}
-					}
-
-					if(find_confilicat_id)
-						break;
-				}
-			}
-
-
-		}
+		//m_refresh_net_device_data
+		pMain->CheckDuplicate();
 
 
 		
@@ -11224,6 +11723,7 @@ void CMainFrame::OnControlMain()
     }
     else
     {
+		HideBacnetWindow();
         if (product_type == T3000_6_ADDRESS)
         {
             //bacnet_view_number = TYPE_TSTAT_MAIN_INFOR;
@@ -11306,34 +11806,6 @@ void CMainFrame::OnControlInputs()
 {
 
     // TODO: Add your command handler code here
-	//UCHAR m_point_type;
-	//UCHAR m_main_panel;
-	//UCHAR m_sub_panel;
-	//UCHAR m_point_index;
-	//int n_ret = decode_label(_T("5-2-VAR3"),m_point_type,m_main_panel,m_sub_panel,m_point_index);
-	//Sleep(1);
-
-	//unsigned char temp_input_index = m_point_index - 1;
-	//if(GetPrivateData_Blocking(0,READINPUT_T3000,temp_input_index,temp_input_index,sizeof(Str_in_point))<= 0)
-	//{
-	//	return;
-	//}
-
-
-	//CString temp_main_panel;
-	//CString temp_in_des;
-	//	CString temp_in_auto_manual;CString temp_in_value;CString temp_in_units;
-	//	CString temp_in_range;CString temp_in_cal;CString temp_cacl_sign;
-	//	CString temp_in_filter;CString temp_in_decon;CString temp_in_jumper;CString temp_in_label;
-
-
-	// Input_data_to_string(temp_input_index ,temp_main_panel,temp_in_des,
-	//	temp_in_auto_manual,temp_in_value,temp_in_units,
-	//	temp_in_range,temp_in_cal,temp_cacl_sign,
-	//	temp_in_filter,temp_in_decon,temp_in_jumper,temp_in_label);
-
-	// Sleep(1);
-	//return;
 
     if((g_protocol == PROTOCOL_BACNET_IP) || 
 		(g_protocol == MODBUS_BACNET_MSTP) || 
@@ -11383,10 +11855,7 @@ void CMainFrame::OnControlInputs()
         {
             if(pDialog[WINDOW_INPUT]->IsWindowVisible() == false)
             {
-                for (int i=0; i<WINDOW_TAB_COUNT; i++)
-                {
-                    pDialog[i]->ShowWindow(SW_HIDE);
-                }
+				((CBacnetInput *) pDialog[WINDOW_INPUT])->Reset_Input_Rect();
                 pDialog[WINDOW_INPUT]->ShowWindow(SW_SHOW);
             }
             //((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetFocus();
@@ -11395,6 +11864,9 @@ void CMainFrame::OnControlInputs()
             bacnet_view_number = TYPE_INPUT;
             g_hwnd_now = m_input_dlg_hwnd;
 
+			CString temp_ui;
+			temp_ui.Format(_T("%u"),TYPE_INPUT);		
+			WritePrivateProfileString(_T("LastView"),_T("FistLevelViewUI"),temp_ui,g_cstring_ini_path);
         }
 
         if(ScreenEdit_Window)
@@ -11433,7 +11905,7 @@ void CMainFrame::OnControlInputs()
     {
         if (!is_connect())
         {
-            AfxMessageBox(_T("NO Connection,Please connect your device,fristly!"));
+            AfxMessageBox(_T("NO Connection,Please connect your device frist!"));
             return;
         }
         if (product_type==CS3000||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8)
@@ -11483,10 +11955,7 @@ void CMainFrame::OnControlPrograms()
             Monitor_Window->Unreg_Hotkey();
             if(pDialog[WINDOW_PROGRAM]->IsWindowVisible() == false)
             {
-                for (int i=0; i<WINDOW_TAB_COUNT; i++)
-                {
-                    pDialog[i]->ShowWindow(SW_HIDE);
-                }
+				Program_Window->Reset_Program_Rect();
                 pDialog[WINDOW_PROGRAM]->ShowWindow(SW_SHOW);
             }
             //((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetFocus();
@@ -11495,6 +11964,10 @@ void CMainFrame::OnControlPrograms()
             Program_Window->Reg_Hotkey();
             bacnet_view_number = TYPE_PROGRAM;
             g_hwnd_now = m_pragram_dlg_hwnd;
+
+			CString temp_ui;
+			temp_ui.Format(_T("%u"),TYPE_PROGRAM);		
+			WritePrivateProfileString(_T("LastView"),_T("FistLevelViewUI"),temp_ui,g_cstring_ini_path);
         }
 
 
@@ -11571,10 +12044,7 @@ void CMainFrame::OnControlOutputs()
         {
             if(pDialog[WINDOW_OUTPUT]->IsWindowVisible() == false)
             {
-                for (int i=0; i<WINDOW_TAB_COUNT; i++)
-                {
-                    pDialog[i]->ShowWindow(SW_HIDE);
-                }
+				Output_Window->Reset_Output_Rect();
                 pDialog[WINDOW_OUTPUT]->ShowWindow(SW_SHOW);
             }
             //((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetFocus();
@@ -11582,6 +12052,10 @@ void CMainFrame::OnControlOutputs()
             Output_Window->m_output_list.SetFocus();
             bacnet_view_number = TYPE_OUTPUT;
             g_hwnd_now = m_output_dlg_hwnd;
+
+			CString temp_ui;
+			temp_ui.Format(_T("%u"),TYPE_OUTPUT);		
+			WritePrivateProfileString(_T("LastView"),_T("FistLevelViewUI"),temp_ui,g_cstring_ini_path);
         }
         if(ScreenEdit_Window)
         {
@@ -11650,10 +12124,7 @@ void CMainFrame::OnControlVariables()
         {
             if(pDialog[WINDOW_VARIABLE]->IsWindowVisible() == false)
             {
-                for (int i=0; i<WINDOW_TAB_COUNT; i++)
-                {
-                    pDialog[i]->ShowWindow(SW_HIDE);
-                }
+				Variable_Window->Reset_Variable_Rect();
                 pDialog[WINDOW_VARIABLE]->ShowWindow(SW_SHOW);
             }
             //((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetFocus();
@@ -11661,6 +12132,11 @@ void CMainFrame::OnControlVariables()
             Variable_Window->m_variable_list.SetFocus();
             bacnet_view_number = TYPE_VARIABLE;
             g_hwnd_now = m_variable_dlg_hwnd;
+
+
+			CString temp_ui;
+			temp_ui.Format(_T("%u"),TYPE_VARIABLE);		
+			WritePrivateProfileString(_T("LastView"),_T("FistLevelViewUI"),temp_ui,g_cstring_ini_path);
         }
         if(ScreenEdit_Window)
         {
@@ -11720,10 +12196,11 @@ void CMainFrame::OnControlWeekly()
             Monitor_Window->Unreg_Hotkey();
             if(pDialog[WINDOW_WEEKLY]->IsWindowVisible() == false)
             {
-                for (int i=0; i<WINDOW_TAB_COUNT; i++)
-                {
-                    pDialog[i]->ShowWindow(SW_HIDE);
-                }
+                //for (int i=0; i<WINDOW_TAB_COUNT; i++)
+                //{
+                //    pDialog[i]->ShowWindow(SW_HIDE);
+                //}
+				WeeklyRoutine_Window->Reset_Weekly_Rect();
                 pDialog[WINDOW_WEEKLY]->ShowWindow(SW_SHOW);
             }
             //((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetFocus();
@@ -11732,6 +12209,9 @@ void CMainFrame::OnControlWeekly()
             WeeklyRoutine_Window->Reg_Hotkey();
             bacnet_view_number = TYPE_WEEKLY;
             g_hwnd_now = m_weekly_dlg_hwnd;
+			CString temp_ui;
+			temp_ui.Format(_T("%u"),TYPE_WEEKLY);		
+			WritePrivateProfileString(_T("LastView"),_T("FistLevelViewUI"),temp_ui,g_cstring_ini_path);
         }
 
         if(g_protocol == PROTOCOL_BIP_TO_MSTP)
@@ -11813,10 +12293,7 @@ void CMainFrame::OnControlAnnualroutines()
             Monitor_Window->Unreg_Hotkey();
             if(pDialog[WINDOW_ANNUAL]->IsWindowVisible() == false)
             {
-                for (int i=0; i<WINDOW_TAB_COUNT; i++)
-                {
-                    pDialog[i]->ShowWindow(SW_HIDE);
-                }
+				AnnualRoutine_Window->Reset_Annual_Rect();
                 pDialog[WINDOW_ANNUAL]->ShowWindow(SW_SHOW);
             }
             //((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetFocus();
@@ -11825,6 +12302,9 @@ void CMainFrame::OnControlAnnualroutines()
             AnnualRoutine_Window->Reg_Hotkey();
             bacnet_view_number = TYPE_ANNUAL;
             g_hwnd_now = m_annual_dlg_hwnd;
+			CString temp_ui;
+			temp_ui.Format(_T("%u"),TYPE_ANNUAL);		
+			WritePrivateProfileString(_T("LastView"),_T("FistLevelViewUI"),temp_ui,g_cstring_ini_path);
         }
 
         if(g_protocol == PROTOCOL_BIP_TO_MSTP)
@@ -11879,16 +12359,23 @@ void CMainFrame::OnControlSettings()
         {
             if(pDialog[WINDOW_SETTING]->IsWindowVisible() == false)
             {
-                for (int i=0; i<WINDOW_TAB_COUNT; i++)
-                {
-                    pDialog[i]->ShowWindow(SW_HIDE);
-                }
-                pDialog[WINDOW_SETTING]->ShowWindow(SW_SHOW);
+                //for (int i=0; i<WINDOW_TAB_COUNT; i++)
+                //{
+                //    pDialog[i]->ShowWindow(SW_HIDE);
+                //}
+				Setting_Window->Reset_Setting_Rect();
+				Setting_Window->ShowWindow(SW_SHOW);
+                //pDialog[WINDOW_SETTING]->ShowWindow(SW_SHOW);
             }
-            ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetFocus();
+			Setting_Window->SetFocus();
+			// Setting_Window->m_variable_list.SetFocus();
+            //((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetFocus();
             ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_SETTING);
             bacnet_view_number = TYPE_SETTING;
             g_hwnd_now = m_setting_dlg_hwnd;
+			CString temp_ui;
+			temp_ui.Format(_T("%u"),TYPE_SETTING);		
+			WritePrivateProfileString(_T("LastView"),_T("FistLevelViewUI"),temp_ui,g_cstring_ini_path);
         }
         if(ScreenEdit_Window)
         {
@@ -11917,6 +12404,7 @@ void CMainFrame::OnControlSettings()
 	else if (product_type == CS3000||product_register_value[7]==PM_T322AI || product_register_value[7] == PWM_TRANSDUCER ||product_register_value[7]==PM_T38AI8AO6DO||product_register_value[7]==PM_T3PT12
 	             ||product_register_value[7]==STM32_HUM_NET )
 	{
+		HideBacnetWindow();
 		bacnet_view_number = TYPE_TSTAT;
 		SwitchToPruductType(DLG_DIALOG_DEFAULT_T3000_VIEW);
 	}
@@ -12019,10 +12507,7 @@ void CMainFrame::OnControlControllers()
         {
             if(pDialog[WINDOW_CONTROLLER]->IsWindowVisible() == false)
             {
-                for (int i=0; i<WINDOW_TAB_COUNT; i++)
-                {
-                    pDialog[i]->ShowWindow(SW_HIDE);
-                }
+				Controller_Window->Reset_Controller_Rect();
                 pDialog[WINDOW_CONTROLLER]->ShowWindow(SW_SHOW);
             }
             //((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetFocus();
@@ -12030,6 +12515,10 @@ void CMainFrame::OnControlControllers()
             Controller_Window->m_controller_list.SetFocus();
             bacnet_view_number = TYPE_CONTROLLER;
             g_hwnd_now = m_controller_dlg_hwnd;
+
+			CString temp_ui;
+			temp_ui.Format(_T("%u"),TYPE_CONTROLLER);		
+			WritePrivateProfileString(_T("LastView"),_T("FistLevelViewUI"),temp_ui,g_cstring_ini_path);
         }
         if(ScreenEdit_Window)
         {
@@ -12070,9 +12559,6 @@ void CMainFrame::OnControlScreens()
 
     //bac_cm5_graphic = true;
     // TODO: Add your command handler code here
-//	CBacnetScreenEdit Dlg;
-//	Dlg.DoModal();
-//	return;
 
     if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
     {
@@ -12093,10 +12579,11 @@ void CMainFrame::OnControlScreens()
             Monitor_Window->Unreg_Hotkey();
             if(pDialog[WINDOW_SCREEN]->IsWindowVisible() == false)
             {
-                for (int i=0; i<WINDOW_TAB_COUNT; i++)
-                {
-                    pDialog[i]->ShowWindow(SW_HIDE);
-                }
+                //for (int i=0; i<WINDOW_TAB_COUNT; i++)
+                //{
+                //    pDialog[i]->ShowWindow(SW_HIDE);
+                //}
+				Screen_Window->Reset_Screen_Rect();
                 pDialog[WINDOW_SCREEN]->ShowWindow(SW_SHOW);
             }
             //((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetFocus();
@@ -12105,6 +12592,9 @@ void CMainFrame::OnControlScreens()
             Screen_Window->Reg_Hotkey();
             bacnet_view_number = TYPE_SCREENS;
             g_hwnd_now = m_screen_dlg_hwnd;
+			CString temp_ui;
+			temp_ui.Format(_T("%u"),TYPE_SCREENS);		
+			WritePrivateProfileString(_T("LastView"),_T("FistLevelViewUI"),temp_ui,g_cstring_ini_path);
         }
         if(ScreenEdit_Window)
         {
@@ -12203,10 +12693,7 @@ void CMainFrame::OnControlMonitors()
             Monitor_Window->Unreg_Hotkey();
             if(pDialog[WINDOW_MONITOR]->IsWindowVisible() == false)
             {
-                for (int i=0; i<WINDOW_TAB_COUNT; i++)
-                {
-                    pDialog[i]->ShowWindow(SW_HIDE);
-                }
+				((CBacnetMonitor *)pDialog[WINDOW_MONITOR])->Reset_Monitor_Rect();
                 pDialog[WINDOW_MONITOR]->ShowWindow(SW_SHOW);
             }
             //((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetFocus();
@@ -12215,6 +12702,9 @@ void CMainFrame::OnControlMonitors()
             Monitor_Window->Reg_Hotkey();
             bacnet_view_number = TYPE_MONITOR;
             g_hwnd_now = m_monitor_dlg_hwnd;
+			CString temp_ui;
+			temp_ui.Format(_T("%u"),TYPE_MONITOR);		
+			WritePrivateProfileString(_T("LastView"),_T("FistLevelViewUI"),temp_ui,g_cstring_ini_path);
         }
 
 
@@ -12307,10 +12797,11 @@ void CMainFrame::OnControlAlarmLog()
         {
             if(pDialog[WINDOW_ALARMLOG]->IsWindowVisible() == false)
             {
-                for (int i=0; i<WINDOW_TAB_COUNT; i++)
-                {
-                    pDialog[i]->ShowWindow(SW_HIDE);
-                }
+                //for (int i=0; i<WINDOW_TAB_COUNT; i++)
+                //{
+                //    pDialog[i]->ShowWindow(SW_HIDE);
+                //}
+				AlarmLog_Window->Reset_Alarm_Rect();
                 pDialog[WINDOW_ALARMLOG]->ShowWindow(SW_SHOW);
             }
             //((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetFocus();
@@ -12318,6 +12809,9 @@ void CMainFrame::OnControlAlarmLog()
             AlarmLog_Window->m_alarmlog_list.SetFocus();
             bacnet_view_number = TYPE_ALARMLOG;
             g_hwnd_now = m_alarmlog_dlg_hwnd;
+			CString temp_ui;
+			temp_ui.Format(_T("%u"),TYPE_ALARMLOG);		
+			WritePrivateProfileString(_T("LastView"),_T("FistLevelViewUI"),temp_ui,g_cstring_ini_path);
         }
         if(ScreenEdit_Window)
         {
@@ -12359,7 +12853,7 @@ void CMainFrame::OnControlCustomerunits()
     }
     else
     {
-       MessageBox(_T("This device doesn’t have a customer units menu item"));
+       MessageBox(_T("This device doesn’t have a custom units menu item"));
     }
 #endif
 }
@@ -12467,63 +12961,17 @@ void CMainFrame::OnHelpUpdatefirmware()
 #endif
 }
 
-void CMainFrame::OnControlTstat()
+void CMainFrame::OnControlRemotePoint()
 {
     // TODO: Add your command handler code here
-#ifdef test_ptp
-    char my_port[50];
 
-    CString temp_cs11;
-
-
-    srand((unsigned)time(NULL));
-    unsigned int temp_value;
-    temp_value = rand()%(0x3FFFFF);
-    g_Print.Format(_T("The initial T3000 Object Instance value is %d"),temp_value);
-    DFTrace(g_Print);
-    Device_Set_Object_Instance_Number(temp_value);
-    address_init();
-    Init_Service_Handlers();
-
-
-
-
-
-
-    //temp_cs.Format(_T("COM%d"),g_com);
-    temp_cs11.Format(_T("COM%d"),5);
-    char cTemp11[255];
-    memset(cTemp11,0,255);
-    WideCharToMultiByte( CP_ACP, 0, temp_cs11.GetBuffer(), -1, cTemp11, 255, NULL, NULL );
-    temp_cs11.ReleaseBuffer();
-    sprintf(my_port,cTemp11);
-
-    dlmstp_set_baud_rate(19200);
-    dl_ptp_init(my_port);
-
-    set_datalink_protocol(4);
-
-    //::PostMessage( BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,1);
-
-
-
-
-    g_bac_instance = 0;
-
-
-
-    return;
-#endif
     if(g_protocol == PROTOCOL_BACNET_IP)
     {
-        if(pDialog[WINDOW_TSTAT] != NULL)
+        if(pDialog[WINDOW_REMOTE_POINT] != NULL)
         {
-            if(pDialog[WINDOW_TSTAT]->IsWindowVisible() == false)
+            if(pDialog[WINDOW_REMOTE_POINT]->IsWindowVisible() == false)
             {
-                for (int i=0; i<WINDOW_TAB_COUNT; i++)
-                {
-                    pDialog[i]->ShowWindow(SW_HIDE);
-                }
+				Remote_Point_Window->Reset_RemotePoint_Rect();
                 pDialog[WINDOW_REMOTE_POINT]->ShowWindow(SW_SHOW);
             }
             ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(12);	//第12个插入的是远端的点;
@@ -12532,6 +12980,9 @@ void CMainFrame::OnControlTstat()
             //Tstat_Window->m_tstat_list.SetFocus();
             //bacnet_view_number = TYPE_TSTAT;
             //g_hwnd_now = m_tstat_dlg_hwnd;
+			CString temp_ui;
+			temp_ui.Format(_T("%u"),TYPE_READ_REMOTE_POINT_INFO);		
+			WritePrivateProfileString(_T("LastView"),_T("FistLevelViewUI"),temp_ui,g_cstring_ini_path);
         }
         if(ScreenEdit_Window)
         {
@@ -15112,20 +15563,230 @@ void CMainFrame::OnToolFlashsn()
     dlg.DoModal();
     g_bPauseMultiRead =FALSE;
 }
-
-
-void CMainFrame::OnMove(int x, int y)
+#include "BacnetProgramEdit.h"
+extern CBacnetProgramEdit *ProgramEdit_Window;
+void CMainFrame::Reset_Window_Pos()
 {
-    CFrameWndEx::OnMove(x, y);
-
-    // TODO: Add your message handler code here
 	if(b_create_status)
 	{
 		CRect temprec;
 		m_wndStatusBar.GetWindowRect(&temprec);
 		if((temprec.top >0) && (temprec.bottom >0) && (temprec.left >0) && (temprec.right > 0))
 			statusbar->SetWindowPos(&wndNoTopMost,temprec.left,temprec.top,temprec.Width(),temprec.Height(),SWP_NOACTIVATE | SWP_SHOWWINDOW );
+		if(((CBacnetInput *)pDialog[WINDOW_INPUT]) != NULL)
+		{
+			if(((CBacnetInput *)pDialog[WINDOW_INPUT])->IsWindowVisible())
+			{
+				((CBacnetInput *)pDialog[WINDOW_INPUT])->Reset_Input_Rect();
+			}
+		}
+
+		if(((CBacnetOutput *)pDialog[WINDOW_OUTPUT]) != NULL)
+		{
+			if(((CBacnetOutput *)pDialog[WINDOW_OUTPUT])->IsWindowVisible())
+			{
+				((CBacnetOutput *)pDialog[WINDOW_OUTPUT])->Reset_Output_Rect();
+			}
+		}
+
+		if(((CBacnetVariable *)pDialog[WINDOW_VARIABLE]) != NULL)
+		{
+			if(((CBacnetVariable *)pDialog[WINDOW_VARIABLE])->IsWindowVisible())
+			{
+				((CBacnetVariable *)pDialog[WINDOW_VARIABLE])->Reset_Variable_Rect();
+			}
+		}
+
+		if(((CBacnetProgram *)pDialog[WINDOW_PROGRAM]) != NULL)
+		{
+			if(((CBacnetProgram *)pDialog[WINDOW_PROGRAM])->IsWindowVisible())
+			{
+				((CBacnetProgram *)pDialog[WINDOW_PROGRAM])->Reset_Program_Rect();
+			}
+		}
+
+		if(((BacnetController *)pDialog[WINDOW_CONTROLLER]) != NULL)
+		{
+			if(((BacnetController *)pDialog[WINDOW_CONTROLLER])->IsWindowVisible())
+			{
+				((BacnetController *)pDialog[WINDOW_CONTROLLER])->Reset_Controller_Rect();
+			}
+		}
+
+		if(((BacnetScreen *)pDialog[WINDOW_SCREEN]) != NULL)
+		{
+			if(((BacnetScreen *)pDialog[WINDOW_SCREEN])->IsWindowVisible())
+			{
+				((BacnetScreen *)pDialog[WINDOW_SCREEN])->Reset_Screen_Rect();
+			}
+		}
+		if(((BacnetWeeklyRoutine *)pDialog[WINDOW_WEEKLY]) != NULL)
+		{
+			if(((BacnetWeeklyRoutine *)pDialog[WINDOW_WEEKLY])->IsWindowVisible())
+			{
+				((BacnetWeeklyRoutine *)pDialog[WINDOW_WEEKLY])->Reset_Weekly_Rect();
+			}
+		}
+		if(((BacnetAnnualRoutine *)pDialog[WINDOW_ANNUAL]) != NULL)
+		{
+			if(((BacnetAnnualRoutine *)pDialog[WINDOW_ANNUAL])->IsWindowVisible())
+			{
+				((BacnetAnnualRoutine *)pDialog[WINDOW_ANNUAL])->Reset_Annual_Rect();
+			}
+		}
+
+		if(((CBacnetMonitor *)pDialog[WINDOW_MONITOR]) != NULL)
+		{
+			if(((CBacnetMonitor *)pDialog[WINDOW_MONITOR])->IsWindowVisible())
+			{
+				((CBacnetMonitor *)pDialog[WINDOW_MONITOR])->Reset_Monitor_Rect();
+			}
+		}
+
+		if(((CBacnetAlarmLog *)pDialog[WINDOW_ALARMLOG]) != NULL)
+		{
+			if(((CBacnetAlarmLog *)pDialog[WINDOW_ALARMLOG])->IsWindowVisible())
+			{
+				((CBacnetAlarmLog *)pDialog[WINDOW_ALARMLOG])->Reset_Alarm_Rect();
+			}
+		}
+
+		if(((CBacnetRemotePoint *)pDialog[WINDOW_REMOTE_POINT]) != NULL)
+		{
+			if(((CBacnetRemotePoint *)pDialog[WINDOW_REMOTE_POINT])->IsWindowVisible())
+			{
+				((CBacnetRemotePoint *)pDialog[WINDOW_REMOTE_POINT])->Reset_RemotePoint_Rect();
+			}
+		}
+
+		if(((CBacnetSetting *)pDialog[WINDOW_SETTING]) != NULL)
+		{
+			if(((CBacnetSetting *)pDialog[WINDOW_SETTING])->IsWindowVisible())
+			{
+				((CBacnetSetting *)pDialog[WINDOW_SETTING])->Reset_Setting_Rect();
+			}
+		}
+
+		switch(bacnet_view_number )
+		{
+		case TYPE_SETTING:
+		case TYPE_MAIN:
+			if(((CBacnetSetting *)pDialog[WINDOW_SETTING]) != NULL)
+			{
+				if(((CBacnetSetting *)pDialog[WINDOW_SETTING])->IsWindowVisible())
+				{
+					((CBacnetSetting *)pDialog[WINDOW_SETTING])->Reset_Setting_Rect();
+				}
+			}
+			break;
+		case TYPE_INPUT:
+			if(((CBacnetInput *)pDialog[WINDOW_INPUT]) != NULL)
+			{
+				if(((CBacnetInput *)pDialog[WINDOW_INPUT])->IsWindowVisible())
+				{
+					((CBacnetInput *)pDialog[WINDOW_INPUT])->Reset_Input_Rect();
+				}
+			}
+			break;
+		case TYPE_OUTPUT:
+			if(((CBacnetOutput *)pDialog[WINDOW_OUTPUT]) != NULL)
+			{
+				if(((CBacnetOutput *)pDialog[WINDOW_OUTPUT])->IsWindowVisible())
+				{
+					((CBacnetOutput *)pDialog[WINDOW_OUTPUT])->Reset_Output_Rect();
+				}
+			}
+			break;
+		case TYPE_PROGRAM:
+			if(((CBacnetProgram *)pDialog[WINDOW_PROGRAM]) != NULL)
+			{
+				if(((CBacnetProgram *)pDialog[WINDOW_PROGRAM])->IsWindowVisible())
+				{
+					((CBacnetProgram *)pDialog[WINDOW_PROGRAM])->Reset_Program_Rect();
+				}
+			}
+			break;
+		case TYPE_VARIABLE:
+			if(((CBacnetVariable *)pDialog[WINDOW_VARIABLE]) != NULL)
+			{
+				if(((CBacnetVariable *)pDialog[WINDOW_VARIABLE])->IsWindowVisible())
+				{
+					((CBacnetVariable *)pDialog[WINDOW_VARIABLE])->Reset_Variable_Rect();
+				}
+			}
+			break;
+		case TYPE_WEEKLY:
+			if(((BacnetWeeklyRoutine *)pDialog[WINDOW_WEEKLY]) != NULL)
+			{
+				if(((BacnetWeeklyRoutine *)pDialog[WINDOW_WEEKLY])->IsWindowVisible())
+				{
+					((BacnetWeeklyRoutine *)pDialog[WINDOW_WEEKLY])->Reset_Weekly_Rect();
+				}
+			}
+			break;
+		case TYPE_ANNUAL:
+			if(((BacnetAnnualRoutine *)pDialog[WINDOW_ANNUAL]) != NULL)
+			{
+				if(((BacnetAnnualRoutine *)pDialog[WINDOW_ANNUAL])->IsWindowVisible())
+				{
+					((BacnetAnnualRoutine *)pDialog[WINDOW_ANNUAL])->Reset_Annual_Rect();
+				}
+			}
+			break;
+		case TYPE_CONTROLLER:
+			if(((BacnetController *)pDialog[WINDOW_CONTROLLER]) != NULL)
+			{
+				if(((BacnetController *)pDialog[WINDOW_CONTROLLER])->IsWindowVisible())
+				{
+					((BacnetController *)pDialog[WINDOW_CONTROLLER])->Reset_Controller_Rect();
+				}
+			}
+			break;
+		case TYPE_SCREENS:
+			if(((BacnetScreen *)pDialog[WINDOW_SCREEN]) != NULL)
+			{
+				if(((BacnetScreen *)pDialog[WINDOW_SCREEN])->IsWindowVisible())
+				{
+					((BacnetScreen *)pDialog[WINDOW_SCREEN])->Reset_Screen_Rect();
+				}
+			}
+			break;
+		case TYPE_MONITOR:
+			if(((CBacnetMonitor *)pDialog[WINDOW_MONITOR]) != NULL)
+			{
+				if(((CBacnetMonitor *)pDialog[WINDOW_MONITOR])->IsWindowVisible())
+				{
+					((CBacnetMonitor *)pDialog[WINDOW_MONITOR])->Reset_Monitor_Rect();
+				}
+			}
+			break;
+		default:
+			break;
+		}
+		if(ProgramEdit_Window)
+		{
+			if(ProgramEdit_Window->IsWindowVisible())
+				::SetWindowPos(ProgramEdit_Window->m_hWnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
+		}
 	}
+}
+
+void CMainFrame::OnMove(int x, int y)
+{
+    CFrameWndEx::OnMove(x, y);
+
+    // TODO: Add your message handler code here
+	//TRACE(_T("Move to x = %d , y = %d \r\n"),x,y);
+		static int cmove_cx = 0;
+	static int cmove_cy = 0;
+	if((cmove_cx != x) || (cmove_cy != y))
+	{
+		Reset_Window_Pos();
+		cmove_cx = x;
+		cmove_cy = y;
+	}
+	
+
 	if(AlarmWindow_Window)
 	{
 		CRect temprec;
@@ -15288,6 +15949,79 @@ void CMainFrame::OnToolBootloader()
 	dlg.DoModal ();
 }
 
+void CMainFrame::HideBacnetWindow()
+{
+	if(Input_Window!=NULL)
+	{
+		if(Input_Window->IsWindowVisible())
+			Input_Window->ShowWindow(SW_HIDE);
+	}
+	if(Output_Window!=NULL)
+	{
+		if(Output_Window->IsWindowVisible())
+			Output_Window->ShowWindow(SW_HIDE);
+	}
+	if(Variable_Window!=NULL)
+	{
+		if(Variable_Window->IsWindowVisible())
+			Variable_Window->ShowWindow(SW_HIDE);
+	}
+	if(Program_Window!=NULL)
+	{
+		if(Program_Window->IsWindowVisible())
+			Program_Window->ShowWindow(SW_HIDE);
+	}
+	if(Controller_Window!=NULL)
+	{
+		if(Controller_Window->IsWindowVisible())
+			Controller_Window->ShowWindow(SW_HIDE);
+	}
+	if(Screen_Window!=NULL)
+	{
+		if(Screen_Window->IsWindowVisible())
+			Screen_Window->ShowWindow(SW_HIDE);
+	}
+	if(WeeklyRoutine_Window!=NULL)
+	{
+		if(WeeklyRoutine_Window->IsWindowVisible())
+			WeeklyRoutine_Window->ShowWindow(SW_HIDE);
+	}
+	if(AnnualRoutine_Window!=NULL)
+	{
+		if(AnnualRoutine_Window->IsWindowVisible())
+			AnnualRoutine_Window->ShowWindow(SW_HIDE);
+	}
+	if(Monitor_Window!=NULL)
+	{
+		if(Monitor_Window->IsWindowVisible())
+			Monitor_Window->ShowWindow(SW_HIDE);
+	}
+	if(AlarmLog_Window!=NULL)
+	{
+		if(AlarmLog_Window->IsWindowVisible())
+			AlarmLog_Window->ShowWindow(SW_HIDE);
+	}
+	if(Tstat_Window!=NULL)
+	{
+		if(Tstat_Window->IsWindowVisible())
+			Tstat_Window->ShowWindow(SW_HIDE);
+	}
+	if(Setting_Window!=NULL)
+	{
+		if(Setting_Window->IsWindowVisible())
+			Setting_Window->ShowWindow(SW_HIDE);
+	}
+	if(User_Login_Window!=NULL)
+	{
+		if(User_Login_Window->IsWindowVisible())
+			User_Login_Window->ShowWindow(SW_HIDE);
+	}
+	if(Remote_Point_Window!=NULL)
+	{
+		if(Remote_Point_Window->IsWindowVisible())
+			Remote_Point_Window->ShowWindow(SW_HIDE);
+	}
+}
 
 void CMainFrame::OnToolsPsychrometry()
 {
@@ -15301,5 +16035,328 @@ void CMainFrame::OnToolsOption()
 {
 	 CT3000Option dlg;
 	 dlg.DoModal();
-	 
 }
+
+
+typedef pair<int,string> mydefpair;
+
+
+
+void CMainFrame::OnSize(UINT nType, int cx, int cy)
+{
+	CFrameWndEx::OnSize(nType, cx, cy);
+	static int cmainf_cx = 0;
+	static int cmainf_cy = 0;
+	if((cmainf_cx != cx) || (cmainf_cy != cy))
+	{
+		Reset_Window_Pos();
+		cmainf_cx = cx;
+		cmainf_cy = cy;
+	}
+	// TODO: Add your message handler code here
+}
+
+
+/*
+My Dear 17C++ pair（对组）用法 
+类模板：template <class T1, class T2> struct pair
+
+参数：T1是第一个值的数据类型，T2是第二个值的数据类型。
+
+功能：pair将一对值组合成一个值，这一对值可以具有不同的数据类型（T1和T2），两个值可以分别用pair的两个公有函数first和second访问。
+
+具体用法：
+
+1.定义（构造）：
+
+1     pair<int, double> p1;  //使用默认构造函数
+2     pair<int, double> p2(1, 2.4);  //用给定值初始化
+3     pair<int, double> p3(p2);  //拷贝构造函数2.访问两个元素（通过first和second）：
+
+1     pair<int, double> p1;  //使用默认构造函数
+2     p1.first = 1;
+3     p1.second = 2.5;
+4     cout << p1.first << ' ' << p1.second << endl;输出结果：1 2.5
+
+3.赋值operator = ：
+
+
+
+（1）利用make_pair：
+
+
+
+1     pair<int, double> p1;
+2     p1 = make_pair(1, 1.2);（2）变量间赋值：
+
+
+
+pair<int, double> p1(1, 1.2);
+pair<int, double> p2 = p1;
+*/
+
+
+
+#if 0
+Lists将元素按顺序储存在链表中. 与 向量(vectors)相比, 它允许快速的插入和删除，但是随机访问却比较慢.
+
+
+	assign() 给list赋值 
+	back() 返回最后一个元素 
+	begin() 返回指向第一个元素的迭代器 
+	clear() 删除所有元素 
+	empty() 如果list是空的则返回true 
+	end() 返回末尾的迭代器 
+	erase() 删除一个元素 
+	front() 返回第一个元素 
+	get_allocator() 返回list的配置器 
+	insert() 插入一个元素到list中 
+	max_size() 返回list能容纳的最大元素数量 
+	merge() 合并两个list 
+	pop_back() 删除最后一个元素 
+	pop_front() 删除第一个元素 
+	push_back() 在list的末尾添加一个元素 
+	push_front() 在list的头部添加一个元素 
+	rbegin() 返回指向第一个元素的逆向迭代器 
+	remove() 从list删除元素 
+	remove_if() 按指定条件删除元素 
+	rend() 指向list末尾的逆向迭代器 
+	resize() 改变list的大小 
+	reverse() 把list的元素倒转 
+	size() 返回list中的元素个数 
+	sort() 给list排序 
+	splice() 合并两个list 
+	swap() 交换两个list 
+	unique() 删除list中重复的元素
+
+
+
+
+	实例一：
+#endif
+
+
+#if 0
+#include <iostream> 
+#include <list> 
+#include <numeric> 
+#include <algorithm> 
+	using namespace std; 
+
+//创建一个list容器的实例LISTINT 
+typedef list<int> LISTINT; 
+//创建一个list容器的实例LISTCHAR 
+typedef list<int> LISTCHAR; 
+
+void main() 
+{ 
+	//用list容器处理整型数据  
+	//用LISTINT创建一个名为listOne的list对象 
+	LISTINT listOne; 
+	//声明i为迭代器 
+	LISTINT::iterator i; 
+
+	//从前面向listOne容器中添加数据 
+	listOne.push_front (2); 
+	listOne.push_front (1); 
+
+	//从后面向listOne容器中添加数据 
+	listOne.push_back (3); 
+	listOne.push_back (4); 
+
+	//从前向后显示listOne中的数据 
+	cout<<"listOne.begin()--- listOne.end():"<<endl; 
+	for (i = listOne.begin(); i != listOne.end(); ++i) 
+		cout << *i << " "; 
+	cout << endl; 
+
+	//从后向后显示listOne中的数据 x
+	LISTINT::reverse_iterator ir; 
+	cout<<"listOne.rbegin()---listOne.rend():"<<endl; 
+	for (ir =listOne.rbegin(); ir!=listOne.rend();ir++) { 
+		cout << *ir << " "; 
+	} 
+	cout << endl; 
+
+
+
+
+	//使用STL的accumulate(累加)算法 
+	int result = accumulate(listOne.begin(), listOne.end(),0); 
+	cout<<"Sum="<<result<<endl; 
+	cout<<"------------------"<<endl; 
+
+	//-------------------------- 
+	//用list容器处理字符型数据 
+	//-------------------------- 
+
+	//用LISTCHAR创建一个名为listOne的list对象 
+	LISTCHAR listTwo; 
+	//声明i为迭代器 
+	LISTCHAR::iterator j; 
+
+	//从前面向listTwo容器中添加数据 
+	listTwo.push_front ('A'); 
+	listTwo.push_front ('B'); 
+
+	//从后面向listTwo容器中添加数据 
+	listTwo.push_back ('x'); 
+	listTwo.push_back ('y'); 
+
+	//从前向后显示listTwo中的数据 
+	cout<<"listTwo.begin()---listTwo.end():"<<endl; 
+	for (j = listTwo.begin(); j != listTwo.end(); ++j) 
+		cout << char(*j) << " "; 
+	cout << endl; 
+
+	//使用STL的max_element算法求listTwo中的最大元素并显示 
+	j=max_element(listTwo.begin(),listTwo.end()); 
+	cout << "The maximum element in listTwo is: "<<char(*j)<<endl; 
+} 
+
+结果：
+
+	listOne.begin()--- listOne.end():
+1 2 3 4
+	listOne.rbegin()---listOne.rend():
+4 3 2 1
+	Sum=10
+	------------------
+	listTwo.begin()---listTwo.end():
+B A x y
+	The maximum element in listTwo is: y
+	Press any key to continue
+
+
+
+
+
+	实例二：
+#endif
+#if 0
+#include <iostream> 
+#include <list> 
+
+	using namespace std; 
+typedef list<int> INTLIST; 
+
+//从前向后显示list队列的全部元素 
+void put_list(INTLIST list, char *name) 
+{ 
+	INTLIST::iterator plist; 
+
+	cout << "The contents of " << name << " : "; 
+	for(plist = list.begin(); plist != list.end(); plist++) 
+		cout << *plist << " "; 
+	cout<<endl; 
+} 
+
+//测试list容器的功能 
+void main(void) 
+{ 
+	//list1对象初始为空 
+	INTLIST list1; 
+	//list2对象最初有10个值为6的元素 
+	INTLIST list2(10,6); 
+	//list3对象最初有3个值为6的元素 
+	INTLIST list3(list2.begin(),--list2.end()); 
+
+	//声明一个名为i的双向迭代器 
+	INTLIST::iterator i; 
+
+	//从前向后显示各list对象的元素 
+	put_list(list1,"list1"); 
+	put_list(list2,"list2"); 
+	put_list(list3,"list3"); 
+
+	//从list1序列后面添加两个元素 
+	list1.push_back(2); 
+	list1.push_back(4); 
+	cout<<"list1.push_back(2) and list1.push_back(4):"<<endl; 
+	put_list(list1,"list1"); 
+
+	//从list1序列前面添加两个元素 
+	list1.push_front(5); 
+	list1.push_front(7); 
+	cout<<"list1.push_front(5) and list1.push_front(7):"<<endl; 
+	put_list(list1,"list1"); 
+
+	//在list1序列中间插入数据 
+	list1.insert(++list1.begin(),3,9); 
+	cout<<"list1.insert(list1.begin()+1,3,9):"<<endl; 
+	put_list(list1,"list1"); 
+
+	//测试引用类函数 
+	cout<<"list1.front()="<<list1.front()<<endl; 
+	cout<<"list1.back()="<<list1.back()<<endl; 
+
+	//从list1序列的前后各移去一个元素 
+	list1.pop_front(); 
+	list1.pop_back(); 
+	cout<<"list1.pop_front() and list1.pop_back():"<<endl; 
+	put_list(list1,"list1"); 
+
+	//清除list1中的第2个元素 
+	list1.erase(++list1.begin()); 
+	cout<<"list1.erase(++list1.begin()):"<<endl; 
+	put_list(list1,"list1"); 
+
+	//对list2赋值并显示 
+	list2.assign(8,1); 
+	cout<<"list2.assign(8,1):"<<endl; 
+	put_list(list2,"list2"); 
+
+	//显示序列的状态信息 
+	cout<<"list1.max_size(): "<<list1.max_size()<<endl; 
+	cout<<"list1.size(): "<<list1.size()<<endl; 
+	cout<<"list1.empty(): "<<list1.empty()<<endl; 
+
+	//list序列容器的运算 
+	put_list(list1,"list1"); 
+	put_list(list3,"list3"); 
+	cout<<"list1>list3: "<<(list1>list3)<<endl; 
+	cout<<"list1<list3: "<<(list1<list3)<<endl; 
+
+	//对list1容器排序 
+	list1.sort(); 
+	put_list(list1,"list1"); 
+
+	//结合处理 
+	list1.splice(++list1.begin(), list3); 
+	put_list(list1,"list1"); 
+	put_list(list3,"list3"); 
+} 
+结果：
+
+	The contents of list1 :
+The contents of list2 : 6 6 6 6 6 6 6 6 6 6
+	The contents of list3 : 6 6 6 6 6 6 6 6 6
+	list1.push_back(2) and list1.push_back(4):
+The contents of list1 : 2 4
+	list1.push_front(5) and list1.push_front(7):
+The contents of list1 : 7 5 2 4
+	list1.insert(list1.begin()+1,3,9):
+The contents of list1 : 7 9 9 9 5 2 4
+	list1.front()=7
+	list1.back()=4
+	list1.pop_front() and list1.pop_back():
+The contents of list1 : 9 9 9 5 2
+	list1.erase(++list1.begin()):
+The contents of list1 : 9 9 5 2
+	list2.assign(8,1):
+The contents of list2 : 1 1 1 1 1 1 1 1
+	list1.max_size(): 1073741823
+	list1.size(): 4
+	list1.empty(): 0
+	The contents of list1 : 9 9 5 2
+	The contents of list3 : 6 6 6 6 6 6 6 6 6
+	list1>list3: 1
+	list1<list3: 0
+	The contents of list1 : 2 5 9 9
+	The contents of list1 : 2 6 6 6 6 6 6 6 6 6 5 9 9
+	The contents of list3 :
+Press any key to continue
+
+
+
+#endif

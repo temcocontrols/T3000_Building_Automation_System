@@ -72,9 +72,15 @@ void CReadWriteDefinitionDlg::DoDataExchange(CDataExchange* pDX)
 BOOL CReadWriteDefinitionDlg::OnInitDialog(){
 CDialogEx::OnInitDialog();
 m_combox_function.ResetContent();
+m_combox_function.AddString(_T("01 Read Coils(0x)"));
+m_combox_function.AddString(_T("02 Read Discrete Inputs(1x)"));
 m_combox_function.AddString(_T("03 Read Holding Registers(4x)"));
-m_combox_function.AddString(_T("06 Write Single Register"));
-m_combox_function.AddString(_T("16 Write Multiple Registers"));
+m_combox_function.AddString(_T("04 Read Input Registers(3x)"));
+//m_combox_function.AddString(_T("05 Write Single Coil"));
+//m_combox_function.AddString(_T("06 Write Single Register"));
+//m_combox_function.AddString(_T("15 Write Multiple Coils"));
+//m_combox_function.AddString(_T("16 Write Multiple Registers"));
+m_combox_function.SetCurSel(m_function);
 
 m_combox_dataformate.ResetContent();
 m_combox_dataformate.AddString(_T("Signed"));
@@ -143,7 +149,7 @@ void CReadWriteDefinitionDlg::OnBnClickedOk()
 
 void CReadWriteDefinitionDlg::OnBnClickedRadio10()
 {
-	// TODO: Add your control notification handler code here
+	 
 	m_rows=0;
 }
 
@@ -189,7 +195,7 @@ void CReadWriteDefinitionDlg::OnBnClickedButtonApply()
 {
 	m_apply=TRUE;
 	m_wronce=FALSE;
-    ::PostMessage(m_pWnd,MY_READ_ONCE,(WPARAM)this,0);
+    ::SendMessage(m_pWnd,MY_READ_ONCE,(WPARAM)this,0);
  
 }
 
@@ -198,6 +204,6 @@ void CReadWriteDefinitionDlg::OnBnClickedButtonRwOnce()
 {
    m_apply=FALSE;
    m_wronce=TRUE;
-   ::PostMessage(m_pWnd,MY_READ_ONCE,(WPARAM)this,0);
+   ::SendMessage(m_pWnd,MY_READ_ONCE,(WPARAM)this,0);
  
 }

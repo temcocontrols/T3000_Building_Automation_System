@@ -16,7 +16,7 @@ IMPLEMENT_DYNAMIC(CBacnetAlarmLog, CDialogEx)
 CBacnetAlarmLog::CBacnetAlarmLog(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CBacnetAlarmLog::IDD, pParent)
 {
-
+	window_max = true;
 }
 
 CBacnetAlarmLog::~CBacnetAlarmLog()
@@ -40,6 +40,8 @@ ON_WM_CLOSE()
 
 ON_WM_HELPINFO()
 
+ON_WM_SIZE()
+ON_WM_SYSCOMMAND()
 END_MESSAGE_MAP()
 
 
@@ -49,10 +51,11 @@ extern CBacnetAlarmWindow * AlarmWindow_Window;
 BOOL CBacnetAlarmLog::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-
+	SetWindowTextW(_T("ALARM"));
 	// TODO:  Add extra initialization here
 	Initial_List();
-
+	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_ALARM);
+	SetIcon(m_hIcon,TRUE);
 
 	if(AlarmWindow_Window == NULL)
 	{
@@ -117,6 +120,24 @@ BOOL CBacnetAlarmLog::PreTranslateMessage(MSG* pMsg)
 		m_alarmlog_list.Get_clicked_mouse_position();
 		return TRUE;
 	}
+	else if(pMsg->message==WM_NCLBUTTONDBLCLK)
+	{
+		if(!window_max)
+		{
+			window_max = true;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
+		}
+		else
+		{
+			window_max = false;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
+		}
+		return 1; 
+	}
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -138,7 +159,8 @@ void CBacnetAlarmLog::Initial_List()
 	m_alarmlog_list.InsertColumn(ALARMLOG_DEL, _T("Delete"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 
 	m_alarmlog_dlg_hwnd = this->m_hWnd;
-	g_hwnd_now = m_alarmlog_dlg_hwnd;
+	m_alarmlog_list.SetListHwnd(this->m_hWnd);
+	//g_hwnd_now = m_alarmlog_dlg_hwnd;
 	m_alarmlog_list.DeleteAllItems();
 
 	for (int i=0;i<(int)m_alarmlog_data.size();i++)
@@ -300,7 +322,7 @@ LRESULT CBacnetAlarmLog::Fresh_Alarmlog_List(WPARAM wParam,LPARAM lParam)
 void CBacnetAlarmLog::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
-	if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
+	if((this->IsWindowVisible()) && (Gsm_communication == false) &&  (this->m_hWnd  == ::GetActiveWindow())  )	//GSM连接时不要刷新;
 	{
 		PostMessage(WM_REFRESH_BAC_ALARMLOG_LIST,NULL,NULL);
 		if(bac_select_device_online)
@@ -414,6 +436,8 @@ void CBacnetAlarmLog::OnClickListAlarmlog(NMHDR *pNMHDR, LRESULT *pResult)
 void CBacnetAlarmLog::OnClose()
 {
 	// TODO: Add your message handler code here and/or call default
+	ShowWindow(FALSE);
+	return;
 	KillTimer(1);
 	m_alarmlog_dlg_hwnd = NULL;
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
@@ -446,4 +470,73 @@ BOOL CBacnetAlarmLog::OnHelpInfo(HELPINFO* pHelpInfo)
 	}
 
 	return CDialogEx::OnHelpInfo(pHelpInfo);
+}
+
+void CBacnetAlarmLog::Reset_Alarm_Rect()
+{
+
+	CRect temp_mynew_rect;
+	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+
+	CRect temp_window;
+	GetWindowRect(&temp_window);
+
+	if(window_max)
+	{
+		CRect temp_mynew_rect;
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), NULL);
+	}
+	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
+	{
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,0,0,SWP_NOSIZE );
+	}
+	else
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left + 90,temp_mynew_rect.top + 70,500,700, NULL);
+
+
+	return;
+
+}
+
+void CBacnetAlarmLog::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	CRect rc;
+	GetClientRect(rc);
+	if(m_alarmlog_list.m_hWnd != NULL)
+	{
+		::SetWindowPos(this->m_hWnd, HWND_TOP, 0,0, 0,0,  SWP_NOSIZE | SWP_NOMOVE);
+		//m_program_list.MoveWindow(&rc);
+		m_alarmlog_list.MoveWindow(rc.left,rc.top,rc.Width(),rc.Height() - 80);
+
+		//GetDlgItem(IDC_BUTTON_PROGRAM_EDIT)->MoveWindow(rc.left + 20 ,rc.bottom - 60 , 120,50);
+	}
+	// TODO: Add your message handler code here
+}
+
+
+void CBacnetAlarmLog::OnSysCommand(UINT nID, LPARAM lParam)
+{
+	// TODO: Add your message handler code here and/or call default
+	if(nID == SC_MAXIMIZE)
+	{
+		if(window_max == false)
+		{
+			window_max = true;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
+		}
+		else
+		{
+			window_max = false;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
+		}
+		return;
+	}
+	CDialogEx::OnSysCommand(nID, lParam);
 }

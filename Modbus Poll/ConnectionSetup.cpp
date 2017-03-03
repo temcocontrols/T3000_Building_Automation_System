@@ -6,7 +6,7 @@
 #include "ConnectionSetup.h"
 #include "afxdialogex.h"
 
-
+#include "EnumSerial.h"
 
 #include "global_variable_extern.h"
 #include "globle_function.h"
@@ -28,16 +28,19 @@ CConnectionSetup::~CConnectionSetup()
 
 void CConnectionSetup::DoDataExchange(CDataExchange* pDX)
 {
-    CDialogEx::DoDataExchange(pDX);
-    DDX_Control(pDX, IDC_COMBOBOX_BRADRATE, m_combox_bradrate);
-    DDX_Control(pDX, IDC_COMBOBOX_CONNECTION_TYPE, m_combox_connection_type);
-    DDX_Control(pDX, IDC_COMBOBOX_COMPORT, m_combox_comport);
-    DDX_Control(pDX, IDC_COMBOBOX_IPADDRESS, m_combox_ipaddress);
-    DDX_Control(pDX, IDC_EDIT_BETWEEN_TIME, m_edit_between_time);
-    DDX_Control(pDX, IDC_EDIT_CONNECT_TIMEOUT, m_edit_connect_timeout);
-    DDX_Control(pDX, IDC_EDIT_PORT, m_edit_port);
-    DDX_Control(pDX, IDC_EDIT_TIMEOUT, m_edit_response_timeout);
-    DDX_Control(pDX, IDC_COMBO_BRANDRATE, m_combox_brandrate);
+	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_COMBOBOX_BRADRATE, m_combox_bradrate);
+	DDX_Control(pDX, IDC_COMBOBOX_CONNECTION_TYPE, m_combox_connection_type);
+	DDX_Control(pDX, IDC_COMBOBOX_COMPORT, m_combox_comport);
+	DDX_Control(pDX, IDC_COMBOBOX_IPADDRESS, m_combox_ipaddress);
+	DDX_Control(pDX, IDC_EDIT_BETWEEN_TIME, m_edit_between_time);
+	DDX_Control(pDX, IDC_EDIT_CONNECT_TIMEOUT, m_edit_connect_timeout);
+	DDX_Control(pDX, IDC_EDIT_PORT, m_edit_port);
+	DDX_Control(pDX, IDC_EDIT_TIMEOUT, m_edit_response_timeout);
+
+	DDX_Control(pDX, IDC_COMBO_DATABITS, m_combox_databits);
+	DDX_Control(pDX, IDC_COMBO_PARITY, m_combox_parity);
+	DDX_Control(pDX, IDC_COMBOBOX_STOPBITS, m_combox_stopbits);
 }
 void CConnectionSetup::OnInitUI()
 {
@@ -56,8 +59,10 @@ void CConnectionSetup::OnInitUI()
     m_combox_bradrate.AddString(_T("19200"));
 	m_combox_bradrate.AddString(_T("38400"));
 	m_combox_bradrate.AddString(_T("57600"));
+	m_combox_bradrate.AddString(_T("76800"));
 	m_combox_bradrate.AddString(_T("115200"));
-	m_combox_bradrate.AddString(_T("76800")); 
+	m_combox_bradrate.AddString(_T("128000"));
+	m_combox_bradrate.AddString(_T("256000"));
     if (m_bradrate==19200)
     {
         m_combox_bradrate.SetCurSel(1);
@@ -74,25 +79,59 @@ void CConnectionSetup::OnInitUI()
 	{
 		m_combox_bradrate.SetCurSel(3);
 	}
-	else if (m_bradrate==115200)
+	else if (m_bradrate==76800)
 	{
 		m_combox_bradrate.SetCurSel(4);
 	}
-	else if (m_bradrate==76800)
+	else if (m_bradrate == 115200)
 	{
 		m_combox_bradrate.SetCurSel(5);
+	}
+	else if (m_bradrate == 128000)
+	{
+		m_combox_bradrate.SetCurSel(6);
+	}
+	else if (m_bradrate == 256000)
+	{
+		m_combox_bradrate.SetCurSel(7);
 	}
     else
     {
         m_combox_bradrate.SetCurSel(1);
     }
 
-    GetSerialComPortNumber1(m_szComm);
+   /* GetSerialComPortNumber1(m_szComm);*/
+	CArray<SSerInfo, SSerInfo&> asi;
+
+	// Populate the list of serial ports.
+	EnumSerialPorts(asi, FALSE/*include all*/);
+
     m_combox_comport.ResetContent();
-    for (int i=0; i<(int)m_szComm.size(); i++)
-    {
-        m_combox_comport.AddString(m_szComm[i]);
-    }
+	/* for (int i=0; i<(int)m_szComm.size(); i++)
+	 {
+		 m_combox_comport.AddString(m_szComm[i]);
+	 }*/
+	for (int ii = 0; ii < asi.GetSize(); ii++) {
+		m_combox_comport.AddString(asi[ii].strFriendlyName);
+// 		TRACE(asi[ii].strPortName);
+// 		TRACE("\n");
+// 		TRACE(asi[ii].strFriendlyName);
+// 		TRACE("\n");
+		
+	}
+	m_combox_databits.ResetContent();
+	m_combox_databits.AddString(L"7 Data bits");
+	m_combox_databits.AddString(L"8 Data bits");
+	m_combox_databits.SetCurSel(1);
+	m_combox_parity.ResetContent();
+	m_combox_parity.AddString(L"None");
+	m_combox_parity.AddString(L"Odd");
+	m_combox_parity.AddString(L"Even");
+	m_combox_parity.SetCurSel(0);
+	m_combox_stopbits.ResetContent();
+	m_combox_stopbits.AddString(L"1 Stop Bit");
+	m_combox_stopbits.AddString(L"2 Stop Bits");
+	m_combox_stopbits.SetCurSel(0);
 
     m_combox_comport.SetWindowText(m_comport);
     m_combox_ipaddress.SetWindowText(m_ipaddress);
@@ -120,15 +159,28 @@ void CConnectionSetup::Fresh_UI()
     {
         GetDlgItem(IDC_COMBOBOX_COMPORT)->EnableWindow(TRUE);
         GetDlgItem(IDC_COMBOBOX_BRADRATE)->EnableWindow(TRUE);
+		GetDlgItem(IDC_COMBO_DATABITS)->EnableWindow(TRUE);
+		GetDlgItem(IDC_COMBO_PARITY)->EnableWindow(TRUE);
+		GetDlgItem(IDC_COMBOBOX_STOPBITS)->EnableWindow(TRUE);
+ 
+
+
+
+
+
+
         GetDlgItem(IDC_COMBOBOX_IPADDRESS)->EnableWindow(FALSE);
         GetDlgItem(IDC_EDIT_PORT)->EnableWindow(FALSE);
         GetDlgItem(IDC_EDIT_CONNECT_TIMEOUT)->EnableWindow(FALSE);
     }
     else
     {
-        GetDlgItem(IDC_COMBOBOX_COMPORT)->EnableWindow(FALSE);
-        GetDlgItem(IDC_COMBOBOX_BRADRATE)->EnableWindow(FALSE);
-
+   
+		GetDlgItem(IDC_COMBOBOX_COMPORT)->EnableWindow(FALSE);
+		GetDlgItem(IDC_COMBOBOX_BRADRATE)->EnableWindow(FALSE);
+		GetDlgItem(IDC_COMBO_DATABITS)->EnableWindow(FALSE);
+		GetDlgItem(IDC_COMBO_PARITY)->EnableWindow(FALSE);
+		GetDlgItem(IDC_COMBOBOX_STOPBITS)->EnableWindow(FALSE);
 
         GetDlgItem(IDC_COMBOBOX_IPADDRESS)->EnableWindow(TRUE);
         GetDlgItem(IDC_EDIT_PORT)->EnableWindow(TRUE);
@@ -209,7 +261,10 @@ void CConnectionSetup::Write_Config()
     Connect_Type.Format(_T("%d"),m_combox_connection_type.GetCurSel());
     CString COM_Port;
     m_combox_comport.GetWindowText(COM_Port);
-    CString Num_com_port=COM_Port.Mid(3);
+	//ÕÒµ½´®¿ÚCOM
+	int index = COM_Port.Find(L"COM");
+	COM_Port = COM_Port.Mid(index, 4);
+    CString Num_com_port = COM_Port.Mid(3);
 
     CString bradrate;
     m_combox_bradrate.GetWindowText(bradrate);

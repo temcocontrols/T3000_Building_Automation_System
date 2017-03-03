@@ -97,6 +97,15 @@ public:
 	afx_msg void OnBnClickedCheckSettingZoneDaylightTime();
 	afx_msg void OnBnClickedButtonBacShowZigbee();
 	afx_msg void OnCbnKillfocusComboBacnetSettingTimeServer();
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
+	void Reset_Setting_Rect();
+	bool window_max; // 标记是否已经最大化;
+	afx_msg void OnEnKillfocusEditSettingModbusId();
+	CEdit m_edit_modbus_id;
+	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+	afx_msg void OnBnClickedButtonSettingIoConfig();
+	afx_msg void OnBnClickedButtonRebootDevice();
 };
 
 

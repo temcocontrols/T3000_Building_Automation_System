@@ -1,11 +1,5 @@
 #include "stdafx.h"
-#include "define.h"
-
-	//extern variable
-	TS_US Register_value[MaxRegisterNum];           //got the register value
-	TS_UC device=255;                         //Tstat ID,255 is for all
-	CString m_com_num;						//com1 or com2
-	CMutex mutex;//multithreading lock
+#include "define.h" 
  	HANDLE m_hSerial=0;//串口句柄
 	OVERLAPPED m_osRead, m_osWrite, m_osMulWrite; // 用于重叠读/写
 	TS_UC  gval[128];//the data that get from com   //8

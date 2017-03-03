@@ -52,6 +52,7 @@ END_MESSAGE_MAP()
 BOOL CDebugWindow::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
+	::SetWindowPos(this->m_hWnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
 	//::SetWindowPos(this->m_hWnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
 	// TODO:  Add extra initialization here
 	Logfile_path.Empty();

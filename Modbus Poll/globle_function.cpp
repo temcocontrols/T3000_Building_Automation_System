@@ -121,7 +121,7 @@ void Traffic_Data(CString &nCString)
 	CString str=print_time.Format("%H:%M:%S    ");
 	PrintText[count].Empty();
 	PrintText[count] =str + nCString;
-	PostMessage(h_data_traffic_window,WM_TRAFFIC_DATA_WINDOW,(WPARAM)PrintText[count].GetBuffer(),NULL);
+	SendMessage(h_data_traffic_window,WM_TRAFFIC_DATA_WINDOW,(WPARAM)PrintText[count].GetBuffer(),NULL);
 	count = (count ++) % 90;
 }
 

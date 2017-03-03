@@ -1210,7 +1210,8 @@ CppSQLite3DB& CppSQLite3DB::operator=(const CppSQLite3DB& db)
 void CppSQLite3DB::open(const char* szFile)
 {
     int nRet = sqlite3_open(szFile, &mpDB);
-
+//   	char *zVfs = NULL;
+//   	int nRet=sqlite3_open_v2(szFile, &mpDB, SQLITE_OPEN_FULLMUTEX, zVfs);
     if (nRet != SQLITE_OK)
     {
         const char* szError = sqlite3_errmsg(mpDB);
