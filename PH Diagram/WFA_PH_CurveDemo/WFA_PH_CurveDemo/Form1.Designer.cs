@@ -31,30 +31,34 @@
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.ph_chart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.button1 = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ph_chart)).BeginInit();
             this.SuspendLayout();
             // 
-            // chart1
+            // ph_chart
             // 
+            this.ph_chart.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             chartArea1.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea1);
+            this.ph_chart.ChartAreas.Add(chartArea1);
+            legend1.Enabled = false;
             legend1.Name = "Legend1";
-            this.chart1.Legends.Add(legend1);
-            this.chart1.Location = new System.Drawing.Point(12, 12);
-            this.chart1.Name = "chart1";
+            this.ph_chart.Legends.Add(legend1);
+            this.ph_chart.Location = new System.Drawing.Point(271, 69);
+            this.ph_chart.Name = "ph_chart";
             series1.ChartArea = "ChartArea1";
             series1.Legend = "Legend1";
             series1.Name = "Series1";
-            this.chart1.Series.Add(series1);
-            this.chart1.Size = new System.Drawing.Size(556, 509);
-            this.chart1.TabIndex = 0;
-            this.chart1.Text = "chart1";
+            this.ph_chart.Series.Add(series1);
+            this.ph_chart.Size = new System.Drawing.Size(550, 375);
+            this.ph_chart.TabIndex = 0;
+            this.ph_chart.Text = "chart1";
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(629, 423);
+            this.button1.Location = new System.Drawing.Point(685, 40);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 1;
@@ -68,19 +72,18 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(833, 533);
             this.Controls.Add(this.button1);
-            this.Controls.Add(this.chart1);
+            this.Controls.Add(this.ph_chart);
             this.Name = "Form1";
             this.Text = "PH Diagram";
             this.Load += new System.EventHandler(this.Form1_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ph_chart)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
-
-        private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
         private System.Windows.Forms.Button button1;
+        public System.Windows.Forms.DataVisualization.Charting.Chart ph_chart;
     }
 }
 

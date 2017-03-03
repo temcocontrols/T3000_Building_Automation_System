@@ -377,8 +377,13 @@ namespace WFA_psychometric_chart
 
         private void EditNodeLineForm_Load(object sender, EventArgs e)
         {
+            if (bcs.dataGridView1.Rows.Count <= 0)
+            {
+                MessageBox.Show("Please have a chart first");
+                this.Close();
+            }
             //This on load we need to laod the data from the other form
-           LoadNodeAndLine();//load values
+            LoadNodeAndLine();//load values
             if(bcs.flagShow == 1)
             {
                 //Means the data is on so
@@ -2404,6 +2409,12 @@ namespace WFA_psychometric_chart
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
+            if(bcs.dataGridView1.Rows.Count <= 0)
+            {
+                MessageBox.Show("Please have a chart first");
+                this.Close(); 
+            }
+            else { 
             //--click or unclick 
             if(checkBox1.Checked == true)
             {
@@ -2459,6 +2470,8 @@ namespace WFA_psychometric_chart
                 //    checkBox1.Checked = false;
                 //}
             }
+
+            }//Close of else
 
         }
 

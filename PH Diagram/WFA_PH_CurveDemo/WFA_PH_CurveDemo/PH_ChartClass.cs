@@ -159,30 +159,26 @@ namespace WFA_PH_CurveDemo
         /// <returns>values based on pased parameter generally, temperature, pressure and enthalpy</returns>
         public double IAPWS_IF97_TowParameterEquivalentFxn(string outputParamName, string prop1, double prop1Value, string prop2, double prop2Value, string fluidName)
         {
-            double result = CoolProp.PropsSI(outputParamName, prop1, prop1Value, prop2, prop2Value, fluidName);
-            //CoolProp.p
-            return result;
+          return CoolProp.PropsSI(outputParamName, prop1, prop1Value, prop2, prop2Value, fluidName);           
         }
-
-
         
         //Triming the values 
         //--This code is not used right now
-        public static string[] nullLessArray(string[] src)
-        {
-            Array.Sort(src);
-            Array.Reverse(src);
-            int index = Array.IndexOf(src, null);
+        //public static string[] nullLessArray(string[] src)
+        //{
+        //    Array.Sort(src);
+        //    Array.Reverse(src);
+        //    int index = Array.IndexOf(src, null);
 
-            string[] outputArray = new string[index];
+        //    string[] outputArray = new string[index];
 
-            for (int counter = 0; counter < index; counter++)
-            {
-                outputArray[counter] = src[counter];
-            }
+        //    for (int counter = 0; counter < index; counter++)
+        //    {
+        //        outputArray[counter] = src[counter];
+        //    }
 
-            return outputArray;
-        }
+        //    return outputArray;
+        //}
 
 
 

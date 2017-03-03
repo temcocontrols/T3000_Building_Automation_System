@@ -15107,8 +15107,15 @@ namespace WFA_psychometric_chart
             //This section contains the edit node section
             try
             {
-                EditNodeLineForm f = new EditNodeLineForm(this);
-                f.ShowDialog();//This will help to wait for second dialog to be closed first.
+                if (dataGridView1.Rows.Count > 0)
+                { 
+                    EditNodeLineForm f = new EditNodeLineForm(this);
+                    f.ShowDialog();//This will help to wait for second dialog to be closed first.
+                }
+                else
+                {
+                    MessageBox.Show("Create a chart first");
+                }
             }
             catch (Exception ex)
             {

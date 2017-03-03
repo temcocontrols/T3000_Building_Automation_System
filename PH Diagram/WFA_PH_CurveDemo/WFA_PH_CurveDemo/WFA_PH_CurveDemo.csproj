@@ -73,6 +73,9 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="FunctionGraph.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="MeshGrid_Class.cs" />
     <Compile Include="PH_ChartClass.cs" />
     <Compile Include="platform-independent\AbstractState.cs" />
@@ -136,7 +139,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="CoolProp.dll" />
+    <Content Include="CoolProp.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

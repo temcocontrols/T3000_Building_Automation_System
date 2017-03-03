@@ -28,14 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle29 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EditNodeLineForm));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle30 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle31 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle32 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle33 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle34 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle35 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.name = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CB_DGV_Temperature_Source = new System.Windows.Forms.DataGridViewComboBoxColumn();
@@ -196,16 +196,16 @@
             // 
             // name
             // 
-            dataGridViewCellStyle29.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.name.DefaultCellStyle = dataGridViewCellStyle29;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.name.DefaultCellStyle = dataGridViewCellStyle1;
             resources.ApplyResources(this.name, "name");
             this.name.Name = "name";
             this.name.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // CB_DGV_Temperature_Source
             // 
-            dataGridViewCellStyle30.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.CB_DGV_Temperature_Source.DefaultCellStyle = dataGridViewCellStyle30;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.CB_DGV_Temperature_Source.DefaultCellStyle = dataGridViewCellStyle2;
             this.CB_DGV_Temperature_Source.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
             resources.ApplyResources(this.CB_DGV_Temperature_Source, "CB_DGV_Temperature_Source");
             this.CB_DGV_Temperature_Source.Items.AddRange(new object[] {
@@ -224,8 +224,8 @@
             // 
             // temp
             // 
-            dataGridViewCellStyle31.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.temp.DefaultCellStyle = dataGridViewCellStyle31;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.temp.DefaultCellStyle = dataGridViewCellStyle3;
             resources.ApplyResources(this.temp, "temp");
             this.temp.Name = "temp";
             this.temp.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
@@ -241,16 +241,16 @@
             // 
             // humidity
             // 
-            dataGridViewCellStyle32.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.humidity.DefaultCellStyle = dataGridViewCellStyle32;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.humidity.DefaultCellStyle = dataGridViewCellStyle4;
             resources.ApplyResources(this.humidity, "humidity");
             this.humidity.Name = "humidity";
             this.humidity.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // equivalentEnthalpy
             // 
-            dataGridViewCellStyle33.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.equivalentEnthalpy.DefaultCellStyle = dataGridViewCellStyle33;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.equivalentEnthalpy.DefaultCellStyle = dataGridViewCellStyle5;
             resources.ApplyResources(this.equivalentEnthalpy, "equivalentEnthalpy");
             this.equivalentEnthalpy.Name = "equivalentEnthalpy";
             this.equivalentEnthalpy.ReadOnly = true;
@@ -258,17 +258,17 @@
             // 
             // color
             // 
-            dataGridViewCellStyle34.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle34.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.color.DefaultCellStyle = dataGridViewCellStyle34;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.color.DefaultCellStyle = dataGridViewCellStyle6;
             resources.ApplyResources(this.color, "color");
             this.color.Name = "color";
             this.color.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             // 
             // nodeSize
             // 
-            dataGridViewCellStyle35.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.nodeSize.DefaultCellStyle = dataGridViewCellStyle35;
+            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.nodeSize.DefaultCellStyle = dataGridViewCellStyle7;
             resources.ApplyResources(this.nodeSize, "nodeSize");
             this.nodeSize.Name = "nodeSize";
             this.nodeSize.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
