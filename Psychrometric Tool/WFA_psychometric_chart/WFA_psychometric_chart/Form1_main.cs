@@ -580,8 +580,12 @@ namespace WFA_psychometric_chart
 
         public string PathToT3000BuildingDB = "";
         public string CurrentSelectedBuilding = "";
+        
         public void Form1_Load(object sender, EventArgs e)
         {
+            this.Text = "Psychometric Chart " + "2017 - 03 - 03";
+
+
 
             //simulationMode.Text = WFA_psychometric_chart.Properties.Resources.Historical_Plot;
             lb_title_display.Text = "";
