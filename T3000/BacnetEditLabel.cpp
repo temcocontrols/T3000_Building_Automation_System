@@ -718,6 +718,11 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 		lpPoint.y = lpPoint.y - 210;
 	else if(lpPoint.y < 250)
 		lpPoint.y = 250;
+
+	if((lpPoint.x + 550 > add_temprect.right  ) && (lpPoint.x > 550))
+		lpPoint.x = lpPoint.x - 510;
+
+
 	MoveWindow(lpPoint.x,lpPoint.y,add_temprect.Width(),add_temprect.Height(),1);
 	GetDlgItem(IDC_EDIT_LABEL_VALUE)->SetFocus();
 

@@ -24,7 +24,7 @@ IMPLEMENT_DYNAMIC(BacnetScreen, CDialogEx)
 BacnetScreen::BacnetScreen(CWnd* pParent /*=NULL*/)
 	: CDialogEx(BacnetScreen::IDD, pParent)
 {
-
+	window_max = true;
 }
 
 BacnetScreen::~BacnetScreen()
@@ -49,6 +49,8 @@ BEGIN_MESSAGE_MAP(BacnetScreen, CDialogEx)
 	ON_WM_CLOSE()
 	ON_WM_TIMER()
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST_SCREEN, &BacnetScreen::OnNMDblclkListScreen)
+	ON_WM_SIZE()
+	ON_WM_SYSCOMMAND()
 //	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
@@ -213,6 +215,25 @@ BOOL BacnetScreen::PreTranslateMessage(MSG* pMsg)
 			}
 		}
 	}
+	if(pMsg->message==WM_NCLBUTTONDBLCLK)
+	{
+		if(!window_max)
+		{
+			window_max = true;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
+		}
+		else
+		{
+			window_max = false;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
+		}
+
+		return 1; 
+	}
 	
 
 	return CDialogEx::PreTranslateMessage(pMsg);
@@ -227,12 +248,21 @@ LRESULT BacnetScreen::Screeenedit_close_handle(WPARAM wParam,LPARAM lParam)
 		bool saving_ret = false;
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Saving data , please wait!"));
 		saving_ret = ScreenEdit_Window->UpdateDeviceLabelFlash();
+		//if(((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SQLITE_INFO)))
+		//{
+		//	CString temp_info;
+		//	temp_info.Format(_T("Close sqlit DB"));
+		//	DFTrace(temp_info);
+		//}
 		if(saving_ret)
 			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Saving data success!"));
 		else
 			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Saving data failed!"));
+		//ScreenEdit_Window->SqliteDBT3000.closedb();
 		delete ScreenEdit_Window;
 		ScreenEdit_Window = NULL;
+		
+		
 	}
 	return 0;
 }
@@ -278,9 +308,11 @@ LRESULT BacnetScreen::OnHotKey(WPARAM wParam,LPARAM lParam)
 BOOL BacnetScreen::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-
+	SetWindowTextW(_T("Graphic"));
 	// TODO:  Add extra initialization here
 	Initial_List();
+	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_GRAPHIC);
+	SetIcon(m_hIcon,TRUE);
 	PostMessage(WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
 
 //	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//F2键
@@ -311,10 +343,12 @@ void BacnetScreen::Initial_List()
 	m_screen_list.InsertColumn(SCREEN_LABEL, _T("Label"), 120, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_screen_list.InsertColumn(SCREEN_PIC_FILE, _T("Picture File"), 140, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	//m_screen_list.InsertColumn(SCREEN_MODE, _T("Mode"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	m_screen_list.InsertColumn(SCREEN_REFRESH, _T("Refresh Rate"), 110, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_screen_list.InsertColumn(SCREEN_ELEMENT_COUNT, _T("Element Count"), 110, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_screen_list.Setlistcolcharlimit(SCREEN_DESCRIPTION,STR_SCREEN_DESCRIPTION_LENGTH -1);
+	m_screen_list.Setlistcolcharlimit(SCREEN_LABEL,STR_SCREEN_LABLE_LENGTH-1);
 
 	m_screen_dlg_hwnd = this->m_hWnd;
-	//g_hwnd_now = m_screen_dlg_hwnd;
+	m_screen_list.SetListHwnd(this->m_hWnd);
 	
 	CRect list_rect,win_rect;
 	m_screen_list.GetWindowRect(list_rect);
@@ -408,7 +442,7 @@ LRESULT BacnetScreen::Fresh_Screen_List(WPARAM wParam,LPARAM lParam)
 		//m_screen_list.SetItemText(i,SCREEN_MODE,_T("Graphic"));
 		CString cs_refresh_time;
 		cs_refresh_time.Format(_T("%d"),m_screen_data.at(i).update);
-		m_screen_list.SetItemText(i,SCREEN_REFRESH,cs_refresh_time);
+		m_screen_list.SetItemText(i,SCREEN_ELEMENT_COUNT,cs_refresh_time);
 		if(isFreshOne)
 		{
 			break;
@@ -494,7 +528,7 @@ LRESULT BacnetScreen::Fresh_Screen_Item(WPARAM wParam,LPARAM lParam)
 		//	}
 		//}
 	}
-	else if (Changed_SubItem == SCREEN_REFRESH)
+	else if (Changed_SubItem == SCREEN_ELEMENT_COUNT)
 	{
 		int temp_value;
 		if((New_CString.GetLength()>=4) || (_wtoi(New_CString)>255))
@@ -698,6 +732,8 @@ void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 
 void BacnetScreen::OnClose()
 {
+	ShowWindow(FALSE);
+	return;
 	// TODO: Add your message handler code here and/or call default
 	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
 	KillTimer(1);
@@ -721,7 +757,7 @@ void BacnetScreen::OnTimer(UINT_PTR nIDEvent)
 	{
 		PostMessage(WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
 	}
-	else if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
+	else if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_SCREENS))  )	//GSM连接时不要刷新;
 	{
 	PostMessage(WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
 	if(bac_select_device_online)
@@ -1184,7 +1220,76 @@ int BacnetScreen::GetPicFileFunction(unsigned char screen_index ,CString temp_im
 
 }
 
+void BacnetScreen::Reset_Screen_Rect()
+{
 
+	CRect temp_mynew_rect;
+	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+
+	CRect temp_window;
+	GetWindowRect(&temp_window);
+
+	if(window_max)
+	{
+		CRect temp_mynew_rect;
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), NULL);
+	}
+	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
+	{
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,0,0,SWP_NOSIZE );
+	}
+	else
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left + 90,temp_mynew_rect.top + 70,500,700, NULL);
+
+
+	return;
+
+}
+
+
+void BacnetScreen::OnSysCommand(UINT nID, LPARAM lParam)
+{
+	// TODO: Add your message handler code here and/or call default
+	if(nID == SC_MAXIMIZE)
+	{
+		if(window_max == false)
+		{
+			window_max = true;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
+		}
+		else
+		{
+			window_max = false;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
+		}
+		return;
+	}
+
+	CDialogEx::OnSysCommand(nID, lParam);
+}
+
+
+void BacnetScreen::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	// TODO: Add your message handler code here
+	CRect rc;
+	GetClientRect(rc);
+	if(m_screen_list.m_hWnd != NULL)
+	{
+		::SetWindowPos(this->m_hWnd, HWND_TOP, 0,0, 0,0,  SWP_NOSIZE | SWP_NOMOVE);
+		//m_program_list.MoveWindow(&rc);
+		m_screen_list.MoveWindow(rc.left,rc.top,rc.Width(),rc.Height() - 80);
+
+		GetDlgItem(IDC_BUTTON_GRAPHIC_INSERT)->MoveWindow(rc.left + 20 ,rc.bottom - 60 , 120,50);
+	}
+}
 
 
 

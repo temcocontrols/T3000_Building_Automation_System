@@ -28,7 +28,7 @@ CBacnetInput::CBacnetInput(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CBacnetInput::IDD, pParent)
 {
   //  m_latest_protocol=3;
-
+	window_max = true;
 }
 
 
@@ -54,6 +54,9 @@ BEGIN_MESSAGE_MAP(CBacnetInput, CDialogEx)
     ON_WM_CLOSE()
     
     ON_WM_HELPINFO()
+	ON_WM_SIZE()
+	ON_WM_MOVE()
+	ON_WM_SYSCOMMAND()
 END_MESSAGE_MAP()
 
 // CBacnetInput message handlers
@@ -73,6 +76,12 @@ LRESULT  CBacnetInput::InputMessageCallBack(WPARAM wParam, LPARAM lParam)
 			Post_Refresh_One_Message(g_bac_instance,READINPUT_T3000,
 				pInvoke->mRow,pInvoke->mRow,sizeof(Str_in_point));
 			SetTimer(2,2000,NULL);
+		}
+		CString g_configfile_path = g_strExePth + g_strStartInterface_config;
+		int savetodb = GetPrivateProfileInt(_T("SaveToDB"), _T("INPUT"), 0, g_configfile_path);
+		if (savetodb == 1)
+		{
+			Save_InputData_to_db(pInvoke->mRow);
 		}
 		//Save_InputData_to_db(pInvoke->mRow);
 	}
@@ -100,19 +109,26 @@ LRESULT  CBacnetInput::InputMessageCallBack(WPARAM wParam, LPARAM lParam)
 BOOL CBacnetInput::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-
+	SetWindowTextW(_T("INPUT"));
+#if 0
 	m_input_item_info.SetWindowTextW(_T(""));
 	m_input_item_info.textColor(RGB(0,0,255));
 	//m_static.bkColor(RGB(0,255,255));
 	m_input_item_info.setFont(20,14,NULL,_T("Arial"));
-
+#endif
 	// TODO:  Add extra initialization here
 	Initial_List();
 	PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
    
 
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
-	//SetTimer(5,250,NULL);
+
+	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_INPUT_DEFAULT);
+	SetIcon(m_hIcon,TRUE);
+	//SetIcon(m_hIcon,FALSE);
+
+	ShowWindow(FALSE);
+	//SetTimer(6,250,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -246,7 +262,8 @@ void CBacnetInput::Initial_List()
 	m_input_list.InsertColumn(INPUT_EXTERNAL, _T("External"), 0, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_PRODUCT, _T("Product Name"), 0, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_EXT_NUMBER, _T("Product Input"), 0, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
-
+	m_input_list.Setlistcolcharlimit(INPUT_FULL_LABLE,STR_IN_DESCRIPTION_LENGTH -1);
+	m_input_list.Setlistcolcharlimit(INPUT_LABLE,STR_IN_LABEL-1);
 	show_external =  false;
 
 	m_input_dlg_hwnd = this->m_hWnd;
@@ -261,7 +278,7 @@ void CBacnetInput::Initial_List()
 	::GetWindowRect(m_input_dlg_hwnd,win_rect);
 	m_input_list.Set_My_WindowRect(win_rect);
 	m_input_list.Set_My_ListRect(list_rect);
-
+	m_input_list.SetListHwnd(this->m_hWnd);
 
 	//m_input_list.DeleteAllItems();
 	for (int i=0;i<(int)m_Input_data.size();i++)
@@ -318,6 +335,8 @@ void CBacnetInput::OnBnClickedOk()
 	// TODO: Add your control notification handler code here
 //	CDialogEx::OnOK();
 }
+
+
 LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 {   
 	int cmp_ret ;//compare if match it will 0;
@@ -572,11 +591,11 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 
 	if(Minipanel_device == 0)	//如果不是minipanel的界面就隐藏扩展行;
 	{
-		CRect temp_rect;
-		temp_rect = Input_rect;
-		temp_rect.right = 975;
-		temp_rect.top = temp_rect.top + 22;
-		m_input_list.MoveWindow(temp_rect);
+		//CRect temp_rect;
+		//temp_rect = Input_rect;
+		//temp_rect.right = 975;
+		//temp_rect.top = temp_rect.top + 22;
+		//m_input_list.MoveWindow(temp_rect);
 
 		m_input_list.SetColumnWidth(INPUT_EXTERNAL,0);
 		m_input_list.SetColumnWidth(INPUT_PRODUCT,0);
@@ -586,22 +605,22 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 	{
 			if(temp_need_show_external)
 			{
-				CRect temp_rect;
-				temp_rect = Input_rect;
-				temp_rect.right = 1200;
-				temp_rect.top = temp_rect.top + 22;
-				m_input_list.MoveWindow(temp_rect);
+				//CRect temp_rect;
+				//temp_rect = Input_rect;
+				//temp_rect.right = 1200;
+				//temp_rect.top = temp_rect.top + 22;
+				//m_input_list.MoveWindow(temp_rect);
 				m_input_list.SetColumnWidth(INPUT_EXTERNAL,60);
 				m_input_list.SetColumnWidth(INPUT_PRODUCT,80);
 				m_input_list.SetColumnWidth(INPUT_EXT_NUMBER,80);
 			}
 			else
 			{
-				CRect temp_rect;
-				temp_rect = Input_rect;
-				temp_rect.right = 975;
-				temp_rect.top = temp_rect.top + 22;
-				m_input_list.MoveWindow(temp_rect);
+				//CRect temp_rect;
+				//temp_rect = Input_rect;
+				//temp_rect.right = 975;
+				//temp_rect.top = temp_rect.top + 22;
+				//m_input_list.MoveWindow(temp_rect);
 
 				m_input_list.SetColumnWidth(INPUT_EXTERNAL,0);
 				m_input_list.SetColumnWidth(INPUT_PRODUCT,0);
@@ -841,16 +860,13 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		{
 			temp_status.Format(JumperStatus[3]);
 		}
-		else if(temp_jumper == 4)
-		{
-			temp_status.Format(JumperStatus[4]);
-		}
 		else if(temp_jumper == 0)
 		{
 			temp_status.Format(JumperStatus[0]);
 		}
 		else
 		{
+			temp_status.Format(JumperStatus[0]);
 			m_Input_data.at(i).decom = m_Input_data.at(i).decom & 0x0f;	 //如果最高位不是 有效值，清零;
 		}
 		m_input_list.SetItemText(i,INPUT_JUMPER,temp_status);
@@ -968,6 +984,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 				(temp_pid == PM_T38AI8AO6DO) ||
 				(temp_pid == PM_T36CT))
 			{
+#if 0
 				m_input_item_info.ShowWindow(true);
 				CString temp_name;
 				temp_name = GetProductName(m_Input_data.at(input_list_line).sub_product);
@@ -978,11 +995,14 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 				temp_number.Format(_T("Input%d"),(unsigned char)m_Input_data.at(input_list_line).sub_number + 1);
 				show_info = _T("Module:") + temp_name +_T("        ") + temp_id + temp_number;
 				m_input_item_info.SetWindowTextW(show_info);
+#endif
 
 			}	
 			else
 			{
+#if 0
 				m_input_item_info.ShowWindow(false);
+#endif
 			}
 		}
 		else
@@ -1287,8 +1307,15 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 				m_input_list.SetItemText(lRow,INPUT_RANGE,temp1);
 			}
 	}
-	else
+	else if((bacnet_device_type == PM_T3PT12) && (lCol == INPUT_JUMPER))
+	{
+		m_input_list.Set_Edit(false);
 		return;
+	}
+	else
+	{
+		return;
+	}
 
 
 
@@ -1322,22 +1349,51 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
+
+
+void CBacnetInput::Reset_Input_Rect()
+{
+	CRect temp_mynew_rect;
+	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+
+	CRect temp_window;
+	GetWindowRect(&temp_window);
+
+	if(window_max)
+	{
+		CRect temp_mynew_rect;
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), NULL);
+	}
+	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
+	{
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,0,0,SWP_NOSIZE );
+	}
+	else
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,700,700, NULL);
+	
+	//MoveWindow(temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(),1);
+	return;
+}
+
 static int move_direction = 1;
 static long ticktime = 0;
 void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
+
+
 	switch(nIDEvent)
 	{
 	case 1:
 		{
-
+			
 
 			if(g_protocol == PROTOCOL_BIP_TO_MSTP)
 			{
 				PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
 			}
-			else if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
+			else if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_INPUT))  )	//GSM连接时不要刷新;
 			{
 				PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
 				if((bac_select_device_online)&& (g_protocol == PROTOCOL_BACNET_IP))
@@ -1447,6 +1503,9 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 void CBacnetInput::OnClose()
 {
 	// TODO: Add your message handler code here and/or call default
+	ShowWindow(FALSE);
+	return;
+
 	m_input_dlg_hwnd = NULL;
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
 	CDialogEx::OnClose();
@@ -1504,6 +1563,25 @@ BOOL CBacnetInput::PreTranslateMessage(MSG* pMsg)
 			((CStatic*)GetDlgItem(IDC_STATIC_INPUT_PIC))->MoveWindow(temp_rect.left - 4,temp_rect.top,temp_rect.Width(),temp_rect.Height(),1);
 			ticktime = nowticktime;
 		}
+	}
+	else if(pMsg->message==WM_NCLBUTTONDBLCLK)
+	{
+		if(!window_max)
+		{
+			window_max = true;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
+		}
+		else
+		{
+			window_max = false;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,500,700,SWP_SHOWWINDOW);
+		}
+
+		return 1; 
 	}
 
     CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
@@ -1587,7 +1665,11 @@ int GetInputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Aut
 		ret_cstring.Format(_T("%.2f"),temp_float_value);
 
 		if(m_Input_data.at(i).range <  (sizeof(Input_List_Analog_Units)/sizeof(Input_List_Analog_Units[0])))
+		{
 			ret_unit =Input_List_Analog_Units[m_Input_data.at(i).range];
+			if(m_Input_data.at(i).range == 0)
+				ret_unit.Empty();
+		}
 		else
 		{
 			ret_unit.Empty();
@@ -1666,4 +1748,60 @@ BOOL CBacnetInput::OnHelpInfo(HELPINFO* pHelpInfo)
 // 	::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
 // 	}
 	return CDialogEx::OnHelpInfo(pHelpInfo);
+}
+
+
+void CBacnetInput::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	// TODO: Add your message handler code here
+	CRect rc;
+	GetClientRect(rc);
+	if(m_input_list.m_hWnd != NULL)
+	{
+
+		::SetWindowPos(this->m_hWnd, HWND_TOP, 0,0, 0,0, SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE);
+		m_input_list.MoveWindow(&rc);
+		//BringWindowToTop();
+		//SetActiveWindow();
+	}
+}
+
+
+void CBacnetInput::OnMove(int x, int y)
+{
+	CDialogEx::OnMove(x, y);
+	::SetWindowPos(this->m_hWnd, HWND_TOP, 0,0, 0,0, SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE);
+
+	//BringWindowToTop();
+	//SetActiveWindow();
+	// TODO: Add your message handler code here
+	
+}
+
+
+void CBacnetInput::OnSysCommand(UINT nID, LPARAM lParam)
+{
+	// TODO: Add your message handler code here and/or call default
+	if(nID == SC_MAXIMIZE)
+	{
+		if(window_max == false)
+		{
+			window_max = true;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
+		}
+		else
+		{
+			window_max = false;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,500,700,SWP_SHOWWINDOW);
+		}
+
+		return;
+	}
+	CDialogEx::OnSysCommand(nID, lParam);
 }

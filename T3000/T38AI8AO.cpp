@@ -232,7 +232,7 @@ void T38AI8AO::InitialRegister(){
 	while(!q.eof())
 	{
 		temp.regID=q.getIntField("RegID");
-		temp.regName =q.getValuebyName(L"T3-8AI8AO");
+		temp.regName =q.getValuebyName(L"T3_8AI8AO");
 		q.nextRow();
 		g_VectorT3Register.push_back(temp);
 	}

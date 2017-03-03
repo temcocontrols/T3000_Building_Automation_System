@@ -66,6 +66,7 @@ LRESULT  CBacnetAnalogCusRang::AnalogRangeTblMessageCallBack(WPARAM wParam, LPAR
 	CString temp_cs = pInvoke->task_info;
 	if(msg_result)
 	{
+		
 		Show_Results = temp_cs + _T("Success!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 	}
@@ -82,7 +83,7 @@ LRESULT  CBacnetAnalogCusRang::AnalogRangeTblMessageCallBack(WPARAM wParam, LPAR
 		m_analog_cus_range_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
 	m_analog_cus_range_list.RedrawItems(pInvoke->mRow,pInvoke->mRow);
 
-	Fresh_AnalogCusRange_List(0,0);
+	Fresh_AnalogCusRange_List(analog_range_tbl_line,analog_range_tbl_line);
 
 	if(pInvoke)
 		delete pInvoke;
@@ -107,8 +108,8 @@ void CBacnetAnalogCusRang::OnCancel()
 {
 	// TODO: Add your specialized code here and/or call the base class
 	Fresh_AnalogCusRange_Item(0,0);
-	g_hwnd_now =	temp_gloab_hwnd;
-	analog_cus_range_dlg = NULL;
+	//g_hwnd_now =	temp_gloab_hwnd;
+	//analog_cus_range_dlg = NULL;
 	CDialogEx::OnCancel();
 }
 
@@ -152,7 +153,7 @@ void CBacnetAnalogCusRang::Initial_List()
 	m_analog_cus_range_list.InsertColumn(1, _T("Value"), 100, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 
 	temp_gloab_hwnd = g_hwnd_now;
-	g_hwnd_now = this->m_hWnd;
+	//g_hwnd_now = this->m_hWnd;
 	analog_cus_range_dlg = this->m_hWnd;
 
 	CRect list_rect,win_rect;
@@ -162,7 +163,7 @@ void CBacnetAnalogCusRang::Initial_List()
 	m_analog_cus_range_list.Set_My_WindowRect(win_rect);
 	m_analog_cus_range_list.Set_My_ListRect(list_rect);
 	m_analog_cus_range_list.Support_Col_0_Edit(true);
-
+	m_analog_cus_range_list.SetListHwnd(this->m_hWnd);
 	//m_analog_cus_range_list.DeleteAllItems();
 	for (int i=0;i<11;i++)
 	{
@@ -223,7 +224,13 @@ LRESULT CBacnetAnalogCusRang::Fresh_AnalogCusRange_Item(WPARAM wParam,LPARAM lPa
 			}
 	}
 
-
+	bool ret_check = false;
+	ret_check = CheckAllDataValid();
+	if(!ret_check)
+	{
+		MessageBox(_T("Please input a regular table"));
+		return 0;
+	}
 
 	CString temp_task_info;
 	temp_task_info.Format(_T("Update Analog Range  "));
@@ -231,6 +238,68 @@ LRESULT CBacnetAnalogCusRang::Fresh_AnalogCusRange_Item(WPARAM wParam,LPARAM lPa
 
 
 	return 0;
+}
+
+
+BOOL CBacnetAnalogCusRang::CheckAllDataValid()
+{
+	int slop_value[11];
+
+	int voltage[11];
+	int mvalue[11];
+
+	memset(voltage,0,sizeof(voltage));
+	memset(mvalue,0,sizeof(mvalue));
+	int voltage_up = -1;
+	int voltage_down = -1;
+
+	int value_up = -1;
+	int value_down = -1;
+
+	for (int i=0;i<11;i++)
+	{
+		if(m_analog_custmer_range.at(analog_range_tbl_line).dat[i+1].value == 0)
+			break;
+		if(m_analog_custmer_range.at(analog_range_tbl_line).dat[i+1].unit == 0)
+			break;
+		voltage[i] = m_analog_custmer_range.at(analog_range_tbl_line).dat[i+1].value - m_analog_custmer_range.at(analog_range_tbl_line).dat[i].value;
+		mvalue[i] = m_analog_custmer_range.at(analog_range_tbl_line).dat[i+1].unit - m_analog_custmer_range.at(analog_range_tbl_line).dat[i].unit;
+
+	}
+	for (int i=0;i<11;i++)
+	{
+		if(mvalue[i] > 0)
+		{
+			value_up = 1;
+		}
+		else if(mvalue[i] < 0)
+		{
+			value_down = 1;
+		}
+	}
+
+	for (int i=0;i<11;i++)
+	{
+		if(voltage[i] > 0)
+		{
+			voltage_up = 1;
+		}
+		else if(voltage[i] < 0)
+		{
+			voltage_down = 1;
+		}
+	}
+
+	if((voltage_up == 1) && (value_down == 1))
+	{
+		return 0;
+	}
+	else if((value_up == 1) && (voltage_down == 1))
+	{
+		return 0;
+	}
+
+	return 1;
 }
 
 LRESULT CBacnetAnalogCusRang::Fresh_AnalogCusRange_List(WPARAM wParam,LPARAM lParam)
@@ -245,7 +314,7 @@ LRESULT CBacnetAnalogCusRang::Fresh_AnalogCusRange_List(WPARAM wParam,LPARAM lPa
 	temp_show_unit.ReleaseBuffer();
 	if(temp_show_unit.GetLength() > 9)
 		temp_show_unit = temp_show_unit.Left(9);
-
+	Analog_Customer_Units[analog_range_tbl_line] = temp_show_unit;
 	((CEdit *)GetDlgItem(IDC_EDIT_BAC_CUS_ANALOG_UNIT))->SetWindowText(temp_show_unit);
 	
 	for (int i=0;i<11;i++)
@@ -382,8 +451,8 @@ void CBacnetAnalogCusRang::SetSlideRange()
 void CBacnetAnalogCusRang::OnClose()
 {
 	// TODO: Add your message handler code here and/or call default
-	g_hwnd_now =	temp_gloab_hwnd;
-	analog_cus_range_dlg = NULL;
+	//g_hwnd_now =	temp_gloab_hwnd;
+	//analog_cus_range_dlg = NULL;
 	CDialogEx::OnClose();
 }
 
@@ -434,7 +503,7 @@ void CBacnetAnalogCusRang::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrol
 
 	int CurPos;
 	int temp_value;
-	//float fvalue; 
+	//float fvalue; 0oi-i--9999999999
 	CRect temp_1;
 	CRect temp_2;
 
@@ -697,6 +766,13 @@ void CBacnetAnalogCusRang::UpdateCusAnalogUnit()
 
 	memcpy_s(m_analog_custmer_range.at(analog_range_tbl_line).table_name,9,cTemp1,9);
 	//m_analog_custmer_range.at(analog_range_tbl_line).table_name
+	bool ret_check = false;
+	ret_check = CheckAllDataValid();
+	if(!ret_check)
+	{
+		MessageBox(_T("Please input a regular table"));
+		return ;
+	}
 	CString temp_task_info;
 	temp_task_info.Format(_T("Update Analog Range Unit : %s  "),temp_cs);
 	Post_Write_Message(g_bac_instance,WRITEANALOG_CUS_TABLE_T3000,analog_range_tbl_line,analog_range_tbl_line,sizeof(Str_table_point),analog_cus_range_dlg ,temp_task_info);
@@ -721,3 +797,5 @@ void CBacnetAnalogCusRang::OnPaint()
 	//delete mygraphics;
 	
 }
+
+

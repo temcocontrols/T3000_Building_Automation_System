@@ -26,6 +26,7 @@ CBacnetOutput::CBacnetOutput(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CBacnetOutput::IDD, pParent)
 {
   //m_latest_protocol=3;
+	window_max = true;
 }
 
 CBacnetOutput::~CBacnetOutput()
@@ -48,6 +49,8 @@ BEGIN_MESSAGE_MAP(CBacnetOutput, CDialogEx)
 	ON_WM_TIMER()
 	ON_WM_CLOSE()
 	ON_WM_HELPINFO()
+	ON_WM_SIZE()
+	ON_WM_SYSCOMMAND()
 END_MESSAGE_MAP()
 
 
@@ -71,7 +74,13 @@ LRESULT  CBacnetOutput::OutputMessageCallBack(WPARAM wParam, LPARAM lParam)
 				pInvoke->mRow,pInvoke->mRow,sizeof(Str_out_point));
 			SetTimer(2,2000,NULL);
 		}
-		//Save_OutputData_to_db(pInvoke->mRow);
+		CString g_configfile_path = g_strExePth + g_strStartInterface_config;
+		int savetodb = GetPrivateProfileInt(_T("SaveToDB"), _T("OUTPUT"), 0, g_configfile_path);
+		if (savetodb == 1)
+		{
+			Save_OutputData_to_db(pInvoke->mRow);
+		}
+		 
 	}
 	else
 	{
@@ -97,6 +106,7 @@ BOOL CBacnetOutput::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
+	SetWindowTextW(_T("OUTPUT"));
 	// TODO:  Add extra initialization here
 	m_output_item_info.SetWindowTextW(_T(""));
 	m_output_item_info.textColor(RGB(0,0,255));
@@ -110,6 +120,12 @@ BOOL CBacnetOutput::OnInitDialog()
 	hIcon   = AfxGetApp()->LoadIcon(IDI_ICON_OK);
 	((CButton *)GetDlgItem(IDC_BUTTON_OUTPUT_APPLY))->SetIcon(hIcon);
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
+
+	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_OUTPUT);
+	SetIcon(m_hIcon,TRUE);
+
+	ShowWindow(FALSE);
+	//SetTimer(6,250,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -264,20 +280,27 @@ void CBacnetOutput::Initial_List()
 	m_output_list.InsertColumn(OUTPUT_VALUE, _T("Value"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_UNITE, _T("Units"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_RANGE, _T("Range"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	
+	m_output_list.InsertColumn(OUTPUT_LOW_VOLTAGE, _T("Low V"), 50, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_output_list.InsertColumn(OUTPUT_HIGH_VOLTAGE, _T("High V"), 50, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	
 	m_output_list.InsertColumn(OUTPUT_PWM_PERIOD, _T("PWM\r\n Period"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	
+
+
 	m_output_list.InsertColumn(OUTPUT_DECOM, _T("Status"), 70, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_LABLE, _T("Label"), 70, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 
 	m_output_list.InsertColumn(OUTPUT_EXTERNAL, _T("External"), 0, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_PRODUCT, _T("Product Name"), 0, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_EXT_NUMBER, _T("Product Output"), 0, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
-
+	m_output_list.Setlistcolcharlimit(OUTPUT_FULL_LABLE,STR_OUT_DESCRIPTION_LENGTH -1);
+	m_output_list.Setlistcolcharlimit(OUTPUT_LABLE,STR_OUT_LABEL-1);
 
 	m_output_dlg_hwnd = this->m_hWnd;
 	//g_hwnd_now = m_output_dlg_hwnd;
 	m_output_list.GetClientRect(Output_rect);
- 
+	m_output_list.SetListHwnd(this->m_hWnd);
 	for (int i=0;i<(int)m_Output_data.size();i++)
 	{
 		CString temp_item,temp_value,temp_cal,temp_filter,temp_status,temp_lable;
@@ -416,22 +439,22 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		show_output_external = temp_need_show_external;
 		if(temp_need_show_external)
 		{
-			CRect temp_rect;
-			temp_rect = Output_rect;
-			temp_rect.right = 1150;
-			temp_rect.top = temp_rect.top + 24;
-			m_output_list.MoveWindow(temp_rect);
+			//CRect temp_rect;
+			//temp_rect = Output_rect;
+			//temp_rect.right = 1150;
+			//temp_rect.top = temp_rect.top + 24;
+			//m_output_list.MoveWindow(temp_rect);
 			m_output_list.SetColumnWidth(OUTPUT_EXTERNAL,60);
 			m_output_list.SetColumnWidth(OUTPUT_PRODUCT,80);
 			m_output_list.SetColumnWidth(OUTPUT_EXT_NUMBER,80);
 		}
 		else
 		{
-			CRect temp_rect;
-			temp_rect = Output_rect;
-			temp_rect.right = 950;
-			temp_rect.top = temp_rect.top + 24;
-			m_output_list.MoveWindow(temp_rect);
+			//CRect temp_rect;
+			//temp_rect = Output_rect;
+			//temp_rect.right = 950;
+			//temp_rect.top = temp_rect.top + 24;
+			//m_output_list.MoveWindow(temp_rect);
 
 			m_output_list.SetColumnWidth(OUTPUT_EXTERNAL,0);
 			m_output_list.SetColumnWidth(OUTPUT_PRODUCT,0);
@@ -440,11 +463,11 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 	}
 	if(Minipanel_device == 0)	//如果不是minipanel的界面就隐藏扩展行;
 	{
-		CRect temp_rect;
-		temp_rect = Output_rect;
-		temp_rect.right = 950;
-		temp_rect.top = temp_rect.top + 24;
-		m_output_list.MoveWindow(temp_rect);
+		//CRect temp_rect;
+		//temp_rect = Output_rect;
+		//temp_rect.right = 950;
+		//temp_rect.top = temp_rect.top + 24;
+		//m_output_list.MoveWindow(temp_rect);
 
 		m_output_list.SetColumnWidth(OUTPUT_EXTERNAL,0);
 		m_output_list.SetColumnWidth(OUTPUT_PRODUCT,0);
@@ -491,6 +514,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		CString temp_item,temp_value,temp_cal,temp_filter,temp_status,temp_lable;
 		CString temp_des;
 		CString temp_units;
+		CString low_voltage,high_voltage;
 
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Output_data.at(i).description, (int)strlen((char *)m_Output_data.at(i).description)+1, 
 			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
@@ -500,6 +524,19 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		m_output_list.SetItemText(i,OUTPUT_FULL_LABLE,temp_des);
 		m_output_list.SetCellEnabled(i,OUTPUT_HW_SWITCH,0);
 		m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T(""));
+
+		if(m_Output_data.at(i).low_voltage == 0)
+			low_voltage.Empty();
+		else
+			low_voltage.Format(_T("%.1f"),m_Output_data.at(i).low_voltage/10);
+
+		if(m_Output_data.at(i).high_voltage == 0)
+			high_voltage.Empty();
+		else
+			high_voltage.Format(_T("%.1f"),m_Output_data.at(i).high_voltage/10);
+		
+		m_output_list.SetItemText(i,OUTPUT_LOW_VOLTAGE,low_voltage);	
+		m_output_list.SetItemText(i,OUTPUT_HIGH_VOLTAGE,high_voltage);	
 		//这样加实在是情非得已，老毛非得加一堆条件，还要smart;
 		if((bacnet_device_type == BIG_MINIPANEL) || ((bacnet_device_type == SMALL_MINIPANEL)) || (bacnet_device_type == TINY_MINIPANEL) || 
 			(bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PWM_TRANSDUCER))
@@ -578,7 +615,8 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			m_output_list.SetCellEnabled(i,OUTPUT_UNITE,0);
 		if(m_Output_data.at(i).digital_analog == BAC_UNITS_ANALOG)
 		{
-
+			m_output_list.SetCellEnabled(i,OUTPUT_LOW_VOLTAGE,1);
+			m_output_list.SetCellEnabled(i,OUTPUT_HIGH_VOLTAGE,1);
 			m_output_list.SetCellEnabled(i,OUTPUT_PWM_PERIOD,1);
 			if(m_Output_data.at(i).range == 0)
 				m_output_list.SetItemText(i,OUTPUT_RANGE,_T("Unused"));
@@ -604,6 +642,8 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		}
 		else if(m_Output_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
 		{
+			m_output_list.SetCellEnabled(i,OUTPUT_LOW_VOLTAGE,0);
+			m_output_list.SetCellEnabled(i,OUTPUT_HIGH_VOLTAGE,0);
 			m_output_list.SetCellEnabled(i,OUTPUT_PWM_PERIOD,0);
 			m_output_list.SetItemText(i,OUTPUT_UNITE,_T(""));
 
@@ -786,7 +826,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		}
 	}
 	copy_data_to_ptrpanel(TYPE_OUTPUT);
-	Invalidate();
+	//Invalidate();
 	return 0;
 }
 
@@ -867,7 +907,7 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 		CString cs_temp = m_output_list.GetItemText(Changed_Item,Changed_SubItem);
 		if(cs_temp.GetLength()>= STR_OUT_DESCRIPTION_LENGTH)	//长度不能大于结构体定义的长度;
 		{
-			MessageBox(_T("Length can not higher than 20"),_T("Warning"));
+			MessageBox(_T("Length can not higher than 18"),_T("Warning"));
 #pragma region note_what_do	
 			//如下所做的事 达到 ,在弹窗后 继续选中客户输入的部分 ，毛总的要求;
 			CRect list_rect,win_rect;
@@ -929,6 +969,31 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 		}
 	}
 
+
+	if(Changed_SubItem == OUTPUT_LOW_VOLTAGE)
+	{
+		int temp_int = (int)(_wtof(New_CString) * 10);
+		if(temp_int> 120)
+		{
+			MessageBox(_T("Voltage can not greater than 12"),_T("Warning"));
+			PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,Changed_Item,REFRESH_ON_ITEM);
+			return 0 ;
+		}
+		m_Output_data.at(Changed_Item).low_voltage = temp_int;
+	}
+
+	if(Changed_SubItem == OUTPUT_HIGH_VOLTAGE)
+	{
+		int temp_int = (int)(_wtof(New_CString) * 10);
+		if(temp_int> 120)
+		{
+			MessageBox(_T("Voltage can not greater than 12"),_T("Warning"));
+			PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,Changed_Item,REFRESH_ON_ITEM);
+			return 0;
+		}
+		m_Output_data.at(Changed_Item).high_voltage = temp_int;
+	}
+
 	cmp_ret = memcmp(&m_temp_output_data[Changed_Item],&m_Output_data.at(Changed_Item),sizeof(Str_out_point));
 	if(cmp_ret!=0)
 	{
@@ -956,9 +1021,9 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 	lvinfo.pt=point;
 	lvinfo.flags=LVHT_ABOVE;
 	int nItem=m_output_list.SubItemHitTest(&lvinfo);
+	
 
-
-
+	 (CMainFrame*)(AfxGetApp()->m_pMainWnd)->SetActiveWindow();
 	if((nItem!=-1) && (nItem < BAC_OUTPUT_ITEM_COUNT))
 	{
 		output_list_line = nItem;
@@ -977,7 +1042,7 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 				(temp_pid == PM_T322AI) ||
 				(temp_pid == PM_T38AI8AO6DO))
 			{
-				m_output_item_info.ShowWindow(true);
+				//m_output_item_info.ShowWindow(true); //由于改成全屏的 支持resize 的显示，所以先屏蔽;
 				CString temp_name;
 				temp_name = GetProductName(m_Output_data.at(output_list_line).sub_product);
 				CString show_info;
@@ -1172,6 +1237,8 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 					m_Output_data.at(lRow).digital_analog =  BAC_UNITS_ANALOG;
 					bac_ranges_type = OUTPUT_RANGE_ANALOG_TYPE;
 					m_output_list.SetCellEnabled(lRow,OUTPUT_PWM_PERIOD,1);
+					m_output_list.SetCellEnabled(lRow,OUTPUT_LOW_VOLTAGE,1);
+					m_output_list.SetCellEnabled(lRow,OUTPUT_HIGH_VOLTAGE,1);
 				}
 
 				if(bac_ranges_type == OUTPUT_RANGE_ANALOG_TYPE)
@@ -1181,6 +1248,8 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 					m_output_list.SetItemText(lRow,OUTPUT_UNITE,Output_Analog_Units_Show[bac_range_number_choose]);		
 					m_output_list.SetItemText(lRow,OUTPUT_RANGE,OutPut_List_Analog_Range[bac_range_number_choose]);	
 					m_output_list.SetCellEnabled(lRow,OUTPUT_PWM_PERIOD,1);
+					m_output_list.SetCellEnabled(lRow,OUTPUT_LOW_VOLTAGE,1);
+					m_output_list.SetCellEnabled(lRow,OUTPUT_HIGH_VOLTAGE,1);
 
 					CString cstemp_value;
 					cstemp_value.Format(_T("%.2f"),((float)m_Output_data.at(lRow).value) / 1000);
@@ -1222,6 +1291,8 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 					m_output_list.SetItemText(lRow,OUTPUT_RANGE,temp1);
 					m_output_list.SetItemText(lRow,OUTPUT_UNITE,_T(""));//如果是数字单位 Unit 要清空;
 					m_output_list.SetCellEnabled(lRow,OUTPUT_PWM_PERIOD,0);
+					m_output_list.SetCellEnabled(lRow,OUTPUT_LOW_VOLTAGE,0);
+					m_output_list.SetCellEnabled(lRow,OUTPUT_HIGH_VOLTAGE,0);
 				}
 			
 	}
@@ -1271,12 +1342,13 @@ void CBacnetOutput::OnTimer(UINT_PTR nIDEvent)
 	{
 	case 1:
 		{
-
+			
 			if(g_protocol == PROTOCOL_BIP_TO_MSTP)
 			{
 				PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
 			}
-			else if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
+			//else if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
+			else if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_OUTPUT))  )	//GSM连接时不要刷新;
 			{
 				PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
 				if((bac_select_device_online) && (g_protocol == PROTOCOL_BACNET_IP))
@@ -1310,6 +1382,9 @@ void CBacnetOutput::OnTimer(UINT_PTR nIDEvent)
 			PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,changed_output_item,REFRESH_ON_ITEM);
 		}
 		break;
+
+	default:
+		break;
 	}
 
 
@@ -1333,6 +1408,25 @@ BOOL CBacnetOutput::PreTranslateMessage(MSG* pMsg)
 		m_output_list.Get_clicked_mouse_position();
 		return TRUE;
 	}
+	else if(pMsg->message==WM_NCLBUTTONDBLCLK)
+	{
+		if(!window_max)
+		{
+			window_max = true;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
+		}
+		else
+		{
+			window_max = false;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 30 ,temp_mynew_rect.top + 30,500,700,SWP_SHOWWINDOW);
+		}
+
+		return 1; 
+	}
     CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
     if (pFrame->m_pDialogInfo != NULL&&pFrame->m_pDialogInfo->IsWindowVisible())
     {
@@ -1350,6 +1444,10 @@ BOOL CBacnetOutput::PreTranslateMessage(MSG* pMsg)
 void CBacnetOutput::OnClose()
 {
 	// TODO: Add your message handler code here and/or call default
+
+	ShowWindow(FALSE);
+	return;
+
 	KillTimer(1);
 	//m_output_dlg_hwnd = NULL;
 	//::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
@@ -1445,7 +1543,11 @@ int GetOutputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Au
 	{
 
 		if(m_Output_data.at(i).range < (sizeof(OutPut_List_Analog_Units)/sizeof(OutPut_List_Analog_Units[0])))
+		{
 			ret_unit = OutPut_List_Analog_Units[m_Output_data.at(i).range];
+			if(m_Output_data.at(i).range == 0)
+				ret_unit.Empty();
+		}
 		else
 		{
 			ret_unit.Empty();
@@ -1520,4 +1622,73 @@ BOOL CBacnetOutput::OnHelpInfo(HELPINFO* pHelpInfo)
 // 		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
 // 	}
 	return CDialogEx::OnHelpInfo(pHelpInfo);
+}
+
+
+void CBacnetOutput::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	CRect rc;
+	GetClientRect(rc);
+	if(m_output_list.m_hWnd != NULL)
+	{
+		::SetWindowPos(this->m_hWnd, HWND_TOP, 0,0, 0,0,  SWP_NOSIZE | SWP_NOMOVE);
+				m_output_list.MoveWindow(&rc);
+	}
+
+	// TODO: Add your message handler code here
+}
+
+
+
+
+void CBacnetOutput::OnSysCommand(UINT nID, LPARAM lParam)
+{
+	// TODO: Add your message handler code here and/or call default
+	if(nID == SC_MAXIMIZE)
+	{
+		if(window_max == false)
+		{
+			window_max = true;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
+		}
+		else
+		{
+			window_max = false;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 30 ,temp_mynew_rect.top + 30,500,700,SWP_SHOWWINDOW);
+		}
+		return;
+	}
+	CDialogEx::OnSysCommand(nID, lParam);
+}
+
+void CBacnetOutput::Reset_Output_Rect()
+{
+
+		CRect temp_mynew_rect;
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+
+		CRect temp_window;
+		GetWindowRect(&temp_window);
+		if(window_max)
+		{
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), NULL);
+		}
+		else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
+		{
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,0,0,SWP_NOSIZE );
+		}
+		else
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left + 30,temp_mynew_rect.top + 30,700,700, NULL);
+
+
+		return;
+
 }

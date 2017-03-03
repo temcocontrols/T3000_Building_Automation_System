@@ -1,59 +1,101 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
-2016 - 12 - 15
+2017 - 02 - 23 Update by Fance
+1. 针对minipanel 菜单上的保存上次浏览的记录.
+2. 针对minipanel 重复panel的问题也修复了.
+
+2017 - 02 - 20 Update by Fance
+1. 在monitor input 中 改变一项时，颜色闪烁
+2. custom table 限制不规则 表格
+
+2017 - 02 - 10Update by Fance
+1. 毛列了接近40条的 to do list ， 吐槽下 登山包。
+
+2017 - 02 - 07 Update by Fance
+1. Add feature  extension I/O .
+
+2017 - 01 - 18 Update by Fance
+1. Merge code finished . 
+2. 修复 range edit填入数字引起的问题.
+
+2017 - 01 - 16 Update by Fance
+1. Fix 编程代码超过2000的时候会出问题...
+2. 进一步优化Trend log 里面 digital 个数 显示的位置.
+
+2017 - 01 - 16 Update by Fance
+1. 增加 Var custmer units 客户自定义的 单位.
+2. PRG 存成第六版 。存入这个单位.
+3. 修复screen edit 中 操作数据库崩溃的问题.
+
+2017 - 01 - 12 Update by Fance
+1. 修复在input 界面跳转至其他设备住界面时  界面覆盖的问题;
+
+2017 - 01 - 10 Update by Fance
+1. 修复 bacview 中whois 反复发送的问题
+2. 修复 bac setting 时间控件焦点问题
+3. 改善Bac 操作UI ，支持所有窗口 双击标题栏 放大 缩小.
+4. PID 增加时间 积分参数.
+
+2017 - 01 - 7 Update by Fance
+1. 艹，新的一年，新的吐槽，周六还要上班。靠。 祝老毛早日患上老年痴呆.
+2. 在trendlog 界面加入Loading 图标.
+3. PT12 Range支持 DI 输入.
+
+2016 - 12 - 19 Update by Fance
+1. 修复一个program里面 变量超过100个 就编译无法通过的问题;
+
+2016 - 12 - 15 Update by Fance
 1. 解决在program 时 TIME-ON 或者 TIME-OFF  个数超过30个以上后 TIME-ON( ) 里面的的值显示异常的问题;
 
-2016 - 12 - 14
+2016 - 12 - 14 Update by Fance
 1. 修改program 里面的时间  12：30  传值为1250.000;
 
-2016 - 12 - 12
+2016 - 12 - 12 Update by Fance
 1. 修复bug Setting将 
 
-2016 - 12 - 02
-Update by Fance
+2016 - 12 - 02 Update by Fance
 1. ISP slove 界面恢复初始.
 
-2016 - 12 - 01
-Update by Fance
+2016 - 12 - 01 Update by Fance
 1. 解决ISP tool 通过网络可能将A 的固件烧入B 的问题;
 2. 在Trendlog 里面 的digital 不在叠加在一起，错开显示,并在最前面显示Label.
 3. 修复 在Alarm 界面 由于接收到的时间错误引起的  弹窗  参数错误的问题.
 4. 加入自动关闭 ISP_SLOVE 窗口 和 ID重复窗口.
 
-2016 - 11 - 22
+2016 - 11 - 22 Update by Fance
 2.  修改input 的扩展属性的显示
 3. Download file 中修改  自动烧写 解决设备一直在isp中的问题.
 4. 修改TSTAT Scan , 需要选择是否扫描Minipanel 下面的所有口的 各个波特率;
 5. Update.exe 中加入 默认更新完成后打开T3000.
 
-2016 - 11 - 04
+2016 - 11 - 04 Update by Fance
 1. Setting界面点击update 3秒后自动刷新 setting 界面
 2. 新增解决id冲突的显示界面.
 
-2016 - 10 - 10
+2016 - 10 - 10 Update by Fance
 1.修复针对T3的，如果minipanel界面在output 切换到T3时界面也要在output ，同理input.
-2016 - 09 - 09
+2016 - 09 - 09 Update by Fance
 1. Bacnet view Setting UI , 哪些下拉菜单  只有下拉功能，去掉编辑功能;
 2. Downloadfile 里面 传文件的 包大小  改为3.5K ，大大加快传输效率;
 
 
-2016 - 09 - 07
+2016 - 09 - 07 Update by Fance
 1. 在其他设备的input 界面时,如果点击TSTAT的设备，需要跳转至TSTAT的input 界面.
 2. 允许删除screen 里面的picture.
 3. 支持T3 在多个设备之间切换INPUT , output.
 4. Trend Log Y轴 取整.
 
-2016 - 07 - 05
+2016 - 07 - 05 Update by Fance
 1. 修复minipanel 时区与电脑时区不一致 引起的 trendlog 无法正常显示的问题;
 2. 在点击扫描的时候 ， 发送 FF 55 FF 55 命令，让Minipanel 立刻去扫描下面的 设备;
 3. 在选择range的时候 打开界面默认要选中字符串，以供客户修改;
 
-2016 - 06 -23
+2016 - 06 -23 Update by Fance
 1. 树形结构里面支持鼠标移动，修复以前那种选中的设备无法正常选中的问题;
 2. 修复扫描到的设备如果设备名称包含 "'" 这种数据库关键字  就崩溃的问题;
 
-2016 - 06 -14
+2016 - 06 -14 Update by Fance
 1. Setting里面也存入prg文件 ，Setting 界面微调 位置;
 2. IP冲突的界面微调位置和显示的label.
 3. 不回广播的T3-BB 在线状态 不受 广播的影响;
@@ -62,117 +104,112 @@ Update by Fance
 6. Analog customer tabel 在input 界面显示其单位.
 7. 修复一个线程里面删数据库 可能由于vector 引起的 崩溃问题;
 
-2016 - 06 - 03
+2016 - 06 - 03 Update by Fance
 1. 修改Trend log graphic 宽度, 在绝大部分显示器上能显示完全;
 
-2016 - 06 - 01
+2016 - 06 - 01 Update by Fance
 1. program edit 界面增加右键 goto definition ,可以查看 当前的value
 2. edit 的 debug 界面查看当前值 加入自动刷新 仅限 out in var;
 3. 优化扫描网络设备时 数据库有的之前会先删掉, 不合适;
 4. 修复 数据库更新时引起的  产品列表丢失;
 5. 修复 Graphic Zoom in /Zoom out 不连续的问题;
 6. Graphic  加入prg1 后  在锁定的情况下，点击能进入编程界面;
-2016 - 05 - 31
+2016 - 05 - 31 Update by Fance
 1. Graphic 右键在绘图区域点击 会显示当前的值;
 
-2016 - 05 - 30 
+2016 - 05 - 30  Update by Fance
 1. Output PWM 周期 在选择digital的时候 禁止改动 wpm 周期这一列;
 2. 删除一些不用的屏蔽代码;
 
-2016 - 05 - 27
+2016 - 05 - 27 Update by Fance
 1. Variable range  time 由 00:00 -> 00:00:00
 
-2016 - 05 -26
+2016 - 05 -26 Update by Fance
 1.不同网段修改IP 成功后，立即更新数据库;
 2.Setting里面Ip修改完毕后夜立即修复数据库;
 3.Building 里面 区别处理remote device; remote 和本地的 不同时显示;
 4.Graphic 修复digital 部分如果在 选定时间内没有点就不划线，现在改为 划此前点的 值;
 5.Graphic 最上端增加显示 X轴的刻度; 修复X轴 时间 按10秒取整;
 
-2016 - 05 - 23
+2016 - 05 - 23 Update by Fance
 1. Cus Analog range 增加 单位显示和修改;
 
-2016 - 05 - 19
+2016 - 05 - 19 Update by Fance
 1. 修改Status bar 置顶的时候产生的 覆盖新窗口的问题;
 2. 增加 远程连接temco 服务器的功能 ，未完全测试通过;
 
-2016 - 05 - 11
+2016 - 05 - 11 Update by Fance
 1.T3 -22i 1-11的input 增加 high speed count 功能.
 
-2016 - 05 - 10
+2016 - 05 - 10 Update by Fance
 1.Bacnet Setting  中 加入time update 最后更新的时间.
 2.修复 input output 点击menu时 重新加载缓存文件 引起的 表格数据 异常.
 
-2016 - 05 - 04
+2016 - 05 - 04 Update by Fance
 1.支持更改 object instance;改为4个字节
 2.重写 后台扫描函数;
 3.后台扫描自动删除重复序列号的 设备;
 
-2016 - 04 - 29
+2016 - 04 - 29 Update by Fance
 1. 解决 Output table 宽度 显示 太长;
 2. Range 里面 ON/OFF 和 OFF/ON 用两个 radio button 来表示; 并且 修复 客户自定义的 在第一次的时候自动读取;
 
-2016 - 04 - 28
+2016 - 04 - 28 Update by Fance
 1. 修改 Program 中 WAIT 函数 ;
 2. 修复ISP  误烧写 .
 
-2016 - 04 - 25
+2016 - 04 - 25 Update by Fance
 1. 修复ISP 烧写的时候提示 不匹配的bug . mark 住了 最早以前的  ISP 的 部分;
 
-2016 - 04 - 22
+2016 - 04 - 22 Update by Fance
 1.支持旧版的T3 ，判断版本号 ，旧版就进入旧版的界面.
 2.解决扫描的时候 会判断读multy的线程 引起 后台不扫描的bug
 
-2016 - 04 - 21
+2016 - 04 - 21 Update by Fance
 1. 支持在minipanel 界面显示
 2. 调整graphic 界面的 大小, 将14个 input label 位置调整至左边，支持更小分辨率的客户.
 
-2016 - 04 - 19
+2016 - 04 - 19 Update by Fance
 1. 修复在program debug 界面下 按insert键后  新串口的 列错位的问题;
 2. 修复label 的第一个字符如果是数字 引起的 program里面 解析 认为是 远程的点的问题，导致 Var1 显示为1.0.var1
 3. 在debug 界面加入 bacnet 的 数据调试信息;
 
 
-2016 - 04 -14
+2016 - 04 -14 Update by Fance
 1. 修复alarmlog 私有的数据 赋值时 的bug.
 
-2016 - 04 -11
+2016 - 04 -11 Update by Fance
 1. Controller 的刷新时间改为4s 一次.
 
-2016 - 04 - 07
-Update by Fance
+2016 - 04 - 07 Update by Fance
 1. Input 和Output 加入panel 两列 如果是扩展的就要写n-m.
 2. 小改动，trend log 右移后提示.
 
-2016 - 04 - 06
-Update by Fance
+2016 - 04 - 06 Update by Fance
 1. Graphic 按照老毛的 要求  把下面14个改成双行的.
 2. 修复 unit 的问题，获取不到unit 的时候就从 其他data 那获取;
 3. 在load prg 之后 
 4. Output 扩展的最高位 区分是DO 还是AO
 5. HAND_AM 如果不是Auto output 就全部显示红色.
 
-2016 - 03 -30
-Update by Fance
+2016 - 03 -30 Update by Fance
 1. Monitor 删掉  时间限制 ，只要On 就开始记录.
 2. Range 在output 里添加一个 模拟的PWM range .
 3. Graphic 显示label 和单位 在左边的 树那里.
 4. Setting 里面略微调整界面.
 5. 所有协议只有Auto ，不管客户选什么协议都能搜到除了远程的和MSTP的设备.
 
-2016 - 03 - 19
-Update by Fance
+2016 - 03 - 19 Update by Fance
 1. 修复treeview 产品 状态显示的问题;
 
-2016 - 03 - 18
-Update by Fance
+2016 - 03 - 18 Update by Fance
 1. 在bacnet setting界面 加入 modbus ID.
 
-2016 - 03 - 17
+2016 - 03 - 17 Update by Fance
 //Fix the bugs which make the program crash when start up.
 //原因是由 自动进入上一次的界面引起的;
 
-2016 - 03 - 16 
+2016 - 03 - 16  Update by Fance
 //Merge Code.
 
 //minipanel 寄存器表
@@ -190,58 +227,48 @@ Update by Fance
 1.在下载界面加入 固件文件夹。
 2.Download hex or bin  file name change to 40 bytes.
 
-2016 - 03 - 04
-Update by Fance
+2016 - 03 - 04 Update by Fance
 1.ISP 修改显示 ISP 的 对话框 引起的 烧写网络 速度过快引起的 烧写中断的问题.
 
 
-2016 - 03 -01
-Update by Fance
+2016 - 03 -01 Update by Fance
 1.自动连接服务器下载Hex代码.
 
-2016 - 02 - 24
-Update by Fance
+2016 - 02 - 24 Update by Fance
 1.修复当点击产品时，产品树 状态显示不正常的问题;
 
-2016 - 1 -11
-Update by Fance
+2016 - 1 -11 Update by Fance
 1. T3需要加Modbus 寄存器 还要和minipanel 界面一样,要求先 加Minipanel 的 寄存器 ，建立一个数据库和T3对应起来.
 2. 改改改 ，艹 ， 困的要死.
 
-2016 - 1 - 8
-Update by Fance
+2016 - 1 - 8 Update by Fance
 1. Setting 里面增加 health ，新的窗口显示各个TX RX的 value.
 2. 增加一个 结构，和monitor 一样 ，用于在grp 里面存储 图片;
 
-2016 - 1 - 5
-Update by Fance
+2016 - 1 - 5 Update by Fance
 1. Input external show T3 加入两个新的T3 模块的产品号.
 
-2016 - 1 - 5
-Update by Fance
+2016 - 1 - 5 Update by Fance
 1.  Big  input27 - 32  small 11 - 16  tiny 6 - 11 range 里面有高速脉冲.  其他的 设置此range 都是低速脉冲;
 	Add Analog input range -> Low speed count;
 
-2016 - 1 - 4
-Update by Fance
+2016 - 1 - 4 Update by Fance
 1. 吐槽下一月份 每个周六都要上班 ，操蛋.
 
-2015 - 12 - 29
-Update by Fance
+2015 - 12 - 29 Update by Fance
 1. 修复Input output 中关于 T3 扩展 无法正常显示的Bug.
 
-2015 - 12 - 21 
-Update by Fance
+2015 - 12 - 21 Update by Fance
 1. 修复不同网卡下面 无法正常访问的问题.
 2. 修复刷新树形产品时，先显示默认label，在显示真实label的问题;
 3. 开启时检测防火墙是否打开，若打开了，提示客户关闭防火墙.
 4.  Fix Bacnet Setting 中IP Auto 写入问题; 
 
-2015 - 12 - 10
+2015 - 12 - 10 Update by Fance
 1. Bacnet Screen  ,上下左右移动.
 2. Screen 选择图片的时候 由单机改为双击.
 
-2015 - 12 - 08 
+2015 - 12 - 08  Update by Fance
 1. Program IDE 大写小强制控制键盘输入
 2. 更改 Program IDE color 的 default value.
 3. Add new toolbar .Home.
@@ -250,12 +277,12 @@ Update by Fance
 6. Trend log 在后台加范围 ， 用于过滤不合理的值;
 
 
-2015 - 11 - 17
+2015 - 11 - 17 Update by Fance
 1. 修复 program IDE debug window , 因 切换时间控件的焦点引起的 值不正确的BUG;
 2. 在graphic window 最小化时 再次点击show graphic 时 ，会自动最大化;
 
 
-2015 - 11 - 16
+2015 - 11 - 16 Update by Fance
 1. 修复 在graphic 中 不选中部分input 的时候 ，在切换X轴的时间 不响应此动作的bug.
 
 2015 - 11 - 12
@@ -726,7 +753,7 @@ int click_resend_time = 0;//当点击的时候，要切换device时 发送whois�
 CString IP_ADDRESS;
 _Refresh_Info Bacnet_Refresh_Info;
 CString remote_ip_address;
-int bacnet_view_number = TYPE_INPUT;
+
 extern CString SaveConfigFilePath; //用来将资料存放至数据库，临时文件的存放目录;
 
 extern SOCKET my_sokect;
@@ -739,6 +766,9 @@ int n_read_list_flag = -1;
 
 #define BAC_TIMER_2_WHOIS   2
 #define BAC_TIMER_3_CHECKALARM         3
+#define BAC_READ_SETTING_TIMER   4
+#define BAC_RESET_WINDOW_TIMER   6
+#define BAC_SET_LAST_UI			7
 
 //#define WM_SEND_OVER     WM_USER + 1287
 // int m_Input_data_length;
@@ -891,13 +921,13 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 	{
 	case 0:
 		{
-		if(WaitDlg!=NULL)
-		{
-			Sleep(50);
-			if(WaitDlg)
-				delete WaitDlg;
-			WaitDlg = NULL;
-		}
+			if(WaitDlg!=NULL)
+			{
+				Sleep(50);
+				if(WaitDlg)
+					delete WaitDlg;
+				WaitDlg = NULL;
+			}
 			if(bac_read_which_list == BAC_READ_ALL_LIST)
 			{
 				if(bac_read_all_results)
@@ -912,7 +942,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					SaveBacnetConfigFile_Cache(temp_file);
 				}
 
-					
+
 				return 0;
 			}
 
@@ -1163,12 +1193,6 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					{
 						::PostMessage(m_annual_dlg_hwnd,WM_REFRESH_BAC_ANNUAL_LIST,NULL,NULL);
 					}
-					//for (int i=0;i<WINDOW_TAB_COUNT;i++)
-					//{
-					//	pDialog[i]->ShowWindow(SW_HIDE);
-					//}
-					//AnnualRoutine_Window->ShowWindow(SW_SHOW);
-					//m_bac_main_tab.SetCurSel(WINDOW_ANNUAL);
 				}
 				else
 				{
@@ -1196,12 +1220,6 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					{
 						::PostMessage(m_controller_dlg_hwnd,WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
 					}
-					//for (int i=0;i<WINDOW_TAB_COUNT;i++)
-					//{
-					//	pDialog[i]->ShowWindow(SW_HIDE);
-					//}
-					//Controller_Window->ShowWindow(SW_SHOW);
-					//m_bac_main_tab.SetCurSel(WINDOW_CONTROLLER);
 				}
 				else
 				{
@@ -1228,12 +1246,6 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					{
 						::PostMessage(m_screen_dlg_hwnd,WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
 					}
-					//for (int i=0;i<WINDOW_TAB_COUNT;i++)
-					//{
-					//	pDialog[i]->ShowWindow(SW_HIDE);
-					//}
-					//Screen_Window->ShowWindow(SW_SHOW);
-					//m_bac_main_tab.SetCurSel(WINDOW_SCREEN);
 				}
 				else
 				{
@@ -1261,12 +1273,6 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					{
 						::PostMessage(m_tstat_dlg_hwnd,WM_REFRESH_BAC_TSTAT_LIST,NULL,NULL);
 					}
-					//for (int i=0;i<WINDOW_TAB_COUNT;i++)
-					//{
-					//	pDialog[i]->ShowWindow(SW_HIDE);
-					//}
-					//Tstat_Window->ShowWindow(SW_SHOW);
-					//m_bac_main_tab.SetCurSel(WINDOW_TSTAT);
 
 				}
 				else
@@ -1277,7 +1283,6 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 						hwait_thread = NULL;
 					}
 					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Tstat list read time out!"));
-					//MessageBox(_T("Tstat list read time out!"));
 				}
 				return 0;
 			}
@@ -1295,13 +1300,6 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					{
 						::PostMessage(m_screen_dlg_hwnd,WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
 					}
-					//for (int i=0;i<WINDOW_TAB_COUNT;i++)
-					//{
-					//	pDialog[i]->ShowWindow(SW_HIDE);
-					//}
-					//Monitor_Window->ShowWindow(SW_SHOW);
-					//m_bac_main_tab.SetCurSel(WINDOW_MONITOR);
-
 				}
 				else
 				{
@@ -1311,7 +1309,6 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 						hwait_thread = NULL;
 					}
 					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Monitor list read time out!"));
-					//MessageBox(_T("Monitor list read time out!"));
 				}
 				return 0;
 			}
@@ -1331,12 +1328,6 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 							AlarmLog_Window->m_alarmlog_list.SetFocus();
 					}
 
-					//for (int i=0;i<WINDOW_TAB_COUNT;i++)
-					//{
-					//	pDialog[i]->ShowWindow(SW_HIDE);
-					//}
-					//AlarmLog_Window->ShowWindow(SW_SHOW);
-					//m_bac_main_tab.SetCurSel((WINDOW_ALARMLOG));
 				}
 				else
 				{
@@ -1373,7 +1364,6 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 				else
 				{
 					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read data time out!"));
-					//MessageBox(_T("Read data time out!"));
 				}
 
 				return 0;
@@ -1393,8 +1383,6 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					ScheduleEdit_Window->Create(IDD_DIALOG_BACNET_SCHEDULE_TIME,this);	
 					ScheduleEdit_Window->ShowWindow(SW_SHOW);
 
-					//CBacnetScheduleTime Dlg;
-					//Dlg.DoModal();
 				}
 				else
 				{
@@ -1404,7 +1392,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 
 				return 0;
 			}
-								
+
 			if(bac_read_which_list == BAC_READ_ANNUALCODE_LIST)
 			{
 				if(bac_annualcode_read_results)
@@ -1437,15 +1425,15 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 			{
 				if(bac_basic_setting_read_results)
 				{
-					TRACE(_T("Read Setting success\r\n"));
+					//TRACE(_T("Read Setting success\r\n"));
 					//PostMessage(WM_FRESH_CM_LIST,READ_SETTING_COMMAND,NULL);
 				}
 			}
-			}
+		}
 		break;
 	case DELETE_WINDOW_MSG:
-	//	m_bac_main_tab.SetFocus();
-	//	m_bac_main_tab.SetCurSel(m_cur_tab_sel);
+		//	m_bac_main_tab.SetFocus();
+		//	m_bac_main_tab.SetCurSel(m_cur_tab_sel);
 		break;
 	case START_BACNET_TIMER:
 		{
@@ -1461,7 +1449,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 			}
 			//MessageBox(_T("Test2"));
 
-			SetTimer(4,500,NULL);
+			SetTimer(BAC_READ_SETTING_TIMER,500,NULL);
 			click_resend_time = 10;
 		}
 		break;
@@ -1470,7 +1458,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 			CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 			pFrame->m_pTreeViewCrl->turn_item_image(selected_tree_item ,false);
 			MessageBox(_T("Connect to the device failed! No response from the TCP server!\
-				\r\nPlease Check the connection!\r\n"),_T("Notice"),MB_OK | MB_ICONINFORMATION);;
+						  \r\nPlease Check the connection!\r\n"),_T("Notice"),MB_OK | MB_ICONINFORMATION);;
 		}
 		break;
 	case PASSWORD_OK_INITIAL_UI:
@@ -1507,11 +1495,6 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					ProgramEdit_Window->ShowWindow(SW_SHOW);
 
 
-
-					//CBacnetProgramEdit Dlg;
-					//Sleep(200);
-					//Dlg.DoModal();	
-					//SetPaneString(BAC_SHOW_MISSION_RESULTS,_T(" "));
 				}
 
 				return 0;
@@ -1519,7 +1502,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 		}
 		break;
 	}
-	
+
 	return 0;
 }
 // CDialogCM5_BacNet message handlers
@@ -1810,6 +1793,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	pDialog[WINDOW_USER_LOGIN] =  User_Login_Window = new CBacnetUserlogin;
 	pDialog[WINDOW_REMOTE_POINT] =  Remote_Point_Window = new CBacnetRemotePoint;
 	//创建两个对话框;
+#if 0
 	Input_Window->Create(IDD_DIALOG_BACNET_INPUT, &m_bac_main_tab);
 	Output_Window->Create(IDD_DIALOG_BACNET_OUTPUT, &m_bac_main_tab);
 	Variable_Window->Create(IDD_DIALOG_BACNET_VARIABLE, &m_bac_main_tab);
@@ -1824,11 +1808,33 @@ void CDialogCM5_BacNet::Tab_Initial()
 	Setting_Window->Create(IDD_DIALOG_BACNET_SETTING,&m_bac_main_tab);
 	User_Login_Window->Create(IDD_DIALOG_BACNET_USER_LOGIN, this);
 	Remote_Point_Window->Create(IDD_DIALOG_BACNET_REMOTE_POINT,&m_bac_main_tab);
+#else
+	Input_Window->Create(IDD_DIALOG_BACNET_INPUT, this);
+	Output_Window->Create(IDD_DIALOG_BACNET_OUTPUT, this);
+	Variable_Window->Create(IDD_DIALOG_BACNET_VARIABLE, this);
+	Program_Window->Create(IDD_DIALOG_BACNET_PROGRAM, this);
+	Controller_Window->Create(IDD_DIALOG_BACNET_CONTROLLER, this);
+	Screen_Window->Create(IDD_DIALOG_BACNET_SCREENS, this);
+	WeeklyRoutine_Window->Create(IDD_DIALOG_BACNET_WEEKLY_ROUTINES, this);
+	AnnualRoutine_Window->Create(IDD_DIALOG_BACNET_ANNUAL_ROUTINES, this);
+	Monitor_Window->Create(IDD_DIALOG_BACNET_MONITOR, this);
+	AlarmLog_Window->Create(IDD_DIALOG_BACNET_ALARMLOG,this);
+	Tstat_Window->Create(IDD_DIALOG_BACNET_TSTAT,this);
+	Setting_Window->Create(IDD_DIALOG_BACNET_SETTING,this);
+	User_Login_Window->Create(IDD_DIALOG_BACNET_USER_LOGIN, this);
+	Remote_Point_Window->Create(IDD_DIALOG_BACNET_REMOTE_POINT,this);
+#endif
 	//设定在Tab内显示的范围;
 	CRect rc;
 	m_bac_main_tab.GetClientRect(rc);
+	rc.top -= 400;
+	rc.bottom -= 399;
+	m_bac_main_tab.MoveWindow(&rc);
 
-	rc.top -= 20;
+	GetClientRect(rc);
+	//rc.top -= 20;
+
+//	rc.top += 20;
 
 
 
@@ -1837,8 +1843,12 @@ void CDialogCM5_BacNet::Tab_Initial()
 		pDialog[i]->MoveWindow(&rc);
 	}
 
+	//CRect temp_mynew_rect
+	//::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+	//MoveWindow(temp_mynew_rect.left,mynew_rect.top,mynew_rect.Width(),mynew_rect.Height(),1);
+
 	//显示初始页面
-	pDialog[WINDOW_INPUT]->ShowWindow(SW_SHOW);
+	pDialog[WINDOW_INPUT]->ShowWindow(SW_HIDE);
 	pDialog[WINDOW_OUTPUT]->ShowWindow(SW_HIDE);
 	pDialog[WINDOW_VARIABLE]->ShowWindow(SW_HIDE);
 	pDialog[WINDOW_PROGRAM]->ShowWindow(SW_HIDE);
@@ -1854,6 +1864,8 @@ void CDialogCM5_BacNet::Tab_Initial()
 	pDialog[WINDOW_REMOTE_POINT]->ShowWindow(SW_HIDE);
     g_hwnd_now = m_input_dlg_hwnd;
 	Input_Window->m_input_list.SetFocus();
+
+	SetTimer(BAC_RESET_WINDOW_TIMER,400,NULL);
 //保存当前选择
 //	m_CurSelTab = WINDOW_INPUT;
 
@@ -1988,6 +2000,20 @@ void CDialogCM5_BacNet::Initial_All_Point()
 		memset(&temp_table_point,0,sizeof(Str_table_point));
 		m_analog_custmer_range.push_back(temp_table_point);
 	}
+	for (int i=0;i< BAC_VARIABLE_CUS_UNIT_COUNT ; i ++)
+	{
+			Str_variable_uint_point temp_var_unit_point;
+			memset(&temp_var_unit_point,0,sizeof(Str_variable_uint_point));
+			m_variable_analog_unite.push_back(temp_var_unit_point);
+	}
+
+	for (int i=0;i<BAC_EXTIO_COUNT;i++)
+	{
+		Str_Extio_point temp_extio_point;
+		memset(&temp_extio_point,0,sizeof(Str_Extio_point));
+		m_extio_config_data.push_back(temp_extio_point);
+	}
+
 }
 //__declspec(dllexport) HANDLE	Get_RS485_Handle();
 static bool already_retry = false;
@@ -3646,7 +3672,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 			//Bacnet_Refresh_Info.Read_Monitor_Info[i].end_instance =2+(BAC_READ_GROUP_NUMBER)*i;
 			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].invoke_id = g_invoke_id;
 			CString temp_cs;
-			temp_cs.Format(_T("Read Customer units From %d to %d "),
+			temp_cs.Format(_T("Read Custom units From %d to %d "),
 				Bacnet_Refresh_Info.Read_Customer_unit_Info[i].start_instance,
 				Bacnet_Refresh_Info.Read_Customer_unit_Info[i].end_instance);
 			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs);
@@ -4381,7 +4407,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 			}
 		}
 		break;
-	case 4:
+	case BAC_READ_SETTING_TIMER:
 		{
 			click_resend_time --;
 			if(m_is_remote_device)
@@ -4394,7 +4420,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 				if(m_bac_scan_com_data.at(i).device_id == g_bac_instance)
 				{
 					find_exsit = true;
-					KillTimer(4);
+					KillTimer(BAC_READ_SETTING_TIMER);
 					break;
 				}
 			}
@@ -4497,12 +4523,17 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 					{
 						//如果 TCP能连接上， 而没有回复UDP的包，就用TCP 发送软复位命令给板子;
 						SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("No who is command response!"));
-						write_one(g_tstat_id,33,151,1);
+						if(IDYES == MessageBox(_T("No bacnet command reply from panel .Do you want reset the network of this panel"),_T("Warning"),MB_YESNO))
+						{
+							write_one(g_tstat_id,33,151,1);
 
-						SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Reset the network , please wait!"));
+							SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Reset the network , please wait!"));
 
+						}
 						click_resend_time = 10;
 						already_retry = true;
+
+
 					}
 					//else
 					//{
@@ -4538,11 +4569,65 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 				}
 				else
 				{
-					TRACE(_T("Resend Who is count = %d\r\n"),6 - click_resend_time);
+					//TRACE(_T("Resend Who is count = %d\r\n"),10 - click_resend_time);
 				}
+
 			}
 
+			if(click_resend_time <= 0)
+			{
+				SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("No Bacnet 'Who is?' Command response"));
+				KillTimer(BAC_READ_SETTING_TIMER);
+			}
 			
+		}
+		break;
+	case BAC_RESET_WINDOW_TIMER:
+		{
+			KillTimer(BAC_RESET_WINDOW_TIMER);
+			Input_Window->Reset_Input_Rect();
+			Output_Window->Reset_Output_Rect();
+			Variable_Window->Reset_Variable_Rect();
+			Program_Window->Reset_Program_Rect();
+			Controller_Window->Reset_Controller_Rect();
+			Screen_Window->Reset_Screen_Rect();
+			WeeklyRoutine_Window->Reset_Weekly_Rect();
+			AnnualRoutine_Window->Reset_Annual_Rect();
+			Monitor_Window->Reset_Monitor_Rect();
+			AlarmLog_Window->Reset_Alarm_Rect();
+			Remote_Point_Window->Reset_RemotePoint_Rect();
+			Setting_Window->Reset_Setting_Rect();
+		}
+		break;
+	case BAC_SET_LAST_UI:
+		{
+			KillTimer(BAC_SET_LAST_UI);
+			int first_view_ui;
+			first_view_ui = (unsigned int)GetPrivateProfileInt(_T("LastView"),_T("FistLevelViewUI"),-1,g_cstring_ini_path);
+			if(first_view_ui == TYPE_OUTPUT)
+				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_OUTPUTS,BN_CLICKED),NULL);
+			else if(first_view_ui == TYPE_VARIABLE)
+				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_VARIABLES,BN_CLICKED),NULL);
+			else if(first_view_ui == TYPE_INPUT)
+				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_INPUTS,BN_CLICKED),NULL);
+			else if(first_view_ui == TYPE_PROGRAM)
+				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_PROGRAMS,BN_CLICKED),NULL);
+			else if(first_view_ui == TYPE_CONTROLLER)
+				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_CONTROLLERS,BN_CLICKED),NULL);
+			else if(first_view_ui == TYPE_SCREENS)
+				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_SCREENS,BN_CLICKED),NULL);
+			else if(first_view_ui == TYPE_WEEKLY)
+				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_WEEKLY,BN_CLICKED),NULL);
+			else if(first_view_ui == TYPE_ANNUAL)
+				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_ANNUALROUTINES,BN_CLICKED),NULL);
+			else if(first_view_ui == TYPE_MONITOR)
+				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_MONITORS,BN_CLICKED),NULL);
+			else if(first_view_ui == TYPE_ALARMLOG)
+				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_ALARM_LOG,BN_CLICKED),NULL);
+			else if(first_view_ui == TYPE_READ_REMOTE_POINT_INFO)
+				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_TSTAT,BN_CLICKED),NULL);
+			else if(first_view_ui == TYPE_SETTING)
+				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_SETTINGS,BN_CLICKED),NULL);
 		}
 		break;
 	default:
@@ -4639,7 +4724,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 
 	if(m_bac_main_tab.IsWindowVisible() == false)
 		m_bac_main_tab.ShowWindow(true);
-
+	
 
 	switch(bacnet_view_number)
 	{
@@ -4788,7 +4873,19 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 			SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_cs);
 			read_analog_customer_unit = true;		
 		}
+
+		if(GetPrivateData_Blocking(g_bac_instance,READVARUNIT_T3000,0,4,sizeof(Str_variable_uint_point)) > 0)
+		{
+			temp_cs.Format(_T("Read Data OK."));
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_cs);
+		}
+
+
 	}
+
+	WritePrivateProfileStringW(_T("LastView"),_T("ViewSerialNumber"),temp_serial_number,g_cstring_ini_path);
+	WritePrivateProfileStringW(_T("LastView"),_T("ViewPid"),_T("35"),g_cstring_ini_path);
+	SetTimer(BAC_SET_LAST_UI,1000,NULL);
 
 }
 void	CDialogCM5_BacNet::Set_Tab_Loaded_Parameter(int ntab)
@@ -5488,6 +5585,7 @@ DWORD WINAPI  Mstp_Connect_Thread(LPVOID lpVoid)
 		}
 	}
 
+
 	if(find_exsit == false)
 	{
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("No Who is response!"));
@@ -5556,3 +5654,80 @@ BOOL CDialogCM5_BacNet::PreTranslateMessage(MSG* pMsg)
     }
 	return CFormView::PreTranslateMessage(pMsg);
 }
+#if 0
+
+#include<stdio.h>
+#include<stdlib.h>
+
+//链表定义
+typedef struct node{
+	int data;
+	struct node *next;
+}link;
+
+//构造链表
+link * create_link(link *head)
+{
+	int data[5];
+	int i=0;
+	while(i<5)
+	{
+		scanf("%d",&data[i]);
+		i++;
+	}
+	link *p=head;//p为每次链表更新后的最后一个节点
+	for (i=0;i<5;i++)
+	{
+		link *q=(link*)malloc(sizeof(link));
+		q->data=data[i];
+		q->next=NULL;
+		p->next=q;
+		p=q;
+	}
+	return head;
+}
+
+//链表反向
+link * reserve_link(link *head)
+{
+	link *last=head->next;//last为链表最后一个节点，反向后为第一个节点
+	int num=1;
+	while (last->next!=NULL)
+	{
+		num++;
+		last=last->next;
+	}
+	link *p,*q;//p为链表更新后反向那端开始的最后一个节点
+	p=last;
+	int i;
+	for (i=num-1;i>=1;i--)
+	{
+		int j=1;
+		q=head->next;
+		while (j<i)//找出原向的第i各节点p
+		{
+			q=q->next;
+			j++;
+		}
+		p->next=q;
+		q->next=NULL;//此时节点q的next域是空，不加此句最后的两个节点会成环
+		p=q;
+	}
+	head->next=last;
+	return head;
+}
+
+int main()
+{
+	link *head=(link*)malloc(sizeof(link));
+	head->data=0;
+	head->next=NULL;
+
+	link *li=create_link(head);
+
+	link *relink=reserve_link(head);
+
+	return 0;
+}
+
+#endif

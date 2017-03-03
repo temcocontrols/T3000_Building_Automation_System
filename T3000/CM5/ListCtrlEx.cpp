@@ -79,6 +79,7 @@ CListCtrlEx::CListCtrlEx()
 	m_select_col = 1;
 	m_dt_left = true;
 	m_support_col0_edit = false; //默认第0列 不允许编辑;
+	m_window_hwnd = NULL;
 }
 
 CListCtrlEx::~CListCtrlEx()
@@ -164,7 +165,7 @@ void ListCtrlEx::CListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 			}
 			else
 			{
-				if((BacNet_hwd!=NULL) && ((g_hwnd_now == m_input_dlg_hwnd) || (g_hwnd_now == m_output_dlg_hwnd) || (g_hwnd_now == m_pragram_dlg_hwnd) || (g_hwnd_now == m_variable_dlg_hwnd)))
+				if((BacNet_hwd!=NULL) && ((m_window_hwnd == m_input_dlg_hwnd) || (m_window_hwnd == m_output_dlg_hwnd) || (m_window_hwnd == m_pragram_dlg_hwnd) || (m_window_hwnd == m_variable_dlg_hwnd)))
 					::PostMessage(BacNet_hwd,WM_CHANGE_NEXT_PANEL_MESSAGE,LIST_UP,0);
 				return ;
 			}
@@ -212,7 +213,7 @@ void ListCtrlEx::CListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 			}
 			else
 			{
-				if((BacNet_hwd!=NULL) && ((g_hwnd_now == m_input_dlg_hwnd) || (g_hwnd_now == m_output_dlg_hwnd) || (g_hwnd_now == m_pragram_dlg_hwnd) || (g_hwnd_now == m_variable_dlg_hwnd)))
+				if((BacNet_hwd!=NULL) && ((m_window_hwnd == m_input_dlg_hwnd) || (m_window_hwnd == m_output_dlg_hwnd) || (m_window_hwnd == m_pragram_dlg_hwnd) || (m_window_hwnd == m_variable_dlg_hwnd)))
 					::PostMessage(BacNet_hwd,WM_CHANGE_NEXT_PANEL_MESSAGE,LIST_DOWN,0);
 				
 				return ;
@@ -378,6 +379,38 @@ CListCtrlEx::ColumnType CListCtrlEx::GetColumnType(int nColIndex)
 	}
 	return m_mapCol2ColType[nColIndex];
 }
+
+
+//////////////////////////////////////////////////////////////////////////
+// need to deal with delete column
+void CListCtrlEx::SetColumnLimitChar(int nColIndex, int nlimitchar)
+{
+	ASSERT(0<=nColIndex && nColIndex<GetColumnCount());
+	// init if empty
+	if (m_limit_char.empty())
+	{
+		for (int i=0; i<GetColumnCount(); ++i)
+		{
+			m_limit_char.insert(ColLimitMap::value_type(i, 0));
+		}
+	}
+	// assign
+	m_limit_char[nColIndex]=nlimitchar;
+	// maybe should update window here
+}
+
+int CListCtrlEx::GetColumnLimitChar(int nColIndex)
+{
+	// insert new if not found
+	ColLimitMap::iterator iter=m_limit_char.find(nColIndex);
+	if (iter==m_limit_char.end())
+	{
+		m_limit_char[nColIndex]=0;
+	}
+	return m_limit_char[nColIndex];
+}
+
+
 
 SortType CListCtrlEx::GetColumnSortBy(int nColIndex)
 {
@@ -635,6 +668,16 @@ void   CListCtrlEx::Set_Edit(bool b_edit)
 BOOL	CListCtrlEx::Get_Edit()
 {
 	return m_need_edit;
+}
+
+HWND	CListCtrlEx::GetListHwnd()
+{
+	return m_window_hwnd;
+}
+
+void  CListCtrlEx::SetListHwnd(HWND n_hwnd)
+{
+	m_window_hwnd = n_hwnd;
 }
 
 void  CListCtrlEx::SetWhetherShowBkCol(bool nshow)
@@ -1475,6 +1518,7 @@ void CListCtrlEx::ShowInPlaceCombo(CellIndex ix)
 	if (ix.first>=0 && ix.first<GetItemCount() && ix.second>=0 && ix.second< GetColumnCount())
 	{
 		CString strCurSel= GetItemText(ix.first, ix.second);
+
 		CRect rcCell;
 		if (GetCellRect(ix, rcCell))
 		{	
@@ -1488,18 +1532,33 @@ void CListCtrlEx::ShowInPlaceCombo(CellIndex ix)
 	}
 }
 
+void CListCtrlEx::Setlistcolcharlimit(unsigned char ncol,unsigned char nlimitchar)
+{
+	if(GetColumnType(ncol) == EditBox)
+	{
+		m_limit_char[ncol] = nlimitchar;
+	}
+}
+
 // show edit box in place
 void CListCtrlEx::ShowInPlaceEdit(CellIndex ix)
 {
 	if (ix.first>=0 && ix.first<GetItemCount() && ix.second>=0 && ix.second< GetColumnCount())
 	{
 		CString strCurSel= GetItemText(ix.first, ix.second);
+
+
 		CRect rcCell;
 		if (GetCellRect(ix, rcCell))
 		{	
 			GetParent()->SendMessage(WM_SET_ITEMS, (WPARAM)this, (LPARAM)&ix);  
 			CInPlaceEdit* pInPlaceEdit = CInPlaceEdit::GetInstance();
 			ASSERT(pInPlaceEdit); 
+			if(m_limit_char[ix.second]!= 0)
+				pInPlaceEdit->SetEditLimit(m_limit_char[ix.second]);
+			else
+				pInPlaceEdit->SetEditLimit(false);
+			//TRACE(_T("m_limit_char = %d\r\n") ,m_limit_char[ix.second] );
 			pInPlaceEdit->ShowEditCtrl(m_dwEditStyle, rcCell, this, IDC_CELL_EDIT, ix.first, ix.second,
 													FindCellData(ix).m_strValidChars, strCurSel);
 		}
@@ -1669,7 +1728,11 @@ void ListCtrlEx::CListCtrlEx::OnLvnEndlabeledit(NMHDR *pNMHDR, LRESULT *pResult)
 	GetParent()->SendMessage(WM_VALIDATE, GetDlgCtrlID(), (LPARAM)pDispInfo); 
 	Changed_item = pDispInfo->item.iItem;
 	Changed_subitem = pDispInfo->item.iSubItem;
-	::PostMessage(g_hwnd_now,WM_LIST_ITEM_CHANGED,Changed_item,Changed_subitem);
+	if(m_window_hwnd == NULL)
+		::PostMessage(g_hwnd_now,WM_LIST_ITEM_CHANGED,Changed_item,Changed_subitem);
+	else
+		::PostMessage(m_window_hwnd,WM_LIST_ITEM_CHANGED,Changed_item,Changed_subitem);
+		
 	*pResult = 0;
 }
 

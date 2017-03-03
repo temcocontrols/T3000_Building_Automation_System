@@ -138,6 +138,8 @@ CString g_strFan=_T("");
 
 CString g_strCurBuildingDatabasefilePath=L"";
 	CString m_str_curBuilding_Domain_IP;
+	CString m_str_curBuilding_Domain_Port;
+
 BOOL g_bEnableRefreshTreeView = TRUE;
 BOOL g_bPauseRefreshTree = FALSE;
 BOOL g_SelectChanged = TRUE;
@@ -1851,7 +1853,9 @@ CString temp_unit_no_index[BAC_CUSTOMER_UNITS_COUNT];
 bool read_customer_unit;	//如果这个设备没有读过 customer unit这一项,就要尝试去读，以前老版本的没有;
 bool receive_customer_unit; //收到回复，flag就置 true;
 bool read_analog_customer_unit;  // 这个是模拟的cus tabel ;
+bool read_var_analog_cus_units;          //Var Cus units 自定义
 CString Analog_Customer_Units[BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT];
+CString Analog_Variable_Units[BAC_VARIABLE_CUS_UNIT_COUNT];
 
 unsigned char bacnet_add_id[254];
 int bacnet_device_type;
@@ -1901,6 +1905,7 @@ int annual_list_line ;
 int screen_list_line ;
 int monitor_list_line;
 int analog_range_tbl_line;
+int ext_io_list_line;
 
 HWND      g_hwnd_now;
 HWND      m_input_dlg_hwnd;
@@ -1932,6 +1937,7 @@ HWND      m_edit_label = NULL;
 HWND      m_at_command_hwnd = NULL;
 HWND      m_remote_point_hwnd = NULL;
 HWND	  m_program_debug_list_hwnd = NULL;
+HWND	  m_ext_io_dlg_hwmd = NULL;
 
 HWND analog_cus_range_dlg=NULL;
 
@@ -1957,6 +1963,8 @@ vector <Client_Info> m_tcp_connect_info;
 vector <Str_label_point> m_graphic_label_data;	//图片里面的Label的信息要存在设备里面;
 vector <Str_remote_point> m_remote_point_data;  //Mini panel 里面Tstat 远端点的 值;
 vector <Str_table_point> m_analog_custmer_range;
+vector <Str_variable_uint_point> m_variable_analog_unite;
+vector <Str_Extio_point> m_extio_config_data;
 
 Time_block_mini Device_time;
 Str_Setting_Info Device_Basic_Setting;
@@ -1965,7 +1973,7 @@ Str_Special Device_Special_Data;
 char m_at_write_buf[100];
 char m_at_read_buf[450];
 
-
+vector <int> exsit_panel_number;
 vector <refresh_net_device> m_refresh_net_device_data;
 vector <GSM_connection_info> m_gsm_connect_info;
 vector <Scan_Info> m_scan_info;
@@ -2046,6 +2054,7 @@ vector<ALL_LOCAL_SUBNET_NODE> g_Vector_Subnet;
 vector<ALL_LOCAL_SUBNET_NODE> g_Scan_Vector_Subnet;
 
 CString g_strStartInterface_config = _T("T3000_config.ini");
+int g_SleepTimeForConfig = 3;
 
 vector<Reg_Infor> g_Vector_Write_Error;
 bool need_read_bacnet_graphic_label_flag = true;	//用于防止重复读取 graphic label ;只有切换设备的时候才需要再次读取;
@@ -2183,6 +2192,9 @@ char ptpLoginPassword[20];
 refresh_net_device device_id_data_1;
 refresh_net_device device_id_data_2;
 
+refresh_net_device device_same_panel_1;
+refresh_net_device device_same_panel_2;
+
 bool edit_confilct_mode = false;
 
 bool scaning_mode = false;
@@ -2200,6 +2212,8 @@ unsigned char nDefaultDisplayType;
 unsigned char nDefaultTextPlace;
 unsigned char nDefaultIconSize;
 COLORREF	  nDefaultclrTxt;
+
+int bacnet_view_number = TYPE_INPUT;
 
 int graphic_view_index ;
 CString grapgic_view_name[3];

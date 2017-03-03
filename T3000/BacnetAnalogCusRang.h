@@ -47,6 +47,7 @@ public:
 	  int m_tipvalue;
 	  afx_msg void OnEnKillfocusEditBacCusAnalogUnit();
 	  void UpdateCusAnalogUnit();
+	  BOOL CheckAllDataValid();
 	  afx_msg void OnPaint();
 };
 

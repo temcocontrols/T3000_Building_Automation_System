@@ -343,6 +343,8 @@ const int BAC_READ_ALARMLOG_GROUP_NUMBER = 4;
 const int BAC_READ_TSTAT_GROUP_NUMBER = 8;
 const int BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER = 8;
 
+const int BAC_VARIABLE_CUS_UNIT_GROUP_NUMBER = 5;
+
 const int BAC_READ_GRPHIC_LABEL_GROUP_NUMBER = 6;
 const int BAC_REMOTE_POINT_GROUP_NUMBER = 25;
 const int BAC_ALALOG_CUSTMER_RANGE_TABLE_GROUP_NUMBER = 1;
@@ -400,6 +402,8 @@ const int BAC_CONNECT_WITH_DEVICE_COUNT = 1;
 const int BAC_GRPHIC_LABEL_COUNT = 240;
 const int BAC_REMOTE_POINT_COUNT = 128;
 
+const int BAC_VARIABLE_CUS_UNIT_COUNT = 5;
+const int BAC_EXTIO_COUNT = 12;
 
 
 
@@ -418,6 +422,7 @@ const int BAC_SCHEDULECODE_GOUP = BAC_WEEKLYCODE_ROUTINES_COUNT;
 const int BAC_HOLIDAY_GROUP = (BAC_HOLIDAY_COUNT + BAC_READ_HOLIDAY_GROUP_NUMBER - 1) / BAC_READ_HOLIDAY_GROUP_NUMBER;
 const int BAC_TIME_COMMAND_GROUP = 1;
 const int BAC_BASIC_SETTING_GROUP = 1;
+const int BAC_VARIABLE_CUS_UNIT_GROUP = 1;
 const int BAC_HOLIDAYCODE_GROUP = BAC_ANNUAL_CODE_COUNT;
 const int BAC_SCREEN_GROUP = (BAC_SCREEN_COUNT + BAC_READ_SCREEN_GROUP_NUMBER -1) / BAC_READ_SCREEN_GROUP_NUMBER;
 const int BAC_MONITOR_GROUP = (BAC_MONITOR_COUNT + BAC_READ_MONITOR_GROUP_NUMBER - 1) / BAC_READ_MONITOR_GROUP_NUMBER;
@@ -630,10 +635,47 @@ const int UNITS_TYPE_CUSTOM = 2;
 const int INPUT_ANOLAG_UNITE_COUNT = 19;
 const int VARIABLE_ANALOG_UNITE_COUNT = 34;
 
+const CString ExtIO_Product[] = 
+{
+	_T("T3_8AI8AO6DO"),
+	_T("T3_22I")
+};
+const int ExtIO_ProductId[] = 
+{
+	44,
+	43
+};
+
+const int ExtIO_INPUT_COUNT[] = 
+{
+	8,
+	22
+};
+const int ExtIO_OUTPUT_COUNT[] = 
+{
+	14,
+	0
+};
+
+const CString ExtIO_Port[] = 
+{
+	_T("RS485 Sub"),
+	_T("Zigbee"),
+	_T("RS485 Main")
+};
+
+
 const CString Units_Type[]=
 {
 	_T("Analog"),
 	_T("Digital")
+	//_T("Custom dig")
+};
+
+const CString PID_Time_Type[]=
+{
+	_T("Hour"),
+	_T("Min")
 	//_T("Custom dig")
 };
 
@@ -1073,20 +1115,20 @@ typedef struct
 
 typedef struct
 {
-	int nSerialNum;
-	int nScreen_index;
-	int nLabel_index;
+	unsigned int nSerialNum;
+	unsigned int nScreen_index;
+	unsigned int nLabel_index;
 	uint8_t nMain_Panel;
 	uint8_t nSub_Panel;
 	uint8_t nPoint_type;
 	uint8_t nPoint_number;
-	int  nPoint_x;
-	int  nPoint_y;
+	unsigned int  nPoint_x;
+	unsigned int  nPoint_y;
 	COLORREF nclrTxt;
 	uint8_t nDisplay_Type;
 	uint8_t nMouse_Status;
-	char ico_name[10];
-	char ico_name_2[10];
+	char ico_name[20];
+	char ico_name_2[20];
 	uint8_t ntext_place;
 	uint8_t n_iconsize;
 }Bacnet_Label_Info;
@@ -1270,8 +1312,7 @@ const CString JumperStatus[]=
 	_T("Thermistor Dry Contact"),
 	_T("4-20 ma"),//_T("4-20 ma / 0-24 V"),
 	_T("0-5 V"),
-	_T("0-10 V"),
-	_T("Thermistor Dry Contact")
+	_T("0-10 V")
 };
 
 
@@ -1280,6 +1321,28 @@ const int T3_REG_TOTAL_COUNT = 292;
 const unsigned char MONITOR_READ_TIMEOUT = 0;
 const unsigned char MONITOR_READ_SUCCESS = 1;
 const unsigned char MONITOR_READ_NO_DATA = 2;
+
+
+#pragma region PID_DIFINE
+const int CONTROLLER_NUM = 0;
+const int CONTROLLER_INPUT = 1;
+const int CONTROLLER_INPUTVALUE = 2;
+const int CONTROLLER_INPUTUNITS = 3;
+const int CONTROLLER_AUTO_MANUAL = 4;
+const int CONTROLLER_OUTPUT = 5;
+const int CONTROLLER_SETPOINT = 6;
+const int CONTROLLER_SETVALUE = 7;
+const int CONTROLLER_SETPOINTUNITS = 8;
+const int CONTROLLER_ACTION = 9;
+const int CONTROLLER_PROPORTIONAL = 10;
+const int CONTROLLER_RESET = 11;
+const int CONTROLLER_I_TIME = 12;
+const int CONTROLLER_RATE = 13;
+const int CONTROLLER_BIAS = 14;
+const int CONTROLLER_COL_NUMBER = 15;
+const int CONTROLLOR_REFRESH_TIME = 4000;
+#pragma endregion PID_DIFINE
+
 
 #pragma region VARIABLE_DEFINE
 
@@ -1415,6 +1478,18 @@ const CString Decom_Array[3] =
 #pragma endregion INPUT_DEFINE
 
 
+#pragma region ExtIO
+const int EXTIO_NUM					= 0;
+const int EXTIO_HARDWARE			= 1;
+const int EXTIO_PORT				= 2;
+const int EXTIO_ID					= 3;
+const int EXTIO_LAST_CONTACT		= 4;
+const int EXTIO_INPUTS_IO			= 5;
+const int EXTIO_OUTPUTS_IO			= 6;
+
+const int EXTIO_COL_NUMBER  = 7;
+#pragma endregion ExtIO
+
 #pragma region OUTPUT_DEFINE
 
 const int OUTPUT_NUM = 0;
@@ -1425,13 +1500,17 @@ const int OUTPUT_HW_SWITCH = 4;
 const int OUTPUT_VALUE = 5;
 const int OUTPUT_UNITE = 6;
 const int OUTPUT_RANGE = 7;
-const int OUTPUT_PWM_PERIOD = 8;
-const int OUTPUT_DECOM = 9;
-const int OUTPUT_LABLE = 10;
-const int OUTPUT_EXTERNAL = 11;
-const int OUTPUT_PRODUCT = 12;
-const int OUTPUT_EXT_NUMBER = 13;
-const int OUTPUT_COL_NUMBER = 14;
+
+const int OUTPUT_LOW_VOLTAGE = 8;
+const int OUTPUT_HIGH_VOLTAGE = 9;
+
+const int OUTPUT_PWM_PERIOD = 10;
+const int OUTPUT_DECOM = 11;
+const int OUTPUT_LABLE = 12;
+const int OUTPUT_EXTERNAL = 13;
+const int OUTPUT_PRODUCT = 14;
+const int OUTPUT_EXT_NUMBER = 15;
+const int OUTPUT_COL_NUMBER = 16;
 
 const CString Output_Decom_Array[2] =
 {
@@ -1456,7 +1535,8 @@ const CString Debug_Combo_Choose[] =
 	_T("Only Monotor Data"),
 	_T("Only Program Code"),
 	_T("Screen Pictrue Data"),
-	_T("Bacnet Data")
+	_T("Bacnet Data"),
+	_T("SQLite Debug")
 };
 
 const CString System_Log[] =
@@ -1497,6 +1577,7 @@ const int DEBUG_SHOW_MONITOR_DATA_ONLY = 3;
 const int DEBUG_SHOW_PROGRAM_DATA_ONLY = 4;
 const int DEBUG_SHOW_WRITE_PIC_DATA_ONLY = 5;
 const int DEBUG_SHOW_BACNET_ALL_DATA = 6;
+const int DEBUG_SHOW_SQLITE_INFO = 7;
 #define NUMBER_BAUDRATE 5
 typedef struct
 {

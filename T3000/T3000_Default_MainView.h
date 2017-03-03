@@ -47,6 +47,7 @@ public:
 	afx_msg void OnCbnSelchangeComboMstpModbus();
 	afx_msg void OnEnKillfocusEditMstpMac();
 	afx_msg void OnCbnKillfocusBraudratecombo();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
 
 

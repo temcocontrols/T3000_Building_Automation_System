@@ -37,13 +37,23 @@ INPUT int read_multi(unsigned char device_var,unsigned short *put_data_into_here
 INPUT int Read_One_log(unsigned char device_var,unsigned short address,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
 INPUT int Write_One_log(unsigned char device_var,unsigned short address,unsigned short val,
                         unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
-INPUT int read_multi_log(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
+INPUT int read_multi_log(unsigned char device_var,unsigned short *put_data_into_here,
+	                      unsigned short start_address,int length,
+	                       unsigned char *put_senddate_into_here,
+	                       unsigned char *put_revdata_into_here, 
+	                       int* sendDataLength, int* recvDataLength);
 INPUT int write_multi_log(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,
                           unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
 INPUT int write_multi_Short_log(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length,//参数命令部分
                                 unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, //发送和接受的原始数据
                                 int* sendDataLength, int* recvDataLength);
-INPUT int Modbus_Standard_Read(unsigned char device_var, unsigned short *put_data_into_here, int function_code, unsigned short start_address, int length);
+INPUT int Modbus_Standard_Read(unsigned char device_var, unsigned short *put_data_into_here, int function_code, unsigned short start_address, int length,
+	unsigned char *put_senddate_into_here,
+	unsigned char *put_revdata_into_here,
+	int* sendDataLength, int* recvDataLength
+      );
+INPUT int Write_Coil_log(unsigned char device_var, unsigned short address, bool val, unsigned char *put_senddate_into_here, unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
+INPUT int write_multi_Coil_log(unsigned char device_var, bool *to_write, unsigned short start_address, unsigned short length, unsigned char *put_senddate_into_here, unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
 
 INPUT void SetResponseTime(unsigned short Time);
 

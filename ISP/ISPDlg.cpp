@@ -1407,16 +1407,16 @@ BOOL CISPDlg::FlashTstat(void)
         FlashSN();
         return FALSE;
     }
-    if (GetCommunicationType () == 0)
-    {
-		if (!DetectBraudrate())
-		{
-			UpdateStatusInfo(_T("Detecting your Braudrate ,Failed"), FALSE);
-			return FALSE;
-		}
-
-		//SetResponseTime(60);
-    }
+//     if (GetCommunicationType () == 0)
+//     {
+// 		if (!DetectBraudrate())
+// 		{
+// 			UpdateStatusInfo(_T("Detecting your Braudrate ,Failed"), FALSE);
+// 			return FALSE;
+// 		}
+// 
+// 		//SetResponseTime(60);
+//     }
     if(!FileValidation(m_strHexFileName))
     {
         return FALSE;

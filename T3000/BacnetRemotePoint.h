@@ -28,6 +28,10 @@ public:
 	void Initial_List();
 	afx_msg LRESULT Fresh_Remote_List(WPARAM wParam,LPARAM lParam);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	void Reset_RemotePoint_Rect();
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
+	bool window_max; // 标记是否已经最大化;
 };
 
 const int REMOTE_NUMBER = 0;

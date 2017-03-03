@@ -44,9 +44,9 @@ UINT _Read_Testo(LPVOID pParam)
 	if(save_data_ini_file_path.IsEmpty())
 	{
 		WritePrivateProfileStringW(_T("Hum_Setting"),_T("INI_File_Path"),_T("D:\\Test.ini"),g_cstring_ini_path);
-		save_data_ini_file_path = _T("D:\\Test.ini");
+		save_data_ini_file_path = _T("C:\\Test124.ini");
 	}
-
+	save_data_ini_file_path = _T("C:\\Test124.ini");
 	if((save_date_into_ini != 1) && (save_date_into_ini != 2))
 	{
 		WritePrivateProfileStringW(_T("Hum_Setting"),_T("ENABLE_SAVE_DATE_INTO_INI"),_T("2"),g_cstring_ini_path);
@@ -63,12 +63,15 @@ UINT _Read_Testo(LPVOID pParam)
 
 		WritePrivateProfileStringW(_T("Hum_Setting"),_T("ENABLE_MINIPANEL_FUC"),_T("2"),g_cstring_ini_path);
 
-		HUM_WRITE_REG1 = 8820;
-		HUM_WRITE_REG2 = 8821;
+		HUM_WRITE_REG1 = 8092;
+		HUM_WRITE_REG2 = 8094;
 		HUM_Minipanel_port = 10000;
 		HUM_Minipanel_modbus_id = 254;
 		use_minipanel_controller = 2;
 	}
+ 
+	HUM_Minipanel_modbus_id = 255;
+	 
 
 	while(TRUE)
 	{
@@ -76,7 +79,7 @@ UINT _Read_Testo(LPVOID pParam)
 		{
 			pdlg->read_testo();
 			::SendMessage(pdlg->m_hWnd,WM_FRESH_TESTO,0,0);
-		 Sleep(300);
+		    Sleep(300);
 		}
 		else{
 			Sleep(1000);
@@ -158,6 +161,7 @@ is_Show_Write_singleDLG=FALSE;
  m_tstatID=g_tstat_id;
  g_Draw_dlg=NULL;
  m_current_Co2_sensorpoint=0;
+ m_IsReadIniFile = FALSE;
 }
 
 CNewHumChamberView::~CNewHumChamberView()
@@ -362,6 +366,7 @@ ON_CBN_SELCHANGE(IDC_COMBO_SETTING_CO2, &CNewHumChamberView::OnCbnSelchangeCombo
 ON_WM_TIMER()
 ON_BN_CLICKED(IDC_CALIBRATION_POINT_REPORT2, &CNewHumChamberView::OnBnClickedCalibrationPointReport2)
 ON_BN_CLICKED(IDC_BUTTON_TESTO_GRAPHIC, &CNewHumChamberView::OnBnClickedButtonTestoGraphic)
+ON_BN_CLICKED(IDC_CHECK_READ, &CNewHumChamberView::OnBnClickedCheckRead)
 END_MESSAGE_MAP()
 
 
@@ -2880,13 +2885,13 @@ void CNewHumChamberView::start(){
 		m_isstart=false;
 		return;
 	}
-	int ret_n = Open_Socket2(_T("192.168.0.113"),10000);
+	/*int ret_n = Open_Socket2(_T("192.168.0.113"),10000);
 	if(ret_n < 0)
 	{
 		AfxMessageBox(_T("Can't connect to T3-BB/LB/TB"));
 		m_isstart=false;
 		return;
-	}
+	}*/
 	for (int i=0;i<4;i++)
 	{
 		m_value[i] = 0;
@@ -2905,7 +2910,36 @@ void CNewHumChamberView::read_testo(){
 	{
 		m_value[i] = 0;
 	}
-	ReadTestoDeviceData(m_value);
+	short temp_value[4];
+	if (m_IsReadIniFile)
+	{
+		temp_value[0] = GetPrivateProfileInt(_T("EnhancedRegister"), _T("VALUE_0"), 0, save_data_ini_file_path);
+		temp_value[1] = GetPrivateProfileInt(_T("EnhancedRegister"), _T("VALUE_1"), 0, save_data_ini_file_path);
+		temp_value[2] = GetPrivateProfileInt(_T("EnhancedRegister"), _T("VALUE_2"), 0, save_data_ini_file_path);
+		Sleep(500);
+	} 
+	else
+	{
+		ReadTestoDeviceData(m_value);
+		temp_value[0] = temp_value[1] = temp_value[2] = temp_value[3] = 0;
+		temp_value[0] = (short)m_value[0];
+		temp_value[3] = (short)m_value[1];
+		temp_value[1] = (short)(m_value[3] * 10);    //物業
+		temp_value[2] = (short)(m_value[2] * 10);	//梁業
+
+
+	 
+		 	CString key_word_temp; CString temp_value_cstring;
+		 
+			temp_value_cstring.Format(_T("%d"), temp_value[0]); 
+			WritePrivateProfileStringW(_T("EnhancedRegister"), L"VALUE_0", temp_value_cstring, save_data_ini_file_path);
+			temp_value_cstring.Format(_T("%d"), temp_value[2]);
+			WritePrivateProfileStringW(_T("EnhancedRegister"), L"VALUE_1", temp_value_cstring, save_data_ini_file_path);
+			temp_value_cstring.Format(_T("%d"), temp_value[1]);
+			WritePrivateProfileStringW(_T("EnhancedRegister"), L"VALUE_2", temp_value_cstring, save_data_ini_file_path);
+		 
+	}
+	
 	//if (m_value[0]<=1.0)
 	//{
 	//  return;
@@ -2917,34 +2951,19 @@ void CNewHumChamberView::read_testo(){
 	//temp_value[1]=(unsigned short)(m_value[3]*10);  //物業
 	//temp_value[2]=(unsigned short)(m_value[2]*10);	//梁業
 
-	short temp_value[4];
-	temp_value[0] = temp_value[1]=temp_value[2]=temp_value[3]=0;
-	temp_value[0]=(short)m_value[0];
-	temp_value[3]=(short)m_value[1];
-	temp_value[1]=(short)(m_value[3]*10);  //物業
-	temp_value[2]=(short)(m_value[2]*10);	//梁業
+	
+	
 
     if(  (m_value[2] == m_value[3])  && (m_value[2] == m_value[4] )&& (m_value[2] == m_value[1]))
     {
         return;
     }
 
-	//if((m_value[2] > 100) || (m_value[2] < -20)  || (m_value[3] < -40) || (m_value[3] > 200) || (m_value[0] == 0) )
-	//{
-	//	return;
+	 
+		
+		
+		
 	//}
-	if(save_date_into_ini == 1)  // 1 enable  2 disable
-	{
-		for (int z=0;z<4;z++)
-		{
-			CString key_word_temp;CString temp_value_cstring;
-			key_word_temp.Format(_T("VALUE_%d"),z);
-			temp_value_cstring.Format(_T("%d"),temp_value[z]);
-			WritePrivateProfileStringW(_T("EnhancedRegister"),key_word_temp,temp_value_cstring,save_data_ini_file_path);
-		}
-		
-		
-	}
 
     CString   strlog;
     strlog.Format(_T("PPM %0.1f  ,CO2 = %0.1f   ,Temp = %0.1f     ,Hum =  %0.1f"),m_value[0],m_value[1],m_value[3],m_value[2]);
@@ -2953,6 +2972,17 @@ void CNewHumChamberView::read_testo(){
 
 	if(use_minipanel_controller == 1)	//1:enable         2: disable
 	{
+		int Value_HUM, Value_TEMP;
+		short Hum_high, Hum_low;
+		short Temp_high, Temp_low;
+		Value_HUM = (int)temp_value[1] * 100;
+		Value_TEMP = (int)temp_value[2] * 100;
+
+		Hum_high = Value_HUM / 65535;
+		 Hum_low = Value_HUM % 65535;
+
+		 Temp_high = Value_TEMP / 65535;
+		 Temp_low = Value_TEMP % 65535;
 		if(has_change_connect_ip)
 		{
 			int ret_n = Open_Socket2(HUM_Minipanel_IP,HUM_Minipanel_port);
@@ -2961,27 +2991,38 @@ void CNewHumChamberView::read_testo(){
 				has_change_connect_ip = false;
 				int last_com_type = GetLastCommunicationType();
 				SetCommunicationType(1);
-				int ret1 = write_one(HUM_Minipanel_modbus_id,HUM_WRITE_REG1,temp_value[1]);
-				ret1 = write_one(HUM_Minipanel_modbus_id,HUM_WRITE_REG2,temp_value[2]);
-				SetCommunicationType(last_com_type);
+				unsigned short DataWrite[2];
+				DataWrite[0] = Hum_high;
+				DataWrite[1] = Hum_low;
+				int ret1 = 
+				Write_Multi_org_short(HUM_Minipanel_modbus_id, DataWrite, HUM_WRITE_REG1, 2);
+
+				DataWrite[0] = Temp_high;
+				DataWrite[1] = Temp_low;
+				ret1 =
+					Write_Multi_org_short(HUM_Minipanel_modbus_id, DataWrite, HUM_WRITE_REG2, 2);
+				     
+
+				    SetCommunicationType(last_com_type);
 			}
 		}
 		else
 		{
 			int last_com_type = GetLastCommunicationType();
 			SetCommunicationType(1);
-			int ret1,ret2,ret3,ret4;
-			ret1 = write_one(HUM_Minipanel_modbus_id,HUM_WRITE_REG1,temp_value[1]);
-			ret2 = write_one(HUM_Minipanel_modbus_id,HUM_WRITE_REG2,temp_value[2]);
+			 int ret1,ret2,ret3,ret4;
+			 
+			 unsigned short DataWrite[2];
+			 DataWrite[0] = Hum_high;
+			 DataWrite[1] = Hum_low;
+			 ret1 =
+				 Write_Multi_org_short(HUM_Minipanel_modbus_id, DataWrite, HUM_WRITE_REG1, 2);
 
-			//if((product_register_value[MODBUS_WORK_STEP]>=0) && (product_register_value[MODBUS_WORK_STEP] <=9))
-			//{
-			//	ret3 = write_one(HUM_Minipanel_modbus_id,HUM_WRITE_REG1 + 5,product_register_value[MODBUS_TEMP_SETTING0 + product_register_value[MODBUS_WORK_STEP]]);
-			//	ret4 = write_one(HUM_Minipanel_modbus_id,HUM_WRITE_REG1 + 6,product_register_value[MODBUS_HUM_SETTING0 + product_register_value[MODBUS_WORK_STEP]]);
-			//}
+			 DataWrite[0] = Temp_high;
+			 DataWrite[1] = Temp_low;
+			 ret1 =
+				 Write_Multi_org_short(HUM_Minipanel_modbus_id, DataWrite, HUM_WRITE_REG2, 2);
 
-
-			//if((ret1 < 0) && (ret2 < 0) && (ret3 < 0) && (ret4 < 0))
 			if((ret1 < 0) && (ret2 < 0))
 			{
 				Open_Socket2(HUM_Minipanel_IP,HUM_Minipanel_port);
@@ -5250,4 +5291,21 @@ void CNewHumChamberView::OnBnClickedButtonTestoGraphic()
 {
 
       
+}
+
+
+void CNewHumChamberView::OnBnClickedCheckRead()
+{
+	if (m_IsReadIniFile)
+	{
+		m_IsReadIniFile = FALSE;
+	}
+	else
+	{
+		m_IsReadIniFile = TRUE;
+	}
+	 
+   ((CButton *)GetDlgItem(IDC_CHECK_READ))->SetCheck(m_IsReadIniFile);
+	 
+	
 }

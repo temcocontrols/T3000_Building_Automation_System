@@ -952,7 +952,10 @@ void COutPutDlg::put_fan_variable()
 
 int COutPutDlg::get_real_fan_select()
 {
-
+	if (product_register_value[7] == PM_TSTAT8)
+	{
+		return product_register_value[MODBUS_FAN_SPEED];
+	}
 	int fan_i=m_fan.GetCurSel();
     if(product_register_value[MODBUS_AUTO_ONLY]==BST_CHECKED)
     {
@@ -6563,10 +6566,10 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 			int nFan=get_real_fan_select();
 			//marked 20090511
 
-            if (nFan>=4)
-            {
-                nFan =4;
-            }
+//             if (nFan>=4)
+//             {
+//                 nFan =4;
+//             }
 		//	138	288	1	Low byte	W/R	FAN0_OPERATION_TABLE_COAST
 
 			if(pid_select2[row-1]==2 || pid_select2[row-1]==3)//min(pid1,pid2) or max(pid1,pid2)

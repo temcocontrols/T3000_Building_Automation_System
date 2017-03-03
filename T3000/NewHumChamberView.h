@@ -69,7 +69,7 @@ public://涉及到的成员变量
     CWinThread* hFirstThread;
     unsigned char m_tstatID;
     unsigned short m_SN[110];
-    
+	BOOL m_IsReadIniFile;
  /*   ULONG m_Time_Offset ; */
 public:
 #if 1
@@ -852,6 +852,7 @@ public:
     afx_msg void OnBnClickedButtonTestoGraphic();
 public:
     CDialog *g_Draw_dlg;
+	afx_msg void OnBnClickedCheckRead();
 };
 
 

@@ -5,7 +5,7 @@
 #pragma once
 
 #include "resource.h"
-#include "msflexgrid1.h"
+ 
 #include "afxwin.h"
 #include "Modbus PollDoc.h"
 
@@ -15,6 +15,8 @@
 #include "global_struct.h"
 #include "AutoRichEditCtrl.h"
 #include "excel9.h"
+#include "GridCtrl_src/GridCtrl.h"
+
 class CModbusPollView : public CFormView
 {
 protected: // create from serialization only
@@ -56,7 +58,7 @@ protected:
 	
 	
 private:
-	CMsflexgrid1 m_MsDataGrid;
+	CGridCtrl m_MsDataGrid;
 	CAutoRichEditCtrl m_connectionState;
 
 public:
@@ -72,8 +74,8 @@ public:
 
    int Get_Reg_Add(int index);
    DECLARE_EVENTSINK_MAP()
-   void DBClickMsflexgridDataGrid();
-   void ClickMsflexgridDataGrid();
+ 
+ 
  
     void Initial_RegName(); 
 	CString Find_RegName(int index);
@@ -104,8 +106,8 @@ public:
 	BOOL m_wronce;
 	CStdioFile m_default_file;
 	////////////////
-  LONG64 m_Tx;
-  LONG64 m_Err;
+    LONG64 m_Tx;
+    LONG64 m_Err;
 	//////////////////////////////////////////////////////////////////////////
 	int m_MBPoll_Function;
 	//////////////////////////////////////////////////////////////////////////
@@ -117,7 +119,6 @@ public:
 	int m_Current_Row;
 	int m_Current_Col;
 
-	//Single Write
 	BOOL m_close_dlg;
 	BOOL m_function;
 	BOOL m_logText;
@@ -126,12 +127,10 @@ public:
 	/////////////////////////DataBuffer/////////////////////////////////////////
 	unsigned short m_DataBuffer[127];
     CString m_Alias[127];
-	//HANDLE m_MultiRead_handle;
-//	afx_msg void OnBnClickedStart();
-	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
-	CEdit m_edit_name;
+ 
+ 
 	BOOL Show_Name;
-	afx_msg void OnEnKillfocusEditName();
+ 
 	virtual BOOL DestroyWindow();
 	//afx_msg void OnViewRegistervalueanalyzer();
 	afx_msg void OnEditAdd();
@@ -181,6 +180,16 @@ public:
 /*	void MouseMoveMsflexgrid1(short Button, short Shift, long x, long y);*/
 	afx_msg void OnSetupUseasdefault();
 	afx_msg void OnFunctionsTestwrite();
+	 
+	afx_msg void OnEditCopy();
+	afx_msg void OnFilePrint32857();
+
+
+	afx_msg void OnGridDblClick(NMHDR *pNotifyStruct, LRESULT* pResult);
+	afx_msg void OnGridClick(NMHDR *pNotifyStruct, LRESULT* pResult);
+	afx_msg void OnGridEndEdit(NMHDR *pNotifyStruct, LRESULT* pResult);
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+
 };
 
 #ifndef _DEBUG  // debug version in Modbus PollView.cpp

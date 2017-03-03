@@ -46,8 +46,11 @@ public:
 	int   WritePicFileFunction(CString ChooseFilePath,unsigned char screen_index,CString pic_filename);
 	int GetPicFileFunction(unsigned char screen_index ,CString temp_image_folder);
 //	afx_msg void OnDestroy();
+	void Reset_Screen_Rect();
 	CString pic_filename;
-
+	void OnSize(UINT nType, int cx, int cy);
+	void OnSysCommand(UINT nID, LPARAM lParam);
+	bool window_max; // 标记是否已经最大化;
 };
 
 
@@ -56,7 +59,7 @@ const int SCREEN_DESCRIPTION	= 1;
 const int SCREEN_LABEL			= 2;
 const int SCREEN_PIC_FILE		= 3;
 //const int SCREEN_MODE			= 4;
-const int SCREEN_REFRESH		= 4;
+const int SCREEN_ELEMENT_COUNT		= 4;
 
 const int SCREEN_COL_NUMBER = 5;
 

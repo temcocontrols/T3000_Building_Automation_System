@@ -48,7 +48,12 @@
                  // Read_Multi(ModbusID,DataBuffer,Start_Address,Count_Number)
 
                 #if 1
-				 int ret = Modbus_Standard_Read(ModbusID,DataBuffer,  function_code, Start_Address, Count_Number);
+				 unsigned char rev_back_rawData[300], send_data[100];
+				 int Send_length;
+				 int Rev_length;
+				// int ret = Modbus_Standard_Read(ModbusID,DataBuffer,  function_code, Start_Address, Count_Number);
+				 int ret = Modbus_Standard_Read(ModbusID, &DataBuffer[0], function_code, Start_Address, Count_Number, &send_data[0], &rev_back_rawData[0], &Send_length, &Rev_length);
+
 				if (ret>0)
                 {
                     /*
@@ -823,8 +828,8 @@ LRESULT CProductRegisterListView::Change_Input_Item(WPARAM wParam,LPARAM lParam)
                  return 0;
              }
 			 CString strGUID = GetGUID();
-             StrSql.Format(_T("Insert INTO CustomProductTable(ModelNo,Reg_ID,Function_Code,Para_Type,Property,Counts_Number,DataFormat,SN) VALUES (%d,%d,%d,'','%s',%d,'%s','%s')")
-                                ,ProductModel,_wtoi(Reg_ID), GetFunctionCode(Function_Name),m_string_property,m_short_counts,m_string_dataformat, strGUID);
+             StrSql.Format(_T("Insert INTO CustomProductTable(ModelNo,Reg_ID,Function_Code,Para_Type,Property,Counts_Number,DataFormat,Caculate,SN) VALUES (%d,%d,%d,'','%s',%d,'%s',%d,'%s')")
+                                ,ProductModel,_wtoi(Reg_ID), GetFunctionCode(Function_Name),m_string_property,m_short_counts,m_string_dataformat, 0,strGUID);
              SqliteDBT3000.execDML((UTF8MBSTR)StrSql);
              
               Struct_Temp.ModelNo =  ProductModel;
@@ -834,6 +839,7 @@ LRESULT CProductRegisterListView::Change_Input_Item(WPARAM wParam,LPARAM lParam)
               Struct_Temp.DataFormat = m_string_dataformat;
 			  Struct_Temp.function_code = GetFunctionCode(Function_Name);
 			  Struct_Temp.SN = strGUID;
+			  Struct_Temp.caculate = 0;
               m_register_data_sheet.push_back(Struct_Temp);
 
             m_register_list.InsertItem(m_register_data_sheet.size(),_T("")); //≤Â»Î“ª––

@@ -15,6 +15,7 @@
 #include "BacnetWait.h"
 #include "BADO/BADO.h"
 #define  WM_MONITOR_USER_MESSAGE WM_USER + 902
+#define  WM_FLASH_CHANGE         WM_USER + 903
 extern char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network,unsigned char & sub_panel, byte panel , int *netpresent);
 extern char *look_label_ex(int panel,int sub_panel, int point_type, int num, int network);
 CBacnetGraphic * GraphicWindow = NULL;
@@ -36,7 +37,7 @@ extern char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type
 CBacnetMonitor::CBacnetMonitor(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CBacnetMonitor::IDD, pParent)
 {
-
+	window_max = true;
 }
 
 CBacnetMonitor::~CBacnetMonitor()
@@ -73,8 +74,9 @@ BEGIN_MESSAGE_MAP(CBacnetMonitor, CDialogEx)
 	ON_WM_CLOSE()
 	ON_MESSAGE(WM_MONITOR_USER_MESSAGE,&CBacnetMonitor::Graphic_Window_Own_Message)
 
-
 	ON_WM_HELPINFO()
+	ON_WM_SIZE()
+	ON_WM_SYSCOMMAND()
 END_MESSAGE_MAP()
 
 
@@ -156,8 +158,11 @@ BOOL CBacnetMonitor::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	old_monitor_line = -1;
+	SetWindowTextW(_T("Trend Log"));
 	// TODO:  Add extra initialization here
 	Initial_List();
+	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_TRENDLOG);
+	SetIcon(m_hIcon,TRUE);
 	PostMessage(WM_REFRESH_BAC_MONITOR_LIST,NULL,NULL);
 	PostMessage(WM_REFRESH_BAC_MONITOR_INPUT_LIST,NULL,NULL);
 
@@ -210,6 +215,13 @@ BOOL CBacnetMonitor::PreTranslateMessage(MSG* pMsg)
 			return 1;
 		}
 	}
+	else if(pMsg->message==WM_NCLBUTTONDBLCLK)
+	{
+		CRect temp_mynew_rect;
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
+		return 1; 
+	}
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -229,8 +241,10 @@ void CBacnetMonitor::Initial_List()
 	m_monitor_list.InsertColumn(MONITOR_INTERVAL, _T("Interval"), 120, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_monitor_list.InsertColumn(MONITOR_STATUS, _T("Status"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_monitor_list.InsertColumn(MONITOR_DATA_SIZE, _T("Data Size (KB)"), 130, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_monitor_list.Setlistcolcharlimit(MONITOR_LABEL,STR_MONITOR_LABEL_LENGTH-1);
 
 	m_monitor_dlg_hwnd = this->m_hWnd;
+	m_monitor_list.SetListHwnd(this->m_hWnd);
 	//g_hwnd_now = m_monitor_dlg_hwnd;
 
 	m_monitor_list.DeleteAllItems();
@@ -259,6 +273,9 @@ void CBacnetMonitor::Initial_List()
 	m_monitor_input_list.InsertColumn(MONITOR_NUM, _T("Num"), 40, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_monitor_input_list.InsertColumn(1, _T("Input"), 90, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_monitor_input_list.DeleteAllItems();
+
+	m_monitor_input_list.SetListHwnd(this->m_hWnd);
+
 	for (int i=0;i<MAX_POINTS_IN_MONITOR;i++)
 	{
 		CString temp_item;
@@ -569,6 +586,41 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
 
 		for (int i=0 ; i< MAX_POINTS_IN_MONITOR;i++)
 		{
+			if((m_monitor_data[monitor_list_line].inputs[i].panel != m_monitor_data[monitor_list_line].inputs[i].sub_panel) ||
+				(m_monitor_data[monitor_list_line].inputs[i].panel != Station_NUM))
+			{
+				m_monitor_data[monitor_list_line].range[i] = 0;
+				continue;
+			}
+			switch(m_monitor_data[monitor_list_line].inputs[i].point_type)
+			{
+			case BAC_VAR + 1://Variable
+				{
+					if(m_monitor_data[monitor_list_line].inputs[i].number < BAC_VARIABLE_ITEM_COUNT)
+						m_monitor_data[monitor_list_line].range[i] = m_Variable_data.at(m_monitor_data[monitor_list_line].inputs[i].number).range;
+				}
+				break;
+			case BAC_IN + 1://Input
+				{
+					if(m_monitor_data[monitor_list_line].inputs[i].number < BAC_INPUT_ITEM_COUNT)
+						m_monitor_data[monitor_list_line].range[i] = m_Input_data.at(m_monitor_data[monitor_list_line].inputs[i].number).range;
+				}
+				break;
+			case BAC_OUT + 1://Output
+				{
+					if(m_monitor_data[monitor_list_line].inputs[i].number < BAC_OUTPUT_ITEM_COUNT)
+						m_monitor_data[monitor_list_line].range[i] = m_Output_data.at(m_monitor_data[monitor_list_line].inputs[i].number).range;
+				}
+				break;
+			default:
+				m_monitor_data[monitor_list_line].range[i] = 0;
+				break;
+			}
+		}
+
+#if 0
+		for (int i=0 ; i< MAX_POINTS_IN_MONITOR;i++)
+		{
 			if((m_temp_monitor_data[monitor_list_line].inputs[i].panel != m_temp_monitor_data[monitor_list_line].inputs[i].sub_panel) ||
 				(m_temp_monitor_data[monitor_list_line].inputs[i].panel != Station_NUM))
 			{
@@ -600,7 +652,7 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
 				break;
 			}
 		}
-
+#endif
 		//这里应该是 monitor_list_line，就是要改变的多少项 而不是右边的input label的项目;
 		int cmp_ret = memcmp(&m_temp_monitor_data[monitor_list_line],&m_monitor_data.at(monitor_list_line),sizeof(Str_monitor_point));
 
@@ -608,8 +660,16 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
 		if(cmp_ret!=0)
 		{
 			m_monitor_input_list.SetItemBkColor(Changed_Item,Changed_SubItem,LIST_ITEM_CHANGED_BKCOLOR);
-		temp_task_info.Format(_T("Write Monitor List Item%d .Changed to \"%s\" "),monitor_list_line + 1,temp_monitor_input);
-		Post_Write_Message(g_bac_instance,WRITEMONITOR_T3000,monitor_list_line,monitor_list_line,sizeof(Str_monitor_point),m_monitor_dlg_hwnd,temp_task_info,Changed_Item,Changed_SubItem);
+			temp_task_info.Format(_T("Write Monitor List Item%d .Changed to \"%s\" "),monitor_list_line + 1,temp_monitor_input);
+			Post_Write_Message(g_bac_instance,WRITEMONITOR_T3000,monitor_list_line,monitor_list_line,sizeof(Str_monitor_point),m_monitor_dlg_hwnd,temp_task_info,Changed_Item,Changed_SubItem);
+
+			if(!temp_monitor_input.IsEmpty())
+			{
+				flash_ctring = temp_monitor_input;
+				flash_count = 10 ;
+				SetTimer(3,300,NULL);
+			}
+
 		}
 	}
 	else
@@ -951,8 +1011,7 @@ void CBacnetMonitor::OnTimer(UINT_PTR nIDEvent)
 	switch(nIDEvent)
 	{
 	case 1:
-
-		if(this->IsWindowVisible() && (bac_select_device_online))
+		if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_MONITOR))  )	//GSM连接时不要刷新;
 		{
 		PostMessage(WM_REFRESH_BAC_MONITOR_LIST,NULL,NULL);
 		PostMessage(WM_REFRESH_BAC_MONITOR_INPUT_LIST,NULL,NULL);
@@ -963,6 +1022,51 @@ void CBacnetMonitor::OnTimer(UINT_PTR nIDEvent)
 	case 2:
 		KillTimer(2);
 		m_monitor_time_picker.Invalidate();
+		break;
+	case 3:
+		{
+			if(flash_count == 0)
+			{
+				KillTimer(3);
+				for (int i=0;i<14;i++)
+					m_monitor_input_list.SetItemTextColor(i,1,RGB(0,0,0));
+			}
+			else
+			{
+				flash_count --;
+				for (int i=0;i<14;i++)
+				{
+					CString get_text;
+					get_text = m_monitor_input_list.GetItemText(i,1);
+					if((flash_ctring.CompareNoCase(get_text) == 0) && (!flash_ctring.IsEmpty()) )
+					{
+						flash_step = (++flash_step) % 3;
+						switch(flash_step)
+						{
+						case 0:
+							{
+								m_monitor_input_list.SetItemTextColor(i,1,RGB(255,0,0));
+							}
+							break;
+						case 1:
+							m_monitor_input_list.SetItemTextColor(i,1,RGB(0,255,0));
+							break;
+						case 2:
+							m_monitor_input_list.SetItemTextColor(i,1,RGB(0,0,255));
+							break;
+						default:
+							break;
+						}
+
+						break;
+					}
+				}
+			}
+
+
+		}
+		break;
+	default:
 		break;
 	}
 	CDialogEx::OnTimer(nIDEvent);
@@ -1602,6 +1706,8 @@ void CBacnetMonitor::OnNMSetfocusListMonitorInput(NMHDR *pNMHDR, LRESULT *pResul
 void CBacnetMonitor::OnClose()
 {
 	// TODO: Add your message handler code here and/or call default
+	ShowWindow(FALSE);
+	return;
 	KillTimer(1);
 	m_monitor_dlg_hwnd = NULL;
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
@@ -1944,6 +2050,82 @@ int GetAmonLabel(int index,CString &ret_label)
 
 	return 1;
 }
+
+void CBacnetMonitor::Reset_Monitor_Rect()
+{
+
+	CRect temp_mynew_rect;
+	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+
+	CRect temp_window;
+	GetWindowRect(&temp_window);
+
+	if(window_max)
+	{
+		CRect temp_mynew_rect;
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), NULL);
+	}
+	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
+	{
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,0,0,SWP_NOSIZE );
+	}
+	else
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left + 140,temp_mynew_rect.top + 70,500,700, NULL);
+
+
+	return;
+
+}
+
+
+
+void CBacnetMonitor::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	// TODO: Add your message handler code here
+	CRect rc;
+	GetClientRect(rc);
+	if(m_monitor_list.m_hWnd != NULL)
+	{
+		::SetWindowPos(this->m_hWnd, HWND_TOP, 0,0, 0,0,  SWP_NOSIZE | SWP_NOMOVE);
+		//m_program_list.MoveWindow(&rc);
+		//m_monitor_list.MoveWindow(rc.left,rc.top,rc.Width(),rc.Height() - 80);
+
+		//GetDlgItem(IDC_BTN_MONITOR_GRAPHIC)->MoveWindow(rc.left + 20 ,rc.bottom - 60 , 120,50);
+		//GetDlgItem(IDC_BUTTON_MONITOR_DEL_SEL)->MoveWindow(rc.left + 200 ,rc.bottom - 60 , 160,50);
+		//GetDlgItem(IDC_BUTTON_MONITOR_DEL_LOCAL)->MoveWindow(rc.left + 400 ,rc.bottom - 60 , 160,50);
+	}
+}
+
+
+void CBacnetMonitor::OnSysCommand(UINT nID, LPARAM lParam)
+{
+	// TODO: Add your message handler code here and/or call default
+	if(nID == SC_MAXIMIZE)
+	{
+		if(window_max == false)
+		{
+			window_max = true;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
+		}
+		else
+		{
+			window_max = false;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
+		}
+		return;
+	}
+
+	CDialogEx::OnSysCommand(nID, lParam);
+}
+
+
 
 
 // CBacnetProgramEdit message handlers

@@ -1226,6 +1226,10 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
                 IP = _T("192.168.0.3");
                 Port = _T("10000");
             }
+			if(Changed_Item>= m_BuildNameLst.size())
+			{
+				return 0;
+			}
 			  WritePrivateProfileStringW(m_BuildNameLst.at(Changed_Item).MainBuildingName,_T("Remote_IP"),IP,g_achive_device_name_path);
             m_building_config_list.SetItemText(m_changedRow,BC_COMPORT,NO_APPLICATION);
             m_building_config_list.SetItemText(m_changedRow,BC_BAUDRATE,NO_APPLICATION);
@@ -2233,9 +2237,13 @@ void CBuildingConfigration::OnNMDblclkListBuildingConfig(NMHDR *pNMHDR, LRESULT 
 		return;
 	if(lRow<0)
 		return;
-     CBuildingConfigEditDlg dlg;
-	 dlg.m_currentBuilding = m_BuildNameLst.at(m_curRow);
-	 if (dlg.DoModal() == IDOK)
+	if (m_curRow>=m_BuildNameLst.size())//点的行超过了数据的size
+	{
+		return;
+	}
+    CBuildingConfigEditDlg dlg;
+	dlg.m_currentBuilding = m_BuildNameLst.at(m_curRow);
+	if (dlg.DoModal() == IDOK)
 	 {
 		 
 		m_BuildNameLst.at(m_curRow) = dlg.m_currentBuilding;
@@ -2263,9 +2271,7 @@ void CBuildingConfigration::OnNMDblclkListBuildingConfig(NMHDR *pNMHDR, LRESULT 
 			  m_BuildNameLst.at(m_curRow).BuildingPath
 			  );
 			  
-
 			SqliteDBT3000.execDML((UTF8MBSTR)SqlText);
-
 			SqliteDBT3000.closedb();
 		 
 			AfxMessageBox(_T("Update Successfully"));
@@ -2277,7 +2283,6 @@ void CBuildingConfigration::OnNMDblclkListBuildingConfig(NMHDR *pNMHDR, LRESULT 
 			e->GetErrorMessage(_T("Exception"), 0);
 		}
 	 }
-	  
 	  
 	*pResult = 0;
 }

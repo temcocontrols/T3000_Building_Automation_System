@@ -19,8 +19,9 @@
 #include "T3000DefaultView.h"
 #include "bado/BADO.h"
 #include "../SQLiteDriver/CppSQLite3.h"
+#include "../MultipleMonthCal32/MultipleMonthCalCtrl.h"
  
-const int g_versionNO=20161205;
+const int g_versionNO=20170215;
 
 
 #ifdef _DEBUG
@@ -41,8 +42,8 @@ END_MESSAGE_MAP()
 CT3000App::CT3000App()
 {
 	m_bHiColorIcons = TRUE;
-	CurrentT3000Version=_T("    2016.12.16 ");
-	T3000_Version = 11216;
+	CurrentT3000Version=_T("    2017.02.27");
+	T3000_Version = 20117;
 
 
 	m_lastinterface=19;
@@ -297,7 +298,7 @@ BOOL CT3000App::InitInstance()
 		InitCommonControlsEx(&InitCtrls);
 
 		Create_T3000_log_file();
-
+		CMultipleMonthCalCtrl::RegisterControl();
 
 		BOOL First_Start=TRUE;
 
@@ -854,6 +855,7 @@ BOOL CT3000App::InitInstance()
 		strTile.Format(_T("T3000 Building Automation System"));
 		strTile+=CurrentT3000Version;
 		m_pMainWnd->SetWindowText(strTile);//
+		m_pMainWnd->ShowWindow(SW_SHOWMAXIMIZED);
 		m_pMainWnd->ShowWindow(SW_SHOW);
 		m_pMainWnd->UpdateWindow();
 	   ((CMainFrame*)m_pMainWnd)->SwitchToPruductType(DLG_DIALOG_DEFAULT_BUILDING); 

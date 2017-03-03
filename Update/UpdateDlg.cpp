@@ -480,6 +480,8 @@ DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
 	{
 		CS_Info.Format(_T("Connecting to server...."));
 		bool conncect_ret = ConnectToFtp(_T("server139.web-hosting.com"),_T("temcoftp@temcocontrols.com"),_T("BwpNXWPgE7hg"));
+		//bool conncect_ret = ConnectToFtp(_T("sftp://ftp.bravocontrols.com"),_T("bravoftp"),_T("gbx@3PJcVbD}"));
+		
 		if(conncect_ret == false)
 		{
 			CS_Info.Format(_T("Connect to server failed.Please check your network."));

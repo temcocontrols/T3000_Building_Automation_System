@@ -22,7 +22,7 @@
 #define CO2NODE_VAR_NUM 15
 #define NET_WORK_CONTROLLER_NUM 24
 #define TSTAT26_VAR_NUM 163
-#define TSTAT26_VAR_NUM_TSTAT67 392
+#define TSTAT26_VAR_NUM_TSTAT67 389
 #define NET_WORK_DEFFERENT_TSTAT_FILE "NET WORK\n"
 #define INPUTCARD_NUM 24
 #define GROUP_NUM 40
@@ -1882,14 +1882,14 @@ void var_write_Tstat67(wofstream & out)
 {
 	int tstat67_register_var[TSTAT26_VAR_NUM_TSTAT67]={	
 		MODBUS_COOL_HEAT_MODE	,
-		MODBUS_MODE_OPERATION	,
+		//MODBUS_MODE_OPERATION	,
 		MODBUS_SEQUENCE	,
 		MODBUS_DEGC_OR_F	,
 		MODBUS_FAN_MODE	,
 		MODBUS_POWERUP_MODE	,
 		MODBUS_AUTO_ONLY	,
-		MODBUS_FACTORY_DEFAULTS	,
-		MODBUS_INFO_BYTE	,
+		//MODBUS_FACTORY_DEFAULTS	,
+		//MODBUS_INFO_BYTE	,
 		//MODBUS_BAUDRATE	,
 		MODBUS_OVERRIDE_TIMER	,
 		MODBUS_OVERRIDE_TIMER_LEFT	,
@@ -7688,6 +7688,7 @@ int  m_crange,inoutputno;
 CppSQLite3DB SqliteDBBuilding;
 CppSQLite3Table table;
 CppSQLite3Query q;
+SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
  if (SqliteDBBuilding.tableExists("Value_Range"))//ÓÐVersion±í
  {
 	 CString sql;

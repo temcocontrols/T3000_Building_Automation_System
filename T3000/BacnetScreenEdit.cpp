@@ -102,7 +102,7 @@ BEGIN_MESSAGE_MAP(CBacnetScreenEdit, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_ADD, &CBacnetScreenEdit::OnBnClickedButtonAdd)
 	ON_BN_CLICKED(IDC_BUTTON_SCREEN_EXIT, &CBacnetScreenEdit::OnBnClickedButtonScreenExit)
 	ON_BN_CLICKED(IDC_BUTTON_DELETE, &CBacnetScreenEdit::OnBnClickedButtonDelete)
-	ON_BN_CLICKED(IDC_BUTTON_DELETE_ALL, &CBacnetScreenEdit::OnBnClickedButtonDeleteAll)
+
 //	ON_WM_RBUTTONDBLCLK()
 	ON_WM_LBUTTONDBLCLK()
 END_MESSAGE_MAP()
@@ -117,27 +117,14 @@ LRESULT  CBacnetScreenEdit::Edit_label_Handle(WPARAM wParam, LPARAM lParam)
 		return true;
 	}
 	Bacnet_Label_Info * temp_info =  (Bacnet_Label_Info *)wParam;
-	CString icon_name;
-	MultiByteToWideChar( CP_ACP, 0, (char *)temp_info->ico_name,(int)strlen((char *)temp_info->ico_name)+1, 
-		icon_name.GetBuffer(MAX_PATH), MAX_PATH );
-	icon_name.ReleaseBuffer();	
 
-	CString icon_name_2;
-	MultiByteToWideChar( CP_ACP, 0, (char *)temp_info->ico_name_2,(int)strlen((char *)temp_info->ico_name_2)+1, 
-		icon_name_2.GetBuffer(MAX_PATH), MAX_PATH );
-	icon_name_2.ReleaseBuffer();	
-	try
-	{
-		CString strSql;
-		strSql.Format(_T("update Screen_Bacnet_Label set Display_Type=%i,Text_Color=%i ,Icon_Name='%s' ,Icon_Name_2='%s', Icon_Place=%i ,Icon_Size=%i where Serial_Num =%i and Screen_Index=%i and  Label_Index=%i"),
-			temp_info->nDisplay_Type,temp_info->nclrTxt,icon_name,icon_name_2,temp_info->ntext_place,temp_info->n_iconsize,temp_info->nSerialNum,temp_info->nScreen_index,temp_info->nLabel_index);
-		SqliteDBT3000.execDML((UTF8MBSTR)strSql);
+	m_graphic_label_data.at(temp_info->nLabel_index).reg.nDisplay_Type = temp_info->nDisplay_Type;
+	m_graphic_label_data.at(temp_info->nLabel_index).reg.nclrTxt = temp_info->nclrTxt;
+	memcpy(&m_graphic_label_data.at(temp_info->nLabel_index).reg.icon_name_1,temp_info->ico_name,20);
+	memcpy(&m_graphic_label_data.at(temp_info->nLabel_index).reg.icon_name_2,temp_info->ico_name_2,20);
+	m_graphic_label_data.at(temp_info->nLabel_index).reg.nIcon_place = temp_info->ntext_place;
+	m_graphic_label_data.at(temp_info->nLabel_index).reg.nIcon_size = temp_info->n_iconsize;
 
-	}
-	catch(_com_error *e)
-	{
-		AfxMessageBox(e->ErrorMessage());
-	}
 	if(temp_info!=NULL)
 	{
 		delete temp_info;
@@ -159,20 +146,9 @@ LRESULT  CBacnetScreenEdit::Delete_Label_Handle(WPARAM wParam, LPARAM lParam)
 {
 	Bacnet_Label_Info * temp_info =  (Bacnet_Label_Info *)wParam;
 
+	memset(&m_graphic_label_data.at(temp_info->nLabel_index),0,sizeof(Str_label_point));
+	m_graphic_label_data.at(temp_info->nLabel_index).reg.label_status = EMPTY_LABEL;
 
-
-	try
-	{
-		CString strSql;
-		strSql.Format(_T("delete   from Screen_Bacnet_Label where Serial_Num =%i and Screen_Index=%i and  Label_Index=%i"),
-			temp_info->nSerialNum,temp_info->nScreen_index,temp_info->nLabel_index);
-		SqliteDBT3000.execDML((UTF8MBSTR)strSql);
-
-	}
-	catch(_com_error *e)
-	{
-		AfxMessageBox(e->ErrorMessage());
-	}
 	if(temp_info!=NULL)
 	{
 		delete temp_info;
@@ -269,58 +245,40 @@ void CBacnetScreenEdit::AddLabel(unsigned char point_type,uint8_t point_number,u
 	//WritePrivateProfileStringW(_T("Setting"),_T("AddLabelDefaultColor"),temp_cs,g_cstring_ini_path);
 	//WritePrivateProfileStringW(_T("Setting"),_T("AddLabelDefaultTextPlace"),temp_cs,g_cstring_ini_path);
 
-	try
-	{
-
-
-		CString strSql;
-		strSql.Format(_T("select * from Screen_Bacnet_Label where Serial_Num =%i and Screen_Index=%i"),m_nSerialNumber,screen_list_line);
-		q = SqliteDBT3000.execQuery((UTF8MBSTR)strSql);
-		CString strtemp;
-		strtemp.Empty();
-		_variant_t temp_variant;
-		int nTemp;
-
-		int Max_Control_ID = LABEL_START_ID;
-		while(!q.eof())
-		{//find the ControlID;
-			strtemp=q.getValuebyName(L"Label_Index");//
-			 
-			nTemp=_wtoi(strtemp);
-			//if(nTemp==nContyrolID)
-			//	nContyrolID=nContyrolID+1;
-			//else
-			//	break;
-			if(Max_Control_ID <= nTemp)	//要加入的Label ID 要大于 目前检索出来的 最大的值;
-				Max_Control_ID = nTemp + 1; 
-			q.nextRow();
-		}
-		 
-
-		int text_color = RGB(0,0,255);
-		int display_type = LABEL_SHOW_FULL_DESCRIPTION;
-		if((point_type == BAC_GRP + 1) ||	//GRP
-			(point_type == BAC_SCH + 1) ||
-			(point_type == BAC_PRG + 1) ||
-			(point_type == BAC_HOL + 1) ||
-			(point_type == BAC_AMON + 1) ||
-			(point_type == BAC_PID + 1))
+		unsigned short label_index = 0;
+		unsigned int item_insert = 0;
+		for (int i=0;i<m_graphic_label_data.size();i++)
 		{
-			//if(nDefaultDisplayType == LABEL_SHOW_VALUE)
-			//	nDefaultDisplayType = LABEL_ICON_VALUE;
+			if((m_graphic_label_data.at(i).reg.label_status == NO_UNSED_LABEL) || 
+				((m_graphic_label_data.at(i).reg.label_status == EMPTY_LABEL)))
+			{
+				item_insert = i;
+				break;
+			}
+
+			//if(label_index < m_graphic_label_data.at(i).reg.nLabel_index )
+			//{
+			//	label_index = m_graphic_label_data.at(i).reg.nLabel_index + 1;
+			//}
 		}
 
-		//strSql.Format(_T("insert into Screen_Bacnet_Label values(%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,'%s','%s',%i,%i)"),m_nSerialNumber,screen_list_line,Max_Control_ID,main_panel,sub_panel,point_type,point_number,point_x,point_y,text_color,display_type,_T(""),_T(""),LABEL_TEXT_BOTTOM,LABEL_ICON_SMALL);
-		strSql.Format(_T("insert into Screen_Bacnet_Label values(%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,'%s','%s',%i,%i)"),m_nSerialNumber,screen_list_line,Max_Control_ID,main_panel,sub_panel,point_type,point_number,point_x,point_y,nDefaultclrTxt,nDefaultDisplayType,_T(""),_T(""),nDefaultTextPlace,nDefaultIconSize);
+		memset(&m_graphic_label_data.at(item_insert),0,sizeof(Str_label_point));
+		m_graphic_label_data.at(item_insert).reg.label_status = ENABLE_LABEL;
+		m_graphic_label_data.at(item_insert).reg.nclrTxt = nDefaultclrTxt;
+		m_graphic_label_data.at(item_insert).reg.nDisplay_Type = nDefaultDisplayType;
+		m_graphic_label_data.at(item_insert).reg.nIcon_place = nDefaultTextPlace;
+		m_graphic_label_data.at(item_insert).reg.nIcon_size = nDefaultIconSize;
 
-		SqliteDBT3000.execDML((UTF8MBSTR)strSql);
+		m_graphic_label_data.at(item_insert).reg.nLabel_index = item_insert;
+		m_graphic_label_data.at(item_insert).reg.nMain_Panel  = main_panel;
+		m_graphic_label_data.at(item_insert).reg.nPoint_number  = point_number;
+		m_graphic_label_data.at(item_insert).reg.nPoint_type = point_type;
+		m_graphic_label_data.at(item_insert).reg.nPoint_x = point_x;
+		m_graphic_label_data.at(item_insert).reg.nPoint_y = point_y;
+		m_graphic_label_data.at(item_insert).reg.nScreen_index = screen_list_line;
+		m_graphic_label_data.at(item_insert).reg.nSerialNum = m_nSerialNumber;
+		m_graphic_label_data.at(item_insert).reg.nSub_Panel = sub_panel;
 
-
-	}
-	catch(_com_error *e)
-	{
-		AfxMessageBox(e->ErrorMessage());
-	}
 	//ReloadLabelsFromDB();
 	Invalidate(1);
 }
@@ -330,9 +288,20 @@ void CBacnetScreenEdit::AddLabel(unsigned char point_type,uint8_t point_number,u
 // CBacnetScreenEdit message handlers
 LRESULT  CBacnetScreenEdit::RedrawScreeneditWindow(WPARAM wParam, LPARAM lParam)
 {
+	static CRect temp_rect;	
 	::GetWindowRect(BacNet_hwd,&mynew_rect);	//获取 view的窗体大小;
-	MoveWindow(mynew_rect.left,mynew_rect.top,mynew_rect.Width(),mynew_rect.Height(),1);
-	InitGraphic(g_serialNum,g_bac_instance,screen_list_line);
+	if(temp_rect!= mynew_rect)
+	{
+		MoveWindow(mynew_rect.left,mynew_rect.top,mynew_rect.Width(),mynew_rect.Height(),1);
+		InitGraphic(g_serialNum,g_bac_instance,screen_list_line);
+		temp_rect = mynew_rect;
+		//if(((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SQLITE_INFO)))
+		//{
+		//	DFTrace(_T("Test log ."));
+		//}
+
+	}
+
 
 	//ReloadLabelsFromDB();
 	//Invalidate();
@@ -346,19 +315,15 @@ void CBacnetScreenEdit::OnBnClickedButtonScreenEditTest()
 
 #include "BacnetMonitor.h"
 #include "BacnetProgram.h"
+#include "BacnetWeeklyRoutine.h"
+#include "BacnetAnnualRoutine.h"
 extern CBacnetMonitor *Monitor_Window ;
 extern CBacnetProgram *Program_Window ;
+extern BacnetWeeklyRoutine *WeeklyRoutine_Window ;
+extern BacnetAnnualRoutine *AnnualRoutine_Window ;
 BOOL CBacnetScreenEdit::PreTranslateMessage(MSG* pMsg)
 {
 	// TODO: Add your specialized code here and/or call the base class
-	//if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN) 
-	//{
-	//	if(m_nFoucsIndext >= 0)
-	//	{
-	//		//saveLabelInfo(m_nFoucsIndext);
-	//		m_nFoucsIndext = -1;
-	//	}
-	//}
 
 
 	if((pMsg->message == WM_KEYDOWN) && (pMsg->wParam == VK_RETURN) && (m_bac_select_label>=0))
@@ -388,8 +353,25 @@ BOOL CBacnetScreenEdit::PreTranslateMessage(MSG* pMsg)
 			program_list_line = m_bac_label_vector.at(m_bac_select_label).nPoint_number;
 			if(program_list_line < BAC_PROGRAM_ITEM_COUNT)
 			{
-				//Monitor_Window->OnBnClickedBtnMonitorGraphic();
 				Program_Window->OnBnClickedButtonProgramEdit();
+			}
+			return 0;
+		}
+		else if(m_bac_label_vector.at(m_bac_select_label).nPoint_type == BAC_SCH)
+		{
+			weekly_list_line = m_bac_label_vector.at(m_bac_select_label).nPoint_number;
+			if(weekly_list_line < BAC_HOLIDAY_COUNT)
+			{
+				WeeklyRoutine_Window->OnBnClickedButtonWeeklyScheduleEdit();
+			}
+			return 0;
+		}
+		else if(m_bac_label_vector.at(m_bac_select_label).nPoint_type == BAC_HOL)
+		{
+			annual_list_line = m_bac_label_vector.at(m_bac_select_label).nPoint_number;
+			if(annual_list_line < BAC_HOLIDAY_COUNT)
+			{
+				AnnualRoutine_Window->OnBnClickedButtonAnnualEdit();
 			}
 			return 0;
 		}
@@ -698,7 +680,7 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 	screen_lock_label  =(bool)GetPrivateProfileInt(_T("Setting"),_T("LockScreenLabel"),0,g_cstring_ini_path);
 
 	//show no pic 如果是0的话就不在显示没有图片.
-	screen_show_nopic  =(bool)GetPrivateProfileInt(_T("Setting"),_T("ScreenLabelShowNoPic"),1,g_cstring_ini_path);
+	screen_show_nopic  =  0;// (bool)GetPrivateProfileInt(_T("Setting"),_T("ScreenLabelShowNoPic"),1,g_cstring_ini_path);
 	
 
 	m_full_screen_mode = false;
@@ -721,9 +703,9 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 
 	//m_building_image_folder = ApplicationFolder + _T("\\Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
 
-	 
+
  
-	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+//	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 	m_bac_select_label = -1;
 	m_bac_lbuttondown = false;
 	//暂时加入，到时候要删掉的，不在这加，debug;
@@ -800,8 +782,8 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 
 	
 	memcpy_s(&m_temp_graphic_label_data,sizeof(Str_label_point) * BAC_GRPHIC_LABEL_COUNT,&m_graphic_label_data.at(0),sizeof(Str_label_point) * BAC_GRPHIC_LABEL_COUNT);
-	UpdateT3000Database();
-	ReloadLabelsFromDB();
+	
+	//ReloadLabelsFromDB();
 	m_screenedit_dlg_hwnd = this->m_hWnd;
 	SetTimer(1,5000,NULL);
 	SetTimer(2,10000,NULL);
@@ -813,6 +795,7 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 	}
 	control_object_instance = g_bac_instance;
 	Invalidate(1);
+	::SetWindowPos(this->m_hWnd,HWND_TOP,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -820,33 +803,6 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 
 #pragma region MY_CODE
 
-void CBacnetScreenEdit::UpdateT3000Database()
-{
-	CString strSql;
-	strSql.Format(_T("delete   from Screen_Bacnet_Label"));
-	 q = SqliteDBT3000.execQuery((UTF8MBSTR)strSql);
-	for (int i=0;i<m_graphic_label_data.size();i++)
-	{
-		if(m_graphic_label_data.at(i).reg.label_status != ENABLE_LABEL)
-			break;
-		CString temp_icon_1;
-		CString temp_icon_2;
-		MultiByteToWideChar( CP_ACP, 0, (char *)m_graphic_label_data.at(i).reg.icon_name_1, 
-			(int)strlen((char *)m_graphic_label_data.at(i).reg.icon_name_1)+1, 
-			temp_icon_1.GetBuffer(MAX_PATH), MAX_PATH );
-		temp_icon_1.ReleaseBuffer();	
-		MultiByteToWideChar( CP_ACP, 0, (char *)m_graphic_label_data.at(i).reg.icon_name_2, 
-			(int)strlen((char *)m_graphic_label_data.at(i).reg.icon_name_2)+1, 
-			temp_icon_2.GetBuffer(MAX_PATH), MAX_PATH );
-		temp_icon_2.ReleaseBuffer();	
-
-		strSql.Format(_T("insert into Screen_Bacnet_Label values(%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,'%s','%s',%i,%i)"),m_graphic_label_data.at(i).reg.nSerialNum,m_graphic_label_data.at(i).reg.nScreen_index,m_graphic_label_data.at(i).reg.nLabel_index,
-			m_graphic_label_data.at(i).reg.nMain_Panel,m_graphic_label_data.at(i).reg.nSub_Panel,m_graphic_label_data.at(i).reg.nPoint_type,m_graphic_label_data.at(i).reg.nPoint_number,m_graphic_label_data.at(i).reg.nPoint_x,
-			m_graphic_label_data.at(i).reg.nPoint_y,m_graphic_label_data.at(i).reg.nclrTxt,m_graphic_label_data.at(i).reg.nDisplay_Type,temp_icon_1,temp_icon_2,m_graphic_label_data.at(i).reg.nIcon_place,m_graphic_label_data.at(i).reg.nIcon_size);
-		 SqliteDBT3000.execDML((UTF8MBSTR)strSql);
-	}
-	
-}
 
 void CBacnetScreenEdit::InitGraphic(int nSerialNum,int nInstanceID,unsigned char screen_number)
 {
@@ -856,12 +812,15 @@ void CBacnetScreenEdit::InitGraphic(int nSerialNum,int nInstanceID,unsigned char
 		PostMessage(WM_CLOSE,NULL,NULL);
 		return;
 	}
+	CString temp_info;
+	temp_info.Format(_T("Screen %d"),screen_number+1);
+	SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_info);
 	CString PicFileTips;
 	MultiByteToWideChar( CP_ACP, 0, (char *)m_screen_data.at(screen_number).picture_file, (int)strlen((char *)m_screen_data.at(screen_number).picture_file)+1, 
 		PicFileTips.GetBuffer(MAX_PATH), MAX_PATH );
 	PicFileTips.ReleaseBuffer();
 
-	m_strImgPathName=m_building_image_folder + _T("\\") + PicFileTips ;//_T("sample1.bmp");
+	m_strImgPathName=m_building_image_folder + _T("\\") + PicFileTips ;
 	WIN32_FIND_DATA fData;
 	HANDLE hFile=NULL; 
 	hFile = FindFirstFile(m_strImgPathName,&fData);
@@ -921,153 +880,125 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
 	m_bac_label_vector.clear();
 	m_graphic_refresh_data.clear();
 	CString strSql;
-	//if(bac_cm5_graphic == false)
-	strSql.Format(_T("select * from Screen_Bacnet_Label where Serial_Num =%i and Screen_Index=%i"),m_nSerialNumber,screen_list_line);
-	 q = SqliteDBT3000.execQuery((UTF8MBSTR)strSql);
+
 	CString strtemp;
 	strtemp.Empty();
-
-	_variant_t temp_variant;
 	int nTemp;
 	CString strTemp;
 	int nItem = 0;//用于记录有多少个需要刷新;
 	::GetWindowRect(BacNet_hwd,&mynew_rect);	//获取 view的窗体大小;
 
-	while(!q.eof())
-	{	
+	for (int i=0;i<m_graphic_label_data.size();i++)
+	{
+		m_graphic_label_data.at(i).reg.nLabel_index = i;
+		if(m_graphic_label_data.at(i).reg.label_status == NO_UNSED_LABEL)
+		{
+			break;
+		}
 		Bacnet_Label_Info bac_label;
-		CString temp_icon_name;
-		int temp_x_persent;
-		int temp_y_persent;
-		bac_label.nSerialNum = m_nSerialNumber;
-		bac_label.nScreen_index = screen_list_line;
-
-		bac_label.nLabel_index=q.getIntField("Label_Index");//
-		bac_label.nMain_Panel = q.getIntField("Main_Panel");
-		bac_label.nSub_Panel = q.getIntField("Sub_Panel");
-		bac_label.nPoint_type = q.getIntField("Point_Type");
-		if(bac_label.nPoint_type > 0)
-			bac_label.nPoint_type = bac_label.nPoint_type - 1;
-		bac_label.nPoint_number = q.getIntField("Point_Number");
-		temp_x_persent = q.getIntField("Point_X");
-
-		temp_y_persent =  q.getIntField("Point_Y");
-		if(temp_x_persent > 1000)
-			temp_x_persent = 980;
-		if(temp_y_persent > 1000)
-			temp_y_persent = 980;
-		if(!m_full_screen_mode)
+		memset(&bac_label,0,sizeof(Bacnet_Label_Info));
+		if((m_graphic_label_data.at(i).reg.nSerialNum == m_nSerialNumber) && (m_graphic_label_data.at(i).reg.nScreen_index == screen_list_line))
 		{
-			bac_label.nPoint_x = (int)((temp_x_persent*m_paint_right_limit)/1000);
-			bac_label.nPoint_y = (int)((temp_y_persent*m_paint_botton_limit)/1000);
-		}
-		else
-		{
-			int width = GetSystemMetrics ( SM_CXSCREEN );  
-			int height= GetSystemMetrics ( SM_CYSCREEN ); 
-			bac_label.nPoint_x = (int)((temp_x_persent*width)/1000);
-			bac_label.nPoint_y = (int)((temp_y_persent*height)/1000);
-		}
+			
+			CString temp_icon_name;
+			int temp_x_persent;
+			int temp_y_persent;
+			bac_label.nSerialNum = m_nSerialNumber;
+			bac_label.nScreen_index = screen_list_line;
 
-		//TRACE(_T("\r\nX_MAX = %u  Y_MAX = %u\r\n"),m_paint_right_limit,m_paint_botton_limit);
-		//TRACE(_T("x_persent = %u  y_persent = %u\r\n"),temp_x_persent,temp_y_persent);
-		//TRACE(_T("nPoint_x = %u nPoint_y = %u\r\n"),bac_label.nPoint_x,bac_label.nPoint_y);
-		//TRACE(_T("temp_variant value"));
-		bac_label.nclrTxt = q.getIntField("Text_Color");
-		bac_label.nDisplay_Type = q.getIntField("Display_Type");
+			bac_label.nLabel_index=m_graphic_label_data.at(i).reg.nLabel_index;
+			bac_label.nMain_Panel = m_graphic_label_data.at(i).reg.nMain_Panel;
+			bac_label.nSub_Panel = m_graphic_label_data.at(i).reg.nSub_Panel;
+			bac_label.nPoint_type = m_graphic_label_data.at(i).reg.nPoint_type;
 
-		temp_icon_name=q.getValuebyName(L"Icon_Name");//
-		if(!temp_icon_name.IsEmpty())
-		{
-			 
-			char cTemp2[255];
-			WideCharToMultiByte( CP_ACP, 0, temp_icon_name.GetBuffer(), -1, cTemp2, 255, NULL, NULL );
-			memcpy(bac_label.ico_name,cTemp2,10);
-		}
-		else
-		{
-			temp_icon_name=_T("");
-			memset(bac_label.ico_name,0,10);
-		}
-
-		temp_icon_name=q.getValuebyName(L"Icon_Name_2");//
-		if(temp_variant.vt!=VT_NULL)
-		{
-		 
-			char cTemp2[255];
-			WideCharToMultiByte( CP_ACP, 0, temp_icon_name.GetBuffer(), -1, cTemp2, 255, NULL, NULL );
-			memcpy(bac_label.ico_name_2,cTemp2,10);
-		}
-		else
-		{
-			temp_icon_name=_T("");
-			memset(bac_label.ico_name_2,0,10);
-		}
-
-
-		bac_label.n_iconsize = q.getIntField("Icon_Size");
-		bac_label.ntext_place = q.getIntField("Icon_Place");
-
-		if(bac_label.n_iconsize > 2)
-			bac_label.n_iconsize = 0;
-		if(bac_label.ntext_place > 3)
-			bac_label.n_iconsize = 0;
-
-
-		bac_label.nMouse_Status = LABEL_MOUSE_NORMAL;
-		m_bac_label_vector.push_back(bac_label);
-		q.nextRow();
-
-
-		_Graphic_Value_Info temp1;
-		
-		temp1.deviceid = g_bac_instance;//暂时只支持 读本地的 instance;
-		temp1.value_type = bac_label.nPoint_type;
-		temp1.value_item = bac_label.nPoint_number;
-		if((bac_label.nMain_Panel == Station_NUM) && (bac_label.nSub_Panel == Station_NUM))  //如果是这个设备下面的 才加到自动刷新 的里面;
-		{
-			if(bac_label.nPoint_type == 1)
+			if(bac_label.nPoint_type > 0)
+				bac_label.nPoint_type = bac_label.nPoint_type - 1;
+			bac_label.nPoint_number =  m_graphic_label_data.at(i).reg.nPoint_number;
+			temp_x_persent = m_graphic_label_data.at(i).reg.nPoint_x;
+			temp_y_persent =  m_graphic_label_data.at(i).reg.nPoint_y;
+			if(temp_x_persent > 1000)
+				temp_x_persent = 980;
+			if(temp_y_persent > 1000)
+				temp_y_persent = 980;
+			if(!m_full_screen_mode)
 			{
-				if(temp1.value_item >= BAC_INPUT_ITEM_COUNT)
-					continue;
-				temp1.command = READINPUT_T3000;
-				temp1.entitysize = sizeof(Str_in_point);
-				m_graphic_refresh_data.push_back(temp1);
+				bac_label.nPoint_x = (int)((temp_x_persent*m_paint_right_limit)/1000);
+				bac_label.nPoint_y = (int)((temp_y_persent*m_paint_botton_limit)/1000);
 			}
-			else if(bac_label.nPoint_type == 0)
+			else
 			{
-				if(temp1.value_item >= BAC_OUTPUT_ITEM_COUNT)
-					continue;
-				temp1.command = READOUTPUT_T3000;
-				temp1.entitysize = sizeof(Str_out_point);
-				m_graphic_refresh_data.push_back(temp1);
-			}
-			else if(bac_label.nPoint_type == 2)
-			{
-				if(temp1.value_item >= BAC_VARIABLE_ITEM_COUNT)
-					continue;
-				temp1.command = READVARIABLE_T3000;
-				temp1.entitysize = sizeof(Str_variable_point);
-				m_graphic_refresh_data.push_back(temp1);
-			}
-			else if(bac_label.nPoint_type == 3)
-			{
-				if(temp1.value_item >= BAC_PID_COUNT)
-					continue;
-				temp1.command = READCONTROLLER_T3000;
-				temp1.entitysize = sizeof(Str_controller_point);
-				m_graphic_refresh_data.push_back(temp1);
+				int width = GetSystemMetrics ( SM_CXSCREEN );  
+				int height= GetSystemMetrics ( SM_CYSCREEN ); 
+				bac_label.nPoint_x = (int)((temp_x_persent*width)/1000);
+				bac_label.nPoint_y = (int)((temp_y_persent*height)/1000);
 			}
 
+			bac_label.nclrTxt = m_graphic_label_data.at(i).reg.nclrTxt;
+			bac_label.nDisplay_Type =m_graphic_label_data.at(i).reg.nDisplay_Type;
+
+
+			memcpy(bac_label.ico_name,m_graphic_label_data.at(i).reg.icon_name_1,STR_ICON_1_NAME_LENGTH);
+			memcpy(bac_label.ico_name_2,m_graphic_label_data.at(i).reg.icon_name_2,STR_ICON_2_NAME_LENGTH);
+
+			bac_label.n_iconsize =m_graphic_label_data.at(i).reg.nIcon_size;
+			bac_label.ntext_place = m_graphic_label_data.at(i).reg.nIcon_place;
+			if(bac_label.n_iconsize > 2)
+				bac_label.n_iconsize = 0;
+			if(bac_label.ntext_place > 3)
+				bac_label.n_iconsize = 0;
+			bac_label.nMouse_Status = LABEL_MOUSE_NORMAL;
+			m_bac_label_vector.push_back(bac_label);
+
+			_Graphic_Value_Info temp1;
+
+			temp1.deviceid = g_bac_instance;//暂时只支持 读本地的 instance;
+			temp1.value_type = bac_label.nPoint_type;
+			temp1.value_item = bac_label.nPoint_number;
+			if((bac_label.nMain_Panel == Station_NUM) && (bac_label.nSub_Panel == Station_NUM))  //如果是这个设备下面的 才加到自动刷新 的里面;
+			{
+				if(bac_label.nPoint_type == 1)
+				{
+					if(temp1.value_item >= BAC_INPUT_ITEM_COUNT)
+						continue;
+					temp1.command = READINPUT_T3000;
+					temp1.entitysize = sizeof(Str_in_point);
+					m_graphic_refresh_data.push_back(temp1);
+				}
+				else if(bac_label.nPoint_type == 0)
+				{
+					if(temp1.value_item >= BAC_OUTPUT_ITEM_COUNT)
+						continue;
+					temp1.command = READOUTPUT_T3000;
+					temp1.entitysize = sizeof(Str_out_point);
+					m_graphic_refresh_data.push_back(temp1);
+				}
+				else if(bac_label.nPoint_type == 2)
+				{
+					if(temp1.value_item >= BAC_VARIABLE_ITEM_COUNT)
+						continue;
+					temp1.command = READVARIABLE_T3000;
+					temp1.entitysize = sizeof(Str_variable_point);
+					m_graphic_refresh_data.push_back(temp1);
+				}
+				else if(bac_label.nPoint_type == 3)
+				{
+					if(temp1.value_item >= BAC_PID_COUNT)
+						continue;
+					temp1.command = READCONTROLLER_T3000;
+					temp1.entitysize = sizeof(Str_controller_point);
+					m_graphic_refresh_data.push_back(temp1);
+				}
+
+			}
+			else if((bac_label.nMain_Panel == Station_NUM) && (bac_label.nSub_Panel != 0))
+			{
+				m_enable_send_remote_point = true;
+			}
+
+			nItem ++;
+
 		}
-		else if((bac_label.nMain_Panel == Station_NUM) && (bac_label.nSub_Panel != 0))
-		{
-			m_enable_send_remote_point = true;
-		}
-		
-		nItem ++;
 	}
-
 	  
 }
 
@@ -1218,11 +1149,8 @@ int CBacnetScreenEdit::JudgeClickItem(CPoint & point)
 				rect_y_botton = m_bac_label_vector.at(i).nPoint_y + delt_y;
 			}
 
-			//for (int j=i+1; j<m_bac_label_vector.size();j++)
-			//{
 			m_bac_label_vector.at(i).nMouse_Status = LABEL_MOUSE_NORMAL;
 
-			//}
 			if((point.x > rect_x ) && (point.x < rect_x_right) && (point.y > rect_y) && (point.y < rect_y_botton))
 			{
 				m_bac_label_vector.at(i).nMouse_Status = LABEL_MOUSE_ON_LB_DOWN;
@@ -1245,8 +1173,6 @@ int CBacnetScreenEdit::HitTestEx(CPoint & point)
 		ScreenToClient(&rcItem);
 		if (rcItem.PtInRect(point))
 		{
-
-			//	m_nFoucsIndext=i;
 			return i;
 		}
 	}
@@ -1357,8 +1283,7 @@ void CBacnetScreenEdit::OnPaint()
 			R_value = 160;G_value = 0; B_value = 160;
 		}
 		SolidBrush  txt_color_brush(Color(255,R_value,G_value,B_value));
-		//SolidBrush  txt_color_brush(Color(255,58,49,242));
-		//SolidBrush  txt_color_brush( m_bac_label_vector.at(i).nclrTxt);
+
 		FontFamily  UnitfontFamily(_T("Arial"));
 		Gdiplus::Font        unitfont(&UnitfontFamily, 16, FontStyleRegular, UnitPixel);
 		pointF.X = m_bac_label_vector.at(i).nPoint_x;
@@ -1460,7 +1385,7 @@ void CBacnetScreenEdit::OnPaint()
 				cs_value.Format(_T("N/A"));
 			}
 
-			//cs_full_label = 
+			
 		}
 		else
 		{
@@ -1586,20 +1511,8 @@ void CBacnetScreenEdit::OnPaint()
 				{
 					if(read_bac_index < BAC_SCREEN_COUNT)
 					{
-						//if(m_bac_label_vector.at(i).nDisplay_Type == LABEL_SHOW_VALUE)
-						//{
-						//	m_bac_label_vector.at(i).nDisplay_Type = LABEL_SHOW_LABEL;
-						//}
-						//else if(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_VALUE)
-						//{
-						//	m_bac_label_vector.at(i).nDisplay_Type = LABEL_ICON_LABEL;
-						//}
 						if(m_bac_label_vector.at(i).nDisplay_Type == LABEL_SHOW_VALUE)
 							m_bac_label_vector.at(i).nDisplay_Type = LABEL_SHOW_LABEL;
-						//else if(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_VALUE)
-						//{
-						//	m_bac_label_vector.at(i).nDisplay_Type = LABEL_ICON_LABEL;
-						//}
 						GetScreenLabel(read_bac_index,cs_label);
 						GetScreenFullLabel(read_bac_index,cs_full_label);
 						cs_value.Empty();
@@ -2080,7 +1993,7 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 
 				switch(m_bac_label_vector.at(i).nPoint_type)
 				{
-				case 1://INPUT
+				case BAC_IN://INPUT
 					{
 						if(temp_index < BAC_INPUT_ITEM_COUNT)
 						{	
@@ -2103,7 +2016,7 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 
 					}
 					break;
-				case 0://OUTPUT
+				case BAC_OUT://OUTPUT
 					{
 						if(temp_index < BAC_OUTPUT_ITEM_COUNT)
 						{
@@ -2125,7 +2038,7 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 
 					}
 					break;
-				case 2://VARIABLE
+				case BAC_VAR://VARIABLE
 					{
 						if(temp_index < BAC_VARIABLE_ITEM_COUNT)
 						{
@@ -2160,7 +2073,9 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 		{
 			if((m_bac_label_vector.at(i).nPoint_type == BAC_GRP) ||
 				(m_bac_label_vector.at(i).nPoint_type == BAC_AMON)||
-				(m_bac_label_vector.at(i).nPoint_type == BAC_PRG))
+				(m_bac_label_vector.at(i).nPoint_type == BAC_PRG) ||
+				(m_bac_label_vector.at(i).nPoint_type == BAC_SCH) ||
+				(m_bac_label_vector.at(i).nPoint_type == BAC_HOL))
 			{
 				click_ret = true;
 				m_bac_select_label = i;
@@ -2259,108 +2174,6 @@ void CBacnetScreenEdit::OnMouseMove(UINT nFlags, CPoint point)
 
 bool CBacnetScreenEdit::UpdateDeviceLabelFlash()
 {
-	
-	//for (int i=0;i<m_graphic_label_data.size();i++)
-	CString strSql;
-	//if(bac_cm5_graphic == false)
-	strSql.Format(_T("select * from Screen_Bacnet_Label where Serial_Num =%i"),m_nSerialNumber);
-	q = SqliteDBT3000.execQuery((UTF8MBSTR)strSql);
-	CString strtemp;
-	strtemp.Empty();
-
-	_variant_t temp_variant;
-	int nTemp;
-	CString strTemp;
-
-	int ncount = 0;
-
-	while(!q.eof())
-	{	
-		Bacnet_Label_Info bac_label;
-		CString temp_icon_name;
-		int temp_x_persent;
-		int temp_y_persent;
-		bac_label.nSerialNum = q.getIntField("Serial_Num");
-		bac_label.nScreen_index = q.getIntField("Screen_Index");//;
-
-		bac_label.nLabel_index=q.getIntField("Label_Index");//
-		bac_label.nMain_Panel = q.getIntField("Main_Panel");
-		bac_label.nSub_Panel = q.getIntField("Sub_Panel");
-		bac_label.nPoint_type = q.getIntField("Point_Type");
-		bac_label.nPoint_number = q.getIntField("Point_Number");
-		temp_x_persent = q.getIntField("Point_X");
-		bac_label.nPoint_x = (int)((temp_x_persent*m_paint_right_limit)/1000);
-		temp_y_persent =  q.getIntField("Point_Y");
-		bac_label.nPoint_y = (int)((temp_y_persent*m_paint_botton_limit)/1000);
-
-		bac_label.nclrTxt = q.getIntField("Text_Color");
-		bac_label.nDisplay_Type = q.getIntField("Display_Type");
-
-		temp_icon_name=q.getValuebyName(L"Icon_Name");//
-		if(!temp_icon_name.IsEmpty())
-		{
-			 
-			char cTemp2[255];
-			WideCharToMultiByte( CP_ACP, 0, temp_icon_name.GetBuffer(), -1, cTemp2, 255, NULL, NULL );
-			memcpy(bac_label.ico_name,cTemp2,10);
-		}
-		else
-		{
-			temp_icon_name=_T("");
-			memset(bac_label.ico_name,0,10);
-		}
-
-		temp_icon_name=q.getValuebyName(L"Icon_Name_2");//
-		if(!temp_icon_name)
-		{
-			 
-			char cTemp2[255];
-			WideCharToMultiByte( CP_ACP, 0, temp_icon_name.GetBuffer(), -1, cTemp2, 255, NULL, NULL );
-			memcpy(bac_label.ico_name_2,cTemp2,10);
-		}
-		else
-		{
-			temp_icon_name=_T("");
-			memset(bac_label.ico_name_2,0,10);
-		}
-
-
-		bac_label.n_iconsize = q.getIntField("Icon_Size");
-		bac_label.ntext_place =q.getIntField("Icon_Place");
-
-		//for (int j=0;j<BAC_GRPHIC_LABEL_COUNT ; j++)
-		//{
-		//	if((m_graphic_label_data.at(j).reg.nSerialNum == m_nSerialNumber) &&
-		//		(m_graphic_label_data.at(j).reg.nScreen_index == bac_label.nScreen_index))
-		//	{
-
-		//	}
-		//}
-		
-		m_graphic_label_data.at(ncount).reg.label_status = ENABLE_LABEL;
-		memcpy(m_graphic_label_data.at(ncount).reg.icon_name_1,bac_label.ico_name,20);
-		memcpy(m_graphic_label_data.at(ncount).reg.icon_name_2,bac_label.ico_name_2,20);
-		m_graphic_label_data.at(ncount).reg.nclrTxt = bac_label.nclrTxt;
-		m_graphic_label_data.at(ncount).reg.nDisplay_Type = bac_label.nDisplay_Type;
-		m_graphic_label_data.at(ncount).reg.nIcon_place = bac_label.ntext_place;
-		m_graphic_label_data.at(ncount).reg.nIcon_size = bac_label.n_iconsize;
-		m_graphic_label_data.at(ncount).reg.nLabel_index = bac_label.nLabel_index;
-		m_graphic_label_data.at(ncount).reg.nMain_Panel = bac_label.nMain_Panel;
-		m_graphic_label_data.at(ncount).reg.nPoint_number = bac_label.nPoint_number;
-		m_graphic_label_data.at(ncount).reg.nPoint_type = bac_label.nPoint_type ;
-		m_graphic_label_data.at(ncount).reg.nPoint_x = temp_x_persent;
-		m_graphic_label_data.at(ncount).reg.nPoint_y = temp_y_persent;
-		m_graphic_label_data.at(ncount).reg.nScreen_index = bac_label.nScreen_index;
-		m_graphic_label_data.at(ncount).reg.nSerialNum = bac_label.nSerialNum;
-		m_graphic_label_data.at(ncount).reg.nSub_Panel = bac_label.nSub_Panel;
-		ncount ++;
-		q.nextRow();
-	}
-	 
-	for (int x=ncount;x< BAC_GRPHIC_LABEL_COUNT;x++)
-	{
-		memset(&m_graphic_label_data.at(x),0,sizeof(Str_label_point));
-	}
 	int ret_return = 0;
 
 	for (int i=0;i<BAC_GRPHIC_LABEL_GROUP - 1;i++ )
@@ -2373,11 +2186,6 @@ bool CBacnetScreenEdit::UpdateDeviceLabelFlash()
 			if(ret_return < 0)
 				return false;
 		}
-		//else
-		//{
-		//	TRACE(_T("start %d  --   size %d  is the same\r\n"),i*BAC_READ_GRPHIC_LABEL_GROUP_NUMBER,sizeof(Str_label_point) * BAC_READ_GRPHIC_LABEL_GROUP_NUMBER);
-		//}
-
 
 	}
 	
@@ -2405,13 +2213,7 @@ void CBacnetScreenEdit::OnCancel()
 		return;
 	}
 
-	if(UpdateDeviceLabelFlash() == false)
-	{
-		if(IDNO == MessageBox(_T("Update data failed .Do you want exit without saving!"),_T("Warning"),MB_YESNO))
-		{
-			return;
-		}
-	}
+
 
 
 	SetClassLong(this->GetSafeHwnd(),GCL_HCURSOR ,(LONG)LoadCursor(NULL , IDC_ARROW));//IDC_ARROW
@@ -2544,39 +2346,6 @@ void CBacnetScreenEdit::OnBnClickedButtonDelete()
 
 
 
-void CBacnetScreenEdit::OnBnClickedButtonDeleteAll()
-{
-	// TODO: Add your control notification handler code here
-
-	if(AfxMessageBox(_T("Do you really want to delete all labels?"),MB_YESNO)==IDYES)
-	{
-		//m_pCon.CreateInstance(_T("ADODB.Connection"));
-		//m_pRs.CreateInstance(_T("ADODB.Recordset"));
-		//m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
- 
-		SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
-		Label_information	label;
-		label=m_RelayLabelLst.at(m_nFoucsIndext);
-
-		try
-		{
-			CString strSql;
-			strSql.Format(_T("delete   from Screen_Label where Serial_Num =%i and Tstat_id=%i and Tips='%s'"),label.nSerialNum,label.tstat_id,label.strTips);
-			SqliteDBT3000.execDML((UTF8MBSTR)strSql);
-		}
-		catch(_com_error *e)
-		{
-			AfxMessageBox(e->ErrorMessage());
-		}
-		SqliteDBT3000.closedb();
-
-		ReloadLabelsFromDB();
-		Invalidate();
-		m_nFoucsIndext=-1;
-	}
-}
-
-
 
 void CBacnetScreenEdit::SaveBacLabel(int nItem)
 {
@@ -2588,29 +2357,8 @@ void CBacnetScreenEdit::SaveBacLabel(int nItem)
 	//m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
 	::GetWindowRect(BacNet_hwd,&mynew_rect);	//获取 view的窗体大小;
 
-
-	int nLeft_persent,nTop_persent;
-	nLeft_persent = (m_bac_label_vector.at(nItem).nPoint_x * 1000)/m_paint_right_limit;
-	nTop_persent = (m_bac_label_vector.at(nItem).nPoint_y * 1000)/m_paint_botton_limit;
-	TRACE(_T("nLeft_persent = %d , nTop_persent = %d\r\n"),nLeft_persent,nTop_persent);
-	int temp_serial_number =  m_bac_label_vector.at(nItem).nSerialNum;
-	int temp_screen = m_bac_label_vector.at(nItem).nScreen_index;
-	int temp_label_index = m_bac_label_vector.at(nItem).nLabel_index;
-	try
-	{
-
-
-		CString strSql;
-		strSql.Format(_T("update Screen_Bacnet_Label set Point_X=%i,Point_Y=%i where Serial_Num =%i and Screen_Index=%i and  Label_Index=%i"),
-			nLeft_persent,nTop_persent,temp_serial_number,temp_screen,temp_label_index);
-		SqliteDBT3000.execDML((UTF8MBSTR)strSql);
-	}
-	catch(_com_error *e)
-	{
-		AfxMessageBox(e->ErrorMessage());
-	}
-	//if(m_pCon->State)
-	//	m_pCon->Close();
+	m_graphic_label_data.at( m_bac_label_vector.at(nItem).nLabel_index).reg.nPoint_x = (m_bac_label_vector.at(nItem).nPoint_x * 1000)/m_paint_right_limit;
+	m_graphic_label_data.at( m_bac_label_vector.at(nItem).nLabel_index).reg.nPoint_y = (m_bac_label_vector.at(nItem).nPoint_y * 1000)/m_paint_botton_limit;
 }
 
 

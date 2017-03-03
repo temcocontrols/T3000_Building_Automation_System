@@ -75,7 +75,7 @@ void CCommunicationTrafficDlg::OnSize(UINT nType, int cx, int cy)
 		CRect ViewRect;
 		GetClientRect(&ViewRect);
 		TRACE(_T(" View:T=%d,B=%d,L=%d,R=%d\n"),ViewRect.top,ViewRect.bottom,ViewRect.left,ViewRect.right);
-		// m_MsDataGrid.SetWindowPos(this,ViewRect.top,ViewRect.left,ViewRect.Width(),ViewRect.Height(),SWP_SHOWWINDOW|SWP_NOZORDER);
+		 
 		if (m_DataList.GetSafeHwnd())
 		{
 			m_DataList.MoveWindow(CRect(0,40,ViewRect.Width(),ViewRect.Height()),TRUE);

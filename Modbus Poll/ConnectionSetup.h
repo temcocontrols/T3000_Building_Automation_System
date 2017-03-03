@@ -51,5 +51,8 @@ public:
 	afx_msg void OnCbnSelchangeComboboxConnectionType();
 	afx_msg void OnCbnSelchangeComboboxComport();
 	afx_msg void OnBnClickedOk();
-	CComboBox m_combox_brandrate;
+ 
+	CComboBox m_combox_databits;
+	CComboBox m_combox_parity;
+	CComboBox m_combox_stopbits;
 };

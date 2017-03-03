@@ -527,7 +527,7 @@ int MONTHCAL_CalculateDayOfWeek(SYSTEMTIME *date, BOOL inplace)
 }
 
 /* add/subtract 'months' from date */
-static inline void MONTHCAL_GetMonth(SYSTEMTIME *date, INT months)
+void MONTHCAL_GetMonth(SYSTEMTIME *date, INT months)
 {
   INT length, m = date->wMonth + months;
 
@@ -737,14 +737,17 @@ MONTHCAL_GetMonthRange(const MONTHCAL_INFO *infoPtr, DWORD flag, SYSTEMTIME *st)
   }
   case GMR_DAYSTATE:
   {
+	  if (infoPtr->dwStyle & MCS_NOTRAILINGDATES)
+	  {
+		  return MONTHCAL_GetMonthRange(infoPtr, GMR_VISIBLE, st);
+	  }
+
       if (st)
       {
           MONTHCAL_GetMinDate(infoPtr, &st[0]);
           MONTHCAL_GetMaxDate(infoPtr, &st[1]);
       }
-      /* include two partially visible months if MCS_NOTRAILINGDATES not set */
-	  BOOL IsTrailing = !(infoPtr->dwStyle & MCS_NOTRAILINGDATES);
-      range = MONTHCAL_GetCalCount(infoPtr) + ( IsTrailing ? 2 : 0 );
+      range = MONTHCAL_GetCalCount(infoPtr);
       break;
   }
   default:
@@ -877,7 +880,6 @@ MONTHCAL_RemoveFromSelection(MONTHCAL_INFO * infoPtr, const SYSTEMTIME * date)
 		item = item->next;
 	}
 
-	MONTHCAL_NotifySelectionChange(infoPtr);
 	MONTHCAL_RedrawDayRect(infoPtr, date);
 }
 
@@ -912,8 +914,6 @@ added:
 		MONTHCAL_RemoveFromSelection(infoPtr, &infoPtr->selectionInfo.first->date);
 		return;
 	}
-	MONTHCAL_NotifySelect(infoPtr);
-	MONTHCAL_NotifySelectionChange(infoPtr);
 	MONTHCAL_RedrawDayRect(infoPtr, date);
 }
 
@@ -937,8 +937,6 @@ static void MONTHCAL_UnselectAll(MONTHCAL_INFO * infoPtr)
 		MONTHCAL_RemoveFromSelection(infoPtr, &item->date);
 		item = infoPtr->selectionInfo.first;
 	}
-
-	MONTHCAL_NotifySelectionChange(infoPtr);
 }
 
 static void MONTHCAL_DrawDay(const MONTHCAL_INFO *infoPtr, HDC hdc, const SYSTEMTIME *st,
@@ -984,7 +982,7 @@ static void MONTHCAL_DrawDay(const MONTHCAL_INFO *infoPtr, HDC hdc, const SYSTEM
 //#include <afxvisualmanager.h>
 static void MONTHCAL_PaintButton(MONTHCAL_INFO *infoPtr, HDC hdc, enum nav_direction button)
 {
-    HTHEME theme = OpenThemeData(infoPtr->hwndSelf, L"MonthCal");//::GetWindowTheme(infoPtr->hwndSelf);
+    HTHEME theme = ::OpenThemeData(infoPtr->hwndSelf, themeClass);//::GetWindowTheme(infoPtr->hwndSelf);
     RECT *r = button == DIRECTION_FORWARD ? &infoPtr->titlebtnnext : &infoPtr->titlebtnprev;
     BOOL pressed = button == DIRECTION_FORWARD ? infoPtr->status & MC_NEXTPRESSED :
                                                  infoPtr->status & MC_PREVPRESSED;    
@@ -1322,12 +1320,12 @@ static void MONTHCAL_PaintCalendar(const MONTHCAL_INFO *infoPtr, HDC hdc, const 
   SetTextColor(hdc, infoPtr->colors[MCSC_TEXT]);
   st = *date;
   st.wDay = 1;
-  mask = 0;
+  mask = 1;
   length = MONTHCAL_MonthLength(date->wMonth, date->wYear);
   while(st.wDay <= length)
   {
-    MONTHCAL_DrawDay(infoPtr, hdc, &st, infoPtr->monthdayState[calIdx+1] & mask, ps);
-    //mask <<= 1;
+    MONTHCAL_DrawDay(infoPtr, hdc, &st, infoPtr->monthdayState[calIdx + (infoPtr->dwStyle & MCS_NOTRAILINGDATES ? 0 : 1)] & mask, ps);
+    mask <<= 1;
     st.wDay++;
   }
 }
@@ -1675,7 +1673,6 @@ MONTHCAL_SetCurSel(MONTHCAL_INFO *infoPtr, SYSTEMTIME *curSel)
   }
 
   MONTHCAL_AddToSelection(infoPtr, curSel);
-  MONTHCAL_SetRange(infoPtr, 1, curSel);
   return TRUE;
 }
 
@@ -1972,8 +1969,8 @@ static void MONTHCAL_NotifyDayState(MONTHCAL_INFO *infoPtr)
   nmds.stStart.wDay = 1;
 
   SendMessageW(infoPtr->hwndNotify, WM_NOTIFY, nmds.nmhdr.idFrom, (LPARAM)&nmds);
-  memcpy(infoPtr->monthdayState, nmds.prgDayState,
-      MONTHCAL_GetMonthRange(infoPtr, GMR_DAYSTATE, 0)*sizeof(MONTHDAYSTATE));
+  //memcpy(infoPtr->monthdayState, nmds.prgDayState,
+  //    MONTHCAL_GetMonthRange(infoPtr, GMR_DAYSTATE, 0)*sizeof(MONTHDAYSTATE));
 
   Free(state);
 }
@@ -2019,6 +2016,8 @@ MONTHCAL_RButtonUp(MONTHCAL_INFO *infoPtr, LPARAM lParam)
 		     menupoint.x, menupoint.y, 0, infoPtr->hwndSelf, NULL))
   {
       MONTHCAL_SetCurSel(infoPtr, &infoPtr->todaysDate);
+	  MONTHCAL_NotifySelect(infoPtr);
+	  MONTHCAL_NotifySelectionChange(infoPtr);
   }
 
   return 0;
@@ -2177,6 +2176,8 @@ MONTHCAL_LButtonDown(MONTHCAL_INFO *infoPtr, LPARAM lParam)
   case MCHT_TODAYLINK:
   {
     MONTHCAL_SetCurSel(infoPtr, &infoPtr->todaysDate);
+	MONTHCAL_NotifySelect(infoPtr);
+	MONTHCAL_NotifySelectionChange(infoPtr);
     return 0;
   }
   case MCHT_CALENDARDATENEXT:
@@ -2191,6 +2192,8 @@ MONTHCAL_LButtonDown(MONTHCAL_INFO *infoPtr, LPARAM lParam)
   {
 	  infoPtr->status = MC_SEL_LBUTDOWN;
 	  MONTHCAL_ChangeSelection(infoPtr, &ht.st);
+	  MONTHCAL_NotifySelect(infoPtr);
+	  MONTHCAL_NotifySelectionChange(infoPtr);
 	  MONTHCAL_SetDayFocus(infoPtr, &ht.st);
       return 0;
   }
@@ -2328,6 +2331,8 @@ MONTHCAL_MouseMove(MONTHCAL_INFO *infoPtr, LPARAM lParam)
   if(!MONTHCAL_SetDayFocus(infoPtr, &ht.st)) return 0;
 
   MONTHCAL_ChangeSelection(infoPtr, &ht.st);
+  MONTHCAL_NotifySelect(infoPtr);
+  MONTHCAL_NotifySelectionChange(infoPtr);
 
   return 0;
 }
@@ -2511,8 +2516,11 @@ static void MONTHCAL_UpdateSize(MONTHCAL_INFO *infoPtr)
       infoPtr->dim.cy = y;
       infoPtr->calendars = (CALENDAR_INFO*)ReAlloc(infoPtr->calendars, MONTHCAL_GetCalCount(infoPtr)*sizeof(CALENDAR_INFO));
 
+	  int count = MONTHCAL_GetMonthRange(infoPtr, GMR_DAYSTATE, 0);
       infoPtr->monthdayState = (MONTHDAYSTATE*)ReAlloc(infoPtr->monthdayState,
-          MONTHCAL_GetMonthRange(infoPtr, GMR_DAYSTATE, 0)*sizeof(MONTHDAYSTATE));
+		  count *sizeof(MONTHDAYSTATE));
+
+	  ::memset(infoPtr->monthdayState, 0, count * sizeof(MONTHDAYSTATE));
       MONTHCAL_NotifyDayState(infoPtr);
 
       /* update pointers that we'll need */
@@ -2608,6 +2616,7 @@ static LRESULT MONTHCAL_SetFont(MONTHCAL_INFO *infoPtr, HFONT hFont, BOOL redraw
 		infoPtr->hFont = CreateFontIndirect(&lf);
 		lf.lfWeight = FW_BOLD;
 		infoPtr->hBoldFont = CreateFontIndirect(&lf);
+		::CloseThemeData(theme);
 	}
 	else
 	{
@@ -2628,7 +2637,7 @@ static LRESULT theme_changed (const MONTHCAL_INFO* infoPtr)
 {
     HTHEME theme = GetWindowTheme (infoPtr->hwndSelf);
     CloseThemeData (theme);
-    OpenThemeData (infoPtr->hwndSelf, themeClass);
+    ::OpenThemeData (infoPtr->hwndSelf, themeClass);
     return 0;
 }
 
@@ -2664,6 +2673,35 @@ static INT MONTHCAL_StyleChanging(MONTHCAL_INFO *infoPtr, WPARAM wStyleType,
     return 0;
 }
 
+static LRESULT
+MONTHCAL_Destroy(MONTHCAL_INFO *infoPtr)
+{
+	//Clear selections ptrs
+	MONTHCAL_UnselectAll(infoPtr);
+
+	KillTimer(infoPtr->hwndSelf, MC_TODAYUPDATETIMER);
+
+	/* free month calendar info data */
+	if (infoPtr->monthdayState)
+		Free(infoPtr->monthdayState);
+	if (infoPtr->calendars)
+		Free(infoPtr->calendars);
+	SetWindowLongPtrW(infoPtr->hwndSelf, 0, 0);
+
+	HTHEME theme = ::GetWindowTheme(infoPtr->hwndSelf);
+	if (theme)
+		::CloseThemeData(theme);
+
+	INT i;
+	for (i = 0; i < BrushLast; i++) DeleteObject(infoPtr->brushes[i]);
+	for (i = 0; i < PenLast; i++) DeleteObject(infoPtr->pens[i]);
+
+	if (infoPtr)
+		Free(infoPtr);
+
+	return 0;
+}
+
 /* FIXME: check whether dateMin/dateMax need to be adjusted. */
 static LRESULT
 MONTHCAL_Create(HWND hwnd, LPCREATESTRUCTW lpcs)
@@ -2682,10 +2720,12 @@ MONTHCAL_Create(HWND hwnd, LPCREATESTRUCTW lpcs)
   infoPtr->hwndSelf = hwnd;
   infoPtr->hwndNotify = lpcs->hwndParent;
   infoPtr->dwStyle = (DWORD)::GetWindowLongPtr(hwnd, GWL_STYLE);
-  infoPtr->dim.cx = infoPtr->dim.cy = 1;
+  infoPtr->dim.cx = 1;
+  infoPtr->dim.cy = 1;
   infoPtr->calendars = (CALENDAR_INFO*)Alloc(sizeof(CALENDAR_INFO));
   if (!infoPtr->calendars) goto fail;
   infoPtr->monthdayState = (MONTHDAYSTATE*)Alloc(3*sizeof(MONTHDAYSTATE));
+  ::memset(infoPtr->monthdayState, 0, 3 * sizeof(MONTHDAYSTATE));
   if (!infoPtr->monthdayState) goto fail;
 
   /* initialize info structure */
@@ -2740,30 +2780,9 @@ MONTHCAL_Create(HWND hwnd, LPCREATESTRUCTW lpcs)
   return 0;
 
 fail:
-  Free(infoPtr->monthdayState);
-  Free(infoPtr->calendars);
-  Free(infoPtr);
-  return 0;
+  return MONTHCAL_Destroy(infoPtr);
 }
 
-static LRESULT
-MONTHCAL_Destroy(MONTHCAL_INFO *infoPtr)
-{
-  INT i;
-
-  /* free month calendar info data */
-  Free(infoPtr->monthdayState);
-  Free(infoPtr->calendars);
-  SetWindowLongPtrW(infoPtr->hwndSelf, 0, 0);
-
-  CloseThemeData (GetWindowTheme (infoPtr->hwndSelf));
-
-  for (i = 0; i < BrushLast; i++) DeleteObject(infoPtr->brushes[i]);
-  for (i = 0; i < PenLast; i++) DeleteObject(infoPtr->pens[i]);
-
-  Free(infoPtr);
-  return 0;
-}
 
 /*
  * Handler for WM_NOTIFY messages
@@ -2948,15 +2967,6 @@ MONTHCAL_WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     return DefWindowProcW(hwnd, uMsg, wParam, lParam);
   }
 }
-
-#define MULTIPLEMONTHCAL_CLASSA          "MultipleMonthCal32"
-#define MULTIPLEMONTHCAL_CLASSW          L"MultipleMonthCal32"
-
-#ifdef UNICODE
-#define MULTIPLEMONTHCAL_CLASS           MULTIPLEMONTHCAL_CLASSW
-#else
-#define MULTIPLEMONTHCAL_CLASS           MULTIPLEMONTHCAL_CLASSA
-#endif
 
 VOID    MONTHCAL_Register(VOID)
 {

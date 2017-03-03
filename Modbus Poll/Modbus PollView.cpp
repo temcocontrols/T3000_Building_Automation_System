@@ -16,6 +16,7 @@
 #include "RegisterValueAnalyzerDlg.h"
 #include "../SQLiteDriver/CppSQLite3.h"
 #include "WriteFunctionDlg.h"
+#include "WriteSingleCoilDlg.h"
  
 // #include "CApplication.h"
 // #include "CWorkbook.h"
@@ -41,7 +42,7 @@ BEGIN_MESSAGE_MAP(CModbusPollView, CFormView)
 	ON_WM_SIZE()
 //	ON_BN_CLICKED(IDC_START, &CModbusPollView::OnBnClickedStart)
 ON_WM_CTLCOLOR()
-ON_EN_KILLFOCUS(IDC_EDIT_NAME, &CModbusPollView::OnEnKillfocusEditName)
+ 
  
 ON_COMMAND(ID_EDIT_ADD, &CModbusPollView::OnEditAdd)
 ON_COMMAND(ID_SETUP_TXT_LOG, &CModbusPollView::OnSetupTxtLog)
@@ -57,6 +58,16 @@ ON_COMMAND(ID_EDIT_CHANGEMODELNAME, &CModbusPollView::OnEditChangemodelname)
 ON_COMMAND(ID_FUNCTIONS_TESTCENTER, &CModbusPollView::OnFunctionsTestcenter)
 ON_COMMAND(ID_SETUP_USEASDEFAULT, &CModbusPollView::OnSetupUseasdefault)
 ON_COMMAND(ID_FUNCTIONS_TESTWRITE, &CModbusPollView::OnFunctionsTestwrite)
+ 
+ON_COMMAND(ID_EDIT_COPY, &CModbusPollView::OnEditCopy)
+ON_COMMAND(ID_FILE_PRINT, &CModbusPollView::OnFilePrint32857)
+
+ON_NOTIFY(NM_DBLCLK, IDC_MSFLEXGRID1, OnGridDblClick)
+ON_NOTIFY(NM_CLICK, IDC_MSFLEXGRID1, OnGridClick)
+ON_NOTIFY(GVN_ENDLABELEDIT, IDC_MSFLEXGRID1, OnGridEndEdit)
+
+
+
 END_MESSAGE_MAP()
 
  
@@ -70,7 +81,7 @@ CModbusPollView::CModbusPollView()
 	  m_Tx=0;
 	  m_MBPoll_Function=3;
 	  m_Slave_ID=GetPrivateProfileInt(_T("MBPOLL_VIEW_SETTING"),_T("SLAVE_ID"),255,g_configfile_path);
-	  m_Function=GetPrivateProfileInt(_T("MBPOLL_VIEW_SETTING"),_T("FUNCTION"),0,g_configfile_path);
+	  m_Function=GetPrivateProfileInt(_T("MBPOLL_VIEW_SETTING"),_T("FUNCTION"),2,g_configfile_path);
 	  m_address=GetPrivateProfileInt(_T("MBPOLL_VIEW_SETTING"),_T("ADDRESS"),0,g_configfile_path);
 	  m_Quantity=GetPrivateProfileInt(_T("MBPOLL_VIEW_SETTING"),_T("QUANTITY"),100,g_configfile_path);
 	  m_Scan_Rate=GetPrivateProfileInt(_T("MBPOLL_VIEW_SETTING"),_T("SCANRATE"),1000,g_configfile_path);
@@ -129,7 +140,7 @@ void CModbusPollView::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_MSFLEXGRID1, m_MsDataGrid);
 	DDX_Control(pDX, IDC_CONNECTION_STATE, m_connectionState);
 	DDX_Control(pDX, IDC_STATIC_TX_RX, m_Tx_Rx);
-	DDX_Control(pDX, IDC_EDIT_NAME, m_edit_name);
+	 
 	DDX_Control(pDX, IDC_MODELNAME, m_ModelNameRichEdit);
 	DDX_Control(pDX, IDC_SLAVEID, m_SlaveIDRichEditCtrl);
 	DDX_Control(pDX, IDC_RICHEDIT_MOD_LIB, m_modelib);
@@ -143,9 +154,7 @@ BOOL CModbusPollView::PreCreateWindow(CREATESTRUCT& cs)
 	return CFormView::PreCreateWindow(cs);
 }
 BEGIN_EVENTSINK_MAP(CModbusPollView, CFormView)
-	ON_EVENT(CModbusPollView, IDC_MSFLEXGRID1, DISPID_DBLCLICK, CModbusPollView::DBClickMsflexgridDataGrid, VTS_NONE)
-	ON_EVENT(CModbusPollView, IDC_MSFLEXGRID1, DISPID_CLICK, CModbusPollView::ClickMsflexgridDataGrid, VTS_NONE)
-//	ON_EVENT(CModbusPollView, IDC_MSFLEXGRID1, DISPID_MOUSEMOVE, CModbusPollView::MouseMoveMsflexgrid1, VTS_I2 VTS_I2 VTS_I4 VTS_I4)
+ 
 END_EVENTSINK_MAP()
 void CModbusPollView::OnInitialUpdate()
 {
@@ -167,12 +176,16 @@ void CModbusPollView::OnInitialUpdate()
 
 	CRect ViewRect;
 	GetClientRect(&ViewRect);
-	//TRACE(_T(" View:T=%d,B=%d,L=%d,R=%d\n"),ViewRect.top,ViewRect.bottom,ViewRect.left,ViewRect.right);
-	// m_MsDataGrid.SetWindowPos(this,ViewRect.top,ViewRect.left,ViewRect.Width(),ViewRect.Height(),SWP_SHOWWINDOW|SWP_NOZORDER);
+	
 	if (m_MsDataGrid.GetSafeHwnd())
 	{
 		m_MsDataGrid.MoveWindow(CRect(0,60,ViewRect.Width(),ViewRect.Height()),TRUE);
 	}
+
+	m_MsDataGrid.EnableDragAndDrop(TRUE);
+	m_MsDataGrid.SetAutoSizeStyle();
+	//m_MsDataGrid.SetEditable(FALSE);
+
 	for (int i=0;i<127;i++)
 	{
 		m_DataBuffer[i]=0;
@@ -282,7 +295,7 @@ void CModbusPollView::OnInitialUpdate()
 }
 
 void CModbusPollView::Fresh_View(){
-	               Fresh_Data();
+	                Fresh_Data();
 }
 void CModbusPollView::Fresh_Data(){
 	 /*
@@ -299,6 +312,7 @@ void CModbusPollView::Fresh_Data(){
 		m_connectionState.SetStringFontSize(12);
 		COLORREF cf=RGB(255,0,0);
 		m_connectionState.SetStringColor(cf);
+		m_cur_modelName = L"";
 		//return;
 	} 
 	else
@@ -309,6 +323,7 @@ void CModbusPollView::Fresh_Data(){
 			m_connectionState.SetStringFontSize(12);
 			COLORREF cf=RGB(255,0,0);
 			m_connectionState.SetStringColor(cf);
+			m_cur_modelName = L"";
 			//return;
 		}
 		else if (m_MultiReadReturnType==-2)
@@ -317,6 +332,7 @@ void CModbusPollView::Fresh_Data(){
 			m_connectionState.SetStringFontSize(12);
 			COLORREF cf=RGB(255,0,0);
 			m_connectionState.SetStringColor(cf);
+			m_cur_modelName = L"";
 			//return;
 		}
 		else if (m_MultiReadReturnType==-3)
@@ -325,6 +341,7 @@ void CModbusPollView::Fresh_Data(){
 			m_connectionState.SetStringFontSize(12);
 			COLORREF cf=RGB(255,0,0);
 			m_connectionState.SetStringColor(cf);
+			m_cur_modelName = L"";
 			//return;
 		}
 		else if (m_MultiReadReturnType==-4)
@@ -333,6 +350,7 @@ void CModbusPollView::Fresh_Data(){
 			m_connectionState.SetStringFontSize(12);
 			COLORREF cf=RGB(255,0,0);
 			m_connectionState.SetStringColor(cf);
+			m_cur_modelName = L"";
 			//return;
 		}
 		else if (m_MultiReadReturnType==-5)
@@ -341,6 +359,7 @@ void CModbusPollView::Fresh_Data(){
 			m_connectionState.SetStringFontSize(12);
 			COLORREF cf=RGB(255,0,0);
 			m_connectionState.SetStringColor(cf);
+			m_cur_modelName = L"";
 			//return;
 		}
 		else
@@ -363,15 +382,19 @@ void CModbusPollView::Fresh_Data(){
 	CString strTemp;
 	if (m_Function==0)
 	{
-		m_MBPoll_Function=3;
+		m_MBPoll_Function=1;
 	} 
 	else if (m_Function==1)
 	{
-		m_MBPoll_Function=6;
+		m_MBPoll_Function=2;
 	}
 	else if (m_Function==2)
 	{
-		m_MBPoll_Function=16;
+		m_MBPoll_Function=3;
+	}
+	else if (m_Function == 3)
+	{
+		m_MBPoll_Function = 4;
 	}
 	else
 	{
@@ -405,6 +428,7 @@ void CModbusPollView::Fresh_Data(){
 		m_SlaveIDRichEditCtrl.SetWindowText(showslaveid);
 		m_SlaveIDRichEditCtrl.SetStringFontSize(13);
 	}
+	 
 	if (m_cur_modelNo!=m_modeldata[0])
 	{
 	  m_ischangedAddress=TRUE;
@@ -412,14 +436,14 @@ void CModbusPollView::Fresh_Data(){
 	 Initial_RegName();
 	COLORREF  cf=RGB(255,255,255);
 /*	m_modelname=GetProductName(m_modeldata[1]);*/
-	if (m_modelname.IsEmpty())
+	/*if (m_modelname.IsEmpty())
 	{
 
 		m_ModelNameRichEdit.SetReadOnly(FALSE);
 		m_ModelNameRichEdit.SetBackgroundColor(FALSE,cf);
 	}
 	else
-	{
+	{*/
 	   if (m_ischangeModelName)
 	   {
 		   m_ModelNameRichEdit.SetReadOnly(FALSE);
@@ -437,7 +461,7 @@ void CModbusPollView::Fresh_Data(){
 		   m_ModelNameRichEdit.SetStringFontSize(13);
 	   }
 	    
-	}
+	//}
 	
 
 	if (m_Rows==0)
@@ -529,8 +553,20 @@ void CModbusPollView::Fresh_Data(){
 	m_grid_cols=3*m_data_cols+1;
 	m_grid_rows=m_data_rows+1;
 	}
-	m_MsDataGrid.put_Cols(m_grid_cols);
-	m_MsDataGrid.put_Rows(m_grid_rows);
+	 
+	TRY 
+	{
+		m_MsDataGrid.SetRowCount(m_grid_rows);
+	    m_MsDataGrid.SetColumnCount(m_grid_cols);
+		m_MsDataGrid.SetFixedRowCount(1);
+		m_MsDataGrid.SetFixedColumnCount(1);
+	}
+	CATCH (CMemoryException, e)
+	{
+		e->ReportError();
+		return;
+	}
+	END_CATCH
 
 	CString index;
 	CString DataTemp;
@@ -540,50 +576,40 @@ void CModbusPollView::Fresh_Data(){
 	if (m_PLC_Addresses==1)
 	{
 		Index_start=1;
-		Index_end=m_MsDataGrid.get_Rows();
+		Index_end=m_MsDataGrid.GetRowCount();
 
 	} 
 	else
 	{
 		Index_start=0;
-		Index_end=m_MsDataGrid.get_Rows()-1;
+		Index_end=m_MsDataGrid.GetRowCount()-1;
 	}
 	row=1;
 	for (int i=Index_start;i<Index_end;i++)
 	{
+
 		index.Format(_T("%d"),i);
-		m_MsDataGrid.put_TextMatrix(row,0,index);
+		m_MsDataGrid.SetItemText(row, 0, index);
 		row++;
 	}
 	//把索引隐藏掉
-	m_MsDataGrid.put_ColWidth(0,0);
+ 
+	//m_MsDataGrid.SetColumnWidth(0, 0);
 	//这里主要是不要显示index行，如果要显示的话，就要把这行屏蔽掉，就可以了
 	//Modbus Poll的
 	if (m_Hide_Alias_Columns!=0)
 	{
 		 //初始化第0行
-		for (int i=1;i<m_MsDataGrid.get_Cols();i++)
+		for (int i=1;i<m_MsDataGrid.GetColumnCount();i++)
 		{
-			index.Format(_T("%d"),m_address+(i-1)*(m_MsDataGrid.get_Rows()-1));
-			m_MsDataGrid.put_TextMatrix(0,i,index);
+			index.Format(_T("%d"),m_address+(i-1)*(m_MsDataGrid.GetRowCount()-1));
+		 
+			m_MsDataGrid.SetItemText(0, i, index);
 		}
 		
-// 			for (int j=1;j<m_MsDataGrid.get_Cols();j++)
-// 			{
-// 				for (int i=1;i<m_MsDataGrid.get_Rows();i++)
-// 				{
-// 					Index=(j-1)*(m_MsDataGrid.get_Rows()-1)+(i-1);
-// 					if (Index<=m_Quantity)
-// 					{
-// 						m_MsDataGrid.put_TextMatrix(i,j,Get_Data(Index));
-// 					}
-// 				}
-// 			}
-
-
- 			for (int i=1;i<m_MsDataGrid.get_Cols();i++)
+ 			for (int i=1;i<m_MsDataGrid.GetColumnCount();i++)
  			{
- 				for (int j=0;j<m_MsDataGrid.get_Rows();j++)
+ 				for (int j=0;j<m_MsDataGrid.GetRowCount();j++)
  				{
  
  					if (j==0)
@@ -592,23 +618,25 @@ void CModbusPollView::Fresh_Data(){
  						if (i%2==1)
  						{
  							index=L"Address";
- 							m_MsDataGrid.put_TextMatrix(0,i,index);
+ 							m_MsDataGrid.SetItemText(0,i,index);
+							m_MsDataGrid.SetItemFgColour(0, i, RGB(139, 126, 102));
  						} 
  						else
  						{
  							index=L"Value";
- 							m_MsDataGrid.put_TextMatrix(0,i,index);
+ 							m_MsDataGrid.SetItemText(0,i,index);
+							m_MsDataGrid.SetItemFgColour(0, i, RGB(0, 0, 0));
  						}
  					} 
  					else
  					{
 					    if (i%2==0)
 					    {
-						Index=(i/2-1)*(m_MsDataGrid.get_Rows()-1)+(j-1);
+						Index=(i/2-1)*(m_MsDataGrid.GetRowCount()-1)+(j-1);
 					    } 
 					    else
 					    {
-						Index=(i/2)*(m_MsDataGrid.get_Rows()-1)+(j-1);
+						Index=(i/2)*(m_MsDataGrid.GetRowCount()-1)+(j-1);
 					    }
   						
   						if (i%2==1)//Add
@@ -617,14 +645,18 @@ void CModbusPollView::Fresh_Data(){
   							{
   								CString StrTemp;
   								StrTemp.Format(_T("%d"),Get_Reg_Add(Index));
-  								m_MsDataGrid.put_TextMatrix(j,i,StrTemp);
-  							}
+  								m_MsDataGrid.SetItemText(j,i,StrTemp);
+								//m_MsDataGrid.SetTextColor(RGB(70, 130, 180));
+								m_MsDataGrid.SetItemFgColour(j, i, RGB(139, 126, 102));
+  								
+							}
   						}
   						else//Value
   						{
   							if (Index<=m_Quantity)
   							{
-  								m_MsDataGrid.put_TextMatrix(j,i,Get_Data(Index));
+  								m_MsDataGrid.SetItemText(j,i,Get_Data(Index));
+								m_MsDataGrid.SetItemFgColour(j, i, RGB(0, 0, 0));
   							}
   						}
  					}
@@ -633,12 +665,12 @@ void CModbusPollView::Fresh_Data(){
 	}
 	else{
 		//初始化行
-		for (int i=1;i<m_MsDataGrid.get_Cols();i++)
+		for (int i=1;i<m_MsDataGrid.GetColumnCount();i++)
 		{
 
 			
 			 
-			for (int j=0;j<m_MsDataGrid.get_Rows();j++)
+			for (int j=0;j<m_MsDataGrid.GetRowCount();j++)
 			{
                  if (j==0)
                  {
@@ -646,17 +678,20 @@ void CModbusPollView::Fresh_Data(){
 					 if((i%3)==1)
 					 {
 						 index=L"Description";
-						 m_MsDataGrid.put_TextMatrix(0,i,index);
+						 m_MsDataGrid.SetItemText(0,i,index);
+						 m_MsDataGrid.SetItemFgColour(0, i, RGB(70, 130, 180));
 					 } 
 					else if ((i%3)==2)
 					 {
 						 index=L"Address";
-						 m_MsDataGrid.put_TextMatrix(0,i,index);
+						 m_MsDataGrid.SetItemText(0,i,index);//	139 126 102
+						 m_MsDataGrid.SetItemFgColour(0, i, RGB(139, 126, 102));
 					 } 
 					 else if ((i%3)==0)
 					 {
 						 index=L"Value";
-						 m_MsDataGrid.put_TextMatrix(0,i,index);
+						 m_MsDataGrid.SetItemText(0,i,index);
+						 m_MsDataGrid.SetItemFgColour(0, i, RGB(0, 0, 0));
 					 }
 					 
                  } 
@@ -664,28 +699,32 @@ void CModbusPollView::Fresh_Data(){
                  {
 					 if ((i%3)==1)
 					 {
-						 Index=((i+2)/3-1)*(m_MsDataGrid.get_Rows()-1)+(j-1);
-						 m_MsDataGrid.put_TextMatrix(j,i, m_Alias[Index]);
+						 Index=((i+2)/3-1)*(m_MsDataGrid.GetRowCount()-1)+(j-1);
+
+						 m_MsDataGrid.SetItemText(j,i, m_Alias[Index]);
+						 m_MsDataGrid.SetItemFgColour(j, i, RGB(70, 130, 180));
 
 					 }
 					 else if ((i%3)==2)
 					 {
-						 Index=((i+1)/3-1)*(m_MsDataGrid.get_Rows()-1)+(j-1);
+						 Index=((i+1)/3-1)*(m_MsDataGrid.GetRowCount()-1)+(j-1);
 						 if (Index<=m_Quantity)
 						 {
 							 CString StrTemp;
 							 StrTemp.Format(_T("%d"),Get_Reg_Add(Index));
-							 m_MsDataGrid.put_TextMatrix(j,i,StrTemp);
+							 m_MsDataGrid.SetItemText(j,i,StrTemp);
+							 m_MsDataGrid.SetItemFgColour(j, i, RGB(139, 126, 102));
 							 
 						 }
-						 
+						 //m_MsDataGrid.SetItemState(j, i, GVIS_READONLY);
 					 }
 					 else if ((i%3)==0)
 					 {
-						 Index=(i/3-1)*(m_MsDataGrid.get_Rows()-1)+(j-1);
+						 Index=(i/3-1)*(m_MsDataGrid.GetRowCount()-1)+(j-1);
 						 if (Index<=m_Quantity)
 						 {
-							 m_MsDataGrid.put_TextMatrix(j,i,Get_Data(Index));
+							 m_MsDataGrid.SetItemText(j,i,Get_Data(Index));
+							 m_MsDataGrid.SetItemFgColour(j, i, RGB(0, 0, 0));
 						 }
 					 }
 
@@ -695,7 +734,7 @@ void CModbusPollView::Fresh_Data(){
 		}
 	}
 
-   
+	m_MsDataGrid.AutoSize();
       
      if(g_Draw_dlg!=NULL)  //&& g_Draw_dlg->IsWindowVisible()
      {
@@ -711,7 +750,7 @@ void CModbusPollView::Fresh_Data(){
          g_Time_Offset+=5;
          if (g_Time_Offset%10==0)
          {
-            ::PostMessage(g_Draw_dlg->m_hWnd,MY_FRESH_DRAW_GRAPHIC,0,0);
+            ::SendMessage(g_Draw_dlg->m_hWnd,MY_FRESH_DRAW_GRAPHIC,0,0);
             Sleep(200);   //响应绘图
          } 
        
@@ -884,6 +923,7 @@ CString CModbusPollView::Get_Data(int index){
 		}
 		strToReturn = tempStr;
 		break;
+
 	default: 
 		tempVal2 = (unsigned short int)val;
 		strToReturn.Format(_T("%06d"), tempVal2);
@@ -1145,240 +1185,13 @@ LRESULT CModbusPollView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
 	if(MY_FRESH_MBPOLLVIEW==message){
 		Fresh_Data();
+		TRACE("Fresh_Data\n");
 	}
 	return CFormView::WindowProc(message, wParam, lParam);
 }
 
 
-HBRUSH CModbusPollView::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
-{
-	HBRUSH hbr = CFormView::OnCtlColor(pDC, pWnd, nCtlColor);
-
-
-	
-
-	// TODO:  Change any attributes of the DC here
-
-	// TODO:  Return a different brush if the default is not desired
-	return hbr;
-}
-
-void CModbusPollView::DBClickMsflexgridDataGrid(){
-	long lRow,lCol;
-	lRow = m_MsDataGrid.get_RowSel();//获取点击的行号	
-	lCol = m_MsDataGrid.get_ColSel(); //获取点击的列号
-	TRACE(_T("Click input grid!\n"));
-
-	CRect rect;
-	m_MsDataGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
-	ScreenToClient(rect); //转换为客户区矩形	
-	CDC* pDC =GetDC();
-
-	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
-	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-	//计算选中格的左上角的坐标(象素为单位)
-	long y = m_MsDataGrid.get_RowPos(lRow)/nTwipsPerDotY;
-	long x = m_MsDataGrid.get_ColPos(lCol)/nTwipsPerDotX;
-	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
-	long width = m_MsDataGrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
-	long height = m_MsDataGrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
-	//形成选中个所在的矩形区域
-	CRect rcCell(x,y,x+width,y+height);
-	//转换成相对对话框的坐标
-	rcCell.OffsetRect(rect.left+1,rect.top+1);
-	ReleaseDC(pDC);
-	CString strValue = m_MsDataGrid.get_TextMatrix(lRow,lCol);
-
-	m_Current_Col=lCol;
-	m_Current_Row=lRow;
-	
-	int Index;
-    UINT Address;
-	if (m_Hide_Alias_Columns!=0)//都是数值的
-	{
-	//	Index=(lCol/3)*(m_MsDataGrid.get_Rows()-1)+(lRow-1);
-		if (lCol%2==0)
-		{
-			Index=(lCol/2-1)*(m_MsDataGrid.get_Rows()-1)+(lRow-1);
-		} 
-		else
-		{
-			Index=(lCol/2)*(m_MsDataGrid.get_Rows()-1)+(lRow-1);
-		}
-
-		Show_Name=FALSE;
-	}
-	else//含义名字的
-	{
-		if (lCol%3==1)
-		{
-			Show_Name=TRUE;
-		}
-		else
-		{
-			Show_Name=FALSE;
-
-
-			if (lCol%3==0)
-			{
-				Index=(lCol/3-1)*(m_MsDataGrid.get_Rows()-1)+(lRow-1);
-			} 
-			else
-			{
-				Index=(lCol/3)*(m_MsDataGrid.get_Rows()-1)+(lRow-1);
-			}
-
-
-			//Index=(lCol/4)*(m_MsDataGrid.get_Rows()-1)+(lRow-1);
-		}
-
-		//Index=(lCol/2-1)*(m_MsDataGrid.get_Rows()-1)+(lRow-1);
-	}
-	if (Show_Name)
-	{
-		m_edit_name.ShowWindow(SW_SHOW);	
-		m_edit_name.SetWindowText(strValue);
-		m_edit_name.MoveWindow(rcCell); //移动到选中格的位置，覆盖
-		m_edit_name.BringWindowToTop();
-		m_edit_name.SetFocus(); //获取焦点
-
-	} 
-	else
-	{
-		Address=Get_Reg_Add(Index);
-		CString Value=Get_Data_No_Address(Index);
-
-		//CWriteSingleRegisterDlg(UINT Slave_ID=255,UINT Address=0,BOOL Close_Dlg=FALSE,BOOL Single_Function=FALSE,UINT DataFormat=0,int value=0,CWnd* pParent = NULL)
-		if (m_Display<3)
-		{
-			CWriteSingleRegisterDlg dlg(m_Slave_ID,Address,m_close_dlg,m_function,m_Display,m_PLC_Addresses,Value,NULL);
-			if (IDOK==dlg.DoModal())
-			{
-				m_close_dlg=dlg.m_close_dlg;
-				m_function=dlg.m_function;
-			}
-			 
-		}
-		else if (m_Display==3)
-		{
-
-			CWriteSingle_BinaryDlg dlg;
-			dlg.m_slave_id=m_Slave_ID;
-			dlg.m_address=Address;
-			dlg.m_close_dlg=m_close_dlg;
-			dlg.m_function=m_function;
-			dlg.m_data_format=m_Display;
-			dlg.m_base_0=m_PLC_Addresses;
-			dlg.m_StrValue=Value;
-			if (IDOK==dlg.DoModal())
-			{
-				m_close_dlg=dlg.m_close_dlg;
-				m_function=dlg.m_function;
-			}
-
-		}
-	}
-	
-	
-
-}
-
-
-void CModbusPollView::ClickMsflexgridDataGrid(){
-	long lRow,lCol;
-	lRow = m_MsDataGrid.get_RowSel();//获取点击的行号	
-	lCol = m_MsDataGrid.get_ColSel(); //获取点击的列号
-	TRACE(_T("Click input grid!\n"));
-
-	CRect rect;
-	m_MsDataGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
-	ScreenToClient(rect); //转换为客户区矩形	
-	CDC* pDC =GetDC();
-
-	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
-	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-	//计算选中格的左上角的坐标(象素为单位)
-	long y = m_MsDataGrid.get_RowPos(lRow)/nTwipsPerDotY;
-	long x = m_MsDataGrid.get_ColPos(lCol)/nTwipsPerDotX;
-	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
-	long width = m_MsDataGrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
-	long height = m_MsDataGrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
-	//形成选中个所在的矩形区域
-	CRect rcCell(x,y,x+width,y+height);
-	//转换成相对对话框的坐标
-	rcCell.OffsetRect(rect.left+1,rect.top+1);
-	ReleaseDC(pDC);
-
-	CString strValue = m_MsDataGrid.get_TextMatrix(lRow,lCol);
-
-	m_Current_Col=lCol;
-	m_Current_Row=lRow;
-	m_edit_name.ShowWindow(SW_HIDE);
-	if (m_Hide_Alias_Columns!=0)//都是数值的
-	{
-		 
-		Show_Name=FALSE;
-	}
-	else//含义名字的
-	{
-		if (lCol%3==1)
-		{
-			Show_Name=TRUE;
-		}
-		else
-		{
-			Show_Name=FALSE;
-			 
-		}
-
-		//Index=(lCol/2-1)*(m_MsDataGrid.get_Rows()-1)+(lRow-1);
-	}
-
-	if (Show_Name)
-	{
-// 		m_edit_name.ShowWindow(SW_SHOW);	
-// 		m_edit_name.SetWindowText(strValue);
-// 		m_edit_name.MoveWindow(rcCell); //移动到选中格的位置，覆盖
-// 		m_edit_name.BringWindowToTop();
-// 		m_edit_name.SetFocus(); //获取焦点
-    
-	} 
-
-	   //          m_MsDataGrid.put_Row(lRow);
-				//m_MsDataGrid.put_Col(lCol);
-				////100 149 237
-				//m_MsDataGrid.put_CellBackColor(RGB(100,150,240));
-
- //   if (lRow!=0&&lCol==0)
- //   {
-	//	/*for (int row=1;row<m_msflexgrid.get_Rows();row++)
-	//	{*/
-	//		for (int i=1;i<m_MsDataGrid.get_Cols();i++){
-	//			m_MsDataGrid.put_Row(lRow);
-	//			m_MsDataGrid.put_Col(i);
-	//			//100 149 237
-	//			m_MsDataGrid.put_CellBackColor(RGB(100,150,240));
-	//		}
-	///*	}*/
-	// 
- //   }
-	//if (lCol!=0&&lRow==0)
-	//{
-	//	for (int row=1;row<m_MsDataGrid.get_Rows();row++)
-	//	{
-	//		/*for (int i=1;i<m_msflexgrid.get_Cols();i++){*/
-	//			m_MsDataGrid.put_Row(row);
-	//			m_MsDataGrid.put_Col(lCol);
-	//			//100 149 237
-	//			m_MsDataGrid.put_CellBackColor(RGB(100,150,240));
-	//	/*	}*/
-	//	}
-	//}
-
-}
-
-
-
+ 
 
  DWORD WINAPI _Multi_Read_Fun03(LPVOID pParam){
 	CModbusPollView* pMBPollView=(CModbusPollView*)(pParam);
@@ -1410,7 +1223,7 @@ void CModbusPollView::ClickMsflexgridDataGrid(){
 		Sleep(1000);
 		if (pMBPollView->m_hWnd!=NULL)
 		{
-			::PostMessage(pMBPollView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
+			::SendMessage(pMBPollView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
 		}
 		  continue;
 	}
@@ -1458,6 +1271,8 @@ void CModbusPollView::ClickMsflexgridDataGrid(){
 	{*/
 		unsigned char rev_back_rawData[300],send_data[100];
 		int tt=read_multi_log(ID,&pMBPollView->m_modeldata[0],6,2,&send_data[0],&rev_back_rawData[0],&Send_length,&Rev_length);
+		
+		
 		if (tt>0)
 		{
 			pMBPollView->m_isgetmodel=TRUE;
@@ -1482,7 +1297,7 @@ void CModbusPollView::ClickMsflexgridDataGrid(){
 
 	if (pMBPollView->m_hWnd!=NULL)
 	{
-		::PostMessage(pMBPollView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
+		::SendMessage(pMBPollView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
 	}
 	Sleep(sleep);
 	}
@@ -1503,7 +1318,7 @@ void CModbusPollView::OnEditAdd()
 	int Index;
 	if(m_Hide_Alias_Columns!=0)//都是数值的
 	{
-		//Index=(m_Current_Col-1)*(m_MsDataGrid.get_Rows()-1)+(m_Current_Row-1);
+		 
         if (m_Current_Col%2!=0)
         {
             return;
@@ -1511,7 +1326,7 @@ void CModbusPollView::OnEditAdd()
         else
         {
 
-            Index=(m_Current_Col/2-1)*(m_MsDataGrid.get_Rows()-1)+(m_Current_Row-1);
+            Index=(m_Current_Col/2-1)*(m_MsDataGrid.GetRowCount()-1)+(m_Current_Row-1);
         }
 	}
 	else//含义名字的
@@ -1523,7 +1338,7 @@ void CModbusPollView::OnEditAdd()
 		else
 		{
 			 
-			Index=(m_Current_Col/3-1)*(m_MsDataGrid.get_Rows()-1)+(m_Current_Row-1);
+			Index=(m_Current_Col/3-1)*(m_MsDataGrid.GetRowCount()-1)+(m_Current_Row-1);
 		}
 
 	 
@@ -1701,11 +1516,29 @@ void CModbusPollView::OnUpdateSetupExcelloging(CCmdUI *pCmdUI)
 	pCmdUI->Enable(m_logExcel);
 }
 void CModbusPollView::Initial_RegName(){
+	
 	_variant_t temp_var;
-	if ((!m_isgetmodel)&&(!m_ischangedAddress)&&(!m_ischangeModelName))
+	if (!m_isgetmodel)
 	{
+		m_VecregisterData.clear();
+		// 		for (int i = 0; i < 127; i++)
+		// 		{
+		// 			m_Alias[i] = _T("");
+		// 		}
+		//memset(m_DataBuffer, 0, 127);
 		return;
 	}
+	if ((!m_isgetmodel)&&(!m_ischangedAddress)&&(!m_ischangeModelName))
+	{
+		m_VecregisterData.clear();
+// 		for (int i = 0; i < 127; i++)
+// 		{
+// 			m_Alias[i] = _T("");
+// 		}
+	//	memset(m_DataBuffer, 0, 127);
+		return;
+	}
+	
 	 
 	 //	m_ischangeModelName=FALSE
 	m_VecregisterData.clear();
@@ -1754,9 +1587,7 @@ void CModbusPollView::Initial_RegName(){
 				while (!q.eof())
 				{
 
-				 
 					tempstuct.RegAddress = q.getIntField((UTF8MBSTR)RegAddress);
-					 
 					tempstuct.RegName = q.getValuebyName(RegName);
 					m_VecregisterData.push_back(tempstuct);
 					q.nextRow();
@@ -1816,157 +1647,12 @@ void CModbusPollView::OnEnKillfocusModelname()
 {
     CString ModelName;
     GetDlgItem(IDC_MODELNAME)->GetWindowText(ModelName);
-
-
-// 	cf=RGB(212,208,200);
-// 	m_ModelNameRichEdit.SetReadOnly(TRUE);
-// 	m_ModelNameRichEdit.SetBackgroundColor(FALSE,cf);
-// 	showmodelname.Format(_T("%s"),m_modelname.GetBuffer());
-// 	m_ModelNameRichEdit.SetWindowText(showmodelname);
-// 	m_ModelNameRichEdit.SetStringFontSize(13);
-//if (ModelName.CompareNoCase(m_cur_modelName)==0)
-//{
-//return;
-//}
-//    
-//if (m_isnewmodel)
-//{
-//	int ret=   AfxMessageBox(_T("This is a new product model!\nDo you want to add it to Database?"),MB_OKCANCEL,0);
-//
-//	if (ret==1)
-//	{
-//		CADO ado;
-//		ado.OnInitADOConn();
-//		if(ado.IsHaveTable(ado,_T("ProductsTypeRegisterTables")))
-//		{  
-//			CString sql;
-//			sql.Format(_T("Insert into ProductsTypeRegisterTables(ProductType,TableName,ProductName,Col_RegName,Col_RegAddress) values('%d','CustomProductTable','%s','Reg_Description','Reg_ID')"),m_modeldata[1],ModelName);
-//			try
-//			{
-//				ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
-//			}
-//			catch (_com_error *e)
-//			{
-//				AfxMessageBox(e->ErrorMessage());
-//			}
-//		}
-//	} 
-//
-//}
-//if (m_ischangeModelName)
-//{
-//	int ret=   AfxMessageBox(_T("Are you sure to change the name of the unit?"),MB_OKCANCEL,0);
-//
-//	if (ret==1)
-//	{
-//		CADO ado;
-//		ado.OnInitADOConn();
-//		if(ado.IsHaveTable(ado,_T("ProductsTypeRegisterTables")))
-//		{  
-//			CString sql;
-//			sql.Format(_T("update  ProductsTypeRegisterTables Set ProductName='%s'  where ProductType=%d"),ModelName,m_cur_modelNo);
-//			try
-//			{
-//				ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
-//			}
-//			catch (_com_error *e)
-//			{
-//				AfxMessageBox(e->ErrorMessage());
-//			}
-//		}
-//	} 
-//
-//}
-//
-//COLORREF  cf=RGB(212,208,200);
-//m_ModelNameRichEdit.SetReadOnly(TRUE);
-//m_ModelNameRichEdit.SetBackgroundColor(FALSE,cf);
-//CString showmodelname;
-//showmodelname.Format(_T("%s"),ModelName.GetBuffer());
-//m_ModelNameRichEdit.SetWindowText(showmodelname);
-//m_ModelNameRichEdit.SetStringFontSize(13);
-//m_ischangeModelName=FALSE;
 }
-void CModbusPollView::OnEnKillfocusEditName()
-{
-	//CString strText;
-	//m_edit_name.GetWindowTextW(strText);
-	//if (strText.IsEmpty())
-	//{
-	//	return;
-	//}
-	//m_MsDataGrid.put_TextMatrix(m_Current_Row,m_Current_Col,strText);
-	//int Index;
-	//if (m_Current_Col%3==0)
-	//{
-
-	//	Index=(m_Current_Col/3-1)*(m_MsDataGrid.get_Rows()-1)+(m_Current_Row-1);
-	//} 
-	//else
-	//{
-	//	Index=(m_Current_Col/3)*(m_MsDataGrid.get_Rows()-1)+(m_Current_Row-1);
-	//}
-	//m_Alias[Index]=strText;
-	//int RegAddress=Get_Reg_Add(Index);
-	// CADO ado;
-	//ado.OnInitADOConn();
-	//CString SqlText;
-	//if (m_cur_TableName.CompareNoCase(_T("CustomProductTable"))==0)
-	//{
-	//SqlText.Format(_T("Select * from CustomProductTable where ModelNo=%d and Reg_ID=%d"),m_cur_modelNo,RegAddress);
-	//ado.m_pRecordset=ado.OpenRecordset(SqlText);
-	//if (!ado.m_pRecordset->EndOfFile)
-	//{
-	//	//strSql.Format(_T("update ALL_NODE set Hardware_Ver ='%s' where Serial_ID = '%s' and Bautrate = '%s'"),hw_instance,str_serialid,str_baudrate);
-	//	//m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-	//	SqlText.Format(_T("update CustomProductTable set Reg_Description='%s' where ModelNo=%d and Reg_ID=%d "),strText.GetBuffer(),m_cur_modelNo,RegAddress);
-	//	try
-	//	{
-	//	ado.m_pConnection->Execute(SqlText.GetString(),NULL,adCmdText);
-	//	}
-	//	catch (_com_error *e)
-	//	{
-	//		AfxMessageBox(e->ErrorMessage());
-	//	}
-	//} 
-	//else
-	//{
-	//	SqlText.Format(_T("Insert into CustomProductTable(Reg_Description,ModelNo,Reg_ID) values('%s',%d,%d)"),strText.GetBuffer(),m_cur_modelNo,RegAddress);
-	//	try
-	//	{
-	//		ado.m_pConnection->Execute(SqlText.GetString(),NULL,adCmdText);
-	//	}
-	//	catch (_com_error *e)
-	//	{
-	//		AfxMessageBox(e->ErrorMessage());
-	//	}
-	//}
-	//   
-	//} 
-	//else
-	//{
-	//   SqlText.Format(_T("Select * from %s where %s=%d"),m_cur_TableName,m_cur_col_RegAddress,RegAddress);
-	//   ado.m_pRecordset=ado.OpenRecordset(SqlText);
-	//   if (!ado.m_pRecordset->EndOfFile)
-	//   {
-	//     SqlText.Format(_T("update %s set %s ='%s' where %s =%d "),m_cur_TableName,m_cur_Col_RegName,strText.GetBuffer(),m_cur_col_RegAddress,RegAddress);
-	//	 try
-	//	 {
-	//	 ado.m_pConnection->Execute(SqlText.GetString(),NULL,adCmdText);
-	//	 }
-	//	 catch (_com_error *e)
-	//	 {
-	//	 	AfxMessageBox(e->ErrorMessage());
-	//	 }
-	//	 
-	//   }
-	//}
-
-}
+ 
 
 void CModbusPollView::OnEditChangemodelname()
 {
-	m_ischangeModelName=TRUE;
+	//m_ischangeModelName=TRUE;
 }
 
  #include "TestCenter.h"
@@ -2040,3 +1726,170 @@ void CModbusPollView::OnFunctionsTestwrite()
 	dlg.m_device_id = m_Slave_ID;
 	dlg.DoModal();
 }
+
+
+
+
+void CModbusPollView::OnEditCopy()
+{
+	m_MsDataGrid.OnEditCopy();
+}
+
+
+void CModbusPollView::OnFilePrint32857()
+{
+	m_MsDataGrid.Print();
+}
+void CModbusPollView::OnGridDblClick(NMHDR *pNotifyStruct, LRESULT* /*pResult*/)
+{
+	NM_GRIDVIEW* pItem = (NM_GRIDVIEW*)pNotifyStruct;
+	long lRow, lCol;
+
+	//Trace(_T("Double Clicked on row %d, col %d\n"), pItem->iRow, pItem->iColumn);
+	lRow=pItem->iRow; 
+	lCol = pItem->iColumn;
+
+	m_Current_Col = pItem->iColumn;
+	m_Current_Row = pItem->iRow;
+
+	CString strValue = m_MsDataGrid.GetItemText(lRow, lCol);
+
+	
+
+	int Index;
+	UINT Address;
+	if (m_Hide_Alias_Columns != 0)//都是数值的
+	{
+		//	Index=(lCol/3)*(m_MsDataGrid.get_Rows()-1)+(lRow-1);
+		if (lCol % 2 == 0)
+		{
+			Index = (lCol / 2 - 1)*(m_MsDataGrid.GetRowCount() - 1) + (lRow - 1);
+		}
+		else
+		{
+			Index = (lCol / 2)*(m_MsDataGrid.GetRowCount() - 1) + (lRow - 1);
+		}
+
+		Show_Name = FALSE;
+	}
+	else//含义名字的
+	{
+		if (lCol % 3 == 1)
+		{
+			Show_Name = TRUE;
+		}
+		else
+		{
+			Show_Name = FALSE;
+
+
+			if (lCol % 3 == 0)
+			{
+				Index = (lCol / 3 - 1)*(m_MsDataGrid.GetRowCount() - 1) + (lRow - 1);
+			}
+			else
+			{
+				Index = (lCol / 3)*(m_MsDataGrid.GetRowCount() - 1) + (lRow - 1);
+			}
+
+
+			//Index=(lCol/4)*(m_MsDataGrid.get_Rows()-1)+(lRow-1);
+		}
+
+		//Index=(lCol/2-1)*(m_MsDataGrid.get_Rows()-1)+(lRow-1);
+	}
+	if (Show_Name)
+	{
+// 		m_edit_name.ShowWindow(SW_SHOW);
+// 		m_edit_name.SetWindowText(strValue);
+// 		m_edit_name.MoveWindow(rcCell); //移动到选中格的位置，覆盖
+// 		m_edit_name.BringWindowToTop();
+// 		m_edit_name.SetFocus(); //获取焦点
+	}
+	else
+	{
+		Address = Get_Reg_Add(Index);
+		CString Value = Get_Data_No_Address(Index);
+
+		//CWriteSingleRegisterDlg(UINT Slave_ID=255,UINT Address=0,BOOL Close_Dlg=FALSE,BOOL Single_Function=FALSE,UINT DataFormat=0,int value=0,CWnd* pParent = NULL)
+		if (m_Display < 3)
+		{
+			if (m_MBPoll_Function == 1)
+			{
+				CWriteSingleCoilDlg dlg(m_Slave_ID, Address, m_close_dlg, m_function, m_PLC_Addresses, _wtoi(Value),NULL);
+			
+				if (IDOK == dlg.DoModal())
+				{
+					m_close_dlg = dlg.m_close_dlg;
+					m_function = dlg.m_function15;
+				}
+			}
+			else
+			{
+				
+
+				CWriteSingleRegisterDlg dlg(m_Slave_ID, Address, m_close_dlg, m_function, m_Display, m_PLC_Addresses, Value, NULL);
+				if (IDOK == dlg.DoModal())
+				{
+					m_close_dlg = dlg.m_close_dlg;
+					m_function = dlg.m_function;
+				}
+			}
+			
+
+		}
+		else if (m_Display == 3)
+		{
+
+			CWriteSingle_BinaryDlg dlg;
+			dlg.m_slave_id = m_Slave_ID;
+			dlg.m_address = Address;
+			dlg.m_close_dlg = m_close_dlg;
+			dlg.m_function = m_function;
+			dlg.m_data_format = m_Display;
+			dlg.m_base_0 = m_PLC_Addresses;
+			dlg.m_StrValue = Value;
+			if (IDOK == dlg.DoModal())
+			{
+				m_close_dlg = dlg.m_close_dlg;
+				m_function = dlg.m_function;
+			}
+
+		}
+	}
+
+}
+void CModbusPollView::OnGridClick(NMHDR *pNotifyStruct, LRESULT* /*pResult*/)
+{
+	NM_GRIDVIEW* pItem = (NM_GRIDVIEW*)pNotifyStruct;
+	//Trace(_T("Clicked on row %d, col %d\n"), pItem->iRow, pItem->iColumn);
+}
+void CModbusPollView::OnGridEndEdit(NMHDR *pNotifyStruct, LRESULT* pResult)
+{
+	NM_GRIDVIEW* pItem = (NM_GRIDVIEW*)pNotifyStruct;
+	CString Name = m_MsDataGrid.GetItemText(pItem->iRow, pItem->iColumn);
+	int Index = ((pItem->iColumn + 2) / 3 - 1)*(m_MsDataGrid.GetRowCount() - 1) + (pItem->iRow - 1);
+	//m_MsDataGrid.SetItemText(j, i, m_Alias[Index]); 
+
+	m_Alias[Index] = Name;
+	m_MsDataGrid.SetItemText(pItem->iRow, pItem->iColumn, Name);
+	*pResult = 1;
+}
+BOOL CModbusPollView::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: Add your specialized code here and/or call the base class
+	if (pMsg->message == WM_KEYDOWN)
+	{
+		if (pMsg->wParam == VK_RETURN
+			|| pMsg->wParam == VK_ESCAPE)
+		{
+			::TranslateMessage(pMsg);
+			::DispatchMessage(pMsg);
+			return TRUE;                    // DO NOT process further
+		}
+	}
+	return CFormView::PreTranslateMessage(pMsg);
+}
+
+
+

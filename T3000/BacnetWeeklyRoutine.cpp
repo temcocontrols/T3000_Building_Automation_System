@@ -24,6 +24,7 @@ BacnetWeeklyRoutine::BacnetWeeklyRoutine(CWnd* pParent /*=NULL*/)
 	: CDialogEx(BacnetWeeklyRoutine::IDD, pParent)
 {
 	weekly_list_line = 0;
+	window_max = true;
 }
 
 BacnetWeeklyRoutine::~BacnetWeeklyRoutine()
@@ -48,7 +49,8 @@ BEGIN_MESSAGE_MAP(BacnetWeeklyRoutine, CDialogEx)
 	ON_NOTIFY(NM_CLICK, IDC_LIST_BAC_WEEKLY, &BacnetWeeklyRoutine::OnNMClickListBacWeekly)
 	ON_WM_CLOSE()
 	ON_WM_TIMER()
-
+	ON_WM_SIZE()
+	ON_WM_SYSCOMMAND()
 	ON_WM_HELPINFO()
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST_BAC_WEEKLY, &BacnetWeeklyRoutine::OnNMDblclkListWeeklySchedule)
 END_MESSAGE_MAP()
@@ -104,7 +106,25 @@ BOOL BacnetWeeklyRoutine::PreTranslateMessage(MSG* pMsg)
 		m_weeklyr_list.Get_clicked_mouse_position();
 		return TRUE;
 	}
+	else if(pMsg->message==WM_NCLBUTTONDBLCLK)
+	{
+		if(!window_max)
+		{
+			window_max = true;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
+		}
+		else
+		{
+			window_max = false;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 60 ,temp_mynew_rect.top + 60,500,700,SWP_SHOWWINDOW);
+		}
 
+		return 1; 
+	}
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
@@ -132,9 +152,11 @@ LRESULT BacnetWeeklyRoutine::OnHotKey(WPARAM wParam,LPARAM lParam)
 BOOL BacnetWeeklyRoutine::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-
+	SetWindowTextW(_T("SCHEDULE"));
 	// TODO:  Add extra initialization here
 	Initial_List();
+	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_SCHEDUAL);
+	SetIcon(m_hIcon,TRUE);
 	PostMessage(WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -159,9 +181,12 @@ void BacnetWeeklyRoutine::Initial_List()
 	m_weeklyr_list.InsertColumn(WEEKLY_ROUTINE_HOLIDAY2, _T("Holiday2"), 90, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_weeklyr_list.InsertColumn(WEEKLY_ROUTINE_STATE2, _T("State2"), 70, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_weeklyr_list.InsertColumn(WEEKLY_ROUTINE_LABEL, _T("Label"), 90, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_weeklyr_list.Setlistcolcharlimit(WEEKLY_ROUTINE_FULL_LABLE,STR_WEEKLY_DESCRIPTION_LENGTH -1);
+	m_weeklyr_list.Setlistcolcharlimit(WEEKLY_ROUTINE_LABEL,STR_WEEKLY_LABEL_LENGTH-1);
+
 	m_weekly_dlg_hwnd = this->m_hWnd;
 	//g_hwnd_now = m_weekly_dlg_hwnd;
-
+	m_weeklyr_list.SetListHwnd(this->m_hWnd);
 
 	CRect list_rect,win_rect;
 	m_weeklyr_list.GetWindowRect(list_rect);
@@ -512,6 +537,8 @@ void BacnetWeeklyRoutine::OnNMClickListBacWeekly(NMHDR *pNMHDR, LRESULT *pResult
 void BacnetWeeklyRoutine::OnClose()
 {
 	// TODO: Add your message handler code here and/or call default
+	ShowWindow(FALSE);
+	return;
 	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
 	KillTimer(1);
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
@@ -530,7 +557,7 @@ void BacnetWeeklyRoutine::OnCancel()
 void BacnetWeeklyRoutine::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
-	if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
+	if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_WEEKLY))  )	//GSM连接时不要刷新;
 	{
 	PostMessage(WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
 	Post_Refresh_Message(g_bac_instance,READWEEKLYROUTINE_T3000,0,BAC_SCHEDULE_COUNT - 1,sizeof(Str_weekly_routine_point), BAC_SCHEDULE_GROUP);
@@ -563,6 +590,77 @@ void BacnetWeeklyRoutine::OnBnClickedButtonWeeklyScheduleEdit()
 	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_WEEKLYCODE);
 
 }
+
+void BacnetWeeklyRoutine::Reset_Weekly_Rect()
+{
+
+	CRect temp_mynew_rect;
+	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+
+	CRect temp_window;
+	GetWindowRect(&temp_window);
+	if(window_max)
+	{
+		CRect temp_mynew_rect;
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), NULL);
+	}
+	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
+	{
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,0,0,SWP_NOSIZE );
+	}
+	else
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left + 110,temp_mynew_rect.top + 80,500,700, NULL);
+
+
+	return;
+
+}
+
+void BacnetWeeklyRoutine::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	// TODO: Add your message handler code here
+	CRect rc;
+	GetClientRect(rc);
+	if(m_weeklyr_list.m_hWnd != NULL)
+	{
+		::SetWindowPos(this->m_hWnd, HWND_TOP, 0,0, 0,0,  SWP_NOSIZE | SWP_NOMOVE);
+		m_weeklyr_list.MoveWindow(rc.left,rc.top,rc.Width(),rc.Height() - 80);
+		GetDlgItem(IDC_BUTTON_WEEKLY_EDIT)->MoveWindow(rc.left + 20 ,rc.bottom - 60 , 120,50);
+	}
+
+}
+
+
+void BacnetWeeklyRoutine::OnSysCommand(UINT nID, LPARAM lParam)
+{
+	// TODO: Add your message handler code here and/or call default
+
+	if(nID == SC_MAXIMIZE)
+	{
+		if(window_max == false)
+		{
+			window_max = true;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
+		}
+		else
+		{
+			window_max = false;
+			CRect temp_mynew_rect;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 60 ,temp_mynew_rect.top + 60,500,700,SWP_SHOWWINDOW);
+		}
+		return;
+	}
+
+	CDialogEx::OnSysCommand(nID, lParam);
+}
+
+
 BOOL BacnetWeeklyRoutine::OnHelpInfo(HELPINFO* pHelpInfo)
 { 
 

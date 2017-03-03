@@ -8,6 +8,7 @@
 #include "globle_function.h"
 
 // CDuplicateIdDetected dialog
+DWORD WINAPI HanlePanelNumber(LPVOID lpvoid);
 DWORD WINAPI DuplicatedProcess(LPVOID lPvoid);
 CString temp_controller_ip;
 int controller_port = 0;
@@ -20,6 +21,13 @@ int second_propose_id = 0;
 
 vector <int> id_exsit_in_db;
 IMPLEMENT_DYNAMIC(CDuplicateIdDetected, CDialogEx)
+
+
+CDuplicateIdDetected::CDuplicateIdDetected(int temp,CWnd* pParent /*=NULL*/)
+	: CDialogEx(CDuplicateIdDetected::IDD, pParent)
+{
+	duplicate_mode = temp;
+}
 
 CDuplicateIdDetected::CDuplicateIdDetected(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CDuplicateIdDetected::IDD, pParent)
@@ -68,11 +76,13 @@ BEGIN_MESSAGE_MAP(CDuplicateIdDetected, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_DUPLICATE_DONE, &CDuplicateIdDetected::OnBnClickedButtonDuplicateDone)
 	ON_BN_CLICKED(IDC_BUTTON_DUPLICATE_CANCEL, &CDuplicateIdDetected::OnBnClickedButtonDuplicateCancel)
 	ON_WM_TIMER()
+	ON_STN_CLICKED(IDC_STATIC_NETWORK_TITLE, &CDuplicateIdDetected::OnStnClickedStaticNetworkTitle)
 END_MESSAGE_MAP()
 
 
 // CDuplicateIdDetected message handlers
 HANDLE DuplicatedThread = NULL;
+HANDLE PanelNumberThread = NULL;
 
 BOOL CDuplicateIdDetected::OnInitDialog()
 {
@@ -88,6 +98,59 @@ BOOL CDuplicateIdDetected::OnInitDialog()
 	GetDlgItem(IDC_EDIT_DEVICE_2)->SetFocus();
 	return FALSE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
+}
+
+DWORD WINAPI HanlePanelNumber(LPVOID lpvoid)
+{
+	CDuplicateIdDetected *mparent = (CDuplicateIdDetected *)lpvoid;
+
+	if(first_need_changed)
+	{
+		 bool bret=Open_Socket2(device_id_data_1.ip_address,device_id_data_1.nport);
+		 SetCommunicationType(1);
+		 if(bret)
+		 {
+			 //first_propose_id
+			 int write_ret = 0 ;
+			write_ret =  write_one(255,36,first_propose_id);
+			if(write_ret <0)
+			{
+				cs_show_info.Format(_T("try to change the first panel id failed..."));
+				Sleep(1000);
+				goto ret_label_panel_ret;
+			}
+		 }
+	}
+
+	if(second_need_changed)
+	{
+		bool bret=Open_Socket2(device_id_data_2.ip_address,device_id_data_2.nport);
+		SetCommunicationType(1);
+		if(bret)
+		{
+			//first_propose_id
+			int write_ret = 0 ;
+			write_ret =  write_one(255,36,second_propose_id);
+			if(write_ret <0)
+			{
+				cs_show_info.Format(_T("try to change %s panel id failed..."),device_id_data_2.ip_address);
+				Sleep(1000);
+				goto ret_label_panel_ret;
+			}
+		}
+	}
+	cs_show_info.Format(_T("Operation Done!"));
+	Sleep(2000);
+	PostMessage(mparent->m_hWnd,WM_CLOSE,NULL,NULL);
+	PanelNumberThread = NULL;
+	return 1;
+
+ret_label_panel_ret:
+	mparent->GetDlgItem(IDC_BUTTON_DUPLICATE_DONE)->EnableWindow(TRUE);
+	mparent->GetDlgItem(IDC_BUTTON_DUPLICATE_CANCEL)->EnableWindow(TRUE);
+
+	PanelNumberThread = NULL;
+	return TRUE;
 }
 
 DWORD WINAPI DuplicatedProcess(LPVOID lPvoid)
@@ -197,7 +260,10 @@ BOOL CDuplicateIdDetected::PreTranslateMessage(MSG* pMsg)
 void CDuplicateIdDetected::Initial_static()
 {
 	id_exsit_in_db.clear();
-	m_static_title.SetWindowTextW(_T("Each device on the RS485 network needs a unique network ID or communications will fail.\r\nYou can change the ID using a plug and play feature built into the device.\r\nWould you like to change the address to the new ID?"));
+	if(duplicate_mode == 0)
+		m_static_title.SetWindowTextW(_T("Each device on the RS485 network needs a unique network ID or communications will fail.\r\nYou can change the ID using a plug and play feature built into the device.\r\nWould you like to change the address to the new ID?"));
+	else if(duplicate_mode == 1)
+		m_static_title.SetWindowTextW(_T("Each device on the same network needs a unique panel number or communications will mess.\r\nWould you like to change the panel number to the new value?"));
 	m_static_title.textColor(RGB(0,0,0));
 	//m_static.bkColor(RGB(0,255,255));
 	m_static_title.setFont(28,16,NULL,_T("Arial"));
@@ -206,7 +272,12 @@ void CDuplicateIdDetected::Initial_static()
 	controller_port = device_id_data_1.nport;
 	//device_id_data_1
 	CString temp_subnet;
-	temp_subnet.Format(_T("Network:        Panel %d:RS485 'MAIN' subnet"),device_id_data_1.panal_number);
+	if(duplicate_mode == 0)
+		temp_subnet.Format(_T("IP:%s  Panel %d:RS485 'MAIN' subnet"),temp_controller_ip,device_id_data_1.panal_number);
+	else if(duplicate_mode == 1)
+	{
+		temp_subnet.Format(_T("%s - %s panel number conflict"),device_id_data_1.ip_address,device_id_data_2.ip_address);
+	}
 
 
 	CString temp_serial_1;CString temp_serial_2;
@@ -216,9 +287,17 @@ void CDuplicateIdDetected::Initial_static()
 
 	temp_serial_1.Format(_T("%u"),device_id_data_1.nSerial);
 	temp_serial_2.Format(_T("%u"),device_id_data_2.nSerial);
+	if(duplicate_mode == 0)
+	{
+		temp_current_id_1.Format(_T("%u"),device_id_data_1.modbusID);
+		temp_current_id_2.Format(_T("%u"),device_id_data_2.modbusID);
+	}
+	else if(duplicate_mode == 1)
+	{
+		temp_current_id_1.Format(_T("%u"),device_id_data_1.panal_number);
+		temp_current_id_2.Format(_T("%u"),device_id_data_2.panal_number);
+	}
 
-	temp_current_id_1.Format(_T("%u"),device_id_data_1.modbusID);
-	temp_current_id_2.Format(_T("%u"),device_id_data_2.modbusID);
 
 	temp_user_text_1 = device_id_data_1.show_label_name;
 	temp_user_text_2 = device_id_data_2.show_label_name;
@@ -242,6 +321,16 @@ void CDuplicateIdDetected::Initial_static()
 	//m_static.bkColor(RGB(0,255,255));
 	m_dup_network_id.setFont(24,16,NULL,_T("Arial"));
 
+	if(duplicate_mode == 0)
+	{
+		m_dup_current_id.SetWindowTextW(_T("Current ID :"));
+		m_dup_propsed_id.SetWindowTextW(_T("Proposed ID :"));
+	}
+	else if(duplicate_mode == 1)
+	{
+		m_dup_current_id.SetWindowTextW(_T("Current Panel:"));
+		m_dup_propsed_id.SetWindowTextW(_T("Proposed Panel:"));
+	}
 	m_dup_current_id.textColor(RGB(0,0,0));
 	//m_dup_current_id.bkColor(RGB(0,255,255));
 	m_dup_current_id.setFont(24,16,NULL,_T("Arial"));
@@ -249,6 +338,7 @@ void CDuplicateIdDetected::Initial_static()
 	m_dup_propsed_id.textColor(RGB(0,0,0));
 	//m_dup_propsed_id.bkColor(RGB(0,255,255));
 	m_dup_propsed_id.setFont(24,16,NULL,_T("Arial"));
+
 
 	m_dup_serial_number.textColor(RGB(0,0,0));
 	//m_dup_serial_number.bkColor(RGB(0,255,255));
@@ -479,17 +569,60 @@ void CDuplicateIdDetected::OnBnClickedButtonDuplicateDone()
 	second_propose_id = _wtoi(TEMP_ID_2);
 
 
+	
+
 	if(original_id.CompareNoCase(TEMP_ID_1) != 0)
 	{
 		first_need_changed = true;
+		if(duplicate_mode == 1)
+		{
+			vector <int>::iterator itter;
+			for (itter = exsit_panel_number.begin();itter != exsit_panel_number.end();++itter)
+			{
+				if(*itter == first_propose_id)
+				{
+					MessageBox(_T("Panel number already exsit in the network,please change a new one."));
+					GetDlgItem(IDC_BUTTON_DUPLICATE_DONE)->EnableWindow(TRUE);
+					GetDlgItem(IDC_BUTTON_DUPLICATE_CANCEL)->EnableWindow(TRUE);
+					return;
+				}
+			}
+		}
+
 	}
 
 	if(original_id.CompareNoCase(TEMP_ID_2) != 0)
 	{
 		second_need_changed = true;
+		if(duplicate_mode == 1)
+		{
+			vector <int>::iterator itter;
+			for (itter = exsit_panel_number.begin();itter != exsit_panel_number.end();++itter)
+			{
+				if(*itter == second_propose_id)
+				{
+					MessageBox(_T("Panel number already exsit in the network,please change a new one."));
+					GetDlgItem(IDC_BUTTON_DUPLICATE_DONE)->EnableWindow(TRUE);
+					GetDlgItem(IDC_BUTTON_DUPLICATE_CANCEL)->EnableWindow(TRUE);
+					return;
+				}
+			}
+		}
 	}
-	if(DuplicatedThread == NULL)
-		DuplicatedThread = CreateThread(NULL,NULL,DuplicatedProcess,this,NULL, NULL);
+
+
+
+	if(duplicate_mode == 0)
+	{
+		if(DuplicatedThread == NULL)
+			DuplicatedThread = CreateThread(NULL,NULL,DuplicatedProcess,this,NULL, NULL);
+	}
+	else if(duplicate_mode == 1)
+	{
+		if(PanelNumberThread == NULL)
+			PanelNumberThread = CreateThread(NULL,NULL,HanlePanelNumber,this,NULL, NULL);
+	}
+
 }
 
 
@@ -530,4 +663,10 @@ void CDuplicateIdDetected::OnTimer(UINT_PTR nIDEvent)
 	}
 	
 	CDialogEx::OnTimer(nIDEvent);
+}
+
+
+void CDuplicateIdDetected::OnStnClickedStaticNetworkTitle()
+{
+	// TODO: Add your control notification handler code here
 }

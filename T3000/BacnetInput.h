@@ -50,9 +50,10 @@ public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual void OnCancel();
 	void Fresh_One_Item(int row);
-
+	void Reset_Input_Rect();
 	int m_latest_protocol;
-   
+	bool window_max; // 标记是否已经最大化;
+
 /*
 Alex
 For Help system
@@ -80,6 +81,9 @@ public:
 #endif
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 	CStaticEx m_input_item_info;
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnMove(int x, int y);
+	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 };
 //int GetPrivateData();
 //int WritePrivateData();

@@ -34,13 +34,16 @@ public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	CDateTimeCtrl m_variable_time_picker;
 	afx_msg void OnNMKillfocusDatetimepicker2Variable(NMHDR *pNMHDR, LRESULT *pResult);
-
+	bool window_max; // 标记是否已经最大化;
 	int m_row;
 	int m_col;
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnClose();
 	virtual void OnCancel();
+	void Reset_Variable_Rect();
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 };
 
 

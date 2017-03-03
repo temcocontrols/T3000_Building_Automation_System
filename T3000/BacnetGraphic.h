@@ -166,6 +166,8 @@ public:
 	afx_msg void OnTimebase5minutes();
 	afx_msg void OnTimebase30minutes();
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	void Save_time_scale(unsigned int ntime);
 };
 	void Delete_Ram_Data();
 //const int _6_min = 1;

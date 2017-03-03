@@ -262,6 +262,14 @@ void CInPlaceEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 		|| ((-1 != m_strValidChars.Find(static_cast<TCHAR> (nChar)))
 		|| (nChar == VK_BACK) || (nChar == CTRL_C) || (nChar == CTRL_V) || (nChar == CTRL_X)))
 	{
+		CString temp_cs;
+		CInPlaceEdit::GetWindowText(temp_cs);
+		TRACE(temp_cs + _T("\r\n"));
+		if((temp_cs.GetLength()>= m_charlimit) && (m_charlimit != 0) && (nChar!= 8))
+		{
+			MessageBeep(MB_ICONEXCLAMATION);
+			return;
+		}
 		CEdit::OnChar(nChar, nRepCnt, nFlags);
 	}
 	else
@@ -318,7 +326,10 @@ void CInPlaceEdit::DeleteInstance()
 	delete m_pInPlaceEdit;
 	m_pInPlaceEdit = NULL;
 }
-
+void CInPlaceEdit::SetEditLimit(int ncount)
+{
+	m_charlimit = ncount;
+}
 BOOL CInPlaceEdit::ShowEditCtrl(DWORD dwStyle, const RECT &rCellRect, CWnd* pParentWnd, 
 								UINT uiResourceID, int iRowIndex, int iColumnIndex,
 								CString& strValidChars, CString& rstrCurSelection)

@@ -1444,13 +1444,15 @@ if(error!=-1)
 		else
 			Byte=0xff;
 
-		if( ncod+2+1 >= PROGRAM_SIZE )
+		if( ncod+2+1 >= PROGRAM_SIZE - 100)
 		{
 		  
 		 if( local_table )
 			delete local_table;
 		  
 		 *pmes = 0;
+		 sntx_err(TOTAL_2000_BREAK);	// 2017 - 01 17  ¶Å·« fix 
+		 error = 1;
 		 return 3;
 		}
 		memcpy(code,&Byte,1);
@@ -1458,13 +1460,15 @@ if(error!=-1)
 
 		if (DORU_SYSTEM)
 		{
-		 if( (ncod+2)+2+2+ind_local_table+2+ind_time_table >= PROGRAM_SIZE )
+		 if( (ncod+2)+2+2+ind_local_table+2+ind_time_table >= PROGRAM_SIZE - 100 )
 		 {
 		   
 			if( local_table )
 			delete local_table;
 			 
 		  *pmes = 0;
+		  sntx_err(TOTAL_2000_BREAK);	// 2017 - 01 17  ¶Å·« fix 
+		  error = 1;
 			return 3;
 		 }
 		 Byte=0;
@@ -1486,8 +1490,12 @@ if(error!=-1)
 
 
 		my_lengthcode = code - mycode;
-		if(my_lengthcode > 2000)
+		if(my_lengthcode >= 2000)
+		{
+			sntx_err(TOTAL_2000_BREAK);   // 2017 - 01 17  ¶Å·« fix 
 			error = 1;
+			return 1;
+		}
 		//program_code_length[program_list_line] = my_lengthcode;
 		//program_code_length[program_list_line] = 400;
 
@@ -2823,7 +2831,7 @@ void sntx_err(int err, int err_true )
 	 "point number out of range",
 	 "line number too big",
 	 "too many lines",
-	 "number of points and variables exceeds 100",
+	 "number of points and variables exceeds 500",
 	 "too many goto",
 	 "warning: panel out of service",
 	 "warning: point out of service",
@@ -7145,6 +7153,8 @@ int	desexpr(void)
 									strcpy(op,op2);
 									strcpy(op2,pop());
 									ind_par--;
+									if(ind_par < 0)
+										ind_par = 0;
 									strcat(op2," , ");
 									strcat(op2,op);
 									if (i==n-1)
@@ -7221,6 +7231,8 @@ int	desexpr(void)
 							if(!desvar())
 								{
 								 strcpy(buf,pop());
+
+
 								 return 1;
 								}
 							push(buf);

@@ -13,10 +13,10 @@ using namespace std;
 extern TS_US LATENCY_TIME_COM ;
 extern  TS_US LATENCY_TIME_NET ;
 //******************************extern variable
-extern TS_US Register_value[MaxRegisterNum];           //got the register value
-extern TS_UC device;                         //Tstat ID,255 is for all
-extern CString m_com_num;						//com1 or com2
-extern CMutex mutex;//multithreading lock
+ 
+ 
+ 
+ 
 extern HANDLE m_hSerial;//串口句柄
 extern OVERLAPPED m_osRead, m_osWrite, m_osMulWrite; // 用于重叠读/写
 extern TS_UC  gval[13];//the data that get from com
@@ -90,144 +90,7 @@ OUTPUT int GetCommunicationType(void)
 }
 
 
-/*
-OUTPUT bool open_com(TS_UC m_com)
-{
-	//open com ,if you want to open "com1",the m_com equal 0;if you want to open "com2",the m_com equal 1
-	//you will get the handle to com,m_hSerial,is a extern variable
-	//the return value ,true is ok,false is failure
-	if(open_com_port_number_in_dll==m_com)
-	{
-		Change_BaudRate(19200);
-		return true;///////////////////////////same com port ,opened by multi times,it's badly.
-	}
-	if(m_hSerial != NULL)
-	{//关闭串口
-		CloseHandle(m_hSerial);
-		m_hSerial = NULL;
-	}
-	/////////////////////////////////////////////////////////////////////加入的串口通信部分
-	switch(m_com)
-	{
-	case 1:					m_hSerial = CreateFile(_T("COM1:"),//串口句柄，打开串口
-							GENERIC_READ | GENERIC_WRITE,
-							0,
-							NULL,
-							OPEN_EXISTING,
-							FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,是另外的形式，表示的是异步通信，能同时读写;0为同步读写
-							NULL);break;
-	case 2:			        m_hSerial = CreateFile(_T("COM2:"),//串口句柄，打开串口
-							GENERIC_READ | GENERIC_WRITE,
-							0,
-							NULL,
-							OPEN_EXISTING,
-							FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,是另外的形式，表示的是异步通信，能同时读写;0为同步读写
-							NULL);break;
-	case 3:					m_hSerial = CreateFile(_T("COM3:"),//串口句柄，打开串口
-							GENERIC_READ | GENERIC_WRITE,
-							0,
-							NULL,
-							OPEN_EXISTING,
-							FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,是另外的形式，表示的是异步通信，能同时读写;0为同步读写
-							NULL);break;
-	case 4:			        m_hSerial = CreateFile(_T("COM4:"),//串口句柄，打开串口
-							GENERIC_READ | GENERIC_WRITE,
-							0,
-							NULL,
-							OPEN_EXISTING,
-							FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,是另外的形式，表示的是异步通信，能同时读写;0为同步读写
-							NULL);break;
-	case 5:					m_hSerial = CreateFile(_T("COM5:"),//串口句柄，打开串口
-							GENERIC_READ | GENERIC_WRITE,
-							0,
-							NULL,
-							OPEN_EXISTING,
-							FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,是另外的形式，表示的是异步通信，能同时读写;0为同步读写
-							NULL);
-							break;
-	case 6:			        m_hSerial = CreateFile(_T("COM6:"),//串口句柄，打开串口
-							GENERIC_READ | GENERIC_WRITE,
-							0,
-							NULL,
-							OPEN_EXISTING,
-							FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,是另外的形式，表示的是异步通信，能同时读写;0为同步读写
-							NULL);break;
-	case 7:					m_hSerial = CreateFile(_T("COM7:"),//串口句柄，打开串口
-							GENERIC_READ | GENERIC_WRITE,
-							0,
-							NULL,
-							OPEN_EXISTING,
-							FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,是另外的形式，表示的是异步通信，能同时读写;0为同步读写
-							NULL);break;
-	case 8:			        m_hSerial = CreateFile(_T("COM8:"),//串口句柄，打开串口
-							GENERIC_READ | GENERIC_WRITE,
-							0,
-							NULL,
-							OPEN_EXISTING,
-							FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,是另外的形式，表示的是异步通信，能同时读写;0为同步读写
-							NULL);break;
-	case 9:			        m_hSerial = CreateFile(_T("COM9:"),//串口句柄，打开串口
-							GENERIC_READ | GENERIC_WRITE,
-							0,
-							NULL,
-							OPEN_EXISTING,
-							FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,是另外的形式，表示的是异步通信，能同时读写;0为同步读写
-							NULL);break;
-	default :				m_hSerial = CreateFile(_T("COM1:"),//串口句柄，打开串口
-							GENERIC_READ | GENERIC_WRITE,
-							0,
-							NULL,
-							OPEN_EXISTING,
-							FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,是另外的形式，表示的是异步通信，能同时读写;0为同步读写
-							NULL);break;
-	}
-    if(m_hSerial == INVALID_HANDLE_VALUE)
-    {
-		CloseHandle(m_hSerial);
-		m_hSerial = NULL;
-		return false;
-    }
-	if(!SetupComm(m_hSerial, 1024*32, 1024*9))
-    {
-        CloseHandle(m_hSerial);
-		m_hSerial = NULL;
-    }
-    DCB  PortDCB;
-    PortDCB.DCBlength = sizeof(DCB);
-    // 默认串口参数
-    if(!GetCommState(m_hSerial, &PortDCB))
-	{
-		CloseHandle(m_hSerial);
-		m_hSerial = NULL;
-		return false;
-	}
-	//not to change the baudate
-    PortDCB.BaudRate = 19200; // baud//attention ,if it is wrong,can't write the com
-    PortDCB.ByteSize = 8;     // Number of bits/byte, 4-8
-    PortDCB.Parity = NOPARITY;
-    PortDCB.StopBits = ONESTOPBIT;
-    if (! SetCommState(m_hSerial, &PortDCB))
-    {
-        return false;
-    }
-    COMMTIMEOUTS CommTimeouts;
-    GetCommTimeouts(m_hSerial, &CommTimeouts);
-    CommTimeouts.ReadIntervalTimeout = 160;
-    CommTimeouts.ReadTotalTimeoutMultiplier = 20;
-    CommTimeouts.ReadTotalTimeoutConstant = 360;
-    CommTimeouts.WriteTotalTimeoutMultiplier = 20;
-    CommTimeouts.WriteTotalTimeoutConstant = 200;
-    if (!SetCommTimeouts(m_hSerial, &CommTimeouts))
-    {
-        return false;
-    }
-	open_com_port_number_in_dll=m_com;
-	baudrate_in_dll=19200;
-
-	return true;
-}
-
-*/
+ 
 
 
 
@@ -1175,9 +1038,11 @@ OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_ad
         data_to_write[1]=0x10;
         data_to_write[2]=start_address >> 8 & 0xff;
         data_to_write[3]=start_address & 0xff;
-        data_to_write[4]=0;
+        data_to_write[4]= length >> 8 & 0xff;
         data_to_write[5]=length&0xff;
-        data_to_write[6]=length*2;//128 is better ,if you send more than 128, the ron software will meet some trouble,because it is too long one times,can not finish on time;on time
+        data_to_write[6]=length*2;
+		//128 is better ,if you send more than 128, 
+		//the ron software will meet some trouble,because it is too long one times,can not finish on time;on time
         for(int i=0; i<length; i++)
         {
 //                 unsigned char UC_Value=to_write[i];
@@ -1364,6 +1229,242 @@ OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_ad
 
     }
     return -1;
+}
+OUTPUT int write_multi_Coil_log(TS_UC device_var, TS_BOOL *to_write, TS_US start_address, TS_US length,//参数命令部分
+	unsigned char *put_senddate_into_here, unsigned char *put_revdata_into_here, //发送和接受的原始数据
+	int* sendDataLength, int* recvDataLength) //发送和接受数据长度
+{
+	unsigned short ToSendData[16];
+	int DataLength = 0;
+	if (length%8==0)
+	{
+		DataLength = length / 8;
+
+	} 
+	else
+	{
+		DataLength = length / 8 + 1;
+	}
+	bitset<8> BitReg;
+	for (int index = 0;index< DataLength;index++)
+	{
+		//初始化BitReg
+		for (int i=0;i<8;i++)
+		{
+			BitReg.at(i) = false;
+		}
+		 
+		for (int i = 0; i < 8; i++)
+		{
+			if (index * 8 + i < length)
+			{
+				BitReg.at(i) = to_write[index * 8 + i];
+			}
+			
+		}
+		ToSendData[index] = BitReg.to_ulong();
+	 
+	}
+
+	if (g_Commu_type == 0)//
+	{
+		//the return value ,-2 is wrong
+		//the return value == -1 ,no connecting
+		HCURSOR hc;//load mouse cursor
+		TS_UC data_to_write[600] = { 0 };
+		data_to_write[0] = device_var;
+		data_to_write[1] = 0x0F;
+		data_to_write[2] = start_address >> 8 & 0xff;
+		data_to_write[3] = start_address & 0xff;
+		data_to_write[4] = length >> 8 & 0xff;
+		data_to_write[5] = length & 0xff;
+
+		data_to_write[6] = DataLength * 2;//128 is better ,if you send more than 128, the ron software will meet some trouble,because it is too long one times,can not finish on time;on time
+		
+		for (int i = 0; i<DataLength; i++)
+		{
+		
+
+
+			data_to_write[7 + i * 2] = ToSendData[i] >> 8 & 0xff;
+			data_to_write[7 + i * 2 + 1] = ToSendData[i] & 0xff;
+
+
+		}
+
+		TS_US crc = CRC16(data_to_write, 2 * DataLength + 7);
+		data_to_write[DataLength * 2 + 7] = crc >> 8 & 0xff;
+		data_to_write[DataLength * 2 + 8] = crc & 0xff;
+
+		//CString traceStr=_T("Send:");
+		//CString temp;
+		//for (int i=0;i<2*length+9;i++)
+		//{
+		//	temp.Format(_T("%02X "),data_to_write[i]);
+		//	traceStr+=temp;
+		//}
+		*sendDataLength = 2 * DataLength + 9;
+		for (int i = 0; i < *sendDataLength; i++)
+		{
+			*((char*)put_senddate_into_here + i) = data_to_write[i];
+		}
+
+		//	TRACE(_T("%s"),traceStr.GetBuffer());
+
+		hc = LoadCursor(NULL, IDC_WAIT);
+		hc = SetCursor(hc);
+		//length is the data length,if you want to write 128 bite,the length == 128
+		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		if (m_hSerial == NULL)
+		{
+			return -1;
+		}
+		////////////////////////////////////////////////clear com error
+		COMSTAT ComStat;
+		DWORD dwErrorFlags;
+
+		ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
+		PurgeComm(m_hSerial, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);//clear read buffer && write buffer
+																							////////////////////////////////////////////////////////////overlapped declare
+		memset(&m_osMulWrite, 0, sizeof(OVERLAPPED));
+		if ((m_osMulWrite.hEvent = CreateEvent(NULL, true, false, _T("MulWrite"))) == NULL)
+			return -2;
+		m_osMulWrite.Offset = 0;
+		m_osMulWrite.OffsetHigh = 0;
+		///////////////////////////////////////////////////////send the to read message
+		int fState = WriteFile(m_hSerial,// 句柄
+			data_to_write,// 数据缓冲区地址
+			length * 2 + 9,// 数据大小
+			&m_had_send_data_number,// 返回发送出去的字节数
+			&m_osMulWrite);
+		if (!fState)// 不支持重叠
+		{
+			if (GetLastError() == ERROR_IO_PENDING)
+			{
+				//WaitForSingleObject(m_osWrite.hEvent,INFINITE);
+				GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+			}
+			else
+				m_had_send_data_number = 0;
+		}
+		///////////////////////////up is write
+		/////////////**************down is read
+		ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
+		memset(&m_osRead, 0, sizeof(OVERLAPPED));
+		if ((m_osRead.hEvent = CreateEvent(NULL, true, false, _T("Read"))) == NULL)
+			return -2;
+		m_osRead.Offset = 0;
+		m_osRead.OffsetHigh = 0;
+		Sleep(LATENCY_TIME_COM);
+		////////////////////////////////////////////////clear com error
+		fState = ReadFile(m_hSerial,// 句柄
+			gval,// 数据缓冲区地址
+			8,// 数据大小
+			&m_had_send_data_number,// 返回发送出去的字节数
+			&m_osRead);
+		if (!fState)// 不支持重叠
+		{
+			if (GetLastError() == ERROR_IO_PENDING)
+			{
+				//WaitForSingleObject(m_osRead.hEvent,INFINITE);
+				GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+			}
+			else
+				m_had_send_data_number = 0;
+		}
+		//traceStr=_T("Rev:");
+		//for(int i=0;i<8;i++){
+		//	temp.Format(_T("%02X "),gval[i]);
+		//	traceStr+=temp;
+		//}
+		//TRACE(_T("%s"),traceStr);
+		*recvDataLength = 8;
+		for (int i = 0; i<8; i++)
+		{
+			*((char*)put_revdata_into_here + i) = gval[i];
+		}
+		//  *((char*)put_senddate_into_here + i) = data_to_write[i];
+		///////////////////////////////////////////////////////////
+		for (int i = 0; i<6; i++)
+		{
+			if (gval[i] != *(data_to_write + i))
+				return -2;
+		}
+		crc = CRC16(gval, 6);
+		if (gval[6] != ((crc >> 8) & 0xff))
+			return -2;
+		if (gval[7] != (crc & 0xff))
+			return -2;
+		return 1;
+	}
+	if (g_Commu_type == 1)//tcp.
+	{
+		//the return value ,-2 is wrong
+		//the return value == -1 ,no connecting
+		HCURSOR hc;//load mouse cursor
+		TS_UC data_to_write[600] = { '\0' };
+		TS_UC data_back_write[600] = { '\0' };
+
+		data_to_write[0] = 1;
+		data_to_write[1] = 2;
+		data_to_write[2] = 3;
+		data_to_write[3] = 4;
+		data_to_write[4] = 5;
+		data_to_write[5] = 6;
+
+		data_to_write[6] = device_var;
+		data_to_write[7] = 0x10;
+		data_to_write[8] = start_address >> 8 & 0xff;
+		data_to_write[9] = start_address & 0xff;
+		data_to_write[10] = length >> 8 & 0xff;;
+		data_to_write[11] = length & 0xff;
+		data_to_write[12] = DataLength * 2;//128 is better ,if you send more than 128, the ron software will meet some trouble,because it is too long one times,can not finish on time;on time
+		 
+		for (int i = 0; i < DataLength; i++)
+		{
+			data_to_write[13 + i * 2] = ToSendData[i] >> 8 & 0xff;
+			data_to_write[13 + i * 2 + 1] = ToSendData[i] & 0xff;
+		}
+		*sendDataLength = 2 * DataLength + 13;
+		for (int i = 0; i < *sendDataLength; i++)
+		{
+			*((char*)put_senddate_into_here + i) = data_to_write[i];
+		}
+		//	1 2 3 4 5 6 2 10 0 c8 0 8 8 5 5 5 5 5 5 5 5
+		//	TS_US crc=CRC16(data_to_write,i+7);
+		//	data_to_write[i+7]=crc>>8 & 0xff;
+		//	data_to_write[i+8]=crc & 0xff;
+		hc = LoadCursor(NULL, IDC_WAIT);
+		hc = SetCursor(hc);
+		//length is the data length,if you want to write 128 bite,the length == 128
+		//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		if (m_hSocket == INVALID_SOCKET)
+		{
+			return -1;
+		}
+
+		int n = ::send(m_hSocket, (char *)data_to_write, 13 + 2 * length, 0);
+		//Sleep(LATENCY_TIME_NET);
+		int nRecv = ::recv(m_hSocket, (char *)data_back_write, 13, 0);
+
+		*recvDataLength = 13;
+		for (int i = 0; i<13; i++)
+		{
+			*((char*)recvDataLength + i) = data_back_write[i];
+		}
+		if (nRecv<0)
+		{
+			return -2;
+		}
+
+		//	memcpy((void*)&to_send_data[0],(void*)&to_Reive_data[6],sizeof(to_Reive_data));
+		for (int i = 0; i<6; i++)
+			if (data_back_write[i + 6] != *(data_to_write + i + 6))
+				return -2;
+		return 1;
+
+	}
+	return -1;
 }
 
 OUTPUT int Read_One(TS_UC device_var,TS_US address)
@@ -2797,6 +2898,254 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
     return -1;//add by Fance
     ///////////////////////////////////////////////////////////
 }
+//MF 0x05 Write Coil
+OUTPUT int Write_Coil_log(TS_UC device_var, TS_US address, TS_BOOL val, unsigned char *put_senddate_into_here, unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength)
+{
+	if (g_Commu_type == 0)
+	{
+		//address        the register
+		//val         the value that you want to write to the register
+		//the return value == -1 ,no connecting
+		//the return value == -3 , no response
+		//清空串口缓冲区
+
+		//		gval[8]={'\0'};//the data that get
+		//      TS_UC  pval[9];
+		for (int i = 0; i <= 11; i++)
+			gval[i] = 0;/////////////////////////////////////////clear buffer
+		TS_US crc;
+		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		pval[0] = device_var;
+		pval[1] = 5;
+		pval[2] = address >> 8 & 0xFF;
+		pval[3] = address & 0xFF;
+		if (val)
+		{
+			pval[4] = 0xFF;
+		} 
+		else
+		{
+			pval[4] = 0x00;
+		}
+		pval[5] = 0x00;
+		 
+			crc = CRC16(pval, 6);
+			pval[6] = (crc >> 8) & 0xff;
+			pval[7] = crc & 0xff;
+	 
+
+		if (m_hSerial == NULL)
+		{
+			return -1;
+		}
+		////////////////////////////////////////////////////////////overlapped declare
+		memset(&m_osWrite, 0, sizeof(OVERLAPPED));
+		if ((m_osWrite.hEvent = CreateEvent(NULL, true, false, _T("Write"))) == NULL)
+			return -2;
+		m_osWrite.Offset = 0;
+		m_osWrite.OffsetHigh = 0;
+		////////////////////////////////////////////////clear com error
+		COMSTAT ComStat;
+		DWORD dwErrorFlags;
+
+		ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
+		PurgeComm(m_hSerial, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);//clear read buffer && write buffer
+		int fState;
+		Sleep(50);
+		 
+			*sendDataLength = 8;
+			for (int i = 0; i < *sendDataLength; i++)
+			{
+				*((char*)put_senddate_into_here + i) = pval[i];
+			}
+
+			fState = WriteFile(m_hSerial,// 句柄
+				pval,// 数据缓冲区地址
+				8,// 数据大小
+				&m_had_send_data_number,// 返回发送出去的字节数
+				&m_osWrite);
+		 
+		 
+		if (!fState)// 不支持重叠
+		{
+			if (GetLastError() == ERROR_IO_PENDING)
+			{
+				//WaitForSingleObject(m_osWrite.hEvent,INFINITE);
+				GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+																								   //			if(GetLastError()==ERROR_IO_INCOMPLETE)
+																								   //				AfxMessageBox("wrong1");
+			}
+			else
+				m_had_send_data_number = 0;
+		}
+
+		///////////////////////////up is write
+		/////////////**************down is read
+		ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
+		memset(&m_osRead, 0, sizeof(OVERLAPPED));
+		if ((m_osRead.hEvent = CreateEvent(NULL, true, false, _T("Read"))) == NULL)
+			return -2;
+		m_osRead.Offset = 0;
+		m_osRead.OffsetHigh = 0;
+		////////////////////////////////////////////////clear com error
+		Sleep(LATENCY_TIME_COM);
+		 
+			fState = ReadFile(m_hSerial,// 句柄
+				gval,// 数据缓冲区地址
+				8,// 数据大小
+				&m_had_send_data_number,// 返回发送出去的字节数
+				&m_osRead);
+		 
+		 
+		if (!fState)// 不支持重叠
+		{
+			if (GetLastError() == ERROR_IO_PENDING)
+			{
+				//WaitForSingleObject(m_osRead.hEvent,INFINITE);
+				GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+			}
+			else
+				m_had_send_data_number = 0;
+		}
+
+		*recvDataLength = m_had_send_data_number;
+		for (int i = 0; i < *recvDataLength; i++)
+		{
+			*((char*)put_revdata_into_here + i) = gval[i];
+		}
+
+		 
+			if (gval[0] == 0 && gval[1] == 0 && gval[2] == 0 && gval[3] == 0 && gval[4] == 0 && gval[5] == 0 && gval[6] == 0 && gval[7] == 0)
+				return -3;
+			for (int i = 0; i<8; i++)
+				if (gval[i] != pval[i])
+					return -2;
+		 
+		 
+		return 1;
+	}
+
+	if (g_Commu_type == 1)//tcp.
+	{
+		//address        the register
+		//val         the value that you want to write to the register
+		//the return value == -1 ,no connecting
+		//the return value == -3 , no response
+		//清空串口缓冲区
+
+		//TS_UC data[12];
+		TS_UC data[16];
+		// 		TS_UC* data=NULL;
+		int nSendNum = 12;
+		if (address == 10)
+		{
+			//data = new TS_UC[16];
+			nSendNum = 16;
+		}
+		else
+		{
+			//data = new TS_UC[12];
+			nSendNum = 12;
+		}
+		ZeroMemory(data, nSendNum);
+
+
+		++g_data_to_send[1];
+		if (g_data_to_send[1] % 256 == 0)
+		{
+			++g_data_to_send[0];
+			g_data_to_send[1] = 0;
+		}
+
+
+
+		data[0] = g_data_to_send[0];
+		data[1] = g_data_to_send[1];
+		data[2] = g_data_to_send[2];
+		data[3] = g_data_to_send[3];
+		data[4] = g_data_to_send[4];
+		data[5] = g_data_to_send[5];
+		//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		data[6] = device_var;
+		data[7] = 5;
+		data[8] = address >> 8 & 0xFF;
+		data[9] = address & 0xFF;
+		 
+
+		if (val)
+		{
+			data[10] = 0xFF;
+		}
+		else
+		{
+			data[10] = 0x00;
+		}
+		data[11] = 0x00;
+
+		for (int i = 0; i <= 11; i++)
+			gval[i] = 0;
+		/////////////////////////////////////////clear buffer
+						//	TS_US crc;
+						//	DWORD m_had_send_data_number;//已经发送的数据的字节数
+		pval[0] = device_var;
+		pval[1] = 5;
+		pval[2] = address >> 8 & 0xFF;
+		pval[3] = address & 0xFF;
+		if (val)
+		{
+			pval[4] = 0xFF;
+		}
+		else
+		{
+			pval[4] = 0x00;
+		}
+		pval[5] = 0x00;
+							  
+		if (m_hSocket == INVALID_SOCKET)
+		{
+			return -1;
+		}
+
+		//::send(m_hSocket,(char*)pval,sizeof(pval),MSG_OOB);
+		//::send(m_hSocket,(char*)data,sizeof(data),0);
+		*sendDataLength = nSendNum;
+		for (int i = 0; i < *sendDataLength; i++)
+		{
+			*((char*)put_senddate_into_here + i) = data[i];
+		}
+
+		int nRet = ::send(m_hSocket, (char*)data, nSendNum, 0);
+
+		//Sleep(SLEEP_TIME+10);
+		Sleep(LATENCY_TIME_NET);
+		//Sleep(300);
+		TS_UC rvdata[17];
+		int nRecv = ::recv(m_hSocket, (char*)rvdata, sizeof(rvdata), 0);
+
+		*recvDataLength = nRecv;
+		for (int i = 0; i < *recvDataLength; i++)
+		{
+			*((char*)put_revdata_into_here + i) = rvdata[i];
+		}
+
+		int nErr = WSAGetLastError();
+
+		memcpy((void*)&gval[0], (void*)&rvdata[6], 13/*sizeof(gval)*/);
+		
+			if (gval[0] == 0 && gval[1] == 0 && gval[2] == 0 && gval[3] == 0 && gval[4] == 0 && gval[5] == 0 )
+				return -3;
+			for (int i = 0; i<5; i++)
+				if (gval[i] != pval[i])
+					return -2;
+		
+		
+
+		
+		return 1;
+	}
+	return -1;//add by Fance
+			  ///////////////////////////////////////////////////////////
+}
 
 #if 1
 OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,int length)
@@ -3012,7 +3361,9 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
 
 #endif
 
-OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,TS_US length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength)
+OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,TS_US length,
+	                      unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here,
+	                       int* sendDataLength, int* recvDataLength)
 {
     if(g_Commu_type==0)
     {
@@ -5062,11 +5413,11 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
         int index=filelog.Find(_T("0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,"));
         if(index==-1)
         {
-            //WriteLogFile(_T(">>More than one device answer......"));
+            
         }
         else
         {
-            //WriteLogFile(_T(">>No one device answer......"));
+            
         }
         //SaveBufferToLogFile(gval, 13);
 
@@ -7168,586 +7519,6 @@ OUTPUT int write_multi_tap(TS_UC device_var,TS_UC *to_write,TS_US start_address,
     return -1;
 }
 
-
-
-
-OUTPUT int MINI_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type,int NET_COM)
-{
-    CString strlog;
-
-
-    if(bComm_Type==0)
-    {
-        //the second time
-        //val         the value that you want to write to the register
-        //the return value == -1 ,no connecting
-        //the return value == -2 ,try it again
-        //the return value == -3,Maybe that have more than 2 Tstat is connecting
-        //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
-        //the return value == -5 ,the input have some trouble
-        //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //清空串口缓冲区
-        //the return value is the register address
-        strlog.Format(_T("Com Scan:  From ID=%d To ID=%d"),devLo,devHi);
-        //WriteLogFile(strlog);
-
-        if(devLo<1 || devHi>254)
-            return -5;
-        //the input inspect
-        for(int i=0; i<13; i++)
-            gval[i]=0;/////////////////////////////////////////clear buffer
-        TS_UC  pval[6];
-        TS_US crc;
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
-        pval[0] = 255;
-        pval[1] = 25;  //put comments here,
-        pval[2] = devHi;
-        pval[3] = devLo;
-        crc = CRC16(pval,4);
-        pval[4] = (crc >>8) & 0xff;
-        pval[5] = crc & 0xff;
-        if(m_hSerial==NULL)
-        {
-            return -1;
-        }
-        ////////////////////////////////////////////////////////////overlapped declare
-        memset(&m_osWrite, 0, sizeof(OVERLAPPED));
-        if((m_osWrite.hEvent = CreateEvent(NULL,true,false,_T("Write")))==NULL)
-            return -2;
-        m_osWrite.Offset = 0;
-        m_osWrite.OffsetHigh = 0 ;
-        ////////////////////////////////////////////////clear com error
-        COMSTAT ComStat;
-        DWORD dwErrorFlags;
-
-        ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
-        PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear buffer
-        int fState=WriteFile(m_hSerial,// 句柄
-                             pval,// 数据缓冲区地址
-                             6,// 数据大小
-                             &m_had_send_data_number,// 返回发送出去的字节数
-                             &m_osWrite);
-        if(!fState)// 不支持重叠
-        {
-            if(GetLastError()==ERROR_IO_PENDING)
-            {
-                //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
-                //			if(GetLastError()==ERROR_IO_INCOMPLETE)
-                //				AfxMessageBox("wrong1");
-            }
-            else
-                m_had_send_data_number=0;
-        }
-
-        //	TRACE("%d T:%x %x %x %x %x %x\n",ddd,pval[0],pval[1],pval[2],pval[3],pval[4],pval[5]);
-        //CloseHandle(m_osWrite.hEvent);
-        ///////////////////////////up is write
-        Sleep(LATENCY_TIME_COM);//because that scan have a delay lower 75ms
-        /////////////**************down is read
-        ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
-        memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
-            return -2;
-        m_osRead.Offset = 0;
-        m_osRead.OffsetHigh = 0;
-        ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// 句柄
-                        gval,// 数据缓冲区地址
-                        13,// 数据大小
-                        &m_had_send_data_number,// 返回发送出去的字节数
-                        &m_osRead);
-        if(!fState)// 不支持重叠
-        {
-            if(GetLastError()==ERROR_IO_PENDING)
-            {
-                //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
-            }
-            else
-                m_had_send_data_number=0;
-        }
-
-
-
-        //WriteLogFile(_T(">>broad cast commnad here, fast check is any devices are alive"));
-        CString filelog;
-        filelog=_T("Send a scan command to any devices: ");
-
-
-
-        for (int i = 0; i < 6; i++)
-        {
-            int nValue = pval[i];
-            CString strValue;
-            strValue.Format(_T("%0X, "), nValue);
-            //g_fileScanLog->WriteString(strValue);
-            filelog+=strValue;
-        }
-
-        //WriteLogFile(filelog);
-        filelog.Empty();
-        filelog=_T("Recv Data : ");
-        for (int i = 0; i < 13; i++)
-        {
-            int nValue = gval[i];
-            CString strValue;
-            strValue.Format(_T("%0X, "), nValue);
-            //g_fileScanLog->WriteString(strValue);
-            filelog+=strValue;
-        }
-
-        //WriteLogFile(filelog);
-        int index=filelog.Find(_T("0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,"));
-        if(index==-1)
-        {
-            //WriteLogFile(_T(">>More than one device answer......"));
-        }
-        else
-        {
-            //WriteLogFile(_T(">>No one device answer......"));
-        }
-
-
-
-        if(gval[8]==0 && gval[9]==0 && gval[10]==0 && gval[11]==0 && gval[12]==0)
-        {
-            //old scan protocal
-            old_or_new_scan_protocal_in_dll=2;
-            if(gval[0]==0 && gval[1]==0 && gval[2]==0 && gval[3]==0 && gval[4]==0)
-            {
-                Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
-                return -4;              //no response ,no connection
-
-
-            }
-            // added by zgq; find this situation: t3000 can find a comport,
-            //which don't connect a tstat, but write file to the com, will receive the same data with send,
-            // infact the com port don't work fine. But it never give you a wrong data.
-            if(gval[0]==pval[0] && gval[1]==pval[1] && gval[2]==pval[2] && gval[3]==pval[3] && gval[4]==pval[4] && gval[5]==pval[5])
-            {
-
-
-                Sleep(SLEEP_TIME);
-                return -4;
-            }
-
-            //////////////////////////////////////////////////////////////////////////
-            if(gval[5]!=0 || gval[6]!=0)//to inspect
-            {
-                Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
-                return -3;
-            }
-            if((gval[0]!=pval[0]) || (gval[1]!=25))
-            {
-                Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
-                return -2;
-            }
-            crc=CRC16(gval,3);
-            if( (gval[3]!=((crc>>8) & 0xff)) || (gval[4]!=(crc & 0xff)))
-            {
-                Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
-                return -2;
-            }
-        }
-        else
-        {
-            // new scan protocal,if many old tstat ,get into here ,scan result is oK too.
-            old_or_new_scan_protocal_in_dll=1;
-            Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
-            if(gval[9]!=0 || gval[10]!=0 || gval[11]!=0 || gval[12]!=0)//to inspect
-                return -3;
-            if((gval[0]!=pval[0]) || (gval[1]!=25))
-                return -2;
-            crc=CRC16(gval,7);
-            if( gval[7]!=((crc>>8) & 0xff) )
-                return -2;
-            if(gval[8]!=(crc & 0xff))
-                return -2;
-        }
-        //here is different with CheckTstatOnline() function
-        //	TRACE("%d R:%x %x %x %x %x %x %x %x %x %x %x %x %x\n",ddd,gval[0],gval[1],gval[2],gval[3],gval[4],gval[5],gval[6],gval[7],gval[8],gval[9],gval[10],gval[11],gval[12]);
-        //	TRACE("%d ^-^ ^-^ %d^\n",ddd,gval[2]);
-        /*
-        if(default_file.Open(_T(saved_path.GetString()),CFile::modeCreate | CFile::modeWrite | CFile::modeNoTruncate)!=0)
-        {
-        default_file.SeekToEnd();
-        a_line.Format("exist:%d",gval[2]);
-        default_file.WriteString(a_line+"\n");
-        default_file.Flush();
-        default_file.Close();
-        }*/
-        return gval[2];
-    }
-
-    if(bComm_Type==1)
-    {
-        //the second time
-        //val         the value that you want to write to the register
-        //the return value == -1 ,no connecting
-        //the return value == -2 ,try it again
-        //the return value == -3,Maybe that have more than 2 Tstat is connecting
-        //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
-        //the return value == -5 ,the input have some trouble
-        //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //清空串口缓冲区
-        //the return value is the register address
-        strlog.Format(_T("MINIPannel NET Scan:  From ID=%d To ID=%d"),devLo,devHi);
-        //NET_WriteLogFile(strlog);
-        if(devLo<1 || devHi>254)
-            return -5;
-        //the input inspect
-        for(int i=0; i<13; i++)
-            gval[i]=0;/////////////////////////////////////////clear buffer
-
-        TS_UC  pval[11];
-//		TS_US crc;
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
-        pval[0]=1;
-        pval[1]=2;
-        pval[2]=3;
-        pval[3]=4;
-        pval[4]=5;
-        pval[5]=6;
-
-        pval[6] = 255;
-        pval[7] = 24;
-        pval[8] = devHi;
-        pval[9] = devLo;
-        pval[10] =NET_COM ;
-
-        /*
-        crc = CRC16(pval,4);
-        pval[4] = (crc >>8) & 0xff;
-        pval[5] = crc & 0xff;
-        */
-
-        if (m_hSocket==INVALID_SOCKET)
-        {
-            return -1;
-        }
-        int nRet =::send(m_hSocket,(char*)pval,sizeof(pval),0);//scan 扫MINI Pannel中的TSTAT
-
-        //Sleep(SLEEP_TIME+8);
-        Sleep(LATENCY_TIME_NET+100);
-// 		TS_UC  rvData[19];
-// 		for(int i=0;i<19;i++)
-// 			rvData[i]=0;
-
-        TS_UC  rvData[100];
-        for(int i=0; i<100; i++)
-            rvData[i]=0;
-
-
-        int nRecv = ::recv(m_hSocket, (char*)rvData, sizeof(rvData), 0);
-        if (nRecv>0)
-        {
-            memcpy(gval,(void*)&rvData[6],sizeof(rvData));
-        }
-
-//		static int num = 0;
-        //NET_WriteLogFile(_T(">>broad cast commnad here, fast check is any devices are alive"));
-        CString filelog;
-        filelog=_T("Send a scan command to any devices: ");
-
-
-        for (int i = 6; i <= 10; i++)
-        {
-            int nValue = pval[i];
-            CString strValue;
-            strValue.Format(_T("%0X, "), nValue);
-            //g_fileScanLog->WriteString(strValue);
-            filelog+=strValue;
-        }
-
-        //NET_WriteLogFile(filelog);
-        filelog.Empty();
-
-        filelog=_T("Recv Data : ");
-        for (int i = 0; i <13; i++)
-        {
-            int nValue = gval[i];
-            CString strValue;
-            strValue.Format(_T("%0X, "), nValue);
-            //g_fileScanLog->WriteString(strValue);
-            filelog+=strValue;
-        }
-        ////NET_WriteLogFile(_T("Recv Data:"));
-        //NET_WriteLogFile(filelog);
-        int index=filelog.Find(_T("0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,"));
-        if(index==-1)
-        {
-            //WriteLogFile(_T(">>More than one device answer......"));
-        }
-        else
-        {
-            //WriteLogFile(_T(">>No one device answer......"));
-        }
-
-//		if (g_fileScanLog == NULL)
-//		{
-//			g_fileScanLog = new CStdioFile;
-//		}
-//
-//	if (g_fileScanLog != NULL)
-//		{
-//			TCHAR exeFullPath[MAX_PATH+1]; //
-//			GetModuleFileName(NULL, exeFullPath, MAX_PATH);
-//			(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;
-//
-//			CString g_strExePth=exeFullPath;
-//			m_strFileINI = g_strExePth + _T("ScanLog.TXT");
-//			if(g_fileScanLog->Open(m_strFileINI.GetString(),CFile::modeReadWrite))
-//			{
-//#if 1
-//                g_fileScanLog->SeekToEnd();
-//				CString strsend,strreceive;
-//				strsend = _T("Send Data:");
-//				strreceive = _T("Receive Data:");
-//				g_fileScanLog->WriteString(strsend+_T("\n"));
-//
-//				CString str;
-//				int idate;
-//				//str.Format(_T("%"),pval);
-//				//m_pFile->WriteString(str+_T("\n"));
-//				for (int i =0;i<sizeof(pval);i++)
-//				{
-//					idate =(int)pval[i];
-//					str.Format(_T("%0x"),idate);
-//
-//					g_fileScanLog->WriteString(str+_T(" "));
-//
-//				}
-//
-//				g_fileScanLog->WriteString(_T("\n"));
-//				g_fileScanLog->WriteString(strreceive+_T("\n"));//↑
-//				for (int i =0;i<sizeof(rvData);i++)
-//				{
-//					idate =(int)rvData[i];
-//					str.Format(_T("%0x"),idate);
-//					g_fileScanLog->WriteString(str+_T(" "));
-//				}
-//
-//
-//
-//				g_fileScanLog->WriteString(_T("\n"));
-//#endif
-//
-//
-//				g_fileScanLog->Close();
-//			}
-//		    else
-//			{
-//			 //-----
-//			}
-//
-//
-//		}
-
-
-
-
-
-
-
-
-        //if(gval[8]==0 && gval[9]==0 && gval[10]==0 && gval[11]==0 && gval[12]==0)//// it's old code, modified by zgq:2011-12-14
-        if(gval[8]==0 && gval[9]==0 && gval[10]==0 && gval[11]==0 && gval[12]==0 && gval[3]==0 &&gval[4]==0 &&gval[5]==0 &&gval[6]==0)
-        {
-            //old scan protocal
-            old_or_new_scan_protocal_in_dll=2;
-            if(gval[0]==0 && gval[1]==0 && gval[2]==0 && gval[3]==0 && gval[4]==0)
-            {
-                Sleep(SLEEP_TIME+8);//be must ,if not use this ,will found some trouble
-                return -4;              //no response ,no connection
-            }
-            if(gval[5]!=0 || gval[6]!=0)//to inspect
-            {
-                Sleep(SLEEP_TIME+8);//be must ,if not use this ,will found some trouble
-                return -3;
-            }
-            if((gval[0]!=255) || (gval[1]!=25))
-            {
-                //		Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
-                return -2;
-            }
-            /*
-            crc=CRC16(gval,3);
-            if( (gval[3]!=((crc>>8) & 0xff)) || (gval[4]!=(crc & 0xff)))
-            {
-            	//		Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
-            	return -2;
-            }
-            */
-
-        }
-        else
-        {
-            // new scan protocal,if many old tstat ,get into here ,scan result is oK too.
-            old_or_new_scan_protocal_in_dll=1;
-            Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
-
-
-            //if(gval[7]!=0 || gval[8]!=0 || gval[9]!=0 || gval[10]!=0)//to inspect
-            if(gval[9]!=0 || gval[10]!=0 || gval[11]!=0 || gval[12]!=0)//to inspect  //zgq: same with com port scan
-            {
-                //Sleep(SLEEP_TIME+8);
-                return -3;
-
-            }
-
-            if((gval[0]!=255) || (gval[1]!=25))
-                return -2;
-
-            /*
-            if (gval[0]==0&&gval[0]==0&&gval[0]==0)
-            {
-            	return -3;
-            }
-            */
-
-            /*
-            crc=CRC16(gval,7);
-            if( gval[7]!=((crc>>8) & 0xff) )
-            	return -2;
-            if(gval[8]!=(crc & 0xff))
-            	return -2;
-            	*/
-        }
-        return gval[2];
-    }
-    return -1;
-}
-
-OUTPUT int MINI_CheckTstatOnline_a(TS_UC devLo,TS_UC devHi, bool bComm_Type,int NET_COM)
-{
-    if(bComm_Type==0)
-    {
-        //val         the value that you want to write to the register
-        //the return value == -1 ,no connecting
-        //the return value == -2 ,try it again
-        //the return value == -3,Maybe that have more than 2 Tstat is connecting
-        //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
-        //the return value == -5 ,the input have some trouble
-        //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //清空串口缓冲区
-        //the return value is the register address
-        //Sleep(50);       //must use this function to slow computer
-        if(devLo<1 || devHi>254)
-            return -5;
-        if(m_hSerial==NULL)
-        {
-            return -1;
-        }
-        int the_return_value;
-        int the_return_value2=0;
-        //CheckTstatOnline2_a 可以记录收发的数据
-        the_return_value=MINI_CheckTstatOnline2_a(devLo,devHi, bComm_Type);
-        //down is inspect result first scan
-        if(the_return_value==-4)
-        {
-            the_return_value=MINI_CheckTstatOnline2_a(devLo,devHi, bComm_Type);
-            return the_return_value;
-        }
-        if(old_or_new_scan_protocal_in_dll==1)
-        {
-            //new protocal
-            if(the_return_value>0)
-            {
-                the_return_value2=MINI_CheckTstatOnline2_a(devLo,devHi, bComm_Type);
-                if(the_return_value2!=-4)
-                    the_return_value=the_return_value2;
-            }
-            return the_return_value;
-        }
-        else if(old_or_new_scan_protocal_in_dll==2)
-        {
-            //old protocal
-            if(the_return_value==-2 || the_return_value==-3 || the_return_value==-4)
-                return the_return_value;
-            int i=0;
-            do
-            {
-                the_return_value=MINI_CheckTstatOnline2_a(devLo,devHi, bComm_Type);
-                if(the_return_value==-3 || the_return_value==-2 || the_return_value==-4)
-                    return the_return_value;
-                else if(the_return_value>0)
-                    i++;
-            }
-            while(i<3);
-            return the_return_value;
-        }
-        //	if(the_return_value>0)
-        //		TRACE("^-^ ^-^ %d\n",the_return_value);
-        return the_return_value;
-    }
-
-    if(bComm_Type==1)//
-    {
-        //val         the value that you want to write to the register
-        //the return value == -1 ,no connecting
-        //the return value == -2 ,try it again
-        //the return value == -3,Maybe that have more than 2 Tstat is connecting
-        //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
-        //the return value == -5 ,the input have some trouble
-        //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //清空串口缓冲区
-        //the return value is the register address
-        //Sleep(50);       //must use this function to slow computer
-        if(devLo<1 || devHi>254)
-            return -5;
-        if (m_hSocket==INVALID_SOCKET)
-        {
-            return -1;
-        }
-        int the_return_value;
-        int the_return_value2=0;
-        the_return_value=MINI_CheckTstatOnline2_a(devLo,devHi, bComm_Type,NET_COM);
-        //down is inspect result first scan
-        if(the_return_value==-4)
-        {
-            the_return_value=MINI_CheckTstatOnline2_a(devLo,devHi, bComm_Type,NET_COM);
-            return the_return_value;
-        }
-        if(old_or_new_scan_protocal_in_dll==1)
-        {
-            //new protocal
-            if(the_return_value>0)
-            {
-                the_return_value2=MINI_CheckTstatOnline2_a(devLo,devHi, bComm_Type,NET_COM);
-                if(the_return_value2!=-4)
-                    the_return_value=the_return_value2;
-            }
-            return the_return_value;
-        }
-        else if(old_or_new_scan_protocal_in_dll==2)
-        {
-            //old protocal
-// 			if(the_return_value==-2 || the_return_value==-3 || the_return_value==-4)
-// 				return the_return_value;
-// 			int i=0;
-// 			do{
-// 				the_return_value=CheckTstatOnline2(devLo,devHi, bComm_Type);
-// 				if(the_return_value==-3 || the_return_value==-2 || the_return_value==-4)
-// 					return the_return_value;
-// 				else if(the_return_value>0)
-// 					i++;
-// 			}while(i<3);
-            if(the_return_value>0)
-            {
-                the_return_value2=MINI_CheckTstatOnline2_a(devLo,devHi, bComm_Type,NET_COM);
-                if(the_return_value2!=-4)
-                    the_return_value=the_return_value2;
-            }
-            return the_return_value;
-        }
-        //	if(the_return_value>0)
-        //		TRACE("^-^ ^-^ %d\n",the_return_value);
-        return the_return_value;
-    }
-    return -1;
-}
-
 OUTPUT void SetResponseTime (TS_US Time)
 {
     if (g_Commu_type == 0)
@@ -7941,7 +7712,11 @@ OUTPUT int SendData (TS_US *to_write,TS_US length,unsigned char *put_senddate_in
 }
 
 
-OUTPUT int Modbus_Standard_Read(TS_UC device_var, TS_US *put_data_into_here, int function_code, TS_US start_address, int length)
+OUTPUT int Modbus_Standard_Read(TS_UC device_var, TS_US *put_data_into_here, int function_code, TS_US start_address, int length,
+	unsigned char *put_senddate_into_here,
+	unsigned char *put_revdata_into_here,
+	int* sendDataLength, int* recvDataLength
+)
 {
 	int responseLength = -2;
 
@@ -7989,7 +7764,11 @@ OUTPUT int Modbus_Standard_Read(TS_UC device_var, TS_US *put_data_into_here, int
 		m_osMulWrite.Offset = 0;
 		m_osMulWrite.OffsetHigh = 0;
 		///////////////////////////////////////////////////////send the to read message
-
+		*sendDataLength = 8;
+		for (int i = 0; i < *sendDataLength; i++)
+		{
+			*((char*)put_senddate_into_here + i) = data_to_send[i];
+		}
 
 
 		int fState = WriteFile(m_hSerial,// 句柄
@@ -8034,6 +7813,14 @@ OUTPUT int Modbus_Standard_Read(TS_UC device_var, TS_US *put_data_into_here, int
 			else
 				m_had_send_data_number = 0;
 		}
+
+		*recvDataLength = m_had_send_data_number;
+		for (int i = 0; i < *recvDataLength; i++)
+		{
+			*((char*)put_revdata_into_here + i) = to_send_data[i];
+		}
+
+
 		///////////////////////////////////////////////////////////
 		if (to_send_data[0] != device_var || to_send_data[1] != function_code)
 			{return -2;}
@@ -8150,12 +7937,22 @@ OUTPUT int Modbus_Standard_Read(TS_UC device_var, TS_US *put_data_into_here, int
 		{
 			return -1;
 		}
-
+		*sendDataLength = sizeof(data_to_send);
+		for (int i = 0; i < *sendDataLength; i++)
+		{
+			*((char*)put_senddate_into_here + i) = data_to_send[i];
+		}
 		::send(m_hSocket, (char*)data_to_send, sizeof(data_to_send), 0);
 
 		Sleep(LATENCY_TIME_NET);
 		int nn = sizeof(to_Reive_data);
 		int nRecv = ::recv(m_hSocket, (char*)to_Reive_data, length * 2 + 12, 0);
+
+		*recvDataLength = nRecv;
+		for (int i = 0; i < *recvDataLength; i++)
+		{
+			*((char*)put_revdata_into_here + i) = to_Reive_data[i];
+		}
 
 		memcpy((void*)&to_send_data[0], (void*)&to_Reive_data[6], sizeof(to_Reive_data));
 		///////////////////////////////////////////////////////////

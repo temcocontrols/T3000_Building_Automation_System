@@ -108,7 +108,7 @@ CParameterDlg::CParameterDlg(CWnd* pParent /*=NULL*/,CString str)
     m_version=1.0;
 
     strparamode = str;
-
+	m_time_left = 0;
 }
 
 CParameterDlg::~CParameterDlg()
@@ -323,6 +323,8 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
 		ON_CBN_SELCHANGE(IDC_COMBO_MRD, &CParameterDlg::OnCbnSelchangeComboMrd)
 		ON_BN_CLICKED(IDC_BUTTON_APPLY_ALL, &CParameterDlg::OnBnClickedButtonApplyAll)
 		ON_BN_CLICKED(IDC_BUTTON_ZIGBEE, &CParameterDlg::OnBnClickedButtonZigbee)
+		ON_EN_KILLFOCUS(IDC_EDIT_SHOWID, &CParameterDlg::OnEnKillfocusEditShowid)
+		ON_BN_CLICKED(IDC_BUTTON_SHOW_MODBUS_ID, &CParameterDlg::OnBnClickedButtonShowModbusId)
 		END_MESSAGE_MAP()
 
 
@@ -795,7 +797,7 @@ BOOL CParameterDlg::OnInitDialog()
 
 
     UpdateData(FALSE);
-    SetTimer(1,2000,NULL);
+    
     //////////////////////////////////////////////////////////////////////////
     // TODO:  Add extra initialization here
     return TRUE;  // return TRUE unless you set the focus to a control
@@ -4688,20 +4690,7 @@ HBRUSH CParameterDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 }
 
 
-void CParameterDlg::OnTimer(UINT_PTR nIDEvent)
-{
-    // TODO: Add your message handler code here and/or call default
-    //Post_Read_one_Thread_Message(g_tstat_id,MODBUS_ROTATION_TIME_LEFT,this->m_hWnd);
-    //Post_Read_one_Thread_Message(g_tstat_id,MODBUS_TEMPRATURE_CHIP,this->m_hWnd);
-    //Post_Read_one_Thread_Message(g_tstat_id,MODBUS_INPUT1_SELECT,this->m_hWnd);
-    //Post_Read_one_Thread_Message(g_tstat_id,MODBUS_EXTERNAL_SENSOR_0,this->m_hWnd);
-    //Post_Read_one_Thread_Message(g_tstat_id,MODBUS_COOLING_PID,this->m_hWnd);
-    //Post_Read_one_Thread_Message(g_tstat_id,MODBUS_PID_UNIVERSAL,this->m_hWnd);
-    //Fresh_Single_UI();
-    //Reflesh_ParameterDlg();
 
-    CDialog::OnTimer(nIDEvent);
-}
 
 void CParameterDlg::Fresh_Single_UI()
 {
@@ -6000,4 +5989,52 @@ void CParameterDlg::OnBnClickedButtonZigbee()
 	CZigbeeInformationDlg dlg;
 	dlg.DoModal();
 	 
+}
+
+
+void CParameterDlg::OnEnKillfocusEditShowid()
+{
+	CString deadmaster;
+	GetDlgItem(IDC_EDIT_SHOWID)->GetWindowText(deadmaster);
+	int deadmastervalue = _wtoi(deadmaster.GetBuffer());
+	 
+
+	Post_Thread_Message(MY_WRITE_ONE, 255, 725, deadmastervalue,
+		product_register_value[725], this->m_hWnd, IDC_EDIT_SHOWID, _T("Show Modbus ID(Min)"));
+}
+
+
+void CParameterDlg::OnBnClickedButtonShowModbusId()
+{
+	int deadmastervalue = 5;
+
+	Post_Thread_Message(MY_WRITE_ONE, 255, 725, deadmastervalue,
+		product_register_value[725], this->m_hWnd, IDC_EDIT_SHOWID, _T("Show Modbus ID(Min)"));
+	m_time_left = 5 * 60;
+	SetTimer(1, 1000, NULL);
+}
+void CParameterDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	 
+	if (nIDEvent == 1)
+	{
+		if (m_time_left == 0)
+		{
+			GetDlgItem(IDC_BUTTON_SHOW_MODBUS_ID)->SetWindowTextW(L"Show Modbus ID");
+			GetDlgItem(IDC_BUTTON_SHOW_MODBUS_ID)->EnableWindow(TRUE);
+			KillTimer(1);
+			 
+		}
+		else
+		{
+			CString time;
+			--m_time_left;
+			time.Format(L"Time Left:%d(s)", m_time_left);
+			GetDlgItem(IDC_BUTTON_SHOW_MODBUS_ID)->SetWindowTextW(time);
+			GetDlgItem(IDC_BUTTON_SHOW_MODBUS_ID)->EnableWindow(FALSE);
+
+		}
+
+	}
+	CDialog::OnTimer(nIDEvent);
 }

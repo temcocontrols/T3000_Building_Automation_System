@@ -370,6 +370,7 @@ void CReadWrite_Multiple_RegDlg::OnBnClickedButtonSend()
 	register_critical_section.Lock();
 	int ret=write_multi_Short_log(m_slave_id,Data_Buffer,m_address,m_quantity,&send_data[0],&rev_back_rawData[0],&Send_length,&Rev_length);
 	register_critical_section.Unlock();
+
 	++g_Tx_Rx;
 	temp.Format(_T("%06d--"),g_Tx_Rx);
 	m_Tx+=temp;

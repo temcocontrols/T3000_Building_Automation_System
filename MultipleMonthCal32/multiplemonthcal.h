@@ -46,4 +46,13 @@ typedef struct tagNMSELCHANGEEX
 VOID   MONTHCAL_Register(VOID);
 VOID   MONTHCAL_Unregister(VOID);
 
+#define MULTIPLEMONTHCAL_CLASSA          "MultipleMonthCal32"
+#define MULTIPLEMONTHCAL_CLASSW          L"MultipleMonthCal32"
+
+#ifdef UNICODE
+#define MULTIPLEMONTHCAL_CLASS           MULTIPLEMONTHCAL_CLASSW
+#else
+#define MULTIPLEMONTHCAL_CLASS           MULTIPLEMONTHCAL_CLASSA
+#endif
+
 #endif  /* __IMPROVED_MONTHCAL_H */

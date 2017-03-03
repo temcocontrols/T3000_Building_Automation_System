@@ -37,8 +37,12 @@ public:
 	virtual void OnCancel();
 	void Reg_Hotkey();
 	void Unreg_Hotkey();
+	void Reset_Weekly_Rect();
+	void OnSize(UINT nType, int cx, int cy);
+	void OnSysCommand(UINT nID, LPARAM lParam);
 
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
+	bool window_max; // 标记是否已经最大化;
 };
 
 const int WEEKLY_ROUTINE_NUM = 0;

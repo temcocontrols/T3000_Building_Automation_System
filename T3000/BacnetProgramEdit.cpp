@@ -13,6 +13,7 @@
 #include "gloab_define.h"
 #include "BacnetProgramSetting.h"
 #include "BacnetProgramDebug.h"
+extern CBacnetProgramEdit *ProgramEdit_Window;
 #define  WM_RICHEDIT_RIGHT_CLICK  WM_USER + 1001
 extern char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network,unsigned char & sub_panel, byte panel , int *netpresent);
 CBacnetProgramDebug * Program_Debug_Window = NULL;
@@ -304,7 +305,8 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 		SetKeyboardState(Keystatus);
 		PostMessage(WM_KEYDOWN,VK_CAPITAL,0);
 	}
-
+	SetTimer(2,1000,NULL);
+	::SetWindowPos(this->m_hWnd,HWND_TOP,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
 	return FALSE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -537,7 +539,7 @@ void CBacnetProgramEdit::OnSend()
 	
 		TRACE(_T("Encode_Program length is %d ,copy length is %d\r\n"),program_code_length[program_list_line],my_lengthcode );
 
-		if(my_lengthcode > 2000)
+		if(my_lengthcode > 1920)
 		{
 			MessageBox(_T("Encode Program Code Length is too large"));
 			return;
@@ -1023,17 +1025,22 @@ int CBacnetProgramEdit::Bacnet_Show_Debug(CString &retselstring)
 
 	switch(point_type)
 	{
-	case 0:
+	case BAC_OUT:
 		{
 			if(point_number >= BAC_OUTPUT_ITEM_COUNT)
 				break;
 		}
-	case 1:
+	case BAC_IN:
 		{
 			if(point_number >= BAC_INPUT_ITEM_COUNT)
 				break;
 		}
-	case 2:
+	case BAC_PID:
+		{
+			if(point_number >= BAC_PID_COUNT)
+				break;
+		}
+	case BAC_VAR:
 		{
 			if(point_number >= BAC_VARIABLE_ITEM_COUNT)
 				break;
@@ -1054,6 +1061,7 @@ int CBacnetProgramEdit::Bacnet_Show_Debug(CString &retselstring)
 			return true;
 		}
 		break;
+
 	default:
 		break;
 	}
@@ -1065,13 +1073,28 @@ bool need_syntax = false;
 void CBacnetProgramEdit::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
-	if(need_syntax)
+	switch(nIDEvent)
 	{
-		KillTimer(1);
-		Syntax_analysis();
-		need_syntax = false;
-		
+	case 1:
+		{
+			if(need_syntax)
+			{
+				KillTimer(1);
+				Syntax_analysis();
+				need_syntax = false;
+			}
+		}
+		break;
+	case 2:
+		{
+			//if(this->GetParent()->IsTopParentActive())
+			//{
+			//	::SetWindowPos(this->m_hWnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
+			//}
+		}
+		break;
 	}
+
 	CDialogEx::OnTimer(nIDEvent);
 }
 
@@ -1190,10 +1213,10 @@ BOOL CBacnetProgramEdit::PreTranslateMessage(MSG* pMsg)
 				}
 
 				static int prg_key_count = 1 ;
-				if(prg_key_count ++ % 2 == 0)
+				if(prg_key_count ++ % 20 == 0)
 				{
 					need_syntax = true;
-					SetTimer(1,5000,NULL);
+					SetTimer(1,10000,NULL);
 					prg_key_count = 1;
 				}
 

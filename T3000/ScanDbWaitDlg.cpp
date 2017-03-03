@@ -372,13 +372,21 @@ void CScanDbWaitDlg::Initial_List()
 	m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 1,SCAN_SKIP,_T(" "));
 	m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 1,SCAN_STATUS,_T(" "));
 	m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 1,SCAN_FOUND,_T(" "));
-
-	scan_mode = _T(" ");
+	if(b_remote_connection)
+	{
+		scan_mode = _T("Remote IP Device");
+	}
+	else
+		scan_mode = _T("");
 	m_scan_com_list.InsertItem(ncount*NUMBER_BAUDRATE + 2,scan_mode);
 	m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 2,SCAN_SKIP,_T(" "));
 	m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 2,SCAN_STATUS,_T(" "));
 	m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 2,SCAN_FOUND,_T(" "));
 
+	if(b_remote_connection)
+	{
+		 m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 2,SCAN_SKIP,_T("No"));
+	}
 
     for (int x=0; x<m_scan_info.size(); x++)
     {

@@ -32,6 +32,10 @@ public:
 	afx_msg void OnClose();
 	virtual void OnCancel();
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
+	bool window_max; // 标记是否已经最大化;
+	void Reset_Alarm_Rect();
 };
 
 const int ALARMLOG_NUM = 0;

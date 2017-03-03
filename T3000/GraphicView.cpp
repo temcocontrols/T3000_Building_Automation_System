@@ -450,7 +450,7 @@ void CGraphicView::OnBnClickedApplybutton()
 
 	if(m_RelayLabelLst.size()<=0)
 	{
-		AfxMessageBox(_T("There is no lable in current graphic view"));
+		AfxMessageBox(_T("There is no label in current graphic view"));
 		return;
 	}
 	ApplyGraphicLabelsDlg Dlg;
