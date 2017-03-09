@@ -186,6 +186,18 @@
   <data name="trashBoxToolStripMenuItem.Text" xml:space="preserve">
     <value>Trash Box</value>
   </data>
+  <data name="gridViewToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>203, 22</value>
+  </data>
+  <data name="gridViewToolStripMenuItem.Text" xml:space="preserve">
+    <value>Grid View</value>
+  </data>
+  <data name="excelExportToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>203, 22</value>
+  </data>
+  <data name="excelExportToolStripMenuItem.Text" xml:space="preserve">
+    <value>Excel Export</value>
+  </data>
   <data name="optionToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>56, 20</value>
   </data>
@@ -880,7 +892,7 @@
     <value>True</value>
   </metadata>
   <data name="id.HeaderText" xml:space="preserve">
-    <value>id</value>
+    <value>ID</value>
   </data>
   <data name="id.Width" type="System.Int32, mscorlib">
     <value>30</value>
@@ -889,7 +901,7 @@
     <value>True</value>
   </metadata>
   <data name="name.HeaderText" xml:space="preserve">
-    <value>name</value>
+    <value>System Name</value>
   </data>
   <data name="name.Width" type="System.Int32, mscorlib">
     <value>120</value>
@@ -1057,13 +1069,25 @@
     <value>311, 22</value>
   </metadata>
   <data name="deleteToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>139, 22</value>
+    <value>192, 22</value>
   </data>
   <data name="deleteToolStripMenuItem.Text" xml:space="preserve">
     <value>Delete Chart</value>
   </data>
+  <data name="saveAsTemplateToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>192, 22</value>
+  </data>
+  <data name="saveAsTemplateToolStripMenuItem.Text" xml:space="preserve">
+    <value>Save as chart template</value>
+  </data>
+  <data name="loadTemplateToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>192, 22</value>
+  </data>
+  <data name="loadTemplateToolStripMenuItem.Text" xml:space="preserve">
+    <value>Load chart template</value>
+  </data>
   <data name="contextMenuStrip1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>140, 26</value>
+    <value>193, 70</value>
   </data>
   <data name="&gt;&gt;contextMenuStrip1.Name" xml:space="preserve">
     <value>contextMenuStrip1</value>
@@ -1078,7 +1102,7 @@
     <value>192, 22</value>
   </data>
   <data name="quickNodeInsertToolStripMenuItem.Text" xml:space="preserve">
-    <value>Quick Node Insert</value>
+    <value>Insert Node</value>
   </data>
   <data name="insertNodeToolStripMenuItem.Enabled" type="System.Boolean, mscorlib">
     <value>False</value>
@@ -1110,11 +1134,17 @@
   <data name="enableToolStripMenuItem.Text" xml:space="preserve">
     <value>Show</value>
   </data>
+  <data name="enableToolStripMenuItem.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
   <data name="settingsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>172, 22</value>
   </data>
   <data name="settingsToolStripMenuItem.Text" xml:space="preserve">
     <value>Settings</value>
+  </data>
+  <data name="settingsToolStripMenuItem.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
   </data>
   <data name="editComfortzoneToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>172, 22</value>
@@ -1468,7 +1498,7 @@
     <value>True</value>
   </metadata>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>52</value>
+    <value>54</value>
   </metadata>
   <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
     <value>6, 14</value>
@@ -3152,7 +3182,7 @@
     <value>CenterScreen</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
-    <value>Psychometric Chart</value>
+    <value>Psychometric Chart </value>
   </data>
   <data name="&gt;&gt;optionToolStripMenuItem.Name" xml:space="preserve">
     <value>optionToolStripMenuItem</value>
@@ -3188,6 +3218,18 @@
     <value>trashBoxToolStripMenuItem</value>
   </data>
   <data name="&gt;&gt;trashBoxToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;gridViewToolStripMenuItem.Name" xml:space="preserve">
+    <value>gridViewToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;gridViewToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;excelExportToolStripMenuItem.Name" xml:space="preserve">
+    <value>excelExportToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;excelExportToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;fileToolStripMenuItem.Name" xml:space="preserve">
@@ -3266,6 +3308,18 @@
     <value>deleteToolStripMenuItem</value>
   </data>
   <data name="&gt;&gt;deleteToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;saveAsTemplateToolStripMenuItem.Name" xml:space="preserve">
+    <value>saveAsTemplateToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;saveAsTemplateToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;loadTemplateToolStripMenuItem.Name" xml:space="preserve">
+    <value>loadTemplateToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;loadTemplateToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;quickNodeInsertToolStripMenuItem.Name" xml:space="preserve">

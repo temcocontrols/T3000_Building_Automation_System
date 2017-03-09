@@ -361,7 +361,7 @@ namespace WFA_psychometric_chart
                     string name = tb_name.Text;
                     Color c = btn_color.BackColor;
                     bs.InsertComfortZoneValue(name, minT, maxT, minH, maxH, c);
-                    MessageBox.Show("insert success");
+                    MessageBox.Show("Add success");
 
                     //NOW LEST REFRESH THE FORM
                     refreshAfterEdit();

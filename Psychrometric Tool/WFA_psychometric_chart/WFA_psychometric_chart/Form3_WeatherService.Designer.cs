@@ -55,7 +55,6 @@
             this.CB_Device = new System.Windows.Forms.ComboBox();
             this.button4 = new System.Windows.Forms.Button();
             this.label14 = new System.Windows.Forms.Label();
-            this.label13 = new System.Windows.Forms.Label();
             this.tb_hum_panel_value = new System.Windows.Forms.TextBox();
             this.tb_temp_panel_value = new System.Windows.Forms.TextBox();
             this.label12 = new System.Windows.Forms.Label();
@@ -97,7 +96,6 @@
             this.label24 = new System.Windows.Forms.Label();
             this.label23 = new System.Windows.Forms.Label();
             this.label22 = new System.Windows.Forms.Label();
-            this.label21 = new System.Windows.Forms.Label();
             this.tb_cw_barometer_value = new System.Windows.Forms.TextBox();
             this.label20 = new System.Windows.Forms.Label();
             this.tb_cw_hum = new System.Windows.Forms.TextBox();
@@ -113,6 +111,12 @@
             this.tb_last_updated = new System.Windows.Forms.TextBox();
             this.tb_location = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
+            this.lb_unit_elevation = new System.Windows.Forms.Label();
+            this.lb_unit_longitude = new System.Windows.Forms.Label();
+            this.lb_unit_latitude = new System.Windows.Forms.Label();
+            this.label5tttttrr = new System.Windows.Forms.Label();
+            this.label5gggg = new System.Windows.Forms.Label();
+            this.lb_station_distance_unit = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -124,6 +128,9 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.lb_unit_elevation);
+            this.groupBox1.Controls.Add(this.lb_unit_longitude);
+            this.groupBox1.Controls.Add(this.lb_unit_latitude);
             this.groupBox1.Controls.Add(this.lb_building_name);
             this.groupBox1.Controls.Add(this.label42);
             this.groupBox1.Controls.Add(this.label40);
@@ -150,7 +157,6 @@
             // 
             resources.ApplyResources(this.lb_building_name, "lb_building_name");
             this.lb_building_name.Name = "lb_building_name";
-            this.lb_building_name.Click += new System.EventHandler(this.lb_building_name_Click);
             // 
             // label42
             // 
@@ -248,13 +254,13 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.label5tttttrr);
             this.groupBox2.Controls.Add(this.lb_chose_a_device);
             this.groupBox2.Controls.Add(this.CB_param_hum);
             this.groupBox2.Controls.Add(this.CB_param_temp);
             this.groupBox2.Controls.Add(this.CB_Device);
             this.groupBox2.Controls.Add(this.button4);
             this.groupBox2.Controls.Add(this.label14);
-            this.groupBox2.Controls.Add(this.label13);
             this.groupBox2.Controls.Add(this.tb_hum_panel_value);
             this.groupBox2.Controls.Add(this.tb_temp_panel_value);
             this.groupBox2.Controls.Add(this.label12);
@@ -306,11 +312,6 @@
             resources.ApplyResources(this.label14, "label14");
             this.label14.Name = "label14";
             // 
-            // label13
-            // 
-            resources.ApplyResources(this.label13, "label13");
-            this.label13.Name = "label13";
-            // 
             // tb_hum_panel_value
             // 
             resources.ApplyResources(this.tb_hum_panel_value, "tb_hum_panel_value");
@@ -345,6 +346,7 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.lb_station_distance_unit);
             this.groupBox3.Controls.Add(this.groupBox7);
             this.groupBox3.Controls.Add(this.tb_station_distance);
             this.groupBox3.Controls.Add(this.label37);
@@ -511,6 +513,7 @@
             // 
             // groupBox5
             // 
+            this.groupBox5.Controls.Add(this.label5gggg);
             this.groupBox5.Controls.Add(this.tb_station_name);
             this.groupBox5.Controls.Add(this.label38);
             this.groupBox5.Controls.Add(this.label33);
@@ -520,7 +523,6 @@
             this.groupBox5.Controls.Add(this.label24);
             this.groupBox5.Controls.Add(this.label23);
             this.groupBox5.Controls.Add(this.label22);
-            this.groupBox5.Controls.Add(this.label21);
             this.groupBox5.Controls.Add(this.tb_cw_barometer_value);
             this.groupBox5.Controls.Add(this.label20);
             this.groupBox5.Controls.Add(this.tb_cw_hum);
@@ -578,11 +580,6 @@
             // 
             resources.ApplyResources(this.label22, "label22");
             this.label22.Name = "label22";
-            // 
-            // label21
-            // 
-            resources.ApplyResources(this.label21, "label21");
-            this.label21.Name = "label21";
             // 
             // tb_cw_barometer_value
             // 
@@ -675,6 +672,36 @@
             resources.ApplyResources(this.label15, "label15");
             this.label15.Name = "label15";
             // 
+            // lb_unit_elevation
+            // 
+            resources.ApplyResources(this.lb_unit_elevation, "lb_unit_elevation");
+            this.lb_unit_elevation.Name = "lb_unit_elevation";
+            // 
+            // lb_unit_longitude
+            // 
+            resources.ApplyResources(this.lb_unit_longitude, "lb_unit_longitude");
+            this.lb_unit_longitude.Name = "lb_unit_longitude";
+            // 
+            // lb_unit_latitude
+            // 
+            resources.ApplyResources(this.lb_unit_latitude, "lb_unit_latitude");
+            this.lb_unit_latitude.Name = "lb_unit_latitude";
+            // 
+            // label5tttttrr
+            // 
+            resources.ApplyResources(this.label5tttttrr, "label5tttttrr");
+            this.label5tttttrr.Name = "label5tttttrr";
+            // 
+            // label5gggg
+            // 
+            resources.ApplyResources(this.label5gggg, "label5gggg");
+            this.label5gggg.Name = "label5gggg";
+            // 
+            // lb_station_distance_unit
+            // 
+            resources.ApplyResources(this.lb_station_distance_unit, "lb_station_distance_unit");
+            this.lb_station_distance_unit.Name = "lb_station_distance_unit";
+            // 
             // Form3_WeatherService
             // 
             resources.ApplyResources(this, "$this");
@@ -725,7 +752,6 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label14;
-        private System.Windows.Forms.Label label13;
         private System.Windows.Forms.TextBox tb_hum_panel_value;
         private System.Windows.Forms.TextBox tb_temp_panel_value;
         private System.Windows.Forms.Label label12;
@@ -753,7 +779,6 @@
         private System.Windows.Forms.Label label24;
         private System.Windows.Forms.Label label23;
         private System.Windows.Forms.Label label22;
-        private System.Windows.Forms.Label label21;
         private System.Windows.Forms.Label label29;
         private System.Windows.Forms.TextBox tb_max_adjust;
         private System.Windows.Forms.Label label28;
@@ -791,5 +816,11 @@
         private System.Windows.Forms.Label label43;
         private System.Windows.Forms.Label lb_device_status;
         private System.Windows.Forms.Label label44;
+        private System.Windows.Forms.Label lb_unit_elevation;
+        private System.Windows.Forms.Label lb_unit_longitude;
+        private System.Windows.Forms.Label lb_unit_latitude;
+        private System.Windows.Forms.Label label5tttttrr;
+        private System.Windows.Forms.Label lb_station_distance_unit;
+        private System.Windows.Forms.Label label5gggg;
     }
 }
