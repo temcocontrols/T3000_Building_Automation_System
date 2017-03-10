@@ -79,6 +79,8 @@
             this.exportDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.historyPlotToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.trashBoxToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.gridViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.excelExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.printToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -118,6 +120,8 @@
             this.lb_number_of_chart_label = new System.Windows.Forms.Label();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveAsTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.CMSinsertNode = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.quickNodeInsertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.insertNodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -330,7 +334,9 @@
             this.simulationMode,
             this.exportDataToolStripMenuItem,
             this.historyPlotToolStripMenuItem1,
-            this.trashBoxToolStripMenuItem});
+            this.trashBoxToolStripMenuItem,
+            this.gridViewToolStripMenuItem,
+            this.excelExportToolStripMenuItem});
             this.optionToolStripMenuItem.Name = "optionToolStripMenuItem";
             resources.ApplyResources(this.optionToolStripMenuItem, "optionToolStripMenuItem");
             // 
@@ -363,6 +369,18 @@
             this.trashBoxToolStripMenuItem.Name = "trashBoxToolStripMenuItem";
             resources.ApplyResources(this.trashBoxToolStripMenuItem, "trashBoxToolStripMenuItem");
             this.trashBoxToolStripMenuItem.Click += new System.EventHandler(this.trashBoxToolStripMenuItem_Click);
+            // 
+            // gridViewToolStripMenuItem
+            // 
+            this.gridViewToolStripMenuItem.Name = "gridViewToolStripMenuItem";
+            resources.ApplyResources(this.gridViewToolStripMenuItem, "gridViewToolStripMenuItem");
+            this.gridViewToolStripMenuItem.Click += new System.EventHandler(this.gridViewToolStripMenuItem_Click);
+            // 
+            // excelExportToolStripMenuItem
+            // 
+            this.excelExportToolStripMenuItem.Name = "excelExportToolStripMenuItem";
+            resources.ApplyResources(this.excelExportToolStripMenuItem, "excelExportToolStripMenuItem");
+            this.excelExportToolStripMenuItem.Click += new System.EventHandler(this.excelExportToolStripMenuItem_Click);
             // 
             // menuStrip1
             // 
@@ -427,6 +445,10 @@
             this.helpPsychometricChartToolStripMenuItem.Name = "helpPsychometricChartToolStripMenuItem";
             resources.ApplyResources(this.helpPsychometricChartToolStripMenuItem, "helpPsychometricChartToolStripMenuItem");
             this.helpPsychometricChartToolStripMenuItem.Click += new System.EventHandler(this.helpPsychometricChartToolStripMenuItem_Click);
+            // 
+            // saveFD
+            // 
+            this.saveFD.RestoreDirectory = true;
             // 
             // lb_unit_chosen_display
             // 
@@ -564,12 +586,14 @@
             resources.ApplyResources(this.dataGridView1, "dataGridView1");
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersVisible = false;
+            this.dataGridView1.TabStop = false;
             this.dataGridView1.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dataGridView1_CellBeginEdit);
             this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick);
             this.dataGridView1.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellDoubleClick);
             this.dataGridView1.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellEndEdit);
             this.dataGridView1.CellEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellEnter);
             this.dataGridView1.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_CellMouseClick);
+            this.dataGridView1.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.dataGridView1_DataBindingComplete);
             this.dataGridView1.SelectionChanged += new System.EventHandler(this.dataGridView1_SelectionChanged_1);
             // 
             // id
@@ -597,7 +621,6 @@
             // 
             resources.ApplyResources(this.lb_db_name, "lb_db_name");
             this.lb_db_name.Name = "lb_db_name";
-            this.lb_db_name.Click += new System.EventHandler(this.lb_db_name_Click);
             // 
             // lb_buildingselectedShow
             // 
@@ -617,7 +640,9 @@
             // contextMenuStrip1
             // 
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.deleteToolStripMenuItem});
+            this.deleteToolStripMenuItem,
+            this.saveAsTemplateToolStripMenuItem,
+            this.loadTemplateToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             resources.ApplyResources(this.contextMenuStrip1, "contextMenuStrip1");
             // 
@@ -626,6 +651,18 @@
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
             resources.ApplyResources(this.deleteToolStripMenuItem, "deleteToolStripMenuItem");
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click_1);
+            // 
+            // saveAsTemplateToolStripMenuItem
+            // 
+            this.saveAsTemplateToolStripMenuItem.Name = "saveAsTemplateToolStripMenuItem";
+            resources.ApplyResources(this.saveAsTemplateToolStripMenuItem, "saveAsTemplateToolStripMenuItem");
+            this.saveAsTemplateToolStripMenuItem.Click += new System.EventHandler(this.saveAsTemplateToolStripMenuItem_Click);
+            // 
+            // loadTemplateToolStripMenuItem
+            // 
+            this.loadTemplateToolStripMenuItem.Name = "loadTemplateToolStripMenuItem";
+            resources.ApplyResources(this.loadTemplateToolStripMenuItem, "loadTemplateToolStripMenuItem");
+            this.loadTemplateToolStripMenuItem.Click += new System.EventHandler(this.loadTemplateToolStripMenuItem_Click);
             // 
             // CMSinsertNode
             // 
@@ -897,8 +934,6 @@
         private System.Windows.Forms.Label lb_devicestatusshow;
         private System.Windows.Forms.ToolStripMenuItem clearChartToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editNodeToolStripMenuItem;
-        private System.Windows.Forms.DataGridViewTextBoxColumn id;
-        private System.Windows.Forms.DataGridViewTextBoxColumn name;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.PictureBox pb_lock_unlock;
         private System.Windows.Forms.ToolStripMenuItem deleteNodeToolStripMenuItem;
@@ -913,6 +948,12 @@
         private System.Windows.Forms.ToolStripMenuItem trashBoxToolStripMenuItem;
         public System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.ToolStripMenuItem addMixNodeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveAsTemplateToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem loadTemplateToolStripMenuItem;
+        private System.Windows.Forms.DataGridViewTextBoxColumn id;
+        private System.Windows.Forms.DataGridViewTextBoxColumn name;
+        private System.Windows.Forms.ToolStripMenuItem gridViewToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem excelExportToolStripMenuItem;
     }
 }
 
