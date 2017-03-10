@@ -302,6 +302,39 @@ namespace WFA_psychometric_chart
             return parameterList;
         }
 
+        public double ReadSingleParameterUsigBacnetID(int bacnetID,string bacnetObjectIdentifierType,int bacnetObjectIDInstance)
+        {
+            BacnetValue Value;
+            //BacnetValue ValueX;
+            bool ret;
+            double returnValue = 0;
+            //   Console.WriteLine("Read ID = %d input0 value = %d");
+            if (bacnetObjectIdentifierType == "OBJECT_ANALOG_VALUE")
+            {
+                ret = ReadScalarValue(bacnetID, new BacnetObjectId(BacnetObjectTypes.OBJECT_ANALOG_VALUE, (uint)bacnetObjectIDInstance), BacnetPropertyIds.PROP_PRESENT_VALUE, out Value);
+            }
+            else if (bacnetObjectIdentifierType == "OBJECT_ANALOG_INPUT")
+            {
+                ret = ReadScalarValue(bacnetID, new BacnetObjectId(BacnetObjectTypes.OBJECT_ANALOG_INPUT, (uint)bacnetObjectIDInstance), BacnetPropertyIds.PROP_PRESENT_VALUE, out Value);
+            }
+            else
+            {
+                //do for output
+                ret = ReadScalarValue(bacnetID, new BacnetObjectId(BacnetObjectTypes.OBJECT_ANALOG_OUTPUT, (uint)bacnetObjectIDInstance), BacnetPropertyIds.PROP_PRESENT_VALUE, out Value);
+            }
+
+            if (ret == true)
+            {
+                // Console.WriteLine("Read id = {0},input1 value : {1}", bacnetID, Value.Value.ToString());
+
+                 returnValue = Math.Round(double.Parse(Value.Value.ToString()), 2);
+
+            }
+
+
+            return returnValue;
+        }
+
 
 
         //======================================New Parameter reading task fist ================================//

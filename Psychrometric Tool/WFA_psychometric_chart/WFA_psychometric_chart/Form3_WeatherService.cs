@@ -157,6 +157,13 @@ namespace WFA_psychometric_chart
                 CB_Device.Items.Add("Device: " + b.controllerName);
                // MessageBox.Show("device");
             }
+            //====inserting and updating controller info with corresponding values For restore fxn====//
+
+            
+                Weather_Restore wr = new Weather_Restore();
+                wr.UpdateOrInsertControllerInfo(lb_building_name.Text, CB_Device.Text, CB_param_temp.Text, CB_param_hum.Text);
+            
+            //=========================End of controller updating to db section================//
 
             //This one is for the online/offline status part
             if (CB_Device.Items.Count > 0)
@@ -417,7 +424,8 @@ namespace WFA_psychometric_chart
                     //btn_update_constantly.Enabled = true;//this will be true when user selects a station 
                     cb_station_names.Enabled = true;
                     tb_station_distance.Enabled = true;
-
+                    lbConnectionIssue.Text = "GOOD";
+                    label30Status.Text = "Status : Updating data...";
 
                     /*
                      we should try to pull the data of the station names based on the location selected.
@@ -497,7 +505,8 @@ namespace WFA_psychometric_chart
                         {
                             s += " name  = " + store_station_list[i].name + " dist = " + store_station_list[i].distance + " \n ";
                             //lets set the value to cb so that it gets the exact value...
-                            cb_station_names.Items.Add(store_station_list[i].name);
+                            string listItem = store_station_list[i].name + "(" + Math.Round((store_station_list[i].distance* 0.621371),2) + " miles)";
+                            cb_station_names.Items.Add(listItem);
 
                         }
 
@@ -515,10 +524,22 @@ namespace WFA_psychometric_chart
                     }//close of using webclient
 
 
+                    //====inserting and updating controller info with corresponding values For restore fxn====//
+
+                    //if (CB_Device.Text != "")
+                    //{
+                        Weather_Restore wr = new Weather_Restore();
+                        wr.UpdateOrInsertWebInfo(lb_building_name.Text,"enabled", cb_station_names.Text);
+                    //}
+                    //=========================End of controller updating to db section================//
+
+
+
+
                     //--This is for the setting ie if the building is selected and closed
 
                     //CheckDataForSettings();
-               
+
                 }
                 catch (Exception ex)
                 {
@@ -541,8 +562,11 @@ namespace WFA_psychometric_chart
                     cb_station_names.Enabled = false;
                     tb_station_distance.Enabled = false;
                     cb_enable_disable.Checked = false;
-                    lbConnectionIssue.Text = "GOOD";
+                    lbConnectionIssue.Text = "";
                     btnShowLogFile.Enabled = false;
+
+                    Weather_Restore wr = new Weather_Restore();
+                    wr.UpdateOrInsertWebInfo(lb_building_name.Text, "dissabled", cb_station_names.Text);
 
                 }
 
@@ -588,9 +612,18 @@ namespace WFA_psychometric_chart
                 //btn_update_constantly.Enabled = true;//this will be true when user selects a station 
                 //cb_station_names.Enabled = true;
                 tb_station_distance.Text = "";
-                lbConnectionIssue.Text = "GOOD";
+                lbConnectionIssue.Text = "";
                 btnShowLogFile.Enabled = false;
-               
+                label30Status.Text = "Status :";
+
+                //===FOr restore of web weather serivce
+                Weather_Restore wr = new Weather_Restore();
+                wr.UpdateOrInsertWebInfo(lb_building_name.Text, "dissabled", cb_station_names.Text);
+
+                //===end
+
+
+
                 //--Disposing the timer1 and timer2 
                 timer1.Stop();
                 timer1.Tick -= new EventHandler(timer1_Tick);
@@ -1591,6 +1624,12 @@ namespace WFA_psychometric_chart
                 //--Close of the setting things...
                 FindPathOfBuildingDB();
 
+                //if(cb_enable_disable.Checked != false)
+                //{
+                    lbConnectionIssue.Text = "";
+                    
+                ////}
+           
 
             }
             catch (Exception ex)
@@ -2542,7 +2581,7 @@ namespace WFA_psychometric_chart
                 else
                 {
                     //MessageBox.Show("pulling...");
-                    label30.Text = WFA_psychometric_chart.Properties.Resources.Status_Updating_data;
+                    label30Status.Text = WFA_psychometric_chart.Properties.Resources.Status_Updating_data;
 
                     InitTimer();
 
@@ -2569,6 +2608,15 @@ namespace WFA_psychometric_chart
             tb_station_distance.Text = store_station_list[index_for_station_selected].distance.ToString();
                 //btn_update_now.Enabled = true;
                 // btn_update_constantly.Enabled = true;
+
+                //====================This one is for web restore section for starting from same point everytime it starts====//
+                if(cb_station_names.Text != "")
+                {
+                //MessageBox.Show("Here we are");
+                Weather_Restore wr = new Weather_Restore();
+                wr.UpdateOrInsertWebInfo(lb_building_name.Text, "enabled", cb_station_names.Text);
+                }
+                //================End of  web restore section===========================================================//
 
 
                 update_constantly_function();//--This functions updates the values constantly..
@@ -2821,9 +2869,19 @@ namespace WFA_psychometric_chart
 
                         CB_param_temp.Enabled = true;
                     CB_param_hum.Enabled = true;
-                      //MessageBox.Show("ENd of the true");
-                    //TEST
-                }
+
+                        //====inserting and updating controller info with corresponding values For restore fxn====//
+
+                        if(CB_Device.Text != "")
+                        { 
+                        Weather_Restore wr = new Weather_Restore();
+                        wr.UpdateOrInsertControllerInfo(lb_building_name.Text, CB_Device.Text, CB_param_temp.Text, CB_param_hum.Text);
+                        }
+                        //=========================End of controller updating to db section================//
+
+                        //MessageBox.Show("ENd of the true");
+                        //TEST
+                    }
                 else
                 {
                         //Show device is offline
@@ -3624,6 +3682,16 @@ namespace WFA_psychometric_chart
 
                     //then reenable again
                     temporary_timer_function();
+
+                    //====inserting and updating controller info with corresponding values For restore fxn====//
+
+                    if (CB_Device.Text != "")
+                    {
+                        Weather_Restore wr = new Weather_Restore();
+                        wr.UpdateOrInsertControllerInfo(lb_building_name.Text, CB_Device.Text, CB_param_temp.Text, CB_param_hum.Text);
+                    }
+                    //=========================End of controller updating to db section================//
+
                 }
                 else
                 {
@@ -3657,10 +3725,159 @@ namespace WFA_psychometric_chart
                 //then reenable again
                 temporary_timer_function();
 
+                //====inserting and updating controller info with corresponding values For restore fxn====//
+
+                if (CB_Device.Text != "")
+                {
+                    Weather_Restore wr = new Weather_Restore();
+                    wr.UpdateOrInsertControllerInfo(lb_building_name.Text, CB_Device.Text, CB_param_temp.Text, CB_param_hum.Text);
+                }
+                //=========================End of controller updating to db section================//
+
+
             }
-       
-       
+
+
         }
+
+        private void Form3_WeatherService_Shown(object sender, EventArgs e)
+        {
+            //--This function helps to restore the previous state of the form if a form has previous state.
+            //try { 
+            if (CheckForInternetConnection() == true)
+               { 
+            RestoreController();
+              //  MessageBox.Show("Controller ok");
+            RestoreWeb();
+                }
+            //}
+            //catch(Exception ex)
+            //{
+            //    MessageBox.Show(ex.Message);
+            //}
+            //--End of restore section for form
+
+        }
+
+        public static bool CheckForInternetConnection()
+        {
+            try
+            {
+                using (var client = new WebClient())
+                using (var stream = client.OpenRead("http://www.google.com"))
+                {
+                    return true;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public void RestoreController()
+        {
+            Weather_Restore wr = new Weather_Restore();
+            wr.ReadControllerDataForRestore(lb_building_name.Text);
+            if(wr.ListControllerInfo.Count == 1) //--If the item is one then only we need to update
+            {
+
+                /*steps : 
+                 1.Press the scan button 
+                 2. match the controller info
+                 3. select the controller info
+                 4. wait for the operation to complete.
+                 5. match the temperatre info
+                 6. select the temperature info
+                 7. match the hum info
+                 8. select the hum info 
+                */
+                EventArgs e1 = new EventArgs();
+                button4_Click(this, e1);//This call the buttons
+
+                for(int i = 0; i < CB_Device.Items.Count; i++)
+                {
+                    if(CB_Device.Items[i].ToString() == wr.ListControllerInfo[0].ControllerInfo)
+                    {
+                        //--We have a match we need to select this and wait for operation to complete..
+                        CB_Device.SelectedIndex = i;//This will select the index, now lets wait for the function to complete
+
+                        break;
+                    }
+                }
+
+                //--For temperature 
+                for (int i = 0; i < CB_param_temp.Items.Count; i++)
+                {
+                    if (CB_param_temp.Items[i].ToString() == wr.ListControllerInfo[0].TempParamInfo)
+                    {
+                        //--We have a match we need to select this and wait for operation to complete..
+                        CB_param_temp.SelectedIndex = i;//This will select the index, now lets wait for the function to complete
+
+                        break;
+                    }
+                }
+
+                //--For humidity 
+                for (int i = 0; i < CB_param_hum.Items.Count; i++)
+                {
+                    if (CB_param_hum.Items[i].ToString() == wr.ListControllerInfo[0].HumParamInfo)
+                    {
+                        //--We have a match we need to select this and wait for operation to complete..
+                        CB_param_hum.SelectedIndex = i;//This will select the index, now lets wait for the function to complete
+
+                        break;
+                    }
+                }
+
+            }//Close of if
+
+
+
+        }
+        public void RestoreWeb()
+        {
+            Weather_Restore wr = new Weather_Restore();
+            wr.ReadWebDataForRestore(lb_building_name.Text);
+
+            //==We need to enable it if the value is enabled else no work
+            if (wr.ListWebInfo.Count == 1)
+            {
+
+                if (wr.ListWebInfo[0].enableDissable == "enabled")
+                {
+                  //  MessageBox.Show("Ok up to here");
+                    //==Now we are ready to go for the task
+                    //cb_enable_disable.Checked = true;//We have checked lets wait for response..
+                    cb_enable_disable.Checked = true;
+
+                    //--If checked is success then only go for further processing
+                    if(cb_enable_disable.Checked == true)
+                    {
+                        if (cb_station_names.Items.Count > 0) { 
+                        //--For station to select the values 
+                        for (int i = 0; i < cb_station_names.Items.Count; i++)
+                        {
+
+                                //MessageBox.Show("we are here for inside");
+                            if (cb_station_names.Items[i].ToString() == wr.ListWebInfo[0].stationInfo)
+                            {
+                                //--We have a match we need to select this and wait for operation to complete..
+                                cb_station_names.SelectedIndex = i;//This will select the index, now lets wait for the function to complete
+
+                                break;
+                            }
+                                
+                            }
+                        }
+
+                    }
+
+                }
+            }
+        }
+
+
 
         private void tb_max_adjust_TextChanged(object sender, EventArgs e)
         {
@@ -3707,11 +3924,10 @@ namespace WFA_psychometric_chart
         private void btnShowLogFile_Click(object sender, EventArgs e)
         {
 
-
-            
             string logFilePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string logFile = logFilePath + @"\ErrorLogFile.txt";
-            if (File.Exists(logFile)) { 
+            if (File.Exists(logFile))
+            { 
             Process.Start("notepad.exe", logFile);
             }
 

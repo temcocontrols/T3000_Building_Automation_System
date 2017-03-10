@@ -55,8 +55,8 @@ namespace WFA_psychometric_chart
             public bool controllerStatus { get; set; }
         }
 
-        List<dataTypeForControllerList> mainControllerList = new List<dataTypeForControllerList>();
-        List<dataTypeForControllerList> copyOfMainControllerList = new List<dataTypeForControllerList>();
+       public List<dataTypeForControllerList> mainControllerList = new List<dataTypeForControllerList>();
+     public   List<dataTypeForControllerList> copyOfMainControllerList = new List<dataTypeForControllerList>();
 
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace WFA_psychometric_chart
                 string sql = "select * from ALL_NODE  where  Parent_SerialNum = '0'";//This will only show parent controller and not sub devices
                    
                 //     MessageBox.Show("Connection = " + connection);
-               //  MessageBox.Show("sql = " + sql);
+               // MessageBox.Show("sql = " + sql);
               //DataSet myDataSet = new DataSet();
               //try
               //{
@@ -136,7 +136,7 @@ namespace WFA_psychometric_chart
             public string Building_Name { get; set; }
             public string Building_Path { get; set; }
         }
-        List<SelectedBuildingDatatype> BuildingSelected = new List<SelectedBuildingDatatype>();
+        public List<SelectedBuildingDatatype> BuildingSelected = new List<SelectedBuildingDatatype>();
 
         public void FindPathOfBuildingDB()
         {
@@ -204,6 +204,7 @@ namespace WFA_psychometric_chart
             //{
             //    return;
             //}
+
             if (copyOfMainControllerList.Count < 0)
             {
 
@@ -219,6 +220,8 @@ namespace WFA_psychometric_chart
 
 
         }
+
+       // public void pullDeviceInfo
 
         public class parameter_class1
         {
@@ -728,29 +731,11 @@ namespace WFA_psychometric_chart
                 // string param2_object_identifier_type = parameterValFromBacnet[CB_param_hum.SelectedIndex].object_identifier_type.ToString();
 
 
-                //if (cb_enthalpy_or_humidity_input.SelectedIndex == 0)
-                //{
-                //info has to be temp and hum
-                //uncomment this after this ............BBK
-                //F1.SetNodeForDeviceUsingTempAndHum(source, name, label, btnColor.BackColor, cbItemSelected, 20, device_instance, deviceIP, temp_param_id, second_param_id, "temp", "hum", temp_present_value, second_present_value, param1_object_identifier_type, param2_object_identifier_type);
-                //--Now lets find the node id
-                // MessageBox.Show("id is " + f1.tempNodeID);
-                // f1.UpdateNodeInfoForDeviceSelection(f1.tempNodeID, device_instance, deviceIP, temp_param_id, second_param_id, "temp", "hum", temp_present_value, second_present_value, param1_object_identifier_type, param2_object_identifier_type);
-
+              
                 //------------------------------------Working here -------------------------------------------------------//
                 f1.UpdateNodeInfoForTemperatureDeviceSelection(f1.tempNodeID, device_instance, deviceIP, temp_param_id, "temp", temp_present_value, param1_object_identifier_type);
 
                 //------------------------------------End of working here------------------------------------------------//
-
-                //}
-                //else
-                //{
-                //    //Temperature and enthalpy select bhayeako 6 ....:) :) ;p 
-                //    ///UNCOMMENT THIS LATERE
-                //    // F1.SetNodeForDeviceUsingTempAndHum(source, name, label, btnColor.BackColor, cbItemSelected, 20, device_instance, deviceIP, temp_param_id, second_param_id, "temp", "enthalpy", temp_present_value, second_present_value, param1_object_identifier_type, param2_object_identifier_type);
-                //    f1.UpdateNodeInfoForDeviceSelection(f1.tempNodeID, device_instance, deviceIP, temp_param_id, second_param_id, "temp", "enthalpy", temp_present_value, second_present_value, param1_object_identifier_type, param2_object_identifier_type);
-                //}
-
 
 
                 f1.CallFromTemperatureAndHumidtyFormForMixNodeFxn(f1.tempNodeID);

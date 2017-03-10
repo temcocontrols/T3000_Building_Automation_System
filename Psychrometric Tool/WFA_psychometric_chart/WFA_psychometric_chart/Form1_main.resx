@@ -1096,7 +1096,7 @@
     <value>System.Windows.Forms.ContextMenuStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <metadata name="CMSinsertNode.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>460, 23</value>
+    <value>455, 19</value>
   </metadata>
   <data name="quickNodeInsertToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>192, 22</value>
@@ -1210,7 +1210,7 @@
     <value>Add Mix Node</value>
   </data>
   <data name="CMSinsertNode.Size" type="System.Drawing.Size, System.Drawing">
-    <value>193, 202</value>
+    <value>193, 224</value>
   </data>
   <data name="&gt;&gt;CMSinsertNode.Name" xml:space="preserve">
     <value>CMSinsertNode</value>
@@ -3182,7 +3182,7 @@
     <value>CenterScreen</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
-    <value>Psychometric Chart </value>
+    <value>Psychometric Chart</value>
   </data>
   <data name="&gt;&gt;optionToolStripMenuItem.Name" xml:space="preserve">
     <value>optionToolStripMenuItem</value>

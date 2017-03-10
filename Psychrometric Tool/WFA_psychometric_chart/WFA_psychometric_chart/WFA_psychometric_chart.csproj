@@ -154,13 +154,21 @@
     <Compile Include="DataGridViewDisplay.Designer.cs">
       <DependentUpon>DataGridViewDisplay.cs</DependentUpon>
     </Compile>
+    <Compile Include="DeviceAndParameterProcess.cs" />
     <Compile Include="DeviceConnection.cs" />
+    <Compile Include="DeviceInput.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceInput.Designer.cs">
+      <DependentUpon>DeviceInput.cs</DependentUpon>
+    </Compile>
     <Compile Include="EditNodeLineForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="EditNodeLineForm.Designer.cs">
       <DependentUpon>EditNodeLineForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="FilterDataFromT3000.cs" />
     <Compile Include="Form1_main.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -208,6 +216,12 @@
     </Compile>
     <Compile Include="form_heat_map.Designer.cs">
       <DependentUpon>form_heat_map.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_HumidityInput.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_HumidityInput.Designer.cs">
+      <DependentUpon>Form_HumidityInput.cs</DependentUpon>
     </Compile>
     <Compile Include="Form_HumiditySourceDeviceInput.cs">
       <SubType>Form</SubType>
@@ -283,6 +297,7 @@
     <Compile Include="TrashBox.Designer.cs">
       <DependentUpon>TrashBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="Weather_Restore.cs" />
     <EmbeddedResource Include="Application_Form4.en-US.resx">
       <DependentUpon>Application_Form4.cs</DependentUpon>
     </EmbeddedResource>
@@ -315,6 +330,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="DataGridViewDisplay.resx">
       <DependentUpon>DataGridViewDisplay.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceInput.resx">
+      <DependentUpon>DeviceInput.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EditNodeLineForm.ko.resx">
       <DependentUpon>EditNodeLineForm.cs</DependentUpon>
@@ -414,6 +432,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="form_heat_map.zh.resx">
       <DependentUpon>form_heat_map.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_HumidityInput.resx">
+      <DependentUpon>Form_HumidityInput.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form_HumiditySourceDeviceInput.ko.resx">
       <DependentUpon>Form_HumiditySourceDeviceInput.cs</DependentUpon>
