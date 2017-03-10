@@ -39,7 +39,7 @@
 class CFSBContainer;
 class CT3000View : public CFormView
 {
-public: // create from serialization only
+	protected: // create from serialization only
 	CT3000View();
 	DECLARE_DYNCREATE(CT3000View)
 

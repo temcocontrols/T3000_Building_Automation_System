@@ -953,7 +953,9 @@ void CTStatOutputView::OnSize(UINT nType, int cx, int cy)
 void CTStatOutputView::Initial_Combox_Show_Tstat(){
     if (ListCtrlEx::ComboBox == m_output_list.GetColumnType(TStat_Range))
     {
-        if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7] == PM_TSTAT5i)){
+        if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7] == PM_TSTAT5i)
+			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+			){
             for (int lRow=0;lRow<7;lRow++)
             {
                 ListCtrlEx::CStrList strlist;
@@ -1096,7 +1098,9 @@ void CTStatOutputView::Initial_Combox_Show_Tstat(){
 
     if (ListCtrlEx::ComboBox == m_output_list.GetColumnType(TStat_Funcation))
     {
-        if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7] == PM_TSTAT5i))
+        if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7] == PM_TSTAT5i)
+			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+			)
         {
             for (int lRow=0;lRow<7;lRow++)
             {
@@ -1191,7 +1195,9 @@ void CTStatOutputView::Initial_Combox_Show_Tstat(){
 
     if (ListCtrlEx::ComboBox == m_output_list.GetColumnType(TStat_Interlock)){
         int m_nModeType=product_register_value[7];
-        if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7] == PM_TSTAT5i))
+        if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7] == PM_TSTAT5i)
+			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+			)
         {
             for (int lRow=0;lRow<7;lRow++)
             {
@@ -1275,7 +1281,9 @@ void CTStatOutputView::Initial_Combox_Show_Tstat(){
     }
 
     if (ListCtrlEx::ComboBox == m_output_list.GetColumnType(TStat_Signal_Type)){
-        if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7] == PM_TSTAT5i))
+        if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT8)
+			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+			||(product_register_value[7] == PM_TSTAT5i))
         {
             for (int lRow=0;lRow<7;lRow++)
             {

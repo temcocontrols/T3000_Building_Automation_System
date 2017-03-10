@@ -373,7 +373,9 @@ BOOL CParameterDlg::OnInitDialog()
     CDialog::OnInitDialog();
 
 
-    if (product_register_value[7]==PM_TSTAT8)
+    if (product_register_value[7]==PM_TSTAT8
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
     {
         m_braudRateCombox.ResetContent();
         m_braudRateCombox.AddString(L"9600");
@@ -523,7 +525,9 @@ BOOL CParameterDlg::OnInitDialog()
 
     }
 
-    if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8)
+    if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
     {
         m_InputSelect1.ResetContent();
         m_inputSelect2.ResetContent();
@@ -772,7 +776,9 @@ BOOL CParameterDlg::OnInitDialog()
         GetDlgItem(IDC_ZIGBEE_TSTATS_TABLE)->ShowWindow(SW_HIDE);
     }
 #endif
-    if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8)
+    if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
     {
 		GetDlgItem(IDC_INPUTSBUTTON)->ShowWindow(SW_HIDE);
 		GetDlgItem(IDC_OutPutsBUTTON)->ShowWindow(SW_HIDE);
@@ -783,7 +789,9 @@ BOOL CParameterDlg::OnInitDialog()
         GetDlgItem(IDC_OutPutsBUTTON)->ShowWindow(SW_SHOW);
     }
 	// && product_register_value[MODBUS_RS485_MODE] == 1
-	if ((product_register_value[7] == PM_TSTAT6 || product_register_value[7] == PM_TSTAT8))
+	if ((product_register_value[7] == PM_TSTAT6 || product_register_value[7] == PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
 	{
 		GetDlgItem(IDC_BUTTON_ZIGBEE)->ShowWindow(TRUE);
 	}
@@ -871,7 +879,9 @@ void CParameterDlg::InitPID2ComboBox()
 
         //    ||product_register_value[7]==PM_TSTAT7
 
-        if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8)
+        if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8
+			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+			)
         {
             m_InputSelect1.ResetContent();
             m_inputSelect2.ResetContent();
@@ -1837,7 +1847,9 @@ void CParameterDlg::OnCbnSelchangeEapplication()
 
     float m_fFirmwareVersion=get_curtstat_version();
 
-    if (product_register_value[7] == PM_TSTAT7 || product_register_value[7] == PM_TSTAT6|| product_register_value[7] == PM_TSTAT5i|| product_register_value[7] == PM_TSTAT8)
+    if (product_register_value[7] == PM_TSTAT7 || product_register_value[7] == PM_TSTAT6|| product_register_value[7] == PM_TSTAT5i|| product_register_value[7] == PM_TSTAT8
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
     {
         short nOccupied = product_register_value[184];  // Day setpoint option
         BOOL bOccupied = nOccupied & 0x0001;
@@ -2269,7 +2281,9 @@ void CParameterDlg::OnEnKillfocusSpset1()
             strText.Format(_T("%d"),(short)product_register_value[MODBUS_MIN_SETPOINT]);
         }
 
-        if ((product_register_value[7] == PM_TSTAT7)||(product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT8))
+        if ((product_register_value[7] == PM_TSTAT7)||(product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT8)
+			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+			)
         {
             if(product_register_value[MODBUS_DAY_SETPOINT]==short(nOrig*10))
             {
@@ -2386,7 +2400,9 @@ void CParameterDlg::OnEnKillfocusEcooldeadband1()
     int nValue= (int)(_wtof(strText)*10);
 
     g_bPauseMultiRead = TRUE;
-    if((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT8))
+    if((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
     {
         if(nValue == product_register_value[MODBUS_DAY_COOLING_DEADBAND])	//346
             return;
@@ -2439,7 +2455,9 @@ void CParameterDlg::OnEnKillfocusEcoolingiterm1()
     int nValue= (int)(_wtof(strText.GetBuffer())*10.0);
 
     g_bPauseMultiRead = TRUE;
-    if((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT8))
+    if((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
     {
         if(nValue == product_register_value[MODBUS_DAY_HEATING_DEADBAND])	//347
             return;
@@ -2649,7 +2667,9 @@ void CParameterDlg::OnEnKillfocusSetvalue1()
 
 
     g_bPauseMultiRead = TRUE;
-    if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
+    if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
     {
         /*Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,345,short(fValue*10),
         	product_register_value[345],this->m_hWnd,IDC_SETVALUE1,_T("SETPOINT"));*/
@@ -3209,7 +3229,9 @@ void CParameterDlg::Reflesh_ParameterDlg()
     }
 
 #if 1
-    if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT8||product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR))
+    if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT8||product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
     {
         GetDlgItem(IDC_TRENDLOGVIEW)->SetWindowText(_T("LCD"));
     }
@@ -3468,7 +3490,9 @@ void CParameterDlg::Reflesh_ParameterDlg()
     m_inputvalue1.SetWindowText(strTemp+strUnit);
 
 
-    if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT8))
+    if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
     {
 
         m_combox_pir_endisable.ResetContent();
@@ -3676,7 +3700,9 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		if (product_register_value[7] == PM_TSTAT5i
 			|| product_register_value[7] == PM_TSTAT6
 			|| product_register_value[7] == PM_TSTAT7
-			|| product_register_value[7] == PM_TSTAT8)
+			|| product_register_value[7] == PM_TSTAT8
+			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+			)
 		{
 			bitset<16>  value109(product_register_value[109]);
 			int sel = value109[4];//第五位
@@ -4170,7 +4196,9 @@ void CParameterDlg::Reflesh_ParameterDlg()
         GetDlgItem(IDC_EDIT_TSTAT_NAME)->ShowWindow(SW_HIDE);
     }
 
-    if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7] == PM_TSTAT5i))
+    if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7] == PM_TSTAT5i)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
     {
 
 
@@ -4324,7 +4352,9 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 
 
-    if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8))
+    if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
     {
 // 		if (product_register_value[MODBUS_TEMP_SELECT]<3)	//382
 // 		{
@@ -4380,7 +4410,9 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 
         int RegAddress=-1;
-        if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8))
+        if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8)
+			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+			)
         {
             RegAddress=650;
         }
@@ -4428,7 +4460,9 @@ void CParameterDlg::Reflesh_ParameterDlg()
         m_heatspN=((float)(short)product_register_value[MODBUS_NIGHT_HEATING_SETPOINT])/10;
     }
     //CenterWindow(this);
-    if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8))
+    if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
     {
         //WINDOWPLACEMENT wp;
         //GetWindowPlacement(&wp);
@@ -4806,7 +4840,9 @@ void CParameterDlg::OnCbnSelchangeInputselect3Pid3()
 // 		TempValue=sel+4;
 // 	}
     int RegAddress=-1;
-    if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8))
+    if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
     {
         RegAddress=650;
     }
@@ -4868,6 +4904,8 @@ void CParameterDlg::ShowPID3()
             product_register_value[7]==PM_TSTAT7||
             product_register_value[7]==PM_TSTAT5i||
             product_register_value[7] == PM_TSTAT8||
+		    (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		||
             product_register_value[7]==PM_TSTAT5E||
             product_register_value[7] == PM_PM5E||
             (product_register_value[7]==PM_TSTATRUNAR)||
@@ -4914,7 +4952,9 @@ void CParameterDlg::ShowPID3()
         temp+=strUnit;
         GetDlgItem(IDC_ECOOLINGITERM3_PID3)->SetWindowText(temp);
         int RegAddress=-1;
-        if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8))
+        if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8)
+			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+			)
         {
             RegAddress=650;
         }
@@ -4939,7 +4979,9 @@ void CParameterDlg::ShowPID3()
 
 
         RegAddress=-1;
-        if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8))
+        if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8)
+			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+			)
         {
             RegAddress=650;
         }
@@ -5049,7 +5091,9 @@ void CParameterDlg::ShowPID3()
         }
 
 
-        if (product_register_value[7]==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8)||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+        if (product_register_value[7]==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8)
+			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V) 
+			||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
         {
 
             temp.Format(_T("%.1f"),((float)(short)product_register_value[705])/10);
@@ -5207,7 +5251,9 @@ void CParameterDlg::OnEnKillfocusSetvalue3Pid3()
 
     int RegValue=(int)Val;
     int RegAddress;
-    if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8))
+    if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
     {
 
 
@@ -5248,7 +5294,9 @@ void CParameterDlg::OnEnKillfocusOutput3Pid3()
     int Val=_wtoi(temp);
     int RegValue=(int)Val;
     int RegAddress;
-    if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8))
+    if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
     {
         RegAddress=664;
     }
@@ -5290,7 +5338,9 @@ void CParameterDlg::OnEnKillfocusEcoolingpterm3Pid3()
 
     int RegValue=(int)Val;
     int RegAddress;
-    if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8))
+    if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V) || (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
     {
         RegAddress=660;
     }
@@ -5317,7 +5367,9 @@ void CParameterDlg::OnEnKillfocusEdit52Pid3()
     float Val=_wtof(temp)*10;
     int RegValue=(int)Val;
     int RegAddress;
-    if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8))
+    if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
     {
         RegAddress=661;
     }
@@ -5345,7 +5397,9 @@ void CParameterDlg::OnEnKillfocusEditPid2offsetpoint6()
     float Val=_wtof(temp)*10;
     int RegValue=(int)Val;
     int RegAddress;
-    if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8))
+    if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
     {
         RegAddress=706;
         if (RegValue==product_register_value[RegAddress])
@@ -5577,12 +5631,11 @@ void CParameterDlg::OnCbnSelchangeComboEnableDis()
     if (sel==0)
     {
         int ret1=write_one(g_tstat_id,629,1);
-        int ret2=write_one(g_tstat_id,565,0);
-        if (ret1>0&&ret2>0)
+        
+        if (ret1>0)
         {
             product_register_value[629]=1;
-            product_register_value[565]=0;
-
+          /*  product_register_value[565]=0;*/
         }
     }
     else
@@ -5604,10 +5657,10 @@ void CParameterDlg::OnEnKillfocusEditSensitivty()
     int intTemp=_wtoi(strTemp);
     if (intTemp>=20&&intTemp<=100)
     {
-        int ret=write_one(g_tstat_id,641,intTemp);
+        int ret=write_one(g_tstat_id,735,intTemp);
         if (ret>0)
         {
-            product_register_value[641]=intTemp;
+            product_register_value[735]=intTemp;
         }
     }
     else
@@ -5788,7 +5841,9 @@ void CParameterDlg::OnBnClickedLock()
 
 void CParameterDlg::OnBnClickedTrendlogview()
 {
-    if ((product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR)||(product_register_value[7]==PM_TSTAT5G))||(product_register_value[7]==PM_TSTAT6)||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT7))
+    if ((product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR)||(product_register_value[7]==PM_TSTAT5G))||(product_register_value[7]==PM_TSTAT6)||(product_register_value[7] == PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V) 
+		||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT7))
     {
         CDisplayConfig display_cfg;
         display_cfg.DoModal();
@@ -5938,7 +5993,9 @@ void CParameterDlg::OnCbnSelchangeComboMrd()
 	if (product_register_value[7] == PM_TSTAT5i 
 		|| product_register_value[7] == PM_TSTAT6 
 		|| product_register_value[7] == PM_TSTAT7
-		|| product_register_value[7] == PM_TSTAT8)
+		|| product_register_value[7] == PM_TSTAT8
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
 	{
 
 		 if (sel == 0)

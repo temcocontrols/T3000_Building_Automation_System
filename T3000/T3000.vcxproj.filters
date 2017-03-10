@@ -705,6 +705,9 @@
     <ClCompile Include="BacnetVarCusRang.cpp">
       <Filter>Bacnet</Filter>
     </ClCompile>
+    <ClCompile Include="WifiConfigDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -1776,6 +1779,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BacnetIOConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WifiConfigDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

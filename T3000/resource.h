@@ -295,6 +295,7 @@
 #define IDI_ICON_DEFAULT_SETTING        667
 #define IDD_DIALOG_BACNET_CUSTOMER_VARIABLE_RANGE 668
 #define IDD_DIALOG_BACNET_EXT_IO_CONFIG 669
+#define IDD_DIALOG_WIFI_CONFIG          671
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -574,6 +575,7 @@
 #define IDC_CHECK1                      1083
 #define IDC_EDIT34                      1083
 #define IDC_FREQ5                       1083
+#define IDC_IPADDRESS6                  1083
 #define IDC_BAUDRATE_COMBX              1084
 #define IDC_EDIT35                      1084
 #define IDC_CHECK17                     1084
@@ -2177,6 +2179,9 @@
 #define IDC_BUTTON_EXT_CANCLE           2295
 #define IDC_BUTTON_EXT_CANCEL           2295
 #define IDC_CUSTOM1                     2296
+#define IDC_BUTTON_WIFI_CONFIG          2297
+#define IDC_EDIT_MAC_ADDRESS            2298
+#define IDC_COMBO_NETWORK_TYPE          2299
 #define IDC_BUTTON_MODEL11              3000
 #define IDC_BUTTON_MODEL1               3000
 #define IDC_BUTTON_MODEL12              3001
@@ -2692,9 +2697,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        670
+#define _APS_NEXT_RESOURCE_VALUE        674
 #define _APS_NEXT_COMMAND_VALUE         34059
-#define _APS_NEXT_CONTROL_VALUE         2297
+#define _APS_NEXT_CONTROL_VALUE         2300
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

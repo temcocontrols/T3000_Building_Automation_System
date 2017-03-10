@@ -813,6 +813,11 @@ BOOL IS_Temco_Product(int product_model)
 			case   PM_TSTAT7				   :
 			case   PM_TSTAT5i				   :
 			case   PM_TSTAT8				   :
+			case   PM_TSTAT8_WIFI:
+			case   PM_TSTAT8_OCC:
+			case   PM_TSTAT7_ARM:
+			case   PM_TSTAT8_220V:
+
 			case   PM_TSTAT5D				   :
 			case   PM_AirQuality			   :
 			case   PM_HUMTEMPSENSOR			   :
@@ -4210,6 +4215,18 @@ CString GetProductName(int ModelID)
     case PM_TSTAT8:
         strProductName="TStat8";
         break;
+	case PM_TSTAT8_WIFI:
+		strProductName = "TStat8_Wifi";
+		break;
+	case PM_TSTAT8_OCC:
+		strProductName = "TStat8_Occ";
+		break;
+	case PM_TSTAT7_ARM:
+		strProductName = "TStat7_ARM";
+		break;
+	case PM_TSTAT8_220V:
+		strProductName = "TStat8_220V";
+		break;
     case PM_HUMTEMPSENSOR:
         strProductName="HUM Sensor";
         break;
@@ -9125,7 +9142,8 @@ void LoadTstat_InputData()
     m_sn=product_register_value[0]+product_register_value[1]*256+product_register_value[2]*256*256+product_register_value[3]*256*256*256;
     int	m_nModel=product_register_value[MODBUS_PRODUCT_MODEL];
     int Product_Type=product_register_value[7];
-    if((Product_Type!=PM_TSTAT6)&&(Product_Type!=PM_TSTAT5i)&&(Product_Type!=PM_TSTAT7)&&(Product_Type!=PM_TSTAT8))
+    if((Product_Type!=PM_TSTAT6)&&(Product_Type!=PM_TSTAT5i)&&(Product_Type!=PM_TSTAT7)&&(Product_Type!=PM_TSTAT8)
+		&& (Product_Type != PM_TSTAT8_WIFI) && (Product_Type != PM_TSTAT8_OCC) && (Product_Type != PM_TSTAT7_ARM) && (Product_Type != PM_TSTAT8_220V))
     {
         return;
     }
@@ -9753,7 +9771,8 @@ void LoadTstat_OutputData()
     int nValue=0;
     int m_crange=0;
     int m_nModeType = product_register_value[7];
-    if((m_nModeType!=PM_TSTAT6)&&(m_nModeType!=PM_TSTAT5i)&&(m_nModeType!=PM_TSTAT7)&&(m_nModeType!=PM_TSTAT8))
+    if((m_nModeType!=PM_TSTAT6)&&(m_nModeType!=PM_TSTAT5i)&&(m_nModeType!=PM_TSTAT7)&&(m_nModeType!=PM_TSTAT8)
+		&& (m_nModeType != PM_TSTAT8_WIFI) && (m_nModeType != PM_TSTAT8_OCC) && (m_nModeType != PM_TSTAT7_ARM) && (m_nModeType != PM_TSTAT8_220V))
     {
         return;
     }
@@ -9879,7 +9898,9 @@ void LoadTstat_OutputData()
     out_struct_temp.OutputName.StrValue=g_strOutName7;
     out_struct_temp.OutputName.regAddress=MODBUS_OUTPUT7_CHAR1  ;
     m_tstat_output_data.push_back(out_struct_temp);
-    if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8)
+	int nFlag = product_register_value[7];
+    if ((product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8)
+		|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
     {
     }
     else
@@ -9918,8 +9939,9 @@ void LoadTstat_OutputData()
         m_tstat_output_data.at(i-1).AM.StrValue=strTemp;
         //strTemp=_T("On/Off");
         nRange=product_register_value[MODBUS_MODE_OUTPUT1+i-1];
-
-        if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
+		int nFlag = product_register_value[7];
+        if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+			|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
         {
 			CppSQLite3DB SqliteDBT3000;
 			CppSQLite3Table table;
@@ -10044,7 +10066,8 @@ void LoadTstat_OutputData()
 #endif
 
     if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16
-            ||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE)//||m_nModeType==17||m_nModeType==18)
+            ||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE
+		|| (m_nModeType == PM_TSTAT8_WIFI) || (m_nModeType == PM_TSTAT8_OCC) || (m_nModeType == PM_TSTAT7_ARM) || (m_nModeType == PM_TSTAT8_220V))//||m_nModeType==17||m_nModeType==18)
     {
         // just for row4 ///////////////////////////////////////////////////////////////
         if((int)(nAMVAlue & 8))
@@ -10062,7 +10085,8 @@ void LoadTstat_OutputData()
     }
 
     nRange = product_register_value[MODBUS_MODE_OUTPUT4];//283  205
-    if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
+    if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V))
     {
 		CppSQLite3DB SqliteDBT3000;
 		CppSQLite3Table table;
@@ -10185,7 +10209,8 @@ void LoadTstat_OutputData()
     //nRange=product_register_value[284];
     //284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
     nRange = product_register_value[MODBUS_MODE_OUTPUT5];
-    if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
+    if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V))
     {
 		CppSQLite3DB SqliteDBT3000;
 		CppSQLite3Table table;
@@ -10228,7 +10253,7 @@ void LoadTstat_OutputData()
                 strTemp=OUTPUT_RANGE45[nRange];
             }
         }
-       SqliteDBT3000.closedb();
+        SqliteDBT3000.closedb();
 
         if(nRange>=0&&nRange<7)
         {
@@ -10295,7 +10320,8 @@ void LoadTstat_OutputData()
 
 
     if ((m_nModeType==1||m_nModeType==3||m_nModeType==2)||m_nModeType==12||m_nModeType==16||m_nModeType==PM_PRESSURE
-            ||m_nModeType==18||m_nModeType==6||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8||m_nModeType==7)//5ADEG
+            ||m_nModeType==18||m_nModeType==6||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8||m_nModeType==7
+		|| (m_nModeType == PM_TSTAT8_WIFI) || (m_nModeType == PM_TSTAT8_OCC) || (m_nModeType == PM_TSTAT7_ARM) || (m_nModeType == PM_TSTAT8_220V))//5ADEG
     {
         //186	207	1	Low byte	W/R	Analog Output1 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V
         //102	210	2	Full	W/R(write only when manual output6 enable)	Output6 ,Analog output1, a number from 0-1000 representing 0% (closed) to 100% (open). When Range = On/Off mode, On=1000, Off=0.
@@ -10648,7 +10674,8 @@ void LoadTstat_OutputData()
         }
         //Delay
 
-        if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
+        if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V))
         {
             CString strdelay;
             for (int row=0; row<7; row++)
@@ -10725,7 +10752,8 @@ void LoadTstat_OutputData()
         //	}
         //}
         ///////////////////////////////////////Signal Type//////////////////////////
-        if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT8||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7)
+        if ((product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT8||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7)
+			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V))
         {
             if (product_register_value[7]==PM_TSTAT6)
             {

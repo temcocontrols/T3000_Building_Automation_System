@@ -341,6 +341,7 @@
     <ClCompile Include="WeeklyRout_InsertDia.cpp" />
     <ClCompile Include="WeeklySchedule.cpp" />
     <ClCompile Include="WhichOneToChooseDlg.cpp" />
+    <ClCompile Include="WifiConfigDlg.cpp" />
     <ClCompile Include="WorkspaceBar.cpp" />
     <ClCompile Include="T3\DialogT3.cpp" />
     <ClCompile Include="CM5\SliderBoth.cpp" />
@@ -707,6 +708,7 @@
     <ClInclude Include="Weekly_Routines.h" />
     <ClInclude Include="WeeklyRout_InsertDia.h" />
     <ClInclude Include="WhichOneToChooseDlg.h" />
+    <ClInclude Include="WifiConfigDlg.h" />
     <ClInclude Include="WorkspaceBar.h" />
     <ClInclude Include="T3\DialogT3.h" />
     <ClInclude Include="CM5\DialogCM5.h" />

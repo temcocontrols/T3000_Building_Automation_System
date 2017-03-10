@@ -48,6 +48,7 @@ public:
 	afx_msg void OnEnKillfocusEditMstpMac();
 	afx_msg void OnCbnKillfocusBraudratecombo();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	afx_msg void OnBnClickedButtonWifiConfig();
 };
 
 

@@ -223,7 +223,9 @@ BOOL COutPutDlg::OnInitDialog()
 	//129	107	1	Low byte	W/R	"AUTO_ONLY , enables or disables manual mode. 0 = Manual Fan Modes 1-x Allowed 
 	//(depending on R122 value, 1 = Auto Mode Only, 2 = DDC mode,the user can not change setpoint and fan speed from keypad."
                                                               
-    if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
+    if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
     {	
         if(product_register_value[107]==0)
         {
@@ -339,7 +341,9 @@ BOOL COutPutDlg::OnInitDialog()
     }
 	put_fan_variable();
 
-	if (product_register_value[7] == PM_TSTAT8)
+	if (product_register_value[7] == PM_TSTAT8
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
 	{
 	 
 		if (product_register_value[MODBUS_FAN_MODE]>=0 && product_register_value[MODBUS_FAN_MODE] <= 3)
@@ -432,7 +436,9 @@ BOOL COutPutDlg::OnInitDialog()
 	
 	//---------------------------------------------------
 	//Annul by Fance 2013 04 07
-	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
+	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
 	{
 		output4_value = product_register_value[MODBUS_MODE_OUTPUT4];// 283 205
 		output5_value = product_register_value[MODBUS_MODE_OUTPUT5];//284 206
@@ -446,7 +452,9 @@ BOOL COutPutDlg::OnInitDialog()
 		m_bFloat=TRUE;
 	}
  
-	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
+	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
 	{
 		i_104_pid1=product_register_value[384];
 		i_268_pid2=product_register_value[247];
@@ -459,7 +467,9 @@ BOOL COutPutDlg::OnInitDialog()
 	//---------------------------------------------------
 	 m_pwm_row1=-1;
 	 m_pwm_row2=-1;
-	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7 || product_register_value[7] == PM_TSTAT8)
+	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7 || product_register_value[7] == PM_TSTAT8
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
 	{
 		int currentrow=0;
 		for (int i=0;i<5;i++)
@@ -504,7 +514,9 @@ BOOL COutPutDlg::OnInitDialog()
 
                                                        // ||product_register_value[7]==PM_TSTAT7
 	CenterWindow(this);
-	if (product_register_value[7] == PM_PM5E||product_register_value[7]==PM_TSTAT5G||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i || product_register_value[7] == PM_TSTAT8)
+	if (product_register_value[7] == PM_PM5E||product_register_value[7]==PM_TSTAT5G||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i || product_register_value[7] == PM_TSTAT8
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
 	{
 		WINDOWPLACEMENT wp;
 
@@ -576,7 +588,9 @@ BOOL COutPutDlg::OnInitDialog()
 	//put_fan_variable();	
 	FreshGrids();
 	SetModelButton();
-	if (product_register_value[7] == PM_TSTAT8)
+	if (product_register_value[7] == PM_TSTAT8
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
 	{
 		m_fanAutoCheck.ShowWindow(FALSE);
 		put_fan_variable();
@@ -813,7 +827,9 @@ void COutPutDlg::put_fan_variable()
 	  SetModelButton();
 
 	  
-	  if (product_register_value[7] == PM_TSTAT8)
+	  if (product_register_value[7] == PM_TSTAT8
+		  || (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		  )
 	  {
 		  strdemo = _T("1-4-0-1,");
 		  SetPaneString(2, strdemo);
@@ -952,7 +968,9 @@ void COutPutDlg::put_fan_variable()
 
 int COutPutDlg::get_real_fan_select()
 {
-	if (product_register_value[7] == PM_TSTAT8)
+	if (product_register_value[7] == PM_TSTAT8
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
 	{
 		return product_register_value[MODBUS_FAN_SPEED];
 	}
@@ -1023,7 +1041,9 @@ int COutPutDlg::set_real_fan_select(){
 
 void COutPutDlg::OnCbnSelchangeFanmode()
 {
-	 if (product_register_value[7] == PM_TSTAT8)
+	 if (product_register_value[7] == PM_TSTAT8
+		 || (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		 )
 	 {
 		 int sel = m_fan_mode_ctrl.GetCurSel();
 		 int ret = write_one(g_tstat_id, MODBUS_FAN_MODE, sel);
@@ -1140,7 +1160,9 @@ void COutPutDlg::OnEnKillfocusPid1coolstageedit()
 void COutPutDlg::FreshGrids()
 {
 	//if (newtstat6[7] == PM_TSTAT6)
-	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
+	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V) 
+		||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
 	{
 		put_fan_variable();
 		FreshGrid_PID1tstat6();
@@ -1167,7 +1189,9 @@ void COutPutDlg::FreshGrids()
 		FreshGrid_PID2();
 	}
 	//CenterWindow(this);
-	if (product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E||product_register_value[7]==PM_TSTAT5G||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT8)
+	if (product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E||product_register_value[7]==PM_TSTAT5G||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V) 
+		||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT8)
 	{
 	FreshGrid_PID3();
 	} 
@@ -1289,6 +1313,11 @@ if(product_register_value[129]==1)
 		case PM_TSTAT6:
         case PM_TSTAT5i:
         case PM_TSTAT8:
+		case PM_TSTAT8_WIFI:
+		case PM_TSTAT8_OCC:
+		case PM_TSTAT7_ARM:
+		case PM_TSTAT8_220V:
+
 		case PM_TSTAT7:
 		case PM_TSTAT5E:m_nmoduleType=3;break;//tstat 5e
         case PM_PM5E:m_nmoduleType=3;break;//tstat 5e
@@ -2931,7 +2960,9 @@ void COutPutDlg::OnBnClickedFanautocheck()
 
 	//write_one(g_tstat_id,129,m_bFanAutoOnly);
 
-	if (product_register_value[7] ==PM_TSTAT6||product_register_value[7] ==PM_TSTAT5i||product_register_value[7] ==PM_TSTAT7||product_register_value[7] ==PM_TSTAT8)
+	if (product_register_value[7] ==PM_TSTAT6||product_register_value[7] ==PM_TSTAT5i||product_register_value[7] ==PM_TSTAT7||product_register_value[7] ==PM_TSTAT8
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
 	{
 		if(product_register_value[107]==0)
 			m_bFanAutoOnly=FALSE;
@@ -3062,7 +3093,9 @@ void COutPutDlg::ClickMsflexgrid1()
 			m_ItemValueCombx.ResetContent();
 			m_ItemValueCombx.AddString(_T("On"));
 			m_ItemValueCombx.AddString(_T("DI1"));
-			if (product_register_value[7]== PM_TSTAT6||product_register_value[7]== PM_TSTAT5i||product_register_value[7]== PM_TSTAT8||product_register_value[7]== PM_TSTAT7)
+			if (product_register_value[7]== PM_TSTAT6||product_register_value[7]== PM_TSTAT5i||product_register_value[7]== PM_TSTAT8||product_register_value[7]== PM_TSTAT7
+				|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+				)
 			{
 				if(product_register_value[MODBUS_ANALOG_IN1]==3)//on/off mode  //找不到对应的tstat6
 					m_ItemValueCombx.AddString(_T("AI1"));
@@ -3107,7 +3140,9 @@ void COutPutDlg::ClickMsflexgrid1()
 		int nOutReg,nValue;
 
 		//if (product_register_value[7] == 6)
-		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
+		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+			)
 		{
 			nOutReg=245+m_nCurRow-1;
 			nValue=product_register_value[nOutReg];
@@ -3167,7 +3202,9 @@ void COutPutDlg::ClickMsflexgrid1()
 		    
 
 
-			 if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
+			 if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+				 || (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+				 )
 			 {
 			 if (lRow==6)
 				 {
@@ -3313,7 +3350,9 @@ void COutPutDlg::ClickMsflexgrid1()
 	{   
 	    if (lRow<=5)
 	    {
-		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
+		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+			)
 		{
 			if(product_register_value[MODBUS_MODE_OUTPUT1+lRow-1]==3)
 			{
@@ -3455,7 +3494,9 @@ void COutPutDlg::OnCbnKillfocusValueitemcombo()
 void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 {
 	int ret=0;
-	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
+	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
 	{
 		if(g_OutPutLevel==1)
 			return;
@@ -5306,7 +5347,9 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 					if(product_register_value[MODBUS_FAN_SPEED]==0)
 					{
 						//if (newtstat6[7] == 6)
-						if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
+						if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+							|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+							)
 						{
 							write_one(g_tstat_id,334+pos,tstatval);
 							product_register_value[334+pos] = tstatval;
@@ -5325,7 +5368,9 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 					else
 					{
 						//if (newtstat6[7] == 6)
-						if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
+						if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+							|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+							)
 						{
 							write_one(g_tstat_id,323+pos,tstatval);
 							product_register_value[323+pos] = tstatval;
@@ -5679,7 +5724,9 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 		//362	125	1	Low byte	W/R	ANALOG INPUT4 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
 
 		//if (newtstat6[7] == 6)
-		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
+		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+			)
 		{
 			if(product_register_value[MODBUS_FAN_SPEED]==0)
 			{
@@ -8067,7 +8114,9 @@ void COutPutDlg::FreshGrid_PID2tstat5GLessthan368()
 	#endif
 
 
-	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
+	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
 	{
 		if (product_register_value[MODBUS_MODE_OUTPUT4]==3)
 		{
@@ -8318,7 +8367,9 @@ void COutPutDlg::ClickMsflexgrid3()
 	int nOutReg,nValue;
 
 	//if (newtstat6[7] == 6)
-	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
+	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
 		{
 		nOutReg=245+m_nCurRow-1;
 		nValue=product_register_value[nOutReg];
@@ -8379,7 +8430,9 @@ void COutPutDlg::ClickMsflexgrid3()
 		}
 		else if (lRow>5)
 		{
-		   if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
+		   if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+			   || (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+			   )
 			 {
 			 if (lRow==6)
 				 {

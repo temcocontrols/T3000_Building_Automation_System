@@ -1391,7 +1391,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 #if 1
     nFlag = product_register_value[7];
     {
-        if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT5i)|| (nFlag == PM_TSTAT8) )
+        if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT5i)|| (nFlag == PM_TSTAT8)
+			|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
         {
             product_type =T3000_6_ADDRESS;
         }
@@ -1428,7 +1429,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
             old_product_type = product_type;
             MyRegAddress.Change_Register_Table();
         }
-		if (product_register_value[7] == PM_TSTAT8)
+		int nFlag = product_register_value[7];
+		if (product_register_value[7] == PM_TSTAT8
+			|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
 		{
 			MODBUS_BAUDRATE = 15;
 		}
@@ -2366,7 +2369,8 @@ void CMainFrame::LoadProductFromDB()
                                                         TVINSERV_LC          //tree0412
                                                         else if (temp_product_class_id == PM_TSTAT7)//TSTAT7 &TSTAT6 //tree0412
                                                             TVINSERV_LED //tree0412
-                                                            else if(temp_product_class_id == PM_TSTAT6||temp_product_class_id == PM_TSTAT7||temp_product_class_id == PM_TSTAT5i||temp_product_class_id == PM_TSTAT8)
+                                                            else if(temp_product_class_id == PM_TSTAT6||temp_product_class_id == PM_TSTAT7||temp_product_class_id == PM_TSTAT5i||temp_product_class_id == PM_TSTAT8
+																|| (temp_product_class_id == PM_TSTAT8_WIFI) || (temp_product_class_id == PM_TSTAT8_OCC) || (temp_product_class_id == PM_TSTAT7_ARM) || (temp_product_class_id == PM_TSTAT8_220V))
                                                                 TVINSERV_TSTAT6
                                                                 else if((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485)||(temp_product_class_id == PM_PRESSURE_SENSOR)|| (temp_product_class_id == STM32_CO2_NET)||(temp_product_class_id == STM32_CO2_RS485))
                                                                     TVINSERV_CO2
@@ -2595,7 +2599,8 @@ void CMainFrame::LoadProductFromDB()
                                                             TVINSERV_LC          //tree0412
                                                             else if (temp_product_class_id == PM_TSTAT7)//TSTAT7 &TSTAT6 //tree0412
                                                                 TVINSERV_LED //tree0412
-                                                                else if(temp_product_class_id == PM_TSTAT6||temp_product_class_id == PM_TSTAT7||temp_product_class_id == PM_TSTAT5i||temp_product_class_id == PM_TSTAT8)
+                                                                else if(temp_product_class_id == PM_TSTAT6||temp_product_class_id == PM_TSTAT7||temp_product_class_id == PM_TSTAT5i||temp_product_class_id == PM_TSTAT8
+																	|| (temp_product_class_id == PM_TSTAT8_WIFI) || (temp_product_class_id == PM_TSTAT8_OCC) || (temp_product_class_id == PM_TSTAT7_ARM) || (temp_product_class_id == PM_TSTAT8_220V))
                                                                     TVINSERV_TSTAT6
                                                                     else if((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485)||(temp_product_class_id == PM_PRESSURE_SENSOR)|| (temp_product_class_id == STM32_CO2_NET)||(temp_product_class_id == STM32_CO2_RS485))
                                                                         TVINSERV_CO2
@@ -3858,7 +3863,8 @@ void CMainFrame::ScanTstatInDB(void)
                                                     TVINSERV_LC          //tree0412
                                                     else if (temp_product_class_id == PM_TSTAT7)//TSTAT7 &TSTAT6 //tree0412
                                                         TVINSERV_LED //tree0412
-                                                        else if(temp_product_class_id == PM_TSTAT6||temp_product_class_id == PM_TSTAT7||temp_product_class_id == PM_TSTAT5i||temp_product_class_id == PM_TSTAT8)
+                                                        else if(temp_product_class_id == PM_TSTAT6||temp_product_class_id == PM_TSTAT7||temp_product_class_id == PM_TSTAT5i||temp_product_class_id == PM_TSTAT8
+															|| (temp_product_class_id == PM_TSTAT8_WIFI) || (temp_product_class_id == PM_TSTAT8_OCC) || (temp_product_class_id == PM_TSTAT7_ARM) || (temp_product_class_id == PM_TSTAT8_220V))
                                                             TVINSERV_TSTAT6
                                                             else if((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485)||(temp_product_class_id == PM_PRESSURE_SENSOR) 
 															|| (temp_product_class_id == STM32_CO2_NET)||(temp_product_class_id == STM32_CO2_RS485))
@@ -6914,7 +6920,8 @@ void CMainFrame::SaveConfigFile()
         strTips.Format(_T("Config file \" %s \" saved successful."), strFilename);
         SetPaneString(1, strTips);
     }
-    else if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
+    else if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V))
     {
 
         int index = 0;
@@ -8737,7 +8744,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     int length = 10;
                     nFlag = Device_Type;
                     int it = 0;
-                    if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT5i) || (nFlag == PM_TSTAT8))
+                    if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT5i) || (nFlag == PM_TSTAT8)
+						|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
                     {
                         product_type =T3000_6_ADDRESS;
                     }
@@ -8970,7 +8978,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                         old_product_type = product_type;
                         MyRegAddress.Change_Register_Table();
                     }
-					if (product_register_value[7] == PM_TSTAT8)
+					int nFlag = product_register_value[7];
+					if (product_register_value[7] == PM_TSTAT8
+						|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
 					{
 						MODBUS_BAUDRATE = 15;
 					}
@@ -9243,7 +9253,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             }
 
 		 
-            else if (nFlag==PM_TSTAT6||nFlag==PM_TSTAT7||nFlag==PM_TSTAT5i||nFlag==PM_TSTAT8)
+            else if (nFlag==PM_TSTAT6||nFlag==PM_TSTAT7||nFlag==PM_TSTAT5i||nFlag==PM_TSTAT8
+				|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
             {
                 CString g_configfile_path =g_strExePth + g_strStartInterface_config;
                 int m_lastinterface=GetPrivateProfileInt(_T("T3000_START"),_T("Interface"),19,g_configfile_path);
@@ -9273,7 +9284,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 //if product module is TSTAT6 or TSTAT7 use T3000_6_ADDRESS. T3000_6_ADDRESS is a register table in t3000.mdb  T3000_Register_Address_By_Name
                 //else if product module is PM_TSTAT5E PM_TSTAT5H use T3000_5EH_LCD_ADDRESS
                 //else if product module is TSTAT5 ABCDFG USE T3000_5ABCDFG_LED_ADDRESS
-                if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT5i) || (nFlag == PM_TSTAT8))
+                if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT5i) || (nFlag == PM_TSTAT8)
+					|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V)
+					)
                 {
                     product_type = T3000_6_ADDRESS;
                 }
@@ -9297,7 +9310,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     old_product_type = product_type;
                     MyRegAddress.Change_Register_Table();
                 }
-				if (product_register_value[7] == PM_TSTAT8)
+				int nFlag = product_register_value[7];
+				if (product_register_value[7] == PM_TSTAT8
+					|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
 				{
 					MODBUS_BAUDRATE = 15;
                 }
@@ -11799,7 +11814,7 @@ void CMainFrame::OnControlMain()
 		} 
     }
      bacnet_view_number = TYPE_MAIN		;
- 	global_interface = BAC_MAIN;
+ 	 global_interface = BAC_MAIN;
 }
 
 void CMainFrame::OnControlInputs()
@@ -11908,7 +11923,8 @@ void CMainFrame::OnControlInputs()
             AfxMessageBox(_T("NO Connection,Please connect your device frist!"));
             return;
         }
-        if (product_type==CS3000||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8)
+        if (product_type==CS3000||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8
+			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V))
         {
 
             SwitchToPruductType(DLG_DIALOG_TSTAT_INPUT_VIEW);
@@ -12231,7 +12247,8 @@ void CMainFrame::OnControlWeekly()
 	
     else
     {
-		if (product_register_value[7] == PM_TSTAT8)
+		int nFlag = product_register_value[7];
+		if (product_register_value[7] == PM_TSTAT8 || (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
 		{
 
 			g_bPauseMultiRead = TRUE;
@@ -12322,7 +12339,9 @@ void CMainFrame::OnControlAnnualroutines()
     else
     {
 
-        if(product_register_value[7]==PM_TSTAT8)
+        if(product_register_value[7]==PM_TSTAT8
+			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+			)
         {
 
             g_bPauseMultiRead = TRUE;
@@ -12410,7 +12429,9 @@ void CMainFrame::OnControlSettings()
 	}
     else
     {
-        if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8)
+        if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8
+			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+			)
         {
             CParameterDlg dlg(this,GetProductName(product_register_value[7]));
             dlg.DoModal();
@@ -12614,7 +12635,9 @@ void CMainFrame::OnControlScreens()
     }
     else
     {
-        if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8)
+        if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8
+			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+			)
         {
             SwitchToGraphicView();
         }

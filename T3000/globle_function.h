@@ -195,8 +195,6 @@ BOOL ValidAddress(CString sAddress);
 BOOL GetIPbyHostName(CString strHostName,CString &strIP);
 void TraverseFolder( const CString& strDir,std::vector<CString>& vecFile);
 
-
-
 void LoadTstat_InputData();
 void LoadInputData_CS3000();
 CString GetTextFromReg(unsigned short reg);

@@ -352,6 +352,18 @@
                 case PM_TSTAT8:
                     stemp="TStat8";
                     break;
+				case PM_TSTAT8_WIFI:
+					stemp = "TStat8_Wifi";
+					break;
+				case PM_TSTAT8_OCC:
+					stemp = "TStat8_Occ";
+					break;
+				case PM_TSTAT7_ARM:
+					stemp = "TStat7_ARM";
+					break;
+				case PM_TSTAT8_220V:
+					stemp = "TStat8_220V";
+					break;
 				case PM_TSTAT7:
 					stemp="TStat7";
 					break;

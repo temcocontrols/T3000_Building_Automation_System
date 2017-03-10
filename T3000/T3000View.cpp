@@ -31,7 +31,7 @@
 #include "DisplayConfig.h"
 #include "LedsDialog.h"
  #include "../SQLiteDriver/CppSQLite3.h"
-
+#include "MainFrm.h"
 
 #ifdef _DEBUG
     #define new DEBUG_NEW
@@ -781,7 +781,9 @@ void CT3000View::Fresh()
     InitFanSpeed();
     m_nID=product_register_value[6];
 
-    if(product_register_value[7]==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8)||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+    if(product_register_value[7]==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
     {
         GetDlgItem(IDC_GRAPGICBUTTON)->ShowWindow(SW_HIDE);
       //  GetDlgItem(IDC_PARAMETERBTN)->ShowWindow(SW_HIDE);
@@ -1484,7 +1486,9 @@ void CT3000View::Fresh_In()
     CString strTemp;
     strTemp.Empty();
     if( nModel==2||nModel==1||nModel==4||nModel==PM_TSTAT5D||nModel==17||nModel==18
-            || nModel==3||nModel==PM_TSTAT6||nModel==PM_TSTAT5i||nModel==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8))//A,B,C,D ,F,G,6,7
+            || nModel==3||nModel==PM_TSTAT6||nModel==PM_TSTAT5i||nModel==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8
+				|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+				))//A,B,C,D ,F,G,6,7
     {
         //strTemp.Format(_T("Input %d"),1);
         //Read_Multi(g_tstat_id,&product_register_value[MODBUS_INTERNAL_THERMISTOR],MODBUS_INTERNAL_THERMISTOR,2);
@@ -1821,7 +1825,9 @@ void CT3000View::Fresh_In()
 
 
 
-    if(nModel == PM_TSTAT6 ||nModel == PM_TSTAT7||(product_register_value[7] == PM_TSTAT8) ||nModel == PM_TSTAT5i)// Tstat 6
+    if(nModel == PM_TSTAT6 ||nModel == PM_TSTAT7||(product_register_value[7] == PM_TSTAT8
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		) ||nModel == PM_TSTAT5i)// Tstat 6
     {
         int m_crange=0;
         //Mdb_Adress_Map = T3000_6_ADDRESS; //让其在 T3000_6_ADDRESS 中 进行地址 Maping;
@@ -2199,7 +2205,9 @@ void CT3000View::Fresh_Out()
     //==========================================================================
     //ABCDEFG,noH
     if(nModel==2||nModel==1||nModel==4||nModel==12||nModel==16||nModel==PM_PM5E	||nModel==17||nModel==18||nModel==3
-            ||nModel==PM_TSTAT6||nModel==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7] == PM_TSTAT8)||nModel==PM_TSTAT7||nModel==PM_PRESSURE)
+            ||nModel==PM_TSTAT6||nModel==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8
+				|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+				)||(product_register_value[7] == PM_TSTAT8)||nModel==PM_TSTAT7||nModel==PM_PRESSURE)
     {
         m_Output_Grid.put_TextMatrix(1,1,g_strOutName1);
         m_Output_Grid.put_TextMatrix(2,1,g_strOutName2);
@@ -2293,7 +2301,9 @@ void CT3000View::Fresh_Out()
     ////----------------------------------------------------------------------
     //4,5
     if(nModel==1||nModel==4||nModel==12||nModel==16||nModel==3||nModel==PM_PM5E
-            ||nModel==PM_TSTAT6||nModel==PM_TSTAT5i||(nModel == PM_TSTAT8)||nModel==PM_TSTAT7||nModel==PM_PRESSURE)//B,C,D,E
+            ||nModel==PM_TSTAT6||nModel==PM_TSTAT5i||(nModel == PM_TSTAT8
+				|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+				)||nModel==PM_TSTAT7||nModel==PM_PRESSURE)//B,C,D,E
     {
 
 
@@ -2488,7 +2498,9 @@ void CT3000View::Fresh_Out()
 
     //:DEG 6. 7
     nRange=product_register_value[MODBUS_OUTPUT1_SCALE];
-    if(nModel==12||nModel==16||nModel==PM_PM5E||nModel==18||nModel==PM_TSTAT6||(product_register_value[7] == PM_TSTAT8)||nModel==PM_TSTAT5i||nModel==PM_TSTAT7||nModel==PM_PRESSURE)
+    if(nModel==12||nModel==16||nModel==PM_PM5E||nModel==18||nModel==PM_TSTAT6||(product_register_value[7] == PM_TSTAT8
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)||nModel==PM_TSTAT5i||nModel==PM_TSTAT7||nModel==PM_PRESSURE)
     {
         if(nRange==0)
         {
@@ -2762,11 +2774,20 @@ void CT3000View::FreshIOGridTable()
         m_inRows=13;
     }
     break;
+	case PM_TSTAT8_WIFI:
+		 
+	case PM_TSTAT8_OCC:
+	 
+	case PM_TSTAT7_ARM:
+		 
+	case PM_TSTAT8_220V:
+		 
     case PM_TSTAT8:
     {
         m_outRows = 8;
         m_inRows = 13;
     }
+	break;
     case PM_TSTAT5E:
     {
         m_outRows=8;
@@ -3120,7 +3141,9 @@ void CT3000View::OnEnKillfocusInputnameedit()
    
 
 
-	if (product_register_value[7]== PM_TSTAT6||product_register_value[7]==PM_TSTAT8||product_register_value[7]==PM_TSTAT7)
+	if (product_register_value[7]== PM_TSTAT6||product_register_value[7]==PM_TSTAT8
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V) 
+		||product_register_value[7]==PM_TSTAT7)
 	{
 	 
 		char cTemp1[8];
@@ -3368,6 +3391,8 @@ void CT3000View::OnEnKillfocusOutputnameedit()
 		||product_register_value[7]==PM_TSTAT8
 		||product_register_value[7]==PM_TSTAT7
 		||product_register_value[7]==PM_TSTAT5i
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+
 		)
 	{
 		char cTemp1[8];
@@ -3711,6 +3736,7 @@ void CT3000View::OnDestroy()
 void CT3000View::OnBnClickedTrendlogview()
 {
 
+	((CMainFrame*)(theApp.m_pMainWnd))->SwitchToPruductType(DLG_DIALOG_DEFAULT_T3000_VIEW);
     //((CMainFrame*)(theApp.m_pMainWnd))->SwitchToPruductType(3);
 ////	SwitchToPruductType(3);
 //	if ((product_register_value[7]==PM_TSTAT5E||(product_register_value[7]==PM_TSTAT5G))||(product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7))
@@ -3726,7 +3752,7 @@ void CT3000View::OnBnClickedTrendlogview()
 //CDisplayLEDLCDConfig dlg;
 //dlg.DoModal();
     // TODO: Add your control notification handler code here
-
+	
 
 }
 
@@ -3940,7 +3966,9 @@ int CT3000View::get_real_fan_select()
     }
 
 	 
-		if (product_register_value[7] == PM_TSTAT8)
+		if (product_register_value[7] == PM_TSTAT8
+			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+			)
 		{
 
 
@@ -4116,7 +4144,9 @@ void CT3000View::OnCbnSelchangeFanspeedcombo()
     //恢复T3000主线程
 
 
-	if (product_register_value[8] = PM_TSTAT8)
+	if (product_register_value[8] = PM_TSTAT8
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
 	{
 		int sel = m_FanComBox.GetCurSel();
 
@@ -4131,7 +4161,9 @@ LRESULT CT3000View::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
     // TODO: Add your specialized code here and/or call the base class
     if(MsgT3000ViewFresh==message)
     {
-        if((product_register_value[7] == PM_TSTAT6) || (product_register_value[7] == PM_TSTAT7) || (product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
+        if((product_register_value[7] == PM_TSTAT6) || (product_register_value[7] == PM_TSTAT7) || (product_register_value[7] == PM_TSTAT5i)
+			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V) 
+			||(product_register_value[7] == PM_TSTAT8))
         {
             product_type =T3000_6_ADDRESS;
         }
@@ -4150,7 +4182,9 @@ LRESULT CT3000View::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
         if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
             //if (product_register_value[7] == 6)
         {
-            if ((product_register_value[7] == PM_TSTAT6&&m_fFirmwareVersion>35.5)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7] == PM_TSTAT5i))
+            if ((product_register_value[7] == PM_TSTAT6&&m_fFirmwareVersion>35.5)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT8
+				|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+				)||(product_register_value[7] == PM_TSTAT5i))
             {
 
                 //product_register_value[]列表交换。
@@ -4284,7 +4318,9 @@ void CT3000View::OnBnClickedBtnSynctime()
 
     szTime[0] =(BYTE)(time.GetYear()%100);
     int nRet = write_one(g_tstat_id,MODBUS_YEAR, szTime[0]);
-	if (product_register_value[7] == PM_TSTAT8) 
+	if (product_register_value[7] == PM_TSTAT8
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
 	{
 		 
 		write_one(g_tstat_id, MODBUS_YEAR, time.GetYear());
@@ -4689,7 +4725,9 @@ LRESULT CT3000View::OnFlexSlideCallBack(WPARAM wParam, LPARAM lParam)
     int nHDB=0;
     int nCDB=0;
 
-    if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7] == PM_TSTAT5i))
+    if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V) 
+		||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7] == PM_TSTAT5i))
     {
         int Increment=product_register_value[MODBUS_SETPOINT_INCREASE];
         switch(wParam)
@@ -6186,7 +6224,9 @@ void CT3000View::InitFanSpeed()
 
 	m_FanComBox.ResetContent();
 
-	if (product_register_value[7] == PM_TSTAT8)
+	if (product_register_value[7] == PM_TSTAT8
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
 	{
 		switch (product_register_value[MODBUS_FAN_MODE])		//122   105
 		{
@@ -7158,7 +7198,9 @@ void CT3000View::Initial_Max_Min()
     int dCoolDB;
     int dHeatDB;
 
-    if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i))
+    if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7] == PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V) 
+		||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i))
     {
         product_register_value[MODBUS_DAY_SETPOINT]=Round_SetPoint_Max(product_register_value[MODBUS_DAY_SETPOINT]);
         product_register_value[MODBUS_DAY_COOLING_DEADBAND]=Round_SetPoint_Max(product_register_value[MODBUS_DAY_COOLING_DEADBAND]);
@@ -7775,7 +7817,9 @@ void CT3000View::FreshCtrl()
 
 
 
-    if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT8))
+    if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		)
     {
         Flexflash=1;
 
@@ -8048,7 +8092,9 @@ void CT3000View::OnCbnSelchangeStaticunint()
 void CT3000View::Read_SliderData()
 {
 
-    if (product_register_value[7]==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8)||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+    if (product_register_value[7]==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8)
+		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
     {
         Read_Multi(g_tstat_id,&product_register_value[MODBUS_DAY_SETPOINT],MODBUS_DAY_SETPOINT,20);
     }

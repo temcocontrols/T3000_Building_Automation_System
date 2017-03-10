@@ -3014,7 +3014,9 @@ void CTStatScanner::WriteOneDevInfoToDB( _ComDeviceInfo* pInfo)
         strBaudRate=pInfo->m_tstatip;
         strCom=pInfo->m_tstatport;
     }
-    if (nClassID == PM_TSTAT6||nClassID == PM_TSTAT7||nClassID == PM_TSTAT8||nClassID == PM_TSTAT5i
+    if (nClassID == PM_TSTAT6||nClassID == PM_TSTAT7||nClassID == PM_TSTAT8
+		|| (nClassID == PM_TSTAT8_WIFI) || (nClassID == PM_TSTAT8_OCC) || (nClassID == PM_TSTAT7_ARM) || (nClassID == PM_TSTAT8_220V)
+		||nClassID == PM_TSTAT5i
             ||nClassID == PM_HUMTEMPSENSOR||nClassID ==PM_AirQuality||nClassID ==PM_HUM_R||nClassID == PM_CO2_RS485||nClassID == PM_CO2_NODE)
     {
         BOOL Is_Open=FALSE;
