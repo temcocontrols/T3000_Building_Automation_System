@@ -9074,10 +9074,15 @@ namespace WFA_psychometric_chart
                 {
                     //FlagForDissableLeftAndRightClicksInChart = 0;
                     CMSinsertNode.Enabled = false;
-                    string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                    //string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-                    string NewDirectory = Path.GetFullPath(Path.Combine(dir, @"..\"));
-                    string file = NewDirectory + @"Database\image\lock.png";
+                    //string NewDirectory = Path.GetFullPath(Path.Combine(dir, @"..\"));
+                    //string file = NewDirectory + @"Database\image\lock.png";
+
+                    string imagePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                    string file = imagePath + @"\image\lock.png";
+
+
                     this.quickNodeInsertToolStripMenuItem.Image = Bitmap.FromFile(file);
                    this.quickNodeInsertToolStripMenuItem.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
                    // this.quickNodeInsertToolStripMenuItem.TextAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -14345,11 +14350,17 @@ namespace WFA_psychometric_chart
             {
                 //Edit mode is dissabled //Edit OFF section
                 //--Load image lock image
-                string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+               // string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-                string NewDirectory = Path.GetFullPath(Path.Combine(dir, @"..\"));
-                string file = NewDirectory + @"Database\image\lock.png";
+                //string NewDirectory = Path.GetFullPath(Path.Combine(dir, @"..\"));
+                //string file = NewDirectory + @"Database\image\lock.png";
+
+
+                string imagePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string file = imagePath + @"\image\lock.png";
+
                 Bitmap SOME = new Bitmap(Image.FromFile(file));
+
                 Bitmap bp = new Bitmap(SOME, pb_lock_unlock.Width, pb_lock_unlock.Height);
                 pb_lock_unlock.Image = bp;//Image.FromFile(file);
 
@@ -14364,11 +14375,16 @@ namespace WFA_psychometric_chart
             {
                 //Edit mode is enable
                 //--Load image lock image
-                string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+               // string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-                string NewDirectory = Path.GetFullPath(Path.Combine(dir, @"..\"));
-                string file = NewDirectory + @"Database\image\unlock.png";
-                 Bitmap SOME = new Bitmap(Image.FromFile(file));
+               // string NewDirectory = Path.GetFullPath(Path.Combine(dir, @"..\"));
+               // string file = NewDirectory + @"Database\image\unlock.png";
+
+
+                string imagePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string file = imagePath + @"\image\unlock.png";
+
+                Bitmap SOME = new Bitmap(Image.FromFile(file));
                 Bitmap bp = new Bitmap(SOME, pb_lock_unlock.Width, pb_lock_unlock.Height);
 
                 pb_lock_unlock.Image = bp;//Image.FromFile(file);
