@@ -16,10 +16,11 @@ public:
 	void    DisplayContextOtherMenu(CPoint & point);
 /*	virtual void	ExtendContextMenu(CMenu & menu);*/
 	afx_msg void	OnContextCmd(UINT uID);
-
+	void  SetVirtualTreeItem(HTREEITEM virtual_item);
 	virtual bool SortByConnection(HTREEITEM hItem)  ;
 	virtual bool SortByFloor(HTREEITEM hItem)  ;
 	virtual bool PingDevice(HTREEITEM hItem) ;
+	bool HandleAddVirtualDevice(HTREEITEM);
      virtual bool    DoDeleteItem(HTREEITEM);
 
 	
@@ -116,6 +117,14 @@ public:
 	unsigned int m_serial_number;
 	afx_msg void OnSetFocus(CWnd* pOldWnd);
 	bool is_focus ;
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	HTREEITEM m_flashed_tree_item;
+	CString offline_mode_string;
+	void StopFlashItem();
+	void FlashSelectItem(HTREEITEM hItem);
+	HTREEITEM m_virtual_tree_item;
+	bool tree_offline_mode;
+	void SetTreeOfflineMode(bool b_value);
 };
 
 

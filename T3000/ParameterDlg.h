@@ -25,13 +25,13 @@ public:
 public:
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedRefreshbutton();
-	afx_msg void OnBnClickedEnableidbutton();
+//	afx_msg void OnBnClickedEnableidbutton();
 	afx_msg void OnCbnSelendcancelBraudratecombo();
 	afx_msg void OnCbnSelchangePowermodelcombo();
 	afx_msg void OnCbnSelchangeKeypadlockcombo();
 	afx_msg void OnCbnSelchangeDisplaycombo();
 	afx_msg void OnCbnSelchangeAutoonlycombo();
- 	afx_msg void OnEnKillfocusIdaddressedit();
+// 	afx_msg void OnEnKillfocusIdaddressedit();
 	afx_msg void OnDestroy();
 
 	afx_msg void OnCbnSelchangekeypadcombo();
@@ -52,7 +52,7 @@ public:
 	afx_msg void OnEnKillfocusInfileredit();
 	afx_msg void OnEnKillfocusTimerleft();
 	afx_msg void OnCbnSelchangeUnitcombo();
-	afx_msg void OnEnKillfocusTempalarmedit();
+//	afx_msg void OnEnKillfocusTempalarmedit();
 	afx_msg void OnEnKillfocusTimeronedit();
 	afx_msg void OnEnKillfocusEdit12();
 	afx_msg void OnBnClickedFreecoolbgtn();
@@ -100,7 +100,7 @@ public:
 	//	unsigned short multi_register_value[513];
 	HANDLE hFirstThread;
 public:
- CMsflexgrid m_zigbee_tstat_table;
+ 
 	CEdit m_idAdressEdit;
 	CComboBox m_braudRateCombox;
 	CComboBox m_keySelectCombox;
@@ -109,16 +109,16 @@ public:
 	CComboBox m_keyLockCombox;
 	CComboBox m_SequenceCombox;
 	//CComboBox m_autoOnlyCombox;
-	CEdit m_valveEdit;
+	 
 	CEdit m_value_percentEdit;
 	CComboBox m_hcChangeCombox;
 	CEdit m_powerSetPointEdit;
 	CEdit m_setpointIncreasement;
 	CEdit m_defSetPointEdit;
-	CEdit m_setPointCtrlEdit;
+ 
 	CEdit m_inputFilterEdit;
 	CEdit m_cycledlayEdit;
-	CEdit m_tempAlarmEdit;
+
 	CEdit m_timerOnEdit;
 	CEdit m_timerOffEdit;
 	CComboBox m_uniteCombox;
@@ -230,17 +230,17 @@ public:
 	CEdit m_sensitivity_editor;
 	afx_msg void OnCbnSelchangeComboEnableDis();
 	afx_msg void OnEnKillfocusEditSensitivty();
-	CComboBox m_combox_setpointdisplay;
-	afx_msg void OnCbnSelchangeComboSetpointdisplay();
+	//CComboBox m_combox_setpointdisplay;
+//	afx_msg void OnCbnSelchangeComboSetpointdisplay();
 	CComboBox m_combox_zigbee;
 	CComboBox m_combox_channel;
 	afx_msg void OnCbnSelchangeComboZigbeetype();
 	afx_msg void OnCbnSelchangeComboChannel();
-	afx_msg void OnBnClickedButtonZigbeeReboot();
-	afx_msg void OnBnClickedBtnTopological();
+//	afx_msg void OnBnClickedButtonZigbeeReboot();
+//	afx_msg void OnBnClickedBtnTopological();
 	afx_msg void OnEnKillfocusEditPid2offsetpoint6();
-	afx_msg void OnBnClickedUnlock();
-	afx_msg void OnBnClickedLock();
+//	afx_msg void OnBnClickedUnlock();
+//	afx_msg void OnBnClickedLock();
 	afx_msg void OnBnClickedTrendlogview();
 	afx_msg void OnCbnSelchangeCombo1();
 	afx_msg void OnCbnSelchangeCombo4();

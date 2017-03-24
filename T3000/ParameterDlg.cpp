@@ -127,15 +127,15 @@ void CParameterDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SEQUENCECOMBOX, m_SequenceCombox);
 	//DDX_Control(pDX, IDC_AUTOONLYCOMBO, m_autoOnlyCombox);
 	DDX_Control(pDX, IDC_VALUPOSEDIT, m_value_percentEdit);
-	DDX_Control(pDX, IDC_VALVEEDIT, m_valveEdit);
+ 
 	DDX_Control(pDX, IDC_HCCHANGECOMBO, m_hcChangeCombox);
 	DDX_Control(pDX, IDC_POWSETPOMITEDIT, m_powerSetPointEdit);
 	DDX_Control(pDX, IDC_STINCREAEDIT, m_setpointIncreasement);
 	DDX_Control(pDX, IDC_DEF_SETPOINT_EDT, m_defSetPointEdit);
-	DDX_Control(pDX, IDC_SETPOINTCTLEDIT, m_setPointCtrlEdit);
+ 
 	DDX_Control(pDX, IDC_INFILEREDIT, m_inputFilterEdit);
 	DDX_Control(pDX, IDC_CYCLEEDIT, m_cycledlayEdit);
-	DDX_Control(pDX, IDC_TEMPALARMEDIT, m_tempAlarmEdit);
+
 	DDX_Control(pDX, IDC_TIMERONEDIT, m_timerOnEdit);
 	DDX_Control(pDX, IDC_EDIT12, m_timerOffEdit);
 	DDX_Control(pDX, IDC_UNITCOMBO, m_uniteCombox);
@@ -187,10 +187,10 @@ void CParameterDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_OCCUPIED_TIMER, m_occupied_timer);
 	DDX_Control(pDX, IDC_COMBO_ENABLE_DIS, m_combox_pir_endisable);
 	DDX_Control(pDX, IDC_EDIT_SENSITIVTY, m_sensitivity_editor);
-	DDX_Control(pDX, IDC_COMBO_SETPOINTDISPLAY, m_combox_setpointdisplay);
+
 	DDX_Control(pDX, IDC_COMBO_ZIGBEETYPE, m_combox_zigbee);
 	DDX_Control(pDX, IDC_COMBO_CHANNEL, m_combox_channel);
-	DDX_Control(pDX, IDC_ZIGBEE_TSTATS_TABLE, m_zigbee_tstat_table);
+
 	DDX_Control(pDX, IDC_COMBO1, m_day_combox);
 	DDX_Control(pDX, IDC_COMBO4, m_night_combox);
 	DDX_Control(pDX, IDC_COMBO_MRD, m_combox_mrd);
@@ -199,7 +199,7 @@ void CParameterDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
     ON_BN_CLICKED(IDOK, &CParameterDlg::OnBnClickedOk)
     ON_BN_CLICKED(IDC_REFRESHBUTTON, &CParameterDlg::OnBnClickedRefreshbutton)
-    ON_BN_CLICKED(IDC_ENABLEIDBUTTON, &CParameterDlg::OnBnClickedEnableidbutton)
+//    ON_BN_CLICKED(IDC_ENABLEIDBUTTON, &CParameterDlg::OnBnClickedEnableidbutton)
     ON_CBN_SELENDCANCEL(IDC_BRAUDRATECOMBO, &CParameterDlg::OnCbnSelendcancelBraudratecombo)
     ON_CBN_SELCHANGE(IDC_POWERMODELCOMBO, &CParameterDlg::OnCbnSelchangePowermodelcombo)
     ON_CBN_SELCHANGE(IDC_KEYPADLOCKCOMBO, &CParameterDlg::OnCbnSelchangeKeypadlockcombo)
@@ -208,7 +208,7 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
 
     ON_CBN_SELCHANGE(IDC_KEYPADSELECT, &CParameterDlg::OnCbnSelchangekeypadcombo)
 
-    ON_EN_KILLFOCUS(IDC_IDADDRESSEDIT, &CParameterDlg::OnEnKillfocusIdaddressedit)
+//    ON_EN_KILLFOCUS(IDC_IDADDRESSEDIT, &CParameterDlg::OnEnKillfocusIdaddressedit)
     ON_WM_DESTROY()
     //ON_CBN_KILLFOCUS(IDC_KEYPADSELECT, &CParameterDlg::OnCbnKillfocusKeypadselect)
     ON_EN_KILLFOCUS(IDC_VALUPOSEDIT, &CParameterDlg::OnEnKillfocusValuposedit)
@@ -221,7 +221,7 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
     ON_EN_KILLFOCUS(IDC_SETPOINTCTLEDIT, &CParameterDlg::OnEnKillfocusSetpointctledit)
     ON_EN_KILLFOCUS(IDC_INFILEREDIT, &CParameterDlg::OnEnKillfocusInfileredit)
     ON_EN_KILLFOCUS(IDC_CYCLEEDIT, &CParameterDlg::OnEnKillfocusCycleedit)
-    ON_EN_KILLFOCUS(IDC_TEMPALARMEDIT, &CParameterDlg::OnEnKillfocusTempalarmedit)
+ 
     ON_EN_KILLFOCUS(IDC_TIMERONEDIT, &CParameterDlg::OnEnKillfocusTimeronedit)
     ON_EN_KILLFOCUS(IDC_EDIT12, &CParameterDlg::OnEnKillfocusEdit12)
     ON_CBN_SELCHANGE(IDC_UNITCOMBO, &CParameterDlg::OnCbnSelchangeUnitcombo)
@@ -305,14 +305,12 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
     ON_EN_KILLFOCUS(IDC_EDIT_DEAD_MASTER, &CParameterDlg::OnEnKillfocusEditDeadMaster)
     ON_CBN_SELCHANGE(IDC_COMBO_ENABLE_DIS, &CParameterDlg::OnCbnSelchangeComboEnableDis)
     ON_EN_KILLFOCUS(IDC_EDIT_SENSITIVTY, &CParameterDlg::OnEnKillfocusEditSensitivty)
-    ON_CBN_SELCHANGE(IDC_COMBO_SETPOINTDISPLAY, &CParameterDlg::OnCbnSelchangeComboSetpointdisplay)
     ON_CBN_SELCHANGE(IDC_COMBO_ZIGBEETYPE, &CParameterDlg::OnCbnSelchangeComboZigbeetype)
     ON_CBN_SELCHANGE(IDC_COMBO_CHANNEL, &CParameterDlg::OnCbnSelchangeComboChannel)
-    ON_BN_CLICKED(IDC_BUTTON_ZIGBEE_REBOOT, &CParameterDlg::OnBnClickedButtonZigbeeReboot)
-    ON_BN_CLICKED(IDC_BTN_TOPOLOGICAL, &CParameterDlg::OnBnClickedBtnTopological)
+//    ON_BN_CLICKED(IDC_BUTTON_ZIGBEE_REBOOT, &CParameterDlg::OnBnClickedButtonZigbeeReboot)
     ON_EN_KILLFOCUS(IDC_EDIT_PID2OFFSETPOINT6, &CParameterDlg::OnEnKillfocusEditPid2offsetpoint6)
-    ON_BN_CLICKED(IDC_UNLOCK, &CParameterDlg::OnBnClickedUnlock)
-    ON_BN_CLICKED(IDC_LOCK, &CParameterDlg::OnBnClickedLock)
+//    ON_BN_CLICKED(IDC_UNLOCK, &CParameterDlg::OnBnClickedUnlock)
+//    ON_BN_CLICKED(IDC_LOCK, &CParameterDlg::OnBnClickedLock)
     ON_BN_CLICKED(IDC_TRENDLOGVIEW, &CParameterDlg::OnBnClickedTrendlogview)
     ON_CBN_SELCHANGE(IDC_COMBO1, &CParameterDlg::OnCbnSelchangeCombo1)
     ON_CBN_SELCHANGE(IDC_COMBO4, &CParameterDlg::OnCbnSelchangeCombo4)
@@ -320,12 +318,12 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
     ON_EN_KILLFOCUS(IDC_EDIT_TRANDUCER_MIN, &CParameterDlg::OnEnKillfocusEditTranducerMin)
     ON_EN_KILLFOCUS(IDC_EDIT_CHANGE_OVER_TIME, &CParameterDlg::OnEnKillfocusEditChangeOverTime)
     ON_EN_KILLFOCUS(IDC_EDIT_TSTAT_NAME, &CParameterDlg::OnEnKillfocusEditTstatName)
-		ON_CBN_SELCHANGE(IDC_COMBO_MRD, &CParameterDlg::OnCbnSelchangeComboMrd)
-		ON_BN_CLICKED(IDC_BUTTON_APPLY_ALL, &CParameterDlg::OnBnClickedButtonApplyAll)
-		ON_BN_CLICKED(IDC_BUTTON_ZIGBEE, &CParameterDlg::OnBnClickedButtonZigbee)
-		ON_EN_KILLFOCUS(IDC_EDIT_SHOWID, &CParameterDlg::OnEnKillfocusEditShowid)
-		ON_BN_CLICKED(IDC_BUTTON_SHOW_MODBUS_ID, &CParameterDlg::OnBnClickedButtonShowModbusId)
-		END_MESSAGE_MAP()
+	ON_CBN_SELCHANGE(IDC_COMBO_MRD, &CParameterDlg::OnCbnSelchangeComboMrd)
+	ON_BN_CLICKED(IDC_BUTTON_APPLY_ALL, &CParameterDlg::OnBnClickedButtonApplyAll)
+	ON_BN_CLICKED(IDC_BUTTON_ZIGBEE, &CParameterDlg::OnBnClickedButtonZigbee)
+	ON_EN_KILLFOCUS(IDC_EDIT_SHOWID, &CParameterDlg::OnEnKillfocusEditShowid)
+	ON_BN_CLICKED(IDC_BUTTON_SHOW_MODBUS_ID, &CParameterDlg::OnBnClickedButtonShowModbusId)
+	END_MESSAGE_MAP()
 
 
 DWORD WINAPI BackparaFreshProc(LPVOID pParam)
@@ -396,9 +394,7 @@ BOOL CParameterDlg::OnInitDialog()
     m_gUnit.AddString(_T("°F"));
 
 
-    /*GetDlgItem(IDC_TEMPALARMEDIT)->ShowWindow(SW_HIDE);
-    GetDlgItem(IDC_STATICALARM)->ShowWindow(SW_HIDE);*/
-    m_setPointCtrlEdit.ShowWindow(SW_HIDE);
+ 
 
     if(g_ParamLevel==1)
     {
@@ -422,19 +418,19 @@ BOOL CParameterDlg::OnInitDialog()
         CStatic* ptimerout=(CStatic*)GetDlgItem(IDC_TIMERON_STATIC);
         ptimerout->SetWindowText(_T("Timer On"));
     }
-    m_combox_setpointdisplay.ResetContent();
-    m_combox_setpointdisplay.AddString(_T("Temperature "));
-    m_combox_setpointdisplay.AddString(_T("Co2"));
-    m_combox_setpointdisplay.AddString(_T("Hum"));
+//     m_combox_setpointdisplay.ResetContent();
+//     m_combox_setpointdisplay.AddString(_T("Temperature "));
+//     m_combox_setpointdisplay.AddString(_T("Co2"));
+//     m_combox_setpointdisplay.AddString(_T("Hum"));
     // initialize PID2 combo box
-    if (product_register_value[704]>=0&&product_register_value[704]<=2)
-    {
-        m_combox_setpointdisplay.SetCurSel(product_register_value[704]);
-    }
-    else
-    {
-        m_combox_setpointdisplay.SetCurSel(0);
-    }
+//     if (product_register_value[704]>=0&&product_register_value[704]<=2)
+//     {
+//         m_combox_setpointdisplay.SetCurSel(product_register_value[704]);
+//     }
+//     else
+//     {
+//         m_combox_setpointdisplay.SetCurSel(0);
+//     }
 
     InitPID2ComboBox();
 
@@ -474,7 +470,7 @@ BOOL CParameterDlg::OnInitDialog()
     // #define  Max		10  //address 365
     // #define  Min		11  //address 366
 
-    //tstat6flex
+   
 
     //Setting the refresh button,add by Fan
     HICON hIcon = NULL;
@@ -569,213 +565,7 @@ BOOL CParameterDlg::OnInitDialog()
 	{
 		GetDlgItem(IDC_BUTTON_ZIGBEE)->ShowWindow(0);
 	}
-#if 1//Zigbee		  
-  /*  if ((product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT8)&&product_register_value[MODBUS_RS485_MODE]==1)
-    {
-
-        WINDOWPLACEMENT wp;
-        GetWindowPlacement(&wp);
-        wp.rcNormalPosition.left += 120;
-        SetWindowPlacement(&wp);
-        GetDlgItem(IDC_STATIC_SPLIT_WINDOW)->ShowWindow(SW_NORMAL);
-
-        GetDlgItem(IDC_STATIC_ZIGBEE_INFORMATION)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_STATIC_ZIGBEE_ID)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_EDIT_ZIGBEE_ID)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_STATIC_ZIGBEE_TYPE)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_COMBO_ZIGBEETYPE)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_STATIC_ZIGBEE_CHANNEL)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_COMBO_CHANNEL)->ShowWindow(SW_SHOW);
-
-
-
-        GetDlgItem(IDC_STATIC_ZIGBEE_SV)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_EDIT_ZIGBEE_SV)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_BUTTON_ZIGBEE_REBOOT)->ShowWindow(SW_SHOW);
-        GetDlgItem( IDC_STATIC_ZIGBEE_SK)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_EDIT_ZIGBEE_SK)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_STATIC_ZIGBEE_MAC)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_EDIT_ZIGBEE_MAC)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_STATIC_NUMBER_TSSTATS)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_ZIGBEE_TSTATS_TABLE)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_BTN_TOPOLOGICAL)->ShowWindow(SW_SHOW);
-
-        strTemp.Format(_T("%d"),product_register_value[21]);
-        GetDlgItem(IDC_EDIT_ZIGBEE_ID)->SetWindowText(strTemp);
-        m_combox_zigbee.ResetContent();
-        m_combox_zigbee.AddString(_T("Coordinator"));
-        m_combox_zigbee.AddString(_T("Router"));
-        if (product_register_value[22]<2)
-        {
-            m_combox_zigbee.SetCurSel(product_register_value[22]);
-        }
-        m_combox_channel.ResetContent();
-        for (int channel=11; channel<27; channel++)
-        {
-            strTemp.Format(_T("%d"),channel);
-            m_combox_channel.AddString(strTemp);
-        }
-
-        int ChannelValue=product_register_value[24]+product_register_value[23]*65535;
-        int ChannelNO=0;
-        if (ChannelValue==0x04000000)
-        {
-            ChannelNO=26;
-        }
-        else if (ChannelValue==0x02000000)
-        {
-            ChannelNO=25;
-        }
-        else if (ChannelValue==0x01000000)
-        {
-            ChannelNO=24;
-        }
-        else if (ChannelValue==0x00800000)
-        {
-            ChannelNO=23;
-        }
-        else if (ChannelValue==0x00400000)
-        {
-            ChannelNO=22;
-        }
-        else if (ChannelValue==0x00200000)
-        {
-            ChannelNO=21;
-        }
-        else if (ChannelValue==0x00100000)
-        {
-            ChannelNO=20;
-        }
-        else if (ChannelValue==0x00080000)
-        {
-            ChannelNO=19;
-        }
-        else if (ChannelValue==0x00040000)
-        {
-            ChannelNO=18;
-        }
-        else if (ChannelValue==0x00020000)
-        {
-            ChannelNO=17;
-        }
-        else if (ChannelValue==0x00010000)
-        {
-            ChannelNO=16;
-        }
-        else if (ChannelValue==0x00008000)
-        {
-            ChannelNO=15;
-        }
-        else if (ChannelValue==0x00004000)
-        {
-            ChannelNO=14;
-        }
-        else if (ChannelValue==0x00002000)
-        {
-            ChannelNO=13;
-        }
-        else if (ChannelValue==0x00001000)
-        {
-            ChannelNO=12;
-        }
-        else if (ChannelValue==0x07FFF8000)
-        {
-            ChannelNO=11;
-        }
-        else
-        {
-            ChannelNO=0;
-        }
-        if (ChannelNO>0)
-        {
-            ChannelNO-=11;
-        }
-        m_combox_channel.SetCurSel(ChannelNO);
-
-        strTemp.Format(_T("%d"),product_register_value[25]);
-        GetDlgItem(IDC_EDIT_ZIGBEE_SV)->SetWindowText(strTemp);
-        strTemp=_T("");
-        for (int Address=35; Address<51; Address++)
-        {
-            CString StrValue;
-            StrValue.Format(_T("%02X"),product_register_value[Address]);
-            strTemp+=StrValue;
-        }
-
-        GetDlgItem(IDC_EDIT_ZIGBEE_SK)->SetWindowText(strTemp);
-        strTemp.Format(_T("%02X-%02X-%02X-%02X-%02X-%02X-%02X-%02X"),product_register_value[26],product_register_value[27],product_register_value[28],product_register_value[29],product_register_value[30],product_register_value[31],product_register_value[32],product_register_value[33]);
-        GetDlgItem(IDC_EDIT_ZIGBEE_MAC)->SetWindowText(strTemp);
-
-        if (product_register_value[51]>0)
-        {
-            m_zigbee_tstat_table.put_Cols(3);
-            m_zigbee_tstat_table.put_Rows(product_register_value[51]+1);
-            m_zigbee_tstat_table.put_TextMatrix(0,0,_T("Index"));
-            m_zigbee_tstat_table.put_TextMatrix(0,1,_T("TstatIDs"));
-            m_zigbee_tstat_table.put_TextMatrix(0,2,_T("Signal Strength"));
-            for (int ids=0; ids<product_register_value[51]; ids++)
-            {
-                strTemp.Format(_T("%d"),ids+1);
-                m_zigbee_tstat_table.put_TextMatrix(ids+1,0,strTemp);
-
-
-                strTemp.Format(_T("%d"),product_register_value[52+ids]);
-                m_zigbee_tstat_table.put_TextMatrix(ids+1,1,strTemp);
-
-                char strength=product_register_value[52+product_register_value[51]+ids];
-
-                strTemp.Format(_T("%d"),strength);
-
-                m_zigbee_tstat_table.put_TextMatrix(ids+1,2,strTemp);
-
-            }
-        }
-        else
-        {
-            m_zigbee_tstat_table.put_Cols(3);
-            m_zigbee_tstat_table.put_Rows(1);
-            m_zigbee_tstat_table.put_TextMatrix(0,0,_T("Index"));
-            m_zigbee_tstat_table.put_TextMatrix(0,1,_T("TstatIDs"));
-            m_zigbee_tstat_table.put_TextMatrix(0,2,_T("Signal Strength"));
-        }
-
-
-
-
-    }
-    else*/
-    {
-        WINDOWPLACEMENT wp;
-        GetWindowPlacement(&wp);
-        CRect rc;
-        CWnd* pWnd = GetDlgItem(IDC_STATIC_SPLIT_WINDOW);
-        pWnd->GetWindowRect(&rc);
-        //ScreenToClient(&rc);
-        wp.rcNormalPosition.right =rc.right-10; /*rc.left - 10;*/
-        SetWindowPlacement(&wp);
-        GetDlgItem(IDC_STATIC_SPLIT_WINDOW)->ShowWindow(SW_HIDE);
-
-        GetDlgItem(IDC_STATIC_ZIGBEE_INFORMATION)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_STATIC_ZIGBEE_ID)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_EDIT_ZIGBEE_ID)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_STATIC_ZIGBEE_TYPE)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_COMBO_ZIGBEETYPE)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_STATIC_ZIGBEE_CHANNEL)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_COMBO_CHANNEL)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_BTN_TOPOLOGICAL)->ShowWindow(SW_HIDE);
-
-
-        GetDlgItem(IDC_STATIC_ZIGBEE_SV)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_EDIT_ZIGBEE_SV)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_BUTTON_ZIGBEE_REBOOT)->ShowWindow(SW_HIDE);
-        GetDlgItem( IDC_STATIC_ZIGBEE_SK)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_EDIT_ZIGBEE_SK)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_STATIC_ZIGBEE_MAC)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_EDIT_ZIGBEE_MAC)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_STATIC_NUMBER_TSSTATS)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_ZIGBEE_TSTATS_TABLE)->ShowWindow(SW_HIDE);
-    }
-#endif
+ 
     if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 		)
@@ -927,22 +717,22 @@ void CParameterDlg::OnBnClickedRefreshbutton()
 
 }
 
-void CParameterDlg::OnBnClickedEnableidbutton()
-{
-    // 	m_idAdressEdit.EnableWindow(TRUE);
-    // 	// TODO: Add your control notification handler code here
-
-    if(m_idAdressEdit.IsWindowEnabled())
-    {
-        m_idAdressEdit.EnableWindow(FALSE);
-        ((CButton *)GetDlgItem(IDC_ENABLEIDBUTTON))->SetWindowTextW(_T("Enable Change"));
-    }
-    else
-    {
-        m_idAdressEdit.EnableWindow(TRUE);
-        ((CButton *)GetDlgItem(IDC_ENABLEIDBUTTON))->SetWindowTextW(_T("Disable Change"));
-    }
-}
+//void CParameterDlg::OnBnClickedEnableidbutton()
+//{
+//    // 	m_idAdressEdit.EnableWindow(TRUE);
+//    // 	// TODO: Add your control notification handler code here
+//
+//    if(m_idAdressEdit.IsWindowEnabled())
+//    {
+//        m_idAdressEdit.EnableWindow(FALSE);
+//        ((CButton *)GetDlgItem(IDC_ENABLEIDBUTTON))->SetWindowTextW(_T("Enable Change"));
+//    }
+//    else
+//    {
+//        m_idAdressEdit.EnableWindow(TRUE);
+//        ((CButton *)GetDlgItem(IDC_ENABLEIDBUTTON))->SetWindowTextW(_T("Disable Change"));
+//    }
+//}
 
 void CParameterDlg::OnCbnSelchangeAutoonlycombo()
 {
@@ -959,108 +749,108 @@ void CParameterDlg::OnCbnSelchangeAutoonlycombo()
     // TODO: Add your control notification handler code here
 }
 
-void CParameterDlg::OnEnKillfocusIdaddressedit()
-{
-    CMainFrame* pPraent=(CMainFrame*)GetParent();
-    if(g_ParamLevel==1)
-        return;
-
-    CString strTemp;
-    m_idAdressEdit.GetWindowText(strTemp);
-    strTemp.Trim();
-    if(strTemp.IsEmpty())
-        return;
-    int nID=_wtoi(strTemp);
-    if(nID<=0||nID>=255)
-    {
-        AfxMessageBox(_T("Please input a correct ID!"));
-        return;
-    }
-    if(g_tstat_id==nID)
-        return;
-
- 
-	CppSQLite3DB SqliteDBBuilding;
-	CppSQLite3Table table;
-	CppSQLite3Query q;
-	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
-
-
-    CString strSql;
-    strSql.Format(_T("select * from ALL_NODE where Product_ID ='%s'"),strTemp);
-    //m_pRsTemp->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-   q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
-    if(!q.eof())
-    {
-        CString strPop;
-        strPop.Format(_T("There is another TSTAT has the ID ='%s', Please input a new one!"),strTemp);
-        AfxMessageBox(strPop);
+//void CParameterDlg::OnEnKillfocusIdaddressedit()
+//{
+//    CMainFrame* pPraent=(CMainFrame*)GetParent();
+//    if(g_ParamLevel==1)
+//        return;
+//
+//    CString strTemp;
+//    m_idAdressEdit.GetWindowText(strTemp);
+//    strTemp.Trim();
+//    if(strTemp.IsEmpty())
+//        return;
+//    int nID=_wtoi(strTemp);
+//    if(nID<=0||nID>=255)
+//    {
+//        AfxMessageBox(_T("Please input a correct ID!"));
+//        return;
+//    }
+//    if(g_tstat_id==nID)
+//        return;
+//
+// 
+//	CppSQLite3DB SqliteDBBuilding;
+//	CppSQLite3Table table;
+//	CppSQLite3Query q;
+//	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+//
+//
+//    CString strSql;
+//    strSql.Format(_T("select * from ALL_NODE where Product_ID ='%s'"),strTemp);
+//    //m_pRsTemp->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
+//   q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+//    if(!q.eof())
+//    {
+//        CString strPop;
+//        strPop.Format(_T("There is another TSTAT has the ID ='%s', Please input a new one!"),strTemp);
+//        AfxMessageBox(strPop);
 // 		if(m_pRsTemp->State)
 // 			m_pRsTemp->Close();
-        SqliteDBBuilding.closedb();
-        return;
-    }
-   
-
-    int nRet=0;
-    g_bPauseMultiRead = TRUE;
-    nRet=write_one(g_tstat_id, 6,nID);
-
-    Sleep(1000);
-
-    nRet=write_one(g_tstat_id, 6,nID);
-    if(nRet>0)
-    {
-        CString strSerial;
-        strSerial.Format(_T("%d"),g_serialNum);
-        strSerial.Trim();
-        g_tstat_id=nID;
-
-        // 修改product name
-        int nProductClassID = 0;
-        for(UINT i = 0; i < pPraent->m_product.size(); i++)
-        {
-            if(pPraent->m_product[i].serial_number== g_serialNum)
-            {
-                nProductClassID = pPraent->m_product[i].product_class_id;
-                break;
-            }
-        }
-        CString strProductName;
-        CString strNewID;
-        if (nProductClassID != 0)
-        {
-
-            strNewID.Format(_T("%d"), g_tstat_id);
-            strProductName = pPraent->GetDeviceClassName(nProductClassID);
-            strProductName = strProductName+_T(":")+strSerial+_T("--")+strNewID;
-        }
-        CString strScreenName = pPraent->GetScreenName(g_serialNum, g_tstat_id);
-
-        //
-
-        try
-        {
-
-            strSql.Format(_T("update ALL_NODE set Product_ID ='%s', Product_name = '%s', Screen_Name = '%s' where Serial_ID = '%s'"),strNewID,strProductName,strScreenName,strSerial);
-            SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
-        }
-        catch(_com_error *e)
-        {
-            AfxMessageBox(e->ErrorMessage());
-        }
-
-        TRACE(strSql);
-
-
-    }
-    g_bPauseMultiRead = FALSE;
-
-    SqliteDBBuilding.closedb();
-
-    //Sleep(1000);
-    pPraent->ScanTstatInDB();
-}
+//        SqliteDBBuilding.closedb();
+//        return;
+//    }
+//   
+//
+//    int nRet=0;
+//    g_bPauseMultiRead = TRUE;
+//    nRet=write_one(g_tstat_id, 6,nID);
+//
+//    Sleep(1000);
+//
+//    nRet=write_one(g_tstat_id, 6,nID);
+//    if(nRet>0)
+//    {
+//        CString strSerial;
+//        strSerial.Format(_T("%d"),g_serialNum);
+//        strSerial.Trim();
+//        g_tstat_id=nID;
+//
+//        // 修改product name
+//        int nProductClassID = 0;
+//        for(UINT i = 0; i < pPraent->m_product.size(); i++)
+//        {
+//            if(pPraent->m_product[i].serial_number== g_serialNum)
+//            {
+//                nProductClassID = pPraent->m_product[i].product_class_id;
+//                break;
+//            }
+//        }
+//        CString strProductName;
+//        CString strNewID;
+//        if (nProductClassID != 0)
+//        {
+//
+//            strNewID.Format(_T("%d"), g_tstat_id);
+//            strProductName = pPraent->GetDeviceClassName(nProductClassID);
+//            strProductName = strProductName+_T(":")+strSerial+_T("--")+strNewID;
+//        }
+//        CString strScreenName = pPraent->GetScreenName(g_serialNum, g_tstat_id);
+//
+//        //
+//
+//        try
+//        {
+//
+//            strSql.Format(_T("update ALL_NODE set Product_ID ='%s', Product_name = '%s', Screen_Name = '%s' where Serial_ID = '%s'"),strNewID,strProductName,strScreenName,strSerial);
+//            SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+//        }
+//        catch(_com_error *e)
+//        {
+//            AfxMessageBox(e->ErrorMessage());
+//        }
+//
+//        TRACE(strSql);
+//
+//
+//    }
+//    g_bPauseMultiRead = FALSE;
+//
+//    SqliteDBBuilding.closedb();
+//
+//    //Sleep(1000);
+//    pPraent->ScanTstatInDB();
+//}
 
 void CParameterDlg::OnDestroy()
 {
@@ -1385,24 +1175,7 @@ void CParameterDlg::OnCbnSelchangeSequencecombox()
 
 
 
-//This Edit is invisible for every product.May be we can delete it.
-//void CParameterDlg::OnEnKillfocusValveedit()
-//{
-//
-//	if(g_ParamLevel==1)
-//		return;
-//	CString strTemp;
-//	m_valveEdit.GetWindowText(strTemp);
-//	if(strTemp.IsEmpty())
-//		return;
-//
-//	if(product_register_value[MODBUS_VALVE_TRAVEL_TIME]==(int)(_wtof(strTemp)*10))	//Add this to judge weather this value need to change.
-//		return;
-//
-//	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_VALVE_TRAVEL_TIME,(int)(_wtof(strTemp)*10),
-//		product_register_value[MODBUS_VALVE_TRAVEL_TIME],this->m_hWnd,IDC_VALVEEDIT,_T("VALVE TRAVEL TIME"));
-//
-//}
+ 
 
 void CParameterDlg::OnCbnSelchangeHcchangecombo()
 {
@@ -1525,10 +1298,10 @@ void CParameterDlg::OnEnKillfocusCycleedit()
                         product_register_value[MODBUS_CYCLING_DELAY],this->m_hWnd,IDC_CYCLEEDIT,_T("CYCLING_DELAY"));
 }
 
-void CParameterDlg::OnEnKillfocusTempalarmedit()
-{
-    //m_tempAlarmEdit
-}
+//void CParameterDlg::OnEnKillfocusTempalarmedit()
+//{
+//    //m_tempAlarmEdit
+//}
 
 
 
@@ -3328,7 +3101,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
     //279	243	1	Low byte	W/R	Valve travel time. The time of the valve travel  from one end to another end. The units is second.
     strTemp.Format(_T("%0.1f"),product_register_value[MODBUS_VALVE_TRAVEL_TIME]/10.0);	//279 T6=243
-    m_valveEdit.SetWindowText(strTemp);
+   
 
     //214	113	1	Low byte	W/R(not to eeprom)
     m_hcChangeCombox.SetCurSel(product_register_value[MODBUS_HEAT_COOL_CONFIG]);	//214  T6=113
@@ -4232,8 +4005,8 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
         GetDlgItem(IDC_EDIT38)->EnableWindow(TRUE);
         GetDlgItem(IDC_COMBO4)->EnableWindow(TRUE);
-        GetDlgItem(IDC_EDIT_CSPWN)->EnableWindow(TRUE);
-        GetDlgItem(IDC_EDIT39)->EnableWindow(TRUE);
+      
+ 
         GetDlgItem(IDC_EDIT_ValueTravelTime)->EnableWindow(TRUE);
 
         //GetDlgItem(IDC_STATIC_1SP2SPN)->ShowWindow(FALSE);
@@ -4323,8 +4096,8 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
         GetDlgItem(IDC_EDIT38)->EnableWindow(FALSE);
         GetDlgItem(IDC_COMBO4)->EnableWindow(FALSE);
-        GetDlgItem(IDC_EDIT_CSPWN)->EnableWindow(FALSE);
-        GetDlgItem(IDC_EDIT39)->EnableWindow(FALSE);
+     
+ 
 
 
 
@@ -5671,16 +5444,16 @@ void CParameterDlg::OnEnKillfocusEditSensitivty()
 }
 
 
-void CParameterDlg::OnCbnSelchangeComboSetpointdisplay()
-{
-    int sel=m_combox_setpointdisplay.GetCurSel();
-    int ret=write_one(g_tstat_id,704,sel);
-    if (ret>0)
-    {
-        product_register_value[704]=sel;
-    }
-    m_combox_setpointdisplay.SetCurSel(product_register_value[704]);
-}
+//void CParameterDlg::OnCbnSelchangeComboSetpointdisplay()
+//{
+//    int sel=m_combox_setpointdisplay.GetCurSel();
+//    int ret=write_one(g_tstat_id,704,sel);
+//    if (ret>0)
+//    {
+//        product_register_value[704]=sel;
+//    }
+//    m_combox_setpointdisplay.SetCurSel(product_register_value[704]);
+//}
 
 
 void CParameterDlg::OnCbnSelchangeComboZigbeetype()
@@ -5788,54 +5561,54 @@ void CParameterDlg::OnCbnSelchangeComboChannel()
 }
 
 
-void CParameterDlg::OnBnClickedButtonZigbeeReboot()
-{
-    int ret= write_one(g_tstat_id,34,1);
-    if (ret<0)
-    {
-        AfxMessageBox(_T("Reboot it ,again"));
-    }
-}
+//void CParameterDlg::OnBnClickedButtonZigbeeReboot()
+//{
+//    int ret= write_one(g_tstat_id,34,1);
+//    if (ret<0)
+//    {
+//        AfxMessageBox(_T("Reboot it ,again"));
+//    }
+//}
 
 extern bool b_pause_refresh_tree ;
-void CParameterDlg::OnBnClickedBtnTopological()
-{
-    int temp_pause = g_bPauseRefreshTree;	//resume all the status.
-    int temp_g_id =  g_tstat_id;
-    int temp_value = b_pause_refresh_tree;
-    bool temp_pasueread = g_bPauseMultiRead;
-    b_pause_refresh_tree = true;
-    g_bPauseRefreshTree = true;
-    g_bPauseMultiRead = true;
-    CTstatZigbeeLogic dlg;
-    dlg.DoModal();
-    g_bPauseRefreshTree = temp_pause;
-    g_tstat_id = temp_g_id ;
-    b_pause_refresh_tree = temp_value;
-    g_bPauseMultiRead = temp_pasueread;
-}
+//void CParameterDlg::OnBnClickedBtnTopological()
+//{
+//    int temp_pause = g_bPauseRefreshTree;	//resume all the status.
+//    int temp_g_id =  g_tstat_id;
+//    int temp_value = b_pause_refresh_tree;
+//    bool temp_pasueread = g_bPauseMultiRead;
+//    b_pause_refresh_tree = true;
+//    g_bPauseRefreshTree = true;
+//    g_bPauseMultiRead = true;
+//    CTstatZigbeeLogic dlg;
+//    dlg.DoModal();
+//    g_bPauseRefreshTree = temp_pause;
+//    g_tstat_id = temp_g_id ;
+//    b_pause_refresh_tree = temp_value;
+//    g_bPauseMultiRead = temp_pasueread;
+//}
 
 
 
 
 
-void CParameterDlg::OnBnClickedUnlock()
-{
-    if (product_register_value[7]==6)
-    {
-        write_one(g_tstat_id,639,0);
-    }
+//void CParameterDlg::OnBnClickedUnlock()
+//{
+//    if (product_register_value[7]==6)
+//    {
+//        write_one(g_tstat_id,639,0);
+//    }
+//
+//}
 
-}
 
-
-void CParameterDlg::OnBnClickedLock()
-{
-    if (product_register_value[7]==6)
-    {
-        write_one(g_tstat_id,639,1);
-    }
-}
+//void CParameterDlg::OnBnClickedLock()
+//{
+//    if (product_register_value[7]==6)
+//    {
+//        write_one(g_tstat_id,639,1);
+//    }
+//}
 #include "DisplayConfig.h"
 #include "LedsDialog.h"
 

@@ -1225,7 +1225,7 @@ void  CNetworkControllView::AddNodeToNCTable(unsigned short* pNode)
 
 	strTemp.Format(_T("%d"), nRow);
 	m_gridSub.put_TextMatrix(nRow,NO_FIELD, strTemp);	
-	strTemp = get_product_class_name_by_model_ID(nProductType);
+	strTemp = GetProductName(nProductType);
 	m_gridSub.put_TextMatrix(nRow,PRODUCT_FIELD,strTemp);
 	strTemp.Format(_T("%d"), nSubnet);
 	m_gridSub.put_TextMatrix(nRow,SUBNET_FIELD,strTemp);

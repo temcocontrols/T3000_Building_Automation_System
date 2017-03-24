@@ -2475,7 +2475,7 @@ void Save2File_ForTwoFiles(TCHAR* fn)
 	_Twrite_to_file_a_line(out,_T("Tstat Config File"));//added the header marker.
 
 	//int nModelID = read_one(g_tstat_id, 7);
-	CString strProductClassName = get_product_class_name_by_model_ID(product_register_value[7]);
+	CString strProductClassName = GetProductName(product_register_value[7]);
 	strProductClassName = _T("Model : ") + strProductClassName;
 	_Twrite_to_file_a_line(out, strProductClassName);//added the model
 	//////////////////////////////////////////////////////////////////////////

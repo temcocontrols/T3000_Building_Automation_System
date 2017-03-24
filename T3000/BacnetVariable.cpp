@@ -111,7 +111,7 @@ BOOL CBacnetVariable::OnInitDialog()
 	SetTimer(1,BAC_LIST_REFRESH_TIME + 5000,NULL);
 
 	//SetTimer(6,250,NULL);
-
+	ShowWindow(FALSE);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -200,22 +200,33 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 
 	int Fresh_Item;
 	int isFreshOne = (int)lParam;
-	if(isFreshOne == REFRESH_ON_ITEM)
+	bool need_refresh_all = false;
+	int Fresh_List_Now = (int)wParam;
+	if( Fresh_List_Now == REFRESH_LIST_NOW)
 	{
-		Fresh_Item = (int)wParam;
+		need_refresh_all = true;
 	}
-	else
+
+	if(need_refresh_all == false)
 	{
-		if(m_variable_list.IsDataNewer((char *)&m_Variable_data.at(0),sizeof(Str_variable_point) * BAC_VARIABLE_ITEM_COUNT))
+		if(isFreshOne == REFRESH_ON_ITEM)
 		{
-			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
-			m_variable_list.SetListData((char *)&m_Variable_data.at(0),sizeof(Str_variable_point) * BAC_VARIABLE_ITEM_COUNT);
+			Fresh_Item = (int)wParam;
 		}
 		else
 		{
-			return 0;
+			if(m_variable_list.IsDataNewer((char *)&m_Variable_data.at(0),sizeof(Str_variable_point) * BAC_VARIABLE_ITEM_COUNT))
+			{
+				//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
+				m_variable_list.SetListData((char *)&m_Variable_data.at(0),sizeof(Str_variable_point) * BAC_VARIABLE_ITEM_COUNT);
+			}
+			else
+			{
+				return 0;
+			}
 		}
 	}
+
 
 
 	for (int i=0;i<(int)m_Variable_data.size();i++)
@@ -392,13 +403,7 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 
 	}
 	copy_data_to_ptrpanel(TYPE_VARIABLE);
-	CString g_configfile_path = g_strExePth + g_strStartInterface_config;
-	int savetodb = GetPrivateProfileInt(_T("SaveToDB"), _T("VAR"), 0, g_configfile_path);
-	if (savetodb == 1)
-	{
-		Save_AVData_to_db();
-	}
-	//Save_AVData_to_db();
+
 	return 0;
 }
 LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)

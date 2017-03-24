@@ -662,39 +662,7 @@ float get_curtstat_version()
 }
 
 
-int make_sure_isp_mode(int the_tstat_id)
-{
-    unsigned short isp_unsigned_short[20];
-    int i=Read_Multi(the_tstat_id,isp_unsigned_short,100,20);
-    if(i==-2 || i==-1)
-        return i;//no response
-    if(i<0)
-        return i;//no in isp mode
-    else
-    {
-        for(int j=0; j<20; j++)
-        {
-            if(isp_unsigned_short[j]!=1)
-                return 0;// no in isp mode
-        }
-    }
-    return 1;//in isp mode
-}
 
-bool get_serialnumber(long & serial,int the_id_of_product)
-{
-
-    unsigned short SerialNum[4]= {0};
-    int nRet=0;
-    nRet=Read_Multi(the_id_of_product,&SerialNum[0],0,4);
-    serial=0;
-    if(nRet>0)
-    {
-        serial=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;
-        return TRUE;
-    }
-    return FALSE;
-}
 
 
 UINT get_serialnumber()
@@ -706,100 +674,8 @@ UINT get_serialnumber()
 
 
 
-bool multi_read_tstat(int id)
-{
-
-    bool return_value=true;
-    int i;
-    for(i=0; i<7; i++)
-    {
-        //register_critical_section.Lock();
-        //int nStart = GetTickCount();
-        if(-2==Read_Multi(id,&product_register_value[i*64],i*64,64,1))
-            return_value=false;
-
-        //TRACE(_T("Read_Multi once = %d \n"), GetTickCount()-nStart);
-        Sleep(50);
-        //register_critical_section.Unlock();
-    }
-    return return_value;
-}
 
 
-bool can_be_writed_hex_file(int product_model,int hex_file_product_model)
-{
-    //product model
-    // T3-8IO-------------20
-    // T3-32I-------------22
-    // T3-8i/60-----------23
-    // Flexdriver---------25
-    //Tstat5A-------------2
-    //Tstat5B-------------1
-    //Tstat5B2------------3
-    //Tstat5C-------------4
-    //Tstat5D-------------12
-    //Solar---------------30
-    //hex_file_product_model parameter is the hex_file_register 0x100 (256)
-    //	if (product_model==18||product_model==17)
-    {
-        return true;
-    }
-    if(hex_file_product_model==255)//////////////old version hex file,before 2005.11.15
-        return true;
-    if(product_model<=TSTAT_PRODUCT_MODEL && hex_file_product_model<=TSTAT_PRODUCT_MODEL)
-        return true;
-    if(product_model==LED_PRODUCT_MODEL && hex_file_product_model==LED_PRODUCT_MODEL)
-        return true;
-    if(product_model==PM_NC && hex_file_product_model==PM_NC)
-        return true;
-    if(product_model==PM_T3IOA && hex_file_product_model==PM_T3IOA)
-        return true;
-    if(product_model==PM_T3PT10 && hex_file_product_model==PM_T3PT10)
-        return true;
-    if(product_model==T3_32I_PRODUCT_MODEL && hex_file_product_model==T3_32I_PRODUCT_MODEL)
-        return true;
-    if(product_model==T3_8I_16O_PRODUCT_MODEL && hex_file_product_model==T3_8I_16O_PRODUCT_MODEL)
-        return true;
-    if(product_model==PM_SOLAR && hex_file_product_model==PM_SOLAR)
-        return true;
-    if(product_model==PM_ZIGBEE && hex_file_product_model==PM_ZIGBEE)
-        return true;
-    return false;
-}
-CString get_product_name_by_product_model(int product_model)
-{
-    CString return_str;
-    if(product_model>0 && product_model<=TSTAT_PRODUCT_MODEL)
-        product_model=TSTAT_PRODUCT_MODEL;
-    switch(product_model)
-    {
-    case 19:
-        return_str=_T("Tstat");
-        break;
-    case 20:
-        return_str=_T("T3-8IO");
-        break;
-    case 22:
-        return_str=_T("T3-32I");
-        break;
-    case 23:
-        return_str=_T("T3-8i/60");
-        break;
-    case 25:
-        return_str=_T("Flexdriver");
-        break;
-    case 30:
-        return_str=_T("Solar");
-        break;
-    case PM_ZIGBEE:
-        return_str=_T("ZigBee");
-        break;
-    default:
-        return_str=_T("Unknown");
-        break;
-    }
-    return return_str;
-}
 BOOL IS_Temco_Product(int product_model)
 {
 
@@ -854,6 +730,7 @@ BOOL IS_Temco_Product(int product_model)
 			case   PM_T38AI8AO6DO			   :
 			case   PM_PRESSURE_SENSOR		   :
 			case   PM_T3PT12				   :
+			case   PM_T36CTA                   :
 			case   PM_CM5					   :
 			case   PM_TSTAT6_HUM_Chamber	   :
 			case   PM_BEENY					   :
@@ -1001,69 +878,12 @@ CString GetTempUnit(int nRange, int nPIDNO)
 
         }
     }
+	else if (nRange == 13)
+	{
+		strTemp = L"V";
+	}
 
     return strTemp;
-}
-
-CString get_product_class_name_by_model_ID(int nModelID)
-{
-    CString strClassName;
-    switch(nModelID)
-    {
-    case 2:
-        strClassName=g_strTstat5a;
-        break;
-    case 1:
-        strClassName=g_strTstat5b;
-        break;
-    case 3:
-        strClassName=g_strTstat5b;
-        break;
-    case 4:
-        strClassName=g_strTstat5c;
-        break;
-    case 6:
-        strClassName=g_strTstat6;
-        break;
-    case 7:
-        strClassName=g_strTstat7;
-        break;
-    case 12:
-        strClassName=g_strTstat5d;
-        break;
-    case PM_NC:
-        strClassName=g_strnetWork;
-        break;
-    case NET_WORK_OR485_PRODUCT_MODEL:
-        strClassName=g_strOR485;
-        break;
-    case 17:
-        strClassName=g_strTstat5f;
-        break;
-    case 18:
-        strClassName=g_strTstat5g;
-        break;
-    case 16:
-        strClassName=g_strTstat5e;
-        break;
-    case PM_PM5E:
-        strClassName=_T("PM5E");
-        break;
-    case 19:
-        strClassName=g_strTstat5h;
-        break;
-    case PM_LightingController:
-        strClassName = g_strLightingCtrl;
-
-    case 13:
-    case 14:
-        break;
-    default:
-        strClassName=g_strTstat5a;
-        break;
-    }
-
-    return strClassName;
 }
 
 
@@ -1454,6 +1274,13 @@ int WriteProgramData(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,
 	private_data.serviceParametersLen = private_data_len;
 
     BACNET_ADDRESS dest = { 0 };
+
+	if(offline_mode)
+	{
+		SaveBacnetBinaryFile(offline_prg_path);
+		return 1;
+	}
+
     status = address_get_by_device(deviceid, &max_apdu, &dest);
     if (status)
     {
@@ -1806,7 +1633,11 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
 		}
 		DFTrace(total_char_test);
 	}
-
+	if(offline_mode)
+	{
+		SaveBacnetBinaryFile(offline_prg_path);
+		return 1;
+	}
 
     status =bacapp_parse_application_data(BACNET_APPLICATION_TAG_OCTET_STRING,(char *)&SendBuffer, &data_value);
     //ct_test(pTest, status == true);
@@ -1981,7 +1812,11 @@ int GetPrivateData(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint
     private_data.serviceParametersLen = private_data_len;
 
     BACNET_ADDRESS dest = { 0 };
-
+	if(offline_mode)
+	{
+		LoadBacnetConfigFile(false,offline_prg_path);
+		return 1;
+	}
 
     status = address_get_by_device(deviceid, &max_apdu, &dest);
     if (status)
@@ -2046,6 +1881,11 @@ int GetProgramData(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance
 
     BACNET_ADDRESS dest = { 0 };
 
+	if(offline_mode)
+	{
+		LoadBacnetConfigFile(false,offline_prg_path);
+		return 1;
+	}
 
     status = address_get_by_device(deviceid, &max_apdu, &dest);
     if (status)
@@ -3941,22 +3781,6 @@ int handle_read_pic_data_ex(char *npoint,int nlength)
 	return 0;
 }
 
-void new_temp_analog_data_block(unsigned char nmonitor_count,unsigned int receive_length)
-{
-    int	temp_receive_data_count = receive_length / 4;
-    int	temp_new_each_data_count = temp_receive_data_count / nmonitor_count;	//得到那14个input 平均每组要new多少个;
-    for (int i=0; i<nmonitor_count; i++)		//new 每个的结构;
-    {
-        if(temp_new_each_data_count == 0 )
-            return;
-        temp_analog_data[i] = new Data_Time_Match[temp_new_each_data_count];
-        //memset(temp_analog_data[i],0,temp_new_each_data_count * sizeof(Data_Time_Match));
-    }
-}
-
-
-
-
 
 
 
@@ -4171,179 +3995,89 @@ void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken)
 }
 
 
+void Inial_Product_map()
+{
+	product_map.insert(map<int,CString>::value_type(PM_TSTAT5A,_T("TStat5A")));
+	product_map.insert(map<int,CString>::value_type(PM_TSTAT5B,_T("TStat5B")));
+	product_map.insert(map<int,CString>::value_type(PM_TSTAT5B2,_T("TStat5B2")));
+	product_map.insert(map<int,CString>::value_type(PM_TSTAT5C,_T("TStat5C")));
+	product_map.insert(map<int,CString>::value_type(PM_TSTAT5D,_T("TStat5D")));
+	product_map.insert(map<int,CString>::value_type(PM_TSTAT5E,_T("TStat5E")));
+
+
+	product_map.insert(map<int,CString>::value_type(PM_PM5E,_T("PM5E")));
+	product_map.insert(map<int,CString>::value_type(PM_TSTAT5F,_T("TStat5F")));
+	product_map.insert(map<int,CString>::value_type(PM_TSTAT5G,_T("TStat5G")));
+	product_map.insert(map<int,CString>::value_type(PM_TSTAT5H,_T("TStat5H")));
+	product_map.insert(map<int,CString>::value_type(PM_TSTAT6,_T("TStat6")));
+	product_map.insert(map<int,CString>::value_type(PM_TSTAT5i,_T("TStat5i")));
+
+	product_map.insert(map<int,CString>::value_type(PM_TSTAT8,_T("TStat8")));
+	product_map.insert(map<int,CString>::value_type(PM_HUMTEMPSENSOR,_T("HUM Sensor")));
+	product_map.insert(map<int,CString>::value_type(STM32_HUM_NET,_T("HUM Sensor")));
+	product_map.insert(map<int,CString>::value_type(STM32_HUM_RS485,_T("HUM Sensor")));
+	product_map.insert(map<int,CString>::value_type(PM_AirQuality,_T("Air Quality")));
+	product_map.insert(map<int,CString>::value_type(PM_TSTAT7,_T("TStat7")));
+
+	product_map.insert(map<int,CString>::value_type(PM_NC,_T("NC")));
+	product_map.insert(map<int,CString>::value_type(PM_CM5,_T("CM5")));
+	product_map.insert(map<int,CString>::value_type(PM_TSTATRUNAR,_T("TStatRunar")));
+	product_map.insert(map<int,CString>::value_type(PM_LightingController,_T("LC")));
+	product_map.insert(map<int,CString>::value_type(PM_CO2_NET,_T("CO2 Net")));
+	product_map.insert(map<int,CString>::value_type(PM_CO2_RS485,_T("CO2")));
+
+	product_map.insert(map<int,CString>::value_type(PM_PRESSURE_SENSOR,_T("Pressure")));
+	product_map.insert(map<int,CString>::value_type(PM_CO2_NODE,_T("CO2 Node")));
+	product_map.insert(map<int,CString>::value_type(PM_TSTAT6_HUM_Chamber,_T("HumChamber")));
+	product_map.insert(map<int,CString>::value_type(PM_T3PT10,_T("T3-PT10")));
+	product_map.insert(map<int,CString>::value_type(PM_T3IOA,_T("T3-8O")));
+	product_map.insert(map<int,CString>::value_type(PM_T332AI,_T("T3-32AI")));
+
+	product_map.insert(map<int,CString>::value_type(PM_T38AI16O,_T("T3-8AI160")));
+	product_map.insert(map<int,CString>::value_type(PM_T38I13O,_T("T3-8I13O")));
+	product_map.insert(map<int,CString>::value_type(PM_T3PERFORMANCE,_T("T3-Performance")));
+	product_map.insert(map<int,CString>::value_type(PM_T34AO,_T("T3-4AO")));
+	product_map.insert(map<int,CString>::value_type(PM_T36CT,_T("T3-6CT")));
+	product_map.insert(map<int,CString>::value_type(PM_MINIPANEL,_T("T3-BB/LB/TB")));
+
+	product_map.insert(map<int,CString>::value_type(PM_PRESSURE,_T("Pressure Sensor")));
+	product_map.insert(map<int,CString>::value_type(PM_HUM_R,_T("HUM-R")));
+	product_map.insert(map<int,CString>::value_type(PM_T322AI,_T("T3-22I")));
+	product_map.insert(map<int,CString>::value_type(PWM_TRANSDUCER,_T("PWM_Tranducer")));
+	product_map.insert(map<int,CString>::value_type(PM_BTU_METER,_T("BTU_Meter")));
+	product_map.insert(map<int,CString>::value_type(PM_T3PT12,_T("T3-PT12")));
+	product_map.insert(map<int,CString>::value_type(PM_T36CTA,_T("T3-6CTA")));
+	product_map.insert(map<int,CString>::value_type(PM_T38AI8AO6DO,_T("T3-8AI8AO6DO")));
+	product_map.insert(map<int,CString>::value_type(PM_CS_SM_AC,_T("CS-SM-AC")));
+	product_map.insert(map<int,CString>::value_type(PM_CS_SM_DC,_T("CS-SM-DC")));
+	product_map.insert(map<int,CString>::value_type(PM_CS_RSM_AC,_T("CS-RSM-AC")));
+	product_map.insert(map<int,CString>::value_type(PM_CS_RSM_DC,_T("CS-RSM-DC")));
+
+
+	product_map.insert(map<int,CString>::value_type(PM_TSTAT8_WIFI,_T("TStat8_Wifi")));
+	product_map.insert(map<int,CString>::value_type(PM_TSTAT8_OCC,_T("TStat8_Occ")));
+	product_map.insert(map<int,CString>::value_type(PM_TSTAT7_ARM,_T("TStat7_ARM")));
+	product_map.insert(map<int,CString>::value_type(PM_TSTAT8_220V,_T("TStat8_220V")));
+
+
+}
+
+
 CString GetProductName(int ModelID)
 {
-    CString strProductName;
-    switch(ModelID)
-    {
-    case PM_TSTAT5A:
-        strProductName="TStat5A";
-        break;
-    case PM_TSTAT5B:
-        strProductName="TStat5B";
-        break;
-    case PM_TSTAT5B2:
-        strProductName="TStat5B2";
-        break;
-    case PM_TSTAT5C:
-        strProductName="TStat5C";
-        break;
-    case PM_TSTAT5D:
-        strProductName="TStat5D";
-        break;
-    case PM_TSTAT5E:
-        strProductName="TStat5E";
-        break;
-    case PM_PM5E:
-        strProductName="PM5E";
-        break;
-    case PM_TSTAT5F:
-        strProductName="TStat5F";
-        break;
-    case PM_TSTAT5G:
-        strProductName="TStat5G";
-        break;
-    case PM_TSTAT5H:
-        strProductName="TStat5H";
-        break;
-    case PM_TSTAT6:
-        strProductName="TStat6";
-        break;
-    case PM_TSTAT5i:
-        strProductName="TStat5i";
-        break;
-    case PM_TSTAT8:
-        strProductName="TStat8";
-        break;
-	case PM_TSTAT8_WIFI:
-		strProductName = "TStat8_Wifi";
-		break;
-	case PM_TSTAT8_OCC:
-		strProductName = "TStat8_Occ";
-		break;
-	case PM_TSTAT7_ARM:
-		strProductName = "TStat7_ARM";
-		break;
-	case PM_TSTAT8_220V:
-		strProductName = "TStat8_220V";
-		break;
-    case PM_HUMTEMPSENSOR:
-        strProductName="HUM Sensor";
-        break;
+	map <int,CString>::iterator myiterator;
 
-	 
-	case STM32_HUM_NET:
-		strProductName="HUM Sensor";
-		break;
-	case STM32_HUM_RS485:
-		strProductName="HUM Sensor";
-		break;
+	myiterator =product_map.find(ModelID);
+	if(myiterator != product_map.end())
+	{
+		return myiterator->second;
+	}
+	else
+	{
+		 return _T("");	
+	}
 
-    case PM_AirQuality:
-        strProductName="Air Quality";
-        break;
-    case PM_TSTAT7:
-        strProductName="TStat7";
-        break;
-    case PM_NC:
-        strProductName="NC";
-        break;
-    case PM_CM5:
-        strProductName ="CM5";
-        break;
-    case PM_TSTATRUNAR:
-        strProductName="TStatRunar";
-        break;
-    //20120424
-    case PM_LightingController:
-        strProductName = "LC";
-        break;
-    case  PM_CO2_NET:
-        strProductName = "CO2 Net";
-        break;
-    case  PM_CO2_RS485:
-        strProductName = "CO2";
-        break;
-    case  PM_PRESSURE_SENSOR:
-        strProductName = "Pressure";
-        break;
-
-    case  PM_CO2_NODE:
-        strProductName = "CO2 Node";
-        break;
-
-    case PM_TSTAT6_HUM_Chamber:
-        strProductName =g_strHumChamber;
-        break;
-
-    case PM_T3PT10 :
-        strProductName="T3-PT10";
-        break;
-    case PM_T3IOA :
-        strProductName="T3-8O";
-        break;
-    case PM_T332AI :
-        strProductName="T3-32AI";
-        break;
-    case  PM_T38AI16O :
-        strProductName="T3-8AI160";
-        break;
-    case PM_T38I13O :
-        strProductName="T3-8I13O";
-        break;
-    case PM_T3PERFORMANCE :
-        strProductName="T3-Performance";
-        break;
-    case PM_T34AO :
-        strProductName="T3-4AO";
-        break;
-    case PM_T36CT :
-        strProductName="T3-6CT";
-        break;
-    case PM_MINIPANEL:
-        strProductName="T3-BB/LB/TB";
-        break;
-    case PM_PRESSURE:
-        strProductName="Pressure Sensor";
-        break;
-    case PM_HUM_R:
-        strProductName="HUM-R";
-        break;
-    case PM_T322AI:
-        strProductName="T3-22I";
-        break;
-	case PWM_TRANSDUCER:
-		strProductName = "PWM_Tranducer";
-		break;
-	case PM_BTU_METER:
-		strProductName = "BTU_Meter";
-		break;
-	case PM_T3PT12:
-		strProductName="T3-PT12";
-		break;
-    case PM_T38AI8AO6DO:
-        strProductName="T3-8AI8AO6DO";
-        break;
-
-    case PM_CS_SM_AC:
-        strProductName="CS-SM-AC";
-        break;
-    case PM_CS_SM_DC:
-        strProductName="CS-SM-DC";
-        break;
-    case PM_CS_RSM_AC:
-        strProductName="CS-RSM-AC";
-        break;
-    case PM_CS_RSM_DC:
-        strProductName="CS-RSM-DC";
-        break;
-  
-
-    default:
-        strProductName="";
-        break;
-    }
-    return strProductName;
+	 return _T("");	
 }
 
 
@@ -7122,6 +6856,8 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
 				::PostMessage(m_annual_dlg_hwnd,WM_REFRESH_BAC_ANNUAL_LIST,NULL,NULL);
 			else if(Controller_Window->IsWindowVisible())
 				::PostMessage(m_controller_dlg_hwnd,WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
+			else if(Screen_Window->IsWindowVisible())
+				::PostMessage(m_screen_dlg_hwnd, WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
 			else if(Monitor_Window->IsWindowVisible())
 			{
 				::PostMessage(m_monitor_dlg_hwnd, WM_REFRESH_BAC_MONITOR_LIST,NULL,NULL);
@@ -7425,7 +7161,7 @@ int LoadBacnetConfigFile_Cache(LPCTSTR tem_read_path)
             temp_point = temp_point + ANNUAL_CODE_SIZE;
         }
 
-        //memcpy(&Device_Basic_Setting,temp_point,sizeof(Str_Setting_Info));
+        memcpy(&Device_Basic_Setting,temp_point,sizeof(Str_Setting_Info));
         temp_point = temp_point + sizeof(Str_Setting_Info);
 
         for (int i=0; i<BAC_GRPHIC_LABEL_COUNT; i++)
@@ -9381,17 +9117,12 @@ void LoadTstat_InputData()
 
         //Range
         m_crange=0;
-
+		strTemp = L"0";
         nValue=product_register_value[MODBUS_ANALOG1_RANGE+i-1];	//189
         nValue &= 0x7F;//去掉最高位
-        if(nValue>=0&&nValue<13)
-        {
-            strTemp=analog_range_TSTAT6[nValue];
-        }
-		else
-		{
-			strTemp = L"0";
-		}
+        
+        strTemp=analog_range_TSTAT6[nValue];
+        
         m_crange=nValue;
 
         m_tstat_input_data.at(i-1).Range.StrValue=strTemp;
@@ -11666,40 +11397,10 @@ BOOL BinFileValidation(const CString& strFileName)
 extern char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network,unsigned char & sub_panel, byte panel , int *netpresent);
 
 
-int decode_label(LPCTSTR label ,UCHAR &n_point_type,UCHAR &n_main_panel , UCHAR &n_sub_panel,UCHAR &m_point_number)
-{
-	if((wcslen(label) == 0) || ((wcslen(label) > 16)))
-	{
-		return -1;
-	}
-	char temp_point[255];
-	memset(temp_point,0,255);
-	WideCharToMultiByte( CP_ACP, 0, label, -1, temp_point, 255, NULL, NULL );
-
-	int temp_number=-1;
-	byte temp_value_type = -1;
-	byte temp_point_type=-1;
-	int temp_panel = -1;
-	int temp_net = -1;
-	int k=0;
-	unsigned char sub_panel = -1;
-	char * tempcs=NULL;
-	tempcs = ispoint_ex(temp_point,&temp_number,&temp_value_type,&temp_point_type,&temp_panel,&temp_net,0,sub_panel,Station_NUM,&k);
-	if(tempcs == NULL)
-	{
-		return -2;
-	}
-	n_point_type = temp_point_type;
-	n_main_panel = temp_panel;
-	n_sub_panel = sub_panel;
-	m_point_number = temp_number;
-	return 1;
-
-}
 
 /*
 步骤 先读  若返回值> 0 就转换对应的数据;
-int decode_label(LPCTSTR label );
+
 int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize);
 bool Input_data_to_string(unsigned char  temp_input_index ,CString &temp_main_panel,CString &temp_in_des,
 							CString &temp_in_auto_manual,CString &temp_in_value,CString &temp_in_units,

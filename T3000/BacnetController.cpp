@@ -105,7 +105,7 @@ BOOL BacnetController::OnInitDialog()
 	PostMessage(WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
 	SetTimer(1,CONTROLLOR_REFRESH_TIME,NULL);
 	// TODO:  Add extra initialization here
-
+	ShowWindow(FALSE);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }

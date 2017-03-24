@@ -42,6 +42,8 @@ public:
 	unsigned char m_download_product_type;
 	afx_msg void OnBnClickedButtonUpdateT3000();
 	void AutoFlashFirmware();
+	void CreateProductFolderMap();
+	CString GetProdcutFtpPath(int nproductid);
 };
 
 

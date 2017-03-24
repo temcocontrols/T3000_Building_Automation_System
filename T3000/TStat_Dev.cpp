@@ -253,6 +253,9 @@ CString CTStat_Dev::GetProductName()
 	case PM_T3PT12:
 		strProductName="T3-PT12";
 		break;
+	case PM_T36CTA:
+		strProductName="T3-6CTA";
+		break;
     case PM_T38AI8AO6DO:
         strProductName="T3-8AI8AO6DO";
         break;

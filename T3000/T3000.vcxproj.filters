@@ -708,6 +708,9 @@
     <ClCompile Include="WifiConfigDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BacnetAddVirtualDevice.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -985,16 +988,10 @@
     <None Include="res\Schedual_Icon_Default2.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\default_icon\outputs.ico">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="res\default_icon\Variables.ico">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\default_icon\Programs.ico">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="res\default_icon\Graphics.ico">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\default_icon\Holidays.ico">
@@ -1042,6 +1039,18 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\default_icon\Configuration.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\default_icon\Graphics2.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\default_icon\outputs2.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\default_icon\inputs.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\toolbar_disable.bmp">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
@@ -1782,6 +1791,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WifiConfigDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetAddVirtualDevice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

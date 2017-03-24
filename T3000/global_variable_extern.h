@@ -5,6 +5,7 @@
 #include "gloab_define.h"
 #include "Global_Struct.h"
 #include "ProductModel.h"
+#include <map>
 #define MY_MBPOLL_REG_DIALOG_MSG (WM_USER + 557)
 #define MY_MBPOLL_WRITE_REG_MSG (WM_USER + 558)
 
@@ -27,7 +28,7 @@ extern int g_language;
 extern const bool WRITE_SUCCESS;
 extern const bool WRITE_FAIL ;
 extern	   bool g_HumChamberThread;
-extern bool g_register_occuppied ; //Add by Alex
+
 extern			  BOOL g_bChamber;
 extern bool list_mouse_click;
 extern CString CurrentT3000Version;
@@ -47,13 +48,13 @@ extern unsigned short reg_tststold[1024];
 extern char charr[600][2][600];
 extern unsigned short newtstat6[1024];
 
-extern int parameterSet;
+
 extern BOOL Flexflash;
 extern BOOL FlexSP;
 extern int FlexSPN;
 extern int  MDAY,MNIGHT;
-extern int tstat6flex[12];
-extern int m_slidertsta6[12];
+
+
 extern int nCom;
 extern	CString program_path;
 extern	int g_tstat_id;
@@ -70,7 +71,7 @@ extern  CString g_achive_folder_temp_db;
 extern  CString g_achive_device_name_path;
 extern  CString g_strImgeFolder;
 extern  CString g_strBuildingFolder;
-extern  CString g_strOrigDatabaseFilePath;
+
 extern  CString g_achive_monitor_datatbase_path ;
 
 extern BOOL g_mstp_flag;
@@ -109,7 +110,7 @@ extern CString showing_text;
 
 extern  CCriticalSection  critical_section;
 extern  CCriticalSection  register_critical_section;
-extern CEvent g_eventPauseMultiRead;
+
 
 
 extern BOOL g_buser_log_in;
@@ -1092,11 +1093,8 @@ extern int Monitor_Input__Data[14][1000];
 extern unsigned char weeklt_time_schedule[BAC_SCHEDULE_COUNT][WEEKLY_SCHEDULE_SIZE + 1];
 extern unsigned char program_code[BAC_PROGRAM_ITEM_COUNT][2000];//暂定2000;
 extern int program_code_length[BAC_PROGRAM_ITEM_COUNT];
-extern int Max_Scale_value;
-extern int Min_Scale_value;
-extern int MAX_SCALE_5;
-extern int MIN_SCALE_5;
-extern int Total_SCALE;
+
+
 extern CString bac_cs_mac;
 extern CString bac_cs_device_id;
 //extern CString bac_cs_vendor_id;
@@ -1159,7 +1157,7 @@ extern vector <Tstat_Input_Struct> m_tstat_input_data;
 
 extern vector <Tstat_Output_Struct> m_tstat_output_data;
 extern CString analog_range[11];
-extern CString analog_range_TSTAT6[13];
+extern CString analog_range_TSTAT6[14];
 extern CString INPUT_FUNS[8];
 extern CString Interlock[6];
 extern CString ONTPUT_FUNS[];
@@ -1283,3 +1281,6 @@ extern CString grapgic_view_name[3];
 extern bool graphic_view_visible[14];
 extern CString bacnet_message_input_title;
 extern CString bacnet_message_return_string;  //得到的输入字符串
+extern pidname_map product_map;
+extern bool offline_mode ; //全局离线模式判断;
+extern CString offline_prg_path;   //离线模式得prg 保存路径;

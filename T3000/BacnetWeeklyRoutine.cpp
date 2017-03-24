@@ -157,6 +157,7 @@ BOOL BacnetWeeklyRoutine::OnInitDialog()
 	Initial_List();
 	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_SCHEDUAL);
 	SetIcon(m_hIcon,TRUE);
+	ShowWindow(FALSE);
 	PostMessage(WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control

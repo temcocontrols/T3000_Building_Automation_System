@@ -21,11 +21,7 @@
 //#define FOR_DATABASE_CONNECT					_T("Driver={Microsoft Access Driver (*.mdb, *.accdb)};Dbq=")
 CBADO::CBADO(void)
 {
-	//g_strDatabasefilepath = _T("");
-	//g_strOrigDatabaseFilePath=_T("");
-	//g_strDatabasefilepath=_T("");
-	//g_strExePth=_T("");
-	//g_strImgeFolder=_T("");
+
 	m_dbfilepath=_T("");
 	m_dbImgeFolder=L"";
 }

@@ -49,6 +49,8 @@ public:
 	afx_msg void OnCbnKillfocusBraudratecombo();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnBnClickedButtonWifiConfig();
+	CEdit m_Edit_AESPassword;
+	afx_msg void OnBnClickedCheckPassword();
 };
 
 

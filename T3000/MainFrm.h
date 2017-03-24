@@ -280,7 +280,7 @@ protected:
 	afx_msg LRESULT OnToolbarCreateNew(WPARAM wp, LPARAM lp);
 	afx_msg void OnApplicationLook(UINT id);
 	afx_msg void OnUpdateApplicationLook(CCmdUI* pCmdUI);
-	//afx_msg LRESULT OnToolbarReset(WPARAM,LPARAM);
+	 
 	afx_msg void OnUpdateCheckBuildingBar(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateCheckIOPane(CCmdUI* pCmdUI);
 	afx_msg void OnScanDevice();
@@ -294,7 +294,7 @@ protected:
 	afx_msg LRESULT  AllWriteMessageCallBack(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT Refresh_RX_TX_Count(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT Retry_Connect_Message(WPARAM wParam, LPARAM lParam);
-	//afx_msg LRESULT Show_Panel(WPARAM wParam, LPARAM lParam);
+	 
 	afx_msg LRESULT Delete_Write_New_Dlg(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT  ReadConfigFromDeviceMessageCallBack(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
@@ -554,4 +554,10 @@ public:
 		afx_msg void OnToolsOption();
 		afx_msg void OnSize(UINT nType, int cx, int cy);
 		void HideBacnetWindow();
+
+		void CreateOfflinePrgFile();
+		afx_msg void OnModeOnlinemode();
+		afx_msg void OnModeOfflinemode();
+		afx_msg void OnUpdateModeOnlinemode(CCmdUI *pCmdUI);
+		afx_msg void OnUpdateModeOfflinemode(CCmdUI *pCmdUI);
 };

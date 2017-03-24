@@ -155,7 +155,6 @@
 #define IDD_DIALOG_BACNET_INPUT         452
 #define IDD_DIALOG11                    453
 #define IDD_DISPLAY_CONFIG              453
-#define IDI_ICON_INPUT                  454
 #define IDD_T38AI8AO                    454
 #define IDD_T38AI16O                    455
 #define IDD_T38I13O                     456
@@ -262,11 +261,8 @@
 #define IDB_BITMAP_ALARM_RED            608
 #define IDR_MENU_PROGRAMEDIT_RIGHT_CLICK 609
 #define IDB_BITMAP9                     610
-#define IDI_ICON_INPUT_DEFAULT          620
-#define IDI_ICON_DEFAULT_OUTPUT         624
 #define IDI_ICON_DEFAULT_VARIABLE       625
 #define IDI_ICON_DEFAULT_PROGRAM        626
-#define IDI_ICON_DEFAULT_GRAPHIC        628
 #define IDI_ICON_DEFAULT_HOLIDAY        629
 #define IDI_ICON_DEFAULT_SCHEDUAL       630
 #define IDI_ICON_DEFAULT_TRENDLOG       631
@@ -296,6 +292,11 @@
 #define IDD_DIALOG_BACNET_CUSTOMER_VARIABLE_RANGE 668
 #define IDD_DIALOG_BACNET_EXT_IO_CONFIG 669
 #define IDD_DIALOG_WIFI_CONFIG          671
+#define IDI_ICON_DEFAULT_GRAPHIC        671
+#define IDI_ICON_DEFAULT_OUTPUT         672
+#define IDI_ICON_INPUT_DEFAULT          673
+#define IDB_BITMAP_TOOLBAR_DISABLE      674
+#define IDD_DIALOG_BACNET_ADD_VIRTUAL_DEVICE 675
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -360,6 +361,7 @@
 #define IDC_DTS3                        1031
 #define IDC_EDIT_AQ                     1031
 #define IDC_EDIT_ZIP                    1031
+#define IDC_EDIT_VIRTUAL_FLOOR          1031
 #define IDC_PARAMETERBTN                1032
 #define IDC_EDIT45                      1032
 #define IDC_DTS4                        1032
@@ -367,6 +369,7 @@
 #define IDC_CO21                        1032
 #define IDC_TEST_TEMP2                  1032
 #define IDC_EDIT_LAT                    1032
+#define IDC_EDIT_VIRTUAL_ROOM           1032
 #define IDC_LEDTABLEBTN                 1033
 #define IDC_EDIT46                      1033
 #define IDC_DTS5                        1033
@@ -2179,9 +2182,21 @@
 #define IDC_BUTTON_EXT_CANCLE           2295
 #define IDC_BUTTON_EXT_CANCEL           2295
 #define IDC_CUSTOM1                     2296
+#define IDC_COMBO_VIRTUAL_PID_NAME      2296
 #define IDC_BUTTON_WIFI_CONFIG          2297
+#define IDC_EDIT_VIRTUAL_PID            2297
 #define IDC_EDIT_MAC_ADDRESS            2298
+#define IDC_EDIT_VIRTUAL_SERIAL_NUMBER  2298
 #define IDC_COMBO_NETWORK_TYPE          2299
+#define IDC_EDIT_VIRTUAL_MODBUS_ID      2299
+#define IDC_EDIT_VIRTUAL_MAIN_BUILDING  2300
+#define IDC_EDIT_VIRTUAL_SUB_BUILDING   2301
+#define IDC_EDIT_VIRTUAL_LABEL_NAME     2302
+#define IDC_BUTTON_VIRTUAL_OK           2303
+#define IDC_BUTTON_VIRTUAL_CANCEL       2304
+#define IDC_STATIC_AEC_ENCRYPT          2305
+#define IDC_EDIT_AES_ENCRYPT            2306
+#define IDC_CHECK_PASSWORD              2307
 #define IDC_BUTTON_MODEL11              3000
 #define IDC_BUTTON_MODEL1               3000
 #define IDC_BUTTON_MODEL12              3001
@@ -2196,6 +2211,11 @@
 #define IDC_EDIT_BACNET_MESSAGE_INPUT   3830
 #define IDC_HELP_HELP1                  3831
 #define IDC_CHECK_SETTING_ZONE_DAYLIGHT_TIME 3832
+#define IDC_SLIDERCONTROL1              3833
+#define IDC_SLIDERCONTROL2              3834
+#define IDC_SLIDERCONTROL3              3835
+
+
 #define IDC_EDIT_TIMEOUT_3              5715
 #define IDC_BUTTON_SYNC_TIME            5716
 #define IDC_STATIC_BAC_SETTING_SD_CARD  5817
@@ -2624,6 +2644,10 @@
 #define ID_TOOLS_OPTION                 34056
 #define ID_PROPERTIES_GOTODEFINITION    34057
 #define ID_TOOLS_LOADSDCARDFILE         34058
+#define ID_FILE_MODE                    34059
+#define ID_MODE_ONLINEMODE              34060
+#define ID_MODE_OFFLIN                  34061
+#define ID_MODE_OFFLINEMODE             34062
 #define ID_HELP_USING_UPDATE            34904
 #define ID_DATABASE_BACNETTOOL          34905
 #define IDD_DIALOG_BACNET_PROGRAM       34906
@@ -2697,9 +2721,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        674
-#define _APS_NEXT_COMMAND_VALUE         34059
-#define _APS_NEXT_CONTROL_VALUE         2300
+#define _APS_NEXT_RESOURCE_VALUE        676
+#define _APS_NEXT_COMMAND_VALUE         34063
+#define _APS_NEXT_CONTROL_VALUE         2308
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

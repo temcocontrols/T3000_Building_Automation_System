@@ -22,8 +22,7 @@
 #include "TStatScheduleDlg.h"
 #include "TstatZigbeeLogic.h"
 
-#include "../FlexSlideBar/FlexSlideWnd.h"
-#include "../FlexSlideBar/FSBContainer.h"
+ 
 #include "DisplayConfig.h"
 #include "DisplayLEDLCDConfig.h"
 #include "HtmlHelp.h"
@@ -31,7 +30,7 @@
 #include "DisplayConfig.h"
 #include "LedsDialog.h"
  #include "../SQLiteDriver/CppSQLite3.h"
-#include "MainFrm.h"
+
 
 #ifdef _DEBUG
     #define new DEBUG_NEW
@@ -78,11 +77,11 @@ BEGIN_MESSAGE_MAP(CT3000View, CFormView)
     ON_MESSAGE(WM_FRESHVIEW, OnFreshView)
     ON_BN_CLICKED(IDC_BTN_SYNCTIME, &CT3000View::OnBnClickedBtnSynctime)
     ON_BN_CLICKED(IDC_BUTTON_SCHEDULE, &CT3000View::OnBnClickedButtonSchedule)
-    ON_MESSAGE(WM_USER_CALLBACK, OnFlexSlideCallBack)
+
     ON_BN_CLICKED(IDC_UNOCCUPIED_MARK, &CT3000View::OnBnClickedUnoccupiedMark)
 
 
-    ON_EN_KILLFOCUS(IDC_EDIT_CUR_SP, &CT3000View::OnEnKillfocusEditCurSp)
+    
 
 
     ON_CBN_SELCHANGE(IDC_STATICUNINT, &CT3000View::OnCbnSelchangeStaticunint)
@@ -227,10 +226,7 @@ CT3000View::CT3000View()
     m_pSetPtDayDlg=NULL;
     m_pSetPtOffceDlg=NULL;
     pMainUIBackFreshThread=NULL;
-    m_pDaySingleSP = NULL;
-    m_pDayTwoSP= NULL;
-    m_pNightSingleSP = NULL;
-    m_pNightTwoSP= NULL;
+   
     m_pFreshBackground=NULL;
     m_rcTabCtrl.CopyRect(CRect(620,500,850,800));//runningtime
     m_bSliderSetPosWarning = TRUE; // permit warning
@@ -247,33 +243,10 @@ CT3000View::CT3000View()
 
 CT3000View::~CT3000View()
 {
-    if (m_pNightSingleSP)
-    {
-        delete m_pNightSingleSP;
-        m_pNightSingleSP = NULL;
-    }
+     
 
-    if (m_pNightTwoSP)
-    {
-        delete m_pNightTwoSP;
-        m_pNightTwoSP = NULL;
-    }
-
-    if (m_pDaySingleSP)
-    {
-        delete m_pDaySingleSP;
-        m_pDaySingleSP = NULL;
-    }
-
-    if (m_pDayTwoSP)
-    {
-        delete m_pDayTwoSP;
-        m_pDayTwoSP = NULL;
-    }
-
-
-
-
+	m_daySlider.Dispose();
+	m_nightSlider.Dispose();
 }
 
 void CT3000View::DoDataExchange(CDataExchange* pDX)
@@ -307,10 +280,7 @@ void CT3000View::DoDataExchange(CDataExchange* pDX)
     // 	DDX_Control(pDX, IDC_NIGHT_SLIDER, m_nightSlider);
     // 	DDX_Control(pDX, IDC_NIGHTHEAT_SLIDER, m_nightHeatSlider);
 
-    DDX_Control(pDX, IDC_TEMPINFO_EDIT, m_TempInfoEdit);
-    DDX_Control(pDX, IDC_DAY_EDIT, m_dayInfoEdit);
-    DDX_Control(pDX, IDC_NIGHT_EDIT, m_nightInfoEdit);
-    DDX_Control(pDX, IDC_NIGHTHEAT_EDIT, m_nightHeatInfoEdit);
+   
     DDX_Control(pDX, IDC_OUTPUT_MSFLEXGRID, m_Output_Grid);
     DDX_Control(pDX, IDC_INPUT_MSFLEXGRID, m_Input_Grid);
     DDX_Control(pDX, IDC_INPUTNAMEEDIT, m_inNameEdt);
@@ -321,23 +291,23 @@ void CT3000View::DoDataExchange(CDataExchange* pDX)
 
 
 
-    DDX_Control(pDX, IDC_EDIT_DAYCOOL, m_DayCoolEdit);
-    DDX_Control(pDX, IDC_EDIT_DAYHEAT, m_DayHeatEdit);
-    DDX_Control(pDX, IDC_STATIC_DAYCOOL, m_DayCoolStatic);
-    DDX_Control(pDX, IDC_STATIC_DATSP, m_DaySPStatic);
-    DDX_Control(pDX, IDC_STATIC_DAYHEAT, m_DayHeatStatic);
+ 
+ 
 
-    DDX_Control(pDX, IDC_SLIDER_DAY, m_singlesliderday);
+ 
 
     DDX_Control(pDX, IDC_STATICUNINT, m_gUnit);
 
 
-    DDX_Control(pDX, IDC_EDIT_CUR_SP, m_nightpotEdit);
+ 
 
 
 
 
   /*  DDX_Control(pDX, IDC_STATIC_ISP, m_isp);*/
+
+	DDX_Control(pDX, IDC_SLIDERCONTROL1, m_daySlider);
+	DDX_Control(pDX, IDC_SLIDERCONTROL2, m_nightSlider);
 }
 
 BOOL CT3000View::PreCreateWindow(CREATESTRUCT& cs)
@@ -351,13 +321,15 @@ void CT3000View::OnInitialUpdate()
 {
     CFormView::OnInitialUpdate();
 
+	m_daySlider.UpdateWindow();
+	m_nightSlider.UpdateWindow();
+
     m_gUnit.AddString(_T(" C"));
     m_gUnit.AddString(_T(" F"));
 
 
 
-    //GetDlgItem(IDC_EDIT_CUR_SP)->EnableWindow(FALSE);
-    //GetDlgItem(IDC_DAY_EDIT)->EnableWindow(FALSE);
+ 
 
     m_inNameEdt.ShowWindow(SW_HIDE);
     m_outNameEdt.ShowWindow(SW_HIDE);
@@ -398,268 +370,54 @@ void CT3000View::OnInitialUpdate()
     lightsensor.Format(_T("%d LUX"),product_register_value[MODBUS_VALUE_SENSOR]);
     GetDlgItem(IDC_LIGHTING_SENSOR)->SetWindowText(lightsensor);
 
-    m_DayCoolEdit.SetReadOnly(TRUE);
-    COLORREF cf=RGB(0,255,255);
-    m_DayCoolEdit.SetBackgroundColor(FALSE,cf);
+    
 
-    m_nightInfoEdit.SetReadOnly(TRUE);
-    cf=RGB(0,255,255);
-    m_nightInfoEdit.SetBackgroundColor(FALSE,cf);
-    //---------------------------------------------
-    m_DayHeatEdit.SetReadOnly(TRUE);
-    cf=RGB(255,0,0);
-    m_DayHeatEdit.SetBackgroundColor(FALSE,cf);
+   
+     
 
-    m_nightHeatInfoEdit.SetReadOnly(TRUE);
-    cf=RGB(255,0,0);
-    m_nightHeatInfoEdit.SetBackgroundColor(FALSE,cf);
-    //---------------------------------------------
-    //m_dayInfoEdit.SetReadOnly(TRUE);
-    cf=RGB(255,255,255);
-    m_dayInfoEdit.SetBackgroundColor(FALSE,cf);
+    
+    
 
-    //m_nightpotEdit.SetReadOnly(TRUE);
-    cf=RGB(255,255,255);
-    m_nightpotEdit.SetBackgroundColor(FALSE,cf);
-    //---------------------------------------------
-    m_TempInfoEdit.SetReadOnly(TRUE);
-    cf=RGB(96,192,0);
-    m_TempInfoEdit.SetBackgroundColor(FALSE,cf);
+}
 
+//Sets day control values from the dayControl
+void CT3000View::UpdateDayControls()
+{
+	 
+	GetDlgItem(IDC_STATIC_MAX_DAY)->SetWindowText(m_daySlider.get_TopValueText());
+	GetDlgItem(IDC_STATIC_MIN_DAY)->SetWindowText(m_daySlider.get_BottomValueText());
+}
+
+//Sets night control values from the nightControl
+void CT3000View::UpdateNightControls()
+{
+	 
+	GetDlgItem(IDC_STATIC_MAX_NIGHT)->SetWindowText(m_nightSlider.get_TopValueText());
+	GetDlgItem(IDC_STATIC_MIN_NIGHT)->SetWindowText(m_nightSlider.get_BottomValueText());
+ 
 }
 
 void CT3000View::CreateFlexSilde()
 {
+	m_nightSlider.SetRange(50, -50);
+	m_nightSlider.SetZoneValues(40, 15);
+	m_nightSlider.put_CurrentValue(0);
+//	m_nightSlider.put_Left(m_daySlider.get_Left() + m_daySlider.get_Width() + 20);
+	m_nightSlider.put_BackgroundWidth(30);
 
+	m_daySlider.SetRange(50, -50);
+	m_daySlider.SetZoneValues(10, -10);
 
+	m_daySlider.put_CurrentValue(0);
+	m_daySlider.put_IsSimpleIndicator(FALSE);
+	m_daySlider.put_BackgroundWidth(30);
+	m_daySlider.put_IndicatorWidth(80);
+	m_daySlider.put_Width(80 + 30 + 50);
+	m_daySlider.put_LinesColor(RGB(192, 192, 192));
+	m_daySlider.put_Visible(TRUE);
+	UpdateDayControls();
 
-    if(m_pNightTwoSP == NULL)
-    {
-        CStatic *s = (CStatic*)GetDlgItem(IDC_FSB_OFFICE);
-        CRect rc;
-        s->GetWindowRect(&rc);
-        ScreenToClient(&rc);
-#if 1
-        m_pNightTwoSP=new CFSBContainer;
-        m_pNightTwoSP->SetParentWnd(this);
-
-
-
-        //int nRet = m_pNightTwoSP->SubclassWindow(s->GetSafeHwnd());
-        //int nRet = m_pNightTwoSP->SubclassDlgItem(IDC_FSB_OFFICE, this);
-        //////////////////////////////////////////////////////////////////////////
-        m_pNightTwoSP->CreateInstance(s, s->GetStyle()|s->GetExStyle(), rc);
-//m_pNightTwoSP->Create( NULL, s->GetStyle()|s->GetExStyle()|SS_SUNKEN, rc, this);
-//		m_pNightTwoSP.Create(_T("CFlexSlideWnd"), SS_SUNKEN, rc, this ,10001);
-//		m_pNightTwoSP.ShowWindow(SW_SHOW);
-//*
-
-        m_pNightTwoSP->CreateFlexSlideBar(FALSE, FSB_STYLE_DOUBLETHUMB);
-        m_pNightTwoSP->SetFlexSlideBarRect(rc);
-        m_pNightTwoSP->SetHorizontal(FALSE);
-        m_pNightTwoSP->SetFSBThumbShape( FSB_THUMBSHAPE_RECT);
-// 		m_pNightTwoSP->SetChannelColor(RGB(192,192,192));
-// 		m_pNightTwoSP->SetThumbColor(RGB(255,128,128));
-
-        m_pNightTwoSP->SetChannelColor(RGB(192,192,192));
-        m_pNightTwoSP->SetThumbColor(RGB(0,255,255)); //改变上面滑块的颜色
-        m_pNightTwoSP->SetPageLength(5);
-        m_pNightTwoSP->SetChannelWidth(20);//中间的坚状条大小
-        m_pNightTwoSP->SetThumbWidth(34);//滑块的大小
-
-        m_pNightTwoSP->SetRange(10, 0);
-        m_pNightTwoSP->SetPos(0, 1, 2);
-        m_pNightTwoSP->Setflag(1);
-        // init two thumb slider
-
-#endif
-//       CStatic *s0 = (CStatic*)GetDlgItem(IDC_SLIDER_TEST);
-//
-//		s->GetWindowRect(&rc);
-//		ScreenToClient(&rc);
-//#if 1
-//		m_pSlider_Test_TwoSP=new CFSBContainer;
-//		m_pSlider_Test_TwoSP->SetParentWnd(this);
-//
-//
-//
-//		//int nRet = m_pNightTwoSP->SubclassWindow(s->GetSafeHwnd());
-//		//int nRet = m_pNightTwoSP->SubclassDlgItem(IDC_FSB_OFFICE, this);
-//		//////////////////////////////////////////////////////////////////////////
-//		m_pSlider_Test_TwoSP->CreateInstance(s, s->GetStyle()|s->GetExStyle(), rc);
-////m_pNightTwoSP->Create( NULL, s->GetStyle()|s->GetExStyle()|SS_SUNKEN, rc, this);
-////		m_pNightTwoSP.Create(_T("CFlexSlideWnd"), SS_SUNKEN, rc, this ,10001);
-////		m_pNightTwoSP.ShowWindow(SW_SHOW);
-////*
-//
-//		m_pSlider_Test_TwoSP->CreateFlexSlideBar(FALSE, FSB_STYLE_DOUBLETHUMB);
-//		m_pSlider_Test_TwoSP->SetFlexSlideBarRect(rc);
-//		m_pSlider_Test_TwoSP->SetHorizontal(FALSE);
-//		m_pSlider_Test_TwoSP->SetFSBThumbShape( FSB_THUMBSHAPE_RECT);
-//// 		m_pNightTwoSP->SetChannelColor(RGB(192,192,192));
-//// 		m_pNightTwoSP->SetThumbColor(RGB(255,128,128));
-//
-//		m_pSlider_Test_TwoSP->SetChannelColor(RGB(192,192,192));
-//		m_pSlider_Test_TwoSP->SetThumbColor(RGB(0,0,255)); //改变上面滑块的颜色
-//		m_pSlider_Test_TwoSP->SetPageLength(5);
-//		m_pSlider_Test_TwoSP->SetChannelWidth(20);//中间的坚状条大小
-//		m_pSlider_Test_TwoSP->SetThumbWidth(34);//滑块的大小
-//
-//		m_pSlider_Test_TwoSP->SetRange(30, 0);
-//		m_pSlider_Test_TwoSP->SetPos(0, 10, 20);
-//		m_pSlider_Test_TwoSP->Setflag(1);
-//		// init two thumb slider
-//
-//#endif
-
-
-
-
-
-//*
-        CStatic *s1 = (CStatic*)GetDlgItem(IDC_FSB_HOTEL);
-        m_pNightSingleSP= new CFSBContainer;
-        //m_pFswHotel->SetParentWnd(this);
-        //nRet = m_pNightSingleSP->SubclassWindow(s1->GetSafeHwnd());
-        //nRet = m_pNightSingleSP->SubclassDlgItem(IDC_FSB_HOTEL, this);
-
-        s1->GetWindowRect(&rc);
-        ScreenToClient(&rc);
-
-        //m_pFswHotel->Create( NULL, s1->GetStyle()|s1->GetExStyle()|SS_SUNKEN, rc, this, 10001);
-        m_pNightSingleSP->CreateInstance(s1, s1->GetStyle()|s1->GetExStyle()|SS_SUNKEN, rc);
-        m_pNightSingleSP->SetParentWnd(this);
-
-        m_pNightSingleSP->CreateFlexSlideBar(FALSE, FSB_STYLE_TRIPLELINKAGE );
-        m_pNightSingleSP->SetFlexSlideBarRect(rc);
-        m_pNightSingleSP->SetHorizontal(FALSE);
-        m_pNightSingleSP->SetFSBThumbShape( FSB_THUMBSHAPE_RECT);
-        m_pNightSingleSP->SetChannelColor(RGB(192,192,192));
-        //m_pNightSingleSP->SetThumbColor(RGB(255,128,128));
-
-        m_pNightSingleSP->SetThumbColor(RGB(0,0,255));
-        m_pNightSingleSP->SetPageLength(5);
-        m_pNightSingleSP->SetChannelWidth(20);
-        m_pNightSingleSP->SetThumbWidth(34);
-
-        m_pNightSingleSP->SetRange(10, 0);
-        m_pNightSingleSP->SetPos(0, 1, 2);
-        m_pNightSingleSP->Setflag(2);
-
-
-        //////////////////////////////////////////////////////////////////////////
-        // Day
-
-        s = (CStatic*)GetDlgItem(IDC_FSB_DAYOFFICE);
-        rc;
-        s->GetWindowRect(&rc);
-        ScreenToClient(&rc);
-        m_pDayTwoSP=new CFSBContainer;
-        m_pDayTwoSP->SetParentWnd(this);
-
-        m_pDayTwoSP->CreateInstance(s, s->GetStyle()|s->GetExStyle(), rc);
-
-        m_pDayTwoSP->CreateFlexSlideBar(FALSE, FSB_STYLE_DOUBLETHUMB);//10,12,FSB_THUMBSHAPE_TRI
-        //	m_pDayTwoSP->CreateFlexSlideBar(FALSE, FSB_STYLE_DOUBLETHUMB,10,12,FSB_THUMBSHAPE_TRI);
-        m_pDayTwoSP->SetFlexSlideBarRect(rc);
-        m_pDayTwoSP->SetHorizontal(FALSE);
-        m_pDayTwoSP->SetFSBThumbShape( FSB_THUMBSHAPE_RECT);
-// 		m_pDayTwoSP->SetChannelColor(RGB(192,192,192));
-// 		m_pDayTwoSP->SetThumbColor(RGB(255,128,128));
-
-        m_pDayTwoSP->SetChannelColor(RGB(192,192,192));
-        m_pDayTwoSP->SetThumbColor(RGB(0,255,255));
-        m_pDayTwoSP->SetPageLength(5);
-        m_pDayTwoSP->SetChannelWidth(20);
-        m_pDayTwoSP->SetThumbWidth(34);
-
-        m_pDayTwoSP->SetRange(10, 0);
-        m_pDayTwoSP->SetPos(0, 1, 2);
-        m_pDayTwoSP->Setflag(3);
-
-        //--------------------------------Test Slider------------------------------------
-
-        //s = (CStatic*)GetDlgItem(IDC_SLIDER_TEST);
-        //rc;
-        //s->GetWindowRect(&rc);
-        //ScreenToClient(&rc);
-        //m_pSlider_Test_TwoSP=new CFSBContainer;
-        //m_pSlider_Test_TwoSP->SetParentWnd(this);
-
-        //m_pSlider_Test_TwoSP->CreateInstance(s, s->GetStyle()|s->GetExStyle(), rc);
-
-        //m_pSlider_Test_TwoSP->CreateFlexSlideBar(FALSE, FSB_STYLE_DOUBLETHUMB);//10,12,FSB_THUMBSHAPE_TRI
-        ////	m_pDayTwoSP->CreateFlexSlideBar(FALSE, FSB_STYLE_DOUBLETHUMB,10,12,FSB_THUMBSHAPE_TRI);
-        //m_pSlider_Test_TwoSP->SetFlexSlideBarRect(rc);
-        //m_pSlider_Test_TwoSP->SetHorizontal(FALSE);
-        //m_pSlider_Test_TwoSP->SetFSBThumbShape( FSB_THUMBSHAPE_RECT);
-        //// 		m_pDayTwoSP->SetChannelColor(RGB(192,192,192));
-        //// 		m_pDayTwoSP->SetThumbColor(RGB(255,128,128));
-
-        //m_pSlider_Test_TwoSP->SetChannelColor(RGB(192,192,192));
-        //m_pSlider_Test_TwoSP->SetThumbColor(RGB(0,0,255));
-        //m_pSlider_Test_TwoSP->SetPageLength(5);
-        //m_pSlider_Test_TwoSP->SetChannelWidth(20);
-        //m_pSlider_Test_TwoSP->SetThumbWidth(34);
-
-        //m_pSlider_Test_TwoSP->SetRange(20, 0);
-        //m_pSlider_Test_TwoSP->SetPos(8, 10, 12);
-        //m_pSlider_Test_TwoSP->Setflag(5);
-        //m_pSlider_Test_TwoSP->ShowWindow(TRUE);
-        //--------------------------------Day hotel------------------------------------
-
-        s1 = (CStatic*)GetDlgItem(IDC_FSB_DAYHOTEL);
-        m_pDaySingleSP= new CFSBContainer;
-        s1->GetWindowRect(&rc);
-        ScreenToClient(&rc);
-        m_pDaySingleSP->CreateInstance(s1, s1->GetStyle()|s1->GetExStyle()|SS_SUNKEN, rc);
-        m_pDaySingleSP->SetParentWnd(this);
-
-        m_pDaySingleSP->CreateFlexSlideBar(FALSE, FSB_STYLE_TRIPLELINKAGE );
-        m_pDaySingleSP->SetFlexSlideBarRect(rc);
-        m_pDaySingleSP->SetHorizontal(FALSE);
-        m_pDaySingleSP->SetFSBThumbShape( FSB_THUMBSHAPE_RECT);
-        m_pDaySingleSP->SetChannelColor(RGB(192,192,192));
-        //m_pDaySingleSP->SetThumbColor(RGB(255,128,128));
-        m_pDaySingleSP->SetThumbColor(RGB(0,0,255));
-        m_pDaySingleSP->SetPageLength(5);
-        m_pDaySingleSP->SetChannelWidth(20);
-        m_pDaySingleSP->SetThumbWidth(34);
-
-        m_pDaySingleSP->SetRange(10, 0);
-        m_pDaySingleSP->SetPos(0, 1, 2);
-        m_pDaySingleSP->Setflag(4);
-        //
-
-
-// 		s1 = (CStatic*)GetDlgItem(IDC_STATIC_TEST);
-// 		m_pTemperSP= new CFSBContainer;
-// 		s1->GetWindowRect(&rc);
-// 		ScreenToClient(&rc);
-// 		m_pTemperSP->CreateInstance(s1, s1->GetStyle()|s1->GetExStyle()|SS_SUNKEN, rc);
-// 		m_pTemperSP->SetParentWnd(this);
-//
-// 		m_pTemperSP->CreateFlexSlideBar(FALSE, FSB_STYLE_TRIPLELINKAGE );
-// 		m_pTemperSP->SetFlexSlideBarRect(rc);
-// 		m_pTemperSP->SetHorizontal(FALSE);
-// 		m_pTemperSP->SetFSBThumbShape( FSB_THUMBSHAPE_RECT);
-// 		m_pTemperSP->SetChannelColor(RGB(192,192,192));
-// 		//m_pDaySingleSP->SetThumbColor(RGB(255,128,128));
-// 		m_pTemperSP->SetThumbColor(RGB(0,0,255));
-// 		m_pTemperSP->SetPageLength(5);
-// 		m_pTemperSP->SetChannelWidth(25);
-// 		m_pTemperSP->SetThumbWidth(30);
-//
-// 		m_pTemperSP->SetRange(10, 0);
-// 		m_pTemperSP->SetPos(3, 7, 9);
-// 		m_pTemperSP->Setflag(5);
-
-
-    }
-
-//     m_tooltips.Create(GetDlgItem(IDC_FSB_DAYHOTEL));
-//
-//     m_tooltips.Activate(TRUE);
+ 
 }
 
 void CT3000View::OnRButtonUp(UINT nFlags, CPoint point)
@@ -705,7 +463,7 @@ void CT3000View::Fresh()
     g_NEED_MULTI_READ=TRUE;
     int  Fresh_Min=(short)product_register_value[MODBUS_MIN_SETPOINT];
     int Fresh_Max=(short)product_register_value[MODBUS_MAX_SETPOINT];
-
+	m_StartFirst = TRUE;
     Initial_Max_Min();
     /*
     1>>input 1.....8
@@ -770,10 +528,10 @@ void CT3000View::Fresh()
     strTemp.Format(_T("Max=%d"),Fresh_Max);
 
 
-    GetDlgItem(IDC_MAX2)->SetWindowText(strTemp);
+ 
     strTemp.Format(_T("Min=%d"),(short)Fresh_Min);
 
-    GetDlgItem(IDC_MIN2)->SetWindowText(strTemp);
+ 
     strTemp.Format(_T("%d"),product_register_value[MODBUS_PIC_VERSION]);
     GetDlgItem(IDC_PIC_EDIT)->SetWindowText(strTemp);
     FreshCtrl();
@@ -781,9 +539,7 @@ void CT3000View::Fresh()
     InitFanSpeed();
     m_nID=product_register_value[6];
 
-    if(product_register_value[7]==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8
-		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
-		)||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+    if(product_register_value[7]==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8)||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
     {
         GetDlgItem(IDC_GRAPGICBUTTON)->ShowWindow(SW_HIDE);
       //  GetDlgItem(IDC_PARAMETERBTN)->ShowWindow(SW_HIDE);
@@ -831,6 +587,12 @@ void CT3000View::Fresh()
         GetDlgItem(IDC_STATIC_NAME_TSTAT)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_EDIT_TSTAT_NAME)->ShowWindow(SW_HIDE);
     }
+	CString	g_configfile_path = g_strExePth + _T("T3000_config.ini");
+	m_offline = GetPrivateProfileInt(_T("SliderUI"), _T("Online"), 0, g_configfile_path);
+	if (!m_offline)
+	{
+		InitFlexSliderBars_tstat6();
+	}
 }
 
 void CT3000View::Fresh_T3000View()
@@ -861,11 +623,10 @@ void CT3000View::Fresh_T3000View()
 
     strTemp.Format(_T("Max=%d"),Fresh_Max);
 
-
-    GetDlgItem(IDC_MAX2)->SetWindowText(strTemp);
+ 
     strTemp.Format(_T("Min=%d"),(short)product_register_value[MODBUS_MIN_SETPOINT]);
 
-    GetDlgItem(IDC_MIN2)->SetWindowText(strTemp);
+   
     strTemp.Format(_T("%d"),product_register_value[MODBUS_PIC_VERSION]);
     GetDlgItem(IDC_PIC_EDIT)->SetWindowText(strTemp);
     FreshCtrl();
@@ -892,55 +653,9 @@ HBRUSH CT3000View::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
     switch(pWnd->GetDlgCtrlID())
     {
 
-    //   case IDC_STATIC_DAYCOOL:
-    //       {
-    //           pDC->SetTextColor(RGB(255,255,255));
-    //           pDC->SetBkColor(RGB(0,0,255));
-    //           pDC->SetBkMode(TRANSPARENT);
-    //           HBRUSH B = CreateSolidBrush(RGB(0,0,255));
-    //           return (HBRUSH)B;
-    //       }
-    //case IDC_EDIT_DAYCOOL:
-    //{
-    //	pDC->SetTextColor(RGB(255,255,255));
-    //	pDC->SetBkColor(RGB(0,0,255));
-    //	pDC->SetBkMode(TRANSPARENT);
-    //	HBRUSH B = CreateSolidBrush(RGB(0,0,255));
-    //	return (HBRUSH)B;
-    //}
-    //case IDC_NIGHT_EDIT:
-    //{
-    //	pDC->SetTextColor(RGB(255,255,255));
-    //	pDC->SetBkColor(RGB(0,0,255));
-    //	pDC->SetBkMode(TRANSPARENT);
-    //	HBRUSH B = CreateSolidBrush(RGB(0,0,255));
-    //	return (HBRUSH)B;
-    //}
-    //   case IDC_STATIC_DAYHEAT:
-    //   {
-    //       pDC->SetTextColor(RGB(255,255,255));
-    //       //pDC->SetBkColor(RGB(255,255,255));
-    //       pDC->SetBkMode(TRANSPARENT);
-    //       HBRUSH B = CreateSolidBrush(RGB(255,0,0));
-    //       return (HBRUSH)B;
-    //   }
-    //	case IDC_EDIT_DAYHEAT:
-    //	{
-    //		pDC->SetTextColor(RGB(255,255,255));
-    //		//pDC->SetBkColor(RGB(255,255,255));
-    //		pDC->SetBkMode(TRANSPARENT);
-    //		HBRUSH B = CreateSolidBrush(RGB(255,0,0));
-    //		return (HBRUSH)B;
-    //	}
+     
 
-    //   case IDC_TEMPINFO_EDIT:
-    //       {
-    //           pDC->SetTextColor(RGB(255,255,255));
-    //           //pDC->SetBkColor(RGB(255,255,255));
-    //           pDC->SetBkMode(TRANSPARENT);
-    //           HBRUSH B = CreateSolidBrush(RGB(96,192,0));
-    //           return (HBRUSH)B;
-    //       }
+     
 
     default:
         return CFormView::OnCtlColor(pDC,pWnd, nCtlColor);
@@ -1178,79 +893,8 @@ void CT3000View::InitSliderBars2()
     //m_pDayTwoSP && bOccupied && bOccupied
 
 
-    m_singlesliderday.SetThumbColor(RGB(96,192,0));
-    m_singlesliderday.SetSelectionColor(RGB(64, 64, 255));
-    m_singlesliderday.SetChannelColor(RGB(196, 196, 255));
+ 
 
-    m_singlesliderday.SetRange((short)DayMin*10, (short)DayMax*10,TRUE);
-
-    int currenttemp=(short)DayMin*10+(short)DayMax*10-(int)product_register_value[MODBUS_TEMPRATURE_CHIP];
-    m_singlesliderday.SetPos(currenttemp);
-#if 0
-    if(m_hotel_or_office==0)  // office - occupied
-    {
-        // 2sp
-        CString strTemp1 = _T("Two SetPoint Mode");
-        m_DayCoolStatic.SetWindowText(_T("Cooling SP"));
-        m_DayHeatStatic.SetWindowText(_T("Heating SP"));
-
-
-
-        m_daysetpoint = dSP;
-        strTemp.Format(_T("%0.1f"),(float)m_daysetpoint);
-        //m_dayInfoEdit.FieldText(RGB(100,100,100),strTemp);
-        m_dayInfoEdit.FieldText(RGB(0,0,0),strTemp);
-        if (g_unint)
-        {
-            strTemp.Format(_T("%.1f C"),(float)dCoolSP);
-        }
-        else
-        {
-            strTemp.Format(_T("%.1f F"),(float)dCoolSP);
-        }
-        //m_DayCoolEdit.FieldText(RGB(100,100,100),strTemp);
-        m_DayCoolEdit.FieldText(RGB(0,0,0),strTemp);
-        //m_DayCoolEdit.SetNumberDefaultTex();
-
-
-        if (g_unint)
-        {
-            strTemp.Format(_T("%.1f C"),(float)dHeatSP);
-        }
-        else
-        {
-            strTemp.Format(_T("%.1f F"),(float)dHeatSP);
-        }
-        //m_DayHeatEdit.FieldText(RGB(100,100,100),strTemp);
-        m_DayHeatEdit.FieldText(RGB(0,0,0),strTemp);
-        //m_DayHeatEdit.SetNumberDefaultTex();
-        //nSP= int(nSP/10.0);
-        if (dCoolSP == dHeatSP && dCoolSP== dSP )
-        {
-            dSP = dHeatSP + 1;
-            dCoolSP = dSP+1;
-        }
-
-
-
-// 		m_pDaySingleSP->SetRange(DayMax*10, DayMin*10);
-// 		BOOL bRetSP = m_pDaySingleSP->SetPos_tstat6_3pos(dHeatSP*10, dSP*10, dCoolSP*10);
-// 		HandleSliderSetPos(bRetSP);
-//
-// 		m_pDaySingleSP->ShowWindow(SW_NORMAL);
-// 		m_pDayTwoSP->ShowWindow(SW_HIDE);
-
-
-        m_pDayTwoSP->SetRange(DayMax*10, DayMin*10);
-        BOOL bRetSP = m_pDayTwoSP->SetPos(dHeatSP*10, dSP*10, dCoolSP*10); // 因为只有2个thumb，所以sp不要了，设为两端的值
-        HandleSliderSetPos(bRetSP);
-
-        m_pDayTwoSP->ShowWindow(SW_NORMAL);
-        m_pDaySingleSP->ShowWindow(SW_HIDE);
-
-    }
-    else  // hotel - occupied
-#endif
 
     {
         // 1SP
@@ -1265,8 +909,7 @@ void CT3000View::InitSliderBars2()
         {
             strTemp.Format(_T("%.1fF"),float(dCoolSP));
         }
-        //m_DayCoolEdit.FieldText(RGB(100,100,100),strTemp);
-        m_DayCoolEdit.FieldText(RGB(0,0,0),strTemp);
+       
         if (g_unint)
         {
             strTemp.Format(_T("%.1fC"),float(dHeatSP));
@@ -1275,12 +918,11 @@ void CT3000View::InitSliderBars2()
         {
             strTemp.Format(_T("%.1fF"),float(dHeatSP));
         }
-        m_DayHeatEdit.FieldText(strTemp);
-        m_DayCoolStatic.SetWindowText(_T("Cooling SP"));
-        m_DayHeatStatic.SetWindowText(_T("Heating SP"));
+       
+      
+        
         strTemp.Format(_T("%0.1f"), (float)dSP);
-        //m_dayInfoEdit.FieldText(RGB(100,100,100),strTemp);
-        m_dayInfoEdit.FieldText(RGB(0,0,0),strTemp);
+       
 
         if (dCoolSP == dHeatSP && dCoolSP== dSP )
         {
@@ -1289,14 +931,10 @@ void CT3000View::InitSliderBars2()
         }
         m_daysetpoint = dSP;
         strTemp.Format(_T("%0.1f"),(float)m_daysetpoint);
-        m_dayInfoEdit.FieldText(RGB(0,0,0),strTemp);
+        
 
 
-// 		m_pDaySingleSP->SetRange(nRangeMax, nRangeMin);
-// 		BOOL bRetSP = m_pDaySingleSP->SetPos(dHeatSP, dSP, dCoolSP);
-// 		HandleSliderSetPos(bRetSP);
-// 		m_pDayTwoSP->ShowWindow(SW_HIDE);
-// 		m_pDaySingleSP->ShowWindow(SW_NORMAL);
+ 
 
 
         if (dHeatSP<dSP&&dSP<dCoolSP)
@@ -1310,17 +948,11 @@ void CT3000View::InitSliderBars2()
             dSP = 2;
             dCoolSP = 3;
         }
-        m_pDaySingleSP->SetRange(DayMax*10, DayMin*10);
-        BOOL bRetSP = m_pDaySingleSP->SetPos_tstat6_3pos(dHeatSP*10, dSP*10, dCoolSP*10);
-        HandleSliderSetPos(bRetSP);
-        m_pDaySingleSP->ShowWindow(SW_NORMAL);
-        m_pDayTwoSP->ShowWindow(SW_HIDE);
+        
 
-
-
-
-
-
+		m_daySlider.SetRange(DayMax * 10.0F, DayMin * 10.0F);
+		m_daySlider.SetZoneValues(dHeatSP * 10.0F, dCoolSP * 10.0F);
+		m_daySlider.put_TwoSliderMode(FALSE);
     }
 
 
@@ -1341,7 +973,7 @@ void CT3000View::InitSliderBars2()
         {
             strTemp.Format(_T("%.1f F"),(float)nCoolSP);
         }
-        m_nightInfoEdit.FieldText(RGB(0,0,0),strTemp);
+        
 
 
         if (g_unint)
@@ -1352,10 +984,10 @@ void CT3000View::InitSliderBars2()
         {
             strTemp.Format(_T("%.1f F"),(float)nHeatSP);
         }
-        m_nightHeatInfoEdit.FieldText(RGB(0,0,0),strTemp);
+         
 
         strTemp.Format(_T("%0.1f"),(float)nSP);
-        m_nightpotEdit.FieldText(RGB(0,0,0),strTemp);
+        
 
 
 
@@ -1367,24 +999,8 @@ void CT3000View::InitSliderBars2()
         }
 
 
-
-        //m_pNightTwoSP->SetRange(nRangeMax, nRangeMin);
-        //BOOL bSetPos = m_pNightTwoSP->SetPos(nHeatSP, nCoolSP, nCoolSP+1);
-        //HandleSliderSetPos(bSetPos);
-
-        //m_pNightTwoSP->ShowWindow(SW_NORMAL);
-        //m_pNightSingleSP->ShowWindow(SW_HIDE);
-// 		m_pNightSingleSP->SetRange(DayMax*10, DayMin*10);
-// 		BOOL bRetSP = m_pNightSingleSP->SetPos_tstat6_3pos(nHeatSP*10, nSP*10, nCoolSP*10);
-// 		HandleSliderSetPos(bRetSP);
-// 		m_pNightSingleSP->ShowWindow(SW_NORMAL);
-// 		m_pNightTwoSP->ShowWindow(SW_HIDE);
-        m_pNightTwoSP->SetRange(DayMax*10, DayMin*10);
-        BOOL bSetPos = m_pNightTwoSP->SetPos(nHeatSP*10, nSP*10, nCoolSP*10);
-        HandleSliderSetPos(bSetPos);
-
-        m_pNightTwoSP->ShowWindow(SW_NORMAL);
-        m_pNightSingleSP->ShowWindow(SW_HIDE);
+ 
+     
     }
     //m_pNightSingleSP && !bOccupied
     else  // unoccupied-hotel
@@ -1401,7 +1017,7 @@ void CT3000View::InitSliderBars2()
         {
             strTemp.Format(_T("%.1f F"),(float)nCoolSP);
         }
-        m_nightInfoEdit.FieldText(RGB(0,0,0),strTemp);
+         
 
         if (g_unint)
         {
@@ -1411,11 +1027,11 @@ void CT3000View::InitSliderBars2()
         {
             strTemp.Format(_T("%.1f F"),(float)nHeatSP);
         }
-        m_nightHeatInfoEdit.FieldText(RGB(0,0,0),strTemp);
+         
 
 
         strTemp.Format(_T("%0.1f"), (float)nSP);
-        m_nightpotEdit.FieldText(RGB(0,0,0),strTemp);
+        
 
         if (nCoolSP == nHeatSP && nHeatSP == 0)
         {
@@ -1440,12 +1056,7 @@ void CT3000View::InitSliderBars2()
             nSP = 2;
             nCoolSP = 3;
         }
-        m_pNightSingleSP->SetRange(DayMax*10, DayMin*10);
-        BOOL bRetSP = m_pNightSingleSP->SetPos_tstat6_3pos(nHeatSP*10, nSP*10, nCoolSP*10);
-        HandleSliderSetPos(bRetSP);
-        m_pNightSingleSP->ShowWindow(SW_NORMAL);
-
-        m_pNightTwoSP->ShowWindow(SW_HIDE);
+     
     }
 
 
@@ -1468,10 +1079,7 @@ void CT3000View::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 void CT3000View::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 
-//     if (pScrollBar->m_hWnd == GetDlgItem(IDC_FSB_DAYHOTEL)->m_hWnd)
-//     {
-//         AfxMessageBox(_T("OK"));
-//     }
+ 
     CFormView::OnVScroll(nSBCode, nPos, pScrollBar);
 }
 
@@ -1486,9 +1094,7 @@ void CT3000View::Fresh_In()
     CString strTemp;
     strTemp.Empty();
     if( nModel==2||nModel==1||nModel==4||nModel==PM_TSTAT5D||nModel==17||nModel==18
-            || nModel==3||nModel==PM_TSTAT6||nModel==PM_TSTAT5i||nModel==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8
-				|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
-				))//A,B,C,D ,F,G,6,7
+            || nModel==3||nModel==PM_TSTAT6||nModel==PM_TSTAT5i||nModel==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8))//A,B,C,D ,F,G,6,7
     {
         //strTemp.Format(_T("Input %d"),1);
         //Read_Multi(g_tstat_id,&product_register_value[MODBUS_INTERNAL_THERMISTOR],MODBUS_INTERNAL_THERMISTOR,2);
@@ -1825,9 +1431,7 @@ void CT3000View::Fresh_In()
 
 
 
-    if(nModel == PM_TSTAT6 ||nModel == PM_TSTAT7||(product_register_value[7] == PM_TSTAT8
-		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
-		) ||nModel == PM_TSTAT5i)// Tstat 6
+    if(nModel == PM_TSTAT6 ||nModel == PM_TSTAT7||(product_register_value[7] == PM_TSTAT8) ||nModel == PM_TSTAT5i)// Tstat 6
     {
         int m_crange=0;
         //Mdb_Adress_Map = T3000_6_ADDRESS; //让其在 T3000_6_ADDRESS 中 进行地址 Maping;
@@ -2205,9 +1809,7 @@ void CT3000View::Fresh_Out()
     //==========================================================================
     //ABCDEFG,noH
     if(nModel==2||nModel==1||nModel==4||nModel==12||nModel==16||nModel==PM_PM5E	||nModel==17||nModel==18||nModel==3
-            ||nModel==PM_TSTAT6||nModel==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8
-				|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
-				)||(product_register_value[7] == PM_TSTAT8)||nModel==PM_TSTAT7||nModel==PM_PRESSURE)
+            ||nModel==PM_TSTAT6||nModel==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7] == PM_TSTAT8)||nModel==PM_TSTAT7||nModel==PM_PRESSURE)
     {
         m_Output_Grid.put_TextMatrix(1,1,g_strOutName1);
         m_Output_Grid.put_TextMatrix(2,1,g_strOutName2);
@@ -2301,9 +1903,7 @@ void CT3000View::Fresh_Out()
     ////----------------------------------------------------------------------
     //4,5
     if(nModel==1||nModel==4||nModel==12||nModel==16||nModel==3||nModel==PM_PM5E
-            ||nModel==PM_TSTAT6||nModel==PM_TSTAT5i||(nModel == PM_TSTAT8
-				|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
-				)||nModel==PM_TSTAT7||nModel==PM_PRESSURE)//B,C,D,E
+            ||nModel==PM_TSTAT6||nModel==PM_TSTAT5i||(nModel == PM_TSTAT8)||nModel==PM_TSTAT7||nModel==PM_PRESSURE)//B,C,D,E
     {
 
 
@@ -2498,9 +2098,7 @@ void CT3000View::Fresh_Out()
 
     //:DEG 6. 7
     nRange=product_register_value[MODBUS_OUTPUT1_SCALE];
-    if(nModel==12||nModel==16||nModel==PM_PM5E||nModel==18||nModel==PM_TSTAT6||(product_register_value[7] == PM_TSTAT8
-		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
-		)||nModel==PM_TSTAT5i||nModel==PM_TSTAT7||nModel==PM_PRESSURE)
+    if(nModel==12||nModel==16||nModel==PM_PM5E||nModel==18||nModel==PM_TSTAT6||(product_register_value[7] == PM_TSTAT8)||nModel==PM_TSTAT5i||nModel==PM_TSTAT7||nModel==PM_PRESSURE)
     {
         if(nRange==0)
         {
@@ -2774,20 +2372,11 @@ void CT3000View::FreshIOGridTable()
         m_inRows=13;
     }
     break;
-	case PM_TSTAT8_WIFI:
-		 
-	case PM_TSTAT8_OCC:
-	 
-	case PM_TSTAT7_ARM:
-		 
-	case PM_TSTAT8_220V:
-		 
     case PM_TSTAT8:
     {
         m_outRows = 8;
         m_inRows = 13;
     }
-	break;
     case PM_TSTAT5E:
     {
         m_outRows=8;
@@ -2998,6 +2587,16 @@ void CT3000View::OnBnClickedParameterbtn()
 BEGIN_EVENTSINK_MAP(CT3000View, CFormView)
 ON_EVENT(CT3000View, IDC_INPUT_MSFLEXGRID, DISPID_CLICK, CT3000View::ClickInputMsflexgrid, VTS_NONE)
 ON_EVENT(CT3000View, IDC_OUTPUT_MSFLEXGRID, DISPID_CLICK, CT3000View::ClickOutputMsflexgrid, VTS_NONE)
+
+ON_EVENT(CT3000View, IDC_SLIDERCONTROL1, 9, CT3000View::DayHandleMovedSlidercontrol1, VTS_VARIANT VTS_R4)
+ON_EVENT(CT3000View, IDC_SLIDERCONTROL1, 7, CT3000View::DayHandleMovedSlidercontrol1, VTS_VARIANT VTS_R4)
+ON_EVENT(CT3000View, IDC_SLIDERCONTROL1, 8, CT3000View::DayHandleMovedSlidercontrol1, VTS_VARIANT VTS_R4)
+
+ON_EVENT(CT3000View, IDC_SLIDERCONTROL2, 9, CT3000View::NightHandleMovedSlidercontrol1, VTS_VARIANT VTS_R4)
+ON_EVENT(CT3000View, IDC_SLIDERCONTROL2, 7, CT3000View::NightHandleMovedSlidercontrol1, VTS_VARIANT VTS_R4)
+ON_EVENT(CT3000View, IDC_SLIDERCONTROL2, 8, CT3000View::NightHandleMovedSlidercontrol1, VTS_VARIANT VTS_R4)
+
+
 END_EVENTSINK_MAP()
 
 void CT3000View::ClickInputMsflexgrid()
@@ -3141,9 +2740,7 @@ void CT3000View::OnEnKillfocusInputnameedit()
    
 
 
-	if (product_register_value[7]== PM_TSTAT6||product_register_value[7]==PM_TSTAT8
-		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V) 
-		||product_register_value[7]==PM_TSTAT7)
+	if (product_register_value[7]== PM_TSTAT6||product_register_value[7]==PM_TSTAT8||product_register_value[7]==PM_TSTAT7)
 	{
 	 
 		char cTemp1[8];
@@ -3391,8 +2988,6 @@ void CT3000View::OnEnKillfocusOutputnameedit()
 		||product_register_value[7]==PM_TSTAT8
 		||product_register_value[7]==PM_TSTAT7
 		||product_register_value[7]==PM_TSTAT5i
-		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
-
 		)
 	{
 		char cTemp1[8];
@@ -3736,7 +3331,6 @@ void CT3000View::OnDestroy()
 void CT3000View::OnBnClickedTrendlogview()
 {
 
-	((CMainFrame*)(theApp.m_pMainWnd))->SwitchToPruductType(DLG_DIALOG_DEFAULT_T3000_VIEW);
     //((CMainFrame*)(theApp.m_pMainWnd))->SwitchToPruductType(3);
 ////	SwitchToPruductType(3);
 //	if ((product_register_value[7]==PM_TSTAT5E||(product_register_value[7]==PM_TSTAT5G))||(product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7))
@@ -3752,7 +3346,7 @@ void CT3000View::OnBnClickedTrendlogview()
 //CDisplayLEDLCDConfig dlg;
 //dlg.DoModal();
     // TODO: Add your control notification handler code here
-	
+
 
 }
 
@@ -3801,20 +3395,7 @@ void CT3000View::OnBnClickedOccupacheck()
     UpdateData(TRUE);
     //stat6
 
-    if (product_register_value[MODBUS_INFO_BYTE]&1)
-    {
-        m_singlesliderday.SetThumbColor(RGB(96,192,0));
-        m_singlesliderday.SetSelectionColor(RGB(64, 64, 255));
-        m_singlesliderday.SetChannelColor(RGB(196, 196, 255));
-
-    }
-    else
-    {
-        m_singlesliderday.SetThumbColor(RGB(255,255,255));
-        m_singlesliderday.SetSelectionColor(RGB(64, 64, 255));
-        m_singlesliderday.SetChannelColor(RGB(196, 196, 255));
-    }
-
+   
 
     // Fresh();
 
@@ -3867,32 +3448,7 @@ void CT3000View::OnBnClickedUnoccupiedMark()
 
     UpdateData(TRUE);
 
-    if (product_register_value[MODBUS_INFO_BYTE]&1)
-    {
-//     m_singlesliderday.SetThumbColor(RGB(96,192,0));
-//     m_singlesliderday.SetSelectionColor(RGB(64, 64, 255));
-//     m_singlesliderday.SetChannelColor(RGB(196, 196, 255));
-
-
-
-
-
-
-
-    }
-    else
-    {
-//     m_singlesliderday.SetThumbColor(RGB(255,255,255));
-//     m_singlesliderday.SetSelectionColor(RGB(64, 64, 255));
-//     m_singlesliderday.SetChannelColor(RGB(196, 196, 255));
-
-
-
-
-
-
-
-    }
+   
     int  Fresh_Min=(short)product_register_value[MODBUS_MIN_SETPOINT];
     int Fresh_Max=(short)product_register_value[MODBUS_MAX_SETPOINT];
     if (Fresh_Min>Fresh_Max)
@@ -3966,9 +3522,7 @@ int CT3000View::get_real_fan_select()
     }
 
 	 
-		if (product_register_value[7] == PM_TSTAT8
-			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
-			)
+		if (product_register_value[7] == PM_TSTAT8)
 		{
 
 
@@ -4144,9 +3698,7 @@ void CT3000View::OnCbnSelchangeFanspeedcombo()
     //恢复T3000主线程
 
 
-	if (product_register_value[8] = PM_TSTAT8
-		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
-		)
+	if (product_register_value[8] = PM_TSTAT8)
 	{
 		int sel = m_FanComBox.GetCurSel();
 
@@ -4161,9 +3713,7 @@ LRESULT CT3000View::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
     // TODO: Add your specialized code here and/or call the base class
     if(MsgT3000ViewFresh==message)
     {
-        if((product_register_value[7] == PM_TSTAT6) || (product_register_value[7] == PM_TSTAT7) || (product_register_value[7] == PM_TSTAT5i)
-			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V) 
-			||(product_register_value[7] == PM_TSTAT8))
+        if((product_register_value[7] == PM_TSTAT6) || (product_register_value[7] == PM_TSTAT7) || (product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
         {
             product_type =T3000_6_ADDRESS;
         }
@@ -4182,9 +3732,7 @@ LRESULT CT3000View::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
         if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
             //if (product_register_value[7] == 6)
         {
-            if ((product_register_value[7] == PM_TSTAT6&&m_fFirmwareVersion>35.5)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT8
-				|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
-				)||(product_register_value[7] == PM_TSTAT5i))
+            if ((product_register_value[7] == PM_TSTAT6&&m_fFirmwareVersion>35.5)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7] == PM_TSTAT5i))
             {
 
                 //product_register_value[]列表交换。
@@ -4221,7 +3769,7 @@ LRESULT CT3000View::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
     {
 // InitFlexSliderBars_tstat6();
         SetFlexSliderBars_tstat6();
-//    m_pSlider_Test_TwoSP->SetPos(8, coolvalue, coolvalue+1);
+ 
 
     }
     return CFormView::WindowProc(message, wParam, lParam);
@@ -4318,9 +3866,7 @@ void CT3000View::OnBnClickedBtnSynctime()
 
     szTime[0] =(BYTE)(time.GetYear()%100);
     int nRet = write_one(g_tstat_id,MODBUS_YEAR, szTime[0]);
-	if (product_register_value[7] == PM_TSTAT8
-		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
-		)
+	if (product_register_value[7] == PM_TSTAT8) 
 	{
 		 
 		write_one(g_tstat_id, MODBUS_YEAR, time.GetYear());
@@ -4397,7 +3943,7 @@ void CT3000View::InitFlexSliderBars()
         strTemp.Format(_T("%.1f C"),m_fTemperature);
     else
         strTemp.Format(_T("%.1f F"),m_fTemperature);
-//	m_TempInfoEdit.FieldText(strTemp);	//2.5.0.95
+ 
 
     // calc
     short nOccupied = product_register_value[MODBUS_INFO_BYTE];  // Day setpoint option  //184
@@ -4427,13 +3973,12 @@ void CT3000View::InitFlexSliderBars()
             }
 
             strTemp.Format(_T("%d"), nSP);
-            m_dayInfoEdit.FieldText(RGB(0,0,0),strTemp);
+     
 
-            //CWnd *pSPWnd = GetDlgItem(IDC_EDIT_CUR_SP);
-            //pSPWnd->SetWindowText(strTemp);
+       
 
-            m_DayCoolStatic.SetWindowText(_T("Cooling SP"));
-            m_DayHeatStatic.SetWindowText(_T("Heating SP"));
+          
+        
 
             if (g_unint)
             {
@@ -4443,8 +3988,8 @@ void CT3000View::InitFlexSliderBars()
             {
                 strTemp.Format(_T("% F"), nCoolSP);
             }
-            m_DayCoolEdit.FieldText(strTemp);
-            //m_DayCoolEdit.SetNumberDefaultTex();
+        
+        
             if (g_unint)
             {
                 strTemp.Format(_T("%d C"), nHeatSP);
@@ -4454,33 +3999,16 @@ void CT3000View::InitFlexSliderBars()
                 strTemp.Format(_T("%d F"), nHeatSP);
             }
 
-            m_DayHeatEdit.FieldText(strTemp);
-            //	m_DayHeatEdit.SetNumberDefaultTex();
+           
+       
 
             nRangeMax = nCoolSP > nRangeMax ? nCoolSP : nRangeMax;
             nRangeMin = nHeatSP < nRangeMin ? nHeatSP : nRangeMin;
 
-            m_pDayTwoSP->SetRange(nRangeMax, nRangeMin);
-            BOOL bRetSP = m_pDayTwoSP->SetPos( nHeatSP, nCoolSP, nCoolSP+1);
-
-            HandleSliderSetPos(bRetSP);//tstat6
-
-            m_pDayTwoSP->ShowWindow(SW_NORMAL);
-            m_pDaySingleSP->ShowWindow(SW_HIDE);
-
-
-            //stat6
-            m_pNightTwoSP->ShowWindow(SW_HIDE);
-            m_pNightSingleSP->ShowWindow(SW_HIDE);
-            strTemp.Format(_T("0.0"));
-            m_nightInfoEdit.FieldText(strTemp);
-            //m_nightInfoEdit.SetNumberDefaultTex();
-            strTemp.Format(_T("0.0"));
-            m_nightHeatInfoEdit.FieldText(strTemp);
-            //m_nightHeatInfoEdit.SetNumberDefaultTex();
-            strTemp.Format(_T("%d"),0);
-            CWnd *pSPWnd = GetDlgItem(IDC_EDIT_CUR_SP);
-            pSPWnd->SetWindowText(strTemp);
+          
+     
+       
+          
 
 
 
@@ -4515,47 +4043,24 @@ void CT3000View::InitFlexSliderBars()
             }
 
             strTemp.Format(_T("%d"), nSP);
-            //CWnd *pSPWnd = GetDlgItem(IDC_EDIT_CUR_SP);
-            //pSPWnd->SetWindowText(strTemp);
-            m_dayInfoEdit.FieldText(RGB(0,0,0),strTemp);
-
-            strTemp.Format(_T("%d"), nCoolDeadband);
-            m_DayCoolEdit.FieldText(strTemp);
-            //m_DayCoolEdit.SetNumberDefaultTex();
-            strTemp.Format(_T("%0.1f"), (float)product_register_value[nHeatingDBRegister]);
-            m_DayHeatEdit.FieldText(strTemp);
-            //m_DayHeatEdit.SetNumberDefaultTex();
-            //0903
-// 			m_DayCoolStatic.SetWindowText(_T("Cooling DB"));
-// 			m_DayHeatStatic.SetWindowText(_T("Heating DB"));
+            
+       
 
 
 
             //////////////////////////////////////////////////////////////////////////
             nRangeMax = nCoolSP > nRangeMax ? nCoolSP : nRangeMax;
             nRangeMin = nHeatSP < nRangeMin ? nHeatSP : nRangeMin;
-            m_pDaySingleSP->SetRange(nRangeMax, nRangeMin);
+            
 
-            BOOL bRetSP = m_pDaySingleSP->SetPos(nHeatSP, nSP, nCoolSP);
+			m_daySlider.SetRange(nRangeMax, nRangeMin);
+			m_daySlider.SetZoneValues(nCoolSP, nHeatSP);
+			m_daySlider.put_TwoSliderMode(FALSE);
 
-            //	BOOL bRetSP = m_pDayTwoSP->SetPos(nHeatSP, nCoolSP, nCoolSP+1); // 因为只有2个thumb，所以sp不要了，设为两端的值
-            HandleSliderSetPos(bRetSP);//tstat6
+            
+            
 
-            m_pDaySingleSP->ShowWindow(SW_NORMAL);
-            m_pDayTwoSP->ShowWindow(SW_HIDE);
-
-            //stat6
-            m_pNightTwoSP->ShowWindow(SW_HIDE);
-            m_pNightSingleSP->ShowWindow(SW_HIDE);
-            strTemp.Format(_T("0.0"));
-            m_nightInfoEdit.FieldText(strTemp);
-            //m_nightInfoEdit.SetNumberDefaultTex();
-            strTemp.Format(_T("0.0"));
-            m_nightHeatInfoEdit.FieldText(strTemp);
-            //m_nightHeatInfoEdit.SetNumberDefaultTex();
-            strTemp.Format(_T("%d"),0);
-            CWnd *pSPWnd = GetDlgItem(IDC_EDIT_CUR_SP);
-            pSPWnd->SetWindowText(strTemp);
+			m_nightSlider.put_Visible(FALSE);
         }
     }
     else  // unoccupied
@@ -4578,40 +4083,23 @@ void CT3000View::InitFlexSliderBars()
             }
 
             strTemp.Format(_T("%0.1f"),(float)((nCoolSP + nHeatSP))/2);
-            CWnd *pSPWnd = GetDlgItem(IDC_EDIT_CUR_SP);
-            pSPWnd->SetWindowText(strTemp);
-
-            strTemp.Format(_T("%d"), nCoolSP);
-            m_nightInfoEdit.FieldText(strTemp);
-            //m_nightInfoEdit.SetNumberDefaultTex();
-            strTemp.Format(_T("%0.1f"), (float)nHeatSP);
-            m_nightHeatInfoEdit.FieldText(strTemp);
+            
 
 
 
             nRangeMax = nCoolSP > nRangeMax ? nCoolSP : nRangeMax;
             nRangeMin = nHeatSP < nRangeMin ? nHeatSP : nRangeMin;
-            m_pNightTwoSP->SetRange(nRangeMax, nRangeMin);
-            BOOL bRetSP = m_pNightTwoSP->SetPos( nHeatSP, nCoolSP,nCoolSP+1);
-            HandleSliderSetPos(bRetSP);//tstat6
-            m_pNightTwoSP->ShowWindow(SW_NORMAL);
-            m_pNightSingleSP->ShowWindow(SW_HIDE);
+            
 
-
+			m_nightSlider.SetRange(nRangeMax, nRangeMin);
+			m_nightSlider.SetZoneValues(nCoolSP + 1, nHeatSP);//??
+			m_nightSlider.put_TwoSliderMode(TRUE);
 
             //stat6
 
-            strTemp.Format(_T("%d"), 0);
-            m_DayCoolEdit.FieldText(strTemp);
-            //	m_DayCoolEdit.SetNumberDefaultTex();
-            strTemp.Format(_T("0.0"));
-            m_DayHeatEdit.FieldText(strTemp);
-            //m_DayHeatEdit.SetNumberDefaultTex();
-            m_pDaySingleSP->ShowWindow(SW_HIDE);
-            m_pDayTwoSP->ShowWindow(SW_HIDE);
+           
 
-            strTemp.Format(_T("%d"), 0);
-            m_dayInfoEdit.FieldText(RGB(0,0,0),strTemp);
+			m_daySlider.put_Visible(FALSE);
         }
         else  // hotel
         {
@@ -4643,43 +4131,22 @@ void CT3000View::InitFlexSliderBars()
                 nCoolSP = nSP+1;
             }
 
-            strTemp.Format(_T("%d"), nSP);
-            CWnd *pSPWnd = GetDlgItem(IDC_EDIT_CUR_SP);
-            pSPWnd->SetWindowText(strTemp);
-
-            strTemp.Format(_T("%0.1f"),(float) product_register_value[nCoolingRegister]);
-            m_nightInfoEdit.FieldText(strTemp);
-            //	m_nightInfoEdit.SetNumberDefaultTex();
-            strTemp.Format(_T("%0.1f"),(float) product_register_value[nHeatingRegister]);
-            m_nightHeatInfoEdit.FieldText(strTemp);
-//0903
-// 			m_NightCoolStatic.SetWindowText(_T("Cooling DB"));
-// 			m_NightHeatStatic.SetWindowText(_T("Heating DB"));
+            
 
 
 
             nRangeMax = nCoolSP > nRangeMax ? nCoolSP : nRangeMax;
             nRangeMin = nHeatSP < nRangeMin ? nHeatSP : nRangeMin;
-            m_pNightSingleSP->SetRange(nRangeMax, nRangeMin);
-            BOOL bRetSP =  m_pNightSingleSP->SetPos( nHeatSP, nSP, nCoolSP);
-            HandleSliderSetPos(bRetSP);//tstat6
+            
 
-
-            m_pNightSingleSP->ShowWindow(SW_NORMAL);
-            m_pNightTwoSP->ShowWindow(SW_HIDE);
-
+			m_nightSlider.SetRange(nRangeMax, nRangeMin);
+			m_nightSlider.SetZoneValues(nCoolSP, nHeatSP);
+			m_nightSlider.put_TwoSliderMode(FALSE);
 
             //stat6
 
-            strTemp.Format(_T("%d"), 0);
-            m_DayCoolEdit.FieldText(strTemp);
-            //	m_DayCoolEdit.SetNumberDefaultTex();
-            strTemp.Format(_T("0.0"));
-            m_DayHeatEdit.FieldText(strTemp);
-            m_pDaySingleSP->ShowWindow(SW_HIDE);
-            m_pDayTwoSP->ShowWindow(SW_HIDE);
-            strTemp.Format(_T("%d"), 0);
-            m_dayInfoEdit.FieldText(RGB(0,0,100),strTemp);
+            
+			m_daySlider.put_Visible(FALSE);
         }
     }
 
@@ -4712,1410 +4179,13 @@ int CT3000View::Round_SetPoint_Min(int spvalue)
     }
     return ret;
 }
-LRESULT CT3000View::OnFlexSlideCallBack(WPARAM wParam, LPARAM lParam)
-{
 
-    //HWND  Hret =m_pDayTwoSP->m_hWnd;//GetSafeHwnd( );
-    //int rett = m_pNightTwoSP->Getflag();
-    int nMin, nMax;
-    int nCoolSP = 0;
-    int nHeatSP = 0;
-    int nSP =0;
-    m_active_key_mouse=TRUE;
-    int nHDB=0;
-    int nCDB=0;
 
-    if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)
-		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V) 
-		||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7] == PM_TSTAT5i))
-    {
-        int Increment=product_register_value[MODBUS_SETPOINT_INCREASE];
-        switch(wParam)
-        {
-        
-		case 1://右侧 晚上 2SP
-        {
-            //350	1	Low byte	W/R	(Night)Unoccupied  setpoin.
-            //352	1	Low byte	W/R	(Night)Unoccupied heating setpoint dead band , heating deadband for the night (OFF) mode. Units of 1 deg.
-            //353	1	Low byte	W/R	(Night)Unoccupied cooling setpoint dead band , cooling deadband for the night (OFF) mode. Units of 1 deg.
-            vector<int>  szPos(2);
-            m_pNightTwoSP->GetRange(nMin, nMax);
-            int nNum = m_pNightTwoSP->GetPos(szPos);
 
-			int nHeatSP = szPos[0] + nMin;
-			int nCoolSP = szPos[1] + nMin;
-			nSP = (nHeatSP + nCoolSP) / 2; //自动调节sp/*product_register_value[MODBUS_NIGHT_SETPOINT]*/
-			nHeatSP = GetRoundNumber(nHeatSP);
-			nCoolSP = GetRoundNumber(nCoolSP);
-			    nSP = GetRoundNumber(nSP);
-            nHDB=nSP-nHeatSP;
-            nCDB=nCoolSP-nSP;
-			int	Tstat_nSP = (short)product_register_value[MODBUS_NIGHT_SETPOINT];
-			int	Tstat_nCoolSP = (short)product_register_value[MODBUS_NIGHT_COOLING_SETPOINT];
-			int	Tstat_nHeatSP = (short)product_register_value[MODBUS_NIGHT_HEATING_SETPOINT];
 
-			if (nHeatSP == nCoolSP)
-			{
-				if (Tstat_nCoolSP != nCoolSP)
-				{
-					nCDB = Increment;
-					nHDB = 0;
-				}
-				if (Tstat_nHeatSP != nHeatSP)
-				{
-					nHDB = Increment;
-					nCDB = 0;
-				}
-			}
-			nHeatSP = nSP - nHDB;
-			nCoolSP = nSP + nCDB;
 
 
-            if ((nHDB<0&&nHDB>254)&&(nCDB<0&&nCDB>254))
-            {
 
-                InitFlexSliderBars_tstat6();
-                m_active_key_mouse=FALSE;
-                return 0;
-            }
-
-          
-
-            int ret=0;
-
-
-            BeginWaitCursor();
-          
-               
-
-
-                
-                
-				ret =	write_one(g_tstat_id, MODBUS_NIGHT_SETPOINT, nSP, 5);//t6 350
-                ret =	write_one(g_tstat_id, MODBUS_NIGHT_HEATING_DEADBAND,nHDB,5);//t6 354
-				ret =	write_one(g_tstat_id, MODBUS_NIGHT_COOLING_DEADBAND, nCDB, 5);//t6 355
-                if (ret<0)
-                {
-                    /*AfxMessageBox(_T("Write Fail!"));*/
-                    m_active_key_mouse=FALSE;
-                    InitFlexSliderBars_tstat6();
-                    return 0;
-                }
-                product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]=nHDB;
-				product_register_value[MODBUS_NIGHT_SETPOINT] = nSP;
-				product_register_value[MODBUS_NIGHT_COOLING_DEADBAND] = nCDB;
-
-
-
-				if (nCoolSP >= DayMax*10 || nHeatSP <= DayMin*10)
-				{
-					InitFlexSliderBars_tstat6();
-				}
-				else
-				{
-
-
-					m_pNightTwoSP->SetPos_tstat6_2pos(nHeatSP, nSP, nCoolSP);
-
-					CString strTemp;
-
-					if (g_unint)
-					{
-						strTemp.Format(_T("%0.1f C"), ((float)nCoolSP) / 10.0);
-					}
-					else
-					{
-						strTemp.Format(_T("%0.1f F"), ((float)nCoolSP) / 10.0);
-					}
-
-					m_nightInfoEdit.FieldText(strTemp);
-					//m_nightInfoEdit.SetNumberDefaultTex();
-					if (g_unint)
-					{
-						strTemp.Format(_T("%0.1f C"), ((float)nHeatSP) / 10.0);
-					}
-					else
-					{
-						strTemp.Format(_T("%0.1f F"), ((float)nHeatSP) / 10.0);
-					}
-
-					m_nightHeatInfoEdit.FieldText(strTemp);
-				}
-
-            EndWaitCursor();
-
-
-
-
-           
-
-        }
-         break;
-
-		case 2://右侧 晚上 1SP
-        {
-            //350	1	Low byte	W/R	(Night)Unoccupied  setpoin.
-            //354	2	Full	W/R	(Night)Unoccupied heating setpoint
-            //355	2	Full	W/R	(Night)Unoccupied cooling setpoint
-            int nRangeMin	=(short)product_register_value[MODBUS_MIN_SETPOINT];
-            int nRangeMax	=(short)product_register_value[MODBUS_MAX_SETPOINT];
-
-
-            vector<int>  szPos(3);
-            m_pNightSingleSP->GetRange(nMin, nMax);
-            int nNum = m_pNightSingleSP->GetPos(szPos);
-
-            int nHeatSP = szPos[0] + nMin;
-            int nSP = szPos[1] + nMin;
-            int nCoolSP= szPos[2] + nMin;
-
-			nHeatSP = GetRoundNumber(nHeatSP);
-			nCoolSP = GetRoundNumber(nCoolSP);
-			nSP = GetRoundNumber(nSP);
-
-            int	Tstat_nSP= (short)product_register_value[MODBUS_NIGHT_SETPOINT];
-            int	Tstat_nCoolSP = (short)product_register_value[MODBUS_NIGHT_COOLING_SETPOINT];
-            int	Tstat_nHeatSP = (short)product_register_value[MODBUS_NIGHT_HEATING_SETPOINT];
-            int NightSP = Tstat_nSP;
-            if (Tstat_nSP!=nSP)
-            {
-
-                
-                if (NightSP<nRangeMin*10)  //  ||
-                {
-                    NightSP = nRangeMin*10;
-                }
-                if (nSP>nRangeMax*10)
-                {
-                    NightSP = nRangeMax*10;
-                }
-
-                int ret=write_one(g_tstat_id, MODBUS_NIGHT_SETPOINT, NightSP,5);//t6 350
-                if (ret<0)
-                {
-                    /*AfxMessageBox(_T("Write Fail!"));*/
-                    m_active_key_mouse=FALSE;
-                    InitFlexSliderBars_tstat6();
-                    return 0;
-                }
-                product_register_value[MODBUS_NIGHT_SETPOINT]=NightSP;
-				product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]=nCoolSP;
-				product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]=nHeatSP;
-
-				CString strTemp;
-				BOOL bRetSP = m_pNightSingleSP->SetPos_tstat6_3pos(nHeatSP, nSP, nCoolSP);
-				HandleSliderSetPos(bRetSP);//tstat6
-
-				if (g_unint)
-				{
-					strTemp.Format(_T("%0.1f C"), (float)nSP/10.0);
-				}
-				else
-				{
-					strTemp.Format(_T("%0.1f F"), (float)nSP/10.0);
-				}
-
-				m_nightpotEdit.FieldText(RGB(0, 0, 0), strTemp);
-
-				if (g_unint)
-				{
-					strTemp.Format(_T("%0.1f C"), ((float)nCoolSP) / 10.0);
-				}
-				else
-				{
-					strTemp.Format(_T("%0.1f F"), ((float)nCoolSP) / 10.0);
-				}
-
-				m_nightInfoEdit.FieldText(strTemp);
-				//m_nightInfoEdit.SetNumberDefaultTex();
-				if (g_unint)
-				{
-					strTemp.Format(_T("%0.1f C"), ((float)nHeatSP) / 10.0);
-				}
-				else
-				{
-					strTemp.Format(_T("%0.1f F"), ((float)nHeatSP) / 10.0);
-				}
-
-				m_nightHeatInfoEdit.FieldText(strTemp);
-
-
-
-            }
-
-
-
-
-        }
-        break;
-        
-		case 3:
-            //左侧 白天 2SP
-        {
-            // 		345	1	Low byte	W/R	(Day)Occupied   setpoint
-            // 		346	1	Low byte	W/R	(Day)Occupied cooling setpoint dead band  , offset from setpoint for cooling to begin.  Units are 0.1 deg.
-            // 		347	1	Low byte	W/R	(Day)Occupied heating setpoint dead band  , offset from setpoint for heating to begin.  Units are 0.1 deg.
-            vector<int>  szPos(2);
-            m_pDayTwoSP->GetRange(nMin, nMax);
-            int nNum = m_pDayTwoSP->GetPos(szPos);
-            int nHeatSP = szPos[0] + nMin;
-            int nCoolSP = szPos[1] + nMin;
-            nSP= (nHeatSP+nCoolSP)/2;
-			nHeatSP = GetRoundNumber(nHeatSP);
-			nCoolSP = GetRoundNumber(nCoolSP);
-			nSP = GetRoundNumber(nSP);
-            nHDB=nSP-nHeatSP;
-            nCDB=nCoolSP-nSP;
-			int	Tstat_nSP = (short)product_register_value[MODBUS_DAY_SETPOINT];
-			int	Tstat_nCoolSP = (short)product_register_value[MODBUS_DAY_COOLING_SETPOINT];
-			int	Tstat_nHeatSP = (short)product_register_value[MODBUS_DAY_HEATING_SETPOINT];
-
-			if (nHeatSP==nCoolSP)
-			{
-				if (Tstat_nCoolSP != nCoolSP)
-				{
-					nCDB = Increment;
-					nHDB = 0;
-				}
-				if (Tstat_nHeatSP != nHeatSP)
-				{
-					nHDB = Increment;
-					nCDB = 0;
-				}
-			}
-			
-			nHeatSP = nSP - nHDB;
-			nCoolSP = nSP + nCDB;
-            if ((nHDB<0&&nHDB>254)&&(nCDB<0&&nCDB>254))
-            {
-                /*AfxMessageBox(_T("Deadband>254 or Deadband <0"));*/
-                InitFlexSliderBars_tstat6();
-                return 0;
-            }
-          
-            BeginWaitCursor();
- 
-                
-			   int ret = write_one(g_tstat_id, MODBUS_DAY_SETPOINT, nSP, 5);//345 T6
-                   ret=  write_one(g_tstat_id, MODBUS_DAY_HEATING_DEADBAND,nHDB,5);//t6 349;
-				   ret = write_one(g_tstat_id, MODBUS_DAY_COOLING_DEADBAND, nCDB, 5);//t6 348;
-                if (ret<0)
-                {
-                    InitFlexSliderBars_tstat6();
-                    m_active_key_mouse=FALSE;
-                    return 0;
-                }
-                product_register_value[MODBUS_DAY_HEATING_DEADBAND]=nHDB;
-				product_register_value[MODBUS_DAY_SETPOINT] = nSP;
-				product_register_value[MODBUS_DAY_COOLING_DEADBAND] = nCDB;
-
-        
-
-          if (nCoolSP >= DayMax*10||nHeatSP<=DayMin*10)
-          {
-			  InitFlexSliderBars_tstat6();
-          }
-		  else
-		  {
-			  CString strTemp;
-			  if (g_unint)
-			  {
-				  strTemp.Format(_T("%0.1f C"), ((float)nCoolSP / 10.0));
-			  }
-			  else
-			  {
-				  strTemp.Format(_T("%0.1f F"), ((float)nCoolSP / 10.0));
-			  }
-
-			  m_DayCoolEdit.FieldText(strTemp);
-			  //m_DayCoolEdit.SetNumberDefaultTex();
-			  if (g_unint)
-			  {
-				  strTemp.Format(_T("%0.1f C"), ((float)nHeatSP / 10.0));
-			  }
-			  else
-			  {
-				  strTemp.Format(_T("%0.1f F"), ((float)nHeatSP / 10.0));
-			  }
-
-
-			  m_DayHeatEdit.FieldText(strTemp);
-
-			  m_pDayTwoSP->SetPos_tstat6_2pos(nHeatSP, nSP, nCoolSP);
-		  }
-
-		
-            EndWaitCursor();
-
-        }
-        break;
-        
-		case 4://左侧 白天 1SP
-        {
-
-            //348	2	Full	W/R	(Day)Occupied  cooling setpoint (day cooling setpoint)
-            //349	2	Full	W/R	(Day)Occupied  heating setpoint (day heating setpoint)
-            int nRangeMin	=(short)product_register_value[MODBUS_MIN_SETPOINT];
-            int nRangeMax	=(short)product_register_value[MODBUS_MAX_SETPOINT];
-            vector<int>  szPos(3);
-            m_pDaySingleSP->GetRange(nMin, nMax);
-            int nNum = m_pDaySingleSP->GetPos(szPos);
-
-            int nHeatSP = szPos[0] + nMin;//最小
-            int nSP = szPos[1] + nMin;
-            int  nCoolSP= szPos[2] + nMin;//最大
-			nHeatSP = GetRoundNumber(nHeatSP);
-			nCoolSP = GetRoundNumber(nCoolSP);
-			nSP = GetRoundNumber(nSP);
-
-            int	Tstat_nSP= (short)product_register_value[MODBUS_DAY_SETPOINT];
-            int	Tstat_nCoolSP = (short)product_register_value[MODBUS_DAY_COOLING_SETPOINT];
-            int	Tstat_nHeatSP = (short)product_register_value[MODBUS_DAY_HEATING_SETPOINT];
-            int DaySP = Tstat_nSP;
-            if (Tstat_nSP!=nSP)
-            {
-
-                
-                if (DaySP<nRangeMin*10) // ||
-                {
-                    DaySP = nRangeMin*10;
-                }
-                if (DaySP>nRangeMax*10)
-                {
-                    DaySP = nRangeMax*10;
-                }
-                //nSP=Round_SetPoint_Max(nSP);
-                int ret= write_one(g_tstat_id, MODBUS_DAY_SETPOINT,DaySP ,5);//345 T6
-                if (ret<0)
-                {
-                    /*AfxMessageBox(_T("Write Fail!"));*/
-                    m_active_key_mouse=FALSE;
-                    InitFlexSliderBars_tstat6();
-                    return 0;
-                }
-                product_register_value[MODBUS_DAY_SETPOINT]=DaySP;
-
-				product_register_value[MODBUS_DAY_COOLING_SETPOINT]=nCoolSP;
-				product_register_value[MODBUS_DAY_HEATING_SETPOINT]=nHeatSP;
-
-				BOOL bRetSP = m_pDaySingleSP->SetPos_tstat6_3pos(nHeatSP, nSP, nCoolSP);//tstat6
-
-				HandleSliderSetPos(bRetSP);//tstat6
-				CString strTemp;
-				if (g_unint)
-				{
-					//strTemp.Format(_T("%d C"), nHeatSP);
-					strTemp.Format(_T("%0.1f C"), (float)nSP/10.0);
-				}
-				else
-				{
-
-					strTemp.Format(_T("%0.1f F"), (float)nSP/10.0);
-				}
-				m_dayInfoEdit.FieldText(RGB(0, 0, 0), strTemp);
-
-
-				if (g_unint)
-				{
-					strTemp.Format(_T("%0.1f C"), ((float)nCoolSP / 10.0));
-				}
-				else
-				{
-					strTemp.Format(_T("%0.1f F"), ((float)nCoolSP / 10.0));
-				}
-				m_DayCoolEdit.FieldText(strTemp);
-			 
-				if (g_unint)
-				{
-					strTemp.Format(_T("%0.1f C"), ((float)nHeatSP / 10.0));
-				}
-				else
-				{
-					strTemp.Format(_T("%0.1f F"), ((float)nHeatSP / 10.0));
-				}
-				m_DayHeatEdit.FieldText(strTemp);
-
-
-
-
-
-                break;
-            }
-
-
-
-
-
-
-
-        }
-
-        }
-
-        //  Sleep(1000);
-
-        m_active_key_mouse=FALSE;
-
-        FlexSP = 1;
-
-        FlexSPN = 1;
-
-
-      //  InitFlexSliderBars_tstat6();
-
-        return 1;
-    }
-    else
-    {
-        //0907
-        /*CFSBContainer* pFSW = (CFSBContainer*)(wParam);*/
-
-        int nModel = product_register_value[7];
-        if (nModel==0)
-        {
-            return 0;
-        }
-        OnFlexSlideCallBackFor5ABCD((int)wParam);// 早期型号A－H的兼容，5E version(34.1 or 35.5)
-        m_active_key_mouse=FALSE;
-        return 1;
-
-    }
-
-
-
-}
-
-//这个函数就是用来处理Slide的滑动写入的
-//Tstat6
-// LRESULT CT3000View::OnFlexSlideCallBack(WPARAM wParam, LPARAM lParam)
-// {
-//
-// 	//HWND  Hret =m_pDayTwoSP->m_hWnd;//GetSafeHwnd( );
-// 	//int rett = m_pNightTwoSP->Getflag();
-//     BOOL slider_change=FALSE;
-// 	int nMin, nMax;
-// 	int nCoolSP = 0;
-// 	int nHeatSP = 0;
-// 	int nSP =0;
-//     m_active_key_mouse=TRUE;
-// 	int nHDB=0;
-// 	int nCDB=0;
-//     int Cool_Max =0;
-//     int Heat_Max =0;
-//     m_new_deadband = 0;
-//     m_old_deadband = 0;
-// 	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
-// 	{
-//         int Increment=product_register_value[MODBUS_SETPOINT_INCREASE];
-//
-// 		switch(wParam)
-// 		{
-// 		case 1://右侧 晚上 2SP
-// 			{
-// 				//350	1	Low byte	W/R	(Night)Unoccupied  setpoin.
-// 				//352	1	Low byte	W/R	(Night)Unoccupied heating setpoint dead band , heating deadband for the night (OFF) mode. Units of 1 deg.
-// 				//353	1	Low byte	W/R	(Night)Unoccupied cooling setpoint dead band , cooling deadband for the night (OFF) mode. Units of 1 deg.
-// 				    vector<int>  szPos(2);
-// 				    m_pNightTwoSP->GetRange(nMin, nMax);
-// 				    int nNum = m_pNightTwoSP->GetPos(szPos);
-//
-//
-// 				    int nHeatSP = szPos[0] + nMin;
-// 				    int nCoolSP = szPos[1] + nMin;
-//
-//
-// 					nSP =  product_register_value[MODBUS_NIGHT_SETPOINT];
-//                     Cool_Max = nMax-nSP;
-//                     Heat_Max = nSP - nMin;
-// 					if (nSP-nHeatSP < Increment)
-// 					{
-//                        nHeatSP = nSP - Increment;
-// 					}
-// 					if (nCoolSP-nSP <Increment)
-// 					{
-// 						nCoolSP = nSP + Increment;
-// 					}
-//
-//                     if (nSP-nHeatSP >=Heat_Max)
-//                     {
-//                         nHeatSP=nSP-Heat_Max;
-//                     }
-//
-//                     if (nCoolSP-nSP>=Cool_Max)
-//                     {
-//                         nCoolSP=nSP+Cool_Max;
-//                     }
-// 					nHDB=nSP-nHeatSP;
-// 					nCDB=nCoolSP-nSP;
-//
-// 			        if ((nHDB<0&&nHDB>254)&&(nCDB<0&&nCDB>254))
-// 			        {
-//
-// 						InitFlexSliderBars_tstat6();
-// 						m_active_key_mouse=FALSE;
-// 						return 0;
-// 			        }
-//
-// 					int	Tstat_nSP= (short)product_register_value[MODBUS_NIGHT_SETPOINT];
-// 					int	Tstat_nCoolSP = (short)product_register_value[MODBUS_NIGHT_COOLING_SETPOINT];
-// 					int	Tstat_nHeatSP = (short)product_register_value[MODBUS_NIGHT_HEATING_SETPOINT];
-//
-// 					int ret=0;
-//
-//
-// 					BeginWaitCursor();
-// 					if (nHeatSP!=Tstat_nHeatSP)
-// 					{
-//                         slider_change = TRUE;
-//                        // nHDB=nSP-nHeatSP;
-//                         m_old_deadband = Tstat_nSP - Tstat_nHeatSP;
-// 						 nHDB = m_old_deadband;
-//                         if (nHeatSP>Tstat_nHeatSP)
-// 						{
-// 							 //nHDB=Round_SetPoint_Min(nHDB);
-//                              nHDB-=Increment;
-// 						}
-// 						else
-// 						{
-// 							// nHDB=Round_SetPoint_Max(nHDB);
-//                               nHDB+=Increment;
-// 						}
-//
-//                         if (nHDB<Increment)
-// 						{
-//                             nHDB = Increment;
-// 						}
-//                         if (nHDB>254)
-//                         {
-//                             nHDB = 254;
-//                         }
-//
-//  						int ret=0;
-//  						ret =write_one(g_tstat_id, MODBUS_NIGHT_HEATING_DEADBAND,nHDB,5);//t6 354
-//  						if (ret<0)
-//  						{
-//  							/*AfxMessageBox(_T("Write Fail!"));*/
-//  							m_active_key_mouse=FALSE;
-//                             InitFlexSliderBars_tstat6();
-//  							return 0;
-//  						}
-//  						//product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]=nHDB;
-//                         m_new_deadband = nHDB;
-//                         m_slider_Type = 1;
-//                         SetTimer(10,500,NULL);
-//
-// //  Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_HEATING_DEADBAND,nHDB,
-// // 	product_register_value[MODBUS_NIGHT_HEATING_DEADBAND],this->m_hWnd,0,_T(""));
-//
-// 					}
-//
-//                     if (nCoolSP!=Tstat_nCoolSP)
-// 					{         slider_change = TRUE;
-// 						  //nCDB=nCoolSP-nSP;
-//                           m_old_deadband = Tstat_nCoolSP - Tstat_nSP;
-//                           nCDB = m_old_deadband;
-// 						if (nCoolSP>Tstat_nCoolSP)
-// 						{
-// 							//nCDB=Round_SetPoint_Max(nCDB);
-//                             nCDB+=Increment;
-// 						}
-// 						else
-// 						{
-// 							//nCDB=Round_SetPoint_Min(nCDB);
-//                              nCDB-=Increment;
-// 						}
-//
-//                           if (nCDB<Increment)
-//                           {
-//                             nCDB=Increment;
-//                           }
-//                           if (nCDB>=254)
-//                           {
-//                             nCDB=254;
-//                           }
-//
-// 						//if ((nCDB<0&&nCDB>254))
-// 						//{
-// 						//	/*AfxMessageBox(_T("Deadband>254 or Deadband <1"));*/
-// 						//	InitFlexSliderBars_tstat6();
-// 						//	m_active_key_mouse=FALSE;
-// 						//	return 0;
-// 						//}
-// // 						 					   Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_COOLING_DEADBAND,nCDB,
-// // 						 						   product_register_value[MODBUS_NIGHT_COOLING_DEADBAND],this->m_hWnd,0,_T(""));
-//
-//  						int ret=0;
-//  						ret =write_one(g_tstat_id, MODBUS_NIGHT_COOLING_DEADBAND,nCDB,5);//t6 355
-//  						if (ret<0)
-//  						{
-//  							/*AfxMessageBox(_T("Write Fail!"));*/
-//  							m_active_key_mouse=FALSE;
-//                             InitFlexSliderBars_tstat6();
-//  							return 0;
-//  						}
-//                         m_new_deadband=nCDB;
-//                          m_slider_Type = 2;
-//                          SetTimer(10,500,NULL);
-//  						//product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]=nCDB;
-// 					}
-//
-//
-// 					EndWaitCursor();
-//
-//
-//
-//
-//                break;
-//
-// 			}
-// 		case 2://右侧 晚上 1SP
-// 			{
-// 				//350	1	Low byte	W/R	(Night)Unoccupied  setpoin.
-// 				//354	2	Full	W/R	(Night)Unoccupied heating setpoint
-// 				//355	2	Full	W/R	(Night)Unoccupied cooling setpoint
-// 				int nRangeMin	=(short)product_register_value[MODBUS_MIN_SETPOINT];
-// 				int nRangeMax	=(short)product_register_value[MODBUS_MAX_SETPOINT];
-//
-//
-// 				vector<int>  szPos(3);
-// 				m_pNightSingleSP->GetRange(nMin, nMax);
-// 				int nNum = m_pNightSingleSP->GetPos(szPos);
-//
-// 				int nHeatSP = szPos[0] + nMin;
-// 				int nSP = szPos[1] + nMin;
-// 				int nCoolSP= szPos[2] + nMin;
-//
-// 				int	Tstat_nSP= (short)product_register_value[MODBUS_NIGHT_SETPOINT];
-// 				int	Tstat_nCoolSP = (short)product_register_value[MODBUS_NIGHT_COOLING_SETPOINT];
-// 				int	Tstat_nHeatSP = (short)product_register_value[MODBUS_NIGHT_HEATING_SETPOINT];
-//                 int NightSP = Tstat_nSP;
-//                 m_old_deadband =  Tstat_nSP;
-// 				if (Tstat_nSP!=nSP)
-// 				{     slider_change = TRUE;
-// 					if (nSP>Tstat_nSP)
-// 					{
-// 						//nSP=Round_SetPoint_Max(nSP);
-//                          NightSP+=Increment;
-// 					}
-// 					else
-// 					{
-// 						//nSP=Round_SetPoint_Min(nSP);
-//                          NightSP-=Increment;
-// 					}
-//                     if (nSP<nRangeMin*10)  //  ||
-//                     {
-//                         nSP = nRangeMin*10;
-//                     }
-//                     if (nSP>nRangeMax*10)
-//                     {
-//                         nSP = nRangeMax*10;
-//                     }
-//
-//  					int ret=write_one(g_tstat_id, MODBUS_NIGHT_SETPOINT, nSP,5);//t6 350
-//   					if (ret<0)
-//   					{
-//   						/*AfxMessageBox(_T("Write Fail!"));*/
-//   						m_active_key_mouse=FALSE;
-//                         InitFlexSliderBars_tstat6();
-//   						return 0;
-//   					}
-//  					//product_register_value[MODBUS_NIGHT_SETPOINT]=NightSP;
-//                     m_slider_Type = 3;
-//                     m_new_deadband =nSP;
-//                     SetTimer(10,500,NULL);
-// //  					Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_SETPOINT,nSP,
-// //  						product_register_value[MODBUS_NIGHT_SETPOINT],this->m_hWnd,0,_T(""));
-//
-// 				}
-//
-//
-//
-//
-// 			}
-// 			break;
-// 		case 3:
-// 		//左侧 白天 2SP
-// 			{
-// 				// 		345	1	Low byte	W/R	(Day)Occupied   setpoint
-// 				// 		346	1	Low byte	W/R	(Day)Occupied cooling setpoint dead band  , offset from setpoint for cooling to begin.  Units are 0.1 deg.
-// 				// 		347	1	Low byte	W/R	(Day)Occupied heating setpoint dead band  , offset from setpoint for heating to begin.  Units are 0.1 deg.
-// 				vector<int>  szPos(2);
-// 				m_pDayTwoSP->GetRange(nMin, nMax);
-// 				int nNum = m_pDayTwoSP->GetPos(szPos);
-// 				int nHeatSP = szPos[0] + nMin;
-// 				int nCoolSP = szPos[1] + nMin;
-//
-//                     nSP= product_register_value[MODBUS_DAY_SETPOINT];
-//
-//                     Cool_Max = nMax-nSP;
-//                     Heat_Max = nSP - nMin;
-//
-//                     if (nSP-nHeatSP<Increment)
-//                     {
-//                         nHeatSP = nSP - Increment;
-//
-//                     }
-//                     if (nCoolSP-nSP<Increment)
-//                     {
-//                         nCoolSP = nSP + Increment;
-//                     }
-//
-//                     if (nSP-nHeatSP >=Heat_Max)
-//                     {
-//                         nHeatSP=nSP-Heat_Max;
-//                     }
-//
-//                     if (nCoolSP-nSP>=Cool_Max)
-//                     {
-//                         nCoolSP=nSP+Cool_Max;
-//                     }
-//
-// 					nHDB=nSP-nHeatSP;
-// 					nCDB=nCoolSP-nSP;
-// 					if ((nHDB<0&&nHDB>254)&&(nCDB<0&&nCDB>254))
-// 					{
-// 						/*AfxMessageBox(_T("Deadband>254 or Deadband <0"));*/
-// 						InitFlexSliderBars_tstat6();
-// 						return 0;
-// 					}
-// 					int	Tstat_nSP= (short)product_register_value[MODBUS_DAY_SETPOINT];
-// 					int	Tstat_nCoolSP = (short)product_register_value[MODBUS_DAY_COOLING_SETPOINT];
-// 					int	Tstat_nHeatSP = (short)product_register_value[MODBUS_DAY_HEATING_SETPOINT];
-// 					BeginWaitCursor();
-//
-// 					if (nHeatSP!=Tstat_nHeatSP)
-// 				    {        slider_change = TRUE;
-// 						//nHDB=nSP-nHeatSP;
-//                         m_old_deadband=Tstat_nSP - Tstat_nHeatSP;
-//                         nHDB = m_old_deadband;
-// 						if (nHeatSP>Tstat_nHeatSP)
-// 						{
-// 							//nHDB=Round_SetPoint_Min(nHDB);
-//                             nHDB-=Increment;
-// 						}
-// 						else
-// 						{
-// 							//nHDB=Round_SetPoint_Max(nHDB);
-//                              nHDB+=Increment;
-// 						}
-//                         if (nHDB<Increment)
-//                         {
-//                             nHDB=Increment;
-//                         }
-//                         if (nHDB>=254)
-//                         {
-//                             nHDB=254;
-//                         }
-// 						//if (nHDB<1&&nHDB>254)
-// 						//{
-// 						//	/*AfxMessageBox(_T("Deadband>254 or Deadband <1"));*/
-// 						//	InitFlexSliderBars_tstat6();
-// 						//	m_active_key_mouse=FALSE;
-// 						//	return 0;
-// 						//}
-//
-//  						int ret=  write_one(g_tstat_id, MODBUS_DAY_HEATING_DEADBAND,nHDB,5);//t6 349;
-//  						if (ret<0)
-//  						{
-//  							 InitFlexSliderBars_tstat6();
-//  							m_active_key_mouse=FALSE;
-//  							return 0;
-//  						}
-//                         m_new_deadband = nHDB;
-//                          m_slider_Type = 4;
-//                          SetTimer(10,500,NULL);
-//  						//product_register_value[MODBUS_DAY_HEATING_DEADBAND]=nHDB;
-//
-// 				    }
-//
-// 					if (nCoolSP!=Tstat_nCoolSP)
-// 					{         slider_change = TRUE;
-// 						   //nHDB=nSP-nHeatSP;
-// 							//nCDB=nCoolSP-nSP;
-//                             m_old_deadband= Tstat_nCoolSP - Tstat_nSP;
-//                             nCDB =  m_old_deadband;
-// 							if (nCoolSP>Tstat_nCoolSP)
-// 							{
-// 								//nCDB=Round_SetPoint_Max(nCDB);
-//                                  nCDB += Increment;
-// 							}
-// 							else
-// 							{
-// 								//nCDB=Round_SetPoint_Min(nCDB);
-//                                  nCDB -= Increment;
-// 							}
-//                             if (nCDB<Increment)
-//                             {
-//                                 nCDB=Increment;
-//                             }
-//                             if (nCDB>=254)
-//                             {
-//                                 nCDB=254;
-//                             }
-// 							//if (nCDB<0&&nCDB>254)
-// 							//{
-// 							///*	AfxMessageBox(_T("Deadband>254 or Deadband <1"));*/
-// 							//	InitFlexSliderBars_tstat6();
-// 							//	m_active_key_mouse=FALSE;
-// 							//	return 0;
-// 							//}
-//
-//  						 	int ret=write_one(g_tstat_id, MODBUS_DAY_COOLING_DEADBAND,nCDB,5);//t6 348;
-//  						 		if (ret<0){
-//
-//                                         m_active_key_mouse=FALSE;
-//  						 				return 0;
-//
-//  						 				}
-//                                          m_slider_Type = 5;
-//                                         m_new_deadband = nCDB;
-//                                         SetTimer(10,500,NULL);
-//  										//product_register_value[MODBUS_DAY_COOLING_DEADBAND]=nCDB;
-//
-//
-// 					}
-//
-//
-// 					EndWaitCursor();
-//
-// 				}
-//
-// 				break;
-// 		case 4://左侧 白天 1SP
-// 			{
-//
-// 				//348	2	Full	W/R	(Day)Occupied  cooling setpoint (day cooling setpoint)
-// 				//349	2	Full	W/R	(Day)Occupied  heating setpoint (day heating setpoint)
-// 				int nRangeMin	=(short)product_register_value[MODBUS_MIN_SETPOINT];
-// 				int nRangeMax	=(short)product_register_value[MODBUS_MAX_SETPOINT];
-// 				vector<int>  szPos(3);
-// 				m_pDaySingleSP->GetRange(nMin, nMax);
-// 				int nNum = m_pDaySingleSP->GetPos(szPos);
-//
-// 				int nHeatSP = szPos[0] + nMin;//最小
-// 				int nSP = szPos[1] + nMin;
-// 				int  nCoolSP= szPos[2] + nMin;//最大
-//
-//
-// 				int	Tstat_nSP= (short)product_register_value[MODBUS_DAY_SETPOINT];
-// 				int	Tstat_nCoolSP = (short)product_register_value[MODBUS_DAY_COOLING_SETPOINT];
-// 				int	Tstat_nHeatSP = (short)product_register_value[MODBUS_DAY_HEATING_SETPOINT];
-// 		         int DaySP = nSP;
-// 				if (Tstat_nSP!=nSP)
-// 				{    slider_change = TRUE;
-//
-// 					if (nSP>Tstat_nSP)
-// 					{
-// 						//nSP=Round_SetPoint_Max(nSP);
-//                         DaySP+=Increment;
-// 					}
-// 					else
-// 					{
-// 						//nSP=Round_SetPoint_Min(nSP);
-//                        DaySP-=Increment;
-// 					}
-//                     if (DaySP<nRangeMin*10) // ||
-//                     {
-//                         DaySP = nRangeMin*10;
-//                     }
-//                     if (DaySP>nRangeMax*10)
-//                     {
-//                         DaySP = nRangeMax*10;
-//                     }
-// 					//nSP=Round_SetPoint_Max(nSP);
-//   					int ret= write_one(g_tstat_id, MODBUS_DAY_SETPOINT,DaySP ,5);//345 T6
-//   					if (ret<0)
-//   					{
-//   						/*AfxMessageBox(_T("Write Fail!"));*/
-//   						m_active_key_mouse=FALSE;
-//                         InitFlexSliderBars_tstat6();
-//   						return 0;
-//   					}
-//
-//  					//product_register_value[MODBUS_DAY_SETPOINT]=DaySP;
-//                     m_new_deadband = DaySP;
-//                       m_slider_Type = 6;
-//                       SetTimer(10,500,NULL);
-// 					break;
-// 				}
-//
-//
-//
-//
-//
-//
-//
-// 			}
-//
-// 		}
-//
-//       //  Sleep(1000);
-//
-//         if ( !slider_change )
-//         {
-//             m_active_key_mouse=FALSE;
-//
-//             FlexSP = 1;
-//
-//             FlexSPN = 1;
-//
-//
-//             SetFlexSliderBars_tstat6();
-//         }
-//
-//
-//       return 1;
-//     }
-//    else{
-//     //0907
-//     /*CFSBContainer* pFSW = (CFSBContainer*)(wParam);*/
-//
-//     int nModel = product_register_value[7];
-// 	if (nModel==0)
-// 	{
-// 		return 0;
-// 	}
-//     OnFlexSlideCallBackFor5ABCD((int)wParam);// 早期型号A－H的兼容，5E version(34.1 or 35.5)
-// 	m_active_key_mouse=FALSE;
-//     return 1;
-//
-//  }
-//
-//
-//
-// }
-
-// 这是5E以及更早的产品的兼容
-// void CT3000View::OnFlexSlideCallBackFor5E()
-// {
-// 	///*
-// 	BeginWaitCursor();
-//
-// 	int nMin, nMax;
-// 	CString strTemp;
-// 	int min=product_register_value[132];
-// 	int max=product_register_value[131];
-//
-// 	int m_hotel_or_office=product_register_value[125];///////hotel or office
-// 	m_hotel_or_office=1;
-// 	if (m_hotel_or_office == 0) // office
-// 	{
-// 		vector<int>  szPos(3);
-// 		m_pNightSingleSP->GetRange(nMin, nMax);
-// 		int nNum = m_pNightSingleSP->GetPos(szPos);
-// 		int nHeatSP = szPos[0] + nMin;
-// 		int nSP = szPos[1] + nMin;
-// 		int nCoolSP = szPos[2] + nMin;
-//
-// 		int nStart = GetTickCount();
-// 		write_one(g_tstat_id, 135, nSP);
-//
-// 		int nEnd = GetTickCount();
-// 		write_one(g_tstat_id, 183, nCoolSP);
-// 		write_one(g_tstat_id, 182, nHeatSP);
-//
-//
-// 		CString str;
-// 		str.Format(_T("Time1 elapsed : %d \n"), nEnd-nStart);
-// 		TRACE(str);
-// 	}
-// 	else  // hotel
-// 	{
-// 		vector<int>  szPos(3);
-// 		m_pNightSingleSP->GetRange(nMin, nMax);
-// 		int nNum = m_pNightSingleSP->GetPos(szPos);
-// 		int nHeatSP = szPos[0] + nMin;
-// 		int nSP = szPos[1] + nMin;
-// 		int nCoolSP = szPos[2] + nMin;
-// 		/*write_one(g_tstat_id, 135, nSP);
-// 		write_one(g_tstat_id, 124, nCoolSP - nSP);
-// 		write_one(g_tstat_id, 123, nSP - nHeatSP);*/
-//
-// 	}
-//
-//
-//
-// 	InitSliderBars2();
-//
-//
-//
-// 	EndWaitCursor();
-// 	//*/
-// }
-
-// 除了5E以外的所有型号
-
-
-
-void CT3000View::OnFlexSlideCallBackFor5ABCD( int response )
-{
-
-    // 目前实现的是以Runar5E，ver ＝34.1 and ver 35.5 为样本.
-    //0907以下
-    /*    BeginWaitCursor();*/
-
-    int nMin, nMax;
-
-    //  CString strTemp;
-    //  int min=(short)product_register_value[MODBUS_MIN_SETPOINT];
-    //  int max=(short)product_register_value[MODBUS_MAX_SETPOINT];
-
-    //  int m_hotel_or_office=0;
-    //  short nOccupied = product_register_value[184];  // Day setpoint option
-    //  BOOL bOccupied = nOccupied & 0x0001;
-
-
-    //
-    //
-
-    //int nOfficeSelReg=MODBUS_APPLICATION;
-    //if (bOccupied)
-    //{
-    // if((product_register_value[7]==PM_TSTAT5E && m_fFirmwareVersion >= 35.4)||(product_register_value[7]==PM_TSTATRUNAR))
-    // {
-    //	 nOfficeSelReg = MODBUS_DAYSETPOINT_OPTION;
-    // }
-    //}
-    //else
-    //{
-    // nOfficeSelReg = MODBUS_APPLICATION;
-    //}
-    // m_hotel_or_office=product_register_value[nOfficeSelReg];
-    int nSP,dSP;
-    nSP=dSP=0;
-    int nCoolSP=0;
-    int nHeatSP=0;
-    int nCoolDB=0;
-    int nHeatDB=0;
-
-    int dCoolSP=0;
-    int dHeatSP=0;
-    int dCoolDB=0;
-    int dHeatDB=0;
-
-    int m_hotel_or_office=product_register_value[MODBUS_APPLICATION];
-    if (product_type==T3000_5ABCDFG_LED_ADDRESS)
-    {
-        dSP=product_register_value[MODBUS_COOLING_SETPOINT];
-        dCoolDB=product_register_value[MODBUS_COOLING_DEADBAND]/10;//119
-        dHeatDB=product_register_value[MODBUS_HEATING_DEADBAND]/10;//heat//120
-        dCoolSP=dSP+dCoolDB;
-        dHeatSP=dSP-dHeatDB;
-        if (m_hotel_or_office==0)// office
-        {
-            nSP=0;
-            nCoolSP=product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]/10;
-            nHeatSP=product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10;
-            nSP = (short)(nCoolSP+nHeatSP)/2 ;
-            nCoolDB = nCoolSP - nSP;
-            nHeatDB = nSP - nHeatSP;
-        }
-        else//Hotel
-        {
-            nSP=dSP;
-
-            nCoolDB = (short)product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]/10;//(max-(itemp-min));
-            nHeatDB = (short)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10;//(max-(itemp-min));
-            nCoolSP = nSP + nCoolDB;
-            nHeatSP = nSP - nHeatDB;
-        }
-
-    }
-
-
-    if (product_type==T3000_5EH_LCD_ADDRESS)
-    {
-
-
-        if (m_hotel_or_office==0)// office
-        {
-            //Setpoint = ( NEW_EEP_CoolingSp + EEP_HeatingSp) / 2
-            //cooling_db = NEW_EEP_CoolingSp - Setpoint;
-            //heating_db = Setpoint - EEP_HeatingSp;
-
-            dCoolSP=product_register_value[MODBUS_NEW_COOLING_SETPOINT]/10;
-            dHeatSP=product_register_value[MODBUS_HEATING_SETPOINT]/10;
-            dSP=(dCoolSP+dHeatSP)/2;
-            dCoolDB=dCoolSP-dSP;
-            dHeatDB=dSP-dHeatSP;
-
-            nSP=0;
-            nCoolSP=product_register_value[MODBUS_NIGHT_COOLING_SETPOINT];
-            nHeatSP=product_register_value[MODBUS_NIGHT_HEATING_SETPOINT];
-            nSP = (short)(nCoolSP+nHeatSP)/2 ;
-            nCoolDB = nCoolSP - nSP;
-            nHeatDB = nSP - nHeatSP;
-        }
-        else//Hotel
-        {
-            // Hotel mode:
-            //Setpoint = EEP_CoolingSp
-            // cooling_db = EEP_CoolDeadband ;
-            //heating_db = EEP_HeatDeadband ;
-
-
-
-            dSP=product_register_value[MODBUS_COOLING_SETPOINT]/10;
-
-            dCoolDB=product_register_value[MODBUS_COOLING_DEADBAND]/10;//119
-
-            dHeatDB=product_register_value[MODBUS_HEATING_DEADBAND]/10;//heat//120
-
-            dCoolSP=dSP+dCoolDB;
-            dHeatSP=dSP-dHeatDB;
-
-            nSP=product_register_value[MODBUS_NIGHT_COOLING_SETPOINT];
-
-            nCoolDB = (short)product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]/10;//(max-(itemp-min));
-            nHeatDB = (short)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10;//(max-(itemp-min));
-
-            nCoolSP = nSP + nCoolDB;
-            nHeatSP = nSP - nHeatDB;
-        }
-
-    }
-
-    //day
-    if (response == 3 ) // office - occupied : 2SP
-    {
-        vector<int>  szPos(3);
-        m_pDayTwoSP->GetRange(nMin, nMax);
-        int nNum = m_pDayTwoSP->GetPos(szPos);
-
-        int day_slider_HeatSP = (szPos[0] + nMin)/10;
-
-        int day_slider_CoolSP = (szPos[1] + nMin)/10;
-
-
-
-        if ((day_slider_CoolSP - dSP<0)||(dSP - day_slider_HeatSP<0))
-        {
-            //AfxMessageBox(_T("Error:>=Setpoint OR <=Setpoint"));
-            CString strTemp;
-            if (day_slider_CoolSP<dSP)
-            {
-                strTemp.Format(_T("Day Cooling Setpoint(%d) should be more than Day Setpoint(%d)"),day_slider_CoolSP,dSP);
-
-            }
-            else
-            {
-                strTemp.Format(_T("Day Heating Setpoint(%d) should be less than Day Setpoint(%d)"),day_slider_HeatSP,dSP);
-            }
-            AfxMessageBox(strTemp);
-            InitSliderBars2();
-            return ;
-        }
-
-        int ret1= write_one(g_tstat_id, MODBUS_COOLING_DEADBAND, (nCoolSP - nSP)*10);
-        int ret2=write_one(g_tstat_id, MODBUS_HEATING_DEADBAND, (nSP - nHeatSP)*10);
-        if (ret1>0&&ret2>0)
-        {
-            product_register_value[MODBUS_COOLING_DEADBAND]=(nCoolSP - nSP)*10;
-            product_register_value[MODBUS_HEATING_DEADBAND]=(nSP - nHeatSP)*10;
-
-        }
-        else
-        {
-            AfxMessageBox(_T("Write Fail,Try again!"));
-        }
-
-    }
-    //
-    if (response == 4)
-        // hotel - occupied  //  1SP
-    {
-        vector<int>  szPos(3);
-        m_pDaySingleSP->GetRange(nMin, nMax);
-        int nNum = m_pDaySingleSP->GetPos(szPos);
-
-        int Slider_nHeatSP = (szPos[0] + nMin)/10;
-        int Slider_nSP = (szPos[1] + nMin)/10;
-        int Slider_nCoolSP = (szPos[2] + nMin)/10;
-
-        nMax/=10;
-        nMin/=10;
-
-        if (Slider_nSP>nMax||Slider_nSP<nMin)
-        {
-            AfxMessageBox(_T("Setpoint is out of the scale"));
-            InitSliderBars2();
-            return;
-        }
-
-
-        if (Slider_nSP!=dSP)
-        {
-            int ret=write_one(g_tstat_id, MODBUS_COOLING_SETPOINT, Slider_nSP);	//135
-            if (ret>0)
-            {
-                product_register_value[MODBUS_COOLING_SETPOINT]=Slider_nSP;
-            }
-            else
-            {
-                AfxMessageBox(_T("Write Fail,Try again!"));
-                return  ;
-            }
-        }
-        else
-        {
-            if (Slider_nHeatSP!=dHeatSP)
-            {
-                int ret2=write_one(g_tstat_id, MODBUS_HEATING_DEADBAND, (Slider_nSP - Slider_nHeatSP)*10);
-                if (ret2>0)
-                {
-
-                    product_register_value[MODBUS_HEATING_DEADBAND]=(Slider_nSP - Slider_nHeatSP)*10;
-
-                }
-                else
-                {
-                    AfxMessageBox(_T("Write Fail,Try again!"));
-                    return ;
-                }
-            }
-            if (Slider_nCoolSP!=dCoolSP)
-            {
-                int ret2=write_one(g_tstat_id, MODBUS_COOLING_DEADBAND, (Slider_nSP - Slider_nHeatSP)*10);
-                if (ret2>0)
-                {
-
-                    product_register_value[MODBUS_COOLING_DEADBAND]=(Slider_nCoolSP - Slider_nSP)*10;
-
-                }
-                else
-                {
-                    AfxMessageBox(_T("Write Fail,Try again!"));
-                    return ;
-                }
-            }
-        }
-
-
-
-
-    }
-    //night
-    if (response == 1) // office - unoccupied
-    {
-        //2sp
-        vector<int>  szPos(3);
-        m_pNightTwoSP->GetRange(nMin, nMax);
-        int nNum = m_pNightTwoSP->GetPos(szPos);
-        int nHeatSP = (szPos[0] + nMin)/10;
-        //int nSP = szPos[1] + nMin;
-        //int nSP = product_register_value[135];//374
-        int nCoolSP = (szPos[1] + nMin)/10;
-        int nSP =(nCoolSP - nHeatSP)/2 +nHeatSP;
-
-
-        int Tstat_nCoolSP=product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]/10;
-        int Tstat_nHeatSP=product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10;
-        if (Tstat_nCoolSP!=nCoolSP)
-        {
-            int ret1= write_one(g_tstat_id, MODBUS_NIGHT_COOLING_SETPOINT, nCoolSP*10);
-            if (ret1>0)
-            {
-                product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]=nCoolSP*10;
-            }
-        }
-
-        if (Tstat_nHeatSP!= nHeatSP)
-        {
-            int ret2=  write_one(g_tstat_id, MODBUS_NIGHT_HEATING_SETPOINT, nHeatSP*10);
-            if (ret2>0)
-            {
-
-                product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]=nHeatSP*10;
-
-            }
-        }
-
-
-
-    }
-
-    if (response == 2) // hotel - unoccupied
-    {
-        //1sp
-        vector<int>  szPos(3);
-        m_pNightSingleSP->GetRange(nMin, nMax);
-        int nNum = m_pNightSingleSP->GetPos(szPos);
-        int Slider_nHeatSP = (szPos[0] + nMin)/10;
-        int Slider_nSP = (szPos[1] + nMin)/10;
-        //int nSP = product_register_value[374]/10;
-        int Slider_nCoolSP = (szPos[2] + nMin)/10;
-
-        nMin /=10;
-        nMax /=10;
-        if (Slider_nSP>nMax||Slider_nSP<nMin)
-        {
-            AfxMessageBox(_T("Setpoint is out of the scale"));
-            InitSliderBars2();
-            return  ;
-        }
-        if (nSP!=Slider_nSP)
-        {
-            int nCoolDB = Slider_nCoolSP-Slider_nSP;
-            int nHeatDB = Slider_nSP - Slider_nHeatSP;
-            int ret1 =write_one(g_tstat_id, MODBUS_COOLING_SETPOINT, Slider_nSP);
-            if (ret1>0)
-            {
-                product_register_value[MODBUS_COOLING_SETPOINT]=nSP;
-                product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]=nHeatDB*10;
-                product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]=nCoolDB*10;
-            }
-            else
-            {
-                AfxMessageBox(_T("Write Fail,Try again!"));
-                return  ;
-            }
-        }
-        else
-        {
-            if (Slider_nHeatSP!=nHeatSP)
-            {
-
-                //int ret1= write_one(g_tstat_id, MODBUS_NIGHT_COOLING_SETPOINT, nCoolSP);
-                int ret2=  write_one(g_tstat_id, MODBUS_NIGHT_HEATING_SETPOINT, Slider_nCoolSP);
-                if (ret2>0)
-                {
-                    product_register_value[MODBUS_COOLING_SETPOINT]=(Slider_nCoolSP-Slider_nHeatSP)/2 + Slider_nHeatSP;
-                    product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]=Slider_nHeatSP;
-                    product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]=Slider_nCoolSP;
-                }
-                else
-                {
-                    AfxMessageBox(_T("Write Fail,Try again!"));
-                    return  ;
-                }
-            }
-            if (Slider_nCoolSP!=nCoolSP)
-            {
-
-                //int ret1= write_one(g_tstat_id, MODBUS_NIGHT_COOLING_SETPOINT, Slider_nCoolSP);
-                int ret2=  write_one(g_tstat_id, MODBUS_NIGHT_HEATING_SETPOINT, Slider_nHeatSP);
-                if (ret2>0)
-                {
-                    product_register_value[MODBUS_COOLING_SETPOINT]=(Slider_nCoolSP-Slider_nHeatSP)/2 + Slider_nHeatSP;
-                    product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]=Slider_nHeatSP;
-                    product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]=Slider_nCoolSP;
-                }
-                else
-                {
-                    AfxMessageBox(_T("Write Fail,Try again!"));
-                    return  ;
-                }
-            }
-        }
-
-
-
-    }
-
-
-    InitSliderBars2();
-    /*    EndWaitCursor();*/
-}
 
 
 void CT3000View::InitFanSpeed()
@@ -6224,9 +4294,7 @@ void CT3000View::InitFanSpeed()
 
 	m_FanComBox.ResetContent();
 
-	if (product_register_value[7] == PM_TSTAT8
-		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
-		)
+	if (product_register_value[7] == PM_TSTAT8)
 	{
 		switch (product_register_value[MODBUS_FAN_MODE])		//122   105
 		{
@@ -6415,14 +4483,15 @@ void CT3000View::InitFlexSliderBars_tstat6()
     }
 
 
-    m_singlesliderday.SetThumbColor(RGB(96,192,0));
-    m_singlesliderday.SetSelectionColor(RGB(64, 64, 255));
-    m_singlesliderday.SetChannelColor(RGB(196, 196, 255));
+     
 
-    m_singlesliderday.SetRange((short)DayMin*10, (short)DayMax*10,TRUE);
-
-    int currenttemp=(short)DayMin*10+(short)DayMax*10-(int)product_register_value[MODBUS_TEMPRATURE_CHIP];
-    m_singlesliderday.SetPos(currenttemp);
+	m_daySlider.put_CurrentValue(((float)((short)product_register_value[MODBUS_TEMPRATURE_CHIP])) / 10.0);
+	m_nightSlider.put_CurrentValue(((float)((short)product_register_value[MODBUS_TEMPRATURE_CHIP])) / 10.0);
+	m_daySlider.put_BackgroundWidth(30);
+	m_nightSlider.put_BackgroundWidth(30);
+	int Increment = product_register_value[MODBUS_SETPOINT_INCREASE];
+	m_daySlider.put_StepValue((float)Increment/10.0);
+	m_nightSlider.put_StepValue((float)Increment / 10.0);
 
 #if 1
     if (FlexSP == 1)
@@ -6439,17 +4508,20 @@ void CT3000View::InitFlexSliderBars_tstat6()
             GetDlgItem(IDC_STATIC_MAX_DAY)->SetWindowText(strInfo);
             strInfo.Format(_T("%d"),DayMin);
             GetDlgItem(IDC_STATIC_MIN_DAY)->SetWindowText(strInfo);
-            m_pDayTwoSP->SetRange(DayMax*10,DayMin*10);
+           
 
-            BOOL bRetSP = m_pDayTwoSP->SetPos_tstat6_2pos(DayHeatingSP, DaySP,DayCoolingSP);
-            if (bRetSP)
-            {
-                CString strInfo;
-                strInfo.Format(_T("nHeatSP=%d;nSP=%d;nCoolSP=%d"),nCoolSP, nSP,nHeatSP);
-                HandleSliderSetPos(bRetSP);//tstat6
-            }
-            m_pDayTwoSP->ShowWindow(SW_NORMAL);
-            m_pDaySingleSP->ShowWindow(SW_HIDE);
+			m_daySlider.SetRange(DayMax, DayMin);
+			m_daySlider.SetZoneValues_2(dCoolSP, dSP,dHeatSP);
+			
+			m_daySlider.put_TwoSliderMode(TRUE);
+			if (g_unint)
+			{
+				m_daySlider.put_AdditionalText(L"C");
+			}
+			else
+			{
+				m_daySlider.put_AdditionalText(L"F");
+			}
             if (g_unint)
             {
                 strTemp.Format(_T("%0.1f C"),((float)((short)product_register_value[MODBUS_DAY_COOLING_SETPOINT])/10.0) );
@@ -6459,8 +4531,8 @@ void CT3000View::InitFlexSliderBars_tstat6()
                 strTemp.Format(_T("%0.1f F"),((float)((short)product_register_value[MODBUS_DAY_COOLING_SETPOINT])/10.0) );
             }
 
-            m_DayCoolEdit.FieldText(strTemp);
-            //m_DayCoolEdit.SetNumberDefaultTex();
+         
+       
             if (g_unint)
             {
                 strTemp.Format(_T("%0.1f C"),((float)((short)product_register_value[MODBUS_DAY_HEATING_SETPOINT])/10.0));
@@ -6471,8 +4543,8 @@ void CT3000View::InitFlexSliderBars_tstat6()
             }
 
 
-            m_DayHeatEdit.FieldText(strTemp);
-            //m_DayHeatEdit.SetNumberDefaultTex();
+       
+            
             m_daysetpoint = nSP;
             if (g_unint)
             {
@@ -6483,12 +4555,10 @@ void CT3000View::InitFlexSliderBars_tstat6()
                 strTemp.Format(_T("%0.1f F"),((float)((short)product_register_value[MODBUS_DAY_SETPOINT])/10.0));
             }
 
-            m_dayInfoEdit.FieldText(RGB(0,0,0),strTemp);
-            m_dayInfoEdit.ShowWindow(FALSE);
+         
             UpdateData(FALSE);
 
-            m_DayCoolStatic.SetWindowText(_T("Cooling SP"));
-            m_DayHeatStatic.SetWindowText(_T("Heating SP"));
+         
 
         }
         else  // hotel 1 SP day
@@ -6510,21 +4580,28 @@ void CT3000View::InitFlexSliderBars_tstat6()
                 DayCoolingSP = 3;
             }
 
-            m_pDaySingleSP->SetRange(DayMax*10, DayMin*10);
-
-            BOOL bRetSP = m_pDaySingleSP->SetPos_tstat6_3pos(DayHeatingSP, DaySP,DayCoolingSP);//tstat6
-
-            HandleSliderSetPos(bRetSP);//tstat6
+          
 
 
 
 
 
 
-            m_pDaySingleSP->ShowWindow(SW_NORMAL);
-            m_pDayTwoSP->ShowWindow(SW_HIDE);
+           
 
-
+			m_daySlider.SetRange(DayMax, DayMin);
+			m_daySlider.SetZoneValues_2(dCoolSP,dSP, dHeatSP);
+			 
+			m_daySlider.put_TwoSliderMode(FALSE);
+			 
+			if (g_unint)
+			{
+				m_daySlider.put_AdditionalText(L"C");
+			}
+			else
+			{
+				m_daySlider.put_AdditionalText(L"F");
+			}
 
             if (g_unint)
             {
@@ -6536,8 +4613,7 @@ void CT3000View::InitFlexSliderBars_tstat6()
 
                 strTemp.Format(_T("%0.1f F"), (float)dSP);
             }
-            m_dayInfoEdit.FieldText(RGB(0,0,0),strTemp);
-            m_dayInfoEdit.ShowWindow(TRUE);
+         
             if (g_unint)
             {
                 //strTemp.Format(_T("%d C"), nHeatSP);
@@ -6548,7 +4624,7 @@ void CT3000View::InitFlexSliderBars_tstat6()
 
                 strTemp.Format(_T("%0.1f F"), (float)dCoolSP);
             }
-            m_DayCoolEdit.FieldText(strTemp);
+            
             if (g_unint)
             {
                 //strTemp.Format(_T("%d C"), nHeatSP);
@@ -6558,9 +4634,8 @@ void CT3000View::InitFlexSliderBars_tstat6()
             {
                 strTemp.Format(_T("%0.1f F"), (float)dHeatSP);
             }
-            m_DayHeatEdit.FieldText(strTemp);
-            m_DayCoolStatic.SetWindowText(_T("Cooling SP"));
-            m_DayHeatStatic.SetWindowText(_T("Heating SP"));
+        
+           
             m_daysetpoint = dSP;
             UpdateData(FALSE);
         }
@@ -6583,18 +4658,20 @@ void CT3000View::InitFlexSliderBars_tstat6()
             strInfo.Format(_T("%d"),DayMin);
             GetDlgItem(IDC_STATIC_MIN_NIGHT)->SetWindowText(strInfo);
 
-            m_pNightTwoSP->SetRange(DayMax*10, DayMin*10);
-            BOOL bRetSP = m_pNightTwoSP->SetPos_tstat6_2pos(NightHeatingSP,NightSP,NightCoolingSP);
+            
 
 
-
-
-            HandleSliderSetPos(bRetSP);//tstat6
-            m_pNightTwoSP->ShowWindow(SW_NORMAL);
-            m_pNightSingleSP->ShowWindow(SW_HIDE);
-
-
-
+			m_nightSlider.SetRange(DayMax , DayMin );
+			m_nightSlider.SetZoneValues_2(nCoolSP,nSP, nHeatSP);
+			m_nightSlider.put_TwoSliderMode(TRUE);
+			if (g_unint)
+			{
+				m_nightSlider.put_AdditionalText(L"C");
+			}
+			else
+			{
+				m_nightSlider.put_AdditionalText(L"F");
+			}
 
 
 
@@ -6609,32 +4686,11 @@ void CT3000View::InitFlexSliderBars_tstat6()
                 strTemp.Format(_T("%0.1f F"),(float)nSP);
             }
 
-            m_nightpotEdit.FieldText(RGB(0,0,0),strTemp);
-            m_nightpotEdit.ShowWindow(FALSE);
-            if (g_unint)
-            {
-                strTemp.Format(_T("%0.1f C"),(float)nCoolSP);
-            }
-            else
-            {
-                strTemp.Format(_T("%0.1f F"),(float)nCoolSP);
-            }
-            m_nightInfoEdit.FieldText(strTemp);
-            //m_nightInfoEdit.SetNumberDefaultTex();
-            if (g_unint)
-            {
-                strTemp.Format(_T("%0.1f C"),(float)nHeatSP);
-            }
-            else
-            {
-                strTemp.Format(_T("%0.1f F"),(float)nHeatSP);
-            }
-
-            m_nightHeatInfoEdit.FieldText(strTemp);
+          
         }
         else
         {
-            //GetDlgItem(IDC_EDIT_CUR_SP)->EnableWindow(FALSE);
+             
 
             strInfo.Format(_T("%d"),DayMax);
             GetDlgItem(IDC_STATIC_MAX_NIGHT)->SetWindowText(strInfo);
@@ -6652,12 +4708,25 @@ void CT3000View::InitFlexSliderBars_tstat6()
                 NightCoolingSP = 3;
             }
 
-            m_pNightSingleSP->SetRange(DayMax*10, DayMin*10);
-            BOOL bRetSP = m_pNightSingleSP->SetPos_tstat6_3pos(NightHeatingSP,NightSP,NightCoolingSP);
-            HandleSliderSetPos(bRetSP);//tstat6
-            m_pNightSingleSP->ShowWindow(SW_NORMAL);
-            m_pNightTwoSP->ShowWindow(SW_HIDE);
+          
+
+			m_nightSlider.SetRange(DayMax, DayMin );
+			m_nightSlider.SetZoneValues_2(nCoolSP,nSP, nHeatSP);
+		 
+			m_nightSlider.put_TwoSliderMode(FALSE);
+
             m_nightpot = nSP;
+
+			if (g_unint)
+			{
+				m_nightSlider.put_AdditionalText(L"C");
+			}
+			else
+			{
+				m_nightSlider.put_AdditionalText(L"F");
+			}
+
+
             if (g_unint)
             {
                 strTemp.Format(_T("%0.1f C"),(float)nSP);
@@ -6667,41 +4736,12 @@ void CT3000View::InitFlexSliderBars_tstat6()
                 strTemp.Format(_T("%0.1f F"),(float)nSP);
             }
 
-            m_nightpotEdit.FieldText(RGB(0,0,0),strTemp);
-            m_nightpotEdit.ShowWindow(TRUE);
-            if (g_unint)
-            {
-                strTemp.Format(_T("%0.1f C"),(float)nCoolSP);
-            }
-            else
-            {
-                strTemp.Format(_T("%0.1f F"),(float)nCoolSP);
-            }
-
-            m_nightInfoEdit.FieldText(strTemp);
-            //m_nightInfoEdit.SetNumberDefaultTex();
-            if (g_unint)
-            {
-                strTemp.Format(_T("%0.1f C"),(float)nHeatSP);
-            }
-            else
-            {
-                strTemp.Format(_T("%0.1f F"),(float)nHeatSP);
-            }
-
-            m_nightHeatInfoEdit.FieldText(strTemp);
+           
         }
 
 
     }
-    if (MDAY==1&&MNIGHT==1)
-    {
-        GetDlgItem(IDC_STATIC_DATSP)->ShowWindow(FALSE);
-    }
-    else
-    {
-        GetDlgItem(IDC_STATIC_DATSP)->ShowWindow(TRUE);
-    }
+   
 #endif
 
 
@@ -6806,15 +4846,7 @@ void CT3000View::SetFlexSliderBars_tstat6()
 
     }
 
-
-    m_singlesliderday.SetThumbColor(RGB(96,192,0));
-    m_singlesliderday.SetSelectionColor(RGB(64, 64, 255));
-    m_singlesliderday.SetChannelColor(RGB(196, 196, 255));
-
-    m_singlesliderday.SetRange((short)DayMin*10, (short)DayMax*10,TRUE);
-
-    int currenttemp=(short)DayMin*10+(short)DayMax*10-(int)product_register_value[MODBUS_TEMPRATURE_CHIP];
-    m_singlesliderday.SetPos(currenttemp);
+ 
 #if 1
     if (FlexSP == 1)
     {
@@ -6830,17 +4862,12 @@ void CT3000View::SetFlexSliderBars_tstat6()
             GetDlgItem(IDC_STATIC_MAX_DAY)->SetWindowText(strInfo);
             strInfo.Format(_T("%d"),DayMin);
             GetDlgItem(IDC_STATIC_MIN_DAY)->SetWindowText(strInfo);
-            m_pDayTwoSP->SetRange(DayMax*10,DayMin*10);
+          
 
-            BOOL bRetSP = m_pDayTwoSP->SetPos_tstat6_2pos(DayHeatingSP, DaySP,DayCoolingSP);
-            if (bRetSP)
-            {
-                CString strInfo;
-                strInfo.Format(_T("nHeatSP=%d;nSP=%d;nCoolSP=%d"),nCoolSP, nSP,nHeatSP);
-                HandleSliderSetPos(bRetSP);//tstat6
-            }
-            m_pDayTwoSP->ShowWindow(SW_NORMAL);
-            m_pDaySingleSP->ShowWindow(SW_HIDE);
+			m_daySlider.SetRange(DayMax * 10, DayMin * 10);
+			m_daySlider.SetZoneValues(DayCoolingSP, DayHeatingSP);
+			m_daySlider.put_TwoSliderMode(TRUE);
+
             if (g_unint)
             {
                 strTemp.Format(_T("%0.1f C"),((float)((short)product_register_value[MODBUS_DAY_COOLING_SETPOINT])/10.0) );
@@ -6850,8 +4877,7 @@ void CT3000View::SetFlexSliderBars_tstat6()
                 strTemp.Format(_T("%0.1f F"),((float)((short)product_register_value[MODBUS_DAY_COOLING_SETPOINT])/10.0) );
             }
 
-            m_DayCoolEdit.FieldText(strTemp);
-            //m_DayCoolEdit.SetNumberDefaultTex();
+          
             if (g_unint)
             {
                 strTemp.Format(_T("%0.1f C"),((float)((short)product_register_value[MODBUS_DAY_HEATING_SETPOINT])/10.0));
@@ -6862,8 +4888,7 @@ void CT3000View::SetFlexSliderBars_tstat6()
             }
 
 
-            m_DayHeatEdit.FieldText(strTemp);
-            //m_DayHeatEdit.SetNumberDefaultTex();
+          
             m_daysetpoint = nSP;
             if (g_unint)
             {
@@ -6874,12 +4899,10 @@ void CT3000View::SetFlexSliderBars_tstat6()
                 strTemp.Format(_T("%0.1f F"),((float)((short)product_register_value[MODBUS_DAY_SETPOINT])/10.0));
             }
 
-            m_dayInfoEdit.FieldText(RGB(0,0,0),strTemp);
-            m_dayInfoEdit.ShowWindow(FALSE);
+    
             UpdateData(FALSE);
 
-            m_DayCoolStatic.SetWindowText(_T("Cooling SP"));
-            m_DayHeatStatic.SetWindowText(_T("Heating SP"));
+           
 
         }
         else  // hotel 1 SP day
@@ -6902,21 +4925,17 @@ void CT3000View::SetFlexSliderBars_tstat6()
                 DayCoolingSP = 3;
             }
 
-            m_pDaySingleSP->SetRange(DayMax*10, DayMin*10);
-
-            BOOL bRetSP = m_pDaySingleSP->SetPos_tstat6_3pos(DayHeatingSP, DaySP,DayCoolingSP);//tstat6
-
-            HandleSliderSetPos(bRetSP);//tstat6
+          
 
 
 
 
 
+         
 
-            m_pDaySingleSP->ShowWindow(SW_NORMAL);
-            m_pDayTwoSP->ShowWindow(SW_HIDE);
-
-
+			m_daySlider.SetRange(DayMax * 10, DayMin * 10);
+			m_daySlider.SetZoneValues(DayCoolingSP, DayHeatingSP);
+			m_daySlider.put_TwoSliderMode(FALSE);
 
             if (g_unint)
             {
@@ -6928,8 +4947,7 @@ void CT3000View::SetFlexSliderBars_tstat6()
 
                 strTemp.Format(_T("%0.1f F"), (float)dSP);
             }
-            m_dayInfoEdit.FieldText(RGB(0,0,0),strTemp);
-            m_dayInfoEdit.ShowWindow(TRUE);
+            
             if (g_unint)
             {
                 //strTemp.Format(_T("%d C"), nHeatSP);
@@ -6940,7 +4958,7 @@ void CT3000View::SetFlexSliderBars_tstat6()
 
                 strTemp.Format(_T("%0.1f F"), (float)dCoolSP);
             }
-            m_DayCoolEdit.FieldText(strTemp);
+        
             if (g_unint)
             {
                 //strTemp.Format(_T("%d C"), nHeatSP);
@@ -6950,9 +4968,8 @@ void CT3000View::SetFlexSliderBars_tstat6()
             {
                 strTemp.Format(_T("%0.1f F"), (float)dHeatSP);
             }
-            m_DayHeatEdit.FieldText(strTemp);
-            m_DayCoolStatic.SetWindowText(_T("Cooling SP"));
-            m_DayHeatStatic.SetWindowText(_T("Heating SP"));
+      
+          
             m_daysetpoint = dSP;
             UpdateData(FALSE);
         }
@@ -6975,20 +4992,11 @@ void CT3000View::SetFlexSliderBars_tstat6()
             strInfo.Format(_T("%d"),DayMin);
             GetDlgItem(IDC_STATIC_MIN_NIGHT)->SetWindowText(strInfo);
 
-            m_pNightTwoSP->SetRange(DayMax*10, DayMin*10);
-            BOOL bRetSP = m_pNightTwoSP->SetPos_tstat6_2pos(NightHeatingSP,NightSP,NightCoolingSP);
+           
 
-
-
-
-            HandleSliderSetPos(bRetSP);//tstat6
-            m_pNightTwoSP->ShowWindow(SW_NORMAL);
-            m_pNightSingleSP->ShowWindow(SW_HIDE);
-
-
-
-
-
+			m_nightSlider.SetRange(DayMax * 10, DayMin * 10);
+			m_nightSlider.SetZoneValues(NightCoolingSP, NightHeatingSP);
+			m_nightSlider.put_TwoSliderMode(TRUE);
 
             m_nightpot = nSP;
             //UpdateData(FALSE);
@@ -7001,32 +5009,11 @@ void CT3000View::SetFlexSliderBars_tstat6()
                 strTemp.Format(_T("%0.1f F"),(float)nSP);
             }
 
-            m_nightpotEdit.FieldText(RGB(0,0,0),strTemp);
-            m_nightpotEdit.ShowWindow(FALSE);
-            if (g_unint)
-            {
-                strTemp.Format(_T("%0.1f C"),(float)nCoolSP);
-            }
-            else
-            {
-                strTemp.Format(_T("%0.1f F"),(float)nCoolSP);
-            }
-            m_nightInfoEdit.FieldText(strTemp);
-            //m_nightInfoEdit.SetNumberDefaultTex();
-            if (g_unint)
-            {
-                strTemp.Format(_T("%0.1f C"),(float)nHeatSP);
-            }
-            else
-            {
-                strTemp.Format(_T("%0.1f F"),(float)nHeatSP);
-            }
-
-            m_nightHeatInfoEdit.FieldText(strTemp);
+         
         }
         else
         {
-            //GetDlgItem(IDC_EDIT_CUR_SP)->EnableWindow(FALSE);
+          
 
             strInfo.Format(_T("%d"),DayMax);
             GetDlgItem(IDC_STATIC_MAX_NIGHT)->SetWindowText(strInfo);
@@ -7044,11 +5031,12 @@ void CT3000View::SetFlexSliderBars_tstat6()
                 NightCoolingSP = 3;
             }
 
-            m_pNightSingleSP->SetRange(DayMax*10, DayMin*10);
-            BOOL bRetSP = m_pNightSingleSP->SetPos_tstat6_3pos(NightHeatingSP,NightSP,NightCoolingSP);
-            HandleSliderSetPos(bRetSP);//tstat6
-            m_pNightSingleSP->ShowWindow(SW_NORMAL);
-            m_pNightTwoSP->ShowWindow(SW_HIDE);
+            
+
+			m_nightSlider.SetRange(DayMax * 10, DayMin * 10);
+			m_nightSlider.SetZoneValues(NightCoolingSP, NightHeatingSP);
+			m_nightSlider.put_TwoSliderMode(FALSE);
+
             m_nightpot = nSP;
             if (g_unint)
             {
@@ -7059,41 +5047,12 @@ void CT3000View::SetFlexSliderBars_tstat6()
                 strTemp.Format(_T("%0.1f F"),(float)nSP);
             }
 
-            m_nightpotEdit.FieldText(RGB(0,0,0),strTemp);
-            m_nightpotEdit.ShowWindow(TRUE);
-            if (g_unint)
-            {
-                strTemp.Format(_T("%0.1f C"),(float)nCoolSP);
-            }
-            else
-            {
-                strTemp.Format(_T("%0.1f F"),(float)nCoolSP);
-            }
-
-            m_nightInfoEdit.FieldText(strTemp);
-            //m_nightInfoEdit.SetNumberDefaultTex();
-            if (g_unint)
-            {
-                strTemp.Format(_T("%0.1f C"),(float)nHeatSP);
-            }
-            else
-            {
-                strTemp.Format(_T("%0.1f F"),(float)nHeatSP);
-            }
-
-            m_nightHeatInfoEdit.FieldText(strTemp);
+            
         }
 
 
     }
-    if (MDAY==1&&MNIGHT==1)
-    {
-        GetDlgItem(IDC_STATIC_DATSP)->ShowWindow(FALSE);
-    }
-    else
-    {
-        GetDlgItem(IDC_STATIC_DATSP)->ShowWindow(TRUE);
-    }
+   
 #endif
 
 
@@ -7107,7 +5066,7 @@ void CT3000View::OnEnKillfocusEditCurSp()
     BeginWaitCursor();
 
     CString str;
-    GetDlgItem(IDC_EDIT_CUR_SP)->GetWindowText(str);
+    
 
     int NightSP = Round_SetPoint_Max((int)(_wtof(str)*10));
 
@@ -7198,9 +5157,7 @@ void CT3000View::Initial_Max_Min()
     int dCoolDB;
     int dHeatDB;
 
-    if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7] == PM_TSTAT8)
-		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V) 
-		||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i))
+    if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i))
     {
         product_register_value[MODBUS_DAY_SETPOINT]=Round_SetPoint_Max(product_register_value[MODBUS_DAY_SETPOINT]);
         product_register_value[MODBUS_DAY_COOLING_DEADBAND]=Round_SetPoint_Max(product_register_value[MODBUS_DAY_COOLING_DEADBAND]);
@@ -7491,11 +5448,13 @@ void CT3000View::FreshCtrl()
     {
         g_unint = FALSE;
         GetDlgItem(IDC_STATICUNINT)->SetWindowText(_T(" F"));
+		m_daySlider.put_AdditionalText(L" F");
     }
     else
     {
         g_unint = TRUE;
         GetDlgItem(IDC_STATICUNINT)->SetWindowText(_T(" C"));
+		m_daySlider.put_AdditionalText(L" C");
     }
 
     m_fFirmwareVersion=get_curtstat_version();
@@ -7813,13 +5772,11 @@ void CT3000View::FreshCtrl()
     pEdit = (CEdit*)GetDlgItem(IDC_EDIT_RTC);
     pEdit->SetWindowText(strDate);
 
-    m_TempInfoEdit.FieldText(strTemp);
+ 
+	m_daySlider.put_CurrentValue(tempflot);
+	m_nightSlider.put_CurrentValue(tempflot);
 
-
-
-    if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT8)
-		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
-		)
+    if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT8))
     {
         Flexflash=1;
 
@@ -7835,9 +5792,7 @@ void CT3000View::FreshCtrl()
             GetDlgItem(IDC_STATIC1SP)->ShowWindow(SW_SHOW);
 
 
-            //GetDlgItem(IDC_SLIDER_DAY)->ShowWindow(SW_SHOW);
-
-            //	GetDlgItem(IDC_SLIDER_NIGHT)->ShowWindow(SW_SHOW);
+            
 
             //max 365 min 366
             if ((short)Fresh_Min>(short)Fresh_Max)
@@ -7875,8 +5830,7 @@ void CT3000View::FreshCtrl()
         else if((FlexSP!=0)||(FlexSPN!=0))
         {
 
-            // 			GetDlgItem(IDC_SLIDER_DAY)->ShowWindow(SW_SHOW);
-            // 			GetDlgItem(IDC_SLIDER_NIGHT)->ShowWindow(SW_SHOW);
+           
 
 
             if ((product_register_value[365] <=0)||(product_register_value[365] >3000))
@@ -7940,8 +5894,7 @@ void CT3000View::FreshCtrl()
             GetDlgItem(IDC_STATIC2SP)->ShowWindow(SW_HIDE);
             GetDlgItem(IDC_STATIC1SP)->ShowWindow(SW_HIDE);
 
-            //GetDlgItem(IDC_DAY_EDIT)->EnableWindow(FALSE);
-            //GetDlgItem(IDC_EDIT_CUR_SP)->EnableWindow(FALSE);
+          
 
             if (Fresh_Min>Fresh_Max)
             {
@@ -8077,11 +6030,13 @@ void CT3000View::OnCbnSelchangeStaticunint()
         {
             g_unint = FALSE;
             GetDlgItem(IDC_STATICUNINT)->SetWindowText(_T(" F"));
+			m_daySlider.put_AdditionalText(_T(" F"));
         }
         else
         {
             g_unint = TRUE;
             GetDlgItem(IDC_STATICUNINT)->SetWindowText(_T(" C"));
+			m_daySlider.put_AdditionalText(_T(" C"));
         }
         Fresh_In();
     }
@@ -8092,9 +6047,7 @@ void CT3000View::OnCbnSelchangeStaticunint()
 void CT3000View::Read_SliderData()
 {
 
-    if (product_register_value[7]==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8)
-		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
-		||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+    if (product_register_value[7]==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8)||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
     {
         Read_Multi(g_tstat_id,&product_register_value[MODBUS_DAY_SETPOINT],MODBUS_DAY_SETPOINT,20);
     }
@@ -8252,4 +6205,829 @@ BOOL CT3000View::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
     }
 
     return(FALSE);
+}
+
+ 
+
+void CT3000View::DayHandleMovedSlidercontrol1(const VARIANT& sender, float newValue)
+{
+		BOOL TwoPoint = m_daySlider.get_TwoSliderMode();
+		int nMin, nMax;
+		int nHeatSP, nCoolSP, nSP;
+		int nHDB;
+		int nCDB;
+	 
+		if ((product_register_value[7] == PM_TSTAT6) || (product_register_value[7] == PM_TSTAT7) || (product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT5i))
+		{
+			int Increment = product_register_value[MODBUS_SETPOINT_INCREASE];
+			nMax = (int)(m_daySlider.get_TopValue() * 10);
+			nMin = (int)(m_daySlider.get_BottomValue() * 10);
+			 
+			if (TwoPoint)
+			{
+				  nHeatSP = (int)(m_daySlider.get_BottomZoneValue()*10);
+				  nCoolSP = (int)(m_daySlider.get_TopZoneValue()*10);
+				  nSP = (int)(m_daySlider.get_MiddleZoneValue() * 10);
+				  if (nHeatSP >= nSP || nCoolSP <= nSP)
+				  {
+					  nSP = (nHeatSP + nCoolSP) / 2;
+				  }
+				 
+				nHeatSP = GetRoundNumber( nHeatSP );
+				nCoolSP = GetRoundNumber( nCoolSP );
+				nSP = GetRoundNumber( nSP );
+				  nHDB = nSP - nHeatSP;
+				  nCDB = nCoolSP - nSP;
+				int	Tstat_nSP     = (short)product_register_value[MODBUS_DAY_SETPOINT];
+				int	Tstat_nCoolSP = (short)product_register_value[MODBUS_DAY_COOLING_SETPOINT];
+				int	Tstat_nHeatSP = (short)product_register_value[MODBUS_DAY_HEATING_SETPOINT];
+	
+				if (nHeatSP == nCoolSP)
+				{
+					if (Tstat_nCoolSP != nCoolSP)
+					{
+						nCDB = Increment;
+						nHDB = 0;
+					}
+					if (Tstat_nHeatSP != nHeatSP)
+					{
+						nHDB = Increment;
+						nCDB = 0;
+					}
+				}
+	
+				nHeatSP = nSP - nHDB;
+				nCoolSP = nSP + nCDB;
+				if ((nHDB < 0 && nHDB>254) && (nCDB < 0 && nCDB>254))
+				{
+					/*AfxMessageBox(_T("Deadband>254 or Deadband <0"));*/
+					InitFlexSliderBars_tstat6();
+					return ;
+				}
+	
+				 
+	
+	
+				int ret = write_one(g_tstat_id, MODBUS_DAY_SETPOINT, nSP, 5);//345 T6
+				ret = write_one(g_tstat_id, MODBUS_DAY_HEATING_DEADBAND, nHDB, 5);//t6 349;
+				ret = write_one(g_tstat_id, MODBUS_DAY_COOLING_DEADBAND, nCDB, 5);//t6 348;
+				if (ret < 0)
+				{
+					InitFlexSliderBars_tstat6();
+					 
+					return ;
+				}
+				product_register_value[MODBUS_DAY_HEATING_DEADBAND] = nHDB;
+				product_register_value[MODBUS_DAY_SETPOINT] = nSP;
+				product_register_value[MODBUS_DAY_COOLING_DEADBAND] = nCDB;
+	
+	
+	
+				if (nCoolSP >= DayMax*10  || nHeatSP <= DayMin*10 )
+				{
+					InitFlexSliderBars_tstat6();
+				}
+				else
+				{
+					CString strTemp;
+					if (g_unint)
+					{
+						strTemp.Format(_T("%0.1f C"), ((float)nCoolSP / 10.0));
+					}
+					else
+					{
+						strTemp.Format(_T("%0.1f F"), ((float)nCoolSP / 10.0));
+					}
+	
+			 
+					if (g_unint)
+					{
+						strTemp.Format(_T("%0.1f C"), ((float)nHeatSP / 10.0));
+					}
+					else
+					{
+						strTemp.Format(_T("%0.1f F"), ((float)nHeatSP / 10.0));
+					}
+	
+	
+					 
+	
+					//InitFlexSliderBars_tstat6();
+				}
+	
+				m_daySlider.SetZoneValues_2((float)nCoolSP / 10.0, (float)nSP / 10.0, (float)nHeatSP / 10.0);
+				 
+			}
+			else
+			{
+				int nRangeMin = (short)product_register_value[MODBUS_MIN_SETPOINT];
+				int nRangeMax = (short)product_register_value[MODBUS_MAX_SETPOINT];
+				 
+				 
+				 
+				nHeatSP = (int)(m_daySlider.get_BottomZoneValue() * 10);
+				nCoolSP = (int)(m_daySlider.get_TopZoneValue() * 10);
+				nSP = (int)(m_daySlider.get_MiddleZoneValue() * 10);
+				  
+	
+				nHeatSP = GetRoundNumber(nHeatSP);
+				nCoolSP = GetRoundNumber(nCoolSP);
+				nSP = GetRoundNumber(nSP);
+	
+				int	Tstat_nSP = (short)product_register_value[MODBUS_DAY_SETPOINT];
+				int	Tstat_nCoolSP = (short)product_register_value[MODBUS_DAY_COOLING_SETPOINT];
+				int	Tstat_nHeatSP = (short)product_register_value[MODBUS_DAY_HEATING_SETPOINT];
+				int DaySP = Tstat_nSP;
+				if (Tstat_nSP != nSP)
+				{
+					if (DaySP < nRangeMin * 10) // ||
+					{
+						DaySP = nRangeMin * 10;
+					}
+					if (DaySP > nRangeMax * 10)
+					{
+						DaySP = nRangeMax * 10;
+					}
+					//nSP=Round_SetPoint_Max(nSP);
+					int ret = write_one(g_tstat_id, MODBUS_DAY_SETPOINT, nSP, 5);//345 T6
+					if (ret < 0)
+					{
+						
+						InitFlexSliderBars_tstat6();
+						return ;
+					}
+					product_register_value[MODBUS_DAY_SETPOINT] = DaySP;
+	
+					product_register_value[MODBUS_DAY_COOLING_SETPOINT] = nCoolSP;
+					product_register_value[MODBUS_DAY_HEATING_SETPOINT] = nHeatSP;
+	
+					CString strTemp;
+					if (g_unint)
+					{
+						//strTemp.Format(_T("%d C"), nHeatSP);
+						strTemp.Format(_T("%0.1f C"), (float)nSP / 10.0);
+					}
+					else
+					{
+	
+						strTemp.Format(_T("%0.1f F"), (float)nSP / 10.0);
+					}
+				 
+	
+	
+					if (g_unint)
+					{
+						strTemp.Format(_T("%0.1f C"), ((float)nCoolSP / 10.0));
+					}
+					else
+					{
+						strTemp.Format(_T("%0.1f F"), ((float)nCoolSP / 10.0));
+					}
+				 
+	
+					if (g_unint)
+					{
+						strTemp.Format(_T("%0.1f C"), ((float)nHeatSP / 10.0));
+					}
+					else
+					{
+						strTemp.Format(_T("%0.1f F"), ((float)nHeatSP / 10.0));
+					}
+					 
+				}
+	
+				m_daySlider.SetZoneValues_2((float)nCoolSP / 10.0, (float)nSP / 10.0, (float)nHeatSP / 10.0);
+				//InitFlexSliderBars_tstat6();
+			}
+	
+		}
+		else
+		{
+
+		}
+}
+
+void CT3000View::NightHandleMovedSlidercontrol1(const VARIANT& sender, float newValue)
+{
+	BOOL TwoPoint = m_nightSlider.get_TwoSliderMode();
+	int nMin, nMax;
+	int nHeatSP, nCoolSP, nSP;
+	int nHDB;
+	int nCDB;
+	 
+	CString strTemp;
+	if ((product_register_value[7] == PM_TSTAT6) || (product_register_value[7] == PM_TSTAT7) || (product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT5i))
+	{
+		int Increment = product_register_value[MODBUS_SETPOINT_INCREASE];
+		nMax = (int)(m_nightSlider.get_TopValue() * 10);
+		nMin = (int)(m_nightSlider.get_BottomValue() * 10);
+		if (TwoPoint)
+		{
+			nHeatSP = (int)(m_nightSlider.get_BottomZoneValue() * 10);
+			nCoolSP = (int)(m_nightSlider.get_TopZoneValue() * 10);
+			nSP = (int)(m_nightSlider.get_MiddleZoneValue() * 10);
+			if (nHeatSP>=nSP||nCoolSP<=nSP)
+			{
+				nSP = (nHeatSP + nCoolSP) / 2;
+			} 
+			//自动调节sp/*product_register_value[MODBUS_NIGHT_SETPOINT]*/
+			nHeatSP = GetRoundNumber(nHeatSP);
+			nCoolSP = GetRoundNumber(nCoolSP);
+			nSP = GetRoundNumber(nSP);
+			nHDB = nSP - nHeatSP;
+			nCDB = nCoolSP - nSP;
+			int	Tstat_nSP = (short)product_register_value[MODBUS_NIGHT_SETPOINT];
+			int	Tstat_nCoolSP = (short)product_register_value[MODBUS_NIGHT_COOLING_SETPOINT];
+			int	Tstat_nHeatSP = (short)product_register_value[MODBUS_NIGHT_HEATING_SETPOINT];
+
+			 
+			nHeatSP = nSP - nHDB;
+			nCoolSP = nSP + nCDB;
+
+
+			if ((nHDB < 0 && nHDB>254) && (nCDB < 0 && nCDB>254))
+			{
+
+				InitFlexSliderBars_tstat6();
+				m_active_key_mouse = FALSE;
+				return;
+			}
+
+
+
+			int ret = 0;
+
+
+		 
+
+
+
+
+
+			ret = write_one(g_tstat_id, MODBUS_NIGHT_SETPOINT, nSP, 5);//t6 350
+			ret = write_one(g_tstat_id, MODBUS_NIGHT_HEATING_DEADBAND, nHDB, 5);//t6 354
+			ret = write_one(g_tstat_id, MODBUS_NIGHT_COOLING_DEADBAND, nCDB, 5);//t6 355
+			if (ret < 0)
+			{
+				/*AfxMessageBox(_T("Write Fail!"));*/
+				m_active_key_mouse = FALSE;
+				InitFlexSliderBars_tstat6();
+				return;
+			}
+			product_register_value[MODBUS_NIGHT_HEATING_DEADBAND] = nHDB;
+			product_register_value[MODBUS_NIGHT_SETPOINT] = nSP;
+			product_register_value[MODBUS_NIGHT_COOLING_DEADBAND] = nCDB;
+
+
+
+			if (nCoolSP >= DayMax*10 || nHeatSP <= DayMin*10)
+			{
+				InitFlexSliderBars_tstat6();
+			}
+			else
+			{
+
+
+
+
+				CString strTemp;
+
+				if (g_unint)
+				{
+					strTemp.Format(_T("%0.1f C"), ((float)nCoolSP) / 10.0);
+				}
+				else
+				{
+					strTemp.Format(_T("%0.1f F"), ((float)nCoolSP) / 10.0);
+				}
+
+			 
+				if (g_unint)
+				{
+					strTemp.Format(_T("%0.1f C"), ((float)nHeatSP) / 10.0);
+				}
+				else
+				{
+					strTemp.Format(_T("%0.1f F"), ((float)nHeatSP) / 10.0);
+				}
+
+				 
+			}
+
+			m_nightSlider.SetZoneValues_2((float)nCoolSP / 10.0, (float)nSP / 10.0, (float)nHeatSP / 10.0);
+		}
+		else
+		{
+			//350	1	Low byte	W/R	(Night)Unoccupied  setpoin.
+			//354	2	Full	W/R	(Night)Unoccupied heating setpoint
+			//355	2	Full	W/R	(Night)Unoccupied cooling setpoint
+			int nRangeMin = (short)product_register_value[MODBUS_MIN_SETPOINT];
+			int nRangeMax = (short)product_register_value[MODBUS_MAX_SETPOINT];
+
+
+
+			nHeatSP = (int)(m_nightSlider.get_BottomZoneValue() * 10);
+			nCoolSP = (int)(m_nightSlider.get_TopZoneValue() * 10);
+		 
+			nSP = (int)(m_nightSlider.get_MiddleZoneValue() * 10);
+
+
+			nHeatSP = GetRoundNumber(nHeatSP);
+			nCoolSP = GetRoundNumber(nCoolSP);
+			nSP = GetRoundNumber(nSP);
+
+			int	Tstat_nSP = (short)product_register_value[MODBUS_NIGHT_SETPOINT];
+			int	Tstat_nCoolSP = (short)product_register_value[MODBUS_NIGHT_COOLING_SETPOINT];
+			int	Tstat_nHeatSP = (short)product_register_value[MODBUS_NIGHT_HEATING_SETPOINT];
+			int NightSP = Tstat_nSP;
+			if (Tstat_nSP != nSP)
+			{
+
+
+				if (NightSP < nRangeMin * 10)  //  ||
+				{
+					NightSP = nRangeMin * 10;
+				}
+				if (nSP > nRangeMax * 10)
+				{
+					NightSP = nRangeMax * 10;
+				}
+
+				int ret = write_one(g_tstat_id, MODBUS_NIGHT_SETPOINT, NightSP, 5);//t6 350
+				if (ret < 0)
+				{
+					/*AfxMessageBox(_T("Write Fail!"));*/
+					m_active_key_mouse = FALSE;
+					InitFlexSliderBars_tstat6();
+					return;
+				}
+				product_register_value[MODBUS_NIGHT_SETPOINT] = NightSP;
+				product_register_value[MODBUS_NIGHT_COOLING_SETPOINT] = nCoolSP;
+				product_register_value[MODBUS_NIGHT_HEATING_SETPOINT] = nHeatSP;
+
+
+
+				if (g_unint)
+				{
+					strTemp.Format(_T("%0.1f C"), (float)nSP / 10.0);
+				}
+				else
+				{
+					strTemp.Format(_T("%0.1f F"), (float)nSP / 10.0);
+				}
+
+				 
+
+				if (g_unint)
+				{
+					strTemp.Format(_T("%0.1f C"), ((float)nCoolSP) / 10.0);
+				}
+				else
+				{
+					strTemp.Format(_T("%0.1f F"), ((float)nCoolSP) / 10.0);
+				}
+
+			 
+				if (g_unint)
+				{
+					strTemp.Format(_T("%0.1f C"), ((float)nHeatSP) / 10.0);
+				}
+				else
+				{
+					strTemp.Format(_T("%0.1f F"), ((float)nHeatSP) / 10.0);
+				}
+
+			 
+				m_nightSlider.SetZoneValues_2((float)nCoolSP / 10.0, (float)nSP / 10.0, (float)nHeatSP / 10.0);
+			}
+		}
+	}
+	else
+	{
+
+	}
+}
+
+void CT3000View::DayFeedBackNewSliderFor5ABCD()
+{
+ 
+	int nSP, dSP;
+	nSP = dSP = 0;
+	int nCoolSP = 0;
+	int nHeatSP = 0;
+	int nCoolDB = 0;
+	int nHeatDB = 0;
+
+	int dCoolSP = 0;
+	int dHeatSP = 0;
+	int dCoolDB = 0;
+	int dHeatDB = 0;
+
+	int m_hotel_or_office = product_register_value[MODBUS_APPLICATION];
+	if (product_type == T3000_5ABCDFG_LED_ADDRESS)
+	{
+		dSP = product_register_value[MODBUS_COOLING_SETPOINT];
+		dCoolDB = product_register_value[MODBUS_COOLING_DEADBAND] / 10;//119
+		dHeatDB = product_register_value[MODBUS_HEATING_DEADBAND] / 10;//heat//120
+		dCoolSP = dSP + dCoolDB;
+		dHeatSP = dSP - dHeatDB;
+		if (m_hotel_or_office == 0)// office
+		{
+			nSP = 0;
+			nCoolSP = product_register_value[MODBUS_NIGHT_COOLING_SETPOINT] / 10;
+			nHeatSP = product_register_value[MODBUS_NIGHT_HEATING_SETPOINT] / 10;
+			nSP = (short)(nCoolSP + nHeatSP) / 2;
+			nCoolDB = nCoolSP - nSP;
+			nHeatDB = nSP - nHeatSP;
+		}
+		else//Hotel
+		{
+			nSP = dSP;
+
+			nCoolDB = (short)product_register_value[MODBUS_NIGHT_COOLING_DEADBAND] / 10;//(max-(itemp-min));
+			nHeatDB = (short)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND] / 10;//(max-(itemp-min));
+			nCoolSP = nSP + nCoolDB;
+			nHeatSP = nSP - nHeatDB;
+		}
+
+	}
+
+
+	if (product_type == T3000_5EH_LCD_ADDRESS)
+	{
+
+
+		if (m_hotel_or_office == 0)// office
+		{
+			//Setpoint = ( NEW_EEP_CoolingSp + EEP_HeatingSp) / 2
+			//cooling_db = NEW_EEP_CoolingSp - Setpoint;
+			//heating_db = Setpoint - EEP_HeatingSp;
+
+			dCoolSP = product_register_value[MODBUS_NEW_COOLING_SETPOINT] / 10;
+			dHeatSP = product_register_value[MODBUS_HEATING_SETPOINT] / 10;
+			dSP = (dCoolSP + dHeatSP) / 2;
+			dCoolDB = dCoolSP - dSP;
+			dHeatDB = dSP - dHeatSP;
+
+			nSP = 0;
+			nCoolSP = product_register_value[MODBUS_NIGHT_COOLING_SETPOINT];
+			nHeatSP = product_register_value[MODBUS_NIGHT_HEATING_SETPOINT];
+			nSP = (short)(nCoolSP + nHeatSP) / 2;
+			nCoolDB = nCoolSP - nSP;
+			nHeatDB = nSP - nHeatSP;
+		}
+		else//Hotel
+		{
+			// Hotel mode:
+			//Setpoint = EEP_CoolingSp
+			// cooling_db = EEP_CoolDeadband ;
+			//heating_db = EEP_HeatDeadband ;
+
+
+
+			dSP = product_register_value[MODBUS_COOLING_SETPOINT] / 10;
+
+			dCoolDB = product_register_value[MODBUS_COOLING_DEADBAND] / 10;//119
+
+			dHeatDB = product_register_value[MODBUS_HEATING_DEADBAND] / 10;//heat//120
+
+			dCoolSP = dSP + dCoolDB;
+			dHeatSP = dSP - dHeatDB;
+
+			nSP = product_register_value[MODBUS_NIGHT_COOLING_SETPOINT];
+
+			nCoolDB = (short)product_register_value[MODBUS_NIGHT_COOLING_DEADBAND] / 10;//(max-(itemp-min));
+			nHeatDB = (short)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND] / 10;//(max-(itemp-min));
+
+			nCoolSP = nSP + nCoolDB;
+			nHeatSP = nSP - nHeatDB;
+		}
+
+	}
+	BOOL TwoPointMode = m_daySlider.get_TwoSliderMode();
+	//day
+	if (TwoPointMode) // office - occupied : 2SP
+	{
+		  nHeatSP = (int)(m_daySlider.get_BottomZoneValue());
+		  nCoolSP = (int)(m_daySlider.get_TopZoneValue());
+		  nSP = (nHeatSP + nCoolSP) / 2;
+
+ 
+
+		int ret1 = write_one(g_tstat_id, MODBUS_COOLING_DEADBAND, ( nCoolSP- nSP)*10 );
+		int ret2 = write_one(g_tstat_id, MODBUS_HEATING_DEADBAND, (nSP - nHeatSP)*10 );
+		if (ret1 > 0 && ret2 > 0)
+		{
+			product_register_value[MODBUS_COOLING_DEADBAND] = (nCoolSP - nSP)*10 ;
+			product_register_value[MODBUS_HEATING_DEADBAND] = (nSP - nHeatSP)*10 ;
+
+		}
+		else
+		{
+			AfxMessageBox(_T("Write Fail,Try again!"));
+		}
+
+	}
+	else // hotel - occupied  //  1SP
+	{
+		
+
+		/*	int Slider_nHeatSP = (szPos[0] + nMin) / 10;
+			int Slider_nSP = (szPos[1] + nMin) / 10;
+			int Slider_nCoolSP = (szPos[2] + nMin) / 10;*/
+		 int Slider_nCoolSP = (int)(m_daySlider.get_TopZoneValue() );
+	
+		 int Slider_nHeatSP = (int)(m_daySlider.get_BottomZoneValue()); 
+
+		  int Slider_nSP = (int)(m_daySlider.get_MiddleZoneValue());
+
+	 
+
+
+		if (Slider_nSP != dSP)
+		{
+			int ret = write_one(g_tstat_id, MODBUS_COOLING_SETPOINT, Slider_nSP);	//135
+			if (ret > 0)
+			{
+				product_register_value[MODBUS_COOLING_SETPOINT] = Slider_nSP;
+			}
+			else
+			{
+				AfxMessageBox(_T("Write Fail,Try again!"));
+				return;
+			}
+		}
+		else
+		{
+			if (Slider_nHeatSP != dHeatSP)
+			{
+				int ret2 = write_one(g_tstat_id, MODBUS_HEATING_DEADBAND, (Slider_nSP - Slider_nHeatSP) * 10);
+				if (ret2 > 0)
+				{
+
+					product_register_value[MODBUS_HEATING_DEADBAND] = (Slider_nSP - Slider_nHeatSP) * 10;
+
+				}
+				else
+				{
+					AfxMessageBox(_T("Write Fail,Try again!"));
+					return;
+				}
+			}
+			if (Slider_nCoolSP != dCoolSP)
+			{
+				int ret2 = write_one(g_tstat_id, MODBUS_COOLING_DEADBAND, (Slider_nSP - Slider_nHeatSP) * 10);
+				if (ret2 > 0)
+				{
+
+					product_register_value[MODBUS_COOLING_DEADBAND] = (Slider_nCoolSP - Slider_nSP) * 10;
+
+				}
+				else
+				{
+					AfxMessageBox(_T("Write Fail,Try again!"));
+					return;
+				}
+			}
+		}
+
+
+
+
+	}
+
+
+
+	InitSliderBars2();
+ 
+}
+void CT3000View::NightFeedBackNewSliderFor5ABCD()
+{
+ 
+	int nSP, dSP;
+	nSP = dSP = 0;
+	int nCoolSP = 0;
+	int nHeatSP = 0;
+	int nCoolDB = 0;
+	int nHeatDB = 0;
+
+	int dCoolSP = 0;
+	int dHeatSP = 0;
+	int dCoolDB = 0;
+	int dHeatDB = 0;
+
+	int m_hotel_or_office = product_register_value[MODBUS_APPLICATION];
+	if (product_type == T3000_5ABCDFG_LED_ADDRESS)
+	{
+		dSP = product_register_value[MODBUS_COOLING_SETPOINT];
+		dCoolDB = product_register_value[MODBUS_COOLING_DEADBAND] / 10;//119
+		dHeatDB = product_register_value[MODBUS_HEATING_DEADBAND] / 10;//heat//120
+		dCoolSP = dSP + dCoolDB;
+		dHeatSP = dSP - dHeatDB;
+		if (m_hotel_or_office == 0)// office
+		{
+			nSP = 0;
+			nCoolSP = product_register_value[MODBUS_NIGHT_COOLING_SETPOINT] / 10;
+			nHeatSP = product_register_value[MODBUS_NIGHT_HEATING_SETPOINT] / 10;
+			nSP = (short)(nCoolSP + nHeatSP) / 2;
+			nCoolDB = nCoolSP - nSP;
+			nHeatDB = nSP - nHeatSP;
+		}
+		else//Hotel
+		{
+			nSP = dSP;
+
+			nCoolDB = (short)product_register_value[MODBUS_NIGHT_COOLING_DEADBAND] / 10;//(max-(itemp-min));
+			nHeatDB = (short)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND] / 10;//(max-(itemp-min));
+			nCoolSP = nSP + nCoolDB;
+			nHeatSP = nSP - nHeatDB;
+		}
+
+	}
+
+
+	if (product_type == T3000_5EH_LCD_ADDRESS)
+	{
+
+
+		if (m_hotel_or_office == 0)// office
+		{
+			//Setpoint = ( NEW_EEP_CoolingSp + EEP_HeatingSp) / 2
+			//cooling_db = NEW_EEP_CoolingSp - Setpoint;
+			//heating_db = Setpoint - EEP_HeatingSp;
+
+			dCoolSP = product_register_value[MODBUS_NEW_COOLING_SETPOINT] / 10;
+			dHeatSP = product_register_value[MODBUS_HEATING_SETPOINT] / 10;
+			dSP = (dCoolSP + dHeatSP) / 2;
+			dCoolDB = dCoolSP - dSP;
+			dHeatDB = dSP - dHeatSP;
+
+			nSP = 0;
+			nCoolSP = product_register_value[MODBUS_NIGHT_COOLING_SETPOINT];
+			nHeatSP = product_register_value[MODBUS_NIGHT_HEATING_SETPOINT];
+			nSP = (short)(nCoolSP + nHeatSP) / 2;
+			nCoolDB = nCoolSP - nSP;
+			nHeatDB = nSP - nHeatSP;
+		}
+		else//Hotel
+		{
+			// Hotel mode:
+			//Setpoint = EEP_CoolingSp
+			// cooling_db = EEP_CoolDeadband ;
+			//heating_db = EEP_HeatDeadband ;
+
+
+
+			dSP = product_register_value[MODBUS_COOLING_SETPOINT] / 10;
+
+			dCoolDB = product_register_value[MODBUS_COOLING_DEADBAND] / 10;//119
+
+			dHeatDB = product_register_value[MODBUS_HEATING_DEADBAND] / 10;//heat//120
+
+			dCoolSP = dSP + dCoolDB;
+			dHeatSP = dSP - dHeatDB;
+
+			nSP = product_register_value[MODBUS_NIGHT_COOLING_SETPOINT];
+
+			nCoolDB = (short)product_register_value[MODBUS_NIGHT_COOLING_DEADBAND] / 10;//(max-(itemp-min));
+			nHeatDB = (short)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND] / 10;//(max-(itemp-min));
+
+			nCoolSP = nSP + nCoolDB;
+			nHeatSP = nSP - nHeatDB;
+		}
+
+	}
+
+	BOOL TwoPointMode = m_daySlider.get_TwoSliderMode();
+	//night
+	if (TwoPointMode) // office - unoccupied
+	{
+		//2sp
+		  nCoolSP = (int)(m_daySlider.get_TopZoneValue());
+
+		  nHeatSP = (int)(m_daySlider.get_BottomZoneValue());
+
+		 
+
+		 int nSP = (nCoolSP - nHeatSP) / 2 + nHeatSP;
+
+		 
+
+		int Tstat_nCoolSP = product_register_value[MODBUS_NIGHT_COOLING_SETPOINT] / 10;
+		int Tstat_nHeatSP = product_register_value[MODBUS_NIGHT_HEATING_SETPOINT] / 10;
+		if (Tstat_nCoolSP != nCoolSP)
+		{
+			int ret1 = write_one(g_tstat_id, MODBUS_NIGHT_COOLING_SETPOINT, nCoolSP * 10);
+			if (ret1 > 0)
+			{
+				product_register_value[MODBUS_NIGHT_COOLING_SETPOINT] = nCoolSP * 10;
+			}
+		}
+
+		if (Tstat_nHeatSP != nHeatSP)
+		{
+			int ret2 = write_one(g_tstat_id, MODBUS_NIGHT_HEATING_SETPOINT, nHeatSP * 10);
+			if (ret2 > 0)
+			{
+
+				product_register_value[MODBUS_NIGHT_HEATING_SETPOINT] = nHeatSP * 10;
+
+			}
+		}
+
+
+
+	}
+
+	else// hotel - unoccupied
+	{
+		//1sp
+		//vector<int>  szPos(3);
+		//m_pNightSingleSP->GetRange(nMin, nMax);
+		//int nNum = m_pNightSingleSP->GetPos(szPos);
+		//int Slider_nHeatSP = (szPos[0] + nMin) / 10;
+		//int Slider_nSP = (szPos[1] + nMin) / 10;
+		////int nSP = product_register_value[374]/10;
+		//int Slider_nCoolSP = (szPos[2] + nMin) / 10;
+		////int Slider_nCoolSP = m_nightSlider.get_TopZoneValue() / 10;
+		////int Slider_nSP = m_nightSlider.get_MiddleZoneValue() / 10;
+		////int Slider_nHeatSP = m_nightSlider.get_BottomZoneValue() / 10;
+
+		//nMin /= 10;
+		//nMax /= 10;
+		//if (Slider_nSP > nMax || Slider_nSP < nMin)
+		//{
+		//	AfxMessageBox(_T("Setpoint is out of the scale"));
+		//	InitSliderBars2();
+		//	return;
+		//}
+
+		int Slider_nCoolSP = (int)(m_daySlider.get_TopZoneValue());
+
+		int Slider_nHeatSP = (int)(m_daySlider.get_BottomZoneValue());
+
+		int Slider_nSP = (int)(m_daySlider.get_MiddleZoneValue());
+
+		if (nSP != Slider_nSP)
+		{
+			int nCoolDB = Slider_nCoolSP - Slider_nSP;
+			int nHeatDB = Slider_nSP - Slider_nHeatSP;
+			int ret1 = write_one(g_tstat_id, MODBUS_COOLING_SETPOINT, Slider_nSP);
+			if (ret1 > 0)
+			{
+				product_register_value[MODBUS_COOLING_SETPOINT] = nSP;
+				product_register_value[MODBUS_NIGHT_HEATING_SETPOINT] = nHeatDB * 10;
+				product_register_value[MODBUS_NIGHT_COOLING_SETPOINT] = nCoolDB * 10;
+			}
+			else
+			{
+				AfxMessageBox(_T("Write Fail,Try again!"));
+				return;
+			}
+		}
+		else
+		{
+			if (Slider_nHeatSP != nHeatSP)
+			{
+
+				//int ret1= write_one(g_tstat_id, MODBUS_NIGHT_COOLING_SETPOINT, nCoolSP);
+				int ret2 = write_one(g_tstat_id, MODBUS_NIGHT_HEATING_SETPOINT, Slider_nCoolSP);
+				if (ret2 > 0)
+				{
+					product_register_value[MODBUS_COOLING_SETPOINT] = (Slider_nCoolSP - Slider_nHeatSP) / 2 + Slider_nHeatSP;
+					product_register_value[MODBUS_NIGHT_HEATING_SETPOINT] = Slider_nHeatSP;
+					product_register_value[MODBUS_NIGHT_COOLING_SETPOINT] = Slider_nCoolSP;
+				}
+				else
+				{
+					AfxMessageBox(_T("Write Fail,Try again!"));
+					return;
+				}
+			}
+			if (Slider_nCoolSP != nCoolSP)
+			{
+
+				//int ret1= write_one(g_tstat_id, MODBUS_NIGHT_COOLING_SETPOINT, Slider_nCoolSP);
+				int ret2 = write_one(g_tstat_id, MODBUS_NIGHT_HEATING_SETPOINT, Slider_nHeatSP);
+				if (ret2 > 0)
+				{
+					product_register_value[MODBUS_COOLING_SETPOINT] = (Slider_nCoolSP - Slider_nHeatSP) / 2 + Slider_nHeatSP;
+					product_register_value[MODBUS_NIGHT_HEATING_SETPOINT] = Slider_nHeatSP;
+					product_register_value[MODBUS_NIGHT_COOLING_SETPOINT] = Slider_nCoolSP;
+				}
+				else
+				{
+					AfxMessageBox(_T("Write Fail,Try again!"));
+					return;
+				}
+			}
+		}
+
+
+
+	}
+
+
+	InitSliderBars2();
+	/*    EndWaitCursor();*/
 }

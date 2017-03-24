@@ -33,7 +33,7 @@ int product_type = 0;
 int old_product_type = 0;
 
 bool g_HumChamberThread=FALSE;
-bool g_register_occuppied = false; //Add by Alex
+
 
 unsigned short cm5_register_value[512]; //CM5
 unsigned short m_buffer[512];//CM5
@@ -51,7 +51,7 @@ int g_language=0;
 CString g_strImagePathName=_T("");
 int now_tstat_id =0;//for batch load /flash.
 
-CString g_strOrigDatabaseFilePath=_T("");
+
 CString	g_strDatabasefilepath=_T("");
 CString g_strExePth=_T("");
 CString g_strImgeFolder=_T("");
@@ -95,7 +95,7 @@ CString showing_text;
 
 
 
-CEvent g_eventPauseMultiRead;
+
 
 BOOL g_buser_log_in=FALSE;
 BOOL g_bPrivilegeMannage=FALSE;
@@ -148,44 +148,18 @@ unsigned int g_llRxCount = 0;
 int g_llerrCount = 0;
 BOOL g_unint = TRUE;//TREE = °C;FALSE = F;
 
-int parameterSet = 0;//用于初始化SLIDER。
+
 
 //int g_nIpPort=6001;
 //CString	g_strIpAdress;
 int MDAY=1,MNIGHT=1;
-int tstat6flex[12]={
-	30,
-	20,
-	40,
-	40,//20,
-	20,//40,
-	30,
-	40,
-	20,
-	20,//40,
-	40,//20,
-	50,
-	15
-};
 
 
 
 
 
-int m_slidertsta6[12]={
-	30,
-	20,
-	40,
-	40,//20,
-	20,//40,
-	30,
-	40,
-	20,
-	20,//40,
-	40,//20,
-	50,
-	15
-};
+
+
 
 // 345	1	Low byte	W/R	(Day)Occupied   setpoint 
 // 346	1	Low byte	W/R	(Day)Occupied cooling setpoint dead band  , offset from setpoint for cooling to begin.  Units are 0.1 deg.
@@ -1985,12 +1959,9 @@ Str_picture_header m_picture_head; //传图片的 头，结构其实是和 monitor same.
 int Monitor_Input__Data[14][1000];	
 
 
-int Max_Scale_value;	//保存整个屏幕的最大刻度值;
-int Min_Scale_value;
 
-int MAX_SCALE_5;
-int MIN_SCALE_5;
-int Total_SCALE;
+
+
 
 vector <_Graphic_Value_Info> m_graphic_refresh_data;
 
@@ -2066,7 +2037,7 @@ bool read_write_bacnet_config = false;	//读写Bacnet config 的时候禁止刷新 List;
  // CString analog_range[ANALOG_RANG_NUMBER]={_T("Raw"),_T("10KC Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor"),_T("Off/On")};
  // CString analog_range[ANALOG_RANG_NUMBER]={_T("Raw"),_T("10KF Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor"),_T("Off/On")};
  CString analog_range[11]={_T("UNUSED"),_T("10K Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor1"),_T("Off/On"),_T("Custom Sensor2"),_T("Occupied/Unoccupied"),_T("Unoccupied/Occupied"),_T("Open/Close"),_T("Close/Open")};
- CString analog_range_TSTAT6[13]={_T("-"),_T("10K Thermistor Type2"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor1"),_T("Off/On"),_T("Custom Sensor2"),_T("Occupied/Unoccupied"),_T("Unoccupied/Occupied"),_T("Open/Close"),_T("Close/Open"),_T("10K Thermistor Type3"),_T("0-20ma")};
+ CString analog_range_TSTAT6[14]={_T("-"),_T("10K Thermistor Type2"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor1"),_T("Off/On"),_T("Custom Sensor2"),_T("Occupied/Unoccupied"),_T("Unoccupied/Occupied"),_T("Open/Close"),_T("Close/Open"),_T("10K Thermistor Type3"),_T("0-20ma"),_T("Voltage")};
 
  CString INPUT_FUNS[8]={_T("Normal"),_T("Freeze Protect"),_T("Occupancy Sensor"),_T("Sweep Off"),_T("Clock"),_T("Changeover Mode"),_T("Outside Temp"),_T("Airflow")};
 
@@ -2220,3 +2191,6 @@ CString grapgic_view_name[3];
 bool graphic_view_visible[14];
 CString bacnet_message_input_title;	//输入的提示信息
 CString bacnet_message_return_string;  //得到的输入字符串
+pidname_map product_map;
+bool offline_mode = false; //全局离线模式判断;
+CString offline_prg_path;   //离线模式得prg 保存路径;

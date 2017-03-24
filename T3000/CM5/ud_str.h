@@ -228,10 +228,7 @@ typedef  struct
 
 	int8_t description[STR_IN_DESCRIPTION_LENGTH]; 	      /* (21 bytes; string)*/
 	int8_t label[STR_IN_LABEL];		      	/* (9 bytes; string)*/
-
-	//int8_t value[4]
 	int value;		     						/* (4 bytes; int32_t)*/
-	//int8_t value[4];
 	uint8_t  filter;  /* (3 bits; 0=1,1=2,2=4,3=8,4=16,5=32, 6=64,7=128,)*/
 	uint8_t decom;/* (1 bit; 0=ok, 1=point decommissioned)*/
 	uint8_t sub_id;/* (1 bit)*/
@@ -242,26 +239,10 @@ typedef  struct
 	uint8_t calibration_sign; /* (1 bit; sign 0=positiv 1=negative )*/
 	uint8_t sub_number; /* (1 bit;  0=0.1, 1=1.0)*/
 	uint8_t calibration_h; /* (5 bits - spare )*/  //去掉了 unused 把 calibration改为了双字节
-#if 0
-	unsigned  filter:3;  /* (3 bits; 0=1,1=2,2=4,3=8,4=16,5=32, 6=64,7=128,)*/
-	unsigned decom	:1;  /* (1 bit; 0=ok, 1=point decommissioned)*/
-	unsigned sen_on :1;  /* (1 bit)*/
-	unsigned sen_off:1;  /* (1 bit)*/
-	unsigned control:1; /*  (1 bit; 0=OFF, 1=ON)*/
-	unsigned auto_manual:1; /* (1 bit; 0=auto, 1=manual)*/
-	unsigned digital_analog :1; /* (1 bit; 1=analog, 0=digital)*/
-	unsigned calibration_sign :1; /* (1 bit; sign 0=positiv 1=negative )*/
-	unsigned calibration_increment:1; /* (1 bit;  0=0.1, 1=1.0)*/
-	unsigned unused:5; /* (5 bits - spare )*/
-#endif
-//	uint8_t flag1;
-//	uint8_t flag2;
-
 	uint8_t calibration_l;  /* (8 bits; -25.6 to 25.6 / -256 to 256 )*/
-
 	uint8_t range;	      			/* (1 uint8_t ; input_range_equate)*/
 
-} Str_in_point; /* 21+1+4+1+1+9 = 38 */
+} Str_in_point; 
 
 
 typedef union {
