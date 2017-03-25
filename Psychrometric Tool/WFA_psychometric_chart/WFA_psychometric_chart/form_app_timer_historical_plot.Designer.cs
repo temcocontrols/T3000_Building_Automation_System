@@ -115,7 +115,7 @@
             this.gb_select_time_and_date.Name = "gb_select_time_and_date";
             this.gb_select_time_and_date.TabStop = false;
             // 
-            // form_app_timer
+            // form_app_timer_historical_plot
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -123,7 +123,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "form_app_timer";
+            this.Name = "form_app_timer_historical_plot";
             this.Load += new System.EventHandler(this.form_app_timer_Load);
             this.gb_select_time_and_date.ResumeLayout(false);
             this.gb_select_time_and_date.PerformLayout();
