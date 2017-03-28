@@ -250,18 +250,17 @@ namespace Example6_3
             // f1.PlotPHChart("Water");//This will call the function required
 
             // MessageBox.Show("We are here inside peak 3d so ");
-
-        
-
+            
             // MessageBox.Show("Read finish excel file");
 
-            f1.DataPullFunctionForCoolProp("Water");
+            f1.DataPullFunctionForCoolProp("water");//n-Propane
+            
 
-            ExcellDataPull ex = new ExcellDataPull();
-            ex.ExcellData();
+            //ExcellDataPull ex = new ExcellDataPull();
+            //ex.ExcellData();
 
 
-            Point3[,] pts = new Point3[300, 300];
+     Point3[,] pts = new Point3[300, 300];
 
      for (int i = 0; i < f1.P_Value.GetLength(0); i++)
      {
@@ -270,10 +269,11 @@ namespace Example6_3
                     //pts[i, j].X = X[i, j];
                     //pts[i, j].Y = Y[i, j];
                     //pts[i, j].Z = Z[i, j];
-                     //pts[i, j] = new Point3((int)f1.H_Value[j,i], (int)f1.P_Value[j, i], (int)f1.T_Value[j, i], 1);
+                     pts[i, j] = new Point3((int)f1.H_Value[j,i], (int)f1.P_Value[j, i], (int)f1.T_Value[j, i], 1);
                     //pts[i, j] = new Point3((int)f1.H_Value[i ,j], (int)f1.P_Value[i, j], (int)f1.T_Value[i, j], 1);
                     //pts[i, j] = new Point3( (float)f1.P_Value[i, j], (float)ex.h_list_Value[i,j], (float)f1.T_Value[i, j], 1);
-                    pts[i, j] = new Point3( (float)ex.h_list_Value[i, j], (float)f1.P_Value[j, i], (float)f1.T_Value[j, i], 1);
+                    //pts[i, j] = new Point3( (float)ex.h_list_Value[i, j], (float)f1.P_Value[j, i], (float)f1.T_Value[j, i], 1);
+
                 }
      }
             int lastValue =(int) f1.P_Value[299, 299];

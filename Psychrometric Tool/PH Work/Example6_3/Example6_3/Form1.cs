@@ -22,26 +22,11 @@ namespace Example6_3
 
             InitializeComponent();
 
-
-            WFA_PH_CurveDemo.Form1 f1 = new WFA_PH_CurveDemo.Form1();
-            // f1.PlotPHChart("Water");//This will call the function required
-
-            // MessageBox.Show("We are here inside peak 3d so ");
-
-
-
-            // MessageBox.Show("Read finish excel file");
-
-            f1.DataPullFunctionForCoolProp("Water");
-
-
-
-
             this.SetStyle(ControlStyles.AllPaintingInWmPaint | 
             ControlStyles.UserPaint | 
             ControlStyles.DoubleBuffer,true);
-        this.SetStyle(ControlStyles.ResizeRedraw, true);
-        this.BackColor = Color.White;
+            this.SetStyle(ControlStyles.ResizeRedraw, true);
+            this.BackColor = Color.White;
 
             //  MessageBox.Show("Form1 constructor");
 
@@ -75,8 +60,6 @@ namespace Example6_3
             //ds.BarStyle.IsBarSingleColor = false;
             //ds.BarStyle.ZOrigin = 0;
 
-
-
             /*    
                      dc.ChartType = DrawChart.ChartTypeEnum.Slice;
                      //dc.IsColorMap = true;
@@ -97,9 +80,9 @@ namespace Example6_3
             //dc.IsInterp = true;
             dc.NumberContours = 25;
             // dc.AddChart()       
-            //cs.IsColorBar = true;
-            //dc.IsColorMap = true;
-            //dc.CMap = cm.Jet();
+            cs.IsColorBar = true;
+            dc.IsColorMap = true;
+            dc.CMap = cm.Jet();
            // MessageBox.Show("end of constructor");
 
         }
@@ -141,7 +124,7 @@ namespace Example6_3
             }
             else
             {
-                MessageBox.Show("We are here nnnnnnnnnnnnnnnnnn");
+              //  MessageBox.Show("We are here nnnnnnnnnnnnnnnnnn");
                 //cs.Elevation = trkElevation.Value;
                 //cs.Azimuth = trkAzimuth.Value;
                 //cf.Exp4D(ds, cs);

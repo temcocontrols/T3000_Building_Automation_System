@@ -683,6 +683,7 @@ namespace Example6_3
 
             int i0, i1, i2, j0, j1, j2;
             float zratio = 1;
+            string s = null;
             // Draw contour on the XY plane:
             for (int i = 0; i < pts.GetLength(0) - 1; i++)
             {
@@ -733,6 +734,7 @@ namespace Example6_3
                                (pts[i2, j2].Z - pts[i1, j1].Z);
                             pta[1] = cs2d.Point2D(new PointF((1-zratio) * pts[i1, j1].X +
                                 zratio * pts[i2, j2].X, pts[i1, j1].Y), cs);
+                            s += "zlevel k = " + k + ",i = " + i + ",j=" + j + "pts x1,y1=(" + pta[0].X + "," + pta[0].Y + "),\n";
                             g.DrawLine(aPen, pta[0], pta[1]);
                         }
                         else if ((zlevels[k] >= pts[i0, j0].Z && zlevels[k] < pts[i1, j1].Z ||
@@ -804,6 +806,7 @@ namespace Example6_3
                             pta[1] = cs2d.Point2D(new PointF(pts[i0, j0].X *(1-zratio) +
                                 pts[i2, j2].X *zratio, pts[i0, j0].Y * (1-zratio) + 
                                 pts[i2, j2].Y *zratio), cs);
+                            s += "zlevel k = " + k + ",i = " + i + ",j=" + j + "pts x1,y1=(" + pta[0].X + "," + pta[0].Y + "),\n";
                             g.DrawLine(aPen, pta[0], pta[1]);
                         }
                     }
@@ -818,7 +821,7 @@ namespace Example6_3
             Point3[] pta = new Point3[2];
             Point3[,] pts = ds.PointArray;
             Matrix3 m = Matrix3.AzimuthElevation(cs.Elevation, cs.Azimuth);
-
+            
             // Find the minumum and maximum z values:
             float zmin = ds.ZDataMin();
             float zmax = ds.ZDataMax();

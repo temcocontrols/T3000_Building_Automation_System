@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Text;
 
 namespace Example6_3
 {
@@ -18,7 +16,7 @@ namespace Example6_3
         public ChartStyle2D(Form1 fm1)
         {
 
-            form1 = fm1;
+            form1 = fm1;           
             Rectangle rect = form1.ClientRectangle;
             chartArea = new Rectangle(rect.X, rect.Y, rect.Width, 3 * rect.Height / 5);
             chartBackColor = fm1.BackColor;
@@ -48,7 +46,7 @@ namespace Example6_3
             Pen aPen = new Pen(Color.Black, 1f);
 
             SizeF tickFontSize = g.MeasureString("A", cs3d.TickFont);
-            // Create vertical gridlines:
+            //Create vertical gridlines:
             float fX, fY;
             if (cs3d.IsYGrid == true)
             {
