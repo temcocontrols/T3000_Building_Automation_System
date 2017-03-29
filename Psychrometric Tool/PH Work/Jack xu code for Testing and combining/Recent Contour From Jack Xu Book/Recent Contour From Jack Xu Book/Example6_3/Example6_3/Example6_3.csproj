@@ -93,12 +93,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\..\..\..\..\..\Documents\Visual Studio 2015\Projects\WFA_PH_CurveDemo\WFA_PH_CurveDemo\WFA_PH_CurveDemo.csproj">
-      <Project>{cbd5e161-de0b-4eb6-a327-f375dba41134}</Project>
-      <Name>WFA_PH_CurveDemo</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <COMReference Include="Microsoft.Office.Core">
       <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
       <VersionMajor>2</VersionMajor>

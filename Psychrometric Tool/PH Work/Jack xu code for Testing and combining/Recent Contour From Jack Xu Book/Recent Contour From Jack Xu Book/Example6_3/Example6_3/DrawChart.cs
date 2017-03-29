@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace Example6_3
@@ -12,7 +14,7 @@ namespace Example6_3
         private bool isHiddenLine = false;
         private bool isInterp = false;
         private int numberInterp = 2;
-        private int numberContours = 10;
+        public int numberContours = 10;
         private SliceEnum xyzSlice = SliceEnum.XSlice;
         private float sliceLocation = 0;
 
@@ -813,6 +815,344 @@ namespace Example6_3
                 }
             }
         }
+
+
+        //==============================My contour code for plotting ==================//
+
+
+        int prevZLabelCheck = 0;
+        int changingZLevel = 0;
+        int prevIIndex = 0;
+        int changingIIndex = 0;
+
+        int flagForIncSeries = 0; //--This one makes sure series is changed only once 
+        ArrayList arrayListSeries = new ArrayList();
+        string selectedSeriesName = "";
+        public List<DataTypeForPointList> AddContour_MyCustomFxn( DataSeries ds)
+        {
+            // Pen aPen = new Pen(ds.LineStyle.LineColor, ds.LineStyle.Thickness);
+            //aPen.DashStyle = ds.LineStyle.Pattern;
+            //SolidBrush aBrush = new SolidBrush(Color.White);
+            indexForSeries = 0;
+            arrayListSeries.Clear();
+           // arrayListSeries = allSeriesInChart;
+           // selectedSeriesName = arrayListSeries[0].ToString();
+            PointF[] pta = new PointF[2];
+            Point3[,] pts = ds.PointArray;
+            Matrix3 m = new Matrix3();
+            
+            
+            // Find the minumum and maximum z values:
+            float zmin = ds.ZDataMin();
+            float zmax = ds.ZDataMax();
+            float[] zlevels = new float[numberContours];
+            for (int i = 0; i < numberContours; i++)
+            {
+                zlevels[i] = zmin + i * (zmax - zmin) / (numberContours - 1);
+            }
+
+            int i0, i1, i2, j0, j1, j2;
+            float zratio = 1;
+            string s = null;
+
+            prevZLabelCheck = 0;
+            changingZLevel = 0;
+            prevIIndex = 0;
+            changingIIndex = 0;
+            flagForIncSeries = 0; //--This one makes sure series is changed only once 
+            listStoredPoints.Clear();
+
+            // Draw contour on the XY plane:
+            for (int i = 0; i < pts.GetLength(0) - 1; i++)
+            {
+                changingIIndex = i;
+                for (int j = 0; j < pts.GetLength(1) - 1; j++)
+                {
+                  
+                    for (int k = 0; k < numberContours; k++)
+                    {
+                        // Left triangle:
+                        i0 = i;
+                        j0 = j;
+                        i1 = i;
+                        j1 = j + 1;
+                        i2 = i + 1;
+                        j2 = j + 1;
+
+                        changingZLevel = k;
+                       
+
+                        if ((zlevels[k] >= pts[i0, j0].Z && zlevels[k] < pts[i1, j1].Z ||
+                            zlevels[k] < pts[i0, j0].Z && zlevels[k] >= pts[i1, j1].Z) &&
+                            (zlevels[k] >= pts[i1, j1].Z && zlevels[k] < pts[i2, j2].Z ||
+                            zlevels[k] < pts[i1, j1].Z && zlevels[k] >= pts[i2, j2].Z))
+                        {
+                            zratio = (zlevels[k] - pts[i0, j0].Z) /
+                                (pts[i1, j1].Z - pts[i0, j0].Z);
+
+                            //pta[0] = cs2d.Point2D(new PointF(pts[i0, j0].X,
+                            //    (1 - zratio) * pts[i0, j0].Y + zratio * pts[i1, j1].Y), cs);
+                            pta[0].X = pts[i0, j0].X;
+                            pta[0].Y = (1 - zratio) * pts[i0, j0].Y + zratio * pts[i1, j1].Y;
+
+                            zratio = (zlevels[k] - pts[i1, j1].Z) /
+                                (pts[i2, j2].Z - pts[i1, j1].Z);
+                            //pta[1] = cs2d.Point2D(new PointF((1 - zratio) * pts[i1, j1].X +
+                            //    zratio * pts[i2, j2].X, pts[i1, j1].Y), cs);
+                            pta[1].X = (1 - zratio) * pts[i1, j1].X + zratio * pts[i2, j2].X;
+                            pta[1].Y = pts[i1, j1].Y;
+
+
+                            //--Calling the function
+                            //PlotLogicFxnForContour(pta, i, k, frm1);
+                            PlotLogicFxnForContour(pta, i, k);
+
+                            //g.DrawLine(aPen, pta[0], pta[1]);
+                        }
+                        else if ((zlevels[k] >= pts[i0, j0].Z && zlevels[k] < pts[i2, j2].Z ||
+                            zlevels[k] < pts[i0, j0].Z && zlevels[k] >= pts[i2, j2].Z) &&
+                            (zlevels[k] >= pts[i1, j1].Z && zlevels[k] < pts[i2, j2].Z ||
+                            zlevels[k] < pts[i1, j1].Z && zlevels[k] >= pts[i2, j2].Z))
+                        {
+                            zratio = (zlevels[k] - pts[i0, j0].Z) /
+                                (pts[i2, j2].Z - pts[i0, j0].Z);
+                            //pta[0] = cs2d.Point2D(new PointF((1 - zratio) * pts[i0, j0].X +
+                            //    zratio * pts[i2, j2].X,
+                            //   (1 - zratio) * pts[i0, j0].Y + zratio * pts[i2, j2].Y), cs);
+
+                            pta[0].X = (1 - zratio) * pts[i0, j0].X +zratio * pts[i2, j2].X;
+                            pta[0].Y = (1 - zratio) * pts[i0, j0].Y + zratio * pts[i2, j2].Y;
+
+
+                            zratio = (zlevels[k] - pts[i1, j1].Z) /
+                               (pts[i2, j2].Z - pts[i1, j1].Z);
+                            //pta[1] = cs2d.Point2D(new PointF((1 - zratio) * pts[i1, j1].X +
+                            //    zratio * pts[i2, j2].X, pts[i1, j1].Y), cs);
+
+                            pta[1].X = (1 - zratio) * pts[i1, j1].X +zratio * pts[i2, j2].X;
+                            pta[1].Y = pts[i1, j1].Y;
+
+                            s += "zlevel k = " + k + ",i = " + i + ",j=" + j + "pts x1,y1=(" + pta[0].X + "," + pta[0].Y + "),\n";
+
+                            //--Calling the function
+                            //PlotLogicFxnForContour(pta, i, k, frm1);
+                            PlotLogicFxnForContour(pta, i, k);
+                            // g.DrawLine(aPen, pta[0], pta[1]);
+                        }
+                        else if ((zlevels[k] >= pts[i0, j0].Z && zlevels[k] < pts[i1, j1].Z ||
+                            zlevels[k] < pts[i0, j0].Z && zlevels[k] >= pts[i1, j1].Z) &&
+                            (zlevels[k] >= pts[i0, j0].Z && zlevels[k] < pts[i2, j2].Z ||
+                            zlevels[k] < pts[i0, j0].Z && zlevels[k] >= pts[i2, j2].Z))
+                        {
+                            zratio = (zlevels[k] - pts[i0, j0].Z) /
+                                (pts[i1, j1].Z - pts[i0, j0].Z);
+                            //pta[0] = cs2d.Point2D(new PointF(pts[i0, j0].X,
+                            //    (1 - zratio) * pts[i0, j0].Y + zratio * pts[i1, j1].Y), cs);
+
+                            pta[0].X = pts[i0, j0].X;
+                            pta[0].Y = (1 - zratio) * pts[i0, j0].Y + zratio * pts[i1, j1].Y;
+
+
+                            zratio = (zlevels[k] - pts[i0, j0].Z) /
+                                (pts[i2, j2].Z - pts[i0, j0].Z);
+                            //pta[1] = cs2d.Point2D(new PointF(pts[i0, j0].X * (1 - zratio) +
+                            //    pts[i2, j2].X * zratio, pts[i0, j0].Y * (1 - zratio) +
+                            //    pts[i2, j2].Y * zratio), cs);
+
+                            pta[1].X = pts[i0, j0].X * (1 - zratio) +pts[i2, j2].X * zratio;
+                            pta[1].Y = pts[i0, j0].Y * (1 - zratio) +pts[i2, j2].Y * zratio;
+
+                            //--Calling the function
+                            //PlotLogicFxnForContour(pta, i, k, frm1);
+                            PlotLogicFxnForContour(pta, i, k);
+                            // g.DrawLine(aPen, pta[0], pta[1]);
+                        }
+
+                        // right triangle:
+                        i0 = i;
+                        j0 = j;
+                        i1 = i + 1;
+                        j1 = j;
+                        i2 = i + 1;
+                        j2 = j + 1;
+                        if ((zlevels[k] >= pts[i0, j0].Z && zlevels[k] < pts[i1, j1].Z ||
+                            zlevels[k] < pts[i0, j0].Z && zlevels[k] >= pts[i1, j1].Z) &&
+                            (zlevels[k] >= pts[i1, j1].Z && zlevels[k] < pts[i2, j2].Z ||
+                            zlevels[k] < pts[i1, j1].Z && zlevels[k] >= pts[i2, j2].Z))
+                        {
+                            zratio = (zlevels[k] - pts[i0, j0].Z) /
+                                (pts[i1, j1].Z - pts[i0, j0].Z);
+                            //pta[0] = cs2d.Point2D(new PointF(pts[i0, j0].X * (1 - zratio) +
+                            //    pts[i1, j1].X * zratio, pts[i0, j0].Y), cs);
+
+                            pta[0].X = pts[i0, j0].X * (1 - zratio) +pts[i1, j1].X * zratio;
+                            pta[0].Y = pts[i0, j0].Y;
+
+
+
+                            zratio = (zlevels[k] - pts[i1, j1].Z) /
+                                (pts[i2, j2].Z - pts[i1, j1].Z);
+                            //pta[1] = cs2d.Point2D(new PointF(pts[i1, j1].X,
+                            //    pts[i1, j1].Y * (1 - zratio) + pts[i2, j2].Y * zratio), cs);
+
+                            pta[1].X = pts[i1, j1].X;
+                            pta[1].Y = pts[i1, j1].Y * (1 - zratio) + pts[i2, j2].Y * zratio;
+
+                            //--Calling the function
+                            // PlotLogicFxnForContour(pta, i, k, frm1);
+                            PlotLogicFxnForContour(pta, i, k);
+                            // g.DrawLine(aPen, pta[0], pta[1]);
+                        }
+                        else if ((zlevels[k] >= pts[i0, j0].Z && zlevels[k] < pts[i2, j2].Z ||
+                            zlevels[k] < pts[i0, j0].Z && zlevels[k] >= pts[i2, j2].Z) &&
+                            (zlevels[k] >= pts[i1, j1].Z && zlevels[k] < pts[i2, j2].Z ||
+                            zlevels[k] < pts[i1, j1].Z && zlevels[k] >= pts[i2, j2].Z))
+                        {
+                            zratio = (zlevels[k] - pts[i0, j0].Z) /
+                                (pts[i2, j2].Z - pts[i0, j0].Z);
+                            //pta[0] = cs2d.Point2D(new PointF(pts[i0, j0].X * (1 - zratio) +
+                            //    pts[i2, j2].X * zratio, pts[i0, j0].Y * (1 - zratio) +
+                            //    pts[i2, j2].Y * zratio), cs);
+
+                            pta[0].X = pts[i0, j0].X * (1 - zratio) +pts[i2, j2].X * zratio;
+                            pta[0].Y = pts[i0, j0].Y * (1 - zratio) +pts[i2, j2].Y * zratio;
+
+
+
+                            zratio = (zlevels[k] - pts[i1, j1].Z) /
+                                (pts[i2, j2].Z - pts[i1, j1].Z);
+                            //pta[1] = cs2d.Point2D(new PointF(pts[i1, j1].X,
+                            //    pts[i1, j1].Y * (1 - zratio) + pts[i2, j2].Y * zratio), cs);
+
+                            pta[1].X = pts[i1, j1].X;
+                            pta[1].Y = pts[i1, j1].Y * (1 - zratio) + pts[i2, j2].Y * zratio;
+
+                            //--Calling the function
+                            //PlotLogicFxnForContour(pta, i, k, frm1);
+                            PlotLogicFxnForContour(pta, i, k);
+                            // g.DrawLine(aPen, pta[0], pta[1]);
+                        }
+                        else if ((zlevels[k] >= pts[i0, j0].Z && zlevels[k] < pts[i1, j1].Z ||
+                            zlevels[k] < pts[i0, j0].Z && zlevels[k] >= pts[i1, j1].Z) &&
+                            (zlevels[k] >= pts[i0, j0].Z && zlevels[k] < pts[i2, j2].Z ||
+                            zlevels[k] < pts[i0, j0].Z && zlevels[k] >= pts[i2, j2].Z))
+                        {
+                            zratio = (zlevels[k] - pts[i0, j0].Z) /
+                                (pts[i1, j1].Z - pts[i0, j0].Z);
+                            //pta[0] = cs2d.Point2D(new PointF(pts[i0, j0].X * (1 - zratio) +
+                            //    pts[i1, j1].X * zratio, pts[i0, j0].Y), cs);
+
+
+                            pta[0].X = pts[i0, j0].X * (1 - zratio) +pts[i1, j1].X * zratio;
+                            pta[0].Y = pts[i0, j0].Y;
+
+
+
+                            zratio = (zlevels[k] - pts[i0, j0].Z) /
+                                (pts[i2, j2].Z - pts[i0, j0].Z);
+                            //pta[1] = cs2d.Point2D(new PointF(pts[i0, j0].X * (1 - zratio) +
+                            //    pts[i2, j2].X * zratio, pts[i0, j0].Y * (1 - zratio) +
+                            //    pts[i2, j2].Y * zratio), cs);
+
+                            pta[1].X = pts[i0, j0].X * (1 - zratio) +pts[i2, j2].X * zratio;
+                            pta[1].Y = pts[i0, j0].Y * (1 - zratio) +pts[i2, j2].Y * zratio;
+
+
+                            s += "zlevel k = " + k + ",i = " + i + ",j=" + j + "pts x1,y1=(" + pta[0].X + "," + pta[0].Y + "),\n";
+                            //--Calling the function
+                            //PlotLogicFxnForContour(pta, i, k, frm1);
+                            PlotLogicFxnForContour(pta, i, k);
+                            //g.DrawLine(aPen, pta[0], pta[1]);
+                        }
+                    }
+                }
+            }
+
+            return listStoredPoints;
+        }
+        public class DataTypeForPointList
+        {
+            public double x1 { get; set; }
+            public double y1 { get; set; }
+            public double x2 { get; set; }
+            public double y2 { get; set; }
+
+            public int zlevel { get; set; }
+        }
+        List<DataTypeForPointList> listStoredPoints = new List<DataTypeForPointList>();
+        int indexForSeries = 0;
+        public void PlotLogicFxnForContour(PointF[] pta,int i ,int k)
+        {
+
+
+            //--x-asix range 0-4000 and  y -axis range0-100 so 
+            if ((pta[0].X > 0 && pta[0].X < 4000) && (pta[0].Y > 0 && pta[0].Y < 100))
+            {
+
+                if ((pta[1].X > 0 && pta[1].X < 4000) && (pta[1].Y > 0 && pta[1].Y < 100))
+                {
+
+
+                    if (changingZLevel == prevZLabelCheck && changingIIndex == prevIIndex)
+                    {
+                        //--We have match the index and z- level so put the point in the series.
+                        flagForIncSeries = 1;
+                        //--Now lets add the values 
+                        //frm1.ph_chart.Series[selectedSeriesName].Points.AddXY(pta[0].X, pta[0].Y);
+                        //frm1.ph_chart.Series[selectedSeriesName].Points.AddXY(pta[1].X, pta[1].Y);
+                        listStoredPoints.Add(new DataTypeForPointList
+                        {
+                            x1 = pta[0].X,
+                            y1 = pta[0].Y,
+                            x2 = pta[1].X,
+                            y2 = pta[1].Y,
+                            zlevel = changingZLevel
+
+                        });
+
+
+                    }
+                    else if (changingZLevel > prevZLabelCheck && changingIIndex > prevIIndex)
+                    {
+                        //==We need to change the series to new one
+                        //--we should only increment the index once if previous value is filled 
+                        if (flagForIncSeries == 1)
+                        {
+                            //==Then we increment the series or change series and plot the points.
+                            //selectedSeriesName = arrayListSeries[indexForSeries++].ToString();
+
+                            //frm1.ph_chart.Series[selectedSeriesName].Points.AddXY(pta[0].X, pta[0].Y);
+                            //frm1.ph_chart.Series[selectedSeriesName].Points.AddXY(pta[1].X, pta[1].Y);
+                            listStoredPoints.Add(new DataTypeForPointList
+                            {
+                                x1 = pta[0].X,
+                                y1 = pta[0].Y,
+                                x2 = pta[1].X,
+                                y2 = pta[1].Y,
+                                zlevel = changingZLevel
+
+                            });
+
+
+
+                            flagForIncSeries = 0;
+                        }
+
+                    }
+
+                    prevZLabelCheck = k;
+                    prevIIndex = i;
+
+
+                }
+            }
+
+
+        }
+
+
+        //===========End of my contour code for plotting =============================//
+
 
         private void AddContour3D(Graphics g, DataSeries ds, ChartStyle cs, ChartStyle2D cs2d)
         {

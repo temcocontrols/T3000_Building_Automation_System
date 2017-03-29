@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -42,6 +43,17 @@ namespace Example6_3
             xlApp.Quit();
 
         }//Close of the function
+
+        //public void plotFxn( WFA_PH_CurveDemo.Form1 f1,ArrayList al)
+        //{
+        //    ChartFunctions cf = new ChartFunctions();
+        //    DataSeries ds = new DataSeries();
+        //    // ChartStyle cs = new ChartStyle(this);
+        //    //cf.Peak3D()
+        //    cf.SetDataPoints(ds);
+        //    DrawChart dc = new DrawChart(new Form1());
+        //    dc.AddContour_MyCustomFxn(ds,f1, al);
+        //}
 
 
     }

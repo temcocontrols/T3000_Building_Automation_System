@@ -28,33 +28,29 @@ namespace Example6_3
             this.SetStyle(ControlStyles.ResizeRedraw, true);
             this.BackColor = Color.White;
 
-            //  MessageBox.Show("Form1 constructor");
-
-            // Subscribing to a paint eventhandler to drawingPanel: 
-          //  MessageBox.Show("Subscribing to a paint eventhandler to drawingPanel: ");
-            PlotPanel.Paint +=
-                new PaintEventHandler(PlotPanelPaint);
-
-
+            //MessageBox.Show("Form1 constructor");
+            //Subscribing to a paint eventhandler to drawingPanel: 
+            //MessageBox.Show("Subscribing to a paint eventhandler to drawingPanel: ");
+            PlotPanel.Paint += new PaintEventHandler(PlotPanelPaint);
 
 
             cs = new ChartStyle(this);
-        cs2d = new ChartStyle2D(this);
-        ds = new DataSeries();
-        dc = new DrawChart(this);
-        cf = new ChartFunctions();
-        cm = new ColorMap();
+            cs2d = new ChartStyle2D(this);
+            ds = new DataSeries();
+            dc = new DrawChart(this);
+            cf = new ChartFunctions();
+            cm = new ColorMap();
             //dc.ChartType = DrawChart.ChartTypeEnum.Contour;
 
-          //  MessageBox.Show("All initialization finish eg. new wala");
+            //MessageBox.Show("All initialization finish eg. new wala");
             cs.GridStyle.LineColor = Color.LightGray;
-     cs.GridStyle.Pattern = DashStyle.Dash;
-     cs.Title = "No Title";
-            cs.IsColorBar = false;//true;
-     cs2d.ChartBackColor = Color.White;
-     cs2d.ChartBorderColor = Color.Black;
+             cs.GridStyle.Pattern = DashStyle.Dash;
+             cs.Title = "No Title";
+             cs.IsColorBar = false;//true;
+             cs2d.ChartBackColor = Color.White;
+             cs2d.ChartBorderColor = Color.Black;
 
-     ds.LineStyle.IsVisible = false;
+             ds.LineStyle.IsVisible = false;
             //ds.BarStyle.XLength = 0.3f;
             //ds.BarStyle.YLength = 0.3f;
             //ds.BarStyle.IsBarSingleColor = false;
@@ -72,17 +68,17 @@ namespace Example6_3
                      dc.XYZSlice = DrawChart.SliceEnum.ZSlice;
                      dc.SliceLocation = 1;
                       //dc.IsBarSingleColor = false;  
-          */
+             */
            // MessageBox.Show("Before contour");
             dc.ChartType = DrawChart.ChartTypeEnum.Contour;
             //  dc.IsHiddenLine = false;
             dc.IsColorMap = false;//true;
             //dc.IsInterp = true;
-            dc.NumberContours = 25;
+            dc.NumberContours = 35;
             // dc.AddChart()       
-            cs.IsColorBar = true;
-            dc.IsColorMap = true;
-            dc.CMap = cm.Jet();
+            //cs.IsColorBar = true;
+            //dc.IsColorMap = true;
+            //dc.CMap = cm.Jet();
            // MessageBox.Show("end of constructor");
 
         }
@@ -137,6 +133,11 @@ namespace Example6_3
   
       
         private void button1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
         {
 
         }
