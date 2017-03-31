@@ -124,7 +124,7 @@
     <Compile Include="Application_Form4.Designer.cs">
       <DependentUpon>Application_Form4.cs</DependentUpon>
     </Compile>
-    <Compile Include="AssemblyDateGeneration.cs" />
+    <Compile Include="AssemblyCreationDate.cs" />
     <Compile Include="BACnetBase.cs" />
     <Compile Include="BACnetClass.cs" />
     <Compile Include="BACnetClient.cs" />

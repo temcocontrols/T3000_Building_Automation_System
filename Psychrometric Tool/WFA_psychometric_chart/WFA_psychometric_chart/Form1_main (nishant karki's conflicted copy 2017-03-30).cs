@@ -784,16 +784,15 @@ namespace WFA_psychometric_chart
             PathToT3000BuildingDB = againNewPath;
             //MessageBox.Show(againNewPath);
 
-            //== For date generation
-            this.Text = "Psychometric Chart [" + AssemblyDateGeneration.Value.ToShortDateString() + "]";
 
 
 
+            //--This one is for date calculation
+            //AssemblyCreationDate acd = new AssemblyCreationDate();
+            this.Text = "Psychometric Chart [" + AssemblyCreationDate.Value.ToShortDateString() + "]";
 
 
         }  //Close of the laod function
-
-
 
 
     //***************************************Codes from building settings*********************************************//
@@ -926,7 +925,9 @@ namespace WFA_psychometric_chart
 
             DataGridView_Show_Data();
             dataGridView1.Rows.Add();
-          
+            //loading the comfortzone when set             
+            //This to prevent anonomous plotting
+           // chart1.Enabled = false;
 
         }
 

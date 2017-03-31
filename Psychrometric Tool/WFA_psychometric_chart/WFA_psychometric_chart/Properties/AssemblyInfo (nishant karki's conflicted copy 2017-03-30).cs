@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Example6_3")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("WFA_psychometric_chart")]
+[assembly: AssemblyDescription("Psychometric Tool")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Example6_3")]
-[assembly: AssemblyCopyright("Copyright ©  2007")]
+[assembly: AssemblyProduct("WFA_psychometric_chart")]
+[assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("26bd6a3a-2861-4d60-86ab-294ac33e0a48")]
+[assembly: Guid("630bc1e2-9e59-480a-a10a-a358eee272c5")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -29,5 +29,8 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+// You can specify all the values or you can default the Build and Revision Numbers 
+// by using the '*' as shown below:
+// [assembly: AssemblyVersion("1.0.*")]
+[assembly: AssemblyVersion("1.0.*")]
+[assembly: AssemblyFileVersion("1.0.*")]
