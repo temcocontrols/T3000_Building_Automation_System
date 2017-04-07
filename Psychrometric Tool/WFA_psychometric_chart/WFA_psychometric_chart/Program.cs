@@ -32,7 +32,12 @@ namespace WFA_psychometric_chart
 
             if (File.Exists(databaseFile1))
             {
-                //file exist so dont create the database      
+                //file exist so dont create the database 
+
+                DatabaseOperation db_op = new DatabaseOperation();
+                db_op.sqlite_database_creation_For_UpdateCondition(selectedBuildingFromT3000);
+
+
             }
             else
             {

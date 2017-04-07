@@ -13,7 +13,6 @@ using System.Runtime.InteropServices;
 using System.Data;
 using System.Xml;
 using System.Net;
-using System.Linq;
 using System.Data.OleDb;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -35,18 +34,15 @@ namespace WFA_psychometric_chart
         SqlCommand cmd = new SqlCommand();
 
         //----------This one for database operation calls to reuse this part-------//
-
-      //  DatabaseOperations dbClientClass;
+         //--------DatabaseOperations dbClientClass;
          //--------end of the database operations ------------------//
         public Form1_main()
         {
             InitializeComponent();
             //this.Disposed += new System.EventHandler ( this.Form1_main_Disposed );
             //this is done to copy the instance of form1 to be reusable in DatabaseOperations
-          //  dbClientClass = new DatabaseOperations(this);
+            //dbClientClass = new DatabaseOperations(this);
         }
-
-
 
         /// <summary>
         /// This returns air pressure in pascal (pa)
@@ -1041,7 +1037,6 @@ namespace WFA_psychometric_chart
             atimer = new System.Timers.Timer();
             atimer.Enabled = true;
             atimer.Elapsed += timer1_Tick_For_Device;
-
             atimer.Interval = 1000 * 5; //x seconds[ 1000 ms * x  =  x seconds]
 
         }
@@ -5367,7 +5362,6 @@ namespace WFA_psychometric_chart
                 //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
 
-
                 //string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 string databasePath1 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 string databaseFile = databasePath1 + @"\db_psychrometric_project.s3db";
@@ -5440,7 +5434,7 @@ namespace WFA_psychometric_chart
                 string tbl_Weather_Controller_Restor_Info= "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Weather_Controller_Restor_Info(count INTEGER PRIMARY KEY AUTOINCREMENT,BuildingName varchar(255), ControllerNameInfo varchar(255) ,TemperatureParameterInfo VARCHAR(255),HumidityParameterInfo varchar(255),TempValue varchar(255),HumValue varchar(255))";
                 string tbl_Weather_Web_Restor_Info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Weather_Web_Restor_Info(count INTEGER PRIMARY KEY AUTOINCREMENT,BuildingName varchar(255),Enable_dissable_info varchar(255), StationInfo varchar(255))";
                 string tbl_Weather_HumSelfCalibration_Restor_Info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Weather_HumSelfCalibration_Restor_Info(count INTEGER PRIMARY KEY AUTOINCREMENT,BuildingName varchar(255),Enable_dissable_info varchar(255), max_adjustment_per_day varchar(255))";
-
+                string tbl_database_version = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Database_Version(count INTEGER PRIMARY KEY AUTOINCREMENT,version varchar(255))";
 
                 //now execute the query
                 SQLiteCommand cm1 = new SQLiteCommand(tbl_comfortzoneSetting, m_dbConnection);
@@ -5482,18 +5476,17 @@ namespace WFA_psychometric_chart
                 SQLiteCommand cm13 = new SQLiteCommand(tbl_Weather_HumSelfCalibration_Restor_Info, m_dbConnection);
                 cm13.ExecuteNonQuery();
 
+                SQLiteCommand cm14 = new SQLiteCommand(tbl_database_version, m_dbConnection);
+                cm14.ExecuteNonQuery();
 
                 /*
-                 Now lets read the data form alex database and store it in the our db_psychometric_project.s3db databse 
-                 
-                 //==Read complete now writing the values to our database
-                
-                
-                  */
+                Now lets read the data form alex database and store it in the our db_psychometric_project.s3db databse                  
+                //==Read complete now writing the values to our database                               
+                */
 
                 //MessageBox.Show("We have created all tables now insertion is left");
                 //This function will write to tbl_bulding_location as well as will make a building selected
-                // WriteT3000BuildingInfoToPsychoDB("1", BuildingSelected[0].country, BuildingSelected[0].state, BuildingSelected[0].city, BuildingSelected[0].street, BuildingSelected[0].longitude, BuildingSelected[0].latitude, BuildingSelected[0].elevation, BuildingSelected[0].Building_Name, BuildingSelected[0].EngineeringUnits);
+                //WriteT3000BuildingInfoToPsychoDB("1", BuildingSelected[0].country, BuildingSelected[0].state, BuildingSelected[0].city, BuildingSelected[0].street, BuildingSelected[0].longitude, BuildingSelected[0].latitude, BuildingSelected[0].elevation, BuildingSelected[0].Building_Name, BuildingSelected[0].EngineeringUnits);
 
                 string sql_stringx = "insert into tbl_building_location ( selection ,country ,state,city ,street,longitude,latitude ,elevation ,BuildingName ,EngineeringUnits  ) VALUES( @sel ,@con,@state ,@city,@stre , @lng  ,@lat,@elev ,@bname ,@engUnit  )";
                 SQLiteCommand command9 = new SQLiteCommand(sql_stringx, m_dbConnection);
@@ -5559,6 +5552,11 @@ namespace WFA_psychometric_chart
                 SQLiteCommand cmd_Music = new SQLiteCommand(sql_comfortzone_Music, m_dbConnection);
                 cmd_Music.ExecuteNonQuery();
 
+                //--For inserting the version value first time while creating database
+                string version = AssemblyDateGeneration.Value.ToShortDateString();
+                string sql_database_version = "INSERT INTO tbl_" + buildingNameSelected + "_Database_Version( version)   VALUES('"+ version + "')";
+                SQLiteCommand cmd_database_version = new SQLiteCommand(sql_database_version, m_dbConnection);
+                cmd_database_version.ExecuteNonQuery();
 
                 //===============END OF THE NEW CODE ADDED IN THIS SECTION==========================//
 
@@ -10567,13 +10565,6 @@ namespace WFA_psychometric_chart
         }
 
 
-
-
-
-
-
-
-
         //Lets have a list for chartDetailList
         public List<chartDetailDT_X> chartInfoPulledForSaving_For_Load = new List<chartDetailDT_X>();//This is used for storing the chart detail ids
 
@@ -11507,12 +11498,7 @@ namespace WFA_psychometric_chart
                // SQLiteConnection.ClearPool();//This helps in 
             }
 
-
-
-
-
         }
-
 
         /// <summary>
         /// This function helps to save the data of single
@@ -11590,13 +11576,6 @@ namespace WFA_psychometric_chart
 
 
         }
-
-
-
-
-
-
-
 
 
         //lets make three list for replaing these : 
@@ -12879,12 +12858,6 @@ namespace WFA_psychometric_chart
           //  MessageBox.Show("Count  node = " + menuStripNodeInfoValues.Count + " , line count = " + menuStripNodeLineInfoValues.Count);
             //=======================end of loading data : now lets plot the data values=======================//
 
-
-            //ClearChart();   //this will clear the chart first
-            // ResettingLines();
-            // ReDrawingLineAndNode();
-           // ReDrawingLineAndNodeForLoadXML();
-
         }
 
         string beginEditText = "";
@@ -13023,8 +12996,6 @@ namespace WFA_psychometric_chart
                             flagResistingForDGVChangeSelection = 0;//close enable of dgv_selectionChange event 
 
                             //===================end of selection of new created chart =======================//
-
-
                         }
                         else
                                 {
@@ -13032,7 +13003,6 @@ namespace WFA_psychometric_chart
                                 }
 
                                 ///close of if we need to add here ...
-
 
                     }
                     else
@@ -13114,8 +13084,7 @@ namespace WFA_psychometric_chart
 
                 return;
             }
-
-                      
+         
             //--Showing the data on cell selected...
             // MessageBox.Show("CELL SELECT " );
             //When dgv is click it clicks twice this if is written to stop those twice click.
@@ -13230,11 +13199,7 @@ namespace WFA_psychometric_chart
                             lb_web_status.Text = "inactive";
                             lb_device_status.Text = "disconnected";
 
-
-
-                          
                             break;
-
                         }
                         else
                         {
@@ -13242,10 +13207,6 @@ namespace WFA_psychometric_chart
                             RefreshGraph();
                         }
                     }
-
-
-
-
 
 
                 }  //close of != null if
@@ -14140,7 +14101,7 @@ namespace WFA_psychometric_chart
                     s += reader["NAME"].ToString()+"\n";
                 }
 
-              //  MessageBox.Show("TABLE NAME = " + s);
+               //MessageBox.Show("TABLE NAME = " + s);
 
    
             } //close of using statement 
@@ -16138,9 +16099,7 @@ namespace WFA_psychometric_chart
             plot_on_graph_values_heat_map(DBT, HR, x_axis, y_axis);
 
             //MessageBox.Show("reached series print" +series1.ToString());
-
             //index_heat_map++;
-
 
             return 0;
         }
@@ -16152,7 +16111,6 @@ namespace WFA_psychometric_chart
             //chart1.Series.Add(series1);
             try
             {
-
 
                 series1_heat_map.ChartType = SeriesChartType.Point;
                 int r, g, b;

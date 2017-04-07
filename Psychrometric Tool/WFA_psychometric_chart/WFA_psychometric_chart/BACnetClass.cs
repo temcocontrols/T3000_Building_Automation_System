@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.BACnet;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace WFA_psychometric_chart
 {
@@ -15,10 +12,9 @@ namespace WFA_psychometric_chart
         static BacnetClient bacnet_client;
 
         // All the present Bacnet Device List
-      public  static List<BacNode> DevicesList = new List<BacNode>();
+        public  static List<BacNode> DevicesList = new List<BacNode>();
 
-        /*****************************************************************************************************/
-
+        /*********************************************************************************************/
 
        // public static IEnumerable<BacNode> DevicesList { get; private set; }
 
@@ -69,7 +65,6 @@ namespace WFA_psychometric_chart
                 //Console.WriteLine("Started");
 
                 Thread.Sleep(3000); // Wait a fiew time for WhoIs responses (managed in handler_OnIam)
-
                 //Console.WriteLine("BACnet Devices List");
                 //Console.WriteLine("Instance ID\tBACnetIP");
                 lock (DevicesList)
@@ -103,14 +98,10 @@ namespace WFA_psychometric_chart
             // Or Bacnet Ethernet
             // bacnet_client = new BacnetClient(new BacnetEthernetProtocolTransport("Connexion au réseau local"));          
 
-            bacnet_client.Start();    // go
-
+            bacnet_client.Start();//go
             // Send WhoIs in order to get back all the Iam responses :  
             bacnet_client.OnIam += new BacnetClient.IamHandler(handler_OnIam);
-
             bacnet_client.WhoIs();
-
-
 
         }
 

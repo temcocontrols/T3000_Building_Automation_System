@@ -143,6 +143,7 @@
     <Compile Include="comfort_zone.Designer.cs">
       <DependentUpon>comfort_zone.cs</DependentUpon>
     </Compile>
+    <Compile Include="DatabaseOperation.cs" />
     <Compile Include="DatabaseOperations.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -259,12 +260,6 @@
     </Compile>
     <Compile Include="Form_Psychrometric_Calculator.Designer.cs">
       <DependentUpon>Form_Psychrometric_Calculator.cs</DependentUpon>
-    </Compile>
-    <Compile Include="form_state_point_management.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="form_state_point_management.Designer.cs">
-      <DependentUpon>form_state_point_management.cs</DependentUpon>
     </Compile>
     <Compile Include="Form_TemperatureSourceDeviceInput.cs">
       <SubType>Form</SubType>
@@ -496,9 +491,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Form_Psychrometric_Calculator.zh.resx">
       <DependentUpon>Form_Psychrometric_Calculator.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="form_state_point_management.resx">
-      <DependentUpon>form_state_point_management.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form_TemperatureSourceDeviceInput.ko.resx">
       <DependentUpon>Form_TemperatureSourceDeviceInput.cs</DependentUpon>

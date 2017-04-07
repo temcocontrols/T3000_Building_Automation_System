@@ -12,7 +12,6 @@ using System.Reflection;
 using System.Data.SQLite;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using System.Data.OleDb;
 
 namespace WFA_psychometric_chart
 {
@@ -72,7 +71,7 @@ namespace WFA_psychometric_chart
          public void timer1_Tick_For_Device(object sender , EventArgs e)
         {
            // MessageBox.Show("Test called ");
-        //  ReadDataFromDevice();
+          //ReadDataFromDevice();
         }
 
         public class DeviceClass
@@ -1734,7 +1733,7 @@ namespace WFA_psychometric_chart
         {
             try { 
 
-            button1.Text = WFA_psychometric_chart.Properties.Resources.Refresh_Building;
+                button1.Text = WFA_psychometric_chart.Properties.Resources.Refresh_Building;
                 label36.Text = WFA_psychometric_chart.Properties.Resources.Select_station_name;
                 //fill_combobox();
 
@@ -2322,9 +2321,6 @@ namespace WFA_psychometric_chart
                                 cmdx.ExecuteNonQuery();
 
                                 //finally close the connection.
-
-
-
 
 
                                 connection.Close();
@@ -2923,44 +2919,35 @@ namespace WFA_psychometric_chart
                 }
 
                 //On this index change the we need to get the values from the 
-              int  indexSelectedDevice = CB_Device.SelectedIndex;
-                    int instanceId = copyOfMainControllerList[indexSelectedDevice].controllerInstanceId;  //(int)device_info[indexSelectedDevice].deviceInstance;//Device instance selected.
+                int indexSelectedDevice = CB_Device.SelectedIndex;
+                int instanceId = copyOfMainControllerList[indexSelectedDevice].controllerInstanceId;//(int)device_info[indexSelectedDevice].deviceInstance;//Device instance selected.
 
-                 //   MessageBox.Show("Instaneid = " + instanceId);
-                //===============For regulare update=============//
-                deviceInstanceValuTemp = instanceId;//This one is for regular update
+                    //   MessageBox.Show("Instaneid = " + instanceId);
+                    //===============For regulare update=============//
+                    deviceInstanceValuTemp = instanceId;//This one is for regular update
                                                     //================end of for regular update=====//
                                                     //This uint has to be converted to int because that is what is required...
 
                     //Checking if the device is online or offline
                     if (CheckDeviceOnlineOffline(deviceInstanceValuTemp, 0) == true)
                     {
-                      //  MessageBox.Show("Checking online status become true");
+                        //  MessageBox.Show("Checking online status become true");
 
                         //return;
 
+                        System.Threading.CancellationTokenSource cts = new System.Threading.CancellationTokenSource();
+                        try {
+                            cts.CancelAfter(10000);
+                            // await PullDataFromDeviceForTimeConstrains(instanceId);
+                            //MessageBox.Show("We are here");
+                             AsyncMethodForPullingDataFromYabee(instanceId,  cts.Token);
 
-                        DeviceConnection db = new DeviceConnection();
-                        //We need to scan for the device first and then parameter
-                        db.ScanForDevice();
-                        //db.ScanForParameters(24649);
-                        db.ScanForParameters(instanceId);//This will return the parameters
-                       // MessageBox.Show("Count = " + db.parameterListValue.Count);       //Now we can use the value strored int  the db.parameterList1
-                        string s = "";
-                        foreach (var bac in db.parameterListValue)
-                        {
-                            parameterValFromBacnet.Add(new parameter_class1
-                            {
-                                device_object_name = bac.device_object_name,
-                                indexID = bac.indexID,
-                                presentValue = bac.presentValue ,
-                                object_identifier_type = bac.object_identifier_type
+                            System.Threading.Thread.Sleep(6000);
 
 
-                            });
-                          //  s += bac.device_object_name + "," + bac.presentValue + "\n";
+
                         }
-
+                        catch (Exception ex) { }
 
                         //  MessageBox.Show("value = " + s);
 
@@ -3073,8 +3060,45 @@ namespace WFA_psychometric_chart
             }
 
         }
+        public async Task AsyncMethodForPullingDataFromYabee(int instanceid, System.Threading.CancellationToken ct)
+        {
+            try
+            {
+                // Do asynchronous work.
+                await Task.Run(() => PullDataFromDeviceForTimeConstrains(instanceid),ct);
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        public void PullDataFromDeviceForTimeConstrains(int instanceId)
+        {
+          
+            DeviceConnection db = new DeviceConnection();
+            //We need to scan for the device first and then parameter
+            db.ScanForDevice();
+            //db.ScanForParameters(24649);
+            db.ScanForParameters(instanceId);//This will return the parameters
+                                             // MessageBox.Show("Count = " + db.parameterListValue.Count);       //Now we can use the value strored int  the db.parameterList1
+            string s = "";
+            foreach (var bac in db.parameterListValue)
+            {
+                parameterValFromBacnet.Add(new parameter_class1
+                {
+                    device_object_name = bac.device_object_name,
+                    indexID = bac.indexID,
+                    presentValue = bac.presentValue,
+                    object_identifier_type = bac.object_identifier_type
 
 
+                });
+                //  s += bac.device_object_name + "," + bac.presentValue + "\n";
+            }
+           // MessageBox.Show("We are  count = "+db.parameterListValue.Count);
+
+        }
 
 
         /// <summary>
@@ -3912,9 +3936,7 @@ namespace WFA_psychometric_chart
 
                 //then reenable again
                 temporary_timer_function();
-
                 //====inserting and updating controller info with corresponding values For restore fxn====//
-
                 if (CB_Device.Text != "")
                 {
                     Weather_Restore wr = new Weather_Restore();

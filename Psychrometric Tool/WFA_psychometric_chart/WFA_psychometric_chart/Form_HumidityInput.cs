@@ -21,13 +21,22 @@ namespace WFA_psychometric_chart
 
         private void btn_ok_Click(object sender, EventArgs e)
         {
+            try
+            { 
             string input = textBox1.Text.Trim();
             Cursor.Current = Cursors.WaitCursor;
             //EditNodeLineForm ef = new EditNodeLineForm()
             frm.HumidityInputPorcessForDevice(input);
+            frm.LoadNodeAndLine();
             //MessageBox.Show("End");
             Cursor.Current = Cursors.Default;
             this.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Please click input, output and variable section in T3000 and retry!");
+                this.Close();
+            }
         }
     }
 }
