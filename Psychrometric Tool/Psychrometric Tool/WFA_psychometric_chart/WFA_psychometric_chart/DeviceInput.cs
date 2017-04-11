@@ -1,42 +1,45 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace WFA_psychometric_chart
 {
-    public partial class Form_HumidityInput : Form
+    public partial class Form_DeviceInput : Form
     {
         EditNodeLineForm frm;
-        public Form_HumidityInput(EditNodeLineForm f)
+        public Form_DeviceInput(EditNodeLineForm fx)
         {
-            frm = f;
+            frm = fx;
             InitializeComponent();
         }
 
         private void btn_ok_Click(object sender, EventArgs e)
         {
-            try
-            { 
+            try { 
             string input = textBox1.Text.Trim();
             Cursor.Current = Cursors.WaitCursor;
+
             //EditNodeLineForm ef = new EditNodeLineForm()
-            frm.HumidityInputPorcessForDevice(input);
-            frm.LoadNodeAndLine();
+            frm.TemperatureInputPorcessForDevice(input);
             //MessageBox.Show("End");
+            frm.LoadNodeAndLine();
+
             Cursor.Current = Cursors.Default;
             this.Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Please click input, output and variable section in T3000 and retry!");
+                MessageBox.Show($"{ex.Message} \n Please select input, output and variable section in T3000 and retry!");
                 this.Close();
             }
+        }
+
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+          //  string textAvailable = textBox1.Text.Trim();
+
+          //string t=   textAvailable.ToUpper();
+          //  textBox1.Text = t;//textAvailable;
         }
     }
 }

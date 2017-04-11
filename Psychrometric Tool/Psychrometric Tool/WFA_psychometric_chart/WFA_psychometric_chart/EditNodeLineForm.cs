@@ -294,7 +294,7 @@ namespace WFA_psychometric_chart
                             fm.ShowDialog();
                             }catch(Exception ex)
                             {
-                                MessageBox.Show("Please click input, output and variable section in T3000 and retry!");
+                                MessageBox.Show($"{ex.Message} \n Please select input, output and variable section in T3000 and retry!");
                             }
                         }  
                       else if(dataGridView1.CurrentCell.ColumnIndex == 4)
@@ -309,7 +309,7 @@ namespace WFA_psychometric_chart
                             }
                             catch (Exception ex)
                             {
-                                MessageBox.Show("Please click input, output and variable section in T3000 and retry!");
+                                MessageBox.Show($"{ex.Message} \n Please select input, output and variable section in T3000 and retry!");
                             }
                         }
 
@@ -5000,7 +5000,7 @@ namespace WFA_psychometric_chart
                             else
                             {
                                 //Invalid input
-                                MessageBox.Show("This is not a temperature parameter!");
+                                MessageBox.Show("This is not a humidity parameter!");
                                 return;
                             }
                             break; //We found the value so break from the loop
@@ -5064,7 +5064,7 @@ namespace WFA_psychometric_chart
                             else
                             {
                                 //Invalid input
-                                MessageBox.Show("This is not a temperature parameter!");
+                                MessageBox.Show("This is not a humidity parameter!");
                                 return;
                             }
                             break; //We found the value so break from the loop
@@ -5129,7 +5129,7 @@ namespace WFA_psychometric_chart
                             else
                             {
                                 //Invalid input
-                                MessageBox.Show("This is not a temperature parameter!");
+                                MessageBox.Show("This is not a humidity parameter!");
                                 return;
                             }
                             break; //We found the value so break from the loop
@@ -5231,7 +5231,7 @@ namespace WFA_psychometric_chart
                                 else
                                 {
                                     //Invalid input
-                                    MessageBox.Show("This is not a temperature parameter!");
+                                    MessageBox.Show("This is not a humidity parameter!");
                                     return;
                                 }
                                 break; //We found the value so break from the loop
@@ -5304,7 +5304,7 @@ namespace WFA_psychometric_chart
                                 else
                                 {
                                     //Invalid input
-                                    MessageBox.Show("This is not a temperature parameter!");
+                                    MessageBox.Show("This is not a humidity parameter!");
                                     return;
                                 }
                                 break; //We found the value so break from the loop
@@ -5379,7 +5379,7 @@ namespace WFA_psychometric_chart
                                 else
                                 {
                                     //Invalid input
-                                    MessageBox.Show("This is not a temperature parameter!");
+                                    MessageBox.Show("This is not a humidity parameter!");
                                     return;
                                 }
                                 break; //We found the value so break from the loop
@@ -5397,7 +5397,7 @@ namespace WFA_psychometric_chart
 
             bcs.UpdateOrInsertHumiditySourceInfo(tempNodeID, DeviceIdentificationKeyWord);
            // LoadNodeAndLine(); //--This load section is done outside this function
-        }
+        } //-Close of humidity input parameter fxn
 
 
         /// <summary>
