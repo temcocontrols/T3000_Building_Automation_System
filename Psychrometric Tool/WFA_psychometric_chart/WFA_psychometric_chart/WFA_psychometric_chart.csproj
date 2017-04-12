@@ -136,6 +136,7 @@
     <Compile Include="buildingChartSetting.Designer.cs">
       <DependentUpon>buildingChartSetting.cs</DependentUpon>
     </Compile>
+    <Compile Include="BuildingIdentificationClass.cs" />
     <Compile Include="ChartOperations.cs" />
     <Compile Include="comfort_zone.cs">
       <SubType>Form</SubType>
@@ -188,6 +189,12 @@
     </Compile>
     <Compile Include="Form4_insert_data.Designer.cs">
       <DependentUpon>Form4_insert_data.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormMessageBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormMessageBox.Designer.cs">
+      <DependentUpon>FormMessageBox.cs</DependentUpon>
     </Compile>
     <Compile Include="form_app_timer_historical_plot.cs">
       <SubType>Form</SubType>
@@ -374,6 +381,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Form4_insert_data.zh.resx">
       <DependentUpon>Form4_insert_data.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormMessageBox.resx">
+      <DependentUpon>FormMessageBox.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="form_app_timer_historical_plot.en-US.resx">
       <DependentUpon>form_app_timer_historical_plot.cs</DependentUpon>

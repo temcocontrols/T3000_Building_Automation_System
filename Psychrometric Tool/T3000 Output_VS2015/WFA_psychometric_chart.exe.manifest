@@ -3,7 +3,7 @@
   <asmv1:assemblyIdentity name="WFA_psychometric_chart.exe" version="1.0.0.1" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
   <application />
   <entryPoint>
-    <assemblyIdentity name="WFA_psychometric_chart" version="1.0.6309.20095" language="neutral" processorArchitecture="msil" />
+    <assemblyIdentity name="WFA_psychometric_chart" version="1.0.6311.34440" language="neutral" processorArchitecture="msil" />
     <commandLine file="WFA_psychometric_chart.exe" parameters="" />
   </entryPoint>
   <trustInfo>
@@ -138,50 +138,50 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="WFA_psychometric_chart.exe" size="1724872">
-      <assemblyIdentity name="WFA_psychometric_chart" version="1.0.6309.20095" language="neutral" processorArchitecture="msil" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="WFA_psychometric_chart.exe" size="1732552">
+      <assemblyIdentity name="WFA_psychometric_chart" version="1.0.6311.34440" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>Ww8vnoDq8OyN5GzdFpVnz3wWdzRcZGGGUO8dRj3j3f4=</dsig:DigestValue>
+        <dsig:DigestValue>tUdGG7EjIch1xDv57HYLJbAglCPii6a1fgW1DpsXqCg=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
     <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="en-US\WFA_psychometric_chart.resources.dll" size="22016">
-      <assemblyIdentity name="WFA_psychometric_chart.resources" version="1.0.6309.20095" language="en-US" processorArchitecture="msil" />
+      <assemblyIdentity name="WFA_psychometric_chart.resources" version="1.0.6311.34440" language="en-US" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>NOszW7gpcmODO6tGu8k0zDNp/eo+0zKx80OaiwuvSx0=</dsig:DigestValue>
+        <dsig:DigestValue>VHjaqM0gQbH2FTlagZ8UiO9z+7zW4ly96ArCSedRi9A=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
     <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ko\WFA_psychometric_chart.resources.dll" size="35840">
-      <assemblyIdentity name="WFA_psychometric_chart.resources" version="1.0.6309.20095" language="ko" processorArchitecture="msil" />
+      <assemblyIdentity name="WFA_psychometric_chart.resources" version="1.0.6311.34440" language="ko" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>9uM4hudPluDXRIxCjSQ7FW8A0UdgwhlsgH/Udh+L1mo=</dsig:DigestValue>
+        <dsig:DigestValue>7bWivgxOxxeTSmA0oRGQe2/Mpy6my2tUf+hvcKf5JMs=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
     <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="zh\WFA_psychometric_chart.resources.dll" size="26624">
-      <assemblyIdentity name="WFA_psychometric_chart.resources" version="1.0.6309.20095" language="zh" processorArchitecture="msil" />
+      <assemblyIdentity name="WFA_psychometric_chart.resources" version="1.0.6311.34440" language="zh" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>N2T0r2feuKGYfCUbXS2J4JhnNyqKRYl/cAUVGi8Yzjo=</dsig:DigestValue>
+        <dsig:DigestValue>HgRM+wdqyEJOypb/E6zy4mRCG9UnvttzYqL16eEoFEo=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
