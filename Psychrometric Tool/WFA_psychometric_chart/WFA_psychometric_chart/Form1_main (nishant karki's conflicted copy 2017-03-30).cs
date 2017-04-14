@@ -13,6 +13,7 @@ using System.Runtime.InteropServices;
 using System.Data;
 using System.Xml;
 using System.Net;
+using System.Linq;
 using System.Data.OleDb;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -34,15 +35,18 @@ namespace WFA_psychometric_chart
         SqlCommand cmd = new SqlCommand();
 
         //----------This one for database operation calls to reuse this part-------//
-         //--------DatabaseOperations dbClientClass;
+
+      //  DatabaseOperations dbClientClass;
          //--------end of the database operations ------------------//
         public Form1_main()
         {
             InitializeComponent();
             //this.Disposed += new System.EventHandler ( this.Form1_main_Disposed );
             //this is done to copy the instance of form1 to be reusable in DatabaseOperations
-            //dbClientClass = new DatabaseOperations(this);
+          //  dbClientClass = new DatabaseOperations(this);
         }
+
+
 
         /// <summary>
         /// This returns air pressure in pascal (pa)
@@ -588,7 +592,7 @@ namespace WFA_psychometric_chart
             string databaseFile1 = databasePath1 + @"\db_psychrometric_project.s3db";
             
 
-            //*************************This section is already implemented main[ program run]  in Program.cs file*********//
+            //*************************This section is already implemented before program run is in Program.cs file*********//
             //So no need to run agin
 
             /*
@@ -629,11 +633,10 @@ namespace WFA_psychometric_chart
                 //value is not present so say user select a building first / configure a building first then open again.
                 MessageBox.Show("Please Configure the building location in T3000 first and restart the application again");
                 //this.exit();
-                //this.Close();
-                Application.Exit();
+                this.Close();
                 return;
             }
-            //--This pulls the location info form T3000 db
+            //--This pulls the location info form alex db
             PullLocationInformation();//this is for loading location information
 
             //MessageBox.Show("ONe");
@@ -781,16 +784,15 @@ namespace WFA_psychometric_chart
             PathToT3000BuildingDB = againNewPath;
             //MessageBox.Show(againNewPath);
 
-            //== For date generation
-            this.Text = "Psychometric Chart [" + AssemblyDateGeneration.Value.ToShortDateString() + "]";
 
 
 
+            //--This one is for date calculation
+            //AssemblyCreationDate acd = new AssemblyCreationDate();
+            this.Text = "Psychometric Chart [" + AssemblyCreationDate.Value.ToShortDateString() + "]";
 
 
         }  //Close of the laod function
-
-
 
 
     //***************************************Codes from building settings*********************************************//
@@ -923,7 +925,9 @@ namespace WFA_psychometric_chart
 
             DataGridView_Show_Data();
             dataGridView1.Rows.Add();
-          
+            //loading the comfortzone when set             
+            //This to prevent anonomous plotting
+           // chart1.Enabled = false;
 
         }
 
@@ -1038,6 +1042,7 @@ namespace WFA_psychometric_chart
             atimer = new System.Timers.Timer();
             atimer.Enabled = true;
             atimer.Elapsed += timer1_Tick_For_Device;
+
             atimer.Interval = 1000 * 5; //x seconds[ 1000 ms * x  =  x seconds]
 
         }
@@ -3876,9 +3881,7 @@ namespace WFA_psychometric_chart
 
         }
         public  List<SelectedBuildingDatatype> BuildingSelected = new List<SelectedBuildingDatatype>();
-        /// <summary>
-        /// Dont use this one it was for access databse not sqlite so
-        /// </summary>
+
         public void FindPathOfBuildingDB()
         {
             try
@@ -3909,7 +3912,13 @@ namespace WFA_psychometric_chart
                         BuildingSelected.Add(new SelectedBuildingDatatype
                         {
                             Main_BuildingName = reader["Main_BuildingName"].ToString(),
-                            Building_Name = reader["Building_Name"].ToString(),                         
+                            Building_Name = reader["Building_Name"].ToString(),
+                          
+                            //protocol = reader["Protocol"].ToString(),
+                            //com_port = reader["Com_Port"].ToString(),
+                            //ip_address = reader["Ip_Address"].ToString(),
+                            //ip_port = reader["Ip_Port"].ToString(),
+                            //braudrate = reader["Braudrate"].ToString(),
                             default_subBuilding = reader["Default_SubBuilding"].ToString(),
                             building_path = reader["Building_Path"].ToString(),
                             longitude = reader["Longitude"].ToString(),
@@ -3919,9 +3928,11 @@ namespace WFA_psychometric_chart
                             country = reader["country"].ToString(),
                             state  = reader["state"].ToString(),
                             city = reader["city"].ToString(),
-                            street = reader["street"].ToString(),                          
+                            street = reader["street"].ToString(),
+                           // ZIP  = reader["ZIP"].ToString(),
                             EngineeringUnits= reader["EngineeringUnits"].ToString(),
-                            
+
+
                         });
                     }
                 }
@@ -3968,6 +3979,11 @@ namespace WFA_psychometric_chart
                             Main_BuildingName = reader["Main_BuildingName"].ToString(),
                             Building_Name = reader["Building_Name"].ToString(),
 
+                            //protocol = reader["Protocol"].ToString(),
+                            //com_port = reader["Com_Port"].ToString(),
+                            //ip_address = reader["Ip_Address"].ToString(),
+                            //ip_port = reader["Ip_Port"].ToString(),
+                            //braudrate = reader["Braudrate"].ToString(),
                             default_subBuilding = reader["Default_SubBuilding"].ToString(),
                             building_path = reader["Building_Path"].ToString(),
                             longitude = reader["Longitude"].ToString(),
@@ -3978,9 +3994,31 @@ namespace WFA_psychometric_chart
                             state = reader["state"].ToString(),
                             city = reader["city"].ToString(),
                             street = reader["street"].ToString(),
-                       
+                            //ZIP = reader["ZIP"].ToString(),
                             EngineeringUnits = reader["EngineeringUnits"].ToString()
-                            
+
+                            //Main_BuildingName = reader["1"].ToString(),
+                            //Building_Name = reader["2"].ToString(),
+
+                            //protocol = reader["3"].ToString(),
+                            //com_port = reader["4"].ToString(),
+                            //ip_address = reader["5"].ToString(),
+                            //ip_port = reader["6"].ToString(),
+                            //braudrate = reader["7"].ToString(),
+                            //default_subBuilding = reader["8"].ToString(),
+                            //building_path = reader["9"].ToString(),
+                            //longitude = reader["10"].ToString(),
+                            //latitude = reader["11"].ToString(),
+                            //elevation = reader["12"].ToString(),
+                            //ID = reader["13"].ToString(),
+                            //country = reader["14"].ToString(),
+                            //state = reader["15"].ToString(),
+                            //city = reader["16"].ToString(),
+                            //street = reader["17"].ToString(),
+                            //ZIP = reader["18"].ToString(),
+                            //EngineeringUnits = reader["19"].ToString()
+
+
 
                         });
                     }
@@ -5324,11 +5362,12 @@ namespace WFA_psychometric_chart
         {
 
             //--lets do try catch
-            //try
-            //{
+            try
+            {
                 //--This is where we are going to create all the database  and tables of sqlite
                 //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+
 
                 //string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 string databasePath1 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -5402,7 +5441,7 @@ namespace WFA_psychometric_chart
                 string tbl_Weather_Controller_Restor_Info= "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Weather_Controller_Restor_Info(count INTEGER PRIMARY KEY AUTOINCREMENT,BuildingName varchar(255), ControllerNameInfo varchar(255) ,TemperatureParameterInfo VARCHAR(255),HumidityParameterInfo varchar(255),TempValue varchar(255),HumValue varchar(255))";
                 string tbl_Weather_Web_Restor_Info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Weather_Web_Restor_Info(count INTEGER PRIMARY KEY AUTOINCREMENT,BuildingName varchar(255),Enable_dissable_info varchar(255), StationInfo varchar(255))";
                 string tbl_Weather_HumSelfCalibration_Restor_Info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Weather_HumSelfCalibration_Restor_Info(count INTEGER PRIMARY KEY AUTOINCREMENT,BuildingName varchar(255),Enable_dissable_info varchar(255), max_adjustment_per_day varchar(255))";
-                string tbl_database_version = "CREATE TABLE IF NOT EXISTS tbl_Database_Version(count INTEGER PRIMARY KEY AUTOINCREMENT,version varchar(255))";
+
 
                 //now execute the query
                 SQLiteCommand cm1 = new SQLiteCommand(tbl_comfortzoneSetting, m_dbConnection);
@@ -5444,17 +5483,18 @@ namespace WFA_psychometric_chart
                 SQLiteCommand cm13 = new SQLiteCommand(tbl_Weather_HumSelfCalibration_Restor_Info, m_dbConnection);
                 cm13.ExecuteNonQuery();
 
-                SQLiteCommand cm14 = new SQLiteCommand(tbl_database_version, m_dbConnection);
-                cm14.ExecuteNonQuery();
 
                 /*
-                Now lets read the data form alex database and store it in the our db_psychometric_project.s3db databse                  
-                //==Read complete now writing the values to our database                               
-                */
+                 Now lets read the data form alex database and store it in the our db_psychometric_project.s3db databse 
+                 
+                 //==Read complete now writing the values to our database
+                
+                
+                  */
 
                 //MessageBox.Show("We have created all tables now insertion is left");
                 //This function will write to tbl_bulding_location as well as will make a building selected
-                //WriteT3000BuildingInfoToPsychoDB("1", BuildingSelected[0].country, BuildingSelected[0].state, BuildingSelected[0].city, BuildingSelected[0].street, BuildingSelected[0].longitude, BuildingSelected[0].latitude, BuildingSelected[0].elevation, BuildingSelected[0].Building_Name, BuildingSelected[0].EngineeringUnits);
+                // WriteT3000BuildingInfoToPsychoDB("1", BuildingSelected[0].country, BuildingSelected[0].state, BuildingSelected[0].city, BuildingSelected[0].street, BuildingSelected[0].longitude, BuildingSelected[0].latitude, BuildingSelected[0].elevation, BuildingSelected[0].Building_Name, BuildingSelected[0].EngineeringUnits);
 
                 string sql_stringx = "insert into tbl_building_location ( selection ,country ,state,city ,street,longitude,latitude ,elevation ,BuildingName ,EngineeringUnits  ) VALUES( @sel ,@con,@state ,@city,@stre , @lng  ,@lat,@elev ,@bname ,@engUnit  )";
                 SQLiteCommand command9 = new SQLiteCommand(sql_stringx, m_dbConnection);
@@ -5520,11 +5560,6 @@ namespace WFA_psychometric_chart
                 SQLiteCommand cmd_Music = new SQLiteCommand(sql_comfortzone_Music, m_dbConnection);
                 cmd_Music.ExecuteNonQuery();
 
-                //--For inserting the version value first time while creating database
-                string version = AssemblyDateGeneration.Value.ToShortDateString();
-                string sql_database_version = "INSERT INTO tbl_Database_Version( version)   VALUES('"+ version + "')";
-                SQLiteCommand cmd_database_version = new SQLiteCommand(sql_database_version, m_dbConnection);
-                cmd_database_version.ExecuteNonQuery();
 
                 //===============END OF THE NEW CODE ADDED IN THIS SECTION==========================//
 
@@ -5552,25 +5587,12 @@ namespace WFA_psychometric_chart
                 c4.ExecuteNonQuery();                
                 m_dbConnection.Close();//--closing the connection
 
-            //}
-            //catch (Exception ex)
-            //{
-                
-            //    string databasePath133 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            //    string databaseFile = databasePath133 + @"\db_psychrometric_project.s3db";
-            //    //try
-            //    //{
-            //        if (File.Exists(databaseFile))
-            //        {
-            //            File.Delete(databaseFile);
-            //        }
-
-            //    //}
-            //    //catch { }
-            //     Application.Exit();
-
-            //}
-
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+         
         }
 
 
@@ -5590,7 +5612,7 @@ namespace WFA_psychometric_chart
         public void WriteT3000BuildingInfoToPsychoDB(string selection, string country, string state,string city,string street, string lng,string lat,string elev,string buildingName, string engUnits)
         {
 
-            //string tableName = "tbl_" + selectedBuildingList[0].BuildingName + "_device";   // currentLineTableFromDB;
+            string tableName = "tbl_" + selectedBuildingList[0].BuildingName + "_device";   // currentLineTableFromDB;
             string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
             string connString = @"Data Source=" + databaseFile + ";Version=3;";
@@ -10546,6 +10568,13 @@ namespace WFA_psychometric_chart
         }
 
 
+
+
+
+
+
+
+
         //Lets have a list for chartDetailList
         public List<chartDetailDT_X> chartInfoPulledForSaving_For_Load = new List<chartDetailDT_X>();//This is used for storing the chart detail ids
 
@@ -11479,7 +11508,12 @@ namespace WFA_psychometric_chart
                // SQLiteConnection.ClearPool();//This helps in 
             }
 
+
+
+
+
         }
+
 
         /// <summary>
         /// This function helps to save the data of single
@@ -11557,6 +11591,13 @@ namespace WFA_psychometric_chart
 
 
         }
+
+
+
+
+
+
+
 
 
         //lets make three list for replaing these : 
@@ -12839,6 +12880,12 @@ namespace WFA_psychometric_chart
           //  MessageBox.Show("Count  node = " + menuStripNodeInfoValues.Count + " , line count = " + menuStripNodeLineInfoValues.Count);
             //=======================end of loading data : now lets plot the data values=======================//
 
+
+            //ClearChart();   //this will clear the chart first
+            // ResettingLines();
+            // ReDrawingLineAndNode();
+           // ReDrawingLineAndNodeForLoadXML();
+
         }
 
         string beginEditText = "";
@@ -12977,6 +13024,8 @@ namespace WFA_psychometric_chart
                             flagResistingForDGVChangeSelection = 0;//close enable of dgv_selectionChange event 
 
                             //===================end of selection of new created chart =======================//
+
+
                         }
                         else
                                 {
@@ -12984,6 +13033,7 @@ namespace WFA_psychometric_chart
                                 }
 
                                 ///close of if we need to add here ...
+
 
                     }
                     else
@@ -13065,7 +13115,8 @@ namespace WFA_psychometric_chart
 
                 return;
             }
-         
+
+                      
             //--Showing the data on cell selected...
             // MessageBox.Show("CELL SELECT " );
             //When dgv is click it clicks twice this if is written to stop those twice click.
@@ -13180,7 +13231,11 @@ namespace WFA_psychometric_chart
                             lb_web_status.Text = "inactive";
                             lb_device_status.Text = "disconnected";
 
+
+
+                          
                             break;
+
                         }
                         else
                         {
@@ -13188,6 +13243,10 @@ namespace WFA_psychometric_chart
                             RefreshGraph();
                         }
                     }
+
+
+
+
 
 
                 }  //close of != null if
@@ -14082,7 +14141,7 @@ namespace WFA_psychometric_chart
                     s += reader["NAME"].ToString()+"\n";
                 }
 
-               //MessageBox.Show("TABLE NAME = " + s);
+              //  MessageBox.Show("TABLE NAME = " + s);
 
    
             } //close of using statement 
@@ -15629,7 +15688,7 @@ namespace WFA_psychometric_chart
             }
             catch (Exception ex)
             {
-               // MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.Message);
             }
         }
 
@@ -16080,7 +16139,9 @@ namespace WFA_psychometric_chart
             plot_on_graph_values_heat_map(DBT, HR, x_axis, y_axis);
 
             //MessageBox.Show("reached series print" +series1.ToString());
+
             //index_heat_map++;
+
 
             return 0;
         }
@@ -16092,6 +16153,7 @@ namespace WFA_psychometric_chart
             //chart1.Series.Add(series1);
             try
             {
+
 
                 series1_heat_map.ChartType = SeriesChartType.Point;
                 int r, g, b;

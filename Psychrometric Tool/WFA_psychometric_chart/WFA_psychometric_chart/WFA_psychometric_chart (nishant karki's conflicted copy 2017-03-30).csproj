@@ -124,7 +124,7 @@
     <Compile Include="Application_Form4.Designer.cs">
       <DependentUpon>Application_Form4.cs</DependentUpon>
     </Compile>
-    <Compile Include="AssemblyDateGeneration.cs" />
+    <Compile Include="AssemblyCreationDate.cs" />
     <Compile Include="BACnetBase.cs" />
     <Compile Include="BACnetClass.cs" />
     <Compile Include="BACnetClient.cs" />
@@ -136,7 +136,6 @@
     <Compile Include="buildingChartSetting.Designer.cs">
       <DependentUpon>buildingChartSetting.cs</DependentUpon>
     </Compile>
-    <Compile Include="BuildingIdentificationClass.cs" />
     <Compile Include="ChartOperations.cs" />
     <Compile Include="comfort_zone.cs">
       <SubType>Form</SubType>
@@ -144,7 +143,6 @@
     <Compile Include="comfort_zone.Designer.cs">
       <DependentUpon>comfort_zone.cs</DependentUpon>
     </Compile>
-    <Compile Include="DatabaseOperation.cs" />
     <Compile Include="DatabaseOperations.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -189,12 +187,6 @@
     </Compile>
     <Compile Include="Form4_insert_data.Designer.cs">
       <DependentUpon>Form4_insert_data.cs</DependentUpon>
-    </Compile>
-    <Compile Include="FormMessageBox.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormMessageBox.Designer.cs">
-      <DependentUpon>FormMessageBox.cs</DependentUpon>
     </Compile>
     <Compile Include="form_app_timer_historical_plot.cs">
       <SubType>Form</SubType>
@@ -267,6 +259,12 @@
     </Compile>
     <Compile Include="Form_Psychrometric_Calculator.Designer.cs">
       <DependentUpon>Form_Psychrometric_Calculator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="form_state_point_management.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="form_state_point_management.Designer.cs">
+      <DependentUpon>form_state_point_management.cs</DependentUpon>
     </Compile>
     <Compile Include="Form_TemperatureSourceDeviceInput.cs">
       <SubType>Form</SubType>
@@ -381,9 +379,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Form4_insert_data.zh.resx">
       <DependentUpon>Form4_insert_data.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FormMessageBox.resx">
-      <DependentUpon>FormMessageBox.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="form_app_timer_historical_plot.en-US.resx">
       <DependentUpon>form_app_timer_historical_plot.cs</DependentUpon>
@@ -501,6 +496,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Form_Psychrometric_Calculator.zh.resx">
       <DependentUpon>Form_Psychrometric_Calculator.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_state_point_management.resx">
+      <DependentUpon>form_state_point_management.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form_TemperatureSourceDeviceInput.ko.resx">
       <DependentUpon>Form_TemperatureSourceDeviceInput.cs</DependentUpon>

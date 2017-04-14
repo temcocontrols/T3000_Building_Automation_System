@@ -29,8 +29,6 @@ namespace WFA_psychometric_chart
                 //Console.WriteLine("Started");
 
                 Thread.Sleep(3000); // Wait a fiew time for WhoIs responses (managed in handler_OnIam)
-               
-             
 
             }
             catch { }

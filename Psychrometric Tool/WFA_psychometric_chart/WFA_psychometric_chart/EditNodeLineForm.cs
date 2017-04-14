@@ -289,9 +289,13 @@ namespace WFA_psychometric_chart
                             //Temperature is selected 
                             //Form_TemperatureSourceDeviceInput ftemp = new Form_TemperatureSourceDeviceInput(this);
                             //ftemp.ShowDialog();
+                            try { 
                             Form_DeviceInput fm = new Form_DeviceInput(this);
                             fm.ShowDialog();
-
+                            }catch(Exception ex)
+                            {
+                                MessageBox.Show($"{ex.Message} \n Please select input, output and variable section in T3000 and retry!");
+                            }
                         }  
                       else if(dataGridView1.CurrentCell.ColumnIndex == 4)
                         {
@@ -299,9 +303,14 @@ namespace WFA_psychometric_chart
 
                             //Form_HumiditySourceDeviceInput ftemp = new Form_HumiditySourceDeviceInput(this);
                             //ftemp.ShowDialog();
+                            try { 
                             Form_HumidityInput fm = new Form_HumidityInput(this);
                             fm.ShowDialog();
-
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"{ex.Message} \n Please select input, output and variable section in T3000 and retry!");
+                            }
                         }
 
                   
@@ -4153,8 +4162,12 @@ namespace WFA_psychometric_chart
                                     //==We have the values now we need to retrive the data
 
                                     double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue-1);
+                                    if (returnValueTemperature <= 0)
+                                    {
+                                        return;
+                                    }
                                     //==Now updating data in database
-                               //     MessageBox.Show("Temperature returned value = " + returnValueTemperature+", Object instance = "+ fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance);
+                                    //     MessageBox.Show("Temperature returned value = " + returnValueTemperature+", Object instance = "+ fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance);
                                     //------------------------------------Working here -------------------------------------------------------//
                                     UpdateNodeInfoForTemperatureDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue-1).ToString(), "temp", returnValueTemperature.ToString(), "OBJECT_ANALOG_INPUT");
                                     //------------------------------------End of working here------------------------------------------------//
@@ -4215,6 +4228,10 @@ namespace WFA_psychometric_chart
                                     //==We have the values now we need to retrive the data
 
                                     double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue-1);
+                                    if (returnValueTemperature <= 0)
+                                    {
+                                        return;
+                                    }
                                     //==Now updating data in database
                                     //------------------------------------Working here -------------------------------------------------------//
                                     UpdateNodeInfoForTemperatureDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue-1).ToString(), "temp", returnValueTemperature.ToString(), "OBJECT_ANALOG_OUTPUT");
@@ -4272,6 +4289,10 @@ namespace WFA_psychometric_chart
                                     //==We have the values now we need to retrive the data
 
                                     double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue-1);
+                                    if (returnValueTemperature <= 0)
+                                    {
+                                        return;
+                                    }
 
                                     //==Now updating data in database
                                     //------------------------------------Working here -------------------------------------------------------//
@@ -4376,6 +4397,10 @@ namespace WFA_psychometric_chart
                                     //==We have the values now we need to retrive the data
 
                                     double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), "IN", variableIndex);
+                                        if (returnValueTemperature <= 0)
+                                        {
+                                            return;
+                                        }
                                         //==Now updating data in database
                                         //------------------------------------Working here -------------------------------------------------------//
                                         UpdateNodeInfoForTemperatureDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", variableIndex.ToString(), "temp", returnValueTemperature.ToString(), "OBJECT_ANALOG_INPUT");
@@ -4445,6 +4470,10 @@ namespace WFA_psychometric_chart
                                         //==We have the values now we need to retrive the data
 
                                         double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), "OUT", variableIndex);
+                                        if (returnValueTemperature <= 0)
+                                        {
+                                            return;
+                                        }
                                         //==Now updating data in database
                                         //------------------------------------Working here -------------------------------------------------------//
                                         UpdateNodeInfoForTemperatureDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", variableIndex.ToString(), "temp", returnValueTemperature.ToString(), "OBJECT_ANALOG_INPUT");
@@ -4507,6 +4536,10 @@ namespace WFA_psychometric_chart
                                     {
                                         //==We have the values now we need to retrive the data
                                         double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), "VAR", variableIndex);
+                                        if (returnValueTemperature <= 0)
+                                        {
+                                            return;
+                                        }
                                         //==Now updating data in database
                                         //------------------------------------Working here -------------------------------------------------------//
                                         UpdateNodeInfoForTemperatureDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", variableIndex.ToString(), "temp", returnValueTemperature.ToString(), "OBJECT_ANALOG_INPUT");
@@ -4537,15 +4570,7 @@ namespace WFA_psychometric_chart
            // MessageBox.Show("updating start");
             bcs.UpdateOrInsertTemperatureSourceInfo(tempNodeID, DeviceIdentificationKeyWord);
 
-            //dataGridView1_CellBeginEdit();
-            //var sender = this.sender;
-            //var eventArgs = new DataGridViewCellEventArgs(dataGridView1.CurrentCell.ColumnIndex-1, dataGridView1.CurrentCell.RowIndex);
-            ////or setting the selected cells manually before executing the function
-            //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[dataGridView1.CurrentCell.ColumnIndex-1].Selected = true;
-            ////dataGridView1_CellClick(this, eventArgs);
-            ////dataGridView1_CellBeginEdit(this, eventArgs);
-            //dataGridView1_CellEndEdit(this, eventArgs);
-            LoadNodeAndLine();
+            //LoadNodeAndLine();//--This is called after completion of this function so 
 
         }//Close of temperatureInputPorcess... fxn
 
@@ -4960,10 +4985,14 @@ namespace WFA_psychometric_chart
                                 {
                                     //==We have the values now we need to retrive the data
 
-                                    double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue - 1);
+                                    double returnValueHumidity = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue - 1);
+                                    if(returnValueHumidity <= 0)
+                                    {
+                                        return;
+                                    }
                                     //==Now updating data in database
                                     //------------------------------------Working here -------------------------------------------------------//
-                                    UpdateNodeInfoForHumidityDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue - 1).ToString(), "hum", returnValueTemperature.ToString(), "OBJECT_ANALOG_INPUT");
+                                    UpdateNodeInfoForHumidityDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue - 1).ToString(), "hum", returnValueHumidity.ToString(), "OBJECT_ANALOG_INPUT");
                                     //------------------------------------End of working here------------------------------------------------//
                                     CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
                                 }
@@ -4971,7 +5000,7 @@ namespace WFA_psychometric_chart
                             else
                             {
                                 //Invalid input
-                                MessageBox.Show("This is not a temperature parameter!");
+                                MessageBox.Show("This is not a humidity parameter!");
                                 return;
                             }
                             break; //We found the value so break from the loop
@@ -5020,10 +5049,14 @@ namespace WFA_psychometric_chart
                                 {
                                     //==We have the values now we need to retrive the data
 
-                                    double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue - 1);
+                                    double returnValueHumidity = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue - 1);
+                                    if (returnValueHumidity <= 0)
+                                    {
+                                        return;
+                                    }
                                     //==Now updating data in database
                                     //------------------------------------Working here -------------------------------------------------------//
-                                    UpdateNodeInfoForHumidityDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue - 1).ToString(), "hum", returnValueTemperature.ToString(), "OBJECT_ANALOG_OUTPUT");
+                                    UpdateNodeInfoForHumidityDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue - 1).ToString(), "hum", returnValueHumidity.ToString(), "OBJECT_ANALOG_OUTPUT");
                                     //------------------------------------End of working here------------------------------------------------//
                                     CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
                                 }
@@ -5031,7 +5064,7 @@ namespace WFA_psychometric_chart
                             else
                             {
                                 //Invalid input
-                                MessageBox.Show("This is not a temperature parameter!");
+                                MessageBox.Show("This is not a humidity parameter!");
                                 return;
                             }
                             break; //We found the value so break from the loop
@@ -5077,11 +5110,14 @@ namespace WFA_psychometric_chart
                                 {
                                     //==We have the values now we need to retrive the data
 
-                                    double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue - 1);
-
+                                    double returnValueHumidity = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue - 1);
+                                    if (returnValueHumidity <= 0)
+                                    {
+                                        return;
+                                    }
                                     //==Now updating data in database
                                     //------------------------------------Working here -------------------------------------------------------//
-                                    UpdateNodeInfoForHumidityDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue - 1).ToString(), "hum", returnValueTemperature.ToString(), "OBJECT_ANALOG_VALUE");
+                                    UpdateNodeInfoForHumidityDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue - 1).ToString(), "hum", returnValueHumidity.ToString(), "OBJECT_ANALOG_VALUE");
                                     //------------------------------------End of working here------------------------------------------------//
                                     CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
 
@@ -5093,7 +5129,7 @@ namespace WFA_psychometric_chart
                             else
                             {
                                 //Invalid input
-                                MessageBox.Show("This is not a temperature parameter!");
+                                MessageBox.Show("This is not a humidity parameter!");
                                 return;
                             }
                             break; //We found the value so break from the loop
@@ -5180,10 +5216,14 @@ namespace WFA_psychometric_chart
                                     {
                                         //==We have the values now we need to retrive the data
 
-                                        double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), "IN", variableIndex);
+                                        double returnValueHumidity = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), "IN", variableIndex);
+                                        if (returnValueHumidity <= 0)
+                                        {
+                                            return;
+                                        }
                                         //==Now updating data in database
                                         //------------------------------------Working here -------------------------------------------------------//
-                                        UpdateNodeInfoForHumidityDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", variableIndex.ToString(), "hum", returnValueTemperature.ToString(), "OBJECT_ANALOG_INPUT");
+                                        UpdateNodeInfoForHumidityDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", variableIndex.ToString(), "hum", returnValueHumidity.ToString(), "OBJECT_ANALOG_INPUT");
                                         //------------------------------------End of working here------------------------------------------------//
                                         CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
                                     }
@@ -5191,7 +5231,7 @@ namespace WFA_psychometric_chart
                                 else
                                 {
                                     //Invalid input
-                                    MessageBox.Show("This is not a temperature parameter!");
+                                    MessageBox.Show("This is not a humidity parameter!");
                                     return;
                                 }
                                 break; //We found the value so break from the loop
@@ -5249,10 +5289,14 @@ namespace WFA_psychometric_chart
                                     {
                                         //==We have the values now we need to retrive the data
 
-                                        double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), "OUT", variableIndex);
+                                        double returnValueHumidity = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), "OUT", variableIndex);
+                                        if (returnValueHumidity <= 0)
+                                        {
+                                            return;
+                                        }
                                         //==Now updating data in database
                                         //------------------------------------Working here -------------------------------------------------------//
-                                        UpdateNodeInfoForHumidityDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", variableIndex.ToString(), "hum", returnValueTemperature.ToString(), "OBJECT_ANALOG_INPUT");
+                                        UpdateNodeInfoForHumidityDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", variableIndex.ToString(), "hum", returnValueHumidity.ToString(), "OBJECT_ANALOG_INPUT");
                                         //------------------------------------End of working here------------------------------------------------//
                                         CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
                                     }
@@ -5260,7 +5304,7 @@ namespace WFA_psychometric_chart
                                 else
                                 {
                                     //Invalid input
-                                    MessageBox.Show("This is not a temperature parameter!");
+                                    MessageBox.Show("This is not a humidity parameter!");
                                     return;
                                 }
                                 break; //We found the value so break from the loop
@@ -5319,11 +5363,15 @@ namespace WFA_psychometric_chart
                                     if (fd.listForControllerInfoFromALL_NODE_Table.Count > 0)
                                     {
                                         //==We have the values now we need to retrive the data
-                                        double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), "VAR", variableIndex);
+                                        double returnValueHumidity = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), "VAR", variableIndex);
+                                        if (returnValueHumidity <= 0)
+                                        {
+                                            return;
+                                        }
                                         //==Now updating data in database
                                         //MessageBox.Show("We are inside matched section of variable label for humidity ,controller  = " + fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance + ",index = " + variableIndex);
                                         //------------------------------------Working here -------------------------------------------------------//
-                                        UpdateNodeInfoForHumidityDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", variableIndex.ToString(), "hum", returnValueTemperature.ToString(), "OBJECT_ANALOG_INPUT");
+                                        UpdateNodeInfoForHumidityDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", variableIndex.ToString(), "hum", returnValueHumidity.ToString(), "OBJECT_ANALOG_INPUT");
                                         //------------------------------------End of working here------------------------------------------------//
                                         CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);//This updates the DGV as well no problem
                                     }
@@ -5331,7 +5379,7 @@ namespace WFA_psychometric_chart
                                 else
                                 {
                                     //Invalid input
-                                    MessageBox.Show("This is not a temperature parameter!");
+                                    MessageBox.Show("This is not a humidity parameter!");
                                     return;
                                 }
                                 break; //We found the value so break from the loop
@@ -5348,8 +5396,8 @@ namespace WFA_psychometric_chart
             }
 
             bcs.UpdateOrInsertHumiditySourceInfo(tempNodeID, DeviceIdentificationKeyWord);
-            LoadNodeAndLine();
-        }
+           // LoadNodeAndLine(); //--This load section is done outside this function
+        } //-Close of humidity input parameter fxn
 
 
         /// <summary>
