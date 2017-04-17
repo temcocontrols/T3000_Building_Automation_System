@@ -5324,8 +5324,8 @@ namespace WFA_psychometric_chart
         {
 
             //--lets do try catch
-            //try
-            //{
+            try
+            {
                 //--This is where we are going to create all the database  and tables of sqlite
                 //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
@@ -5452,6 +5452,38 @@ namespace WFA_psychometric_chart
                 //==Read complete now writing the values to our database                               
                 */
 
+                //--At least adding default_building for first time in the database
+                string defaultBuildingSQL = "Select * from tbl_building_location where BuildingName = 'Default_Building'";
+
+                    bool buildingPresent = false;             
+                    SQLiteCommand cmd = new SQLiteCommand(defaultBuildingSQL, m_dbConnection);
+                   
+                    SQLiteDataReader reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        buildingPresent = true;
+
+                    }
+               if(buildingPresent != true)
+                {
+                    //--Default buildig setting not present so insert the default building setting
+                    string sqlStringDefaultBuilding = "insert into tbl_building_location ( selection ,country ,state,city ,street,longitude,latitude ,elevation ,BuildingName ,EngineeringUnits  ) VALUES( @sel ,@con,@state ,@city,@stre , @lng  ,@lat,@elev ,@bname ,@engUnit  )";
+                    SQLiteCommand commandDefaultBuilding = new SQLiteCommand(sqlStringDefaultBuilding, m_dbConnection);
+                    commandDefaultBuilding.CommandType = CommandType.Text;
+                    commandDefaultBuilding.Parameters.AddWithValue("@sel", "0");
+                    commandDefaultBuilding.Parameters.AddWithValue("@con", "china");
+                    commandDefaultBuilding.Parameters.AddWithValue("@state", "shanghai");
+                    commandDefaultBuilding.Parameters.AddWithValue("@city","shanghai");
+                    commandDefaultBuilding.Parameters.AddWithValue("@stre", "");
+                    commandDefaultBuilding.Parameters.AddWithValue("@lng", "121.516799926758");
+                    commandDefaultBuilding.Parameters.AddWithValue("@lat", "31.169605255127");
+                    commandDefaultBuilding.Parameters.AddWithValue("@elev", "4");
+                    commandDefaultBuilding.Parameters.AddWithValue("@bname", "Default_Building");
+                    commandDefaultBuilding.Parameters.AddWithValue("@engUnit", "SI");
+                    commandDefaultBuilding.ExecuteNonQuery();
+                }
+
+
                 //MessageBox.Show("We have created all tables now insertion is left");
                 //This function will write to tbl_bulding_location as well as will make a building selected
                 //WriteT3000BuildingInfoToPsychoDB("1", BuildingSelected[0].country, BuildingSelected[0].state, BuildingSelected[0].city, BuildingSelected[0].street, BuildingSelected[0].longitude, BuildingSelected[0].latitude, BuildingSelected[0].elevation, BuildingSelected[0].Building_Name, BuildingSelected[0].EngineeringUnits);
@@ -5552,24 +5584,313 @@ namespace WFA_psychometric_chart
                 c4.ExecuteNonQuery();                
                 m_dbConnection.Close();//--closing the connection
 
-            //}
-            //catch (Exception ex)
-            //{
-                
-            //    string databasePath133 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            //    string databaseFile = databasePath133 + @"\db_psychrometric_project.s3db";
-            //    //try
-            //    //{
-            //        if (File.Exists(databaseFile))
-            //        {
-            //            File.Delete(databaseFile);
-            //        }
+        }
+            catch (Exception ex)
+            {
 
-            //    //}
-            //    //catch { }
-            //     Application.Exit();
 
-            //}
+                string databasePath133 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string databaseFile = databasePath133 + @"\db_psychrometric_project.s3db";
+                //try
+                //{
+                    if (File.Exists(databaseFile))
+                    {
+                        File.Delete(databaseFile);
+                    }
+
+                //}
+                //catch { }
+            Application.Exit();
+              
+
+            }
+
+        }
+
+        public void sqlite_database_creationWithDefaultSettingsOnly(string buildingNameSelected)
+        {
+            //--lets do try catch
+            try
+            {
+                //--This is where we are going to create all the database  and tables of sqlite
+                //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+
+                //string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string databasePath1 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string databaseFile = databasePath1 + @"\db_psychrometric_project.s3db";
+                //string connString = @"Data Source=" + databaseFile1 + ";Version=3;";
+
+                //  MessageBox.Show("Create table section path Path = " + databaseFile);
+                //--new database file 
+                SQLiteConnection.CreateFile(databaseFile);
+
+                //--now lets create the tables
+                SQLiteConnection m_dbConnection = new SQLiteConnection("Data Source=" + databaseFile + ";Version=3;");
+                m_dbConnection.Open();
+
+                //--building location table : tbl_building_location
+                //--This one is with the zip code later zip code is removed
+                //string sql = "create table tbl_building_location (selection int,ID INTEGER PRIMARY KEY AUTOINCREMENT ,country varchar(255),state varchar(255),city varchar(255),street varchar(255), ZIP int,longitude varchar(255),latitude varchar(255),elevation varchar(255),BuildingName varchar(255),EngineeringUnits varchar(255))";
+                string sql = "create table IF NOT EXISTS tbl_building_location (selection int,ID INTEGER PRIMARY KEY AUTOINCREMENT ,country varchar(255),state varchar(255),city varchar(255),street varchar(255) ,longitude varchar(255),latitude varchar(255),elevation varchar(255),BuildingName varchar(255),EngineeringUnits varchar(255))";
+
+                SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+                command.ExecuteNonQuery();
+                //--next table geo location value : tbl_geo_location_value
+                //string sql1 = "create table tbl_geo_location_value (ID int ,longitude varchar(255),latitude varchar(255),elevation varchar(255))";
+                //SQLiteCommand command1 = new SQLiteCommand(sql1, m_dbConnection);
+                //command1.ExecuteNonQuery();
+
+                //--next table historical data:tbl_historical_data
+                string sql2 = "create table IF NOT EXISTS tbl_historical_data (ID INTEGER,date_current datetime,hour_current int,minute_current int,distance_from_building varchar(255),temperature varchar(255),humidity varchar(255),bar_pressure varchar(255),wind varchar(255),direction varchar(255),station_name varchar(255))";
+                SQLiteCommand command2 = new SQLiteCommand(sql2, m_dbConnection);
+                command2.ExecuteNonQuery();
+                //--next table tbl_temp_himidity 
+                //string sql3 = "create table tbl_temp_humidity (temp int,humidity int)";
+                //SQLiteCommand command3 = new SQLiteCommand(sql3, m_dbConnection);
+                //command3.ExecuteNonQuery();
+
+                string sql3 = "create table IF NOT EXISTS tbl_language_option (ID int, language_id int)";
+                SQLiteCommand command3 = new SQLiteCommand(sql3, m_dbConnection);
+                command3.ExecuteNonQuery();
+
+
+                ////--next table weather related datas...
+                string sql4 = "create table IF NOT EXISTS tbl_weather_related_values (ID INTEGER ,location varchar(255),distance_from_building varchar(255),last_update_date varchar(255),temp varchar(255),humidity varchar(255),bar_pressure varchar(255),wind varchar(255),direction varchar(255),station_name varchar(255))";
+                SQLiteCommand command4 = new SQLiteCommand(sql4, m_dbConnection);
+                command4.ExecuteNonQuery();
+
+
+                //==================Lets create some more essential tables  added in jan 26th 2017=========//
+
+                /*
+                 Tables to be added in this section 
+                 1.tbl_[] _chart_comfort_zone_setting
+                 2.tbl_[]_chart_detail
+                 3.tbl_[]_comfort_zone_detail
+                 4.tbl_[]_device_info_for_node
+                 5.tbl_[]_input_storage_from_T3000
+                 6.tbl_[]_line_value
+                 7.tbl_[]_mix_node_info
+                 8.tbl_[]_node_data_related_T300
+                 9. tbl_[]_node_value
+                 */
+                string tbl_comfortzoneSetting = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_chart_comfort_zone_setting  ( count INTEGER PRIMARY KEY AUTOINCREMENT,chartID varchar(255) ,comfort_zone_ID varchar(255),status varchar(255) )";
+                string tbl_chart_detail = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_chart_detail(count INTEGER PRIMARY KEY AUTOINCREMENT ,chartID VARCHAR(255),chartName varchar(255),chart_respective_nodeID varchar(255),chart_respective_lineID varchar(255),enableChartStatus varchar(255))";
+                string tbl_comfort_zone_detail = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_comfort_zone_detail  ( count INTEGER PRIMARY KEY AUTOINCREMENT,id varchar(255) ,name varchar(255),min_temp varchar(255),max_temp varchar(255),min_hum varchar(255), max_hum  varchar(255) ,colorValue varchar(255)  )";
+                string tbl_device_info_for_node = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_device_info_for_node  ( count INTEGER PRIMARY KEY AUTOINCREMENT,nodeID varchar(255) ,device_instanceID_for_param1 varchar(255),device_instanceID_for_param2 varchar(255),IP_for_param1 varchar(255),IP_for_param2 varchar(255),param1ID varchar(255),param2ID varchar(255), param1_info  varchar(255) ,param2_info varchar(255),param1_identifier_type varchar(255),param2_identifier_type varchar(255)  )";
+                string tbl_input_storage_form_T3000 = " CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_input_storage_from_T3000  ( count INTEGER PRIMARY KEY AUTOINCREMENT,PanelID varchar(255),InputIndex varchar(255),InputDescription varchar(255),InputAM varchar(255), InputValue  varchar(255) ,InputUnit varchar(255),InputRange varchar(255),InputCalibration varchar(255),InputFilter varchar(255),InputJumper varchar(255),InputLabel varchar(255)  )";
+                string tbl_line_value = " CREATE TABLE  IF NOT EXISTS tbl_" + buildingNameSelected + "_line_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_lineID varchar(255) ,lineID string,prevNodeID varchar(255),nextNodeID varchar(255),lineColorValue varchar(255),lineSeriesID varchar(255),thickness varchar(255),name varchar(255), status INTEGER)";
+                string tbl_mix_node_info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_mix_node_info  ( count INTEGER PRIMARY KEY AUTOINCREMENT,nodeID varchar(255),chartID varchar(255),previousNodeID varchar(255),nextNodeID varchar(255) )";
+                string tbl_node_data_related_T3000 = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_data_related_T3000  (count INTEGER PRIMARY KEY AUTOINCREMENT, nodeID varchar(255), param1_panelID varchar(255), param1_inputIndex varchar(255), param2_panelID varchar(255), param2_inputIndex varchar(255)) ";
+                string tbl_node_value = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),name varchar(255),temperature_source varchar(255),humidity_source varchar(255),colorValue varchar(255),nodeSize varchar(255),airFlow varchar(225),lastUpdatedDate varchar(255))";
+                string tbl_TemperatureHumiditySourceInfo = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_TemperatureHumiditySourceInfo(count INTEGER PRIMARY KEY AUTOINCREMENT,NodeID varchar(255), chartID varchar(255) ,TemperatureSourceInfo VARCHAR(255),HumiditySourceInfo varchar(255))";
+                string tbl_Weather_Controller_Restor_Info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Weather_Controller_Restor_Info(count INTEGER PRIMARY KEY AUTOINCREMENT,BuildingName varchar(255), ControllerNameInfo varchar(255) ,TemperatureParameterInfo VARCHAR(255),HumidityParameterInfo varchar(255),TempValue varchar(255),HumValue varchar(255))";
+                string tbl_Weather_Web_Restor_Info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Weather_Web_Restor_Info(count INTEGER PRIMARY KEY AUTOINCREMENT,BuildingName varchar(255),Enable_dissable_info varchar(255), StationInfo varchar(255))";
+                string tbl_Weather_HumSelfCalibration_Restor_Info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Weather_HumSelfCalibration_Restor_Info(count INTEGER PRIMARY KEY AUTOINCREMENT,BuildingName varchar(255),Enable_dissable_info varchar(255), max_adjustment_per_day varchar(255))";
+                string tbl_database_version = "CREATE TABLE IF NOT EXISTS tbl_Database_Version(count INTEGER PRIMARY KEY AUTOINCREMENT,version varchar(255))";
+
+                //now execute the query
+                SQLiteCommand cm1 = new SQLiteCommand(tbl_comfortzoneSetting, m_dbConnection);
+                cm1.ExecuteNonQuery();
+
+                SQLiteCommand cm2 = new SQLiteCommand(tbl_chart_detail, m_dbConnection);
+                cm2.ExecuteNonQuery();
+
+                SQLiteCommand cm3 = new SQLiteCommand(tbl_comfort_zone_detail, m_dbConnection);
+                cm3.ExecuteNonQuery();
+
+                SQLiteCommand cm4 = new SQLiteCommand(tbl_device_info_for_node, m_dbConnection);
+                cm4.ExecuteNonQuery();
+
+                SQLiteCommand cm5 = new SQLiteCommand(tbl_input_storage_form_T3000, m_dbConnection);
+                cm5.ExecuteNonQuery();
+
+                SQLiteCommand cm6 = new SQLiteCommand(tbl_line_value, m_dbConnection);
+                cm6.ExecuteNonQuery();
+
+                SQLiteCommand cm7 = new SQLiteCommand(tbl_mix_node_info, m_dbConnection);
+                cm7.ExecuteNonQuery();
+
+                SQLiteCommand cm8 = new SQLiteCommand(tbl_node_data_related_T3000, m_dbConnection);
+                cm8.ExecuteNonQuery();
+
+                SQLiteCommand cm9 = new SQLiteCommand(tbl_node_value, m_dbConnection);
+                cm9.ExecuteNonQuery();
+
+                SQLiteCommand cm10 = new SQLiteCommand(tbl_TemperatureHumiditySourceInfo, m_dbConnection);
+                cm10.ExecuteNonQuery();
+
+                SQLiteCommand cm11 = new SQLiteCommand(tbl_Weather_Controller_Restor_Info, m_dbConnection);
+                cm11.ExecuteNonQuery();
+
+                SQLiteCommand cm12 = new SQLiteCommand(tbl_Weather_Web_Restor_Info, m_dbConnection);
+                cm12.ExecuteNonQuery();
+
+                SQLiteCommand cm13 = new SQLiteCommand(tbl_Weather_HumSelfCalibration_Restor_Info, m_dbConnection);
+                cm13.ExecuteNonQuery();
+
+                SQLiteCommand cm14 = new SQLiteCommand(tbl_database_version, m_dbConnection);
+                cm14.ExecuteNonQuery();
+
+                /*
+                Now lets read the data form alex database and store it in the our db_psychometric_project.s3db databse                  
+                //==Read complete now writing the values to our database                               
+                */
+
+                //--At least adding default_building for first time in the database
+                string defaultBuildingSQL = "Select * from tbl_building_location where BuildingName = 'Default_Building'";
+
+                bool buildingPresent = false;
+                SQLiteCommand cmd = new SQLiteCommand(defaultBuildingSQL, m_dbConnection);
+
+                SQLiteDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    buildingPresent = true;
+
+                }
+                if (buildingPresent != true)
+                {
+                    //--Default buildig setting not present so insert the default building setting
+                    string sqlStringDefaultBuilding = "insert into tbl_building_location ( selection ,country ,state,city ,street,longitude,latitude ,elevation ,BuildingName ,EngineeringUnits  ) VALUES( @sel ,@con,@state ,@city,@stre , @lng  ,@lat,@elev ,@bname ,@engUnit  )";
+                    SQLiteCommand commandDefaultBuilding = new SQLiteCommand(sqlStringDefaultBuilding, m_dbConnection);
+                    commandDefaultBuilding.CommandType = CommandType.Text;
+                    commandDefaultBuilding.Parameters.AddWithValue("@sel", "0");
+                    commandDefaultBuilding.Parameters.AddWithValue("@con", "china");
+                    commandDefaultBuilding.Parameters.AddWithValue("@state", "shanghai");
+                    commandDefaultBuilding.Parameters.AddWithValue("@city", "shanghai");
+                    commandDefaultBuilding.Parameters.AddWithValue("@stre", "");
+                    commandDefaultBuilding.Parameters.AddWithValue("@lng", "121.516799926758");
+                    commandDefaultBuilding.Parameters.AddWithValue("@lat", "31.169605255127");
+                    commandDefaultBuilding.Parameters.AddWithValue("@elev", "4");
+                    commandDefaultBuilding.Parameters.AddWithValue("@bname", buildingNameSelected);//buildingNameSelected //Default_Building
+                    commandDefaultBuilding.Parameters.AddWithValue("@engUnit", "SI");
+                    commandDefaultBuilding.ExecuteNonQuery();
+                }
+
+
+                //MessageBox.Show("We have created all tables now insertion is left");
+                //This function will write to tbl_bulding_location as well as will make a building selected
+                //WriteT3000BuildingInfoToPsychoDB("1", BuildingSelected[0].country, BuildingSelected[0].state, BuildingSelected[0].city, BuildingSelected[0].street, BuildingSelected[0].longitude, BuildingSelected[0].latitude, BuildingSelected[0].elevation, BuildingSelected[0].Building_Name, BuildingSelected[0].EngineeringUnits);
+
+                //string sql_stringx = "insert into tbl_building_location ( selection ,country ,state,city ,street,longitude,latitude ,elevation ,BuildingName ,EngineeringUnits  ) VALUES( @sel ,@con,@state ,@city,@stre , @lng  ,@lat,@elev ,@bname ,@engUnit  )";
+                //SQLiteCommand command9 = new SQLiteCommand(sql_stringx, m_dbConnection);
+                //command9.CommandType = CommandType.Text;
+                //command9.Parameters.AddWithValue("@sel", "1");
+                //command9.Parameters.AddWithValue("@con", BuildingSelected[0].country);
+                //command9.Parameters.AddWithValue("@state", BuildingSelected[0].state);
+                //command9.Parameters.AddWithValue("@city", BuildingSelected[0].city);
+                //command9.Parameters.AddWithValue("@stre", BuildingSelected[0].street);
+                //command9.Parameters.AddWithValue("@lng", BuildingSelected[0].longitude);
+                //command9.Parameters.AddWithValue("@lat", BuildingSelected[0].latitude);
+                //command9.Parameters.AddWithValue("@elev", BuildingSelected[0].elevation);
+                //command9.Parameters.AddWithValue("@bname", BuildingSelected[0].Building_Name);
+                //command9.Parameters.AddWithValue("@engUnit", BuildingSelected[0].EngineeringUnits);
+                //command9.ExecuteNonQuery();
+
+                //==Now lets make a single default comfort zone in our database.
+                //--This one is for default value.
+                string id = GetGUID();
+                string sql_data_for_comfortzone = "INSERT INTO tbl_" + buildingNameSelected + "_comfort_zone_detail( id ,name,min_temp ,max_temp,min_hum , max_hum  ,colorValue   )   VALUES('" + id + "', 'Default_comfort_zone','22','28','60','80','GREEN')";
+                SQLiteCommand cmddata = new SQLiteCommand(sql_data_for_comfortzone, m_dbConnection);
+                cmddata.ExecuteNonQuery();
+
+                //--comfortzone airport.
+                string id_airport = GetGUID();
+                string sql_comfortzone_airport = "INSERT INTO tbl_" + buildingNameSelected + "_comfort_zone_detail( id ,name,min_temp ,max_temp,min_hum , max_hum  ,colorValue   )   VALUES('" + id_airport + "', 'Airport','22','28','35','65','Blue')";
+                SQLiteCommand cmd_airport = new SQLiteCommand(sql_comfortzone_airport, m_dbConnection);
+                cmd_airport.ExecuteNonQuery();
+
+                //--comfortzone club.
+                string id_club = GetGUID();
+                string sql_comfortzone_club = "INSERT INTO tbl_" + buildingNameSelected + "_comfort_zone_detail( id ,name,min_temp ,max_temp,min_hum , max_hum  ,colorValue   )   VALUES('" + id_club + "', 'Club','22','28','35','65','Blueviolet')";
+                SQLiteCommand cmd_club = new SQLiteCommand(sql_comfortzone_club, m_dbConnection);
+                cmd_club.ExecuteNonQuery();
+
+                //--comfortzone computer.
+                string id_computer = GetGUID();
+                string sql_comfortzone_computer = "INSERT INTO tbl_" + buildingNameSelected + "_comfort_zone_detail( id ,name,min_temp ,max_temp,min_hum , max_hum  ,colorValue   )   VALUES('" + id_computer + "', 'Computer','22','28','35','65','Turquoise')";
+                SQLiteCommand cmd_computer = new SQLiteCommand(sql_comfortzone_computer, m_dbConnection);
+                cmd_computer.ExecuteNonQuery();
+
+                //--comfortzone datacenter.
+                string id_datacenter = GetGUID();
+                string sql_comfortzone_datacenter = "INSERT INTO tbl_" + buildingNameSelected + "_comfort_zone_detail( id ,name,min_temp ,max_temp,min_hum , max_hum  ,colorValue   )   VALUES('" + id_datacenter + "', 'Data Center','22','28','35','65','Lightgreen')";
+                SQLiteCommand cmd_datacenter = new SQLiteCommand(sql_comfortzone_datacenter, m_dbConnection);
+                cmd_datacenter.ExecuteNonQuery();
+
+                //--comfortzone gym.
+                string id_gym = GetGUID();
+                string sql_comfortzone_gym = "INSERT INTO tbl_" + buildingNameSelected + "_comfort_zone_detail( id ,name,min_temp ,max_temp,min_hum , max_hum  ,colorValue   )   VALUES('" + id_gym + "', 'Gym','22','28','35','65','Lightgray')";
+                SQLiteCommand cmd_gym = new SQLiteCommand(sql_comfortzone_gym, m_dbConnection);
+                cmd_gym.ExecuteNonQuery();
+
+                //--comfortzone Hospital.
+                string id_Hospital = GetGUID();
+                string sql_comfortzone_Hospital = "INSERT INTO tbl_" + buildingNameSelected + "_comfort_zone_detail( id ,name,min_temp ,max_temp,min_hum , max_hum  ,colorValue   )   VALUES('" + id_Hospital + "', 'Hospital','22','28','35','65','Red')";
+                SQLiteCommand cmd_Hospital = new SQLiteCommand(sql_comfortzone_Hospital, m_dbConnection);
+                cmd_Hospital.ExecuteNonQuery();
+
+                //--comfortzone Music.
+                string id_Music = GetGUID();
+                string sql_comfortzone_Music = "INSERT INTO tbl_" + buildingNameSelected + "_comfort_zone_detail( id ,name,min_temp ,max_temp,min_hum , max_hum  ,colorValue   )   VALUES('" + id_Music + "', 'Music','22','28','35','65','Orangered')";
+                SQLiteCommand cmd_Music = new SQLiteCommand(sql_comfortzone_Music, m_dbConnection);
+                cmd_Music.ExecuteNonQuery();
+
+                //--For inserting the version value first time while creating database
+                string version = AssemblyDateGeneration.Value.ToShortDateString();
+                string sql_database_version = "INSERT INTO tbl_Database_Version( version)   VALUES('" + version + "')";
+                SQLiteCommand cmd_database_version = new SQLiteCommand(sql_database_version, m_dbConnection);
+                cmd_database_version.ExecuteNonQuery();
+
+                //===============END OF THE NEW CODE ADDED IN THIS SECTION==========================//
+
+
+
+
+                //--Lets input some values in the tbl_building_location and in tbl_language_option default 
+
+                //string sql_input1 = "INSERT INTO tbl_building_location (selection,country,state,city,street,BuildingName,EngineeringUnits) VALUES(1, 'china','SangHai','SangHai','No.35,yi yuan garden','Default_Building','SI') ";
+                //SQLiteCommand commandINput5 = new SQLiteCommand(sql_input1, m_dbConnection);
+                //commandINput5.ExecuteNonQuery();
+
+                //MessageBox.Show("Test We reached this part ln 5207");
+                //Adding to language option
+                string sql_input2 = "INSERT INTO tbl_language_option (ID,language_id) VALUES(1, 1) ";
+                string sql_input3 = "INSERT INTO tbl_language_option (ID,language_id) VALUES(2, 0) ";
+                string sql_input4 = "INSERT INTO tbl_language_option (ID,language_id) VALUES(3, 0) ";
+
+                SQLiteCommand c2 = new SQLiteCommand(sql_input2, m_dbConnection);
+                c2.ExecuteNonQuery();
+
+                SQLiteCommand c3 = new SQLiteCommand(sql_input3, m_dbConnection);
+                c3.ExecuteNonQuery();
+                SQLiteCommand c4 = new SQLiteCommand(sql_input4, m_dbConnection);
+                c4.ExecuteNonQuery();
+                m_dbConnection.Close();//--closing the connection
+
+            }
+            catch (Exception ex)
+            {
+
+
+                string databasePath133 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string databaseFile = databasePath133 + @"\db_psychrometric_project.s3db";
+                //try
+                //{
+                if (File.Exists(databaseFile))
+                {
+                    File.Delete(databaseFile);
+                }
+
+                //}
+                //catch { }
+                Application.Exit();
+
+
+            }
+
 
         }
 

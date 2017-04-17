@@ -52,7 +52,7 @@ namespace WFA_psychometric_chart
                     else
                     {
                         //--Building info is not present
-                        string text = "Current selected building location information is not provided. Input the location information in T3000 in building configuration section.\nDo you wish to continue with default setting?";
+                        string text = "Current selected building location information is not provided. Input the location information in T3000 in building configuration section.\nDo you wish to continue with default settings?";
                         if (MessageBox.Show(text,"System configuration warning",MessageBoxButtons.YesNo)== DialogResult.Yes)
                         {
                             //--Yes is click continue with the default settings.
@@ -64,8 +64,9 @@ namespace WFA_psychometric_chart
                             //MessageBox.Show("Application close ");
                             //--NO selected
                             f1.Close();//just close the form and the application
+                            Environment.Exit(0);
                             Application.Exit();
-                            //Application.Exit(0);
+                         
                         }
                     }
                 }
