@@ -41,13 +41,13 @@ namespace Example6_3
             this.PlotPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.PlotPanel.Location = new System.Drawing.Point(8, 8);
             this.PlotPanel.Name = "PlotPanel";
-            this.PlotPanel.Size = new System.Drawing.Size(826, 490);
+            this.PlotPanel.Size = new System.Drawing.Size(826, 255);
             this.PlotPanel.TabIndex = 1;
             // 
             // button1
             // 
             this.button1.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.button1.Location = new System.Drawing.Point(744, 504);
+            this.button1.Location = new System.Drawing.Point(721, 278);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(82, 26);
             this.button1.TabIndex = 2;
@@ -59,11 +59,12 @@ namespace Example6_3
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(838, 542);
+            this.ClientSize = new System.Drawing.Size(838, 343);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.PlotPanel);
             this.Name = "Form1";
             this.Text = "Form1";
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
 
         }

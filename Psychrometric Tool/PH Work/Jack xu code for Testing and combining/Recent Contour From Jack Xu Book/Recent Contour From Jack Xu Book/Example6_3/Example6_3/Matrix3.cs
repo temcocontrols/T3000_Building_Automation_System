@@ -242,7 +242,7 @@ namespace Example6_3
             return pt;
         }
 
-        public static Matrix3 Euler(float alpha, float beta, float gamma)
+        public static Matrix3 Euler(float alpha, float beta, float gamma) 
         {
             Matrix3 result = new Matrix3();
             alpha = alpha * (float)Math.PI / 180.0f;
