@@ -42,7 +42,24 @@ namespace WFA_PH_CurveDemo
 
             MathOperation PH = new MathOperation();
 
-            
+
+            //===============Test ===================//
+
+            //for (double y = 0.005; y < 40; y *= 2)
+            //{
+
+              //  double pressureVal= PH.IAPWS_IF97_TowParameterEquivalentFxn("P", "T", 483.15, "H", 400 * 1000,  fluidName); //--This multiply is done to convert MPa to Pa and enthlapy is divided to convert J/kg to kJ/Kg
+            //    aListTemperature.Add(temperature);
+              
+
+            //}
+
+
+            //================End of test=========//
+
+
+
+
 
             /*
              Lets do it step by step as the way that has been done in the Matlab
@@ -51,12 +68,15 @@ namespace WFA_PH_CurveDemo
             //--1. press_rng = logspace(-2,2,300); % [MPa] pressure (p) range
 
             // var stopWatch = System.Diagnostics.Stopwatch.StartNew();
-           
-            double[] press_rng = PH.LogSpace(-2, 2, 300,true,10).ToArray();
-           
+
+            //double[] press_rng = PH.LogSpace(-2, 2, 300,true,10).ToArray();
+            double[] press_rng = PH.LogSpace(-3, 2, 300, true, 10).ToArray();// initially it was form -2,2,300 //-4,4,300 is not supported by coolprop
             //--For line spacing values
             //2. temp_rng = 273.15+linspace(1,800,300); 
-            double[] temp_rng =  PH.LinSpace(1, 800, 300, true).ToArray();
+            //double[] temp_rng =  PH.LinSpace(1, 800, 300, true).ToArray();
+
+            //--Here -4,800,300 doesnot work error by cool prop 0 onwards on negative axis(eg.0,-1,-2,-3,...) does not work
+            double[] temp_rng = PH.LinSpace(1, 800, 300, true).ToArray();// changed from 1,800,300 
 
 
             for (int i = 0; i < temp_rng.Length; i++)
@@ -290,7 +310,6 @@ namespace WFA_PH_CurveDemo
             }
         
             //---Contour line plotting chunk of code -----------//
-
             /*
              Steps : 
              1. number of contour
@@ -301,7 +320,7 @@ namespace WFA_PH_CurveDemo
 
             int numberOfContour = 25;
             ArrayList alSeries = new ArrayList();
-            for(int i = 0; i < 25; i++)
+            for(int i = 0; i < numberOfContour; i++)
             {
                 string name = "ContourSeries" + i;
                 alSeries.Add(name);
@@ -315,7 +334,16 @@ namespace WFA_PH_CurveDemo
 
             cf.SetDataPoints(ds, P_Value, T_Value, H_Value);
             //==After calling this we need to call the number of contour plots
-            dc.numberContours = 25;
+            /* numberContours values = 
+             28 gives 20 lines,
+             30 gives 20 lines,
+             25 gives 17 lines
+             35 gives 25 lines [max limit]
+             20 gives 14 lines
+             27 gives 19 lines
+             13 gives 8 lines
+             */
+            dc.numberContours = 35; 
             
             List<Example6_3.DrawChart.DataTypeForPointList> listPoints = new List<Example6_3.DrawChart.DataTypeForPointList>();
             listPoints = dc.AddContour_MyCustomFxn(ds);
@@ -328,6 +356,8 @@ namespace WFA_PH_CurveDemo
             int ind = 0;
             int flagSingleTemperatureIndicator = 1;//on first
             double zlevelValueForTempIndicator = 0;
+            int dataPointCounter = 0;
+           // int enthalpyValueForIndiator = 2000;
            
             //---------------End of indicator of temperature---//
 
@@ -337,7 +367,7 @@ namespace WFA_PH_CurveDemo
             int initialZ = listPoints[0].zlevel;
             int initalIndex = 0;
             int runningz = 0;
-            for(int i = 0; i < 25; i++)
+            for(int i = 0; i < numberOfContour; i++)
             {
                 //==First one is for moving in the list
                 string seriesName = alSeries[i].ToString();
@@ -358,22 +388,27 @@ namespace WFA_PH_CurveDemo
                         phChart.Series[seriesName].Points.AddXY(listPoints[z].x1, listPoints[z].y1);
                         phChart.Series[seriesName].Points.AddXY(listPoints[z].x2, listPoints[z].y2);
 
+                        dataPointCounter++;
+
+
+                      
                         //===========Temperature indicator================//
-                        if (flagSingleTemperatureIndicator == 1)//(flagSingleTemperatureIndicator == 1 && zlevelValueForTempIndicator == listPoints[z].zlevel) //(listPoints[z].x1 == 2000)
+                        if (flagSingleTemperatureIndicator == 1 && dataPointCounter > (listPoints[z].zlevel) && (listPoints[z].x1 > 200 && listPoints[z].x1 < 2500) )//(flagSingleTemperatureIndicator == 1 && zlevelValueForTempIndicator == listPoints[z].zlevel) //(listPoints[z].x1 == 2000)
                         {
-                            double temperature = PH.IAPWS_IF97_TowParameterEquivalentFxn("T", "H", 2000 * 1000, "P", listPoints[z].y2 * 1000000, fluidName); //--This multiply is done to convert MPa to Pa and enthlapy is divided to convert J/kg to kJ/Kg
-                            phChart.Series[seriesName1].Points.AddXY(2000, listPoints[z].y2);
-                            phChart.Series[seriesName1].Points[ind++].Label = $"{Math.Round(temperature - 273.15, 2)} DegC";
+                            double temperature = PH.IAPWS_IF97_TowParameterEquivalentFxn("T", "H", listPoints[z].x1 * 1000, "P", listPoints[z].y1 * 1000000, fluidName); //--This multiply is done to convert MPa to Pa and enthlapy is divided to convert J/kg to kJ/Kg
+                            phChart.Series[seriesName1].Points.AddXY(listPoints[z].x1, listPoints[z].y1);
+                            phChart.Series[seriesName1].Points[ind++].Label = $"{Math.Round(temperature - 273.15, 0)} DegC";
                             flagSingleTemperatureIndicator = 0;//off
-                            zlevelValueForTempIndicator = listPoints[z].zlevel;
+                            
+                            dataPointCounter = 0;
                         }
 
                         if (listPoints[z].zlevel > zlevelValueForTempIndicator)
                         {
                             flagSingleTemperatureIndicator = 1;//on
-                                                               //zlevelValueForTempIndicator = listPoints[z].zlevel;
+                            ////zlevelValueForTempIndicator = listPoints[z].zlevel;
                         }
-
+                        zlevelValueForTempIndicator = listPoints[z].zlevel;
                         //===========Temper indiactor end==============//
 
 
@@ -402,11 +437,11 @@ namespace WFA_PH_CurveDemo
 
             //---End of the contour line plot chunk of code---//
             ArrayList aListTemperature = new ArrayList();
-
             //string seriesName1 = "TemperaturePoints";
             //phChart.Series.Add(seriesName1);
             //phChart.Series[seriesName1].ChartType = SeriesChartType.Point;
             //int ind = 0;
+
             //for (double y = 0.005; y < 40; y *= 2)
             //{
 
@@ -417,8 +452,6 @@ namespace WFA_PH_CurveDemo
 
 
             //}
-
-
 
 
 
