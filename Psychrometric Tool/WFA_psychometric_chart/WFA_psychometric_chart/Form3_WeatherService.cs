@@ -244,7 +244,7 @@ namespace WFA_psychometric_chart
             //====inserting and updating controller info with corresponding values For restore fxn====//
 
             
-                Weather_Restore wr = new Weather_Restore();
+            Weather_Restore wr = new Weather_Restore();
             string buildingName = "";
             if (lb_building_name.InvokeRequired)
             {
@@ -2935,7 +2935,12 @@ namespace WFA_psychometric_chart
 
                         //return;
 
-                        System.Threading.CancellationTokenSource cts = new System.Threading.CancellationTokenSource();
+                        // 0. First check weather INPUTable table is present in alex database or not
+
+                        if (IsInputTablePresentInT3000() == true)
+                        {
+
+                         System.Threading.CancellationTokenSource cts = new System.Threading.CancellationTokenSource();
                         try {
                             cts.CancelAfter(10000);
                             // await PullDataFromDeviceForTimeConstrains(instanceId);
@@ -2966,13 +2971,14 @@ namespace WFA_psychometric_chart
                         //**************************First Temperature filtering*******************************//
 
 
-                        //--Here we need to scan form th    e  T3000 database and then publish the list which is there 
+                        //--Here we need to scan form the  T3000 database and then publish the list which is there 
                         /*
                         Task :
-                        1.Read the data from the alex db 
+                         1.Read the data from the alex db 
                         2.Find only TEMPERATURE VALUE
                         3.Filter and display only temperature values
                         */
+                         
                         Form1_main f = new Form1_main();
                         string path_to_alexdb = f.PathToT3000BuildingDB;// PathToT3000BuildingDB;
                         ReadDataFromAlexDatabase("INPUTable");
@@ -3040,10 +3046,11 @@ namespace WFA_psychometric_chart
                         Weather_Restore wr = new Weather_Restore();
                         wr.UpdateOrInsertControllerInfo(lb_building_name.Text, CB_Device.Text, CB_param_temp.Text, CB_param_hum.Text, tb_temp_panel_value.Text,tb_hum_panel_value.Text);
                         }
-                        //=========================End of controller updating to db section================//
+                            //=========================End of controller updating to db section================//
 
-                        //MessageBox.Show("ENd of the true");
-                        //TEST
+                            //MessageBox.Show("ENd of the true");
+                            //TEST
+                        } //--Close if IsInputTablePresentInT3000
                     }
                 else
                 {
@@ -3052,11 +3059,12 @@ namespace WFA_psychometric_chart
                 }
                 
             }//Close of if
+                
 
-
-            }catch(Exception ex)
+            }
+            catch(Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                //MessageBox.Show(ex.Message);
             }
 
         }
@@ -3146,7 +3154,7 @@ namespace WFA_psychometric_chart
                                     object_identifier_type = parameterValFromBacnet[item].object_identifier_type,
                                     presentValue = parameterValFromBacnet[item].presentValue
                                 });
-                                test += "\n" + parameterValFromBacnet[item].indexID + ",val" + parameterValFromBacnet[item].presentValue;
+                               // test += "\n" + parameterValFromBacnet[item].indexID + ",val" + parameterValFromBacnet[item].presentValue;
                                 break;//After the value is found break form this loop
                             }
 
@@ -3431,6 +3439,32 @@ namespace WFA_psychometric_chart
         }
 
 
+       private bool IsInputTablePresentInT3000()
+        {
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string path = databasePath;  //@"C:\Folder1\Folder2\Folder3\Folder4";
+            string newPath = Path.GetFullPath(Path.Combine(path, @"..\"));
+            string againDbPath = @"Data Source=" + newPath + "" + BuildingSelected[0].Building_Path;
+
+            bool returnValue = false;
+            using (SQLiteConnection connection = new SQLiteConnection(againDbPath))
+            {
+                connection.Open();
+                SQLiteDataReader reader = null;
+                string queryString = "SELECT name FROM sqlite_master WHERE type='table' AND name='INPUTable';"; 
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+
+                    returnValue = true;
+                }
+            }
+
+
+
+            return returnValue;
+        }
 
 
         //Don't use System.Window.Timer

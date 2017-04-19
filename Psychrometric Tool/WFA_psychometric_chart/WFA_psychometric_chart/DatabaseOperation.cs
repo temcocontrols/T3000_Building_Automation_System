@@ -409,6 +409,31 @@ namespace WFA_psychometric_chart
 
         }
 
+        public bool IsBuildingSelectedInPsychrometric()
+        {
+            string tableName = "tbl_building_location";//currentNodeTableFromDB; 
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string connString1 = @"Data Source=" + databaseFile + ";Version=3;";
+
+            bool buildingPresent = false;
+            //---Read data if the building name is present then only do updating else dont do that
+            string sql1 = $"SELECT * From   { tableName } where selection='1'";
+            using (SQLiteConnection thisConnection = new SQLiteConnection(connString1))
+            {
+                SQLiteCommand cmd = new SQLiteCommand(sql1, thisConnection);
+                thisConnection.Open();
+                SQLiteDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    buildingPresent = true;
+
+                }
+            }//close of using
+
+            return buildingPresent;
+        }
+
 
         //--Update selected building if not present
         public void UpdateIDOneSelectBuildingInPsychro()
@@ -427,17 +452,12 @@ namespace WFA_psychometric_chart
                 SQLiteCommand command = new SQLiteCommand(sql_string, thisConnection);
                 command.CommandType = CommandType.Text;
                 command.Parameters.AddWithValue("@sel", 1);
-
                 command.ExecuteNonQuery();
             }//close of using
-
-           
-
+            
         }//updateID...
 
     
-
-
 
     }
 }

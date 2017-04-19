@@ -29,14 +29,14 @@ namespace WFA_psychometric_chart
             
             string databasePath1 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string databaseFile1 = databasePath1 + @"\db_psychrometric_project.s3db";
-
+            DatabaseOperation db_op = new DatabaseOperation();
             if (File.Exists(databaseFile1))
             {
                 //file exist so dont create the database 
 
 
                 //MessageBox.Show("File exist section");
-                DatabaseOperation db_op = new DatabaseOperation();
+               
                 db_op.sqlite_database_creation_For_UpdateCondition(selectedBuildingFromT3000);
                 //MessageBox.Show("finish of sqlite_database_creation_For_UpdateCondition ");
 
@@ -73,7 +73,18 @@ namespace WFA_psychometric_chart
                     }
                     else
                     {
-                        MessageBox.Show("Please enter the building location information first in T300 and then restart the application");
+                       if( MessageBox.Show("Please enter the building location information first in T300 and then restart the application.\n Do you want to continue with the default settings","Chose an option",MessageBoxButtons.YesNo)==DialogResult.Yes)
+                        {
+                            string buildingName = "Default_Building";
+                            //--Seprate code is required because first time when application starts no
+                            //--Building info provided so we have to go with default settings
+                            f1.sqlite_database_creationWithDefaultSettingsOnly(buildingName);//Passing BuildingName
+                            //Previous code doesnot selecte default building so to select default building do this on
+                            db_op.SelectBuildingInPsychro(buildingName);
+
+                        }
+                        else
+                        { 
                         string databasePath133 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                         string databaseFile = databasePath133 + @"\db_psychrometric_project.s3db";
 
@@ -84,8 +95,9 @@ namespace WFA_psychometric_chart
                         }
                         Environment.Exit(0);
                         Application.Exit();
-                        
+                        }//Close of else
                     }
+
                 }
                 else
                 {
@@ -94,9 +106,7 @@ namespace WFA_psychometric_chart
                     Application.Exit();//Close the application
                 }
             }
-
-        //===================End of this section=======================//
-
+           //===================End of this section=======================//
 
             //Show the language select dialog
             MultiLang.SelectLanguage frmLang = new MultiLang.SelectLanguage();
