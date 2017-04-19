@@ -151,6 +151,7 @@ BOOL BacnetAnnualRoutine::OnInitDialog()
 	Initial_List();
 	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_HOLIDAY);
 	SetIcon(m_hIcon,TRUE);
+	ShowWindow(FALSE);
 //	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);
 	PostMessage(WM_REFRESH_BAC_ANNUAL_LIST,NULL,NULL);
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);

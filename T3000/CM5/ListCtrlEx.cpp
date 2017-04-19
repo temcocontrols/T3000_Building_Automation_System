@@ -763,6 +763,10 @@ void CListCtrlEx::Get_Selected_Item(int &my_select_raw,int &my_select_col)
 
 void CListCtrlEx::InitListData()
 {
+	m_data[0] = 0x55;
+	m_data[1] = 0xff;
+	m_data[2] = 0x55;
+	m_data[3] = 0xff;
 	memset(m_data,0,30000);
 }
 

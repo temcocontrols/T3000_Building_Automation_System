@@ -62,6 +62,13 @@
 #define PM_BEENY            70  
 #define PM_WATER_SENSOR                         71
 
+#define PM_TSTAT8_WIFI 91
+#define PM_TSTAT8_OCC 92
+#define PM_TSTAT7_ARM 93
+#define PM_TSTAT8_220V 94
+
+#define PM_T36CTA  95
+
 #define PM_NC               100  
 #define PWM_TRANSDUCER         104
 #define PM_LightingController         120

@@ -1,6 +1,10 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
+2017 - 03 - 13 Update by Fance
+1. 优化了在delete 树 产品时，重新加载 数据库  的问题.
+2. 解决掉sort by floor 代码bug.
+
 2017 - 02 - 23 Update by Fance
 1. 针对minipanel 菜单上的保存上次浏览的记录.
 2. 针对minipanel 重复panel的问题也修复了.
@@ -1016,7 +1020,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					else
 					{
 						if(Output_Window->IsWindowVisible())
-							::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
+							::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,REFRESH_LIST_NOW,NULL);
 					}
 					//for (int i=0;i<WINDOW_TAB_COUNT;i++)
 					//{
@@ -1052,7 +1056,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					else
 					{
 						if(Variable_Window->IsWindowVisible())
-							::PostMessage(m_variable_dlg_hwnd,WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
+							::PostMessage(m_variable_dlg_hwnd,WM_REFRESH_BAC_VARIABLE_LIST,REFRESH_LIST_NOW,NULL);
 					}
 					//for (int i=0;i<WINDOW_TAB_COUNT;i++)
 					//{
@@ -1865,7 +1869,7 @@ void CDialogCM5_BacNet::Tab_Initial()
     g_hwnd_now = m_input_dlg_hwnd;
 	Input_Window->m_input_list.SetFocus();
 
-	SetTimer(BAC_RESET_WINDOW_TIMER,400,NULL);
+	SetTimer(BAC_RESET_WINDOW_TIMER,10,NULL);
 //保存当前选择
 //	m_CurSelTab = WINDOW_INPUT;
 
@@ -2021,7 +2025,6 @@ bool has_change_connect_ip = true;
 //INPUT int test_function_return_value();
 void CDialogCM5_BacNet::Fresh()
 {
-
 	g_bPauseMultiRead = true; // 只要在minipanel的界面 就暂停 读 寄存器的那个线程;
     if(initial_once)
     {
@@ -2046,6 +2049,7 @@ void CDialogCM5_BacNet::Fresh()
 	{
 		initial_once = false;
 		Tab_Initial();
+
 	}
 	m_user_level = LOGIN_SUCCESS_FULL_ACCESS;
 	if(pFrame->m_product.at(selected_product_index).protocol == PROTOCOL_GSM)
@@ -2100,6 +2104,7 @@ void CDialogCM5_BacNet::Fresh()
 		((pFrame->m_product.at(selected_product_index).product_class_id == T38AI8AO6DO) ||
 		 (pFrame->m_product.at(selected_product_index).product_class_id == PID_T322AI) ||
 			(pFrame->m_product.at(selected_product_index).product_class_id == PWM_TRANSDUCER) ||
+			(pFrame->m_product.at(selected_product_index).product_class_id == PID_T36CTA) ||
 		 (pFrame->m_product.at(selected_product_index).product_class_id == PID_T3PT12)) ||
 		 (pFrame->m_product.at(selected_product_index).product_class_id == STM32_HUM_NET))
 	{
@@ -2118,14 +2123,15 @@ void CDialogCM5_BacNet::Fresh()
 		set_datalink_protocol(2);
 
 		Re_Initial_Bac_Socket_IP = pFrame->m_product.at(selected_product_index).NetworkCard_Address;
-		if(Initial_bac(g_gloab_bac_comport,pFrame->m_product.at(selected_product_index).NetworkCard_Address))
+		
+		if((!offline_mode) &&(Initial_bac(g_gloab_bac_comport,pFrame->m_product.at(selected_product_index).NetworkCard_Address)))
 		{
 			initial_once_ip = true;
 		}
-		else
-		{
-			DFTrace(_T("Initial_bac function failed!"));
-		}
+		//else
+		//{
+		//	DFTrace(_T("Initial_bac function failed!"));
+		//}
 	}
 	else
 	{
@@ -2187,29 +2193,37 @@ void CDialogCM5_BacNet::Fresh()
 		}
 		nconnectionip = StringIP;
 	}
-	for (int i=0;i<3;i++)
+	if(!offline_mode)
 	{
-		ret = Open_Socket2(nconnectionip,nport);
-		if(ret)
+		for (int i=0;i<3;i++)
 		{
-			g_llTxCount ++;
-			g_llRxCount ++;
-			
-			if(pFrame->m_product.at(selected_product_index).status == false)
+			ret = Open_Socket2(nconnectionip,nport);
+			if(ret)
 			{
-				//int ret_write = Write_One(g_tstat_id,33,151);	33write 151 is to reset the minipanel ethenet.
-				//TRACE(_T("Write_One(g_tstat_id,33,151) == %d\r\n"),ret_write);
+				g_llTxCount ++;
+				g_llRxCount ++;
+
+				if(pFrame->m_product.at(selected_product_index).status == false)
+				{
+					//int ret_write = Write_One(g_tstat_id,33,151);	33write 151 is to reset the minipanel ethenet.
+					//TRACE(_T("Write_One(g_tstat_id,33,151) == %d\r\n"),ret_write);
+				}
+				bac_select_device_online = true;
+				TRACE(_T("Reconnected ~~~~~~~~\r\n"));
+				break;
 			}
-			bac_select_device_online = true;
-			TRACE(_T("Reconnected ~~~~~~~~\r\n"));
-			break;
+			else 
+			{
+				g_llTxCount ++;
+				g_llerrCount ++;
+				bac_select_device_online = false;
+			}
 		}
-		else 
-		{
-			g_llTxCount ++;
-			g_llerrCount ++;
-			bac_select_device_online = false;
-		}
+	}
+	else
+	{
+		::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,START_BACNET_TIMER,0);
+		return;
 	}
 	
 	if(ret)
@@ -3212,6 +3226,25 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 	bac_read_all_results = false;
 	int end_temp_instance = 0;
 	bac_programcode_read_results = false;
+
+	if(offline_mode)
+	{
+		LoadBacnetConfigFile(false,offline_prg_path);
+		hwait_thread = NULL;
+		if(bac_read_which_list == BAC_READ_PROGRAMCODE_LIST)
+		{
+			bac_programcode_read_results = true;
+			memcpy_s(mycode  ,2000 ,program_code[program_list_line],2000);
+			::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,SHOW_PROGRAM_IDE,0);
+		}
+		else if(bac_read_which_list == BAC_READ_BASIC_SETTING_COMMAND)
+		{
+			::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);
+		}
+		return 0;
+
+	}
+
 	for (int i=0;i<BAC_GRPHIC_LABEL_GROUP;i++)
 	{
 		if(bac_read_which_list == BAC_READ_GRAPHIC_LABEL_INFO)
@@ -4362,6 +4395,8 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 	{
 	case BAC_TIMER_2_WHOIS:
 		{
+			if(offline_mode)
+				break;
 			if(this->IsWindowVisible())
 			{
 				g_bPauseMultiRead = true; // 只要在minipanel的界面 就暂停 读 寄存器的那个线程;
@@ -4409,6 +4444,12 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 		break;
 	case BAC_READ_SETTING_TIMER:
 		{
+			if(offline_mode)
+			{
+				Initial_Some_UI(LOGIN_SUCCESS_FULL_ACCESS);
+				KillTimer(BAC_READ_SETTING_TIMER);
+				break;
+			}
 			click_resend_time --;
 			if(m_is_remote_device)
 				Send_WhoIs_remote_ip(remote_ip_address);
@@ -4495,12 +4536,13 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 				if(is_connected)	
 				{
 					Initial_Some_UI(LOGIN_SUCCESS_FULL_ACCESS);
+					KillTimer(BAC_READ_SETTING_TIMER);
 					break;
 				}
 				else
 				{
 					bac_select_device_online = false;
-					KillTimer(4);
+					KillTimer(BAC_READ_SETTING_TIMER);
 					CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 					pFrame->m_pTreeViewCrl->turn_item_image(selected_tree_item ,false);
 					pFrame->m_product.at(selected_product_index).status_last_time[0] = false;
@@ -4711,7 +4753,17 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 	{	
 		if(g_protocol != PROTOCOL_BIP_TO_MSTP)
 		{
-			if(LoadBacnetConfigFile_Cache(achive_file_path) < 0 )
+			if(offline_mode)
+			{
+				CString offline_folder;
+				offline_folder = g_strBuildingFolder + pFrame->m_strCurMainBuildingName;
+				CreateDirectory(offline_folder,NULL);//
+				offline_prg_path = offline_folder + _T("\\Offline.prg");
+
+				LoadBacnetConfigFile(false,offline_prg_path);
+				PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,BAC_READ_ALL_LIST);
+			}
+			else if(LoadBacnetConfigFile_Cache(achive_file_path) < 0 )
 			{
 				PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,BAC_READ_ALL_LIST);
 			}
@@ -4736,7 +4788,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 	case TYPE_OUTPUT:
 		g_hwnd_now = m_output_dlg_hwnd;
 		Output_Window->m_output_list.SetFocus();
-		::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
+		::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST,NULL,REFRESH_LIST_NOW);
 		break;
 	case TYPE_VARIABLE:
 		g_hwnd_now =  m_variable_dlg_hwnd;
@@ -5199,6 +5251,11 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 	{
 		output_reg = 0; // (6+8)*23 = 322
 		input_reg =  3; //  23 * 12 = 506
+	}
+	else if (n_read_product_type == PID_T36CTA)
+	{
+		output_reg = 1;    // (1)*23 = 322
+		input_reg = 5;    //  23 * 12 = 506
 	}
 	else if(n_read_product_type == STM32_HUM_NET)
 	{

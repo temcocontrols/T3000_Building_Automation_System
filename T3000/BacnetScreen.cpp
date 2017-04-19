@@ -315,6 +315,7 @@ BOOL BacnetScreen::OnInitDialog()
 	SetIcon(m_hIcon,TRUE);
 	PostMessage(WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
 
+	ShowWindow(FALSE);
 //	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//F2键
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -391,22 +392,23 @@ LRESULT BacnetScreen::Fresh_Screen_List(WPARAM wParam,LPARAM lParam)
 {
 	int Fresh_Item;
 	int isFreshOne = (int)lParam;
+
 	if(isFreshOne == REFRESH_ON_ITEM)
 	{
 		Fresh_Item = (int)wParam;
 	}
-	else
-	{
-		if(m_screen_list.IsDataNewer((char *)&m_screen_data.at(0),sizeof(Control_group_point) * BAC_SCREEN_COUNT))
-		{
-			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
-			m_screen_list.SetListData((char *)&m_screen_data.at(0),sizeof(Control_group_point) * BAC_SCREEN_COUNT);
-		}
-		else
-		{
-			return 0;
-		}
-	}
+	//else
+	//{
+	//	if(m_screen_list.IsDataNewer((char *)&m_screen_data.at(0),sizeof(Control_group_point) * BAC_SCREEN_COUNT))
+	//	{
+	//		//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
+	//		m_screen_list.SetListData((char *)&m_screen_data.at(0),sizeof(Control_group_point) * BAC_SCREEN_COUNT);
+	//	}
+	//	else
+	//	{
+	//		return 0;
+	//	}
+	//}
 
 	for (int i=0;i<(int)m_screen_data.size();i++)
 	{

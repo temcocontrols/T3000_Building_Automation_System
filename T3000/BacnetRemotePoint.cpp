@@ -56,7 +56,7 @@ BOOL CBacnetRemotePoint::OnInitDialog()
 	SetIcon(m_hIcon,TRUE);
 	//	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//F2¼ü
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
-
+	ShowWindow(FALSE);
 	// TODO:  Add extra initialization here
 
 	return TRUE;  // return TRUE unless you set the focus to a control

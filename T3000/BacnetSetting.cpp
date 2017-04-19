@@ -107,6 +107,7 @@ BEGIN_MESSAGE_MAP(CBacnetSetting, CDialogEx)
 	ON_WM_HSCROLL()
 	ON_BN_CLICKED(IDC_BUTTON_SETTING_IO_CONFIG, &CBacnetSetting::OnBnClickedButtonSettingIoConfig)
 	ON_BN_CLICKED(IDC_BUTTON_REBOOT_DEVICE, &CBacnetSetting::OnBnClickedButtonRebootDevice)
+	ON_WM_VSCROLL()
 END_MESSAGE_MAP()
 
 
@@ -436,6 +437,28 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				((CButton *)GetDlgItem(IDC_CHECK_SETTING_PAP))->SetCheck(false);
 			}
 
+			if((debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA) || (debug_item_show == DEBUG_SHOW_ALL))
+			{
+				CString temp123;
+				temp123.Format(_T("%u"),Device_Basic_Setting.reg.time_update_since_1970);
+				DFTrace(temp123);
+			}
+
+			if((Device_Basic_Setting.reg.time_update_since_1970 < 1420041600)  || (Device_Basic_Setting.reg.time_update_since_1970 > 1735660800))
+			{
+				((CEdit *)GetDlgItem(IDC_EDIT_SETTING_LAST_UPDATE_TIME))->SetWindowTextW(_T("No Reply"));
+			}
+			else
+			{
+				CTime time_scaletime;
+				CString strTime;
+				time_t scale_time  = Device_Basic_Setting.reg.time_update_since_1970;
+				time_scaletime = scale_time;
+				strTime = time_scaletime.Format("%y/%m/%d %H:%M:%S");
+				((CEdit *)GetDlgItem(IDC_EDIT_SETTING_LAST_UPDATE_TIME))->SetWindowTextW(strTime);
+			}
+
+
 			if(Device_Basic_Setting.reg.en_dyndns == 0)
 			{
 				GetDlgItem(IDC_CHECK_SETTING_DYNDNS)->EnableWindow(FALSE);
@@ -481,19 +504,8 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 					Device_Basic_Setting.reg.en_dyndns = 1;
 					((CButton *)GetDlgItem(IDC_CHECK_SETTING_DYNDNS))->SetCheck(false);
 				}
-				if((Device_Basic_Setting.reg.time_update_since_1970 < 1420041600)  || (Device_Basic_Setting.reg.time_update_since_1970 > 1735660800))
-				{
-					((CEdit *)GetDlgItem(IDC_EDIT_SETTING_LAST_UPDATE_TIME))->SetWindowTextW(_T("No Reply"));
-				}
-				else
-				{
-					CTime time_scaletime;
-					CString strTime;
-					time_t scale_time  = Device_Basic_Setting.reg.time_update_since_1970;
-					time_scaletime = scale_time;
-					strTime = time_scaletime.Format("%y/%m/%d %H:%M:%S");
-					((CEdit *)GetDlgItem(IDC_EDIT_SETTING_LAST_UPDATE_TIME))->SetWindowTextW(strTime);
-				}
+
+
 
 				
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->ResetContent();
@@ -889,6 +901,7 @@ BOOL CBacnetSetting::OnInitDialog()
 	CDialogEx::OnInitDialog();
 
 	// TODO:  Add extra initialization here
+	InitScrollbar();
 	SetWindowTextW(_T("Setting"));
 	m_setting_dlg_hwnd = this->m_hWnd;
 	g_hwnd_now = m_setting_dlg_hwnd;
@@ -906,7 +919,7 @@ BOOL CBacnetSetting::OnInitDialog()
 
 	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_SETTING);
 	SetIcon(m_hIcon,TRUE);
-	
+	ShowWindow(FALSE);
 	GetDlgItem(IDC_BUTTON_BAC_SETTING_OK)->SetFocus();
 	return FALSE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -980,6 +993,7 @@ void CBacnetSetting::OnTimer(UINT_PTR nIDEvent)
 				   time_scaletime = scale_time;
 				   strTime = time_scaletime.Format("%y/%m/%d %H:%M:%S");
 				    SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("SYNC time sucess")); 
+					((CEdit *)GetDlgItem(IDC_EDIT_SETTING_LAST_UPDATE_TIME))->SetWindowTextW(strTime);
 			   }
 
 		}
@@ -1956,3 +1970,77 @@ void CBacnetSetting::OnBnClickedButtonRebootDevice()
 	}
 
 }
+
+void CBacnetSetting::InitScrollbar()
+{
+	SCROLLINFO scrollinfo;
+	GetScrollInfo(SB_VERT,&scrollinfo,SIF_ALL);    
+	scrollinfo.nPage=20;    //设置滑块大小
+	scrollinfo.nMax=75;     //设置滚动条的最大位置0--75
+	SetScrollInfo(SB_VERT,&scrollinfo,SIF_ALL);  
+}
+
+void CBacnetSetting::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+{
+	// TODO: Add your message handler code here and/or call default
+
+	SCROLLINFO scrollinfo;
+	GetScrollInfo(SB_VERT,&scrollinfo,SIF_ALL);
+	int unit=3;        
+	switch (nSBCode)  
+	{      
+	case SB_LINEUP:          //Scroll one line up
+		scrollinfo.nPos -= 1;  
+		if (scrollinfo.nPos<scrollinfo.nMin)
+		{  
+			scrollinfo.nPos = scrollinfo.nMin;  
+			break;  
+		}  
+		SetScrollInfo(SB_VERT,&scrollinfo,SIF_ALL);  
+		ScrollWindow(0,unit); 
+		break;  
+	case SB_LINEDOWN:           //Scroll one line down
+		scrollinfo.nPos += 1;  
+		if (scrollinfo.nPos+scrollinfo.nPage>scrollinfo.nMax)  //此处一定要注意加上滑块的长度，再作判断
+		{  
+			scrollinfo.nPos = scrollinfo.nMax;  
+			break;  
+		}  
+		SetScrollInfo(SB_VERT,&scrollinfo,SIF_ALL);  
+		ScrollWindow(0,-unit);  
+		break;  
+	case SB_PAGEUP:            //Scroll one page up.
+		scrollinfo.nPos -= 5;  
+		if (scrollinfo.nPos<=scrollinfo.nMin)
+		{  
+			scrollinfo.nPos = scrollinfo.nMin;  
+			break;  
+		}  
+		SetScrollInfo(SB_VERT,&scrollinfo,SIF_ALL);  
+		ScrollWindow(0,unit*5);  
+		break;  
+	case SB_PAGEDOWN:        //Scroll one page down        
+		scrollinfo.nPos += 5;  
+		if (scrollinfo.nPos+scrollinfo.nPage>=scrollinfo.nMax)  //此处一定要注意加上滑块的长度，再作判断
+		{  
+			scrollinfo.nPos = scrollinfo.nMax;  
+			break;  
+		}  
+		SetScrollInfo(SB_VERT,&scrollinfo,SIF_ALL);  
+		ScrollWindow(0,-unit*5);  
+		break;  
+	case SB_ENDSCROLL:      //End scroll     
+		break;  
+	case SB_THUMBPOSITION:  //Scroll to the absolute position. The current position is provided in nPos
+		break;  
+	case SB_THUMBTRACK:                  //Drag scroll box to specified position. The current position is provided in nPos
+		ScrollWindow(0,(scrollinfo.nPos-nPos)*unit);  
+		scrollinfo.nPos = nPos;  
+		SetScrollInfo(SB_VERT,&scrollinfo,SIF_ALL);
+		break;  
+	}
+
+	CDialog::OnVScroll(nSBCode, nPos, pScrollBar);
+}
+
+

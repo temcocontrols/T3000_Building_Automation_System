@@ -142,6 +142,7 @@ bool CFileOperation::Rename(CString sSource, CString sDest)
 	try
 	{
 		DoRename(sSource, sDest);
+		//CFile::Rename(sSource, sDest);
 	}
 	catch(CFExeption* e)
 	{
@@ -153,7 +154,7 @@ bool CFileOperation::Rename(CString sSource, CString sDest)
 	return true;
 }
 
-
+ 
 void CFileOperation::DoRename(CString sSource, CString sDest)
 {
 	if (!MoveFile(sSource, sDest)) throw new CFExeption(GetLastError());

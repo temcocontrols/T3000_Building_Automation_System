@@ -259,11 +259,7 @@
 			//get_tstat_version(j);
 
 			temp_grid_flash.EpSize=pFrame->m_product.at(i).nEPsize;
-			//if(temp_grid_flash.software_version>0)
-			{
-			//	if(make_sure_isp_mode(j)==1)
-		 	//temp_grid_flash.software_version=p_mode;
-			}
+
 			// 屏蔽NC的设备信息
 	/*	 	if(PM_NC==temp_grid_flash.device||NET_WORK_OR485_PRODUCT_MODEL==temp_grid_flash.device)
 				continue; */
@@ -352,6 +348,18 @@
                 case PM_TSTAT8:
                     stemp="TStat8";
                     break;
+				case PM_TSTAT8_WIFI:
+					stemp = "TStat8_Wifi";
+					break;
+				case PM_TSTAT8_OCC:
+					stemp = "TStat8_Occ";
+					break;
+				case PM_TSTAT7_ARM:
+					stemp = "TStat7_ARM";
+					break;
+				case PM_TSTAT8_220V:
+					stemp = "TStat8_220V";
+					break;
 				case PM_TSTAT7:
 					stemp="TStat7";
 					break;

@@ -171,6 +171,19 @@ CString CTStat_Dev::GetProductName()
     case PM_TSTAT8:
         strProductName="TStat8";
         break;
+	case PM_TSTAT8_WIFI:
+		strProductName = "TStat8_Wifi";
+		break;
+	case PM_TSTAT8_OCC:
+		strProductName = "TStat8_Occ";
+		break;
+	case PM_TSTAT7_ARM:
+		strProductName = "TStat8_ARM";
+		break;
+	case PM_TSTAT8_220V:
+		strProductName = "TStat8_220V";
+		break;
+
 	case PM_TSTAT7:
 		strProductName="TStat7";
 		break;
@@ -239,6 +252,9 @@ CString CTStat_Dev::GetProductName()
 		break;
 	case PM_T3PT12:
 		strProductName="T3-PT12";
+		break;
+	case PM_T36CTA:
+		strProductName="T3-6CTA";
 		break;
     case PM_T38AI8AO6DO:
         strProductName="T3-8AI8AO6DO";

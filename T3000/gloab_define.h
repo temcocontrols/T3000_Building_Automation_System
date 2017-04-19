@@ -1,6 +1,6 @@
 #pragma once
 #include "RelayLabel.h"
-
+#include <map>
 //minipanel ¼Ä´æÆ÷±í
 //  9800	-	9999    200¸ö¼Ä´æÆ÷   setting
 //  10000	-   11471   1472		  OUT
@@ -809,7 +809,7 @@ const CString Input_Analog_Units_Array[] =
 	 _T("0.0 to 100"),
 	 _T("0.0 to 20"),
 	 _T("0.0 to 20"),
-	 _T("Speed Count"),
+	 _T("Pulse Count (Slow 1Hz)"),
 	 _T("0.0 to 3000"),
 	 _T("0 to 100"),
 	 _T("0 to 100"),
@@ -819,7 +819,7 @@ const CString Input_Analog_Units_Array[] =
 	  _T("Table 3"),
 	  _T("Table 4"),
 	  _T("Table 5"),
-	  _T("High Speed Count"),
+	  _T("Pulse Count (Fast 100Hz)"),
 	  _T("Frequency")
 };
 
@@ -998,15 +998,14 @@ const int KEY_INSERT = 1020;
 
 typedef enum
 {		
-	PRODUCT_CM5 = 0,//10A + 8 D			//10D
-	//IN				//OUT	
-	BIG_MINIPANEL = 1,			//32 A				//12D   12A
+	PRODUCT_CM5 = 0,						//10A + 8 D			//10D									   //IN				//OUT	
+	BIG_MINIPANEL = 1,						//32 A				//12D   12A
 	SMALL_MINIPANEL = 2,		//16 A				//6 D	4 A
 	TINY_MINIPANEL = 3,	
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,
-	PID_T3PT12 = 46
-	 
+	PID_T3PT12 = 46,
+	PID_T36CTA = 95  
 };
 
 const int BIG_MINIPANEL_IN_A = 32;
@@ -1234,6 +1233,8 @@ const int m_screenHotKeyID[SCREEN_HOTKEY_COUNT] =
 	4008,
 	4009
 };
+
+typedef map<int,CString> pidname_map;
 
 struct AddressMap
 {
@@ -1854,5 +1855,6 @@ typedef union
 }Str_UPD_SCAN;
 
 
+const int REFRESH_LIST_NOW  = 2000;
 
 

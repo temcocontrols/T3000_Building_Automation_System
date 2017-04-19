@@ -77,12 +77,6 @@ LRESULT  CBacnetInput::InputMessageCallBack(WPARAM wParam, LPARAM lParam)
 				pInvoke->mRow,pInvoke->mRow,sizeof(Str_in_point));
 			SetTimer(2,2000,NULL);
 		}
-		CString g_configfile_path = g_strExePth + g_strStartInterface_config;
-		int savetodb = GetPrivateProfileInt(_T("SaveToDB"), _T("INPUT"), 0, g_configfile_path);
-		if (savetodb == 1)
-		{
-			Save_InputData_to_db(pInvoke->mRow);
-		}
 		//Save_InputData_to_db(pInvoke->mRow);
 	}
 	else
@@ -539,12 +533,17 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 	}
 	else if(bacnet_device_type == PID_T3PT12)
 	{
-		INPUT_LIMITE_ITEM_COUNT = 12;
+		    INPUT_LIMITE_ITEM_COUNT = 12;
 			Minipanel_device = 0;
+	}
+	else if (bacnet_device_type == PID_T36CTA)
+	{
+		INPUT_LIMITE_ITEM_COUNT = 19;
+		Minipanel_device = 0;
 	}
 	else
 	{
-		INPUT_LIMITE_ITEM_COUNT = BAC_INPUT_ITEM_COUNT;
+		    INPUT_LIMITE_ITEM_COUNT = BAC_INPUT_ITEM_COUNT;
 	}
 
 
@@ -591,11 +590,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 
 	if(Minipanel_device == 0)	//如果不是minipanel的界面就隐藏扩展行;
 	{
-		//CRect temp_rect;
-		//temp_rect = Input_rect;
-		//temp_rect.right = 975;
-		//temp_rect.top = temp_rect.top + 22;
-		//m_input_list.MoveWindow(temp_rect);
+	 
 
 		m_input_list.SetColumnWidth(INPUT_EXTERNAL,0);
 		m_input_list.SetColumnWidth(INPUT_PRODUCT,0);
@@ -605,23 +600,12 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 	{
 			if(temp_need_show_external)
 			{
-				//CRect temp_rect;
-				//temp_rect = Input_rect;
-				//temp_rect.right = 1200;
-				//temp_rect.top = temp_rect.top + 22;
-				//m_input_list.MoveWindow(temp_rect);
 				m_input_list.SetColumnWidth(INPUT_EXTERNAL,60);
 				m_input_list.SetColumnWidth(INPUT_PRODUCT,80);
 				m_input_list.SetColumnWidth(INPUT_EXT_NUMBER,80);
 			}
 			else
 			{
-				//CRect temp_rect;
-				//temp_rect = Input_rect;
-				//temp_rect.right = 975;
-				//temp_rect.top = temp_rect.top + 22;
-				//m_input_list.MoveWindow(temp_rect);
-
 				m_input_list.SetColumnWidth(INPUT_EXTERNAL,0);
 				m_input_list.SetColumnWidth(INPUT_PRODUCT,0);
 				m_input_list.SetColumnWidth(INPUT_EXT_NUMBER,0);
@@ -699,6 +683,8 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		{
 
 			m_input_list.SetCellEnabled(i,INPUT_CAL,1);
+			m_input_list.SetCellEnabled(i,INPUT_CAL_OPERATION,1);
+			m_input_list.SetCellEnabled(i,INPUT_FITLER,1);
 
 			if((m_Input_data.at(i).range >=20) && (m_Input_data.at(i).range <=24))
 				m_input_list.SetItemText(i,INPUT_UNITE,Analog_Customer_Units[m_Input_data.at(i).range-20]);
@@ -763,6 +749,9 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		{
 
 			m_input_list.SetItemText(i,INPUT_CAL,_T(""));
+			m_input_list.SetCellEnabled(i,INPUT_CAL,0);
+			m_input_list.SetCellEnabled(i,INPUT_CAL_OPERATION,0);
+			m_input_list.SetCellEnabled(i,INPUT_FITLER,0);
 
 			if(m_Input_data.at(i).range == 0)
 			{
@@ -1073,6 +1062,10 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 	else if(lCol == INPUT_CAL_OPERATION)
 	{
+		if(m_Input_data.at(lRow).digital_analog == BAC_UNITS_DIGITAL)
+			return;
+
+
 		CString n_option1;
 		CString n_option2;
 		CString n_value;
@@ -1387,7 +1380,8 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 	{
 	case 1:
 		{
-			
+			if(offline_mode)
+				break;
 
 			if(g_protocol == PROTOCOL_BIP_TO_MSTP)
 			{

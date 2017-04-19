@@ -1,4 +1,8 @@
-T3000 Release  History
+﻿T3000 Release  History
+
+Ver 2017.03.10
+1. Added a new UI for the wifi's configuration 
+2. Merged all the communication configuration together.
 
 Ver 2017.03.02
 1. Show Modbus ID for Tstat

@@ -12,7 +12,7 @@
 #define DOWNLOAD_AND_UPDATE  1
 #define DOWNLOAD_ONLY        2
 int download_and_update = 0;
-
+CString productfolder;
 extern vector <Str_download_firmware_info> download_info_type;
 
 BYTE IP_ADDRESS_SERVER[20];
@@ -40,6 +40,8 @@ CString new_firmware_ip;
 int is_local_temco_net = false;
 extern bool update_t3000_only ;
 IMPLEMENT_DYNAMIC(Dowmloadfile, CDialogEx)
+
+map <int,CString> product_folder_map;
 
 Dowmloadfile::Dowmloadfile(CWnd* pParent /*=NULL*/)
 	: CDialogEx(Dowmloadfile::IDD, pParent)
@@ -115,6 +117,18 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 		TCP_File_Socket.Close();
 		GetDlgItem(IDC_BUTTON_START_DOWNLOAD)->EnableWindow(true);
 		GetDlgItem(IDC_BUTTON_FILE_DOWNLOAD_ONLY)->EnableWindow(true);
+
+		if(MessageBox(_T("Do you want download firmware manually from website?"),_T("Download"),MB_YESNO) == IDYES)
+		{
+			CString excute_path;
+			if(!productfolder.IsEmpty())
+			{ 
+				excute_path = _T("http://www.temcocontrols.com/ftp/firmware/") + productfolder;
+				ShellExecute(NULL, L"open", excute_path, NULL, NULL, SW_SHOWNORMAL);
+			}
+			return 0;
+		}
+
 	}
 	else if(ncommand == DOWNLOAD_CLOSE_SOCKET)
 	{
@@ -325,8 +339,8 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 		CString complete_message;
 		complete_message.Format(_T("Local file doesn't exist, downloading from server now."));
 		m_download_info.InsertString(m_download_info.GetCount(),complete_message);
-		complete_message.Format(_T("Check MD5 value over!"));
-		m_download_info.InsertString(m_download_info.GetCount(),complete_message);
+		//complete_message.Format(_T("Check MD5 value over!"));
+		//m_download_info.InsertString(m_download_info.GetCount(),complete_message);
 		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
 
 
@@ -335,7 +349,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 		m_download_info.InsertString(m_download_info.GetCount(),complete_message);
 		complete_message.Format(_T("Device Firmware: %.1f"),m_product_isp_auto_flash.software_version);
 		m_download_info.InsertString(m_download_info.GetCount(),complete_message);
-		complete_message.Format(_T("Newfirmware.com:: %.1f"),((float)download_fw_version)/10);
+		complete_message.Format(_T("Newfirmware.com: %.1f"),((float)download_fw_version)/10);
 		m_download_info.InsertString(m_download_info.GetCount(),complete_message);
 		complete_message.Format(_T("               "));
 		m_download_info.InsertString(m_download_info.GetCount(),complete_message);
@@ -452,9 +466,17 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 			}
 			else
 			{
+
+
 				if(MessageBox(_T("Do you want download firmware manually from website?"),_T("Download"),MB_YESNO) == IDYES)
 				{
-					ShellExecute(NULL, L"open", L"http://www.temcocontrols.com/ftp/firmware/", NULL, NULL, SW_SHOWNORMAL);
+					CString excute_path;
+					if(!productfolder.IsEmpty())
+					{ 
+						excute_path = _T("http://www.temcocontrols.com/ftp/firmware/") + productfolder;
+						ShellExecute(NULL, L"open", excute_path, NULL, NULL, SW_SHOWNORMAL);
+					}
+					//ShellExecute(NULL, L"open", L"http://www.temcocontrols.com/ftp/firmware/", NULL, NULL, SW_SHOWNORMAL);
 				}
 
 			}
@@ -714,12 +736,39 @@ DWORD WINAPI   Dowmloadfile::DownLoadFileProcess(LPVOID lpVoid)
 	return 0;
 }
 
+void Dowmloadfile::CreateProductFolderMap()
+{
+	//product_folder_map
+	
+	product_folder_map.insert(map <int,CString>::value_type(PM_TSTAT5B,_T("Tstat5/Tstat5LED")));
+	product_folder_map.insert(map <int,CString>::value_type(PM_MINIPANEL,_T("CM5/cm5_rev38.6.bin")));
+	product_folder_map.insert(map <int,CString>::value_type(PM_TSTAT6,_T("Tstat6/128kChip")));
+	Sleep(1);
+}
+
+CString Dowmloadfile::GetProdcutFtpPath(int nproductid)
+{
+	map <int,CString>::iterator itter;
+	itter = product_folder_map.find(nproductid);
+	if(itter != product_folder_map.end())
+	{
+		return itter->second;
+	}
+	else
+		return _T("");
+	
+}
 
 BOOL Dowmloadfile::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
 	// TODO:  Add extra initialization here
+	CreateProductFolderMap();
+
+	productfolder = GetProdcutFtpPath(m_product_isp_auto_flash.product_class_id);
+
+
 
 	((CComboBox *)GetDlgItem(IDC_COMBO_UPDATE_TYPE))->AddString(_T("Bootloader"));
 	((CComboBox *)GetDlgItem(IDC_COMBO_UPDATE_TYPE))->AddString(_T("Main Firmware"));
@@ -789,7 +838,20 @@ BOOL Dowmloadfile::OnInitDialog()
 		if(host == NULL)
 		{
 			if(!flash_multi_auto)
+			{
 				MessageBox(_T("Connect firmware server failed.  \r\nPlease check your internet connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+				if(MessageBox(_T("Do you want download firmware manually from website?"),_T("Download"),MB_YESNO) == IDYES)
+				{
+					CString excute_path;
+					if(!productfolder.IsEmpty())
+					{ 
+						excute_path = _T("http://www.temcocontrols.com/ftp/firmware/") + productfolder;
+						ShellExecute(NULL, L"open", excute_path, NULL, NULL, SW_SHOWNORMAL);
+					}
+
+				}
+			}
+
 			PostMessage(WM_CLOSE,NULL,NULL);
 			return TRUE;
 		}

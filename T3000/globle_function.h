@@ -61,20 +61,20 @@ float get_tstat_version(unsigned short tstat_id);
 
 float get_curtstat_version();
 
-int make_sure_isp_mode(int the_tstat_id);
-bool get_serialnumber(long & serial,int the_id_of_product=-1);
-bool multi_read_tstat(int id);
+
+
+
 
 //
 void SetPaneString(int nIndext,CString str);
 
 UINT get_serialnumber();
-bool can_be_writed_hex_file(int product_model,int hex_file_product_model);
-CString get_product_name_by_product_model(int product_model);
+
+
 BOOL IS_Temco_Product(int product_model);
 //CString GetTempUnit(int analog1_or_analog2=-1);
 CString GetTempUnit(int nRange=-1,int nPIDNO = 0);
-CString get_product_class_name_by_model_ID(int nModelID);
+
 
 extern int Read_One_t(unsigned char device_var,unsigned short address, int slot);
 extern int Write_One_t(unsigned char device_var, unsigned short address, unsigned short val, int slot);
@@ -145,7 +145,7 @@ char * intervaltotextfull(char *textbuf, long seconds , unsigned minutes , unsig
   unsigned char Str_to_Byte(CString need_conver);
   void Init_Service_Handlers(void);
 CString GetProductName(int ModelID);
-
+void Inial_Product_map();
 CString Get_Table_Name(int SerialNo,CString Type ,int Row);
 void    Insert_Update_Table_Name(int SerialNo,CString Type,int Row,CString TableName); 
 int Get_Unit_Process(CString Unit);
@@ -195,8 +195,6 @@ BOOL ValidAddress(CString sAddress);
 BOOL GetIPbyHostName(CString strHostName,CString &strIP);
 void TraverseFolder( const CString& strDir,std::vector<CString>& vecFile);
 
-
-
 void LoadTstat_InputData();
 void LoadInputData_CS3000();
 CString GetTextFromReg(unsigned short reg);
@@ -222,7 +220,7 @@ BOOL HexFileValidation(const CString& strFileName);
 BOOL BinFileValidation(const CString& strFileName);
 BOOL AllCharactorIsDigital(LPCTSTR lpszSrc);
 
-int decode_label(LPCTSTR label ,UCHAR &n_point_type,UCHAR &n_main_panel , UCHAR &n_sub_panel,UCHAR &m_point_number);
+
 bool Input_data_to_string(unsigned char  temp_input_index ,
 	CString &temp_in_main_panel,
 	CString &temp_in_des,

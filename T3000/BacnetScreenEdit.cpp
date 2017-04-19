@@ -15,6 +15,7 @@
 extern int pointtotext(char *buf,Point_Net *point);
 Str_label_point m_temp_graphic_label_data[BAC_GRPHIC_LABEL_COUNT];
 
+static int m_bac_select_label_old = -1;
 static bool click_ret_old = false;
 CBacnetEditLabel * Edit_Label_Window = NULL;
 CBacnetAddLabel * Add_Label_Window = NULL;
@@ -197,8 +198,16 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
 		return 0;
 	}
 
+
 	if(temp_number != 0)	//Vector 里面是 0开始 , 这里如果是INPUT1  那值为1  直接减一 存起来 用;
 		temp_number = temp_number - 1;
+
+
+		if((temp_point_type == 23) || (temp_point_type == 24) || (temp_point_type == 25) || (temp_point_type == 26))
+		{
+			temp_number = temp_number + 1;
+		}
+
 	::GetWindowRect(BacNet_hwd,&mynew_rect);	//获取 view的窗体大小;
 
 	int nLeft,nTop;
@@ -673,7 +682,7 @@ LRESULT CBacnetScreenEdit::OnHotKey(WPARAM wParam,LPARAM lParam)
 	}
 	return 0;
 }
-
+//杜帆：很奇葩的事情是  IDI_ICON_DEFAULT_GRAPHIC  利用LoadIcon 加载出来显示的 会很清楚  其他的 用LoadImage 比较清楚;
 BOOL CBacnetScreenEdit::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
@@ -724,32 +733,56 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 	InitGraphic(g_serialNum,g_bac_instance,screen_list_line);
 
 	SetClassLong(this->GetSafeHwnd(),GCL_HCURSOR ,(LONG)LoadCursor(NULL , IDC_CROSS));//IDC_ARROW
+	//SetClassLong(this->GetSafeHwnd(),GCL_HCURSOR ,(LONG)LoadCursor(NULL , IDC_HAND));//IDC_ARROW
+	
+	//default_icon =  AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_ICON);
+	default_icon = (HICON)LoadImage(AfxGetInstanceHandle(),	MAKEINTRESOURCE(IDI_ICON_DEFAULT_ICON),IMAGE_ICON,0,0,LR_LOADTRANSPARENT); 
 
-	default_icon =  AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_ICON);
-	default_on_icon = AfxGetApp()->LoadIcon(IDI_ICON_SWITCH_ON);
-	default_off_icon = AfxGetApp()->LoadIcon(IDI_ICON_SWITCH_OFF);
+	//default_on_icon = AfxGetApp()->LoadIcon(IDI_ICON_SWITCH_ON);
+	default_on_icon = (HICON)LoadImage(AfxGetInstanceHandle(),	MAKEINTRESOURCE(IDI_ICON_SWITCH_ON),IMAGE_ICON,0,0,LR_LOADTRANSPARENT); 
 
-	default_input_icon = AfxGetApp()->LoadIcon(IDI_ICON_INPUT_DEFAULT);	
-	default_output_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_OUTPUT);	
-	default_variable_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_VARIABLE);	
-	default_program_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_PROGRAM);	
-	default_pid_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_PID);	
-	default_holiday_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_HOLIDAY);	
-	default_schedual_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_SCHEDUAL);	
-	default_trendlog_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_TRENDLOG);	
 
-	default_screen_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_GRAPHIC);	
+	//default_off_icon = AfxGetApp()->LoadIcon(IDI_ICON_SWITCH_OFF);
+	default_off_icon = (HICON)LoadImage(AfxGetInstanceHandle(),	MAKEINTRESOURCE(IDI_ICON_SWITCH_OFF),IMAGE_ICON,0,0,LR_LOADTRANSPARENT); 
+
+	//default_input_icon = AfxGetApp()->LoadIcon(IDI_ICON_INPUT_DEFAULT);	
+	default_input_icon = (HICON)LoadImage(AfxGetInstanceHandle(),	MAKEINTRESOURCE(IDI_ICON_INPUT_DEFAULT),IMAGE_ICON,0,0,LR_LOADTRANSPARENT); 
+
+	//default_output_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_OUTPUT);	
+	default_output_icon = (HICON)LoadImage(AfxGetInstanceHandle(),	MAKEINTRESOURCE(IDI_ICON_DEFAULT_OUTPUT),IMAGE_ICON,0,0,LR_LOADTRANSPARENT); 
+
+
+	//default_variable_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_VARIABLE);
+	default_variable_icon = (HICON)LoadImage(AfxGetInstanceHandle(),	MAKEINTRESOURCE(IDI_ICON_DEFAULT_VARIABLE),IMAGE_ICON,0,0,LR_LOADTRANSPARENT); 
+//	default_program_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_PROGRAM);	
+
+
+	default_program_icon = (HICON)LoadImage(AfxGetInstanceHandle(),	MAKEINTRESOURCE(IDI_ICON_DEFAULT_PROGRAM),IMAGE_ICON,0,0, LR_LOADTRANSPARENT);  
+
+
+
+	//default_pid_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_PID);	
+	default_pid_icon = (HICON)LoadImage(AfxGetInstanceHandle(),	MAKEINTRESOURCE(IDI_ICON_DEFAULT_PID),IMAGE_ICON,0,0, LR_LOADTRANSPARENT);  
+
+	//default_holiday_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_HOLIDAY);	
+	default_holiday_icon = (HICON)LoadImage(AfxGetInstanceHandle(),	MAKEINTRESOURCE(IDI_ICON_DEFAULT_HOLIDAY),IMAGE_ICON,0,0, LR_LOADTRANSPARENT);  
+
+	//default_schedual_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_SCHEDUAL);	
+	default_schedual_icon = (HICON)LoadImage(AfxGetInstanceHandle(),	MAKEINTRESOURCE(IDI_ICON_DEFAULT_SCHEDUAL),IMAGE_ICON,0,0, LR_LOADTRANSPARENT);  
+
+	//default_trendlog_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_TRENDLOG);	
+	default_trendlog_icon = (HICON)LoadImage(AfxGetInstanceHandle(),	MAKEINTRESOURCE(IDI_ICON_DEFAULT_TRENDLOG),IMAGE_ICON,0,0, LR_LOADTRANSPARENT);  
+
+
+
+	default_screen_icon = (HICON)LoadImage(AfxGetInstanceHandle(),	MAKEINTRESOURCE(IDI_ICON_DEFAULT_GRAPHIC),IMAGE_ICON,0,0, LR_LOADTRANSPARENT);  
+	//default_screen_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_GRAPHIC);	
+	//default_screen_icon = (HICON)LoadImage(AfxGetInstanceHandle(),	MAKEINTRESOURCE(IDI_ICON_DEFAULT_GRAPHIC),IMAGE_ICON,0,0, LR_LOADTRANSPARENT );  
 	//default_schedual_icon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_SCHEDUAL);	
 	
-	lock_icon = (HICON)LoadImage(AfxGetInstanceHandle(),  
-		MAKEINTRESOURCE(IDI_ICON_LABEL_LOCK),  
-		IMAGE_ICON,0,0,  
-		LR_LOADTRANSPARENT);  
+	lock_icon = (HICON)LoadImage(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDI_ICON_LABEL_LOCK), IMAGE_ICON,0,0,LR_LOADTRANSPARENT);  
 
-	unlock_icon = (HICON)LoadImage(AfxGetInstanceHandle(),  
-		MAKEINTRESOURCE(IDI_ICON_LABEL_UNLOCK),  
-		IMAGE_ICON,0,0,  
-		LR_LOADTRANSPARENT);  
+	unlock_icon = (HICON)LoadImage(AfxGetInstanceHandle(), 	MAKEINTRESOURCE(IDI_ICON_LABEL_UNLOCK), IMAGE_ICON,0,0, LR_LOADTRANSPARENT);  
 
 
 	//LoadBitmap()
@@ -1588,7 +1621,8 @@ void CBacnetScreenEdit::OnPaint()
 			Pen *myRectangle_pen;
 
 			cstring_length = cs_show_info.GetLength();
-
+			if(cstring_length == 0)
+				cstring_length = 10;
 			x_point = pointF.X - 2;
 			y_point = pointF.Y - 2;
 			right_point =  cstring_length * 10;
@@ -1885,9 +1919,9 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 		int rect_y_botton = rect_y + 30;
 
 		int x_l_exp_value = 10;
-		int x_r_exp_value = 10;
-		int y_top_exp_value = 10;
-		int y_btn_exp_value = 10;
+		int x_r_exp_value = 20;
+		int y_top_exp_value = 20;
+		int y_btn_exp_value = 20;
 
 		if((point.x > 0 ) && (point.x < LOCK_ICON_SIZE_X) && (point.y > 0) && (point.y < LOCK_ICON_SIZE_Y))
 		{
@@ -2107,6 +2141,7 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 	}
 	m_bac_lbuttondown = true;
 
+	
 
 	if(click_ret_old != click_ret)
 	{
@@ -2114,10 +2149,15 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 		click_ret_old = click_ret;
 	}
 
-
-	//return;
-
-
+	if(m_bac_select_label == -1)
+	{
+		SetClassLong(this->GetSafeHwnd(),GCL_HCURSOR ,(LONG)LoadCursor(NULL , IDC_CROSS));
+	}
+	else
+	{
+		SetClassLong(this->GetSafeHwnd(),GCL_HCURSOR ,(LONG)LoadCursor(NULL , IDC_HAND));
+	}
+	
 	CDialogEx::OnLButtonDown(nFlags, point);
 }
 

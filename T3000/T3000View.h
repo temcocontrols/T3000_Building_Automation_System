@@ -12,13 +12,12 @@
 
 #include "SetPtDayDlg.h"
 #include "OfficeStPtDlg.h"
-#include "../FlexSlideBar/FlexSlideBarDef.h"
-//#include "../FlexSlideBar/FlexSlideWnd.h"
-#include "../FlexSlideBar/FSBContainer.h"
+ 
 
 #include "singleslider/MacSliderCtrl.h"
 #include "AutoRichEditCtrl.h"
 #include "CM5/CStatic/staticex.h"
+#include "cslidercontrol0.h"
 //#include "TemcoDataGrid.h"
 #define WM_FRESHVIEW WM_USER + 1100
 
@@ -36,7 +35,7 @@
 //#define  Max		10  //address 365
 //#define  Min		11  //address 366
 
-class CFSBContainer;
+ 
 class CT3000View : public CFormView
 {
 public: // create from serialization only
@@ -74,6 +73,10 @@ public:
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	virtual void OnInitialUpdate(); // called first time after construct
+
+	void UpdateDayControls();
+	void UpdateNightControls();
+
 	void CreateFlexSilde();
 // Implementation
 public:
@@ -122,8 +125,9 @@ public:
 
 
 
-	void OnFlexSlideCallBackFor5ABCD(int response);
-   
+
+	void DayFeedBackNewSliderFor5ABCD();
+	void NightFeedBackNewSliderFor5ABCD();
 	void InitFanSpeed();
 	int m_InRanges[10];
 	int m_OutRanges[10];
@@ -178,24 +182,14 @@ public:
 	CTabCtrl m_SetPtTabCtrl;
     
 
-// slider
-	//CFlexSlideWnd m_pFswOffice;
-	//CFlexSlideWnd m_pFswHotel;
-	//CFSBContainer*  m_pFswOffice;
-	//CFSBContainer*  m_pFswHotel;
-	CFSBContainer*  m_pNightTwoSP;
-	CFSBContainer*  m_pNightSingleSP;
+ 
 
-	CFSBContainer*  m_pDayTwoSP;
-	CFSBContainer*  m_pDaySingleSP;
+	CSliderControl0  m_nightSlider;
+	CSliderControl0  m_daySlider;
 
- //	CFSBContainer*  m_pTemperSP;
-     CFSBContainer*  m_pSlider_Test_TwoSP;
+ 
 
-	CAutoRichEditCtrl m_TempInfoEdit;
-	CAutoRichEditCtrl m_dayInfoEdit;
-	CAutoRichEditCtrl m_nightInfoEdit;
-	CAutoRichEditCtrl m_nightHeatInfoEdit;
+ 
      
 	CStatic m_SetptStatic;
 	
@@ -203,11 +197,10 @@ public:
 	CEdit m_inNameEdt;
 	CEdit m_outNameEdt;
 
-	CAutoRichEditCtrl m_DayCoolEdit;
-	CAutoRichEditCtrl m_DayHeatEdit;
-	CStatic m_DayCoolStatic;
-	CStatic m_DaySPStatic;
-	CStatic m_DayHeatStatic;
+
+ 
+ 
+ 
 
     int m_new_deadband;
     int m_old_deadband;
@@ -244,7 +237,7 @@ public:
 	afx_msg void OnMoving(UINT fwSide, LPRECT pRect);
 	afx_msg void OnBnClickedBtnSynctime();
 	afx_msg void OnBnClickedButtonSchedule();
-	afx_msg LRESULT OnFlexSlideCallBack(WPARAM wParam, LPARAM lParam);
+
 	afx_msg void OnBnClickedUnoccupiedMark();
 
 
@@ -258,7 +251,7 @@ public:
 	BOOL				m_bSliderSetPosWarning;
 	void InitFlexSliderBars_tstat6();//tsat6
     void SetFlexSliderBars_tstat6();
-	void OnFlexSlideCallBackFortstat6();
+ 
 	void TemperatureSlider();
  
     int Round_SetPoint_Max(int spvalue);
@@ -266,8 +259,8 @@ public:
 	int m_daysetpoint;//0907
 	afx_msg void OnEnKillfocusEditCurSp();
 	int m_nightpot;//0907
-	//CSliderCtrl m_singlesliderday;
-	 CMacSliderCtrl m_singlesliderday;
+ 
+	 
 	 
 	 
 	 
@@ -280,16 +273,10 @@ public:
     afx_msg void OnBnClickedHelp();
 //	afx_msg void OnBnClickedBtnTopological();
  
-	 CAutoRichEditCtrl m_nightpotEdit;
+	 
 
 	 afx_msg void OnBnClickedHelpHelp();
-	// CMsflexgrid m_zigbee_tstat_table;
-	// CComboBox m_combox_zigbee;
-//	 afx_msg void OnEnKillfocusEditZigbeechannel1();
-	 //CComboBox m_combox_channel;
-//	 afx_msg void OnCbnSelchangeComboZigbeetype();
-//	 afx_msg void OnCbnSelchangeComboChannel();
-//	 afx_msg void OnBnClickedButtonZigbeeReboot();
+ 
 	 afx_msg LRESULT  ResumeMessageCallBackForT3000View(WPARAM wParam, LPARAM lParam);
 	 afx_msg LRESULT  ReadDataCallBack(WPARAM wParam, LPARAM lParam);
     // BOOL OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult);
@@ -299,7 +286,15 @@ public:
      CToolTipCtrl m_tooltips;
      afx_msg void OnEnKillfocusDayEdit();
      
+	 BOOL m_offline;
+	 BOOL m_StartFirst;
      //afx_msg void OnBnClickedTestSlider();
+//	 void ValuesChangedDaySlider(const VARIANT& sender, float newValue);
+//	 void ValuesChangedNightSlider(const VARIANT& sender, float newValue);
+	  
+	  
+	 void DayHandleMovedSlidercontrol1(const VARIANT& sender, float newValue);
+	 void NightHandleMovedSlidercontrol1(const VARIANT& sender, float newValue);
 };
 
 #ifndef _DEBUG  // debug version in T3000View.cpp

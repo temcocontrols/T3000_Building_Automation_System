@@ -1,0 +1,32 @@
+{
+  "version": 2,
+  "targets": {
+    ".NETFramework,Version=v4.0": {},
+    ".NETFramework,Version=v4.0/win": {}
+  },
+  "libraries": {},
+  "projectFileDependencyGroups": {
+    "": [],
+    ".NETFramework,Version=v4.0": []
+  },
+  "packageFolders": {
+    "C:\\Users\\haven\\.nuget\\packages\\": {}
+  },
+  "project": {
+    "restore": {
+      "projectUniqueName": "C:\\Users\\haven\\OneDrive\\Documents\\Repositories\\ImprovedControls\\T3000Controls\\T3000Controls.csproj",
+      "projectName": "T3000Controls",
+      "projectPath": "C:\\Users\\haven\\OneDrive\\Documents\\Repositories\\ImprovedControls\\T3000Controls\\T3000Controls.csproj",
+      "projectJsonPath": "C:\\Users\\haven\\OneDrive\\Documents\\Repositories\\ImprovedControls\\T3000Controls\\project.json",
+      "projectStyle": "ProjectJson"
+    },
+    "frameworks": {
+      "net40": {}
+    },
+    "runtimes": {
+      "win": {
+        "#import": []
+      }
+    }
+  }
+}

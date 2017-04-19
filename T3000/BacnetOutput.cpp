@@ -74,13 +74,7 @@ LRESULT  CBacnetOutput::OutputMessageCallBack(WPARAM wParam, LPARAM lParam)
 				pInvoke->mRow,pInvoke->mRow,sizeof(Str_out_point));
 			SetTimer(2,2000,NULL);
 		}
-		CString g_configfile_path = g_strExePth + g_strStartInterface_config;
-		int savetodb = GetPrivateProfileInt(_T("SaveToDB"), _T("OUTPUT"), 0, g_configfile_path);
-		if (savetodb == 1)
-		{
-			Save_OutputData_to_db(pInvoke->mRow);
-		}
-		 
+		//Save_OutputData_to_db(pInvoke->mRow);
 	}
 	else
 	{
@@ -360,10 +354,15 @@ void CBacnetOutput::OnBnClickedButtonOutputRead()
 
 LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 {
-     
+    bool need_refresh_all = false; 
 	int Fresh_Item;
 	int isFreshOne = (int)lParam;
 	int  Minipanel_device = 1;
+	int Fresh_List_Now = (int)wParam;
+	if( Fresh_List_Now == REFRESH_LIST_NOW)
+	{
+		need_refresh_all = true;
+	}
 
 	int digital_special_output_count = 0;
 	int analog_special_output_count = 0;
@@ -412,6 +411,11 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		    (bacnet_device_type == PID_T3PT12))
 	{
 		OUTPUT_LIMITE_ITEM_COUNT = 0;
+	}
+	else if (
+		(bacnet_device_type == PID_T36CTA))
+	{
+		OUTPUT_LIMITE_ITEM_COUNT = 2;
 	}
 	else
 	{
@@ -474,22 +478,27 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		m_output_list.SetColumnWidth(OUTPUT_EXT_NUMBER,0);
 	}
 
-	if(isFreshOne == REFRESH_ON_ITEM)
+
+	if(need_refresh_all == false)
 	{
-		Fresh_Item = (int)wParam;
-	}
-	else
-	{
-		if(m_output_list.IsDataNewer((char *)&m_Output_data.at(0),sizeof(Str_out_point) * BAC_OUTPUT_ITEM_COUNT))
+		if(isFreshOne == REFRESH_ON_ITEM)
 		{
-			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
-			m_output_list.SetListData((char *)&m_Output_data.at(0),sizeof(Str_out_point) * BAC_OUTPUT_ITEM_COUNT);
+			Fresh_Item = (int)wParam;
 		}
 		else
 		{
-			return 0;
+			if(m_output_list.IsDataNewer((char *)&m_Output_data.at(0),sizeof(Str_out_point) * BAC_OUTPUT_ITEM_COUNT))
+			{
+				//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
+				m_output_list.SetListData((char *)&m_Output_data.at(0),sizeof(Str_out_point) * BAC_OUTPUT_ITEM_COUNT);
+			}
+			else
+			{
+				return 0;
+			}
 		}
 	}
+
 
 
 	CString temp1;
@@ -1609,18 +1618,13 @@ int GetOutputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Au
 BOOL CBacnetOutput::OnHelpInfo(HELPINFO* pHelpInfo)
 {
 	// TODO: Add your message handler code here and/or call default
-// 	if((m_latest_protocol == PROTOCOL_BACNET_IP) || (m_latest_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
-// 	{
 		HWND hWnd;
 
 		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
 		else
 			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_6_4_OUTPUTS);
 		return (hWnd != NULL);
-// 	}
-// 	else{
-// 		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
-// 	}
+
 	return CDialogEx::OnHelpInfo(pHelpInfo);
 }
 
