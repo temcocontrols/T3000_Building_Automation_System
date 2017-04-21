@@ -46,8 +46,7 @@ namespace Example6_3
 
 
             //}
-
-
+            
             //================End of test=========//
 
 
@@ -253,6 +252,35 @@ namespace Example6_3
             }
             phChart.Series["Series01"].Points.AddXY(hLcrit, pcrit);
             phChart.Series["Series01"].Color = Color.Blue;
+            phChart.Series["Series01"].Font = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold);
+            //phChart.Series["Series01"].Font.
+            phChart.Series["Series01"].Points[12].Label = "S";
+            phChart.Series["Series01"].Points[15].Label = "a";
+            phChart.Series["Series01"].Points[18].Label = "t";
+            phChart.Series["Series01"].Points[21].Label = "u";
+            phChart.Series["Series01"].Points[24].Label = "r";
+            phChart.Series["Series01"].Points[27].Label = "a";
+            phChart.Series["Series01"].Points[30].Label = "t";
+            phChart.Series["Series01"].Points[33].Label = "i";
+            phChart.Series["Series01"].Points[36].Label = "o";
+            phChart.Series["Series01"].Points[40].Label = "n";
+
+            phChart.Series["Series01"].Points[50].Label = "L";
+            phChart.Series["Series01"].Points[55].Label = "i";
+            phChart.Series["Series01"].Points[63].Label = "q";
+            phChart.Series["Series01"].Points[69].Label = "u";
+            phChart.Series["Series01"].Points[75].Label = "i";
+            phChart.Series["Series01"].Points[80].Label = "d";
+
+
+
+
+
+
+
+
+
+
             phChart.Series["Series01"].ChartArea = "ChartArea1";
 
             //This one if for  [hVsat;hVcrit],[psat;pcrit],'r', ...
@@ -264,6 +292,27 @@ namespace Example6_3
             }
             phChart.Series["Series2"].Points.AddXY(hVcrit, pcrit);
             phChart.Series["Series2"].Color = Color.Red;
+            //Chart1.Series(0).Font = New Font(Me.Font.Name, 5, FontStyle.Regular)
+            phChart.Series["Series2"].Font = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold);
+            // phChart.Series["Series2"].Points[12].Label = $"Saturation Vapour";
+            phChart.Series["Series2"].Points[12].Label = "S";
+            phChart.Series["Series2"].Points[15].Label = "a";
+            phChart.Series["Series2"].Points[18].Label = "t";
+            phChart.Series["Series2"].Points[21].Label = "u";
+            phChart.Series["Series2"].Points[24].Label = "r";
+            phChart.Series["Series2"].Points[27].Label = "a";
+            phChart.Series["Series2"].Points[31].Label = "t";
+            phChart.Series["Series2"].Points[35].Label = "i";
+            phChart.Series["Series2"].Points[39].Label = "o";
+            phChart.Series["Series2"].Points[44].Label = "n";
+
+            phChart.Series["Series2"].Points[50].Label = "V";
+            phChart.Series["Series2"].Points[55].Label = "a";
+            phChart.Series["Series2"].Points[60].Label = "p";
+            phChart.Series["Series2"].Points[67].Label = "o";
+            phChart.Series["Series2"].Points[74].Label = "u";
+            phChart.Series["Series2"].Points[80].Label = "r";
+
             phChart.Series["Series2"].ChartArea = "ChartArea1";
 
             //--For critical point
@@ -299,6 +348,9 @@ namespace Example6_3
                 }
 
                 phChart.Series["Series4" + i].Color = Color.Green;
+                phChart.Series["Series4" + i].Points[12].Label = $"{(i + 1) * 10} %";
+                phChart.Series["Series4" + i].Font = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold);
+
                 phChart.Series["Series4" + i].ChartArea = "ChartArea1";
 
             }
@@ -318,6 +370,7 @@ namespace Example6_3
             {
                 string name = "ContourSeries" + i;
                 alSeries.Add(name);
+              
 
             }
 
@@ -365,9 +418,13 @@ namespace Example6_3
             {
                 //==First one is for moving in the list
                 string seriesName = alSeries[i].ToString();
-                phChart.Series.Add(seriesName);
-                phChart.Series[seriesName].ChartType = SeriesChartType.Line;
-
+                Series s1 = new Series(seriesName);
+                //s1.MarkerSize = 15;//--This does not work so
+                s1.ChartType = SeriesChartType.Line;
+                phChart.Series.Add(s1);
+                //phChart.Series.Add(seriesName);
+                //phChart.Series[seriesName].ChartType = SeriesChartType.Line;
+                //phChart.Series[seriesName].MarkerSize = 60;
                 //==For moving in the list
                 for (int z = initalIndex; z < listPoints.Count; z++)
                 {
@@ -445,7 +502,98 @@ namespace Example6_3
 
             //}
 
+            //=================================This part is for regregration cycle=====================//
 
+            //--We need to convert temp to kelvine
+            double T1 = 106 + 273.15;//Deg C+273.15 = kelving temperature ==>TEMPERATURE // changed from 10
+            double P1 = 0.05;//MPa ==>Y-Axis[Pressure] //changed form 0.05mpa
+            double T2 = 200 + 273.15;
+            double P2 = 2;//MPa //changed form 1 MPa
+            double T3 = 200 + 273.15;
+            double P3 = P2;
+            double T4 = T1;
+            double P4 = P1;
+
+            //--Lets calculate enthalpy 
+            //double enthalpy1 = PH.IAPWS_IF97_TowParameterEquivalentFxn("H", "P", P1 * 1000000, "T", T1, fluidName) / 1000;
+            //double enthalpy2 = PH.IAPWS_IF97_TowParameterEquivalentFxn("H", "P", P2 * 1000000, "T", T2, fluidName) / 1000;
+            //double enthalpy3 = PH.IAPWS_IF97_TowParameterEquivalentFxn("H", "P", P3 * 1000000, "T", T3, fluidName) / 1000;
+            //double enthalpy4 = PH.IAPWS_IF97_TowParameterEquivalentFxn("H", "P", P4 * 1000000, "T", T4, fluidName) / 1000;
+
+            double enthalpy1 = 2650;
+            double enthalpy2 = 2900;
+            double enthalpy3 = 900;
+            double enthalpy4 = 900;
+
+
+            // MessageBox.Show($"Different enthalpy values en1[same input as en4]= {enthalpy1} , en2 = {enthalpy2},en3 = {enthalpy3} , en4  ={enthalpy4}");
+            string sName1 = "RefregrationCyclePoints";
+            phChart.Series.Add(sName1);
+            phChart.Series[sName1].ChartType = SeriesChartType.Point;            
+            phChart.Series[sName1].MarkerStyle = MarkerStyle.Circle;
+            phChart.Series[sName1].MarkerSize = 8;
+
+            phChart.Series[sName1].Points.AddXY(enthalpy1,P1);
+            phChart.Series[sName1].Points.AddXY(enthalpy2, P2);
+            phChart.Series[sName1].Points.AddXY(enthalpy3, P3);
+            phChart.Series[sName1].Points.AddXY(enthalpy4, P4);
+
+            string lineCycle1 = "LineRefCycle1";
+            phChart.Series.Add(lineCycle1);
+            phChart.Series[lineCycle1].ChartType = SeriesChartType.Line;
+            
+            phChart.Series[lineCycle1].BorderWidth = 5;
+            phChart.Series[lineCycle1].MarkerStyle = MarkerStyle.Circle;
+            phChart.Series[lineCycle1].MarkerSize = 5;
+            phChart.Series[lineCycle1].Color = Color.Green;
+            phChart.Series[lineCycle1].Points.AddXY(enthalpy1, P1);
+            phChart.Series[lineCycle1].Points.AddXY((enthalpy1+ enthalpy2 )/ 2, 0.3);//1.2 is pressure it is manually given as scale is in log
+            phChart.Series[lineCycle1].Points.AddXY(enthalpy2, P2);
+            phChart.Series[lineCycle1].Points[1].Label = "Compression";
+
+
+            string lineCycle2 = "LineRefCycle2";
+            phChart.Series.Add(lineCycle2);
+            phChart.Series[lineCycle2].ChartType = SeriesChartType.Line;
+            phChart.Series[lineCycle2].MarkerStyle = MarkerStyle.Circle;
+          
+            phChart.Series[lineCycle2].BorderWidth = 5;
+            phChart.Series[lineCycle2].MarkerSize = 5;
+            phChart.Series[lineCycle2].Color = Color.Green;
+            phChart.Series[lineCycle2].Points.AddXY(enthalpy2, P2);
+            phChart.Series[lineCycle2].Points.AddXY((enthalpy2+ enthalpy3) / 2, (P2+ P3 )/ 2);
+            phChart.Series[lineCycle2].Points.AddXY(enthalpy3, P3);
+            phChart.Series[lineCycle2].Points[1].Label = "Condensor";
+
+            string lineCycle3 = "LineRefCycle3";
+            phChart.Series.Add(lineCycle3);
+            phChart.Series[lineCycle3].ChartType = SeriesChartType.Line;
+            phChart.Series[lineCycle3].MarkerStyle = MarkerStyle.Circle;
+            
+            phChart.Series[lineCycle3].BorderWidth = 5;
+            phChart.Series[lineCycle3].MarkerSize = 5;
+            phChart.Series[lineCycle3].Color = Color.Green;           
+            phChart.Series[lineCycle3].Points.AddXY(enthalpy3, P3);
+            phChart.Series[lineCycle3].Points.AddXY((enthalpy3+ enthalpy4)/2, 0.3);//0.3 is a pressure ie 0.3mpa
+            phChart.Series[lineCycle3].Points.AddXY(enthalpy4, P4);
+            phChart.Series[lineCycle3].Points[1].Label = "Expansion Valve";
+
+
+            string lineCycle4 = "LineRefCycle4";
+            phChart.Series.Add(lineCycle4);
+            phChart.Series[lineCycle4].ChartType = SeriesChartType.Line;
+            phChart.Series[lineCycle4].MarkerStyle = MarkerStyle.Circle;
+            
+            phChart.Series[lineCycle4].BorderWidth = 5;
+            phChart.Series[lineCycle4].MarkerSize = 5;
+            phChart.Series[lineCycle4].Color = Color.Green;            
+            phChart.Series[lineCycle4].Points.AddXY(enthalpy4, P4);
+            phChart.Series[lineCycle4].Points.AddXY((enthalpy4 + enthalpy1) / 2, (P4 + P1) / 2);
+            phChart.Series[lineCycle4].Points.AddXY(enthalpy1, P1);
+            phChart.Series[lineCycle4].Points[1].Label = "Evaporator";
+
+
+            //=================================End regregration cycle=====================//
 
         }
 

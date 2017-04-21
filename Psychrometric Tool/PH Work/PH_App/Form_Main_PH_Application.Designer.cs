@@ -64,7 +64,7 @@
             this.ClientSize = new System.Drawing.Size(833, 550);
             this.Controls.Add(this.phChart);
             this.Name = "Form_Main_PH_Application";
-            this.Text = "Form_Main_PH_Application";
+            this.Text = "PH Chart";
             this.Load += new System.EventHandler(this.Form_Main_PH_Application_Load);
             this.Shown += new System.EventHandler(this.Form_Main_PH_Application_Shown);
             ((System.ComponentModel.ISupportInitialize)(this.phChart)).EndInit();
