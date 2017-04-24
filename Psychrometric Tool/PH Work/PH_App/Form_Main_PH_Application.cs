@@ -231,13 +231,14 @@ namespace Example6_3
 
             phChart.Series.Clear();
             phChart.ChartAreas[0].AxisX.Minimum = 1 / 1000; //--This was 1/1000
-            phChart.ChartAreas[0].AxisX.Maximum = 4000;
-            phChart.ChartAreas[0].AxisX.Interval = 500;
+            phChart.ChartAreas[0].AxisX.Maximum = 4000; //4000;
+            phChart.ChartAreas[0].AxisX.Interval = 100;
 
-            phChart.ChartAreas[0].AxisY.Minimum = 0.001; //--This was 0.001
+            phChart.ChartAreas[0].AxisY.Minimum =0.01; //--This was 0.001
             phChart.ChartAreas[0].AxisY.IsLogarithmic = true;
             phChart.ChartAreas[0].AxisY.LogarithmBase = 10;
             phChart.ChartAreas[0].AxisY.Interval = 1;
+           // phChart.ChartAreas[0].AxisY.Maximum = 50;
 
             //--this one is for [hLsat;hLcrit],[psat;pcrit],'b', ...
             // ph_chart.ChartAreas[0].AxisX.Minimum =
@@ -254,6 +255,8 @@ namespace Example6_3
             phChart.Series["Series01"].Color = Color.Blue;
             phChart.Series["Series01"].Font = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold);
             //phChart.Series["Series01"].Font.
+
+           // /*
             phChart.Series["Series01"].Points[12].Label = "S";
             phChart.Series["Series01"].Points[15].Label = "a";
             phChart.Series["Series01"].Points[18].Label = "t";
@@ -272,7 +275,7 @@ namespace Example6_3
             phChart.Series["Series01"].Points[75].Label = "i";
             phChart.Series["Series01"].Points[80].Label = "d";
 
-
+           // */
 
 
 
@@ -295,6 +298,8 @@ namespace Example6_3
             //Chart1.Series(0).Font = New Font(Me.Font.Name, 5, FontStyle.Regular)
             phChart.Series["Series2"].Font = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold);
             // phChart.Series["Series2"].Points[12].Label = $"Saturation Vapour";
+
+           // /*
             phChart.Series["Series2"].Points[12].Label = "S";
             phChart.Series["Series2"].Points[15].Label = "a";
             phChart.Series["Series2"].Points[18].Label = "t";
@@ -312,6 +317,7 @@ namespace Example6_3
             phChart.Series["Series2"].Points[67].Label = "o";
             phChart.Series["Series2"].Points[74].Label = "u";
             phChart.Series["Series2"].Points[80].Label = "r";
+           // */
 
             phChart.Series["Series2"].ChartArea = "ChartArea1";
 
@@ -348,7 +354,7 @@ namespace Example6_3
                 }
 
                 phChart.Series["Series4" + i].Color = Color.Green;
-                phChart.Series["Series4" + i].Points[12].Label = $"{(i + 1) * 10} %";
+                phChart.Series["Series4" + i].Points[12].Label = $"{(i + 1) * 10} %";//initially no. 12
                 phChart.Series["Series4" + i].Font = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold);
 
                 phChart.Series["Series4" + i].ChartArea = "ChartArea1";
@@ -442,13 +448,13 @@ namespace Example6_3
                         dataPointCounter++;
 
 
-
+                       // /*
                         //===========Temperature indicator================//
                         if (flagSingleTemperatureIndicator == 1 && dataPointCounter > (listPoints[z].zlevel) && (listPoints[z].x1 > 200 && listPoints[z].x1 < 2500))//(flagSingleTemperatureIndicator == 1 && zlevelValueForTempIndicator == listPoints[z].zlevel) //(listPoints[z].x1 == 2000)
                         {
                             double temperature = PH.IAPWS_IF97_TowParameterEquivalentFxn("T", "H", listPoints[z].x1 * 1000, "P", listPoints[z].y1 * 1000000, fluidName); //--This multiply is done to convert MPa to Pa and enthlapy is divided to convert J/kg to kJ/Kg
                             phChart.Series[seriesName1].Points.AddXY(listPoints[z].x1, listPoints[z].y1);
-                            phChart.Series[seriesName1].Points[ind++].Label = $"{Math.Round(temperature - 273.15, 0)} DegC";
+                            phChart.Series[seriesName1].Points[ind++].Label = $"{Math.Round(temperature - 273.15, 0)}°C";
                             flagSingleTemperatureIndicator = 0;//off
 
                             dataPointCounter = 0;
@@ -461,7 +467,7 @@ namespace Example6_3
                         }
                         zlevelValueForTempIndicator = listPoints[z].zlevel;
                         //===========Temper indiactor end==============//
-
+                       // */
 
 
                     }
@@ -499,11 +505,10 @@ namespace Example6_3
             //    aListTemperature.Add(temperature);
             //    phChart.Series[seriesName1].Points.AddXY(400, y);
             //    phChart.Series[seriesName1].Points[ind++].Label = $"{Math.Round(temperature - 273.15, 2)} DegC";
-
             //}
 
             //=================================This part is for regregration cycle=====================//
-
+            ///*
             //--We need to convert temp to kelvine
             double T1 = 106 + 273.15;//Deg C+273.15 = kelving temperature ==>TEMPERATURE // changed from 10
             double P1 = 0.05;//MPa ==>Y-Axis[Pressure] //changed form 0.05mpa
@@ -592,7 +597,7 @@ namespace Example6_3
             phChart.Series[lineCycle4].Points.AddXY(enthalpy1, P1);
             phChart.Series[lineCycle4].Points[1].Label = "Evaporator";
 
-
+          // */
             //=================================End regregration cycle=====================//
 
         }
