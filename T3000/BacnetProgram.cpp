@@ -122,7 +122,7 @@ BOOL CBacnetProgram::OnInitDialog()
 	PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
 	// TODO:  Add extra initialization here
 
-
+	ShowWindow(FALSE);
 	//RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//Insert¼ü
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -462,12 +462,12 @@ void CBacnetProgram::OnBnClickedButtonProgramEdit()
 	}
 	else
 	{
-		if(bac_select_device_online)
+		//if(bac_select_device_online)
 			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_PROGRAMCODE);
-		else
-		{
-			MessageBox(_T("Device is offline,Please check connection!"));
-		}
+		//else
+		//{
+		//	MessageBox(_T("Device is offline,Please check connection!"));
+		//}
 	}
 
 

@@ -19,6 +19,7 @@ enum ECmdHandler {
 	ID_SORT_BY_CONNECTION,
 	ID_SORT_BY_FLOOR,
 	ID_PING_CMD,
+	ID_ADD_VIRTUAL_DEVICE,
 	ID_MAX_CMD
 };
 
@@ -138,10 +139,12 @@ CImageTreeCtrl::CImageTreeCtrl()
 	m_Commandmap[ID_SORT_BY_CONNECTION]		     = &CImageTreeCtrl::SortByConnection;
 	m_Commandmap[ID_SORT_BY_FLOOR]		        = &CImageTreeCtrl::SortByFloor;
 	m_Commandmap[ID_PING_CMD]		        = &CImageTreeCtrl::PingDevice;
-	
+	m_Commandmap[ID_ADD_VIRTUAL_DEVICE]     = &CImageTreeCtrl::HandleAddVirtualDevice;
 	old_hItem = NULL;
 	m_serial_number = 0;
 	is_focus = false;
+	tree_offline_mode = false;
+	m_virtual_tree_item = NULL;
 }
 
 CImageTreeCtrl::~CImageTreeCtrl()
@@ -159,6 +162,7 @@ BEGIN_MESSAGE_MAP(CImageTreeCtrl, CTreeCtrl)
 	ON_COMMAND_RANGE(ID_RENAME, ID_MAX_CMD-1, OnContextCmd)
 	ON_WM_KILLFOCUS()
 	ON_WM_SETFOCUS()
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 void CImageTreeCtrl::OnContextCmd(UINT id) {
 	HTREEITEM hCur = GetSelectedItem();
@@ -214,6 +218,13 @@ bool CImageTreeCtrl::PingDevice(HTREEITEM hItem)
 	return true;
 }
 
+#include "BacnetAddVirtualDevice.h"
+bool CImageTreeCtrl::HandleAddVirtualDevice(HTREEITEM)
+{
+	CBacnetAddVirtualDevice popdlg;
+	popdlg.DoModal();
+	return true;
+}
 
 bool CImageTreeCtrl::SortByConnection(HTREEITEM hItem) 
 {
@@ -670,17 +681,44 @@ bool CImageTreeCtrl::DoDeleteItem(HTREEITEM hItem)
             HTREEITEM floornode=GetParentItem(parentnode);
             CString Floorname=GetItemText(floornode);
              
+
+			vector <tree_product>::iterator myiterator;
+
+
+			for (myiterator=pFrame->m_product.begin();myiterator!=pFrame->m_product.end();)
+			{
+				if (hItem == myiterator->product_item)
+				{
+					CString strSql, temp_serial;
+					unsigned int sn = myiterator->serial_number;
+					temp_serial.Format(_T("%u"), sn); 
+					strSql.Format(_T("delete   from ALL_NODE  where  Serial_ID='%s' "), temp_serial);
+					SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+					DeleteItem(myiterator->product_item);
+					myiterator = pFrame->m_product.erase(myiterator);
+
+					break;
+				}
+				else
+				{
+					++myiterator;
+				}
+			}
+
+#if 0
 			for (int i = 0; i < pFrame->m_product.size(); i++) {
 				if (hItem == pFrame->m_product.at(i).product_item)
 				{
 					CString strSql, temp_serial;
-					int sn = pFrame->m_product.at(i).serial_number;
-					temp_serial.Format(_T("%d"), sn); 
+					unsigned int sn = pFrame->m_product.at(i).serial_number;
+					temp_serial.Format(_T("%u"), sn); 
 					strSql.Format(_T("delete   from ALL_NODE  where  Serial_ID='%s' "), temp_serial);
 					SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+
+					DeleteItem(pFrame->m_product.at(i).product_item);
 				}
 			}
-
+#endif
            /*strSql.Format(_T("select * from ALL_NODE where  Product_name='%s' order by Building_Name"),m_name_old);
                 
 				q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
@@ -714,7 +752,7 @@ bool CImageTreeCtrl::DoDeleteItem(HTREEITEM hItem)
 		
 		
 		
-        ::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
+//        ::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
         return true;
 }
 // CImageTreeCtrl 消息处理程序
@@ -1262,6 +1300,40 @@ unsigned int CImageTreeCtrl::GetSelectSerialNumber()
 	return m_serial_number;
 }
 
+void CImageTreeCtrl::SetTreeOfflineMode(bool b_value)
+{
+	tree_offline_mode = b_value;
+}
+
+
+void CImageTreeCtrl::FlashSelectItem(HTREEITEM hItem)
+{
+	if(tree_offline_mode == false)
+		return;
+	static int flash_count = 1;
+	flash_count = flash_count %3  + 1;
+	if(flash_count == 1)
+	{
+		SetItemBold(hItem,1);
+		SetItemColor( hItem, RGB(255,0,0));
+	}
+	else if(flash_count == 2)
+	{
+		SetItemBold(hItem,1);
+		SetItemColor( hItem, RGB(0,255,0));
+	}
+	else if(flash_count == 3)
+	{
+		SetItemBold(hItem,1);
+		SetItemColor( hItem, RGB(0,0,255));
+	}
+}
+
+void CImageTreeCtrl::StopFlashItem()
+{
+	SetItemBold(old_hItem,0);
+	SetItemColor( old_hItem, RGB(0,0,0));
+}
 
 void CImageTreeCtrl::SetSelectItem(HTREEITEM hItem)
 {
@@ -1277,6 +1349,8 @@ void CImageTreeCtrl::SetSelectItem(HTREEITEM hItem)
 
 	SetItemBold(hItem,1);
 	SetItemColor( hItem, RGB(255,0,0));
+	m_hSelItem = hItem;
+	offline_mode_string = GetItemText(m_hSelItem);
 }
 
 void CImageTreeCtrl::SetItemColor(HTREEITEM hItem, COLORREF color)
@@ -1445,7 +1519,45 @@ try
 			memDC.SetBkColor( GetSysColor( COLOR_WINDOW ) );
 			//向内存中的图片写入内容,为该节点的内容
 			memDC.TextOut( rect.left+2, rect.top+1, sItem );
+			if(tree_offline_mode)
+			{
+				if(hItem == m_hSelItem)
+					memDC.TextOut( rect.right + 10, rect.top+1, _T("->Offline Mode") );
+				
+#if 0
+				CBitmap bmp;
+				if (bmp.LoadBitmap(IDB_BITMAP_ALARM_RED))
+				{
+					BITMAP bmpInfo;
+					bmp.GetBitmap(&bmpInfo);
 
+					// Create an in-memory DC compatible with the
+					// display DC we're using to paint
+					CDC dcMemory;
+					dcMemory.CreateCompatibleDC(&memDC);
+
+					// Select the bitmap into the in-memory DC
+					CBitmap* pOldBitmap = dcMemory.SelectObject(&bmp);
+
+					// Find a centerpoint for the bitmap in the client area
+					CRect rect_bit;
+					GetClientRect(&rect_bit);
+					int nX = rect_bit.left + (rect_bit.Width() - bmpInfo.bmWidth) / 2;
+					int nY = rect_bit.top + (rect_bit.Height() - bmpInfo.bmHeight) / 2;
+
+					// Copy the bits from the in-memory DC into the on-
+					// screen DC to actually do the painting. Use the centerpoint
+					// we computed for the target offset.
+					memDC.BitBlt(rect.right, rect.top, bmpInfo.bmWidth, bmpInfo.bmHeight, &dcMemory, 
+						0, 0, SRCCOPY);
+
+					dcMemory.SelectObject(pOldBitmap);
+
+				}
+#endif
+			}
+
+			
 			memDC.SelectObject( pFontDC );
 		}
 		hItem = GetNextVisibleItem( hItem );
@@ -1482,7 +1594,10 @@ void CImageTreeCtrl::OnKillFocus(CWnd* pNewWnd)
 	// TODO: Add your message handler code here
 }
 
-
+void CImageTreeCtrl::SetVirtualTreeItem(HTREEITEM virtual_item)
+{
+	m_virtual_tree_item = virtual_item;
+}
 
 void CImageTreeCtrl::DisplayContextOtherMenu(CPoint & point) {
 		CPoint pt(point);
@@ -1498,7 +1613,8 @@ void CImageTreeCtrl::DisplayContextOtherMenu(CPoint & point) {
 		VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_CONNECTION, _T("Sort By Connection")));
 		VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_FLOOR, _T("Sort By Floor")));
 		
-
+		if((m_virtual_tree_item != NULL) && (hItem == m_virtual_tree_item))
+			VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_VIRTUAL_DEVICE, _T("Add Virtual Device")));
 		if(menu.GetMenuItemCount() > 0)
 			menu.TrackPopupMenu(TPM_LEFTALIGN, point.x, point.y, this);
 }
@@ -1611,4 +1727,20 @@ void CImageTreeCtrl::OnSetFocus(CWnd* pOldWnd)
 	CTreeCtrl::OnSetFocus(pOldWnd);
 
 	// TODO: Add your message handler code here
+}
+
+
+void CImageTreeCtrl::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: Add your message handler code here and/or call default
+	if(tree_offline_mode == false)
+	{
+		KillTimer(1);
+	}
+	else
+	FlashSelectItem(m_hSelItem);
+	//CString temp_item_text ;
+	//temp_item_text = offline_mode_string + _T("  Offline Mode");
+	//SetItemText(m_hSelItem,temp_item_text);
+	CTreeCtrl::OnTimer(nIDEvent);
 }

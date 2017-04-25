@@ -37,7 +37,7 @@ void CTstatRangeDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STATIC_RANGE_ENTER_UNITS, m_static_range_units_select);
 	//DDX_Radio(pDX, IDC_RADIO_T_0, m_input_Analog_select);
 	DDX_Text(pDX, IDC_EDIT_RANGE_SELECT, m_current_range);
-	DDV_MinMaxInt(pDX, m_current_range, 0, 12);
+	DDV_MinMaxInt(pDX, m_current_range, 0, 13);
 
 
 
@@ -106,6 +106,7 @@ BEGIN_MESSAGE_MAP(CTstatRangeDlg, CDialogEx)
     ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)
     ON_BN_CLICKED(IDC_RADIO_5V, &CTstatRangeDlg::OnBnClickedRadio5v)
     ON_BN_CLICKED(IDC_RADIO_10V, &CTstatRangeDlg::OnBnClickedRadio10v)
+	ON_BN_CLICKED(IDC_RADIO_T_13, &CTstatRangeDlg::OnBnClickedRadioT13)
 END_MESSAGE_MAP()
 
 
@@ -150,7 +151,7 @@ void CTstatRangeDlg::Initial_window(){
 	m_show_unit.ShowWindow(TRUE);
 	temp_cs.Format(_T("%d"),m_input_Analog_select);
 	((CEdit *)GetDlgItem(IDC_EDIT_RANGE_SELECT))->SetWindowTextW(temp_cs);
-	 for (int i=IDC_RADIO_T_0;i<=IDC_RADIO_T_12;i++)
+	 for (int i=IDC_RADIO_T_0;i<=IDC_RADIO_T_13;i++)
 	 {
 	    ((CButton *)GetDlgItem(i))->SetCheck(0);
 	 }
@@ -244,7 +245,7 @@ void CTstatRangeDlg::OnTimer(UINT_PTR nIDEvent)
 	}
 	else
 		break;
-	if((nfocusid >= IDC_RADIO_T_0) && (nfocusid <= IDC_RADIO_T_12))
+	if((nfocusid >= IDC_RADIO_T_0) && (nfocusid <= IDC_RADIO_T_13))
 	{
 		//bac_ranges_type = INPUT_RANGE_DIGITAL_TYPE;
 	}
@@ -364,7 +365,7 @@ void CTstatRangeDlg::OnCancel()
 }
 void CTstatRangeDlg::Click_Radio(){
 	  m_input_Analog_select = 0;
-	for (int i=IDC_RADIO_T_0;i<=IDC_RADIO_T_12;i++)
+	for (int i=IDC_RADIO_T_0;i<=IDC_RADIO_T_13;i++)
 	{
 		if (((CButton *)GetDlgItem(i))->GetCheck()==1)
 		{
@@ -653,8 +654,6 @@ void CTstatRangeDlg::InitRangeUI()
 
 void CTstatRangeDlg::to_fresh()
 {
-    //float m_version=get_tstat_version(g_tstat_id);
-    //multi_read_tstat(g_tstat_id);	
     if(m_InputNo==2)
     {
 
@@ -1811,4 +1810,10 @@ void CTstatRangeDlg::OnBnClickedRadio10v()
         ((CButton*)GetDlgItem(IDC_RADIO_10V))->SetCheck(0);
 
     }
+}
+
+
+void CTstatRangeDlg::OnBnClickedRadioT13()
+{
+	  Click_Radio();
 }

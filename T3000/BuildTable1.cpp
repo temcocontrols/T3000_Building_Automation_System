@@ -152,7 +152,6 @@ BOOL CBuildTable1::OnInitDialog()
 void CBuildTable1::to_fresh()
 {
 	//float m_version=get_tstat_version(g_tstat_id);
-	//multi_read_tstat(g_tstat_id);	
 	if(m_InputNo==2)
 	{
 		

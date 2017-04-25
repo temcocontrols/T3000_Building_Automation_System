@@ -106,6 +106,8 @@ public:
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg void OnBnClickedButtonSettingIoConfig();
 	afx_msg void OnBnClickedButtonRebootDevice();
+	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+	void InitScrollbar();
 };
 
 

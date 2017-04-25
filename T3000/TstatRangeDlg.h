@@ -132,4 +132,5 @@ private:
 public:
     afx_msg void OnBnClickedRadio5v();
     afx_msg void OnBnClickedRadio10v();
+	afx_msg void OnBnClickedRadioT13();
 };

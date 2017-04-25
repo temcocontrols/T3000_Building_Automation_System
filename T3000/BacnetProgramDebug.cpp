@@ -887,7 +887,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 						cstemp_value.Format(_T("%.3f"),temp_float_value);
 						m_program_debug_list.SetItemText(0,VARIABLE_VALUE,cstemp_value);
 					}
-
+					
 				}
 
 				CString temp_des2;

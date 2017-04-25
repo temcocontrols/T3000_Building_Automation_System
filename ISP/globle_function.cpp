@@ -380,6 +380,18 @@ CString GetProductName(int ModelID)
 	case PM_TSTAT8:
 		strProductName=L"TStat8";
 		break;
+	case PM_TSTAT8_WIFI:
+		strProductName = "TStat8_Wifi";
+		break;
+	case PM_TSTAT8_OCC:
+		strProductName = "TStat8_Occ";
+		break;
+	case PM_TSTAT7_ARM:
+		strProductName = "TStat8_ARM";
+		break;
+	case PM_TSTAT8_220V:
+		strProductName = "TStat8_220V";
+		break;
 	case PM_NC:					//
 		strProductName=_T("NC");
 		break;

@@ -42,8 +42,8 @@ END_MESSAGE_MAP()
 CT3000App::CT3000App()
 {
 	m_bHiColorIcons = TRUE;
-	CurrentT3000Version=_T("    2017.02.27");
-	T3000_Version = 20117;
+	CurrentT3000Version=_T("    2017.03.16");
+	T3000_Version = 20316;
 
 
 	m_lastinterface=19;
@@ -562,7 +562,7 @@ BOOL CT3000App::InitInstance()
 			hFind = FindFirstFile(g_strDatabasefilepath, &wfd);//
 			if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
 			{
-				//CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);//
+				
 				//没有找到就创建一个默认的数据库
 				FilePath=g_strExePth+_T("Database\\T3000.db");
 				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000DB1), _T("T3000DB"));   

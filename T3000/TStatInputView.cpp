@@ -679,14 +679,13 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
                 CTstatRangeDlg   dlg;
                 int rangevalue=m_tstat_input_data.at(lRow).Range.RegValue;
                 dlg.m_current_range = rangevalue&0x7F;
-                for (int i=0;i<11;i++)
+                for (int i=0;i<13;i++)
                 {
                     if (m_tstat_input_data.at(lRow).Range.StrValue.CompareNoCase(analog_range_TSTAT6[i])==0)
                     {
                         dlg.m_current_range=i;
                         break;
                     }
-
                 }
 
 

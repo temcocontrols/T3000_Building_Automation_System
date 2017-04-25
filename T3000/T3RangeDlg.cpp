@@ -16,7 +16,7 @@ CString Range_Units[15] =
     _T("0-100%"),
     _T("ON/OFF"),
     _T("OFF/ON"),
-    _T("Low Speed Count"),
+    _T("Pulse Count (Slow 1Hz)"),
     _T("Lighting Control"),
     _T("TYPE3 10K C"),
     _T("TYPE3 10K F"),
@@ -24,7 +24,7 @@ CString Range_Units[15] =
     _T("0-5V"),
     _T("0-10V"),
     _T("0-20 ma"),
-    _T("High Speed Count")
+    _T("Pulse Count (Fast 100Hz)")
 };
 
 // CT3RangeDlg dialog

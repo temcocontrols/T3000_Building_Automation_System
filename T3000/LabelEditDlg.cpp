@@ -276,6 +276,11 @@ int m_inRows;
 			case PM_TSTAT6:	m_inRows=12;break;
 			case PM_TSTAT5i:	m_inRows=12;break;
             case PM_TSTAT8:	m_inRows=12;break;
+			case PM_TSTAT8_WIFI:	m_inRows = 12; break;
+			case PM_TSTAT8_OCC:	m_inRows = 12; break;
+			case PM_TSTAT7_ARM:	m_inRows = 12; break;
+			case PM_TSTAT8_220V:	m_inRows = 12; break;
+
 			case 16:m_inRows=10;break; // 5E
             case PM_PM5E:m_inRows=10;break; // 5E
 			case 17:m_inRows=5;break; // 5F

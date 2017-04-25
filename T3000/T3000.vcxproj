@@ -18,6 +18,7 @@
     <ProjectGuid>{F7226464-C41C-4909-BF74-97328B72FFC8}</ProjectGuid>
     <RootNamespace>T3000</RootNamespace>
     <Keyword>MFCProj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -139,6 +140,7 @@
     <ClCompile Include="AutoRichEditCtrl.cpp" />
     <ClCompile Include="Bacnetaddintodb.cpp" />
     <ClCompile Include="BacnetAddLabel.cpp" />
+    <ClCompile Include="BacnetAddVirtualDevice.cpp" />
     <ClCompile Include="BacnetAlarmLog.cpp" />
     <ClCompile Include="ARDDlg.cpp" />
     <ClCompile Include="BacnetAlarmWindow.cpp" />
@@ -341,6 +343,7 @@
     <ClCompile Include="WeeklyRout_InsertDia.cpp" />
     <ClCompile Include="WeeklySchedule.cpp" />
     <ClCompile Include="WhichOneToChooseDlg.cpp" />
+    <ClCompile Include="WifiConfigDlg.cpp" />
     <ClCompile Include="WorkspaceBar.cpp" />
     <ClCompile Include="T3\DialogT3.cpp" />
     <ClCompile Include="CM5\SliderBoth.cpp" />
@@ -394,9 +397,10 @@
     <None Include="res\default view.jpg" />
     <None Include="res\default_icon\Alarms.ico" />
     <None Include="res\default_icon\Configuration.ico" />
-    <None Include="res\default_icon\Graphics.ico" />
+    <None Include="res\default_icon\Graphics2.ico" />
     <None Include="res\default_icon\Holidays.ico" />
-    <None Include="res\default_icon\outputs.ico" />
+    <None Include="res\default_icon\inputs.ico" />
+    <None Include="res\default_icon\outputs2.ico" />
     <None Include="res\default_icon\PID.ico" />
     <None Include="res\default_icon\Programs.ico" />
     <None Include="res\default_icon\RemotePoints.ico" />
@@ -460,6 +464,7 @@
     <None Include="res\toolbar1.bmp" />
     <None Include="res\toolbar2.bmp" />
     <None Include="res\Toolbar256.bmp" />
+    <None Include="res\toolbar_disable.bmp" />
     <None Include="res\Toolbar_V25049.bmp" />
     <None Include="res\ToolbarOwn.bmp" />
     <None Include="res\treenode.bmp" />
@@ -478,6 +483,7 @@
     <ClInclude Include="AutoRichEditCtrl.h" />
     <ClInclude Include="Bacnetaddintodb.h" />
     <ClInclude Include="BacnetAddLabel.h" />
+    <ClInclude Include="BacnetAddVirtualDevice.h" />
     <ClInclude Include="BacnetAlarmLog.h" />
     <ClInclude Include="ARDDlg.h" />
     <ClInclude Include="BacnetAlarmWindow.h" />
@@ -707,6 +713,7 @@
     <ClInclude Include="Weekly_Routines.h" />
     <ClInclude Include="WeeklyRout_InsertDia.h" />
     <ClInclude Include="WhichOneToChooseDlg.h" />
+    <ClInclude Include="WifiConfigDlg.h" />
     <ClInclude Include="WorkspaceBar.h" />
     <ClInclude Include="T3\DialogT3.h" />
     <ClInclude Include="CM5\DialogCM5.h" />

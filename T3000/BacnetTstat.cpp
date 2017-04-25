@@ -46,6 +46,7 @@ BOOL CBacnetTstat::OnInitDialog()
 	// TODO:  Add extra initialization here
 	Initial_List();
 	PostMessage(WM_REFRESH_BAC_TSTAT_LIST,NULL,NULL);
+	ShowWindow(FALSE);
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE

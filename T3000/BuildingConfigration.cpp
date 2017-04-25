@@ -17,6 +17,7 @@
 #include "RemotePtpLogin.h"
 #include <ctime>
 #include <iostream>
+#include "../SQLiteDriver/sqlite3.h"
 using namespace std;
 // CBuildingConfigration dialog
 #define WM_FRESH_DB  WM_USER + 1014
@@ -806,6 +807,14 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
         if (Is_Changed)
         {
 
+			CString m_select = m_building_config_list.GetItemText(m_curRow, BC_ITEM);
+			 
+			if (!m_select.IsEmpty())
+			{
+				AfxMessageBox(_T("The current building is using,Can't Change it !"));
+				m_building_config_list.SetItemText(m_curRow, m_curCol, m_select_text);
+				return 0;
+			}
 
             if (m_select_text.CompareNoCase(cs_temp)==0)
             {
@@ -834,11 +843,52 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
             filefoldSource= filefoldSource+L"\\";
 
             NewfilefoldSource = g_strExePth+CString("Database\\Buildings\\")+cs_temp+CString("\\");
-            CFileOperation      fp;
-            if (fp.CheckPath (fileSource)>0)
-            {
-                fp.Rename (fileSource,NewfileSource);
-                fp.Rename (filefoldSource,NewfilefoldSource) ;
+//   			char source[255];
+// 			char desr[255];
+ 			
+  			
+  			  
+		  
+ 			CFileOperation      fp;
+             if (fp.CheckPath (fileSource)>0)
+             {
+				strTips.Format(L"Can't rename from %s to %s", fileSource, NewfileSource);
+
+// 				WideCharToMultiByte(CP_ACP, 0, fileSource.GetBuffer(), -1, source, 255, NULL, NULL);
+// 
+// 				WideCharToMultiByte(CP_ACP, 0, NewfileSource.GetBuffer(), -1, desr, 255, NULL, NULL);
+
+
+				 if (!fp.Rename(fileSource, NewfileSource))
+				 {
+					 AfxMessageBox(strTips);
+					 m_building_config_list.SetItemText(m_curRow, m_curCol, m_select_text);
+					 return 0;
+				 }
+// 				if (rename(source, desr)<0)
+// 				{
+// 					AfxMessageBox(strTips);
+// 					return 0;
+// 				}
+				strTips.Format(L"Can't rename from %s to %s", filefoldSource, NewfilefoldSource);
+// 				WideCharToMultiByte(CP_ACP, 0, filefoldSource.GetBuffer(), -1, source, 255, NULL, NULL);
+// 
+// 				WideCharToMultiByte(CP_ACP, 0, NewfilefoldSource.GetBuffer(), -1, desr, 255, NULL, NULL);
+
+
+// 				if (rename(source, desr) < 0)
+// 				{
+// 					AfxMessageBox(strTips);
+// 					return 0;
+// 				}
+                 if (!fp.Rename(filefoldSource, NewfilefoldSource))
+                 {
+ 					AfxMessageBox(strTips);
+					m_building_config_list.SetItemText(m_curRow, m_curCol, m_select_text);
+ 					return 0;
+                 }
+				
+                
                 
             }
 
@@ -861,9 +911,15 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
                     if (!q.eof())
                     {
                        
+						sql.Format(L"Delete from Building_ALL where Building_Name= '%s' ", cs_temp);
+						SqliteDBT3000.execDML((UTF8MBSTR)sql);
 
                         sql.Format(_T("update Building_ALL set Building_Name = '%s' where Building_Name = '%s' "),cs_temp,m_select_text);
-                       SqliteDBT3000.execDML((UTF8MBSTR)sql);
+                        SqliteDBT3000.execDML((UTF8MBSTR)sql);
+
+
+						sql.Format(L"Delete from Building where Main_BuildingName= '%s' ", cs_temp);
+						SqliteDBT3000.execDML((UTF8MBSTR)sql);
 
                         sql.Format(_T("update Building set Main_BuildingName = '%s' ,Building_Name = '%s' , Building_Path = '%s'  where  Building_Path = '%s' "),cs_temp,cs_temp,NewfileSource,path);
 						SqliteDBT3000.execDML((UTF8MBSTR)sql);
@@ -875,6 +931,7 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 
 
                 }
+				q.finalize();
                 SqliteDBT3000.closedb();
 
 				m_BuildNameLst.at(m_curRow).MainBuildingName = cs_temp;
@@ -889,17 +946,19 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
             catch(_com_error *e)
             {
                 AfxMessageBox(_T("Operator Failed"));
-
             }
             m_bChanged=TRUE;
             m_building_config_list.SetItemText (Changed_Item,BC_BUILDINGPATH,NewfileSource);
             _variant_t temp_variant;
 
-            CString DB_Building_Name=L"";
-            CppSQLite3DB SqliteDBBuilding;
+           
+            //修改ALL_NODE 里面的BuilingName .
+#if 0    //校驗一下看看是否是Building的Database
+
+			CString DB_Building_Name = L"";
+			CppSQLite3DB SqliteDBBuilding;
 			CppSQLite3Query q;
-            //修改Building的数据库,也要更新,明天接着做吧..哈哈....完蛋
-#if 1 //校驗一下看看是否是Building的Database
+
             CString BuildingPath = GetExePath(true)+ NewfileSource;
              SqliteDBBuilding.open((UTF8MBSTR)BuildingPath);
             
@@ -923,24 +982,32 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
             	   
 
             }
+
+
+			sql.Format(_T("Select * from ALL_NODE"));
+			q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
+			while (!q.eof())
+			{
+
+				sql.Format(_T("update ALL_NODE set MainBuilding_Name  = '%s' ,Building_Name = '%s'  where  MainBuilding_Name  = '%s'"), cs_temp, cs_temp, DB_Building_Name);
+				SqliteDBBuilding.execDML((UTF8MBSTR)sql);
+				q.nextRow();
+
+			}
+
+			 if (SqliteDBBuilding.open((UTF8MBSTR)BuildingPath) == SQLITE_OK)
+			 {
+				 SqliteDBBuilding.closedb();
+			 }
+			
+
+
 #endif
 
 
+ 
 
-
-            sql.Format(_T("Select * from ALL_NODE"));
-            q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
-            while(!q.eof())
-            {
-
-                sql.Format(_T("update ALL_NODE set MainBuilding_Name  = '%s' ,Building_Name = '%s'  where  MainBuilding_Name  = '%s'"),cs_temp,cs_temp,DB_Building_Name);
-                SqliteDBBuilding.execDML((UTF8MBSTR)sql);
-                q.nextRow();
-
-            }
            
-
-           SqliteDBBuilding.closedb();
 
 
         }
@@ -2012,12 +2079,13 @@ void CBuildingConfigration::OnBuildingconfigSelect()
     }
 
 	int ID = m_BuildNameLst.at(m_curRow).ID;
-    CString m_select,m_strMainBuildingName;
+    CString m_select,m_strMainBuildingName,currentpath, sql;
     m_strMainBuildingName=m_building_config_list.GetItemText(m_curRow,BC_MAINNAME);
     m_select=m_building_config_list.GetItemText(m_curRow,m_curCol);
+	currentpath = m_building_config_list.GetItemText(m_curRow, BC_BUILDINGPATH);
     if (!m_select.IsEmpty())
     {
-        AfxMessageBox(_T("you have already Selected.\ndon't need to select ,again!"));
+        AfxMessageBox(_T("you have already Selected.\n don't need to select ,again!"));
         return;
 	}
 	
@@ -2028,7 +2096,7 @@ void CBuildingConfigration::OnBuildingconfigSelect()
     {
 
         CString execute_str=_T("update Building set Default_SubBuilding = 0 where Default_SubBuilding = 1");
-       SqliteDBT3000.execDML((UTF8MBSTR)execute_str);
+        SqliteDBT3000.execDML((UTF8MBSTR)execute_str);
         execute_str.Format(_T("update Building set Default_SubBuilding =  1 where  Main_BuildingName= '%s'"),m_strMainBuildingName);
         SqliteDBT3000.execDML((UTF8MBSTR)execute_str);
 	    
@@ -2056,6 +2124,62 @@ void CBuildingConfigration::OnBuildingconfigSelect()
 
     //Fresh_List();
     //Initial_Building_List();
+
+
+
+	//修改ALL_NODE 里面的BuilingName .
+#if 1    //校驗一下看看是否是Building的Database
+
+	CString DB_Building_Name = L"";
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Query q;
+
+	CString BuildingPath = GetExePath(true) + currentpath;
+	SqliteDBBuilding.open((UTF8MBSTR)BuildingPath);
+
+	if (!SqliteDBBuilding.tableExists("ALL_NODE"))
+	{
+
+		SqliteDBBuilding.closedb();
+		AfxMessageBox(_T("The Database of the building is error."));
+		return ;
+	}
+	else
+	{
+
+		sql.Format(_T("Select  distinct mainbuilding_name  from  ALL_NODE"));
+		q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
+		if (!q.eof())
+		{
+
+			DB_Building_Name = q.getValuebyName(L"MainBuilding_Name");
+		}
+
+
+	}
+
+
+	sql.Format(_T("Select * from ALL_NODE"));
+	q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
+	while (!q.eof())
+	{
+
+		sql.Format(_T("update ALL_NODE set MainBuilding_Name  = '%s' ,Building_Name = '%s' "), m_strMainBuildingName, m_strMainBuildingName);
+		SqliteDBBuilding.execDML((UTF8MBSTR)sql);
+		q.nextRow();
+
+	}
+
+	if (SqliteDBBuilding.open((UTF8MBSTR)BuildingPath) == SQLITE_OK)
+	{
+		SqliteDBBuilding.closedb();
+	}
+
+
+
+#endif
+
+
     m_bChanged=TRUE;
 }
 

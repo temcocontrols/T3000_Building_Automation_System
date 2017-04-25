@@ -38,6 +38,7 @@ public:
 	bool Copy(CString sSource, CString sDest); // copy file or folder
 	bool Replace(CString sSource, CString sDest); // move file or folder
 	bool Rename(CString sSource, CString sDest); // rename file or folder
+ 
 	CString GetErrorString() {return m_sError;} // return error description
 	DWORD GetErrorCode() {return m_dwError;} // return error code
 	void ShowError() // show error message

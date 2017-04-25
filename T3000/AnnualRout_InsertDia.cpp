@@ -238,9 +238,10 @@ void AnnualRout_InsertDia::load()
 	} 
 	else
 	{
+		int nFlag = product_register_value[7];
 		if (m_strtype.CompareNoCase(_T("Lightingcontroller")) == 0)
 			Read_Multi(g_tstat_id, the_days, 5752 + ONE_YEAR_BETYS*(m_addr - 1), ONE_YEAR_BETYS);//get from network
-		else if (product_register_value[7] == PM_TSTAT8)
+		else if (product_register_value[7] == PM_TSTAT8 || (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
 		{
 
 			Read_Multi(g_tstat_id, the_days, 918, ONE_YEAR_BETYS);
@@ -253,7 +254,8 @@ void AnnualRout_InsertDia::load()
 			if (the_days[i] != 0xFF)
 				break;
 		}
-		if (product_register_value[7] != PM_TSTAT8)
+		  
+		if ((product_register_value[7] != PM_TSTAT8) || (nFlag != PM_TSTAT8_WIFI) || (nFlag != PM_TSTAT8_OCC) || (nFlag != PM_TSTAT7_ARM) || (nFlag != PM_TSTAT8_220V))
 		{
 			if (i == ONE_YEAR_BETYS)
 			{
@@ -351,6 +353,7 @@ BOOL AnnualRout_InsertDia::OnInitDialog()
 	} 
 	else
 	{
+		int nFlag = product_register_value[7];
 		if (g_protocol == PROTOCOL_BACNET_IP)
 		{								//器件。产品本来不同 界面就会有差异 都还要用一个界面。木有办法，只能 加在一起了。;
 			GetDlgItem(IDC_LIST1)->ShowWindow(0);
@@ -387,7 +390,7 @@ BOOL AnnualRout_InsertDia::OnInitDialog()
 
 
 		}
-		else if (product_register_value[7] == PM_TSTAT8)
+		else if ((product_register_value[7] == PM_TSTAT8) || (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
 		{
 			GetDlgItem(IDC_LIST1)->ShowWindow(0);
 			GetDlgItem(IDC_YEARSTATIC)->ShowWindow(0);
@@ -950,6 +953,7 @@ void AnnualRout_InsertDia::OnMcnSelectBacMonthcalendar(NMHDR *pNMHDR, LRESULT *p
 	} 
 	else
 	{
+		int nFlag = product_register_value[7];
 		if (g_protocol != PROTOCOL_BACNET_IP)
 		{
 			CString str;
@@ -961,7 +965,7 @@ void AnnualRout_InsertDia::OnMcnSelectBacMonthcalendar(NMHDR *pNMHDR, LRESULT *p
 			for (int j = 0; j < m; j++)
 				l *= 2;
 			the_days[day_number / 8] = the_days[day_number / 8] ^ l;//异或。
-			if (product_register_value[7] == PM_TSTAT8)
+			if ((product_register_value[7] == PM_TSTAT8) || (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
 			{
 				int ret = write_one(g_tstat_id, 918 + address_offset, the_days[address_offset]);
 			}

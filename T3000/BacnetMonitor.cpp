@@ -167,7 +167,7 @@ BOOL CBacnetMonitor::OnInitDialog()
 	PostMessage(WM_REFRESH_BAC_MONITOR_INPUT_LIST,NULL,NULL);
 
 	hIcon   = AfxGetApp()->LoadIcon(IDI_ICON_REFRESH);
-
+	ShowWindow(FALSE);
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
