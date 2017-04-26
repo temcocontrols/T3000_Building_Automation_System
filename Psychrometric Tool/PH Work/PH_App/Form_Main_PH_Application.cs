@@ -2,7 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 
@@ -232,7 +234,7 @@ namespace Example6_3
             phChart.Series.Clear();
             phChart.ChartAreas[0].AxisX.Minimum = 1 / 1000; //--This was 1/1000
             phChart.ChartAreas[0].AxisX.Maximum = 4000; //4000;
-            phChart.ChartAreas[0].AxisX.Interval = 100;
+            phChart.ChartAreas[0].AxisX.Interval = 500;
 
             phChart.ChartAreas[0].AxisY.Minimum =0.01; //--This was 0.001
             phChart.ChartAreas[0].AxisY.IsLogarithmic = true;
@@ -276,12 +278,6 @@ namespace Example6_3
             phChart.Series["Series01"].Points[80].Label = "d";
 
            // */
-
-
-
-
-
-
 
 
             phChart.Series["Series01"].ChartArea = "ChartArea1";
@@ -624,6 +620,29 @@ namespace Example6_3
                 this.Enabled = true;//optional
                 this.UseWaitCursor = false;
             }
+        }
+
+        private void phChart_MouseDown(object sender, MouseEventArgs e)
+        {
+
+            if (e.Button == MouseButtons.Right)//on right mouse button is clicked.
+            {
+
+               
+               
+                    //==This shows the contextmenustrip on right click
+                    CMSinsertNode.Enabled = true;
+                    CMSinsertNode.Show(MousePosition);//-- this mouse position is used to show the menustrip in mouse pointer
+                
+            }
+
+        }
+
+        private void quickNodeInsertToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //--Now adding nodes 
+
+
         }
     }
 }

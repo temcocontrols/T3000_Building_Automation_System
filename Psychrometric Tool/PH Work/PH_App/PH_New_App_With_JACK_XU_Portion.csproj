@@ -104,6 +104,9 @@
     <Compile Include="MathOperation.cs" />
     <Compile Include="Matrix3.cs" />
     <Compile Include="MeshGridClass.cs" />
+    <Compile Include="NodeAndLineClass.cs" />
+    <Compile Include="PHChartOperation.cs" />
+    <Compile Include="PHDatabaseOperation.cs" />
     <Compile Include="platform-independent\AbstractState.cs" />
     <Compile Include="platform-independent\backends.cs" />
     <Compile Include="platform-independent\backend_families.cs" />

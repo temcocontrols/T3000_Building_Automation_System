@@ -28,12 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
+            this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this.phChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.lb_db_name = new System.Windows.Forms.Label();
             this.lb_buildingselectedShow = new System.Windows.Forms.Label();
@@ -54,14 +55,14 @@
             this.lb_dbt = new System.Windows.Forms.Label();
             this.label21 = new System.Windows.Forms.Label();
             this.gb_showstatus = new System.Windows.Forms.GroupBox();
+            this.lb_realtimeshow = new System.Windows.Forms.Label();
+            this.lb_modeshow = new System.Windows.Forms.Label();
             this.lb_vertical_line2 = new System.Windows.Forms.Label();
             this.lb_for_line_vertical1 = new System.Windows.Forms.Label();
             this.lb_numberOfHandler = new System.Windows.Forms.Label();
             this.lb_number_of_chart_label = new System.Windows.Forms.Label();
             this.lb_device_status = new System.Windows.Forms.Label();
             this.lb_devicestatusshow = new System.Windows.Forms.Label();
-            this.lb_realtimeshow = new System.Windows.Forms.Label();
-            this.lb_modeshow = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.printToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -78,11 +79,22 @@
             this.excelExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpPsychometricChartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.CMSinsertNode = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.quickNodeInsertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.insertNodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.disconnectLineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearChartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.editNodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteNodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.disconnectLineFromAToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.nodeAToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.nodeBToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.phChart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox4ttt.SuspendLayout();
             this.gb_showstatus.SuspendLayout();
             this.menuStrip1.SuspendLayout();
+            this.CMSinsertNode.SuspendLayout();
             this.SuspendLayout();
             // 
             // phChart
@@ -90,22 +102,23 @@
             this.phChart.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            chartArea3.AxisX.Title = "Enthalpy h[KJ/kg]";
-            chartArea3.AxisY.Title = "Pressure P[MPa]";
-            chartArea3.Name = "ChartArea1";
-            this.phChart.ChartAreas.Add(chartArea3);
-            legend3.Enabled = false;
-            legend3.Name = "Legend1";
-            this.phChart.Legends.Add(legend3);
+            chartArea2.AxisX.Title = "Enthalpy h[KJ/kg]";
+            chartArea2.AxisY.Title = "Pressure P[MPa]";
+            chartArea2.Name = "ChartArea1";
+            this.phChart.ChartAreas.Add(chartArea2);
+            legend2.Enabled = false;
+            legend2.Name = "Legend1";
+            this.phChart.Legends.Add(legend2);
             this.phChart.Location = new System.Drawing.Point(225, 38);
             this.phChart.Name = "phChart";
-            series3.ChartArea = "ChartArea1";
-            series3.Legend = "Legend1";
-            series3.Name = "Series1";
-            this.phChart.Series.Add(series3);
+            series2.ChartArea = "ChartArea1";
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            this.phChart.Series.Add(series2);
             this.phChart.Size = new System.Drawing.Size(858, 564);
             this.phChart.TabIndex = 1;
             this.phChart.Text = "chart1";
+            this.phChart.MouseDown += new System.Windows.Forms.MouseEventHandler(this.phChart_MouseDown);
             // 
             // lb_db_name
             // 
@@ -134,14 +147,14 @@
             // 
             this.dataGridView1.AllowUserToAddRows = false;
             this.dataGridView1.BackgroundColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle7.Font = new System.Drawing.Font("Arial", 8.25F);
-            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.ControlDark;
-            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Arial", 8.25F);
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.ControlDark;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.id,
@@ -156,10 +169,10 @@
             // 
             // id
             // 
-            dataGridViewCellStyle8.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.Color.SteelBlue;
-            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.Color.WhiteSmoke;
-            this.id.DefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle5.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.Color.SteelBlue;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.Color.WhiteSmoke;
+            this.id.DefaultCellStyle = dataGridViewCellStyle5;
             this.id.HeaderText = "ID";
             this.id.Name = "id";
             this.id.ReadOnly = true;
@@ -168,9 +181,9 @@
             // 
             // name
             // 
-            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.Color.SteelBlue;
-            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.Color.White;
-            this.name.DefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.Color.SteelBlue;
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.Color.White;
+            this.name.DefaultCellStyle = dataGridViewCellStyle6;
             this.name.HeaderText = "System Name";
             this.name.Name = "name";
             this.name.ReadOnly = true;
@@ -351,6 +364,26 @@
             this.gb_showstatus.TabIndex = 54;
             this.gb_showstatus.TabStop = false;
             // 
+            // lb_realtimeshow
+            // 
+            this.lb_realtimeshow.AutoSize = true;
+            this.lb_realtimeshow.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.lb_realtimeshow.Location = new System.Drawing.Point(494, 12);
+            this.lb_realtimeshow.Name = "lb_realtimeshow";
+            this.lb_realtimeshow.Size = new System.Drawing.Size(55, 13);
+            this.lb_realtimeshow.TabIndex = 61;
+            this.lb_realtimeshow.Text = "Real Time";
+            // 
+            // lb_modeshow
+            // 
+            this.lb_modeshow.AutoSize = true;
+            this.lb_modeshow.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.lb_modeshow.Location = new System.Drawing.Point(432, 13);
+            this.lb_modeshow.Name = "lb_modeshow";
+            this.lb_modeshow.Size = new System.Drawing.Size(43, 13);
+            this.lb_modeshow.TabIndex = 60;
+            this.lb_modeshow.Text = "Mode : ";
+            // 
             // lb_vertical_line2
             // 
             this.lb_vertical_line2.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
@@ -410,26 +443,6 @@
             this.lb_devicestatusshow.Size = new System.Drawing.Size(77, 13);
             this.lb_devicestatusshow.TabIndex = 0;
             this.lb_devicestatusshow.Text = "Device Status:";
-            // 
-            // lb_realtimeshow
-            // 
-            this.lb_realtimeshow.AutoSize = true;
-            this.lb_realtimeshow.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.lb_realtimeshow.Location = new System.Drawing.Point(494, 12);
-            this.lb_realtimeshow.Name = "lb_realtimeshow";
-            this.lb_realtimeshow.Size = new System.Drawing.Size(55, 13);
-            this.lb_realtimeshow.TabIndex = 61;
-            this.lb_realtimeshow.Text = "Real Time";
-            // 
-            // lb_modeshow
-            // 
-            this.lb_modeshow.AutoSize = true;
-            this.lb_modeshow.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.lb_modeshow.Location = new System.Drawing.Point(432, 13);
-            this.lb_modeshow.Name = "lb_modeshow";
-            this.lb_modeshow.Size = new System.Drawing.Size(43, 13);
-            this.lb_modeshow.TabIndex = 60;
-            this.lb_modeshow.Text = "Mode : ";
             // 
             // menuStrip1
             // 
@@ -502,38 +515,38 @@
             // simulationMode
             // 
             this.simulationMode.Name = "simulationMode";
-            this.simulationMode.Size = new System.Drawing.Size(152, 22);
+            this.simulationMode.Size = new System.Drawing.Size(147, 22);
             this.simulationMode.Text = "PH Calculator";
             // 
             // exportDataToolStripMenuItem
             // 
             this.exportDataToolStripMenuItem.Name = "exportDataToolStripMenuItem";
-            this.exportDataToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exportDataToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
             this.exportDataToolStripMenuItem.Text = "Export Data";
             // 
             // historyPlotToolStripMenuItem1
             // 
             this.historyPlotToolStripMenuItem1.Name = "historyPlotToolStripMenuItem1";
-            this.historyPlotToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.historyPlotToolStripMenuItem1.Size = new System.Drawing.Size(147, 22);
             this.historyPlotToolStripMenuItem1.Text = "History Plot";
             this.historyPlotToolStripMenuItem1.Visible = false;
             // 
             // trashBoxToolStripMenuItem
             // 
             this.trashBoxToolStripMenuItem.Name = "trashBoxToolStripMenuItem";
-            this.trashBoxToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.trashBoxToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
             this.trashBoxToolStripMenuItem.Text = "Trash Box";
             // 
             // gridViewToolStripMenuItem
             // 
             this.gridViewToolStripMenuItem.Name = "gridViewToolStripMenuItem";
-            this.gridViewToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.gridViewToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
             this.gridViewToolStripMenuItem.Text = "Grid View";
             // 
             // excelExportToolStripMenuItem
             // 
             this.excelExportToolStripMenuItem.Name = "excelExportToolStripMenuItem";
-            this.excelExportToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.excelExportToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
             this.excelExportToolStripMenuItem.Text = "Excel Export";
             // 
             // helpToolStripMenuItem
@@ -547,8 +560,85 @@
             // helpPsychometricChartToolStripMenuItem
             // 
             this.helpPsychometricChartToolStripMenuItem.Name = "helpPsychometricChartToolStripMenuItem";
-            this.helpPsychometricChartToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.helpPsychometricChartToolStripMenuItem.Size = new System.Drawing.Size(120, 22);
             this.helpPsychometricChartToolStripMenuItem.Text = "PH chart";
+            // 
+            // CMSinsertNode
+            // 
+            this.CMSinsertNode.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.quickNodeInsertToolStripMenuItem,
+            this.insertNodeToolStripMenuItem,
+            this.disconnectLineToolStripMenuItem,
+            this.clearChartToolStripMenuItem,
+            this.editNodeToolStripMenuItem,
+            this.deleteNodeToolStripMenuItem,
+            this.disconnectLineFromAToolStripMenuItem});
+            this.CMSinsertNode.Name = "contextMenuStrip2";
+            this.CMSinsertNode.Size = new System.Drawing.Size(193, 180);
+            // 
+            // quickNodeInsertToolStripMenuItem
+            // 
+            this.quickNodeInsertToolStripMenuItem.Name = "quickNodeInsertToolStripMenuItem";
+            this.quickNodeInsertToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
+            this.quickNodeInsertToolStripMenuItem.Text = "Insert Node";
+            this.quickNodeInsertToolStripMenuItem.Click += new System.EventHandler(this.quickNodeInsertToolStripMenuItem_Click);
+            // 
+            // insertNodeToolStripMenuItem
+            // 
+            this.insertNodeToolStripMenuItem.Enabled = false;
+            this.insertNodeToolStripMenuItem.Name = "insertNodeToolStripMenuItem";
+            this.insertNodeToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
+            this.insertNodeToolStripMenuItem.Text = "Insert Node";
+            this.insertNodeToolStripMenuItem.Visible = false;
+            // 
+            // disconnectLineToolStripMenuItem
+            // 
+            this.disconnectLineToolStripMenuItem.Enabled = false;
+            this.disconnectLineToolStripMenuItem.Name = "disconnectLineToolStripMenuItem";
+            this.disconnectLineToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
+            this.disconnectLineToolStripMenuItem.Text = "Disconnect Line";
+            this.disconnectLineToolStripMenuItem.Visible = false;
+            // 
+            // clearChartToolStripMenuItem
+            // 
+            this.clearChartToolStripMenuItem.Name = "clearChartToolStripMenuItem";
+            this.clearChartToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
+            this.clearChartToolStripMenuItem.Text = "Clear Chart";
+            // 
+            // editNodeToolStripMenuItem
+            // 
+            this.editNodeToolStripMenuItem.Name = "editNodeToolStripMenuItem";
+            this.editNodeToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
+            this.editNodeToolStripMenuItem.Text = "Edit Node";
+            // 
+            // deleteNodeToolStripMenuItem
+            // 
+            this.deleteNodeToolStripMenuItem.Enabled = false;
+            this.deleteNodeToolStripMenuItem.Name = "deleteNodeToolStripMenuItem";
+            this.deleteNodeToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
+            this.deleteNodeToolStripMenuItem.Text = "Delete Node";
+            // 
+            // disconnectLineFromAToolStripMenuItem
+            // 
+            this.disconnectLineFromAToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.nodeAToolStripMenuItem,
+            this.nodeBToolStripMenuItem});
+            this.disconnectLineFromAToolStripMenuItem.Enabled = false;
+            this.disconnectLineFromAToolStripMenuItem.Name = "disconnectLineFromAToolStripMenuItem";
+            this.disconnectLineFromAToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
+            this.disconnectLineFromAToolStripMenuItem.Text = "Disconnect Line From ";
+            // 
+            // nodeAToolStripMenuItem
+            // 
+            this.nodeAToolStripMenuItem.Name = "nodeAToolStripMenuItem";
+            this.nodeAToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.nodeAToolStripMenuItem.Text = "Node A";
+            // 
+            // nodeBToolStripMenuItem
+            // 
+            this.nodeBToolStripMenuItem.Name = "nodeBToolStripMenuItem";
+            this.nodeBToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.nodeBToolStripMenuItem.Text = "Node B";
             // 
             // Form_Main_PH_Application
             // 
@@ -562,6 +652,7 @@
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.groupBox4ttt);
             this.Controls.Add(this.phChart);
+            this.MinimumSize = new System.Drawing.Size(1000, 680);
             this.Name = "Form_Main_PH_Application";
             this.Text = "PH Chart";
             this.Load += new System.EventHandler(this.Form_Main_PH_Application_Load);
@@ -574,6 +665,7 @@
             this.gb_showstatus.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.CMSinsertNode.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -625,5 +717,15 @@
         private System.Windows.Forms.ToolStripMenuItem excelExportToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpPsychometricChartToolStripMenuItem;
+        private System.Windows.Forms.ContextMenuStrip CMSinsertNode;
+        private System.Windows.Forms.ToolStripMenuItem quickNodeInsertToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem insertNodeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem disconnectLineToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem clearChartToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem editNodeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem deleteNodeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem disconnectLineFromAToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem nodeAToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem nodeBToolStripMenuItem;
     }
 }
