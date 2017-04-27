@@ -100,6 +100,7 @@
     <Compile Include="Form_Main_PH_Application.Designer.cs">
       <DependentUpon>Form_Main_PH_Application.cs</DependentUpon>
     </Compile>
+    <Compile Include="InsertNode.cs" />
     <Compile Include="LineStyle.cs" />
     <Compile Include="MathOperation.cs" />
     <Compile Include="Matrix3.cs" />
@@ -173,6 +174,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="ChartOperations\" />
     <Folder Include="System\" />
   </ItemGroup>
   <ItemGroup>

@@ -286,18 +286,8 @@ namespace Example6_3
         }
         public void SetDataPoints(DataSeries ds, double[,] P_Value, double[,] T_Value, double[,] H_Value)
         {
-            //ds.XDataMin = cs.XMin;
-            //ds.YDataMin = cs.YMin;
             ds.XSpacing = 1;// 0.3f;
             ds.YSpacing = 1;// 0.3f;
-
-            //WFA_PH_CurveDemo.Form1 f1 = new WFA_PH_CurveDemo.Form1();
-            // f1.PlotPHChart("Water");//This will call the function required
-            // MessageBox.Show("We are here inside peak 3d so ");
-            // MessageBox.Show("Read finish excel file");
-            // f1.DataPullFunctionForCoolProp("water");//n-Propane
-
-
 
             Point3[,] pts = new Point3[300, 300];
 
@@ -305,21 +295,11 @@ namespace Example6_3
             {
                 for (int j = 0; j < P_Value.GetLength(1); j++)
                 {
-                    //pts[i, j].X = X[i, j];
-                    //pts[i, j].Y = Y[i, j];
-                    //pts[i, j].Z = Z[i, j];
                     pts[i, j] = new Point3((float)H_Value[j, i], (float)P_Value[j, i], (float)T_Value[j, i], 1);
-                    //pts[i, j] = new Point3((int)f1.H_Value[i ,j], (int)f1.P_Value[i, j], (int)f1.T_Value[i, j], 1);
-                    //pts[i, j] = new Point3( (float)f1.P_Value[i, j], (float)ex.h_list_Value[i,j], (float)f1.T_Value[i, j], 1);
-                    //pts[i, j] = new Point3( (float)ex.h_list_Value[i, j], (float)f1.P_Value[j, i], (float)f1.T_Value[j, i], 1);
-
+                   
                 }
             }
-            //int lastValue = (int)f1.P_Value[299, 299];
-
-            //*/
-
-
+           
             ds.PointArray = pts;
 
         }

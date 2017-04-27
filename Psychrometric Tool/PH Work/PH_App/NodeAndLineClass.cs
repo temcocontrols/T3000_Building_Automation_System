@@ -20,7 +20,6 @@ namespace PH_App
             public string name { get; set; }
             public Color colorValue { get; set; }
             public int marker_Size { get; set; }
-            //public double airFlow { get; set; }
             public string lastUpdatedDate { get; set; }
 
 

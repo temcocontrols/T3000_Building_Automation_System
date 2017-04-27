@@ -66,9 +66,9 @@ namespace PH_App
             series1.ChartType = SeriesChartType.Point;
             series1.MarkerStyle = MarkerStyle.Circle;
             series1.Points.AddXY(xAxisValue, yAxisValue);
-            string s = $"source :\nTemperature Source  {temperatureSource}   \nPressure Source { pressureSource } \n Name : {nodeName}";
+            string nodeTips = $"source :\nTemperature Source  {temperatureSource}   \nPressure Source { pressureSource } \n Name : {nodeName}";
             series1.Points[nodePointCount].Color = colorValue;
-            series1.Points[nodePointCount].ToolTip = s;
+            series1.Points[nodePointCount].ToolTip = nodeTips;
             
         }
 
