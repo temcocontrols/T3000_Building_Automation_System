@@ -49,6 +49,7 @@ public:
 	  void UpdateCusAnalogUnit();
 	  BOOL CheckAllDataValid();
 	  afx_msg void OnPaint();
+	  afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
 
 const int ANALOG_CUS_RANGE_RBL_VALUE = 0;

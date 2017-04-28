@@ -44,25 +44,53 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\Interfaces\ICheck.cs" />
+    <Compile Include="Controls\Interfaces\ICheckEvents.cs" />
+    <Compile Include="Controls\Interfaces\ITLabel.cs" />
     <Compile Include="Controls\BackgroundControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Controls\BackgroundControl.Designer.cs">
       <DependentUpon>BackgroundControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\TCheckBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\TCheckBox.Designer.cs">
+      <DependentUpon>TCheckBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\TLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\TLabel.Designer.cs">
+      <DependentUpon>TLabel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Extensions\IntegerExtensions.cs" />
     <Compile Include="Controls\Interfaces\ISetPointsControl.cs" />
     <Compile Include="Controls\Interfaces\ISliderControl.cs" />
     <Compile Include="Controls\Interfaces\ISliderControlEvents.cs" />
+    <Compile Include="Forms\Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\SetPointsForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\SetPointsForm.Designer.cs">
       <DependentUpon>SetPointsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Utilities\ComUtilities.cs" />
     <Compile Include="Utilities\GraphicsUtilities.cs" />
@@ -114,12 +142,29 @@
     <EmbeddedResource Include="Controls\IndicatorControl.resx">
       <DependentUpon>IndicatorControl.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\TransparentLabel.resx">
+      <DependentUpon>TransparentLabel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\SetPointsForm.resx">
       <DependentUpon>SetPointsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="project.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="img\CHECKED.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CHECKED.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

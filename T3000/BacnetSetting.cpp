@@ -338,11 +338,68 @@ void CBacnetSetting::OnBnClickedBtnBacIPChange()
 
 }
 
+CString Check_Time(unsigned long local_time , unsigned int device_time)
+{
+	CString ret_cstring;
+	if (local_time < device_time)
+	{
+		ret_cstring = _T("No Reply");
+	}
+	else if (device_time + 3600 * 24 * 30 < local_time)
+	{
+		ret_cstring = _T("1 month ago");
+	}
+	else if (device_time + 3600 * 24 * 7 < local_time)
+	{
+		ret_cstring = _T("7 days ago");
+	}
+	else if (device_time + 3600 * 24 < local_time)
+	{
+		ret_cstring = _T("1 day ago");
+	}
+	else if (device_time + 3600 * 12 < local_time)
+	{
+		ret_cstring = _T(" 12 hours ago");
+	}
+	else if (device_time + 3600 < local_time)
+	{
+		ret_cstring = _T(" 1 hour ago");
+	}
+	else if (device_time + 1800 < local_time)
+	{
+		ret_cstring = _T(" 30 minutes ago");
+	}
+	else if (device_time + 600 < local_time)
+	{
+		ret_cstring = _T(" 10 minutes ago");
+	}
+	else if (device_time + 300 < local_time)
+	{
+		ret_cstring = _T(" 5 minutes ago");
+	}
+	else if (device_time + 60 < local_time)
+	{
+		ret_cstring = _T(" 1 minute ago");
+	}
+	else if (device_time < local_time)
+	{
+		ret_cstring = _T("10 seconds ago");
+	}
+
+	return ret_cstring;
+}
+
+
+
+
 
 
 
 LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 {
+
+	//CString test123123;
+	//test123123 = Check_Time(1, 2);
 	int command_type = wParam;
 	int button_click = 0;
 	CString temp_cs;
@@ -437,6 +494,9 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				((CButton *)GetDlgItem(IDC_CHECK_SETTING_PAP))->SetCheck(false);
 			}
 
+
+			unsigned long time_setting_now = (unsigned long)time(NULL);
+
 			if((debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA) || (debug_item_show == DEBUG_SHOW_ALL))
 			{
 				CString temp123;
@@ -450,11 +510,14 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 			}
 			else
 			{
-				CTime time_scaletime;
+				//CTime time_scaletime;
 				CString strTime;
 				time_t scale_time  = Device_Basic_Setting.reg.time_update_since_1970;
-				time_scaletime = scale_time;
-				strTime = time_scaletime.Format("%y/%m/%d %H:%M:%S");
+
+				strTime = Check_Time(time_setting_now,Device_Basic_Setting.reg.time_update_since_1970);
+
+				//time_scaletime = scale_time;
+				//strTime = time_scaletime.Format("%y/%m/%d %H:%M:%S");
 				((CEdit *)GetDlgItem(IDC_EDIT_SETTING_LAST_UPDATE_TIME))->SetWindowTextW(strTime);
 			}
 
@@ -728,7 +791,9 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->AddString(Device_Serial_Port_Status[MAIN_MSTP]);
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->AddString(Device_Serial_Port_Status[MAIN_MODBUS]);
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->AddString(Device_Serial_Port_Status[SUB_MODBUS]);
+				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->AddString(Device_Serial_Port_Status[MSTP_MASTER]);
 
+				
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->EnableWindow(TRUE);
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->EnableWindow(TRUE);
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->EnableWindow(TRUE);

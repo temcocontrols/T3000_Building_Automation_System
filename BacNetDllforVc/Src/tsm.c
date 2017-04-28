@@ -305,6 +305,13 @@ void tsm_free_invoke_id(
     }
 }
 
+
+bool dll_offline_mode = false;
+bool set_offline_mode(bool offline)
+{
+	dll_offline_mode = offline;
+}
+
 /** Check if the invoke ID has been made free by the Transaction State Machine.
  * @param invokeID [in] The invokeID to be checked, normally of last message sent.
  * @return True if it is free (done with), False if still pending in the TSM.
@@ -314,6 +321,9 @@ bool tsm_invoke_id_free(
 {
     bool status = true;
     uint8_t index;
+
+	if(dll_offline_mode)
+		return true;
 
     index = tsm_find_invokeID_index(invokeID);
     if (index < MAX_TSM_TRANSACTIONS)

@@ -295,6 +295,7 @@ public:
 	  
 	 void DayHandleMovedSlidercontrol1(const VARIANT& sender, float newValue);
 	 void NightHandleMovedSlidercontrol1(const VARIANT& sender, float newValue);
+	 /*void ClickSlidercontrol1(const VARIANT& sender, LPDISPATCH e);*/
 };
 
 #ifndef _DEBUG  // debug version in T3000View.cpp

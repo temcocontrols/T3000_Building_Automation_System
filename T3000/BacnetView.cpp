@@ -2019,12 +2019,485 @@ void CDialogCM5_BacNet::Initial_All_Point()
 	}
 
 }
+
+
+
+
+class Complex
+{
+public:
+	Complex() {} //缺省构造函数
+	Complex(double);	//带参数的构造函数
+	Complex(double,double);
+	Complex(int length, char *str);				 //构造函数;
+	Complex operator * (const Complex&) const;   //重载操作符  *
+	Complex operator / (const Complex&) const;	 //重载操作符  /
+	Complex(const Complex&);					 //拷贝构造函数	->本例浅拷贝
+	Complex &operator = (const Complex&);		//赋值构造函数 ->本例浅拷贝
+
+	~Complex() {}
+private:
+	double real;
+	double imag;
+	int str_length;
+	char * name;
+};
+
+Complex::Complex(int length, char * str)
+{
+	str_length = length;
+	name = new char[str_length];
+	if (name != NULL)
+	{
+		strcpy(name, str);
+	}
+}
+
+Complex::Complex(double e)
+{
+	real = e;
+	imag = 0;
+	str_length = 0;
+	name = NULL;
+
+}
+
+Complex::Complex(double treal, double timag)
+{
+	real = treal;
+	imag = timag;
+	str_length = 0;
+	name = NULL;
+}
+
+Complex::Complex(const Complex &other)
+{
+	real = other.real;
+	imag = other.imag;
+
+
+	
+}
+
+Complex &Complex::operator= (const Complex & other)
+{
+	real = other.real;
+	imag = other.imag;
+	return *this;
+}
+
+
+Complex Complex::operator*(const Complex &other) const
+{
+	Complex Ret(real*other.real, imag*other.imag);
+	return Ret;
+}
+
+Complex Complex::operator/(const Complex &other) const
+{
+	Complex Ret(real / other.real, imag / other.imag);
+	return Ret;
+}
+
+
+
+
+typedef struct test_struct
+{
+	int index;
+	int  name;
+};
+
+
+
+class FreshValue
+{
+public:
+	FreshValue();   //缺省构造函数
+	FreshValue(int, char*);
+	FreshValue(double);
+	FreshValue(double, double);
+	FreshValue(const FreshValue&); //拷贝构造函数
+
+	FreshValue &operator = (const FreshValue &); //赋值构造函数;
+	FreshValue operator+  (const FreshValue &); //重载加号操作符;
+	~FreshValue();
+private:
+	int str_length;
+	char *name;
+	double real;
+	double imag;
+};
+
+FreshValue::~FreshValue()
+{
+	if(name!= NULL)
+		delete name;
+}
+
+//重载操作符 + 号
+FreshValue FreshValue::operator+ (const FreshValue &other)
+{
+	FreshValue Ret(real + other.real,imag + other.imag);
+	return Ret;
+	
+}
+
+
+//赋值构造函数 ，需要释放原有内存，开辟新内存接受 值.
+FreshValue &FreshValue::operator= (const FreshValue& other)
+{
+	str_length = other.str_length;
+	if(name!=NULL)
+		delete name;
+	else
+	{
+		return *this;
+	}
+	name = new char[str_length];
+	if (name != NULL)
+	{
+		strcpy(name, other.name);
+	}
+	real = other.real;
+	imag = other.imag;
+
+	return *this;
+}
+
+
+FreshValue::FreshValue()
+{
+	str_length = 0;
+	name = NULL;
+	real = 0;
+	imag = 0;
+}
+
+FreshValue::FreshValue(int temp_length, char *pchar)
+{
+	str_length = temp_length;
+	name = new char[str_length];
+	if (name != NULL)
+	{
+		strcpy(name, pchar);
+	}
+	real = 0;
+	imag = 0;
+}
+
+FreshValue::FreshValue(double temp_real)
+{
+	real = temp_real;
+	imag = 0;
+	str_length = 0;
+	name = NULL;
+}
+
+
+FreshValue::FreshValue(double temp_real, double temp_imag)
+{
+	real = temp_real;
+	imag = temp_imag;
+	str_length = 0;
+	name = NULL;
+}
+
+
+//拷贝构造函数 -> 深拷贝.
+FreshValue::FreshValue(const FreshValue&other)
+{
+	str_length = other.str_length;
+	if ((other.name != NULL) && (other.str_length > 0))
+	{
+		name = new char[str_length];
+		if (name != NULL)
+		{
+			strcpy(name, other.name);
+		}
+	}
+
+	real = other.real;
+	imag = other.imag;
+}
+
+typedef struct MyTree
+{
+	int index;
+	MyTree * left;
+	MyTree * right;
+
+	MyTree()
+	{
+		left = NULL;
+		right = NULL;
+	}
+};
+
+int   isB(MyTree   *t)
+{
+	if (!t)   return   0;
+	int   left = isB(t->left);
+	int   right = isB(t->right);
+	if (left >= 0 && right >= 0 && left - right <= 1 || left - right >= -1)
+		return   (left < right) ? (right + 1) : (left + 1);
+	else   return   -1;
+
+}
+
+
+
+class Bacnet
+{
+public:
+	char * char_bac;
+
+	Bacnet()
+	{
+		char_bac = NULL;
+	}
+
+	Bacnet(char *temp)
+	{
+		if (temp != NULL)
+		{
+			int length = strlen(temp);
+			if (length > 0)
+			{
+				char_bac = new char[length+1];
+				if (char_bac != NULL)
+				{
+					strcpy(char_bac, temp);
+				}
+			}
+
+		}
+	}
+
+	Bacnet(const Bacnet &other)
+	{
+		if (other.char_bac != NULL)
+		{
+			int length = strlen(other.char_bac);
+			if (length > 0)
+			{
+				char_bac = new char[length+1];
+				if (char_bac != NULL)
+				{
+					strcpy(char_bac, other.char_bac);
+				}
+			}
+		}
+	}
+
+	Bacnet &operator = (const Bacnet &other)
+	{
+		int length = strlen(other.char_bac);
+		if (char_bac != NULL)
+			delete[] char_bac;
+		char_bac = new char[length+1];
+		if (char_bac != NULL)
+		{
+			strcpy(char_bac, other.char_bac);
+		}
+		return *this;
+	}
+
+	Bacnet operator+ (const Bacnet &other)
+	{
+		int length = strlen(other.char_bac);
+		if (length == 0)
+		{
+			return *this;
+		}
+
+		int new_length = length + strlen(char_bac);
+		if (new_length > 0)
+		{
+			char *old_char = char_bac;
+			char_bac = new char[new_length+1];
+			if (char_bac != NULL)
+			{
+				if (old_char != NULL)
+				{
+					strcpy(char_bac, old_char);
+					if (other.char_bac != NULL)
+					{
+						strcat(char_bac, other.char_bac);
+						return *this;
+					}
+				}
+			}
+		}
+		return *this;
+	}
+
+};
+
+/*volatile*/ int test_thread = 0;
+#if 0
+HANDLE my_mutex = NULL;
+
+
+DWORD WINAPI  Thread_1(LPVOID lpVoid)
+{
+	my_mutex = CreateMutex(NULL, true, _T("test_mutex"));
+	ReleaseMutex(my_mutex);
+	while (1)
+	{
+		WaitForSingleObject(my_mutex, INFINITE);
+		test_thread++;
+		TRACE(_T("thread1 %d \r\n"), test_thread);
+		ReleaseMutex(my_mutex);
+		Sleep(3000);
+		
+		
+	}
+	return 0;
+}
+
+
+DWORD WINAPI  Thread_2(LPVOID lpVoid)
+{
+	while (1)
+	{
+		WaitForSingleObject(my_mutex, INFINITE);
+		test_thread++;
+		TRACE(_T("thread2 %d\r\n"), test_thread);
+		ReleaseMutex(my_mutex);
+		Sleep(5000);
+		
+	}
+	return 0;
+}
+#endif
+
+#if 0
+class String
+{
+private:
+	char * str;
+	int length;
+	static int number ;
+	enum {MAXNUMBER = 90};
+public:
+	String();
+	String(const char *);
+	String(const String&);
+	String &operator = (const String&);
+	String &operator = (const char *);
+	char &operator[] (int);
+	const char &operator[] (int) const;
+
+	friend bool operator<(const String&, const String&);
+	friend bool operator>(const String&, const String&);
+	friend bool operator=(const String&, const String&);
+	friend String operator+(const String&, const String&);
+
+	friend ostream operator<<(ostream &os, const String&);
+	friend istream operator >> (istream &is, const String&);
+}
+#endif
+
+
+
+
+
+class Mystr
+{
+private:
+	int length;
+	char *str;
+public:
+	Mystr();
+	Mystr(const char *);
+	Mystr(const Mystr&);
+	Mystr &operator=(const char *);
+	Mystr &operator=(const Mystr&);
+	char &operator[] (int);
+	const char &operator[] (int) const;
+	friend bool operator<(const Mystr&, const Mystr&);
+	friend bool operator>(const Mystr&, const Mystr&);
+	friend bool operator==(const Mystr&, const Mystr&);
+
+	friend Mystr operator+(const Mystr&, const Mystr&);
+};
+
+char &Mystr::operator[](int index)
+{
+	return str[index];
+}
+
+const char &Mystr::operator[](int index) const
+{
+	return str[index];
+}
+
+
+bool operator<(const Mystr &str1, const Mystr &str2)
+{
+	return (strcmp(str1.str, str2.str) < 0);
+}
+
+
+Mystr &Mystr::operator=(const char *other)
+{
+	delete[] str;
+	length = strlen(other);
+	str = new char[length + 1];
+	if(str!= NULL)
+		strcpy(str, other);
+	return *this;
+}
+
+Mystr &Mystr::operator=(const Mystr&other)
+{
+	if (this == &other)
+		return *this;
+	delete[] str;
+	length = other.length;
+	str = new char[length + 1];
+	if (str != NULL)
+	{
+		strcpy(str, other.str);
+	}
+
+	return *this;
+}
+
+Mystr::Mystr()
+{
+	length = 0;
+	str = new char[1];
+	str[0] = '\0';
+}
+
+Mystr::Mystr(const char *other)
+{
+	length = strlen(other);
+	str = new char[length + 1];
+	strcpy_s(str, length, other);
+}
+
+Mystr::Mystr(const Mystr&other)
+{
+	length = other.length;
+	str = new char[length + 1];
+	if (str != NULL)
+	{
+		strcpy_s(str, length, other.str);
+	}
+}
+
+
+
 //__declspec(dllexport) HANDLE	Get_RS485_Handle();
 static bool already_retry = false;
 bool has_change_connect_ip = true;
 //INPUT int test_function_return_value();
 void CDialogCM5_BacNet::Fresh()
 {
+
 	g_bPauseMultiRead = true; // 只要在minipanel的界面 就暂停 读 寄存器的那个线程;
     if(initial_once)
     {
@@ -2203,13 +2676,13 @@ void CDialogCM5_BacNet::Fresh()
 				g_llTxCount ++;
 				g_llRxCount ++;
 
-				if(pFrame->m_product.at(selected_product_index).status == false)
-				{
+				//if(pFrame->m_product.at(selected_product_index).status == false)
+				//{
 					//int ret_write = Write_One(g_tstat_id,33,151);	33write 151 is to reset the minipanel ethenet.
 					//TRACE(_T("Write_One(g_tstat_id,33,151) == %d\r\n"),ret_write);
-				}
+				//}
 				bac_select_device_online = true;
-				TRACE(_T("Reconnected ~~~~~~~~\r\n"));
+				//TRACE(_T("Reconnected ~~~~~~~~\r\n"));
 				break;
 			}
 			else 

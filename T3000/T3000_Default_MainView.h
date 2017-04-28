@@ -51,6 +51,16 @@ public:
 	afx_msg void OnBnClickedButtonWifiConfig();
 	CEdit m_Edit_AESPassword;
 	afx_msg void OnBnClickedCheckPassword();
+	afx_msg void OnCbnSelchangeComboMrd();
+	CComboBox m_combox_mrd;
+	bool m_checkpassword;
+	afx_msg void OnEnKillfocusEditAesEncrypt();
+	afx_msg void OnEnKillfocusEditNetworkid();
+	afx_msg void OnEnKillfocusEditNodeid();
+	afx_msg void OnEnKillfocusEditFreid();
+	CEdit m_Edit_Network;
+	CEdit m_Edit_NodeID;
+	CEdit m_Edit_FrequenceID;
 };
 
 

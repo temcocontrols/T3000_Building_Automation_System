@@ -8,7 +8,6 @@ extern CString g_strFlashInfo;
 extern unsigned int the_max_register_number_parameter_Count;
 extern unsigned int the_max_register_number_parameter_Finished;
 UINT Flash_Modebus_Device(LPVOID pParam);
-//UINT run_back_ground_flash_thread(LPVOID pParam);
 UINT flashThread_ForExtendFormatHexfile(LPVOID pParam);
 UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam);
 int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_number_parameter, TS_UC *register_data_orginal, LPVOID pParam);

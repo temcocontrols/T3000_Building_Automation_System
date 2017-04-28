@@ -42,8 +42,8 @@ END_MESSAGE_MAP()
 CT3000App::CT3000App()
 {
 	m_bHiColorIcons = TRUE;
-	CurrentT3000Version=_T("    2017.03.16");
-	T3000_Version = 20316;
+	CurrentT3000Version=_T("    2017.04.27");
+	T3000_Version = 20427;
 
 
 	m_lastinterface=19;
@@ -287,6 +287,8 @@ BOOL CT3000App::InitInstance()
 	//TODO: call AfxInitRichEdit2() to initialize richedit2 library.
 	try
 	{
+		::ShellExecute(NULL, _T("open"), _T("RegT3000Controls.bat"), _T(""), _T(""), SW_HIDE);
+
 		// InitCommonControlsEx() is required on Windows XP if an application
 		// manifest specifies use of ComCtl32.dll version 6 or later to enable
 		// visual styles.  Otherwise, any window creation will fail.

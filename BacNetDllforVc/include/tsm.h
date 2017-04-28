@@ -114,7 +114,8 @@ extern "C" {
         BACNET_NPDU_DATA * ndpu_data,
         uint8_t * apdu,
         uint16_t * apdu_len);
-
+	 __declspec(dllexport) 	void test_char_fun(char * testchar);
+ __declspec(dllexport) 	bool set_offline_mode(bool offline);
  __declspec(dllexport)   bool tsm_invoke_id_free(
         uint8_t invokeID);
     bool tsm_invoke_id_failed(
