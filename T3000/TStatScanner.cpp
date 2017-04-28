@@ -100,6 +100,8 @@ CTStatScanner::CTStatScanner(void)
     m_pFile = new CStdioFile;//txt
     m_com_scan_end = false;
 	is_delete_tstat_scanner = false;
+	exsit_serial_array = NULL;
+	serial_array_length = 0;
 }
 
 CTStatScanner::~CTStatScanner(void)
@@ -107,6 +109,13 @@ CTStatScanner::~CTStatScanner(void)
 // 	delete		m_pScanNCThread;
 // 	delete		m_pScanTstatThread;
 // 	delete		m_pWaitScanThread;
+	if (exsit_serial_array != NULL)
+	{
+		delete[] exsit_serial_array;
+		exsit_serial_array = NULL;
+	}
+
+
 	is_delete_tstat_scanner = true;
     if (m_eScanNCEnd != NULL)
     {
@@ -141,7 +150,11 @@ CTStatScanner::~CTStatScanner(void)
         delete m_eScanRemoteIPEnd;
     }
 
-
+	if (exsit_serial_array != NULL)
+	{
+		delete[] exsit_serial_array;
+	}
+	
     //if(m_eScanBacnetMstpEnd != NULL)
     //{
     //	delete m_eScanBacnetMstpEnd;
@@ -1867,13 +1880,50 @@ BOOL CTStatScanner::binary_search_crc(int a)
     return false;
 }
 
+#if 0
+
+void quickSort(char  array[], int length)
+{
+	int start = 0;
+	int end = length - 1;
+	char value = array[start];// 得到哨兵元素
+	if (1 > length) return;// 递归出口
+
+	while (start < end) 
+	{// 以哨兵元素为标准，分成大于它和小于它的两列元素
+
+		while (start < end) {// 从数组尾部往前循环得到小于哨兵元素的一个元素
+			if (array[end--] < value) 
+			{
+				array[start++] = array[++end];
+				break;
+			}
+		}
+
+		while (start < end) {// 从数组头部往后循环得到大于哨兵元素的一个元素
+			if (array[start++] > value) 
+			{
+				array[end--] = array[--start];
+				break;
+			}
+		}
+	}
+
+	array[start] = value;// 放置哨兵元素
+	//printf("\nstart:%d, end:%d\n", start, end);// 这个是测试下start和end是否一样
+	quickSort(array, start);// 递归排序小于哨兵元素的那一列元素
+	quickSort(array + start + 1, length - start - 1);// 递归排序大于哨兵元素的那一列
+}
+#endif
 
 //*
 UINT _ScanTstatThread2(LPVOID pParam)
 {
     CTStatScanner* pScan = (CTStatScanner*)(pParam);
-
-
+#if 0
+	char temp_array[100] = { 5,4,6,3,7,2,8,1,9,0 };
+	quickSort(temp_array, 10);
+#endif
     UINT i = 0;
 
     for (i = 0; i < pScan->m_szComs.size(); i++)
@@ -1978,6 +2028,18 @@ UINT _ScanTstatThread2(LPVOID pParam)
     return 1;
 }
 
+void CTStatScanner::SetOldExsitSerial(UINT * serialarray,int nsize)
+{
+	if (exsit_serial_array != NULL)
+	{
+		delete[] exsit_serial_array;
+		exsit_serial_array = NULL;
+	}
+
+	exsit_serial_array = new  UINT[nsize];
+	memcpy(exsit_serial_array, serialarray, nsize*sizeof(UINT));
+	serial_array_length = nsize;
+}
 
 void CTStatScanner::SetParentWnd(CWnd* pParent)
 {

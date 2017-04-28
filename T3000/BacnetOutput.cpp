@@ -732,7 +732,8 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 				(temp_pid == PM_T34AO) ||
 				(temp_pid == PM_T322AI) ||
 				(temp_pid == PM_T38AI8AO6DO) ||
-				(temp_pid == PM_T36CT))
+				(temp_pid == PM_T36CT) ||
+				(temp_pid == PM_T36CTA))
 			{
 				CString temp_name;
 				temp_name = GetProductName(m_Output_data.at(i).sub_product);
@@ -1049,7 +1050,8 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 				(temp_pid == PM_T34AO) ||
 				(temp_pid == PM_T36CT) ||
 				(temp_pid == PM_T322AI) ||
-				(temp_pid == PM_T38AI8AO6DO))
+				(temp_pid == PM_T38AI8AO6DO)||
+				(temp_pid == PM_T36CTA))
 			{
 				//m_output_item_info.ShowWindow(true); //由于改成全屏的 支持resize 的显示，所以先屏蔽;
 				CString temp_name;

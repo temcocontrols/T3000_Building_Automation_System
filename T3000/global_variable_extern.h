@@ -1275,6 +1275,7 @@ extern unsigned char nDefaultIconSize;
 extern COLORREF	  nDefaultclrTxt;
 
 extern int bacnet_view_number;
+extern int input_item_select_for_range;
 
 extern int graphic_view_index ;
 extern CString grapgic_view_name[3];

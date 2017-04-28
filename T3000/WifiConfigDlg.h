@@ -39,4 +39,5 @@ public:
 	CComboBox m_combox_NetType;
 	CEdit m_Edit_SSID;
 	CEdit m_Edit_Key;
+	afx_msg void OnBnClickedOk();
 };

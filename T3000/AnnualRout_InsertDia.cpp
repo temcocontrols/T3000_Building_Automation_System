@@ -363,8 +363,8 @@ BOOL AnnualRout_InsertDia::OnInitDialog()
 			GetDlgItem(IDC_STATIC)->ShowWindow(0);
 			GetDlgItem(IDOK)->ShowWindow(0);
 
- 			MoveWindow(100, 100, 680, 800);
- 			GetDlgItem(IDC_MONTHCALENDAR1)->MoveWindow(10, 10, 680, 800);
+ 			MoveWindow(100, 100, 980, 600);
+ 			GetDlgItem(IDC_MONTHCALENDAR1)->MoveWindow(10, 10, 980, 600);
 
 			m_schedule_day_dlg_hwnd = this->m_hWnd;
 			//g_hwnd_now = m_schedule_day_dlg_hwnd;

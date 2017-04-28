@@ -4043,10 +4043,39 @@ void get_write_var_line_output(TCHAR *buf,float tstat_version,int outputno,CStdi
 		return;
 	try
 	{
+		
 
-		 int ID=read_one(now_tstat_id,6);
-		if(ID>0)
-		{  unsigned short num[4];  
+		 int Model_ID =read_one(now_tstat_id,7,5);
+		if(Model_ID>0)
+		{  
+			if ((Model_ID == PM_TSTAT5G) || (Model_ID == PM_TSTAT5E) || (Model_ID == PM_PM5E) || (Model_ID == PM_TSTAT6) || (product_register_value[7] == PM_TSTAT5i) || (Model_ID == PM_TSTAT7) || (Model_ID == PM_TSTAT8)
+				|| (Model_ID == PM_TSTAT8_WIFI) || (Model_ID == PM_TSTAT8_OCC) || (Model_ID == PM_TSTAT7_ARM) || (Model_ID == PM_TSTAT8_220V))
+			{
+				strText.TrimRight();
+				strText.TrimLeft();
+				unsigned char p[8];//input+input1
+				for (int i = 0; i < 8; i++)
+				{
+					if (i < strText.GetLength())
+						p[i] = strText.GetAt(i);
+					else
+						p[i] = 0;
+				}
+
+				if (Write_Multi(g_tstat_id, p, MODBUS_OUTPUT1_CHAR1 + 4 * (lRow - 1), 8) > 0)
+				{
+
+				}
+				else
+				{
+					//AfxMessageBox(_T("Error"));
+					//return;
+				}
+
+
+			}
+
+			unsigned short num[4];  
 		   Read_Multi(now_tstat_id,&num[0],0,4);
 		   g_serialNum=num[0]+num[1]*256+num[2]*256*256+num[3]*256*256;
 

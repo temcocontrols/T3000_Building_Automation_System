@@ -2,12 +2,12 @@
 {
     partial class TLabel
     {
-        /// <summary> 
+        /// <summary>
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary> 
+        /// <summary>
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
@@ -16,44 +16,25 @@
             if (disposing && (components != null))
             {
                 components.Dispose();
+                if (this.drawPen != null)
+                   this.drawPen.Dispose();
+
+              
             }
             base.Dispose(disposing);
         }
 
         #region Component Designer generated code
 
-        /// <summary> 
+        /// <summary>
         /// Required method for Designer support - do not modify 
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent()
         {
-            this.label1 = new System.Windows.Forms.Label();
-            this.SuspendLayout();
-            // 
-            // label1
-            // 
-            this.label1.Location = new System.Drawing.Point(0, 0);
-            this.label1.Margin = new System.Windows.Forms.Padding(3);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(144, 36);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Temco Label";
-            // 
-            // TLabel
-            // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.Controls.Add(this.label1);
-            this.Name = "TLabel";
-            this.Size = new System.Drawing.Size(147, 39);
-            this.ResumeLayout(false);
-
+            components = new System.ComponentModel.Container();
         }
 
         #endregion
-
-        private System.Windows.Forms.Label label1;
     }
 }

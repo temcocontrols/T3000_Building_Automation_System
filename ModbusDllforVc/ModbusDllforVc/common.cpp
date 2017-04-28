@@ -1251,14 +1251,14 @@ OUTPUT int write_multi_Coil_log(TS_UC device_var, TS_BOOL *to_write, TS_US start
 		//≥ı ºªØBitReg
 		for (int i=0;i<8;i++)
 		{
-			BitReg.at(i) = false;
+			BitReg[i] = false;
 		}
 		 
 		for (int i = 0; i < 8; i++)
 		{
 			if (index * 8 + i < length)
 			{
-				BitReg.at(i) = to_write[index * 8 + i];
+				BitReg[i] = to_write[index * 8 + i];
 			}
 			
 		}

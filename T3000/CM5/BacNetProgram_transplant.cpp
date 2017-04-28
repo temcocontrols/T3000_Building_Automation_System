@@ -12,7 +12,7 @@
 
 #include "T3000DEF.H"
 #include "ROUTER.H"
-
+#define MAX_FUNCTION_COUNT    30
 #include "..\gloab_define.h"
 
 #pragma warning(disable:4309)
@@ -746,7 +746,7 @@ public:
 	byte								       lock[MAX_INFO_TYPE];
 	//fance In_aux							       in_aux[MAX_INS];
 	//fance Con_aux							       con_aux[MAX_PIDS];
-	Info_Table					       info[27];
+	Info_Table					       info[MAX_FUNCTION_COUNT+1];
 	//	Str_grp_element				group_elements[MAX_ELEM];
 	Str_out_point   				   outputs[MAX_OUTS];
 	Str_in_point    				   inputs[MAX_INS];
@@ -3542,7 +3542,7 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 	{
 		memcpy(pc,q,p-q);
 		pc[p-q]=0;
-		for(k=OUT;k<=26;k++)
+		for(k=OUT;k<= MAX_FUNCTION_COUNT;k++)
 		{
 			if(k!=DMON)
 			{
@@ -3559,7 +3559,7 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 				//if (!strcmp(pc,my_info_panel[k].name))
 				//	break;
 
-		if (k<=26)
+		if (k<= MAX_FUNCTION_COUNT)
 		{
 			if (p==NULL) 
 			{
@@ -3571,7 +3571,9 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 				//												fprintf(pmes,"error line %d\n",line);
 				error=1;return 0;
 			}
-			else  if (((strlen(p)==1) && (*p=='0')) && ((k!= COIL_REG) && (k!= DIS_INPUT_REG) && (k!= INPUT_REG) && (k!= MB_REG)))
+			else  if (((strlen(p)==1) && (*p=='0')) && 
+				((k!= COIL_REG) && (k!= DIS_INPUT_REG) && (k!= INPUT_REG) && (k!= MB_REG) &&
+				(k != BAC_AV) && (k != BAC_AI) && (k != BAC_AO) && (k != BAC_DO) ))
 			{
 				memcpy(pmes,"error line : ",13);
 				pmes += 13;
@@ -5783,7 +5785,11 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 							if(((unsigned char)vars_table[cur_index].point_type == COIL_REG) ||
 								((unsigned char)vars_table[cur_index].point_type == DIS_INPUT_REG) ||
 								((unsigned char)vars_table[cur_index].point_type == INPUT_REG) ||
-								((unsigned char)vars_table[cur_index].point_type == MB_REG) )
+								((unsigned char)vars_table[cur_index].point_type == MB_REG) ||
+								((unsigned char)vars_table[cur_index].point_type == BAC_AV) ||
+								((unsigned char)vars_table[cur_index].point_type == BAC_AI) ||
+								((unsigned char)vars_table[cur_index].point_type == BAC_AO) ||
+								((unsigned char)vars_table[cur_index].point_type == BAC_DO))
 							{
 								point.number     = (unsigned char)((vars_table[cur_index].num_point) & 0x00ff);
 								high_3bit = ((vars_table[cur_index].num_point) & 0xff00) >> 3;
@@ -5814,7 +5820,11 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 							if(((unsigned char)vars_table[cur_index].point_type == COIL_REG) ||
 								((unsigned char)vars_table[cur_index].point_type == DIS_INPUT_REG) ||
 								((unsigned char)vars_table[cur_index].point_type == INPUT_REG) ||
-								((unsigned char)vars_table[cur_index].point_type == MB_REG) )
+								((unsigned char)vars_table[cur_index].point_type == MB_REG) ||
+								((unsigned char)vars_table[cur_index].point_type == BAC_AV) ||
+								((unsigned char)vars_table[cur_index].point_type == BAC_AI) ||
+								((unsigned char)vars_table[cur_index].point_type == BAC_AO) ||
+								((unsigned char)vars_table[cur_index].point_type == BAC_DO))
 							{
 								point.number     = (unsigned char)((vars_table[cur_index].num_point) & 0x00ff);
 								high_3bit = ((vars_table[cur_index].num_point) & 0xff00) >> 3;
@@ -6883,7 +6893,11 @@ int pointtotext(char *buf,Point_Net *point)
 	if((point->point_type == COIL_REG) ||
 		(point->point_type == DIS_INPUT_REG) ||
 		(point->point_type == INPUT_REG) ||
-		(point->point_type == MB_REG))
+		(point->point_type == MB_REG) ||
+		(point->point_type == BAC_AV) ||
+		(point->point_type == BAC_AI) ||
+		(point->point_type == BAC_AO) ||
+		(point->point_type == BAC_DO) )
 	{
 		strcat(buf,itoa(num,x,10));
 	}
@@ -7343,7 +7357,7 @@ void init_info_table( void )
 {
 	int i;
 	memset( ptr_panel.info, 0, 18*sizeof( Info_Table ) );
-	for( i=0; i<27; i++ )
+	for( i=0; i<MAX_FUNCTION_COUNT + 1; i++ )
 	//for( i=0; i<18; i++ )
 	{
 		switch( i )
@@ -7489,6 +7503,19 @@ void init_info_table( void )
 				break;
 			case MB_REG:
 				ptr_panel.info[i].name = "MB_REG";
+				break;
+
+			case BAC_AV:
+				ptr_panel.info[i].name = "AV";
+				break;
+			case BAC_AI:
+				ptr_panel.info[i].name = "AI";
+				break;
+			case BAC_AO:
+				ptr_panel.info[i].name = "AO";
+				break;
+			case BAC_DO:
+				ptr_panel.info[i].name = "DO";
 				break;
 			default:
 				{

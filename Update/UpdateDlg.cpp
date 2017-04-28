@@ -241,41 +241,41 @@ void CUpdateDlg::InitialStatic()
 	m_static_cs_info.SetWindowTextW(_T(""));
 	m_static_cs_info.textColor(RGB(0,0,0));
 	//m_static_cs_info.bkColor(RGB(255,255,255));
-	m_static_cs_info.setFont(20,15,NULL,_T("Times New Roman"));
+	m_static_cs_info.setFont(20,15,NULL,_T("Arial"));
 
 	m_static_checkupdate.SetWindowTextW(_T("Check Update"));
 	m_static_checkupdate.textColor(RGB(0,0,0));
 	//m_static_download.bkColor(RGB(255,255,255));
-	m_static_checkupdate.setFont(20,15,NULL,_T("Times New Roman"));
+	m_static_checkupdate.setFont(20,15,NULL,_T("Arial"));
 
 	m_static_download.SetWindowTextW(_T("Download"));
 	m_static_download.textColor(RGB(0,0,0));
 	//m_static_download.bkColor(RGB(255,255,255));
-	m_static_download.setFont(20,15,NULL,_T("Times New Roman"));
+	m_static_download.setFont(20,15,NULL,_T("Arial"));
 
 
 
 	m_static_uncompress.SetWindowTextW(_T("Extracting"));
 	m_static_uncompress.textColor(RGB(0,0,0));
 	//m_static_uncompress.bkColor(RGB(255,255,255));
-	m_static_uncompress.setFont(20,15,NULL,_T("Times New Roman"));
+	m_static_uncompress.setFont(20,15,NULL,_T("Arial"));
 
 	m_static_install.SetWindowTextW(_T("Install"));
 	m_static_install.textColor(RGB(0,0,0));
 	//m_static_install.bkColor(RGB(255,255,255));
-	m_static_install.setFont(20,15,NULL,_T("Times New Roman"));
+	m_static_install.setFont(20,15,NULL,_T("Arial"));
 
 	m_static_finish.SetWindowTextW(_T("Done"));
 	m_static_finish.textColor(RGB(0,0,0));
 	//m_static_finish.bkColor(RGB(255,255,255));
-	m_static_finish.setFont(20,15,NULL,_T("Times New Roman"));
+	m_static_finish.setFont(20,15,NULL,_T("Arial"));
 
 
 	
 	m_static_persent.SetWindowTextW(_T(""));
 	m_static_persent.textColor(RGB(0,0,0));
 	//m_static_finish.bkColor(RGB(255,255,255));
-	m_static_persent.setFont(20,15,NULL,_T("Times New Roman"));
+	m_static_persent.setFont(20,15,NULL,_T("Arial"));
 	//m_static_pic_step.SetWindowPos( NULL,252,165 + 45*(input_step-1),0,0,SWP_NOZORDER | SWP_NOSIZE );    
 }
 
@@ -492,7 +492,8 @@ DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
 		}
 		CS_Info.Format(_T("Checking for updates ...."));
 		bool download_ret = false;
-		download_ret = DownloadFileFromFtp(_T("//software//T3000Version.ini") ,DownloadFileFolder);
+		//download_ret = DownloadFileFromFtp(_T("//software//T3000Version.ini") ,DownloadFileFolder);
+		download_ret = DownloadFileFromFtp(_T("//T3000Version.ini"), DownloadFileFolder);
 		if(download_ret == false)
 		{
 			CS_Info.Format(_T("Check version  from FTP Server failed."));
@@ -515,7 +516,7 @@ DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
 
 		if((PC_T3000_Version < T3000_FTP_Version) || (PC_T3000_Version == 0 ))
 		{
-			CS_Info.Format(_T("Find new version , ready to update."));
+			CS_Info.Format(_T("New version available, downloading now."));
 		}
 		else
 		{
@@ -561,7 +562,7 @@ DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
 		CString temp123;
 		temp123 = DownloadFileFolder + _T("\\T3000Update.zip");
 		DesDownloadFilePath = temp123;
-		copy_ret =  CopyFileW(_T("Z:\\TemcoSoftware\\Release\\T3000ForInstallation\\T3000Update.zip"),temp123,FALSE);
+		copy_ret =  CopyFileW(_T("Z:\\TemcoSoftware\\Release\\T3000InstallShield\\T3000Update.zip"),temp123,FALSE);
 		//copy_ret = CopyDirW(_T("Z:\\TemcoSoftware\\Release\\T3000ForInstallation\\T3000Update.zip"),DownloadFileFolder,FALSE);
 		if(copy_ret)
 		{

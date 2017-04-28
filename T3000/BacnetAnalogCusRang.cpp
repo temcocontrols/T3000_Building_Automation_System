@@ -12,6 +12,15 @@ CString C_or_V;
 int max_unit = 0xffffffff;
 int min_unit = 0x7fffffff;
 
+int max_voltage = 0xffffffff;
+int min_voltage = 0x7fffffff;
+
+int voltage_up = -1;
+int voltage_down = -1;
+
+int value_up = -1;
+int value_down = -1;
+
 // CBacnetAnalogCusRang dialog
 HWND temp_gloab_hwnd =NULL;
 IMPLEMENT_DYNAMIC(CBacnetAnalogCusRang, CDialogEx)
@@ -53,6 +62,7 @@ BEGIN_MESSAGE_MAP(CBacnetAnalogCusRang, CDialogEx)
 	  ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)
 	  ON_EN_KILLFOCUS(IDC_EDIT_BAC_CUS_ANALOG_UNIT, &CBacnetAnalogCusRang::OnEnKillfocusEditBacCusAnalogUnit)
 	  ON_WM_PAINT()
+	  ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -96,9 +106,10 @@ BOOL CBacnetAnalogCusRang::OnInitDialog()
 	m_tooltips.Create(GetDlgItem(IDC_SLIDER_BAC_DEF_1));
 
 	m_tooltips.Activate(TRUE);
-
+	CheckAllDataValid();
 	// TODO:  Add extra initialization here
 	Initial_List();
+	SetTimer(1,1000,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -199,8 +210,7 @@ LRESULT CBacnetAnalogCusRang::Fresh_AnalogCusRange_Item(WPARAM wParam,LPARAM lPa
 	int Changed_SubItem = (int)lParam;
 	CString cs_info;
 
-	max_unit = 0xffffffff;
-	min_unit = 0x7fffffff;
+
 
 	for (int i=0;i<11;i++)//只要有修改1个，就重新将界面上所有的值 读到 内存 并写入 设备;
 	{
@@ -247,27 +257,41 @@ BOOL CBacnetAnalogCusRang::CheckAllDataValid()
 
 	int voltage[11];
 	int mvalue[11];
+	voltage_up = -1;
+	voltage_down = -1;
+
+	value_up = -1;
+	value_down = -1;
 
 	memset(voltage,0,sizeof(voltage));
 	memset(mvalue,0,sizeof(mvalue));
-	int voltage_up = -1;
-	int voltage_down = -1;
 
-	int value_up = -1;
-	int value_down = -1;
+	max_unit = 0xffffffff;
+	min_unit = 0x7fffffff;
 
+	max_voltage = 0xffffffff;
+	min_voltage = 0x7fffffff;
+
+	int valid_data_count = 0;
 	for (int i=0;i<11;i++)
 	{
 		if(m_analog_custmer_range.at(analog_range_tbl_line).dat[i+1].value == 0)
+		{
+			valid_data_count = i;
 			break;
-		if(m_analog_custmer_range.at(analog_range_tbl_line).dat[i+1].unit == 0)
-			break;
+		}
 		voltage[i] = m_analog_custmer_range.at(analog_range_tbl_line).dat[i+1].value - m_analog_custmer_range.at(analog_range_tbl_line).dat[i].value;
+		if(m_analog_custmer_range.at(analog_range_tbl_line).dat[i+1].unit == 0)
+		{
+			valid_data_count = i;
+			break;
+		}	
 		mvalue[i] = m_analog_custmer_range.at(analog_range_tbl_line).dat[i+1].unit - m_analog_custmer_range.at(analog_range_tbl_line).dat[i].unit;
-
 	}
 	for (int i=0;i<11;i++)
 	{
+		if(i>=valid_data_count)
+			break;
 		if(mvalue[i] > 0)
 		{
 			value_up = 1;
@@ -280,6 +304,8 @@ BOOL CBacnetAnalogCusRang::CheckAllDataValid()
 
 	for (int i=0;i<11;i++)
 	{
+		if(i>=valid_data_count)
+			break;
 		if(voltage[i] > 0)
 		{
 			voltage_up = 1;
@@ -290,14 +316,29 @@ BOOL CBacnetAnalogCusRang::CheckAllDataValid()
 		}
 	}
 
-	if((voltage_up == 1) && (value_down == 1))
+	//if((voltage_up == 1) && (value_down == 1))
+	//if((voltage_up == 1) && (voltage_down == voltage_up))
+	if(voltage_down == 1)
 	{
 		return 0;
 	}
-	else if((value_up == 1) && (voltage_down == 1))
+	else if((value_up == 1) && (value_up == value_down))
 	{
 		return 0;
 	}
+	min_voltage = m_analog_custmer_range.at(analog_range_tbl_line).dat[0].value;
+	max_voltage = m_analog_custmer_range.at(analog_range_tbl_line).dat[valid_data_count].value;
+	if(value_up == 1)
+	{
+		min_unit = m_analog_custmer_range.at(analog_range_tbl_line).dat[0].unit;
+		max_unit = m_analog_custmer_range.at(analog_range_tbl_line).dat[valid_data_count].unit;
+	}
+	else if(value_down)
+	{
+		min_unit = m_analog_custmer_range.at(analog_range_tbl_line).dat[valid_data_count].unit;
+		max_unit = m_analog_custmer_range.at(analog_range_tbl_line).dat[0].unit;
+	}
+
 
 	return 1;
 }
@@ -305,8 +346,7 @@ BOOL CBacnetAnalogCusRang::CheckAllDataValid()
 LRESULT CBacnetAnalogCusRang::Fresh_AnalogCusRange_List(WPARAM wParam,LPARAM lParam)
 {
 	// Str_in_point Get_Str_in_Point(int index);
-	max_unit = 0xffffffff;
-    min_unit = 0x7fffffff;
+
 
 	CString temp_show_unit;
 	MultiByteToWideChar( CP_ACP, 0, (char *)m_analog_custmer_range.at(analog_range_tbl_line).table_name, (int)strlen(m_analog_custmer_range.at(analog_range_tbl_line).table_name)+1, 
@@ -402,14 +442,11 @@ LRESULT CBacnetAnalogCusRang::Fresh_AnalogCusRange_List(WPARAM wParam,LPARAM lPa
 			GetDlgItem(IDC_STATIC_VC_11)->SetWindowText(n_value_2byte+C_or_V);
 			GetDlgItem(IDC_STATIC_VALUE_11)->SetWindowText(n_unite_4byte);
 		}
-
-
-		if(m_analog_custmer_range.at(analog_range_tbl_line).dat[i].unit > max_unit)
-			max_unit = m_analog_custmer_range.at(analog_range_tbl_line).dat[i].unit;
-
-		if(m_analog_custmer_range.at(analog_range_tbl_line).dat[i].unit < min_unit)
-			min_unit =  m_analog_custmer_range.at(analog_range_tbl_line).dat[i].unit;
 	}
+
+
+
+
 	SetSlideRange();
 
 	return 0;
@@ -784,18 +821,68 @@ void CBacnetAnalogCusRang::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
 	// TODO: Add your message handler code here
-	// Do not call CDialogEx::OnPaint() for painting messages
-	//CMemDC memDC(dc,this);
-	//SolidBrush *CharacterBlackBrush;
-	//Graphics *mygraphics;
-	//mygraphics = new Graphics(memDC.GetDC());
-	//SolidBrush  TitleCharacterColor(Color(255,255,0,255));
-	//FontFamily  CharacterfontFamily(_T("Arial"));
-	//Gdiplus::Font  Scroll_font(&CharacterfontFamily, 28, FontStyleBold, UnitPixel);
-	//PointF     TitlepointF(20, 20);
-	//mygraphics->DrawString(_T("Test"), -1, &Scroll_font, TitlepointF,&TitleCharacterColor);
-	//delete mygraphics;
+
 	
 }
 
 
+
+
+void CBacnetAnalogCusRang::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: Add your message handler code here and/or call default
+	switch(nIDEvent)
+	{
+	case 1:
+		{
+			//int voltage_up = -1;
+			//int voltage_down = -1;
+
+			//int value_up = -1;
+			//int value_down = -1;
+			//min_unit,max_unit);
+			float real_voltage = ((float)m_Input_data.at(input_item_select_for_range).value)/1000;
+
+			int temp_index_of = 0;
+			for (int i=0;i<10;i++)
+			{
+				if((real_voltage >= m_analog_custmer_range.at(analog_range_tbl_line).dat[i].value/10  ) && 
+					(real_voltage <= m_analog_custmer_range.at(analog_range_tbl_line).dat[i+1].value/10))
+				{
+					temp_index_of = i;
+					break;
+				}
+			}
+
+			float show_value = 0;
+			if(voltage_up)
+			{
+				if(max_voltage != min_voltage)
+				{
+					//show_value =  ((float)(max_unit - min_unit))/((float)(max_voltage - min_voltage)/10) *  (real_voltage -((float)min_voltage)/10) + min_unit;
+					float y2 = m_analog_custmer_range.at(analog_range_tbl_line).dat[temp_index_of+1].unit;
+					float y1 = m_analog_custmer_range.at(analog_range_tbl_line).dat[temp_index_of].unit;
+					float x2 = m_analog_custmer_range.at(analog_range_tbl_line).dat[temp_index_of+1].value;
+					float x1 = m_analog_custmer_range.at(analog_range_tbl_line).dat[temp_index_of].value;
+					float x3 = real_voltage*10;
+					show_value = (y2 - y1)/(x2 - x1)*(x3 - x1) + y1;
+					//show_value =  ((float)(m_analog_custmer_range.at(analog_range_tbl_line).dat[temp_index_of+1].unit - m_analog_custmer_range.at(analog_range_tbl_line).dat[temp_index_of].unit))/(((float)(m_analog_custmer_range.at(analog_range_tbl_line).dat[temp_index_of+1].value - m_analog_custmer_range.at(analog_range_tbl_line).dat[temp_index_of].value))/10) *  (real_voltage -((float)m_analog_custmer_range.at(analog_range_tbl_line).dat[temp_index_of].value)/10) + m_analog_custmer_range.at(analog_range_tbl_line).dat[temp_index_of].value;
+				}
+			}
+			CString temp_voltage;
+			temp_voltage.Format(_T("%.2f"), real_voltage);
+			((CStatic *)GetDlgItem(IDC_STATIC_CUS_ANALOG_VALUE))->SetWindowText(temp_voltage);
+			//
+			CString temp_unit;
+			((CEdit *)GetDlgItem(IDC_EDIT_BAC_CUS_ANALOG_UNIT))->GetWindowTextW(temp_unit);
+			CString ret_string;
+			ret_string.Format(_T("IN%u  %.3f  %s"),input_item_select_for_range+1,show_value,temp_unit);
+			((CEdit *)GetDlgItem(IDC_STATIC_CUS_RANGE_VALUE))->SetWindowText(ret_string);
+			//TRACE(_T("%f\r\n"),show_value);
+		}
+		break;
+	default:
+		break;
+	}
+	CDialogEx::OnTimer(nIDEvent);
+}

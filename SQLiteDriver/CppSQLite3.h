@@ -262,12 +262,12 @@ Attempt to open the file read/write. If this is not possible, open the file read
 SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE
 
 	*/
-    void open(const char* szFile);
+    int open(const char* szFile);
 
     void closedb();
 
     bool tableExists(const char* szTable);
-
+ 
     int execDML(const char* szSQL);
 
     CppSQLite3Query execQuery(const char* szSQL);

@@ -377,12 +377,6 @@ int CWorkspaceBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_image_list.Add(&a,RGB(0,0,0));
     m_TreeCtrl.SetImageList(&m_image_list,TVSIL_NORMAL);
 
-
-
-// Setup trees content:
-//	HTREEITEM hRoot1 = m_TreeCtrl.InsertItem (_T("Root 1"));
-//m_TreeCtrl.InsertItem (_T("Item 1"), hRoot1);
-//	m_TreeCtrl.InsertItem (_T("Item 2"), hRoot1);
 	return 0;
 }
 void CWorkspaceBar::OnSize(UINT nType, int cx, int cy) 
@@ -395,10 +389,7 @@ void CWorkspaceBar::OnSize(UINT nType, int cx, int cy)
 		m_TreeCtrl.SetWindowPos (NULL, 0, 0,
 		cx, cy,
 		SWP_NOACTIVATE | SWP_NOZORDER);
-		
-		
-	//	m_FolderBtm.SetWindowPos (NULL, 10, cy-29,
-	//	70, 28,SWP_NOACTIVATE | SWP_NOZORDER);
+
 	}
 	if(m_TreeCtrl.m_hWnd!=NULL)
 	{

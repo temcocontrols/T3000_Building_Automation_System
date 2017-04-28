@@ -1207,7 +1207,7 @@ CppSQLite3DB& CppSQLite3DB::operator=(const CppSQLite3DB& db)
 }
 
 
-void CppSQLite3DB::open(const char* szFile)
+int CppSQLite3DB::open(const char* szFile)
 {
     int nRet = sqlite3_open(szFile, &mpDB);
 //   	char *zVfs = NULL;
@@ -1217,8 +1217,9 @@ void CppSQLite3DB::open(const char* szFile)
         const char* szError = sqlite3_errmsg(mpDB);
         throw CppSQLite3Exception(nRet, (char*)szError, DONT_DELETE_MSG);
     }
-
+	
     setBusyTimeout(mnBusyTimeoutMs);
+	return SQLITE_OK;
 }
 
 
@@ -1226,7 +1227,9 @@ void CppSQLite3DB::closedb()
 {
     if (mpDB)
     {
+		//sqlite3_finalize()
         sqlite3_close(mpDB);
+		
         mpDB = 0;
     }
 }
