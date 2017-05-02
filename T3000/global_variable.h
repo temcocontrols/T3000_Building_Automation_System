@@ -2185,6 +2185,7 @@ unsigned char nDefaultIconSize;
 COLORREF	  nDefaultclrTxt;
 
 int bacnet_view_number = TYPE_INPUT;
+int input_item_select_for_range = 0;
 
 int graphic_view_index ;
 CString grapgic_view_name[3];

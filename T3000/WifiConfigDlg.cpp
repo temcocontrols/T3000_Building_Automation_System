@@ -42,6 +42,7 @@ BEGIN_MESSAGE_MAP(CWifiConfigDlg, CDialogEx)
 	ON_EN_KILLFOCUS(IDC_EDIT1, &CWifiConfigDlg::OnEnKillfocusEdit1)
 	ON_EN_KILLFOCUS(IDC_EDIT2, &CWifiConfigDlg::OnEnKillfocusEdit2)
 	//ON_WM_NCPAINT()
+	ON_BN_CLICKED(IDOK, &CWifiConfigDlg::OnBnClickedOk)
 END_MESSAGE_MAP()
 
 
@@ -197,16 +198,44 @@ CString CWifiConfigDlg::Exchange2String(unsigned short *Buffer, int reglength)
 
 void CWifiConfigDlg::OnEnKillfocusEdit1()
 {
-	 
+	CString str;
+	m_Edit_SSID.GetWindowTextW(str);
+	if (str.GetLength() <= 0)
+	{
+		return;
+	}
+	unsigned char AESPwd[16];
+	memset(AESPwd, 0, 16);
+	for (int i = 0; i < str.GetLength(); i++)
+	{
+		AESPwd[i] = str.GetAt(i);
+	}
+	int ret = Write_Multi_org(g_tstat_id, AESPwd, 782, 16, 5);
+ 
 }
 
 
 void CWifiConfigDlg::OnEnKillfocusEdit2()
 {
-	 
+	CString str;
+	m_Edit_Key.GetWindowTextW(str);
+	if (str.GetLength() <= 0)
+	{
+		return;
+	}
+	unsigned char AESPwd[16];
+	memset(AESPwd, 0, 16);
+	for (int i = 0; i < str.GetLength(); i++)
+	{
+		AESPwd[i] = str.GetAt(i);
+	}
+	int ret = Write_Multi_org(g_tstat_id, AESPwd, 798, 16, 5);
 }
 
 
-// void CWifiConfigDlg::OnNcPaint()
-// {
-// }
+void CWifiConfigDlg::OnBnClickedOk()
+{
+	 
+
+	CDialogEx::OnOK();
+}

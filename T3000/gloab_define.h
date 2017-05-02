@@ -914,13 +914,14 @@ const CString DDNS_Server_Name[] =
 const CString Device_Serial_Port_Status[] =
 {
 	_T("Unused"),
-	_T("Bacnet MSTP"),
+	_T("MSTP Slave"),
 	_T("Modbus Slave"),
 	_T("Bacnet PTP"),
 	_T("GSM"),
 	_T("Main Zigbee"),
 	_T("Sub Zigbee"),
 	_T("Modbus Master"),
+	_T("MSTP Master")
 };
 
 const CString Variable_Analog_Units_Array[] = 
@@ -1147,6 +1148,7 @@ const int LABEL_SHOW_LABEL = 2;
 const int LABEL_ICON_VALUE = 3;
 const int LABEL_ICON_FULL_DESCRIPTION = 4;
 const int LABEL_ICON_LABEL = 5;
+const int LABEL_ICON_SHOW_VALUE = 6;
 const CString Label_Display_Array[] = 
 {
 	_T("Value"),
@@ -1155,7 +1157,7 @@ const CString Label_Display_Array[] =
 	_T("Icon"),
 	_T("Icon Description"),
 	_T("Icon Label"),
-	_T(""),
+	_T("Icon Value"),
 	_T(""),
 	_T(""),
 	_T(""),
@@ -1856,5 +1858,7 @@ typedef union
 
 
 const int REFRESH_LIST_NOW  = 2000;
+
+const CString DEFAULT_ICON = _T("Default.icon");
 
 

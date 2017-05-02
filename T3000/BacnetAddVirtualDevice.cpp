@@ -129,7 +129,8 @@ void CBacnetAddVirtualDevice::OnBnClickedButtonVirtualOk()
 	GetDlgItemText(IDC_EDIT_VIRTUAL_LABEL_NAME,pid_name);
 	GetDlgItemText(IDC_EDIT_VIRTUAL_PID,pid_class_value);
 	GetDlgItemText(IDC_EDIT_VIRTUAL_MODBUS_ID,modbus_id);
-	
+	str_object_instance = str_serialid;
+	str_panel_number = modbus_id ;
 	CppSQLite3DB SqliteDBBuilding;
 	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 	CString strSql;
@@ -143,7 +144,10 @@ void CBacnetAddVirtualDevice::OnBnClickedButtonVirtualOk()
 	SqliteDBBuilding.closedb();
 	MessageBox(_T("Add virtual device success"));
 	PostMessage(WM_CLOSE,NULL,NULL);
+	::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING, 0, 0);
+
 }
+
 
 
 void CBacnetAddVirtualDevice::OnBnClickedButtonVirtualCancel()

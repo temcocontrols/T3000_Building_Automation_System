@@ -43,6 +43,10 @@ int GetScheduleFullLabel(int index,CString &ret_full_label);
 
 int GetAmonLabel(int index,CString &ret_label);
 
+
+
+
+
 IMPLEMENT_DYNAMIC(CBacnetEditLabel, CDialogEx)
 
 CBacnetEditLabel::CBacnetEditLabel(CWnd* pParent /*=NULL*/)
@@ -103,7 +107,6 @@ BOOL CBacnetEditLabel::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	m_edit_label = this->m_hWnd;
-
 
 
 
@@ -626,13 +629,25 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 	 MultiByteToWideChar( CP_ACP, 0, (char *)temp_info.ico_name,(int)strlen((char *)temp_info.ico_name)+1, 
 		 temp_icon_path.GetBuffer(MAX_PATH), MAX_PATH );
 	 temp_icon_path.ReleaseBuffer();	
-	 m_edit_icon_path.SetWindowTextW(temp_icon_path);
-
+	
+	 temp_icon_path.Trim();
+	 if (temp_icon_path.IsEmpty())
+	 {
+		 m_edit_icon_path.SetWindowTextW(DEFAULT_ICON);
+	 }
+	 
+	 //
 	 MultiByteToWideChar( CP_ACP, 0, (char *)temp_info.ico_name_2,(int)strlen((char *)temp_info.ico_name_2)+1, 
 		 temp_icon_path.GetBuffer(MAX_PATH), MAX_PATH );
 	 temp_icon_path.ReleaseBuffer();	
 	 m_edit_icon2_path.SetWindowTextW(temp_icon_path);
-
+	 
+	 temp_icon_path.Trim();
+	 if (temp_icon_path.IsEmpty())
+	 {
+		 m_edit_icon2_path.SetWindowTextW(DEFAULT_ICON);
+	 }
+	 
 	switch(temp_info.nDisplay_Type)
 	{
 	case LABEL_SHOW_VALUE:
@@ -641,6 +656,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 	case LABEL_ICON_VALUE:
 	case LABEL_ICON_FULL_DESCRIPTION:
 	case LABEL_ICON_LABEL:
+	case LABEL_ICON_SHOW_VALUE:
 		{
 			m_edit_display.SetWindowTextW(Label_Display_Array[temp_info.nDisplay_Type]);
 			m_display_cs = Label_Display_Array[temp_info.nDisplay_Type];
@@ -731,7 +747,6 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 		PostMessage(WM_CLOSE,NULL,NULL);
 		return ;
 	}
-
 
 
 	if(temp_info.nSub_Panel != Station_NUM)
@@ -1131,6 +1146,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 			}
 			break;
 		}
+		
 		if((digital_status == 0) || (digital_status == 1))
 		{
 			m_edit_icon2_path.ShowWindow(true);
@@ -1222,6 +1238,12 @@ void CBacnetEditLabel::OnStnClickedStaticEditLabelDisplay()
 		ChangeWindowPos(1);
 	}
 	else if(label_info.nDisplay_Type == LABEL_ICON_FULL_DESCRIPTION)
+	{
+		label_info.nDisplay_Type = LABEL_ICON_SHOW_VALUE;
+		m_edit_display.SetWindowTextW(Label_Display_Array[label_info.nDisplay_Type]);
+		ChangeWindowPos(1);
+	}
+	else if (label_info.nDisplay_Type == LABEL_ICON_SHOW_VALUE)
 	{
 		label_info.nDisplay_Type = LABEL_ICON_LABEL;
 		m_edit_display.SetWindowTextW(Label_Display_Array[label_info.nDisplay_Type]);

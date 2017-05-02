@@ -101,7 +101,7 @@ public:
 	HANDLE hFirstThread;
 public:
  
-	CEdit m_idAdressEdit;
+	//CEdit m_idAdressEdit;
 	CComboBox m_braudRateCombox;
 	CComboBox m_keySelectCombox;
 	CComboBox m_powerupModelCombox;
@@ -232,10 +232,10 @@ public:
 	afx_msg void OnEnKillfocusEditSensitivty();
 	//CComboBox m_combox_setpointdisplay;
 //	afx_msg void OnCbnSelchangeComboSetpointdisplay();
-	CComboBox m_combox_zigbee;
-	CComboBox m_combox_channel;
-	afx_msg void OnCbnSelchangeComboZigbeetype();
-	afx_msg void OnCbnSelchangeComboChannel();
+// 	CComboBox m_combox_zigbee;
+// 	CComboBox m_combox_channel;
+	//afx_msg void OnCbnSelchangeComboZigbeetype();
+/*	afx_msg void OnCbnSelchangeComboChannel();*/
 //	afx_msg void OnBnClickedButtonZigbeeReboot();
 //	afx_msg void OnBnClickedBtnTopological();
 	afx_msg void OnEnKillfocusEditPid2offsetpoint6();

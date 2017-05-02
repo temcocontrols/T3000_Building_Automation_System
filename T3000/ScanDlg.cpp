@@ -40,6 +40,9 @@ CScanDlg::CScanDlg(CWnd* pParent /*=NULL*/)
 	m_szGridEditPos.cx = -1;
 	m_szGridEditPos.cy = -1;
 	m_IsScan=TRUE;
+	exsit_ref= RGB(255, 255, 255);
+	new_ref = RGB(178, 227, 137);
+	exsit_serial = false;
 }
 
 CScanDlg::~CScanDlg()
@@ -1114,9 +1117,19 @@ void CScanDlg::InitScanGrid()
 // 	m_flexGrid.put_ColWidth(9,800);		//fix
 	
 }
-void CScanDlg::FLEX_GRID_PUT_COLOR_STR(int row,int col,CString str) 
+
+void CScanDlg::SetExsit(bool ref_exsit)
 {
-    COLORREF ref=RGB(178,227,137);
+	exsit_serial = ref_exsit;
+}
+
+void CScanDlg::FLEX_GRID_PUT_COLOR_STR(int row,int col,CString str)
+{
+	COLORREF ref;
+	if (exsit_serial)
+		ref = exsit_ref;// RGB(178, 227, 137);
+	else
+		ref = new_ref;
 	m_flexGrid.put_TextMatrix(row,col,str);
 	m_flexGrid.put_Row(row);
 	m_flexGrid.put_Col(col);
@@ -1133,6 +1146,30 @@ void CScanDlg::AddNetDeviceToGrid()
 
 	for (UINT i = 0; i < m_refresh_net_device_data.size(); i++)
 	{
+		CString strserialnum;
+		strserialnum.Format(_T("%u"), m_refresh_net_device_data.at(i).nSerial);
+
+		//m_pScanner->exsit_serial_array
+		bool temp_exsit = false;
+		for (int j = 0;j < m_pScanner->serial_array_length;j++)
+		{
+			if (m_refresh_net_device_data.at(i).nSerial == m_pScanner->exsit_serial_array[j])
+			{
+				temp_exsit = true;
+				break;
+			}
+		}
+		if (temp_exsit)
+		{
+			exsit_serial = true;
+		}
+		else
+		{
+			exsit_serial = false;
+		}
+
+		FLEX_GRID_PUT_COLOR_STR(i + nRSize, SCAN_TABLE_SERIALID, strserialnum);
+
 		CString strType = m_refresh_net_device_data.at(i).show_label_name;		
 		FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_TYPE,strType); 
 
@@ -1149,9 +1186,7 @@ void CScanDlg::AddNetDeviceToGrid()
 		CString strsubnet = _T("Sub_net1");		
 		FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_SUBNET,strsubnet); 
 
-		CString strserialnum;
-		strserialnum.Format(_T("%u"),m_refresh_net_device_data.at(i).nSerial);
-		FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_SERIALID,strserialnum); 
+
 
 		CString strip = m_refresh_net_device_data.at(i).ip_address;
 		FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_ADDRESS,strip); 

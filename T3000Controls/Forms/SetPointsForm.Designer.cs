@@ -28,30 +28,16 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.setPointsControl1 = new T3000Controls.SetPointsControl();
+             
             this.SuspendLayout();
-            // 
-            // setPointsControl1
-            // 
-            this.setPointsControl1.AdditionalText = " C";
-            this.setPointsControl1.BackColor = System.Drawing.Color.Transparent;
-            this.setPointsControl1.BottomValue = -100F;
-            this.setPointsControl1.BottomZoneValue = -30F;
-            this.setPointsControl1.CurrentValue = 0F;
-            this.setPointsControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.setPointsControl1.Location = new System.Drawing.Point(0, 0);
-            this.setPointsControl1.Name = "setPointsControl1";
-            this.setPointsControl1.Size = new System.Drawing.Size(846, 505);
-            this.setPointsControl1.TabIndex = 0;
-            this.setPointsControl1.TopValue = 100F;
-            this.setPointsControl1.TopZoneValue = 50F;
+             
             // 
             // SetPointsForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(846, 505);
-            this.Controls.Add(this.setPointsControl1);
+            this.ClientSize = new System.Drawing.Size(846, 466);
+           
             this.Name = "SetPointsForm";
             this.Text = "SetPointsForm";
             this.ResumeLayout(false);
@@ -60,6 +46,6 @@
 
         #endregion
 
-        private SetPointsControl setPointsControl1;
+        //private Text text1;
     }
 }

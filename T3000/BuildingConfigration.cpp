@@ -2337,6 +2337,7 @@ void CBuildingConfigration::OnBnClickedOk()
 
 void CBuildingConfigration::OnNMDblclkListBuildingConfig(NMHDR *pNMHDR, LRESULT *pResult)
 {
+
    LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	// TODO: Add your control notification handler code here
 	CString temp_cstring;

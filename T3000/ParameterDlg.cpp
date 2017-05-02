@@ -118,7 +118,7 @@ CParameterDlg::~CParameterDlg()
 void CParameterDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_IDADDRESSEDIT, m_idAdressEdit);
+	//DDX_Control(pDX, IDC_IDADDRESSEDIT, m_idAdressEdit);
 	DDX_Control(pDX, IDC_BRAUDRATECOMBO, m_braudRateCombox);
 	DDX_Control(pDX, IDC_COMBO2, m_keySelectCombox);
 	DDX_Control(pDX, IDC_POWERMODELCOMBO, m_powerupModelCombox);
@@ -187,9 +187,6 @@ void CParameterDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_OCCUPIED_TIMER, m_occupied_timer);
 	DDX_Control(pDX, IDC_COMBO_ENABLE_DIS, m_combox_pir_endisable);
 	DDX_Control(pDX, IDC_EDIT_SENSITIVTY, m_sensitivity_editor);
-
-	DDX_Control(pDX, IDC_COMBO_ZIGBEETYPE, m_combox_zigbee);
-	DDX_Control(pDX, IDC_COMBO_CHANNEL, m_combox_channel);
 
 	DDX_Control(pDX, IDC_COMBO1, m_day_combox);
 	DDX_Control(pDX, IDC_COMBO4, m_night_combox);
@@ -305,8 +302,8 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
     ON_EN_KILLFOCUS(IDC_EDIT_DEAD_MASTER, &CParameterDlg::OnEnKillfocusEditDeadMaster)
     ON_CBN_SELCHANGE(IDC_COMBO_ENABLE_DIS, &CParameterDlg::OnCbnSelchangeComboEnableDis)
     ON_EN_KILLFOCUS(IDC_EDIT_SENSITIVTY, &CParameterDlg::OnEnKillfocusEditSensitivty)
-    ON_CBN_SELCHANGE(IDC_COMBO_ZIGBEETYPE, &CParameterDlg::OnCbnSelchangeComboZigbeetype)
-    ON_CBN_SELCHANGE(IDC_COMBO_CHANNEL, &CParameterDlg::OnCbnSelchangeComboChannel)
+   // ON_CBN_SELCHANGE(IDC_COMBO_ZIGBEETYPE, &CParameterDlg::OnCbnSelchangeComboZigbeetype)
+ /*   ON_CBN_SELCHANGE(IDC_COMBO_CHANNEL, &CParameterDlg::OnCbnSelchangeComboChannel)*/
 //    ON_BN_CLICKED(IDC_BUTTON_ZIGBEE_REBOOT, &CParameterDlg::OnBnClickedButtonZigbeeReboot)
     ON_EN_KILLFOCUS(IDC_EDIT_PID2OFFSETPOINT6, &CParameterDlg::OnEnKillfocusEditPid2offsetpoint6)
 //    ON_BN_CLICKED(IDC_UNLOCK, &CParameterDlg::OnBnClickedUnlock)
@@ -404,7 +401,7 @@ BOOL CParameterDlg::OnInitDialog()
         dlg.SetPromtionTxt(strPromption);
         dlg.DoModal();
     }
-    m_idAdressEdit.EnableWindow(FALSE);
+   // m_idAdressEdit.EnableWindow(FALSE);
 
 
     if(product_register_value[MODBUS_MODE_OUTPUT4]==2)//283
@@ -2417,7 +2414,7 @@ BOOL CParameterDlg::PreTranslateMessage(MSG* pMsg)
         if(pMsg->wParam == VK_RETURN)
         {
             CWnd *temp_focus=GetFocus();	//Maurice require ,click enter and the cursor still in this edit or combobox.
-            GetDlgItem(IDC_VALVEEDIT)->SetFocus();
+            GetDlgItem(IDC_EDIT_TEST)->SetFocus();
             temp_focus->SetFocus();
             return 1;
         }
@@ -3017,7 +3014,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
     CString strTemp;
     strTemp.Format(_T("%d"),g_tstat_id);
-    m_idAdressEdit.SetWindowText(strTemp);
+   // m_idAdressEdit.SetWindowText(strTemp);
     CString strUnit=GetTempUnit();//Unit string.
 
     //185	110	1	Low byte	W/R(Reboot after write)	Bau - Baudrate, 0=9600, 1=19.2kbaud
@@ -5456,109 +5453,109 @@ void CParameterDlg::OnEnKillfocusEditSensitivty()
 //}
 
 
-void CParameterDlg::OnCbnSelchangeComboZigbeetype()
-{
-    int sel=m_combox_zigbee.GetCurSel();
-    if (sel==product_register_value[22])
-    {
-        return;
-    }
-    int ret=write_one(g_tstat_id,22,sel);
-    if (ret>0)
-    {
-        product_register_value[22]=sel;
-    }
-}
+// void CParameterDlg::OnCbnSelchangeComboZigbeetype()
+// {
+//     int sel=m_combox_zigbee.GetCurSel();
+//     if (sel==product_register_value[22])
+//     {
+//         return;
+//     }
+//     int ret=write_one(g_tstat_id,22,sel);
+//     if (ret>0)
+//     {
+//         product_register_value[22]=sel;
+//     }
+// }
 
 
-void CParameterDlg::OnCbnSelchangeComboChannel()
-{
-    int sel=m_combox_channel.GetCurSel();
-    int channelno=sel+11;
-    int channelvalue=0;
-    if (channelno==11)
-    {
-        channelvalue=0x07FFF8000;
-    }
-    else if (channelno==12)
-    {
-        channelvalue=0x00001000;
-    }
-    else if (channelno==13)
-    {
-        channelvalue=0x00002000;
-    }
-    else if (channelno==14)
-    {
-        channelvalue=0x00004000;
-    }
-    else if (channelno==15)
-    {
-        channelvalue=0x00008000;
-    }
-    else if (channelno==16)
-    {
-        channelvalue=0x00010000;
-    }
-    else if (channelno==17)
-    {
-        channelvalue=0x00020000;
-    }
-    else if (channelno==18)
-    {
-        channelvalue=0x00040000;
-    }
-    else if (channelno==19)
-    {
-        channelvalue=0x00080000;
-    }
-    else if (channelno==20)
-    {
-        channelvalue=0x00100000;
-    }
-    else if (channelno==21)
-    {
-        channelvalue=0x00200000;
-    }
-    else if (channelno==22)
-    {
-        channelvalue=0x00400000;
-    }
-    else if (channelno==23)
-    {
-        channelvalue=0x00800000;
-    }
-    else if (channelno==24)
-    {
-        channelvalue=0x01000000;
-    }
-    else if (channelno==25)
-    {
-        channelvalue=0x02000000;
-    }
-    else if (channelno==26)
-    {
-        channelvalue=0x04000000;
-    }
-    else
-    {
-
-        channelvalue=0;
-    }
-    int high=0;
-    int low=0;
-    if (channelvalue>0)
-    {
-        high=channelvalue/65535;
-        low=channelvalue%65535;
-    }
-    if ((product_register_value[23]!=high)||(product_register_value[24]!=low))
-    {
-        write_one(g_tstat_id,23,high);
-        write_one(g_tstat_id,24,low);
-    }
-
-}
+// void CParameterDlg::OnCbnSelchangeComboChannel()
+// {
+//     int sel=m_combox_channel.GetCurSel();
+//     int channelno=sel+11;
+//     int channelvalue=0;
+//     if (channelno==11)
+//     {
+//         channelvalue=0x07FFF8000;
+//     }
+//     else if (channelno==12)
+//     {
+//         channelvalue=0x00001000;
+//     }
+//     else if (channelno==13)
+//     {
+//         channelvalue=0x00002000;
+//     }
+//     else if (channelno==14)
+//     {
+//         channelvalue=0x00004000;
+//     }
+//     else if (channelno==15)
+//     {
+//         channelvalue=0x00008000;
+//     }
+//     else if (channelno==16)
+//     {
+//         channelvalue=0x00010000;
+//     }
+//     else if (channelno==17)
+//     {
+//         channelvalue=0x00020000;
+//     }
+//     else if (channelno==18)
+//     {
+//         channelvalue=0x00040000;
+//     }
+//     else if (channelno==19)
+//     {
+//         channelvalue=0x00080000;
+//     }
+//     else if (channelno==20)
+//     {
+//         channelvalue=0x00100000;
+//     }
+//     else if (channelno==21)
+//     {
+//         channelvalue=0x00200000;
+//     }
+//     else if (channelno==22)
+//     {
+//         channelvalue=0x00400000;
+//     }
+//     else if (channelno==23)
+//     {
+//         channelvalue=0x00800000;
+//     }
+//     else if (channelno==24)
+//     {
+//         channelvalue=0x01000000;
+//     }
+//     else if (channelno==25)
+//     {
+//         channelvalue=0x02000000;
+//     }
+//     else if (channelno==26)
+//     {
+//         channelvalue=0x04000000;
+//     }
+//     else
+//     {
+// 
+//         channelvalue=0;
+//     }
+//     int high=0;
+//     int low=0;
+//     if (channelvalue>0)
+//     {
+//         high=channelvalue/65535;
+//         low=channelvalue%65535;
+//     }
+//     if ((product_register_value[23]!=high)||(product_register_value[24]!=low))
+//     {
+//         write_one(g_tstat_id,23,high);
+//         write_one(g_tstat_id,24,low);
+//     }
+// 
+// }
 
 
 //void CParameterDlg::OnBnClickedButtonZigbeeReboot()

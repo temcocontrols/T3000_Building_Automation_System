@@ -259,11 +259,14 @@ void CConnectionSetup::Write_Config()
 
     CString Connect_Type;
     Connect_Type.Format(_T("%d"),m_combox_connection_type.GetCurSel());
-    CString COM_Port;
+    CString COM_Port,FriendComportName;
     m_combox_comport.GetWindowText(COM_Port);
 	//ÕÒµ½´®¿ÚCOM
+	FriendComportName = COM_Port;
+	int ComStart = COM_Port.Find(L"(");
+	int ComEnd = COM_Port.Find(L")");
 	int index = COM_Port.Find(L"COM");
-	COM_Port = COM_Port.Mid(index, 4);
+	COM_Port = COM_Port.Mid(index, ComEnd-ComStart-1);
     CString Num_com_port = COM_Port.Mid(3);
 
     CString bradrate;
@@ -286,7 +289,7 @@ void CConnectionSetup::Write_Config()
 
     WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Connection Type"),Connect_Type,g_configfile_path);
 
-    WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("COM Port"),COM_Port,g_configfile_path);
+    WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("COM Port"), FriendComportName,g_configfile_path);
 
     WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("COM_Port"),Num_com_port,g_configfile_path);
 

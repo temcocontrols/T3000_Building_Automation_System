@@ -433,7 +433,7 @@ void CModbusPollView::Fresh_Data(){
 	{
 	  m_ischangedAddress=TRUE;
 	}
-	 Initial_RegName();
+	 //Initial_RegName();
 	COLORREF  cf=RGB(255,255,255);
 /*	m_modelname=GetProductName(m_modeldata[1]);*/
 	/*if (m_modelname.IsEmpty())

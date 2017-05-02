@@ -123,7 +123,7 @@ public:
 	void SetScanType( BOOL bScanCom);
 
 	void SetParentWnd(CWnd* pParent);
-	
+	void SetOldExsitSerial(unsigned int * serialarray, int nsize);
 	void AddNetToGrid();	
 	void AddComDeviceToGrid();
 
@@ -194,6 +194,8 @@ public:
 	BOOL IsNetDevice(const CString& strDevType);
 
 public:
+	unsigned int * exsit_serial_array;
+	int serial_array_length;
 	//vector<CTStat_Dev*>		m_szTstatScandRet;
 	//vector<CTStat_Net*>		m_szNCScanRet;
 	vector<_ComDeviceInfo*>		m_szTstatScandRet;

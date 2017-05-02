@@ -41,6 +41,14 @@ public:
 	void Timer2_handle();
 	afx_msg void OnBnClickedBtnEditCustomerRange();
 	afx_msg void OnBnClickedBtnEditCustomerVarRange();
+	afx_msg void OnBnClickedRadio73();
+	afx_msg void OnBnClickedRadio74();
+	afx_msg void OnBnClickedRadio75();
+	afx_msg void OnBnClickedRadio76();
+	afx_msg void OnBnClickedRadio77();
+	afx_msg void OnBnClickedRadio78();
+	afx_msg void OnBnClickedRadio79();
+	afx_msg void OnBnClickedRadio80();
 };
 
 const CString Range_Type[] =

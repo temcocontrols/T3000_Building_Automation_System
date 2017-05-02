@@ -100,6 +100,7 @@ HTREEITEM  hLastTreeItem =NULL;
 #include "NewTstatSchedulesDlg.h"
 #include "../SQLiteDriver/CppSQLite3.h"
 #include "BTUMeterDlg.h"
+#include "ProductModel.h"
 bool b_create_status = false;
 const TCHAR c_strCfgFileName[] = _T("config.txt");
 //	配置文件名称，用于保存用户设置
@@ -240,21 +241,23 @@ BOOL m_active_key_mouse = FALSE;
     #define TVINSERV_MINIPANEL		{tvInsert.item.iImage=7;tvInsert.item.iSelectedImage=7;} //MiniPanel
 #endif
 
-//tree0412
+
 #if 1
-    #define TVINSERV_BUILDING 		    {tvInsert.item.iImage=0; tvInsert.item.iSelectedImage=0;}
-    #define TVINSERV_FLOOR	 			{tvInsert.item.iImage=0; tvInsert.item.iSelectedImage=0;}
-    #define TVINSERV_ROOM				{tvInsert.item.iImage=2; tvInsert.item.iSelectedImage=2;}
-    #define TVINSERV_TSTAT 			    {tvInsert.item.iImage=6; tvInsert.item.iSelectedImage=6;}
-    #define TVINSERV_LED 				{tvInsert.item.iImage=8; tvInsert.item.iSelectedImage=8;}//TSTAT6&7
-    #define TVINSERV_NET_WORK		    {tvInsert.item.iImage=12;tvInsert.item.iSelectedImage=12;}
-    #define TVINSERV_SOLAR				{tvInsert.item.iImage=12;tvInsert.item.iSelectedImage=12;}
-    #define TVINSERV_CMFIVE			    {tvInsert.item.iImage=10;tvInsert.item.iSelectedImage=10;} //CM5
-    #define TVINSERV_MINIPANEL		    {tvInsert.item.iImage=14;tvInsert.item.iSelectedImage=14;} //MiniPanel
-    #define TVINSERV_LC				    {tvInsert.item.iImage=16;tvInsert.item.iSelectedImage=16;} //Lightingcontroller
-    #define TVINSERV_TSTAT6			    {tvInsert.item.iImage=18;tvInsert.item.iSelectedImage=18;}//tstat6
-    #define TVINSERV_CO2			    {tvInsert.item.iImage=20;tvInsert.item.iSelectedImage=20;}//CO2
-    #define TVINSERV_CS3000             {tvInsert.item.iImage=22;tvInsert.item.iSelectedImage=22;}//cs3000
+#define TVINSERV_BUILDING 		    {tvInsert.item.iImage=0; tvInsert.item.iSelectedImage=0;}
+#define TVINSERV_FLOOR	 			{tvInsert.item.iImage=0; tvInsert.item.iSelectedImage=0;}
+#define TVINSERV_ROOM				{tvInsert.item.iImage=2; tvInsert.item.iSelectedImage=2;}
+#define TVINSERV_TSTAT_DEFAULT 	    {tvInsert.item.iImage=6; tvInsert.item.iSelectedImage=6;}     //默认的产品图标
+#define TVINSERV_LED_TSTAT7 		{tvInsert.item.iImage=8; tvInsert.item.iSelectedImage=8;}   //TSTAT7
+#define TVINSERV_CMFIVE			    {tvInsert.item.iImage=10;tvInsert.item.iSelectedImage=10;}   //TSTAT7
+#define TVINSERV_NET_WORK		    {tvInsert.item.iImage=12;tvInsert.item.iSelectedImage=12;}
+#define TVINSERV_MINIPANEL		    {tvInsert.item.iImage=14;tvInsert.item.iSelectedImage=14;} //MiniPanel
+#define TVINSERV_LC				    {tvInsert.item.iImage=26;tvInsert.item.iSelectedImage=26;} //Lightingcontroller
+#define TVINSERV_TSTAT6			    {tvInsert.item.iImage=16;tvInsert.item.iSelectedImage=18;}//tstat6
+#define TVINSERV_CO2			    {tvInsert.item.iImage=18;tvInsert.item.iSelectedImage=20;}//CO2
+#define TVINSERV_T3ARM			    {tvInsert.item.iImage=20;tvInsert.item.iSelectedImage=22;}//CO2
+#define TVINSERV_CS3000             {tvInsert.item.iImage=22;tvInsert.item.iSelectedImage=24;}//cs3000
+#define TVINSERV_TSTAT8			    {tvInsert.item.iImage=24;tvInsert.item.iSelectedImage=26;}//tstat6
+#define TVINSERV_T3LC			    {tvInsert.item.iImage=26;tvInsert.item.iSelectedImage=28;}//tstat6
 #endif
 
 #define ITEM_MASK				TVIF_IMAGE|TVIF_SELECTEDIMAGE|TVIF_TEXT
@@ -1972,7 +1975,7 @@ void CMainFrame::LoadProductFromDB()
 		m_subNetLst.push_back(temBuildingInfo);
 	}
 	if(m_subNetLst.size()<=0)
-		AfxMessageBox(_T("There is no default building,please select a building First！"));
+		AfxMessageBox(_T("There is no default building,please select a building First."));
 
 
 
@@ -2186,45 +2189,44 @@ void CMainFrame::LoadProductFromDB()
 						//TRACE(strProdcut);
 						tvInsert.hInsertAfter =TVI_SORT;// TVI_LAST; // 项目插入方式
 						int temp_product_class_id=q.getIntField("Product_class_ID");
-						if(temp_product_class_id==PM_NC)
+						if(temp_product_class_id==PM_NC|| temp_product_class_id == PM_SOLAR)
 							TVINSERV_NET_WORK
-						else if(temp_product_class_id==LED_PRODUCT_MODEL)
-						TVINSERV_LED
-						else if(temp_product_class_id==PM_SOLAR)
-						TVINSERV_SOLAR
 						else if (temp_product_class_id == PM_CM5 ) //CM5
 						TVINSERV_CMFIVE
+						else if (temp_product_class_id == PM_T3_LC) //CM5
+							TVINSERV_T3LC
 						else if (temp_product_class_id == PM_T3PT10||
 						temp_product_class_id == PM_T3IOA||
 						temp_product_class_id == PM_T332AI||
 						temp_product_class_id ==  PM_T38AI16O||
 						temp_product_class_id == PM_T38I13O||
 						temp_product_class_id == PM_T34AO||
-						temp_product_class_id == PM_T36CT||
-						temp_product_class_id == PM_T322AI||
-						temp_product_class_id == PM_T3PT12||
-						temp_product_class_id == PM_T36CTA||
-						temp_product_class_id == PM_T38AI8AO6DO) //T3
+						temp_product_class_id == PM_T36CT) //T3
 						TVINSERV_NET_WORK
+						else if (
+							temp_product_class_id == PM_T322AI ||
+							temp_product_class_id == PM_T3PT12 ||
+							temp_product_class_id == PM_T36CTA ||
+							temp_product_class_id == PM_T38AI8AO6DO)
+							TVINSERV_T3ARM
 						else if (temp_product_class_id ==PM_MINIPANEL )//Mini Panel
 						TVINSERV_MINIPANEL
 						else if (temp_product_class_id == PM_AirQuality) //AirQuality
-						TVINSERV_TSTAT6
+							TVINSERV_TSTAT_DEFAULT
 						else if (temp_product_class_id == PM_LightingController)//Lightingcontroller
 						TVINSERV_LC          //tree0412
-						else if (temp_product_class_id == PM_TSTAT7)//TSTAT7 &TSTAT6 //tree0412
-						TVINSERV_LED //tree0412
-						else if(temp_product_class_id == PM_TSTAT6||temp_product_class_id == PM_TSTAT7||temp_product_class_id == PM_TSTAT5i||temp_product_class_id == PM_TSTAT8)
+						else if (temp_product_class_id == PM_TSTAT7|| temp_product_class_id == PM_TSTAT7_ARM)//TSTAT7 &TSTAT6 //tree0412
+							TVINSERV_LED_TSTAT7 //tree0412
+						else if(temp_product_class_id == PM_TSTAT6||temp_product_class_id == PM_TSTAT5i)
 						TVINSERV_TSTAT6
+						else if(temp_product_class_id == PM_TSTAT8|| temp_product_class_id == PM_TSTAT8_WIFI || temp_product_class_id == PM_TSTAT8_OCC || temp_product_class_id == PM_TSTAT8_220V)
+						TVINSERV_TSTAT8
 						else if((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485)||(temp_product_class_id == PM_PRESSURE_SENSOR)|| (temp_product_class_id == STM32_CO2_NET)||(temp_product_class_id == STM32_CO2_RS485))
 						TVINSERV_CO2
 						else if (temp_product_class_id == PM_CS_SM_AC||temp_product_class_id == PM_CS_SM_DC||temp_product_class_id == PM_CS_RSM_AC||temp_product_class_id == PM_CS_RSM_DC)
-						{
 							TVINSERV_CS3000
-						}
 						else
-
-							TVINSERV_TSTAT
+							TVINSERV_TSTAT_DEFAULT
 
 							HTREEITEM hProductItem=m_pTreeViewCrl->InsertItem(&tvInsert);
 
@@ -2416,46 +2418,44 @@ void CMainFrame::LoadProductFromDB()
 
 
 							int temp_product_class_id=q.getIntField("Product_class_ID");
-							if(temp_product_class_id==PM_NC)
+							if (temp_product_class_id == PM_NC || temp_product_class_id == PM_SOLAR)
 								TVINSERV_NET_WORK
-							else if(temp_product_class_id==LED_PRODUCT_MODEL)
-							TVINSERV_LED
-							else if(temp_product_class_id==PM_SOLAR)
-							TVINSERV_SOLAR
-							else if (temp_product_class_id == PM_CM5 ) //CM5
-							TVINSERV_CMFIVE
-							else if (temp_product_class_id == PM_T3PT10||
-							temp_product_class_id == PM_T3IOA||
-							temp_product_class_id == PM_T332AI||
-							temp_product_class_id ==  PM_T38AI16O||
-							temp_product_class_id == PM_T38I13O||
-							temp_product_class_id == PM_T34AO||
-							temp_product_class_id == PM_T36CT||
-                                                     temp_product_class_id == PM_T322AI||
-													  temp_product_class_id == PM_T3PT12||
-													  temp_product_class_id == PM_T36CTA||
-                                                     temp_product_class_id == PM_T38AI8AO6DO) //T3
-                                                TVINSERV_NET_WORK
-                                                else if (temp_product_class_id ==PM_MINIPANEL )//Mini Panel
-                                                    TVINSERV_MINIPANEL
-                                                    else if (temp_product_class_id == PM_AirQuality) //AirQuality
-                                                        TVINSERV_TSTAT6
-                                                        else if (temp_product_class_id == PM_LightingController)//Lightingcontroller
-                                                            TVINSERV_LC          //tree0412
-                                                            else if (temp_product_class_id == PM_TSTAT7)//TSTAT7 &TSTAT6 //tree0412
-                                                                TVINSERV_LED //tree0412
-                                                                else if(temp_product_class_id == PM_TSTAT6||temp_product_class_id == PM_TSTAT7||temp_product_class_id == PM_TSTAT5i||temp_product_class_id == PM_TSTAT8
-																	|| (temp_product_class_id == PM_TSTAT8_WIFI) || (temp_product_class_id == PM_TSTAT8_OCC) || (temp_product_class_id == PM_TSTAT7_ARM) || (temp_product_class_id == PM_TSTAT8_220V))
-                                                                    TVINSERV_TSTAT6
-                                                                    else if((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485)||(temp_product_class_id == PM_PRESSURE_SENSOR)|| (temp_product_class_id == STM32_CO2_NET)||(temp_product_class_id == STM32_CO2_RS485))
-                                                                        TVINSERV_CO2
-                                                                        else if (temp_product_class_id == PM_CS_SM_AC||temp_product_class_id == PM_CS_SM_DC||temp_product_class_id == PM_CS_RSM_AC||temp_product_class_id == PM_CS_RSM_DC)
-                                                                        {
-                                                                            TVINSERV_CS3000
-							}
+							else if (temp_product_class_id == PM_CM5) //CM5
+								TVINSERV_CMFIVE
+							else if (temp_product_class_id == PM_T3_LC) //CM5
+								TVINSERV_T3LC
+							else if (temp_product_class_id == PM_T3PT10 ||
+								temp_product_class_id == PM_T3IOA ||
+								temp_product_class_id == PM_T332AI ||
+								temp_product_class_id == PM_T38AI16O ||
+								temp_product_class_id == PM_T38I13O ||
+								temp_product_class_id == PM_T34AO ||
+								temp_product_class_id == PM_T36CT) //T3
+								TVINSERV_NET_WORK
+							else if (
+								temp_product_class_id == PM_T322AI ||
+								temp_product_class_id == PM_T3PT12 ||
+								temp_product_class_id == PM_T36CTA ||
+								temp_product_class_id == PM_T38AI8AO6DO)
+								TVINSERV_T3ARM
+							else if (temp_product_class_id == PM_MINIPANEL)//Mini Panel
+								TVINSERV_MINIPANEL
+							else if (temp_product_class_id == PM_AirQuality) //AirQuality
+								TVINSERV_TSTAT_DEFAULT
+							else if (temp_product_class_id == PM_LightingController)//Lightingcontroller
+								TVINSERV_LC          //tree0412
+							else if (temp_product_class_id == PM_TSTAT7 || temp_product_class_id == PM_TSTAT7_ARM)//TSTAT7 &TSTAT6 //tree0412
+								TVINSERV_LED_TSTAT7 //tree0412
+							else if (temp_product_class_id == PM_TSTAT6 || temp_product_class_id == PM_TSTAT5i)
+								TVINSERV_TSTAT6
+							else if (temp_product_class_id == PM_TSTAT8 || temp_product_class_id == PM_TSTAT8_WIFI || temp_product_class_id == PM_TSTAT8_OCC || temp_product_class_id == PM_TSTAT8_220V)
+								TVINSERV_TSTAT8
+							else if ((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485) || (temp_product_class_id == PM_PRESSURE_SENSOR) || (temp_product_class_id == STM32_CO2_NET) || (temp_product_class_id == STM32_CO2_RS485))
+								TVINSERV_CO2
+							else if (temp_product_class_id == PM_CS_SM_AC || temp_product_class_id == PM_CS_SM_DC || temp_product_class_id == PM_CS_RSM_AC || temp_product_class_id == PM_CS_RSM_DC)
+								TVINSERV_CS3000
 							else
-
-								TVINSERV_TSTAT
+								TVINSERV_TSTAT_DEFAULT
 
 								HTREEITEM hSubItem=m_pTreeViewCrl->InsertItem(&tvInsert);
 
@@ -2641,45 +2641,44 @@ void CMainFrame::LoadProductFromDB()
 				//TRACE(strProdcut);
 				tvInsert.hInsertAfter =TVI_SORT;// TVI_LAST; // 项目插入方式
 				int temp_product_class_id=q.getIntField("Product_class_ID");
-				if(temp_product_class_id==PM_NC)
+				if (temp_product_class_id == PM_NC || temp_product_class_id == PM_SOLAR)
 					TVINSERV_NET_WORK
-				else if(temp_product_class_id==LED_PRODUCT_MODEL)
-				TVINSERV_LED
-				else if(temp_product_class_id==PM_SOLAR)
-				TVINSERV_SOLAR
-				else if (temp_product_class_id == PM_CM5 ) //CM5
-				TVINSERV_CMFIVE
-				else if (temp_product_class_id == PM_T3PT10||
-				temp_product_class_id == PM_T3IOA||
-				temp_product_class_id == PM_T332AI||
-				temp_product_class_id ==  PM_T38AI16O||
-				temp_product_class_id == PM_T38I13O||
-				temp_product_class_id == PM_T34AO||
-				temp_product_class_id == PM_T36CT||
-				temp_product_class_id == PM_T322AI||
-				temp_product_class_id == PM_T3PT12||
-				temp_product_class_id == PM_T36CTA||
-				temp_product_class_id == PM_T38AI8AO6DO) //T3
-				TVINSERV_NET_WORK
-				else if (temp_product_class_id ==PM_MINIPANEL )//Mini Panel
-				TVINSERV_MINIPANEL
+				else if (temp_product_class_id == PM_CM5) //CM5
+					TVINSERV_CMFIVE
+				else if (temp_product_class_id == PM_T3_LC) //CM5
+					TVINSERV_T3LC
+				else if (temp_product_class_id == PM_T3PT10 ||
+					temp_product_class_id == PM_T3IOA ||
+					temp_product_class_id == PM_T332AI ||
+					temp_product_class_id == PM_T38AI16O ||
+					temp_product_class_id == PM_T38I13O ||
+					temp_product_class_id == PM_T34AO ||
+					temp_product_class_id == PM_T36CT) //T3
+					TVINSERV_NET_WORK
+				else if (
+					temp_product_class_id == PM_T322AI ||
+					temp_product_class_id == PM_T3PT12 ||
+					temp_product_class_id == PM_T36CTA ||
+					temp_product_class_id == PM_T38AI8AO6DO)
+					TVINSERV_T3ARM
+				else if (temp_product_class_id == PM_MINIPANEL)//Mini Panel
+					TVINSERV_MINIPANEL
 				else if (temp_product_class_id == PM_AirQuality) //AirQuality
-				TVINSERV_TSTAT6
+					TVINSERV_TSTAT_DEFAULT
 				else if (temp_product_class_id == PM_LightingController)//Lightingcontroller
-				TVINSERV_LC          //tree0412
-				else if (temp_product_class_id == PM_TSTAT7)//TSTAT7 &TSTAT6 //tree0412
-				TVINSERV_LED //tree0412
-				else if(temp_product_class_id == PM_TSTAT6||temp_product_class_id == PM_TSTAT7||temp_product_class_id == PM_TSTAT5i||temp_product_class_id == PM_TSTAT8)
-				TVINSERV_TSTAT6
-				else if((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485)||(temp_product_class_id == PM_PRESSURE_SENSOR)|| (temp_product_class_id == STM32_CO2_NET)||(temp_product_class_id == STM32_CO2_RS485))
-				TVINSERV_CO2
-				else if (temp_product_class_id == PM_CS_SM_AC||temp_product_class_id == PM_CS_SM_DC||temp_product_class_id == PM_CS_RSM_AC||temp_product_class_id == PM_CS_RSM_DC)
-				{
+					TVINSERV_LC          //tree0412
+				else if (temp_product_class_id == PM_TSTAT7 || temp_product_class_id == PM_TSTAT7_ARM)//TSTAT7 &TSTAT6 //tree0412
+					TVINSERV_LED_TSTAT7 //tree0412
+				else if (temp_product_class_id == PM_TSTAT6 || temp_product_class_id == PM_TSTAT5i)
+					TVINSERV_TSTAT6
+				else if (temp_product_class_id == PM_TSTAT8 || temp_product_class_id == PM_TSTAT8_WIFI || temp_product_class_id == PM_TSTAT8_OCC || temp_product_class_id == PM_TSTAT8_220V)
+					TVINSERV_TSTAT8
+				else if ((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485) || (temp_product_class_id == PM_PRESSURE_SENSOR) || (temp_product_class_id == STM32_CO2_NET) || (temp_product_class_id == STM32_CO2_RS485))
+					TVINSERV_CO2
+				else if (temp_product_class_id == PM_CS_SM_AC || temp_product_class_id == PM_CS_SM_DC || temp_product_class_id == PM_CS_RSM_AC || temp_product_class_id == PM_CS_RSM_DC)
 					TVINSERV_CS3000
-				}
 				else
-
-					TVINSERV_TSTAT
+					TVINSERV_TSTAT_DEFAULT
 
 					HTREEITEM hProductItem=m_pTreeViewCrl->InsertItem(&tvInsert);
 
@@ -3174,53 +3173,44 @@ void CMainFrame::ScanTstatInDB(void)
                     int const PM_T36CT = 29;
                     */
 #if 1
-                    if(temp_product_class_id==PM_NC)
-                        TVINSERV_NET_WORK
-                        else if(temp_product_class_id==LED_PRODUCT_MODEL)
-                            TVINSERV_LED
-                            else if(temp_product_class_id==PM_SOLAR)
-                                TVINSERV_SOLAR
-                                else if (temp_product_class_id == PM_CM5 ) //CM5
-                                    TVINSERV_CMFIVE
-                                    else if (temp_product_class_id == PM_T3PT10||
-                                             temp_product_class_id == PM_T3IOA||
-                                             temp_product_class_id == PM_T332AI||
-                                             temp_product_class_id ==  PM_T38AI16O||
-                                             temp_product_class_id == PM_T38I13O||
-                                             temp_product_class_id == PM_T34AO||
-                                             temp_product_class_id == PM_T36CT||
-										     temp_product_class_id == PWM_TRANSDUCER ||
-                                             temp_product_class_id == PM_T322AI||
-											 temp_product_class_id == PM_T3PT12||
-											 temp_product_class_id == PM_T36CTA||
-                                             temp_product_class_id == PM_T38AI8AO6DO) //T3
-                                        TVINSERV_NET_WORK
-                                        else if (temp_product_class_id ==PM_MINIPANEL )//Mini Panel
-                                            TVINSERV_MINIPANEL
-                                            else if (temp_product_class_id == PM_AirQuality) //AirQuality
-                                                TVINSERV_TSTAT6
-                                                else if (temp_product_class_id == PM_LightingController)//Lightingcontroller
-                                                    //TVINSERV_NET_WORK  //tree0412
-                                                    TVINSERV_LC          //tree0412
-                                                    else if (temp_product_class_id == PM_TSTAT7)//TSTAT7 &TSTAT6 //tree0412
-                                                        TVINSERV_LED //tree0412
-                                                        else if(temp_product_class_id == PM_TSTAT6||temp_product_class_id == PM_TSTAT7||temp_product_class_id == PM_TSTAT5i||temp_product_class_id == PM_TSTAT8
-															|| (temp_product_class_id == PM_TSTAT8_WIFI) || (temp_product_class_id == PM_TSTAT8_OCC) || (temp_product_class_id == PM_TSTAT7_ARM) || (temp_product_class_id == PM_TSTAT8_220V))
-                                                            TVINSERV_TSTAT6
-                                                            else if((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485)||(temp_product_class_id == PM_PRESSURE_SENSOR) 
-															|| (temp_product_class_id == STM32_CO2_NET)||(temp_product_class_id == STM32_CO2_RS485))
-                                                                TVINSERV_CO2
-// 					PM_CS_SM_AC
-// 					PM_CS_SM_DC
-// 					PM_CS_RSM_AC
-// 					PM_CS_RSM_DC
-                                                                else if (temp_product_class_id == PM_CS_SM_AC||temp_product_class_id == PM_CS_SM_DC||temp_product_class_id == PM_CS_RSM_AC||temp_product_class_id == PM_CS_RSM_DC)
-                                                                {
-                                                                    TVINSERV_CS3000
-                                                                }
-                                                                else
-
-                                                                    TVINSERV_TSTAT
+					if (temp_product_class_id == PM_NC || temp_product_class_id == PM_SOLAR)
+						TVINSERV_NET_WORK
+					else if (temp_product_class_id == PM_CM5) //CM5
+						TVINSERV_CMFIVE
+					else if (temp_product_class_id == PM_T3_LC) //CM5
+						TVINSERV_T3LC
+					else if (temp_product_class_id == PM_T3PT10 ||
+						temp_product_class_id == PM_T3IOA ||
+						temp_product_class_id == PM_T332AI ||
+						temp_product_class_id == PM_T38AI16O ||
+						temp_product_class_id == PM_T38I13O ||
+						temp_product_class_id == PM_T34AO ||
+						temp_product_class_id == PM_T36CT) //T3
+						TVINSERV_NET_WORK
+					else if (
+						temp_product_class_id == PM_T322AI ||
+						temp_product_class_id == PM_T3PT12 ||
+						temp_product_class_id == PM_T36CTA ||
+						temp_product_class_id == PM_T38AI8AO6DO)
+						TVINSERV_T3ARM
+					else if (temp_product_class_id == PM_MINIPANEL)//Mini Panel
+						TVINSERV_MINIPANEL
+					else if (temp_product_class_id == PM_AirQuality) //AirQuality
+						TVINSERV_TSTAT_DEFAULT
+					else if (temp_product_class_id == PM_LightingController)//Lightingcontroller
+						TVINSERV_LC          //tree0412
+					else if (temp_product_class_id == PM_TSTAT7 || temp_product_class_id == PM_TSTAT7_ARM)//TSTAT7 &TSTAT6 //tree0412
+						TVINSERV_LED_TSTAT7 //tree0412
+					else if (temp_product_class_id == PM_TSTAT6 || temp_product_class_id == PM_TSTAT5i)
+						TVINSERV_TSTAT6
+					else if (temp_product_class_id == PM_TSTAT8 || temp_product_class_id == PM_TSTAT8_WIFI || temp_product_class_id == PM_TSTAT8_OCC || temp_product_class_id == PM_TSTAT8_220V)
+						TVINSERV_TSTAT8
+					else if ((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485) || (temp_product_class_id == PM_PRESSURE_SENSOR) || (temp_product_class_id == STM32_CO2_NET) || (temp_product_class_id == STM32_CO2_RS485))
+						TVINSERV_CO2
+					else if (temp_product_class_id == PM_CS_SM_AC || temp_product_class_id == PM_CS_SM_DC || temp_product_class_id == PM_CS_RSM_AC || temp_product_class_id == PM_CS_RSM_DC)
+						TVINSERV_CS3000
+					else
+						TVINSERV_TSTAT_DEFAULT
 #endif
 
 
@@ -4721,6 +4711,26 @@ void CMainFrame::Scan_Product()
 	scaning_mode = true;
     m_pScanner = new CTStatScanner;
     g_ScnnedNum=0;
+
+	int size_serial = m_product.size();
+
+	UINT * serial_int = new UINT[size_serial];
+	memset(serial_int, 0, size_serial*sizeof(UINT));
+	int c_count = 0;
+	vector <tree_product>::iterator temp_v;
+	for (temp_v = m_product.begin();temp_v != m_product.end();)
+	{
+		if (temp_v->serial_number != 0)
+		{
+			serial_int[c_count] = temp_v->serial_number;
+			c_count++;
+			
+		}
+		++temp_v;
+	}
+	
+	m_pScanner->SetOldExsitSerial(serial_int, c_count);
+	delete[] serial_int;
     m_pScanner->SetParentWnd(this);
     m_pScanner->SetSubnetInfo(m_subNetLst);//vector<Building_info>& szSubnets);
 
@@ -6947,10 +6957,221 @@ void CMainFrame::OnToolRefreshLeftTreee()
     EndWaitCursor();
 
 }
+
+int* Pool1234()
+{
+	int *x;
+	int a[2] = { 0,1 };
+	a[0] = 5;
+	//将数组的基地址赋值给整型指针  
+	x = &a[0];
+	//返回整个数组  
+	return x;
+}
+
+int  add(int  a, int  b)
+
+{
+
+	return  a + b;
+
+}
+const char* testValue = "BruceZhang";
+char gstr[30] = { 0 };
+char* Func_1(void)
+{
+	char str[30] = "Bruce";
+	//cout << "str:" << str << endl;
+
+	return str;
+}
+
+char* Func_2(void)
+{
+	strcpy(gstr, testValue);
+	//cout << "gstr:" << gstr << endl;
+	return gstr;
+}
+
+
+//void quick_sort_serialnumber(int serial_array[], int length)
+//{
+//	int start = 0;
+//	int end = length - 1;
+//	int set_value = serial_array[start];
+//	while (1 > length)
+//		return;
+//	while (end > start)
+//	{
+//		while (end > start)
+//		{
+//			if (serial_array[end--] < set_value)
+//			{
+//				serial_array[start++] = serial_array[++end];
+//				break;
+//			}
+//		}
+//
+//		while (end > start)
+//		{
+//			if (serial_array[start++] > set_value)
+//			{
+//				serial_array[end--] = serial_array[--start];
+//				break;
+//			}
+//		}
+//	}
+//
+//	serial_array[start] = set_value;
+//	quick_sort_serialnumber(serial_array, start);
+//	quick_sort_serialnumber(serial_array + start + 1, length - start - 1);
+//
+//}
+
+
+typedef struct Mystu
+{
+	int index;
+	string name;
+	bool operator> (const Mystu & other);
+	bool operator< (const Mystu & other);
+};
+
+bool Mystu::operator> (const Mystu & other)
+{
+	//strcmp(name,)
+	if (name >other.name)
+		return true;
+	return false;
+}
+
+bool Mystu::operator< (const Mystu & other)
+{
+
+	if (name <other.name)
+		return true;
+	return false;
+}
+template<class ElemType>
+void quick_sort_serial(ElemType array[], int length)
+{
+	int start = 0;
+	int end = length - 1;
+	ElemType setpoint = array[start];
+	if (length < 1)
+		return;
+	while (end > start)
+	{
+		while (end > start)
+		{
+			if (array[end--] < setpoint)
+			{
+				array[start++] = array[++end];
+				break;
+			}
+		}
+
+		while (end > start)
+		{
+			if (array[start++] > setpoint)
+			{
+				array[end--] = array[--start];
+				break;
+			}
+		}
+	}
+	array[start] = setpoint;
+	quick_sort_serial(array, start);
+	quick_sort_serial(array + start + 1,length - start - 1);
+
+}
+
+template <class T, int I> class MyCList
+{
+public:
+	int SetItem(int Index, const T &Item)
+	{
+		if ((Index<0) || (Index>I - 1))
+			return 0; // 出错
+		Buffer[Index] = Item;
+		return 1; // 成功
+	};
+	int GetItem(int Index, T &Item);
+private:
+	T Buffer[];
+};
+
+//template<class T, int I> int CList<T, I>::SetItem(int Index, const T &Item)
+//{
+//	if ((Index<0) || (Index>I - 1))
+//		return 0; // 出错
+//	Buffer[Index] = Item;
+//	return 1; // 成功
+//}
+
+template<class ElemType>
+void Swap(ElemType& a, ElemType& b)
+{
+	ElemType c = a;
+	a = b;
+	b = c;
+}
+
+template<class ElemType>
+void SelectionSort(ElemType data[], int n)
+{
+	int i, j, min;
+	for (i = 0; i < n; i++) 
+	{
+		min = i;//得出最小的
+		for (j = i + 1; j < n; j++) {
+			if (data[j] < data[min])
+				min = j;
+		}
+		Swap(data[i], data[min]);
+	}
+}
+
+// 将数组data中，[lptr...rptr-1][rptr...rightEnd]两部分的元素进行合并
+// tmpArr为合并时的辅存空间
+template<class ElemType>
+void Merge(ElemType data[], ElemType tmpArr[], int lptr, int rptr, int rightEnd)
+{
+	int leftEnd = rptr - 1;
+	int ptr, i;
+	ptr = i = lptr;
+	while (lptr <= leftEnd && rptr <= rightEnd)
+		if (data[lptr] <= data[rptr])
+			tmpArr[ptr++] = data[lptr++];
+		else
+			tmpArr[ptr++] = data[rptr++];
+	while (lptr <= leftEnd)
+		tmpArr[ptr++] = data[lptr++];
+	while (rptr <= rightEnd)
+		tmpArr[ptr++] = data[rptr++];
+	for (;i <= rightEnd; i++)
+		data[i] = tmpArr[i];
+}
+
+// 非递归实现
+template<class ElemType>
+void MPass(ElemType data[], ElemType tmpArr[], int n, int mergeLength)
+{
+	int i = 0;
+	while (i <= n - 2 * mergeLength) {
+		Merge(data, tmpArr, i, i + mergeLength, i + 2 * mergeLength - 1);
+		i = i + 2 * mergeLength;
+	}
+	if (i + mergeLength < n)
+		Merge(data, tmpArr, i, i + mergeLength, n - 1);
+}
+
+
+
 #include "ScanDlg.h"
 void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 {
-     
+
 	CppSQLite3DB SqliteDBT3000;
 	CppSQLite3DB SqliteDBBuilding;
 	CppSQLite3Table table;

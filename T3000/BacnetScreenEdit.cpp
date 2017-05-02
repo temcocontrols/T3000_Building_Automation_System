@@ -1141,7 +1141,8 @@ int CBacnetScreenEdit::JudgeClickItem(CPoint & point)
 		}
 		else if((m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_VALUE) ||
 			(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_FULL_DESCRIPTION) ||
-			(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_LABEL))
+			(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_LABEL) ||
+			(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_SHOW_VALUE))
 		{
 			int temp_index = 0;
 			temp_index = m_bac_label_vector.at(i).nPoint_number;
@@ -1590,6 +1591,9 @@ void CBacnetScreenEdit::OnPaint()
 			case LABEL_ICON_LABEL:
 				cs_show_info = cs_label + _T("  ") + cs_value + _T("  ") + cs_unit + _T("  ") + cs_auto_m;
 				break;
+			case LABEL_ICON_SHOW_VALUE:
+				cs_show_info = cs_value + _T("  ") + cs_unit + _T("  ") + cs_auto_m;
+				break;
 			default:
 				{
 					cs_show_info = _T("Label Invalid");
@@ -1639,6 +1643,7 @@ void CBacnetScreenEdit::OnPaint()
 
 		if((m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_LABEL) ||
 			(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_VALUE) ||
+			(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_SHOW_VALUE) ||
 			(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_FULL_DESCRIPTION))
 		{
 			CString temp_cstring;
@@ -1956,6 +1961,7 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 			break;
 		}
 		else if(((m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_VALUE) ||
+			(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_SHOW_VALUE) ||
 			(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_FULL_DESCRIPTION) ||
 			(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_LABEL)) /*&& (screen_lock_label == false)*/)
 		{

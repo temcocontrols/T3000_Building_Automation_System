@@ -1500,7 +1500,7 @@ LRESULT CFlash_Multy::MultyFlashMessage(WPARAM wParam,LPARAM lParam)
     CString strTips;
     if (main_command  == CHANGE_ONE_ITEM)
     {
-        if (flash_device.at(sub_parameter).online)
+        if (flash_device.at(sub_parameter-1).online)
         {
             m_flash_multy_list.SetItemText(sub_parameter,FLASH_ONLINE,_T("Online"));
         }
@@ -1508,10 +1508,10 @@ LRESULT CFlash_Multy::MultyFlashMessage(WPARAM wParam,LPARAM lParam)
         {
             m_flash_multy_list.SetItemText(sub_parameter,FLASH_ONLINE,_T("Offline"));
         }
-        strTips.Format(_T("%0.1f"),flash_device.at(sub_parameter).software_rev);
+        strTips.Format(_T("%0.1f"),flash_device.at(sub_parameter-1).software_rev);
         m_flash_multy_list.SetItemText(sub_parameter,FLASH_CURRENT_FIRMWARE,strTips);
 
-        m_flash_multy_list.SetItemText(sub_parameter,FLASH_FILE_REV,flash_device.at(sub_parameter).file_rev);
+        m_flash_multy_list.SetItemText(sub_parameter,FLASH_FILE_REV,flash_device.at(sub_parameter-1).file_rev);
 
     }
 	CppSQLite3DB SqliteDBBuilding;
@@ -1532,7 +1532,7 @@ LRESULT CFlash_Multy::MultyFlashMessage(WPARAM wParam,LPARAM lParam)
     {
         m_flash_multy_list.SetItemTextColor(sub_parameter,-1,FLASH_COLOR_GREEN);
         m_flash_multy_list.SetItemText(sub_parameter,FLASH_RESULTS,_T("Sucessful"));
-        StrSql.Format(_T("Update BatchFlashResult Set FirmwareResult = 3 Where SN = %d "),_wtoi(flash_device.at(sub_parameter).strSN));
+        StrSql.Format(_T("Update BatchFlashResult Set FirmwareResult = 3 Where SN = %d "),_wtoi(flash_device.at(sub_parameter-1).strSN));
         //bado.OpenRecordset(StrSql);
 		SqliteDBBuilding.execDML((UTF8MBSTR)StrSql);
     }
@@ -1555,7 +1555,7 @@ LRESULT CFlash_Multy::MultyFlashMessage(WPARAM wParam,LPARAM lParam)
         m_flash_multy_list.SetItemTextColor(sub_parameter,-1,CONFIG_COLOR_CONFIG_FLASH_GOOD);
         //m_flash_multy_list.SetItemText(sub_parameter,FLASH_RESULTS,_T("Sucessful"));
         m_flash_multy_list.SetItemText(sub_parameter,FLASH_CONFIG_RESULTS,_T("Sucessful"));
-        StrSql.Format(_T("Update BatchFlashResult Set ConfigResult = 3 Where SN = %d "),_wtoi(flash_device.at(sub_parameter).strSN));
+        StrSql.Format(_T("Update BatchFlashResult Set ConfigResult = 3 Where SN = %d "),_wtoi(flash_device.at(sub_parameter-1).strSN));
         SqliteDBBuilding.execDML((UTF8MBSTR)StrSql);
     }
     break;

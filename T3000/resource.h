@@ -297,6 +297,8 @@
 #define IDI_ICON_INPUT_DEFAULT          673
 #define IDB_BITMAP_TOOLBAR_DISABLE      674
 #define IDD_DIALOG_BACNET_ADD_VIRTUAL_DEVICE 675
+#define IDD_DIALOG_FREE_COOLING         676
+#define IDD_DIALOG16                    679
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -525,11 +527,13 @@
 #define IDC_EDIT52                      1070
 #define IDC_EDIT59                      1070
 #define IDC_EDIT_AQ_HIGH                1070
+#define IDC_EDIT_NODEID                 1070
 #define IDC_TEMPINFO_EDIT               1071
 #define IDC_CHANGE_OVER_EDIT            1071
 #define IDC_SLIDER6                     1071
 #define IDC_HUM9                        1071
 #define IDC_EDIT54                      1071
+#define IDC_EDIT_FREID                  1071
 #define ID_VIEW_IOPANE_DLGBAR           1072
 #define IDC_NIGHTHEAT_EDIT2             1072
 #define IDC_EDIT_DAYHEAT                1072
@@ -2197,6 +2201,41 @@
 #define IDC_STATIC_AEC_ENCRYPT          2305
 #define IDC_EDIT_AES_ENCRYPT            2306
 #define IDC_CHECK_PASSWORD              2307
+#define IDC_TLABEL1                     2310
+#define IDC_TLABEL2                     2311
+#define IDC_TLABEL3                     2312
+#define IDC_TLABEL4                     2313
+#define IDC_TLABEL23                    2314
+#define IDC_TLABEL5                     2315
+#define IDC_TLABEL6                     2316
+#define IDC_TLABEL7                     2317
+#define IDC_TLABEL8                     2318
+#define IDC_TLABEL9                     2319
+#define IDC_TLABEL10                    2320
+#define IDC_TLABEL11                    2321
+#define IDC_TLABEL12                    2322
+#define IDC_TLABEL13                    2323
+#define IDC_TLABEL14                    2324
+#define IDC_TLABEL15                    2325
+#define IDC_TLABEL16                    2326
+#define IDC_TLABEL17                    2327
+#define IDC_TLABEL18                    2328
+#define IDC_TLABEL19                    2329
+#define IDC_TLABEL20                    2330
+#define IDC_TLABEL21                    2331
+#define IDC_TLABEL22                    2332
+#define IDC_TCHECKBOX1                  2333
+#define IDC_TCHECKBOX2                  2334
+#define IDC_TCHECKBOX3                  2335
+#define IDC_TCHECKBOX4                  2336
+#define IDC_TCHECKBOX5                  2337
+#define IDC_STATIC_CUS_RANGE_VALUE      2338
+#define IDC_STATIC_NETWORKID            2339
+#define IDC_STATIC_NETWORKID2           2340
+#define IDC_STATIC_NETWORKID3           2341
+#define IDC_EDIT_NETWORKID              2342
+#define IDC_EDIT_PIC_VERSION            2343
+#define IDC_STATIC_PIC_VERSION          2344
 #define IDC_BUTTON_MODEL11              3000
 #define IDC_BUTTON_MODEL1               3000
 #define IDC_BUTTON_MODEL12              3001
@@ -2214,8 +2253,6 @@
 #define IDC_SLIDERCONTROL1              3833
 #define IDC_SLIDERCONTROL2              3834
 #define IDC_SLIDERCONTROL3              3835
-
-
 #define IDC_EDIT_TIMEOUT_3              5715
 #define IDC_BUTTON_SYNC_TIME            5716
 #define IDC_STATIC_BAC_SETTING_SD_CARD  5817
@@ -2721,9 +2758,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        676
+#define _APS_NEXT_RESOURCE_VALUE        683
 #define _APS_NEXT_COMMAND_VALUE         34063
-#define _APS_NEXT_CONTROL_VALUE         2308
+#define _APS_NEXT_CONTROL_VALUE         2345
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

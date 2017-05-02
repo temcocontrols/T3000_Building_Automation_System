@@ -879,7 +879,8 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 				(temp_pid == PM_T34AO) ||
 				(temp_pid == PM_T322AI) ||
 				(temp_pid == PM_T38AI8AO6DO) ||
-				(temp_pid == PM_T36CT))
+				(temp_pid == PM_T36CT) ||
+				(temp_pid == PM_T36CTA))
 			{
 				//m_input_item_info.ShowWindow(true);
 				CString temp_name;
@@ -971,7 +972,8 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 				(temp_pid == PM_T34AO) ||
 				(temp_pid == PM_T322AI) ||
 				(temp_pid == PM_T38AI8AO6DO) ||
-				(temp_pid == PM_T36CT))
+				(temp_pid == PM_T36CT) ||
+				(temp_pid == PM_T36CTA))
 			{
 #if 0
 				m_input_item_info.ShowWindow(true);

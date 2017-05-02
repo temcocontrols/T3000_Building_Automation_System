@@ -72,6 +72,10 @@ public:
 BOOL	CheckTheSameSubnet(CString strIP);
 BOOL    ChangeNetDeviceIP(CString strIP,int row_flags);
 void FLEX_GRID_PUT_COLOR_STR(int row,int col,CString str);
+COLORREF exsit_ref;
+COLORREF new_ref;
+bool exsit_serial;
+void SetExsit(bool ref_exsit);
 void GetIPMaskGetWay(vector<ALL_LOCAL_SUBNET_NODE>  &Vector_Subnet);
 void GetIPMaskGetWay(CString &StrIP,CString &StrMask,CString &StrGetway);
 BOOL GetNewIP(CString &newIP);

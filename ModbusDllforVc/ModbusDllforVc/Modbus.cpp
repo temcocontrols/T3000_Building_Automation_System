@@ -1249,14 +1249,14 @@ CModbus::~CModbus()
 		//≥ı ºªØBitReg
 		for (int i = 0; i<8; i++)
 		{
-			BitReg.at(i) = false;
+			BitReg[i] = false;
 		}
 
 		for (int i = 0; i < 8; i++)
 		{
 			if (index * 8 + i < length)
 			{
-				BitReg.at(i) = to_write[index * 8 + i];
+				BitReg[i] = to_write[index * 8 + i];
 			}
 
 		}
