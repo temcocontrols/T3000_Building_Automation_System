@@ -113,7 +113,6 @@
     <Compile Include="BuildingOperation.cs" />
     <Compile Include="ChartCreation.cs" />
     <Compile Include="ChartFunctions.cs" />
-    <Compile Include="ChartOperation.cs" />
     <Compile Include="ChartStyle.cs" />
     <Compile Include="ChartStyle2D.cs" />
     <Compile Include="ColorMap.cs" />
@@ -143,6 +142,7 @@
     <Compile Include="Matrix3.cs" />
     <Compile Include="MeshGridClass.cs" />
     <Compile Include="NodeAndLineClass.cs" />
+    <Compile Include="ObjectCollection.cs" />
     <Compile Include="PHChartOperation.cs" />
     <Compile Include="platform-independent\AbstractState.cs" />
     <Compile Include="platform-independent\backends.cs" />

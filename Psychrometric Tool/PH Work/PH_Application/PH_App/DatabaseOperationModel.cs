@@ -367,11 +367,11 @@ namespace PH_App
             bool buildingPresent = false;
             //---Read data if the building name is present then only do updating else dont do that
             string sql1 = $"SELECT * From   { tableName } where BuildingName='{buildingNameToBeSelected}'";
-            using (SQLiteConnection thisConnection = new SQLiteConnection(connString1))
+            using (var thisConnection = new SQLiteConnection(connString1))
             {
-                SQLiteCommand cmd = new SQLiteCommand(sql1, thisConnection);
+                var cmd = new SQLiteCommand(sql1, thisConnection);
                 thisConnection.Open();
-                SQLiteDataReader reader = cmd.ExecuteReader();
+                var reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
                     buildingPresent = true;
@@ -384,12 +384,12 @@ namespace PH_App
             {
 
                 //--Unselecting all the buildings
-                using (SQLiteConnection thisConnection = new SQLiteConnection(connString1))
+                using (var thisConnection = new SQLiteConnection(connString1))
                 {
 
                     thisConnection.Open();
                     string sql_string = $"update  {tableName }  set selection=@sel";
-                    SQLiteCommand command = new SQLiteCommand(sql_string, thisConnection);
+                    var command = new SQLiteCommand(sql_string, thisConnection);
                     command.CommandType = CommandType.Text;
                     command.Parameters.AddWithValue("@sel", 0);
 
@@ -397,12 +397,12 @@ namespace PH_App
                 }//close of using
 
                 //--Now selecting the one building
-                using (SQLiteConnection thisConnection = new SQLiteConnection(connString1))
+                using (var thisConnection = new SQLiteConnection(connString1))
                 {
                     // SQLiteCommand cmd = new SQLiteCommand(sql1, thisConnection);
                     thisConnection.Open();
                     string sql_string = $"update  {tableName }  set selection=@sel where BuildingName=@build";
-                    SQLiteCommand command = new SQLiteCommand(sql_string, thisConnection);
+                    var command = new SQLiteCommand(sql_string, thisConnection);
                     command.CommandType = CommandType.Text;
                     command.Parameters.AddWithValue("@sel", 1);
                     command.Parameters.AddWithValue("@build", buildingNameToBeSelected);
@@ -840,63 +840,68 @@ namespace PH_App
                  8.tbl_[]_node_data_related_T300
                  9. tbl_[]_node_value
                  */
-                string tbl_comfortzoneSetting = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_chart_comfort_zone_setting  ( count INTEGER PRIMARY KEY AUTOINCREMENT,chartID varchar(255) ,comfort_zone_ID varchar(255),status varchar(255) )";
+                // string tbl_comfortzoneSetting = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_chart_comfort_zone_setting  ( count INTEGER PRIMARY KEY AUTOINCREMENT,chartID varchar(255) ,comfort_zone_ID varchar(255),status varchar(255) )";
                 string tbl_chart_detail = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_chart_detail(count INTEGER PRIMARY KEY AUTOINCREMENT ,chartID VARCHAR(255),chartName varchar(255),chart_respective_nodeID varchar(255),chart_respective_lineID varchar(255),enableChartStatus varchar(255))";
-                string tbl_comfort_zone_detail = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_comfort_zone_detail  ( count INTEGER PRIMARY KEY AUTOINCREMENT,id varchar(255) ,name varchar(255),min_temp varchar(255),max_temp varchar(255),min_hum varchar(255), max_hum  varchar(255) ,colorValue varchar(255)  )";
+                //string tbl_comfort_zone_detail = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_comfort_zone_detail  ( count INTEGER PRIMARY KEY AUTOINCREMENT,id varchar(255) ,name varchar(255),min_temp varchar(255),max_temp varchar(255),min_hum varchar(255), max_hum  varchar(255) ,colorValue varchar(255)  )";
                 string tbl_device_info_for_node = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_device_info_for_node  ( count INTEGER PRIMARY KEY AUTOINCREMENT,nodeID varchar(255) ,device_instanceID_for_param1 varchar(255),device_instanceID_for_param2 varchar(255),IP_for_param1 varchar(255),IP_for_param2 varchar(255),param1ID varchar(255),param2ID varchar(255), param1_info  varchar(255) ,param2_info varchar(255),param1_identifier_type varchar(255),param2_identifier_type varchar(255)  )";
                 string tbl_input_storage_form_T3000 = " CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_input_storage_from_T3000  ( count INTEGER PRIMARY KEY AUTOINCREMENT,PanelID varchar(255),InputIndex varchar(255),InputDescription varchar(255),InputAM varchar(255), InputValue  varchar(255) ,InputUnit varchar(255),InputRange varchar(255),InputCalibration varchar(255),InputFilter varchar(255),InputJumper varchar(255),InputLabel varchar(255)  )";
                 string tbl_line_value = " CREATE TABLE  IF NOT EXISTS tbl_" + buildingNameSelected + "_line_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_lineID varchar(255) ,lineID string,prevNodeID varchar(255),nextNodeID varchar(255),lineColorValue varchar(255),lineSeriesID varchar(255),thickness varchar(255),name varchar(255), status INTEGER)";
-                string tbl_mix_node_info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_mix_node_info  ( count INTEGER PRIMARY KEY AUTOINCREMENT,nodeID varchar(255),chartID varchar(255),previousNodeID varchar(255),nextNodeID varchar(255) )";
+                //string tbl_mix_node_info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_mix_node_info  ( count INTEGER PRIMARY KEY AUTOINCREMENT,nodeID varchar(255),chartID varchar(255),previousNodeID varchar(255),nextNodeID varchar(255) )";
                 string tbl_node_data_related_T3000 = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_data_related_T3000  (count INTEGER PRIMARY KEY AUTOINCREMENT, nodeID varchar(255), param1_panelID varchar(255), param1_inputIndex varchar(255), param2_panelID varchar(255), param2_inputIndex varchar(255)) ";
                 string tbl_node_value = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),name varchar(255),temperature_source varchar(255),humidity_source varchar(255),colorValue varchar(255),nodeSize varchar(255),airFlow varchar(225),lastUpdatedDate varchar(255))";
-                string tbl_TemperatureHumiditySourceInfo = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_TemperatureHumiditySourceInfo(count INTEGER PRIMARY KEY AUTOINCREMENT,NodeID varchar(255), chartID varchar(255) ,TemperatureSourceInfo VARCHAR(255),HumiditySourceInfo varchar(255))";
-                string tbl_Weather_Controller_Restor_Info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Weather_Controller_Restor_Info(count INTEGER PRIMARY KEY AUTOINCREMENT,BuildingName varchar(255), ControllerNameInfo varchar(255) ,TemperatureParameterInfo VARCHAR(255),HumidityParameterInfo varchar(255),TempValue varchar(255),HumValue varchar(255))";
-                string tbl_Weather_Web_Restor_Info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Weather_Web_Restor_Info(count INTEGER PRIMARY KEY AUTOINCREMENT,BuildingName varchar(255),Enable_dissable_info varchar(255), StationInfo varchar(255))";
-                string tbl_Weather_HumSelfCalibration_Restor_Info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Weather_HumSelfCalibration_Restor_Info(count INTEGER PRIMARY KEY AUTOINCREMENT,BuildingName varchar(255),Enable_dissable_info varchar(255), max_adjustment_per_day varchar(255))";
+
+
+                //string tbl_TemperatureHumiditySourceInfo = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_TemperatureHumiditySourceInfo(count INTEGER PRIMARY KEY AUTOINCREMENT,NodeID varchar(255), chartID varchar(255) ,TemperatureSourceInfo VARCHAR(255),HumiditySourceInfo varchar(255))";
+                //string tbl_Weather_Controller_Restor_Info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Weather_Controller_Restor_Info(count INTEGER PRIMARY KEY AUTOINCREMENT,BuildingName varchar(255), ControllerNameInfo varchar(255) ,TemperatureParameterInfo VARCHAR(255),HumidityParameterInfo varchar(255),TempValue varchar(255),HumValue varchar(255))";
+                //string tbl_Weather_Web_Restor_Info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Weather_Web_Restor_Info(count INTEGER PRIMARY KEY AUTOINCREMENT,BuildingName varchar(255),Enable_dissable_info varchar(255), StationInfo varchar(255))";
+                //string tbl_Weather_HumSelfCalibration_Restor_Info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Weather_HumSelfCalibration_Restor_Info(count INTEGER PRIMARY KEY AUTOINCREMENT,BuildingName varchar(255),Enable_dissable_info varchar(255), max_adjustment_per_day varchar(255))";
+                //string tbl_database_version = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Database_Version(count INTEGER PRIMARY KEY AUTOINCREMENT,version varchar(255))";
                 string tbl_database_version = "CREATE TABLE IF NOT EXISTS tbl_Database_Version(count INTEGER PRIMARY KEY AUTOINCREMENT,version varchar(255))";
 
+                //MessageBox.Show("Creating tables from update section");
+
                 //now execute the query
-                SQLiteCommand cm1 = new SQLiteCommand(tbl_comfortzoneSetting, m_dbConnection);
-                cm1.ExecuteNonQuery();
+                //SQLiteCommand cm101 = new SQLiteCommand(tbl_comfortzoneSetting, m_dbConnection);
+                //cm101.ExecuteNonQuery();
 
-                SQLiteCommand cm2 = new SQLiteCommand(tbl_chart_detail, m_dbConnection);
-                cm2.ExecuteNonQuery();
+                SQLiteCommand cm201 = new SQLiteCommand(tbl_chart_detail, m_dbConnection);
+                cm201.ExecuteNonQuery();
 
-                SQLiteCommand cm3 = new SQLiteCommand(tbl_comfort_zone_detail, m_dbConnection);
-                cm3.ExecuteNonQuery();
+                //SQLiteCommand cm301 = new SQLiteCommand(tbl_comfort_zone_detail, m_dbConnection);
+                //cm301.ExecuteNonQuery();
 
-                SQLiteCommand cm4 = new SQLiteCommand(tbl_device_info_for_node, m_dbConnection);
-                cm4.ExecuteNonQuery();
+                SQLiteCommand cm401 = new SQLiteCommand(tbl_device_info_for_node, m_dbConnection);
+                cm401.ExecuteNonQuery();
 
-                SQLiteCommand cm5 = new SQLiteCommand(tbl_input_storage_form_T3000, m_dbConnection);
-                cm5.ExecuteNonQuery();
+                SQLiteCommand cm501 = new SQLiteCommand(tbl_input_storage_form_T3000, m_dbConnection);
+                cm501.ExecuteNonQuery();
 
-                SQLiteCommand cm6 = new SQLiteCommand(tbl_line_value, m_dbConnection);
-                cm6.ExecuteNonQuery();
+                SQLiteCommand cm601 = new SQLiteCommand(tbl_line_value, m_dbConnection);
+                cm601.ExecuteNonQuery();
 
-                SQLiteCommand cm7 = new SQLiteCommand(tbl_mix_node_info, m_dbConnection);
-                cm7.ExecuteNonQuery();
+                //SQLiteCommand cm701 = new SQLiteCommand(tbl_mix_node_info, m_dbConnection);
+                //cm701.ExecuteNonQuery();
 
-                SQLiteCommand cm8 = new SQLiteCommand(tbl_node_data_related_T3000, m_dbConnection);
-                cm8.ExecuteNonQuery();
+                SQLiteCommand cm801 = new SQLiteCommand(tbl_node_data_related_T3000, m_dbConnection);
+                cm801.ExecuteNonQuery();
 
-                SQLiteCommand cm9 = new SQLiteCommand(tbl_node_value, m_dbConnection);
-                cm9.ExecuteNonQuery();
+                SQLiteCommand cm901 = new SQLiteCommand(tbl_node_value, m_dbConnection);
+                cm901.ExecuteNonQuery();
 
-                SQLiteCommand cm10 = new SQLiteCommand(tbl_TemperatureHumiditySourceInfo, m_dbConnection);
-                cm10.ExecuteNonQuery();
+                //SQLiteCommand cm1001 = new SQLiteCommand(tbl_TemperatureHumiditySourceInfo, m_dbConnection);
+                //cm1001.ExecuteNonQuery();
 
-                SQLiteCommand cm11 = new SQLiteCommand(tbl_Weather_Controller_Restor_Info, m_dbConnection);
-                cm11.ExecuteNonQuery();
+                //SQLiteCommand cm1101 = new SQLiteCommand(tbl_Weather_Controller_Restor_Info, m_dbConnection);
+                //cm1101.ExecuteNonQuery();
 
-                SQLiteCommand cm12 = new SQLiteCommand(tbl_Weather_Web_Restor_Info, m_dbConnection);
-                cm12.ExecuteNonQuery();
+                //SQLiteCommand cm1201 = new SQLiteCommand(tbl_Weather_Web_Restor_Info, m_dbConnection);
+                //cm1201.ExecuteNonQuery();
 
-                SQLiteCommand cm13 = new SQLiteCommand(tbl_Weather_HumSelfCalibration_Restor_Info, m_dbConnection);
-                cm13.ExecuteNonQuery();
+                //SQLiteCommand cm1301 = new SQLiteCommand(tbl_Weather_HumSelfCalibration_Restor_Info, m_dbConnection);
+                //cm1301.ExecuteNonQuery();
 
-                SQLiteCommand cm14 = new SQLiteCommand(tbl_database_version, m_dbConnection);
-                cm14.ExecuteNonQuery();
+                SQLiteCommand cm1401 = new SQLiteCommand(tbl_database_version, m_dbConnection);
+                cm1401.ExecuteNonQuery();
 
                 /*
                 Now lets read the data form alex database and store it in the our db_psychometric_project.s3db databse                  
@@ -907,9 +912,9 @@ namespace PH_App
                 string defaultBuildingSQL = "Select * from tbl_building_location where BuildingName = 'Default_Building'";
 
                 bool buildingPresent = false;
-                SQLiteCommand cmd = new SQLiteCommand(defaultBuildingSQL, m_dbConnection);
+                var cmd = new SQLiteCommand(defaultBuildingSQL, m_dbConnection);
 
-                SQLiteDataReader reader = cmd.ExecuteReader();
+                var reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
                     buildingPresent = true;
@@ -919,7 +924,7 @@ namespace PH_App
                 {
                     //--Default buildig setting not present so insert the default building setting
                     string sqlStringDefaultBuilding = "insert into tbl_building_location ( selection ,country ,state,city ,street,longitude,latitude ,elevation ,BuildingName ,EngineeringUnits  ) VALUES( @sel ,@con,@state ,@city,@stre , @lng  ,@lat,@elev ,@bname ,@engUnit  )";
-                    SQLiteCommand commandDefaultBuilding = new SQLiteCommand(sqlStringDefaultBuilding, m_dbConnection);
+                    var commandDefaultBuilding = new SQLiteCommand(sqlStringDefaultBuilding, m_dbConnection);
                     commandDefaultBuilding.CommandType = CommandType.Text;
                     commandDefaultBuilding.Parameters.AddWithValue("@sel", "0");
                     commandDefaultBuilding.Parameters.AddWithValue("@con", "china");
@@ -1467,7 +1472,7 @@ namespace PH_App
                 var command = new SQLiteCommand(sql, connection);
 
                 var reader = command.ExecuteReader();
-                MessageBox.Show("Reader field Count = " + reader.FieldCount+"\nsql="+sql+"\nconstring= "+connString);
+               // MessageBox.Show("Reader field Count = " + reader.FieldCount+"\nsql="+sql+"\nconstring= "+connString);
                 while (reader.Read())
                 {
                     //This is the reading part of the data...
@@ -1583,9 +1588,9 @@ namespace PH_App
                 string chartLineGroupID = chartDetailList[id].chart_respective_lineID;//This is for the line
 
                 string selectedChartID = chartDetailList[id].chartID;
-                var nc = new NodeAndLineClass();
+               // var nc = new NodeAndLineClass();
                 //--Reset the context menu stip first..
-                nc.listNodeInfoValues.Clear();
+                listNodeInfoValues.Clear();
                 //--Reset the context menu stip first..
                 listLineInfoValues.Clear();
                 //--Now lets clear the mix node list first and then refill agiain
@@ -1656,13 +1661,15 @@ namespace PH_App
                         count = 0;
                     }
                     //--Resetting the actual index value
-                    var bo = new BuildingOperation();
-                    bo.index = count; //Index is set to the count values of the node
+
+                    //--HereError
+                    //var bo = new BuildingOperation();
+                    index = count; //Index is set to the count values of the node
 
                     //--Now we can find the previous id values as follows:
                     //=====================================Finding previous id value=================================//
 
-                    bo.previousNodeIndexForLineInput = bo.IndexOfPreviousNodeForLineFunction(nc);
+                     previousNodeIndexForLineInput = IndexOfPreviousNodeForLineFunction();
                     //==================================End of previous id=======================================//
 
                     //--Adding data form the line node values...
@@ -1691,43 +1698,7 @@ namespace PH_App
                         });
 
                     }
-                    //count2 = menuStripNodeLineInfoValues.Count-1; //--This is used for udpdating the index values..
-
-                    //   MessageBox.Show("count line data in menuStripNodeLineInfoValues = " + menuStripNodeLineInfoValues.Count);
-
-
-                    //===============================Loading Mix NODE info===================================//
-
-
-                    //SQLiteDataReader readerMix = null;
-                    //string queryStringMix = "SELECT *  from " + tableMixNode + " WHERE chartID = @chartID";
-
-                    //SQLiteCommand commandMix = new SQLiteCommand(queryStringMix, connection);
-                    //commandMix.Parameters.AddWithValue("@chartID", selectedChartID);//This is the group id that is used to identify each node
-
-
-
-                    //// int count = 0;
-                    //readerMix = commandMix.ExecuteReader();
-                    //while (readerMix.Read())
-                    //{
-                    //    //editied for reading from alex db
-                    //    mixNodeInfoList.Add(new TempDataTypeForMixNode
-                    //    {
-                    //        chartID = readerMix["chartID"].ToString(),
-                    //        nodeID = readerMix["nodeID"].ToString(), //This is just changed code : bbk305
-                    //        previousNodeID = readerMix["previousNodeID"].ToString(),
-                    //        nextNodeID = readerMix["nextNodeID"].ToString(),
-
-
-                    //    });
-
-                    //}
-
-
-
-                    //=================================End of loading mix node============================//
-
+                
                    
                 }//close of using..
             }

@@ -261,6 +261,177 @@
   <data name="groupBox4ttt.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Bottom, Left</value>
   </data>
+  <data name="&gt;&gt;label5.Name" xml:space="preserve">
+    <value>label5</value>
+  </data>
+  <data name="&gt;&gt;label5.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label5.Parent" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;label5.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;label4.Name" xml:space="preserve">
+    <value>label4</value>
+  </data>
+  <data name="&gt;&gt;label4.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label4.Parent" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;label4.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;label3.Name" xml:space="preserve">
+    <value>label3</value>
+  </data>
+  <data name="&gt;&gt;label3.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label3.Parent" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;label3.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="&gt;&gt;labelline1.Name" xml:space="preserve">
+    <value>labelline1</value>
+  </data>
+  <data name="&gt;&gt;labelline1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;labelline1.Parent" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;labelline1.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="&gt;&gt;lb_DP.Name" xml:space="preserve">
+    <value>lb_DP</value>
+  </data>
+  <data name="&gt;&gt;lb_DP.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lb_DP.Parent" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;lb_DP.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="&gt;&gt;label25.Name" xml:space="preserve">
+    <value>label25</value>
+  </data>
+  <data name="&gt;&gt;label25.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label25.Parent" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;label25.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="&gt;&gt;lb_RH.Name" xml:space="preserve">
+    <value>lb_RH</value>
+  </data>
+  <data name="&gt;&gt;lb_RH.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lb_RH.Parent" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;lb_RH.ZOrder" xml:space="preserve">
+    <value>6</value>
+  </data>
+  <data name="&gt;&gt;label24.Name" xml:space="preserve">
+    <value>label24</value>
+  </data>
+  <data name="&gt;&gt;label24.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label24.Parent" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;label24.ZOrder" xml:space="preserve">
+    <value>7</value>
+  </data>
+  <data name="&gt;&gt;lb_humidity_ratio.Name" xml:space="preserve">
+    <value>lb_humidity_ratio</value>
+  </data>
+  <data name="&gt;&gt;lb_humidity_ratio.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lb_humidity_ratio.Parent" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;lb_humidity_ratio.ZOrder" xml:space="preserve">
+    <value>8</value>
+  </data>
+  <data name="&gt;&gt;label23.Name" xml:space="preserve">
+    <value>label23</value>
+  </data>
+  <data name="&gt;&gt;label23.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label23.Parent" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;label23.ZOrder" xml:space="preserve">
+    <value>9</value>
+  </data>
+  <data name="&gt;&gt;lb_dbt.Name" xml:space="preserve">
+    <value>lb_dbt</value>
+  </data>
+  <data name="&gt;&gt;lb_dbt.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lb_dbt.Parent" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;lb_dbt.ZOrder" xml:space="preserve">
+    <value>10</value>
+  </data>
+  <data name="&gt;&gt;label21.Name" xml:space="preserve">
+    <value>label21</value>
+  </data>
+  <data name="&gt;&gt;label21.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label21.Parent" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;label21.ZOrder" xml:space="preserve">
+    <value>11</value>
+  </data>
+  <data name="groupBox4ttt.Location" type="System.Drawing.Point, System.Drawing">
+    <value>9, 37</value>
+  </data>
+  <data name="groupBox4ttt.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>2, 3, 2, 3</value>
+  </data>
+  <data name="groupBox4ttt.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>2, 3, 2, 3</value>
+  </data>
+  <data name="groupBox4ttt.Size" type="System.Drawing.Size, System.Drawing">
+    <value>40, 603</value>
+  </data>
+  <data name="groupBox4ttt.TabIndex" type="System.Int32, mscorlib">
+    <value>50</value>
+  </data>
+  <data name="&gt;&gt;groupBox4ttt.Name" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;groupBox4ttt.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;groupBox4ttt.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;groupBox4ttt.ZOrder" xml:space="preserve">
+    <value>8</value>
+  </data>
   <data name="label5.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
@@ -645,35 +816,125 @@
   <data name="&gt;&gt;label21.ZOrder" xml:space="preserve">
     <value>11</value>
   </data>
-  <data name="groupBox4ttt.Location" type="System.Drawing.Point, System.Drawing">
-    <value>9, 37</value>
-  </data>
-  <data name="groupBox4ttt.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 3, 2, 3</value>
-  </data>
-  <data name="groupBox4ttt.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 3, 2, 3</value>
-  </data>
-  <data name="groupBox4ttt.Size" type="System.Drawing.Size, System.Drawing">
-    <value>40, 603</value>
-  </data>
-  <data name="groupBox4ttt.TabIndex" type="System.Int32, mscorlib">
-    <value>50</value>
-  </data>
-  <data name="&gt;&gt;groupBox4ttt.Name" xml:space="preserve">
-    <value>groupBox4ttt</value>
-  </data>
-  <data name="&gt;&gt;groupBox4ttt.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;groupBox4ttt.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;groupBox4ttt.ZOrder" xml:space="preserve">
-    <value>8</value>
-  </data>
   <data name="gb_showstatus.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Left</value>
+  </data>
+  <data name="&gt;&gt;lb_realtimeshow.Name" xml:space="preserve">
+    <value>lb_realtimeshow</value>
+  </data>
+  <data name="&gt;&gt;lb_realtimeshow.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lb_realtimeshow.Parent" xml:space="preserve">
+    <value>gb_showstatus</value>
+  </data>
+  <data name="&gt;&gt;lb_realtimeshow.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;lb_modeshow.Name" xml:space="preserve">
+    <value>lb_modeshow</value>
+  </data>
+  <data name="&gt;&gt;lb_modeshow.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lb_modeshow.Parent" xml:space="preserve">
+    <value>gb_showstatus</value>
+  </data>
+  <data name="&gt;&gt;lb_modeshow.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;lb_vertical_line2.Name" xml:space="preserve">
+    <value>lb_vertical_line2</value>
+  </data>
+  <data name="&gt;&gt;lb_vertical_line2.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lb_vertical_line2.Parent" xml:space="preserve">
+    <value>gb_showstatus</value>
+  </data>
+  <data name="&gt;&gt;lb_vertical_line2.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="&gt;&gt;lb_for_line_vertical1.Name" xml:space="preserve">
+    <value>lb_for_line_vertical1</value>
+  </data>
+  <data name="&gt;&gt;lb_for_line_vertical1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lb_for_line_vertical1.Parent" xml:space="preserve">
+    <value>gb_showstatus</value>
+  </data>
+  <data name="&gt;&gt;lb_for_line_vertical1.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="&gt;&gt;lb_numberOfHandler.Name" xml:space="preserve">
+    <value>lb_numberOfHandler</value>
+  </data>
+  <data name="&gt;&gt;lb_numberOfHandler.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lb_numberOfHandler.Parent" xml:space="preserve">
+    <value>gb_showstatus</value>
+  </data>
+  <data name="&gt;&gt;lb_numberOfHandler.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="&gt;&gt;lb_number_of_chart_label.Name" xml:space="preserve">
+    <value>lb_number_of_chart_label</value>
+  </data>
+  <data name="&gt;&gt;lb_number_of_chart_label.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lb_number_of_chart_label.Parent" xml:space="preserve">
+    <value>gb_showstatus</value>
+  </data>
+  <data name="&gt;&gt;lb_number_of_chart_label.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="&gt;&gt;lb_device_status.Name" xml:space="preserve">
+    <value>lb_device_status</value>
+  </data>
+  <data name="&gt;&gt;lb_device_status.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lb_device_status.Parent" xml:space="preserve">
+    <value>gb_showstatus</value>
+  </data>
+  <data name="&gt;&gt;lb_device_status.ZOrder" xml:space="preserve">
+    <value>6</value>
+  </data>
+  <data name="&gt;&gt;lb_devicestatusshow.Name" xml:space="preserve">
+    <value>lb_devicestatusshow</value>
+  </data>
+  <data name="&gt;&gt;lb_devicestatusshow.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lb_devicestatusshow.Parent" xml:space="preserve">
+    <value>gb_showstatus</value>
+  </data>
+  <data name="&gt;&gt;lb_devicestatusshow.ZOrder" xml:space="preserve">
+    <value>7</value>
+  </data>
+  <data name="gb_showstatus.Location" type="System.Drawing.Point, System.Drawing">
+    <value>51, 608</value>
+  </data>
+  <data name="gb_showstatus.Size" type="System.Drawing.Size, System.Drawing">
+    <value>1032, 32</value>
+  </data>
+  <data name="gb_showstatus.TabIndex" type="System.Int32, mscorlib">
+    <value>54</value>
+  </data>
+  <data name="&gt;&gt;gb_showstatus.Name" xml:space="preserve">
+    <value>gb_showstatus</value>
+  </data>
+  <data name="&gt;&gt;gb_showstatus.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;gb_showstatus.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;gb_showstatus.ZOrder" xml:space="preserve">
+    <value>4</value>
   </data>
   <data name="lb_realtimeshow.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -909,30 +1170,39 @@
   <data name="&gt;&gt;lb_devicestatusshow.ZOrder" xml:space="preserve">
     <value>7</value>
   </data>
-  <data name="gb_showstatus.Location" type="System.Drawing.Point, System.Drawing">
-    <value>51, 608</value>
-  </data>
-  <data name="gb_showstatus.Size" type="System.Drawing.Size, System.Drawing">
-    <value>1032, 32</value>
-  </data>
-  <data name="gb_showstatus.TabIndex" type="System.Int32, mscorlib">
-    <value>54</value>
-  </data>
-  <data name="&gt;&gt;gb_showstatus.Name" xml:space="preserve">
-    <value>gb_showstatus</value>
-  </data>
-  <data name="&gt;&gt;gb_showstatus.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;gb_showstatus.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;gb_showstatus.ZOrder" xml:space="preserve">
-    <value>4</value>
-  </data>
   <metadata name="menuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
+  <data name="menuStrip1.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="menuStrip1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>1095, 24</value>
+  </data>
+  <data name="menuStrip1.TabIndex" type="System.Int32, mscorlib">
+    <value>55</value>
+  </data>
+  <data name="menuStrip1.Text" xml:space="preserve">
+    <value>menuStrip1</value>
+  </data>
+  <data name="&gt;&gt;menuStrip1.Name" xml:space="preserve">
+    <value>menuStrip1</value>
+  </data>
+  <data name="&gt;&gt;menuStrip1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.MenuStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;menuStrip1.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;menuStrip1.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="fileToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>37, 20</value>
+  </data>
+  <data name="fileToolStripMenuItem.Text" xml:space="preserve">
+    <value>File</value>
+  </data>
   <data name="printToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>177, 22</value>
   </data>
@@ -963,11 +1233,11 @@
   <data name="exitToolStripMenuItem.Text" xml:space="preserve">
     <value>Exit</value>
   </data>
-  <data name="fileToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>37, 20</value>
+  <data name="optionToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>56, 20</value>
   </data>
-  <data name="fileToolStripMenuItem.Text" xml:space="preserve">
-    <value>File</value>
+  <data name="optionToolStripMenuItem.Text" xml:space="preserve">
+    <value>Option</value>
   </data>
   <data name="simulationMode.Size" type="System.Drawing.Size, System.Drawing">
     <value>147, 22</value>
@@ -1008,47 +1278,17 @@
   <data name="excelExportToolStripMenuItem.Text" xml:space="preserve">
     <value>Excel Export</value>
   </data>
-  <data name="optionToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>56, 20</value>
-  </data>
-  <data name="optionToolStripMenuItem.Text" xml:space="preserve">
-    <value>Option</value>
-  </data>
-  <data name="helpPsychometricChartToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>120, 22</value>
-  </data>
-  <data name="helpPsychometricChartToolStripMenuItem.Text" xml:space="preserve">
-    <value>PH chart</value>
-  </data>
   <data name="helpToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>44, 20</value>
   </data>
   <data name="helpToolStripMenuItem.Text" xml:space="preserve">
     <value>Help</value>
   </data>
-  <data name="menuStrip1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
+  <data name="helpPsychometricChartToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>120, 22</value>
   </data>
-  <data name="menuStrip1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>1095, 24</value>
-  </data>
-  <data name="menuStrip1.TabIndex" type="System.Int32, mscorlib">
-    <value>55</value>
-  </data>
-  <data name="menuStrip1.Text" xml:space="preserve">
-    <value>menuStrip1</value>
-  </data>
-  <data name="&gt;&gt;menuStrip1.Name" xml:space="preserve">
-    <value>menuStrip1</value>
-  </data>
-  <data name="&gt;&gt;menuStrip1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.MenuStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;menuStrip1.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;menuStrip1.ZOrder" xml:space="preserve">
-    <value>3</value>
+  <data name="helpPsychometricChartToolStripMenuItem.Text" xml:space="preserve">
+    <value>PH chart</value>
   </data>
   <metadata name="CMSinsertNode.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>129, 21</value>
@@ -1058,18 +1298,6 @@
   </data>
   <data name="quickNodeInsertToolStripMenuItem.Text" xml:space="preserve">
     <value>Insert Node</value>
-  </data>
-  <data name="insertNodeToolStripMenuItem.Enabled" type="System.Boolean, mscorlib">
-    <value>False</value>
-  </data>
-  <data name="insertNodeToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>192, 22</value>
-  </data>
-  <data name="insertNodeToolStripMenuItem.Text" xml:space="preserve">
-    <value>Insert Node</value>
-  </data>
-  <data name="insertNodeToolStripMenuItem.Visible" type="System.Boolean, mscorlib">
-    <value>False</value>
   </data>
   <data name="disconnectLineToolStripMenuItem.Enabled" type="System.Boolean, mscorlib">
     <value>False</value>
@@ -1104,18 +1332,6 @@
   <data name="deleteNodeToolStripMenuItem.Text" xml:space="preserve">
     <value>Delete Node</value>
   </data>
-  <data name="nodeAToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>114, 22</value>
-  </data>
-  <data name="nodeAToolStripMenuItem.Text" xml:space="preserve">
-    <value>Node A</value>
-  </data>
-  <data name="nodeBToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>114, 22</value>
-  </data>
-  <data name="nodeBToolStripMenuItem.Text" xml:space="preserve">
-    <value>Node B</value>
-  </data>
   <data name="disconnectLineFromAToolStripMenuItem.Enabled" type="System.Boolean, mscorlib">
     <value>False</value>
   </data>
@@ -1133,6 +1349,18 @@
   </data>
   <data name="&gt;&gt;CMSinsertNode.Type" xml:space="preserve">
     <value>System.Windows.Forms.ContextMenuStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="nodeAToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>114, 22</value>
+  </data>
+  <data name="nodeAToolStripMenuItem.Text" xml:space="preserve">
+    <value>Node A</value>
+  </data>
+  <data name="nodeBToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>114, 22</value>
+  </data>
+  <data name="nodeBToolStripMenuItem.Text" xml:space="preserve">
+    <value>Node B</value>
   </data>
   <data name="lb_unit_chosen_display.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -1321,12 +1549,6 @@
     <value>quickNodeInsertToolStripMenuItem</value>
   </data>
   <data name="&gt;&gt;quickNodeInsertToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;insertNodeToolStripMenuItem.Name" xml:space="preserve">
-    <value>insertNodeToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;insertNodeToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;disconnectLineToolStripMenuItem.Name" xml:space="preserve">

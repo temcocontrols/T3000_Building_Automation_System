@@ -11,14 +11,14 @@ namespace PH_App
     /// <summary>
     /// this will perform all the operations related to initital database operations
     /// </summary>
-    class InitialDatabaseSetupController:DatabaseOperationModel
+    public class InitialDatabaseSetupController:DatabaseOperationModel
     {
-       
+
         //public int SelectedSettingsForUserOption { get; set; }
         public void CheckingAndUpdatingBuildingDataFromT3000ToPsychro(string buildingNameFromT3000, string buildingNameFromPsychro)
         {
-           // Form1_main f1 = new Form1_main();
-            var db_o = new DatabaseOperationModel();
+            // Form1_main f1 = new Form1_main();
+            // var db_o = new DatabaseOperationModel();
             List<SelectedBuildingDatatype> selectedBuildingInT300 = new List<SelectedBuildingDatatype>();
             //Just a check
             if (buildingNameFromT3000 == "" || buildingNameFromPsychro == "")
@@ -30,7 +30,7 @@ namespace PH_App
             if (buildingNameFromPsychro == buildingNameFromT3000)
             {
                 //--Matched then select this one
-                db_o.SelectBuildingInPsychro(buildingNameFromT3000);
+                SelectBuildingInPsychro(buildingNameFromT3000);
                 // MessageBox.Show($"Matched db selected  = { buildingNameFromPsychro}");
 
             }
@@ -42,19 +42,19 @@ namespace PH_App
                     // MessageBox.Show("Data present in psycho CheckDataPresentInPsychro is true");
 
                     //--Data present, only selection
-                    db_o.SelectBuildingInPsychro(buildingNameFromT3000);
+                    SelectBuildingInPsychro(buildingNameFromT3000);
 
                 }
                 else
                 {
                     //--False
-                    selectedBuildingInT300 = db_o.FindPathOfBuildingInT3000();  //f1.FindPathOfBuildingDBNewVersion();
+                    selectedBuildingInT300 = FindPathOfBuildingInT3000();  //f1.FindPathOfBuildingDBNewVersion();
                     if (selectedBuildingInT300[0].country != "" && selectedBuildingInT300[0].Building_Name != "")
                     {
                         //  MessageBox.Show("country and building name not empty f1.BuildingSelected[0].country !=  f1.BuildingSelected[0].Building_Name != is true");
 
-                        db_o.WriteT3000BuildingInfoToPsychoDB("1", selectedBuildingInT300[0].country, selectedBuildingInT300[0].state, selectedBuildingInT300[0].city, selectedBuildingInT300[0].street, selectedBuildingInT300[0].longitude, selectedBuildingInT300[0].latitude, selectedBuildingInT300[0].elevation, selectedBuildingInT300[0].Building_Name, selectedBuildingInT300[0].EngineeringUnits);
-                        db_o.SelectBuildingInPsychro(selectedBuildingInT300[0].Building_Name);
+                        WriteT3000BuildingInfoToPsychoDB("1", selectedBuildingInT300[0].country, selectedBuildingInT300[0].state, selectedBuildingInT300[0].city, selectedBuildingInT300[0].street, selectedBuildingInT300[0].longitude, selectedBuildingInT300[0].latitude, selectedBuildingInT300[0].elevation, selectedBuildingInT300[0].Building_Name, selectedBuildingInT300[0].EngineeringUnits);
+                        SelectBuildingInPsychro(selectedBuildingInT300[0].Building_Name);
                     }
                     else
                     {
@@ -64,7 +64,7 @@ namespace PH_App
                         {
                             //--Yes is click continue with the default settings.
                             string buildingName = "Default_Building";
-                            db_o.SelectBuildingInPsychro(buildingName);
+                            SelectBuildingInPsychro(buildingName);
                         }
                         else
                         {
@@ -107,10 +107,10 @@ namespace PH_App
         {
             //==Before any thign lets run this code because we need language values which is set by this =================//
             //Form1_main f1 = new Form1_main();
-           // var idb = new DatabaseOperationModel();
+            // var idb = new DatabaseOperationModel();
             //List<SelectedBuildingDatatype> buildingSelected = new List<SelectedBuildingDatatype>();
 
-             buildingSelected = FindPathOfBuildingInT3000();
+            buildingSelected = FindPathOfBuildingInT3000();
             string selectedBuildingFromT3000 = buildingSelected[0].Building_Name;//This stores the building name selected in alex part
 
             //string databasePath1 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -125,13 +125,13 @@ namespace PH_App
 
                 //MessageBox.Show("File exist section");
 
-              sqlite_database_creation_For_UpdateCondition(selectedBuildingFromT3000, buildingSelected[0].country, buildingSelected[0].state, buildingSelected[0].city, buildingSelected[0].street, buildingSelected[0].longitude, buildingSelected[0].latitude, buildingSelected[0].elevation, buildingSelected[0].EngineeringUnits);
+                sqlite_database_creation_For_UpdateCondition(selectedBuildingFromT3000, buildingSelected[0].country, buildingSelected[0].state, buildingSelected[0].city, buildingSelected[0].street, buildingSelected[0].longitude, buildingSelected[0].latitude, buildingSelected[0].elevation, buildingSelected[0].EngineeringUnits);
                 //MessageBox.Show("finish of sqlite_database_creation_For_UpdateCondition ");
 
                 //--This one is for checking if the data is present or not if not presnet then create
                 ReadDataForBuildingSelectedFromPsychrometric(); //--We find selected building in Psychro metric database
 
-               // BuildingIdentificationClass bic = new BuildingIdentificationClass();
+                // BuildingIdentificationClass bic = new BuildingIdentificationClass();
                 if (selectedBuildingList[0].BuildingName != "")
                 {
                     CheckingAndUpdatingBuildingDataFromT3000ToPsychro(selectedBuildingFromT3000, selectedBuildingList[0].BuildingName);
@@ -197,7 +197,7 @@ namespace PH_App
             }
         }
 
-        public void sqlite_database_creation_For_UpdateCondition(string buildingNameSelected, string country, string state, string city, string street, string longitude, string latitude, string elevation,  string EngineeringUnits)
+        public void sqlite_database_creation_For_UpdateCondition(string buildingNameSelected, string country, string state, string city, string street, string longitude, string latitude, string elevation, string EngineeringUnits)
         {
 
             //--lets do try catch
@@ -205,7 +205,7 @@ namespace PH_App
             //{
             //var idb = new DatabaseOperationModel();
             string tableName = "tbl_Database_Version";//"tbl_" + buildingNameSelected + "_Database_Version";
-           string versionValue=ReadVersionInfo(tableName);//Calling the function 
+            string versionValue = ReadVersionInfo(tableName);//Calling the function 
             if (versionValue != "")
             {
                 DateTime dt = DateTime.Parse(versionValue);
@@ -215,7 +215,7 @@ namespace PH_App
                     //--Operations are required
                     CreateRequiredTable(buildingNameSelected);//Those table which are not present are only created
 
-                    ReadDataPresentOrNotThenInsertBuildingValue(  country,  state,  city,  street,  longitude,  latitude,  elevation, buildingNameSelected, EngineeringUnits);
+                    ReadDataPresentOrNotThenInsertBuildingValue(country, state, city, street, longitude, latitude, elevation, buildingNameSelected, EngineeringUnits);
                     //After changes lets update the version info
                     UpdateVersionInfoAfterUpdating(AssemblyDateGeneration.Value.ToShortDateString());
                 }

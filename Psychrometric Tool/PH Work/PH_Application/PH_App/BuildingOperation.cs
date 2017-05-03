@@ -12,7 +12,7 @@ using System.Reflection;
 
 namespace PH_App
 {
-   public class  BuildingOperation : DatabaseOperationModel
+   public class  BuildingOperation : MainController
     {
         
         int flagResistingForDGVChangeSelection = 0;//disENABLE;
@@ -26,9 +26,11 @@ namespace PH_App
         int indexRun = 0;
         int FlagForStopingRunningProcessInstantly = 0;//Currently OFF
         int flagForInsertOrUpdateDataToDB = 0;
-        public int index = 0;
-        public int previousNodeIndexForLineInput = 0;
-        
+
+        public Form_Main_PH_Application frm1;//This one is for backgroundworker 
+
+
+
         int incrementIndex = 0;
         public int indexForWhichChartIsSelected = 0;//--This index value stores the index value in a list of which chart is selected
         public int indexOfChartSelected = 0;
@@ -165,8 +167,8 @@ namespace PH_App
 
                             //LETS FILL THE DATA
                             // fillDataGridView();
-                            MainController mc = new MainController();
-                            mc.DataGridView_Show_Data(f);//This will do both pulling data and filing the data...
+                           // MainController mc = new MainController();
+                            DataGridView_Show_Data(f);//This will do both pulling data and filing the data...
 
                             f.dataGridView1.Rows.Add();
                             f.dataGridView1.CurrentCell.Selected = false;
@@ -355,6 +357,8 @@ namespace PH_App
                             //if match found load
                             //data_load();
                             //lb_title_display.Text = "";//--Historical plot needs to be cleared
+                            frm1 = f;//Copying the object for further use
+
                             indexRun = 0;//For inserting nodeName and lineName like node1,line1 etc
                             chart1.Enabled = true;
 
@@ -385,8 +389,8 @@ namespace PH_App
 
                             flagForInsertOrUpdateDataToDB = 1;
                             //--This is also completed..
-                            var ch = new ChartOperation();
-                            ch.ReDrawingLineAndNode();  //Done checking bbk modif: changing to alex db 
+                            //var ch = new ChartOperation();
+                             ReDrawingLineAndNode();  //Done checking bbk modif: changing to alex db 
 
 
                             flagSinglCellClick = 1;
@@ -448,6 +452,7 @@ namespace PH_App
                     //If the chart is in online mode then only do updating task
                     //--***********************Uncomment later********************//
                     InitTimerForDevice();
+                   
                     //--*************************end*****************************//
                 }
                 else
@@ -523,7 +528,8 @@ namespace PH_App
             atimer.Interval = 1000 * 5; //x seconds[ 1000 ms * x  =  x seconds]
 
         }
-        
+
+        //public void timer1_Tick_For_Device(object sender, EventArgs e)
         public void timer1_Tick_For_Device(object sender, EventArgs e)
         {
 
@@ -531,15 +537,15 @@ namespace PH_App
             {
                 if (FlagForCntdBG_Update == 0)
                 {
-                      return;
+                    return;
                 }
                 else
                 {
-                    var f = new Form_Main_PH_Application(this);
-                    if (!f.backgroundWorker1.IsBusy)
+                    //var f = new Form_Main_PH_Application();
+                    if (!frm1.backgroundWorker1.IsBusy)
                     {
-                     
-                        f.backgroundWorker1.RunWorkerAsync();//--Running the worker async
+
+                        frm1.backgroundWorker1.RunWorkerAsync();//--Running the worker async
 
                     }
                 }
@@ -559,51 +565,17 @@ namespace PH_App
             chart1.Invalidate();
             //plot_new_graph(); //--This one needs to be reinvented
 
-            NodeAndLineClass nc = new NodeAndLineClass();
+           // NodeAndLineClass nc = new NodeAndLineClass();
             //--Reseting the menustrip values for new plotting....
-           nc.listLineInfoValues.Clear();
-           nc.listNodeInfoValues.Clear();
+           listLineInfoValues.Clear();
+            listNodeInfoValues.Clear();
             index = 0;  //This is resetting the index values
             incrementIndex = 0;
            // ReloadComfortZoneForBackGroundWorker();
            
         }
 
-        public int IndexOfPreviousNodeForLineFunction(NodeAndLineClass nc)
-        {
-            //int indCountForPrevIdOfLine = 0;
-            string idValue = "";
-            int indexX = 0;
-            for (int i = 0; i < nc.listNodeInfoValues.Count; i++)
-            {
-                //--Now we need to count the valus
-                if (nc.listNodeInfoValues[i].temperature_source == "Mix")
-                {
-                    //Do not count 
-                }
-                else
-                {
-                    //Its not mix node so count every other nodes
-                    //indCountForPrevIdOfLine++;
-                    idValue = nc.listNodeInfoValues[i].ID;
-                }
-            }
-            //--Now lets identify the node value
-            for (int i = 0; i < nc.listNodeInfoValues.Count; i++)
-
-            {
-                /*
-               indCountForPrevIdOfLine-1 this -1 is done because 
-                          indCountForPrevIdOfLine 1 means index is 0 
-               */
-                if (idValue == nc.listNodeInfoValues[i].ID)
-                {
-                    indexX = i;
-                    break;
-                }
-            }
-            return indexX;
-        }
+       
         public void dataGridView1_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e, Form_Main_PH_Application f)
         {
             //MessageBox.Show("ok");

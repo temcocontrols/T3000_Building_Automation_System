@@ -5,7 +5,7 @@ using PH_App;
 
 namespace PH_App
 {
-    static class Program
+    static class Program 
     {
         /// <summary>
         /// The main entry point for the application.
@@ -22,12 +22,16 @@ namespace PH_App
       frmLang.Dispose() ;
       frmLang = null ;
 
-            var idb = new InitialDatabaseSetupController();
+            InitialDatabaseSetupController idb;//= new InitialDatabaseSetupController();
+
+            var fm = new Form_Main_PH_Application();
+           //fm.objectInitialization();
+            idb = fm.idsc;
 
             idb.InitialProcessingForDatabaseAndApp();
             //Application.Run(new Form1());
-            BuildingOperation b = new BuildingOperation();
-            Application.Run(new Form_Main_PH_Application(b));
+           // BuildingOperation b = fm.bo;//new BuildingOperation();
+            Application.Run(fm);// new Form_Main_PH_Application()
         }
     }
 }

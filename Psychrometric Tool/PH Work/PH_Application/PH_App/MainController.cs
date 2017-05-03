@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace PH_App
 {
-    class MainController :DatabaseOperationModel
+   public class MainController :DatabaseOperationModel
     {
        // public double AirPressureFromDB = 0;
         public double AirPressureFromDB { get; set; }
@@ -176,6 +176,8 @@ namespace PH_App
 
 
         }//--close fo filldatagridview
+
+
 
 
     }

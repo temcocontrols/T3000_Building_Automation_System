@@ -6,20 +6,40 @@ namespace PH_App
 {
     public partial class Form_Main_PH_Application : Form
     {
-          BuildingOperation bo;
-        public Form_Main_PH_Application(BuildingOperation b)
+
+        public MainController mc;
+        public InitialDatabaseSetupController idsc;
+        public DatabaseOperationModel dom;
+        public BuildingOperation bo;
+        public ObjectCollection ObjColl;
+        public Form_Main_PH_Application()
         {
             InitializeComponent();
-            bo = b;//new BuildingOperation();
-            bo.ReadDataForBuildingSelectedFromPsychrometric();
-            
+            //bo = new BuildingOperation();
+            ObjColl = new ObjectCollection();
+            //ObjColl.InitializeAllObjects();
+            mc = ObjColl.mc;
+            idsc = ObjColl.idsc;
+            dom = ObjColl.dom;
+            bo = ObjColl.bo;
+
+        }
+        public void objectInitialization()
+        {
+            ObjColl = new ObjectCollection();
+           // ObjColl.InitializeAllObjects();
+            mc = ObjColl.mc;
+            idsc = ObjColl.idsc;
+            dom = ObjColl.dom;
+            bo = ObjColl.bo;
         }
         Series seriesPoint = new Series("seriesNode1");
         
         private void Form_Main_PH_Application_Load(object sender, System.EventArgs e)
         {
             //--This is the main load application part
-            
+           // bo.ReadDataForBuildingSelectedFromPsychrometric();
+
 
         }
 
@@ -36,7 +56,7 @@ namespace PH_App
                 var mc = new PH_App.MainController();
                 mc.LoadForPH(fluidName,this);//--
                 phChart.Series.Add(seriesPoint);
-
+                bo.ReadDataForBuildingSelectedFromPsychrometric();
             }
             finally
             {
@@ -113,5 +133,10 @@ namespace PH_App
         {
             bo.DGVCellMouseClick(sender, e, this,this.CMSinsertNode);
         }
+
+        //private void insertNodeToolStripMenuItem_Click(object sender, EventArgs e)
+        //{
+
+        //}
     }
 }
