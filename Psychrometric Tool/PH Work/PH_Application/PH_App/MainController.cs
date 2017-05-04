@@ -32,7 +32,7 @@ namespace PH_App
 
             //--Plotting of the chart Here --------//
             string fluidNAME = fluidName;//"Water";//"1-Butene"; // "Water";//"n-Propane";//Acetone//Ammonia//Krypton//Nitrogen //Note for Air not working //Argon//CarbonDioxide// not working p-Xylene//R134a
-            ChartCreation ch = new ChartCreation();
+            ChartCreationAndOperations ch = new ChartCreationAndOperations();
             ch.PlotPHChart(fluidNAME, f.phChart);
 
             //--End of the plotting chart here-----//
@@ -87,7 +87,7 @@ namespace PH_App
                 AirPressureFromDB = 101325;//in terms of pa }
             }
         }
-        public string BuildingSelectionTableCreationReturnBuildingName(PH_App.Form_Main_PH_Application f)
+        public string BuildingSelectionTableCreationReturnBuildingName(Form_Main_PH_Application f)
         {
             CheckSelectedBuilding();
             string buildingNameValue = selectedBuildingList[0].BuildingName;
@@ -109,7 +109,7 @@ namespace PH_App
             string againNewPath = newPath + @"Database\Buildings\" + buildingNameValue + @"\" + buildingNameValue + ".db";  //psychopath+ database\Buildings\"BuildingName"\"BuildingName.db"           
             return againNewPath;
         }
-        public void BuildingConfigurationSetting(PH_App.Form_Main_PH_Application f)
+        public void BuildingConfigurationSetting(Form_Main_PH_Application f)
         {
             DataGridView_Show_Data(f);
             f.dataGridView1.Rows.Add();

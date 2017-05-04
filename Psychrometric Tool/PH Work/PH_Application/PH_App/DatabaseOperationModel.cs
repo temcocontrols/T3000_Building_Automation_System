@@ -140,7 +140,7 @@ namespace PH_App
                 string tbl_line_value = " CREATE TABLE  IF NOT EXISTS tbl_" + buildingNameSelected + "_line_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_lineID varchar(255) ,lineID string,prevNodeID varchar(255),nextNodeID varchar(255),lineColorValue varchar(255),lineSeriesID varchar(255),thickness varchar(255),name varchar(255), status INTEGER)";
                 //string tbl_mix_node_info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_mix_node_info  ( count INTEGER PRIMARY KEY AUTOINCREMENT,nodeID varchar(255),chartID varchar(255),previousNodeID varchar(255),nextNodeID varchar(255) )";
                 string tbl_node_data_related_T3000 = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_data_related_T3000  (count INTEGER PRIMARY KEY AUTOINCREMENT, nodeID varchar(255), param1_panelID varchar(255), param1_inputIndex varchar(255), param2_panelID varchar(255), param2_inputIndex varchar(255)) ";
-                string tbl_node_value = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),name varchar(255),temperature_source varchar(255),humidity_source varchar(255),colorValue varchar(255),nodeSize varchar(255),airFlow varchar(225),lastUpdatedDate varchar(255))";
+                string tbl_node_value = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),name varchar(255),temperature_source varchar(255),pressure_source varchar(255),colorValue varchar(255),nodeSize varchar(255),lastUpdatedDate varchar(255))";
 
 
                 //string tbl_TemperatureHumiditySourceInfo = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_TemperatureHumiditySourceInfo(count INTEGER PRIMARY KEY AUTOINCREMENT,NodeID varchar(255), chartID varchar(255) ,TemperatureSourceInfo VARCHAR(255),HumiditySourceInfo varchar(255))";
@@ -552,8 +552,8 @@ namespace PH_App
                 string tbl_line_value = " CREATE TABLE  IF NOT EXISTS tbl_" + buildingNameSelected + "_line_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_lineID varchar(255) ,lineID string,prevNodeID varchar(255),nextNodeID varchar(255),lineColorValue varchar(255),lineSeriesID varchar(255),thickness varchar(255),name varchar(255), status INTEGER)";
                 //string tbl_mix_node_info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_mix_node_info  ( count INTEGER PRIMARY KEY AUTOINCREMENT,nodeID varchar(255),chartID varchar(255),previousNodeID varchar(255),nextNodeID varchar(255) )";
                 string tbl_node_data_related_T3000 = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_data_related_T3000  (count INTEGER PRIMARY KEY AUTOINCREMENT, nodeID varchar(255), param1_panelID varchar(255), param1_inputIndex varchar(255), param2_panelID varchar(255), param2_inputIndex varchar(255)) ";
-                string tbl_node_value = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),name varchar(255),temperature_source varchar(255),humidity_source varchar(255),colorValue varchar(255),nodeSize varchar(255),airFlow varchar(225),lastUpdatedDate varchar(255))";
-
+                //string tbl_node_value = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),name varchar(255),temperature_source varchar(255),humidity_source varchar(255),colorValue varchar(255),nodeSize varchar(255),airFlow varchar(225),lastUpdatedDate varchar(255))";
+                string tbl_node_value = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),name varchar(255),temperature_source varchar(255),pressure_source varchar(255),colorValue varchar(255),nodeSize varchar(255),lastUpdatedDate varchar(255))";
 
                 //string tbl_TemperatureHumiditySourceInfo = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_TemperatureHumiditySourceInfo(count INTEGER PRIMARY KEY AUTOINCREMENT,NodeID varchar(255), chartID varchar(255) ,TemperatureSourceInfo VARCHAR(255),HumiditySourceInfo varchar(255))";
                 //string tbl_Weather_Controller_Restor_Info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Weather_Controller_Restor_Info(count INTEGER PRIMARY KEY AUTOINCREMENT,BuildingName varchar(255), ControllerNameInfo varchar(255) ,TemperatureParameterInfo VARCHAR(255),HumidityParameterInfo varchar(255),TempValue varchar(255),HumValue varchar(255))";
@@ -848,8 +848,8 @@ namespace PH_App
                 string tbl_line_value = " CREATE TABLE  IF NOT EXISTS tbl_" + buildingNameSelected + "_line_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_lineID varchar(255) ,lineID string,prevNodeID varchar(255),nextNodeID varchar(255),lineColorValue varchar(255),lineSeriesID varchar(255),thickness varchar(255),name varchar(255), status INTEGER)";
                 //string tbl_mix_node_info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_mix_node_info  ( count INTEGER PRIMARY KEY AUTOINCREMENT,nodeID varchar(255),chartID varchar(255),previousNodeID varchar(255),nextNodeID varchar(255) )";
                 string tbl_node_data_related_T3000 = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_data_related_T3000  (count INTEGER PRIMARY KEY AUTOINCREMENT, nodeID varchar(255), param1_panelID varchar(255), param1_inputIndex varchar(255), param2_panelID varchar(255), param2_inputIndex varchar(255)) ";
-                string tbl_node_value = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),name varchar(255),temperature_source varchar(255),humidity_source varchar(255),colorValue varchar(255),nodeSize varchar(255),airFlow varchar(225),lastUpdatedDate varchar(255))";
-
+                // string tbl_node_value = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),name varchar(255),temperature_source varchar(255),humidity_source varchar(255),colorValue varchar(255),nodeSize varchar(255),airFlow varchar(225),lastUpdatedDate varchar(255))";
+                string tbl_node_value = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),name varchar(255),temperature_source varchar(255),pressure_source varchar(255),colorValue varchar(255),nodeSize varchar(255),lastUpdatedDate varchar(255))";
 
                 //string tbl_TemperatureHumiditySourceInfo = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_TemperatureHumiditySourceInfo(count INTEGER PRIMARY KEY AUTOINCREMENT,NodeID varchar(255), chartID varchar(255) ,TemperatureSourceInfo VARCHAR(255),HumiditySourceInfo varchar(255))";
                 //string tbl_Weather_Controller_Restor_Info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Weather_Controller_Restor_Info(count INTEGER PRIMARY KEY AUTOINCREMENT,BuildingName varchar(255), ControllerNameInfo varchar(255) ,TemperatureParameterInfo VARCHAR(255),HumidityParameterInfo varchar(255),TempValue varchar(255),HumValue varchar(255))";
@@ -1708,6 +1708,79 @@ namespace PH_App
             }
 
         }
+
+        public void InsertNodeInfoToDBWithoutDeviceInfo(string buildingName, string chart_respective_nodeID, string id, double xVal, double yVal, string temperature_source, string pressure_source, string name, Color colorValue, int nodeSizeValue)
+        {
+            //This is the name of the table that stores the node information...
+            if (buildingName == "")
+            {
+                return;
+            }
+
+            //string tableName = "tbl_" + selectedBuildingList[0].BuildingName + "_node_value";//currentNodeTableFromDB;  
+            string tableName = "tbl_" + buildingName + "_node_value";//currentNodeTableFromDB;  
+                                                                     //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                                                                     //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
+
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                string sql_string = "insert into " + tableName + "(chart_respective_nodeID,nodeID,xValue,yValue,temperature_source,pressure_source,name,colorValue,nodeSize,lastUpdatedDate) VALUES(@chartid,@id,@xVal,@yVal,@temperature_source,@humidity_source,@name,@colorVal,@node_size_value,@lastUpdateDate)";
+                SQLiteCommand command = new SQLiteCommand(sql_string, connection);
+                command.CommandType = CommandType.Text;
+                command.Parameters.AddWithValue("@chartid", chart_respective_nodeID);
+                command.Parameters.AddWithValue("@id", id);
+                command.Parameters.AddWithValue("@xVal", xVal.ToString());
+                command.Parameters.AddWithValue("@yVal", yVal.ToString());
+                command.Parameters.AddWithValue("@temperature_source", temperature_source);
+                command.Parameters.AddWithValue("@humidity_source", pressure_source);
+                command.Parameters.AddWithValue("@name", name);
+                command.Parameters.AddWithValue("@colorVal", ColorTranslator.ToHtml(colorValue));
+                command.Parameters.AddWithValue("@node_size_value", nodeSizeValue);
+                //command.Parameters.AddWithValue("@airFlow", airFlow);
+                command.Parameters.AddWithValue("@lastUpdateDate", DateTime.Now);//Lets store the date time in the node values
+
+                command.ExecuteNonQuery();
+            }
+
+        }//--close of insertnodeinfotodb fxn
+
+        public void InsertLineInfoToDB(string id, string prevNodeId, string nextNodeId, Color lineColor, string lineSeriesVal, int linethickness,string chart_respective_lineID, string lineName, int lineStatus_ON_OFF)
+        {
+            //--Note for series the series.name property will be stored in databse and later it will be converted.
+            string lineSeriesName = lineSeriesVal;
+            //string tableName = currentLineTableFromDB;
+            string tableName = "tbl_" + selectedBuildingList[0].BuildingName + "_line_value";   // currentLineTableFromDB;
+            //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
+
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                string sql_string = "insert into " + tableName + "(chart_respective_lineID,lineID,prevNodeId,nextNodeId,lineColorValue,lineSeriesId,thickness,name,status) VALUES(@chartid,@id,@pn,@nn,@lc,@ls,@thicknessValue,@nameVal,@statusVal)";
+                SQLiteCommand command = new SQLiteCommand(sql_string, connection);
+                command.CommandType = CommandType.Text;
+                command.Parameters.AddWithValue("@chartid", chart_respective_lineID);
+                command.Parameters.AddWithValue("@id", id);
+                command.Parameters.AddWithValue("@pn", prevNodeId);
+                command.Parameters.AddWithValue("@nn", nextNodeId);
+                command.Parameters.AddWithValue("@lc", ColorTranslator.ToHtml(lineColor));
+                command.Parameters.AddWithValue("@ls", lineSeriesName);
+                command.Parameters.AddWithValue("@thicknessValue", linethickness);
+                command.Parameters.AddWithValue("@nameVal", lineName);
+                command.Parameters.AddWithValue("@statusVal", lineStatus_ON_OFF.ToString());
+                command.ExecuteNonQuery();
+            }
+
+
+        }
+
 
 
     }

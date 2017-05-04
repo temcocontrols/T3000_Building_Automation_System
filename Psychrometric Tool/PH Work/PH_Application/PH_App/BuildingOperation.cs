@@ -1,18 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using PH_App;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
 
 namespace PH_App
 {
-   public class  BuildingOperation : MainController
+    public class  BuildingOperation : MainController
     {
         
         int flagResistingForDGVChangeSelection = 0;//disENABLE;
@@ -28,8 +23,6 @@ namespace PH_App
         int flagForInsertOrUpdateDataToDB = 0;
 
         public Form_Main_PH_Application frm1;//This one is for backgroundworker 
-
-
 
         int incrementIndex = 0;
         public int indexForWhichChartIsSelected = 0;//--This index value stores the index value in a list of which chart is selected
@@ -574,8 +567,6 @@ namespace PH_App
            // ReloadComfortZoneForBackGroundWorker();
            
         }
-
-       
         public void dataGridView1_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e, Form_Main_PH_Application f)
         {
             //MessageBox.Show("ok");

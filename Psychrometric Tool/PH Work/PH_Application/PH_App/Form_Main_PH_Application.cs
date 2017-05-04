@@ -68,16 +68,16 @@ namespace PH_App
         private void phChart_MouseDown(object sender, MouseEventArgs e)
         {
 
-            if (e.Button == MouseButtons.Right)//on right mouse button is clicked.
-            {
+            //if (e.Button == MouseButtons.Right)//on right mouse button is clicked.
+            //{
 
                
                
-                    //==This shows the contextmenustrip on right click
-                    CMSinsertNode.Enabled = true;
-                    CMSinsertNode.Show(MousePosition);//-- this mouse position is used to show the menustrip in mouse pointer
+            //        //==This shows the contextmenustrip on right click
+            //        CMSinsertNode.Enabled = true;
+            //        CMSinsertNode.Show(MousePosition);//-- this mouse position is used to show the menustrip in mouse pointer
                 
-            }
+            //}
 
         }
 
@@ -85,11 +85,6 @@ namespace PH_App
         {
             //--Now adding nodes 
 
-
-        }
-
-        private void phChart_Click(object sender, EventArgs e)
-        {
 
         }
 
@@ -132,6 +127,11 @@ namespace PH_App
         private void dataGridView1_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
             bo.DGVCellMouseClick(sender, e, this,this.CMSinsertNode);
+        }
+
+        private void editNodeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
 
         //private void insertNodeToolStripMenuItem_Click(object sender, EventArgs e)

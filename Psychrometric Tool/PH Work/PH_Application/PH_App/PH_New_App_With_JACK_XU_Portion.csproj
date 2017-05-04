@@ -110,13 +110,19 @@
   <ItemGroup>
     <Compile Include="AssemblyDateGeneration.cs" />
     <Compile Include="BarStyle.cs" />
-    <Compile Include="BuildingOperation.cs" />
-    <Compile Include="ChartCreation.cs" />
+    <Compile Include="BuildingOperation.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ChartCreationAndOperations.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="ChartFunctions.cs" />
     <Compile Include="ChartStyle.cs" />
     <Compile Include="ChartStyle2D.cs" />
     <Compile Include="ColorMap.cs" />
-    <Compile Include="DatabaseOperationModel.cs" />
+    <Compile Include="DatabaseOperationModel.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="DataSeries.cs" />
     <Compile Include="DrawChart.cs" />
     <Compile Include="Form1_jack_xu.cs">
@@ -132,16 +138,20 @@
       <DependentUpon>Form_Main_PH_Application.cs</DependentUpon>
     </Compile>
     <Compile Include="ILineOperation.cs" />
-    <Compile Include="InitialDatabaseSetupController.cs" />
+    <Compile Include="InitialDatabaseSetupController.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="INodeOperation.cs" />
-    <Compile Include="LineOperation.cs" />
-    <Compile Include="MainController.cs" />
-    <Compile Include="NodeOperation.cs" />
+    <Compile Include="MainController.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="LineStyle.cs" />
     <Compile Include="MathOperation.cs" />
     <Compile Include="Matrix3.cs" />
     <Compile Include="MeshGridClass.cs" />
-    <Compile Include="NodeAndLineClass.cs" />
+    <Compile Include="NodeAndLineClass.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="ObjectCollection.cs" />
     <Compile Include="PHChartOperation.cs" />
     <Compile Include="platform-independent\AbstractState.cs" />

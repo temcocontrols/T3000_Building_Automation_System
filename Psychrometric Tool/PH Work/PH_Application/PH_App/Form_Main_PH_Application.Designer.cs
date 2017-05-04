@@ -30,12 +30,12 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form_Main_PH_Application));
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea6 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend6 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
             this.phChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.lb_db_name = new System.Windows.Forms.Label();
             this.lb_buildingselectedShow = new System.Windows.Forms.Label();
@@ -104,19 +104,18 @@
             // phChart
             // 
             resources.ApplyResources(this.phChart, "phChart");
-            chartArea2.AxisX.Title = "Enthalpy h[KJ/kg]";
-            chartArea2.AxisY.Title = "Pressure P[MPa]";
-            chartArea2.Name = "ChartArea1";
-            this.phChart.ChartAreas.Add(chartArea2);
-            legend2.Enabled = false;
-            legend2.Name = "Legend1";
-            this.phChart.Legends.Add(legend2);
+            chartArea6.AxisX.Title = "Enthalpy h[KJ/kg]";
+            chartArea6.AxisY.Title = "Pressure P[MPa]";
+            chartArea6.Name = "ChartArea1";
+            this.phChart.ChartAreas.Add(chartArea6);
+            legend6.Enabled = false;
+            legend6.Name = "Legend1";
+            this.phChart.Legends.Add(legend6);
             this.phChart.Name = "phChart";
-            series2.ChartArea = "ChartArea1";
-            series2.Legend = "Legend1";
-            series2.Name = "Series1";
-            this.phChart.Series.Add(series2);
-            this.phChart.Click += new System.EventHandler(this.phChart_Click);
+            series6.ChartArea = "ChartArea1";
+            series6.Legend = "Legend1";
+            series6.Name = "Series1";
+            this.phChart.Series.Add(series6);
             this.phChart.MouseDown += new System.Windows.Forms.MouseEventHandler(this.phChart_MouseDown);
             // 
             // lb_db_name
@@ -133,14 +132,14 @@
             // 
             this.dataGridView1.AllowUserToAddRows = false;
             this.dataGridView1.BackgroundColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("Arial", 8.25F);
-            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.ControlDark;
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle16.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle16.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle16.Font = new System.Drawing.Font("Arial", 8.25F);
+            dataGridViewCellStyle16.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle16.SelectionBackColor = System.Drawing.SystemColors.ControlDark;
+            dataGridViewCellStyle16.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle16.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle16;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.id,
@@ -159,10 +158,10 @@
             // 
             // id
             // 
-            dataGridViewCellStyle5.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.Color.SteelBlue;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.Color.WhiteSmoke;
-            this.id.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle17.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle17.SelectionBackColor = System.Drawing.Color.SteelBlue;
+            dataGridViewCellStyle17.SelectionForeColor = System.Drawing.Color.WhiteSmoke;
+            this.id.DefaultCellStyle = dataGridViewCellStyle17;
             resources.ApplyResources(this.id, "id");
             this.id.Name = "id";
             this.id.ReadOnly = true;
@@ -170,9 +169,9 @@
             // 
             // name
             // 
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.Color.SteelBlue;
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.Color.White;
-            this.name.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle18.SelectionBackColor = System.Drawing.Color.SteelBlue;
+            dataGridViewCellStyle18.SelectionForeColor = System.Drawing.Color.White;
+            this.name.DefaultCellStyle = dataGridViewCellStyle18;
             resources.ApplyResources(this.name, "name");
             this.name.Name = "name";
             this.name.ReadOnly = true;
@@ -449,6 +448,7 @@
             // 
             this.editNodeToolStripMenuItem.Name = "editNodeToolStripMenuItem";
             resources.ApplyResources(this.editNodeToolStripMenuItem, "editNodeToolStripMenuItem");
+            this.editNodeToolStripMenuItem.Click += new System.EventHandler(this.editNodeToolStripMenuItem_Click);
             // 
             // deleteNodeToolStripMenuItem
             // 
@@ -531,13 +531,9 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label labelline1;
-        private System.Windows.Forms.Label lb_DP;
         private System.Windows.Forms.Label label25;
-        private System.Windows.Forms.Label lb_RH;
         private System.Windows.Forms.Label label24;
-        private System.Windows.Forms.Label lb_humidity_ratio;
         private System.Windows.Forms.Label label23;
-        private System.Windows.Forms.Label lb_dbt;
         private System.Windows.Forms.Label label21;
         private System.Windows.Forms.GroupBox gb_showstatus;
         private System.Windows.Forms.Label lb_modeshow;
@@ -561,15 +557,6 @@
         private System.Windows.Forms.ToolStripMenuItem excelExportToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpPsychometricChartToolStripMenuItem;
-        private System.Windows.Forms.ContextMenuStrip CMSinsertNode;
-        private System.Windows.Forms.ToolStripMenuItem quickNodeInsertToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem disconnectLineToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem clearChartToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem editNodeToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem deleteNodeToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem disconnectLineFromAToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem nodeAToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem nodeBToolStripMenuItem;
         public System.Windows.Forms.Label lb_db_name;
         public System.Windows.Forms.Label lb_unit_chosen_display;
         public System.Windows.Forms.Label lb_numberOfHandler;
@@ -577,5 +564,18 @@
         public System.Windows.Forms.Label lb_realtimeshow;
         public System.Windows.Forms.Label lb_device_status;
         public System.ComponentModel.BackgroundWorker backgroundWorker1;
+        public System.Windows.Forms.ToolStripMenuItem disconnectLineFromAToolStripMenuItem;
+        public System.Windows.Forms.ToolStripMenuItem nodeAToolStripMenuItem;
+        public System.Windows.Forms.ToolStripMenuItem nodeBToolStripMenuItem;
+        public System.Windows.Forms.ToolStripMenuItem quickNodeInsertToolStripMenuItem;
+        public System.Windows.Forms.ToolStripMenuItem disconnectLineToolStripMenuItem;
+        public System.Windows.Forms.ToolStripMenuItem clearChartToolStripMenuItem;
+        public System.Windows.Forms.ToolStripMenuItem editNodeToolStripMenuItem;
+        public System.Windows.Forms.ToolStripMenuItem deleteNodeToolStripMenuItem;
+        public System.Windows.Forms.ContextMenuStrip CMSinsertNode;
+        public System.Windows.Forms.Label lb_DP;
+        public System.Windows.Forms.Label lb_RH;
+        public System.Windows.Forms.Label lb_humidity_ratio;
+        public System.Windows.Forms.Label lb_dbt;
     }
 }

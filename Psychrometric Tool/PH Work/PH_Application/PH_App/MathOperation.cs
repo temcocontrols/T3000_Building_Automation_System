@@ -27,7 +27,6 @@ namespace PH_App
             return Enumerable.Range(0, count).Select(i => start * Math.Pow(p, i / d));
         }
 
-
         //==Lograthmically spacing of numbers
         public ArrayList logarithmicSpace(double start, double end, int count)
         {
@@ -44,9 +43,7 @@ namespace PH_App
             return ArrList;
         }
 
-
         //Another logrithmic fxn
-
         //Create logarithmically spaced vector
         public ArrayList logSpace(int start, int end, int count)
         {
@@ -61,7 +58,6 @@ namespace PH_App
 
             return ArrList;
         }
-
 
         //==Lograthmically spacing of numbers
         public ArrayList logSpaceMyFunction(double start, double end, int count)
@@ -92,9 +88,6 @@ namespace PH_App
             double n = (double)count, diff = (end - start) / (n - 1);
             return Enumerable.Range(0, count).Select(i => start + ((i) * diff));
         }
-
-
-
 
         //--This is used and it works
         //------------------------------------Log spacing in c# --------------------------------------------//

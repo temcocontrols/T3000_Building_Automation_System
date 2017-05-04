@@ -1,17 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 
 namespace PH_App
 {
-    public class NodeAndLineClass 
+    public class NodeAndLineClass :ChartCreationAndOperations
     {
         public int previousNodeIndexForLineInput = 0;
         public int index = 0;
+        int indexRun = 0;
+        int lineDefaultThickness = 3;
+        int nodeDefaultThickness = 15;
+        //--variable for storing the indexOfThePoints so that we can gather other properties..
+        public string indexOfPrevPointForLineMovement = "";
+        public string indexOfNextNodeForLineMovement = "";
+
+
         public class DataTypeForNode
         {
             public string ID { get; set; } //--for identifying which point is selected..
@@ -60,15 +66,12 @@ namespace PH_App
                     if (listNodeInfoValues.Count > 0)
                     {
                         //--This is for replotting all the things again...
-
-
                         if (chart1.InvokeRequired)
                         {
                             chart1.Invoke(new Action(() => series1.Points.Clear()));
                         }
                         else
                         {
-                            //lb_device_status.Text = "connected";
                             series1.Points.Clear();
                         }
 
@@ -79,7 +82,6 @@ namespace PH_App
                             listLineInfoValues[i].lineSeriesID.Points.Clear();
                         }
                         //--this is redraw functionality
-                        //foreach(var values in menuStripNodeInfoValues)
                         //--Resetting the index value
                         indexForSeriesNodePoint = 0;
                         for (int x = 0; x < listNodeInfoValues.Count; x++)
@@ -97,17 +99,12 @@ namespace PH_App
 
                         }
                         //--resetting incrementIndex
-                        //CODE:BBK305A  
-                        // incrementIndex = 0;
-
                         if (listLineInfoValues.Count > 0)
                         {
 
                             for (int x = 0; x < listLineInfoValues.Count; x++)
                             {
                                 //  incrementIndex++;
-
-
                                 //--tHIS IS REDEFINED code bbk305
                                 ReDrawLines(listLineInfoValues[x].ID, listLineInfoValues[x].prevNodeId, listLineInfoValues[x].nextNodeId, listLineInfoValues[x].lineSeriesID, listLineInfoValues[x].lineColorValue, listLineInfoValues[x].lineThickness, listLineInfoValues[x].name, listLineInfoValues[x].status);
 
@@ -181,7 +178,7 @@ namespace PH_App
             //  }//--Close of lock 
 
         } //Close of redraw point 
-        List<NodeAndLineClass.DataTypeForNode> temporaryNodeValueStoreForRedrawLine = new List<NodeAndLineClass.DataTypeForNode>();
+        List<DataTypeForNode> temporaryNodeValueStoreForRedrawLine = new List<DataTypeForNode>();
         //--Redraw line function
         public void ReDrawLines(string id, string prevNodeID, string nextNodeID, Series lineSeriesID, Color c, int thickness_value, string name, int status)
         {
@@ -193,14 +190,6 @@ namespace PH_App
             //   {
             temporaryNodeValueStoreForRedrawLine.Clear();//Clearing the values of the list
                                                          // MessageBox.Show("ReDrawLines FRIST LINE");
-
-
-            //double startHumidity1 = 0;
-            //double startEnthalpy1 = 0;
-            //double endHumidity1 = 0;//--this is for the start and end humidity print in the tooltip
-            //double endEnthalpy1 = 0;
-            //double startSpecificVolume1 = 0;//--specific volume
-            //double endSpecificVolume1 = 0;
 
 
             if (chart1.InvokeRequired)
@@ -267,7 +256,7 @@ namespace PH_App
 
                     // temporaryNodeValueStore =  menuStripNodeInfoValues.GetRange(i,1);  //This is for copying the value.
                     //Copying the values on index 0 assumption 
-                    temporaryNodeValueStoreForRedrawLine.Add(new NodeAndLineClass.DataTypeForNode
+                    temporaryNodeValueStoreForRedrawLine.Add(new DataTypeForNode
                     {
                         ID = listNodeInfoValues[i].ID,
                         xVal = listNodeInfoValues[i].xVal,
@@ -455,16 +444,17 @@ namespace PH_App
             for (int i = 0; i < listNodeInfoValues.Count; i++)
             {
                 //--Now we need to count the valus
-                if (listNodeInfoValues[i].temperature_source == "Mix")
-                {
-                    //Do not count 
-                }
-                else
-                {
+                //--No more mix value is present now 
+                //if (listNodeInfoValues[i].temperature_source == "Mix")
+                //{
+                //    //Do not count 
+                //}
+                //else
+                //{
                     //Its not mix node so count every other nodes
                     //indCountForPrevIdOfLine++;
                     idValue = listNodeInfoValues[i].ID;
-                }
+                //}
             }
             //--Now lets identify the node value
             for (int i = 0; i < listNodeInfoValues.Count; i++)
@@ -482,6 +472,328 @@ namespace PH_App
             }
             return indexX;
         }
+
+        public void InsertNodeAndLine()
+        {
+            //This will help in quick insertion           
+            int t = listNodeInfoValues.Count;
+            indexRun = 1;
+            if (t == 0){
+                indexRun = 1;
+            }
+            else {
+                foreach (var node in listLineInfoValues){
+                    indexRun++;
+                }
+            }
+            //We also need to check if the value is present or not after setting 
+            int indNodeRun = indexRun;
+            string nodeName = "Node" + indNodeRun;//This is the node name
+            for (int i = 0; i < listNodeInfoValues.Count; i++){
+                if (listNodeInfoValues[i].name == nodeName){
+                    indNodeRun++;
+                    nodeName = "Node" + indNodeRun;
+                    i = 0;
+                }
+            }
+            //--For line
+            int indLineRun = indexRun - 1;
+            //This one is for line Name
+            string lineName = "Line" + indLineRun;
+            for (int i = 0; i < listLineInfoValues.Count; i++){
+                if (listLineInfoValues[i].name == lineName){
+                    indLineRun++;
+                    lineName = "Line" + indLineRun;
+                    i = 0;
+                }
+            }
+
+
+
+        }//Close ofinsetnode
+
+        //--SetNode Function
+        public void SetNodeAndLine(double xAxisValue,double yAxisValue,string temperatureSource, string pressureSource, string name, Color c1, int markerSize, string lineNameVal, int lineStatusVal,int lineThickness)
+        {
+
+           
+            //ChartCreation ch = new ChartCreation();
+            double xMinRangeValue = xAxisMinimum;
+            double xMaxRangeValue = xAxisMaximum;
+            double yMinRnageValue = yAxisMinimum;
+            double yMaxRangeValue = yAxisMaximum;
+
+           
+            ////now lets plot the values only when the humidity is <= 100 and temp >0  and < 50
+            if ((xAxisValue > xMinRangeValue && xAxisValue <= xMaxRangeValue) && (yAxisValue > yMinRnageValue && yAxisValue <= yMaxRangeValue))
+            {
+                //now lets plot the values....
+                // plot_by_DBT_HR_process_diagram((double)(int)temperatureValue, (double)humidityValue / 100);
+                PlotOnGraphAndInsertToDB(xAxisValue, yAxisValue, temperatureSource, pressureSource, name, c1, markerSize, lineNameVal, lineStatusVal, lineThickness);
+            }
+            else
+            {
+                 MessageBox.Show("Please select a proper region");
+                
+            }
+
+        }//Close of SetNode
+
+        //==We need to do some callings or so...
+        public void PlotOnGraphAndInsertToDB(double xval, double yval, string temperatureSource, string pressureSource, string name, Color c1, int markerSize, string lineNameVal, int lineStatusVal,int linethickness)
+        {
+            //chart1.Series.Clear();
+
+
+            //try
+            //{
+
+
+                series1.ChartType = SeriesChartType.Point;
+                //int r, g, b;
+
+                //series1.MarkerSize = 20;
+                //series1.MarkerStyle = MarkerStyle.Circle;
+                //series1.Points.AddXY(xval, yval);
+                //string s = "source :\nTemperature Source " + temperature_sourceGlobal + "\nHumidity Source" + humidity_sourceGlobal + "\n Name : " + tbName;
+                //series1.Points[index].Color = colorValue;
+                //series1.Points[index].ToolTip = s;
+                int countNumberOfNodes = listNodeInfoValues.Count;
+                SetNode(series1, countNumberOfNodes, xval, yval, name, c1, markerSize, temperatureSource, pressureSource);
+
+                //string labelStringValue = null;
+                //labeling part
+                //if (comboboxItemText == "Label")
+                //{
+                //    //label is selected
+                //    labelStringValue = tbLabel;
+                //}
+                //else if (comboboxItemText == "Name")
+                //{
+                //Name is selected
+               // labelStringValue = tbName;
+                //}
+                //else
+                //{
+                //    //Source is selected
+                //    labelStringValue = tbSource;
+                //}
+
+              //  series1.Points[index].Label = labelStringValue;
+
+                //  MessageBox.Show("value xval =" + xval + ",yval = " + yval);
+                //series1.Points[index_series++].Color = colorValue;//blue
+                //    MessageBox.Show("end re");
+                //index_series++;
+                //series1.Enabled = true;
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show(ex.Message);
+            //}
+
+            //now lets move on to storing those values and futher porcessing it...
+
+
+            //we need to get this a unique id 
+            
+            string unique_id_for_node = dom.buildingList[0].BuildingName + dom.GetGUID();//This is the unique id 
+
+
+            //the value is added...
+            listNodeInfoValues.Add(new DataTypeForNode
+            {
+                ID = unique_id_for_node,
+                xVal = xval,
+                yVal = yval,
+                // source = tbSource,
+                temperature_source = temperatureSource,
+                pressure_source = pressureSource,
+                name = name,
+                // label = tbLabel,
+                colorValue = c1,
+                // showItemText = comboboxItemText,
+                marker_Size = markerSize,
+                //airFlow = airFlowValueGlobal
+                lastUpdatedDate = DateTime.Now.ToString()
+
+            });
+
+            //--Inserting the node values in the database sqlite
+
+
+            //if (flagForInsertOrUpdateDataToDB == 1)
+            //{
+            //do only if the  flag is raised.
+
+            // InsertNodeInfoToDB(unique_id_for_node, xval, yval, tbSource, tbName, tbLabel, colorValue, comboboxItemText, markerSize, deviceInstanceValue, deviceIP, deviceParam1ID, deviceParam2ID, device_param1_info_for_node, device_param2_info_for_node, object_param1_identifier_type, object_param2_identifier_type);
+            //--New code is added to here
+            var objDbOperation = dom;//new DatabaseOperations();
+                //  MessageBox.Show("Building Name= " + selectedBuildingList[0].BuildingName);
+                // MessageBox.Show(unique_id_for_node+"xval = "+ xval+" yval"+ yval+"temp "+ temperature_sourceGlobal+"hum="+ humidity_sourceGlobal+",name="+ tbName+",col="+ colorValue+",size=" +markerSize +",air="+airFlowValueGlobal.ToString());
+                objDbOperation.InsertNodeInfoToDBWithoutDeviceInfo(dom.buildingList[0].BuildingName, dom.chartDetailList[bo.indexForWhichChartIsSelected].chart_respective_nodeID, unique_id_for_node, xval, yval, temperatureSource, pressureSource, name, c1, markerSize);
+            // MessageBox.Show("Operation Complete Test");
+            //InsertNodeInfoToDBWithoutDeviceInfo(unique_id_for_node,)
+            //}
+
+
+
+            //the liine plot part is only done when ther is two points or more
+            //if (index > 0)
+            if (countNumberOfNodes > 0)
+            {
+
+                //double startHumidity1 = 0;
+                //double startEnthalpy1 = 0;
+                //double endHumidity1 = 0;//--this is for the start and end humidity print in the tooltip
+                //double endEnthalpy1 = 0;
+
+                //now lets plot lines between tow points...
+                Series newLineSeries = new Series("LineSeries" + countNumberOfNodes);
+                //string nameSeries = newLineSeries.Name;
+
+                //--If the series already present lets remove from the chart ok ol :)
+                if (chart1.Series.IndexOf(newLineSeries.Name) != -1)
+                {
+                    //MessageBox.Show("Series exits");
+                    //--This  means the series is present....
+                    chart1.Series.RemoveAt(chart1.Series.IndexOf(newLineSeries.Name));
+                }
+
+                string unique_id_for_line = dom.buildingList[0].BuildingName + dom.GetGUID();//selectedBuildingList[0].BuildingName + GetGUID();//This is the unique id 
+
+
+
+                //--Lets store the nodeline info as well
+                listLineInfoValues.Add(new DataTypeForLine
+                {
+                    //--Id of this ..
+                    ID = unique_id_for_line,
+                    // prevNodeId = menuStripNodeInfoValues[index - 1].id, //previousNodeIndexForLineInput
+                    prevNodeId = listNodeInfoValues[countNumberOfNodes-1].ID,
+                    nextNodeId = listNodeInfoValues[countNumberOfNodes].ID,
+                    lineColorValue = listNodeInfoValues[countNumberOfNodes - 1].colorValue,
+                    lineSeriesID = newLineSeries,
+                    lineThickness = 3, //default thickness is 3
+                    name = lineNameVal,
+                    status = lineStatusVal
+
+                });
+
+
+                //--Adding to db
+                //if (flagForInsertOrUpdateDataToDB == 1)
+                //{
+                    //--Insert the values when the flag is raised.
+                    //InsertLineInfoToDB(unique_id_for_line, menuStripNodeInfoValues[index - 1].id, menuStripNodeInfoValues[index].id, menuStripNodeInfoValues[index - 1].colorValue, newLineSeries, menuStripNodeLineInfoValues[index - 1].lineThickness);
+                    // InsertLineInfoToDB(unique_id_for_line, menuStripNodeInfoValues[index - 1].id, menuStripNodeInfoValues[index].id, menuStripNodeInfoValues[index - 1].colorValue, newLineSeries,3);
+                    
+                    dom.InsertLineInfoToDB(unique_id_for_line, listNodeInfoValues[countNumberOfNodes - 1].ID, listNodeInfoValues[countNumberOfNodes].ID, listNodeInfoValues[countNumberOfNodes].colorValue, newLineSeries.Name.ToString(),linethickness, bo.chartDetailList[bo.indexForWhichChartIsSelected].chart_respective_lineID, lineNameVal, lineStatusVal);
+                //}
+
+
+
+                //newSeries.MarkerStyle = MarkerStyle.Triangle;
+                newLineSeries.ChartType = SeriesChartType.Line;
+                //newLineSeries.MarkerBorderWidth.Equals(15);
+                newLineSeries.MarkerSize.Equals(linethickness);
+                //newLineSeries.BorderWidth.Equals(15);
+                // newLineSeries.SetCustomProperty(newLineSeries.MarkerSize.ToString(),newLineSeries.MarkerSize.Equals(25).ToString());
+                newLineSeries.Color = listNodeInfoValues[countNumberOfNodes].colorValue;
+                
+                //=====================================THisi used========================//
+
+                string tooltipString = "";
+              
+                // double enthalpyChange = endEnthalpy1 - startEnthalpy1;
+                string sequenceDetected = listNodeInfoValues[countNumberOfNodes - 1].name + " to " + listNodeInfoValues[countNumberOfNodes].name;
+
+                
+                string ZeroLine = "Process:  " + name + " ";
+                string FirstLine = @"Parameters                      " + "Units               " + temporaryNodeValueStoreForRedrawLine[0].name + "                  " + temporaryNodeValueStoreForRedrawLine[1].name;
+                string SecondLine = @"enthalpy                                   " + "KJ/KG                   " + Math.Round(temporaryNodeValueStoreForRedrawLine[0].xVal, 2) + "                           " + Math.Round(temporaryNodeValueStoreForRedrawLine[1].xVal, 2);
+                //string ThirdLine = @"Relative Humidity           " + "%                     " + startHumidity1 + "                     " + endHumidity1;
+                string FourthLine = @"Pressure               " + "MPa  " + Math.Round(temporaryNodeValueStoreForRedrawLine[0].yVal, 2) + "                       " + Math.Round(temporaryNodeValueStoreForRedrawLine[1].yVal, 2);
+              
+                tooltipString = sequenceDetected+"\n" + ZeroLine + "\n" + FirstLine + "\n" + SecondLine + "\n" + FourthLine;
+
+
+                newLineSeries.ToolTip = tooltipString;
+
+                //=============================end of this is used======================//
+                newLineSeries.Points.Add(new DataPoint(listNodeInfoValues[countNumberOfNodes - 1].xVal, listNodeInfoValues[countNumberOfNodes - 1].yVal));
+                //double mid_point_XValue = (menuStripNodeInfoValues[index - 1].xVal + menuStripNodeInfoValues[index].xVal)/ 2;
+                //double mid_point_YValue = (menuStripNodeInfoValues[index - 1].yVal + menuStripNodeInfoValues[index].yVal) / 2;
+                double mid_point_XValue = (listNodeInfoValues[countNumberOfNodes - 1].xVal + listNodeInfoValues[countNumberOfNodes].xVal) / 2;
+                double mid_point_YValue = (listNodeInfoValues[countNumberOfNodes - 1].yVal + listNodeInfoValues[countNumberOfNodes].yVal) / 2;
+
+                newLineSeries.Points.Add(new DataPoint(mid_point_XValue, mid_point_YValue));
+                newLineSeries.Points.Add(new DataPoint(listNodeInfoValues[countNumberOfNodes].xVal, listNodeInfoValues[countNumberOfNodes].yVal));
+
+                if (lineStatusVal == 1)
+                {
+                    newLineSeries.Points[1].Color = c1;
+                    newLineSeries.Points[1].Label = lineNameVal;
+                }
+                chart1.Series.Add(newLineSeries);
+                chart1.Series[newLineSeries.Name].BorderWidth = 3;
+
+
+            }
+
+
+
+            //index++;
+            //--Why is this done ,, don't know // lets see later
+            previousNodeIndexForLineInput = IndexOfPreviousNodeForLineFunction();
+
+
+        }//close of buttons
+
+        public void SetLine(Series newSeries, int nodePointCount, double xAxisValue, double yAxisValue, string  lineName, Color colorValue, int markerSize, string temperatureSource, string pressureSource)
+        {
+            newSeries.ChartType = SeriesChartType.Line;
+            newSeries.MarkerStyle = MarkerStyle.Circle;
+            newSeries.MarkerSize = markerSize;
+            newSeries.Points.AddXY(xAxisValue, yAxisValue);
+            //string s = $"source :\nTemperature Source  {temperatureSource}   \nPressure Source { pressureSource } \n Name : {nodeName}";
+            newSeries.Points[nodePointCount].Color = colorValue;
+            //newSeries.Points[nodePointCount].ToolTip = $"source :\nTemperature Source  {temperatureSource}   \nPressure Source { pressureSource } \n Name : {lineName}";//s;
+            //newSeries.Points[nodePointCount].Label = lineName;
+            string tooltipString = "";
+         
+            string sequenceDetected = temporaryNodeValueStoreForRedrawLine[0].name + " to " + temporaryNodeValueStoreForRedrawLine[1].name;
+
+            string ZeroLine = "Process:  " + lineName + " ";
+            string FirstLine = @"Parameters                      " + "Units               " + temporaryNodeValueStoreForRedrawLine[0].name + "                  " + temporaryNodeValueStoreForRedrawLine[1].name;
+            string SecondLine = @"enthalpy                                   " + "KJ/KG                   " + Math.Round(temporaryNodeValueStoreForRedrawLine[0].xVal, 2) + "                           " + Math.Round(temporaryNodeValueStoreForRedrawLine[1].xVal, 2);
+            //string ThirdLine = @"Relative Humidity           " + "%                     " + startHumidity1 + "                     " + endHumidity1;
+            string FourthLine = @"Pressure               " + "MPa  " + Math.Round(temporaryNodeValueStoreForRedrawLine[0].yVal, 2) + "                       " + Math.Round(temporaryNodeValueStoreForRedrawLine[1].yVal, 2);
+            tooltipString = ZeroLine + "\n" + FirstLine + "\n" + SecondLine + "\n" + FourthLine;
+
+        }
+
+        /// <summary>
+        /// Sets the node to Chart 
+        /// </summary>
+        /// <param name="series1"></param>
+        /// <param name="xAxisValue"></param>
+        /// <param name="yAxisValue"></param>
+        /// <param name="nodeName"></param>
+        /// <param name="c1"></param>
+        /// <param name="markerSize"></param>
+        public void SetNode(Series newSeries, int nodePointCount, double xAxisValue, double yAxisValue, string nodeName, Color colorValue, int markerSize, string temperatureSource, string pressureSource)
+        {
+            newSeries.ChartType = SeriesChartType.Point;
+            newSeries.MarkerStyle = MarkerStyle.Circle;
+            newSeries.MarkerSize = markerSize;
+            newSeries.Points.AddXY(xAxisValue, yAxisValue);
+            //string nodeTips = $"source :\nTemperature Source  {temperatureSource}   \nPressure Source { pressureSource } \n Name : {nodeName}";
+            newSeries.Points[nodePointCount].Color = colorValue;
+            newSeries.Points[nodePointCount].ToolTip = $"source :\nTemperature Source  {temperatureSource}   \nPressure Source { pressureSource } \n Name : {nodeName}";//nodeTips;
+            newSeries.Points[nodePointCount].Label = nodeName;
+        }
+
 
     }
 }

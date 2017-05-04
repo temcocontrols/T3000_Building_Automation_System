@@ -3,13 +3,35 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using System.Reflection;
+using System.IO;
 
 namespace PH_App
 {
-    class ChartCreation
+   public class ChartCreationAndOperations :Form_Main_PH_Application
     {
-       
+        /// <summary>
+        /// These are the properties of the chart asixes
+        /// </summary>
+        public double xAxisMinimum = 0;
+        public double xAxisMaximum = 4000;
+        public double yAxisMinimum = 1 / 1000;
+        public double yAxisMaximum = 100;
+
+        //--Mouse pointer location Info
+        double xCoordinateValue = 0;
+        double yCoordinateValue = 0;
+        Point? prevPosition = null;
+
+       public double currentXAxis = 0.000;
+       public double currentYAxis = 0.000;
+
+        //--Flags decleration over here
+        int FlagForDisconnectingLineChoice = 0;// 0 means off and 1 means on
+        int FlagForDissableLeftAndRightClicksInChart = 0;//==do not dissable /OFF
+
         public class DataTypeForPH_CurveData
         {
 
@@ -24,7 +46,6 @@ namespace PH_App
         public double[,] P_Value = new double[300, 300];
         public double[,] T_Value = new double[300, 300];
         public double[,] H_Value = new double[300, 300];
-
          
         public void PlotPHChart(string fluidName,Chart phChart)
         {
@@ -574,6 +595,391 @@ namespace PH_App
             //=================================End regregration cycle=====================//
 
         }
-   
+
+        private void Chart_MouseDown(object sender, MouseEventArgs e)
+        {
+
+            if (e.Button == MouseButtons.Right)//on right mouse button is clicked.
+            {
+
+                //--Check of enable or dissable the cell click
+                //if (FlagForDissableLeftAndRightClicksInChart == 1)
+                //{
+                //    //FlagForDissableLeftAndRightClicksInChart = 0;
+                //    return;//DO not proceed forward
+                //}
+
+
+                //we need to show context menu strip
+
+                //MessageBox.Show("Right pressed");    
+                //--this is calculated based on this location the graphics will be plotted..
+                xCoordinateValue = e.Location.X;
+                yCoordinateValue = e.Location.Y;
+
+                //contextMenuStrip1.Show(MousePosition);//--This is dissabled
+
+
+
+                //==Now lets reset the values first,displaying the previous and next node ====//
+
+                if (FlagForDisconnectingLineChoice == 1)
+                {
+                    //--We need to show the text and weather he wants to delete form first or seconds
+                    //First lets enable and change the Text
+                    disconnectLineFromAToolStripMenuItem.Enabled = true;
+                    //disconnectLineFromAToolStripMenuItem.Visible = true;
+                    //disconnectLineFromBToolStripMenuItem.Enabled = true;
+
+                    //if(addMixNodeToolStripMenuItem.Enabled == true)
+                    //{ 
+                    //addMixNodeToolStripMenuItem.Visible = true;
+                    //}
+
+                    //--Now lets make the text 
+                    //steps :
+                    /*
+                       1.Detect previous and next node id 
+                       2.Detect corresponding name value for the corresponding  id
+                       3.Display the node Name  
+                    */
+                    string prevNodeIDTemp = "";
+                    string nextNodeIDTemp = "";
+                    
+                    foreach (var node in dom.listNodeInfoValues)
+                    {
+                        if (node.ID == dom.indexOfNextNodeForLineMovement)
+                        {
+                            //--Next noe is identified 
+                            nextNodeIDTemp = node.name;//--Store the name of the thing
+                        }
+                        else if (node.ID == dom.indexOfPrevPointForLineMovement)
+                        {
+                            //--Previous node is identified 
+                            prevNodeIDTemp = node.name;//--Stroing the name of the node
+                        }
+
+                    }
+
+                    //--we need lineID
+                    //   disconnectLineFromAToolStripMenuItem.Text = "Disconnect line from " + prevNodeIDTemp;
+                    // disconnectLineFromBToolStripMenuItem.Text = "Disconnect line from " + nextNodeIDTemp;
+
+                    nodeAToolStripMenuItem.Text = "Node Name: " + prevNodeIDTemp;
+                    nodeBToolStripMenuItem.Text = "Node Name: " + nextNodeIDTemp;
+
+
+
+                }
+                else
+                {
+                    //--We need to turn off the click option
+                    disconnectLineFromAToolStripMenuItem.Enabled = false;
+                    // disconnectLineFromAToolStripMenuItem.Visible = false;
+                    //disconnectLineFromBToolStripMenuItem.Enabled = false;
+
+                    //--lets dissable the line
+                    nodeAToolStripMenuItem.Enabled = false;
+                    nodeBToolStripMenuItem.Enabled = false;
+                   // addMixNodeToolStripMenuItem.Enabled = false;//For dissabling the add mix node
+                                                                //--Lets make it invisible
+                                                                //addMixNodeToolStripMenuItem.Visible = false;
+
+                    //--Lets dissbale
+                    //nodeAToolStripMenuItem.Enabled = false;
+                    //nodeBToolStripMenuItem.Enabled = false;
+
+                }
+
+                //==this one is for delete node to hide
+                if (deleteNodeToolStripMenuItem.Enabled == true)
+                {
+                    deleteNodeToolStripMenuItem.Visible = true;
+                }
+                else
+                {
+                    deleteNodeToolStripMenuItem.Visible = false;
+                }
+
+                //--------This one is for mix node to show or hide
+                //if (addMixNodeToolStripMenuItem.Enabled == false)
+                //{
+                //    addMixNodeToolStripMenuItem.Visible = false;
+                //}
+                //else
+                //{
+                //    addMixNodeToolStripMenuItem.Visible = true;
+                //}
+
+                //--This one is for disconnecting line 
+                if (nodeAToolStripMenuItem.Enabled == false)
+                {
+                    //disconnecting line invisible
+                    disconnectLineFromAToolStripMenuItem.Visible = false;
+                }
+                else
+                {
+
+                    //visible
+                    disconnectLineFromAToolStripMenuItem.Visible = true;
+                }
+
+                //--Now lets do for the comfort zone parts...
+
+                //--now lets check some things
+                //InfoForComfortZoneOfChart(chartDetailList[indexForWhichChartIsSelected].chartID);
+                ////MessageBox.Show("here = " + default_comfort_zone_of_chart[0].status + " count = "+ default_comfort_zone_of_chart.Count);
+                //if (default_comfort_zone_of_chart.Count > 0)
+                //{
+                //    if (default_comfort_zone_of_chart[0].status == "enable")
+                //    {
+                //        //now lets calculate the humidity because we can only make comparision with the humidity values....
+                //        HumTempCalcByCoordinate();//This will return humidityValue AND TemperatureValue by mouse coordinate
+                //                                  //MessageBox.Show("check min temp = " + listchartComfortZoneInfoSingle[0].min_temp + "\n max temp = " + listchartComfortZoneInfoSingle[0].max_temp + "\n min hum= " + listchartComfortZoneInfoSingle[0].min_hum + "\n max hum=" + listchartComfortZoneInfoSingle[0].max_hum);
+
+                //        if (listchartComfortZoneInfoSingle.Count > 0)
+                //        {
+                //            if ((temperatureValue > double.Parse(listchartComfortZoneInfoSingle[0].min_temp) && temperatureValue < double.Parse(listchartComfortZoneInfoSingle[0].max_temp)) && (humidityValue > double.Parse(listchartComfortZoneInfoSingle[0].min_hum) && humidityValue < double.Parse(listchartComfortZoneInfoSingle[0].max_hum)))
+                //            {
+                //                if (showComfortZoneToolStripMenuItem.Enabled == true)
+                //                {
+                //                    showComfortZoneToolStripMenuItem.Visible = true;
+                //                }
+                //                else
+                //                {
+                //                    showComfortZoneToolStripMenuItem.Visible = false;
+                //                }
+                //            }
+                //            else
+                //            {
+                //                showComfortZoneToolStripMenuItem.Visible = false;
+                //            }
+                //            //--Chart is enable futher processing is needed
+                //        }//close of if listchartComfortZoneInfoSingle
+                //    }
+                //    else
+                //    {
+                //        //--Hide the comfort zone
+                //        showComfortZoneToolStripMenuItem.Visible = false;
+                //    }
+                //}
+                //else
+                //{
+                //    showComfortZoneToolStripMenuItem.Visible = false;
+                //}
+
+
+
+                //===End of the reset the values=========// 
+                this.quickNodeInsertToolStripMenuItem.Image = null;
+                if (FlagForDissableLeftAndRightClicksInChart == 1)
+                {
+                    //FlagForDissableLeftAndRightClicksInChart = 0;
+                    CMSinsertNode.Enabled = false;
+                    //string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+                    //string NewDirectory = Path.GetFullPath(Path.Combine(dir, @"..\"));
+                    //string file = NewDirectory + @"Database\image\lock.png";
+
+                    //string imagePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                    //string file = imagePath + @"\image\lock.png";
+                    string imagePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                    string file = imagePath + @"\..\Database\image\lock.png";
+
+
+                    this.quickNodeInsertToolStripMenuItem.Image = Bitmap.FromFile(file);
+                    this.quickNodeInsertToolStripMenuItem.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+                    // this.quickNodeInsertToolStripMenuItem.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+                    //quickNodeInsertToolStripMenuItem.ImageAlign = 
+                    this.quickNodeInsertToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
+
+                    CMSinsertNode.Show(MousePosition);//-- this mouse position is used to show the menustrip in mouse pointer
+
+                    //return;//DO not proceed forward
+                }
+                else
+                {
+                    //==This shows the contextmenustrip on right click
+                    CMSinsertNode.Enabled = true;
+                    CMSinsertNode.Show(MousePosition);//-- this mouse position is used to show the menustrip in mouse pointer
+                }
+
+            }
+
+        }
+
+        private void chart1_MouseMove(object sender, MouseEventArgs e,Chart chart1)
+        {
+            //this part helps to get the x  and the y coordinate 
+            //this coordinate finding is based on the plotting part of chart element type..
+            var pos = e.Location;
+            if (prevPosition.HasValue && pos == prevPosition.Value)
+                return;
+            // tooltip.RemoveAll();
+            prevPosition = pos;
+            var results = chart1.HitTest(pos.X, pos.Y, false, ChartElementType.PlottingArea);
+            foreach (var result in results)
+            {
+                if (result.ChartElementType == ChartElementType.PlottingArea)
+                {
+                    var xVal = result.ChartArea.AxisX.PixelPositionToValue(pos.X);
+                    var yVal = result.ChartArea.AxisY.PixelPositionToValue(pos.Y);
+
+                    // if((currentXAxis>=0 && currentXAxis<=50)&&(currentYAxis>=0 && currentYAxis <= 30)) { 
+
+                    if (((double)xVal >= xAxisMinimum && (double)xVal <= xAxisMaximum) && ((double)yVal >= yAxisMinimum && (double)yVal <= yAxisMaximum))
+                    {
+                        //--These currentXAxis and currentYAxis is used for showing the dotted line 
+                        currentXAxis = (double)xVal;
+                        currentYAxis = (double)yVal;
+
+                        //lb_test.Text = "x = " + currentXAxis + ",y  = " + currentYAxis;
+                        // if ((currentXAxis >= 0 && currentXAxis <= 50) && (currentYAxis >= 0 && currentYAxis <= 30))
+                        //{
+
+                        //now lets move on to making other part 
+                        /*1.find dbt value => this is x axis value 
+                         * 2.find sp.ratio value => this is yaxis value
+                         */
+                        lb_dbt.Text = Math.Round(xVal, 2).ToString();
+                        lb_humidity_ratio.Text = Math.Round(yVal, 2).ToString();
+
+                        //now lets move towards printing the relative humidity at that position and dew point and enthalpy also wbt
+                        //first Relative humidity...
+                        //first we need to see equation w = 622*phi*pg./(patm-phi*pg);
+                        /*
+                         we need to calc phi value given by ycord/30 as the max value is 30..
+                         * second pg which is calculated by temperature pulled from the text file we need to fist 
+                         * calculate the round up value of x coord to an integer...
+                         */
+
+                        //this part is not correct yet we need to do this again....
+
+                        double phi = 0.00000;
+                        //double y_axis = yVal;
+                        //now for pg..
+                        ArrayList temperature_value = new ArrayList();
+                        ArrayList pg_value_from_txtfile = new ArrayList();
+
+                        //--Copying the ref temp and humidity values..
+                        temperature_value = t;
+                        pg_value_from_txtfile = pg;
+
+                        double temperature = Math.Round(xVal);
+                        double corres_pg_value = 0.000000;
+                        for (int i = 0; i < temperature_value.Count; i++)
+                        {
+                            if (temperature == Double.Parse(temperature_value[i].ToString()))
+                            {
+                                corres_pg_value = Double.Parse(pg_value_from_txtfile[i].ToString());
+
+                                break;
+                            }
+                        }//close of for
+
+                        double patm = AirPressureFromDB * 0.001; // this is in terms of kpa //101.325;//this is constant... //101.325;//this is constant...
+                                                                 //Lets check the patm value
+                                                                 //  lb_test1.Text = "patm = " + patm;
+                        double w = yVal;
+                        phi = w * patm / (622 * corres_pg_value + w * corres_pg_value);//this phi gives the relative humidty..
+                        phi = phi * 100;//changing into percent..
+                                        //now display in label...
+                        lb_RH.Text = Math.Round(phi, 2).ToString();
+
+                        // lb_test1.Text = " Humidity = " + phi;
+
+                        //now lets calculate the dew point...
+                        double humidity = phi;
+                        double temperature1 = xVal;
+                        double TD = 243.04 * (Math.Log(humidity / 100) + ((17.625 * temperature1) / (243.04 + temperature1))) / (17.625 - Math.Log(humidity / 100) - ((17.625 * temperature1) / (243.04 + temperature1)));
+                        //now lets print this value..
+                        lb_DP.Text = Math.Round(TD, 2).ToString();
+
+
+                        //now lets move towards enthalpy...
+
+                        Patm = patm * 10;  // 1013;
+                        A = 6.116441;
+                        m = 7.591386;
+                        Tn = 240.7263;
+                        B = 621.9907;
+
+                        double Pws = A * Math.Pow(10, (m * TD) / (TD + Tn));
+
+                        double X = B * Pws / (Patm - Pws);   //This one is formula 
+
+                        h = temperature1 * (1.01 + (0.00189 * X)) + 2.5 * X; //This one is the enthalpy
+                        //now lets display this value ..
+                        lb_enthalpy.Text = Math.Round(h, 2).ToString();
+
+                    }
+
+
+                }//Closing of currentxval= 0-50 and 0-30 currentyval
+            }
+
+            if (flagForEditComfortZoneGraphically == 1)
+            {
+
+                if (flagForBorderLineSelectedForMoveForEditCF == 1)
+                {
+                    //--Perform redraw function 
+
+
+                    CursorFunctionForComfortZoneEditMode(e);
+
+                }
+                else
+                {
+                    //--IF edit comfort zone is enabled dont do other task just do the 
+                    //Task of comfort zone only and let other task hault for now
+                    ComfortZoneBorderLineDetectForEdit(e); // --This methods detects line movement
+                }
+
+
+
+
+            }
+            else
+            {
+
+                //--IF the line is selected/disconnected and then we need to connect to a node
+                if (flagForDisconnectClick == 1)  //Disconnect is clicked then they talk
+                {
+                    //--Creating temporary line..
+                    //--then redraw it again...
+                    addTemporarySeries();
+                    //--Now lets move on the showing the hand when hover over the Node lets do it bro...
+                    addCursorFunctionForLineDisconnectConnect(e);
+                    // lb_where.Text = "me : discon =1";
+
+                }
+                else
+                {
+                    // lb_where.Text = "me : else line detect on";
+                    disconnectLineToolStripMenuItem.Enabled = false;
+
+                    //--This one is for two side of line disconnection -------//
+                    disconnectLineFromAToolStripMenuItem.Enabled = false;
+                    //disconnectLineFromBToolStripMenuItem.Enabled = false;
+
+                    nodeAToolStripMenuItem.Enabled = false;
+                    nodeBToolStripMenuItem.Enabled = false;
+                    addMixNodeToolStripMenuItem.Enabled = false;//Dissable add mix node
+                                                                //---End of two side of line disconnection section
+
+                    //--This is for the weather the line is moverover or not...
+                    LineDetectOnMouseMove(e);
+
+                    //--Lets add a function for the process diagram drawing..
+
+                    ProcessDiagramMouseMoveFunction(e);//--This does the adding and removing part             
+                }
+
+            }
+
+        }//close of the main private void...
+
+
     }
 }
