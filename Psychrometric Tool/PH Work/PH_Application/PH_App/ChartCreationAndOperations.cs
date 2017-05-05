@@ -20,17 +20,40 @@ namespace PH_App
         public double yAxisMinimum = 1 / 1000;
         public double yAxisMaximum = 100;
 
+        //dotted series when the mouese is moved
+        Series addDottedSeries = new Series("newdottedSeries");
+
+
         //--Mouse pointer location Info
         double xCoordinateValue = 0;
         double yCoordinateValue = 0;
         Point? prevPosition = null;
 
-       public double currentXAxis = 0.000;
+        //variables
+       public double xAxis1;
+       public double yAxis1;
+       public int load = 0;//false
+       string idOfNodeSelected;//--initially it represents nothing...
+       int indexOfLineInTheList = 0; //This holds the id of the line selected.
+       string idSelected;
+       int FlagForNodeDelete = 0;//0 means node not selected 1 means selected
+       string nodeID_ForDeletingNode = "";
+       int readyForMouseClick = 0;//this event will be true only when the cursor is in hand mode..
+       int mouseClickAction = 0;
+        int incrementIndex = 0;//--Defining the index
+
+
+        //Current pointer location
+        public double currentXAxis = 0.000;
        public double currentYAxis = 0.000;
 
         //--Flags decleration over here
         int FlagForDisconnectingLineChoice = 0;// 0 means off and 1 means on
         int FlagForDissableLeftAndRightClicksInChart = 0;//==do not dissable /OFF
+        int flagForDisconnectClick = 0;//0 means false it is used to see if the disconnect option is clicked or not.
+        int flagForDisconnectLineFromNode_PrevNode_Or_NextNode = 0;//-- 0 means off 1 means on for previous node    and 2 means next node
+        int flagNodeSelectedForConnect = 0;
+        int indexForSeriesNodePoint = 0;
 
         public class DataTypeForPH_CurveData
         {
@@ -854,7 +877,7 @@ namespace PH_App
                          */
 
                         //this part is not correct yet we need to do this again....
-
+                       /*
                         double phi = 0.00000;
                         //double y_axis = yVal;
                         //now for pg..
@@ -911,46 +934,46 @@ namespace PH_App
                         h = temperature1 * (1.01 + (0.00189 * X)) + 2.5 * X; //This one is the enthalpy
                         //now lets display this value ..
                         lb_enthalpy.Text = Math.Round(h, 2).ToString();
-
+                        */
                     }
 
 
                 }//Closing of currentxval= 0-50 and 0-30 currentyval
             }
 
-            if (flagForEditComfortZoneGraphically == 1)
-            {
+            //if (flagForEditComfortZoneGraphically == 1)
+            //{
 
-                if (flagForBorderLineSelectedForMoveForEditCF == 1)
-                {
-                    //--Perform redraw function 
-
-
-                    CursorFunctionForComfortZoneEditMode(e);
-
-                }
-                else
-                {
-                    //--IF edit comfort zone is enabled dont do other task just do the 
-                    //Task of comfort zone only and let other task hault for now
-                    ComfortZoneBorderLineDetectForEdit(e); // --This methods detects line movement
-                }
+            //    if (flagForBorderLineSelectedForMoveForEditCF == 1)
+            //    {
+            //        //--Perform redraw function 
 
 
+            //        CursorFunctionForComfortZoneEditMode(e);
+
+            //    }
+            //    else
+            //    {
+            //        //--IF edit comfort zone is enabled dont do other task just do the 
+            //        //Task of comfort zone only and let other task hault for now
+            //        ComfortZoneBorderLineDetectForEdit(e); // --This methods detects line movement
+            //    }
 
 
-            }
-            else
-            {
+
+
+            //}
+            //else
+            //{
 
                 //--IF the line is selected/disconnected and then we need to connect to a node
                 if (flagForDisconnectClick == 1)  //Disconnect is clicked then they talk
                 {
                     //--Creating temporary line..
                     //--then redraw it again...
-                    addTemporarySeries();
+                    addTemporarySeries(addDottedSeries);
                     //--Now lets move on the showing the hand when hover over the Node lets do it bro...
-                    addCursorFunctionForLineDisconnectConnect(e);
+                    addCursorFunctionForLineDisconnectConnect(e,phChart);
                     // lb_where.Text = "me : discon =1";
 
                 }
@@ -965,20 +988,615 @@ namespace PH_App
 
                     nodeAToolStripMenuItem.Enabled = false;
                     nodeBToolStripMenuItem.Enabled = false;
-                    addMixNodeToolStripMenuItem.Enabled = false;//Dissable add mix node
+                   // addMixNodeToolStripMenuItem.Enabled = false;//Dissable add mix node
                                                                 //---End of two side of line disconnection section
 
                     //--This is for the weather the line is moverover or not...
-                    LineDetectOnMouseMove(e);
+                    LineDetectOnMouseMove(e,phChart);
 
                     //--Lets add a function for the process diagram drawing..
 
-                    ProcessDiagramMouseMoveFunction(e);//--This does the adding and removing part             
+                    ProcessDiagramMouseMoveFunction(e,phChart);//--This does the adding and removing part             
                 }
+
+           // }//close of else
+
+        }//close of the main private void...
+
+        /// <summary>
+        /// add a dotted series when the mouse is moved but not we need to add to
+        /// chart first in order to get the desired effect
+        /// </summary>
+        /// <param name="addDottedSeries"></param>
+        public void addTemporarySeries(Series addDottedSeries)
+        {
+
+            //--then redraw it again...
+            addDottedSeries.Points.Clear();
+            addDottedSeries.ChartType = SeriesChartType.FastLine;
+            addDottedSeries.BorderDashStyle = ChartDashStyle.Dash;//--This gives the dashed style
+            addDottedSeries.Color = Color.Black;
+            addDottedSeries.BorderWidth = 3;
+
+            double xAxisValue = 0.00;
+            double yAxisvalue = 0.00;
+
+            if (flagForDisconnectLineFromNode_PrevNode_Or_NextNode == 0)
+            {
+                //--If the line is not reseted then return form here
+                return;
+            }
+            //We need to find the previous point
+            for (int i = 0; i < dom.listNodeInfoValues.Count; i++)
+            {
+                //1 means prev node is selected 
+                if (flagForDisconnectLineFromNode_PrevNode_Or_NextNode == 2) //This is done because we are detaching from node1
+                {
+                    if (dom.listNodeInfoValues[i].ID == dom.indexOfPrevPointForLineMovement)//indexOfPrevPointForLineMovement variable is in NodeAndLineClass 
+                    {
+                        //This is the node of previous point we need to find the x and y coordinate of
+                        xAxisValue = dom.listNodeInfoValues[i].xVal;
+                        yAxisvalue = dom.listNodeInfoValues[i].yVal;
+                        break;//If value found no need to search all exit of loop
+                    }
+
+                } //2 means next node is selected 0 means off
+                else if (flagForDisconnectLineFromNode_PrevNode_Or_NextNode == 1)//--This is done we are detaching form node2
+                {
+                    if (dom.listNodeInfoValues[i].ID == dom.indexOfNextNodeForLineMovement)
+                    {
+                        //This is the node of previous point we need to find the x and y coordinate of
+                        xAxisValue = dom.listNodeInfoValues[i].xVal;
+                        yAxisvalue = dom.listNodeInfoValues[i].yVal;
+                        break;//If value found no need to search all exit of loop
+                    }
+                }
+            }
+            //addDottedSeries.Points.AddXY(menuStripNodeInfoValues[indexOfPrevPointForLineMovement].xVal, menuStripNodeInfoValues[indexOfPrevPointForLineMovement].yVal);
+            addDottedSeries.Points.AddXY(xAxisValue, yAxisvalue);//--this is the new changed code:bbk305
+            addDottedSeries.Points.AddXY(currentXAxis, currentYAxis);
+
+        }
+
+        public void addCursorFunctionForLineDisconnectConnect(MouseEventArgs e,Chart chart1)
+        {//--This function helps to draw a mouse move event..
+            //--This is done to prevent mouse event e.x called before chart is loaded other wise the program will crash
+            if (!chart1.IsAccessible && load == 0)
+            {
+                load = 1;
+                return;
 
             }
 
-        }//close of the main private void...
+            //this event occurs and compares the values in the list first and identifies if the values
+            if ((e.X > chart1.ChartAreas[0].Position.X && e.Y > chart1.ChartAreas[0].Position.Y) && (e.X < chart1.Width && e.Y < chart1.Height))
+            {
+                try
+                {
+                    //Point position = e.Location;
+                    double xValue = chart1.ChartAreas[0].AxisX.PixelPositionToValue(e.X);
+                    double yValue = chart1.ChartAreas[0].AxisY.PixelPositionToValue(e.Y);
+
+                    xAxis1 = xValue;
+                    yAxis1 = yValue;
+                    if ((xAxis1 >= 0 && xAxis1 <= 50) && (yAxis1 >= 0 && yAxis1 <= 30))
+                    {
+                        //Console.Write("xval = " + xValue + "yvalue = " + yValue);
+                        if (dom.listNodeInfoValues.Count > 0)
+                        {
+                            //foreach(var values in menuStripNodeInfoValues)
+
+                            for (int i = 0; i < dom.listNodeInfoValues.Count; i++)
+                            {
+
+                                if ((xValue > dom.listNodeInfoValues[i].xVal - 0.25 && xValue < dom.listNodeInfoValues[i].xVal + 0.25) && (yValue > dom.listNodeInfoValues[i].yVal - 0.25 && yValue < dom.listNodeInfoValues[i].yVal + 0.25))
+                                {
+
+                                    idOfNodeSelected = dom.listNodeInfoValues[i].ID;
+                                    if (Cursor == Cursors.Cross)
+                                    {
+                                        Cursor = Cursors.Hand;
+                                    }
+
+                                    //--Whenever this occurs lets move on to attaching the the node or say refreshing and replotting....
+                                    //--For this as well lets rise a flag..
+                                    flagNodeSelectedForConnect = 1;
+                                    break;//this break is for if found the value no longer loop increases the perfomances..
+                                }
+                                else
+                                {
+                                    if (Cursor != Cursors.Cross)
+                                    {
+                                        this.Cursor = Cursors.Cross;
+                                        // readyForMouseClick = 0;//dissable on click event.
+                                        flagNodeSelectedForConnect = 0;
+                                    }
+
+                                }
+                            }
+                        }//close of if menuStripAllValue>0
+                    }//close of if
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }//--close of the if..
+
+        }//close of the actual function...public void
+
+        Color storeColor;
+        int flagForColor = 0;
+
+        //--Lets store the series for futher processing...
+        Series tempSeries;
+        /// <summary>
+        /// Detects the line which connects the two nodes
+        /// when hovered over it 
+        /// </summary>
+        /// <param name="e">mouse event argument an event simply</param>
+        private void LineDetectOnMouseMove(MouseEventArgs e,Chart chart1)
+        {
+            HitTestResult hit = chart1.HitTest(e.X, e.Y);
+            // Text = "Element: " + hit.ChartElementType;
+            DataPoint dp = null;
+            if (hit.ChartElementType == ChartElementType.DataPoint)
+                dp = hit.Series.Points[hit.PointIndex];
+
+            //lb_test.Text = "nothing ";
+
+            if (dp != null)
+            {
+                //  Text += " Point #" + hit.PointIndex  + " x-value:" + dp.XValue + " y-value: " + dp.YValues[0]+" series name = "+hit.Series.Name;
+
+                if (dom.listLineInfoValues.Count > 0)
+                {
+                    for (int i = 0; i < dom.listLineInfoValues.Count; i++)
+                    {
+
+                        if (hit.Series.Name != null)
+                        {
+                            if ((string)hit.Series.Name == (string)dom.listLineInfoValues[i].lineSeriesID.Name)
+                            {
+                                //--lets store previous color first
+                                storeColor = dom.listLineInfoValues[i].lineColorValue;
+                                flagForColor = 1;
+                                tempSeries = hit.Series;
+
+                                //  idOfLineSelecteForDisconnect = menuStripNodeLineInfoValues[i].ID;
+                                indexOfLineInTheList = i; // updating the index 
+
+                                //--These two variables are in NodeAndLineClass.cs files
+                                //--Logging the index so that it could be used for futher processing later...
+                                dom.indexOfPrevPointForLineMovement = dom.listLineInfoValues[i].prevNodeId;//This gets the previous node id value...
+
+                                dom.indexOfNextNodeForLineMovement = dom.listLineInfoValues[i].nextNodeId;//==This gets the next node id
+
+                                hit.Series.Color = Color.Black;
+                                disconnectLineToolStripMenuItem.Enabled = true;
+                                // lb_test.Text = Text;
+
+                                //---This code is for detecting form A and form B point in line detachment---//
+
+                                /*
+                                Steps : here we do following task
+                                1. Enable both the click option for now just enable.
+                                2. We have node info in this->indexOfPrevPointForLineMovement and  this->indexOfNextNodeForLineMovement
+                                */
+                                disconnectLineFromAToolStripMenuItem.Enabled = true;
+                                //disconnectLineFromBToolStripMenuItem.Enabled = true;
+
+                                nodeAToolStripMenuItem.Enabled = true;
+                                nodeBToolStripMenuItem.Enabled = true;
+                                //addMixNodeToolStripMenuItem.Enabled = true;//For adding mix node
+
+                                FlagForDisconnectingLineChoice = 1;
+                                //---End of line deteachment section --------------------//
+                            }
+                        }
+                    }
+                }//CLOSE OF IF MENUSTRIP
+
+            }//CLOSE of if dp 
+            else
+            {
+                if (flagForColor == 1)
+                    tempSeries.Color = storeColor;
+
+            }
+        }
+        int tempIndexForNode = 0;
+        private void ProcessDiagramMouseMoveFunction(MouseEventArgs e,Chart chart1)
+        {
+            //--This function helps to draw a mouse move event..
+            //--This is done to prevent mouse event e.x called before chart is loaded other wise the program will crash
+            if (!chart1.IsAccessible && load == 0)
+            {
+                load = 1;
+                return;
+
+            }
+
+            //this event occurs and compares the values in the list first and identifies if the values
+            if ((e.X > chart1.ChartAreas[0].Position.X && e.Y > chart1.ChartAreas[0].Position.Y) && (e.X < chart1.Width && e.Y < chart1.Height))
+            {
+                try
+                {
+                    //Point position = e.Location;
+                    double xValue = chart1.ChartAreas[0].AxisX.PixelPositionToValue(e.X);
+                    double yValue = chart1.ChartAreas[0].AxisY.PixelPositionToValue(e.Y);
+                    if ((xValue >= 0 && xValue <= 50) && (yValue >= 0 && yValue <= 30))
+                    {
+
+                        xAxis1 = xValue;
+                        yAxis1 = yValue;
+                        //Console.Write("xval = " + xValue + "yvalue = " + yValue);
+                        if (dom.listNodeInfoValues.Count > 0)
+                        {
+                            //foreach(var values in menuStripNodeInfoValues)
+
+                            for (int i = 0; i < dom.listNodeInfoValues.Count; i++)
+                            {
+
+                                if (dom.listNodeInfoValues[i].temperature_source != "Mix")
+                                {
+
+                                    if ((xValue > dom.listNodeInfoValues[i].xVal - 0.25 && xValue < dom.listNodeInfoValues[i].xVal + 0.25) && (yValue > dom.listNodeInfoValues[i].yVal - 0.25 && yValue < dom.listNodeInfoValues[i].yVal + 0.25))
+                                    {
+
+                                        //--This is changed from int to string  code bbk305
+                                        idSelected = dom.listNodeInfoValues[i].ID; //Now this is a string 
+                                        tempIndexForNode = i;//This is for finding other values with searching for this we need index
+                                        if (Cursor != Cursors.Cross)
+                                        {
+                                            Cursor = Cursors.Hand;
+                                            //====This flag is for deleting the node===========//
+
+                                            FlagForNodeDelete = 1;//flag is ready on Node selected
+                                            nodeID_ForDeletingNode = idSelected;
+                                            deleteNodeToolStripMenuItem.Enabled = true; //Turn on the delete buttton
+                                                                                        //=============end of flag for deleting===========//
+                                        }
+                                        //this.Cursor = Cursors.Hand;
+                                        //now this works so lets move forward.
+                                        readyForMouseClick = 1;//enable on click event
+
+
+                                        break;//this break is for if found the value no longer loop increases the perfomances..
+                                    }
+                                    else
+                                    {
+                                        if (Cursor != Cursors.Cross)
+                                        {
+                                            this.Cursor = Cursors.Arrow;
+                                            readyForMouseClick = 0;//dissable on click event.
+
+                                            //====This flag is for deleting the node===========//
+
+                                            FlagForNodeDelete = 0;//flag is ready OFF , Node NOT SELECTED
+                                            deleteNodeToolStripMenuItem.Enabled = false;//Turn of the delet button
+                                                                                        //nodeID_ForDeletingNode = idSelected;
+                                                                                        //=============end of flag for deleting===========//
+
+                                        }
+
+                                    }
+                                    //--Lets filter out the mix nodes---
+
+                                }//Close of if section Mix section
+
+                                //==This one is special case for mix node only
+                                else if (dom.listNodeInfoValues[i].temperature_source == "Mix")
+                                {
+                                    if ((xValue > dom.listNodeInfoValues[i].xVal - 0.25 && xValue < dom.listNodeInfoValues[i].xVal + 0.25) && (yValue > dom.listNodeInfoValues[i].yVal - 0.25 && yValue < dom.listNodeInfoValues[i].yVal + 0.25))
+                                    {
+
+                                        //--This is changed from int to string  code bbk305
+                                        idSelected = dom.listNodeInfoValues[i].ID; //Now this is a string 
+                                        tempIndexForNode = i;//This is for finding other values with searching for this we need index
+                                        if (Cursor != Cursors.Cross)
+                                        {
+                                            Cursor = Cursors.Hand;
+                                            //====This flag is for deleting the node===========//
+
+                                            FlagForNodeDelete = 1;//flag is ready on Node selected
+                                            nodeID_ForDeletingNode = idSelected;
+                                            deleteNodeToolStripMenuItem.Enabled = true; //Turn on the delete buttton
+                                                                                        //=============end of flag for deleting===========//
+                                        }
+                                        //this.Cursor = Cursors.Hand;
+                                        //now this works so lets move forward.
+                                        //===This should be dissabled
+                                        // readyForMouseClick = 1;//enable on click event
+
+
+                                        break;//this break is for if found the value no longer loop increases the perfomances..
+                                    }
+                                    else
+                                    {
+                                        if (Cursor != Cursors.Cross)
+                                        {
+                                            this.Cursor = Cursors.Arrow;
+                                            /// readyForMouseClick = 0;//dissable on click event.
+
+                                            //====This flag is for deleting the node===========//
+
+                                            FlagForNodeDelete = 0;//flag is ready OFF , Node NOT SELECTED
+                                            deleteNodeToolStripMenuItem.Enabled = false;//Turn of the delet button
+                                                                                        //nodeID_ForDeletingNode = idSelected;
+                                                                                        //=============end of flag for deleting===========//
+
+                                        }
+
+                                    }
+
+                                }
+
+
+                            }//Close of for loop
+                        }//close of if menuStripAllValue>0
+
+
+                        if (mouseClickAction == 1)
+                        {
+
+                            if (Control.ModifierKeys == Keys.Alt)
+                            {
+                                //--This alter key is for moving along constant x-axis ...
+                                // MessageBox.Show(" alt is pressed for x axis constant");
+
+
+                                //menuStripNodeInfoValues[idSelected].xVal = xAxis1;
+                                dom.listNodeInfoValues[tempIndexForNode].yVal = yAxis1;//This value is changed...
+
+
+                                //====================For mix node movement = ===============//
+
+                                //UpdateMixPointOnNodeMovement();
+
+                                //=====================End of mix node movemnt===================//
+
+                                // label5.Text = "click past x =" + menuStripNodeInfoValues[idSelected].xVal + " y " + menuStripNodeInfoValues[idSelected].yVal;
+
+                                dom.series1.Points.Clear();
+                                for (int i = 0; i < dom.listLineInfoValues.Count; i++)//-- this -1 is done because for three points we have two line series..
+                                {
+                                    // chart1.Series.Remove(menuStripNodeLineInfoValues[i].lineSeriesID);//--removing line series that joins node..
+                                    dom.listLineInfoValues[i].lineSeriesID.Points.Clear();
+
+                                }
+                                //--this is redraw functionality
+                                //foreach(var values in menuStripNodeInfoValues)
+                                indexForSeriesNodePoint = 0;
+                                for (int x = 0; x < dom.listNodeInfoValues.Count; x++)
+                                {
+                                    string labelValue;
+                                    //if (menuStripNodeInfoValues[x].showItemText == "Label")
+                                    //{
+                                    //    labelValue = menuStripNodeInfoValues[x].label;
+                                    //}
+                                    //else if (menuStripNodeInfoValues[x].showItemText == "Name")
+                                    //{
+                                    labelValue = dom.listNodeInfoValues[x].name;
+                                    //}
+                                    //else
+                                    //{
+                                    //    labelValue = menuStripNodeInfoValues[x].source;
+                                    //}
+
+                                    //--this is changed as well code :bbk305
+                                    // ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue, menuStripNodeInfoValues[x].marker_Size);
+                                    dom.ReDrawPoints(dom.series1, dom.listNodeInfoValues[x].xVal, dom.listNodeInfoValues[x].yVal, dom.listNodeInfoValues[x].colorValue, dom.listNodeInfoValues[x].temperature_source, dom.listNodeInfoValues[x].pressure_source, dom.listNodeInfoValues[x].name, labelValue, dom.listNodeInfoValues[x].marker_Size);
+                                    //Updating values in database
+                                    if (bo.flagForInsertOrUpdateDataToDB == 1)
+                                    {
+                                        //   UpdateNodeInfoToDB(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].showItemText, menuStripNodeInfoValues[x].marker_Size);
+                                    }
+
+
+                                    // incrementIndex++;
+                                    indexForSeriesNodePoint++;//Incrementing the index values
+                                                              //--Every time it redraws the point we need to update to database the node values
+                                }
+                                //--resetting incrementIndex
+                                //incrementIndex = 0;
+                                if (dom.listLineInfoValues.Count > 0)
+                                {
+
+
+                                    for (int x = 0; x < dom.listLineInfoValues.Count; x++)
+                                    {
+                                        // incrementIndex++;
+
+                                        //ReDrawLines(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue);
+                                        dom.ReDrawLines(dom.listLineInfoValues[x].ID, dom.listLineInfoValues[x].prevNodeId, dom.listLineInfoValues[x].nextNodeId, dom.listLineInfoValues[x].lineSeriesID, dom.listLineInfoValues[x].lineColorValue, dom.listLineInfoValues[x].lineThickness, dom.listLineInfoValues[x].name, dom.listLineInfoValues[x].status);
+
+                                    }
+
+                                }
+
+                                chart1.Invalidate();
+                                // incrementIndex = 0;//reset the values again..
+                                //  indexForSeriesNodePoint = 0;//Resetting the index value BBK305A
+
+                            }
+                            else if (Control.ModifierKeys == Keys.Shift)
+                            {
+                                //--This ctrl key is for moving along the y-  axis...
+
+                                //--THis function basically evolve when the shift key is pressed and mouse move.
+                                // MessageBox.Show("shift  is pressed for y  axis constant");
+
+                                //menuStripNodeInfoValues[idSelected].xVal = xAxis1;
+                                dom.listNodeInfoValues[tempIndexForNode].xVal = xAxis1;//--This value is just changed 
+                                                                                        //menuStripNodeInfoValues[idSelected].yVal = yAxis1;
+
+                                //====================For mix node movement = ===============//
+
+                                //UpdateMixPointOnNodeMovement();
+
+                                //=====================End of mix node movemnt===================//
+                                //label5.Text = "click past x =" + menuStripNodeInfoValues[idSelected].xVal + " y " + menuStripNodeInfoValues[idSelected].yVal;
+
+                                dom.series1.Points.Clear();
+                                for (int i = 0; i < dom.listLineInfoValues.Count; i++)//-- this -1 is done because for three points we have two line series..
+                                {
+                                    //chart1.Series.Remove(menuStripNodeLineInfoValues[i].lineSeriesID);
+                                    dom.listLineInfoValues[i].lineSeriesID.Points.Clear();
+
+                                }
+                                //--this is redraw functionality
+                                //foreach(var values in menuStripNodeInfoValues)
+                                indexForSeriesNodePoint = 0;
+                                for (int x = 0; x < dom.listNodeInfoValues.Count; x++)
+                                {
+                                    string labelValue;
+                                    //if (menuStripNodeInfoValues[x].showItemText == "Label")
+                                    //{
+                                    //    labelValue = menuStripNodeInfoValues[x].label;
+                                    //}
+                                    //else if (menuStripNodeInfoValues[x].showItemText == "Name")
+                                    //{
+                                    labelValue = dom.listNodeInfoValues[x].name;
+                                    //}
+                                    //else
+                                    //{
+                                    //    labelValue = menuStripNodeInfoValues[x].source;
+                                    //}
+
+
+                                    // ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue, menuStripNodeInfoValues[x].marker_Size);
+                                    //dom.ReDrawPoints(dom.series1, dom.listNodeInfoValues[x].xVal, dom.listNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].temperature_source, menuStripNodeInfoValues[x].humidity_source, menuStripNodeInfoValues[x].name, labelValue, menuStripNodeInfoValues[x].marker_Size);
+                                    dom.ReDrawPoints(dom.series1, dom.listNodeInfoValues[x].xVal, dom.listNodeInfoValues[x].yVal, dom.listNodeInfoValues[x].colorValue, dom.listNodeInfoValues[x].temperature_source, dom.listNodeInfoValues[x].pressure_source, dom.listNodeInfoValues[x].name, labelValue, dom.listNodeInfoValues[x].marker_Size);
+
+                                    //Updating values in database...
+                                    if (bo.flagForInsertOrUpdateDataToDB == 1)
+                                    {
+                                        //UpdateNodeInfoToDB(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].showItemText, menuStripNodeInfoValues[x].marker_Size);
+                                    }
+
+                                    // incrementIndex++;
+                                    indexForSeriesNodePoint++;
+                                }
+                                //--resetting incrementIndex
+                                incrementIndex = 0;
+                                if (dom.listLineInfoValues.Count > 0)
+                                {
+                                    for (int x = 0; x < dom.listLineInfoValues.Count; x++)
+                                    {
+                                        incrementIndex++;
+
+                                        // dom.ReDrawLines(menuStripNodeLineInfoValues[x].ID, menuStripNodeLineInfoValues[x].prevNodeId, menuStripNodeLineInfoValues[x].nextNodeId, menuStripNodeLineInfoValues[x].lineSeriesID, menuStripNodeLineInfoValues[x].lineColorValue, menuStripNodeLineInfoValues[x].lineThickness, menuStripNodeLineInfoValues[x].name, menuStripNodeLineInfoValues[x].status);
+                                        dom.ReDrawLines(dom.listLineInfoValues[x].ID, dom.listLineInfoValues[x].prevNodeId, dom.listLineInfoValues[x].nextNodeId, dom.listLineInfoValues[x].lineSeriesID, dom.listLineInfoValues[x].lineColorValue, dom.listLineInfoValues[x].lineThickness, dom.listLineInfoValues[x].name, dom.listLineInfoValues[x].status);
+                                    }
+
+                                }
+
+                                chart1.Invalidate();
+                                // incrementIndex = 0;//reset the values again..
+                                // indexForSeriesNodePoint = 0;
+
+                            }
+                            else
+                            {
+
+                                //--Show indicator
+                                ////--Lets clear the indicator point first.
+                                //seriesLineIndicator.Points.Clear();
+
+                                //menuStripNodeInfoValues[idSelected].xVal = xAxis1;
+                                //menuStripNodeInfoValues[idSelected].yVal = yAxis1;
+
+                                dom.listNodeInfoValues[tempIndexForNode].xVal = xAxis1;
+                                dom.listNodeInfoValues[tempIndexForNode].yVal = yAxis1;
+
+
+                                //***********************For mix node section functions******************//
+
+                                //Function helps in updating the mix point x and y value when other node are moved
+                               // UpdateMixPointOnNodeMovement();
+                                //************************End of the mix node ************************//
+                                //label5.Text = "click past x =" + menuStripNodeInfoValues[idSelected].xVal + " y " + menuStripNodeInfoValues[idSelected].yVal;
+
+                                dom.series1.Points.Clear();
+                                for (int i = 0; i < dom.listLineInfoValues.Count; i++)//-- this -1 is done because for three points we have two line series..
+                                {
+                                    //chart1.Series.Remove(menuStripNodeLineInfoValues[i].lineSeriesID);
+                                    dom.listLineInfoValues[i].lineSeriesID.Points.Clear();
+                                }
+                                //--this is redraw functionality
+                                //foreach(var values in menuStripNodeInfoValues)
+                                indexForSeriesNodePoint = 0;
+                                for (int x = 0; x < dom.listNodeInfoValues.Count; x++)
+                                {
+                                    string labelValue;
+                                    //if (menuStripNodeInfoValues[x].showItemText == "Label")
+                                    //{
+                                    //    labelValue = menuStripNodeInfoValues[x].label;
+                                    //}
+                                    //else if (menuStripNodeInfoValues[x].showItemText == "Name")
+                                    //{
+                                    labelValue = dom.listNodeInfoValues[x].name;
+                                    //}
+                                    //else
+                                    //{
+                                    //    labelValue = menuStripNodeInfoValues[x].source;
+                                    //}
+
+
+                                    // ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue, menuStripNodeInfoValues[x].marker_Size);
+                                    // ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].temperature_source, menuStripNodeInfoValues[x].humidity_source, menuStripNodeInfoValues[x].name, labelValue, menuStripNodeInfoValues[x].marker_Size);
+                                    dom.ReDrawPoints(dom.series1, dom.listNodeInfoValues[x].xVal, dom.listNodeInfoValues[x].yVal, dom.listNodeInfoValues[x].colorValue, dom.listNodeInfoValues[x].temperature_source, dom.listNodeInfoValues[x].pressure_source, dom.listNodeInfoValues[x].name, labelValue, dom.listNodeInfoValues[x].marker_Size);
+                                    //Updating values in database...
+                                    if (bo.flagForInsertOrUpdateDataToDB == 1)
+                                    {
+                                        //UpdateNodeInfoToDB(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].showItemText, menuStripNodeInfoValues[x].marker_Size);
+                                    }
+
+
+                                    // incrementIndex++;
+                                    indexForSeriesNodePoint++;
+                                }
+                                //--resetting incrementIndex
+                                // incrementIndex = 0;
+                                if (dom.listLineInfoValues.Count > 0)
+                                {
+                                    // MessageBox.Show("MENUSTIRP NODE LINE INFO VALUE");
+
+                                    for (int x = 0; x < dom.listLineInfoValues.Count; x++)
+                                    {
+                                        // MessageBox.Show("MENUSTIRP NODE LINE INFO VALUE");
+                                        // incrementIndex++;
+
+                                        //ReDrawLines(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue);
+                                        // ReDrawLines(menuStripNodeLineInfoValues[x].ID, menuStripNodeLineInfoValues[x].prevNodeId, menuStripNodeLineInfoValues[x].nextNodeId, menuStripNodeLineInfoValues[x].lineSeriesID, menuStripNodeLineInfoValues[x].lineColorValue, menuStripNodeLineInfoValues[x].lineThickness, menuStripNodeLineInfoValues[x].name, menuStripNodeLineInfoValues[x].status);
+                                        dom.ReDrawLines(dom.listLineInfoValues[x].ID, dom.listLineInfoValues[x].prevNodeId, dom.listLineInfoValues[x].nextNodeId, dom.listLineInfoValues[x].lineSeriesID, dom.listLineInfoValues[x].lineColorValue, dom.listLineInfoValues[x].lineThickness, dom.listLineInfoValues[x].name, dom.listLineInfoValues[x].status);                                    }
+                                }
+
+
+                                chart1.Invalidate();
+                                //incrementIndex = 0;//reset the values again..
+                                //   indexForSeriesNodePoint = 0;
+
+                                //indexForSeriesNodePoint = 0;
+
+                            }//closing of key else part
+                        }
+
+                        //Need to add here
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+
+            }//close of if chart1.ChartAreas[0]
+
+
+        }
+
 
 
     }

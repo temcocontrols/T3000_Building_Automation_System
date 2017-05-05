@@ -18,9 +18,9 @@ namespace PH_App
         int flagForTimer = 0;
         int FlagForLockUnlock = 0;//0 means lock and 1 means unlock
         int FlagForDissableLeftAndRightClicksInChart = 0;//==do not dissable /OFF
-        int indexRun = 0;
-        int FlagForStopingRunningProcessInstantly = 0;//Currently OFF
-        int flagForInsertOrUpdateDataToDB = 0;
+      public  int indexRun = 0;
+      public  int FlagForStopingRunningProcessInstantly = 0;//Currently OFF
+      public  int flagForInsertOrUpdateDataToDB = 0;
 
         public Form_Main_PH_Application frm1;//This one is for backgroundworker 
 

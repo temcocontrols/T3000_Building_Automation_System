@@ -622,19 +622,19 @@ namespace PH_App
             //--Inserting the node values in the database sqlite
 
 
-            //if (flagForInsertOrUpdateDataToDB == 1)
-            //{
-            //do only if the  flag is raised.
+            if (bo.flagForInsertOrUpdateDataToDB == 1)
+            {
+                //do only if the  flag is raised.
 
-            // InsertNodeInfoToDB(unique_id_for_node, xval, yval, tbSource, tbName, tbLabel, colorValue, comboboxItemText, markerSize, deviceInstanceValue, deviceIP, deviceParam1ID, deviceParam2ID, device_param1_info_for_node, device_param2_info_for_node, object_param1_identifier_type, object_param2_identifier_type);
-            //--New code is added to here
-            var objDbOperation = dom;//new DatabaseOperations();
+                // InsertNodeInfoToDB(unique_id_for_node, xval, yval, tbSource, tbName, tbLabel, colorValue, comboboxItemText, markerSize, deviceInstanceValue, deviceIP, deviceParam1ID, deviceParam2ID, device_param1_info_for_node, device_param2_info_for_node, object_param1_identifier_type, object_param2_identifier_type);
+                //--New code is added to here
+                var objDbOperation = dom;//new DatabaseOperations();
                 //  MessageBox.Show("Building Name= " + selectedBuildingList[0].BuildingName);
                 // MessageBox.Show(unique_id_for_node+"xval = "+ xval+" yval"+ yval+"temp "+ temperature_sourceGlobal+"hum="+ humidity_sourceGlobal+",name="+ tbName+",col="+ colorValue+",size=" +markerSize +",air="+airFlowValueGlobal.ToString());
                 objDbOperation.InsertNodeInfoToDBWithoutDeviceInfo(dom.buildingList[0].BuildingName, dom.chartDetailList[bo.indexForWhichChartIsSelected].chart_respective_nodeID, unique_id_for_node, xval, yval, temperatureSource, pressureSource, name, c1, markerSize);
             // MessageBox.Show("Operation Complete Test");
             //InsertNodeInfoToDBWithoutDeviceInfo(unique_id_for_node,)
-            //}
+            }
 
 
 
@@ -682,14 +682,14 @@ namespace PH_App
 
 
                 //--Adding to db
-                //if (flagForInsertOrUpdateDataToDB == 1)
-                //{
+                if (bo.flagForInsertOrUpdateDataToDB == 1)
+                {
                     //--Insert the values when the flag is raised.
                     //InsertLineInfoToDB(unique_id_for_line, menuStripNodeInfoValues[index - 1].id, menuStripNodeInfoValues[index].id, menuStripNodeInfoValues[index - 1].colorValue, newLineSeries, menuStripNodeLineInfoValues[index - 1].lineThickness);
                     // InsertLineInfoToDB(unique_id_for_line, menuStripNodeInfoValues[index - 1].id, menuStripNodeInfoValues[index].id, menuStripNodeInfoValues[index - 1].colorValue, newLineSeries,3);
-                    
+
                     dom.InsertLineInfoToDB(unique_id_for_line, listNodeInfoValues[countNumberOfNodes - 1].ID, listNodeInfoValues[countNumberOfNodes].ID, listNodeInfoValues[countNumberOfNodes].colorValue, newLineSeries.Name.ToString(),linethickness, bo.chartDetailList[bo.indexForWhichChartIsSelected].chart_respective_lineID, lineNameVal, lineStatusVal);
-                //}
+                }
 
 
 
