@@ -1,0 +1,637 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7EDB848C-32C4-4C58-B206-D4FD1328F9F1}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>WFA_psychometric_chart</RootNamespace>
+    <AssemblyName>WFA_psychometric_chart</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>C:\Users\nischal\Desktop\publish of final window psychrometric\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>1</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\T3000 Output_VS2015\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RegisterForComInterop>true</RegisterForComInterop>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>48EE4A1464C3D7B3891BB717B3F9B7CDB7E6D5EF</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>WFA_psychometric_chart_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>true</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup>
+    <NoWin32Manifest>true</NoWin32Manifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Office.Interop.Excel.15.0.4795.1000\lib\net20\Microsoft.Office.Interop.Excel.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="PacketDotNet">
+      <HintPath>..\..\..\AlexCode\BACnetForBhoj\BACnetForBhoj\PacketDotNet.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpPcap">
+      <HintPath>..\..\..\AlexCode\BACnetForBhoj\BACnetForBhoj\SharpPcap.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite, Version=1.0.101.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Core.1.0.101.0\lib\net45\System.Data.SQLite.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Data.SQLite.EF6, Version=1.0.101.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.EF6.1.0.101.0\lib\net45\System.Data.SQLite.EF6.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Data.SQLite.Linq, Version=1.0.101.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Linq.1.0.101.0\lib\net45\System.Data.SQLite.Linq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Application_Form4.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Application_Form4.Designer.cs">
+      <DependentUpon>Application_Form4.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AssemblyCreationDate.cs" />
+    <Compile Include="BACnetBase.cs" />
+    <Compile Include="BACnetClass.cs" />
+    <Compile Include="BACnetClient.cs" />
+    <Compile Include="BACnetTransport.cs" />
+    <Compile Include="BacnetTransportEthernet.cs" />
+    <Compile Include="buildingChartSetting.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="buildingChartSetting.Designer.cs">
+      <DependentUpon>buildingChartSetting.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ChartOperations.cs" />
+    <Compile Include="comfort_zone.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="comfort_zone.Designer.cs">
+      <DependentUpon>comfort_zone.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DatabaseOperations.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DatabaseOperationsForEditNodeClass.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DataGridViewDisplay.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DataGridViewDisplay.Designer.cs">
+      <DependentUpon>DataGridViewDisplay.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceAndParameterProcess.cs" />
+    <Compile Include="DeviceConnection.cs" />
+    <Compile Include="DeviceInput.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceInput.Designer.cs">
+      <DependentUpon>DeviceInput.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditNodeLineForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditNodeLineForm.Designer.cs">
+      <DependentUpon>EditNodeLineForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FilterDataFromT3000.cs" />
+    <Compile Include="Form1_main.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1_main.Designer.cs">
+      <DependentUpon>Form1_main.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form3_WeatherService.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form3_WeatherService.Designer.cs">
+      <DependentUpon>Form3_WeatherService.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form4_insert_data.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form4_insert_data.Designer.cs">
+      <DependentUpon>Form4_insert_data.cs</DependentUpon>
+    </Compile>
+    <Compile Include="form_app_timer_historical_plot.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="form_app_timer_historical_plot.Designer.cs">
+      <DependentUpon>form_app_timer_historical_plot.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_Device_Information_For_EditMode.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_Device_Information_For_EditMode.Designer.cs">
+      <DependentUpon>Form_Device_Information_For_EditMode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="form_export_data.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="form_export_data.Designer.cs">
+      <DependentUpon>form_export_data.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_handler.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_handler.Designer.cs">
+      <DependentUpon>Form_handler.cs</DependentUpon>
+    </Compile>
+    <Compile Include="form_heat_map.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="form_heat_map.Designer.cs">
+      <DependentUpon>form_heat_map.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_HumidityInput.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_HumidityInput.Designer.cs">
+      <DependentUpon>Form_HumidityInput.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_HumiditySourceDeviceInput.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_HumiditySourceDeviceInput.Designer.cs">
+      <DependentUpon>Form_HumiditySourceDeviceInput.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_input_by_temp_hum_for_main.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_input_by_temp_hum_for_main.Designer.cs">
+      <DependentUpon>Form_input_by_temp_hum_for_main.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_Input_For_Seriespoint.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_Input_For_Seriespoint.Designer.cs">
+      <DependentUpon>Form_Input_For_Seriespoint.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_point_add.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_point_add.Designer.cs">
+      <DependentUpon>Form_point_add.cs</DependentUpon>
+    </Compile>
+    <Compile Include="form_process_diagram.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="form_process_diagram.Designer.cs">
+      <DependentUpon>form_process_diagram.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_Psychrometric_Calculator.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_Psychrometric_Calculator.Designer.cs">
+      <DependentUpon>Form_Psychrometric_Calculator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="form_state_point_management.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="form_state_point_management.Designer.cs">
+      <DependentUpon>form_state_point_management.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_TemperatureSourceDeviceInput.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_TemperatureSourceDeviceInput.Designer.cs">
+      <DependentUpon>Form_TemperatureSourceDeviceInput.cs</DependentUpon>
+    </Compile>
+    <Compile Include="InsertNodeFormForBuildingChartSetting.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="InsertNodeFormForBuildingChartSetting.Designer.cs">
+      <DependentUpon>InsertNodeFormForBuildingChartSetting.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SelectLanguage.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SelectLanguage.designer.cs">
+      <DependentUpon>SelectLanguage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GraphForTrendLog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GraphForTrendLog.Designer.cs">
+      <DependentUpon>GraphForTrendLog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TrashBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TrashBox.Designer.cs">
+      <DependentUpon>TrashBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Weather_Restore.cs" />
+    <EmbeddedResource Include="Application_Form4.en-US.resx">
+      <DependentUpon>Application_Form4.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Application_Form4.ko.resx">
+      <DependentUpon>Application_Form4.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Application_Form4.resx">
+      <DependentUpon>Application_Form4.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Application_Form4.zh.resx">
+      <DependentUpon>Application_Form4.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="buildingChartSetting.ko.resx">
+      <DependentUpon>buildingChartSetting.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="buildingChartSetting.resx">
+      <DependentUpon>buildingChartSetting.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="buildingChartSetting.zh.resx">
+      <DependentUpon>buildingChartSetting.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="comfort_zone.ko.resx">
+      <DependentUpon>comfort_zone.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="comfort_zone.resx">
+      <DependentUpon>comfort_zone.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="comfort_zone.zh.resx">
+      <DependentUpon>comfort_zone.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataGridViewDisplay.resx">
+      <DependentUpon>DataGridViewDisplay.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceInput.resx">
+      <DependentUpon>DeviceInput.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditNodeLineForm.ko.resx">
+      <DependentUpon>EditNodeLineForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditNodeLineForm.resx">
+      <DependentUpon>EditNodeLineForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditNodeLineForm.zh.resx">
+      <DependentUpon>EditNodeLineForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form1_main.en-US.resx">
+      <DependentUpon>Form1_main.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form1_main.ko.resx">
+      <DependentUpon>Form1_main.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form1_main.resx">
+      <DependentUpon>Form1_main.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form1_main.zh.resx">
+      <DependentUpon>Form1_main.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form3_WeatherService.en-US.resx">
+      <DependentUpon>Form3_WeatherService.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form3_WeatherService.ko.resx">
+      <DependentUpon>Form3_WeatherService.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form3_WeatherService.resx">
+      <DependentUpon>Form3_WeatherService.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form3_WeatherService.zh.resx">
+      <DependentUpon>Form3_WeatherService.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form4_insert_data.en-US.resx">
+      <DependentUpon>Form4_insert_data.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form4_insert_data.ko.resx">
+      <DependentUpon>Form4_insert_data.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form4_insert_data.resx">
+      <DependentUpon>Form4_insert_data.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form4_insert_data.zh.resx">
+      <DependentUpon>Form4_insert_data.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_app_timer_historical_plot.en-US.resx">
+      <DependentUpon>form_app_timer_historical_plot.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_app_timer_historical_plot.ko.resx">
+      <DependentUpon>form_app_timer_historical_plot.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_app_timer_historical_plot.resx">
+      <DependentUpon>form_app_timer_historical_plot.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_app_timer_historical_plot.zh.resx">
+      <DependentUpon>form_app_timer_historical_plot.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_Device_Information_For_EditMode.ko.resx">
+      <DependentUpon>Form_Device_Information_For_EditMode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_Device_Information_For_EditMode.resx">
+      <DependentUpon>Form_Device_Information_For_EditMode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_Device_Information_For_EditMode.zh.resx">
+      <DependentUpon>Form_Device_Information_For_EditMode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_export_data.en-US.resx">
+      <DependentUpon>form_export_data.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_export_data.ko.resx">
+      <DependentUpon>form_export_data.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_export_data.resx">
+      <DependentUpon>form_export_data.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_export_data.zh.resx">
+      <DependentUpon>form_export_data.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_handler.ko.resx">
+      <DependentUpon>Form_handler.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_handler.resx">
+      <DependentUpon>Form_handler.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_handler.zh.resx">
+      <DependentUpon>Form_handler.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_heat_map.en-US.resx">
+      <DependentUpon>form_heat_map.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_heat_map.ko.resx">
+      <DependentUpon>form_heat_map.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_heat_map.resx">
+      <DependentUpon>form_heat_map.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_heat_map.zh.resx">
+      <DependentUpon>form_heat_map.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_HumidityInput.resx">
+      <DependentUpon>Form_HumidityInput.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_HumiditySourceDeviceInput.ko.resx">
+      <DependentUpon>Form_HumiditySourceDeviceInput.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_HumiditySourceDeviceInput.resx">
+      <DependentUpon>Form_HumiditySourceDeviceInput.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_HumiditySourceDeviceInput.zh.resx">
+      <DependentUpon>Form_HumiditySourceDeviceInput.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_input_by_temp_hum_for_main.ko.resx">
+      <DependentUpon>Form_input_by_temp_hum_for_main.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_input_by_temp_hum_for_main.resx">
+      <DependentUpon>Form_input_by_temp_hum_for_main.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_input_by_temp_hum_for_main.zh.resx">
+      <DependentUpon>Form_input_by_temp_hum_for_main.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_Input_For_Seriespoint.en-US.resx">
+      <DependentUpon>Form_Input_For_Seriespoint.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_Input_For_Seriespoint.ko.resx">
+      <DependentUpon>Form_Input_For_Seriespoint.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_Input_For_Seriespoint.resx">
+      <DependentUpon>Form_Input_For_Seriespoint.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_Input_For_Seriespoint.zh.resx">
+      <DependentUpon>Form_Input_For_Seriespoint.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_point_add.ko.resx">
+      <DependentUpon>Form_point_add.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_point_add.resx">
+      <DependentUpon>Form_point_add.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_point_add.zh.resx">
+      <DependentUpon>Form_point_add.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_process_diagram.en-US.resx">
+      <DependentUpon>form_process_diagram.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_process_diagram.ko.resx">
+      <DependentUpon>form_process_diagram.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_process_diagram.resx">
+      <DependentUpon>form_process_diagram.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_process_diagram.zh.resx">
+      <DependentUpon>form_process_diagram.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_Psychrometric_Calculator.ko.resx">
+      <DependentUpon>Form_Psychrometric_Calculator.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_Psychrometric_Calculator.resx">
+      <DependentUpon>Form_Psychrometric_Calculator.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_Psychrometric_Calculator.zh.resx">
+      <DependentUpon>Form_Psychrometric_Calculator.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_state_point_management.resx">
+      <DependentUpon>form_state_point_management.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_TemperatureSourceDeviceInput.ko.resx">
+      <DependentUpon>Form_TemperatureSourceDeviceInput.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_TemperatureSourceDeviceInput.resx">
+      <DependentUpon>Form_TemperatureSourceDeviceInput.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_TemperatureSourceDeviceInput.zh.resx">
+      <DependentUpon>Form_TemperatureSourceDeviceInput.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GraphForTrendLog.ko.resx">
+      <DependentUpon>GraphForTrendLog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InsertNodeFormForBuildingChartSetting.ko.resx">
+      <DependentUpon>InsertNodeFormForBuildingChartSetting.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InsertNodeFormForBuildingChartSetting.resx">
+      <DependentUpon>InsertNodeFormForBuildingChartSetting.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InsertNodeFormForBuildingChartSetting.zh.resx">
+      <DependentUpon>InsertNodeFormForBuildingChartSetting.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.en-US.resx">
+      <DependentUpon>Resources.resx</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.ko.resx">
+      <DependentUpon>Resources.resx</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.zh.resx">
+      <DependentUpon>Resources.resx</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SelectLanguage.en-US.resx">
+      <DependentUpon>SelectLanguage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SelectLanguage.ko.resx">
+      <DependentUpon>SelectLanguage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SelectLanguage.resx">
+      <DependentUpon>SelectLanguage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GraphForTrendLog.resx">
+      <DependentUpon>GraphForTrendLog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TrashBox.ko.resx">
+      <DependentUpon>TrashBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TrashBox.resx">
+      <DependentUpon>TrashBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TrashBox.zh.resx">
+      <DependentUpon>TrashBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <None Include="WFA_psychometric_chart_TemporaryKey.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\d_arrow.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\u_arrow.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="Microsoft.Office.Core">
+      <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>4</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="VBIDE">
+      <Guid>{0002E157-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>5</VersionMajor>
+      <VersionMinor>3</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="WFA_psychometric_chart_ml.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.5">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.5 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\System.Data.SQLite.Core.1.0.101.0\build\net45\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.101.0\build\net45\System.Data.SQLite.Core.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.101.0\build\net45\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.101.0\build\net45\System.Data.SQLite.Core.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

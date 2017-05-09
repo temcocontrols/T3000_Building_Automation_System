@@ -12,7 +12,6 @@ using System.Reflection;
 using System.Data.SQLite;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using System.Data.OleDb;
 
 namespace WFA_psychometric_chart
 {
@@ -72,7 +71,7 @@ namespace WFA_psychometric_chart
          public void timer1_Tick_For_Device(object sender , EventArgs e)
         {
            // MessageBox.Show("Test called ");
-        //  ReadDataFromDevice();
+          //ReadDataFromDevice();
         }
 
         public class DeviceClass
@@ -91,6 +90,13 @@ namespace WFA_psychometric_chart
 
             // initialize timer for constant reading..
             //InitTimerForDevice();
+            if (flagForTimerNew == 1)
+            {
+                atimerNew.Enabled = false;
+                atimerNew.Stop();
+                atimerNew.Dispose();
+                flagForTimerNew = 0;//Dissabling the timer
+            }
 
             if (flagForTimer == 1)
             {
@@ -104,22 +110,92 @@ namespace WFA_psychometric_chart
             }
 
             device_info.Clear();//Resetting the values
-            //=========Resetting the two comboboxes first===========
+                                //=========Resetting the two comboboxes first===========
 
-            CB_param_hum.Text = "";
-            CB_param_hum.Items.Clear();
-            CB_param_hum.Enabled = false;
+            if (CB_param_hum.InvokeRequired)
+            {
+                CB_param_hum.Invoke(new Action(() => CB_param_hum.Text = ""));
+                CB_param_hum.Invoke(new Action(() => CB_param_hum.Items.Clear()));
+                CB_param_hum.Invoke(new Action(() => CB_param_hum.Enabled = false));
+                CB_param_hum.Invoke(new Action(() => CB_param_hum.Text = ""));
 
-            CB_param_temp.Text = "";
-            CB_param_temp.Items.Clear();
-            CB_param_temp.Enabled = false;
-            tb_temp_panel_value.Text = "";
-            tb_hum_panel_value.Text = "";
+            }
+            else
+            {
+                CB_param_hum.Text = "";
+                CB_param_hum.Items.Clear();
+                CB_param_hum.Enabled = false;
+
+            }
+
+
+            //CB_param_hum.Text = "";
+            //CB_param_hum.Items.Clear();
+            //CB_param_hum.Enabled = false;
+
+            //CB_param_temp.Text = "";
+            //CB_param_temp.Items.Clear();
+            //CB_param_temp.Enabled = false;
+
+
+
+            if (CB_param_hum.InvokeRequired)
+            {
+                CB_param_temp.Invoke(new Action(() => CB_param_temp.Text = ""));
+                CB_param_temp.Invoke(new Action(() => CB_param_temp.Items.Clear()));
+                CB_param_temp.Invoke(new Action(() => CB_param_temp.Enabled = false));
+                CB_param_temp.Invoke(new Action(() => CB_param_temp.Text = ""));
+
+            }
+            else
+            {
+                CB_param_temp.Text = "";
+                CB_param_temp.Items.Clear();
+                CB_param_temp.Enabled = false;
+
+            }
+            if (tb_temp_panel_value.InvokeRequired)
+            {
+                tb_temp_panel_value.Invoke(new Action(() => tb_temp_panel_value.Text = ""));
+              
+            }
+            else
+            {
+                tb_temp_panel_value.Text = "";
+             
+            }
+            if (tb_hum_panel_value.InvokeRequired)
+            {
+                tb_hum_panel_value.Invoke(new Action(() => tb_hum_panel_value.Text = ""));
+
+            }
+            else
+            {
+                tb_hum_panel_value.Text = "";
+
+            }
+
+            // tb_temp_panel_value.Text = "";
+           // tb_hum_panel_value.Text = "";
             //=======================end of resetting=============
 
 
-            CB_Device.Items.Clear();//Clearing the combobox
-            CB_Device.Text = "";
+            //CB_Device.Items.Clear();//Clearing the combobox
+            //CB_Device.Text = "";
+
+            if (CB_Device.InvokeRequired)
+            {
+                CB_Device.Invoke(new Action(() => CB_Device.Items.Clear()));
+                CB_Device.Invoke(new Action(() => CB_Device.Text = ""));
+
+            }
+            else
+            {
+                CB_Device.Items.Clear();//Clearing the combobox
+                CB_Device.Text = "";
+
+
+            }
 
             //DeviceConnection dc = new DeviceConnection();
             //dc.ScanForDevice();//Scan the device
@@ -154,19 +230,112 @@ namespace WFA_psychometric_chart
             //Now lets fill the combobox value
             foreach (var b in copyOfMainControllerList)
             {
-                CB_Device.Items.Add("Device: " + b.controllerName);
-               // MessageBox.Show("device");
+                // CB_Device.Items.Add("Device: " + b.controllerName);
+                if (CB_Device.InvokeRequired)
+                {
+                    CB_Device.Invoke(new Action(() => CB_Device.Items.Add("Device: " + b.controllerName)));                    
+                }
+                else
+                {
+                    CB_Device.Items.Add("Device: " + b.controllerName);
+                }
+                // MessageBox.Show("device");
             }
+            //====inserting and updating controller info with corresponding values For restore fxn====//
+
+            
+            Weather_Restore wr = new Weather_Restore();
+            string buildingName = "";
+            if (lb_building_name.InvokeRequired)
+            {
+                lb_building_name.Invoke(new Action(() => buildingName = lb_building_name.Text));
+            }
+            else
+            {
+                // lb_building_name.Items.Add("Device: " + b.controllerName);
+                buildingName = lb_building_name.Text;
+            }
+            string deviceInfo = "";
+            if (CB_Device.InvokeRequired)
+            {
+                CB_Device.Invoke(new Action(() => deviceInfo = CB_Device.Text));
+            }
+            else
+            {
+                // lb_building_name.Items.Add("Device: " + b.controllerName);
+                deviceInfo = CB_Device.Text;
+            }
+            string TempInfo = "";
+            if (CB_param_temp.InvokeRequired)
+            {
+                CB_param_temp.Invoke(new Action(() => TempInfo = CB_param_temp.Text));
+            }
+            else
+            {
+                // lb_building_name.Items.Add("Device: " + b.controllerName);
+                TempInfo = CB_param_temp.Text;
+            }
+            string HumInfo = "";
+            if (CB_param_hum.InvokeRequired)
+            {
+                CB_param_hum.Invoke(new Action(() => HumInfo = CB_param_hum.Text));
+            }
+            else
+            {
+                // lb_building_name.Items.Add("Device: " + b.controllerName);
+                HumInfo = CB_param_hum.Text;
+            }
+
+            string tb_TempBox = "";
+            if (tb_temp_panel_value.InvokeRequired)
+            {
+                tb_temp_panel_value.Invoke(new Action(() => tb_TempBox = tb_temp_panel_value.Text));
+            }
+            else
+            {
+                // lb_building_name.Items.Add("Device: " + b.controllerName);
+                tb_TempBox = tb_temp_panel_value.Text;
+            }
+            string tb_HumBox = "";
+            if (tb_hum_panel_value.InvokeRequired)
+            {
+                tb_hum_panel_value.Invoke(new Action(() => tb_HumBox = tb_hum_panel_value.Text));
+            }
+            else
+            {
+                // lb_building_name.Items.Add("Device: " + b.controllerName);
+                tb_HumBox = tb_hum_panel_value.Text;
+            }
+
+            // wr.UpdateOrInsertControllerInfo(lb_building_name.Text, CB_Device.Text, CB_param_temp.Text, CB_param_hum.Text,tb_temp_panel_value.Text,tb_hum_panel_value.Text);
+            wr.UpdateOrInsertControllerInfo(buildingName, deviceInfo, TempInfo, HumInfo, tb_TempBox, tb_HumBox);
+            //=========================End of controller updating to db section================//
 
             //This one is for the online/offline status part
             if (CB_Device.Items.Count > 0)
             {
                 //if There is item then we say device is online else ofline
-                lb_device_status.Text = "connected";
+                //lb_device_status.Text = "connected";
+                if (lb_device_status.InvokeRequired)
+                {
+                    lb_device_status.Invoke(new Action(() => lb_device_status.Text = "connected"));
+                }
+                else
+                {
+                    lb_device_status.Text = "connected";
+                }
             }
             else
             {
-                lb_device_status.Text = "disconnected";
+                // lb_device_status.Text = "disconnected";
+                if (lb_device_status.InvokeRequired)
+                {
+                    lb_device_status.Invoke(new Action(() => lb_device_status.Text = "disconnected"));
+                }
+                else
+                {
+                    lb_device_status.Text = "disconnected";
+                }
             }
 
         }
@@ -417,7 +586,8 @@ namespace WFA_psychometric_chart
                     //btn_update_constantly.Enabled = true;//this will be true when user selects a station 
                     cb_station_names.Enabled = true;
                     tb_station_distance.Enabled = true;
-
+                    lbConnectionIssue.Text = "GOOD";
+                    label30Status.Text = "Status : Updating data...";
 
                     /*
                      we should try to pull the data of the station names based on the location selected.
@@ -497,7 +667,8 @@ namespace WFA_psychometric_chart
                         {
                             s += " name  = " + store_station_list[i].name + " dist = " + store_station_list[i].distance + " \n ";
                             //lets set the value to cb so that it gets the exact value...
-                            cb_station_names.Items.Add(store_station_list[i].name);
+                            string listItem = store_station_list[i].name + "(" + Math.Round((store_station_list[i].distance* 0.621371),2) + " miles)";
+                            cb_station_names.Items.Add(listItem);
 
                         }
 
@@ -515,10 +686,22 @@ namespace WFA_psychometric_chart
                     }//close of using webclient
 
 
+                    //====inserting and updating controller info with corresponding values For restore fxn====//
+
+                    //if (CB_Device.Text != "")
+                    //{
+                        Weather_Restore wr = new Weather_Restore();
+                        wr.UpdateOrInsertWebInfo(lb_building_name.Text,"enabled", cb_station_names.Text);
+                    //}
+                    //=========================End of controller updating to db section================//
+
+
+
+
                     //--This is for the setting ie if the building is selected and closed
 
                     //CheckDataForSettings();
-               
+
                 }
                 catch (Exception ex)
                 {
@@ -541,8 +724,11 @@ namespace WFA_psychometric_chart
                     cb_station_names.Enabled = false;
                     tb_station_distance.Enabled = false;
                     cb_enable_disable.Checked = false;
-                    lbConnectionIssue.Text = "GOOD";
+                    lbConnectionIssue.Text = "";
                     btnShowLogFile.Enabled = false;
+
+                    Weather_Restore wr = new Weather_Restore();
+                    wr.UpdateOrInsertWebInfo(lb_building_name.Text, "dissabled", cb_station_names.Text);
 
                 }
 
@@ -588,9 +774,18 @@ namespace WFA_psychometric_chart
                 //btn_update_constantly.Enabled = true;//this will be true when user selects a station 
                 //cb_station_names.Enabled = true;
                 tb_station_distance.Text = "";
-                lbConnectionIssue.Text = "GOOD";
+                lbConnectionIssue.Text = "";
                 btnShowLogFile.Enabled = false;
-               
+                label30Status.Text = "Status :";
+
+                //===FOr restore of web weather serivce
+                Weather_Restore wr = new Weather_Restore();
+                wr.UpdateOrInsertWebInfo(lb_building_name.Text, "dissabled", cb_station_names.Text);
+
+                //===end
+
+
+
                 //--Disposing the timer1 and timer2 
                 timer1.Stop();
                 timer1.Tick -= new EventHandler(timer1_Tick);
@@ -768,8 +963,10 @@ namespace WFA_psychometric_chart
 
                 btn_help.Enabled = true;
                 tb_max_adjust.Enabled = true;
-               // tb_current_offset.Enabled = true;
+                // tb_current_offset.Enabled = true;
                 //btn_set_value.Enabled = true;
+                Weather_Restore wr = new Weather_Restore();
+                wr.UpdateOrInsertHumSelfCalibrationInfo(lb_building_name.Text, "yes", tb_max_adjust.Text);
 
             }
             else
@@ -781,6 +978,10 @@ namespace WFA_psychometric_chart
                 tb_max_adjust.Enabled = false;
                 // tb_current_offset.Enabled = false;
                 //btn_set_value.Enabled = false;
+
+
+                Weather_Restore wr = new Weather_Restore();
+                wr.UpdateOrInsertHumSelfCalibrationInfo(lb_building_name.Text, "no", tb_max_adjust.Text);
 
                 //Disposing the events
                 timer2.Stop();
@@ -1532,7 +1733,7 @@ namespace WFA_psychometric_chart
         {
             try { 
 
-            button1.Text = WFA_psychometric_chart.Properties.Resources.Refresh_Building;
+                button1.Text = WFA_psychometric_chart.Properties.Resources.Refresh_Building;
                 label36.Text = WFA_psychometric_chart.Properties.Resources.Select_station_name;
                 //fill_combobox();
 
@@ -1591,6 +1792,12 @@ namespace WFA_psychometric_chart
                 //--Close of the setting things...
                 FindPathOfBuildingDB();
 
+                //if(cb_enable_disable.Checked != false)
+                //{
+                    lbConnectionIssue.Text = "";
+                    
+                ////}
+           
 
             }
             catch (Exception ex)
@@ -2116,9 +2323,6 @@ namespace WFA_psychometric_chart
                                 //finally close the connection.
 
 
-
-
-
                                 connection.Close();
 
 
@@ -2542,7 +2746,7 @@ namespace WFA_psychometric_chart
                 else
                 {
                     //MessageBox.Show("pulling...");
-                    label30.Text = WFA_psychometric_chart.Properties.Resources.Status_Updating_data;
+                    label30Status.Text = WFA_psychometric_chart.Properties.Resources.Status_Updating_data;
 
                     InitTimer();
 
@@ -2569,6 +2773,15 @@ namespace WFA_psychometric_chart
             tb_station_distance.Text = store_station_list[index_for_station_selected].distance.ToString();
                 //btn_update_now.Enabled = true;
                 // btn_update_constantly.Enabled = true;
+
+                //====================This one is for web restore section for starting from same point everytime it starts====//
+                if(cb_station_names.Text != "")
+                {
+                //MessageBox.Show("Here we are");
+                Weather_Restore wr = new Weather_Restore();
+                wr.UpdateOrInsertWebInfo(lb_building_name.Text, "enabled", cb_station_names.Text);
+                }
+                //================End of  web restore section===========================================================//
 
 
                 update_constantly_function();//--This functions updates the values constantly..
@@ -2677,11 +2890,18 @@ namespace WFA_psychometric_chart
 
         private void CB_Device_SelectedIndexChanged(object sender, EventArgs e)
         {
-            try { 
-            //now on index change
-           // groupBox3.Enabled = true;
-            //Lets clear the combobox first
-            CB_param_temp.Items.Clear();
+            try {
+
+
+                if (FlagDissableSelection == 0)
+                {
+                    return;
+                }
+
+                //now on index change
+                // groupBox3.Enabled = true;
+                //Lets clear the combobox first
+                CB_param_temp.Items.Clear();
             CB_param_hum.Items.Clear();
             parameterValFromBacnet.Clear();//Clearing the list value
 
@@ -2699,44 +2919,40 @@ namespace WFA_psychometric_chart
                 }
 
                 //On this index change the we need to get the values from the 
-              int  indexSelectedDevice = CB_Device.SelectedIndex;
-                    int instanceId = copyOfMainControllerList[indexSelectedDevice].controllerInstanceId;  //(int)device_info[indexSelectedDevice].deviceInstance;//Device instance selected.
+                int indexSelectedDevice = CB_Device.SelectedIndex;
+                int instanceId = copyOfMainControllerList[indexSelectedDevice].controllerInstanceId;//(int)device_info[indexSelectedDevice].deviceInstance;//Device instance selected.
 
-                 //   MessageBox.Show("Instaneid = " + instanceId);
-                //===============For regulare update=============//
-                deviceInstanceValuTemp = instanceId;//This one is for regular update
+                    //   MessageBox.Show("Instaneid = " + instanceId);
+                    //===============For regulare update=============//
+                    deviceInstanceValuTemp = instanceId;//This one is for regular update
                                                     //================end of for regular update=====//
                                                     //This uint has to be converted to int because that is what is required...
 
                     //Checking if the device is online or offline
                     if (CheckDeviceOnlineOffline(deviceInstanceValuTemp, 0) == true)
                     {
-                      //  MessageBox.Show("Checking online status become true");
+                        //  MessageBox.Show("Checking online status become true");
 
                         //return;
 
+                        // 0. First check weather INPUTable table is present in alex database or not
 
-                        DeviceConnection db = new DeviceConnection();
-                        //We need to scan for the device first and then parameter
-                        db.ScanForDevice();
-                        //db.ScanForParameters(24649);
-                        db.ScanForParameters(instanceId);//This will return the parameters
-                       // MessageBox.Show("Count = " + db.parameterListValue.Count);       //Now we can use the value strored int  the db.parameterList1
-                        string s = "";
-                        foreach (var bac in db.parameterListValue)
+                        if (IsInputTablePresentInT3000() == true)
                         {
-                            parameterValFromBacnet.Add(new parameter_class1
-                            {
-                                device_object_name = bac.device_object_name,
-                                indexID = bac.indexID,
-                                presentValue = bac.presentValue ,
-                                object_identifier_type = bac.object_identifier_type
+
+                         System.Threading.CancellationTokenSource cts = new System.Threading.CancellationTokenSource();
+                        try {
+                            cts.CancelAfter(10000);
+                            // await PullDataFromDeviceForTimeConstrains(instanceId);
+                            //MessageBox.Show("We are here");
+                             AsyncMethodForPullingDataFromYabee(instanceId,  cts.Token);
+
+                            System.Threading.Thread.Sleep(6000);
 
 
-                            });
-                          //  s += bac.device_object_name + "," + bac.presentValue + "\n";
+
                         }
-
+                        catch (Exception ex) { }
 
                         //  MessageBox.Show("value = " + s);
 
@@ -2755,13 +2971,14 @@ namespace WFA_psychometric_chart
                         //**************************First Temperature filtering*******************************//
 
 
-                        //--Here we need to scan form th    e  T3000 database and then publish the list which is there 
+                        //--Here we need to scan form the  T3000 database and then publish the list which is there 
                         /*
                         Task :
-                        1.Read the data from the alex db 
+                         1.Read the data from the alex db 
                         2.Find only TEMPERATURE VALUE
                         3.Filter and display only temperature values
                         */
+                         
                         Form1_main f = new Form1_main();
                         string path_to_alexdb = f.PathToT3000BuildingDB;// PathToT3000BuildingDB;
                         ReadDataFromAlexDatabase("INPUTable");
@@ -2821,9 +3038,20 @@ namespace WFA_psychometric_chart
 
                         CB_param_temp.Enabled = true;
                     CB_param_hum.Enabled = true;
-                      //MessageBox.Show("ENd of the true");
-                    //TEST
-                }
+
+                        //====inserting and updating controller info with corresponding values For restore fxn====//
+
+                        if(CB_Device.Text != "")
+                        { 
+                        Weather_Restore wr = new Weather_Restore();
+                        wr.UpdateOrInsertControllerInfo(lb_building_name.Text, CB_Device.Text, CB_param_temp.Text, CB_param_hum.Text, tb_temp_panel_value.Text,tb_hum_panel_value.Text);
+                        }
+                            //=========================End of controller updating to db section================//
+
+                            //MessageBox.Show("ENd of the true");
+                            //TEST
+                        } //--Close if IsInputTablePresentInT3000
+                    }
                 else
                 {
                         //Show device is offline
@@ -2831,16 +3059,54 @@ namespace WFA_psychometric_chart
                 }
                 
             }//Close of if
+                
 
-
-            }catch(Exception ex)
+            }
+            catch(Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                //MessageBox.Show(ex.Message);
             }
 
         }
+        public async Task AsyncMethodForPullingDataFromYabee(int instanceid, System.Threading.CancellationToken ct)
+        {
+            try
+            {
+                // Do asynchronous work.
+                await Task.Run(() => PullDataFromDeviceForTimeConstrains(instanceid),ct);
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        public void PullDataFromDeviceForTimeConstrains(int instanceId)
+        {
+          
+            DeviceConnection db = new DeviceConnection();
+            //We need to scan for the device first and then parameter
+            db.ScanForDevice();
+            //db.ScanForParameters(24649);
+            db.ScanForParameters(instanceId);//This will return the parameters
+                                             // MessageBox.Show("Count = " + db.parameterListValue.Count);       //Now we can use the value strored int  the db.parameterList1
+            string s = "";
+            foreach (var bac in db.parameterListValue)
+            {
+                parameterValFromBacnet.Add(new parameter_class1
+                {
+                    device_object_name = bac.device_object_name,
+                    indexID = bac.indexID,
+                    presentValue = bac.presentValue,
+                    object_identifier_type = bac.object_identifier_type
 
 
+                });
+                //  s += bac.device_object_name + "," + bac.presentValue + "\n";
+            }
+           // MessageBox.Show("We are  count = "+db.parameterListValue.Count);
+
+        }
 
 
         /// <summary>
@@ -2888,7 +3154,7 @@ namespace WFA_psychometric_chart
                                     object_identifier_type = parameterValFromBacnet[item].object_identifier_type,
                                     presentValue = parameterValFromBacnet[item].presentValue
                                 });
-                                test += "\n" + parameterValFromBacnet[item].indexID + ",val" + parameterValFromBacnet[item].presentValue;
+                               // test += "\n" + parameterValFromBacnet[item].indexID + ",val" + parameterValFromBacnet[item].presentValue;
                                 break;//After the value is found break form this loop
                             }
 
@@ -3173,6 +3439,32 @@ namespace WFA_psychometric_chart
         }
 
 
+       private bool IsInputTablePresentInT3000()
+        {
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string path = databasePath;  //@"C:\Folder1\Folder2\Folder3\Folder4";
+            string newPath = Path.GetFullPath(Path.Combine(path, @"..\"));
+            string againDbPath = @"Data Source=" + newPath + "" + BuildingSelected[0].Building_Path;
+
+            bool returnValue = false;
+            using (SQLiteConnection connection = new SQLiteConnection(againDbPath))
+            {
+                connection.Open();
+                SQLiteDataReader reader = null;
+                string queryString = "SELECT name FROM sqlite_master WHERE type='table' AND name='INPUTable';"; 
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+
+                    returnValue = true;
+                }
+            }
+
+
+
+            return returnValue;
+        }
 
 
         //Don't use System.Window.Timer
@@ -3600,6 +3892,12 @@ namespace WFA_psychometric_chart
             if(CB_param_temp.SelectedIndex >= 0)
             {
 
+                //--Do not do anything if flag is dissabled
+                if (FlagDissableSelection == 0)
+                {
+                    return;
+                }
+
                 //AfterFilteringFromAlexValueListOfValues 
                 //on this index is selected the value should be displayed to text box
                 //tb_temp_panel_value.Text = parameterValFromBacnet[CB_param_temp.SelectedIndex].presentValue.ToString() ;
@@ -3624,6 +3922,17 @@ namespace WFA_psychometric_chart
 
                     //then reenable again
                     temporary_timer_function();
+
+                    //====inserting and updating controller info with corresponding values For restore fxn====//
+
+                    if (CB_Device.Text != "")
+                    {
+                        Weather_Restore wr = new Weather_Restore();
+                        // wr.UpdateOrInsertControllerInfo(lb_building_name.Text, CB_Device.Text, CB_param_temp.Text, CB_param_hum.Text);
+                        wr.UpdateOrInsertControllerInfo(lb_building_name.Text, CB_Device.Text, CB_param_temp.Text, CB_param_hum.Text, tb_temp_panel_value.Text, tb_hum_panel_value.Text);
+                    }
+                    //=========================End of controller updating to db section================//
+
                 }
                 else
                 {
@@ -3639,6 +3948,11 @@ namespace WFA_psychometric_chart
         {
             if (CB_param_hum.SelectedIndex >= 0)
             {
+                //--Do not do anything if flag is dissabled
+                if (FlagDissableSelection == 0)
+                {
+                    return;
+                }
 
                 //tb_hum_panel_value.Text = parameterValFromBacnet[CB_param_hum.SelectedIndex].presentValue.ToString();
                 tb_hum_panel_value.Text = AfterFilteringFromAlexValueListOfValuesForHumidityOnly[CB_param_hum.SelectedIndex].presentValue.ToString();
@@ -3656,11 +3970,306 @@ namespace WFA_psychometric_chart
 
                 //then reenable again
                 temporary_timer_function();
+                //====inserting and updating controller info with corresponding values For restore fxn====//
+                if (CB_Device.Text != "")
+                {
+                    Weather_Restore wr = new Weather_Restore();
+                    // wr.UpdateOrInsertControllerInfo(lb_building_name.Text, CB_Device.Text, CB_param_temp.Text, CB_param_hum.Text);
+                    wr.UpdateOrInsertControllerInfo(lb_building_name.Text, CB_Device.Text, CB_param_temp.Text, CB_param_hum.Text, tb_temp_panel_value.Text, tb_hum_panel_value.Text);
+                }
+                //=========================End of controller updating to db section================//
+
 
             }
-       
-       
+
+
         }
+
+        private void Form3_WeatherService_Shown(object sender, EventArgs e)
+        {
+            //--This function helps to restore the previous state of the form if a form has previous state.
+            //try { 
+            //if (CheckForInternetConnection() == true)
+            //{
+            //--This will be enabled later 
+            //RestoreController();
+            InitialControllerSetUp();
+
+            //  MessageBox.Show("Controller ok");
+            RestoreWeb();
+            RestoreHumiditySelfCalibration();//For humidity self calibration
+            InitTimerForDeviceNew();
+            //}
+            //}
+            //catch(Exception ex)
+            //{
+            //MessageBox.Show(ex.Message);
+            //}
+            //--End of restore section for form
+
+        }
+
+        public static bool CheckForInternetConnection()
+        {
+            try
+            {
+                using (var client = new WebClient())
+                using (var stream = client.OpenRead("http://www.google.com"))
+                {
+                    return true;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        int FlagDissableSelection = 1;//--Zero means dissable and 1 means enable
+        public void InitialControllerSetUp()
+        {
+            Weather_Restore wr = new Weather_Restore();
+            wr.ReadControllerDataForRestore(lb_building_name.Text);
+            if (wr.ListControllerInfo.Count == 1) //--If the item is one then only we need to update
+            {
+                //MessageBox.Show("Controller info=" + wr.ListControllerInfo[0].ControllerInfo);
+                //CB_Device.Items.Add( wr.ListControllerInfo[0].ControllerInfo);
+                FlagDissableSelection = 0;
+                CB_Device.Items.Insert(0, wr.ListControllerInfo[0].ControllerInfo);
+                CB_Device.SelectedIndex = 0;
+
+                //CB_Device.DisplayMember = wr.ListControllerInfo[0].ControllerInfo;
+                CB_param_temp.Enabled = true;
+                CB_param_hum.Enabled = true;
+
+                //CB_param_temp.Text = wr.ListControllerInfo[0].TempParamInfo;
+                //CB_param_hum.Text = wr.ListControllerInfo[0].HumParamInfo;
+                CB_param_temp.Items.Insert(0, wr.ListControllerInfo[0].TempParamInfo);
+                CB_param_temp.SelectedIndex = 0;
+
+                CB_param_hum.Items.Insert(0, wr.ListControllerInfo[0].HumParamInfo);
+                CB_param_hum.SelectedIndex = 0;
+
+                tb_temp_panel_value.Text = wr.ListControllerInfo[0].TempValue;
+                tb_hum_panel_value.Text = wr.ListControllerInfo[0].HumValue;
+                FlagDissableSelection = 1;
+            }
+       }
+
+
+        private System.Timers.Timer atimerNew;
+       int flagForTimerNew = 0;
+        public void InitTimerForDeviceNew()
+        {
+
+            // MessageBox.Show("inside timer");
+            flagForTimerNew = 1;
+            atimerNew = new System.Timers.Timer();
+            atimerNew.Enabled = true;
+            
+            atimerNew.Elapsed += timer1_Tick_For_DeviceNew;
+
+            atimerNew.Interval = 1000 * 3; //x seconds[ 1000 ms * x  =  x seconds]
+            //atimerNew.Start();
+
+        }
+
+        public void someFxn()
+        {
+          //  MessageBox.Show("finish of the RestoreController fxn");
+
+            atimerNew.Enabled = false;
+            atimerNew.Stop();
+            atimerNew.Dispose();
+            flagForTimerNew = 0;//Dissabling the timer
+            RestoreController();
+            //==After this close the timer
+           
+            //atimerNew.Enabled = false;
+            //atimerNew.Stop();
+            //atimerNew.Elapsed -= timer1_Tick_For_DeviceNew;
+        }
+
+        public void timer1_Tick_For_DeviceNew(object sender, EventArgs e)
+        {
+
+            //try
+            //{
+
+                // AsyncMethodForUpdate();
+                //if (InvokeRequired)
+                //{
+                //    //this.Invoke(new Action(() => RefreshDataFromDeviceAndWeb()));
+                //    this.Invoke(new Action(() => AsyncMethodForUpdate()));
+                //    return;
+                //}
+                //else
+                //{
+                //    AsyncMethodForUpdate();
+                //}
+                someFxn();
+
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show(ex.Message);
+            //}
+
+
+        }
+
+
+        public void RestoreController()
+        {
+            Weather_Restore wr = new Weather_Restore();
+            wr.ReadControllerDataForRestore(lb_building_name.Text);
+            if(wr.ListControllerInfo.Count == 1) //--If the item is one then only we need to update
+            {
+
+                /*steps : 
+                 1.Press the scan button 
+                 2. match the controller info
+                 3. select the controller info
+                 4. wait for the operation to complete.
+                 5. match the temperatre info
+                 6. select the temperature info
+                 7. match the hum info
+                 8. select the hum info 
+                */
+                EventArgs e1 = new EventArgs();
+                button4_Click(this, e1);//This call the buttons
+
+                for(int i = 0; i < CB_Device.Items.Count; i++)
+                {
+                    if(CB_Device.Items[i].ToString() == wr.ListControllerInfo[0].ControllerInfo)
+                    {
+                        //--We have a match we need to select this and wait for operation to complete..
+                        //CB_Device.SelectedIndex = i;//This will select the index, now lets wait for the function to complete
+                        if (CB_Device.InvokeRequired)
+                        {
+                            CB_Device.Invoke(new Action(() => CB_Device.SelectedIndex = i));
+                        }
+                        else
+                        {
+                            CB_Device.SelectedIndex = i;
+                        }
+
+                        break;
+                    }
+                }
+
+                //--For temperature 
+                for (int i = 0; i < CB_param_temp.Items.Count; i++)
+                {
+                    if (CB_param_temp.Items[i].ToString() == wr.ListControllerInfo[0].TempParamInfo)
+                    {
+                        //--We have a match we need to select this and wait for operation to complete..
+                        //CB_param_temp.SelectedIndex = i;//This will select the index, now lets wait for the function to complete
+                        if (CB_param_temp.InvokeRequired)
+                        {
+                            CB_param_temp.Invoke(new Action(() => CB_param_temp.SelectedIndex = i));
+                        }
+                        else
+                        {
+                            CB_param_temp.SelectedIndex = i;
+                        }
+                        break;
+                    }
+                }
+
+                //--For humidity 
+                for (int i = 0; i < CB_param_hum.Items.Count; i++)
+                {
+                    if (CB_param_hum.Items[i].ToString() == wr.ListControllerInfo[0].HumParamInfo)
+                    {
+                        //--We have a match we need to select this and wait for operation to complete..
+                        //CB_param_hum.SelectedIndex = i;//This will select the index, now lets wait for the function to complete
+                        if (CB_param_hum.InvokeRequired)
+                        {
+                            CB_param_hum.Invoke(new Action(() => CB_param_hum.SelectedIndex = i));
+                        }
+                        else
+                        {
+                            CB_param_hum.SelectedIndex = i;
+                        }
+                        break;
+                    }
+                }
+
+            }//Close of if
+            
+        }
+        public void RestoreWeb()
+        {
+            Weather_Restore wr = new Weather_Restore();
+            wr.ReadWebDataForRestore(lb_building_name.Text);
+
+            //==We need to enable it if the value is enabled else no work
+            if (wr.ListWebInfo.Count == 1)
+            {
+
+                if (wr.ListWebInfo[0].enableDissable == "enabled")
+                {
+                  //  MessageBox.Show("Ok up to here");
+                    //==Now we are ready to go for the task
+                    //cb_enable_disable.Checked = true;//We have checked lets wait for response..
+                    cb_enable_disable.Checked = true;
+
+                    //--If checked is success then only go for further processing
+                    if(cb_enable_disable.Checked == true)
+                    {
+                        if (cb_station_names.Items.Count > 0) { 
+                        //--For station to select the values 
+                        for (int i = 0; i < cb_station_names.Items.Count; i++)
+                        {
+
+                                //MessageBox.Show("we are here for inside");
+                            if (cb_station_names.Items[i].ToString() == wr.ListWebInfo[0].stationInfo)
+                            {
+                                //--We have a match we need to select this and wait for operation to complete..
+                                cb_station_names.SelectedIndex = i;//This will select the index, now lets wait for the function to complete
+
+                                break;
+                            }
+                                
+                            }
+                        }
+
+                    }
+
+                }
+            }
+        }
+
+
+        public void RestoreHumiditySelfCalibration()
+        {
+            Weather_Restore wr = new Weather_Restore();
+            wr.ReadHumSelfCalibrationInfoDTDataForRestore(lb_building_name.Text);
+
+            //==We need to enable it if the value is enabled else no work
+            if (wr.ListHumSelfCalibrationInfo.Count == 1)
+            {
+
+                if (wr.ListHumSelfCalibrationInfo[0].enableDissable == "yes")
+                {
+                    //  MessageBox.Show("Ok up to here");
+                    //==Now we are ready to go for the task
+                    //cb_enable_disable.Checked = true;//We have checked lets wait for response..
+                    cb_hum_self_calib.Checked = true;
+
+                    //--If checked is success then only go for further processing
+                    if (cb_hum_self_calib.Checked == true)
+                    {
+                        tb_max_adjust.Text = wr.ListHumSelfCalibrationInfo[0].MAX_Adjustment_Value;
+
+                    }
+
+                }
+            }
+        }
+
+
 
         private void tb_max_adjust_TextChanged(object sender, EventArgs e)
         {
@@ -3675,6 +4284,9 @@ namespace WFA_psychometric_chart
                 {
                     //double x = double.Parse(a);
                     self_calibrate();
+
+                    Weather_Restore wr = new Weather_Restore();
+                    wr.UpdateOrInsertHumSelfCalibrationInfo(lb_building_name.Text, "yes", tb_max_adjust.Text);
                 }
                 else
                 {
@@ -3707,11 +4319,10 @@ namespace WFA_psychometric_chart
         private void btnShowLogFile_Click(object sender, EventArgs e)
         {
 
-
-            
             string logFilePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string logFile = logFilePath + @"\ErrorLogFile.txt";
-            if (File.Exists(logFile)) { 
+            if (File.Exists(logFile))
+            { 
             Process.Start("notepad.exe", logFile);
             }
 
