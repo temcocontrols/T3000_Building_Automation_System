@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.BACnet;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace WFA_psychometric_chart
 {
@@ -15,10 +12,9 @@ namespace WFA_psychometric_chart
         static BacnetClient bacnet_client;
 
         // All the present Bacnet Device List
-      public  static List<BacNode> DevicesList = new List<BacNode>();
+        public  static List<BacNode> DevicesList = new List<BacNode>();
 
-        /*****************************************************************************************************/
-
+        /*********************************************************************************************/
 
        // public static IEnumerable<BacNode> DevicesList { get; private set; }
 
@@ -69,7 +65,6 @@ namespace WFA_psychometric_chart
                 //Console.WriteLine("Started");
 
                 Thread.Sleep(3000); // Wait a fiew time for WhoIs responses (managed in handler_OnIam)
-
                 //Console.WriteLine("BACnet Devices List");
                 //Console.WriteLine("Instance ID\tBACnetIP");
                 lock (DevicesList)
@@ -103,14 +98,10 @@ namespace WFA_psychometric_chart
             // Or Bacnet Ethernet
             // bacnet_client = new BacnetClient(new BacnetEthernetProtocolTransport("Connexion au réseau local"));          
 
-            bacnet_client.Start();    // go
-
+            bacnet_client.Start();//go
             // Send WhoIs in order to get back all the Iam responses :  
             bacnet_client.OnIam += new BacnetClient.IamHandler(handler_OnIam);
-
             bacnet_client.WhoIs();
-
-
 
         }
 
@@ -300,6 +291,39 @@ namespace WFA_psychometric_chart
 
             //********************************************added code end*************************************************************//
             return parameterList;
+        }
+
+        public double ReadSingleParameterUsigBacnetID(int bacnetID,string bacnetObjectIdentifierType,int bacnetObjectIDInstance)
+        {
+            BacnetValue Value;
+            //BacnetValue ValueX;
+            bool ret;
+            double returnValue = 0;
+            //   Console.WriteLine("Read ID = %d input0 value = %d");
+            if (bacnetObjectIdentifierType == "OBJECT_ANALOG_VALUE")
+            {
+                ret = ReadScalarValue(bacnetID, new BacnetObjectId(BacnetObjectTypes.OBJECT_ANALOG_VALUE, (uint)bacnetObjectIDInstance), BacnetPropertyIds.PROP_PRESENT_VALUE, out Value);
+            }
+            else if (bacnetObjectIdentifierType == "OBJECT_ANALOG_INPUT")
+            {
+                ret = ReadScalarValue(bacnetID, new BacnetObjectId(BacnetObjectTypes.OBJECT_ANALOG_INPUT, (uint)bacnetObjectIDInstance), BacnetPropertyIds.PROP_PRESENT_VALUE, out Value);
+            }
+            else
+            {
+                //do for output
+                ret = ReadScalarValue(bacnetID, new BacnetObjectId(BacnetObjectTypes.OBJECT_ANALOG_OUTPUT, (uint)bacnetObjectIDInstance), BacnetPropertyIds.PROP_PRESENT_VALUE, out Value);
+            }
+
+            if (ret == true)
+            {
+                // Console.WriteLine("Read id = {0},input1 value : {1}", bacnetID, Value.Value.ToString());
+
+                 returnValue = Math.Round(double.Parse(Value.Value.ToString()), 2);
+
+            }
+
+
+            return returnValue;
         }
 
 

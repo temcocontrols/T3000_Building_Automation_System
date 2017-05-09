@@ -13,7 +13,6 @@ using System.Runtime.InteropServices;
 using System.Data;
 using System.Xml;
 using System.Net;
-using System.Linq;
 using System.Data.OleDb;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -35,18 +34,15 @@ namespace WFA_psychometric_chart
         SqlCommand cmd = new SqlCommand();
 
         //----------This one for database operation calls to reuse this part-------//
-
-      //  DatabaseOperations dbClientClass;
+         //--------DatabaseOperations dbClientClass;
          //--------end of the database operations ------------------//
         public Form1_main()
         {
             InitializeComponent();
             //this.Disposed += new System.EventHandler ( this.Form1_main_Disposed );
             //this is done to copy the instance of form1 to be reusable in DatabaseOperations
-          //  dbClientClass = new DatabaseOperations(this);
+            //dbClientClass = new DatabaseOperations(this);
         }
-
-
 
         /// <summary>
         /// This returns air pressure in pascal (pa)
@@ -580,12 +576,8 @@ namespace WFA_psychometric_chart
 
         public string PathToT3000BuildingDB = "";
         public string CurrentSelectedBuilding = "";
-        
         public void Form1_Load(object sender, EventArgs e)
         {
-            this.Text = "Psychometric Chart " + "2017 - 03 - 03";
-
-
 
             //simulationMode.Text = WFA_psychometric_chart.Properties.Resources.Historical_Plot;
             lb_title_display.Text = "";
@@ -594,10 +586,9 @@ namespace WFA_psychometric_chart
 
             string databasePath1 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string databaseFile1 = databasePath1 + @"\db_psychrometric_project.s3db";
+            
 
-
-
-            //*************************This section is already implemented before program run is in Program.cs file*********//
+            //*************************This section is already implemented main[ program run]  in Program.cs file*********//
             //So no need to run agin
 
             /*
@@ -638,10 +629,11 @@ namespace WFA_psychometric_chart
                 //value is not present so say user select a building first / configure a building first then open again.
                 MessageBox.Show("Please Configure the building location in T3000 first and restart the application again");
                 //this.exit();
-                this.Close();
+                //this.Close();
+                Application.Exit();
                 return;
             }
-            //--This pulls the location info form alex db
+            //--This pulls the location info form T3000 db
             PullLocationInformation();//this is for loading location information
 
             //MessageBox.Show("ONe");
@@ -694,9 +686,6 @@ namespace WFA_psychometric_chart
             //button2.Text = WFA_psychometric_chart.Properties.Resources.Show_Heat_Map;
 
 
-            
-
-
             //lets plot the graph as soon as the form loads.
             plot_new_graph();
 
@@ -707,10 +696,10 @@ namespace WFA_psychometric_chart
             chart1.Series.Add(series1);
             chart1.Series.Add(series1_heat_map);
             chart1.Series.Add(seriesLineIndicator);//--This line indicator is for show temporary line for movement...
-                                                   //=============================================Code from buildingSetting section ================================//  
-                                                   //--ADDITIONAL PART OF CODE...
+             //=============================================Code from buildingSetting section ================================//  
+             //--ADDITIONAL PART OF CODE...
 
-            //==========================For building infor==========//
+             //==========================For building infor==========//
 
               //  MessageBox.Show("Test :Shows path of the building "+ BuildingSelected[0].Building_Path+",Building Name= "+ BuildingSelected[0].Building_Name);
               //==========================end of building info========//
@@ -725,8 +714,8 @@ namespace WFA_psychometric_chart
               2.If DB presnet then pull the values to display 
               */
 
-              //===============================Building Selection starts=========================//
-              CheckSelectedBuilding();
+            //===============================Building Selection starts=========================//
+            CheckSelectedBuilding();
             string buildingNameValue = selectedBuildingList[0].BuildingName;
             lb_unit_chosen_display.Text = "Unit : " + buildingList[0].EngineeringUnits;
             lb_db_name.Text = buildingNameValue;
@@ -747,7 +736,6 @@ namespace WFA_psychometric_chart
             //==============================end of building selection starts==================//
 
             //=======================================End of building Setting section.=======================================//
-
             // public List<chartDetailDT> chartDetailList = new List<chartDetailDT>();//This is used for storing the chart detail ids
 
             if (dataGridView1.Rows.Count > 0)  //If there is data then only do this one
@@ -792,8 +780,17 @@ namespace WFA_psychometric_chart
             string againNewPath = newPath+@"Database\Buildings\"+ buildingNameValue +@"\"+buildingNameValue+".db";  //psychopath+ database\Buildings\"BuildingName"\"BuildingName.db" 
             PathToT3000BuildingDB = againNewPath;
             //MessageBox.Show(againNewPath);
-            
+
+            //== For date generation
+            this.Text = "Psychometric Chart [" + AssemblyDateGeneration.Value.ToShortDateString() + "]";
+
+
+
+
+
         }  //Close of the laod function
+
+
 
 
     //***************************************Codes from building settings*********************************************//
@@ -926,19 +923,12 @@ namespace WFA_psychometric_chart
 
             DataGridView_Show_Data();
             dataGridView1.Rows.Add();
-            //loading the comfortzone when set             
-            //This to prevent anonomous plotting
-           // chart1.Enabled = false;
+          
 
         }
 
 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Section for hardware%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%//
-
-
-
-
-
 
 
         // int countX = 0;
@@ -1048,7 +1038,6 @@ namespace WFA_psychometric_chart
             atimer = new System.Timers.Timer();
             atimer.Enabled = true;
             atimer.Elapsed += timer1_Tick_For_Device;
-
             atimer.Interval = 1000 * 5; //x seconds[ 1000 ms * x  =  x seconds]
 
         }
@@ -1081,13 +1070,11 @@ namespace WFA_psychometric_chart
                 //    {
                 //        AsyncMethod1ForPullingData();
                 //    }
-
                 //--Now lets do the same task with background worker
                 //if (!bgWorker.IsBusy)
                 //{
                 //   // MessageBox.Show("background worker calling");
                 //    bgWorker.RunWorkerAsync();//--Running the worker async
-
                 //}
 
                // MessageBox.Show("Entered form timer");
@@ -2879,6 +2866,212 @@ namespace WFA_psychometric_chart
 
         }
 
+        /// <summary>
+        /// Helps to update the temperature source info in to database
+        /// </summary>
+        /// <param name="nodeID">node id </param>
+        /// <param name="TemperatureSourceValue">Temepraturesource value like 1-var1, var2, label1 etc</param>
+        public void DB_TemperatureSourceUpdate(string nodeID,string TemperatureSourceValue)
+        {
+            /*
+           //This function helps to update the temperature source detail such as 1-VAR1, 2-var2 etc.
+           or even label name from alex db
+            */
+
+           
+            string tableName = "tbl_" + selectedBuildingList[0].BuildingName + "_TemperatureHumiditySourceInfo";// "tbl_" ++"_node_value";
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                SQLiteDataReader reader = null;
+                string queryString = " UPDATE " + tableName + "  set TemperatureSourceInfo = @status    where NodeID = @id_value";
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                command.Parameters.AddWithValue("@status", TemperatureSourceValue);
+                command.Parameters.AddWithValue("@id_value", nodeID);
+                //SqlDataAdapter dataAdapter = new SqlDataAdapter(queryString, connection.ConnectionString); //connection.ConnectionString is the connection string
+                reader = command.ExecuteReader();
+
+            }//Close of using          
+
+        }
+
+        public void UpdateOrInsertTemperatureSourceInfo(string nodeID, string TemperaturSourceInfo)
+        {
+            string tableForTempHum = "tbl_" + selectedBuildingList[0].BuildingName + "_TemperatureHumiditySourceInfo";
+
+
+            bool dataPresent = false;
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+
+                // tables and also we need to all the chart of single building in a s single table .
+                string sql = "select * from " + tableForTempHum + " where nodeID = '" + nodeID + "'";
+                SQLiteCommand command = new SQLiteCommand(sql, connection);
+                SQLiteDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    dataPresent = true;
+                }
+
+            }
+
+            //Data is present then update else insert
+            if(dataPresent == true)
+            {
+                DB_TemperatureSourceUpdate(nodeID, TemperaturSourceInfo);
+            }else
+            {
+                InsertValueOfTemperatureHumiditySoure(nodeID, TemperaturSourceInfo,"");
+            }
+
+
+        }
+
+        public void InsertValueOfTemperatureHumiditySoure(string nodeID, string TemperatureSource,string HumiditySource)
+        {
+            string tableForTempHum = "tbl_" + selectedBuildingList[0].BuildingName + "_TemperatureHumiditySourceInfo";
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                //SQLiteDataReader reader = null;
+                string sql_string = "insert into " + tableForTempHum + "(NodeID,chartID,TemperatureSourceInfo,HumiditySourceInfo) VALUES(@id,@chartID,@t,@h)";
+                SQLiteCommand command = new SQLiteCommand(sql_string, connection);
+                command.CommandType = CommandType.Text;
+
+                command.Parameters.AddWithValue("@id", nodeID);
+                command.Parameters.AddWithValue("@chartID", chartDetailList[indexForWhichChartIsSelected].chartID);
+                command.Parameters.AddWithValue("@t", TemperatureSource);
+                command.Parameters.AddWithValue("@h", HumiditySource);
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public void UpdateOrInsertHumiditySourceInfo(string nodeID, string HumiditySourceInfo)
+        {
+            string tableForTempHum = "tbl_" + selectedBuildingList[0].BuildingName + "_TemperatureHumiditySourceInfo";
+
+
+            bool dataPresent = false;
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+
+                // tables and also we need to all the chart of single building in a s single table .
+                string sql = "select * from " + tableForTempHum + " where nodeID = '" + nodeID + "'";
+                SQLiteCommand command = new SQLiteCommand(sql, connection);
+                SQLiteDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    dataPresent = true;
+                }
+
+            }
+
+            //Data is present then update else insert
+            if (dataPresent == true)
+            {
+                DB_HumiditySourceUpdate(nodeID, HumiditySourceInfo);
+            }
+            else
+            {
+                InsertValueOfTemperatureHumiditySoure(nodeID, "", HumiditySourceInfo);
+            }
+
+
+        }
+
+
+
+        /// <summary>
+        /// Function helps to update the humidity source value into the database
+        /// </summary>
+        /// <param name="nodeID"></param>
+        /// <param name="HumiditySourceValue"></param>
+        public void DB_HumiditySourceUpdate(string nodeID, string HumiditySourceValue)
+        {
+            /*
+           //This function helps to update the temperature source detail such as 1-VAR1, 2-var2 etc.
+           or even label name from alex db
+            */
+
+
+            string tableName = "tbl_" + selectedBuildingList[0].BuildingName + "_TemperatureHumiditySourceInfo";// "tbl_" ++"_node_value";
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                SQLiteDataReader reader = null;
+                string queryString = " UPDATE " + tableName + "  set HumiditySourceInfo = @status    where NodeID = @id_value";
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                command.Parameters.AddWithValue("@status", HumiditySourceValue);
+                command.Parameters.AddWithValue("@id_value", nodeID);
+                //SqlDataAdapter dataAdapter = new SqlDataAdapter(queryString, connection.ConnectionString); //connection.ConnectionString is the connection string
+                reader = command.ExecuteReader();
+            }//Close of using          
+
+        }
+
+        public class TemperatureHumiditySourceInfo
+        {
+            public string chartID { get; set; }
+            public string nodeID { get; set; }
+            public string TemepratureSoureString { get; set; }
+            public string HumiditySourceString { get; set; }
+        }
+        public List<TemperatureHumiditySourceInfo> listTempHumSourceInfo = new List<TemperatureHumiditySourceInfo>();
+
+        public void PullDataForTemperatureHumiditySource(string nodeID)
+        {
+
+            listTempHumSourceInfo.Clear();
+            string tableForTempHum = "tbl_" + selectedBuildingList[0].BuildingName + "_TemperatureHumiditySourceInfo";
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+
+                // tables and also we need to all the chart of single building in a s single table .
+                string sql = "select * from " + tableForTempHum + " where nodeID = '" + nodeID + "'";
+                SQLiteCommand command = new SQLiteCommand(sql, connection);
+                SQLiteDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    listTempHumSourceInfo.Add(new TemperatureHumiditySourceInfo
+                    {
+                        chartID = reader["chartID"].ToString(),
+                        nodeID = nodeID,
+                        TemepratureSoureString = reader["TemperatureSourceInfo"].ToString(),
+                        HumiditySourceString = reader["HumiditySourceInfo"].ToString(),
+
+                    });
+                  
+                }
+
+            }//Close of using statement
+        }
 
 
 
@@ -3683,7 +3876,9 @@ namespace WFA_psychometric_chart
 
         }
         public  List<SelectedBuildingDatatype> BuildingSelected = new List<SelectedBuildingDatatype>();
-
+        /// <summary>
+        /// Dont use this one it was for access databse not sqlite so
+        /// </summary>
         public void FindPathOfBuildingDB()
         {
             try
@@ -3714,13 +3909,7 @@ namespace WFA_psychometric_chart
                         BuildingSelected.Add(new SelectedBuildingDatatype
                         {
                             Main_BuildingName = reader["Main_BuildingName"].ToString(),
-                            Building_Name = reader["Building_Name"].ToString(),
-                          
-                            //protocol = reader["Protocol"].ToString(),
-                            //com_port = reader["Com_Port"].ToString(),
-                            //ip_address = reader["Ip_Address"].ToString(),
-                            //ip_port = reader["Ip_Port"].ToString(),
-                            //braudrate = reader["Braudrate"].ToString(),
+                            Building_Name = reader["Building_Name"].ToString(),                         
                             default_subBuilding = reader["Default_SubBuilding"].ToString(),
                             building_path = reader["Building_Path"].ToString(),
                             longitude = reader["Longitude"].ToString(),
@@ -3730,11 +3919,9 @@ namespace WFA_psychometric_chart
                             country = reader["country"].ToString(),
                             state  = reader["state"].ToString(),
                             city = reader["city"].ToString(),
-                            street = reader["street"].ToString(),
-                           // ZIP  = reader["ZIP"].ToString(),
+                            street = reader["street"].ToString(),                          
                             EngineeringUnits= reader["EngineeringUnits"].ToString(),
-
-
+                            
                         });
                     }
                 }
@@ -3781,11 +3968,6 @@ namespace WFA_psychometric_chart
                             Main_BuildingName = reader["Main_BuildingName"].ToString(),
                             Building_Name = reader["Building_Name"].ToString(),
 
-                            //protocol = reader["Protocol"].ToString(),
-                            //com_port = reader["Com_Port"].ToString(),
-                            //ip_address = reader["Ip_Address"].ToString(),
-                            //ip_port = reader["Ip_Port"].ToString(),
-                            //braudrate = reader["Braudrate"].ToString(),
                             default_subBuilding = reader["Default_SubBuilding"].ToString(),
                             building_path = reader["Building_Path"].ToString(),
                             longitude = reader["Longitude"].ToString(),
@@ -3796,31 +3978,9 @@ namespace WFA_psychometric_chart
                             state = reader["state"].ToString(),
                             city = reader["city"].ToString(),
                             street = reader["street"].ToString(),
-                            //ZIP = reader["ZIP"].ToString(),
+                       
                             EngineeringUnits = reader["EngineeringUnits"].ToString()
-
-                            //Main_BuildingName = reader["1"].ToString(),
-                            //Building_Name = reader["2"].ToString(),
-
-                            //protocol = reader["3"].ToString(),
-                            //com_port = reader["4"].ToString(),
-                            //ip_address = reader["5"].ToString(),
-                            //ip_port = reader["6"].ToString(),
-                            //braudrate = reader["7"].ToString(),
-                            //default_subBuilding = reader["8"].ToString(),
-                            //building_path = reader["9"].ToString(),
-                            //longitude = reader["10"].ToString(),
-                            //latitude = reader["11"].ToString(),
-                            //elevation = reader["12"].ToString(),
-                            //ID = reader["13"].ToString(),
-                            //country = reader["14"].ToString(),
-                            //state = reader["15"].ToString(),
-                            //city = reader["16"].ToString(),
-                            //street = reader["17"].ToString(),
-                            //ZIP = reader["18"].ToString(),
-                            //EngineeringUnits = reader["19"].ToString()
-
-
+                            
 
                         });
                     }
@@ -5170,7 +5330,6 @@ namespace WFA_psychometric_chart
                 //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
 
-
                 //string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 string databasePath1 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 string databaseFile = databasePath1 + @"\db_psychrometric_project.s3db";
@@ -5239,7 +5398,11 @@ namespace WFA_psychometric_chart
                 string tbl_mix_node_info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_mix_node_info  ( count INTEGER PRIMARY KEY AUTOINCREMENT,nodeID varchar(255),chartID varchar(255),previousNodeID varchar(255),nextNodeID varchar(255) )";
                 string tbl_node_data_related_T3000 = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_data_related_T3000  (count INTEGER PRIMARY KEY AUTOINCREMENT, nodeID varchar(255), param1_panelID varchar(255), param1_inputIndex varchar(255), param2_panelID varchar(255), param2_inputIndex varchar(255)) ";
                 string tbl_node_value = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),name varchar(255),temperature_source varchar(255),humidity_source varchar(255),colorValue varchar(255),nodeSize varchar(255),airFlow varchar(225),lastUpdatedDate varchar(255))";
-
+                string tbl_TemperatureHumiditySourceInfo = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_TemperatureHumiditySourceInfo(count INTEGER PRIMARY KEY AUTOINCREMENT,NodeID varchar(255), chartID varchar(255) ,TemperatureSourceInfo VARCHAR(255),HumiditySourceInfo varchar(255))";
+                string tbl_Weather_Controller_Restor_Info= "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Weather_Controller_Restor_Info(count INTEGER PRIMARY KEY AUTOINCREMENT,BuildingName varchar(255), ControllerNameInfo varchar(255) ,TemperatureParameterInfo VARCHAR(255),HumidityParameterInfo varchar(255),TempValue varchar(255),HumValue varchar(255))";
+                string tbl_Weather_Web_Restor_Info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Weather_Web_Restor_Info(count INTEGER PRIMARY KEY AUTOINCREMENT,BuildingName varchar(255),Enable_dissable_info varchar(255), StationInfo varchar(255))";
+                string tbl_Weather_HumSelfCalibration_Restor_Info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Weather_HumSelfCalibration_Restor_Info(count INTEGER PRIMARY KEY AUTOINCREMENT,BuildingName varchar(255),Enable_dissable_info varchar(255), max_adjustment_per_day varchar(255))";
+                string tbl_database_version = "CREATE TABLE IF NOT EXISTS tbl_Database_Version(count INTEGER PRIMARY KEY AUTOINCREMENT,version varchar(255))";
 
                 //now execute the query
                 SQLiteCommand cm1 = new SQLiteCommand(tbl_comfortzoneSetting, m_dbConnection);
@@ -5269,19 +5432,61 @@ namespace WFA_psychometric_chart
                 SQLiteCommand cm9 = new SQLiteCommand(tbl_node_value, m_dbConnection);
                 cm9.ExecuteNonQuery();
 
+                SQLiteCommand cm10 = new SQLiteCommand(tbl_TemperatureHumiditySourceInfo, m_dbConnection);
+                cm10.ExecuteNonQuery();
 
+                SQLiteCommand cm11 = new SQLiteCommand(tbl_Weather_Controller_Restor_Info, m_dbConnection);
+                cm11.ExecuteNonQuery();
+
+                SQLiteCommand cm12 = new SQLiteCommand(tbl_Weather_Web_Restor_Info, m_dbConnection);
+                cm12.ExecuteNonQuery();
+
+                SQLiteCommand cm13 = new SQLiteCommand(tbl_Weather_HumSelfCalibration_Restor_Info, m_dbConnection);
+                cm13.ExecuteNonQuery();
+
+                SQLiteCommand cm14 = new SQLiteCommand(tbl_database_version, m_dbConnection);
+                cm14.ExecuteNonQuery();
 
                 /*
-                 Now lets read the data form alex database and store it in the our db_psychometric_project.s3db databse 
-                 
-                 //==Read complete now writing the values to our database
-                
-                
-                  */
+                Now lets read the data form alex database and store it in the our db_psychometric_project.s3db databse                  
+                //==Read complete now writing the values to our database                               
+                */
+
+                //--At least adding default_building for first time in the database
+                string defaultBuildingSQL = "Select * from tbl_building_location where BuildingName = 'Default_Building'";
+
+                    bool buildingPresent = false;             
+                    SQLiteCommand cmd = new SQLiteCommand(defaultBuildingSQL, m_dbConnection);
+                   
+                    SQLiteDataReader reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        buildingPresent = true;
+
+                    }
+               if(buildingPresent != true)
+                {
+                    //--Default buildig setting not present so insert the default building setting
+                    string sqlStringDefaultBuilding = "insert into tbl_building_location ( selection ,country ,state,city ,street,longitude,latitude ,elevation ,BuildingName ,EngineeringUnits  ) VALUES( @sel ,@con,@state ,@city,@stre , @lng  ,@lat,@elev ,@bname ,@engUnit  )";
+                    SQLiteCommand commandDefaultBuilding = new SQLiteCommand(sqlStringDefaultBuilding, m_dbConnection);
+                    commandDefaultBuilding.CommandType = CommandType.Text;
+                    commandDefaultBuilding.Parameters.AddWithValue("@sel", "0");
+                    commandDefaultBuilding.Parameters.AddWithValue("@con", "china");
+                    commandDefaultBuilding.Parameters.AddWithValue("@state", "shanghai");
+                    commandDefaultBuilding.Parameters.AddWithValue("@city","shanghai");
+                    commandDefaultBuilding.Parameters.AddWithValue("@stre", "");
+                    commandDefaultBuilding.Parameters.AddWithValue("@lng", "121.516799926758");
+                    commandDefaultBuilding.Parameters.AddWithValue("@lat", "31.169605255127");
+                    commandDefaultBuilding.Parameters.AddWithValue("@elev", "4");
+                    commandDefaultBuilding.Parameters.AddWithValue("@bname", "Default_Building");
+                    commandDefaultBuilding.Parameters.AddWithValue("@engUnit", "SI");
+                    commandDefaultBuilding.ExecuteNonQuery();
+                }
+
 
                 //MessageBox.Show("We have created all tables now insertion is left");
                 //This function will write to tbl_bulding_location as well as will make a building selected
-                // WriteT3000BuildingInfoToPsychoDB("1", BuildingSelected[0].country, BuildingSelected[0].state, BuildingSelected[0].city, BuildingSelected[0].street, BuildingSelected[0].longitude, BuildingSelected[0].latitude, BuildingSelected[0].elevation, BuildingSelected[0].Building_Name, BuildingSelected[0].EngineeringUnits);
+                //WriteT3000BuildingInfoToPsychoDB("1", BuildingSelected[0].country, BuildingSelected[0].state, BuildingSelected[0].city, BuildingSelected[0].street, BuildingSelected[0].longitude, BuildingSelected[0].latitude, BuildingSelected[0].elevation, BuildingSelected[0].Building_Name, BuildingSelected[0].EngineeringUnits);
 
                 string sql_stringx = "insert into tbl_building_location ( selection ,country ,state,city ,street,longitude,latitude ,elevation ,BuildingName ,EngineeringUnits  ) VALUES( @sel ,@con,@state ,@city,@stre , @lng  ,@lat,@elev ,@bname ,@engUnit  )";
                 SQLiteCommand command9 = new SQLiteCommand(sql_stringx, m_dbConnection);
@@ -5347,6 +5552,11 @@ namespace WFA_psychometric_chart
                 SQLiteCommand cmd_Music = new SQLiteCommand(sql_comfortzone_Music, m_dbConnection);
                 cmd_Music.ExecuteNonQuery();
 
+                //--For inserting the version value first time while creating database
+                string version = AssemblyDateGeneration.Value.ToShortDateString();
+                string sql_database_version = "INSERT INTO tbl_Database_Version( version)   VALUES('"+ version + "')";
+                SQLiteCommand cmd_database_version = new SQLiteCommand(sql_database_version, m_dbConnection);
+                cmd_database_version.ExecuteNonQuery();
 
                 //===============END OF THE NEW CODE ADDED IN THIS SECTION==========================//
 
@@ -5374,12 +5584,314 @@ namespace WFA_psychometric_chart
                 c4.ExecuteNonQuery();                
                 m_dbConnection.Close();//--closing the connection
 
+        }
+            catch (Exception ex)
+            {
+
+
+                string databasePath133 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string databaseFile = databasePath133 + @"\db_psychrometric_project.s3db";
+                //try
+                //{
+                    if (File.Exists(databaseFile))
+                    {
+                        File.Delete(databaseFile);
+                    }
+
+                //}
+                //catch { }
+            Application.Exit();
+              
+
+            }
+
+        }
+
+        public void sqlite_database_creationWithDefaultSettingsOnly(string buildingNameSelected)
+        {
+            //--lets do try catch
+            try
+            {
+                //--This is where we are going to create all the database  and tables of sqlite
+                //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+
+                //string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string databasePath1 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string databaseFile = databasePath1 + @"\db_psychrometric_project.s3db";
+                //string connString = @"Data Source=" + databaseFile1 + ";Version=3;";
+
+                //  MessageBox.Show("Create table section path Path = " + databaseFile);
+                //--new database file 
+                SQLiteConnection.CreateFile(databaseFile);
+
+                //--now lets create the tables
+                SQLiteConnection m_dbConnection = new SQLiteConnection("Data Source=" + databaseFile + ";Version=3;");
+                m_dbConnection.Open();
+
+                //--building location table : tbl_building_location
+                //--This one is with the zip code later zip code is removed
+                //string sql = "create table tbl_building_location (selection int,ID INTEGER PRIMARY KEY AUTOINCREMENT ,country varchar(255),state varchar(255),city varchar(255),street varchar(255), ZIP int,longitude varchar(255),latitude varchar(255),elevation varchar(255),BuildingName varchar(255),EngineeringUnits varchar(255))";
+                string sql = "create table IF NOT EXISTS tbl_building_location (selection int,ID INTEGER PRIMARY KEY AUTOINCREMENT ,country varchar(255),state varchar(255),city varchar(255),street varchar(255) ,longitude varchar(255),latitude varchar(255),elevation varchar(255),BuildingName varchar(255),EngineeringUnits varchar(255))";
+
+                SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+                command.ExecuteNonQuery();
+                //--next table geo location value : tbl_geo_location_value
+                //string sql1 = "create table tbl_geo_location_value (ID int ,longitude varchar(255),latitude varchar(255),elevation varchar(255))";
+                //SQLiteCommand command1 = new SQLiteCommand(sql1, m_dbConnection);
+                //command1.ExecuteNonQuery();
+
+                //--next table historical data:tbl_historical_data
+                string sql2 = "create table IF NOT EXISTS tbl_historical_data (ID INTEGER,date_current datetime,hour_current int,minute_current int,distance_from_building varchar(255),temperature varchar(255),humidity varchar(255),bar_pressure varchar(255),wind varchar(255),direction varchar(255),station_name varchar(255))";
+                SQLiteCommand command2 = new SQLiteCommand(sql2, m_dbConnection);
+                command2.ExecuteNonQuery();
+                //--next table tbl_temp_himidity 
+                //string sql3 = "create table tbl_temp_humidity (temp int,humidity int)";
+                //SQLiteCommand command3 = new SQLiteCommand(sql3, m_dbConnection);
+                //command3.ExecuteNonQuery();
+
+                string sql3 = "create table IF NOT EXISTS tbl_language_option (ID int, language_id int)";
+                SQLiteCommand command3 = new SQLiteCommand(sql3, m_dbConnection);
+                command3.ExecuteNonQuery();
+
+
+                ////--next table weather related datas...
+                string sql4 = "create table IF NOT EXISTS tbl_weather_related_values (ID INTEGER ,location varchar(255),distance_from_building varchar(255),last_update_date varchar(255),temp varchar(255),humidity varchar(255),bar_pressure varchar(255),wind varchar(255),direction varchar(255),station_name varchar(255))";
+                SQLiteCommand command4 = new SQLiteCommand(sql4, m_dbConnection);
+                command4.ExecuteNonQuery();
+
+
+                //==================Lets create some more essential tables  added in jan 26th 2017=========//
+
+                /*
+                 Tables to be added in this section 
+                 1.tbl_[] _chart_comfort_zone_setting
+                 2.tbl_[]_chart_detail
+                 3.tbl_[]_comfort_zone_detail
+                 4.tbl_[]_device_info_for_node
+                 5.tbl_[]_input_storage_from_T3000
+                 6.tbl_[]_line_value
+                 7.tbl_[]_mix_node_info
+                 8.tbl_[]_node_data_related_T300
+                 9. tbl_[]_node_value
+                 */
+                string tbl_comfortzoneSetting = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_chart_comfort_zone_setting  ( count INTEGER PRIMARY KEY AUTOINCREMENT,chartID varchar(255) ,comfort_zone_ID varchar(255),status varchar(255) )";
+                string tbl_chart_detail = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_chart_detail(count INTEGER PRIMARY KEY AUTOINCREMENT ,chartID VARCHAR(255),chartName varchar(255),chart_respective_nodeID varchar(255),chart_respective_lineID varchar(255),enableChartStatus varchar(255))";
+                string tbl_comfort_zone_detail = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_comfort_zone_detail  ( count INTEGER PRIMARY KEY AUTOINCREMENT,id varchar(255) ,name varchar(255),min_temp varchar(255),max_temp varchar(255),min_hum varchar(255), max_hum  varchar(255) ,colorValue varchar(255)  )";
+                string tbl_device_info_for_node = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_device_info_for_node  ( count INTEGER PRIMARY KEY AUTOINCREMENT,nodeID varchar(255) ,device_instanceID_for_param1 varchar(255),device_instanceID_for_param2 varchar(255),IP_for_param1 varchar(255),IP_for_param2 varchar(255),param1ID varchar(255),param2ID varchar(255), param1_info  varchar(255) ,param2_info varchar(255),param1_identifier_type varchar(255),param2_identifier_type varchar(255)  )";
+                string tbl_input_storage_form_T3000 = " CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_input_storage_from_T3000  ( count INTEGER PRIMARY KEY AUTOINCREMENT,PanelID varchar(255),InputIndex varchar(255),InputDescription varchar(255),InputAM varchar(255), InputValue  varchar(255) ,InputUnit varchar(255),InputRange varchar(255),InputCalibration varchar(255),InputFilter varchar(255),InputJumper varchar(255),InputLabel varchar(255)  )";
+                string tbl_line_value = " CREATE TABLE  IF NOT EXISTS tbl_" + buildingNameSelected + "_line_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_lineID varchar(255) ,lineID string,prevNodeID varchar(255),nextNodeID varchar(255),lineColorValue varchar(255),lineSeriesID varchar(255),thickness varchar(255),name varchar(255), status INTEGER)";
+                string tbl_mix_node_info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_mix_node_info  ( count INTEGER PRIMARY KEY AUTOINCREMENT,nodeID varchar(255),chartID varchar(255),previousNodeID varchar(255),nextNodeID varchar(255) )";
+                string tbl_node_data_related_T3000 = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_data_related_T3000  (count INTEGER PRIMARY KEY AUTOINCREMENT, nodeID varchar(255), param1_panelID varchar(255), param1_inputIndex varchar(255), param2_panelID varchar(255), param2_inputIndex varchar(255)) ";
+                string tbl_node_value = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),name varchar(255),temperature_source varchar(255),humidity_source varchar(255),colorValue varchar(255),nodeSize varchar(255),airFlow varchar(225),lastUpdatedDate varchar(255))";
+                string tbl_TemperatureHumiditySourceInfo = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_TemperatureHumiditySourceInfo(count INTEGER PRIMARY KEY AUTOINCREMENT,NodeID varchar(255), chartID varchar(255) ,TemperatureSourceInfo VARCHAR(255),HumiditySourceInfo varchar(255))";
+                string tbl_Weather_Controller_Restor_Info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Weather_Controller_Restor_Info(count INTEGER PRIMARY KEY AUTOINCREMENT,BuildingName varchar(255), ControllerNameInfo varchar(255) ,TemperatureParameterInfo VARCHAR(255),HumidityParameterInfo varchar(255),TempValue varchar(255),HumValue varchar(255))";
+                string tbl_Weather_Web_Restor_Info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Weather_Web_Restor_Info(count INTEGER PRIMARY KEY AUTOINCREMENT,BuildingName varchar(255),Enable_dissable_info varchar(255), StationInfo varchar(255))";
+                string tbl_Weather_HumSelfCalibration_Restor_Info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Weather_HumSelfCalibration_Restor_Info(count INTEGER PRIMARY KEY AUTOINCREMENT,BuildingName varchar(255),Enable_dissable_info varchar(255), max_adjustment_per_day varchar(255))";
+                string tbl_database_version = "CREATE TABLE IF NOT EXISTS tbl_Database_Version(count INTEGER PRIMARY KEY AUTOINCREMENT,version varchar(255))";
+
+                //now execute the query
+                SQLiteCommand cm1 = new SQLiteCommand(tbl_comfortzoneSetting, m_dbConnection);
+                cm1.ExecuteNonQuery();
+
+                SQLiteCommand cm2 = new SQLiteCommand(tbl_chart_detail, m_dbConnection);
+                cm2.ExecuteNonQuery();
+
+                SQLiteCommand cm3 = new SQLiteCommand(tbl_comfort_zone_detail, m_dbConnection);
+                cm3.ExecuteNonQuery();
+
+                SQLiteCommand cm4 = new SQLiteCommand(tbl_device_info_for_node, m_dbConnection);
+                cm4.ExecuteNonQuery();
+
+                SQLiteCommand cm5 = new SQLiteCommand(tbl_input_storage_form_T3000, m_dbConnection);
+                cm5.ExecuteNonQuery();
+
+                SQLiteCommand cm6 = new SQLiteCommand(tbl_line_value, m_dbConnection);
+                cm6.ExecuteNonQuery();
+
+                SQLiteCommand cm7 = new SQLiteCommand(tbl_mix_node_info, m_dbConnection);
+                cm7.ExecuteNonQuery();
+
+                SQLiteCommand cm8 = new SQLiteCommand(tbl_node_data_related_T3000, m_dbConnection);
+                cm8.ExecuteNonQuery();
+
+                SQLiteCommand cm9 = new SQLiteCommand(tbl_node_value, m_dbConnection);
+                cm9.ExecuteNonQuery();
+
+                SQLiteCommand cm10 = new SQLiteCommand(tbl_TemperatureHumiditySourceInfo, m_dbConnection);
+                cm10.ExecuteNonQuery();
+
+                SQLiteCommand cm11 = new SQLiteCommand(tbl_Weather_Controller_Restor_Info, m_dbConnection);
+                cm11.ExecuteNonQuery();
+
+                SQLiteCommand cm12 = new SQLiteCommand(tbl_Weather_Web_Restor_Info, m_dbConnection);
+                cm12.ExecuteNonQuery();
+
+                SQLiteCommand cm13 = new SQLiteCommand(tbl_Weather_HumSelfCalibration_Restor_Info, m_dbConnection);
+                cm13.ExecuteNonQuery();
+
+                SQLiteCommand cm14 = new SQLiteCommand(tbl_database_version, m_dbConnection);
+                cm14.ExecuteNonQuery();
+
+                /*
+                Now lets read the data form alex database and store it in the our db_psychometric_project.s3db databse                  
+                //==Read complete now writing the values to our database                               
+                */
+
+                //--At least adding default_building for first time in the database
+                string defaultBuildingSQL = "Select * from tbl_building_location where BuildingName = 'Default_Building'";
+
+                bool buildingPresent = false;
+                SQLiteCommand cmd = new SQLiteCommand(defaultBuildingSQL, m_dbConnection);
+
+                SQLiteDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    buildingPresent = true;
+
+                }
+                if (buildingPresent != true)
+                {
+                    //--Default buildig setting not present so insert the default building setting
+                    string sqlStringDefaultBuilding = "insert into tbl_building_location ( selection ,country ,state,city ,street,longitude,latitude ,elevation ,BuildingName ,EngineeringUnits  ) VALUES( @sel ,@con,@state ,@city,@stre , @lng  ,@lat,@elev ,@bname ,@engUnit  )";
+                    SQLiteCommand commandDefaultBuilding = new SQLiteCommand(sqlStringDefaultBuilding, m_dbConnection);
+                    commandDefaultBuilding.CommandType = CommandType.Text;
+                    commandDefaultBuilding.Parameters.AddWithValue("@sel", "0");
+                    commandDefaultBuilding.Parameters.AddWithValue("@con", "china");
+                    commandDefaultBuilding.Parameters.AddWithValue("@state", "shanghai");
+                    commandDefaultBuilding.Parameters.AddWithValue("@city", "shanghai");
+                    commandDefaultBuilding.Parameters.AddWithValue("@stre", "");
+                    commandDefaultBuilding.Parameters.AddWithValue("@lng", "121.516799926758");
+                    commandDefaultBuilding.Parameters.AddWithValue("@lat", "31.169605255127");
+                    commandDefaultBuilding.Parameters.AddWithValue("@elev", "4");
+                    commandDefaultBuilding.Parameters.AddWithValue("@bname", buildingNameSelected);//buildingNameSelected //Default_Building
+                    commandDefaultBuilding.Parameters.AddWithValue("@engUnit", "SI");
+                    commandDefaultBuilding.ExecuteNonQuery();
+                }
+
+
+                //MessageBox.Show("We have created all tables now insertion is left");
+                //This function will write to tbl_bulding_location as well as will make a building selected
+                //WriteT3000BuildingInfoToPsychoDB("1", BuildingSelected[0].country, BuildingSelected[0].state, BuildingSelected[0].city, BuildingSelected[0].street, BuildingSelected[0].longitude, BuildingSelected[0].latitude, BuildingSelected[0].elevation, BuildingSelected[0].Building_Name, BuildingSelected[0].EngineeringUnits);
+
+                //string sql_stringx = "insert into tbl_building_location ( selection ,country ,state,city ,street,longitude,latitude ,elevation ,BuildingName ,EngineeringUnits  ) VALUES( @sel ,@con,@state ,@city,@stre , @lng  ,@lat,@elev ,@bname ,@engUnit  )";
+                //SQLiteCommand command9 = new SQLiteCommand(sql_stringx, m_dbConnection);
+                //command9.CommandType = CommandType.Text;
+                //command9.Parameters.AddWithValue("@sel", "1");
+                //command9.Parameters.AddWithValue("@con", BuildingSelected[0].country);
+                //command9.Parameters.AddWithValue("@state", BuildingSelected[0].state);
+                //command9.Parameters.AddWithValue("@city", BuildingSelected[0].city);
+                //command9.Parameters.AddWithValue("@stre", BuildingSelected[0].street);
+                //command9.Parameters.AddWithValue("@lng", BuildingSelected[0].longitude);
+                //command9.Parameters.AddWithValue("@lat", BuildingSelected[0].latitude);
+                //command9.Parameters.AddWithValue("@elev", BuildingSelected[0].elevation);
+                //command9.Parameters.AddWithValue("@bname", BuildingSelected[0].Building_Name);
+                //command9.Parameters.AddWithValue("@engUnit", BuildingSelected[0].EngineeringUnits);
+                //command9.ExecuteNonQuery();
+
+                //==Now lets make a single default comfort zone in our database.
+                //--This one is for default value.
+                string id = GetGUID();
+                string sql_data_for_comfortzone = "INSERT INTO tbl_" + buildingNameSelected + "_comfort_zone_detail( id ,name,min_temp ,max_temp,min_hum , max_hum  ,colorValue   )   VALUES('" + id + "', 'Default_comfort_zone','22','28','60','80','GREEN')";
+                SQLiteCommand cmddata = new SQLiteCommand(sql_data_for_comfortzone, m_dbConnection);
+                cmddata.ExecuteNonQuery();
+
+                //--comfortzone airport.
+                string id_airport = GetGUID();
+                string sql_comfortzone_airport = "INSERT INTO tbl_" + buildingNameSelected + "_comfort_zone_detail( id ,name,min_temp ,max_temp,min_hum , max_hum  ,colorValue   )   VALUES('" + id_airport + "', 'Airport','22','28','35','65','Blue')";
+                SQLiteCommand cmd_airport = new SQLiteCommand(sql_comfortzone_airport, m_dbConnection);
+                cmd_airport.ExecuteNonQuery();
+
+                //--comfortzone club.
+                string id_club = GetGUID();
+                string sql_comfortzone_club = "INSERT INTO tbl_" + buildingNameSelected + "_comfort_zone_detail( id ,name,min_temp ,max_temp,min_hum , max_hum  ,colorValue   )   VALUES('" + id_club + "', 'Club','22','28','35','65','Blueviolet')";
+                SQLiteCommand cmd_club = new SQLiteCommand(sql_comfortzone_club, m_dbConnection);
+                cmd_club.ExecuteNonQuery();
+
+                //--comfortzone computer.
+                string id_computer = GetGUID();
+                string sql_comfortzone_computer = "INSERT INTO tbl_" + buildingNameSelected + "_comfort_zone_detail( id ,name,min_temp ,max_temp,min_hum , max_hum  ,colorValue   )   VALUES('" + id_computer + "', 'Computer','22','28','35','65','Turquoise')";
+                SQLiteCommand cmd_computer = new SQLiteCommand(sql_comfortzone_computer, m_dbConnection);
+                cmd_computer.ExecuteNonQuery();
+
+                //--comfortzone datacenter.
+                string id_datacenter = GetGUID();
+                string sql_comfortzone_datacenter = "INSERT INTO tbl_" + buildingNameSelected + "_comfort_zone_detail( id ,name,min_temp ,max_temp,min_hum , max_hum  ,colorValue   )   VALUES('" + id_datacenter + "', 'Data Center','22','28','35','65','Lightgreen')";
+                SQLiteCommand cmd_datacenter = new SQLiteCommand(sql_comfortzone_datacenter, m_dbConnection);
+                cmd_datacenter.ExecuteNonQuery();
+
+                //--comfortzone gym.
+                string id_gym = GetGUID();
+                string sql_comfortzone_gym = "INSERT INTO tbl_" + buildingNameSelected + "_comfort_zone_detail( id ,name,min_temp ,max_temp,min_hum , max_hum  ,colorValue   )   VALUES('" + id_gym + "', 'Gym','22','28','35','65','Lightgray')";
+                SQLiteCommand cmd_gym = new SQLiteCommand(sql_comfortzone_gym, m_dbConnection);
+                cmd_gym.ExecuteNonQuery();
+
+                //--comfortzone Hospital.
+                string id_Hospital = GetGUID();
+                string sql_comfortzone_Hospital = "INSERT INTO tbl_" + buildingNameSelected + "_comfort_zone_detail( id ,name,min_temp ,max_temp,min_hum , max_hum  ,colorValue   )   VALUES('" + id_Hospital + "', 'Hospital','22','28','35','65','Red')";
+                SQLiteCommand cmd_Hospital = new SQLiteCommand(sql_comfortzone_Hospital, m_dbConnection);
+                cmd_Hospital.ExecuteNonQuery();
+
+                //--comfortzone Music.
+                string id_Music = GetGUID();
+                string sql_comfortzone_Music = "INSERT INTO tbl_" + buildingNameSelected + "_comfort_zone_detail( id ,name,min_temp ,max_temp,min_hum , max_hum  ,colorValue   )   VALUES('" + id_Music + "', 'Music','22','28','35','65','Orangered')";
+                SQLiteCommand cmd_Music = new SQLiteCommand(sql_comfortzone_Music, m_dbConnection);
+                cmd_Music.ExecuteNonQuery();
+
+                //--For inserting the version value first time while creating database
+                string version = AssemblyDateGeneration.Value.ToShortDateString();
+                string sql_database_version = "INSERT INTO tbl_Database_Version( version)   VALUES('" + version + "')";
+                SQLiteCommand cmd_database_version = new SQLiteCommand(sql_database_version, m_dbConnection);
+                cmd_database_version.ExecuteNonQuery();
+
+                //===============END OF THE NEW CODE ADDED IN THIS SECTION==========================//
+
+
+
+
+                //--Lets input some values in the tbl_building_location and in tbl_language_option default 
+
+                //string sql_input1 = "INSERT INTO tbl_building_location (selection,country,state,city,street,BuildingName,EngineeringUnits) VALUES(1, 'china','SangHai','SangHai','No.35,yi yuan garden','Default_Building','SI') ";
+                //SQLiteCommand commandINput5 = new SQLiteCommand(sql_input1, m_dbConnection);
+                //commandINput5.ExecuteNonQuery();
+
+                //MessageBox.Show("Test We reached this part ln 5207");
+                //Adding to language option
+                string sql_input2 = "INSERT INTO tbl_language_option (ID,language_id) VALUES(1, 1) ";
+                string sql_input3 = "INSERT INTO tbl_language_option (ID,language_id) VALUES(2, 0) ";
+                string sql_input4 = "INSERT INTO tbl_language_option (ID,language_id) VALUES(3, 0) ";
+
+                SQLiteCommand c2 = new SQLiteCommand(sql_input2, m_dbConnection);
+                c2.ExecuteNonQuery();
+
+                SQLiteCommand c3 = new SQLiteCommand(sql_input3, m_dbConnection);
+                c3.ExecuteNonQuery();
+                SQLiteCommand c4 = new SQLiteCommand(sql_input4, m_dbConnection);
+                c4.ExecuteNonQuery();
+                m_dbConnection.Close();//--closing the connection
+
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+
+
+                string databasePath133 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string databaseFile = databasePath133 + @"\db_psychrometric_project.s3db";
+                //try
+                //{
+                if (File.Exists(databaseFile))
+                {
+                    File.Delete(databaseFile);
+                }
+
+                //}
+                //catch { }
+                Application.Exit();
+
+
             }
-         
+
+
         }
 
 
@@ -5399,7 +5911,7 @@ namespace WFA_psychometric_chart
         public void WriteT3000BuildingInfoToPsychoDB(string selection, string country, string state,string city,string street, string lng,string lat,string elev,string buildingName, string engUnits)
         {
 
-            string tableName = "tbl_" + selectedBuildingList[0].BuildingName + "_device";   // currentLineTableFromDB;
+            //string tableName = "tbl_" + selectedBuildingList[0].BuildingName + "_device";   // currentLineTableFromDB;
             string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
             string connString = @"Data Source=" + databaseFile + ";Version=3;";
@@ -8869,10 +9381,15 @@ namespace WFA_psychometric_chart
                 {
                     //FlagForDissableLeftAndRightClicksInChart = 0;
                     CMSinsertNode.Enabled = false;
-                    string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                    //string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-                    string NewDirectory = Path.GetFullPath(Path.Combine(dir, @"..\"));
-                    string file = NewDirectory + @"Database\image\lock.png";
+                    //string NewDirectory = Path.GetFullPath(Path.Combine(dir, @"..\"));
+                    //string file = NewDirectory + @"Database\image\lock.png";
+
+                    string imagePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                    string file = imagePath + @"\image\lock.png";
+
+
                     this.quickNodeInsertToolStripMenuItem.Image = Bitmap.FromFile(file);
                    this.quickNodeInsertToolStripMenuItem.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
                    // this.quickNodeInsertToolStripMenuItem.TextAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -10350,13 +10867,6 @@ namespace WFA_psychometric_chart
         }
 
 
-
-
-
-
-
-
-
         //Lets have a list for chartDetailList
         public List<chartDetailDT_X> chartInfoPulledForSaving_For_Load = new List<chartDetailDT_X>();//This is used for storing the chart detail ids
 
@@ -11290,12 +11800,7 @@ namespace WFA_psychometric_chart
                // SQLiteConnection.ClearPool();//This helps in 
             }
 
-
-
-
-
         }
-
 
         /// <summary>
         /// This function helps to save the data of single
@@ -11373,13 +11878,6 @@ namespace WFA_psychometric_chart
 
 
         }
-
-
-
-
-
-
-
 
 
         //lets make three list for replaing these : 
@@ -12662,12 +13160,6 @@ namespace WFA_psychometric_chart
           //  MessageBox.Show("Count  node = " + menuStripNodeInfoValues.Count + " , line count = " + menuStripNodeLineInfoValues.Count);
             //=======================end of loading data : now lets plot the data values=======================//
 
-
-            //ClearChart();   //this will clear the chart first
-            // ResettingLines();
-            // ReDrawingLineAndNode();
-           // ReDrawingLineAndNodeForLoadXML();
-
         }
 
         string beginEditText = "";
@@ -12806,8 +13298,6 @@ namespace WFA_psychometric_chart
                             flagResistingForDGVChangeSelection = 0;//close enable of dgv_selectionChange event 
 
                             //===================end of selection of new created chart =======================//
-
-
                         }
                         else
                                 {
@@ -12815,7 +13305,6 @@ namespace WFA_psychometric_chart
                                 }
 
                                 ///close of if we need to add here ...
-
 
                     }
                     else
@@ -12897,8 +13386,7 @@ namespace WFA_psychometric_chart
 
                 return;
             }
-
-                      
+         
             //--Showing the data on cell selected...
             // MessageBox.Show("CELL SELECT " );
             //When dgv is click it clicks twice this if is written to stop those twice click.
@@ -13013,11 +13501,7 @@ namespace WFA_psychometric_chart
                             lb_web_status.Text = "inactive";
                             lb_device_status.Text = "disconnected";
 
-
-
-                          
                             break;
-
                         }
                         else
                         {
@@ -13025,10 +13509,6 @@ namespace WFA_psychometric_chart
                             RefreshGraph();
                         }
                     }
-
-
-
-
 
 
                 }  //close of != null if
@@ -13480,7 +13960,7 @@ namespace WFA_psychometric_chart
             string nodeTableName = "tbl_" + selectedBuildingList[0].BuildingName + "_node_value";
             string tableNameDevice = "tbl_" + selectedBuildingList[0].BuildingName + "_device_info_for_node";//currentNodeTableFromDB; 
             string tableComfortZone = "tbl_" + selectedBuildingList[0].BuildingName + "_chart_comfort_zone_setting";//currentNodeTableFromDB; 
-
+            string tableTempHumSourceInfo = "tbl_" + selectedBuildingList[0].BuildingName + "_TemperatureHumiditySourceInfo";
             //lets get the id values...
             string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
@@ -13604,7 +14084,16 @@ namespace WFA_psychometric_chart
 
             }//Close of using
 
+            //--For clearing source and humidity info
+            using (SQLiteConnection connection = new SQLiteConnection(connString1))
+            {
+                connection.Open();
+                string queryString = "delete from " + tableTempHumSourceInfo + " where chartID = @id_value_x";
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                command.Parameters.AddWithValue("@id_value_x", chartID);
+                command.ExecuteNonQuery();
 
+            }//Close of using
 
 
             ////--Now lets delete the chart actual content for the tbl_..._chart_detail table
@@ -13914,7 +14403,7 @@ namespace WFA_psychometric_chart
                     s += reader["NAME"].ToString()+"\n";
                 }
 
-              //  MessageBox.Show("TABLE NAME = " + s);
+               //MessageBox.Show("TABLE NAME = " + s);
 
    
             } //close of using statement 
@@ -14131,11 +14620,17 @@ namespace WFA_psychometric_chart
             {
                 //Edit mode is dissabled //Edit OFF section
                 //--Load image lock image
-                string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+               // string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-                string NewDirectory = Path.GetFullPath(Path.Combine(dir, @"..\"));
-                string file = NewDirectory + @"Database\image\lock.png";
+                //string NewDirectory = Path.GetFullPath(Path.Combine(dir, @"..\"));
+                //string file = NewDirectory + @"Database\image\lock.png";
+
+
+                string imagePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string file = imagePath + @"\image\lock.png";
+
                 Bitmap SOME = new Bitmap(Image.FromFile(file));
+
                 Bitmap bp = new Bitmap(SOME, pb_lock_unlock.Width, pb_lock_unlock.Height);
                 pb_lock_unlock.Image = bp;//Image.FromFile(file);
 
@@ -14150,11 +14645,16 @@ namespace WFA_psychometric_chart
             {
                 //Edit mode is enable
                 //--Load image lock image
-                string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+               // string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-                string NewDirectory = Path.GetFullPath(Path.Combine(dir, @"..\"));
-                string file = NewDirectory + @"Database\image\unlock.png";
-                 Bitmap SOME = new Bitmap(Image.FromFile(file));
+               // string NewDirectory = Path.GetFullPath(Path.Combine(dir, @"..\"));
+               // string file = NewDirectory + @"Database\image\unlock.png";
+
+
+                string imagePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string file = imagePath + @"\image\unlock.png";
+
+                Bitmap SOME = new Bitmap(Image.FromFile(file));
                 Bitmap bp = new Bitmap(SOME, pb_lock_unlock.Width, pb_lock_unlock.Height);
 
                 pb_lock_unlock.Image = bp;//Image.FromFile(file);
@@ -15097,7 +15597,7 @@ namespace WFA_psychometric_chart
         //int flagDataBindingCompleteForSelection = 0;
         private void dataGridView1_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
         {
-            MessageBox.Show("ok");
+            //MessageBox.Show("ok");
             dataGridView1.ClearSelection();
             //MessageBox.Show("Databinding");
             dataGridView1.SelectionChanged -= this.dataGridView1_SelectionChanged_1;
@@ -15111,15 +15611,8 @@ namespace WFA_psychometric_chart
             //This section contains the edit node section
             try
             {
-                if (dataGridView1.Rows.Count > 0)
-                { 
-                    EditNodeLineForm f = new EditNodeLineForm(this);
-                    f.ShowDialog();//This will help to wait for second dialog to be closed first.
-                }
-                else
-                {
-                    MessageBox.Show("Create a chart first");
-                }
+                EditNodeLineForm f = new EditNodeLineForm(this);
+                f.ShowDialog();//This will help to wait for second dialog to be closed first.
             }
             catch (Exception ex)
             {
@@ -15157,7 +15650,20 @@ namespace WFA_psychometric_chart
             */
             try
             {
-                if(menuStripNodeInfoValues.Count <=0)
+
+                
+                String fileName = "";
+
+                saveFD.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);// "C:";
+                saveFD.FileName = "ExcelSave";
+                saveFD.Title = Properties.Resources.Save_Excel_file_to;
+                saveFD.Filter = "Excel file|*.xls";
+                if (saveFD.ShowDialog() == DialogResult.OK)
+                {
+
+                    
+
+                    if (menuStripNodeInfoValues.Count <=0)
                 {
                     MessageBox.Show("No data present to export");
                 }
@@ -15169,15 +15675,16 @@ namespace WFA_psychometric_chart
                     return;
                 }
 
-                //excel is checked..
-                Excel.Application oApp;
+                    Cursor = Cursors.WaitCursor;
+                 //excel is checked..
+                 Excel.Application oApp;
                 Excel.Workbook oBook;
                 Excel.Worksheet oSheet;
 
                 oApp = new Excel.Application();
                 oBook = oApp.Workbooks.Add();
                 oSheet = (Excel.Worksheet)oBook.Worksheets.get_Item(1);
-                Cursor = Cursors.WaitCursor;
+               
 
                 //printing the building information..
                 oSheet.Cells[1, 1] = "Node Information";//WFA_psychometric_chart.Properties.Resources.Building_Information;
@@ -15354,21 +15861,16 @@ namespace WFA_psychometric_chart
                 //now lets open the save dialog box and the save it there..
 
                 Cursor = Cursors.Default;
-                String fileName = "";
-
-                saveFD.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);// "C:";
-                saveFD.FileName = "ExcelSave";
-                saveFD.Title = Properties.Resources.Save_Excel_file_to;
-                saveFD.Filter = "Excel file|*.xls";
-                if (saveFD.ShowDialog() == DialogResult.OK)
-                {
-                    //save the file..
+                 //save the file..
                     fileName = saveFD.FileName;
                     oBook.SaveAs(fileName);
 
+
+                    oBook.Close();
+                    oApp.Quit();
                 }
-                oBook.Close();
-                oApp.Quit();
+                
+                
             }
             catch (Exception ex)
             {
@@ -15448,7 +15950,7 @@ namespace WFA_psychometric_chart
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+               // MessageBox.Show(ex.Message);
             }
         }
 
@@ -15899,9 +16401,7 @@ namespace WFA_psychometric_chart
             plot_on_graph_values_heat_map(DBT, HR, x_axis, y_axis);
 
             //MessageBox.Show("reached series print" +series1.ToString());
-
             //index_heat_map++;
-
 
             return 0;
         }
@@ -15913,7 +16413,6 @@ namespace WFA_psychometric_chart
             //chart1.Series.Add(series1);
             try
             {
-
 
                 series1_heat_map.ChartType = SeriesChartType.Point;
                 int r, g, b;

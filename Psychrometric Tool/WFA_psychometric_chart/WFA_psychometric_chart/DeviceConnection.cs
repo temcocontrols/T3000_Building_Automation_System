@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 
 
 namespace WFA_psychometric_chart
@@ -14,7 +10,7 @@ namespace WFA_psychometric_chart
 
         ////Lets build the function we need to do the task 
         //public class ca{
-        //      public  string deviceName { get; set; }
+        //    public  string deviceName { get; set; }
         //    public string deviceInstance { get; set; }
         //    public string ConnectedPort { get; set; }
         //}
@@ -33,8 +29,6 @@ namespace WFA_psychometric_chart
                 //Console.WriteLine("Started");
 
                 Thread.Sleep(3000); // Wait a fiew time for WhoIs responses (managed in handler_OnIam)
-               
-             
 
             }
             catch { }
