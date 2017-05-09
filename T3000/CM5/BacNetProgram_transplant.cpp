@@ -6841,7 +6841,7 @@ int pointtotext(char *buf,Point_Net *point)
 	panel=point->panel;
 	point_type= (point->point_type ) & 0x1F;
 	sub_panel = point->sub_panel;
-	if(point_type > 27)
+	if(point_type > BAC_DO)
 	{
 		error = -6;
 		return -6;

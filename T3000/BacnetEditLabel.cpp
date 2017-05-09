@@ -278,7 +278,8 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 				{
 					m_Input_data.at(label_info.nPoint_number).auto_manual = 1;	//Manual = 1;
 					show_temp = _T("Manual");
-					m_edit_value.EnableWindow(true);
+					if (m_Input_data.at(label_info.nPoint_number).digital_analog == BAC_UNITS_ANALOG)
+						m_edit_value.EnableWindow(true);
 					
 				}
 				m_AutoManual = show_temp;	
@@ -286,6 +287,8 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 			}
 			else if(ncommand == CHANGE_VALUE)
 			{
+				if (m_Input_data.at(label_info.nPoint_number).auto_manual == BAC_AUTO)
+					return 0;
 				if(m_Input_data.at(label_info.nPoint_number).digital_analog == BAC_UNITS_ANALOG)
 				{
 					CString temp_analog_value;
@@ -355,7 +358,8 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 				{
 					m_Output_data.at(label_info.nPoint_number).auto_manual = 1;	//Manual = 1;
 					show_temp = _T("Manual");
-					m_edit_value.EnableWindow(true);
+					if (m_Output_data.at(label_info.nPoint_number).digital_analog == BAC_UNITS_DIGITAL)
+						m_edit_value.EnableWindow(true);
 
 				}
 				m_AutoManual = show_temp;
@@ -374,6 +378,8 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 				}
 				else if(m_Output_data.at(label_info.nPoint_number).digital_analog == BAC_UNITS_DIGITAL)
 				{
+					if (m_Output_data.at(label_info.nPoint_number).auto_manual == BAC_AUTO) //如果是
+						return 0;
 					if((m_Output_data.at(label_info.nPoint_number).range < 23) &&(m_Output_data.at(label_info.nPoint_number).range !=0))
 						temp_unit = Digital_Units_Array[m_Output_data.at(label_info.nPoint_number).range];
 					else if((m_Output_data.at(label_info.nPoint_number).range >=23) && (m_Output_data.at(label_info.nPoint_number).range <= 30))
@@ -427,7 +433,8 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 				{
 					m_Variable_data.at(label_info.nPoint_number).auto_manual = 1;	//Manual = 1;
 					show_temp = _T("Manual");
-					m_edit_value.EnableWindow(true);
+					if (m_Variable_data.at(label_info.nPoint_number).digital_analog == BAC_UNITS_DIGITAL)
+						m_edit_value.EnableWindow(true);
 
 				}
 				m_AutoManual = show_temp;
@@ -446,6 +453,8 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 				}
 				else if(m_Variable_data.at(label_info.nPoint_number).digital_analog == BAC_UNITS_DIGITAL)
 				{
+					if (m_Variable_data.at(label_info.nPoint_number).auto_manual == BAC_AUTO) //如果是
+						return 0;
 					if((m_Variable_data.at(label_info.nPoint_number).range < 23) &&(m_Variable_data.at(label_info.nPoint_number).range !=0))
 						temp_unit = Digital_Units_Array[m_Variable_data.at(label_info.nPoint_number).range];
 					else if((m_Variable_data.at(label_info.nPoint_number).range >=23) && (m_Variable_data.at(label_info.nPoint_number).range <= 30))
@@ -554,7 +563,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 				{
 					m_Program_data.at(label_info.nPoint_number).auto_manual = 1;	//Manual = 1;
 					show_temp = _T("Manual");
-					m_edit_value.EnableWindow(true);
+					//m_edit_value.EnableWindow(true);
 
 				}
 				m_AutoManual = show_temp;
@@ -566,6 +575,8 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 			}
 			else if(ncommand == CHANGE_VALUE)
 			{
+				if (m_Program_data.at(label_info.nPoint_number).auto_manual == BAC_AUTO) //如果是
+					return 0;
 				if(m_Program_data.at(label_info.nPoint_number).on_off == 0)
 				{
 					m_Program_data.at(label_info.nPoint_number).on_off = 1;
@@ -817,8 +828,10 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					if(m_AutoManual.CompareNoCase(_T("M")) == 0)
 					{			
 						m_AutoManual = _T("Manual");	
-						if(digital_status == 0)
+						if (digital_status == 2)
+						{
 							m_edit_value.EnableWindow(true);
+						}
 						else
 							m_edit_value.EnableWindow(false);
 					}
@@ -830,7 +843,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					m_edit_auto_manual.SetWindowTextW(m_AutoManual);
 					m_edit_value.SetWindowTextW(m_value);
 
-					if((digital_status == 0) || (digital_status == 1))
+					if(digital_status != 2)
 					{
 						//如果是数字量 就 disable 对话框 ，用来响应 click的改变事件;
 						m_edit_value.EnableWindow(FALSE);
@@ -863,7 +876,8 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					if(m_AutoManual.CompareNoCase(_T("M")) == 0)
 					{			
 						m_AutoManual = _T("Manual");	
-						m_edit_value.EnableWindow(true);
+
+							m_edit_value.EnableWindow(true);
 					}
 					else
 					{
@@ -873,7 +887,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					m_edit_auto_manual.SetWindowTextW(m_AutoManual);
 					m_edit_value.SetWindowTextW(m_value);
 
-					if((digital_status == 0) || (digital_status == 1))
+					if (digital_status != 2)
 					{
 						//如果是数字量 就 disable 对话框 ，用来响应 click的改变事件;
 						m_edit_value.EnableWindow(FALSE);
@@ -914,8 +928,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					}
 					m_edit_auto_manual.SetWindowTextW(m_AutoManual);
 					m_edit_value.SetWindowTextW(m_value);
-
-					if((digital_status == 0) || (digital_status == 1))
+					if (digital_status != 2)
 					{
 						//如果是数字量 就 disable 对话框 ，用来响应 click的改变事件;
 						m_edit_value.EnableWindow(FALSE);
@@ -1146,8 +1159,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 			}
 			break;
 		}
-		
-		if((digital_status == 0) || (digital_status == 1))
+		if (digital_status == 2)
 		{
 			m_edit_icon2_path.ShowWindow(true);
 		}

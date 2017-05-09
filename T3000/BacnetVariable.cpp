@@ -1183,7 +1183,7 @@ int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &
 			CString cstemp_value;
 			float temp_float_value;
 			temp_float_value = ((float)m_Variable_data.at(i).value) / 1000;
-			ret_cstring.Format(_T("%.3f"),temp_float_value);
+			ret_cstring.Format(_T("%.1f"),temp_float_value);
 			digital_value = 2;
 		}
 		else

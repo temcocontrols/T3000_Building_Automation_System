@@ -747,6 +747,7 @@ BOOL IS_Temco_Product(int product_model)
 			case   STM32_HUM_RS485			   :
 			case   STM32_PRESSURE_NET		   :
 			case   STM32_PRESSURE_RS3485	   :
+			case   PM_T3_LC						:
 			       return TRUE;
 			default:
 			       return FALSE;
@@ -4058,6 +4059,7 @@ void Inial_Product_map()
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT8_OCC,_T("TStat8_Occ")));
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT7_ARM,_T("TStat7_ARM")));
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT8_220V,_T("TStat8_220V")));
+	product_map.insert(map<int, CString>::value_type(PM_T3_LC, _T("T3_LC")));
 
 
 }
@@ -4065,7 +4067,7 @@ void Inial_Product_map()
 
 CString GetProductName(int ModelID)
 {
-	map <int,CString>::iterator myiterator;
+	/*map <int,CString>::iterator myiterator;
 
 	myiterator =product_map.find(ModelID);
 	if(myiterator != product_map.end())
@@ -4075,9 +4077,9 @@ CString GetProductName(int ModelID)
 	else
 	{
 		 return _T("");	
-	}
-
-	 return _T("");	
+	}*/
+	return product_map[ModelID];
+	  //_T("");	
 }
 
 
@@ -10633,6 +10635,10 @@ void LoadRegistersGraphicMode()
         LoadRegistersGraphicMode_CO2485();
     }
     break;
+	case STM32_PRESSURE_NET:
+	{
+		LoadRegistersGraphicMode_STM32Pressure();
+	}
     }
 }
 
@@ -10667,6 +10673,7 @@ void LoadRegistersGraphicMode_HUMTEMPSENSOR()
     g_calibration_module_data.User_Fre.StrValue=_T("Frequency");
     g_calibration_module_data.User_Hum.regAddress	 = 456 ;
     g_calibration_module_data.User_Hum.StrValue =_T("Humidity(%)");
+
     g_calibration_module_data.Factory_Fre.regAddress  =381;
     g_calibration_module_data.Factory_Fre.StrValue=_T("Frequency");
     g_calibration_module_data.Factory_Hum.regAddress  =382;
@@ -10690,6 +10697,26 @@ void LoadRegistersGraphicMode_CO2485()
     g_calibration_module_data.Factory_Hum.regAddress  =717;
     g_calibration_module_data.Factory_Hum.StrValue =_T("Pressure");
 }
+void LoadRegistersGraphicMode_STM32Pressure()
+{
+	g_calibration_module_data.Current_Frequency.regAddress = 710;
+	g_calibration_module_data.Current_Frequency.StrValue = _T("AD");
+
+	g_calibration_module_data.User_Table_Selection.regAddress = 774;
+	g_calibration_module_data.User_Table_Point_Number.regAddress = 737;
+	g_calibration_module_data.User_Offset.regAddress = 770;
+	g_calibration_module_data.User_Offset.RegValue = (short)product_register_value[770];
+	g_calibration_module_data.User_Fre.regAddress = 739;
+	g_calibration_module_data.User_Fre.StrValue = _T("AD");
+	g_calibration_module_data.User_Hum.regAddress = 738;
+	g_calibration_module_data.User_Hum.StrValue = _T("Pressure");
+
+	g_calibration_module_data.Factory_Fre.regAddress = 718;
+	g_calibration_module_data.Factory_Fre.StrValue = _T("AD");
+	g_calibration_module_data.Factory_Hum.regAddress = 717;
+	g_calibration_module_data.Factory_Hum.StrValue = _T("Pressure");
+}
+
 BOOL ReadLineFromHexFile(CFile& file, char* pBuffer)
 {
     //当hex文件中每一行的文件超过了256个字符的时候，我们就认为这个hex文件出现了问题
@@ -11790,168 +11817,178 @@ bool Save_OutputData_to_db(unsigned char  temp_output_index)
 	SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 	SqliteDBBuilding.closedb();	
 }
-bool Save_AVData_to_db()
+bool Save_VariableData_to_db(unsigned char  temp_output_index, unsigned int nserialnumber)
 {
-	CString strPanel;
-	strPanel.Format(_T("%d"), (unsigned char)Station_NUM);
+	//CString strPanel;
+	//strPanel.Format(_T("%d"), (unsigned char)Station_NUM);
 
-	CppSQLite3DB SqliteDBBuilding;
-	CString strSql;
-	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
-	if (!SqliteDBBuilding.tableExists("VariablesTable"))
-	{
+	//CppSQLite3DB SqliteDBBuilding;
+	//CString strSql;
+	//SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+	//if (!SqliteDBBuilding.tableExists("VariablesTable"))
+	//{
+	//	strSql.Format(_T("CREATE TABLE [VariablesTable] ([SerialNumber] Int,[var_panel] CHAR(255),[var_index] CHAR(255),[var_am] CHAR(255),[var_value] CHAR(255),[var_units] CHAR(255),[var_label] CHAR(255));"));
+	//	SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+	//}
+	//else
+	//{
+	//	if (!SqliteDBBuilding.tableColumnExists(_T("VariablesTable"), _T("SerialNumber")))
+	//	{
+	//		strSql.Format(_T("Drop table VariablesTable"));
+	//		SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+	//		strSql.Format(_T("CREATE TABLE [VariablesTable] ([SerialNumber] Int,[var_panel] CHAR(255),[var_index] CHAR(255),[var_am] CHAR(255),[var_value] CHAR(255),[var_units] CHAR(255),[var_label] CHAR(255));"));
+	//		SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+	//	}
+	//}
+	//unsigned char i;
+	//i = temp_output_index;
+	//CString Strindex;
+	//Strindex.Format(_T("%u"), i);
 
-		strSql.Format(_T("CREATE TABLE [VariablesTable] ([var_panel] CHAR(255),[var_index] CHAR(255),[var_am] CHAR(255),[var_value] CHAR(255),[var_units] CHAR(255),[var_label] CHAR(255));"));
-		SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
-
-	}
- 
-	strSql.Format(_T("delete from VariablesTable "));
-	SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
-	for (int i = 0; i < (int)m_Variable_data.size(); i++)
-	{
-		CString temp_item, temp_value, temp_cal, temp_filter, temp_status, temp_lable;
-		CString temp_des,temp_am;
-		CString temp_units;
-		CString Strindex;
-		Strindex.Format(_T("%d"), i);
-		 
-
-		if (i >= variable_item_limit_count)
-		{
-			return 0;
-		}
-
-		MultiByteToWideChar(CP_ACP, 0, (char *)m_Variable_data.at(i).description, (int)strlen((char *)m_Variable_data.at(i).description) + 1,
-			temp_des.GetBuffer(MAX_PATH), MAX_PATH);
-		temp_des.ReleaseBuffer();
-		 
-		if (m_Variable_data.at(i).auto_manual == 0)
-		{
-			temp_am= _T("Auto");
-		}
-		else
-		{
-			temp_am = _T("Manual");
-		}
+	//strSql.Format(_T("delete from VariablesTable where SerialNumber = '%u' and var_index = '%s'"), nserialnumber, Strindex);
+	//SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 
 
-		if (m_Variable_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
-		{
+	//CString temp_item, temp_value, temp_cal, temp_filter, temp_status, temp_lable;
+	//CString temp_des, temp_am;
+	//CString temp_units;
 
-			if ((m_Variable_data.at(i).range == 0) || (m_Variable_data.at(i).range > 30))
-			{
-				CString cstemp_value2;
-				float temp_float_value1;
-				temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
-				cstemp_value2.Format(_T("%.3f"), temp_float_value1);
-				 
-				temp_units= Variable_Analog_Units_Array[0];
-			}
-			else
-			{
-			 
-				CStringArray temparray;
 
-				if ((m_Variable_data.at(i).range < 23) && (m_Variable_data.at(i).range != 0))
-					temp_units = Digital_Units_Array[m_Variable_data.at(i).range];
-				else if ((m_Variable_data.at(i).range >= 23) && (m_Variable_data.at(i).range <= 30))
-				{
-					if (receive_customer_unit)
-						temp_units = temp_unit_no_index[m_Variable_data.at(i).range - 23];
-				}
-				else
-				{
-					temp_units = Digital_Units_Array[0];
-					 
-				}
 
-				SplitCStringA(temparray, temp_units, _T("/"));
-				if ((temparray.GetSize() == 2))
-				{
-					if (m_Variable_data.at(i).control == 0)
-						temp_value = temparray.GetAt(0);
-					else
-						temp_value=temparray.GetAt(1);
-					 
-				}
+	//if (i >= variable_item_limit_count)
+	//{
+	//	return 0;
+	//}
 
-			}
- 
-		}
-		else
-		{
-			if (m_Variable_data.at(i).range == 20)	//如果是时间;
-			{
-				temp_units= Variable_Analog_Units_Array[m_Variable_data.at(i).range];
-				char temp_char[50];
-				int time_seconds = m_Variable_data.at(i).value / 1000;
-				intervaltotextfull(temp_char, time_seconds, 0, 0);
-				CString temp_11;
-				MultiByteToWideChar(CP_ACP, 0, temp_char, strlen(temp_char) + 1,
-					temp_11.GetBuffer(MAX_PATH), MAX_PATH);
-				temp_11.ReleaseBuffer();
-				temp_value=temp_11;
- 
-			}
-		 
-			else if (m_Variable_data.at(i).range < sizeof(Variable_Analog_Units_Array) / sizeof(Variable_Analog_Units_Array[0]))
-			{
-				temp_units=Variable_Analog_Units_Array[m_Variable_data.at(i).range];
+	//MultiByteToWideChar(CP_ACP, 0, (char *)m_Variable_data.at(i).description, (int)strlen((char *)m_Variable_data.at(i).description) + 1,
+	//	temp_des.GetBuffer(MAX_PATH), MAX_PATH);
+	//temp_des.ReleaseBuffer();
 
-				CString cstemp_value;
-				float temp_float_value;
-				temp_float_value = ((float)m_Variable_data.at(i).value) / 1000;
-				cstemp_value.Format(_T("%.3f"), temp_float_value);
-				temp_value = cstemp_value;
+	//if (m_Variable_data.at(i).auto_manual == 0)
+	//{
+	//	temp_am = _T("Auto");
+	//}
+	//else
+	//{
+	//	temp_am = _T("Manual");
+	//}
 
-			 
-			}
-			else if ((m_Variable_data.at(i).range >= 34) && (m_Variable_data.at(i).range <= 38))
-			{
-				temp_units=Analog_Variable_Units[m_Variable_data.at(i).range - 34];
-				CString cstemp_value;
-				float temp_float_value;
-				temp_float_value = ((float)m_Variable_data.at(i).value) / 1000;
-				cstemp_value.Format(_T("%.3f"), temp_float_value);
-				temp_value = cstemp_value;
-			}
-			else
-			{
-				temp_units =Variable_Analog_Units_Array[0];
 
-				CString cstemp_value;
-				float temp_float_value;
-				temp_float_value = ((float)m_Variable_data.at(i).value) / 1000;
-				cstemp_value.Format(_T("%.3f"), temp_float_value);
-				temp_value=cstemp_value;
-			}
+	//if (m_Variable_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
+	//{
 
-		}
+	//	if ((m_Variable_data.at(i).range == 0) || (m_Variable_data.at(i).range > 30))
+	//	{
+	//		CString cstemp_value2;
+	//		float temp_float_value1;
+	//		temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
+	//		cstemp_value2.Format(_T("%.3f"), temp_float_value1);
 
-		CString temp_des2;
-		MultiByteToWideChar(CP_ACP, 0, (char *)m_Variable_data.at(i).label, (int)strlen((char *)m_Variable_data.at(i).label) + 1,
-			temp_des2.GetBuffer(MAX_PATH), MAX_PATH);
-		temp_des2.ReleaseBuffer();
-		temp_des= temp_des2;
-		 
- 		strSql.Format(_T("Insert INTO VariablesTable(var_panel,var_index,var_am,var_value,var_units,var_label) Values('%s','%s','%s','%s','%s','%s' )"),
- 			strPanel,
- 			Strindex,
-			temp_am,
-			temp_value,
-			temp_units,
-			temp_des
- 			);
+	//		temp_units = Variable_Analog_Units_Array[0];
+	//	}
+	//	else
+	//	{
 
-		SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
-		
-		 
+	//		CStringArray temparray;
 
-	}
-	SqliteDBBuilding.closedb();
- 
-	
+	//		if ((m_Variable_data.at(i).range < 23) && (m_Variable_data.at(i).range != 0))
+	//			temp_units = Digital_Units_Array[m_Variable_data.at(i).range];
+	//		else if ((m_Variable_data.at(i).range >= 23) && (m_Variable_data.at(i).range <= 30))
+	//		{
+	//			if (receive_customer_unit)
+	//				temp_units = temp_unit_no_index[m_Variable_data.at(i).range - 23];
+	//		}
+	//		else
+	//		{
+	//			temp_units = Digital_Units_Array[0];
+
+	//		}
+
+	//		SplitCStringA(temparray, temp_units, _T("/"));
+	//		if ((temparray.GetSize() == 2))
+	//		{
+	//			if (m_Variable_data.at(i).control == 0)
+	//				temp_value = temparray.GetAt(0);
+	//			else
+	//				temp_value = temparray.GetAt(1);
+
+	//		}
+
+	//	}
+
+	//}
+	//else
+	//{
+	//	if (m_Variable_data.at(i).range == 20)	//如果是时间;
+	//	{
+	//		temp_units = Variable_Analog_Units_Array[m_Variable_data.at(i).range];
+	//		char temp_char[50];
+	//		int time_seconds = m_Variable_data.at(i).value / 1000;
+	//		intervaltotextfull(temp_char, time_seconds, 0, 0);
+	//		CString temp_11;
+	//		MultiByteToWideChar(CP_ACP, 0, temp_char, strlen(temp_char) + 1,
+	//			temp_11.GetBuffer(MAX_PATH), MAX_PATH);
+	//		temp_11.ReleaseBuffer();
+	//		temp_value = temp_11;
+
+	//	}
+
+	//	else if (m_Variable_data.at(i).range < sizeof(Variable_Analog_Units_Array) / sizeof(Variable_Analog_Units_Array[0]))
+	//	{
+	//		temp_units = Variable_Analog_Units_Array[m_Variable_data.at(i).range];
+
+	//		CString cstemp_value;
+	//		float temp_float_value;
+	//		temp_float_value = ((float)m_Variable_data.at(i).value) / 1000;
+	//		cstemp_value.Format(_T("%.3f"), temp_float_value);
+	//		temp_value = cstemp_value;
+
+
+	//	}
+	//	else if ((m_Variable_data.at(i).range >= 34) && (m_Variable_data.at(i).range <= 38))
+	//	{
+	//		temp_units = Analog_Variable_Units[m_Variable_data.at(i).range - 34];
+	//		CString cstemp_value;
+	//		float temp_float_value;
+	//		temp_float_value = ((float)m_Variable_data.at(i).value) / 1000;
+	//		cstemp_value.Format(_T("%.3f"), temp_float_value);
+	//		temp_value = cstemp_value;
+	//	}
+	//	else
+	//	{
+	//		temp_units = Variable_Analog_Units_Array[0];
+
+	//		CString cstemp_value;
+	//		float temp_float_value;
+	//		temp_float_value = ((float)m_Variable_data.at(i).value) / 1000;
+	//		cstemp_value.Format(_T("%.3f"), temp_float_value);
+	//		temp_value = cstemp_value;
+	//	}
+
+	//}
+
+	//CString temp_des2;
+	//MultiByteToWideChar(CP_ACP, 0, (char *)m_Variable_data.at(i).label, (int)strlen((char *)m_Variable_data.at(i).label) + 1,
+	//	temp_des2.GetBuffer(MAX_PATH), MAX_PATH);
+	//temp_des2.ReleaseBuffer();
+	//temp_des = temp_des2;
+
+	//strSql.Format(_T("Insert INTO VariablesTable(SerialNumber,var_panel,var_index,var_am,var_value,var_units,var_label) Values(%u,'%s','%s','%s','%s','%s','%s' )"),
+	//	nserialnumber,
+	//	strPanel,
+	//	Strindex,
+	//	temp_am,
+	//	temp_value,
+	//	temp_units,
+	//	temp_des
+	//);
+
+	//SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+
+
+	//SqliteDBBuilding.closedb();
+
+return 0;
 }
 CString GetGUID()
 {

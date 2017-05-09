@@ -256,6 +256,9 @@ CString CTStat_Dev::GetProductName()
 	case PM_T36CTA:
 		strProductName="T3-6CTA";
 		break;
+	case STM32_PRESSURE_NET:
+		strProductName = "Pressure";
+		break;
     case PM_T38AI8AO6DO:
         strProductName="T3-8AI8AO6DO";
         break;

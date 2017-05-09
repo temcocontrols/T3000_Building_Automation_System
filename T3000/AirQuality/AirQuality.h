@@ -290,7 +290,6 @@ public:
 	CEdit m_edit_calibration;
 	int m_nCurRow;
 	int m_nCurCol;
- 
 	CButton m_check_user;
 	CButton m_check_default;
 	CStatic m_Picture;

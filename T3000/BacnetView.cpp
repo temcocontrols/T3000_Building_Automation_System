@@ -2021,8 +2021,6 @@ void CDialogCM5_BacNet::Initial_All_Point()
 }
 
 
-
-
 class Complex
 {
 public:
@@ -2491,6 +2489,16 @@ Mystr::Mystr(const Mystr&other)
 
 
 
+void CDialogCM5_BacNet::InitialBacnetWindow()
+{
+	if (initial_once)
+	{
+		initial_once = false;
+		Tab_Initial();
+	}
+}
+
+
 //__declspec(dllexport) HANDLE	Get_RS485_Handle();
 static bool already_retry = false;
 bool has_change_connect_ip = true;
@@ -2499,11 +2507,7 @@ void CDialogCM5_BacNet::Fresh()
 {
 
 	g_bPauseMultiRead = true; // 只要在minipanel的界面 就暂停 读 寄存器的那个线程;
-    if(initial_once)
-    {
-        initial_once = false;
-        Tab_Initial();
-    }
+
 	if ((g_protocol!=PROTOCOL_BACNET_IP) && (g_protocol != MODBUS_BACNET_MSTP)  && (g_protocol != PROTOCOL_BIP_TO_MSTP) && (g_protocol != MODBUS_RS485) && (g_protocol != MODBUS_TCPIP))
 	{
 		return;
@@ -2579,6 +2583,7 @@ void CDialogCM5_BacNet::Fresh()
 			(pFrame->m_product.at(selected_product_index).product_class_id == PWM_TRANSDUCER) ||
 			(pFrame->m_product.at(selected_product_index).product_class_id == PID_T36CTA) ||
 		 (pFrame->m_product.at(selected_product_index).product_class_id == PID_T3PT12)) ||
+			(pFrame->m_product.at(selected_product_index).product_class_id == PM_T3_LC)  ||
 		 (pFrame->m_product.at(selected_product_index).product_class_id == STM32_HUM_NET))
 	{
 		BacNet_hwd = this->m_hWnd;
@@ -2735,6 +2740,8 @@ void CDialogCM5_BacNet::Fresh()
 				bacnet_device_type = PWM_TRANSDUCER;
 			else if(pFrame->m_product.at(selected_product_index).product_class_id == STM32_HUM_NET)
 				bacnet_device_type = STM32_HUM_NET;	
+			else if (pFrame->m_product.at(selected_product_index).product_class_id == PM_T3_LC)
+				bacnet_device_type = PM_T3_LC;
 			else
 			{
 				int ret = 0;
@@ -3242,6 +3249,7 @@ DWORD WINAPI  MSTP_Write_Command_Thread(LPVOID lpVoid)
 			}
 			else
 			{
+				
 				temp_cstring->Format(_T("Write input item %d success!\r\n"),i+1);
 				m_finished_count ++;
 				m_persent = m_finished_count * 100 / m_total_count;
@@ -3255,6 +3263,28 @@ DWORD WINAPI  MSTP_Write_Command_Thread(LPVOID lpVoid)
 
 	return 0;
 }
+
+
+//DWORD WINAPI Write_Data_Into_Db(LPVOID lpVoid)
+//{
+//	for (int i = 0; i < BAC_INPUT_ITEM_COUNT; i++)
+//	{
+//		Save_InputData_to_db(i, g_selected_serialnumber);
+//	}
+//
+//	for (int i = 0; i < BAC_OUTPUT_ITEM_COUNT; i++)
+//	{
+//		Save_OutputData_to_db(i, g_selected_serialnumber);
+//	}
+//
+//	for (int i = 0; i < BAC_VARIABLE_ITEM_COUNT; i++)
+//	{
+//		Save_VariableData_to_db(i, g_selected_serialnumber);
+//	}
+//
+//	write_indb_thread = NULL;
+//	return 0;
+//}
 
 DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
 {
@@ -5725,10 +5755,15 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 		output_reg = 0; // (6+8)*23 = 322
 		input_reg =  3; //  23 * 12 = 506
 	}
+	else if (n_read_product_type == PM_T3_LC)
+	{
+		output_reg =2 ; // (6+8)*23 = 322
+		input_reg = 2; //  23 * 12 = 506
+	}
 	else if (n_read_product_type == PID_T36CTA)
 	{
-		output_reg = 1;    // (1)*23 = 322
-		input_reg = 5;    //  23 * 12 = 506
+		output_reg = 1;       //(1)*23 = 322
+		input_reg = 5;       //23 * 12 = 506
 	}
 	else if(n_read_product_type == STM32_HUM_NET)
 	{

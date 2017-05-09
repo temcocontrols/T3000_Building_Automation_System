@@ -39,6 +39,7 @@ int GetPidValue(int index,CString &Auto_M,CString &persend_data);
 
 int GetPrgFullLabel(int index,CString &ret_full_label);
 int GetPrgLabel(int index,CString &ret_label);
+int GetPrgValue(int index, CString &ret_cstring);
 
 int GetScreenLabel(int index,CString &ret_label);
 int GetScreenFullLabel(int index,CString &ret_full_label);
@@ -1925,8 +1926,46 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 
 		int x_l_exp_value = 10;
 		int x_r_exp_value = 20;
-		int y_top_exp_value = 20;
-		int y_btn_exp_value = 20;
+		int y_top_exp_value = 3;
+		int y_btn_exp_value = 3;
+
+		if ((m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_VALUE) ||
+			(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_FULL_DESCRIPTION) ||
+			(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_LABEL) ||
+			(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_SHOW_VALUE))
+		{
+			int niconsize = 0;
+			if (m_bac_label_vector.at(i).n_iconsize == LABEL_ICON_SMALL)
+			{
+				niconsize = 32;
+			}
+			else if (m_bac_label_vector.at(i).n_iconsize == LABEL_ICON_NORMAL)
+			{
+				niconsize = 64;
+			}
+			else if (m_bac_label_vector.at(i).n_iconsize == LABEL_ICON_LARGE)
+			{
+				niconsize = 96;
+			}
+			if (m_bac_label_vector.at(i).ntext_place == LABEL_TEXT_BOTTOM)
+			{
+				y_top_exp_value = niconsize;
+			}
+			else if (m_bac_label_vector.at(i).ntext_place == LABEL_TEXT_TOP)
+			{
+				y_btn_exp_value = niconsize;
+			}
+			else if (m_bac_label_vector.at(i).ntext_place == LABEL_TEXT_LEFT)
+			{
+				x_r_exp_value = niconsize;
+			}
+			else if (m_bac_label_vector.at(i).ntext_place == LABEL_TEXT_RIGHT)
+			{
+				x_l_exp_value = niconsize;
+			}
+		}
+
+
 
 		if((point.x > 0 ) && (point.x < LOCK_ICON_SIZE_X) && (point.y > 0) && (point.y < LOCK_ICON_SIZE_Y))
 		{

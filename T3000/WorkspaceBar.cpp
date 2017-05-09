@@ -443,15 +443,14 @@ void CWorkspaceBar::OnFolderBrowerBtn()
 LRESULT CWorkspaceBar::OnNcHitTest(CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
-
-return 0;   // 使得 dockable pane 无法拖动了。
+	// 使得 dockable pane 无法拖动了。
+return 0;  
 	return CDockablePane::OnNcHitTest(point);
 }
 
 void CWorkspaceBar::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
-	 
+ 
 	CDockablePane::OnLButtonDown(nFlags, point);
 }
 

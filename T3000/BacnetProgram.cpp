@@ -615,6 +615,26 @@ int GetPrgLabel(int index,CString &ret_label)
 	return 1;
 }
 
+int GetPrgValue(int index, CString &ret_cstring)
+{
+	if (index >= BAC_PROGRAM_ITEM_COUNT)
+	{
+		ret_cstring.Empty();
+		return -1;
+	}
+	int i = index;
+
+	if (m_Program_data.at(i).on_off == 0)
+	{
+		ret_cstring = ProgramStatus[1];
+	}
+	else
+	{
+		ret_cstring = ProgramStatus[0];
+	}
+
+	return 1;
+}
 
 int GetPrgFullLabel(int index,CString &ret_full_label)
 {

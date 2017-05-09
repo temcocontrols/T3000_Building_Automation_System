@@ -397,9 +397,6 @@ CString Check_Time(unsigned long local_time , unsigned int device_time)
 
 LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 {
-
-	//CString test123123;
-	//test123123 = Check_Time(1, 2);
 	int command_type = wParam;
 	int button_click = 0;
 	CString temp_cs;
@@ -793,7 +790,6 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->AddString(Device_Serial_Port_Status[SUB_MODBUS]);
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->AddString(Device_Serial_Port_Status[MSTP_MASTER]);
 
-				
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->EnableWindow(TRUE);
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->EnableWindow(TRUE);
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->EnableWindow(TRUE);

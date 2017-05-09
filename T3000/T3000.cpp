@@ -32,7 +32,6 @@ const int g_versionNO=20170215;
 ULONG_PTR g_gdiplusToken;
 BEGIN_MESSAGE_MAP(CT3000App, CWinAppEx)
 	ON_COMMAND(ID_APP_ABOUT, &CT3000App::OnAppAbout)
-	// Standard file based document commands
 	ON_COMMAND(ID_FILE_NEW, &CWinAppEx::OnFileNew)
 	ON_COMMAND(ID_FILE_SAVE_CONFIG, &CWinAppEx::OnFileOpen)
 	ON_COMMAND(ID_VERSIONHISTORY,OnVersionInfo)
@@ -42,9 +41,8 @@ END_MESSAGE_MAP()
 CT3000App::CT3000App()
 {
 	m_bHiColorIcons = TRUE;
-	CurrentT3000Version=_T("    2017.04.27");
-	T3000_Version = 20427;
-
+	CurrentT3000Version=_T("    2017.5.5");
+	T3000_Version = 20316;
 
 	m_lastinterface=19;
 }
@@ -91,15 +89,15 @@ BOOL CT3000App::user_login()
 // CT3000App initialization
 BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
 {
-	LPCTSTR   pszDllName   =   OcxFileName   ;     //ActiveX控件的路径及文件名       
-	HINSTANCE   hLib   =   LoadLibrary(pszDllName);   //装载ActiveX控件   
+	LPCTSTR   pszDllName   =   OcxFileName   ;			//ActiveX控件的路径及文件名       
+	HINSTANCE   hLib   =   LoadLibrary(pszDllName);    //装载ActiveX控件   
 	if   (hLib   <   (HINSTANCE)HINSTANCE_ERROR)   
 	{   
 		return   FALSE;   
 	}   
 	FARPROC   lpDllEntryPoint;     
-	lpDllEntryPoint   =   GetProcAddress(hLib,(LPCSTR)(_T("DllRegisterServer")));   //获取注册函数DllRegisterServer地址   
-	if(lpDllEntryPoint!=NULL)       //调用注册函数DllRegisterServer   
+	lpDllEntryPoint   =   GetProcAddress(hLib,(LPCSTR)(_T("DllRegisterServer")));     //获取注册函数DllRegisterServer地址   
+	if(lpDllEntryPoint!=NULL)														 //调用注册函数DllRegisterServer   
 	{   
 		if(FAILED((*lpDllEntryPoint)()))   
 		{//   AfxMessageBox(_T("false"));
@@ -284,18 +282,28 @@ void CT3000App::UpdateDB()
 }
 BOOL CT3000App::InitInstance()
 {
+	GetModulePath();
+	CString strSource = g_strExePth + L"T3000Controls.dll";
 	//TODO: call AfxInitRichEdit2() to initialize richedit2 library.
 	try
 	{
-		::ShellExecute(NULL, _T("open"), _T("RegT3000Controls.bat"), _T(""), _T(""), SW_HIDE);
-
+		//if (ReadDLLRegAsm()<1)
+		{
+			CopyFile(strSource, L"C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\T3000Controls.dll", FALSE);
+			// ::ShellExecute(NULL, _T("open"), _T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe T3000Controls.dll"), _T(""), _T(""), SW_SHOW); 
+			ShellExecute(NULL, _T("open"), _T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe"), L"C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\T3000Controls.dll", NULL, SW_HIDE);
+		/*	SetDLLRegAsm(1);*/
+// 			AfxMessageBox(L"Restart T3000,Please");
+// 			return FALSE;
+		}
+		
 		// InitCommonControlsEx() is required on Windows XP if an application
 		// manifest specifies use of ComCtl32.dll version 6 or later to enable
 		// visual styles.  Otherwise, any window creation will fail.
+
 		INITCOMMONCONTROLSEX InitCtrls;
 		InitCtrls.dwSize = sizeof(InitCtrls);
-		// Set this to include all the common control classes you want to use
-		// in your application.
+
 		InitCtrls.dwICC = ICC_WIN95_CLASSES;
 		InitCommonControlsEx(&InitCtrls);
 
@@ -356,10 +364,11 @@ BOOL CT3000App::InitInstance()
 		//  	 
 		//  	}
 		// 	
-
 		//	versionstring=ImageString.g(index_start);
+
 		CWinAppEx::InitInstance();
-		HRESULT hr;//
+		HRESULT hr;
+		//
 
 
 		if(!AfxInitRichEdit())
@@ -1073,11 +1082,17 @@ BOOL CT3000App::haveRegister()
 		return TRUE;
 }
 
-CString CT3000App::GetModulePath()
+void CT3000App::GetModulePath()
 {
-	wchar_t path[MAX_PATH];
-	GetModuleFileName(NULL,path,MAX_PATH);
-	return CString(path);
+ 
+
+	TCHAR exeFullPath[MAX_PATH + 1]; //
+	GetModuleFileName(NULL, exeFullPath, MAX_PATH); //
+	(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;//
+	g_strDatabasefilepath = exeFullPath;//
+	g_strExePth = g_strDatabasefilepath;//
+
+	
 }
 
 int CT3000App::GetSoftInstallDays()
@@ -1088,7 +1103,7 @@ int CT3000App::GetSoftInstallDays()
 	CTimeSpan timeSpan;
 
 	curTime=CTime::GetCurrentTime();
-	strPath=GetModulePath();
+	//strPath=GetModulePath();
 
 	strPath=strPath.Left(strPath.ReverseFind(_T('\\'))+1);
 	strPath+=_T("T3000_Rev2.5.0.99.exe");
@@ -1192,12 +1207,27 @@ int CT3000App::GetLanguage(){
 	return language;
 
 }
+int CT3000App::ReadDLLRegAsm() {
+	CRegKey key;
+	LPCTSTR data_Set = _T("Software\\Microsoft\\Windows NT\\CurrentVersion");//_T("Software\\Microsoft\\");//
+	key.Open(HKEY_LOCAL_MACHINE, data_Set);
+	DWORD language;
+	ReadNameber(key, _T("T3000"), language);
+	return language;
+
+}
 
 void CT3000App::SetLanguage(DWORD Last){
 	CRegKey key;
 	LPCTSTR data_Set = _T("Software\\Microsoft\\Windows NT\\CurrentVersion");//_T("Software\\Microsoft\\");//
 	key.Open(HKEY_LOCAL_MACHINE,data_Set);
 	WriteNumber(key,_T("T3000"),Last);
+}
+void CT3000App::SetDLLRegAsm(DWORD Last) {
+	CRegKey key;
+	LPCTSTR data_Set = _T("Software\\Microsoft\\Windows NT\\CurrentVersion");//_T("Software\\Microsoft\\");//
+	key.Open(HKEY_LOCAL_MACHINE, data_Set);
+	WriteNumber(key, _T("T3000"), Last);
 }
 #include "Dowmloadfile.h"
 extern tree_product	m_product_isp_auto_flash;

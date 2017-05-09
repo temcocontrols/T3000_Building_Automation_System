@@ -16,7 +16,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 中文(简体，中国) resources
+// Chinese (Simplified, PRC) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
@@ -166,7 +166,7 @@ BEGIN
     CONTROL         "M->F",IDC_BUTTON_MF,"Button",BS_OWNERDRAW | WS_TABSTOP,270,55,50,14
 END
 
-IDD_DIALOG_AIRQUALITY DIALOGEX 0, 0, 776, 533
+IDD_DIALOG_AIRQUALITY DIALOGEX 0, 0, 776, 496
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_BORDER | WS_SYSMENU
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
@@ -197,8 +197,8 @@ BEGIN
     EDITTEXT        IDC_EDIT_BACKLIGHT_TIME_TIME,539,41,40,14,ES_AUTOHSCROLL
     LTEXT           "Back Light Selection:",IDC_STATIC_BLS,475,62,66,8
     GROUPBOX        "Factory Table",IDC_STATIC,466,177,155,150,BS_CENTER | NOT WS_VISIBLE
-    PUSHBUTTON      "Add",IDD_USER_TABLE_ADD,15,489,50,14,NOT WS_VISIBLE
-    PUSHBUTTON      "Delete",IDD_USER_TABLE_DEL,75,490,50,14,NOT WS_VISIBLE
+    PUSHBUTTON      "Add",IDD_USER_TABLE_ADD,479,365,50,14,NOT WS_VISIBLE
+    PUSHBUTTON      "Delete",IDD_USER_TABLE_DEL,539,366,50,14,NOT WS_VISIBLE
     CONTROL         "",IDC_CHARTCTRL,"ChartCtrl",NOT WS_VISIBLE | WS_CLIPCHILDREN | WS_TABSTOP,642,97,127,392
     LTEXT           "Frequency",IDC_STATIC,464,152,35,8,NOT WS_VISIBLE
     EDITTEXT        IDC_EDIT_FREQUENCE,506,150,40,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_VISIBLE
@@ -2889,7 +2889,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 769
         TOPMARGIN, 7
-        BOTTOMMARGIN, 526
+        BOTTOMMARGIN, 489
     END
 
     IDD_DIALOG_LIGHTINGCONTROLLER, DIALOG
@@ -6513,12 +6513,12 @@ BEGIN
     ID_BUILDINGCONFIGDB     "BuildingConfig"
 END
 
-#endif    // 中文(简体，中国) resources
+#endif    // Chinese (Simplified, PRC) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// 英语(美国) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
@@ -6930,7 +6930,7 @@ BEGIN
     LTEXT           "Row Number",IDC_STATIC,7,7,45,9
     COMBOBOX        IDC_COMBO1,7,218,55,30,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
     LTEXT           "year select:",IDC_YEARSTATIC,7,204,39,8
-    CONTROL         "",IDC_MONTHCALENDAR1,"MultipleMonthCal32",WS_TABSTOP | 0x59,55,7,591,692
+    CONTROL         "",IDC_MONTHCALENDAR1,"MultipleMonthCal32",WS_TABSTOP | 0x59,55,7,389,692
 END
 
 IDD_CONFIG_ROUTINES DIALOGEX 0, 0, 375, 377
@@ -6960,7 +6960,7 @@ BEGIN
     PUSHBUTTON      "Exit",IDC_EXITBUTTON,331,6,50,26
     EDITTEXT        IDC_TEXTEDIT,7,323,40,14,ES_AUTOHSCROLL
     COMBOBOX        IDC_PRODUCTTYPECOMBO,67,323,48,40,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
-    COMBOBOX        IDC_COMBO1,86,20,69,73,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO1,595,5,69,73,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Sub Net select",IDC_STATIC1,17,24,54,8
     PUSHBUTTON      "Add Custom Device",IDC_ARD,386,6,76,26,BS_MULTILINE
     PUSHBUTTON      "Delete Offline",IDC_DELBUTTON_OFFLINE,271,6,51,26
@@ -8509,7 +8509,7 @@ BEGIN
 0x0000, 0x0000, 0x0001, 0x8001, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 
 0x0002, 0x8001, 0x0001, 0x0000, 0x2100, 0x3443, 0x0812, 0x0000, 0x2500, 
 0x0067, 0xe400, 0x002d, 0x4200, 0x6f6f, 0x0050, 0x0600, 0x8000, 0x0000, 
-0x0200, 0x0000, 0x0f00, 0x0000, 0x0100, 0x0000, 0x0100, 0x0000, 0x0000, 
+0x0200, 0x0000, 0x1000, 0x0000, 0x0100, 0x0000, 0x0100, 0x0000, 0x0000, 
 0x0000, 0x0500, 0x0000, 0x0880, 0x0000, 0x0f80, 0x0000, 0x1280, 0x0000, 
 0x0d80, 0x0000, 0x0e80, 0x0000, 0x8080, 0x8080, 0xc000, 0xc0c0, 0x0000, 
 0x0000, 0x0000, 0x0000, 0x0100, 0x0000, 0x0100, 0x0000, 0x0000, 0x0000, 
@@ -10085,12 +10085,12 @@ BEGIN
     ID_BUILDINGCONFIGDB     "Show building config"
 END
 
-#endif    // 英语(美国) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// 英语(英国) resources
+// English (United Kingdom) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
@@ -10196,7 +10196,7 @@ BEGIN
     0
 END
 
-#endif    // 英语(英国) resources
+#endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

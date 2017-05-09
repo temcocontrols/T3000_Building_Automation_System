@@ -412,6 +412,10 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 	{
 		OUTPUT_LIMITE_ITEM_COUNT = 0;
 	}
+	else if (bacnet_device_type == PM_T3_LC)
+	{
+		OUTPUT_LIMITE_ITEM_COUNT = 8;
+	}
 	else if (
 		(bacnet_device_type == PID_T36CTA))
 	{
@@ -733,7 +737,9 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 				(temp_pid == PM_T322AI) ||
 				(temp_pid == PM_T38AI8AO6DO) ||
 				(temp_pid == PM_T36CT) ||
-				(temp_pid == PM_T36CTA))
+				(temp_pid == PM_T36CTA)||
+				(temp_pid == PM_T3_LC)
+				)
 			{
 				CString temp_name;
 				temp_name = GetProductName(m_Output_data.at(i).sub_product);
@@ -1051,7 +1057,9 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 				(temp_pid == PM_T36CT) ||
 				(temp_pid == PM_T322AI) ||
 				(temp_pid == PM_T38AI8AO6DO)||
-				(temp_pid == PM_T36CTA))
+				(temp_pid == PM_T36CTA)||
+				(temp_pid == PM_T3_LC)
+				)
 			{
 				//m_output_item_info.ShowWindow(true); //由于改成全屏的 支持resize 的显示，所以先屏蔽;
 				CString temp_name;
@@ -1566,7 +1574,7 @@ int GetOutputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Au
 		}
 
 		CString temp_value;
-		ret_cstring.Format(_T("%.2f"),((float)m_Output_data.at(i).value) / 1000);
+		ret_cstring.Format(_T("%.1f"),((float)m_Output_data.at(i).value) / 1000);
 		digital_value = 2;//analog;
 	}
 	else if(m_Output_data.at(i).digital_analog == BAC_UNITS_DIGITAL)

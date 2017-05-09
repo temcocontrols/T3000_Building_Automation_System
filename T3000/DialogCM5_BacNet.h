@@ -35,7 +35,7 @@ public:
 	afx_msg void OnBnClickedButtonTest();
 	virtual void OnInitialUpdate();
 	void Fresh();
-
+	void InitialBacnetWindow();
 	bool CM5_Thread;
 	bool m_MSTP_THREAD;
 	//HANDLE CM5_hThread;

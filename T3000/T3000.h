@@ -239,15 +239,20 @@ public:
 //	bool cm5_timer;	  //CM5
     BOOL JudgeT3000Version();
 	BOOL haveRegister();
-	CString GetModulePath();
+	void GetModulePath();
 	int GetSoftInstallDays();
 	void WriteNumber(CRegKey& key,CStringW valueName,DWORD value);
 	BOOL ReadNameber(CRegKey& key,CStringW valueName,DWORD& value);
 	void Judgestore();
 	void ReadREG();
+	
 	int  GetLanguage();
     void UpdateDB();
 	void SetLanguage(DWORD Last);
+
+	int ReadDLLRegAsm();
+	void SetDLLRegAsm(DWORD version);
+
 	DWORD m_maxClients;
 	DWORD password;
  

@@ -515,6 +515,9 @@ CString GetProductName(int ModelID)
 	case STM32_CO2_NODE:
 		strProductName="CO2 NODE";
 		break;
+	case PM_PWMETER:
+		strProductName = "PWMETER";
+		break;
 
 	default:
 		strProductName.Format(_T("Model ID:%d is out of control"),ModelID);

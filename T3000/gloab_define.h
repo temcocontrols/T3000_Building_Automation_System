@@ -1006,7 +1006,8 @@ typedef enum
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,
 	PID_T3PT12 = 46,
-	PID_T36CTA = 95  
+	PID_T36CTA = 95,
+	
 };
 
 const int BIG_MINIPANEL_IN_A = 32;

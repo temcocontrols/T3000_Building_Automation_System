@@ -536,6 +536,11 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		    INPUT_LIMITE_ITEM_COUNT = 12;
 			Minipanel_device = 0;
 	}
+	else if (bacnet_device_type == PM_T3_LC)
+	{
+		INPUT_LIMITE_ITEM_COUNT = 8;
+		Minipanel_device = 0;
+	}
 	else if (bacnet_device_type == PID_T36CTA)
 	{
 		INPUT_LIMITE_ITEM_COUNT = 19;
@@ -871,7 +876,8 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 			Minipanel_device == 1)
 		{
 			unsigned char temp_pid = m_Input_data.at(i).sub_product;
-			if((temp_pid == PM_T3PT10) ||
+			if(
+				(temp_pid == PM_T3PT10) ||
 				(temp_pid == PM_T3IOA) ||
 				(temp_pid == PM_T332AI) ||
 				(temp_pid == PM_T38AI16O) ||
@@ -880,7 +886,9 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 				(temp_pid == PM_T322AI) ||
 				(temp_pid == PM_T38AI8AO6DO) ||
 				(temp_pid == PM_T36CT) ||
-				(temp_pid == PM_T36CTA))
+				(temp_pid == PM_T36CTA)||
+				(temp_pid == PM_T3_LC)
+				)
 			{
 				//m_input_item_info.ShowWindow(true);
 				CString temp_name;
@@ -973,7 +981,9 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 				(temp_pid == PM_T322AI) ||
 				(temp_pid == PM_T38AI8AO6DO) ||
 				(temp_pid == PM_T36CT) ||
-				(temp_pid == PM_T36CTA))
+				(temp_pid == PM_T36CTA) ||
+				(temp_pid == PM_T3_LC)
+				)
 			{
 #if 0
 				m_input_item_info.ShowWindow(true);
@@ -1658,7 +1668,7 @@ int GetInputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Aut
 	{
 		float temp_float_value;
 		temp_float_value = ((float)m_Input_data.at(i).value) / 1000;
-		ret_cstring.Format(_T("%.2f"),temp_float_value);
+		ret_cstring.Format(_T("%.1f"),temp_float_value);
 
 		if(m_Input_data.at(i).range <  (sizeof(Input_List_Analog_Units)/sizeof(Input_List_Analog_Units[0])))
 		{
@@ -1680,7 +1690,7 @@ int GetInputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Aut
 		{
 			float temp_float_value;
 			temp_float_value = ((float)m_Input_data.at(i).value) / 1000;
-			ret_cstring.Format(_T("%.2f"),temp_float_value);
+			ret_cstring.Format(_T("%.1f"),temp_float_value);
 		}
 		else if((m_Input_data.at(i).range>30))
 		{
