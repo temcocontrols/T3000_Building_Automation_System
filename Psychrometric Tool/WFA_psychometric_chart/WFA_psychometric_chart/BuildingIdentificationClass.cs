@@ -65,8 +65,7 @@ namespace WFA_psychometric_chart
                             //--NO selected
                             f1.Close();//just close the form and the application
                             Environment.Exit(0);
-                            Application.Exit();
-                         
+                            //Application.Exit();                         
                         }
                     }
                 }

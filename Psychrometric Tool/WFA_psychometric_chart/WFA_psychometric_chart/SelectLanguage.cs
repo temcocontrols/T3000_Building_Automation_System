@@ -1,7 +1,4 @@
 using System;
-using System.Drawing;
-using System.Collections;
-using System.ComponentModel;
 using System.Windows.Forms;
 using System.Reflection;
 using System.Globalization;
@@ -10,7 +7,6 @@ using System.IO.IsolatedStorage;
 using System.Threading;
 using System.Text;
 using System.Xml;
-using System.Collections.Generic;
 using System.Data.SQLite;
 
 namespace MultiLang
@@ -20,7 +16,7 @@ namespace MultiLang
         public SelectLanguage()
         {
             InitializeComponent();
-          this.Disposed += new System.EventHandler ( this.SelectLanguage_Disposed );
+          this.Disposed += new EventHandler ( this.SelectLanguage_Disposed );
         }
 
         //----------------------------------------------
@@ -304,7 +300,7 @@ namespace MultiLang
 
                 //string selecte_location = reader["id"].ToString()+","+reader["country"].ToString() + "," + reader["state"].ToString() + "," + reader["city"].ToString();
                 //stored_location.Add(selecte_location);
-                id_return =int.Parse( reader["ID"].ToString());
+                id_return =int.Parse(reader["ID"].ToString());
      
             }
            //  MessageBox.Show("id ret = " + id_return);
@@ -319,6 +315,7 @@ namespace MultiLang
 
             return id_return;
         }
+
         string lstCultureSelected;//= "en-US";
         private void btOK_Click(object sender, System.EventArgs e)
         {

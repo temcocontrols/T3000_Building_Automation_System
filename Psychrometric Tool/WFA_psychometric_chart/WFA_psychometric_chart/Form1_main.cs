@@ -751,7 +751,6 @@ namespace WFA_psychometric_chart
                 //    // or setting the selected cells manually before executing the function
                 //    dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Selected = true;
                 //    dataGridView1_CellClick(sender, eventArgs);
-
                 //}
                 if (dataGridView1.CurrentCell.RowIndex >= 0 && dataGridView1.CurrentCell.RowIndex < chartDetailList.Count)
                 {
@@ -4362,29 +4361,29 @@ namespace WFA_psychometric_chart
             plot_new_graph();
         }
 
-        public void RefreshGraph()
-        {
-           // lock (this) { 
-            //try
-            //{
-                this.Invalidate();
-                chart1.Invalidate();
-                // chart1.Dispose();//--Releases all the resources used by the chart...
-                plot_new_graph();
+            public void RefreshGraph()
+            {
+               // lock (this) { 
+                //try
+                //{
+                    this.Invalidate();
+                    chart1.Invalidate();
+                    // chart1.Dispose();//--Releases all the resources used by the chart...
+                    plot_new_graph();
 
-                //--Reseting the menustrip values for new plotting....
-                menuStripNodeLineInfoValues.Clear();
-                menuStripNodeInfoValues.Clear();
-                index = 0;  //This is resetting the index values
-                incrementIndex = 0;
-            ReloadComfortZoneForBackGroundWorker();
-            // }
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show(ex.Message);
-            //}
-            // }//--Close of lock
-        }
+                    //--Reseting the menustrip values for new plotting....
+                    menuStripNodeLineInfoValues.Clear();
+                    menuStripNodeInfoValues.Clear();
+                    index = 0;  //This is resetting the index values
+                    incrementIndex = 0;
+                ReloadComfortZoneForBackGroundWorker();
+                // }
+                //catch (Exception ex)
+                //{
+                //    MessageBox.Show(ex.Message);
+                //}
+                // }//--Close of lock
+            }
 
         public void InsertNodeInfoToDB(string id, double xVal, double yVal, string source, string name, string label, Color colorValue, string showItemText, int nodeSizeValue, string deviceinstance, string deviceip, string param1id, string param2id, string param1info, string param2info, string param1type, string param2type)
         {
@@ -5267,10 +5266,10 @@ namespace WFA_psychometric_chart
                     }
                 }//close of if...
            // }//close of if int try parse.
-            else
-            {
-                MessageBox.Show(WFA_psychometric_chart.Properties.Resources.Please_enter_a_valid_zip_numbe);
-            }
+            //else
+            //{
+            //    MessageBox.Show(Properties.Resources.Please_enter_a_valid_zip_numbe);
+            //}
 
         }
 
@@ -9387,7 +9386,9 @@ namespace WFA_psychometric_chart
                     //string file = NewDirectory + @"Database\image\lock.png";
 
                     string imagePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                    string file = imagePath + @"\image\lock.png";
+                    //string file = imagePath + @"\image\lock.png";
+                    string newPath = Path.GetFullPath(Path.Combine(imagePath, @"..\"));
+                    string file = newPath + @"Database\image\lock.png";//imagePath + @"\image\lock.png";
 
 
                     this.quickNodeInsertToolStripMenuItem.Image = Bitmap.FromFile(file);
@@ -9788,7 +9789,6 @@ namespace WFA_psychometric_chart
                 marker_Size = markerSize  ,
                 airFlow = airFlowValueGlobal
 
-
             });
 
             //--Inserting the node values in the database sqlite
@@ -9800,12 +9800,12 @@ namespace WFA_psychometric_chart
 
                 // InsertNodeInfoToDB(unique_id_for_node, xval, yval, tbSource, tbName, tbLabel, colorValue, comboboxItemText, markerSize, deviceInstanceValue, deviceIP, deviceParam1ID, deviceParam2ID, device_param1_info_for_node, device_param2_info_for_node, object_param1_identifier_type, object_param2_identifier_type);
                 //--New code is added to here
-                DatabaseOperations ObjDbOperation = new DatabaseOperations();
+                DatabaseOperations objDbOperation = new DatabaseOperations();
                 //  MessageBox.Show("Building Name= " + selectedBuildingList[0].BuildingName);
                // MessageBox.Show(unique_id_for_node+"xval = "+ xval+" yval"+ yval+"temp "+ temperature_sourceGlobal+"hum="+ humidity_sourceGlobal+",name="+ tbName+",col="+ colorValue+",size=" +markerSize +",air="+airFlowValueGlobal.ToString());
-                ObjDbOperation.InsertNodeInfoToDBWithoutDeviceInfo(CurrentSelectedBuilding, chartDetailList[indexForWhichChartIsSelected].chart_respective_nodeID, unique_id_for_node, xval, yval, temperature_sourceGlobal, humidity_sourceGlobal, tbName, colorValue, markerSize, airFlowValueGlobal.ToString());
+                objDbOperation.InsertNodeInfoToDBWithoutDeviceInfo(CurrentSelectedBuilding, chartDetailList[indexForWhichChartIsSelected].chart_respective_nodeID, unique_id_for_node, xval, yval, temperature_sourceGlobal, humidity_sourceGlobal, tbName, colorValue, markerSize, airFlowValueGlobal.ToString());
                // MessageBox.Show("Operation Complete Test");
-            //InsertNodeInfoToDBWithoutDeviceInfo(unique_id_for_node,)
+                //InsertNodeInfoToDBWithoutDeviceInfo(unique_id_for_node,)
             }
 
 
@@ -9813,9 +9813,6 @@ namespace WFA_psychometric_chart
             //the liine plot part is only done when ther is two points or more
             if (index > 0)
             {
-
-
-
 
                 double startHumidity1 = 0;
                 double startEnthalpy1 = 0;
@@ -9936,7 +9933,7 @@ namespace WFA_psychometric_chart
                 string NinthLine = @"Total Enthalpy Flow         " + "KJ/s                " + Math.Round(totalEnthalpyFlow1, 2) + "                      " + Math.Round(totalEnthalpyFlow2, 2);
                 double heatChange = totalEnthalpyFlow2 - totalEnthalpyFlow1;
                 string TenthLine = @"Heat Change                    " + "KW                  " + Math.Round(heatChange, 2) + "                     ";
-               string tooltipString = ZeroLine + "\n" + FirstLine + "\n" + SecondLine + "\n" + ThirdLine + "\n" + FourthLine + "\n" + FifthLine + "\n" + SixthLine + "\n" + SeventhLine + "\n" + EighthLine + "\n" + NinthLine + "\n" + TenthLine;
+                string tooltipString = ZeroLine + "\n" + FirstLine + "\n" + SecondLine + "\n" + ThirdLine + "\n" + FourthLine + "\n" + FifthLine + "\n" + SixthLine + "\n" + SeventhLine + "\n" + EighthLine + "\n" + NinthLine + "\n" + TenthLine;
                 newLineSeries.ToolTip = tooltipString;
 
                 //=============================end of this is used======================//
@@ -10805,31 +10802,31 @@ namespace WFA_psychometric_chart
                 }
 
 
-
-                string sql_for_CF_Detail = "SELECT * From  " + tableForCF_Detail +" where id = '"+ comfortZoneInforForEachChartForSaving[0].comfortzoneid+"'";
+                if (comfortZoneInforForEachChartForSaving.Count > 0) { 
+                    string sql_for_CF_Detail = "SELECT * From  " + tableForCF_Detail +" where id = '"+ comfortZoneInforForEachChartForSaving[0].comfortzoneid+"'";
               
 
-                //--Now reading the chart info
-                SQLiteCommand cmd4 = new SQLiteCommand(sql_for_CF_Detail, conx);
-                SQLiteDataReader reader4 = cmd4.ExecuteReader();
-                while (reader4.Read())
-                {
-
-                    if (reader4["id"].ToString() != "")
+                    //--Now reading the chart info
+                    SQLiteCommand cmd4 = new SQLiteCommand(sql_for_CF_Detail, conx);
+                    SQLiteDataReader reader4 = cmd4.ExecuteReader();
+                    while (reader4.Read())
                     {
-                        ComfortZonesDetailForSaving.Add(new dataTypeForCF
-                        {
-                            id = reader4["id"].ToString(),
-                            name = reader4["name"].ToString(),
-                            min_temp = reader4["min_temp"].ToString(), //this is in string formate
-                            max_temp = reader4["max_temp"].ToString(),
-                            min_hum = reader4["min_hum"].ToString(),
-                            max_hum = reader4["max_hum"].ToString(),
-                            colorValue = ColorTranslator.FromHtml(reader4["colorValue"].ToString())
-                        });
-                    }
-                }
 
+                        if (reader4["id"].ToString() != "")
+                        {
+                            ComfortZonesDetailForSaving.Add(new dataTypeForCF
+                            {
+                                id = reader4["id"].ToString(),
+                                name = reader4["name"].ToString(),
+                                min_temp = reader4["min_temp"].ToString(), //this is in string formate
+                                max_temp = reader4["max_temp"].ToString(),
+                                min_hum = reader4["min_hum"].ToString(),
+                                max_hum = reader4["max_hum"].ToString(),
+                                colorValue = ColorTranslator.FromHtml(reader4["colorValue"].ToString())
+                            });
+                        }
+                    }
+                }//IF THE VALUE EXIST CLOSE
 
 
                 string sql_for_mix_node_info = "SELECT * From  " + mixnodeInfoTable +" where chartID  = '"+chartId+"'";
@@ -13718,10 +13715,7 @@ namespace WFA_psychometric_chart
             //} else if(t == 0)
             //{
             //    indexRun = 1;
-            //}
-
-
-
+            //}            
             if (t == 0)
             {
                 indexRun = 1;
@@ -14627,7 +14621,8 @@ namespace WFA_psychometric_chart
 
 
                 string imagePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                string file = imagePath + @"\image\lock.png";
+                string newPath = Path.GetFullPath(Path.Combine(imagePath, @"..\"));
+                string file = newPath + @"Database\image\lock.png";//imagePath + @"\image\lock.png";
 
                 Bitmap SOME = new Bitmap(Image.FromFile(file));
 
@@ -14652,7 +14647,8 @@ namespace WFA_psychometric_chart
 
 
                 string imagePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                string file = imagePath + @"\image\unlock.png";
+                string newPath = Path.GetFullPath(Path.Combine(imagePath, @"..\"));
+                string file = newPath + @"Database\image\unlock.png"; //imagePath + @"\image\unlock.png";
 
                 Bitmap SOME = new Bitmap(Image.FromFile(file));
                 Bitmap bp = new Bitmap(SOME, pb_lock_unlock.Width, pb_lock_unlock.Height);
@@ -14805,6 +14801,7 @@ namespace WFA_psychometric_chart
         private void disconnectLineFromAToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //--This one is for  detaching line form A
+            //this varibale is used int addDottedSeries() function 
             flagForDisconnectLineFromNode_PrevNode_Or_NextNode = 1;//now prev node is ON
 
             //---------This code is from Disconnect Line menustipe-------//
@@ -15580,12 +15577,15 @@ namespace WFA_psychometric_chart
              */
 
             try { 
-            int selectedItemIndex = dataGridView1.CurrentCell.RowIndex; //int.Parse(dataGridView1.Rows[indexSelectedForDeletion].Cells[0].Value.ToString());
+            int selectedItemIndex = dataGridView1.CurrentCell.RowIndex;
+            if (selectedItemIndex < chartDetailList.Count) { 
+             //int.Parse(dataGridView1.Rows[indexSelectedForDeletion].Cells[0].Value.ToString());
             string chart_ID = chartDetailList[selectedItemIndex].chartID;
             string chart_Name = chartDetailList[selectedItemIndex].chartName;
 
 
             LoadDataFromTemplateFileToDBActionTemplateFileUpload(chart_ID, chart_Name);
+            }
             }
             catch (Exception ex)
             {
@@ -15878,6 +15878,21 @@ namespace WFA_psychometric_chart
             }
         }
 
+        private void lb_db_name_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lb_buildingselectedShow_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void groupBox4ttt_Enter(object sender, EventArgs e)
+        {
+
+        }
+
 
 
 
@@ -15899,7 +15914,7 @@ namespace WFA_psychometric_chart
             try
             {
                 //cb1_select_data.Items.Clear();
-                ArrayList stored_location = new ArrayList();
+                //ArrayList stored_location = new ArrayList();
                 temp_building_values.Clear();//we need to clear the values for new items
                
                 

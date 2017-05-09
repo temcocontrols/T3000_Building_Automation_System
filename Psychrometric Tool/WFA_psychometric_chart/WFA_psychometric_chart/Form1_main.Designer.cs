@@ -112,6 +112,8 @@
             this.lb_dbt = new System.Windows.Forms.Label();
             this.label21 = new System.Windows.Forms.Label();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.id = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.name = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.lb_db_name = new System.Windows.Forms.Label();
             this.lb_buildingselectedShow = new System.Windows.Forms.Label();
             this.lb_numberOfHandler = new System.Windows.Forms.Label();
@@ -146,8 +148,6 @@
             this.lb_devicestatusshow = new System.Windows.Forms.Label();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.pb_lock_unlock = new System.Windows.Forms.PictureBox();
-            this.id = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.name = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.groupBox4ttt.SuspendLayout();
@@ -342,18 +342,21 @@
             // 
             // realTimeMode
             // 
+            this.realTimeMode.Image = global::WFA_psychometric_chart.Properties.Resources.weather_service;
             this.realTimeMode.Name = "realTimeMode";
             resources.ApplyResources(this.realTimeMode, "realTimeMode");
             this.realTimeMode.Click += new System.EventHandler(this.realTimeMode_Click);
             // 
             // simulationMode
             // 
+            this.simulationMode.Image = global::WFA_psychometric_chart.Properties.Resources.Calculator;
             this.simulationMode.Name = "simulationMode";
             resources.ApplyResources(this.simulationMode, "simulationMode");
             this.simulationMode.Click += new System.EventHandler(this.simulationMode_Click);
             // 
             // exportDataToolStripMenuItem
             // 
+            this.exportDataToolStripMenuItem.Image = global::WFA_psychometric_chart.Properties.Resources.export_data;
             this.exportDataToolStripMenuItem.Name = "exportDataToolStripMenuItem";
             resources.ApplyResources(this.exportDataToolStripMenuItem, "exportDataToolStripMenuItem");
             this.exportDataToolStripMenuItem.Click += new System.EventHandler(this.exportDataToolStripMenuItem_Click_1);
@@ -366,18 +369,21 @@
             // 
             // trashBoxToolStripMenuItem
             // 
+            this.trashBoxToolStripMenuItem.Image = global::WFA_psychometric_chart.Properties.Resources.tttrash;
             this.trashBoxToolStripMenuItem.Name = "trashBoxToolStripMenuItem";
             resources.ApplyResources(this.trashBoxToolStripMenuItem, "trashBoxToolStripMenuItem");
             this.trashBoxToolStripMenuItem.Click += new System.EventHandler(this.trashBoxToolStripMenuItem_Click);
             // 
             // gridViewToolStripMenuItem
             // 
+            this.gridViewToolStripMenuItem.Image = global::WFA_psychometric_chart.Properties.Resources.gridview_fiel;
             this.gridViewToolStripMenuItem.Name = "gridViewToolStripMenuItem";
             resources.ApplyResources(this.gridViewToolStripMenuItem, "gridViewToolStripMenuItem");
             this.gridViewToolStripMenuItem.Click += new System.EventHandler(this.gridViewToolStripMenuItem_Click);
             // 
             // excelExportToolStripMenuItem
             // 
+            this.excelExportToolStripMenuItem.Image = global::WFA_psychometric_chart.Properties.Resources.ex;
             this.excelExportToolStripMenuItem.Name = "excelExportToolStripMenuItem";
             resources.ApplyResources(this.excelExportToolStripMenuItem, "excelExportToolStripMenuItem");
             this.excelExportToolStripMenuItem.Click += new System.EventHandler(this.excelExportToolStripMenuItem_Click);
@@ -405,30 +411,35 @@
             // 
             // printToolStripMenuItem
             // 
+            this.printToolStripMenuItem.Image = global::WFA_psychometric_chart.Properties.Resources.print;
             this.printToolStripMenuItem.Name = "printToolStripMenuItem";
             resources.ApplyResources(this.printToolStripMenuItem, "printToolStripMenuItem");
             this.printToolStripMenuItem.Click += new System.EventHandler(this.printToolStripMenuItem_Click);
             // 
             // saveAsToolStripMenuItem
             // 
+            this.saveAsToolStripMenuItem.Image = global::WFA_psychometric_chart.Properties.Resources.save_file;
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
             resources.ApplyResources(this.saveAsToolStripMenuItem, "saveAsToolStripMenuItem");
             this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
             // 
             // saveConfigurationToolStripMenuItem
             // 
+            this.saveConfigurationToolStripMenuItem.Image = global::WFA_psychometric_chart.Properties.Resources.save_config;
             this.saveConfigurationToolStripMenuItem.Name = "saveConfigurationToolStripMenuItem";
             resources.ApplyResources(this.saveConfigurationToolStripMenuItem, "saveConfigurationToolStripMenuItem");
             this.saveConfigurationToolStripMenuItem.Click += new System.EventHandler(this.saveConfigurationToolStripMenuItem_Click);
             // 
             // loadConfigurationToolStripMenuItem
             // 
+            this.loadConfigurationToolStripMenuItem.Image = global::WFA_psychometric_chart.Properties.Resources.upload_file;
             this.loadConfigurationToolStripMenuItem.Name = "loadConfigurationToolStripMenuItem";
             resources.ApplyResources(this.loadConfigurationToolStripMenuItem, "loadConfigurationToolStripMenuItem");
             this.loadConfigurationToolStripMenuItem.Click += new System.EventHandler(this.loadConfigurationToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
+            this.exitToolStripMenuItem.Image = global::WFA_psychometric_chart.Properties.Resources.exit;
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             resources.ApplyResources(this.exitToolStripMenuItem, "exitToolStripMenuItem");
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
@@ -442,6 +453,7 @@
             // 
             // helpPsychometricChartToolStripMenuItem
             // 
+            this.helpPsychometricChartToolStripMenuItem.Image = global::WFA_psychometric_chart.Properties.Resources.helpfile;
             this.helpPsychometricChartToolStripMenuItem.Name = "helpPsychometricChartToolStripMenuItem";
             resources.ApplyResources(this.helpPsychometricChartToolStripMenuItem, "helpPsychometricChartToolStripMenuItem");
             this.helpPsychometricChartToolStripMenuItem.Click += new System.EventHandler(this.helpPsychometricChartToolStripMenuItem_Click);
@@ -467,6 +479,7 @@
             // 
             // groupBox4ttt
             // 
+            resources.ApplyResources(this.groupBox4ttt, "groupBox4ttt");
             this.groupBox4ttt.Controls.Add(this.label6line);
             this.groupBox4ttt.Controls.Add(this.label5);
             this.groupBox4ttt.Controls.Add(this.label4);
@@ -483,9 +496,9 @@
             this.groupBox4ttt.Controls.Add(this.lb_dbt);
             this.groupBox4ttt.Controls.Add(this.label21);
             this.groupBox4ttt.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            resources.ApplyResources(this.groupBox4ttt, "groupBox4ttt");
             this.groupBox4ttt.Name = "groupBox4ttt";
             this.groupBox4ttt.TabStop = false;
+            this.groupBox4ttt.Enter += new System.EventHandler(this.groupBox4ttt_Enter);
             // 
             // label6line
             // 
@@ -596,15 +609,38 @@
             this.dataGridView1.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.dataGridView1_DataBindingComplete);
             this.dataGridView1.SelectionChanged += new System.EventHandler(this.dataGridView1_SelectionChanged_1);
             // 
+            // id
+            // 
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.SteelBlue;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.WhiteSmoke;
+            this.id.DefaultCellStyle = dataGridViewCellStyle2;
+            resources.ApplyResources(this.id, "id");
+            this.id.Name = "id";
+            this.id.ReadOnly = true;
+            this.id.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // name
+            // 
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.SteelBlue;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.White;
+            this.name.DefaultCellStyle = dataGridViewCellStyle3;
+            resources.ApplyResources(this.name, "name");
+            this.name.Name = "name";
+            this.name.ReadOnly = true;
+            this.name.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
             // lb_db_name
             // 
             resources.ApplyResources(this.lb_db_name, "lb_db_name");
             this.lb_db_name.Name = "lb_db_name";
+            this.lb_db_name.Click += new System.EventHandler(this.lb_db_name_Click);
             // 
             // lb_buildingselectedShow
             // 
             resources.ApplyResources(this.lb_buildingselectedShow, "lb_buildingselectedShow");
             this.lb_buildingselectedShow.Name = "lb_buildingselectedShow";
+            this.lb_buildingselectedShow.Click += new System.EventHandler(this.lb_buildingselectedShow_Click);
             // 
             // lb_numberOfHandler
             // 
@@ -627,18 +663,21 @@
             // 
             // deleteToolStripMenuItem
             // 
+            this.deleteToolStripMenuItem.Image = global::WFA_psychometric_chart.Properties.Resources.delete;
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
             resources.ApplyResources(this.deleteToolStripMenuItem, "deleteToolStripMenuItem");
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click_1);
             // 
             // saveAsTemplateToolStripMenuItem
             // 
+            this.saveAsTemplateToolStripMenuItem.Image = global::WFA_psychometric_chart.Properties.Resources.save;
             this.saveAsTemplateToolStripMenuItem.Name = "saveAsTemplateToolStripMenuItem";
             resources.ApplyResources(this.saveAsTemplateToolStripMenuItem, "saveAsTemplateToolStripMenuItem");
             this.saveAsTemplateToolStripMenuItem.Click += new System.EventHandler(this.saveAsTemplateToolStripMenuItem_Click);
             // 
             // loadTemplateToolStripMenuItem
             // 
+            this.loadTemplateToolStripMenuItem.Image = global::WFA_psychometric_chart.Properties.Resources.upload_temp;
             this.loadTemplateToolStripMenuItem.Name = "loadTemplateToolStripMenuItem";
             resources.ApplyResources(this.loadTemplateToolStripMenuItem, "loadTemplateToolStripMenuItem");
             this.loadTemplateToolStripMenuItem.Click += new System.EventHandler(this.loadTemplateToolStripMenuItem_Click);
@@ -818,27 +857,6 @@
             this.pb_lock_unlock.TabStop = false;
             this.pb_lock_unlock.Click += new System.EventHandler(this.pb_lock_unlock_Click);
             // 
-            // id
-            // 
-            dataGridViewCellStyle2.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.SteelBlue;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.WhiteSmoke;
-            this.id.DefaultCellStyle = dataGridViewCellStyle2;
-            resources.ApplyResources(this.id, "id");
-            this.id.Name = "id";
-            this.id.ReadOnly = true;
-            this.id.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // name
-            // 
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.SteelBlue;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.White;
-            this.name.DefaultCellStyle = dataGridViewCellStyle3;
-            resources.ApplyResources(this.name, "name");
-            this.name.Name = "name";
-            this.name.ReadOnly = true;
-            this.name.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
             // Form1_main
             // 
             resources.ApplyResources(this, "$this");
@@ -926,11 +944,8 @@
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem quickNodeInsertToolStripMenuItem;
         private System.Windows.Forms.GroupBox gb_showstatus;
-        private System.Windows.Forms.Label lb_realtimeshow;
         private System.Windows.Forms.Label lb_modeshow;
-        private System.Windows.Forms.Label lb_web_status;
         private System.Windows.Forms.Label lb_webstatusshow;
-        private System.Windows.Forms.Label lb_device_status;
         private System.Windows.Forms.Label lb_devicestatusshow;
         private System.Windows.Forms.ToolStripMenuItem clearChartToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editNodeToolStripMenuItem;
@@ -954,6 +969,9 @@
         private System.Windows.Forms.ToolStripMenuItem excelExportToolStripMenuItem;
         private System.Windows.Forms.DataGridViewTextBoxColumn id;
         private System.Windows.Forms.DataGridViewTextBoxColumn name;
+        public System.Windows.Forms.Label lb_realtimeshow;
+        public System.Windows.Forms.Label lb_web_status;
+        public System.Windows.Forms.Label lb_device_status;
     }
 }
 

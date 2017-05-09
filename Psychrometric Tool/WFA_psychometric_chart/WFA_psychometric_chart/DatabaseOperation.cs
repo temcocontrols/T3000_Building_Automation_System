@@ -35,16 +35,13 @@ namespace WFA_psychometric_chart
 
                         ReadDataPresentOrNotThenInsertBuildingValue();
                         //After changes lets update the version info
-                        UpdateVersionInfoAfterUpdating( AssemblyDateGeneration.Value.ToShortDateString());
+                        UpdateVersionInfoAfterUpdating(AssemblyDateGeneration.Value.ToShortDateString());
                     }
                 }
-
-
-
             //}
             //catch (Exception ex)
             //{
-            //   MessageBox.Show(ex.Message);
+            // MessageBox.Show(ex.Message);
             //}         
         }
         string versionValue;
@@ -300,8 +297,6 @@ namespace WFA_psychometric_chart
                         BuildingName = reader["BuildingName"].ToString(),
                         EngineeringUnits = reader["EngineeringUnits"].ToString()
                     });
-
-
                     returnVal = true;
                 }
             }//close of using

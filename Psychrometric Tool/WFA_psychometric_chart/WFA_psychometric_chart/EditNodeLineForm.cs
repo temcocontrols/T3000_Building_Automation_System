@@ -2940,7 +2940,7 @@ namespace WFA_psychometric_chart
 
                 saveFD.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);// "C:";
                 saveFD.FileName = "Excelfile";
-                saveFD.Title = WFA_psychometric_chart.Properties.Resources.Save_Excel_file_to;
+                saveFD.Title = Properties.Resources.Save_Excel_file_to;
                 saveFD.Filter = "Excel file|*.xls";
                 if (saveFD.ShowDialog() == DialogResult.OK)
                 {
@@ -4116,10 +4116,10 @@ namespace WFA_psychometric_chart
                 //controllers identified
 
                // MessageBox.Show("condition true start");
-                int controllerNumberValue = controllerNumber;
+                int controllerNumberValue = controllerNumber;//This is alwyas between >0 and < 1000,ie 1,2,3,....999
                 string VariableIdentifiedValue = variableIdentifier;
                 int variableNumberValue = variableNumber;//Here [var]1 menas 0 input index and [var]2 means 1
-               // MessageBox.Show("controllerNum=" + controllerNumberValue + ", variableiden= " + VariableIdentifiedValue + ",varnum= " + variableNumberValue);
+                //MessageBox.Show("controllerNum=" + controllerNumberValue + ", variableiden= " + VariableIdentifiedValue + ",varnum= " + variableNumberValue);
                 if (VariableIdentifiedValue == "IN")
                 {
                     //We have input section.
@@ -4137,8 +4137,9 @@ namespace WFA_psychometric_chart
                     //MessageBox.Show("Inside IN , inputFromT3000List.Count= " + fd.InputFromT3000List.Count);
                     for (int i = 0; i < fd.InputFromT3000List.Count; i++)
                     {
-                        if (controllerNumberValue == int.Parse(fd.InputFromT3000List[i].PanelID) && (variableNumberValue - 1) == int.Parse(fd.InputFromT3000List[i].InputIndex))
-                        {
+                        //if (controllerNumberValue == int.Parse(fd.InputFromT3000List[i].PanelID) && (variableNumberValue - 1) == int.Parse(fd.InputFromT3000List[i].InputIndex))
+                            if (controllerNumberValue == int.Parse(fd.InputFromT3000List[i].PanelID) && (variableNumberValue-1) == int.Parse(fd.InputFromT3000List[i].InputIndex))//the input index starts from 0 so but in yabee starts from 1
+                            {
                             //==We are ok value is present now we need to check for unit
                             if (fd.InputFromT3000List[i].InputUnit == "Deg.C")
                             {
@@ -4161,15 +4162,18 @@ namespace WFA_psychometric_chart
                                 {
                                     //==We have the values now we need to retrive the data
 
-                                    double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue-1);
-                                    if (returnValueTemperature <= 0)
+                                    //double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue-1);
+                                    double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue);
+                                    if (returnValueTemperature <= 0.0000001 && returnValueTemperature > 50)
                                     {
-                                        return;
+                                        MessageBox.Show("Temperature value can be less than 0 and greater than 50 Degree Celsius");
+                                        return;//we can break form loop as well
                                     }
                                     //==Now updating data in database
                                     //     MessageBox.Show("Temperature returned value = " + returnValueTemperature+", Object instance = "+ fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance);
                                     //------------------------------------Working here -------------------------------------------------------//
-                                    UpdateNodeInfoForTemperatureDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue-1).ToString(), "temp", returnValueTemperature.ToString(), "OBJECT_ANALOG_INPUT");
+                                    //UpdateNodeInfoForTemperatureDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue-1).ToString(), "temp", returnValueTemperature.ToString(), "OBJECT_ANALOG_INPUT");
+                                    UpdateNodeInfoForTemperatureDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue).ToString(), "temp", returnValueTemperature.ToString(), "OBJECT_ANALOG_INPUT");
                                     //------------------------------------End of working here------------------------------------------------//
                                     CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
                                 }                           
@@ -4204,8 +4208,9 @@ namespace WFA_psychometric_chart
                     //==We only need variable data...
                     for (int i = 0; i < fd.outputFromT3000List.Count; i++)
                     {
-                        if (controllerNumberValue == int.Parse(fd.outputFromT3000List[i].out_panel) && (variableNumberValue - 1) == int.Parse(fd.outputFromT3000List[i].out_index))
-                        {
+                        //if (controllerNumberValue == int.Parse(fd.outputFromT3000List[i].out_panel) && (variableNumberValue - 1) == int.Parse(fd.outputFromT3000List[i].out_index))
+                         if (controllerNumberValue == int.Parse(fd.outputFromT3000List[i].out_panel) && (variableNumberValue-1) == int.Parse(fd.outputFromT3000List[i].out_index))
+                            {
                             //==We are ok value is present now we need to check for unit
                             if (fd.outputFromT3000List[i].out_units == "Deg.C")
                             {
@@ -4227,14 +4232,17 @@ namespace WFA_psychometric_chart
                                 {
                                     //==We have the values now we need to retrive the data
 
-                                    double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue-1);
-                                    if (returnValueTemperature <= 0)
+                                    //double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue-1);
+                                    double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue);
+                                    if (returnValueTemperature <= 0.0000001 && returnValueTemperature > 50)
                                     {
-                                        return;
+                                        MessageBox.Show("Temperature value can be less than 0 and greater than 50 Degree Celsius");
+                                        return;//we can break form loop as well
                                     }
                                     //==Now updating data in database
                                     //------------------------------------Working here -------------------------------------------------------//
-                                    UpdateNodeInfoForTemperatureDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue-1).ToString(), "temp", returnValueTemperature.ToString(), "OBJECT_ANALOG_OUTPUT");
+                                    //UpdateNodeInfoForTemperatureDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue-1).ToString(), "temp", returnValueTemperature.ToString(), "OBJECT_ANALOG_OUTPUT");
+                                    UpdateNodeInfoForTemperatureDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue).ToString(), "temp", returnValueTemperature.ToString(), "OBJECT_ANALOG_OUTPUT");
                                     //------------------------------------End of working here------------------------------------------------//
                                     CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
                                 }
@@ -4266,8 +4274,9 @@ namespace WFA_psychometric_chart
                     //==We only need variable data...
                     for(int i = 0; i < fd.variableFromT3000List.Count; i++)
                     {
-                        if(controllerNumberValue ==int.Parse(fd.variableFromT3000List[i].var_panel) && (variableNumberValue -1)== int.Parse(fd.variableFromT3000List[i].var_index))
-                        {
+                        //if(controllerNumberValue ==int.Parse(fd.variableFromT3000List[i].var_panel) && (variableNumberValue -1)== int.Parse(fd.variableFromT3000List[i].var_index))
+                        if (controllerNumberValue == int.Parse(fd.variableFromT3000List[i].var_panel) && (variableNumberValue-1) == int.Parse(fd.variableFromT3000List[i].var_index))
+                            {
                             //==We are ok value is present now we need to check for unit
                             if(fd.variableFromT3000List[i].var_units == "Deg.C")
                             {
@@ -4288,17 +4297,20 @@ namespace WFA_psychometric_chart
                                 {
                                     //==We have the values now we need to retrive the data
 
-                                    double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue-1);
-                                    if (returnValueTemperature <= 0)
+                                    //double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue-1);
+                                    double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue);
+                                    if (returnValueTemperature <= 0.0000001 && returnValueTemperature > 50)
                                     {
-                                        return;
+                                        MessageBox.Show("Temperature value can be less than 0 and greater than 50 Degree Celsius");
+                                        return;//we can break form loop as well
                                     }
 
                                     //==Now updating data in database
                                     //------------------------------------Working here -------------------------------------------------------//
-                                    UpdateNodeInfoForTemperatureDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue-1).ToString(), "temp", returnValueTemperature.ToString(), "OBJECT_ANALOG_VALUE");
+                                    //UpdateNodeInfoForTemperatureDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue-1).ToString(), "temp", returnValueTemperature.ToString(), "OBJECT_ANALOG_VALUE");
+                                    UpdateNodeInfoForTemperatureDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue).ToString(), "temp", returnValueTemperature.ToString(), "OBJECT_ANALOG_VALUE");
                                     //------------------------------------End of working here------------------------------------------------//
-                                   CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
+                                    CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
                                     
                                 }
 
@@ -4374,7 +4386,7 @@ namespace WFA_psychometric_chart
                     //==We only need variable data...
                     for (int i = 0; i < fd.InputFromT3000List.Count; i++)
                     {
-                        if (controller_PanelNumber == int.Parse(fd.InputFromT3000List[i].PanelID) && variableIndex == int.Parse(fd.InputFromT3000List[i].InputIndex))
+                        if (controller_PanelNumber == int.Parse(fd.InputFromT3000List[i].PanelID) && (variableIndex-1) == int.Parse(fd.InputFromT3000List[i].InputIndex))
                         {
                             //==We are ok value is present now we need to check for unit
                             if (fd.InputFromT3000List[i].InputUnit == "Deg.C")
@@ -4397,9 +4409,10 @@ namespace WFA_psychometric_chart
                                     //==We have the values now we need to retrive the data
 
                                     double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), "IN", variableIndex);
-                                        if (returnValueTemperature <= 0)
+                                        if (returnValueTemperature <= 0.0000001 && returnValueTemperature > 50)
                                         {
-                                            return;
+                                            MessageBox.Show("Temperature value can be less than 0 and greater than 50 Degree Celsius");
+                                            return;//we can break form loop as well
                                         }
                                         //==Now updating data in database
                                         //------------------------------------Working here -------------------------------------------------------//
@@ -4446,7 +4459,8 @@ namespace WFA_psychometric_chart
                                                                                        //==We only need variable data...
                         for (int i = 0; i < fd.outputFromT3000List.Count; i++)
                         {
-                            if (controller_PanelNumber == int.Parse(fd.outputFromT3000List[i].out_panel) && variableIndex == int.Parse(fd.outputFromT3000List[i].out_index))
+
+                            if (controller_PanelNumber == int.Parse(fd.outputFromT3000List[i].out_panel) && (variableIndex-1) == int.Parse(fd.outputFromT3000List[i].out_index))
                             {
                                 //==We are ok value is present now we need to check for unit
                                 if (fd.outputFromT3000List[i].out_units == "Deg.C")
@@ -4470,9 +4484,10 @@ namespace WFA_psychometric_chart
                                         //==We have the values now we need to retrive the data
 
                                         double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), "OUT", variableIndex);
-                                        if (returnValueTemperature <= 0)
+                                        if (returnValueTemperature <= 0.0000001 && returnValueTemperature > 50)
                                         {
-                                            return;
+                                            MessageBox.Show("Temperature value can be less than 0 and greater than 50 Degree Celsius");
+                                            return;//we can break form loop as well
                                         }
                                         //==Now updating data in database
                                         //------------------------------------Working here -------------------------------------------------------//
@@ -4514,7 +4529,7 @@ namespace WFA_psychometric_chart
                         //==We only need variable data...
                         for (int i = 0; i < fd.variableFromT3000List.Count; i++)
                         {
-                            if (controller_PanelNumber == int.Parse(fd.variableFromT3000List[i].var_panel) && variableIndex == int.Parse(fd.variableFromT3000List[i].var_index))
+                            if (controller_PanelNumber == int.Parse(fd.variableFromT3000List[i].var_panel) && (variableIndex-1) == int.Parse(fd.variableFromT3000List[i].var_index))
                             {
                                 //==We are ok value is present now we need to check for unit
                                 if (fd.variableFromT3000List[i].var_units == "Deg.C")
@@ -4536,9 +4551,10 @@ namespace WFA_psychometric_chart
                                     {
                                         //==We have the values now we need to retrive the data
                                         double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), "VAR", variableIndex);
-                                        if (returnValueTemperature <= 0)
+                                        if (returnValueTemperature <= 0.0000001 && returnValueTemperature > 50)
                                         {
-                                            return;
+                                            MessageBox.Show("Temperature value can be less than 0 and greater than 50 Degree Celsius");
+                                            return;//we can break form loop as well
                                         }
                                         //==Now updating data in database
                                         //------------------------------------Working here -------------------------------------------------------//
@@ -4985,14 +5001,15 @@ namespace WFA_psychometric_chart
                                 {
                                     //==We have the values now we need to retrive the data
 
-                                    double returnValueHumidity = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue - 1);
-                                    if(returnValueHumidity <= 0)
+                                    double returnValueHumidity = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue);
+                                    if(returnValueHumidity <= 0.00001 && returnValueHumidity >100)
                                     {
+                                        MessageBox.Show("Humidity can't be less than 0 and greater than 100%");
                                         return;
                                     }
                                     //==Now updating data in database
                                     //------------------------------------Working here -------------------------------------------------------//
-                                    UpdateNodeInfoForHumidityDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue - 1).ToString(), "hum", returnValueHumidity.ToString(), "OBJECT_ANALOG_INPUT");
+                                    UpdateNodeInfoForHumidityDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue).ToString(), "hum", returnValueHumidity.ToString(), "OBJECT_ANALOG_INPUT");
                                     //------------------------------------End of working here------------------------------------------------//
                                     CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
                                 }
@@ -5049,14 +5066,15 @@ namespace WFA_psychometric_chart
                                 {
                                     //==We have the values now we need to retrive the data
 
-                                    double returnValueHumidity = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue - 1);
-                                    if (returnValueHumidity <= 0)
+                                    double returnValueHumidity = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue);
+                                    if (returnValueHumidity <= 0.00001 && returnValueHumidity > 100)
                                     {
+                                        MessageBox.Show("Humidity can't be less than 0 and greater than 100%");
                                         return;
                                     }
                                     //==Now updating data in database
                                     //------------------------------------Working here -------------------------------------------------------//
-                                    UpdateNodeInfoForHumidityDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue - 1).ToString(), "hum", returnValueHumidity.ToString(), "OBJECT_ANALOG_OUTPUT");
+                                    UpdateNodeInfoForHumidityDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue).ToString(), "hum", returnValueHumidity.ToString(), "OBJECT_ANALOG_OUTPUT");
                                     //------------------------------------End of working here------------------------------------------------//
                                     CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
                                 }
@@ -5110,14 +5128,15 @@ namespace WFA_psychometric_chart
                                 {
                                     //==We have the values now we need to retrive the data
 
-                                    double returnValueHumidity = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue - 1);
-                                    if (returnValueHumidity <= 0)
+                                    double returnValueHumidity = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue);
+                                    if (returnValueHumidity <= 0.00001 && returnValueHumidity > 100)
                                     {
+                                        MessageBox.Show("Humidity can't be less than 0 and greater than 100%");
                                         return;
                                     }
                                     //==Now updating data in database
                                     //------------------------------------Working here -------------------------------------------------------//
-                                    UpdateNodeInfoForHumidityDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue - 1).ToString(), "hum", returnValueHumidity.ToString(), "OBJECT_ANALOG_VALUE");
+                                    UpdateNodeInfoForHumidityDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue).ToString(), "hum", returnValueHumidity.ToString(), "OBJECT_ANALOG_VALUE");
                                     //------------------------------------End of working here------------------------------------------------//
                                     CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
 
@@ -5194,7 +5213,7 @@ namespace WFA_psychometric_chart
                         //==We only need variable data...
                         for (int i = 0; i < fd.InputFromT3000List.Count; i++)
                         {
-                            if (controller_PanelNumber == int.Parse(fd.InputFromT3000List[i].PanelID) && variableIndex == int.Parse(fd.InputFromT3000List[i].InputIndex))
+                            if (controller_PanelNumber == int.Parse(fd.InputFromT3000List[i].PanelID) && (variableIndex-1) == int.Parse(fd.InputFromT3000List[i].InputIndex))
                             {
                                 //==We are ok value is present now we need to check for unit
                                 if (fd.InputFromT3000List[i].InputUnit.Contains("%"))
@@ -5217,8 +5236,9 @@ namespace WFA_psychometric_chart
                                         //==We have the values now we need to retrive the data
 
                                         double returnValueHumidity = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), "IN", variableIndex);
-                                        if (returnValueHumidity <= 0)
+                                        if (returnValueHumidity <= 0.00001 && returnValueHumidity > 100)
                                         {
+                                            MessageBox.Show("Humidity can't be less than 0 and greater than 100%");
                                             return;
                                         }
                                         //==Now updating data in database
@@ -5266,7 +5286,7 @@ namespace WFA_psychometric_chart
                         //==We only need variable data...
                         for (int i = 0; i < fd.outputFromT3000List.Count; i++)
                         {
-                            if (controller_PanelNumber == int.Parse(fd.outputFromT3000List[i].out_panel) && variableIndex == int.Parse(fd.outputFromT3000List[i].out_index))
+                            if (controller_PanelNumber == int.Parse(fd.outputFromT3000List[i].out_panel) && (variableIndex-1) == int.Parse(fd.outputFromT3000List[i].out_index))
                             {
                                 //==We are ok value is present now we need to check for unit
                                 if (fd.outputFromT3000List[i].out_units.Contains("%"))
@@ -5290,8 +5310,9 @@ namespace WFA_psychometric_chart
                                         //==We have the values now we need to retrive the data
 
                                         double returnValueHumidity = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), "OUT", variableIndex);
-                                        if (returnValueHumidity <= 0)
+                                        if (returnValueHumidity <= 0.00001 && returnValueHumidity > 100)
                                         {
+                                            MessageBox.Show("Humidity can't be less than 0 and greater than 100%");
                                             return;
                                         }
                                         //==Now updating data in database
@@ -5338,7 +5359,7 @@ namespace WFA_psychometric_chart
                        // MessageBox.Show("Count for var in alex db= " + fd.variableFromT3000List.Count);
                         for (int i = 0; i < fd.variableFromT3000List.Count; i++)
                         {
-                            if (controller_PanelNumber == int.Parse(fd.variableFromT3000List[i].var_panel) && variableIndex == int.Parse(fd.variableFromT3000List[i].var_index))
+                            if (controller_PanelNumber == int.Parse(fd.variableFromT3000List[i].var_panel) && (variableIndex - 1) == int.Parse(fd.variableFromT3000List[i].var_index))
                             {
                                 //==We are ok value is present now we need to check for unit
                                 if (fd.variableFromT3000List[i].var_units.Contains("%"))
@@ -5364,8 +5385,10 @@ namespace WFA_psychometric_chart
                                     {
                                         //==We have the values now we need to retrive the data
                                         double returnValueHumidity = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), "VAR", variableIndex);
-                                        if (returnValueHumidity <= 0)
+
+                                        if (returnValueHumidity <= 0.00001 && returnValueHumidity > 100)
                                         {
+                                            MessageBox.Show("Humidity can't be less than 0 and greater than 100%");
                                             return;
                                         }
                                         //==Now updating data in database
