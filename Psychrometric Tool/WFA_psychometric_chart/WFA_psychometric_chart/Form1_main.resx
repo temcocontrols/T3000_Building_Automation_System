@@ -133,7 +133,7 @@
     <value>0, 0, 0, 0</value>
   </data>
   <data name="chart1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>933, 577</value>
+    <value>933, 604</value>
   </data>
   <data name="chart1.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -874,7 +874,7 @@
     <value>2, 3, 2, 3</value>
   </data>
   <data name="groupBox4ttt.Size" type="System.Drawing.Size, System.Drawing">
-    <value>40, 617</value>
+    <value>40, 644</value>
   </data>
   <data name="groupBox4ttt.TabIndex" type="System.Int32, mscorlib">
     <value>46</value>
@@ -1450,7 +1450,7 @@
     <value>9</value>
   </data>
   <data name="gb_showstatus.Location" type="System.Drawing.Point, System.Drawing">
-    <value>44, 611</value>
+    <value>44, 638</value>
   </data>
   <data name="gb_showstatus.Size" type="System.Drawing.Size, System.Drawing">
     <value>1088, 32</value>
@@ -1471,7 +1471,7 @@
     <value>3</value>
   </data>
   <metadata name="backgroundWorker1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>585, 26</value>
+    <value>586, 15</value>
   </metadata>
   <data name="pb_lock_unlock.Location" type="System.Drawing.Point, System.Drawing">
     <value>307, 53</value>
@@ -1507,7 +1507,7 @@
     <value>6, 14</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>1132, 645</value>
+    <value>1132, 672</value>
   </data>
   <data name="$this.Font" type="System.Drawing.Font, System.Drawing">
     <value>Arial, 8.25pt</value>

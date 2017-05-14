@@ -140,25 +140,18 @@ namespace WFA_psychometric_chart
                 if(cbx.ColumnIndex == 1)
                 {
                     //--TEMPERATURE SOURCE IS CHANGED TO Manual
-                    // string nodeIDVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[3].Value.ToString();
-                    // string nameVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value.ToString();//--This contains the name
-                    // string labelVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();//--This contains the name
-                    // string sourceVal = "Manual";//dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[2].Value.ToString();//--This contains the name
-                    // double xVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString());
-                    // //double yVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
-                    // double humidity = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
-                    // bcs.CalculateYFromXandHumidity(xVal, humidity / 100);
-                    // double yVal = bcs.y_coord_value;
-                    // string showTextVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[7].Value.ToString();
-                    ////  MessageBox.Show("source  = " + sourceVal);
-                    // Color colorVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[8].Style.BackColor;
-                    // int nodeSizeVal = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[9].Value.ToString());
-                    // UpdateDataValueAndRefreshDGV(nodeIDVal, xVal, yVal, sourceVal, nameVal, labelVal, colorVal, showTextVal, nodeSizeVal);
-
+                
                     string nodeIDVal = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[2].Value);
                     string nameVal = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value);//--This contains the name
-                    string temperature_Source = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value);//--This contains the name
-                    string humidity_Souce = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value);//--This contains the name
+                    string temperature_Source = "Manual"; //Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value);//--This contains the name
+                    string humidity_Souce = "";
+                    string humidityValueCheck = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value);
+                    if(humidityValueCheck  == "Manual" || humidityValueCheck== "Web") { 
+                     humidity_Souce = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value);//--This contains the name
+                    }else
+                    {
+                        humidity_Souce = "Device";
+                    }
                     double xVal = double.Parse(Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[3].Value));
                     // double yVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
                     double humidity = double.Parse(Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value));
@@ -182,8 +175,20 @@ namespace WFA_psychometric_chart
 
                     string nodeIDVal = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[2].Value);
                     string nameVal = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value);//--This contains the name
-                    string temperature_Source = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value);//--This contains the name
-                    string humidity_Souce = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value);//--This contains the name
+
+                   // string temperature_Source = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value);//--This contains the name
+                    string temperature_Source = "";
+                    string tempValueCheck = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value);//--This contains the name
+                    if (tempValueCheck == "Manual" || tempValueCheck == "Web")
+                    {
+                        temperature_Source = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value);//--This contains the name
+                    }
+                    else
+                    {
+                        temperature_Source = "Device";
+                    }
+
+                    string humidity_Souce = "Manual"; //Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value);//--This contains the name
                     double xVal = double.Parse(Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[3].Value));
                     // double yVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
                     double humidity = double.Parse(Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value));
@@ -457,9 +462,7 @@ namespace WFA_psychometric_chart
             }
                                                    
          //================================END OF COMFORT ZONE SETTING=========================//
-
-
-        }
+        }//Close of load
 
 
 
@@ -556,8 +559,21 @@ namespace WFA_psychometric_chart
 
             string nodeIDVal = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[2].Value);
             string nameVal = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value);//--This contains the name
-            string temperature_Source = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value);//--This contains the name
-            string humidity_Souce = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value);//--This contains the name
+            //string temperature_Source = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value);//--This contains the name
+            //string humidity_Souce = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value);//--This contains the name
+            string temperature_Source = "";
+            string tempValueCheck = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value);//--This contains the name
+            if (tempValueCheck == "Manual" || tempValueCheck == "Web")
+            {
+                temperature_Source = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value);//--This contains the name
+            }
+            else
+            {
+                temperature_Source = "Device";
+            }
+
+            string humidity_Souce = "Web"; //Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value);//--This contains the name
+
             double xVal = double.Parse(Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[3].Value));
             // double yVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
             // Color colorVal = colorDialog1.Color;   //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[8].Style.BackColor;
@@ -604,9 +620,19 @@ namespace WFA_psychometric_chart
 
             string nodeIDVal = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[2].Value);
             string nameVal = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value);//--This contains the name
-            string temperature_Source = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value);//--This contains the name
-            string humidity_Souce = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value);//--This contains the name
-                                                                                                                     // double xVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[3].Value.ToString());
+                                                                                                                     //string temperature_Source = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value);//--This contains the name
+                                                                                                                     //string humidity_Souce = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value);//--This contains the name
+            string temperature_Source = "Web"; //Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value);//--This contains the name
+            string humidity_Souce = "";
+            string humidityValueCheck = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value);
+            if (humidityValueCheck == "Manual" || humidityValueCheck == "Web")
+            {
+                humidity_Souce = Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value);//--This contains the name
+            }
+            else
+            {
+                humidity_Souce = "Device";
+            }                                                                                          // double xVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[3].Value.ToString());
             double yVal = y_value; //double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
             Color colorVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[7].Style.BackColor;
             int nodeSizeVal = int.Parse(Convert.ToString(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[8].Value));
@@ -1185,8 +1211,9 @@ namespace WFA_psychometric_chart
             dataGridView1.Rows.Clear();
             dataGridView2.Rows.Clear();
             string temperature_value_For_Device="Device"; //By default it will be device 
-            string humidity_value_For_Device = "Device";
+            string humidity_value_For_Device = "Device"; 
 
+            //--For node
             if (bcs.menuStripNodeInfoValues.Count > 0)
             {
 
@@ -1211,7 +1238,14 @@ namespace WFA_psychometric_chart
                         temperature_value = "Web";
                         temperature_indexValue = 1;
                     }
-                    else  if(bcs.menuStripNodeInfoValues[i].temperature_source == "Device")
+                    else if (bcs.menuStripNodeInfoValues[i].temperature_source == "Mix")
+                    {
+                        // temperature_value = "Mix";
+                        temperature_value = "Manual";//For mix we make it manual
+                        //temperature_indexValue = 2;//No need for this one
+                    }
+
+                    else  if(bcs.menuStripNodeInfoValues[i].temperature_source == "Device") //For anything else //--if() changed
                     {
 
                         /*
@@ -1231,12 +1265,7 @@ namespace WFA_psychometric_chart
                         temperature_value = temperature_value_For_Device;//This one is for inputting
                         temperature_indexValue = 2;
                     }
-                    else if (bcs.menuStripNodeInfoValues[i].temperature_source == "Mix")
-                    {
-                        // temperature_value = "Mix";
-                        temperature_value = "Manual";//For mix we make it manual
-                        //temperature_indexValue = 2;//No need for this one
-                    }
+                   
 
                     //==For entering the datasource in each datagridview by removing previous one
                     //--This one is for tempeature source in columnIndex = 1;
@@ -1269,7 +1298,13 @@ namespace WFA_psychometric_chart
                         indexForSource = 1;
 
                     }
-                    else if (bcs.menuStripNodeInfoValues[i].humidity_source == "Device")
+                    else if (bcs.menuStripNodeInfoValues[i].humidity_source == "Mix")
+                    {
+                        // humidity_sourceValue = "Mix";
+                        humidity_sourceValue = "Manual";
+                        //  indexForSource = 2;
+                    }
+                    else if (bcs.menuStripNodeInfoValues[i].humidity_source == "Device") //--changed recently because humidty need to be  changed
                     {
                         bcs.PullDataForTemperatureHumiditySource(bcs.menuStripNodeInfoValues[i].id);
                         //--Now we can get the values
@@ -1285,12 +1320,7 @@ namespace WFA_psychometric_chart
                         humidity_sourceValue = humidity_value_For_Device;
                         indexForSource = 2;
                     }
-                    else if (bcs.menuStripNodeInfoValues[i].humidity_source == "Mix")
-                    {
-                        // humidity_sourceValue = "Mix";
-                        humidity_sourceValue = "Manual";
-                        //  indexForSource = 2;
-                    }
+                    
 
                     //--Samething for humidity
                     //var dgvcbc1 = CB_DGV_Humidity_Source;//dataGridView1.Rows[0].Cells[4];
@@ -1348,7 +1378,7 @@ namespace WFA_psychometric_chart
                         {
                             cb_Hum.Items.Add("Device");
                         }
-                        //--Now assigning the values
+                        //--Now assigning the values , for mix node
                         dataGridView1.Rows[i].Cells[0].Value = bcs.menuStripNodeInfoValues[i].name;
                         dataGridView1.Rows[i].Cells[1].Value = "Manual"; //bcs.menuStripNodeInfoValues[i].name;
                         dataGridView1.Rows[i].Cells[2].Value = bcs.menuStripNodeInfoValues[i].id;
@@ -1381,7 +1411,7 @@ namespace WFA_psychometric_chart
                        // string[] row = new string[] { bcs.menuStripNodeInfoValues[i].name, temperature_value, bcs.menuStripNodeInfoValues[i].id, Math.Round(bcs.menuStripNodeInfoValues[i].xVal, 2).ToString(), CB_DGV_Humidity_Source.Items[indexForSource].ToString(), Math.Round(bcs.humDataGridValue, 2).ToString(), Math.Round(bcs.enthalpyDataGridView, 2).ToString(), " ", bcs.menuStripNodeInfoValues[i].marker_Size.ToString(), bcs.menuStripNodeInfoValues[i].airFlow.ToString() };
                         //--This one is for enabling or dissabling a particualr row
                         if (bcs.menuStripNodeInfoValues[i].temperature_source == "Manual")
-                    {
+                           {
                             //sourceValue = "Manual";
                             //indexForSource = 0;
 
@@ -1434,8 +1464,6 @@ namespace WFA_psychometric_chart
                             
                             //================================End of new added way of coding========================//
 
-
-
                             //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].ReadOnly = false;
                             //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].ReadOnly = false;
                             //indexForParticularRow
@@ -1448,8 +1476,6 @@ namespace WFA_psychometric_chart
                             //sourceValue = "Manual";
                             //indexForSource = 0;                                                    
                             dataGridView1.Rows[indexForParticularRow].Cells[5].ReadOnly = false;
-
-
                         }
                         else if (bcs.menuStripNodeInfoValues[i].humidity_source == "Web")
                         {
@@ -1457,7 +1483,6 @@ namespace WFA_psychometric_chart
                             //indexForSource = 1;
                             // dataGridView1.Rows.Add(row);                                             
                             dataGridView1.Rows[indexForParticularRow].Cells[5].ReadOnly = true;
-
                         }
                         else
                         {
@@ -1465,7 +1490,6 @@ namespace WFA_psychometric_chart
                             //indexForSource = 2;
                             //dataGridView1.Rows.Add(row);                                             
                             dataGridView1.Rows[indexForParticularRow].Cells[5].ReadOnly = true;
-
                         }
 
 
@@ -1531,22 +1555,15 @@ namespace WFA_psychometric_chart
                         if (bcs.menuStripNodeInfoValues[i].humidity_source == "Manual")
                         {
                             dataGridView1.Rows[indexForParticularRow].Cells[5].ReadOnly = false;
-
-
-
-
                         }
                         else if (bcs.menuStripNodeInfoValues[i].humidity_source == "Web")
                         {                                 
                             dataGridView1.Rows[indexForParticularRow].Cells[5].ReadOnly = true;
-
                         }
                         else
                         {
                             dataGridView1.Rows[indexForParticularRow].Cells[5].ReadOnly = true;
-
                         }
-
 
                     }
                     else
@@ -1557,7 +1574,6 @@ namespace WFA_psychometric_chart
                             //=================================New added way of coding ===============================//
 
                             dataGridView1.Rows.Add();//After adding rows assigning the values to the Rows 2 datagridviewComboboxCell
-
                             //--This one if for temperature 
                             DataGridViewComboBoxCell cb = (DataGridViewComboBoxCell)dataGridView1.Rows[i].Cells[1];
                             cb.Items.Clear();
@@ -1566,7 +1582,6 @@ namespace WFA_psychometric_chart
                             if (bcs.menuStripNodeInfoValues[i].temperature_source == "Device")
                             {
                                 cb.Items.Add(temperature_value_For_Device);
-
                             }
                             else
                             {
@@ -1609,13 +1624,10 @@ namespace WFA_psychometric_chart
                         if (bcs.menuStripNodeInfoValues[i].humidity_source == "Manual")
                         {                    
                             dataGridView1.Rows[indexForParticularRow].Cells[5].ReadOnly = false;
-
-
                         }
                         else if (bcs.menuStripNodeInfoValues[i].humidity_source == "Web")
                         {                                                                                    
                             dataGridView1.Rows[indexForParticularRow].Cells[5].ReadOnly = true;
-
                         }
                         else
                         {                                                                                    
@@ -1628,9 +1640,7 @@ namespace WFA_psychometric_chart
                     }//Close of else function for mix
 
                     indexForParticularRow++;
-
-                    //  dataGridView1.Rows.Add(row);
-
+                    //dataGridView1.Rows.Add(row);
                     DataGridViewButtonCell buttonCell = (DataGridViewButtonCell)dataGridView1.Rows[i].Cells[7];
                     buttonCell.FlatStyle = FlatStyle.Popup;
                     buttonCell.Style.BackColor = bcs.menuStripNodeInfoValues[i].colorValue;
@@ -1692,7 +1702,7 @@ namespace WFA_psychometric_chart
                             airFlowNode2 = (int)bcs.menuStripNodeInfoValues[v].airFlow;
                             break;
                         }
-
+                             
                     }
 
                     //Lets calculate some energy parameters such as DBT, Relative humidity,humidity ratio,,
@@ -1727,7 +1737,8 @@ namespace WFA_psychometric_chart
 
             }
 
-
+            dataGridView1.EndEdit();//To end the edit call ,and to refresh
+            dataGridView2.EndEdit();
           //  dataGridView1.Enabled = true;
 
         }
@@ -1928,22 +1939,44 @@ namespace WFA_psychometric_chart
             //This part contains the cell click values
             if ((e.RowIndex >= 0 && e.RowIndex < bcs.menuStripNodeInfoValues.Count) && (e.ColumnIndex == 7))
             {
-                if (colorDialog1.ShowDialog() == DialogResult.OK)
-                {
-                    DataGridViewButtonCell buttonCell = (DataGridViewButtonCell)dataGridView1.Rows[e.RowIndex].Cells[7];
-                    buttonCell.FlatStyle = FlatStyle.Popup;
-                    buttonCell.Style.BackColor = colorDialog1.Color;//System.Drawing.Color.Red;
-                    //--We need to update to db as well
-
-                    try
+                    if (colorDialog1.ShowDialog() == DialogResult.OK)
                     {
-                        //--Once the name is changed it has to save the changes
-                        //string finalSize = dataGridView1.CurrentCell.Value.ToString();
-                        string nodeIDVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[2].Value.ToString();
-                        string nameVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value.ToString();//--This contains the name
-                        string temperature_Source = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();//--This contains the name
-                        string humidity_Souce = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString();//--This contains the name
-                        double xVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[3].Value.ToString());
+                        DataGridViewButtonCell buttonCell = (DataGridViewButtonCell)dataGridView1.Rows[e.RowIndex].Cells[7];
+                        buttonCell.FlatStyle = FlatStyle.Popup;
+                        buttonCell.Style.BackColor = colorDialog1.Color;//System.Drawing.Color.Red;
+                                                                        //--We need to update to db as well
+
+                        try
+                        {
+                            //--Once the name is changed it has to save the changes
+                            //string finalSize = dataGridView1.CurrentCell.Value.ToString();
+                            string nodeIDVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[2].Value.ToString();
+                            string nameVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value.ToString();//--This contains the name
+                            string temperature_Source = "";
+                            string value = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();//--This contains the name
+                            if (value == "Web" || value == "Manual")
+                            {
+                                temperature_Source = value;//dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();//--This contains the name
+                            }
+                            else
+                            {
+                                temperature_Source = "Device";
+                            }
+
+
+                            string humidity_Souce = "";
+
+                            string valHum = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString();//--This contains the name
+                            if(valHum == "Web" || valHum == "Manual")
+                            {
+                                humidity_Souce = valHum;//dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString();//--This contains the name
+
+                            }else
+                            {
+                                humidity_Souce = "Device";
+                            }
+
+                            double xVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[3].Value.ToString());
                         // double yVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
                         double humidity = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
                         bcs.CalculateYFromXandHumidity(xVal, humidity / 100);
@@ -3385,7 +3418,7 @@ namespace WFA_psychometric_chart
                         double xVal = finalTemp; //double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString());
 
                          double humidity = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
-                        bcs.CalculateYFromXandHumidity(xVal, humidity / 100);
+                         bcs.CalculateYFromXandHumidity(xVal, humidity / 100);
 
                         double yVal = bcs.y_coord_value;
 
@@ -4037,11 +4070,10 @@ namespace WFA_psychometric_chart
                 {
                     try {
                         //--For temperature value
-                        string finalTempInput = dataGridView1.CurrentCell.Value.ToString();//dataGridView1.CurrentCell.Value.ToString().Trim();
-                        finalTemperatureSource = finalTempInput;
+                        finalTemperatureSource  = dataGridView1.CurrentCell.Value.ToString();//dataGridView1.CurrentCell.Value.ToString().Trim();                         
                         //MessageBox.Show("here : " + finalTemperatureSource);
 
-                   // TemperatureInputPorcessForDevice(finalTempInput);
+                      // TemperatureInputPorcessForDevice(finalTempInput);
                     }
                     catch(Exception ex)
                     {
@@ -4054,8 +4086,7 @@ namespace WFA_psychometric_chart
                     {
 
                         //For humidity value
-                        string finalHumInput = dataGridView1.CurrentCell.Value.ToString().Trim();
-                        finalHumiditySource = finalHumInput;
+                         finalHumiditySource = dataGridView1.CurrentCell.Value.ToString().Trim();                        
                         //dataGridView1_KeyPress(sender, e);
                         //HumidityInputPorcessForDevice(finalHumInput);
                     }
@@ -4634,14 +4665,14 @@ namespace WFA_psychometric_chart
 
         private void dataGridView1_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e.KeyValue == (Char)Keys.Enter || e.KeyValue == (Char)Keys.Tab)
-            {
-                //dataGridView1.CommitEdit(DataGridViewDataErrorContexts.Commit);
-                //string SelectedText = Convert.ToString(dataGridView1.CurrentCell.FormattedValue.ToString());
-                //MessageBox.Show("Tab pressed released enter or tab = " + SelectedText);
+            //if (e.KeyValue == (Char)Keys.Enter || e.KeyValue == (Char)Keys.Tab)
+            //{
+            //    //dataGridView1.CommitEdit(DataGridViewDataErrorContexts.Commit);
+            //    //string SelectedText = Convert.ToString(dataGridView1.CurrentCell.FormattedValue.ToString());
+            //    //MessageBox.Show("Tab pressed released enter or tab = " + SelectedText);
                 
 
-            }
+            //}
         }
 
         string variableIdentifier; int variableNumber;
@@ -5496,7 +5527,6 @@ namespace WFA_psychometric_chart
                 {
                     //This one is name
                     initialName = dataGridView1.CurrentCell.Value.ToString().Trim();
-
                 }
                 //else if (dataGridView1.CurrentCell.ColumnIndex == 1)
                 //{

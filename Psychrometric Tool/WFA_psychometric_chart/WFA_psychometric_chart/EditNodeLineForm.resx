@@ -399,15 +399,6 @@
   <data name="MFR1.ToolTipText" xml:space="preserve">
     <value>Mass flow rate of start node</value>
   </data>
-  <metadata name="Enthalpy1.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <data name="Enthalpy1.HeaderText" xml:space="preserve">
-    <value>Enthalpy1</value>
-  </data>
-  <data name="Enthalpy1.ToolTipText" xml:space="preserve">
-    <value>Enthalpy of start node</value>
-  </data>
   <metadata name="TEF1.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -461,12 +452,6 @@
   </data>
   <data name="MFR2.ToolTipText" xml:space="preserve">
     <value>Mass flow rate of end node</value>
-  </data>
-  <metadata name="Enthalpy2.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <data name="Enthalpy2.HeaderText" xml:space="preserve">
-    <value>Enthalpy2</value>
   </data>
   <metadata name="TEF2.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -4804,65 +4789,23 @@
   <data name="$this.Text" xml:space="preserve">
     <value>Edit Node Line</value>
   </data>
-  <data name="&gt;&gt;name.Name" xml:space="preserve">
-    <value>name</value>
+  <data name="&gt;&gt;colorDialog1.Name" xml:space="preserve">
+    <value>colorDialog1</value>
   </data>
-  <data name="&gt;&gt;name.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="&gt;&gt;colorDialog1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ColorDialog, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;CB_DGV_Temperature_Source.Name" xml:space="preserve">
-    <value>CB_DGV_Temperature_Source</value>
+  <data name="&gt;&gt;colorDialog2.Name" xml:space="preserve">
+    <value>colorDialog2</value>
   </data>
-  <data name="&gt;&gt;CB_DGV_Temperature_Source.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DataGridViewComboBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="&gt;&gt;colorDialog2.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ColorDialog, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;nodeID.Name" xml:space="preserve">
-    <value>nodeID</value>
+  <data name="&gt;&gt;saveFD.Name" xml:space="preserve">
+    <value>saveFD</value>
   </data>
-  <data name="&gt;&gt;nodeID.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;temp.Name" xml:space="preserve">
-    <value>temp</value>
-  </data>
-  <data name="&gt;&gt;temp.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;CB_DGV_Humidity_Source.Name" xml:space="preserve">
-    <value>CB_DGV_Humidity_Source</value>
-  </data>
-  <data name="&gt;&gt;CB_DGV_Humidity_Source.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DataGridViewComboBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;humidity.Name" xml:space="preserve">
-    <value>humidity</value>
-  </data>
-  <data name="&gt;&gt;humidity.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;equivalentEnthalpy.Name" xml:space="preserve">
-    <value>equivalentEnthalpy</value>
-  </data>
-  <data name="&gt;&gt;equivalentEnthalpy.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;color.Name" xml:space="preserve">
-    <value>color</value>
-  </data>
-  <data name="&gt;&gt;color.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DataGridViewButtonColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;nodeSize.Name" xml:space="preserve">
-    <value>nodeSize</value>
-  </data>
-  <data name="&gt;&gt;nodeSize.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;airFlow.Name" xml:space="preserve">
-    <value>airFlow</value>
-  </data>
-  <data name="&gt;&gt;airFlow.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="&gt;&gt;saveFD.Type" xml:space="preserve">
+    <value>System.Windows.Forms.SaveFileDialog, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;lineID.Name" xml:space="preserve">
     <value>lineID</value>
@@ -4954,12 +4897,6 @@
   <data name="&gt;&gt;MFR1.Type" xml:space="preserve">
     <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;Enthalpy1.Name" xml:space="preserve">
-    <value>Enthalpy1</value>
-  </data>
-  <data name="&gt;&gt;Enthalpy1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="&gt;&gt;TEF1.Name" xml:space="preserve">
     <value>TEF1</value>
   </data>
@@ -4996,12 +4933,6 @@
   <data name="&gt;&gt;MFR2.Type" xml:space="preserve">
     <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;Enthalpy2.Name" xml:space="preserve">
-    <value>Enthalpy2</value>
-  </data>
-  <data name="&gt;&gt;Enthalpy2.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="&gt;&gt;TEF2.Name" xml:space="preserve">
     <value>TEF2</value>
   </data>
@@ -5014,23 +4945,65 @@
   <data name="&gt;&gt;HC.Type" xml:space="preserve">
     <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;colorDialog1.Name" xml:space="preserve">
-    <value>colorDialog1</value>
+  <data name="&gt;&gt;name.Name" xml:space="preserve">
+    <value>name</value>
   </data>
-  <data name="&gt;&gt;colorDialog1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ColorDialog, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="&gt;&gt;name.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;colorDialog2.Name" xml:space="preserve">
-    <value>colorDialog2</value>
+  <data name="&gt;&gt;CB_DGV_Temperature_Source.Name" xml:space="preserve">
+    <value>CB_DGV_Temperature_Source</value>
   </data>
-  <data name="&gt;&gt;colorDialog2.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ColorDialog, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="&gt;&gt;CB_DGV_Temperature_Source.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewComboBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;saveFD.Name" xml:space="preserve">
-    <value>saveFD</value>
+  <data name="&gt;&gt;nodeID.Name" xml:space="preserve">
+    <value>nodeID</value>
   </data>
-  <data name="&gt;&gt;saveFD.Type" xml:space="preserve">
-    <value>System.Windows.Forms.SaveFileDialog, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="&gt;&gt;nodeID.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;temp.Name" xml:space="preserve">
+    <value>temp</value>
+  </data>
+  <data name="&gt;&gt;temp.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;CB_DGV_Humidity_Source.Name" xml:space="preserve">
+    <value>CB_DGV_Humidity_Source</value>
+  </data>
+  <data name="&gt;&gt;CB_DGV_Humidity_Source.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewComboBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;humidity.Name" xml:space="preserve">
+    <value>humidity</value>
+  </data>
+  <data name="&gt;&gt;humidity.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;equivalentEnthalpy.Name" xml:space="preserve">
+    <value>equivalentEnthalpy</value>
+  </data>
+  <data name="&gt;&gt;equivalentEnthalpy.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;color.Name" xml:space="preserve">
+    <value>color</value>
+  </data>
+  <data name="&gt;&gt;color.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewButtonColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;nodeSize.Name" xml:space="preserve">
+    <value>nodeSize</value>
+  </data>
+  <data name="&gt;&gt;nodeSize.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;airFlow.Name" xml:space="preserve">
+    <value>airFlow</value>
+  </data>
+  <data name="&gt;&gt;airFlow.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>EditNodeLineForm</value>
