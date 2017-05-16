@@ -689,7 +689,6 @@ namespace WFA_psychometric_chart
             //label2.Text = WFA_psychometric_chart.Properties.Resources.To;
             //button2.Text = WFA_psychometric_chart.Properties.Resources.Show_Heat_Map;
 
-
             //lets plot the graph as soon as the form loads.
             plot_new_graph();
 
@@ -2169,8 +2168,8 @@ namespace WFA_psychometric_chart
         public string city_name_pulled = "";
         public string country_name_pulled = "";
         public string last_update_pulled = "";
-        public string temp_pulled = "";
-        public string hum_pulled = "";
+        public string temp_pulled = "0";//--Default value should be 0
+        public string hum_pulled = "0";
         public string pressure_pulled = "";
         public string wind_speed_pulled = "";
         public string direction_pulled = "";
@@ -4802,7 +4801,7 @@ namespace WFA_psychometric_chart
         }
         public List<TempDataTypeForMixNode> mixNodeInfoList = new List<TempDataTypeForMixNode>();
         public List<TempDataTypeForMixNode> temporaryMixNodeList = new List<TempDataTypeForMixNode>();
-
+        public List<TemperatureHumiditySourceInfo> listTemperatureAndHumidtySourceInfoWhenDeviceSelected = new List<TemperatureHumiditySourceInfo>();
 
         public int previousNodeIndexForLineInput = 0;
 
@@ -4852,6 +4851,9 @@ namespace WFA_psychometric_chart
             //--Now lets clear the mix node list first and then refill agiain
             mixNodeInfoList.Clear();
 
+                //for device and humidity info
+                listTemperatureAndHumidtySourceInfoWhenDeviceSelected.Clear();
+
 
             string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
@@ -4866,8 +4868,14 @@ namespace WFA_psychometric_chart
             string nodeTableName = "tbl_" + selectedBuildingList[0].BuildingName + "_node_value";
             string lineTableName = "tbl_" + selectedBuildingList[0].BuildingName + "_line_value";
             string tableMixNode = "tbl_" + selectedBuildingList[0].BuildingName + "_mix_node_info";
+             
+            //--Table for input instring value for device
+            string tableInputStringOfNodeForDevice = "tbl_" + selectedBuildingList[0].BuildingName + "_TemperatureHumiditySourceInfo";
 
-            using (SQLiteConnection connection = new SQLiteConnection(connString))
+
+
+
+                using (SQLiteConnection connection = new SQLiteConnection(connString))
             {
                 connection.Open();
 
@@ -4958,16 +4966,16 @@ namespace WFA_psychometric_chart
                 //===============================Loading Mix NODE info===================================//
 
 
-                SQLiteDataReader readerMix = null;
+               // SQLiteDataReader readerMix = null;
                 string queryStringMix = "SELECT *  from " + tableMixNode + " WHERE chartID = @chartID";
 
-                SQLiteCommand commandMix = new SQLiteCommand(queryStringMix, connection);
+                var commandMix = new SQLiteCommand(queryStringMix, connection);
                 commandMix.Parameters.AddWithValue("@chartID",selectedChartID );//This is the group id that is used to identify each node
 
 
 
                 // int count = 0;
-                readerMix = commandMix.ExecuteReader();
+              var readerMix = commandMix.ExecuteReader();
                 while (readerMix.Read())
                 {
                     //editied for reading from alex db
@@ -4984,11 +4992,35 @@ namespace WFA_psychometric_chart
                 }
 
 
-
-                //=================================End of loading mix node============================//
-
+                    //--This one is for humidity source info
 
 
+                    //using (SQLiteConnection connection = new SQLiteConnection(connString))
+                    //{
+                    //    connection.Open();
+
+                    // tables and also we need to all the chart of single building in a s single table .
+                       string querySql = "select * from " + tableInputStringOfNodeForDevice;//+ " where nodeID = '" + nodeID + "'";
+                        var command12 = new SQLiteCommand(querySql, connection);
+                        var reader12 = command12.ExecuteReader();
+                        while (reader12.Read())
+                        {
+                        listTemperatureAndHumidtySourceInfoWhenDeviceSelected.Add(new TemperatureHumiditySourceInfo
+                            {
+                                chartID = reader12["chartID"].ToString(),
+                                nodeID = reader12["NodeID"].ToString(),
+                                TemepratureSoureString = reader12["TemperatureSourceInfo"].ToString(),
+                                HumiditySourceString = reader12["HumiditySourceInfo"].ToString(),
+
+                            });
+
+                        }
+
+                   // }//Close of using statement
+
+
+
+                    //=================================End of loading mix node============================//
 
 
 
@@ -4996,7 +5028,10 @@ namespace WFA_psychometric_chart
 
 
 
-            }//close of using..
+
+
+
+                }//close of using..
             }catch(Exception ex)
             {
                 MessageBox.Show(ex.Message);
@@ -6917,6 +6952,7 @@ namespace WFA_psychometric_chart
                                     //    labelValue = menuStripNodeInfoValues[x].source;
                                     //}
 
+
                                     //--this is changed as well code :bbk305
                                     // ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue, menuStripNodeInfoValues[x].marker_Size);
                                     ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].temperature_source, menuStripNodeInfoValues[x].humidity_source, menuStripNodeInfoValues[x].name, labelValue, menuStripNodeInfoValues[x].marker_Size);
@@ -8151,10 +8187,6 @@ namespace WFA_psychometric_chart
 
             }
 
-
-          
-
-
         }
 
 
@@ -8199,19 +8231,81 @@ namespace WFA_psychometric_chart
                     //else if (menuStripNodeInfoValues[x].showItemText == "Name")
                     //{
                         labelValue = menuStripNodeInfoValues[x].name;
-                    //}
-                    //else
-                    //{
-                    //    labelValue = menuStripNodeInfoValues[x].source;
-                    //}
+                            //}
+                            //else
+                            //{
+                            //    labelValue = menuStripNodeInfoValues[x].source;
+                            //}
 
+                            //==Lets check for temperature and humidity source so that we can print the those values of device
+                            string temperaryTemperatureSource = "";
+                            //Console.WriteLine("count = " + listTemperatureAndHumidtySourceInfoWhenDeviceSelected.Count);
+                            if(menuStripNodeInfoValues[x].temperature_source == "Device")
+                            {
+                                //Console.WriteLine("Inside");
+                                //--Then we need to select the device info
+                                foreach(var item in listTemperatureAndHumidtySourceInfoWhenDeviceSelected)
+                                {
+                                   // Console.WriteLine("Print Uppers Tempr  " + item.TemepratureSoureString+",id "+item.nodeID);
+                                    if (item.nodeID == menuStripNodeInfoValues[x].id)
+                                    {
+                                        //Console.WriteLine("Found Tempr  " + item.TemepratureSoureString);
+                                        if (item.TemepratureSoureString != "")
+                                        {
+                                            temperaryTemperatureSource = item.TemepratureSoureString;
+                                        }
+                                        else
+                                        {
+                                            temperaryTemperatureSource = "Device";//menuStripNodeInfoValues[x].temperature_source;
+                                        }
+                                        break;
+                                    }
+                                }
 
-                    //--Redefined code bbk305
-                    ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].temperature_source, menuStripNodeInfoValues[x].humidity_source,  menuStripNodeInfoValues[x].name, labelValue, menuStripNodeInfoValues[x].marker_Size);
+                            }
+                            else
+                            {
+                                temperaryTemperatureSource = menuStripNodeInfoValues[x].temperature_source;
+                            }
 
-                    //CODE : BBK305A
-                    //--incrementIndex++;
-                    indexForSeriesNodePoint++;
+                            //For humidity source 
+
+                            string temperaryHumiditySource = "";
+                            if (menuStripNodeInfoValues[x].humidity_source == "Device")
+                            {
+                                //--Then we need to select the device info
+                                foreach (var item in listTemperatureAndHumidtySourceInfoWhenDeviceSelected)
+                                {
+                                    if (item.nodeID == menuStripNodeInfoValues[x].id)
+                                    {
+                                        //Console.WriteLine("Found  " + item.HumiditySourceString);
+                                        if (item.HumiditySourceString != "")
+                                        {
+                                            temperaryHumiditySource = item.HumiditySourceString;
+                                        }
+                                        else
+                                        {
+                                            temperaryHumiditySource = "Device";//menuStripNodeInfoValues[x].temperature_source;
+                                        }
+                                        break;
+                                    }
+                                }
+
+                            }
+                            else
+                            {
+                                temperaryHumiditySource = menuStripNodeInfoValues[x].humidity_source;
+                            }
+
+                            //Console.WriteLine("temp= " + temperaryTemperatureSource + ",hum= " + temperaryHumiditySource+",count ="+listTemperatureAndHumidtySourceInfoWhenDeviceSelected.Count);
+
+                            //--Redefined code bbk305
+                            // ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].temperature_source, menuStripNodeInfoValues[x].humidity_source,  menuStripNodeInfoValues[x].name, labelValue, menuStripNodeInfoValues[x].marker_Size);
+                            ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, temperaryTemperatureSource, temperaryHumiditySource, menuStripNodeInfoValues[x].name, labelValue, menuStripNodeInfoValues[x].marker_Size);
+
+                            //CODE : BBK305A
+                            //--incrementIndex++;
+                            indexForSeriesNodePoint++;
 
                 }
                 //--resetting incrementIndex
@@ -8539,7 +8633,6 @@ namespace WFA_psychometric_chart
                             //    labelValue = menuStripNodeInfoValues[x].source;
                             //}
 
-
                             // ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue, menuStripNodeInfoValues[x].marker_Size);
                             ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].temperature_source, menuStripNodeInfoValues[x].humidity_source, menuStripNodeInfoValues[x].name, labelValue, menuStripNodeInfoValues[x].marker_Size);
                             //  incrementIndex++;
@@ -8649,6 +8742,7 @@ namespace WFA_psychometric_chart
             //s1.ChartType = SeriesChartType.Point;
 
             //string s = "source => temp:" + source_temperature+",hum : "+source_humidity + "\n Name : " + name1 + "\nLable : " + label1x;// + "\nindex=" + indexForSeriesNodePoint;
+           
             string s = "source \t\n temp: " + source_temperature + ",\t\n hum : " + source_humidity + "\n Name : " + name1;// + "\nindex=" + indexForSeriesNodePoint;
             if (chart1.InvokeRequired)
             {
@@ -9423,6 +9517,7 @@ namespace WFA_psychometric_chart
                     //==This shows the contextmenustrip on right click
                     CMSinsertNode.Enabled =true;
                     CMSinsertNode.Show(MousePosition);//-- this mouse position is used to show the menustrip in mouse pointer
+                    //CMSinsertNode.Show(Mous)
                 }
 
             }
@@ -13925,9 +14020,6 @@ namespace WFA_psychometric_chart
                     //    dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Selected = true;
                     //    dataGridView1_CellClick(sender, eventArgs);
                     //}
-
-
-
 
 
                 }//Close of clear chart
