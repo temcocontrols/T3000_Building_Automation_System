@@ -81,6 +81,7 @@
       <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
@@ -110,19 +111,13 @@
   <ItemGroup>
     <Compile Include="AssemblyDateGeneration.cs" />
     <Compile Include="BarStyle.cs" />
-    <Compile Include="BuildingOperation.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ChartCreationAndOperations.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="BuildingOperation.cs" />
+    <Compile Include="ChartCreationAndOperations.cs" />
     <Compile Include="ChartFunctions.cs" />
     <Compile Include="ChartStyle.cs" />
     <Compile Include="ChartStyle2D.cs" />
     <Compile Include="ColorMap.cs" />
-    <Compile Include="DatabaseOperationModel.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="DatabaseOperationModel.cs" />
     <Compile Include="DataSeries.cs" />
     <Compile Include="DrawChart.cs" />
     <Compile Include="Form1_jack_xu.cs">
@@ -131,6 +126,12 @@
     <Compile Include="Form1_jack_xu.Designer.cs">
       <DependentUpon>Form1_jack_xu.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormEditNodeAndLine.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormEditNodeAndLine.Designer.cs">
+      <DependentUpon>FormEditNodeAndLine.cs</DependentUpon>
+    </Compile>
     <Compile Include="Form_Main_PH_Application.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -138,22 +139,15 @@
       <DependentUpon>Form_Main_PH_Application.cs</DependentUpon>
     </Compile>
     <Compile Include="ILineOperation.cs" />
-    <Compile Include="InitialDatabaseSetupController.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="InitialDatabaseSetupController.cs" />
     <Compile Include="INodeOperation.cs" />
-    <Compile Include="MainController.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="MainController.cs" />
     <Compile Include="LineStyle.cs" />
     <Compile Include="MathOperation.cs" />
     <Compile Include="Matrix3.cs" />
     <Compile Include="MeshGridClass.cs" />
-    <Compile Include="NodeAndLineClass.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="ObjectCollection.cs" />
-    <Compile Include="PHChartOperation.cs" />
+    <Compile Include="PHChartGlobalVariables.cs" />
     <Compile Include="platform-independent\AbstractState.cs" />
     <Compile Include="platform-independent\backends.cs" />
     <Compile Include="platform-independent\backend_families.cs" />
@@ -207,6 +201,9 @@
     <EmbeddedResource Include="Form1_jack_xu.resx">
       <DependentUpon>Form1_jack_xu.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormEditNodeAndLine.resx">
+      <DependentUpon>FormEditNodeAndLine.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form_Main_PH_Application.en-US.resx">
       <DependentUpon>Form_Main_PH_Application.cs</DependentUpon>
@@ -273,6 +270,35 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="Microsoft.Office.Core">
+      <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>7</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="Microsoft.Office.Interop.Excel">
+      <Guid>{00020813-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>8</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="VBIDE">
+      <Guid>{0002E157-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>5</VersionMajor>
+      <VersionMinor>3</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.105.0\build\net45\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.105.0\build\net45\System.Data.SQLite.Core.targets')" />

@@ -11,7 +11,7 @@ namespace PH_App
     /// <summary>
     /// this will perform all the operations related to initital database operations
     /// </summary>
-    public class InitialDatabaseSetupController:DatabaseOperationModel
+    public class InitialDatabaseSetupController:MainController//DatabaseOperationModel
     {
 
         //public int SelectedSettingsForUserOption { get; set; }

@@ -30,12 +30,12 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form_Main_PH_Application));
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea6 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend6 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.phChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.lb_db_name = new System.Windows.Forms.Label();
             this.lb_buildingselectedShow = new System.Windows.Forms.Label();
@@ -47,15 +47,16 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.labelline1 = new System.Windows.Forms.Label();
-            this.lb_DP = new System.Windows.Forms.Label();
+            this.lbEntropy = new System.Windows.Forms.Label();
             this.label25 = new System.Windows.Forms.Label();
-            this.lb_RH = new System.Windows.Forms.Label();
+            this.lbTemperature = new System.Windows.Forms.Label();
             this.label24 = new System.Windows.Forms.Label();
-            this.lb_humidity_ratio = new System.Windows.Forms.Label();
+            this.lbEnthalpy = new System.Windows.Forms.Label();
             this.label23 = new System.Windows.Forms.Label();
-            this.lb_dbt = new System.Windows.Forms.Label();
+            this.lbPressure = new System.Windows.Forms.Label();
             this.label21 = new System.Windows.Forms.Label();
             this.gb_showstatus = new System.Windows.Forms.GroupBox();
+            this.lbPrintTest = new System.Windows.Forms.Label();
             this.lb_realtimeshow = new System.Windows.Forms.Label();
             this.lb_modeshow = new System.Windows.Forms.Label();
             this.lb_vertical_line2 = new System.Windows.Forms.Label();
@@ -73,8 +74,6 @@
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.optionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.simulationMode = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.historyPlotToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.trashBoxToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gridViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.excelExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -82,7 +81,6 @@
             this.helpPsychometricChartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.CMSinsertNode = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.quickNodeInsertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.disconnectLineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearChartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editNodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteNodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -92,6 +90,12 @@
             this.lb_unit_chosen_display = new System.Windows.Forms.Label();
             this.pb_lock_unlock = new System.Windows.Forms.PictureBox();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.saveFD = new System.Windows.Forms.SaveFileDialog();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveAsTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.phChart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox4ttt.SuspendLayout();
@@ -99,24 +103,27 @@
             this.menuStrip1.SuspendLayout();
             this.CMSinsertNode.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pb_lock_unlock)).BeginInit();
+            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // phChart
             // 
             resources.ApplyResources(this.phChart, "phChart");
-            chartArea6.AxisX.Title = "Enthalpy h[KJ/kg]";
-            chartArea6.AxisY.Title = "Pressure P[MPa]";
-            chartArea6.Name = "ChartArea1";
-            this.phChart.ChartAreas.Add(chartArea6);
-            legend6.Enabled = false;
-            legend6.Name = "Legend1";
-            this.phChart.Legends.Add(legend6);
+            chartArea1.AxisX.Title = "Enthalpy h[KJ/kg]";
+            chartArea1.AxisY.Title = "Pressure P[MPa]";
+            chartArea1.Name = "ChartArea1";
+            this.phChart.ChartAreas.Add(chartArea1);
+            legend1.Enabled = false;
+            legend1.Name = "Legend1";
+            this.phChart.Legends.Add(legend1);
             this.phChart.Name = "phChart";
-            series6.ChartArea = "ChartArea1";
-            series6.Legend = "Legend1";
-            series6.Name = "Series1";
-            this.phChart.Series.Add(series6);
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.phChart.Series.Add(series1);
+            this.phChart.MouseClick += new System.Windows.Forms.MouseEventHandler(this.phChart_MouseClick);
             this.phChart.MouseDown += new System.Windows.Forms.MouseEventHandler(this.phChart_MouseDown);
+            this.phChart.MouseMove += new System.Windows.Forms.MouseEventHandler(this.phChart_MouseMove);
             // 
             // lb_db_name
             // 
@@ -132,14 +139,14 @@
             // 
             this.dataGridView1.AllowUserToAddRows = false;
             this.dataGridView1.BackgroundColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle16.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle16.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle16.Font = new System.Drawing.Font("Arial", 8.25F);
-            dataGridViewCellStyle16.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle16.SelectionBackColor = System.Drawing.SystemColors.ControlDark;
-            dataGridViewCellStyle16.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle16.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle16;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Arial", 8.25F);
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.ControlDark;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.id,
@@ -158,10 +165,10 @@
             // 
             // id
             // 
-            dataGridViewCellStyle17.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle17.SelectionBackColor = System.Drawing.Color.SteelBlue;
-            dataGridViewCellStyle17.SelectionForeColor = System.Drawing.Color.WhiteSmoke;
-            this.id.DefaultCellStyle = dataGridViewCellStyle17;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.SteelBlue;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.WhiteSmoke;
+            this.id.DefaultCellStyle = dataGridViewCellStyle2;
             resources.ApplyResources(this.id, "id");
             this.id.Name = "id";
             this.id.ReadOnly = true;
@@ -169,9 +176,9 @@
             // 
             // name
             // 
-            dataGridViewCellStyle18.SelectionBackColor = System.Drawing.Color.SteelBlue;
-            dataGridViewCellStyle18.SelectionForeColor = System.Drawing.Color.White;
-            this.name.DefaultCellStyle = dataGridViewCellStyle18;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.SteelBlue;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.White;
+            this.name.DefaultCellStyle = dataGridViewCellStyle3;
             resources.ApplyResources(this.name, "name");
             this.name.Name = "name";
             this.name.ReadOnly = true;
@@ -184,13 +191,13 @@
             this.groupBox4ttt.Controls.Add(this.label4);
             this.groupBox4ttt.Controls.Add(this.label3);
             this.groupBox4ttt.Controls.Add(this.labelline1);
-            this.groupBox4ttt.Controls.Add(this.lb_DP);
+            this.groupBox4ttt.Controls.Add(this.lbEntropy);
             this.groupBox4ttt.Controls.Add(this.label25);
-            this.groupBox4ttt.Controls.Add(this.lb_RH);
+            this.groupBox4ttt.Controls.Add(this.lbTemperature);
             this.groupBox4ttt.Controls.Add(this.label24);
-            this.groupBox4ttt.Controls.Add(this.lb_humidity_ratio);
+            this.groupBox4ttt.Controls.Add(this.lbEnthalpy);
             this.groupBox4ttt.Controls.Add(this.label23);
-            this.groupBox4ttt.Controls.Add(this.lb_dbt);
+            this.groupBox4ttt.Controls.Add(this.lbPressure);
             this.groupBox4ttt.Controls.Add(this.label21);
             this.groupBox4ttt.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.groupBox4ttt.Name = "groupBox4ttt";
@@ -220,40 +227,40 @@
             resources.ApplyResources(this.labelline1, "labelline1");
             this.labelline1.Name = "labelline1";
             // 
-            // lb_DP
+            // lbEntropy
             // 
-            resources.ApplyResources(this.lb_DP, "lb_DP");
-            this.lb_DP.Name = "lb_DP";
+            resources.ApplyResources(this.lbEntropy, "lbEntropy");
+            this.lbEntropy.Name = "lbEntropy";
             // 
             // label25
             // 
             resources.ApplyResources(this.label25, "label25");
             this.label25.Name = "label25";
             // 
-            // lb_RH
+            // lbTemperature
             // 
-            resources.ApplyResources(this.lb_RH, "lb_RH");
-            this.lb_RH.Name = "lb_RH";
+            resources.ApplyResources(this.lbTemperature, "lbTemperature");
+            this.lbTemperature.Name = "lbTemperature";
             // 
             // label24
             // 
             resources.ApplyResources(this.label24, "label24");
             this.label24.Name = "label24";
             // 
-            // lb_humidity_ratio
+            // lbEnthalpy
             // 
-            resources.ApplyResources(this.lb_humidity_ratio, "lb_humidity_ratio");
-            this.lb_humidity_ratio.Name = "lb_humidity_ratio";
+            resources.ApplyResources(this.lbEnthalpy, "lbEnthalpy");
+            this.lbEnthalpy.Name = "lbEnthalpy";
             // 
             // label23
             // 
             resources.ApplyResources(this.label23, "label23");
             this.label23.Name = "label23";
             // 
-            // lb_dbt
+            // lbPressure
             // 
-            resources.ApplyResources(this.lb_dbt, "lb_dbt");
-            this.lb_dbt.Name = "lb_dbt";
+            resources.ApplyResources(this.lbPressure, "lbPressure");
+            this.lbPressure.Name = "lbPressure";
             // 
             // label21
             // 
@@ -263,6 +270,7 @@
             // gb_showstatus
             // 
             resources.ApplyResources(this.gb_showstatus, "gb_showstatus");
+            this.gb_showstatus.Controls.Add(this.lbPrintTest);
             this.gb_showstatus.Controls.Add(this.lb_realtimeshow);
             this.gb_showstatus.Controls.Add(this.lb_modeshow);
             this.gb_showstatus.Controls.Add(this.lb_vertical_line2);
@@ -273,6 +281,11 @@
             this.gb_showstatus.Controls.Add(this.lb_devicestatusshow);
             this.gb_showstatus.Name = "gb_showstatus";
             this.gb_showstatus.TabStop = false;
+            // 
+            // lbPrintTest
+            // 
+            resources.ApplyResources(this.lbPrintTest, "lbPrintTest");
+            this.lbPrintTest.Name = "lbPrintTest";
             // 
             // lb_realtimeshow
             // 
@@ -351,23 +364,24 @@
             // 
             this.saveConfigurationToolStripMenuItem.Name = "saveConfigurationToolStripMenuItem";
             resources.ApplyResources(this.saveConfigurationToolStripMenuItem, "saveConfigurationToolStripMenuItem");
+            this.saveConfigurationToolStripMenuItem.Click += new System.EventHandler(this.saveConfigurationToolStripMenuItem_Click);
             // 
             // loadConfigurationToolStripMenuItem
             // 
             this.loadConfigurationToolStripMenuItem.Name = "loadConfigurationToolStripMenuItem";
             resources.ApplyResources(this.loadConfigurationToolStripMenuItem, "loadConfigurationToolStripMenuItem");
+            this.loadConfigurationToolStripMenuItem.Click += new System.EventHandler(this.loadConfigurationToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             resources.ApplyResources(this.exitToolStripMenuItem, "exitToolStripMenuItem");
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
             // optionToolStripMenuItem
             // 
             this.optionToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.simulationMode,
-            this.exportDataToolStripMenuItem,
-            this.historyPlotToolStripMenuItem1,
             this.trashBoxToolStripMenuItem,
             this.gridViewToolStripMenuItem,
             this.excelExportToolStripMenuItem});
@@ -378,16 +392,6 @@
             // 
             this.simulationMode.Name = "simulationMode";
             resources.ApplyResources(this.simulationMode, "simulationMode");
-            // 
-            // exportDataToolStripMenuItem
-            // 
-            this.exportDataToolStripMenuItem.Name = "exportDataToolStripMenuItem";
-            resources.ApplyResources(this.exportDataToolStripMenuItem, "exportDataToolStripMenuItem");
-            // 
-            // historyPlotToolStripMenuItem1
-            // 
-            this.historyPlotToolStripMenuItem1.Name = "historyPlotToolStripMenuItem1";
-            resources.ApplyResources(this.historyPlotToolStripMenuItem1, "historyPlotToolStripMenuItem1");
             // 
             // trashBoxToolStripMenuItem
             // 
@@ -403,6 +407,7 @@
             // 
             this.excelExportToolStripMenuItem.Name = "excelExportToolStripMenuItem";
             resources.ApplyResources(this.excelExportToolStripMenuItem, "excelExportToolStripMenuItem");
+            this.excelExportToolStripMenuItem.Click += new System.EventHandler(this.excelExportToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -420,7 +425,6 @@
             // 
             this.CMSinsertNode.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.quickNodeInsertToolStripMenuItem,
-            this.disconnectLineToolStripMenuItem,
             this.clearChartToolStripMenuItem,
             this.editNodeToolStripMenuItem,
             this.deleteNodeToolStripMenuItem,
@@ -434,15 +438,11 @@
             resources.ApplyResources(this.quickNodeInsertToolStripMenuItem, "quickNodeInsertToolStripMenuItem");
             this.quickNodeInsertToolStripMenuItem.Click += new System.EventHandler(this.quickNodeInsertToolStripMenuItem_Click);
             // 
-            // disconnectLineToolStripMenuItem
-            // 
-            resources.ApplyResources(this.disconnectLineToolStripMenuItem, "disconnectLineToolStripMenuItem");
-            this.disconnectLineToolStripMenuItem.Name = "disconnectLineToolStripMenuItem";
-            // 
             // clearChartToolStripMenuItem
             // 
             this.clearChartToolStripMenuItem.Name = "clearChartToolStripMenuItem";
             resources.ApplyResources(this.clearChartToolStripMenuItem, "clearChartToolStripMenuItem");
+            this.clearChartToolStripMenuItem.Click += new System.EventHandler(this.clearChartToolStripMenuItem_Click);
             // 
             // editNodeToolStripMenuItem
             // 
@@ -454,6 +454,7 @@
             // 
             resources.ApplyResources(this.deleteNodeToolStripMenuItem, "deleteNodeToolStripMenuItem");
             this.deleteNodeToolStripMenuItem.Name = "deleteNodeToolStripMenuItem";
+            this.deleteNodeToolStripMenuItem.Click += new System.EventHandler(this.deleteNodeToolStripMenuItem_Click);
             // 
             // disconnectLineFromAToolStripMenuItem
             // 
@@ -467,11 +468,13 @@
             // 
             this.nodeAToolStripMenuItem.Name = "nodeAToolStripMenuItem";
             resources.ApplyResources(this.nodeAToolStripMenuItem, "nodeAToolStripMenuItem");
+            this.nodeAToolStripMenuItem.Click += new System.EventHandler(this.nodeAToolStripMenuItem_Click);
             // 
             // nodeBToolStripMenuItem
             // 
             this.nodeBToolStripMenuItem.Name = "nodeBToolStripMenuItem";
             resources.ApplyResources(this.nodeBToolStripMenuItem, "nodeBToolStripMenuItem");
+            this.nodeBToolStripMenuItem.Click += new System.EventHandler(this.nodeBToolStripMenuItem_Click);
             // 
             // lb_unit_chosen_display
             // 
@@ -483,10 +486,42 @@
             resources.ApplyResources(this.pb_lock_unlock, "pb_lock_unlock");
             this.pb_lock_unlock.Name = "pb_lock_unlock";
             this.pb_lock_unlock.TabStop = false;
+            this.pb_lock_unlock.Click += new System.EventHandler(this.pb_lock_unlock_Click);
             // 
             // backgroundWorker1
             // 
             this.backgroundWorker1.WorkerSupportsCancellation = true;
+            // 
+            // saveFD
+            // 
+            this.saveFD.RestoreDirectory = true;
+            // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.deleteToolStripMenuItem,
+            this.saveAsTemplateToolStripMenuItem,
+            this.loadTemplateToolStripMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            resources.ApplyResources(this.contextMenuStrip1, "contextMenuStrip1");
+            // 
+            // deleteToolStripMenuItem
+            // 
+            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+            resources.ApplyResources(this.deleteToolStripMenuItem, "deleteToolStripMenuItem");
+            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
+            // 
+            // saveAsTemplateToolStripMenuItem
+            // 
+            this.saveAsTemplateToolStripMenuItem.Name = "saveAsTemplateToolStripMenuItem";
+            resources.ApplyResources(this.saveAsTemplateToolStripMenuItem, "saveAsTemplateToolStripMenuItem");
+            this.saveAsTemplateToolStripMenuItem.Click += new System.EventHandler(this.saveAsTemplateToolStripMenuItem_Click);
+            // 
+            // loadTemplateToolStripMenuItem
+            // 
+            this.loadTemplateToolStripMenuItem.Name = "loadTemplateToolStripMenuItem";
+            resources.ApplyResources(this.loadTemplateToolStripMenuItem, "loadTemplateToolStripMenuItem");
+            this.loadTemplateToolStripMenuItem.Click += new System.EventHandler(this.loadTemplateToolStripMenuItem_Click);
             // 
             // Form_Main_PH_Application
             // 
@@ -514,6 +549,7 @@
             this.menuStrip1.PerformLayout();
             this.CMSinsertNode.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pb_lock_unlock)).EndInit();
+            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -527,13 +563,11 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn id;
         private System.Windows.Forms.DataGridViewTextBoxColumn name;
         private System.Windows.Forms.GroupBox groupBox4ttt;
-        private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label labelline1;
         private System.Windows.Forms.Label label25;
         private System.Windows.Forms.Label label24;
-        private System.Windows.Forms.Label label23;
         private System.Windows.Forms.Label label21;
         private System.Windows.Forms.GroupBox gb_showstatus;
         private System.Windows.Forms.Label lb_modeshow;
@@ -550,8 +584,6 @@
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem optionToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem simulationMode;
-        private System.Windows.Forms.ToolStripMenuItem exportDataToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem historyPlotToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem trashBoxToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem gridViewToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem excelExportToolStripMenuItem;
@@ -568,14 +600,22 @@
         public System.Windows.Forms.ToolStripMenuItem nodeAToolStripMenuItem;
         public System.Windows.Forms.ToolStripMenuItem nodeBToolStripMenuItem;
         public System.Windows.Forms.ToolStripMenuItem quickNodeInsertToolStripMenuItem;
-        public System.Windows.Forms.ToolStripMenuItem disconnectLineToolStripMenuItem;
         public System.Windows.Forms.ToolStripMenuItem clearChartToolStripMenuItem;
         public System.Windows.Forms.ToolStripMenuItem editNodeToolStripMenuItem;
         public System.Windows.Forms.ToolStripMenuItem deleteNodeToolStripMenuItem;
         public System.Windows.Forms.ContextMenuStrip CMSinsertNode;
-        public System.Windows.Forms.Label lb_DP;
-        public System.Windows.Forms.Label lb_RH;
-        public System.Windows.Forms.Label lb_humidity_ratio;
-        public System.Windows.Forms.Label lb_dbt;
+        public System.Windows.Forms.Label lbEntropy;
+        public System.Windows.Forms.Label lbTemperature;
+        public System.Windows.Forms.Label lbPressure;
+        private System.Windows.Forms.Label label5;
+        public System.Windows.Forms.Label lbEnthalpy;
+        private System.Windows.Forms.Label label23;
+        private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveAsTemplateToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem loadTemplateToolStripMenuItem;
+        public System.Windows.Forms.Label lbPrintTest;
+        public System.Windows.Forms.SaveFileDialog saveFD;
     }
 }

@@ -12,15 +12,15 @@ namespace PH_App
         public InitialDatabaseSetupController idsc { get; set; }
         public DatabaseOperationModel dom { get; set; }
         public BuildingOperation bo { get; set; }
+        public ChartCreationAndOperations coprn { get; set; }
         
-
-
         public ObjectCollection()
         {
              mc = new MainController();
              idsc = new InitialDatabaseSetupController();
              dom = new DatabaseOperationModel();
             bo = new BuildingOperation();
+           coprn = new ChartCreationAndOperations();
              
         }
 
