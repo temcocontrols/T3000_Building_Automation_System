@@ -21,9 +21,9 @@
 #include "ChartPointsArray.h"
 
 template <class T>
-CChartPointsArray<T>::CChartPointsArray(unsigned iResize) 
-  : m_pPoints(NULL), m_iMaxPoints(iResize), m_iCurrentPoints(0),
-    m_iResize(iResize), m_Ordering(poXOrdering)
+CChartPointsArray<T>::CChartPointsArray(unsigned iResize)
+	: m_pPoints(NULL), m_iMaxPoints(iResize), m_iCurrentPoints(0),
+	  m_iResize(iResize), m_Ordering(poXOrdering)
 {
 	m_pPoints = new T[iResize];
 }
@@ -45,8 +45,8 @@ void CChartPointsArray<T>::AddPoint(const T& newPoint)
 	{
 		m_iMaxPoints += m_iResize;
 		T* pOldPoints = m_pPoints;
-		m_pPoints =	new T[m_iMaxPoints];
-		memcpy(m_pPoints,pOldPoints,m_iCurrentPoints*sizeof(T));
+		m_pPoints = new T[m_iMaxPoints];
+		memcpy(m_pPoints, pOldPoints, m_iCurrentPoints * sizeof(T));
 		delete[] pOldPoints;
 	}
 
@@ -59,13 +59,13 @@ void CChartPointsArray<T>::AddPoint(const T& newPoint)
 	}
 	else
 	{
-		if (newPoint.GetXMax() > m_dXMaxVal)  m_dXMaxVal = newPoint.GetXMax();
-		if (newPoint.GetXMin() < m_dXMinVal)  m_dXMinVal = newPoint.GetXMin();
-		if (newPoint.GetYMax() > m_dYMaxVal)  m_dYMaxVal = newPoint.GetYMax();
-		if (newPoint.GetYMin() < m_dYMinVal)  m_dYMinVal = newPoint.GetYMin();
+		if (newPoint.GetXMax() > m_dXMaxVal) m_dXMaxVal = newPoint.GetXMax();
+		if (newPoint.GetXMin() < m_dXMinVal) m_dXMinVal = newPoint.GetXMin();
+		if (newPoint.GetYMax() > m_dYMaxVal) m_dYMaxVal = newPoint.GetYMax();
+		if (newPoint.GetYMin() < m_dYMinVal) m_dYMinVal = newPoint.GetYMin();
 	}
 
-	if (m_Ordering==poNoOrdering)
+	if (m_Ordering == poNoOrdering)
 	{
 		m_pPoints[m_iCurrentPoints] = newPoint;
 		m_iCurrentPoints++;
@@ -77,24 +77,24 @@ void CChartPointsArray<T>::AddPoint(const T& newPoint)
 }
 
 template <class T>
-void CChartPointsArray<T>::AddPoints(T* pPoints, 
-										unsigned uCount)
+void CChartPointsArray<T>::AddPoints(T* pPoints,
+                                     unsigned uCount)
 {
-	if (m_iCurrentPoints+uCount > m_iMaxPoints)
+	if (m_iCurrentPoints + uCount > m_iMaxPoints)
 	{
-		m_iMaxPoints = m_iCurrentPoints+uCount;
+		m_iMaxPoints = m_iCurrentPoints + uCount;
 		T* pOldPoints = m_pPoints;
-		m_pPoints =	new T[m_iMaxPoints];
-		memcpy(m_pPoints,pOldPoints,m_iCurrentPoints*sizeof(T));
+		m_pPoints = new T[m_iMaxPoints];
+		memcpy(m_pPoints, pOldPoints, m_iCurrentPoints * sizeof(T));
 		delete[] pOldPoints;
 	}
-	for (unsigned i=0; i<uCount; i++)
+	for (unsigned i = 0; i < uCount; i++)
 		AddPoint(pPoints[i]);
 }
 
-template<class T>
-void CChartPointsArray<T>::SetPoints(T* pPoints, 
-										unsigned uCount)
+template <class T>
+void CChartPointsArray<T>::SetPoints(T* pPoints,
+                                     unsigned uCount)
 {
 	if (uCount > m_iMaxPoints)
 	{
@@ -105,7 +105,7 @@ void CChartPointsArray<T>::SetPoints(T* pPoints,
 	}
 	m_iCurrentPoints = uCount;
 
-	for (unsigned i=0;i<uCount;i++)
+	for (unsigned i = 0; i < uCount; i++)
 	{
 		m_pPoints[i] = pPoints[i];
 	}
@@ -129,7 +129,7 @@ void CChartPointsArray<T>::RemovePointsFromBegin(unsigned Count)
 {
 	ASSERT (Count < m_iCurrentPoints);
 	T* pSource = m_pPoints + Count;
-	memmove(m_pPoints, pSource, sizeof(T) * (m_iCurrentPoints-Count));
+	memmove(m_pPoints, pSource, sizeof(T) * (m_iCurrentPoints - Count));
 	m_iCurrentPoints -= Count;
 	RefreshMinMax();
 }
@@ -157,9 +157,9 @@ const T& CChartPointsArray<T>::operator[](unsigned Index) const
 }
 
 template <class T>
-bool CChartPointsArray<T>::GetSerieXMinMax(double& Min, double& Max)  const
+bool CChartPointsArray<T>::GetSerieXMinMax(double& Min, double& Max) const
 {
-	if (m_iCurrentPoints==0)
+	if (m_iCurrentPoints == 0)
 		return false;
 
 	Min = m_dXMinVal;
@@ -168,9 +168,9 @@ bool CChartPointsArray<T>::GetSerieXMinMax(double& Min, double& Max)  const
 }
 
 template <class T>
-bool CChartPointsArray<T>::GetSerieYMinMax(double& Min, double& Max)  const
+bool CChartPointsArray<T>::GetSerieYMinMax(double& Min, double& Max) const
 {
-	if (m_iCurrentPoints==0)
+	if (m_iCurrentPoints == 0)
 		return false;
 
 	Min = m_dYMinVal;
@@ -186,10 +186,10 @@ void CChartPointsArray<T>::SetOrdering(PointsOrdering newOrdering)
 }
 
 template <class T>
-bool CChartPointsArray<T>::GetVisiblePoints(double dAxisMin, 
-											double dAxisMax,
-											unsigned& uFirstPt, 
-											unsigned& uLastPt) const
+bool CChartPointsArray<T>::GetVisiblePoints(double dAxisMin,
+                                            double dAxisMax,
+                                            unsigned& uFirstPt,
+                                            unsigned& uLastPt) const
 {
 	if (m_iCurrentPoints == 0)
 		return false;
@@ -201,8 +201,8 @@ bool CChartPointsArray<T>::GetVisiblePoints(double dAxisMin,
 		return true;
 	}
 
-	uFirstPt = BinarySearch(0,m_iCurrentPoints-1,dAxisMin);		     
-	uLastPt = BinarySearch(uFirstPt,m_iCurrentPoints-1,dAxisMax);                
+	uFirstPt = BinarySearch(0, m_iCurrentPoints - 1, dAxisMin);
+	uLastPt = BinarySearch(uFirstPt, m_iCurrentPoints - 1, dAxisMax);
 	return true;
 }
 
@@ -214,12 +214,12 @@ void CChartPointsArray<T>::ReorderPoints()
 	case poNoOrdering:
 		break;
 	case poXOrdering:
-	    qsort(m_pPoints, m_iCurrentPoints, sizeof(T), 
-			  CChartPointsArray::ComparePointsOnX);
+		qsort(m_pPoints, m_iCurrentPoints, sizeof(T),
+		      CChartPointsArray::ComparePointsOnX);
 		break;
 	case poYOrdering:
-	    qsort(m_pPoints, m_iCurrentPoints, sizeof(T), 
-			  CChartPointsArray::ComparePointsOnY);
+		qsort(m_pPoints, m_iCurrentPoints, sizeof(T),
+		      CChartPointsArray::ComparePointsOnY);
 		break;
 	}
 }
@@ -236,15 +236,15 @@ void CChartPointsArray<T>::InsertNewPoint(const T& newPoint)
 
 	if (m_Ordering == poXOrdering)
 	{
-		if (newPoint.GetX() >= m_pPoints[m_iCurrentPoints-1].GetX())
+		if (newPoint.GetX() >= m_pPoints[m_iCurrentPoints - 1].GetX())
 			m_pPoints[m_iCurrentPoints] = newPoint;
 		else
 		{
-			for (unsigned i=0; i<m_iCurrentPoints; i++)
+			for (unsigned i = 0; i < m_iCurrentPoints; i++)
 			{
 				if (newPoint.GetX() < m_pPoints[i].GetX())
 				{
-					InsertPointAtPos(newPoint,i);
+					InsertPointAtPos(newPoint, i);
 					break;
 				}
 			}
@@ -252,15 +252,15 @@ void CChartPointsArray<T>::InsertNewPoint(const T& newPoint)
 	}
 	else if (m_Ordering == poYOrdering)
 	{
-		if (newPoint.GetY() >= m_pPoints[m_iCurrentPoints-1].GetY())
+		if (newPoint.GetY() >= m_pPoints[m_iCurrentPoints - 1].GetY())
 			m_pPoints[m_iCurrentPoints] = newPoint;
 		else
 		{
-			for (unsigned i=0; i<m_iCurrentPoints; i++)
+			for (unsigned i = 0; i < m_iCurrentPoints; i++)
 			{
 				if (newPoint.GetY() < m_pPoints[i].GetY())
 				{
-					InsertPointAtPos(newPoint,i);
+					InsertPointAtPos(newPoint, i);
 					break;
 				}
 			}
@@ -276,7 +276,7 @@ void CChartPointsArray<T>::InsertPointAtPos(const T& newPoint, int iPos)
 	// Find the address of the insert point
 	T* pPointPos = m_pPoints + iPos;
 	// Move all remaining points one place to the right.
-	memmove(pPointPos+1,pPointPos,(m_iCurrentPoints-iPos)*sizeof(T));
+	memmove(pPointPos + 1, pPointPos, (m_iCurrentPoints - iPos) * sizeof(T));
 	// Store the new point
 	*pPointPos = newPoint;
 }
@@ -284,23 +284,23 @@ void CChartPointsArray<T>::InsertPointAtPos(const T& newPoint, int iPos)
 template <class T>
 int CChartPointsArray<T>::ComparePointsOnX(void const* pA, void const* pB)
 {
-    T* pPointA = (T *) pA;
-    T* pPointB = (T *) pB;
+	T* pPointA = (T *)pA;
+	T* pPointB = (T *)pB;
 
-    if (pPointA->GetX() < pPointB->GetX()) return -1;
-    if (pPointA->GetX() > pPointB->GetX()) return 1;
-    return 0;
+	if (pPointA->GetX() < pPointB->GetX()) return -1;
+	if (pPointA->GetX() > pPointB->GetX()) return 1;
+	return 0;
 }
 
 template <class T>
 int CChartPointsArray<T>::ComparePointsOnY(void const* pA, void const* pB)
 {
-    T* pPointA = (T *) pA;
-    T* pPointB = (T *) pB;
+	T* pPointA = (T *)pA;
+	T* pPointB = (T *)pB;
 
-    if (pPointA->GetY() < pPointB->GetY()) return -1;
-    if (pPointA->GetY() > pPointB->GetY()) return 1;
-    return 0;
+	if (pPointA->GetY() < pPointB->GetY()) return -1;
+	if (pPointA->GetY() > pPointB->GetY()) return 1;
+	return 0;
 }
 
 template <class T>
@@ -310,42 +310,40 @@ void CChartPointsArray<T>::RefreshMinMax()
 	m_dXMaxVal = m_pPoints[0].GetXMax();
 	m_dYMinVal = m_pPoints[0].GetYMin();
 	m_dYMaxVal = m_pPoints[0].GetYMax();
-	for (unsigned uIndex=0; uIndex<m_iCurrentPoints; uIndex++)
+	for (unsigned uIndex = 0; uIndex < m_iCurrentPoints; uIndex++)
 	{
-		if (m_pPoints[uIndex].GetXMax() > m_dXMaxVal)  
+		if (m_pPoints[uIndex].GetXMax() > m_dXMaxVal)
 			m_dXMaxVal = m_pPoints[uIndex].GetXMax();
-		if (m_pPoints[uIndex].GetXMin() < m_dXMinVal)  
+		if (m_pPoints[uIndex].GetXMin() < m_dXMinVal)
 			m_dXMinVal = m_pPoints[uIndex].GetXMin();
-		if (m_pPoints[uIndex].GetYMax() > m_dYMaxVal)  
+		if (m_pPoints[uIndex].GetYMax() > m_dYMaxVal)
 			m_dYMaxVal = m_pPoints[uIndex].GetYMax();
-		if (m_pPoints[uIndex].GetYMin() < m_dYMinVal)  
+		if (m_pPoints[uIndex].GetYMin() < m_dYMinVal)
 			m_dYMinVal = m_pPoints[uIndex].GetYMin();
 	}
 }
 
 template <class T>
-int CChartPointsArray<T>::BinarySearch(unsigned uLeft, 
-									   unsigned uRight, 
-									   double dFind) const
+int CChartPointsArray<T>::BinarySearch(unsigned uLeft,
+                                       unsigned uRight,
+                                       double dFind) const
 {
-	unsigned middle = uLeft + ((uRight - uLeft) /2);	
+	unsigned middle = uLeft + ((uRight - uLeft) / 2);
 	double midVal = 0;
 	if (m_Ordering == poXOrdering)
 		midVal = m_pPoints[middle].GetX();
 	if (m_Ordering == poYOrdering)
 		midVal = m_pPoints[middle].GetY();
 
-	if(midVal > dFind)
+	if (midVal > dFind)
 	{
-		if(uLeft < middle)				
-			return BinarySearch(uLeft,middle-1,dFind);			
-		else				
-			return uLeft;	
+		if (uLeft < middle)
+			return BinarySearch(uLeft, middle - 1, dFind);
+		else
+			return uLeft;
 	}
-	else if(middle < uRight)					
-		return BinarySearch(middle+1,uRight,dFind);				
-	else					
+	else if (middle < uRight)
+		return BinarySearch(middle + 1, uRight, dFind);
+	else
 		return uRight;
 }
-
-

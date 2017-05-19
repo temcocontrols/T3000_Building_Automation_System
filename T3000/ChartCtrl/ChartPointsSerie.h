@@ -32,7 +32,7 @@
 /**
 	The data points are simply displayed as independant points.
 **/
-class CChartPointsSerie : public CChartXYSerie  
+class CChartPointsSerie : public CChartXYSerie
 {
 public:
 	//! The different point shapes
@@ -48,24 +48,25 @@ public:
 	//! Retrieves the width and height of each points
 	void GetPointSize(int& XSize, int& YSize) const
 	{
-        XSize = m_iXPointSize;
-        YSize = m_iYPointSize;
-    }
+		XSize = m_iXPointSize;
+		YSize = m_iYPointSize;
+	}
+
 	//! Sets the points shape
 	void SetPointType(PointType Type);
 	//! Returns the points shape
-	PointType GetPointType() const     { return m_iPointType; }
+	PointType GetPointType() const { return m_iPointType; }
 
 	//! Sets the border color of the points
 	void SetBorderColor(COLORREF Color);
 	//! Returns the border color of the points
-	COLORREF GetBorderColor()	{ return m_colBorder; }
+	COLORREF GetBorderColor() { return m_colBorder; }
 
 	//! Constructor
 	CChartPointsSerie(CChartCtrl* pParent);
 	//! Destructor
 	virtual ~CChartPointsSerie();
-	
+
 	//! Check whether a screen point is on the series.
 	/**
 		@param screenPoint
@@ -85,7 +86,7 @@ private:
 		@param rectBitmap
 			The rectangle in which to draw the legend icon
 	**/
-    void DrawLegend(CDC* pDC, const CRect& rectBitmap) const;
+	void DrawLegend(CDC* pDC, const CRect& rectBitmap) const;
 
 	//! Draws the most recent points of the series.
 	/**
@@ -102,12 +103,12 @@ private:
 		@param pDC
 			The device context used to draw
 	**/
-	void DrawAll(CDC *pDC);
+	void DrawAll(CDC* pDC);
 
 	//! Width of the points
-	int m_iXPointSize;		
+	int m_iXPointSize;
 	//! Height of the points
-	int m_iYPointSize;	
+	int m_iYPointSize;
 	//! Shape of the points
 	PointType m_iPointType;
 	//! The border color

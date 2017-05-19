@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 
 #include "MainFrm.h"
-#include "globle_function.h"
+#include "global_function.h"
 // CWriteSingleRegDlg dialog
 
 IMPLEMENT_DYNAMIC(CWriteSingleRegDlg, CDialogEx)

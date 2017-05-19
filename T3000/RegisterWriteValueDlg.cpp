@@ -6,7 +6,7 @@
 #include "RegisterWriteValueDlg.h"
 #include "afxdialogex.h"
 #include "MainFrm.h"
-#include "globle_function.h"
+#include "global_function.h"
  
  #include "../SQLiteDriver/CppSQLite3.h"
 IMPLEMENT_DYNAMIC(CRegisterWriteValueDlg, CDialog)

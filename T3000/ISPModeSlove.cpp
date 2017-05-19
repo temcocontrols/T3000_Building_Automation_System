@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "ISPModeSlove.h"
 #include "afxdialogex.h"
-#include "globle_function.h"
+#include "global_function.h"
 
 // CISPModeSlove dialog
 int timer_count = 30;
@@ -14,7 +14,6 @@ IMPLEMENT_DYNAMIC(CISPModeSlove, CDialogEx)
 CISPModeSlove::CISPModeSlove(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CISPModeSlove::IDD, pParent)
 {
-
 }
 
 CISPModeSlove::~CISPModeSlove()
@@ -53,8 +52,8 @@ BOOL CISPModeSlove::OnInitDialog()
 	// TODO:  Add extra initialization here
 	Initial_static();
 	timer_count = 30;
-	SetTimer(1,1000,NULL);
-	return TRUE;  // return TRUE unless you set the focus to a control
+	SetTimer(1, 1000,NULL);
+	return TRUE; // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
@@ -66,45 +65,20 @@ CStaticEx m_isp_mode_title;
 
 void CISPModeSlove::Initial_static()
 {
-
-	//m_isp_mode_title.textColor(RGB(0,0,0));
-	////m_isp_mode_title.bkColor(RGB(0,255,255));
-	//m_isp_mode_title.setFont(28,16,NULL,_T("Arial"));
-
-	////m_device_ip_title.SetWindowTextW(_T(""));
-	//m_device_ip_title.textColor(RGB(0,0,0));
-	////m_device_ip_title.bkColor(RGB(0,255,255));
-	//m_device_ip_title.setFont(22,16,NULL,_T("Arial"));
-
-	////m_product_name_title.SetWindowTextW(_T(""));
-	//m_product_name_title.textColor(RGB(0,0,0));
-	////m_product_name_title.bkColor(RGB(0,255,255));
-	//m_product_name_title.setFont(22,16,NULL,_T("Arial"));
-
 	CString temp_ip;
-	temp_ip.Format(_T("%u.%u.%u.%u"),need_isp_device.ipaddress[0],need_isp_device.ipaddress[1],need_isp_device.ipaddress[2],need_isp_device.ipaddress[3]);
+	temp_ip.Format(_T("%u.%u.%u.%u"), need_isp_device.ipaddress[0], need_isp_device.ipaddress[1], need_isp_device.ipaddress[2], need_isp_device.ipaddress[3]);
 
 	m_device_ip_edit.SetWindowTextW(temp_ip);
-	//m_device_ip_edit.textColor(RGB(0,0,255));
-	////m_device_ip_edit.bkColor(RGB(0,255,255));
-	//m_device_ip_edit.setFont(22,16,NULL,_T("Arial"));
-
-
 	CString temp_device_name;
 	temp_device_name = GetProductName(need_isp_device.product_id);
 
 	m_device_name_edit.SetWindowTextW(temp_device_name);
-	//m_device_name_edit.textColor(RGB(0,0,255));
-	////m_device_name_edit.bkColor(RGB(0,255,255));
-	//m_device_name_edit.setFont(22,16,NULL,_T("Arial"));
 
 	GetDlgItem(IDC_STATIC_ISP_FIRMWARE_PATH)->SetWindowTextW(_T(""));
 	((CButton *)GetDlgItem(IDC_RADIO_FROM_SERVER))->SetCheck(true);
 
-	
 
-
-	if(isp_mode_error_code == 2)
+	if (isp_mode_error_code == 2)
 	{
 		m_isp_mode_title.SetWindowTextW(_T("Your device is in ISP mode !\r\n\And your bootloader is broken.\r\nPlease update your bootloader.\r\n\
 We suggest you to update your firmware."));
@@ -115,7 +89,6 @@ We suggest you to update your firmware."));
 		GetDlgItem(IDC_STATIC_ISP_FIRMWARE)->EnableWindow(1);
 		GetDlgItem(IDC_STATIC_ISP_FIRMWARE_PATH)->EnableWindow(1);
 		GetDlgItem(IDC_BUTTON_ISP_CHOOSE_FIRMWARE)->EnableWindow(1);
-
 	}
 	else
 	{
@@ -135,25 +108,23 @@ BOOL CISPModeSlove::PreTranslateMessage(MSG* pMsg)
 }
 
 
-
 void CISPModeSlove::OnBnClickedButtonIspChooseFirmware()
 {
 	// TODO: Add your control notification handler code here
 	KillTimer(1);
-	CFileDialog dlg(true,_T(""),_T(" "),OFN_HIDEREADONLY ,_T("hex File;bin File|*.hex;*.bin|all File|*.*||"),NULL,0);
-	if(IDOK!=dlg.DoModal())
-		return ;
+	CFileDialog dlg(true,_T(""),_T(" "),OFN_HIDEREADONLY,_T("hex File;bin File|*.hex;*.bin|all File|*.*||"),NULL, 0);
+	if (IDOK != dlg.DoModal())
+		return;
 	CString temp_path;
 	temp_path = dlg.GetPathName();
 	GetDlgItem(IDC_STATIC_ISP_FIRMWARE_PATH)->SetWindowTextW(temp_path);
-
 }
 
 
 void CISPModeSlove::OnBnClickedButtonUpdateFirmware()
 {
 	// TODO: Add your control notification handler code here
-	GetDlgItemText(IDC_STATIC_ISP_FIRMWARE_PATH,isp_mode_detect_firmware_path);	
+	GetDlgItemText(IDC_STATIC_ISP_FIRMWARE_PATH, isp_mode_detect_firmware_path);
 	isp_mode_firmware_auto = ((CButton *)GetDlgItem(IDC_RADIO_FROM_SERVER))->GetCheck(); //返回1表示选上，0表示没选上;
 	isp_mode_is_cancel = false;
 	PostMessage(WM_CLOSE,NULL,NULL);
@@ -166,8 +137,6 @@ void CISPModeSlove::OnBnClickedButtonIspCancel()
 	isp_mode_is_cancel = true;
 	PostMessage(WM_CLOSE,NULL,NULL);
 }
-
-
 
 
 void CISPModeSlove::OnBnClickedRadioFromServer()
@@ -191,19 +160,19 @@ void CISPModeSlove::OnBnClickedRadioFromHardisk()
 void CISPModeSlove::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
-	switch(nIDEvent)
+	switch (nIDEvent)
 	{
 	case 1:
 		{
 			timer_count --;
-			if(timer_count == 0)
+			if (timer_count == 0)
 			{
 				KillTimer(1);
 				isp_mode_is_cancel = true;
 				PostMessage(WM_CLOSE,NULL,NULL);
 			}
 			CString temp_cs;
-			temp_cs.Format(_T("Cancel (%d)"),timer_count);
+			temp_cs.Format(_T("Cancel (%d)"), timer_count);
 			GetDlgItem(IDC_BUTTON_ISP_CANCEL)->SetWindowTextW(temp_cs);
 		}
 		break;

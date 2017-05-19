@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "OutPutDlg.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "AfxMessageDialog.h"
 #include "MainFrm.h"
 #include "../SQLiteDriver/CppSQLite3.h"

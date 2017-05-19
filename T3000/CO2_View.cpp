@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "CO2_View.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "CM5\MyOwnListCtrl.h"
 #include "../SQLiteDriver/CppSQLite3.h"
 #include <bitset>
@@ -174,7 +174,9 @@ void CCO2_View::Dump(CDumpContext& dc) const
 }
 #endif
 #endif //_DEBUG
-
+/// <summary>
+/// Load CO2's Window
+/// </summary>
 void CCO2_View::Fresh()
 {
     g_NEED_MULTI_READ = FALSE;
@@ -269,7 +271,9 @@ void CCO2_View::Fresh()
 
 
 }
-
+/// <summary>
+/// Show ,Hide some window Fields ,according to different devices
+/// </summary>
 void CCO2_View::SH_Window(){
     CString temp_id;
     float m_fFirmwareVersion=0;
@@ -501,7 +505,9 @@ void CCO2_View::SH_Window(){
 
     }
 }
-
+/// <summary>
+/// Load CO2's page
+/// </summary>
 void CCO2_View::Fresh_CO2(){
      Initial_List();
      C02_SHOW_TEMP();

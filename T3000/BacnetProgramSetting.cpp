@@ -20,7 +20,6 @@ IMPLEMENT_DYNAMIC(CBacnetProgramSetting, CDialogEx)
 CBacnetProgramSetting::CBacnetProgramSetting(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CBacnetProgramSetting::IDD, pParent)
 {
-
 }
 
 CBacnetProgramSetting::~CBacnetProgramSetting()
@@ -48,13 +47,13 @@ void CBacnetProgramSetting::OnBnClickedOk()
 	COLORREF color_label = ((CMFCColorButton *)GetDlgItem(IDC_MFCCOLORBUTTON_LABEL))->GetColor();
 	COLORREF color_function = ((CMFCColorButton *)GetDlgItem(IDC_MFCCOLORBUTTON_FUNCTION))->GetColor();
 	COLORREF color_command = ((CMFCColorButton *)GetDlgItem(IDC_MFCCOLORBUTTON_COMMAND))->GetColor();
-	if(color_text == 0xffffffff)
+	if (color_text == 0xffffffff)
 		color_text = DEFAULT_PRG_TEXT_COLOR;
-	if(color_label == 0xffffffff)
+	if (color_label == 0xffffffff)
 		color_label = DEFAULT_PRG_LABEL_COLOR;
-	if(color_function == 0xffffffff)
+	if (color_function == 0xffffffff)
 		color_function = DEFAULT_PRG_FUNCTION_COLOR;
-	if(color_command == 0xffffffff)
+	if (color_command == 0xffffffff)
 		color_command = DEFAULT_PRG_COMMAND_COLOR;
 
 	CString temp_string;
@@ -62,7 +61,7 @@ void CBacnetProgramSetting::OnBnClickedOk()
 
 	int check_ret = ((CButton *)GetDlgItem(IDC_CHECK_PRG_SETTING_UPPER))->GetCheck();
 
-	if((color_text != prg_text_color) || (color_label != prg_label_color) || (color_function != prg_function_color) || (color_command != prg_command_color) || (temp_string.CompareNoCase(prg_character_font) != 0) || (check_ret != show_upper) )
+	if ((color_text != prg_text_color) || (color_label != prg_label_color) || (color_function != prg_function_color) || (color_command != prg_command_color) || (temp_string.CompareNoCase(prg_character_font) != 0) || (check_ret != show_upper))
 	{
 		show_upper = check_ret;
 		prg_color_change = true;
@@ -76,17 +75,17 @@ void CBacnetProgramSetting::OnBnClickedOk()
 		CString temp_color_function;
 		CString temp_color_command;
 		CString temp_upper;
-		temp_color_text.Format(_T("%u"),prg_text_color);
-		temp_color_label.Format(_T("%u"),prg_label_color);
-		temp_color_function.Format(_T("%u"),prg_function_color);
-		temp_color_command.Format(_T("%u"),prg_command_color);
-		temp_upper.Format(_T("%d"),show_upper);
-		WritePrivateProfileString(_T("Program_IDE_Color"),_T("Text Color"),temp_color_text,g_cstring_ini_path);
-		WritePrivateProfileString(_T("Program_IDE_Color"),_T("Label Color"),temp_color_label,g_cstring_ini_path);
-		WritePrivateProfileString(_T("Program_IDE_Color"),_T("Function Color"),temp_color_function,g_cstring_ini_path);
-		WritePrivateProfileString(_T("Program_IDE_Color"),_T("Command Color"),temp_color_command,g_cstring_ini_path);
-		WritePrivateProfileString(_T("Program_IDE_Color"),_T("Text Font"),prg_character_font,g_cstring_ini_path);
-		WritePrivateProfileString(_T("Program_IDE_Color"),_T("Upper Case"),temp_upper,g_cstring_ini_path);
+		temp_color_text.Format(_T("%u"), prg_text_color);
+		temp_color_label.Format(_T("%u"), prg_label_color);
+		temp_color_function.Format(_T("%u"), prg_function_color);
+		temp_color_command.Format(_T("%u"), prg_command_color);
+		temp_upper.Format(_T("%d"), show_upper);
+		WritePrivateProfileString(_T("Program_IDE_Color"),_T("Text Color"), temp_color_text, g_cstring_ini_path);
+		WritePrivateProfileString(_T("Program_IDE_Color"),_T("Label Color"), temp_color_label, g_cstring_ini_path);
+		WritePrivateProfileString(_T("Program_IDE_Color"),_T("Function Color"), temp_color_function, g_cstring_ini_path);
+		WritePrivateProfileString(_T("Program_IDE_Color"),_T("Command Color"), temp_color_command, g_cstring_ini_path);
+		WritePrivateProfileString(_T("Program_IDE_Color"),_T("Text Font"), prg_character_font, g_cstring_ini_path);
+		WritePrivateProfileString(_T("Program_IDE_Color"),_T("Upper Case"), temp_upper, g_cstring_ini_path);
 	}
 
 	CDialogEx::OnOK();
@@ -119,7 +118,7 @@ BOOL CBacnetProgramSetting::OnInitDialog()
 	((CMFCColorButton *)GetDlgItem(IDC_MFCCOLORBUTTON_COMMAND))->SetColor(prg_command_color);
 	((CMFCColorButton *)GetDlgItem(IDC_MFCCOLORBUTTON_COMMAND))->SetColumnsNumber(10);
 
-	if(show_upper)
+	if (show_upper)
 	{
 		((CButton *)GetDlgItem(IDC_CHECK_PRG_SETTING_UPPER))->SetCheck(1);
 	}
@@ -128,12 +127,12 @@ BOOL CBacnetProgramSetting::OnInitDialog()
 		((CButton *)GetDlgItem(IDC_CHECK_PRG_SETTING_UPPER))->SetCheck(0);
 	}
 
-	for(int j=0;j<sizeof(Program_Fonts)/sizeof(Program_Fonts[0]);j++)
+	for (int j = 0; j < sizeof(Program_Fonts) / sizeof(Program_Fonts[0]); j++)
 	{
 		((CComboBox *)GetDlgItem(IDC_COMBO_PRG_SETTING_FONT))->AddString(Program_Fonts[j]);
 	}
 	((CComboBox *)GetDlgItem(IDC_COMBO_PRG_SETTING_FONT))->SetWindowTextW(prg_character_font);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
+	return TRUE; // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }

@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "InputSetDlg.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "BuildTable1.h"
 #include "../SQLiteDriver/CppSQLite3.h"
 

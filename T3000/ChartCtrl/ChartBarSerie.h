@@ -46,20 +46,20 @@ public:
 	//! Specifies if the bars are vertical or horizontal.
 	void SetHorizontal(bool bHorizontal);
 	//! Returns true if bars are horizontal, false otherwise.
-	bool GetHorizontal() const		  { return m_bHorizontal; }
+	bool GetHorizontal() const { return m_bHorizontal; }
 
 	//! Sets the bars border color
 	void SetBorderColor(COLORREF BorderColor);
 	//! Returns the bars border color
-	COLORREF GetBorderColor() const			   { return m_BorderColor; }
+	COLORREF GetBorderColor() const { return m_BorderColor; }
 	//! Sets the bars border width
 	void SetBorderWidth(int Width);
 	//! Returns the bars border width
-	int  GetBorderWidth() const		{ return m_iBorderWidth;  }
+	int GetBorderWidth() const { return m_iBorderWidth; }
 	//! Sets the bars width (in pixels)
 	void SetBarWidth(int Width);
 	//! Returns the bars width (in pixels)
-	int  GetBarWidth() const		{ return m_iBarWidth;  }
+	int GetBarWidth() const { return m_iBarWidth; }
 
 	//! Set the group Id of the series
 	/**
@@ -68,7 +68,7 @@ public:
 	**/
 	void SetGroupId(unsigned GroupId);
 	//! Returns the group Id of the series
-	unsigned GetGroupId() const			{ return m_uGroupId;    }
+	unsigned GetGroupId() const { return m_uGroupId; }
 
 	//! Specifies if the series is stacked with other bar series
 	/**
@@ -93,9 +93,9 @@ public:
 	void SetGradient(COLORREF GradientColor, EGradientType GradientType);
 
 	//! Static function used to specify the space (in pixels) between series of the same group
-	static void SetInterSpace(int Space)	{ m_iInterSpace = Space; }
+	static void SetInterSpace(int Space) { m_iInterSpace = Space; }
 	//! Static function returning the space between series of the same group.
-	static int  GetInterSpace()				{ return m_iInterSpace;  }
+	static int GetInterSpace() { return m_iInterSpace; }
 
 	//! Specifies a base line for the bars.
 	/**
@@ -137,7 +137,7 @@ private:
 		@param rectBitmap
 			The rectangle in which to draw the legend icon
 	**/
-    void DrawLegend(CDC* pDC, const CRect& rectBitmap) const;
+	void DrawLegend(CDC* pDC, const CRect& rectBitmap) const;
 
 	//! Draws the most recent points of the series.
 	/**
@@ -154,10 +154,10 @@ private:
 		@param pDC
 			The device context used to draw
 	**/
-	void DrawAll(CDC *pDC);
+	void DrawAll(CDC* pDC);
 
-	void DrawBar(CDC* pDC, CBrush* pFillBrush, CBrush* pBorderBrush, 
-				 CRect BarRect);
+	void DrawBar(CDC* pDC, CBrush* pFillBrush, CBrush* pBorderBrush,
+	             CRect BarRect);
 
 	// Retrieves the offset of the serie along the minor axis (horizontal
 	// axis for vertical bars). This offset is based on series with the
@@ -169,10 +169,10 @@ private:
 
 
 	//! Space between two series of the same group.
-	static int m_iInterSpace;	
+	static int m_iInterSpace;
 	//! List of all bar series added to the control
 	static TBarSeriesList m_lstBarSeries;
-	
+
 	//! Specifies if the bars are horizontal or vertical.
 	bool m_bHorizontal;
 
@@ -184,7 +184,7 @@ private:
 
 	// Specifies to which group this series belongs to. Series in the same group are
 	// 'stacked' next to each other.
-	unsigned m_uGroupId;		
+	unsigned m_uGroupId;
 
 	int m_iBarWidth;
 	int m_iBorderWidth;

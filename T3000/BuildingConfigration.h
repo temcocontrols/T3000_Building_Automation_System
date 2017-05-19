@@ -2,7 +2,7 @@
 
 #include "CM5/ListCtrlEx.h"
 #include "afxcmn.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "afxwin.h"
 #include "../SQLiteDriver/CppSQLite3.h"
 // CBuildingConfigration dialog

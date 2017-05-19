@@ -38,7 +38,7 @@ class CChartSerie;
 	object is retrieved	by calling the GetLegend() function on the 
 	CChartCtrl class. 
 **/
-class CChartLegend  
+class CChartLegend
 {
 	friend CChartCtrl;
 
@@ -70,7 +70,7 @@ public:
 	void UndockLegend(int iLeftPos, int iTopPos);
 
 	//! Sets the background of the legend transparent.
-	void SetTransparent(bool bTransparent);  
+	void SetTransparent(bool bTransparent);
 	//! Sets the legend in horizontal/vertical mode.
 	/**
 		In horizontal mode, the names are drawn next to each other
@@ -81,14 +81,14 @@ public:
 	//! Sets the legend visible/invisible.
 	void SetVisible(bool bVisible);
 	//! Returns true if the legend is visible.
-	bool IsVisible()  const         { return m_bIsVisible; }
+	bool IsVisible() const { return m_bIsVisible; }
 
 	//! Returns the back color of the legend.
-	COLORREF GetBackColor() const			   { return m_BackColor; }
+	COLORREF GetBackColor() const { return m_BackColor; }
 	//! Sets the back color of the legend.
 	void SetBackColor(COLORREF NewColor);
 	//! Returns the shadow color.
-	COLORREF GetShadowColor() const		   { return m_ShadowColor; }
+	COLORREF GetShadowColor() const { return m_ShadowColor; }
 	//! Sets the shadow color.
 	void SetShadowColor(COLORREF NewColor);
 	//! Enables/disables the shadow.
@@ -120,10 +120,10 @@ private:
 	//! The font face name used to display the series names.
 	TChartString m_strFontName;
 	//! The font point size.
-	int          m_iFontSize;
+	int m_iFontSize;
 
 	//! True if the legend is docked
-	bool m_bDocked;	
+	bool m_bDocked;
 	//! The side of the control on which the legend is docked.
 	DockSide m_DockSide;
 

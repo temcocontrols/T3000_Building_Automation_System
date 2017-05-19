@@ -6,8 +6,8 @@
 #include "TStatOutputView.h"
 #include "BacnetOutput.h"
 #include "afxdialogex.h"
-#include "globle_function.h"
-#include "gloab_define.h"
+#include "global_function.h"
+#include "global_define.h"
  
 #include <bitset>
 #include "MainFrm.h"

@@ -5,7 +5,6 @@
 #pragma once
 
 #include "WorkspaceBar.h"
-#include "IODisplayBar.h"
 #include "GraphicView.h"
 #include "TrendLogView.h"
 #include "RefreshTreeThread.h"
@@ -15,7 +14,7 @@
 #define	ID_RW_INFO			101
 #define	ID_PROTOCOL_INFO	102
 */
-#include "globle_function.h"
+#include "global_function.h"
 #include "T3/DialogT3.h"	//T3
 
 #include "AirQuality/AirQuality.h"//AirQuality

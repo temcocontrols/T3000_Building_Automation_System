@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "GridLoad.h"
 #include "MainFrm.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "T3000RegAddress.h"
 T3000RegAddress M_RegAddress;
 namespace NC_Define

@@ -23,10 +23,10 @@
 #include "ChartGanttSerie.h"
 #include "ChartCtrl.h"
 
-CChartGanttSerie::CChartGanttSerie(CChartCtrl* pParent) 
-  : CChartSerieBase<SChartGanttPoint>(pParent), m_iBarWidth(10), m_iBorderWidth(1),
-    m_BorderColor(RGB(0,0,0)), m_bGradient(true), 
-    m_GradientColor(RGB(255,255,255)), m_GradientType(gtHorizontalDouble)
+CChartGanttSerie::CChartGanttSerie(CChartCtrl* pParent)
+	: CChartSerieBase<SChartGanttPoint>(pParent), m_iBarWidth(10), m_iBorderWidth(1),
+	  m_BorderColor(RGB(0,0,0)), m_bGradient(true),
+	  m_GradientColor(RGB(255,255,255)), m_GradientType(gtHorizontalDouble)
 {
 	m_bShadow = true;
 	this->SetSeriesOrdering(poYOrdering);
@@ -42,23 +42,23 @@ void CChartGanttSerie::AddPoint(double StartTime, double EndTime, double YValue)
 	CChartSerieBase<SChartGanttPoint>::AddPoint(newPoint);
 }
 
-bool CChartGanttSerie::IsPointOnSerie(const CPoint& screenPoint, 
-											unsigned& uIndex) const
+bool CChartGanttSerie::IsPointOnSerie(const CPoint& screenPoint,
+                                      unsigned& uIndex) const
 {
 	uIndex = INVALID_POINT;
 	if (!m_bIsVisible)
 		return false;
 
-	unsigned uFirst=0, uLast=0;
-	if (!GetVisiblePoints(uFirst,uLast))
+	unsigned uFirst = 0, uLast = 0;
+	if (!GetVisiblePoints(uFirst, uLast))
 		return false;
-	if (uFirst>0)
+	if (uFirst > 0)
 		uFirst--;
-	if (uLast<GetPointsCount()-1)
+	if (uLast < GetPointsCount() - 1)
 		uLast++;
 
 	bool bResult = false;
-	for (unsigned i=uFirst ; i <= uLast ; i++)
+	for (unsigned i = uFirst; i <= uLast; i++)
 	{
 		CRect BarRect = GetBarRectangle(i);
 		if (BarRect.PtInRect(screenPoint))
@@ -68,7 +68,7 @@ bool CChartGanttSerie::IsPointOnSerie(const CPoint& screenPoint,
 			break;
 		}
 	}
-	return bResult; 
+	return bResult;
 }
 
 void CChartGanttSerie::DrawLegend(CDC* pDC, const CRect& rectBitmap) const
@@ -80,18 +80,18 @@ void CChartGanttSerie::DrawLegend(CDC* pDC, const CRect& rectBitmap) const
 
 	//Draw bar:
 	CBrush BorderBrush(m_BorderColor);
-	pDC->FillRect(rectBitmap,&BorderBrush);
+	pDC->FillRect(rectBitmap, &BorderBrush);
 
 	CRect FillRect(rectBitmap);
 	CBrush FillBrush(m_SerieColor);
-	FillRect.DeflateRect(m_iBorderWidth,m_iBorderWidth);
+	FillRect.DeflateRect(m_iBorderWidth, m_iBorderWidth);
 	if (m_bGradient)
 	{
-		CChartGradient::DrawGradient(pDC,FillRect,m_SerieColor,m_GradientColor,m_GradientType);
+		CChartGradient::DrawGradient(pDC, FillRect, m_SerieColor, m_GradientColor, m_GradientType);
 	}
 	else
 	{
-		pDC->FillRect(FillRect,&FillBrush);
+		pDC->FillRect(FillRect, &FillBrush);
 	}
 }
 
@@ -102,19 +102,19 @@ void CChartGanttSerie::Draw(CDC* pDC)
 	if (!pDC->GetSafeHdc())
 		return;
 
-	unsigned uFirst=0, uLast=0;
-	if (!GetVisiblePoints(uFirst,uLast))
+	unsigned uFirst = 0, uLast = 0;
+	if (!GetVisiblePoints(uFirst, uLast))
 		return;
 
 	CRect TempClipRect(m_PlottingRect);
-	TempClipRect.DeflateRect(1,1);
+	TempClipRect.DeflateRect(1, 1);
 	pDC->SetBkMode(TRANSPARENT);
 	pDC->IntersectClipRect(TempClipRect);
 
 	CBrush BorderBrush(m_BorderColor);
 	CBrush FillBrush(m_SerieColor);
 	//Draw all points that haven't been drawn yet
-	for (m_uLastDrawnPoint;m_uLastDrawnPoint<(int)GetPointsCount();m_uLastDrawnPoint++)
+	for (m_uLastDrawnPoint; m_uLastDrawnPoint < (int)GetPointsCount(); m_uLastDrawnPoint++)
 	{
 		CRect BarRect = GetBarRectangle(m_uLastDrawnPoint);
 		DrawBar(pDC, &FillBrush, &BorderBrush, BarRect);
@@ -125,22 +125,22 @@ void CChartGanttSerie::Draw(CDC* pDC)
 	DeleteObject(FillBrush);
 }
 
-void CChartGanttSerie::DrawAll(CDC *pDC)
+void CChartGanttSerie::DrawAll(CDC* pDC)
 {
 	if (!m_bIsVisible)
 		return;
 	if (!pDC->GetSafeHdc())
 		return;
 
-	unsigned uFirst=0, uLast=0;
-	if (!GetVisiblePoints(uFirst,uLast))
+	unsigned uFirst = 0, uLast = 0;
+	if (!GetVisiblePoints(uFirst, uLast))
 		return;
 
 	CRect TempClipRect(m_PlottingRect);
-	TempClipRect.DeflateRect(1,1);
-	if (uFirst>0)
+	TempClipRect.DeflateRect(1, 1);
+	if (uFirst > 0)
 		uFirst--;
-	if (uLast<GetPointsCount()-1)
+	if (uLast < GetPointsCount() - 1)
 		uLast++;
 
 	pDC->SetBkMode(TRANSPARENT);
@@ -148,7 +148,7 @@ void CChartGanttSerie::DrawAll(CDC *pDC)
 
 	CBrush BorderBrush(m_BorderColor);
 	CBrush FillBrush(m_SerieColor);
-	for (m_uLastDrawnPoint=uFirst;m_uLastDrawnPoint<=uLast;m_uLastDrawnPoint++)
+	for (m_uLastDrawnPoint = uFirst; m_uLastDrawnPoint <= uLast; m_uLastDrawnPoint++)
 	{
 		CRect BarRect = GetBarRectangle(m_uLastDrawnPoint);
 		DrawBar(pDC, &FillBrush, &BorderBrush, BarRect);
@@ -159,26 +159,27 @@ void CChartGanttSerie::DrawAll(CDC *pDC)
 	DeleteObject(FillBrush);
 }
 
-void CChartGanttSerie::SetBorderColor(COLORREF BorderColor)  
-{ 
-	m_BorderColor = BorderColor; 
-	m_pParentCtrl->RefreshCtrl();
-}
-void CChartGanttSerie::SetBorderWidth(int Width)  
-{ 
-	m_iBorderWidth = Width; 
+void CChartGanttSerie::SetBorderColor(COLORREF BorderColor)
+{
+	m_BorderColor = BorderColor;
 	m_pParentCtrl->RefreshCtrl();
 }
 
-void CChartGanttSerie::SetBarWidth(int Width)		
-{ 
+void CChartGanttSerie::SetBorderWidth(int Width)
+{
+	m_iBorderWidth = Width;
+	m_pParentCtrl->RefreshCtrl();
+}
+
+void CChartGanttSerie::SetBarWidth(int Width)
+{
 	m_iBarWidth = Width;
 	m_pParentCtrl->RefreshCtrl();
 }
 
-void CChartGanttSerie::ShowGradient(bool bShow)		
-{ 
-	m_bGradient = bShow; 
+void CChartGanttSerie::ShowGradient(bool bShow)
+{
+	m_bGradient = bShow;
 	m_pParentCtrl->RefreshCtrl();
 }
 
@@ -198,31 +199,31 @@ CRect CChartGanttSerie::GetBarRectangle(unsigned uPointIndex) const
 	int PointYStart = YVal - m_iBarWidth;
 	int PointYEnd = YVal + m_iBarWidth;
 	CRect PointRect(min(PointXStart, PointXEnd), min(PointYStart, PointYEnd),
-					max(PointXStart, PointXEnd), max(PointYStart, PointYEnd) );
+	                max(PointXStart, PointXEnd), max(PointYStart, PointYEnd));
 	return PointRect;
 }
 
-void CChartGanttSerie::DrawBar(CDC* pDC, CBrush* pFillBrush, CBrush* pBorderBrush, 
-							   CRect BarRect)
+void CChartGanttSerie::DrawBar(CDC* pDC, CBrush* pFillBrush, CBrush* pBorderBrush,
+                               CRect BarRect)
 {
 	if (m_bShadow)
 	{
 		CBrush ShadowBrush(m_ShadowColor);
 		CRect ShadowRect(BarRect);
-		ShadowRect.OffsetRect(m_iShadowDepth,m_iShadowDepth);
-		pDC->FillRect(ShadowRect,&ShadowBrush);
+		ShadowRect.OffsetRect(m_iShadowDepth, m_iShadowDepth);
+		pDC->FillRect(ShadowRect, &ShadowBrush);
 	}
-	pDC->FillRect(BarRect,pBorderBrush);
+	pDC->FillRect(BarRect, pBorderBrush);
 
 	CRect FillRect(BarRect);
-	FillRect.DeflateRect(m_iBorderWidth,m_iBorderWidth);
+	FillRect.DeflateRect(m_iBorderWidth, m_iBorderWidth);
 	if (m_bGradient)
 	{
-		CChartGradient::DrawGradient(pDC,FillRect,m_SerieColor,m_GradientColor,
-									 m_GradientType);
+		CChartGradient::DrawGradient(pDC, FillRect, m_SerieColor, m_GradientColor,
+		                             m_GradientType);
 	}
 	else
 	{
-		pDC->FillRect(FillRect,pFillBrush);
+		pDC->FillRect(FillRect, pFillBrush);
 	}
 }

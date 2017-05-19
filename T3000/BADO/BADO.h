@@ -17,8 +17,19 @@ public:
 	CString m_dbfilepath;
 	CString m_dbImgeFolder;
 public:
+	/// <summary>
+	/// Set DB Path
+	/// </summary>
+	/// <param name="dbpath"></param>
     void SetDBPath(CString dbpath);
-	BOOL OnInitADOConn();						// 连接数据库
+	/// <summary>
+	/// initial ADO Connection
+	/// </summary>
+	BOOL OnInitADOConn();	
+	// 连接数据库
+	/// <summary>
+	/// Open a Record set
+	/// </summary>
 	_RecordsetPtr& OpenRecordset(CString sql);  //打开记录集
 	void CloseRecordset();						//关闭记录集
 	void CloseConn();							//关闭数据库连接

@@ -5,7 +5,7 @@
 #include "BuildTable1.h"
 #include "stdafx.h"
 #include "T3000.h"
-#include "globle_function.h"
+#include "global_function.h"
 
 
 #define	SLIDER_RANGE 65535

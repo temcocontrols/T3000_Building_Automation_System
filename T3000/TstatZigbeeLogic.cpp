@@ -6,7 +6,7 @@
 #include "T3000.h"
 #include "TstatZigbeeLogic.h"
 #include "afxdialogex.h"
-#include "globle_function.h"
+#include "global_function.h"
 
 
 #define WM_SHOW_ID_LIST WM_USER + 277

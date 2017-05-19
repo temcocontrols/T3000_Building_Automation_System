@@ -60,6 +60,6 @@ public:
 		@param GradientType
 			The type of gradient to use in the rectangle
 	**/
-	static void DrawGradient(CDC* pDC, const CRect& GradientRect, COLORREF Color1, 
-							 COLORREF Color2, EGradientType GradientType);
+	static void DrawGradient(CDC* pDC, const CRect& GradientRect, COLORREF Color1,
+	                         COLORREF Color2, EGradientType GradientType);
 };

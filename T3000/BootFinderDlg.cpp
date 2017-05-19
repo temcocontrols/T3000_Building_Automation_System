@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "BootFinderDlg.h"
 #include "afxdialogex.h"
-#include "globle_function.h"
+#include "global_function.h"
 
 
    // CBootFinderDlg dialog

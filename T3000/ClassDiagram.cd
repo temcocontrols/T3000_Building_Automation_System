@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="CChangePasswordDlg" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <NestedTypes>
+      <Enum Name="CChangePasswordDlg::__unnamed_enum_0ae1_1" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>ChangePasswordDlg.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAQIAEAACAgAAEAABAAAAAAAAAABAAAAAAEAAAAAAA=</HashCode>
+      <FileName>ChangePasswordDlg.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

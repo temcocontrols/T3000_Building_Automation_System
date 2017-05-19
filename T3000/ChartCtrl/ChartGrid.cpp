@@ -25,7 +25,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
@@ -36,15 +36,14 @@ using namespace std;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CChartGrid::CChartGrid() 
-  : m_GridColor(RGB(128,128,128)), m_pParentCtrl(NULL), m_bIsVisible(true), 
-    m_bIsHorizontal(true), m_lstTickPos()
+CChartGrid::CChartGrid()
+	: m_GridColor(RGB(128,128,128)), m_pParentCtrl(NULL), m_bIsVisible(true),
+	  m_bIsHorizontal(true), m_lstTickPos()
 {
 }
 
 CChartGrid::~CChartGrid()
 {
-
 }
 
 void CChartGrid::AddTick(int Position)
@@ -57,35 +56,35 @@ void CChartGrid::ClearTicks()
 	m_lstTickPos.clear();
 }
 
-void CChartGrid::Draw(CDC *pDC)
+void CChartGrid::Draw(CDC* pDC)
 {
 	if (!m_bIsVisible)
 		return;
-	if (!pDC->GetSafeHdc() )
+	if (!pDC->GetSafeHdc())
 		return;
-	
+
 	CRect plottingRect = m_pParentCtrl->GetPlottingRect();
 	pDC->IntersectClipRect(plottingRect);
 
 	CPen* pOldPen;
-	CPen NewPen(PS_SOLID,0,m_GridColor);
+	CPen NewPen(PS_SOLID, 0, m_GridColor);
 	pOldPen = pDC->SelectObject(&NewPen);
 
 	list<int>::iterator iter = m_lstTickPos.begin();
 	int ActuPosition = 0;
 
-	for (iter; iter!=m_lstTickPos.end(); iter++)
+	for (iter; iter != m_lstTickPos.end(); iter++)
 	{
 		ActuPosition = *iter;
 		if (!m_bIsHorizontal)
 		{
 			int ActuX = plottingRect.left;
 
-			while (ActuX<plottingRect.right)
+			while (ActuX < plottingRect.right)
 			{
-				pDC->MoveTo(ActuX,ActuPosition);
+				pDC->MoveTo(ActuX, ActuPosition);
 				ActuX += 3;
-				pDC->LineTo(ActuX,ActuPosition);
+				pDC->LineTo(ActuX, ActuPosition);
 				ActuX += 3;
 			}
 		}
@@ -93,11 +92,11 @@ void CChartGrid::Draw(CDC *pDC)
 		{
 			int ActuY = plottingRect.bottom;
 
-			while (ActuY>plottingRect.top)
+			while (ActuY > plottingRect.top)
 			{
-				pDC->MoveTo(ActuPosition,ActuY);
+				pDC->MoveTo(ActuPosition, ActuY);
 				ActuY -= 3;
-				pDC->LineTo(ActuPosition,ActuY);
+				pDC->LineTo(ActuPosition, ActuY);
 				ActuY -= 3;
 			}
 		}
@@ -117,7 +116,7 @@ void CChartGrid::SetVisible(bool bVisible)
 
 void CChartGrid::SetColor(COLORREF NewColor)
 {
-	m_GridColor = NewColor; 
+	m_GridColor = NewColor;
 	if (m_pParentCtrl)
 		m_pParentCtrl->RefreshCtrl();
 }

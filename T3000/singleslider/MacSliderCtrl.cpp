@@ -46,13 +46,13 @@ COLORREF CMacSliderCtrl::LightenColor(const COLORREF crColor, BYTE byIncreaseVal
 
 	if ((byRed + byIncreaseVal) <= 255)
 		byRed = BYTE(byRed + byIncreaseVal);
-	if ((byGreen + byIncreaseVal)	<= 255)
+	if ((byGreen + byIncreaseVal) <= 255)
 		byGreen = BYTE(byGreen + byIncreaseVal);
 	if ((byBlue + byIncreaseVal) <= 255)
 		byBlue = BYTE(byBlue + byIncreaseVal);
 
 	return RGB(byRed, byGreen, byBlue);
-}	// LightenColorref
+} // LightenColorref
 
 //-------------------------------------------------------------------
 //
@@ -78,7 +78,7 @@ COLORREF CMacSliderCtrl::DarkenColor(const COLORREF crColor, BYTE byReduceVal)
 		byBlue = BYTE(byBlue - byReduceVal);
 
 	return RGB(byRed, byGreen, byBlue);
-}	// DarkenColorref
+} // DarkenColorref
 
 /////////////////////////////////////////////////////////////////////////////
 // CMacSliderCtrl
@@ -99,7 +99,7 @@ CMacSliderCtrl::CMacSliderCtrl()
 	m_crSelection = ::GetSysColor(COLOR_HIGHLIGHT);
 	GetColors();
 	CreatePens();
-}	// CMacSliderCtrl
+} // CMacSliderCtrl
 
 //-------------------------------------------------------------------
 //
@@ -113,7 +113,7 @@ CMacSliderCtrl::~CMacSliderCtrl()
 //
 {
 	DeletePens();
-}	// ~CMacSliderCtrl
+} // ~CMacSliderCtrl
 
 
 BEGIN_MESSAGE_MAP(CMacSliderCtrl, CSliderCtrl)
@@ -127,7 +127,7 @@ END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------
 //
-void CMacSliderCtrl::OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult) 
+void CMacSliderCtrl::OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
 //
 // Return Value:	None.
 //
@@ -148,7 +148,7 @@ void CMacSliderCtrl::OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
 	if (lpcd->dwDrawStage == CDDS_PREPAINT)
 	{
 		// Request prepaint notifications for each item.
-		*pResult = CDRF_NOTIFYITEMDRAW;         
+		*pResult = CDRF_NOTIFYITEMDRAW;
 		return;
 	}
 
@@ -156,8 +156,8 @@ void CMacSliderCtrl::OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
 	// CDDS_PREPAINT, CDDS_ITEMPREPAINT is sent when the control is
 	// about to paint an item.
 	if (lpcd->dwDrawStage == CDDS_ITEMPREPAINT)
-	{	
-		CDC *pDC = CDC::FromHandle(lpcd->hdc);
+	{
+		CDC* pDC = CDC::FromHandle(lpcd->hdc);
 		CRect rect(lpcd->rc);
 		int nSavedDC = pDC->SaveDC();
 
@@ -165,8 +165,8 @@ void CMacSliderCtrl::OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
 		{
 			*pResult = CDRF_DODEFAULT;
 			return;
-		}	// if drawing tics
-		else if (lpcd->dwItemSpec ==  TBCD_THUMB)
+		} // if drawing tics
+		else if (lpcd->dwItemSpec == TBCD_THUMB)
 		{
 			// If the slider has been clicked on (selected) darken
 			// the thumb. Save the thumb color, in case it is changed.
@@ -191,7 +191,7 @@ void CMacSliderCtrl::OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
 				GetColors();
 				CreatePens();
 			}
-		}	// if drawing thumb
+		} // if drawing thumb
 		else if (lpcd->dwItemSpec == TBCD_CHANNEL)
 		{
 			// If the slider is disabled, change the thumb
@@ -207,7 +207,7 @@ void CMacSliderCtrl::OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
 			DrawChannel(pDC, rect, rcThumb.Height() > rcThumb.Width());
 
 			m_crChannel = crSavedChannel;
-		}	// if drawing channel
+		} // if drawing channel
 
 		pDC->RestoreDC(nSavedDC);
 
@@ -216,11 +216,11 @@ void CMacSliderCtrl::OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
 	}
 
 	*pResult = 0;
-}	// OnCustomDraw
+} // OnCustomDraw
 
 //-------------------------------------------------------------------
 //
-void CMacSliderCtrl::DrawHorizontalThumb(CDC *pDC, const CRect &rect)
+void CMacSliderCtrl::DrawHorizontalThumb(CDC* pDC, const CRect& rect)
 //
 // Return Value:	None.
 //
@@ -235,9 +235,9 @@ void CMacSliderCtrl::DrawHorizontalThumb(CDC *pDC, const CRect &rect)
 	int nMid = nWidth >> 1;
 
 	CPen penFrame(PS_SOLID, 1, ::GetSysColor(COLOR_WINDOWFRAME));
-	CPen *pOldPen = pDC->SelectObject(&penFrame);	
+	CPen* pOldPen = pDC->SelectObject(&penFrame);
 	CBrush br(m_crThumb);
-	CBrush *pOldBrush = pDC->SelectObject(&br);
+	CBrush* pOldBrush = pDC->SelectObject(&br);
 
 	DWORD dwStyle = GetStyle();
 
@@ -290,7 +290,7 @@ void CMacSliderCtrl::DrawHorizontalThumb(CDC *pDC, const CRect &rect)
 		}
 
 		rc.DeflateRect(1, 2, 1, 0);
-	}	// if point at top of thumb
+	} // if point at top of thumb
 	// Point is on bottom.
 	else
 	{
@@ -328,7 +328,7 @@ void CMacSliderCtrl::DrawHorizontalThumb(CDC *pDC, const CRect &rect)
 		}
 
 		rc.DeflateRect(1, 0, 1, 2);
-	}	// if point at bottom of thumb
+	} // if point at bottom of thumb
 
 	// Only draw the gripper if the slider is enabled.
 	if (IsWindowEnabled())
@@ -373,15 +373,15 @@ void CMacSliderCtrl::DrawHorizontalThumb(CDC *pDC, const CRect &rect)
 				pDC->SetPixel(rc.left + 7, rc.top + 4, m_crThumbLighter);
 			}
 		}
-	}	// if (IsWindowEnabled())
+	} // if (IsWindowEnabled())
 
 	pDC->SelectObject(pOldPen);
 	pDC->SelectObject(pOldBrush);
-}	// DrawHorizontalThumb
+} // DrawHorizontalThumb
 
 //-------------------------------------------------------------------
 //
-void CMacSliderCtrl::DrawVerticalThumb(CDC *pDC, const CRect &rect)//»æÖÆ»¬¶¯¿Ø¼þ
+void CMacSliderCtrl::DrawVerticalThumb(CDC* pDC, const CRect& rect)//»æÖÆ»¬¶¯¿Ø¼þ
 //
 // Return Value:	None.
 //
@@ -396,9 +396,9 @@ void CMacSliderCtrl::DrawVerticalThumb(CDC *pDC, const CRect &rect)//»æÖÆ»¬¶¯¿Ø¼
 	int nMid = nHeight >> 1;
 
 	CPen penFrame(PS_SOLID, 1, ::GetSysColor(COLOR_WINDOWFRAME));
-	CPen *pOldPen = pDC->SelectObject(&penFrame);	
+	CPen* pOldPen = pDC->SelectObject(&penFrame);
 	CBrush br(m_crThumb);
-	CBrush *pOldBrush = pDC->SelectObject(&br);
+	CBrush* pOldBrush = pDC->SelectObject(&br);
 
 	DWORD dwStyle = GetStyle();
 
@@ -447,7 +447,7 @@ void CMacSliderCtrl::DrawVerticalThumb(CDC *pDC, const CRect &rect)//»æÖÆ»¬¶¯¿Ø¼
 		pDC->LineTo(rc.right - 2, rc.top + 1);
 
 		rc.DeflateRect(2, 1, 0, 0);
-	}	// if point on left side
+	} // if point on left side
 	// Point is on right side.
 	else
 	{
@@ -481,7 +481,7 @@ void CMacSliderCtrl::DrawVerticalThumb(CDC *pDC, const CRect &rect)//»æÖÆ»¬¶¯¿Ø¼
 		pDC->LineTo(rc.right - 1, rc.bottom - nMid - 1);
 
 		rc.DeflateRect(0, 1, 1, 0);
-	}	// if point is on right side
+	} // if point is on right side
 #endif
 
 #if 1
@@ -528,16 +528,16 @@ void CMacSliderCtrl::DrawVerticalThumb(CDC *pDC, const CRect &rect)//»æÖÆ»¬¶¯¿Ø¼
 				pDC->SetPixel(rc.left + 4, rc.top + 7, m_crThumbLighter);
 			}
 		}
-	}	// if (IsWindowEnabled())
+	} // if (IsWindowEnabled())
 
 #endif
 	pDC->SelectObject(pOldPen);
 	pDC->SelectObject(pOldBrush);
-}	// DrawVerticalThumb
+} // DrawVerticalThumb
 
 //-------------------------------------------------------------------
 //
-void CMacSliderCtrl::DrawChannel(CDC *pDC, const CRect &rect, BOOL bHorz)
+void CMacSliderCtrl::DrawChannel(CDC* pDC, const CRect& rect, BOOL bHorz)
 //
 // Return Value:	None.
 //
@@ -562,9 +562,9 @@ void CMacSliderCtrl::DrawChannel(CDC *pDC, const CRect &rect, BOOL bHorz)
 	else
 		rc.InflateRect(0, -1, 0, -1);
 
-	CPen *pOldPen = pDC->SelectObject(&m_penDkShadow);
+	CPen* pOldPen = pDC->SelectObject(&m_penDkShadow);
 	CBrush br(m_crChannel);
-	CBrush *pOldBrush = pDC->SelectObject(&br);
+	CBrush* pOldBrush = pDC->SelectObject(&br);
 
 #if 0//2.5.0.95 É¾³ý»¬¿éÖÐµÄ¼áÌõ
 	// If the height or width is > 3, draw the inner round rect.
@@ -623,7 +623,7 @@ void CMacSliderCtrl::DrawChannel(CDC *pDC, const CRect &rect, BOOL bHorz)
 
 	pDC->SelectObject(pOldBrush);
 	pDC->SelectObject(pOldPen);
-}	// DrawChannel
+} // DrawChannel
 
 //-------------------------------------------------------------------
 //
@@ -657,16 +657,16 @@ void CMacSliderCtrl::GetColors()
 	BYTE byGreenDkShadow = GetGValue(crDkShadow);
 	BYTE byBlueFace = GetBValue(crFace);
 	BYTE byBlueShadow = GetBValue(crShadow);
-	BYTE byBlueDkShadow= GetBValue(crDkShadow);
+	BYTE byBlueDkShadow = GetBValue(crDkShadow);
 
 	m_crShadow = RGB(byRedFace + ((byRedShadow - byRedFace) >> 1),
-							byGreenFace + ((byGreenShadow - byGreenFace) >> 1),
-							byBlueFace + ((byBlueShadow - byBlueFace) >> 1));
+		byGreenFace + ((byGreenShadow - byGreenFace) >> 1),
+		byBlueFace + ((byBlueShadow - byBlueFace) >> 1));
 
 	m_crDkShadow = RGB(byRedShadow + ((byRedDkShadow - byRedShadow) >> 1),
-							byGreenShadow + ((byGreenDkShadow - byGreenShadow) >> 1),
-							byBlueShadow + ((byBlueDkShadow - byBlueShadow) >> 1));
-}	// GetColors
+		byGreenShadow + ((byGreenDkShadow - byGreenShadow) >> 1),
+		byBlueShadow + ((byBlueDkShadow - byBlueShadow) >> 1));
+} // GetColors
 
 //-------------------------------------------------------------------
 //
@@ -689,7 +689,7 @@ void CMacSliderCtrl::CreatePens()
 	m_penDkShadow.CreatePen(PS_SOLID, 1, m_crDkShadow);
 	m_penShadow.CreatePen(PS_SOLID, 1, m_crShadow);
 	m_penHilight.CreatePen(PS_SOLID, 1, m_crHilight);
-}	// CreatePens
+} // CreatePens
 
 //-------------------------------------------------------------------
 //
@@ -718,7 +718,7 @@ void CMacSliderCtrl::DeletePens()
 		m_penShadow.DeleteObject();
 	if (m_penHilight.m_hObject)
 		m_penHilight.DeleteObject();
-}	// DeletePens
+} // DeletePens
 
 //-------------------------------------------------------------------
 //
@@ -734,7 +734,7 @@ void CMacSliderCtrl::SetChannelColor(COLORREF crColor)
 	m_crChannel = crColor;
 	GetColors();
 	CreatePens();
-}	// SetChannelColor
+} // SetChannelColor
 
 //-------------------------------------------------------------------
 //
@@ -748,7 +748,7 @@ COLORREF CMacSliderCtrl::GetChannelColor()
 //
 {
 	return m_crChannel;
-}	// GetChannelColor
+} // GetChannelColor
 
 //-------------------------------------------------------------------
 //
@@ -765,7 +765,7 @@ void CMacSliderCtrl::SetThumbColor(COLORREF crColor)
 	GetColors();
 	CreatePens();
 	RedrawWindow();
-}	// SetThumbColor
+} // SetThumbColor
 
 //-------------------------------------------------------------------
 //
@@ -779,7 +779,7 @@ COLORREF CMacSliderCtrl::GetThumbColor()
 //
 {
 	return m_crThumb;
-}	// GetThumbColor
+} // GetThumbColor
 
 //-------------------------------------------------------------------
 //
@@ -796,7 +796,7 @@ void CMacSliderCtrl::SetSelectionColor(COLORREF crColor)
 	GetColors();
 	CreatePens();
 	RedrawWindow();
-}	// SetSelectionColor
+} // SetSelectionColor
 
 //-------------------------------------------------------------------
 //
@@ -810,4 +810,4 @@ COLORREF CMacSliderCtrl::GetSelectionColor()
 //
 {
 	return m_crSelection;
-}	// GetSelectionColor
+} // GetSelectionColor

@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "FreeCoolDlg.h"
 #include "global_variable_extern.h"
-#include "globle_function.h"
+#include "global_function.h"
 // CFreeCoolDlg ¶Ô»°¿ò
 
 IMPLEMENT_DYNAMIC(CFreeCoolDlg, CDialog)

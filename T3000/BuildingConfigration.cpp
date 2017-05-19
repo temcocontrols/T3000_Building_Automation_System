@@ -4,7 +4,7 @@
 #include "T3000.h"
 #include "BuildingConfigration.h"
 #include "afxdialogex.h"
- 
+#include "BacnetRemotePortWarning.h"
  
 #include <iostream>
 #include <windows.h>
@@ -12,7 +12,7 @@
 #include "FileOperations.h"
 #include "BuildingConfigEditDlg.h"
 
-#include "globle_function.h"
+#include "global_function.h"
 #include "ConnectRemoteServer.h"
 #include "RemotePtpLogin.h"
 #include <ctime>
@@ -1290,8 +1290,8 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
             }
             else
             {
-                IP = _T("192.168.0.3");
-                Port = _T("10000");
+				IP = _T("newfirmware.com");
+				Port = _T("502");
             }
 			if(Changed_Item>= m_BuildNameLst.size())
 			{
@@ -1304,6 +1304,11 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
             m_building_config_list.SetItemText(m_changedRow,BC_IPADDRESS,IP);
             m_building_config_list.SetItemText(m_changedRow,BC_IPPORT,Port);
 
+			if (GetPrivateProfileInt(_T("Setting"), _T("ENABLE_PORT_WARNING"), 1, g_cstring_ini_path) == 1)
+			{
+				CBacnetRemotePortWarning Dlg;
+				Dlg.DoModal();
+			}
         }
 
         if( (protocol_index == INDEX_MODBUS_485) ||

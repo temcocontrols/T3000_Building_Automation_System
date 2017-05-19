@@ -26,8 +26,8 @@
     <UseOfMfc>Static</UseOfMfc>
     <UseOfAtl>false</UseOfAtl>
     <CharacterSet>Unicode</CharacterSet>
-    <WholeProgramOptimization>false</WholeProgramOptimization>
-    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -163,6 +163,7 @@
     <ClCompile Include="BacnetProgramSetting.cpp" />
     <ClCompile Include="BacnetRange.cpp" />
     <ClCompile Include="BacnetRemotePoint.cpp" />
+    <ClCompile Include="BacnetRemotePortWarning.cpp" />
     <ClCompile Include="BacnetScheduleTime.cpp" />
     <ClCompile Include="BacnetScreen.cpp" />
     <ClCompile Include="BacnetScreenEdit.cpp" />
@@ -186,7 +187,6 @@
     <ClCompile Include="BuildingConfigEditDlg.cpp" />
     <ClCompile Include="BuildingConfigration.cpp" />
     <ClCompile Include="BuildTable1.cpp" />
-    <ClCompile Include="CalibartionHT.cpp" />
     <ClCompile Include="ChangePasswordDlg.cpp" />
     <ClCompile Include="ChartCtrl\ChartAxis.cpp" />
     <ClCompile Include="ChartCtrl\ChartAxisLabel.cpp" />
@@ -229,7 +229,6 @@
     <ClCompile Include="DebugWindow.cpp" />
     <ClCompile Include="DetectOnlineDlg.cpp" />
     <ClCompile Include="DisplayConfig.cpp" />
-    <ClCompile Include="DisplayLEDLCDConfig.cpp" />
     <ClCompile Include="DllFunction.cpp" />
     <ClCompile Include="Dowmloadfile.cpp" />
     <ClCompile Include="DownloadSocket.cpp" />
@@ -239,6 +238,7 @@
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="fileRW.cpp" />
     <ClCompile Include="Flash_Multy.cpp" />
+    <ClCompile Include="global_function.cpp" />
     <ClCompile Include="GraphicMode.cpp" />
     <ClCompile Include="HexFileParser.cpp" />
     <ClCompile Include="IONameConfig.cpp" />
@@ -251,16 +251,13 @@
     <ClCompile Include="EreaseDlg.cpp" />
     <ClCompile Include="excel9.cpp" />
     <ClCompile Include="FreeCoolDlg.cpp" />
-    <ClCompile Include="globle_function.cpp" />
     <ClCompile Include="GraphicView.cpp" />
     <ClCompile Include="GridButton.cpp" />
-    <ClCompile Include="GridFlashDlg.cpp" />
     <ClCompile Include="GridLoad.cpp" />
     <ClCompile Include="hangeIDDlg.cpp" />
     <ClCompile Include="ImageTreeCtrl.cpp" />
     <ClCompile Include="IniFile.cpp" />
     <ClCompile Include="InputSetDlg.cpp" />
-    <ClCompile Include="IODisplayBar.cpp" />
     <ClCompile Include="LabelEditDlg.cpp" />
     <ClCompile Include="LedsDialog.cpp" />
     <ClCompile Include="LightingController\LightingController.cpp" />
@@ -268,7 +265,6 @@
     <ClCompile Include="LoginDlg.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="ManageAccountDlg.cpp" />
-    <ClCompile Include="monthview1.cpp" />
     <ClCompile Include="msflexgrid1.cpp" />
     <ClCompile Include="MySocket.cpp" />
     <ClCompile Include="NetworkControllView.cpp" />
@@ -285,18 +281,14 @@
     <ClCompile Include="PressureSensorForm.cpp" />
     <ClCompile Include="ProductRegisterListView.cpp" />
     <ClCompile Include="RefreshTreeThread.cpp" />
-    <ClCompile Include="RegisterViewerDlg.cpp" />
     <ClCompile Include="RegisterWriteValueDlg.cpp" />
     <ClCompile Include="RelayLabel.cpp" />
     <ClCompile Include="RemotePtpLogin.cpp" />
     <ClCompile Include="ScanDbWaitDlg.cpp" />
     <ClCompile Include="ScanDlg.cpp" />
-    <ClCompile Include="ScanSelectDlg.cpp" />
-    <ClCompile Include="Scanwaydlg.cpp" />
     <ClCompile Include="SetPtDayDlg.cpp" />
     <ClCompile Include="SetptGraphicBar.cpp" />
     <ClCompile Include="SetTimeDlg.cpp" />
-    <ClCompile Include="StaticDlg.cpp" />
     <ClCompile Include="StatusbarCtrl.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -307,7 +299,6 @@
     <ClCompile Include="T3000Doc.cpp" />
     <ClCompile Include="T3000Option.cpp" />
     <ClCompile Include="T3000RegAddress.cpp" />
-    <ClCompile Include="T3000TableView.cpp" />
     <ClCompile Include="T3000UpdateDlg.cpp" />
     <ClCompile Include="T3000View.cpp" />
     <ClCompile Include="T3000_Default_MainView.cpp" />
@@ -322,7 +313,6 @@
     <ClCompile Include="T3RangeDlg.cpp" />
     <ClCompile Include="T3RTDView.cpp" />
     <ClCompile Include="TCP_Server.cpp" />
-    <ClCompile Include="TDelayForm.cpp" />
     <ClCompile Include="TemcoDataGrid.cpp" />
     <ClCompile Include="TempHumSensorForm.cpp" />
     <ClCompile Include="Timer_Calibrate.cpp" />
@@ -341,8 +331,6 @@
     <ClCompile Include="UserAcessSetDlg.cpp" />
     <ClCompile Include="Weekly_Routines.cpp" />
     <ClCompile Include="WeeklyRout_InsertDia.cpp" />
-    <ClCompile Include="WeeklySchedule.cpp" />
-    <ClCompile Include="WhichOneToChooseDlg.cpp" />
     <ClCompile Include="WifiConfigDlg.cpp" />
     <ClCompile Include="WorkspaceBar.cpp" />
     <ClCompile Include="T3\DialogT3.cpp" />
@@ -359,6 +347,7 @@
     <None Include="ChartCtrl\ChartLabel.inl" />
     <None Include="ChartCtrl\ChartPointsArray.inl" />
     <None Include="ChartCtrl\ChartSerieBase.inl" />
+    <None Include="ClassDiagram.cd" />
     <None Include="OutputTableDlg.htm">
       <DeploymentContent>true</DeploymentContent>
     </None>
@@ -515,6 +504,7 @@
     <ClInclude Include="BacnetVariable.h" />
     <ClInclude Include="BacnetWait.h" />
     <ClInclude Include="Bacnet_Include.h" />
+    <ClInclude Include="BADO\BADO.h" />
     <ClInclude Include="BatchSNDlg.h" />
     <ClInclude Include="BinFileParser.h" />
     <ClInclude Include="BoatMonitorViewer.h" />
@@ -585,6 +575,7 @@
     <ClInclude Include="fileRW.h" />
     <ClInclude Include="Flash_Multy.h" />
     <ClInclude Include="gloab_define.h" />
+    <ClInclude Include="global_function.h" />
     <ClInclude Include="global_struct.h" />
     <ClInclude Include="GraphicMode.h" />
     <ClInclude Include="HexFileParser.h" />
@@ -654,7 +645,6 @@
     <ClInclude Include="FreeCoolDlg.h" />
     <ClInclude Include="global_variable.h" />
     <ClInclude Include="global_variable_extern.h" />
-    <ClInclude Include="globle_function.h" />
     <ClInclude Include="GraphicView.h" />
     <ClInclude Include="GridButton.h" />
     <ClInclude Include="GridFlashDlg.h" />

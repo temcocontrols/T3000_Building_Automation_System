@@ -373,7 +373,8 @@ int CWorkspaceBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
  //  m_image_list.Create(IDB_TREENODE_BMP,16,1,RGB(255,255,255));
 	CBitmap a;
 	a.LoadBitmap(IDB_TREENODE_BMP);
-	m_image_list.Create(24,24,ILC_COLOR24,1,1);
+	//m_image_list.Create(24,24,ILC_COLOR24,1,1);
+	m_image_list.Create(36, 24, ILC_COLOR24, 1, 1);
 	m_image_list.Add(&a,RGB(0,0,0));
     m_TreeCtrl.SetImageList(&m_image_list,TVSIL_NORMAL);
 
@@ -443,15 +444,14 @@ void CWorkspaceBar::OnFolderBrowerBtn()
 LRESULT CWorkspaceBar::OnNcHitTest(CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
-
-return 0;   // 使得 dockable pane 无法拖动了。
+	// 使得 dockable pane 无法拖动了。
+return 0;  
 	return CDockablePane::OnNcHitTest(point);
 }
 
 void CWorkspaceBar::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
-	 
+ 
 	CDockablePane::OnLButtonDown(nFlags, point);
 }
 

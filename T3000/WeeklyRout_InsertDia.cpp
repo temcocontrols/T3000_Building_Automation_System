@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "WeeklyRout_InsertDia.h"
 #include "schedule.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "schedule.h"
 
 

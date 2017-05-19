@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "T3ModulesOutputDlg.h"
 #include "afxdialogex.h"
-#include "globle_function.h"
+#include "global_function.h"
 
 // CT3ModulesOutputDlg dialog
 

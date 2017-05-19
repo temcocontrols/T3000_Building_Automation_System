@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "ParameterDlg.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "FreeCoolDlg.h"
 #include "OutsidDailog.h"
 
@@ -322,7 +322,11 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON_SHOW_MODBUS_ID, &CParameterDlg::OnBnClickedButtonShowModbusId)
 	END_MESSAGE_MAP()
 
-
+	/// <summary>
+	/// back fresh
+	/// </summary>
+	/// <param name="pParam"></param>
+	/// <returns></returns>
 DWORD WINAPI BackparaFreshProc(LPVOID pParam)
 {
     CParameterDlg* pdlg = (CParameterDlg*)pParam;
@@ -598,7 +602,9 @@ BOOL CParameterDlg::OnInitDialog()
     return TRUE;  // return TRUE unless you set the focus to a control
     // EXCEPTION: OCX Property Pages should return FALSE
 }
-
+/// <summary>
+/// InitPID2ComboBox
+/// </summary>
 void CParameterDlg::InitPID2ComboBox()
 {
     //m_inputSelect2.Clear();
@@ -700,13 +706,17 @@ void CParameterDlg::InitPID2ComboBox()
 }
 
 
-
+/// <summary>
+/// 
+/// </summary>
 void CParameterDlg::OnBnClickedOk()
 {
     // TODO: Add your control notification handler code here
     //OnOK();
 }
-
+/// <summary>
+/// 
+/// </summary>
 void CParameterDlg::OnBnClickedRefreshbutton()
 {
     Reflesh_ParameterDlg();

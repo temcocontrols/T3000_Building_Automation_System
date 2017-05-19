@@ -8,7 +8,7 @@
 #include "Schedule_grid.h"
 
 #include "AnnualRout_InsertDia.h"
-#include "globle_function.h"
+#include "global_function.h"
 // Annual_Routines ¶Ô»°¿ò
 #define GRID_ROW_NUMBER 16
 #define GRID_COL_NUMBER 3

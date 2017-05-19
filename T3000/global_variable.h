@@ -3,7 +3,7 @@
 #include "afxmt.h"
 #include "Bacnet_Include.h"
 #include "CM5\ud_str.h"
-#include "gloab_define.h"
+#include "global_define.h"
 #include "Global_Struct.h"
  
 CString USB_Serial;

@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "T3000DefaultView.h"
-#include "globle_function.h"
+#include "global_function.h"
 HBITMAP 	hBitmap_default_bmp;
 // CT3000DefaultView
 

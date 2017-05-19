@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "Config_Routines.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "Schedule_grid.h"
 
 

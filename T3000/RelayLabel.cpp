@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "RelayLabel.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "global_variable_extern.h"
  #include "../SQLiteDriver/CppSQLite3.h"
  

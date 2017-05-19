@@ -1,19 +1,19 @@
 #include "StdAfx.h"
 #include "DownloadSocket.h"
-#include "gloab_define.h"
+#include "global_define.h"
 extern char receive_buffer[4000];
 extern unsigned short totalpackage;
 extern unsigned short current_package;
 extern char download_filename[20];
 extern unsigned short download_fw_version;
 extern char receive_md5[20];
-extern int download_step ;
-extern unsigned int T3000_Version ; //T3000µÄ°æ±¾ºÅ.
+extern int download_step;
+extern unsigned int T3000_Version; //T3000ï¿½Ä°æ±¾ï¿½ï¿½.
 int Receive_data_length = 0;
 
-extern int total_file_length;	
+extern int total_file_length;
 int malloc_download_memory_size = 0;
-char * receivefile_buffer = NULL;
+char* receivefile_buffer = NULL;
 
 DownloadSocket::DownloadSocket(void)
 {
@@ -29,138 +29,122 @@ DownloadSocket::~DownloadSocket(void)
 void DownloadSocket::OnReceive(int nErrorCode)
 {
 	// TODO: Add your specialized code here and/or call the base class
-	memset(receive_buffer,0,4000);
-	Receive_data_length=Receive(receive_buffer,4000);
+	memset(receive_buffer, 0, 4000);
+	Receive_data_length = Receive(receive_buffer, 4000);
 
-	if(((unsigned char)receive_buffer[0]!= 0x55) || ((unsigned char)receive_buffer[1] !=0xff))
+	if (((unsigned char)receive_buffer[0] != 0x55) || ((unsigned char)receive_buffer[1] != 0xff))
 	{
 		CAsyncSocket::OnReceive(nErrorCode);
 		return;
 	}
-		
-	char *temp_point = receive_buffer;
+
+	char* temp_point = receive_buffer;
 	temp_point = temp_point + 4;
 
 	int crc_add = 0;
 	unsigned char crc_result = 0;
-	for (int i=0;i<Receive_data_length-1;i++)
+	for (int i = 0; i < Receive_data_length - 1; i++)
 	{
 		crc_add = crc_add + receive_buffer[i];
 	}
 	crc_result = crc_add % 256;
 
-	unsigned char ncommand  = *(temp_point++);
-	switch(ncommand)
+	unsigned char ncommand = *(temp_point++);
+	switch (ncommand)
 	{
 	case RETURN_FILE_SIZE:
 		{
-			if(Receive_data_length !=sizeof(Download_File_Return))
+			if (Receive_data_length != sizeof(Download_File_Return))
 			{
 				break;
 			}
-			totalpackage = ((unsigned char)temp_point[1]<<8) | ((unsigned char)temp_point[0]);
+			totalpackage = ((unsigned char)temp_point[1] << 8) | ((unsigned char)temp_point[0]);
 			temp_point = temp_point + 2;
-			memcpy(download_filename,temp_point,40);
+			memcpy(download_filename, temp_point, 40);
 			temp_point = temp_point + 40;
-			download_fw_version =  ((unsigned char)temp_point[1]<<8) | ((unsigned char)temp_point[0]);
-			//if(strstr(download_filename,"T3000_EXE")!=NULL)
-			//{
-			//	unsigned int temp_version = 0;
-			//	temp_version= receive_buffer[48]*256 + receive_buffer[47];
-			//	if(temp_version > T3000_Version)
-			//		download_step = SHOW_FTP_PATH;
-			//	else
-			//	{
-			//		PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_T3000_NO_UPDATE,NULL);
-			//		download_step = THREAD_IDLE;
-			//		break;
-			//	}
-			//}
-			//else
-				download_step = SEND_GET_MD5_VALUE;
+			download_fw_version = ((unsigned char)temp_point[1] << 8) | ((unsigned char)temp_point[0]);
 
-			malloc_download_memory_size = totalpackage  * TFTP_SEND_LENGTH;
-			receivefile_buffer =  new char[malloc_download_memory_size];
-			memset(receivefile_buffer,0,malloc_download_memory_size);
-			PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_FILE_INFO,NULL);
+			download_step = SEND_GET_MD5_VALUE;
 
-
-
+			malloc_download_memory_size = totalpackage * TFTP_SEND_LENGTH;
+			receivefile_buffer = new char[malloc_download_memory_size];
+			memset(receivefile_buffer, 0, malloc_download_memory_size);
+			PostMessage(m_parent_hwnd, WM_DOWNLOADFILE_MESSAGE, DOWNLOAD_FILE_INFO, NULL);
 		}
 		break;
-	case  ACK_MD5_VALUE:
+	case ACK_MD5_VALUE:
 		{
-			memset(receive_md5,0,20);
-			if(Receive_data_length != 26)
+			memset(receive_md5, 0, 20);
+			if (Receive_data_length != 26)
 			{
 				break;
 			}
-			memcpy_s(receive_md5,20,temp_point,20);
+			memcpy_s(receive_md5, 20, temp_point, 20);
 			temp_point = temp_point + 20;
 			download_step = CHECK_MD5_VALUE;
 		}
 		break;
-	case  TRANSFER_FILE_PAGE:
+	case TRANSFER_FILE_PAGE:
 		{
-			int ntemp_receive_package = ((unsigned char)temp_point[1]<<8) | ((unsigned char)temp_point[0]);
+			int ntemp_receive_package = ((unsigned char)temp_point[1] << 8) | ((unsigned char)temp_point[0]);
 			temp_point = temp_point + 2;
-			int ntemptotalpackage = ((unsigned char)temp_point[1]<<8) | ((unsigned char)temp_point[0]);
+			int ntemptotalpackage = ((unsigned char)temp_point[1] << 8) | ((unsigned char)temp_point[0]);
 			temp_point = temp_point + 2;
-			if((ntemptotalpackage != totalpackage) || (ntemp_receive_package > totalpackage))
+			if ((ntemptotalpackage != totalpackage) || (ntemp_receive_package > totalpackage))
 				break;
-			if(ntemp_receive_package != current_package)
+			if (ntemp_receive_package != current_package)
 				break;
-			if(ntemp_receive_package < ntemptotalpackage)
+			if (ntemp_receive_package < ntemptotalpackage)
 			{
 				memcpy_s(receivefile_buffer + TFTP_SEND_LENGTH * (ntemp_receive_package - 1),
-					TFTP_SEND_LENGTH,temp_point,TFTP_SEND_LENGTH);
+				         TFTP_SEND_LENGTH, temp_point, TFTP_SEND_LENGTH);
 				download_step = RECEIVE_WANTED_PACKAGE;
 				current_package = ntemp_receive_package + 1;
 			}
 			else
 			{
-				temp_point = temp_point - 3 - 4;	//ÐèÒª»Ø¹ýÍ·È¥µÃµ½ ´Ë°üµÄ³¤¶È;
-				
+				temp_point = temp_point - 3 - 4; //ï¿½ï¿½Òªï¿½Ø¹ï¿½Í·È¥ï¿½Ãµï¿½ ï¿½Ë°ï¿½ï¿½Ä³ï¿½ï¿½ï¿½;
+
 				int nlength;
-				nlength = ((unsigned char)temp_point[1]<<8) | ((unsigned char)temp_point[0]);
+				nlength = ((unsigned char)temp_point[1] << 8) | ((unsigned char)temp_point[0]);
 				nlength = nlength - 4 - 4;
-				if(nlength <=0 )
+				if (nlength <= 0)
 					break;
-				total_file_length = (ntemptotalpackage - 1) * TFTP_SEND_LENGTH + nlength ;
+				total_file_length = (ntemptotalpackage - 1) * TFTP_SEND_LENGTH + nlength;
 				temp_point = temp_point + 3 + 4;
 				memcpy_s(receivefile_buffer + TFTP_SEND_LENGTH * (ntemp_receive_package - 1),
-					nlength,temp_point,nlength);
+				         nlength, temp_point, nlength);
 				download_step = RECEIVE_COMPLET;
 			}
 
 			break;
 		}
 
-	case  DOWNLOAD_FILE_ERROR:
+	case DOWNLOAD_FILE_ERROR:
 		{
 			SetDownloadResults(DOWNLOAD_RESULTS_FAILED);
-			PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,RETURN_ERROR,DOWNLOAD_FILE_ERROR);
+			PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE, RETURN_ERROR, DOWNLOAD_FILE_ERROR);
 			download_step = THREAD_IDLE;
 		}
 		break;
-	case  HOST_BUSY:
+	case HOST_BUSY:
 		{
 			SetDownloadResults(DOWNLOAD_RESULTS_FAILED);
-			PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,RETURN_ERROR,HOST_BUSY);
+			PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE, RETURN_ERROR, HOST_BUSY);
 			download_step = THREAD_IDLE;
 		}
 		break;
 	case NO_MD5_FILE_EXSIT:
 		{
 			SetDownloadResults(DOWNLOAD_RESULTS_FAILED);
-			PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,RETURN_ERROR,NO_MD5_FILE_EXSIT);
+			PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE, RETURN_ERROR, NO_MD5_FILE_EXSIT);
 			download_step = THREAD_IDLE;
 		}
 		break;
-	default :
+	default:
 		{
 			SetDownloadResults(DOWNLOAD_RESULTS_FAILED);
-			PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,RETURN_ERROR,NULL);
+			PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE, RETURN_ERROR,NULL);
 			download_step = THREAD_IDLE;
 		}
 		break;
@@ -168,6 +152,7 @@ void DownloadSocket::OnReceive(int nErrorCode)
 
 	CAsyncSocket::OnReceive(nErrorCode);
 }
+
 void DownloadSocket::SetParentWindow(HWND n_hwnd)
 {
 	m_parent_hwnd = n_hwnd;
@@ -180,35 +165,31 @@ void DownloadSocket::SetDownloadResults(int ret_results)
 
 int DownloadSocket::GetDownloadResults()
 {
-	return	m_results ;
+	return m_results;
 }
 
 void DownloadSocket::OnConnect(int nErrorCode)
 {
 	// TODO: Add your specialized code here and/or call the base class
-	LPVOID	lpMsgBuf;
-	// TODO: Add your specialized code here and/or call the base class
-	if(!nErrorCode)
+	LPVOID lpMsgBuf;
+	if (!nErrorCode)
 	{
 		SetDownloadResults(DOWNLOAD_RESULTS_UNKNOW);
-		PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_CONNECT_SUCCESS,NULL);	//½¨Á¢Ì×½Ó×Ö,Á¬½Ó³É¹¦Ê±¾Í¿ªÊ¼ÇëÇó´«ÊäµÄÎÄ¼þ;
+		PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE, DOWNLOAD_CONNECT_SUCCESS,NULL); //ï¿½ï¿½ï¿½ï¿½ï¿½×½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½Ó³É¹ï¿½Ê±ï¿½Í¿ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½;
 		is_connect = true;
 	}
 	else
 	{
+		FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		              NULL, nErrorCode,MAKELANGID(LANG_NEUTRAL,SUBLANG_DEFAULT),
+		              (LPTSTR)&lpMsgBuf,
+		              0,
+		              NULL);
 
-		FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_IGNORE_INSERTS,
-			NULL,nErrorCode,MAKELANGID(LANG_NEUTRAL,SUBLANG_DEFAULT),
-			(LPTSTR)&lpMsgBuf,
-			0,
-			NULL);
-		//MessageBox((LPCTSTR)lpMsgBuf,"Error",MB_ICONERROR|MB_OK);
 		CString strMsg;
-		strMsg.Format(_T("Link Failed!\n\n%*sError ID:%d.Error Description:%s"),4,_T(""),nErrorCode,lpMsgBuf);
+		strMsg.Format(_T("Link Failed!\n\n%*sError ID:%d.Error Description:%s"), 4,_T(""), nErrorCode, lpMsgBuf);
 		AfxMessageBox(strMsg);
-		PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_CONNECT_FAILED,NULL);
-
-		//dlg->m_list_receive_box.InsertString(0,strMsg);
+		PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE, DOWNLOAD_CONNECT_FAILED,NULL);
 	}
 
 	CAsyncSocket::OnConnect(nErrorCode);
@@ -218,6 +199,6 @@ void DownloadSocket::OnConnect(int nErrorCode)
 void DownloadSocket::OnClose(int nErrorCode)
 {
 	// TODO: Add your specialized code here and/or call the base class
-	PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_DISCONNEC,NULL);
+	PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE, DOWNLOAD_DISCONNEC,NULL);
 	CAsyncSocket::OnClose(nErrorCode);
 }

@@ -87,16 +87,10 @@
     <ClCompile Include="FreeCoolDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="globle_function.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GraphicView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GridButton.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GridFlashDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GridLoad.cpp">
@@ -112,9 +106,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="InputSetDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="IODisplayBar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LabelEditDlg.cpp">
@@ -136,12 +127,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ManageAccountDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="monthview1.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="msflexgrid1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NetworkControllView.cpp">
@@ -174,9 +159,6 @@
     <ClCompile Include="ScanDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ScanSelectDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SetPtDayDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -195,13 +177,7 @@
     <ClCompile Include="T3000RegAddress.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="T3000TableView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="T3000View.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TDelayForm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Timer_Calibrate.cpp">
@@ -237,9 +213,6 @@
     <ClCompile Include="WeeklyRout_InsertDia.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WeeklySchedule.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="WorkspaceBar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -259,9 +232,6 @@
       <Filter>singleslider</Filter>
     </ClCompile>
     <ClCompile Include="CO2_View.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Scanwaydlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="IONameConfig.cpp">
@@ -369,13 +339,7 @@
     <ClCompile Include="LCOutNameConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RegisterViewerDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TemcoDataGrid.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="StaticDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RegisterWriteValueDlg.cpp">
@@ -405,9 +369,6 @@
     <ClCompile Include="BacnetView.cpp">
       <Filter>Bacnet</Filter>
     </ClCompile>
-    <ClCompile Include="DisplayLEDLCDConfig.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CO2NetView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -416,9 +377,6 @@
     </ClCompile>
     <ClCompile Include="BacnetSetting.cpp">
       <Filter>Bacnet</Filter>
-    </ClCompile>
-    <ClCompile Include="WhichOneToChooseDlg.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Class\md5.cpp">
       <Filter>ClassInfo</Filter>
@@ -448,9 +406,6 @@
       <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="Bacnetaddintodb.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CalibartionHT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PressureSensorForm.cpp">
@@ -710,6 +665,15 @@
     </ClCompile>
     <ClCompile Include="BacnetAddVirtualDevice.cpp">
       <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetRemotePortWarning.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="msflexgrid1.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="global_function.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1053,6 +1017,7 @@
     <None Include="res\toolbar_disable.bmp">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">
@@ -1113,9 +1078,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="global_variable_extern.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="globle_function.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GraphicView.h">
@@ -1794,6 +1756,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BacnetAddVirtualDevice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BADO\BADO.h">
+      <Filter>BADO</Filter>
+    </ClInclude>
+    <ClInclude Include="global_function.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

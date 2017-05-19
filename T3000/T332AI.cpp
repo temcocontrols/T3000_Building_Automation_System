@@ -6,7 +6,7 @@
 #include "T332AI.h"
 #include "Dialog_Progess.h"
  
-#include "globle_function.h"
+#include "global_function.h"
 #include "MainFrm.h"
 // T332AI
 CString Range_Unit_T332AI[]={_T("RAW DATA"),_T("TYPE2 10K C"),_T("TYPE2 10K F"),_T("0-100%"),_T("ON/OFF"),_T("OFF/ON"),_T("Pulse Input"),_T("Lighting Control"),_T("TYPE3 10K C"),_T("TYPE3 10K F"),_T("NO USE"),_T("0-5V"),_T("0-10V"),_T("0-20ma")};

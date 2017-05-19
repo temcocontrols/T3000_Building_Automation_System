@@ -4,23 +4,23 @@
 
 #include "stdafx.h"
 #include "T3000.h"
-#include "Scanwaydlg.h"
 #include "MainFrm.h"
 #include "T3000Doc.h"
-#include "T3000TableView.h"
+
 #include "T3000view.h"
 #include "WorkspaceBar.h"
 #include "NetworkControllView.h"
 #include "T3000DefaultView.h"
 #include "global_variable_extern.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "AddBuilding.h"
-#include "ScanSelectDlg.h"
+#include "StatusbarCtrl.h"
+CMyStatusbarCtrl * statusbar = NULL;
 
 #include "ISPModeSlove.h"
 #include "AllNodesDiaolg.h"
 #include "GridLoad.h"
-#include "GridFlashDlg.h"
+
 #include "ScanDbWaitDlg.h"
 #include "ChangePasswordDlg.h"
 #include "ManageAccountDlg.h"
@@ -38,7 +38,7 @@
 #include "Dialog_Progess.h"
 
 #include "excel9.h"
-#include "ScanSelectDlg.h"
+
 
 #include "BacnetTool.h"
 #include "BacnetAlarmWindow.h"
@@ -54,7 +54,7 @@ extern CDialog_Progess *WaitRead_Data_Dlg;
 
 #include "T38I13O.h"
 #include "T332AI.h"
-#include "gloab_define.h"
+#include "global_define.h"
 #include "ping.h"
 #include "BacnetUserlogin.h"
 #include "BacnetAddLabel.h"
@@ -70,7 +70,6 @@ HTREEITEM  hLastTreeItem =NULL;
 #include "BacnetWait.h"
 #include "BacnetScreenEdit.h"
 #include "LanguageLocale.h"
-#include "RegisterViewerDlg.h"
 #include "DebugWindow.h"
 
 #include "T36CT.h"
@@ -225,7 +224,7 @@ CEvent g_killMultiReadEvent;
 
 volatile HANDLE Read_Mutex=NULL;
 //CEvent g_pauseMultiReadEvent;
-extern CT3000TableView* pTableView;
+
 //BOOL g_bPauseMultiRead=FALSE;
 BOOL m_active_key_mouse = FALSE;
 //tree0412
@@ -242,6 +241,8 @@ BOOL m_active_key_mouse = FALSE;
 #endif
 
 
+
+//tree0412  2017 05 11 fance change
 #if 1
 #define TVINSERV_BUILDING 		    {tvInsert.item.iImage=0; tvInsert.item.iSelectedImage=0;}
 #define TVINSERV_FLOOR	 			{tvInsert.item.iImage=0; tvInsert.item.iSelectedImage=0;}
@@ -252,12 +253,12 @@ BOOL m_active_key_mouse = FALSE;
 #define TVINSERV_NET_WORK		    {tvInsert.item.iImage=12;tvInsert.item.iSelectedImage=12;}
 #define TVINSERV_MINIPANEL		    {tvInsert.item.iImage=14;tvInsert.item.iSelectedImage=14;} //MiniPanel
 #define TVINSERV_LC				    {tvInsert.item.iImage=26;tvInsert.item.iSelectedImage=26;} //Lightingcontroller
-#define TVINSERV_TSTAT6			    {tvInsert.item.iImage=16;tvInsert.item.iSelectedImage=18;}//tstat6
-#define TVINSERV_CO2			    {tvInsert.item.iImage=18;tvInsert.item.iSelectedImage=20;}//CO2
-#define TVINSERV_T3ARM			    {tvInsert.item.iImage=20;tvInsert.item.iSelectedImage=22;}//CO2
-#define TVINSERV_CS3000             {tvInsert.item.iImage=22;tvInsert.item.iSelectedImage=24;}//cs3000
-#define TVINSERV_TSTAT8			    {tvInsert.item.iImage=24;tvInsert.item.iSelectedImage=26;}//tstat6
-#define TVINSERV_T3LC			    {tvInsert.item.iImage=26;tvInsert.item.iSelectedImage=28;}//tstat6
+#define TVINSERV_TSTAT6			    {tvInsert.item.iImage=16;tvInsert.item.iSelectedImage=16;}//tstat6
+#define TVINSERV_CO2			    {tvInsert.item.iImage=18;tvInsert.item.iSelectedImage=18;}//CO2
+#define TVINSERV_T3ARM			    {tvInsert.item.iImage=20;tvInsert.item.iSelectedImage=20;}//CO2
+#define TVINSERV_CS3000             {tvInsert.item.iImage=22;tvInsert.item.iSelectedImage=22;}//cs3000
+#define TVINSERV_TSTAT8			    {tvInsert.item.iImage=24;tvInsert.item.iSelectedImage=24;}//tstat6
+#define TVINSERV_T3LC			    {tvInsert.item.iImage=26;tvInsert.item.iSelectedImage=26;}//tstat6
 #endif
 
 #define ITEM_MASK				TVIF_IMAGE|TVIF_SELECTEDIMAGE|TVIF_TEXT
@@ -692,6 +693,7 @@ void CMainFrame::InitViews()
                                 AFX_IDW_PANE_FIRST + nView, &newContext);
         m_pViews [nView]->OnInitialUpdate();//?
     }
+	((CDialogCM5_BacNet *)m_pViews[DLG_BACNET_VIEW])->InitialBacnetWindow();
 }
 void getLocalIp(void)
 {
@@ -861,8 +863,9 @@ int test_map_function()
 	return 0; 
 }
 #endif
-#include "StatusbarCtrl.h"
-CMyStatusbarCtrl * statusbar = NULL;
+
+
+
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
     if (CFrameWndEx::OnCreate(lpCreateStruct) == -1)
@@ -1220,10 +1223,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
         m_pDialogInfo->ShowWindow(SW_HIDE);
         m_pDialogInfo->CenterWindow();
         m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T(""));
-
-
-
-
     }
 
 
@@ -1249,7 +1248,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
         {
             product_type=CS3000;
         }
-        else if (nFlag==PM_T3PT12||nFlag==PM_T322AI||nFlag==PM_T38AI8AO6DO||nFlag==PM_T3PT10||nFlag==PM_T3IOA||nFlag==PM_T332AI||nFlag== PM_T38AI16O||nFlag==PM_T38I13O||nFlag==PM_T34AO||nFlag==PM_T36CT||nFlag==PM_T36CTA||nFlag==PM_T3PERFORMANCE)
+        else if (nFlag==PM_T3PT12||nFlag==PM_T322AI||nFlag==PM_T38AI8AO6DO||nFlag==PM_T3PT10||nFlag==PM_T3IOA||nFlag==PM_T332AI||nFlag== PM_T38AI16O||nFlag==PM_T38I13O||nFlag==PM_T34AO||nFlag==PM_T36CT||nFlag==PM_T36CTA || nFlag == PM_T3_LC ||nFlag==PM_T3PERFORMANCE)
 		 {
             product_type=T3000_T3_MODULES;
         }
@@ -1589,7 +1588,9 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 				DoConnectToANode(hSelItem);
 
 			}
-			else if (m_product.at(i).product_class_id == PM_T36CTA) //T3
+			else if (m_product.at(i).product_class_id == PM_T36CTA
+				||m_product.at(i).product_class_id == PM_T3_LC
+				) //T3
 			{
 				g_tstat_id = m_product.at(i).product_id;
 				/*SwitchToPruductType(DLG_DIALOGT3_VIEW);*/
@@ -2207,11 +2208,13 @@ void CMainFrame::LoadProductFromDB()
 							temp_product_class_id == PM_T322AI ||
 							temp_product_class_id == PM_T3PT12 ||
 							temp_product_class_id == PM_T36CTA ||
-							temp_product_class_id == PM_T38AI8AO6DO)
+							temp_product_class_id == PM_T3_LC ||
+							temp_product_class_id == PM_T38AI8AO6DO
+							)
 							TVINSERV_T3ARM
 						else if (temp_product_class_id ==PM_MINIPANEL )//Mini Panel
 						TVINSERV_MINIPANEL
-						else if (temp_product_class_id == PM_AirQuality) //AirQuality
+						else if (temp_product_class_id == PM_AirQuality)//AirQuality
 							TVINSERV_TSTAT_DEFAULT
 						else if (temp_product_class_id == PM_LightingController)//Lightingcontroller
 						TVINSERV_LC          //tree0412
@@ -2221,7 +2224,12 @@ void CMainFrame::LoadProductFromDB()
 						TVINSERV_TSTAT6
 						else if(temp_product_class_id == PM_TSTAT8|| temp_product_class_id == PM_TSTAT8_WIFI || temp_product_class_id == PM_TSTAT8_OCC || temp_product_class_id == PM_TSTAT8_220V)
 						TVINSERV_TSTAT8
-						else if((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485)||(temp_product_class_id == PM_PRESSURE_SENSOR)|| (temp_product_class_id == STM32_CO2_NET)||(temp_product_class_id == STM32_CO2_RS485))
+						else if((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485)||
+							(temp_product_class_id == PM_PRESSURE_SENSOR)|| 
+							(temp_product_class_id == STM32_PRESSURE_NET) ||
+							(temp_product_class_id == STM32_PRESSURE_RS3485) ||
+							(temp_product_class_id == STM32_CO2_NET)||
+							(temp_product_class_id == STM32_CO2_RS485))
 						TVINSERV_CO2
 						else if (temp_product_class_id == PM_CS_SM_AC||temp_product_class_id == PM_CS_SM_DC||temp_product_class_id == PM_CS_RSM_AC||temp_product_class_id == PM_CS_RSM_DC)
 							TVINSERV_CS3000
@@ -2436,6 +2444,7 @@ void CMainFrame::LoadProductFromDB()
 								temp_product_class_id == PM_T322AI ||
 								temp_product_class_id == PM_T3PT12 ||
 								temp_product_class_id == PM_T36CTA ||
+								
 								temp_product_class_id == PM_T38AI8AO6DO)
 								TVINSERV_T3ARM
 							else if (temp_product_class_id == PM_MINIPANEL)//Mini Panel
@@ -2450,7 +2459,12 @@ void CMainFrame::LoadProductFromDB()
 								TVINSERV_TSTAT6
 							else if (temp_product_class_id == PM_TSTAT8 || temp_product_class_id == PM_TSTAT8_WIFI || temp_product_class_id == PM_TSTAT8_OCC || temp_product_class_id == PM_TSTAT8_220V)
 								TVINSERV_TSTAT8
-							else if ((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485) || (temp_product_class_id == PM_PRESSURE_SENSOR) || (temp_product_class_id == STM32_CO2_NET) || (temp_product_class_id == STM32_CO2_RS485))
+							else if ((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485) ||
+								(temp_product_class_id == PM_PRESSURE_SENSOR) ||
+								(temp_product_class_id == STM32_PRESSURE_NET) ||
+								(temp_product_class_id == STM32_PRESSURE_RS3485) ||
+								(temp_product_class_id == STM32_CO2_NET) ||
+								(temp_product_class_id == STM32_CO2_RS485))
 								TVINSERV_CO2
 							else if (temp_product_class_id == PM_CS_SM_AC || temp_product_class_id == PM_CS_SM_DC || temp_product_class_id == PM_CS_RSM_AC || temp_product_class_id == PM_CS_RSM_DC)
 								TVINSERV_CS3000
@@ -2659,6 +2673,7 @@ void CMainFrame::LoadProductFromDB()
 					temp_product_class_id == PM_T322AI ||
 					temp_product_class_id == PM_T3PT12 ||
 					temp_product_class_id == PM_T36CTA ||
+					
 					temp_product_class_id == PM_T38AI8AO6DO)
 					TVINSERV_T3ARM
 				else if (temp_product_class_id == PM_MINIPANEL)//Mini Panel
@@ -2673,7 +2688,12 @@ void CMainFrame::LoadProductFromDB()
 					TVINSERV_TSTAT6
 				else if (temp_product_class_id == PM_TSTAT8 || temp_product_class_id == PM_TSTAT8_WIFI || temp_product_class_id == PM_TSTAT8_OCC || temp_product_class_id == PM_TSTAT8_220V)
 					TVINSERV_TSTAT8
-				else if ((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485) || (temp_product_class_id == PM_PRESSURE_SENSOR) || (temp_product_class_id == STM32_CO2_NET) || (temp_product_class_id == STM32_CO2_RS485))
+				else if ((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485) ||
+					(temp_product_class_id == PM_PRESSURE_SENSOR) ||
+					(temp_product_class_id == STM32_PRESSURE_NET) ||
+					(temp_product_class_id == STM32_PRESSURE_RS3485) ||
+					(temp_product_class_id == STM32_CO2_NET) ||
+					(temp_product_class_id == STM32_CO2_RS485))
 					TVINSERV_CO2
 				else if (temp_product_class_id == PM_CS_SM_AC || temp_product_class_id == PM_CS_SM_DC || temp_product_class_id == PM_CS_RSM_AC || temp_product_class_id == PM_CS_RSM_DC)
 					TVINSERV_CS3000
@@ -3205,7 +3225,12 @@ void CMainFrame::ScanTstatInDB(void)
 						TVINSERV_TSTAT6
 					else if (temp_product_class_id == PM_TSTAT8 || temp_product_class_id == PM_TSTAT8_WIFI || temp_product_class_id == PM_TSTAT8_OCC || temp_product_class_id == PM_TSTAT8_220V)
 						TVINSERV_TSTAT8
-					else if ((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485) || (temp_product_class_id == PM_PRESSURE_SENSOR) || (temp_product_class_id == STM32_CO2_NET) || (temp_product_class_id == STM32_CO2_RS485))
+					else if ((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485) ||
+						(temp_product_class_id == PM_PRESSURE_SENSOR) ||
+						(temp_product_class_id == STM32_PRESSURE_NET) ||
+						(temp_product_class_id == STM32_PRESSURE_RS3485) ||
+						(temp_product_class_id == STM32_CO2_NET) ||
+						(temp_product_class_id == STM32_CO2_RS485))
 						TVINSERV_CO2
 					else if (temp_product_class_id == PM_CS_SM_AC || temp_product_class_id == PM_CS_SM_DC || temp_product_class_id == PM_CS_RSM_AC || temp_product_class_id == PM_CS_RSM_DC)
 						TVINSERV_CS3000
@@ -3387,7 +3412,7 @@ void CMainFrame::OnLoadConfigFile()
         return;
     }
 	else if(((g_protocol == MODBUS_RS485) || (g_protocol ==MODBUS_TCPIP)) &&  
-		((bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PID_T3PT12) || (bacnet_device_type == PID_T36CTA) || (bacnet_device_type == PWM_TRANSDUCER)))
+		((bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PM_T3_LC) || (bacnet_device_type == PID_T3PT12) || (bacnet_device_type == PID_T36CTA) || (bacnet_device_type == PWM_TRANSDUCER)))
 	{
 		CFileDialog dlg(true,_T("*.prg"),_T(" "),OFN_HIDEREADONLY ,_T("Prg files (*.prg)|*.prg||"),NULL,0);
 		if(IDOK!=dlg.DoModal())
@@ -4351,7 +4376,8 @@ void CMainFrame::ClearBuilding()
 
     //
     int n=m_buildingLst.size();
-    m_pTreeViewCrl->DeleteAllItems();
+	if(m_pTreeViewCrl->m_hWnd != NULL)
+		m_pTreeViewCrl->DeleteAllItems();
     m_comportlist.clear();
 //	m_subNetLst.clear();
     m_floorLst.clear();
@@ -6190,7 +6216,7 @@ void CMainFrame::SaveConfigFile()
         return;
     }
 	else if(((g_protocol == MODBUS_RS485) || (g_protocol ==MODBUS_TCPIP)) &&  
-		    ((bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PID_T3PT12) || (bacnet_device_type == PID_T36CTA) || (bacnet_device_type == PWM_TRANSDUCER)))
+		    ((bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PM_T3_LC) || (bacnet_device_type == PID_T3PT12) || (bacnet_device_type == PID_T36CTA) || (bacnet_device_type == PWM_TRANSDUCER)))
 	{
 		//T3的设备支持minipanel的 input output 就读10000以后的寄存器;
 		MainFram_hwd = this->m_hWnd;
@@ -6606,6 +6632,8 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
         //AfxMessageBox(_T("There is no default building,please select a building First."));
         BOOL bTemp = g_bEnableRefreshTreeView ;
         g_bEnableRefreshTreeView = FALSE;
+		if(m_pTreeViewCrl->m_hWnd == NULL)
+			return 0;
         ScanTstatInDB();
 
         int temp_select_serial = m_pTreeViewCrl->GetSelectSerialNumber();
@@ -6957,221 +6985,10 @@ void CMainFrame::OnToolRefreshLeftTreee()
     EndWaitCursor();
 
 }
-
-int* Pool1234()
-{
-	int *x;
-	int a[2] = { 0,1 };
-	a[0] = 5;
-	//将数组的基地址赋值给整型指针  
-	x = &a[0];
-	//返回整个数组  
-	return x;
-}
-
-int  add(int  a, int  b)
-
-{
-
-	return  a + b;
-
-}
-const char* testValue = "BruceZhang";
-char gstr[30] = { 0 };
-char* Func_1(void)
-{
-	char str[30] = "Bruce";
-	//cout << "str:" << str << endl;
-
-	return str;
-}
-
-char* Func_2(void)
-{
-	strcpy(gstr, testValue);
-	//cout << "gstr:" << gstr << endl;
-	return gstr;
-}
-
-
-//void quick_sort_serialnumber(int serial_array[], int length)
-//{
-//	int start = 0;
-//	int end = length - 1;
-//	int set_value = serial_array[start];
-//	while (1 > length)
-//		return;
-//	while (end > start)
-//	{
-//		while (end > start)
-//		{
-//			if (serial_array[end--] < set_value)
-//			{
-//				serial_array[start++] = serial_array[++end];
-//				break;
-//			}
-//		}
-//
-//		while (end > start)
-//		{
-//			if (serial_array[start++] > set_value)
-//			{
-//				serial_array[end--] = serial_array[--start];
-//				break;
-//			}
-//		}
-//	}
-//
-//	serial_array[start] = set_value;
-//	quick_sort_serialnumber(serial_array, start);
-//	quick_sort_serialnumber(serial_array + start + 1, length - start - 1);
-//
-//}
-
-
-typedef struct Mystu
-{
-	int index;
-	string name;
-	bool operator> (const Mystu & other);
-	bool operator< (const Mystu & other);
-};
-
-bool Mystu::operator> (const Mystu & other)
-{
-	//strcmp(name,)
-	if (name >other.name)
-		return true;
-	return false;
-}
-
-bool Mystu::operator< (const Mystu & other)
-{
-
-	if (name <other.name)
-		return true;
-	return false;
-}
-template<class ElemType>
-void quick_sort_serial(ElemType array[], int length)
-{
-	int start = 0;
-	int end = length - 1;
-	ElemType setpoint = array[start];
-	if (length < 1)
-		return;
-	while (end > start)
-	{
-		while (end > start)
-		{
-			if (array[end--] < setpoint)
-			{
-				array[start++] = array[++end];
-				break;
-			}
-		}
-
-		while (end > start)
-		{
-			if (array[start++] > setpoint)
-			{
-				array[end--] = array[--start];
-				break;
-			}
-		}
-	}
-	array[start] = setpoint;
-	quick_sort_serial(array, start);
-	quick_sort_serial(array + start + 1,length - start - 1);
-
-}
-
-template <class T, int I> class MyCList
-{
-public:
-	int SetItem(int Index, const T &Item)
-	{
-		if ((Index<0) || (Index>I - 1))
-			return 0; // 出错
-		Buffer[Index] = Item;
-		return 1; // 成功
-	};
-	int GetItem(int Index, T &Item);
-private:
-	T Buffer[];
-};
-
-//template<class T, int I> int CList<T, I>::SetItem(int Index, const T &Item)
-//{
-//	if ((Index<0) || (Index>I - 1))
-//		return 0; // 出错
-//	Buffer[Index] = Item;
-//	return 1; // 成功
-//}
-
-template<class ElemType>
-void Swap(ElemType& a, ElemType& b)
-{
-	ElemType c = a;
-	a = b;
-	b = c;
-}
-
-template<class ElemType>
-void SelectionSort(ElemType data[], int n)
-{
-	int i, j, min;
-	for (i = 0; i < n; i++) 
-	{
-		min = i;//得出最小的
-		for (j = i + 1; j < n; j++) {
-			if (data[j] < data[min])
-				min = j;
-		}
-		Swap(data[i], data[min]);
-	}
-}
-
-// 将数组data中，[lptr...rptr-1][rptr...rightEnd]两部分的元素进行合并
-// tmpArr为合并时的辅存空间
-template<class ElemType>
-void Merge(ElemType data[], ElemType tmpArr[], int lptr, int rptr, int rightEnd)
-{
-	int leftEnd = rptr - 1;
-	int ptr, i;
-	ptr = i = lptr;
-	while (lptr <= leftEnd && rptr <= rightEnd)
-		if (data[lptr] <= data[rptr])
-			tmpArr[ptr++] = data[lptr++];
-		else
-			tmpArr[ptr++] = data[rptr++];
-	while (lptr <= leftEnd)
-		tmpArr[ptr++] = data[lptr++];
-	while (rptr <= rightEnd)
-		tmpArr[ptr++] = data[rptr++];
-	for (;i <= rightEnd; i++)
-		data[i] = tmpArr[i];
-}
-
-// 非递归实现
-template<class ElemType>
-void MPass(ElemType data[], ElemType tmpArr[], int n, int mergeLength)
-{
-	int i = 0;
-	while (i <= n - 2 * mergeLength) {
-		Merge(data, tmpArr, i, i + mergeLength, i + 2 * mergeLength - 1);
-		i = i + 2 * mergeLength;
-	}
-	if (i + mergeLength < n)
-		Merge(data, tmpArr, i, i + mergeLength, n - 1);
-}
-
-
-
 #include "ScanDlg.h"
 void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 {
-
+     
 	CppSQLite3DB SqliteDBT3000;
 	CppSQLite3DB SqliteDBBuilding;
 	CppSQLite3Table table;
@@ -7508,6 +7325,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				bacnet_device_type = PID_T3PT12;
 			else if(product_Node.product_class_id == PM_T36CTA)
 				bacnet_device_type = PM_T36CTA;
+			else if (product_Node.product_class_id == PM_T3_LC)
+				bacnet_device_type = PM_T3_LC;
+
 
 			else if(product_Node.product_class_id == STM32_HUM_NET)
 				bacnet_device_type = STM32_HUM_NET;
@@ -7563,6 +7383,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					bacnet_device_type = PID_T3PT12;
 				else if(product_Node.product_class_id == PM_T36CTA)
 					bacnet_device_type = PID_T36CTA;
+				else if (product_Node.product_class_id == PM_T3_LC)
+					bacnet_device_type = PM_T3_LC;
                 CString temp_csa;
                 temp_csa =  product_Node.BuildingInfo.strComPort;
                 temp_csa = temp_csa.Right(temp_csa.GetLength() - 3);
@@ -8337,8 +8159,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     else if (nFlag==PM_T3PT10||nFlag==PM_T3IOA||nFlag==PM_T332AI||nFlag== PM_T38AI16O||nFlag==PM_T38I13O||
                              nFlag==PM_T34AO||nFlag==PM_T36CT||nFlag==PM_T3PERFORMANCE||
                              nFlag == PM_T322AI||
-							  nFlag == PM_T3PT12||
-							   nFlag == PM_T36CTA||
+							 nFlag == PM_T3PT12||
+							 nFlag == PM_T36CTA||
+						     nFlag == PM_T3_LC ||
                              nFlag == PM_T38AI8AO6DO)
                     {
                         product_type=T3000_T3_MODULES;
@@ -8815,8 +8638,13 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             {
                 SwitchToPruductType(DLG_CO2_NET_VIEW);
             }
-	else if ((product_register_value[7]==PM_CO2_RS485&&product_register_value[14] == 6)||nFlag==PM_AirQuality||nFlag==PM_HUM_R||product_register_value[7]==PM_HUMTEMPSENSOR||product_register_value[7]==STM32_HUM_NET||product_register_value[7]==STM32_HUM_RS485)
-				//else if (nFlag==PM_AirQuality||nFlag==PM_HUM_R||nFlag==PM_HUMTEMPSENSOR)
+	else if ((product_register_value[7]==PM_CO2_RS485&&product_register_value[14] == 6)||
+		nFlag==PM_AirQuality||nFlag==PM_HUM_R||
+		product_register_value[7]==PM_HUMTEMPSENSOR||
+		product_register_value[7]==STM32_HUM_NET||
+		product_register_value[7] == STM32_PRESSURE_NET ||
+		product_register_value[7]==STM32_HUM_RS485
+		)
 			{ 
 				SwitchToPruductType(DLG_AIRQUALITY_VIEW);
 			}
@@ -8842,7 +8670,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
                 SwitchToPruductType(DLG_DIALOG_TSTAT_INPUT_VIEW);
             }
-            else if (nFlag == PM_T322AI || nFlag == CS3000 || nFlag == PWM_TRANSDUCER || nFlag == PM_T38AI8AO6DO || nFlag == PM_T3PT12 || nFlag == PM_T36CTA )
+            else if (nFlag == PM_T322AI || nFlag == CS3000 || nFlag == PWM_TRANSDUCER || nFlag == PM_T38AI8AO6DO || nFlag == PM_T3PT12 || nFlag == PM_T36CTA||nFlag == PM_T3_LC )
             {
 				//就说明是加了minipanel 10000以后寄存器的; 否则的话就跳转至以前的界面;
 				new_device_support_mini_ui = true;
@@ -9324,7 +9152,7 @@ end_condition :
 				m_product.at(i).status_last_time[2] = m_product.at(i).status_last_time[1] ;
 				m_product.at(i).status_last_time[1] = m_product.at(i).status_last_time[0] ;
 				m_product.at(i).status_last_time[0] = temp_online ;
-				m_product.at(i).status = m_product.at(i).status_last_time[0] || m_product.at(i).status_last_time[1] || m_product.at(i).status_last_time[2];
+				m_product.at(i).status = m_product.at(i).status_last_time[0];// || m_product.at(i).status_last_time[1] || m_product.at(i).status_last_time[2];
 				continue;
             }
         }
@@ -10944,8 +10772,33 @@ loop1:
 					unsigned short write_buffer[200];
 					memset(write_buffer,0,400);
 					int test_value1 = 0;
-					switch( My_WriteList_Struct->command )
+					switch( (unsigned char)My_WriteList_Struct->command )
 					{
+					case WRITEANALOG_CUS_TABLE_T3000:
+					{
+						memcpy(write_buffer, &m_analog_custmer_range.at(My_WriteList_Struct->start_instance), sizeof(Str_table_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
+						for (int j = 0;j < 200;j++)
+						{
+							write_buffer[j] = htons(write_buffer[j]);
+						}
+						test_value1 = Write_Multi_org_short(g_tstat_id, write_buffer, BAC_CUSTOMER_TABLE_START + 53 * My_WriteList_Struct->start_instance, 53, 4);
+
+						_MessageInvokeIDInfo *pMy_Invoke_id = new _MessageInvokeIDInfo;
+						pMy_Invoke_id->hwnd = My_WriteList_Struct->hWnd;
+						pMy_Invoke_id->mCol = My_WriteList_Struct->ItemInfo.nCol;
+						pMy_Invoke_id->mRow = My_WriteList_Struct->ItemInfo.nRow;
+						pMy_Invoke_id->task_info = My_WriteList_Struct->Write_Info;
+
+						if (test_value1 > 0)
+						{
+							::PostMessage(pMy_Invoke_id->hwnd, MY_RESUME_DATA, (WPARAM)WRITE_SUCCESS, (LPARAM)pMy_Invoke_id);
+						}
+						else
+						{
+							::PostMessage(pMy_Invoke_id->hwnd, MY_RESUME_DATA, (WPARAM)WRITE_FAIL, (LPARAM)pMy_Invoke_id);
+						}
+					}
+					break;
 					case WRITEOUTPUT_T3000:
 						{
 							memcpy( write_buffer,&m_Output_data.at(My_WriteList_Struct->start_instance),sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
@@ -11379,7 +11232,7 @@ void CMainFrame::OnControlMain()
             SwitchToPruductType(DLG_T3000_VIEW);
         }
         else if (product_type == CS3000||product_register_value[7]==PM_T322AI || product_register_value[7] == PWM_TRANSDUCER ||product_register_value[7]==PM_T38AI8AO6DO || product_register_value[7]==PM_T3PT12
-		|| product_register_value[7]==PM_T36CTA)
+		|| product_register_value[7]==PM_T36CTA||product_register_value[7] == PM_T3_LC)
         {
 		 
             bacnet_view_number = TYPE_TSTAT;
@@ -11441,8 +11294,13 @@ void CMainFrame::OnControlMain()
 		{
 			SwitchToPruductType(DLG_CO2_NET_VIEW);
 		}
-		else if ((product_register_value[7]==PM_CO2_RS485&&product_register_value[14] == 6)||product_register_value[7]==PM_AirQuality||product_register_value[7]==PM_HUM_R||product_register_value[7]==PM_HUMTEMPSENSOR||product_register_value[7]==STM32_HUM_NET||product_register_value[7]==STM32_HUM_RS485)
-			//else if (nFlag==PM_AirQuality||nFlag==PM_HUM_R||nFlag==PM_HUMTEMPSENSOR)
+		else if ((product_register_value[7]==PM_CO2_RS485&&product_register_value[14] == 6)
+			||product_register_value[7]==PM_AirQuality||
+			product_register_value[7]==PM_HUM_R||
+			product_register_value[7]==PM_HUMTEMPSENSOR||
+			product_register_value[7]==STM32_HUM_NET||
+			product_register_value[7] == STM32_PRESSURE_NET ||
+			product_register_value[7]==STM32_HUM_RS485)
 		{ 
 			SwitchToPruductType(DLG_AIRQUALITY_VIEW);
 		} 
@@ -11456,16 +11314,23 @@ void CMainFrame::OnControlInputs()
 
     // TODO: Add your command handler code here
 
-    if((g_protocol == PROTOCOL_BACNET_IP) || 
-		(g_protocol == MODBUS_BACNET_MSTP) || 
-		(g_protocol == PROTOCOL_BIP_TO_MSTP)||
-		((g_protocol == MODBUS_RS485 ) && ((product_type == PM_MINIPANEL)  
-			|| ( ( (bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI)
-			|| (bacnet_device_type == PID_T3PT12) || (bacnet_device_type == PWM_TRANSDUCER))  
+    if(  (g_protocol == PROTOCOL_BACNET_IP) || 
+		 (g_protocol == MODBUS_BACNET_MSTP) || 
+		 (g_protocol == PROTOCOL_BIP_TO_MSTP)||
+		 ((g_protocol == MODBUS_RS485 ) && 
+		  (
+			 (product_type == PM_MINIPANEL)|| 
+			  ( ( (bacnet_device_type == T38AI8AO6DO) 
+				  || (bacnet_device_type == PID_T322AI)
+			      || (bacnet_device_type == PID_T3PT12) 
+				  || (bacnet_device_type == PM_T3_LC)
+				  || (bacnet_device_type == PWM_TRANSDUCER))  
 				&& new_device_support_mini_ui ) ) ) ||
-		((g_protocol == MODBUS_TCPIP ) && 
+		
+		   ((g_protocol == MODBUS_TCPIP ) && 
 		( ( (bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) 
 			|| (bacnet_device_type == PID_T3PT12) 
+			|| (bacnet_device_type == PM_T3_LC)
 			|| (bacnet_device_type == PID_T36CTA)
 			) && new_device_support_mini_ui  )  ))
     {
@@ -11490,7 +11355,7 @@ void CMainFrame::OnControlInputs()
 
 				UINT temp = ::GetWindowLong(pActiveView->m_hWnd, GWL_ID);
 				::SetWindowLong(pActiveView->m_hWnd, GWL_ID,
-					::GetWindowLong(pNewView->m_hWnd, GWL_ID));
+				::GetWindowLong(pNewView->m_hWnd, GWL_ID));
 				::SetWindowLong(pNewView->m_hWnd, GWL_ID, temp);
 				pActiveView->ShowWindow(SW_HIDE);
 				pNewView->ShowWindow(SW_SHOW);
@@ -11544,8 +11409,11 @@ void CMainFrame::OnControlInputs()
 		else if((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP))
 		{
 			hide_485_progress = false;
+			::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, bacnet_device_type, BAC_IN);//第二个参数 In
+
+			//::SendMessage(BacNet_hwd, WM_RS485_MESSAGE, bacnet_device_type, READANALOG_CUS_TABLE_T3000);//第二个参数 READANALOG_CUS_TABLE_T3000
 			::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
-			::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type,BAC_IN);//第二个参数 In
+
 		}
         else
         {
@@ -11656,9 +11524,21 @@ void CMainFrame::OnControlOutputs()
     if((g_protocol == PROTOCOL_BACNET_IP) || 
 		(g_protocol == MODBUS_BACNET_MSTP) || 
 		(g_protocol == PROTOCOL_BIP_TO_MSTP) || 
-		((g_protocol == MODBUS_RS485 ) && ((product_type == PM_MINIPANEL)  || ( ( (bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PWM_TRANSDUCER) || (bacnet_device_type == PID_T3PT12)  )  
+		((g_protocol == MODBUS_RS485 ) &&
+		((product_type == PM_MINIPANEL) 
+			|| ( ( (bacnet_device_type == T38AI8AO6DO)
+				|| (bacnet_device_type == PID_T322AI) 
+				|| (bacnet_device_type == PM_T3_LC)
+				|| (bacnet_device_type == PWM_TRANSDUCER) 
+				|| (bacnet_device_type == PID_T3PT12)  )  
 			&& new_device_support_mini_ui ) ) ) ||
-		((g_protocol == MODBUS_TCPIP ) && ( ( (bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PID_T3PT12) || (bacnet_device_type == PID_T36CTA)) && new_device_support_mini_ui  )  ))
+		((g_protocol == MODBUS_TCPIP ) && 
+		( ( (bacnet_device_type == T38AI8AO6DO) || 
+			(bacnet_device_type == PID_T322AI) || 
+			(bacnet_device_type == PID_T3PT12) || 
+			(bacnet_device_type == PM_T3_LC)||
+			(bacnet_device_type == PID_T36CTA)) 
+			&& new_device_support_mini_ui  )  ))
 	{
 
 		if(BacNet_hwd == NULL)
@@ -12065,6 +11945,7 @@ void CMainFrame::OnControlSettings()
 	else if (product_type == CS3000||product_register_value[7]==PM_T322AI || product_register_value[7] == PWM_TRANSDUCER ||product_register_value[7]==PM_T38AI8AO6DO
 	              ||product_register_value[7]==PM_T3PT12
 				  ||product_register_value[7]==PM_T36CTA
+					|| product_register_value[7] == PM_T3_LC
 	             ||product_register_value[7]==STM32_HUM_NET )
 	{
 		HideBacnetWindow();

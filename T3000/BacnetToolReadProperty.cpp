@@ -5,10 +5,10 @@
 #include "T3000.h"
 #include "BacnetToolReadProperty.h"
 #include "afxdialogex.h"
-extern int object_instance ;
-extern int object_identifier ;
-extern int property_identifier ;
-extern bool read_property_cancel ;
+extern int object_instance;
+extern int object_identifier;
+extern int property_identifier;
+extern bool read_property_cancel;
 // CBacnetToolReadProperty dialog
 
 IMPLEMENT_DYNAMIC(CBacnetToolReadProperty, CDialogEx)
@@ -16,7 +16,6 @@ IMPLEMENT_DYNAMIC(CBacnetToolReadProperty, CDialogEx)
 CBacnetToolReadProperty::CBacnetToolReadProperty(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CBacnetToolReadProperty::IDD, pParent)
 {
-
 }
 
 CBacnetToolReadProperty::~CBacnetToolReadProperty()
@@ -47,7 +46,7 @@ void CBacnetToolReadProperty::OnBnClickedBtnBacSend()
 	// TODO: Add your control notification handler code here
 	CString temp_instance;
 	m_instance_edit.GetWindowTextW(temp_instance);
-	if(temp_instance.IsEmpty())
+	if (temp_instance.IsEmpty())
 	{
 		object_instance = 0;
 	}
@@ -55,8 +54,8 @@ void CBacnetToolReadProperty::OnBnClickedBtnBacSend()
 	{
 		object_instance = _wtoi(temp_instance);
 	}
-	object_identifier =	m_combo_object_identifier.GetCurSel();
-	property_identifier =	m_combo_property_identifier.GetCurSel();
+	object_identifier = m_combo_object_identifier.GetCurSel();
+	property_identifier = m_combo_property_identifier.GetCurSel();
 	read_property_cancel = false;
 	PostMessage(WM_CLOSE,NULL,NULL);
 }
@@ -65,9 +64,9 @@ void CBacnetToolReadProperty::OnBnClickedBtnBacSend()
 BOOL CBacnetToolReadProperty::PreTranslateMessage(MSG* pMsg)
 {
 	// TODO: Add your specialized code here and/or call the base class
-	if(pMsg->message == WM_KEYDOWN)
+	if (pMsg->message == WM_KEYDOWN)
 	{
-		if(pMsg->wParam == VK_RETURN)
+		if (pMsg->wParam == VK_RETURN)
 			OnBnClickedBtnBacSend();
 	}
 	return CDialogEx::PreTranslateMessage(pMsg);
@@ -80,7 +79,7 @@ BOOL CBacnetToolReadProperty::OnInitDialog()
 
 	// TODO:  Add extra initialization here
 	Initial_combo();
-	return TRUE;  // return TRUE unless you set the focus to a control
+	return TRUE; // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
@@ -90,51 +89,50 @@ void CBacnetToolReadProperty::Initial_combo()
 	m_combo_service_choice.SetCurSel(0);
 	GetDlgItem(IDC_TOOL_NETWORK_EDIT)->SetWindowTextW(_T("0"));
 
-	const char * temp = NULL;
-	
+	const char* temp = NULL;
+
 	CString Add_CString;
 	char temp_char[100];
 	CString temp_1;
-	for (int i=0;i<=OBJECT_LIGHTING_OUTPUT;i++)
+	for (int i = 0; i <= OBJECT_LIGHTING_OUTPUT; i++)
 	{
 		temp_1.Empty();
-		temp_1.Format(_T("( %d )"),i);
+		temp_1.Format(_T("( %d )"), i);
 		Add_CString.Empty();
-		memset(temp_char,0,sizeof(temp_char));
+		memset(temp_char, 0, sizeof(temp_char));
 		temp = bactext_object_type_name(i);
-		strcpy_s(temp_char,100,temp);
-		::MultiByteToWideChar(CP_ACP,0,temp_char,strlen(temp_char) + 1,Add_CString.GetBuffer(MAX_PATH),MAX_PATH);
+		strcpy_s(temp_char, 100, temp);
+		::MultiByteToWideChar(CP_ACP, 0, temp_char, strlen(temp_char) + 1, Add_CString.GetBuffer(MAX_PATH),MAX_PATH);
 		Add_CString.ReleaseBuffer();
 		Add_CString = Add_CString + temp_1;
 		m_combo_object_identifier.AddString(Add_CString);
 		m_combo_object_identifier.SetCurSel(8);
 	}
 
-	for (int i=0;i<=PROP_EGRESS_ACTIVE;i++)
+	for (int i = 0; i <= PROP_EGRESS_ACTIVE; i++)
 	{
 		temp_1.Empty();
-		temp_1.Format(_T("( %d )"),i);
+		temp_1.Format(_T("( %d )"), i);
 		Add_CString.Empty();
-		memset(temp_char,0,sizeof(temp_char));
+		memset(temp_char, 0, sizeof(temp_char));
 		temp = bactext_property_name(i);
-		strcpy_s(temp_char,100,temp);
-		::MultiByteToWideChar(CP_ACP,0,temp_char,strlen(temp_char) + 1,Add_CString.GetBuffer(MAX_PATH),MAX_PATH);
+		strcpy_s(temp_char, 100, temp);
+		::MultiByteToWideChar(CP_ACP, 0, temp_char, strlen(temp_char) + 1, Add_CString.GetBuffer(MAX_PATH),MAX_PATH);
 		Add_CString.ReleaseBuffer();
 		Add_CString = Add_CString + temp_1;
 		m_combo_property_identifier.AddString(Add_CString);
 		m_combo_property_identifier.SetCurSel(PROP_OBJECT_NAME);
 	}
 
-	
-	//bactext_property_name
-//	m_combo_object_identifier
-}
 
+	//bactext_property_name
+	//	m_combo_object_identifier
+}
 
 
 void CBacnetToolReadProperty::OnBnClickedBtnBacCancel()
 {
 	// TODO: Add your control notification handler code here
-		read_property_cancel = true;
-		PostMessage(WM_CLOSE,NULL,NULL);
+	read_property_cancel = true;
+	PostMessage(WM_CLOSE,NULL,NULL);
 }

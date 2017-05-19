@@ -26,10 +26,15 @@
 struct SChartGanttPoint
 {
 	//! Default constructor
-	SChartGanttPoint() : StartTime(0.0), EndTime(0.0), YValue(0.0)  { }
+	SChartGanttPoint() : StartTime(0.0), EndTime(0.0), YValue(0.0)
+	{
+	}
+
 	//! Construct a new gantt point with the specifed values
-	SChartGanttPoint(double Start, double End, double YVal) 
-		: StartTime(Start), EndTime(End), YValue(YVal)  { }
+	SChartGanttPoint(double Start, double End, double YVal)
+		: StartTime(Start), EndTime(End), YValue(YVal)
+	{
+	}
 
 	//! The start time of the gantt point
 	double StartTime;
@@ -39,7 +44,7 @@ struct SChartGanttPoint
 	double YValue;
 
 	//! Returns the X value of the point, which is the average between start time and end time
-	double GetX() const { return (EndTime-StartTime)/2; }
+	double GetX() const { return (EndTime - StartTime) / 2; }
 	//! Returns the Y value
 	double GetY() const { return YValue; }
 	//! Returns the start time
@@ -92,15 +97,15 @@ public:
 	//! Sets the bars border color
 	void SetBorderColor(COLORREF BorderColor);
 	//! Returns the bars border color
-	COLORREF GetBorderColor() const			   { return m_BorderColor; }
+	COLORREF GetBorderColor() const { return m_BorderColor; }
 	//! Sets the bars border width
 	void SetBorderWidth(int Width);
 	//! Returns the bars border width
-	int  GetBorderWidth() const		{ return m_iBorderWidth;  }
+	int GetBorderWidth() const { return m_iBorderWidth; }
 	//! Sets the bars width (in pixels)
 	void SetBarWidth(int Width);
 	//! Returns the bars width (in pixels)
-	int  GetBarWidth() const		{ return m_iBarWidth;  }
+	int GetBarWidth() const { return m_iBarWidth; }
 
 	//! Specifies if a gradient is applied to the bars
 	void ShowGradient(bool bShow);
@@ -122,7 +127,7 @@ protected:
 		@param rectBitmap
 			The rectangle in which to draw the legend icon
 	**/
-    void DrawLegend(CDC* pDC, const CRect& rectBitmap) const;
+	void DrawLegend(CDC* pDC, const CRect& rectBitmap) const;
 
 	//! Draws the most recent points of the series.
 	/**
@@ -137,14 +142,14 @@ protected:
 		@param pDC
 			The device context used to draw
 	**/
-	void DrawAll(CDC *pDC);
+	void DrawAll(CDC* pDC);
 
 private:
 	//! Returns the rectangle of a specific point of the series.
 	CRect GetBarRectangle(unsigned uPointIndex) const;
 
-	void DrawBar(CDC* pDC, CBrush* pFillBrush, CBrush* pBorderBrush, 
-				 CRect BarRect);
+	void DrawBar(CDC* pDC, CBrush* pFillBrush, CBrush* pBorderBrush,
+	             CRect BarRect);
 
 	//! The bar width
 	int m_iBarWidth;

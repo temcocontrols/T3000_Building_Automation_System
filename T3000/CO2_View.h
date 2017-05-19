@@ -41,7 +41,9 @@
 #define	SCAN_DB_SIZE				5
 
 // CCO2_View form view
-
+/// <summary>
+/// CCO2_View
+/// </summary>
 class CCO2_View : public CFormView
 {
 	DECLARE_DYNCREATE(CCO2_View)

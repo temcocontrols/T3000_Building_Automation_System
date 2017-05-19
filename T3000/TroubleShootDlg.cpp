@@ -257,6 +257,7 @@ BOOL CTroubleShootDlg::ChangeNetDeviceIP(CString strIP){
 // 		FD_ZERO(&fdSocket);	
 // 		FD_SET(h_scan_Broad, &fdSocket);
 
+
 		nRet = ::sendto(h_scan_Broad,(char*)pSendBuf,nSendLen,0,(sockaddr*)&h_bcast,sizeof(h_bcast));
 		if (nRet == SOCKET_ERROR)
 		{

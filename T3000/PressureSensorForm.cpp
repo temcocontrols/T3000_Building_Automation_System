@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "PressureSensorForm.h"
  #include "../SQLiteDriver/CppSQLite3.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "OutPutDlg.h"
 #include "MainFrm.h"
 // CPressureSensorForm

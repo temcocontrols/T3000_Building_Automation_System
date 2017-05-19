@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "BatchSNDlg.h"
 #include "afxdialogex.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "excel9.h"
 DWORD WINAPI _Batch_Flash_SN(LPVOID pParam)
 {

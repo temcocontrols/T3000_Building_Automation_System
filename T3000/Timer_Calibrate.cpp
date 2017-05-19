@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "Timer_Calibrate.h"
-#include "globle_function.h"
+#include "global_function.h"
 //#include ".\timer_calibrate.h"
 
 

@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "TStatScanner.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "ScanDlg.h"
 
 #include "ScanDbWaitDlg.h"
@@ -9,9 +9,9 @@
 #include "define.h"
 #include "bip.h"
 #include "rs485.h" // For call Get_RS485_Handle() function
-#include "WhichOneToChooseDlg.h"
+
 //#include "global_variable.h"
-//#include "gloab_define.h"
+//#include "global_define.h"
 //AB means Add Building
 #define AB_MAINNAME	1
 #define AB_NAME	2
@@ -1880,50 +1880,13 @@ BOOL CTStatScanner::binary_search_crc(int a)
     return false;
 }
 
-#if 0
-
-void quickSort(char  array[], int length)
-{
-	int start = 0;
-	int end = length - 1;
-	char value = array[start];// 得到哨兵元素
-	if (1 > length) return;// 递归出口
-
-	while (start < end) 
-	{// 以哨兵元素为标准，分成大于它和小于它的两列元素
-
-		while (start < end) {// 从数组尾部往前循环得到小于哨兵元素的一个元素
-			if (array[end--] < value) 
-			{
-				array[start++] = array[++end];
-				break;
-			}
-		}
-
-		while (start < end) {// 从数组头部往后循环得到大于哨兵元素的一个元素
-			if (array[start++] > value) 
-			{
-				array[end--] = array[--start];
-				break;
-			}
-		}
-	}
-
-	array[start] = value;// 放置哨兵元素
-	//printf("\nstart:%d, end:%d\n", start, end);// 这个是测试下start和end是否一样
-	quickSort(array, start);// 递归排序小于哨兵元素的那一列元素
-	quickSort(array + start + 1, length - start - 1);// 递归排序大于哨兵元素的那一列
-}
-#endif
 
 //*
 UINT _ScanTstatThread2(LPVOID pParam)
 {
     CTStatScanner* pScan = (CTStatScanner*)(pParam);
-#if 0
-	char temp_array[100] = { 5,4,6,3,7,2,8,1,9,0 };
-	quickSort(temp_array, 10);
-#endif
+
+
     UINT i = 0;
 
     for (i = 0; i < pScan->m_szComs.size(); i++)

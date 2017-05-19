@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "WifiConfigDlg.h"
 #include "afxdialogex.h"
-#include "globle_Function.h"
+#include "global_function.h"
 
 
 // CWifiConfigDlg dialog

@@ -19,7 +19,7 @@
  *
  */
 
-#ifndef _CHARTBALLOONLABEL_H_ 
+#ifndef _CHARTBALLOONLABEL_H_
 #define _CHARTBALLOONLABEL_H_
 
 #include "ChartLabel.h"
@@ -40,20 +40,20 @@ public:
 	//! Sets the background color of the text area.
 	void SetBackgroundColor(COLORREF colBackground);
 	//! Retrieves the background color of the text area.
-	COLORREF GetBackgroundColor() const		{ return m_colBackground; }
+	COLORREF GetBackgroundColor() const { return m_colBackground; }
 	//! Sets the color of the line connecting the point to the text area.
-	void SetLineColor(COLORREF colArrow);	
+	void SetLineColor(COLORREF colArrow);
 	//! Retrieves the color of the line connecting the point to the text area.
-	COLORREF GetLineColor() const			{ return m_colLine; }
+	COLORREF GetLineColor() const { return m_colLine; }
 	//! Sets the color of border's text area.
 	void SetBorderColor(COLORREF colBorder);
 	//! Retrieves the color of border's text area.
-	COLORREF GetBorderColor() const			{ return m_colBorder; }
+	COLORREF GetBorderColor() const { return m_colBorder; }
 
 	//! Specifies if the text area is rounded or not.
 	void SetRoundedRect(bool bRounded);
 	//! Returns true if the text area is rounded.
-	bool GetRoundedRect() const		{ return m_bRoundedRect; }
+	bool GetRoundedRect() const { return m_bRoundedRect; }
 
 	//! Sets the font of the text.
 	/**

@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "Weekly_Routines.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "WeeklyRout_InsertDia.h"
 
 

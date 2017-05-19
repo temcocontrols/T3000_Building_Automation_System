@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 #include <vector>
  
-#include "globle_function.h"
+#include "global_function.h"
 
 // CCustomSTable dialog
 

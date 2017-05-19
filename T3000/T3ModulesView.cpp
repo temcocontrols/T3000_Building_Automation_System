@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "T3ModulesView.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "T3RTDView.h"
 #include "T3RangeDlg.h"
 

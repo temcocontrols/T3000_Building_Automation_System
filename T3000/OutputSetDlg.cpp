@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "OutputSetDlg.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "../SQLiteDriver/CppSQLite3.h" 
  
 #define INDEX_OUTFIELD 0

@@ -5,7 +5,7 @@
 
 #include "T3000Doc.h"
 #include "T3000View.h"
-#include "globle_function.h"
+#include "global_function.h"
 //#include "global_variable.h"
 #include "global_variable_extern.h"
 #include "ParameterDlg.h"
@@ -17,14 +17,14 @@
 #include "AfxMessageDialog.h"
 
 #include "LedsDialog.h"
-#include "TDelayForm.h"
+
 
 #include "TStatScheduleDlg.h"
 #include "TstatZigbeeLogic.h"
 
  
 #include "DisplayConfig.h"
-#include "DisplayLEDLCDConfig.h"
+
 #include "HtmlHelp.h"
 
 #include "DisplayConfig.h"

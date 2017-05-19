@@ -17,7 +17,6 @@ IMPLEMENT_DYNAMIC(CBacnetGraphicSetting, CDialogEx)
 CBacnetGraphicSetting::CBacnetGraphicSetting(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CBacnetGraphicSetting::IDD, pParent)
 {
-
 }
 
 CBacnetGraphicSetting::~CBacnetGraphicSetting()
@@ -49,7 +48,7 @@ BOOL CBacnetGraphicSetting::OnInitDialog()
 
 	// TODO:  Add extra initialization here
 
-	return TRUE;  // return TRUE unless you set the focus to a control
+	return TRUE; // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
@@ -68,28 +67,28 @@ void CBacnetGraphicSetting::OnBnClickedOk()
 	int start_minute = temp_start_time.GetMinute();
 	int start_sec = temp_start_time.GetSecond();
 
-	 CTime temp_start(start_year,start_month,start_day,start_hour,start_minute,start_sec);
-	 unsigned long start_long_time = temp_start.GetTime();
+	CTime temp_start(start_year, start_month, start_day, start_hour, start_minute, start_sec);
+	unsigned long start_long_time = temp_start.GetTime();
 
 
-	 CTime temp_end_day;
-	 CTime temp_end_time;
-	 m_grp_end_day.GetTime(temp_end_day);
-	 m_grp_end_time.GetTime(temp_end_time);
-	 int end_year = temp_end_day.GetYear();
-	 int end_month = temp_end_day.GetMonth();
-	 int end_day = temp_end_day.GetDay();
-	 int end_hour = temp_end_time.GetHour();
-	 int end_minute = temp_end_time.GetMinute();
-	 int end_sec = temp_end_time.GetSecond();
+	CTime temp_end_day;
+	CTime temp_end_time;
+	m_grp_end_day.GetTime(temp_end_day);
+	m_grp_end_time.GetTime(temp_end_time);
+	int end_year = temp_end_day.GetYear();
+	int end_month = temp_end_day.GetMonth();
+	int end_day = temp_end_day.GetDay();
+	int end_hour = temp_end_time.GetHour();
+	int end_minute = temp_end_time.GetMinute();
+	int end_sec = temp_end_time.GetSecond();
 
-	 CTime temp_end(end_year,end_month,end_day,end_hour,end_minute,end_sec);
-	 unsigned long end_long_time = temp_end.GetTime();
+	CTime temp_end(end_year, end_month, end_day, end_hour, end_minute, end_sec);
+	unsigned long end_long_time = temp_end.GetTime();
 
-	 customer_start_time = start_long_time;
-	 customer_end_time = end_long_time;
-	 customer_define_x_time = customer_end_time - customer_start_time;
-	 use_customer_time = true;
+	customer_start_time = start_long_time;
+	customer_end_time = end_long_time;
+	customer_define_x_time = customer_end_time - customer_start_time;
+	use_customer_time = true;
 	CDialogEx::OnOK();
 }
 
@@ -97,6 +96,6 @@ void CBacnetGraphicSetting::OnBnClickedOk()
 void CBacnetGraphicSetting::OnBnClickedCancel()
 {
 	// TODO: Add your control notification handler code here
-	 use_customer_time = false;
+	use_customer_time = false;
 	CDialogEx::OnCancel();
 }

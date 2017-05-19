@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "T38I13O.h"
  
-#include "globle_function.h"
+#include "global_function.h"
 #include "MainFrm.h"
 #include "WriteSingleRegDlg.h"
 #include "Dialog_Progess.h"

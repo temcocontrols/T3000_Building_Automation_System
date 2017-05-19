@@ -1,6 +1,6 @@
 #include "stdAfx.h"
 #include "SetptGraphicBar.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "global_variable_extern.h"
 
 int xBase=123;

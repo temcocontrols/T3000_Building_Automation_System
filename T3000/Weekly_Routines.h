@@ -3,7 +3,7 @@
 #include "msflexgrid1.h"
 #include "afxwin.h"
 #include "schedule.h"
-#include "WeeklySchedule.h"
+
 
 
 class Weekly_Routines : public CDialog

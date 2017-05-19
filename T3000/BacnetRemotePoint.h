@@ -35,10 +35,12 @@ public:
 };
 
 const int REMOTE_NUMBER = 0;
-const int REMOTE_DEVICE_ID = 1;
-const int REMOTE_REG = 2;
-const int REMOTE_VALUE = 3;
-const int REMOTE_DEVICE_STATUS = 4;
-const int REMOTE_DESCRIPTION = 5;
+const int REMOTE_MAIN_ID = 1;
+const int REMOTE_DEVICE_ID = 2;
+const int REMOTE_REG = 3;
+const int REMOTE_TPYE = 4;
+const int REMOTE_VALUE = 5;
+const int REMOTE_DEVICE_STATUS = 6;
+const int REMOTE_DESCRIPTION = 7;
 
-const int REMOTE_COL_NUMBER = 6;
+const int REMOTE_COL_NUMBER = 8;

@@ -26,14 +26,14 @@
 
 class CMacSliderCtrl : public CSliderCtrl
 {
-// Construction
+	// Construction
 public:
 	CMacSliderCtrl();
 
-// Attributes
+	// Attributes
 public:
 
-// Operations
+	// Operations
 public:
 	void SetChannelColor(COLORREF crColor);
 	COLORREF GetChannelColor();
@@ -42,12 +42,12 @@ public:
 	void SetSelectionColor(COLORREF crColor);
 	COLORREF GetSelectionColor();
 
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CMacSliderCtrl)
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
 	virtual ~CMacSliderCtrl();
 
@@ -62,9 +62,9 @@ private:
 	COLORREF LightenColor(const COLORREF crColor, BYTE byIncreaseVal);
 	COLORREF DarkenColor(const COLORREF crColor, BYTE byReduceVal);
 
-	void DrawHorizontalThumb(CDC* pDC, const CRect &rect);
-	void DrawVerticalThumb(CDC* pDC, const CRect &rect);
-	void DrawChannel(CDC* pDC, const CRect &rect, BOOL bHoriz);
+	void DrawHorizontalThumb(CDC* pDC, const CRect& rect);
+	void DrawVerticalThumb(CDC* pDC, const CRect& rect);
+	void DrawChannel(CDC* pDC, const CRect& rect, BOOL bHoriz);
 	void DeletePens();
 	void CreatePens();
 	CPen m_penThumb;

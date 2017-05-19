@@ -21,6 +21,7 @@ CAfxMessageDialog::CAfxMessageDialog(CWnd* pParent /*=NULL*/)
 
 CAfxMessageDialog::~CAfxMessageDialog()
 {
+
 }
 
 void CAfxMessageDialog::DoDataExchange(CDataExchange* pDX)

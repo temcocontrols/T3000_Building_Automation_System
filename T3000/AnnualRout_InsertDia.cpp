@@ -7,7 +7,7 @@
 #include "AnnualRout_InsertDia.h"
 #include "Annual_Routines.h"
 #include "schedule.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "Schedule_grid.h"
 #include "../MultipleMonthCal32/multiplemonthcal.h"
 

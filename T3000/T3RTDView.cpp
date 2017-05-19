@@ -7,7 +7,7 @@
 
 #include "Dialog_Progess.h"
  
-#include "globle_function.h"
+#include "global_function.h"
 #include "MainFrm.h"
 #include "EreaseDlg.h"
 

@@ -6,7 +6,7 @@
 #include "Flash_Multy.h"
 #include "afxdialogex.h"
 #include "MainFrm.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "Dowmloadfile.h"
 #include "../SQLiteDriver/CppSQLite3.h"
 #include "BinFileParser.h"

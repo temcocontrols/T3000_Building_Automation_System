@@ -6,7 +6,7 @@
 #include "LCOutNameConfig.h"
 #include "afxdialogex.h"
 #include "schedule.h"
-#include "globle_function.h"
+#include "global_function.h"
  #include "../SQLiteDriver/CppSQLite3.h"
 
 // CLCOutNameConfig dialog

@@ -6,20 +6,19 @@
 #include "T3000.h"
 #include "BacnetAlarmWindow.h"
 #include "afxdialogex.h"
-HBITMAP     show_bitmap;
-HBITMAP 	hBitmap_red_bmp;
-HBITMAP 	hBitmap_brown_bmp;
-HBITMAP 	hBitmap_green_bmp;
+HBITMAP show_bitmap;
+HBITMAP hBitmap_red_bmp;
+HBITMAP hBitmap_brown_bmp;
+HBITMAP hBitmap_green_bmp;
 // CBacnetAlarmWindow dialog
-CBacnetAlarmWindow * AlarmWindow_Window = NULL;
-CRect my_view_rect;	//用来存储 窗体位置;
+CBacnetAlarmWindow* AlarmWindow_Window = NULL;
+CRect my_view_rect; //用来存储 窗体位置;
 CRect warning_window_rect;
 IMPLEMENT_DYNAMIC(CBacnetAlarmWindow, CDialogEx)
 
 CBacnetAlarmWindow::CBacnetAlarmWindow(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CBacnetAlarmWindow::IDD, pParent)
 {
-
 }
 
 CBacnetAlarmWindow::~CBacnetAlarmWindow()
@@ -47,9 +46,9 @@ END_MESSAGE_MAP()
 BOOL CBacnetAlarmWindow::PreTranslateMessage(MSG* pMsg)
 {
 	// TODO: Add your specialized code here and/or call the base class
-	if(pMsg->message == WM_KEYDOWN )
+	if (pMsg->message == WM_KEYDOWN)
 	{
-		if((pMsg->wParam == VK_RETURN) ||(pMsg->wParam == VK_ESCAPE))
+		if ((pMsg->wParam == VK_RETURN) || (pMsg->wParam == VK_ESCAPE))
 			return 0;
 	}
 	return CDialogEx::PreTranslateMessage(pMsg);
@@ -60,61 +59,54 @@ BOOL CBacnetAlarmWindow::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	this->ShowWindow(SW_HIDE);
-	hBitmap_red_bmp =(HBITMAP)LoadImage(AfxGetInstanceHandle(),  
-		MAKEINTRESOURCE(IDB_BITMAP_ALARM_RED),  
-		IMAGE_BITMAP,0,0,  
-		LR_LOADMAP3DCOLORS);
-	
-	hBitmap_brown_bmp =(HBITMAP)LoadImage(AfxGetInstanceHandle(),  
-		MAKEINTRESOURCE(IDB_BITMAP_ALARM_BROWN),  
-		IMAGE_BITMAP,0,0,  
-		LR_LOADMAP3DCOLORS);
+	hBitmap_red_bmp = (HBITMAP)LoadImage(AfxGetInstanceHandle(),
+	                                     MAKEINTRESOURCE(IDB_BITMAP_ALARM_RED),
+	                                     IMAGE_BITMAP, 0, 0,
+	                                     LR_LOADMAP3DCOLORS);
 
-	hBitmap_green_bmp =(HBITMAP)LoadImage(AfxGetInstanceHandle(),  
-		MAKEINTRESOURCE(IDB_BITMAP_ALARM_GREEN),  
-		IMAGE_BITMAP,0,0,  
-		LR_LOADMAP3DCOLORS);
+	hBitmap_brown_bmp = (HBITMAP)LoadImage(AfxGetInstanceHandle(),
+	                                       MAKEINTRESOURCE(IDB_BITMAP_ALARM_BROWN),
+	                                       IMAGE_BITMAP, 0, 0,
+	                                       LR_LOADMAP3DCOLORS);
 
-
+	hBitmap_green_bmp = (HBITMAP)LoadImage(AfxGetInstanceHandle(),
+	                                       MAKEINTRESOURCE(IDB_BITMAP_ALARM_GREEN),
+	                                       IMAGE_BITMAP, 0, 0,
+	                                       LR_LOADMAP3DCOLORS);
 
 
 	// TODO:  Add extra initialization here
-	::SetWindowPos(this->m_hWnd,HWND_TOPMOST,0,0,32,24,SWP_NOMOVE|SWP_SHOWWINDOW);
+	::SetWindowPos(this->m_hWnd,HWND_TOPMOST, 0, 0, 32, 24,SWP_NOMOVE | SWP_SHOWWINDOW);
 
 	m_static_bac_alarm.SetWindowTextW(_T("ALARM"));
 	m_static_bac_alarm.textColor(RGB(255,0,0));
 	m_static_bac_alarm.bkColor(RGB(0,0,0));
-	m_static_bac_alarm.setFont(32,10,NULL,_T("Arial"));
+	m_static_bac_alarm.setFont(32, 10,NULL,_T("Arial"));
 	m_static_bac_alarm.ShowWindow(SW_HIDE);
-	SetTimer(1,500,NULL);
+	SetTimer(1, 500,NULL);
 	m_alarmwindow_dlg_hwnd = this->m_hWnd;
-	::GetWindowRect(BacNet_hwd,&my_view_rect);	//获取 view的窗体大小;
+	::GetWindowRect(BacNet_hwd, &my_view_rect); //获取 view的窗体大小;
 	GetWindowRect(&warning_window_rect);
 	//warning_window_rect.Height();
-	MoveWindow(my_view_rect.right - warning_window_rect.Width() ,my_view_rect.top/* - warning_window_rect.Height()*/,
-		warning_window_rect.Width(),warning_window_rect.Height(),1);
+	MoveWindow(my_view_rect.right - warning_window_rect.Width(), my_view_rect.top/* - warning_window_rect.Height()*/,
+	           warning_window_rect.Width(), warning_window_rect.Height(), 1);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
+	return TRUE; // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
-LRESULT  CBacnetAlarmWindow::RedrawScreeneditWindow(WPARAM wParam, LPARAM lParam)
+LRESULT CBacnetAlarmWindow::RedrawScreeneditWindow(WPARAM wParam, LPARAM lParam)
 {
-
-
-
-
-
-	::GetWindowRect(MainFram_hwd,&my_view_rect);	//获取 view的窗体大小;
+	::GetWindowRect(MainFram_hwd, &my_view_rect); //获取 view的窗体大小;
 	GetWindowRect(&warning_window_rect);
 	//warning_window_rect.Height();
 	//MoveWindow(my_view_rect.right - warning_window_rect.Width() ,my_view_rect.top,
 	//	warning_window_rect.Width(),warning_window_rect.Height(),1);
 	CRect temp_rect;
-	temp_rect.left =my_view_rect.left + 390;
-	temp_rect.top  =my_view_rect.top + 64;
+	temp_rect.left = my_view_rect.left + 390;
+	temp_rect.top = my_view_rect.top + 64;
 
-//	MoveWindow(temp_rect.left ,temp_rect.top,warning_window_rect.Width(),warning_window_rect.Height(),1);
+	//	MoveWindow(temp_rect.left ,temp_rect.top,warning_window_rect.Width(),warning_window_rect.Height(),1);
 	Invalidate();
 	return 0;
 }
@@ -123,20 +115,20 @@ void CBacnetAlarmWindow::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
 	static int n_count = 0;
-	switch(nIDEvent)
+	switch (nIDEvent)
 	{
 	case 1:
 		{
-			n_count = (++n_count)%3;
-			if(n_count == 0 )
+			n_count = (++n_count) % 3;
+			if (n_count == 0)
 			{
 				show_bitmap = hBitmap_red_bmp;
 			}
-			else if(n_count == 1)
+			else if (n_count == 1)
 			{
 				show_bitmap = hBitmap_brown_bmp;
 			}
-			else if(n_count == 2)
+			else if (n_count == 2)
 			{
 				show_bitmap = hBitmap_green_bmp;
 			}
@@ -174,20 +166,20 @@ void CBacnetAlarmWindow::OnPaint()
 	// TODO: Add your message handler code here
 	// Do not call CDialogEx::OnPaint() for painting messages
 
-	CMemDC memDC(dc,this);
+	CMemDC memDC(dc, this);
 	CRect rcClient;
 	GetClientRect(&rcClient);
 	memDC.GetDC().FillSolidRect(&rcClient,RGB(230,230,230));
-	Graphics *mygraphics;
+	Graphics* mygraphics;
 	mygraphics = new Graphics(memDC.GetDC());
 	mygraphics->SetSmoothingMode(SmoothingModeAntiAlias);
 
 
 	CRect test_rect;
 	HWND temp_hwnd = this->m_hWnd;
-	::GetWindowRect(temp_hwnd,&test_rect);	//获取 view的窗体大小;
+	::GetWindowRect(temp_hwnd, &test_rect); //获取 view的窗体大小;
 	Bitmap bitmap(show_bitmap,NULL);
-	mygraphics->DrawImage(&bitmap,0 ,0,test_rect.Width(),test_rect.Height());
+	mygraphics->DrawImage(&bitmap, 0, 0, test_rect.Width(), test_rect.Height());
 
 
 	delete mygraphics;
@@ -223,14 +215,14 @@ void CBacnetAlarmWindow::OnPaint()
 end_connect_paint:
 
 	return;
-
 }
 
 #include "MainFrm.h"
+
 void CBacnetAlarmWindow::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
-	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
 	pFrame->OnControlAlarmLog();
 	CDialogEx::OnLButtonDown(nFlags, point);
 }
