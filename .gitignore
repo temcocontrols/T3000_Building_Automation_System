@@ -47,3 +47,5 @@
 **/*.MAX
 /T3000.VC.db
 /*.opendb
+/Psychrometric Tool/T3000 Output_VS2015
+/Psychrometric Tool/WFA_psychometric_chart/packages
