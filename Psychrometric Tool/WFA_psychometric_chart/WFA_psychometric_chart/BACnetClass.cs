@@ -55,8 +55,61 @@ namespace WFA_psychometric_chart
         }
 
 
-        public void StartProgramForScanHardware(int deviceId, uint inputnodeid,string identifier_type)
+        public  void StartProgramForScanHardware(int deviceId, uint inputnodeid,string identifier_type)
         {
+            Trace.Listeners.Add(new ConsoleTraceListener());
+
+            try
+            {
+                StartActivity();
+                //Console.WriteLine("Started");
+
+                Thread.Sleep(3000); // Wait a fiew time for WhoIs responses (managed in handler_OnIam)
+                //Console.WriteLine("BACnet Devices List");
+                //Console.WriteLine("Instance ID\tBACnetIP");
+                lock (DevicesList)
+                {
+                    //foreach (BacNode bn in DevicesList)
+                    //{
+                    //    // Console.WriteLine("{0}\t{1}.{2}.{3}.{4}", bn.device_id, bn.adr.adr[0], bn.adr.adr[1], bn.adr.adr[2], bn.adr.adr[3]);
+                    //}
+
+                }
+          
+                int BacnetID = deviceId;//24649;//int.Parse(StrBacnetID);
+                uint inputNodeID = inputnodeid;
+                //ReadWriteExample(BacnetID);
+                readBacnetDevieParameterForScanHardware(BacnetID, inputNodeID,identifier_type);//identifier type
+            }
+            catch { }
+
+            //Console.ReadKey();
+        }
+
+        /// <summary>
+        /// Without who is request who is confirms device connectivity however it sleeps for 3 second
+        /// so while in loop after connection direct call for the values using this function form bacnet
+        /// </summary>
+        /// <param name="deviceId">Instance ID of device</param>
+        /// <param name="inputnodeid">input parameter value </param>
+        /// <param name="identifier_type">identifier like OBJECT_ANALOG_VALUE,OBJECT_ANALOG_INPUT,etc</param>
+        /// <returns></returns>
+        public double ReadBacnetValue(int deviceId, uint inputnodeid, string identifier_type)
+        {
+            double retValue = 0;
+            int BacnetID = deviceId;//24649;//int.Parse(StrBacnetID);
+            uint inputNodeID = inputnodeid;
+
+            readBacnetDevieParameterForScanHardware(BacnetID, inputNodeID, identifier_type);//identifier type
+
+            retValue = PresentValueFromBacnet;
+            return retValue;
+        }
+
+        public bool RequestingBacnetDeviceForCommunication()
+        {
+            bool deviceConnectedOrNotConnected = false;//false =not connected
+
             Trace.Listeners.Add(new ConsoleTraceListener());
 
             try
@@ -72,20 +125,14 @@ namespace WFA_psychometric_chart
                     foreach (BacNode bn in DevicesList)
                     {
                         // Console.WriteLine("{0}\t{1}.{2}.{3}.{4}", bn.device_id, bn.adr.adr[0], bn.adr.adr[1], bn.adr.adr[2], bn.adr.adr[3]);
+                        deviceConnectedOrNotConnected = true;//device detected so
                     }
 
                 }
-          
-                int BacnetID = deviceId;//24649;//int.Parse(StrBacnetID);
-                uint inputNodeID = inputnodeid;
-                //ReadWriteExample(BacnetID);
-                readBacnetDevieParameterForScanHardware(BacnetID, inputNodeID,identifier_type);//identifier type
             }
             catch { }
-
-            //Console.ReadKey();
+                return deviceConnectedOrNotConnected;
         }
-
 
 
 

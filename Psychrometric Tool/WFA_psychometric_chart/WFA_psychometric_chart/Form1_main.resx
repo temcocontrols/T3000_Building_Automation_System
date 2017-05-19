@@ -133,7 +133,7 @@
     <value>0, 0, 0, 0</value>
   </data>
   <data name="chart1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>933, 577</value>
+    <value>933, 604</value>
   </data>
   <data name="chart1.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -380,6 +380,9 @@
   </data>
   <data name="&gt;&gt;lb_title_display.ZOrder" xml:space="preserve">
     <value>8</value>
+  </data>
+  <data name="groupBox4ttt.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Bottom, Left</value>
   </data>
   <data name="label6line.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
@@ -871,7 +874,7 @@
     <value>2, 3, 2, 3</value>
   </data>
   <data name="groupBox4ttt.Size" type="System.Drawing.Size, System.Drawing">
-    <value>40, 617</value>
+    <value>40, 644</value>
   </data>
   <data name="groupBox4ttt.TabIndex" type="System.Int32, mscorlib">
     <value>46</value>
@@ -1006,7 +1009,7 @@
     <value>NoControl</value>
   </data>
   <data name="lb_numberOfHandler.Location" type="System.Drawing.Point, System.Drawing">
-    <value>97, 10</value>
+    <value>98, 10</value>
   </data>
   <data name="lb_numberOfHandler.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>2, 0, 2, 0</value>
@@ -1039,7 +1042,7 @@
     <value>NoControl</value>
   </data>
   <data name="lb_number_of_chart_label.Location" type="System.Drawing.Point, System.Drawing">
-    <value>5, 11</value>
+    <value>6, 11</value>
   </data>
   <data name="lb_number_of_chart_label.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>2, 0, 2, 0</value>
@@ -1219,7 +1222,7 @@
     <value>System.Windows.Forms.ContextMenuStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="gb_showstatus.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Bottom</value>
+    <value>Bottom, Left</value>
   </data>
   <data name="lb_vertical_line2.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
@@ -1447,7 +1450,7 @@
     <value>9</value>
   </data>
   <data name="gb_showstatus.Location" type="System.Drawing.Point, System.Drawing">
-    <value>44, 611</value>
+    <value>44, 638</value>
   </data>
   <data name="gb_showstatus.Size" type="System.Drawing.Size, System.Drawing">
     <value>1088, 32</value>
@@ -1468,7 +1471,7 @@
     <value>3</value>
   </data>
   <metadata name="backgroundWorker1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>585, 26</value>
+    <value>586, 15</value>
   </metadata>
   <data name="pb_lock_unlock.Location" type="System.Drawing.Point, System.Drawing">
     <value>307, 53</value>
@@ -1504,7 +1507,7 @@
     <value>6, 14</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>1132, 645</value>
+    <value>1132, 672</value>
   </data>
   <data name="$this.Font" type="System.Drawing.Font, System.Drawing">
     <value>Arial, 8.25pt</value>
@@ -3292,6 +3295,18 @@
   <data name="&gt;&gt;toolTip1.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolTip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;id.Name" xml:space="preserve">
+    <value>id</value>
+  </data>
+  <data name="&gt;&gt;id.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;name.Name" xml:space="preserve">
+    <value>name</value>
+  </data>
+  <data name="&gt;&gt;name.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;deleteToolStripMenuItem.Name" xml:space="preserve">
     <value>deleteToolStripMenuItem</value>
   </data>
@@ -3399,18 +3414,6 @@
   </data>
   <data name="&gt;&gt;backgroundWorker1.Type" xml:space="preserve">
     <value>System.ComponentModel.BackgroundWorker, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;id.Name" xml:space="preserve">
-    <value>id</value>
-  </data>
-  <data name="&gt;&gt;id.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;name.Name" xml:space="preserve">
-    <value>name</value>
-  </data>
-  <data name="&gt;&gt;name.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>Form1_main</value>
