@@ -633,6 +633,10 @@ namespace WFA_psychometric_chart
                 Application.Exit();
                 return;
             }
+
+            //--Lets find the building path again coz previous building path is not accessible
+            FindPathOfBuildingDBNewVersion();
+
             //--This pulls the location info form T3000 db
             PullLocationInformation();//this is for loading location information
 
@@ -684,7 +688,6 @@ namespace WFA_psychometric_chart
             //label1.Text = WFA_psychometric_chart.Properties.Resources.From;
             //label2.Text = WFA_psychometric_chart.Properties.Resources.To;
             //button2.Text = WFA_psychometric_chart.Properties.Resources.Show_Heat_Map;
-
 
             //lets plot the graph as soon as the form loads.
             plot_new_graph();
@@ -751,7 +754,6 @@ namespace WFA_psychometric_chart
                 //    // or setting the selected cells manually before executing the function
                 //    dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Selected = true;
                 //    dataGridView1_CellClick(sender, eventArgs);
-
                 //}
                 if (dataGridView1.CurrentCell.RowIndex >= 0 && dataGridView1.CurrentCell.RowIndex < chartDetailList.Count)
                 {
@@ -1038,7 +1040,7 @@ namespace WFA_psychometric_chart
             atimer = new System.Timers.Timer();
             atimer.Enabled = true;
             atimer.Elapsed += timer1_Tick_For_Device;
-            atimer.Interval = 1000 * 5; //x seconds[ 1000 ms * x  =  x seconds]
+            atimer.Interval = 1000 * 12; //x seconds[ 1000 ms * x  =  x seconds]//12 seconds
 
         }
 
@@ -1193,13 +1195,14 @@ namespace WFA_psychometric_chart
                     //--No node then 
                     return;
                 }
-              try { 
+              try {
 
-            //--Read each node and then perform the following fxn
-
-            //--*****************************From here commented the code for alex db****************--//
-            foreach (var node in menuStripNodeInfoValues)
-            {
+                //--Read each node and then perform the following fxn
+                bool commumicationSuccesValue =   BacnetCommunicationRequest();//Communication request
+                //MessageBox.Show("dev connected or not = "+commumicationSuccesValue);
+                //--*****************************From here commented the code for alex db****************--//
+                foreach (var node in menuStripNodeInfoValues)
+              {
 
                 //Check if there is command to stop or not
                 if (FlagForStopingRunningProcessInstantly == 1)
@@ -1224,44 +1227,47 @@ namespace WFA_psychometric_chart
                 2.based on panel id value calculate the x and y coordinate.
                 3.Update the database value.
                 */
-                // MessageBox.Show("node id= " + node.id);
+               //  MessageBox.Show("node name= " + node.name);
                 ReadDeviceInfoForNode(node.id);
 
                 //Here we will check for the device parameter id values
 
                 if (CheckDeviceOnlineOffline(int.Parse(device_info_list[0].device_instance_id_for_param1), 0) == true)
                 {
-                    //online mode...
-                    //2nd step calc x and y
-                    //The value will always be unique and always be in the 0 index  
-                    if (device_info_list[0].param1_info == "temp")
-                    {
-                        //This meand the value is humidity and temperature so we process like wise
-                        //This gets the value
-                        //ReadDataFromDevice(int.Parse(device_info_list[0].device_instance_id), uint.Parse(device_info_list[0].param1_id), uint.Parse(device_info_list[0].param2_id), device_info_list[0].param1_identifier_type, device_info_list[0].param2_identifier_type);
-                         //ReadDataFromDevice(int.Parse(device_info_list[0].device_instance_id_for_param1), uint.Parse(device_info_list[0].param1_id), uint.Parse(device_info_list[0].param2_id), device_info_list[0].param1_identifier_type, device_info_list[0].param2_identifier_type);
-                                ReadDataFromDeviceForTemperature(int.Parse(device_info_list[0].device_instance_id_for_param1), uint.Parse(device_info_list[0].param1_id), device_info_list[0].param1_identifier_type);
+                           
+                            //online mode...
+                            //2nd step calc x and y
+                            //The value will always be unique and always be in the 0 index  
+                            if (device_info_list[0].param1_info == "temp")
+                            {
+                                //This meand the value is humidity and temperature so we process like wise
+                                //This gets the value
+                                //ReadDataFromDevice(int.Parse(device_info_list[0].device_instance_id), uint.Parse(device_info_list[0].param1_id), uint.Parse(device_info_list[0].param2_id), device_info_list[0].param1_identifier_type, device_info_list[0].param2_identifier_type);
+                                //ReadDataFromDevice(int.Parse(device_info_list[0].device_instance_id_for_param1), uint.Parse(device_info_list[0].param1_id), uint.Parse(device_info_list[0].param2_id), device_info_list[0].param1_identifier_type, device_info_list[0].param2_identifier_type);
+                                if (commumicationSuccesValue == false) { return; } //If no communication then return
+                                double returnTemperatureValue = ReadDataFromDeviceForTemperature(int.Parse(device_info_list[0].device_instance_id_for_param1), uint.Parse(device_info_list[0].param1_id), device_info_list[0].param1_identifier_type);
                                 //we have recent value in hardwareValue1 and hardwareValue2 so lets calc corresponding x and y value
                                 //now temp itself is x value we need to calculate y value
-
+                               // MessageBox.Show("Inside checkonline offline,val ret=" + hardwareValue1);
                                 // if ((hardwareValue1.ToString() == null || hardwareValue1 == 0.00) || (hardwareValue2.ToString() == null || hardwareValue2 == 0.00))
-                                if ((hardwareValue1.ToString() == null || hardwareValue1 == 0.00))
+                                if ((returnTemperatureValue.ToString() == null || (returnTemperatureValue <= 0.00 || returnTemperatureValue > 50)))
                                 {
-                            return;
-                        }
+                                    // return;
+                                    goto HumidtyLine;//Goto serch for humidty values , if temperature is 0 don't do anything
+                                 }
 
-                        //MessageBox.Show("inside")
+                                //  MessageBox.Show("inside temperature source,val = "+hardwareValue1+",node name = "+node.name);
 
-                        double x_Value = hardwareValue1;
-                      //  double y_value = CalculateYFromXandHumidity(hardwareValue1, hardwareValue2 / 100);
+                                double x_Value = returnTemperatureValue;//hardwareValue1;
+                               //double y_value = CalculateYFromXandHumidity(hardwareValue1, hardwareValue2 / 100);
 
-                        //   MessageBox.Show("x val /temp/hardwareValue1 = "+x_Value+"\nhardwareValue2"+hardwareValue2+"\ny value hardware= " + y_value);
-                        //Now lets update the values in db
+                                //MessageBox.Show("x val /temp/hardwareValue1 = "+x_Value+"\nhardwareValue2"+hardwareValue2+"\ny value hardware= " + y_value);
+                                //Now lets update the values in db
 
-                        lock (menuStripNodeInfoValues)
+                         lock (menuStripNodeInfoValues)
                         {
-                                    // UpdateNodeInfoToDB(node.id, x_Value, y_value, node.source, node.name, node.label, node.colorValue, node.showItemText, node.marker_Size);
-                                    UpdateNodeInfoToDBForTemeperatureFromHardware(node.id, x_Value);//This is completed
+                          // UpdateNodeInfoToDB(node.id, x_Value, y_value, node.source, node.name, node.label, node.colorValue, node.showItemText, node.marker_Size);
+                          UpdateNodeInfoToDBForTemeperatureFromHardware(node.id, x_Value);//This is completed
                         }
 
                         countTime++;
@@ -1343,8 +1349,8 @@ namespace WFA_psychometric_chart
                 //Now lets update the values in db
                 lock (menuStripNodeInfoValues)
                 {
-                            //  UpdateNodeInfoToDB(node.id, temperature_Val, y_value, node.source, node.name, node.label, node.colorValue, node.showItemText, node.marker_Size);
-                            UpdateNodeInfoToDBForTemeperatureFromHardware(node.id, temperature_Val);//This is completed
+                   //  UpdateNodeInfoToDB(node.id, temperature_Val, y_value, node.source, node.name, node.label, node.colorValue, node.showItemText, node.marker_Size);
+                   UpdateNodeInfoToDBForTemeperatureFromHardware(node.id, temperature_Val);//This is completed
                 }
                 //==============THIS ONE IF FOR ONLINE OFFLINE==========
                 //  lb_web_status.Text = "active";                            
@@ -1352,18 +1358,21 @@ namespace WFA_psychometric_chart
             } //Close of web
 
             //=============================================Code for parameter 1 ie temperature complete===================//
+             
+
+                    HumidtyLine:
 
                     ///===================================================Now for second parameter of node humidity updateing=======//
 
-                    if (node.humidity_source == "Device")
-                    {
-                        //The node is pulled from device
-                        //steps read node's device info
-                        /*Steps :
-                        1.Read the node info from db (this contains panel id values and what are those for)
-                        2.based on panel id value calculate the x and y coordinate.
-                        3.Update the database value.
-                        */
+           if (node.humidity_source == "Device")
+            {
+                  //The node is pulled from device
+                  //steps read node's device info
+                   /*Steps :
+                    1.Read the node info from db (this contains panel id values and what are those for)
+                    2.based on panel id value calculate the x and y coordinate.
+                    3.Update the database value.
+                    */
                         // MessageBox.Show("node id= " + node.id);
                         ReadDeviceInfoForNode(node.id);
 
@@ -1380,16 +1389,18 @@ namespace WFA_psychometric_chart
                                 //This gets the value
                                 //ReadDataFromDevice(int.Parse(device_info_list[0].device_instance_id), uint.Parse(device_info_list[0].param1_id), uint.Parse(device_info_list[0].param2_id), device_info_list[0].param1_identifier_type, device_info_list[0].param2_identifier_type);
                                 //ReadDataFromDevice(int.Parse(device_info_list[0].device_instance_id_for_param1), uint.Parse(device_info_list[0].param1_id), uint.Parse(device_info_list[0].param2_id), device_info_list[0].param1_identifier_type, device_info_list[0].param2_identifier_type);
+                                if (commumicationSuccesValue == false) { return; } //If no communication then return
                                 ReadDataFromDeviceForHumidity(int.Parse(device_info_list[0].device_instance_id_for_param2), uint.Parse(device_info_list[0].param2_id), device_info_list[0].param2_identifier_type);
                                 //we have recent value in hardwareValue1 and hardwareValue2 so lets calc corresponding x and y value
                                 //now temp itself is x value we need to calculate y value
 
                                 // if ((hardwareValue1.ToString() == null || hardwareValue1 == 0.00) || (hardwareValue2.ToString() == null || hardwareValue2 == 0.00))
-                                if ((hardwareValue2.ToString() == null || hardwareValue2== 0.00))
+                                if ((hardwareValue2.ToString() == null || (hardwareValue2 <= 0.00 || hardwareValue2 > 100)))
                                 {
-                                    return;
+                                    //return;
+                                    goto Finish;
                                 }
-
+                                //MessageBox.Show("Humidity : Inside checkonline offline,val ret=" + hardwareValue2);
                                 //MessageBox.Show("inside")
 
                                 double x_Value = node.xVal;   //This one is the x value
@@ -1492,17 +1503,13 @@ namespace WFA_psychometric_chart
 
 
 
+                    //For go to statement
                     ///==========================================end of second parameter value==============================//
 
-   
-
-                    //else
-                    //{
-                    //    //Inserted by manual mode do nothing
-                    //}
 
 
-
+                    Finish:
+                    double z = 0;//no use for go to statement cant go before  } so 
                 }  //Close of foreach now lets plot the values..
 
             }
@@ -1555,7 +1562,7 @@ namespace WFA_psychometric_chart
 
 
 
-            //======================================New code added nove 29th,2016====================================//
+            //======================================New code added nov 29th,2016====================================//
 
             ///*steps:
             //1.Reading data from nodetable
@@ -1729,7 +1736,6 @@ namespace WFA_psychometric_chart
                     //    if ((reader["InputUnit"].ToString() == "Deg.C" && (tempVal >= 0 && tempVal <= 50)) || (reader["InputUnit"].ToString().Contains("%") && (tempVal >= 0 && tempVal <= 100)))
                     // {
 
-
                     // if (tempVal )
                     listForInputFromPsychoDB.Add(new datatypeForT300InputTable
                         {
@@ -1844,17 +1850,17 @@ namespace WFA_psychometric_chart
                 BACnetClass b = new BACnetClass();
 
                 //for temperature value
-               // b.StartProgramForScanHardware(deviceID, panID_1, param1_identifier_type);
-               // double temperary1 = double.Parse(b.PresentValueFromBacnet.ToString());
+                //b.StartProgramForScanHardware(deviceID, panID_1, param1_identifier_type);
+                //double temperary1 = double.Parse(b.PresentValueFromBacnet.ToString());
                 //tb_temp_panel_value.Text = temp;
                 //For humidity value
-                b.StartProgramForScanHardware(deviceID, panID_2, param2_identifier_type);
-                double temperary2 = double.Parse(b.PresentValueFromBacnet.ToString());
+                //b.StartProgramForScanHardware(deviceID, panID_2, param2_identifier_type);
+                double temperary2 =  b.ReadBacnetValue(deviceID, panID_2, param2_identifier_type);
+                //double temperary2 = double.Parse(b.PresentValueFromBacnet.ToString());
                 //tb_hum_panel_value.Text = humidity;
                 //hardwareValue1 = temperary1;//--This value contains the temperature values
-                hardwareValue2 = temperary2; //This one is humidity
-                //lets store these two values in a temporary list
-
+                hardwareValue2 = temperary2;//This one is humidity
+                //--lets store these two values in a temporary list
             }
             catch (Exception ex)
             {
@@ -1864,27 +1870,29 @@ namespace WFA_psychometric_chart
 
         }
 
-        public void ReadDataFromDeviceForTemperature(int deviceID, uint temp_panID,  string param1_identifier_type)
+        public double ReadDataFromDeviceForTemperature(int deviceID, uint temp_panID,  string param1_identifier_type)
         {
             //lets do some operation regarding the pannel id and stuff
-
+            double temperatureVal = 0;
             //then perform this task 
             try
             {
                 uint panID_1 = temp_panID;//0; //uint.Parse(panelID1);
 
                // uint panID_2 = hum_panID;//1;//uint.Parse(panelID2);
-                BACnetClass b = new BACnetClass();
+                var b = new BACnetClass();
+
 
                 //for temperature value
-                b.StartProgramForScanHardware(deviceID, panID_1, param1_identifier_type);
-                double temperary1 = double.Parse(b.PresentValueFromBacnet.ToString());
+                //b.StartProgramForScanHardware(deviceID, panID_1, param1_identifier_type);
+                temperatureVal= b.ReadBacnetValue(deviceID, panID_1, param1_identifier_type);
+               // temperatureVal = double.Parse(b.PresentValueFromBacnet.ToString());
                 //tb_temp_panel_value.Text = temp;
                 //For humidity value
-              //  b.StartProgramForScanHardware(deviceID, panID_2, param2_identifier_type);
+                //b.StartProgramForScanHardware(deviceID, panID_2, param2_identifier_type);
                 //double temperary2 = double.Parse(b.PresentValueFromBacnet.ToString());
                 //tb_hum_panel_value.Text = humidity;
-                hardwareValue1 = temperary1;  //--This one is temperature 
+                hardwareValue1 = temperatureVal;  //--This one is temperature 
                // hardwareValue2 = temperary2;
                 //lets store these two values in a temporary list
 
@@ -1894,9 +1902,16 @@ namespace WFA_psychometric_chart
                 MessageBox.Show(ex.Message);
 
             }
-
+            return temperatureVal;
         }
 
+        public bool BacnetCommunicationRequest()
+        {
+          //  bool val = false;
+            var b = new BACnetClass();
+
+            return b.RequestingBacnetDeviceForCommunication();//val;
+        }
 
  
         public double y_coord_value;
@@ -2153,8 +2168,8 @@ namespace WFA_psychometric_chart
         public string city_name_pulled = "";
         public string country_name_pulled = "";
         public string last_update_pulled = "";
-        public string temp_pulled = "";
-        public string hum_pulled = "";
+        public string temp_pulled = "0";//--Default value should be 0
+        public string hum_pulled = "0";
         public string pressure_pulled = "";
         public string wind_speed_pulled = "";
         public string direction_pulled = "";
@@ -2357,6 +2372,7 @@ namespace WFA_psychometric_chart
 
             string sql = "select * from ALL_NODE  where Object_Instance = '" + deviceID + "' and Parent_SerialNum = '" + Parent_SerialNum + "'";
             bool status = false;
+            //MessageBox.Show("Outside the path,"+BuildingSelected.Count );
             if (BuildingSelected.Count > 0)
             {
                 /*
@@ -2365,8 +2381,9 @@ namespace WFA_psychometric_chart
                 */
                 string path = databasePath;  //@"C:\Folder1\Folder2\Folder3\Folder4";
                 string newPath = Path.GetFullPath(Path.Combine(path, @"..\"));
-                string againDbPath = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + newPath + "" + BuildingSelected[0].building_path;
-
+                //string againDbPath = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + newPath + "" + BuildingSelected[0].building_path;
+                string againDbPath = @"Data Source=" + newPath + "" + BuildingSelected[0].building_path;
+                //MessageBox.Show("Path = \n" + againDbPath);
                 try
                 {
                     using (SQLiteConnection conn = new SQLiteConnection(againDbPath))
@@ -3977,8 +3994,7 @@ namespace WFA_psychometric_chart
                             country = reader["country"].ToString(),
                             state = reader["state"].ToString(),
                             city = reader["city"].ToString(),
-                            street = reader["street"].ToString(),
-                       
+                            street = reader["street"].ToString(),                       
                             EngineeringUnits = reader["EngineeringUnits"].ToString()
                             
 
@@ -4362,29 +4378,29 @@ namespace WFA_psychometric_chart
             plot_new_graph();
         }
 
-        public void RefreshGraph()
-        {
-           // lock (this) { 
-            //try
-            //{
-                this.Invalidate();
-                chart1.Invalidate();
-                // chart1.Dispose();//--Releases all the resources used by the chart...
-                plot_new_graph();
+            public void RefreshGraph()
+            {
+               // lock (this) { 
+                //try
+                //{
+                    this.Invalidate();
+                    chart1.Invalidate();
+                    // chart1.Dispose();//--Releases all the resources used by the chart...
+                    plot_new_graph();
 
-                //--Reseting the menustrip values for new plotting....
-                menuStripNodeLineInfoValues.Clear();
-                menuStripNodeInfoValues.Clear();
-                index = 0;  //This is resetting the index values
-                incrementIndex = 0;
-            ReloadComfortZoneForBackGroundWorker();
-            // }
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show(ex.Message);
-            //}
-            // }//--Close of lock
-        }
+                    //--Reseting the menustrip values for new plotting....
+                    menuStripNodeLineInfoValues.Clear();
+                    menuStripNodeInfoValues.Clear();
+                    index = 0;  //This is resetting the index values
+                    incrementIndex = 0;
+                ReloadComfortZoneForBackGroundWorker();
+                // }
+                //catch (Exception ex)
+                //{
+                //    MessageBox.Show(ex.Message);
+                //}
+                // }//--Close of lock
+            }
 
         public void InsertNodeInfoToDB(string id, double xVal, double yVal, string source, string name, string label, Color colorValue, string showItemText, int nodeSizeValue, string deviceinstance, string deviceip, string param1id, string param2id, string param1info, string param2info, string param1type, string param2type)
         {
@@ -4785,7 +4801,7 @@ namespace WFA_psychometric_chart
         }
         public List<TempDataTypeForMixNode> mixNodeInfoList = new List<TempDataTypeForMixNode>();
         public List<TempDataTypeForMixNode> temporaryMixNodeList = new List<TempDataTypeForMixNode>();
-
+        public List<TemperatureHumiditySourceInfo> listTemperatureAndHumidtySourceInfoWhenDeviceSelected = new List<TemperatureHumiditySourceInfo>();
 
         public int previousNodeIndexForLineInput = 0;
 
@@ -4835,6 +4851,9 @@ namespace WFA_psychometric_chart
             //--Now lets clear the mix node list first and then refill agiain
             mixNodeInfoList.Clear();
 
+                //for device and humidity info
+                listTemperatureAndHumidtySourceInfoWhenDeviceSelected.Clear();
+
 
             string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
@@ -4849,8 +4868,14 @@ namespace WFA_psychometric_chart
             string nodeTableName = "tbl_" + selectedBuildingList[0].BuildingName + "_node_value";
             string lineTableName = "tbl_" + selectedBuildingList[0].BuildingName + "_line_value";
             string tableMixNode = "tbl_" + selectedBuildingList[0].BuildingName + "_mix_node_info";
+             
+            //--Table for input instring value for device
+            string tableInputStringOfNodeForDevice = "tbl_" + selectedBuildingList[0].BuildingName + "_TemperatureHumiditySourceInfo";
 
-            using (SQLiteConnection connection = new SQLiteConnection(connString))
+
+
+
+                using (SQLiteConnection connection = new SQLiteConnection(connString))
             {
                 connection.Open();
 
@@ -4941,16 +4966,16 @@ namespace WFA_psychometric_chart
                 //===============================Loading Mix NODE info===================================//
 
 
-                SQLiteDataReader readerMix = null;
+               // SQLiteDataReader readerMix = null;
                 string queryStringMix = "SELECT *  from " + tableMixNode + " WHERE chartID = @chartID";
 
-                SQLiteCommand commandMix = new SQLiteCommand(queryStringMix, connection);
+                var commandMix = new SQLiteCommand(queryStringMix, connection);
                 commandMix.Parameters.AddWithValue("@chartID",selectedChartID );//This is the group id that is used to identify each node
 
 
 
                 // int count = 0;
-                readerMix = commandMix.ExecuteReader();
+              var readerMix = commandMix.ExecuteReader();
                 while (readerMix.Read())
                 {
                     //editied for reading from alex db
@@ -4967,11 +4992,35 @@ namespace WFA_psychometric_chart
                 }
 
 
-
-                //=================================End of loading mix node============================//
-
+                    //--This one is for humidity source info
 
 
+                    //using (SQLiteConnection connection = new SQLiteConnection(connString))
+                    //{
+                    //    connection.Open();
+
+                    // tables and also we need to all the chart of single building in a s single table .
+                       string querySql = "select * from " + tableInputStringOfNodeForDevice;//+ " where nodeID = '" + nodeID + "'";
+                        var command12 = new SQLiteCommand(querySql, connection);
+                        var reader12 = command12.ExecuteReader();
+                        while (reader12.Read())
+                        {
+                        listTemperatureAndHumidtySourceInfoWhenDeviceSelected.Add(new TemperatureHumiditySourceInfo
+                            {
+                                chartID = reader12["chartID"].ToString(),
+                                nodeID = reader12["NodeID"].ToString(),
+                                TemepratureSoureString = reader12["TemperatureSourceInfo"].ToString(),
+                                HumiditySourceString = reader12["HumiditySourceInfo"].ToString(),
+
+                            });
+
+                        }
+
+                   // }//Close of using statement
+
+
+
+                    //=================================End of loading mix node============================//
 
 
 
@@ -4979,7 +5028,10 @@ namespace WFA_psychometric_chart
 
 
 
-            }//close of using..
+
+
+
+                }//close of using..
             }catch(Exception ex)
             {
                 MessageBox.Show(ex.Message);
@@ -5267,10 +5319,10 @@ namespace WFA_psychometric_chart
                     }
                 }//close of if...
            // }//close of if int try parse.
-            else
-            {
-                MessageBox.Show(WFA_psychometric_chart.Properties.Resources.Please_enter_a_valid_zip_numbe);
-            }
+            //else
+            //{
+            //    MessageBox.Show(Properties.Resources.Please_enter_a_valid_zip_numbe);
+            //}
 
         }
 
@@ -6900,6 +6952,7 @@ namespace WFA_psychometric_chart
                                     //    labelValue = menuStripNodeInfoValues[x].source;
                                     //}
 
+
                                     //--this is changed as well code :bbk305
                                     // ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue, menuStripNodeInfoValues[x].marker_Size);
                                     ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].temperature_source, menuStripNodeInfoValues[x].humidity_source, menuStripNodeInfoValues[x].name, labelValue, menuStripNodeInfoValues[x].marker_Size);
@@ -8134,10 +8187,6 @@ namespace WFA_psychometric_chart
 
             }
 
-
-          
-
-
         }
 
 
@@ -8182,19 +8231,81 @@ namespace WFA_psychometric_chart
                     //else if (menuStripNodeInfoValues[x].showItemText == "Name")
                     //{
                         labelValue = menuStripNodeInfoValues[x].name;
-                    //}
-                    //else
-                    //{
-                    //    labelValue = menuStripNodeInfoValues[x].source;
-                    //}
+                            //}
+                            //else
+                            //{
+                            //    labelValue = menuStripNodeInfoValues[x].source;
+                            //}
 
+                            //==Lets check for temperature and humidity source so that we can print the those values of device
+                            string temperaryTemperatureSource = "";
+                            //Console.WriteLine("count = " + listTemperatureAndHumidtySourceInfoWhenDeviceSelected.Count);
+                            if(menuStripNodeInfoValues[x].temperature_source == "Device")
+                            {
+                                //Console.WriteLine("Inside");
+                                //--Then we need to select the device info
+                                foreach(var item in listTemperatureAndHumidtySourceInfoWhenDeviceSelected)
+                                {
+                                   // Console.WriteLine("Print Uppers Tempr  " + item.TemepratureSoureString+",id "+item.nodeID);
+                                    if (item.nodeID == menuStripNodeInfoValues[x].id)
+                                    {
+                                        //Console.WriteLine("Found Tempr  " + item.TemepratureSoureString);
+                                        if (item.TemepratureSoureString != "")
+                                        {
+                                            temperaryTemperatureSource = item.TemepratureSoureString;
+                                        }
+                                        else
+                                        {
+                                            temperaryTemperatureSource = "Device";//menuStripNodeInfoValues[x].temperature_source;
+                                        }
+                                        break;
+                                    }
+                                }
 
-                    //--Redefined code bbk305
-                    ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].temperature_source, menuStripNodeInfoValues[x].humidity_source,  menuStripNodeInfoValues[x].name, labelValue, menuStripNodeInfoValues[x].marker_Size);
+                            }
+                            else
+                            {
+                                temperaryTemperatureSource = menuStripNodeInfoValues[x].temperature_source;
+                            }
 
-                    //CODE : BBK305A
-                    //--incrementIndex++;
-                    indexForSeriesNodePoint++;
+                            //For humidity source 
+
+                            string temperaryHumiditySource = "";
+                            if (menuStripNodeInfoValues[x].humidity_source == "Device")
+                            {
+                                //--Then we need to select the device info
+                                foreach (var item in listTemperatureAndHumidtySourceInfoWhenDeviceSelected)
+                                {
+                                    if (item.nodeID == menuStripNodeInfoValues[x].id)
+                                    {
+                                        //Console.WriteLine("Found  " + item.HumiditySourceString);
+                                        if (item.HumiditySourceString != "")
+                                        {
+                                            temperaryHumiditySource = item.HumiditySourceString;
+                                        }
+                                        else
+                                        {
+                                            temperaryHumiditySource = "Device";//menuStripNodeInfoValues[x].temperature_source;
+                                        }
+                                        break;
+                                    }
+                                }
+
+                            }
+                            else
+                            {
+                                temperaryHumiditySource = menuStripNodeInfoValues[x].humidity_source;
+                            }
+
+                            //Console.WriteLine("temp= " + temperaryTemperatureSource + ",hum= " + temperaryHumiditySource+",count ="+listTemperatureAndHumidtySourceInfoWhenDeviceSelected.Count);
+
+                            //--Redefined code bbk305
+                            // ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].temperature_source, menuStripNodeInfoValues[x].humidity_source,  menuStripNodeInfoValues[x].name, labelValue, menuStripNodeInfoValues[x].marker_Size);
+                            ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, temperaryTemperatureSource, temperaryHumiditySource, menuStripNodeInfoValues[x].name, labelValue, menuStripNodeInfoValues[x].marker_Size);
+
+                            //CODE : BBK305A
+                            //--incrementIndex++;
+                            indexForSeriesNodePoint++;
 
                 }
                 //--resetting incrementIndex
@@ -8522,7 +8633,6 @@ namespace WFA_psychometric_chart
                             //    labelValue = menuStripNodeInfoValues[x].source;
                             //}
 
-
                             // ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue, menuStripNodeInfoValues[x].marker_Size);
                             ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].temperature_source, menuStripNodeInfoValues[x].humidity_source, menuStripNodeInfoValues[x].name, labelValue, menuStripNodeInfoValues[x].marker_Size);
                             //  incrementIndex++;
@@ -8632,6 +8742,7 @@ namespace WFA_psychometric_chart
             //s1.ChartType = SeriesChartType.Point;
 
             //string s = "source => temp:" + source_temperature+",hum : "+source_humidity + "\n Name : " + name1 + "\nLable : " + label1x;// + "\nindex=" + indexForSeriesNodePoint;
+           
             string s = "source \t\n temp: " + source_temperature + ",\t\n hum : " + source_humidity + "\n Name : " + name1;// + "\nindex=" + indexForSeriesNodePoint;
             if (chart1.InvokeRequired)
             {
@@ -9388,6 +9499,8 @@ namespace WFA_psychometric_chart
 
                     string imagePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                     string file = imagePath + @"\image\lock.png";
+                    //string newPath = Path.GetFullPath(Path.Combine(imagePath, @"..\"));
+                    //string file = newPath + @"Database\image\lock.png";//imagePath + @"\image\lock.png";
 
 
                     this.quickNodeInsertToolStripMenuItem.Image = Bitmap.FromFile(file);
@@ -9404,6 +9517,7 @@ namespace WFA_psychometric_chart
                     //==This shows the contextmenustrip on right click
                     CMSinsertNode.Enabled =true;
                     CMSinsertNode.Show(MousePosition);//-- this mouse position is used to show the menustrip in mouse pointer
+                    //CMSinsertNode.Show(Mous)
                 }
 
             }
@@ -9788,7 +9902,6 @@ namespace WFA_psychometric_chart
                 marker_Size = markerSize  ,
                 airFlow = airFlowValueGlobal
 
-
             });
 
             //--Inserting the node values in the database sqlite
@@ -9800,12 +9913,12 @@ namespace WFA_psychometric_chart
 
                 // InsertNodeInfoToDB(unique_id_for_node, xval, yval, tbSource, tbName, tbLabel, colorValue, comboboxItemText, markerSize, deviceInstanceValue, deviceIP, deviceParam1ID, deviceParam2ID, device_param1_info_for_node, device_param2_info_for_node, object_param1_identifier_type, object_param2_identifier_type);
                 //--New code is added to here
-                DatabaseOperations ObjDbOperation = new DatabaseOperations();
+                DatabaseOperations objDbOperation = new DatabaseOperations();
                 //  MessageBox.Show("Building Name= " + selectedBuildingList[0].BuildingName);
                // MessageBox.Show(unique_id_for_node+"xval = "+ xval+" yval"+ yval+"temp "+ temperature_sourceGlobal+"hum="+ humidity_sourceGlobal+",name="+ tbName+",col="+ colorValue+",size=" +markerSize +",air="+airFlowValueGlobal.ToString());
-                ObjDbOperation.InsertNodeInfoToDBWithoutDeviceInfo(CurrentSelectedBuilding, chartDetailList[indexForWhichChartIsSelected].chart_respective_nodeID, unique_id_for_node, xval, yval, temperature_sourceGlobal, humidity_sourceGlobal, tbName, colorValue, markerSize, airFlowValueGlobal.ToString());
+                objDbOperation.InsertNodeInfoToDBWithoutDeviceInfo(CurrentSelectedBuilding, chartDetailList[indexForWhichChartIsSelected].chart_respective_nodeID, unique_id_for_node, xval, yval, temperature_sourceGlobal, humidity_sourceGlobal, tbName, colorValue, markerSize, airFlowValueGlobal.ToString());
                // MessageBox.Show("Operation Complete Test");
-            //InsertNodeInfoToDBWithoutDeviceInfo(unique_id_for_node,)
+                //InsertNodeInfoToDBWithoutDeviceInfo(unique_id_for_node,)
             }
 
 
@@ -9813,9 +9926,6 @@ namespace WFA_psychometric_chart
             //the liine plot part is only done when ther is two points or more
             if (index > 0)
             {
-
-
-
 
                 double startHumidity1 = 0;
                 double startEnthalpy1 = 0;
@@ -9936,7 +10046,7 @@ namespace WFA_psychometric_chart
                 string NinthLine = @"Total Enthalpy Flow         " + "KJ/s                " + Math.Round(totalEnthalpyFlow1, 2) + "                      " + Math.Round(totalEnthalpyFlow2, 2);
                 double heatChange = totalEnthalpyFlow2 - totalEnthalpyFlow1;
                 string TenthLine = @"Heat Change                    " + "KW                  " + Math.Round(heatChange, 2) + "                     ";
-               string tooltipString = ZeroLine + "\n" + FirstLine + "\n" + SecondLine + "\n" + ThirdLine + "\n" + FourthLine + "\n" + FifthLine + "\n" + SixthLine + "\n" + SeventhLine + "\n" + EighthLine + "\n" + NinthLine + "\n" + TenthLine;
+                string tooltipString = ZeroLine + "\n" + FirstLine + "\n" + SecondLine + "\n" + ThirdLine + "\n" + FourthLine + "\n" + FifthLine + "\n" + SixthLine + "\n" + SeventhLine + "\n" + EighthLine + "\n" + NinthLine + "\n" + TenthLine;
                 newLineSeries.ToolTip = tooltipString;
 
                 //=============================end of this is used======================//
@@ -10805,31 +10915,31 @@ namespace WFA_psychometric_chart
                 }
 
 
-
-                string sql_for_CF_Detail = "SELECT * From  " + tableForCF_Detail +" where id = '"+ comfortZoneInforForEachChartForSaving[0].comfortzoneid+"'";
+                if (comfortZoneInforForEachChartForSaving.Count > 0) { 
+                    string sql_for_CF_Detail = "SELECT * From  " + tableForCF_Detail +" where id = '"+ comfortZoneInforForEachChartForSaving[0].comfortzoneid+"'";
               
 
-                //--Now reading the chart info
-                SQLiteCommand cmd4 = new SQLiteCommand(sql_for_CF_Detail, conx);
-                SQLiteDataReader reader4 = cmd4.ExecuteReader();
-                while (reader4.Read())
-                {
-
-                    if (reader4["id"].ToString() != "")
+                    //--Now reading the chart info
+                    SQLiteCommand cmd4 = new SQLiteCommand(sql_for_CF_Detail, conx);
+                    SQLiteDataReader reader4 = cmd4.ExecuteReader();
+                    while (reader4.Read())
                     {
-                        ComfortZonesDetailForSaving.Add(new dataTypeForCF
-                        {
-                            id = reader4["id"].ToString(),
-                            name = reader4["name"].ToString(),
-                            min_temp = reader4["min_temp"].ToString(), //this is in string formate
-                            max_temp = reader4["max_temp"].ToString(),
-                            min_hum = reader4["min_hum"].ToString(),
-                            max_hum = reader4["max_hum"].ToString(),
-                            colorValue = ColorTranslator.FromHtml(reader4["colorValue"].ToString())
-                        });
-                    }
-                }
 
+                        if (reader4["id"].ToString() != "")
+                        {
+                            ComfortZonesDetailForSaving.Add(new dataTypeForCF
+                            {
+                                id = reader4["id"].ToString(),
+                                name = reader4["name"].ToString(),
+                                min_temp = reader4["min_temp"].ToString(), //this is in string formate
+                                max_temp = reader4["max_temp"].ToString(),
+                                min_hum = reader4["min_hum"].ToString(),
+                                max_hum = reader4["max_hum"].ToString(),
+                                colorValue = ColorTranslator.FromHtml(reader4["colorValue"].ToString())
+                            });
+                        }
+                    }
+                }//IF THE VALUE EXIST CLOSE
 
 
                 string sql_for_mix_node_info = "SELECT * From  " + mixnodeInfoTable +" where chartID  = '"+chartId+"'";
@@ -13718,10 +13828,7 @@ namespace WFA_psychometric_chart
             //} else if(t == 0)
             //{
             //    indexRun = 1;
-            //}
-
-
-
+            //}            
             if (t == 0)
             {
                 indexRun = 1;
@@ -13913,9 +14020,6 @@ namespace WFA_psychometric_chart
                     //    dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Selected = true;
                     //    dataGridView1_CellClick(sender, eventArgs);
                     //}
-
-
-
 
 
                 }//Close of clear chart
@@ -14627,7 +14731,9 @@ namespace WFA_psychometric_chart
 
 
                 string imagePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                string file = imagePath + @"\image\lock.png";
+                //string newPath = Path.GetFullPath(Path.Combine(imagePath, @"..\"));
+                //string file = newPath + @"Database\image\lock.png";//imagePath + @"\image\lock.png";
+                string file = imagePath + @"\image\lock.png"; 
 
                 Bitmap SOME = new Bitmap(Image.FromFile(file));
 
@@ -14639,6 +14745,7 @@ namespace WFA_psychometric_chart
                FlagForDissableLeftAndRightClicksInChart = 1;//turn on 
                //==End of edit OFF
                 FlagForLockUnlock = 1;
+                //FlagForStopingRunningProcessInstantly = 0;//later added mmmm ,means dont stop
                 lb_realtimeshow.Text = "Real Time Mode";
             }
             else
@@ -14652,7 +14759,9 @@ namespace WFA_psychometric_chart
 
 
                 string imagePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                string file = imagePath + @"\image\unlock.png";
+                //string newPath = Path.GetFullPath(Path.Combine(imagePath, @"..\"));
+                //string file = newPath + @"Database\image\unlock.png"; //imagePath + @"\image\unlock.png";
+                string file = imagePath + @"\image\unlock.png"; 
 
                 Bitmap SOME = new Bitmap(Image.FromFile(file));
                 Bitmap bp = new Bitmap(SOME, pb_lock_unlock.Width, pb_lock_unlock.Height);
@@ -14664,6 +14773,7 @@ namespace WFA_psychometric_chart
                 //==============End of edit on flag decleration =========//
 
                 FlagForLockUnlock = 0;
+                //FlagForStopingRunningProcessInstantly = 1;//later added mmmm
                 lb_realtimeshow.Text = "Edit Mode";
             }
         }
@@ -14805,6 +14915,7 @@ namespace WFA_psychometric_chart
         private void disconnectLineFromAToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //--This one is for  detaching line form A
+            //this varibale is used int addDottedSeries() function 
             flagForDisconnectLineFromNode_PrevNode_Or_NextNode = 1;//now prev node is ON
 
             //---------This code is from Disconnect Line menustipe-------//
@@ -15580,12 +15691,15 @@ namespace WFA_psychometric_chart
              */
 
             try { 
-            int selectedItemIndex = dataGridView1.CurrentCell.RowIndex; //int.Parse(dataGridView1.Rows[indexSelectedForDeletion].Cells[0].Value.ToString());
+            int selectedItemIndex = dataGridView1.CurrentCell.RowIndex;
+            if (selectedItemIndex < chartDetailList.Count) { 
+             //int.Parse(dataGridView1.Rows[indexSelectedForDeletion].Cells[0].Value.ToString());
             string chart_ID = chartDetailList[selectedItemIndex].chartID;
             string chart_Name = chartDetailList[selectedItemIndex].chartName;
 
 
             LoadDataFromTemplateFileToDBActionTemplateFileUpload(chart_ID, chart_Name);
+            }
             }
             catch (Exception ex)
             {
@@ -15878,6 +15992,21 @@ namespace WFA_psychometric_chart
             }
         }
 
+        private void lb_db_name_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lb_buildingselectedShow_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void groupBox4ttt_Enter(object sender, EventArgs e)
+        {
+
+        }
+
 
 
 
@@ -15899,7 +16028,7 @@ namespace WFA_psychometric_chart
             try
             {
                 //cb1_select_data.Items.Clear();
-                ArrayList stored_location = new ArrayList();
+                //ArrayList stored_location = new ArrayList();
                 temp_building_values.Clear();//we need to clear the values for new items
                
                 

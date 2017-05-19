@@ -3988,23 +3988,32 @@ namespace WFA_psychometric_chart
         private void Form3_WeatherService_Shown(object sender, EventArgs e)
         {
             //--This function helps to restore the previous state of the form if a form has previous state.
-            //try { 
-            //if (CheckForInternetConnection() == true)
-            //{
-            //--This will be enabled later 
-            //RestoreController();
-            InitialControllerSetUp();
+            try {
+                //if (CheckForInternetConnection() == true)
+                //{
+                //--This will be enabled later 
+                //RestoreController();
+                //Cursor.Current = Cursors.WaitCursor;
+                this.Enabled = false;//optional, better target a panel or specific controls
+                this.UseWaitCursor = true;//from the Form/Window instance
+                InitialControllerSetUp();
 
             //  MessageBox.Show("Controller ok");
             RestoreWeb();
             RestoreHumiditySelfCalibration();//For humidity self calibration
             InitTimerForDeviceNew();
-            //}
-            //}
-            //catch(Exception ex)
-            //{
-            //MessageBox.Show(ex.Message);
-            //}
+                //}
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                //Cursor.Current = Cursors.Default;
+                this.Enabled = true;//optional
+                this.UseWaitCursor = false;
+            }
             //--End of restore section for form
 
         }

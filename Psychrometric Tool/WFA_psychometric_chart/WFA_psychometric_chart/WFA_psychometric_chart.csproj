@@ -60,7 +60,7 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -86,10 +86,10 @@
       <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PacketDotNet">
-      <HintPath>..\..\..\AlexCode\BACnetForBhoj\BACnetForBhoj\PacketDotNet.dll</HintPath>
+      <HintPath>..\..\..\..\PSYCHO FILES\T3000 Output_VS2015\PacketDotNet.dll</HintPath>
     </Reference>
     <Reference Include="SharpPcap">
-      <HintPath>..\..\..\AlexCode\BACnetForBhoj\BACnetForBhoj\SharpPcap.dll</HintPath>
+      <HintPath>..\..\..\..\PSYCHO FILES\T3000 Output_VS2015\SharpPcap.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -137,7 +137,6 @@
       <DependentUpon>buildingChartSetting.cs</DependentUpon>
     </Compile>
     <Compile Include="BuildingIdentificationClass.cs" />
-    <Compile Include="ChartOperations.cs" />
     <Compile Include="comfort_zone.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -282,6 +281,11 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="SelectLanguage.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -532,6 +536,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources1.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.zh.resx">
       <DependentUpon>Resources.resx</DependentUpon>
@@ -562,11 +567,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
@@ -604,6 +604,21 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\print.ico" />
+    <None Include="Resources\save file.ico" />
+    <None Include="Resources\save config.ico" />
+    <None Include="Resources\upload file.ico" />
+    <None Include="Resources\exit.ico" />
+    <None Include="Resources\weather service.ico" />
+    <None Include="Resources\Calculator.ico" />
+    <None Include="Resources\export data.ico" />
+    <None Include="Resources\tttrash.ico" />
+    <None Include="Resources\gridview fiel.ico" />
+    <None Include="Resources\ex.ico" />
+    <None Include="Resources\helpfile.ico" />
+    <None Include="Resources\delete.ico" />
+    <None Include="Resources\save.ico" />
+    <None Include="Resources\upload temp.ico" />
     <Content Include="WFA_psychometric_chart_ml.xml" />
   </ItemGroup>
   <ItemGroup>

@@ -14,9 +14,15 @@ namespace WFA_psychometric_chart
 
         private void btn_ok_Click(object sender, EventArgs e)
         {
-            try { 
+            try {
+            //this.Focus(); //This just focuses on this item rather than textbox
             string input = textBox1.Text.Trim();
             Cursor.Current = Cursors.WaitCursor;
+                if(input == "")
+                {
+                    //MessageBox.Show("Enter the input key");
+                    return;//Enter values
+                }
 
             //EditNodeLineForm ef = new EditNodeLineForm()
             frm.TemperatureInputPorcessForDevice(input);
