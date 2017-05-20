@@ -11,9 +11,9 @@ namespace PH_App
         public MainController mc;
         public InitialDatabaseSetupController idsc;
         public DatabaseOperationModel dom;
-        public BuildingOperation bo;
+        //public BuildingOperation bo;
         public ObjectCollection ObjColl;
-        public ChartCreationAndOperations chartOprn;
+        //public ChartCreationAndOperations chartOprn;
 
         public Form_Main_PH_Application()
         {
@@ -24,8 +24,8 @@ namespace PH_App
             mc = ObjColl.mc;
             idsc = ObjColl.idsc;
             dom = ObjColl.dom;
-            bo = ObjColl.bo;
-            chartOprn = ObjColl.coprn;
+            //bo = ObjColl.bo;
+            //chartOprn = ObjColl.coprn;
         }
         public void objectInitialization()
         {
@@ -34,7 +34,7 @@ namespace PH_App
             mc = ObjColl.mc;
             idsc = ObjColl.idsc;
             dom = ObjColl.dom;
-            bo = ObjColl.bo;
+           // bo = ObjColl.bo;
         }
         Series seriesPoint = new Series("seriesNode1");
         
@@ -61,11 +61,13 @@ namespace PH_App
                 phChart.Series.Add(seriesPoint);
                 phChart.Series.Add(mc.series1);
                 mc.ReadDataForBuildingSelectedFromPsychrometric();
-               // MessageBox.Show("chart condn=" + phChart.Enabled);
-               // phChart.Enabled = true; 
+
+                // MessageBox.Show("chart condn=" + phChart.Enabled);
+                // phChart.Enabled = true; 
+                mc.RefreshByLoadingDataWhileLoad(sender, e, this);
 
 
-            }
+                }
             finally
             {
                this.Enabled = true;//optional
@@ -153,7 +155,7 @@ namespace PH_App
 
         private void editNodeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            mc.LoadEditNodeDialog();
         }
         Point? prevPosition = null;
         ToolTip tooltip = new ToolTip();
@@ -275,9 +277,30 @@ namespace PH_App
            mc.ExcelExportFunction(sender, e, this);
         }
 
+        private void gridViewToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            mc.LoadEditNodeDialog();
+        }
+
         private void pb_lock_unlock_Click(object sender, EventArgs e)
         {
             mc.LockAndUnlock(this);
         }
+
+        //--This one is for refreshing the data
+        /// <summary>
+        /// Function should be called inside the boundary of the chart list
+        /// 
+        /// </summary>
+        public void RefreshChart(int index)
+        {
+            int rowIndex = index;//dataGridView1.CurrentCell.RowIndex;
+            var eventArgs = new DataGridViewCellEventArgs(1, rowIndex);           
+            // or setting the selected cells manually before executing the function
+            dataGridView1.Rows[rowIndex].Cells[1].Selected = true;
+            dataGridView1_CellClick(this, eventArgs);
+            
+        }
+
     }
 }

@@ -20,7 +20,11 @@ namespace PH_App
     /// </summary>
    public class MainController :DatabaseOperationModel
     {
-
+       // Form_Main_PH_Application fmain;
+        public MainController()
+        {
+           //fmain = f1;
+        }
       
         
         public void LoadForPH(string fluidName, Form_Main_PH_Application f)
@@ -58,6 +62,30 @@ namespace PH_App
             f.Text = "Psychometric Chart [" + AssemblyDateGeneration.Value.ToShortDateString() + "]";
         }
 
+        public void RefreshByLoadingDataWhileLoad(object sender, EventArgs e, Form_Main_PH_Application f1)
+        {
+            //--Refreshing the data
+            if (f1.dataGridView1.Rows.Count > 0)  //If there is data then only do this one
+            {
+                if (f1.dataGridView1.CurrentCell.RowIndex >= 0 && f1.dataGridView1.CurrentCell.RowIndex < chartDetailList.Count)
+                {
+                    var eventArgs = new DataGridViewCellEventArgs(f1.dataGridView1.CurrentCell.ColumnIndex, f1.dataGridView1.CurrentCell.RowIndex);
+                    //or setting the selected cells manually before executing the function
+                    f1.dataGridView1.Rows[f1.dataGridView1.CurrentCell.RowIndex].Cells[f1.dataGridView1.CurrentCell.ColumnIndex].Selected = true;
+                    f1.dataGridView1_CellClick(sender, eventArgs);
+                    //MessageBox.Show("selecteion change clicked");
+                }
+                else
+                {
+                    var eventArgs = new DataGridViewCellEventArgs(1, 0);
+                    // or setting the selected cells manually before executing the function
+                    f1.dataGridView1.Rows[0].Cells[1].Selected = true;
+                    f1.dataGridView1_CellClick(sender, eventArgs);
+                    // }
+                }
+
+            }
+        }
         public void WebInfoCalibration()
         {
             PullLocationInformation();
@@ -198,7 +226,7 @@ namespace PH_App
         public double xAxisMaximum = 4000;
         public double yAxisMinimum = 0;//1 / 10000;
         public double yAxisMaximum = 100;
-        double radiusSize = 0.25;//initally 0.25
+        double radiusSize = 0.01;//initally 0.25
 
 
         public class DataTypeForPH_CurveData
@@ -1137,7 +1165,7 @@ namespace PH_App
             }
             else
             {
-                f1.lbPrintTest.Text = "FlagForDisConnect=0";
+                //f1.lbPrintTest.Text = "FlagForDisConnect=0";
                 // lb_where.Text = "me : else line detect on";
                // f1.disconnectLineToolStripMenuItem.Enabled = false;
 
@@ -1273,6 +1301,9 @@ namespace PH_App
 
                                 }
                             }
+
+                            f1.lbPrintTest.Text = "id sel  =" + idSelected;
+
                         }//close of if menuStripAllValue>0
                     }//close of if
                 }
@@ -1383,26 +1414,39 @@ namespace PH_App
                 {
                     //Point position = e.Location;
                     double xValue = chart1.ChartAreas[0].AxisX.PixelPositionToValue(e.X);
-                    double yValue =Math.Pow(10, chart1.ChartAreas[0].AxisY.PixelPositionToValue(e.Y));
+                    double yValue = Math.Pow(10, chart1.ChartAreas[0].AxisY.PixelPositionToValue(e.Y));
                     if ((xValue >= xAxisMinimum && xValue <= xAxisMaximum) && (yValue >= yAxisMinimum && yValue <= yAxisMaximum))
                     {
 
                         xAxis1 = xValue;
                         yAxis1 = yValue;
+                        //--ADJUSTING THE radius value
+                        if(yAxis1 > 1 && yAxis1< 20)
+                        {
+                            radiusSize = 1;
+                        }else if (yAxis1 >= 20)
+                        {
+                            radiusSize = 2;
+                        }
+                        else
+                        {
+                            radiusSize = 0.25;
+                        }
                         //Console.Write("xval = " + xValue + "yvalue = " + yValue);
                         if (listNodeInfoValues.Count > 0)
                         {
                             //foreach(var values in menuStripNodeInfoValues)
-                           
+
 
                             for (int i = 0; i < listNodeInfoValues.Count; i++)
                             {
 
                                 if (listNodeInfoValues[i].temperature_source != "Mix")
                                 {
-                                   
 
-                                    if ((xValue > listNodeInfoValues[i].xVal - radiusSize  && xValue < listNodeInfoValues[i].xVal + radiusSize) && (yValue > listNodeInfoValues[i].yVal - radiusSize && yValue < listNodeInfoValues[i].yVal + radiusSize))
+
+                                    //if ((xValue > listNodeInfoValues[i].xVal - radiusSize  && xValue < listNodeInfoValues[i].xVal + radiusSize) && (yValue > listNodeInfoValues[i].yVal - radiusSize && yValue < listNodeInfoValues[i].yVal + radiusSize))
+                                    if ((xValue > listNodeInfoValues[i].xVal - radiusSize && xValue < listNodeInfoValues[i].xVal + radiusSize) && (yValue > listNodeInfoValues[i].yVal - radiusSize && yValue < listNodeInfoValues[i].yVal + radiusSize))
                                     {
 
                                         //--This is changed from int to string  code bbk305
@@ -1504,7 +1548,7 @@ namespace PH_App
 
 
                                 //menuStripNodeInfoValues[idSelected].xVal = xAxis1;
-                                 listNodeInfoValues[tempIndexForNode].yVal = yAxis1;//This value is changed...
+                                listNodeInfoValues[tempIndexForNode].yVal = yAxis1;//This value is changed...
                                 //====================For mix node movement = ===============//
 
                                 //UpdateMixPointOnNodeMovement();
@@ -1542,7 +1586,7 @@ namespace PH_App
                                     //--this is changed as well code :bbk305
                                     // ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue, menuStripNodeInfoValues[x].marker_Size);
                                     //f1.dom.ReDrawPoints(f1.dom.series1, f1.dom.listNodeInfoValues[x].xVal, f1.dom.listNodeInfoValues[x].yVal, f1.dom.listNodeInfoValues[x].colorValue, f1.dom.listNodeInfoValues[x].temperature_source, f1.dom.listNodeInfoValues[x].pressure_source, f1.dom.listNodeInfoValues[x].name, labelValue, f1.dom.listNodeInfoValues[x].marker_Size);
-                                    ReDrawPoints(chart1,series1, listNodeInfoValues[x].xVal, listNodeInfoValues[x].yVal, listNodeInfoValues[x].colorValue, listNodeInfoValues[x].temperature_source, listNodeInfoValues[x].pressure_source, listNodeInfoValues[x].name, labelValue, listNodeInfoValues[x].marker_Size);
+                                    ReDrawPoints(chart1, series1, listNodeInfoValues[x].xVal, listNodeInfoValues[x].yVal, listNodeInfoValues[x].colorValue, listNodeInfoValues[x].temperature_source, listNodeInfoValues[x].pressure_source, listNodeInfoValues[x].name, labelValue, listNodeInfoValues[x].marker_Size);
                                     //Updating values in database
                                     if (flagForInsertOrUpdateDataToDB == 1)
                                     {
@@ -1566,7 +1610,7 @@ namespace PH_App
 
                                         //ReDrawLines(menuStripNodeInfoValues[x].id, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue);
                                         //f1.dom.ReDrawLines(f1.dom.listLineInfoValues[x].ID, f1.dom.listLineInfoValues[x].prevNodeId, f1.dom.listLineInfoValues[x].nextNodeId, f1.dom.listLineInfoValues[x].lineSeriesID, f1.dom.listLineInfoValues[x].lineColorValue, f1.dom.listLineInfoValues[x].lineThickness, f1.dom.listLineInfoValues[x].name, f1.dom.listLineInfoValues[x].status);
-                                        ReDrawLines(chart1,listLineInfoValues[x].ID, listLineInfoValues[x].prevNodeId, listLineInfoValues[x].nextNodeId, listLineInfoValues[x].lineSeriesID, listLineInfoValues[x].lineColorValue, listLineInfoValues[x].lineThickness, listLineInfoValues[x].name, listLineInfoValues[x].status);
+                                        ReDrawLines(chart1, listLineInfoValues[x].ID, listLineInfoValues[x].prevNodeId, listLineInfoValues[x].nextNodeId, listLineInfoValues[x].lineSeriesID, listLineInfoValues[x].lineColorValue, listLineInfoValues[x].lineThickness, listLineInfoValues[x].name, listLineInfoValues[x].status);
 
                                     }
 
@@ -1586,7 +1630,7 @@ namespace PH_App
 
                                 //menuStripNodeInfoValues[idSelected].xVal = xAxis1;
                                 listNodeInfoValues[tempIndexForNode].xVal = xAxis1;//--This value is just changed 
-                                                                                          //menuStripNodeInfoValues[idSelected].yVal = yAxis1;
+                                                                                   //menuStripNodeInfoValues[idSelected].yVal = yAxis1;
 
                                 //====================For mix node movement = ===============//
 
@@ -1624,7 +1668,7 @@ namespace PH_App
 
                                     // ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue, menuStripNodeInfoValues[x].marker_Size);
                                     //dom.ReDrawPoints(dom.series1, dom.listNodeInfoValues[x].xVal, dom.listNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].temperature_source, menuStripNodeInfoValues[x].humidity_source, menuStripNodeInfoValues[x].name, labelValue, menuStripNodeInfoValues[x].marker_Size);
-                                     ReDrawPoints(chart1,series1, listNodeInfoValues[x].xVal, listNodeInfoValues[x].yVal, listNodeInfoValues[x].colorValue, listNodeInfoValues[x].temperature_source, listNodeInfoValues[x].pressure_source, listNodeInfoValues[x].name, labelValue, listNodeInfoValues[x].marker_Size);
+                                    ReDrawPoints(chart1, series1, listNodeInfoValues[x].xVal, listNodeInfoValues[x].yVal, listNodeInfoValues[x].colorValue, listNodeInfoValues[x].temperature_source, listNodeInfoValues[x].pressure_source, listNodeInfoValues[x].name, labelValue, listNodeInfoValues[x].marker_Size);
 
                                     //Updating values in database...
                                     if (flagForInsertOrUpdateDataToDB == 1)
@@ -1741,6 +1785,7 @@ namespace PH_App
 
                         //Need to add here
                     }
+
 
                 }
                 catch (Exception ex)
@@ -4303,9 +4348,29 @@ namespace PH_App
 
         //====================CHart and template operations===============================//
 
+        //========================EditNodeAndLine Operation compartment============//
+        public void LoadEditNodeDialog()
+        {
+            var editNode = new FormEditNodeAndLine(this);
+            editNode.ShowDialog();
+        }
 
-   
+        public void chart1RefreshCustom()
+        {
+            //this.Invalidate();
+            //chart1.Invalidate();
+            //plot_new_graph();
+           // int indx = 
+            if (chartDetailList.Count > 0)
+            {
+                
+              var obj = new Form_Main_PH_Application();
 
+                obj.RefreshChart(indexOfChartSelected);
+            }
+
+        }
+        //========================End edit node and line compartment=================//
 
     }
 }

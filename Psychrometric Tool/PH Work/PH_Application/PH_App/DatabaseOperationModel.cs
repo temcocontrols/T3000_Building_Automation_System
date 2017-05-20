@@ -1672,8 +1672,10 @@ namespace PH_App
 
                     //--Now we can find the previous id values as follows:
                     //=====================================Finding previous id value=================================//
-                    var chartOptrn = new ChartCreationAndOperations();
-                     previousNodeIndexForLineInput = chartOptrn.IndexOfPreviousNodeForLineFunction();
+                    //  var chartOptrn = new ChartCreationAndOperations();
+                    var main = new MainController();
+
+                     previousNodeIndexForLineInput = main.IndexOfPreviousNodeForLineFunction();
                     //==================================End of previous id=======================================//
 
                     //--Adding data form the line node values...
@@ -2196,9 +2198,7 @@ namespace PH_App
 
         }
 
-
-
-
+        
         public class nodeDataTypeForSaving
         {
             //  public int count { get; set; }
@@ -2218,11 +2218,7 @@ namespace PH_App
             public string lastUpdatedDate { get; set; }
 
         }
-
-
-
-
-
+        
         public class chartDetailDT_X
         {
             // public int count { get; set; }
@@ -2232,8 +2228,7 @@ namespace PH_App
             public string chart_respective_lineID { get; set; }
             public string enableChartStatus { get; set; }
         }
-
-
+        
         public class lineDataType_X
         {
             //  public int count { get; set; }
@@ -4042,6 +4037,58 @@ namespace PH_App
         }
 
 
+        //============================This one is for Edit Node and line section=========//
+
+        /// <summary>
+        /// Updating node info in db
+        /// </summary>
+        /// <param name="buildingName"></param>
+        /// <param name="id"></param>
+        /// <param name="xVal"></param>
+        /// <param name="yVal"></param>
+        /// <param name="temperature_source"></param>
+        /// <param name="pressure_source"></param>
+        /// <param name="name"></param>
+        /// <param name="colorValue"></param>
+        /// <param name="nodeSizeValue"></param>
+       
+        public void UpdateDataForNodeInfoInEditNodeSection(string buildingName, string id, double xVal, double yVal, string temperature_source, string pressure_source, string name, Color colorValue, int nodeSizeValue)
+        {
+
+            string tableName = "tbl_" + buildingName + "_node_value";//currentNodeTableFromDB;  
+
+            //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
+
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                string sql_string = "UPDATE " + tableName + "   set  xValue =@xVal ,  yValue=@yVal, temperature_source=@tempsource,  pressure_source=@pressuresource, name=@name, colorValue=@colorVal, nodeSize=@node_size_value where nodeID  =@id";
+                SQLiteCommand command = new SQLiteCommand(sql_string, connection);
+                command.CommandType = CommandType.Text;
+                command.Parameters.AddWithValue("@xVal", xVal.ToString());
+                command.Parameters.AddWithValue("@yVal", yVal.ToString());
+                // command.Parameters.AddWithValue("@source", source);
+                command.Parameters.AddWithValue("@tempsource", temperature_source);
+                command.Parameters.AddWithValue("@pressuresource",pressure_source);
+                command.Parameters.AddWithValue("@name", name);
+                //command.Parameters.AddWithValue("@label", label);
+                command.Parameters.AddWithValue("@colorVal", ColorTranslator.ToHtml(colorValue));
+                //command.Parameters.AddWithValue("@text", showItemText);
+                command.Parameters.AddWithValue("@node_size_value", nodeSizeValue);
+               // command.Parameters.AddWithValue("@airflow", airFlow);
+                command.Parameters.AddWithValue("@id", id);
+                //MessageBox.Show("selected value = " + cb_station_names.SelectedItem.ToString());
+                command.ExecuteNonQuery();
+            }
+        }
+
+
+
+        //=============================End of edit node and line section===============//
 
 
 

@@ -12,10 +12,10 @@ namespace PH_App
    public class PHChartGlobalVariables
     {
         //--These are the chart properties.
-        public int XAxisMinimum { get; set; }
-        public int XAxisMaximum { get; set; }
-        public int YAxisMinimum { get; set; }
-        public int YAxisMaximum { get; set; }
+        //public int XAxisMinimum { get; set; }
+        //public int XAxisMaximum { get; set; }
+        //public int YAxisMinimum { get; set; }
+        //public int YAxisMaximum { get; set; }
 
 
         //=============Variables from nodeandlineclass ===================

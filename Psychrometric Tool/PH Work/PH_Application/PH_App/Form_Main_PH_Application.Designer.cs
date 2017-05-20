@@ -402,6 +402,7 @@
             // 
             this.gridViewToolStripMenuItem.Name = "gridViewToolStripMenuItem";
             resources.ApplyResources(this.gridViewToolStripMenuItem, "gridViewToolStripMenuItem");
+            this.gridViewToolStripMenuItem.Click += new System.EventHandler(this.gridViewToolStripMenuItem_Click);
             // 
             // excelExportToolStripMenuItem
             // 

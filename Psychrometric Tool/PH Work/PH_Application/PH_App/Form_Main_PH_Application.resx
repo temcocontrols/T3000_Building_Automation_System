@@ -241,7 +241,7 @@
     <value>2, 3, 2, 3</value>
   </data>
   <data name="dataGridView1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>153, 546</value>
+    <value>141, 546</value>
   </data>
   <data name="dataGridView1.TabIndex" type="System.Int32, mscorlib">
     <value>51</value>
