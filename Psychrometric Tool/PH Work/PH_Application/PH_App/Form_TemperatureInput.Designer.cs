@@ -69,8 +69,11 @@
             this.Controls.Add(this.btn_ok);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBox1);
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "Form_TemperatureInput";
-            this.Text = "Form_TemperatureInput";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.Text = "Temperature Input";
             this.ResumeLayout(false);
             this.PerformLayout();
 

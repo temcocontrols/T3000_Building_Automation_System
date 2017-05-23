@@ -297,6 +297,9 @@
   <data name="label4.TabIndex" type="System.Int32, mscorlib">
     <value>12</value>
   </data>
+  <data name="label4.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
   <data name="&gt;&gt;label4.Name" xml:space="preserve">
     <value>label4</value>
   </data>
@@ -320,6 +323,9 @@
   </data>
   <data name="label3.TabIndex" type="System.Int32, mscorlib">
     <value>11</value>
+  </data>
+  <data name="label3.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
   </data>
   <data name="&gt;&gt;label3.Name" xml:space="preserve">
     <value>label3</value>
@@ -381,6 +387,9 @@
   <data name="lbEntropy.Text" xml:space="preserve">
     <value>null</value>
   </data>
+  <data name="lbEntropy.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
   <data name="&gt;&gt;lbEntropy.Name" xml:space="preserve">
     <value>lbEntropy</value>
   </data>
@@ -416,6 +425,9 @@
   </data>
   <data name="label25.Text" xml:space="preserve">
     <value>S</value>
+  </data>
+  <data name="label25.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
   </data>
   <data name="&gt;&gt;label25.Name" xml:space="preserve">
     <value>label25</value>
@@ -453,6 +465,9 @@
   <data name="lbTemperature.Text" xml:space="preserve">
     <value>null</value>
   </data>
+  <data name="lbTemperature.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
   <data name="&gt;&gt;lbTemperature.Name" xml:space="preserve">
     <value>lbTemperature</value>
   </data>
@@ -488,6 +503,9 @@
   </data>
   <data name="label24.Text" xml:space="preserve">
     <value>T</value>
+  </data>
+  <data name="label24.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
   </data>
   <data name="&gt;&gt;label24.Name" xml:space="preserve">
     <value>label24</value>
@@ -689,6 +707,9 @@
   </data>
   <data name="lbPrintTest.Text" xml:space="preserve">
     <value>label1</value>
+  </data>
+  <data name="lbPrintTest.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
   </data>
   <data name="&gt;&gt;lbPrintTest.Name" xml:space="preserve">
     <value>lbPrintTest</value>
@@ -997,25 +1018,25 @@
     <value>File</value>
   </data>
   <data name="simulationMode.Size" type="System.Drawing.Size, System.Drawing">
-    <value>152, 22</value>
+    <value>147, 22</value>
   </data>
   <data name="simulationMode.Text" xml:space="preserve">
     <value>PH Calculator</value>
   </data>
   <data name="trashBoxToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>152, 22</value>
+    <value>147, 22</value>
   </data>
   <data name="trashBoxToolStripMenuItem.Text" xml:space="preserve">
     <value>Trash Box</value>
   </data>
   <data name="gridViewToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>152, 22</value>
+    <value>147, 22</value>
   </data>
   <data name="gridViewToolStripMenuItem.Text" xml:space="preserve">
     <value>Grid View</value>
   </data>
   <data name="excelExportToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>152, 22</value>
+    <value>147, 22</value>
   </data>
   <data name="excelExportToolStripMenuItem.Text" xml:space="preserve">
     <value>Excel Export</value>

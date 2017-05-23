@@ -155,7 +155,7 @@ namespace PH_App
 
         private void editNodeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            mc.LoadEditNodeDialog();
+            mc.LoadEditNodeDialog(this);
         }
         Point? prevPosition = null;
         ToolTip tooltip = new ToolTip();
@@ -279,7 +279,7 @@ namespace PH_App
 
         private void gridViewToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            mc.LoadEditNodeDialog();
+            mc.LoadEditNodeDialog(this);
         }
 
         private void pb_lock_unlock_Click(object sender, EventArgs e)
@@ -287,19 +287,30 @@ namespace PH_App
             mc.LockAndUnlock(this);
         }
 
+        private void backgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+            //--Background worker
+            mc.RefreshDataFromDeviceAndWeb(this);
+        }
+
+        private void backgroundWorker1_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
+        {
+            //--BG Complete
+            mc.BackgroundWorkerRunWorkerCompleted(sender, e, this, phChart);
+
+        }
+
         //--This one is for refreshing the data
         /// <summary>
         /// Function should be called inside the boundary of the chart list
-        /// 
         /// </summary>
         public void RefreshChart(int index)
-        {
+        {            
             int rowIndex = index;//dataGridView1.CurrentCell.RowIndex;
             var eventArgs = new DataGridViewCellEventArgs(1, rowIndex);           
             // or setting the selected cells manually before executing the function
             dataGridView1.Rows[rowIndex].Cells[1].Selected = true;
-            dataGridView1_CellClick(this, eventArgs);
-            
+            dataGridView1_CellClick(this, eventArgs);            
         }
 
     }

@@ -4086,10 +4086,586 @@ namespace PH_App
             }
         }
 
+        public void UpdateNodeInfoToDBFromTemperatureDeviceSource(string id, double xVal, double yVal, string TemperatureSource, string pressureSource, string name, Color colorValue, int nodeSizeValue)
+        {
+            string tableName = "tbl_" + selectedBuildingList[0].BuildingName + "_node_value";//currentNodeTableFromDB;  
 
+            //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
+
+
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                string sql_string = "UPDATE " + tableName + "   set  xValue =@xVal ,  yValue=@yVal, temperature_source=@tempSource,pressure_source=@pressureSource ,name=@name,  colorValue=@colorVal, nodeSize=@node_size_value ,lastUpdatedDate= @date  where nodeID  =@id";
+                SQLiteCommand command = new SQLiteCommand(sql_string, connection);
+                command.CommandType = CommandType.Text;
+                command.Parameters.AddWithValue("@xVal", xVal.ToString());
+                command.Parameters.AddWithValue("@yVal", yVal.ToString());
+                // command.Parameters.AddWithValue("@source", source);
+                command.Parameters.AddWithValue("@tempSource", TemperatureSource);
+                command.Parameters.AddWithValue("@pressureSource", pressureSource);
+                command.Parameters.AddWithValue("@name", name);
+                //command.Parameters.AddWithValue("@label", label);
+                command.Parameters.AddWithValue("@colorVal", ColorTranslator.ToHtml(colorValue));
+                //command.Parameters.AddWithValue("@text", showItemText);
+               // command.Parameters.AddWithValue("@airflow", airFlow.ToString());
+                command.Parameters.AddWithValue("@node_size_value", nodeSizeValue);
+                command.Parameters.AddWithValue("@date", DateTime.Now); //This is the date presented at what time the update  was performed
+                command.Parameters.AddWithValue("@id", id);
+                //MessageBox.Show("selected value = " + cb_station_names.SelectedItem.ToString());
+                command.ExecuteNonQuery();
+            }
+
+        }//--close of insertnodeinfotodb fxn
+
+
+        public void InsertUpdateFromTemperatureDeviceSelectionToDBOnlyTempertureUpdate(string nodeid, string temp_deviceInstanceID, string temp_ip, string temp_param1id, string temp_param1info, string temp_param1type)
+        {
+
+            //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
+
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+            string tableNameDevice = "tbl_" + selectedBuildingList[0].BuildingName + "_device_info_for_node";//currentNodeTableFromDB; 
+
+            //checking if the data is present or not
+            SQLiteDataReader reader = null;
+            string queryString = "SELECT *  from " + tableNameDevice + " WHERE nodeID = @id";
+
+            bool flag = false;
+            using (SQLiteConnection cxn = new SQLiteConnection(connString))
+            {
+                cxn.Open();
+                SQLiteCommand command = new SQLiteCommand(queryString, cxn);
+
+                command.Parameters.AddWithValue("@id", nodeid);//This is the group id that is used to identify each node
+                reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    if (reader["nodeID"].ToString() != "")
+                    {
+                        flag = true;
+                    }
+                }   //Close of while
+
+            } //Close of using
+
+
+
+            if (flag == false)
+            {
+                //insert the value 
+
+                using (SQLiteConnection connection = new SQLiteConnection(connString))
+                {
+                    connection.Open();
+                    //SQLiteDataReader reader = null;
+                    //  MessageBox.Show("Insert the node value flag = false wala and id  = "+nodeid);
+                    string sql_string = "insert into " + tableNameDevice + "(nodeID,device_instanceID_for_param1,device_instanceID_for_param2,IP_for_param1,IP_for_param2,param1ID,param2ID,param1_info,param2_info,param1_identifier_type,param2_identifier_type) VALUES(@id,@instanceIDparam1,@deviceInstanceParam2,@IP_param1,@IP_param2,@param1,@param2,@param1info, @param2info, @param1_iden_type, @param2_iden_type)";
+                    SQLiteCommand command = new SQLiteCommand(sql_string, connection);
+                    command.CommandType = CommandType.Text;
+
+                    command.Parameters.AddWithValue("@id", nodeid);
+                    command.Parameters.AddWithValue("@instanceIDparam1", temp_deviceInstanceID);
+                    command.Parameters.AddWithValue("@deviceInstanceParam2", "");//Insert empty value
+
+                    command.Parameters.AddWithValue("@IP_param1", temp_ip);
+                    command.Parameters.AddWithValue("@IP_param2", "");//Insert empty value
+
+                    command.Parameters.AddWithValue("@param1", temp_param1id);
+                    command.Parameters.AddWithValue("@param2", "");
+                    command.Parameters.AddWithValue("@param1info", temp_param1info);
+                    command.Parameters.AddWithValue("@param2info", "");
+                    command.Parameters.AddWithValue("@param1_iden_type", temp_param1type);
+                    command.Parameters.AddWithValue("@param2_iden_type", "");
+                    command.ExecuteNonQuery();
+                }
+            }
+            else
+            {
+                //Update the value
+                using (SQLiteConnection connection = new SQLiteConnection(connString))
+                {
+                    connection.Open();
+                    //SQLiteDataReader reader = null;
+                    //  MessageBox.Show("Update mechanism the node value flag = true  wala,id = "+nodeid);
+
+                    string sql_string = "UPDATE  " + tableNameDevice + "  SET device_instanceID_for_param1 = @instanceID,IP_for_param1 =@IP ,param1ID = @param1 ,param1_info = @param1info,param1_identifier_type= @param1_iden_type  where nodeID = @id ";
+                    SQLiteCommand command = new SQLiteCommand(sql_string, connection);
+                    command.CommandType = CommandType.Text;
+                    command.Parameters.AddWithValue("@id", nodeid);
+                    command.Parameters.AddWithValue("@instanceID", temp_deviceInstanceID);
+                    command.Parameters.AddWithValue("@IP", temp_ip);
+                    command.Parameters.AddWithValue("@param1", temp_param1id);
+                    // command.Parameters.AddWithValue("@param2", param2id);
+                    command.Parameters.AddWithValue("@param1info", temp_param1info);
+                    //  command.Parameters.AddWithValue("@param2info", param2info);
+                    command.Parameters.AddWithValue("@param1_iden_type", temp_param1type);
+                    // command.Parameters.AddWithValue("@param2_iden_type", param2type);
+                    command.ExecuteNonQuery();
+                }
+
+            }
+
+
+        }
+
+        public void InsertValueOfTemperatureHumiditySoure(string nodeID, string TemperatureSource, string pressureSource)
+        {
+            string tableForTempHum = "tbl_" + selectedBuildingList[0].BuildingName + "_TemperaturePressureSourceInfo";
+            //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
+
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                //SQLiteDataReader reader = null;
+                string sql_string = "insert into " + tableForTempHum + "(NodeID,chartID,TemperatureSourceInfo,PressureSourceInfo) VALUES(@id,@chartID,@t,@h)";
+                SQLiteCommand command = new SQLiteCommand(sql_string, connection);
+                command.CommandType = CommandType.Text;
+
+                command.Parameters.AddWithValue("@id", nodeID);
+                command.Parameters.AddWithValue("@chartID", chartDetailList[indexForWhichChartIsSelected].chartID);
+                command.Parameters.AddWithValue("@t", TemperatureSource);
+                command.Parameters.AddWithValue("@h", pressureSource);
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public void UpdateOrInsertHumiditySourceInfo(string nodeID, string pressureSource)
+        {
+            string tableForTempHum = "tbl_" + selectedBuildingList[0].BuildingName + "_TemperaturePressureSourceInfo";
+
+
+            bool dataPresent = false;
+            //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
+
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+
+                // tables and also we need to all the chart of single building in a s single table .
+                string sql = "select * from " + tableForTempHum + " where nodeID = '" + nodeID + "'";
+                SQLiteCommand command = new SQLiteCommand(sql, connection);
+                SQLiteDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    dataPresent = true;
+                }
+
+            }
+
+            //Data is present then update else insert
+            if (dataPresent == true)
+            {
+                DB_HumiditySourceUpdate(nodeID, pressureSource);
+            }
+            else
+            {
+                InsertValueOfTemperatureHumiditySoure(nodeID, "", pressureSource);
+            }
+
+
+        }
+
+
+
+        /// <summary>
+        /// Function helps to update the humidity source value into the database
+        /// </summary>
+        /// <param name="nodeID"></param>
+        /// <param name="pressureSourceValue"></param>
+        public void DB_HumiditySourceUpdate(string nodeID, string pressureSourceValue)
+        {
+            /*
+           //This function helps to update the temperature source detail such as 1-VAR1, 2-var2 etc.
+           or even label name from alex db
+            */
+
+
+            string tableName = "tbl_" + selectedBuildingList[0].BuildingName + "_TemperaturePressureSourceInfo";// "tbl_" ++"_node_value";
+                                                                                                                //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                                                                                                                //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
+
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                SQLiteDataReader reader = null;
+                string queryString = " UPDATE " + tableName + "  set PressureSourceInfo = @status    where NodeID = @id_value";
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                command.Parameters.AddWithValue("@status", pressureSourceValue);
+                command.Parameters.AddWithValue("@id_value", nodeID);
+                //SqlDataAdapter dataAdapter = new SqlDataAdapter(queryString, connection.ConnectionString); //connection.ConnectionString is the connection string
+                reader = command.ExecuteReader();
+            }//Close of using          
+
+        }
+        public void DB_TemperatureSourceUpdate(string nodeID, string TemperatureSourceValue)
+        {
+            /*
+           //This function helps to update the temperature source detail such as 1-VAR1, 2-var2 etc.
+           or even label name from alex db
+            */
+
+
+            string tableName = "tbl_" + selectedBuildingList[0].BuildingName + "_TemperaturePressureSourceInfo";// "tbl_" ++"_node_value";
+            //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
+
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                SQLiteDataReader reader = null;
+                string queryString = " UPDATE " + tableName + "  set TemperatureSourceInfo = @status    where NodeID = @id_value";
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                command.Parameters.AddWithValue("@status", TemperatureSourceValue);
+                command.Parameters.AddWithValue("@id_value", nodeID);
+                //SqlDataAdapter dataAdapter = new SqlDataAdapter(queryString, connection.ConnectionString); //connection.ConnectionString is the connection string
+                reader = command.ExecuteReader();
+
+            }//Close of using          
+
+        }
+
+        public void UpdateOrInsertTemperatureSourceInfo(string nodeID, string TemperaturSourceInfo)
+        {
+            string tableForTempHum = "tbl_" + selectedBuildingList[0].BuildingName + "_TemperaturePressureSourceInfo";
+
+
+            bool dataPresent = false;
+            //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
+
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+
+                // tables and also we need to all the chart of single building in a s single table .
+                string sql = "select * from " + tableForTempHum + " where nodeID = '" + nodeID + "'";
+                SQLiteCommand command = new SQLiteCommand(sql, connection);
+                SQLiteDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    dataPresent = true;
+                }
+
+            }
+
+            //Data is present then update else insert
+            if (dataPresent == true)
+            {
+                DB_TemperatureSourceUpdate(nodeID, TemperaturSourceInfo);
+            }
+            else
+            {
+                InsertValueOfTemperatureHumiditySoure(nodeID, TemperaturSourceInfo, "");
+            }
+
+
+        }
+
+        public void InsertUpdateFromHumidityDeviceSelectionToDBOnlyTempertureUpdate(string nodeid, string Humidity_deviceInstanceID, string Humidity_ip, string Humidity_param1id, string Humidity_param1info, string Humidity_param1type)
+        {
+            string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
+
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+            string tableNameDevice = "tbl_" + selectedBuildingList[0].BuildingName + "_device_info_for_node";//currentNodeTableFromDB; 
+
+            //checking if the data is present or not
+            SQLiteDataReader reader = null;
+            string queryString = "SELECT *  from " + tableNameDevice + " WHERE nodeID = @id";
+
+            bool flag = false;
+            using (SQLiteConnection cxn = new SQLiteConnection(connString))
+            {
+                cxn.Open();
+                SQLiteCommand command = new SQLiteCommand(queryString, cxn);
+
+                command.Parameters.AddWithValue("@id", nodeid);//This is the group id that is used to identify each node
+                reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    if (reader["nodeID"].ToString() != "")
+                    {
+                        flag = true;
+                    }
+                }   //Close of while
+
+            } //Close of using
+
+
+
+            if (flag == false)
+            {
+                //insert the value 
+
+                using (SQLiteConnection connection = new SQLiteConnection(connString))
+                {
+                    connection.Open();
+                    //SQLiteDataReader reader = null;
+                    //  MessageBox.Show("Insert the node value flag = false wala and id  = "+nodeid);
+                    string sql_string = "insert into " + tableNameDevice + "(nodeID,device_instanceID_for_param1,device_instanceID_for_param2,IP_for_param1,IP_for_param2,param1ID,param2ID,param1_info,param2_info,param1_identifier_type,param2_identifier_type) VALUES(@id,@instanceIDparam1,@deviceInstanceParam2,@IP_param1,@IP_param2,@param1,@param2,@param1info, @param2info, @param1_iden_type, @param2_iden_type)";
+                    SQLiteCommand command = new SQLiteCommand(sql_string, connection);
+                    command.CommandType = CommandType.Text;
+
+                    command.Parameters.AddWithValue("@id", nodeid);
+                    command.Parameters.AddWithValue("@instanceIDparam1", "");
+                    command.Parameters.AddWithValue("@deviceInstanceParam2", Humidity_deviceInstanceID);//Insert empty value
+
+                    command.Parameters.AddWithValue("@IP_param1", "");
+                    command.Parameters.AddWithValue("@IP_param2", Humidity_ip);//Insert empty value
+
+                    command.Parameters.AddWithValue("@param1", "");
+                    command.Parameters.AddWithValue("@param2", Humidity_param1id);
+                    command.Parameters.AddWithValue("@param1info", "");
+                    command.Parameters.AddWithValue("@param2info", Humidity_param1info);
+                    command.Parameters.AddWithValue("@param1_iden_type", "");
+                    command.Parameters.AddWithValue("@param2_iden_type", Humidity_param1type);
+                    command.ExecuteNonQuery();
+                }
+            }
+            else
+            {
+                //Update the value
+                using (SQLiteConnection connection = new SQLiteConnection(connString))
+                {
+                    connection.Open();
+                    //SQLiteDataReader reader = null;
+                    //  MessageBox.Show("Update mechanism the node value flag = true  wala,id = "+nodeid);
+
+                    string sql_string = "UPDATE  " + tableNameDevice + "  SET device_instanceID_for_param2 = @instanceID,IP_for_param2 =@IP ,param2ID = @param2 ,param2_info = @param2info,param2_identifier_type= @param2_iden_type  where nodeID = @id ";
+                    SQLiteCommand command = new SQLiteCommand(sql_string, connection);
+                    command.CommandType = CommandType.Text;
+                    command.Parameters.AddWithValue("@id", nodeid);
+                    command.Parameters.AddWithValue("@instanceID", Humidity_deviceInstanceID);
+                    command.Parameters.AddWithValue("@IP", Humidity_ip);
+                    command.Parameters.AddWithValue("@param2", Humidity_param1id);
+                    // command.Parameters.AddWithValue("@param2", param2id);
+                    command.Parameters.AddWithValue("@param2info", Humidity_param1info);
+                    //  command.Parameters.AddWithValue("@param2info", param2info);
+                    command.Parameters.AddWithValue("@param2_iden_type", Humidity_param1type);
+                    // command.Parameters.AddWithValue("@param2_iden_type", param2type);
+                    command.ExecuteNonQuery();
+                }
+
+            }
+
+
+        }
 
         //=============================End of edit node and line section===============//
 
+
+        //-======================Backgroundworker Task -==========================//
+        public class device_info_class
+        {
+            public string nodeID { get; set; }
+            public string device_instance_id_for_param1 { get; set; }
+            public string device_IP_for_param1 { get; set; }
+
+            public string device_instance_id_for_param2 { get; set; }
+            public string device_IP_for_param2 { get; set; }
+            public string param1_id { get; set; }
+            public string param2_id { get; set; }
+            public string param1_info { get; set; }
+            public string param2_info { get; set; }
+
+            public string param1_identifier_type { get; set; }
+            public string param2_identifier_type { get; set; }
+
+        }
+       public List<device_info_class> device_info_list = new List<device_info_class>();//This list will store the values of device info
+
+        /// <summary>
+        /// This get the device info values form the database 
+        /// </summary>
+        /// <param name="nodeID1">the node id selected to search for </param>
+        public void ReadDeviceInfoForNode(string nodeID1)
+        {
+            device_info_list.Clear();//Resetting list
+            //string deviceTableName = "tbl_"+
+            string tableNameDevice = "tbl_" + selectedBuildingList[0].BuildingName + "_device_info_for_node";//currentNodeTableFromDB; 
+                                                                                                             //lets get the id values...
+                                                                                                             //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
+
+            string connString1 = @"Data Source=" + databaseFile + ";Version=3;";
+
+            string sql1 = "SELECT * From  " + tableNameDevice + "  where nodeID='" + nodeID1 + "'";
+            //  MessageBox.Show("sql1=" + sql1);
+
+            //(nodeID,device_instanceID,IP,param1ID_X,param2ID_Y) VALUES(@id,@instanceID,@IP,@param1,@param2)";
+
+            using (SQLiteConnection thisConnection = new SQLiteConnection(connString1))
+            {
+                SQLiteCommand cmd = new SQLiteCommand(sql1, thisConnection);
+
+                thisConnection.Open();
+
+                SQLiteDataReader reader = cmd.ExecuteReader();
+
+                //    MessageBox.Show("cmd error= " + cmd.CommandText);
+
+                while (reader.Read())
+                {
+                    // AL_nodeId.Add(reader["nodeID"].ToString());
+                    device_info_list.Add(new device_info_class
+                    {
+                        nodeID = nodeID1,
+                        device_instance_id_for_param1 = reader["device_instanceID_for_param1"].ToString(),
+                        device_IP_for_param1 = reader["IP_for_param1"].ToString(),
+                        device_instance_id_for_param2 = reader["device_instanceID_for_param2"].ToString(),
+                        device_IP_for_param2 = reader["IP_for_param2"].ToString(),
+                        param1_id = reader["param1ID"].ToString(),
+                        param2_id = reader["param2ID"].ToString(),
+                        param1_info = reader["param1_info"].ToString(),
+                        param2_info = reader["param2_info"].ToString(),
+                        param1_identifier_type = reader["param1_identifier_type"].ToString(),
+                        param2_identifier_type = reader["param2_identifier_type"].ToString()
+
+                    });
+                }
+
+
+            }
+
+        }
+
+        List<bool> dataCheckList = new List<bool>();
+
+        public bool CheckDeviceOnlineOffline(int deviceID, int Parent_SerialNum)
+        {
+            //Resetting
+            dataCheckList.Clear();
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            //   string databaseFile = databasePath + @"\Database\Buildings\Default_Building\Default_Building.mdb";
+            //String connection = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source="+ databaseFile+ @";Persist Security Info=True ";
+            //C:\Program Files (x86)\T3000\Database\Buildings\Default_Building
+            //String connection = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Program Files (x86)\T3000\Database\Buildings\Default_Building\Default_Building.mdb;Persist Security Info=True ";
+
+            string sql = "select * from ALL_NODE  where Object_Instance = '" + deviceID + "' and Parent_SerialNum = '" + Parent_SerialNum + "'";
+            bool status = false;
+            //MessageBox.Show("Outside the path,"+BuildingSelected.Count );
+            if (buildingSelected.Count > 0)
+            {
+                /*
+                This path is dynamic path we calculated based on this 
+                <installed directory of T3000 (not psycho)>\... where ... = Database\..value returned by files
+                */
+                string path = databasePath;  //@"C:\Folder1\Folder2\Folder3\Folder4";
+                string newPath = Path.GetFullPath(Path.Combine(path, @"..\"));
+                //string againDbPath = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + newPath + "" + BuildingSelected[0].building_path;
+                string againDbPath = @"Data Source=" + newPath + "" + buildingSelected[0].building_path;
+                //MessageBox.Show("Path = \n" + againDbPath);
+                try
+                {
+                    using (SQLiteConnection conn = new SQLiteConnection(againDbPath))
+                    {
+                        using (SQLiteCommand cmd = new SQLiteCommand(sql, conn))
+                        {
+                            conn.Open();
+                            SQLiteDataReader reader = cmd.ExecuteReader();
+                            while (reader.Read())
+                            {
+                                dataCheckList.Add((bool)reader["Online_Status"]);
+                            }
+
+                        }
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+
+                if (dataCheckList.Count > 0)
+                {
+                    if (dataCheckList[0] == true)
+                    {
+                        status = true;
+                    }
+                }
+                //MessageBox.Show( "datacheckcount= " + dataCheckList.Count + " Status = " + status);
+            }
+            return status;
+        }
+        public void UpdateNodeInfoToDBForTemeperatureFromHardware(string id, double xVal)
+        {
+            string tableName = "tbl_" + selectedBuildingList[0].BuildingName + "_node_value";//currentNodeTableFromDB;  
+
+            //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
+
+
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                string sql_string = "UPDATE " + tableName + "   set  xValue =@xVal , lastUpdatedDate=@date   where nodeID  =@id";
+                SQLiteCommand command = new SQLiteCommand(sql_string, connection);
+                command.CommandType = CommandType.Text;
+                command.Parameters.AddWithValue("@xVal", xVal.ToString());              
+                command.Parameters.AddWithValue("@date", DateTime.Now.ToString());
+                command.Parameters.AddWithValue("@id", id);
+                //MessageBox.Show("selected value = " + cb_station_names.SelectedItem.ToString());
+                command.ExecuteNonQuery();
+            }
+
+        }//--close of insertnodeinfotodb fxn
+        public void UpdateNodeInfoToDBForPressureFromHardware(string id, double yVal)
+        {
+            string tableName = "tbl_" + selectedBuildingList[0].BuildingName + "_node_value";//currentNodeTableFromDB;  
+
+            //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
+
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                string sql_string = "UPDATE " + tableName + "   set   yValue=@yVal, lastUpdatedDate=@date  where nodeID  =@id";
+                SQLiteCommand command = new SQLiteCommand(sql_string, connection);
+                command.CommandType = CommandType.Text;
+                // command.Parameters.AddWithValue("@xVal", xVal.ToString());
+                command.Parameters.AddWithValue("@yVal", yVal.ToString());
+               
+                command.Parameters.AddWithValue("@date", DateTime.Now.ToString());
+                command.Parameters.AddWithValue("@id", id);
+                //MessageBox.Show("selected value = " + cb_station_names.SelectedItem.ToString());
+                command.ExecuteNonQuery();
+            }
+
+        }//--close of insertnodeinfotodb fxn
+
+
+        //====================End of background worker task====================//
 
 
 

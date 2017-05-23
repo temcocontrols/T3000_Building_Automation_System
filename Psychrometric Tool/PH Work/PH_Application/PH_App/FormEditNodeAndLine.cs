@@ -1,25 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+using System.Data.SQLite;
 using System.Drawing;
+using System.IO;
 using System.Linq;
-using System.Text;
+using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace PH_App
 {
     public partial class FormEditNodeAndLine : Form
     {
         MainController bcs;
-        public FormEditNodeAndLine(MainController mc1)
+        Form_Main_PH_Application fmain;
+        public FormEditNodeAndLine(MainController mc1,Form_Main_PH_Application f)
         {
             bcs = mc1;
+            fmain = f;
             InitializeComponent();
         }
-
         //=================Variables Compartment ===============//
         string initialTemp, initialPressure, initialName, initialLabel, initialNodeSize, initialAirFlow;
         ///THis flag is for omitting of calling of the double event while clicking in the web section
@@ -37,43 +38,43 @@ namespace PH_App
         public string finalTemperatureSource;
         public string finalPressureSource;
         //==================End of variable compartment========//
-        private void dataGridView1_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
-        {
-            try
-            {
-                if (sender == null || e == null)
-                {
-                    return;
-                }
-                else if (dataGridView1.CurrentCell.Value == null)
-                {
-                    //MessageBox.Show("Current cell value is empty");
-                    return;
-                }
-                if (dataGridView1.CurrentCell.RowIndex < bcs.listNodeInfoValues.Count)
-                {
+        //private void dataGridView1_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+        //{
+        //    try
+        //    {
+        //        if (sender == null || e == null)
+        //        {
+        //            return;
+        //        }
+        //        else if (dataGridView1.CurrentCell.Value == null)
+        //        {
+        //            //MessageBox.Show("Current cell value is empty");
+        //            return;
+        //        }
+        //        if (dataGridView1.CurrentCell.RowIndex < bcs.listNodeInfoValues.Count)
+        //        {
 
-                    ComboBox combo = e.Control as ComboBox;
+        //            ComboBox combo = e.Control as ComboBox;
 
-                    if (combo != null)
-                    {
+        //            if (combo != null)
+        //            {
                      
-                        combo.SelectionChangeCommitted -= new EventHandler(ComboBox_SelectedIndexChanged);
-                        combo.SelectionChangeCommitted += new EventHandler(ComboBox_SelectedIndexChanged);
-                    }
-                }
-                //}catch(Exception ex)
-                //{
-                //    MessageBox.Show("exception at line 45:" + ex.Message);
-                //}
-            }
-            catch (NullReferenceException nre)
-            {
-                //MessageBox.Show("\nline 49.\n" + nre.Message);
+        //                combo.SelectionChangeCommitted -= new EventHandler(ComboBox_SelectedIndexChanged);
+        //                combo.SelectionChangeCommitted += new EventHandler(ComboBox_SelectedIndexChanged);
+        //            }
+        //        }
+        //        //}catch(Exception ex)
+        //        //{
+        //        //    MessageBox.Show("exception at line 45:" + ex.Message);
+        //        //}
+        //    }
+        //    catch (NullReferenceException nre)
+        //    {
+        //        //MessageBox.Show("\nline 49.\n" + nre.Message);
 
-            }
+        //    }
 
-        }
+        //}
 
         //--Lets make a global variable that can be accessed by edit cell mode
 
@@ -82,13 +83,8 @@ namespace PH_App
         //public string temporarySelectedShowText = "";
 
         public string tempNodeID = "";
-        public int tempRowIndex = 0;
-
-
-
+        public int tempRowIndex = 0;        
         //--End of making the global variable 
-
-
         private void ComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (sender == null || e == null)
@@ -110,7 +106,7 @@ namespace PH_App
             }
 
             //if (item != null)
-            // MessageBox.Show("bbk item selected  = "+item);
+             //MessageBox.Show("bbk item selected  = "+item);
 
             /*
             Here we can differenticate between the item are 
@@ -175,7 +171,7 @@ namespace PH_App
 
 
                 }
-                else if (cbx.ColumnIndex == 4)
+                else if (cbx.ColumnIndex == 4)//was 4
                 {
                     //Humidity source is chosen to be Manual
 
@@ -283,7 +279,7 @@ namespace PH_App
                     }
 
                     DataGridViewComboBoxCell cbx = (DataGridViewComboBoxCell)dataGridView1.CurrentCell;
-                    cbx.Value = cb.Items[2];
+                    cbx.Value = cb.Items[1];//index was 2
 
                     //temporarySelectedName = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value.ToString();
                     //temporarySelectedLabel = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();
@@ -337,8 +333,6 @@ namespace PH_App
           
 
         }
-
-
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             //dataGridView1.EndEdit();
@@ -363,7 +357,7 @@ namespace PH_App
                     return;
                 }
             }
-            //-------For Humidity source
+            //-------For pressure source
             else if ((e.RowIndex >= 0 && e.RowIndex < bcs.listNodeInfoValues.Count) && (e.ColumnIndex == 4))
             {
                 if (sender == null || e == null)
@@ -458,7 +452,6 @@ namespace PH_App
                 {
                     try
                     {
-
                         if (dataGridView1.CurrentCell.Value == null)
                         {
                             dataGridView1.CurrentCell.Value = initialTemp;
@@ -477,10 +470,9 @@ namespace PH_App
                         //.                     
 
                     }
-                    catch (Exception ex)
+                    catch //(Exception ex)
                     {
                         MessageBox.Show("You can only input number values");
-
                         dataGridView1.CurrentCell.Value = initialTemp;
                         return;
                     }
@@ -489,15 +481,13 @@ namespace PH_App
                     {
                         //--Once the name is changed it has to save the changes
 
-                        double finalTemp = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[3].Value.ToString())+273.15; 
-                       
+                        double finalTemp = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[3].Value.ToString())+273.15;                        
                         string nodeIDVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[2].Value.ToString();
                         string nameVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value.ToString();//--This contains the name
                         string pressure_sourceVal;
                         if (dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString() == "Manual" || dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString() == "Web")
                         {
                             pressure_sourceVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString();//--This contains the name
-
                         }
                         else
                         {
@@ -521,8 +511,7 @@ namespace PH_App
                         double yVal = pressure;//bcs.y_coord_value;
                         double xVal = enthalpyValue;
 
-
-
+                        
                         //double yVal = //double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
 
                         // MessageBox.Show("column index " + dataGridView1.CurrentCell.ColumnIndex+",\ntemperature="+xVal+"\nHumidity ="+humidity+"\nyval= "+yVal);
@@ -559,7 +548,7 @@ namespace PH_App
 
                         double finalHum = double.Parse(dataGridView1.CurrentCell.Value.ToString());
                     }
-                    catch (Exception ex)
+                    catch //(Exception ex)
                     {
                         MessageBox.Show("You can only input number values");
 
@@ -663,7 +652,7 @@ namespace PH_App
 
 
                         }
-                        catch (Exception ex)
+                        catch //(Exception ex)
                         {
                             MessageBox.Show("You can only input letters,numbers and underscores values");
 
@@ -763,7 +752,7 @@ namespace PH_App
                             }
 
                         }
-                        catch (Exception ex)
+                        catch //(Exception ex)
                         {
                             MessageBox.Show("You can only input integer values");
 
@@ -864,7 +853,6 @@ namespace PH_App
 
 
         }
-
         public void updateNodeInfoBasedOnPresentValue(string NodeID, double xVal, double yVal, string temperature_source, string pressure_source, string name, Color color, int nodesize)
         {
             string nodeIDVal = NodeID;
@@ -889,33 +877,52 @@ namespace PH_App
             var db = new DatabaseOperationModel();
             db.UpdateDataForNodeInfoInEditNodeSection(buildingName, nodeIDVal, temperature_Val, y_value, temperatureSource, pressureSouce, nameVal, colorVal, nodeSizeVal);
             //--Now Refresh Data...
-            RefreshDataFromDBAndChart();
-            //--After refreshing
-            LoadNodeAndLine();//--Loading the data 
-
+            //RefreshDataFromDBAndChart();
+            ////--After refreshing
+            //LoadNodeAndLine();//--Loading the data 
+            RefreshChartAndDGVForMixNodeFunction();
 
 
 
         }
-
         public void RefreshDataFromDBAndChart()
         {
             bcs.LoadNodeAndLineFromDB(bcs.indexOfChartSelected);   //Lets make it passing the stirngs 
 
             // flagForInsertOrUpdateDataToDB = 1;
             //--This is also completed..    
-            bcs.chart1RefreshCustom();
+            bcs.chart1RefreshCustom(fmain);
             //chart1.Invalidate();
-            //bcs.ReDrawingLineAndNode();
+            // bcs.LoadNodeAndLineFromDB(bcs.indexOfChartSelected);   //Lets make it passing the stirngs 
+
+            // flagForInsertOrUpdateDataToDB = 1;
+            //--This is also completed..
+            // bcs.RefreshGraph();
+            // bcs.Invalidate();
+            //bcs.chart1RefreshCustom();
+            fmain.phChart.Invalidate();
+
+            //chart1.Invalidate();
+            bcs.ReDrawingLineAndNode(fmain.phChart);
+
 
         }
-
         private void FormEditNodeAndLine_Load(object sender, EventArgs e)
         {
             LoadNodeAndLine();
+
+            dataGridView1.AllowUserToAddRows = false;
+            dataGridView2.AllowUserToAddRows = false;
+          
+            if (dataGridView2.Rows.Count > 0)  //If there is data then only do this one
+            {
+                //set parameters of your event args
+                var eventArgs = new DataGridViewCellEventArgs(1, 0);
+                // or setting the selected cells manually before executing the function
+                dataGridView2.Rows[0].Cells[1].Selected = true;
+                dataGridView2_CellClick(sender, eventArgs);
+            }
         }
-
-
         public void LoadNodeAndLine()
         {
             //dataGridView1.Rows.Clear();
@@ -1189,7 +1196,7 @@ namespace PH_App
                             dataGridView1.Rows[i].Cells[0].Value = bcs.listNodeInfoValues[i].name;
                             dataGridView1.Rows[i].Cells[1].Value = temperature_value;//CB_DGV_Temperature_Source.Items[temperature_indexValue].ToString();//"Manual"; //bcs.menuStripNodeInfoValues[i].name;
                             dataGridView1.Rows[i].Cells[2].Value = bcs.listNodeInfoValues[i].ID;
-                            dataGridView1.Rows[i].Cells[3].Value = temperatureValueFromCoolProp;//"";
+                            dataGridView1.Rows[i].Cells[3].Value =Math.Round( temperatureValueFromCoolProp,2);//"";
                             dataGridView1.Rows[i].Cells[4].Value = pressure_sourceValue;// CB_DGV_Humidity_Source.Items[indexForSource].ToString();//"Manual";
                             dataGridView1.Rows[i].Cells[5].Value = Math.Round(bcs.listNodeInfoValues[i].yVal, 2).ToString(); //Math.Round(bcs.humDataGridValue, 2).ToString();//"Manual";
                             dataGridView1.Rows[i].Cells[6].Value = Math.Round(bcs.listNodeInfoValues[i].xVal, 2).ToString();//Math.Round(bcs.enthalpyDataGridView, 2).ToString();//"Manual";
@@ -1273,7 +1280,7 @@ namespace PH_App
                         dataGridView1.Rows[i].Cells[0].Value = bcs.listNodeInfoValues[i].name;
                         dataGridView1.Rows[i].Cells[1].Value = temperature_value;//CB_DGV_Temperature_Source.Items[temperature_indexValue].ToString();//"Manual"; //bcs.menuStripNodeInfoValues[i].name;
                         dataGridView1.Rows[i].Cells[2].Value = bcs.listNodeInfoValues[i].ID;
-                        dataGridView1.Rows[i].Cells[3].Value = temperatureValueFromCoolProp;//"";
+                        dataGridView1.Rows[i].Cells[3].Value = Math.Round(temperatureValueFromCoolProp,2);//"";
                         dataGridView1.Rows[i].Cells[4].Value = pressure_sourceValue;// CB_DGV_Humidity_Source.Items[indexForSource].ToString();//"Manual";
                         dataGridView1.Rows[i].Cells[5].Value = Math.Round(bcs.listNodeInfoValues[i].yVal, 2).ToString(); //Math.Round(bcs.humDataGridValue, 2).ToString();//"Manual";
                         dataGridView1.Rows[i].Cells[6].Value = Math.Round(bcs.listNodeInfoValues[i].xVal, 2).ToString();//Math.Round(bcs.enthalpyDataGridView, 2).ToString();//"Manual";
@@ -1342,7 +1349,7 @@ namespace PH_App
                         dataGridView1.Rows[i].Cells[0].Value = bcs.listNodeInfoValues[i].name;
                         dataGridView1.Rows[i].Cells[1].Value = temperature_value;//CB_DGV_Temperature_Source.Items[temperature_indexValue].ToString();//"Manual"; //bcs.menuStripNodeInfoValues[i].name;
                         dataGridView1.Rows[i].Cells[2].Value = bcs.listNodeInfoValues[i].ID;
-                        dataGridView1.Rows[i].Cells[3].Value = temperatureValueFromCoolProp;//"";
+                        dataGridView1.Rows[i].Cells[3].Value = Math.Round(temperatureValueFromCoolProp,2);//"";
                         dataGridView1.Rows[i].Cells[4].Value = pressure_sourceValue;// CB_DGV_Humidity_Source.Items[indexForSource].ToString();//"Manual";
                         dataGridView1.Rows[i].Cells[5].Value = Math.Round(bcs.listNodeInfoValues[i].yVal, 2).ToString(); //Math.Round(bcs.humDataGridValue, 2).ToString();//"Manual";
                         dataGridView1.Rows[i].Cells[6].Value = Math.Round(bcs.listNodeInfoValues[i].xVal, 2).ToString();//Math.Round(bcs.enthalpyDataGridView, 2).ToString();//"Manual";
@@ -1392,7 +1399,7 @@ namespace PH_App
             string idNode2 = "", lastUpdatedDateNode2 = "", humiditySourceNode2 = "", temperatureSourceNode2 = "", nameNode2 = "";
             double xValueNode1 = 0, yValueNode1 = 0;
             double xValueNode2 = 0, yValueNode2 = 0;
-            int airFlowNode1 = 0, airFlowNode2 = 0;
+            //int airFlowNode1 = 0, airFlowNode2 = 0;
 
             //--Scanning for the values
             if (bcs.listLineInfoValues.Count > 0)
@@ -1459,8 +1466,8 @@ namespace PH_App
                         DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[i].Cells[9];
                         if (bcs.listLineInfoValues[i].status == 1)
                         {
-                            cbCell.Value = "true";
-
+                            cbCell.Value = "true";//cbCell.TrueValue;//"true";
+                            //dataGridView2.Rows[i].Cells[9].Value = true;
                         }
                     }
                     catch (Exception ex)
@@ -1468,7 +1475,7 @@ namespace PH_App
                         MessageBox.Show(ex.Message);
                     }
 
-                }
+                }//Close of for loop
 
             }
 
@@ -1477,7 +1484,6 @@ namespace PH_App
             //  dataGridView1.Enabled = true;
 
         }
-
         private void dataGridView1_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
         {
             try
@@ -1537,8 +1543,6 @@ namespace PH_App
             }
 
         }
-
-
         //===========================This one is for Temperature Source Pull=========================//
 
         public void TemperatureInputPorcessForDevice(string DeviceIdentificationKeyWord)
@@ -1586,10 +1590,11 @@ namespace PH_App
                     //We have variable section.
                     //--We need to do filtering accordingly
                     FilterDataFromT3000 fd = new FilterDataFromT3000();
-                    Form_TemperatureSourceDeviceInput ft = new Form_TemperatureSourceDeviceInput(this);
+                    //Form_TemperatureSourceDeviceInput ft = new Form_TemperatureSourceDeviceInput(this);
                     DeviceAndParameterProcess dpp = new DeviceAndParameterProcess();
-                    ft.FindPathOfBuildingDB();
-                    string buildingPath = ft.BuildingSelected[0].Building_Path;
+                    FindPathOfBuildingDB();//ft.FindPathOfBuildingDB();
+                    string buildingPath = BuildingSelected[0].Building_Path;//ft.BuildingSelected[0].Building_Path;
+
                     // fd.ReadDataFromAlexDatabaseForInput("INPUTable", buildingPath); //Pulls the input information
                     // fd.ReadDataFromAlexDatabaseForOutput("OUTPUTable", buildingPath);//pulls the output information
                     fd.ReadDataFromAlexDatabaseForInput("INPUTable", buildingPath);//Pulls variable information
@@ -1624,9 +1629,9 @@ namespace PH_App
 
                                     //double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue-1);
                                     double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue);
-                                    if (returnValueTemperature <= 0.0000001 && returnValueTemperature > 50)
+                                    if (returnValueTemperature <= 0.0000001 && returnValueTemperature > 1000)
                                     {
-                                        MessageBox.Show("Temperature value can be less than 0 and greater than 50 Degree Celsius");
+                                        MessageBox.Show("Temperature value can be less than 0 and greater than 1000 Degree Celsius");
                                         return;//we can break form loop as well
                                     }
                                     //==Now updating data in database
@@ -1635,7 +1640,7 @@ namespace PH_App
                                     //UpdateNodeInfoForTemperatureDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue-1).ToString(), "temp", returnValueTemperature.ToString(), "OBJECT_ANALOG_INPUT");
                                     UpdateNodeInfoForTemperatureDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue).ToString(), "temp", returnValueTemperature.ToString(), "OBJECT_ANALOG_INPUT");
                                     //------------------------------------End of working here------------------------------------------------//
-                                    CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
+                                   // CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
                                 }
                             }
                             else
@@ -1658,10 +1663,10 @@ namespace PH_App
                     //We have variable section.
                     //--We need to do filtering accordingly
                     FilterDataFromT3000 fd = new FilterDataFromT3000();
-                    Form_TemperatureSourceDeviceInput ft = new Form_TemperatureSourceDeviceInput(this);
+                    //Form_TemperatureSourceDeviceInput ft = new Form_TemperatureSourceDeviceInput(this);
                     DeviceAndParameterProcess dpp = new DeviceAndParameterProcess();
-                    ft.FindPathOfBuildingDB();
-                    string buildingPath = ft.BuildingSelected[0].Building_Path;
+                    FindPathOfBuildingDB();//ft.FindPathOfBuildingDB();
+                    string buildingPath = BuildingSelected[0].Building_Path;//ft.BuildingSelected[0].Building_Path;
                     // fd.ReadDataFromAlexDatabaseForInput("INPUTable", buildingPath); //Pulls the input information
                     // fd.ReadDataFromAlexDatabaseForOutput("OUTPUTable", buildingPath);//pulls the output information
                     fd.ReadDataFromAlexDatabaseForOutput("OUTPUTable", buildingPath);//Pulls variable information
@@ -1694,9 +1699,9 @@ namespace PH_App
 
                                     //double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue-1);
                                     double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue);
-                                    if (returnValueTemperature <= 0.0000001 && returnValueTemperature > 50)
+                                    if (returnValueTemperature <= 0.0000001 && returnValueTemperature > 1000)
                                     {
-                                        MessageBox.Show("Temperature value can be less than 0 and greater than 50 Degree Celsius");
+                                        MessageBox.Show("Temperature value can be less than 0 and greater than 1000 Degree Celsius");
                                         return;//we can break form loop as well
                                     }
                                     //==Now updating data in database
@@ -1704,7 +1709,7 @@ namespace PH_App
                                     //UpdateNodeInfoForTemperatureDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue-1).ToString(), "temp", returnValueTemperature.ToString(), "OBJECT_ANALOG_OUTPUT");
                                     UpdateNodeInfoForTemperatureDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue).ToString(), "temp", returnValueTemperature.ToString(), "OBJECT_ANALOG_OUTPUT");
                                     //------------------------------------End of working here------------------------------------------------//
-                                    CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
+                                    //CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
                                 }
                             }
                             else
@@ -1724,10 +1729,11 @@ namespace PH_App
                     //We have variable section.
                     //--We need to do filtering accordingly
                     FilterDataFromT3000 fd = new FilterDataFromT3000();
-                    Form_TemperatureSourceDeviceInput ft = new Form_TemperatureSourceDeviceInput(this);
+                    //Form_TemperatureSourceDeviceInput ft = new Form_TemperatureSourceDeviceInput(this);
                     DeviceAndParameterProcess dpp = new DeviceAndParameterProcess();
-                    ft.FindPathOfBuildingDB();
-                    string buildingPath = ft.BuildingSelected[0].Building_Path;
+                    FindPathOfBuildingDB();//ft.FindPathOfBuildingDB();
+                    string buildingPath = BuildingSelected[0].Building_Path;//ft.BuildingSelected[0].Building_Path;
+
                     // fd.ReadDataFromAlexDatabaseForInput("INPUTable", buildingPath); //Pulls the input information
                     // fd.ReadDataFromAlexDatabaseForOutput("OUTPUTable", buildingPath);//pulls the output information
                     fd.ReadDataFromAlexDatabaseForVariable("VariablesTable", buildingPath);//Pulls variable information
@@ -1759,7 +1765,7 @@ namespace PH_App
 
                                     //double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue-1);
                                     double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue);
-                                    if (returnValueTemperature <= 0.0000001 && returnValueTemperature > 50)
+                                    if (returnValueTemperature <= 0.0000001 && returnValueTemperature > 1000)
                                     {
                                         MessageBox.Show("Temperature value can be less than 0 and greater than 50 Degree Celsius");
                                         return;//we can break form loop as well
@@ -1770,7 +1776,7 @@ namespace PH_App
                                     //UpdateNodeInfoForTemperatureDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue-1).ToString(), "temp", returnValueTemperature.ToString(), "OBJECT_ANALOG_VALUE");
                                     UpdateNodeInfoForTemperatureDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue).ToString(), "temp", returnValueTemperature.ToString(), "OBJECT_ANALOG_VALUE");
                                     //------------------------------------End of working here------------------------------------------------//
-                                    CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
+                                    //CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
 
                                 }
 
@@ -1788,17 +1794,12 @@ namespace PH_App
 
                     }
 
-
-
                 }
                 else
                 {
                     //We have invalid input
                     return;
                 }
-
-
-
             }
             if (condition != true)
             {
@@ -1816,9 +1817,9 @@ namespace PH_App
                 // MessageBox.Show("condition false start");
                 // PullDataForAllPossibleInputsFromT3000();
                 FilterDataFromT3000 fd = new FilterDataFromT3000();
-                Form_TemperatureSourceDeviceInput ft = new Form_TemperatureSourceDeviceInput(this);
+               // Form_TemperatureSourceDeviceInput ft = new Form_TemperatureSourceDeviceInput(this);
                 DeviceAndParameterProcess dpp = new DeviceAndParameterProcess();
-                int compareValue = CompareLabelInformation(DeviceIdentificationKeyWord, fd, ft);
+                int compareValue = CompareLabelInformation(DeviceIdentificationKeyWord, fd);
 
                 // MessageBox.Show("Compare lebel return value = "+ compareValue);
 
@@ -1842,8 +1843,8 @@ namespace PH_App
                         //FilterDataFromT3000 fd = new FilterDataFromT3000();
                         //Form_TemperatureSourceDeviceInput ft = new Form_TemperatureSourceDeviceInput(this);
                         //DeviceAndParameterProcess dpp = new DeviceAndParameterProcess();
-                        ft.FindPathOfBuildingDB();
-                        string buildingPath = ft.BuildingSelected[0].Building_Path;
+                        FindPathOfBuildingDB();
+                        string buildingPath =  BuildingSelected[0].Building_Path;
                         //==We only need variable data...
                         for (int i = 0; i < fd.InputFromT3000List.Count; i++)
                         {
@@ -1872,7 +1873,7 @@ namespace PH_App
                                         //==We have the values now we need to retrive the data
 
                                         double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), "IN", variableIndex + 1);//this variableIndex+1 is done because yabee starts form 1 and t3000 from 0
-                                        if (returnValueTemperature <= 0.0000001 && returnValueTemperature > 50)
+                                        if (returnValueTemperature <= 0.0000001 && returnValueTemperature > 1000)
                                         {
                                             MessageBox.Show("Temperature value can be less than 0 and greater than 50 Degree Celsius");
                                             return;//we can break form loop as well
@@ -1881,7 +1882,7 @@ namespace PH_App
                                         //------------------------------------Working here -------------------------------------------------------//
                                         UpdateNodeInfoForTemperatureDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableIndex + 1).ToString(), "temp", returnValueTemperature.ToString(), "OBJECT_ANALOG_INPUT");
                                         //------------------------------------End of working here------------------------------------------------//
-                                        CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
+                                        //CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
                                     }
                                 }
                                 else
@@ -1914,8 +1915,8 @@ namespace PH_App
                         //FilterDataFromT3000 fd = new FilterDataFromT3000();
                         //Form_TemperatureSourceDeviceInput ft = new Form_TemperatureSourceDeviceInput(this);
                         //DeviceAndParameterProcess dpp = new DeviceAndParameterProcess();
-                        ft.FindPathOfBuildingDB();
-                        string buildingPath = ft.BuildingSelected[0].Building_Path;
+                         FindPathOfBuildingDB();
+                        string buildingPath = BuildingSelected[0].Building_Path;
                         // fd.ReadDataFromAlexDatabaseForInput("INPUTable", buildingPath); //Pulls the input information
                         // fd.ReadDataFromAlexDatabaseForOutput("OUTPUTable", buildingPath);//pulls the output information
                         // fd.ReadDataFromAlexDatabaseForInput("INPUTable", buildingPath);//Pulls variable information
@@ -1948,16 +1949,16 @@ namespace PH_App
                                         //==We have the values now we need to retrive the data
 
                                         double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), "OUT", variableIndex + 1);
-                                        if (returnValueTemperature <= 0.0000001 && returnValueTemperature > 50)
+                                        if (returnValueTemperature <= 0.0000001 && returnValueTemperature > 1000)
                                         {
-                                            MessageBox.Show("Temperature value can be less than 0 and greater than 50 Degree Celsius");
+                                            MessageBox.Show("Temperature value can be less than 0 and greater than1000 Degree Celsius");
                                             return;//we can break form loop as well
                                         }
                                         //==Now updating data in database
                                         //------------------------------------Working here -------------------------------------------------------//
                                         UpdateNodeInfoForTemperatureDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableIndex + 1).ToString(), "temp", returnValueTemperature.ToString(), "OBJECT_ANALOG_INPUT");
                                         //------------------------------------End of working here------------------------------------------------//
-                                        CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
+                                        //CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
                                     }
                                 }
                                 else
@@ -1988,8 +1989,8 @@ namespace PH_App
                         //FilterDataFromT3000 fd = new FilterDataFromT3000();
                         //Form_TemperatureSourceDeviceInput ft = new Form_TemperatureSourceDeviceInput(this);
                         //DeviceAndParameterProcess dpp = new DeviceAndParameterProcess();
-                        ft.FindPathOfBuildingDB();
-                        string buildingPath = ft.BuildingSelected[0].Building_Path;
+                        FindPathOfBuildingDB();
+                        string buildingPath = BuildingSelected[0].Building_Path;
                         //==We only need variable data...
                         for (int i = 0; i < fd.variableFromT3000List.Count; i++)
                         {
@@ -2016,7 +2017,7 @@ namespace PH_App
                                     {
                                         //==We have the values now we need to retrive the data
                                         double returnValueTemperature = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), "VAR", variableIndex + 1);
-                                        if (returnValueTemperature <= 0.0000001 && returnValueTemperature > 50)
+                                        if (returnValueTemperature <= 0.0000001 && returnValueTemperature > 1000)
                                         {
                                             MessageBox.Show("Temperature value can be less than 0 and greater than 50 Degree Celsius");
                                             return;//we can break form loop as well
@@ -2025,7 +2026,7 @@ namespace PH_App
                                         //------------------------------------Working here -------------------------------------------------------//
                                         UpdateNodeInfoForTemperatureDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableIndex + 1).ToString(), "temp", returnValueTemperature.ToString(), "OBJECT_ANALOG_INPUT");
                                         //------------------------------------End of working here------------------------------------------------//
-                                        CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);//This updates the DGV as well no problem
+                                       // CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);//This updates the DGV as well no problem
                                     }
                                 }
                                 else
@@ -2168,7 +2169,1178 @@ namespace PH_App
             return outputCondtion;
         }
 
+        public class SelectedBuildingDatatype
+        {
+
+            public string Main_BuildingName { get; set; }
+            public string Building_Name { get; set; }
+            public string Building_Path { get; set; }
+        }
+        public List<SelectedBuildingDatatype> BuildingSelected = new List<SelectedBuildingDatatype>();
+
+        public void FindPathOfBuildingDB()
+        {
+            BuildingSelected.Clear();
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            // string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            //  string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            string path = databasePath;  //@"C:\Folder1\Folder2\Folder3\Folder4";
+            string newPath = Path.GetFullPath(Path.Combine(path, @"..\"));
+            //string againDbPath = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + newPath + @"Database\T3000.mdb";
+            string againDbPath = @"Data Source=" + newPath + @"Database\T3000.db;Version=3;";
+            //MessageBox.Show("reutn from here : New path : " + againDbPath);
+
+            // return;//This to return
+            // bool returnValue = false;
+            //string latValue = "";
+            using (SQLiteConnection connection = new SQLiteConnection(againDbPath))
+            {
+                connection.Open();
+                SQLiteDataReader reader = null;
+                string queryString = "SELECT * from Building WHERE Default_SubBuilding = 1 ";//-1 or True  can be used
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+
+                reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+
+                    BuildingSelected.Add(new SelectedBuildingDatatype
+                    {
+                        Main_BuildingName = reader["Main_BuildingName"].ToString(),
+                        Building_Name = reader["Building_Name"].ToString(),
+                        Building_Path = reader["Building_Path"].ToString()
+                    });
+                }
+            }
+
+            //  MessageBox.Show("count = " + BuildingSelected.Count);
+        }
+
+        public void UpdateNodeInfoForTemperatureDeviceSelection_ForTextInput_ForDevice(string nodeID, string Temp_deviceInstancID, string Temp_IP, string Temp_param1id, string Temp_param1info, string Temp_param1Value, string Temp_param1_id_type)
+        {
+
+            //==We require following things : 
+            /*
+            1. name ,label,source,xValue,yValue,showText,color,nodeSize== for updating node
+            2. nodeID,deviceInstanceID,deviceIP, param1[id,value,type],param2[id,value,type] ==>insert if first time else update the values
+            */
+            string nodeIDVal = nodeID; //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[3].Value.ToString();            
+            string nameVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value.ToString();//--This contains the name
+            string TemperatureSource = "Device";//dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();//--This contains the name
+            //----Temperature Value will be received for parameter value from hardware
+            string TemperatureValue = Temp_param1Value;  //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[2].Value.ToString();//--This contains the name
+            string PressureSource;
+            if (dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString() == "Manual" || dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString() == "Web")
+            {
+                PressureSource = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString();//--This contains the name
+            }
+            else
+            {
+                PressureSource = "Device";//dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString();//--This contains the name
+            }
+
+            string pressureValue = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString();//--This contains the name
+                                                                                                                    //string TemperatureSource = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();//--This contains the name
+
+            double xVal = 0.00;
+            double yVal = 0.00;
+
+           // int AirFlow = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[9].Value.ToString());
+            Color colorVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[7].Style.BackColor;
+            int nodeSizeVal = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[8].Value.ToString());
+
+            //double humValue = double.Parse(pressureValue);//Now we have humidity value as well 
+
+            //This is where the actual action is going to happen
+            //First lets find the xValue and the yValue of the selected index value
+            // if (param1info == "temp" && param2info == "hum")
+            // {
+            //--Now lets calculate the x and y value
+            //We got temperature and humidity
+
+            //bcs.CalculateYFromXandHumidity(double.Parse(TemperatureValue), humValue / 100);//This will get the y value
+            yVal = double.Parse(pressureValue);
+            var mth = new  MathOperation();
+            xVal = Math.Round(mth.IAPWS_IF97_TowParameterEquivalentFxn("H", "P", yVal * 1000000, "T", double.Parse(TemperatureValue)+273.15, "water")/1000, 2); //(int)double.Parse(TemperatureValue); //int.Parse(TemperatureValue);
+            //bcs.y_coord_value;//This value will be updated
+            //}
+            //else
+            //{
+            //    //We get temp and enthaly
+
+            //    xVal = double.Parse(param1Value);
+            //    yVal = bcs.CalculateYFromXandEnthalpy(xVal, double.Parse(param2Value));
+
+            //}
+
+            // MessageBox.Show("bbk test , nodeIDValue= " + nodeIDVal);
+            //tHIS FXN will update to db
+            //--------------------This one is also commented latere--------------------------------//
+            //bcs.UpdateNodeInfoToDB(nodeIDVal, xVal, yVal, sourceVal, nameVal, labelVal, colorVal, showTextVal, nodeSizeVal);
+            bcs.UpdateNodeInfoToDBFromTemperatureDeviceSource(nodeID, xVal, yVal, TemperatureSource, PressureSource, nameVal, colorVal,  nodeSizeVal);
+            //----------------------lets rememeber this--------------------------------------------//
+            //--Now since the value has been updated now we again want to reload the values to both the tables.
+            //insert or update the node information if already present
+
+            //----------------------------This one is comented now ---------------------------------------//
+            //bcs.InsertIntoDeviceInfoDB(nodeIDVal, deviceInstancID, IP, param1id, param2id, param1info, param2info, param1_id_type, param2_id_type);
+            bcs.InsertUpdateFromTemperatureDeviceSelectionToDBOnlyTempertureUpdate(nodeID, Temp_deviceInstancID, Temp_IP, Temp_param1id, Temp_param1info, Temp_param1_id_type);
+            //------------------------------end this------------------------------------------------------//
+
+            //--Refreshing data
+            RefreshDataFromDBAndChart();
+            //--After refreshing
+            LoadNodeAndLine();//--Loading the data 
+
+        }
+
+        public List<FilterDataFromT3000.T3000DataType> listInputValueAfterFilter = new List<FilterDataFromT3000.T3000DataType>();
+
+
+        public List<FilterDataFromT3000.T3000DataTypeForOutput> listOutputValueAfterFilter = new List<FilterDataFromT3000.T3000DataTypeForOutput>();
+
+       
+
+        public List<FilterDataFromT3000.T3000DataTypeForVariable> listVariableValueAfterFilter = new List<FilterDataFromT3000.T3000DataTypeForVariable>();
+
+     
+
+        public int CompareLabelInformation(string inputLabel, FilterDataFromT3000 fd)
+        {
+            int retVal = 0;
+            listInputValueAfterFilter.Clear();
+            listOutputValueAfterFilter.Clear();
+            listVariableValueAfterFilter.Clear();
+            //FilterDataFromT3000 fd = new FilterDataFromT3000();
+            //--PULL DATA AND COMPARE
+            // FilterDataFromT3000 fd = new FilterDataFromT3000();
+            //Form_TemperatureSourceDeviceInput ft = new Form_TemperatureSourceDeviceInput(this);
+             FindPathOfBuildingDB();
+            string buildingPath =  BuildingSelected[0].Building_Path;
+            fd.ReadDataFromAlexDatabaseForInput("INPUTable", buildingPath); //Pulls the input information
+            fd.ReadDataFromAlexDatabaseForOutput("OUTPUTable", buildingPath);//pulls the output information
+            fd.ReadDataFromAlexDatabaseForVariable("VariablesTable", buildingPath);//Pulls variable information
+                                                                                   //  MessageBox.Show("input count = " + fd.InputFromT3000List.Count + ",output count =  " + fd.outputFromT3000List.Count);
+
+
+
+            //--First comparing the label with the input tables
+            for (int i = 0; i < fd.InputFromT3000List.Count; i++)
+            {
+                if (inputLabel == fd.InputFromT3000List[i].InputLabel)
+                {
+                    listInputValueAfterFilter.Add(new FilterDataFromT3000.T3000DataType
+                    {
+                        InputAM = fd.InputFromT3000List[i].InputAM,
+                        InputCalibration = fd.InputFromT3000List[i].InputCalibration,
+                        InputCalSign = fd.InputFromT3000List[i].InputCalSign,
+                        InputDecon = fd.InputFromT3000List[i].InputDecon,
+                        InputDescription = fd.InputFromT3000List[i].InputDescription,
+                        InputFilter = fd.InputFromT3000List[i].InputFilter,
+                        InputIndex = fd.InputFromT3000List[i].InputIndex,
+                        InputJumper = fd.InputFromT3000List[i].InputJumper,
+                        InputLabel = fd.InputFromT3000List[i].InputLabel,
+                        InputRange = fd.InputFromT3000List[i].InputRange,
+                        InputUnit = fd.InputFromT3000List[i].InputUnit,
+                        InputValue = fd.InputFromT3000List[i].InputValue,
+                        PanelID = fd.InputFromT3000List[i].PanelID
+                    });
+
+                    retVal = 1;
+                    return retVal;//This should return values immediately
+                }
+            }
+
+
+            //--First comparing the label with the output tables
+            for (int i = 0; i < fd.outputFromT3000List.Count; i++)
+            {
+                if (inputLabel == fd.outputFromT3000List[i].out_label)
+                {
+                    listOutputValueAfterFilter.Add(new FilterDataFromT3000.T3000DataTypeForOutput
+                    {
+                        out_panel = fd.outputFromT3000List[i].out_panel,
+                        out_index = fd.outputFromT3000List[i].out_index,
+                        out_am = fd.outputFromT3000List[i].out_am,
+                        out_value = fd.outputFromT3000List[i].out_value,
+                        out_units = fd.outputFromT3000List[i].out_units,
+                        out_range = fd.outputFromT3000List[i].out_range,
+                        out_pwm_period = fd.outputFromT3000List[i].out_pwm_period,
+                        out_decom = fd.outputFromT3000List[i].out_decom,
+                        out_label = fd.outputFromT3000List[i].out_label
+                    });
+
+                    retVal = 2;
+                    return retVal;//This should return values immediately
+                }
+            }
+
+            //--First comparing the label with the variable tables
+            for (int i = 0; i < fd.variableFromT3000List.Count; i++)
+            {
+                if (inputLabel == fd.variableFromT3000List[i].var_label)
+                {
+                    listVariableValueAfterFilter.Add(new FilterDataFromT3000.T3000DataTypeForVariable
+                    {
+                        var_panel = fd.variableFromT3000List[i].var_panel,
+                        var_index = fd.variableFromT3000List[i].var_index,
+                        var_am = fd.variableFromT3000List[i].var_am,
+                        var_value = fd.variableFromT3000List[i].var_value,
+                        var_units = fd.variableFromT3000List[i].var_units,
+                        var_label = fd.variableFromT3000List[i].var_label
+
+                    });
+
+                    retVal = 3;
+                    return retVal;//This should return values immediately
+                }
+            }
+
+
+
+
+            return retVal;
+        }
+
+        public void PressureInputPorcessForDevice(string DeviceIdentificationKeyWord)
+        {
+            /*
+             *Prerequisite : the datagridviewcombobox need to be dynamic for this to work
+             Steps : 1. Interpret the variable inputed
+                     2. Find controller info 
+                     3. Find Variable info
+                     4. Pull data from yabee
+                     5. Update data to db
+                     6. Update the DGV  
+             */
+            Regex reg = new Regex("^[^<>.!@#%/]+$");//new Regex(@"[A-Za-z0-9\-\_]+");//Regular Expression for checking letters , hypens and numbers.
+            Match match = reg.Match(DeviceIdentificationKeyWord);
+            if (match.Success)
+            {
+                //Matched so its ok
+            }
+            else
+            {
+                //Match fail so fall back
+                MessageBox.Show("Please enter a valid entity.");
+                return;
+            }
+
+
+            bool condition = processInputData(DeviceIdentificationKeyWord);
+            //MessageBox.Show("Condition  = " + condition);
+            if (condition == true)
+            {
+                //Means we have input for controllers and variable infos not label
+                //So we have controllers values as
+                //controllers identified
+                int controllerNumberValue = controllerNumber;
+                string VariableIdentifiedValue = variableIdentifier;
+                int variableNumberValue = variableNumber;//Here [var]1 menas 0 input index and [var]2 means 1
+                if (VariableIdentifiedValue == "IN")
+                {
+                    //We have input section.
+                    //We have variable section.
+                    //--We need to do filtering accordingly
+                    FilterDataFromT3000 fd = new FilterDataFromT3000();
+                    //Form_TemperatureSourceDeviceInput ft = new Form_TemperatureSourceDeviceInput(this);
+                    DeviceAndParameterProcess dpp = new DeviceAndParameterProcess();
+                     FindPathOfBuildingDB();
+                    string buildingPath = BuildingSelected[0].Building_Path;
+                    // fd.ReadDataFromAlexDatabaseForInput("INPUTable", buildingPath); //Pulls the input information
+                    // fd.ReadDataFromAlexDatabaseForOutput("OUTPUTable", buildingPath);//pulls the output information
+                    fd.ReadDataFromAlexDatabaseForInput("INPUTable", buildingPath);//Pulls variable information
+                    //==We only need variable data...
+                    for (int i = 0; i < fd.InputFromT3000List.Count; i++)
+                    {
+                        if (controllerNumberValue == int.Parse(fd.InputFromT3000List[i].PanelID) && (variableNumberValue - 1) == int.Parse(fd.InputFromT3000List[i].InputIndex))
+                        {
+                            //==We are ok value is present now we need to check for unit
+                            // if (fd.InputFromT3000List[i].InputUnit.Contains("%"))
+                            if (fd.InputFromT3000List[i].InputUnit.Contains("psi"))//pressure per square inch
+                            {
+                                //We can accept this value it is a humidity value
+
+
+                                //--Now steps 
+                                /*
+                                 * 0. Find controller instance id from alex db //we currently have panel_number which is not instance id
+                                 1. Retrive data from device
+                                 2. Update data in database
+                                 3. Refresh Controller
+                                 */
+                                // double returnValue = dpp.InputDeviceInfoAndValue()
+
+                                fd.ReadALL_NODE_Information_For_Given_Panel("ALL_NODE", buildingPath, controllerNumberValue);//We have data now.
+
+                                if (fd.listForControllerInfoFromALL_NODE_Table.Count > 0)
+                                {
+                                    //==We have the values now we need to retrive the data
+
+                                    //This returned pressure value is in psi later it will be converted to MPa
+                                    double returnedPressure = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue);
+                                    if (returnedPressure <= 0.00001 && returnedPressure > 14504) //100 MPa = 14504 psi so
+                                    {
+                                        MessageBox.Show("Pressure can't be less than 0 and greater than 14504 psi");
+                                        return;
+                                    }
+                                    //==Now updating data in database
+                                    //------------------------------------Working here -------------------------------------------------------//
+                                    UpdateNodeInfoForHumidityDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue).ToString(), "hum", returnedPressure.ToString(), "OBJECT_ANALOG_INPUT");
+                                    //------------------------------------End of working here------------------------------------------------//
+                                   // CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
+                                }
+                            }
+                            else
+                            {
+                                //Invalid input
+                                MessageBox.Show("This is not a pressure parameter!");
+                                return;
+                            }
+                            break; //We found the value so break from the loop
+                        }
+
+                    }
+
+                }
+                else if (VariableIdentifiedValue == "OUT")
+                {
+                    //--we have output section
+
+                    //We have input section.
+                    //We have variable section.
+                    //--We need to do filtering accordingly
+                    FilterDataFromT3000 fd = new FilterDataFromT3000();
+                    //Form_TemperatureSourceDeviceInput ft = new Form_TemperatureSourceDeviceInput(this);
+                    DeviceAndParameterProcess dpp = new DeviceAndParameterProcess();
+                    FindPathOfBuildingDB();
+                    string buildingPath = BuildingSelected[0].Building_Path;
+                    // fd.ReadDataFromAlexDatabaseForInput("INPUTable", buildingPath); //Pulls the input information
+                    // fd.ReadDataFromAlexDatabaseForOutput("OUTPUTable", buildingPath);//pulls the output information
+                    fd.ReadDataFromAlexDatabaseForOutput("OUTPUTable", buildingPath);//Pulls variable information
+                    //==We only need variable data...
+                    for (int i = 0; i < fd.outputFromT3000List.Count; i++)
+                    {
+                        if (controllerNumberValue == int.Parse(fd.outputFromT3000List[i].out_panel) && (variableNumberValue - 1) == int.Parse(fd.outputFromT3000List[i].out_index))
+                        {
+                            //==We are ok value is present now we need to check for unit
+                            if (fd.outputFromT3000List[i].out_units.Contains("psi"))
+                            {
+                                //Value is humidity value
+                                //We can accept this value 
+                                //--Now steps 
+                                /*
+                                 * 0. Find controller instance id from alex db //we currently have panel_number which is not instance id
+                                 1. Retrive data from device
+                                 2. Update data in database
+                                 3. Refresh Controller
+                                 */
+                                // double returnValue = dpp.InputDeviceInfoAndValue()
+
+                                fd.ReadALL_NODE_Information_For_Given_Panel("ALL_NODE", buildingPath, controllerNumberValue);//We have data now.
+
+                                if (fd.listForControllerInfoFromALL_NODE_Table.Count > 0)
+                                {
+                                    //==We have the values now we need to retrive the data
+
+                                    double returnValueHumidity = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue);
+                                    if (returnValueHumidity <= 0.00001 && returnValueHumidity > 14504)
+                                    {
+                                        MessageBox.Show("Pressure can't be less than 0 and greater than 14504 psi");
+                                        return;
+                                    }
+                                    //==Now updating data in database
+                                    //------------------------------------Working here -------------------------------------------------------//
+                                    UpdateNodeInfoForHumidityDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue).ToString(), "hum", returnValueHumidity.ToString(), "OBJECT_ANALOG_OUTPUT");
+                                    //------------------------------------End of working here------------------------------------------------//
+                                    //CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
+                                }
+                            }
+                            else
+                            {
+                                //Invalid input
+                                MessageBox.Show("This is not a pressure parameter!");
+                                return;
+                            }
+                            break; //We found the value so break from the loop
+                        }
+
+                    }
+
+                }
+                else if (VariableIdentifiedValue == "VAR") //We are strict regarding typing "var" small case will not work 
+                {
+                    //We have variable section.
+                    //--We need to do filtering accordingly
+                    FilterDataFromT3000 fd = new FilterDataFromT3000();
+                   // Form_TemperatureSourceDeviceInput ft = new Form_TemperatureSourceDeviceInput(this);
+                    DeviceAndParameterProcess dpp = new DeviceAndParameterProcess();
+                     FindPathOfBuildingDB();
+                    string buildingPath = BuildingSelected[0].Building_Path;
+                    // fd.ReadDataFromAlexDatabaseForInput("INPUTable", buildingPath); //Pulls the input information
+                    // fd.ReadDataFromAlexDatabaseForOutput("OUTPUTable", buildingPath);//pulls the output information
+                    fd.ReadDataFromAlexDatabaseForVariable("VariablesTable", buildingPath);//Pulls variable information
+                    //==We only need variable data...
+                    for (int i = 0; i < fd.variableFromT3000List.Count; i++)
+                    {
+                        if (controllerNumberValue == int.Parse(fd.variableFromT3000List[i].var_panel) && (variableNumberValue - 1) == int.Parse(fd.variableFromT3000List[i].var_index))
+                        {
+                            //==We are ok value is present now we need to check for unit
+                            if (fd.variableFromT3000List[i].var_units.Contains("psi"))
+                            {
+                                //Contains humidity value
+                                //We can accept this value 
+                                //--Now steps 
+                                /*
+                                 0. Find controller instance id from alex db //we currently have panel_number which is not instance id
+                                 1. Retrive data from device
+                                 2. Update data in database
+                                 3. Refresh Controller
+                                 */
+                                // double returnValue = dpp.InputDeviceInfoAndValue()
+
+                                fd.ReadALL_NODE_Information_For_Given_Panel("ALL_NODE", buildingPath, controllerNumberValue);//We have data now.
+
+                                if (fd.listForControllerInfoFromALL_NODE_Table.Count > 0)
+                                {
+                                    //==We have the values now we need to retrive the data
+
+                                    double returnValueHumidity = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), VariableIdentifiedValue, variableNumberValue);
+                                    if (returnValueHumidity <= 0.00001 && returnValueHumidity > 14504)
+                                    {
+                                        MessageBox.Show("Pressure can't be less than 0 and greater than 14504 psi");
+                                        return;
+                                    }
+                                    //==Now updating data in database
+                                    //------------------------------------Working here -------------------------------------------------------//
+                                    UpdateNodeInfoForHumidityDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableNumberValue).ToString(), "hum", returnValueHumidity.ToString(), "OBJECT_ANALOG_VALUE");
+                                    //------------------------------------End of working here------------------------------------------------//
+                                   // CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
+
+                                }
+
+                                // break;
+
+                            }
+                            else
+                            {
+                                //Invalid input
+                                MessageBox.Show("This is not a pressure parameter!");
+                                return;
+                            }
+                            break; //We found the value so break from the loop
+                        }
+
+                    }
+
+
+
+                }
+                else
+                {
+                    //We have invalid input
+                    return;
+                }
+
+
+
+            }
+            if (condition != true)
+            {
+                //We need to check if the input is for labels
+                //--If condition is true we do not need to check for labels 
+                /*
+               steps : 1.  Compare for data extracted from database for all level values
+               2.Find controller information.
+               3. Retrive data from hardware
+               4. Update data
+               5. Refresh the controll this will be done finally               
+               */
+
+                //Retrive data for comparision
+                // PullDataForAllPossibleInputsFromT3000();
+                FilterDataFromT3000 fd = new FilterDataFromT3000();
+                //Form_TemperatureSourceDeviceInput ft = new Form_TemperatureSourceDeviceInput(this);
+                DeviceAndParameterProcess dpp = new DeviceAndParameterProcess();
+
+                int compareValue = CompareLabelInformation(DeviceIdentificationKeyWord, fd);
+                // MessageBox.Show("Compare Value= " + compareValue);
+                if (compareValue == 0)
+                {
+                    MessageBox.Show("Input is not matched with any value");
+                    return;//No futher processing no data present
+
+                }
+                else if (compareValue == 1)// Input value is matched
+                {
+
+                    if (listInputValueAfterFilter.Count > 0)
+                    {
+
+                        int controller_PanelNumber = int.Parse(listInputValueAfterFilter[0].PanelID);
+                        int variableIndex = int.Parse(listInputValueAfterFilter[0].InputIndex);
+
+                        //We have input section.
+                        //--We need to do filtering accordingly
+                        //FilterDataFromT3000 fd = new FilterDataFromT3000();
+                        //Form_TemperatureSourceDeviceInput ft = new Form_TemperatureSourceDeviceInput(this);
+                        //DeviceAndParameterProcess dpp = new DeviceAndParameterProcess();
+
+                         FindPathOfBuildingDB();
+                        string buildingPath = BuildingSelected[0].Building_Path;
+                        //==We only need variable data...
+                        // MessageBox.Show("ControllerPanelNumber=" + controller_PanelNumber + ", \nvariableIndex=" + variableIndex+"\nbuildingpath="+ buildingPath);
+                        for (int i = 0; i < fd.InputFromT3000List.Count; i++)
+                        {
+                            // if (controller_PanelNumber == int.Parse(fd.InputFromT3000List[i].PanelID) && (variableIndex-1) == int.Parse(fd.InputFromT3000List[i].InputIndex))
+                            if (controller_PanelNumber == int.Parse(fd.InputFromT3000List[i].PanelID) && (variableIndex) == int.Parse(fd.InputFromT3000List[i].InputIndex))
+                            {
+                                //==We are ok value is present now we need to check for unit
+                                if (fd.InputFromT3000List[i].InputUnit.Contains("psi"))
+                                {
+                                    //We can accept this value 
+                                    //--Now steps 
+                                    /*
+                                     0. Find controller instance id from alex db //we currently have panel_number which is not instance id
+                                     1. Retrive data from device
+                                     2. Update data in database
+                                     3. Refresh Controller
+                                     */
+                                    // double returnValue = dpp.InputDeviceInfoAndValue()
+
+                                    fd.ReadALL_NODE_Information_For_Given_Panel("ALL_NODE", buildingPath, controller_PanelNumber);//We have data now.
+
+                                    if (fd.listForControllerInfoFromALL_NODE_Table.Count > 0)
+                                    {
+                                        //==We have the values now we need to retrive the data
+
+                                        double returnValueHumidity = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), "IN", variableIndex + 1);//this variableIndex +1 is done because yabee starts form 1 and index in T3000 from 0 so
+                                        if (returnValueHumidity <= 0.00001 && returnValueHumidity > 14504)
+                                        {
+                                            MessageBox.Show("Humidity can't be less than 0 and greater than 14504 psi");
+                                            return;
+                                        }
+                                        //==Now updating data in database
+                                        //------------------------------------Working here -------------------------------------------------------//
+                                        UpdateNodeInfoForHumidityDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableIndex + 1).ToString(), "hum", returnValueHumidity.ToString(), "OBJECT_ANALOG_INPUT");
+                                        //------------------------------------End of working here------------------------------------------------//
+                                       // CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
+                                    }
+                                }
+                                else
+                                {
+                                    //Invalid input
+                                    MessageBox.Show("This is not a pressure parameter!");
+                                    return;
+                                }
+                                break; //We found the value so break from the loop
+                            }
+
+                        }
+
+                    }//Close of input.Count
+
+
+
+                }
+                else if (compareValue == 2)// Output value is matched
+                {
+                    if (listOutputValueAfterFilter.Count > 0)
+                    {
+
+                        int controller_PanelNumber = int.Parse(listOutputValueAfterFilter[0].out_panel);
+                        int variableIndex = int.Parse(listOutputValueAfterFilter[0].out_index);
+
+                        //We have input section.
+                        //We have variable section.
+                        //--We need to do filtering accordingly
+                        //FilterDataFromT3000 fd = new FilterDataFromT3000();
+                        //Form_TemperatureSourceDeviceInput ft = new Form_TemperatureSourceDeviceInput(this);
+                        //DeviceAndParameterProcess dpp = new DeviceAndParameterProcess();
+                         FindPathOfBuildingDB();
+                        string buildingPath = BuildingSelected[0].Building_Path;
+                        // fd.ReadDataFromAlexDatabaseForInput("INPUTable", buildingPath); //Pulls the input information
+                        // fd.ReadDataFromAlexDatabaseForOutput("OUTPUTable", buildingPath);//pulls the output information
+                        // fd.ReadDataFromAlexDatabaseForInput("INPUTable", buildingPath);//Pulls variable information
+                        //==We only need variable data...
+                        for (int i = 0; i < fd.outputFromT3000List.Count; i++)
+                        {
+                            // if (controller_PanelNumber == int.Parse(fd.outputFromT3000List[i].out_panel) && (variableIndex-1) == int.Parse(fd.outputFromT3000List[i].out_index))
+
+                            if (controller_PanelNumber == int.Parse(fd.outputFromT3000List[i].out_panel) && (variableIndex) == int.Parse(fd.outputFromT3000List[i].out_index))
+                            {
+                                //==We are ok value is present now we need to check for unit
+                                if (fd.outputFromT3000List[i].out_units.Contains("psi"))
+                                {
+                                    //We can accept this value 
+
+
+                                    //--Now steps 
+                                    /*
+                                     * 0. Find controller instance id from alex db //we currently have panel_number which is not instance id
+                                     1. Retrive data from device
+                                     2. Update data in database
+                                     3. Refresh Controller
+                                     */
+                                    // double returnValue = dpp.InputDeviceInfoAndValue()
+
+                                    fd.ReadALL_NODE_Information_For_Given_Panel("ALL_NODE", buildingPath, controller_PanelNumber);//We have data now.
+
+                                    if (fd.listForControllerInfoFromALL_NODE_Table.Count > 0)
+                                    {
+                                        //==We have the values now we need to retrive the data
+
+                                        double returnValueHumidity = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), "OUT", variableIndex + 1);
+                                        if (returnValueHumidity <= 0.00001 && returnValueHumidity > 14504)
+                                        {
+                                            MessageBox.Show("Humidity can't be less than 0 and greater than 14504psi");
+                                            return;
+                                        }
+                                        //==Now updating data in database
+                                        //------------------------------------Working here -------------------------------------------------------//
+                                        UpdateNodeInfoForHumidityDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableIndex + 1).ToString(), "hum", returnValueHumidity.ToString(), "OBJECT_ANALOG_INPUT");
+                                        //------------------------------------End of working here------------------------------------------------//
+                                      //  CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);
+                                    }
+                                }
+                                else
+                                {
+                                    //Invalid input
+                                    MessageBox.Show("This is not a pressure parameter!");
+                                    return;
+                                }
+                                break; //We found the value so break from the loop
+                            }
+
+                        }
+
+                    }//Close of input.Count
+
+                }
+                else if (compareValue == 3)// Variable value is matched
+                {
+
+                    //MessageBox.Show("Inside 3 count for listVariableValueAfterFilter.Count  = " + listVariableValueAfterFilter.Count);
+
+                    if (listVariableValueAfterFilter.Count > 0)
+                    {
+
+                        int controller_PanelNumber = int.Parse(listVariableValueAfterFilter[0].var_panel);
+                        int variableIndex = int.Parse(listVariableValueAfterFilter[0].var_index);
+                        // MessageBox.Show("Inside 3 count for contnum  = " + controller_PanelNumber+"Var index= "+ variableIndex);
+
+                        //We have input section.
+                        //We have variable section.
+                        //--We need to do filtering accordingly
+
+                         FindPathOfBuildingDB();
+                        string buildingPath = BuildingSelected[0].Building_Path;
+
+                        //==We only need variable data...
+                        // MessageBox.Show("Count for var in alex db= " + fd.variableFromT3000List.Count);
+                        for (int i = 0; i < fd.variableFromT3000List.Count; i++)
+                        {
+                            //if (controller_PanelNumber == int.Parse(fd.variableFromT3000List[i].var_panel) && (variableIndex - 1) == int.Parse(fd.variableFromT3000List[i].var_index))
+                            if (controller_PanelNumber == int.Parse(fd.variableFromT3000List[i].var_panel) && (variableIndex) == int.Parse(fd.variableFromT3000List[i].var_index))
+                            {
+                                //==We are ok value is present now we need to check for unit
+                                if (fd.variableFromT3000List[i].var_units.Contains("psi"))
+                                {
+                                    //We can accept this value 
+
+                                    // MessageBox.Show("Inside %"); 
+
+                                    //--Now steps 
+                                    /*
+                                     * 0. Find controller instance id from alex db //we currently have panel_number which is not instance id
+                                     1. Retrive data from device
+                                     2. Update data in database
+                                     3. Refresh Controller
+                                     */
+
+                                    fd.ReadALL_NODE_Information_For_Given_Panel("ALL_NODE", buildingPath, controller_PanelNumber);//We have data now.
+
+
+
+
+                                    if (fd.listForControllerInfoFromALL_NODE_Table.Count > 0)
+                                    {
+                                        //==We have the values now we need to retrive the data
+                                        double returnValueHumidity = dpp.InputDeviceInfoAndValue(int.Parse(fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance), "VAR", variableIndex + 1);
+
+                                        if (returnValueHumidity <= 0.00001 && returnValueHumidity > 14504)
+                                        {
+                                            MessageBox.Show("Pressure can't be less than 0 and greater than 14504 psi");
+                                            return;
+                                        }
+                                        //==Now updating data in database
+                                        //MessageBox.Show("We are inside matched section of variable label for humidity ,controller  = " + fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance + ",index = " + variableIndex);
+                                        //------------------------------------Working here -------------------------------------------------------//
+                                        UpdateNodeInfoForHumidityDeviceSelection_ForTextInput_ForDevice(tempNodeID, fd.listForControllerInfoFromALL_NODE_Table[0].Object_Instance, "", (variableIndex + 1).ToString(), "hum", returnValueHumidity.ToString(), "OBJECT_ANALOG_INPUT");
+                                        //------------------------------------End of working here------------------------------------------------//
+                                        //CallFromTemperatureAndHumidtyFormForMixNodeFxn(tempNodeID);//This updates the DGV as well no problem
+                                    }
+                                }
+                                else
+                                {
+                                    //Invalid input
+                                    MessageBox.Show("This is not a humidity parameter!");
+                                    return;
+                                }
+                                break; //We found the value so break from the loop
+                            }
+
+                        }
+
+                    }//Close of input.Count
+
+                } //Close ofcomp ==3
+
+
+
+            }
+
+            bcs.UpdateOrInsertHumiditySourceInfo(tempNodeID, DeviceIdentificationKeyWord);
+            // LoadNodeAndLine(); //--This load section is done outside this function
+        } //-Close of humidity input parameter fxn
+
+        public void UpdateNodeInfoForHumidityDeviceSelection_ForTextInput_ForDevice(string nodeID, string Humidity_deviceInstancID, string Humidity_IP, string Humidity_param1id, string Humidity_param1info, string Humidity_param1Value, string Humidity_param1_id_type)
+        {
+
+            //==We require following things : 
+            /*
+            1. name ,label,source,xValue,yValue,showText,color,nodeSize== for updating node
+            2. nodeID,deviceInstanceID,deviceIP, param1[id,value,type],param2[id,value,type] ==>insert if first time else update the values
+            */
+            string nodeIDVal = nodeID; //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[3].Value.ToString();            
+            string nameVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value.ToString();//--This contains the name
+            string TemperatureSource;
+            if (dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString() == "Manual" || dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString() == "Web")
+            {
+                TemperatureSource = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();//--This contains the name
+            }
+            else
+            {
+                TemperatureSource = "Device";//  dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();//--This contains the name
+            }
+
+            //----Temperature Value will be received for parameter value from hardware
+            string XaxisValue = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[6].Value.ToString();//--This contains the name
+            string pressureSource = "Device";//dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString();//--This contains the name
+            string pressureValue = Humidity_param1Value; //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString();//--This contains the name
+                                                         //string TemperatureSource = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();//--This contains the name
+
+            double xVal = 0.00;
+            double yVal = 0.00;
+
+           // int AirFlow = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[9].Value.ToString());
+            Color colorVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[7].Style.BackColor;
+            int nodeSizeVal = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[8].Value.ToString());
+
+            double pressureVal = double.Parse(pressureValue)/145.038;//converting form psi to MPa
+
+            //This is where the actual action is going to happen
+            //First lets find the xValue and the yValue of the selected index value
+            // if (param1info == "temp" && param2info == "hum")
+            // {
+            //--Now lets calculate the x and y value
+            //We got temperature and humidity
+
+           // bcs.CalculateYFromXandHumidity(double.Parse(TemperatureValue), humValue / 100);//This will get the y value
+                                                                                           // MessageBox.Show("Temperature Error print = " + TemperatureValue);
+
+            xVal = (int)double.Parse(XaxisValue);
+            yVal = pressureVal;// bcs.y_coord_value;//This value will be updated
+            //}
+            //else
+            //{
+            //    //We get temp and enthaly
+
+            //    xVal = double.Parse(param1Value);
+            //    yVal = bcs.CalculateYFromXandEnthalpy(xVal, double.Parse(param2Value));
+
+            //}
+
+            // MessageBox.Show("bbk test , nodeIDValue= " + nodeIDVal);
+            //tHIS FXN will update to db
+            //--------------------This one is also commented latere--------------------------------//
+            //bcs.UpdateNodeInfoToDB(nodeIDVal, xVal, yVal, sourceVal, nameVal, labelVal, colorVal, showTextVal, nodeSizeVal);
+            bcs.UpdateNodeInfoToDBFromTemperatureDeviceSource(nodeID, xVal, yVal, TemperatureSource, pressureSource, nameVal, colorVal,  nodeSizeVal);
+            //----------------------lets rememeber this--------------------------------------------//
+            //--Now since the value has been updated now we again want to reload the values to both the tables.
+            //insert or update the node information if already present
+
+            //----------------------------This one is comented now ---------------------------------------//
+            //bcs.InsertIntoDeviceInfoDB(nodeIDVal, deviceInstancID, IP, param1id, param2id, param1info, param2info, param1_id_type, param2_id_type);
+            // bcs.InsertUpdateFromTemperatureDeviceSelectionToDBOnlyTempertureUpdate(nodeID, Temp_deviceInstancID, Temp_IP, Temp_param1id, Temp_param1info, Temp_param1_id_type);
+
+            bcs.InsertUpdateFromHumidityDeviceSelectionToDBOnlyTempertureUpdate(nodeID, Humidity_deviceInstancID, Humidity_IP, Humidity_param1id, Humidity_param1info, Humidity_param1_id_type);
+            //------------------------------end this------------------------------------------------------//
+
+            //--Refreshing data
+            //  RefreshDataFromDBAndChart();
+            //--After refreshing
+            // LoadNodeAndLine();//--Loading the data 
+            RefreshChartAndDGVForMixNodeFunction();
+        }
+
         //===========================End of temperature souce pull====================//
 
+        //============================FOR dgv2 ===================================//
+        string initialThickness;
+        string initialLineName;       
+        private void dataGridView2_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
+        {
+            //--Cell begin edit 
+            if (dataGridView2.CurrentCell.ColumnIndex == 5)
+            {
+                //This is the value of the thickneess
+                initialThickness = dataGridView2.CurrentCell.Value.ToString();
+
+            }
+            else if (e.ColumnIndex == 1)
+            {
+                //Name is being edited
+                initialLineName = dataGridView2.CurrentCell.Value.ToString();
+            }
+        }
+
+        private void dataGridView2_MouseHover(object sender, EventArgs e)
+        {
+
+        }
+
+        private void dataGridView1_EditingControlShowing_1(object sender, DataGridViewEditingControlShowingEventArgs e)
+        {
+            try
+            {
+                if (sender == null || e == null)
+                {
+                    return;
+                }
+                else if (dataGridView1.CurrentCell.Value == null)
+                {
+                    //MessageBox.Show("Current cell value is empty");
+                    return;
+                }
+                if (dataGridView1.CurrentCell.RowIndex < bcs.listNodeInfoValues.Count)
+                {
+
+                    ComboBox combo = e.Control as ComboBox;
+
+                    if (combo != null)
+                    {
+
+                        combo.SelectionChangeCommitted -= new EventHandler(ComboBox_SelectedIndexChanged);
+                        combo.SelectionChangeCommitted += new EventHandler(ComboBox_SelectedIndexChanged);
+                    }
+                }
+                //}catch(Exception ex)
+                //{
+                //    MessageBox.Show("exception at line 45:" + ex.Message);
+                //}
+            }
+            catch (NullReferenceException nre)
+            {
+                //MessageBox.Show("\nline 49.\n" + nre.Message);
+
+            }
+        }
+
+        private void dataGridView2_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            //--Cell click event
+            if ((e.RowIndex >= 0 && e.RowIndex < bcs.listLineInfoValues.Count) && (e.ColumnIndex == 4))
+            {
+                if (colorDialog2.ShowDialog() == DialogResult.OK)
+                {
+
+                    DataGridViewButtonCell buttonCell = (DataGridViewButtonCell)dataGridView2.Rows[e.RowIndex].Cells[4];
+                    buttonCell.FlatStyle = FlatStyle.Popup;
+                    buttonCell.Style.BackColor = colorDialog2.Color;//System.Drawing.Color.Red;
+
+
+
+                    //We need to update 
+                    try
+
+                    {
+                        // string finalThickness = dataGridView2.CurrentCell.Value.ToString();
+
+                        //Convert.ToString is for handling null event
+                        string lineid = Convert.ToString(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[0].Value);
+                        string prevNodeID = Convert.ToString(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[6].Value);
+                        string nextNodeID = Convert.ToString(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[7].Value);
+                        Color color = colorDialog2.Color;  //dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[3].Style.BackColor;
+                        int thickness = int.Parse(Convert.ToString(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[5].Value));//finalThickness
+                        Series s = new Series(Convert.ToString(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[8].Value));
+                        string lineName = Convert.ToString(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[1].Value);
+
+                        int status = 0;//0 means dissable 1 means enabled
+
+                        DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9];
+
+                        if (cbCell.Value.ToString() == "true")
+                        {
+                            status = 1;
+                        }
+                        else
+                        {
+                            status = 0;
+                        }
+                        LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status);
+
+                    }
+                    catch //(Exception ex)
+                    {
+                        // MessageBox.Show("exception  at line :1391"+ex.Message);
+                    }
+
+                }//Close of if
+            }
+
+            else if ((e.RowIndex >= 0 && e.RowIndex < bcs.listLineInfoValues.Count) && e.ColumnIndex == 9)
+            {
+                string finalThickness = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[5].Value.ToString();
+               // MessageBox.Show("Click");
+                //Convert.ToString is for handling null event
+                string lineid = Convert.ToString(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[0].Value.ToString());
+                string prevNodeID = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[6].Value.ToString();
+                string nextNodeID = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[7].Value.ToString();
+                Color color = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[4].Style.BackColor;
+                int thickness = int.Parse(finalThickness);//finalThickness
+                Series s = new Series(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[8].Value.ToString());
+                string lineName = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[1].Value.ToString();
+                int status = 0;//0 means dissable 1 means enabled
+
+                DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9];
+                if (cbCell.Value == cbCell.TrueValue)//cbCell.TrueValue) // .ToString() == "true"
+                {
+                    status = 1;
+                }
+                else
+                {
+                    status = 0;
+                }
+                LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status);
+            }
+
+
+            ////==Cell clicked function is triggered
+
+            if (e.RowIndex >= 0)
+            {
+                DataGridViewRow row = dataGridView2.Rows[e.RowIndex];
+               // EnergyCalculationForProcess(row);//SELECTED ROW
+            }
+
+        }
+        public void LineUpdateAndReload(string lineid, string prevNodeID, string nextNodeID, Color color, int thickness, Series lineseries, string name, int status)
+        {
+
+            bcs.UpdateLineInfoToDB(lineid, prevNodeID, nextNodeID, color, lineseries, thickness, name, status);
+
+            //==Now lets refresh the data and 
+            //RefreshDataFromDBAndChart();
+            //--After refreshing
+            //LoadNodeAndLine();//--Loading the data 
+            RefreshChartAndDGVForMixNodeFunction();
+
+
+        }
+        private void dataGridView2_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            //--Cell end edit
+            if ((e.RowIndex >= 0 && e.RowIndex < bcs.listLineInfoValues.Count) && e.ColumnIndex == 5)
+            {
+                //now lets check for the number value
+                try
+                {
+
+                    string finalThickness = dataGridView2.CurrentCell.Value.ToString();
+
+                    string pattern = @"^[0-9]+$"; //for integers only
+                    Regex rgx = new Regex(pattern);
+                    //string sentence = "Who writes these notes?";
+                    if (rgx.IsMatch(finalThickness) == true)
+                    {
+                        //matched no need to edit 
+                    }
+                    else
+                    {
+                        MessageBox.Show("You can only input integer values");
+                        dataGridView2.CurrentCell.Value = initialThickness;
+                        return;
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("You can only input integer values");
+
+                    dataGridView2.CurrentCell.Value = initialThickness;
+                    return;
+                }
+
+                try
+
+                {
+                    string finalThickness = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[5].Value.ToString();
+
+                    //Convert.ToString is for handling null event
+                    string lineid = Convert.ToString(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[0].Value.ToString());
+                    string prevNodeID = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[6].Value.ToString();
+                    string nextNodeID = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[7].Value.ToString();
+                    Color color = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[4].Style.BackColor;
+                    int thickness = int.Parse(finalThickness);//finalThickness
+                    Series s = new Series(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[8].Value.ToString());
+                    string lineName = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[1].Value.ToString();
+                    int status = 0;//0 means dissable 1 means enabled
+
+                    DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9];
+                    if (cbCell.Value.ToString() == "true")//cbCell.TrueValue
+                    {
+                        status = 1;
+                    }
+                    else
+                    {
+                        status = 0;
+                    }
+
+                    LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status);
+
+                }
+                catch
+                { }
+
+
+            }
+            else if ((e.RowIndex >= 0 && e.RowIndex < bcs.listLineInfoValues.Count) && e.ColumnIndex == 9)
+            {
+                //string finalThickness = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[5].Value.ToString();
+
+                ////Convert.ToString is for handling null event
+                //string lineid = Convert.ToString(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[0].Value.ToString());
+                //string prevNodeID = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[6].Value.ToString();
+                //string nextNodeID = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[7].Value.ToString();
+                //Color color = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[4].Style.BackColor;
+                //int thickness = int.Parse(finalThickness);//finalThickness
+                //Series s = new Series(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[8].Value.ToString());
+                //string lineName = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[1].Value.ToString();
+                //int status = 0;//0 means dissable 1 means enabled
+
+                //DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9];
+                //if (cbCell.Value == cbCell.TrueValue)
+                //{
+                //    status = 1;
+                //}
+                //else
+                //{
+                //    status = 0;
+                //}
+                //LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status);
+
+
+            }
+            else if ((e.RowIndex >= 0 && e.RowIndex < bcs.listLineInfoValues.Count) && e.ColumnIndex == 1)
+            {
+
+                //Name changed 
+                try
+                {
+
+                    string finalLineName = dataGridView2.CurrentCell.Value.ToString();
+
+                    string pattern = @"^\w+$"; //for integers only
+                    Regex rgx = new Regex(pattern);
+                    //string sentence = "Who writes these notes?";
+                    if (rgx.IsMatch(finalLineName) == true)
+                    {
+                        //matched no need to edit 
+                    }
+                    else
+                    {
+                        MessageBox.Show("You can only input letters,integer and underscore values");
+                        dataGridView2.CurrentCell.Value = initialLineName;
+                        return;
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("You can only input integer values");
+
+                    dataGridView2.CurrentCell.Value = initialLineName;
+                    return;
+                }
+
+                try
+
+                {
+                    string finalLineName = dataGridView2.CurrentCell.Value.ToString();
+
+                    //Convert.ToString is for handling null event
+                    string lineid = Convert.ToString(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[0].Value.ToString());
+                    string prevNodeID = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[6].Value.ToString();
+                    string nextNodeID = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[7].Value.ToString();
+                    Color color = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[4].Style.BackColor;
+                    int thickness = int.Parse(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[5].Value.ToString());//finalThickness
+                    Series s = new Series(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[8].Value.ToString());
+                    string lineName = finalLineName; //dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[1].Value.ToString();
+                    int status = 0;//0 means dissable 1 means enabled
+
+                    DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9];
+                    if (cbCell.Value.ToString() == "true")//cbCell.TrueValue
+                    {
+                        status = 1;
+                    }
+                    else
+                    {
+                        status = 0;
+                    }
+                    // MessageBox.Show("Status 1means true , 0 means false = " + status);
+                    LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status);
+
+                }
+                catch
+                { }
+
+
+            }
+
+        }
+
+        private void dataGridView2_SelectionChanged(object sender, EventArgs e)
+        {
+           // return;
+            DataGridViewCell cellCopy = dataGridView2.CurrentCell;
+
+            if (dataGridView2.Rows.Count <= 0)
+            {
+                return;
+            }
+
+            if (cellCopy != null)
+            {
+                if (dataGridView2.CurrentCell.RowIndex.ToString() != "")
+                {
+                    //set parameters of your event args
+                    var eventArgs = new DataGridViewCellEventArgs(0, dataGridView2.CurrentCell.RowIndex);
+                    //or setting the selected cells manually before executing the function
+                    //dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[dataGridView2.CurrentCell.ColumnIndex].Selected = true;
+                    dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[0].Selected = true;
+                    dataGridView2_CellClick(sender, eventArgs);
+                }
+
+            }
+        }
+
+        private void dataGridView2_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        //===========================End of DGV2================================//
     }
 }

@@ -12,11 +12,33 @@ namespace PH_App
 {
     public partial class Form_PressureInput : Form
     {
-        FormEditNodeAndLine f1;
+        FormEditNodeAndLine frm;
         public Form_PressureInput(FormEditNodeAndLine f)
         {
-            f1 = f;
+            frm = f;
             InitializeComponent();
+        }
+
+        private void btn_ok_Click(object sender, EventArgs e)
+        {
+            //--This is a button click event...
+
+            try
+            {
+                string input = textBox1.Text.Trim();
+                Cursor.Current = Cursors.WaitCursor;
+                //EditNodeLineForm ef = new EditNodeLineForm()
+                frm.PressureInputPorcessForDevice(input);
+                frm.LoadNodeAndLine();
+                //MessageBox.Show("End");
+                Cursor.Current = Cursors.Default;
+                this.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"{ex.Message} \n Please select input, output and variable section in T3000 and retry!");
+                this.Close();
+            }
         }
     }
 }

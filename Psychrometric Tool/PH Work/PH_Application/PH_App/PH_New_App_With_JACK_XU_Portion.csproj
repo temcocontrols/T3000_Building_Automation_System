@@ -82,6 +82,12 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="PacketDotNet">
+      <HintPath>..\..\..\Project 1 Working Later Update To Dropbox\Psychrometric Tool\T3000 Output_VS2015\PacketDotNet.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpPcap">
+      <HintPath>..\..\..\Project 1 Working Later Update To Dropbox\Psychrometric Tool\T3000 Output_VS2015\SharpPcap.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />

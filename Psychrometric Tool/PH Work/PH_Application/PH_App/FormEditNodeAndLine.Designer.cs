@@ -28,16 +28,22 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle36 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle37 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle38 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle39 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle40 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle41 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle42 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
             this.saveFD = new System.Windows.Forms.SaveFileDialog();
             this.label2 = new System.Windows.Forms.Label();
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
+            this.label1 = new System.Windows.Forms.Label();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.colorDialog2 = new System.Windows.Forms.ColorDialog();
+            this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.lineID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.lineName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.startNodeID = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -48,8 +54,6 @@
             this.nextNodeID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.lineSeriesValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.lineStatus = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.label1 = new System.Windows.Forms.Label();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.name = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CB_DGV_Temperature_Source = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.nodeID = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -59,10 +63,6 @@
             this.equivalentEnthalpy = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.color = new System.Windows.Forms.DataGridViewButtonColumn();
             this.nodeSize = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.colorDialog2 = new System.Windows.Forms.ColorDialog();
-            this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
@@ -101,6 +101,69 @@
             this.dataGridView2.Name = "dataGridView2";
             this.dataGridView2.Size = new System.Drawing.Size(543, 246);
             this.dataGridView2.TabIndex = 14;
+            this.dataGridView2.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dataGridView2_CellBeginEdit);
+            this.dataGridView2.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView2_CellClick);
+            this.dataGridView2.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView2_CellContentClick);
+            this.dataGridView2.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView2_CellEndEdit);
+            this.dataGridView2.SelectionChanged += new System.EventHandler(this.dataGridView2_SelectionChanged);
+            this.dataGridView2.MouseHover += new System.EventHandler(this.dataGridView2_MouseHover);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.label1.Location = new System.Drawing.Point(8, 6);
+            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(63, 13);
+            this.label1.TabIndex = 13;
+            this.label1.Text = "Edit Node : ";
+            // 
+            // dataGridView1
+            // 
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.name,
+            this.CB_DGV_Temperature_Source,
+            this.nodeID,
+            this.temp,
+            this.CB_DGV_Pressure_Source,
+            this.humidity,
+            this.equivalentEnthalpy,
+            this.color,
+            this.nodeSize});
+            this.dataGridView1.Location = new System.Drawing.Point(11, 22);
+            this.dataGridView1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.Size = new System.Drawing.Size(784, 237);
+            this.dataGridView1.TabIndex = 12;
+            this.dataGridView1.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dataGridView1_CellBeginEdit);
+            this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick);
+            this.dataGridView1.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellEndEdit);
+            this.dataGridView1.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.dataGridView1_EditingControlShowing_1);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.label4.Location = new System.Drawing.Point(243, 270);
+            this.label4.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(415, 13);
+            this.label4.TabIndex = 17;
+            this.label4.Text = "Note : Start Node Name and End Node Name are non-editable other fields are editab" +
+    "le";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.label3.Location = new System.Drawing.Point(290, 6);
+            this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(316, 13);
+            this.label3.TabIndex = 16;
+            this.label3.Text = "Note : Equivalent Enthalpy is non-editable other fields are editable";
             // 
             // lineID
             // 
@@ -169,56 +232,26 @@
             // 
             // lineStatus
             // 
+            this.lineStatus.FalseValue = "false";
             this.lineStatus.HeaderText = "Show Name";
+            this.lineStatus.IndeterminateValue = "0";
             this.lineStatus.Name = "lineStatus";
             this.lineStatus.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.lineStatus.TrueValue = "true";
             this.lineStatus.Width = 80;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label1.Location = new System.Drawing.Point(8, 6);
-            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(63, 13);
-            this.label1.TabIndex = 13;
-            this.label1.Text = "Edit Node : ";
-            // 
-            // dataGridView1
-            // 
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.name,
-            this.CB_DGV_Temperature_Source,
-            this.nodeID,
-            this.temp,
-            this.CB_DGV_Pressure_Source,
-            this.humidity,
-            this.equivalentEnthalpy,
-            this.color,
-            this.nodeSize});
-            this.dataGridView1.Location = new System.Drawing.Point(11, 22);
-            this.dataGridView1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(784, 237);
-            this.dataGridView1.TabIndex = 12;
-            this.dataGridView1.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dataGridView1_CellBeginEdit);
-            this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick);
-            this.dataGridView1.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellEndEdit);
             // 
             // name
             // 
-            dataGridViewCellStyle36.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.name.DefaultCellStyle = dataGridViewCellStyle36;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.name.DefaultCellStyle = dataGridViewCellStyle1;
             this.name.HeaderText = "Name";
             this.name.Name = "name";
             this.name.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // CB_DGV_Temperature_Source
             // 
-            dataGridViewCellStyle37.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.CB_DGV_Temperature_Source.DefaultCellStyle = dataGridViewCellStyle37;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.CB_DGV_Temperature_Source.DefaultCellStyle = dataGridViewCellStyle2;
             this.CB_DGV_Temperature_Source.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
             this.CB_DGV_Temperature_Source.HeaderText = "Temperature Source";
             this.CB_DGV_Temperature_Source.Name = "CB_DGV_Temperature_Source";
@@ -234,9 +267,9 @@
             // 
             // temp
             // 
-            dataGridViewCellStyle38.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.temp.DefaultCellStyle = dataGridViewCellStyle38;
-            this.temp.HeaderText = "Temperature";
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.temp.DefaultCellStyle = dataGridViewCellStyle3;
+            this.temp.HeaderText = "Temperature(°C)";
             this.temp.Name = "temp";
             this.temp.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
@@ -248,16 +281,16 @@
             // 
             // humidity
             // 
-            dataGridViewCellStyle39.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.humidity.DefaultCellStyle = dataGridViewCellStyle39;
-            this.humidity.HeaderText = "Pressure";
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.humidity.DefaultCellStyle = dataGridViewCellStyle4;
+            this.humidity.HeaderText = "Pressure[MPa]";
             this.humidity.Name = "humidity";
             this.humidity.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // equivalentEnthalpy
             // 
-            dataGridViewCellStyle40.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.equivalentEnthalpy.DefaultCellStyle = dataGridViewCellStyle40;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.equivalentEnthalpy.DefaultCellStyle = dataGridViewCellStyle5;
             this.equivalentEnthalpy.HeaderText = "Equivalent Enthalpy";
             this.equivalentEnthalpy.Name = "equivalentEnthalpy";
             this.equivalentEnthalpy.ReadOnly = true;
@@ -265,9 +298,9 @@
             // 
             // color
             // 
-            dataGridViewCellStyle41.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle41.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.color.DefaultCellStyle = dataGridViewCellStyle41;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.color.DefaultCellStyle = dataGridViewCellStyle6;
             this.color.HeaderText = "Color";
             this.color.Name = "color";
             this.color.Resizable = System.Windows.Forms.DataGridViewTriState.True;
@@ -275,34 +308,11 @@
             // 
             // nodeSize
             // 
-            dataGridViewCellStyle42.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.nodeSize.DefaultCellStyle = dataGridViewCellStyle42;
+            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.nodeSize.DefaultCellStyle = dataGridViewCellStyle7;
             this.nodeSize.HeaderText = "Node Size";
             this.nodeSize.Name = "nodeSize";
             this.nodeSize.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label4.Location = new System.Drawing.Point(243, 270);
-            this.label4.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(415, 13);
-            this.label4.TabIndex = 17;
-            this.label4.Text = "Note : Start Node Name and End Node Name are non-editable other fields are editab" +
-    "le";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label3.Location = new System.Drawing.Point(290, 6);
-            this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(316, 13);
-            this.label3.TabIndex = 16;
-            this.label3.Text = "Note : Equivalent Enthalpy is non-editable other fields are editable";
             // 
             // FormEditNodeAndLine
             // 
