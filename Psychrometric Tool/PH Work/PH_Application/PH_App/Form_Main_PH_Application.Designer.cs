@@ -397,6 +397,7 @@
             // 
             this.trashBoxToolStripMenuItem.Name = "trashBoxToolStripMenuItem";
             resources.ApplyResources(this.trashBoxToolStripMenuItem, "trashBoxToolStripMenuItem");
+            this.trashBoxToolStripMenuItem.Click += new System.EventHandler(this.trashBoxToolStripMenuItem_Click);
             // 
             // gridViewToolStripMenuItem
             // 

@@ -117,103 +117,76 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="btn_ok.Text" xml:space="preserve">
-    <value>Ok</value>
+  <data name="CB_DGV_Pressure_Source.HeaderText" xml:space="preserve">
+    <value>Pressure Source</value>
+  </data>
+  <data name="CB_DGV_Temperature_Source.HeaderText" xml:space="preserve">
+    <value>Temperature Source</value>
+  </data>
+  <data name="color.HeaderText" xml:space="preserve">
+    <value>Color</value>
+  </data>
+  <data name="endNodeID.HeaderText" xml:space="preserve">
+    <value>End Node Name</value>
+  </data>
+  <data name="equivalentEnthalpy.HeaderText" xml:space="preserve">
+    <value>Equivalent Enthalpy</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
-    <value>Temperature Input</value>
+    <value>FormEditNodeAndLine</value>
+  </data>
+  <data name="humidity.HeaderText" xml:space="preserve">
+    <value>Pressure[MPa]</value>
   </data>
   <data name="label1.Text" xml:space="preserve">
-    <value>Device Input :</value>
+    <value>Edit Node : </value>
   </data>
-  <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="btn_ok.Location" type="System.Drawing.Point, System.Drawing">
-    <value>78, 64</value>
+  <data name="label2.Text" xml:space="preserve">
+    <value>Edit Process Line : </value>
   </data>
-  <data name="btn_ok.Size" type="System.Drawing.Size, System.Drawing">
-    <value>81, 25</value>
+  <data name="label3.Text" xml:space="preserve">
+    <value>Note : Equivalent Enthalpy is non-editable other fields are editable</value>
   </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="btn_ok.TabIndex" type="System.Int32, mscorlib">
-    <value>5</value>
+  <data name="label4.Text" xml:space="preserve">
+    <value>Note : Start Node Name and End Node Name are non-editable other fields are editable</value>
   </data>
-  <data name="&gt;&gt;btn_ok.Name" xml:space="preserve">
-    <value>btn_ok</value>
+  <data name="linecolor.HeaderText" xml:space="preserve">
+    <value>Color</value>
   </data>
-  <data name="&gt;&gt;btn_ok.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="lineID.HeaderText" xml:space="preserve">
+    <value>Line ID</value>
   </data>
-  <data name="&gt;&gt;btn_ok.Parent" xml:space="preserve">
-    <value>$this</value>
+  <data name="lineName.HeaderText" xml:space="preserve">
+    <value>Line Name</value>
   </data>
-  <data name="&gt;&gt;btn_ok.ZOrder" xml:space="preserve">
-    <value>0</value>
+  <data name="lineSeriesValue.HeaderText" xml:space="preserve">
+    <value>line series</value>
   </data>
-  <data name="label1.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
+  <data name="lineStatus.HeaderText" xml:space="preserve">
+    <value>Show Name</value>
   </data>
-  <data name="label1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>4, 28</value>
+  <data name="name.HeaderText" xml:space="preserve">
+    <value>Name</value>
   </data>
-  <data name="label1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>74, 13</value>
+  <data name="nextNodeID.HeaderText" xml:space="preserve">
+    <value>Next node id</value>
   </data>
-  <data name="label1.TabIndex" type="System.Int32, mscorlib">
-    <value>4</value>
+  <data name="nodeID.HeaderText" xml:space="preserve">
+    <value>Node ID</value>
   </data>
-  <data name="&gt;&gt;label1.Name" xml:space="preserve">
-    <value>label1</value>
+  <data name="nodeSize.HeaderText" xml:space="preserve">
+    <value>Node Size</value>
   </data>
-  <data name="&gt;&gt;label1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="prevNodeID.HeaderText" xml:space="preserve">
+    <value>Prev node id</value>
   </data>
-  <data name="&gt;&gt;label1.Parent" xml:space="preserve">
-    <value>$this</value>
+  <data name="startNodeID.HeaderText" xml:space="preserve">
+    <value>Start Node Name</value>
   </data>
-  <data name="&gt;&gt;label1.ZOrder" xml:space="preserve">
-    <value>1</value>
+  <data name="temp.HeaderText" xml:space="preserve">
+    <value>Temperature(°C)</value>
   </data>
-  <data name="textBox1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>78, 28</value>
-  </data>
-  <data name="textBox1.MaxLength" type="System.Int32, mscorlib">
-    <value>50</value>
-  </data>
-  <data name="textBox1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>123, 20</value>
-  </data>
-  <data name="textBox1.TabIndex" type="System.Int32, mscorlib">
-    <value>3</value>
-  </data>
-  <data name="&gt;&gt;textBox1.Name" xml:space="preserve">
-    <value>textBox1</value>
-  </data>
-  <data name="&gt;&gt;textBox1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;textBox1.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;textBox1.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
-    <value>6, 13</value>
-  </data>
-  <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>204, 129</value>
-  </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="$this.StartPosition" type="System.Windows.Forms.FormStartPosition, System.Windows.Forms">
-    <value>CenterParent</value>
-  </data>
-  <data name="&gt;&gt;$this.Name" xml:space="preserve">
-    <value>Form_TemperatureInput</value>
-  </data>
-  <data name="&gt;&gt;$this.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Form, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="thickness.HeaderText" xml:space="preserve">
+    <value>Thickness</value>
   </data>
 </root>

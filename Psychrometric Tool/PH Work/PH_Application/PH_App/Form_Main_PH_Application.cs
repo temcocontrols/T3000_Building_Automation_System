@@ -290,14 +290,17 @@ namespace PH_App
         private void backgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
             //--Background worker
+            //MessageBox.Show("Do worker");
             mc.RefreshDataFromDeviceAndWeb(this);
         }
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
             //--BG Complete
+            if(mc.flagForCompletingDataPullForBG == 1)
+            { 
             mc.BackgroundWorkerRunWorkerCompleted(sender, e, this, phChart);
-
+            }
         }
 
         //--This one is for refreshing the data
@@ -313,5 +316,24 @@ namespace PH_App
             dataGridView1_CellClick(this, eventArgs);            
         }
 
+        private void trashBoxToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //--Lets open the trash box
+            try
+            {
+                TrashBox tb = new TrashBox(this);
+                tb.ShowDialog();
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        public void RefreshChartListForTrashBoxRestore(Form_Main_PH_Application Fmain)
+        {
+            mc.RefreshingEverythingChartAndContent(Fmain, Fmain, phChart);
+        }
     }
 }

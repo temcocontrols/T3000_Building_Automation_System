@@ -117,6 +117,174 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="$this.Text" xml:space="preserve">
+    <value>PH Chart</value>
+  </data>
+  <data name="clearChartToolStripMenuItem.Text" xml:space="preserve">
+    <value>Clear Chart</value>
+  </data>
+  <data name="deleteNodeToolStripMenuItem.Text" xml:space="preserve">
+    <value>Delete Node</value>
+  </data>
+  <data name="deleteToolStripMenuItem.Text" xml:space="preserve">
+    <value>Delete Chart</value>
+  </data>
+  <data name="disconnectLineFromAToolStripMenuItem.Text" xml:space="preserve">
+    <value>Disconnect Line From </value>
+  </data>
+  <data name="editNodeToolStripMenuItem.Text" xml:space="preserve">
+    <value>Edit Node</value>
+  </data>
+  <data name="excelExportToolStripMenuItem.Text" xml:space="preserve">
+    <value>Excel Export</value>
+  </data>
+  <data name="exitToolStripMenuItem.Text" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+  <data name="fileToolStripMenuItem.Text" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="gridViewToolStripMenuItem.Text" xml:space="preserve">
+    <value>Grid View</value>
+  </data>
+  <data name="helpPsychometricChartToolStripMenuItem.Text" xml:space="preserve">
+    <value>PH chart</value>
+  </data>
+  <data name="helpToolStripMenuItem.Text" xml:space="preserve">
+    <value>Help</value>
+  </data>
+  <data name="id.HeaderText" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="label21.Text" xml:space="preserve">
+    <value>P</value>
+  </data>
+  <data name="label23.Text" xml:space="preserve">
+    <value>H</value>
+  </data>
+  <data name="label24.Text" xml:space="preserve">
+    <value>T</value>
+  </data>
+  <data name="label25.Text" xml:space="preserve">
+    <value>S</value>
+  </data>
+  <data name="lb_buildingselectedShow.Text" xml:space="preserve">
+    <value>Current Building: </value>
+  </data>
+  <data name="lb_db_name.Text" xml:space="preserve">
+    <value>dbName</value>
+  </data>
+  <data name="lb_device_status.Text" xml:space="preserve">
+    <value>disconnected</value>
+  </data>
+  <data name="lb_devicestatusshow.Text" xml:space="preserve">
+    <value>Device Status:</value>
+  </data>
+  <data name="lb_modeshow.Text" xml:space="preserve">
+    <value>Mode : </value>
+  </data>
+  <data name="lb_number_of_chart_label.Text" xml:space="preserve">
+    <value>Number of chart  : </value>
+  </data>
+  <data name="lb_numberOfHandler.Text" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="lb_realtimeshow.Text" xml:space="preserve">
+    <value>Real Time</value>
+  </data>
+  <data name="lb_unit_chosen_display.Text" xml:space="preserve">
+    <value>Unit : SI</value>
+  </data>
+  <data name="lbEnthalpy.Text" xml:space="preserve">
+    <value>null</value>
+  </data>
+  <data name="lbEntropy.Text" xml:space="preserve">
+    <value>null</value>
+  </data>
+  <data name="lbPressure.Text" xml:space="preserve">
+    <value>null</value>
+  </data>
+  <data name="lbPrintTest.Text" xml:space="preserve">
+    <value>label1</value>
+  </data>
+  <data name="lbTemperature.Text" xml:space="preserve">
+    <value>null</value>
+  </data>
+  <data name="loadConfigurationToolStripMenuItem.Text" xml:space="preserve">
+    <value>Load Configuration</value>
+  </data>
+  <data name="loadTemplateToolStripMenuItem.Text" xml:space="preserve">
+    <value>Load chart template</value>
+  </data>
+  <data name="menuStrip1.Text" xml:space="preserve">
+    <value>menuStrip1</value>
+  </data>
+  <data name="name.HeaderText" xml:space="preserve">
+    <value>System Name</value>
+  </data>
+  <data name="nodeAToolStripMenuItem.Text" xml:space="preserve">
+    <value>Node A</value>
+  </data>
+  <data name="nodeBToolStripMenuItem.Text" xml:space="preserve">
+    <value>Node B</value>
+  </data>
+  <data name="optionToolStripMenuItem.Text" xml:space="preserve">
+    <value>Option</value>
+  </data>
+  <data name="phChart.Text" xml:space="preserve">
+    <value>chart1</value>
+  </data>
+  <data name="printToolStripMenuItem.Text" xml:space="preserve">
+    <value>Print</value>
+  </data>
+  <data name="quickNodeInsertToolStripMenuItem.Text" xml:space="preserve">
+    <value>Insert Node</value>
+  </data>
+  <data name="saveAsTemplateToolStripMenuItem.Text" xml:space="preserve">
+    <value>Save as chart template</value>
+  </data>
+  <data name="saveAsToolStripMenuItem.Text" xml:space="preserve">
+    <value>Save As</value>
+  </data>
+  <data name="saveConfigurationToolStripMenuItem.Text" xml:space="preserve">
+    <value>Save Configuration</value>
+  </data>
+  <data name="simulationMode.Text" xml:space="preserve">
+    <value>PH Calculator</value>
+  </data>
+  <data name="trashBoxToolStripMenuItem.Text" xml:space="preserve">
+    <value>Trash Box</value>
+  </data>
+  <metadata name="id.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="name.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="menuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
+  <metadata name="CMSinsertNode.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>129, 21</value>
+  </metadata>
+  <metadata name="backgroundWorker1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>278, 24</value>
+  </metadata>
+  <metadata name="saveFD.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>466, 22</value>
+  </metadata>
+  <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>556, 22</value>
+  </metadata>
+  <metadata name="contextMenuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>653, 22</value>
+  </metadata>
+  <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>61</value>
+  </metadata>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="phChart.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Bottom, Left, Right</value>
@@ -131,9 +299,6 @@
   <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="phChart.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
-  </data>
-  <data name="phChart.Text" xml:space="preserve">
-    <value>chart1</value>
   </data>
   <data name="&gt;&gt;phChart.Name" xml:space="preserve">
     <value>phChart</value>
@@ -168,9 +333,6 @@
   <data name="lb_db_name.TabIndex" type="System.Int32, mscorlib">
     <value>53</value>
   </data>
-  <data name="lb_db_name.Text" xml:space="preserve">
-    <value>dbName</value>
-  </data>
   <data name="&gt;&gt;lb_db_name.Name" xml:space="preserve">
     <value>lb_db_name</value>
   </data>
@@ -201,9 +363,6 @@
   <data name="lb_buildingselectedShow.TabIndex" type="System.Int32, mscorlib">
     <value>52</value>
   </data>
-  <data name="lb_buildingselectedShow.Text" xml:space="preserve">
-    <value>Current Building: </value>
-  </data>
   <data name="&gt;&gt;lb_buildingselectedShow.Name" xml:space="preserve">
     <value>lb_buildingselectedShow</value>
   </data>
@@ -216,20 +375,8 @@
   <data name="&gt;&gt;lb_buildingselectedShow.ZOrder" xml:space="preserve">
     <value>7</value>
   </data>
-  <metadata name="id.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <data name="id.HeaderText" xml:space="preserve">
-    <value>ID</value>
-  </data>
   <data name="id.Width" type="System.Int32, mscorlib">
     <value>20</value>
-  </data>
-  <metadata name="name.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <data name="name.HeaderText" xml:space="preserve">
-    <value>System Name</value>
   </data>
   <data name="name.Width" type="System.Int32, mscorlib">
     <value>130</value>
@@ -384,9 +531,6 @@
   <data name="lbEntropy.TabIndex" type="System.Int32, mscorlib">
     <value>7</value>
   </data>
-  <data name="lbEntropy.Text" xml:space="preserve">
-    <value>null</value>
-  </data>
   <data name="lbEntropy.Visible" type="System.Boolean, mscorlib">
     <value>False</value>
   </data>
@@ -422,9 +566,6 @@
   </data>
   <data name="label25.TabIndex" type="System.Int32, mscorlib">
     <value>6</value>
-  </data>
-  <data name="label25.Text" xml:space="preserve">
-    <value>S</value>
   </data>
   <data name="label25.Visible" type="System.Boolean, mscorlib">
     <value>False</value>
@@ -462,9 +603,6 @@
   <data name="lbTemperature.TabIndex" type="System.Int32, mscorlib">
     <value>5</value>
   </data>
-  <data name="lbTemperature.Text" xml:space="preserve">
-    <value>null</value>
-  </data>
   <data name="lbTemperature.Visible" type="System.Boolean, mscorlib">
     <value>False</value>
   </data>
@@ -500,9 +638,6 @@
   </data>
   <data name="label24.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
-  </data>
-  <data name="label24.Text" xml:space="preserve">
-    <value>T</value>
   </data>
   <data name="label24.Visible" type="System.Boolean, mscorlib">
     <value>False</value>
@@ -540,9 +675,6 @@
   <data name="lbEnthalpy.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
   </data>
-  <data name="lbEnthalpy.Text" xml:space="preserve">
-    <value>null</value>
-  </data>
   <data name="&gt;&gt;lbEnthalpy.Name" xml:space="preserve">
     <value>lbEnthalpy</value>
   </data>
@@ -575,9 +707,6 @@
   </data>
   <data name="label23.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>
-  </data>
-  <data name="label23.Text" xml:space="preserve">
-    <value>H</value>
   </data>
   <data name="&gt;&gt;label23.Name" xml:space="preserve">
     <value>label23</value>
@@ -612,9 +741,6 @@
   <data name="lbPressure.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
   </data>
-  <data name="lbPressure.Text" xml:space="preserve">
-    <value>null</value>
-  </data>
   <data name="&gt;&gt;lbPressure.Name" xml:space="preserve">
     <value>lbPressure</value>
   </data>
@@ -647,9 +773,6 @@
   </data>
   <data name="label21.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
-  </data>
-  <data name="label21.Text" xml:space="preserve">
-    <value>P</value>
   </data>
   <data name="&gt;&gt;label21.Name" xml:space="preserve">
     <value>label21</value>
@@ -705,9 +828,6 @@
   <data name="lbPrintTest.TabIndex" type="System.Int32, mscorlib">
     <value>59</value>
   </data>
-  <data name="lbPrintTest.Text" xml:space="preserve">
-    <value>label1</value>
-  </data>
   <data name="lbPrintTest.Visible" type="System.Boolean, mscorlib">
     <value>False</value>
   </data>
@@ -738,9 +858,6 @@
   <data name="lb_realtimeshow.TabIndex" type="System.Int32, mscorlib">
     <value>61</value>
   </data>
-  <data name="lb_realtimeshow.Text" xml:space="preserve">
-    <value>Real Time</value>
-  </data>
   <data name="&gt;&gt;lb_realtimeshow.Name" xml:space="preserve">
     <value>lb_realtimeshow</value>
   </data>
@@ -767,9 +884,6 @@
   </data>
   <data name="lb_modeshow.TabIndex" type="System.Int32, mscorlib">
     <value>60</value>
-  </data>
-  <data name="lb_modeshow.Text" xml:space="preserve">
-    <value>Mode : </value>
   </data>
   <data name="&gt;&gt;lb_modeshow.Name" xml:space="preserve">
     <value>lb_modeshow</value>
@@ -849,9 +963,6 @@
   <data name="lb_numberOfHandler.TabIndex" type="System.Int32, mscorlib">
     <value>51</value>
   </data>
-  <data name="lb_numberOfHandler.Text" xml:space="preserve">
-    <value>0</value>
-  </data>
   <data name="&gt;&gt;lb_numberOfHandler.Name" xml:space="preserve">
     <value>lb_numberOfHandler</value>
   </data>
@@ -882,9 +993,6 @@
   <data name="lb_number_of_chart_label.TabIndex" type="System.Int32, mscorlib">
     <value>50</value>
   </data>
-  <data name="lb_number_of_chart_label.Text" xml:space="preserve">
-    <value>Number of chart  : </value>
-  </data>
   <data name="&gt;&gt;lb_number_of_chart_label.Name" xml:space="preserve">
     <value>lb_number_of_chart_label</value>
   </data>
@@ -912,9 +1020,6 @@
   <data name="lb_device_status.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
   </data>
-  <data name="lb_device_status.Text" xml:space="preserve">
-    <value>disconnected</value>
-  </data>
   <data name="&gt;&gt;lb_device_status.Name" xml:space="preserve">
     <value>lb_device_status</value>
   </data>
@@ -941,9 +1046,6 @@
   </data>
   <data name="lb_devicestatusshow.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
-  </data>
-  <data name="lb_devicestatusshow.Text" xml:space="preserve">
-    <value>Device Status:</value>
   </data>
   <data name="&gt;&gt;lb_devicestatusshow.Name" xml:space="preserve">
     <value>lb_devicestatusshow</value>
@@ -978,86 +1080,44 @@
   <data name="&gt;&gt;gb_showstatus.ZOrder" xml:space="preserve">
     <value>5</value>
   </data>
-  <metadata name="menuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
   <data name="printToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>177, 22</value>
-  </data>
-  <data name="printToolStripMenuItem.Text" xml:space="preserve">
-    <value>Print</value>
   </data>
   <data name="saveAsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>177, 22</value>
   </data>
-  <data name="saveAsToolStripMenuItem.Text" xml:space="preserve">
-    <value>Save As</value>
-  </data>
   <data name="saveConfigurationToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>177, 22</value>
-  </data>
-  <data name="saveConfigurationToolStripMenuItem.Text" xml:space="preserve">
-    <value>Save Configuration</value>
   </data>
   <data name="loadConfigurationToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>177, 22</value>
   </data>
-  <data name="loadConfigurationToolStripMenuItem.Text" xml:space="preserve">
-    <value>Load Configuration</value>
-  </data>
   <data name="exitToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>177, 22</value>
-  </data>
-  <data name="exitToolStripMenuItem.Text" xml:space="preserve">
-    <value>Exit</value>
   </data>
   <data name="fileToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>37, 20</value>
   </data>
-  <data name="fileToolStripMenuItem.Text" xml:space="preserve">
-    <value>File</value>
-  </data>
   <data name="simulationMode.Size" type="System.Drawing.Size, System.Drawing">
-    <value>147, 22</value>
-  </data>
-  <data name="simulationMode.Text" xml:space="preserve">
-    <value>PH Calculator</value>
+    <value>152, 22</value>
   </data>
   <data name="trashBoxToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>147, 22</value>
-  </data>
-  <data name="trashBoxToolStripMenuItem.Text" xml:space="preserve">
-    <value>Trash Box</value>
+    <value>152, 22</value>
   </data>
   <data name="gridViewToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>147, 22</value>
-  </data>
-  <data name="gridViewToolStripMenuItem.Text" xml:space="preserve">
-    <value>Grid View</value>
+    <value>152, 22</value>
   </data>
   <data name="excelExportToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>147, 22</value>
-  </data>
-  <data name="excelExportToolStripMenuItem.Text" xml:space="preserve">
-    <value>Excel Export</value>
+    <value>152, 22</value>
   </data>
   <data name="optionToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>56, 20</value>
   </data>
-  <data name="optionToolStripMenuItem.Text" xml:space="preserve">
-    <value>Option</value>
-  </data>
   <data name="helpPsychometricChartToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>120, 22</value>
   </data>
-  <data name="helpPsychometricChartToolStripMenuItem.Text" xml:space="preserve">
-    <value>PH chart</value>
-  </data>
   <data name="helpToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>44, 20</value>
-  </data>
-  <data name="helpToolStripMenuItem.Text" xml:space="preserve">
-    <value>Help</value>
   </data>
   <data name="menuStrip1.Location" type="System.Drawing.Point, System.Drawing">
     <value>0, 0</value>
@@ -1067,9 +1127,6 @@
   </data>
   <data name="menuStrip1.TabIndex" type="System.Int32, mscorlib">
     <value>55</value>
-  </data>
-  <data name="menuStrip1.Text" xml:space="preserve">
-    <value>menuStrip1</value>
   </data>
   <data name="&gt;&gt;menuStrip1.Name" xml:space="preserve">
     <value>menuStrip1</value>
@@ -1083,26 +1140,14 @@
   <data name="&gt;&gt;menuStrip1.ZOrder" xml:space="preserve">
     <value>4</value>
   </data>
-  <metadata name="CMSinsertNode.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>129, 21</value>
-  </metadata>
   <data name="quickNodeInsertToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>192, 22</value>
-  </data>
-  <data name="quickNodeInsertToolStripMenuItem.Text" xml:space="preserve">
-    <value>Insert Node</value>
   </data>
   <data name="clearChartToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>192, 22</value>
   </data>
-  <data name="clearChartToolStripMenuItem.Text" xml:space="preserve">
-    <value>Clear Chart</value>
-  </data>
   <data name="editNodeToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>192, 22</value>
-  </data>
-  <data name="editNodeToolStripMenuItem.Text" xml:space="preserve">
-    <value>Edit Node</value>
   </data>
   <data name="deleteNodeToolStripMenuItem.Enabled" type="System.Boolean, mscorlib">
     <value>False</value>
@@ -1110,29 +1155,17 @@
   <data name="deleteNodeToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>192, 22</value>
   </data>
-  <data name="deleteNodeToolStripMenuItem.Text" xml:space="preserve">
-    <value>Delete Node</value>
-  </data>
   <data name="nodeAToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>114, 22</value>
   </data>
-  <data name="nodeAToolStripMenuItem.Text" xml:space="preserve">
-    <value>Node A</value>
-  </data>
   <data name="nodeBToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>114, 22</value>
-  </data>
-  <data name="nodeBToolStripMenuItem.Text" xml:space="preserve">
-    <value>Node B</value>
   </data>
   <data name="disconnectLineFromAToolStripMenuItem.Enabled" type="System.Boolean, mscorlib">
     <value>False</value>
   </data>
   <data name="disconnectLineFromAToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>192, 22</value>
-  </data>
-  <data name="disconnectLineFromAToolStripMenuItem.Text" xml:space="preserve">
-    <value>Disconnect Line From </value>
   </data>
   <data name="CMSinsertNode.Size" type="System.Drawing.Size, System.Drawing">
     <value>193, 114</value>
@@ -1160,9 +1193,6 @@
   </data>
   <data name="lb_unit_chosen_display.TabIndex" type="System.Int32, mscorlib">
     <value>56</value>
-  </data>
-  <data name="lb_unit_chosen_display.Text" xml:space="preserve">
-    <value>Unit : SI</value>
   </data>
   <data name="&gt;&gt;lb_unit_chosen_display.Name" xml:space="preserve">
     <value>lb_unit_chosen_display</value>
@@ -1203,35 +1233,14 @@
   <data name="&gt;&gt;pb_lock_unlock.ZOrder" xml:space="preserve">
     <value>2</value>
   </data>
-  <metadata name="backgroundWorker1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>278, 24</value>
-  </metadata>
-  <metadata name="saveFD.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>466, 22</value>
-  </metadata>
-  <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>556, 22</value>
-  </metadata>
-  <metadata name="contextMenuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>653, 22</value>
-  </metadata>
   <data name="deleteToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>192, 22</value>
-  </data>
-  <data name="deleteToolStripMenuItem.Text" xml:space="preserve">
-    <value>Delete Chart</value>
   </data>
   <data name="saveAsTemplateToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>192, 22</value>
   </data>
-  <data name="saveAsTemplateToolStripMenuItem.Text" xml:space="preserve">
-    <value>Save as chart template</value>
-  </data>
   <data name="loadTemplateToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>192, 22</value>
-  </data>
-  <data name="loadTemplateToolStripMenuItem.Text" xml:space="preserve">
-    <value>Load chart template</value>
   </data>
   <data name="contextMenuStrip1.Size" type="System.Drawing.Size, System.Drawing">
     <value>193, 70</value>
@@ -1242,12 +1251,6 @@
   <data name="&gt;&gt;contextMenuStrip1.Type" xml:space="preserve">
     <value>System.Windows.Forms.ContextMenuStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>61</value>
-  </metadata>
   <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
     <value>6, 13</value>
   </data>
@@ -1256,9 +1259,6 @@
   </data>
   <data name="$this.MinimumSize" type="System.Drawing.Size, System.Drawing">
     <value>1000, 680</value>
-  </data>
-  <data name="$this.Text" xml:space="preserve">
-    <value>PH Chart</value>
   </data>
   <data name="&gt;&gt;id.Name" xml:space="preserve">
     <value>id</value>

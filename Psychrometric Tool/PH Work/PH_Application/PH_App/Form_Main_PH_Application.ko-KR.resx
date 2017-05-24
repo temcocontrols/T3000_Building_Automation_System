@@ -129,9 +129,6 @@
   <data name="disconnectLineFromAToolStripMenuItem.Text" xml:space="preserve">
     <value>에서 분리 라인</value>
   </data>
-  <data name="disconnectLineToolStripMenuItem.Text" xml:space="preserve">
-    <value>분리 라인</value>
-  </data>
   <data name="editNodeToolStripMenuItem.Text" xml:space="preserve">
     <value>편집 노드</value>
   </data>
@@ -140,9 +137,6 @@
   </data>
   <data name="exitToolStripMenuItem.Text" xml:space="preserve">
     <value>끝내기</value>
-  </data>
-  <data name="exportDataToolStripMenuItem.Text" xml:space="preserve">
-    <value>데이터 내보내기</value>
   </data>
   <data name="fileToolStripMenuItem.Text" xml:space="preserve">
     <value>파일</value>
@@ -156,14 +150,8 @@
   <data name="helpToolStripMenuItem.Text" xml:space="preserve">
     <value>도움말</value>
   </data>
-  <data name="historyPlotToolStripMenuItem1.Text" xml:space="preserve">
-    <value>역사 플롯</value>
-  </data>
   <data name="id.HeaderText" xml:space="preserve">
     <value>신분증</value>
-  </data>
-  <data name="insertNodeToolStripMenuItem.Text" xml:space="preserve">
-    <value>노드 삽입</value>
   </data>
   <data name="label21.Text" xml:space="preserve">
     <value>피</value>
@@ -180,20 +168,11 @@
   <data name="lb_db_name.Text" xml:space="preserve">
     <value>DBNAME</value>
   </data>
-  <data name="lb_dbt.Text" xml:space="preserve">
-    <value>없는</value>
-  </data>
   <data name="lb_device_status.Text" xml:space="preserve">
     <value>분리</value>
   </data>
   <data name="lb_devicestatusshow.Text" xml:space="preserve">
     <value>장치 상태 :</value>
-  </data>
-  <data name="lb_DP.Text" xml:space="preserve">
-    <value>없는</value>
-  </data>
-  <data name="lb_humidity_ratio.Text" xml:space="preserve">
-    <value>없는</value>
   </data>
   <data name="lb_modeshow.Text" xml:space="preserve">
     <value>모드 :</value>
@@ -204,7 +183,16 @@
   <data name="lb_realtimeshow.Text" xml:space="preserve">
     <value>실시간</value>
   </data>
-  <data name="lb_RH.Text" xml:space="preserve">
+  <data name="lbEnthalpy.Text" xml:space="preserve">
+    <value>없는</value>
+  </data>
+  <data name="lbEntropy.Text" xml:space="preserve">
+    <value>없는</value>
+  </data>
+  <data name="lbPressure.Text" xml:space="preserve">
+    <value>없는</value>
+  </data>
+  <data name="lbTemperature.Text" xml:space="preserve">
     <value>없는</value>
   </data>
   <data name="loadConfigurationToolStripMenuItem.Text" xml:space="preserve">

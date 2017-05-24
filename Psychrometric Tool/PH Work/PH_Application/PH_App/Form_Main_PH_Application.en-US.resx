@@ -126,11 +126,11 @@
   <data name="deleteNodeToolStripMenuItem.Text" xml:space="preserve">
     <value>Delete Node</value>
   </data>
+  <data name="deleteToolStripMenuItem.Text" xml:space="preserve">
+    <value>Delete Chart</value>
+  </data>
   <data name="disconnectLineFromAToolStripMenuItem.Text" xml:space="preserve">
     <value>Disconnect Line From </value>
-  </data>
-  <data name="disconnectLineToolStripMenuItem.Text" xml:space="preserve">
-    <value>Disconnect Line</value>
   </data>
   <data name="editNodeToolStripMenuItem.Text" xml:space="preserve">
     <value>Edit Node</value>
@@ -140,9 +140,6 @@
   </data>
   <data name="exitToolStripMenuItem.Text" xml:space="preserve">
     <value>Exit</value>
-  </data>
-  <data name="exportDataToolStripMenuItem.Text" xml:space="preserve">
-    <value>Export Data</value>
   </data>
   <data name="fileToolStripMenuItem.Text" xml:space="preserve">
     <value>File</value>
@@ -156,14 +153,8 @@
   <data name="helpToolStripMenuItem.Text" xml:space="preserve">
     <value>Help</value>
   </data>
-  <data name="historyPlotToolStripMenuItem1.Text" xml:space="preserve">
-    <value>History Plot</value>
-  </data>
   <data name="id.HeaderText" xml:space="preserve">
     <value>ID</value>
-  </data>
-  <data name="insertNodeToolStripMenuItem.Text" xml:space="preserve">
-    <value>Insert Node</value>
   </data>
   <data name="label21.Text" xml:space="preserve">
     <value>P</value>
@@ -183,20 +174,11 @@
   <data name="lb_db_name.Text" xml:space="preserve">
     <value>dbName</value>
   </data>
-  <data name="lb_dbt.Text" xml:space="preserve">
-    <value>null</value>
-  </data>
   <data name="lb_device_status.Text" xml:space="preserve">
     <value>disconnected</value>
   </data>
   <data name="lb_devicestatusshow.Text" xml:space="preserve">
     <value>Device Status:</value>
-  </data>
-  <data name="lb_DP.Text" xml:space="preserve">
-    <value>null</value>
-  </data>
-  <data name="lb_humidity_ratio.Text" xml:space="preserve">
-    <value>null</value>
   </data>
   <data name="lb_modeshow.Text" xml:space="preserve">
     <value>Mode : </value>
@@ -210,11 +192,29 @@
   <data name="lb_realtimeshow.Text" xml:space="preserve">
     <value>Real Time</value>
   </data>
-  <data name="lb_RH.Text" xml:space="preserve">
+  <data name="lb_unit_chosen_display.Text" xml:space="preserve">
+    <value>Unit : SI</value>
+  </data>
+  <data name="lbEnthalpy.Text" xml:space="preserve">
+    <value>null</value>
+  </data>
+  <data name="lbEntropy.Text" xml:space="preserve">
+    <value>null</value>
+  </data>
+  <data name="lbPressure.Text" xml:space="preserve">
+    <value>null</value>
+  </data>
+  <data name="lbPrintTest.Text" xml:space="preserve">
+    <value>label1</value>
+  </data>
+  <data name="lbTemperature.Text" xml:space="preserve">
     <value>null</value>
   </data>
   <data name="loadConfigurationToolStripMenuItem.Text" xml:space="preserve">
     <value>Load Configuration</value>
+  </data>
+  <data name="loadTemplateToolStripMenuItem.Text" xml:space="preserve">
+    <value>Load chart template</value>
   </data>
   <data name="menuStrip1.Text" xml:space="preserve">
     <value>menuStrip1</value>
@@ -239,6 +239,9 @@
   </data>
   <data name="quickNodeInsertToolStripMenuItem.Text" xml:space="preserve">
     <value>Insert Node</value>
+  </data>
+  <data name="saveAsTemplateToolStripMenuItem.Text" xml:space="preserve">
+    <value>Save as chart template</value>
   </data>
   <data name="saveAsToolStripMenuItem.Text" xml:space="preserve">
     <value>Save As</value>

@@ -12,6 +12,8 @@ using System.Threading;
 using System.Text;
 using System.Xml;
 using System.Collections.Generic;
+using System.Data.SQLite;
+using System.Configuration;
 
 namespace MultiLang
 {
@@ -47,7 +49,7 @@ namespace MultiLang
         private CultureInfo SelectedCulture;
 
         // The array of supported cultures is updated automatically by Multi-Language for Visual Studio
-        private static string[] SupportedCultures = { "en-US", "ko-KR", "zh-Hans-HK" } ; //MLHIDE
+        private static string[] SupportedCultures = { "en-US", "ko-KR", "zh-Hans-HK" }; //MLHIDE
 
         //----------------------------------------------
         //Public Methods
@@ -260,16 +262,53 @@ namespace MultiLang
                     rbSelected.Checked = true;
                     break;
             }
-
+            //event should be button pressed
+            btOK_Click(this, e);
         }
-
+        string lstCultureSelected;//= "en-US";
         private void btOK_Click(object sender, System.EventArgs e)
         {
             if (lstCultures.SelectedItem != null)
             {
+                //--bbk This is changed based on the data available in the database..
+                //Steps: 
+                /*
+                1.Connect to the databse.
+                2. Get the id 
+                3. if id=1 english,id=2 chinese and id = 3 then korean
+                */
+                //--Connect to database
+                //"en-US", "zh-CHS", "ko-KR"
+
+                int returnValueDB = DatabaseOperation();
+               // MessageBox.Show("VALUE = " + returnValueDB);
+                if (returnValueDB == 1)
+                {
+                    lstCultureSelected = "en-US";
+                    // lstCultureSelected = "ko-KR";
+                    lstCultures.SelectedIndex = 0;
+
+
+                }
+                else if (returnValueDB == 2)
+                {
+                    lstCultureSelected = "zh-Hans-HK";
+                    //lstCultures.SelectedIndex.Equals(2);
+                    lstCultures.SelectedIndex = 1;
+                }
+                else
+                {
+                    // lstCultureSelected = "en-US";
+                    lstCultureSelected = "ko-KR";
+                    // lstCultures.SelectedIndex.Equals(1);
+                    lstCultures.SelectedIndex = 2;
+                }
+
+
                 SelectedCulture = (CultureInfo)lstCultures.SelectedItem;
+                this.Close();
             }
-            this.Close();
+            //this.Close();
         }
 
         private void OnStartup_CheckedChanged(object sender, System.EventArgs e)
@@ -281,6 +320,59 @@ namespace MultiLang
             else if (rbDefault.Checked)
                 StartupMode = enumStartupMode.UseDefaultCulture;
         }
+
+
+        public int DatabaseOperation()
+        {
+
+            int id_return = 1;
+            try
+            {
+                //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+                string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
+
+                if (File.Exists(databaseFile) == false)
+                {
+                    //database file doesnot exist exit the application
+                    MessageBox.Show("Internal database file not found ");
+                    this.Close();
+                    Application.Exit();
+
+                }
+
+
+                string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+                SQLiteConnection connection = new SQLiteConnection(connString);
+                connection.Open();
+                SQLiteDataReader reader = null;
+                SQLiteCommand comm = new SQLiteCommand("SELECT * from tbl_language_option where language_id = 1", connection);
+                //command.Parameters.AddWithValue("@1", userName)
+                reader = comm.ExecuteReader();
+                while (reader.Read())
+                {
+
+                    //string selecte_location = reader["id"].ToString()+","+reader["country"].ToString() + "," + reader["state"].ToString() + "," + reader["city"].ToString();
+                    //stored_location.Add(selecte_location);
+                    id_return = int.Parse(reader["ID"].ToString());
+
+                }
+                //  MessageBox.Show("id ret = " + id_return);
+                comm.Dispose();
+                reader.Dispose();
+                connection.Close();
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+            return id_return;
+        }
+
+
 
     }
 }

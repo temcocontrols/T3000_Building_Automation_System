@@ -215,6 +215,12 @@
     <Compile Include="SelectLanguage.designer.cs">
       <DependentUpon>SelectLanguage.cs</DependentUpon>
     </Compile>
+    <Compile Include="TrashBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TrashBox.Designer.cs">
+      <DependentUpon>TrashBox.cs</DependentUpon>
+    </Compile>
     <Compile Include="WebOperation.cs" />
     <EmbeddedResource Include="Form1_jack_xu.en-US.resx">
       <DependentUpon>Form1_jack_xu.cs</DependentUpon>
@@ -225,6 +231,9 @@
     <EmbeddedResource Include="Form1_jack_xu.resx">
       <DependentUpon>Form1_jack_xu.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormEditNodeAndLine.en-US.resx">
+      <DependentUpon>FormEditNodeAndLine.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormEditNodeAndLine.resx">
       <DependentUpon>FormEditNodeAndLine.cs</DependentUpon>
@@ -241,10 +250,28 @@
     <EmbeddedResource Include="Form_Main_PH_Application.zh-Hans-HK.resx">
       <DependentUpon>Form_Main_PH_Application.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Form_PressureInput.en-US.resx">
+      <DependentUpon>Form_PressureInput.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_PressureInput.ko-KR.resx">
+      <DependentUpon>Form_PressureInput.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form_PressureInput.resx">
       <DependentUpon>Form_PressureInput.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Form_PressureInput.zh-Hans-HK.resx">
+      <DependentUpon>Form_PressureInput.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_TemperatureInput.en-US.resx">
+      <DependentUpon>Form_TemperatureInput.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_TemperatureInput.ko-KR.resx">
+      <DependentUpon>Form_TemperatureInput.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form_TemperatureInput.resx">
+      <DependentUpon>Form_TemperatureInput.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_TemperatureInput.zh-Hans-HK.resx">
       <DependentUpon>Form_TemperatureInput.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -257,6 +284,30 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="SelectLanguage.en-US.resx">
+      <DependentUpon>SelectLanguage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SelectLanguage.ko-KR.resx">
+      <DependentUpon>SelectLanguage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SelectLanguage.resx">
+      <DependentUpon>SelectLanguage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SelectLanguage.zh-Hans-HK.resx">
+      <DependentUpon>SelectLanguage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TrashBox.en-US.resx">
+      <DependentUpon>TrashBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TrashBox.ko-KR.resx">
+      <DependentUpon>TrashBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TrashBox.resx">
+      <DependentUpon>TrashBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TrashBox.zh-Hans-HK.resx">
+      <DependentUpon>TrashBox.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>

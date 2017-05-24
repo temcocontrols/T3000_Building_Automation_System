@@ -1564,7 +1564,6 @@ namespace PH_App
         public void LoadNodeAndLineFromDB(int indexValue)
         {
             //Based on this row index we need to update the values and redraw lines..
-
             try
             {
                 // listForDataFromDB.Clear();//Lets clear the node...
@@ -1585,9 +1584,9 @@ namespace PH_App
                 // int id = int.Parse(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString());
                 //int id = e.RowIndex;//This index is used to identify which cell or chart is clicked.
                 int id = indexValue;//This index is used to identify which cell or chart is clicked.
-                                    /*
-                                    Now lets find the chart line id and chart node id 
-                                    */
+                /*
+                 Now lets find the chart line id and chart node id 
+                */
                 string chartNodeGroupID = chartDetailList[id].chart_respective_nodeID;//This is for the node
                 string chartLineGroupID = chartDetailList[id].chart_respective_lineID;//This is for the line
 
@@ -1672,7 +1671,7 @@ namespace PH_App
 
                     //--Now we can find the previous id values as follows:
                     //=====================================Finding previous id value=================================//
-                    //  var chartOptrn = new ChartCreationAndOperations();
+                    //var chartOptrn = new ChartCreationAndOperations();
                     var main = new MainController();
 
                      previousNodeIndexForLineInput = main.IndexOfPreviousNodeForLineFunction();
@@ -1682,7 +1681,7 @@ namespace PH_App
                     SQLiteDataReader reader2x = null;
                     string queryString2x = "SELECT *  from  " + lineTableName + " WHERE chart_respective_lineID = @lineID";
                     //--Testing..
-                    //   MessageBox.Show("CurrentLineTableFromDB = " + currentLineTableFromDB);
+                    //MessageBox.Show("CurrentLineTableFromDB = " + currentLineTableFromDB);
 
                     SQLiteCommand command2x = new SQLiteCommand(queryString2x, connection);
                     command2x.Parameters.AddWithValue("@lineID", chartLineGroupID);//This is the group id that is used to identify each node
@@ -4667,6 +4666,247 @@ namespace PH_App
 
         //====================End of background worker task====================//
 
+
+        //===================For TrashBox db opartion========================//
+
+        //This list holds the detail of the chart to be deleted
+        public List<DataTypeForNode> deleteNodeDetailList = new List<DataTypeForNode>();
+
+        //Read node Values
+        /// <summary>
+        ///    help in reading all the node info for a particular chart
+        /// </summary>
+        /// <param name="chartID">char id</param>
+        public void ReadNodeInfoToDelete(string chartNodeID,string buildingName)
+        {
+            deleteNodeDetailList.Clear();
+            string tableName = "tbl_" + buildingName + "_node_value";// "tbl_" ++"_node_value";
+                                                                                             //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                                                                                             //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
+
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                SQLiteDataReader reader = null;
+                string queryString = "SELECT *  from  " + tableName + "  where chart_respective_nodeID = @id_value";
+
+
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                command.Parameters.AddWithValue("@id_value", chartNodeID);
+                //SqlDataAdapter dataAdapter = new SqlDataAdapter(queryString, connection.ConnectionString); //connection.ConnectionString is the connection string
+
+                reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    deleteNodeDetailList.Add(new DataTypeForNode
+                    {
+                     
+                        ID = reader["nodeID"].ToString(), //This is just changed code : bbk305
+                        xVal = double.Parse(reader["xValue"].ToString()),
+                        yVal = double.Parse(reader["yValue"].ToString()),
+                        temperature_source = reader["temperature_source"].ToString(),
+                        pressure_source = reader["pressure_source"].ToString(),
+                        name = reader["name"].ToString(),
+
+                        // label = reader["label"].ToString(),
+                        colorValue = ColorTranslator.FromHtml(reader["colorValue"].ToString()),
+                        // showItemText = reader["showTextItem"].ToString(),
+                        marker_Size = int.Parse(reader["nodeSize"].ToString()),
+                        //airFlow = int.Parse(reader["airFlow"].ToString()),
+                        lastUpdatedDate = reader["lastUpdatedDate"].ToString()
+
+
+                    });
+                }
+            }//Close of using 
+        }
+        public void DeleteNodeDeviceInfo(string nodeID, string buildingName)
+        {
+            string tableName = "tbl_" + buildingName + "_device_info_for_node";// "tbl_" ++"_node_value";
+                                                                                                       //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                                                                                                       //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
+
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                SQLiteDataReader reader = null;
+                string queryString = "delete   from  " + tableName + "  where nodeID = @id_value";
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                command.Parameters.AddWithValue("@id_value", nodeID);
+                //SqlDataAdapter dataAdapter = new SqlDataAdapter(queryString, connection.ConnectionString); //connection.ConnectionString is the connection string
+                reader = command.ExecuteReader();
+
+            }//Close of using 
+        }
+
+
+
+        //Same for the line 
+        public void DeleteLine(string lineID,string buildingName)
+        {
+            string tableName = "tbl_" + buildingName + "_line_value";// "tbl_" ++"_node_value";
+                                                                                             //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                                                                                             //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
+
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                SQLiteDataReader reader = null;
+                string queryString = "delete   from  " + tableName + "  where chart_respective_lineID = @id_value";
+
+
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                command.Parameters.AddWithValue("@id_value", lineID);
+                //SqlDataAdapter dataAdapter = new SqlDataAdapter(queryString, connection.ConnectionString); //connection.ConnectionString is the connection string
+
+                reader = command.ExecuteReader();
+
+
+            }//Close of using 
+        }
+
+
+
+        public void DeleteNode(string nodeID,string buildingName)
+        {
+            string tableName = "tbl_" + buildingName + "_node_value";// "tbl_" ++"_node_value";
+            //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
+
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                SQLiteDataReader reader = null;
+                string queryString = "delete   from  " + tableName + "  where chart_respective_nodeID = @id_value";
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                command.Parameters.AddWithValue("@id_value", nodeID);
+                //SqlDataAdapter dataAdapter = new SqlDataAdapter(queryString, connection.ConnectionString); //connection.ConnectionString is the connection string
+                reader = command.ExecuteReader();
+
+
+            }//Close of using 
+        }
+
+
+
+
+        public void DeleteChart(string chartID,string buildingName)
+        {
+            /*
+            Steps :1. Frist read line info,nodeinfo,comfortzone info for particular chart id
+                    2.Then delete line value using lineID,
+                    3.Delete node values using nodeID
+                    4.Delete comfortzone value using chartid
+                    5.delete the chart info using chart id value
+            */
+
+            //string chartID =   
+            string tableName = "tbl_" + buildingName + "_chart_detail";// "tbl_" ++"_node_value";
+            //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
+
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                SQLiteDataReader reader = null;
+                string queryString = "delete   from  " + tableName + "  where chartID = @id_value";
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                command.Parameters.AddWithValue("@id_value", chartID);
+                //SqlDataAdapter dataAdapter = new SqlDataAdapter(queryString, connection.ConnectionString); //connection.ConnectionString is the connection string
+                reader = command.ExecuteReader();
+
+            }//Close of using          
+
+        }
+
+        public void updateValueInDatabaseToTrue(string buildingName, string chartID)
+        {
+            //--Now lets make the check state to be true
+            string tableForChartDetail = "tbl_" + buildingName + "_chart_detail";
+            //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
+
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+
+                //--We also need to create table for particular data added..
+
+                string sql = "UPDATE " + tableForChartDetail + " SET  enableChartStatus ='true' where chartID = '" + chartID + "'";
+
+
+                SQLiteCommand command = new SQLiteCommand(connection);
+                command.CommandText = sql;
+              
+                command.ExecuteNonQuery();
+              
+            }
+
+        }
+
+        public List<chartDetailDT> chartDetailListForDissabledValue = new List<chartDetailDT>();//This is used for storing the chart detail ids
+
+        public void PullChartListForTrashBox(string buildingName)
+        {
+
+            chartDetailListForDissabledValue.Clear();//resetting the chart list value..
+            string tableForChartDetail = "tbl_" + buildingName + "_chart_detail";
+            //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
+
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+            //  MessageBox.Show("connection string " + connString);
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+
+                //--We also need to create table for particular data added..
+
+                string sql = "select * from " + tableForChartDetail + " where enableChartStatus ='false' ";
+
+                SQLiteCommand command = new SQLiteCommand(sql, connection);
+
+                SQLiteDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    //This is the reading part of the data...
+                    chartDetailListForDissabledValue.Add(new chartDetailDT
+                    {
+                        count = int.Parse(reader["count"].ToString()),
+                        chartID = reader["chartID"].ToString(),
+                        chartName = reader["chartName"].ToString(),
+                        chart_respective_nodeID = reader["chart_respective_nodeID"].ToString(),
+                        chart_respective_lineID = reader["chart_respective_lineID"].ToString(),
+                        enableChartStatus = reader["enableChartStatus"].ToString() //either true or false
+
+                    });
+                }
+            }
+
+        }  //Close of the function  PullChartList
+
+
+        //====================End of trash box db oparation================//
 
 
 

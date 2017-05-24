@@ -1421,7 +1421,7 @@ namespace PH_App
 
                         xAxis1 = xValue;
                         yAxis1 = yValue;
-                        //--ADJUSTING THE radius value
+                        //--ADJUSTING THE radius value for PH Chart...
                         if(yAxis1 > 1 && yAxis1< 20)
                         {
                             radiusSize = 1;
@@ -1596,6 +1596,7 @@ namespace PH_App
 
 
                                     // incrementIndex++;
+                                    //AA
                                     indexForSeriesNodePoint++;//Incrementing the index values
                                                               //--Every time it redraws the point we need to update to database the node values
                                 }
@@ -1619,7 +1620,7 @@ namespace PH_App
 
                                 chart1.Invalidate();
                                 // incrementIndex = 0;//reset the values again..
-                                 indexForSeriesNodePoint = 0;//Resetting the index value BBK305A
+                               //  indexForSeriesNodePoint = 0;//Resetting the index value BBK305A
 
                             }
                             else if (Control.ModifierKeys == Keys.Shift)
@@ -1678,6 +1679,7 @@ namespace PH_App
                                     }
 
                                     // incrementIndex++;
+                                    //AA
                                     indexForSeriesNodePoint++;
                                 }
                                 //--resetting incrementIndex
@@ -1696,7 +1698,7 @@ namespace PH_App
 
                                 chart1.Invalidate();
                                 // incrementIndex = 0;//reset the values again..
-                                 indexForSeriesNodePoint = 0;
+                                // indexForSeriesNodePoint = 0;
 
                             }
                             else
@@ -1758,7 +1760,8 @@ namespace PH_App
 
 
                                     // incrementIndex++;
-                                    indexForSeriesNodePoint++;
+                                    //AA
+                                   indexForSeriesNodePoint++;
                                 }
                                 //--resetting incrementIndex
                                 // incrementIndex = 0;
@@ -1779,7 +1782,7 @@ namespace PH_App
                                 //incrementIndex = 0;//reset the values again..
                                 //   indexForSeriesNodePoint = 0;
 
-                                indexForSeriesNodePoint = 0;
+                               // indexForSeriesNodePoint = 0;
 
                             }//closing of key else part
                         }
@@ -1936,19 +1939,7 @@ namespace PH_App
             //Now we do others task
 
             //This one is last one when released go back to 0 initial state not selected
-            //if (flagForBorderLineSelectedForMoveForEditCF == 2)
-            //{
-            //    flagForBorderLineSelectedForMoveForEditCF = 0;
-            //}
-
-
-
-
-
-            //}
-            //else
-            //{
-
+           
             //This flagForDisconnectClick is for the line not node
             if (flagForDisconnectClick == 1)
             {
@@ -2118,6 +2109,7 @@ namespace PH_App
                             //ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].temperature_source, menuStripNodeInfoValues[x].humidity_source, menuStripNodeInfoValues[x].name, labelValue, menuStripNodeInfoValues[x].marker_Size);
                             ReDrawPoints(chart1, series1, listNodeInfoValues[x].xVal, listNodeInfoValues[x].yVal, listNodeInfoValues[x].colorValue, listNodeInfoValues[x].temperature_source, listNodeInfoValues[x].pressure_source, listNodeInfoValues[x].name, labelValue, listNodeInfoValues[x].marker_Size);
                             //incrementIndex++;
+                            //AA
                             indexForSeriesNodePoint++;
 
                         }
@@ -2187,6 +2179,7 @@ namespace PH_App
                             
                             ReDrawPoints(chart1, series1, listNodeInfoValues[x].xVal, listNodeInfoValues[x].yVal, listNodeInfoValues[x].colorValue, listNodeInfoValues[x].temperature_source, listNodeInfoValues[x].pressure_source, listNodeInfoValues[x].name, labelValue, listNodeInfoValues[x].marker_Size);
                             //incrementIndex++;
+                            //AA
                             indexForSeriesNodePoint++;
 
                         }
@@ -2206,7 +2199,7 @@ namespace PH_App
 
                         chart1.Invalidate();
                         // incrementIndex = 0;//reset the values again..
-                        indexForSeriesNodePoint = 0;//Resetting the values...
+                       // indexForSeriesNodePoint = 0;//Resetting the values...
 
 
                     }
@@ -2246,6 +2239,7 @@ namespace PH_App
                             //ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].temperature_source, menuStripNodeInfoValues[x].humidity_source, menuStripNodeInfoValues[x].name, labelValue, menuStripNodeInfoValues[x].marker_Size);
                             ReDrawPoints(chart1, series1, listNodeInfoValues[x].xVal, listNodeInfoValues[x].yVal, listNodeInfoValues[x].colorValue, listNodeInfoValues[x].temperature_source, listNodeInfoValues[x].pressure_source, listNodeInfoValues[x].name, labelValue, listNodeInfoValues[x].marker_Size);
                             //incrementIndex++;
+                            //AA
                             indexForSeriesNodePoint++;
                         }
                         //--resetting incrementIndex
@@ -2263,7 +2257,7 @@ namespace PH_App
                         }
                         chart1.Invalidate();
                         // incrementIndex = 0;//reset the values again..
-                        indexForSeriesNodePoint = 0;//Resetting the values...
+                       // indexForSeriesNodePoint = 0;//Resetting the values...
 
 
                     }//closing of key else part
@@ -2410,16 +2404,30 @@ namespace PH_App
 
         //=======================This one if for node and line operation===========//
         List<Series> listLineSeriesTrackForRemove = new List<Series>();
-            
+
+        //==Lets use a flag to not refresh until this function completes
+        /// <summary>
+        /// Helps to freez update when the plotting is in process
+        /// for both node and line, used while handling OutofRange exception
+        /// </summary>
+        int flagDontEraseSeries = 0; //0ff  
+         
         public void ReDrawingLineAndNode(Chart chart1)
         {
 
             try
             {
-                lock (this)
+                lock(this) //(this)
                 {
                     if (listNodeInfoValues.Count > 0)
                     {
+                        if(flagDontEraseSeries == 1)
+                        {
+                            return; //Work is in process
+                        }
+
+
+                        flagDontEraseSeries = 1;//fLAG ON
                         //--This is for replotting all the things again...
                         if (chart1.InvokeRequired)
                         {
@@ -2458,6 +2466,7 @@ namespace PH_App
 
                             //CODE : BBK305A
                             //--incrementIndex++;
+                            //AA
                             indexForSeriesNodePoint++;
 
                         }
@@ -2486,9 +2495,9 @@ namespace PH_App
                         }
                         //CODE :BBK305A \\
                         //incrementIndex = 0;//reset the values again..
-                        indexForSeriesNodePoint = 0;//Resetting the value
+                        //indexForSeriesNodePoint = 0;//Resetting the value
                     }//Close of if menustripnodeinfovalues
-
+                    flagDontEraseSeries = 0;//0FF AGAIN
                 }//==Close of the lock
             }
             catch 
@@ -2509,8 +2518,10 @@ namespace PH_App
             string s = "source \t\n temperature: " + source_temperature + ",\t\n Pressure  :  " + pressure_source + "\n Name        :" + name1;// + "\nindex=" + indexForSeriesNodePoint;
             if (chart1.InvokeRequired)
             {
-                //if(s1.Points.Count > indexForSeriesNodePoint) //For removing out of range exception
-                //{ 
+                if (s1.Points.Count >= indexForSeriesNodePoint && indexForSeriesNodePoint <listNodeInfoValues.Count) //For removing out of range exception
+                {
+                //Console.WriteLine("indexForSeriesNodePoint =" + indexForSeriesNodePoint);
+
                 chart1.Invoke(new Action(() =>s1.ChartType = SeriesChartType.Point ));
                 chart1.Invoke(new Action(() => s1.MarkerSize = marker_size_value));//= 20;
                 chart1.Invoke(new Action(() => s1.MarkerStyle = MarkerStyle.Circle));
@@ -2520,11 +2531,12 @@ namespace PH_App
                 //chart1.Invoke(new Action(() => chart1.Series["My Series"].Points[indexForSeriesNodePoint].Label));
                 chart1.Invoke(new Action(() => s1.Points[indexForSeriesNodePoint].Color = c));
                 chart1.Invoke(new Action(() => s1.Points[indexForSeriesNodePoint].MarkerStyle = MarkerStyle.Circle));
-                chart1.Invoke(new Action(() => s1.Points[indexForSeriesNodePoint].Color = c));
+                //chart1.Invoke(new Action(() => s1.Points[indexForSeriesNodePoint].Color = c));
                 chart1.Invoke(new Action(() => s1.Points[indexForSeriesNodePoint].MarkerSize = marker_size_value));
                     //--This one is for storing the series
                     // chart1.Invoke(new Action(() => listNodeSeriesPlotted.Add(s1.Name)));
-               // }
+                   // indexForSeriesNodePoint++;
+              }
             }
             else
             {
@@ -2537,14 +2549,15 @@ namespace PH_App
                 s1.Points[indexForSeriesNodePoint].Label = labelValueText;
                 s1.Points[indexForSeriesNodePoint].Color = c;
                 s1.Points[indexForSeriesNodePoint].MarkerStyle = MarkerStyle.Circle;
-                s1.Points[indexForSeriesNodePoint].Color = c;
+               // s1.Points[indexForSeriesNodePoint].Color = c;
                 s1.Points[indexForSeriesNodePoint].MarkerSize = marker_size_value;
                 //==ADDING THE SERIES TO THE LIST==//
                 //code123
-               // listNodeSeriesPlotted.Add(s1.Name);
+                // listNodeSeriesPlotted.Add(s1.Name);
+               // indexForSeriesNodePoint++;
 
             }
-
+           
             //  }//--Close of lock 
 
         } //Close of redraw point 
@@ -2769,13 +2782,12 @@ namespace PH_App
                         //Then show the label in the chart
                         newLineSeries.Points[1].Label = name;
                     }
-
                     chart1.Series.Add(newLineSeries);
                 }
 
-               // temporaryNodeValueStoreForRedrawLine.Clear();//--Lets reset the value CODE:BBK305A
+                 //temporaryNodeValueStoreForRedrawLine.Clear();//--Lets reset the value CODE:BBK305A
 
-                //   }  //close of if incrementindex
+                //}  //close of if incrementindex
 
 
             }//close of temporary node value
@@ -2805,11 +2817,10 @@ namespace PH_App
             }
             //--Now lets identify the node value
             for (int i = 0; i < listNodeInfoValues.Count; i++)
-
             {
                 /*
-               indCountForPrevIdOfLine-1 this -1 is done because 
-                          indCountForPrevIdOfLine 1 means index is 0 
+                indCountForPrevIdOfLine-1 this -1 is done because 
+                indCountForPrevIdOfLine 1 means index is 0 
                */
                 if (idValue == listNodeInfoValues[i].ID)
                 {
@@ -2864,30 +2875,81 @@ namespace PH_App
 
             }
 
-           // MessageBox.Show("X =" + xCoordinateValue + ",Y = " + yCoordinateValue);
-            //return;
+           
+            if(listNodeInfoValues.Count < 4) { 
 
-            //var results = chart1.HitTest((int)xCoordinateValue, (int)yCoordinateValue, false, ChartElementType.PlottingArea);
-            //foreach (var result in results)
-            //{
-            //    if (result.ChartElementType == ChartElementType.PlottingArea)
-            //    {
-            //        // double xVal = xCoord - chart1.ChartAreas[0].Position.X ;
-            //        //double yVal = yCoord-chart1.ChartAreas[0].Position.Y;
-                    
-            //        var xVal = result.ChartArea.AxisX.PixelPositionToValue(xCoordinateValue);
-            //        var yVal =Math.Abs( result.ChartArea.AxisY.PixelPositionToValue(yCoordinateValue));
+                if(listNodeInfoValues.Count == 3)
+                {
+                    SetNodeAndLine(chart1, xAxis, yAxis, "Manual", "Manual", nodeName, Color.Blue, nodeDefaultThickness, lineName, 1, lineDefaultThickness);
 
-            //        //MessageBox.Show("aFTER CONVERTING THE VALUES=" + xVal + ",YVAL" + yVal);
-            //        //return;
+                    //--ADDING A LINE TO THIS 
+                    string linename = "Line" + (indLineRun+1);
+                    ADDFinalLineForCloseRefregration(chart1, listNodeInfoValues.Count, linename, lineDefaultThickness, 1);
+                }
+                else
+                { 
                     SetNodeAndLine(chart1,xAxis, yAxis, "Manual", "Manual", nodeName, Color.Blue, nodeDefaultThickness, lineName, 1, lineDefaultThickness);
-
+                }
+            }
+            else
+            {
+                MessageBox.Show("You can only add four points");
+            }
             //        break;
             //    }
             //}
 
 
         }//Close ofinsetnode
+
+        public void ADDFinalLineForCloseRefregration(Chart chart1, int countNumberOfNodes,string lineNameVal, int linethickness, int lineStatusVal)
+        {
+            Series newLineSeries = new Series("LineSeries" + countNumberOfNodes);
+            //string nameSeries = newLineSeries.Name;
+
+            //--If the series already present lets remove from the chart ok ol :)
+            if (chart1.Series.IndexOf(newLineSeries.Name) != -1)
+            {
+                //MessageBox.Show("Series exits");
+                //--This  means the series is present....
+                chart1.Series.RemoveAt(chart1.Series.IndexOf(newLineSeries.Name));
+            }
+
+            string unique_id_for_line = selectedBuildingList[0].BuildingName + GetGUID();//This is the unique id  //buildingList[0].BuildingName + GetGUID();//selectedBuildingList[0].BuildingName + GetGUID();//This is the unique id 
+
+
+
+            //--Lets store the nodeline info as well
+            listLineInfoValues.Add(new DataTypeForLine
+            {
+                //--Id of this ..
+                ID = unique_id_for_line,
+                // prevNodeId = menuStripNodeInfoValues[index - 1].id, //previousNodeIndexForLineInput
+                prevNodeId = listNodeInfoValues[countNumberOfNodes - 1].ID,
+                nextNodeId = listNodeInfoValues[0].ID,
+                lineColorValue = listNodeInfoValues[countNumberOfNodes - 1].colorValue,
+                lineSeriesID = newLineSeries,
+                lineThickness = 3, //default thickness is 3
+                name = lineNameVal,
+                status = lineStatusVal
+
+            });
+
+
+            //--Adding to db
+            if (flagForInsertOrUpdateDataToDB == 1)
+            {
+                // MessageBox.Show("Flag forupdate or insert insde line should be 1= " + flagForInsertOrUpdateDataToDB);
+                //--Insert the values when the flag is raised.
+                //InsertLineInfoToDB(unique_id_for_line, menuStripNodeInfoValues[index - 1].id, menuStripNodeInfoValues[index].id, menuStripNodeInfoValues[index - 1].colorValue, newLineSeries, menuStripNodeLineInfoValues[index - 1].lineThickness);
+                // InsertLineInfoToDB(unique_id_for_line, menuStripNodeInfoValues[index - 1].id, menuStripNodeInfoValues[index].id, menuStripNodeInfoValues[index - 1].colorValue, newLineSeries,3);
+
+                InsertLineInfoToDB(unique_id_for_line, listNodeInfoValues[countNumberOfNodes - 1].ID, listNodeInfoValues[0].ID, listNodeInfoValues[countNumberOfNodes-1].colorValue, newLineSeries.Name.ToString(), linethickness, chartDetailList[indexForWhichChartIsSelected].chart_respective_lineID, lineNameVal, lineStatusVal);
+            }
+
+            ReDrawLines(chart1, unique_id_for_line, listNodeInfoValues[countNumberOfNodes - 1].ID, listNodeInfoValues[0].ID, newLineSeries, listNodeInfoValues[countNumberOfNodes-1].colorValue, linethickness, lineNameVal, lineStatusVal);
+
+        }
 
         //--SetNode Function
         public void SetNodeAndLine(Chart chart1,double xAxisValue, double yAxisValue, string temperatureSource, string pressureSource, string name, Color c1, int markerSize, string lineNameVal, int lineStatusVal, int lineThickness)
@@ -3501,7 +3563,7 @@ namespace PH_App
             {
                 if (atimer.Enabled) // Check if the timer is running
                 {
-                    //Return error.........
+                    //Return error...
                     atimer.Enabled = false;
                     atimer.Dispose();
                     flagForTimer = 0;
@@ -3516,7 +3578,6 @@ namespace PH_App
                 //--This flag is for OFFLINE mode Or ONLINE mode
                 //--Now you are going to turn OFF the offline mode and go into realtime mode
                 FlagForCntdBG_Update = 0;//currently in realtime mode so 1
-
 
                 //--also make the radio button to be OFF and other to be ON
                 //rb_ON.Checked = true;
@@ -3582,17 +3643,18 @@ namespace PH_App
                             LoadNodeAndLineFromDB(indexOfChartSelected);   //Lets make it passing the stirngs 
 
                             flagForInsertOrUpdateDataToDB = 1;
-                            //--This is also completed..
-                            //var ch = new ChartOperation();
-                            //--This needs to be removed or somethings 
-                            //var ch = new ChartCreationAndOperations();
-                           // MessageBox.Show("Near RedrawingNodeAandLine(),\n node count"+listNodeInfoValues.Count +",line count"+listLineInfoValues.Count);
-                             ReDrawingLineAndNode(chart1);  //Done checking bbk modif: changing to alex db 
+                            flagDontEraseSeries = 0; //this flag is for not updating 
+                                                     //--This is also completed..
+                                                     //var ch = new ChartOperation();
+                                                     //--This needs to be removed or somethings 
+                                                     //var ch = new ChartCreationAndOperations();
+                                                     // MessageBox.Show("Near RedrawingNodeAandLine(),\n node count"+listNodeInfoValues.Count +",line count"+listLineInfoValues.Count);
+                            ReDrawingLineAndNode(chart1);  //Done checking bbk modif: changing to alex db 
 
 
                             flagSinglCellClick = 1;
 
-
+                            
                             //==============This part is for comfort zone=====================
 
                             //====================end of comfort zone=========================
@@ -3727,7 +3789,7 @@ namespace PH_App
             atimer = new System.Timers.Timer();
             atimer.Enabled = true;
             atimer.Elapsed += timer1_Tick_For_Device;
-            atimer.Interval = 1000 * 7; //x seconds[ 1000 ms * x  =  x seconds]
+            atimer.Interval = 1000 * 15; //x seconds[ 1000 ms * x  =  x seconds]
 
         }
 
@@ -3748,8 +3810,13 @@ namespace PH_App
                     {
 
                         frm1.backgroundWorker1.RunWorkerAsync();//--Running the worker async
-
+                       // MessageBox.Show("Run worker async");
                     }
+                    //else
+                    //{
+                    //    //cancelling background worker
+                    //    frm1.backgroundWorker1.CancelAsync();
+                    //}
                 }
             }
             catch (Exception ex)
@@ -3764,7 +3831,7 @@ namespace PH_App
         {
 
             f.Invalidate();
-            chart1.Invalidate();
+           // chart1.Invalidate();//Uncommment later AAA
             //plot_new_graph(); //--This one needs to be reinvented
 
             //===Removing the node series value
@@ -3785,14 +3852,14 @@ namespace PH_App
             //==Removing the dotteed series
             RemovingSeriesPointFromChart(chart1, addDottedSeries.Name);//--Removing the dotted series
 
-            listLineInfoValues.Clear();
-            listNodeInfoValues.Clear();
+            //listLineInfoValues.Clear();
+            //listNodeInfoValues.Clear();
             index = 0;  //This is resetting the index values
             incrementIndex = 0;
             // ReloadComfortZoneForBackGroundWorker();
 
         }
-        
+
         void RemoveSeriesFromChart(Chart chart1, string seriesName)
         {
             if (chart1.Series.IndexOf(seriesName) != -1)
@@ -4319,7 +4386,7 @@ namespace PH_App
         public void chart1RefreshCustom(Form_Main_PH_Application f1)
         {
             //this.Invalidate();
-            //chart1.Invalidate();
+          f1.phChart.Invalidate();
             //plot_new_graph();
            // int indx = 
             //if (chartDetailList.Count > 0)
@@ -4352,8 +4419,6 @@ namespace PH_App
                 {
                     //--we cancel the worker 
                     // MessageBox.Show("Cancled : ln :12759");
-
-
                 }
                 else if (e.Error != null)
                 {
@@ -4369,7 +4434,7 @@ namespace PH_App
 
                         // lock (dataGridView1)
                         //{ 
-
+                        flagForCompletingBG = 0;
                         if (f1.InvokeRequired)
                         {
                             // MessageBox.Show("Let me crash in here");
@@ -4382,32 +4447,30 @@ namespace PH_App
                         }
                         if (chartDetailList.Count > 0)
                         {
-                            int id = indexOfChartSelected;    //This value is changed 
-                           // LoadNodeAndLineFromDB(id);   //Lets make it passing the stirngs 
-                                                         // MessageBox.Show("Let me be loading in backgoundworker1_");
 
-                            //====Once loaded we need to check and update for mix nodes as they have not been updated and
-                            //=======again we need to load the data form db and then redraw okie
-                            //--Because we don't have mix node
-                            //foreach (var node in listNodeInfoValues)
-                            //{
-                            //    if (node.temperature_source != "Mix")
-                            //    {
-                            //        //==Then only update the values
-                            //        DBUpdateMixPointOnNodeValueChange(node.ID);
-
-                            //    }
-
-                            //}
-
-                            //==Now again load the data 
+                            int id = indexOfChartSelected;//--This value is changed                            
+                                                          //==Now again load the data 
                             LoadNodeAndLineFromDB(id);
+                            //int checkForDeviceInfo = 0;
+                            //foreach (var item in listNodeInfoValues)
+                            //{
+                            //    if (item.temperature_source == "Device" || item.pressure_source == "Device")
+                            //    {
+                            //        checkForDeviceInfo = 1;
+                            //        //once on we can exit from the loop
+                            //        break;
+                            //    }
+                            //}
 
                             // flagForInsertOrUpdateDataToDB = 1;
                             //--This is also completed..
-                            ReDrawingLineAndNode(chart1);
-                            // ReloadComfortZoneForBackGroundWorker();
+                            //if (checkForDeviceInfo == 1)
+                            //{
 
+                                ReDrawingLineAndNode(chart1);
+                            // }
+
+                            flagForCompletingBG = 1;
                         }
                         //} //close of lock
                     }
@@ -4435,8 +4498,14 @@ namespace PH_App
 
             f.Invalidate();
             chart1.Invalidate();
+
+
             //plot_new_graph(); //--This one needs to be reinvented
 
+            if(flagDontEraseSeries == 1)
+            {
+                return;//Dont update is on so return 
+            }
 
             RemovingSeriesPointFromChart(chart1, series1.Name);//This contains the node points
 
@@ -4450,8 +4519,8 @@ namespace PH_App
             //==Removing the dotteed series
             RemovingSeriesPointFromChart(chart1, addDottedSeries.Name);//--Removing the dotted series
 
-            listLineInfoValues.Clear();
-            listNodeInfoValues.Clear();
+            //listLineInfoValues.Clear();
+            //listNodeInfoValues.Clear();
             index = 0;  //This is resetting the index values
             incrementIndex = 0;
             // ReloadComfortZoneForBackGroundWorker();
@@ -4466,9 +4535,11 @@ namespace PH_App
         List<StoreTempPressureValue> listPressureHardwareValue = new List<StoreTempPressureValue>();
 
         // int countTime = 0;
+      public  int flagForCompletingDataPullForBG = 0;
+        public int flagForCompletingBG = 1;//1 means on
         public void RefreshDataFromDeviceAndWeb(Form_Main_PH_Application f1)
         {
-
+         
             // lock (menuStripNodeInfoValues)
             // {
 
@@ -4489,7 +4560,11 @@ namespace PH_App
             3.call plot fxn
             */
             //Read 
-
+            if(flagForCompletingBG == 0)
+            {
+                return;
+            }
+          
             if (FlagForStopingRunningProcessInstantly == 1)
             {
                 //if it is commanded to stop then stop here;
@@ -4497,17 +4572,16 @@ namespace PH_App
                 FlagForStopingRunningProcessInstantly = 0; //Do not stop next time
                 return;
             }
-
             LoadNodeAndLineFromDB(indexOfChartSelected);//indexOfChartSelected= index chosen
-
             if (listNodeInfoValues.Count < 1)
             {
                 //--No node then 
                 return;
             }
+           
             try
             {
-
+                flagForCompletingDataPullForBG = 0;
                 //--Read each node and then perform the following fxn
                 listTemperatureHardwareValue.Clear();//empty the list
                 listPressureHardwareValue.Clear();
@@ -4542,7 +4616,7 @@ namespace PH_App
                         */
                         //  MessageBox.Show("node name= " + node.name);
                         ReadDeviceInfoForNode(node.ID);
-
+                        //
                         //Here we will check for the device parameter id values
 
                         if (CheckDeviceOnlineOffline(int.Parse(device_info_list[0].device_instance_id_for_param1), 0) == true)
@@ -4550,18 +4624,17 @@ namespace PH_App
 
                             //online mode...
                             //2nd step calc x and y
+                          // MessageBox.Show("Hi");
                             //The value will always be unique and always be in the 0 index  
                             if (device_info_list[0].param1_info == "temp")
                             {
                                 //This meand the value is humidity and temperature so we process like wise
                                 //This gets the value
-                                //ReadDataFromDevice(int.Parse(device_info_list[0].device_instance_id), uint.Parse(device_info_list[0].param1_id), uint.Parse(device_info_list[0].param2_id), device_info_list[0].param1_identifier_type, device_info_list[0].param2_identifier_type);
-                                //ReadDataFromDevice(int.Parse(device_info_list[0].device_instance_id_for_param1), uint.Parse(device_info_list[0].param1_id), uint.Parse(device_info_list[0].param2_id), device_info_list[0].param1_identifier_type, device_info_list[0].param2_identifier_type);
+                               // MessageBox.Show("Hi ,com" + commumicationSuccesValue);
                                 if (commumicationSuccesValue == false) { return; } //If no communication then return
                                 double returnTemperatureValue = ReadDataFromDeviceForTemperature(int.Parse(device_info_list[0].device_instance_id_for_param1), uint.Parse(device_info_list[0].param1_id), device_info_list[0].param1_identifier_type);
                                 //we have recent value in hardwareValue1 and hardwareValue2 so lets calc corresponding x and y value
                                 //now temp itself is x value we need to calculate y value
-                                // MessageBox.Show("Inside checkonline offline,val ret=" + hardwareValue1);
                                 // if ((hardwareValue1.ToString() == null || hardwareValue1 == 0.00) || (hardwareValue2.ToString() == null || hardwareValue2 == 0.00))
                                 if ((returnTemperatureValue.ToString() == null || (returnTemperatureValue <= 0.00 || returnTemperatureValue > 1000)))
                                 {
@@ -4573,16 +4646,12 @@ namespace PH_App
                                 var mth = new MathOperation();
                                 double x_Value =Math.Round( mth.IAPWS_IF97_TowParameterEquivalentFxn("H", "T", (returnTemperatureValue + 215.13), "P", node.yVal * 1000000, "water")/1000,2); //returnTemperatureValue;//hardwareValue1;
                                 //double y_value = CalculateYFromXandHumidity(hardwareValue1, hardwareValue2 / 100);
-
-                                //MessageBox.Show("x val /temp/hardwareValue1 = "+x_Value+"\nhardwareValue2"+hardwareValue2+"\ny value hardware= " + y_value);
-                                //Now lets update the values in db
-
+                                //MessageBox.Show("xvalue = " + x_Value);
                                 //lock (listNodeInfoValues)
                                 //{
                                 //    // UpdateNodeInfoToDB(node.id, x_Value, y_value, node.source, node.name, node.label, node.colorValue, node.showItemText, node.marker_Size);
                                 //    UpdateNodeInfoToDBForTemeperatureFromHardware(node.ID, x_Value);//This is completed
                                 //}
-
                                 listTemperatureHardwareValue.Add(new StoreTempPressureValue
                                 {
                                     NodeID =  node.ID,
@@ -4604,16 +4673,7 @@ namespace PH_App
                                 }
 
                        
-                            }
-                            //else if (device_info_list[0].param1_info == "temp" && device_info_list[0].param2_info == "enthalpy")
-                            //{
-                            //   //--No data for now
-                            //}
-                            //else
-                            //{
-                            //    //First is humidity and second is enthalpy
-                            //}
-
+                            }                           
                         }
                         else
                         {
@@ -4639,7 +4699,7 @@ namespace PH_App
                          2.based on panel id value calculate the x and y coordinate.
                          3.Update the database value.
                          */
-                        // MessageBox.Show("node id= " + node.id);
+                         //--MessageBox.Show("node id= " + node.id);
                         ReadDeviceInfoForNode(node.ID);
 
                         //Here we will check for the device parameter id values
@@ -4656,7 +4716,7 @@ namespace PH_App
                                 //ReadDataFromDevice(int.Parse(device_info_list[0].device_instance_id), uint.Parse(device_info_list[0].param1_id), uint.Parse(device_info_list[0].param2_id), device_info_list[0].param1_identifier_type, device_info_list[0].param2_identifier_type);
                                 //ReadDataFromDevice(int.Parse(device_info_list[0].device_instance_id_for_param1), uint.Parse(device_info_list[0].param1_id), uint.Parse(device_info_list[0].param2_id), device_info_list[0].param1_identifier_type, device_info_list[0].param2_identifier_type);
                                 if (commumicationSuccesValue == false) { return; } //If no communication then return
-                              double pressureValue=     ReadDataFromDeviceForPressure(int.Parse(device_info_list[0].device_instance_id_for_param2), uint.Parse(device_info_list[0].param2_id), device_info_list[0].param2_identifier_type);
+                                double pressureValue=    ReadDataFromDeviceForPressure(int.Parse(device_info_list[0].device_instance_id_for_param2), uint.Parse(device_info_list[0].param2_id), device_info_list[0].param2_identifier_type);
                                 //we have recent value in hardwareValue1 and hardwareValue2 so lets calc corresponding x and y value
                                 //now temp itself is x value we need to calculate y value
 
@@ -4671,7 +4731,7 @@ namespace PH_App
 
                                 // double x_Value = node.xVal;   //This one is the x value
                                 double y_value = pressureValue / 145.03;//pressureValue is psi so now convert to in MPa by diving by 145.03
-                                //   MessageBox.Show("x val /temp/hardwareValue1 = "+x_Value+"\nhardwareValue2"+hardwareValue2+"\ny value hardware= " + y_value);
+                                //MessageBox.Show("y value press mpa= " + y_value);
                                 //Now lets update the values in db
 
                                 //lock (listNodeInfoValues)
@@ -4697,18 +4757,14 @@ namespace PH_App
                                 else
                                 {
                                     f1.lb_device_status.Text = "connected";
-                                }
-
-                              
-                            }
-                          
+                                }                              
+                            }                          
                         }
                         else
                         {
                             //offline mode
                             f1.lb_device_status.Text = "disconnected";
                         }
-
                     }
 
                     //--Now lets add to the database
@@ -4737,7 +4793,7 @@ namespace PH_App
                 }  //Close of foreach now lets plot the values..
 
 
-
+                flagForCompletingDataPullForBG = 1;
             }
             catch (Exception ex)
             {
@@ -4746,6 +4802,7 @@ namespace PH_App
 
 
         } //Close of the fxn
+
 
         public bool BacnetCommunicationRequest()
         {
@@ -4824,6 +4881,179 @@ namespace PH_App
         //=======================End of backgroundworker task================//
 
 
+        //========================For TrashBox function ====================//
+        public void deleteChartAndItsContent(string chartID1, string chart_resp_nodeid, string chart_resp_lineID,string buildingName)
+        {
+
+            //if (dataGridView1.CurrentCell.RowIndex > -1 && dataGridView1.CurrentCell.RowIndex < f1.chartDetailList.Count)//Header is selected..
+            if (chartID1 != "" && chart_resp_nodeid != "" && chart_resp_lineID != "")//Header is selected..
+            {
+                //int selectedItemIndex = index;//dataGridView1.CurrentCell.RowIndex; //int.Parse(dataGridView1.Rows[indexSelectedForDeletion].Cells[0].Value.ToString());
+
+                //we need to find the corresponding tables for deletion.
+
+                //int id = selectedItemIndex;
+
+                string chartID = chartID1;//f1.chartDetailList[selectedItemIndex].chartID;
+                string chart_respective_node_ID = chart_resp_nodeid; //f1.chartDetailList[selectedItemIndex].chart_respective_nodeID;
+                string chart_respective_line_ID = chart_resp_lineID;//f1.chartDetailList[selectedItemIndex].chart_respective_lineID;
+                //First read the node values for particular chart 
+                 ReadNodeInfoToDelete(chart_respective_node_ID, buildingName);
+
+                //For all node delete the device list
+                if (deleteNodeDetailList.Count > 0)
+                {
+                    //if there is data then delete the device infor
+                    foreach (var item in  deleteNodeDetailList)
+                    {
+                        if ((item.temperature_source == "Device") || (item.pressure_source == "Device"))
+                        {
+                           DeleteNodeDeviceInfo(item.ID, buildingName);
+                        }
+                    }
+                }
+
+                //After this deletion lets delete the line info
+                DeleteLine(chart_respective_line_ID, buildingName);//This deletes the line
+
+                //now delete comfort zone..
+                //f1.DeleteComfortZoneSettingForChart(chartID);
+
+                //now delete the node value
+                DeleteNode(chart_respective_node_ID, buildingName);
+
+                //Delete the mix node info
+                //f1.DeleteMixNodeInfo(chartID);
+
+                //Now delete the chart itself
+                DeleteChart(chartID, buildingName);
+
+
+            }//Close of if
+
+        }
+
+        public void RefreshingEverythingChartAndContent(object sender, Form_Main_PH_Application f1, Chart chart1)
+        {
+
+
+            f1.dataGridView1.Rows.Clear();//--This one is for clearing the data
+            f1.dataGridView1.Refresh();//--Release the previously selectecd items
+            f1.dataGridView1.Rows.Add();
+            //   MessageBox.Show("Reached before refreshGraph() and after datagv ref");
+            DataGridView_Show_Data(f1);
+
+            //If there is no rows in datagridview...
+            //if(dataGridView1.Rows.Count < 1) { 
+
+
+
+            RefreshGraph(chart1, f1);
+
+            //after deletion lets select the its corresponding upper chart
+            //Select the chart with was selected
+            if (chartDetailList.Count > 0)
+            {
+                //We need to select the particular index 
+                //--I hope this will do the replotting thing as well
+                if (f1.dataGridView1.Rows[0].Cells[1].Value != null)
+                {
+                    f1.dataGridView1.Rows[0].Cells[1].Selected = true;//The row is selected 
+                }
+
+            }
+
+
+            if (chartDetailList.Count > 0)
+            {
+                //if (dataGridView1.CurrentCell.RowIndex >= 1)
+                //{
+                //    //set parameters of your event args
+                //    var eventArgs = new DataGridViewCellEventArgs(1, dataGridView1.CurrentCell.RowIndex-1);
+                //    // or setting the selected cells manually before executing the function
+                //    dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex - 1].Cells[1].Selected = true;
+                //    dataGridView1_CellClick(sender, eventArgs);
+                //} else
+                //{ 
+                //set parameters of your event args
+                if (indexOfChartSelected >= 0 && indexOfChartSelected < chartDetailList.Count)
+                {
+                    var eventArgs = new DataGridViewCellEventArgs(1, indexOfChartSelected);
+                    // or setting the selected cells manually before executing the function
+                    f1.dataGridView1.Rows[indexOfChartSelected].Cells[1].Selected = true;
+                    DGVCellClick(sender, eventArgs, f1, chart1);
+
+                }
+                else
+                {
+                    var eventArgs = new DataGridViewCellEventArgs(1, 0);
+                    // or setting the selected cells manually before executing the function
+                    f1.dataGridView1.Rows[0].Cells[1].Selected = true;
+                    f1.dataGridView1_CellClick(sender, eventArgs);
+                    // }
+                }
+            }
+        }
+
+
+        public void LoadDataFromDB(TrashBox f1)
+        {
+
+            //--We need to  pass the buildingName value
+
+           // Form1_main f1 = new Form1_main();
+
+              CheckSelectedBuilding();
+            string buildingName = selectedBuildingList[0].BuildingName;
+            // f1.CurrentSelectedBuilding;//f1.selectedBuildingList[0].BuildingName;
+            //buildingNameGlobal = buildingName;
+
+            // MessageBox.Show("BuildingName = " + buildingNameGlobal);
+            if (buildingName == "")
+            {
+                //If no building is selected then do not go futher 
+                return;
+            }
+
+            PullChartListForTrashBox(buildingName);
+            // MessageBox.Show("number of list value items =  " + chartDetailListForDissabledValue.Count);
+
+            //--Now lets load the values in the database
+
+            fillDataGridView(f1);//This will load the values form db
+
+            // }
+
+        }
+        private void fillDataGridView(TrashBox f1)
+        {
+
+
+            int xCount = 0;
+            if (chartDetailListForDissabledValue.Count > 0)
+            {
+                for (int i = 0; i < chartDetailListForDissabledValue.Count; i++)
+                {
+                    if (chartDetailListForDissabledValue[i].enableChartStatus == "false") //when enable then only display
+                    {
+                        f1.dataGridView1.Rows.Add();
+                        f1.dataGridView1.Rows[i].Cells["Count"].Value = ++xCount;//chartDetailList[i].;
+                        f1.dataGridView1.Rows[i].Cells["chartID"].Value = chartDetailListForDissabledValue[i].chartID; //++xCount;//chartDetailList[i].;
+                        f1.dataGridView1.Rows[i].Cells["ChartName"].Value = chartDetailListForDissabledValue[i].chartName;
+                        f1.dataGridView1.Rows[i].Cells["chart_respective_nodeID"].Value = chartDetailListForDissabledValue[i].chart_respective_nodeID;
+                        f1.dataGridView1.Rows[i].Cells["chart_respective_lineID"].Value = chartDetailListForDissabledValue[i].chart_respective_lineID;
+                        // dataGridView1.Rows[i].Cells["RestoreChartCheckBox"].Value = "";
+                        // MessageBox.Show("entered " + i);
+                    }
+                }
+            }//--if close
+
+            //  lb_numberOfHandler.Text = chartDetailList.Count.ToString();
+
+
+        }//--close fo filldatagridview
+
+        //========================End of trashbox function============//
 
     }
 }

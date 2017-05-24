@@ -31,6 +31,7 @@ namespace PH_App
             idb.InitialProcessingForDatabaseAndApp();
             //Application.Run(new Form1());
            // BuildingOperation b = fm.bo;//new BuildingOperation();
+
             Application.Run(fm);// new Form_Main_PH_Application()
         }
     }
