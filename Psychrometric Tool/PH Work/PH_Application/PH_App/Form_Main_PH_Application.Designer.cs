@@ -30,12 +30,12 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form_Main_PH_Application));
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend4 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
             this.phChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.lb_db_name = new System.Windows.Forms.Label();
             this.lb_buildingselectedShow = new System.Windows.Forms.Label();
@@ -56,7 +56,7 @@
             this.lbPressure = new System.Windows.Forms.Label();
             this.label21 = new System.Windows.Forms.Label();
             this.gb_showstatus = new System.Windows.Forms.GroupBox();
-            this.lbPrintTest = new System.Windows.Forms.Label();
+            this.lbTest2 = new System.Windows.Forms.Label();
             this.lb_realtimeshow = new System.Windows.Forms.Label();
             this.lb_modeshow = new System.Windows.Forms.Label();
             this.lb_vertical_line2 = new System.Windows.Forms.Label();
@@ -65,6 +65,7 @@
             this.lb_number_of_chart_label = new System.Windows.Forms.Label();
             this.lb_device_status = new System.Windows.Forms.Label();
             this.lb_devicestatusshow = new System.Windows.Forms.Label();
+            this.lbPrintTest = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.printToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -109,18 +110,18 @@
             // phChart
             // 
             resources.ApplyResources(this.phChart, "phChart");
-            chartArea1.AxisX.Title = "Enthalpy h[KJ/kg]";
-            chartArea1.AxisY.Title = "Pressure P[MPa]";
-            chartArea1.Name = "ChartArea1";
-            this.phChart.ChartAreas.Add(chartArea1);
-            legend1.Enabled = false;
-            legend1.Name = "Legend1";
-            this.phChart.Legends.Add(legend1);
+            chartArea4.AxisX.Title = "Enthalpy h[KJ/kg]";
+            chartArea4.AxisY.Title = "Pressure P[MPa]";
+            chartArea4.Name = "ChartArea1";
+            this.phChart.ChartAreas.Add(chartArea4);
+            legend4.Enabled = false;
+            legend4.Name = "Legend1";
+            this.phChart.Legends.Add(legend4);
             this.phChart.Name = "phChart";
-            series1.ChartArea = "ChartArea1";
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.phChart.Series.Add(series1);
+            series4.ChartArea = "ChartArea1";
+            series4.Legend = "Legend1";
+            series4.Name = "Series1";
+            this.phChart.Series.Add(series4);
             this.phChart.MouseClick += new System.Windows.Forms.MouseEventHandler(this.phChart_MouseClick);
             this.phChart.MouseDown += new System.Windows.Forms.MouseEventHandler(this.phChart_MouseDown);
             this.phChart.MouseMove += new System.Windows.Forms.MouseEventHandler(this.phChart_MouseMove);
@@ -139,14 +140,14 @@
             // 
             this.dataGridView1.AllowUserToAddRows = false;
             this.dataGridView1.BackgroundColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Arial", 8.25F);
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.ControlDark;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle10.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle10.Font = new System.Drawing.Font("Arial", 8.25F);
+            dataGridViewCellStyle10.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle10.SelectionBackColor = System.Drawing.SystemColors.ControlDark;
+            dataGridViewCellStyle10.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle10;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.id,
@@ -165,10 +166,10 @@
             // 
             // id
             // 
-            dataGridViewCellStyle2.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.SteelBlue;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.WhiteSmoke;
-            this.id.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle11.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle11.SelectionBackColor = System.Drawing.Color.SteelBlue;
+            dataGridViewCellStyle11.SelectionForeColor = System.Drawing.Color.WhiteSmoke;
+            this.id.DefaultCellStyle = dataGridViewCellStyle11;
             resources.ApplyResources(this.id, "id");
             this.id.Name = "id";
             this.id.ReadOnly = true;
@@ -176,9 +177,9 @@
             // 
             // name
             // 
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.SteelBlue;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.White;
-            this.name.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle12.SelectionBackColor = System.Drawing.Color.SteelBlue;
+            dataGridViewCellStyle12.SelectionForeColor = System.Drawing.Color.White;
+            this.name.DefaultCellStyle = dataGridViewCellStyle12;
             resources.ApplyResources(this.name, "name");
             this.name.Name = "name";
             this.name.ReadOnly = true;
@@ -270,8 +271,9 @@
             // gb_showstatus
             // 
             resources.ApplyResources(this.gb_showstatus, "gb_showstatus");
-            this.gb_showstatus.Controls.Add(this.lbPrintTest);
+            this.gb_showstatus.Controls.Add(this.lbTest2);
             this.gb_showstatus.Controls.Add(this.lb_realtimeshow);
+            this.gb_showstatus.Controls.Add(this.lbPrintTest);
             this.gb_showstatus.Controls.Add(this.lb_modeshow);
             this.gb_showstatus.Controls.Add(this.lb_vertical_line2);
             this.gb_showstatus.Controls.Add(this.lb_for_line_vertical1);
@@ -282,10 +284,10 @@
             this.gb_showstatus.Name = "gb_showstatus";
             this.gb_showstatus.TabStop = false;
             // 
-            // lbPrintTest
+            // lbTest2
             // 
-            resources.ApplyResources(this.lbPrintTest, "lbPrintTest");
-            this.lbPrintTest.Name = "lbPrintTest";
+            resources.ApplyResources(this.lbTest2, "lbTest2");
+            this.lbTest2.Name = "lbTest2";
             // 
             // lb_realtimeshow
             // 
@@ -328,6 +330,11 @@
             // 
             resources.ApplyResources(this.lb_devicestatusshow, "lb_devicestatusshow");
             this.lb_devicestatusshow.Name = "lb_devicestatusshow";
+            // 
+            // lbPrintTest
+            // 
+            resources.ApplyResources(this.lbPrintTest, "lbPrintTest");
+            this.lbPrintTest.Name = "lbPrintTest";
             // 
             // menuStrip1
             // 
@@ -392,6 +399,7 @@
             // 
             this.simulationMode.Name = "simulationMode";
             resources.ApplyResources(this.simulationMode, "simulationMode");
+            this.simulationMode.Click += new System.EventHandler(this.simulationMode_Click);
             // 
             // trashBoxToolStripMenuItem
             // 
@@ -422,6 +430,7 @@
             // 
             this.helpPsychometricChartToolStripMenuItem.Name = "helpPsychometricChartToolStripMenuItem";
             resources.ApplyResources(this.helpPsychometricChartToolStripMenuItem, "helpPsychometricChartToolStripMenuItem");
+            this.helpPsychometricChartToolStripMenuItem.Click += new System.EventHandler(this.helpPsychometricChartToolStripMenuItem_Click);
             // 
             // CMSinsertNode
             // 
@@ -621,5 +630,6 @@
         private System.Windows.Forms.ToolStripMenuItem loadTemplateToolStripMenuItem;
         public System.Windows.Forms.Label lbPrintTest;
         public System.Windows.Forms.SaveFileDialog saveFD;
+        public System.Windows.Forms.Label lbTest2;
     }
 }

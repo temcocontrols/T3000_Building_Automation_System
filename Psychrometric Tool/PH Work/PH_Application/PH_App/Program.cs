@@ -16,11 +16,7 @@ namespace PH_App
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-      //Show the language select dialog
-      MultiLang.SelectLanguage frmLang = new MultiLang.SelectLanguage() ;
-      frmLang.LoadSettingsAndShow() ;
-      frmLang.Dispose() ;
-      frmLang = null ;
+     
 
             InitialDatabaseSetupController idb;//= new InitialDatabaseSetupController();
 
@@ -29,8 +25,14 @@ namespace PH_App
             idb = fm.idsc;
 
             idb.InitialProcessingForDatabaseAndApp();
+
+            //Show the language select dialog
+            MultiLang.SelectLanguage frmLang = new MultiLang.SelectLanguage();
+            frmLang.LoadSettingsAndShow();
+            frmLang.Dispose();
+            frmLang = null;
             //Application.Run(new Form1());
-           // BuildingOperation b = fm.bo;//new BuildingOperation();
+            // BuildingOperation b = fm.bo;//new BuildingOperation();
 
             Application.Run(fm);// new Form_Main_PH_Application()
         }

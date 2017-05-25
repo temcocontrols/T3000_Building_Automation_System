@@ -33,6 +33,7 @@ namespace PH_App
             public string EngineeringUnits { get; set; }
         }
        public List<SelectedBuildingDatatype> buildingSelected = new List<SelectedBuildingDatatype>();
+        public List<SelectedBuildingDatatype> buildingSelectedInT3000 = new List<SelectedBuildingDatatype>();
         public List<SelectedBuildingDatatype> FindPathOfBuildingInT3000()
         {
           
@@ -2059,20 +2060,6 @@ namespace PH_App
 
             }//Close of using 
 
-            //==This one is for deleting mix node info if present 
-            //string tableMixNodeInfo = "tbl_" + selectedBuildingList[0].BuildingName + "_mix_node_info";// "tbl_" ++"_node_value";
-            //using (SQLiteConnection connection = new SQLiteConnection(connString))
-            //{
-            //    connection.Open();
-            //    SQLiteDataReader reader = null;
-            //    string queryString = "delete   from  " + tableMixNodeInfo + "  where nodeID = @id_value";
-            //    SQLiteCommand command = new SQLiteCommand(queryString, connection);
-            //    command.Parameters.AddWithValue("@id_value", nodeID);
-            //    //SqlDataAdapter dataAdapter = new SqlDataAdapter(queryString, connection.ConnectionString); //connection.ConnectionString is the connection string
-            //    reader = command.ExecuteReader();
-
-            //}//Close of using 
-
 
         }
 
@@ -2092,12 +2079,9 @@ namespace PH_App
                 connection.Open();
                 SQLiteDataReader reader = null;
                 string queryString = "delete   from  " + tableName + "  where prevNodeID = @id_value";
-
-
                 SQLiteCommand command = new SQLiteCommand(queryString, connection);
                 command.Parameters.AddWithValue("@id_value", nodeID);
                 //SqlDataAdapter dataAdapter = new SqlDataAdapter(queryString, connection.ConnectionString); //connection.ConnectionString is the connection string
-
                 reader = command.ExecuteReader();
 
 
@@ -2118,7 +2102,6 @@ namespace PH_App
                 //SqlDataAdapter dataAdapter = new SqlDataAdapter(queryString, connection.ConnectionString); //connection.ConnectionString is the connection string
 
                 reader = command.ExecuteReader();
-
 
             }//Close of using 
 
@@ -4566,8 +4549,8 @@ namespace PH_App
 
             string sql = "select * from ALL_NODE  where Object_Instance = '" + deviceID + "' and Parent_SerialNum = '" + Parent_SerialNum + "'";
             bool status = false;
-            //MessageBox.Show("Outside the path,"+BuildingSelected.Count );
-            if (buildingSelected.Count > 0)
+            //MessageBox.Show("Outside the path,"+buildingSelected.Count );
+            if (buildingSelectedInT3000.Count > 0)
             {
                 /*
                 This path is dynamic path we calculated based on this 
@@ -4576,8 +4559,8 @@ namespace PH_App
                 string path = databasePath;  //@"C:\Folder1\Folder2\Folder3\Folder4";
                 string newPath = Path.GetFullPath(Path.Combine(path, @"..\"));
                 //string againDbPath = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + newPath + "" + BuildingSelected[0].building_path;
-                string againDbPath = @"Data Source=" + newPath + "" + buildingSelected[0].building_path;
-                //MessageBox.Show("Path = \n" + againDbPath);
+                string againDbPath = @"Data Source=" + newPath + "" + buildingSelectedInT3000[0].building_path;
+                // MessageBox.Show("Path = \n" + againDbPath);
                 try
                 {
                     using (SQLiteConnection conn = new SQLiteConnection(againDbPath))

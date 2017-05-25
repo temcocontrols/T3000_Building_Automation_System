@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Drawing;
+using System.IO;
+using System.Reflection;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 
@@ -61,7 +63,7 @@ namespace PH_App
                 phChart.Series.Add(seriesPoint);
                 phChart.Series.Add(mc.series1);
                 mc.ReadDataForBuildingSelectedFromPsychrometric();
-
+                mc.buildingSelectedInT3000 = mc.FindPathOfBuildingInT3000();
                 // MessageBox.Show("chart condn=" + phChart.Enabled);
                 // phChart.Enabled = true; 
                 mc.RefreshByLoadingDataWhileLoad(sender, e, this);
@@ -324,6 +326,32 @@ namespace PH_App
                 TrashBox tb = new TrashBox(this);
                 tb.ShowDialog();
 
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void simulationMode_Click(object sender, EventArgs e)
+        {
+            var v = new PHCalculator();
+            v.ShowDialog();
+        }
+
+        private void helpPsychometricChartToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //--Help file section
+            //var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            //MessageBox.Show("PATH = " + path);
+            try
+            {
+                string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string file = dir + @"\manual_ph_chart.chm";
+                if (File.Exists(file))
+                { 
+                Help.ShowHelp(this, file);
+                }
             }
             catch (Exception ex)
             {

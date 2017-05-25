@@ -1414,7 +1414,7 @@ namespace PH_App
                 try
                 {
                     //Point position = e.Location;
-                    double xValue = chart1.ChartAreas[0].AxisX.PixelPositionToValue(e.X);
+                    double xValue =Math.Round(chart1.ChartAreas[0].AxisX.PixelPositionToValue(e.X),3);
                     double yValue = Math.Pow(10, chart1.ChartAreas[0].AxisY.PixelPositionToValue(e.Y));
                     if ((xValue >= xAxisMinimum && xValue <= xAxisMaximum) && (yValue >= yAxisMinimum && yValue <= yAxisMaximum))
                     {
@@ -1424,14 +1424,14 @@ namespace PH_App
                         //--ADJUSTING THE radius value for PH Chart...
                         if(yAxis1 > 1 && yAxis1< 20)
                         {
-                            radiusSize = 1;
+                            radiusSize = 0.1;
                         }else if (yAxis1 >= 20)
                         {
                             radiusSize = 2;
                         }
                         else
                         {
-                            radiusSize = 0.25;
+                            radiusSize = 0.025;
                         }
                         //Console.Write("xval = " + xValue + "yvalue = " + yValue);
                         if (listNodeInfoValues.Count > 0)
@@ -1442,14 +1442,13 @@ namespace PH_App
                             for (int i = 0; i < listNodeInfoValues.Count; i++)
                             {
 
-                                if (listNodeInfoValues[i].temperature_source != "Mix")
-                                {
+                                //if (listNodeInfoValues[i].temperature_source != "Mix")
+                                //{
 
 
                                     //if ((xValue > listNodeInfoValues[i].xVal - radiusSize  && xValue < listNodeInfoValues[i].xVal + radiusSize) && (yValue > listNodeInfoValues[i].yVal - radiusSize && yValue < listNodeInfoValues[i].yVal + radiusSize))
                                     if ((xValue > listNodeInfoValues[i].xVal - radiusSize && xValue < listNodeInfoValues[i].xVal + radiusSize) && (yValue > listNodeInfoValues[i].yVal - radiusSize && yValue < listNodeInfoValues[i].yVal + radiusSize))
                                     {
-
                                         //--This is changed from int to string  code bbk305
                                         idSelected = listNodeInfoValues[i].ID; //Now this is a string 
                                         tempIndexForNode = i;//This is for finding other values with searching for this we need index
@@ -1466,8 +1465,7 @@ namespace PH_App
                                         //this.Cursor = Cursors.Hand;
                                         //now this works so lets move forward.
                                         readyForMouseClick = 1;//enable on click event
-
-
+                                    
                                         break;//this break is for if found the value no longer loop increases the perfomances..
                                     }
                                     else
@@ -1481,60 +1479,59 @@ namespace PH_App
 
                                             FlagForNodeDelete = 0;//flag is ready OFF , Node NOT SELECTED
                                             f1.deleteNodeToolStripMenuItem.Enabled = false;//Turn of the delet button
-                                                                                           //nodeID_ForDeletingNode = idSelected;
-                                                                                           //=============end of flag for deleting===========//
-
+                                            //nodeID_ForDeletingNode = idSelected;
+                                           //=============end of flag for deleting===========//
                                         }
 
                                     }
                                     //--Lets filter out the mix nodes---
 
-                                }//Close of if section Mix section
+                               // }//Close of if section Mix section
 
                                 //==This one is special case for mix node only
-                                else if (listNodeInfoValues[i].temperature_source == "Mix")
-                                {
-                                    if ((xValue > listNodeInfoValues[i].xVal - radiusSize && xValue < listNodeInfoValues[i].xVal + radiusSize) && (yValue > listNodeInfoValues[i].yVal - radiusSize && yValue < listNodeInfoValues[i].yVal + radiusSize))
-                                    {
+                                //else if (listNodeInfoValues[i].temperature_source == "Mix")
+                                //{
+                                //    if ((xValue > listNodeInfoValues[i].xVal - radiusSize && xValue < listNodeInfoValues[i].xVal + radiusSize) && (yValue > listNodeInfoValues[i].yVal - radiusSize && yValue < listNodeInfoValues[i].yVal + radiusSize))
+                                //    {
 
-                                        //--This is changed from int to string  code bbk305
-                                        idSelected = listNodeInfoValues[i].ID; //Now this is a string 
-                                        tempIndexForNode = i;//This is for finding other values with searching for this we need index
-                                        if (f1.Cursor != Cursors.Cross)
-                                        {
-                                            f1.Cursor = Cursors.Hand;
-                                            //====This flag is for deleting the node===========//
+                                //        //--This is changed from int to string  code bbk305
+                                //        idSelected = listNodeInfoValues[i].ID; //Now this is a string 
+                                //        tempIndexForNode = i;//This is for finding other values with searching for this we need index
+                                //        if (f1.Cursor != Cursors.Cross)
+                                //        {
+                                //            f1.Cursor = Cursors.Hand;
+                                //            //====This flag is for deleting the node===========//
 
-                                            FlagForNodeDelete = 1;//flag is ready on Node selected
-                                            nodeID_ForDeletingNode = idSelected;
-                                            f1.deleteNodeToolStripMenuItem.Enabled = true; //Turn on the delete buttton
-                                                                                           //=============end of flag for deleting===========//
-                                        }
-                                        //this.Cursor = Cursors.Hand;
-                                        //now this works so lets move forward.
-                                        //===This should be dissabled
-                                        // readyForMouseClick = 1;//enable on click event
+                                //            FlagForNodeDelete = 1;//flag is ready on Node selected
+                                //            nodeID_ForDeletingNode = idSelected;
+                                //            f1.deleteNodeToolStripMenuItem.Enabled = true; //Turn on the delete buttton
+                                //                                                           //=============end of flag for deleting===========//
+                                //        }
+                                //        //this.Cursor = Cursors.Hand;
+                                //        //now this works so lets move forward.
+                                //        //===This should be dissabled
+                                //        // readyForMouseClick = 1;//enable on click event
 
 
-                                        break;//this break is for if found the value no longer loop increases the perfomances..
-                                    }
-                                    else
-                                    {
-                                        if (f1.Cursor != Cursors.Cross)
-                                        {
-                                            f1.Cursor = Cursors.Arrow;
-                                            /// readyForMouseClick = 0;//dissable on click event.
+                                //        break;//this break is for if found the value no longer loop increases the perfomances..
+                                //    }
+                                //    else
+                                //    {
+                                //        if (f1.Cursor != Cursors.Cross)
+                                //        {
+                                //            f1.Cursor = Cursors.Arrow;
+                                //            /// readyForMouseClick = 0;//dissable on click event.
 
-                                            //====This flag is for deleting the node===========//
+                                //            //====This flag is for deleting the node===========//
 
-                                            FlagForNodeDelete = 0;//flag is ready OFF , Node NOT SELECTED
-                                            f1.deleteNodeToolStripMenuItem.Enabled = false;//Turn of the delet button
-                                            //nodeID_ForDeletingNode = idSelected;
-                                            //=============end of flag for deleting===========//
+                                //            FlagForNodeDelete = 0;//flag is ready OFF , Node NOT SELECTED
+                                //            f1.deleteNodeToolStripMenuItem.Enabled = false;//Turn of the delet button
+                                //            //nodeID_ForDeletingNode = idSelected;
+                                //            //=============end of flag for deleting===========//
 
-                                        }
-                                    }
-                                }
+                                //        }
+                                //    }
+                                //}
                             }//Close of for loop
                         }//close of if menuStripAllValue>0
 
@@ -2454,6 +2451,7 @@ namespace PH_App
                         listLineSeriesTrackForRemove.Clear();//Now lets clear for the new drawings
                         //-this is redraw functionality
                         //--Resetting the index value
+                       //Series copySeries = new Series("tt");
                         indexForSeriesNodePoint = 0;
                         for (int x = 0; x < listNodeInfoValues.Count; x++)
                         {
@@ -2462,14 +2460,38 @@ namespace PH_App
                             labelValue = listNodeInfoValues[x].name;
 
                             //--Redefined code bbk305
-                            ReDrawPoints(chart1, series1, listNodeInfoValues[x].xVal, listNodeInfoValues[x].yVal, listNodeInfoValues[x].colorValue, listNodeInfoValues[x].temperature_source, listNodeInfoValues[x].pressure_source, listNodeInfoValues[x].name, labelValue, listNodeInfoValues[x].marker_Size);
-
+                           ReDrawPoints(chart1, series1, listNodeInfoValues[x].xVal, listNodeInfoValues[x].yVal, listNodeInfoValues[x].colorValue, listNodeInfoValues[x].temperature_source, listNodeInfoValues[x].pressure_source, listNodeInfoValues[x].name, labelValue, listNodeInfoValues[x].marker_Size);
+                           // ReDrawPoints(chart1, copySeries, listNodeInfoValues[x].xVal, listNodeInfoValues[x].yVal, listNodeInfoValues[x].colorValue, listNodeInfoValues[x].temperature_source, listNodeInfoValues[x].pressure_source, listNodeInfoValues[x].name, labelValue, listNodeInfoValues[x].marker_Size);
                             //CODE : BBK305A
                             //--incrementIndex++;
                             //AA
                             indexForSeriesNodePoint++;
 
                         }
+                        //if (chart1.InvokeRequired)
+                        //{
+                            
+                        //    if (chart1.Series.IndexOf(series1.Name) != -1)
+                        //    {
+                        //        //--This  means the series is present....
+                        //        chart1.Invoke(new Action(() => series1 = copySeries));
+                        //        chart1.Invoke(new Action(() => chart1.Series.RemoveAt(chart1.Series.IndexOf(newLineSeries.Name))));
+                        //        chart1.Invoke(new Action(() => chart1.Series.Add(series1)));
+                        //    }
+                            
+                        //}
+                        //else
+                        //{
+                        //    // series1.Points.Clear();
+                        //    series1 = copySeries;//Just copying the series value
+                        //    if (chart1.Series.IndexOf(series1.Name) != -1)
+                        //    {
+                        //        //--This  means the series is present....
+                        //       chart1.Series.RemoveAt(chart1.Series.IndexOf(newLineSeries.Name));
+                        //        chart1.Series.Add(series1);
+                        //    }
+                            
+                        //}
                         //--resetting incrementIndex
                         if (listLineInfoValues.Count > 0)
                         {
@@ -2520,23 +2542,24 @@ namespace PH_App
             {
                 if (s1.Points.Count >= indexForSeriesNodePoint && indexForSeriesNodePoint <listNodeInfoValues.Count) //For removing out of range exception
                 {
-                //Console.WriteLine("indexForSeriesNodePoint =" + indexForSeriesNodePoint);
+                    //Console.WriteLine("indexForSeriesNodePoint =" + indexForSeriesNodePoint);
 
-                chart1.Invoke(new Action(() =>s1.ChartType = SeriesChartType.Point ));
-                chart1.Invoke(new Action(() => s1.MarkerSize = marker_size_value));//= 20;
-                chart1.Invoke(new Action(() => s1.MarkerStyle = MarkerStyle.Circle));
-                chart1.Invoke(new Action(() => s1.Points.AddXY(x, y)));
-                chart1.Invoke(new Action(() => s1.Points[indexForSeriesNodePoint].ToolTip = s)); // chart1.Series["My Series"].Points[indexForSeriesNodePoint].ToolTip = s));
-                chart1.Invoke(new Action(() => s1.Points[indexForSeriesNodePoint].Label = labelValueText));
-                //chart1.Invoke(new Action(() => chart1.Series["My Series"].Points[indexForSeriesNodePoint].Label));
-                chart1.Invoke(new Action(() => s1.Points[indexForSeriesNodePoint].Color = c));
-                chart1.Invoke(new Action(() => s1.Points[indexForSeriesNodePoint].MarkerStyle = MarkerStyle.Circle));
-                //chart1.Invoke(new Action(() => s1.Points[indexForSeriesNodePoint].Color = c));
-                chart1.Invoke(new Action(() => s1.Points[indexForSeriesNodePoint].MarkerSize = marker_size_value));
+                    chart1.Invoke(new Action(() => s1.ChartType = SeriesChartType.Point));
+                    chart1.Invoke(new Action(() => s1.MarkerSize = marker_size_value));//= 20;
+                    chart1.Invoke(new Action(() => s1.MarkerStyle = MarkerStyle.Circle));
+                    chart1.Invoke(new Action(() => s1.Points.AddXY(x, y)));
+                    chart1.Invoke(new Action(() => s1.Points[indexForSeriesNodePoint].ToolTip = s)); // chart1.Series["My Series"].Points[indexForSeriesNodePoint].ToolTip = s));
+                    chart1.Invoke(new Action(() => s1.Points[indexForSeriesNodePoint].Label = labelValueText));
+                    //chart1.Invoke(new Action(() => chart1.Series["My Series"].Points[indexForSeriesNodePoint].Label));
+                    chart1.Invoke(new Action(() => s1.Points[indexForSeriesNodePoint].Color = c));
+                    chart1.Invoke(new Action(() => s1.Points[indexForSeriesNodePoint].MarkerStyle = MarkerStyle.Circle));
+                    //chart1.Invoke(new Action(() => s1.Points[indexForSeriesNodePoint].Color = c));
+                    chart1.Invoke(new Action(() => s1.Points[indexForSeriesNodePoint].MarkerSize = marker_size_value));
                     //--This one is for storing the series
                     // chart1.Invoke(new Action(() => listNodeSeriesPlotted.Add(s1.Name)));
-                   // indexForSeriesNodePoint++;
-              }
+                    // indexForSeriesNodePoint++;
+
+                }
             }
             else
             {
@@ -2715,27 +2738,7 @@ namespace PH_App
 
 
                 //*/
-
-                //===============This one is for datatable======================================================//
-                //DataTable table = new DataTable();
-                //table.Columns.Add("Parameters", typeof(string));
-                //table.Columns.Add("Units", typeof(string));
-                //table.Columns.Add(temporaryNodeValueStoreForRedrawLine[0].name.ToString(), typeof(string));
-                //table.Columns.Add(temporaryNodeValueStoreForRedrawLine[1].name.ToString(), typeof(string));
-
-                //table.Rows.Add("DBT", "\x00B0 C", Math.Round(temporaryNodeValueStoreForRedrawLine[0].xVal, 2).ToString(), Math.Round(temporaryNodeValueStoreForRedrawLine[1].xVal, 2).ToString());
-                //table.Rows.Add("Relative Humidity", "%  ", startHumidity1.ToString(), endHumidity1.ToString());
-                //table.Rows.Add("Humidity Ratio", "Kg/Kg dryair", Math.Round(temporaryNodeValueStoreForRedrawLine[0].yVal, 2).ToString(), Math.Round(temporaryNodeValueStoreForRedrawLine[1].yVal, 2).ToString());
-                //table.Rows.Add("Volume flow rate", "m\xB3/s ", Math.Round(temporaryNodeValueStoreForRedrawLine[0].airFlow, 2).ToString(), Math.Round(temporaryNodeValueStoreForRedrawLine[1].airFlow, 2).ToString());
-                //table.Rows.Add("Sp. Volume", "m\xB3/Kg", startSpecificVolume1.ToString(), endSpecificVolume1.ToString());
-                //table.Rows.Add("Mass Flow rate(dry air)", "Kg(dry air)/s", Math.Round(massFlowRate1, 2).ToString(), Math.Round(massFlowRate2, 2).ToString());
-                //table.Rows.Add("Enthalpy", "KJ/Kg ", startEnthalpy1.ToString(), endEnthalpy1.ToString());
-                //table.Rows.Add("Total Energy Flow", "KJ/s", Math.Round(totalEnthalpyFlow1, 2).ToString(), Math.Round(totalEnthalpyFlow2, 2).ToString());
-                //table.Rows.Add("Heat Change", "KW ", Math.Round(heatChange, 2).ToString(), "");
-                // MessageBox.Show("Table \n" + table.Columns[2].Rows[3].ToString());
-                //tooltipString = table.ToString();
-                //================================datatable close==============================================//
-                if (chart1.InvokeRequired)
+               if (chart1.InvokeRequired)
                 {
 
                     chart1.Invoke(new Action(() => newLineSeries.ToolTip = tooltipString));
@@ -3789,7 +3792,7 @@ namespace PH_App
             atimer = new System.Timers.Timer();
             atimer.Enabled = true;
             atimer.Elapsed += timer1_Tick_For_Device;
-            atimer.Interval = 1000 * 15; //x seconds[ 1000 ms * x  =  x seconds]
+            atimer.Interval = 1000 * 5; //x seconds[ 1000 ms * x  =  x seconds]
 
         }
 
@@ -3812,11 +3815,7 @@ namespace PH_App
                         frm1.backgroundWorker1.RunWorkerAsync();//--Running the worker async
                        // MessageBox.Show("Run worker async");
                     }
-                    //else
-                    //{
-                    //    //cancelling background worker
-                    //    frm1.backgroundWorker1.CancelAsync();
-                    //}
+                  
                 }
             }
             catch (Exception ex)
@@ -4437,7 +4436,7 @@ namespace PH_App
                         flagForCompletingBG = 0;
                         if (f1.InvokeRequired)
                         {
-                            // MessageBox.Show("Let me crash in here");
+                            //MessageBox.Show("Let me crash in here");
                             f1.Invoke(new MethodInvoker(RefreshGraphForBGW_Complete));
                         }
                         else
@@ -4535,11 +4534,11 @@ namespace PH_App
         List<StoreTempPressureValue> listPressureHardwareValue = new List<StoreTempPressureValue>();
 
         // int countTime = 0;
-      public  int flagForCompletingDataPullForBG = 0;
+        public int flagForCompletingDataPullForBG = 1;
         public int flagForCompletingBG = 1;//1 means on
         public void RefreshDataFromDeviceAndWeb(Form_Main_PH_Application f1)
         {
-         
+
             // lock (menuStripNodeInfoValues)
             // {
 
@@ -4560,11 +4559,20 @@ namespace PH_App
             3.call plot fxn
             */
             //Read 
-            if(flagForCompletingBG == 0)
-            {
-                return;
-            }
+            //--This one is for not going forward if previous work is not completed 
+            //MessageBox.Show("High ");
+            //if (flagForCompletingDataPullForBG == 0)
+            //{
+            //    return;
+            //}
+            //MessageBox.Show("Low");
+            //if (flagForCompletingBG == 0)
+            //{
+            //    return;
+            //}
+           
           
+
             if (FlagForStopingRunningProcessInstantly == 1)
             {
                 //if it is commanded to stop then stop here;
@@ -4586,7 +4594,7 @@ namespace PH_App
                 listTemperatureHardwareValue.Clear();//empty the list
                 listPressureHardwareValue.Clear();
                 bool commumicationSuccesValue = BacnetCommunicationRequest();//Communication request
-                //MessageBox.Show("dev connected or not = "+commumicationSuccesValue);
+               // MessageBox.Show("dev connected or not = "+commumicationSuccesValue);
                 //--*****************************From here commented the code for alex db****************--//
                 foreach (var node in listNodeInfoValues)
                 {
@@ -4614,28 +4622,49 @@ namespace PH_App
                         2.based on panel id value calculate the x and y coordinate.
                         3.Update the database value.
                         */
-                        //  MessageBox.Show("node name= " + node.name);
+                    
                         ReadDeviceInfoForNode(node.ID);
                         //
                         //Here we will check for the device parameter id values
-
-                        if (CheckDeviceOnlineOffline(int.Parse(device_info_list[0].device_instance_id_for_param1), 0) == true)
+                        //
+                        bool retValue = CheckDeviceOnlineOffline(int.Parse(device_info_list[0].device_instance_id_for_param1), 0);
+                        //MessageBox.Show("node name= " + node.name + "\ndevice_info_list.count= " + device_info_list.Count + "\nValue = " + device_info_list[0].device_instance_id_for_param1+"\nretvalue = "+retValue);
+                        if (retValue == true)
                         {
 
                             //online mode...
                             //2nd step calc x and y
-                          // MessageBox.Show("Hi");
-                            //The value will always be unique and always be in the 0 index  
+                           // MessageBox.Show("Hi,device_info_list.count= "+ device_info_list.Count);
+                            //The value will always be unique and always be in the 0 index 
+                             
                             if (device_info_list[0].param1_info == "temp")
                             {
                                 //This meand the value is humidity and temperature so we process like wise
                                 //This gets the value
                                // MessageBox.Show("Hi ,com" + commumicationSuccesValue);
                                 if (commumicationSuccesValue == false) { return; } //If no communication then return
+
+                                if (f1.lbTest2.InvokeRequired)
+                                {
+                                    f1.lbTest2.Invoke(new Action(() => f1.lbTest2.Text = "AboveReaddata"));
+                                }
+                                else
+                                {
+                                    f1.lbTest2.Text = "AboveReaddata ";
+                                }
+
                                 double returnTemperatureValue = ReadDataFromDeviceForTemperature(int.Parse(device_info_list[0].device_instance_id_for_param1), uint.Parse(device_info_list[0].param1_id), device_info_list[0].param1_identifier_type);
                                 //we have recent value in hardwareValue1 and hardwareValue2 so lets calc corresponding x and y value
                                 //now temp itself is x value we need to calculate y value
                                 // if ((hardwareValue1.ToString() == null || hardwareValue1 == 0.00) || (hardwareValue2.ToString() == null || hardwareValue2 == 0.00))
+                                if (f1.lbTest2.InvokeRequired)
+                                {
+                                    f1.lbTest2.Invoke(new Action(() => f1.lbTest2.Text = "Below+TempValue="+ returnTemperatureValue));
+                                }
+                                else
+                                {
+                                    f1.lbTest2.Text = "Below "+ returnTemperatureValue;
+                                }
                                 if ((returnTemperatureValue.ToString() == null || (returnTemperatureValue <= 0.00 || returnTemperatureValue > 1000)))
                                 {
                                     // return;
@@ -4672,7 +4701,14 @@ namespace PH_App
                                     f1.lb_device_status.Text = "connected";
                                 }
 
-                       
+                                if (f1.lbTest2.InvokeRequired)
+                                {
+                                    f1.lbTest2.Invoke(new Action(() => f1.lbTest2.Text ="Name="+node.name+",Temp = "+ returnTemperatureValue));
+                                }
+                                else
+                                {
+                                    f1.lbTest2.Text = "Temp = " + returnTemperatureValue;
+                                }
                             }                           
                         }
                         else
@@ -4719,7 +4755,14 @@ namespace PH_App
                                 double pressureValue=    ReadDataFromDeviceForPressure(int.Parse(device_info_list[0].device_instance_id_for_param2), uint.Parse(device_info_list[0].param2_id), device_info_list[0].param2_identifier_type);
                                 //we have recent value in hardwareValue1 and hardwareValue2 so lets calc corresponding x and y value
                                 //now temp itself is x value we need to calculate y value
-
+                                if (f1.lbTest2.InvokeRequired)
+                                {
+                                    f1.lbTest2.Invoke(new Action(() => f1.lbTest2.Text = "pressure=" + pressureValue));
+                                }
+                                else
+                                {
+                                    f1.lbTest2.Text = "pressure " + pressureValue;
+                                }
                                 // if ((hardwareValue1.ToString() == null || hardwareValue1 == 0.00) || (hardwareValue2.ToString() == null || hardwareValue2 == 0.00))
                                 if ((pressureValue.ToString() == null || (pressureValue <= 0.00 || pressureValue > 14504)))
                                 {

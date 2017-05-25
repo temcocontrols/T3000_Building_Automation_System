@@ -171,6 +171,12 @@
     <Compile Include="Matrix3.cs" />
     <Compile Include="MeshGridClass.cs" />
     <Compile Include="ObjectCollection.cs" />
+    <Compile Include="PHCalculator.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PHCalculator.Designer.cs">
+      <DependentUpon>PHCalculator.cs</DependentUpon>
+    </Compile>
     <Compile Include="PHChartGlobalVariables.cs" />
     <Compile Include="platform-independent\AbstractState.cs" />
     <Compile Include="platform-independent\backends.cs" />
@@ -273,6 +279,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Form_TemperatureInput.zh-Hans-HK.resx">
       <DependentUpon>Form_TemperatureInput.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PHCalculator.resx">
+      <DependentUpon>PHCalculator.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
