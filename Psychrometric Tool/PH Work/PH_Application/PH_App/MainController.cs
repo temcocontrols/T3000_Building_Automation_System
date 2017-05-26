@@ -3743,9 +3743,11 @@ namespace PH_App
                 // string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
 
+                //string imagePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                //string newPath = Path.GetFullPath(Path.Combine(imagePath, @"..\"));
+                //string file = newPath + @"Database\image\lock.png";
                 string imagePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                string newPath = Path.GetFullPath(Path.Combine(imagePath, @"..\"));
-                string file = newPath + @"Database\image\lock.png";
+                string file = imagePath + @"\image\lock.png";
                 // MessageBox.Show(file);
 
                 Bitmap SOME = new Bitmap(Image.FromFile(file));
@@ -3766,9 +3768,11 @@ namespace PH_App
                 //--Load image lock image
                 // string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
+                //string imagePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                //string newPath = Path.GetFullPath(Path.Combine(imagePath, @"..\"));
+                //string file = newPath + @"Database\image\unlock.png";
                 string imagePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                string newPath = Path.GetFullPath(Path.Combine(imagePath, @"..\"));
-                string file = newPath + @"Database\image\unlock.png";
+                string file = imagePath + @"\image\unlock.png";
 
                 Bitmap SOME = new Bitmap(Image.FromFile(file));
                 Bitmap bp = new Bitmap(SOME, f.pb_lock_unlock.Width, f.pb_lock_unlock.Height);
