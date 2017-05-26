@@ -575,6 +575,7 @@
     <ClInclude Include="fileRW.h" />
     <ClInclude Include="Flash_Multy.h" />
     <ClInclude Include="gloab_define.h" />
+    <ClInclude Include="global_define.h" />
     <ClInclude Include="global_function.h" />
     <ClInclude Include="global_struct.h" />
     <ClInclude Include="GraphicMode.h" />

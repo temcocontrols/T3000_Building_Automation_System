@@ -118,6 +118,11 @@ void CBADO::SetDBPath(CString dbpath)
 	m_dbfilepath = dbpath;
 }
 
+/// <summary>
+/// according to select sql ,to get the record set.
+/// </summary>
+/// <param name="sql"></param>
+/// <returns></returns>
 _RecordsetPtr& CBADO::OpenRecordset(CString sql)
 {
 	ASSERT(!sql.IsEmpty());
@@ -134,6 +139,9 @@ _RecordsetPtr& CBADO::OpenRecordset(CString sql)
 	return m_pRecordset;
 }
 
+/// <summary>
+/// close record set
+/// </summary>
 void CBADO::CloseRecordset()
 {
 	if (m_pRecordset->State)
@@ -142,6 +150,10 @@ void CBADO::CloseRecordset()
 	}
 }
 
+
+/// <summary>
+/// close the connection
+/// </summary>
 void CBADO::CloseConn()
 {
 	if (m_pConnection->State)
@@ -152,6 +164,11 @@ void CBADO::CloseConn()
 	::CoUninitialize();
 }
 
+/// <summary>
+/// according to recordset ,to calculate how many records in one search
+/// </summary>
+/// <param name="pRecordset"></param>
+/// <returns></returns>
 UINT CBADO::GetRecordCount(_RecordsetPtr pRecordset)
 {
 	int nCount = 0;
@@ -180,6 +197,12 @@ UINT CBADO::GetRecordCount(_RecordsetPtr pRecordset)
 	return nCount;
 }
 
+
+
+/// <summary>
+/// According to Sql ,to excute 
+/// </summary>
+/// <param name="strSQL"></param>
 void CBADO::Createtable(CString strSQL)
 {
 	CBADO m_ado;
@@ -241,6 +264,13 @@ bool CBADO::IsHaveTable(CBADO ado, CString strTableName)
 	}
 }
 
+
+/// <summary>  
+/// Rename Database Table by the function .
+/// </summary> 
+/// <param name="TableName_Old"></param>
+/// <param name="TableName_New"></param>
 void CBADO::RenameTable(CString TableName_Old, CString TableName_New)
 {
+
 }

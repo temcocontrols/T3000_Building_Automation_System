@@ -397,6 +397,10 @@ void CT3000View::UpdateNightControls()
  
 }
 
+
+/// <summary>
+/// Create Sliders, and then initial the two sliders.
+/// </summary>
 void CT3000View::CreateFlexSilde()
 {
 	m_nightSlider.SetRange(50, -50);
@@ -456,6 +460,10 @@ void CT3000View::OnFileOpen()
 
 }
 
+
+/// <summary>
+/// Fresh : it will load all windows ,and show some settings ,according to different devices.
+/// </summary>
 void CT3000View::Fresh()
 {
     CMainFrame* pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
@@ -599,6 +607,13 @@ void CT3000View::Fresh()
 	}
 }
 
+
+/// <summary>
+/// Fresh_T3000View
+/// <summary>
+/// Fresh the window
+/// </summary>
+/// </summary>
 void CT3000View::Fresh_T3000View()
 {
     int  Fresh_Min=(short)product_register_value[MODBUS_MIN_SETPOINT];
@@ -1087,6 +1102,8 @@ void CT3000View::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
     CFormView::OnVScroll(nSBCode, nPos, pScrollBar);
 }
 
+
+// Fresh input table
 void CT3000View::Fresh_In()
 {
 
@@ -1806,7 +1823,7 @@ void CT3000View::Fresh_In()
 
 
 
-
+//Fresh output table
 void CT3000View::Fresh_Out()
 {
 //	Savetmp_Mdb_Adress_Map();
@@ -2338,6 +2355,8 @@ void CT3000View::Fresh_Out()
 }
 
 
+
+// Fresh input ,output , grid table 
 void CT3000View::FreshIOGridTable()
 {
     if(::GetFocus()==m_outNameEdt.m_hWnd)
@@ -2540,6 +2559,8 @@ void CT3000View::FreshIOGridTable()
 
 
 }
+
+// load input ,output tables about tstat3
 void CT3000View::FreshIOGridTable_Tstat6()
 {
     m_Input_Grid.put_Rows(13);
@@ -2669,7 +2690,6 @@ void CT3000View::ClickInputMsflexgrid()
 
 
 }
-
 void CT3000View::ClickOutputMsflexgrid()
 {
     long lRow,lCol;

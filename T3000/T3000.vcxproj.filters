@@ -1764,6 +1764,9 @@
     <ClInclude Include="global_function.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="global_define.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="T3000.rc">

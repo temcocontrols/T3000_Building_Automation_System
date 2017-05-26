@@ -46,14 +46,10 @@ BOOL CZigbeeInformationDlg::OnInitDialog()
 	CString strTemp;
 	if ((product_register_value[7] == PM_TSTAT6 || product_register_value[7] == PM_TSTAT8
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
-		) && product_register_value[MODBUS_RS485_MODE] == 1)
+		) )
 	{
 
-		WINDOWPLACEMENT wp;
-		GetWindowPlacement(&wp);
-		wp.rcNormalPosition.left += 120;
-		SetWindowPlacement(&wp);
-		GetDlgItem(IDC_STATIC_SPLIT_WINDOW)->ShowWindow(SW_NORMAL);
+		
 
 		GetDlgItem(IDC_STATIC_ZIGBEE_INFORMATION)->ShowWindow(SW_SHOW);
 		GetDlgItem(IDC_STATIC_ZIGBEE_ID)->ShowWindow(SW_SHOW);

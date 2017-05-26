@@ -16,7 +16,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 中文(简体，中国) resources
+// Chinese (Simplified, PRC) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
@@ -6542,12 +6542,12 @@ BEGIN
     ID_BUILDINGCONFIGDB     "BuildingConfig"
 END
 
-#endif    // 中文(简体，中国) resources
+#endif    // Chinese (Simplified, PRC) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// 英语(美国) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
@@ -7093,8 +7093,8 @@ BEGIN
     EDITTEXT        IDC_STINCREAEDIT,163,43,48,12,ES_AUTOHSCROLL
     LTEXT           "Powerup Setpoint",IDC_STATIC_POWERUPSETPPONT,214,44,59,11
     EDITTEXT        IDC_POWSETPOMITEDIT,278,41,48,12,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "heat/cool changeover",IDC_STATIC_HT_CHANGEOVER,189,78,37,18,0,WS_EX_RIGHT
-    COMBOBOX        IDC_HCCHANGECOMBO,232,81,48,30,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "heat/cool change over",IDC_STATIC_HT_CHANGEOVER,185,78,41,20,0,WS_EX_RIGHT
+    COMBOBOX        IDC_HCCHANGECOMBO,239,81,64,30,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Default",IDC_STATIC_GROUP_DEFAULT,557,47,24,9
     EDITTEXT        IDC_DEF_SETPOINT_EDT,587,44,55,12,ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "Mode",IDC_STATIC_GROUP_MODE,556,34,21,8,0,WS_EX_RIGHT
@@ -7227,9 +7227,9 @@ BEGIN
     EDITTEXT        IDC_INPUTVALUE3_PID3,113,307,40,12,ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER
     PUSHBUTTON      "Airflow Setting",IDC_AIRFLOW_SETTING,348,244,58,14
     CONTROL         "",IDC_STATIC_SEPERATOR,"Static",SS_BLACKFRAME,7,343,558,1
-    EDITTEXT        IDC_EDIT_BACKLIGHT_TIME,624,60,31,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_BACKLIGHT_TIME,624,60,37,14,ES_AUTOHSCROLL
     LTEXT           "BackLight OFF Time",IDC_STATIC,555,63,63,8
-    LTEXT           "min",IDC_STATIC,660,63,12,8
+    LTEXT           "min",IDC_STATIC,665,63,12,8
     CONTROL         "Ocuppied Sensor Enable",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,405,70,92,14
     LTEXT           "Occupied Timer:",IDC_STATIC,401,87,52,8,NOT WS_VISIBLE
     EDITTEXT        IDC_EDIT_OCCUPIED_TIMER,454,85,48,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
@@ -7249,8 +7249,8 @@ BEGIN
     EDITTEXT        IDC_EDIT_TRANDUCER_MAX,320,135,35,12,ES_AUTOHSCROLL
     LTEXT           "Min",IDC_STATIC,386,136,12,8
     EDITTEXT        IDC_EDIT_TRANDUCER_MIN,404,134,35,12,ES_AUTOHSCROLL
-    LTEXT           "Change over delay(min)",IDC_STATIC,282,78,42,18
-    EDITTEXT        IDC_EDIT_CHANGE_OVER_TIME,328,81,40,14,ES_AUTOHSCROLL
+    LTEXT           "Change over delay(min)",IDC_STATIC,307,78,42,18
+    EDITTEXT        IDC_EDIT_CHANGE_OVER_TIME,353,81,40,14,ES_AUTOHSCROLL
     LTEXT           "Name:",IDC_STATIC_NAME_TSTAT,37,3,22,8
     EDITTEXT        IDC_EDIT_TSTAT_NAME,67,0,174,14,ES_AUTOHSCROLL
     LTEXT           "Modbus Reply Delay",IDC_STATIC,347,279,66,8,NOT WS_VISIBLE
@@ -7259,7 +7259,7 @@ BEGIN
     PUSHBUTTON      "Apply",IDC_BUTTON_APPLY_ALL,492,300,84,24
     EDITTEXT        IDC_EDIT_SHOWID,414,292,58,16,ES_AUTOHSCROLL | NOT WS_VISIBLE
     LTEXT           "Show Modbus ID",IDC_STATIC,353,296,54,8,NOT WS_VISIBLE
-    PUSHBUTTON      "Show Modbus ID",IDC_BUTTON_SHOW_MODBUS_ID,350,308,121,17
+    PUSHBUTTON      "Display Network ID on Device LCD",IDC_BUTTON_SHOW_MODBUS_ID,350,308,121,17
     EDITTEXT        IDC_EDIT_TEST,581,274,40,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
 END
 
@@ -8711,12 +8711,12 @@ BEGIN
 0x4e49, 0x0038, 
     IDC_COMBO_LCDSCRN2, 0x403, 5, 0
 0x6f4d, 0x6564, "\000" 
-    IDC_COMBO_ROUNDDIS, 0x403, 13, 0
-0x656e, 0x7261, 0x7365, 0x2074, 0x6e75, 0x7469, "\000" 
-    IDC_COMBO_ROUNDDIS, 0x403, 7, 0
-0x6f6e, 0x6d72, 0x6c61, "\000" 
-    IDC_COMBO_ROUNDDIS, 0x403, 9, 0
-0x2f31, 0x2032, 0x6e75, 0x7469, "\000" 
+    IDC_COMBO_ROUNDDIS, 0x403, 4, 0
+0x2e31, 0x0030, 
+    IDC_COMBO_ROUNDDIS, 0x403, 4, 0
+0x2e30, 0x0035, 
+    IDC_COMBO_ROUNDDIS, 0x403, 4, 0
+0x2e30, 0x0031, 
     IDC_COMBO1, 0x403, 7, 0
 0x6953, 0x676e, 0x656c, "\000" 
     IDC_COMBO1, 0x403, 5, 0
@@ -9639,6 +9639,7 @@ BEGIN
         MENUITEM "Load firmware for many devices [Ctrl+M]", ID_FILE_BATCHBURNHEX
         MENUITEM "Flash SN",                    ID_TOOL_FLASHSN
         MENUITEM "Psychrometry",                ID_TOOLS_PSYCHROMETRY
+        MENUITEM "PH Chart",                    ID_TOOLS_PHCHART
         MENUITEM "Option",                      ID_TOOLS_OPTION
         MENUITEM "&DisConnect \tCtrl+D",        ID_DISCONNECT2
     END
@@ -10114,12 +10115,12 @@ BEGIN
     ID_BUILDINGCONFIGDB     "Show building config"
 END
 
-#endif    // 英语(美国) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// 英语(英国) resources
+// English (United Kingdom) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
@@ -10225,7 +10226,7 @@ BEGIN
     0
 END
 
-#endif    // 英语(英国) resources
+#endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

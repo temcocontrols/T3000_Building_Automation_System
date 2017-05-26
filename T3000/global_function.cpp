@@ -12982,6 +12982,14 @@ bool Save_OutputData_to_db(unsigned char  temp_output_index, unsigned int nseria
 	SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 	SqliteDBBuilding.closedb();
 }
+
+
+/// <summary>
+/// Save_VariableData_to_db
+/// </summary>
+/// <param name="temp_output_index"></param>
+/// <param name="nserialnumber"></param>
+/// <returns></returns>
 bool Save_VariableData_to_db(unsigned char  temp_output_index, unsigned int nserialnumber)
 {
 	CString strPanel;

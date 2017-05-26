@@ -183,7 +183,11 @@ public:
     
 
  
-
+	/*  
+	 *  something about slider
+	 *  1.if you want to use the slider 
+  
+	*/ 
 	CSliderControl0  m_nightSlider;
 	CSliderControl0  m_daySlider;
 

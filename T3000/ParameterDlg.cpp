@@ -349,216 +349,217 @@ DWORD WINAPI BackparaFreshProc(LPVOID pParam)
 
 BOOL CParameterDlg::OnInitDialog()
 {
-    //20120420
-    //pProgess = new CDialog_Progess(this,1,10);
-    //创建对话框窗口
+	//20120420
+	//pProgess = new CDialog_Progess(this,1,10);
+	//创建对话框窗口
 
 
-    //居中显示
-    //	pProgess->CenterWindow();//2.5.0.98
+	//居中显示
+	//	pProgess->CenterWindow();//2.5.0.98
 
-    //显示对话框窗口
+	//显示对话框窗口
 
-    //20120420
+	//20120420
 
-    //2.5.0.98
+	//2.5.0.98
 //	gGetDialogStrings(this->m_hWnd,IDD_PARAMETERDIALOG);
 
-    CMainFrame* pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
+	CMainFrame* pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
 
-    RECT RECT_SET1;
-    pMain->GetClientRect(&RECT_SET1);
+	RECT RECT_SET1;
+	pMain->GetClientRect(&RECT_SET1);
 
-    CDialog::OnInitDialog();
+	CDialog::OnInitDialog();
 
 
-    if (product_register_value[7]==PM_TSTAT8
+	if (product_register_value[7] == PM_TSTAT8
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 		)
-    {
-        m_braudRateCombox.ResetContent();
-        m_braudRateCombox.AddString(L"9600");
-        m_braudRateCombox.AddString(L"19200");
-        m_braudRateCombox.AddString(L"38400");
-        m_braudRateCombox.AddString(L"57600");
-        m_braudRateCombox.AddString(L"115200");
+	{
+		m_braudRateCombox.ResetContent();
+		m_braudRateCombox.AddString(L"9600");
+		m_braudRateCombox.AddString(L"19200");
+		m_braudRateCombox.AddString(L"38400");
+		m_braudRateCombox.AddString(L"57600");
+		m_braudRateCombox.AddString(L"115200");
 
-    }
-    else
-    {
-        m_braudRateCombox.ResetContent();
-        m_braudRateCombox.AddString(L"9600");
-        m_braudRateCombox.AddString(L"19200");
-    }
+	}
+	else
+	{
+		m_braudRateCombox.ResetContent();
+		m_braudRateCombox.AddString(L"9600");
+		m_braudRateCombox.AddString(L"19200");
+	}
 
-    m_gUnit.AddString(_T("°C"));
-    m_gUnit.AddString(_T("°F"));
-
-
- 
-
-    if(g_ParamLevel==1)
-    {
-        CAfxMessageDialog dlg;
-        CString strPromption;
-        strPromption.LoadString(IDS_STRNOPRIVILEGE);
-        dlg.SetPromtionTxt(strPromption);
-        dlg.DoModal();
-    }
-   // m_idAdressEdit.EnableWindow(FALSE);
-
-
-    if(product_register_value[MODBUS_MODE_OUTPUT4]==2)//283
-    {
-        write_one(g_tstat_id,MODBUS_TIMER_SELECT,3);//327
-        CStatic* ptimerout=(CStatic*)GetDlgItem(IDC_TIMERON_STATIC);
-        ptimerout->SetWindowText(_T("Out4"));
-    }
-    else
-    {
-        CStatic* ptimerout=(CStatic*)GetDlgItem(IDC_TIMERON_STATIC);
-        ptimerout->SetWindowText(_T("Timer On"));
-    }
-//     m_combox_setpointdisplay.ResetContent();
-//     m_combox_setpointdisplay.AddString(_T("Temperature "));
-//     m_combox_setpointdisplay.AddString(_T("Co2"));
-//     m_combox_setpointdisplay.AddString(_T("Hum"));
-    // initialize PID2 combo box
-//     if (product_register_value[704]>=0&&product_register_value[704]<=2)
-//     {
-//         m_combox_setpointdisplay.SetCurSel(product_register_value[704]);
-//     }
-//     else
-//     {
-//         m_combox_setpointdisplay.SetCurSel(0);
-//     }
-
-    InitPID2ComboBox();
-
-    //Refresh();//Changed by Fance ,When initial the dialog ,it should be mapping by the product.
-    ////if ((strparamode.CompareNoCase(_T("Tstat6")) == 0)||(strparamode.CompareNoCase(_T("Tstat7")) == 0))
-    ////	Refresh6();
-    ////else
-    ////	Refresh();
-
-
-
-    if(hFirstThread != NULL)
-        TerminateThread(hFirstThread, 0);
-    hFirstThread=NULL;
-    if (!hFirstThread)
-    {
-        hFirstThread = CreateThread(NULL,NULL,BackparaFreshProc,this,NULL,0);
-    }
-    // pParamBackFresh = AfxBeginThread(BackparaFreshProc,this);
-    //pParamBackFresh->m_bAutoDelete =FALSE;
+	m_gUnit.AddString(_T("°C"));
+	m_gUnit.AddString(_T("°F"));
 
 
 
 
+	if (g_ParamLevel == 1)
+	{
+		CAfxMessageDialog dlg;
+		CString strPromption;
+		strPromption.LoadString(IDS_STRNOPRIVILEGE);
+		dlg.SetPromtionTxt(strPromption);
+		dlg.DoModal();
+	}
+	// m_idAdressEdit.EnableWindow(FALSE);
 
 
-    // #define  DaySP		0  //address 345
-    // #define  DcoolDB	1  //address 346
-    // #define  DheatDB	2  //address 347
-    // #define  DcoolSP	3  //address 348
-    // #define  DheatSP	4  //address 349
-    // #define  NightSP	5  //address 350
-    // #define  NheatDB	6  //address 352
-    // #define  NcoolDB	7  //address 353
-    // #define  NheatSP	8  //address 354
-    // #define  NcoolSP	9  //address 355
-    // #define  Max		10  //address 365
-    // #define  Min		11  //address 366
+	if (product_register_value[MODBUS_MODE_OUTPUT4] == 2)//283
+	{
+		write_one(g_tstat_id, MODBUS_TIMER_SELECT, 3);//327
+		CStatic* ptimerout = (CStatic*)GetDlgItem(IDC_TIMERON_STATIC);
+		ptimerout->SetWindowText(_T("Out4"));
+	}
+	else
+	{
+		CStatic* ptimerout = (CStatic*)GetDlgItem(IDC_TIMERON_STATIC);
+		ptimerout->SetWindowText(_T("Timer On"));
+	}
+	//     m_combox_setpointdisplay.ResetContent();
+	//     m_combox_setpointdisplay.AddString(_T("Temperature "));
+	//     m_combox_setpointdisplay.AddString(_T("Co2"));
+	//     m_combox_setpointdisplay.AddString(_T("Hum"));
+		// initialize PID2 combo box
+	//     if (product_register_value[704]>=0&&product_register_value[704]<=2)
+	//     {
+	//         m_combox_setpointdisplay.SetCurSel(product_register_value[704]);
+	//     }
+	//     else
+	//     {
+	//         m_combox_setpointdisplay.SetCurSel(0);
+	//     }
 
-   
+	InitPID2ComboBox();
 
-    //Setting the refresh button,add by Fan
-    HICON hIcon = NULL;
-    HINSTANCE hInstResource    = NULL;
-    hInstResource = AfxFindResourceHandle(MAKEINTRESOURCE(IDI_ICON_REFRESH), RT_GROUP_ICON);
-    hIcon = (HICON)::LoadImage(hInstResource, MAKEINTRESOURCE(IDI_ICON_REFRESH), IMAGE_ICON, 16, 16, 0);
-    ((CButton *)GetDlgItem(IDC_REFRESHBUTTON))->SetIcon(hIcon);
-
-    m_brush.CreateSolidBrush(RGB(255,0,0));
-
-
-    if (product_type == T3000_6_ADDRESS)
-    {
-        INPUT_SETTING[3] = g_strInName1;
-        INPUT_SETTING[4] = g_strInName2;
-        INPUT_SETTING[5] = g_strInName3;
-        INPUT_SETTING[6] = g_strInName4;
-        INPUT_SETTING[7] = g_strInName5;
-        INPUT_SETTING[8] = g_strInName6;
-        INPUT_SETTING[9] = g_strInName7;
-        INPUT_SETTING[10] = g_strInName8;
+	//Refresh();//Changed by Fance ,When initial the dialog ,it should be mapping by the product.
+	////if ((strparamode.CompareNoCase(_T("Tstat6")) == 0)||(strparamode.CompareNoCase(_T("Tstat7")) == 0))
+	////	Refresh6();
+	////else
+	////	Refresh();
 
 
-        if((product_register_value[20]&2)!=2)
-        {
-            INPUT_SETTING[11] = _T("Spare");
-        }
 
-        if((product_register_value[MODBUS_TSTAT6_CO2_AVALUE]>=0)&&(product_register_value[MODBUS_TSTAT6_CO2_AVALUE]<=3000))
-        {
-            //  m_disable_CO2=TRUE;
-        }
-        else
-        {
-            //m_disable_CO2=FALSE;
-            INPUT_SETTING[12] = _T("Spare");
-        }
+	if (hFirstThread != NULL)
+		TerminateThread(hFirstThread, 0);
+	hFirstThread = NULL;
+	if (!hFirstThread)
+	{
+		hFirstThread = CreateThread(NULL, NULL, BackparaFreshProc, this, NULL, 0);
+	}
+	// pParamBackFresh = AfxBeginThread(BackparaFreshProc,this);
+	//pParamBackFresh->m_bAutoDelete =FALSE;
 
 
-        INPUT_SETTING_T7[3] = g_strInName1;
-        INPUT_SETTING_T7[4] = g_strInName2;
-        INPUT_SETTING_T7[5] = g_strInName3;
-        INPUT_SETTING_T7[6] = g_strInName4;
-        INPUT_SETTING_T7[7] = g_strInName5;
-        INPUT_SETTING_T7[8] = g_strInName6;
-        INPUT_SETTING_T7[9] = g_strInName7;
-        INPUT_SETTING_T7[10] =g_strInName8;
 
-    }
 
-    if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8
+
+
+	// #define  DaySP		0  //address 345
+	// #define  DcoolDB	1  //address 346
+	// #define  DheatDB	2  //address 347
+	// #define  DcoolSP	3  //address 348
+	// #define  DheatSP	4  //address 349
+	// #define  NightSP	5  //address 350
+	// #define  NheatDB	6  //address 352
+	// #define  NcoolDB	7  //address 353
+	// #define  NheatSP	8  //address 354
+	// #define  NcoolSP	9  //address 355
+	// #define  Max		10  //address 365
+	// #define  Min		11  //address 366
+
+
+
+	//Setting the refresh button,add by Fan
+	HICON hIcon = NULL;
+	HINSTANCE hInstResource = NULL;
+	hInstResource = AfxFindResourceHandle(MAKEINTRESOURCE(IDI_ICON_REFRESH), RT_GROUP_ICON);
+	hIcon = (HICON)::LoadImage(hInstResource, MAKEINTRESOURCE(IDI_ICON_REFRESH), IMAGE_ICON, 16, 16, 0);
+	((CButton *)GetDlgItem(IDC_REFRESHBUTTON))->SetIcon(hIcon);
+
+	m_brush.CreateSolidBrush(RGB(255, 0, 0));
+
+
+	if (product_type == T3000_6_ADDRESS)
+	{
+		INPUT_SETTING[3] = g_strInName1;
+		INPUT_SETTING[4] = g_strInName2;
+		INPUT_SETTING[5] = g_strInName3;
+		INPUT_SETTING[6] = g_strInName4;
+		INPUT_SETTING[7] = g_strInName5;
+		INPUT_SETTING[8] = g_strInName6;
+		INPUT_SETTING[9] = g_strInName7;
+		INPUT_SETTING[10] = g_strInName8;
+
+
+		if ((product_register_value[20] & 2) != 2)
+		{
+			INPUT_SETTING[11] = _T("Spare");
+		}
+
+		if ((product_register_value[MODBUS_TSTAT6_CO2_AVALUE] >= 0) && (product_register_value[MODBUS_TSTAT6_CO2_AVALUE] <= 3000))
+		{
+			//  m_disable_CO2=TRUE;
+		}
+		else
+		{
+			//m_disable_CO2=FALSE;
+			INPUT_SETTING[12] = _T("Spare");
+		}
+
+
+		INPUT_SETTING_T7[3] = g_strInName1;
+		INPUT_SETTING_T7[4] = g_strInName2;
+		INPUT_SETTING_T7[5] = g_strInName3;
+		INPUT_SETTING_T7[6] = g_strInName4;
+		INPUT_SETTING_T7[7] = g_strInName5;
+		INPUT_SETTING_T7[8] = g_strInName6;
+		INPUT_SETTING_T7[9] = g_strInName7;
+		INPUT_SETTING_T7[10] = g_strInName8;
+
+	}
+
+	if (product_register_value[7] == PM_TSTAT5i || product_register_value[7] == PM_TSTAT6 || product_register_value[7] == PM_TSTAT7 || product_register_value[7] == PM_TSTAT8
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 		)
-    {
-        m_InputSelect1.ResetContent();
-        m_inputSelect2.ResetContent();
-        m_inputSelect3.ResetContent();
-        for (int i=0; i<NUM_INPUT_SETTING; i++)
-        {
-            m_InputSelect1.AddString(INPUT_SETTING[i]);
-            m_inputSelect2.AddString(INPUT_SETTING[i]);
-            m_inputSelect3.AddString(INPUT_SETTING[i]);
-        }
-    }
-    if (product_register_value[7]==PM_TSTAT7)
-    {
-        m_InputSelect1.ResetContent();
-        m_inputSelect2.ResetContent();
+	{
+		m_InputSelect1.ResetContent();
+		m_inputSelect2.ResetContent();
+		m_inputSelect3.ResetContent();
+		for (int i = 0; i < NUM_INPUT_SETTING; i++)
+		{
+			m_InputSelect1.AddString(INPUT_SETTING[i]);
+			m_inputSelect2.AddString(INPUT_SETTING[i]);
+			m_inputSelect3.AddString(INPUT_SETTING[i]);
+		}
+	}
+	if (product_register_value[7] == PM_TSTAT7)
+	{
+		m_InputSelect1.ResetContent();
+		m_inputSelect2.ResetContent();
 
-        for (int i=0; i<NUM_INPUT_SETTING_T7; i++)
-        {
-            m_InputSelect1.AddString(INPUT_SETTING_T7[i]);
-            m_inputSelect2.AddString(INPUT_SETTING_T7[i]);
+		for (int i = 0; i < NUM_INPUT_SETTING_T7; i++)
+		{
+			m_InputSelect1.AddString(INPUT_SETTING_T7[i]);
+			m_inputSelect2.AddString(INPUT_SETTING_T7[i]);
 
-        }
-    }
-    //ShowPID3();
-    m_keyLockCombox.AddString(_T("Lock Off"));
-    m_keyLockCombox.AddString(_T("FAN.SP UNLOCK.Menu Lock."));
-    m_keyLockCombox.AddString(_T("FAN.SP UNLOCK.Menu Part Lock CAL,ORT,Unlock."));
-    m_keyLockCombox.AddString(_T("FAN.SP LOCK.Menu Lock"));
-    m_keyLockCombox.AddString(_T("FAN.SP UNLOCK.Most Menu Unlock "));
+		}
+	}
+	//ShowPID3();
+	m_keyLockCombox.AddString(_T("Lock Off"));
+	m_keyLockCombox.AddString(_T("FAN.SP UNLOCK.Menu Lock."));
+	m_keyLockCombox.AddString(_T("FAN.SP UNLOCK.Menu Part Lock CAL,ORT,Unlock."));
+	m_keyLockCombox.AddString(_T("FAN.SP LOCK.Menu Lock"));
+	m_keyLockCombox.AddString(_T("FAN.SP UNLOCK.Most Menu Unlock "));
 
 	CRect rect;
 	GetClientRect(&rect);
 	CString strTemp;
-	if ((product_register_value[7] == PM_TSTAT6 || product_register_value[7] == PM_TSTAT8) && product_register_value[MODBUS_RS485_MODE] == 1)
+	if ((product_register_value[7] == PM_TSTAT6 || product_register_value[7] == PM_TSTAT8)
+		/*&& product_register_value[MODBUS_RS485_MODE] == 1*/)
 	{
 		GetDlgItem(IDC_BUTTON_ZIGBEE)->ShowWindow(1);
 	}
@@ -566,23 +567,21 @@ BOOL CParameterDlg::OnInitDialog()
 	{
 		GetDlgItem(IDC_BUTTON_ZIGBEE)->ShowWindow(0);
 	}
- 
-    if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8
+
+	if (product_register_value[7] == PM_TSTAT5i || product_register_value[7] == PM_TSTAT6 || product_register_value[7] == PM_TSTAT7 || product_register_value[7] == PM_TSTAT8
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 		)
-    {
+	{
 		GetDlgItem(IDC_INPUTSBUTTON)->ShowWindow(SW_HIDE);
 		GetDlgItem(IDC_OutPutsBUTTON)->ShowWindow(SW_HIDE);
 	}
-    else
-    {
-        GetDlgItem(IDC_INPUTSBUTTON)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_OutPutsBUTTON)->ShowWindow(SW_SHOW);
-    }
-	// && product_register_value[MODBUS_RS485_MODE] == 1
-	if ((product_register_value[7] == PM_TSTAT6 || product_register_value[7] == PM_TSTAT8)
-		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
-		)
+	else
+	{
+		GetDlgItem(IDC_INPUTSBUTTON)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_OutPutsBUTTON)->ShowWindow(SW_SHOW);
+	}
+	 
+	if (product_register_value[7] == PM_TSTAT6 || product_register_value[7] == PM_TSTAT8 || product_register_value[7] == PM_TSTAT8_WIFI || product_register_value[7] == PM_TSTAT8_OCC || product_register_value[7] == PM_TSTAT7_ARM || product_register_value[7] == PM_TSTAT8_220V)	 
 	{
 		GetDlgItem(IDC_BUTTON_ZIGBEE)->ShowWindow(TRUE);
 	}

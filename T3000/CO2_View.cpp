@@ -265,8 +265,7 @@ void CCO2_View::Fresh()
 
 
 
-//         if(RefreshThread==NULL)
-//             RefreshThread = CreateThread(NULL,NULL,StartRefresh,this,NULL,NULL);
+
 
 
 
@@ -2934,8 +2933,10 @@ void CCO2_View::Initial_InputList(){
       f_external_temp = (float)i_external_temp / 10;
       CString  TempValue,StrAM;
 
-
-      if(product_register_value[124] == 0)//�ڲ�
+	  /// <summary>
+	  /// Here ,according to 124 value ,to read different register value.
+	  /// </summary>
+      if(product_register_value[124] == 0)
       {
           TempValue.Format(_T("%0.1f"),f_internal_temp);
       }
@@ -2960,11 +2961,6 @@ void CCO2_View::Initial_InputList(){
         m_input_list.SetItemText(1,4,_T("UNUSED"));
         strTemp.Format (_T("%d"),product_register_value[111]);
         m_input_list.SetItemText(2,4,strTemp);
-
-
-
-
-
 
   }
 
@@ -3138,7 +3134,8 @@ else if (m_product_type == 3)
     m_output_list.InsertColumn(2, _T("Range"), 45, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_output_list.InsertColumn(3, _T("Min Out Scale"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_output_list.InsertColumn(4, _T("Max Out Scale"), 85, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-    g_hwnd_now = this->m_hWnd;
+	m_output_list.InsertColumn(5, _T("Unit"), 85, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	g_hwnd_now = this->m_hWnd;
 
     m_output_list.InsertItem(0,_T("1"));
     m_output_list.InsertItem(1,_T("2"));
@@ -3170,19 +3167,99 @@ else if (m_product_type == 3)
     m_output_list.SetItemText(1,2,strTemp);
     m_output_list.SetItemText(2,2,strTemp);
 
+	float tc =(float)((short) product_register_value[128]);
+	if (product_register_value[125] == 0)
+	{
+		strTemp.Format(_T("%.1f"),tc/10 );
+	}
+	else
+	{
+		strTemp.Format(_T("%.1f"), CTwoF(tc/10));
+	}
 
-    strTemp.Format (_T("%d"),product_register_value[128]);
+   
     m_output_list.SetItemText(0,3,strTemp);
-    strTemp.Format (_T("%d"),product_register_value[129]);
+
+	tc = (float)((short)product_register_value[129]);
+	if (product_register_value[125] == 0)
+	{
+		strTemp.Format(_T("%.1f"), tc / 10);
+	}
+	else
+	{
+		strTemp.Format(_T("%.1f"), CTwoF(tc / 10));
+	}
+
+  
     m_output_list.SetItemText(0,4,strTemp);
-    strTemp.Format (_T("%d"),product_register_value[130]);
+
+	tc = (float)((short)product_register_value[130]);
+	if (product_register_value[125] == 0)
+	{
+		strTemp.Format(_T("%.1f"), tc / 10);
+	}
+	else
+	{
+		strTemp.Format(_T("%.1f"), CTwoF(tc / 10));
+	}
+    
     m_output_list.SetItemText(1,3,strTemp);
-    strTemp.Format (_T("%d"),product_register_value[131]);
+	tc = (float)((short)product_register_value[131]);
+	if (product_register_value[125] == 0)
+	{
+		strTemp.Format(_T("%.1f"), tc / 10);
+	}
+	else
+	{
+		strTemp.Format(_T("%.1f"), CTwoF(tc / 10));
+	}
     m_output_list.SetItemText(1,4,strTemp);
-    strTemp.Format (_T("%d"),product_register_value[132]);
+	tc = (float)((short)product_register_value[132]);
+	if (product_register_value[125] == 0)
+	{
+		strTemp.Format(_T("%.1f"), tc / 10);
+	}
+	else
+	{
+		strTemp.Format(_T("%.1f"), CTwoF(tc / 10));
+	}
     m_output_list.SetItemText(2,3,strTemp);
-    strTemp.Format (_T("%d"),product_register_value[133]);
+	tc = (float)((short)product_register_value[133]);
+	if (product_register_value[125] == 0)
+	{
+		strTemp.Format(_T("%.1f"), tc / 10);
+	}
+	else
+	{
+		strTemp.Format(_T("%.1f"), CTwoF(tc / 10));
+	}
     m_output_list.SetItemText(2,4,strTemp);
+
+
+
+	CString strTemp1, strTemp2, strUnit, strHUM, strCO2;
+	strTemp1.Format(_T("%cC"), 176);
+	strTemp2.Format(_T("%cF"), 176);
+
+	if (product_register_value[125] == 0)
+	{
+
+
+		strUnit = strTemp1;
+	}
+	else if (product_register_value[125] == 1)
+	{
+
+
+		strUnit = strTemp2;
+	}
+	m_output_list.SetItemText(0, 5, strUnit);
+	strTemp = L"%";
+
+	m_output_list.SetItemText(1, 5, strTemp);
+
+	strTemp = L"ppm";
+	m_output_list.SetItemText(2, 5, strTemp);
 
     m_output_list.ShowWindow (SW_SHOW);
 
@@ -3270,6 +3347,15 @@ else
     }
 }
 
+float CCO2_View::CTwoF(float tc)
+{
+	return (((tc * 9) / 5) + 320) / 10.0;
+}
+
+float CCO2_View::FTwoC(float tf)
+{
+	return (5 * (10 * tf - 320)) / 9;
+}
 // *************************************************************************************
 // 	input: input the unit type
 //	output: get the  ratio
@@ -3567,8 +3653,12 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
         if (m_product_type == 3)
         {
             CString New_CString =  m_output_list.GetItemText(Changed_Item,Changed_SubItem);
-            int ItemValue = _wtoi(New_CString);
+            int ItemValue = (int)(_wtof(New_CString)*10);
 
+			if (product_register_value[125]!=0&&Changed_Item == 0)
+			{
+				ItemValue = (int)(FTwoC(_wtof(New_CString)) * 10);
+			}
             if (Changed_SubItem == 3)
             {
                     int RegAddress = 128 + 2*Changed_Item;
@@ -3581,10 +3671,7 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
                             product_register_value[RegAddress]=ItemValue;
                             PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
                         }
-
                     }
-
-
             }
             if (Changed_SubItem == 4)
             {
@@ -3598,7 +3685,6 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
                         product_register_value[RegAddress]=ItemValue;
                         PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
                     }
-
                 }
             }
 
@@ -3807,6 +3893,7 @@ void CCO2_View::OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult){
                 }
 
                 PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
+				Initial_OutputList();
             }
             else
             {
@@ -4160,18 +4247,103 @@ LRESULT CCO2_View::Fresh_Lists(WPARAM wParam,LPARAM lParam){
             m_output_list.SetItemText(2,2,strTemp);
 
 
-            strTemp.Format (_T("%d"),product_register_value[128]);
-            m_output_list.SetItemText(0,3,strTemp);
-            strTemp.Format (_T("%d"),product_register_value[129]);
-            m_output_list.SetItemText(0,4,strTemp);
-            strTemp.Format (_T("%d"),product_register_value[130]);
-            m_output_list.SetItemText(1,3,strTemp);
-            strTemp.Format (_T("%d"),product_register_value[131]);
-            m_output_list.SetItemText(1,4,strTemp);
-            strTemp.Format (_T("%d"),product_register_value[132]);
-            m_output_list.SetItemText(2,3,strTemp);
-            strTemp.Format (_T("%d"),product_register_value[133]);
-            m_output_list.SetItemText(2,4,strTemp);
+			float tc = (float)((short)product_register_value[128]);
+			if (product_register_value[125] == 0)
+			{
+				strTemp.Format(_T("%.1f"), tc / 10);
+			}
+			else
+			{
+				strTemp.Format(_T("%.1f"), CTwoF(tc / 10));
+			}
+
+
+			m_output_list.SetItemText(0, 3, strTemp);
+
+			tc = (float)((short)product_register_value[129]);
+			if (product_register_value[125] == 0)
+			{
+				strTemp.Format(_T("%.1f"), tc / 10);
+			}
+			else
+			{
+				strTemp.Format(_T("%.1f"), CTwoF(tc / 10));
+			}
+
+
+			m_output_list.SetItemText(0, 4, strTemp);
+
+			tc = (float)((short)product_register_value[130]);
+			if (product_register_value[125] == 0)
+			{
+				strTemp.Format(_T("%.1f"), tc / 10);
+			}
+			else
+			{
+				strTemp.Format(_T("%.1f"), CTwoF(tc / 10));
+			}
+
+			m_output_list.SetItemText(1, 3, strTemp);
+			tc = (float)((short)product_register_value[131]);
+			if (product_register_value[125] == 0)
+			{
+				strTemp.Format(_T("%.1f"), tc / 10);
+			}
+			else
+			{
+				strTemp.Format(_T("%.1f"), CTwoF(tc / 10));
+			}
+			m_output_list.SetItemText(1, 4, strTemp);
+			tc = (float)((short)product_register_value[132]);
+			if (product_register_value[125] == 0)
+			{
+				strTemp.Format(_T("%.1f"), tc / 10);
+			}
+			else
+			{
+				strTemp.Format(_T("%.1f"), CTwoF(tc / 10));
+			}
+			m_output_list.SetItemText(2, 3, strTemp);
+			tc = (float)((short)product_register_value[133]);
+			if (product_register_value[125] == 0)
+			{
+				strTemp.Format(_T("%.1f"), tc / 10);
+			}
+			else
+			{
+				strTemp.Format(_T("%.1f"), CTwoF(tc / 10));
+			}
+			m_output_list.SetItemText(2, 4, strTemp);
+
+
+
+			CString strTemp1, strTemp2, strUnit, strHUM, strCO2;
+			strTemp1.Format(_T("%cC"), 176);
+			strTemp2.Format(_T("%cF"), 176);
+
+			if (product_register_value[125] == 0)
+			{
+
+
+				strUnit = strTemp1;
+			}
+			else if (product_register_value[125] == 1)
+			{
+
+
+				strUnit = strTemp2;
+			}
+			m_output_list.SetItemText(0, 5, strUnit);
+			strTemp = L"%";
+
+			m_output_list.SetItemText(1, 5, strTemp);
+
+			strTemp = L"ppm";
+			m_output_list.SetItemText(2, 5, strTemp);
+
+
+
+			 
 
             m_output_list.ShowWindow (SW_SHOW);
         }

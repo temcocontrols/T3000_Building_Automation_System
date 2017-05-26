@@ -559,4 +559,5 @@ public:
 		afx_msg void OnModeOfflinemode();
 		afx_msg void OnUpdateModeOnlinemode(CCmdUI *pCmdUI);
 		afx_msg void OnUpdateModeOfflinemode(CCmdUI *pCmdUI);
+		afx_msg void OnToolsPhchart();
 };

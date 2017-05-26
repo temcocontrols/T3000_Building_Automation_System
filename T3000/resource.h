@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ 生成的包含文件。
-// 供 T3000.rc 使用
+// Microsoft Visual C++ generated include file.
+// Used by T3000.rc
 //
 #define IDCANCEL2                       3
 #define IDCWRITEONE                     3
@@ -2702,6 +2702,7 @@
 #define ID_MODE_ONLINEMODE              34060
 #define ID_MODE_OFFLIN                  34061
 #define ID_MODE_OFFLINEMODE             34062
+#define ID_TOOLS_PHCHART                34063
 #define ID_HELP_USING_UPDATE            34904
 #define ID_DATABASE_BACNETTOOL          34905
 #define IDD_DIALOG_BACNET_PROGRAM       34906
@@ -2776,7 +2777,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        687
-#define _APS_NEXT_COMMAND_VALUE         34063
+#define _APS_NEXT_COMMAND_VALUE         34064
 #define _APS_NEXT_CONTROL_VALUE         2345
 #define _APS_NEXT_SYMED_VALUE           320
 #endif

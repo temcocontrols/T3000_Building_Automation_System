@@ -420,7 +420,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	 ON_COMMAND(ID_MODE_OFFLINEMODE, &CMainFrame::OnModeOfflinemode)
 	 ON_UPDATE_COMMAND_UI(ID_MODE_ONLINEMODE, &CMainFrame::OnUpdateModeOnlinemode)
 	 ON_UPDATE_COMMAND_UI(ID_MODE_OFFLINEMODE, &CMainFrame::OnUpdateModeOfflinemode)
-	 END_MESSAGE_MAP()
+		ON_COMMAND(ID_TOOLS_PHCHART, &CMainFrame::OnToolsPhchart)
+		END_MESSAGE_MAP()
 
 static UINT indicators[] =
 {
@@ -15690,3 +15691,10 @@ void CMainFrame::OnUpdateModeOfflinemode(CCmdUI *pCmdUI)
 		pCmdUI->Enable(TRUE);
 }
 
+
+
+void CMainFrame::OnToolsPhchart()
+{
+	CString strHistotyFile = g_strExePth + _T("PH_Application\PH_App_By_BBK.exe");
+	ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);
+}

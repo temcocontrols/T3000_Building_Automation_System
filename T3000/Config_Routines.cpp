@@ -329,6 +329,11 @@ void CConfig_Routines::load_grid()
 	m_FlexGrid.put_Col(1);
 
 }
+
+
+/// <summary>
+/// select group routines
+/// </summary>
 void CConfig_Routines::on_select()
 {
 	long lRow,lCol;
@@ -431,7 +436,8 @@ BOOL CConfig_Routines::OnInitDialog()
 	load_grid();
 //	SetPaneString(_T("Finish"));
 	NET_WORK_SET_TIMER
-	return TRUE;  // return TRUE unless you set the focus to a control
+	return TRUE;  
+	// return TRUE unless you set the focus to a control
 	// 异常: OCX 属性页应返回 FALSE
 }
 BEGIN_EVENTSINK_MAP(CConfig_Routines, CDialog)
