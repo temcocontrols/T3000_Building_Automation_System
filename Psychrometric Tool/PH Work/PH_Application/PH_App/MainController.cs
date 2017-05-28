@@ -3704,7 +3704,6 @@ namespace PH_App
                 {
                     // MessageBox.Show("background asyc dissabled");
                     f.backgroundWorker1.CancelAsync(); //==First dissabling background worker
-
                 }
 
                 if (FlagForCntdBG_Update == 1)
