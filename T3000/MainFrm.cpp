@@ -15712,3 +15712,7 @@ void CMainFrame::OnToolsPhchart()
 	CString strHistotyFile = g_strExePth + _T("PH_Application\PH_App_By_BBK.exe");
 	ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);
 }
+
+
+//add comments by NOVAS
+//no change source code
