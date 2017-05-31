@@ -5,7 +5,7 @@ using namespace ListCtrlEx;
 
 //////////////////////////////////////////////////////////////////////////
 // ------------ for CInPlaceCombo --------------------//
-CInPlaceCombo* CInPlaceCombo::m_pInPlaceCombo = NULL;
+CInPlaceCombo* CInPlaceCombo::m_pInPlaceCombo = NULL; 
 
 CInPlaceCombo::CInPlaceCombo()
 {
@@ -31,7 +31,7 @@ BEGIN_MESSAGE_MAP(CInPlaceCombo, CComboBox)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
-int CInPlaceCombo::OnCreate(LPCREATESTRUCT lpCreateStruct)
+int CInPlaceCombo::OnCreate(LPCREATESTRUCT lpCreateStruct) 
 {
 	if (CComboBox::OnCreate(lpCreateStruct) == -1)
 	{
@@ -41,9 +41,9 @@ int CInPlaceCombo::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CFont* pFont = GetParent()->GetFont();
 	SetFont(pFont);
 	SetFocus();
-	ResetContent();
-	CStrList::iterator iter = m_DropDownList.begin();
-	for (; iter != m_DropDownList.end(); ++iter)
+	ResetContent(); 
+	CStrList::iterator iter=m_DropDownList.begin();
+	for (; iter!=m_DropDownList.end(); ++iter)
 	{
 		AddString(*iter);
 	}
@@ -51,22 +51,22 @@ int CInPlaceCombo::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	return 0;
 }
 
-BOOL CInPlaceCombo::PreTranslateMessage(MSG* pMsg)
+BOOL CInPlaceCombo::PreTranslateMessage(MSG* pMsg) 
 {
 	if (pMsg->message == WM_KEYDOWN)
 	{
-		if (pMsg->wParam == VK_RETURN || pMsg->wParam == VK_ESCAPE)
+		if(pMsg->wParam == VK_RETURN || pMsg->wParam == VK_ESCAPE)
 		{
 			::TranslateMessage(pMsg);
 			::DispatchMessage(pMsg);
-			return TRUE;
+			return TRUE;				
 		}
 	}
 
 	return CComboBox::PreTranslateMessage(pMsg);
 }
 
-void CInPlaceCombo::OnKillFocus(CWnd* pNewWnd)
+void CInPlaceCombo::OnKillFocus(CWnd* pNewWnd) 
 {
 	CComboBox::OnKillFocus(pNewWnd);
 
@@ -88,7 +88,7 @@ void CInPlaceCombo::OnKillFocus(CWnd* pNewWnd)
 	PostMessage(WM_CLOSE);
 }
 
-void CInPlaceCombo::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
+void CInPlaceCombo::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags) 
 {
 	// If the key is "Esc" set focus back to the list control
 	if (nChar == VK_ESCAPE || nChar == VK_RETURN)
@@ -104,14 +104,14 @@ void CInPlaceCombo::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 	CComboBox::OnChar(nChar, nRepCnt, nFlags);
 }
 
-void CInPlaceCombo::OnCloseup()
+void CInPlaceCombo::OnCloseup() 
 {
 	GetParent()->SetFocus();
 }
 
 CInPlaceCombo* CInPlaceCombo::GetInstance()
 {
-	if (m_pInPlaceCombo == NULL)
+	if(m_pInPlaceCombo == NULL)
 	{
 		m_pInPlaceCombo = new CInPlaceCombo;
 	}
@@ -124,9 +124,10 @@ void CInPlaceCombo::DeleteInstance()
 	m_pInPlaceCombo = NULL;
 }
 
-BOOL CInPlaceCombo::ShowComboCtrl(DWORD dwStyle, const CRect& rCellRect, CWnd* pParentWnd, UINT uiResourceID,
-                                  int iRowIndex, int iColumnIndex, CStrList& lstDropDown, CString strCurSel, int iCurSel)
+BOOL CInPlaceCombo::ShowComboCtrl(DWORD dwStyle, const CRect &rCellRect, CWnd* pParentWnd, UINT uiResourceID,
+								  int iRowIndex, int iColumnIndex, CStrList &lstDropDown, CString strCurSel, int iCurSel )
 {
+
 	m_iRowIndex = iRowIndex;
 	m_iColumnIndex = iColumnIndex;
 	m_bESC = FALSE;
@@ -140,17 +141,17 @@ BOOL CInPlaceCombo::ShowComboCtrl(DWORD dwStyle, const CRect& rCellRect, CWnd* p
 	{
 		GetLBText(iCurSel, m_strWindowText);
 	}
-	else if (!strCurSel.IsEmpty())
+	else if (!strCurSel.IsEmpty()) 
 	{
 		m_strWindowText = strCurSel;
 	}
 
-	if (NULL == m_pInPlaceCombo->m_hWnd)
+	if (NULL == m_pInPlaceCombo->m_hWnd) 
 	{
-		bRetVal = m_pInPlaceCombo->Create(dwStyle, rCellRect, pParentWnd, uiResourceID);
+		bRetVal = m_pInPlaceCombo->Create(dwStyle, rCellRect, pParentWnd, uiResourceID); 
 	}
 
-	if (iCurSel >= 0 && iCurSel < this->GetCount())
+	if (iCurSel >=0 && iCurSel < this->GetCount())
 	{
 		SetCurSel(iCurSel);
 	}
@@ -165,11 +166,11 @@ BOOL CInPlaceCombo::ShowComboCtrl(DWORD dwStyle, const CRect& rCellRect, CWnd* p
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 // --------------- for CInPlaceEdit -------------------//
-CInPlaceEdit* CInPlaceEdit::m_pInPlaceEdit = NULL;
+CInPlaceEdit* CInPlaceEdit::m_pInPlaceEdit=NULL;
 
 CInPlaceEdit::CInPlaceEdit()
 {
-	m_iRowIndex = -1;
+	m_iRowIndex= -1;
 	m_iColumnIndex = -1;
 	m_bESC = FALSE;
 	m_strValidChars.Empty();
@@ -201,17 +202,14 @@ LRESULT CInPlaceEdit::OnPaste(WPARAM /*wParam*/, LPARAM /*lParam*/)
 	{
 		CString strFromClipboard;
 		// get the text from clipboard
-		if (OpenClipboard())
-		{
+		if(OpenClipboard()) {
 			HANDLE l_hData = GetClipboardData(CF_TEXT);
-			if (NULL == l_hData)
-			{
+			if(NULL == l_hData) {
 				return 1;
 			}
 
-			char* l_pBuffer = (char*)GlobalLock(l_hData);
-			if (NULL != l_pBuffer)
-			{
+			char *l_pBuffer = (char*)GlobalLock(l_hData);
+			if(NULL != l_pBuffer) {
 				strFromClipboard = l_pBuffer;
 			}
 
@@ -219,7 +217,7 @@ LRESULT CInPlaceEdit::OnPaste(WPARAM /*wParam*/, LPARAM /*lParam*/)
 			CloseClipboard();
 		}
 		// Validate the characters before pasting 
-		for (int iCounter_ = 0; iCounter_ < strFromClipboard.GetLength(); iCounter_++)
+		for(int iCounter_ = 0; iCounter_ < strFromClipboard.GetLength(); iCounter_++)
 		{
 			if (-1 == m_strValidChars.Find(strFromClipboard.GetAt(iCounter_)))
 			{
@@ -229,11 +227,11 @@ LRESULT CInPlaceEdit::OnPaste(WPARAM /*wParam*/, LPARAM /*lParam*/)
 	}
 
 	//let the individual control handle other processing
-	CEdit::Default();
-	return 1;
+	CEdit::Default();	
+	return 1;	
 }
 
-void CInPlaceEdit::OnKillFocus(CWnd* pNewWnd)
+void CInPlaceEdit::OnKillFocus(CWnd* pNewWnd) 
 {
 	CEdit::OnKillFocus(pNewWnd);
 
@@ -248,7 +246,7 @@ void CInPlaceEdit::OnKillFocus(CWnd* pNewWnd)
 
 	dispinfo.item.mask = LVIF_TEXT;
 	dispinfo.item.iItem = m_iRowIndex;
-	dispinfo.item.iSubItem = m_iColumnIndex;
+	dispinfo.item.iSubItem = m_iColumnIndex; 
 	// escape key is down so use old string
 	dispinfo.item.pszText = m_bESC ? LPTSTR((LPCTSTR)m_strWindowText) : LPTSTR((LPCTSTR)strEdit);
 	dispinfo.item.cchTextMax = m_bESC ? m_strWindowText.GetLength() : strEdit.GetLength();
@@ -257,17 +255,17 @@ void CInPlaceEdit::OnKillFocus(CWnd* pNewWnd)
 	PostMessage(WM_CLOSE);
 }
 
-void CInPlaceEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
+void CInPlaceEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags) 
 {
 	// TODO: Add your message handler code here and/or call default
-	if ((m_strValidChars.IsEmpty()) // no valid chars
-		|| ((-1 != m_strValidChars.Find(static_cast<TCHAR>(nChar)))
-			|| (nChar == VK_BACK) || (nChar == CTRL_C) || (nChar == CTRL_V) || (nChar == CTRL_X)))
+	if ( (m_strValidChars.IsEmpty()) // no valid chars
+		|| ((-1 != m_strValidChars.Find(static_cast<TCHAR> (nChar)))
+		|| (nChar == VK_BACK) || (nChar == CTRL_C) || (nChar == CTRL_V) || (nChar == CTRL_X)))
 	{
 		CString temp_cs;
 		CInPlaceEdit::GetWindowText(temp_cs);
 		TRACE(temp_cs + _T("\r\n"));
-		if ((temp_cs.GetLength() >= m_charlimit) && (m_charlimit != 0) && (nChar != 8))
+		if((temp_cs.GetLength()>= m_charlimit) && (m_charlimit != 0) && (nChar!= 8))
 		{
 			MessageBeep(MB_ICONEXCLAMATION);
 			return;
@@ -281,7 +279,7 @@ void CInPlaceEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 	}
 }
 
-BOOL CInPlaceEdit::PreTranslateMessage(MSG* pMsg)
+BOOL CInPlaceEdit::PreTranslateMessage(MSG* pMsg) 
 {
 	if (WM_KEYDOWN == pMsg->message && (VK_ESCAPE == pMsg->wParam || VK_RETURN == pMsg->wParam))
 	{
@@ -297,7 +295,7 @@ BOOL CInPlaceEdit::PreTranslateMessage(MSG* pMsg)
 	return CEdit::PreTranslateMessage(pMsg);
 }
 
-int CInPlaceEdit::OnCreate(LPCREATESTRUCT lpCreateStruct)
+int CInPlaceEdit::OnCreate(LPCREATESTRUCT lpCreateStruct) 
 {
 	if (CEdit::OnCreate(lpCreateStruct) == -1)
 		return -1;
@@ -316,7 +314,7 @@ int CInPlaceEdit::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 CInPlaceEdit* CInPlaceEdit::GetInstance()
 {
-	if (m_pInPlaceEdit == NULL)
+	if(m_pInPlaceEdit == NULL)
 	{
 		m_pInPlaceEdit = new CInPlaceEdit;
 	}
@@ -328,15 +326,13 @@ void CInPlaceEdit::DeleteInstance()
 	delete m_pInPlaceEdit;
 	m_pInPlaceEdit = NULL;
 }
-
 void CInPlaceEdit::SetEditLimit(int ncount)
 {
 	m_charlimit = ncount;
 }
-
-BOOL CInPlaceEdit::ShowEditCtrl(DWORD dwStyle, const RECT& rCellRect, CWnd* pParentWnd,
-                                UINT uiResourceID, int iRowIndex, int iColumnIndex,
-                                CString& strValidChars, CString& rstrCurSelection)
+BOOL CInPlaceEdit::ShowEditCtrl(DWORD dwStyle, const RECT &rCellRect, CWnd* pParentWnd, 
+								UINT uiResourceID, int iRowIndex, int iColumnIndex,
+								CString& strValidChars, CString& rstrCurSelection)
 {
 	m_iRowIndex = iRowIndex;
 	m_iColumnIndex = iColumnIndex;
@@ -344,10 +340,10 @@ BOOL CInPlaceEdit::ShowEditCtrl(DWORD dwStyle, const RECT& rCellRect, CWnd* pPar
 	m_strWindowText = rstrCurSelection;
 	m_bESC = FALSE;
 
-	if (NULL == m_pInPlaceEdit->m_hWnd)
+	if (NULL == m_pInPlaceEdit->m_hWnd) 
 	{
-		return m_pInPlaceEdit->Create(dwStyle, rCellRect, pParentWnd, uiResourceID);
-	}
+		return m_pInPlaceEdit->Create(dwStyle, rCellRect, pParentWnd, uiResourceID); 
+	}	
 
 	return TRUE;
 }
@@ -358,12 +354,14 @@ BOOL CInPlaceEdit::ShowEditCtrl(DWORD dwStyle, const RECT& rCellRect, CWnd* pPar
 IMPLEMENT_DYNAMIC(CListCtrlExSortHead, CHeaderCtrl)
 
 CListCtrlExSortHead::CListCtrlExSortHead()
-	: m_iSortColumn(-1), m_bSortDesc(FALSE)
+: m_iSortColumn(-1),m_bSortDesc(FALSE)
 {
+
 }
 
 CListCtrlExSortHead::~CListCtrlExSortHead()
 {
+
 }
 
 
@@ -372,15 +370,16 @@ BEGIN_MESSAGE_MAP(CListCtrlExSortHead, CHeaderCtrl)
 END_MESSAGE_MAP()
 
 
+
 // CSortHeadCtrl message handlers
-void CListCtrlExSortHead::SetSortArrow(const int nSortColumn, const BOOL bDesc)
+void CListCtrlExSortHead::SetSortArrow( const int nSortColumn, const BOOL bDesc )
 {
-	if (nSortColumn < 0 || nSortColumn >= this->GetItemCount())
+	if (nSortColumn<0 || nSortColumn>=this->GetItemCount())
 	{
 		ASSERT(FALSE);
 	}
-	m_iSortColumn = nSortColumn;
-	m_bSortDesc = bDesc;
+	m_iSortColumn=nSortColumn;
+	m_bSortDesc=bDesc;
 
 	// change the item to owner drawn.
 	HD_ITEM hditem;
@@ -395,7 +394,7 @@ void CListCtrlExSortHead::SetSortArrow(const int nSortColumn, const BOOL bDesc)
 	//UpdateWindow();
 }
 
-inline int CListCtrlExSortHead::GetCrntSortCol() const
+inline int	 CListCtrlExSortHead::GetCrntSortCol() const
 {
 	return m_iSortColumn;
 }
@@ -414,15 +413,15 @@ void CListCtrlExSortHead::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 	// Draw the background
 	CBrush br(::GetSysColor(COLOR_3DFACE));
-	pDC->FillRect(rcLabel, &br);
+	pDC->FillRect(rcLabel, &br);	
 
 	// Labels are offset by a certain amount  
 	// This offset is related to the width of a space character
-	int offset = pDC->GetTextExtent(_T(" "), 1).cx * 2;
+	int offset = pDC->GetTextExtent(_T(" "), 1).cx*2;
 
 	// Get the column text and format
 	TCHAR buf[256];
-	HD_ITEM hditem;
+	HD_ITEM hditem;	
 
 	hditem.mask = HDI_TEXT | HDI_FORMAT;
 	hditem.pszText = buf;
@@ -431,7 +430,7 @@ void CListCtrlExSortHead::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	GetItem(lpDrawItemStruct->itemID, &hditem);
 
 	// Determine format for drawing column label
-	UINT uFormat = DT_SINGLELINE | DT_NOPREFIX | DT_VCENTER | DT_END_ELLIPSIS;
+	UINT uFormat = DT_SINGLELINE | DT_NOPREFIX | DT_VCENTER | DT_END_ELLIPSIS ;
 
 	if (hditem.fmt & HDF_CENTER)
 		uFormat |= DT_CENTER;
@@ -468,54 +467,55 @@ void CListCtrlExSortHead::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		// Set up pens to use for drawing the triangle
 		CPen penLight(PS_SOLID, 1, GetSysColor(COLOR_3DHILIGHT));
 		CPen penShadow(PS_SOLID, 1, GetSysColor(COLOR_3DSHADOW));
-		CPen* pOldPen = pDC->SelectObject(&penLight);
+		CPen *pOldPen = pDC->SelectObject(&penLight);
 
 		if (!m_bSortDesc)
 		{
 			// Draw triangle pointing upwards
-			pDC->MoveTo(rcIcon.right - 2 * offset, offset - 1);
-			pDC->LineTo(rcIcon.right - 3 * offset / 2, rcIcon.bottom - offset);
-			pDC->LineTo(rcIcon.right - 5 * offset / 2 - 2, rcIcon.bottom - offset);
-			pDC->MoveTo(rcIcon.right - 5 * offset / 2 - 1, rcIcon.bottom - offset - 1);
+			pDC->MoveTo(rcIcon.right - 2*offset, offset - 1);
+			pDC->LineTo(rcIcon.right - 3*offset/2, rcIcon.bottom - offset);
+			pDC->LineTo(rcIcon.right - 5*offset/2-2, rcIcon.bottom - offset);
+			pDC->MoveTo(rcIcon.right - 5*offset/2-1, rcIcon.bottom - offset - 1);
 
 			pDC->SelectObject(&penShadow);
-			pDC->LineTo(rcIcon.right - 2 * offset, offset - 2);
+			pDC->LineTo(rcIcon.right - 2*offset, offset-2);
 		}
-		else
+		else	
 		{
 			// Draw triangle pointing downwards
-			pDC->MoveTo(rcIcon.right - 3 * offset / 2, offset - 1);
-			pDC->LineTo(rcIcon.right - 2 * offset - 1, rcIcon.bottom - offset + 1);
-			pDC->MoveTo(rcIcon.right - 2 * offset - 1, rcIcon.bottom - offset);
+			pDC->MoveTo(rcIcon.right - 3*offset/2, offset-1);
+			pDC->LineTo(rcIcon.right - 2*offset-1, rcIcon.bottom - offset + 1);
+			pDC->MoveTo(rcIcon.right - 2*offset-1, rcIcon.bottom - offset);
 
 			pDC->SelectObject(&penShadow);
-			pDC->LineTo(rcIcon.right - 5 * offset / 2 - 1, offset - 1);
-			pDC->LineTo(rcIcon.right - 3 * offset / 2, offset - 1);
+			pDC->LineTo(rcIcon.right - 5*offset/2-1, offset - 1);
+			pDC->LineTo(rcIcon.right - 3*offset/2, offset - 1);
 		}
 
 		// Restore the pen
 		pDC->SelectObject(pOldPen);
 	}
+
 }
 
 
-void ListCtrlEx::CListCtrlExSortHead::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
+void ListCtrlEx::CListCtrlExSortHead::OnNMCustomdraw(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
-	switch (pNMCD->dwDrawStage)
+	switch(pNMCD->dwDrawStage)
 	{
 	case CDDS_PREPAINT:
-		*pResult = CDRF_NOTIFYSUBITEMDRAW; // ask for subitem notifications.
+		*pResult = CDRF_NOTIFYSUBITEMDRAW;          // ask for subitem notifications.
 		*pResult = CDRF_DODEFAULT;
 		break;
 	case CDDS_ITEMPREPAINT:
-		*pResult = CDRF_NOTIFYSUBITEMDRAW; // ask for subitem notifications.
+		*pResult = CDRF_NOTIFYSUBITEMDRAW;          // ask for subitem notifications.
 		*pResult = CDRF_DODEFAULT;
 		break;
-	case CDDS_ITEMPREPAINT | CDDS_SUBITEM: // recd when CDRF_NOTIFYSUBITEMDRAW is returned in
+	case CDDS_ITEMPREPAINT|CDDS_SUBITEM:			// recd when CDRF_NOTIFYSUBITEMDRAW is returned in
 		*pResult = CDRF_DODEFAULT;
 		break;
-	default: // it wasn't a notification that was interesting to us.
+	default:														// it wasn't a notification that was interesting to us.
 		*pResult = CDRF_DODEFAULT;
 		break;
 	}

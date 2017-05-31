@@ -129,10 +129,10 @@ BOOL _ITEM_COMPARE_FUNCS::_IsDecNumber(const CString& str, double& f)
 
 int _ITEM_COMPARE_FUNCS::_DecNumberCompare(double f1, double f2)
 {
-	if (f1 < f2)
+	if(f1 < f2)
 		return -1;
-
-	if (f1 > f2)
+	
+	if(f1 > f2)
 		return 1;
 
 	return 0;
@@ -193,8 +193,9 @@ CMyOwnListCtrl::CMyOwnListCtrl(): m_pWndEdit(NULL)
 }
 
 
+
 CMyOwnListCtrl::~CMyOwnListCtrl()
-{
+{	
 	if (m_pszSeparator != NULL)
 		delete [] m_pszSeparator;
 
@@ -220,20 +221,20 @@ END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CMyOwnListCtrl message handlers
-void CMyOwnListCtrl::OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
+void CMyOwnListCtrl::OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult) 
 {
 	LPNMLVCUSTOMDRAW lplvcd = (LPNMLVCUSTOMDRAW)pNMHDR;
 
 	if (lplvcd->nmcd.dwDrawStage == CDDS_PREPAINT)
 	{
-		*pResult = CDRF_NOTIFYITEMDRAW;
+	    *pResult = CDRF_NOTIFYITEMDRAW;
 	}
-	else if (lplvcd->nmcd.dwDrawStage == CDDS_ITEMPREPAINT)
+    else if (lplvcd->nmcd.dwDrawStage == CDDS_ITEMPREPAINT)
 	{
-		*pResult = CDRF_NOTIFYSUBITEMDRAW;
+	    *pResult = CDRF_NOTIFYSUBITEMDRAW;
 	}
-	else if (lplvcd->nmcd.dwDrawStage == (CDDS_ITEMPREPAINT | CDDS_SUBITEM))
-	{
+    else if (lplvcd->nmcd.dwDrawStage == (CDDS_ITEMPREPAINT | CDDS_SUBITEM))
+    {
 		CItemData* p = (CItemData*)(CListCtrl::GetItemData(lplvcd->nmcd.dwItemSpec));
 		ASSERT(p != NULL);
 		ASSERT(lplvcd->iSubItem >= 0 && lplvcd->iSubItem < p->aTextColors.GetSize());
@@ -243,7 +244,7 @@ void CMyOwnListCtrl::OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
 	}
 }
 
-void CMyOwnListCtrl::OnColumnclick(NMHDR* pNMHDR, LRESULT* pResult)
+void CMyOwnListCtrl::OnColumnclick(NMHDR* pNMHDR, LRESULT* pResult) 
 {
 	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
 	// TODO: Add your control notification handler code here
@@ -252,56 +253,56 @@ void CMyOwnListCtrl::OnColumnclick(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 }
 
-void CMyOwnListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
+void CMyOwnListCtrl::OnLButtonDown(UINT nFlags, CPoint point) 
 {
 	// TODO: Add your message handler code here and/or call default
 	_MouseClkMonitor(WM_LBUTTONDOWN, nFlags, point, TRUE);
 }
 
-void CMyOwnListCtrl::OnLButtonDblClk(UINT nFlags, CPoint point)
+void CMyOwnListCtrl::OnLButtonDblClk(UINT nFlags, CPoint point) 
 {
 	// TODO: Add your message handler code here and/or call default
 	_MouseClkMonitor(WM_LBUTTONDBLCLK, nFlags, point, TRUE);
 }
 
-void CMyOwnListCtrl::OnMButtonDown(UINT nFlags, CPoint point)
+void CMyOwnListCtrl::OnMButtonDown(UINT nFlags, CPoint point) 
 {
 	// TODO: Add your message handler code here and/or call default
 	_MouseClkMonitor(WM_MBUTTONDOWN, nFlags, point, FALSE);
 }
 
-void CMyOwnListCtrl::OnMButtonDblClk(UINT nFlags, CPoint point)
+void CMyOwnListCtrl::OnMButtonDblClk(UINT nFlags, CPoint point) 
 {
 	// TODO: Add your message handler code here and/or call default
 	_MouseClkMonitor(WM_MBUTTONDBLCLK, nFlags, point, FALSE);
 }
 
-void CMyOwnListCtrl::OnRButtonDown(UINT nFlags, CPoint point)
+void CMyOwnListCtrl::OnRButtonDown(UINT nFlags, CPoint point) 
 {
 	// TODO: Add your message handler code here and/or call default
 	_MouseClkMonitor(WM_RBUTTONDOWN, nFlags, point, FALSE);
 }
 
-void CMyOwnListCtrl::OnRButtonDblClk(UINT nFlags, CPoint point)
+void CMyOwnListCtrl::OnRButtonDblClk(UINT nFlags, CPoint point) 
 {
 	// TODO: Add your message handler code here and/or call default
 	_MouseClkMonitor(WM_RBUTTONDBLCLK, nFlags, point, FALSE);
 }
 
-int CMyOwnListCtrl::OnCreate(LPCREATESTRUCT lpCreateStruct)
+int CMyOwnListCtrl::OnCreate(LPCREATESTRUCT lpCreateStruct) 
 {
 	lpCreateStruct->style &= ~MUST_NOT_STYLE;
 	lpCreateStruct->style |= MUST_STYLE;
 	if (CListCtrl::OnCreate(lpCreateStruct) == -1)
 		return -1;
-
+	
 	// TODO: Add your specialized creation code here
 	SetExtendedStyle(GetExtendedStyle());
 	ASSERT(GetHeaderCtrl() != NULL);
 	return 0;
 }
 
-void CMyOwnListCtrl::OnDestroy()
+void CMyOwnListCtrl::OnDestroy() 
 {
 	DeleteAllItems();
 	m_pWndEdit->DestroyWindow();
@@ -347,7 +348,7 @@ BOOL CMyOwnListCtrl::SetColumnHeader(const CString& strHeadings)
 }
 
 int CMyOwnListCtrl::InsertItem(int nIndex, LPCTSTR lpText)
-{
+{	
 	EndEdit(TRUE);
 	_UnsetSortedColumn();
 	const int IDX = CListCtrl::InsertItem(nIndex, lpText);
@@ -359,7 +360,7 @@ int CMyOwnListCtrl::InsertItem(int nIndex, LPCTSTR lpText)
 BOOL CMyOwnListCtrl::DeleteItem(int nItem, BOOL bSelectNextItem)
 {
 	EndEdit(m_ptEditting.x != nItem);
-
+	
 	if (bSelectNextItem)
 		SetItemStates(nItem + 1, RC_ITEM_SELECTED);
 
@@ -378,9 +379,9 @@ int CMyOwnListCtrl::DeleteAllItems(DWORD dwStates)
 			_FreeItemMemory(i);
 		CListCtrl::DeleteAllItems();
 		UnlockWindowUpdate();
-		return nItemCount;
+		return nItemCount;		
 	}
-
+	
 	int nDelCount = 0;
 	LockWindowUpdate();
 
@@ -392,7 +393,7 @@ int CMyOwnListCtrl::DeleteAllItems(DWORD dwStates)
 			nItemCount--;
 			nDelCount++;
 		}
-	}
+	}	
 	UnlockWindowUpdate();
 	return nDelCount;
 }
@@ -401,12 +402,12 @@ void CMyOwnListCtrl::SortItems(int nColumn, BOOL bAscending)
 {
 	EndEdit(TRUE);
 	if (nColumn < 0 || nColumn >= GetColumnCount() || !IsSortable())
-		return;
+		return;	
 
 	// do the sorting	
 	m_nSortCol = nColumn;
 	m_bSortAscending = bAscending;
-
+	
 	BOOL bEnd = FALSE;
 	int nSep1 = -1;
 	int nSep2 = _FindSeparator(-1, nColumn);
@@ -420,8 +421,7 @@ void CMyOwnListCtrl::SortItems(int nColumn, BOOL bAscending)
 		_PartialSort(nSep1 + 1, nSep2 - 1);
 		nSep1 = _FindSeparator(nSep2 - 1, nColumn);
 		nSep2 = _FindSeparator(nSep1, nColumn);
-	}
-	while (!bEnd && nSep1 >= 0);
+	} while (!bEnd && nSep1 >= 0);
 
 	GetParent()->SendMessage(WM_ITEM_SORTED, (WPARAM)m_nSortCol, (LPARAM)m_bSortAscending);
 }
@@ -438,7 +438,7 @@ int CMyOwnListCtrl::GetColumnCount() const
 	return GetHeaderCtrl()->GetItemCount();
 }
 
-int CMyOwnListCtrl::InsertItem(const LVITEM* pItem)
+int CMyOwnListCtrl::InsertItem(const LVITEM *pItem)
 {
 	EndEdit(TRUE);
 	_UnsetSortedColumn();
@@ -449,7 +449,7 @@ int CMyOwnListCtrl::InsertItem(const LVITEM* pItem)
 }
 
 int CMyOwnListCtrl::InsertItem(int nItem, LPCTSTR lpItem, int nImage)
-{
+{	
 	EndEdit(TRUE);
 	_UnsetSortedColumn();
 	const int IDX = CListCtrl::InsertItem(nItem, lpItem, nImage);
@@ -476,10 +476,10 @@ void CMyOwnListCtrl::SetGridLines(BOOL bSet)
 	else
 		dwStype &= ~LVS_EX_GRIDLINES;
 
-	SetExtendedStyle(dwStype);
+	SetExtendedStyle(dwStype);	
 }
 
-int CMyOwnListCtrl::InsertColumn(int nCol, const LVCOLUMN* pColumn)
+int CMyOwnListCtrl::InsertColumn(int nCol, const LVCOLUMN *pColumn)
 {
 	EndEdit(TRUE);
 	const int IDX = CListCtrl::InsertColumn(nCol, pColumn);
@@ -513,7 +513,7 @@ void CMyOwnListCtrl::SetCheckboxeStyle(int nStyle)
 	DWORD dwStype = GetExtendedStyle();
 	if (nStyle == 0)
 	{
-		dwStype &= ~LVS_EX_CHECKBOXES;
+		dwStype &= ~LVS_EX_CHECKBOXES;		
 	}
 	else
 	{
@@ -532,7 +532,7 @@ int CMyOwnListCtrl::MoveTo(int nItem, int nNewPosition)
 	EndEdit(TRUE);
 	const int ITEMS = CListCtrl::GetItemCount();
 	nNewPosition = max(0, nNewPosition);
-	nNewPosition = min(ITEMS - 1, nNewPosition);
+	nNewPosition  = min(ITEMS - 1, nNewPosition);
 
 	if (nItem == nNewPosition)
 		return nNewPosition;
@@ -551,7 +551,7 @@ int CMyOwnListCtrl::MoveTo(int nItem, int nNewPosition)
 	{
 		aImages[i] = GetItemImage(nItem, i);
 		aTexts[i] = GetItemText(nItem, i);
-	}
+	}	
 
 	// Delete the item
 	CListCtrl::DeleteItem(nItem);
@@ -571,7 +571,7 @@ int CMyOwnListCtrl::MoveTo(int nItem, int nNewPosition)
 }
 
 int CMyOwnListCtrl::MoveUp(int nItem, int nCount)
-{
+{	
 	return MoveTo(nItem, nItem - nCount);
 }
 
@@ -607,7 +607,7 @@ BOOL CMyOwnListCtrl::SwapItems(int nItem1, int nItem2)
 		SetItemImage(nItem1, i, GetItemImage(nItem2, i));
 		SetItemImage(nItem2, i, nImg);
 	}
-
+	
 	// swap item data
 	CListCtrl::SetItemData(nItem1, DATA2);
 	CListCtrl::SetItemData(nItem2, DATA1);
@@ -635,7 +635,7 @@ BOOL CMyOwnListCtrl::SetItemText(int nItem, int nSubItem, TCHAR val)
 }
 
 BOOL CMyOwnListCtrl::SetItemText(int nItem, int nSubItem, INT val)
-{
+{	
 	return SetItemText(nItem, nSubItem, (LONG)val);
 }
 
@@ -647,7 +647,7 @@ BOOL CMyOwnListCtrl::SetItemText(int nItem, int nSubItem, UINT val)
 BOOL CMyOwnListCtrl::SetItemText(int nItem, int nSubItem, DOUBLE val, int nPrecision)
 {
 	CString sText, sFmt;
-
+	
 	if (nPrecision >= 0)
 	{
 		sFmt.Format(_T("%%.%df"), nPrecision);
@@ -659,11 +659,11 @@ BOOL CMyOwnListCtrl::SetItemText(int nItem, int nSubItem, DOUBLE val, int nPreci
 		sText.TrimRight(_T('0'));
 		sText.TrimRight(_T('.'));
 	}
-
+	
 	return SetItemText(nItem, nSubItem, sText);
 }
 
-BOOL CMyOwnListCtrl::SetItemText(int nItem, int nSubItem, const COleDateTime& dateTime, DWORD dwFlags)
+BOOL CMyOwnListCtrl::SetItemText(int nItem, int nSubItem, const COleDateTime &dateTime, DWORD dwFlags)
 {
 	return SetItemText(nItem, nSubItem, dateTime.GetStatus() == COleDateTime::valid ? dateTime.Format(dwFlags) : _T(""));
 }
@@ -685,7 +685,7 @@ BOOL CMyOwnListCtrl::SetItemText(int nItem, int nSubItem, ULONG val)
 BOOL CMyOwnListCtrl::DeleteAllColumns()
 {
 	while (GetColumnCount() > 0)
-		DeleteColumn(0);
+		DeleteColumn(0);		
 	return TRUE;
 }
 
@@ -714,10 +714,10 @@ int CMyOwnListCtrl::InsertItemEx(int nItem, LPCTSTR lpText, ...)
 	if (IDX < 0)
 		return -1;
 
-	va_list list;
+ 	va_list list;
 	va_start(list, lpText);
 
-	for (int iColumn = 1; iColumn < GetColumnCount(); iColumn++)
+	for(int iColumn = 1; iColumn < GetColumnCount(); iColumn++)
 	{
 		LPCTSTR lp = va_arg(list, LPCTSTR);
 		if (lp != NULL)
@@ -746,7 +746,7 @@ BOOL CMyOwnListCtrl::_IsEditVisible() const
 }
 
 void CMyOwnListCtrl::SetEditable(BOOL bSet)
-{
+{	
 	if (!bSet)
 		EndEdit(TRUE);
 	m_bAllowEdit = bSet;
@@ -774,14 +774,14 @@ BOOL CMyOwnListCtrl::_ItemCheckMonitor(int nIndex, BOOL bBefore, BOOL bAfter, UI
 		{
 			SetAllItemStates(RC_ITEM_CHECKED, RC_ITEM_UNCHECKED); // uncheck all
 			SetItemStates(nIndex, RC_ITEM_CHECKED);
-		}
+		}		
 	}
 	else if (m_nChkStyle == RC_CHKBOX_DISABLED)
 	{
 		// Cannot change the item checked/unchecked states by mouse clicks
 		SetItemStates(nIndex, bBefore ? RC_ITEM_CHECKED : RC_ITEM_UNCHECKED);
 		return TRUE;
-	}
+	}	
 
 	SetAllItemStates(RC_ITEM_SELECTED, RC_ITEM_UNSELECTED); // unselect all
 	SetItemStates(nIndex, RC_ITEM_SELECTED | RC_ITEM_FOCUSED);
@@ -794,7 +794,7 @@ int CMyOwnListCtrl::GetCheckboxStyle() const
 	return m_nChkStyle;
 }
 
-void CMyOwnListCtrl::_StringSplit(const CString& str, CStringArray& arr, TCHAR chDelimitior)
+void CMyOwnListCtrl::_StringSplit(const CString &str, CStringArray &arr, TCHAR chDelimitior)
 {
 	int nStart = 0, nEnd = 0;
 	arr.RemoveAll();
@@ -803,7 +803,7 @@ void CMyOwnListCtrl::_StringSplit(const CString& str, CStringArray& arr, TCHAR c
 	{
 		// determine the paragraph ("xxx,xxx,xxx;")
 		nEnd = str.Find(chDelimitior, nStart);
-		if (nEnd == -1)
+		if( nEnd == -1 )
 		{
 			// reached the end of string
 			nEnd = str.GetLength();
@@ -844,7 +844,7 @@ DWORD CMyOwnListCtrl::SetExtendedStyle(DWORD dwNewStyle)
 	return CListCtrl::SetExtendedStyle(dwNewStyle);
 }
 
-BOOL CMyOwnListCtrl::PreCreateWindow(CREATESTRUCT& cs)
+BOOL CMyOwnListCtrl::PreCreateWindow(CREATESTRUCT& cs) 
 {
 	// TODO: Add your specialized code here and/or call the base class
 	cs.style &= ~MUST_NOT_STYLE;
@@ -852,7 +852,7 @@ BOOL CMyOwnListCtrl::PreCreateWindow(CREATESTRUCT& cs)
 	return CListCtrl::PreCreateWindow(cs);
 }
 
-BOOL CMyOwnListCtrl::PreTranslateMessage(MSG* pMsg)
+BOOL CMyOwnListCtrl::PreTranslateMessage(MSG* pMsg) 
 {
 	// TODO: Add your specialized code here and/or call the base class
 	if (pMsg->message == WM_KEYDOWN)
@@ -896,7 +896,7 @@ BOOL CMyOwnListCtrl::PreTranslateMessage(MSG* pMsg)
 					return TRUE;
 				}
 				break;
-
+				
 			case VK_DOWN: // edit lower item
 				if (pt.x < CListCtrl::GetItemCount() - 1)
 				{
@@ -906,10 +906,10 @@ BOOL CMyOwnListCtrl::PreTranslateMessage(MSG* pMsg)
 					EnsureVisible(pt.x, FALSE);
 					return TRUE;
 				}
-				break;
+				break;			
 
 			default:
-				break;
+				break;				
 			}
 		}
 	}
@@ -922,7 +922,7 @@ CEdit* CMyOwnListCtrl::GetEditControl()
 	return m_pWndEdit;
 }
 
-BOOL CMyOwnListCtrl::Create(CWnd* pParentWnd, UINT nID, LPCRECT lpRect, DWORD dwStyle)
+BOOL CMyOwnListCtrl::Create(CWnd* pParentWnd, UINT nID, LPCRECT lpRect, DWORD dwStyle) 
 {
 	// TODO: Add your specialized code here and/or call the base class
 	ASSERT(pParentWnd != NULL);
@@ -939,7 +939,7 @@ BOOL CMyOwnListCtrl::Create(CWnd* pParentWnd, UINT nID, LPCRECT lpRect, DWORD dw
 	return CListCtrl::Create(dwStyle, rect, pParentWnd, nID);
 }
 
-void CMyOwnListCtrl::PreSubclassWindow()
+void CMyOwnListCtrl::PreSubclassWindow() 
 {
 	// TODO: Add your specialized code here and/or call the base class
 	LONG lStyle = ::GetWindowLong(GetSafeHwnd(), GWL_STYLE);
@@ -993,16 +993,14 @@ BOOL CMyOwnListCtrl::ModifyStyle(DWORD dwRemove, DWORD dwAdd, UINT nFlags)
 	dwAdd |= MUST_STYLE;
 	return CListCtrl::ModifyStyle(dwRemove, dwAdd, nFlags);
 }
-
-extern HWND m_input_dlg_hwnd;
-
+extern HWND      m_input_dlg_hwnd;
 void CMyOwnListCtrl::_MouseClkMonitor(UINT nMsg, UINT nFlags, CPoint point, BOOL bTriggerEdit)
 {
 	CString tempStr;
 	LVHITTESTINFO hti;
 	hti.pt = point;
 	const int IDX = SubItemHitTest(&hti);
-	const BOOL BEFORE = CListCtrl::GetCheck(IDX) > 0;
+	const BOOL BEFORE = CListCtrl::GetCheck(IDX) > 0;	
 	const BOOL WAS_EDIT = _IsEditVisible();
 
 	/*if(hti.iSubItem==2)
@@ -1015,7 +1013,7 @@ void CMyOwnListCtrl::_MouseClkMonitor(UINT nMsg, UINT nFlags, CPoint point, BOOL
 		//m_valueCombx.InsertString(0,_T("Off"));
 		//m_valueCombx.InsertString(1,_T("On"));
 
-		//m_valueCombx.MoveWindow(rc); //ï¿½Æ¶ï¿½ï¿½ï¿½Ñ¡ï¿½Ð¸ï¿½ï¿½Î»ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½
+		//m_valueCombx.MoveWindow(rc); //ÒÆ¶¯µ½Ñ¡ÖÐ¸ñµÄÎ»ÖÃ£¬¸²¸Ç
 
 		return;
 	}*/
@@ -1036,11 +1034,11 @@ void CMyOwnListCtrl::_MouseClkMonitor(UINT nMsg, UINT nFlags, CPoint point, BOOL
 		//::PostMessage(hMbpollWnd,MY_MBPOLL_REG_DIALOG_MSG,NULL,NULL);
 		if (regDetailsOpenedFrom == 0)
 		{
-			::PostMessage(hMbpollWnd,MY_MBPOLL_REG_DIALOG_MSG, hti.iItem, hti.iSubItem);
+			::PostMessage(hMbpollWnd,MY_MBPOLL_REG_DIALOG_MSG,hti.iItem,hti.iSubItem);
 		}
 		if (regDetailsOpenedFrom == 1)
 		{
-			::PostMessage(hMbpollWritePopWnd,MY_MBPOLL_WRITE_REG_MSG, hti.iItem, hti.iSubItem);
+			::PostMessage(hMbpollWritePopWnd,MY_MBPOLL_WRITE_REG_MSG,hti.iItem,hti.iSubItem);
 		}
 		break;
 
@@ -1061,9 +1059,9 @@ void CMyOwnListCtrl::_MouseClkMonitor(UINT nMsg, UINT nFlags, CPoint point, BOOL
 		break;
 
 	default:
-		break;
+		break;		
 	}
-
+	
 	const BOOL STATSCHANGED = _ItemCheckMonitor(IDX, BEFORE, CListCtrl::GetCheck(IDX) > 0, nMsg);
 
 	if (bTriggerEdit && m_bAllowEdit && !STATSCHANGED && !WAS_EDIT && WASACTIVE)
@@ -1084,7 +1082,7 @@ int CMyOwnListCtrl::GetItemImage(int nItem, int nSubItem) const
 	return CListCtrl::GetItem(&lvi) ? lvi.iImage : -1;
 }
 
-CImageList* CMyOwnListCtrl::SetImageList(CImageList* pImageList)
+CImageList* CMyOwnListCtrl::SetImageList(CImageList *pImageList)
 {
 	return CListCtrl::SetImageList(pImageList, LVSIL_SMALL);
 }
@@ -1097,7 +1095,7 @@ CImageList* CMyOwnListCtrl::GetImageList() const
 CImageList* CMyOwnListCtrl::SetImageList(UINT nBitmapID, COLORREF crMask)
 {
 	m_imgList.DeleteImageList();
-	m_imgList.Create(nBitmapID, 16, 4, crMask);
+	m_imgList.Create(nBitmapID, 16, 4, crMask);	
 	return CListCtrl::SetImageList(&m_imgList, LVSIL_SMALL);
 }
 
@@ -1106,7 +1104,7 @@ BOOL CMyOwnListCtrl::StartEdit(int nItem, int nSubItem)
 	// Get the grid width and height
 	if (!m_bAllowEdit || !_IsValidIndex(nItem) || nSubItem < 0 || nSubItem >= GetColumnCount())
 		return FALSE;
-
+	
 	if (m_ptEditting.x == nItem && m_ptEditting.y == nSubItem)
 		return TRUE;
 
@@ -1185,14 +1183,14 @@ BOOL CMyOwnListCtrl::SetHeaderImage(int nColumn, int nImageIndex, BOOL bLeftSide
 {
 	if (GetHeaderCtrl()->GetImageList() == NULL)
 		CListCtrl::GetHeaderCtrl()->SetImageList(GetImageList());
-
+	
 	HDITEM hi;
 	::memset(&hi, 0, sizeof(HDITEM));
 	hi.mask = HDI_FORMAT;
 	if (!GetHeaderCtrl()->GetItem(nColumn, &hi))
 		return FALSE;
-
-	hi.mask |= HDI_IMAGE;
+	
+	hi.mask |= HDI_IMAGE;		
 	hi.fmt |= HDF_IMAGE;
 
 	if (!bLeftSide)
@@ -1229,7 +1227,7 @@ DWORD CMyOwnListCtrl::_GetHeaderTextFormat(int nColumn) const
 		return ES_LEFT;
 
 	if (hd.fmt & HDF_CENTER)
-	{
+	{	
 		return ES_CENTER;
 	}
 	else if (hd.fmt & HDF_RIGHT)
@@ -1250,7 +1248,7 @@ int CMyOwnListCtrl::GetHeaderImage(int nColumn) const
 	return !GetHeaderCtrl()->GetItem(nColumn, &hi) ? hi.iImage : -1;
 }
 
-CImageList* CMyOwnListCtrl::SetHeaderImageList(CImageList* pImageList)
+CImageList* CMyOwnListCtrl::SetHeaderImageList(CImageList *pImageList)
 {
 	return CListCtrl::GetHeaderCtrl()->SetImageList(pImageList);
 }
@@ -1279,7 +1277,7 @@ int CMyOwnListCtrl::GetItemCount(DWORD dwStates) const
 		return ITEMS;
 
 	int nCount = 0;
-	for (int i = 0; i < ITEMS; i++)
+	for (int i = 0; i <ITEMS; i++)
 	{
 		if (ExamItemStates(i, dwStates))
 			nCount++;
@@ -1291,7 +1289,7 @@ int CMyOwnListCtrl::GetFirstItem(DWORD dwStates, int nStartAfter) const
 {
 	const int ITEMS = CListCtrl::GetItemCount();
 	nStartAfter = max(-1, nStartAfter);
-	for (int i = nStartAfter + 1; i < ITEMS; i++)
+	for (int i = nStartAfter + 1; i <ITEMS; i++)
 	{
 		if (ExamItemStates(i, dwStates))
 			return i;
@@ -1391,7 +1389,7 @@ void CMyOwnListCtrl::_EnsureSingleCheck(int nItem)
 				if (CListCtrl::GetCheck(i))
 					CListCtrl::SetCheck(i, FALSE);
 			}
-		}
+		}		
 	}
 }
 
@@ -1399,9 +1397,9 @@ BOOL CMyOwnListCtrl::_SetItemStatesNoVerify(int nItem, DWORD dwNewStates)
 {
 	if (dwNewStates == RC_ITEM_NONE)
 		return FALSE;
-
+	
 	BOOL bResult = TRUE;
-
+	
 	if (dwNewStates & RC_ITEM_SELECTED)
 		bResult &= CListCtrl::SetItemState(nItem, LVIS_SELECTED, LVIS_SELECTED);
 
@@ -1437,7 +1435,7 @@ CString CMyOwnListCtrl::GetHeaderText(int nColumn) const
 		return _T("");
 
 	HDITEM hd;
-	TCHAR szBuffer[256] = _T("");
+	TCHAR  szBuffer[256] = _T("");
 	hd.mask = HDI_TEXT;
 	hd.pszText = szBuffer;
 	hd.cchTextMax = 255;
@@ -1493,7 +1491,7 @@ void CMyOwnListCtrl::_AllocItemMemory(int nItem)
 	ASSERT(_IsValidIndex(nItem));
 	const int COLS = GetColumnCount();
 	ASSERT(COLS > 0);
-	CItemData* pData = new CItemData;
+	CItemData* pData = new CItemData;	
 	pData->dwData = CListCtrl::GetItemData(nItem);
 	pData->aTextColors.SetSize(COLS);
 	pData->aBkColors.SetSize(COLS);
@@ -1534,7 +1532,7 @@ DWORD CMyOwnListCtrl::GetItemData(int nItem) const
 	return p == NULL ? 0 : p->dwData;
 }
 
-BOOL CMyOwnListCtrl::GetItem(LVITEM* pItem) const
+BOOL CMyOwnListCtrl::GetItem(LVITEM *pItem) const
 {
 	const BOOL RES = CListCtrl::GetItem(pItem);
 	if (RES && (pItem->mask & LVIF_PARAM) != 0)
@@ -1546,11 +1544,11 @@ BOOL CMyOwnListCtrl::GetItem(LVITEM* pItem) const
 	return RES;
 }
 
-BOOL CMyOwnListCtrl::SetItem(const LVITEM* pItem)
+BOOL CMyOwnListCtrl::SetItem(const LVITEM *pItem)
 {
 	if (pItem == NULL)
 		return FALSE;
-
+	
 	LVITEM li;
 	memcpy(&li, pItem, sizeof(LVITEM));
 	if ((li.mask & LVIF_PARAM) != 0)
@@ -1560,7 +1558,7 @@ BOOL CMyOwnListCtrl::SetItem(const LVITEM* pItem)
 		{
 			p->dwData = li.lParam;
 			li.lParam = (LPARAM)p;
-		}
+		}		
 	}
 	return CListCtrl::SetItem(&li);
 }
@@ -1574,7 +1572,7 @@ BOOL CMyOwnListCtrl::SetItem(int nItem, int nSubItem, UINT nMask, LPCTSTR lpszIt
 		{
 			p->dwData = lParam;
 			lParam = (LPARAM)p;
-		}
+		}		
 	}
 	return CListCtrl::SetItem(nItem, nSubItem, nMask, lpszItem, nImage, nState, nStateMask, lParam);
 }
@@ -1707,8 +1705,8 @@ BOOL CMyOwnListCtrl::_PartialSort(int nStart, int nEnd)
 	int* aIndices = new int[COUNT];
 	for (i = 0; i < COUNT; i++)
 		aIndices[i] = nStart + i;
-
-	_QuickSortRecursive(aIndices, 0, COUNT - 1);
+	
+	_QuickSortRecursive(aIndices, 0, COUNT - 1); 
 
 	// rearrange items
 	const int COLS = GetColumnCount();
@@ -1733,7 +1731,7 @@ BOOL CMyOwnListCtrl::_PartialSort(int nStart, int nEnd)
 		CListCtrl::SetItemData(nStart + i, aRows[i].dwData);
 		for (int j = 0; j < COLS; j++)
 		{
-			SetItemImage(nStart + i, j, aRows[i].aImages[j]);
+			SetItemImage(nStart + i, j, aRows[i].aImages[j]);			
 			CListCtrl::SetItemText(nStart + i, j, aRows[i].aTexts[j]);
 		}
 	}
@@ -1748,17 +1746,17 @@ int CMyOwnListCtrl::_CompareItems(int nItem1, int nItem2)
 	const CString s2 = GetItemText(nItem2, m_nSortCol);
 
 	DWORD dw1, dw2;
-	if (_ITEM_COMPARE_FUNCS::_IsHexNumber(s1, dw1) && _ITEM_COMPARE_FUNCS::_IsHexNumber(s2, dw2))
+	if(_ITEM_COMPARE_FUNCS::_IsHexNumber(s1, dw1) && _ITEM_COMPARE_FUNCS::_IsHexNumber(s2, dw2))
 		return _ITEM_COMPARE_FUNCS::_HexNumberCompare(dw1, dw2);
 
 	double f1, f2;
-	if (_ITEM_COMPARE_FUNCS::_IsDecNumber(s1, f1) && _ITEM_COMPARE_FUNCS::_IsDecNumber(s2, f2))
+	if(_ITEM_COMPARE_FUNCS::_IsDecNumber(s1, f1) && _ITEM_COMPARE_FUNCS::_IsDecNumber(s2, f2))
 		return _ITEM_COMPARE_FUNCS::_DecNumberCompare(f1, f2);
 
 	COleDateTime date1, date2;
-	if (_ITEM_COMPARE_FUNCS::_IsDate(s1, date1) && _ITEM_COMPARE_FUNCS::_IsDate(s2, date2))
+	if(_ITEM_COMPARE_FUNCS::_IsDate(s1, date1) && _ITEM_COMPARE_FUNCS::_IsDate(s2, date2))
 		return _ITEM_COMPARE_FUNCS::_DateCompare(date1, date2);
-
+	
 	// plain text.
 	return s1.Compare(s2);
 }
@@ -1800,9 +1798,9 @@ void CMyOwnListCtrl::_QuickSortRecursive(int* pArr, int nLow, int nHigh)
 				i--;
 		}
 
-		if (i >= j)
+		if ( i >= j )
 		{
-			if (i != j)
+			if ( i != j )
 			{
 				int nTemp = pArr[i];
 				pArr[i] = pArr[j];
@@ -1812,12 +1810,12 @@ void CMyOwnListCtrl::_QuickSortRecursive(int* pArr, int nLow, int nHigh)
 			i--;
 			j++;
 		}
-	}
-	while (j <= i);
+		
+	} while (j <= i);
 
 	if (nLow < i)
-		_QuickSortRecursive(pArr, nLow, i);
+		_QuickSortRecursive(pArr,nLow,i);
 
 	if (j < nHigh)
-		_QuickSortRecursive(pArr, j, nHigh);
+		_QuickSortRecursive(pArr,j,nHigh);
 }

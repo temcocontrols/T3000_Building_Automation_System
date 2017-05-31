@@ -18,9 +18,6 @@
 
 #include "global_variable_extern.h"
 #include <afxinet.h>
-/// <summary>
-/// CheckForUpdate
-/// </summary>
 BOOL CheckForUpdate(
 	LPCTSTR szFtpServer,
 	LPCTSTR szFtpUsername,
@@ -28,17 +25,9 @@ BOOL CheckForUpdate(
 	LPCTSTR szFtpFilename,
 	LPCTSTR szCurrentVersion,
 	LPTSTR szLastVersion );
-/// <summary>
-/// FLEX_GRID_PUT_STR
-/// </summary>
+
 void FLEX_GRID_PUT_STR(CMsflexgrid m_FlexGri,int row,int col,CString str);
-/// <summary>
-/// Set_Communication_Count
-/// </summary>
 int Set_Communication_Count(bool b_transmission,int bac_instanceid);
-/// <summary>
-/// 
-/// </summary>
 int modbus_read_one_value( 
 				int& value, 
 				unsigned char device_var,

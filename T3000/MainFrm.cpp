@@ -2487,23 +2487,23 @@ void CMainFrame::LoadProductFromDB()
 							long temp_serial_id = (long)(_wtoi64(strSql));
 							unsigned int correct_id = (DWORD)(_wtoi64(strSql));
 							//用于将以前数据库中的 负的序列号 修改为正的;Add by Fance
-							if(temp_serial_id < 0)
-							{
-								CString wrong_serial_id;
-								wrong_serial_id = strSql;
-								CString correct_serial_id;
-								CString str_temp;
-								correct_serial_id.Format(_T("%u"),correct_id);
-								try
-								{
-									str_temp.Format(_T("update ALL_NODE set Serial_ID ='%s' where Serial_ID = '%s'"),correct_serial_id, wrong_serial_id);
-									SqliteDBBuilding.execDML((UTF8MBSTR)str_temp);
-								}
-								catch(_com_error *e)
-								{
-									AfxMessageBox(e->ErrorMessage());
-								}
-							}
+							//if(temp_serial_id < 0)
+							//{
+							//	CString wrong_serial_id;
+							//	wrong_serial_id = strSql;
+							//	CString correct_serial_id;
+							//	CString str_temp;
+							//	correct_serial_id.Format(_T("%u"),correct_id);
+							//	try
+							//	{
+							//		str_temp.Format(_T("update ALL_NODE set Serial_ID ='%s' where Serial_ID = '%s'"),correct_serial_id, wrong_serial_id);
+							//		SqliteDBBuilding.execDML((UTF8MBSTR)str_temp);
+							//	}
+							//	catch(_com_error *e)
+							//	{
+							//		AfxMessageBox(e->ErrorMessage());
+							//	}
+							//}
 							m_product_temp.serial_number= correct_id;
 
 
@@ -9418,7 +9418,7 @@ LRESULT  CMainFrame::HandleIspModedivice(WPARAM wParam, LPARAM lParam)
 	BOOL bDontLinger = FALSE;
 	setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
 	closesocket(h_Broad);
-
+	
 	CString temp_ipaddress;
 	temp_ipaddress.Format(_T("%u.%u.%u.%u"),need_isp_device.ipaddress[0],need_isp_device.ipaddress[1],need_isp_device.ipaddress[2],need_isp_device.ipaddress[3]);
 
@@ -9505,12 +9505,12 @@ LRESULT  CMainFrame::HandleDuplicateID(WPARAM wParam, LPARAM lParam)
 	b_pause_refresh_tree = true;
 	if(duplicate_mode == 0)
 	{
-		CDuplicateIdDetected Dlg(0);
+		CDuplicateIdDetected Dlg(0,NULL);
 		Dlg.DoModal();
 	}
 	else
 	{
-		CDuplicateIdDetected Dlg(1);
+		CDuplicateIdDetected Dlg(1, NULL);
 		Dlg.DoModal();
 	}
 

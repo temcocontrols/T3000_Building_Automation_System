@@ -8,12 +8,13 @@
 
 #include "global_function.h"
 // CBacnetUserConfig dialog
-extern bool show_user_list_window;
+extern bool show_user_list_window ;
 IMPLEMENT_DYNAMIC(CBacnetUserConfig, CDialogEx)
 
 CBacnetUserConfig::CBacnetUserConfig(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CBacnetUserConfig::IDD, pParent)
 {
+
 }
 
 CBacnetUserConfig::~CBacnetUserConfig()
@@ -28,8 +29,8 @@ void CBacnetUserConfig::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CBacnetUserConfig, CDialogEx)
-	ON_MESSAGE(WM_REFRESH_BAC_USER_NAME_LIST,Fresh_User_List)
-	ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_User_Item)
+	ON_MESSAGE(WM_REFRESH_BAC_USER_NAME_LIST,Fresh_User_List)	
+	ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_User_Item)	
 	ON_NOTIFY(NM_CLICK, IDC_USER_LIST, &CBacnetUserConfig::OnNMClickUserList)
 	ON_BN_CLICKED(IDC_CHECK_USERLIST_INFO, &CBacnetUserConfig::OnBnClickedCheckUserlistInfo)
 	ON_BN_CLICKED(IDC_BUTTON_USER_OK, &CBacnetUserConfig::OnBnClickedButtonUserOk)
@@ -43,19 +44,19 @@ END_MESSAGE_MAP()
 BOOL CBacnetUserConfig::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-	m_slected_item = -1; //初始化时 没有选择，从0 开始选择	;
+	m_slected_item = -1;	//初始化时 没有选择，从0 开始选择	;
 	ok_button_stage = 0;
 	// TODO:  Add extra initialization here
 	Initial_List();
 	Enable_Window_Stage(HIDE_ALL);
-	show_user_list_window = false; //避免点击左边list的时候 也弹出 配置对话框，只有在 点userlist 按键时弹出;
-	return TRUE; // return TRUE unless you set the focus to a control
+	show_user_list_window = false;	//避免点击左边list的时候 也弹出 配置对话框，只有在 点userlist 按键时弹出;
+	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
 void CBacnetUserConfig::Enable_Window_Stage(int nstage)
 {
-	switch (nstage)
+	switch(nstage)
 	{
 	case HIDE_ENTER_ORIGINAL_PASSWORD:
 		{
@@ -81,6 +82,7 @@ void CBacnetUserConfig::Enable_Window_Stage(int nstage)
 		break;
 	case ENTER_ORIGINAL_PASSWORD:
 		{
+
 			GetDlgItem(IDC_STATIC_USER_GROUP_BOX)->EnableWindow(1);
 			GetDlgItem(IDC_STATIC_USER_NAME)->EnableWindow(1);
 			GetDlgItem(IDC_EDIT_USER_NAME)->EnableWindow(1);
@@ -110,6 +112,7 @@ void CBacnetUserConfig::Enable_Window_Stage(int nstage)
 			GetDlgItem(IDC_EDIT_USER_NEW_PASSWORD)->SetFocus();
 
 			GetDlgItem(IDC_BUTTON_USER_DELETE)->EnableWindow(true);
+			
 		}
 		break;
 	case RETYPE_NEW_PASSWORD:
@@ -125,6 +128,7 @@ void CBacnetUserConfig::Enable_Window_Stage(int nstage)
 		break;
 	case HIDE_ALL:
 		{
+			
 			GetDlgItem(IDC_STATIC_USER_GROUP_BOX)->EnableWindow(false);
 			GetDlgItem(IDC_STATIC_USER_NAME)->EnableWindow(false);
 			GetDlgItem(IDC_EDIT_USER_NAME)->EnableWindow(false);
@@ -159,13 +163,13 @@ void CBacnetUserConfig::Enable_Window_Stage(int nstage)
 BOOL CBacnetUserConfig::PreTranslateMessage(MSG* pMsg)
 {
 	// TODO: Add your specialized code here and/or call the base class
-	if (pMsg->message == WM_KEYDOWN)
+	if(pMsg->message == WM_KEYDOWN)
 	{
-		if (pMsg->wParam == VK_RETURN)
+		if(pMsg->wParam == VK_RETURN)
 		{
-			if (this->IsWindowVisible())
+			if(this->IsWindowVisible())
 			{
-				if ((GetFocus()->GetDlgCtrlID() == IDC_EDIT_USER_PASSWORD) ||
+				if((GetFocus()->GetDlgCtrlID() == IDC_EDIT_USER_PASSWORD) ||
 					(GetFocus()->GetDlgCtrlID() == IDC_EDIT_USER_NEW_PASSWORD) ||
 					(GetFocus()->GetDlgCtrlID() == IDC_EDIT_USER_RETYPE_PASSWORD))
 				{
@@ -173,12 +177,12 @@ BOOL CBacnetUserConfig::PreTranslateMessage(MSG* pMsg)
 					::PostMessage(GetDlgItem(IDC_BUTTON_USER_OK)->m_hWnd,WM_LBUTTONUP,NULL,NULL);
 					return 0;
 				}
-				else if ((GetFocus()->GetDlgCtrlID() == IDC_USER_LIST))
+				else if((GetFocus()->GetDlgCtrlID() == IDC_USER_LIST))
 				{
-					CRect list_rect, win_rect;
+					CRect list_rect,win_rect;
 					m_user_config_list.GetWindowRect(list_rect);
 					ScreenToClient(&list_rect);
-					::GetWindowRect(m_user_config_hwnd, win_rect);
+					::GetWindowRect(m_user_config_hwnd,win_rect);
 					m_user_config_list.Set_My_WindowRect(win_rect);
 					m_user_config_list.Set_My_ListRect(list_rect);
 
@@ -198,52 +202,52 @@ BOOL CBacnetUserConfig::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetUserConfig::Initial_List()
 {
-	m_user_config_list.ModifyStyle(0, LVS_SINGLESEL | LVS_REPORT | LVS_SHOWSELALWAYS);
+	m_user_config_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 	//m_user_config_list.SetExtendedStyle(m_user_config_list.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
-	m_user_config_list.SetExtendedStyle(m_user_config_list.GetExtendedStyle() | LVS_EX_GRIDLINES & (~LVS_EX_FULLROWSELECT));//Not allow full row select.
+	m_user_config_list.SetExtendedStyle(m_user_config_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
 	m_user_config_list.InsertColumn(USERLIST_NAME, _T("User  Name"), 150, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
 
 	m_user_config_hwnd = this->m_hWnd;
 	g_hwnd_now = m_user_config_hwnd;
 
-	CRect list_rect, win_rect;
+	CRect list_rect,win_rect;
 	m_user_config_list.GetWindowRect(list_rect);
 	ScreenToClient(&list_rect);
-	::GetWindowRect(m_user_config_hwnd, win_rect);
+	::GetWindowRect(m_user_config_hwnd,win_rect);
 	m_user_config_list.Set_My_WindowRect(win_rect);
 	m_user_config_list.Set_My_ListRect(list_rect);
 
 
 	m_user_config_list.DeleteAllItems();
-	for (int i = 0; i < (int)m_user_login_data.size(); i++)
+	for (int i=0;i<(int)m_user_login_data.size();i++)
 	{
-		CString temp_item, temp_dig_off, temp_dig_on, temp_dir_inv;
-		temp_item.Format(_T("%d"), i + 1);
+		CString temp_item,temp_dig_off,temp_dig_on,temp_dir_inv;
+		temp_item.Format(_T("%d"),i+1);
 		//m_user_config_list.InsertItem(i,temp_item);
 		m_user_config_list.InsertItem(i,_T(""));
 
 		CString temp_user_name;
-		MultiByteToWideChar(CP_ACP, 0, (char *)m_user_login_data.at(i).name, (int)strlen((char *)m_user_login_data.at(i).name) + 1,
-		                    temp_user_name.GetBuffer(MAX_PATH), MAX_PATH);
+		MultiByteToWideChar( CP_ACP, 0, (char *)m_user_login_data.at(i).name, (int)strlen((char *)m_user_login_data.at(i).name)+1, 
+			temp_user_name.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_user_name.ReleaseBuffer();
-		if (temp_user_name.IsEmpty())
+		if(temp_user_name.IsEmpty())
 		{
-			m_user_config_list.SetItemText(i, USERLIST_NAME,_T(""));
+			m_user_config_list.SetItemText(i,USERLIST_NAME,_T(""));
 		}
-		if (temp_user_name.GetLength() >= STR_USER_NAME_LENGTH)
+		if(temp_user_name.GetLength()>= STR_USER_NAME_LENGTH)
 			temp_user_name = temp_user_name.Left(STR_USER_NAME_LENGTH - 1);
-		m_user_config_list.SetItemText(i, USERLIST_NAME, temp_user_name);
+		m_user_config_list.SetItemText(i,USERLIST_NAME,temp_user_name);
 
-		for (int x = 0; x < 1; x++)
+		for (int x=0;x<1;x++)
 		{
-			if ((i % 2) == 0)
-				m_user_config_list.SetItemBkColor(i, x, LIST_ITEM_DEFAULT_BKCOLOR);
+			if((i%2)==0)
+				m_user_config_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR);
 			else
-				m_user_config_list.SetItemBkColor(i, x, LIST_ITEM_DEFAULT_BKCOLOR_GRAY);
+				m_user_config_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR_GRAY);		
 		}
 	}
 
-	if (Device_Basic_Setting.reg.user_name == 2)
+	if(Device_Basic_Setting.reg.user_name == 2)
 	{
 		((CButton *)GetDlgItem(IDC_CHECK_USERLIST_INFO))->SetCheck(true);
 	}
@@ -254,96 +258,102 @@ void CBacnetUserConfig::Initial_List()
 }
 
 
-LRESULT CBacnetUserConfig::Fresh_User_List(WPARAM wParam, LPARAM lParam)
+LRESULT CBacnetUserConfig::Fresh_User_List(WPARAM wParam,LPARAM lParam)
 {
-	for (int i = 0; i < (int)m_user_login_data.size(); i++)
+
+	for (int i=0;i<(int)m_user_login_data.size();i++)
 	{
 		CString temp_user_name;
-		MultiByteToWideChar(CP_ACP, 0, (char *)m_user_login_data.at(i).name, (int)strlen((char *)m_user_login_data.at(i).name) + 1,
-		                    temp_user_name.GetBuffer(MAX_PATH), MAX_PATH);
+		MultiByteToWideChar( CP_ACP, 0, (char *)m_user_login_data.at(i).name, (int)strlen((char *)m_user_login_data.at(i).name)+1, 
+			temp_user_name.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_user_name.ReleaseBuffer();
-		if (temp_user_name.IsEmpty())
+		if(temp_user_name.IsEmpty())
 		{
-			m_user_config_list.SetItemText(i, USERLIST_NAME,_T(""));
+			m_user_config_list.SetItemText(i,USERLIST_NAME,_T(""));
 		}
-		if (temp_user_name.GetLength() >= STR_USER_NAME_LENGTH)
+		if(temp_user_name.GetLength()>= STR_USER_NAME_LENGTH)
 			temp_user_name = temp_user_name.Left(STR_USER_NAME_LENGTH - 1);
-		m_user_config_list.SetItemText(i, USERLIST_NAME, temp_user_name);
+		m_user_config_list.SetItemText(i,USERLIST_NAME,temp_user_name);
 	}
 
 	return 0;
 }
 
 
-LRESULT CBacnetUserConfig::Fresh_User_Item(WPARAM wParam, LPARAM lParam)
+LRESULT CBacnetUserConfig::Fresh_User_Item(WPARAM wParam,LPARAM lParam)
 {
 	//int cmp_ret ;//compare if match it will 0;
 	int Changed_Item = (int)wParam;
 	int Changed_SubItem = (int)lParam;
 
 	return 0;
-	if (Changed_SubItem == USERLIST_NAME)
+	if(Changed_SubItem == USERLIST_NAME)
 	{
-		CString cs_temp = m_user_config_list.GetItemText(Changed_Item, Changed_SubItem);
-		if (cs_temp.GetLength() >= STR_USER_NAME_LENGTH) //长度不能大于结构体定义的长度;
+		CString cs_temp = m_user_config_list.GetItemText(Changed_Item,Changed_SubItem);
+		if(cs_temp.GetLength()>= STR_USER_NAME_LENGTH)	//长度不能大于结构体定义的长度;
 		{
 			MessageBox(_T("Length can not greater than 16"),_T("Warning"));
 			PostMessage(WM_REFRESH_BAC_USER_NAME_LIST,NULL,NULL);
 			return 0;
 		}
 		char cTemp1[255];
-		memset(cTemp1, 0, 255);
-		WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL);
-		memcpy_s(m_user_login_data.at(Changed_Item).name,STR_USER_NAME_LENGTH, cTemp1,STR_USER_NAME_LENGTH);
+		memset(cTemp1,0,255);
+		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+		memcpy_s(m_user_login_data.at(Changed_Item).name,STR_USER_NAME_LENGTH,cTemp1,STR_USER_NAME_LENGTH);
+
 	}
 	return 0;
 }
 
 
-void CBacnetUserConfig::OnNMClickUserList(NMHDR* pNMHDR, LRESULT* pResult)
+
+
+
+void CBacnetUserConfig::OnNMClickUserList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	// TODO: Add your control notification handler code here
 	*pResult = 0;
 
 	CString temp_cstring;
-	long lRow, lCol;
+	long lRow,lCol;
 	m_user_config_list.Set_Edit(false);
-	DWORD dwPos = GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
-	CPoint point(LOWORD(dwPos), HIWORD(dwPos));
+	DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
+	CPoint point( LOWORD(dwPos), HIWORD(dwPos));
 	m_user_config_list.ScreenToClient(&point);
 	LVHITTESTINFO lvinfo;
-	lvinfo.pt = point;
-	lvinfo.flags = LVHT_ABOVE;
-	int nItem = m_user_config_list.SubItemHitTest(&lvinfo);
+	lvinfo.pt=point;
+	lvinfo.flags=LVHT_ABOVE;
+	int nItem=m_user_config_list.SubItemHitTest(&lvinfo);
 
 	lRow = lvinfo.iItem;
 	lCol = lvinfo.iSubItem;
 
 
-	if (lRow > m_user_config_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+	if(lRow>m_user_config_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
 		return;
-	if (lRow < 0)
+	if(lRow<0)
 		return;
 
 	m_slected_item = lRow;
-	if (m_slected_item >= BAC_USER_LOGIN_COUNT)
+	if(m_slected_item >= BAC_USER_LOGIN_COUNT)
 		return;
 	Refresh_parameter(m_slected_item);
+
 }
 
 void CBacnetUserConfig::Refresh_parameter(UINT index)
 {
 	CString temp_password;
-	MultiByteToWideChar(CP_ACP, 0, (char *)m_user_login_data.at(index).password, (int)strlen((char *)m_user_login_data.at(index).password) + 1,
-	                    temp_password.GetBuffer(MAX_PATH), MAX_PATH);
+	MultiByteToWideChar( CP_ACP, 0, (char *)m_user_login_data.at(index).password, (int)strlen((char *)m_user_login_data.at(index).password)+1, 
+		temp_password.GetBuffer(MAX_PATH), MAX_PATH );
 	temp_password.ReleaseBuffer();
-	if (temp_password.IsEmpty())
+	if(temp_password.IsEmpty())
 	{
 		GetDlgItem(IDC_EDIT_USER_PASSWORD)->SetWindowText(_T(""));
 		//MessageBox(_T("No password in this item,you can create a new one!"));
 	}
-	else if (temp_password.GetLength() >= STR_USER_PASSWORD_LENGTH)
+	else if(temp_password.GetLength()>= STR_USER_PASSWORD_LENGTH)
 	{
 		temp_password = temp_password.Left(STR_USER_NAME_LENGTH - 1);
 		GetDlgItem(IDC_EDIT_USER_PASSWORD)->SetWindowText(temp_password);
@@ -351,14 +361,14 @@ void CBacnetUserConfig::Refresh_parameter(UINT index)
 
 
 	CString temp_user_name;
-	MultiByteToWideChar(CP_ACP, 0, (char *)m_user_login_data.at(index).name, (int)strlen((char *)m_user_login_data.at(index).name) + 1,
-	                    temp_user_name.GetBuffer(MAX_PATH), MAX_PATH);
+	MultiByteToWideChar( CP_ACP, 0, (char *)m_user_login_data.at(index).name, (int)strlen((char *)m_user_login_data.at(index).name)+1, 
+		temp_user_name.GetBuffer(MAX_PATH), MAX_PATH );
 	temp_user_name.ReleaseBuffer();
-	if (temp_user_name.IsEmpty())
+	if(temp_user_name.IsEmpty())
 	{
 		GetDlgItem(IDC_EDIT_USER_NAME)->SetWindowText(_T(""));
 	}
-	if (temp_user_name.GetLength() >= STR_USER_NAME_LENGTH)
+	if(temp_user_name.GetLength()>= STR_USER_NAME_LENGTH)
 		temp_user_name = temp_user_name.Left(STR_USER_NAME_LENGTH - 1);
 	GetDlgItem(IDC_EDIT_USER_NAME)->SetWindowText(temp_user_name);
 
@@ -367,19 +377,19 @@ void CBacnetUserConfig::Refresh_parameter(UINT index)
 	((CComboBox *)GetDlgItem(IDC_COMBO_ACCESS_LEVEL))->AddString(_T("Full access"));
 	((CComboBox *)GetDlgItem(IDC_COMBO_ACCESS_LEVEL))->AddString(_T("Graphic Mode"));
 	((CComboBox *)GetDlgItem(IDC_COMBO_ACCESS_LEVEL))->AddString(_T("Routine Mode"));
-	if (m_user_login_data.at(index).access_level == 1)
+	if(m_user_login_data.at(index).access_level == 1)
 	{
 		GetDlgItem(IDC_COMBO_ACCESS_LEVEL)->SetWindowText(_T("View only"));
 	}
-	else if (m_user_login_data.at(index).access_level == 2)
+	else if(m_user_login_data.at(index).access_level == 2)
 	{
 		GetDlgItem(IDC_COMBO_ACCESS_LEVEL)->SetWindowText(_T("Full access"));
 	}
-	else if (m_user_login_data.at(index).access_level == 3)
+	else if(m_user_login_data.at(index).access_level == 3)
 	{
 		GetDlgItem(IDC_COMBO_ACCESS_LEVEL)->SetWindowText(_T("Graphic Mode"));
 	}
-	else if (m_user_login_data.at(index).access_level == 4)
+	else if(m_user_login_data.at(index).access_level == 4)
 	{
 		GetDlgItem(IDC_COMBO_ACCESS_LEVEL)->SetWindowText(_T("Routine Mode"));
 	}
@@ -388,7 +398,7 @@ void CBacnetUserConfig::Refresh_parameter(UINT index)
 		GetDlgItem(IDC_COMBO_ACCESS_LEVEL)->SetWindowText(_T("Full access"));
 	}
 
-	if ((!temp_user_name.IsEmpty()) && (!temp_password.IsEmpty()))
+	if((!temp_user_name.IsEmpty()) && (!temp_password.IsEmpty()))
 	{
 		GetDlgItem(IDC_EDIT_USER_PASSWORD)->SetWindowTextW(_T(""));
 		GetDlgItem(IDC_EDIT_USER_NEW_PASSWORD)->SetWindowTextW(_T(""));
@@ -404,13 +414,14 @@ void CBacnetUserConfig::Refresh_parameter(UINT index)
 		ok_button_stage = stage_enter_new_password;
 		Enable_Window_Stage(HIDE_ENTER_ORIGINAL_PASSWORD);
 	}
+
 }
 
 
 void CBacnetUserConfig::OnBnClickedCheckUserlistInfo()
 {
 	// TODO: Add your control notification handler code here
-	if (!((CButton *)GetDlgItem(IDC_CHECK_USERLIST_INFO))->GetCheck())
+	if(!((CButton *)GetDlgItem(IDC_CHECK_USERLIST_INFO))->GetCheck())
 	{
 		((CButton *)GetDlgItem(IDC_CHECK_USERLIST_INFO))->SetCheck(false);
 
@@ -418,43 +429,44 @@ void CBacnetUserConfig::OnBnClickedCheckUserlistInfo()
 		//CString temp_task_info;
 		//temp_task_info.Format(_T("Disable user list feature "));
 		//Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
+
 	}
 	else
 	{
 		bool any_user_valid = false;
 		bool any_user_administrator = false;
 		//检测是否里面存在有效的账号密码;
-		for (int i = 0; i < (int)m_user_login_data.size(); i++)
+		for (int i=0;i<(int)m_user_login_data.size();i++)
 		{
 			CString temp_user_name;
-			MultiByteToWideChar(CP_ACP, 0, (char *)m_user_login_data.at(i).name, (int)strlen((char *)m_user_login_data.at(i).name) + 1,
-			                    temp_user_name.GetBuffer(MAX_PATH), MAX_PATH);
+			MultiByteToWideChar( CP_ACP, 0, (char *)m_user_login_data.at(i).name, (int)strlen((char *)m_user_login_data.at(i).name)+1, 
+				temp_user_name.GetBuffer(MAX_PATH), MAX_PATH );
 			temp_user_name.ReleaseBuffer();
 
 			CString temp_password;
-			MultiByteToWideChar(CP_ACP, 0, (char *)m_user_login_data.at(i).password, (int)strlen((char *)m_user_login_data.at(i).password) + 1,
-			                    temp_password.GetBuffer(MAX_PATH), MAX_PATH);
+			MultiByteToWideChar( CP_ACP, 0, (char *)m_user_login_data.at(i).password, (int)strlen((char *)m_user_login_data.at(i).password)+1, 
+				temp_password.GetBuffer(MAX_PATH), MAX_PATH );
 			temp_password.ReleaseBuffer();
-			if (!temp_user_name.IsEmpty())
+			if(!temp_user_name.IsEmpty())
 			{
-				if (!temp_password.IsEmpty())
+				if(!temp_password.IsEmpty())
 				{
-					if (m_user_login_data.at(i).access_level == LOGIN_SUCCESS_FULL_ACCESS)
+					if(m_user_login_data.at(i).access_level == LOGIN_SUCCESS_FULL_ACCESS)
 					{
 						any_user_administrator = true;
 						break;
 					}
-					any_user_valid = true; //User表里面 存在可用的 账号密码;
+					any_user_valid = true;	//User表里面 存在可用的 账号密码;
 				}
-			}
+			}		
 		}
 
-		if (any_user_administrator)
+		if(any_user_administrator)
 		{
 			((CButton *)GetDlgItem(IDC_CHECK_USERLIST_INFO))->SetCheck(true);
 			Device_Basic_Setting.reg.user_name = 2;
 		}
-		else if (any_user_valid)
+		else if(any_user_valid)
 		{
 			((CButton *)GetDlgItem(IDC_CHECK_USERLIST_INFO))->SetCheck(false);
 			Device_Basic_Setting.reg.user_name = 1;
@@ -468,30 +480,32 @@ void CBacnetUserConfig::OnBnClickedCheckUserlistInfo()
 			MessageBox(_T("User List don't contain any valid user name and password!\r\nPlease add it and then enable this feature!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
 			return;
 		}
+
+		
+
 	}
 
 	int temp_invoke_id = -1;
 	int send_status = true;
-	int resend_count = 0;
-	for (int z = 0; z < 3; z++)
+	int	resend_count = 0;
+	for (int z=0;z<3;z++)
 	{
-		do
+		do 
 		{
 			resend_count ++;
-			if (resend_count > 5)
+			if(resend_count>5)
 			{
 				send_status = false;
 				break;
 			}
-			temp_invoke_id = WritePrivateData(g_bac_instance, WRITE_SETTING_COMMAND, 0, 0);
+			temp_invoke_id = WritePrivateData(g_bac_instance,WRITE_SETTING_COMMAND,0,0);
 
 			Sleep(SEND_COMMAND_DELAY_TIME);
-		}
-		while (g_invoke_id < 0);
-		if (send_status)
+		} while (g_invoke_id<0);
+		if(send_status)
 		{
 			Sleep(1000);
-			if (tsm_invoke_id_free(temp_invoke_id))
+			if(tsm_invoke_id_free(temp_invoke_id))
 			{
 				ok_button_stage = 0;
 				PostMessage(WM_REFRESH_BAC_USER_NAME_LIST,NULL,NULL);
@@ -503,6 +517,7 @@ void CBacnetUserConfig::OnBnClickedCheckUserlistInfo()
 				continue;
 		}
 	}
+
 }
 
 
@@ -516,32 +531,32 @@ void CBacnetUserConfig::OnBnClickedButtonUserOk()
 	CString second_pw;
 	CString temp_user_name;
 	CString access_string;
-	switch (ok_button_stage)
+	switch(ok_button_stage)
 	{
-	case stage_enter_original_password: //检查原始密码是否正确;
+	case stage_enter_original_password://检查原始密码是否正确;
 		{
 			//m_user_login_data.at(m_slected_item).password
-			GetDlgItemTextW(IDC_EDIT_USER_NAME, temp_user_name);
-			GetDlgItemTextW(IDC_EDIT_USER_PASSWORD, temp_enter_original);
-			if (temp_user_name.IsEmpty())
+			GetDlgItemTextW(IDC_EDIT_USER_NAME,temp_user_name);
+			GetDlgItemTextW(IDC_EDIT_USER_PASSWORD,temp_enter_original);
+			if(temp_user_name.IsEmpty())
 			{
 				MessageBox(_T("user name is empty"),_T("Warning"),MB_OK);
 				return;
 			}
-			if (temp_user_name.GetLength() >= STR_USER_NAME_LENGTH)
+			if(temp_user_name.GetLength()>=STR_USER_NAME_LENGTH)
 			{
 				MessageBox(_T("User name is too long!"),_T("Warning"),MB_OK);
 				return;
 			}
-			if (temp_enter_original.IsEmpty())
+			if(temp_enter_original.IsEmpty())
 			{
 				MessageBox(_T("Password is empty"),_T("Warning"),MB_OK);
 				return;
 			}
-			memset(temp_buffer, 0, 255);
-			WideCharToMultiByte(CP_ACP,NULL, temp_enter_original.GetBuffer(), -1, temp_buffer, 255,NULL,NULL);
-			compare_ret = strcmp(temp_buffer, m_user_login_data.at(m_slected_item).password);
-			if (compare_ret == 0)
+			memset(temp_buffer,0,255);
+			WideCharToMultiByte(CP_ACP,NULL,temp_enter_original.GetBuffer(),-1,temp_buffer,255,NULL,NULL);
+			compare_ret = strcmp(temp_buffer,m_user_login_data.at(m_slected_item).password);
+			if(compare_ret == 0)
 			{
 				ok_button_stage = stage_enter_new_password;
 				Enable_Window_Stage(ENTER_NEW_PASSWORD);
@@ -549,7 +564,7 @@ void CBacnetUserConfig::OnBnClickedButtonUserOk()
 			else
 			{
 				SetDlgItemTextW(IDC_EDIT_USER_PASSWORD,_T(""));
-				MessageBox(_T("Password error"),_T("Warning"),MB_OK);
+				MessageBox(_T("Password error"),_T("Warning"),MB_OK);	
 				GetDlgItem(IDC_EDIT_USER_PASSWORD)->SetFocus();
 				return;
 			}
@@ -557,13 +572,13 @@ void CBacnetUserConfig::OnBnClickedButtonUserOk()
 		break;
 	case stage_enter_new_password:
 		{
-			GetDlgItemTextW(IDC_EDIT_USER_NEW_PASSWORD, first_pw);
-			if (first_pw.IsEmpty())
+			GetDlgItemTextW(IDC_EDIT_USER_NEW_PASSWORD,first_pw);
+			if(first_pw.IsEmpty())
 			{
 				MessageBox(_T("Password is empty"),_T("Warning"),MB_OK);
 				return;
 			}
-			if (first_pw.GetLength() >= STR_USER_PASSWORD_LENGTH)
+			if(first_pw.GetLength()>=STR_USER_PASSWORD_LENGTH)
 			{
 				MessageBox(_T("Password too long!"),_T("Warning"),MB_OK);
 				return;
@@ -572,44 +587,44 @@ void CBacnetUserConfig::OnBnClickedButtonUserOk()
 			Enable_Window_Stage(RETYPE_NEW_PASSWORD);
 		}
 		break;
-	case stage_retype_password:
+	case  stage_retype_password:
 		{
-			GetDlgItemTextW(IDC_EDIT_USER_NEW_PASSWORD, first_pw);
-			GetDlgItemTextW(IDC_EDIT_USER_RETYPE_PASSWORD, second_pw);
-			GetDlgItemTextW(IDC_EDIT_USER_NAME, temp_user_name);
-			GetDlgItemTextW(IDC_COMBO_ACCESS_LEVEL, access_string);
-
-			if (second_pw.IsEmpty())
+			GetDlgItemTextW(IDC_EDIT_USER_NEW_PASSWORD,first_pw);
+			GetDlgItemTextW(IDC_EDIT_USER_RETYPE_PASSWORD,second_pw);
+			GetDlgItemTextW(IDC_EDIT_USER_NAME,temp_user_name);
+			GetDlgItemTextW(IDC_COMBO_ACCESS_LEVEL,access_string);
+			
+			if(second_pw.IsEmpty())
 			{
 				MessageBox(_T("Password is empty"),_T("Warning"),MB_OK);
 				return;
 			}
-			if (second_pw.GetLength() >= STR_USER_PASSWORD_LENGTH)
+			if(second_pw.GetLength()>=STR_USER_PASSWORD_LENGTH)
 			{
 				MessageBox(_T("Password too long!"),_T("Warning"),MB_OK);
 				return;
 			}
 
-			if (first_pw.CompareNoCase(second_pw) == 0)
+			if(first_pw.CompareNoCase(second_pw) == 0)
 			{
-				if (temp_user_name.IsEmpty())
+				if(temp_user_name.IsEmpty())
 				{
 					MessageBox(_T("user name is empty"),_T("Warning"),MB_OK);
 					return;
 				}
-				memset(temp_buffer, 0, 255);
-				WideCharToMultiByte(CP_ACP,NULL, temp_user_name.GetBuffer(), -1, temp_buffer, 255,NULL,NULL);
-				memcpy(m_user_login_data.at(m_slected_item).name, temp_buffer,STR_USER_NAME_LENGTH);
+				memset(temp_buffer,0,255);
+				WideCharToMultiByte(CP_ACP,NULL,temp_user_name.GetBuffer(),-1,temp_buffer,255,NULL,NULL);
+				memcpy(m_user_login_data.at(m_slected_item).name,temp_buffer,STR_USER_NAME_LENGTH);
 
-				if (access_string.CompareNoCase(_T("View only")) == 0)
+				if(access_string.CompareNoCase(_T("View only")) == 0 )
 				{
 					m_user_login_data.at(m_slected_item).access_level = 1;
 				}
-				else if (access_string.CompareNoCase(_T("Graphic Mode")) == 0)
+				else if(access_string.CompareNoCase(_T("Graphic Mode")) == 0)
 				{
 					m_user_login_data.at(m_slected_item).access_level = 3;
 				}
-				else if (access_string.CompareNoCase(_T("Routine Mode")) == 0)
+				else if(access_string.CompareNoCase(_T("Routine Mode")) == 0)
 				{
 					m_user_login_data.at(m_slected_item).access_level = 4;
 				}
@@ -618,33 +633,32 @@ void CBacnetUserConfig::OnBnClickedButtonUserOk()
 				//_T("View only"));
 				//_T("Full access"));
 
-				memset(temp_buffer, 0, 255);
-				WideCharToMultiByte(CP_ACP,NULL, second_pw.GetBuffer(), -1, temp_buffer, 255,NULL,NULL);
-				memcpy(m_user_login_data.at(m_slected_item).password, temp_buffer,STR_USER_PASSWORD_LENGTH);
+				memset(temp_buffer,0,255);
+				WideCharToMultiByte(CP_ACP,NULL,second_pw.GetBuffer(),-1,temp_buffer,255,NULL,NULL);
+				memcpy(m_user_login_data.at(m_slected_item).password,temp_buffer,STR_USER_PASSWORD_LENGTH);
 
 				//Post_Write_Message(g_bac_instance,WRITEUSER_T3000,m_slected_item,m_slected_item,sizeof(Str_userlogin_point),m_user_config_hwnd ,_T(""),m_slected_item,m_slected_item);
 				int temp_invoke_id = -1;
 				int send_status = true;
-				int resend_count = 0;
-				for (int z = 0; z < 3; z++)
+				int	resend_count = 0;
+				for (int z=0;z<3;z++)
 				{
-					do
+					do 
 					{
 						resend_count ++;
-						if (resend_count > 5)
+						if(resend_count>5)
 						{
 							send_status = false;
 							break;
 						}
-						temp_invoke_id = WritePrivateData(g_bac_instance, WRITEUSER_T3000, m_slected_item, m_slected_item);
+						temp_invoke_id = WritePrivateData(g_bac_instance,WRITEUSER_T3000,m_slected_item,m_slected_item);
 
 						Sleep(SEND_COMMAND_DELAY_TIME);
-					}
-					while (g_invoke_id < 0);
-					if (send_status)
+					} while (g_invoke_id<0);
+					if(send_status)
 					{
 						Sleep(1000);
-						if (tsm_invoke_id_free(temp_invoke_id))
+						if(tsm_invoke_id_free(temp_invoke_id))
 						{
 							ok_button_stage = 0;
 							PostMessage(WM_REFRESH_BAC_USER_NAME_LIST,NULL,NULL);
@@ -656,6 +670,9 @@ void CBacnetUserConfig::OnBnClickedButtonUserOk()
 							continue;
 					}
 				}
+
+
+
 			}
 			else
 			{
@@ -673,34 +690,34 @@ void CBacnetUserConfig::OnBnClickedButtonUserOk()
 void CBacnetUserConfig::OnBnClickedButtonUserDelete()
 {
 	// TODO: Add your control notification handler code here
-	if ((m_slected_item < 0) || (m_slected_item >= BAC_USER_LOGIN_COUNT))
+	if((m_slected_item<0) || (m_slected_item >= BAC_USER_LOGIN_COUNT ))
 		return;
 
-	memset(&m_user_login_data.at(m_slected_item), 0, sizeof(Str_userlogin_point));
+	memset(&m_user_login_data.at(m_slected_item),0,sizeof(Str_userlogin_point));
+
 
 
 	int temp_invoke_id = -1;
 	int send_status = true;
-	int resend_count = 0;
-	for (int z = 0; z < 3; z++)
+	int	resend_count = 0;
+	for (int z=0;z<3;z++)
 	{
-		do
+		do 
 		{
 			resend_count ++;
-			if (resend_count > 5)
+			if(resend_count>5)
 			{
 				send_status = false;
 				break;
 			}
-			temp_invoke_id = WritePrivateData(g_bac_instance, WRITEUSER_T3000, m_slected_item, m_slected_item);
+			temp_invoke_id = WritePrivateData(g_bac_instance,WRITEUSER_T3000,m_slected_item,m_slected_item);
 
 			Sleep(SEND_COMMAND_DELAY_TIME);
-		}
-		while (g_invoke_id < 0);
-		if (send_status)
+		} while (g_invoke_id<0);
+		if(send_status)
 		{
 			Sleep(1000);
-			if (tsm_invoke_id_free(temp_invoke_id))
+			if(tsm_invoke_id_free(temp_invoke_id))
 			{
 				ok_button_stage = 0;
 				PostMessage(WM_REFRESH_BAC_USER_NAME_LIST,NULL,NULL);
@@ -714,4 +731,5 @@ void CBacnetUserConfig::OnBnClickedButtonUserDelete()
 	}
 
 	MessageBox(_T("Timeout!Please try again!"));
+
 }

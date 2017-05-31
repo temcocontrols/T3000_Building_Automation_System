@@ -14,6 +14,7 @@ IMPLEMENT_DYNAMIC(CBacnetMessageInput, CDialogEx)
 CBacnetMessageInput::CBacnetMessageInput(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CBacnetMessageInput::IDD, pParent)
 {
+
 }
 
 CBacnetMessageInput::~CBacnetMessageInput()
@@ -44,18 +45,18 @@ BOOL CBacnetMessageInput::OnInitDialog()
 	m_static_title.SetWindowTextW(bacnet_message_input_title);
 	m_static_title.textColor(RGB(0,0,0));
 	//m_static_title.bkColor(RGB(0,255,255));
-	m_static_title.setFont(24, 14,NULL,_T("Arial"));
+	m_static_title.setFont(24,14,NULL,_T("Arial"));
 
 
 	m_edit_return.SetWindowTextW(_T(""));
 	m_edit_return.textColor(RGB(0,0,0));
 	m_edit_return.bkColor(RGB(255,255,255));
-	m_edit_return.setFont(24, 14,NULL,_T("Arial"));
+	m_edit_return.setFont(24,14,NULL,_T("Arial"));
 
 	m_edit_return.SetFocus();
 	// TODO:  Add extra initialization here
 
-	return FALSE; // return TRUE unless you set the focus to a control
+	return FALSE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 

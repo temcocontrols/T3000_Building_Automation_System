@@ -1033,6 +1033,7 @@ typedef enum
 	BIG_MINIPANEL = 1,						//32 A				//12D   12A
 	SMALL_MINIPANEL = 2,		//16 A				//6 D	4 A
 	TINY_MINIPANEL = 3,	
+	TINY_EX_MINIPANEL = 4,
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,
 	PID_T3PT12 = 46,
@@ -1050,6 +1051,9 @@ const int CM5_MINIPANEL_IN_D = 8;
 const int TINY_MINIPANEL_IN_A = 11;
 const int TINY_MINIPANEL_IN_D = 0;
 
+const int TINYEX_MINIPANEL_IN_A = 8;
+const int TINYEX_MINIPANEL_IN_D = 0;
+
 const int BIG_MINIPANEL_OUT_A = 12;
 const int BIG_MINIPANEL_OUT_D = 12;
 const int SMALL_MINIPANEL_OUT_A = 4;
@@ -1059,6 +1063,9 @@ const int CM5_MINIPANEL_OUT_D = 10;
 
 const int TINY_MINIPANEL_OUT_D = 6;
 const int TINY_MINIPANEL_OUT_A = 2;
+
+const int TINYEX_MINIPANEL_OUT_D = 8;
+const int TINYEX_MINIPANEL_OUT_A = 6;
 
 const int T38AI8AO6DO_OUT_D = 6;
 const int T38AI8AO6DO_OUT_A = 8;

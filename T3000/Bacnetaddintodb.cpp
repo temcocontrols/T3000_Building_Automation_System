@@ -15,6 +15,7 @@ IMPLEMENT_DYNAMIC(CBacnetaddintodb, CDialogEx)
 CBacnetaddintodb::CBacnetaddintodb(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CBacnetaddintodb::IDD, pParent)
 {
+
 }
 
 CBacnetaddintodb::~CBacnetaddintodb()
@@ -44,7 +45,7 @@ void CBacnetaddintodb::OnBnClickedBacnetSettingAddBtn()
 	CString temp_add_id;
 	temp_add_id.Empty();
 	GetDlgItem(IDC_BACNET_ADDED_EDIT)->GetWindowTextW(temp_add_id);
-	if (temp_add_id.IsEmpty())
+	if(temp_add_id.IsEmpty())
 	{
 		MessageBox(_T("Please input an ID.Click 'add' button and 'OK' button ,it will add this id into device database"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
 		GetDlgItem(IDC_BACNET_ADDED_EDIT)->SetWindowTextW(_T(""));
@@ -52,28 +53,28 @@ void CBacnetaddintodb::OnBnClickedBacnetSettingAddBtn()
 	}
 
 	long nidvalue = _wtoi64(temp_add_id);
-	if ((nidvalue <= 0) || (nidvalue >= 255))
+	if((nidvalue <= 0) || (nidvalue >= 255))
 	{
 		MessageBox(_T("Please input an effective ID."),_T("Warning"),MB_OK | MB_ICONINFORMATION);
 		GetDlgItem(IDC_BACNET_ADDED_EDIT)->SetWindowTextW(_T(""));
 		return;
 	}
 
-	for (int x = 0; x < 254; x++)
+	for (int x=0;x<254;x++)
 	{
-		if (bacnet_add_id[x] == 0) //为0 就说明后面没有了;
+		if(bacnet_add_id[x] == 0)	//为0 就说明后面没有了;
 		{
 			bacnet_add_id[x] = nidvalue;
 			CString showvalue;
 			CString temp_id;
-			temp_id.Format(_T("%02u"), nidvalue);
+			temp_id.Format(_T("%02u"),nidvalue);
 			GetDlgItem(IDC_STATIC_ADDED_SHOW)->GetWindowTextW(showvalue);
 			showvalue = showvalue + _T("  ") + temp_id;
 			GetDlgItem(IDC_STATIC_ADDED_SHOW)->SetWindowTextW(showvalue);
 			GetDlgItem(IDC_BACNET_ADDED_EDIT)->SetWindowTextW(_T(""));
 			return;
 		}
-		if (nidvalue == bacnet_add_id[x])
+		if(nidvalue == bacnet_add_id[x])
 		{
 			MessageBox(_T("This ID already exsit in the below window."),_T("Warning"),MB_OK | MB_ICONINFORMATION);
 			GetDlgItem(IDC_BACNET_ADDED_EDIT)->SetWindowTextW(_T(""));
@@ -88,8 +89,8 @@ BOOL CBacnetaddintodb::OnInitDialog()
 	CDialogEx::OnInitDialog();
 
 	// TODO:  Add extra initialization here
-	memset(bacnet_add_id, 0, 254);
-	return TRUE; // return TRUE unless you set the focus to a control
+	memset(bacnet_add_id,0,254);
+	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
@@ -97,9 +98,9 @@ BOOL CBacnetaddintodb::OnInitDialog()
 BOOL CBacnetaddintodb::PreTranslateMessage(MSG* pMsg)
 {
 	// TODO: Add your specialized code here and/or call the base class
-	if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN))
+	if((pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN))
 	{
-		if (bacnet_add_id[0] == 0)
+		if(bacnet_add_id[0] == 0)
 			cancle_send = true;
 		else
 			cancle_send = false;
@@ -119,11 +120,11 @@ void CBacnetaddintodb::OnCancel()
 void CBacnetaddintodb::OnBnClickedButtonSettingAddOk()
 {
 	// TODO: Add your control notification handler code here
-	if (bacnet_add_id[0] == 0)
+	if(bacnet_add_id[0] == 0)
 		cancle_send = true;
 	else
 		cancle_send = false;
-	PostMessage(WM_CLOSE, 0, 0);
+	PostMessage(WM_CLOSE,0,0);
 }
 
 
@@ -131,7 +132,7 @@ void CBacnetaddintodb::OnBnClickedButtonSettingAddCancel()
 {
 	// TODO: Add your control notification handler code here
 	cancle_send = false;
-	PostMessage(WM_CLOSE, 0, 0);
+	PostMessage(WM_CLOSE,0,0);
 }
 
 
@@ -139,5 +140,5 @@ void CBacnetaddintodb::OnBnClickedBacnetSettingClearBtn()
 {
 	// TODO: Add your control notification handler code here
 	GetDlgItem(IDC_STATIC_ADDED_SHOW)->SetWindowTextW(_T(""));
-	memset(bacnet_add_id, 0, 254);
+	memset(bacnet_add_id,0,254);
 }

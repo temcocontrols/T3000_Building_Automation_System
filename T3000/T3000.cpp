@@ -40,9 +40,8 @@ END_MESSAGE_MAP()
 CT3000App::CT3000App()
 {
 	m_bHiColorIcons = TRUE;
-	CurrentT3000Version=_T("    2017.5.12 ");
-	T3000_Version = 20512;
-
+	CurrentT3000Version=_T("    2017.5.31 ");
+	T3000_Version = 20531;
 	m_lastinterface=19;
 }
 // The one and only CT3000App object
@@ -116,14 +115,6 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
 	
 }
  
-
- 
-
- 
-
-
-
-
 BOOL CT3000App::JudgeT3000Version(){
 CString ftp_T3000Version;
 ftp_T3000Version=GetContentFromURL(_T("http://www.temcocontrols.com/ftp/software/T3000_Version.txt"));
@@ -206,7 +197,6 @@ void CT3000App::UpdateDB()
 				stemp_building.street = q.getValuebyName(L"street");
 			    stemp_building.ZIP = q.getValuebyName(L"ZIP");
 				stemp_building.EngineeringUnits = q.getValuebyName(L"EngineeringUnits");
-
 				q.nextRow();
 			m_Building.push_back(stemp_building);
 		 
@@ -279,6 +269,12 @@ void CT3000App::UpdateDB()
 		SqliteDBT3000.closedb();
     }
 }
+
+
+/// <summary>
+/// T3000 Start ,from here
+/// </summary>
+/// <returns></returns>
 BOOL CT3000App::InitInstance()
 {
 	GetModulePath();

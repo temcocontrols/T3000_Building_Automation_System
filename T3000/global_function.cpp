@@ -67,14 +67,7 @@ extern CBacnetTstat *Tstat_Window ;
 extern CBacnetSetting * Setting_Window ;
 extern CBacnetUserlogin* User_Login_Window ;
 extern CBacnetRemotePoint* Remote_Point_Window ;
- /// <summary>
- /// read_multi
- /// </summary>
- /// <param name="device_var"></param>
- /// <param name="put_data_into_here"></param>
- /// <param name="start_address"></param>
- /// <param name="length"></param>
- /// <returns></returns>
+ 
 int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length)
 {
     int retVal;
@@ -176,13 +169,7 @@ int g_CheckTstatOnline_a(unsigned char  devLo,unsigned char devHi, bool bComm_Ty
     g_bEnableRefreshTreeView |= EnableRefreshTreeView_original_value;
     return j;
 }
-/// <summary>
-/// g_NetController_CheckTstatOnline_a
-/// </summary>
-/// <param name="devLo"></param>
-/// <param name="devHi"></param>
-/// <param name="bComm_Type"></param>
-/// <returns></returns>
+
 int g_NetController_CheckTstatOnline_a(unsigned char  devLo,unsigned char devHi, bool bComm_Type)
 {
 
@@ -221,17 +208,7 @@ int g_NetController_CheckTstatOnline_a(unsigned char  devLo,unsigned char devHi,
     g_bEnableRefreshTreeView |= EnableRefreshTreeView_original_value;
     return j;
 }
-//val         the value that you want to write to the register
-//the return value == -1 ,no connecting
-//the return value == -2 ,try it again
-//the return value == -3,Maybe that have more than 2 Tstat is connecting
-//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
-//the return value == -5 ,the input have some trouble
-//the return value == -6 , the bus has bannet protocol,scan stop;
-//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-//清空串口缓冲区
-//the return value is the register address
-//Sleep(50);       //must use this function to slow computer
+
 void SetPaneString(int nIndext,CString str)
 {
     if(nIndext != BAC_SHOW_MISSION_RESULTS)
@@ -257,15 +234,6 @@ void SetPaneString(int nIndext,CString str)
         pStatusBar->SetPaneBackgroundColor(nIndext,RGB(42,58,87));
     }
 }
-/// <summary>
-/// Write_Multi
-/// </summary>
-/// <param name="device_var"></param>
-/// <param name="to_write"></param>
-/// <param name="start_address"></param>
-/// <param name="length"></param>
-/// <param name="retry_times"></param>
-/// <returns></returns>
 int Write_Multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times)
 {
     BOOL bTemp = g_bEnableRefreshTreeView;
@@ -295,15 +263,6 @@ int Write_Multi(unsigned char device_var,unsigned char *to_write,unsigned short 
     // SetPaneString(3,g_strT3000LogString);
     return j;
 }
-/// <summary>
-/// Write_Multi_short
-/// </summary>
-/// <param name="device_var"></param>
-/// <param name="to_write"></param>
-/// <param name="start_address"></param>
-/// <param name="length"></param>
-/// <param name="retry_times"></param>
-/// <returns></returns>
 int Write_Multi_short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length,int retry_times)
 {
     BOOL bTemp = g_bEnableRefreshTreeView;
@@ -332,15 +291,6 @@ int Write_Multi_short(unsigned char device_var,unsigned short *to_write,unsigned
     }
     return j;
 }
-/// <summary>
-/// Write_Multi_org
-/// </summary>
-/// <param name="device_var"></param>
-/// <param name="to_write"></param>
-/// <param name="start_address"></param>
-/// <param name="length"></param>
-/// <param name="retry_times"></param>
-/// <returns></returns>
 int Write_Multi_org(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times)
 {
     // 	CString str;
@@ -464,9 +414,7 @@ int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsig
 }
 
 
-/// <summary>
-/// turn_hex_str_to_ten_num
-/// </summary>
+
 
 int turn_hex_str_to_ten_num(char *source)
 {
@@ -559,11 +507,7 @@ int turn_hex_str_to_ten_num(char *source)
     l+=k;
     return l;
 }
-/// <summary>
-/// turn_hex_char_to_int
-/// </summary>
-/// <param name="c"></param>
-/// <returns></returns>
+
 int turn_hex_char_to_int(char c)
 {
     int k=0;
@@ -642,11 +586,7 @@ int turn_hex_char_to_int(char c)
     }
     return k;
 }
-/// <summary>
-/// turn_hex_file_line_to_unsigned_char
-/// </summary>
-/// <param name="str"></param>
-/// <returns></returns>
+
 bool turn_hex_file_line_to_unsigned_char(char *str)
 {
     char *p_temp=str;
@@ -660,12 +600,7 @@ bool turn_hex_file_line_to_unsigned_char(char *str)
     return true;
 }
 
-/// <summary>
-/// turn_int_to_unsigned_char
-/// </summary>
-/// <param name="source"></param>
-/// <param name="length_source"></param>
-/// <param name="aim"></param>
+
 void turn_int_to_unsigned_char(char *source,int length_source,unsigned char *aim)
 {
     char *p_c_temp=source;
@@ -689,9 +624,7 @@ void turn_int_to_unsigned_char(char *source,int length_source,unsigned char *aim
 
 
 
-/// <summary>
-/// get tsat version number
-/// </summary>
+
 
 float get_tstat_version(unsigned short tstat_id)
 {
@@ -711,10 +644,7 @@ float get_tstat_version(unsigned short tstat_id)
     }//tstat_version
     return tstat_version2;
 }
-/// <summary>
-/// read tstat version number
-/// </summary>
-/// <returns></returns>
+
 float get_curtstat_version()
 {
     float tstat_version2= product_register_value[4];//tstat version
@@ -733,9 +663,7 @@ float get_curtstat_version()
 
 
 
-/// <summary>
-/// get_serialnumber
-/// </summary>
+
 
 UINT get_serialnumber()
 {
@@ -747,11 +675,7 @@ UINT get_serialnumber()
 
 
 
-/// <summary>
-/// Judge wether it is temco product
-/// </summary>
-/// <param name="product_model"></param>
-/// <returns></returns>
+
 BOOL IS_Temco_Product(int product_model)
 {
 
@@ -963,11 +887,7 @@ CString GetTempUnit(int nRange, int nPIDNO)
     return strTemp;
 }
 
-/// <summary>
-/// GetSerialComPortNumber1
-/// </summary>
-/// <param name="szComm"></param>
-/// <returns></returns>
+
 BOOL GetSerialComPortNumber1(vector<CString>& szComm)
 {
     LPCTSTR strRegEntry = _T("HARDWARE\\DEVICEMAP\\SERIALCOMM\\");
@@ -1021,15 +941,6 @@ BOOL GetSerialComPortNumber1(vector<CString>& szComm)
 
     return FALSE;
 }
-/// <summary>
-/// Post_Refresh_One_Message
-/// </summary>
-/// <param name="deviceid"></param>
-/// <param name="command"></param>
-/// <param name="start_instance"></param>
-/// <param name="end_instance"></param>
-/// <param name="entitysize"></param>
-/// <returns></returns>
 BOOL Post_Refresh_One_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize)
 {
     _MessageRefreshListInfo *pmy_refresh_info = new _MessageRefreshListInfo;
@@ -1047,16 +958,6 @@ BOOL Post_Refresh_One_Message(uint32_t deviceid,int8_t command,int8_t start_inst
         return TRUE;
     }
 }
-/// <summary>
-/// Post_Refresh_Message
-/// </summary>
-/// <param name="deviceid"></param>
-/// <param name="command"></param>
-/// <param name="start_instance"></param>
-/// <param name="end_instance"></param>
-/// <param name="entitysize"></param>
-/// <param name="block_size"></param>
-/// <returns></returns>
 BOOL Post_Refresh_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize,int block_size)
 {
 
@@ -1079,19 +980,6 @@ BOOL Post_Refresh_Message(uint32_t deviceid,int8_t command,int8_t start_instance
         return TRUE;
     }
 }
-/// <summary>
-/// 
-/// </summary>
-/// <param name="deviceid"></param>
-/// <param name="command"></param>
-/// <param name="start_instance"></param>
-/// <param name="end_instance"></param>
-/// <param name="entitysize"></param>
-/// <param name="hWnd"></param>
-/// <param name="Task_Info"></param>
-/// <param name="nRow"></param>
-/// <param name="nCol"></param>
-/// <returns></returns>
 BOOL Post_Write_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize,HWND hWnd ,CString Task_Info ,int nRow,int nCol)
 {
     _MessageWriteListInfo *pmy_write_info = new _MessageWriteListInfo;
@@ -1157,18 +1045,7 @@ BOOL Post_Invoke_ID_Monitor_Thread(UINT MsgType,
         return TRUE;
     }
 }
-/// <summary>
-/// Post_Thread_Message
-/// </summary>
-/// <param name="MsgType"></param>
-/// <param name="device_id"></param>
-/// <param name="address"></param>
-/// <param name="new_value"></param>
-/// <param name="old_value"></param>
-/// <param name="Dlg_hwnd"></param>
-/// <param name="CTRL_ID"></param>
-/// <param name="Changed_Name"></param>
-/// <returns></returns>
+
 BOOL Post_Thread_Message(UINT MsgType,
                          unsigned char device_id,
                          unsigned short address,
@@ -1210,13 +1087,7 @@ BOOL Post_Thread_Message(UINT MsgType,
         return TRUE;
     }
 }
-/// <summary>
-/// Post_Read_one_Thread_Message
-/// </summary>
-/// <param name="device_id"></param>
-/// <param name="address"></param>
-/// <param name="Dlg_hwnd"></param>
-/// <returns></returns>
+
 BOOL Post_Read_one_Thread_Message(
     unsigned char device_id,
     unsigned short address,
@@ -1240,15 +1111,8 @@ extern int my_lengthcode;
 
 
 
- /// <summary>
- /// WriteBacnetPictureData_Blocking
- /// </summary>
- /// <param name="deviceid"></param>
- /// <param name="index"></param>
- /// <param name="transfer_packet"></param>
- /// <param name="total_packet"></param>
- /// <param name="senddata"></param>
- /// <returns></returns>
+
+
 int WriteBacnetPictureData_Blocking(uint32_t deviceid,uint8_t index , unsigned short transfer_packet, unsigned short total_packet,unsigned char * senddata)
 {
 
@@ -1796,15 +1660,6 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
     return -2;
 }
 
-/// <summary>
-/// GetPrivateData_Blocking
-/// </summary>
-/// <param name="deviceid"></param>
-/// <param name="command"></param>
-/// <param name="start_instance"></param>
-/// <param name="end_instance"></param>
-/// <param name="entitysize"></param>
-/// <returns></returns>
 int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize)
 {
 
@@ -2046,15 +1901,8 @@ int GetProgramData(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance
 
 
 
- 
-/// <summary>
-/// GetProgramData_Blocking
-/// </summary>
-/// <param name="deviceid"></param>
-/// <param name="start_instance"></param>
-/// <param name="end_instance"></param>
-/// <param name="npackgae"></param>
-/// <returns></returns>
+
+
 int GetProgramData_Blocking(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance,uint8_t npackgae)
 {
     int temp_invoke_id = -1;
@@ -3593,6 +3441,8 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 				bacnet_device_type = SMALL_MINIPANEL;
 			else if(Device_Basic_Setting.reg.mini_type == TINY_MINIPANEL)
 				bacnet_device_type = TINY_MINIPANEL;
+			else if (Device_Basic_Setting.reg.mini_type == TINY_EX_MINIPANEL)
+				bacnet_device_type = TINY_EX_MINIPANEL;
 			else
 				bacnet_device_type = PRODUCT_CM5;
 			my_temp_point = my_temp_point + 1;	//中间 minitype  和 debug  没什么用;
@@ -3885,13 +3735,6 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
     return 1;
 }
 
-
-/// <summary>
-/// handle_read_pic_data_ex
-/// </summary>
-/// <param name="npoint"></param>
-/// <param name="nlength"></param>
-/// <returns></returns>
 int handle_read_pic_data_ex(char *npoint,int nlength)
 {
 
@@ -3945,14 +3788,6 @@ int handle_read_pic_data_ex(char *npoint,int nlength)
 
 
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
-
-/// <summary>
-/// local_handler_conf_private_trans_ack
-/// </summary>
-/// <param name="service_request"></param>
-/// <param name="service_len"></param>
-/// <param name="src"></param>
-/// <param name="service_data"></param>
 void local_handler_conf_private_trans_ack(
     uint8_t * service_request,
     uint16_t service_len,
@@ -4125,14 +3960,6 @@ void local_handler_conf_private_trans_ack(
 }
 
 //This function coded by Fance,used to split the cstring to each part.
-
-
-/// <summary>
-/// SplitCStringA
-/// </summary>
-/// <param name="saArray"></param>
-/// <param name="sSource"></param>
-/// <param name="sToken"></param>
 void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken)
 {
     CString sTempSource, sTempSplitted;
@@ -4171,9 +3998,6 @@ void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken)
 }
 
 
-/// <summary>
-/// Inial_Product_map
-/// </summary>
 void Inial_Product_map()
 {
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT5A,_T("TStat5A")));
@@ -4243,11 +4067,6 @@ void Inial_Product_map()
 }
 
 
-/// <summary>
-/// GetProductName
-/// </summary>
-/// <param name="ModelID"></param>
-/// <returns></returns>
 CString GetProductName(int ModelID)
 {
 	/*map <int,CString>::iterator myiterator;
@@ -4266,14 +4085,6 @@ CString GetProductName(int ModelID)
 }
 
 
-
-/// <summary>
-/// Get_Table_Name
-/// </summary>
-/// <param name="SerialNo"></param>
-/// <param name="Type"></param>
-/// <param name="Row"></param>
-/// <returns></returns>
 CString Get_Table_Name(int SerialNo,CString Type ,int Row)
 {
     
@@ -4309,14 +4120,6 @@ CString Get_Table_Name(int SerialNo,CString Type ,int Row)
     SqliteDBBuilding.closedb();
     return Table_Name;
 }
-
-/// <summary>
-/// Insert_Update_Table_Name
-/// </summary>
-/// <param name="SerialNo"></param>
-/// <param name="Type"></param>
-/// <param name="Row"></param>
-/// <param name="TableName"></param>
 void    Insert_Update_Table_Name(int SerialNo,CString Type,int Row,CString TableName)
 {
 	CppSQLite3DB SqliteDBBuilding;
@@ -4342,12 +4145,6 @@ SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 	SqliteDBBuilding.closedb();
 }
 
-
-/// <summary>
-/// Get_Unit_Process 
-/// </summary>
-/// <param name="Unit"></param>
-/// <returns></returns>
 int Get_Unit_Process(CString Unit)
 {
     int ret_Value=1;
@@ -4415,12 +4212,6 @@ int Get_Unit_Process(CString Unit)
 }
 
 
-/// <summary>
-/// get bit value ,according to register value.
-/// </summary>
-/// <param name="RegisterValue"></param>
-/// <param name="Position"></param>
-/// <returns></returns>
 BOOL Get_Bit_FromRegister(unsigned short RegisterValue,unsigned short Position)
 {
 
@@ -4432,15 +4223,7 @@ BOOL Get_Bit_FromRegister(unsigned short RegisterValue,unsigned short Position)
 }
 
 
-/// <summary>
-/// exchange value to text.
-/// </summary>
-/// <param name="textbuf"></param>
-/// <param name="seconds"></param>
-/// <param name="minutes"></param>
-/// <param name="hours"></param>
-/// <param name="c"></param>
-/// <returns></returns>
+
 char * intervaltotext(char *textbuf, long seconds , unsigned minutes , unsigned hours, char *c)
 {
     char buf[12], *textbuffer;
@@ -4482,17 +4265,6 @@ char * intervaltotext(char *textbuf, long seconds , unsigned minutes , unsigned 
     return NULL;
 }
 
-
-
-/// <summary>
-/// exchange value to full text
-/// </summary>
-/// <param name="textbuf"></param>
-/// <param name="seconds"></param>
-/// <param name="minutes"></param>
-/// <param name="hours"></param>
-/// <param name="c"></param>
-/// <returns></returns>
 char * intervaltotextfull(char *textbuf, long seconds , unsigned minutes , unsigned hours, char *c)
 {
     char buf[12], *textbuffer;
@@ -4533,12 +4305,7 @@ char * intervaltotextfull(char *textbuf, long seconds , unsigned minutes , unsig
     if(textbuf) strcpy(textbuf, buf);
     return( buf ) ;
 }
-/// <summary>
-/// bacnet i am handler
-/// </summary>
-/// <param name="service_request"></param>
-/// <param name="service_len"></param>
-/// <param name="src"></param>
+
 void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_ADDRESS * src)
 {
 
@@ -4622,13 +4389,6 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
 SOCKET my_sokect;
 extern void  init_info_table( void );
 extern void Init_table_bank();
-
-/// <summary>
-/// initial bacnet.
-/// </summary>
-/// <param name="comport"></param>
-/// <param name="bind_local_ip"></param>
-/// <returns></returns>
 bool Initial_bac(int comport,CString bind_local_ip)
 {
 
@@ -4815,12 +4575,6 @@ bool Initial_bac(int comport,CString bind_local_ip)
     return true;
 }
 //#include "datalink.h"
-
-/// <summary>
-/// mstp process function handle
-/// </summary>
-/// <param name="lpVoid"></param>
-/// <returns></returns>
 DWORD WINAPI   MSTP_Receive(LPVOID lpVoid)
 {
     BACNET_ADDRESS src = {0};
@@ -4844,11 +4598,6 @@ DWORD WINAPI   MSTP_Receive(LPVOID lpVoid)
     return 0;
 }
 
-
-
-/// <summary>
-/// initial serivce handle.
-/// </summary>
 void Init_Service_Handlers(	void)
 {
     Device_Init(NULL);
@@ -4973,15 +4722,6 @@ void local_rp_ack_print_data(	BACNET_READ_PROPERTY_DATA * data)
 #endif
     }
 }
-
-
-/// <summary>
-/// local handle read property ack
-/// </summary>
-/// <param name="service_request"></param>
-/// <param name="service_len"></param>
-/// <param name="src"></param>
-/// <param name="service_data"></param>
 void Localhandler_read_property_ack(
     uint8_t * service_request,
     uint16_t service_len,
@@ -5143,16 +4883,6 @@ unsigned char Str_to_Byte(CString need_conver)
 extern char local_network_ip[255];
 extern CString local_enthernet_ip;
 //socket dll.
-
-
-
-/// <summary>
-/// open bacnet socket,according to ip ,and port 
-/// </summary>
-/// <param name="strIPAdress"></param>
-/// <param name="nPort"></param>
-/// <param name="mysocket"></param>
-/// <returns></returns>
 bool Open_bacnetSocket2(CString strIPAdress,short nPort,SOCKET &mysocket)
 {
 
@@ -5447,13 +5177,6 @@ BOOL CheckForUpdate(
 
 
 #if 1
-/// <summary>
-/// add device of net , to refresh data list 
-/// </summary>
-/// <param name="buffer"></param>
-/// <param name="nBufLen"></param>
-/// <param name="siBind"></param>
-/// <returns></returns>
 int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 {
 	refresh_net_device temp;
@@ -5672,11 +5395,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 #endif
 
  
-/// <summary>
-/// Get Ip address ,according to a local ip address
-/// </summary>
-/// <param name="IP_address_local"></param>
-/// <returns></returns>
+
 int GetHostAdaptersInfo(CString &IP_address_local)
 {
     CString szAdaptersInfo;
@@ -5763,9 +5482,6 @@ int GetHostAdaptersInfo(CString &IP_address_local)
 
 
 
-/// <summary>
-/// Get Mask address
-/// </summary>
 void GetIPMaskGetWay()
 {
     g_Vector_Subnet.clear();
@@ -5824,12 +5540,7 @@ void GetIPMaskGetWay()
 }
 
 
-/// <summary>
-/// Get IP Address ,by a  host name 
-/// </summary>
-/// <param name="strHostName"></param>
-/// <param name="strIP"></param>
-/// <returns></returns>
+
 BOOL GetIPbyHostName(CString strHostName,CString &strIP)
 {
     WSAData   wsdata;
@@ -5849,11 +5560,6 @@ BOOL GetIPbyHostName(CString strHostName,CString &strIP)
     return TRUE;
 }
 
-/// <summary>
-/// Judge a string is a number or not 
-/// </summary>
-/// <param name="str"></param>
-/// <returns></returns>
 BOOL Is_Dig_Num(CString str)
 {
     int n=str.GetLength();
@@ -5863,12 +5569,6 @@ BOOL Is_Dig_Num(CString str)
     return TRUE;
 }
 
-
-/// <summary>
-///Valid a string ,that is a ip address or not  
-/// </summary>
-/// <param name="sAddress"></param>
-/// <returns></returns>
 BOOL ValidAddress(CString sAddress)
 {
     int nPos;
@@ -5896,9 +5596,6 @@ BOOL ValidAddress(CString sAddress)
 }
 
 
-/// <summary>
-/// Scan all ethernet devices by ethernet cards.
-/// </summary>
 void GetIPMaskGetWayForScan()
 {
     g_Scan_Vector_Subnet.clear();
@@ -5954,11 +5651,6 @@ void GetIPMaskGetWayForScan()
     }
 }
 
-
-/// <summary>
-/// Check all ethernet devices are online ,or not 
-/// </summary>
-/// <returns></returns>
 UINT RefreshNetWorkDeviceListByUDPFunc()
 {
 
@@ -6221,12 +5913,6 @@ END_REFRESH_SCAN:
 }
 
 extern SOCKET my_sokect;
-
-
-/// <summary>
-/// Send the command of whois 
-/// </summary>
-/// <param name="ipaddress_temp"></param>
 void Send_WhoIs_remote_ip(CString ipaddress_temp)
 {
     CString ipaddress;
@@ -6305,12 +5991,7 @@ void Send_WhoIs_remote_ip(CString ipaddress_temp)
 
 
 
- /// <summary>
- /// configure bacnet devices
- /// </summary>
- /// <param name="write_to_device"></param>
- /// <param name="tem_read_path"></param>
- /// <returns></returns>
+ 
 int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
 {
     if((g_mac!=0) &&(g_bac_instance!=0))
@@ -7202,11 +6883,7 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
     return 0;
 }
 
-/// <summary>
-/// Load Modbus Or Bacnet configuration file.
-/// </summary>
-/// <param name="tem_read_path"></param>
-/// <returns></returns>
+
 int LoadMiniModbusConfigFile(LPCTSTR tem_read_path)
 {
 	CString FilePath;
@@ -7308,11 +6985,7 @@ int LoadMiniModbusConfigFile(LPCTSTR tem_read_path)
 }
 
 
-/// <summary>
-/// Load Modbus Cache file ,when starting T3000
-/// </summary>
-/// <param name="tem_read_path"></param>
-/// <returns></returns>
+
 int LoadModbusConfigFile_Cache(LPCTSTR tem_read_path)
 {
 	CString FilePath;
@@ -7371,11 +7044,6 @@ int LoadModbusConfigFile_Cache(LPCTSTR tem_read_path)
 
 }
 
-
-/// <summary>
-/// Copy_Data_From_485_to_Bacnet
-/// </summary>
-/// <param name="start_point"></param>
 void Copy_Data_From_485_to_Bacnet(unsigned short *start_point)
 {
 	memcpy(&Device_Basic_Setting.reg,start_point,400); //Setting 的400个字节;
@@ -7403,12 +7071,6 @@ void Copy_Data_From_485_to_Bacnet(unsigned short *start_point)
 	//}
 }
 
-
-/// <summary>
-/// LoadBacnetConfigFile_Cache
-/// </summary>
-/// <param name="tem_read_path"></param>
-/// <returns></returns>
 int LoadBacnetConfigFile_Cache(LPCTSTR tem_read_path)
 {
     if((g_mac!=0) &&(g_bac_instance!=0))
@@ -7768,10 +7430,6 @@ void SaveModbusConfigFile_Cache(CString &SaveConfigFilePath,char *npoint,unsigne
 }
 
 
-/// <summary>
-/// SaveBacnetConfigFile_Cache
-/// </summary>
-/// <param name="SaveConfigFilePath"></param>
 void SaveBacnetConfigFile_Cache(CString &SaveConfigFilePath)
 {
     if((g_mac!=0) &&(g_bac_instance!=0))
@@ -7901,12 +7559,6 @@ void SaveBacnetConfigFile_Cache(CString &SaveConfigFilePath)
     }
 }
 
-
-
-/// <summary>
-/// Save Bacnet Binary File
-/// </summary>
-/// <param name="SaveConfigFilePath"></param>
 void SaveBacnetBinaryFile(CString &SaveConfigFilePath)
 {
 
@@ -8045,12 +7697,6 @@ void SaveBacnetBinaryFile(CString &SaveConfigFilePath)
 	//	delete pBuf;
 }
 
-
-
-/// <summary>
-/// Save Configuration file ,bacnet.
-/// </summary>
-/// <param name="SaveConfigFilePath"></param>
 void SaveBacnetConfigFile(CString &SaveConfigFilePath)
 {
     if((g_mac!=0) &&(g_bac_instance!=0))
@@ -8751,11 +8397,7 @@ DWORD WinExecAndWait( LPCTSTR lpszAppPath,LPCTSTR lpParameters,LPCTSTR lpszDirec
 
 
 
-/// <summary>
-/// Kill a process by name
-/// </summary>
-/// <param name="strProcessName"></param>
-/// <returns></returns>
+
 BOOL KillProcessFromName(CString strProcessName)
 {
     //创建进程快照(TH32CS_SNAPPROCESS表示创建所有进程的快照)
@@ -8856,7 +8498,7 @@ BOOL KillProcessFromName(CString strProcessName)
 
 
 
-//check a path ,which is there or not .
+
 BOOL DirectoryExist(CString Path)
 {
     WIN32_FIND_DATA fd;
@@ -8873,13 +8515,6 @@ BOOL DirectoryExist(CString Path)
 }
 
 
-
-/// <summary>
-/// ping command
-/// </summary>
-/// <param name="strIP"></param>
-/// <param name="pWndEcho"></param>
-/// <returns></returns>
 BOOL Ping(const CString& strIP, CWnd* pWndEcho)
 {
     CMyPing* pPing = new CMyPing;
@@ -8894,12 +8529,6 @@ BOOL Ping(const CString& strIP, CWnd* pWndEcho)
 }
 
 
-
-/// <summary>
-/// according the path ,create directory.
-/// </summary>
-/// <param name="path"></param>
-/// <returns></returns>
 BOOL CreateDirectory(CString path)
 {
     SECURITY_ATTRIBUTES attrib;
@@ -8910,11 +8539,6 @@ BOOL CreateDirectory(CString path)
     return CreateDirectory( path, &attrib);
 }
 #if 1
-/// <summary>
-/// Delete the directory ,according to the para path 
-/// </summary>
-/// <param name="path"></param>
-/// <returns></returns>
 BOOL DeleteDirectory(CString path)
 {
 
@@ -8949,11 +8573,7 @@ BOOL DeleteDirectory(CString path)
 
 
 
-/// <summary>
-/// Discorver all files of one file fold .
-/// </summary>
-/// <param name="strDir"></param>
-/// <param name="vecFile"></param>
+
 void TraverseFolder( const CString& strDir,std::vector<CString>& vecFile)
 {
     WIN32_FIND_DATA FindFileData;
@@ -9001,14 +8621,6 @@ void TraverseFolder( const CString& strDir,std::vector<CString>& vecFile)
     FindClose(hFind);
 }
 
-
-
-/// <summary>
-/// get file name by full path
-/// </summary>
-/// <param name="ncstring"></param>
-/// <param name="cs_return"></param>
-/// <returns></returns>
 bool GetFileNameFromPath(CString ncstring,CString &cs_return)
 {
     CStringArray ntemparray;
@@ -9024,13 +8636,6 @@ bool GetFileNameFromPath(CString ncstring,CString &cs_return)
 }
 
 
-
-
-
-/// <summary>
-/// 
-/// </summary>
-/// <param name="lpCString"></param>
 void DFTrace(LPCTSTR lpCString)
 {
     CString nCString;
@@ -9046,13 +8651,6 @@ void DFTrace(LPCTSTR lpCString)
 
 }
 
-
-
-/// <summary>
-/// get full content by url
-/// </summary>
-/// <param name="URL"></param>
-/// <returns></returns>
 CString GetContentFromURL(CString URL)
 {
     CString strHtml;
@@ -9082,15 +8680,6 @@ CString GetContentFromURL(CString URL)
 
     return strHtml;
 }
-
-
-/// <summary>
-/// GetProductFirmwareTimeFromTemcoWebsite
-/// </summary>
-/// <param name="URL"></param>
-/// <param name="HexOrBinName"></param>
-/// <param name="FileSize"></param>
-/// <returns></returns>
 CString GetProductFirmwareTimeFromTemcoWebsite(CString URL,CString HexOrBinName,CString &FileSize)
 {
     CString ftp_T3000Version;
@@ -9148,14 +8737,6 @@ CString GetProductFirmwareTimeFromTemcoWebsite(CString URL,CString HexOrBinName,
     return VersionString;
 }
 
-
-
-/// <summary>
-/// compare the two ips in the same subnet or not
-/// </summary>
-/// <param name="strIP"></param>
-/// <param name="strIP2"></param>
-/// <returns></returns>
 BOOL CheckTheSameSubnet(CString strIP ,CString strIP2)
 {
     BOOL ret=FALSE;
@@ -9186,11 +8767,6 @@ BOOL CheckTheSameSubnet(CString strIP ,CString strIP2)
 }
 
 
-/// <summary>
-/// GetExePath
-/// </summary>
-/// <param name="bHasSlash"></param>
-/// <returns></returns>
 CString GetExePath(bool bHasSlash)
 {
     TCHAR	szBuf[MAX_PATH];
@@ -9215,11 +8791,6 @@ CString GetExePath(bool bHasSlash)
 }
 
 
-
-/// <summary>
-/// Save_Product_Value_Cache
-/// </summary>
-/// <param name="SaveFilePath"></param>
 void Save_Product_Value_Cache(CString &SaveFilePath)
 {
     CString FilePath;
@@ -9263,13 +8834,6 @@ void Save_Product_Value_Cache(CString &SaveFilePath)
 //     LoadTstat_OutputData();
     
 }
-
-
-/// <summary>
-/// Load_Product_Value_Cache
-/// </summary>
-/// <param name="tem_read_path"></param>
-/// <returns></returns>
 int Load_Product_Value_Cache(LPCTSTR tem_read_path)
 {
     CString FilePath;
@@ -9799,10 +9363,6 @@ void LoadTstat_InputData()
 
 }
 
-
-/// <summary>
-/// Load CS3000 Input Data from Device
-/// </summary>
 void LoadInputData_CS3000()
 {
     m_tstat_input_data.clear();
@@ -9859,14 +9419,6 @@ void LoadInputData_CS3000()
 
 }
 #define  THE_CHAR_LENGTH 8
-
-
-
-/// <summary>
-/// Exchange register value to text
-/// </summary>
-/// <param name="reg"></param>
-/// <returns></returns>
 CString GetTextFromReg(unsigned short reg)
 {
     CString str_temp=_T("");
@@ -9906,15 +9458,6 @@ CString GetTextFromReg(unsigned short reg)
 
     return str_temp;
 }
-
-
-
-/// <summary>
-/// Exchange register value to text
-/// </summary>
-/// <param name="reg"></param>
-/// <param name="Buffer"></param>
-/// <returns></returns>
 CString GetTextFromReg_Buffer(unsigned short reg,unsigned short *Buffer)
 {
     CString str_temp=_T("");
@@ -9955,10 +9498,6 @@ CString GetTextFromReg_Buffer(unsigned short reg,unsigned short *Buffer)
     return str_temp;
 }
 #define  OUTPUT_NUMBER 7
-
-/// <summary>
-/// Load all tstats data from Output
-/// </summary>
 void LoadTstat_OutputData()
 {
 
@@ -11020,10 +10559,6 @@ void LoadTstat_OutputData()
 
 }
 
-
-/// <summary>
-/// Load CS3000's output data
-/// </summary>
 void LoadOutputData_CS3000()
 {
     m_tstat_output_data.clear();
@@ -11069,11 +10604,6 @@ void LoadOutputData_CS3000()
 
 }
 
-
-
-/// <summary>
-/// Load Graphic data from different device.
-/// </summary>
 void LoadRegistersGraphicMode()
 {
     int Product_Mode = product_register_value[7];
@@ -11110,10 +10640,6 @@ void LoadRegistersGraphicMode()
     }
 }
 
-
-/// <summary>
-/// Load Graphic data from different device.
-/// </summary>
 void LoadRegistersGraphicMode_AQ()
 {
     g_calibration_module_data.Current_Frequency.regAddress = 305;
@@ -11133,10 +10659,6 @@ void LoadRegistersGraphicMode_AQ()
 
     //这个是AQ的Graphic的模块
 }
-
-/// <summary>
-/// Load Graphic data from different device.
-/// </summary>
 void LoadRegistersGraphicMode_HUMTEMPSENSOR()
 {
     g_calibration_module_data.Current_Frequency.regAddress = 374;
@@ -11154,10 +10676,6 @@ void LoadRegistersGraphicMode_HUMTEMPSENSOR()
     g_calibration_module_data.Factory_Hum.regAddress  =382;
     g_calibration_module_data.Factory_Hum.StrValue =_T("Humidity(%)");
 }
-
-/// <summary>
-/// Load Graphic data from different device.
-/// </summary>
 void LoadRegistersGraphicMode_CO2485()
 {
     g_calibration_module_data.Current_Frequency.regAddress = 710;
@@ -11176,10 +10694,6 @@ void LoadRegistersGraphicMode_CO2485()
     g_calibration_module_data.Factory_Hum.regAddress  =717;
     g_calibration_module_data.Factory_Hum.StrValue =_T("Pressure");
 }
-
-/// <summary>
-/// Read Hex file 
-/// </summary>
 BOOL ReadLineFromHexFile(CFile& file, char* pBuffer)
 {
     //当hex文件中每一行的文件超过了256个字符的时候，我们就认为这个hex文件出现了问题
@@ -11214,13 +10728,6 @@ BOOL ReadLineFromHexFile(CFile& file, char* pBuffer)
     //TRACE(_T("%s"),pBuffer);
     return FALSE;
 }
-
-/// <summary>
-/// Read device information from device
-/// </summary>
-/// <param name="filepath"></param>
-/// <param name="ret_bin_Info"></param>
-/// <returns></returns>
 int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
 {
     CFileFind fFind;
@@ -11300,13 +10807,6 @@ int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
     }
 	 return NO_VERSION_INFO;
 }
-
-/// <summary>
-/// get device information from bin file
-/// </summary>
-/// <param name="filepath"></param>
-/// <param name="ret_bin_Info"></param>
-/// <returns></returns>
 int Get_Binfile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
 {
     CFileFind fFind;
@@ -11352,12 +10852,6 @@ int Get_Binfile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
     return OPEN_FILE_ERROR;
 
 }
-
-/// <summary>
-/// check a file whether it is a correct hex file or not 
-/// </summary>
-/// <param name="strFileName"></param>
-/// <returns></returns>
 BOOL HexFileValidation(const CString& strFileName)
 {
     const CString strConst = _T("hex");
@@ -11371,14 +10865,7 @@ BOOL HexFileValidation(const CString& strFileName)
 }
 
 
-/// <summary>
-/// GetPictureBlockData_Blocking
-/// </summary>
-/// <param name="deviceid"></param>
-/// <param name="nIndex"></param>
-/// <param name="ntotal_seg"></param>
-/// <param name="nseg_index"></param>
-/// <returns></returns>
+
 int GetPictureBlockData_Blocking(uint32_t deviceid,int8_t nIndex, uint16_t ntotal_seg,uint16_t nseg_index)
 {
 
@@ -11486,15 +10973,7 @@ int GetPictureBlockData(uint32_t deviceid,int8_t nIndex, uint16_t ntotal_seg,uin
 }
 
 
-/// <summary>
-/// WriteBacnetPictureData :Write Picutre to device 
-/// </summary>
-/// <param name="deviceid"></param>
-/// <param name="index"></param>
-/// <param name="transfer_packet"></param>
-/// <param name="total_packet"></param>
-/// <param name="senddata"></param>
-/// <returns></returns>
+
 int WriteBacnetPictureData(uint32_t deviceid,uint8_t index , unsigned short transfer_packet, unsigned short total_packet,unsigned char * senddata)
 {
 	unsigned char command = WRITEPIC_T3000;
@@ -11574,12 +11053,6 @@ int WriteBacnetPictureData(uint32_t deviceid,uint8_t index , unsigned short tran
 	return -2;
 }
 
-
-/// <summary>
-/// According to product type ,to show bacnet information
-/// </summary>
-/// <param name="product_type"></param>
-/// <returns></returns>
 BOOL ShowBacnetView(unsigned char product_type)
 {
 	if((product_type == PM_MINIPANEL) || 
@@ -11597,21 +11070,6 @@ BOOL AllCharactorIsDigital(LPCTSTR lpszSrc)
 }
 
 
-
-/// <summary>
-/// Output_data_to_string 
-/// </summary>
-/// <param name="temp_output_index"></param>
-/// <param name="temp_out_panel"></param>
-/// <param name="temp_out_des"></param>
-/// <param name="temp_out_auto_manual"></param>
-/// <param name="temp_out_value"></param>
-/// <param name="temp_out_units"></param>
-/// <param name="temp_out_range"></param>
-/// <param name="temp_out_pwm_period"></param>
-/// <param name="temp_out_decom"></param>
-/// <param name="temp_out_label"></param>
-/// <returns></returns>
 bool Output_data_to_string(unsigned char  temp_output_index,
 							CString &temp_out_panel,
 							CString &temp_out_des,
@@ -11741,26 +11199,6 @@ bool Output_data_to_string(unsigned char  temp_output_index,
 	TRACE(temp_out_panel + _T(" ") +temp_out_des + _T(" ") +temp_out_auto_manual+ _T(" ") + temp_out_value + _T(" ")+  temp_out_units + _T(" ")+ temp_out_range+ _T(" ") +  temp_out_pwm_period + _T(" ") +  temp_out_decom+ _T(" ") + temp_out_label+ _T(" ")  + _T("\n"));
 }
 
-
-
-
-/// <summary>
-/// Input_data_to_string
-/// </summary>
-/// <param name="temp_input_index"></param>
-/// <param name="temp_in_main_panel"></param>
-/// <param name="temp_in_des"></param>
-/// <param name="temp_in_auto_manual"></param>
-/// <param name="temp_in_value"></param>
-/// <param name="temp_in_units"></param>
-/// <param name="temp_in_range"></param>
-/// <param name="temp_in_cal"></param>
-/// <param name="temp_cacl_sign"></param>
-/// <param name="temp_in_filter"></param>
-/// <param name="temp_in_decon"></param>
-/// <param name="temp_in_jumper"></param>
-/// <param name="temp_in_label"></param>
-/// <returns></returns>
 bool Input_data_to_string(unsigned char  temp_input_index ,
 	CString &temp_in_main_panel,
 	CString &temp_in_des,
@@ -11949,12 +11387,6 @@ bool Input_data_to_string(unsigned char  temp_input_index ,
 }
 
 
-
-/// <summary>
-/// Bin File Validation
-/// </summary>
-/// <param name="strFileName"></param>
-/// <returns></returns>
 BOOL BinFileValidation(const CString& strFileName)
 {
     const CString strConst = _T("bin");
@@ -11982,6 +11414,8 @@ bool Input_data_to_string(unsigned char  temp_input_index ,CString &temp_main_pa
 
 bool Save_InputData_to_db(unsigned char  temp_input_index )
 {
+	return true;
+
 
 	CString temp_in_main_panel;
 	CString temp_in_des;
@@ -12202,13 +11636,12 @@ bool Save_InputData_to_db(unsigned char  temp_input_index )
 	return true;
 }
 
-/// <summary>
-/// Save_OutputData_to_db
-/// </summary>
-/// <param name="temp_output_index"></param>
-/// <returns></returns>
+
 bool Save_OutputData_to_db(unsigned char  temp_output_index)
 {
+	return true;
+
+
 
 	CString  temp_out_panel;
 	CString  temp_out_des;
@@ -12366,12 +11799,6 @@ bool Save_OutputData_to_db(unsigned char  temp_output_index)
 	SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 	SqliteDBBuilding.closedb();	
 }
-
-
-/// <summary>
-/// Save_AVData_to_db
-/// </summary>
-/// <returns></returns>
 bool Save_AVData_to_db()
 {
 	CString strPanel;
@@ -12535,12 +11962,6 @@ bool Save_AVData_to_db()
  
 	
 }
-
-
-/// <summary>
-/// GetGUID
-/// </summary>
-/// <returns></returns>
 CString GetGUID()
 {
 	GUID guid;
@@ -12561,12 +11982,7 @@ CString GetGUID()
 }
 
 
-/// <summary>
-/// Save_InputData_to_db
-/// </summary>
-/// <param name="temp_input_index"></param>
-/// <param name="nserialnumber"></param>
-/// <returns></returns>
+
 bool Save_InputData_to_db(unsigned char  temp_input_index, unsigned int nserialnumber)
 {
 
@@ -12803,14 +12219,6 @@ bool Save_InputData_to_db(unsigned char  temp_input_index, unsigned int nserialn
 }
 
 
-
-
-/// <summary>
-/// Save_OutputData_to_db
-/// </summary>
-/// <param name="temp_output_index"></param>
-/// <param name="nserialnumber"></param>
-/// <returns></returns>
 bool Save_OutputData_to_db(unsigned char  temp_output_index, unsigned int nserialnumber)
 {
 
@@ -12982,16 +12390,12 @@ bool Save_OutputData_to_db(unsigned char  temp_output_index, unsigned int nseria
 	SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 	SqliteDBBuilding.closedb();
 }
-
-
-/// <summary>
-/// Save_VariableData_to_db
-/// </summary>
-/// <param name="temp_output_index"></param>
-/// <param name="nserialnumber"></param>
-/// <returns></returns>
 bool Save_VariableData_to_db(unsigned char  temp_output_index, unsigned int nserialnumber)
 {
+
+	return true;
+
+
 	CString strPanel;
 	strPanel.Format(_T("%d"), (unsigned char)Station_NUM);
 

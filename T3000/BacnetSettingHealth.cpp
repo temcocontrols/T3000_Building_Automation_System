@@ -14,6 +14,7 @@ IMPLEMENT_DYNAMIC(CBacnetSettingHealth, CDialogEx)
 CBacnetSettingHealth::CBacnetSettingHealth(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CBacnetSettingHealth::IDD, pParent)
 {
+
 }
 
 CBacnetSettingHealth::~CBacnetSettingHealth()
@@ -39,10 +40,10 @@ BOOL CBacnetSettingHealth::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	Refresh_Health_Data();
-	SetTimer(1, 4000,NULL);
+	SetTimer(1,4000,NULL);
 	// TODO:  Add extra initialization here
 
-	return TRUE; // return TRUE unless you set the focus to a control
+	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
@@ -59,7 +60,7 @@ void CBacnetSettingHealth::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
 	//Post_Refresh_Message(g_bac_instance,READ_MISC,0,0,sizeof(Str_MISC),1);
-	GetPrivateData(g_bac_instance, READ_MISC, 0, 0, sizeof(Str_MISC));
+	GetPrivateData(g_bac_instance,READ_MISC,0,0,sizeof(Str_MISC));
 
 	Refresh_Health_Data();
 	CDialogEx::OnTimer(nIDEvent);
@@ -67,40 +68,30 @@ void CBacnetSettingHealth::OnTimer(UINT_PTR nIDEvent)
 
 void CBacnetSettingHealth::Refresh_Health_Data()
 {
-	CString CS_COM_RX_1;
-	CString CS_COM_RX_2;
-	CString CS_COM_RX_3;
-	CString CS_COM_TX_1;
-	CString CS_COM_TX_2;
-	CString CS_COM_TX_3;
-	CString CS_COM_COLLISION_1;
-	CString CS_COM_COLLISION_2;
-	CString CS_COM_COLLISION_3;
-	CString CS_PACHET_ERROR_1;
-	CString CS_PACHET_ERROR_2;
-	CString CS_PACHET_ERROR_3;
-	CString CS_TIMEOUT_1;
-	CString CS_TIMEOUT_2;
-	CString CS_TIMEOUT_3;
-	CS_COM_RX_1.Format(_T("%u"), Device_Misc_Data.reg.com_rx[0]);
-	CS_COM_RX_2.Format(_T("%u"), Device_Misc_Data.reg.com_rx[1]);
-	CS_COM_RX_3.Format(_T("%u"), Device_Misc_Data.reg.com_rx[2]);
+	CString CS_COM_RX_1;	CString CS_COM_RX_2;	CString CS_COM_RX_3;
+	CString CS_COM_TX_1;	CString CS_COM_TX_2;	CString CS_COM_TX_3;
+	CString CS_COM_COLLISION_1;	CString CS_COM_COLLISION_2;	CString CS_COM_COLLISION_3;
+	CString CS_PACHET_ERROR_1;	CString CS_PACHET_ERROR_2;	CString CS_PACHET_ERROR_3;
+	CString CS_TIMEOUT_1;	CString CS_TIMEOUT_2;	CString CS_TIMEOUT_3;
+	CS_COM_RX_1.Format(_T("%u"),Device_Misc_Data.reg.com_rx[0]);
+	CS_COM_RX_2.Format(_T("%u"),Device_Misc_Data.reg.com_rx[1]);
+	CS_COM_RX_3.Format(_T("%u"),Device_Misc_Data.reg.com_rx[2]);
 
-	CS_COM_TX_1.Format(_T("%u"), Device_Misc_Data.reg.com_tx[0]);
-	CS_COM_TX_2.Format(_T("%u"), Device_Misc_Data.reg.com_tx[1]);
-	CS_COM_TX_3.Format(_T("%u"), Device_Misc_Data.reg.com_tx[2]);
+	CS_COM_TX_1.Format(_T("%u"),Device_Misc_Data.reg.com_tx[0]);
+	CS_COM_TX_2.Format(_T("%u"),Device_Misc_Data.reg.com_tx[1]);
+	CS_COM_TX_3.Format(_T("%u"),Device_Misc_Data.reg.com_tx[2]);
 
-	CS_COM_COLLISION_1.Format(_T("%u"), Device_Misc_Data.reg.collision[0]);
-	CS_COM_COLLISION_2.Format(_T("%u"), Device_Misc_Data.reg.collision[1]);
-	CS_COM_COLLISION_3.Format(_T("%u"), Device_Misc_Data.reg.collision[2]);
+	CS_COM_COLLISION_1.Format(_T("%u"),Device_Misc_Data.reg.collision[0]);
+	CS_COM_COLLISION_2.Format(_T("%u"),Device_Misc_Data.reg.collision[1]);
+	CS_COM_COLLISION_3.Format(_T("%u"),Device_Misc_Data.reg.collision[2]);
 
-	CS_PACHET_ERROR_1.Format(_T("%u"), Device_Misc_Data.reg.packet_error[0]);
-	CS_PACHET_ERROR_2.Format(_T("%u"), Device_Misc_Data.reg.packet_error[1]);
-	CS_PACHET_ERROR_3.Format(_T("%u"), Device_Misc_Data.reg.packet_error[2]);
+	CS_PACHET_ERROR_1.Format(_T("%u"),Device_Misc_Data.reg.packet_error[0]);
+	CS_PACHET_ERROR_2.Format(_T("%u"),Device_Misc_Data.reg.packet_error[1]);
+	CS_PACHET_ERROR_3.Format(_T("%u"),Device_Misc_Data.reg.packet_error[2]);
 
-	CS_TIMEOUT_1.Format(_T("%u"), Device_Misc_Data.reg.timeout[0]);
-	CS_TIMEOUT_2.Format(_T("%u"), Device_Misc_Data.reg.timeout[1]);
-	CS_TIMEOUT_3.Format(_T("%u"), Device_Misc_Data.reg.timeout[2]);
+	CS_TIMEOUT_1.Format(_T("%u"),Device_Misc_Data.reg.timeout[0]);
+	CS_TIMEOUT_2.Format(_T("%u"),Device_Misc_Data.reg.timeout[1]);
+	CS_TIMEOUT_3.Format(_T("%u"),Device_Misc_Data.reg.timeout[2]);
 
 	GetDlgItem(IDC_EDIT_RX_1)->SetWindowTextW(CS_COM_RX_1);
 	GetDlgItem(IDC_EDIT_RX_2)->SetWindowTextW(CS_COM_RX_2);
@@ -121,16 +112,17 @@ void CBacnetSettingHealth::Refresh_Health_Data()
 	GetDlgItem(IDC_EDIT_TIMEOUT_1)->SetWindowTextW(CS_TIMEOUT_1);
 	GetDlgItem(IDC_EDIT_TIMEOUT_2)->SetWindowTextW(CS_TIMEOUT_2);
 	GetDlgItem(IDC_EDIT_TIMEOUT_3)->SetWindowTextW(CS_TIMEOUT_3);
+
 }
 
 
 void CBacnetSettingHealth::OnBnClickedButtonHealthClear()
 {
 	// TODO: Add your control notification handler code here
-	memset(&Device_Special_Data, 0, sizeof(Str_Special));
+	memset(&Device_Special_Data,0,sizeof(Str_Special));
 	Device_Special_Data.reg.clear_health_rx_tx = 0x11;
 
-	if (Write_Private_Data_Blocking(WRITE_SPECIAL_COMMAND, 0, 0) > 0)
+	if(Write_Private_Data_Blocking(WRITE_SPECIAL_COMMAND,0,0) > 0 )
 	{
 		PostMessage(WM_REFRESH_BAC_MONITOR_LIST,NULL,NULL);
 		MessageBox(_T("Clear Count : OK !"));
