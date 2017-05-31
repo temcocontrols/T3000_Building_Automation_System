@@ -763,7 +763,7 @@ BOOL Dowmloadfile::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	CreateProductFolderMap();
 
 	productfolder = GetProdcutFtpPath(m_product_isp_auto_flash.product_class_id);
@@ -886,7 +886,7 @@ BOOL Dowmloadfile::OnInitDialog()
 
 BOOL Dowmloadfile::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message == WM_KEYDOWN)
 	{
 		if((pMsg->wParam==VK_RETURN)  || (pMsg->wParam == VK_ESCAPE))
@@ -992,7 +992,7 @@ void Dowmloadfile::Start_Download()
 
 void Dowmloadfile::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if(wait_download_and_isp_finished)
 	{
 		MessageBox(_T("Can't exit, please wait!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
@@ -1006,7 +1006,7 @@ void Dowmloadfile::OnClose()
 
 void Dowmloadfile::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	CDialogEx::OnCancel();
 }
@@ -1031,7 +1031,7 @@ BOOL Dowmloadfile::IsNetDevice(int DevType)
 
 void Dowmloadfile::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	int temp_count = 0;
 	switch(nIDEvent)
 	{
@@ -1109,7 +1109,7 @@ void Dowmloadfile::OnTimer(UINT_PTR nIDEvent)
 
 void Dowmloadfile::OnBnClickedButton1()
 {
-	// TODO: Add your control notification handler code here
+	
 
 
 	CString temp_folder_path;
@@ -1137,14 +1137,14 @@ void Dowmloadfile::OnBnClickedButton1()
 
 void Dowmloadfile::OnBnClickedButtonStartDownload()
 {
-	// TODO: Add your control notification handler code here
+	
 	download_and_update = DOWNLOAD_AND_UPDATE;
 	Start_Download();
 }
 
 void Dowmloadfile::OnBnClickedButtonFileDownloadOnly()
 {
-	// TODO: Add your control notification handler code here
+	
 	download_and_update = DOWNLOAD_ONLY;
 	Start_Download();
 }
@@ -1227,7 +1227,7 @@ void Dowmloadfile::AutoFlashFirmware()
 
 void Dowmloadfile::OnBnClickedButtonUpdateT3000()
 {
-	// TODO: Add your control notification handler code here
+	
 
 	CString tempApplicationFolder;
 	GetModuleFileName(NULL, tempApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);

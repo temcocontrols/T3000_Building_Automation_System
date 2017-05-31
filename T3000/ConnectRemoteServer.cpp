@@ -44,7 +44,7 @@ END_MESSAGE_MAP()
 void CConnectRemoteServer::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-	// TODO: Add your message handler code here
+	
 	// Do not call CDialogEx::OnPaint() for painting messages
 	CMemDC memDC(dc, this);
 	CRect rcClient;
@@ -111,7 +111,7 @@ BOOL CConnectRemoteServer::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	static_step = 0;
-	// TODO:  Add extra initialization here
+	
 
 
 	if (udp_ptp_client_thread == NULL)
@@ -650,7 +650,7 @@ DWORD WINAPI TcpClient_Connect_Thread(LPVOID lpVoid)
 
 void CConnectRemoteServer::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	CDialogEx::OnCancel();
 }
@@ -658,7 +658,7 @@ void CConnectRemoteServer::OnCancel()
 
 void CConnectRemoteServer::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 
 	CDialogEx::OnClose();
 }

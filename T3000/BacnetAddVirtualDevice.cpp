@@ -40,7 +40,7 @@ BOOL CBacnetAddVirtualDevice::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	HICON temp_icon_ok = AfxGetApp()->LoadIconW(IDI_ICON_OK);
 	HICON temp_icon_cancel = AfxGetApp()->LoadIconW(IDI_ICON_EXIT);
 
@@ -96,7 +96,7 @@ void CBacnetAddVirtualDevice::UI_Initial()
 
 BOOL CBacnetAddVirtualDevice::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -104,7 +104,7 @@ BOOL CBacnetAddVirtualDevice::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetAddVirtualDevice::OnBnClickedButtonVirtualOk()
 {
-	// TODO: Add your control notification handler code here
+	
 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 	CString temp_main_building;
 	CString temp_sub_building;
@@ -152,5 +152,5 @@ void CBacnetAddVirtualDevice::OnBnClickedButtonVirtualOk()
 
 void CBacnetAddVirtualDevice::OnBnClickedButtonVirtualCancel()
 {
-	// TODO: Add your control notification handler code here
+	
 }

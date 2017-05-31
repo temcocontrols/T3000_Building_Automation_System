@@ -47,7 +47,7 @@ BOOL CBacnetUserlogin::OnInitDialog()
 
 	m_user_name.Empty();
 	m_user_password.Empty();
-	// TODO:  Add extra initialization here
+	
 	m_cxScreen=GetSystemMetrics(SM_CXSCREEN);
 	m_cyScreen=GetSystemMetrics(SM_CYSCREEN);
 	m_user_login_hwnd = this->m_hWnd;
@@ -90,7 +90,7 @@ LRESULT  CBacnetUserlogin::RedrawLoginWindow(WPARAM wParam, LPARAM lParam)
 
 BOOL CBacnetUserlogin::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message == WM_KEYDOWN)
 	{
 		if(pMsg->wParam==VK_RETURN)
@@ -124,7 +124,7 @@ BOOL CBacnetUserlogin::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetUserlogin::OnBnClickedButtonLogin()
 {
-	// TODO: Add your control notification handler code here
+	
 	bool any_user_valid = false;
 	//检测是否里面存在有效的账号密码;
 	for (int i=0;i<(int)m_user_login_data.size();i++)
@@ -253,7 +253,7 @@ int CBacnetUserlogin::CheckLoginData()
 void CBacnetUserlogin::OnCancel()
 {
 
-	// TODO: Add your specialized code here and/or call the base class
+	
 	//CDialogEx::OnCancel();
 }
 
@@ -261,14 +261,14 @@ void CBacnetUserlogin::OnCancel()
 void CBacnetUserlogin::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-	// TODO: Add your message handler code here
+	
 	// Do not call CDialogEx::OnPaint() for painting messages
 
 	CRect test_rect;
 	::GetWindowRect(BacNet_hwd,&test_rect);	//获取 view的窗体大小;
 
 
-	// TODO: Add your message handler code here
+	
 	// Do not call CDialogEx::OnPaint() for painting messages
 
 	CMemDC memDC(dc,this);

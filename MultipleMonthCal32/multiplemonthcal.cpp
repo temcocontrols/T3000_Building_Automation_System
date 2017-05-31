@@ -33,7 +33,7 @@
  * the specification mentioned above.
  * If you discover missing features, or bugs, please note them below.
  * 
- * TODO:
+ * 
  *    -- MCM_[GS]ETUNICODEFORMAT
  *    -- handle resources better (doesn't work now); 
  *    -- take care of internationalization.
@@ -2506,7 +2506,7 @@ static void MONTHCAL_UpdateSize(MONTHCAL_INFO *infoPtr)
     y = (client.bottom - todayrect->bottom + todayrect->top + MC_CALENDAR_PADDING) /
          (days->bottom - title->top + MC_CALENDAR_PADDING);
 
-  /* TODO: ensure that count is properly adjusted to fit 12 months constraint */
+  /*  ensure that count is properly adjusted to fit 12 months constraint */
   if (x == 0) x = 1;
   if (y == 0) y = 1;
 

@@ -81,7 +81,7 @@ BOOL CT3RangeDlg::OnInitDialog()
 {
     CDialog::OnInitDialog();
 
-    // TODO:  Add extra initialization here
+    
     m_show_unit.ShowWindow(FALSE);
     m_show_unit.SetWindowTextW(_T(""));
     m_show_unit.textColor(RGB(255,0,0));
@@ -136,7 +136,7 @@ void CT3RangeDlg::Initial_window()
 
 LRESULT CT3RangeDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
-    // TODO: Add your specialized code here and/or call the base class
+    
     if (message==WM_T3_RANGE)
     {
 

@@ -28,7 +28,7 @@ DownloadSocket::~DownloadSocket(void)
 
 void DownloadSocket::OnReceive(int nErrorCode)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	memset(receive_buffer,0,4000);
 	Receive_data_length=Receive(receive_buffer,4000);
 
@@ -172,7 +172,7 @@ int DownloadSocket::GetDownloadResults()
 
 void DownloadSocket::OnConnect(int nErrorCode)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	LPVOID	lpMsgBuf;
 	if(!nErrorCode)
 	{
@@ -201,7 +201,7 @@ void DownloadSocket::OnConnect(int nErrorCode)
 
 void DownloadSocket::OnClose(int nErrorCode)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_DISCONNEC,NULL);
 	CAsyncSocket::OnClose(nErrorCode);
 }

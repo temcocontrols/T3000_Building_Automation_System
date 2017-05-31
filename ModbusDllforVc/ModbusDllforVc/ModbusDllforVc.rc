@@ -83,13 +83,13 @@ BEGIN
 	BEGIN
         BLOCK "040904e4"
 		BEGIN
-            VALUE "CompanyName", "TODO: <Company name>"
-            VALUE "FileDescription", "TODO: <File description>"
+            VALUE "CompanyName", " <Company name>"
+            VALUE "FileDescription", " <File description>"
 			VALUE "FileVersion",     "1.0.0.1"
 			VALUE "InternalName",    "ModbusDllforVc.dll"
-            VALUE "LegalCopyright", "TODO: (c) <Company name>.  All rights reserved."
+            VALUE "LegalCopyright", " (c) <Company name>.  All rights reserved."
 			VALUE "OriginalFilename","ModbusDllforVc.dll"
-            VALUE "ProductName", "TODO: <Product name>"
+            VALUE "ProductName", " <Product name>"
 			VALUE "ProductVersion",  "1.0.0.1"
 		END
 	END

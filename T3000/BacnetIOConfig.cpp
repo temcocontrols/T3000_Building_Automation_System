@@ -45,7 +45,7 @@ BOOL CBacnetIOConfig::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	Initial_List();
 	return TRUE; // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -54,7 +54,7 @@ BOOL CBacnetIOConfig::OnInitDialog()
 
 BOOL CBacnetIOConfig::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN)
 	{
 		CRect list_rect, win_rect;
@@ -343,7 +343,7 @@ LRESULT CBacnetIOConfig::Fresh_Extio_Item(WPARAM wParam, LPARAM lParam)
 
 void CBacnetIOConfig::OnBnClickedButtonExtioAdd()
 {
-	// TODO: Add your control notification handler code here
+	
 	int ext_io_size = m_ext_io_config_list.GetItemCount();
 	if (ext_io_size >= 12)
 	{
@@ -405,7 +405,7 @@ void CBacnetIOConfig::OnBnClickedButtonExtioAdd()
 
 void CBacnetIOConfig::OnBnClickedButtonExtioDeleteSel()
 {
-	// TODO: Add your control notification handler code here
+	
 	int size_of_list = m_ext_io_config_list.GetItemCount();
 	for (int i = 1; i < size_of_list; i++)
 	{
@@ -438,7 +438,7 @@ void CBacnetIOConfig::OnBnClickedButtonExtioDeleteSel()
 void CBacnetIOConfig::OnNMClickListIoconfig(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 	DWORD dwPos = GetMessagePos();
 	CPoint point(LOWORD(dwPos), HIWORD(dwPos));
 	m_ext_io_config_list.ScreenToClient(&point);
@@ -471,7 +471,7 @@ void CBacnetIOConfig::OnNMClickListIoconfig(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CBacnetIOConfig::OnBnClickedButtonExtOk()
 {
-	// TODO: Add your control notification handler code here
+	
 	if (Write_Private_Data_Blocking(WRITEEXT_IO_T3000, 0, BAC_EXTIO_COUNT - 1) <= 0)
 	{
 		MessageBox(_T("Write data failed!"));
@@ -483,6 +483,6 @@ void CBacnetIOConfig::OnBnClickedButtonExtOk()
 
 void CBacnetIOConfig::OnBnClickedButtonExtCancel()
 {
-	// TODO: Add your control notification handler code here
+	
 	PostMessage(WM_CLOSE,NULL,NULL);
 }

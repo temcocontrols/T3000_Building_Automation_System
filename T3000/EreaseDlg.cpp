@@ -40,7 +40,7 @@ END_MESSAGE_MAP()
 
 void CEreaseDlg::OnBnClickedMyOk()
 {
-	// TODO: Add your control notification handler code here
+	
 // 	if(AfxMessageBox(_T("Are you sure to erease the config parameters?"))==IDOK)
 // 	{
     /*if(write_one(m_nTstatID,16,143)>0)
@@ -171,7 +171,7 @@ BOOL CEreaseDlg::OnInitDialog()
 	strText.Format(_T("%d"),m_nTstatID);
 	m_tstatIDEdit.SetWindowText(strText);
 
-	// TODO:  Add extra initialization here
+	
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }

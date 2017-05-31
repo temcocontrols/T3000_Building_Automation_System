@@ -160,7 +160,7 @@ void CGraphicView::OnPaint()
 	//m_Label.ShowWindow(SW_SHOW);
 
 //	m_Label.SetRedraw(1);
-	// TODO: Add your message handler code here
+	
 	// Do not call CFormView::OnPaint() for painting messages
 }
 void CGraphicView::PainNoImageInfo(CDC* pDC)
@@ -206,7 +206,7 @@ void CGraphicView::PainNoImageInfo(CDC* pDC)
 
 BOOL CGraphicView::OnEraseBkgnd(CDC* pDC)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 
 
 	return 1;//CFormView::OnEraseBkgnd(pDC);
@@ -214,7 +214,7 @@ BOOL CGraphicView::OnEraseBkgnd(CDC* pDC)
 
 void CGraphicView::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 
 	int n=HitTestEx(point);
 	if(n>=0)
@@ -232,7 +232,7 @@ void CGraphicView::OnLButtonDown(UINT nFlags, CPoint point)
 
 void CGraphicView::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if(m_LbtDown&&m_nFoucsIndext>=0)
 	{
 		saveLabelInfo(m_nFoucsIndext);
@@ -247,7 +247,7 @@ void CGraphicView::OnLButtonUp(UINT nFlags, CPoint point)
 
 void CGraphicView::OnMouseMove(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 
 	if(m_bLockBtn.GetCheck()==BST_CHECKED)
 		return;
@@ -297,7 +297,7 @@ int CGraphicView::HitTestEx(CPoint & point)
 }
 INT_PTR CGraphicView::OnToolHitTest(CPoint point, TOOLINFO* pTI) const
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 /*
 	int nIndext=-1;
 	int i=0;
@@ -440,7 +440,7 @@ void CGraphicView::OnBnClickedDelbutton()
 		break;
 	}
 	SqliteDBT3000.closedb();
-	// TODO: Add your control notification handler code here
+	
 }
 
 void CGraphicView::OnBnClickedApplybutton()
@@ -591,7 +591,7 @@ void CGraphicView::OnDestroy()
 	CFormView::OnDestroy();
 
 	ClearAllLabels();
-	// TODO: Add your message handler code here
+	
 }
 
 void CGraphicView::OnInitialUpdate()
@@ -773,7 +773,7 @@ void CGraphicView::OnBnClickedImgcnfigbutton()
 
 void CGraphicView::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	switch(nIDEvent)
 	{
 	case 1:

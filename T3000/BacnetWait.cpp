@@ -78,7 +78,7 @@ BOOL BacnetWait::OnInitDialog()
 	
 	this->ShowWindow(SW_HIDE);
 
-	// TODO:  Add extra initialization here
+	
     if((m_wait_type == BAC_WAIT_NORMAL_READ ) || (m_wait_type == BAC_WAIT_READ_DATA_WRITE_CONFIG))	//Read one of the list or read all list;
 	{
 		SetTimer(1,200,NULL);
@@ -101,7 +101,7 @@ BOOL BacnetWait::OnInitDialog()
 
 void BacnetWait::OnOK()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	CDialogEx::OnOK();
 }
@@ -109,7 +109,7 @@ void BacnetWait::OnOK()
 
 void BacnetWait::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	DestroyWindow();
 	//CDialogEx::OnCancel();
 }
@@ -117,7 +117,7 @@ void BacnetWait::OnCancel()
 
 BOOL BacnetWait::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if (pMsg->message == WM_KEYDOWN)
 	{
 		if (pMsg->wParam == VK_RETURN || pMsg->wParam == VK_ESCAPE)
@@ -2030,7 +2030,7 @@ endthis:
 		}
 		break;
 	}
-	// TODO: Add your message handler code here and/or call default
+	 
 
 	CDialogEx::OnTimer(nIDEvent);
 }
@@ -2040,7 +2040,7 @@ endthis:
 
 void BacnetWait::PostNcDestroy()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	CDialogEx::PostNcDestroy();
 	delete this;

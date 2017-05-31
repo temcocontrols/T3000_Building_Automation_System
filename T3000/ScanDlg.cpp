@@ -1658,7 +1658,7 @@ void CScanDlg::SetGridCellColor(int nRow, int nCol, COLORREF clr)
 
 void CScanDlg::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 
 	//RecoveryID();
 	if (!m_IsScan)
@@ -1715,7 +1715,7 @@ void CScanDlg::OnClose()
 
 BOOL CScanDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 return CDialog::OnCommand(wParam, lParam);
 }
 
@@ -2381,7 +2381,7 @@ void CScanDlg::OnBnClickedButtonAuto()
 
 void CScanDlg::OnBnClickedButtonManual()
 {
-	// TODO: Add your control notification handler code here
+	
 //	AfxMessageBox(_T("111"), MB_OK);
 }
 

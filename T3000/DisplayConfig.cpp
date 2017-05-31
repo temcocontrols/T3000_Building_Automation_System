@@ -915,7 +915,7 @@ void CDisplayConfig::OnBnClickedFreshTable()
 
 BOOL CDisplayConfig::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(WM_KEYDOWN == pMsg->message)
 	{
 

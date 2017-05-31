@@ -597,7 +597,7 @@ BOOL CParameterDlg::OnInitDialog()
     UpdateData(FALSE);
     
     //////////////////////////////////////////////////////////////////////////
-    // TODO:  Add extra initialization here
+    
     return TRUE;  // return TRUE unless you set the focus to a control
     // EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -710,7 +710,7 @@ void CParameterDlg::InitPID2ComboBox()
 /// </summary>
 void CParameterDlg::OnBnClickedOk()
 {
-    // TODO: Add your control notification handler code here
+    
     //OnOK();
 }
 /// <summary>
@@ -726,7 +726,7 @@ void CParameterDlg::OnBnClickedRefreshbutton()
 //void CParameterDlg::OnBnClickedEnableidbutton()
 //{
 //    // 	m_idAdressEdit.EnableWindow(TRUE);
-//    // 	// TODO: Add your control notification handler code here
+//    // 	
 //
 //    if(m_idAdressEdit.IsWindowEnabled())
 //    {
@@ -752,7 +752,7 @@ void CParameterDlg::OnCbnSelchangeAutoonlycombo()
     //	product_register_value[MODBUS_AUTO_ONLY],this->m_hWnd,IDC_AUTOONLYCOMBO,_T("AUTO ONLY"));
 
 
-    // TODO: Add your control notification handler code here
+    
 }
 
 //void CParameterDlg::OnEnKillfocusIdaddressedit()
@@ -877,7 +877,7 @@ void CParameterDlg::OnDestroy()
     //}
     if(hFirstThread != NULL)
         TerminateThread(hFirstThread, 0);
-    // TODO: Add your message handler code here
+    
 }
 
 void CParameterDlg::OnCbnSelchangekeypadcombo()
@@ -954,7 +954,7 @@ void CParameterDlg::OnCbnSelchangekeypadcombo()
 
 //void CParameterDlg::OnCbnKillfocusKeypadselect()
 //{
-//	// TODO: Add your control notification handler code here
+//	
 //
 //		int nItem=m_keySelectCombox.GetCurSel();
 //		switch(nItem)
@@ -1478,7 +1478,7 @@ void CParameterDlg::OnBnClickedOutdoorresetbtn()
 
     COutsidDailog Dlg;
     Dlg.DoModal();
-    // TODO: Add your control notification handler code here
+    
 }
 
 
@@ -2417,7 +2417,7 @@ void CParameterDlg::OnEnKillfocusEnigntcooling1()
 
 BOOL CParameterDlg::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: Add your specialized code here and/or call the base class
+    
     if(pMsg->message == WM_KEYDOWN  )
     {
         if(pMsg->wParam == VK_RETURN)
@@ -2639,7 +2639,7 @@ void CParameterDlg::OnCbnSelchangeComboRounddis()
 
 void CParameterDlg::OnCbnKillfocusCombo1()
 {
-    // TODO: Add your control notification handler code here
+    
     //CString str;
 
     //GetDlgItem(IDC_COMBO1)->GetWindowText(str);
@@ -2654,7 +2654,7 @@ void CParameterDlg::OnCbnKillfocusCombo1()
 
 void CParameterDlg::OnCbnKillfocusCombo4()
 {
-    // TODO: Add your control notification handler code here
+    
 //CString str;
 
     //GetDlgItem(IDC_COMBO4)->GetWindowText(str);
@@ -4338,7 +4338,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 void CParameterDlg::OnBnClickedCancel()
 {
-    // TODO: Add your control notification handler code here
+    
 // 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 // 	CView* pT3000View = pFrame->m_pViews[DLG_T3000_VIEW];
 // 	if(pFrame->m_pViews[DLG_T3000_VIEW]->m_hWnd!=NULL)
@@ -4484,9 +4484,9 @@ HBRUSH CParameterDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 {
     HBRUSH hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
 
-    // TODO:  Change any attributes of the DC here
+    
 
-    // TODO:  Return a different brush if the default is not desired
+    
     for (int i=0; i<(int)Change_Color_ID.size(); i++)
     {
         if(pWnd->GetDlgCtrlID()==Change_Color_ID.at(i))//注意此处的（pWnd->），否则没效果
@@ -4523,12 +4523,12 @@ void CParameterDlg::Fresh_Single_UI()
 
 //void CParameterDlg::OnEnChangeEdit34()
 //{
-//	// TODO:  If this is a RICHEDIT control, the control will not
+//	
 //	// send this notification unless you override the CDialog::OnInitDialog()
 //	// function and call CRichEditCtrl().SetEventMask()
 //	// with the ENM_CHANGE flag ORed into the mask.
 //
-//	// TODO:  Add your control notification handler code here
+//	// 
 //}
 
 

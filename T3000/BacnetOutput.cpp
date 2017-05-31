@@ -101,7 +101,7 @@ BOOL CBacnetOutput::OnInitDialog()
 	CDialogEx::OnInitDialog();
 
 	SetWindowTextW(_T("OUTPUT"));
-	// TODO:  Add extra initialization here
+	
 	m_output_item_info.SetWindowTextW(_T(""));
 	m_output_item_info.textColor(RGB(0,0,255));
 	//m_static.bkColor(RGB(0,255,255));
@@ -1036,7 +1036,7 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	 
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 	long lRow,lCol;
 	m_output_list.Set_Edit(true);
 	DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
@@ -1354,7 +1354,7 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CBacnetOutput::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	switch(nIDEvent)
 	{
 	case 1:
@@ -1411,7 +1411,7 @@ void CBacnetOutput::OnTimer(UINT_PTR nIDEvent)
 
 BOOL CBacnetOutput::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN) 
 	{
 		CRect list_rect,win_rect;
@@ -1459,7 +1459,7 @@ BOOL CBacnetOutput::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetOutput::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 
 	ShowWindow(FALSE);
 	return;
@@ -1473,7 +1473,7 @@ void CBacnetOutput::OnClose()
 
 void CBacnetOutput::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
 }
 
@@ -1624,7 +1624,7 @@ int GetOutputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Au
 
 BOOL CBacnetOutput::OnHelpInfo(HELPINFO* pHelpInfo)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 		HWND hWnd;
 
 		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
@@ -1648,7 +1648,7 @@ void CBacnetOutput::OnSize(UINT nType, int cx, int cy)
 				m_output_list.MoveWindow(&rc);
 	}
 
-	// TODO: Add your message handler code here
+	
 }
 
 
@@ -1656,7 +1656,7 @@ void CBacnetOutput::OnSize(UINT nType, int cx, int cy)
 
 void CBacnetOutput::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if(nID == SC_MAXIMIZE)
 	{
 		if(window_max == false)

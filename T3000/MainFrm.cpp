@@ -584,7 +584,7 @@ UINT __cdecl  _FreshTreeView(LPVOID pParam );
 
 CMainFrame::CMainFrame()
 {
-    // TODO: add member initialization code here
+    
     theApp.m_nAppLook = theApp.GetInt(_T("ApplicationLook"), ID_VIEW_APPLOOK_VS_2005);
     m_nStyle=0;
 	m_pFreshTree = NULL;
@@ -960,7 +960,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
         return -1;      // fail to create
     }
 
-    // TODO: Delete these five lines if you don't want the toolbar and menubar to be dockable
+    //  Delete these five lines if you don't want the toolbar and menubar to be dockable
     //m_testtoolbar.EnableDocking(CBRS_ALIGN_ANY);
 
     //m_wndMenuBar.EnableDocking(CBRS_ALIGN_ANY);
@@ -1324,7 +1324,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 {
     if( !CFrameWndEx::PreCreateWindow(cs) )
         return FALSE;
-    // TODO: Modify the Window class or styles here by modifying
+    //  Modify the Window class or styles here by modifying
     //  the CREATESTRUCT cs
 
 
@@ -3399,7 +3399,7 @@ void CMainFrame::ScanTstatInDB(void)
 
 void CMainFrame::OnFileOpen()
 {
-    // TODO: Add your command handler code here
+    
     AfxMessageBox(_T("Open configuration file."));
 }
 void CMainFrame::OnLoadConfigFile()
@@ -4237,7 +4237,7 @@ void CMainFrame::OnScanDevice()
 
 void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 {
-    // TODO: Add your message handler code here and/or call default
+     
     if(REFRESH_TIMER==nIDEvent)
     {
         if (g_bEnableRefreshTreeView && m_bEnableRefreshTreeView && !g_bPauseMultiRead )
@@ -6621,12 +6621,12 @@ void CMainFrame::OnDestroy()
 
 
     CFrameWndEx::OnDestroy();
-    // TODO: Add your message handler code here
+    
 }
 
 LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
-    // TODO: Add your specialized code here and/or call the base class
+    
     if(message==WM_MYMSG_REFRESHBUILDING)
     {
         //Sleep(1000);
@@ -11060,7 +11060,7 @@ loop1:
 
 void CMainFrame::OnDatabaseIonameconfig()
 {
-    // TODO: Add your command handler code here
+    
     CIONameConfig ionameconfig;
     ionameconfig.DoModal();
 }
@@ -11068,7 +11068,7 @@ void CMainFrame::OnDatabaseIonameconfig()
 
 void CMainFrame::OnDatabaseMbpoll()
 {
-    //// TODO: Add your command handler code here
+    //
     //if (mbPollDlgOpen == TRUE)
     //	{
     //	mbPoll->ShowWindow(SW_SHOW);
@@ -11122,7 +11122,7 @@ void CMainFrame::OnDatabaseMbpoll()
 //{
 //     OnDisconnect();
 //	 OnDestroy();
-//	// TODO: Add your command handler code here
+//	
 //}
 void CMainFrame::OnToolIsptoolforone()
 {
@@ -11313,7 +11313,7 @@ void CMainFrame::OnControlMain()
 void CMainFrame::OnControlInputs()
 {
 
-    // TODO: Add your command handler code here
+    
 
     if(  (g_protocol == PROTOCOL_BACNET_IP) || 
 		 (g_protocol == MODBUS_BACNET_MSTP) || 
@@ -11456,7 +11456,7 @@ void CMainFrame::OnControlInputs()
 
 void CMainFrame::OnControlPrograms()
 {
-    // TODO: Add your command handler code here
+    
 
 
     if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
@@ -11519,7 +11519,7 @@ void CMainFrame::OnControlPrograms()
 
 void CMainFrame::OnControlOutputs()
 {
-    // TODO: Add your command handler code here
+    
 
 	// new_device_support_mini_ui  主要是为了支持 旧版本的T3进入以前的界面;
     if((g_protocol == PROTOCOL_BACNET_IP) || 
@@ -11649,7 +11649,7 @@ void CMainFrame::OnControlOutputs()
 
 void CMainFrame::OnControlVariables()
 {
-    // TODO: Add your command handler code here
+    
     if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
     {
         if((m_user_level ==	LOGIN_SUCCESS_GRAPHIC_MODE) ||
@@ -11712,7 +11712,7 @@ void CMainFrame::OnControlVariables()
 #include "NewTstatSchedulesDlg.h"
 void CMainFrame::OnControlWeekly()
 {
-    // TODO: Add your command handler code here
+    
     if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
     {
         if((m_user_level !=	LOGIN_SUCCESS_ROUTINE_MODE) &&
@@ -11808,7 +11808,7 @@ void CMainFrame::OnControlWeekly()
 
 void CMainFrame::OnControlAnnualroutines()
 {
-    // TODO: Add your command handler code here
+    
 
 	 
     if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
@@ -11884,7 +11884,7 @@ void CMainFrame::OnControlAnnualroutines()
 #include "ParameterDlg.h"
 void CMainFrame::OnControlSettings()
 {
-    // TODO: Add your command handler code here
+    
     if((g_protocol == PROTOCOL_BACNET_IP) || 
 		(g_protocol == PROTOCOL_BIP_TO_MSTP) || 
 		(g_protocol == MODBUS_BACNET_MSTP) ||
@@ -11970,7 +11970,7 @@ void CMainFrame::OnControlSettings()
 
 void CMainFrame::OnMiscellaneousLoaddescriptors()
 {
-    // TODO: Add your command handler code here
+    
     if(g_protocol == PROTOCOL_BACNET_IP)
     {
         if(bac_select_device_online)
@@ -11987,7 +11987,7 @@ void CMainFrame::OnMiscellaneousLoaddescriptors()
 
 void CMainFrame::OnMiscellaneousUpdatemini()
 {
-    // TODO: Add your command handler code here
+    
 
     if(g_protocol == PROTOCOL_BACNET_IP)
     {
@@ -12006,7 +12006,7 @@ void CMainFrame::OnMiscellaneousUpdatemini()
 //#include "BacnetController.h"
 void CMainFrame::OnControlControllers()
 {
-    // TODO: Add your command handler code here
+    
 
     if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP) ||
 		( ((g_protocol == MODBUS_TCPIP ) || (g_protocol == MODBUS_RS485)) &&   (bacnet_device_type == STM32_HUM_NET)))
@@ -12105,7 +12105,7 @@ void CMainFrame::OnControlScreens()
 {
 
     //bac_cm5_graphic = true;
-    // TODO: Add your command handler code here
+    
 
     if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
     {
@@ -12219,7 +12219,7 @@ void CMainFrame::OnLanguage34006()
 
 void CMainFrame::OnControlMonitors()
 {
-    // TODO: Add your command handler code here
+    
 
     if(g_protocol == PROTOCOL_BACNET_IP)
     {
@@ -12278,11 +12278,11 @@ void CMainFrame::OnSizing(UINT fwSide, LPRECT pRect)
 {
     CFrameWndEx::OnSizing(fwSide, pRect);
 
-    // TODO: Add your message handler code here
+    
 }
 void CMainFrame::OnToolRegisterviewer()
 {
-    // TODO: Add your command handler code here
+    
    /* CRegisterViewerDlg dlg;
 	dlg.DoModal();*/
 	HideBacnetWindow();
@@ -12324,7 +12324,7 @@ void CMainFrame::OnPaint()
     }
 
 
-    // TODO: Add your message handler code here
+    
     // Do not call CFrameWndEx::OnPaint() for painting messages
 }
 
@@ -12335,12 +12335,12 @@ void CMainFrame::OnDatabaseBacnettool()
     //dlg.DoModal();
     CBacnetTool dlg;
     dlg.DoModal();
-    // TODO: Add your command handler code here
+    
 }
 
 void CMainFrame::OnControlAlarmLog()
 {
-    // TODO: Add your command handler code here
+    
     if(g_protocol == PROTOCOL_BACNET_IP)
     {
         if(pDialog[WINDOW_ALARMLOG] != NULL)
@@ -12393,7 +12393,7 @@ void CMainFrame::OnControlCustomerunits()
     Sleep(1);
 #endif
 #ifndef test_ptp
-    // TODO: Add your command handler code here
+    
     if(g_protocol == PROTOCOL_BACNET_IP)
     {
         if(bac_select_device_online)
@@ -12419,7 +12419,7 @@ void CMainFrame::OnMenuCheckupdate()
 
 // void CMainFrame::OnDatabasePv()
 // {
-//     // TODO: Add your command handler code here
+//     
 //     //AfxMessageBox(_T("Developing....."));
 //     //return;
 //     CLoginDlg Dlg(g_buser_log_in);
@@ -12443,7 +12443,7 @@ void CMainFrame::OnMenuCheckupdate()
 void CMainFrame::OnHelpUpdatefirmware()
 {
 #if 0
-    // TODO: Add your command handler code here
+    
 #if 0
     MessageBox(_T("This function is still under develepment!"),_T("Notice"),MB_OK | MB_ICONINFORMATION);
     return;
@@ -12554,7 +12554,7 @@ void CMainFrame::CreateOfflinePrgFile()
 
 void CMainFrame::OnControlRemotePoint()
 {
-    // TODO: Add your command handler code here
+    
 
     if(g_protocol == PROTOCOL_BACNET_IP)
     {
@@ -12629,7 +12629,7 @@ void CMainFrame::OnUpdateConnect2(CCmdUI *pCmdUI)
 //建立TCP 服务器, GSM 会连接上来;
 void CMainFrame::OnMiscellaneousGsmconnection()
 {
-    // TODO: Add your command handler code here
+    
 
     if(Tcp_Server_Window == NULL)
     {
@@ -12747,7 +12747,7 @@ void CMainFrame::BuildingComportConfig()
 
 BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 {
-    // TODO: Add your message handler code here and/or call default
+     
     int nSize = pCopyDataStruct->cbData;// = (strMsg.GetLength()+1)*sizeof(TCHAR); //(lstrlen(szBuffer)+1)*sizeof(TCHAR);
     //pCopyDataStruct->lpData =  (LPVOID)(LPCTSTR)strMsg;
     CString strMsg = CString(LPCTSTR(pCopyDataStruct->lpData));
@@ -13725,14 +13725,14 @@ void CMainFrame::OnToolDetectonlineproducts()
 
 void CMainFrame::OnUpdateControlMain(CCmdUI *pCmdUI)
 {
-    // TODO: Add your command update UI handler code here
+    //  Add your command update UI handler code here
     pCmdUI->SetCheck(bacnet_view_number == TYPE_MAIN);
 }
 
 
 void CMainFrame::OnUpdateControlInputs(CCmdUI *pCmdUI)
 {
-    // TODO: Add your command update UI handler code here
+    //  Add your command update UI handler code here
     pCmdUI->SetCheck(bacnet_view_number == TYPE_INPUT);
 
 //       if(pCmdUI->m_pMenu != NULL)
@@ -13744,63 +13744,63 @@ void CMainFrame::OnUpdateControlInputs(CCmdUI *pCmdUI)
 
 void CMainFrame::OnUpdateControlOutputs(CCmdUI *pCmdUI)
 {
-    // TODO: Add your command update UI handler code here
+    //  Add your command update UI handler code here
     pCmdUI->SetCheck(bacnet_view_number == TYPE_OUTPUT);
 }
 
 
 void CMainFrame::OnUpdateControlVariables(CCmdUI *pCmdUI)
 {
-    // TODO: Add your command update UI handler code here
+    //  Add your command update UI handler code here
     pCmdUI->SetCheck(bacnet_view_number == TYPE_VARIABLE);
 }
 
 
 void CMainFrame::OnUpdateControlPrograms(CCmdUI *pCmdUI)
 {
-    // TODO: Add your command update UI handler code here
+    //  Add your command update UI handler code here
     pCmdUI->SetCheck(bacnet_view_number == TYPE_PROGRAM);
 }
 
 
 void CMainFrame::OnUpdateControlScreens(CCmdUI *pCmdUI)
 {
-    // TODO: Add your command update UI handler code here
+    //  Add your command update UI handler code here
     pCmdUI->SetCheck(bacnet_view_number == TYPE_SCREENS);
 }
 
 
 void CMainFrame::OnUpdateControlControllers(CCmdUI *pCmdUI)
 {
-    // TODO: Add your command update UI handler code here
+    //  Add your command update UI handler code here
     pCmdUI->SetCheck(bacnet_view_number == TYPE_CONTROLLER);
 }
 
 
 void CMainFrame::OnUpdateControlWeekly(CCmdUI *pCmdUI)
 {
-    // TODO: Add your command update UI handler code here
+    //  Add your command update UI handler code here
     pCmdUI->SetCheck(bacnet_view_number == TYPE_WEEKLY);
 }
 
 
 void CMainFrame::OnUpdateControlAnnualroutines(CCmdUI *pCmdUI)
 {
-    // TODO: Add your command update UI handler code here
+    //  Add your command update UI handler code here
     pCmdUI->SetCheck(bacnet_view_number == TYPE_ANNUAL);
 }
 
 
 void CMainFrame::OnUpdateControlMonitors(CCmdUI *pCmdUI)
 {
-    // TODO: Add your command update UI handler code here
+    //  Add your command update UI handler code here
     pCmdUI->SetCheck(bacnet_view_number == TYPE_MONITOR);
 }
 
 
 void CMainFrame::OnUpdateControlAlarmLog(CCmdUI *pCmdUI)
 {
-    // TODO: Add your command update UI handler code here
+    //  Add your command update UI handler code here
     pCmdUI->SetCheck(bacnet_view_number == TYPE_ALARMLOG);
 }
 
@@ -13828,21 +13828,20 @@ void CMainFrame::Create_Thread_Read_Item(int n_item)
 
 void CMainFrame::OnUpdateControlTstat(CCmdUI *pCmdUI)
 {
-    // TODO: Add your command update UI handler code here
+    //  Add your command update UI handler code here
     pCmdUI->SetCheck(bacnet_view_number == TYPE_TSTAT);
 }
 
 
 void CMainFrame::OnUpdateControlSettings(CCmdUI *pCmdUI)
 {
-    // TODO: Add your command update UI handler code here
+    //  Add your command update UI handler code here
     pCmdUI->SetCheck(bacnet_view_number == TYPE_SETTING);
 }
 
 
 BOOL CMainFrame::OnHelpInfo(HELPINFO* pHelpInfo)
-{
-    // TODO: Add your message handler code here and/or call default   IDH_TOPIC_TBS_COVER_EDITOR
+{ 
     HWND hWnd;
 
     if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
@@ -13853,6 +13852,11 @@ BOOL CMainFrame::OnHelpInfo(HELPINFO* pHelpInfo)
     return CFrameWndEx::OnHelpInfo(pHelpInfo);
 }
 
+
+
+/// <summary>
+/// use the tool ,wo export a register list 
+/// </summary>
 void CMainFrame::OnFileExportregiseterslist()
 {
     CStdioFile* m_pFile;
@@ -15011,6 +15015,10 @@ void CMainFrame::OnFileExportregiseterslist()
 //}
 
 
+
+/// <summary>
+/// register maintenance stystem
+/// </summary>
 void CMainFrame::OnToolRegistersmaintenancesystem()
 {
     //维护寄存器列表管理的 一个应用程序
@@ -15027,7 +15035,13 @@ void CMainFrame::OnToolRegistersmaintenancesystem()
     ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);*/
 }
 
-
+/// <summary>
+/// 消息提示 ，根据不同的控件，提示不一样的信息
+/// </summary>
+/// <param name="id"></param>
+/// <param name="Pnmhdr"></param>
+/// <param name="pResult"></param>
+/// <returns></returns>
 BOOL CMainFrame::OnToolTipNotify(UINT id,NMHDR *Pnmhdr,LRESULT *pResult)
 {
     TOOLTIPTEXT *pTTT = (TOOLTIPTEXT *) Pnmhdr;
@@ -15116,7 +15130,7 @@ BOOL CMainFrame::OnToolTipNotify(UINT id,NMHDR *Pnmhdr,LRESULT *pResult)
 
 INT_PTR CMainFrame::OnToolHitTest(CPoint point, TOOLINFO* pTI) const
 {
-    // TODO: Add your specialized code here and/or call the base class
+    
 
     return CFrameWndEx::OnToolHitTest(point, pTI);
 
@@ -15366,7 +15380,7 @@ void CMainFrame::OnMove(int x, int y)
 {
     CFrameWndEx::OnMove(x, y);
 
-    // TODO: Add your message handler code here
+    
 	//TRACE(_T("Move to x = %d , y = %d \r\n"),x,y);
 		static int cmove_cx = 0;
 	static int cmove_cy = 0;
@@ -15438,7 +15452,7 @@ void CMainFrame::Check_Local_TemcoUpdate()
 
 void CMainFrame::OnHelpUsingUpdate()
 {
-	// TODO: Add your command handler code here
+	
 #if 0
 	MessageBox(_T("This function is still under develepment!"),_T("Notice"),MB_OK | MB_ICONINFORMATION);
 	return;
@@ -15644,14 +15658,14 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 		cmainf_cx = cx;
 		cmainf_cy = cy;
 	}
-	// TODO: Add your message handler code here
+	
 }
 
 
 
 void CMainFrame::OnModeOnlinemode()
 {
-	// TODO: Add your command handler code here
+	
 	offline_mode = false;
 	m_pTreeViewCrl->SetTreeOfflineMode(offline_mode);
 	m_pTreeViewCrl->KillTimer(1);
@@ -15663,7 +15677,7 @@ void CMainFrame::OnModeOnlinemode()
 
 void CMainFrame::OnModeOfflinemode()
 {
-	// TODO: Add your command handler code here
+	
 	offline_mode = true;
 	m_pTreeViewCrl->SetTreeOfflineMode(offline_mode);
 	m_pTreeViewCrl->SetTimer(1,500,NULL);
@@ -15674,7 +15688,7 @@ void CMainFrame::OnModeOfflinemode()
 
 void CMainFrame::OnUpdateModeOnlinemode(CCmdUI *pCmdUI)
 {
-	// TODO: Add your command update UI handler code here
+	//  Add your command update UI handler code here
 	if(offline_mode)
 		pCmdUI->Enable(TRUE);
 	else
@@ -15684,7 +15698,7 @@ void CMainFrame::OnUpdateModeOnlinemode(CCmdUI *pCmdUI)
 
 void CMainFrame::OnUpdateModeOfflinemode(CCmdUI *pCmdUI)
 {
-	// TODO: Add your command update UI handler code here
+	//  Add your command update UI handler code here
 	if(offline_mode)
 		pCmdUI->Enable(FALSE);
 	else

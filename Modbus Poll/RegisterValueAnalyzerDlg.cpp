@@ -109,7 +109,7 @@ void CRegisterValueAnalyzerDlg::OnSize(UINT nType, int cx, int cy)
 
 void CRegisterValueAnalyzerDlg::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 
 	CDialogEx::OnVScroll(nSBCode, nPos, pScrollBar);
 }
@@ -117,7 +117,7 @@ void CRegisterValueAnalyzerDlg::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* p
 
 void CRegisterValueAnalyzerDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 
 	CDialogEx::OnHScroll(nSBCode, nPos, pScrollBar);
 }
@@ -170,7 +170,7 @@ BOOL CRegisterValueAnalyzerDlg::OnInitDialog()
 	else
 		m_ChartCtrl.GetLegend()->SetVisible(false);
 	m_ChartCtrl.RefreshCtrl();
-	// TODO:  Add extra initialization here
+	
 	CRect ViewRect;
 	GetClientRect(&ViewRect);
 
@@ -826,7 +826,7 @@ void CRegisterValueAnalyzerDlg::Fresh(){
  
 void CRegisterValueAnalyzerDlg::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if (DATATIME_TIMER == nIDEvent){
 	//	Fresh();
 	}
@@ -843,7 +843,7 @@ void CRegisterValueAnalyzerDlg::OnTimer(UINT_PTR nIDEvent)
 
 LRESULT CRegisterValueAnalyzerDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if (message==MY_FRESH_DRAW_GRAPHIC)
 	{
 		Fresh();

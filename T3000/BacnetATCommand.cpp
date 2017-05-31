@@ -43,7 +43,7 @@ BOOL CBacnetATCommand::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	m_at_command_hwnd = this->m_hWnd;
 	CHARFORMAT cf;
 	ZeroMemory(&cf, sizeof(CHARFORMAT));
@@ -116,7 +116,7 @@ LRESULT CBacnetATCommand::Fresh_RX_AT_Command(WPARAM wParam,LPARAM lParam)
 
 BOOL CBacnetATCommand::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -124,7 +124,7 @@ BOOL CBacnetATCommand::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetATCommand::OnBnClickedButtonAtSend()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString cs_send_tx;
 	GetDlgItemTextW(IDC_EDIT_SEND,cs_send_tx);
 	if(cs_send_tx.GetLength()>=98)
@@ -166,7 +166,7 @@ void CBacnetATCommand::OnBnClickedButtonAtSend()
 
 void CBacnetATCommand::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	int temp_invoke_id = -1;
 	int send_status = true;
 	int	resend_count = 0;
@@ -201,7 +201,7 @@ void CBacnetATCommand::OnTimer(UINT_PTR nIDEvent)
 
 void CBacnetATCommand::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	memset(m_at_write_buf,0,100);
 
 	m_at_write_buf[0] = AT_CLOSE;

@@ -41,7 +41,7 @@ BOOL CEnterValueDlg::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
 
-    // TODO:  Add extra initialization here
+    
     m_edit_value.SetSel(0,m_string_value.GetLength());
     m_edit_value.SetFocus();
     return FALSE;  // return TRUE unless you set the focus to a control

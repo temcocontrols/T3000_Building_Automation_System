@@ -52,7 +52,7 @@ END_MESSAGE_MAP()
 void CWifiConfigDlg::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-					   // TODO: Add your message handler code here
+					   
 					   // Do not call CDialogEx::OnPaint() for painting messages
 
 	CRect   rect;
@@ -127,7 +127,7 @@ BOOL CWifiConfigDlg::OnInitDialog()
 
 BOOL CWifiConfigDlg::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if (pMsg->message == WM_KEYDOWN)
 	{
 		if (pMsg->wParam == VK_RETURN)

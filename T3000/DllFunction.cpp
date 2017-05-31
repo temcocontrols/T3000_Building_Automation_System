@@ -136,13 +136,13 @@ OVERLAPPED m_TESTORead;
 
   int ReadTestoDeviceData(float reveivevalue[]) 
 {
-	// TODO: Add your control notification handler code here
+	
 
 	char vbtSend[] = {0x12,0,0,0,1,1,0x55,0xd1,0xb7};
 	ULONG	nWritten;
 	WriteFile(hDevice, vbtSend, 9, &nWritten, NULL);
 	Sleep(100);
-	// TODO: Add your control notification handler code here
+	
 	char	*buf = NULL;
 	ULONG	nRead;
 	int	    n = 65;

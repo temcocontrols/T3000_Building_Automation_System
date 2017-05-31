@@ -353,7 +353,7 @@ void CIONameConfig::OnEnKillfocusNameedit()
 
 void CIONameConfig::OnBnClickedOk()
 {
-	// TODO: Add your control notification handler code here
+	
 	//CDialog::OnOK();
 	if (m_Clicked)
 	{
@@ -506,7 +506,7 @@ void CIONameConfig::GetIOName()
 
 void CIONameConfig::OnBnClickedCancel()
 {
-	// TODO: Add your control notification handler code here
+	
 	if (m_changed)
 	{
 	GetIOName();

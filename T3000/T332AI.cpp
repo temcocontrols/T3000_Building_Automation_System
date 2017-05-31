@@ -630,7 +630,7 @@ void T332AI::OnEnKillfocusEditResponseDelay()
 
 BOOL T332AI::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: Add your specialized code here and/or call the base class
+    
     if(pMsg->message == WM_KEYDOWN  )
     {
         if(pMsg->wParam == VK_RETURN)

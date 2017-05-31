@@ -446,7 +446,7 @@ END_EVENTSINK_MAP()
 
 void CConfig_Routines::ClickMsflexgrid1()
 {
-	// TODO: 在此处添加消息处理程序代码
+	
 	on_select();		
 }
 
@@ -460,7 +460,7 @@ void CConfig_Routines::OnEnSetfocusEdit1()
 
 void CConfig_Routines::OnEnKillfocusEdit1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	UpdateData(true);
 	if(row_col==3 || row_col==5)
 	{
@@ -501,7 +501,7 @@ void CConfig_Routines::OnEnKillfocusEdit1()
 
 void CConfig_Routines::OnCbnSetfocusCombo1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	NET_WORK_KILL_TIMER
 	UpdateData(true);
 	CString str_temp;
@@ -512,7 +512,7 @@ void CConfig_Routines::OnCbnSetfocusCombo1()
 
 void CConfig_Routines::OnCbnKillfocusCombo1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	UpdateData(true);
 	CString str_temp;
 	m_combo_col_row.GetWindowText(str_temp);
@@ -610,7 +610,7 @@ void CConfig_Routines::down_move()
 
 BOOL CConfig_Routines::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: 在此添加专用代码和/或调用基类
+	
 /*	if(pMsg->message == WM_RBUTTONDOWN )
 	{		//
 			CMenu menu;
@@ -635,12 +635,12 @@ BOOL CConfig_Routines::PreTranslateMessage(MSG* pMsg)
 void CConfig_Routines::OnDestroy()
 {
 	CDialog::OnDestroy();
-	// TODO: 在此处添加消息处理程序代码
+	
 	NET_WORK_KILL_TIMER
 }
 void CConfig_Routines::OnBnClickedButton1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	//clear one row
 	CString str;
 	str.Format(_T("Are you sure to clear %d"),row_row);
@@ -671,13 +671,13 @@ void CConfig_Routines::OnBnClickedButton1()
 
 void CConfig_Routines::OnTimer(UINT nIDEvent)
 {
-	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	
 	load_grid();
 	CDialog::OnTimer(nIDEvent);
 }
 
 void CConfig_Routines::OnBnClickedCancel()
 {
-	// TODO: Add your control notification handler code here
+	
 	OnCancel();
 }

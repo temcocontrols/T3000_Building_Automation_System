@@ -406,7 +406,7 @@ unsigned char rev_back_rawData[300],send_data[100];
 void CWriteMultiRegistersDlg::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-	// TODO: Add your message handler code here
+	
 	// Do not call CDialogEx::OnPaint() for painting messages
 	m_ListBox_registers.SetCurSel(0);
 

@@ -41,7 +41,7 @@ BOOL CBacnetSettingHealth::OnInitDialog()
 	CDialogEx::OnInitDialog();
 	Refresh_Health_Data();
 	SetTimer(1,4000,NULL);
-	// TODO:  Add extra initialization here
+	
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -50,7 +50,7 @@ BOOL CBacnetSettingHealth::OnInitDialog()
 
 BOOL CBacnetSettingHealth::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -58,7 +58,7 @@ BOOL CBacnetSettingHealth::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetSettingHealth::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	//Post_Refresh_Message(g_bac_instance,READ_MISC,0,0,sizeof(Str_MISC),1);
 	GetPrivateData(g_bac_instance,READ_MISC,0,0,sizeof(Str_MISC));
 
@@ -118,7 +118,7 @@ void CBacnetSettingHealth::Refresh_Health_Data()
 
 void CBacnetSettingHealth::OnBnClickedButtonHealthClear()
 {
-	// TODO: Add your control notification handler code here
+	
 	memset(&Device_Special_Data,0,sizeof(Str_Special));
 	Device_Special_Data.reg.clear_health_rx_tx = 0x11;
 

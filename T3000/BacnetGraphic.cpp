@@ -273,7 +273,7 @@ BOOL CBacnetGraphic::OnInitDialog()
 #ifndef _DEBUG
 	::SetWindowPos(this->m_hWnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
 #endif
-	// TODO:  Add extra initialization here
+	
 	MSG msg;
 	WNDCLASS wndClass;
 	GdiplusStartupInput gdistartupInput;
@@ -1486,7 +1486,7 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 
 void CBacnetGraphic::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	switch(nIDEvent)
 	{
 	case 2:
@@ -1511,7 +1511,7 @@ void CBacnetGraphic::OnTimer(UINT_PTR nIDEvent)
 
 BOOL CBacnetGraphic::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message == WM_KEYDOWN)
 	{
 		if(pMsg->wParam == VK_LEFT)
@@ -1531,7 +1531,7 @@ BOOL CBacnetGraphic::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetGraphic::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 //	PostMessage(WM_CLOSE,NULL,NULL);
 	//GraphicWindow = NULL;
 	//::PostMessage(m_monitor_dlg_hwnd,WM_MONITOR_USER_MESSAGE,MONITOR_MESSAGE_DELETE,0);
@@ -1542,7 +1542,7 @@ void CBacnetGraphic::OnCancel()
 
 void CBacnetGraphic::OnOK()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	CDialogEx::OnOK();
 }
@@ -1550,7 +1550,7 @@ void CBacnetGraphic::OnOK()
 //计算点击的坐标是否在某个  自己绘制的STATIC 里面 ，如果在里面就设置是否变色 以及 显示;
 void CBacnetGraphic::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	RclickValueTime.X = 0;
 	RclickValueTime.Y = 0;
 	int click_item = -1;
@@ -2175,7 +2175,7 @@ void CBacnetGraphic::InitialParameter(int base_time,float y_min_value,float y_ma
 
 void CBacnetGraphic::PostNcDestroy()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	flag_continue_thread = false;
 	Sleep(400);
 	TerminateThread(mythread,2);
@@ -2233,7 +2233,7 @@ void Delete_Ram_Data()
 
 void CBacnetGraphic::OnTimebase1hour()
 {
-	// TODO: Add your command handler code here
+	
 
 	CString temp_cs1;
 	temp_cs1.Format(_T("%d"),TIME_ONE_HOUR);
@@ -2252,7 +2252,7 @@ void CBacnetGraphic::OnTimebase1hour()
 
 void CBacnetGraphic::OnTimebase1day()
 {
-	// TODO: Add your command handler code here
+	
 	CString temp_cs1;
 	temp_cs1.Format(_T("%d"),TIME_ONE_DAY);
 	WritePrivateProfileString(_T("Setting"),_T("GraphicScaleType"),temp_cs1,g_cstring_ini_path);
@@ -2270,7 +2270,7 @@ void CBacnetGraphic::OnTimebase1day()
 
 void CBacnetGraphic::OnTimebase10minutes()
 {
-	// TODO: Add your command handler code here
+	
 
 	CString temp_cs1;
 	temp_cs1.Format(_T("%d"),TIME_TEN_MINUTE);
@@ -2295,7 +2295,7 @@ void CBacnetGraphic::Save_time_scale(unsigned int ntime)
 
 void CBacnetGraphic::OnTimebase12hours()
 {
-	// TODO: Add your command handler code here
+	
 	CString temp_cs1;
 	temp_cs1.Format(_T("%d"),TIME_TWELVE_HOUR);
 	WritePrivateProfileString(_T("Setting"),_T("GraphicScaleType"),temp_cs1,g_cstring_ini_path);
@@ -2311,7 +2311,7 @@ void CBacnetGraphic::OnTimebase12hours()
 
 void CBacnetGraphic::OnTimebase4hours()
 {
-	// TODO: Add your command handler code here
+	
 	CString temp_cs1;
 	temp_cs1.Format(_T("%d"),TIME_FOUR_HOUR);
 	WritePrivateProfileString(_T("Setting"),_T("GraphicScaleType"),temp_cs1,g_cstring_ini_path);
@@ -2326,7 +2326,7 @@ void CBacnetGraphic::OnTimebase4hours()
 
 void CBacnetGraphic::OnTimebase4days()
 {
-	// TODO: Add your command handler code here
+	
 	//if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
 	//{
 	//	return;
@@ -2592,7 +2592,7 @@ void CBacnetGraphic::Reset_X_Y_Parameter()
 
 void CBacnetGraphic::OnGraphicLeft()
 {
-	// TODO: Add your command handler code here
+	
 
 	draw_graphic_finished = false;
 
@@ -2618,7 +2618,7 @@ void CBacnetGraphic::OnGraphicLeft()
 
 void CBacnetGraphic::OnGraphicRight()
 {
-	// TODO: Add your command handler code here
+	
 
 	draw_graphic_finished = false;
 
@@ -2652,7 +2652,7 @@ void CBacnetGraphic::OnGraphicRight()
 
 void CBacnetGraphic::OnZoomin()
 {
-	// TODO: Add your command handler code here
+	
 	while(draw_graphic_finished == false)
 	{
 		Sleep(1);
@@ -2683,7 +2683,7 @@ void CBacnetGraphic::OnZoomin()
 
 void CBacnetGraphic::OnZoomout()
 {
-	// TODO: Add your command handler code here
+	
 	while(draw_graphic_finished == false)
 	{
 		Sleep(1);
@@ -2837,7 +2837,7 @@ BOOL CBacnetGraphic::OnHelpInfo(HELPINFO* pHelpInfo)
 
 void CBacnetGraphic::OnTimebaseCustomerdefine()
 {
-	// TODO: Add your command handler code here
+	
 	CBacnetGraphicSetting dlg;
 	dlg.DoModal();
 	if(use_customer_time)
@@ -2863,7 +2863,7 @@ void CBacnetGraphic::OnTimebaseCustomerdefine()
 
 void CBacnetGraphic::OnTimebase5minutes()
 {
-	// TODO: Add your command handler code here
+	
 	m_time_selected = TIME_FIVE_MINUTE;
 	draw_graphic_finished = false;
 	b_has_create_point = false;
@@ -2873,7 +2873,7 @@ void CBacnetGraphic::OnTimebase5minutes()
 
 void CBacnetGraphic::OnTimebase30minutes()
 {
-	// TODO: Add your command handler code here
+	
 	CString temp_cs1;
 	temp_cs1.Format(_T("%d"),TIME_THIRTY_MINUTE);
 	WritePrivateProfileString(_T("Setting"),_T("GraphicScaleType"),temp_cs1,g_cstring_ini_path);
@@ -2887,7 +2887,7 @@ void CBacnetGraphic::OnTimebase30minutes()
 
 void CBacnetGraphic::OnRButtonDown(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	int temp_y_value = 0;
 	if(contain_digital )
 		temp_y_value = 500;
@@ -2967,7 +2967,7 @@ void CBacnetGraphic::OnRButtonDown(UINT nFlags, CPoint point)
 
 void CBacnetGraphic::OnMouseMove(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if(b_show_value_line)
 	{
 		int temp_y_value = 0;

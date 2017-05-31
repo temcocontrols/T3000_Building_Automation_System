@@ -104,7 +104,7 @@ BOOL CBuildingConfigration::OnInitDialog()
 
 
     Initial_Building_List();
-    // TODO:  Add extra initialization here
+    
 
     return TRUE;  // return TRUE unless you set the focus to a control
     // EXCEPTION: OCX Property Pages should return FALSE
@@ -113,7 +113,7 @@ BOOL CBuildingConfigration::OnInitDialog()
 
 BOOL CBuildingConfigration::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: Add your specialized code here and/or call the base class
+    
     if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN)
     {
         CRect list_rect,win_rect;
@@ -1563,7 +1563,7 @@ BOOL IsNum(CString str)
 
 void CBuildingConfigration::OnBnClickedBuildingButtonAdd()
 {
-    // TODO: Add your control notification handler code here
+    
     bool is_domain = false;
     int last_count = m_building_config_list.GetItemCount() - 1;
     CString strMainBuildName;
@@ -1735,14 +1735,14 @@ void CBuildingConfigration::OnSize(UINT nType, int cx, int cy)
 
     CDialogEx::OnSize(nType, cx, cy);
 
-    // TODO: Add your message handler code here
+    
 }
 
 
 void CBuildingConfigration::OnNMClickListBuildingConfig(NMHDR *pNMHDR, LRESULT *pResult)
 {
     LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-    // TODO: Add your control notification handler code here
+    
     CString temp_cstring;
     long lRow,lCol;
     m_building_config_list.Set_Edit(true);
@@ -2323,7 +2323,7 @@ void CBuildingConfigration::OnBuildingconfigDelete()
 
 LRESULT CBuildingConfigration::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
-    // TODO: Add your specialized code here and/or call the base class
+    
     if (message==WM_FRESH_DB)
     {
         Fresh_List_Row();
@@ -2335,7 +2335,7 @@ LRESULT CBuildingConfigration::WindowProc(UINT message, WPARAM wParam, LPARAM lP
 
 void CBuildingConfigration::OnBnClickedOk()
 {
-    // TODO: Add your control notification handler code here
+    
     //CDialogEx::OnOK();
 }
 
@@ -2344,7 +2344,7 @@ void CBuildingConfigration::OnNMDblclkListBuildingConfig(NMHDR *pNMHDR, LRESULT 
 {
 
    LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 	CString temp_cstring;
 	long lRow,lCol;
 	m_building_config_list.Set_Edit(true);

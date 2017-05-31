@@ -105,7 +105,7 @@ void CSetPtDayDlg::LoadImage()
 
 void CSetPtDayDlg::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	m_pSetPtCtrl->OnLButtonDown(nFlags,point);
 	m_pNightSetPt->OnLButtonDown(nFlags,point);
 	CDialog::OnLButtonDown(nFlags, point);
@@ -113,7 +113,7 @@ void CSetPtDayDlg::OnLButtonDown(UINT nFlags, CPoint point)
 
 void CSetPtDayDlg::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	m_pSetPtCtrl->OnLButtonUp(nFlags,point);
 	m_pNightSetPt->OnLButtonUp(nFlags,point);
 	CDialog::OnLButtonUp(nFlags, point);
@@ -121,7 +121,7 @@ void CSetPtDayDlg::OnLButtonUp(UINT nFlags, CPoint point)
 
 void CSetPtDayDlg::OnMouseMove(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	m_pSetPtCtrl->OnMouseMove(nFlags,point);
 	m_pNightSetPt->OnMouseMove(nFlags,point);
 	CDialog::OnMouseMove(nFlags, point);
@@ -129,7 +129,7 @@ void CSetPtDayDlg::OnMouseMove(UINT nFlags, CPoint point)
 
 BOOL CSetPtDayDlg::OnEraseBkgnd(CDC* pDC)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 
 	return 1;
 	return CDialog::OnEraseBkgnd(pDC);
@@ -137,7 +137,7 @@ BOOL CSetPtDayDlg::OnEraseBkgnd(CDC* pDC)
 
 BOOL CSetPtDayDlg::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base clas	
+	//  Add your specialized code here and/or call the base clas	
 	if(pMsg->message == WM_KEYDOWN  )
 	{
 		if(pMsg->wParam == VK_RETURN||pMsg->wParam == VK_ESCAPE)

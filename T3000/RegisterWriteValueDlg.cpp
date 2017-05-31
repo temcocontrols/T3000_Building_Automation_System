@@ -184,7 +184,7 @@ HBRUSH CRegisterWriteValueDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 {
 	HBRUSH hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
 
-	// TODO:  Change any attributes of the DC here
+	
 	if (pWnd->GetDlgCtrlID()==IDC_EDIT_VALUE)
 	{
 	  if (m_color==0)
@@ -204,6 +204,6 @@ HBRUSH CRegisterWriteValueDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 		  return (HBRUSH)B;
 	  }
 	}
-	// TODO:  Return a different brush if the default is not desired
+	
 	return hbr;
 }

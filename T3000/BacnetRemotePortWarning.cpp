@@ -41,7 +41,7 @@ BOOL CBacnetRemotePortWarning::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	m_static_remote_warning_info.SetWindowTextW(_T("In order to connect to a remote system over the internet\r\nthe remote device requires access to port 502 TCP and \
 47808 UDP. You can set this up in the router at the remote site.\r\n You will need to use port forwarding to route these ports\r\n to the panel with ID=1 at the remote site.\r\n\r\n\
 Port 47808 is fixed while the port 502 is user configurable\r\nthe setting can be found in the same advanced settings \r\ndialog where you defined the IP address for the controller"));
@@ -60,7 +60,7 @@ Port 47808 is fixed while the port 502 is user configurable\r\nthe setting can b
 
 BOOL CBacnetRemotePortWarning::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -68,7 +68,7 @@ BOOL CBacnetRemotePortWarning::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetRemotePortWarning::OnBnClickedCheckRemotePortWarning()
 {
-	// TODO: Add your control notification handler code here
+	
 	//if(GetPrivateProfileInt(_T("Setting") ,_T("ENABLE_PORT_WARNING") ,1,g_cstring_ini_path ) == 1)
 	if(((CButton *)GetDlgItem(IDC_CHECK_REMOTE_PORT_WARNING))->GetCheck())
 	{

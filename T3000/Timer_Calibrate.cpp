@@ -62,7 +62,7 @@ BOOL Timer_Calibrate::OnInitDialog()
 	m_DatetimeEdit.ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_STATIC101)->ShowWindow(SW_HIDE);
 
-	// TODO:  在此添加额外的初始化
+	
 	had_select=false;
 	SETTIMER;
 	//SetTimer(1,30000,NULL);
@@ -142,7 +142,7 @@ void Timer_Calibrate::OnDestroy()
 	CDialog::OnDestroy();
 	KILLTIMER;
 //	write_one(THE_ID,16,0xa2,2);////////////////////////////////////////////////first step
-	// TODO: 在此处添加消息处理程序代码
+	
 }
 
 void Timer_Calibrate::OnTimer(UINT nIDEvent)
@@ -210,7 +210,7 @@ void Timer_Calibrate::OnTimer(UINT nIDEvent)
 
 void Timer_Calibrate::OnBnClickedOk()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	//OnOK();
 	KILLTIMER;
 	had_select=false;
@@ -297,7 +297,7 @@ void Timer_Calibrate::OnBnClickedOk()
 
 void Timer_Calibrate::OnNMSetfocusDatetimepicker1(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	KILLTIMER;
 	had_select=true;
 	*pResult = 0;
@@ -305,7 +305,7 @@ void Timer_Calibrate::OnNMSetfocusDatetimepicker1(NMHDR *pNMHDR, LRESULT *pResul
 
 void Timer_Calibrate::OnNMKillfocusDatetimepicker1(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	SETTIMER;	
 	*pResult = 0;
 }
@@ -313,12 +313,12 @@ void Timer_Calibrate::OnNMKillfocusDatetimepicker1(NMHDR *pNMHDR, LRESULT *pResu
 void Timer_Calibrate::OnDtnDatetimechangeDatetimepicker1(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMDATETIMECHANGE pDTChange = reinterpret_cast<LPNMDATETIMECHANGE>(pNMHDR);
-	// TODO: 在此添加控件通知处理程序代码
+	
 	*pResult = 0;
 }
 
 void Timer_Calibrate::OnBnClickedCancel()
 {
-	// TODO: Add your control notification handler code here
+	
 	OnCancel();
 }

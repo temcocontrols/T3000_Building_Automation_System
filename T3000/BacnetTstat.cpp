@@ -43,7 +43,7 @@ BOOL CBacnetTstat::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	Initial_List();
 	PostMessage(WM_REFRESH_BAC_TSTAT_LIST,NULL,NULL);
 	ShowWindow(FALSE);
@@ -55,7 +55,7 @@ BOOL CBacnetTstat::OnInitDialog()
 
 BOOL CBacnetTstat::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN) 
 	{
 		return 1;
@@ -389,7 +389,7 @@ LRESULT CBacnetTstat::Fresh_Tstat_Item(WPARAM wParam,LPARAM lParam)
 
 void CBacnetTstat::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 
 	CDialogEx::OnTimer(nIDEvent);
 }
@@ -397,7 +397,7 @@ void CBacnetTstat::OnTimer(UINT_PTR nIDEvent)
 
 void CBacnetTstat::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
 	//CDialogEx::OnCancel();
 }

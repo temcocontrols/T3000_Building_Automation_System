@@ -119,7 +119,7 @@ void CNetworkControllView::Dump(CDumpContext& dc) const
 
 BOOL CNetworkControllView::OnEraseBkgnd(CDC* pDC)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	CRect rcClient;
 	pDC->FillSolidRect(&rcClient,RGB(202,208,212));
 	return CFormView::OnEraseBkgnd(pDC);
@@ -152,7 +152,7 @@ void CNetworkControllView::OnInitialUpdate()
 	*/
 
 	SetTimer(1,20000,NULL);
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	//////////////////////////////////////////////////////////////////////////
 	// init timesever combobox
@@ -277,7 +277,7 @@ void CNetworkControllView::OnBnClickedGetbtn()
 		return;
 	write_one(g_tstat_id,132,1);
 	Sleep(4000);
-	// TODO: Add your control notification handler code here
+	
 }
 
 void CNetworkControllView::OnBnClickedSavebtn()
@@ -286,7 +286,7 @@ void CNetworkControllView::OnBnClickedSavebtn()
 		return;
 	write_one(g_tstat_id,131,1);
 	Sleep(5000);
-	// TODO: Add your control notification handler code here
+	
 }
 
 void CNetworkControllView::OnBnClickedRebootbtn()
@@ -294,7 +294,7 @@ void CNetworkControllView::OnBnClickedRebootbtn()
 	if(g_NetWorkLevel==1)
 		return;
 	write_one(g_tstat_id,133,1);
-	// TODO: Add your control notification handler code here
+	
 }
 
 void CNetworkControllView::OnBnClickedFarcallbtn()
@@ -351,7 +351,7 @@ void CNetworkControllView::OnBnClickedButton10()
 	CConfig_Routines dlg;
 	dlg.DoModal();
 	g_bPauseMultiRead=FALSE;
-	// TODO: Add your control notification handler code here
+	
 }
 
 void CNetworkControllView::OnBnClickedApplybutton()
@@ -538,7 +538,7 @@ return;
 
 void CNetworkControllView::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	CMainFrame* pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
 	CView* pNewView = pMain->m_pViews[1];
 	CView* pActiveView = pMain->GetActiveView();
@@ -557,13 +557,13 @@ void CNetworkControllView::OnDestroy()
 {
 	CFormView::OnDestroy();
 	KillTimer(1);
-	// TODO: Add your message handler code here
+	
 }
 
 void CNetworkControllView::OnIpnFieldchangedIpaddress1(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMIPADDRESS pIPAddr = reinterpret_cast<LPNMIPADDRESS>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 	*pResult = 0;
 }
 
@@ -667,7 +667,7 @@ void CNetworkControllView::OnEnKillfocusIdaddressEdit()
 
 BOOL CNetworkControllView::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->wParam == VK_RETURN )
 	{ 
 		GetDlgItem(IDC_SERIALSTATIC)->SetFocus();

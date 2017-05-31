@@ -39,7 +39,7 @@ END_MESSAGE_MAP()
 #include "global_function.h"
 void CBacnetVarCusRang::OnBnClickedButtonBacVarOk()
 {
-	// TODO: Add your control notification handler code here
+	
 	GetDlgItemText(IDC_EDIT_BAC_VAR_CUS_RANGE1,Analog_Variable_Units[0]);
 	GetDlgItemText(IDC_EDIT_BAC_VAR_CUS_RANGE2,Analog_Variable_Units[1]);
 	GetDlgItemText(IDC_EDIT_BAC_VAR_CUS_RANGE3,Analog_Variable_Units[2]);
@@ -68,7 +68,7 @@ void CBacnetVarCusRang::OnBnClickedButtonBacVarOk()
 
 void CBacnetVarCusRang::OnBnClickedButtonBacVarCancel()
 {
-	// TODO: Add your control notification handler code here
+	
 }
 
 
@@ -76,7 +76,7 @@ BOOL CBacnetVarCusRang::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	Initial_Static_Unit();
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -93,7 +93,7 @@ void CBacnetVarCusRang::Initial_Static_Unit()
 
 void CBacnetVarCusRang::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 
 	CDialogEx::OnClose();
 }
@@ -101,7 +101,7 @@ void CBacnetVarCusRang::OnClose()
 
 BOOL CBacnetVarCusRang::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }

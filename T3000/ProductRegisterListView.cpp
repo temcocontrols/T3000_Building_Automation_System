@@ -996,7 +996,7 @@ void CProductRegisterListView::OnDestroy()
     close_com();
     CFormView::OnDestroy();
 
-    // TODO: Add your message handler code here
+    
 }
 
 
@@ -1072,7 +1072,7 @@ void CProductRegisterListView::OnBnClickedUpbutton()
 
 void CProductRegisterListView::OnTimer(UINT_PTR nIDEvent)
 {
-    // TODO: Add your message handler code here and/or call default
+     
       if (nIDEvent == 1)
       {
         //UpdateData();
@@ -1083,23 +1083,23 @@ void CProductRegisterListView::OnTimer(UINT_PTR nIDEvent)
 
 void CProductRegisterListView::OnEnChangeEditDelayLoop()
 {
-    // TODO:  If this is a RICHEDIT control, the control will not
+    
     // send this notification unless you override the CFormView::OnInitDialog()
     // function and call CRichEditCtrl().SetEventMask()
     // with the ENM_CHANGE flag ORed into the mask.
        UpdateData();
-    // TODO:  Add your control notification handler code here
+    // 
 }
 
 
 void CProductRegisterListView::OnEnChangeEditDelayItems()
 {
-    // TODO:  If this is a RICHEDIT control, the control will not
+    
     // send this notification unless you override the CFormView::OnInitDialog()
     // function and call CRichEditCtrl().SetEventMask()
     // with the ENM_CHANGE flag ORed into the mask.
       UpdateData();
-    // TODO:  Add your control notification handler code here
+    // 
 }
 
 int CProductRegisterListView::GetFunctionCode(CString FunctionName)

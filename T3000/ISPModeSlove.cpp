@@ -49,7 +49,7 @@ BOOL CISPModeSlove::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	Initial_static();
 	timer_count = 30;
 	SetTimer(1, 1000,NULL);
@@ -102,7 +102,7 @@ We suggest you to update your firmware."));
 
 BOOL CISPModeSlove::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -110,7 +110,7 @@ BOOL CISPModeSlove::PreTranslateMessage(MSG* pMsg)
 
 void CISPModeSlove::OnBnClickedButtonIspChooseFirmware()
 {
-	// TODO: Add your control notification handler code here
+	
 	KillTimer(1);
 	CFileDialog dlg(true,_T(""),_T(" "),OFN_HIDEREADONLY,_T("hex File;bin File|*.hex;*.bin|all File|*.*||"),NULL, 0);
 	if (IDOK != dlg.DoModal())
@@ -123,7 +123,7 @@ void CISPModeSlove::OnBnClickedButtonIspChooseFirmware()
 
 void CISPModeSlove::OnBnClickedButtonUpdateFirmware()
 {
-	// TODO: Add your control notification handler code here
+	
 	GetDlgItemText(IDC_STATIC_ISP_FIRMWARE_PATH, isp_mode_detect_firmware_path);
 	isp_mode_firmware_auto = ((CButton *)GetDlgItem(IDC_RADIO_FROM_SERVER))->GetCheck(); //返回1表示选上，0表示没选上;
 	isp_mode_is_cancel = false;
@@ -133,7 +133,7 @@ void CISPModeSlove::OnBnClickedButtonUpdateFirmware()
 
 void CISPModeSlove::OnBnClickedButtonIspCancel()
 {
-	// TODO: Add your control notification handler code here
+	
 	isp_mode_is_cancel = true;
 	PostMessage(WM_CLOSE,NULL,NULL);
 }
@@ -141,7 +141,7 @@ void CISPModeSlove::OnBnClickedButtonIspCancel()
 
 void CISPModeSlove::OnBnClickedRadioFromServer()
 {
-	// TODO: Add your control notification handler code here
+	
 	GetDlgItem(IDC_STATIC_ISP_FIRMWARE)->EnableWindow(0);
 	GetDlgItem(IDC_STATIC_ISP_FIRMWARE_PATH)->EnableWindow(0);
 	GetDlgItem(IDC_BUTTON_ISP_CHOOSE_FIRMWARE)->EnableWindow(0);
@@ -150,7 +150,7 @@ void CISPModeSlove::OnBnClickedRadioFromServer()
 
 void CISPModeSlove::OnBnClickedRadioFromHardisk()
 {
-	// TODO: Add your control notification handler code here
+	
 	GetDlgItem(IDC_STATIC_ISP_FIRMWARE)->EnableWindow(1);
 	GetDlgItem(IDC_STATIC_ISP_FIRMWARE_PATH)->EnableWindow(1);
 	GetDlgItem(IDC_BUTTON_ISP_CHOOSE_FIRMWARE)->EnableWindow(1);
@@ -159,7 +159,7 @@ void CISPModeSlove::OnBnClickedRadioFromHardisk()
 
 void CISPModeSlove::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	switch (nIDEvent)
 	{
 	case 1:

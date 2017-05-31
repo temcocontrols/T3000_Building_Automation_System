@@ -107,7 +107,7 @@ BOOL CBacnetAnalogCusRang::OnInitDialog()
 
 	m_tooltips.Activate(TRUE);
 	CheckAllDataValid();
-	// TODO:  Add extra initialization here
+	
 	Initial_List();
 	Fresh_AnalogCusRange_List(analog_range_tbl_line, analog_range_tbl_line);
 	SetTimer(1,1000,NULL);
@@ -118,7 +118,7 @@ BOOL CBacnetAnalogCusRang::OnInitDialog()
 
 void CBacnetAnalogCusRang::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	Fresh_AnalogCusRange_Item(0,0);
 	//g_hwnd_now =	temp_gloab_hwnd;
 	//analog_cus_range_dlg = NULL;
@@ -488,7 +488,7 @@ void CBacnetAnalogCusRang::SetSlideRange()
 
 void CBacnetAnalogCusRang::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	//g_hwnd_now =	temp_gloab_hwnd;
 	//analog_cus_range_dlg = NULL;
 	CDialogEx::OnClose();
@@ -497,7 +497,7 @@ void CBacnetAnalogCusRang::OnClose()
 
 BOOL CBacnetAnalogCusRang::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	CWnd * window_focus =	GetFocus();
 	if(window_focus == NULL)
 		return 0;
@@ -782,7 +782,7 @@ BOOL CBacnetAnalogCusRang::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pR
 
 void CBacnetAnalogCusRang::OnEnKillfocusEditBacCusAnalogUnit()
 {
-	// TODO: Add your control notification handler code here
+	
 
 	UpdateCusAnalogUnit();
 }
@@ -821,7 +821,7 @@ void CBacnetAnalogCusRang::UpdateCusAnalogUnit()
 void CBacnetAnalogCusRang::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-	// TODO: Add your message handler code here
+	
 
 	
 }
@@ -831,7 +831,7 @@ void CBacnetAnalogCusRang::OnPaint()
 
 void CBacnetAnalogCusRang::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	switch(nIDEvent)
 	{
 	case 1:

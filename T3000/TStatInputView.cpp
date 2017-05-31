@@ -1047,7 +1047,7 @@ void CTStatInputView::OnSize(UINT nType, int cx, int cy)
 
 BOOL CTStatInputView::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: Add your specialized code here and/or call the base class
+    
     if((pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN))
     {
         CRect list_rect,win_rect;

@@ -44,7 +44,7 @@ END_MESSAGE_MAP()
 
 void CTCP_Server::OnBnClickedButtonStartServer()
 {
-	// TODO: Add your control notification handler code here
+	
 
 	CString temp_cs;
 	USHORT nport;
@@ -121,7 +121,7 @@ void CTCP_Server::OnBnClickedButtonStartServer()
 
 void CTCP_Server::OnBnClickedButtonStopServer()
 {
-	// TODO: Add your control notification handler code here
+	
 	if (m_bServer)
 	{
 		TCP_Server_Running = false;
@@ -137,7 +137,7 @@ void CTCP_Server::OnBnClickedButtonStopServer()
 
 BOOL CTCP_Server::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -147,7 +147,7 @@ BOOL CTCP_Server::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	GetDlgItem(IDC_BUTTON_STOP_SERVER)->EnableWindow(false);
 	Initial_List();
 	return TRUE; // return TRUE unless you set the focus to a control
@@ -157,7 +157,7 @@ BOOL CTCP_Server::OnInitDialog()
 
 void CTCP_Server::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	this->ShowWindow(SW_HIDE);
 	return;
 	CDialogEx::OnCancel();

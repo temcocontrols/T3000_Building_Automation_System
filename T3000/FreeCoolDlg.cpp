@@ -43,7 +43,7 @@ BOOL CFreeCoolDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 	
-	// TODO:  在此添加额外的初始化
+	
 
 	GetDlgItem(IDC_TMPEDIT)->EnableWindow(FALSE);
 	//GetDlgItem(IDC_AIREDIT)->EnableWindow(FALSE);
@@ -125,7 +125,7 @@ BOOL CFreeCoolDlg::OnInitDialog()
 }
 BOOL CFreeCoolDlg::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: 在此添加专用代码和/或调用基类
+	
 	if(pMsg->message == WM_KEYDOWN  )
 	{		
 		if(pMsg->wParam == VK_RETURN )
@@ -142,13 +142,13 @@ BOOL CFreeCoolDlg::PreTranslateMessage(MSG* pMsg)
 void CFreeCoolDlg::OnBnClickedCancel()
 {
 
-	// TODO: 在此添加控件通知处理程序代码
+	
 	OnCancel();
 }
 
 void CFreeCoolDlg::OnBnClickedCheck1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	CButton* pButton=(CButton*)GetDlgItem(IDC_CHECK1);
 	short nValue=-1;
 	nValue =read_one(g_tstat_id,350);
@@ -218,12 +218,12 @@ void CFreeCoolDlg::OnEnKillfocusTrgedit()
 
 void CFreeCoolDlg::OnEnKillfocusTmpedit()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 }
 
 void CFreeCoolDlg::OnBnClickedRadio1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	CButton* pNCRadio=((CButton*)GetDlgItem(IDC_RADIO1));
 	CButton* pLocalRadio=((CButton*)GetDlgItem(IDC_RADIO2));
 
@@ -256,7 +256,7 @@ void CFreeCoolDlg::OnBnClickedRadio1()
 
 void CFreeCoolDlg::OnBnClickedRadio2()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	CButton* pNCRadio=((CButton*)GetDlgItem(IDC_RADIO1));
 	CButton* pLocalRadio=((CButton*)GetDlgItem(IDC_RADIO2));
 
@@ -276,7 +276,7 @@ void CFreeCoolDlg::OnBnClickedRadio2()
 
 void CFreeCoolDlg::OnTimer(UINT nIDEvent)
 {
-	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	
 	if(nIDEvent==1)
 	{
 		Refresh();

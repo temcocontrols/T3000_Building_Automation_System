@@ -822,7 +822,7 @@ void T38AI8AO::OnDestroy()
 
 CFormView::OnDestroy();
 
-	// TODO: Add your message handler code here
+	
 }
 
 

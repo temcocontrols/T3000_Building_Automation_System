@@ -110,7 +110,7 @@ BOOL ApplyGraphicLabelsDlg::OnInitDialog()
 
 	ReloadAddBuildingDB();
 
-	// TODO:  Add extra initialization here
+	
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -394,7 +394,7 @@ void ApplyGraphicLabelsDlg::ApplyTo()
 }
 LRESULT ApplyGraphicLabelsDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	return CDialog::WindowProc(message, wParam, lParam);
 }

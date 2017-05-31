@@ -176,32 +176,32 @@ void CFileView::OnProperties()
 
 void CFileView::OnFileOpen()
 {
-	// TODO: Add your command handler code here
+	
 }
 
 void CFileView::OnFileOpenWith()
 {
-	// TODO: Add your command handler code here
+	
 }
 
 void CFileView::OnDummyCompile()
 {
-	// TODO: Add your command handler code here
+	
 }
 
 void CFileView::OnEditCut()
 {
-	// TODO: Add your command handler code here
+	
 }
 
 void CFileView::OnEditCopy()
 {
-	// TODO: Add your command handler code here
+	
 }
 
 void CFileView::OnEditClear()
 {
-	// TODO: Add your command handler code here
+	
 }
 
 void CFileView::OnPaint()

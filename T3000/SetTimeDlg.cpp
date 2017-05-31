@@ -50,7 +50,7 @@ BOOL CSetTimeDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	m_TimePicker.GetFocus();
 	return FALSE;  // return TRUE unless you set the focus to a control
 				  // EXCEPTION: OCX Property Pages should return FALSE

@@ -99,7 +99,7 @@ afx_msg LRESULT CCommunicationTrafficDlg::OnTrafficDataWindow(WPARAM wParam, LPA
 
 void CCommunicationTrafficDlg::OnBnClickedOk()
 {
-	// TODO: Add your control notification handler code here
+	
 	//CDialogEx::OnOK();
 	 g_is_show_Data_Traffic_Window=FALSE;
 	 m_DataList.ResetContent();
@@ -228,7 +228,7 @@ void CCommunicationTrafficDlg::OnBnClickedCopy()
 
 void CCommunicationTrafficDlg::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	g_is_show_Data_Traffic_Window=FALSE;
 	 m_DataList.ResetContent();
 	ShowWindow(SW_HIDE);
@@ -240,7 +240,7 @@ void CCommunicationTrafficDlg::OnClose()
 //{
 //    CDialogEx::OnShowWindow(bShow, nStatus);
 //
-//    // TODO: Add your message handler code here
+//    
 //}
 
 
@@ -260,5 +260,5 @@ void CCommunicationTrafficDlg::OnShowWindow(BOOL bShow, UINT nStatus)
         m_btn_save.EnableWindow(TRUE);
         m_btn_stop.SetWindowText(_T("Continue"));
     }
-    // TODO: Add your message handler code here
+    
 }

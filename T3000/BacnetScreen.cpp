@@ -177,7 +177,7 @@ LRESULT  BacnetScreen::ScreenCallBack(WPARAM wParam, LPARAM lParam)
 
 BOOL BacnetScreen::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN) 
 	{
 
@@ -294,7 +294,7 @@ LRESULT BacnetScreen::OnHotKey(WPARAM wParam,LPARAM lParam)
 
 
 		return 0;
-		// TODO: Add your command handler code here
+		
 	}
 	return 0;
 }
@@ -305,7 +305,7 @@ BOOL BacnetScreen::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	SetWindowTextW(_T("Graphic"));
-	// TODO:  Add extra initialization here
+	
 	Initial_List();
 	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_GRAPHIC);
 	SetIcon(m_hIcon,TRUE);
@@ -321,7 +321,7 @@ BOOL BacnetScreen::OnInitDialog()
 
 void BacnetScreen::OnOK()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	CDialogEx::OnOK();
 }
@@ -558,7 +558,7 @@ LRESULT BacnetScreen::Fresh_Screen_Item(WPARAM wParam,LPARAM lParam)
 void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 	int device_obj_instance = g_bac_instance;
 	DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
 	CPoint point( LOWORD(dwPos), HIWORD(dwPos));
@@ -732,7 +732,7 @@ void BacnetScreen::OnClose()
 {
 	ShowWindow(FALSE);
 	return;
-	// TODO: Add your message handler code here and/or call default
+	 
 	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
 	KillTimer(1);
 	CDialogEx::OnClose();
@@ -741,7 +741,7 @@ void BacnetScreen::OnClose()
 
 void BacnetScreen::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 //	KillTimer(1);
 //	m_screen_dlg_hwnd = NULL;
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
@@ -750,7 +750,7 @@ void BacnetScreen::OnCancel()
 
 void BacnetScreen::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if(g_protocol == PROTOCOL_BIP_TO_MSTP)
 	{
 		PostMessage(WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
@@ -1248,7 +1248,7 @@ void BacnetScreen::Reset_Screen_Rect()
 
 void BacnetScreen::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if(nID == SC_MAXIMIZE)
 	{
 		if(window_max == false)
@@ -1276,7 +1276,7 @@ void BacnetScreen::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 
-	// TODO: Add your message handler code here
+	
 	CRect rc;
 	GetClientRect(rc);
 	if(m_screen_list.m_hWnd != NULL)
@@ -1297,7 +1297,7 @@ void BacnetScreen::OnNMClickListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 
 	*pResult = 0;
 
-	// TODO: Add your control notification handler code here
+	
 	DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
 	CPoint point( LOWORD(dwPos), HIWORD(dwPos));
 	m_screen_list.ScreenToClient(&point);

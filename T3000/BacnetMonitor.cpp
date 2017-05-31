@@ -159,7 +159,7 @@ BOOL CBacnetMonitor::OnInitDialog()
 	CDialogEx::OnInitDialog();
 	old_monitor_line = -1;
 	SetWindowTextW(_T("Trend Log"));
-	// TODO:  Add extra initialization here
+	
 	Initial_List();
 	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_TRENDLOG);
 	SetIcon(m_hIcon,TRUE);
@@ -177,7 +177,7 @@ BOOL CBacnetMonitor::OnInitDialog()
 
 BOOL CBacnetMonitor::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message == WM_KEYDOWN  )
 	{
 		if(pMsg->wParam == VK_RETURN)
@@ -818,7 +818,7 @@ LRESULT CBacnetMonitor::Fresh_MCallBack_Item(WPARAM wParam,LPARAM lParam)
 void CBacnetMonitor::OnNMDblclkListMonitor(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 	OnBnClickedBtnMonitorGraphic();
 	*pResult = 0;
 }
@@ -829,7 +829,7 @@ void CBacnetMonitor::OnNMClickListMonitor(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	CString temp_task_info;
-	// TODO: Add your control notification handler code here
+	
 	DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
 	CPoint point( LOWORD(dwPos), HIWORD(dwPos));
 	m_monitor_list.ScreenToClient(&point);
@@ -972,7 +972,7 @@ void CBacnetMonitor::OnNMClickListMonitor(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CBacnetMonitor::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	switch(nIDEvent)
 	{
 	case 1:
@@ -1040,7 +1040,7 @@ void CBacnetMonitor::OnTimer(UINT_PTR nIDEvent)
 
 void CBacnetMonitor::OnNMKillfocusDatetimepickerMonitor(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: Add your control notification handler code here
+	
 	*pResult = 0;
 
 	memcpy_s(&m_temp_monitor_data[m_row],sizeof(Str_monitor_point),&m_monitor_data.at(m_row),sizeof(Str_monitor_point));
@@ -1144,7 +1144,7 @@ void CBacnetMonitor::Check_New_DB()
 
 void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
 {
-	// TODO: Add your control notification handler code here
+	
 	Check_New_DB();
 	for (int i=0;i<14;i++)
 	{
@@ -1617,7 +1617,7 @@ readendthread:
 
 void CBacnetMonitor::OnNMSetfocusListMonitor(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: Add your control notification handler code here
+	
 	//Fance
 	//两个list 要只有一个 的select 处于显示状态;
 	int my_raw=0;
@@ -1645,7 +1645,7 @@ void CBacnetMonitor::OnNMSetfocusListMonitor(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CBacnetMonitor::OnNMSetfocusListMonitorInput(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: Add your control notification handler code here
+	
 
 	int my_raw=0;
 	int my_col=0;
@@ -1670,7 +1670,7 @@ void CBacnetMonitor::OnNMSetfocusListMonitorInput(NMHDR *pNMHDR, LRESULT *pResul
 
 void CBacnetMonitor::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	ShowWindow(FALSE);
 	return;
 	KillTimer(1);
@@ -1681,7 +1681,7 @@ void CBacnetMonitor::OnClose()
 
 void CBacnetMonitor::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 //	KillTimer(1);
 //	m_monitor_dlg_hwnd = NULL;
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
@@ -2049,7 +2049,7 @@ void CBacnetMonitor::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 
-	// TODO: Add your message handler code here
+	
 	CRect rc;
 	GetClientRect(rc);
 	if(m_monitor_list.m_hWnd != NULL)
@@ -2067,7 +2067,7 @@ void CBacnetMonitor::OnSize(UINT nType, int cx, int cy)
 
 void CBacnetMonitor::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if(nID == SC_MAXIMIZE)
 	{
 		if(window_max == false)

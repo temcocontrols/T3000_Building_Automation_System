@@ -260,7 +260,7 @@ BOOL WeeklyRout_InsertDia::OnInitDialog()
 	CDialog::OnInitDialog();
 
 
-	// TODO:  在此添加额外的初始化
+	
 	CString str;
 	str.Format(_T("Weekly Routines %d"),m_addr);
 	this->SetWindowText(str);
@@ -274,13 +274,13 @@ END_EVENTSINK_MAP()
 
 void WeeklyRout_InsertDia::ClickMsflexgrid1()
 {
-	// TODO: 在此处添加消息处理程序代码
+	
 	on_select();
 }
 
 void WeeklyRout_InsertDia::OnEnSetfocusEdit1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	UpdateData(true);
 	//m_before_focus_string=m_sChange;
 }
@@ -311,7 +311,7 @@ bool WeeklyRout_InsertDia::inspect_input_string(int Row,int Col,CString &str)
 }
 void WeeklyRout_InsertDia::OnEnKillfocusEdit1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	UpdateData(true);
 	inspect_input_string(row_row,row_col,m_sChange);///////////////inspect
 	m_FlexGrid.put_TextMatrix(row_row,row_col,m_sChange);//设置文本信息
@@ -321,13 +321,13 @@ void WeeklyRout_InsertDia::OnEnKillfocusEdit1()
 
 void WeeklyRout_InsertDia::OnCbnSetfocusCombo1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	UpdateData(true);
 }
 
 void WeeklyRout_InsertDia::OnCbnKillfocusCombo1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	UpdateData(true);
 	CString str_temp;
 	m_combo_col_row.GetWindowText(str_temp);
@@ -339,16 +339,16 @@ void WeeklyRout_InsertDia::OnCbnKillfocusCombo1()
 void WeeklyRout_InsertDia::OnDestroy()
 {
 	CDialog::OnDestroy();
-	// TODO: 在此处添加消息处理程序代码
+	
 }
 void WeeklyRout_InsertDia::OnCancel()
 {
-	// TODO: 在此添加专用代码和/或调用基类
+	
 	CDialog::OnCancel();
 }
 BOOL WeeklyRout_InsertDia::DestroyWindow()
 {
-	// TODO: 在此添加专用代码和/或调用基类
+	
 	write_grid();//////////////////////////////////////////////write_multi only ont times
 	return CDialog::DestroyWindow();
 }
@@ -428,7 +428,7 @@ void WeeklyRout_InsertDia::down_move()
 
 BOOL WeeklyRout_InsertDia::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: 在此添加专用代码和/或调用基类
+	
 	if(pMsg->message == WM_KEYDOWN  )
 	{		
 		if(pMsg->wParam == VK_ESCAPE )
@@ -440,7 +440,7 @@ BOOL WeeklyRout_InsertDia::PreTranslateMessage(MSG* pMsg)
 
 void WeeklyRout_InsertDia::OnBnClickedCopyTo()
 {//COPY TO BUTTON
-	// TODO: 在此添加控件通知处理程序代码
+	
 	UpdateData(true);
 	if(m_mon)
 		col_copy_to_col(row_col,1);
@@ -489,17 +489,17 @@ void WeeklyRout_InsertDia::disable_one_day(int day_number)
 }
 void WeeklyRout_InsertDia::OnBnClickedCancel()
 {
-	// TODO: Add your control notification handler code here
+	
 	OnCancel();
 }
 void WeeklyRout_InsertDia::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	CDialog::OnLButtonDblClk(nFlags, point);
 }
 
 void WeeklyRout_InsertDia::OnBnClickedOk()
 {
-	// TODO: Add your control notification handler code here
+	
 	OnOK();
 }

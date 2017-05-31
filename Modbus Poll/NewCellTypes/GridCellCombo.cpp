@@ -382,7 +382,7 @@ HBRUSH CInPlaceList::CtlColor(CDC* /*pDC*/, UINT /*nCtlColor*/)
     return (HBRUSH) brush.GetSafeHandle();
     */
 	
-	// TODO: Return a non-NULL brush if the parent's handler should not be called
+	//  Return a non-NULL brush if the parent's handler should not be called
 	return NULL;
 }
 

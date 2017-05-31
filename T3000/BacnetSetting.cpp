@@ -119,7 +119,7 @@ END_MESSAGE_MAP()
 
 void CBacnetSetting::OnBnClickedButtonBacTest()
 {
-	// TODO: Add your control notification handler code here
+	
 
 	int	resend_count = 0;
 	do 
@@ -174,7 +174,7 @@ void CBacnetSetting::Get_Time_Edit_By_Control()
 
 void CBacnetSetting::OnNMKillfocusDatePicker(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: Add your control notification handler code here
+	
 
 	Get_Time_Edit_By_Control();
 	//GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(0);
@@ -184,7 +184,7 @@ void CBacnetSetting::OnNMKillfocusDatePicker(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CBacnetSetting::OnNMKillfocusTimePicker(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: Add your control notification handler code here
+	
 	Get_Time_Edit_By_Control();
 	//GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(0);
 	*pResult = 0;
@@ -195,7 +195,7 @@ void CBacnetSetting::OnNMKillfocusTimePicker(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CBacnetSetting::OnNMSetfocusDatePicker(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: Add your control notification handler code here
+	
 	//GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(TRUE);
 	Get_Time_Edit_By_Control();
 	*pResult = 0;
@@ -204,7 +204,7 @@ void CBacnetSetting::OnNMSetfocusDatePicker(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CBacnetSetting::OnNMSetfocusTimePicker(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: Add your control notification handler code here
+	
 	//GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(TRUE);
 	Get_Time_Edit_By_Control();
 	*pResult = 0;
@@ -240,7 +240,7 @@ void CBacnetSetting::OnBnClickedBtnBacSYNCTime()
 
 void CBacnetSetting::OnBnClickedBtnBacWriteTime()
 {
-	// TODO: Add your control notification handler code here
+	
 
 	Get_Time_Edit_By_Control();
 
@@ -962,7 +962,7 @@ BOOL CBacnetSetting::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	InitScrollbar();
 	SetWindowTextW(_T("Setting"));
 	m_setting_dlg_hwnd = this->m_hWnd;
@@ -990,7 +990,7 @@ BOOL CBacnetSetting::OnInitDialog()
 
 BOOL CBacnetSetting::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN) 
 	{
 		int temp_focus_id = GetFocus()->GetDlgCtrlID();
@@ -1034,7 +1034,7 @@ BOOL CBacnetSetting::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetSetting::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	switch(nIDEvent)
 	{
 	case TIMER_SYNC_TIMER:
@@ -1102,7 +1102,7 @@ LRESULT  CBacnetSetting::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
 
 void CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom0()
 {
-	// TODO: Add your control notification handler code here
+	
 	UpdateData();
 	CString temp_string;
 	int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->GetCurSel();	
@@ -1125,7 +1125,7 @@ void CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom0()
 
 void CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom1()
 {
-	// TODO: Add your control notification handler code here
+	
 
 	CString temp_string;
 	int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->GetCurSel();	
@@ -1146,7 +1146,7 @@ void CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom1()
 
 void CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom2()
 {
-	// TODO: Add your control notification handler code here
+	
 
 	CString temp_string;
 	int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->GetCurSel();	
@@ -1168,7 +1168,7 @@ void CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom2()
 
 void CBacnetSetting::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	//CDialogEx::OnCancel();
 }
@@ -1176,7 +1176,7 @@ void CBacnetSetting::OnCancel()
 
 void CBacnetSetting::OnBnClickedButtonSettingLdf()
 {
-	// TODO: Add your control notification handler code here
+	
 	if(IDYES == MessageBox(_T("Are you sure you want load factory default"),_T("Warning"),MB_YESNOCANCEL | MB_ICONINFORMATION))
 	{
 		Device_Basic_Setting.reg.reset_default = 88;
@@ -1190,7 +1190,7 @@ void CBacnetSetting::OnBnClickedButtonSettingLdf()
 
 void CBacnetSetting::OnCbnSelchangeComboBacnetSettingBaudrate0()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString temp_string;
 	int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->GetCurSel();	
 	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->GetLBText(nSel,temp_string);
@@ -1211,7 +1211,7 @@ void CBacnetSetting::OnCbnSelchangeComboBacnetSettingBaudrate0()
 
 void CBacnetSetting::OnCbnSelchangeComboBacnetSettingBaudrate1()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString temp_string;
 	int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->GetCurSel();	
 	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->GetLBText(nSel,temp_string);
@@ -1231,7 +1231,7 @@ void CBacnetSetting::OnCbnSelchangeComboBacnetSettingBaudrate1()
 
 void CBacnetSetting::OnCbnSelchangeComboBacnetSettingBaudrate2()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString temp_string;
 	int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE2))->GetCurSel();	
 	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE2))->GetLBText(nSel,temp_string);
@@ -1251,7 +1251,7 @@ void CBacnetSetting::OnCbnSelchangeComboBacnetSettingBaudrate2()
 
 void CBacnetSetting::OnBnClickedButtonSettingCleanDb()
 {
-	// TODO: Add your control notification handler code here
+	
 	if(IDYES == MessageBox(_T("Are you sure you want clean the device database"),_T("Warning"),MB_YESNOCANCEL | MB_ICONINFORMATION))
 	{
 		Device_Basic_Setting.reg.reset_default = 150;
@@ -1265,7 +1265,7 @@ void CBacnetSetting::OnBnClickedButtonSettingCleanDb()
 extern bool cancle_send ;
 void CBacnetSetting::OnBnClickedButtonSettingAddIntoDb()
 {
-	// TODO: Add your control notification handler code here
+	
 	CBacnetaddintodb dlg;
 	dlg.DoModal();
 
@@ -1281,7 +1281,7 @@ void CBacnetSetting::OnBnClickedButtonSettingAddIntoDb()
 
 void CBacnetSetting::OnBnClickedButtonSettingUserList()
 {
-	// TODO: Add your control notification handler code here
+	
 	show_user_list_window = true;
 	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_READ_USER_LOGIN_INFO);
 }
@@ -1289,7 +1289,7 @@ void CBacnetSetting::OnBnClickedButtonSettingUserList()
 
 void CBacnetSetting::OnBnClickedRadioUsbDevice()
 {
-	// TODO: Add your control notification handler code here
+	
 	if(Device_Basic_Setting.reg.usb_mode != 0)
 	{
 		Device_Basic_Setting.reg.usb_mode = 0;
@@ -1303,7 +1303,7 @@ void CBacnetSetting::OnBnClickedRadioUsbDevice()
 
 void CBacnetSetting::OnBnClickedRadioUsbHost()
 {
-	// TODO: Add your control notification handler code here
+	
 		if(Device_Basic_Setting.reg.usb_mode != 1)
 		{
 			Device_Basic_Setting.reg.usb_mode = 1;
@@ -1317,7 +1317,7 @@ void CBacnetSetting::OnBnClickedRadioUsbHost()
 
 void CBacnetSetting::OnBnClickedButtonSettingGsmModual()
 {
-	// TODO: Add your control notification handler code here
+	
 	CBacnetATCommand Dlg;
 	Dlg.DoModal();
 }
@@ -1325,7 +1325,7 @@ void CBacnetSetting::OnBnClickedButtonSettingGsmModual()
 
 void CBacnetSetting::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	ShowWindow(FALSE);
 	return;
 	CDialogEx::OnClose();
@@ -1334,7 +1334,7 @@ void CBacnetSetting::OnClose()
 
 void CBacnetSetting::OnEnKillfocusEditSettingPanel()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString temp_cstring;
 	m_edit_panel.GetWindowTextW(temp_cstring);
 	int temp_panel = _wtoi(temp_cstring);
@@ -1364,7 +1364,7 @@ void CBacnetSetting::OnEnKillfocusEditSettingPanel()
 
 void CBacnetSetting::OnEnKillfocusEditSettingNodesLabelSetting()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString temp_cstring;
 	m_edit_nodes_label.GetWindowTextW(temp_cstring);
 	if(temp_cstring.GetLength()>=20)
@@ -1431,7 +1431,7 @@ void CBacnetSetting::OnEnKillfocusEditSettingNodesLabelSetting()
 
 void CBacnetSetting::OnCbnSelchangeComboBacnetSettingTimeServer()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString temp_string;
 	int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->GetCurSel();	
 	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->GetLBText(nSel,temp_string);
@@ -1456,7 +1456,7 @@ void CBacnetSetting::OnCbnSelchangeComboBacnetSettingTimeServer()
 
 void CBacnetSetting::OnBnClickedCheckSettingSyncTime()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString temp_task_info;
 	if(Device_Basic_Setting.reg.en_sntp == 1)
 	{
@@ -1478,7 +1478,7 @@ void CBacnetSetting::OnBnClickedCheckSettingSyncTime()
 
 void CBacnetSetting::OnEnKillfocusEditDyndnsUserName()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString temp_cstring;
 	m_dyndns_user.GetWindowTextW(temp_cstring);
 	if(temp_cstring.GetLength()>=DYNDNS_MAX_USERNAME_SIZE)
@@ -1509,7 +1509,7 @@ void CBacnetSetting::OnEnKillfocusEditDyndnsUserName()
 
 void CBacnetSetting::OnEnKillfocusEditDyndnsPassword()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString temp_cstring;
 	m_dyndns_password.GetWindowTextW(temp_cstring);
 	if(temp_cstring.GetLength()>=DYNDNS_MAX_PASSWORD_SIZE)
@@ -1540,7 +1540,7 @@ void CBacnetSetting::OnEnKillfocusEditDyndnsPassword()
 
 void CBacnetSetting::OnEnKillfocusEditDyndnsDomain()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString temp_cstring;
 	m_dyndns_domain.GetWindowTextW(temp_cstring);
 	if(temp_cstring.GetLength()>=DYNDNS_MAX_DOMAIN_SIZE)
@@ -1571,9 +1571,9 @@ void CBacnetSetting::OnEnKillfocusEditDyndnsDomain()
 
 void CBacnetSetting::OnBnClickedCheckSettingDyndns()
 {
-	// TODO: Add your control notification handler code here
+	
 
-		// TODO: Add your control notification handler code here
+		
 		CString temp_task_info;
 		if(Device_Basic_Setting.reg.en_dyndns == 1)
 		{
@@ -1593,7 +1593,7 @@ void CBacnetSetting::OnBnClickedCheckSettingDyndns()
 
 void CBacnetSetting::OnCbnSelchangeComboBacnetSettingDdnsServer()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString temp_string;
 	int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->GetCurSel();	
 	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->GetLBText(nSel,temp_string);
@@ -1615,7 +1615,7 @@ void CBacnetSetting::OnCbnSelchangeComboBacnetSettingDdnsServer()
 
 void CBacnetSetting::OnEnKillfocusEditTimeUpdate()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString temp_cstring;
 	m_edit_ddns_update_time.GetWindowTextW(temp_cstring);
 	int update_time = _wtoi(temp_cstring);
@@ -1646,7 +1646,7 @@ void CBacnetSetting::OnEnKillfocusEditTimeUpdate()
 
 void CBacnetSetting::OnCbnSelchangeComboBacnetSettingTimeZone()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString temp_string;
 	int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->GetCurSel();	
 	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->GetLBText(nSel,temp_string);
@@ -1664,7 +1664,7 @@ void CBacnetSetting::OnCbnSelchangeComboBacnetSettingTimeZone()
 
 void CBacnetSetting::OnBnClickedCheckSettingPap()
 {
-	// TODO: Add your control notification handler code here
+	
 		CString temp_task_info;
 		if(Device_Basic_Setting.reg.en_plug_n_play != 1)
 		{
@@ -1683,7 +1683,7 @@ void CBacnetSetting::OnBnClickedCheckSettingPap()
 
 void CBacnetSetting::OnEnKillfocusEditSettingPort()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString temp_cstring;
 	m_edit_port.GetWindowTextW(temp_cstring);
 	int temp_port = _wtoi(temp_cstring);
@@ -1712,7 +1712,7 @@ void CBacnetSetting::OnEnKillfocusEditSettingPort()
 
 void CBacnetSetting::OnBnClickedButtonHealth()
 {
-	// TODO: Add your control notification handler code here
+	
 	GetPrivateData_Blocking(g_bac_instance,READ_MISC,0,0,sizeof(Str_MISC));
 	CBacnetSettingHealth Health_Dlg;
 	Health_Dlg.DoModal();
@@ -1721,7 +1721,7 @@ void CBacnetSetting::OnBnClickedButtonHealth()
 
 void CBacnetSetting::OnEnKillfocusEditSettingObjInstance()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString temp_cstring;
 	m_setting_obj_instance.GetWindowTextW(temp_cstring);
 	unsigned int temp_obj_instance = unsigned int(_wtoi(temp_cstring));
@@ -1755,7 +1755,7 @@ void CBacnetSetting::OnEnKillfocusEditSettingObjInstance()
 
 BOOL CBacnetSetting::OnHelpInfo(HELPINFO* pHelpInfo)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	// 	if((m_latest_protocol == PROTOCOL_BACNET_IP) || (m_latest_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
 	// 	{
 	HWND hWnd;
@@ -1773,7 +1773,7 @@ BOOL CBacnetSetting::OnHelpInfo(HELPINFO* pHelpInfo)
 
 void CBacnetSetting::OnBnClickedButtonBacSettingOk()
 {
-	// TODO: Add your control notification handler code here
+	
 	if(Write_Private_Data_Blocking(WRITE_SETTING_COMMAND,0,0) <= 0)
 	{
 		CString temp_task_info;
@@ -1786,7 +1786,7 @@ void CBacnetSetting::OnBnClickedButtonBacSettingOk()
 
 void CBacnetSetting::OnBnClickedButtonBacSettingCancel()
 {
-	// TODO: Add your control notification handler code here
+	
 	 PostMessage(WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);
 	 PostMessage(WM_FRESH_SETTING_UI,TIME_COMMAND,NULL);
 }
@@ -1794,7 +1794,7 @@ void CBacnetSetting::OnBnClickedButtonBacSettingCancel()
 
 void CBacnetSetting::OnBnClickedButtonSyncTime()
 {
-	// TODO: Add your control notification handler code here
+	
 
 	Device_Basic_Setting.reg.reset_default = 99;
 	CString temp_task_info;
@@ -1818,8 +1818,8 @@ void CBacnetSetting::OnBnClickedButtonSyncTime()
 
 void CBacnetSetting::OnBnClickedCheckSettingZoneDaylightTime()
 {
-	// TODO: Add your control notification handler code here
-	// TODO: Add your control notification handler code here 
+	
+	 
 	CString temp_task_info;
 	if(Device_Basic_Setting.reg.time_zone_summer_daytime == 1)
 	{
@@ -1839,7 +1839,7 @@ void CBacnetSetting::OnBnClickedCheckSettingZoneDaylightTime()
 
 void CBacnetSetting::OnBnClickedButtonBacShowZigbee()
 {
-	// TODO: Add your control notification handler code here
+	
 	CTstatZigbeeLogic dlg;
 	dlg.DoModal();
 }
@@ -1847,7 +1847,7 @@ void CBacnetSetting::OnBnClickedButtonBacShowZigbee()
 
 void CBacnetSetting::OnCbnKillfocusComboBacnetSettingTimeServer()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString temp_string;
 	GetDlgItemText(IDC_COMBO_BACNET_SETTING_TIME_SERVER,temp_string);
 	if(!temp_string.IsEmpty())
@@ -1908,7 +1908,7 @@ void CBacnetSetting::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 
-	// TODO: Add your message handler code here
+	
 	CRect rc;
 	GetClientRect(rc);
 	if(this->m_hWnd != NULL)
@@ -1920,7 +1920,7 @@ void CBacnetSetting::OnSize(UINT nType, int cx, int cy)
 
 void CBacnetSetting::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if(nID == SC_MAXIMIZE)
 	{
 		if(window_max == false)
@@ -1948,7 +1948,7 @@ void CBacnetSetting::OnSysCommand(UINT nID, LPARAM lParam)
 
 void CBacnetSetting::OnEnKillfocusEditSettingModbusId()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString temp_cstring;
 	m_edit_modbus_id.GetWindowTextW(temp_cstring);
 	unsigned int temp_modbusid = unsigned int(_wtoi(temp_cstring));
@@ -1986,14 +1986,14 @@ void CBacnetSetting::OnEnKillfocusEditSettingModbusId()
 
 void CBacnetSetting::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	CDialogEx::OnHScroll(nSBCode, nPos, pScrollBar);
 }
 
 
 void CBacnetSetting::OnBnClickedButtonSettingIoConfig()
 {
-	// TODO: Add your control notification handler code here
+	
 	//版本大于38.6 的才有在setting 里面改port 的功能
 	if(Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 +Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 438)
 	{
@@ -2014,7 +2014,7 @@ void CBacnetSetting::OnBnClickedButtonSettingIoConfig()
 
 void CBacnetSetting::OnBnClickedButtonRebootDevice()
 {
-	// TODO: Add your control notification handler code here
+	
 	//版本大于38.6 的才有在setting 里面改port 的功能
 	if(Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 +Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 441)
 	{
@@ -2044,7 +2044,7 @@ void CBacnetSetting::InitScrollbar()
 
 void CBacnetSetting::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 
 	SCROLLINFO scrollinfo;
 	GetScrollInfo(SB_VERT,&scrollinfo,SIF_ALL);

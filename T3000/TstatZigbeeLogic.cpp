@@ -69,7 +69,7 @@ BOOL CTstatZigbeeLogic::OnInitDialog()
 	Zigbee_Tstat_Id.push_back(g_tstat_id);	//第一个点击的 tstat 的ID先加到表里面去,因为它的寄存器里面没有它自己的;
 	Zigbee_Show_Tstat_Id.push_back(g_tstat_id);
 
-	// TODO:  Add extra initialization here
+	
 	//if(hGetZigbeeInfo == NULL)
 	//{
 	//	hGetZigbeeInfo =CreateThread(NULL,NULL,GetZigbeeInfo,this,NULL, &nZigbeeInfoThreadID);
@@ -367,7 +367,7 @@ void CTstatZigbeeLogic::AddTSTAT_ID(unsigned short * npoint , int nlength,unsign
 
 BOOL CTstatZigbeeLogic::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -549,7 +549,7 @@ LRESULT  CTstatZigbeeLogic::HandleMessage(WPARAM wParam, LPARAM lParam)
 
 void CTstatZigbeeLogic::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 // 	if(hGetZigbeeInfo == NULL)
 // 		hGetZigbeeInfo =CreateThread(NULL,NULL,GetZigbeeInfo,this,NULL, &nZigbeeInfoThreadID);
 
@@ -601,5 +601,5 @@ void CTstatZigbeeLogic::OnDestroy()
 
 
 
-	// TODO: Add your message handler code here
+	
 }

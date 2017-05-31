@@ -47,7 +47,7 @@ BOOL CBacnetScheduleTime::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	Initial_List();
-	// TODO:  Add extra initialization here
+	
 	PostMessage(WM_REFRESH_BAC_SCHEDULE_LIST,NULL,NULL);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -57,7 +57,7 @@ BOOL CBacnetScheduleTime::OnInitDialog()
 
 BOOL CBacnetScheduleTime::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if (pMsg->message == WM_KEYDOWN)
 	{
 		if (pMsg->wParam == VK_RETURN)
@@ -144,7 +144,7 @@ void CBacnetScheduleTime::Initial_List()
 
 void CBacnetScheduleTime::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 
 	g_hwnd_now = m_WeeklyParent_Hwnd;
 	if(m_weekly_dlg_hwnd!=NULL)
@@ -196,7 +196,7 @@ LRESULT CBacnetScheduleTime::Fresh_Schedual_Item(WPARAM wParam,LPARAM lParam)
 void CBacnetScheduleTime::OnNMClickListScheduleTime(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 
 	long lRow,lCol;
 	m_schedule_time_list.Set_Edit(false);
@@ -270,7 +270,7 @@ void CBacnetScheduleTime::OnNMClickListScheduleTime(NMHDR *pNMHDR, LRESULT *pRes
 
 void CBacnetScheduleTime::OnNMKillfocusDatetimepicker1Schedual(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: Add your control notification handler code here
+	
 	CTime temp_time;CString temp_cs;
 	int chour,cmin;
 	m_schedual_time_picker.GetTime(temp_time);
@@ -348,7 +348,7 @@ void CBacnetScheduleTime::OnBnClickedCopyMon_Fri()
 
 void CBacnetScheduleTime::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	switch(nIDEvent)
 	{
 	case 1:

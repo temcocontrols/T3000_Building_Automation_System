@@ -46,7 +46,7 @@ END_MESSAGE_MAP()
 
 BOOL CBacnetAlarmWindow::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message == WM_KEYDOWN )
 	{
 		if((pMsg->wParam == VK_RETURN) ||(pMsg->wParam == VK_ESCAPE))
@@ -78,7 +78,7 @@ BOOL CBacnetAlarmWindow::OnInitDialog()
 
 
 
-	// TODO:  Add extra initialization here
+	
 	::SetWindowPos(this->m_hWnd,HWND_TOPMOST,0,0,32,24,SWP_NOMOVE|SWP_SHOWWINDOW);
 
 	m_static_bac_alarm.SetWindowTextW(_T("ALARM"));
@@ -121,7 +121,7 @@ LRESULT  CBacnetAlarmWindow::RedrawScreeneditWindow(WPARAM wParam, LPARAM lParam
 
 void CBacnetAlarmWindow::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	static int n_count = 0;
 	switch(nIDEvent)
 	{
@@ -171,7 +171,7 @@ void CBacnetAlarmWindow::OnTimer(UINT_PTR nIDEvent)
 void CBacnetAlarmWindow::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-	// TODO: Add your message handler code here
+	
 	// Do not call CDialogEx::OnPaint() for painting messages
 
 	CMemDC memDC(dc,this);
@@ -229,7 +229,7 @@ end_connect_paint:
 #include "MainFrm.h"
 void CBacnetAlarmWindow::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 	pFrame->OnControlAlarmLog();
 	CDialogEx::OnLButtonDown(nFlags, point);

@@ -106,7 +106,7 @@
 //                                 - Change row/column order programatically or via drag and drop
 //                                 - Added save/restore layer (for undoing row/column order changes)
 //
-// TODO:   1) Implement sparse grids (super easy now)
+//    1) Implement sparse grids (super easy now)
 //         2) Fix it so that as you drag select, the speed of selection increases
 //            with time.
 //         3) Scrolling is still a little dodgy (too much grey area). I know there
@@ -823,7 +823,7 @@ void CGridCtrl::OnSettingChange(UINT uFlags, LPCTSTR lpszSection)
 #endif
 
 // For drag-selection. Scrolls hidden cells into view
-// TODO: decrease timer interval over time to speed up selection over time
+//  decrease timer interval over time to speed up selection over time
 void CGridCtrl::OnTimer(UINT nIDEvent)
 {
     ASSERT(nIDEvent == WM_LBUTTONDOWN);
@@ -3825,7 +3825,7 @@ int CGridCtrl::InsertColumn(LPCTSTR strHeading,
     if (nColumn >= 0 && nColumn < m_nFixedCols)
     {
 
-        // TODO: Fix it so column insertion works for in the fixed column area
+        //  Fix it so column insertion works for in the fixed column area
         ASSERT(FALSE);
         return -1;
     }
@@ -3913,7 +3913,7 @@ int CGridCtrl::InsertRow(LPCTSTR strHeading, int nRow /* = -1 */)
 {
     if (nRow >= 0 && nRow < m_nFixedRows)
     {
-        // TODO: Fix it so column insertion works for in the fixed row area
+        //  Fix it so column insertion works for in the fixed row area
         ASSERT(FALSE);
         return -1;
     }
@@ -6350,7 +6350,7 @@ void CGridCtrl::OnLButtonDown(UINT nFlags, CPoint point)
             OnFixedRowClick(m_LeftClickDownCell);
             if(m_AllowReorderColumn && m_LeftClickDownCell.col >=  GetFixedColumnCount())
 			{
-				ResetSelectedRange(); // TODO : This is not the better solution, as we do not see why clicking in column header should reset selection
+				ResetSelectedRange(); // This is not the better solution, as we do not see why clicking in column header should reset selection
 											//but the state of selection is instable after drag (at least until someone debugs it), so better clear it allways.
 				m_MouseMode = MOUSE_PREPARE_DRAG;
 				m_CurCol = m_LeftClickDownCell.col;

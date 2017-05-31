@@ -94,7 +94,7 @@ END_MESSAGE_MAP()
 
 void COutputSetDlg::OnBnClickedOk()
 {
-	// TODO: Add your control notification handler code here
+	
 	OnOK();
 }
 
@@ -203,7 +203,7 @@ BOOL COutputSetDlg::OnInitDialog()
 
 void COutputSetDlg::OnBnClickedCancel()
 {
-	// TODO: Add your control notification handler code here
+	
 	OnCancel();
 }
 
@@ -7964,7 +7964,7 @@ void COutputSetDlg::OnCbnKillfocusCombolock()
 
 void COutputSetDlg::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if(b_is_fresh==true)
 	{
 		AfxMessageBox(_T("It's refreshing ,can not exit at this time!"));

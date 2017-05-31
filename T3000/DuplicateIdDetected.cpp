@@ -91,7 +91,7 @@ BOOL CDuplicateIdDetected::OnInitDialog()
 	second_need_changed = false;
 	auto_close_seconds = 30;
 	cs_show_info.Empty();
-	// TODO:  Add extra initialization here
+	
 	Initial_static();
 	SetTimer(1,500,NULL);
 	SetTimer(2,1000,NULL);
@@ -251,7 +251,7 @@ ret_label_write_ret:
 
 BOOL CDuplicateIdDetected::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -547,7 +547,7 @@ void CDuplicateIdDetected::Initial_static()
 
 void CDuplicateIdDetected::OnBnClickedButtonDuplicateDone()
 {
-	// TODO: Add your control notification handler code here
+	
 	KillTimer(2);
 	GetDlgItem(IDC_BUTTON_DUPLICATE_DONE)->EnableWindow(FALSE);
 	GetDlgItem(IDC_BUTTON_DUPLICATE_CANCEL)->EnableWindow(FALSE);
@@ -624,7 +624,7 @@ void CDuplicateIdDetected::OnBnClickedButtonDuplicateDone()
 
 void CDuplicateIdDetected::OnBnClickedButtonDuplicateCancel()
 {
-	// TODO: Add your control notification handler code here
+	
 	KillTimer(2);
 	edit_confilct_mode = false;
 	PostMessage(WM_CLOSE,NULL,NULL);
@@ -633,7 +633,7 @@ void CDuplicateIdDetected::OnBnClickedButtonDuplicateCancel()
 
 void CDuplicateIdDetected::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	switch(nIDEvent)
 	{
 	case 1:
@@ -664,5 +664,5 @@ void CDuplicateIdDetected::OnTimer(UINT_PTR nIDEvent)
 
 void CDuplicateIdDetected::OnStnClickedStaticNetworkTitle()
 {
-	// TODO: Add your control notification handler code here
+	
 }

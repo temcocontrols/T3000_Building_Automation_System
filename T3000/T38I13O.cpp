@@ -1086,7 +1086,7 @@ void T38I13O::OnEnKillfocusEditName()
 
 void T38I13O::OnCbnSelchangeBrandrate()
 {
-	// TODO: Add your control notification handler code here
+	
 }
 
 
@@ -1110,7 +1110,7 @@ void T38I13O::OnCbnSelchangeBrandrate()
 
 void T38I13O::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	CMainFrame*pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
 	CView* pNewView = pMain->m_pViews[8];
 	CView* pActiveView = pMain->GetActiveView();
@@ -1150,7 +1150,7 @@ void T38I13O::OnDestroy()
 
 //BOOL T38I13O::PreTranslateMessage(MSG* pMsg)
 //{
-//	// TODO: Add your specialized code here and/or call the base class
+//	
 //	// CMainFrame* pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
 //	if(pMsg->message==WM_FRESH_T38I13O){
 //		if (no_mouse_keyboard_event_enable_refresh)

@@ -374,7 +374,7 @@ END_MESSAGE_MAP()
 void CGridLoad::OnBnClickedButton4()
 {
 	SendMessage(WM_CLOSE,0,0);
-	// TODO: Add your control notification handler code here
+	
 }
 
 BOOL CGridLoad::OnInitDialog()
@@ -663,7 +663,7 @@ BOOL CGridLoad::OnInitDialog()
 		
 	m_pLoadBackCheckThread=AfxBeginThread(Check_LoadStatus,this);////////////////////////create thread,read information	
 	m_pLoadBackCheckThread->m_bAutoDelete=false;
-	// TODO:  Add extra initialization here
+	
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -989,7 +989,7 @@ void CGridLoad::OnBnClickedConfigbutton()
 
 void CGridLoad::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if(nIDEvent == 1)
 	{
 		CString strTemp;

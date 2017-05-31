@@ -102,7 +102,7 @@ BOOL COutsidDailog::OnInitDialog()
 //	SetTimer(1,20000,NULL);
 
 
-	// TODO:  在此添加额外的初始化
+	
 	return TRUE;  // return TRUE unless you set the focus to a control
 // 异常: OCX 属性页应返回 FALSE
 
@@ -150,12 +150,12 @@ void COutsidDailog::OnEnKillfocusEdit4()
 
 void COutsidDailog::OnBnClickedCancel()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	OnCancel();
 }
 BOOL COutsidDailog::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: 在此添加专用代码和/或调用基类
+	
 	if(pMsg->message == WM_KEYDOWN  )
 	{		
 		if(pMsg->wParam == VK_RETURN )
@@ -268,7 +268,7 @@ void COutsidDailog::Refresh()
 }
 void COutsidDailog::OnTimer(UINT nIDEvent)
 {
-	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	
 	if(nIDEvent==1)
 	{
 	//	Refresh();

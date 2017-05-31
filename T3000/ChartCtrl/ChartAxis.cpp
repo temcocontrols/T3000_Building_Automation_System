@@ -608,7 +608,7 @@ void CChartAxis::UpdateScrollBarPos()
 	PlottingRect.top++;
 	PlottingRect.left++;
 
-	// TODO: check if other toolbars are already present
+	
 	// on other axes.
 	CRect Temp;
 	m_pScrollBar->GetWindowRect(&Temp);

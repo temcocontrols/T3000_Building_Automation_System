@@ -53,7 +53,7 @@ BOOL CBacnetProgramDebug::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	SetTimer(UPDATE_DEBUG_DATA_TIMER,5000,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -62,7 +62,7 @@ BOOL CBacnetProgramDebug::OnInitDialog()
 
 BOOL CBacnetProgramDebug::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN) 
 	{
 		CRect list_rect,win_rect;
@@ -82,7 +82,7 @@ BOOL CBacnetProgramDebug::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetProgramDebug::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	KillTimer(UPDATE_DEBUG_DATA_TIMER);
 	CDialogEx::OnCancel();
 }
@@ -90,7 +90,7 @@ void CBacnetProgramDebug::OnCancel()
 
 void CBacnetProgramDebug::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	KillTimer(UPDATE_DEBUG_DATA_TIMER);
 	CDialogEx::OnClose();
 }
@@ -1623,7 +1623,7 @@ LRESULT CBacnetProgramDebug::Fresh_Program_Debug_Item(WPARAM wParam,LPARAM lPara
 void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 	*pResult = 0;
 
 
@@ -2481,7 +2481,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 
 void CBacnetProgramDebug::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	switch(nIDEvent)
 	{
 	case 2:
@@ -2533,7 +2533,7 @@ void CBacnetProgramDebug::OnTimer(UINT_PTR nIDEvent)
 
 void CBacnetProgramDebug::OnNMKillfocusDatetimepickerPrgVariable(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: Add your control notification handler code here
+	
 	if(!m_prg_debug_variable_time_picker.IsWindowVisible())
 		return;
 	if(m_Variable_data.at(point_number).range != 20)

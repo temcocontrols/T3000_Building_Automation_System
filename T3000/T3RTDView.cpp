@@ -751,7 +751,7 @@ afx_msg LRESULT CT3RTDView::OnFreshPt10Back(WPARAM wParam, LPARAM lParam)
 
 BOOL CT3RTDView::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if (message==FRESH_PT10_BACK)
 	{
 	   InitialDialog();
@@ -770,7 +770,7 @@ void CT3RTDView::OnDestroy()
 	 
 	CFormView::OnDestroy();
 
-	// TODO: Add your message handler code here
+	
 }
 
 
@@ -828,7 +828,7 @@ BOOL CT3RTDView::PreTranslateMessage(MSG* pMsg)
 
 	void CT3RTDView::OnEnSetfocusEditName()
 	{
-		// TODO: Add your control notification handler code here
+		
 		 m_EDIT_ID=2;
 	}
 

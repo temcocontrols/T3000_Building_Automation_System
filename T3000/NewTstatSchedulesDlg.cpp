@@ -920,7 +920,7 @@ void CNewTstatSchedulesDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CNewTstatSchedulesDlg::OnNMKillfocusDatetimepicker1Schedual(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: Add your control notification handler code here
+	
 	CTime temp_time;CString temp_cs;
 	int chour,cmin;
 	m_schedual_time_picker.GetTime(temp_time);
@@ -933,7 +933,7 @@ void CNewTstatSchedulesDlg::OnNMKillfocusDatetimepicker1Schedual(NMHDR *pNMHDR, 
 
 BOOL CNewTstatSchedulesDlg::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if (pMsg->message == WM_KEYDOWN)
 	{
 		if (GetFocus()->GetDlgCtrlID() ==IDC_LIST1 )

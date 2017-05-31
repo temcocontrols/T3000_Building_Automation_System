@@ -56,7 +56,7 @@ BOOL CEnter_Value_BinaryDlg::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
 
-    // TODO:  Add extra initialization here
+    
       m_bool_check1 =  m_Binary_Value[0];
       m_bool_check2 =  m_Binary_Value[1];
       m_bool_check3 =  m_Binary_Value[2];
@@ -81,7 +81,7 @@ BOOL CEnter_Value_BinaryDlg::OnInitDialog()
 
 void CEnter_Value_BinaryDlg::OnBnClickedOk()
 {
-    // TODO: Add your control notification handler code here
+    
      UpdateData(TRUE);
       m_Binary_Value[0]=m_bool_check1;
       m_Binary_Value[1]=m_bool_check2;

@@ -279,7 +279,7 @@ BOOL CT3000App::InitInstance()
 {
 	GetModulePath();
 	CString strSource = g_strExePth + L"T3000Controls.dll";
-	//TODO: call AfxInitRichEdit2() to initialize richedit2 library.
+	//
 	try
 	{
 		//if (ReadDLLRegAsm()<1)
@@ -772,7 +772,7 @@ BOOL CT3000App::InitInstance()
 			// of your final executable, you should remove from the following
 			// the specific initialization routines you do not need
 			// Change the registry key under which our settings are stored
-			// TODO: You should modify this string to be something appropriate
+			//  You should modify this string to be something appropriate
 			// such as the name of your company or organization
 			SetRegistryKey(_T("Temco T3000 Application"));//
 			LoadStdProfileSettings();  // Load standard INI file options (including MRU)//
@@ -1043,7 +1043,7 @@ void CAboutDlg::OnBnClickedButton1()
 }
 int CT3000App::ExitInstance()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	CoUninitialize( );
 	return CWinAppEx::ExitInstance();
 }
@@ -1229,7 +1229,7 @@ extern tree_product	m_product_isp_auto_flash;
 bool update_t3000_only = false;
 void CAboutDlg::OnBnClickedOk()
 {
-// TODO: Add your control notification handler code here
+
 	update_t3000_only = true;
 	m_product_isp_auto_flash.product_class_id =  199;
 	Dowmloadfile Dlg;
@@ -1243,7 +1243,7 @@ BOOL CAboutDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	CString temp_version;
 	temp_version = _T("T3000 Building Automation System") + CurrentT3000Version;
 	

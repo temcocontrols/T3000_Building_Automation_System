@@ -257,7 +257,7 @@ void CInPlaceEdit::OnKillFocus(CWnd* pNewWnd)
 
 void CInPlaceEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags) 
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if ( (m_strValidChars.IsEmpty()) // no valid chars
 		|| ((-1 != m_strValidChars.Find(static_cast<TCHAR> (nChar)))
 		|| (nChar == VK_BACK) || (nChar == CTRL_C) || (nChar == CTRL_V) || (nChar == CTRL_X)))

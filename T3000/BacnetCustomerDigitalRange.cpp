@@ -44,7 +44,7 @@ BOOL CBacnetCustomerDigitalRange::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	Initial_List();
 	PostMessage(WM_REFRESH_BAC_CUSTOMER_DIGITAL_RANGE_LIST,NULL,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -98,7 +98,7 @@ void CBacnetCustomerDigitalRange::Initial_List()
 
 BOOL CBacnetCustomerDigitalRange::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if((pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN))
 	{
 		CRect list_rect,win_rect;
@@ -225,7 +225,7 @@ LRESULT CBacnetCustomerDigitalRange::Fresh_Customer_Digital_Range_Item(WPARAM wP
 void CBacnetCustomerDigitalRange::OnNMClickListCustomerDigitalRange(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 
 	long lRow,lCol;
 	m_customer_dig_range_list.Set_Edit(true);

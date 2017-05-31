@@ -3055,7 +3055,7 @@ void CNewHumChamberView::read_testo(){
 
 LRESULT CNewHumChamberView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if (message==WM_FRESH_TESTO)
 	{
 	
@@ -3142,7 +3142,7 @@ void CNewHumChamberView::OnDestroy()
 	close_testo();
 	CFormView::OnDestroy();
 
-	// TODO: Add your message handler code here
+	
 }
 
 unsigned short CNewHumChamberView::Get_Checks(){
@@ -3648,7 +3648,7 @@ void CNewHumChamberView::OnSetfocusTemp9()
 
 BOOL CNewHumChamberView::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message == WM_KEYDOWN  )
 	{
 
@@ -3818,7 +3818,7 @@ void CNewHumChamberView::OnSetfocusHum9()
 
 void CNewHumChamberView::OnSetfocusTime1()
 {
-	// TODO: Add your control notification handler code here
+	
 	float temp_float;
 	CString str_text;
 	UINT temp_Int;
@@ -4921,7 +4921,7 @@ void CNewHumChamberView::Fresh_CO2_Time(){
 
 void CNewHumChamberView::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 // 	if (message==WM_FRESH_TESTO)
 // 	{
 

@@ -87,7 +87,7 @@ BOOL BacnetRange::OnInitDialog()
 	m_show_unit.textColor(RGB(255,0,0));
 	m_show_unit.setFont(24,12,NULL,_T("Arial"));
 	Initial_static();
-	// TODO:  Add extra initialization here
+	
 
 	((CEdit *)GetDlgItem(IDC_EDIT_RANGE_SELECT))->SetFocus();
 	((CEdit *)GetDlgItem(IDC_EDIT_RANGE_SELECT))->SetSel(0,-1);
@@ -697,7 +697,7 @@ void BacnetRange::Initial_static()
 
 BOOL BacnetRange::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message == WM_KEYDOWN)
 	{
 		if(GetFocus()==GetDlgItem(IDC_EDIT_RANGE_SELECT))
@@ -717,7 +717,7 @@ BOOL BacnetRange::PreTranslateMessage(MSG* pMsg)
 
 void BacnetRange::OnOK()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	CString temp;
 	GetDlgItemText(IDC_EDIT_RANGE_SELECT,temp);
 	if(bacnet_device_type == PM_T3PT12)
@@ -792,7 +792,7 @@ void BacnetRange::OnOK()
 
 void BacnetRange::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	range_cancel = true;
 	bac_range_number_choose = 0;
 	CDialogEx::OnCancel();
@@ -801,7 +801,7 @@ void BacnetRange::OnCancel()
 
 void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	int sel_value;
 	CString temp_value;
 	bool click_radio = false;
@@ -1871,7 +1871,7 @@ void BacnetRange::Timer2_handle()
 
 void BacnetRange::OnEnKillfocusEditRangeSelect()
 {
-	// TODO: Add your control notification handler code here
+	
 	KillTimer(2);
 	SetTimer(1,400,NULL);
 }
@@ -1879,7 +1879,7 @@ void BacnetRange::OnEnKillfocusEditRangeSelect()
 
 void BacnetRange::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	range_cancel = true;
 	CDialogEx::OnClose();
 }
@@ -1887,7 +1887,7 @@ void BacnetRange::OnClose()
 
 void BacnetRange::OnBnClickedCancel()
 {
-	// TODO: Add your control notification handler code here
+	
 	range_cancel = true;
 	CDialogEx::OnCancel();
 }
@@ -1895,7 +1895,7 @@ void BacnetRange::OnBnClickedCancel()
 
 void BacnetRange::OnBnClickedBtnEditCustomerRange()
 {
-	// TODO: Add your control notification handler code here
+	
 	CBacnetCustomerDigitalRange dlg;
 	dlg.DoModal();
 
@@ -1930,7 +1930,7 @@ void BacnetRange::OnBnClickedBtnEditCustomerRange()
 
 void BacnetRange::OnBnClickedBtnEditCustomerVarRange()
 {
-	// TODO: Add your control notification handler code here
+	
 	CBacnetVarCusRang Rangdlg;
 	Rangdlg.DoModal();
 	for (int i=IDC_RADIO_VAR_CUS_1;i<=IDC_RADIO_VAR_CUS_5;i++)
@@ -1944,55 +1944,55 @@ void BacnetRange::OnBnClickedBtnEditCustomerVarRange()
 
 void BacnetRange::OnBnClickedRadio73()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	OnBnClickedBtnEditCustomerRange();
 }
 
 
 void BacnetRange::OnBnClickedRadio74()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	//OnBnClickedBtnEditCustomerRange();
 }
 
 
 void BacnetRange::OnBnClickedRadio75()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	OnBnClickedBtnEditCustomerRange();
 }
 
 
 void BacnetRange::OnBnClickedRadio76()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	OnBnClickedBtnEditCustomerRange();
 }
 
 
 void BacnetRange::OnBnClickedRadio77()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	OnBnClickedBtnEditCustomerRange();
 }
 
 
 void BacnetRange::OnBnClickedRadio78()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	OnBnClickedBtnEditCustomerRange();
 }
 
 
 void BacnetRange::OnBnClickedRadio79()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	OnBnClickedBtnEditCustomerRange();
 }
 
 
 void BacnetRange::OnBnClickedRadio80()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	OnBnClickedBtnEditCustomerRange();
 }

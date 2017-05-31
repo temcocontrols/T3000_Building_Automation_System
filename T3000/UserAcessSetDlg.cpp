@@ -50,7 +50,7 @@ END_MESSAGE_MAP()
 
 void CUserAcessSetDlg::OnBnClickedOk()
 {
-	// TODO: Add your control notification handler code here
+	
 	//OnOK();
 }
 
@@ -669,7 +669,7 @@ void CUserAcessSetDlg::OnCbnKillfocusLevelsetcombo()
  
 void CUserAcessSetDlg::OnBnClickedCancel()
 {
-	// TODO: Add your control notification handler code here
+	
 	OnCancel();
 }
 

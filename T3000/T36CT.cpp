@@ -1205,7 +1205,7 @@ void T36CT::OnCbnSelchangeBraudratecombo()
 
 LRESULT T36CT::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if (message==FRESH_CT6_BACK)
 	{
 	    InitialDialog();
@@ -1226,7 +1226,7 @@ void T36CT::OnDestroy()
 
 	CFormView::OnDestroy();
 
-	// TODO: Add your message handler code here
+	
 }
 
 

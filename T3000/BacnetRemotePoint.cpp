@@ -57,7 +57,7 @@ BOOL CBacnetRemotePoint::OnInitDialog()
 	//	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//F2¼ü
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
 	ShowWindow(FALSE);
-	// TODO:  Add extra initialization here
+	
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -116,7 +116,7 @@ void CBacnetRemotePoint::Initial_List()
 
 BOOL CBacnetRemotePoint::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message==WM_NCLBUTTONDBLCLK)
 	{
 		if(!window_max)
@@ -141,7 +141,7 @@ BOOL CBacnetRemotePoint::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetRemotePoint::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
 	//CDialogEx::OnCancel();
 }
@@ -149,7 +149,7 @@ void CBacnetRemotePoint::OnCancel()
 
 void CBacnetRemotePoint::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	ShowWindow(FALSE);
 	return;
 	CDialogEx::OnClose();
@@ -421,7 +421,7 @@ void CBacnetRemotePoint::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 
-	// TODO: Add your message handler code here
+	
 	CRect rc;
 	GetClientRect(rc);
 	if(m_remote_point_list.m_hWnd != NULL)
@@ -436,7 +436,7 @@ void CBacnetRemotePoint::OnSize(UINT nType, int cx, int cy)
 
 void CBacnetRemotePoint::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if(nID == SC_MAXIMIZE)
 	{
 		if(window_max == false)
@@ -461,7 +461,7 @@ void CBacnetRemotePoint::OnSysCommand(UINT nID, LPARAM lParam)
 
 void CBacnetRemotePoint::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	switch(nIDEvent)
 	{
 	case 1:

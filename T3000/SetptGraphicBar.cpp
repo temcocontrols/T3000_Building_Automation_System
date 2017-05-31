@@ -350,7 +350,7 @@ void CSetptGraphicBar::OnLButtonDown(UINT nFlags, CPoint point)
 		}
 
 	}
-	// TODO: Add your message handler code here and/or call default
+	 
 }
 
 void CSetptGraphicBar::OnLButtonUp(UINT nFlags, CPoint point)
@@ -550,7 +550,7 @@ void CSetptGraphicBar::OnMouseMove(UINT nFlags, CPoint point)
 		}
 	}
 	
-	// TODO: Add your message handler code here and/or call default
+	 
 
 }
 int CSetptGraphicBar::PosTOValue(int nPix)

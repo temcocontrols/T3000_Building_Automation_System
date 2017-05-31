@@ -135,7 +135,7 @@ Modbus Poll.manifest
 
 Other notes:
 
-The application wizard uses "TODO:" to indicate parts of the source code you
+The application wizard uses "" to indicate parts of the source code you
 should add to or customize.
 
 If your application uses MFC in a shared DLL, you will need

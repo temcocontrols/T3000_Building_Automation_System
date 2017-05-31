@@ -120,7 +120,7 @@ BOOL CBacnetProgram::OnInitDialog()
 	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_PROGRAM);
 	SetIcon(m_hIcon,TRUE);
 	PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
-	// TODO:  Add extra initialization here
+	
 
 	ShowWindow(FALSE);
 	//RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//Insert¼ü
@@ -401,7 +401,7 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 
 void CBacnetProgram::OnBnClickedButtonProgramEdit()
 {
-	// TODO: Add your control notification handler code here
+	
 
 
 	CString temp_show_info;
@@ -494,14 +494,14 @@ void CBacnetProgram::OnNMClickListProgram(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 
 
-	// TODO: Add your control notification handler code here
+	
 
 
 	*pResult = 0;
 }
 void CBacnetProgram::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	ShowWindow(FALSE);
 	return;
 
@@ -511,14 +511,14 @@ void CBacnetProgram::OnClose()
 }
 void CBacnetProgram::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
 	//CDialogEx::OnCancel();
 }
 
 void CBacnetProgram::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if(g_protocol == PROTOCOL_BIP_TO_MSTP)
 	{
 		PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
@@ -535,7 +535,7 @@ void CBacnetProgram::OnTimer(UINT_PTR nIDEvent)
 
 BOOL CBacnetProgram::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN) 
 	{
 		CRect list_rect,win_rect;
@@ -651,7 +651,7 @@ int GetPrgFullLabel(int index,CString &ret_full_label)
 void CBacnetProgram::OnNMDblclkListProgram(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 	OnBnClickedButtonProgramEdit();
 	*pResult = 0;
 }
@@ -689,7 +689,7 @@ void CBacnetProgram::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 
-	// TODO: Add your message handler code here
+	
 	CRect rc;
 	GetClientRect(rc);
 	if(m_program_list.m_hWnd != NULL)
@@ -705,7 +705,7 @@ void CBacnetProgram::OnSize(UINT nType, int cx, int cy)
 
 void CBacnetProgram::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if(nID == SC_MAXIMIZE)
 	{
 		if(window_max == false)

@@ -96,7 +96,7 @@ BOOL CBacnetVariable::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	SetWindowTextW(_T("VARIABLE"));
-	// TODO:  Add extra initialization here
+	
 	Initial_List();	//Initial the list of Variable,read from device;
 	PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
 
@@ -119,7 +119,7 @@ BOOL CBacnetVariable::OnInitDialog()
 
 void CBacnetVariable::OnBnClickedButtonVariableRead()
 {
-	// TODO: Add your control notification handler code here
+	
 
 	PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
 }
@@ -481,7 +481,7 @@ LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)
 
 void CBacnetVariable::OnBnClickedButtonVariableApply()
 {
-	// TODO: Add your control notification handler code here
+	
 	for (int i=0;i<(int)m_Variable_data.size();i++)
 	{
 		CString cs_temp=m_variable_list.GetItemText(i,VARIABLE_FULL_LABLE);
@@ -518,7 +518,7 @@ void CBacnetVariable::OnBnClickedButtonVariableApply()
 void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 	long lRow,lCol;
 	m_variable_list.Set_Edit(true);
 	DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
@@ -863,7 +863,7 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CBacnetVariable::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	switch(nIDEvent)
 	{
 	case 1:
@@ -906,7 +906,7 @@ void CBacnetVariable::OnTimer(UINT_PTR nIDEvent)
 
 void CBacnetVariable::OnNMKillfocusDatetimepicker2Variable(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: Add your control notification handler code here
+	
 	CTime temp_time;CString temp_cs;
 	int chour,cmin,csend;
 	m_variable_time_picker.GetTime(temp_time);
@@ -940,7 +940,7 @@ void CBacnetVariable::OnNMKillfocusDatetimepicker2Variable(NMHDR *pNMHDR, LRESUL
 
 BOOL CBacnetVariable::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message == WM_KEYDOWN  )
 	{
 		if(pMsg->wParam == VK_RETURN)
@@ -987,7 +987,7 @@ BOOL CBacnetVariable::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetVariable::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	ShowWindow(FALSE);
 	return;
 	KillTimer(1);
@@ -999,7 +999,7 @@ void CBacnetVariable::OnClose()
 
 void CBacnetVariable::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	//KillTimer(1);
 	//m_variable_dlg_hwnd = NULL;
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
@@ -1202,7 +1202,7 @@ void CBacnetVariable::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 
-	// TODO: Add your message handler code here
+	
 	CRect rc;
 	GetClientRect(rc);
 	if(m_variable_list.m_hWnd != NULL)
@@ -1215,7 +1215,7 @@ void CBacnetVariable::OnSize(UINT nType, int cx, int cy)
 
 void CBacnetVariable::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 
 	if(nID == SC_MAXIMIZE)
 	{

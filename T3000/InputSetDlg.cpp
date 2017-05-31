@@ -151,7 +151,7 @@ OnEnKillfocusInvalueedit();
 }
 void CInputSetDlg::OnBnClickedOk()
 {
-	// TODO: Add your control notification handler code here
+	
 	//OnOK();
 }
 
@@ -458,7 +458,7 @@ BOOL CInputSetDlg::OnInitDialog()
 
 
 	Fresh_Grid();
-	// TODO:  Add extra initialization here
+	
 
 	m_nCurCol=1;
 	m_nCurRow=1;
@@ -478,7 +478,7 @@ BOOL CInputSetDlg::OnInitDialog()
 
 BOOL CInputSetDlg::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->lParam == WM_CLOSE)
 		Sleep(1);
 			BOOL flag=FALSE;
@@ -635,7 +635,7 @@ void CInputSetDlg::SetCurrentCell(){
 }
 void CInputSetDlg::OnBnClickedCancel()
 {
-	// TODO: Add your control notification handler code here
+	
 	OnCancel();
 }
 
@@ -5918,7 +5918,7 @@ void CInputSetDlg::ClickMsflexgrid5E( int nRow, int nCol, CRect rcCell )
  
 void CInputSetDlg::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if(b_is_fresh==true)
 	{
 		AfxMessageBox(_T("It's refreshing ,can not exit at this time!"));
@@ -6337,6 +6337,6 @@ void CInputSetDlg::OnCbnSelendokRangCombo()
 
 void CInputSetDlg::OnCbnSelendokValuecombo()
 {
-	// TODO: Add your control notification handler code here
+	
 	OnCbnSelchangeValuecombo();
 }

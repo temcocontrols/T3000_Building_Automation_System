@@ -70,7 +70,7 @@ public:
     virtual CGridCtrl*  GetGrid() const             { return m_pGrid;   }
     // virtual DWORD    GetState() const - use base class
     virtual DWORD       GetFormat() const;
-    virtual COLORREF    GetTextClr() const          { return m_crFgClr; } // TODO: change to use default cell
+    virtual COLORREF    GetTextClr() const          { return m_crFgClr; } //  change to use default cell
     virtual COLORREF    GetBackClr() const          { return m_crBkClr; }
     virtual LOGFONT*    GetFont() const;
     virtual CFont*      GetFontObject() const;

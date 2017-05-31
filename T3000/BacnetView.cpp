@@ -1745,7 +1745,7 @@ LRESULT  CDialogCM5_BacNet::AllMessageCallBack(WPARAM wParam, LPARAM lParam)
 
 void CDialogCM5_BacNet::OnBnClickedButtonTest()
 {
-	// TODO: Add your control notification handler code here
+	
 	Send_WhoIs_Global(g_bac_instance, g_bac_instance);
 }
 
@@ -1759,7 +1759,7 @@ void CDialogCM5_BacNet::OnInitialUpdate()
 	
 	//Tab_Initial();
 	//initial_once = false;
-	// TODO: Add your specialized code here and/or call the base class
+	
 }
 
 void CDialogCM5_BacNet::Tab_Initial()
@@ -4340,7 +4340,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 		}
 	}
 
-	// TODO: Add your control notification handler code here
+	
 	for (int i=0;i<BAC_SCHEDULE_GROUP;i++)
 	{
 
@@ -4844,7 +4844,7 @@ void CDialogCM5_BacNet::SetConnected_IP(LPCTSTR myip)
 
 void CDialogCM5_BacNet::WriteFlash()
 {
-	// TODO: Add your control notification handler code here
+	
 	//WRITEPRGFLASH_COMMAND
 	int resend_count = 0;
 	do 
@@ -4884,7 +4884,7 @@ void CDialogCM5_BacNet::Set_remote_device_IP(LPCTSTR ipaddress)
 
 void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 
 	bool is_connected = false;
 	switch(nIDEvent)
@@ -5473,7 +5473,7 @@ void CDialogCM5_BacNet::Inital_Tab_Loaded_Parameter()
 
 void CDialogCM5_BacNet::OnTcnSelchangeBacMaintab(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: Add your control notification handler code here
+	
 	
 	int selected = m_bac_main_tab.GetCurSel();
 
@@ -6219,7 +6219,7 @@ LRESULT CDialogCM5_BacNet::RS485_Read_Fun(WPARAM wParam,LPARAM lParam)
 
 BOOL CDialogCM5_BacNet::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_TAB) 
 	{
 		if(m_bac_main_tab.IsWindowVisible() == false)

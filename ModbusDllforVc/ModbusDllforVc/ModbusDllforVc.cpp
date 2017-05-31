@@ -9,7 +9,7 @@
 #endif
 
 //
-//TODO: If this DLL is dynamically linked against the MFC DLLs,
+
 //		any functions exported from this DLL which call into
 //		MFC must have the AFX_MANAGE_STATE macro added at the
 //		very beginning of the function.
@@ -43,7 +43,7 @@ END_MESSAGE_MAP()
 
 CModbusDllforVcApp::CModbusDllforVcApp()
 {
-	// TODO: add construction code here,
+
 	// Place all significant initialization in InitInstance
 }
 

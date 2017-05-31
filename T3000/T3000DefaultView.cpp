@@ -91,7 +91,7 @@ void CT3000DefaultView::Fresh()
 void CT3000DefaultView::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-	// TODO: Add your message handler code here
+	
 	// Do not call CFormView::OnPaint() for painting messages
 	CMemDC memDC(dc,this);
 	Graphics graphics(memDC.GetDC());

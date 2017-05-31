@@ -117,7 +117,7 @@ BOOL CTstatRangeDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	m_show_unit.ShowWindow(FALSE);
 	m_show_unit.SetWindowTextW(_T(""));
 	m_show_unit.textColor(RGB(255,0,0));
@@ -218,7 +218,7 @@ BOOL CTstatRangeDlg::PreTranslateMessage(MSG* pMsg)
 
 LRESULT CTstatRangeDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if (message==WM_TSTAT_RANGE)
 	{
 	 
@@ -230,7 +230,7 @@ LRESULT CTstatRangeDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
 void CTstatRangeDlg::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	int sel_value;
 	CString temp_value;
 	switch(nIDEvent)
@@ -337,7 +337,7 @@ void CTstatRangeDlg::OnEnSetfocusEditRangeSelect()
 }
 void CTstatRangeDlg::OnOK()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
  
 	CString temp;
 	GetDlgItemText(IDC_EDIT_RANGE_SELECT,temp);
@@ -549,48 +549,48 @@ void CTstatRangeDlg::OnBnClickedRadioT3()
 void CTstatRangeDlg::OnBnClickedRadioT4()
 {
 Click_Radio();
-	// TODO: Add your control notification handler code here
+	
 }
 
 
 void CTstatRangeDlg::OnBnClickedRadio()
 {
-	Click_Radio();// TODO: Add your control notification handler code here
+	Click_Radio();
 }
 
 
 void CTstatRangeDlg::OnBnClickedRadioT6()
 {
-	Click_Radio();// TODO: Add your control notification handler code here
+	Click_Radio();
 }
 
 
 void CTstatRangeDlg::OnBnClickedRadioT7()
 {
-	Click_Radio();	// TODO: Add your control notification handler code here
+	Click_Radio();	
 }
 
 
 void CTstatRangeDlg::OnBnClickedRadioT8()
 {
-	Click_Radio();	// TODO: Add your control notification handler code here
+	Click_Radio();	
 }
 
 
 void CTstatRangeDlg::OnBnClickedRadioT9()
 {
-	Click_Radio();	// TODO: Add your control notification handler code here
+	Click_Radio();	
 }
 
 
 void CTstatRangeDlg::OnBnClickedRadioT10()
 {
-	Click_Radio();	// TODO: Add your control notification handler code here
+	Click_Radio();	
 }
 
 void CTstatRangeDlg::OnBnClickedRadioT11()
 {
-	Click_Radio();	// TODO: Add your control notification handler code here
+	Click_Radio();	
 }
 
 void CTstatRangeDlg::OnBnClickedRadioT12()
@@ -897,133 +897,133 @@ short CTstatRangeDlg::Get_Max(short *short_Array,int length){
 
 void CTstatRangeDlg::OnEnChangeEdit1()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+	
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 	
-	// TODO:  在此添加控件通知处理程序代码
+	//   在此添加控件通知处理程序代码
 	IsModfied=true;
 }
 
 void CTstatRangeDlg::OnEnChangeEdit8()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+	
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-	// TODO:  在此添加控件通知处理程序代码
+	//   在此添加控件通知处理程序代码
 	IsModfied=true;
 }
 
 void CTstatRangeDlg::OnEnChangeEdit9()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+	
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-	// TODO:  在此添加控件通知处理程序代码
+	//   在此添加控件通知处理程序代码
 	IsModfied=true;
 }
 
 void CTstatRangeDlg::OnEnChangeEdit13()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+	
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-	// TODO:  在此添加控件通知处理程序代码
+	//   在此添加控件通知处理程序代码
 	IsModfied=true;
 }
 
 void CTstatRangeDlg::OnEnChangeEdit14()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+	
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-	// TODO:  在此添加控件通知处理程序代码
+	//   在此添加控件通知处理程序代码
 	IsModfied=true;
 }
 
 void CTstatRangeDlg::OnEnChangeEdit15()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+	
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-	// TODO:  在此添加控件通知处理程序代码
+	//   在此添加控件通知处理程序代码
 	IsModfied=true;
 }
 
 void CTstatRangeDlg::OnEnChangeEdit16()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+	
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-	// TODO:  在此添加控件通知处理程序代码
+	//   在此添加控件通知处理程序代码
 	IsModfied=true;
 }
 
 void CTstatRangeDlg::OnEnChangeEdit17()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+	
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-	// TODO:  在此添加控件通知处理程序代码
+	//   在此添加控件通知处理程序代码
 	IsModfied=true;
 }
 
 void CTstatRangeDlg::OnEnChangeEdit18()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+	
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-	// TODO:  在此添加控件通知处理程序代码
+	//   在此添加控件通知处理程序代码
 	IsModfied=true;
 }
 
 void CTstatRangeDlg::OnEnChangeEdit19()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+	
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-	// TODO:  在此添加控件通知处理程序代码
+	//   在此添加控件通知处理程序代码
 	IsModfied=true;
 }
 
 void CTstatRangeDlg::OnEnChangeEdit20()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+	
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-	// TODO:  在此添加控件通知处理程序代码
+	//   在此添加控件通知处理程序代码
 	IsModfied=true;
 }
 
 void CTstatRangeDlg::OnEnChangeEdit12()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+	
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-	// TODO:  在此添加控件通知处理程序代码
+	//   在此添加控件通知处理程序代码
 	IsModfied=true;
 }
 
@@ -1040,7 +1040,7 @@ void CTstatRangeDlg::OnEnKillfocusEdit1()
 
 void CTstatRangeDlg::OnEnKillfocusEdit8()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 // if(m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 // {
 // 	float ftemp;
@@ -1113,7 +1113,7 @@ void CTstatRangeDlg::OnEnKillfocusEdit9()
 
 void CTstatRangeDlg::OnEnKillfocusEdit13()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 // 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 // 	{
 // 		float ftemp;
@@ -1151,7 +1151,7 @@ void CTstatRangeDlg::OnEnKillfocusEdit13()
 
 void CTstatRangeDlg::OnEnKillfocusEdit14()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 // 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION) 
 // 	{
 // 		float ftemp;
@@ -1188,7 +1188,7 @@ void CTstatRangeDlg::OnEnKillfocusEdit14()
 
 void CTstatRangeDlg::OnEnKillfocusEdit15()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 // 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 // 	{
 // 		float ftemp;
@@ -1228,7 +1228,7 @@ void CTstatRangeDlg::OnEnKillfocusEdit15()
 
 void CTstatRangeDlg::OnEnKillfocusEdit16()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 // 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 // 	{
 // 		float ftemp;
@@ -1267,7 +1267,7 @@ void CTstatRangeDlg::OnEnKillfocusEdit16()
 
 void CTstatRangeDlg::OnEnKillfocusEdit17()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 // 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 // 	{
 // 		float ftemp;
@@ -1305,7 +1305,7 @@ void CTstatRangeDlg::OnEnKillfocusEdit17()
 
 void CTstatRangeDlg::OnEnKillfocusEdit18()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	
 // 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 // 	{
@@ -1345,7 +1345,7 @@ void CTstatRangeDlg::OnEnKillfocusEdit18()
 
 void CTstatRangeDlg::OnEnKillfocusEdit19()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 // 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION) 
 // 	{
 // 		float ftemp;
@@ -1386,7 +1386,7 @@ void CTstatRangeDlg::OnEnKillfocusEdit19()
 
 void CTstatRangeDlg::OnEnKillfocusEdit20()
 {
-// TODO: 在此添加控件通知处理程序代码
+
 // 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 // 	{
 // 		float ftemp;
@@ -1425,7 +1425,7 @@ void CTstatRangeDlg::OnEnKillfocusEdit20()
 
 void CTstatRangeDlg::OnEnKillfocusEdit12()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	if(IsModfied)
 	{
 		UpdateData();		
@@ -1458,17 +1458,17 @@ void CTstatRangeDlg::OnEnKillfocusEdit12()
 }
 void CTstatRangeDlg::OnEnChangeEdit10()
 {
-    // TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+    
     // 发送该通知，除非重写 CDialog::OnInitDialog()
     // 函数并调用 CRichEditCtrl().SetEventMask()，
     // 同时将 ENM_CHANGE 标志“或”运算到掩码中。
     IsModfied=true;
-    // TODO:  在此添加控件通知处理程序代码
+    //   在此添加控件通知处理程序代码
 }
 
 void CTstatRangeDlg::OnEnSetfocusEdit10()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    
     KillTimer(1);//killtimer
 }
 

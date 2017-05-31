@@ -141,7 +141,7 @@ void CWriteSingle_BinaryDlg::OnBnClickedOk()
 {
 	CString m_Tx,m_Rx;
 	
-	// TODO: Add your control notification handler code here
+	
 	UpdateData(TRUE);
 	m_Binary_Value[0]=m_Check1;
 	m_Binary_Value[1]=m_Check2;
@@ -306,7 +306,7 @@ void CWriteSingle_BinaryDlg::OnBnClickedCheckCloseDlg()
 void CWriteSingle_BinaryDlg::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-	// TODO: Add your message handler code here
+	
 	// Do not call CDialogEx::OnPaint() for painting messages
 	m_editor_address.SetSel(0,-1);
 	m_editor_address.SetFocus();

@@ -1297,7 +1297,7 @@ int WriteProgramData(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,
 ****************************************************/
 int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char start_instance,unsigned char end_instance)
 {
-    // TODO: Add your control notification handler code here
+    
 
     unsigned char command = (unsigned char)n_command;
 
@@ -1775,7 +1775,7 @@ Get Bacnet Private Data
 /************************************************************************/
 int GetPrivateData(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize)
 {
-    // TODO: Add your control notification handler code here
+    
 
     uint8_t apdu[480] = { 0 };
     uint8_t test_value[480] = { 0 };
@@ -1844,7 +1844,7 @@ Get Bacnet Private Data
 /************************************************************************/
 int GetProgramData(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance,uint8_t npackgae)
 {
-    // TODO: Add your control notification handler code here
+    
 
     uint8_t apdu[480] = { 0 };
     uint8_t test_value[480] = { 0 };
@@ -1961,7 +1961,7 @@ Get Bacnet Monitor Private Data
 /************************************************************************/
 int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t nIndex,int8_t ntype_ad, uint16_t ntotal_seg,uint16_t nseg_index,MonitorUpdateData* up_data)
 {
-    // TODO: Add your control notification handler code here
+    
 
     uint8_t apdu[480] = { 0 };
     uint8_t test_value[480] = { 0 };
@@ -10924,7 +10924,7 @@ Get Bacnet picture Private Data
 /************************************************************************/
 int GetPictureBlockData(uint32_t deviceid,int8_t nIndex, uint16_t ntotal_seg,uint16_t nseg_index)
 {
-	// TODO: Add your control notification handler code here
+	
 
 	uint8_t apdu[480] = { 0 };
 	uint8_t test_value[480] = { 0 };

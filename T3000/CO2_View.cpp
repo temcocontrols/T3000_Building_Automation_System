@@ -1,7 +1,6 @@
 // CO2_View.cpp : implementation file
 // CO2 coded by Fance 2013 07 20
 // Already finished CO2 with RS485.
-
 #include "stdafx.h"
 #include "T3000.h"
 #include "CO2_View.h"
@@ -912,7 +911,7 @@ void CCO2_View::OnBnClickedCo2Enableidbutton()
     CEreaseDlg Dlg;
     Dlg.DoModal();
     g_bPauseMultiRead = FALSE;
-    // TODO: Add your control notification handler code here
+    
     //if(m_co2_idAdressEdit.IsWindowEnabled())
     //{
     //	m_co2_idAdressEdit.EnableWindow(FALSE);
@@ -932,13 +931,13 @@ END_EVENTSINK_MAP()
 
 void CCO2_View::ClickMsflexgridCo2()
 {
-    // TODO: Add your message handler code here
+    
 }
 
 
 void CCO2_View::OnCbnSelchangeComboCo2SensorSel()
 {
-    // TODO: Add your control notification handler code here
+    
     UpdateData();
     int temp_cursel = m_sensor_sel.GetCurSel();
     if(temp_cursel != product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT])
@@ -1030,7 +1029,7 @@ LRESULT  CCO2_View::ResumeCO2MessageCallBack(WPARAM wParam, LPARAM lParam)
 
 void CCO2_View::OnCbnSelchangeCo2TempUnit()
 {
-    // TODO: Add your control notification handler code here
+    
     UpdateData();
     if (m_nCurCol==2)
     {
@@ -1076,7 +1075,7 @@ void CCO2_View::OnCbnSelchangeCo2TempUnit()
 
 BOOL CCO2_View::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: Add your specialized code here and/or call the base class
+    
 
     if(pMsg->message == WM_KEYDOWN  )
     {
@@ -1166,7 +1165,7 @@ BOOL CCO2_View::PreTranslateMessage(MSG* pMsg)
 
 void CCO2_View::OnEnKillfocusEditInternalTemp()
 {
-    // TODO: Add your control notification handler code here
+    
     UpdateData();
     int ivalue=0;
     ivalue = m_f_internal_temp *10;
@@ -1192,7 +1191,7 @@ HBRUSH CCO2_View::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 {
     HBRUSH hbr = CFormView::OnCtlColor(pDC, pWnd, nCtlColor);
 
-    // TODO:  Change any attributes of the DC here
+    
     for (int i=0;i<(int)Change_Color_ID.size();i++)
     {
         if(/*nCtlColor==CTLCOLOR_EDIT &&*/pWnd->GetDlgCtrlID()==Change_Color_ID.at(i))//ע���˴��ģ�pWnd->��������ûЧ��
@@ -1204,14 +1203,14 @@ HBRUSH CCO2_View::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
         }
 
     }
-    // TODO:  Return a different brush if the default is not desired
+    
     return hbr;
 }
 
 
 void CCO2_View::OnEnKillfocusEditExternalTemp()
 {
-    // TODO: Add your control notification handler code here
+    
     UpdateData();
     int ivalue=0;
     ivalue = m_f_external_temp *10;
@@ -1260,7 +1259,7 @@ void CCO2_View::OnEnKillfocusCo2PrepareAlarmSetpoint()
 
 void CCO2_View::OnEnKillfocusCo2AlarmSetpoint()
 {
-    // TODO: Add your control notification handler code here
+    
     UpdateData();
     if (m_product_type == 3)
     {
@@ -1284,7 +1283,7 @@ void CCO2_View::OnEnKillfocusCo2AlarmSetpoint()
 
 void CCO2_View::OnEnKillfocusCo2CalibratingOffset()
 {
-    // TODO: Add your control notification handler code here
+    
     UpdateData();
     if (m_product_type == 3)
     {
@@ -1308,7 +1307,7 @@ void CCO2_View::OnEnKillfocusCo2CalibratingOffset()
 
 void CCO2_View::OnBnClickedRadioAlarmManual()
 {
-    // TODO: Add your control notification handler code here
+    
     unsigned short temp_value;
     temp_value = product_register_value[CO2_485_MODBUS_ALARM_AUTO_MANUAL] | 0x80;
     if(temp_value != product_register_value[CO2_485_MODBUS_ALARM_AUTO_MANUAL])
@@ -1322,7 +1321,7 @@ void CCO2_View::OnBnClickedRadioAlarmManual()
 
 void CCO2_View::OnBnClickedRadioAlarmAuto()
 {
-    // TODO: Add your control notification handler code here
+    
     unsigned short temp_value;
     temp_value = product_register_value[CO2_485_MODBUS_ALARM_AUTO_MANUAL] & 0x7f;
     if(temp_value != product_register_value[CO2_485_MODBUS_ALARM_AUTO_MANUAL])
@@ -1335,7 +1334,7 @@ void CCO2_View::OnBnClickedRadioAlarmAuto()
 
 void CCO2_View::OnCbnSelchangeCo2AlarmState()
 {
-    // TODO: Add your control notification handler code here
+    
     UpdateData();
     int temp_item =	m_co2_alarm_state.GetCurSel();
     int write_value =0;
@@ -1433,19 +1432,19 @@ void CCO2_View::OnInitialUpdate()
     //CO2_Thread=AfxBeginThread(_ReadCo2MultiRegisters,this,THREAD_PRIORITY_NORMAL,0,0,NULL );
     //CO2_Thread->SuspendThread();
 
-    // TODO: Add your specialized code here and/or call the base class
+    
 }
 
 void CCO2_View::OnNMKillfocusCo2Datetimepicker1(NMHDR *pNMHDR, LRESULT *pResult)
 {
-    // TODO: Add your control notification handler code here
+    
     *pResult = 0;
     Check_DayTime();
 }
 
 void CCO2_View::OnNMKillfocusCo2DatetimepickerTime(NMHDR *pNMHDR, LRESULT *pResult)
 {
-    // TODO: Add your control notification handler code here
+    
     *pResult = 0;
     Check_HourTime();
 }
@@ -1522,7 +1521,7 @@ void CCO2_View::Check_HourTime()
 
 void CCO2_View::OnBnClickedButtonCo2SyncTime()
 {
-    // TODO: Add your control notification handler code here
+    
     CTime TimeTemp=TimeTemp.GetCurrentTime();
     m_co2_time_picker.SetTime(&TimeTemp);
     m_co2_day_picker.SetTime(&TimeTemp);
@@ -1560,7 +1559,7 @@ void CCO2_View::OnBnClickedButtonCo2SyncTime()
 
 void CCO2_View::OnBnClickedRadioPasswordEnable()
 {
-    // TODO: Add your control notification handler code here
+    
     if(product_register_value[CO2_485_MODBUS_PASSWORD_ENABLE] != TRUE)
     {
         Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_485_MODBUS_PASSWORD_ENABLE,1,
@@ -1570,7 +1569,7 @@ void CCO2_View::OnBnClickedRadioPasswordEnable()
 
 void CCO2_View::OnBnClickedRadioPasswordDisable()
 {
-    // TODO: Add your control notification handler code here
+    
     if(product_register_value[CO2_485_MODBUS_PASSWORD_ENABLE] != FALSE)
     {
         Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_485_MODBUS_PASSWORD_ENABLE,0,
@@ -1580,7 +1579,7 @@ void CCO2_View::OnBnClickedRadioPasswordDisable()
 
 void CCO2_View::OnEnKillfocusEditCo2Passwor()
 {
-    // TODO: Add your control notification handler code here
+    
     UpdateData();
     if(m_cs_password.GetLength()!=4)
     {
@@ -1619,7 +1618,7 @@ void CCO2_View::OnEnKillfocusEditCo2Passwor()
 
 void CCO2_View::OnEnKillfocusEditCo2BlockTime()
 {
-    // TODO: Add your control notification handler code here
+    
     UpdateData();
     if(m_co2_block_time != product_register_value[CO2_485_MODBUS_MENU_BLOCK_SECONDS])
     {
@@ -1630,7 +1629,7 @@ void CCO2_View::OnEnKillfocusEditCo2BlockTime()
 
 void CCO2_View::OnEnKillfocusEditCo2BacklightTime()
 {
-    // TODO: Add your control notification handler code here
+    
     UpdateData();
     if(m_co2_backlight_time != product_register_value[CO2_485_MODBUS_BACKLIGHT_KEEP_SECONDS])
     {
@@ -1641,7 +1640,7 @@ void CCO2_View::OnEnKillfocusEditCo2BacklightTime()
 
 LRESULT CCO2_View::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
-    // TODO: Add your specialized code here and/or call the base class
+    
     if(MsgT3000ViewFresh==message)
     {
         if(this->IsWindowVisible())	//add by Fance ,if window not visible, it's unnecessary to fresh it;
@@ -1652,7 +1651,7 @@ LRESULT CCO2_View::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
 void CCO2_View::OnBnClickedBtnCo2Refresh()
 {
-    // TODO: Add your control notification handler code here
+    
 
 }
 extern  HANDLE Read_Mute;
@@ -1844,7 +1843,7 @@ LRESULT  CCO2_View::DealMessage(WPARAM wParam,LPARAM lParam)
 
 void CCO2_View::OnEnKillfocusCo2AlarmOnTime()
 {
-    // TODO: Add your control notification handler code here
+    
     UpdateData();
     if(m_alarm_on_time != product_register_value[CO2_485_MODBUS_PRE_ALARM_SETTING_ON_TIME])
     {
@@ -1856,7 +1855,7 @@ void CCO2_View::OnEnKillfocusCo2AlarmOnTime()
 
 void CCO2_View::OnEnKillfocusCo2AlarmOffTime()
 {
-    // TODO: Add your control notification handler code here
+    
     UpdateData();
     if(m_alarm_off_time != product_register_value[CO2_485_MODBUS_PRE_ALARM_SETTING_OFF_TIME])
     {
@@ -1872,7 +1871,7 @@ void CCO2_View::OnEnKillfocusCo2AlarmOffTime()
 
 void CCO2_View::OnBnClickedRadioHumidityHeatEnable()
 {
-    // TODO: Add your control notification handler code here
+    
     if(product_register_value[CO2_485_MODBUS_HUM_SENSOR_HEATING] != TRUE)
     {
         Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_485_MODBUS_HUM_SENSOR_HEATING,1,
@@ -1882,7 +1881,7 @@ void CCO2_View::OnBnClickedRadioHumidityHeatEnable()
 
 void CCO2_View::OnBnClickedRadioHumidityHeatDisable()
 {
-    // TODO: Add your control notification handler code here
+    
     if(product_register_value[CO2_485_MODBUS_PASSWORD_ENABLE] != FALSE)
     {
         Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_485_MODBUS_HUM_SENSOR_HEATING,0,
@@ -2550,7 +2549,7 @@ void CCO2_View::OnLButtonDown(CPoint point)
 //void CCO2_View::OnBnDropDownDownbutton(NMHDR *pNMHDR, LRESULT *pResult)
 //{
 //	LPNMBCDROPDOWN pDropDown = reinterpret_cast<LPNMBCDROPDOWN>(pNMHDR);
-//	// TODO: Add your control notification handler code here
+//	
 //	*pResult = 0;
 //}
 

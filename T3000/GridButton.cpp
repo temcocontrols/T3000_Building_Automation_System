@@ -51,7 +51,7 @@ CSize CGridButton::GetPosition()const
 
 BOOL CGridButton::OnCommand(WPARAM wParam, LPARAM lParam)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	return CButton::OnCommand(wParam, lParam);
 }
@@ -60,5 +60,5 @@ void CGridButton::OnKillFocus(CWnd* pNewWnd)
 {
 	CButton::OnKillFocus(pNewWnd);
 
-	// TODO: Add your message handler code here
+	
 }

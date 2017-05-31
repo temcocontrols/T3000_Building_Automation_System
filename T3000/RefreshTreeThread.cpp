@@ -26,14 +26,14 @@ CRefreshTreeThread::~CRefreshTreeThread()
 
 BOOL CRefreshTreeThread::InitInstance()
 {
-	// TODO:  perform and per-thread initialization here
+	//   perform and per-thread initialization here
 
    return TRUE;
 }
 
 int CRefreshTreeThread::ExitInstance()
 {
-	// TODO:  perform any per-thread cleanup here
+	//   perform any per-thread cleanup here
 	return CWinThread::ExitInstance();
 }
 
@@ -54,7 +54,7 @@ void CRefreshTreeThread::OnRefreshTree(WPARAM wParam,LPARAM lParam)
 
 BOOL CRefreshTreeThread::OnIdle(LONG lCount)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 // #ifdef _DEBUG
 // 	TRACE("IDEL COUNT = %d \n", lCount);
 // #endif
@@ -68,6 +68,6 @@ void CRefreshTreeThread::SetMainWnd(CMainFrame* pMain)
 }
 int CRefreshTreeThread::Run()
 {
-	// TODO: Add your specialized code here and/or call the base class	
+		
 	return CWinThread::Run();
 }

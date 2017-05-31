@@ -91,7 +91,7 @@ BOOL CMyStatusbarCtrl::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	m_statusbar_hwnd = this->m_hWnd;
-	// TODO:  Add extra initialization here
+	
 	if (mystatusbarthread == NULL)
 	{
 		mystatusbarthread = CreateThread(NULL,NULL, MyStatusBarThread, this,NULL,NULL);
@@ -106,7 +106,7 @@ BOOL CMyStatusbarCtrl::OnInitDialog()
 
 BOOL CMyStatusbarCtrl::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -114,7 +114,7 @@ BOOL CMyStatusbarCtrl::PreTranslateMessage(MSG* pMsg)
 
 void CMyStatusbarCtrl::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 
 	CDialogEx::OnClose();
 }
@@ -122,7 +122,7 @@ void CMyStatusbarCtrl::OnClose()
 
 void CMyStatusbarCtrl::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	CDialogEx::OnCancel();
 }
@@ -485,7 +485,7 @@ void CMyStatusbarCtrl::DrawStatusBar(HDC my_hdc)
 void CMyStatusbarCtrl::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-	// TODO: Add your message handler code here
+	
 }
 
 LRESULT CMyStatusbarCtrl::ShowProgressText(WPARAM wParam, LPARAM lParam)

@@ -67,7 +67,7 @@ BOOL CWriteSingleRegDlg::OnInitDialog()
 
 void CWriteSingleRegDlg::OnBnClickedOk()
 {
-	// TODO: Add your control notification handler code here
+	
 	//CDialogEx::OnOK();
 	UpdateData(TRUE);
 	int ret=write_one(g_tstat_id,m_address,m_value);
@@ -97,6 +97,6 @@ void CWriteSingleRegDlg::OnBnClickedOk()
 void CWriteSingleRegDlg::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-	// TODO: Add your message handler code here
+	
 	// Do not call CDialogEx::OnPaint() for painting messages
 }

@@ -77,7 +77,7 @@ END_MESSAGE_MAP()
 
 BOOL CBacnetTool::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -131,7 +131,7 @@ BOOL CBacnetTool::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	
 
 	InitialTemcoLogo();
@@ -207,7 +207,7 @@ void CBacnetTool::InitialListView()
 
 void CBacnetTool::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	CDialogEx::OnCancel();
 }
@@ -332,7 +332,7 @@ void LocalIAmHandler_Tool(	uint8_t * service_request,	uint16_t service_len,	BACN
 
 void CBacnetTool::OnBnClickedButtonBacToolExit()
 {
-	// TODO: Add your control notification handler code here
+	
 	Send_WhoIs_Global(-1, -1);
 }
 
@@ -488,7 +488,7 @@ void Localhandler_read_property_ack_tool(
 
 void CBacnetTool::OnBnClickedButtonBacToolTest2()
 {
-	// TODO: Add your control notification handler code here
+	
 	CBacnetToolReadProperty Dlg;
 	Dlg.DoModal();
 	if(!read_property_cancel)

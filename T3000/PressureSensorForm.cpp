@@ -1342,7 +1342,7 @@ CString StrTemp;
 }
 LRESULT CPressureSensorForm::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if (message==FRESH_PRESSURE_SENSOR_BACK)
 	{
 	    Changing_Parter();
@@ -1365,7 +1365,7 @@ void CPressureSensorForm::OnDestroy()
 	hFirstThread=NULL;
 	CFormView::OnDestroy();
 
-	// TODO: Add your message handler code here
+	
 }
 
 
@@ -1625,7 +1625,7 @@ void CPressureSensorForm::OnEnKillfocusEditSensorMax()
 
 //BOOL CPressureSensorForm::PreTranslateMessage(MSG* pMsg)
 //{
-//	// TODO: Add your specialized code here and/or call the base class
+//	
 //     if (pMsg->)
 //     {
 //     }
@@ -1635,7 +1635,7 @@ void CPressureSensorForm::OnEnKillfocusEditSensorMax()
 
 //void CPressureSensorForm::OnHotKey(UINT nHotKeyId, UINT nKey1, UINT nKey2)
 //{
-//	// TODO: Add your message handler code here and/or call default
+//	 
 //
 //	CFormView::OnHotKey(nHotKeyId, nKey1, nKey2);
 //}

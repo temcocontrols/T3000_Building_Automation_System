@@ -294,7 +294,7 @@ void CAirflowSettingDlg::OnEnKillfocusEditPid2offsetpoint5()
 
 void CAirflowSettingDlg::OnBnClickedOk()
 {
-	// TODO: Add your control notification handler code here
+	
 	CDialogEx::OnOK();
 }
 

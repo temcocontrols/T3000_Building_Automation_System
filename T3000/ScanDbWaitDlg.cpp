@@ -52,13 +52,13 @@ void CScanDbWaitDlg::SetTStatScaner(CTStatScanner* pScanner)
 // CScanDbWaitDlg message handlers
 void CScanDbWaitDlg::OnBnClickedOk()
 {
-    // TODO: Add your control notification handler code here
+    
     //OnOK();
 }
 
 void CScanDbWaitDlg::OnBnClickedCancel()
 {
-    // TODO: Add your control notification handler code here
+    
     //OnCancel();
     ;
 }
@@ -66,7 +66,7 @@ void CScanDbWaitDlg::OnBnClickedCancel()
 
 void CScanDbWaitDlg::OnBnClickedExitbutton()
 {
-    // TODO: Add your control notification handler code here
+    
     g_bCancelScan=TRUE;
     m_pScaner->StopScan();
 
