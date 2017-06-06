@@ -67,8 +67,6 @@ namespace PH_App
                 // MessageBox.Show("chart condn=" + phChart.Enabled);
                 // phChart.Enabled = true; 
                 mc.RefreshByLoadingDataWhileLoad(sender, e, this);
-
-
                 }
             finally
             {
@@ -86,12 +84,10 @@ namespace PH_App
             //        //==This shows the contextmenustrip on right click
             //        CMSinsertNode.Enabled = true;
             //      CMSinsertNode.Show(MousePosition);//-- this mouse position is used to show the menustrip in mouse pointer
-
             //}
             // MessageBox.Show("VALUES ="+chartOprn.ToString());
             // MessageBox.Show("Ph chart" + phChart.Enabled);
             mc.Chart_MouseDown(sender, e,this, MousePosition);
-
         }
         double xCoord=0, yCoord=0;
         private void quickNodeInsertToolStripMenuItem_Click(object sender, EventArgs e)
@@ -117,7 +113,20 @@ namespace PH_App
         public void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             //var bo = new PH_App.BuildingOperation();
-            mc.DGVCellClick(sender, e, this, phChart);
+
+           // mc.DGVCellClick(sender, e, this, phChart);
+            //try
+            //{
+            //    this.Enabled = false;//optional, better target a panel or specific controls
+            //    this.UseWaitCursor = true;//from the Form/Window instance
+
+                mc.DGVCellClick(sender, e, this, phChart);
+            //}
+            //finally
+            //{
+            //    this.Enabled = true;//optional
+            //    this.UseWaitCursor = false;
+            //}
         }
 
         public void dataGridView1_SelectionChanged(object sender, EventArgs e)
@@ -181,19 +190,23 @@ namespace PH_App
                     var yVal =Math.Pow(10, (result.ChartArea.AxisY.PixelPositionToValue(pos.Y)));
                     xCoord = xVal;
                     yCoord = yVal;
-                   // tooltip.Show("X=" + xVal + ", Y=" + yVal, this.phChart,
-                   //              pos.X, pos.Y - 15);
+                    // tooltip.Show("X=" + xVal + ", Y=" + yVal, this.phChart,
+                    //  pos.X, pos.Y - 15);
+                    
                 }
             }
 
+            //mc.chart_MouseMove(sender, e, phChart, this, xCoord, yCoord);
+            mc.chart_MouseMove(sender, e, phChart, this);
 
-             mc.chart_MouseMove(sender, e, phChart,this);
+
 
         }
 
         private void phChart_MouseClick(object sender, MouseEventArgs e)
         {
             mc.chart_MouseClick(sender, e, phChart,this);
+           
         }
 
         private void clearChartToolStripMenuItem_Click(object sender, EventArgs e)
@@ -325,7 +338,6 @@ namespace PH_App
             {
                 TrashBox tb = new TrashBox(this);
                 tb.ShowDialog();
-
             }
             catch (Exception ex)
             {
@@ -357,6 +369,12 @@ namespace PH_App
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var frmsetting = new FormSetting();
+            frmsetting.ShowDialog();
         }
 
         public void RefreshChartListForTrashBoxRestore(Form_Main_PH_Application Fmain)

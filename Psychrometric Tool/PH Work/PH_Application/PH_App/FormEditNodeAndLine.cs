@@ -3105,6 +3105,7 @@ namespace PH_App
 
             else if ((e.RowIndex >= 0 && e.RowIndex < bcs.listLineInfoValues.Count) && e.ColumnIndex == 9)
             {
+                 /*   
                 string finalThickness = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[5].Value.ToString();
                // MessageBox.Show("Click");
                 //Convert.ToString is for handling null event
@@ -3117,7 +3118,7 @@ namespace PH_App
                 string lineName = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[1].Value.ToString();
                 int status = 0;//0 means dissable 1 means enabled
 
-               // DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9];
+                DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9];
 
                     //if(cbCell.Value.ToString()== "true")
                     //{
@@ -3127,7 +3128,7 @@ namespace PH_App
                     //    cbCell.Value = "true";
                     //}
                     
-                    if (Convert.ToBoolean(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9].Value))//cbCell.TrueValue) // .ToString() == "true"
+                    if (Convert.ToBoolean(cbCell.EditedFormattedValue))//.ToString()=="true")//cbCell.TrueValue) // .ToString() == "true"
                     {
                         status = 1;
                     }
@@ -3138,16 +3139,17 @@ namespace PH_App
                     // MessageBox.Show("Test click = " + cbCell.Value.ToString());
                     LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status);
                     RefreshChartAndDGVForMixNodeFunction();
+                    */
                 }
 
 
-            ////==Cell clicked function is triggered
+                ////==Cell clicked function is triggered
 
-            //if (e.RowIndex >= 0)
-            //{
-            //    DataGridViewRow row = dataGridView2.Rows[e.RowIndex];
-            //   // EnergyCalculationForProcess(row);//SELECTED ROW
-            //}
+                //if (e.RowIndex >= 0)
+                //{
+                //    DataGridViewRow row = dataGridView2.Rows[e.RowIndex];
+                //   // EnergyCalculationForProcess(row);//SELECTED ROW
+                //}
             }
             catch { }
         }
@@ -3164,6 +3166,51 @@ namespace PH_App
 
 
         }
+
+        private void dataGridView2_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            //--For the click event in data gridview 
+            try
+            {
+                /*
+                if(dataGridView2.DataSource == null)
+                {
+                    return;
+                }
+                //--Content click
+                if ((e.RowIndex >= 0 && e.RowIndex < bcs.listLineInfoValues.Count) && e.ColumnIndex == 9)
+                {
+                    string finalThickness = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[5].Value.ToString();
+                    // MessageBox.Show("Click");
+                    //Convert.ToString is for handling null event
+                    string lineid = Convert.ToString(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[0].Value.ToString());
+                    string prevNodeID = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[6].Value.ToString();
+                    string nextNodeID = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[7].Value.ToString();
+                    Color color = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[4].Style.BackColor;
+                    int thickness = int.Parse(finalThickness);//finalThickness
+                    Series s = new Series(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[8].Value.ToString());
+                    string lineName = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[1].Value.ToString();
+                    int status = 0;//0 means dissable 1 means enabled
+
+                    DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9];
+
+
+                    if (cbCell.EditedFormattedValue.ToString() == "true")//cbCell.TrueValue) // .ToString() == "true"
+                    {
+                        status = 1;
+                    }
+                    else
+                    {
+                        status = 0;
+                    }
+                    // MessageBox.Show("Test click = " + cbCell.Value.ToString());
+                    LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status);
+                }
+                */
+            }
+            catch { }
+        }
+
         private void dataGridView2_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             //--Cell end edit
@@ -3214,7 +3261,8 @@ namespace PH_App
                     int status = 0;//0 means dissable 1 means enabled
 
                     DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9];
-                    if (cbCell.Value.ToString() == "true")//cbCell.TrueValue
+                    //if (cbCell.Value.ToString() == "true")//cbCell.TrueValue
+                   if (cbCell.EditedFormattedValue.ToString() == "true")//cbCell.TrueValue
                     {
                         status = 1;
                     }
@@ -3231,33 +3279,7 @@ namespace PH_App
 
 
             }
-            else if ((e.RowIndex >= 0 && e.RowIndex < bcs.listLineInfoValues.Count) && e.ColumnIndex == 9)
-            {
-                //string finalThickness = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[5].Value.ToString();
-
-                ////Convert.ToString is for handling null event
-                //string lineid = Convert.ToString(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[0].Value.ToString());
-                //string prevNodeID = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[6].Value.ToString();
-                //string nextNodeID = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[7].Value.ToString();
-                //Color color = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[4].Style.BackColor;
-                //int thickness = int.Parse(finalThickness);//finalThickness
-                //Series s = new Series(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[8].Value.ToString());
-                //string lineName = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[1].Value.ToString();
-                //int status = 0;//0 means dissable 1 means enabled
-
-                //DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9];
-                //if (cbCell.Value == cbCell.TrueValue)
-                //{
-                //    status = 1;
-                //}
-                //else
-                //{
-                //    status = 0;
-                //}
-                //LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status);
-
-
-            }
+           
             else if ((e.RowIndex >= 0 && e.RowIndex < bcs.listLineInfoValues.Count) && e.ColumnIndex == 1)
             {
 
@@ -3353,45 +3375,47 @@ namespace PH_App
 
         private void dataGridView2_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            try { 
-            //--Content click
-            if ((e.RowIndex >= 0 && e.RowIndex < bcs.listLineInfoValues.Count) && e.ColumnIndex == 9)
+            //--Cell content click 
+            //if ((e.RowIndex >= 0 && e.RowIndex < bcs.listLineInfoValues.Count) && e.ColumnIndex == 9)
+            //{
+            //    dataGridView2.CommitEdit(DataGridViewDataErrorContexts.CurrentCellChange);
+            //}
+            try
             {
-                string finalThickness = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[5].Value.ToString();
-                // MessageBox.Show("Click");
-                //Convert.ToString is for handling null event
-                string lineid = Convert.ToString(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[0].Value.ToString());
-                string prevNodeID = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[6].Value.ToString();
-                string nextNodeID = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[7].Value.ToString();
-                Color color = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[4].Style.BackColor;
-                int thickness = int.Parse(finalThickness);//finalThickness
-                Series s = new Series(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[8].Value.ToString());
-                string lineName = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[1].Value.ToString();
-                int status = 0;//0 means dissable 1 means enabled
+                
+                //--Content click
+                if ((e.RowIndex >= 0 && e.RowIndex < bcs.listLineInfoValues.Count) && e.ColumnIndex == 9)
+                {
+                  
+                    string finalThickness = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[5].Value.ToString();
+                    // MessageBox.Show("Click");
+                    //Convert.ToString is for handling null event
+                    string lineid = Convert.ToString(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[0].Value.ToString());
+                    string prevNodeID = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[6].Value.ToString();
+                    string nextNodeID = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[7].Value.ToString();
+                    Color color = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[4].Style.BackColor;
+                    int thickness = int.Parse(finalThickness);//finalThickness
+                    Series s = new Series(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[8].Value.ToString());
+                    string lineName = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[1].Value.ToString();
+                    int status = 0;//0 means dissable 1 means enabled
 
-                DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9];
+                    DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9];
 
-                //if(cbCell.Value.ToString()== "true")
-                //{
-                //    cbCell.Value = "false";
-                //}else
-                //{
-                //    cbCell.Value = "true";
-                //}
-
-                //if (cbCell.Value.ToString() == "true")//cbCell.TrueValue) // .ToString() == "true"
-                //{
-                //    status = 1;
-                //}
-                //else
-                //{
-                //    status = 0;
-                //}
-                //// MessageBox.Show("Test click = " + cbCell.Value.ToString());
-                //LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status);
-            }
+                    if (Convert.ToBoolean(cbCell.EditedFormattedValue))//.ToString() == "true")//cbCell.TrueValue) // .ToString() == "true"
+                    {
+                        status = 1;
+                    }
+                    else
+                    {
+                        status = 0;
+                    }
+                    // MessageBox.Show("Test click = " + cbCell.Value.ToString());
+                    LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status);
+                   // */
+                }
             }
             catch { }
+
         }
         private void dataGridView2_DataError(object sender, DataGridViewDataErrorEventArgs e)
         {
@@ -3405,6 +3429,7 @@ namespace PH_App
                 //--Content click
                 if ((e.RowIndex >= 0 && e.RowIndex < bcs.listLineInfoValues.Count) && e.ColumnIndex == 9)
                 {
+                    /*
                     string finalThickness = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[5].Value.ToString();
                     // MessageBox.Show("Click");
                     //Convert.ToString is for handling null event
@@ -3427,16 +3452,18 @@ namespace PH_App
                     //    cbCell.Value = "true";
                     //}
 
-                    //if (cbCell.Value.ToString() == "true")//cbCell.TrueValue) // .ToString() == "true"
-                    //{
-                    //    status = 1;
-                    //}
-                    //else
-                    //{
-                    //    status = 0;
-                    //}
-                    //// MessageBox.Show("Test click = " + cbCell.Value.ToString());
-                    //LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status);
+                    if (cbCell.Value.ToString() == "true")//cbCell.TrueValue) // .ToString() == "true"
+                    {
+                        status = 1;
+                    }
+                    else
+                    {
+                        status = 0;
+                    }
+                    // MessageBox.Show("Test click = " + cbCell.Value.ToString());
+                    LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status);
+
+                    */
                 }
             }
             catch { }

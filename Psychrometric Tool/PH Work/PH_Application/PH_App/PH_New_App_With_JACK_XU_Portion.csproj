@@ -144,6 +144,12 @@
     <Compile Include="FormEditNodeAndLine.Designer.cs">
       <DependentUpon>FormEditNodeAndLine.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormSetting.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormSetting.Designer.cs">
+      <DependentUpon>FormSetting.cs</DependentUpon>
+    </Compile>
     <Compile Include="Form_Main_PH_Application.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -243,6 +249,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormEditNodeAndLine.resx">
       <DependentUpon>FormEditNodeAndLine.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormSetting.resx">
+      <DependentUpon>FormSetting.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form_Main_PH_Application.en-US.resx">
       <DependentUpon>Form_Main_PH_Application.cs</DependentUpon>

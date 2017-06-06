@@ -567,8 +567,7 @@ namespace PH_App
             {
                 string name = "ContourSeries" + i;
                 alSeries.Add(name);
-
-
+                
             }
 
             ChartFunctions cf = new ChartFunctions();
@@ -1016,9 +1015,10 @@ namespace PH_App
             }
 
         }
+        //public void chart_MouseMove(object sender, MouseEventArgs e, Chart chart1, Form_Main_PH_Application f1,double xCoordinate,double yCoordinate)
         public void chart_MouseMove(object sender, MouseEventArgs e, Chart chart1, Form_Main_PH_Application f1)
         {
-            //this part helps to get the x  and the y coordinate 
+            //this part helps to get the x  and the y coordinate
             //this coordinate finding is based on the plotting part of chart element type..
             var pos = e.Location;
             if (prevPosition.HasValue && pos == prevPosition.Value)
@@ -1030,8 +1030,8 @@ namespace PH_App
             {
                 if (result.ChartElementType == ChartElementType.PlottingArea)
                 {
-                    var xVal = result.ChartArea.AxisX.PixelPositionToValue(pos.X);
-                    var yVal = Math.Pow(10, result.ChartArea.AxisY.PixelPositionToValue(pos.Y));
+                    var xVal = result.ChartArea.AxisX.PixelPositionToValue(pos.X);//xCoordinate;//result.ChartArea.AxisX.PixelPositionToValue(pos.X);
+                    var yVal = Math.Pow(10, result.ChartArea.AxisY.PixelPositionToValue(pos.Y));//yCoordinate;//Math.Pow(10, result.ChartArea.AxisY.PixelPositionToValue(pos.Y));
 
                     // if((currentXAxis>=0 && currentXAxis<=50)&&(currentYAxis>=0 && currentYAxis <= 30)) { 
 
@@ -1051,111 +1051,24 @@ namespace PH_App
                          */
                         f1.lbEnthalpy.Text = Math.Round(xVal, 2).ToString();
                         f1.lbPressure.Text = Math.Round(yVal, 2).ToString();
+                        //=================Temperature parameter============//
+                        //var mth = new MathOperation();
+                        //double PressureConverted = yVal * 1000000;
+                        //double EnthalpyConverted = xVal / 1000;
+                        //if ((PressureConverted > 0.001*1000000 && PressureConverted < 100000000) && (EnthalpyConverted > 0.0001 && EnthalpyConverted < 3))
+                        //    f1.lbTemperature.Text = Math.Round((mth.IAPWS_IF97_TowParameterEquivalentFxn("T", "P", PressureConverted, "H", EnthalpyConverted, "water") - 273.15), 2).ToString();
+
+                        //================End of Temperature================//
                         //lb_humidity_ratio.Text = Math.Round(yVal, 2).ToString();
-
-                        //now lets move towards printing the relative humidity at that position and dew point and enthalpy also wbt
-                        //first Relative humidity...
-                        //first we need to see equation w = 622*phi*pg./(patm-phi*pg);
-                        /*
-                         we need to calc phi value given by ycord/30 as the max value is 30..
-                         * second pg which is calculated by temperature pulled from the text file we need to fist 
-                         * calculate the round up value of x coord to an integer...
-                         */
-
-                        //this part is not correct yet we need to do this again....
-                        /*
-                        double phi = 0.00000;
-                        //double y_axis = yVal;
-                        //now for pg..
-                        ArrayList temperature_value = new ArrayList();
-                        ArrayList pg_value_from_txtfile = new ArrayList();
-
-                        //--Copying the ref temp and humidity values..
-                        temperature_value = t;
-                        pg_value_from_txtfile = pg;
-
-                        double temperature = Math.Round(xVal);
-                        double corres_pg_value = 0.000000;
-                        for (int i = 0; i < temperature_value.Count; i++)
-                        {
-                            if (temperature == Double.Parse(temperature_value[i].ToString()))
-                            {
-                                corres_pg_value = Double.Parse(pg_value_from_txtfile[i].ToString());
-
-                                break;
-                            }
-                        }//close of for
-
-                        double patm = AirPressureFromDB * 0.001; // this is in terms of kpa //101.325;//this is constant... //101.325;//this is constant...
-                                                                 //Lets check the patm value
-                                                                 //  lb_test1.Text = "patm = " + patm;
-                        double w = yVal;
-                        phi = w * patm / (622 * corres_pg_value + w * corres_pg_value);//this phi gives the relative humidty..
-                        phi = phi * 100;//changing into percent..
-                                        //now display in label...
-                        lb_RH.Text = Math.Round(phi, 2).ToString();
-
-                        //lb_test1.Text = " Humidity = " + phi;
-
-                        //now lets calculate the dew point...
-                        double humidity = phi;
-                        double temperature1 = xVal;
-                        double TD = 243.04 * (Math.Log(humidity / 100) + ((17.625 * temperature1) / (243.04 + temperature1))) / (17.625 - Math.Log(humidity / 100) - ((17.625 * temperature1) / (243.04 + temperature1)));
-                        //now lets print this value..
-                        lb_DP.Text = Math.Round(TD, 2).ToString();
-
-
-                        //now lets move towards enthalpy...
-
-                        Patm = patm * 10;  // 1013;
-                        A = 6.116441;
-                        m = 7.591386;
-                        Tn = 240.7263;
-                        B = 621.9907;
-
-                        double Pws = A * Math.Pow(10, (m * TD) / (TD + Tn));
-
-                        double X = B * Pws / (Patm - Pws);   //This one is formula 
-
-                        h = temperature1 * (1.01 + (0.00189 * X)) + 2.5 * X; //This one is the enthalpy
-                        //now lets display this value ..
-                        lb_enthalpy.Text = Math.Round(h, 2).ToString();
-                        */
                     }
-
-
                 }//Closing of currentxval= 0-50 and 0-30 currentyval
             }
 
-            //if (flagForEditComfortZoneGraphically == 1)
-            //{
-
-            //    if (flagForBorderLineSelectedForMoveForEditCF == 1)
-            //    {
-            //        //--Perform redraw function 
-
-
-            //        CursorFunctionForComfortZoneEditMode(e);
-
-            //    }
-            //    else
-            //    {
-            //        //--IF edit comfort zone is enabled dont do other task just do the 
-            //        //Task of comfort zone only and let other task hault for now
-            //        ComfortZoneBorderLineDetectForEdit(e); // --This methods detects line movement
-            //    }
-
-
-
-
-            //}
-            //else
-            //{
 
             //--IF the line is selected/disconnected and then we need to connect to a node
             if (flagForDisconnectClick == 1)  //Disconnect is clicked then they talk
             {
-                f1.lbPrintTest.Text = "FlagForDisConnect=1";
+               // f1.lbPrintTest.Text = "FlagForDisConnect=1";
                 //--Creating temporary line..
                 //--then redraw it again...
                 addTemporarySeries(addDottedSeries, f1);
@@ -1166,10 +1079,7 @@ namespace PH_App
             }
             else
             {
-                //f1.lbPrintTest.Text = "FlagForDisConnect=0";
-                // lb_where.Text = "me : else line detect on";
-               // f1.disconnectLineToolStripMenuItem.Enabled = false;
-
+           
                 //--This one is for two side of line disconnection -------//
                 f1.disconnectLineFromAToolStripMenuItem.Enabled = false;
                 //disconnectLineFromBToolStripMenuItem.Enabled = false;
@@ -1180,14 +1090,10 @@ namespace PH_App
                 //---End of two side of line disconnection section
 
                 //--This is for the weather the line is moverover or not...
-                LineDetectOnMouseMove(e, f1.phChart, f1);
-
+                LineDetectOnMouseMove(e, chart1, f1);
                 //--Lets add a function for the process diagram drawing..
-
-                ProcessDiagramMouseMoveFunction(e, f1.phChart, f1);//--This does the adding and removing part             
+                ProcessDiagramMouseMoveFunction(e, chart1, f1);//--This does the adding and removing part             
             }
-
-            // }//close of else
 
         }//close of the main private void...
 
@@ -1315,7 +1221,6 @@ namespace PH_App
             }//--close of the if..
 
         }//close of the actual function...public void
-
         Color storeColor;
         int flagForColor = 0;
 
@@ -1416,26 +1321,26 @@ namespace PH_App
                     //Point position = e.Location;
                     double xValue =Math.Round(chart1.ChartAreas[0].AxisX.PixelPositionToValue(e.X),3);
                     double yValue = Math.Pow(10, chart1.ChartAreas[0].AxisY.PixelPositionToValue(e.Y));
-                    if ((xValue >= xAxisMinimum && xValue <= xAxisMaximum) && (yValue >= yAxisMinimum && yValue <= yAxisMaximum))
+                    if ((xValue > xAxisMinimum && xValue < xAxisMaximum) && (yValue > yAxisMinimum && yValue < yAxisMaximum))
                     {
 
                         xAxis1 = xValue;
                         yAxis1 = yValue;
                         //--ADJUSTING THE radius value for PH Chart...
-                        if(yAxis1 > 1 && yAxis1< 20)
+                        if(yAxis1 > 1 && yAxis1 < 20)
                         {
-                            radiusSize = 0.1;
+                            radiusSize = 0.20;
                         }else if (yAxis1 >= 20)
                         {
                             radiusSize = 2;
                         }
                         else
                         {
-                            radiusSize = 0.025;
+                            radiusSize = 0.01;
                         }
                         //Console.Write("xval = " + xValue + "yvalue = " + yValue);
-                        if (listNodeInfoValues.Count > 0)
-                        {
+                        //if (listNodeInfoValues.Count > 0)
+                        //{
                             //foreach(var values in menuStripNodeInfoValues)
 
 
@@ -1460,11 +1365,12 @@ namespace PH_App
                                             FlagForNodeDelete = 1;//flag is ready on Node selected
                                             nodeID_ForDeletingNode = idSelected;
                                             f1.deleteNodeToolStripMenuItem.Enabled = true; //Turn on the delete buttton
-                                                                                           //=============end of flag for deleting===========//
-                                        }
+                                       readyForMouseClick = 1;//enable on click event     
+                                     //=============end of flag for deleting===========//
+                                     }
                                         //this.Cursor = Cursors.Hand;
                                         //now this works so lets move forward.
-                                        readyForMouseClick = 1;//enable on click event
+                                       
                                     
                                         break;//this break is for if found the value no longer loop increases the perfomances..
                                     }
@@ -1486,54 +1392,8 @@ namespace PH_App
                                     }
                                     //--Lets filter out the mix nodes---
 
-                               // }//Close of if section Mix section
-
-                                //==This one is special case for mix node only
-                                //else if (listNodeInfoValues[i].temperature_source == "Mix")
-                                //{
-                                //    if ((xValue > listNodeInfoValues[i].xVal - radiusSize && xValue < listNodeInfoValues[i].xVal + radiusSize) && (yValue > listNodeInfoValues[i].yVal - radiusSize && yValue < listNodeInfoValues[i].yVal + radiusSize))
-                                //    {
-
-                                //        //--This is changed from int to string  code bbk305
-                                //        idSelected = listNodeInfoValues[i].ID; //Now this is a string 
-                                //        tempIndexForNode = i;//This is for finding other values with searching for this we need index
-                                //        if (f1.Cursor != Cursors.Cross)
-                                //        {
-                                //            f1.Cursor = Cursors.Hand;
-                                //            //====This flag is for deleting the node===========//
-
-                                //            FlagForNodeDelete = 1;//flag is ready on Node selected
-                                //            nodeID_ForDeletingNode = idSelected;
-                                //            f1.deleteNodeToolStripMenuItem.Enabled = true; //Turn on the delete buttton
-                                //                                                           //=============end of flag for deleting===========//
-                                //        }
-                                //        //this.Cursor = Cursors.Hand;
-                                //        //now this works so lets move forward.
-                                //        //===This should be dissabled
-                                //        // readyForMouseClick = 1;//enable on click event
-
-
-                                //        break;//this break is for if found the value no longer loop increases the perfomances..
-                                //    }
-                                //    else
-                                //    {
-                                //        if (f1.Cursor != Cursors.Cross)
-                                //        {
-                                //            f1.Cursor = Cursors.Arrow;
-                                //            /// readyForMouseClick = 0;//dissable on click event.
-
-                                //            //====This flag is for deleting the node===========//
-
-                                //            FlagForNodeDelete = 0;//flag is ready OFF , Node NOT SELECTED
-                                //            f1.deleteNodeToolStripMenuItem.Enabled = false;//Turn of the delet button
-                                //            //nodeID_ForDeletingNode = idSelected;
-                                //            //=============end of flag for deleting===========//
-
-                                //        }
-                                //    }
-                                //}
                             }//Close of for loop
-                        }//close of if menuStripAllValue>0
+                       // }//close of if menuStripAllValue>0
 
 
                         if (mouseClickAction == 1)
@@ -2030,7 +1890,6 @@ namespace PH_App
         public void NodeSelectionAndRelease(MouseEventArgs e, Chart chart1, Form_Main_PH_Application f1)
         {//this is used to select the partciular id values..
 
-
             if (readyForMouseClick == 1)
             {
 
@@ -2408,13 +2267,16 @@ namespace PH_App
         /// for both node and line, used while handling OutofRange exception
         /// </summary>
         int flagDontEraseSeries = 0; //0ff  
-         
+        /// <summary>
+        /// a locker for locking execution of a code
+        /// </summary>
+        //object locker = new object();
         public void ReDrawingLineAndNode(Chart chart1)
         {
 
             try
             {
-                lock(this) //(this)
+                lock(this)//(locker) //(this) //Change this => locker later 
                 {
                     if (listNodeInfoValues.Count > 0)
                     {
@@ -2456,9 +2318,7 @@ namespace PH_App
                         for (int x = 0; x < listNodeInfoValues.Count; x++)
                         {
                             string labelValue;
-
                             labelValue = listNodeInfoValues[x].name;
-
                             //--Redefined code bbk305
                            ReDrawPoints(chart1, series1, listNodeInfoValues[x].xVal, listNodeInfoValues[x].yVal, listNodeInfoValues[x].colorValue, listNodeInfoValues[x].temperature_source, listNodeInfoValues[x].pressure_source, listNodeInfoValues[x].name, labelValue, listNodeInfoValues[x].marker_Size);
                            // ReDrawPoints(chart1, copySeries, listNodeInfoValues[x].xVal, listNodeInfoValues[x].yVal, listNodeInfoValues[x].colorValue, listNodeInfoValues[x].temperature_source, listNodeInfoValues[x].pressure_source, listNodeInfoValues[x].name, labelValue, listNodeInfoValues[x].marker_Size);
@@ -2466,7 +2326,6 @@ namespace PH_App
                             //--incrementIndex++;
                             //AA
                             indexForSeriesNodePoint++;
-
                         }
                         //if (chart1.InvokeRequired)
                         //{
@@ -2477,8 +2336,7 @@ namespace PH_App
                         //        chart1.Invoke(new Action(() => series1 = copySeries));
                         //        chart1.Invoke(new Action(() => chart1.Series.RemoveAt(chart1.Series.IndexOf(newLineSeries.Name))));
                         //        chart1.Invoke(new Action(() => chart1.Series.Add(series1)));
-                        //    }
-                            
+                        //    }                            
                         //}
                         //else
                         //{
@@ -2489,8 +2347,7 @@ namespace PH_App
                         //        //--This  means the series is present....
                         //       chart1.Series.RemoveAt(chart1.Series.IndexOf(newLineSeries.Name));
                         //        chart1.Series.Add(series1);
-                        //    }
-                            
+                        //    }                            
                         //}
                         //--resetting incrementIndex
                         if (listLineInfoValues.Count > 0)
@@ -2543,7 +2400,7 @@ namespace PH_App
                 if (s1.Points.Count >= indexForSeriesNodePoint && indexForSeriesNodePoint <listNodeInfoValues.Count) //For removing out of range exception
                 {
                     //Console.WriteLine("indexForSeriesNodePoint =" + indexForSeriesNodePoint);
-
+                    /*
                     chart1.Invoke(new Action(() => s1.ChartType = SeriesChartType.Point));
                     chart1.Invoke(new Action(() => s1.MarkerSize = marker_size_value));//= 20;
                     chart1.Invoke(new Action(() => s1.MarkerStyle = MarkerStyle.Circle));
@@ -2556,8 +2413,21 @@ namespace PH_App
                     //chart1.Invoke(new Action(() => s1.Points[indexForSeriesNodePoint].Color = c));
                     chart1.Invoke(new Action(() => s1.Points[indexForSeriesNodePoint].MarkerSize = marker_size_value));
                     //--This one is for storing the series
-                    // chart1.Invoke(new Action(() => listNodeSeriesPlotted.Add(s1.Name)));
-                    // indexForSeriesNodePoint++;
+                    //--chart1.Invoke(new Action(() => listNodeSeriesPlotted.Add(s1.Name)));
+
+                    */
+                    chart1.Invoke((MethodInvoker)delegate {
+                        s1.ChartType = SeriesChartType.Point;
+                        s1.MarkerSize = marker_size_value;
+                        s1.MarkerStyle = MarkerStyle.Circle;
+                        s1.Points.AddXY(x, y);
+                        s1.Points[indexForSeriesNodePoint].ToolTip = s;
+                        s1.Points[indexForSeriesNodePoint].Label = labelValueText;
+                        s1.Points[indexForSeriesNodePoint].Color = c;
+                        s1.Points[indexForSeriesNodePoint].MarkerStyle = MarkerStyle.Circle;
+                        s1.Points[indexForSeriesNodePoint].MarkerSize = marker_size_value;
+                    });
+
 
                 }
             }
@@ -2584,21 +2454,21 @@ namespace PH_App
             //  }//--Close of lock 
 
         } //Close of redraw point 
+
         List<DataTypeForNode> temporaryNodeValueStoreForRedrawLine = new List<DataTypeForNode>();
         //--Redraw line function
         public void ReDrawLines(Chart chart1,string id, string prevNodeID, string nextNodeID, Series lineSeriesID, Color c, int thickness_value, string name, int status)
         {
             // lock (this) { 
-
             // if (incrementIndex > 0)
             //  if(indexForSeriesNodePoint>0) //This index is resetted later
             //   {
             temporaryNodeValueStoreForRedrawLine.Clear();//Clearing the values of the list
-                                                         // MessageBox.Show("ReDrawLines FRIST LINE");
-
+            // MessageBox.Show("ReDrawLines FRIST LINE");
 
             if (chart1.InvokeRequired)
             {
+                /*
                 //now lets plot lines between tow points...
                 chart1.Invoke(new Action(() => newLineSeries = lineSeriesID));//new Series("LineSeries" + incrementIndex); //lineSeriesID; 
 
@@ -2622,6 +2492,30 @@ namespace PH_App
                 }
                 //newSeries.ToolTip = 
                 chart1.Invoke(new Action(() => newLineSeries.Color = c));
+
+               */
+
+                chart1.Invoke((MethodInvoker)delegate {
+
+                    newLineSeries = lineSeriesID;//new Series("LineSeries" + incrementIndex); //lineSeriesID; 
+                    if (chart1.Series.IndexOf(newLineSeries.Name) != -1)
+                    {
+                        chart1.Series.RemoveAt(chart1.Series.IndexOf(newLineSeries.Name));
+                    }
+                    newLineSeries.MarkerSize = 1;
+                    newLineSeries.ChartType = SeriesChartType.Line;
+                    if (thickness_value <= 0)
+                    {
+                        newLineSeries.BorderWidth = 3;
+                    }
+                    else
+                    {
+                        newLineSeries.BorderWidth = thickness_value;//This is the thickness of lines
+                    }
+                    newLineSeries.Color = c;
+
+                });
+
             }
             else
             {
@@ -2740,6 +2634,7 @@ namespace PH_App
                 //*/
                if (chart1.InvokeRequired)
                 {
+                    /*
 
                     chart1.Invoke(new Action(() => newLineSeries.ToolTip = tooltipString));
                     //newSeries.MarkerStyle = MarkerStyle.Circle;
@@ -2758,6 +2653,23 @@ namespace PH_App
                     }
 
                     chart1.Invoke(new Action(() => chart1.Series.Add(newLineSeries)));
+                    */
+
+                    chart1.Invoke((MethodInvoker)delegate {
+                        newLineSeries.ToolTip = tooltipString;
+                        newLineSeries.Points.Add(new DataPoint(temporaryNodeValueStoreForRedrawLine[0].xVal, temporaryNodeValueStoreForRedrawLine[0].yVal));   //for prevnodeid
+                        double mid_point_XValue = (temporaryNodeValueStoreForRedrawLine[0].xVal + temporaryNodeValueStoreForRedrawLine[1].xVal) / 2;
+                        double mid_point_YValue = Math.Sqrt(temporaryNodeValueStoreForRedrawLine[0].yVal * temporaryNodeValueStoreForRedrawLine[1].yVal);// / r;//10;
+                        newLineSeries.Points.Add(new DataPoint(mid_point_XValue, mid_point_YValue));   //Middle point for plotting the Label
+
+                        newLineSeries.Points.Add(new DataPoint(temporaryNodeValueStoreForRedrawLine[1].xVal, temporaryNodeValueStoreForRedrawLine[1].yVal));   //for nextnodeid
+                        if (status == 1)
+                        {
+                            //Then show the label in the chart
+                            newLineSeries.Points[1].Label = name;
+                        }
+                        chart1.Series.Add(newLineSeries);
+                    });
 
                 }
                 else
@@ -2773,7 +2685,7 @@ namespace PH_App
                      * then again calculage log value
                      */
                     //double mid_point_YValue = Math.Log((Math.Pow(10, temporaryNodeValueStoreForRedrawLine[0].yVal) + Math.Pow(10, temporaryNodeValueStoreForRedrawLine[1].yVal)) / 2);
-                    // double r = Math.Sqrt(temporaryNodeValueStoreForRedrawLine[0].yVal + temporaryNodeValueStoreForRedrawLine[1].yVal);
+                    //double r = Math.Sqrt(temporaryNodeValueStoreForRedrawLine[0].yVal + temporaryNodeValueStoreForRedrawLine[1].yVal);
 
                     //Gemetric mean is calculated because the y axis is in lograthmic value which is geometric progression
                     double mid_point_YValue = Math.Sqrt(temporaryNodeValueStoreForRedrawLine[0].yVal * temporaryNodeValueStoreForRedrawLine[1].yVal);// / r;//10;
@@ -2789,13 +2701,14 @@ namespace PH_App
                 }
 
                  //temporaryNodeValueStoreForRedrawLine.Clear();//--Lets reset the value CODE:BBK305A
-
                 //}  //close of if incrementindex
-
-
             }//close of temporary node value
-
             // }//--Close of LOCK
+        }
+
+        public void methodForRedrawing(string s,string s2)
+        {
+
         }
 
         public int IndexOfPreviousNodeForLineFunction()
@@ -2935,7 +2848,6 @@ namespace PH_App
                 lineThickness = 3, //default thickness is 3
                 name = lineNameVal,
                 status = lineStatusVal
-
             });
 
 
@@ -2976,7 +2888,6 @@ namespace PH_App
             else
             {
                 MessageBox.Show("Please select a proper region");
-
             }
 
         }//Close of SetNode
@@ -2993,7 +2904,6 @@ namespace PH_App
 
             series1.ChartType = SeriesChartType.Point;
             //int r, g, b;
-
             //series1.MarkerSize = 20;
             //series1.MarkerStyle = MarkerStyle.Circle;
             //series1.Points.AddXY(xval, yval);
@@ -3121,9 +3031,7 @@ namespace PH_App
                     lineThickness = 3, //default thickness is 3
                     name = lineNameVal,
                     status = lineStatusVal
-
                 });
-
 
                 //--Adding to db
                 if (flagForInsertOrUpdateDataToDB == 1)
@@ -3132,7 +3040,6 @@ namespace PH_App
                     //--Insert the values when the flag is raised.
                     //InsertLineInfoToDB(unique_id_for_line, menuStripNodeInfoValues[index - 1].id, menuStripNodeInfoValues[index].id, menuStripNodeInfoValues[index - 1].colorValue, newLineSeries, menuStripNodeLineInfoValues[index - 1].lineThickness);
                     // InsertLineInfoToDB(unique_id_for_line, menuStripNodeInfoValues[index - 1].id, menuStripNodeInfoValues[index].id, menuStripNodeInfoValues[index - 1].colorValue, newLineSeries,3);
-
                     InsertLineInfoToDB(unique_id_for_line, listNodeInfoValues[countNumberOfNodes - 1].ID, listNodeInfoValues[countNumberOfNodes].ID, listNodeInfoValues[countNumberOfNodes].colorValue, newLineSeries.Name.ToString(), linethickness, chartDetailList[indexForWhichChartIsSelected].chart_respective_lineID, lineNameVal, lineStatusVal);
                 }
 
@@ -3550,8 +3457,6 @@ namespace PH_App
                         //contextMenuStrip1.Show(dataGridView1.PointToScreen(e.Location));
                     }
                 }
-
-
             }
         }
         public void DGVCellClick(object sender, DataGridViewCellEventArgs e, Form_Main_PH_Application f, System.Windows.Forms.DataVisualization.Charting.Chart chart1)
@@ -3587,7 +3492,6 @@ namespace PH_App
                 //--IFno chart is present thMMen make edit mode on
                 FlagForLockUnlock = 1;//   This means edit mode ON 
                 LockAndUnlock(f);//This method will make things lock
-
                 return;
             }
 
@@ -3623,7 +3527,7 @@ namespace PH_App
                             //--This flag is for OFFLINE mode Or ONLINE mode
                             //--Now you are going to turn OFF the offline mode and go into realtime mode
                             FlagForCntdBG_Update = 1;//currently in realtime mode so 1
-
+                                                                                                                            
                             //--also make the radio button to be OFF and other to be ON
                             // rb_OFF.Checked = true;
 
@@ -3647,11 +3551,11 @@ namespace PH_App
 
                             flagForInsertOrUpdateDataToDB = 1;
                             flagDontEraseSeries = 0; //this flag is for not updating 
-                                                     //--This is also completed..
-                                                     //var ch = new ChartOperation();
-                                                     //--This needs to be removed or somethings 
-                                                     //var ch = new ChartCreationAndOperations();
-                                                     // MessageBox.Show("Near RedrawingNodeAandLine(),\n node count"+listNodeInfoValues.Count +",line count"+listLineInfoValues.Count);
+                             //--This is also completed..
+                             //var ch = new ChartOperation();
+                             //--This needs to be removed or somethings 
+                             //var ch = new ChartCreationAndOperations();
+                             // MessageBox.Show("Near RedrawingNodeAandLine(),\n node count"+listNodeInfoValues.Count +",line count"+listLineInfoValues.Count);
                             ReDrawingLineAndNode(chart1);  //Done checking bbk modif: changing to alex db 
 
 
@@ -3661,9 +3565,7 @@ namespace PH_App
                             //==============This part is for comfort zone=====================
 
                             //====================end of comfort zone=========================
-
                             //---Here we are going to call scan hardware function ----------------//
-
                             //StartHardwareScan();
                             //---End of call for scan hardware-----------------------------------//
 
@@ -3686,7 +3588,6 @@ namespace PH_App
                 {
                     flagForInsertOrUpdateDataToDB = 0; //==insert or update OFF
                 }
-
 
                 //This is for cell formating and editing...
                 //  if (dataGridView1.CurrentCell.ColumnIndex >= 0) { 
@@ -3712,7 +3613,6 @@ namespace PH_App
                     // chart1.Enabled = false;//should be dissabled 
                     //If the chart is in online mode then only do updating task
                     //--***********************Uncomment later********************//
-
 
                       InitTimerForDevice(); //uncomment later
 
@@ -4268,7 +4168,7 @@ namespace PH_App
                 f1.dataGridView1.Rows.Clear();//--This one is for clearing the data
                 f1.dataGridView1.Refresh();//--Release the previously selectecd items
                 f1.dataGridView1.Rows.Add();
-                //   MessageBox.Show("Reached before refreshGraph() and after datagv ref");
+                //MessageBox.Show("Reached before refreshGraph() and after datagv ref");
                 DataGridView_Show_Data(f1);
 
                 //If there is no rows in datagridview...
