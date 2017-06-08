@@ -33,10 +33,8 @@ namespace PH_App
             }
             catch { }
 
-            return BACnetClass.DevicesList;
-                
+            return BACnetClass.DevicesList;                
         }
-
 
         //========================================Device return value of the and id of the selected ====================//
  
@@ -55,7 +53,6 @@ namespace PH_App
 
         //========================================End of the device retrun....=========================================//
 
-        
-
+       
     }
 }

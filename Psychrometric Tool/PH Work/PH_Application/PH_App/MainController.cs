@@ -28,7 +28,7 @@ namespace PH_App
         }
       
         
-        public void LoadForPH(string fluidName, Form_Main_PH_Application f)
+        public void LoadForPH(string fluidName, Form_Main_PH_Application f,double Xmin,double Xmax,double Ymin,double Ymax)
         {
             string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
 
@@ -48,7 +48,8 @@ namespace PH_App
             //--Plotting of the chart Here --------//
             string fluidNAME = fluidName;//"Water";//"1-Butene"; // "Water";//"n-Propane";//Acetone//Ammonia//Krypton//Nitrogen //Note for Air not working //Argon//CarbonDioxide// not working p-Xylene//R134a
             //var ch = new ChartCreationAndOperations();
-            PlotPHChart(fluidNAME, f.phChart);
+            f.lbFluidName.Text = "Fluid Name: " + fluidName;
+            PlotPHChart(fluidNAME, f.phChart,Xmin,Xmax,Ymin,Ymax);
 
             //--End of the plotting chart here-----//
             //--Other task here
@@ -245,7 +246,7 @@ namespace PH_App
         public double[,] T_Value = new double[300, 300];
         public double[,] H_Value = new double[300, 300];
 
-        public void PlotPHChart(string fluidName, Chart phChart)
+        public void PlotPHChart(string fluidName, Chart phChart,double Xmin,double Xmax,double Ymin,double Ymax)
         {
 
             MathOperation PH = new MathOperation();
@@ -259,7 +260,7 @@ namespace PH_App
             // var stopWatch = System.Diagnostics.Stopwatch.StartNew();
 
             //double[] press_rng = PH.LogSpace(-2, 2, 300,true,10).ToArray();
-            double[] press_rng = PH.LogSpace(-3, 2, 300, true, 10).ToArray();// initially it was form -2,2,300 //-4,4,300 is not supported by coolprop
+            double[] press_rng = PH.LogSpace(-2, 2, 300, true, 10).ToArray();// initially it was form -2,2,300 //-4,4,300 is not supported by coolprop
             //--For line spacing values
             //2. temp_rng = 273.15+linspace(1,800,300); 
             //double[] temp_rng =  PH.LinSpace(1, 800, 300, true).ToArray();
@@ -427,15 +428,15 @@ namespace PH_App
              */
 
             phChart.Series.Clear();
-            phChart.ChartAreas[0].AxisX.Minimum = 1 / 1000; //--This was 1/1000
-            phChart.ChartAreas[0].AxisX.Maximum = 4000; //4000;
+            phChart.ChartAreas[0].AxisX.Minimum = Xmin; //1 / 1000; //--This was 1/1000
+            phChart.ChartAreas[0].AxisX.Maximum = Xmax;//4000; //4000;
             phChart.ChartAreas[0].AxisX.Interval = 500;
 
-            phChart.ChartAreas[0].AxisY.Minimum = 0.01; //--This was 0.001
+            phChart.ChartAreas[0].AxisY.Minimum = Ymin; //0.01; //--This was 0.001
             phChart.ChartAreas[0].AxisY.IsLogarithmic = true;
             phChart.ChartAreas[0].AxisY.LogarithmBase = 10;
             phChart.ChartAreas[0].AxisY.Interval = 1;
-            // phChart.ChartAreas[0].AxisY.Maximum = 50;
+            phChart.ChartAreas[0].AxisY.Maximum = Ymax; //50;
 
             //--this one is for [hLsat;hLcrit],[psat;pcrit],'b', ...
             // ph_chart.ChartAreas[0].AxisX.Minimum =
@@ -453,7 +454,7 @@ namespace PH_App
             phChart.Series["Series01"].Font = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold);
             //phChart.Series["Series01"].Font.
 
-            // /*
+             /*
             phChart.Series["Series01"].Points[12].Label = "S";
             phChart.Series["Series01"].Points[15].Label = "a";
             phChart.Series["Series01"].Points[18].Label = "t";
@@ -472,7 +473,7 @@ namespace PH_App
             phChart.Series["Series01"].Points[75].Label = "i";
             phChart.Series["Series01"].Points[80].Label = "d";
 
-            // */
+             */
 
 
             phChart.Series["Series01"].ChartArea = "ChartArea1";
@@ -490,7 +491,7 @@ namespace PH_App
             phChart.Series["Series2"].Font = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold);
             // phChart.Series["Series2"].Points[12].Label = $"Saturation Vapour";
 
-            // /*
+             /*
             phChart.Series["Series2"].Points[12].Label = "S";
             phChart.Series["Series2"].Points[15].Label = "a";
             phChart.Series["Series2"].Points[18].Label = "t";
@@ -508,7 +509,7 @@ namespace PH_App
             phChart.Series["Series2"].Points[67].Label = "o";
             phChart.Series["Series2"].Points[74].Label = "u";
             phChart.Series["Series2"].Points[80].Label = "r";
-            // */
+             */
 
             phChart.Series["Series2"].ChartArea = "ChartArea1";
 
@@ -546,7 +547,7 @@ namespace PH_App
 
                 phChart.Series["Series4" + i].Color = Color.Green;
                 phChart.Series["Series4" + i].Points[12].Label = $"{(i + 1) * 10} %";//initially no. 12
-                phChart.Series["Series4" + i].Font = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold);
+                phChart.Series["Series4" + i].Font = new Font(FontFamily.GenericSansSerif, 10, FontStyle.Bold);
 
                 phChart.Series["Series4" + i].ChartArea = "ChartArea1";
 
@@ -586,7 +587,7 @@ namespace PH_App
              27 gives 19 lines
              13 gives 8 lines
              */
-            dc.numberContours = 35;
+            dc.numberContours = 25;//35;
 
             List<DrawChart.DataTypeForPointList> listPoints = new List<DrawChart.DataTypeForPointList>();
             listPoints = dc.AddContour_MyCustomFxn(ds);
@@ -617,6 +618,8 @@ namespace PH_App
                 Series s1 = new Series(seriesName);
                 //s1.MarkerSize = 15;//--This does not work so
                 s1.ChartType = SeriesChartType.Line;
+                //s1.MarkerSize = 1;
+                s1.BorderWidth = 2;
                 phChart.Series.Add(s1);
                 //phChart.Series.Add(seriesName);
                 //phChart.Series[seriesName].ChartType = SeriesChartType.Line;
@@ -637,16 +640,15 @@ namespace PH_App
 
                         dataPointCounter++;
 
-
                         // /*
                         //===========Temperature indicator================//
+                        /*
                         if (flagSingleTemperatureIndicator == 1 && dataPointCounter > (listPoints[z].zlevel) && (listPoints[z].x1 > 200 && listPoints[z].x1 < 2500))//(flagSingleTemperatureIndicator == 1 && zlevelValueForTempIndicator == listPoints[z].zlevel) //(listPoints[z].x1 == 2000)
                         {
                             double temperature = PH.IAPWS_IF97_TowParameterEquivalentFxn("T", "H", listPoints[z].x1 * 1000, "P", listPoints[z].y1 * 1000000, fluidName); //--This multiply is done to convert MPa to Pa and enthlapy is divided to convert J/kg to kJ/Kg
                             phChart.Series[seriesName1].Points.AddXY(listPoints[z].x1, listPoints[z].y1);
                             phChart.Series[seriesName1].Points[ind++].Label = $"{Math.Round(temperature - 273.15, 0)}°C";
                             flagSingleTemperatureIndicator = 0;//off
-
                             dataPointCounter = 0;
                         }
 
@@ -656,16 +658,14 @@ namespace PH_App
                             ////zlevelValueForTempIndicator = listPoints[z].zlevel;
                         }
                         zlevelValueForTempIndicator = listPoints[z].zlevel;
+                        */
                         //===========Temper indiactor end==============//
                         // */
-
-
                     }
                     else
                     {
                         initialZ = listPoints[z].zlevel;
                         initalIndex = z;
-
                         //flagSingleTemperatureIndicator = 1;//on
                         break;
                     }
@@ -786,7 +786,6 @@ namespace PH_App
             phChart.Series[lineCycle4].Points.AddXY((enthalpy4 + enthalpy1) / 2, (P4 + P1) / 2);
             phChart.Series[lineCycle4].Points.AddXY(enthalpy1, P1);
             phChart.Series[lineCycle4].Points[1].Label = "Evaporator";
-
 
           */
             //=================================End regregration cycle=====================//
@@ -1052,10 +1051,11 @@ namespace PH_App
                         f1.lbEnthalpy.Text = Math.Round(xVal, 2).ToString();
                         f1.lbPressure.Text = Math.Round(yVal, 2).ToString();
                         //=================Temperature parameter============//
+
                         //var mth = new MathOperation();
                         //double PressureConverted = yVal * 1000000;
                         //double EnthalpyConverted = xVal / 1000;
-                        //if ((PressureConverted > 0.001*1000000 && PressureConverted < 100000000) && (EnthalpyConverted > 0.0001 && EnthalpyConverted < 3))
+                        //if ((PressureConverted > 0.001 * 1000000 && PressureConverted < 100000000) && (EnthalpyConverted > 0.0001 && EnthalpyConverted < 3))
                         //    f1.lbTemperature.Text = Math.Round((mth.IAPWS_IF97_TowParameterEquivalentFxn("T", "P", PressureConverted, "H", EnthalpyConverted, "water") - 273.15), 2).ToString();
 
                         //================End of Temperature================//
@@ -4732,8 +4732,6 @@ namespace PH_App
                     //For go to statement
                     ///==========================================end of second parameter value==============================//
 
-
-
                     Finish:
                     double z = 0;//no use for go to statement cant go before  } so 
                 }  //Close of foreach now lets plot the values..
@@ -4973,8 +4971,6 @@ namespace PH_App
         }
         private void fillDataGridView(TrashBox f1)
         {
-
-
             int xCount = 0;
             if (chartDetailListForDissabledValue.Count > 0)
             {

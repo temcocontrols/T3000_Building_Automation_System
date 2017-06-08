@@ -78,6 +78,7 @@
             this.trashBoxToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gridViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.excelExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpPsychometricChartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.CMSinsertNode = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -97,7 +98,7 @@
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.lbFluidName = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.phChart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox4ttt.SuspendLayout();
@@ -421,6 +422,12 @@
             resources.ApplyResources(this.excelExportToolStripMenuItem, "excelExportToolStripMenuItem");
             this.excelExportToolStripMenuItem.Click += new System.EventHandler(this.excelExportToolStripMenuItem_Click);
             // 
+            // settingsToolStripMenuItem
+            // 
+            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            resources.ApplyResources(this.settingsToolStripMenuItem, "settingsToolStripMenuItem");
+            this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
+            // 
             // helpToolStripMenuItem
             // 
             this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -538,16 +545,16 @@
             resources.ApplyResources(this.loadTemplateToolStripMenuItem, "loadTemplateToolStripMenuItem");
             this.loadTemplateToolStripMenuItem.Click += new System.EventHandler(this.loadTemplateToolStripMenuItem_Click);
             // 
-            // settingsToolStripMenuItem
+            // lbFluidName
             // 
-            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            resources.ApplyResources(this.settingsToolStripMenuItem, "settingsToolStripMenuItem");
-            this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
+            resources.ApplyResources(this.lbFluidName, "lbFluidName");
+            this.lbFluidName.Name = "lbFluidName";
             // 
             // Form_Main_PH_Application
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.lbFluidName);
             this.Controls.Add(this.pb_lock_unlock);
             this.Controls.Add(this.lb_unit_chosen_display);
             this.Controls.Add(this.menuStrip1);
@@ -640,5 +647,6 @@
         public System.Windows.Forms.SaveFileDialog saveFD;
         public System.Windows.Forms.Label lbTest2;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
+        public System.Windows.Forms.Label lbFluidName;
     }
 }

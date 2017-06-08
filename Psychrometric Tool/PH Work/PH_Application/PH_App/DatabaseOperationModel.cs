@@ -85,6 +85,48 @@ namespace PH_App
             return versionValue;
         }
 
+        public class fluidProperty
+        {
+           public int selected { get; set; }
+           public string fluidName { get; set; }
+         public    double Xmin { get; set; }
+            public double Xmax { get; set; }
+            public double Ymin { get; set; }
+            public double Ymax { get; set; }
+        }
+        public List<fluidProperty> fluidInfo = new List<fluidProperty>();
+
+        public void PullDataOfFluidInfo(string buildingName)
+        {
+            fluidInfo.Clear();
+            string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
+            //--now lets create the tables
+            using (SQLiteConnection m_dbConnection = new SQLiteConnection($"Data Source={databaseFile};Version=3;"))
+            {
+                m_dbConnection.Open();
+                string slqFluid = "Select * from tbl_" + buildingName + "_FluidInfo where selected='1'";
+
+              //  bool fluidPresent = false;
+                SQLiteCommand cmdFluid = new SQLiteCommand(slqFluid, m_dbConnection);
+
+                SQLiteDataReader readerFluid = cmdFluid.ExecuteReader();
+                while (readerFluid.Read())
+                {
+                    //fluidPresent = true;
+                    fluidInfo.Add(new fluidProperty
+                    {
+                        selected = int.Parse(readerFluid["selected"].ToString()),
+                        fluidName = readerFluid["fluidName"].ToString(),
+                        Xmin = double.Parse(readerFluid["Xmin"].ToString()),
+                        Xmax = double.Parse(readerFluid["Xmax"].ToString()),
+                        Ymin = double.Parse(readerFluid["Ymin"].ToString()),
+                        Ymax = double.Parse(readerFluid["Ymax"].ToString()),
+                    });
+                }
+
+            }
+
+        }
         /// <summary>
         /// Create all the tables which are not present 
         /// </summary>
@@ -155,6 +197,8 @@ namespace PH_App
                 //string tbl_database_version = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Database_Version(count INTEGER PRIMARY KEY AUTOINCREMENT,version varchar(255))";
                 string tbl_database_version = "CREATE TABLE IF NOT EXISTS tbl_Database_Version(count INTEGER PRIMARY KEY AUTOINCREMENT,version varchar(255))";
 
+                string tbl_FluidInfo = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_FluidInfo(count INTEGER PRIMARY KEY AUTOINCREMENT,selected INTEGER, fluidName varchar(255) ,Xmin VARCHAR(255),Xmax varchar(255),Ymin VARCHAR(255),Ymax varchar(255))";
+
                 //MessageBox.Show("Creating tables from update section");
 
                 //now execute the query
@@ -188,17 +232,60 @@ namespace PH_App
                 SQLiteCommand cm1001 = new SQLiteCommand(tbl_TemperatureHumiditySourceInfo, m_dbConnection);
                 cm1001.ExecuteNonQuery();
 
-                //SQLiteCommand cm1101 = new SQLiteCommand(tbl_Weather_Controller_Restor_Info, m_dbConnection);
-                //cm1101.ExecuteNonQuery();
-
-                //SQLiteCommand cm1201 = new SQLiteCommand(tbl_Weather_Web_Restor_Info, m_dbConnection);
-                //cm1201.ExecuteNonQuery();
-
-                //SQLiteCommand cm1301 = new SQLiteCommand(tbl_Weather_HumSelfCalibration_Restor_Info, m_dbConnection);
-                //cm1301.ExecuteNonQuery();
-
+               
                 SQLiteCommand cm1401 = new SQLiteCommand(tbl_database_version, m_dbConnection);
                 cm1401.ExecuteNonQuery();
+
+                //For fluidInfo
+                SQLiteCommand cmdFluidInfo = new SQLiteCommand(tbl_FluidInfo, m_dbConnection);
+                cmdFluidInfo.ExecuteNonQuery();
+
+
+                string slqFluid = "Select * from tbl_" + buildingNameSelected + "_FluidInfo";
+
+                bool fluidPresent = false;
+                SQLiteCommand cmdFluid = new SQLiteCommand(slqFluid, m_dbConnection);
+
+                SQLiteDataReader readerFluid = cmdFluid.ExecuteReader();
+                while (readerFluid.Read())
+                {
+                    fluidPresent = true;
+
+                }
+
+                if (fluidPresent != true)
+                {
+
+
+                    //water
+                    string sqlWater = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '1','Water','0.001','4000','0.001','100')";
+                    SQLiteCommand cmdWater = new SQLiteCommand(sqlWater, m_dbConnection);
+                    cmdWater.ExecuteNonQuery();
+                    //acetone
+                    string sqlAcetone = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','Acetone','0.001','2000','0.03','100')";
+                    SQLiteCommand cmdAcetone = new SQLiteCommand(sqlAcetone, m_dbConnection);
+                    cmdAcetone.ExecuteNonQuery();
+                    //ammonia
+                    string sqlAmmonia = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','Ammonia','0.5','4000','0.5','100')";
+                    SQLiteCommand cmdAmmonia = new SQLiteCommand(sqlAmmonia, m_dbConnection);
+                    cmdAmmonia.ExecuteNonQuery();
+
+                    //n-Propane
+                    string sqlPropane = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','n-Propane','0.001','2800','0.05','100')";
+                    SQLiteCommand cmdPropane = new SQLiteCommand(sqlPropane, m_dbConnection);
+                    cmdPropane.ExecuteNonQuery();
+
+                    //R134a
+                    string sqlR134a = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','R134a','0.5','1400','0.5','100')";
+                    SQLiteCommand cmdR134a = new SQLiteCommand(sqlR134a, m_dbConnection);
+                    cmdR134a.ExecuteNonQuery();
+
+                    //1-Butene
+                    string sqlButene = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','1-Butene','0.5','2400','0.5','100')";
+                    SQLiteCommand cmdButene = new SQLiteCommand(sqlButene, m_dbConnection);
+                    cmdButene.ExecuteNonQuery();
+                }
+
 
             }//--Close of using statement 
         }//--Close of method
@@ -716,6 +803,53 @@ namespace PH_App
                 //SQLiteCommand cmd_Music = new SQLiteCommand(sql_comfortzone_Music, m_dbConnection);
                 //cmd_Music.ExecuteNonQuery();
 
+                //--First check the data then 
+                string slqFluid = "Select * from tbl_"+ buildingNameSelected + "_FluidInfo";
+
+                bool fluidPresent = false;
+                SQLiteCommand cmdFluid = new SQLiteCommand(slqFluid, m_dbConnection);
+
+                SQLiteDataReader readerFluid = cmdFluid.ExecuteReader();
+                while (readerFluid.Read())
+                {
+                    fluidPresent = true;
+
+                }
+
+                if (fluidPresent != true)
+                {
+               
+
+                    //water
+                    string sqlWater = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '1','Water','0.001','4000','0.001','100')";
+                    SQLiteCommand cmdWater = new SQLiteCommand(sqlWater, m_dbConnection);
+                    cmdWater.ExecuteNonQuery();
+                    //acetone
+                    string sqlAcetone = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','Acetone','0.001','2000','0.03','100')";
+                    SQLiteCommand cmdAcetone = new SQLiteCommand(sqlAcetone, m_dbConnection);
+                    cmdAcetone.ExecuteNonQuery();
+                    //ammonia
+                    string sqlAmmonia = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','Ammonia','0.5','4000','0.5','100')";
+                    SQLiteCommand cmdAmmonia = new SQLiteCommand(sqlAmmonia, m_dbConnection);
+                    cmdAmmonia.ExecuteNonQuery();
+
+                    //n-Propane
+                    string sqlPropane = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','n-Propane','0.001','2800','0.05','100')";
+                    SQLiteCommand cmdPropane = new SQLiteCommand(sqlPropane, m_dbConnection);
+                    cmdPropane.ExecuteNonQuery();
+
+                    //R134a
+                    string sqlR134a = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','R134a','0.5','1400','0.5','100')";
+                    SQLiteCommand cmdR134a = new SQLiteCommand(sqlR134a, m_dbConnection);
+                    cmdR134a.ExecuteNonQuery();
+
+                    //1-Butene
+                    string sqlButene = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','1-Butene','0.5','2400','0.5','100')";
+                    SQLiteCommand cmdButene = new SQLiteCommand(sqlButene, m_dbConnection);
+                    cmdButene.ExecuteNonQuery();
+                }
+
+
                 //--For inserting the version value first time while creating database
                 string version = AssemblyDateGeneration.Value.ToShortDateString();
                 string sql_database_version = "INSERT INTO  tbl_Database_Version( version)   VALUES('" + version + "')";
@@ -869,6 +1003,12 @@ namespace PH_App
                 //SQLiteCommand cm101 = new SQLiteCommand(tbl_comfortzoneSetting, m_dbConnection);
                 //cm101.ExecuteNonQuery();
 
+                string tbl_FluidInfo = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_FluidInfo(count INTEGER PRIMARY KEY AUTOINCREMENT,selected INTEGER, fluidName varchar(255) ,Xmin VARCHAR(255),Xmax varchar(255),Ymin VARCHAR(255),Ymax varchar(255))";
+                
+                //For fluidInfo
+                SQLiteCommand cmdFluidInfo = new SQLiteCommand(tbl_FluidInfo, m_dbConnection);
+                cmdFluidInfo.ExecuteNonQuery();
+
                 SQLiteCommand cm201 = new SQLiteCommand(tbl_chart_detail, m_dbConnection);
                 cm201.ExecuteNonQuery();
 
@@ -1012,6 +1152,51 @@ namespace PH_App
                 //string sql_comfortzone_Music = "INSERT INTO tbl_" + buildingNameSelected + "_comfort_zone_detail( id ,name,min_temp ,max_temp,min_hum , max_hum  ,colorValue   )   VALUES('" + id_Music + "', 'Music','22','28','35','65','Orangered')";
                 //SQLiteCommand cmd_Music = new SQLiteCommand(sql_comfortzone_Music, m_dbConnection);
                 //cmd_Music.ExecuteNonQuery();
+                string slqFluid = "Select * from tbl_" + buildingNameSelected + "_FluidInfo";
+
+                bool fluidPresent = false;
+                SQLiteCommand cmdFluid = new SQLiteCommand(slqFluid, m_dbConnection);
+
+                SQLiteDataReader readerFluid = cmdFluid.ExecuteReader();
+                while (readerFluid.Read())
+                {
+                    fluidPresent = true;
+                }
+
+                if (fluidPresent != true)
+                {
+
+                    //water
+                    string sqlWater = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '1','Water','0.001','4000','0.001','100')";
+                    SQLiteCommand cmdWater = new SQLiteCommand(sqlWater, m_dbConnection);
+                    cmdWater.ExecuteNonQuery();
+                    //acetone
+                    string sqlAcetone = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','Acetone','0.001','2000','0.03','100')";
+                    SQLiteCommand cmdAcetone = new SQLiteCommand(sqlAcetone, m_dbConnection);
+                    cmdAcetone.ExecuteNonQuery();
+                    //ammonia
+                    string sqlAmmonia = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','Ammonia','0.5','4000','0.5','100')";
+                    SQLiteCommand cmdAmmonia = new SQLiteCommand(sqlAmmonia, m_dbConnection);
+                    cmdAmmonia.ExecuteNonQuery();
+
+                    //n-Propane
+                    string sqlPropane = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','n-Propane','0.001','2800','0.05','100')";
+                    SQLiteCommand cmdPropane = new SQLiteCommand(sqlPropane, m_dbConnection);
+                    cmdPropane.ExecuteNonQuery();
+
+                    //R134a
+                    string sqlR134a = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','R134a','0.5','1400','0.5','100')";
+                    SQLiteCommand cmdR134a = new SQLiteCommand(sqlR134a, m_dbConnection);
+                    cmdR134a.ExecuteNonQuery();
+
+                    //1-Butene
+                    string sqlButene = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','1-Butene','0.5','2400','0.5','100')";
+                    SQLiteCommand cmdButene = new SQLiteCommand(sqlButene, m_dbConnection);
+                    cmdButene.ExecuteNonQuery();
+                }
+
+
+
 
                 //--For inserting the version value first time while creating database
                 string version = AssemblyDateGeneration.Value.ToShortDateString();

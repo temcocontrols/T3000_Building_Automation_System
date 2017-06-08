@@ -13,9 +13,8 @@ namespace PH_App
         public MainController mc;
         public InitialDatabaseSetupController idsc;
         public DatabaseOperationModel dom;
-        //public BuildingOperation bo;
         public ObjectCollection ObjColl;
-        //public ChartCreationAndOperations chartOprn;
+       
 
         public Form_Main_PH_Application()
         {
@@ -26,17 +25,16 @@ namespace PH_App
             mc = ObjColl.mc;
             idsc = ObjColl.idsc;
             dom = ObjColl.dom;
-            //bo = ObjColl.bo;
-            //chartOprn = ObjColl.coprn;
+           
         }
         public void objectInitialization()
         {
             ObjColl = new ObjectCollection();
-           // ObjColl.InitializeAllObjects();
+            //ObjColl.InitializeAllObjects();
             mc = ObjColl.mc;
             idsc = ObjColl.idsc;
             dom = ObjColl.dom;
-           // bo = ObjColl.bo;
+            //bo = ObjColl.bo;
         }
         Series seriesPoint = new Series("seriesNode1");
         
@@ -55,15 +53,34 @@ namespace PH_App
                 this.UseWaitCursor = true;//from the Form/Window instance
                 
                 string fluidName = "Water";//"1-Butene"; // "Water";//"n-Propane";//Acetone//Ammonia//Krypton//Nitrogen //Note for Air not working //Argon//CarbonDioxide// not working p-Xylene//R134a
-                //PH_App.ChartCreation ch = new PH_App.ChartCreation();
-                //ch.PlotPHChart(fluidName, phChart);
-                // lb_fluid_name.Text = "PH-Curve for " + fluidNAME;
-                //var mc = new PH_App.MainController();
-                mc.LoadForPH(fluidName,this);//--
-                phChart.Series.Add(seriesPoint);
-                phChart.Series.Add(mc.series1);
+
+                //--Pulling the fluid info 
+                double Xmin = 0.001;
+                double Xmax = 4000;
+                double Ymin = 0.001;
+                double Ymax = 100;
+
+                //--Now lets pull the values from database
                 mc.ReadDataForBuildingSelectedFromPsychrometric();
                 mc.buildingSelectedInT3000 = mc.FindPathOfBuildingInT3000();
+
+                mc.PullDataOfFluidInfo(mc.buildingSelectedInT3000[0].Building_Name);
+
+                //--Now we have the data
+                if (mc.fluidInfo.Count > 0)
+                {
+                    //--We need to update the values
+                    fluidName = mc.fluidInfo[0].fluidName;
+                    Xmin = mc.fluidInfo[0].Xmin;
+                    Xmax = mc.fluidInfo[0].Xmax;
+                    Ymin = mc.fluidInfo[0].Ymin;
+                    Ymax = mc.fluidInfo[0].Ymax;
+                }
+
+                mc.LoadForPH(fluidName,this,Xmin,Xmax,Ymin,Ymax);//--
+                phChart.Series.Add(seriesPoint);
+                phChart.Series.Add(mc.series1);
+              
                 // MessageBox.Show("chart condn=" + phChart.Enabled);
                 // phChart.Enabled = true; 
                 mc.RefreshByLoadingDataWhileLoad(sender, e, this);
@@ -80,7 +97,6 @@ namespace PH_App
 
             //if (e.Button == MouseButtons.Right)//on right mouse button is clicked.
             //{
-
             //        //==This shows the contextmenustrip on right click
             //        CMSinsertNode.Enabled = true;
             //      CMSinsertNode.Show(MousePosition);//-- this mouse position is used to show the menustrip in mouse pointer
