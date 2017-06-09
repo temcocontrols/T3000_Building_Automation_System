@@ -45,7 +45,7 @@ namespace PH_App
             
         }
 
-        private void Form_Main_PH_Application_Shown(object sender, EventArgs e)
+        public void Form_Main_PH_Application_Shown(object sender, EventArgs e)
         {
             try
             {
@@ -129,7 +129,6 @@ namespace PH_App
         public void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             //var bo = new PH_App.BuildingOperation();
-
            // mc.DGVCellClick(sender, e, this, phChart);
             //try
             //{
@@ -389,7 +388,7 @@ namespace PH_App
 
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var frmsetting = new FormSetting();
+            var frmsetting = new FormSetting(this);
             frmsetting.ShowDialog();
         }
 

@@ -454,26 +454,29 @@ namespace PH_App
             phChart.Series["Series01"].Font = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold);
             //phChart.Series["Series01"].Font.
 
-             /*
-            phChart.Series["Series01"].Points[12].Label = "S";
-            phChart.Series["Series01"].Points[15].Label = "a";
-            phChart.Series["Series01"].Points[18].Label = "t";
-            phChart.Series["Series01"].Points[21].Label = "u";
-            phChart.Series["Series01"].Points[24].Label = "r";
-            phChart.Series["Series01"].Points[27].Label = "a";
-            phChart.Series["Series01"].Points[30].Label = "t";
-            phChart.Series["Series01"].Points[33].Label = "i";
-            phChart.Series["Series01"].Points[36].Label = "o";
-            phChart.Series["Series01"].Points[40].Label = "n";
+            // /*
+            if (fluidName == "Water")
+            {
+                phChart.Series["Series01"].Points[12].Label = "S";
+                phChart.Series["Series01"].Points[15].Label = "a";
+                phChart.Series["Series01"].Points[18].Label = "t";
+                phChart.Series["Series01"].Points[21].Label = "u";
+                phChart.Series["Series01"].Points[24].Label = "r";
+                phChart.Series["Series01"].Points[27].Label = "a";
+                phChart.Series["Series01"].Points[30].Label = "t";
+                phChart.Series["Series01"].Points[33].Label = "i";
+                phChart.Series["Series01"].Points[36].Label = "o";
+                phChart.Series["Series01"].Points[40].Label = "n";
 
-            phChart.Series["Series01"].Points[50].Label = "L";
-            phChart.Series["Series01"].Points[55].Label = "i";
-            phChart.Series["Series01"].Points[63].Label = "q";
-            phChart.Series["Series01"].Points[69].Label = "u";
-            phChart.Series["Series01"].Points[75].Label = "i";
-            phChart.Series["Series01"].Points[80].Label = "d";
+                phChart.Series["Series01"].Points[50].Label = "L";
+                phChart.Series["Series01"].Points[55].Label = "i";
+                phChart.Series["Series01"].Points[63].Label = "q";
+                phChart.Series["Series01"].Points[69].Label = "u";
+                phChart.Series["Series01"].Points[75].Label = "i";
+                phChart.Series["Series01"].Points[80].Label = "d";
 
-             */
+            }
+            //*/
 
 
             phChart.Series["Series01"].ChartArea = "ChartArea1";
@@ -490,26 +493,29 @@ namespace PH_App
             //Chart1.Series(0).Font = New Font(Me.Font.Name, 5, FontStyle.Regular)
             phChart.Series["Series2"].Font = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold);
             // phChart.Series["Series2"].Points[12].Label = $"Saturation Vapour";
+            if (fluidName == "Water")
+            {
 
-             /*
-            phChart.Series["Series2"].Points[12].Label = "S";
-            phChart.Series["Series2"].Points[15].Label = "a";
-            phChart.Series["Series2"].Points[18].Label = "t";
-            phChart.Series["Series2"].Points[21].Label = "u";
-            phChart.Series["Series2"].Points[24].Label = "r";
-            phChart.Series["Series2"].Points[27].Label = "a";
-            phChart.Series["Series2"].Points[31].Label = "t";
-            phChart.Series["Series2"].Points[35].Label = "i";
-            phChart.Series["Series2"].Points[39].Label = "o";
-            phChart.Series["Series2"].Points[44].Label = "n";
+                ///*
+                phChart.Series["Series2"].Points[12].Label = "S";
+                phChart.Series["Series2"].Points[15].Label = "a";
+                phChart.Series["Series2"].Points[18].Label = "t";
+                phChart.Series["Series2"].Points[21].Label = "u";
+                phChart.Series["Series2"].Points[24].Label = "r";
+                phChart.Series["Series2"].Points[27].Label = "a";
+                phChart.Series["Series2"].Points[31].Label = "t";
+                phChart.Series["Series2"].Points[35].Label = "i";
+                phChart.Series["Series2"].Points[39].Label = "o";
+                phChart.Series["Series2"].Points[44].Label = "n";
 
-            phChart.Series["Series2"].Points[50].Label = "V";
-            phChart.Series["Series2"].Points[55].Label = "a";
-            phChart.Series["Series2"].Points[60].Label = "p";
-            phChart.Series["Series2"].Points[67].Label = "o";
-            phChart.Series["Series2"].Points[74].Label = "u";
-            phChart.Series["Series2"].Points[80].Label = "r";
-             */
+                phChart.Series["Series2"].Points[50].Label = "V";
+                phChart.Series["Series2"].Points[55].Label = "a";
+                phChart.Series["Series2"].Points[60].Label = "p";
+                phChart.Series["Series2"].Points[67].Label = "o";
+                phChart.Series["Series2"].Points[74].Label = "u";
+                phChart.Series["Series2"].Points[80].Label = "r";
+            }
+             // */
 
             phChart.Series["Series2"].ChartArea = "ChartArea1";
 
@@ -642,7 +648,9 @@ namespace PH_App
 
                         // /*
                         //===========Temperature indicator================//
-                        /*
+                        ///*
+                          if(fluidName == "Water") { 
+                        
                         if (flagSingleTemperatureIndicator == 1 && dataPointCounter > (listPoints[z].zlevel) && (listPoints[z].x1 > 200 && listPoints[z].x1 < 2500))//(flagSingleTemperatureIndicator == 1 && zlevelValueForTempIndicator == listPoints[z].zlevel) //(listPoints[z].x1 == 2000)
                         {
                             double temperature = PH.IAPWS_IF97_TowParameterEquivalentFxn("T", "H", listPoints[z].x1 * 1000, "P", listPoints[z].y1 * 1000000, fluidName); //--This multiply is done to convert MPa to Pa and enthlapy is divided to convert J/kg to kJ/Kg
@@ -658,7 +666,8 @@ namespace PH_App
                             ////zlevelValueForTempIndicator = listPoints[z].zlevel;
                         }
                         zlevelValueForTempIndicator = listPoints[z].zlevel;
-                        */
+                        }
+                          //*/
                         //===========Temper indiactor end==============//
                         // */
                     }
@@ -688,7 +697,7 @@ namespace PH_App
             //phChart.Series.Add(seriesName1);
             //phChart.Series[seriesName1].ChartType = SeriesChartType.Point;
             //int ind = 0;
-
+        
             //for (double y = 0.005; y < 40; y *= 2)
             //{
             //    double temperature = PH.IAPWS_IF97_TowParameterEquivalentFxn("T", "H", 400 * 1000, "P", y * 1000000, fluidName); //--This multiply is done to convert MPa to Pa and enthlapy is divided to convert J/kg to kJ/Kg
