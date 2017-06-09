@@ -18,6 +18,7 @@ extern bool cancle_send ;
 bool show_user_list_window = false;
 
 #define TIMER_SYNC_TIMER    1
+#define TIMER_REFRESH    2
 
 IMPLEMENT_DYNAMIC(CBacnetSetting, CDialogEx)
 
@@ -108,6 +109,7 @@ BEGIN_MESSAGE_MAP(CBacnetSetting, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_SETTING_IO_CONFIG, &CBacnetSetting::OnBnClickedButtonSettingIoConfig)
 	ON_BN_CLICKED(IDC_BUTTON_REBOOT_DEVICE, &CBacnetSetting::OnBnClickedButtonRebootDevice)
 	ON_WM_VSCROLL()
+	ON_BN_CLICKED(IDC_BUTTON1, &CBacnetSetting::OnBnClickedButton1)
 END_MESSAGE_MAP()
 
 
@@ -419,7 +421,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 	 n_tempBias = (n_tempBias/60)*100;
 
 	 //判断 minipanel 的时区 与本地电脑时区是否一致，不一致自动更改;
-	 if(Device_Basic_Setting.reg.time_zone != n_tempBias)
+	 /*if(Device_Basic_Setting.reg.time_zone != n_tempBias)
 	 {
 		 Device_Basic_Setting.reg.time_zone = n_tempBias;
 		 if(Write_Private_Data_Blocking(WRITE_SETTING_COMMAND,0,0) > 0)
@@ -428,7 +430,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 			 temp_task_info.Format(_T("SYNC Time zone OK!"));
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_task_info);
 		 }
-	 }
+	 }*/
 
 	switch(command_type)
 	{
@@ -952,6 +954,8 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 		break;
 	}
 	//GetDlgItem(IDC_BAC_SYNC_LOCAL_PC)->SetFocus();
+	
+
 	return 0;
 }
 
@@ -961,8 +965,8 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 BOOL CBacnetSetting::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-
 	
+	SetTimer(TIMER_REFRESH, 5000, NULL);
 	InitScrollbar();
 	SetWindowTextW(_T("Setting"));
 	m_setting_dlg_hwnd = this->m_hWnd;
@@ -1060,6 +1064,20 @@ void CBacnetSetting::OnTimer(UINT_PTR nIDEvent)
 
 		}
 		break;
+	case TIMER_REFRESH:
+		{
+		if (this->IsWindowVisible())
+		{
+
+				//SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("TIMER_REFRESH"));
+			//PostMessage(WM_FRESH_CM_LIST, READ_SETTING_COMMAND, NULL);
+			//PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);
+			//PostMessage(WM_FRESH_SETTING_UI, TIME_COMMAND, NULL);
+		}
+		//else KillTimer(TIMER_REFRESH);
+
+		}
+	break;
 	default:
 		break;
 	}
@@ -1081,7 +1099,7 @@ LRESULT  CBacnetSetting::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
 	{
 		Show_Results = temp_cs + _T("Success!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
-
+		//SetTimer(TIMER_REFRESH, 15000, NULL);
 	}
 	else
 	{
@@ -1325,7 +1343,6 @@ void CBacnetSetting::OnBnClickedButtonSettingGsmModual()
 
 void CBacnetSetting::OnClose()
 {
-	 
 	ShowWindow(FALSE);
 	return;
 	CDialogEx::OnClose();
@@ -1648,7 +1665,7 @@ void CBacnetSetting::OnCbnSelchangeComboBacnetSettingTimeZone()
 {
 	
 	CString temp_string;
-	int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->GetCurSel();	
+	int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->GetCurSel();
 	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->GetLBText(nSel,temp_string);
 	if(nSel >= sizeof(Time_Zone_Value)/sizeof(Time_Zone_Value[0]))
 		return;
@@ -2104,5 +2121,3 @@ void CBacnetSetting::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
 	CDialog::OnVScroll(nSBCode, nPos, pScrollBar);
 }
-
-
