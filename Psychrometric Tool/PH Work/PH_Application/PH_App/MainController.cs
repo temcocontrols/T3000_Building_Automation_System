@@ -28,7 +28,8 @@ namespace PH_App
         }
       
         
-        public void LoadForPH(string fluidName, Form_Main_PH_Application f,double Xmin,double Xmax,double Ymin,double Ymax)
+      //  public void LoadForPH(string fluidName, Form_Main_PH_Application f,double Xmin,double Xmax,double Ymin,double Ymax,double xDiv,double yDiv,bool xFlag,bool yFlag)
+      public void LoadForPH(string fluidName, Form_Main_PH_Application f, double Xmin, double Xmax, double Ymin, double Ymax)
         {
             string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
 
@@ -48,13 +49,13 @@ namespace PH_App
             //--Plotting of the chart Here --------//
             string fluidNAME = fluidName;//"Water";//"1-Butene"; // "Water";//"n-Propane";//Acetone//Ammonia//Krypton//Nitrogen //Note for Air not working //Argon//CarbonDioxide// not working p-Xylene//R134a
             //var ch = new ChartCreationAndOperations();
-            f.lbFluidName.Text = "Fluid Name: " + fluidName;
-            PlotPHChart(fluidNAME, f.phChart,Xmin,Xmax,Ymin,Ymax);
-
+            f.lbFluidName.Text =fluidName;
+            //PlotPHChart(fluidNAME, f.phChart,Xmin,Xmax,Ymin,Ymax,xDiv,yDiv,xFlag,yFlag);
+            PlotPHChart(fluidNAME, f.phChart, Xmin, Xmax, Ymin, Ymax);
             //--End of the plotting chart here-----//
             //--Other task here
-           
-           string buildingNameValue= BuildingSelectionTableCreationReturnBuildingName(f);
+
+            string buildingNameValue= BuildingSelectionTableCreationReturnBuildingName(f);
             //=========Building click and settings====//
             BuildingConfigurationSetting(f);
             //--Assing the location path to alex database 
@@ -246,7 +247,8 @@ namespace PH_App
         public double[,] T_Value = new double[300, 300];
         public double[,] H_Value = new double[300, 300];
 
-        public void PlotPHChart(string fluidName, Chart phChart,double Xmin,double Xmax,double Ymin,double Ymax)
+        //public void PlotPHChart(string fluidName, Chart phChart,double Xmin,double Xmax,double Ymin,double Ymax, double xDiv, double yDiv, bool xFlag, bool yFlag)
+        public void PlotPHChart(string fluidName, Chart phChart, double Xmin, double Xmax, double Ymin, double Ymax)
         {
 
             MathOperation PH = new MathOperation();
@@ -260,7 +262,7 @@ namespace PH_App
             // var stopWatch = System.Diagnostics.Stopwatch.StartNew();
 
             //double[] press_rng = PH.LogSpace(-2, 2, 300,true,10).ToArray();
-            double[] press_rng = PH.LogSpace(-2, 2, 300, true, 10).ToArray();// initially it was form -2,2,300 //-4,4,300 is not supported by coolprop
+            double[] press_rng = PH.LogSpace(-3, 2, 300, true, 10).ToArray();// initially it was form -2,2,300 //-4,4,300 is not supported by coolprop
             //--For line spacing values
             //2. temp_rng = 273.15+linspace(1,800,300); 
             //double[] temp_rng =  PH.LinSpace(1, 800, 300, true).ToArray();
@@ -428,15 +430,59 @@ namespace PH_App
              */
 
             phChart.Series.Clear();
-            phChart.ChartAreas[0].AxisX.Minimum = Xmin; //1 / 1000; //--This was 1/1000
-            phChart.ChartAreas[0].AxisX.Maximum = Xmax;//4000; //4000;
-            phChart.ChartAreas[0].AxisX.Interval = 500;
+            /*
+            if (xFlag == true)
+            {
+                phChart.ChartAreas[0].AxisX.Minimum = Xmin/xDiv;
 
-            phChart.ChartAreas[0].AxisY.Minimum = Ymin; //0.01; //--This was 0.001
+                if (Xmax - (Xmin/xDiv) > 2000)
+                {
+                    phChart.ChartAreas[0].AxisX.Interval = 500;
+                }
+                else
+                {
+                    phChart.ChartAreas[0].AxisX.Interval = 100;
+                }
+
+            }
+            else { 
+            phChart.ChartAreas[0].AxisX.Minimum = Xmin; //1 / 1000; //--This was 1/1000
+                if(Xmax-Xmin > 2000)
+                {
+                    phChart.ChartAreas[0].AxisX.Interval = 500;
+                }else
+                {
+                    phChart.ChartAreas[0].AxisX.Interval = 100;
+                }
+            }
+            phChart.ChartAreas[0].AxisX.Maximum = Xmax;//4000; //4000;
+           // phChart.ChartAreas[0].AxisX.Interval = 500;
+
+            if (yFlag == true)
+            {
+                phChart.ChartAreas[0].AxisY.Minimum = Ymin/yDiv; //0.01; //--This was 0.001
+            }
+            else
+            {
+                phChart.ChartAreas[0].AxisY.Minimum = Ymin; //0.01; //--This was 0.001
+            }
+            
             phChart.ChartAreas[0].AxisY.IsLogarithmic = true;
             phChart.ChartAreas[0].AxisY.LogarithmBase = 10;
             phChart.ChartAreas[0].AxisY.Interval = 1;
             phChart.ChartAreas[0].AxisY.Maximum = Ymax; //50;
+            */
+
+            phChart.ChartAreas[0].AxisX.Minimum =Math.Round(Xmin,0);
+            phChart.ChartAreas[0].AxisX.Maximum = Xmax;//4000; //4000;
+            phChart.ChartAreas[0].AxisX.Interval = 200;
+
+            phChart.ChartAreas[0].AxisY.Minimum = Ymin;//Math.Round(Ymin,3); //0.01; //--This was 0.001         
+            phChart.ChartAreas[0].AxisY.IsLogarithmic = true;
+            phChart.ChartAreas[0].AxisY.LogarithmBase = 10;// Math.Round(10.000,3);
+            phChart.ChartAreas[0].AxisY.Interval = 1;// Math.Round(1.000,3);
+            phChart.ChartAreas[0].AxisY.Maximum = Ymax;//Math.Round(Ymax,3); //50;
+            phChart.ChartAreas[0].AxisY.LabelStyle.Format = "{0:0.###}";//"{#.####}";
 
             //--this one is for [hLsat;hLcrit],[psat;pcrit],'b', ...
             // ph_chart.ChartAreas[0].AxisX.Minimum =
@@ -4585,7 +4631,8 @@ namespace PH_App
 
                                 //  MessageBox.Show("inside temperature source,val = "+hardwareValue1+",node name = "+node.name);
                                 var mth = new MathOperation();
-                                double x_Value =Math.Round( mth.IAPWS_IF97_TowParameterEquivalentFxn("H", "T", (returnTemperatureValue + 215.13), "P", node.yVal * 1000000, "water")/1000,2); //returnTemperatureValue;//hardwareValue1;
+                                //double x_Value =Math.Round( mth.IAPWS_IF97_TowParameterEquivalentFxn("H", "T", (returnTemperatureValue + 215.13), "P", node.yVal * 1000000, "water")/1000,2); //returnTemperatureValue;//hardwareValue1;
+                                double x_Value = Math.Round(mth.IAPWS_IF97_TowParameterEquivalentFxn("H", "T", (returnTemperatureValue + 215.13), "P", node.yVal * 1000000, f1.lbFluidName.Text) / 1000, 2); //returnTemperatureValue;//hardwareValue1;
                                 //double y_value = CalculateYFromXandHumidity(hardwareValue1, hardwareValue2 / 100);
                                 //MessageBox.Show("xvalue = " + x_Value);
                                 //lock (listNodeInfoValues)

@@ -506,8 +506,9 @@ namespace PH_App
                      
                         double pressure = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
                         var opt = new MathOperation();
-                        double enthalpyValue = opt.IAPWS_IF97_TowParameterEquivalentFxn("H", "P", pressure * 1000000, "T", finalTemp, "water")/1000;
-                       // bcs.CalculateYFromXandHumidity(xVal, pressure / 100);
+                        // double enthalpyValue = opt.IAPWS_IF97_TowParameterEquivalentFxn("H", "P", pressure * 1000000, "T", finalTemp, "water")/1000;
+                        double enthalpyValue = opt.IAPWS_IF97_TowParameterEquivalentFxn("H", "P", pressure * 1000000, "T", finalTemp, fmain.lbFluidName.Text) / 1000;
+                        // bcs.CalculateYFromXandHumidity(xVal, pressure / 100);
                         double yVal = pressure;//bcs.y_coord_value;
                         double xVal = enthalpyValue;
 
@@ -959,9 +960,9 @@ namespace PH_App
                     //===============================calling coolProp api for temperature values====//
 
                     double temperatureValueFromCoolProp = 0;
-                    
-                    temperatureValueFromCoolProp = Math.Round( mth.IAPWS_IF97_TowParameterEquivalentFxn("T", "P", bcs.listNodeInfoValues[i].yVal * 1000000, "H", bcs.listNodeInfoValues[i].xVal * 1000,"water"),2)-273.15; //CoolProp.PropsSI()//Now in degreecelcius
 
+                    //temperatureValueFromCoolProp = Math.Round( mth.IAPWS_IF97_TowParameterEquivalentFxn("T", "P", bcs.listNodeInfoValues[i].yVal * 1000000, "H", bcs.listNodeInfoValues[i].xVal * 1000,"water"),2)-273.15; //CoolProp.PropsSI()//Now in degreecelcius
+                    temperatureValueFromCoolProp = Math.Round(mth.IAPWS_IF97_TowParameterEquivalentFxn("T", "P", bcs.listNodeInfoValues[i].yVal * 1000000, "H", bcs.listNodeInfoValues[i].xVal * 1000, fmain.lbFluidName.Text), 2) - 273.15; //CoolProp.PropsSI()//Now in degreecelcius
                     //==========================END of calling coolprop============================//
 
                     //For temperature source 
@@ -2262,7 +2263,8 @@ namespace PH_App
             //bcs.CalculateYFromXandHumidity(double.Parse(TemperatureValue), humValue / 100);//This will get the y value
             yVal = double.Parse(pressureValue);
             var mth = new  MathOperation();
-            xVal = Math.Round(mth.IAPWS_IF97_TowParameterEquivalentFxn("H", "P", yVal * 1000000, "T", double.Parse(TemperatureValue)+273.15, "water")/1000, 2); //(int)double.Parse(TemperatureValue); //int.Parse(TemperatureValue);
+            //xVal = Math.Round(mth.IAPWS_IF97_TowParameterEquivalentFxn("H", "P", yVal * 1000000, "T", double.Parse(TemperatureValue)+273.15, "water")/1000, 2); //(int)double.Parse(TemperatureValue); //int.Parse(TemperatureValue);
+            xVal = Math.Round(mth.IAPWS_IF97_TowParameterEquivalentFxn("H", "P", yVal * 1000000, "T", double.Parse(TemperatureValue) + 273.15, fmain.lbFluidName.Text.Trim()) / 1000, 2); //(int)double.Parse(TemperatureValue); //int.Parse(TemperatureValue);
             //bcs.y_coord_value;//This value will be updated
             //}
             //else

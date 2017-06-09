@@ -44,7 +44,7 @@
             "n-Propane",
             "R134a",
             "1-Butene"});
-            this.cbFluidName.Location = new System.Drawing.Point(100, 33);
+            this.cbFluidName.Location = new System.Drawing.Point(77, 22);
             this.cbFluidName.Name = "cbFluidName";
             this.cbFluidName.Size = new System.Drawing.Size(161, 21);
             this.cbFluidName.TabIndex = 0;
@@ -52,7 +52,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(28, 36);
+            this.label1.Location = new System.Drawing.Point(5, 25);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(66, 13);
             this.label1.TabIndex = 1;
@@ -60,7 +60,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(163, 90);
+            this.button1.Location = new System.Drawing.Point(140, 79);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(98, 23);
             this.button1.TabIndex = 2;
@@ -72,7 +72,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(298, 168);
+            this.ClientSize = new System.Drawing.Size(264, 128);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.cbFluidName);

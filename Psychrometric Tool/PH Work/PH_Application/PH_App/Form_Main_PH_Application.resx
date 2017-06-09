@@ -145,7 +145,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;phChart.ZOrder" xml:space="preserve">
-    <value>11</value>
+    <value>12</value>
   </data>
   <data name="lb_db_name.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -181,7 +181,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;lb_db_name.ZOrder" xml:space="preserve">
-    <value>7</value>
+    <value>8</value>
   </data>
   <data name="lb_buildingselectedShow.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -214,7 +214,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;lb_buildingselectedShow.ZOrder" xml:space="preserve">
-    <value>8</value>
+    <value>9</value>
   </data>
   <metadata name="id.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -256,7 +256,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;dataGridView1.ZOrder" xml:space="preserve">
-    <value>9</value>
+    <value>10</value>
   </data>
   <data name="groupBox4ttt.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Bottom, Left</value>
@@ -688,7 +688,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;groupBox4ttt.ZOrder" xml:space="preserve">
-    <value>10</value>
+    <value>11</value>
   </data>
   <data name="gb_showstatus.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Left</value>
@@ -1009,7 +1009,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;gb_showstatus.ZOrder" xml:space="preserve">
-    <value>6</value>
+    <value>7</value>
   </data>
   <metadata name="menuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
@@ -1120,7 +1120,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;menuStrip1.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>6</value>
   </data>
   <metadata name="CMSinsertNode.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>129, 21</value>
@@ -1192,7 +1192,7 @@
     <value>NoControl</value>
   </data>
   <data name="lb_unit_chosen_display.Location" type="System.Drawing.Point, System.Drawing">
-    <value>859, 24</value>
+    <value>782, 24</value>
   </data>
   <data name="lb_unit_chosen_display.Size" type="System.Drawing.Size, System.Drawing">
     <value>63, 18</value>
@@ -1213,7 +1213,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;lb_unit_chosen_display.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>5</value>
   </data>
   <data name="pb_lock_unlock.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
@@ -1240,7 +1240,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;pb_lock_unlock.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>4</value>
   </data>
   <metadata name="backgroundWorker1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>278, 24</value>
@@ -1291,16 +1291,16 @@
     <value>NoControl</value>
   </data>
   <data name="lbFluidName.Location" type="System.Drawing.Point, System.Drawing">
-    <value>928, 24</value>
+    <value>962, 24</value>
   </data>
   <data name="lbFluidName.Size" type="System.Drawing.Size, System.Drawing">
-    <value>91, 18</value>
+    <value>48, 18</value>
   </data>
   <data name="lbFluidName.TabIndex" type="System.Int32, mscorlib">
     <value>59</value>
   </data>
   <data name="lbFluidName.Text" xml:space="preserve">
-    <value>Fluid Name:</value>
+    <value>Water</value>
   </data>
   <data name="&gt;&gt;lbFluidName.Name" xml:space="preserve">
     <value>lbFluidName</value>
@@ -1312,6 +1312,39 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;lbFluidName.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="lbFNameLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="lbFNameLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Arial, 11.25pt, style=Bold</value>
+  </data>
+  <data name="lbFNameLabel.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="lbFNameLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>865, 24</value>
+  </data>
+  <data name="lbFNameLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>91, 18</value>
+  </data>
+  <data name="lbFNameLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>60</value>
+  </data>
+  <data name="lbFNameLabel.Text" xml:space="preserve">
+    <value>Fluid Name:</value>
+  </data>
+  <data name="&gt;&gt;lbFNameLabel.Name" xml:space="preserve">
+    <value>lbFNameLabel</value>
+  </data>
+  <data name="&gt;&gt;lbFNameLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lbFNameLabel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;lbFNameLabel.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">

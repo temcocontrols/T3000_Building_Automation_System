@@ -45,26 +45,32 @@ namespace PH_App
             
         }
 
+
+        string fluidName = "Water";//"1-Butene"; // "Water";//"n-Propane";//Acetone//Ammonia//Krypton//Nitrogen //Note for Air not working //Argon//CarbonDioxide// not working p-Xylene//R134a
+
+        //--Pulling the fluid info 
+        double Xmin = 0.001;
+        double Xmax = 4000;
+        double Ymin = 0.001;
+        double Ymax = 100;
+        
         public void Form_Main_PH_Application_Shown(object sender, EventArgs e)
         {
             try
             {
                 this.Enabled = false;//optional, better target a panel or specific controls
                 this.UseWaitCursor = true;//from the Form/Window instance
-                
-                string fluidName = "Water";//"1-Butene"; // "Water";//"n-Propane";//Acetone//Ammonia//Krypton//Nitrogen //Note for Air not working //Argon//CarbonDioxide// not working p-Xylene//R134a
-
-                //--Pulling the fluid info 
-                double Xmin = 0.001;
-                double Xmax = 4000;
-                double Ymin = 0.001;
-                double Ymax = 100;
-
+              
                 //--Now lets pull the values from database
                 mc.ReadDataForBuildingSelectedFromPsychrometric();
                 mc.buildingSelectedInT3000 = mc.FindPathOfBuildingInT3000();
 
                 mc.PullDataOfFluidInfo(mc.buildingSelectedInT3000[0].Building_Name);
+
+                double xDiv = 1000;
+                double yDiv = 1000;
+                bool xFlag = false;
+                bool yFlag = false;
 
                 //--Now we have the data
                 if (mc.fluidInfo.Count > 0)
@@ -72,12 +78,67 @@ namespace PH_App
                     //--We need to update the values
                     fluidName = mc.fluidInfo[0].fluidName;
                     Xmin = mc.fluidInfo[0].Xmin;
-                    Xmax = mc.fluidInfo[0].Xmax;
+                    Xmax = mc.fluidInfo[0].Xmax; //--No prob
                     Ymin = mc.fluidInfo[0].Ymin;
-                    Ymax = mc.fluidInfo[0].Ymax;
+                    Ymax = mc.fluidInfo[0].Ymax;//--No prob
+
+                    /*
+                    if(Xmin >= 0.001 && Xmin < 0.009)
+                    {
+                        //div by three
+                        xDiv = 1000;
+                        Xmin *= xDiv;
+                        xFlag = true;
+                    }
+                    else if (Xmin >= 0.01 && Xmin < 0.09)
+                    {
+                        xDiv = 100;
+                        Xmin *= xDiv;
+                        xFlag = true;
+                    }
+                    else if (Xmin >= 0.1 && Xmin < 0.9)
+                    {
+                        xDiv = 10;
+                        Xmin *= xDiv;
+                        xFlag = true;
+                    }
+                    else
+                    {
+                        //Do nothing
+                        xFlag = false;
+                    }
+
+                    if (Ymin >= 0.001 && Ymin < 0.009)
+                    {
+                        //div by three
+                        yDiv = 1000;
+                        Ymin *= yDiv;
+                        yFlag = true;
+                    }
+                    else if (Ymin >= 0.01 && Ymin < 0.09)
+                    {
+                        yDiv = 100;
+                        Ymin *= yDiv;
+                        yFlag = true;
+                    }
+                    else if (Ymin >= 0.1 && Ymin < 0.9)
+                    {
+                        yDiv = 10;
+                        Ymin *= yDiv;
+                        yFlag = true;
+                    }
+                    else
+                    {
+                        //Do nothing
+                        yFlag = false;
+                    }
+                    */
+
+
                 }
 
-                mc.LoadForPH(fluidName,this,Xmin,Xmax,Ymin,Ymax);//--
+                // mc.LoadForPH(fluidName,this,Xmin,Xmax,Ymin,Ymax,xDiv,yDiv,xFlag,yFlag);//--
+                mc.LoadForPH(fluidName, this, Xmin, Xmax, Ymin, Ymax);//--
                 phChart.Series.Add(seriesPoint);
                 phChart.Series.Add(mc.series1);
               

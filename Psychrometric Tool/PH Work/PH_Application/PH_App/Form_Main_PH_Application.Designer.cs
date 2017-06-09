@@ -99,6 +99,7 @@
             this.saveAsTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lbFluidName = new System.Windows.Forms.Label();
+            this.lbFNameLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.phChart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox4ttt.SuspendLayout();
@@ -550,10 +551,16 @@
             resources.ApplyResources(this.lbFluidName, "lbFluidName");
             this.lbFluidName.Name = "lbFluidName";
             // 
+            // lbFNameLabel
+            // 
+            resources.ApplyResources(this.lbFNameLabel, "lbFNameLabel");
+            this.lbFNameLabel.Name = "lbFNameLabel";
+            // 
             // Form_Main_PH_Application
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.lbFNameLabel);
             this.Controls.Add(this.lbFluidName);
             this.Controls.Add(this.pb_lock_unlock);
             this.Controls.Add(this.lb_unit_chosen_display);
@@ -648,5 +655,6 @@
         public System.Windows.Forms.Label lbTest2;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         public System.Windows.Forms.Label lbFluidName;
+        public System.Windows.Forms.Label lbFNameLabel;
     }
 }

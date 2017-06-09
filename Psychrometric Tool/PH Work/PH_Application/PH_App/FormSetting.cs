@@ -33,7 +33,9 @@ namespace PH_App
                     string tableName = "tbl_" + f1.lb_db_name.Text + "_FluidInfo";
                     SetAllFluidToZero(tableName);
                     SetSingleFluidToOne(tableName, fname);
-                    LoadingTheNewChart();
+                        // LoadingTheNewChart();
+                     System.Diagnostics.Process.Start(Application.ExecutablePath); // to start new instance of application
+                     f1.Close(); //to turn off current app
                     }
                     finally
                     {
@@ -81,7 +83,14 @@ namespace PH_App
 
         public void LoadingTheNewChart()
         {
-            f1.Form_Main_PH_Application_Shown(this, new EventArgs());
+            if (f1.dataGridView1.Rows.Count > 0)  //If there is data then only do this one
+            {
+                if (f1.dataGridView1.CurrentCell.RowIndex >= 0 )
+                {
+                    var eventArgs = new DataGridViewCellEventArgs(0,0);
+                    f1.Form_Main_PH_Application_Shown(f1, eventArgs);
+                }
+            }  
         }
 
     }
