@@ -1,0 +1,4 @@
+WFA_psychometric_chart.exe
+en-US
+ko
+zh

@@ -1,0 +1,21 @@
+[Tstat]
+Installdir : 
+LastFlashFile : 
+LastFlashMethod : COM
+LastFlashPage : [Tstat]
+Default address : 2
+Default COM port : COM3
+Default baudrate : 19200
+[NC]
+LastFlashFile : C:\Program File\
+LastFlashPage : Ethernet
+Default IP : 192.168.0.3
+Default IP Port : 6001
+[Lighting Controller]
+LastFlashFile : C:\Program File\
+LastFlashType : Main board
+Default IP : 192.168.0.3
+Default IP Port : 6001
+Default address : 255
+Default Note : 0
+Default SubID : 254
