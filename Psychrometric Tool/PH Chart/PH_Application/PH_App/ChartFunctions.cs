@@ -253,9 +253,7 @@ namespace PH_App
             // MessageBox.Show("We are here inside peak 3d so ");
 
             // MessageBox.Show("Read finish excel file");
-
             // f1.DataPullFunctionForCoolProp("water");//n-Propane
-
 
             //ExcellDataPull ex = new ExcellDataPull();
             //ex.ExcellData();
@@ -286,8 +284,8 @@ namespace PH_App
         }
         public void SetDataPoints(DataSeries ds, double[,] P_Value, double[,] T_Value, double[,] H_Value)
         {
-            ds.XSpacing = 1;// 0.3f;
-            ds.YSpacing = 1;// 0.3f;
+            ds.XSpacing =  1;// 0.3f;
+            ds.YSpacing =  1;// 0.3f;
 
             Point3[,] pts = new Point3[300, 300];
 
@@ -295,8 +293,7 @@ namespace PH_App
             {
                 for (int j = 0; j < P_Value.GetLength(1); j++)
                 {
-                    pts[i, j] = new Point3((float)H_Value[j, i], (float)P_Value[j, i], (float)T_Value[j, i], 1);
-                   
+                    pts[i, j] = new Point3((float)H_Value[j, i], (float)P_Value[j, i], (float)T_Value[j, i], 1);                   
                 }
             }
            
@@ -315,7 +312,7 @@ namespace PH_App
             cs.XTick = 4;
             cs.YTick = 4;
             cs.ZTick = 0.5f;
-
+            
             ds.XDataMin = cs.XMin;
             ds.YDataMin = cs.YMin;
             ds.XSpacing = 0.5f;

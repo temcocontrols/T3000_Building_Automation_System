@@ -81,60 +81,7 @@ namespace PH_App
                     Xmax = mc.fluidInfo[0].Xmax; //--No prob
                     Ymin = mc.fluidInfo[0].Ymin;
                     Ymax = mc.fluidInfo[0].Ymax;//--No prob
-
-                    /*
-                    if(Xmin >= 0.001 && Xmin < 0.009)
-                    {
-                        //div by three
-                        xDiv = 1000;
-                        Xmin *= xDiv;
-                        xFlag = true;
-                    }
-                    else if (Xmin >= 0.01 && Xmin < 0.09)
-                    {
-                        xDiv = 100;
-                        Xmin *= xDiv;
-                        xFlag = true;
-                    }
-                    else if (Xmin >= 0.1 && Xmin < 0.9)
-                    {
-                        xDiv = 10;
-                        Xmin *= xDiv;
-                        xFlag = true;
-                    }
-                    else
-                    {
-                        //Do nothing
-                        xFlag = false;
-                    }
-
-                    if (Ymin >= 0.001 && Ymin < 0.009)
-                    {
-                        //div by three
-                        yDiv = 1000;
-                        Ymin *= yDiv;
-                        yFlag = true;
-                    }
-                    else if (Ymin >= 0.01 && Ymin < 0.09)
-                    {
-                        yDiv = 100;
-                        Ymin *= yDiv;
-                        yFlag = true;
-                    }
-                    else if (Ymin >= 0.1 && Ymin < 0.9)
-                    {
-                        yDiv = 10;
-                        Ymin *= yDiv;
-                        yFlag = true;
-                    }
-                    else
-                    {
-                        //Do nothing
-                        yFlag = false;
-                    }
-                    */
-
-
+                    
                 }
 
                 // mc.LoadForPH(fluidName,this,Xmin,Xmax,Ymin,Ymax,xDiv,yDiv,xFlag,yFlag);//--
@@ -155,15 +102,7 @@ namespace PH_App
 
         private void phChart_MouseDown(object sender, MouseEventArgs e)
         {
-
-            //if (e.Button == MouseButtons.Right)//on right mouse button is clicked.
-            //{
-            //        //==This shows the contextmenustrip on right click
-            //        CMSinsertNode.Enabled = true;
-            //      CMSinsertNode.Show(MousePosition);//-- this mouse position is used to show the menustrip in mouse pointer
-            //}
-            // MessageBox.Show("VALUES ="+chartOprn.ToString());
-            // MessageBox.Show("Ph chart" + phChart.Enabled);
+            
             mc.Chart_MouseDown(sender, e,this, MousePosition);
         }
         double xCoord=0, yCoord=0;
@@ -174,9 +113,7 @@ namespace PH_App
             {
                 this.Enabled = false;//optional, better target a panel or specific controls
                 this.UseWaitCursor = true;//from the Form/Window instance
-
                 mc.InsertNodeAndLine(phChart, xCoord, yCoord);
-
             }
             finally
             {

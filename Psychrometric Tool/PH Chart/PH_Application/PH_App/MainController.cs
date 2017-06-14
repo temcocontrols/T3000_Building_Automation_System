@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using Excel = Microsoft.Office.Interop.Excel;
+using System.Xml;
 
 
 namespace PH_App
@@ -51,7 +52,17 @@ namespace PH_App
             //var ch = new ChartCreationAndOperations();
             f.lbFluidName.Text =fluidName;
             //PlotPHChart(fluidNAME, f.phChart,Xmin,Xmax,Ymin,Ymax,xDiv,yDiv,xFlag,yFlag);
-            PlotPHChart(fluidNAME, f.phChart, Xmin, Xmax, Ymin, Ymax);
+            string filePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\Data\";
+            string pathWithFile = filePath + fluidName + "_Data";//databasePath1 + @"\db_psychrometric_project.s3db";
+
+            if (File.Exists(pathWithFile))
+            {
+                PlotPHChartUsingData(fluidNAME, f.phChart, Xmin, Xmax, Ymin, Ymax);
+            }
+            else
+            {
+                PlotPHChart(fluidNAME, f.phChart, Xmin, Xmax, Ymin, Ymax);
+            }
             //--End of the plotting chart here-----//
             //--Other task here
 
@@ -326,10 +337,8 @@ namespace PH_App
 
             for (int i = 0; i < temp_rng.Length; i++)
             {
-
                 if (((temp_rng[i] <= maxCriticalTemperature)))
                 {
-
                     double psat = PH.IAPWS_IF97_TowParameterEquivalentFxn("P", "T", temp_rng[i], "Q", 0, fluidName) / 1000000;
                     psatList.Add(psat);
                 } //Close of if statement
@@ -356,7 +365,6 @@ namespace PH_App
             {
                 double hVsat = CoolProp.PropsSI("H", "P", item * 1000000, "Q", 1, fluidName) / 1000;      // PH.IAPWS_IF97_TowParameterEquivalentFxn("H", "P", item, "Q", 1.0, fluidName);//Zero for vapor
                 hVsatList.Add(hVsat);
-
             }
 
             //--8. already declared
@@ -391,10 +399,8 @@ namespace PH_App
                 for (int j = 0; j < hVL_List.Count; j++)
                 {
                     hVL_LeftSideValue[j, i] = hVL_List[j] * stepVal;
-
                 }
                 stepVal += 0.1;
-
             }
 
             for (int i = 0; i < 9; i++)
@@ -402,10 +408,7 @@ namespace PH_App
                 for (int j = 0; j < hLsatList.Count; j++)
                 {
                     hLsat_RightSideValue[j, i] = hLsatList[j];
-
                 }
-
-
             }
 
             //For final sum
@@ -414,7 +417,6 @@ namespace PH_App
                 for (int j = 0; j < hLsatList.Count; j++)
                 {
                     hX[j, i] = hLsat_RightSideValue[j, i] + hVL_LeftSideValue[j, i];//  hLsatList[j].Value;
-
                 }
 
             }
@@ -429,50 +431,7 @@ namespace PH_App
                     hX,psat*ones(1,9),'g') % vapor dome                    
              */
 
-            phChart.Series.Clear();
-            /*
-            if (xFlag == true)
-            {
-                phChart.ChartAreas[0].AxisX.Minimum = Xmin/xDiv;
-
-                if (Xmax - (Xmin/xDiv) > 2000)
-                {
-                    phChart.ChartAreas[0].AxisX.Interval = 500;
-                }
-                else
-                {
-                    phChart.ChartAreas[0].AxisX.Interval = 100;
-                }
-
-            }
-            else { 
-            phChart.ChartAreas[0].AxisX.Minimum = Xmin; //1 / 1000; //--This was 1/1000
-                if(Xmax-Xmin > 2000)
-                {
-                    phChart.ChartAreas[0].AxisX.Interval = 500;
-                }else
-                {
-                    phChart.ChartAreas[0].AxisX.Interval = 100;
-                }
-            }
-            phChart.ChartAreas[0].AxisX.Maximum = Xmax;//4000; //4000;
-           // phChart.ChartAreas[0].AxisX.Interval = 500;
-
-            if (yFlag == true)
-            {
-                phChart.ChartAreas[0].AxisY.Minimum = Ymin/yDiv; //0.01; //--This was 0.001
-            }
-            else
-            {
-                phChart.ChartAreas[0].AxisY.Minimum = Ymin; //0.01; //--This was 0.001
-            }
-            
-            phChart.ChartAreas[0].AxisY.IsLogarithmic = true;
-            phChart.ChartAreas[0].AxisY.LogarithmBase = 10;
-            phChart.ChartAreas[0].AxisY.Interval = 1;
-            phChart.ChartAreas[0].AxisY.Maximum = Ymax; //50;
-            */
-
+            phChart.Series.Clear();       
             phChart.ChartAreas[0].AxisX.Minimum =Math.Round(Xmin,0);
             phChart.ChartAreas[0].AxisX.Maximum = Xmax;//4000; //4000;
             phChart.ChartAreas[0].AxisX.Interval = 200;
@@ -499,7 +458,6 @@ namespace PH_App
             phChart.Series["Series01"].Color = Color.Blue;
             phChart.Series["Series01"].Font = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold);
             //phChart.Series["Series01"].Font.
-
             // /*
             if (fluidName == "Water")
             {
@@ -520,10 +478,8 @@ namespace PH_App
                 phChart.Series["Series01"].Points[69].Label = "u";
                 phChart.Series["Series01"].Points[75].Label = "i";
                 phChart.Series["Series01"].Points[80].Label = "d";
-
             }
             //*/
-
 
             phChart.Series["Series01"].ChartArea = "ChartArea1";
 
@@ -583,28 +539,23 @@ namespace PH_App
                     psatOneToNine[j, i] = psatList[j];
                 }
             }
-
+            
             for (int i = 0; i < hX.GetLength(1); i++)//Row 
             {
 
                 phChart.Series.Add("Series4" + i);
                 phChart.Series["Series4" + i].ChartType = SeriesChartType.Line;
 
-
-
                 for (int j = 0; j < hX.GetLength(0); j++)//Column 
                 {
                     phChart.Series["Series4" + i].Points.AddXY(hX[j, i], psatOneToNine[j, i]);
                 }
-
                 phChart.Series["Series4" + i].Color = Color.Green;
                 phChart.Series["Series4" + i].Points[12].Label = $"{(i + 1) * 10} %";//initially no. 12
                 phChart.Series["Series4" + i].Font = new Font(FontFamily.GenericSansSerif, 10, FontStyle.Bold);
-
                 phChart.Series["Series4" + i].ChartArea = "ChartArea1";
-
             }
-
+            
             //---Contour line plotting chunk of code -----------//
             /*
              Steps : 
@@ -619,8 +570,7 @@ namespace PH_App
             for (int i = 0; i < numberOfContour; i++)
             {
                 string name = "ContourSeries" + i;
-                alSeries.Add(name);
-                
+                alSeries.Add(name);                
             }
 
             ChartFunctions cf = new ChartFunctions();
@@ -639,11 +589,24 @@ namespace PH_App
              27 gives 19 lines
              13 gives 8 lines
              */
-            dc.numberContours = 25;//35;
+            if (fluidName == "water")
+            {
+                dc.numberContours = 25;//35;
+            }
+            else
+            {
+                dc.numberContours = 35;//35;
+            }
+           
 
             List<DrawChart.DataTypeForPointList> listPoints = new List<DrawChart.DataTypeForPointList>();
             listPoints = dc.AddContour_MyCustomFxn(ds);
 
+            //--xml file formate
+
+            //--End of the xml file formate---------------//
+
+            CreateXML(fluidName, listPoints, hLsatList, hVsatList, psatList, hcrit, pcrit, hLcrit, hVcrit, hX, psatOneToNine);
             //-------------For indicator of Temperature---------//
 
             string seriesName1 = "TemperaturePoints";
@@ -653,12 +616,11 @@ namespace PH_App
             int flagSingleTemperatureIndicator = 1;//on first
             double zlevelValueForTempIndicator = 0;
             int dataPointCounter = 0;
-            // int enthalpyValueForIndiator = 2000;
+            //int enthalpyValueForIndiator = 2000;
 
             //---------------End of indicator of temperature---//
 
-
-
+            
             //--Serching z-levels and plotting 
             int initialZ = listPoints[0].zlevel;
             int initalIndex = 0;
@@ -680,10 +642,7 @@ namespace PH_App
                 for (int z = initalIndex; z < listPoints.Count; z++)
                 {
                     runningz = z;
-
-
-
-
+                    
                     if (initialZ == listPoints[z].zlevel)
                     {
                         //==Same zlevel then draw on one line
@@ -695,7 +654,7 @@ namespace PH_App
                         // /*
                         //===========Temperature indicator================//
                         ///*
-                          if(fluidName == "Water") { 
+                       if(fluidName == "Water") { 
                         
                         if (flagSingleTemperatureIndicator == 1 && dataPointCounter > (listPoints[z].zlevel) && (listPoints[z].x1 > 200 && listPoints[z].x1 < 2500))//(flagSingleTemperatureIndicator == 1 && zlevelValueForTempIndicator == listPoints[z].zlevel) //(listPoints[z].x1 == 2000)
                         {
@@ -713,7 +672,7 @@ namespace PH_App
                         }
                         zlevelValueForTempIndicator = listPoints[z].zlevel;
                         }
-                          //*/
+                        //*/
                         //===========Temper indiactor end==============//
                         // */
                     }
@@ -724,21 +683,18 @@ namespace PH_App
                         //flagSingleTemperatureIndicator = 1;//on
                         break;
                     }
-
                 }
-
                 if (runningz == listPoints.Count)
                 {
                     break;
                 }
-
             }
 
             //stopWatch.Stop();
             //MessageBox.Show($"Elapsed millisecond = { stopWatch.ElapsedMilliseconds} ms");
 
             //---End of the contour line plot chunk of code---//
-            ArrayList aListTemperature = new ArrayList();
+          //  ArrayList aListTemperature = new ArrayList();
             //string seriesName1 = "TemperaturePoints";
             //phChart.Series.Add(seriesName1);
             //phChart.Series[seriesName1].ChartType = SeriesChartType.Point;
@@ -846,6 +802,526 @@ namespace PH_App
             //=================================End regregration cycle=====================//
 
         }
+        public void CreateXML(string fluidName, List<DrawChart.DataTypeForPointList> listPoints, List<double> hLsatList, List<double> hVsatList, List<double> psatList,double hcrit,double pcrit,double hLcrit,double hVcrit,double[,] hX,double[,] psatOneToNine)
+        {
+            string filePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\Data\";
+            string pathWithFile = filePath + fluidName + "_Data";//databasePath1 + @"\db_psychrometric_project.s3db";
+
+            if (!File.Exists(pathWithFile))
+            {
+                //---XML file formate--//
+                var xmlDoc = new XmlDocument();
+
+                XmlNode rooNode = xmlDoc.CreateElement("FluidInfo");
+
+                //--For setting attribute in rootnode
+                XmlAttribute attributeFluidName = xmlDoc.CreateAttribute("FluidName");
+                attributeFluidName.Value = fluidName;
+                rooNode.Attributes.Append(attributeFluidName);
+
+                //hLsatList
+                XmlNode hLsatList_Node = xmlDoc.CreateElement("hLsatList");
+                for (int i = 0; i < hLsatList.Count; i++)
+                {
+                    //--Here we add the values
+                    XmlNode hlsatlistInnerNode = xmlDoc.CreateElement("hLsatList_Node");
+                    hlsatlistInnerNode.InnerText = Math.Round(hLsatList[i], 6).ToString(); //Trimming the data values
+                    hLsatList_Node.AppendChild(hlsatlistInnerNode);
+                }
+
+                //hVsatList
+                XmlNode hVsatList_Node = xmlDoc.CreateElement("hVsatList");
+                for (int i = 0; i < hVsatList.Count; i++)
+                {
+                    //--Here we add the values
+                    XmlNode hVsatlistInnerNode = xmlDoc.CreateElement("hVsatList_Node");
+                    hVsatlistInnerNode.InnerText = Math.Round(hVsatList[i], 6).ToString(); //Trimming the data values
+                    hVsatList_Node.AppendChild(hVsatlistInnerNode);
+                }
+
+                //psatList
+                XmlNode psatList_Node = xmlDoc.CreateElement("psatList");
+                for (int i = 0; i < psatList.Count; i++)
+                {
+                    //--Here we add the values
+                    XmlNode psatlistInnerNode = xmlDoc.CreateElement("psatList_Node");
+                    psatlistInnerNode.InnerText = Math.Round(psatList[i], 6).ToString(); //Trimming the data values
+                    psatList_Node.AppendChild(psatlistInnerNode);
+                }
+
+                XmlNode hcrit_Node = xmlDoc.CreateElement("hcrit_Node");
+                XmlNode pcrit_Node = xmlDoc.CreateElement("pcrit_Node");
+                XmlNode hLcrit_Node = xmlDoc.CreateElement("hLcrit_Node");
+                XmlNode hVcrit_Node = xmlDoc.CreateElement("hVcrit_Node");
+
+                //values 
+                hcrit_Node.InnerText = Math.Round(hcrit, 6).ToString();
+                pcrit_Node.InnerText = Math.Round(pcrit, 6).ToString();
+                hLcrit_Node.InnerText = Math.Round(hLcrit, 6).ToString();
+                hVcrit_Node.InnerText = Math.Round(hVcrit, 6).ToString();
+
+                //hX
+                var hX_Node = xmlDoc.CreateElement("hX_Nodes");
+                for (int i = 0; i < hX.GetLength(0); i++)
+                {
+                    for (int j = 0; j < hX.GetLength(1); j++)
+                    {
+                        XmlNode hXInnerNode = xmlDoc.CreateElement("hX_Node");
+                        hXInnerNode.InnerText = Math.Round(hX[i, j], 6).ToString();
+                        XmlAttribute attributeI = xmlDoc.CreateAttribute("i");
+                        attributeI.Value = i.ToString();
+                        XmlAttribute attributeJ = xmlDoc.CreateAttribute("j");
+                        attributeJ.Value = j.ToString();
+                        hXInnerNode.Attributes.Append(attributeI);
+                        hXInnerNode.Attributes.Append(attributeJ);
+                        hX_Node.AppendChild(hXInnerNode);
+                    }
+                }
+
+                /*
+                //psatOneToNine
+                XmlNode psatOneToNine_Node = xmlDoc.CreateElement("psatOneToNine_Nodes");
+                for (int i = 0; i < psatOneToNine.GetLength(0); i++)
+                {
+                    for (int j = 0; j < psatOneToNine.GetLength(1); j++)
+                    {
+                        XmlNode psatOneInnerNode = xmlDoc.CreateElement("psatOneToNine_Node");
+                        psatOneInnerNode.InnerText = Math.Round(hX[i, j], 6).ToString();
+                        XmlAttribute attributeI = xmlDoc.CreateAttribute("i");
+                        attributeI.Value = i.ToString();
+                        XmlAttribute attributeJ = xmlDoc.CreateAttribute("j");
+                        attributeJ.Value = j.ToString();
+                        psatOneInnerNode.Attributes.Append(attributeI);
+                        psatOneInnerNode.Attributes.Append(attributeJ);
+                        psatOneToNine_Node.AppendChild(psatOneInnerNode);
+                    }
+                }
+                */
+
+                //ListPoints
+                XmlNode listPoints_Node = xmlDoc.CreateElement("listPoints_Nodes");
+                for (int i = 0; i < listPoints.Count; i++)
+                {
+                    XmlNode innerNode = xmlDoc.CreateElement("listPoints_Node");
+                    //innerNode.Value = Math.Round(listPoints[i, j]., 6).ToString();
+                    XmlAttribute attributeX1 = xmlDoc.CreateAttribute("x1");
+                    attributeX1.Value = Math.Round(listPoints[i].x1, 6).ToString();
+                    XmlAttribute attributeX2 = xmlDoc.CreateAttribute("x2");
+                    attributeX2.Value = Math.Round(listPoints[i].x2, 6).ToString();
+
+                    XmlAttribute attributeY1 = xmlDoc.CreateAttribute("y1");
+                    attributeY1.Value = Math.Round(listPoints[i].y1, 6).ToString();
+                    XmlAttribute attributeY2 = xmlDoc.CreateAttribute("y2");
+                    attributeY2.Value = Math.Round(listPoints[i].y2, 6).ToString();
+
+                    XmlAttribute attribute_Zlevel = xmlDoc.CreateAttribute("zLevel");
+                    attribute_Zlevel.Value = listPoints[i].zlevel.ToString();
+
+                    innerNode.Attributes.Append(attributeX1);
+                    innerNode.Attributes.Append(attributeX2);
+                    innerNode.Attributes.Append(attributeY1);
+                    innerNode.Attributes.Append(attributeY2);
+                    innerNode.Attributes.Append(attribute_Zlevel);
+
+                    listPoints_Node.AppendChild(innerNode);
+                }
+
+                //--Now lets append to the root node
+                rooNode.AppendChild(hLsatList_Node);
+                rooNode.AppendChild(hVsatList_Node);
+                rooNode.AppendChild(psatList_Node);
+                rooNode.AppendChild(hcrit_Node);
+                rooNode.AppendChild(pcrit_Node);
+
+                rooNode.AppendChild(hLcrit_Node);
+                rooNode.AppendChild(hVcrit_Node);
+                rooNode.AppendChild(hX_Node);
+                //rooNode.AppendChild(psatOneToNine_Node);
+                rooNode.AppendChild(listPoints_Node);
+                xmlDoc.AppendChild(rooNode);
+                if (!Directory.Exists(filePath))
+                {
+                    Directory.CreateDirectory(filePath);
+
+                }
+                // MessageBox.Show(filePath);
+                xmlDoc.Save(pathWithFile);
+                FileInfo finfo = new FileInfo(pathWithFile);
+                finfo.Attributes = FileAttributes.ReadOnly;
+            }//Close of file .exits
+
+        }
+
+
+        public void PlotPHChartUsingData(string fluidName, Chart phChart, double Xmin, double Xmax, double Ymin, double Ymax)
+        {
+            /*
+             steps:1. Read the xml data carefully with verification
+             step :2. store the data in related variable similar to the plot function
+             step :3. Effective function manupilation
+             */
+            string filePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\Data\";
+            string pathWithFile = filePath + fluidName + "_Data";//databasePath1 + @"\db_psychrometric_project.s3db";
+
+            if (File.Exists(pathWithFile))
+            {
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load(pathWithFile);
+
+                //--Since the file is read only so can't be modified externally so no verification
+
+                XmlNodeList xmlRootNode = xmlDoc.GetElementsByTagName("FluidInfo");
+                foreach (XmlNode x in xmlRootNode)
+                {
+                    if(x.Attributes["FluidName"].Value == fluidName)
+                    {
+                        //--ok
+                    }else
+                    {
+                        return;
+                    }
+                }
+
+                //--First lets declear all the variables
+                List<DrawChart.DataTypeForPointList> listPoints = new List<DrawChart.DataTypeForPointList>();
+                List<double> hLsatList = new List<double>();
+
+                List<double> hVsatList = new List<double>();
+                List<double> psatList = new List<double>();
+                double hcrit=1;
+                double pcrit=1;
+                double hLcrit =1;
+                double hVcrit =1;
+               
+
+
+                //--hLsatList_Node
+                XmlNodeList hLsatList_Node = xmlDoc.GetElementsByTagName("hLsatList_Node");
+                foreach (XmlNode x in hLsatList_Node)
+                {
+                    hLsatList.Add(double.Parse(x.InnerText));
+                }
+                //--hVsatList
+                XmlNodeList hVsatList_Node = xmlDoc.GetElementsByTagName("hVsatList_Node");
+                foreach (XmlNode x in hVsatList_Node)
+                {
+                    hVsatList.Add(double.Parse(x.InnerText));
+                }
+                //--psatList
+                XmlNodeList psatList_Node = xmlDoc.GetElementsByTagName("psatList_Node");
+                foreach (XmlNode x in psatList_Node)
+                {
+                    psatList.Add(double.Parse(x.InnerText));
+                }
+
+                //--hcrit
+                XmlNodeList hcrit_Node = xmlDoc.GetElementsByTagName("hcrit_Node");
+                foreach (XmlNode x in hcrit_Node)
+                {
+                    hcrit= double.Parse(x.InnerText);
+                }
+
+                //--pcrit
+                XmlNodeList pcrit_Node = xmlDoc.GetElementsByTagName("pcrit_Node");
+                foreach (XmlNode x in pcrit_Node)
+                {
+                    pcrit = double.Parse(x.InnerText);
+                }
+
+                //--hLcrit
+                XmlNodeList hLcrit_Node = xmlDoc.GetElementsByTagName("hLcrit_Node");
+                foreach (XmlNode x in hLcrit_Node)
+                {
+                    hLcrit = double.Parse(x.InnerText);
+                }
+
+                //--hVcrit
+                XmlNodeList hVcrit_Node = xmlDoc.GetElementsByTagName("hVcrit_Node");
+                foreach (XmlNode x in hVcrit_Node)
+                {
+                    hVcrit = double.Parse(x.InnerText);
+                }
+
+                //--hVcrit
+                XmlNodeList hX_Node = xmlDoc.GetElementsByTagName("hX_Node");
+                //--lets count the j index
+                int rowIndex = (int)hX_Node.Count/9 ;
+                double[,] hX = new double[rowIndex,9]; //index is this 
+                //double[,] psatOneToNine=new double[hX_Node.Count / 9, 9];
+                int jIndex = 0;
+                int iIndex = 0;
+                for(int  i=0; i < rowIndex*9;i++)
+                {
+
+                  if(iIndex < rowIndex) { 
+                    hX[iIndex, jIndex] = double.Parse(hX_Node[i].InnerText);
+                    jIndex++;
+
+                    if(jIndex == 9)
+                    {
+                        iIndex++;
+                        jIndex = 0;                        
+                    }
+                   }
+                }
+
+              
+                XmlNodeList listPoints_Node = xmlDoc.GetElementsByTagName("listPoints_Node");
+               
+                foreach (XmlNode x in listPoints_Node)
+                {
+                    listPoints.Add(new DrawChart.DataTypeForPointList
+                    {
+                        x1 = double.Parse(x.Attributes["x1"].Value),
+                        x2 = double.Parse(x.Attributes["x2"].Value),
+                        y1 = double.Parse(x.Attributes["y1"].Value),
+                        y2 = double.Parse(x.Attributes["y2"].Value),
+                        zlevel = int.Parse(x.Attributes["zLevel"].Value)
+                    });
+                }
+               
+                //--Reading part has completed now
+                //--lets move to plotting parts
+
+                //=======================================Actual plot going on here================//
+
+
+
+                phChart.Series.Clear();
+                phChart.ChartAreas[0].AxisX.Minimum = Math.Round(Xmin, 0);
+                phChart.ChartAreas[0].AxisX.Maximum = Xmax;//4000; //4000;
+                phChart.ChartAreas[0].AxisX.Interval = 200;
+
+                phChart.ChartAreas[0].AxisY.Minimum = Ymin;//Math.Round(Ymin,3); //0.01; //--This was 0.001         
+                phChart.ChartAreas[0].AxisY.IsLogarithmic = true;
+                phChart.ChartAreas[0].AxisY.LogarithmBase = 10;// Math.Round(10.000,3);
+                phChart.ChartAreas[0].AxisY.Interval = 1;// Math.Round(1.000,3);
+                phChart.ChartAreas[0].AxisY.Maximum = Ymax;//Math.Round(Ymax,3); //50;
+                phChart.ChartAreas[0].AxisY.LabelStyle.Format = "{0:0.###}";//"{#.####}";
+
+                //--this one is for [hLsat;hLcrit],[psat;pcrit],'b', ...
+                // ph_chart.ChartAreas[0].AxisX.Minimum =
+
+                phChart.Series.Clear();
+
+                phChart.Series.Add("Series01");
+                phChart.Series["Series01"].ChartType = SeriesChartType.Line;
+                for (int i = 0; i < hLsatList.Count; i++)
+                {
+                    phChart.Series["Series01"].Points.AddXY(hLsatList[i], psatList[i]);
+                }
+                phChart.Series["Series01"].Points.AddXY(hLcrit, pcrit);
+                phChart.Series["Series01"].Color = Color.Blue;
+                phChart.Series["Series01"].Font = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold);
+                //phChart.Series["Series01"].Font.
+
+                // /*
+                if (fluidName == "Water")
+                {
+                    phChart.Series["Series01"].Points[12].Label = "S";
+                    phChart.Series["Series01"].Points[15].Label = "a";
+                    phChart.Series["Series01"].Points[18].Label = "t";
+                    phChart.Series["Series01"].Points[21].Label = "u";
+                    phChart.Series["Series01"].Points[24].Label = "r";
+                    phChart.Series["Series01"].Points[27].Label = "a";
+                    phChart.Series["Series01"].Points[30].Label = "t";
+                    phChart.Series["Series01"].Points[33].Label = "i";
+                    phChart.Series["Series01"].Points[36].Label = "o";
+                    phChart.Series["Series01"].Points[40].Label = "n";
+
+                    phChart.Series["Series01"].Points[50].Label = "L";
+                    phChart.Series["Series01"].Points[55].Label = "i";
+                    phChart.Series["Series01"].Points[63].Label = "q";
+                    phChart.Series["Series01"].Points[69].Label = "u";
+                    phChart.Series["Series01"].Points[75].Label = "i";
+                    phChart.Series["Series01"].Points[80].Label = "d";
+                }
+                //*/
+
+                phChart.Series["Series01"].ChartArea = "ChartArea1";
+
+                //This one if for  [hVsat;hVcrit],[psat;pcrit],'r', ...
+                phChart.Series.Add("Series2");
+                phChart.Series["Series2"].ChartType = SeriesChartType.Line;
+                for (int i = 0; i < hVsatList.Count; i++)
+                {
+                    phChart.Series["Series2"].Points.AddXY(hVsatList[i], psatList[i]);
+                }
+                phChart.Series["Series2"].Points.AddXY(hVcrit, pcrit);
+                phChart.Series["Series2"].Color = Color.Red;
+                //Chart1.Series(0).Font = New Font(Me.Font.Name, 5, FontStyle.Regular)
+                phChart.Series["Series2"].Font = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold);
+                // phChart.Series["Series2"].Points[12].Label = $"Saturation Vapour";
+                if (fluidName == "Water")
+                {
+
+                    ///*
+                    phChart.Series["Series2"].Points[12].Label = "S";
+                    phChart.Series["Series2"].Points[15].Label = "a";
+                    phChart.Series["Series2"].Points[18].Label = "t";
+                    phChart.Series["Series2"].Points[21].Label = "u";
+                    phChart.Series["Series2"].Points[24].Label = "r";
+                    phChart.Series["Series2"].Points[27].Label = "a";
+                    phChart.Series["Series2"].Points[31].Label = "t";
+                    phChart.Series["Series2"].Points[35].Label = "i";
+                    phChart.Series["Series2"].Points[39].Label = "o";
+                    phChart.Series["Series2"].Points[44].Label = "n";
+
+                    phChart.Series["Series2"].Points[50].Label = "V";
+                    phChart.Series["Series2"].Points[55].Label = "a";
+                    phChart.Series["Series2"].Points[60].Label = "p";
+                    phChart.Series["Series2"].Points[67].Label = "o";
+                    phChart.Series["Series2"].Points[74].Label = "u";
+                    phChart.Series["Series2"].Points[80].Label = "r";
+                }
+                // */
+
+                phChart.Series["Series2"].ChartArea = "ChartArea1";
+
+                //--For critical point
+                //This one if for  hcrit,pcrit,'o', ...
+                phChart.Series.Add("Series3");
+                phChart.Series["Series3"].ChartType = SeriesChartType.Point;
+
+                phChart.Series["Series3"].Points.AddXY(hcrit, pcrit);
+                phChart.Series["Series3"].Color = Color.Orange;
+                phChart.Series["Series3"].ChartArea = "ChartArea1";
+
+                //--This one is the last one
+                double[,] psatOneToNine = new double[psatList.Count, 9];
+                for (int i = 0; i < 9; i++)
+                {
+                    for (int j = 0; j < psatList.Count; j++)
+                    {
+                        psatOneToNine[j, i] = psatList[j];
+                    }
+                }
+                
+                for (int i = 0; i < hX.GetLength(1); i++)//Row 
+                {
+
+                    phChart.Series.Add("Series4" + i);
+                    phChart.Series["Series4" + i].ChartType = SeriesChartType.Line;
+
+                    for (int j = 0; j < hX.GetLength(0); j++)//Column 
+                    {
+                        phChart.Series["Series4" + i].Points.AddXY(hX[j, i], psatOneToNine[j, i]);
+                    }
+                    phChart.Series["Series4" + i].Color = Color.Green;
+                    phChart.Series["Series4" + i].Points[12].Label = $"{(i + 1) * 10} %";//initially no. 12
+                    phChart.Series["Series4" + i].Font = new Font(FontFamily.GenericSansSerif, 10, FontStyle.Bold);
+                    phChart.Series["Series4" + i].ChartArea = "ChartArea1";
+                }
+               // */
+                //---Contour line plotting chunk of code -----------//
+                /*
+                 Steps : 
+                 1. number of contour
+                 2. series decleration
+                 3. ds the data setting for Jack xu book[data is already calculated so]
+                 4. calling the plot function in Jack xu code
+                 */
+
+                int numberOfContour = 25;
+                ArrayList alSeries = new ArrayList();
+                for (int i = 0; i < numberOfContour; i++)
+                {
+                    string name = "ContourSeries" + i;
+                    alSeries.Add(name);
+                }
+               
+                string seriesName1 = "TemperaturePoints";
+                phChart.Series.Add(seriesName1);
+                phChart.Series[seriesName1].ChartType = SeriesChartType.Point;
+                int ind = 0;
+                int flagSingleTemperatureIndicator = 1;//on first
+                double zlevelValueForTempIndicator = 0;
+                int dataPointCounter = 0;
+                //int enthalpyValueForIndiator = 2000;
+                MathOperation PH = new MathOperation();
+
+                //---------------End of indicator of temperature---//
+
+               
+                //--Serching z-levels and plotting 
+                int initialZ = listPoints[0].zlevel;
+                int initalIndex = 0;
+                int runningz = 0;
+                for (int i = 0; i < numberOfContour; i++)
+                {
+                    //==First one is for moving in the list
+                    string seriesName = alSeries[i].ToString();
+                    Series s1 = new Series(seriesName);
+                    //s1.MarkerSize = 15;//--This does not work so
+                    s1.ChartType = SeriesChartType.Line;
+                    //s1.MarkerSize = 1;
+                    s1.BorderWidth = 2;
+                    phChart.Series.Add(s1);
+                    //phChart.Series.Add(seriesName);
+                    //phChart.Series[seriesName].ChartType = SeriesChartType.Line;
+                    //phChart.Series[seriesName].MarkerSize = 60;
+                    //==For moving in the list
+                    for (int z = initalIndex; z < listPoints.Count; z++)
+                    {
+                        runningz = z;
+
+                        if (initialZ == listPoints[z].zlevel)
+                        {
+                            //==Same zlevel then draw on one line
+                            phChart.Series[seriesName].Points.AddXY(listPoints[z].x1, listPoints[z].y1);
+                            phChart.Series[seriesName].Points.AddXY(listPoints[z].x2, listPoints[z].y2);
+
+                            dataPointCounter++;
+
+                            // /*
+                            //===========Temperature indicator================//
+                            ///*
+                            if (fluidName == "Water")
+                            {
+
+                                if (flagSingleTemperatureIndicator == 1 && dataPointCounter > (listPoints[z].zlevel) && (listPoints[z].x1 > 200 && listPoints[z].x1 < 2500))//(flagSingleTemperatureIndicator == 1 && zlevelValueForTempIndicator == listPoints[z].zlevel) //(listPoints[z].x1 == 2000)
+                                {
+                                    double temperature = PH.IAPWS_IF97_TowParameterEquivalentFxn("T", "H", listPoints[z].x1 * 1000, "P", listPoints[z].y1 * 1000000, fluidName); //--This multiply is done to convert MPa to Pa and enthlapy is divided to convert J/kg to kJ/Kg
+                                    phChart.Series[seriesName1].Points.AddXY(listPoints[z].x1, listPoints[z].y1);
+                                    phChart.Series[seriesName1].Points[ind++].Label = $"{Math.Round(temperature - 273.15, 0)}°C";
+                                    flagSingleTemperatureIndicator = 0;//off
+                                    dataPointCounter = 0;
+                                }
+
+                                if (listPoints[z].zlevel > zlevelValueForTempIndicator)
+                                {
+                                    flagSingleTemperatureIndicator = 1;//on
+                                                                       ////zlevelValueForTempIndicator = listPoints[z].zlevel;
+                                }
+                                zlevelValueForTempIndicator = listPoints[z].zlevel;
+                            }
+                            //
+                            //===========Temper indiactor end==============//
+                            // 
+                        }
+                        else
+                        {
+                            initialZ = listPoints[z].zlevel;
+                            initalIndex = z;
+                            //flagSingleTemperatureIndicator = 1;//on
+                            break;
+                        }
+                    }
+
+                    if (runningz == listPoints.Count)
+                    {
+                        break;
+                    }
+                }
+                //*/
+                //=================================End of the actual plot==========================//
+
+
+            
+            }//File.Exists() function
+        }
+
+
         public void Chart_MouseDown(object sender, MouseEventArgs e, Form_Main_PH_Application f1, Point position)
         {
 
