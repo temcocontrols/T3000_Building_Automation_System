@@ -18,7 +18,8 @@ extern bool cancle_send ;
 bool show_user_list_window = false;
 
 #define TIMER_SYNC_TIMER    1
-#define TIMER_REFRESH    2
+#define TIMER_REFRESH_READ    2
+#define TIMER_REFRESH_READ_DELAY    15000
 
 IMPLEMENT_DYNAMIC(CBacnetSetting, CDialogEx)
 
@@ -109,7 +110,6 @@ BEGIN_MESSAGE_MAP(CBacnetSetting, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_SETTING_IO_CONFIG, &CBacnetSetting::OnBnClickedButtonSettingIoConfig)
 	ON_BN_CLICKED(IDC_BUTTON_REBOOT_DEVICE, &CBacnetSetting::OnBnClickedButtonRebootDevice)
 	ON_WM_VSCROLL()
-	ON_BN_CLICKED(IDC_BUTTON1, &CBacnetSetting::OnBnClickedButton1)
 END_MESSAGE_MAP()
 
 
@@ -704,7 +704,9 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 						temp_cs1.GetBuffer(MAX_PATH), MAX_PATH );
 					temp_cs1.ReleaseBuffer();
 				
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(temp_cs1);
+					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->AddString(temp_cs1);
+					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetCurSel(3);
+					//((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(temp_cs1);
 				}
 				//else if(Device_Basic_Setting.reg.en_sntp == 6)
 				//{
@@ -954,8 +956,6 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 		break;
 	}
 	//GetDlgItem(IDC_BAC_SYNC_LOCAL_PC)->SetFocus();
-	
-
 	return 0;
 }
 
@@ -965,8 +965,8 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 BOOL CBacnetSetting::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
+
 	
-	SetTimer(TIMER_REFRESH, 5000, NULL);
 	InitScrollbar();
 	SetWindowTextW(_T("Setting"));
 	m_setting_dlg_hwnd = this->m_hWnd;
@@ -1064,19 +1064,24 @@ void CBacnetSetting::OnTimer(UINT_PTR nIDEvent)
 
 		}
 		break;
-	case TIMER_REFRESH:
-		{
+	case TIMER_REFRESH_READ:
+	{
+		KillTimer(TIMER_REFRESH_READ);
 		if (this->IsWindowVisible())
 		{
 
-				//SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("TIMER_REFRESH"));
-			//PostMessage(WM_FRESH_CM_LIST, READ_SETTING_COMMAND, NULL);
-			//PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);
-			//PostMessage(WM_FRESH_SETTING_UI, TIME_COMMAND, NULL);
+			if (g_protocol == MODBUS_RS485)
+			{
+				::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, 0, READ_SETTING_COMMAND);//第二个参数 In
+			}
+			else
+			{
+				if (bac_select_device_online)
+					::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, TYPE_SETTING);
+			}
 		}
-		//else KillTimer(TIMER_REFRESH);
 
-		}
+	}
 	break;
 	default:
 		break;
@@ -1099,7 +1104,7 @@ LRESULT  CBacnetSetting::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
 	{
 		Show_Results = temp_cs + _T("Success!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
-		//SetTimer(TIMER_REFRESH, 15000, NULL);
+
 	}
 	else
 	{
@@ -1109,6 +1114,8 @@ LRESULT  CBacnetSetting::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 
 	}
+	KillTimer(TIMER_REFRESH_READ);
+	SetTimer(TIMER_REFRESH_READ, TIMER_REFRESH_READ_DELAY, NULL);
 
 	if(pInvoke)
 		delete pInvoke;
@@ -1343,6 +1350,7 @@ void CBacnetSetting::OnBnClickedButtonSettingGsmModual()
 
 void CBacnetSetting::OnClose()
 {
+	 
 	ShowWindow(FALSE);
 	return;
 	CDialogEx::OnClose();
@@ -1665,7 +1673,7 @@ void CBacnetSetting::OnCbnSelchangeComboBacnetSettingTimeZone()
 {
 	
 	CString temp_string;
-	int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->GetCurSel();
+	int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->GetCurSel();	
 	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->GetLBText(nSel,temp_string);
 	if(nSel >= sizeof(Time_Zone_Value)/sizeof(Time_Zone_Value[0]))
 		return;
@@ -2121,3 +2129,5 @@ void CBacnetSetting::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
 	CDialog::OnVScroll(nSBCode, nPos, pScrollBar);
 }
+
+
