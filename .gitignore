@@ -2,6 +2,8 @@
 /T3000 Output
 /T3000 Output_VS2015
 
+**/Thumbs.db
+
 **/Debug/
 /**/.svn
 *.pdb
