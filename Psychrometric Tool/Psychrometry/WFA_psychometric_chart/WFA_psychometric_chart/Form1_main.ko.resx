@@ -167,6 +167,7 @@
   </data>
   <data name="id.HeaderText" xml:space="preserve">
     <value>신분증</value>
+    <comment>Previous text: id</comment>
   </data>
   <data name="insertNodeToolStripMenuItem.Text" xml:space="preserve">
     <value>노드 삽입</value>
@@ -209,6 +210,7 @@
   </data>
   <data name="name.HeaderText" xml:space="preserve">
     <value>이름</value>
+    <comment>Previous text: name</comment>
   </data>
   <data name="nodeAToolStripMenuItem.Text" xml:space="preserve">
     <value>노드 A</value>
@@ -224,6 +226,7 @@
   </data>
   <data name="quickNodeInsertToolStripMenuItem.Text" xml:space="preserve">
     <value>빠른 노드 삽입</value>
+    <comment>Previous text: Quick Node Insert</comment>
   </data>
   <data name="realTimeMode.Text" xml:space="preserve">
     <value>날씨 서비스</value>

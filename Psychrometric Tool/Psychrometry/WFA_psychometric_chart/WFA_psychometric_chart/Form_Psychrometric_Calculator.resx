@@ -364,13 +364,13 @@
     <value>2, 0, 2, 0</value>
   </data>
   <data name="unit_temp.Size" type="System.Drawing.Size, System.Drawing">
-    <value>39, 14</value>
+    <value>18, 14</value>
   </data>
   <data name="unit_temp.TabIndex" type="System.Int32, mscorlib">
     <value>22</value>
   </data>
   <data name="unit_temp.Text" xml:space="preserve">
-    <value>Deg. C</value>
+    <value>°C</value>
   </data>
   <data name="&gt;&gt;unit_temp.Name" xml:space="preserve">
     <value>unit_temp</value>

@@ -126,6 +126,9 @@
   <data name="button2.Text" xml:space="preserve">
     <value>취소</value>
   </data>
+  <data name="button3.Text" xml:space="preserve">
+    <value>지우기</value>
+  </data>
   <data name="chartID.HeaderText" xml:space="preserve">
     <value>
 차트 ID</value>

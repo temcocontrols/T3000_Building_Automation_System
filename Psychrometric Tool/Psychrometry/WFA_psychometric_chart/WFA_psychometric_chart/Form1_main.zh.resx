@@ -129,23 +129,14 @@
   <data name="deleteNodeToolStripMenuItem.Text" xml:space="preserve">
     <value>删除节点</value>
   </data>
-  <data name="deleteToolStripMenuItem.Text" xml:space="preserve">
-    <value>删除表</value>
-  </data>
   <data name="disconnectLineFromAToolStripMenuItem.Text" xml:space="preserve">
     <value>断开线路</value>
-  </data>
-  <data name="disconnectLineToolStripMenuItem.Text" xml:space="preserve">
-    <value>断开连接线</value>
   </data>
   <data name="editComfortzoneToolStripMenuItem.Text" xml:space="preserve">
     <value>编辑舒适区</value>
   </data>
   <data name="editNodeToolStripMenuItem.Text" xml:space="preserve">
     <value>编辑节点</value>
-  </data>
-  <data name="enableToolStripMenuItem.Text" xml:space="preserve">
-    <value>显示</value>
   </data>
   <data name="exitToolStripMenuItem.Text" xml:space="preserve">
     <value>出口</value>
@@ -167,9 +158,7 @@
   </data>
   <data name="id.HeaderText" xml:space="preserve">
     <value>识别</value>
-  </data>
-  <data name="insertNodeToolStripMenuItem.Text" xml:space="preserve">
-    <value>插入节点</value>
+    <comment>Previous text: id</comment>
   </data>
   <data name="label3.Text" xml:space="preserve">
     <value>气压：</value>
@@ -180,44 +169,17 @@
   <data name="lb_buildingselectedShow.Text" xml:space="preserve">
     <value>当前建筑：</value>
   </data>
-  <data name="lb_db_name.Text" xml:space="preserve">
-    <value>DBNAME</value>
-  </data>
-  <data name="lb_device_status.Text" xml:space="preserve">
-    <value>断开的</value>
-  </data>
   <data name="lb_devicestatusshow.Text" xml:space="preserve">
     <value>设备状态：</value>
   </data>
-  <data name="lb_modeshow.Text" xml:space="preserve">
-    <value>模式：</value>
-  </data>
-  <data name="lb_number_of_chart_label.Text" xml:space="preserve">
-    <value>图表的数量：</value>
-  </data>
-  <data name="lb_pressure_display.Text" xml:space="preserve">
-    <value>压力</value>
-  </data>
-  <data name="lb_realtimeshow.Text" xml:space="preserve">
-    <value>即时的</value>
-  </data>
   <data name="lb_title_display.Text" xml:space="preserve">
     <value>标题</value>
-  </data>
-  <data name="lb_unit_chosen_display.Text" xml:space="preserve">
-    <value>单位：SI</value>
-  </data>
-  <data name="lb_web_status.Text" xml:space="preserve">
-    <value>待用</value>
   </data>
   <data name="lb_webstatusshow.Text" xml:space="preserve">
     <value>网络状态：</value>
   </data>
   <data name="loadConfigurationToolStripMenuItem.Text" xml:space="preserve">
     <value>负载配置</value>
-  </data>
-  <data name="name.HeaderText" xml:space="preserve">
-    <value>名称</value>
   </data>
   <data name="nodeAToolStripMenuItem.Text" xml:space="preserve">
     <value>节点A.</value>
@@ -233,6 +195,7 @@
   </data>
   <data name="quickNodeInsertToolStripMenuItem.Text" xml:space="preserve">
     <value>快速节点插入</value>
+    <comment>Previous text: Quick Node Insert</comment>
   </data>
   <data name="realTimeMode.Text" xml:space="preserve">
     <value>实时模式</value>
@@ -243,9 +206,6 @@
   </data>
   <data name="saveConfigurationToolStripMenuItem.Text" xml:space="preserve">
     <value>保存配置</value>
-  </data>
-  <data name="settingsToolStripMenuItem.Text" xml:space="preserve">
-    <value>设置</value>
   </data>
   <data name="showComfortZoneToolStripMenuItem.Text" xml:space="preserve">
     <value>舒适区</value>

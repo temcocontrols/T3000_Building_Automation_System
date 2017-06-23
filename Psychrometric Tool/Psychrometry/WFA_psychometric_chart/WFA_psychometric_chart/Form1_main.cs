@@ -10392,16 +10392,16 @@ namespace WFA_psychometric_chart
 
         private void saveConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
         {
-           // try {
+            try {
                 //We need to get the configuration for load here 
                 // SaveConfiguration();
                 //  SaveConfigurationForBuildingSetting();//--This actual saving the data
                 SQLiteSaveConfigurationSetting();
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show(ex.Message);
-            //}
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
 
@@ -12972,6 +12972,7 @@ namespace WFA_psychometric_chart
                 //--Pulling data and plotting values--
                 //DataGridView_Show_Data();
                 //Now reloading the data 
+
                 PullDataAndPlot();
 
             }
@@ -14728,8 +14729,7 @@ namespace WFA_psychometric_chart
 
                 //string NewDirectory = Path.GetFullPath(Path.Combine(dir, @"..\"));
                 //string file = NewDirectory + @"Database\image\lock.png";
-
-
+                
                 string imagePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 //string newPath = Path.GetFullPath(Path.Combine(imagePath, @"..\"));
                 //string file = newPath + @"Database\image\lock.png";//imagePath + @"\image\lock.png";

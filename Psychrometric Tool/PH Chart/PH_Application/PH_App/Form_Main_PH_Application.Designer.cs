@@ -30,12 +30,12 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form_Main_PH_Application));
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this.phChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.lb_db_name = new System.Windows.Forms.Label();
             this.lb_buildingselectedShow = new System.Windows.Forms.Label();
@@ -52,10 +52,12 @@
             this.lbTemperature = new System.Windows.Forms.Label();
             this.lbTemperatureIndicator = new System.Windows.Forms.Label();
             this.lbEnthalpy = new System.Windows.Forms.Label();
-            this.label23 = new System.Windows.Forms.Label();
+            this.label23fewfe = new System.Windows.Forms.Label();
             this.lbPressure = new System.Windows.Forms.Label();
-            this.label21 = new System.Windows.Forms.Label();
+            this.label21ffae = new System.Windows.Forms.Label();
             this.gb_showstatus = new System.Windows.Forms.GroupBox();
+            this.lbTest4 = new System.Windows.Forms.Label();
+            this.lbTest3 = new System.Windows.Forms.Label();
             this.lbTest2 = new System.Windows.Forms.Label();
             this.lb_realtimeshow = new System.Windows.Forms.Label();
             this.lbPrintTest = new System.Windows.Forms.Label();
@@ -113,20 +115,21 @@
             // phChart
             // 
             resources.ApplyResources(this.phChart, "phChart");
-            chartArea1.AxisX.Title = "Enthalpy h[KJ/kg]";
-            chartArea1.AxisY.Title = "Pressure P[MPa]";
-            chartArea1.Name = "ChartArea1";
-            this.phChart.ChartAreas.Add(chartArea1);
-            legend1.Enabled = false;
-            legend1.Name = "Legend1";
-            this.phChart.Legends.Add(legend1);
+            chartArea2.AxisX.Title = "Enthalpy h[KJ/kg]";
+            chartArea2.AxisY.Title = "Pressure P[MPa]";
+            chartArea2.Name = "ChartArea1";
+            this.phChart.ChartAreas.Add(chartArea2);
+            legend2.Enabled = false;
+            legend2.Name = "Legend1";
+            this.phChart.Legends.Add(legend2);
             this.phChart.Name = "phChart";
-            series1.ChartArea = "ChartArea1";
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.phChart.Series.Add(series1);
+            series2.ChartArea = "ChartArea1";
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            this.phChart.Series.Add(series2);
             this.phChart.MouseClick += new System.Windows.Forms.MouseEventHandler(this.phChart_MouseClick);
             this.phChart.MouseDown += new System.Windows.Forms.MouseEventHandler(this.phChart_MouseDown);
+            this.phChart.MouseHover += new System.EventHandler(this.phChart_MouseHover);
             this.phChart.MouseMove += new System.Windows.Forms.MouseEventHandler(this.phChart_MouseMove);
             // 
             // lb_db_name
@@ -143,14 +146,14 @@
             // 
             this.dataGridView1.AllowUserToAddRows = false;
             this.dataGridView1.BackgroundColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Arial", 8.25F);
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.ControlDark;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Arial", 8.25F);
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.ControlDark;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.id,
@@ -169,10 +172,10 @@
             // 
             // id
             // 
-            dataGridViewCellStyle2.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.SteelBlue;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.WhiteSmoke;
-            this.id.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle5.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.Color.SteelBlue;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.Color.WhiteSmoke;
+            this.id.DefaultCellStyle = dataGridViewCellStyle5;
             resources.ApplyResources(this.id, "id");
             this.id.Name = "id";
             this.id.ReadOnly = true;
@@ -180,9 +183,9 @@
             // 
             // name
             // 
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.SteelBlue;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.White;
-            this.name.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.Color.SteelBlue;
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.Color.White;
+            this.name.DefaultCellStyle = dataGridViewCellStyle6;
             resources.ApplyResources(this.name, "name");
             this.name.Name = "name";
             this.name.ReadOnly = true;
@@ -200,9 +203,9 @@
             this.groupBox4ttt.Controls.Add(this.lbTemperature);
             this.groupBox4ttt.Controls.Add(this.lbTemperatureIndicator);
             this.groupBox4ttt.Controls.Add(this.lbEnthalpy);
-            this.groupBox4ttt.Controls.Add(this.label23);
+            this.groupBox4ttt.Controls.Add(this.label23fewfe);
             this.groupBox4ttt.Controls.Add(this.lbPressure);
-            this.groupBox4ttt.Controls.Add(this.label21);
+            this.groupBox4ttt.Controls.Add(this.label21ffae);
             this.groupBox4ttt.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.groupBox4ttt.Name = "groupBox4ttt";
             this.groupBox4ttt.TabStop = false;
@@ -256,24 +259,26 @@
             resources.ApplyResources(this.lbEnthalpy, "lbEnthalpy");
             this.lbEnthalpy.Name = "lbEnthalpy";
             // 
-            // label23
+            // label23fewfe
             // 
-            resources.ApplyResources(this.label23, "label23");
-            this.label23.Name = "label23";
+            resources.ApplyResources(this.label23fewfe, "label23fewfe");
+            this.label23fewfe.Name = "label23fewfe";
             // 
             // lbPressure
             // 
             resources.ApplyResources(this.lbPressure, "lbPressure");
             this.lbPressure.Name = "lbPressure";
             // 
-            // label21
+            // label21ffae
             // 
-            resources.ApplyResources(this.label21, "label21");
-            this.label21.Name = "label21";
+            resources.ApplyResources(this.label21ffae, "label21ffae");
+            this.label21ffae.Name = "label21ffae";
             // 
             // gb_showstatus
             // 
             resources.ApplyResources(this.gb_showstatus, "gb_showstatus");
+            this.gb_showstatus.Controls.Add(this.lbTest4);
+            this.gb_showstatus.Controls.Add(this.lbTest3);
             this.gb_showstatus.Controls.Add(this.lbTest2);
             this.gb_showstatus.Controls.Add(this.lb_realtimeshow);
             this.gb_showstatus.Controls.Add(this.lbPrintTest);
@@ -286,6 +291,16 @@
             this.gb_showstatus.Controls.Add(this.lb_devicestatusshow);
             this.gb_showstatus.Name = "gb_showstatus";
             this.gb_showstatus.TabStop = false;
+            // 
+            // lbTest4
+            // 
+            resources.ApplyResources(this.lbTest4, "lbTest4");
+            this.lbTest4.Name = "lbTest4";
+            // 
+            // lbTest3
+            // 
+            resources.ApplyResources(this.lbTest3, "lbTest3");
+            this.lbTest3.Name = "lbTest3";
             // 
             // lbTest2
             // 
@@ -550,6 +565,9 @@
             // 
             resources.ApplyResources(this.lbFluidName, "lbFluidName");
             this.lbFluidName.Name = "lbFluidName";
+            this.lbFluidName.Click += new System.EventHandler(this.lbFluidName_Click);
+            this.lbFluidName.MouseLeave += new System.EventHandler(this.lbFluidName_MouseLeave);
+            this.lbFluidName.MouseHover += new System.EventHandler(this.lbFluidName_MouseHover);
             // 
             // lbFNameLabel
             // 
@@ -574,6 +592,7 @@
             this.Name = "Form_Main_PH_Application";
             this.Load += new System.EventHandler(this.Form_Main_PH_Application_Load);
             this.Shown += new System.EventHandler(this.Form_Main_PH_Application_Shown);
+            this.MouseHover += new System.EventHandler(this.Form_Main_PH_Application_MouseHover);
             ((System.ComponentModel.ISupportInitialize)(this.phChart)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.groupBox4ttt.ResumeLayout(false);
@@ -603,7 +622,7 @@
         private System.Windows.Forms.Label labelline1;
         private System.Windows.Forms.Label label25;
         private System.Windows.Forms.Label lbTemperatureIndicator;
-        private System.Windows.Forms.Label label21;
+        private System.Windows.Forms.Label label21ffae;
         private System.Windows.Forms.GroupBox gb_showstatus;
         private System.Windows.Forms.Label lb_modeshow;
         private System.Windows.Forms.Label lb_vertical_line2;
@@ -644,7 +663,7 @@
         public System.Windows.Forms.Label lbPressure;
         private System.Windows.Forms.Label label5;
         public System.Windows.Forms.Label lbEnthalpy;
-        private System.Windows.Forms.Label label23;
+        private System.Windows.Forms.Label label23fewfe;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
@@ -656,5 +675,7 @@
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         public System.Windows.Forms.Label lbFluidName;
         public System.Windows.Forms.Label lbFNameLabel;
+        public System.Windows.Forms.Label lbTest3;
+        public System.Windows.Forms.Label lbTest4;
     }
 }

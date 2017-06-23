@@ -144,9 +144,7 @@ namespace PH_App
                     SelectBuildingInPsychro("Default_Building");//Selecting the default building
 
                 }
-
-
-
+                
             }
             else
             {

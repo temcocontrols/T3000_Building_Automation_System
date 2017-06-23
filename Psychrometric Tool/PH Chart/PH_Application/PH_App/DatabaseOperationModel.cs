@@ -87,9 +87,9 @@ namespace PH_App
 
         public class fluidProperty
         {
-           public int selected { get; set; }
-           public string fluidName { get; set; }
-         public    double Xmin { get; set; }
+            public int selected { get; set; }
+            public string fluidName { get; set; }
+            public double Xmin { get; set; }
             public double Xmax { get; set; }
             public double Ymin { get; set; }
             public double Ymax { get; set; }
@@ -104,9 +104,10 @@ namespace PH_App
             using (SQLiteConnection m_dbConnection = new SQLiteConnection($"Data Source={databaseFile};Version=3;"))
             {
                 m_dbConnection.Open();
-                string slqFluid = "Select * from tbl_" + buildingName + "_FluidInfo where selected='1'";
+                //string slqFluid = "Select * from tbl_" + buildingName + "_FluidInfo where selected='1'";
+                string slqFluid = "Select * from tbl_" + buildingName + "_FluidInfo ";
 
-              //  bool fluidPresent = false;
+                //  bool fluidPresent = false;
                 SQLiteCommand cmdFluid = new SQLiteCommand(slqFluid, m_dbConnection);
 
                 SQLiteDataReader readerFluid = cmdFluid.ExecuteReader();
@@ -201,6 +202,11 @@ namespace PH_App
 
                 //MessageBox.Show("Creating tables from update section");
 
+                ////--tbl_[]_chart_fluid_info
+                string sqlChartFluidInfo = "create table IF NOT EXISTS tbl_" + buildingNameSelected + "_chart_fluid_info(count INTEGER PRIMARY KEY AUTOINCREMENT,chartID varchar(255),fluidName varchar(255))";
+                SQLiteCommand cmdChartFluidInfo = new SQLiteCommand(sqlChartFluidInfo, m_dbConnection);
+                cmdChartFluidInfo.ExecuteNonQuery();
+
                 //now execute the query
                 //SQLiteCommand cm101 = new SQLiteCommand(tbl_comfortzoneSetting, m_dbConnection);
                 //cm101.ExecuteNonQuery();
@@ -256,7 +262,7 @@ namespace PH_App
                 if (fluidPresent != true)
                 {
 
-
+                    /*
                     //water
                     string sqlWater = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '1','Water','0.001','4000','0.001','100')";
                     SQLiteCommand cmdWater = new SQLiteCommand(sqlWater, m_dbConnection);
@@ -284,6 +290,37 @@ namespace PH_App
                     string sqlButene = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','1-Butene','0.5','2400','0.5','100')";
                     SQLiteCommand cmdButene = new SQLiteCommand(sqlButene, m_dbConnection);
                     cmdButene.ExecuteNonQuery();
+                    */
+
+
+                    //water
+                    string sqlWater = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '1','Water','0.001','4000','0.001','100')";
+                    SQLiteCommand cmdWater = new SQLiteCommand(sqlWater, m_dbConnection);
+                    cmdWater.ExecuteNonQuery();
+                    //acetone
+                    string sqlAcetone = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','Acetone','0.001','1500','0.03','30')";
+                    SQLiteCommand cmdAcetone = new SQLiteCommand(sqlAcetone, m_dbConnection);
+                    cmdAcetone.ExecuteNonQuery();
+                    //ammonia
+                    string sqlAmmonia = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','Ammonia','0.5','2500','0.5','50')";
+                    SQLiteCommand cmdAmmonia = new SQLiteCommand(sqlAmmonia, m_dbConnection);
+                    cmdAmmonia.ExecuteNonQuery();
+
+                    //n-Propane
+                    string sqlPropane = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','n-Propane','0.001','1000','0.05','10')";
+                    SQLiteCommand cmdPropane = new SQLiteCommand(sqlPropane, m_dbConnection);
+                    cmdPropane.ExecuteNonQuery();
+
+                    //R134a
+                    string sqlR134a = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','R134a','0.5','600','0.5','10')";
+                    SQLiteCommand cmdR134a = new SQLiteCommand(sqlR134a, m_dbConnection);
+                    cmdR134a.ExecuteNonQuery();
+
+                    //1-Butene
+                    string sqlButene = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','1-Butene','0.5','800','0.5','10')";
+                    SQLiteCommand cmdButene = new SQLiteCommand(sqlButene, m_dbConnection);
+                    cmdButene.ExecuteNonQuery();
+
                 }
 
 
@@ -657,6 +694,18 @@ namespace PH_App
                 //now execute the query
                 //SQLiteCommand cm1 = new SQLiteCommand(tbl_comfortzoneSetting, m_dbConnection);
                 //cm1.ExecuteNonQuery();
+                string tbl_FluidInfo = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_FluidInfo(count INTEGER PRIMARY KEY AUTOINCREMENT,selected INTEGER, fluidName varchar(255) ,Xmin VARCHAR(255),Xmax varchar(255),Ymin VARCHAR(255),Ymax varchar(255))";
+
+
+                ////--tbl_[]_chart_fluid_info
+                string sqlChartFluidInfo = "create table IF NOT EXISTS tbl_" + buildingNameSelected + "_chart_fluid_info(count INTEGER PRIMARY KEY AUTOINCREMENT,chartID varchar(255),fluidName varchar(255))";
+                SQLiteCommand cmdChartFluidInfo = new SQLiteCommand(sqlChartFluidInfo, m_dbConnection);
+                cmdChartFluidInfo.ExecuteNonQuery();
+
+
+                //For fluidInfo
+                SQLiteCommand cmdFluidInfo = new SQLiteCommand(tbl_FluidInfo, m_dbConnection);
+                cmdFluidInfo.ExecuteNonQuery();
 
                 SQLiteCommand cm2 = new SQLiteCommand(tbl_chart_detail, m_dbConnection);
                 cm2.ExecuteNonQuery();
@@ -818,8 +867,8 @@ namespace PH_App
 
                 if (fluidPresent != true)
                 {
-               
 
+                    /*
                     //water
                     string sqlWater = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '1','Water','0.001','4000','0.001','100')";
                     SQLiteCommand cmdWater = new SQLiteCommand(sqlWater, m_dbConnection);
@@ -845,6 +894,36 @@ namespace PH_App
 
                     //1-Butene
                     string sqlButene = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','1-Butene','0.5','2400','0.5','100')";
+                    SQLiteCommand cmdButene = new SQLiteCommand(sqlButene, m_dbConnection);
+                    cmdButene.ExecuteNonQuery();
+
+                    */
+
+                    //water
+                    string sqlWater = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '1','Water','0.001','4000','0.001','100')";
+                    SQLiteCommand cmdWater = new SQLiteCommand(sqlWater, m_dbConnection);
+                    cmdWater.ExecuteNonQuery();
+                    //acetone
+                    string sqlAcetone = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','Acetone','0.001','1500','0.03','30')";
+                    SQLiteCommand cmdAcetone = new SQLiteCommand(sqlAcetone, m_dbConnection);
+                    cmdAcetone.ExecuteNonQuery();
+                    //ammonia
+                    string sqlAmmonia = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','Ammonia','0.5','2500','0.5','50')";
+                    SQLiteCommand cmdAmmonia = new SQLiteCommand(sqlAmmonia, m_dbConnection);
+                    cmdAmmonia.ExecuteNonQuery();
+
+                    //n-Propane
+                    string sqlPropane = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','n-Propane','0.001','1000','0.05','10')";
+                    SQLiteCommand cmdPropane = new SQLiteCommand(sqlPropane, m_dbConnection);
+                    cmdPropane.ExecuteNonQuery();
+
+                    //R134a
+                    string sqlR134a = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','R134a','0.5','600','0.5','10')";
+                    SQLiteCommand cmdR134a = new SQLiteCommand(sqlR134a, m_dbConnection);
+                    cmdR134a.ExecuteNonQuery();
+
+                    //1-Butene
+                    string sqlButene = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','1-Butene','0.5','800','0.5','10')";
                     SQLiteCommand cmdButene = new SQLiteCommand(sqlButene, m_dbConnection);
                     cmdButene.ExecuteNonQuery();
                 }
@@ -1004,7 +1083,13 @@ namespace PH_App
                 //cm101.ExecuteNonQuery();
 
                 string tbl_FluidInfo = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_FluidInfo(count INTEGER PRIMARY KEY AUTOINCREMENT,selected INTEGER, fluidName varchar(255) ,Xmin VARCHAR(255),Xmax varchar(255),Ymin VARCHAR(255),Ymax varchar(255))";
-                
+
+                ////--tbl_[]_chart_fluid_info
+                string sqlChartFluidInfo = "create table IF NOT EXISTS tbl_" + buildingNameSelected + "_chart_fluid_info(count INTEGER PRIMARY KEY AUTOINCREMENT,chartID varchar(255),fluidName varchar(255))";
+                SQLiteCommand cmdChartFluidInfo = new SQLiteCommand(sqlChartFluidInfo, m_dbConnection);
+                cmdChartFluidInfo.ExecuteNonQuery();
+
+
                 //For fluidInfo
                 SQLiteCommand cmdFluidInfo = new SQLiteCommand(tbl_FluidInfo, m_dbConnection);
                 cmdFluidInfo.ExecuteNonQuery();
@@ -1165,7 +1250,7 @@ namespace PH_App
 
                 if (fluidPresent != true)
                 {
-
+                    /*
                     //water
                     string sqlWater = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '1','Water','0.001','4000','0.001','100')";
                     SQLiteCommand cmdWater = new SQLiteCommand(sqlWater, m_dbConnection);
@@ -1191,6 +1276,36 @@ namespace PH_App
 
                     //1-Butene
                     string sqlButene = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','1-Butene','0.5','2400','0.5','100')";
+                    SQLiteCommand cmdButene = new SQLiteCommand(sqlButene, m_dbConnection);
+                    cmdButene.ExecuteNonQuery();
+                    */
+
+
+                    //water
+                    string sqlWater = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '1','Water','0.001','4000','0.001','100')";
+                    SQLiteCommand cmdWater = new SQLiteCommand(sqlWater, m_dbConnection);
+                    cmdWater.ExecuteNonQuery();
+                    //acetone
+                    string sqlAcetone = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','Acetone','0.001','1500','0.03','30')";
+                    SQLiteCommand cmdAcetone = new SQLiteCommand(sqlAcetone, m_dbConnection);
+                    cmdAcetone.ExecuteNonQuery();
+                    //ammonia
+                    string sqlAmmonia = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','Ammonia','0.5','2500','0.5','50')";
+                    SQLiteCommand cmdAmmonia = new SQLiteCommand(sqlAmmonia, m_dbConnection);
+                    cmdAmmonia.ExecuteNonQuery();
+
+                    //n-Propane
+                    string sqlPropane = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','n-Propane','0.001','1000','0.05','10')";
+                    SQLiteCommand cmdPropane = new SQLiteCommand(sqlPropane, m_dbConnection);
+                    cmdPropane.ExecuteNonQuery();
+
+                    //R134a
+                    string sqlR134a = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','R134a','0.5','600','0.5','10')";
+                    SQLiteCommand cmdR134a = new SQLiteCommand(sqlR134a, m_dbConnection);
+                    cmdR134a.ExecuteNonQuery();
+
+                    //1-Butene
+                    string sqlButene = "INSERT INTO tbl_" + buildingNameSelected + "_FluidInfo(selected,fluidName,Xmin,Xmax,Ymin,Ymax )   VALUES( '0','1-Butene','0.5','800','0.5','10')";
                     SQLiteCommand cmdButene = new SQLiteCommand(sqlButene, m_dbConnection);
                     cmdButene.ExecuteNonQuery();
                 }
@@ -1551,14 +1666,7 @@ namespace PH_App
             string tableForInputStorageFromT3000 = "tbl_" + buildingName + "_input_storage_from_T3000";
             string tableForValuesFromT3000 = "tbl_" + buildingName + "_node_data_related_T3000";
            // string tableMixNode = "tbl_" + buildingName + "_mix_node_info";
-
-
-            //These two tables are for comfort zone 
-            //string tableforComfortZoneDetail = "tbl_" + buildingName + "_comfort_zone_detail";
-            //string tableForChartComfortZoneSetting = "tbl_" + buildingName + "_chart_comfort_zone_setting";
-
-           //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+           
             string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
             string connString = @"Data Source=" + databaseFile + ";Version=3;";
 
@@ -1567,7 +1675,6 @@ namespace PH_App
             using (SQLiteConnection connection = new SQLiteConnection(connString))
             {
                 connection.Open();
-
                
                 string sql3 = "create table IF NOT EXISTS " + tableForChartDetail + "(count INTEGER PRIMARY KEY AUTOINCREMENT ,chartID VARCHAR(255),chartName varchar(255),chart_respective_nodeID varchar(255),chart_respective_lineID varchar(255),enableChartStatus varchar(255))";
                 SQLiteCommand command3 = new SQLiteCommand(sql3, connection);
@@ -1618,6 +1725,7 @@ namespace PH_App
                 command8.ExecuteNonQuery();
 
 
+
                 //tableMixNode
                 //string sql9 = "create table IF NOT EXISTS  " + tableMixNode + "  ( count INTEGER PRIMARY KEY AUTOINCREMENT,nodeID varchar(255),chartID varchar(255),previousNodeID varchar(255),nextNodeID varchar(255) )";
                 //SQLiteCommand command9 = new SQLiteCommand(sql9, connection);
@@ -1637,6 +1745,7 @@ namespace PH_App
             public string chart_respective_nodeID { get; set; }
             public string chart_respective_lineID { get; set; }
             public string enableChartStatus { get; set; }
+          //  public string fluidName { get; set; }
         }
         public List<chartDetailDT> chartDetailList = new List<chartDetailDT>();//This is used for storing the chart detail ids
 
@@ -1673,13 +1782,46 @@ namespace PH_App
                         chartName = reader["chartName"].ToString(),
                         chart_respective_nodeID = reader["chart_respective_nodeID"].ToString(),
                         chart_respective_lineID = reader["chart_respective_lineID"].ToString(),
-                        enableChartStatus = reader["enableChartStatus"].ToString() //either true or false
-
+                        enableChartStatus = reader["enableChartStatus"].ToString() 
+                       //fluidName = reader["fluidName"].ToString()
                     });
                 }
             }
-
         }  //Close of the function  PullChartList
+
+        public class fluidChartType
+        {
+            public int count { get; set; }
+            public string chartID { get; set; }
+            public string fluidName { get; set; }
+            
+        }
+        public List<fluidChartType> fluidForChartsList = new List<fluidChartType>();//This is used for storing the chart detail ids
+
+        public void PullFluidForChartList(string buildingName)
+        {
+
+            fluidForChartsList.Clear();//resetting the chart list value..
+            string tableName = "tbl_" + buildingName + "_chart_fluid_info";
+            string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                string sql = "select * from  " + tableName ;
+                var command = new SQLiteCommand(sql, connection);
+                var reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    fluidForChartsList.Add(new fluidChartType
+                    {
+                        count = int.Parse(reader["count"].ToString()),
+                        chartID = reader["chartID"].ToString(),
+                        fluidName = reader["fluidName"].ToString()                        
+                    });
+                }
+            }
+        }
 
         public string GetGUID()
         {
@@ -1691,6 +1833,8 @@ namespace PH_App
             string buildingNameValue = selectedBuildingList[0].BuildingName;//listBuildingSelectedInfoInPsycho
             //string buildingNameValue = listBuildingSelectedInfoInPsycho[0].BuildingName;
             string tableNameOfChart = "tbl_" + buildingNameValue + "_chart_detail";
+            string chartFluidTable = "tbl_" + buildingNameValue + "_chart_fluid_info";
+
             //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
             string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
@@ -1712,9 +1856,20 @@ namespace PH_App
                 command.Parameters.AddWithValue("@nodeRespectiveID", chart_resp_nodes_group_ID);
                 command.Parameters.AddWithValue("@lineRespectiveID", chart_resp_lines_group_ID);
                 command.Parameters.AddWithValue("@enableChartStatus1", enableChartStatusVar);
+               // command.Parameters.AddWithValue("@fName","Water");
 
                 //MessageBox.Show("selected value = " + cb_station_names.SelectedItem.ToString());
                 command.ExecuteNonQuery();
+
+
+                //--Inserting fluidName Water in tbl_[]_chart_fluid_info
+
+                string sqlQuery = "insert into  " + chartFluidTable + " (chartID,fluidName) VALUES(@chartID,@fluidName)";
+                SQLiteCommand cmd = new SQLiteCommand(sqlQuery, connection);
+                cmd.CommandType = CommandType.Text;
+                cmd.Parameters.AddWithValue("@chartID", chartIDValue);
+                cmd.Parameters.AddWithValue("@fluidName", "Water");
+                cmd.ExecuteNonQuery();
 
 
             }
@@ -1747,11 +1902,20 @@ namespace PH_App
                 command.ExecuteNonQuery();
             }
         }
+        //public class TemperatureHumiditySourceInfo
+        //{
+        //    public string chartID { get; set; }
+        //    public string nodeID { get; set; }
+        //    public string TemepratureSoureString { get; set; }
+        //    public string HumiditySourceString { get; set; }
+        //}
+        public List<TemperaturePressureSourceInfo> listTemperatureAndHumidtySourceInfoWhenDeviceSelected = new List<TemperaturePressureSourceInfo>();
+
         public void LoadNodeAndLineFromDB(int indexValue)
         {
             //Based on this row index we need to update the values and redraw lines..
-            try
-            {
+            //try
+            //{
                 // listForDataFromDB.Clear();//Lets clear the node...
                 if (indexValue < 0)
                 {
@@ -1761,7 +1925,6 @@ namespace PH_App
                 {
                     return;
                 }
-
                 if (selectedBuildingList.Count <= 0)
                 {
                     return;
@@ -1784,7 +1947,8 @@ namespace PH_App
                 listLineInfoValues.Clear();
                 //--Now lets clear the mix node list first and then refill agiain
                 //mixNodeInfoList.Clear();
-
+                //for device and humidity info
+                listTemperatureAndHumidtySourceInfoWhenDeviceSelected.Clear();
 
                 //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
@@ -1800,7 +1964,9 @@ namespace PH_App
                 */
                 string nodeTableName = "tbl_" + selectedBuildingList[0].BuildingName + "_node_value";
                 string lineTableName = "tbl_" + selectedBuildingList[0].BuildingName + "_line_value";
-               // string tableMixNode = "tbl_" + selectedBuildingList[0].BuildingName + "_mix_node_info";
+                // string tableMixNode = "tbl_" + selectedBuildingList[0].BuildingName + "_mix_node_info";
+                //--Table for input instring value for device
+                string tableInputStringOfNodeForDevice = "tbl_" + selectedBuildingList[0].BuildingName + "_TemperaturePressureSourceInfo";
 
                 using (SQLiteConnection connection = new SQLiteConnection(connString))
                 {
@@ -1859,12 +2025,11 @@ namespace PH_App
                     //=====================================Finding previous id value=================================//
                     //var chartOptrn = new ChartCreationAndOperations();
                     var main = new MainController();
-
                      previousNodeIndexForLineInput = main.IndexOfPreviousNodeForLineFunction();
                     //==================================End of previous id=======================================//
 
                     //--Adding data form the line node values...
-                    SQLiteDataReader reader2x = null;
+                    
                     string queryString2x = "SELECT *  from  " + lineTableName + " WHERE chart_respective_lineID = @lineID";
                     //--Testing..
                     //MessageBox.Show("CurrentLineTableFromDB = " + currentLineTableFromDB);
@@ -1872,8 +2037,8 @@ namespace PH_App
                     SQLiteCommand command2x = new SQLiteCommand(queryString2x, connection);
                     command2x.Parameters.AddWithValue("@lineID", chartLineGroupID);//This is the group id that is used to identify each node
 
-                    //int count2 = 0;
-                    reader2x = command2x.ExecuteReader();
+                //int count2 = 0;
+                  SQLiteDataReader reader2x  = command2x.ExecuteReader();
                     while (reader2x.Read())
                     {
                         listLineInfoValues.Add(new DataTypeForLine
@@ -1887,16 +2052,34 @@ namespace PH_App
                             name = reader2x["name"].ToString(),
                             status = int.Parse(reader2x["status"].ToString())
                         });
+                    }
+
+                    
+                    //--For temperature and humidity source info
+                    string querySQLString = "select * from   " + tableInputStringOfNodeForDevice;
+                    var command12 = new SQLiteCommand(querySQLString, connection);
+                    var reader1 = command12.ExecuteReader();
+                    while (reader1.Read())
+                    {
+                        listTemperatureAndHumidtySourceInfoWhenDeviceSelected.Add(new TemperaturePressureSourceInfo
+                        {
+                            chartID = reader1["chartID"].ToString(),
+                            nodeID = reader1["NodeID"].ToString(),
+                            TemepratureSoureString = reader1["TemperatureSourceInfo"].ToString(),
+                            PressureSourceString = reader1["PressureSourceInfo"].ToString(),
+
+                        });
 
                     }
-                
-                   
+
+                   // */
+
                 }//close of using..
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show(ex.Message);
+            //}
 
         }
 
@@ -2305,7 +2488,7 @@ namespace PH_App
             string tableNameDevice = "tbl_" + selectedBuildingList[0].BuildingName + "_device_info_for_node";//currentNodeTableFromDB; 
             //string tableForComfortZoneSetting = "tbl_" + selectedBuildingList[0].BuildingName + "_chart_comfort_zone_setting";
             //string tableForCF_Detail = "tbl_" + selectedBuildingList[0].BuildingName + "_comfort_zone_detail";
-            //string tableFor_mix_node_info = "tbl_" + selectedBuildingList[0].BuildingName + "_mix_node_info";
+            string tableForFluidInfo = "tbl_" + selectedBuildingList[0].BuildingName + "_chart_fluid_info";
 
             //lets get the id values...
             //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -2313,7 +2496,7 @@ namespace PH_App
             string databaseFile_x = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
 
             //Reading the data form SQLite DB
-            ReadDataForSavingConfiguration(databaseFile_x, chartTableName, nodeTableName, lineTableName, tableNameDevice);//This reads all the data
+            ReadDataForSavingConfiguration(databaseFile_x, chartTableName, nodeTableName, lineTableName, tableNameDevice, tableForFluidInfo);//This reads all the data
 
             string fileName = "";
             f1.saveFD.InitialDirectory = "C:";
@@ -2355,10 +2538,10 @@ namespace PH_App
                 string tableNameDevicex = "tbl_device_info_for_node";//currentNodeTableFromDB; 
                 //string tableForComfortZoneSettingx = "tbl_chart_comfort_zone_setting";
                 //string tableForCF_Detailx = "tbl_comfort_zone_detail";
-                //string tableForMixNode = "tbl_mix_node_info";
+                string tableForfluidinfo = "tbl_chart_fluid_info";
 
 
-                InsertForSavingConfiguration(databaseFile, chartTableNamex, nodeTableNamex, lineTableNamex, tableNameDevicex);
+                InsertForSavingConfiguration(databaseFile, chartTableNamex, nodeTableNamex, lineTableNamex, tableNameDevicex, tableForfluidinfo);
 
                 // SQLiteConnection.ClearPool();//This helps in 
             }
@@ -2437,11 +2620,14 @@ namespace PH_App
         //Now  list for pulling the device info
         public List<dt_for_device_info> deviceInfoPulledForSaving = new List<dt_for_device_info>();
 
+        //For fluid info 
+        public List<fluidChartType> listfluidInfoForChart = new List<fluidChartType>();
+
         //Now for storing the comfortzone setting...
-       // public List<datatype_for_comfortzone> comfortZoneInforForEachChartForSaving = new List<datatype_for_comfortzone>();//which chart is associated with which comfortzone
+        // public List<datatype_for_comfortzone> comfortZoneInforForEachChartForSaving = new List<datatype_for_comfortzone>();//which chart is associated with which comfortzone
 
         //Now for storing the actual confort zone values
-      //  public List<dataTypeForCF> ComfortZonesDetailForSaving = new List<dataTypeForCF>();  //This one contains the comfortzone setting
+        //  public List<dataTypeForCF> ComfortZonesDetailForSaving = new List<dataTypeForCF>();  //This one contains the comfortzone setting
 
         //public class dataTypeFor_mix_node_info
         //{
@@ -2455,13 +2641,13 @@ namespace PH_App
         //    //public Color colorValue { get; set; }
         //}
 
-       // public List<dataTypeFor_mix_node_info> mixNodeInfoListForSaveConfiguration = new List<dataTypeFor_mix_node_info>();  //This one contains the comfortzone setting
+        // public List<dataTypeFor_mix_node_info> mixNodeInfoListForSaveConfiguration = new List<dataTypeFor_mix_node_info>();  //This one contains the comfortzone setting
 
         /// <summary>
         /// Read data form db to save as SQLite file
         /// </summary>
 
-        public void ReadDataForSavingConfiguration(string path, string chartTableName, string nodeTableName, string lineTableName, string tableNameDevice)
+        public void ReadDataForSavingConfiguration(string path, string chartTableName, string nodeTableName, string lineTableName, string tableNameDevice,string tableForFluidInfo)
         {
 
             //--Resetting values first
@@ -2469,6 +2655,7 @@ namespace PH_App
             nodeInfoPulledForSaving.Clear();
             lineInfoPulledForSaving.Clear();
             deviceInfoPulledForSaving.Clear();
+            listfluidInfoForChart.Clear();
             //comfortZoneInforForEachChartForSaving.Clear();
             //ComfortZonesDetailForSaving.Clear();
             //mixNodeInfoListForSaveConfiguration.Clear();
@@ -2493,7 +2680,7 @@ namespace PH_App
             string sql_forDevice = "SELECT * From  " + tableNameDevice;
             //string sql_for_CF_Setting = "SELECT * From  " + tableForComfortZoneSetting;
             //string sql_for_CF_Detail = "SELECT * From  " + tableForCF_Detail;
-            //string sql_for_mix_node_info = "SELECT * From  " + mixnodeInfoTable;
+           string sqlforfluidinfo = "SELECT * From  " + tableForFluidInfo;
             //;
 
 
@@ -2619,6 +2806,28 @@ namespace PH_App
                     }
                 }
 
+
+                //string sqlForFluidInfo = "SELECT * From  " + tableFluidInfo;
+
+
+                //--Now reading the last part associated comfortzone with each chart
+                SQLiteCommand cmd5 = new SQLiteCommand(sqlforfluidinfo, conx);
+                SQLiteDataReader reader5 = cmd5.ExecuteReader();
+
+                while (reader5.Read())
+                {
+                    if (reader5["chartID"].ToString() != "")
+                    {
+                        //This is the reading part of the data...
+                        listfluidInfoForChart.Add(new fluidChartType
+                        {
+                            chartID = reader5["chartID"].ToString(),//reader["chartID"].ToString(),
+                            fluidName = reader5["fluidName"].ToString(),
+                            count = int.Parse(reader5["count"].ToString())
+                        });
+                    }
+                }
+
                 //--Now reading the chart info
                 //SQLiteCommand cmd4 = new SQLiteCommand(sql_for_CF_Detail, conx);
                 //SQLiteDataReader reader4 = cmd4.ExecuteReader();
@@ -2698,7 +2907,7 @@ namespace PH_App
             string tableForNode = "tbl_node_value";
             string tableForLine = "tbl_line_value";
             string tableFordevice = "tbl_device_info_for_node";
-           // string tableFormixNodeInfo = "tbl_mix_node_info";
+           string tableForfluidinfo = "tbl_chart_fluid_info";
 
 
             //These two tables are for comfort zone 
@@ -2743,16 +2952,16 @@ namespace PH_App
                 //SQLiteCommand command7 = new SQLiteCommand(sql7, connection);
                 //command7.ExecuteNonQuery();
 
-                //string sql8 = "create table IF NOT EXISTS  " + tableFormixNodeInfo + "  ( count INTEGER PRIMARY KEY AUTOINCREMENT,chartID varchar(255) ,nodeID varchar(255),previousNodeID varchar(255),nextNodeID varchar(255) )";
-                //SQLiteCommand command8 = new SQLiteCommand(sql8, connection);
-                //command8.ExecuteNonQuery();
+                string sql8 = "create table IF NOT EXISTS  " + tableForfluidinfo + "  ( count INTEGER PRIMARY KEY AUTOINCREMENT,chartID varchar(255) ,fluidName varchar(255))";
+                SQLiteCommand command8 = new SQLiteCommand(sql8, connection);
+                command8.ExecuteNonQuery();
 
 
             }
 
         }
 
-        public void InsertForSavingConfiguration(string fileWithPath, string chartTableName, string nodeTableName, string lineTableName, string tableNameDevice)
+        public void InsertForSavingConfiguration(string fileWithPath, string chartTableName, string nodeTableName, string lineTableName, string tableNameDevice,string tableForFluidInfo)
         {
 
             //--This is where we are going to create all the database  and tables of sqlite
@@ -2850,17 +3059,17 @@ namespace PH_App
 
 
 
-                ////---Now for the comfort zone setting i guess... :)
-                //foreach (var ch in comfortZoneInforForEachChartForSaving)
-                //{
-                //    string sql_string = "insert into " + tableForComfortZoneSetting + "(chartID,comfort_zone_ID,status) VALUES(@chartid,@comfortzoneid,@status)";
-                //    SQLiteCommand command = new SQLiteCommand(sql_string, m_dbConnection);
-                //    command.CommandType = CommandType.Text;
-                //    command.Parameters.AddWithValue("@chartid", ch.chartid);
-                //    command.Parameters.AddWithValue("@comfortzoneid", ch.comfortzoneid);
-                //    command.Parameters.AddWithValue("@status", ch.status);
-                //    command.ExecuteNonQuery();
-                //}
+                //---Now for the comfort zone setting i guess... :)
+                foreach (var ch in listfluidInfoForChart)
+                {
+                    string sql_string = "insert into " + tableForFluidInfo + "(chartID,fluidName) VALUES(@chartid,@comfortzoneid)";
+                    SQLiteCommand command = new SQLiteCommand(sql_string, m_dbConnection);
+                    command.CommandType = CommandType.Text;
+                    command.Parameters.AddWithValue("@chartid", ch.chartID);
+                    command.Parameters.AddWithValue("@comfortzoneid", ch.fluidName);
+                    //command.Parameters.AddWithValue("@status", ch.status);
+                    command.ExecuteNonQuery();
+                }
 
 
                 ////--Information about detail comfortzone
@@ -2937,7 +3146,7 @@ namespace PH_App
             string tableNameDevice = "tbl_device_info_for_node";//currentNodeTableFromDB; 
             //string tableForComfortZoneSetting = "tbl_chart_comfort_zone_setting";
             //string tableForCF_Detail = "tbl_comfort_zone_detail";
-            //string tableForMixNode = "tbl_mix_node_info";
+            string tableForfluidInfo = "tbl_chart_fluid_info";
 
 
             OpenFileDialog theDialog = new OpenFileDialog();
@@ -2964,7 +3173,7 @@ namespace PH_App
                 //####### TASK1 :Read data
                 // try {
                 // MessageBox.Show("read data"); 
-                ReadDataForSavingConfiguration_For_Load(pathToFile, chartTableName, nodeTableName, lineTableName, tableNameDevice);//This reads all the data
+                ReadDataForSavingConfiguration_For_Load(pathToFile, chartTableName, nodeTableName, lineTableName, tableNameDevice, tableForfluidInfo);//This reads all the data
 
                 // MessageBox.Show("finish read data");
                 //}catch(Exception ex)
@@ -2987,12 +3196,13 @@ namespace PH_App
                 string tableNameDevice1 = "tbl_" + selectedBuildingList[0].BuildingName + "_device_info_for_node";//currentNodeTableFromDB; 
                 //string tableForComfortZoneSetting1 = "tbl_" + selectedBuildingList[0].BuildingName + "_chart_comfort_zone_setting";
                 //string tableForCF_Detail1 = "tbl_" + selectedBuildingList[0].BuildingName + "_comfort_zone_detail";
-                //string tableformixnode = "tbl_" + selectedBuildingList[0].BuildingName + "_mix_node_info";
+                string tableforfluidinfo = "tbl_" + selectedBuildingList[0].BuildingName + "_chart_fluid_info";
 
                 DeleteAllDataFromTable(databaseFileName1, chartTableName1);
                 DeleteAllDataFromTable(databaseFileName1, nodeTableName1);
                 DeleteAllDataFromTable(databaseFileName1, lineTableName1);
                 DeleteAllDataFromTable(databaseFileName1, tableNameDevice1);
+                DeleteAllDataFromTable(databaseFileName1, tableforfluidinfo);
                 //DeleteAllDataFromTable(databaseFileName1, tableForComfortZoneSetting1);
                 //DeleteAllDataFromTable(databaseFileName1, tableForCF_Detail1);
                 //DeleteAllDataFromTable(databaseFileName1, tableformixnode);
@@ -3006,11 +3216,11 @@ namespace PH_App
                 string tableNameDevicex = "tbl_" + selectedBuildingList[0].BuildingName + "_device_info_for_node";//currentNodeTableFromDB; 
                 //string tableForComfortZoneSettingx = "tbl_" + selectedBuildingList[0].BuildingName + "_chart_comfort_zone_setting";
                 //string tableForCF_Detailx = "tbl_" + selectedBuildingList[0].BuildingName + "_comfort_zone_detail";
-                //string tableformixnodex = "tbl_" + selectedBuildingList[0].BuildingName + "_mix_node_info";
+                string tableForfluidInfox = "tbl_" + selectedBuildingList[0].BuildingName + "_chart_fluid_info";
 
                 // MessageBox.Show("Loading Here mix table "+ tableformixnodex+"dbfILE NAME"+ databaseFileName1);
 
-                InsertForSavingConfiguration_For_Load(databaseFileName1, chartTableNamex, nodeTableNamex, lineTableNamex, tableNameDevicex);
+                InsertForSavingConfiguration_For_Load(databaseFileName1, chartTableNamex, nodeTableNamex, lineTableNamex, tableNameDevicex, tableForfluidInfox);
 
 
                 // MessageBox.Show("InsertioncOMPLETE");
@@ -3034,6 +3244,7 @@ namespace PH_App
         //Now  list for pulling the device info
         public List<dt_for_device_info> deviceInfoPulledForSaving_For_Load = new List<dt_for_device_info>();
 
+        public List<fluidChartType> listFluidInfo_For_Load = new List<fluidChartType>();
         //Now for storing the comfortzone setting...
         //public List<datatype_for_comfortzone> comfortZoneInforForEachChartForSaving_For_Load = new List<datatype_for_comfortzone>();//which chart is associated with which comfortzone
 
@@ -3043,7 +3254,7 @@ namespace PH_App
         //public List<dataTypeFor_mix_node_info> mixNodeList_For_Load = new List<dataTypeFor_mix_node_info>();  //This one contains the comfortzone setting
 
 
-        public void ReadDataForSavingConfiguration_For_Load(string DB_String_path, string chartTableName, string nodeTableName, string lineTableName, string tableNameDevice)
+        public void ReadDataForSavingConfiguration_For_Load(string DB_String_path, string chartTableName, string nodeTableName, string lineTableName, string tableNameDevice,string tableForFluidInfo)
         {
 
             //--Resetting values first
@@ -3051,6 +3262,7 @@ namespace PH_App
             nodeInfoPulledForSaving_For_Load.Clear();
             lineInfoPulledForSaving_For_Load.Clear();
             deviceInfoPulledForSaving_For_Load.Clear();
+            listFluidInfo_For_Load.Clear();
             //comfortZoneInforForEachChartForSaving_For_Load.Clear();
             //ComfortZonesDetailForSaving_For_Load.Clear();
             //mixNodeList_For_Load.Clear();
@@ -3061,6 +3273,8 @@ namespace PH_App
             string sql_for_node = "SELECT * From  " + nodeTableName;
             string sql_for_line = "SELECT * From  " + lineTableName;
             string sql_forDevice = "SELECT * From  " + tableNameDevice;
+            string sql_forfluidInfo = "SELECT * From  " + tableForFluidInfo;
+
             //string sql_for_CF_Setting = "SELECT * From  " + tableForComfortZoneSetting;
             //string sql_for_CF_Detail = "SELECT * From  " + tableForCF_Detail;
             //string sql_for_mix_node = "SELECT * From  " + tableForMixNode;
@@ -3270,43 +3484,31 @@ namespace PH_App
             }
             // MessageBox.Show("device count value = " + deviceInfoPulledForSaving_For_Load.Count);
 
+            //For fluid info
+            using (SQLiteConnection conName = new SQLiteConnection(connectionString))
+            {
+                conName.Open();
+                //--Now reading the chart info
+                using (SQLiteCommand cmd4 = new SQLiteCommand(sql_forfluidInfo, conName))
+                {
+                    SQLiteDataReader reader4 = cmd4.ExecuteReader();
+                    while (reader4.Read())
+                    {
 
-            //using (SQLiteConnection conName = new SQLiteConnection(connectionString))
-            //{
-            //    conName.Open();
-            //    //--Now reading the chart info
-            //    using (SQLiteCommand cmd4 = new SQLiteCommand(sql_for_CF_Detail, conName))
-            //    {
-            //        SQLiteDataReader reader4 = cmd4.ExecuteReader();
-            //        while (reader4.Read())
-            //        {
+                       
 
-            //            if (reader4["id"].ToString() != "")
-            //            {
-            //                foreach (var items in ComfortZonesDetailForSaving_For_Load)
-            //                {
-            //                    if (items.id == reader4["id"].ToString())
-            //                    {
-            //                        //if contain do not add
-            //                        return;
-            //                    }
-            //                }
-
-            //                ComfortZonesDetailForSaving_For_Load.Add(new dataTypeForCF
-            //                {
-            //                    id = reader4["id"].ToString(),
-            //                    name = reader4["name"].ToString(),
-            //                    min_temp = reader4["min_temp"].ToString(), //this is in string formate
-            //                    max_temp = reader4["max_temp"].ToString(),
-            //                    min_hum = reader4["min_hum"].ToString(),
-            //                    max_hum = reader4["max_hum"].ToString(),
-            //                    colorValue = ColorTranslator.FromHtml(reader4["colorValue"].ToString())
-            //                });
-            //            }
-            //        }
-            //        reader4.Close();
-            //    }
-            //}
+                            listFluidInfo_For_Load.Add(new fluidChartType
+                            {
+                                chartID = reader4["chartID"].ToString(),
+                                fluidName = reader4["fluidName"].ToString(),
+                                count = int.Parse(reader4["count"].ToString())
+                                
+                            });
+                       
+                    }
+                    reader4.Close();
+                }
+            }
             ////  MessageBox.Show("cf detail count value = " + ComfortZonesDetailForSaving_For_Load.Count);
 
             //using (SQLiteConnection conName = new SQLiteConnection(connectionString))
@@ -3412,7 +3614,7 @@ namespace PH_App
             }//Close of using 
         }
 
-        public void InsertForSavingConfiguration_For_Load(string fileWithPath, string chartTableName, string nodeTableName, string lineTableName, string tableNameDevice)
+        public void InsertForSavingConfiguration_For_Load(string fileWithPath, string chartTableName, string nodeTableName, string lineTableName, string tableNameDevice,string tablefluidinfo)
         {
 
             //--This is where we are going to create all the database  and tables of sqlite
@@ -3511,17 +3713,17 @@ namespace PH_App
 
 
 
-                //---Now for the comfort zone setting i guess... :)
-                //foreach (var ch in comfortZoneInforForEachChartForSaving_For_Load)
-                //{
-                //    string sql_string = "insert into " + tableForComfortZoneSetting + "(chartID,comfort_zone_ID,status) VALUES(@chartid,@comfortzoneid,@status)";
-                //    SQLiteCommand command = new SQLiteCommand(sql_string, m_dbConnection);
-                //    command.CommandType = CommandType.Text;
-                //    command.Parameters.AddWithValue("@chartid", ch.chartid);
-                //    command.Parameters.AddWithValue("@comfortzoneid", ch.comfortzoneid);
-                //    command.Parameters.AddWithValue("@status", ch.status);
-                //    command.ExecuteNonQuery();
-                //}
+                //---fluidinfo
+                foreach (var ch in listFluidInfo_For_Load)
+                {
+                    string sql_string = "insert into " + tablefluidinfo + "(chartID,fluidName) VALUES(@chartid,@comfortzoneid)";
+                    SQLiteCommand command = new SQLiteCommand(sql_string, m_dbConnection);
+                    command.CommandType = CommandType.Text;
+                    command.Parameters.AddWithValue("@chartid", ch.chartID);
+                    command.Parameters.AddWithValue("@comfortzoneid", ch.fluidName);
+                    //command.Parameters.AddWithValue("@status", ch.status);
+                    command.ExecuteNonQuery();
+                }
 
 
                 ////--Information about detail comfortzone
@@ -3592,7 +3794,7 @@ namespace PH_App
             
         }//Close of dissable chart
 
-        public void ReadDataForSavingTemplateFile(string chartId, string path, string chartTableName, string nodeTableName, string lineTableName, string tableNameDevice)
+        public void ReadDataForSavingTemplateFile(string chartId, string path, string chartTableName, string nodeTableName, string lineTableName, string tableNameDevice,string tableFluidInfo)
         {
 
             //--Resetting values first
@@ -3600,6 +3802,7 @@ namespace PH_App
             nodeInfoPulledForSaving.Clear();
             lineInfoPulledForSaving.Clear();
             deviceInfoPulledForSaving.Clear();
+            listfluidInfoForChart.Clear();
             //comfortZoneInforForEachChartForSaving.Clear();
             //ComfortZonesDetailForSaving.Clear();
             //mixNodeInfoListForSaveConfiguration.Clear();
@@ -3766,26 +3969,26 @@ namespace PH_App
                 }//Close of the for loop
 
 
-                //string sql_for_CF_Setting = "SELECT * From  " + tableForComfortZoneSetting + "  where chartID = '" + chartId + "'";
+                string sqlForFluidInfo = "SELECT * From  " + tableFluidInfo + "  where chartID = '" + chartId + "'";
 
 
-                ////--Now reading the last part associated comfortzone with each chart
-                //SQLiteCommand cmd5 = new SQLiteCommand(sql_for_CF_Setting, conx);
-                //SQLiteDataReader reader5 = cmd5.ExecuteReader();
+                //--Now reading the last part associated comfortzone with each chart
+                SQLiteCommand cmd5 = new SQLiteCommand(sqlForFluidInfo, conx);
+                SQLiteDataReader reader5 = cmd5.ExecuteReader();
 
-                //while (reader5.Read())
-                //{
-                //    if (reader5["chartID"].ToString() != "")
-                //    {
-                //        //This is the reading part of the data...
-                //        comfortZoneInforForEachChartForSaving.Add(new datatype_for_comfortzone
-                //        {
-                //            chartid = reader5["chartID"].ToString(),//reader["chartID"].ToString(),
-                //            comfortzoneid = reader5["comfort_zone_ID"].ToString(),
-                //            status = reader5["status"].ToString()
-                //        });
-                //    }
-                //}
+                while (reader5.Read())
+                {
+                    if (reader5["chartID"].ToString() != "")
+                    {
+                        //This is the reading part of the data...
+                        listfluidInfoForChart.Add(new fluidChartType
+                        {
+                            chartID = reader5["chartID"].ToString(),//reader["chartID"].ToString(),
+                            fluidName = reader5["fluidName"].ToString(),
+                            count = int.Parse(reader5["count"].ToString())
+                        });
+                    }
+                }
 
 
                 //if (comfortZoneInforForEachChartForSaving.Count > 0)
@@ -3861,7 +4064,7 @@ namespace PH_App
             //string tableForComfortZoneSetting = "tbl_" + selectedBuildingList[0].BuildingName + "_chart_comfort_zone_setting";
             //string tableForCF_Detail = "tbl_" + selectedBuildingList[0].BuildingName + "_comfort_zone_detail";
             //string tableFor_mix_node_info = "tbl_" + selectedBuildingList[0].BuildingName + "_mix_node_info";
-
+            string tableFluidInfo = "tbl_" + selectedBuildingList[0].BuildingName + "_chart_fluid_info";
             //lets get the id values...
             //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             //string databaseFile_x = databasePath + @"\db_psychrometric_project.s3db";
@@ -3869,7 +4072,7 @@ namespace PH_App
 
 
             //Reading the data form SQLite DB
-            ReadDataForSavingTemplateFile(chartID, databaseFile_x, chartTableName, nodeTableName, lineTableName, tableNameDevice);//This reads all the data
+            ReadDataForSavingTemplateFile(chartID, databaseFile_x, chartTableName, nodeTableName, lineTableName, tableNameDevice, tableFluidInfo);//This reads all the data
 
             string fileName = "";
             f1.saveFD.InitialDirectory = "C:";
@@ -3912,10 +4115,11 @@ namespace PH_App
                 //string tableForComfortZoneSettingx = "tbl_chart_comfort_zone_setting";
                 //string tableForCF_Detailx = "tbl_comfort_zone_detail";
                 //string tableForMixNode = "tbl_mix_node_info";
+                string tableForFluidInfo = "tbl_chart_fluid_info";
 
 
                 //--This will work same as for saving the entire files ok ok
-                InsertForSavingConfiguration(databaseFile, chartTableNamex, nodeTableNamex, lineTableNamex, tableNameDevicex);
+                InsertForSavingConfiguration(databaseFile, chartTableNamex, nodeTableNamex, lineTableNamex, tableNameDevicex, tableForFluidInfo);
 
                 // SQLiteConnection.ClearPool();//This helps in 
             }
@@ -3936,6 +4140,7 @@ namespace PH_App
             //These two tables are for comfort zone 
             string tableforComfortZoneDetail = "tbl_comfort_zone_detail";
             string tableForChartComfortZoneSetting = "tbl_chart_comfort_zone_setting";
+            string tableFluidInfo = "tbl_chart_fluid_info";
 
             // string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             // string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
@@ -3981,9 +4186,9 @@ namespace PH_App
                 SQLiteCommand command7 = new SQLiteCommand(sql7, connection);
                 command7.ExecuteNonQuery();
 
-                //string sql8 = "create table IF NOT EXISTS  " + tableFormixNodeInfo + "  ( count INTEGER PRIMARY KEY AUTOINCREMENT,chartID varchar(255) ,nodeID varchar(255),previousNodeID varchar(255),nextNodeID varchar(255) )";
-                //SQLiteCommand command8 = new SQLiteCommand(sql8, connection);
-                //command8.ExecuteNonQuery();
+                string sql8 = "create table IF NOT EXISTS  " + tableFluidInfo + "  ( count INTEGER PRIMARY KEY AUTOINCREMENT,chartID varchar(255) ,fluidName varchar(255) )";
+                SQLiteCommand command8 = new SQLiteCommand(sql8, connection);
+                command8.ExecuteNonQuery();
 
 
             }
@@ -4006,6 +4211,7 @@ namespace PH_App
             //string tableForComfortZoneSetting = "tbl_chart_comfort_zone_setting";
             //string tableForCF_Detail = "tbl_comfort_zone_detail";
             //string tableForMixNode = "tbl_mix_node_info";
+            string tableForFluidInfo = "tbl_chart_fluid_info";
 
 
             OpenFileDialog theDialog = new OpenFileDialog();
@@ -4044,7 +4250,7 @@ namespace PH_App
                 }
 
 
-                ReadDataForSavingConfiguration_For_Load(pathToFile, chartTableName, nodeTableName, lineTableName, tableNameDevice);//This reads all the data
+                ReadDataForSavingConfiguration_For_Load(pathToFile, chartTableName, nodeTableName, lineTableName, tableNameDevice, tableForFluidInfo);//This reads all the data
 
                 // MessageBox.Show("finish read data");
                 //}catch(Exception ex)
@@ -4066,6 +4272,7 @@ namespace PH_App
                 string nodeTableName1 = "tbl_" + selectedBuildingList[0].BuildingName + "_node_value";
                 string lineTableName1 = "tbl_" + selectedBuildingList[0].BuildingName + "_line_value";
                 string tableNameDevice1 = "tbl_" + selectedBuildingList[0].BuildingName + "_device_info_for_node";//currentNodeTableFromDB; 
+                string tablefluidinfo = "tbl_" + selectedBuildingList[0].BuildingName + "_chart_fluid_info";//currentNodeTableFromDB; 
                 //string tableForComfortZoneSetting1 = "tbl_" + selectedBuildingList[0].BuildingName + "_chart_comfort_zone_setting";
                 //string tableForCF_Detail1 = "tbl_" + selectedBuildingList[0].BuildingName + "_comfort_zone_detail";
                 //string tableformixnode = "tbl_" + selectedBuildingList[0].BuildingName + "_mix_node_info";
@@ -4110,7 +4317,7 @@ namespace PH_App
                 }
 
 
-                InsertForSavingConfiguration_For_Load(databaseFileName1, chartTableNamex, nodeTableNamex, lineTableNamex, tableNameDevicex);
+                InsertForSavingConfiguration_For_Load(databaseFileName1, chartTableNamex, nodeTableNamex, lineTableNamex, tableNameDevicex, tablefluidinfo);
 
 
                 // MessageBox.Show("InsertioncOMPLETE");
@@ -5002,6 +5209,38 @@ namespace PH_App
 
         }
 
+        public void DeleteFluidInfoForChart(string chartID, string buildingName)
+        {
+            /*
+            Steps :1. Frist read line info,nodeinfo,comfortzone info for particular chart id
+                    2.Then delete line value using lineID,
+                    3.Delete node values using nodeID
+                    4.Delete comfortzone value using chartid
+                    5.delete the chart info using chart id value
+            */
+
+            //string chartID =   
+            string tableName = "tbl_" + buildingName + "_chart_fluid_info";// "tbl_" ++"_node_value";
+            //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
+
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                SQLiteDataReader reader = null;
+                string queryString = "delete   from  " + tableName + "  where chartID = @id_value";
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                command.Parameters.AddWithValue("@id_value", chartID);
+                //SqlDataAdapter dataAdapter = new SqlDataAdapter(queryString, connection.ConnectionString); //connection.ConnectionString is the connection string
+                reader = command.ExecuteReader();
+
+            }//Close of using          
+
+        }
+
         public void updateValueInDatabaseToTrue(string buildingName, string chartID)
         {
             //--Now lets make the check state to be true
@@ -5071,7 +5310,7 @@ namespace PH_App
                 }
             }
 
-        }  //Close of the function  PullChartList
+        }  //Close of the function  
 
 
         //====================End of trash box db oparation================//

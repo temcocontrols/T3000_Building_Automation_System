@@ -56,7 +56,7 @@ namespace PH_App
         public int index = 0;
         public int indexRun = 0;
         public int lineDefaultThickness = 3;
-        public  int nodeDefaultThickness = 15;
+        public  int nodeDefaultThickness = 20;
         //--variable for storing the indexOfThePoints so that we can gather other properties..
         public string indexOfPrevPointForLineMovement = "";
         public string indexOfNextNodeForLineMovement = "";

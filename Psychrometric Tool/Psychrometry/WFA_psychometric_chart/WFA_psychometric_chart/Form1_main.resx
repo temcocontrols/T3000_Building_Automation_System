@@ -127,13 +127,13 @@
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="chart1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>199, 39</value>
+    <value>209, 24</value>
   </data>
   <data name="chart1.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>0, 0, 0, 0</value>
   </data>
   <data name="chart1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>933, 604</value>
+    <value>923, 604</value>
   </data>
   <data name="chart1.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -292,7 +292,7 @@
     <value>Arial, 11.25pt, style=Bold</value>
   </data>
   <data name="lb_unit_chosen_display.Location" type="System.Drawing.Point, System.Drawing">
-    <value>1029, 67</value>
+    <value>1029, 52</value>
   </data>
   <data name="lb_unit_chosen_display.Size" type="System.Drawing.Size, System.Drawing">
     <value>63, 18</value>
@@ -325,7 +325,7 @@
     <value>NoControl</value>
   </data>
   <data name="lb_pressure_display.Location" type="System.Drawing.Point, System.Drawing">
-    <value>861, 67</value>
+    <value>861, 52</value>
   </data>
   <data name="lb_pressure_display.Size" type="System.Drawing.Size, System.Drawing">
     <value>73, 18</value>
@@ -358,7 +358,7 @@
     <value>NoControl</value>
   </data>
   <data name="lb_title_display.Location" type="System.Drawing.Point, System.Drawing">
-    <value>651, 67</value>
+    <value>651, 52</value>
   </data>
   <data name="lb_title_display.Size" type="System.Drawing.Size, System.Drawing">
     <value>43, 22</value>
@@ -1474,7 +1474,7 @@
     <value>586, 15</value>
   </metadata>
   <data name="pb_lock_unlock.Location" type="System.Drawing.Point, System.Drawing">
-    <value>307, 53</value>
+    <value>307, 38</value>
   </data>
   <data name="pb_lock_unlock.Size" type="System.Drawing.Size, System.Drawing">
     <value>45, 40</value>

@@ -120,17 +120,30 @@
   <data name="airFlow.HeaderText" xml:space="preserve">
     <value>기류</value>
   </data>
+  <data name="btn_add.Text" xml:space="preserve">
+    <value>더하다</value>
+  </data>
+  <data name="btn_delete.Text" xml:space="preserve">
+    <value>지우기</value>
+  </data>
+  <data name="btn_ok.Text" xml:space="preserve">
+    <value>확인</value>
+  </data>
+  <data name="btn_update.Text" xml:space="preserve">
+    <value>최신 정보</value>
+  </data>
+  <data name="button2.Text" xml:space="preserve">
+    <value>취소</value>
+    <comment>Previous text: Cancel</comment>
+  </data>
   <data name="CB_DGV_Humidity_Source.HeaderText" xml:space="preserve">
     <value>습도 원</value>
-  </data>
-  <data name="CB_DGV_Humidity_Source.Items1" xml:space="preserve">
-    <value>웹</value>
   </data>
   <data name="CB_DGV_Temperature_Source.HeaderText" xml:space="preserve">
     <value>온도 소스</value>
   </data>
-  <data name="CB_DGV_Temperature_Source.Items1" xml:space="preserve">
-    <value>웹</value>
+  <data name="checkBox1.Text" xml:space="preserve">
+    <value>표시</value>
   </data>
   <data name="color.HeaderText" xml:space="preserve">
     <value>색</value>
@@ -147,6 +160,12 @@
   </data>
   <data name="label1.Text" xml:space="preserve">
     <value>편집 노드 :</value>
+  </data>
+  <data name="label16.Text" xml:space="preserve">
+    <value>이름:</value>
+  </data>
+  <data name="label6.Text" xml:space="preserve">
+    <value>색:</value>
   </data>
   <data name="linecolor.HeaderText" xml:space="preserve">
     <value>색</value>

@@ -595,8 +595,8 @@ namespace WFA_psychometric_chart
                      */
 
 
-                    double lat = Double.Parse(tb_latitude.Text);
-                    double lng = Double.Parse(tb_longitude.Text);
+                    double lat = double.Parse(tb_latitude.Text);
+                    double lng = double.Parse(tb_longitude.Text);
 
                     //after this lets get the web url data 
                     using (var wc = new WebClient())
@@ -2891,8 +2891,6 @@ namespace WFA_psychometric_chart
         private void CB_Device_SelectedIndexChanged(object sender, EventArgs e)
         {
             try {
-
-
                 if (FlagDissableSelection == 0)
                 {
                     return;
@@ -2902,11 +2900,11 @@ namespace WFA_psychometric_chart
                 // groupBox3.Enabled = true;
                 //Lets clear the combobox first
                 CB_param_temp.Items.Clear();
-            CB_param_hum.Items.Clear();
-            parameterValFromBacnet.Clear();//Clearing the list value
+              CB_param_hum.Items.Clear();
+              parameterValFromBacnet.Clear();//Clearing the list value
 
-            if (CB_Device.SelectedIndex > -1)
-            {
+                if (CB_Device.SelectedIndex > -1)
+                {
                 //This one is if the timer is running then stop the timer second time 
                 if (flagForTimer == 1)
                 {
@@ -2925,8 +2923,8 @@ namespace WFA_psychometric_chart
                     //   MessageBox.Show("Instaneid = " + instanceId);
                     //===============For regulare update=============//
                     deviceInstanceValuTemp = instanceId;//This one is for regular update
-                                                    //================end of for regular update=====//
-                                                    //This uint has to be converted to int because that is what is required...
+                    //================end of for regular update=====//
+                    //This uint has to be converted to int because that is what is required...
 
                     //Checking if the device is online or offline
                     if (CheckDeviceOnlineOffline(deviceInstanceValuTemp, 0) == true)
@@ -2939,9 +2937,8 @@ namespace WFA_psychometric_chart
 
                         if (IsInputTablePresentInT3000() == true)
                         {
-
                          System.Threading.CancellationTokenSource cts = new System.Threading.CancellationTokenSource();
-                        try {
+                         try{
                             cts.CancelAfter(10000);
                             // await PullDataFromDeviceForTimeConstrains(instanceId);
                             //MessageBox.Show("We are here");
@@ -2949,10 +2946,8 @@ namespace WFA_psychometric_chart
 
                             System.Threading.Thread.Sleep(6000);
 
-
-
-                        }
-                        catch (Exception ex) { }
+                         }
+                         catch (Exception ex) { }
 
                         //  MessageBox.Show("value = " + s);
 
@@ -2979,8 +2974,8 @@ namespace WFA_psychometric_chart
                         3.Filter and display only temperature values
                         */
                          
-                        Form1_main f = new Form1_main();
-                        string path_to_alexdb = f.PathToT3000BuildingDB;// PathToT3000BuildingDB;
+                        //Form1_main f = new Form1_main();
+                        //string path_to_alexdb = f.PathToT3000BuildingDB;// PathToT3000BuildingDB;
                         ReadDataFromAlexDatabase("INPUTable");
 
 
@@ -3016,10 +3011,10 @@ namespace WFA_psychometric_chart
                         FilterDataForDisplayInListForHumidity();//Filteres value form alex db and give new value to insert to list teurns:AfterFilteringFromAlexValueListOfValues
 
 
-                        foreach (var item in AfterFilteringFromAlexValueListOfValuesForHumidityOnly)
+                        foreach (var item1 in AfterFilteringFromAlexValueListOfValuesForHumidityOnly)
                         {
                             //CB_param_temp.Items.Add(item.device_object_name + ":" + item.indexID + "[" + item.presentValue + "]");
-                            CB_param_hum.Items.Add(item.device_object_name + ":" + item.indexID + "[Value = " + item.presentValue + "]");
+                            CB_param_hum.Items.Add(item1.device_object_name + ":" + item1.indexID + "[Value = " + item1.presentValue + "]");
 
 
                             // CB_param_hum.Items.Add(item.device_object_name + ":" + item.indexID);
@@ -3138,7 +3133,7 @@ namespace WFA_psychometric_chart
 
                     if (parameterValFromBacnet[item].object_identifier_type == "OBJECT_ANALOG_INPUT")
                     {
-                        int indexToCompare = (int)parameterValFromBacnet[item].indexID;
+                        int indexToCompare = (int)(parameterValFromBacnet[item].indexID-1);
                         for (int v = 0; v < FilteredHumidityValueList.Count; v++)
                         {
                             if (indexToCompare == int.Parse(FilteredHumidityValueList[v].InputIndex))
@@ -3251,7 +3246,7 @@ namespace WFA_psychometric_chart
 
                     if (parameterValFromBacnet[item].object_identifier_type == "OBJECT_ANALOG_INPUT")
                     {
-                        int indexToCompare = (int)parameterValFromBacnet[item].indexID;
+                        int indexToCompare = (int)(parameterValFromBacnet[item].indexID-1);//Because bacnet index starts at 1 and alex index at 0 so
                         for (int v = 0; v < FilteredTemperatureValueList.Count; v++)
                         {
                             if (indexToCompare == int.Parse(FilteredTemperatureValueList[v].InputIndex))

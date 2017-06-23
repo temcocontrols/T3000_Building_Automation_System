@@ -417,7 +417,7 @@ namespace WFA_psychometric_chart
         private void EditNodeLineForm_Load(object sender, EventArgs e)
         {
             //This on load we need to laod the data from the other form
-           LoadNodeAndLine();//load values
+            LoadNodeAndLine();//load values
             if(bcs.flagShow == 1)
             {
                 //Means the data is on so
@@ -468,8 +468,7 @@ namespace WFA_psychometric_chart
 
 
 
-        //==THis flag is for omitting of calling of the double event while clicking in the web section
-
+        ///THis flag is for omitting of calling of the double event while clicking in the web section
         bool flagForWeb = false;
 
 
@@ -2062,6 +2061,7 @@ namespace WFA_psychometric_chart
 
            else if ((e.RowIndex >= 0 && e.RowIndex < bcs.menuStripNodeLineInfoValues.Count) && e.ColumnIndex == 9)
             {
+                /*
                 string finalThickness = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[5].Value.ToString();
 
                 //Convert.ToString is for handling null event
@@ -2075,7 +2075,7 @@ namespace WFA_psychometric_chart
                 int status = 0;//0 means dissable 1 means enabled
 
                 DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9];
-                if (cbCell.Value == cbCell.TrueValue) // .ToString() == "true"
+                if (cbCell.Value.ToString() == "true")//cbCell.TrueValue) // .ToString() == "true"
                 {
                     status = 1;
                 }
@@ -2083,19 +2083,21 @@ namespace WFA_psychometric_chart
                 {
                     status = 0;
                 }
+                //MessageBox.Show("Test click = " + cbCell.Value.ToString());
                 LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status);
-
+                */
 
             }
 
 
             ////==Cell clicked function is triggered
-            
+          
             if(e.RowIndex >= 0)
             { 
             DataGridViewRow row = dataGridView2.Rows[e.RowIndex];
             EnergyCalculationForProcess(row);//SELECTED ROW
             }
+           // */
         }
 
         public void EnergyCalculationForProcess(DataGridViewRow dgv_row)
@@ -3081,6 +3083,44 @@ namespace WFA_psychometric_chart
             //{
             //  // dataGridView2.CommitEdit(DataGridViewDataErrorContexts.Commit);
             //}
+            if ((e.RowIndex >= 0 && e.RowIndex < bcs.menuStripNodeLineInfoValues.Count) && e.ColumnIndex == 9)
+            {
+                string finalThickness = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[5].Value.ToString();
+
+                //Convert.ToString is for handling null event
+                string lineid = Convert.ToString(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[0].Value.ToString());
+                string prevNodeID = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[6].Value.ToString();
+                string nextNodeID = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[7].Value.ToString();
+                Color color = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[4].Style.BackColor;
+                int thickness = int.Parse(finalThickness);//finalThickness
+                Series s = new Series(dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[8].Value.ToString());
+                string lineName = dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[1].Value.ToString();
+                int status = 0;//0 means dissable 1 means enabled
+
+                DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[9];
+                if (Convert.ToBoolean(cbCell.EditedFormattedValue))//cbCell.TrueValue) // .ToString() == "true"
+                {
+                    status = 1;
+                }
+                else
+                {
+                    status = 0;
+                }
+                //MessageBox.Show("Test click = " + cbCell.Value.ToString());
+                LineUpdateAndReload(lineid, prevNodeID, nextNodeID, color, thickness, s, lineName, status);
+
+
+            }
+
+
+            ////==Cell clicked function is triggered
+
+            if (e.RowIndex >= 0)
+            {
+                DataGridViewRow row = dataGridView2.Rows[e.RowIndex];
+                EnergyCalculationForProcess(row);//SELECTED ROW
+            }
+       // }
 
         }
 
@@ -3131,7 +3171,11 @@ namespace WFA_psychometric_chart
 
         private void dataGridView2_SelectionChanged(object sender, EventArgs e)
         {
-            var cellCopy = dataGridView2.CurrentCell;
+            if(sender == null)
+            {
+                return;
+            }
+            DataGridViewCell cellCopy = dataGridView2.CurrentCell;
 
             if(dataGridView2.Rows.Count <= 0)
             {
@@ -3299,7 +3343,7 @@ namespace WFA_psychometric_chart
                     }
 
                 }
-                catch (Exception ex)
+                catch //(Exception ex)
                 {
                     MessageBox.Show("You can only input integer values");
 
@@ -3348,7 +3392,6 @@ namespace WFA_psychometric_chart
         {
 
             bcs.DBUpdateMixPointOnNodeValueChange(nodeID);
-
             RefreshChartAndDGVForMixNodeFunction();
         }
 
@@ -4687,6 +4730,11 @@ namespace WFA_psychometric_chart
                 
 
             //}
+        }
+
+        private void dataGridView2_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+
         }
 
         string variableIdentifier; int variableNumber;

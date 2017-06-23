@@ -162,12 +162,6 @@
   <data name="label12.Text" xml:space="preserve">
     <value>值</value>
   </data>
-  <data name="label13.Text" xml:space="preserve">
-    <value>摄氏度</value>
-  </data>
-  <data name="label14.Text" xml:space="preserve">
-    <value>％</value>
-  </data>
   <data name="label15.Text" xml:space="preserve">
     <value>位置：</value>
   </data>
@@ -186,12 +180,6 @@
   <data name="label20.Text" xml:space="preserve">
     <value>晴雨表：</value>
   </data>
-  <data name="label21.Text" xml:space="preserve">
-    <value>摄氏度</value>
-  </data>
-  <data name="label22.Text" xml:space="preserve">
-    <value>％</value>
-  </data>
   <data name="label24.Text" xml:space="preserve">
     <value>风：</value>
   </data>
@@ -207,20 +195,14 @@
   <data name="label28.Text" xml:space="preserve">
     <value>每天最高调整：</value>
   </data>
-  <data name="label29.Text" xml:space="preserve">
-    <value>％</value>
-  </data>
   <data name="label3.Text" xml:space="preserve">
     <value>市：</value>
   </data>
-  <data name="label30.Text" xml:space="preserve">
+  <data name="label30Status.Text" xml:space="preserve">
     <value>状态：无</value>
   </data>
   <data name="label31.Text" xml:space="preserve">
     <value>电流偏移％：</value>
-  </data>
-  <data name="label35.Text" xml:space="preserve">
-    <value>％</value>
   </data>
   <data name="label36.Text" xml:space="preserve">
     <value>选择电台名称:</value>
@@ -267,14 +249,8 @@
   <data name="lb_chose_a_device.Text" xml:space="preserve">
     <value>选择设备：</value>
   </data>
-  <data name="lb_device_status.Text" xml:space="preserve">
-    <value>断开的</value>
-  </data>
-  <data name="lb_mode.Text" xml:space="preserve">
-    <value>模式：</value>
-  </data>
-  <data name="lb_real_time.Text" xml:space="preserve">
-    <value>即时的</value>
+  <data name="lb_unit_elevation.Text" xml:space="preserve">
+    <value>仪表</value>
   </data>
   <data name="lb_web_status.Text" xml:space="preserve">
     <value>非活动</value>

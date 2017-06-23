@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMessageBox));
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.btnGoBack = new System.Windows.Forms.Button();
             this.btnRunDefaultSetting = new System.Windows.Forms.Button();
@@ -35,47 +36,34 @@
             // 
             // richTextBox1
             // 
-            this.richTextBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.richTextBox1.Location = new System.Drawing.Point(1, 12);
+            resources.ApplyResources(this.richTextBox1, "richTextBox1");
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.ReadOnly = true;
-            this.richTextBox1.Size = new System.Drawing.Size(286, 87);
-            this.richTextBox1.TabIndex = 1;
-            this.richTextBox1.Text = "Building location information is not Provided. Please input the building location" +
-    " information  in T3000";
             // 
             // btnGoBack
             // 
-            this.btnGoBack.Location = new System.Drawing.Point(12, 117);
+            resources.ApplyResources(this.btnGoBack, "btnGoBack");
             this.btnGoBack.Name = "btnGoBack";
-            this.btnGoBack.Size = new System.Drawing.Size(126, 36);
-            this.btnGoBack.TabIndex = 2;
-            this.btnGoBack.Text = "Go back to T300";
             this.btnGoBack.UseVisualStyleBackColor = true;
             this.btnGoBack.Click += new System.EventHandler(this.btnGoBack_Click);
             // 
             // btnRunDefaultSetting
             // 
-            this.btnRunDefaultSetting.Location = new System.Drawing.Point(144, 117);
+            resources.ApplyResources(this.btnRunDefaultSetting, "btnRunDefaultSetting");
             this.btnRunDefaultSetting.Name = "btnRunDefaultSetting";
-            this.btnRunDefaultSetting.Size = new System.Drawing.Size(126, 36);
-            this.btnRunDefaultSetting.TabIndex = 3;
-            this.btnRunDefaultSetting.Text = "Run with Defult Building";
             this.btnRunDefaultSetting.UseVisualStyleBackColor = true;
             this.btnRunDefaultSetting.Click += new System.EventHandler(this.btnRunDefaultSetting_Click);
             // 
             // FormMessageBox
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(298, 192);
             this.Controls.Add(this.btnRunDefaultSetting);
             this.Controls.Add(this.btnGoBack);
             this.Controls.Add(this.richTextBox1);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "FormMessageBox";
-            this.Text = "FormMessageBox";
             this.ResumeLayout(false);
 
         }

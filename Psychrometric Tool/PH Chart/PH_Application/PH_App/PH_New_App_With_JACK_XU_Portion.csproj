@@ -144,6 +144,12 @@
     <Compile Include="FormEditNodeAndLine.Designer.cs">
       <DependentUpon>FormEditNodeAndLine.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormFluidSelection.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormFluidSelection.Designer.cs">
+      <DependentUpon>FormFluidSelection.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormSetting.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -249,6 +255,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormEditNodeAndLine.resx">
       <DependentUpon>FormEditNodeAndLine.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormFluidSelection.resx">
+      <DependentUpon>FormFluidSelection.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormSetting.resx">
       <DependentUpon>FormSetting.cs</DependentUpon>

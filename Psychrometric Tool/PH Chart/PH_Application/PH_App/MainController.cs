@@ -31,7 +31,7 @@ namespace PH_App
         
       //  public void LoadForPH(string fluidName, Form_Main_PH_Application f,double Xmin,double Xmax,double Ymin,double Ymax,double xDiv,double yDiv,bool xFlag,bool yFlag)
       public void LoadForPH(string fluidName, Form_Main_PH_Application f, double Xmin, double Xmax, double Ymin, double Ymax)
-        {
+      {
             string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
 
            // PH_Application.Form_Main_PH_Application f = new PH_Application.Form_Main_PH_Application();
@@ -48,21 +48,11 @@ namespace PH_App
            // PressureCalibrationForBuilding();
 
             //--Plotting of the chart Here --------//
-            string fluidNAME = fluidName;//"Water";//"1-Butene"; // "Water";//"n-Propane";//Acetone//Ammonia//Krypton//Nitrogen //Note for Air not working //Argon//CarbonDioxide// not working p-Xylene//R134a
+           // string fluidNAME = fluidName;//"Water";//"1-Butene"; // "Water";//"n-Propane";//Acetone//Ammonia//Krypton//Nitrogen //Note for Air not working //Argon//CarbonDioxide// not working p-Xylene//R134a
             //var ch = new ChartCreationAndOperations();
             f.lbFluidName.Text =fluidName;
             //PlotPHChart(fluidNAME, f.phChart,Xmin,Xmax,Ymin,Ymax,xDiv,yDiv,xFlag,yFlag);
-            string filePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\Data\";
-            string pathWithFile = filePath + fluidName + "_Data";//databasePath1 + @"\db_psychrometric_project.s3db";
-
-            if (File.Exists(pathWithFile))
-            {
-                PlotPHChartUsingData(fluidNAME, f.phChart, Xmin, Xmax, Ymin, Ymax);
-            }
-            else
-            {
-                PlotPHChart(fluidNAME, f.phChart, Xmin, Xmax, Ymin, Ymax);
-            }
+            plot_new_chart(fluidName, f.phChart, Xmin, Xmax, Ymin, Ymax);
             //--End of the plotting chart here-----//
             //--Other task here
 
@@ -74,6 +64,21 @@ namespace PH_App
 
             //== For date generation
             f.Text = "PH Chart [" + AssemblyDateGeneration.Value.ToShortDateString() + "]";
+        }
+
+        public void plot_new_chart(string fluidName, Chart chart, double Xmin, double Xmax, double Ymin, double Ymax)
+        {
+            string filePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\Data\";
+            string pathWithFile = filePath + fluidName + "_Data";//databasePath1 + @"\db_psychrometric_project.s3db";
+
+            if (File.Exists(pathWithFile))
+            {
+                PlotPHChartUsingData(fluidName, chart, Xmin, Xmax, Ymin, Ymax);
+            }
+            else
+            {
+                PlotPHChart(fluidName, chart, Xmin, Xmax, Ymin, Ymax);
+            }
         }
 
         public void RefreshByLoadingDataWhileLoad(object sender, EventArgs e, Form_Main_PH_Application f1)
@@ -164,7 +169,7 @@ namespace PH_App
         public void BuildingConfigurationSetting(Form_Main_PH_Application f)
         {
             DataGridView_Show_Data(f);
-            f.dataGridView1.Rows.Add();
+            //f.dataGridView1.Rows.Add();
             f.phChart.Enabled = false;
          
             if (f.dataGridView1.Rows.Count > 0 && chartDetailList.Count >0)  //If there is data then only do this one
@@ -182,9 +187,7 @@ namespace PH_App
                     var eventArgs = new DataGridViewCellEventArgs(1, 0);
                     // or setting the selected cells manually before executing the function
                     f.dataGridView1.Rows[0].Cells[1].Selected = true;
-                    //f.dataGridView1_CellClick(sender, eventArgs);
-                    
-                   
+                    //f.dataGridView1_CellClick(sender, eventArgs);                                      
                 }
             }
 
@@ -199,10 +202,9 @@ namespace PH_App
             }
             //Pulling the data form the data grid view...
             PullChartList(selectedBuildingList[0].BuildingName);//This is the list of the building present ...
-            
-            fillDataGridView(f1);
-        
-
+            //--Function for pulling fluid list...
+            PullFluidForChartList(selectedBuildingList[0].BuildingName);//Reading chart list
+            fillDataGridView(f1);        
         }
         private void fillDataGridView(Form_Main_PH_Application f1)
         {
@@ -211,6 +213,10 @@ namespace PH_App
             int xCount = 0;
             if (chartDetailList.Count > 0)
             {
+                //f1.dataGridView1.Rows.Clear();//Clearing the chart
+                f1.dataGridView1.Rows.Clear();//--This one is for clearing the data
+                f1.dataGridView1.Refresh();//--Release the previously selectecd items
+               
                 for (int i = 0; i < chartDetailList.Count; i++)
                 {
                     if (chartDetailList[i].enableChartStatus == "true") //when enable then only display
@@ -220,13 +226,15 @@ namespace PH_App
                         f1.dataGridView1.Rows[i].Cells["Name"].Value = chartDetailList[i].chartName;
                     }
                 }
+                f1.dataGridView1.Rows.Add();
                 //dataGridView1.DataBindingComplete += new DataGridViewBindingCompleteEventHandler(dataGridView1.DataBindingComplete);
-
             }//--if close
-            //dataGridView1.ClearSelection();
-
+            
+            if (chartDetailList.Count == 0)
+            {
+                f1.dataGridView1.Rows.Add();
+            }
             f1.lb_numberOfHandler.Text = chartDetailList.Count.ToString();
-
 
         }//--close fo filldatagridview
 
@@ -984,6 +992,7 @@ namespace PH_App
 
                 //--First lets declear all the variables
                 List<DrawChart.DataTypeForPointList> listPoints = new List<DrawChart.DataTypeForPointList>();
+                List<DrawChart.DataTypeForPointList> listPoints_WithTrimmedData = new List<DrawChart.DataTypeForPointList>();
                 List<double> hLsatList = new List<double>();
 
                 List<double> hVsatList = new List<double>();
@@ -1067,19 +1076,25 @@ namespace PH_App
 
               
                 XmlNodeList listPoints_Node = xmlDoc.GetElementsByTagName("listPoints_Node");
-               
+                int skip = 4;
                 foreach (XmlNode x in listPoints_Node)
                 {
-                    listPoints.Add(new DrawChart.DataTypeForPointList
+                    if (skip == 4)
                     {
-                        x1 = double.Parse(x.Attributes["x1"].Value),
-                        x2 = double.Parse(x.Attributes["x2"].Value),
-                        y1 = double.Parse(x.Attributes["y1"].Value),
-                        y2 = double.Parse(x.Attributes["y2"].Value),
-                        zlevel = int.Parse(x.Attributes["zLevel"].Value)
-                    });
+                        listPoints_WithTrimmedData.Add(new DrawChart.DataTypeForPointList
+                        {
+                            x1 = double.Parse(x.Attributes["x1"].Value),
+                            x2 = double.Parse(x.Attributes["x2"].Value),
+                            y1 = double.Parse(x.Attributes["y1"].Value),
+                            y2 = double.Parse(x.Attributes["y2"].Value),
+                            zlevel = int.Parse(x.Attributes["zLevel"].Value)
+                        });
+                    skip = 0;
                 }
-               
+                skip++;
+            }
+                //MessageBox.Show("number of points" + listPoints_WithTrimmedData.Count);
+                listPoints = listPoints_WithTrimmedData;
                 //--Reading part has completed now
                 //--lets move to plotting parts
 
@@ -1154,7 +1169,6 @@ namespace PH_App
                 // phChart.Series["Series2"].Points[12].Label = $"Saturation Vapour";
                 if (fluidName == "Water")
                 {
-
                     ///*
                     phChart.Series["Series2"].Points[12].Label = "S";
                     phChart.Series["Series2"].Points[15].Label = "a";
@@ -1264,7 +1278,6 @@ namespace PH_App
                     for (int z = initalIndex; z < listPoints.Count; z++)
                     {
                         runningz = z;
-
                         if (initialZ == listPoints[z].zlevel)
                         {
                             //==Same zlevel then draw on one line
@@ -1401,8 +1414,6 @@ namespace PH_App
                     f1.nodeAToolStripMenuItem.Text = "Node Name: " + prevNodeIDTemp;
                     f1.nodeBToolStripMenuItem.Text = "Node Name: " + nextNodeIDTemp;
 
-
-
                 }
                 else
                 {
@@ -1421,7 +1432,6 @@ namespace PH_App
                     //--Lets dissbale
                     //nodeAToolStripMenuItem.Enabled = false;
                     //nodeBToolStripMenuItem.Enabled = false;
-
                 }
 
                 //==this one is for delete node to hide
@@ -1545,6 +1555,7 @@ namespace PH_App
             }
 
         }
+        MathOperation mth = new MathOperation();
         //public void chart_MouseMove(object sender, MouseEventArgs e, Chart chart1, Form_Main_PH_Application f1,double xCoordinate,double yCoordinate)
         public void chart_MouseMove(object sender, MouseEventArgs e, Chart chart1, Form_Main_PH_Application f1)
         {
@@ -1570,11 +1581,7 @@ namespace PH_App
                         //--These currentXAxis and currentYAxis is used for showing the dotted line 
                         currentXAxis = (double)xVal;
                         currentYAxis = (double)yVal;
-
-                        //lb_test.Text = "x = " + currentXAxis + ",y  = " + currentYAxis;
-                        // if ((currentXAxis >= 0 && currentXAxis <= 50) && (currentYAxis >= 0 && currentYAxis <= 30))
-                        //{
-
+                        
                         //now lets move on to making other part 
                         /*1.find dbt value => this is x axis value 
                          * 2.find sp.ratio value => this is yaxis value
@@ -1583,14 +1590,16 @@ namespace PH_App
                         f1.lbPressure.Text = Math.Round(yVal, 2).ToString();
                         //=================Temperature parameter============//
 
-                        //var mth = new MathOperation();
-                        //double PressureConverted = yVal * 1000000;
-                        //double EnthalpyConverted = xVal / 1000;
-                        //if ((PressureConverted > 0.001 * 1000000 && PressureConverted < 100000000) && (EnthalpyConverted > 0.0001 && EnthalpyConverted < 3))
-                        //    f1.lbTemperature.Text = Math.Round((mth.IAPWS_IF97_TowParameterEquivalentFxn("T", "P", PressureConverted, "H", EnthalpyConverted, "water") - 273.15), 2).ToString();
-
+                        
+                        double PressureConverted = yVal * 1000000;
+                        double EnthalpyConverted = xVal* 1000; //--To convert to kj/kg
+                        if (PressureConverted > 80000000 && EnthalpyConverted < 11000) {
+                        }else { 
+                        //if ((PressureConverted > 0.001 * 1000000 && PressureConverted < 100000000) && (EnthalpyConverted > 0.0001 && EnthalpyConverted < 4))
+                        if ((PressureConverted > 0.001 * 1000000 && PressureConverted < 100000000) && (EnthalpyConverted > 0.0001 && EnthalpyConverted < 4000000))
+                            f1.lbTemperature.Text = Math.Round((mth.IAPWS_IF97_TowParameterEquivalentFxn("T", "P", PressureConverted, "H", EnthalpyConverted, f1.lbFluidName.Text.Trim())-273.15), 2).ToString();
+                        }
                         //================End of Temperature================//
-                        //lb_humidity_ratio.Text = Math.Round(yVal, 2).ToString();
                     }
                 }//Closing of currentxval= 0-50 and 0-30 currentyval
             }
@@ -1704,6 +1713,19 @@ namespace PH_App
 
                     xAxis1 = xValue;
                     yAxis1 = yValue;
+                    if (yAxis1 > 1 && yAxis1 < 20)
+                    {
+                        radiusSize = 0.20;
+
+                    }
+                    else if (yAxis1 >= 20)
+                    {
+                        radiusSize = 2;
+                    }
+                    else
+                    {
+                        radiusSize = 0.01;
+                    }
                     if ((xAxis1 >= xAxisMinimum && xAxis1 <= xAxisMaximum) && (yAxis1 >= yAxisMinimum && yAxis1 <= yAxisMaximum))
                     {
                         //Console.Write("xval = " + xValue + "yvalue = " + yValue);
@@ -1726,7 +1748,9 @@ namespace PH_App
                                     //--Whenever this occurs lets move on to attaching the the node or say refreshing and replotting....
                                     //--For this as well lets rise a flag..
                                     flagNodeSelectedForConnect = 1;
-                                    break;//this break is for if found the value no longer loop increases the perfomances..
+
+                                   
+                                        break;//this break is for if found the value no longer loop increases the perfomances..
                                 }
                                 else
                                 {
@@ -1740,7 +1764,7 @@ namespace PH_App
                                 }
                             }
 
-                            f1.lbPrintTest.Text = "id sel  =" + idSelected;
+                           // f1.lbPrintTest.Text = "id sel  =" + idSelected;
 
                         }//close of if menuStripAllValue>0
                     }//close of if
@@ -1832,7 +1856,7 @@ namespace PH_App
 
             }
         }
-
+        ToolTip tooltip = new ToolTip();
         private void ProcessDiagramMouseMoveFunction(MouseEventArgs e, Chart chart1, Form_Main_PH_Application f1)
         {
             //--This function helps to draw a mouse move event..
@@ -1845,33 +1869,45 @@ namespace PH_App
             }
 
             //this event occurs and compares the values in the list first and identifies if the values
-            if ((e.X > chart1.ChartAreas[0].Position.X && e.Y > chart1.ChartAreas[0].Position.Y) && (e.X < chart1.Width && e.Y < chart1.Height))
+            if ((e.X > chart1.ChartAreas[0].Position.X && e.Y > chart1.ChartAreas[0].Position.Y) && (e.X <(chart1.Width) && e.Y <(chart1.Height)))
             {
+                f1.lbPrintTest.Text = "inside" ;
+                 //tooltip.Show("X=" + e.X + ", Y=" + e.Y,chart1,e.X,e.Y);
                 try
                 {
                     //Point position = e.Location;
                     double xValue =Math.Round(chart1.ChartAreas[0].AxisX.PixelPositionToValue(e.X),3);
                     double yValue = Math.Pow(10, chart1.ChartAreas[0].AxisY.PixelPositionToValue(e.Y));
-                    if ((xValue > xAxisMinimum && xValue < xAxisMaximum) && (yValue > yAxisMinimum && yValue < yAxisMaximum))
+                    //tooltip.Show("X=" + xValue + ", Y=" + yValue, chart1, e.X, e.Y);
+                    if ((xValue >= xAxisMinimum && xValue <= xAxisMaximum) && (yValue >= yAxisMinimum && yValue <= yAxisMaximum))
                     {
 
                         xAxis1 = xValue;
                         yAxis1 = yValue;
                         //--ADJUSTING THE radius value for PH Chart...
-                        if(yAxis1 > 1 && yAxis1 < 20)
+                        if(yAxis1 >= 1 && yAxis1 <= 10)
                         {
-                            radiusSize = 0.20;
-                        }else if (yAxis1 >= 20)
-                        {
-                            radiusSize = 2;
+                            radiusSize = 1.5;
+
                         }
-                        else
+                        else if (yAxis1 < 1 && yAxis1 >= 0.1)
                         {
-                            radiusSize = 0.01;
+                            radiusSize = 0.15;
+                        }
+                        else if(yAxis1 > 10)
+                        {
+                            radiusSize = 3;
+                        }
+                        else if (yAxis1 < 0.1 && yAxis1 >= 0.01)
+                        {
+                            radiusSize = 0.008;
+                        }else
+                        {
+                            radiusSize = 0.2;
                         }
                         //Console.Write("xval = " + xValue + "yvalue = " + yValue);
-                        //if (listNodeInfoValues.Count > 0)
-                        //{
+                        if (listNodeInfoValues.Count > 0)
+                        {
                             //foreach(var values in menuStripNodeInfoValues)
 
 
@@ -1883,7 +1919,7 @@ namespace PH_App
 
 
                                     //if ((xValue > listNodeInfoValues[i].xVal - radiusSize  && xValue < listNodeInfoValues[i].xVal + radiusSize) && (yValue > listNodeInfoValues[i].yVal - radiusSize && yValue < listNodeInfoValues[i].yVal + radiusSize))
-                                    if ((xValue > listNodeInfoValues[i].xVal - radiusSize && xValue < listNodeInfoValues[i].xVal + radiusSize) && (yValue > listNodeInfoValues[i].yVal - radiusSize && yValue < listNodeInfoValues[i].yVal + radiusSize))
+                                    if ((xValue > listNodeInfoValues[i].xVal - (radiusSize+15) && xValue < listNodeInfoValues[i].xVal + (radiusSize+15)) && (yValue > listNodeInfoValues[i].yVal - radiusSize && yValue < listNodeInfoValues[i].yVal + radiusSize))
                                     {
                                         //--This is changed from int to string  code bbk305
                                         idSelected = listNodeInfoValues[i].ID; //Now this is a string 
@@ -1896,13 +1932,11 @@ namespace PH_App
                                             FlagForNodeDelete = 1;//flag is ready on Node selected
                                             nodeID_ForDeletingNode = idSelected;
                                             f1.deleteNodeToolStripMenuItem.Enabled = true; //Turn on the delete buttton
-                                       readyForMouseClick = 1;//enable on click event     
+                                            readyForMouseClick = 1;//enable on click event     
                                      //=============end of flag for deleting===========//
                                      }
                                         //this.Cursor = Cursors.Hand;
-                                        //now this works so lets move forward.
-                                       
-                                    
+                                        //now this works so lets move forward.                                                                           
                                         break;//this break is for if found the value no longer loop increases the perfomances..
                                     }
                                     else
@@ -1916,7 +1950,7 @@ namespace PH_App
 
                                             FlagForNodeDelete = 0;//flag is ready OFF , Node NOT SELECTED
                                             f1.deleteNodeToolStripMenuItem.Enabled = false;//Turn of the delet button
-                                            //nodeID_ForDeletingNode = idSelected;
+                                           // nodeID_ForDeletingNode = idSelected;
                                            //=============end of flag for deleting===========//
                                         }
 
@@ -1924,7 +1958,8 @@ namespace PH_App
                                     //--Lets filter out the mix nodes---
 
                             }//Close of for loop
-                       // }//close of if menuStripAllValue>0
+                            f1.lbPrintTest.Text = "id sel  =" + idSelected;
+                        }//close of if menuStripAllValue>0
 
 
                         if (mouseClickAction == 1)
@@ -2034,7 +2069,6 @@ namespace PH_App
                                 {
                                     //chart1.Series.Remove(menuStripNodeLineInfoValues[i].lineSeriesID);
                                     listLineInfoValues[i].lineSeriesID.Points.Clear();
-
                                 }
                                 //--this is redraw functionality
                                 //foreach(var values in menuStripNodeInfoValues)
@@ -2164,8 +2198,6 @@ namespace PH_App
                                     }
 
                                 }
-
-
                                 chart1.Invalidate();
                                 //incrementIndex = 0;//reset the values again..
                                 //   indexForSeriesNodePoint = 0;
@@ -2174,11 +2206,8 @@ namespace PH_App
 
                             }//closing of key else part
                         }
-
                         //Need to add here
                     }
-
-
                 }
                 catch (Exception ex)
                 {
@@ -2517,10 +2546,7 @@ namespace PH_App
                         chart1.Invalidate();
                         // incrementIndex = 0;//reset the values again..
                         indexForSeriesNodePoint = 0;//Resetting the values...
-
-
-
-
+                        
                     }
                     else if (Control.ModifierKeys == Keys.Shift)
                     {
@@ -2545,23 +2571,11 @@ namespace PH_App
                         for (int x = 0; x < listNodeInfoValues.Count; x++)
                         {
                             string labelValue;
-                            //if (menuStripNodeInfoValues[x].showItemText == "Label")
-                            //{
-                            //    labelValue = menuStripNodeInfoValues[x].label;
-                            //}
-
-
-                            //else if (menuStripNodeInfoValues[x].showItemText == "Name")
-                            //{
+                           
                             labelValue = listNodeInfoValues[x].name;
-                            //}
-                            //else
-                            //{
-                            //    labelValue = menuStripNodeInfoValues[x].source;
-                            //}
+                         
 
-
-                            //   ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue, menuStripNodeInfoValues[x].marker_Size);
+                            //ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].source, menuStripNodeInfoValues[x].name, menuStripNodeInfoValues[x].label, labelValue, menuStripNodeInfoValues[x].marker_Size);
                             //ReDrawPoints(series1, menuStripNodeInfoValues[x].xVal, menuStripNodeInfoValues[x].yVal, menuStripNodeInfoValues[x].colorValue, menuStripNodeInfoValues[x].temperature_source, menuStripNodeInfoValues[x].humidity_source, menuStripNodeInfoValues[x].name, labelValue, menuStripNodeInfoValues[x].marker_Size);
                             
                             ReDrawPoints(chart1, series1, listNodeInfoValues[x].xVal, listNodeInfoValues[x].yVal, listNodeInfoValues[x].colorValue, listNodeInfoValues[x].temperature_source, listNodeInfoValues[x].pressure_source, listNodeInfoValues[x].name, labelValue, listNodeInfoValues[x].marker_Size);
@@ -2593,8 +2607,7 @@ namespace PH_App
                     else
                     {
 
-                        //menuStripNodeInfoValues[idSelected].xVal = xAxis1;
-                        //menuStripNodeInfoValues[idSelected].yVal = yAxis1;
+                     
                         listNodeInfoValues[tempIndexForNode].xVal = xAxis1;
                         listNodeInfoValues[tempIndexForNode].yVal = yAxis1;
                         //label5.Text = "click past x =" + menuStripNodeInfoValues[idSelected].xVal + " y " + menuStripNodeInfoValues[idSelected].yVal;
@@ -2666,14 +2679,14 @@ namespace PH_App
                 //if (dialogResult == DialogResult.Yes)
                 {
 
-                    try
-                    {
-                        f1.Enabled = false;//optional, better target a panel or specific controls
-                        f1.UseWaitCursor = true;//from the Form/Window instance
+                    //try
+                    //{
+                        //f1.Enabled = false;//optional, better target a panel or specific controls
+                        //f1.UseWaitCursor = true;//from the Form/Window instance
 
                         //mc.InsertNodeAndLine(phChart, xCoord, yCoord);
 
-                        int ROWINDEX = f1.dataGridView1.CurrentCell.RowIndex;
+                        int rowIndex = f1.dataGridView1.CurrentCell.RowIndex;
 
                     //--This function should clear the chart 
                     /*
@@ -2712,7 +2725,7 @@ namespace PH_App
                     DataGridView_Show_Data(f1);
                     //MessageBox.Show("row add..");
 
-                    f1.dataGridView1.Rows.Add();
+                    //f1.dataGridView1.Rows.Add();
                     //if (dataGridView1.Rows.Count > 0)
                     //{
                     //    dataGridView1.Rows[0].Selected = false;
@@ -2741,20 +2754,20 @@ namespace PH_App
                     if (f1.dataGridView1.CurrentCell.RowIndex.ToString() != "")
                     {
                         //set parameters of your event args
-                        var eventArgs = new DataGridViewCellEventArgs(1, ROWINDEX);
+                        var eventArgs = new DataGridViewCellEventArgs(1, rowIndex);
                         //or setting the selected cells manually before executing the function
                         //dataGridView2.Rows[dataGridView2.CurrentCell.RowIndex].Cells[dataGridView2.CurrentCell.ColumnIndex].Selected = true;
-                        f1.dataGridView1.Rows[ROWINDEX].Cells[1].Selected = true;
+                        f1.dataGridView1.Rows[rowIndex].Cells[1].Selected = true;
                        f1.dataGridView1_CellClick(sender, eventArgs);
                     }
 
 
-                    }
-                    finally
-                    {
-                        f1.Enabled = true;//optional
-                        f1.UseWaitCursor = false;
-                    }
+                    //}
+                    //finally
+                    //{
+                    //    f1.Enabled = true;//optional
+                    //    f1.UseWaitCursor = false;
+                    //}
 
                 }//Close of clear chart
 
@@ -2809,6 +2822,36 @@ namespace PH_App
             {
                 lock(this)//(locker) //(this) //Change this => locker later 
                 {
+                    //=========Insert the series if not present==//
+                    if (chart1.InvokeRequired)
+                    {
+                        if (chart1.Series.IndexOf(series1) != -1)
+                        {
+                            // Series Exists do nothing
+                            chart1.Invoke(new Action(() => series1.Points.Clear()));
+                        }
+                        else
+                        {
+                            chart1.Invoke(new Action(() => chart1.Series.Add(series1)));
+                            chart1.Invoke(new Action(() => series1.Points.Clear()));
+                        }
+                    }
+                    else
+                    {
+                        if (chart1.Series.IndexOf(series1) != -1)
+                        {
+                            // Series Exists do nothing
+                            series1.Points.Clear();
+                        }
+                        else
+                        {
+                            chart1.Series.Add(series1);
+                            series1.Points.Clear();
+                        }
+                    }
+
+                    //=========End of insert series===========//
+
                     if (listNodeInfoValues.Count > 0)
                     {
                         if(flagDontEraseSeries == 1)
@@ -2818,7 +2861,8 @@ namespace PH_App
 
 
                         flagDontEraseSeries = 1;//fLAG ON
-                        //--This is for replotting all the things again...
+                                                //--This is for replotting all the things again...
+                        
                         if (chart1.InvokeRequired)
                         {
                             chart1.Invoke(new Action(() => series1.Points.Clear()));
@@ -2850,9 +2894,83 @@ namespace PH_App
                         {
                             string labelValue;
                             labelValue = listNodeInfoValues[x].name;
+
+                            //------For Temperature and humidity source plotting------
+                            
+                            //==Lets check for temperature and humidity source so that we can print the those values of device
+                            string temperaryTemperatureSource = "";
+                            //Console.WriteLine("count = " + listTemperatureAndHumidtySourceInfoWhenDeviceSelected.Count);
+                            if (listNodeInfoValues[x].temperature_source == "Device")
+                            {
+                                //Console.WriteLine("Inside");
+                                //--Then we need to select the device info
+                                foreach (var item in listTemperatureAndHumidtySourceInfoWhenDeviceSelected)
+                                {
+                                    // Console.WriteLine("Print Uppers Tempr  " + item.TemepratureSoureString+",id "+item.nodeID);
+                                    if (item.nodeID == listNodeInfoValues[x].ID)
+                                    {
+                                        //Console.WriteLine("Found Tempr  " + item.TemepratureSoureString);
+                                        if (item.TemepratureSoureString != "")
+                                        {
+                                            temperaryTemperatureSource = item.TemepratureSoureString;
+                                        }
+                                        else
+                                        {
+                                            temperaryTemperatureSource = "Device";//menuStripNodeInfoValues[x].temperature_source;
+                                        }
+                                        break;
+                                    }
+                                }
+
+                            }
+                            else
+                            {
+                                temperaryTemperatureSource = listNodeInfoValues[x].temperature_source;
+                            }
+
+                            //For humidity source 
+
+                            string pressureSource = "";
+                            if (listNodeInfoValues[x].pressure_source == "Device")
+                            {
+                                //--Then we need to select the device info
+                                foreach (var item in listTemperatureAndHumidtySourceInfoWhenDeviceSelected)
+                                {
+                                    if (item.nodeID == listNodeInfoValues[x].ID)
+                                    {
+                                        //Console.WriteLine("Found  " + item.HumiditySourceString);
+                                        if (item.PressureSourceString != "")
+                                        {
+                                            pressureSource = item.PressureSourceString;
+                                        }
+                                        else
+                                        {
+                                            pressureSource = "Device";//menuStripNodeInfoValues[x].temperature_source;
+                                        }
+                                        break;
+                                    }
+                                }
+
+                            }
+                            else
+                            {
+                                pressureSource = listNodeInfoValues[x].pressure_source;
+                            }
+
+
+
+                            //--End of temperature and humidity source plotting
+
+
+
+
+
                             //--Redefined code bbk305
-                           ReDrawPoints(chart1, series1, listNodeInfoValues[x].xVal, listNodeInfoValues[x].yVal, listNodeInfoValues[x].colorValue, listNodeInfoValues[x].temperature_source, listNodeInfoValues[x].pressure_source, listNodeInfoValues[x].name, labelValue, listNodeInfoValues[x].marker_Size);
-                           // ReDrawPoints(chart1, copySeries, listNodeInfoValues[x].xVal, listNodeInfoValues[x].yVal, listNodeInfoValues[x].colorValue, listNodeInfoValues[x].temperature_source, listNodeInfoValues[x].pressure_source, listNodeInfoValues[x].name, labelValue, listNodeInfoValues[x].marker_Size);
+                            ReDrawPoints(chart1, series1, listNodeInfoValues[x].xVal, listNodeInfoValues[x].yVal, listNodeInfoValues[x].colorValue, temperaryTemperatureSource, pressureSource, listNodeInfoValues[x].name, labelValue, listNodeInfoValues[x].marker_Size);
+                            
+                            
+                            //  ReDrawPoints(chart1, series1, listNodeInfoValues[x].xVal, listNodeInfoValues[x].yVal, listNodeInfoValues[x].colorValue, listNodeInfoValues[x].temperature_source, listNodeInfoValues[x].pressure_source, listNodeInfoValues[x].name, labelValue, listNodeInfoValues[x].marker_Size);
+                            // ReDrawPoints(chart1, copySeries, listNodeInfoValues[x].xVal, listNodeInfoValues[x].yVal, listNodeInfoValues[x].colorValue, listNodeInfoValues[x].temperature_source, listNodeInfoValues[x].pressure_source, listNodeInfoValues[x].name, labelValue, listNodeInfoValues[x].marker_Size);
                             //CODE : BBK305A
                             //--incrementIndex++;
                             //AA
@@ -2945,7 +3063,6 @@ namespace PH_App
                     chart1.Invoke(new Action(() => s1.Points[indexForSeriesNodePoint].MarkerSize = marker_size_value));
                     //--This one is for storing the series
                     //--chart1.Invoke(new Action(() => listNodeSeriesPlotted.Add(s1.Name)));
-
                     */
                     chart1.Invoke((MethodInvoker)delegate {
                         s1.ChartType = SeriesChartType.Point;
@@ -2958,8 +3075,6 @@ namespace PH_App
                         s1.Points[indexForSeriesNodePoint].MarkerStyle = MarkerStyle.Circle;
                         s1.Points[indexForSeriesNodePoint].MarkerSize = marker_size_value;
                     });
-
-
                 }
             }
             else
@@ -2973,17 +3088,14 @@ namespace PH_App
                 s1.Points[indexForSeriesNodePoint].Label = labelValueText;
                 s1.Points[indexForSeriesNodePoint].Color = c;
                 s1.Points[indexForSeriesNodePoint].MarkerStyle = MarkerStyle.Circle;
-               // s1.Points[indexForSeriesNodePoint].Color = c;
+                //s1.Points[indexForSeriesNodePoint].Color = c;
                 s1.Points[indexForSeriesNodePoint].MarkerSize = marker_size_value;
                 //==ADDING THE SERIES TO THE LIST==//
                 //code123
-                // listNodeSeriesPlotted.Add(s1.Name);
-               // indexForSeriesNodePoint++;
-
-            }
-           
+                //listNodeSeriesPlotted.Add(s1.Name);
+                //indexForSeriesNodePoint++;
+            }           
             //  }//--Close of lock 
-
         } //Close of redraw point 
 
         List<DataTypeForNode> temporaryNodeValueStoreForRedrawLine = new List<DataTypeForNode>();
@@ -2995,21 +3107,19 @@ namespace PH_App
             //  if(indexForSeriesNodePoint>0) //This index is resetted later
             //   {
             temporaryNodeValueStoreForRedrawLine.Clear();//Clearing the values of the list
-            // MessageBox.Show("ReDrawLines FRIST LINE");
+            //MessageBox.Show("ReDrawLines FRIST LINE");
 
             if (chart1.InvokeRequired)
             {
                 /*
                 //now lets plot lines between tow points...
                 chart1.Invoke(new Action(() => newLineSeries = lineSeriesID));//new Series("LineSeries" + incrementIndex); //lineSeriesID; 
-
-
+                
                 if (chart1.Series.IndexOf(newLineSeries.Name) != -1)
                 {
                     //--This  means the series is present....
                     chart1.Invoke(new Action(() => chart1.Series.RemoveAt(chart1.Series.IndexOf(newLineSeries.Name))));
                 }
-
                 //}
                 chart1.Invoke(new Action(() => newLineSeries.MarkerSize = 1));
                 chart1.Invoke(new Action(() => newLineSeries.ChartType = SeriesChartType.Line));
@@ -3023,7 +3133,6 @@ namespace PH_App
                 }
                 //newSeries.ToolTip = 
                 chart1.Invoke(new Action(() => newLineSeries.Color = c));
-
                */
 
                 chart1.Invoke((MethodInvoker)delegate {
@@ -3868,7 +3977,7 @@ namespace PH_App
                         // MainController mc = new MainController();
                         DataGridView_Show_Data(f);//This will do both pulling data and filing the data...
 
-                        f.dataGridView1.Rows.Add();
+                      //  f.dataGridView1.Rows.Add();
                         f.dataGridView1.CurrentCell.Selected = false;
 
                         //===============This one for refreshing the chart and selecting new created chart===//
@@ -3992,12 +4101,10 @@ namespace PH_App
         }
         public void DGVCellClick(object sender, DataGridViewCellEventArgs e, Form_Main_PH_Application f, System.Windows.Forms.DataVisualization.Charting.Chart chart1)
         {
-
             if (f.dataGridView1.Rows.Count <= 0)
             {
                 return;
             }
-
             if (flagForTimer == 1)
             {
                 if (atimer.Enabled) // Check if the timer is running
@@ -4006,11 +4113,9 @@ namespace PH_App
                     atimer.Enabled = false;
                     atimer.Dispose();
                     flagForTimer = 0;
-
                 }
             }//close of flagfortimer
-
-           
+            
             //--Lets check if the datagridview1 is empty or chartDetailList is empty
             if (chartDetailList.Count <= 0)
             {
@@ -4029,7 +4134,6 @@ namespace PH_App
             //--Showing the data on cell selected...
             // MessageBox.Show("CELL SELECT " );
             //When dgv is click it clicks twice this if is written to stop those twice click.
-
             if (flagSinglCellClick == 1)
             {
                 flagSinglCellClick = 0;
@@ -4058,9 +4162,11 @@ namespace PH_App
                             //--This flag is for OFFLINE mode Or ONLINE mode
                             //--Now you are going to turn OFF the offline mode and go into realtime mode
                             FlagForCntdBG_Update = 1;//currently in realtime mode so 1
-                                                                                                                            
+
                             //--also make the radio button to be OFF and other to be ON
                             // rb_OFF.Checked = true;
+                            //chartSelectedIDValue = chartDetailList[i].chartID;//--tHIS CONTAINS THE ID OF THE CHART
+                            indexForWhichChartIsSelected = i;
 
                             FlagForLockUnlock = 0;//   This means edit mode OFF 
                             LockAndUnlock(f);//This method will make things lock
@@ -4072,10 +4178,9 @@ namespace PH_App
                             RefreshGraph(chart1, f);
                             /*
                             We need to identify which item in the list was clicked .
-                              //Before we load line we need to identify the id of the chart to load the data..
-                              */
-                            //chartSelectedIDValue = chartDetailList[i].chartID;//--tHIS CONTAINS THE ID OF THE CHART
-                            indexForWhichChartIsSelected = i;
+                            //Before we load line we need to identify the id of the chart to load the data..
+                            */
+                            
                             //This has been changed
                             indexOfChartSelected = e.RowIndex;    //This value is changed 
                             LoadNodeAndLineFromDB(indexOfChartSelected);   //Lets make it passing the stirngs 
@@ -4089,9 +4194,7 @@ namespace PH_App
                              // MessageBox.Show("Near RedrawingNodeAandLine(),\n node count"+listNodeInfoValues.Count +",line count"+listLineInfoValues.Count);
                             ReDrawingLineAndNode(chart1);  //Done checking bbk modif: changing to alex db 
 
-
                             flagSinglCellClick = 1;
-
                             
                             //==============This part is for comfort zone=====================
 
@@ -4226,7 +4329,7 @@ namespace PH_App
             atimer = new System.Timers.Timer();
             atimer.Enabled = true;
             atimer.Elapsed += timer1_Tick_For_Device;
-            atimer.Interval = 1000 * 5; //x seconds[ 1000 ms * x  =  x seconds]
+            atimer.Interval = 1000 * 8; //x seconds[ 1000 ms * x  =  x seconds]
 
         }
 
@@ -4245,19 +4348,31 @@ namespace PH_App
                     //var f = new Form_Main_PH_Application();
                     if (!frm1.backgroundWorker1.IsBusy)
                     {
-
                         frm1.backgroundWorker1.RunWorkerAsync();//--Running the worker async
                        // MessageBox.Show("Run worker async");
-                    }
-                  
+                    }                  
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
-
-
+        }
+        public void plot_new_graph(Chart chart, Form_Main_PH_Application f)
+        {
+            //--Step 1: read the fluid info
+            //--step 2: read the fluid xmin,xmax,ymin and ymax values
+            //3. call the plot function
+            //PullFluidForChartList()
+          if(indexForWhichChartIsSelected < chartDetailList.Count)
+            { 
+            string selectedChartId = chartDetailList[indexForWhichChartIsSelected].chartID;
+            fluidChartType fluid = fluidForChartsList.Find(x => x.chartID == selectedChartId);
+            string fluidName = fluid.fluidName;
+            f.lbFluidName.Text = fluidName;
+            fluidProperty fluidSelected = fluidInfo.Find(x => x.fluidName == fluidName);
+            plot_new_chart(fluidName, chart, fluidSelected.Xmin, fluidSelected.Xmax, fluidSelected.Ymin, fluidSelected.Ymax);
+            }
         }
 
         public void RefreshGraph(Chart chart1, Form_Main_PH_Application f)
@@ -4265,7 +4380,7 @@ namespace PH_App
 
             f.Invalidate();
            // chart1.Invalidate();//Uncommment later AAA
-            //plot_new_graph(); //--This one needs to be reinvented
+            plot_new_graph(chart1,f); //--This one needs to be reinvented
 
             //===Removing the node series value
             //foreach(var item in listNodeSeriesPlotted)
@@ -4279,7 +4394,6 @@ namespace PH_App
             foreach (var item in listLineInfoValues)
             {
                 RemoveSeriesFromChart(chart1, item.lineSeriesID.Name);//Removing the line series
-
             }
 
             //==Removing the dotteed series
@@ -4289,8 +4403,7 @@ namespace PH_App
             //listNodeInfoValues.Clear();
             index = 0;  //This is resetting the index values
             incrementIndex = 0;
-            // ReloadComfortZoneForBackGroundWorker();
-
+            //ReloadComfortZoneForBackGroundWorker();
         }
 
         void RemoveSeriesFromChart(Chart chart1, string seriesName)
@@ -4394,7 +4507,7 @@ namespace PH_App
 
            f1.dataGridView1.Rows.Clear();
             DataGridView_Show_Data(f1);
-            f1.dataGridView1.Rows.Add();
+            //f1.dataGridView1.Rows.Add();
             //If there is no rows in datagridview...
             //if(dataGridView1.Rows.Count < 1) { 
 
@@ -4551,20 +4664,13 @@ namespace PH_App
 
                     //now lets print the value in loop
                     for (int i1 = 0; i1 < listLineInfoValues.Count; i1++)
-                    {
-
-
-
-
+                    {                        
                         //===========================Copied here of the code=========================//
-
-
                         string idNode1 = "", lastUpdatedDateNode1 = "", humiditySourceNode1 = "", temperatureSourceNode1 = "", nameNode1 = "";
                         string idNode2 = "", lastUpdatedDateNode2 = "", humiditySourceNode2 = "", temperatureSourceNode2 = "", nameNode2 = "";
                         double xValueNode1 = 0, yValueNode1 = 0;
                         double xValueNode2 = 0, yValueNode2 = 0;
-                       // int airFlowNode1 = 0, airFlowNode2 = 0;
-
+                        //int airFlowNode1 = 0, airFlowNode2 = 0;
                         //--Scanning for the values
 
                         string startNodeName = "";
@@ -4585,7 +4691,6 @@ namespace PH_App
                                // airFlowNode1 = (int)menuStripNodeInfoValues[x].airFlow;
                                 break;
                             }
-
                         }
 
                         //--This one is for end nodename
@@ -4604,61 +4709,31 @@ namespace PH_App
                                 //airFlowNode2 = (int)menuStripNodeInfoValues[v].airFlow;
                                 break;
                             }
-
                         }
 
                         //--Lets make a function which returns all the other values
                         //EditNodeLineForm ed_form = new EditNodeLineForm(this);
-                       // ed_form.EnergyParameterCalculationForTwoNodes(xValueNode1, yValueNode1, airFlowNode1, xValueNode2, yValueNode2, airFlowNode2);
+                        //ed_form.EnergyParameterCalculationForTwoNodes(xValueNode1, yValueNode1, airFlowNode1, xValueNode2, yValueNode2, airFlowNode2);
 
                         //===========================End : Copied here of the code=========================//
 
-
                         oSheet.Cells[NewLineCount + 2 + i1, 1] = listLineInfoValues[i1].name;//dataGridView2.Rows[i].Cells[1].Value.ToString();
                         oSheet.Cells[NewLineCount + 2 + i1, 2] = //dataGridView2.Rows[i].Cells[2].Value.ToString();//"Start Node Name";
-
                         oSheet.Cells[NewLineCount + 2 + i1, 3] = startNodeName;//dataGridView2.Rows[i].Cells[3].Value.ToString();//"End Node Name";
-
                         oSheet.Cells[NewLineCount + 2 + i1, 4] = listLineInfoValues[i1].lineColorValue;// col.ToString();
                         oSheet.Cells[NewLineCount + 2 + i1, 5] = listLineInfoValues[i1].lineThickness;//dataGridView2.Rows[i].Cells[5].Value.ToString(); //"Thickness";
-                                                                                                               //DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[i].Cells[9];
-
+                        //DataGridViewCheckBoxCell cbCell = (DataGridViewCheckBoxCell)dataGridView2.Rows[i].Cells[9];
                         oSheet.Cells[NewLineCount + 2 + i1, 6] = listLineInfoValues[i1].status;//status; //"Show Name";
-                        //oSheet.Cells[NewLineCount + 2 + i1, 7] = xValueNode1; //dataGridView2.Rows[i].Cells[10].Value.ToString(); //"DBT1";
-                        //oSheet.Cells[NewLineCount + 2 + i1, 8] = ed_form.relativeHumidity1;//dataGridView2.Rows[i].Cells[11].Value.ToString();//"RH1";
-                        //oSheet.Cells[NewLineCount + 2 + i1, 9] = yValueNode1;//dataGridView2.Rows[i].Cells[12].Value.ToString(); //"HR1";
-                        //oSheet.Cells[NewLineCount + 2 + i1, 10] = ed_form.spVol1; //dataGridView2.Rows[i].Cells[13].Value.ToString(); //"SV1";
-
-
-                        //oSheet.Cells[NewLineCount + 2 + i1, 11] = ed_form.massFlowRate1;//dataGridView2.Rows[i].Cells[14].Value.ToString(); //"MFR1";
-                        //oSheet.Cells[NewLineCount + 2 + i1, 12] = ed_form.enthalpy1;//dataGridView2.Rows[i].Cells[15].Value.ToString(); //"enthalpy1";
-
-                        //oSheet.Cells[NewLineCount + 2 + i1, 13] = ed_form.totalEnergyFlow1;// dataGridView2.Rows[i].Cells[16].Value.ToString(); //"TEF1";
-                        //oSheet.Cells[NewLineCount + 2 + i1, 14] = xValueNode2;//dataGridView2.Rows[i].Cells[17].Value.ToString(); //"DBT2";
-                        //oSheet.Cells[NewLineCount + 2 + i1, 15] = ed_form.relativeHumidity2;//dataGridView2.Rows[i].Cells[18].Value.ToString();// "RH2";
-                        //oSheet.Cells[NewLineCount + 2 + i1, 16] = yValueNode2;//dataGridView2.Rows[i].Cells[19].Value.ToString(); //"HR2";
-                        //oSheet.Cells[NewLineCount + 2 + i1, 17] = ed_form.spVol2;//dataGridView2.Rows[i].Cells[20].Value.ToString(); //"SV2";
-                        //oSheet.Cells[NewLineCount + 2 + i1, 18] = ed_form.massFlowRate2;//  dataGridView2.Rows[i].Cells[21].Value.ToString(); //"MFR2";
-                        //oSheet.Cells[NewLineCount + 2 + i1, 19] = ed_form.enthalpy2; //dataGridView2.Rows[i].Cells[22].Value.ToString(); //"Enthalpy2";
-                        //oSheet.Cells[NewLineCount + 2 + i1, 20] = ed_form.totalEnergyFlow2;// dataGridView2.Rows[i].Cells[23].Value.ToString();// "TEF2";
-                        //oSheet.Cells[NewLineCount + 2 + i1, 21] = ed_form.heatChangeForBoth;//dataGridView2.Rows[i].Cells[24].Value.ToString(); //"heat change";
-
-
+                        
                     }
-
                     //now lets open the save dialog box and the save it there..
-
                     f1.Cursor = Cursors.Default;
                     //save the file..
                     fileName = f1.saveFD.FileName;
                     oBook.SaveAs(fileName);
-
-
                     oBook.Close();
                     oApp.Quit();
                 }
-
-
             }
             catch (Exception ex)
             {
@@ -4671,8 +4746,7 @@ namespace PH_App
 
         public void DeleteIndividualChart(object sender, EventArgs e,Form_Main_PH_Application f1,Chart chart1)
         {
-            //  DialogResult dialogResult = MessageBox.Show( "Are you sure you want to delete this chart?", "Delete chart", MessageBoxButtons.YesNo,MessageBoxIcon.Exclamation);
-
+            //DialogResult dialogResult = MessageBox.Show( "Are you sure you want to delete this chart?", "Delete chart", MessageBoxButtons.YesNo,MessageBoxIcon.Exclamation);
             if (MessageBox.Show("Are you sure you want to delete this chart?", "Delete chart", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
             //if (dialogResult == DialogResult.Yes)
             {
@@ -4684,8 +4758,6 @@ namespace PH_App
                 */
 
               
-
-
                 //===New added code==========================================//
                 int selectedItemIndex = f1.dataGridView1.CurrentCell.RowIndex; //int.Parse(dataGridView1.Rows[indexSelectedForDeletion].Cells[0].Value.ToString());
 
@@ -4696,9 +4768,7 @@ namespace PH_App
 
 
 
-                f1.dataGridView1.Rows.Clear();//--This one is for clearing the data
-                f1.dataGridView1.Refresh();//--Release the previously selectecd items
-                f1.dataGridView1.Rows.Add();
+               
                 //MessageBox.Show("Reached before refreshGraph() and after datagv ref");
                 DataGridView_Show_Data(f1);
 
@@ -4762,19 +4832,19 @@ namespace PH_App
              This functions helps in saving the chart as template             
              */
 
-            try
-            {
+            //try
+            //{
 
                 int selectedItemIndex = f1.dataGridView1.CurrentCell.RowIndex; //int.Parse(dataGridView1.Rows[indexSelectedForDeletion].Cells[0].Value.ToString());
                 string chart_ID = chartDetailList[selectedItemIndex].chartID;
 
 
                 SaveChartAsTemplate(chart_ID,f1);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show(ex.Message);
+            //}
         }
 
 
@@ -4965,6 +5035,7 @@ namespace PH_App
         public double Value { get; set; }
         }
         List<StoreTempPressureValue> listTemperatureHardwareValue = new List<StoreTempPressureValue>();
+        List<StoreTempPressureValue> listXaxisEnthalpyValue = new List<StoreTempPressureValue>();
         List<StoreTempPressureValue> listPressureHardwareValue = new List<StoreTempPressureValue>();
 
         // int countTime = 0;
@@ -5015,7 +5086,7 @@ namespace PH_App
                 return;
             }
             LoadNodeAndLineFromDB(indexOfChartSelected);//indexOfChartSelected= index chosen
-            if (listNodeInfoValues.Count < 1)
+            if (listNodeInfoValues.Count <= 0)
             {
                 //--No node then 
                 return;
@@ -5023,6 +5094,7 @@ namespace PH_App
            
             try
             {
+                var mth = new MathOperation();
                 flagForCompletingDataPullForBG = 0;
                 //--Read each node and then perform the following fxn
                 listTemperatureHardwareValue.Clear();//empty the list
@@ -5046,6 +5118,7 @@ namespace PH_App
                     //=======================For with single node for for Temperature source check and update===========//
                     //param1 value is temperature 
 
+                    //double x_Value = 0.00;//For temperature value pulling 
 
                     if (node.temperature_source == "Device")
                     {
@@ -5080,7 +5153,7 @@ namespace PH_App
 
                                 if (f1.lbTest2.InvokeRequired)
                                 {
-                                    f1.lbTest2.Invoke(new Action(() => f1.lbTest2.Text = "AboveReaddata"));
+                                    f1.lbTest2.Invoke(new Action(() => f1.lbTest2.Text = "aaaAboveReaddata"));
                                 }
                                 else
                                 {
@@ -5099,27 +5172,39 @@ namespace PH_App
                                 {
                                     f1.lbTest2.Text = "Below "+ returnTemperatureValue;
                                 }
-                                if ((returnTemperatureValue.ToString() == null || (returnTemperatureValue <= 0.00 || returnTemperatureValue > 1000)))
+                                if ((returnTemperatureValue.ToString() == null || (returnTemperatureValue <= 0.0000 || returnTemperatureValue > 1000)))
                                 {
                                     // return;
+                                    if (f1.lbTest2.InvokeRequired)
+                                    {
+                                        f1.lbTest2.Invoke(new Action(() => f1.lbTest2.Text = "Goto pressure"));
+                                    }
                                     goto pressureLine;//Goto serch for humidty values , if temperature is 0 don't do anything
                                 }
-
+                                if (f1.lbTest2.InvokeRequired)
+                                {
+                                    f1.lbTest2.Invoke(new Action(() => f1.lbTest2.Text = "After below and goto"));
+                                }
                                 //  MessageBox.Show("inside temperature source,val = "+hardwareValue1+",node name = "+node.name);
-                                var mth = new MathOperation();
+                               
                                 //double x_Value =Math.Round( mth.IAPWS_IF97_TowParameterEquivalentFxn("H", "T", (returnTemperatureValue + 215.13), "P", node.yVal * 1000000, "water")/1000,2); //returnTemperatureValue;//hardwareValue1;
-                                double x_Value = Math.Round(mth.IAPWS_IF97_TowParameterEquivalentFxn("H", "T", (returnTemperatureValue + 215.13), "P", node.yVal * 1000000, f1.lbFluidName.Text) / 1000, 2); //returnTemperatureValue;//hardwareValue1;
-                                //double y_value = CalculateYFromXandHumidity(hardwareValue1, hardwareValue2 / 100);
-                                //MessageBox.Show("xvalue = " + x_Value);
-                                //lock (listNodeInfoValues)
-                                //{
-                                //    // UpdateNodeInfoToDB(node.id, x_Value, y_value, node.source, node.name, node.label, node.colorValue, node.showItemText, node.marker_Size);
-                                //    UpdateNodeInfoToDBForTemeperatureFromHardware(node.ID, x_Value);//This is completed
-                                //}
+                               // double x_Value = Math.Round(mth.IAPWS_IF97_TowParameterEquivalentFxn("H", "T", (returnTemperatureValue + 215.13), "P", node.yVal * 1000000, f1.lbFluidName.Text) / 1000, 2); //returnTemperatureValue;//hardwareValue1;
+                                                                                                                                                                                                                            //double y_value = CalculateYFromXandHumidity(hardwareValue1, hardwareValue2 / 100);
+                                                                                                                                                                                                                            //MessageBox.Show("xvalue = " + x_Value);
+                                                                                                                                                                                                                            //lock (listNodeInfoValues)
+                                                                                                                                                                                                                            //{
+                                                                                                                                                                                                                            //    // UpdateNodeInfoToDB(node.id, x_Value, y_value, node.source, node.name, node.label, node.colorValue, node.showItemText, node.marker_Size);
+                                                                                                                                                                                                                            //    UpdateNodeInfoToDBForTemeperatureFromHardware(node.ID, x_Value);//This is completed
+                                                                                                                                                                                                                            //}
+
+                                if (f1.lbTest2.InvokeRequired)
+                                {
+                                    f1.lbTest2.Invoke(new Action(() => f1.lbTest2.Text = "temperature ="+ returnTemperatureValue));
+                                }
                                 listTemperatureHardwareValue.Add(new StoreTempPressureValue
                                 {
                                     NodeID =  node.ID,
-                                    Value = x_Value
+                                    Value = returnTemperatureValue
                                 });
                                 //countTime++;
                                 //=============STATUS SHOWING ONLINE OR DEVICE OFFLINE=================
@@ -5174,7 +5259,10 @@ namespace PH_App
                         ReadDeviceInfoForNode(node.ID);
 
                         //Here we will check for the device parameter id values
-
+                        if (f1.lbTest3.InvokeRequired)
+                        {
+                            f1.lbTest3.Invoke(new Action(() => f1.lbTest3.Text = "inside presure "));
+                        }
                         if (CheckDeviceOnlineOffline(int.Parse(device_info_list[0].device_instance_id_for_param2), 0) == true)
                         {
                             //online mode...
@@ -5186,17 +5274,25 @@ namespace PH_App
                                 //This gets the value
                                 //ReadDataFromDevice(int.Parse(device_info_list[0].device_instance_id), uint.Parse(device_info_list[0].param1_id), uint.Parse(device_info_list[0].param2_id), device_info_list[0].param1_identifier_type, device_info_list[0].param2_identifier_type);
                                 //ReadDataFromDevice(int.Parse(device_info_list[0].device_instance_id_for_param1), uint.Parse(device_info_list[0].param1_id), uint.Parse(device_info_list[0].param2_id), device_info_list[0].param1_identifier_type, device_info_list[0].param2_identifier_type);
-                                if (commumicationSuccesValue == false) { return; } //If no communication then return
+                                if (commumicationSuccesValue == false) {
+
+                                    if (f1.lbTest3.InvokeRequired)
+                                    {
+                                        f1.lbTest3.Invoke(new Action(() => f1.lbTest3.Text = "presure commSuccessValue =" + commumicationSuccesValue));
+                                    }
+                                    return;
+                                } //If no communication then return
+
                                 double pressureValue=    ReadDataFromDeviceForPressure(int.Parse(device_info_list[0].device_instance_id_for_param2), uint.Parse(device_info_list[0].param2_id), device_info_list[0].param2_identifier_type);
                                 //we have recent value in hardwareValue1 and hardwareValue2 so lets calc corresponding x and y value
                                 //now temp itself is x value we need to calculate y value
-                                if (f1.lbTest2.InvokeRequired)
+                                if (f1.lbTest3.InvokeRequired)
                                 {
-                                    f1.lbTest2.Invoke(new Action(() => f1.lbTest2.Text = "pressure=" + pressureValue));
+                                    f1.lbTest3.Invoke(new Action(() => f1.lbTest3.Text = "pressure=" + pressureValue));
                                 }
                                 else
                                 {
-                                    f1.lbTest2.Text = "pressure " + pressureValue;
+                                    f1.lbTest3.Text = "pressure " + pressureValue;
                                 }
                                 // if ((hardwareValue1.ToString() == null || hardwareValue1 == 0.00) || (hardwareValue2.ToString() == null || hardwareValue2 == 0.00))
                                 if ((pressureValue.ToString() == null || (pressureValue <= 0.00 || pressureValue > 14504)))
@@ -5245,22 +5341,7 @@ namespace PH_App
                         }
                     }
 
-                    //--Now lets add to the database
-
-                    lock (listNodeInfoValues)
-                    {
-
-                        foreach (var item in listTemperatureHardwareValue)
-                        {
-                            UpdateNodeInfoToDBForTemeperatureFromHardware(item.NodeID, item.Value);//This is completed
-                        }
-                        foreach (var item in listPressureHardwareValue)
-                        {
-                            UpdateNodeInfoToDBForPressureFromHardware(item.NodeID,item.Value);
-                        }
-                        
-                    }
-
+                   
                     //For go to statement
                     ///==========================================end of second parameter value==============================//
 
@@ -5268,6 +5349,79 @@ namespace PH_App
                     double z = 0;//no use for go to statement cant go before  } so 
                 }  //Close of foreach now lets plot the values..
 
+                //--Now lets add to the database
+
+                //==Now doing the actual pulling 
+                for (int i = 0; i < listTemperatureHardwareValue.Count; i++)
+                {
+                    int id = 0;
+                    for (int j = 0; j < listPressureHardwareValue.Count; j++)
+                    {
+                        //--For checking new updated value
+                        if (listTemperatureHardwareValue[i].NodeID == listPressureHardwareValue[j].NodeID)
+                        {
+                            //--Node id matched so no need to see in list 
+                            if (f1.lbTest4.InvokeRequired)
+                            {
+                                f1.lbTest4.Invoke(new Action(() => f1.lbTest4.Text = "Before iapws_if97 " ));
+                            }
+                            double xValue = Math.Round((mth.IAPWS_IF97_TowParameterEquivalentFxn("H", "P", listPressureHardwareValue[j].Value * 1000000, "T", (listTemperatureHardwareValue[i].Value + 273.15), f1.lbFluidName.Text) / 1000), 2); //returnTemperatureValue;//hardwareValue1;
+                            //double xValue = Math.Round((CoolProp.PropsSI("H", "P", listPressureHardwareValue[j].Value * 1000000, "T", (listTemperatureHardwareValue[i].Value + 273.15), f1.lbFluidName.Text) / 1000), 2);
+                            listXaxisEnthalpyValue.Add(new StoreTempPressureValue
+                            {
+                                NodeID = listTemperatureHardwareValue[i].NodeID,
+                                Value = xValue
+                            });
+                            id = 1;
+                            if (f1.lbTest4.InvokeRequired)
+                            {
+                                f1.lbTest4.Invoke(new Action(() => f1.lbTest4.Text = "after iapws... xvalue ="+ xValue));
+                            }
+                            break;
+                        }
+                    }
+                    if (id == 0)
+                    {
+                        foreach (var item in listNodeInfoValues)
+                        {
+                            if (listTemperatureHardwareValue[i].NodeID == item.ID)
+                            {
+                                //--Node id matched so no need to see in list 
+                                double xValue = Math.Round((mth.IAPWS_IF97_TowParameterEquivalentFxn("H", "P", item.yVal * 1000000, "T", (listTemperatureHardwareValue[i].Value + 273.15), f1.lbFluidName.Text.Trim()) / 1000), 2); //returnTemperatureValue;//hardwareValue1;
+                                listXaxisEnthalpyValue.Add(new StoreTempPressureValue
+                                {
+                                    NodeID = listTemperatureHardwareValue[i].NodeID,
+                                    Value = xValue
+                                });
+                               
+                                break;
+                            }
+                        }
+
+                    }
+                  
+                }
+
+
+                lock (listNodeInfoValues)
+                {
+
+                    foreach (var item in listXaxisEnthalpyValue)
+                    {
+                        if (item.Value > 0.00000)
+                        {
+                            UpdateNodeInfoToDBForTemeperatureFromHardware(item.NodeID, item.Value);//This is completed
+                        }
+                    }
+                    foreach (var item in listPressureHardwareValue)
+                    {
+                        if (item.Value > 0.00000)
+                        {
+                            UpdateNodeInfoToDBForPressureFromHardware(item.NodeID, item.Value);
+                        }
+                    }
+
+                }
 
                 flagForCompletingDataPullForBG = 1;
             }
@@ -5404,6 +5558,8 @@ namespace PH_App
                 //Now delete the chart itself
                 DeleteChart(chartID, buildingName);
 
+                //--Delete fluid info
+                DeleteFluidInfoForChart(chartID, buildingName);
 
             }//Close of if
 
@@ -5436,9 +5592,7 @@ namespace PH_App
                 {
                     f1.dataGridView1.Rows[0].Cells[1].Selected = true;//The row is selected 
                 }
-
             }
-
 
             if (chartDetailList.Count > 0)
             {
@@ -5458,7 +5612,6 @@ namespace PH_App
                     // or setting the selected cells manually before executing the function
                     f1.dataGridView1.Rows[indexOfChartSelected].Cells[1].Selected = true;
                     DGVCellClick(sender, eventArgs, f1, chart1);
-
                 }
                 else
                 {

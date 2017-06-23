@@ -168,9 +168,6 @@
   <data name="label12.Text" xml:space="preserve">
     <value>값</value>
   </data>
-  <data name="label13.Text" xml:space="preserve">
-    <value>° C</value>
-  </data>
   <data name="label15.Text" xml:space="preserve">
     <value>위치:</value>
   </data>
@@ -188,9 +185,6 @@
   </data>
   <data name="label20.Text" xml:space="preserve">
     <value>기압계:</value>
-  </data>
-  <data name="label21.Text" xml:space="preserve">
-    <value>deg입니다. C</value>
   </data>
   <data name="label24.Text" xml:space="preserve">
     <value>바람:</value>
@@ -210,7 +204,7 @@
   <data name="label3.Text" xml:space="preserve">
     <value>도시:</value>
   </data>
-  <data name="label30.Text" xml:space="preserve">
+  <data name="label30Status.Text" xml:space="preserve">
     <value>상태: 없음</value>
   </data>
   <data name="label31.Text" xml:space="preserve">
@@ -273,6 +267,9 @@
   </data>
   <data name="lb_real_time.Text" xml:space="preserve">
     <value>실시간</value>
+  </data>
+  <data name="lb_unit_elevation.Text" xml:space="preserve">
+    <value>미터</value>
   </data>
   <data name="lb_web_status.Text" xml:space="preserve">
     <value>비활성</value>

@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using static PH_App.DatabaseOperationModel;
 
 namespace PH_App
 {
@@ -58,52 +59,101 @@ namespace PH_App
         {
             try
             {
-                this.Enabled = false;//optional, better target a panel or specific controls
-                this.UseWaitCursor = true;//from the Form/Window instance
+                //this.Enabled = false;//optional, better target a panel or specific controls
+                //this.UseWaitCursor = true;//from the Form/Window instance
               
                 //--Now lets pull the values from database
+
                 mc.ReadDataForBuildingSelectedFromPsychrometric();
                 mc.buildingSelectedInT3000 = mc.FindPathOfBuildingInT3000();
-
+                /*
+                 Steps: 1. Load building name,
+                 2. pull the chart list 
+                 3. if chart is present then pull the data from that list , pull fluid name
+                 4. pull fluid detail 
+                 5. pass it to plot function
+                 */
+                if (mc.buildingSelectedInT3000.Count > 0)
+                { 
                 mc.PullDataOfFluidInfo(mc.buildingSelectedInT3000[0].Building_Name);
+                    if (mc.selectedBuildingList.Count > 0) { 
+                mc.PullChartList(mc.selectedBuildingList[0].BuildingName);
 
-                double xDiv = 1000;
-                double yDiv = 1000;
-                bool xFlag = false;
-                bool yFlag = false;
+                if (mc.chartDetailList.Count > 0) {
+                 string chartIdForFluidName = mc.chartDetailList[0].chartID;
+                mc.PullFluidForChartList(mc.selectedBuildingList[0].BuildingName);
+                fluidChartType fluidInfoForName = mc.fluidForChartsList.Find(x => x.chartID == chartIdForFluidName);
 
+                 string fluidName1 = fluidInfoForName.fluidName;
+                  fluidProperty fluidDetail = mc.fluidInfo.Find(x => x.fluidName == fluidName1);
+
+               
                 //--Now we have the data
                 if (mc.fluidInfo.Count > 0)
                 {
-                    //--We need to update the values
-                    fluidName = mc.fluidInfo[0].fluidName;
-                    Xmin = mc.fluidInfo[0].Xmin;
-                    Xmax = mc.fluidInfo[0].Xmax; //--No prob
-                    Ymin = mc.fluidInfo[0].Ymin;
-                    Ymax = mc.fluidInfo[0].Ymax;//--No prob
-                    
-                }
+                                //--We need to update the values
+                                //fluidName = mc.fluidInfo[0].fluidName;
+                                //Xmin = mc.fluidInfo[0].Xmin;
+                                //Xmax = mc.fluidInfo[0].Xmax; //--No prob
+                                //Ymin = mc.fluidInfo[0].Ymin;
+                                //Ymax = mc.fluidInfo[0].Ymax;//--No prob                    
 
+                                fluidName = fluidDetail.fluidName;
+                                Xmin = fluidDetail.Xmin;
+                                Xmax = fluidDetail.Xmax; //--No prob
+                                Ymin = fluidDetail.Ymin;
+                                Ymax = fluidDetail.Ymax;
+                            }
+                }
+                }
+                 }
                 // mc.LoadForPH(fluidName,this,Xmin,Xmax,Ymin,Ymax,xDiv,yDiv,xFlag,yFlag);//--
                 mc.LoadForPH(fluidName, this, Xmin, Xmax, Ymin, Ymax);//--
                 phChart.Series.Add(seriesPoint);
                 phChart.Series.Add(mc.series1);
-              
-                // MessageBox.Show("chart condn=" + phChart.Enabled);
-                // phChart.Enabled = true; 
+               //MessageBox.Show("Enthaly val(temp = 60deg,pre=20mpa) ="+Math.Round((CoolProp.PropsSI("H", "P", 40 * 1000000, "T", (10 + 273.15), "water") / 1000), 2));
+                //MessageBox.Show("chart condn=" + phChart.Enabled);
+                //phChart.Enabled = true; 
                 mc.RefreshByLoadingDataWhileLoad(sender, e, this);
                 }
-            finally
+            catch(Exception ex)
             {
-               this.Enabled = true;//optional
-               this.UseWaitCursor = false;
+                MessageBox.Show(ex.Message);
             }
+            //finally
+            //{
+            //   this.Enabled = true;//optional
+            //   this.UseWaitCursor = false;
+            //}
         }
 
         private void phChart_MouseDown(object sender, MouseEventArgs e)
         {
-            
+            // This gives the corresponding X and Y coordinates of the mouse point.
+            var pos = e.Location;
+            if (prevPosition.HasValue && pos == prevPosition.Value)
+                return;
+            tooltip.RemoveAll();
+            prevPosition = pos;
+            var results = phChart.HitTest(pos.X, pos.Y, false,
+                                         ChartElementType.PlottingArea);
+            foreach (var result in results)
+            {
+                if (result.ChartElementType == ChartElementType.PlottingArea)
+                {
+                    var xVal = result.ChartArea.AxisX.PixelPositionToValue(pos.X);
+
+                    var yVal = Math.Pow(10, (result.ChartArea.AxisY.PixelPositionToValue(pos.Y)));
+                    xCoord = xVal;
+                    yCoord = yVal;
+                    // tooltip.Show("X=" + xVal + ", Y=" + yVal, this.phChart,
+                    //  pos.X, pos.Y - 15);
+
+                }
+            }
+
             mc.Chart_MouseDown(sender, e,this, MousePosition);
+            
         }
         double xCoord=0, yCoord=0;
         private void quickNodeInsertToolStripMenuItem_Click(object sender, EventArgs e)
@@ -111,15 +161,19 @@ namespace PH_App
             //--Now adding nodes
             try
             {
-                this.Enabled = false;//optional, better target a panel or specific controls
-                this.UseWaitCursor = true;//from the Form/Window instance
+                //this.Enabled = false;//optional, better target a panel or specific controls
+                //this.UseWaitCursor = true;//from the Form/Window instance
                 mc.InsertNodeAndLine(phChart, xCoord, yCoord);
             }
-            finally
+            catch(Exception ex)
             {
-                this.Enabled = true;//optional
-                this.UseWaitCursor = false;
+                MessageBox.Show(ex.Message);
             }
+            //finally
+            //{
+            //    this.Enabled = true;//optional
+            //    this.UseWaitCursor = false;
+            //}
            
 
         }
@@ -130,9 +184,8 @@ namespace PH_App
            // mc.DGVCellClick(sender, e, this, phChart);
             //try
             //{
-            //    this.Enabled = false;//optional, better target a panel or specific controls
-            //    this.UseWaitCursor = true;//from the Form/Window instance
-
+            //this.Enabled = false;//optional, better target a panel or specific controls
+            //this.UseWaitCursor = true;//from the Form/Window instance
                 mc.DGVCellClick(sender, e, this, phChart);
             //}
             //finally
@@ -186,34 +239,14 @@ namespace PH_App
 
         private void phChart_MouseMove(object sender, MouseEventArgs e)
         {
-            // This gives the corresponding X and Y coordinates of the mouse point.
-            var pos = e.Location;
-            if (prevPosition.HasValue && pos == prevPosition.Value)
-                return;
-            tooltip.RemoveAll();
-            prevPosition = pos;
-            var results = phChart.HitTest(pos.X, pos.Y, false,
-                                         ChartElementType.PlottingArea);
-            foreach (var result in results)
-            {
-                if (result.ChartElementType == ChartElementType.PlottingArea)
-                {
-                    var xVal = result.ChartArea.AxisX.PixelPositionToValue(pos.X);
-                    
-                    var yVal =Math.Pow(10, (result.ChartArea.AxisY.PixelPositionToValue(pos.Y)));
-                    xCoord = xVal;
-                    yCoord = yVal;
-                    // tooltip.Show("X=" + xVal + ", Y=" + yVal, this.phChart,
-                    //  pos.X, pos.Y - 15);
-                    
-                }
-            }
-
+            try { 
+           
             //mc.chart_MouseMove(sender, e, phChart, this, xCoord, yCoord);
             mc.chart_MouseMove(sender, e, phChart, this);
+            }catch(Exception ex)
+            {
 
-
-
+            }
         }
 
         private void phChart_MouseClick(object sender, MouseEventArgs e)
@@ -388,6 +421,41 @@ namespace PH_App
         {
             var frmsetting = new FormSetting(this);
             frmsetting.ShowDialog();
+        }
+
+        private void lbFluidName_Click(object sender, EventArgs e)
+        {
+            //--This is function for on click for fluid info
+            FormFluidSelection f = new FormFluidSelection(mc, this);
+            f.ShowDialog();
+
+        }
+
+        private void lbFluidName_MouseHover(object sender, EventArgs e)
+        {
+            //
+            lbFluidName.BorderStyle = BorderStyle.FixedSingle;
+            lbFluidName.ForeColor = Color.Blue;
+            
+        }
+
+        private void Form_Main_PH_Application_MouseHover(object sender, EventArgs e)
+        {
+            lbFluidName.ForeColor = Color.Black;
+            lbFluidName.BorderStyle = BorderStyle.None;
+
+        }
+
+        private void phChart_MouseHover(object sender, EventArgs e)
+        {
+            //lbFluidName.ForeColor = Color.Black;
+            //lbFluidName.BorderStyle = BorderStyle.None;
+        }
+
+        private void lbFluidName_MouseLeave(object sender, EventArgs e)
+        {
+            lbFluidName.ForeColor = Color.Black;
+            lbFluidName.BorderStyle = BorderStyle.None;
         }
 
         public void RefreshChartListForTrashBoxRestore(Form_Main_PH_Application Fmain)

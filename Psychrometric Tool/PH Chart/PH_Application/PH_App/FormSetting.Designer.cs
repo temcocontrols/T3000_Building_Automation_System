@@ -48,6 +48,7 @@
             this.cbFluidName.Name = "cbFluidName";
             this.cbFluidName.Size = new System.Drawing.Size(161, 21);
             this.cbFluidName.TabIndex = 0;
+            this.cbFluidName.SelectedIndexChanged += new System.EventHandler(this.cbFluidName_SelectedIndexChanged);
             // 
             // label1
             // 
@@ -57,6 +58,7 @@
             this.label1.Size = new System.Drawing.Size(66, 13);
             this.label1.TabIndex = 1;
             this.label1.Text = "Fluid Name :";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // button1
             // 
