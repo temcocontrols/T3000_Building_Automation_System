@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "T3000", "T3000\T3000.vcxproj", "{F7226464-C41C-4909-BF74-97328B72FFC8}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -23,6 +23,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "T3000Controls", "T3000Controls\T3000Controls.csproj", "{0D845AA6-E9B7-4542-9A2D-EB371076C021}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModbusPoll", "Modbus Poll\ModbusPoll.vcxproj", "{7ECEC3E5-9E56-40C5-8043-9B472536F566}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "T3000Test", "T3000Test\T3000Test.vcxproj", "{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -338,6 +340,44 @@ Global
 		{7ECEC3E5-9E56-40C5-8043-9B472536F566}.Unicode Release|Win32.Build.0 = Release|Win32
 		{7ECEC3E5-9E56-40C5-8043-9B472536F566}.Unicode Release|x64.ActiveCfg = Release|Win32
 		{7ECEC3E5-9E56-40C5-8043-9B472536F566}.Unicode Release|x64.Build.0 = Release|Win32
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Debug|Win32.Build.0 = Debug|Win32
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Debug|x64.ActiveCfg = Debug|x64
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Debug|x64.Build.0 = Debug|x64
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Release|Any CPU.ActiveCfg = Release|Win32
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Release|Win32.ActiveCfg = Release|Win32
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Release|Win32.Build.0 = Release|Win32
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Release|x64.ActiveCfg = Release|x64
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Release|x64.Build.0 = Release|x64
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Template|Any CPU.ActiveCfg = Release|x64
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Template|Any CPU.Build.0 = Release|x64
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Template|Mixed Platforms.ActiveCfg = Release|Win32
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Template|Mixed Platforms.Build.0 = Release|Win32
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Template|Win32.ActiveCfg = Release|Win32
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Template|Win32.Build.0 = Release|Win32
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Template|x64.ActiveCfg = Release|x64
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Template|x64.Build.0 = Release|x64
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Unicode Debug|Any CPU.ActiveCfg = Release|x64
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Unicode Debug|Any CPU.Build.0 = Release|x64
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Unicode Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Unicode Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Unicode Debug|Win32.ActiveCfg = Debug|Win32
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Unicode Debug|Win32.Build.0 = Debug|Win32
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Unicode Debug|x64.ActiveCfg = Debug|x64
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Unicode Debug|x64.Build.0 = Debug|x64
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Unicode Release|Any CPU.ActiveCfg = Release|x64
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Unicode Release|Any CPU.Build.0 = Release|x64
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Unicode Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Unicode Release|Mixed Platforms.Build.0 = Release|Win32
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Unicode Release|Win32.ActiveCfg = Release|Win32
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Unicode Release|Win32.Build.0 = Release|Win32
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Unicode Release|x64.ActiveCfg = Release|x64
+		{E8AE912C-1A6A-429A-9CFC-B6BE1DCEB31C}.Unicode Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

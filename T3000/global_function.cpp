@@ -12393,7 +12393,7 @@ bool Save_OutputData_to_db(unsigned char  temp_output_index, unsigned int nseria
 bool Save_VariableData_to_db(unsigned char  temp_output_index, unsigned int nserialnumber)
 {
 
-	return true;
+	//return true;
 
 
 	CString strPanel;

@@ -277,6 +277,7 @@ void CT3000App::UpdateDB()
 /// <returns></returns>
 BOOL CT3000App::InitInstance()
 {
+	 
 	GetModulePath();
 	CString strSource = g_strExePth + L"T3000Controls.dll";
 	//
@@ -360,7 +361,7 @@ BOOL CT3000App::InitInstance()
 		//  	}
 		// 	
 		//	versionstring=ImageString.g(index_start);
-
+	//	Logger::WriteMessage("T3000 Unit Tester Begin....");
 		CWinAppEx::InitInstance();
 		HRESULT hr;
 		//
