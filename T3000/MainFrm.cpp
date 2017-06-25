@@ -102,14 +102,14 @@ HTREEITEM  hLastTreeItem =NULL;
 #include "ProductModel.h"
 bool b_create_status = false;
 const TCHAR c_strCfgFileName[] = _T("config.txt");
-//	ÅäÖÃÎÄ¼şÃû³Æ£¬ÓÃÓÚ±£´æÓÃ»§ÉèÖÃ
+//	é…ç½®æ–‡ä»¶åç§°ï¼Œç”¨äºä¿å­˜ç”¨æˆ·è®¾ç½®
 extern bool b_statusbarthreadflag;
 extern tree_product	m_product_isp_auto_flash;
 #pragma region Fance Test
 //For Test
-// ÔÚÃ»ÓĞÊó±êºÍ¼üÅÌÏûÏ¢µÄÊ±ºò ¾ÍÆôÓÃ×Ô¶¯Ë¢ĞÂ treeview,Èç¹ûÓĞ¾Í ²»ÒªË¢ĞÂ£¬ÒòÎªÈç¹ûÕıÔÚË¢ĞÂ£¬¿Í»§¿ÏÄÜ¾ÍÎŞ·¨µÚÒ»Ê±¼ä¶Áµ½×Ô¼ºÏëÒªµÄÊı¾İ;
+// åœ¨æ²¡æœ‰é¼ æ ‡å’Œé”®ç›˜æ¶ˆæ¯çš„æ—¶å€™ å°±å¯ç”¨è‡ªåŠ¨åˆ·æ–° treeview,å¦‚æœæœ‰å°± ä¸è¦åˆ·æ–°ï¼Œå› ä¸ºå¦‚æœæ­£åœ¨åˆ·æ–°ï¼Œå®¢æˆ·è‚¯èƒ½å°±æ— æ³•ç¬¬ä¸€æ—¶é—´è¯»åˆ°è‡ªå·±æƒ³è¦çš„æ•°æ®;
 
-bool start_record_time = true;	//¿ªÆô¼ÆÊ±£¬Èç¹ûÓÃ»§Ò»¶ÎÊ±¼äÎŞ¼üÅÌºÍÊó±ê×ó¼ü²Ù×÷¾Í¿ªÆô×Ô¶¯Ë¢ĞÂ;
+bool start_record_time = true;	//å¼€å¯è®¡æ—¶ï¼Œå¦‚æœç”¨æˆ·ä¸€æ®µæ—¶é—´æ— é”®ç›˜å’Œé¼ æ ‡å·¦é”®æ“ä½œå°±å¼€å¯è‡ªåŠ¨åˆ·æ–°;
 unsigned long time_click = 0;
 
 bool enable_show_debug_window = false;
@@ -228,7 +228,7 @@ volatile HANDLE Read_Mutex=NULL;
 //BOOL g_bPauseMultiRead=FALSE;
 BOOL m_active_key_mouse = FALSE;
 //tree0412
-#if 0//Ô­ÓĞ
+#if 0//åŸæœ‰
     #define TVINSERV_BUILDING 		{tvInsert.item.iImage=0;tvInsert.item.iSelectedImage=0;}
     #define TVINSERV_FLOOR	 			{tvInsert.item.iImage=0;tvInsert.item.iSelectedImage=0;}
     #define TVINSERV_ROOM				{tvInsert.item.iImage=1;tvInsert.item.iSelectedImage=1;}
@@ -247,7 +247,7 @@ BOOL m_active_key_mouse = FALSE;
 #define TVINSERV_BUILDING 		    {tvInsert.item.iImage=0; tvInsert.item.iSelectedImage=0;}
 #define TVINSERV_FLOOR	 			{tvInsert.item.iImage=0; tvInsert.item.iSelectedImage=0;}
 #define TVINSERV_ROOM				{tvInsert.item.iImage=2; tvInsert.item.iSelectedImage=2;}
-#define TVINSERV_TSTAT_DEFAULT 	    {tvInsert.item.iImage=6; tvInsert.item.iSelectedImage=6;}     //Ä¬ÈÏµÄ²úÆ·Í¼±ê
+#define TVINSERV_TSTAT_DEFAULT 	    {tvInsert.item.iImage=6; tvInsert.item.iSelectedImage=6;}     //é»˜è®¤çš„äº§å“å›¾æ ‡
 #define TVINSERV_LED_TSTAT7 		{tvInsert.item.iImage=8; tvInsert.item.iSelectedImage=8;}   //TSTAT7
 #define TVINSERV_CMFIVE			    {tvInsert.item.iImage=10;tvInsert.item.iSelectedImage=10;}   //TSTAT7
 #define TVINSERV_NET_WORK		    {tvInsert.item.iImage=12;tvInsert.item.iSelectedImage=12;}
@@ -288,7 +288,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
     ON_COMMAND_RANGE(ID_VIEW_APPLOOK_WIN_2000, ID_VIEW_APPLOOK_OFF_2007_AQUA, &CMainFrame::OnApplicationLook)
     ON_UPDATE_COMMAND_UI_RANGE(ID_VIEW_APPLOOK_WIN_2000, ID_VIEW_APPLOOK_OFF_2007_AQUA, &CMainFrame::OnUpdateApplicationLook)
 
-    //ON_REGISTERED_MESSAGE(AFX_WM_RESETTOOLBAR, //OnToolbarReset) // ¹¤¾ßÀ¸µÄ°´Å¥Ìí¼ÓÎÄ×ÖµÄ·½·¨
+    //ON_REGISTERED_MESSAGE(AFX_WM_RESETTOOLBAR, //OnToolbarReset) // å·¥å…·æ çš„æŒ‰é’®æ·»åŠ æ–‡å­—çš„æ–¹æ³•
     ON_COMMAND(ID_BUILDINGBAR,OnCheckBuildingBar)
     ON_UPDATE_COMMAND_UI(ID_BUILDINGBAR, OnUpdateCheckBuildingBar)
     ON_COMMAND(ID_INPUTOUTPUTPANE,OnCheckIOPane)
@@ -541,7 +541,7 @@ UINT _ReadMultiRegisters(LPVOID pParam)
             multy_ret = Read_Multi(g_tstat_id,&multi_register_value[i*100],i*100,100);
             //register_critical_section.Unlock();
             Sleep(100);
-            if(multy_ret<0)		//Fance : Èç¹û³öÏÖ¶ÁÊ§°Ü ¾ÍÌø³öÑ­»·Ìå,ÒòÎªÈç¹ûÊÇÓÉ¶Ï¿ªÁ¬½Ó Ôì³ÉµÄ ¶ÁÊ§°Ü »áÊ¹ÆäËûĞèÒªÓÃµ½¶ÁµÄµØ·½Ò»Ö±ÎŞ·¨»ñµÃ×ÊÔ´;
+            if(multy_ret<0)		//Fance : å¦‚æœå‡ºç°è¯»å¤±è´¥ å°±è·³å‡ºå¾ªç¯ä½“,å› ä¸ºå¦‚æœæ˜¯ç”±æ–­å¼€è¿æ¥ é€ æˆçš„ è¯»å¤±è´¥ ä¼šä½¿å…¶ä»–éœ€è¦ç”¨åˆ°è¯»çš„åœ°æ–¹ä¸€ç›´æ— æ³•è·å¾—èµ„æº;
                 break;
         }
 
@@ -720,7 +720,7 @@ void getLocalIp(void)
     }
 }
 
-//void MyUpperCase( char str[] ) // ½«str ÖĞµÄĞ¡Ğ´×ÖÄ¸×ª»»³É´óĞ´×ÖÄ¸
+//void MyUpperCase( char str[] ) // å°†str ä¸­çš„å°å†™å­—æ¯è½¬æ¢æˆå¤§å†™å­—æ¯
 //{
 //	int abc = sizeof(str)/sizeof(str[0]);
 //	int xxx = sizeof(str);
@@ -999,7 +999,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     m_pTreeViewCrl->SetExtendedStyle(TVS_EDITLABELS, TVS_EDITLABELS);
     MainFram_hwd = this->m_hWnd;
 
-    //  2011,7,4, ÏÈÅĞ¶ÏÊÇ·ñµÚÒ»´ÎÔËĞĞ£¬ÊÇ·ñÒªµ¼ÈëÊı¾İ¿â¡£
+    //  2011,7,4, å…ˆåˆ¤æ–­æ˜¯å¦ç¬¬ä¸€æ¬¡è¿è¡Œï¼Œæ˜¯å¦è¦å¯¼å…¥æ•°æ®åº“ã€‚
     //ImportDataBaseForFirstRun();
     CString g_configfile_path =g_strExePth + g_strStartInterface_config;
     g_selected_serialnumber=0;//GetPrivateProfileInt(_T("T3000_START"),_T("SerialNumber"),0,g_configfile_path);
@@ -1018,7 +1018,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	Check_Local_TemcoUpdate();
 
     ScanTstatInDB();
-   // DeleteConflictInDB();//ÓÃÓÚ´¦ÀíÊı¾İ¿âÖĞÖØ¸´µÄÊı¾İ£¬ÕâĞ©Êı¾İÓĞÏàÍ¬µÄĞòÁĞºÅ;
+   // DeleteConflictInDB();//ç”¨äºå¤„ç†æ•°æ®åº“ä¸­é‡å¤çš„æ•°æ®ï¼Œè¿™äº›æ•°æ®æœ‰ç›¸åŒçš„åºåˆ—å·;
     PostMessage(WM_REFRESH_TREEVIEW_MAP,0,0);
 
     SetTimer(MONITOR_MOUSE_KEYBOARD_TIMER,1000,NULL);
@@ -1034,10 +1034,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 
    
-    BuildingComportConfig();//ÓÃÓÚ ¸ü¸Ä ConfigÀïÃæµÄ ComportÏî;
+    BuildingComportConfig();//ç”¨äº æ›´æ”¹ Configé‡Œé¢çš„ Comporté¡¹;
 
 
-//Õ¹¿ªËùÓĞµÄÏî
+//å±•å¼€æ‰€æœ‰çš„é¡¹
 //	Treestatus();
     HTREEITEM htiRoot = m_pTreeViewCrl->GetRootItem();//GetRootItem();
     m_pTreeViewCrl->Expand(htiRoot,TVE_EXPAND);
@@ -1055,8 +1055,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 
 
-    //RegisterÈÈ¼ü
-#ifdef _DEBUG //debug°æ±¾   
+    //Registerçƒ­é”®
+#ifdef _DEBUG //debugç‰ˆæœ¬   
     int nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[0],MOD_ALT,'I');
     if(!nRet)
         AfxMessageBox(_T("RegisterHotKey ALT + I failure"));
@@ -1100,13 +1100,13 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     if(!nRet)
         AfxMessageBox(_T("RegisterHotKey ALT + R failure"));
 
-    nRet = RegisterHotKey(GetSafeHwnd(),1111,(MOD_SHIFT | MOD_CONTROL | MOD_ALT),'D'); //ÈÈ¼ü ctrl + alt + shift + D
+    nRet = RegisterHotKey(GetSafeHwnd(),1111,(MOD_SHIFT | MOD_CONTROL | MOD_ALT),'D'); //çƒ­é”® ctrl + alt + shift + D
     if(!nRet)
         AfxMessageBox(_T("RegisterHotKey MOD_SHIFT + D failure"));
-    nRet = RegisterHotKey(GetSafeHwnd(),1112,(MOD_SHIFT | MOD_CONTROL | MOD_ALT),'F'); //ÈÈ¼ü ctrl + alt + shift + F
+    nRet = RegisterHotKey(GetSafeHwnd(),1112,(MOD_SHIFT | MOD_CONTROL | MOD_ALT),'F'); //çƒ­é”® ctrl + alt + shift + F
     if(!nRet)
         AfxMessageBox(_T("RegisterHotKey MOD_SHIFT + F failure"));
-#else //release°æ±¾   
+#else //releaseç‰ˆæœ¬   
     RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[0],MOD_ALT,'I');
     RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[1],MOD_ALT,'O');
     RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[2],MOD_ALT,'V');
@@ -1168,7 +1168,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
      m_sFileToDownloadInto+=_T("firmware\\");
      CreateDirectory(m_sFileToDownloadInto,NULL);*/
 
-    // ĞèÒªÖ´ĞĞÏß³ÌÖĞµÄ²Ù×÷Ê±
+    // éœ€è¦æ‰§è¡Œçº¿ç¨‹ä¸­çš„æ“ä½œæ—¶
 
     if (m_lasttime_tree_node.protocol == Modbus_Serial)
     {
@@ -1203,7 +1203,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     }
     else
     {
-       // m_pTreeViewCrl->turn_item_image(m_lasttime_tree_node.product_item ,false); //2016 03 17 ÓÉ¶Å·«ÆÁ±Î. ³õÊ¼»¯ m_lasttime_tree_node.product_item µÄÖµ¿ÉÄÜÎª0xcdcdcdcd. µ¼ÖÂÔËĞĞ´íÎó;
+       // m_pTreeViewCrl->turn_item_image(m_lasttime_tree_node.product_item ,false); //2016 03 17 ç”±æœå¸†å±è”½. åˆå§‹åŒ– m_lasttime_tree_node.product_item çš„å€¼å¯èƒ½ä¸º0xcdcdcdcd. å¯¼è‡´è¿è¡Œé”™è¯¯;
         for (int i = 0; i<(int)m_product.size(); i++)
         {
             if (m_product.at(i).product_item == m_lasttime_tree_node.product_item)
@@ -1760,7 +1760,7 @@ BOOL CMainFrame::ValidAddress(CString sAddress,UINT& n1,UINT& n2,UINT& n3,UINT& 
     return true;
 }
 
-//É¾³ıÊı¾İ¿âÖĞ ÖØµşµÄdevice.;
+//åˆ é™¤æ•°æ®åº“ä¸­ é‡å çš„device.;
 void CMainFrame::DeleteConflictInDB()
 {
     bool find_conflict = false;
@@ -1987,13 +1987,13 @@ void CMainFrame::LoadProductFromDB()
 
 	CString strBuilding=m_strCurSubBuldingName;//m_subNetLst.at(k).strBuildingName;
 
-	tvInsert.hParent = TVI_ROOT; // Ö¸¶¨¸¸¾ä±ú
-	tvInsert.item.mask = ITEM_MASK; // Ö¸¶¨TV_ITEM½á¹¹¶ÔÏó
+	tvInsert.hParent = TVI_ROOT; // æŒ‡å®šçˆ¶å¥æŸ„
+	tvInsert.item.mask = ITEM_MASK; // æŒ‡å®šTV_ITEMç»“æ„å¯¹è±¡
 	tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strBuilding;
-	tvInsert.hInsertAfter = TVI_LAST; // ÏîÄ¿²åÈë·½Ê½
+	tvInsert.hInsertAfter = TVI_LAST; // é¡¹ç›®æ’å…¥æ–¹å¼
 	TVINSERV_BUILDING
 		HTREEITEM hTreeSubbuilding=NULL;
-	hTreeSubbuilding=m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//²åÈësubbuilding¡£
+	hTreeSubbuilding=m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//æ’å…¥subbuildingã€‚
 	// Expand the parent, if possible.
 	HTREEITEM hParent = m_pTreeViewCrl->GetParentItem(hTreeSubbuilding);
 	if (hParent != NULL)
@@ -2003,23 +2003,23 @@ void CMainFrame::LoadProductFromDB()
 
 
 	HTREEITEM hlocalnetwork=NULL;
-	//ÀÏÃ«¸öÉñ¾­²¡ £¬¸ÄÀ´¸ÄÈ¥ £¬³ö¶û·´¶û. ÒªÇóÑ¡ÔñÔ¶³ÌÁ¬½ÓµÄÊ±ºò ²»ÏÔÊ¾ ±¾µØµÄÉè±¸.
-	//Ç±ÔÚÎÊÌâÊÇ¿Í»§Ò»²»Ğ¡ĞÄÑ¡ÖĞremote ºó £¬ÕâÑù¸Ä»á³öÏÖ É¨Ãè²»µ½µÄÇé¿ö.¼´Ê¹É¨Ãèµ½ÁË £¬ÀÏÃ«ÒªÇó²»ÏÔÊ¾±¾µØµÄÉè±¸£¬¿Í»§»á±§Ô¹ É¨²»µ½.
+	//è€æ¯›ä¸ªç¥ç»ç—… ï¼Œæ”¹æ¥æ”¹å» ï¼Œå‡ºå°”åå°”. è¦æ±‚é€‰æ‹©è¿œç¨‹è¿æ¥çš„æ—¶å€™ ä¸æ˜¾ç¤º æœ¬åœ°çš„è®¾å¤‡.
+	//æ½œåœ¨é—®é¢˜æ˜¯å®¢æˆ·ä¸€ä¸å°å¿ƒé€‰ä¸­remote å ï¼Œè¿™æ ·æ”¹ä¼šå‡ºç° æ‰«æä¸åˆ°çš„æƒ…å†µ.å³ä½¿æ‰«æåˆ°äº† ï¼Œè€æ¯›è¦æ±‚ä¸æ˜¾ç¤ºæœ¬åœ°çš„è®¾å¤‡ï¼Œå®¢æˆ·ä¼šæŠ±æ€¨ æ‰«ä¸åˆ°.
 	if(b_remote_connection == false)
 	{
 		if((current_building_protocol == P_MODBUS_TCP) || (current_building_protocol == P_AUTO))
 		{
 			CString strNetWrokName= _T("Local Network");
 			///*********tree***********************************
-			tvInsert.hParent = hTreeSubbuilding; // Ö¸¶¨¸¸¾ä±ú
-			tvInsert.item.mask = ITEM_MASK; // Ö¸¶¨TV_ITEM½á¹¹¶ÔÏó
+			tvInsert.hParent = hTreeSubbuilding; // æŒ‡å®šçˆ¶å¥æŸ„
+			tvInsert.item.mask = ITEM_MASK; // æŒ‡å®šTV_ITEMç»“æ„å¯¹è±¡
 
 			tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strNetWrokName;
-			tvInsert.hInsertAfter = TVI_LAST; // ÏîÄ¿²åÈë·½Ê½
+			tvInsert.hInsertAfter = TVI_LAST; // é¡¹ç›®æ’å…¥æ–¹å¼
 			TVINSERV_FLOOR
 
 
-				hlocalnetwork=m_pTreeViewCrl->InsertItem(&tvInsert);//·µ»ØÂ¥²ãµÄ¾ä±ú
+				hlocalnetwork=m_pTreeViewCrl->InsertItem(&tvInsert);//è¿”å›æ¥¼å±‚çš„å¥æŸ„
 		}
 	}
 
@@ -2030,11 +2030,11 @@ void CMainFrame::LoadProductFromDB()
 		{
 			CString strSerialRootName= _T("Serial Port");
 			///*********tree***********************************
-			tvInsert.hParent = hTreeSubbuilding; // Ö¸¶¨¸¸¾ä±ú
-			tvInsert.item.mask = ITEM_MASK; // Ö¸¶¨TV_ITEM½á¹¹¶ÔÏó
+			tvInsert.hParent = hTreeSubbuilding; // æŒ‡å®šçˆ¶å¥æŸ„
+			tvInsert.item.mask = ITEM_MASK; // æŒ‡å®šTV_ITEMç»“æ„å¯¹è±¡
 
 			tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strSerialRootName;
-			tvInsert.hInsertAfter = TVI_LAST; // ÏîÄ¿²åÈë·½Ê½
+			tvInsert.hInsertAfter = TVI_LAST; // é¡¹ç›®æ’å…¥æ–¹å¼
 			TVINSERV_FLOOR
 
 
@@ -2049,11 +2049,11 @@ void CMainFrame::LoadProductFromDB()
 		{
 			CString strRemoteNetworkName= _T("Remote Network Device");
 			///*********tree***********************************
-			tvInsert.hParent = hTreeSubbuilding; // Ö¸¶¨¸¸¾ä±ú
-			tvInsert.item.mask = ITEM_MASK; // Ö¸¶¨TV_ITEM½á¹¹¶ÔÏó
+			tvInsert.hParent = hTreeSubbuilding; // æŒ‡å®šçˆ¶å¥æŸ„
+			tvInsert.item.mask = ITEM_MASK; // æŒ‡å®šTV_ITEMç»“æ„å¯¹è±¡
 
 			tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strRemoteNetworkName;
-			tvInsert.hInsertAfter = TVI_LAST; // ÏîÄ¿²åÈë·½Ê½
+			tvInsert.hInsertAfter = TVI_LAST; // é¡¹ç›®æ’å…¥æ–¹å¼
 			TVINSERV_FLOOR
 
 
@@ -2079,7 +2079,7 @@ void CMainFrame::LoadProductFromDB()
 				strSql.Format(_T("select DISTINCT Com_Port from ALL_NODE where Building_Name = '%s' ORDER BY Com_Port ASC"),strBuilding);
 				q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
 
-				while(!q.eof())//ËùÓĞÂ¥²ã¡£
+				while(!q.eof())//æ‰€æœ‰æ¥¼å±‚ã€‚
 				{
 					PortName= q.getValuebyName(L"Com_Port");
 					int comport_value = _wtoi(PortName);
@@ -2090,11 +2090,11 @@ void CMainFrame::LoadProductFromDB()
 					}
 
 					temp_show = _T("Com") + PortName;
-					tvInsert.hParent = hrootserialport; // Ö¸¶¨¸¸¾ä±ú
-					tvInsert.item.mask = ITEM_MASK; // Ö¸¶¨TV_ITEM½á¹¹¶ÔÏó
+					tvInsert.hParent = hrootserialport; // æŒ‡å®šçˆ¶å¥æŸ„
+					tvInsert.item.mask = ITEM_MASK; // æŒ‡å®šTV_ITEMç»“æ„å¯¹è±¡
 
 					tvInsert.item.pszText = (LPTSTR)(LPCTSTR)temp_show;
-					tvInsert.hInsertAfter = TVI_LAST; // ÏîÄ¿²åÈë·½Ê½
+					tvInsert.hInsertAfter = TVI_LAST; // é¡¹ç›®æ’å…¥æ–¹å¼
 					TVINSERV_FLOOR
 
 
@@ -2150,7 +2150,7 @@ void CMainFrame::LoadProductFromDB()
 
 				if(!q.eof())
 				{
-					while(!q.eof())//´ÎCom port ÏÂÃæµÄËùÓĞ Éè±¸;
+					while(!q.eof())//æ¬¡Com port ä¸‹é¢çš„æ‰€æœ‰ è®¾å¤‡;
 					{
 						if(z == LOCAL_NETWORK_PORT)
 						{
@@ -2167,7 +2167,7 @@ void CMainFrame::LoadProductFromDB()
 						temp_parent_serialnum=q.getValuebyName(L"Parent_SerialNum");
 						unsigned int temp_int_serial;
 						temp_int_serial = (unsigned int)_wtoi(temp_parent_serialnum);
-						if((!temp_parent_serialnum.IsEmpty()) && (temp_int_serial != 0))	//ËµÃ÷ÓĞ¸¸½Úµã;ÏÈ²åÈë¸¸½Úµã
+						if((!temp_parent_serialnum.IsEmpty()) && (temp_int_serial != 0))	//è¯´æ˜æœ‰çˆ¶èŠ‚ç‚¹;å…ˆæ’å…¥çˆ¶èŠ‚ç‚¹
 						{
 							q.nextRow();
 							continue;
@@ -2176,20 +2176,20 @@ void CMainFrame::LoadProductFromDB()
 						CString strProdcut=q.getValuebyName(L"Product_name");
 						if(z == COM_SERIAL_PORT)
 						{
-							tvInsert.hParent = m_comportlist.at(j).each_port_item ; // Ö¸¶¨¸¸¾ä±ú
+							tvInsert.hParent = m_comportlist.at(j).each_port_item ; // æŒ‡å®šçˆ¶å¥æŸ„
 						}
 						else if(z == LOCAL_NETWORK_PORT)
 						{
-							tvInsert.hParent = hlocalnetwork;// Ö¸¶¨¸¸¾ä±ú Îª±¾µØÍøÂç;
+							tvInsert.hParent = hlocalnetwork;// æŒ‡å®šçˆ¶å¥æŸ„ ä¸ºæœ¬åœ°ç½‘ç»œ;
 						}
 						else if(z == REMOTE_CONNECTION)
 						{
-							tvInsert.hParent = hrootremote;// Ö¸¶¨¸¸¾ä±ú Îª±¾µØÍøÂç;
+							tvInsert.hParent = hrootremote;// æŒ‡å®šçˆ¶å¥æŸ„ ä¸ºæœ¬åœ°ç½‘ç»œ;
 						}
-						tvInsert.item.mask = ITEM_MASK; // Ö¸¶¨TV_ITEM½á¹¹¶ÔÏó
+						tvInsert.item.mask = ITEM_MASK; // æŒ‡å®šTV_ITEMç»“æ„å¯¹è±¡
 						tvInsert.item.pszText =(LPTSTR)(LPCTSTR) strProdcut;
 						//TRACE(strProdcut);
-						tvInsert.hInsertAfter =TVI_SORT;// TVI_LAST; // ÏîÄ¿²åÈë·½Ê½
+						tvInsert.hInsertAfter =TVI_SORT;// TVI_LAST; // é¡¹ç›®æ’å…¥æ–¹å¼
 						int temp_product_class_id=q.getIntField("Product_class_ID");
 						if(temp_product_class_id==PM_NC|| temp_product_class_id == PM_SOLAR)
 							TVINSERV_NET_WORK
@@ -2251,7 +2251,7 @@ void CMainFrame::LoadProductFromDB()
 
 						long temp_serial_id = (long)(_wtoi64(strSql));
 						unsigned int correct_id = (DWORD)(_wtoi64(strSql));
-						//ÓÃÓÚ½«ÒÔÇ°Êı¾İ¿âÖĞµÄ ¸ºµÄĞòÁĞºÅ ĞŞ¸ÄÎªÕıµÄ;Add by Fance
+						//ç”¨äºå°†ä»¥å‰æ•°æ®åº“ä¸­çš„ è´Ÿçš„åºåˆ—å· ä¿®æ”¹ä¸ºæ­£çš„;Add by Fance
 						if(temp_serial_id < 0)
 						{
 							CString wrong_serial_id;
@@ -2394,7 +2394,7 @@ void CMainFrame::LoadProductFromDB()
 				q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
 
 
-				if(!q.eof())//¾ÍËµÃ÷Õâ¸ö½ÚµãÏÂÃæÓĞ ¹ÒÔÚ¸¸½ÚµãÏÂÃæµÄ;
+				if(!q.eof())//å°±è¯´æ˜è¿™ä¸ªèŠ‚ç‚¹ä¸‹é¢æœ‰ æŒ‚åœ¨çˆ¶èŠ‚ç‚¹ä¸‹é¢çš„;
 				{
 					while(!q.eof())
 					{
@@ -2419,11 +2419,11 @@ void CMainFrame::LoadProductFromDB()
 						if(find_parents)
 						{
 							CString strProdcut=q.getValuebyName(L"Product_name");
-							tvInsert.hParent = parents_item ; // Ö¸¶¨¸¸¾ä±ú
-							tvInsert.item.mask = ITEM_MASK; // Ö¸¶¨TV_ITEM½á¹¹¶ÔÏó
+							tvInsert.hParent = parents_item ; // æŒ‡å®šçˆ¶å¥æŸ„
+							tvInsert.item.mask = ITEM_MASK; // æŒ‡å®šTV_ITEMç»“æ„å¯¹è±¡
 							tvInsert.item.pszText =(LPTSTR)(LPCTSTR) strProdcut;
 							//TRACE(strProdcut);
-							tvInsert.hInsertAfter =TVI_SORT;// TVI_LAST; // ÏîÄ¿²åÈë·½Ê½
+							tvInsert.hInsertAfter =TVI_SORT;// TVI_LAST; // é¡¹ç›®æ’å…¥æ–¹å¼
 
 
 							int temp_product_class_id=q.getIntField("Product_class_ID");
@@ -2486,7 +2486,7 @@ void CMainFrame::LoadProductFromDB()
 
 							long temp_serial_id = (long)(_wtoi64(strSql));
 							unsigned int correct_id = (DWORD)(_wtoi64(strSql));
-							//ÓÃÓÚ½«ÒÔÇ°Êı¾İ¿âÖĞµÄ ¸ºµÄĞòÁĞºÅ ĞŞ¸ÄÎªÕıµÄ;Add by Fance
+							//ç”¨äºå°†ä»¥å‰æ•°æ®åº“ä¸­çš„ è´Ÿçš„åºåˆ—å· ä¿®æ”¹ä¸ºæ­£çš„;Add by Fance
 							//if(temp_serial_id < 0)
 							//{
 							//	CString wrong_serial_id;
@@ -2618,11 +2618,11 @@ void CMainFrame::LoadProductFromDB()
 	{
 		CString strVirtualDevice= _T("Virtual Device");
 		///*********tree***********************************
-		tvInsert.hParent = hTreeSubbuilding; // Ö¸¶¨¸¸¾ä±ú
-		tvInsert.item.mask = ITEM_MASK; // Ö¸¶¨TV_ITEM½á¹¹¶ÔÏó
+		tvInsert.hParent = hTreeSubbuilding; // æŒ‡å®šçˆ¶å¥æŸ„
+		tvInsert.item.mask = ITEM_MASK; // æŒ‡å®šTV_ITEMç»“æ„å¯¹è±¡
 
 		tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strVirtualDevice;
-		tvInsert.hInsertAfter = TVI_LAST; // ÏîÄ¿²åÈë·½Ê½
+		tvInsert.hInsertAfter = TVI_LAST; // é¡¹ç›®æ’å…¥æ–¹å¼
 		TVINSERV_FLOOR
 
 			hrootvirtualdevice=m_pTreeViewCrl->InsertItem(&tvInsert);
@@ -2640,7 +2640,7 @@ void CMainFrame::LoadProductFromDB()
 
 		if(!q.eof())
 		{
-			while(!q.eof())//´ÎCom port ÏÂÃæµÄËùÓĞ Éè±¸;
+			while(!q.eof())//æ¬¡Com port ä¸‹é¢çš„æ‰€æœ‰ è®¾å¤‡;
 			{
 				temp_parent_serialnum=q.getValuebyName(L"Parent_SerialNum");
 				unsigned int temp_int_serial;
@@ -2649,12 +2649,12 @@ void CMainFrame::LoadProductFromDB()
 
 				CString strProdcut=q.getValuebyName(L"Product_name");
 
-				tvInsert.hParent = hrootvirtualdevice ; // Ö¸¶¨¸¸¾ä±ú
+				tvInsert.hParent = hrootvirtualdevice ; // æŒ‡å®šçˆ¶å¥æŸ„
 
-				tvInsert.item.mask = ITEM_MASK; // Ö¸¶¨TV_ITEM½á¹¹¶ÔÏó
+				tvInsert.item.mask = ITEM_MASK; // æŒ‡å®šTV_ITEMç»“æ„å¯¹è±¡
 				tvInsert.item.pszText =(LPTSTR)(LPCTSTR) strProdcut;
 				//TRACE(strProdcut);
-				tvInsert.hInsertAfter =TVI_SORT;// TVI_LAST; // ÏîÄ¿²åÈë·½Ê½
+				tvInsert.hInsertAfter =TVI_SORT;// TVI_LAST; // é¡¹ç›®æ’å…¥æ–¹å¼
 				int temp_product_class_id=q.getIntField("Product_class_ID");
 				if (temp_product_class_id == PM_NC || temp_product_class_id == PM_SOLAR)
 					TVINSERV_NET_WORK
@@ -2715,7 +2715,7 @@ void CMainFrame::LoadProductFromDB()
 
 				long temp_serial_id = (long)(_wtoi64(strSql));
 				unsigned int correct_id = (DWORD)(_wtoi64(strSql));
-				//ÓÃÓÚ½«ÒÔÇ°Êı¾İ¿âÖĞµÄ ¸ºµÄĞòÁĞºÅ ĞŞ¸ÄÎªÕıµÄ;Add by Fance
+				//ç”¨äºå°†ä»¥å‰æ•°æ®åº“ä¸­çš„ è´Ÿçš„åºåˆ—å· ä¿®æ”¹ä¸ºæ­£çš„;Add by Fance
 				if(temp_serial_id < 0)
 				{
 					CString wrong_serial_id;
@@ -2907,7 +2907,7 @@ void CMainFrame::ScanTstatInDB(void)
         
 				
 		current_building_protocol = P_AUTO;
-		//¼òÖ±ÊÇÄÔ²Ğ£¬ÀÏÃ«.ÒªÇóÕâÑùÏ¹¼¸°Ñ¸Ä. //²»¹Ü¿Í»§Ñ¡Ê²Ã´¼¦°ÉĞ­Òé £¬ ¶¼ÒªÄÜÉ¨µ½ËùÓĞÉè±¸.ÄÇ²»¾ÍÊÇTMDÖ»ÓĞAuto ÁËÂğ£¿»¹Ñ¡¸öP°¡;
+		//ç®€ç›´æ˜¯è„‘æ®‹ï¼Œè€æ¯›.è¦æ±‚è¿™æ ·çå‡ æŠŠæ”¹. //ä¸ç®¡å®¢æˆ·é€‰ä»€ä¹ˆé¸¡å§åè®® ï¼Œ éƒ½è¦èƒ½æ‰«åˆ°æ‰€æœ‰è®¾å¤‡.é‚£ä¸å°±æ˜¯TMDåªæœ‰Auto äº†å—ï¼Ÿè¿˜é€‰ä¸ªPå•Š;
 
 
         CString StrComport;
@@ -2988,7 +2988,7 @@ void CMainFrame::ScanTstatInDB(void)
             m_subNetLst.push_back(temBuildingInfo);
         }
         if(m_subNetLst.size()<=0)
-            AfxMessageBox(_T("There is no default building,please select a building First£¡"));
+            AfxMessageBox(_T("There is no default building,please select a building Firstï¼"));
 
         
 
@@ -3002,14 +3002,14 @@ void CMainFrame::ScanTstatInDB(void)
         {
             CString strBuilding=m_strCurSubBuldingName;//m_subNetLst.at(k).strBuildingName;
 
-            tvInsert.hParent = TVI_ROOT; // Ö¸¶¨¸¸¾ä±ú
-            tvInsert.item.mask = ITEM_MASK; // Ö¸¶¨TV_ITEM½á¹¹¶ÔÏó
+            tvInsert.hParent = TVI_ROOT; // æŒ‡å®šçˆ¶å¥æŸ„
+            tvInsert.item.mask = ITEM_MASK; // æŒ‡å®šTV_ITEMç»“æ„å¯¹è±¡
             tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strBuilding;
-            tvInsert.hInsertAfter = TVI_LAST; // ÏîÄ¿²åÈë·½Ê½
+            tvInsert.hInsertAfter = TVI_LAST; // é¡¹ç›®æ’å…¥æ–¹å¼
             TVINSERV_BUILDING
             HTREEITEM hTreeSubbuilding=NULL;
-            //hTreeSubbuilding=m_pTreeViewCrl->InsertItem(&tvInsert);//²åÈësubbuilding¡£
-            hTreeSubbuilding=m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//²åÈësubbuilding¡£
+            //hTreeSubbuilding=m_pTreeViewCrl->InsertItem(&tvInsert);//æ’å…¥subbuildingã€‚
+            hTreeSubbuilding=m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//æ’å…¥subbuildingã€‚
             // m_pTreeViewCrl->Expand(hTreeSubbuilding,TVE_EXPAND);//Add
 
             // Expand the parent, if possible.
@@ -3047,20 +3047,20 @@ void CMainFrame::ScanTstatInDB(void)
              
             vector <tree_floor> tmpfloorLst;//
             tmpfloorLst.empty();
-            while(!q.eof())//ËùÓĞÂ¥²ã¡£
+            while(!q.eof())//æ‰€æœ‰æ¥¼å±‚ã€‚
             {
                 CString strFloorName=q.getValuebyName(L"Floor_name");
                 ///*********tree***********************************
-                tvInsert.hParent = hTreeSubbuilding; // Ö¸¶¨¸¸¾ä±ú
-                tvInsert.item.mask = ITEM_MASK; // Ö¸¶¨TV_ITEM½á¹¹¶ÔÏó
+                tvInsert.hParent = hTreeSubbuilding; // æŒ‡å®šçˆ¶å¥æŸ„
+                tvInsert.item.mask = ITEM_MASK; // æŒ‡å®šTV_ITEMç»“æ„å¯¹è±¡
 
                 tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strFloorName;
-                tvInsert.hInsertAfter = TVI_LAST; // ÏîÄ¿²åÈë·½Ê½
+                tvInsert.hInsertAfter = TVI_LAST; // é¡¹ç›®æ’å…¥æ–¹å¼
                 TVINSERV_FLOOR
 
                 HTREEITEM hTreeFloor=NULL;
-                //hTreeFloor=m_pTreeViewCrl->InsertItem(&tvInsert);//·µ»ØÂ¥²ãµÄ¾ä±ú
-                hTreeFloor=m_pTreeViewCrl->InsertFloorItem(&tvInsert);//·µ»ØÂ¥²ãµÄ¾ä±ú
+                //hTreeFloor=m_pTreeViewCrl->InsertItem(&tvInsert);//è¿”å›æ¥¼å±‚çš„å¥æŸ„
+                hTreeFloor=m_pTreeViewCrl->InsertFloorItem(&tvInsert);//è¿”å›æ¥¼å±‚çš„å¥æŸ„
 
                 HTREEITEM hParent = m_pTreeViewCrl->GetParentItem(hTreeFloor);
                 if (hParent != NULL)
@@ -3110,15 +3110,15 @@ void CMainFrame::ScanTstatInDB(void)
                 }
 
                 q = SqliteDB.execQuery((UTF8MBSTR)temp_str);
-                //²åÈëÃ¿¸ö·¿¼äµ½Ïà¹ØµÄÂ¥²ã¡£
+                //æ’å…¥æ¯ä¸ªæˆ¿é—´åˆ°ç›¸å…³çš„æ¥¼å±‚ã€‚
                 while(!q.eof())
                 {
                     CString strRoomName;
                     strRoomName=q.getValuebyName(L"Room_name");
-                    tvInsert.hParent = tmpfloorLst.at(i).floor_item ; // Ö¸¶¨¸¸¾ä±ú
-                    tvInsert.item.mask = ITEM_MASK; // Ö¸¶¨TV_ITEM½á¹¹¶ÔÏó
+                    tvInsert.hParent = tmpfloorLst.at(i).floor_item ; // æŒ‡å®šçˆ¶å¥æŸ„
+                    tvInsert.item.mask = ITEM_MASK; // æŒ‡å®šTV_ITEMç»“æ„å¯¹è±¡
                     tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strRoomName;
-                    tvInsert.hInsertAfter = TVI_LAST; // ÏîÄ¿²åÈë·½Ê½
+                    tvInsert.hInsertAfter = TVI_LAST; // é¡¹ç›®æ’å…¥æ–¹å¼
                     TVINSERV_ROOM
                     HTREEITEM hTreeRoom=NULL;
                     //hTreeRoom=m_pTreeViewCrl->InsertItem(&tvInsert);
@@ -3142,7 +3142,7 @@ void CMainFrame::ScanTstatInDB(void)
             }
             ///////end room nodes//////////////////////////////////////////////////////////////////////
             //////Begin product node/////////////////////////////////////////////////////////////////
-            ///Ã¿¸ö·¿¼ä£»
+            ///æ¯ä¸ªæˆ¿é—´ï¼›
             for(UINT i=0; i<tmproomLst.size(); i++)
             {
                 //loop for product Name
@@ -3177,11 +3177,11 @@ void CMainFrame::ScanTstatInDB(void)
                 while(!q.eof())
                 {
                     CString strProdcut=q.getValuebyName(L"Product_name");
-                    tvInsert.hParent = tmproomLst.at(i).room_item ; // Ö¸¶¨¸¸¾ä±ú
-                    tvInsert.item.mask = ITEM_MASK; // Ö¸¶¨TV_ITEM½á¹¹¶ÔÏó
+                    tvInsert.hParent = tmproomLst.at(i).room_item ; // æŒ‡å®šçˆ¶å¥æŸ„
+                    tvInsert.item.mask = ITEM_MASK; // æŒ‡å®šTV_ITEMç»“æ„å¯¹è±¡
                     tvInsert.item.pszText =(LPTSTR)(LPCTSTR) strProdcut;
                     //TRACE(strProdcut);
-                    tvInsert.hInsertAfter =TVI_SORT;// TVI_LAST; // ÏîÄ¿²åÈë·½Ê½
+                    tvInsert.hInsertAfter =TVI_SORT;// TVI_LAST; // é¡¹ç›®æ’å…¥æ–¹å¼
                     int temp_product_class_id=q.getIntField("Product_class_ID");
 
                     /*
@@ -3262,7 +3262,7 @@ void CMainFrame::ScanTstatInDB(void)
 
                     //long temp_serial_id = _wtol(strSql);
                     //unsigned int correct_id = (DWORD)(_wtol(strSql));
-                    //ÓÃÓÚ½«ÒÔÇ°Êı¾İ¿âÖĞµÄ ¸ºµÄĞòÁĞºÅ ĞŞ¸ÄÎªÕıµÄ;Add by Fance
+                    //ç”¨äºå°†ä»¥å‰æ•°æ®åº“ä¸­çš„ è´Ÿçš„åºåˆ—å· ä¿®æ”¹ä¸ºæ­£çš„;Add by Fance
                     if(temp_serial_id < 0)
                     {
                         CString wrong_serial_id;
@@ -3357,7 +3357,7 @@ void CMainFrame::ScanTstatInDB(void)
                     if (g_selected_serialnumber == m_product_temp.serial_number)
                     {
                         m_lasttime_tree_node  =  m_product_temp;
-                        m_pTreeViewCrl->SetSelectItem(m_product_temp.product_item);//ÔÚÏßµÄÊ±ºò²Å½«ÑÕÉ«±äºì;
+                        m_pTreeViewCrl->SetSelectItem(m_product_temp.product_item);//åœ¨çº¿çš„æ—¶å€™æ‰å°†é¢œè‰²å˜çº¢;
                         m_pTreeViewCrl->SetSelectSerialNumber(m_product_temp.serial_number);
                         m_current_tree_node =   m_product_temp;
                         /*g_selected_serialnumber = m_product.at(i).serial_number;*/
@@ -3460,7 +3460,7 @@ void CMainFrame::OnBatchFlashHex()
     setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
     closesocket(h_Broad);
 
-    SetCommunicationType(0);//¹Ø±Õ´®¿Ú£¬¹©ISP Ê¹ÓÃ;
+    SetCommunicationType(0);//å…³é—­ä¸²å£ï¼Œä¾›ISP ä½¿ç”¨;
     close_com();
 
 
@@ -3479,7 +3479,7 @@ void CMainFrame::OnBatchFlashHex()
     }
     SetCommunicationType(temp_type);
 
-    //Fance Add. ÔÚISP ÓÃÍê1234 4321 µÄ¶Ë¿ÚÖ®ºó£¬T3000 ÔÚÖØĞÂ´ò¿ªÊ¹ÓÃ£¬Ë¢ĞÂlistview µÄÍøÂçÉè±¸ÒªÊ¹ÓÃ;
+    //Fance Add. åœ¨ISP ç”¨å®Œ1234 4321 çš„ç«¯å£ä¹‹åï¼ŒT3000 åœ¨é‡æ–°æ‰“å¼€ä½¿ç”¨ï¼Œåˆ·æ–°listview çš„ç½‘ç»œè®¾å¤‡è¦ä½¿ç”¨;
     h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
     BOOL bBroadcast=TRUE;
     ::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
@@ -3712,7 +3712,7 @@ BOOL CMainFrame::ConnectDevice(LPCTSTR ip_address,int nport)
     {
         strInfo.Format((_T("Open IP:%s failure")),connect_ip);//prompt info;
         SetPaneString(1,strInfo);
-        //ValidOpenFailure(build_info.strIp,n1, n2,n3,n4); // ¼ì²éÊ§°ÜµÄÔ­Òò£¬²¢¸ø³öÏêÏ¸µÄÌáÊ¾ĞÅÏ¢
+        //ValidOpenFailure(build_info.strIp,n1, n2,n3,n4); // æ£€æŸ¥å¤±è´¥çš„åŸå› ï¼Œå¹¶ç»™å‡ºè¯¦ç»†çš„æç¤ºä¿¡æ¯
         return FALSE;
     }
     return true;
@@ -3737,7 +3737,7 @@ BOOL CMainFrame::ConnectSubBuilding(Building_info build_info)
         CString* pstrInfo = new CString(g_strT3000LogString);
         ::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,WPARAM(pstrInfo),LPARAM(3));
         UINT n1,n2,n3,n4;
-        if (ValidAddress(build_info.strIp,n1,n2,n3,n4)==FALSE)  // ÑéÖ¤NCµÄIP
+        if (ValidAddress(build_info.strIp,n1,n2,n3,n4)==FALSE)  // éªŒè¯NCçš„IP
         {
 
 
@@ -3789,7 +3789,7 @@ BOOL CMainFrame::ConnectSubBuilding(Building_info build_info)
             {
                 strInfo.Format((_T("Open IP:%s failure")),build_info.strIp);//prompt info;
                 SetPaneString(1,strInfo);
-                //ValidOpenFailure(build_info.strIp,n1, n2,n3,n4); // ¼ì²éÊ§°ÜµÄÔ­Òò£¬²¢¸ø³öÏêÏ¸µÄÌáÊ¾ĞÅÏ¢
+                //ValidOpenFailure(build_info.strIp,n1, n2,n3,n4); // æ£€æŸ¥å¤±è´¥çš„åŸå› ï¼Œå¹¶ç»™å‡ºè¯¦ç»†çš„æç¤ºä¿¡æ¯
                 return FALSE;
             }
         }
@@ -3851,7 +3851,7 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
 
         //	CStringArray temparray;
         //	SplitCStringA(temparray,strIP,_T("."));
-        //	if((temparray.GetSize()==4))	//ÓĞ3¸ö  . 4¶Î
+        //	if((temparray.GetSize()==4))	//æœ‰3ä¸ª  . 4æ®µ
         //	{
         //		CString temp_0;
         //		CString temp_1;
@@ -3871,12 +3871,12 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
         //			}
 
         //		}
-        //		else	//·ñÔòÅĞ¶ÏÎª ÓòÃû;
+        //		else	//å¦åˆ™åˆ¤æ–­ä¸º åŸŸå;
         //		{
         //			is_domain = true;
         //		}
         //	}
-        //	else	//ÅĞ¶ÏÎª ÓòÃû;
+        //	else	//åˆ¤æ–­ä¸º åŸŸå;
         //	{
         //		is_domain = true;
         //	}
@@ -3902,7 +3902,7 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
         //}
 
         UINT n1,n2,n3,n4;
-        if (ValidAddress(tree_node.BuildingInfo.strIp,n1,n2,n3,n4)==FALSE)  // ÑéÖ¤NCµÄIP
+        if (ValidAddress(tree_node.BuildingInfo.strIp,n1,n2,n3,n4)==FALSE)  // éªŒè¯NCçš„IP
         {
 
             CString StringIP;
@@ -4028,7 +4028,7 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
                 strInfo.Format((_T("Open IP:%s failure")),tree_node.BuildingInfo.strIp);//prompt info;
                 SetPaneString(1,strInfo);
                 //write_T3000_log_file(strInfo);
-                //ValidOpenFailure(build_info.strIp,n1, n2,n3,n4); // ¼ì²éÊ§°ÜµÄÔ­Òò£¬²¢¸ø³öÏêÏ¸µÄÌáÊ¾ĞÅÏ¢
+                //ValidOpenFailure(build_info.strIp,n1, n2,n3,n4); // æ£€æŸ¥å¤±è´¥çš„åŸå› ï¼Œå¹¶ç»™å‡ºè¯¦ç»†çš„æç¤ºä¿¡æ¯
                 return FALSE;
             }
         }
@@ -4118,14 +4118,14 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
         m_CurSubBuldingInfo=tree_node.BuildingInfo;
         m_pTreeViewCrl->turn_item_image(tree_node.product_item ,true);
 
-        m_pTreeViewCrl->SetSelectItem(tree_node.product_item );//ÔÚÏßµÄÊ±ºò²Å½«ÑÕÉ«±äºì;
+        m_pTreeViewCrl->SetSelectItem(tree_node.product_item );//åœ¨çº¿çš„æ—¶å€™æ‰å°†é¢œè‰²å˜çº¢;
         m_pTreeViewCrl->SetSelectSerialNumber(tree_node.serial_number);
         g_selected_serialnumber = tree_node.serial_number;
 
     }
     return bRet;
 }
-void CMainFrame::CheckConnectFailure(const CString& strIP) // ¼ì²éÊ§°ÜµÄÔ­Òò£¬²¢¸ø³öÏêÏ¸µÄÌáÊ¾ĞÅÏ¢
+void CMainFrame::CheckConnectFailure(const CString& strIP) // æ£€æŸ¥å¤±è´¥çš„åŸå› ï¼Œå¹¶ç»™å‡ºè¯¦ç»†çš„æç¤ºä¿¡æ¯
 {
     USES_CONVERSION;
     LPCSTR szIP = W2A(strIP);
@@ -4154,13 +4154,13 @@ void CMainFrame::CheckConnectFailure(const CString& strIP) // ¼ì²éÊ§°ÜµÄÔ­Òò£¬²¢
     strHostIP.Format(_T("%d.%d.%d.%d"), sa.sin_addr.S_un.S_un_b.s_b1,sa.sin_addr.S_un.S_un_b.s_b2,sa.sin_addr.S_un.S_un_b.s_b3,sa.sin_addr.S_un.S_un_b.s_b4);
     //AfxMessageBox(strIP);
 
-    // ÊÇ·ñÊÇÍ¬Ò»×ÓÍø
+    // æ˜¯å¦æ˜¯åŒä¸€å­ç½‘
     if ( ia.S_un.S_un_b.s_b1 == sa.sin_addr.S_un.S_un_b.s_b1 &&
             ia.S_un.S_un_b.s_b2 == sa.sin_addr.S_un.S_un_b.s_b2 &&
             ia.S_un.S_un_b.s_b3 == sa.sin_addr.S_un.S_un_b.s_b3
        )
     {
-        // ÊÇÍ¬Ò»×ÓÍø£¬µ«ÊÇÁ¬½Ó²»ÉÏ£¬ÄÇÃ´ÌáÊ¾¼ì²éÉè±¸Á¬½Ó
+        // æ˜¯åŒä¸€å­ç½‘ï¼Œä½†æ˜¯è¿æ¥ä¸ä¸Šï¼Œé‚£ä¹ˆæç¤ºæ£€æŸ¥è®¾å¤‡è¿æ¥
         CString strTip;
         strTip.Format(_T("Can not set up the connection with %s, please check its IP address and net cable. "), strIP);
         AfxMessageBox(strTip);
@@ -4190,7 +4190,7 @@ void CMainFrame::OnAddBuildingConfig()
     }
  
 
-    bool temp_value = 	b_pause_refresh_tree;	//Èç¹ûÔÚConfig½çÃæÑ¡ÔñbuildingµÄÊ±ºò¾Í²»ÒªË¢ĞÂTreeÁË.
+    bool temp_value = 	b_pause_refresh_tree;	//å¦‚æœåœ¨Configç•Œé¢é€‰æ‹©buildingçš„æ—¶å€™å°±ä¸è¦åˆ·æ–°Treeäº†.
     b_pause_refresh_tree = true;
     m_nStyle=4;
     Invalidate();
@@ -4273,7 +4273,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
         else
         {
             //CString strTemp;
-            //if (g_nStartID == -1) // ÓÃÕâ¸öÀ´Çø·ÖÊÇscan TStat »¹ÊÇscan NC
+            //if (g_nStartID == -1) // ç”¨è¿™ä¸ªæ¥åŒºåˆ†æ˜¯scan TStat è¿˜æ˜¯scan NC
             //{
             //    strTemp = _T("sending scan broadcast");
             //}
@@ -4309,7 +4309,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 		SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
 
-        for(int i=0; i<m_product.size(); i++) //ÓÃÓÚ¸üĞÂ ²úÆ·µÄ×´Ì¬£¬ÒÔ±ãÏÂ´Î´ò¿ªµÄÊ±ºòÖ±½ÓÏÔÊ¾ÉÏ´Î¹Ø±ÕµÄÊ±ºòµÄ×´Ì¬;
+        for(int i=0; i<m_product.size(); i++) //ç”¨äºæ›´æ–° äº§å“çš„çŠ¶æ€ï¼Œä»¥ä¾¿ä¸‹æ¬¡æ‰“å¼€çš„æ—¶å€™ç›´æ¥æ˜¾ç¤ºä¸Šæ¬¡å…³é—­çš„æ—¶å€™çš„çŠ¶æ€;
         {
             CString serial_number_temp;
             serial_number_temp.Format(_T("%u"),m_product.at(i).serial_number);
@@ -4424,7 +4424,7 @@ void CMainFrame::SwitchToPruductType(int nIndex)
     //g_protocol = PROTOCOL_UNKNOW;//USE FOR identify the bacnet ip protocol
 
 here:
-    g_bPauseMultiRead = FALSE;//»Ö¸´Ö÷Ïß³ÌµÄË¢ĞÂ
+    g_bPauseMultiRead = FALSE;//æ¢å¤ä¸»çº¿ç¨‹çš„åˆ·æ–°
 
     //CString g_configfile_path =g_strExePth + g_strStartInterface_config;
     //// 	//WrPrivateProfileInt(_T("Setting"),_T("Interface"),19,g_configfile_path);
@@ -4680,7 +4680,7 @@ void CMainFrame::Scan_Product()
     */
     CString strTime;
     strTime=Get_NowTime();
-    //¿ªÊ¼Ê±¼ä
+    //å¼€å§‹æ—¶é—´
 
     CString g_strT3000LogString=_T("--------------------------------Scan Begin--------------------------------\n");
 
@@ -4702,7 +4702,7 @@ void CMainFrame::Scan_Product()
     ClearBuilding();
 
 
-    HANDLE temphandle;//Èç¹ûÓÃ»§µã»÷Scan£¬¶ø bacnetµÄÏß³Ì»¹ÔÚ¼ÌĞø¹¤×÷£¬ĞèÒªÏÈ½áÊøÕâÁ½¸öÏß³Ì;
+    HANDLE temphandle;//å¦‚æœç”¨æˆ·ç‚¹å‡»Scanï¼Œè€Œ bacnetçš„çº¿ç¨‹è¿˜åœ¨ç»§ç»­å·¥ä½œï¼Œéœ€è¦å…ˆç»“æŸè¿™ä¸¤ä¸ªçº¿ç¨‹;
     if(bac_net_initial_once)
     {
         temphandle = Get_RS485_Handle();
@@ -4789,7 +4789,7 @@ void CMainFrame::Scan_Product()
 	dlg.DoModal();
 
     m_bScanALL = TRUE;
-	refresh_tree_status_immediately = true; //Á¢¼´Ë¢ĞÂ Ê÷ĞÎ½á¹¹;
+	refresh_tree_status_immediately = true; //ç«‹å³åˆ·æ–° æ ‘å½¢ç»“æ„;
 //	close_com();
     //m_bScanFinished = FALSE;
     delete m_pWaitScanDlg;
@@ -4984,9 +4984,9 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 		  BAC_CUSTOMER_UNIT_GROUP +
 		  BAC_USER_LOGIN_GROUP +
 		  BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT +
-		  BAC_PROGRAM_ITEM_COUNT*5 +   //³ËÒÔ5 ÊÇÒòÎªÃ¿¸öprogram¶¼ÓĞ5°ü£¬¹²2000¸ö×Ö½ÚÒª¶Á;
-		  1 +		//Õâ¸ö1ÊÇSetting
-		  1;		//Õâ¸ö1ÊÇVariable Custmer Units.	
+		  BAC_PROGRAM_ITEM_COUNT*5 +   //ä¹˜ä»¥5 æ˜¯å› ä¸ºæ¯ä¸ªprograméƒ½æœ‰5åŒ…ï¼Œå…±2000ä¸ªå­—èŠ‚è¦è¯»;
+		  1 +		//è¿™ä¸ª1æ˜¯Setting
+		  1;		//è¿™ä¸ª1æ˜¯Variable Custmer Units.	
 
 
 	  int read_all_step = 1000 / read_total_count;
@@ -5294,7 +5294,7 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 	 }
 
 
-	 //ÏÂÃæÊÇ¶ÁSetting ½á¹¹µÄ²¿·Ö;
+	 //ä¸‹é¢æ˜¯è¯»Setting ç»“æ„çš„éƒ¨åˆ†;
 	 if(GetPrivateData_Blocking(g_bac_instance,READ_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info)) > 0)
 	 {
 		 Mession_ret.Format(_T("Read device information form  success."));
@@ -5310,7 +5310,7 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 	 }
 	  g_progress_persent = read_success_count * 100 /read_total_count;
 
-#if 1 ////////////////////////// ¸ÄÎªvar cus units
+#if 1 ////////////////////////// æ”¹ä¸ºvar cus units
 	  for (int i=0; i<1; i++)
 	  {
 		  if(GetPrivateData_Blocking(g_bac_instance,READVARIABLE_T3000,0,4,sizeof(Str_variable_uint_point)) > 0)
@@ -5356,7 +5356,7 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 
 	 for (int z=0;z<BAC_PROGRAM_ITEM_COUNT;z++)
 	 {
-		 memset(program_code[z],0,2000);		 //ÇåÁã;
+		 memset(program_code[z],0,2000);		 //æ¸…é›¶;
 		 for (int x=0;x<5;x++)
 		 {
 			 int send_status = true;
@@ -5461,7 +5461,7 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 			BAC_CUSTOMER_UNIT_GROUP +
 			BAC_USER_LOGIN_GROUP +
 			BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT ;//+
-			//BAC_PROGRAM_ITEM_COUNT*5;//³ËÒÔ5 ÊÇÒòÎªÃ¿¸öprogram¶¼ÓĞ5°ü£¬¹²2000¸ö×Ö½ÚÒª¶Á;
+			//BAC_PROGRAM_ITEM_COUNT*5;//ä¹˜ä»¥5 æ˜¯å› ä¸ºæ¯ä¸ªprograméƒ½æœ‰5åŒ…ï¼Œå…±2000ä¸ªå­—èŠ‚è¦è¯»;
 	}
 	else if((temp_prg_version >= 4) && (temp_prg_version <= 5))
 	{
@@ -5480,7 +5480,7 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 			BAC_GRPHIC_LABEL_GROUP + 
 			BAC_CUSTOMER_UNIT_GROUP +
 			BAC_USER_LOGIN_GROUP +
-			BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT //BAC_PROGRAM_ITEM_COUNT*5;//³ËÒÔ5 ÊÇÒòÎªÃ¿¸öprogram¶¼ÓĞ5°ü£¬¹²2000¸ö×Ö½ÚÒª¶Á;
+			BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT //BAC_PROGRAM_ITEM_COUNT*5;//ä¹˜ä»¥5 æ˜¯å› ä¸ºæ¯ä¸ªprograméƒ½æœ‰5åŒ…ï¼Œå…±2000ä¸ªå­—èŠ‚è¦è¯»;
 			+ 1 ;   //Setting
 	}
 	else if(temp_prg_version == 6)
@@ -5500,7 +5500,7 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 			BAC_GRPHIC_LABEL_GROUP + 
 			BAC_CUSTOMER_UNIT_GROUP +
 			BAC_USER_LOGIN_GROUP +
-			BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT //BAC_PROGRAM_ITEM_COUNT*5;//³ËÒÔ5 ÊÇÒòÎªÃ¿¸öprogram¶¼ÓĞ5°ü£¬¹²2000¸ö×Ö½ÚÒª¶Á;
+			BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT //BAC_PROGRAM_ITEM_COUNT*5;//ä¹˜ä»¥5 æ˜¯å› ä¸ºæ¯ä¸ªprograméƒ½æœ‰5åŒ…ï¼Œå…±2000ä¸ªå­—èŠ‚è¦è¯»;
 			+ 1		//Setting
 			+ 1;    //Variable_Cus_Units
 	}
@@ -5519,7 +5519,7 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
     int write_all_step = 1000 / write_total_count;
     int write_success_count = 0;
     int write_pos = 0;
-	if(temp_prg_version >= 6)	 // version 6 ÖĞ²Å¼ÓµÄÕâÍæÒâ;
+	if(temp_prg_version >= 6)	 // version 6 ä¸­æ‰åŠ çš„è¿™ç©æ„;
 	{
 
 			if(Write_Private_Data_Blocking(WRITEVARUNIT_T3000,0,4) > 0)
@@ -5987,7 +5987,7 @@ LRESULT CMainFrame::Refresh_RX_TX_Count(WPARAM wParam, LPARAM lParam)
     int ret = (int)wParam;
     if(ret == 1)
     {
-        Set_Communication_Count(1,g_bac_instance);//³É¹¦£¬¼ÆÊı+1
+        Set_Communication_Count(1,g_bac_instance);//æˆåŠŸï¼Œè®¡æ•°+1
 
         //m_pTreeViewCrl->turn_item_image(selected_tree_item ,true); //2016 02 24 MARK Fance
         //SetPaneConnectionPrompt(_T("Online"));
@@ -6195,7 +6195,7 @@ void CMainFrame::SaveConfigFile()
                 DeleteFile(SaveConfigFilePath);
             }
 
-            //Ğ­ÒéÊ±bacnet £¬ÓÃ»§µã»÷ File saveÊ± ÏÈµ÷ÓÃÏß³Ì¶ÁÈ¡ËùÓĞĞèÒª´æµÄ×ÊÁÏ£»ÔÚ·¢ËÍÏûÏ¢»ØÀ´ µ÷ÓÃSaveBacnetConfigFile;
+            //åè®®æ—¶bacnet ï¼Œç”¨æˆ·ç‚¹å‡» File saveæ—¶ å…ˆè°ƒç”¨çº¿ç¨‹è¯»å–æ‰€æœ‰éœ€è¦å­˜çš„èµ„æ–™ï¼›åœ¨å‘é€æ¶ˆæ¯å›æ¥ è°ƒç”¨SaveBacnetConfigFile;
             //::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_SVAE_CONFIG);
 
             if(g_protocol == PROTOCOL_BACNET_IP)
@@ -6219,7 +6219,7 @@ void CMainFrame::SaveConfigFile()
 	else if(((g_protocol == MODBUS_RS485) || (g_protocol ==MODBUS_TCPIP)) &&  
 		    ((bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PM_T3_LC) || (bacnet_device_type == PID_T3PT12) || (bacnet_device_type == PID_T36CTA) || (bacnet_device_type == PWM_TRANSDUCER)))
 	{
-		//T3µÄÉè±¸Ö§³ÖminipanelµÄ input output ¾Í¶Á10000ÒÔºóµÄ¼Ä´æÆ÷;
+		//T3çš„è®¾å¤‡æ”¯æŒminipanelçš„ input output å°±è¯»10000ä»¥åçš„å¯„å­˜å™¨;
 		MainFram_hwd = this->m_hWnd;
 
 		CFileDialog dlg(false,_T("*.prg"),_T(" "),OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,_T("prg files (*.prg)|*.prg|All Files (*.*)|*.*||"),NULL,0);
@@ -6428,7 +6428,7 @@ void CMainFrame::OnDestroy()
 	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
 
-    for(int i=0; i<m_product.size(); i++) //ÓÃÓÚ¸üĞÂ ²úÆ·µÄ×´Ì¬£¬ÒÔ±ãÏÂ´Î´ò¿ªµÄÊ±ºòÖ±½ÓÏÔÊ¾ÉÏ´Î¹Ø±ÕµÄÊ±ºòµÄ×´Ì¬;
+    for(int i=0; i<m_product.size(); i++) //ç”¨äºæ›´æ–° äº§å“çš„çŠ¶æ€ï¼Œä»¥ä¾¿ä¸‹æ¬¡æ‰“å¼€çš„æ—¶å€™ç›´æ¥æ˜¾ç¤ºä¸Šæ¬¡å…³é—­çš„æ—¶å€™çš„çŠ¶æ€;
     {
         CString serial_number_temp;
         serial_number_temp.Format(_T("%u"),m_product.at(i).serial_number);
@@ -6485,7 +6485,7 @@ void CMainFrame::OnDestroy()
 
         int temp =1;
 
-       // UpdataSlider(temp); //Ã¿´Î½áÊø¶¼»áÒç³ö ±¨´í; 2016 - 03 - 17 ¶Å·« ÆÁ±Î;
+       // UpdataSlider(temp); //æ¯æ¬¡ç»“æŸéƒ½ä¼šæº¢å‡º æŠ¥é”™; 2016 - 03 - 17 æœå¸† å±è”½;
         b_statusbarthreadflag = FALSE; //close the status bar thread;
         g_bEnableRefreshTreeView = FALSE;
         //HTREEITEM htiSel = m_pTreeViewCrl->GetSelectedItem();
@@ -6573,7 +6573,7 @@ void CMainFrame::OnDestroy()
             TerminateThread(hThread,0);
         if(m_pFreshTree!=NULL)
             TerminateThread(m_pFreshTree,0);
-        // ½áÊøÏß³Ì
+        // ç»“æŸçº¿ç¨‹
 
         if (m_pRefreshThread)
         {
@@ -6614,7 +6614,7 @@ void CMainFrame::OnDestroy()
 
 
     }
-    catch (...)//Õâ¸öÎŞĞ§£¬µ±pDialogInfo->Create(IDC_STATIC_INFO,this);ÖĞµÄIDĞ´´íÊ±£¬Õâ¸öº¯ÊıÃ»ÓĞthrowÅ×³ö´íÎó£¬ËùÒÔ²¶»ñ²»µ½
+    catch (...)//è¿™ä¸ªæ— æ•ˆï¼Œå½“pDialogInfo->Create(IDC_STATIC_INFO,this);ä¸­çš„IDå†™é”™æ—¶ï¼Œè¿™ä¸ªå‡½æ•°æ²¡æœ‰throwæŠ›å‡ºé”™è¯¯ï¼Œæ‰€ä»¥æ•è·ä¸åˆ°
     {
         Sleep(1);
     }
@@ -6638,7 +6638,7 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
         ScanTstatInDB();
 
         int temp_select_serial = m_pTreeViewCrl->GetSelectSerialNumber();
-        bool find_serial_number_device = false;	//Èç¹ûÖØĞÂ¼ÓÔØÊı¾İ¿â£¬Ã»ÓĞ·¢ÏÖÑ¡ÖĞµÄÄÇ¸öÉè±¸ ĞòÁĞºÅ£¬¾ÍËµÃ÷¿ÉÄÜ±»É¾µôÁË;ĞèÒªÍË³öµ±Ç°½çÃæ ÇĞ»»ÖÁ³õÊ¼½çÃæ;
+        bool find_serial_number_device = false;	//å¦‚æœé‡æ–°åŠ è½½æ•°æ®åº“ï¼Œæ²¡æœ‰å‘ç°é€‰ä¸­çš„é‚£ä¸ªè®¾å¤‡ åºåˆ—å·ï¼Œå°±è¯´æ˜å¯èƒ½è¢«åˆ æ‰äº†;éœ€è¦é€€å‡ºå½“å‰ç•Œé¢ åˆ‡æ¢è‡³åˆå§‹ç•Œé¢;
         HTREEITEM temp_htree;
         for (int i=0; i<m_product.size(); i++)
         {
@@ -6647,7 +6647,7 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
                 temp_htree = m_product.at(i).product_item;
                 m_pTreeViewCrl->SetSelectItem(temp_htree);
                 find_serial_number_device = true;
-                selected_product_index = i;//ÖØĞÂ¼ÓÔØ ²úÆ·ÁĞ±íµÄÊ±ºò Ñ¡ÖĞÉÏ´ÎÑ¡ÖĞµÄÉè±¸;
+                selected_product_index = i;//é‡æ–°åŠ è½½ äº§å“åˆ—è¡¨çš„æ—¶å€™ é€‰ä¸­ä¸Šæ¬¡é€‰ä¸­çš„è®¾å¤‡;
                 break;
             }
         }
@@ -7029,7 +7029,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
     if(User_Login_Window != NULL)
     {
-        if(User_Login_Window->IsWindowVisible())	//Èç¹û¿Í»§µã»÷ÆäËûµÄ Éè±¸£¬Ö®Ç°»¹Í£ÁôÔÚ µÇÈë½çÃæ¾ÍÏÈ¹ØµôµÇÈë½çÃæ£¬ºóÃæÔÙÅĞ¶ÏÒª²»ÒªµÇÈë;
+        if(User_Login_Window->IsWindowVisible())	//å¦‚æœå®¢æˆ·ç‚¹å‡»å…¶ä»–çš„ è®¾å¤‡ï¼Œä¹‹å‰è¿˜åœç•™åœ¨ ç™»å…¥ç•Œé¢å°±å…ˆå…³æ‰ç™»å…¥ç•Œé¢ï¼Œåé¢å†åˆ¤æ–­è¦ä¸è¦ç™»å…¥;
             User_Login_Window->ShowWindow(SW_HIDE);
     }
     if(ScreenEdit_Window != NULL)
@@ -7051,15 +7051,15 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
     MainFram_hwd = this->m_hWnd;
     //20120420
     CDialog_Progess* pDlg = new CDialog_Progess(this,1,100);
-    //´´½¨¶Ô»°¿ò´°¿Ú
+    //åˆ›å»ºå¯¹è¯æ¡†çª—å£
     pDlg->Create(IDD_DIALOG10_Progress, this);
 
-    //¾ÓÖĞÏÔÊ¾
+    //å±…ä¸­æ˜¾ç¤º
     //pDlg->CenterWindow();
     //void MoveWindow( LPCRECT lpRect, BOOL bRepaint = TRUE );
     //pDlg->MoveWindow(100,100,500,1000);
     pDlg->ShowProgress(0,0);
-    //ÏÔÊ¾¶Ô»°¿ò´°¿Ú
+    //æ˜¾ç¤ºå¯¹è¯æ¡†çª—å£
    // g_llerrCount = g_llTxCount = g_llRxCount = 0;//click tree, clear all count;
     old_tx_count = persent_array_count = 0;
     //::SetWindowPos(pDlg->m_hWnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
@@ -7087,7 +7087,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				hLastTreeItem = hSelItem;
 			}
 
-			m_pTreeViewCrl->SetSelectItem(hTreeItem);//ÔÚÏßµÄÊ±ºò²Å½«ÑÕÉ«±äºì;
+			m_pTreeViewCrl->SetSelectItem(hTreeItem);//åœ¨çº¿çš„æ—¶å€™æ‰å°†é¢œè‰²å˜çº¢;
 			m_pTreeViewCrl->SetSelectSerialNumber(product_Node.serial_number);
 			g_selected_serialnumber = m_product.at(i).serial_number;
 			g_bac_instance = NULL;
@@ -7103,7 +7103,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             int nTRet=-1;
             //g_tstat_id=m_product.at(i).product_id;
             product_Node=m_product.at(i);
-            selected_product_index = i;//¼ÇÂ¼Ä¿Ç°Ñ¡ÖĞµÄÊÇÄÄÒ»¸ö ²úÆ·;ÓÃÓÚºóÃæ×Ô¶¯¸üĞÂfirmware;
+            selected_product_index = i;//è®°å½•ç›®å‰é€‰ä¸­çš„æ˜¯å“ªä¸€ä¸ª äº§å“;ç”¨äºåé¢è‡ªåŠ¨æ›´æ–°firmware;
             selected_tree_item = hTreeItem;
             Statuspanel.Empty();
             if(product_Node.note_parent_serial_number == 0)
@@ -7130,7 +7130,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 }
             }
 
-            //if(1)//GSM  Ä£¿é
+            //if(1)//GSM  æ¨¡å—
             if((m_product.at(i).protocol != MODBUS_BACNET_MSTP) && (m_product.at(i).protocol != PROTOCOL_GSM) && (m_product.at(i).protocol != PROTOCOL_REMOTE_IP)&&(m_product.at(i).protocol!=MODBUS_RS485))
             {
                 if(!m_product.at(i).BuildingInfo.strIp.IsEmpty())
@@ -7140,7 +7140,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
                     if (!offline_mode &&(!scandlg.TestPing(m_product.at(i).BuildingInfo.strIp)))
                     {
-                        //È¥µô½ø¶ÈÌõ
+                        //å»æ‰è¿›åº¦æ¡
                         pDlg->ShowWindow(SW_HIDE);
                         if(pDlg)
                             delete pDlg;//20120220
@@ -7177,7 +7177,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                                 {
 
                                     is_OK=dlg.is_ok;
-									refresh_tree_status_immediately = true;//ÔÚ¸ÄÍêIPºóÁ¢¿ÌÔÚÈ¥É¨Ãè£¬¸üĞÂÊı¾İ¿â;
+									refresh_tree_status_immediately = true;//åœ¨æ”¹å®ŒIPåç«‹åˆ»åœ¨å»æ‰«æï¼Œæ›´æ–°æ•°æ®åº“;
                                     // 								scandlg.Set_IsScan(FALSE);
                                     // 								scandlg.SetNode(product_Node);
                                     // 								scandlg.DoModal();
@@ -7193,7 +7193,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                                 m_product.at(i).status_last_time[1] = false;
                                 m_product.at(i).status_last_time[2] = false;
                                 m_product.at(i).status = false;
-                                //MessageBox(_T("Device is offline!"));	//Ping ²»Í¨ £¬ »¹ÔÚÒ»¸öÍø¶Î £¬ »¹ÏÔÊ¾ÔÚÏß; ÆäÊµ²»ÔÚÏß;
+                                //MessageBox(_T("Device is offline!"));	//Ping ä¸é€š ï¼Œ è¿˜åœ¨ä¸€ä¸ªç½‘æ®µ ï¼Œ è¿˜æ˜¾ç¤ºåœ¨çº¿; å…¶å®ä¸åœ¨çº¿;
 
                                 if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
                                 {
@@ -7336,7 +7336,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             g_serialNum = product_Node.serial_number;
             if((product_Node.product_class_id == PM_CM5) || 
 				(product_Node.product_class_id == PM_MINIPANEL) /*|| */
-				/*(product_Node.product_class_id == PM_T38AI8AO6DO) */  )	//Èç¹ûÊÇCM5»òÕßMINIPANEL ²ÅÓĞ bacnetĞ­Òé;
+				/*(product_Node.product_class_id == PM_T38AI8AO6DO) */  )	//å¦‚æœæ˜¯CM5æˆ–è€…MINIPANEL æ‰æœ‰ bacnetåè®®;
             {
 				
 				 product_type = product_Node.product_class_id;
@@ -7430,7 +7430,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                                     break;
                                 }
                             }
-                            if(found_device>=0)	//·¢ÏÖ ÒÑ¾­Á¬½ÓµÄÉè±¸;
+                            if(found_device>=0)	//å‘ç° å·²ç»è¿æ¥çš„è®¾å¤‡;
                             {
                                 bip_set_socket(m_tcp_connect_info.at(found_device).client_socket);
                                 SEND_COMMAND_DELAY_TIME = 1000;
@@ -7460,14 +7460,14 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     if(pDlg)
                         delete pDlg;//20120220
                     pDlg = NULL;
-                    m_pTreeViewCrl->SetSelectItem(hTreeItem);//ÔÚÏßµÄÊ±ºò²Å½«ÑÕÉ«±äºì;
+                    m_pTreeViewCrl->SetSelectItem(hTreeItem);//åœ¨çº¿çš„æ—¶å€™æ‰å°†é¢œè‰²å˜çº¢;
                     m_pTreeViewCrl->SetSelectSerialNumber(product_Node.serial_number);
                     g_selected_serialnumber = m_product.at(i).serial_number;
 					goto do_connect_success;
                     return;
 
                 }
-				else if(m_product.at(i).protocol == MODBUS_RS485) //Èç¹û¿Í»§ÊÇ½«MinipanelµÄ ´®¿ÚÁ¬½ÓÖÁPC;
+				else if(m_product.at(i).protocol == MODBUS_RS485) //å¦‚æœå®¢æˆ·æ˜¯å°†Minipanelçš„ ä¸²å£è¿æ¥è‡³PC;
 				{
 					g_protocol = MODBUS_RS485;
 					g_tstat_id = product_Node.product_id;
@@ -7478,7 +7478,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					if(pDlg)
 						delete pDlg;//20120220
 					pDlg = NULL;
-					m_pTreeViewCrl->SetSelectItem(hTreeItem);//ÔÚÏßµÄÊ±ºò²Å½«ÑÕÉ«±äºì;
+					m_pTreeViewCrl->SetSelectItem(hTreeItem);//åœ¨çº¿çš„æ—¶å€™æ‰å°†é¢œè‰²å˜çº¢;
 					m_pTreeViewCrl->SetSelectSerialNumber(product_Node.serial_number);
 					g_selected_serialnumber = m_product.at(i).serial_number;
 					goto do_conncet_failed;
@@ -7491,7 +7491,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     if(product_Node.protocol == PROTOCOL_REMOTE_IP)
                         is_local = false;
                     //BOOL is_local = IP_is_Local(product_Node.BuildingInfo.strIp);
-                    if(is_local == false)	//ÅĞ¶ÏÊÇ·ñÊÇ±¾µØIP£¬²»ÊÇ±¾µØµÄ¾ÍÒªÁ¬½Óµ½Ô¶¶ËµÄ£¬Ô¶¶ËµÄ Who  is  ¹ã²¥·¢²¼¹ıÈ¥µÄ;
+                    if(is_local == false)	//åˆ¤æ–­æ˜¯å¦æ˜¯æœ¬åœ°IPï¼Œä¸æ˜¯æœ¬åœ°çš„å°±è¦è¿æ¥åˆ°è¿œç«¯çš„ï¼Œè¿œç«¯çš„ Who  is  å¹¿æ’­å‘å¸ƒè¿‡å»çš„;
                     {
                         SEND_COMMAND_DELAY_TIME = 500;
                         m_is_remote_device = true;
@@ -7532,7 +7532,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 HANDLE hFind;//
                 WIN32_FIND_DATA wfd;//
                 hFind = FindFirstFile(StrBinHexPath, &wfd);//
-                if ((hFind!=INVALID_HANDLE_VALUE)&&(!StrULRPath.IsEmpty()))//ËµÃ÷µ±Ç°Ä¿Â¼ÏÂÎŞt3000.mdb
+                if ((hFind!=INVALID_HANDLE_VALUE)&&(!StrULRPath.IsEmpty()))//è¯´æ˜å½“å‰ç›®å½•ä¸‹æ— t3000.mdb
                 {
                     filename=StrBinHexPath;
                 }
@@ -7562,7 +7562,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 if(pDlg)
                     delete pDlg;//20120220
                 pDlg = NULL;
-                m_pTreeViewCrl->SetSelectItem(hTreeItem);//ÔÚÏßµÄÊ±ºò²Å½«ÑÕÉ«±äºì;
+                m_pTreeViewCrl->SetSelectItem(hTreeItem);//åœ¨çº¿çš„æ—¶å€™æ‰å°†é¢œè‰²å˜çº¢;
                 m_pTreeViewCrl->SetSelectSerialNumber(product_Node.serial_number);
                 g_selected_serialnumber = m_product.at(i).serial_number;
                 g_bPauseMultiRead = true;
@@ -7637,7 +7637,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     BOOL bRet = ConnectDevice(product_Node);//ConnectSubBuilding(product_Node.BuildingInfo);
 
 
-                   // SetLastCommunicationType(1); //²»¿ÉÀí½âÎªÊ²Ã´ÒªÕâÃ´×ö£¬ÆÁ±Î by ¶Å·« 06 03 31;
+                   // SetLastCommunicationType(1); //ä¸å¯ç†è§£ä¸ºä»€ä¹ˆè¦è¿™ä¹ˆåšï¼Œå±è”½ by æœå¸† 06 03 31;
 
 
 					ip=product_Node.BuildingInfo.strIp;
@@ -7661,13 +7661,13 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 #endif
                 }
             }
-            //´®¿ÚÉèÖÃ
+            //ä¸²å£è®¾ç½®
             else
             {
                 g_protocol=MODBUS_RS485;
 
                 {
-                    //close_com();//¹Ø±ÕËùÓĞ¶Ë¿Ú
+                    //close_com();//å…³é—­æ‰€æœ‰ç«¯å£
                     //int nComPort = _wtoi(product_Node.BuildingInfo.strComPort.Mid(3));
 
                     int nComPort = product_Node.ncomport;
@@ -7813,7 +7813,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                         //HANDLE hFind;//
                         //WIN32_FIND_DATA wfd;//
                         //hFind = FindFirstFile(StrBinHexPath, &wfd);//
-                        //if ((hFind!=INVALID_HANDLE_VALUE)&&(!StrULRPath.IsEmpty()))//ËµÃ÷µ±Ç°Ä¿Â¼ÏÂÎŞt3000.mdb
+                        //if ((hFind!=INVALID_HANDLE_VALUE)&&(!StrULRPath.IsEmpty()))//è¯´æ˜å½“å‰ç›®å½•ä¸‹æ— t3000.mdb
                         //{
                         //	filename=StrBinHexPath;
                         //}
@@ -7889,7 +7889,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     SetLastSuccessBaudrate(m_nbaudrat);
 					bac_select_device_online = true;
 					m_product.at(i).status = true;
-                    m_pTreeViewCrl->SetSelectItem(hTreeItem);//ÔÚÏßµÄÊ±ºò²Å½«ÑÕÉ«±äºì;
+                    m_pTreeViewCrl->SetSelectItem(hTreeItem);//åœ¨çº¿çš„æ—¶å€™æ‰å°†é¢œè‰²å˜çº¢;
                     m_pTreeViewCrl->SetSelectSerialNumber(product_Node.serial_number);
                     g_selected_serialnumber = m_product.at(i).serial_number;
 
@@ -8024,7 +8024,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             {
                 //SetPaneConnectionPrompt(_T("Online!"));
                 pDlg->ShowWindow(SW_HIDE);
-                m_pTreeViewCrl->SetSelectItem(hTreeItem);//ÔÚÏßµÄÊ±ºò²Å½«ÑÕÉ«±äºì;
+                m_pTreeViewCrl->SetSelectItem(hTreeItem);//åœ¨çº¿çš„æ—¶å€™æ‰å°†é¢œè‰²å˜çº¢;
                 m_pTreeViewCrl->SetSelectSerialNumber(product_Node.serial_number);
                 g_selected_serialnumber = m_product.at(i).serial_number;
                 m_pTreeViewCrl->turn_item_image(hSelItem ,true);
@@ -8053,9 +8053,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             Comment by:Alex
             Date:2013/04/10
             Purpose:
-            Õâ¸öµÄÄ¿µÄµÄµ±ÊÇÍ¨¹ıTCPÁ¬½ÓµÄÊ±ºò£¬°Ñ¶Áµ½µÄ¼Ä´æÆ÷¶Áµ½
+            è¿™ä¸ªçš„ç›®çš„çš„å½“æ˜¯é€šè¿‡TCPè¿æ¥çš„æ—¶å€™ï¼ŒæŠŠè¯»åˆ°çš„å¯„å­˜å™¨è¯»åˆ°
             multi_register_value_tcp
-            ÊÊÓÃÓÚÍøÂç¿Ú£¬´óÊı¾İÁ¿
+            é€‚ç”¨äºç½‘ç»œå£ï¼Œå¤§æ•°æ®é‡
             */
             //Device_Type=read_one(g_tstat_id,7,10);
             CString achive_file_path;
@@ -8084,7 +8084,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                         if(itemp < 0 )
                         {
                             //continue;
-                            break; //¶Á²»µ½¾ÍÍË³ö£¬ºÜ¶àÊ±ºò NCÔÚ¶ÁµÄ¹ı³ÌÖĞ¶Ï¿ªÁ¬½ÓT3000 »¹Ò»Ö±È¥¶ÁÊ£ÓàµÄ ¾Í»áÒıÆğÎŞÏìÓ¦;
+                            break; //è¯»ä¸åˆ°å°±é€€å‡ºï¼Œå¾ˆå¤šæ—¶å€™ NCåœ¨è¯»çš„è¿‡ç¨‹ä¸­æ–­å¼€è¿æ¥T3000 è¿˜ä¸€ç›´å»è¯»å‰©ä½™çš„ å°±ä¼šå¼•èµ·æ— å“åº”;
                         }
                         else
                         {
@@ -8191,7 +8191,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                         int i;
                         it =0;
                         float progress;
-                        for(i=0; i<(length*power_value); i++)	//Ôİ¶¨Îª0 £¬ÒòÎªTSTAT6 Ä¿Ç°Îª600¶à
+                        for(i=0; i<(length*power_value); i++)	//æš‚å®šä¸º0 ï¼Œå› ä¸ºTSTAT6 ç›®å‰ä¸º600å¤š
                         {
                             int itemp = 0;
                             itemp = Read_Multi(g_tstat_id,&multi_register_value[i*(100/power_value)],i*(100/power_value),100/power_value,5);
@@ -8223,7 +8223,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                         int i;
                         it =0;
                         float progress;
-                        for(i=0; i<(length*power_value); i++)	//Ôİ¶¨Îª0 £¬ÒòÎªTSTAT6 Ä¿Ç°Îª600¶à
+                        for(i=0; i<(length*power_value); i++)	//æš‚å®šä¸º0 ï¼Œå› ä¸ºTSTAT6 ç›®å‰ä¸º600å¤š
                         {
                             int itemp = 0;
                             itemp = Read_Multi(g_tstat_id,&multi_register_value[i*(100/power_value)],i*(100/power_value),100/power_value,5);
@@ -8290,7 +8290,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                         CString strSerial;
                         strSerial.Format(_T("%d"),get_serialnumber());
 
-#if 1 // µã»÷µÄÊ±ºò°ÑĞÂµÄTstat6µÄÃû×ÖĞ´µ½Tstat6µÄ¼Ä´æÆ÷ÖĞ
+#if 1 // ç‚¹å‡»çš„æ—¶å€™æŠŠæ–°çš„Tstat6çš„åå­—å†™åˆ°Tstat6çš„å¯„å­˜å™¨ä¸­
                         CString temp_serial_number;
                         CString newname;
                         CString strSql;
@@ -8303,7 +8303,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                         if (temp_write_flag == 1)
                         {
                             GetPrivateProfileStringW(temp_serial_number,_T("NewName"),_T(""),newname.GetBuffer(MAX_PATH),MAX_PATH,g_achive_device_name_path);
-                            if(newname.GetLength()> 16)	//³¤¶È²»ÄÜ´óÓÚ½á¹¹Ìå¶¨ÒåµÄ³¤¶È;
+                            if(newname.GetLength()> 16)	//é•¿åº¦ä¸èƒ½å¤§äºç»“æ„ä½“å®šä¹‰çš„é•¿åº¦;
                             {
                                 newname.Delete(16,newname.GetLength()-16);
                             }
@@ -8479,7 +8479,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
                             if(!q.eof())
                             {
-                                //»ñÈ¡È¨ÏŞ£º
+                                //è·å–æƒé™ï¼š
                                 g_AllscreensetLevel=q.getIntField("allscreen_level");
                                 if(g_AllscreensetLevel!=1)
                                 {
@@ -8517,7 +8517,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             q = SqliteDBT3000.execQuery((UTF8MBSTR)strsql);
                             if(!q.eof())
                             {
-                                //»ñÈ¡È¨ÏŞ£º
+                                //è·å–æƒé™ï¼š
                                 g_NetWorkLevel=q.getIntField("networkcontroller");//
                                 g_BuildingsetLevel=q.getIntField("database_limition");
                             }
@@ -8673,7 +8673,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             }
             else if (nFlag == PM_T322AI || nFlag == CS3000 || nFlag == PWM_TRANSDUCER || nFlag == PM_T38AI8AO6DO || nFlag == PM_T3PT12 || nFlag == PM_T36CTA||nFlag == PM_T3_LC )
             {
-				//¾ÍËµÃ÷ÊÇ¼ÓÁËminipanel 10000ÒÔºó¼Ä´æÆ÷µÄ; ·ñÔòµÄ»°¾ÍÌø×ªÖÁÒÔÇ°µÄ½çÃæ;
+				//å°±è¯´æ˜æ˜¯åŠ äº†minipanel 10000ä»¥åå¯„å­˜å™¨çš„; å¦åˆ™çš„è¯å°±è·³è½¬è‡³ä»¥å‰çš„ç•Œé¢;
 				new_device_support_mini_ui = true;
 
                 bacnet_view_number = TYPE_TSTAT;
@@ -8759,9 +8759,9 @@ DWORD WINAPI   CMainFrame::retry_connect(LPVOID lpVoid)
 }
 
 ///////////////////////////////////////////////////////////////////////////
-//  Added by zgq;2010-11-29;Ìí¼Ó³õÊ¼»¯TreeCtrl£¬Ï£ÍûÔÚ³ÌĞò³õÊ¼»¯Íê³Éºó
-//  TreeCtrlÄÜ¹»·´Ó¦Éè±¸µÄÁ¬½Ó×´¿ö¡£
-//  ·½·¨£º±éÀúTreeCtrl£¬·Ö±ğÈ¥Á¬½ÓÃ¿Ò»¸öNode£¬²¢¸ù¾İ×´Ì¬ĞŞ¸ÄÆäÏÔÊ¾
+//  Added by zgq;2010-11-29;æ·»åŠ åˆå§‹åŒ–TreeCtrlï¼Œå¸Œæœ›åœ¨ç¨‹åºåˆå§‹åŒ–å®Œæˆå
+//  TreeCtrlèƒ½å¤Ÿååº”è®¾å¤‡çš„è¿æ¥çŠ¶å†µã€‚
+//  æ–¹æ³•ï¼šéå†TreeCtrlï¼Œåˆ†åˆ«å»è¿æ¥æ¯ä¸€ä¸ªNodeï¼Œå¹¶æ ¹æ®çŠ¶æ€ä¿®æ”¹å…¶æ˜¾ç¤º
 // void CMainFrame::InitTreeNodeConn()
 // {
 // 	// find the currently selected item
@@ -8896,7 +8896,7 @@ void CMainFrame::CheckDuplicate()
 
 	}
 }
-// refresh_com Ö»ÓĞµ±Õâ¸öÖµÎª0µÄÊ±ºò²ÅË¢ĞÂ´®¿ÚÄÇ²¿·ÖµÄ×´Ì¬,ÒòÎªÍøÂç¹ã²¥µÄ ºÜ¿ì;¿ÉÒÔÆµ·±É¨Ãè£¬´®¿ÚÌ«ÂıÁË;
+// refresh_com åªæœ‰å½“è¿™ä¸ªå€¼ä¸º0çš„æ—¶å€™æ‰åˆ·æ–°ä¸²å£é‚£éƒ¨åˆ†çš„çŠ¶æ€,å› ä¸ºç½‘ç»œå¹¿æ’­çš„ å¾ˆå¿«;å¯ä»¥é¢‘ç¹æ‰«æï¼Œä¸²å£å¤ªæ…¢äº†;
 BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
 {
     bool find_new_device = false;
@@ -8907,7 +8907,7 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
         //tree0412if(!g_bEnableRefreshTreeView || g_bPauseRefreshTree || g_bPauseMultiRead)
         if( g_bPauseRefreshTree )
             return false;
-        //if(no_mouse_keyboard_event_enable_refresh == false)	//Èç¹ûÍ»È»ÓĞ¿Í»§²Ù×÷ÁË£¬¾Í²»ÒªÔÚË¢ĞÂtreeviewÁË;
+        //if(no_mouse_keyboard_event_enable_refresh == false)	//å¦‚æœçªç„¶æœ‰å®¢æˆ·æ“ä½œäº†ï¼Œå°±ä¸è¦åœ¨åˆ·æ–°treeviewäº†;
         //   return false;
 
 
@@ -8922,10 +8922,10 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
             nSerialNumber=tp.serial_number;
 
             //int newnID=read_one(nID,6,2);
-            /*ĞèÒªÏÈ±£´æÖ®Ç°µÄÍ¨ĞÅĞ­Òé;
+            /*éœ€è¦å…ˆä¿å­˜ä¹‹å‰çš„é€šä¿¡åè®®;
             Get the protocol ,if it is bacnet ip,we compare the device id.
             */
-            //Èç¹ûstrip²»ÊÇ¿ÕµÄ¾ÍËµÃ÷Õâ¸öÉè±¸ÊÒ¹ÒÔÚNC»òLCµÈµÈÏÂÃæµÄMODBUS  RS485Éè±¸
+            //å¦‚æœstripä¸æ˜¯ç©ºçš„å°±è¯´æ˜è¿™ä¸ªè®¾å¤‡å®¤æŒ‚åœ¨NCæˆ–LCç­‰ç­‰ä¸‹é¢çš„MODBUS  RS485è®¾å¤‡
             //if((m_product.at(i).protocol == MODBUS_RS485) && (m_product.at(i).BuildingInfo.strIp.IsEmpty()))
 
             int temp_port = 0;
@@ -8942,10 +8942,10 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
                 //m_product.at(i).status = false;
                 temp_online = false;
                 SetCommunicationType(0);
-                //close_com(); // ÏÈ²»¹Ø±Õ;
+                //close_com(); // å…ˆä¸å…³é—­;
                 int nComPort = m_product.at(i).ncomport;
                 int n_baudrate = m_product.at(i).baudrate;
-                //38400ÊÇÓĞÒ»¸özigbee µÄ USB  ËüµÄ²¨ÌØÂÊ,ËùÒÔÒ²ĞèÒªÅĞ¶Ï38400;
+                //38400æ˜¯æœ‰ä¸€ä¸ªzigbee çš„ USB  å®ƒçš„æ³¢ç‰¹ç‡,æ‰€ä»¥ä¹Ÿéœ€è¦åˆ¤æ–­38400;
                 if((n_baudrate != 19200) 
 				&& (n_baudrate != 9600) 
 				&& (n_baudrate != 38400)
@@ -8965,7 +8965,7 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
                 if((nComPort>0) && (nComPort<20))
                 {
                     //TRACE(_T("Open Com%d "),nComPort);
-                    if(nComPort!=nCom)	//Èç¹û²»µÈÓÚµ±Ç°Ñ¡ÔñµÄÉè±¸µÄ´®¿Ú£¬¾Í²»Òª¼ì²â×´Ì¬;ÃâµÃ´®¿ÚÒ»¿ªÒ»¹ØµÄ.
+                    if(nComPort!=nCom)	//å¦‚æœä¸ç­‰äºå½“å‰é€‰æ‹©çš„è®¾å¤‡çš„ä¸²å£ï¼Œå°±ä¸è¦æ£€æµ‹çŠ¶æ€;å…å¾—ä¸²å£ä¸€å¼€ä¸€å…³çš„.
                         continue;
                     // bret = open_com(nComPort);
                     bret = 1;
@@ -9028,14 +9028,14 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
 
                         unsigned int nSerialNumberRead;
 
-                        if(nRet>=0)  // ¼ÆËã´®¿ÚºÅ
+                        if(nRet>=0)  // è®¡ç®—ä¸²å£å·
                         {
                             nSerialNumberRead=first_ten_reg[0]+first_ten_reg[1]*256+first_ten_reg[2]*256*256+first_ten_reg[3]*256*256*256;
                         }
 
                         if(nSerialNumber>=0)
                         {
-                            if(nSerialNumberRead==nSerialNumber) // È¡µ½´®¿ÚºÅ£¬²¢ÏàµÈ£¬ËµÃ÷online;
+                            if(nSerialNumberRead==nSerialNumber) // å–åˆ°ä¸²å£å·ï¼Œå¹¶ç›¸ç­‰ï¼Œè¯´æ˜online;
                             {
                                 temp_online = true;
                                 //m_product.at(i).status = true;
@@ -9044,7 +9044,7 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
                         }
                     }
                 }
-                //close_com();//ÏÈ²»¹Ø
+                //close_com();//å…ˆä¸å…³
                 //TRACE(_T(" CloseCom \r\n"));
 end_condition :
 
@@ -9193,7 +9193,7 @@ end_condition :
 
         str_object_instance.Format(_T("%u"),m_refresh_net_device_data.at(y).object_instance);
         str_panel_number.Format(_T("%u"),m_refresh_net_device_data.at(y).panal_number);
-        if(db_exsit)	//Êı¾İ¿â´æÔÚ£¬¾Í²é¿´ÊÇ·ñÒª¸üĞÂ;
+        if(db_exsit)	//æ•°æ®åº“å­˜åœ¨ï¼Œå°±æŸ¥çœ‹æ˜¯å¦è¦æ›´æ–°;
         {
             if((m_refresh_net_device_data.at(y).ip_address.CompareNoCase(m_product.at(n_index).BuildingInfo.strIp) != 0) ||
                     (m_refresh_net_device_data.at(y).NetCard_Address.CompareNoCase(m_product.at(n_index).NetworkCard_Address) != 0) ||
@@ -9280,7 +9280,7 @@ end_condition :
             }
 
         }
-        else			//²»´æÔÚ ¾Í²åÈë;
+        else			//ä¸å­˜åœ¨ å°±æ’å…¥;
         {
             CString strSql;
             CString str_ip_address;
@@ -9445,7 +9445,7 @@ LRESULT  CMainFrame::HandleIspModedivice(WPARAM wParam, LPARAM lParam)
 
 	//	isp_product_id = m_product.at(selected_product_index).product_class_id;
 	//	if (!((product_Node.BuildingInfo.strIp.CompareNoCase(_T("9600")) ==0)||(product_Node.BuildingInfo.strIp.CompareNoCase(_T("19200"))==0) ||(product_Node.BuildingInfo.strIp.CompareNoCase(_T(""))) == 0))
-	SetCommunicationType(0);//¹Ø±Õ´®¿Ú£¬¹©ISP Ê¹ÓÃ;
+	SetCommunicationType(0);//å…³é—­ä¸²å£ï¼Œä¾›ISP ä½¿ç”¨;
 	close_com();
 
 	Dlg.DoModal();
@@ -9464,7 +9464,7 @@ finished_detect:
 	}
 	SetCommunicationType(temp_type);
 
-	//Fance Add. ÔÚISP ÓÃÍê1234 4321 µÄ¶Ë¿ÚÖ®ºó£¬T3000 ÔÚÖØĞÂ´ò¿ªÊ¹ÓÃ£¬Ë¢ĞÂlistview µÄÍøÂçÉè±¸ÒªÊ¹ÓÃ;
+	//Fance Add. åœ¨ISP ç”¨å®Œ1234 4321 çš„ç«¯å£ä¹‹åï¼ŒT3000 åœ¨é‡æ–°æ‰“å¼€ä½¿ç”¨ï¼Œåˆ·æ–°listview çš„ç½‘ç»œè®¾å¤‡è¦ä½¿ç”¨;
 	h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
 	BOOL bBroadcast=TRUE;
 	::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
@@ -9528,7 +9528,7 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
     {
         tree_product tp = m_product.at(i);
         if(tp.status>0)
-            // Èç¹ûonline£¬¸üĞÂÏÔÊ¾Í¼Æ¬
+            // å¦‚æœonlineï¼Œæ›´æ–°æ˜¾ç¤ºå›¾ç‰‡
         {
             if(selected_product_index == i)
             {
@@ -9538,7 +9538,7 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
             m_pTreeViewCrl->turn_item_image(tp.product_item ,true);
 
         }
-        else  // Ìæ»»offlineµÄÍ¼Æ¬
+        else  // æ›¿æ¢offlineçš„å›¾ç‰‡
         {
             //SetPaneConnectionPrompt(_T("Offline!"));
             if(selected_product_index == i)
@@ -9561,7 +9561,7 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
             else
 			{
 			//if(tp.product_class_id	!= PM_MINIPANEL)
-               bac_select_device_online = false; //¶ÔminipanelÌØÊâ´¦Àí, ±»Ñ¡ÖĞµÄÉè±¸²»»Ø 64 £¬¶øÆäËûÍ¨ĞÅÓÖÕı³££¬Í·ÌÛ;
+               bac_select_device_online = false; //å¯¹minipanelç‰¹æ®Šå¤„ç†, è¢«é€‰ä¸­çš„è®¾å¤‡ä¸å› 64 ï¼Œè€Œå…¶ä»–é€šä¿¡åˆæ­£å¸¸ï¼Œå¤´ç–¼;
 			}
         }
     }
@@ -9639,7 +9639,7 @@ UINT _FreshTreeView(LPVOID pParam )
 		Sleep(10000);
 		HWND temp1_hwmd ;//= 0x000211F0;
 		HWND temp2_hwmd;
-		temp1_hwmd = FindWindowA(NULL,"Temco×îĞÂ³¶µ°Èº - Èº(868547772)");
+		temp1_hwmd = FindWindowA(NULL,"Temcoæœ€æ–°æ‰¯è›‹ç¾¤ - ç¾¤(868547772)");
 		::EnumChildWindows(temp1_hwmd,(WNDENUMPROC)enum3Dinstall_two,1);
 		int aaaaaaaaaa = 0;
 		while(1)
@@ -9680,7 +9680,7 @@ UINT _FreshTreeView(LPVOID pParam )
         {
 			for (int x=0;x<30;x++)
 			{
-				if(refresh_tree_status_immediately)  //ÔÚÉè±¸µÄIP »ò¶Ë¿Ú¸Ä±äºó £¬ÆäËûÎÄ¼ş»á½«´ËflagÉèÖÃÎªtrue ÒªÇóÖØĞÂË¢ĞÂ;
+				if(refresh_tree_status_immediately)  //åœ¨è®¾å¤‡çš„IP æˆ–ç«¯å£æ”¹å˜å ï¼Œå…¶ä»–æ–‡ä»¶ä¼šå°†æ­¤flagè®¾ç½®ä¸ºtrue è¦æ±‚é‡æ–°åˆ·æ–°;
 				{
 					refresh_tree_status_immediately = false;
 					break;
@@ -9700,7 +9700,7 @@ UINT _FreshTreeView(LPVOID pParam )
             
         }
 		pMain->m_frist_start = false;
-		if(b_remote_connection)	//Èç¹ûÊÇÔ¶³ÌÁ¬½ÓµÄÉè±¸ ¾Í²»É¨Ãè , Ò²ÎŞ·¨Í¨¹ı 0x64 ÅĞ¶ÏÔ¶³ÌµÄÉè±¸ÊÇ·ñÔÚÏß.  Fance;
+		if(b_remote_connection)	//å¦‚æœæ˜¯è¿œç¨‹è¿æ¥çš„è®¾å¤‡ å°±ä¸æ‰«æ , ä¹Ÿæ— æ³•é€šè¿‡ 0x64 åˆ¤æ–­è¿œç¨‹çš„è®¾å¤‡æ˜¯å¦åœ¨çº¿.  Fance;
 		{
 			if((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
 			{
@@ -9710,7 +9710,7 @@ UINT _FreshTreeView(LPVOID pParam )
 			Sleep(1000);
 			continue;
 		}
-        //if(g_bPauseMultiRead)  //2016 04 22 ÆÁ±Î .
+        //if(g_bPauseMultiRead)  //2016 04 22 å±è”½ .
         //{
         //    Sleep(10);
         //    continue;
@@ -9718,7 +9718,7 @@ UINT _FreshTreeView(LPVOID pParam )
 
         while(1)
         {
-            if(no_mouse_keyboard_event_enable_refresh)//ÅĞ¶ÏÈç¹ûÒ»¶ÎÊ±¼äÎŞÈË²Ù×÷£¬²ÅË¢ĞÂtree£¬Òª²»È»´®¿Ú×ÊÔ´»á¾­³£³åÍ»;
+            if(no_mouse_keyboard_event_enable_refresh)//åˆ¤æ–­å¦‚æœä¸€æ®µæ—¶é—´æ— äººæ“ä½œï¼Œæ‰åˆ·æ–°treeï¼Œè¦ä¸ç„¶ä¸²å£èµ„æºä¼šç»å¸¸å†²çª;
             {
                 //g_strT3000LogString=_T("T3000 is free");
                 //		CString* pstrInfo = new CString(g_strT3000LogString);
@@ -9749,7 +9749,7 @@ UINT _FreshTreeView(LPVOID pParam )
         //	continue;
         //}
 
-        //ÕâÀïÃ¿Ò»²½¶¼ÒªÈ·ÈÏ¿Í·şÊÇ²»ÊÇÔÚ²Ù×÷T3000,Èç¹û¿Í»§ÔÚ²Ù×÷£¨¶ÁĞ´£©¾Í²»ÒªºÍ¿Í»§ÇÀ×ÊÔ´;
+        //è¿™é‡Œæ¯ä¸€æ­¥éƒ½è¦ç¡®è®¤å®¢æœæ˜¯ä¸æ˜¯åœ¨æ“ä½œT3000,å¦‚æœå®¢æˆ·åœ¨æ“ä½œï¼ˆè¯»å†™ï¼‰å°±ä¸è¦å’Œå®¢æˆ·æŠ¢èµ„æº;
         //if(no_mouse_keyboard_event_enable_refresh == false)
         //{
         //    ReleaseMutex(Read_Mutex);
@@ -9757,7 +9757,7 @@ UINT _FreshTreeView(LPVOID pParam )
         //}
 		    m_refresh_net_device_data.clear();
         //if((current_building_protocol == P_AUTO) || (current_building_protocol == P_MODBUS_TCP) || (current_building_protocol == P_BACNET_IP))
-        //{//¼òÖ±ÊÇÄÔ²Ğ£¬ÀÏÃ«.ÒªÇóÕâÑùÏ¹¼¸°Ñ¸Ä. //²»¹Ü¿Í»§Ñ¡Ê²Ã´¼¦°ÉĞ­Òé £¬ ¶¼ÒªÄÜÉ¨µ½ËùÓĞÉè±¸.ÄÇ²»¾ÍÊÇTMDÖ»ÓĞAuto ÁËÂğ£¿»¹Ñ¡¸öP°¡;
+        //{//ç®€ç›´æ˜¯è„‘æ®‹ï¼Œè€æ¯›.è¦æ±‚è¿™æ ·çå‡ æŠŠæ”¹. //ä¸ç®¡å®¢æˆ·é€‰ä»€ä¹ˆé¸¡å§åè®® ï¼Œ éƒ½è¦èƒ½æ‰«åˆ°æ‰€æœ‰è®¾å¤‡.é‚£ä¸å°±æ˜¯TMDåªæœ‰Auto äº†å—ï¼Ÿè¿˜é€‰ä¸ªPå•Š;
             RefreshNetWorkDeviceListByUDPFunc();
         //}
 
@@ -9824,7 +9824,7 @@ LRESULT CMainFrame::OnAddTreeNode(WPARAM wParam, LPARAM lParam)
         KillTimer(SCAN_TIMER);
         m_wndWorkSpace.m_TreeCtrl.Invalidate();
 
-        //SelectTreeNodeFromRecord();//scan ½â¾öscanÍêºó£¬µã»÷ËùÉ¨µ½µÄÏî£¬ÏÔÊ¾com²»¶ÔÎÊÌâ¡£
+        //SelectTreeNodeFromRecord();//scan è§£å†³scanå®Œåï¼Œç‚¹å‡»æ‰€æ‰«åˆ°çš„é¡¹ï¼Œæ˜¾ç¤ºcomä¸å¯¹é—®é¢˜ã€‚
 
         //////////////////////////////////////////////////////////////////////////
         delete m_pScanner;
@@ -9832,7 +9832,7 @@ LRESULT CMainFrame::OnAddTreeNode(WPARAM wParam, LPARAM lParam)
     }
     g_bEnableRefreshTreeView =TRUE;
     g_bPauseRefreshTree = FALSE;
-    PostMessage(WM_REFRESH_TREEVIEW_MAP,0,0);//É¨ÃèÍêÁËÖ®ºó¹Ø±ÕÉ¨Ãè´°¿Ú£¬»¹ÒªË¢ĞÂTreeview;
+    PostMessage(WM_REFRESH_TREEVIEW_MAP,0,0);//æ‰«æå®Œäº†ä¹‹åå…³é—­æ‰«æçª—å£ï¼Œè¿˜è¦åˆ·æ–°Treeview;
     return 1;
 }
 
@@ -9862,11 +9862,11 @@ LRESULT CMainFrame::OnHotKey(WPARAM wParam,LPARAM lParam)
         AnnualRoutine_Window->Unreg_Hotkey();
         Monitor_Window->Unreg_Hotkey();
     }
-    //ÅĞ¶ÏÏìÓ¦ÁËÊ²Ã´ÈÈ¼ü
+    //åˆ¤æ–­å“åº”äº†ä»€ä¹ˆçƒ­é”®
     if( MOD_ALT == fuModifiers && 'G' == uVirtKey )  //Screen
     {
         OnControlScreens();
-        //AfxMessageBox(_T("Äã°´ÏÂÁË×éºÏ¼ü alt + m"));
+        //AfxMessageBox(_T("ä½ æŒ‰ä¸‹äº†ç»„åˆé”® alt + m"));
     }
     else if(MOD_ALT == fuModifiers && 'P' == uVirtKey)//Program
     {
@@ -9964,7 +9964,7 @@ const CString strDeviceRegEntryValid = _T("DeviceValid");
 //			htiParent = m_pTreeViewCrl->GetParentItem(htiParent);
 //		}
 //	}
-//	else // Ã»ÓĞÕâ¸ö±íÏî
+//	else // æ²¡æœ‰è¿™ä¸ªè¡¨é¡¹
 //	{
 //		ASSERT(0);
 //	}
@@ -10030,10 +10030,10 @@ const CString strDeviceRegEntryValid = _T("DeviceValid");
 //		HTREEITEM htiRoot = m_pTreeViewCrl->GetRootItem();
 //		HTREEITEM htiSel = GetLastSelNodeFromRecord(reg, htiRoot);
 //		m_pTreeViewCrl->SelectItem(htiSel);
-//	//	DoConnectToANode(htiSel);//scan Ô­À´ÓĞÕâ¾äµÄ¡£
+//	//	DoConnectToANode(htiSel);//scan åŸæ¥æœ‰è¿™å¥çš„ã€‚
 //
 //	}
-//	else // Ã»ÓĞÕâ¸ö±íÏî
+//	else // æ²¡æœ‰è¿™ä¸ªè¡¨é¡¹
 //	{
 //		m_pTreeViewCrl->SelectItem(NULL);
 //	}
@@ -10054,7 +10054,7 @@ HTREEITEM CMainFrame::GetLastSelNodeFromRecord(CRegKey& reg, HTREEITEM& htiRoot)
     ZeroMemory(szRet, 64);
 
     //////////////////////////////////////////////////////////////////////////
-    // ÏÈ»ñµÃËùÓĞµÄ±êÖ¾Î» ºÍ name
+    // å…ˆè·å¾—æ‰€æœ‰çš„æ ‡å¿—ä½ å’Œ name
     // subnet
     if(reg.QueryDWORDValue(strSubnetRegEntryValid, nSubnet) == ERROR_SUCCESS)
     {
@@ -10130,7 +10130,7 @@ HTREEITEM CMainFrame::GetLastSelNodeFromRecord(CRegKey& reg, HTREEITEM& htiRoot)
     }
 
     /////////////////////////////////////////////////////////////////////////
-    // ²éÕÒ½Úµã
+    // æŸ¥æ‰¾èŠ‚ç‚¹
     if(nSubnet == 1)
     {
         htiSel = SearchItemByName(htiRoot, strSubnetName);
@@ -10181,8 +10181,8 @@ HTREEITEM CMainFrame::GetLastSelNodeFromRecord(CRegKey& reg, HTREEITEM& htiRoot)
 
 
 //////////////////////////////////////////////////////////////////////////
-// ¸ù¾İÊ÷½ÚµãµÄnameËÑË÷Ò»¸ö½Úµã²¢·µ»Ø
-// Èç¹ûÓĞ¶à¸ö½ÚµãÍ¬Ãû£¬ÄÇÃ´·µ»ØµÚÒ»¸öÕÒµ½µÄ
+// æ ¹æ®æ ‘èŠ‚ç‚¹çš„nameæœç´¢ä¸€ä¸ªèŠ‚ç‚¹å¹¶è¿”å›
+// å¦‚æœæœ‰å¤šä¸ªèŠ‚ç‚¹åŒåï¼Œé‚£ä¹ˆè¿”å›ç¬¬ä¸€ä¸ªæ‰¾åˆ°çš„
 //
 HTREEITEM CMainFrame::SearchItemByName(HTREEITEM& htiRoot, const CString& strItemName)
 {
@@ -10235,9 +10235,9 @@ HTREEITEM CMainFrame::SearchItemByName(HTREEITEM& htiRoot, const CString& strIte
 }
 
 
-// ÎªµÚÒ»´ÎÔËĞĞµ¼ÈëÊı¾İ¿â£¬Èç¹û²»ÊÇµÚÒ»´ÎÔËĞĞÔò²»ÓÃÌáÊ¾
-// ÅĞ¶Ïµ±Ç°°æ±¾Óë×¢²á±íÖĞ°æ±¾ÊÇ·ñÒ»ÖÂ£¬ÈçÒ»ÖÂÔò²»ÓÃÌáÊ¾
-// Èç²»Ò»ÖÂ£¬ÄÇÃ´ÒªÌáÊ¾£¬²¢°Ñµ±Ç°°æ±¾Ğ´Èë×¢²á±í
+// ä¸ºç¬¬ä¸€æ¬¡è¿è¡Œå¯¼å…¥æ•°æ®åº“ï¼Œå¦‚æœä¸æ˜¯ç¬¬ä¸€æ¬¡è¿è¡Œåˆ™ä¸ç”¨æç¤º
+// åˆ¤æ–­å½“å‰ç‰ˆæœ¬ä¸æ³¨å†Œè¡¨ä¸­ç‰ˆæœ¬æ˜¯å¦ä¸€è‡´ï¼Œå¦‚ä¸€è‡´åˆ™ä¸ç”¨æç¤º
+// å¦‚ä¸ä¸€è‡´ï¼Œé‚£ä¹ˆè¦æç¤ºï¼Œå¹¶æŠŠå½“å‰ç‰ˆæœ¬å†™å…¥æ³¨å†Œè¡¨
 BOOL CMainFrame::ImportDataBaseForFirstRun()
 {
     CString strFileVer = GetCurrentFileVersion();
@@ -10266,7 +10266,7 @@ BOOL CMainFrame::ImportDataBaseForFirstRun()
 const CString c_strFileVersionPath = _T("Software\\Temco T3000 Application\\T3000\\FileVersion\\");
 
 
-// ´Ó×¢²á±í¶Áfileversion
+// ä»æ³¨å†Œè¡¨è¯»fileversion
 CString CMainFrame::ReadFileVersionFromRegister(CRegKey& reg)
 {
     WCHAR szBuf[64] = {0};
@@ -10279,7 +10279,7 @@ CString CMainFrame::ReadFileVersionFromRegister(CRegKey& reg)
             m_strFileVersion = CString(szBuf);
         }
     }
-    else // Ã»ÓĞÕâ¸ö±íÏî
+    else // æ²¡æœ‰è¿™ä¸ªè¡¨é¡¹
     {
         ASSERT(0);
     }
@@ -10295,12 +10295,12 @@ CString CMainFrame::GetCurrentFileVersion()
     WCHAR cPath[200];
     DWORD dwHandle,InfoSize;
     CString strVersion;
-    ::GetModuleFileName(NULL,cPath,sizeof(cPath)); //Ê×ÏÈ»ñµÃ°æ±¾ĞÅÏ¢×ÊÔ´µÄ³¤¶È+
+    ::GetModuleFileName(NULL,cPath,sizeof(cPath)); //é¦–å…ˆè·å¾—ç‰ˆæœ¬ä¿¡æ¯èµ„æºçš„é•¿åº¦+
 
-    InfoSize = GetFileVersionInfoSize(cPath,&dwHandle); //½«°æ±¾ĞÅÏ¢×ÊÔ´¶ÁÈë»º³åÇø
+    InfoSize = GetFileVersionInfoSize(cPath,&dwHandle); //å°†ç‰ˆæœ¬ä¿¡æ¯èµ„æºè¯»å…¥ç¼“å†²åŒº
     if(InfoSize==0) return _T("None Version Supprot");
     char *InfoBuf = new char[InfoSize];
-    GetFileVersionInfo(cPath,0,InfoSize,InfoBuf); //»ñµÃÉú³ÉÎÄ¼şÊ¹ÓÃµÄ´úÂëÒ³¼°ÎÄ¼ş°æ±¾
+    GetFileVersionInfo(cPath,0,InfoSize,InfoBuf); //è·å¾—ç”Ÿæˆæ–‡ä»¶ä½¿ç”¨çš„ä»£ç é¡µåŠæ–‡ä»¶ç‰ˆæœ¬
     unsigned int  cbTranslate = 0;
     struct LANGANDCODEPAGE
     {
@@ -10401,12 +10401,12 @@ void CMainFrame::ReadExcel()
 // 	}
     books.AttachDispatch(app.GetWorkbooks());
     book.AttachDispatch(books.Add(_variant_t(strPath)));
-    //¦Ì?¦Ì?Worksheets
+    //Î¼?Î¼?Worksheets
     sheets.AttachDispatch(book.GetWorksheets());
     sheet.AttachDispatch(sheets.GetItem(_variant_t("Sheet1")));
-    //¦Ì?¦Ì?¨¨?2?Cells
+    //Î¼?Î¼?Ã¨?2?Cells
     range.AttachDispatch(sheet.GetCells());
-//	CString sText[]={_T("±àºÅ"),_T("ĞÕÃû"),_T("ËùÊô²¿ÃÅ")};//±êÌâ
+//	CString sText[]={_T("ç¼–å·"),_T("å§“å"),_T("æ‰€å±éƒ¨é—¨")};//æ ‡é¢˜
 //	int temp = m_Grid.GetItemCount()+1;
 
 // 	for (int setnum=0;setnum<m_Grid.GetItemCount()+1;setnum++)
@@ -10415,12 +10415,12 @@ void CMainFrame::ReadExcel()
 // 		{
 // 			if (!setnum)
 // 			{
-// 				range.SetItem(_variant_t((long)(setnum+1)),_variant_t((long)(num+1)),//ÔÚÕâÀïĞ´Èë±êÌâ
+// 				range.SetItem(_variant_t((long)(setnum+1)),_variant_t((long)(num+1)),//åœ¨è¿™é‡Œå†™å…¥æ ‡é¢˜
 // 					_variant_t(sText[num]));
 // 			}
 // 			else
 // 			{
-// 				range.SetItem(_variant_t((long)(setnum+1)),_variant_t((long)(num+1)),//ÔÚÕâÀïĞ´ÈëÊı¾İ
+// 				range.SetItem(_variant_t((long)(setnum+1)),_variant_t((long)(num+1)),//åœ¨è¿™é‡Œå†™å…¥æ•°æ®
 // 					_variant_t(m_Grid.GetItemText(setnum-1,num)));
 // 			}
 // 		}
@@ -10459,7 +10459,7 @@ DWORD WINAPI   CMainFrame::Get_All_Dlg_Message(LPVOID lpVoid)
                 MyCriticalSection.Unlock();
 
                 My_Write_Struct= (_MessageWriteOneInfo *)msg.wParam;
-                product_register_value[My_Write_Struct->address] = My_Write_Struct->new_value;//ÏÈ±ä¹ıÀ´£¬ÃâµÃºóÌ¨¸üĞÂµÄÊ±ºò ÂÒ±ä¡£
+                product_register_value[My_Write_Struct->address] = My_Write_Struct->new_value;//å…ˆå˜è¿‡æ¥ï¼Œå…å¾—åå°æ›´æ–°çš„æ—¶å€™ ä¹±å˜ã€‚
                 break;
             case MY_WRITE_ONE_LIST:
                 MyCriticalSection.Lock();
@@ -10470,7 +10470,7 @@ DWORD WINAPI   CMainFrame::Get_All_Dlg_Message(LPVOID lpVoid)
                 My_Receive_msg.push_back(msg);
                 MyCriticalSection.Unlock();
 // 				My_Write_Struct= (_MessageWriteOneInfo_List *)msg.wParam;
-// 				product_register_value[My_Write_Struct->address] = My_Write_Struct->new_value;//ÏÈ±ä¹ıÀ´£¬ÃâµÃºóÌ¨¸üĞÂµÄÊ±ºò ÂÒ±ä¡£
+// 				product_register_value[My_Write_Struct->address] = My_Write_Struct->new_value;//å…ˆå˜è¿‡æ¥ï¼Œå…å¾—åå°æ›´æ–°çš„æ—¶å€™ ä¹±å˜ã€‚
                 break;
             case  MY_READ_ONE:
                 MyCriticalSection.Lock();
@@ -10612,7 +10612,7 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                                 //sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),My_Write_Struct->mRow,m_sn);
                                 //ado.m_pRecordset=ado.OpenRecordset(sql);
 
-                                //if (!ado.m_pRecordset->EndOfFile)//ÓĞ±íµ«ÊÇÃ»ÓĞ¶ÔÓ¦ĞòÁĞºÅµÄÖµ
+                                //if (!ado.m_pRecordset->EndOfFile)//æœ‰è¡¨ä½†æ˜¯æ²¡æœ‰å¯¹åº”åºåˆ—å·çš„å€¼
                                 //{
                                 //	sql.Format(_T("update Value_Range set CRange = %d where CInputNo=%d and SN=%d "),My_Write_Struct->db_value,My_Write_Struct->mRow,m_sn);
                                 //	ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
@@ -10742,7 +10742,7 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                 My_Invoke_Struct = (_MessageInvokeIDInfo *)msg.wParam;
                 My_Receive_msg.erase(My_Receive_msg.begin());
                 MyCriticalSection.Unlock();
-                for (int i=0; i<2000; i++) //10ÃëÖÓÅĞ¶ÏÈÎÎñÊÇ·ñ³¬Ê±.
+                for (int i=0; i<2000; i++) //10ç§’é’Ÿåˆ¤æ–­ä»»åŠ¡æ˜¯å¦è¶…æ—¶.
                 {
                     if(tsm_invoke_id_free(My_Invoke_Struct->Invoke_ID))
                     {
@@ -10777,7 +10777,7 @@ loop1:
 					{
 					case WRITEANALOG_CUS_TABLE_T3000:
 					{
-						memcpy(write_buffer, &m_analog_custmer_range.at(My_WriteList_Struct->start_instance), sizeof(Str_table_point));//ÒòÎªOutput Ö»ÓĞ45¸ö×Ö½Ú£¬Á½¸öbyte·Åµ½1¸ö modbusµÄ¼Ä´æÆ÷ÀïÃæ;
+						memcpy(write_buffer, &m_analog_custmer_range.at(My_WriteList_Struct->start_instance), sizeof(Str_table_point));//å› ä¸ºOutput åªæœ‰45ä¸ªå­—èŠ‚ï¼Œä¸¤ä¸ªbyteæ”¾åˆ°1ä¸ª modbusçš„å¯„å­˜å™¨é‡Œé¢;
 						for (int j = 0;j < 200;j++)
 						{
 							write_buffer[j] = htons(write_buffer[j]);
@@ -10802,7 +10802,7 @@ loop1:
 					break;
 					case WRITEOUTPUT_T3000:
 						{
-							memcpy( write_buffer,&m_Output_data.at(My_WriteList_Struct->start_instance),sizeof(Str_out_point));//ÒòÎªOutput Ö»ÓĞ45¸ö×Ö½Ú£¬Á½¸öbyte·Åµ½1¸ö modbusµÄ¼Ä´æÆ÷ÀïÃæ;
+							memcpy( write_buffer,&m_Output_data.at(My_WriteList_Struct->start_instance),sizeof(Str_out_point));//å› ä¸ºOutput åªæœ‰45ä¸ªå­—èŠ‚ï¼Œä¸¤ä¸ªbyteæ”¾åˆ°1ä¸ª modbusçš„å¯„å­˜å™¨é‡Œé¢;
 							for (int j=0;j<200;j++)
 							{
 								write_buffer[j] = htons(write_buffer[j]);
@@ -10827,7 +10827,7 @@ loop1:
 						break;
 					case WRITEINPUT_T3000:
 						{
-							memcpy( write_buffer,&m_Input_data.at(My_WriteList_Struct->start_instance),sizeof(Str_in_point));//ÒòÎªINÖ»ÓĞ46¸ö×Ö½Ú£¬Á½¸öbyte·Åµ½1¸ö modbusµÄ¼Ä´æÆ÷ÀïÃæ;
+							memcpy( write_buffer,&m_Input_data.at(My_WriteList_Struct->start_instance),sizeof(Str_in_point));//å› ä¸ºINåªæœ‰46ä¸ªå­—èŠ‚ï¼Œä¸¤ä¸ªbyteæ”¾åˆ°1ä¸ª modbusçš„å¯„å­˜å™¨é‡Œé¢;
 							for (int j=0;j<200;j++)
 							{
 								write_buffer[j] = htons(write_buffer[j]);
@@ -10854,7 +10854,7 @@ loop1:
 						break;
 					case WRITEPID_T3000:
 						{
-							memcpy( write_buffer,&m_controller_data.at(My_WriteList_Struct->start_instance),sizeof(Str_controller_point));//ÒòÎªINÖ»ÓĞ46¸ö×Ö½Ú£¬Á½¸öbyte·Åµ½1¸ö modbusµÄ¼Ä´æÆ÷ÀïÃæ;
+							memcpy( write_buffer,&m_controller_data.at(My_WriteList_Struct->start_instance),sizeof(Str_controller_point));//å› ä¸ºINåªæœ‰46ä¸ªå­—èŠ‚ï¼Œä¸¤ä¸ªbyteæ”¾åˆ°1ä¸ª modbusçš„å¯„å­˜å™¨é‡Œé¢;
 							for (int j=0;j<200;j++)
 							{
 								write_buffer[j] = htons(write_buffer[j]);
@@ -10903,7 +10903,7 @@ loop1:
                     if(My_WriteList_Struct->end_instance<=(My_WriteList_Struct->start_instance+4))
                     {
                         temp_end_value  =  My_WriteList_Struct->end_instance;
-                        //continue;//Èç¹û´óÓÚÕâ¸ö·¶Î§£¬¾Ícontinue;
+                        //continue;//å¦‚æœå¤§äºè¿™ä¸ªèŒƒå›´ï¼Œå°±continue;
                     }
                     else
                         temp_end_value = My_WriteList_Struct->start_instance + 4;
@@ -10935,7 +10935,7 @@ loop1:
                 }
                 while (temp_end_value<My_WriteList_Struct->end_instance);
 
-                //if(My_WriteList_Struct)		//É¾³ı new µÄ¶«Î÷;
+                //if(My_WriteList_Struct)		//åˆ é™¤ new çš„ä¸œè¥¿;
                 //	delete My_WriteList_Struct;
 
 
@@ -11142,7 +11142,7 @@ void CMainFrame::OnToolIsptoolforone()
 
     //	isp_product_id = m_product.at(selected_product_index).product_class_id;
     //	if (!((product_Node.BuildingInfo.strIp.CompareNoCase(_T("9600")) ==0)||(product_Node.BuildingInfo.strIp.CompareNoCase(_T("19200"))==0) ||(product_Node.BuildingInfo.strIp.CompareNoCase(_T(""))) == 0))
-    SetCommunicationType(0);//¹Ø±Õ´®¿Ú£¬¹©ISP Ê¹ÓÃ;
+    SetCommunicationType(0);//å…³é—­ä¸²å£ï¼Œä¾›ISP ä½¿ç”¨;
     close_com();
 
     CString ApplicationFolder;
@@ -11172,7 +11172,7 @@ void CMainFrame::OnToolIsptoolforone()
     }
     SetCommunicationType(temp_type);
 
-    //Fance Add. ÔÚISP ÓÃÍê1234 4321 µÄ¶Ë¿ÚÖ®ºó£¬T3000 ÔÚÖØĞÂ´ò¿ªÊ¹ÓÃ£¬Ë¢ĞÂlistview µÄÍøÂçÉè±¸ÒªÊ¹ÓÃ;
+    //Fance Add. åœ¨ISP ç”¨å®Œ1234 4321 çš„ç«¯å£ä¹‹åï¼ŒT3000 åœ¨é‡æ–°æ‰“å¼€ä½¿ç”¨ï¼Œåˆ·æ–°listview çš„ç½‘ç»œè®¾å¤‡è¦ä½¿ç”¨;
     h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
     BOOL bBroadcast=TRUE;
     ::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
@@ -11410,9 +11410,9 @@ void CMainFrame::OnControlInputs()
 		else if((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP))
 		{
 			hide_485_progress = false;
-			::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, bacnet_device_type, BAC_IN);//µÚ¶ş¸ö²ÎÊı In
+			::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, bacnet_device_type, BAC_IN);//ç¬¬äºŒä¸ªå‚æ•° In
 
-			//::SendMessage(BacNet_hwd, WM_RS485_MESSAGE, bacnet_device_type, READANALOG_CUS_TABLE_T3000);//µÚ¶ş¸ö²ÎÊı READANALOG_CUS_TABLE_T3000
+			//::SendMessage(BacNet_hwd, WM_RS485_MESSAGE, bacnet_device_type, READANALOG_CUS_TABLE_T3000);//ç¬¬äºŒä¸ªå‚æ•° READANALOG_CUS_TABLE_T3000
 			::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
 
 		}
@@ -11445,7 +11445,7 @@ void CMainFrame::OnControlInputs()
         }
         else
         {
-           MessageBox(_T("This device doesn¡¯t have a input menu item"));
+           MessageBox(_T("This device doesnâ€™t have a input menu item"));
         }
 
     }
@@ -11512,7 +11512,7 @@ void CMainFrame::OnControlPrograms()
     }
     else
     {
-       MessageBox(_T("This device doesn¡¯t have a programs menu item"));
+       MessageBox(_T("This device doesnâ€™t have a programs menu item"));
     }
 }
 
@@ -11521,7 +11521,7 @@ void CMainFrame::OnControlOutputs()
 {
     
 
-	// new_device_support_mini_ui  Ö÷ÒªÊÇÎªÁËÖ§³Ö ¾É°æ±¾µÄT3½øÈëÒÔÇ°µÄ½çÃæ;
+	// new_device_support_mini_ui  ä¸»è¦æ˜¯ä¸ºäº†æ”¯æŒ æ—§ç‰ˆæœ¬çš„T3è¿›å…¥ä»¥å‰çš„ç•Œé¢;
     if((g_protocol == PROTOCOL_BACNET_IP) || 
 		(g_protocol == MODBUS_BACNET_MSTP) || 
 		(g_protocol == PROTOCOL_BIP_TO_MSTP) || 
@@ -11613,7 +11613,7 @@ void CMainFrame::OnControlOutputs()
 		else if((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP))
 		{
 			::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
-			::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type,BAC_OUT);//µÚ¶ş¸ö²ÎÊı OUT
+			::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type,BAC_OUT);//ç¬¬äºŒä¸ªå‚æ•° OUT
 		}
         else
         {
@@ -11639,7 +11639,7 @@ void CMainFrame::OnControlOutputs()
         }
         else
         {
-			MessageBox(_T("This device doesn¡¯t have a output menu item"));
+			MessageBox(_T("This device doesnâ€™t have a output menu item"));
         }
         //MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
     }
@@ -11704,7 +11704,7 @@ void CMainFrame::OnControlVariables()
     }
     else
     {
-       MessageBox(_T("This device doesn¡¯t have a variable menu item"));
+       MessageBox(_T("This device doesnâ€™t have a variable menu item"));
     }
 }
 
@@ -11878,7 +11878,7 @@ void CMainFrame::OnControlAnnualroutines()
         }
 		 
         else
-			MessageBox(_T("This device doesn¡¯t have a holidays menu item"));
+			MessageBox(_T("This device doesnâ€™t have a holidays menu item"));
     }
 }
 #include "ParameterDlg.h"
@@ -11934,7 +11934,7 @@ void CMainFrame::OnControlSettings()
         }
 		else if(g_protocol == MODBUS_RS485)
 		{
-			::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,0,READ_SETTING_COMMAND);//µÚ¶ş¸ö²ÎÊı In
+			::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,0,READ_SETTING_COMMAND);//ç¬¬äºŒä¸ªå‚æ•° In
 		}
         else
         {
@@ -11963,7 +11963,7 @@ void CMainFrame::OnControlSettings()
             dlg.DoModal();
         }
         else
-           MessageBox(_T("This device doesn¡¯t have a configuration menu item"));
+           MessageBox(_T("This device doesnâ€™t have a configuration menu item"));
     }
 }
 
@@ -11980,7 +11980,7 @@ void CMainFrame::OnMiscellaneousLoaddescriptors()
     }
     else
     {
-		 MessageBox(_T("This device doesn¡¯t have a menu item"));
+		 MessageBox(_T("This device doesnâ€™t have a menu item"));
     }
 }
 
@@ -11999,7 +11999,7 @@ void CMainFrame::OnMiscellaneousUpdatemini()
     }
     else
     {
-        MessageBox(_T("This device doesn¡¯t have a  menu item"));
+        MessageBox(_T("This device doesnâ€™t have a  menu item"));
     }
 }
 
@@ -12085,7 +12085,7 @@ void CMainFrame::OnControlControllers()
 		{
 			hide_485_progress = false;
 			::PostMessage(m_controller_dlg_hwnd,WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
-			::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type,BAC_PID);//µÚ¶ş¸ö²ÎÊı In
+			::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type,BAC_PID);//ç¬¬äºŒä¸ªå‚æ•° In
 		}
         else
         {
@@ -12097,7 +12097,7 @@ void CMainFrame::OnControlControllers()
     }
     else
     {
-       MessageBox(_T("This device doesn¡¯t have a pid menu item"));
+       MessageBox(_T("This device doesnâ€™t have a pid menu item"));
     }
 }
 
@@ -12268,7 +12268,7 @@ void CMainFrame::OnControlMonitors()
     }
     else
     {
-        MessageBox(_T("This device doesn¡¯t have a trendlog menu item"));
+        MessageBox(_T("This device doesnâ€™t have a trendlog menu item"));
     }
 
     //CBacnetMonitor Dlg;
@@ -12380,7 +12380,7 @@ void CMainFrame::OnControlAlarmLog()
     }
     else
     {
-       MessageBox(_T("This device doesn¡¯t have a alarms menu item"));
+       MessageBox(_T("This device doesnâ€™t have a alarms menu item"));
     }
 }
 
@@ -12403,7 +12403,7 @@ void CMainFrame::OnControlCustomerunits()
     }
     else
     {
-       MessageBox(_T("This device doesn¡¯t have a custom units menu item"));
+       MessageBox(_T("This device doesnâ€™t have a custom units menu item"));
     }
 #endif
 }
@@ -12447,7 +12447,7 @@ void CMainFrame::OnHelpUpdatefirmware()
 #if 0
     MessageBox(_T("This function is still under develepment!"),_T("Notice"),MB_OK | MB_ICONINFORMATION);
     return;
-    if(m_product.at(selected_product_index).status == false)//ËµÃ÷²»ÔÚÏß;
+    if(m_product.at(selected_product_index).status == false)//è¯´æ˜ä¸åœ¨çº¿;
     {
         if(IDNO == MessageBox(_T("The device you selected is not on line or the communication is bad, are you sure you want to update!"),_T("Notice"),MB_YESNO | MB_ICONINFORMATION))
             return;
@@ -12472,7 +12472,7 @@ void CMainFrame::OnHelpUpdatefirmware()
 
 //	isp_product_id = m_product.at(selected_product_index).product_class_id;
 //	if (!((product_Node.BuildingInfo.strIp.CompareNoCase(_T("9600")) ==0)||(product_Node.BuildingInfo.strIp.CompareNoCase(_T("19200"))==0) ||(product_Node.BuildingInfo.strIp.CompareNoCase(_T(""))) == 0))
-    SetCommunicationType(0);//¹Ø±Õ´®¿Ú£¬¹©ISP Ê¹ÓÃ;
+    SetCommunicationType(0);//å…³é—­ä¸²å£ï¼Œä¾›ISP ä½¿ç”¨;
     close_com();
     Dowmloadfile Dlg;
     Dlg.DoModal();
@@ -12488,7 +12488,7 @@ void CMainFrame::OnHelpUpdatefirmware()
     }
     SetCommunicationType(temp_type);
 
-    //Fance Add. ÔÚISP ÓÃÍê1234 4321 µÄ¶Ë¿ÚÖ®ºó£¬T3000 ÔÚÖØĞÂ´ò¿ªÊ¹ÓÃ£¬Ë¢ĞÂlistview µÄÍøÂçÉè±¸ÒªÊ¹ÓÃ;
+    //Fance Add. åœ¨ISP ç”¨å®Œ1234 4321 çš„ç«¯å£ä¹‹åï¼ŒT3000 åœ¨é‡æ–°æ‰“å¼€ä½¿ç”¨ï¼Œåˆ·æ–°listview çš„ç½‘ç»œè®¾å¤‡è¦ä½¿ç”¨;
     h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
     BOOL bBroadcast=TRUE;
     ::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
@@ -12565,7 +12565,7 @@ void CMainFrame::OnControlRemotePoint()
 				Remote_Point_Window->Reset_RemotePoint_Rect();
                 pDialog[WINDOW_REMOTE_POINT]->ShowWindow(SW_SHOW);
             }
-            ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(12);	//µÚ12¸ö²åÈëµÄÊÇÔ¶¶ËµÄµã;
+            ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(12);	//ç¬¬12ä¸ªæ’å…¥çš„æ˜¯è¿œç«¯çš„ç‚¹;
             Remote_Point_Window->m_remote_point_list.SetFocus();
             bacnet_view_number = TYPE_READ_REMOTE_POINT_INFO;
             //Tstat_Window->m_tstat_list.SetFocus();
@@ -12592,7 +12592,7 @@ void CMainFrame::OnControlRemotePoint()
     }
     else
     {
-		MessageBox(_T("This device doesn¡¯t have a menu item"));
+		MessageBox(_T("This device doesnâ€™t have a menu item"));
     }
 
 
@@ -12626,7 +12626,7 @@ void CMainFrame::OnUpdateConnect2(CCmdUI *pCmdUI)
 }
 
 
-//½¨Á¢TCP ·şÎñÆ÷, GSM »áÁ¬½ÓÉÏÀ´;
+//å»ºç«‹TCP æœåŠ¡å™¨, GSM ä¼šè¿æ¥ä¸Šæ¥;
 void CMainFrame::OnMiscellaneousGsmconnection()
 {
     
@@ -12709,7 +12709,7 @@ void CMainFrame::BuildingComportConfig()
                         SetLastOpenedComport(m_building_com_port);
                         open_com(m_building_com_port);
                     }
-                    else	//Èç¹ûÔÚÃ¶¾ÙµÄ ´®¿ÚÀïÃæÃ»ÓĞÕÒµ½¾ÍÄ¬ÈÏµÚÒ»¸ö;»¹Òª¸ÄÊı¾İ¿â;
+                    else	//å¦‚æœåœ¨æšä¸¾çš„ ä¸²å£é‡Œé¢æ²¡æœ‰æ‰¾åˆ°å°±é»˜è®¤ç¬¬ä¸€ä¸ª;è¿˜è¦æ”¹æ•°æ®åº“;
                     {
                         CString temp_port;
                         temp_port = m_vector_comport.at(0);
@@ -12834,7 +12834,7 @@ CString CMainFrame::GetFWVersionFromFTP(CString ProductName)
     char sRecived[1024];
     if(pHttpFile)
     {
-        while(pHttpFile->ReadString((LPTSTR)sRecived, 1024)) //½â¾öCstringÂÒÂë
+        while(pHttpFile->ReadString((LPTSTR)sRecived, 1024)) //è§£å†³Cstringä¹±ç 
         {
             CString temp(sRecived);
             /*	strHtml += temp;* /*/
@@ -12868,7 +12868,7 @@ LRESULT CMainFrame::OnThreadFinished(WPARAM wParam, LPARAM /*lParam*/)
         m_bSafeToClose=TRUE;
         return 0L;
     }
-    //ÏÂÔØÍê³ÉÖ®ºó£¬´ò¿ªÎÄ¼ş
+    //ä¸‹è½½å®Œæˆä¹‹åï¼Œæ‰“å¼€æ–‡ä»¶
     else
     {
         //EndDialog(IDOK);
@@ -13812,7 +13812,7 @@ void CMainFrame::Create_Thread_Read_Item(int n_item)
         WaitRead_Data_Dlg = 0;
     }
     WaitRead_Data_Dlg = new CDialog_Progess(this,1,100);
-    //´´½¨¶Ô»°¿ò´°¿Ú
+    //åˆ›å»ºå¯¹è¯æ¡†çª—å£
     WaitRead_Data_Dlg->Create(IDD_DIALOG10_Progress, this);
     WaitRead_Data_Dlg->ShowProgress(0,0);
     RECT RECT_SET1;
@@ -15021,22 +15021,22 @@ void CMainFrame::OnFileExportregiseterslist()
 /// </summary>
 void CMainFrame::OnToolRegistersmaintenancesystem()
 {
-    //Î¬»¤¼Ä´æÆ÷ÁĞ±í¹ÜÀíµÄ Ò»¸öÓ¦ÓÃ³ÌĞò
-    //ËüÄÜ¹»Î¬»¤ËùÒÔ²úÆ·µÄ¼Ä´æÆ÷
-    // ËüµÄËùÓĞµÄ¹¦ÄÜÁĞ±í
+    //ç»´æŠ¤å¯„å­˜å™¨åˆ—è¡¨ç®¡ç†çš„ ä¸€ä¸ªåº”ç”¨ç¨‹åº
+    //å®ƒèƒ½å¤Ÿç»´æŠ¤æ‰€ä»¥äº§å“çš„å¯„å­˜å™¨
+    // å®ƒçš„æ‰€æœ‰çš„åŠŸèƒ½åˆ—è¡¨
     /*
-    1>ÓÃ»§¹ÜÀí
-    2>ÃÜÂëĞŞ¸Ä
-    3>ÏîÄ¿¹ÜÀí
-    4>¼Ä´æÆ÷ĞÅÏ¢ĞŞ¸Ä
-    5>²úÆ·µÄÌí¼Ó
+    1>ç”¨æˆ·ç®¡ç†
+    2>å¯†ç ä¿®æ”¹
+    3>é¡¹ç›®ç®¡ç†
+    4>å¯„å­˜å™¨ä¿¡æ¯ä¿®æ”¹
+    5>äº§å“çš„æ·»åŠ 
     */
   /*  CString strHistotyFile=g_strExePth+_T("RegisterListManager.exe");
     ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);*/
 }
 
 /// <summary>
-/// ÏûÏ¢ÌáÊ¾ £¬¸ù¾İ²»Í¬µÄ¿Ø¼ş£¬ÌáÊ¾²»Ò»ÑùµÄĞÅÏ¢
+/// æ¶ˆæ¯æç¤º ï¼Œæ ¹æ®ä¸åŒçš„æ§ä»¶ï¼Œæç¤ºä¸ä¸€æ ·çš„ä¿¡æ¯
 /// </summary>
 /// <param name="id"></param>
 /// <param name="Pnmhdr"></param>
@@ -15137,7 +15137,7 @@ INT_PTR CMainFrame::OnToolHitTest(CPoint point, TOOLINFO* pTI) const
 
     CString adoStr;
     static CString strText;
-    INT_PTR hInt = CFrameWndEx::OnToolHitTest(point,pTI);//ÏÈµ÷ÓÃ»ùÀàº¯Êı,ÔÙĞŞ¸Ä´®.   ;
+    INT_PTR hInt = CFrameWndEx::OnToolHitTest(point,pTI);//å…ˆè°ƒç”¨åŸºç±»å‡½æ•°,å†ä¿®æ”¹ä¸².   ;
     strText = pTI->lpszText;
 
     //if(pTI->uId == ID_CONTROL_INPUTS )
@@ -15145,10 +15145,10 @@ INT_PTR CMainFrame::OnToolHitTest(CPoint point, TOOLINFO* pTI) const
     //	adoStr = _T("test111");
 
     //}
-    strText = adoStr + strText; //ÖØĞÂ×éºÏ³É: New(Ctrl+N)ĞÎÊ½.
+    strText = adoStr + strText; //é‡æ–°ç»„åˆæˆ: New(Ctrl+N)å½¢å¼.
 
-    //»ùÀàÖĞ»áÊÍ·ÅÕâ¸öÖ¸ÕëpTI->lpszText,µ«ÊÇÓÉÓÚÎÒÃÇÒªĞŞ¸ÄÕâ¸ö´®,
-    //ËùÒÔÔ­À´µÄ¿Õ¼ä²»Ò»¶¨¹»,ËùÒÔÒªÊÍ·ÅµôÔ­À´µÄ,²¢ÖØĞÂÉêÇë,
+    //åŸºç±»ä¸­ä¼šé‡Šæ”¾è¿™ä¸ªæŒ‡é’ˆpTI->lpszText,ä½†æ˜¯ç”±äºæˆ‘ä»¬è¦ä¿®æ”¹è¿™ä¸ªä¸²,
+    //æ‰€ä»¥åŸæ¥çš„ç©ºé—´ä¸ä¸€å®šå¤Ÿ,æ‰€ä»¥è¦é‡Šæ”¾æ‰åŸæ¥çš„,å¹¶é‡æ–°ç”³è¯·,
     int len = strText.GetLength()*sizeof(TCHAR);
     TCHAR *pBuf =(TCHAR*)malloc(len+10);
     memset(pBuf,0,len+10);
@@ -15456,7 +15456,7 @@ void CMainFrame::OnHelpUsingUpdate()
 #if 0
 	MessageBox(_T("This function is still under develepment!"),_T("Notice"),MB_OK | MB_ICONINFORMATION);
 	return;
-	if(m_product.at(selected_product_index).status == false)//ËµÃ÷²»ÔÚÏß;
+	if(m_product.at(selected_product_index).status == false)//è¯´æ˜ä¸åœ¨çº¿;
 	{
 		if(IDNO == MessageBox(_T("The device you selected is not on line or the communication is bad, are you sure you want to update!"),_T("Notice"),MB_YESNO | MB_ICONINFORMATION))
 			return;
@@ -15508,7 +15508,7 @@ void CMainFrame::OnHelpUsingUpdate()
 
 	//	isp_product_id = m_product.at(selected_product_index).product_class_id;
 	//	if (!((product_Node.BuildingInfo.strIp.CompareNoCase(_T("9600")) ==0)||(product_Node.BuildingInfo.strIp.CompareNoCase(_T("19200"))==0) ||(product_Node.BuildingInfo.strIp.CompareNoCase(_T(""))) == 0))
-	SetCommunicationType(0);//¹Ø±Õ´®¿Ú£¬¹©ISP Ê¹ÓÃ;
+	SetCommunicationType(0);//å…³é—­ä¸²å£ï¼Œä¾›ISP ä½¿ç”¨;
 	close_com();
 	Dowmloadfile Dlg;
 	Dlg.DoModal();
@@ -15524,7 +15524,7 @@ void CMainFrame::OnHelpUsingUpdate()
 	}
 	SetCommunicationType(temp_type);
 
-	//Fance Add. ÔÚISP ÓÃÍê1234 4321 µÄ¶Ë¿ÚÖ®ºó£¬T3000 ÔÚÖØĞÂ´ò¿ªÊ¹ÓÃ£¬Ë¢ĞÂlistview µÄÍøÂçÉè±¸ÒªÊ¹ÓÃ;
+	//Fance Add. åœ¨ISP ç”¨å®Œ1234 4321 çš„ç«¯å£ä¹‹åï¼ŒT3000 åœ¨é‡æ–°æ‰“å¼€ä½¿ç”¨ï¼Œåˆ·æ–°listview çš„ç½‘ç»œè®¾å¤‡è¦ä½¿ç”¨;
 	h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
 	BOOL bBroadcast=TRUE;
 	::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
@@ -15709,7 +15709,7 @@ void CMainFrame::OnUpdateModeOfflinemode(CCmdUI *pCmdUI)
 
 void CMainFrame::OnToolsPhchart()
 {
-	CString strHistotyFile = g_strExePth + _T("PH_Application\PH_App_By_BBK.exe");
+	CString strHistotyFile = g_strExePth + _T("PH_Application\\PH_App_By_BBK.exe");
 	ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);
 }
 
