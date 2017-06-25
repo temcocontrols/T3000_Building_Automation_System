@@ -4621,7 +4621,10 @@ void CT3000View::InitFlexSliderBars_tstat6()
     }
 
 
-     
+	int i_Temperature_Max = 2 + (short)product_register_value[MODBUS_TEMPRATURE_CHIP] / 10;
+	int i_Temperature_min = (short)product_register_value[MODBUS_TEMPRATURE_CHIP] / 10 - 2;
+	if (DayMax < i_Temperature_Max) DayMax = i_Temperature_Max;
+	if (DayMin > i_Temperature_min) DayMin = i_Temperature_min;
 
 	m_daySlider.put_CurrentValue(((float)((short)product_register_value[MODBUS_TEMPRATURE_CHIP])) / 10.0);
 	m_nightSlider.put_CurrentValue(((float)((short)product_register_value[MODBUS_TEMPRATURE_CHIP])) / 10.0);
@@ -5440,6 +5443,10 @@ void CT3000View::Initial_Max_Min()
         DayMax = GetRoundMM(TRUE,dCoolSP,nCoolSP,1.1);
         DayMin = GetRoundMM(FALSE,dHeatSP,nHeatSP,0.9);
 
+		int i_Temperature_Max = 2 + (short)product_register_value[MODBUS_TEMPRATURE_CHIP] / 10;
+		int i_Temperature_min = (short)product_register_value[MODBUS_TEMPRATURE_CHIP] / 10 - 2;
+		if (DayMax < i_Temperature_Max) DayMax = i_Temperature_Max;
+		if (DayMin > i_Temperature_min) DayMin = i_Temperature_min;
 
     }
 

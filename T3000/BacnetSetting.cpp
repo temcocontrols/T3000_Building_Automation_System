@@ -18,6 +18,8 @@ extern bool cancle_send ;
 bool show_user_list_window = false;
 
 #define TIMER_SYNC_TIMER    1
+#define TIMER_REFRESH_READ    2
+#define TIMER_REFRESH_READ_DELAY    15000
 
 IMPLEMENT_DYNAMIC(CBacnetSetting, CDialogEx)
 
@@ -419,7 +421,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 	 n_tempBias = (n_tempBias/60)*100;
 
 	 //判断 minipanel 的时区 与本地电脑时区是否一致，不一致自动更改;
-	 if(Device_Basic_Setting.reg.time_zone != n_tempBias)
+	 /*if(Device_Basic_Setting.reg.time_zone != n_tempBias)
 	 {
 		 Device_Basic_Setting.reg.time_zone = n_tempBias;
 		 if(Write_Private_Data_Blocking(WRITE_SETTING_COMMAND,0,0) > 0)
@@ -428,7 +430,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 			 temp_task_info.Format(_T("SYNC Time zone OK!"));
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_task_info);
 		 }
-	 }
+	 }*/
 
 	switch(command_type)
 	{
@@ -702,7 +704,9 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 						temp_cs1.GetBuffer(MAX_PATH), MAX_PATH );
 					temp_cs1.ReleaseBuffer();
 				
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(temp_cs1);
+					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->AddString(temp_cs1);
+					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetCurSel(3);
+					//((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(temp_cs1);
 				}
 				//else if(Device_Basic_Setting.reg.en_sntp == 6)
 				//{
@@ -1060,6 +1064,25 @@ void CBacnetSetting::OnTimer(UINT_PTR nIDEvent)
 
 		}
 		break;
+	case TIMER_REFRESH_READ:
+	{
+		KillTimer(TIMER_REFRESH_READ);
+		if (this->IsWindowVisible())
+		{
+
+			if (g_protocol == MODBUS_RS485)
+			{
+				::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, 0, READ_SETTING_COMMAND);//第二个参数 In
+			}
+			else
+			{
+				if (bac_select_device_online)
+					::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, TYPE_SETTING);
+			}
+		}
+
+	}
+	break;
 	default:
 		break;
 	}
@@ -1091,6 +1114,8 @@ LRESULT  CBacnetSetting::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 
 	}
+	KillTimer(TIMER_REFRESH_READ);
+	SetTimer(TIMER_REFRESH_READ, TIMER_REFRESH_READ_DELAY, NULL);
 
 	if(pInvoke)
 		delete pInvoke;
