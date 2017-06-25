@@ -162,14 +162,14 @@ void CReadWriteDefinitionDlg::OnBnClickedRadio20()
 
 void CReadWriteDefinitionDlg::OnBnClickedRadio50()
 {
-	// TODO: Add your control notification handler code here
+	
 	m_rows=2;
 }
 
 
 void CReadWriteDefinitionDlg::OnBnClickedRadio100()
 {
-	// TODO: Add your control notification handler code here
+	
 	m_rows=3;
 }
 
@@ -184,7 +184,7 @@ void CReadWriteDefinitionDlg::OnBnClickedRadiofit()
 void CReadWriteDefinitionDlg::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-	// TODO: Add your message handler code here
+	
 	// Do not call CDialogEx::OnPaint() for painting messages
 	m_editor_slave_id.SetSel(0,-1);
 	m_editor_slave_id.SetFocus();

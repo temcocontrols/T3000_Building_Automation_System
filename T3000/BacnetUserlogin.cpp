@@ -5,8 +5,8 @@
 #include "T3000.h"
 #include "BacnetUserlogin.h"
 #include "afxdialogex.h"
-#include "globle_function.h"
-#include "gloab_define.h"
+#include "global_function.h"
+#include "global_define.h"
 // CBacnetUserlogin dialog
 CRect userlogin_rect;	//用来存储 窗体应该有多大;
 CString bmp_login_path;
@@ -47,7 +47,7 @@ BOOL CBacnetUserlogin::OnInitDialog()
 
 	m_user_name.Empty();
 	m_user_password.Empty();
-	// TODO:  Add extra initialization here
+	
 	m_cxScreen=GetSystemMetrics(SM_CXSCREEN);
 	m_cyScreen=GetSystemMetrics(SM_CYSCREEN);
 	m_user_login_hwnd = this->m_hWnd;
@@ -90,7 +90,7 @@ LRESULT  CBacnetUserlogin::RedrawLoginWindow(WPARAM wParam, LPARAM lParam)
 
 BOOL CBacnetUserlogin::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message == WM_KEYDOWN)
 	{
 		if(pMsg->wParam==VK_RETURN)
@@ -124,7 +124,7 @@ BOOL CBacnetUserlogin::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetUserlogin::OnBnClickedButtonLogin()
 {
-	// TODO: Add your control notification handler code here
+	
 	bool any_user_valid = false;
 	//检测是否里面存在有效的账号密码;
 	for (int i=0;i<(int)m_user_login_data.size();i++)
@@ -253,7 +253,7 @@ int CBacnetUserlogin::CheckLoginData()
 void CBacnetUserlogin::OnCancel()
 {
 
-	// TODO: Add your specialized code here and/or call the base class
+	
 	//CDialogEx::OnCancel();
 }
 
@@ -261,38 +261,25 @@ void CBacnetUserlogin::OnCancel()
 void CBacnetUserlogin::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-	// TODO: Add your message handler code here
+	
 	// Do not call CDialogEx::OnPaint() for painting messages
 
 	CRect test_rect;
 	::GetWindowRect(BacNet_hwd,&test_rect);	//获取 view的窗体大小;
 
 
-	// TODO: Add your message handler code here
+	
 	// Do not call CDialogEx::OnPaint() for painting messages
 
 	CMemDC memDC(dc,this);
 	CRect rcClient;
 	GetClientRect(&rcClient);
-	//memDC.GetDC().FillSolidRect(&rcClient,::GetSysColor (COLOR_3DLIGHT));
-	//	if(g_strImagePathName.IsEmpty())
 
-
-		//	CMemDC memDC(dc,this);
 		memDC.GetDC().FillSolidRect(&rcClient,RGB(202,208,216));
 		Graphics graphics(memDC.GetDC());
-		//CString testpath;
-		//testpath = _T("d:\\Login.bmp");
-		//CBitmap bitmap;//(testpath);
-		//bitmap.LoadBitmap(IDB_BITMAP_LOGIN);
-		//CBitmap bitmap;
-		// load bitmap
-		//bitmap.LoadBitmap(IDB_BITMAP_LOGIN);
+
 
 		Bitmap bitmap(hBitmap_login,NULL);
-		//Bitmap bitmap1(bitmap);
-		//graphics.DrawImage(&bitmap,XStart,YStart,bitmap.GetWidth(),bitmap.GetHeight());
-		//graphics.DrawImage(&bitmap,XStart,YStart,m_cxScreen,m_cyScreen);
 		graphics.DrawImage(&bitmap,0 ,0,test_rect.Width(),test_rect.Height());
 
 }

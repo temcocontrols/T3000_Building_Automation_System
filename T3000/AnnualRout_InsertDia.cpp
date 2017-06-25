@@ -7,7 +7,7 @@
 #include "AnnualRout_InsertDia.h"
 #include "Annual_Routines.h"
 #include "schedule.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "Schedule_grid.h"
 #include "../MultipleMonthCal32/multiplemonthcal.h"
 
@@ -432,7 +432,7 @@ BOOL AnnualRout_InsertDia::OnInitDialog()
 
 
 
-			// TODO:  在此添加额外的初始化	
+				
 			CString str;
 			//	description2 temp_description;
 			//	Annual_Routines temp;
@@ -519,7 +519,7 @@ BOOL AnnualRout_InsertDia::OnInitDialog()
 
 
 
-			// TODO:  在此添加额外的初始化	
+				
 			CString str;
 			//	description2 temp_description;
 			//	Annual_Routines temp;
@@ -653,7 +653,7 @@ int AnnualRout_InsertDia::the_day_number(CString var1)
 void AnnualRout_InsertDia::OnBnClickedButton2()
 {
 
-	// TODO: 在此添加控件通知处理程序代码
+	
 	//delete
 
 	UpdateData(true);
@@ -689,7 +689,7 @@ void AnnualRout_InsertDia::OnDestroy()
 
 //void AnnualRout_InsertDia::OnBnClickedButton3()
 //{
-//	// TODO: 在此添加控件通知处理程序代码
+//	
 //	//clear button
 //	unsigned char ttt[ONE_YEAR_BETYS];
 //	for(int i=0;i<ONE_YEAR_BETYS;i++)
@@ -701,7 +701,7 @@ void AnnualRout_InsertDia::OnDestroy()
 
 void AnnualRout_InsertDia::OnRButtonDown(UINT nFlags, CPoint point)
 {
-	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	
 
 	CDialog::OnRButtonDown(nFlags, point);
 }
@@ -737,7 +737,7 @@ BOOL AnnualRout_InsertDia::PreTranslateMessage(MSG* pMsg)
 
 void AnnualRout_InsertDia::OnLbnSelchangeList1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	UpdateData(true);
 	m_addr=m_list_ctrl.GetCurSel()+1;
 	load();
@@ -745,7 +745,7 @@ void AnnualRout_InsertDia::OnLbnSelchangeList1()
 
 void AnnualRout_InsertDia::OnAnnualroutAdd()
 {
-	// TODO: 在此添加命令处理程序代码
+	
 	UpdateData(true);
 	
 	//CString str;
@@ -780,7 +780,7 @@ void AnnualRout_InsertDia::OnAnnualroutAdd()
 
 void AnnualRout_InsertDia::OnAnnualroutClear()
 {
-	// TODO: 在此添加命令处理程序代码
+	
 	if(IDOK==MessageBox(_T("Clear All?"),_T("CLEAR"),MB_OKCANCEL))
 	{
 		m_month_ctrl.UnselectAll();
@@ -798,13 +798,13 @@ void AnnualRout_InsertDia::OnAnnualroutClear()
 
 void AnnualRout_InsertDia::OnBnClickedOk()
 {
-	// TODO: Add your control notification handler code here
+	
 	OnOK();
 }
 
 LRESULT AnnualRout_InsertDia::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(message == WM_LBUTTONDBLCLK )
 	{
 
@@ -921,7 +921,7 @@ void AnnualRout_InsertDia::OnMcnSelectBacMonthcalendar(NMHDR *pNMHDR, LRESULT *p
 {
 	//Exchanged selection handler
 	LPNMSELCHANGEEX pSelChange = reinterpret_cast<LPNMSELCHANGEEX>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 	
 	//Get last selected item
 	LPSELECTION_ITEM current = pSelChange->selectionInfo.first;

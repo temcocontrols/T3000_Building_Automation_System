@@ -41,7 +41,7 @@ BOOL CRemotePtpLogin::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	CString temp_cs;
 	temp_cs.Format(_T("%u"),try_connect_serial);
 	GetDlgItem(IDC_EDIT_LOGIN_SERIAL_NUMBER)->SetWindowTextW(temp_cs);
@@ -53,7 +53,7 @@ BOOL CRemotePtpLogin::OnInitDialog()
 
 BOOL CRemotePtpLogin::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message == WM_KEYDOWN  )
 	{
 		if(pMsg->wParam == VK_RETURN)
@@ -89,7 +89,7 @@ BOOL CRemotePtpLogin::PreTranslateMessage(MSG* pMsg)
 
 void CRemotePtpLogin::OnBnClickedButtonLoginOk()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString temp_serial_number;
 	CString temp_user_name;
 	CString temp_password;
@@ -107,7 +107,7 @@ void CRemotePtpLogin::OnBnClickedButtonLoginOk()
 
 void CRemotePtpLogin::OnBnClickedButtonLoginCancel()
 {
-	// TODO: Add your control notification handler code here
+	
 	ptp_cancel_login = true;
 	PostMessage(WM_CLOSE,NULL,NULL);
 }

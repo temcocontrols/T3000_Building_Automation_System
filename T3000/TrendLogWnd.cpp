@@ -37,7 +37,7 @@ int CTrendLogWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 	GetClientRect(&m_rcClient);
 
-	// TODO:  Add your specialized creation code here
+	
 
 	return 0;
 }
@@ -47,6 +47,6 @@ void CTrendLogWnd::OnPaint()
 	CPaintDC dc(this); // device context for painting
 	GetClientRect(&m_rcClient);
 	dc.FillSolidRect(&m_rcClient,RGB(0,0,0));
-	// TODO: Add your message handler code here
+	
 	// Do not call CWnd::OnPaint() for painting messages
 }

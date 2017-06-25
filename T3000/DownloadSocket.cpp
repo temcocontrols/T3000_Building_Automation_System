@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "DownloadSocket.h"
-#include "gloab_define.h"
+#include "global_define.h"
 extern char receive_buffer[4000];
 extern unsigned short totalpackage;
 extern unsigned short current_package;
@@ -28,7 +28,7 @@ DownloadSocket::~DownloadSocket(void)
 
 void DownloadSocket::OnReceive(int nErrorCode)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	memset(receive_buffer,0,4000);
 	Receive_data_length=Receive(receive_buffer,4000);
 
@@ -58,31 +58,18 @@ void DownloadSocket::OnReceive(int nErrorCode)
 			{
 				break;
 			}
-			totalpackage = ((unsigned char)temp_point[1]<<8) | ((unsigned char)temp_point[0]);
+			totalpackage = ((unsigned char)temp_point[1] << 8) | ((unsigned char)temp_point[0]);
 			temp_point = temp_point + 2;
-			memcpy(download_filename,temp_point,40);
+			memcpy(download_filename, temp_point, 40);
 			temp_point = temp_point + 40;
-			download_fw_version =  ((unsigned char)temp_point[1]<<8) | ((unsigned char)temp_point[0]);
-			//if(strstr(download_filename,"T3000_EXE")!=NULL)
-			//{
-			//	unsigned int temp_version = 0;
-			//	temp_version= receive_buffer[48]*256 + receive_buffer[47];
-			//	if(temp_version > T3000_Version)
-			//		download_step = SHOW_FTP_PATH;
-			//	else
-			//	{
-			//		PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_T3000_NO_UPDATE,NULL);
-			//		download_step = THREAD_IDLE;
-			//		break;
-			//	}
-			//}
-			//else
-				download_step = SEND_GET_MD5_VALUE;
+			download_fw_version = ((unsigned char)temp_point[1] << 8) | ((unsigned char)temp_point[0]);
+
+			download_step = SEND_GET_MD5_VALUE;
 
 			malloc_download_memory_size = totalpackage  * TFTP_SEND_LENGTH;
-			receivefile_buffer =  new char[malloc_download_memory_size];
-			memset(receivefile_buffer,0,malloc_download_memory_size);
-			PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_FILE_INFO,NULL);
+			receivefile_buffer = new char[malloc_download_memory_size];
+			memset(receivefile_buffer, 0, malloc_download_memory_size);
+			PostMessage(m_parent_hwnd, WM_DOWNLOADFILE_MESSAGE, DOWNLOAD_FILE_INFO, NULL);
 
 
 
@@ -185,9 +172,8 @@ int DownloadSocket::GetDownloadResults()
 
 void DownloadSocket::OnConnect(int nErrorCode)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	LPVOID	lpMsgBuf;
-	// TODO: Add your specialized code here and/or call the base class
 	if(!nErrorCode)
 	{
 		SetDownloadResults(DOWNLOAD_RESULTS_UNKNOW);
@@ -202,13 +188,11 @@ void DownloadSocket::OnConnect(int nErrorCode)
 			(LPTSTR)&lpMsgBuf,
 			0,
 			NULL);
-		//MessageBox((LPCTSTR)lpMsgBuf,"Error",MB_ICONERROR|MB_OK);
+		
 		CString strMsg;
 		strMsg.Format(_T("Link Failed!\n\n%*sError ID:%d.Error Description:%s"),4,_T(""),nErrorCode,lpMsgBuf);
 		AfxMessageBox(strMsg);
 		PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_CONNECT_FAILED,NULL);
-
-		//dlg->m_list_receive_box.InsertString(0,strMsg);
 	}
 
 	CAsyncSocket::OnConnect(nErrorCode);
@@ -217,7 +201,7 @@ void DownloadSocket::OnConnect(int nErrorCode)
 
 void DownloadSocket::OnClose(int nErrorCode)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_DISCONNEC,NULL);
 	CAsyncSocket::OnClose(nErrorCode);
 }

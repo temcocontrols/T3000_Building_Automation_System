@@ -40,7 +40,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
@@ -53,7 +53,7 @@ unsigned CChartSerie::m_uNextFreeId = 0;
 CChartSerie::CChartSerie(CChartCtrl* pParent)
 {
 	m_pParentCtrl = pParent;
-//	m_uLastDrawnPoint = 0;
+	//	m_uLastDrawnPoint = 0;
 	m_strSerieName = _T("");
 
 	m_pHorizontalAxis = m_pVerticalAxis = NULL;
@@ -61,7 +61,7 @@ CChartSerie::CChartSerie(CChartCtrl* pParent)
 	m_uNextFreeId++;
 
 	m_bIsVisible = true;
-	m_bShadow = false;		
+	m_bShadow = false;
 	m_SerieColor = RGB(0, 0, 0);
 	m_ShadowColor = RGB(150,150,150);
 	m_iShadowDepth = 2;
@@ -81,9 +81,9 @@ CChartSerie::~CChartSerie()
 //	m_vPoints.SetOrdering(newOrdering);
 //}
 
-void CChartSerie::SetName(const TChartString& NewName) 
-{ 
-	m_strSerieName = NewName; 
+void CChartSerie::SetName(const TChartString& NewName)
+{
+	m_strSerieName = NewName;
 	m_pParentCtrl->RefreshCtrl();
 }
 
@@ -97,27 +97,27 @@ double CChartSerie::YScreenToValue(long YScreenCoord) const
 	return m_pVerticalAxis->ScreenToValue(YScreenCoord);
 }
 
-void CChartSerie::ValueToScreen(double XValue, double YValue, CPoint &ScreenPoint) const
+void CChartSerie::ValueToScreen(double XValue, double YValue, CPoint& ScreenPoint) const
 {
 	ScreenPoint.x = m_pHorizontalAxis->ValueToScreen(XValue);
 	ScreenPoint.y = m_pVerticalAxis->ValueToScreen(YValue);
 }
 
 void CChartSerie::SetVisible(bool bVisible)
-{ 
-	m_bIsVisible = bVisible; 
+{
+	m_bIsVisible = bVisible;
 	m_pParentCtrl->RefreshCtrl();
 }
 
-void CChartSerie::SetColor(COLORREF NewColor)	   
-{ 
-	m_SerieColor = NewColor; 
+void CChartSerie::SetColor(COLORREF NewColor)
+{
+	m_SerieColor = NewColor;
 	m_pParentCtrl->RefreshCtrl();
 }
 
-void CChartSerie::SetShadowColor(COLORREF NewColor) 
-{ 
-	m_ShadowColor = NewColor; 
+void CChartSerie::SetShadowColor(COLORREF NewColor)
+{
+	m_ShadowColor = NewColor;
 	m_pParentCtrl->RefreshCtrl();
 }
 
@@ -128,8 +128,8 @@ void CChartSerie::EnableShadow(bool bEnable)
 }
 
 void CChartSerie::SetShadowDepth(int Depth)
-{ 
-	m_iShadowDepth = Depth; 
+{
+	m_iShadowDepth = Depth;
 	m_pParentCtrl->RefreshCtrl();
 }
 

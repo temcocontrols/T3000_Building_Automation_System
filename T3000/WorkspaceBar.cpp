@@ -57,7 +57,7 @@ END_MESSAGE_MAP()
 
 CWorkspaceBar::CWorkspaceBar()
 {
-	// TODO: add one-time construction code here
+	// 
 
 }
 
@@ -373,7 +373,8 @@ int CWorkspaceBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
  //  m_image_list.Create(IDB_TREENODE_BMP,16,1,RGB(255,255,255));
 	CBitmap a;
 	a.LoadBitmap(IDB_TREENODE_BMP);
-	m_image_list.Create(24,24,ILC_COLOR24,1,1);
+	//m_image_list.Create(24,24,ILC_COLOR24,1,1);
+	m_image_list.Create(36, 24, ILC_COLOR24, 1, 1);
 	m_image_list.Add(&a,RGB(0,0,0));
     m_TreeCtrl.SetImageList(&m_image_list,TVSIL_NORMAL);
 
@@ -442,7 +443,11 @@ void CWorkspaceBar::OnFolderBrowerBtn()
 
 LRESULT CWorkspaceBar::OnNcHitTest(CPoint point)
 {
+<<<<<<< HEAD
 	// TODO: Add your message handler code here and/or call default
+=======
+	 
+>>>>>>> master
 	// 使得 dockable pane 无法拖动了。
 return 0;  
 	return CDockablePane::OnNcHitTest(point);
@@ -458,7 +463,7 @@ void CWorkspaceBar::OnLButtonDown(UINT nFlags, CPoint point)
 void CWorkspaceBar::OnTvnEndlabeleditTree(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMTVDISPINFO pTVDispInfo = reinterpret_cast<LPNMTVDISPINFO>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 	*pResult = 0;
 
 //	m_TreeCtrl.SetItemText(pTVDispInfo->item.hItem, pTVDispInfo->item.pszText);
@@ -470,7 +475,7 @@ void CWorkspaceBar::OnTvnEndlabeleditTree(NMHDR *pNMHDR, LRESULT *pResult)
 void CWorkspaceBar::OnTvnBeginlabeleditTree(NMHDR *pNMHDR, LRESULT *pResult)
 {	
 	LPNMTVDISPINFO pTVDispInfo = reinterpret_cast<LPNMTVDISPINFO>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 
 
 	CMainFrame* pMainFrame= (CMainFrame*)AfxGetMainWnd();
@@ -480,7 +485,7 @@ void CWorkspaceBar::OnTvnBeginlabeleditTree(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CWorkspaceBar::OnNMClickTree(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: Add your control notification handler code here
+	
 	
 	CMainFrame* pMainFrame= (CMainFrame*)AfxGetMainWnd();
 	pMainFrame->OnHTreeItemClick(pNMHDR,pResult);
@@ -489,7 +494,7 @@ void CWorkspaceBar::OnNMClickTree(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CWorkspaceBar::OnNMSelectChanged_Tree(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: Add your control notification handler code here
+	
 
 	CMainFrame* pMainFrame= (CMainFrame*)AfxGetMainWnd();
 	pMainFrame->OnHTreeMessageSeletedChanged(pNMHDR,pResult);
@@ -507,7 +512,7 @@ void CWorkspaceBar::OnNMSelectChanged_Tree(NMHDR *pNMHDR, LRESULT *pResult)
 
 //void CWorkspaceBar::OnRButtonDown(UINT nFlags, CPoint point)
 //{
-//	// TODO: Add your message handler code here and/or call default
+//	 
 //	 AfxMessageBox(_T("RButtonDown"));
 //	CDockablePane::OnRButtonDown(nFlags, point);
 //}

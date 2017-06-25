@@ -28,7 +28,7 @@ using namespace std;
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
@@ -36,7 +36,7 @@ static char THIS_FILE[]=__FILE__;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CChartTitle::CChartTitle(CChartCtrl* pParent) 
+CChartTitle::CChartTitle(CChartCtrl* pParent)
 {
 	m_pParentCtrl = pParent;
 	m_bIsVisible = true;
@@ -45,7 +45,6 @@ CChartTitle::CChartTitle(CChartCtrl* pParent)
 
 CChartTitle::~CChartTitle()
 {
-
 }
 
 void CChartTitle::SetFont(int iPointSize, const TChartString& strFaceName)
@@ -66,11 +65,11 @@ void CChartTitle::SetColor(COLORREF NewColor)
 	m_pParentCtrl->RefreshCtrl();
 }
 
-void CChartTitle::SetLineFont(int iLineIndex, 
-							  int iPointSize, 
-							  const TChartString& strFaceName)
+void CChartTitle::SetLineFont(int iLineIndex,
+                              int iPointSize,
+                              const TChartString& strFaceName)
 {
-	CChartFont newFont(strFaceName,iPointSize);
+	CChartFont newFont(strFaceName, iPointSize);
 	m_mapLineFonts[iLineIndex] = newFont;
 }
 
@@ -92,7 +91,7 @@ size_t CChartTitle::GetStringCount() const
 
 TChartString CChartTitle::GetString(size_t Index) const
 {
-	if ( (Index<0) || (Index>=m_StringArray.size()) )
+	if ((Index < 0) || (Index >= m_StringArray.size()))
 		return _T("");
 	return m_StringArray[Index];
 }
@@ -103,7 +102,7 @@ void CChartTitle::RemoveAll()
 	m_pParentCtrl->RefreshCtrl();
 }
 
-void CChartTitle::Draw(CDC *pDC)
+void CChartTitle::Draw(CDC* pDC)
 {
 	if (!pDC->GetSafeHdc())
 		return;
@@ -117,7 +116,7 @@ void CChartTitle::Draw(CDC *pDC)
 	//Draw all entries
 	int YPos = 4;
 	size_t TitleCount = m_StringArray.size();
-	for (size_t i=0;i<TitleCount;i++)
+	for (size_t i = 0; i < TitleCount; i++)
 	{
 		map<int, CChartFont>::iterator iter = m_mapLineFonts.find(i);
 		if (iter != m_mapLineFonts.end())
@@ -127,16 +126,16 @@ void CChartTitle::Draw(CDC *pDC)
 		int TextWidth = pDC->GetTextExtent(m_StringArray[i].c_str()).cx;
 		int TextHeigh = pDC->GetTextExtent(m_StringArray[i].c_str()).cy;
 
-		int XPos = m_TitleRect.left + (int)fabs((m_TitleRect.left-m_TitleRect.right)/2.0) - TextWidth/2;
+		int XPos = m_TitleRect.left + (int)fabs((m_TitleRect.left - m_TitleRect.right) / 2.0) - TextWidth / 2;
 
-/*		if (m_bShadow)
-		{
-			pDC->SetTextColor(m_ShadowColor);
-			pDC->ExtTextOut(XPos+m_iShadowDepth,m_TitleRect.top+YPos+m_iShadowDepth,
-							ETO_CLIPPED,NULL,m_StringArray[i].c_str(),NULL);
-			pDC->SetTextColor(m_TextColor);
-		}*/
-		pDC->ExtTextOut(XPos,m_TitleRect.top+YPos,ETO_CLIPPED,NULL,m_StringArray[i].c_str(),NULL);
+		/*		if (m_bShadow)
+				{
+					pDC->SetTextColor(m_ShadowColor);
+					pDC->ExtTextOut(XPos+m_iShadowDepth,m_TitleRect.top+YPos+m_iShadowDepth,
+									ETO_CLIPPED,NULL,m_StringArray[i].c_str(),NULL);
+					pDC->SetTextColor(m_TextColor);
+				}*/
+		pDC->ExtTextOut(XPos, m_TitleRect.top + YPos,ETO_CLIPPED,NULL, m_StringArray[i].c_str(),NULL);
 
 		if (iter != m_mapLineFonts.end())
 			iter->second.UnselectFont(pDC);
@@ -149,7 +148,7 @@ void CChartTitle::Draw(CDC *pDC)
 	pDC->SetBkMode(iPrevMode);
 }
 
-CSize CChartTitle::GetSize(CDC *pDC)
+CSize CChartTitle::GetSize(CDC* pDC)
 {
 	CSize TitleSize;
 
@@ -159,19 +158,19 @@ CSize CChartTitle::GetSize(CDC *pDC)
 		return TitleSize;
 	}
 
-	int Height = 4;		//Upper space
+	int Height = 4; //Upper space
 	CSize TextSize = 0;
 	int MaxTextWidth = 0;
 
 	size_t TitleCount = m_StringArray.size();
-	if (TitleCount==0)
+	if (TitleCount == 0)
 	{
 		TitleSize.cx = TitleSize.cy = 0;
 		return TitleSize;
 	}
 
 	m_DefaultFont.SelectFont(pDC);
-	for (size_t i=0;i<TitleCount;i++)
+	for (size_t i = 0; i < TitleCount; i++)
 	{
 		map<int, CChartFont>::iterator iter = m_mapLineFonts.find(i);
 		if (iter != m_mapLineFonts.end())

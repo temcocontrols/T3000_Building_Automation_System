@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "TStatInputView.h"
 #include "BacnetInput.h"
-#include "globle_function.h"
+#include "global_function.h"
  
  
 #include <bitset>
@@ -803,21 +803,38 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	//Custom Table
      if (lCol == 9)
      {
- //         if (m_tstat_input_data.at(lRow).CustomTable.StrValue.CompareNoCase(NO_APPLICATION)==0)
- //         {
- //             IS_SEND=FALSE;
- //             return;
- //         }
- //         else if (m_tstat_input_data.at(lRow).CustomTable.StrValue.CompareNoCase(L"Custom1...")==0)
- //         {
- //            // CBuildTable1 Dlg(2);
- //           //  Dlg.DoModal();
- //         }
- //         else if (m_tstat_input_data.at(lRow).CustomTable.StrValue.CompareNoCase(L"Custom2...")==0)
- //         {
- //            // CBuildTable1 Dlg(3);
- //             //Dlg.DoModal();
- //         }
+ //         if (m_tstat_input_data.at(lRow).CustomTable.StrValue.CompareNoCase(NO_APPLICATION)==0)
+
+ //         {
+
+ //             IS_SEND=FALSE;
+
+ //             return;
+
+ //         }
+
+ //         else if (m_tstat_input_data.at(lRow).CustomTable.StrValue.CompareNoCase(L"Custom1...")==0)
+
+ //         {
+
+ //            // CBuildTable1 Dlg(2);
+
+
+ //           //  Dlg.DoModal();
+
+ //         }
+
+ //         else if (m_tstat_input_data.at(lRow).CustomTable.StrValue.CompareNoCase(L"Custom2...")==0)
+
+ //         {
+
+ //            // CBuildTable1 Dlg(3);
+
+
+ //             //Dlg.DoModal();
+
+ //         }
+
  
      }
 	 //Filter
@@ -1030,7 +1047,7 @@ void CTStatInputView::OnSize(UINT nType, int cx, int cy)
 
 BOOL CTStatInputView::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: Add your specialized code here and/or call the base class
+    
     if((pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN))
     {
         CRect list_rect,win_rect;

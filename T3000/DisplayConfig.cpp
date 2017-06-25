@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "DisplayConfig.h"
 #include "afxdialogex.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "MainFrm.h"
 #include <bitset>
 // CDisplayConfig dialog
@@ -915,7 +915,7 @@ void CDisplayConfig::OnBnClickedFreshTable()
 
 BOOL CDisplayConfig::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(WM_KEYDOWN == pMsg->message)
 	{
 

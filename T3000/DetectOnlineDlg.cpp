@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "DetectOnlineDlg.h"
 #include "afxdialogex.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "MainFrm.h"
 #include "crc.h"
 #include <algorithm>
@@ -2138,7 +2138,7 @@ void CDetectOnlineDlg::OnDestroy()
 // 	::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
 
 	CDialogEx::OnDestroy();
-	// TODO: Add your message handler code here
+	
 }
 
 
@@ -2324,7 +2324,7 @@ void CDetectOnlineDlg::OnSize(UINT nType, int cx, int cy)
 		}
 
 	}
-	// TODO: Add your message handler code here
+	
 }
 
 
@@ -2611,18 +2611,18 @@ void CDetectOnlineDlg::OnBnClickedButtonWriteSerialNo()
 
 //void CDetectOnlineDlg::OnEnChangeEdit2()
 //{
-//	// TODO:  If this is a RICHEDIT control, the control will not
+//	
 //	// send this notification unless you override the CDialogEx::OnInitDialog()
 //	// function and call CRichEditCtrl().SetEventMask()
 //	// with the ENM_CHANGE flag ORed into the mask.
 //
-//	// TODO:  Add your control notification handler code here
+//	// 
 //}
 
 
 BOOL CDetectOnlineDlg::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(WM_KEYDOWN == pMsg->message)
 	{
 

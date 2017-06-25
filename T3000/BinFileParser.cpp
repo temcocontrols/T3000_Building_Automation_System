@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "BinFileParser.h"
-#include "globle_function.h"
+#include "global_function.h"
  
 CBinFileParser::CBinFileParser(void)
 {

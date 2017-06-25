@@ -78,54 +78,54 @@ IMPLEMENT_DYNCREATE( CStaticEx, CStatic )
 BEGIN_MESSAGE_MAP(CStaticEx, CStatic)
 	//{{AFX_MSG_MAP(CStaticEx)
 	//}}AFX_MSG_MAP
-    ON_WM_SETCURSOR()
-    ON_WM_CTLCOLOR_REFLECT()
-  //  ON_CONTROL_REFLECT( STN_CLICKED, OnClicked )
+	ON_WM_SETCURSOR()
+	ON_WM_CTLCOLOR_REFLECT()
+	//  ON_CONTROL_REFLECT( STN_CLICKED, OnClicked )
 END_MESSAGE_MAP()
 
-CStaticEx::CStaticEx() 
+CStaticEx::CStaticEx()
 {
-    // Use system colors for defaults
-    //
-    m_crTextColor = ::GetSysColor( COLOR_WINDOWTEXT );
-    m_crBkColor   = ::GetSysColor( COLOR_3DFACE     );
+	// Use system colors for defaults
+	//
+	m_crTextColor = ::GetSysColor(COLOR_WINDOWTEXT);
+	m_crBkColor = ::GetSysColor(COLOR_3DFACE);
 
-    m_crOnClickColor   = RGB( 0,  128, 192 );
+	m_crOnClickColor = RGB( 0, 128, 192 );
 
-    // The default brush type; SOLID
-    //
-    CreateBrushType();
+	// The default brush type; SOLID
+	//
+	CreateBrushType();
 
-    // Uses default font
-    //
-    m_pCFont = 0;
+	// Uses default font
+	//
+	m_pCFont = 0;
 
-    // Link was not visited
-    //
-    m_didClickEvent = FALSE;
+	// Link was not visited
+	//
+	m_didClickEvent = FALSE;
 
-    // Set to popup a dialog when this control is clicked
-    //
-    m_dialog = 0;
+	// Set to popup a dialog when this control is clicked
+	//
+	m_dialog = 0;
 
-    // Show a new window when this control is clicked
-    //
-    m_showThisCwnd = 0;
-    m_sendMsgToThisCwnd = 0;
+	// Show a new window when this control is clicked
+	//
+	m_showThisCwnd = 0;
+	m_sendMsgToThisCwnd = 0;
 
-    // defines a message that may be sent to m_showThisCwnd
-    //
-    m_msg_flags  = 0;
-    m_wm_message = 0;
+	// defines a message that may be sent to m_showThisCwnd
+	//
+	m_msg_flags = 0;
+	m_wm_message = 0;
 
-    // Do use the hand cursor
-    //
-    m_doCustomCursor = false;
+	// Do use the hand cursor
+	//
+	m_doCustomCursor = false;
 }
 
 CStaticEx::~CStaticEx()
 {
-    if ( m_pCFont ) delete m_pCFont;
+	if (m_pCFont) delete m_pCFont;
 }
 
 
@@ -138,128 +138,129 @@ CStaticEx::~CStaticEx()
 
 // Allow = operator to be used for copying basics.
 //
-CStaticEx& CStaticEx::operator = ( const CStaticEx& o )
+CStaticEx& CStaticEx::operator =(const CStaticEx& o)
 {
+	_ASSERT( o != *this ); // You probably did not mean to do this...
 
-    _ASSERT( o != *this ); // You probably did not mean to do this...
+	if (o == *this) return *this; // copying self...
 
-    if ( o == *this ) return *this; // copying self...
-    
-    m_shellCommandArg  = o.m_shellCommandArg;
-    m_crOnClickColor   = o.m_crOnClickColor;
+	m_shellCommandArg = o.m_shellCommandArg;
+	m_crOnClickColor = o.m_crOnClickColor;
 
-    bkColor( o.m_crBkColor );
-    textColor( o.m_crTextColor );
+	bkColor(o.m_crBkColor);
+	textColor(o.m_crTextColor);
 
-    if ( o.m_pCFont ) {
-         CLogFont pLogFont;
-         o.m_pCFont->GetLogFont( &pLogFont );
-         setFont( &pLogFont );
-    }
+	if (o.m_pCFont)
+	{
+		CLogFont pLogFont;
+		o.m_pCFont->GetLogFont(&pLogFont);
+		setFont(&pLogFont);
+	}
 
-    m_dialog            = o.m_dialog;
-    m_showThisCwnd      = o.m_showThisCwnd;
-    m_didClickEvent     = o.m_didClickEvent;
-    m_sendMsgToThisCwnd = o.m_sendMsgToThisCwnd;
-    m_msg_flags         = o.m_msg_flags;
-    m_wm_message        = o.m_wm_message;
-    m_doCustomCursor    = o.m_doCustomCursor;
+	m_dialog = o.m_dialog;
+	m_showThisCwnd = o.m_showThisCwnd;
+	m_didClickEvent = o.m_didClickEvent;
+	m_sendMsgToThisCwnd = o.m_sendMsgToThisCwnd;
+	m_msg_flags = o.m_msg_flags;
+	m_wm_message = o.m_wm_message;
+	m_doCustomCursor = o.m_doCustomCursor;
 
-    return *this;
+	return *this;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // CStaticEx message handlers
 
-void CStaticEx::setFont( const LOGFONT* lpLogFont )
+void CStaticEx::setFont(const LOGFONT* lpLogFont)
 {
-    _ASSERT( lpLogFont ); // logfont is not defined!!!
+	_ASSERT( lpLogFont ); // logfont is not defined!!!
 
-    if ( !lpLogFont ) return;
+	if (!lpLogFont) return;
 
-    if ( m_pCFont ) delete m_pCFont;
-    
-    m_pCFont = new CFont;
-    m_pCFont->CreateFontIndirect( lpLogFont );
+	if (m_pCFont) delete m_pCFont;
 
-    SetFont( m_pCFont );
+	m_pCFont = new CFont;
+	m_pCFont->CreateFontIndirect(lpLogFont);
+
+	SetFont(m_pCFont);
 }
 
-void CStaticEx::setFont( LONG fontHeight      /* = -8                         */, 
-                         LONG fontWeight      /* = FW_NORMAL                  */,
-                         UCHAR pitchAndFamily /* = DEFAULT_PITCH | FF_DONTCARE*/,
-                         LPCWSTR faceName     /*  = "MS Sans Serif"   */      )
+void CStaticEx::setFont(LONG fontHeight /* = -8                         */,
+                        LONG fontWeight /* = FW_NORMAL                  */,
+                        UCHAR pitchAndFamily /* = DEFAULT_PITCH | FF_DONTCARE*/,
+                        LPCWSTR faceName /*  = "MS Sans Serif"   */)
 {
-    if ( m_pCFont ) 
-    {
-        delete m_pCFont;
-    }
-    m_pCFont = new CFont;
-//	 faceName       = _T("MS Sans Serif") ;
-    //const CLogFont lf( fontHeight, 
-    //                   FW_NORMAL,
-    //                   pitchAndFamily,
-    //                   faceName
-    //                 );
+	if (m_pCFont)
+	{
+		delete m_pCFont;
+	}
+	m_pCFont = new CFont;
+	//	 faceName       = _T("MS Sans Serif") ;
+	//const CLogFont lf( fontHeight, 
+	//                   FW_NORMAL,
+	//                   pitchAndFamily,
+	//                   faceName
+	//                 );
 
 	LOGFONT lf;
-		memset(&lf,0,sizeof(LOGFONT));
-	lf.lfHeight=fontHeight;
-	lf.lfWeight=FW_NORMAL;
-	lf.lfPitchAndFamily= DEFAULT_PITCH | FF_DONTCARE;
-	_tcsncpy_s(lf.lfFaceName,LF_FACESIZE,faceName/*_T("MS Sans Serif")*/,100);
-//	lf.lfFaceName=_T("MS Sans Serif");
+	memset(&lf, 0, sizeof(LOGFONT));
+	lf.lfHeight = fontHeight;
+	lf.lfWeight = FW_NORMAL;
+	lf.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
+	_tcsncpy_s(lf.lfFaceName,LF_FACESIZE, faceName/*_T("MS Sans Serif")*/, 100);
+	//	lf.lfFaceName=_T("MS Sans Serif");
 
-    m_pCFont->CreateFontIndirect( &lf );
-    SetFont( m_pCFont );
+	m_pCFont->CreateFontIndirect(&lf);
+	SetFont(m_pCFont);
 }
 
-COLORREF CStaticEx::bkColor( COLORREF crColor )
+COLORREF CStaticEx::bkColor(COLORREF crColor)
 {
-    _ASSERT(::IsWindow(m_hWnd)); 
+	_ASSERT(::IsWindow(m_hWnd));
 
-    COLORREF cr = m_crBkColor;
-    
-    m_crBkColor = crColor;
-    
-    m_brBkGround.DeleteObject();
-    
-    CreateBrushType();
-    
-    Invalidate();
+	COLORREF cr = m_crBkColor;
 
-    return cr;
+	m_crBkColor = crColor;
+
+	m_brBkGround.DeleteObject();
+
+	CreateBrushType();
+
+	Invalidate();
+
+	return cr;
 }
 
-COLORREF CStaticEx::textColor( COLORREF crColor )
+COLORREF CStaticEx::textColor(COLORREF crColor)
 {
-    _ASSERT(::IsWindow(m_hWnd)); 
-    
-    COLORREF cr = m_crTextColor;
-    
-    m_crTextColor = crColor;
-    
-    Invalidate();
-    
-    return cr;
+	_ASSERT(::IsWindow(m_hWnd));
+
+	COLORREF cr = m_crTextColor;
+
+	m_crTextColor = crColor;
+
+	Invalidate();
+
+	return cr;
 }
 
-COLORREF CStaticEx::setLinkColorVisited( COLORREF crColor )
+COLORREF CStaticEx::setLinkColorVisited(COLORREF crColor)
 {
-    COLORREF c  = m_crOnClickColor;
-    m_crOnClickColor = crColor;
-    return c;
+	COLORREF c = m_crOnClickColor;
+	m_crOnClickColor = crColor;
+	return c;
 }
-COLORREF CStaticEx::setLinkColorUnvisited( COLORREF crColor )
+
+COLORREF CStaticEx::setLinkColorUnvisited(COLORREF crColor)
 {
-    m_crTextColor = crColor;
-    return textColor( crColor );
+	m_crTextColor = crColor;
+	return textColor(crColor);
 }
 
 
 BOOL CStaticEx::CreateBrushType()
 {
-    return m_brBkGround.CreateSolidBrush( m_crBkColor );
+	return m_brBkGround.CreateSolidBrush(m_crBkColor);
 }
 
 //void CStaticEx::onClickDoShellCommand( const CString& linkAddress /* = "bberry@javanet.com" */ )
@@ -268,23 +269,22 @@ BOOL CStaticEx::CreateBrushType()
 //}
 
 
-
-HBRUSH CStaticEx::CtlColor(CDC* pDC, UINT nCtlColor) 
+HBRUSH CStaticEx::CtlColor(CDC* pDC, UINT nCtlColor)
 {
-    // Setup for receiving mouse input; we only turn it
-    // on if it is needed...
-    //
-    if ( !m_shellCommandArg.IsEmpty() ) 
-    {
-         doOnClickEvents();
-         pDC->SetTextColor( m_didClickEvent ? m_crOnClickColor : m_crTextColor );
-    }
-    else 
-         pDC->SetTextColor( m_crTextColor );
-  
-    pDC->SetBkColor  ( m_crBkColor );
+	// Setup for receiving mouse input; we only turn it
+	// on if it is needed...
+	//
+	if (!m_shellCommandArg.IsEmpty())
+	{
+		doOnClickEvents();
+		pDC->SetTextColor(m_didClickEvent ? m_crOnClickColor : m_crTextColor);
+	}
+	else
+		pDC->SetTextColor(m_crTextColor);
 
-    return (HBRUSH)m_brBkGround;
+	pDC->SetBkColor(m_crBkColor);
+
+	return (HBRUSH)m_brBkGround;
 }
 #if 0
 void CStaticEx::OnClicked()
@@ -304,8 +304,8 @@ void CStaticEx::OnClicked()
 
     if ( !m_shellCommandArg.IsEmpty() )
     {
-         // Call ShellExecute to run the link...
-         //
+// Call ShellExecute to run the link...
+//
          HINSTANCE h = ShellExecute( 0, _T("open"), m_shellCommandArg, 0, 0, SW_SHOWNORMAL );
 
          if ( (UINT)h > 32 ) {
@@ -324,22 +324,22 @@ void CStaticEx::OnClicked()
     }
 }
 #endif
-BOOL CStaticEx::OnSetCursor( CWnd* pWnd, UINT nHitTest, UINT message )
+BOOL CStaticEx::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 {
-    HCURSOR hCursor;
+	HCURSOR hCursor;
 
-    if ( m_doCustomCursor ) 
-    {
-       // hCursor = AfxGetApp()->LoadCursor( IDC_CURSOR_HAND );
-    }
-    else
-    {
-        hCursor = AfxGetApp()->LoadStandardCursor( IDC_ARROW );
-    }
+	if (m_doCustomCursor)
+	{
+		// hCursor = AfxGetApp()->LoadCursor( IDC_CURSOR_HAND );
+	}
+	else
+	{
+		hCursor = AfxGetApp()->LoadStandardCursor(IDC_ARROW);
+	}
 
-    _ASSERT( hCursor );
+	_ASSERT( hCursor );
 
-    ::SetCursor( hCursor );
+	::SetCursor(hCursor);
 
-    return TRUE;
+	return TRUE;
 }

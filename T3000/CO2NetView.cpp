@@ -1454,7 +1454,7 @@ HBRUSH CCO2NetView::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 {
     HBRUSH hbr = CFormView::OnCtlColor(pDC, pWnd, nCtlColor);
 
-    // TODO:  Change any attributes of the DC here
+    
     for (int i=0; i<(int)Change_Color_ID.size(); i++)
     {
         if(pWnd->GetDlgCtrlID()==Change_Color_ID.at(i))//注意此处的（pWnd->），否则没效果
@@ -1466,7 +1466,7 @@ HBRUSH CCO2NetView::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
         }
 
     }
-    // TODO:  Return a different brush if the default is not desired
+    
     return hbr;
 }
 
@@ -1564,7 +1564,7 @@ LRESULT  CCO2NetView::ReadDataCallBack(WPARAM wParam, LPARAM lParam)
 
 BOOL CCO2NetView::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: Add your specialized code here and/or call the base class
+    
     if(pMsg->message == WM_KEYDOWN  )
     {
         if(pMsg->wParam == VK_RETURN)
@@ -1582,7 +1582,7 @@ BOOL CCO2NetView::PreTranslateMessage(MSG* pMsg)
 
 LRESULT CCO2NetView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
-    // TODO: Add your specialized code here and/or call the base class
+    
 
     return CFormView::WindowProc(message, wParam, lParam);
 }

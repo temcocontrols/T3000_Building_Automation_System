@@ -16,9 +16,9 @@
 #include "T3000.h"
 #include "BacnetRange.h"
 #include "afxdialogex.h"
-#include "gloab_define.h"
+#include "global_define.h"
 #include "BacnetAnalogCusRang.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "BacnetCustomerDigitalRange.h"
 #include "BacnetVarCusRang.h"
 CBacnetAnalogCusRang * bac_analog_window = NULL;
@@ -87,7 +87,7 @@ BOOL BacnetRange::OnInitDialog()
 	m_show_unit.textColor(RGB(255,0,0));
 	m_show_unit.setFont(24,12,NULL,_T("Arial"));
 	Initial_static();
-	// TODO:  Add extra initialization here
+	
 
 	((CEdit *)GetDlgItem(IDC_EDIT_RANGE_SELECT))->SetFocus();
 	((CEdit *)GetDlgItem(IDC_EDIT_RANGE_SELECT))->SetSel(0,-1);
@@ -107,6 +107,12 @@ BOOL BacnetRange::OnInitDialog()
 		{
 			((CButton *)GetDlgItem(i))->EnableWindow(FALSE);
 		}
+
+		for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
+		{
+			((CButton *)GetDlgItem(i))->EnableWindow(FALSE);
+		}
+
 		for (int i=IDC_RADIO81;i<=IDC_RADIO88;i++)
 		{
 			((CButton *)GetDlgItem(i))->EnableWindow(FALSE);
@@ -325,6 +331,11 @@ void BacnetRange::Initial_static()
 			GetDlgItem(i)->ShowWindow(false);
 		}
 
+		for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
+		{
+			GetDlgItem(i)->ShowWindow(false);
+		}
+
 		for (int i=IDC_RADIO81;i<=IDC_RADIO88;i++)
 		{
 			GetDlgItem(i)->ShowWindow(false);
@@ -452,6 +463,11 @@ void BacnetRange::Initial_static()
 			GetDlgItem(i)->ShowWindow(false);
 		}
 
+		for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
+		{
+			GetDlgItem(i)->ShowWindow(false);
+		}
+
 		for (int i=IDC_RADIO81;i<=IDC_RADIO88;i++)
 		{
 			GetDlgItem(i)->ShowWindow(false);
@@ -568,6 +584,17 @@ void BacnetRange::Initial_static()
 
 			((CButton *)GetDlgItem(i))->ShowWindow(1);
 		}
+
+		for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
+		{
+			CRect c1;
+			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+			ScreenToClient(c1);
+			GetDlgItem(i)->SetWindowPos(NULL, c1.left + 50, c1.top, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+
+			((CButton *)GetDlgItem(i))->ShowWindow(1);
+		}
+
 		for (int i=IDC_RADIO81;i<=IDC_RADIO88;i++)
 		{
 			CRect c1; 
@@ -623,6 +650,12 @@ void BacnetRange::Initial_static()
 			GetDlgItem(IDC_RADIO69)->EnableWindow(FALSE);	
 			GetDlgItem(IDC_RADIO87)->EnableWindow(TRUE);
 		}
+		else if ((bacnet_device_type == TINY_EX_MINIPANEL) && (input_list_line >= 0) && (input_list_line <= 7))
+		{
+			GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. Pulse Count (Fast 100Hz)"));
+			GetDlgItem(IDC_RADIO69)->EnableWindow(FALSE);
+			GetDlgItem(IDC_RADIO87)->EnableWindow(TRUE);
+		}
 		else if((bacnet_device_type == PID_T322AI) && (input_list_line >= 0) && (input_list_line <=10))
 		{
 			GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. Pulse Count (Fast 100Hz)"));
@@ -650,7 +683,7 @@ void BacnetRange::Initial_static()
 		GetDlgItem(IDC_STATIC_ANALOG_UNITS2)->ShowWindow(false);//variable
 		GetDlgItem(IDC_STATIC_ANALOG_UNITS)->ShowWindow(false);//output
 		GetDlgItem(IDC_STATIC_INPUT_ANALOG_UNITS)->ShowWindow(true);//input
-		MoveWindow(Temp_Rect.left,Temp_Rect.top,750,800);
+		MoveWindow(Temp_Rect.left,Temp_Rect.top,900,800);
 	}
 
 
@@ -664,7 +697,7 @@ void BacnetRange::Initial_static()
 
 BOOL BacnetRange::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message == WM_KEYDOWN)
 	{
 		if(GetFocus()==GetDlgItem(IDC_EDIT_RANGE_SELECT))
@@ -684,7 +717,7 @@ BOOL BacnetRange::PreTranslateMessage(MSG* pMsg)
 
 void BacnetRange::OnOK()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	CString temp;
 	GetDlgItemText(IDC_EDIT_RANGE_SELECT,temp);
 	if(bacnet_device_type == PM_T3PT12)
@@ -759,7 +792,7 @@ void BacnetRange::OnOK()
 
 void BacnetRange::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	range_cancel = true;
 	bac_range_number_choose = 0;
 	CDialogEx::OnCancel();
@@ -768,7 +801,7 @@ void BacnetRange::OnCancel()
 
 void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	int sel_value;
 	CString temp_value;
 	bool click_radio = false;
@@ -802,8 +835,8 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 			else
 				break;
 
-		
-			if(((nfocusid >= IDC_RADIO54) && (nfocusid <= IDC_RADIO72)) || ((nfocusid >= IDC_RADIO81) && (nfocusid <= IDC_RADIO88)))
+
+			if(((nfocusid >= IDC_RADIO54) && (nfocusid <= IDC_RADIO72)) || ((nfocusid >= IDC_RADIO81) && (nfocusid <= IDC_RADIO88)) || ( (nfocusid>= IDC_RADIO101) && (nfocusid <= IDC_RADIO113)))
 			{
 				bac_ranges_type = INPUT_RANGE_ANALOG_TYPE;
 				click_radio = true;
@@ -893,8 +926,6 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 				if (bac_analog_window != NULL)
 				{
 					delete bac_analog_window;
-					//TRACE(_T("Delete Analog window\r\n"));
-					//::PostMessage(bac_analog_window->m_hWnd, WM_CLOSE, NULL, NULL);
 					bac_analog_window = NULL;
 				}
 			}
@@ -932,6 +963,16 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 						break;
 					}
 				}
+
+				for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
+				{
+					if (((CButton *)GetDlgItem(i))->GetCheck())
+					{
+						m_input_Analog_select = i - IDC_RADIO101 + 27;
+						break;
+					}
+				}
+
 				if(((CButton *)GetDlgItem(IDC_RADIO81))->GetCheck())
 				{
 					m_input_Analog_select = 19;
@@ -1019,8 +1060,6 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 				{
 					if(bac_analog_window!=NULL)
 					{
-						//TRACE(_T("Delete Analog window\r\n"));
-						//::PostMessage(bac_analog_window->m_hWnd,WM_CLOSE,NULL,NULL);
 						delete bac_analog_window;
 						bac_analog_window = NULL;
 					}
@@ -1058,7 +1097,6 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 
 						bac_range_number_choose = m_analog_select;
 						
-						//TRACE(_T("m_analog_select = %d\r\n"),m_analog_select);
 						if((m_analog_select>=34) && (m_analog_select <= 38))
 						{
 							m_show_unit.SetWindowTextW(	Analog_Variable_Units[m_analog_select-34]);
@@ -1148,6 +1186,17 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 							m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 							m_rang_pic.Invalidate(TRUE);
 						}
+						else if ((m_input_Analog_select >= 27) && (m_input_Analog_select <= 39))
+						{
+							int temp_value;
+							temp_value = m_input_Analog_select - 27;
+							CRect c4;
+							GetDlgItem(IDC_RADIO101 + temp_value)->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+							ScreenToClient(c4);
+							m_rang_pic.SetWindowPos(NULL, c4.left - 40, c4.top - 4, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+							m_rang_pic.Invalidate(TRUE);
+
+						}
 						else
 						{
 							CRect c4;
@@ -1156,6 +1205,8 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 							m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 							m_rang_pic.Invalidate(TRUE);
 						}
+
+
 
 
 						for (int i=IDC_RADIO35;i<=IDC_RADIO46;i++)
@@ -1219,7 +1270,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 						
 						if(m_digital_select >22)
 						{
-							//bac_range_number_choose = m_digital_select - 11 + 22;
+							
 							bac_range_number_choose = m_digital_select ;
 
 							CRect c6;
@@ -1285,6 +1336,11 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 						}
 
 						for (int i=IDC_RADIO81;i<=IDC_RADIO88;i++)
+						{
+							((CButton *)GetDlgItem(i))->SetCheck(false);
+						}
+
+						for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
 						{
 							((CButton *)GetDlgItem(i))->SetCheck(false);
 						}
@@ -1618,6 +1674,11 @@ void BacnetRange::Timer2_handle()
 			{
 				((CButton *)GetDlgItem(i))->SetCheck(false);
 			}
+
+			for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
+			{
+				((CButton *)GetDlgItem(i))->SetCheck(false);
+			}
 			
 			m_input_Analog_select = 0;
 			if(sel_value<=11)
@@ -1690,7 +1751,7 @@ void BacnetRange::Timer2_handle()
 
 			}
 		}
-		else if(sel_value <= 56)
+		else if(sel_value <= 69)
 		{
 			bac_ranges_type = INPUT_RANGE_ANALOG_TYPE;
 			for (int i=IDC_RADIO35;i<=IDC_RADIO46;i++)
@@ -1731,6 +1792,16 @@ void BacnetRange::Timer2_handle()
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
 			}
+			else if ((sel_value >= 57) && (sel_value <= 69))
+			{
+				int temp_delt = 0;
+				temp_delt = sel_value - 57;
+				CRect c4;
+				GetDlgItem(IDC_RADIO101 + temp_delt)->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+				ScreenToClient(c4);
+				m_rang_pic.SetWindowPos(NULL, c4.left - 40, c4.top - 4, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+				m_rang_pic.Invalidate(TRUE);
+			}
 			else if((sel_value >= 50) && (sel_value <= 54))
 			{
 				int temp_delt = 0;
@@ -1755,6 +1826,10 @@ void BacnetRange::Timer2_handle()
 			{
 				((CButton *)GetDlgItem(i))->SetCheck(false);
 			}
+			for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
+			{
+				((CButton *)GetDlgItem(i))->SetCheck(false);
+			}
 			for (int i=IDC_RADIO81;i<=IDC_RADIO88;i++)
 			{
 				((CButton *)GetDlgItem(i))->SetCheck(false);
@@ -1774,6 +1849,12 @@ void BacnetRange::Timer2_handle()
 				delta_temp = sel_value - 50;
 				((CButton *)GetDlgItem(IDC_RADIO82 + delta_temp))->SetCheck(true);
 			}
+			else if ((sel_value >= 57) && (sel_value <= 69))
+			{
+				int delta_temp = 0;
+				delta_temp = sel_value - 57;
+				((CButton *)GetDlgItem(IDC_RADIO101 + delta_temp))->SetCheck(true);
+			}
 			else
 			{
 				((CButton *)GetDlgItem(IDC_RADIO54 + m_input_Analog_select))->SetCheck(true);
@@ -1790,7 +1871,7 @@ void BacnetRange::Timer2_handle()
 
 void BacnetRange::OnEnKillfocusEditRangeSelect()
 {
-	// TODO: Add your control notification handler code here
+	
 	KillTimer(2);
 	SetTimer(1,400,NULL);
 }
@@ -1798,7 +1879,7 @@ void BacnetRange::OnEnKillfocusEditRangeSelect()
 
 void BacnetRange::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	range_cancel = true;
 	CDialogEx::OnClose();
 }
@@ -1806,7 +1887,7 @@ void BacnetRange::OnClose()
 
 void BacnetRange::OnBnClickedCancel()
 {
-	// TODO: Add your control notification handler code here
+	
 	range_cancel = true;
 	CDialogEx::OnCancel();
 }
@@ -1814,7 +1895,7 @@ void BacnetRange::OnBnClickedCancel()
 
 void BacnetRange::OnBnClickedBtnEditCustomerRange()
 {
-	// TODO: Add your control notification handler code here
+	
 	CBacnetCustomerDigitalRange dlg;
 	dlg.DoModal();
 
@@ -1849,7 +1930,7 @@ void BacnetRange::OnBnClickedBtnEditCustomerRange()
 
 void BacnetRange::OnBnClickedBtnEditCustomerVarRange()
 {
-	// TODO: Add your control notification handler code here
+	
 	CBacnetVarCusRang Rangdlg;
 	Rangdlg.DoModal();
 	for (int i=IDC_RADIO_VAR_CUS_1;i<=IDC_RADIO_VAR_CUS_5;i++)
@@ -1863,55 +1944,55 @@ void BacnetRange::OnBnClickedBtnEditCustomerVarRange()
 
 void BacnetRange::OnBnClickedRadio73()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	OnBnClickedBtnEditCustomerRange();
 }
 
 
 void BacnetRange::OnBnClickedRadio74()
 {
-	// TODO: 在此添加控件通知处理程序代码
-	OnBnClickedBtnEditCustomerRange();
+	
+	//OnBnClickedBtnEditCustomerRange();
 }
 
 
 void BacnetRange::OnBnClickedRadio75()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	OnBnClickedBtnEditCustomerRange();
 }
 
 
 void BacnetRange::OnBnClickedRadio76()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	OnBnClickedBtnEditCustomerRange();
 }
 
 
 void BacnetRange::OnBnClickedRadio77()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	OnBnClickedBtnEditCustomerRange();
 }
 
 
 void BacnetRange::OnBnClickedRadio78()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	OnBnClickedBtnEditCustomerRange();
 }
 
 
 void BacnetRange::OnBnClickedRadio79()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	OnBnClickedBtnEditCustomerRange();
 }
 
 
 void BacnetRange::OnBnClickedRadio80()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	OnBnClickedBtnEditCustomerRange();
 }

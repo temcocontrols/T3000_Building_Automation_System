@@ -11,7 +11,7 @@
 #include "LabelEditDlg.h"
 #include "BacnetAddLabel.h"
 #include "BacnetEditLabel.h"
-#include "gloab_define.h"
+#include "global_define.h"
 extern int pointtotext(char *buf,Point_Net *point);
 Str_label_point m_temp_graphic_label_data[BAC_GRPHIC_LABEL_COUNT];
 
@@ -320,7 +320,7 @@ LRESULT  CBacnetScreenEdit::RedrawScreeneditWindow(WPARAM wParam, LPARAM lParam)
 
 void CBacnetScreenEdit::OnBnClickedButtonScreenEditTest()
 {
-	// TODO: Add your control notification handler code here
+	
 }
 
 #include "BacnetMonitor.h"
@@ -333,7 +333,7 @@ extern BacnetWeeklyRoutine *WeeklyRoutine_Window ;
 extern BacnetAnnualRoutine *AnnualRoutine_Window ;
 BOOL CBacnetScreenEdit::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 
 	if((pMsg->message == WM_KEYDOWN) && (pMsg->wParam == VK_RETURN) && (m_bac_select_label>=0))
@@ -720,7 +720,7 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 	m_bac_lbuttondown = false;
 	//暂时加入，到时候要删掉的，不在这加，debug;
 	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//Insert键
-	// TODO:  Add extra initialization here
+	
 	
 	m_cxScreen=GetSystemMetrics(SM_CXSCREEN);
 	m_cyScreen=GetSystemMetrics(SM_CYSCREEN);
@@ -1231,7 +1231,7 @@ void CBacnetScreenEdit::OnPaint()
 	::GetWindowRect(BacNet_hwd,&mynew_rect);	//获取 view的窗体大小;
 
 	
-	// TODO: Add your message handler code here
+	
 	// Do not call CDialogEx::OnPaint() for painting messages
 
 	CMemDC memDC(dc,this);
@@ -1764,24 +1764,7 @@ void CBacnetScreenEdit::OnPaint()
 				}
 				else
 				{
-					//HBITMAP 	hBitmap_brown_bmp2;
-					//hBitmap_brown_bmp2 =(HBITMAP)LoadImage(AfxGetInstanceHandle(),  
-					//	MAKEINTRESOURCE(IDB_PNG1),  
-					//	IMAGE_BITMAP,0,0,  
-					//	LR_LOADMAP3DCOLORS | LR_LOADTRANSPARENT);
 
-					//Bitmap icon_bitmap(hBitmap_brown_bmp2,NULL);
-
-					//HICON default_input_icon;
-					//HICON default_output_icon;
-					//HICON default_variable_icon;
-					//HICON default_program_icon;
-					//HICON default_pid_icon;
-					//HICON default_holiday_icon;
-					//HICON default_schedual_icon;
-					//HICON default_trendlog_icon;
-
-					//Bitmap icon_bitmap(default_schedual_icon);
 					int temp_point_type = m_bac_label_vector.at(i).nPoint_type;
 					switch(temp_point_type)
 					{
@@ -1850,47 +1833,8 @@ void CBacnetScreenEdit::OnPaint()
 
 
 		}
-			//else// 未找到 ICON 或位图
-			//{
-			//	Graphics graphics_icon(memDC.GetDC());
-			//	Bitmap icondefault_bitmap(default_icon);
-			//	switch(m_bac_label_vector.at(i).ntext_place)
-			//	{
-			//	case LABEL_TEXT_BOTTOM:
-			//		{
-			//			icon_point.Y = pointF.Y - icon_size_y - 2;
-			//			icon_point.X = pointF.X;
-			//		}
-			//		break;
-			//	case LABEL_TEXT_LEFT:
-			//		{
-			//			icon_point.X =  pointF.X + right_point  + 2;
-			//			icon_point.Y = pointF.Y ;
-
-			//		}
-			//		break;
-			//	case LABEL_TEXT_TOP:
-			//		{
-			//			icon_point.Y = pointF.Y + 30;
-			//			icon_point.X = pointF.X;
-			//		}
-			//		break;
-			//	case LABEL_TEXT_RIGHT:
-			//		{
-			//			icon_point.X =  pointF.X - right_point - 4;
-			//			icon_point.Y = pointF.Y ;
-			//		}
-			//		break;
-			//	default:
-			//		break;
-			//	}
-			//	graphics_icon.DrawImage(&icondefault_bitmap,(int)icon_point.X ,(int)icon_point.Y,(int)icon_size_x,(int)icon_size_y);
-			//	
-
-			//}
 
 
-		//}
 		if(screen_lock_label)
 		{
 
@@ -1915,7 +1859,7 @@ void CBacnetScreenEdit::OnPaint()
 
 void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	bool click_ret = false;
 	for (int i=0;i<m_bac_label_vector.size();i++)
 	{
@@ -2209,7 +2153,7 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 
 void CBacnetScreenEdit::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if(m_bac_lbuttondown && (m_bac_select_label >=0))
 	{
 		SaveBacLabel(m_bac_select_label);
@@ -2223,7 +2167,7 @@ void CBacnetScreenEdit::OnLButtonUp(UINT nFlags, CPoint point)
 
 void CBacnetScreenEdit::OnMouseMove(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if((m_bac_select_label >=0) && m_bac_lbuttondown)
 	{
 		if(screen_lock_label)
@@ -2280,7 +2224,7 @@ bool CBacnetScreenEdit::UpdateDeviceLabelFlash()
 
 void CBacnetScreenEdit::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	m_bac_select_label = -1;
 	int nsize = screnn_sequence.size();
 	if(nsize > 1)
@@ -2325,7 +2269,7 @@ void CBacnetScreenEdit::OnCancel()
 
 void CBacnetScreenEdit::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	switch(nIDEvent)
 	{
 	case 1:
@@ -2380,7 +2324,7 @@ void CBacnetScreenEdit::OnTimer(UINT_PTR nIDEvent)
 
 void CBacnetScreenEdit::OnBnClickedButtonAdd()
 {
-	// TODO: Add your control notification handler code here
+	
 	//Add_Label();
 }
 
@@ -2390,14 +2334,14 @@ void CBacnetScreenEdit::OnBnClickedButtonAdd()
 
 void CBacnetScreenEdit::OnBnClickedButtonScreenExit()
 {
-	// TODO: Add your control notification handler code here
+	
 	PostMessage(WM_CLOSE,NULL,NULL);
 }
 
 
 void CBacnetScreenEdit::OnBnClickedButtonDelete()
 {
-	// TODO: Add your control notification handler code here
+	
 	if(m_nFoucsIndext<0)
 	{
 		MessageBox(_T("Please select a label first!"),_T("Notice"),MB_OK | MB_ICONINFORMATION);
@@ -2438,8 +2382,6 @@ void CBacnetScreenEdit::SaveBacLabel(int nItem)
 		return;
 	if(nItem>=(int)m_bac_label_vector.size())
 		return;
-	//m_pCon.CreateInstance(_T("ADODB.Connection"));
-	//m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
 	::GetWindowRect(BacNet_hwd,&mynew_rect);	//获取 view的窗体大小;
 
 	m_graphic_label_data.at( m_bac_label_vector.at(nItem).nLabel_index).reg.nPoint_x = (m_bac_label_vector.at(nItem).nPoint_x * 1000)/m_paint_right_limit;
@@ -2452,7 +2394,7 @@ void CBacnetScreenEdit::SaveBacLabel(int nItem)
 
 void CBacnetScreenEdit::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if(m_bac_select_label >=0)
 	{
 		Bacnet_Edit_Label();

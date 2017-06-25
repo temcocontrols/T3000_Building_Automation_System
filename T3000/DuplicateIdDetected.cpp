@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "DuplicateIdDetected.h"
 #include "afxdialogex.h"
-#include "globle_function.h"
+#include "global_function.h"
 
 // CDuplicateIdDetected dialog
 DWORD WINAPI HanlePanelNumber(LPVOID lpvoid);
@@ -91,7 +91,7 @@ BOOL CDuplicateIdDetected::OnInitDialog()
 	second_need_changed = false;
 	auto_close_seconds = 30;
 	cs_show_info.Empty();
-	// TODO:  Add extra initialization here
+	
 	Initial_static();
 	SetTimer(1,500,NULL);
 	SetTimer(2,1000,NULL);
@@ -222,10 +222,10 @@ DWORD WINAPI DuplicatedProcess(LPVOID lPvoid)
 			cs_show_info.Format(_T("try to change the sub id failed..."));
 			break;
 		}
-		cs_show_info.Format(_T("Waiting... (%d)"),10 - recheck_time);
+		cs_show_info.Format(_T("Waiting... (%d)"),5 - recheck_time);
 		recheck_time ++ ;
 		Sleep(1000);
-	 } while ((ret_ret != 2) && (recheck_time < 10));
+	 } while ((ret_ret != 2) && (recheck_time < 5));
 	 
 	 if(ret_ret != 2)
 	 {
@@ -241,8 +241,8 @@ DWORD WINAPI DuplicatedProcess(LPVOID lPvoid)
 	 }
 
 ret_label_write_ret:
-	mparent->GetDlgItem(IDC_BUTTON_DUPLICATE_DONE)->EnableWindow(TRUE);
-	mparent->GetDlgItem(IDC_BUTTON_DUPLICATE_CANCEL)->EnableWindow(TRUE);
+//	mparent->GetDlgItem(IDC_BUTTON_DUPLICATE_DONE)->EnableWindow(TRUE);
+//	mparent->GetDlgItem(IDC_BUTTON_DUPLICATE_CANCEL)->EnableWindow(TRUE);
 
 	
 	DuplicatedThread = NULL;
@@ -251,7 +251,7 @@ ret_label_write_ret:
 
 BOOL CDuplicateIdDetected::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -302,8 +302,8 @@ void CDuplicateIdDetected::Initial_static()
 	temp_user_text_1 = device_id_data_1.show_label_name;
 	temp_user_text_2 = device_id_data_2.show_label_name;
 
-	temp_product_id_1 = GetProductName(device_id_data_1.product_id);
-	temp_product_id_2 = GetProductName(device_id_data_2.product_id);
+	temp_product_id_1 = _T(" ");//GetProductName(device_id_data_1.product_id);
+	temp_product_id_2 = _T(" ");//GetProductName(device_id_data_2.product_id);
 
 	m_network_title.SetWindowTextW(temp_subnet);
 	m_network_title.textColor(RGB(0,0,0));
@@ -332,20 +332,16 @@ void CDuplicateIdDetected::Initial_static()
 		m_dup_propsed_id.SetWindowTextW(_T("Proposed Panel:"));
 	}
 	m_dup_current_id.textColor(RGB(0,0,0));
-	//m_dup_current_id.bkColor(RGB(0,255,255));
 	m_dup_current_id.setFont(24,16,NULL,_T("Arial"));
 
 	m_dup_propsed_id.textColor(RGB(0,0,0));
-	//m_dup_propsed_id.bkColor(RGB(0,255,255));
 	m_dup_propsed_id.setFont(24,16,NULL,_T("Arial"));
 
 
 	m_dup_serial_number.textColor(RGB(0,0,0));
-	//m_dup_serial_number.bkColor(RGB(0,255,255));
 	m_dup_serial_number.setFont(24,16,NULL,_T("Arial"));
 
 	m_dup_model.textColor(RGB(0,0,0));
-	//m_dup_model.bkColor(RGB(0,255,255));
 	m_dup_model.setFont(24,16,NULL,_T("Arial"));
 
 	m_dup_user_test.textColor(RGB(0,0,0));
@@ -480,7 +476,7 @@ void CDuplicateIdDetected::Initial_static()
 
 		if(temp_count > 0)
 		{
-			while(!m_q.eof())//次Com port 下面的所有 设备;
+			while(!m_q.eof())//此Com port 下面的所有 设备;
 			{
 				 
                     temp_pid = m_q.getValuebyName(L"Product_ID");
@@ -551,7 +547,7 @@ void CDuplicateIdDetected::Initial_static()
 
 void CDuplicateIdDetected::OnBnClickedButtonDuplicateDone()
 {
-	// TODO: Add your control notification handler code here
+	
 	KillTimer(2);
 	GetDlgItem(IDC_BUTTON_DUPLICATE_DONE)->EnableWindow(FALSE);
 	GetDlgItem(IDC_BUTTON_DUPLICATE_CANCEL)->EnableWindow(FALSE);
@@ -628,7 +624,7 @@ void CDuplicateIdDetected::OnBnClickedButtonDuplicateDone()
 
 void CDuplicateIdDetected::OnBnClickedButtonDuplicateCancel()
 {
-	// TODO: Add your control notification handler code here
+	
 	KillTimer(2);
 	edit_confilct_mode = false;
 	PostMessage(WM_CLOSE,NULL,NULL);
@@ -637,7 +633,7 @@ void CDuplicateIdDetected::OnBnClickedButtonDuplicateCancel()
 
 void CDuplicateIdDetected::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	switch(nIDEvent)
 	{
 	case 1:
@@ -668,5 +664,5 @@ void CDuplicateIdDetected::OnTimer(UINT_PTR nIDEvent)
 
 void CDuplicateIdDetected::OnStnClickedStaticNetworkTitle()
 {
-	// TODO: Add your control notification handler code here
+	
 }

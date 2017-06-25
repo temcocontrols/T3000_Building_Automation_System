@@ -218,7 +218,7 @@ BOOL CUpdateDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
-	// TODO: Add extra initialization here
+	//  Add extra initialization here
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -653,7 +653,7 @@ HCURSOR CUpdateDlg::OnQueryDragIcon()
 
 void CUpdateDlg::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	CString temp_cs;
 static	int pic_static_step = 0;
 
@@ -794,7 +794,7 @@ static	int pic_static_step = 0;
 
 void CUpdateDlg::OnBnClickedButtonCancel()
 {
-	// TODO: Add your control notification handler code here
+	
 	if(getftpthread)
 	{
 		TerminateThread(getftpthread,0);
@@ -816,7 +816,7 @@ void CUpdateDlg::OnBnClickedButtonCancel()
 
 BOOL CUpdateDlg::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN) 
 	{
 		return 1;
@@ -947,6 +947,6 @@ BOOL CUpdateDlg::DownloadFileHttp(const CString& strFileURLInServer, //´ýÏÂÔØÎÄ¼
 
 void CUpdateDlg::OnBnClickedCheckOpenT3000()
 {
-	// TODO: Add your control notification handler code here
+	
 	run_t3000 =  ((CButton *)GetDlgItem(IDC_CHECK_OPEN_T3000))->GetCheck();
 }

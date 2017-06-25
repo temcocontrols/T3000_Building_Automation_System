@@ -107,7 +107,7 @@ BOOL CLightingSet::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 //	m_outputboardsum = 1;
 // 	for (int i = 0;i<5;i++)
 // 	{

@@ -6,7 +6,7 @@
 #include "BacnetUserConfig.h"
 #include "afxdialogex.h"
 
-#include "globle_function.h"
+#include "global_function.h"
 // CBacnetUserConfig dialog
 extern bool show_user_list_window ;
 IMPLEMENT_DYNAMIC(CBacnetUserConfig, CDialogEx)
@@ -46,7 +46,7 @@ BOOL CBacnetUserConfig::OnInitDialog()
 	CDialogEx::OnInitDialog();
 	m_slected_item = -1;	//初始化时 没有选择，从0 开始选择	;
 	ok_button_stage = 0;
-	// TODO:  Add extra initialization here
+	
 	Initial_List();
 	Enable_Window_Stage(HIDE_ALL);
 	show_user_list_window = false;	//避免点击左边list的时候 也弹出 配置对话框，只有在 点userlist 按键时弹出;
@@ -162,7 +162,7 @@ void CBacnetUserConfig::Enable_Window_Stage(int nstage)
 
 BOOL CBacnetUserConfig::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message == WM_KEYDOWN)
 	{
 		if(pMsg->wParam == VK_RETURN)
@@ -312,7 +312,7 @@ LRESULT CBacnetUserConfig::Fresh_User_Item(WPARAM wParam,LPARAM lParam)
 void CBacnetUserConfig::OnNMClickUserList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 	*pResult = 0;
 
 	CString temp_cstring;
@@ -420,7 +420,7 @@ void CBacnetUserConfig::Refresh_parameter(UINT index)
 
 void CBacnetUserConfig::OnBnClickedCheckUserlistInfo()
 {
-	// TODO: Add your control notification handler code here
+	
 	if(!((CButton *)GetDlgItem(IDC_CHECK_USERLIST_INFO))->GetCheck())
 	{
 		((CButton *)GetDlgItem(IDC_CHECK_USERLIST_INFO))->SetCheck(false);
@@ -465,9 +465,6 @@ void CBacnetUserConfig::OnBnClickedCheckUserlistInfo()
 		{
 			((CButton *)GetDlgItem(IDC_CHECK_USERLIST_INFO))->SetCheck(true);
 			Device_Basic_Setting.reg.user_name = 2;
-			/*CString temp_task_info;
-			temp_task_info.Format(_T("Enable user list feature "));
-			Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);*/
 		}
 		else if(any_user_valid)
 		{
@@ -526,7 +523,7 @@ void CBacnetUserConfig::OnBnClickedCheckUserlistInfo()
 
 void CBacnetUserConfig::OnBnClickedButtonUserOk()
 {
-	// TODO: Add your control notification handler code here
+	
 	char temp_buffer[255];
 	int compare_ret = 0;
 	CString temp_enter_original;
@@ -692,7 +689,7 @@ void CBacnetUserConfig::OnBnClickedButtonUserOk()
 
 void CBacnetUserConfig::OnBnClickedButtonUserDelete()
 {
-	// TODO: Add your control notification handler code here
+	
 	if((m_slected_item<0) || (m_slected_item >= BAC_USER_LOGIN_COUNT ))
 		return;
 

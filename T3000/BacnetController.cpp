@@ -10,8 +10,8 @@
 
 #include "CM5/ud_str.h"
 #include "Bacnet_Include.h"
-#include "globle_function.h"
-#include "gloab_define.h"
+#include "global_function.h"
+#include "global_define.h"
 
 //extern int Station_NUM;
 // BacnetController dialog
@@ -104,7 +104,7 @@ BOOL BacnetController::OnInitDialog()
 	SetIcon(m_hIcon,TRUE);
 	PostMessage(WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
 	SetTimer(1,CONTROLLOR_REFRESH_TIME,NULL);
-	// TODO:  Add extra initialization here
+	
 	ShowWindow(FALSE);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -113,7 +113,7 @@ BOOL BacnetController::OnInitDialog()
 
 BOOL BacnetController::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN) 
 	{
 		CRect list_rect,win_rect;
@@ -1031,7 +1031,7 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 void BacnetController::OnNMClickListController(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 	long lRow,lCol;
 	m_controller_list.Set_Edit(true);
 	DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
@@ -1121,7 +1121,7 @@ void BacnetController::OnNMClickListController(NMHDR *pNMHDR, LRESULT *pResult)
 
 void BacnetController::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	switch(nIDEvent)
 	{
 	case 1:
@@ -1156,7 +1156,7 @@ void BacnetController::OnTimer(UINT_PTR nIDEvent)
 
 void BacnetController::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	ShowWindow(FALSE);
 	return;
 	KillTimer(1);
@@ -1167,7 +1167,7 @@ void BacnetController::OnClose()
 
 void BacnetController::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	//KillTimer(1);
 	//m_output_dlg_hwnd = NULL;
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
@@ -1205,7 +1205,7 @@ int GetPidValue(int index,CString &Auto_M,CString &persend_data)
 
 void BacnetController::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 
 	if(nID == SC_MAXIMIZE)
 	{
@@ -1261,7 +1261,7 @@ void BacnetController::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 
-	// TODO: Add your message handler code here
+	
 	CRect rc;
 	GetClientRect(rc);
 	if(m_controller_list.m_hWnd != NULL)

@@ -65,7 +65,7 @@ END_EVENTSINK_MAP()
 
 BOOL CTemcoDataGrid::OnKeyUp(short FAR* KeyCode, short Shift) 
 {
-	// TODO: Add your control notification handler code here
+	
 
 	if (*KeyCode == VK_SPACE || *KeyCode == VK_DELETE)
 	{
@@ -97,7 +97,7 @@ void CTemcoDataGrid::OnClearCell()
 //
 BOOL CTemcoDataGrid::OnMouseUp(short Button, short Shift, long x, long y) 
 {
-	// TODO: Add your control notification handler code here
+	
 	int row = get_MouseRow();
 	int col = get_MouseCol();
 
@@ -144,7 +144,7 @@ BOOL CTemcoDataGrid::OnMouseUp(short Button, short Shift, long x, long y)
 //}
 BOOL CTemcoDataGrid::OnMouseMove(short Button, short Shift, long x, long y) 
 {
-	// TODO: Add your control  handler code here
+	//  Add your control  handler code here
 	//ACE(_T("Mouse move\n"));
 
 	if (Button&0x1) // 1 - vbLeftButton 
@@ -181,7 +181,7 @@ BOOL CTemcoDataGrid::OnMouseMove(short Button, short Shift, long x, long y)
 //{
 //	HBRUSH hbr = CMsflexgrid::OnCtlColor(pDC, pWnd, nCtlColor);
 //
-//	// TODO:  Change any attributes of the DC here
+//	
 //	switch(m_pParent->GetDlgCtrlID())
 //	{
 //	case IDC_STATIC_NAME:
@@ -193,7 +193,7 @@ BOOL CTemcoDataGrid::OnMouseMove(short Button, short Shift, long x, long y)
 //			return (HBRUSH)B;
 //		}
 //	}
-//	// TODO:  Return a different brush if the default is not desired
+//	
 //
 //	//return hbr;
 //}
@@ -201,7 +201,7 @@ BOOL CTemcoDataGrid::OnMouseMove(short Button, short Shift, long x, long y)
 
 //int CTemcoDataGrid::OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message)
 //{
-//	// TODO: Add your message handler code here and/or call default
+//	 
 //
 //	return CMsflexgrid::OnMouseActivate(pDesktopWnd, nHitTest, message);
 //}
@@ -209,7 +209,7 @@ BOOL CTemcoDataGrid::OnMouseMove(short Button, short Shift, long x, long y)
 
 //void CTemcoDataGrid::OnRButtonDown(UINT nFlags, CPoint point)
 //{
-//	// TODO: Add your message handler code here and/or call default
+//	 
 //	
 //	CMsflexgrid::OnRButtonDown(nFlags, point);
 //}
@@ -217,7 +217,7 @@ BOOL CTemcoDataGrid::OnMouseMove(short Button, short Shift, long x, long y)
 
 void CTemcoDataGrid::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	m_SelCurCol=get_MouseCol();
 	m_SelCurRow=get_MouseRow();
 

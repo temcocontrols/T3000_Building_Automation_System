@@ -8,8 +8,8 @@
 
 #include "CM5/ud_str.h"
 #include "Bacnet_Include.h"
-#include "globle_function.h"
-#include "gloab_define.h"
+#include "global_function.h"
+#include "global_define.h"
 #include "BacnetRange.h"
 #include "MainFrm.h"
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
@@ -101,7 +101,7 @@ BOOL CBacnetOutput::OnInitDialog()
 	CDialogEx::OnInitDialog();
 
 	SetWindowTextW(_T("OUTPUT"));
-	// TODO:  Add extra initialization here
+	
 	m_output_item_info.SetWindowTextW(_T(""));
 	m_output_item_info.textColor(RGB(0,0,255));
 	//m_static.bkColor(RGB(0,255,255));
@@ -206,7 +206,7 @@ void CBacnetOutput::Reload_Unit_Type()
 		#endif
 		m_output_list.SetColumnWidth(OUTPUT_HW_SWITCH,80);
 	}
-	else if(bacnet_device_type == TINY_MINIPANEL)
+	else if((bacnet_device_type == TINY_MINIPANEL) || ((bacnet_device_type == TINY_EX_MINIPANEL)))
 	{
 #ifdef NEED_ANALOG_DIGITAL_ONLY
 		if(TINY_MINIPANEL_OUT_D > (int)m_Output_data.size()) 
@@ -384,6 +384,12 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		analog_special_output_count = TINY_MINIPANEL_OUT_A;
 		Minipanel_device = 1;
 	}
+	else if (bacnet_device_type == TINY_EX_MINIPANEL)
+	{
+		digital_special_output_count = TINYEX_MINIPANEL_OUT_D;
+		analog_special_output_count = TINYEX_MINIPANEL_OUT_A;
+		Minipanel_device = 1;
+	}
 	else if(bacnet_device_type == T38AI8AO6DO)
 	{
 		digital_special_output_count = T38AI8AO6DO_OUT_D;
@@ -416,10 +422,18 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 	{
 		OUTPUT_LIMITE_ITEM_COUNT = 8;
 	}
+<<<<<<< HEAD
 	else if (
 		(bacnet_device_type == PID_T36CTA))
+=======
+	else if ((bacnet_device_type == PID_T36CTA))
+>>>>>>> master
 	{
 		OUTPUT_LIMITE_ITEM_COUNT = 2;
+	}
+	else if (bacnet_device_type == TINY_EX_MINIPANEL)
+	{
+		//OUTPUT_LIMITE_ITEM_COUNT = 14;
 	}
 	else
 	{
@@ -551,7 +565,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		m_output_list.SetItemText(i,OUTPUT_LOW_VOLTAGE,low_voltage);	
 		m_output_list.SetItemText(i,OUTPUT_HIGH_VOLTAGE,high_voltage);	
 		//这样加实在是情非得已，老毛非得加一堆条件，还要smart;
-		if((bacnet_device_type == BIG_MINIPANEL) || ((bacnet_device_type == SMALL_MINIPANEL)) || (bacnet_device_type == TINY_MINIPANEL) || 
+		if((bacnet_device_type == BIG_MINIPANEL) || ((bacnet_device_type == SMALL_MINIPANEL)) || (bacnet_device_type == TINY_MINIPANEL) || (bacnet_device_type == TINY_EX_MINIPANEL) ||
 			(bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PWM_TRANSDUCER))
 		{
 			if(i < (digital_special_output_count +analog_special_output_count) )
@@ -1027,7 +1041,7 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	 
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 	long lRow,lCol;
 	m_output_list.Set_Edit(true);
 	DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
@@ -1328,17 +1342,6 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 	int cmp_ret = memcmp(&m_temp_output_data[lRow],&m_Output_data.at(lRow),sizeof(Str_out_point));
 	if(cmp_ret!=0)
 	{
-		//if(Write_Private_Data_Blocking(WRITEOUTPUT_T3000,lRow,lRow) > 0)
-		//{
-		//	temp_task_info.Format(_T("Write Output List Item%d .Changed to \"%s\" "),lRow + 1,New_CString);
-		//	SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_task_info);
-		//}
-		//else
-		//{
-		//	temp_task_info.Format(_T("Write Output List Item%d .Changed to \"%s\" Failed"),lRow + 1,New_CString);
-		//	SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_task_info);
-		//}
-
 		changed_output_item = lRow;
 		SetTimer(UPDATE_OUTPUT_ONE_ITEM_TIMER,2000,NULL);
 		m_output_list.SetItemBkColor(lRow,lCol,LIST_ITEM_CHANGED_BKCOLOR);
@@ -1356,7 +1359,7 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CBacnetOutput::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	switch(nIDEvent)
 	{
 	case 1:
@@ -1366,7 +1369,6 @@ void CBacnetOutput::OnTimer(UINT_PTR nIDEvent)
 			{
 				PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
 			}
-			//else if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
 			else if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_OUTPUT))  )	//GSM连接时不要刷新;
 			{
 				PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
@@ -1414,7 +1416,7 @@ void CBacnetOutput::OnTimer(UINT_PTR nIDEvent)
 
 BOOL CBacnetOutput::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN) 
 	{
 		CRect list_rect,win_rect;
@@ -1462,7 +1464,7 @@ BOOL CBacnetOutput::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetOutput::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 
 	ShowWindow(FALSE);
 	return;
@@ -1476,7 +1478,7 @@ void CBacnetOutput::OnClose()
 
 void CBacnetOutput::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
 }
 
@@ -1627,7 +1629,7 @@ int GetOutputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Au
 
 BOOL CBacnetOutput::OnHelpInfo(HELPINFO* pHelpInfo)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 		HWND hWnd;
 
 		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
@@ -1651,7 +1653,7 @@ void CBacnetOutput::OnSize(UINT nType, int cx, int cy)
 				m_output_list.MoveWindow(&rc);
 	}
 
-	// TODO: Add your message handler code here
+	
 }
 
 
@@ -1659,7 +1661,7 @@ void CBacnetOutput::OnSize(UINT nType, int cx, int cy)
 
 void CBacnetOutput::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if(nID == SC_MAXIMIZE)
 	{
 		if(window_max == false)

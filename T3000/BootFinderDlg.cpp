@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "BootFinderDlg.h"
 #include "afxdialogex.h"
-#include "globle_function.h"
+#include "global_function.h"
 
 
    // CBootFinderDlg dialog
@@ -226,7 +226,7 @@ void CBootFinderDlg::SetDHCP_Data()
 }
 void CBootFinderDlg::OnBnClickedOk()
 {
-    // TODO: Add your control notification handler code here
+    
     //CString strTips;
     //int mode_send_flash_try_time = 0  ;
     //ISP_STEP = ISP_SEND_FLASH_COMMAND;
@@ -409,5 +409,5 @@ void CBootFinderDlg::OnDestroy()
 
     CDialogEx::OnDestroy();
 
-    // TODO: Add your message handler code here
+    
 }

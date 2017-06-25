@@ -6,7 +6,7 @@
 #include "ImageTreeCtrl.h"
 #include "../SQLiteDriver/CppSQLite3.h"
 #include "MainFrm.h"
-#include "globle_function.h"
+#include "global_function.h"
 // CImageTreeCtrl
 enum ECmdHandler {
 	ID_RENAME = 1,
@@ -1215,7 +1215,7 @@ int CImageTreeCtrl::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 
 
-	// TODO:  Add your specialized creation code here
+	
 
 	return 0;
 }
@@ -1592,7 +1592,7 @@ void CImageTreeCtrl::OnKillFocus(CWnd* pNewWnd)
 	//TRACE(_T("Lose focus.................\n"));
 	CTreeCtrl::OnKillFocus(pNewWnd);
 
-	// TODO: Add your message handler code here
+	
 }
 
 void CImageTreeCtrl::SetVirtualTreeItem(HTREEITEM virtual_item)
@@ -1727,13 +1727,13 @@ void CImageTreeCtrl::OnSetFocus(CWnd* pOldWnd)
 	//TRACE(_T("Get focus.................\n"));
 	CTreeCtrl::OnSetFocus(pOldWnd);
 
-	// TODO: Add your message handler code here
+	
 }
 
 
 void CImageTreeCtrl::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if(tree_offline_mode == false)
 	{
 		KillTimer(1);

@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "RelayLabel.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "global_variable_extern.h"
  #include "../SQLiteDriver/CppSQLite3.h"
  
@@ -38,7 +38,7 @@ END_MESSAGE_MAP()
 
 BOOL CRelayLabel::OnEraseBkgnd(CDC* pDC)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	//CRect rcClient;
 //GetClientRect(&rcClient);
 //	pDC->FillSolidRect(&rcClient,m_bkClr);
@@ -49,7 +49,7 @@ BOOL CRelayLabel::OnEraseBkgnd(CDC* pDC)
 
 BOOL CRelayLabel::Create(LPCTSTR lpszText, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	//SetTimer(1,15000,NULL);
 	m_fFirmwareVersion=get_curtstat_version();
 	return CStatic::Create(lpszText, dwStyle, rect, pParentWnd, nID);
@@ -58,7 +58,7 @@ BOOL CRelayLabel::Create(LPCTSTR lpszText, DWORD dwStyle, const RECT& rect, CWnd
 void CRelayLabel::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-	// TODO: Add your message handler code here
+	
 	// Do not call CStatic::OnPaint() for painting messages
 
 	CRect rcClient;
@@ -932,7 +932,7 @@ void CRelayLabel::DispalyRigesterValue(int nStatus,COLORREF textClr,COLORREF bkC
 }
 void CRelayLabel::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	Invalidate();
 	CStatic::OnTimer(nIDEvent);
 }
@@ -941,5 +941,5 @@ void CRelayLabel::OnDestroy()
 {
 	CStatic::OnDestroy();
 	KillTimer(1);
-	// TODO: Add your message handler code here
+	
 }

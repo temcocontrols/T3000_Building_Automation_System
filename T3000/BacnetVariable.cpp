@@ -8,8 +8,8 @@
 
 #include "CM5/ud_str.h"
 #include "Bacnet_Include.h"
-#include "globle_function.h"
-#include "gloab_define.h"
+#include "global_function.h"
+#include "global_define.h"
 #include "BacnetRange.h"
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern int initial_dialog;
@@ -96,7 +96,7 @@ BOOL CBacnetVariable::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	SetWindowTextW(_T("VARIABLE"));
-	// TODO:  Add extra initialization here
+	
 	Initial_List();	//Initial the list of Variable,read from device;
 	PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
 
@@ -119,7 +119,7 @@ BOOL CBacnetVariable::OnInitDialog()
 
 void CBacnetVariable::OnBnClickedButtonVariableRead()
 {
-	// TODO: Add your control notification handler code here
+	
 
 	PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
 }
@@ -300,37 +300,6 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 				}
 				
 			}
-#if 0
-			m_variable_list.SetItemText(i,VARIABLE_UNITE,Digital_Units_Array[m_Variable_data.at(i).range]);	//单位 这个要商量 看要怎么搞;
-			if((m_Variable_data.at(i).range >= 12)&&(m_Variable_data.at(i).range <= 22))
-			{
-				CString temp1;
-				CStringArray temparray;
-				temp1 = Digital_Units_Array[m_Variable_data.at(i).range - 11];//11 is the sizeof the array
-				SplitCStringA(temparray,temp1,_T("/"));
-				if((temparray.GetSize()==2)&&(!temparray.GetAt(1).IsEmpty()))
-				{
-					m_variable_list.SetItemText(i,VARIABLE_VALUE,temparray.GetAt(1));
-				}
-				m_variable_list.SetItemText(i,VARIABLE_UNITE,temp1);
-			}
-			else if((m_Variable_data.at(i).range >= 1)&&(m_Variable_data.at(i).range <= 11))
-			{
-				CString temp1;
-				CStringArray temparray;
-				temp1 = Digital_Units_Array[m_Variable_data.at(i).range];
-				SplitCStringA(temparray,temp1,_T("/"));
-				if((temparray.GetSize()==2)&&(!temparray.GetAt(0).IsEmpty()))
-				{
-					m_variable_list.SetItemText(i,VARIABLE_VALUE,temparray.GetAt(0));
-				}
-				m_variable_list.SetItemText(i,VARIABLE_UNITE,temp1);
-			}
-			else
-			{
-				m_variable_list.SetItemText(i,VARIABLE_VALUE,_T("0"));
-			}
-#endif
 		}
 		else
 		{
@@ -346,13 +315,8 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 				temp_11.ReleaseBuffer();		
 				m_variable_list.SetItemText(i,VARIABLE_VALUE,temp_11);
 
-				//temp_value.Format(_T("%d"),m_Variable_data.at(i).value);
-				//m_variable_list.SetItemText(i,VARIABLE_VALUE,temp_value);
 			}
-			//else if(m_Variable_data.at(i).range == 0)
-			//{
-			//	m_variable_list.SetItemText(i,VARIABLE_UNITE,Variable_Analog_Units_Array[0]);
-			//}
+
 			else if(m_Variable_data.at(i).range<sizeof(Variable_Analog_Units_Array)/sizeof(Variable_Analog_Units_Array[0]))
 			{
 			m_variable_list.SetItemText(i,VARIABLE_UNITE,Variable_Analog_Units_Array[m_Variable_data.at(i).range]);
@@ -362,9 +326,6 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 			temp_float_value = ((float)m_Variable_data.at(i).value) / 1000;
 			cstemp_value.Format(_T("%.3f"),temp_float_value);
 			m_variable_list.SetItemText(i,VARIABLE_VALUE,cstemp_value);
-
-			//temp_value.Format(_T("%d"),m_Variable_data.at(i).value);
-			//m_variable_list.SetItemText(i,VARIABLE_VALUE,temp_value);
 			}
 			else if((m_Variable_data.at(i).range >= 34 ) && (m_Variable_data.at(i).range <= 38))
 			{
@@ -520,7 +481,7 @@ LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)
 
 void CBacnetVariable::OnBnClickedButtonVariableApply()
 {
-	// TODO: Add your control notification handler code here
+	
 	for (int i=0;i<(int)m_Variable_data.size();i++)
 	{
 		CString cs_temp=m_variable_list.GetItemText(i,VARIABLE_FULL_LABLE);
@@ -557,7 +518,7 @@ void CBacnetVariable::OnBnClickedButtonVariableApply()
 void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 	long lRow,lCol;
 	m_variable_list.Set_Edit(true);
 	DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
@@ -902,7 +863,7 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CBacnetVariable::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	switch(nIDEvent)
 	{
 	case 1:
@@ -945,7 +906,7 @@ void CBacnetVariable::OnTimer(UINT_PTR nIDEvent)
 
 void CBacnetVariable::OnNMKillfocusDatetimepicker2Variable(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: Add your control notification handler code here
+	
 	CTime temp_time;CString temp_cs;
 	int chour,cmin,csend;
 	m_variable_time_picker.GetTime(temp_time);
@@ -979,7 +940,7 @@ void CBacnetVariable::OnNMKillfocusDatetimepicker2Variable(NMHDR *pNMHDR, LRESUL
 
 BOOL CBacnetVariable::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message == WM_KEYDOWN  )
 	{
 		if(pMsg->wParam == VK_RETURN)
@@ -1026,7 +987,7 @@ BOOL CBacnetVariable::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetVariable::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	ShowWindow(FALSE);
 	return;
 	KillTimer(1);
@@ -1038,7 +999,7 @@ void CBacnetVariable::OnClose()
 
 void CBacnetVariable::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	//KillTimer(1);
 	//m_variable_dlg_hwnd = NULL;
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
@@ -1200,17 +1161,11 @@ int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &
 
 BOOL CBacnetVariable::OnHelpInfo(HELPINFO* pHelpInfo)
 {
-	//if (g_protocol==PROTOCOL_BACNET_IP){
-		HWND hWnd;
-		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
-		else
-			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_6_5_VARIABLES);
-		return (hWnd != NULL);
-// 	}
-// 	else{
-// 		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
-// 	}
-
+	HWND hWnd;
+	if (pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
+	else
+		hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_6_5_VARIABLES);
+	return (hWnd != NULL);
 	return CDialogEx::OnHelpInfo(pHelpInfo);
 }
 
@@ -1247,7 +1202,7 @@ void CBacnetVariable::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 
-	// TODO: Add your message handler code here
+	
 	CRect rc;
 	GetClientRect(rc);
 	if(m_variable_list.m_hWnd != NULL)
@@ -1260,7 +1215,7 @@ void CBacnetVariable::OnSize(UINT nType, int cx, int cy)
 
 void CBacnetVariable::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 
 	if(nID == SC_MAXIMIZE)
 	{

@@ -77,7 +77,7 @@ CChildFrame::~CChildFrame()
 
 BOOL CChildFrame::PreCreateWindow(CREATESTRUCT& cs)
 {
-	// TODO: Modify the Window class or styles here by modifying the CREATESTRUCT cs
+	// 
 	if( !CMDIChildWndEx::PreCreateWindow(cs) )
 		return FALSE;
 
@@ -385,7 +385,7 @@ int CChildFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 
 
-	// TODO:  Add your specialized creation code here
+	
 
 	return 0;
 }

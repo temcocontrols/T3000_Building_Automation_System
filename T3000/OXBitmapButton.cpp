@@ -3308,7 +3308,7 @@ void COXBitmapButton::OnToggle()
 
 BOOL COXBitmapButton::PreCreateWindow(CREATESTRUCT& cs) 
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	cs.style |= BS_OWNERDRAW;
 	return CButton::PreCreateWindow(cs);
 }

@@ -11,6 +11,11 @@
 #include "FileOperations.h" 
 
 //************************************************************************************************************
+
+/// <summary>
+/// CFExeption
+/// </summary>
+/// <param name="dwErrCode"></param>
 CFExeption::CFExeption(DWORD dwErrCode)
 {
 	LPVOID lpMsgBuf;
@@ -21,7 +26,10 @@ CFExeption::CFExeption(DWORD dwErrCode)
 	m_dwError = dwErrCode;
 }
 
-
+/// <summary>
+/// CFExeption Construction
+/// </summary>
+/// <param name="sErrText"></param>
 CFExeption::CFExeption(CString sErrText)
 {
 	m_sError = sErrText;
@@ -31,12 +39,20 @@ CFExeption::CFExeption(CString sErrText)
 
 //************************************************************************************************************
 
+
+/// <summary>
+/// CFExeption  Construction
+/// </summary>
 CFileOperation::CFileOperation()
 {
 	Initialize();
 }
 
 
+
+/// <summary>
+/// Construction Initialize
+/// </summary>
 void CFileOperation::Initialize()
 {
 	m_sError = _T("No error");
@@ -48,6 +64,11 @@ void CFileOperation::Initialize()
 }
 
 
+
+/// <summary>
+/// Delete a file by path name as a string 
+/// </summary>
+/// <param name="sPathName"></param>
 void CFileOperation::DoDelete(CString sPathName)
 {
 	CFileFind ff;
@@ -84,6 +105,12 @@ void CFileOperation::DoDelete(CString sPathName)
 }
 
 
+/// <summary>
+/// copy file fold from one place to another place 
+/// </summary>
+/// <param name="sSourceFolder"></param>
+/// <param name="sDestFolder"></param>
+/// <param name="bDelteAfterCopy"></param>
 void CFileOperation::DoFolderCopy(CString sSourceFolder, CString sDestFolder, bool bDelteAfterCopy)
 {
 	CFileFind ff;
@@ -119,6 +146,11 @@ void CFileOperation::DoFolderCopy(CString sSourceFolder, CString sDestFolder, bo
 }
 
 
+/// <summary>
+/// Delete path by a string name
+/// </summary>
+/// <param name="sPathName"></param>
+/// <returns></returns>
 bool CFileOperation::Delete(CString sPathName)
 {
 	try
@@ -137,6 +169,14 @@ bool CFileOperation::Delete(CString sPathName)
 }
 
 
+
+
+/// <summary>
+/// Rename file 
+/// </summary>
+/// <param name="sSource"></param>
+/// <param name="sDest"></param>
+/// <returns></returns>
 bool CFileOperation::Rename(CString sSource, CString sDest)
 {
 	try
@@ -154,13 +194,24 @@ bool CFileOperation::Rename(CString sSource, CString sDest)
 	return true;
 }
 
- 
+ /// <summary>
+ /// Rename from one to another 
+ /// </summary>
+ /// <param name="sSource"></param>
+ /// <param name="sDest"></param>
 void CFileOperation::DoRename(CString sSource, CString sDest)
 {
 	if (!MoveFile(sSource, sDest)) throw new CFExeption(GetLastError());
 }
 
 
+
+/// <summary>
+/// copy from one dest to source .
+/// </summary>
+/// <param name="sSource"></param>
+/// <param name="sDest"></param>
+/// <param name="bDelteAfterCopy"></param>
 void CFileOperation::DoCopy(CString sSource, CString sDest, bool bDelteAfterCopy)
 {
 	CheckSelfRecursion(sSource, sDest);
@@ -241,6 +292,13 @@ void CFileOperation::DoCopy(CString sSource, CString sDest, bool bDelteAfterCopy
 }
 
 
+
+/// <summary>
+/// Do file copy 
+/// </summary>
+/// <param name="sSourceFile"></param>
+/// <param name="sDestFile"></param>
+/// <param name="bDelteAfterCopy"></param>
 void CFileOperation::DoFileCopy(CString sSourceFile, CString sDestFile, bool bDelteAfterCopy)
 {
 	BOOL bOvrwriteFails = FALSE;
@@ -260,6 +318,12 @@ void CFileOperation::DoFileCopy(CString sSourceFile, CString sDestFile, bool bDe
 }
 
 
+/// <summary>
+/// copy file 
+/// </summary>
+/// <param name="sSource"></param>
+/// <param name="sDest"></param>
+/// <returns></returns>
 bool CFileOperation::Copy(CString sSource, CString sDest)
 {
 	if (CheckSelfCopy(sSource, sDest)) return true;
@@ -282,6 +346,14 @@ bool CFileOperation::Copy(CString sSource, CString sDest)
 }
 
 
+
+
+/// <summary>
+/// replace file from one place to another place
+/// </summary>
+/// <param name="sSource"></param>
+/// <param name="sDest"></param>
+/// <returns></returns>
 bool CFileOperation::Replace(CString sSource, CString sDest)
 {
 	if (CheckSelfCopy(sSource, sDest)) return true;
@@ -308,6 +380,11 @@ bool CFileOperation::Replace(CString sSource, CString sDest)
 }
 
 
+/// <summary>
+/// change file name 
+/// </summary>
+/// <param name="sFileName"></param>
+/// <returns></returns>
 CString CFileOperation::ChangeFileName(CString sFileName)
 {
 	CString sName, sNewName, sResult;
@@ -368,7 +445,11 @@ CString CFileOperation::ChangeFileName(CString sFileName)
 	return sResult;
 }
 
-
+/// <summary>
+/// is file exist ?
+/// </summary>
+/// <param name="sPathName"></param>
+/// <returns></returns>
 bool CFileOperation::IsFileExist(CString sPathName)
 {
 	HANDLE hFile;
@@ -379,6 +460,12 @@ bool CFileOperation::IsFileExist(CString sPathName)
 }
 
 
+
+/// <summary>
+/// check file path .
+/// </summary>
+/// <param name="sPath"></param>
+/// <returns></returns>
 int CFileOperation::CheckPath(CString sPath)
 {
 	DWORD dwAttr = GetFileAttributes(sPath);
@@ -393,12 +480,21 @@ int CFileOperation::CheckPath(CString sPath)
 }
 
 
+/// <summary>
+/// set a file path
+/// </summary>
+/// <param name="sPath"></param>
 void CFileOperation::PreparePath(CString &sPath)
 {
 	if(sPath.Right(1) != "\\") sPath += "\\";
 }
 
 
+/// <summary>
+/// delete file path .t
+/// </summary>
+/// <param name="sPathName"></param>
+/// <returns></returns>
 bool CFileOperation::CanDelete(CString sPathName)
 {
 	DWORD dwAttr = GetFileAttributes(sPathName);

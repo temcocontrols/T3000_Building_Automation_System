@@ -4,7 +4,7 @@
 #include "T3000.h"
 #include "BuildingConfigration.h"
 #include "afxdialogex.h"
- 
+#include "BacnetRemotePortWarning.h"
  
 #include <iostream>
 #include <windows.h>
@@ -12,7 +12,7 @@
 #include "FileOperations.h"
 #include "BuildingConfigEditDlg.h"
 
-#include "globle_function.h"
+#include "global_function.h"
 #include "ConnectRemoteServer.h"
 #include "RemotePtpLogin.h"
 #include <ctime>
@@ -104,7 +104,7 @@ BOOL CBuildingConfigration::OnInitDialog()
 
 
     Initial_Building_List();
-    // TODO:  Add extra initialization here
+    
 
     return TRUE;  // return TRUE unless you set the focus to a control
     // EXCEPTION: OCX Property Pages should return FALSE
@@ -113,7 +113,7 @@ BOOL CBuildingConfigration::OnInitDialog()
 
 BOOL CBuildingConfigration::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: Add your specialized code here and/or call the base class
+    
     if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN)
     {
         CRect list_rect,win_rect;
@@ -1290,8 +1290,8 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
             }
             else
             {
-                IP = _T("192.168.0.3");
-                Port = _T("10000");
+				IP = _T("newfirmware.com");
+				Port = _T("502");
             }
 			if(Changed_Item>= m_BuildNameLst.size())
 			{
@@ -1304,6 +1304,11 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
             m_building_config_list.SetItemText(m_changedRow,BC_IPADDRESS,IP);
             m_building_config_list.SetItemText(m_changedRow,BC_IPPORT,Port);
 
+			if (GetPrivateProfileInt(_T("Setting"), _T("ENABLE_PORT_WARNING"), 1, g_cstring_ini_path) == 1)
+			{
+				CBacnetRemotePortWarning Dlg;
+				Dlg.DoModal();
+			}
         }
 
         if( (protocol_index == INDEX_MODBUS_485) ||
@@ -1558,7 +1563,7 @@ BOOL IsNum(CString str)
 
 void CBuildingConfigration::OnBnClickedBuildingButtonAdd()
 {
-    // TODO: Add your control notification handler code here
+    
     bool is_domain = false;
     int last_count = m_building_config_list.GetItemCount() - 1;
     CString strMainBuildName;
@@ -1730,14 +1735,14 @@ void CBuildingConfigration::OnSize(UINT nType, int cx, int cy)
 
     CDialogEx::OnSize(nType, cx, cy);
 
-    // TODO: Add your message handler code here
+    
 }
 
 
 void CBuildingConfigration::OnNMClickListBuildingConfig(NMHDR *pNMHDR, LRESULT *pResult)
 {
     LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-    // TODO: Add your control notification handler code here
+    
     CString temp_cstring;
     long lRow,lCol;
     m_building_config_list.Set_Edit(true);
@@ -2318,7 +2323,7 @@ void CBuildingConfigration::OnBuildingconfigDelete()
 
 LRESULT CBuildingConfigration::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
-    // TODO: Add your specialized code here and/or call the base class
+    
     if (message==WM_FRESH_DB)
     {
         Fresh_List_Row();
@@ -2330,7 +2335,7 @@ LRESULT CBuildingConfigration::WindowProc(UINT message, WPARAM wParam, LPARAM lP
 
 void CBuildingConfigration::OnBnClickedOk()
 {
-    // TODO: Add your control notification handler code here
+    
     //CDialogEx::OnOK();
 }
 
@@ -2339,7 +2344,7 @@ void CBuildingConfigration::OnNMDblclkListBuildingConfig(NMHDR *pNMHDR, LRESULT 
 {
 
    LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 	CString temp_cstring;
 	long lRow,lCol;
 	m_building_config_list.Set_Edit(true);

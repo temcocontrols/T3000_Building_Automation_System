@@ -44,7 +44,7 @@ END_MESSAGE_MAP()
 
 void CBacnetToolReadProperty::OnBnClickedBtnBacSend()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString temp_instance;
 	m_instance_edit.GetWindowTextW(temp_instance);
 	if(temp_instance.IsEmpty())
@@ -64,7 +64,7 @@ void CBacnetToolReadProperty::OnBnClickedBtnBacSend()
 
 BOOL CBacnetToolReadProperty::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message == WM_KEYDOWN)
 	{
 		if(pMsg->wParam == VK_RETURN)
@@ -78,7 +78,7 @@ BOOL CBacnetToolReadProperty::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	Initial_combo();
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -134,7 +134,7 @@ void CBacnetToolReadProperty::Initial_combo()
 
 void CBacnetToolReadProperty::OnBnClickedBtnBacCancel()
 {
-	// TODO: Add your control notification handler code here
+	
 		read_property_cancel = true;
 		PostMessage(WM_CLOSE,NULL,NULL);
 }

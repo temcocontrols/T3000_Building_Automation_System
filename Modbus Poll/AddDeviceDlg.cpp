@@ -47,8 +47,8 @@ END_MESSAGE_MAP()
 
 void CAddDeviceDlg::OnBnClickedOk()
 {
-	// TODO: Add your control notification handler code here
-	//
+	
+	
 	UpdateData(TRUE);
 CDialogEx::OnOK();
 }

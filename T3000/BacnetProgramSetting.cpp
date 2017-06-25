@@ -43,7 +43,7 @@ END_MESSAGE_MAP()
 
 void CBacnetProgramSetting::OnBnClickedOk()
 {
-	// TODO: Add your control notification handler code here
+	
 	COLORREF color_text = ((CMFCColorButton *)GetDlgItem(IDC_MFCCOLORBUTTON_DEFAULT_TEXT))->GetColor();
 	COLORREF color_label = ((CMFCColorButton *)GetDlgItem(IDC_MFCCOLORBUTTON_LABEL))->GetColor();
 	COLORREF color_function = ((CMFCColorButton *)GetDlgItem(IDC_MFCCOLORBUTTON_FUNCTION))->GetColor();
@@ -97,7 +97,7 @@ BOOL CBacnetProgramSetting::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	((CMFCColorButton *)GetDlgItem(IDC_MFCCOLORBUTTON_DEFAULT_TEXT))->EnableAutomaticButton(_T("Automatic"), DEFAULT_PRG_TEXT_COLOR);
 	((CMFCColorButton *)GetDlgItem(IDC_MFCCOLORBUTTON_DEFAULT_TEXT))->EnableOtherButton(_T("Other"));
 	((CMFCColorButton *)GetDlgItem(IDC_MFCCOLORBUTTON_DEFAULT_TEXT))->SetColor(prg_text_color);

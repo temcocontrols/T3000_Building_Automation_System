@@ -41,7 +41,7 @@ END_MESSAGE_MAP()
 
 void CBacnetaddintodb::OnBnClickedBacnetSettingAddBtn()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString temp_add_id;
 	temp_add_id.Empty();
 	GetDlgItem(IDC_BACNET_ADDED_EDIT)->GetWindowTextW(temp_add_id);
@@ -88,7 +88,7 @@ BOOL CBacnetaddintodb::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	memset(bacnet_add_id,0,254);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -97,7 +97,7 @@ BOOL CBacnetaddintodb::OnInitDialog()
 
 BOOL CBacnetaddintodb::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if((pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN))
 	{
 		if(bacnet_add_id[0] == 0)
@@ -111,7 +111,7 @@ BOOL CBacnetaddintodb::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetaddintodb::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	CDialogEx::OnCancel();
 }
@@ -119,7 +119,7 @@ void CBacnetaddintodb::OnCancel()
 
 void CBacnetaddintodb::OnBnClickedButtonSettingAddOk()
 {
-	// TODO: Add your control notification handler code here
+	
 	if(bacnet_add_id[0] == 0)
 		cancle_send = true;
 	else
@@ -130,7 +130,7 @@ void CBacnetaddintodb::OnBnClickedButtonSettingAddOk()
 
 void CBacnetaddintodb::OnBnClickedButtonSettingAddCancel()
 {
-	// TODO: Add your control notification handler code here
+	
 	cancle_send = false;
 	PostMessage(WM_CLOSE,0,0);
 }
@@ -138,7 +138,7 @@ void CBacnetaddintodb::OnBnClickedButtonSettingAddCancel()
 
 void CBacnetaddintodb::OnBnClickedBacnetSettingClearBtn()
 {
-	// TODO: Add your control notification handler code here
+	
 	GetDlgItem(IDC_STATIC_ADDED_SHOW)->SetWindowTextW(_T(""));
 	memset(bacnet_add_id,0,254);
 }

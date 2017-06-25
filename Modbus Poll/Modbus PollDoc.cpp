@@ -62,7 +62,7 @@ void CModbusPollDoc::OnDrawThumbnail(CDC& dc, LPRECT lprcBounds)
 	// Modify this code to draw the document's data
 	dc.FillSolidRect(lprcBounds, RGB(255, 255, 255));
 
-	CString strText = _T("TODO: implement thumbnail drawing here");
+	CString strText = _T(" implement thumbnail drawing here");
 	LOGFONT lf;
 
 	CFont* pDefaultGUIFont = CFont::FromHandle((HFONT) GetStockObject(DEFAULT_GUI_FONT));
@@ -214,7 +214,7 @@ BOOL CModbusPollDoc::OnOpenDocument(LPCTSTR lpszPathName)
 
 BOOL CModbusPollDoc::OnSaveDocument(LPCTSTR lpszPathName)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	CMDIChildWnd * pChild =
 		((CMDIFrameWnd*)(AfxGetApp()->m_pMainWnd))->MDIGetActive();
 

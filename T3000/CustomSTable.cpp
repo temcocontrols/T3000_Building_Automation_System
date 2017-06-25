@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 #include <vector>
  
-#include "globle_function.h"
+#include "global_function.h"
 
 // CCustomSTable dialog
 
@@ -250,7 +250,7 @@ void CCustomSTable::OnEnKillfocusEdit1()
 
 void CCustomSTable::OnEnKillfocusEdit8()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 // if(m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 // {
 // 	float ftemp;
@@ -392,7 +392,7 @@ void CCustomSTable::OnEnKillfocusEdit20()
 
 void CCustomSTable::OnEnKillfocusEdit12()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	 
 	/*	UpdateData();*/		
 	GetDlgItem(IDC_EDIT12)->GetWindowText(m_units_s);
@@ -441,7 +441,7 @@ void CCustomSTable::OnEnKillfocusEdit12()
 
 void CCustomSTable::OnBnClickedOk()
 {
-	// TODO: Add your control notification handler code here
+	
 
 	if(m_InputNo==2)
 	{

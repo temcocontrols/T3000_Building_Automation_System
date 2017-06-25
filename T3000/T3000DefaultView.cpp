@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "T3000DefaultView.h"
-#include "globle_function.h"
+#include "global_function.h"
 HBITMAP 	hBitmap_default_bmp;
 // CT3000DefaultView
 
@@ -57,29 +57,29 @@ void CT3000DefaultView::OnInitialUpdate()
 		MAKEINTRESOURCE(IDB_BITMAP_BUILDING_DEFAULT),  
 		IMAGE_BITMAP,0,0,  
 		LR_LOADMAP3DCOLORS); */ 
-    HANDLE hFind;//
-    WIN32_FIND_DATA wfd;//
-    CString bmppath = GetExePath(true)+_T("default_screen.bmp");
-    hFind = FindFirstFile(bmppath, &wfd);//
-    if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
-    {
+//     HANDLE hFind;//
+//     WIN32_FIND_DATA wfd;//
+//     CString bmppath = GetExePath(true)+_T("default_screen.bmp");
+//     hFind = FindFirstFile(bmppath, &wfd);//
+//     if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
+//     {
         hBitmap_default_bmp =(HBITMAP)LoadImage(AfxGetInstanceHandle(),  
             MAKEINTRESOURCE(IDB_BITMAP_BUILDING_DEFAULT),  
             IMAGE_BITMAP,0,0,  
             LR_LOADMAP3DCOLORS);
-    }
-    else
-    {
-        hBitmap_default_bmp =(HBITMAP)LoadImage(AfxGetInstanceHandle(),
-            bmppath,  
-            IMAGE_BITMAP,0,0,  
-            LR_LOADFROMFILE|LR_CREATEDIBSECTION); 
-        if(NULL == hBitmap_default_bmp)
-        {
-            // LoadImage faled so get extended error information.
-            DWORD dwError = ::GetLastError();
-        }
-    }
+//     }
+//     else
+//     {
+//         hBitmap_default_bmp =(HBITMAP)LoadImage(AfxGetInstanceHandle(),
+//             bmppath,  
+//             IMAGE_BITMAP,0,0,  
+//             LR_LOADFROMFILE|LR_CREATEDIBSECTION); 
+//         if(NULL == hBitmap_default_bmp)
+//         {
+//             // LoadImage faled so get extended error information.
+//             DWORD dwError = ::GetLastError();
+//         }
+//     }
    
 	CFormView::OnInitialUpdate();
 }
@@ -91,7 +91,7 @@ void CT3000DefaultView::Fresh()
 void CT3000DefaultView::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-	// TODO: Add your message handler code here
+	
 	// Do not call CFormView::OnPaint() for painting messages
 	CMemDC memDC(dc,this);
 	Graphics graphics(memDC.GetDC());

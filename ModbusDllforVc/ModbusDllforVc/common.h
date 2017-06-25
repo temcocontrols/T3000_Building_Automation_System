@@ -74,7 +74,6 @@ OUTPUT void Create_T3000_log_file();
 OUTPUT CString Get_NowTime();
 void SaveBufferToLogFile(TS_UC* pBuffer, int nSize);
 
-
 //--------------------------------
 OUTPUT void SetCommunicationType(int nType);
 OUTPUT int GetCommunicationType(void);

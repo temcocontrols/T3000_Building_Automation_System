@@ -247,7 +247,7 @@ void CMyOwnListCtrl::OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
 void CMyOwnListCtrl::OnColumnclick(NMHDR* pNMHDR, LRESULT* pResult) 
 {
 	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
-	// TODO: Add your control notification handler code here
+	
 	const int COL = pNMListView->iSubItem;
 	SortItems(COL, COL == m_nSortCol ? !m_bSortAscending : TRUE);
 	*pResult = 0;
@@ -255,37 +255,37 @@ void CMyOwnListCtrl::OnColumnclick(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CMyOwnListCtrl::OnLButtonDown(UINT nFlags, CPoint point) 
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	_MouseClkMonitor(WM_LBUTTONDOWN, nFlags, point, TRUE);
 }
 
 void CMyOwnListCtrl::OnLButtonDblClk(UINT nFlags, CPoint point) 
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	_MouseClkMonitor(WM_LBUTTONDBLCLK, nFlags, point, TRUE);
 }
 
 void CMyOwnListCtrl::OnMButtonDown(UINT nFlags, CPoint point) 
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	_MouseClkMonitor(WM_MBUTTONDOWN, nFlags, point, FALSE);
 }
 
 void CMyOwnListCtrl::OnMButtonDblClk(UINT nFlags, CPoint point) 
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	_MouseClkMonitor(WM_MBUTTONDBLCLK, nFlags, point, FALSE);
 }
 
 void CMyOwnListCtrl::OnRButtonDown(UINT nFlags, CPoint point) 
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	_MouseClkMonitor(WM_RBUTTONDOWN, nFlags, point, FALSE);
 }
 
 void CMyOwnListCtrl::OnRButtonDblClk(UINT nFlags, CPoint point) 
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	_MouseClkMonitor(WM_RBUTTONDBLCLK, nFlags, point, FALSE);
 }
 
@@ -296,7 +296,7 @@ int CMyOwnListCtrl::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CListCtrl::OnCreate(lpCreateStruct) == -1)
 		return -1;
 	
-	// TODO: Add your specialized creation code here
+	
 	SetExtendedStyle(GetExtendedStyle());
 	ASSERT(GetHeaderCtrl() != NULL);
 	return 0;
@@ -309,7 +309,7 @@ void CMyOwnListCtrl::OnDestroy()
 	m_imgList.DeleteImageList();
 	m_headerImgList.DeleteImageList();
 	CListCtrl::OnDestroy();
-	// TODO: Add your message handler code here	
+		
 }
 
 BOOL CMyOwnListCtrl::_IsValidIndex(int nIndex) const
@@ -846,7 +846,7 @@ DWORD CMyOwnListCtrl::SetExtendedStyle(DWORD dwNewStyle)
 
 BOOL CMyOwnListCtrl::PreCreateWindow(CREATESTRUCT& cs) 
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	cs.style &= ~MUST_NOT_STYLE;
 	cs.style |= MUST_STYLE;
 	return CListCtrl::PreCreateWindow(cs);
@@ -854,7 +854,7 @@ BOOL CMyOwnListCtrl::PreCreateWindow(CREATESTRUCT& cs)
 
 BOOL CMyOwnListCtrl::PreTranslateMessage(MSG* pMsg) 
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if (pMsg->message == WM_KEYDOWN)
 	{
 		if (!_IsEditVisible())
@@ -924,7 +924,7 @@ CEdit* CMyOwnListCtrl::GetEditControl()
 
 BOOL CMyOwnListCtrl::Create(CWnd* pParentWnd, UINT nID, LPCRECT lpRect, DWORD dwStyle) 
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	ASSERT(pParentWnd != NULL);
 
 	dwStyle &= ~MUST_NOT_STYLE;
@@ -941,7 +941,7 @@ BOOL CMyOwnListCtrl::Create(CWnd* pParentWnd, UINT nID, LPCRECT lpRect, DWORD dw
 
 void CMyOwnListCtrl::PreSubclassWindow() 
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	LONG lStyle = ::GetWindowLong(GetSafeHwnd(), GWL_STYLE);
 	lStyle &= ~MUST_NOT_STYLE;
 	lStyle |= MUST_STYLE;

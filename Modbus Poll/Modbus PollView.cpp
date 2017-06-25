@@ -148,7 +148,7 @@ void CModbusPollView::DoDataExchange(CDataExchange* pDX)
 
 BOOL CModbusPollView::PreCreateWindow(CREATESTRUCT& cs)
 {
-	// TODO: Modify the Window class or styles here by modifying
+	//  Modify the Window class or styles here by modifying
 	//  the CREATESTRUCT cs
 
 	return CFormView::PreCreateWindow(cs);
@@ -1308,7 +1308,7 @@ return 1;
 
 BOOL CModbusPollView::DestroyWindow()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	 	
 	return CFormView::DestroyWindow();
 }
@@ -1877,7 +1877,7 @@ void CModbusPollView::OnGridEndEdit(NMHDR *pNotifyStruct, LRESULT* pResult)
 }
 BOOL CModbusPollView::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if (pMsg->message == WM_KEYDOWN)
 	{
 		if (pMsg->wParam == VK_RETURN

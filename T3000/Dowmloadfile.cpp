@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "Dowmloadfile.h"
 #include "afxdialogex.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "MainFrm.h"
 #include "Class/md5.h"
 // Dowmloadfile dialog
@@ -763,7 +763,7 @@ BOOL Dowmloadfile::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	CreateProductFolderMap();
 
 	productfolder = GetProdcutFtpPath(m_product_isp_auto_flash.product_class_id);
@@ -886,7 +886,7 @@ BOOL Dowmloadfile::OnInitDialog()
 
 BOOL Dowmloadfile::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message == WM_KEYDOWN)
 	{
 		if((pMsg->wParam==VK_RETURN)  || (pMsg->wParam == VK_ESCAPE))
@@ -980,15 +980,11 @@ void Dowmloadfile::Start_Download()
 	const BOOL bReuseaddr=TRUE;
 	const BOOL bDontLinger = FALSE; 
 	TCP_File_Socket.SetSockOpt(SO_DONTLINGER,&bDontLinger,sizeof(BOOL),SOL_SOCKET);
-
-	//sockClient.Create(m_my_port,SOCK_STREAM);
 	TCP_File_Socket.SetSockOpt(SO_REUSEADDR,&bReuseaddr,sizeof(BOOL),SOL_SOCKET);
 	TCP_File_Socket.GetLastError();
 	TCP_File_Socket.AsyncSelect(FD_READ |FD_CONNECT |FD_CLOSE);
 
 	((CComboBox *)GetDlgItem(IDC_COMBO_UPDATE_TYPE))->EnableWindow(false);
-	//((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_TEMCO_IP))->SetAddress(IP_ADDRESS_SERVER);
-	//((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_TEMCO_IP))->EnableWindow(false);
 	GetDlgItem(IDC_BUTTON_START_DOWNLOAD)->EnableWindow(false);
 	GetDlgItem(IDC_BUTTON_FILE_DOWNLOAD_ONLY)->EnableWindow(false);
 }
@@ -996,7 +992,7 @@ void Dowmloadfile::Start_Download()
 
 void Dowmloadfile::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if(wait_download_and_isp_finished)
 	{
 		MessageBox(_T("Can't exit, please wait!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
@@ -1010,7 +1006,7 @@ void Dowmloadfile::OnClose()
 
 void Dowmloadfile::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	CDialogEx::OnCancel();
 }
@@ -1035,7 +1031,7 @@ BOOL Dowmloadfile::IsNetDevice(int DevType)
 
 void Dowmloadfile::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	int temp_count = 0;
 	switch(nIDEvent)
 	{
@@ -1113,7 +1109,7 @@ void Dowmloadfile::OnTimer(UINT_PTR nIDEvent)
 
 void Dowmloadfile::OnBnClickedButton1()
 {
-	// TODO: Add your control notification handler code here
+	
 
 
 	CString temp_folder_path;
@@ -1141,14 +1137,14 @@ void Dowmloadfile::OnBnClickedButton1()
 
 void Dowmloadfile::OnBnClickedButtonStartDownload()
 {
-	// TODO: Add your control notification handler code here
+	
 	download_and_update = DOWNLOAD_AND_UPDATE;
 	Start_Download();
 }
 
 void Dowmloadfile::OnBnClickedButtonFileDownloadOnly()
 {
-	// TODO: Add your control notification handler code here
+	
 	download_and_update = DOWNLOAD_ONLY;
 	Start_Download();
 }
@@ -1170,131 +1166,76 @@ void Dowmloadfile::AutoFlashFirmware()
 	exe_folder.ReleaseBuffer();
 
 
-	WritePrivateProfileStringW(_T("Data"),_T("FirmwarePath"),isp_mode_detect_firmware_path,AutoFlashConfigPath);
+	WritePrivateProfileStringW(_T("Data"), _T("FirmwarePath"), isp_mode_detect_firmware_path, AutoFlashConfigPath);
 
 
 	temp_isp_info.Format(_T("FirmwarePath = "));
 	temp_isp_info = temp_isp_info + isp_mode_detect_firmware_path;
-	m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
-	m_download_info.SetTopIndex(m_download_info.GetCount()-1);
+	m_download_info.InsertString(m_download_info.GetCount(), temp_isp_info);
+	m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
 
-	
+
 
 
 	bool is_sub_device = false;
-	//CString temp_deal_ip =	m_product_isp_auto_flash.BuildingInfo.strIp;
-	//if(!temp_deal_ip.IsEmpty())
-	//{
-	//	CStringArray temparray;
-	//	SplitCStringA(temparray,temp_deal_ip,_T("."));
-	//	if(temparray.GetSize()==4)
-	//	{
-	//		if(m_product_isp_auto_flash.note_parent_serial_number == 0)
-	//			is_sub_device  = false;
-	//		else
-	//			is_sub_device = true;
-	//	}
-	//}
+
+	WritePrivateProfileStringW(_T("Data"), _T("Command"), _T("1"), AutoFlashConfigPath);
+
+	WritePrivateProfileStringW(_T("Data"), _T("COM_OR_NET"), _T("NET"), AutoFlashConfigPath);
+	WritePrivateProfileStringW(_T("Data"), _T("IPAddress"), m_product_isp_auto_flash.BuildingInfo.strIp, AutoFlashConfigPath);
+	if ((m_product_isp_auto_flash.ncomport == 0) || (m_product_isp_auto_flash.ncomport == 47808))
+	{
+		m_product_isp_auto_flash.ncomport = 502;
+	}
+	temp_isp_info.Format(_T("Communications port : network"));
+	m_download_info.InsertString(m_download_info.GetCount(), temp_isp_info);
+	temp_isp_info.Format(_T("IP Address : "));
+	temp_isp_info = temp_isp_info + m_product_isp_auto_flash.BuildingInfo.strIp;
+	m_download_info.InsertString(m_download_info.GetCount(), temp_isp_info);
 
 
-	//bool is_sub_device = (bool)IsNetDevice(m_product_isp_auto_flash.product_class_id);
+	CString n_tcpport;
+	n_tcpport.Format(_T("%d"), m_product_isp_auto_flash.ncomport);
 
+	temp_isp_info.Format(_T("Port : "));
+	temp_isp_info = temp_isp_info + n_tcpport;
+	m_download_info.InsertString(m_download_info.GetCount(), temp_isp_info);
 
-	WritePrivateProfileStringW(_T("Data"),_T("Command"),_T("1"),AutoFlashConfigPath);
-	//if(m_product_isp_auto_flash.BuildingInfo.strIp.IsEmpty() || 
-	//	(m_product_isp_auto_flash.baudrate == 19200) || 
-	//	(m_product_isp_auto_flash.baudrate == 115200))//´®¿Ú
-	//{
-	//	CString temp_baudrate;
-	//	temp_baudrate.Format(_T("%d"),m_product_isp_auto_flash.baudrate);
-	//	WritePrivateProfileStringW(_T("Data"),_T("COM_OR_NET"),_T("COM"),AutoFlashConfigPath);
-	//	CString cs_comport;
-	//	cs_comport.Format(_T("COM%d"), m_product_isp_auto_flash.ncomport);
-	//	WritePrivateProfileStringW(_T("Data"),_T("COMPORT"),cs_comport,AutoFlashConfigPath);
-	//	//WritePrivateProfileStringW(_T("Data"),_T("Baudrate"),_T("19200"),AutoFlashConfigPath);
-	//	WritePrivateProfileStringW(_T("Data"),_T("Baudrate"),temp_baudrate,AutoFlashConfigPath);
+	WritePrivateProfileStringW(_T("Data"), _T("IPPort"), n_tcpport, AutoFlashConfigPath);
+	if (is_sub_device)
+	{
+		WritePrivateProfileStringW(_T("Data"), _T("Subnote"), _T("1"), AutoFlashConfigPath);
+		CString nsub_id;
+		nsub_id.Format(_T("%d"), m_product_isp_auto_flash.product_id);
+		WritePrivateProfileStringW(_T("Data"), _T("SubID"), nsub_id, AutoFlashConfigPath);
 
-	//	CString nflash_id;
-	//	nflash_id.Format(_T("%d"),m_product_isp_auto_flash.product_id);
-	//	WritePrivateProfileStringW(_T("Data"),_T("ID"),nflash_id,AutoFlashConfigPath);
+		temp_isp_info.Format(_T("Device is subnote."));
+		m_download_info.InsertString(m_download_info.GetCount(), temp_isp_info);
+	}
+	else
+	{
+		WritePrivateProfileStringW(_T("Data"), _T("Subnote"), _T("0"), AutoFlashConfigPath);
+	}
 
-	//	temp_isp_info.Format(_T("ISP via : "));
-	//	temp_isp_info = temp_isp_info + cs_comport;
-	//	m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
-	//	temp_isp_info.Format(_T("ISP baudrate : %d"),m_product_isp_auto_flash.baudrate);
-	//	m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
-	//	temp_isp_info.Format(_T("Device ID :"));
-	//	temp_isp_info = temp_isp_info + nflash_id;
-	//	m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
-	//}
-	//else
-	//{
-		WritePrivateProfileStringW(_T("Data"),_T("COM_OR_NET"),_T("NET"),AutoFlashConfigPath);
-		WritePrivateProfileStringW(_T("Data"),_T("IPAddress"),m_product_isp_auto_flash.BuildingInfo.strIp,AutoFlashConfigPath);
-		if((m_product_isp_auto_flash.ncomport == 0) || (m_product_isp_auto_flash.ncomport == 47808))
-		{
-			m_product_isp_auto_flash.ncomport = 502;
-		}
-		temp_isp_info.Format(_T("Communications port : network"));
-		m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
-		temp_isp_info.Format(_T("IP Address : "));
-		temp_isp_info = temp_isp_info + m_product_isp_auto_flash.BuildingInfo.strIp;
-		m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
+	temp_isp_info.Format(_T("Please wait!ISP is running!"));
+	m_download_info.InsertString(m_download_info.GetCount(), temp_isp_info);
 
-
-		CString n_tcpport;
-		n_tcpport.Format(_T("%d"),m_product_isp_auto_flash.ncomport);
-
-		temp_isp_info.Format(_T("Port : "));
-		temp_isp_info = temp_isp_info + n_tcpport;
-		m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
-
-		WritePrivateProfileStringW(_T("Data"),_T("IPPort"),n_tcpport,AutoFlashConfigPath);
-		if(is_sub_device)
-		{
-			WritePrivateProfileStringW(_T("Data"),_T("Subnote"),_T("1"),AutoFlashConfigPath);
-			CString nsub_id;
-			nsub_id.Format(_T("%d"),m_product_isp_auto_flash.product_id);
-			WritePrivateProfileStringW(_T("Data"),_T("SubID"),nsub_id,AutoFlashConfigPath);
-
-			temp_isp_info.Format(_T("Device is subnote."));
-			m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
-		}
-		else
-		{
-			WritePrivateProfileStringW(_T("Data"),_T("Subnote"),_T("0"),AutoFlashConfigPath);
-		}
-
-		temp_isp_info.Format(_T("Please wait!ISP is running!"));
-		m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
-	//}
-SetTimer(1,200,NULL);
+	SetTimer(1, 200, NULL);
 	HANDLE Call_ISP_Application = NULL;
-	Call_ISP_Application =CreateThread(NULL,NULL,isp_thread,this,NULL, NULL);
+	Call_ISP_Application = CreateThread(NULL, NULL, isp_thread, this, NULL, NULL);
 }
 
 void Dowmloadfile::OnBnClickedButtonUpdateT3000()
 {
-	// TODO: Add your control notification handler code here
-	//if(is_local_temco_net == false)
-	//{
-		CString tempApplicationFolder;
-		GetModuleFileName(NULL, tempApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
-		PathRemoveFileSpec(tempApplicationFolder.GetBuffer(MAX_PATH));
-		tempApplicationFolder.ReleaseBuffer();
+	
+
+	CString tempApplicationFolder;
+	GetModuleFileName(NULL, tempApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+	PathRemoveFileSpec(tempApplicationFolder.GetBuffer(MAX_PATH));
+	tempApplicationFolder.ReleaseBuffer();
 
 
-		ShellExecute(NULL,_T("open"),_T("Update.exe"),NULL,tempApplicationFolder,SW_SHOWNORMAL);
-	//}
-	//else
-	//{
-	//	m_product_isp_auto_flash.product_class_id =  199;
-	//	download_and_update = DOWNLOAD_ONLY;
-	//	Start_Download();
-	//}
-
-
-
+	ShellExecute(NULL, _T("open"), _T("Update.exe"), NULL, tempApplicationFolder, SW_SHOWNORMAL);
 
 	return;
 }

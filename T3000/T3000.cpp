@@ -9,7 +9,6 @@
 
 #include "T3000Doc.h"
 #include "T3000View.h"
-#include "T3000TableView.h"
 #include "DialogCM5_BacNet.h"
 
 #include "LoginDlg.h"
@@ -41,9 +40,14 @@ END_MESSAGE_MAP()
 CT3000App::CT3000App()
 {
 	m_bHiColorIcons = TRUE;
+<<<<<<< HEAD
 	CurrentT3000Version=_T("    2017.5.5");
 	T3000_Version = 20316;
 
+=======
+	CurrentT3000Version=_T("    2017.5.31 ");
+	T3000_Version = 20531;
+>>>>>>> master
 	m_lastinterface=19;
 }
 // The one and only CT3000App object
@@ -117,14 +121,6 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
 	
 }
  
-
- 
-
- 
-
-
-
-
 BOOL CT3000App::JudgeT3000Version(){
 CString ftp_T3000Version;
 ftp_T3000Version=GetContentFromURL(_T("http://www.temcocontrols.com/ftp/software/T3000_Version.txt"));
@@ -207,7 +203,6 @@ void CT3000App::UpdateDB()
 				stemp_building.street = q.getValuebyName(L"street");
 			    stemp_building.ZIP = q.getValuebyName(L"ZIP");
 				stemp_building.EngineeringUnits = q.getValuebyName(L"EngineeringUnits");
-
 				q.nextRow();
 			m_Building.push_back(stemp_building);
 		 
@@ -280,11 +275,24 @@ void CT3000App::UpdateDB()
 		SqliteDBT3000.closedb();
     }
 }
+
+
+/// <summary>
+/// T3000 Start ,from here
+/// </summary>
+/// <returns></returns>
 BOOL CT3000App::InitInstance()
 {
+<<<<<<< HEAD
 	GetModulePath();
 	CString strSource = g_strExePth + L"T3000Controls.dll";
 	//TODO: call AfxInitRichEdit2() to initialize richedit2 library.
+=======
+	 
+	GetModulePath();
+	CString strSource = g_strExePth + L"T3000Controls.dll";
+	//
+>>>>>>> master
 	try
 	{
 		//if (ReadDLLRegAsm()<1)
@@ -365,7 +373,11 @@ BOOL CT3000App::InitInstance()
 		//  	}
 		// 	
 		//	versionstring=ImageString.g(index_start);
+<<<<<<< HEAD
 
+=======
+	//	Logger::WriteMessage("T3000 Unit Tester Begin....");
+>>>>>>> master
 		CWinAppEx::InitInstance();
 		HRESULT hr;
 		//
@@ -777,7 +789,7 @@ BOOL CT3000App::InitInstance()
 			// of your final executable, you should remove from the following
 			// the specific initialization routines you do not need
 			// Change the registry key under which our settings are stored
-			// TODO: You should modify this string to be something appropriate
+			//  You should modify this string to be something appropriate
 			// such as the name of your company or organization
 			SetRegistryKey(_T("Temco T3000 Application"));//
 			LoadStdProfileSettings();  // Load standard INI file options (including MRU)//
@@ -1048,7 +1060,7 @@ void CAboutDlg::OnBnClickedButton1()
 }
 int CT3000App::ExitInstance()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	CoUninitialize( );
 	return CWinAppEx::ExitInstance();
 }
@@ -1234,7 +1246,7 @@ extern tree_product	m_product_isp_auto_flash;
 bool update_t3000_only = false;
 void CAboutDlg::OnBnClickedOk()
 {
-// TODO: Add your control notification handler code here
+
 	update_t3000_only = true;
 	m_product_isp_auto_flash.product_class_id =  199;
 	Dowmloadfile Dlg;
@@ -1248,7 +1260,7 @@ BOOL CAboutDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	CString temp_version;
 	temp_version = _T("T3000 Building Automation System") + CurrentT3000Version;
 	

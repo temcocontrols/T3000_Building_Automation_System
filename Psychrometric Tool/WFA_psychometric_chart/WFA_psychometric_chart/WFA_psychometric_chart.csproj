@@ -86,10 +86,10 @@
       <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PacketDotNet">
-      <HintPath>..\..\..\..\PSYCHO FILES\T3000 Output_VS2015\PacketDotNet.dll</HintPath>
+      <HintPath>..\..\T3000 Output_VS2015\PacketDotNet.dll</HintPath>
     </Reference>
     <Reference Include="SharpPcap">
-      <HintPath>..\..\..\..\PSYCHO FILES\T3000 Output_VS2015\SharpPcap.dll</HintPath>
+      <HintPath>..\..\T3000 Output_VS2015\SharpPcap.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />

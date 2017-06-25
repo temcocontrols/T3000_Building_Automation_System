@@ -67,7 +67,6 @@ CString city;
 CString street;
 CString ZIP;
 CString EngineeringUnits;
-
 };
 struct Building_ALL{
 CString Building_Name;
@@ -80,10 +79,7 @@ struct CustomProductTable{
 _variant_t ModelNo;
 _variant_t Reg_Description;
 _variant_t Reg_ID;
-
 };
-
-
 
 struct IONAME{
 _variant_t SERIAL_ID;
@@ -136,13 +132,12 @@ _variant_t Input_or_Output;
 _variant_t Text_Color;
 _variant_t Back_Color;
 };
+
 struct Value_Range{
 _variant_t SN;
 _variant_t CInputNo;
 _variant_t CRange;
 };
-
-
 
 class COwnMemDC : public CDC {
 	private:

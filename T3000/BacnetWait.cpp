@@ -5,8 +5,8 @@
 #include "T3000.h"
 #include "BacnetWait.h"
 #include "afxdialogex.h"
-#include "gloab_define.h"
-#include "globle_function.h"
+#include "global_define.h"
+#include "global_function.h"
 extern _Refresh_Info Bacnet_Refresh_Info;
 extern _Refresh_Write_Info Write_Config_Info;
 // BacnetWait dialog
@@ -78,7 +78,7 @@ BOOL BacnetWait::OnInitDialog()
 	
 	this->ShowWindow(SW_HIDE);
 
-	// TODO:  Add extra initialization here
+	
     if((m_wait_type == BAC_WAIT_NORMAL_READ ) || (m_wait_type == BAC_WAIT_READ_DATA_WRITE_CONFIG))	//Read one of the list or read all list;
 	{
 		SetTimer(1,200,NULL);
@@ -101,7 +101,7 @@ BOOL BacnetWait::OnInitDialog()
 
 void BacnetWait::OnOK()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	CDialogEx::OnOK();
 }
@@ -109,7 +109,7 @@ void BacnetWait::OnOK()
 
 void BacnetWait::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	DestroyWindow();
 	//CDialogEx::OnCancel();
 }
@@ -117,7 +117,7 @@ void BacnetWait::OnCancel()
 
 BOOL BacnetWait::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if (pMsg->message == WM_KEYDOWN)
 	{
 		if (pMsg->wParam == VK_RETURN || pMsg->wParam == VK_ESCAPE)
@@ -405,25 +405,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 				}
 			}
 		}
-		//for (int i=0;i<BAC_TSTAT_GROUP;i++ )
-		//{
-		//	if(bac_read_which_list ==BAC_READ_ALL_LIST)
-		//	{
-		//		if(Bacnet_Refresh_Info.Read_Tstat_Info[i].task_result == BAC_RESULTS_OK)
-		//		{
-		//			success_count ++;
-		//			pos = pos +all_step;
-		//		}
-		//	}
-		//	else if(bac_read_which_list == BAC_READ_TSTAT_LIST)
-		//	{
-		//		if(Bacnet_Refresh_Info.Read_Tstat_Info[i].task_result == BAC_RESULTS_OK)
-		//		{
-		//			success_count ++;
-		//			pos = pos + tstat_step;
-		//		}
-		//	}
-		//}
+
 
 		for (int i=0;i<BAC_USER_LOGIN_GROUP;i++ )
 		{
@@ -1477,14 +1459,6 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 						Bacnet_Refresh_Info.Read_AlarmLog_Info[i].start_instance);
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
 
-
-					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
-
-					//TRACE(_T("Resend start = %d , Resend end = %d\r\n"),
-					//	Bacnet_Refresh_Info.Read_AlarmLog_Info[i].start_instance,
-					//	Bacnet_Refresh_Info.Read_AlarmLog_Info[i].end_instance);
-
-
 				}
 			}
 		}
@@ -2056,7 +2030,7 @@ endthis:
 		}
 		break;
 	}
-	// TODO: Add your message handler code here and/or call default
+	 
 
 	CDialogEx::OnTimer(nIDEvent);
 }
@@ -2066,7 +2040,7 @@ endthis:
 
 void BacnetWait::PostNcDestroy()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	CDialogEx::PostNcDestroy();
 	delete this;

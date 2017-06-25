@@ -30,92 +30,92 @@ CChartGradient::~CChartGradient()
 {
 }
 
-void CChartGradient::DrawGradient(CDC* pDC, const CRect& GradientRect, COLORREF Color1, 
-								  COLORREF Color2, EGradientType GradientType)
+void CChartGradient::DrawGradient(CDC* pDC, const CRect& GradientRect, COLORREF Color1,
+                                  COLORREF Color2, EGradientType GradientType)
 {
 #if _MFC_VER > 0x0600
-	if ( (GradientType == gtHorizontal) || (GradientType == gtVertical) )
+	if ((GradientType == gtHorizontal) || (GradientType == gtVertical))
 	{
-		TRIVERTEX vertex[2] ;
-		vertex[0].x     = GradientRect.left;
-		vertex[0].y     = GradientRect.top;
-		vertex[0].Red   = ((COLOR16)GetRValue(Color1))<<8;
-		vertex[0].Green = ((COLOR16)GetGValue(Color1))<<8;
-		vertex[0].Blue  = ((COLOR16)GetBValue(Color1))<<8;
+		TRIVERTEX vertex[2];
+		vertex[0].x = GradientRect.left;
+		vertex[0].y = GradientRect.top;
+		vertex[0].Red = ((COLOR16)GetRValue(Color1)) << 8;
+		vertex[0].Green = ((COLOR16)GetGValue(Color1)) << 8;
+		vertex[0].Blue = ((COLOR16)GetBValue(Color1)) << 8;
 		vertex[0].Alpha = 0x0000;
-		vertex[1].x     = GradientRect.right;
-		vertex[1].y     = GradientRect.bottom; 
-		vertex[1].Red   = ((COLOR16)GetRValue(Color2))<<8;
-		vertex[1].Green = ((COLOR16)GetGValue(Color2))<<8;
-		vertex[1].Blue  = ((COLOR16)GetBValue(Color2))<<8;
+		vertex[1].x = GradientRect.right;
+		vertex[1].y = GradientRect.bottom;
+		vertex[1].Red = ((COLOR16)GetRValue(Color2)) << 8;
+		vertex[1].Green = ((COLOR16)GetGValue(Color2)) << 8;
+		vertex[1].Blue = ((COLOR16)GetBValue(Color2)) << 8;
 		vertex[1].Alpha = 0x0000;
 		GRADIENT_RECT gRect;
-		gRect.UpperLeft  = 0;
+		gRect.UpperLeft = 0;
 		gRect.LowerRight = 1;
 		if (GradientType == gtHorizontal)
-			pDC->GradientFill(vertex,2,&gRect,1,GRADIENT_FILL_RECT_H);
+			pDC->GradientFill(vertex, 2, &gRect, 1,GRADIENT_FILL_RECT_H);
 		else
-			pDC->GradientFill(vertex,2,&gRect,1,GRADIENT_FILL_RECT_V);
+			pDC->GradientFill(vertex, 2, &gRect, 1,GRADIENT_FILL_RECT_V);
 	}
 	else
 	{
-		for (int i=0;i<2; i++)
+		for (int i = 0; i < 2; i++)
 		{
-			TRIVERTEX vertex[2] ;
+			TRIVERTEX vertex[2];
 			if (GradientType == gtHorizontalDouble)
 			{
-				vertex[0].x     = GradientRect.left + (GradientRect.Width()/2) * i;
-				vertex[0].y     = GradientRect.top;
+				vertex[0].x = GradientRect.left + (GradientRect.Width() / 2) * i;
+				vertex[0].y = GradientRect.top;
 			}
 			else
 			{
-				vertex[0].x     = GradientRect.left;
-				vertex[0].y     = GradientRect.top + (GradientRect.Height()/2) * i; 
+				vertex[0].x = GradientRect.left;
+				vertex[0].y = GradientRect.top + (GradientRect.Height() / 2) * i;
 			}
-			if (i==0)
+			if (i == 0)
 			{
-				vertex[0].Red   = ((COLOR16)GetRValue(Color1))<<8;
-				vertex[0].Green = ((COLOR16)GetGValue(Color1))<<8;
-				vertex[0].Blue  = ((COLOR16)GetBValue(Color1))<<8;
+				vertex[0].Red = ((COLOR16)GetRValue(Color1)) << 8;
+				vertex[0].Green = ((COLOR16)GetGValue(Color1)) << 8;
+				vertex[0].Blue = ((COLOR16)GetBValue(Color1)) << 8;
 			}
 			else
 			{
-				vertex[0].Red   = ((COLOR16)GetRValue(Color2))<<8;
-				vertex[0].Green = ((COLOR16)GetGValue(Color2))<<8;
-				vertex[0].Blue  = ((COLOR16)GetBValue(Color2))<<8;
+				vertex[0].Red = ((COLOR16)GetRValue(Color2)) << 8;
+				vertex[0].Green = ((COLOR16)GetGValue(Color2)) << 8;
+				vertex[0].Blue = ((COLOR16)GetBValue(Color2)) << 8;
 			}
 			vertex[0].Alpha = 0x0000;
 			if (GradientType == gtHorizontalDouble)
 			{
-				vertex[1].x     = GradientRect.left + (GradientRect.Width()/2) * (i+1);
-				vertex[1].y     = GradientRect.bottom; 
+				vertex[1].x = GradientRect.left + (GradientRect.Width() / 2) * (i + 1);
+				vertex[1].y = GradientRect.bottom;
 			}
 			else
 			{
-				vertex[1].x     = GradientRect.right;
-				vertex[1].y     = GradientRect.top + (GradientRect.Height()/2) * (i+1); 
+				vertex[1].x = GradientRect.right;
+				vertex[1].y = GradientRect.top + (GradientRect.Height() / 2) * (i + 1);
 			}
-			if (i==0)
+			if (i == 0)
 			{
-				vertex[1].Red   = ((COLOR16)GetRValue(Color2))<<8;
-				vertex[1].Green = ((COLOR16)GetGValue(Color2))<<8;
-				vertex[1].Blue  = ((COLOR16)GetBValue(Color2))<<8;
+				vertex[1].Red = ((COLOR16)GetRValue(Color2)) << 8;
+				vertex[1].Green = ((COLOR16)GetGValue(Color2)) << 8;
+				vertex[1].Blue = ((COLOR16)GetBValue(Color2)) << 8;
 			}
 			else
 			{
-				vertex[1].Red   = ((COLOR16)GetRValue(Color1))<<8;
-				vertex[1].Green = ((COLOR16)GetGValue(Color1))<<8;
-				vertex[1].Blue  = ((COLOR16)GetBValue(Color1))<<8;
-			}			
+				vertex[1].Red = ((COLOR16)GetRValue(Color1)) << 8;
+				vertex[1].Green = ((COLOR16)GetGValue(Color1)) << 8;
+				vertex[1].Blue = ((COLOR16)GetBValue(Color1)) << 8;
+			}
 			vertex[1].Alpha = 0x0000;
 
 			GRADIENT_RECT gRect;
-			gRect.UpperLeft  = 0;
+			gRect.UpperLeft = 0;
 			gRect.LowerRight = 1;
 			if (GradientType == gtHorizontalDouble)
-				pDC->GradientFill(vertex,2,&gRect,1,GRADIENT_FILL_RECT_H);
+				pDC->GradientFill(vertex, 2, &gRect, 1,GRADIENT_FILL_RECT_H);
 			else
-				pDC->GradientFill(vertex,2,&gRect,1,GRADIENT_FILL_RECT_V);
+				pDC->GradientFill(vertex, 2, &gRect, 1,GRADIENT_FILL_RECT_V);
 		}
 	}
 #else
@@ -123,5 +123,4 @@ void CChartGradient::DrawGradient(CDC* pDC, const CRect& GradientRect, COLORREF 
 	pDC->FillRect(GradientRect,&NewBrush);
 	DeleteObject(NewBrush);
 #endif
-
 }

@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "BacnetEditLabel.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "afxdialogex.h"
 #include "MainFrm.h"
 #define WM_EDIT_CHANGE_VALUE WM_USER + 1115
@@ -151,7 +151,7 @@ void CBacnetEditLabel::Initial_UI()
 	m_edit_display.bkColor(RGB(255,255,255));
 	m_edit_display.setFont(18,10,NULL,_T("Arial"));
 
-	// TODO:  Add extra initialization here
+	
 	m_bkClrBtn.EnableAutomaticButton(_T("Automatic"), m_bkColor);
 	m_bkClrBtn.EnableOtherButton(_T("Other"));
 	m_bkClrBtn.SetColor((COLORREF)-1);
@@ -235,7 +235,7 @@ void CBacnetEditLabel::Initial_UI()
 
 BOOL CBacnetEditLabel::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message == WM_KEYDOWN)
 	{
 		if(pMsg->wParam == VK_RETURN)
@@ -264,7 +264,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 	CString temp_unit;
 	switch(label_info.nPoint_type)
 	{
-	case 1: //input
+	case BAC_IN: //input
 		{
 			if(ncommand == CHANGE_AUTO_MANUAL)
 			{
@@ -344,7 +344,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 
 		}
 		break;
-	case 0: //Output
+	case BAC_OUT: //Output
 		{
 			if(ncommand == CHANGE_AUTO_MANUAL)
 			{
@@ -419,7 +419,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 			Post_Write_Message(g_bac_instance,WRITEOUTPUT_T3000,label_info.nPoint_number,label_info.nPoint_number,sizeof(Str_out_point),m_edit_label ,temp_task_info);
 		}
 		break;
-	case 2://variable
+	case BAC_VAR://variable
 		{
 			if(ncommand == CHANGE_AUTO_MANUAL)
 			{
@@ -496,7 +496,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 			Post_Write_Message(g_bac_instance,WRITEVARIABLE_T3000,label_info.nPoint_number,label_info.nPoint_number,sizeof(Str_variable_point),m_edit_label ,temp_task_info);
 		}
 		break;
-	case 4: //SCHEDULE
+	case BAC_SCH: //SCHEDULE
 		{
 			if(ncommand == CHANGE_AUTO_MANUAL)
 			{
@@ -523,7 +523,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 			}
 		}
 		break;
-	case 5: //HOLIDAY
+	case BAC_HOL: //HOLIDAY
 		{
 			if(ncommand == CHANGE_AUTO_MANUAL)
 			{
@@ -549,7 +549,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 			}
 		}
 		break;
-	case 6: //Program
+	case BAC_PRG: //Program
 		{
 			if(ncommand == CHANGE_AUTO_MANUAL)
 			{
@@ -605,7 +605,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 
 void CBacnetEditLabel::OnBnClickedMfccolorbuttonColor()
 {
-	// TODO: Add your control notification handler code here
+	
 		COLORREF color = m_bkClrBtn.GetColor();
 		if (color == -1)
 		{
@@ -843,6 +843,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					m_edit_auto_manual.SetWindowTextW(m_AutoManual);
 					m_edit_value.SetWindowTextW(m_value);
 
+<<<<<<< HEAD
 					if(digital_status != 2)
 					{
 						//如果是数字量 就 disable 对话框 ，用来响应 click的改变事件;
@@ -852,6 +853,17 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					{
 						m_edit_value.EnableWindow(TRUE);
 					}
+=======
+					//if(digital_status != 2)
+					//{
+					//	//如果是数字量 就 disable 对话框 ，用来响应 click的改变事件;
+					//	m_edit_value.EnableWindow(FALSE);
+					//}
+					//else
+					//{
+					//	m_edit_value.EnableWindow(TRUE);
+					//}
+>>>>>>> master
 				}
 			}
 			break;
@@ -877,7 +889,21 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					{			
 						m_AutoManual = _T("Manual");	
 
+<<<<<<< HEAD
 							m_edit_value.EnableWindow(true);
+=======
+						if (digital_status != 2)
+						{
+							//如果是数字量 就 disable 对话框 ，用来响应 click的改变事件;
+							m_edit_value.EnableWindow(FALSE);
+						}
+						else
+						{
+							m_edit_value.EnableWindow(TRUE);
+						}
+
+						//	m_edit_value.EnableWindow(true);
+>>>>>>> master
 					}
 					else
 					{
@@ -887,6 +913,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					m_edit_auto_manual.SetWindowTextW(m_AutoManual);
 					m_edit_value.SetWindowTextW(m_value);
 
+<<<<<<< HEAD
 					if (digital_status != 2)
 					{
 						//如果是数字量 就 disable 对话框 ，用来响应 click的改变事件;
@@ -896,6 +923,9 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					{
 						m_edit_value.EnableWindow(TRUE);
 					}
+=======
+
+>>>>>>> master
 				}
 			}
 			break;
@@ -919,7 +949,17 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					if(m_AutoManual.CompareNoCase(_T("M")) == 0)
 					{			
 						m_AutoManual = _T("Manual");	
-						m_edit_value.EnableWindow(true);
+
+						if (digital_status != 2)
+						{
+							//如果是数字量 就 disable 对话框 ，用来响应 click的改变事件;
+							m_edit_value.EnableWindow(FALSE);
+						}
+						else
+						{
+							m_edit_value.EnableWindow(TRUE);
+						}
+						//m_edit_value.EnableWindow(true);
 					}
 					else
 					{
@@ -928,6 +968,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					}
 					m_edit_auto_manual.SetWindowTextW(m_AutoManual);
 					m_edit_value.SetWindowTextW(m_value);
+<<<<<<< HEAD
 					if (digital_status != 2)
 					{
 						//如果是数字量 就 disable 对话框 ，用来响应 click的改变事件;
@@ -937,6 +978,9 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					{
 						m_edit_value.EnableWindow(TRUE);
 					}
+=======
+
+>>>>>>> master
 
 				}
 			}
@@ -1183,7 +1227,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 
 void CBacnetEditLabel::OnStnClickedStaticEditLabelAutoManual()
 {
-	// TODO: Add your control notification handler code here
+	
 	if((label_info.nSub_Panel == Station_NUM) && (label_info.nMain_Panel == Station_NUM))
 		PostMessage(WM_EDIT_CHANGE_VALUE,CHANGE_AUTO_MANUAL,NULL);
 	return;
@@ -1223,7 +1267,7 @@ LRESULT  CBacnetEditLabel::MessageCallBack(WPARAM wParam, LPARAM lParam)
 
 void CBacnetEditLabel::OnStnClickedStaticEditLabelDisplay()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString temp_cs;
 	if(label_info.nDisplay_Type == LABEL_SHOW_VALUE)
 	{
@@ -1302,7 +1346,7 @@ void CBacnetEditLabel::ChangeWindowPos(bool nshow)
 }
 void CBacnetEditLabel::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if((label_info.nclrTxt != label_info_buffer.nclrTxt) ||
 		(label_info.nDisplay_Type != label_info_buffer.nDisplay_Type) ||
 		(label_info.ntext_place != label_info_buffer.ntext_place) ||
@@ -1325,7 +1369,7 @@ void CBacnetEditLabel::OnClose()
 
 void CBacnetEditLabel::OnStnClickedStaticEditTextPlace()
 {
-	// TODO: Add your control notification handler code here
+	
 	if(label_info.ntext_place == LABEL_TEXT_BOTTOM)
 	{
 		label_info.ntext_place = LABEL_TEXT_LEFT;
@@ -1355,7 +1399,7 @@ void CBacnetEditLabel::OnStnClickedStaticEditTextPlace()
 
 void CBacnetEditLabel::OnStnClickedStaticEditIconSize()
 {
-	// TODO: Add your control notification handler code here
+	
 	if(label_info.n_iconsize == LABEL_ICON_SMALL)
 	{
 		label_info.n_iconsize = LABEL_ICON_NORMAL;
@@ -1380,12 +1424,12 @@ void CBacnetEditLabel::OnStnClickedStaticEditIconSize()
 #if 0
 void CBacnetEditLabel::OnEnChangeEditIconPath()
 {
-	// TODO:  If this is a RICHEDIT control, the control will not
+	
 	// send this notification unless you override the CDialogEx::OnInitDialog()
 	// function and call CRichEditCtrl().SetEventMask()
 	// with the ENM_CHANGE flag ORed into the mask.
 
-	// TODO:  Add your control notification handler code here
+	// 
 	CString FilePath;
 	CString image_fordor;
 	CString ApplicationFolder;
@@ -1437,7 +1481,7 @@ void CBacnetEditLabel::OnEnChangeEditIconPath()
 
 void CBacnetEditLabel::OnStnClickedEditIconPath()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString FilePath;
 	CString image_fordor;
 	CString ApplicationFolder;
@@ -1500,14 +1544,14 @@ void CBacnetEditLabel::OnStnClickedEditIconPath()
 
 void CBacnetEditLabel::OnBnClickedButtonLabelExit()
 {
-	// TODO: Add your control notification handler code here
+	
 	PostMessage(WM_CLOSE,NULL,NULL);
 }
 
 
 void CBacnetEditLabel::OnStnClickedEditIconPath2()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString FilePath;
 	CString image_fordor;
 	CString ApplicationFolder;
@@ -1563,7 +1607,7 @@ void CBacnetEditLabel::OnStnClickedEditIconPath2()
 
 void CBacnetEditLabel::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	CRect edit_rect;
 	((CEdit *)GetDlgItem(IDC_EDIT_LABEL_VALUE))->GetWindowRect(edit_rect);
 	ScreenToClient(&edit_rect);

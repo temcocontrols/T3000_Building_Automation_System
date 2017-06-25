@@ -41,7 +41,9 @@
 #define	SCAN_DB_SIZE				5
 
 // CCO2_View form view
-
+/// <summary>
+/// CCO2_View
+/// </summary>
 class CCO2_View : public CFormView
 {
 	DECLARE_DYNCREATE(CCO2_View)
@@ -73,7 +75,8 @@ public:
 	float m_co2_firmwareversion;
 	UINT m_co2_hardwareversion;
 	UINT m_co2_serialNumber;
-
+	float CTwoF(float tc);
+	float FTwoC(float tf);
 	bool m_temp_unit_c0_f1;
 	CString cs_temp_unit;
 	bool m_start_tip;
@@ -345,7 +348,7 @@ public:
 //	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	CEdit m_test_edit;
-    int m_product_type; //1.CO2,2.Pressure sensor
+    int m_product_type; //1.CO2,2.Pressure sensor,3 CO2 Node
 	afx_msg void OnEnKillfocusIdCo2Edit();
 	afx_msg void OnCbnSelchangeCo2Braudratecombo();
     ListCtrlEx::CListCtrlEx m_input_list;

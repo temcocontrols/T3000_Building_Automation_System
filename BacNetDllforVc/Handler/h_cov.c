@@ -205,7 +205,7 @@ int handler_cov_encode_subscriptions(
                     cov_encode_subscription(&apdu[apdu_len],
                     max_apdu - apdu_len, &COV_Subscriptions[index]);
                 apdu_len += len;
-                /* TODO: too late here to notice that we overran the buffer */
+               
                 if (apdu_len > max_apdu) {
                     return -2;
                 }

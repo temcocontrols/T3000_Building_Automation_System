@@ -9,8 +9,8 @@
 
 #include "CM5/ud_str.h"
 #include "Bacnet_Include.h"
-#include "globle_function.h"
-#include "gloab_define.h"
+#include "global_function.h"
+#include "global_define.h"
 #include "BacnetProgramSetting.h"
 #include "BacnetProgramDebug.h"
 extern CBacnetProgramEdit *ProgramEdit_Window;
@@ -240,7 +240,7 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 	SetWindowText(ShowProgramText);
 	((CBacnetProgram*)pDialog[WINDOW_PROGRAM])->Unreg_Hotkey();
 	prg_character_font.Empty();
-	// TODO:  Add extra initialization here
+	
 	m_edit_changed = false;
 	my_panel = bac_gloab_panel; //Set the panel number
 	AnalysisString.Empty();
@@ -357,7 +357,7 @@ LRESULT CBacnetProgramEdit::Fresh_Program_RichEdit(WPARAM wParam,LPARAM lParam)
 
 void CBacnetProgramEdit::OnOK()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetFocus();
 
@@ -518,7 +518,7 @@ void CBacnetProgramEdit::Syntax_analysis()
 
 void CBacnetProgramEdit::OnSend()
 {
-	// TODO: Add your command handler code here
+	
 	memset(program_code[program_list_line],0,2000);
 
 	renumvar = 1;
@@ -703,7 +703,7 @@ program_part_success:
 
 void CBacnetProgramEdit::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	UnregisterHotKey(GetSafeHwnd(),KEY_F2);//×¢ÏúF2¼ü
 	UnregisterHotKey(GetSafeHwnd(),KEY_F3);
 	UnregisterHotKey(GetSafeHwnd(),KEY_F7);
@@ -719,14 +719,14 @@ void CBacnetProgramEdit::OnClose()
 
 void CBacnetProgramEdit::OnClear()
 {
-	// TODO: Add your command handler code here
+	
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetWindowTextW(_T(""));
 }
 
 
 void CBacnetProgramEdit::OnLoadfile()
 {
-	// TODO: Add your command handler code here
+	
 
 
 	CString FilePath;
@@ -770,7 +770,7 @@ void CBacnetProgramEdit::OnLoadfile()
 
 void CBacnetProgramEdit::OnSavefile()
 {
-	// TODO: Add your command handler code here
+	
 	CFileDialog dlg(false,_T("*.txt"),_T(" "),OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,_T("txt files (*.txt)|*.txt|All Files (*.*)|*.*||"),NULL,0);
 	if(IDOK==dlg.DoModal())
 	{
@@ -810,7 +810,7 @@ void CBacnetProgramEdit::OnSavefile()
 
 void CBacnetProgramEdit::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	
 	CString Edit_Buffer;
 	GetDlgItemText(IDC_RICHEDIT2_PROGRAM,Edit_Buffer);
@@ -835,7 +835,7 @@ void CBacnetProgramEdit::OnCancel()
 //Move the mouse point to the end of the text.
 void CBacnetProgramEdit::OnEnSetfocusRichedit2Program()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString temp;
 	GetDlgItemText(IDC_RICHEDIT2_PROGRAM,temp);
 	int length = temp.GetLength();
@@ -845,7 +845,7 @@ void CBacnetProgramEdit::OnEnSetfocusRichedit2Program()
 
 void CBacnetProgramEdit::OnRefresh()
 {
-	// TODO: Add your command handler code here
+	
 
 	memset(mycode,0,2000);
 
@@ -892,7 +892,7 @@ dlg_part_success:
 
 BOOL CBacnetProgramEdit::OnHelpInfo(HELPINFO* pHelpInfo)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if (g_protocol==PROTOCOL_BACNET_IP){
 		HWND hWnd;
 
@@ -909,7 +909,7 @@ BOOL CBacnetProgramEdit::OnHelpInfo(HELPINFO* pHelpInfo)
 
 void CBacnetProgramEdit::OnProgramIdeSettings()
 {
-	// TODO: Add your command handler code here
+	
 	CBacnetProgramSetting ProgramSettingdlg;
 	ProgramSettingdlg.DoModal();
 	CString tempcs;
@@ -1072,7 +1072,7 @@ bool need_syntax = false;
 
 void CBacnetProgramEdit::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	switch(nIDEvent)
 	{
 	case 1:
@@ -1175,7 +1175,7 @@ void CBacnetProgramEdit::SetBackFont()
 
 BOOL CBacnetProgramEdit::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_INSERT) 
 	{
 		Run_once_mutex = true;
@@ -1268,7 +1268,7 @@ BOOL CBacnetProgramEdit::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetProgramEdit::OnPropertiesGotodefinition()
 {
-	// TODO: Add your command handler code here
+	
 	PostMessage(WM_KEYDOWN, VK_INSERT,1); 
 }
 

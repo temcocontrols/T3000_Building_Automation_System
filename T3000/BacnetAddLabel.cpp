@@ -40,7 +40,7 @@ BOOL CBacnetAddLabel::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	m_add_label = this->m_hWnd;
 	POINT lpPoint;
 	GetCursorPos(&lpPoint);
@@ -76,7 +76,7 @@ BOOL CBacnetAddLabel::OnInitDialog()
 
 BOOL CBacnetAddLabel::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	if(pMsg->message == WM_KEYDOWN) 
 	{

@@ -6,8 +6,8 @@
 #include "TStatOutputView.h"
 #include "BacnetOutput.h"
 #include "afxdialogex.h"
-#include "globle_function.h"
-#include "gloab_define.h"
+#include "global_function.h"
+#include "global_define.h"
  
 #include <bitset>
 #include "MainFrm.h"
@@ -930,7 +930,7 @@ void CTStatOutputView::OnInitialUpdate()
     {
         m_output_list.MoveWindow(CRect(0,0,ViewRect.Width(),ViewRect.Height()),TRUE);
     }
-    // TODO: Add your specialized code here and/or call the base class
+    
 }
 
 
@@ -1303,7 +1303,7 @@ void CTStatOutputView::Initial_Combox_Show_Tstat(){
 
 BOOL CTStatOutputView::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: Add your specialized code here and/or call the base class
+    
     if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN) 
     {
         CRect list_rect,win_rect;

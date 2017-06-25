@@ -6,7 +6,7 @@
 #include "Flash_Multy.h"
 #include "afxdialogex.h"
 #include "MainFrm.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "Dowmloadfile.h"
 #include "../SQLiteDriver/CppSQLite3.h"
 #include "BinFileParser.h"
@@ -97,7 +97,7 @@ BOOL CFlash_Multy::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
 
-    // TODO:  Add extra initialization here
+    
     m_strLogFilePath=g_strExePth+_T("Load_config_Log");
     CreateDirectory(m_strLogFilePath,NULL);//create directory file
     Initial_List();
@@ -184,7 +184,7 @@ BOOL CFlash_Multy::OnInitDialog()
 
 BOOL CFlash_Multy::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: Add your specialized code here and/or call the base class
+    
 
     return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -192,7 +192,7 @@ BOOL CFlash_Multy::PreTranslateMessage(MSG* pMsg)
 
 void CFlash_Multy::OnClose()
 {
-    // TODO: Add your message handler code here and/or call default
+     
 
     CDialogEx::OnClose();
 }
@@ -200,7 +200,7 @@ void CFlash_Multy::OnClose()
 
 void CFlash_Multy::OnCancel()
 {
-    // TODO: Add your specialized code here and/or call the base class
+    
 
     CDialogEx::OnCancel();
 }
@@ -438,7 +438,7 @@ BOOL CFlash_Multy::IsOurNetDevice(int DevType)
 
 void CFlash_Multy::OnBnClickedButtonApplyWoAllSelect()
 {
-    // TODO: Add your control notification handler code here
+    
 
     int ncount = m_flash_multy_list.GetItemCount();
     for (int i=0; i<ncount; i++)
@@ -617,7 +617,7 @@ BOOL CFlash_Multy::Product_Firmware_Check(CString ProductName,CString FirmwareFi
 }
 void CFlash_Multy::OnBnClickedButtonMultySel()
 {
-    // TODO: Add your control notification handler code here
+    
 
     CString strFilter = _T("hex File;bin File|*.hex;*.bin|all File|*.*||");
     CFileDialog dlg(true,_T("hex"),NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER,strFilter);
@@ -748,7 +748,7 @@ void CFlash_Multy::SetAutoConfig(Str_flash_device ndevice_info)
 
 void CFlash_Multy::OnBnClickedButtonStatrt()
 {
-    // TODO: Add your control notification handler code here
+    
     UpdateData();
     /*if (m_Start)
     {
@@ -1368,7 +1368,7 @@ DWORD WINAPI  CFlash_Multy::multy_check_online(LPVOID lpVoid)
 
 void CFlash_Multy::OnTimer(UINT_PTR nIDEvent)
 {
-    // TODO: Add your message handler code here and/or call default
+     
     int temp_count = 0;
     temp_count = GetPrivateProfileInt(_T("LogInfo"),_T("AddCount"),0,AutoFlashConfigPath);
     if(multy_log_count <= temp_count)
@@ -1576,7 +1576,7 @@ LRESULT CFlash_Multy::MultyFlashMessage(WPARAM wParam,LPARAM lParam)
 void CFlash_Multy::OnNMClickListFlashMulty(NMHDR *pNMHDR, LRESULT *pResult)
 {
     LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-    // TODO: Add your control notification handler code here
+    
     *pResult = 0;
 
     long lRow,lCol;
@@ -1799,7 +1799,7 @@ void CFlash_Multy::OnDestroy()
 
     CDialogEx::OnDestroy();
 
-    // TODO: Add your message handler code here
+    
 }
 
 //获取数据库中有多少 产品类型;
@@ -1850,7 +1850,7 @@ void CFlash_Multy::GetProductType()
 
 void CFlash_Multy::OnBnClickedButtonUpdateFirmware()
 {
-    // TODO: Add your control notification handler code here
+    
     GetProductType();
     flash_multi_auto = true;
 

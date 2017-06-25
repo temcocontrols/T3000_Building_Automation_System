@@ -39,7 +39,7 @@
 #include "ChartDateTimeAxis.h"
 #include "ChartCrossHairCursor.h"
 #include "ChartDragLineCursor.h"
-	
+
 #include <map>
 
 
@@ -65,7 +65,6 @@ class CChartGanttSerie;
 **/
 class CChartCtrl : public CWnd
 {
-
 public:
 	//! Retrieves de device context.
 	/**
@@ -73,12 +72,12 @@ public:
 	**/
 	CDC* GetDC();
 	//! Retrieves the plotting rectangle.
-	CRect GetPlottingRect()  const { return m_PlottingRect; }
+	CRect GetPlottingRect() const { return m_PlottingRect; }
 
 	//! Returns a pointer to the legend object.
-	CChartLegend* GetLegend() const  { return m_pLegend; }
+	CChartLegend* GetLegend() const { return m_pLegend; }
 	//! Returns a pointer to the title object.
-	CChartTitle*  GetTitle()  const  { return m_pTitles; }
+	CChartTitle* GetTitle() const { return m_pTitles; }
 
 	//! An enumeration of the different axis positions.
 	enum EAxisPos
@@ -141,7 +140,7 @@ public:
 		to the control.
 		@see AttachCustomSerie for more info about the parameters of the function.
 	**/
-	CChartPointsSerie* CreatePointsSerie(bool bSecondaryHorizAxis=false, bool bSecondaryVertAxis=false);
+	CChartPointsSerie* CreatePointsSerie(bool bSecondaryHorizAxis = false, bool bSecondaryVertAxis = false);
 	//! Create and attach a line series to the control
 	/**
 		The function will assert if the associated axes are not attached 
@@ -155,7 +154,7 @@ public:
 		to the control.
 		@see AttachCustomSerie for more info about the parameters of the function.
 	**/
-	CChartLineSerie* CreateLineSerie(bool bSecondaryHorizAxis=false, bool bSecondaryVertAxis=false);
+	CChartLineSerie* CreateLineSerie(bool bSecondaryHorizAxis = false, bool bSecondaryVertAxis = false);
 	//! Create and attach a surface series to the control
 	/**
 		The function will assert if the associated axes are not attached 
@@ -169,7 +168,7 @@ public:
 		to the control.
 		@see AttachCustomSerie for more info about the parameters of the function.
 	**/
-	CChartSurfaceSerie* CreateSurfaceSerie(bool bSecondaryHorizAxis=false, bool bSecondaryVertAxis=false);
+	CChartSurfaceSerie* CreateSurfaceSerie(bool bSecondaryHorizAxis = false, bool bSecondaryVertAxis = false);
 	//! Create and attach a bar series to the control
 	/**
 		@param bSecondaryHorizAxis
@@ -181,7 +180,7 @@ public:
 		to the control.
 		@see AttachCustomSerie for more info about the parameters of the function.
 	**/
-	CChartBarSerie* CreateBarSerie(bool bSecondaryHorizAxis=false, bool bSecondaryVertAxis=false);
+	CChartBarSerie* CreateBarSerie(bool bSecondaryHorizAxis = false, bool bSecondaryVertAxis = false);
 	//! Create and attach a candlestick series to the control
 	/**
 		@param bSecondaryHorizAxis
@@ -193,7 +192,7 @@ public:
 		to the control.
 		@see AttachCustomSerie for more info about the parameters of the function.
 	**/
-	CChartCandlestickSerie* CreateCandlestickSerie(bool bSecondaryHorizAxis=false, bool bSecondaryVertAxis=false);
+	CChartCandlestickSerie* CreateCandlestickSerie(bool bSecondaryHorizAxis = false, bool bSecondaryVertAxis = false);
 	//! Create and attach a gantt series to the control
 	/**
 		@param bSecondaryHorizAxis
@@ -205,7 +204,7 @@ public:
 		to the control.
 		@see AttachCustomSerie for more info about the parameters of the function.
 	**/
-	CChartGanttSerie* CreateGanttSerie(bool bSecondaryHorizAxis=false, bool bSecondaryVertAxis=false);
+	CChartGanttSerie* CreateGanttSerie(bool bSecondaryHorizAxis = false, bool bSecondaryVertAxis = false);
 	//! Attaches a custom series to the chart
 	/**
 		You should only use this function if you want to attach a custom series
@@ -224,7 +223,7 @@ public:
 			If this value is false, the associated vertical axis is the 
 			left axis, otherwise it is the right axis.
 	**/
-	void AttachCustomSerie(CChartSerie* pNewSeries, bool bSecondaryHorizAxis=false, bool bSecondaryVertAxis=false);
+	void AttachCustomSerie(CChartSerie* pNewSeries, bool bSecondaryHorizAxis = false, bool bSecondaryVertAxis = false);
 	//! Retrieves a specific series from the chart
 	/**
 		@param uSerieId
@@ -255,7 +254,7 @@ public:
 		@remark The function will assert if the associated axes are not attached 
 		to the control.
 	**/
-	CChartCrossHairCursor* CreateCrossHairCursor(bool bSecondaryHorizAxis=false, bool bSecondaryVertAxis=false);
+	CChartCrossHairCursor* CreateCrossHairCursor(bool bSecondaryHorizAxis = false, bool bSecondaryVertAxis = false);
 	//! Create and attach a drag-line cursor to the control
 	/**
 		A drag-line cursor is a simple line (horizontal or vertical) that can be
@@ -302,36 +301,47 @@ public:
 	}
 
 	//! Returns the type of the edge used as border.
-	UINT GetEdgeType() const        { return EdgeType;    }
+	UINT GetEdgeType() const { return EdgeType; }
 	//! Sets the edge type.
 	/**
 		@param NewEdge 
 			The type of the edge. See the DrawEdge function in MSDN for 
 			a list of the different types.
 	**/
-	void SetEdgeType(UINT NewEdge)  
-	{ 
-		EdgeType = NewEdge; 
+	void SetEdgeType(UINT NewEdge)
+	{
+		EdgeType = NewEdge;
 		RefreshCtrl();
 	}
 
 	//! Returns the background color
-	COLORREF GetBackColor() const			{ return m_BackColor;   }
+	COLORREF GetBackColor() const { return m_BackColor; }
 	//! Sets the background color.
-	void SetBackColor(COLORREF NewCol)		
-	{ 
-		m_BackColor = NewCol;  
-		m_bBackGradient = false; 
+	void SetBackColor(COLORREF NewCol)
+	{
+		m_BackColor = NewCol;
+		m_bBackGradient = false;
 		RefreshCtrl();
 	}
+
 	//! Returns the color of the plotting area's border 
-	COLORREF GetBorderColor() const			{ return m_BorderColor;   }
+	COLORREF GetBorderColor() const { return m_BorderColor; }
 	//! Sets the color of the plotting area's border 
-	void SetBorderColor(COLORREF NewCol)	{ m_BorderColor = NewCol;	RefreshCtrl(); }
+	void SetBorderColor(COLORREF NewCol)
+	{
+		m_BorderColor = NewCol;
+		RefreshCtrl();
+	}
+
 	//! Returns the color of the zoom rectangle
-	COLORREF GetZoomRectColor() const		{ return m_ZoomRectColor;   }
+	COLORREF GetZoomRectColor() const { return m_ZoomRectColor; }
 	//! Sets the color of the zoom rectangle
-	void SetZoomRectColor(COLORREF NewCol)	{ m_ZoomRectColor = NewCol; RefreshCtrl(); }
+	void SetZoomRectColor(COLORREF NewCol)
+	{
+		m_ZoomRectColor = NewCol;
+		RefreshCtrl();
+	}
+
 	//! Sets a gradient background
 	/**
 		@param Col1
@@ -348,13 +358,13 @@ public:
 	void SetBackGradient(COLORREF Col1, COLORREF Col2, EGradientType GradientType);
 
 	//! Enables/disables the pan feature
-	void SetPanEnabled(bool bEnabled)  { m_bPanEnabled = bEnabled;  }
+	void SetPanEnabled(bool bEnabled) { m_bPanEnabled = bEnabled; }
 	//! Returns true if the pan feature is enabled
-	bool GetPanEnabled() const		   { return m_bPanEnabled;	    }
+	bool GetPanEnabled() const { return m_bPanEnabled; }
 	//! Enables/disables the zoom feature
 	void SetZoomEnabled(bool bEnabled) { m_bZoomEnabled = bEnabled; }
 	//! Returns true if the zoom feature is enabled
-	bool GetZoomEnabled() const		   { return m_bZoomEnabled;	    }
+	bool GetZoomEnabled() const { return m_bZoomEnabled; }
 	//! Undo all pan and zoom operations that were done on the chart
 	void UndoPanZoom();
 
@@ -383,8 +393,8 @@ public:
 		@param dwStyle
 			Style of the control
 	**/
-	int Create(CWnd* pParentWnd, const RECT& rect, UINT nID, DWORD dwStyle=WS_VISIBLE);
-	
+	int Create(CWnd* pParentWnd, const RECT& rect, UINT nID, DWORD dwStyle = WS_VISIBLE);
+
 	//! Helper function to convert a date to a double value
 	static double DateToValue(const COleDateTime& Date);
 	//! Helper function to convert a double value to a date
@@ -398,7 +408,7 @@ public:
 			A pointer to a CPrintDialog. 
 			If NULL is passed, the default print dialog will be displayed.
 	**/
-    virtual void Print(const TChartString& strTitle, CPrintDialog* pPrntDialog = NULL);
+	virtual void Print(const TChartString& strTitle, CPrintDialog* pPrntDialog = NULL);
 
 #if _MFC_VER > 0x0600
 	//! Saves the chart to an image file
@@ -416,14 +426,14 @@ public:
 			The file type to save the image as. See the CImage::Save in MSDN
 			for more information.
 	**/
-	void SaveAsImage(const TChartString& strFilename, const CRect& rect, 
-			int nBPP, REFGUID guidFileType= GUID_NULL);
+	void SaveAsImage(const TChartString& strFilename, const CRect& rect,
+	                 int nBPP, REFGUID guidFileType = GUID_NULL);
 #endif
 
 	//! Default constructor
-    CChartCtrl();	
+	CChartCtrl();
 	//! Default destructor
-    virtual ~CChartCtrl();
+	virtual ~CChartCtrl();
 
 	//! Register a mouse listener with the control.
 	/**
@@ -431,7 +441,7 @@ public:
 		@param pMouseListener
 			The mouse listener to register with this control.
 	**/
-	void RegisterMouseListener(CChartMouseListener* pMouseListener) { m_pMouseListener = pMouseListener;}
+	void RegisterMouseListener(CChartMouseListener* pMouseListener) { m_pMouseListener = pMouseListener; }
 
 	//! Tell the control to set the current series to the first series.
 	/**
@@ -471,11 +481,11 @@ protected:
 	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
-	
+
 protected:
-    virtual void OnBeginPrinting(CDC *pDC, CPrintInfo *pInfo);
-    virtual void OnPrint(CDC *pDC, CPrintInfo *pInfo);
-    virtual void OnEndPrinting(CDC *pDC, CPrintInfo *pInfo);
+	virtual void OnBeginPrinting(CDC* pDC, CPrintInfo* pInfo);
+	virtual void OnPrint(CDC* pDC, CPrintInfo* pInfo);
+	virtual void OnEndPrinting(CDC* pDC, CPrintInfo* pInfo);
 
 	// This function can be called to draw the chart
 	// on the screen or for printing.
@@ -497,7 +507,7 @@ private:
 	void SendMouseEvent(CChartMouseListener::MouseEvent mouseEvent, const CPoint& screenPoint) const;
 
 	//! Specifies if the refresh is currently enabled or not.
-	int m_iEnableRefresh ;
+	int m_iEnableRefresh;
 	//! Specifies if there is a pending refresh. 
 	/**
 		If true, once EnableRefresh(true) is called, a refresh of the control
@@ -505,12 +515,12 @@ private:
 	**/
 	bool m_bPendingRefresh;
 	//! Memory bitmap on which the chart background is drawn (axis, grid, title, ...)
-	CDC m_BackgroundDC;	
+	CDC m_BackgroundDC;
 	//! Specifies if the memory bitmap has already been created.
 	bool m_bMemDCCreated;
 
 	//! Specifies if the background is gradient or solid
-	bool m_bBackGradient;	
+	bool m_bBackGradient;
 	//! First gradient color for the background
 	COLORREF m_BackGradientCol1;
 	//! Second gradient color for the background
@@ -518,37 +528,37 @@ private:
 	//! The gradient type used for the background
 	EGradientType m_BackGradientType;
 	//! The background color (if no gradient used)
-	COLORREF m_BackColor;	
+	COLORREF m_BackColor;
 	//! The border color
 	COLORREF m_BorderColor;
 	//! The type of edge
-	UINT EdgeType;		
+	UINT EdgeType;
 
 	//! Zone in wich the series will be plotted
-	CRect m_PlottingRect;	
+	CRect m_PlottingRect;
 
 	typedef std::map<unsigned, CChartSerie*> TSeriesMap;
 	//! Map containing all the series added to the chart.
-	TSeriesMap m_mapSeries;	
+	TSeriesMap m_mapSeries;
 	//! The four axis of the control.
 	CChartAxis* m_pAxes[4];
 
 	//! The chart legend
-	CChartLegend* m_pLegend;	
+	CChartLegend* m_pLegend;
 	//! The chart titles
-	CChartTitle*  m_pTitles;	
+	CChartTitle* m_pTitles;
 
 	//! Specifies if the mouse panning is enabled
 	bool m_bPanEnabled;
 	//! Specifies if the right mouse button is currently pressed
-	bool m_bRMouseDown;		
+	bool m_bRMouseDown;
 	//! The point on which the panning started
 	CPoint m_PanAnchor;
 
 	//! Specifies if the zoom is enabled
-	bool  m_bZoomEnabled;
+	bool m_bZoomEnabled;
 	//! Specifies if the left mouse button is currently pressed
-	bool  m_bLMouseDown;
+	bool m_bLMouseDown;
 	//! The rectangle of the zoom area
 	CRect m_rectZoomArea;
 	//! The color of the zoom rectangle
@@ -558,11 +568,11 @@ private:
 	bool m_bToolBarCreated;
 
 	//! The font used for printing
-    CFont  m_PrinterFont;  
+	CFont m_PrinterFont;
 	//! Page size in chartctrl units.
-    CSize m_LogicalPageSize;     
+	CSize m_LogicalPageSize;
 	//! Page size in device units.
-    CSize m_PaperSize;    
+	CSize m_PaperSize;
 
 	typedef std::map<unsigned, CChartCursor*> TCursorMap;
 	//! The map containing all the cursors
@@ -583,4 +593,3 @@ private:
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-

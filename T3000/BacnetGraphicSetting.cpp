@@ -47,7 +47,7 @@ BOOL CBacnetGraphicSetting::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -56,7 +56,7 @@ BOOL CBacnetGraphicSetting::OnInitDialog()
 
 void CBacnetGraphicSetting::OnBnClickedOk()
 {
-	// TODO: Add your control notification handler code here
+	
 	CTime temp_start_day;
 	CTime temp_start_time;
 	m_grp_start_day.GetTime(temp_start_day);
@@ -96,7 +96,7 @@ void CBacnetGraphicSetting::OnBnClickedOk()
 
 void CBacnetGraphicSetting::OnBnClickedCancel()
 {
-	// TODO: Add your control notification handler code here
+	
 	 use_customer_time = false;
 	CDialogEx::OnCancel();
 }

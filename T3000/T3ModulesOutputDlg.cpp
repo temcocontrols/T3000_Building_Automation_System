@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "T3ModulesOutputDlg.h"
 #include "afxdialogex.h"
-#include "globle_function.h"
+#include "global_function.h"
 
 // CT3ModulesOutputDlg dialog
 
@@ -1106,14 +1106,14 @@ void CT3ModulesOutputDlg::OnNMClickList_output(NMHDR *pNMHDR, LRESULT *pResult)
 void CT3ModulesOutputDlg::OnNMDblclkListT3outputs(NMHDR *pNMHDR, LRESULT *pResult)
 {
     LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-    // TODO: Add your control notification handler code here
+    
     *pResult = 0;
 }
 
 
 BOOL CT3ModulesOutputDlg::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: Add your specialized code here and/or call the base class
+    
     if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN) 
     {
         CRect list_rect,win_rect;

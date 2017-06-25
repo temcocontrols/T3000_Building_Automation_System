@@ -5,7 +5,7 @@
 
 #include "T3000Doc.h"
 #include "T3000View.h"
-#include "globle_function.h"
+#include "global_function.h"
 //#include "global_variable.h"
 #include "global_variable_extern.h"
 #include "ParameterDlg.h"
@@ -17,14 +17,14 @@
 #include "AfxMessageDialog.h"
 
 #include "LedsDialog.h"
-#include "TDelayForm.h"
+
 
 #include "TStatScheduleDlg.h"
 #include "TstatZigbeeLogic.h"
 
  
 #include "DisplayConfig.h"
-#include "DisplayLEDLCDConfig.h"
+
 #include "HtmlHelp.h"
 
 #include "DisplayConfig.h"
@@ -218,7 +218,7 @@ CT3000View::CT3000View()
     , m_daysetpoint(0)//0907
     , m_nightpot(0)//0907
 {
-    // TODO: add construction code here
+    //  add construction code here
     m_hSerial=NULL;
     m_hSocket=NULL;
     m_outRows=1;
@@ -312,7 +312,7 @@ void CT3000View::DoDataExchange(CDataExchange* pDX)
 
 BOOL CT3000View::PreCreateWindow(CREATESTRUCT& cs)
 {
-    // TODO: Modify the Window class or styles here by modifying
+    //  Modify the Window class or styles here by modifying
     //  the CREATESTRUCT cs
     return CFormView::PreCreateWindow(cs);
 }
@@ -397,6 +397,10 @@ void CT3000View::UpdateNightControls()
  
 }
 
+
+/// <summary>
+/// Create Sliders, and then initial the two sliders.
+/// </summary>
 void CT3000View::CreateFlexSilde()
 {
 	m_nightSlider.SetRange(50, -50);
@@ -452,10 +456,14 @@ CT3000Doc* CT3000View::GetDocument() const // non-debug version is inline
 
 void CT3000View::OnFileOpen()
 {
-    // TODO: Add your command handler code here
+    
 
 }
 
+
+/// <summary>
+/// Fresh : it will load all windows ,and show some settings ,according to different devices.
+/// </summary>
 void CT3000View::Fresh()
 {
     CMainFrame* pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
@@ -599,6 +607,13 @@ void CT3000View::Fresh()
 	}
 }
 
+
+/// <summary>
+/// Fresh_T3000View
+/// <summary>
+/// Fresh the window
+/// </summary>
+/// </summary>
 void CT3000View::Fresh_T3000View()
 {
     int  Fresh_Min=(short)product_register_value[MODBUS_MIN_SETPOINT];
@@ -647,7 +662,7 @@ void CT3000View::Fresh_T3000View()
 }
 void CT3000View::OnBnClickedCoolRadio()
 {
-    // TODO: Add your control notification handler code here
+    
 }
 HBRUSH CT3000View::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 {
@@ -1076,7 +1091,7 @@ void CT3000View::InitSliderBars2()
 
 void CT3000View::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
-    // TODO: Add your message handler code here and/or call default
+     
 
     CFormView::OnHScroll(nSBCode, nPos, pScrollBar);
 }
@@ -1087,6 +1102,8 @@ void CT3000View::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
     CFormView::OnVScroll(nSBCode, nPos, pScrollBar);
 }
 
+
+// Fresh input table
 void CT3000View::Fresh_In()
 {
 
@@ -1806,7 +1823,7 @@ void CT3000View::Fresh_In()
 
 
 
-
+//Fresh output table
 void CT3000View::Fresh_Out()
 {
 //	Savetmp_Mdb_Adress_Map();
@@ -2338,6 +2355,8 @@ void CT3000View::Fresh_Out()
 }
 
 
+
+// Fresh input ,output , grid table 
 void CT3000View::FreshIOGridTable()
 {
     if(::GetFocus()==m_outNameEdt.m_hWnd)
@@ -2540,6 +2559,8 @@ void CT3000View::FreshIOGridTable()
 
 
 }
+
+// load input ,output tables about tstat3
 void CT3000View::FreshIOGridTable_Tstat6()
 {
     m_Input_Grid.put_Rows(13);
@@ -2587,7 +2608,7 @@ void CT3000View::FreshIOGridTable_Tstat6()
 void CT3000View::OnBnClickedGrapgicbutton()
 {
     ((CMainFrame*)(theApp.m_pMainWnd))->SwitchToGraphicView();
-    // TODO: Add your control notification handler code here
+    
 }
 
 void CT3000View::OnBnClickedParameterbtn()
@@ -2607,7 +2628,7 @@ void CT3000View::OnBnClickedParameterbtn()
 
     g_bEnableRefreshTreeView = TRUE;
 
-    // TODO: Add your control notification handler code here
+    
 }
 
 BEGIN_EVENTSINK_MAP(CT3000View, CFormView)
@@ -2669,7 +2690,6 @@ void CT3000View::ClickInputMsflexgrid()
 
 
 }
-
 void CT3000View::ClickOutputMsflexgrid()
 {
     long lRow,lCol;
@@ -3212,7 +3232,7 @@ void CT3000View::OnEnKillfocusOutputnameedit()
 BOOL CT3000View::PreTranslateMessage(MSG* pMsg)
 {
 
-// TODO: Add your specialized code here and/or call the base class
+
     if(pMsg->message == WM_KEYDOWN  )
     {
         if(pMsg->wParam == VK_RETURN)
@@ -3243,7 +3263,7 @@ BOOL CT3000View::PreTranslateMessage(MSG* pMsg)
 //时间更新.....
 void CT3000View::OnTimer(UINT_PTR nIDEvent)
 {
-    // TODO: Add your message handler code here and/or call default
+     
     if(g_bPauseMultiRead)
         return;
 
@@ -3363,7 +3383,7 @@ void CT3000View::OnDestroy()
             }
     }
     KillTimer(1);
-    // TODO: Add your message handler code here
+    
 }
 
 void CT3000View::OnBnClickedTrendlogview()
@@ -3383,7 +3403,7 @@ void CT3000View::OnBnClickedTrendlogview()
 //	}
 //CDisplayLEDLCDConfig dlg;
 //dlg.DoModal();
-    // TODO: Add your control notification handler code here
+    
 
 
 }
@@ -3811,7 +3831,7 @@ void CT3000View::OnCbnSelchangeFanspeedcombo()
 
 LRESULT CT3000View::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
-    // TODO: Add your specialized code here and/or call the base class
+    
     if(MsgT3000ViewFresh==message)
     {
 		if ((product_register_value[7] == PM_TSTAT6) || (product_register_value[7] == PM_TSTAT7) || (product_register_value[7] == PM_TSTAT5i) || (product_register_value[7] == PM_TSTAT8
@@ -3917,7 +3937,7 @@ void CT3000View::OnMove(int x, int y)
     }
     */
 
-    // TODO: Add your message handler code here
+    
 }
 
 void CT3000View::OnWindowPosChanging(WINDOWPOS* lpwndpos)
@@ -4601,7 +4621,10 @@ void CT3000View::InitFlexSliderBars_tstat6()
     }
 
 
-     
+	int i_Temperature_Max = 2 + (short)product_register_value[MODBUS_TEMPRATURE_CHIP] / 10;
+	int i_Temperature_min = (short)product_register_value[MODBUS_TEMPRATURE_CHIP] / 10 - 2;
+	if (DayMax < i_Temperature_Max) DayMax = i_Temperature_Max;
+	if (DayMin > i_Temperature_min) DayMin = i_Temperature_min;
 
 	m_daySlider.put_CurrentValue(((float)((short)product_register_value[MODBUS_TEMPRATURE_CHIP])) / 10.0);
 	m_nightSlider.put_CurrentValue(((float)((short)product_register_value[MODBUS_TEMPRATURE_CHIP])) / 10.0);
@@ -5178,7 +5201,7 @@ void CT3000View::SetFlexSliderBars_tstat6()
 
 void CT3000View::OnEnKillfocusEditCurSp()
 {
-// TODO: Add your control notification handler code here
+
 #if 1//0907
 
     BeginWaitCursor();
@@ -5420,6 +5443,10 @@ void CT3000View::Initial_Max_Min()
         DayMax = GetRoundMM(TRUE,dCoolSP,nCoolSP,1.1);
         DayMin = GetRoundMM(FALSE,dHeatSP,nHeatSP,0.9);
 
+		int i_Temperature_Max = 2 + (short)product_register_value[MODBUS_TEMPRATURE_CHIP] / 10;
+		int i_Temperature_min = (short)product_register_value[MODBUS_TEMPRATURE_CHIP] / 10 - 2;
+		if (DayMax < i_Temperature_Max) DayMax = i_Temperature_Max;
+		if (DayMin > i_Temperature_min) DayMin = i_Temperature_min;
 
     }
 
@@ -6202,7 +6229,7 @@ void CT3000View::Read_SliderData()
 
 BOOL CT3000View::OnHelpInfo(HELPINFO* pHelpInfo)
 {
-    // TODO: Add your message handler code here and/or call default
+     
     /* T3000_help.chm::/T3000_Help/How%20to%20use%20T3000/How%20to%20use%20T3000,basicly.htm*/
     CString filename=g_strExePth+_T("T3000_help.chm::/T3000_Help/How to use T3000/How to use T3000,basicly.htm");
     ::HtmlHelp(
@@ -7175,5 +7202,5 @@ void CT3000View::NightFeedBackNewSliderFor5ABCD()
 
 // void CT3000View::ClickSlidercontrol1(const VARIANT& sender, LPDISPATCH e)
 // {
-// 	// TODO: Add your message handler code here
+// 	
 // }

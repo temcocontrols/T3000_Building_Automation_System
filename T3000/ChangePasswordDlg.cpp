@@ -44,6 +44,6 @@ BOOL CChangePasswordDlg::OnInitDialog()
 
 void CChangePasswordDlg::OnBnClickedOk()
 {
-	// TODO: Add your control notification handler code here
+	
 	OnOK();
 }

@@ -45,13 +45,13 @@ END_MESSAGE_MAP()
 
 void CManageAccountDlg::OnBnClickedOk()
 {
-	// TODO: Add your control notification handler code here
+	
 	//OnOK();
 }
 
 void CManageAccountDlg::OnBnClickedExitbutton()
 {
-	// TODO: Add your control notification handler code here
+	
 	CDialog::OnOK();
 }
 
@@ -286,7 +286,7 @@ void CManageAccountDlg::OnEnKillfocusValueedit()
 		Update_Recorder();
 	}
 
-	// TODO: Add your control notification handler code here
+	
 }
 void CManageAccountDlg::Update_Recorder()
 {

@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "Weekly_Routines.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "WeeklyRout_InsertDia.h"
 
 
@@ -364,7 +364,7 @@ BOOL Weekly_Routines::OnInitDialog()
 	m_holidayCombx.ShowWindow(SW_HIDE);
 	 m_strInfo=_T("Double clicking row number cell or hit 'Insert' key to insert data.");
 	 
-	// TODO:  在此添加额外的初始化
+	
 
 // 	 CString strInfo;
 // 	 strInfo.Format(_T("Weekly_Routines::OnInitDialog()"));			
@@ -385,13 +385,13 @@ END_EVENTSINK_MAP()
 
 void Weekly_Routines::ClickMsflexgrid1()
 {
-	// TODO: 在此处添加消息处理程序代码
+	
 	on_select();		
 }
 
 void Weekly_Routines::OnEnSetfocusEdit1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	NET_WORK_KILL_TIMER
 	UpdateData(true);
 	m_before_focus_string=m_sChange;
@@ -399,7 +399,7 @@ void Weekly_Routines::OnEnSetfocusEdit1()
 
 void Weekly_Routines::OnEnKillfocusEdit1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	//UpdateData(true);
 	/*
 	if(row_col==4 || row_col==6)
@@ -429,7 +429,7 @@ void Weekly_Routines::OnEnKillfocusEdit1()
 
 void Weekly_Routines::OnCbnSetfocusCombo1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	NET_WORK_KILL_TIMER
 	UpdateData(true);
 	CString str_temp;
@@ -439,7 +439,7 @@ void Weekly_Routines::OnCbnSetfocusCombo1()
 
 void Weekly_Routines::OnCbnKillfocusCombo1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	CString strLabel=m_FlexGrid.get_TextMatrix(row_row,1);
 	if(strLabel.IsEmpty())
 		return;
@@ -553,7 +553,7 @@ void Weekly_Routines::down_move()
 
 BOOL Weekly_Routines::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: 在此添加专用代码和/或调用基类
+	
 
 	if(pMsg->message == WM_KEYDOWN  )
 	{	
@@ -608,13 +608,13 @@ BOOL Weekly_Routines::PreTranslateMessage(MSG* pMsg)
 void Weekly_Routines::OnDestroy()
 {
 	CDialog::OnDestroy();
-	// TODO: 在此处添加消息处理程序代码
+	
 	NET_WORK_KILL_TIMER
 }
 
 void Weekly_Routines::OnBnClickedOk()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	
 	OnOK();
 }
@@ -658,7 +658,7 @@ void Weekly_Routines::OnTimer(UINT nIDEvent)
 
 void Weekly_Routines::KeyDownMsflexgrid1(short* KeyCode, short Shift)
 {
-	// TODO: 在此处添加消息处理程序代码
+	
 	//AfxMessageBox("OK");
 }
 void Weekly_Routines::OnWeeklySet()
@@ -669,7 +669,7 @@ void Weekly_Routines::OnWeeklySet()
 
 void Weekly_Routines::DblClickMsflexgrid1()
 {
-	// TODO: 在此处添加消息处理程序代码
+	
 #if 1
 	long lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
 	long lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
@@ -693,13 +693,13 @@ void Weekly_Routines::OnPaint()
 	CRect outRc=CRect(6,15,650,40);
 	dc.SetBkMode(TRANSPARENT);
 	dc.DrawText(m_strInfo,&outRc,DT_WORDBREAK|DT_VCENTER|DT_CENTER);
-	// TODO: 在此处添加消息处理程序代码
+	
 	// 不为绘图消息调用 CDialog::OnPaint()
 }
 
 void Weekly_Routines::OnCbnSelchangeHolidaycombx()
 {
-	// TODO: Add your control notification handler code here
+	
 }
 
 void Weekly_Routines::OnCbnKillfocusHolidaycombx()

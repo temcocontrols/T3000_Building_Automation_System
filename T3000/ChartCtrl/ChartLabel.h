@@ -19,7 +19,7 @@
  *
  */
 
-#ifndef _CHARTLABEL_H_ 
+#ifndef _CHARTLABEL_H_
 #define _CHARTLABEL_H_
 
 template <class PointType>
@@ -43,9 +43,14 @@ class CChartLabelProvider
 {
 public:
 	//! Constructor
-	CChartLabelProvider()  { }
+	CChartLabelProvider()
+	{
+	}
+
 	//! Destructor
-	virtual ~CChartLabelProvider()  { }
+	virtual ~CChartLabelProvider()
+	{
+	}
 
 	//! Method to override in order to provide the text of the label.
 	/**
@@ -56,7 +61,7 @@ public:
 		@return a string which will be the text displayed in the label.
 	**/
 	virtual TChartString GetText(CChartSerieBase<PointType>* pSerie,
-			unsigned PointIndex) = 0;
+	                             unsigned PointIndex) = 0;
 };
 
 //! Draws a label containing some text which is attached to a point of a series.
@@ -112,7 +117,7 @@ protected:
 	CChartLabelProvider<PointType>* m_pLabelProvider;
 
 	//! The parent charting control.
-	CChartCtrl*  m_pParentCtrl;
+	CChartCtrl* m_pParentCtrl;
 	//! The parent series.
 	CChartSerieBase<PointType>* m_pParentSeries;
 };

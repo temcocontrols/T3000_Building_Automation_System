@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "TStatScanner.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "ScanDlg.h"
 
 #include "ScanDbWaitDlg.h"
@@ -9,9 +9,9 @@
 #include "define.h"
 #include "bip.h"
 #include "rs485.h" // For call Get_RS485_Handle() function
-#include "WhichOneToChooseDlg.h"
+
 //#include "global_variable.h"
-//#include "gloab_define.h"
+//#include "global_define.h"
 //AB means Add Building
 #define AB_MAINNAME	1
 #define AB_NAME	2

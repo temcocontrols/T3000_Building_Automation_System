@@ -3,7 +3,7 @@
 #include "Global_Struct.h"
 #include "t3000.h"
 #include <locale.h>
-#include "globle_function.h"
+#include "global_function.h"
 
 //extern CString g_strExePath; 
 

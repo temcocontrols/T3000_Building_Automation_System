@@ -6,7 +6,7 @@
 #include "GraphicMode.h"
 #include "afxdialogex.h"
 #include "MainFrm.h"
-#include "globle_function.h"
+#include "global_function.h"
 
 
 
@@ -93,7 +93,7 @@ void CGraphicMode::OnSize(UINT nType, int cx, int cy)
 		}
 
 	}
-	// TODO: Add your message handler code here
+	
 }
 
 
@@ -102,7 +102,7 @@ BOOL CGraphicMode::OnInitDialog()
 	CDialogEx::OnInitDialog();
 
     
-	// TODO:  Add extra initialization here
+	
 	CRect ViewRect;
 	GetClientRect(&ViewRect);
 

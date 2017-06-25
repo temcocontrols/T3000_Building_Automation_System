@@ -34,7 +34,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-// TODO: Add message handlers (eg TTM_SETTIPBKCOLOR) and point them 
+//  Add message handlers (eg TTM_SETTIPBKCOLOR) and point them 
 //       to the correct functions.
 
 LPCTSTR COXToolTipCtrl::m_szArrowSpace = _T("  ");

@@ -312,7 +312,6 @@ void CReadWrite_Multiple_RegDlg::OnEnKillfocusEditId()
 {
 	UpdateData(TRUE);
 	FreshListbox();
-	// TODO: Add your control notification handler code here
 }
 
 
@@ -320,7 +319,7 @@ void CReadWrite_Multiple_RegDlg::OnEnKillfocusEditAddress()
 {
 	UpdateData(TRUE);
 	FreshListbox();
-	// TODO: Add your control notification handler code here
+	
 }
 
 
@@ -328,7 +327,7 @@ void CReadWrite_Multiple_RegDlg::OnEnKillfocusEditQuantity()
 {
 	UpdateData(TRUE);
 	FreshListbox();
-	// TODO: Add your control notification handler code here
+	
 }
 
 
@@ -336,7 +335,7 @@ void CReadWrite_Multiple_RegDlg::OnEnKillfocusEdit1()
 {
 	UpdateData(TRUE);
 	FreshListbox();
-	// TODO: Add your control notification handler code here
+	
 }
 
 
@@ -344,7 +343,7 @@ void CReadWrite_Multiple_RegDlg::OnEnKillfocusEdit2()
 {
    UpdateData(TRUE);
    FreshListbox();
-	// TODO: Add your control notification handler code here
+	
 }
 
 

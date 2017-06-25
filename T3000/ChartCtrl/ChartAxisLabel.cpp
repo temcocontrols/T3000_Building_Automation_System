@@ -28,7 +28,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
@@ -37,8 +37,8 @@ static char THIS_FILE[]=__FILE__;
 //////////////////////////////////////////////////////////////////////
 
 CChartAxisLabel::CChartAxisLabel()
-  : m_pParentCtrl(NULL), m_bIsVisible(true), m_TextColor(RGB(0,0,0)),
-	m_bIsHorizontal(true), m_Font(), m_strLabelText(_T(""))
+	: m_pParentCtrl(NULL), m_bIsVisible(true), m_TextColor(RGB(0,0,0)),
+	  m_bIsHorizontal(true), m_Font(), m_strLabelText(_T(""))
 {
 	m_Font.SetVertical(!m_bIsHorizontal);
 }
@@ -56,14 +56,14 @@ void CChartAxisLabel::SetVisible(bool bVisible)
 
 void CChartAxisLabel::SetColor(COLORREF NewColor)
 {
-	m_TextColor = NewColor; 
+	m_TextColor = NewColor;
 	if (m_pParentCtrl)
 		m_pParentCtrl->RefreshCtrl();
 }
 
-void CChartAxisLabel::SetText(const TChartString& NewText)  
-{ 
-	m_strLabelText = NewText; 
+void CChartAxisLabel::SetText(const TChartString& NewText)
+{
+	m_strLabelText = NewText;
 	if (m_pParentCtrl)
 		m_pParentCtrl->RefreshCtrl();
 }
@@ -88,7 +88,7 @@ void CChartAxisLabel::SetFont(const CChartFont& newFont)
 		m_pParentCtrl->RefreshCtrl();
 }
 
-CSize CChartAxisLabel::GetSize(CDC *pDC) const
+CSize CChartAxisLabel::GetSize(CDC* pDC) const
 {
 	CSize LabelSize;
 	LabelSize.cx = 0;
@@ -118,7 +118,7 @@ CSize CChartAxisLabel::GetSize(CDC *pDC) const
 	return LabelSize;
 }
 
-void CChartAxisLabel::Draw(CDC *pDC)
+void CChartAxisLabel::Draw(CDC* pDC)
 {
 	if (!m_bIsVisible)
 		return;
@@ -133,13 +133,13 @@ void CChartAxisLabel::Draw(CDC *pDC)
 	m_Font.SelectFont(pDC);
 	if (!m_bIsHorizontal)
 	{
-		pDC->ExtTextOut(m_TextRect.left + 2,m_TextRect.top,
-					ETO_CLIPPED,NULL,m_strLabelText.c_str(),NULL);
+		pDC->ExtTextOut(m_TextRect.left + 2, m_TextRect.top,
+		                ETO_CLIPPED,NULL, m_strLabelText.c_str(),NULL);
 	}
 	else
-	{		
-		pDC->ExtTextOut(m_TextRect.left,m_TextRect.top + 2,
-					ETO_CLIPPED,NULL,m_strLabelText.c_str(),NULL);
+	{
+		pDC->ExtTextOut(m_TextRect.left, m_TextRect.top + 2,
+		                ETO_CLIPPED,NULL, m_strLabelText.c_str(),NULL);
 	}
 	m_Font.UnselectFont(pDC);
 
@@ -147,7 +147,7 @@ void CChartAxisLabel::Draw(CDC *pDC)
 	pDC->SetTextColor(OldColor);
 }
 
-void CChartAxisLabel::SetPosition(int LeftBorder, int TopBorder, CDC *pDC)
+void CChartAxisLabel::SetPosition(int LeftBorder, int TopBorder, CDC* pDC)
 {
 	CSize NewSize = GetSize(pDC);
 	m_TextRect.top = TopBorder;

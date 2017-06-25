@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 
 #include "../SQLiteDriver/CppSQLite3.h"
-#include "globle_function.h"
+#include "global_function.h"
 // CT3000Option dialog
  
 IMPLEMENT_DYNAMIC(CT3000Option, CDialogEx)

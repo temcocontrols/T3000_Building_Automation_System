@@ -1,6 +1,12 @@
 # Next For T3000 ignore
+/Documentation/Express
+/Documentation/T3000InstallShield
+/Documentation/TemcoSoftware
+
 /T3000 Output
 /T3000 Output_VS2015
+
+**/Thumbs.db
 
 **/Debug/
 /**/.svn
@@ -46,3 +52,9 @@
 **/*.MNL
 **/*.MAX
 /T3000.VC.db
+<<<<<<< HEAD
+=======
+/*.opendb
+/Psychrometric Tool/T3000 Output_VS2015
+/Psychrometric Tool/WFA_psychometric_chart/packages
+>>>>>>> master

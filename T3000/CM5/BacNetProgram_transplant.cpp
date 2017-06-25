@@ -13,7 +13,7 @@
 #include "T3000DEF.H"
 #include "ROUTER.H"
 #define MAX_FUNCTION_COUNT    30
-#include "..\gloab_define.h"
+#include "..\global_define.h"
 
 #pragma warning(disable:4309)
 #pragma warning(disable:4305)

@@ -692,9 +692,9 @@ Update by Fance
 #include "BacnetOutput.h"
 #include "BacnetProgram.h"
 #include "BacnetVariable.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "Dialog_Progess.h"
-#include "gloab_define.h"
+#include "global_define.h"
 #include "datalink.h"
 #include "BacnetWait.h"
 #include "Bacnet_Include.h"
@@ -764,6 +764,7 @@ extern SOCKET my_sokect;
 extern bool show_user_list_window ;
 HANDLE connect_mstp_thread = NULL; // 当点击MSTP的设备时开启 连接的线程;
 HANDLE read_rs485_thread = NULL; // RS485的设备 通用;
+HANDLE write_indb_thread = NULL; //将资料写入数据库的线程;
 
 int n_read_product_type = 0;
 int n_read_list_flag = -1;
@@ -1744,7 +1745,7 @@ LRESULT  CDialogCM5_BacNet::AllMessageCallBack(WPARAM wParam, LPARAM lParam)
 
 void CDialogCM5_BacNet::OnBnClickedButtonTest()
 {
-	// TODO: Add your control notification handler code here
+	
 	Send_WhoIs_Global(g_bac_instance, g_bac_instance);
 }
 
@@ -1758,7 +1759,7 @@ void CDialogCM5_BacNet::OnInitialUpdate()
 	
 	//Tab_Initial();
 	//initial_once = false;
-	// TODO: Add your specialized code here and/or call the base class
+	
 }
 
 void CDialogCM5_BacNet::Tab_Initial()
@@ -2752,6 +2753,8 @@ void CDialogCM5_BacNet::Fresh()
 					bacnet_device_type = SMALL_MINIPANEL;
 				else if(ret == TINY_MINIPANEL)
 					bacnet_device_type = TINY_MINIPANEL;
+				else if (ret == TINY_EX_MINIPANEL)
+					bacnet_device_type = TINY_EX_MINIPANEL;
 				else
 					bacnet_device_type = PRODUCT_CM5;
 			}
@@ -3157,8 +3160,6 @@ void CDialogCM5_BacNet::Show_Wait_Dialog_And_SendMessage(int read_list_type)
 	bac_read_which_list = read_list_type;
 	if(WaitDlg==NULL)
 	{
-		//if(bac_read_which_list != BAC_READ_CUSTOMER_UNITS)
-		//{
 			if(bac_read_which_list == BAC_READ_SVAE_CONFIG)
 			{
 				WaitDlg = new BacnetWait((int)BAC_WAIT_READ_DATA_WRITE_CONFIG);//如果是保存为ini文件 就要读取全部的data;
@@ -3174,12 +3175,7 @@ void CDialogCM5_BacNet::Show_Wait_Dialog_And_SendMessage(int read_list_type)
 			RECT RECT_SET1;
 			GetClientRect(&RECT_SET1);
 			ClientToScreen(&RECT_SET1);
-			WaitDlg->MoveWindow(RECT_SET1.left + 50,RECT_SET1.bottom - 19,800,20);
-			//RECT RECT_SET1;
-			//GetWindowRect(&RECT_SET1);
-			//WaitDlg->MoveWindow(RECT_SET1.left+100,RECT_SET1.top+400,560/*RECT_SET1.left+270*//*RECT_SET1.right/2+20*/,100);
-		//}
-		
+			WaitDlg->MoveWindow(RECT_SET1.left + 50,RECT_SET1.bottom - 19,800,20);		
 	}
 
 	//::PostMessage(BacNet_hwd,WM_SEND_OVER,0,0);
@@ -3196,7 +3192,6 @@ void CDialogCM5_BacNet::Show_Wait_Dialog_And_SendMessage(int read_list_type)
 DWORD WINAPI  MSTP_Write_Command_Thread(LPVOID lpVoid)
 {
 	
-	//CDialogCM5_BacNet *pParent = (CDialogCM5_BacNet *)lpVoid;
 	int m_persent = 0;
 	int m_finished_count = 0;
 	int m_total_count = 0;
@@ -3264,6 +3259,7 @@ DWORD WINAPI  MSTP_Write_Command_Thread(LPVOID lpVoid)
 	return 0;
 }
 
+<<<<<<< HEAD
 
 //DWORD WINAPI Write_Data_Into_Db(LPVOID lpVoid)
 //{
@@ -3285,6 +3281,28 @@ DWORD WINAPI  MSTP_Write_Command_Thread(LPVOID lpVoid)
 //	write_indb_thread = NULL;
 //	return 0;
 //}
+=======
+DWORD WINAPI Write_Data_Into_Db(LPVOID lpVoid)
+{
+	for (int i = 0;i<BAC_INPUT_ITEM_COUNT;i++)
+	{
+		Save_InputData_to_db(i, g_selected_serialnumber);
+	}
+
+	for (int i = 0;i<BAC_OUTPUT_ITEM_COUNT;i++)
+	{
+		Save_OutputData_to_db(i, g_selected_serialnumber);
+	}
+
+	for (int i = 0;i<BAC_VARIABLE_ITEM_COUNT;i++)
+	{
+		Save_VariableData_to_db(i, g_selected_serialnumber);
+	}
+
+	write_indb_thread = NULL;
+	return 0;
+}
+>>>>>>> master
 
 DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
 {
@@ -4347,7 +4365,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 		}
 	}
 
-	// TODO: Add your control notification handler code here
+	
 	for (int i=0;i<BAC_SCHEDULE_GROUP;i++)
 	{
 
@@ -4851,7 +4869,7 @@ void CDialogCM5_BacNet::SetConnected_IP(LPCTSTR myip)
 
 void CDialogCM5_BacNet::WriteFlash()
 {
-	// TODO: Add your control notification handler code here
+	
 	//WRITEPRGFLASH_COMMAND
 	int resend_count = 0;
 	do 
@@ -4891,7 +4909,7 @@ void CDialogCM5_BacNet::Set_remote_device_IP(LPCTSTR ipaddress)
 
 void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 
 	bool is_connected = false;
 	switch(nIDEvent)
@@ -5417,7 +5435,11 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 		}
 	}
 
-	if((!read_analog_customer_unit) && pFrame->m_product.at(selected_product_index).protocol != MODBUS_RS485 && ((pFrame->m_product.at(selected_product_index).product_class_id ==PM_CM5 ) ||
+	//if ((!read_analog_customer_unit) && pFrame->m_product.at(selected_product_index).protocol != MODBUS_RS485 && ((pFrame->m_product.at(selected_product_index).product_class_id == PM_CM5) ||
+	//	(pFrame->m_product.at(selected_product_index).product_class_id == PM_MINIPANEL)))
+      if((!read_analog_customer_unit) && 
+		pFrame->m_product.at(selected_product_index).protocol != MODBUS_RS485 && 
+		((pFrame->m_product.at(selected_product_index).product_class_id ==PM_CM5 ) ||
 		(pFrame->m_product.at(selected_product_index).product_class_id ==PM_MINIPANEL )	))
 	{
 		CString temp_cs;
@@ -5437,7 +5459,8 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 
 
 	}
-
+	if (write_indb_thread == NULL)
+		write_indb_thread = CreateThread(NULL, NULL, Write_Data_Into_Db, this, NULL, NULL);
 	WritePrivateProfileStringW(_T("LastView"),_T("ViewSerialNumber"),temp_serial_number,g_cstring_ini_path);
 	WritePrivateProfileStringW(_T("LastView"),_T("ViewPid"),_T("35"),g_cstring_ini_path);
 	SetTimer(BAC_SET_LAST_UI,1000,NULL);
@@ -5475,7 +5498,7 @@ void CDialogCM5_BacNet::Inital_Tab_Loaded_Parameter()
 
 void CDialogCM5_BacNet::OnTcnSelchangeBacMaintab(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: Add your control notification handler code here
+	
 	
 	int selected = m_bac_main_tab.GetCurSel();
 
@@ -5871,7 +5894,36 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 			}
 			
 		}
-		break;
+		for (int i = 0;i < 3;i++)
+		{
+			int itemp = 0;
+			itemp = Read_Multi(read_device_id, &read_data_buffer[i * 100], BAC_CUSTOMER_TABLE_START + i * 100, 100, 4);
+			if (itemp < 0)
+			{
+				read_result = false;
+				break;
+			}
+			else
+			{
+				if (!hide_485_progress)
+					g_progress_persent = (i + 1) * 100 / 2;
+			}
+			Sleep(100);
+
+		}
+		if (read_result)
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read Analog table OK!"));
+
+
+			for (int i = 0;i<BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT;i++)
+			{
+				memcpy(&m_analog_custmer_range.at(i), &read_data_buffer[i * 53], sizeof(Str_table_point));//因为Input 只有45个字节，两个byte放到1个 modbus的寄存器里面;
+			}
+
+		}
+
+	break;
 	case BAC_PID:
 		{
 			//output 45 按46算  *64  + input 46  *64  需要读2944;
@@ -5919,6 +5971,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 			}
 		}
 		break;
+
 	case   READ_SETTING_COMMAND:
 		{
 			//Setting 400 个字节
@@ -6191,7 +6244,7 @@ LRESULT CDialogCM5_BacNet::RS485_Read_Fun(WPARAM wParam,LPARAM lParam)
 
 BOOL CDialogCM5_BacNet::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_TAB) 
 	{
 		if(m_bac_main_tab.IsWindowVisible() == false)

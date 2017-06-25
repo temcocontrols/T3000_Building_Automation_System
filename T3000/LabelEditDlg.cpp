@@ -389,7 +389,7 @@ void CLabelEditDlg::OnEnKillfocusRegedit()
 
 void CLabelEditDlg::OnEnKillfocusWidthedit()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString strText;
 	m_widthEdit.GetWindowText(strText);
 	if(strText.IsEmpty())

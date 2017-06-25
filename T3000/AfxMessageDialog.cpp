@@ -21,6 +21,7 @@ CAfxMessageDialog::CAfxMessageDialog(CWnd* pParent /*=NULL*/)
 
 CAfxMessageDialog::~CAfxMessageDialog()
 {
+
 }
 
 void CAfxMessageDialog::DoDataExchange(CDataExchange* pDX)
@@ -61,7 +62,7 @@ void CAfxMessageDialog::OnPaint()
 
 void CAfxMessageDialog::OnTimer(UINT nIDEvent)
 {
-	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	
 	if(nIDEvent==1)
 	{
 		CAfxMessageDialog::OnCancel();
@@ -79,7 +80,7 @@ void CAfxMessageDialog::OnTimer(UINT nIDEvent)
 
 void CAfxMessageDialog::OnBnClickedOk()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	OnOK();
 }
 BOOL CAfxMessageDialog::OnInitDialog()
@@ -100,12 +101,12 @@ void CAfxMessageDialog::OnDestroy()
 	KillTimer(1);
 	KillTimer(2);
 
-	// TODO: 在此处添加消息处理程序代码
+	
 }
 
 void CAfxMessageDialog::OnBnClickedCancel()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	OnCancel();
 }
 void CAfxMessageDialog::SetTotalTime(int nTime)

@@ -6,7 +6,7 @@
 #include "T38AI8AO.h"
  #include "../SQLiteDriver/CppSQLite3.h"
  #include "Dialog_Progess.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "MainFrm.h"
 #include <bitset>
 // T38AI8AO
@@ -822,7 +822,7 @@ void T38AI8AO::OnDestroy()
 
 CFormView::OnDestroy();
 
-	// TODO: Add your message handler code here
+	
 }
 
 

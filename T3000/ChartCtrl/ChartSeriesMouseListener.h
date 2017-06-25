@@ -40,9 +40,14 @@ class CChartSeriesMouseListener
 {
 public:
 	//! Constructor
-	CChartSeriesMouseListener()  { }
+	CChartSeriesMouseListener()
+	{
+	}
+
 	//! Destructor
-	virtual ~CChartSeriesMouseListener()  { }
+	virtual ~CChartSeriesMouseListener()
+	{
+	}
 
 	//! Virtual function to implement in order to be notified when a mouse event occurs on a series.
 	/**
@@ -59,7 +64,9 @@ public:
 			parameter.
 	**/
 	virtual void OnMouseEventSeries(CChartMouseListener::MouseEvent mouseEvent, CPoint point,
-					CChartSerieBase<PointType>* pSerie, unsigned uPointIndex) { }
+	                                CChartSerieBase<PointType>* pSerie, unsigned uPointIndex)
+	{
+	}
 };
 
 #endif  // _CHARTSERIESMOUSELISTENER_H_

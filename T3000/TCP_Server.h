@@ -3,7 +3,7 @@
 #include "Class/MulitithreadSocket.h"
 #include "CM5/ListCtrlEx.h"
 // CTCP_Server dialog
-#include "globle_function.h"
+#include "global_function.h"
 #include "afxcmn.h"
 class CTCP_Server : public CDialogEx
 {

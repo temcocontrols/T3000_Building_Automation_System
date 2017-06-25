@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "BacnetTool.h"
 #include "afxdialogex.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "BacnetToolReadProperty.h"
 
 bool read_property_cancel = true;
@@ -77,7 +77,7 @@ END_MESSAGE_MAP()
 
 BOOL CBacnetTool::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -86,8 +86,6 @@ BOOL CBacnetTool::PreTranslateMessage(MSG* pMsg)
 
 LRESULT CBacnetTool::FreshListView(WPARAM wParam, LPARAM lParam)
 {
-	//m_TreeCtrl.DeleteItem(ToolFirstChild);
-	//ToolFirstChild = m_TreeCtrl.InsertItem(_T("BACnet IP"),0,1);
 	for (int i=0;i<(int)m_bacnet_tool_device.size();i++)
 	{
 		if(m_bacnet_tool_device.at(i).Device_Htree.hTreeItem == NULL)
@@ -123,21 +121,6 @@ LRESULT CBacnetTool::FreshListView(WPARAM wParam, LPARAM lParam)
 		{
 			m_TreeCtrl.SetItemText(m_bacnet_tool_device.at(i).Htree_Prop_object_name.hTreeItem,m_bacnet_tool_device.at(i).Htree_Prop_object_name.show_cstring);
 		}
-#if 0
-		
-		
-		m_bacnet_tool_device.at(i).Htree_Vendor_identifier = m_TreeCtrl.InsertItem(TVIF_TEXT,_T("vendor_identifier: ") + m_bacnet_tool_device.at(i).Vendor_identifier, 0, 0, 0, 0, 0,m_bacnet_tool_device.at(i).Device_Htree,NULL);
-#endif
-		//m_TreeCtrl.Expand(ToolFirstChild,TVE_EXPAND);
-		//m_TreeCtrl.Expand(m_bacnet_tool_device.at(i).Device_Htree,TVE_EXPAND);
-		//m_TreeCtrl.InsertItem(()
-	#if 0
-			m_bacnet_tool_device.at(i).Device_Htree = m_TreeCtrl.InsertItem(m_bacnet_tool_device.at(i).Object_identifier,ToolFirstChild,TVI_SORT);
-			m_bacnet_tool_device.at(i).Htree_Update_time = m_TreeCtrl.InsertItem(_T("Last Update : ") + m_bacnet_tool_device.at(i).update_time ,m_bacnet_tool_device.at(i).Device_Htree,TVI_SORT);
-			m_bacnet_tool_device.at(i).Htree_IP_Address = m_TreeCtrl.InsertItem(_T("IP Address: ") + m_bacnet_tool_device.at(i).IP_Address,m_bacnet_tool_device.at(i).Device_Htree,TVI_SORT);
-			m_bacnet_tool_device.at(i).Htree_Object_identifier = m_TreeCtrl.InsertItem(_T("object_identifier: ") + m_bacnet_tool_device.at(i).Object_identifier,m_bacnet_tool_device.at(i).Device_Htree,TVI_SORT);
-			m_bacnet_tool_device.at(i).Htree_Vendor_identifier = m_TreeCtrl.InsertItem(_T("vendor_identifier: ") + m_bacnet_tool_device.at(i).Vendor_identifier,m_bacnet_tool_device.at(i).Device_Htree,TVI_SORT);
-	#endif
 	}
 	
 	//Device_Htree
@@ -148,7 +131,7 @@ BOOL CBacnetTool::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	
 
 	InitialTemcoLogo();
@@ -224,7 +207,7 @@ void CBacnetTool::InitialListView()
 
 void CBacnetTool::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	CDialogEx::OnCancel();
 }
@@ -349,7 +332,7 @@ void LocalIAmHandler_Tool(	uint8_t * service_request,	uint16_t service_len,	BACN
 
 void CBacnetTool::OnBnClickedButtonBacToolExit()
 {
-	// TODO: Add your control notification handler code here
+	
 	Send_WhoIs_Global(-1, -1);
 }
 
@@ -505,7 +488,7 @@ void Localhandler_read_property_ack_tool(
 
 void CBacnetTool::OnBnClickedButtonBacToolTest2()
 {
-	// TODO: Add your control notification handler code here
+	
 	CBacnetToolReadProperty Dlg;
 	Dlg.DoModal();
 	if(!read_property_cancel)

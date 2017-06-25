@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "TStatScheduleDlg.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "global_variable_extern.h"
 #include "schedule.h"
 
@@ -54,7 +54,7 @@ BOOL CTStatScheduleDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	m_scheduleonoff.AddString(_T("Disable"));
 	m_scheduleonoff.AddString(_T("Enable"));
 	m_scheduleonoff.SetCurSel(product_register_value[MODBUS_SCHEDULE_ON_OFF]);

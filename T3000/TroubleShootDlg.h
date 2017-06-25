@@ -1,7 +1,7 @@
 #pragma once
 
 #include "global_variable_extern.h"
-#include "globle_function.h"
+#include "global_function.h"
 // CTroubleShootDlg dialog
 #include "MainFrm.h"
 #include "ScanDlg.h"

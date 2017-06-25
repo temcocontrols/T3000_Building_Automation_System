@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "T3000UpdateDlg.h"
 #include "afxdialogex.h"
-#include "globle_function.h"
+#include "global_function.h"
 
 
 // CT3000UpdateDlg dialog
@@ -90,7 +90,7 @@ BOOL CT3000UpdateDlg::OnInitDialog()
 
 void CT3000UpdateDlg::OnBnClickedDownload()
 {
-    // TODO: Add your control notification handler code here
+    
     if (m_new)
     {
             ShellExecute( GetDesktopWindow()->m_hWnd, _T("open"),

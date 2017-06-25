@@ -36,9 +36,14 @@ class CChartCursorListener
 {
 public:
 	//! Default constructor
-	CChartCursorListener()  { }
+	CChartCursorListener()
+	{
+	}
+
 	//! Destructor
-	virtual ~CChartCursorListener()  { }
+	virtual ~CChartCursorListener()
+	{
+	}
 
 	//! Pure virtual function to implement in order to be notified about a cursor movement.
 	/**
@@ -68,14 +73,14 @@ public:
 	//! Sets the cursor color.
 	void SetColor(COLORREF cursorColor);
 	//! Retrieves the cursor Id.
-	unsigned GetCursorId() const  { return m_uCursorId; }
+	unsigned GetCursorId() const { return m_uCursorId; }
 
 	//! Registers a cursor listener with this cursor.
 	void RegisterListener(CChartCursorListener* pListener);
 
 protected:
 	//! Default constructor
-	CChartCursor(CChartCtrl* pParent); 
+	CChartCursor(CChartCtrl* pParent);
 	//! Default destructor
 	virtual ~CChartCursor();
 
@@ -90,13 +95,18 @@ protected:
 		This function can be overriden by child classes to take appropriate
 		actions on the mouse click event.
 	**/
-	virtual void OnMouseButtonDown(CPoint /*mousePoint*/)  { }
+	virtual void OnMouseButtonDown(CPoint /*mousePoint*/)
+	{
+	}
+
 	//! Virtual function that is called when the left mouse button is released.
 	/**
 		This function can be overriden by child classes to take appropriate
 		actions on the mouse click event.
 	**/
-	virtual void OnMouseButtonUp(CPoint /*mousePoint*/)    { }
+	virtual void OnMouseButtonUp(CPoint /*mousePoint*/)
+	{
+	}
 
 	//! Pure virtual function that draws the cursor.
 	virtual void Draw(CDC* pDC) = 0;

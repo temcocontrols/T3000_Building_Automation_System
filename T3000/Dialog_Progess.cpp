@@ -43,7 +43,7 @@ BOOL CDialog_Progess::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// TODO:  Add extra initialization here		
+			
 	//设置进度条的范围
 		m_progress.SetRange(m_lower,m_upper);
 	//设置进度条的每一步的增量
@@ -93,7 +93,7 @@ BOOL CDialog_Progess::PreTranslateMessage(MSG* pMsg)
 
 void CDialog_Progess::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 
 	CDialog::OnClose();
 	
@@ -101,7 +101,7 @@ void CDialog_Progess::OnClose()
 
 void CDialog_Progess::OnOK()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	CDialog::OnOK();
 }
@@ -118,7 +118,7 @@ void CDialog_Progess::ShowProgress( int setpos,int percent )
 }
 void CDialog_Progess::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 
 if(nIDEvent == 1)
 {

@@ -59,7 +59,7 @@ void CTrendLogView::OnInitialUpdate()
 
 	
 	m_TrendLogWnd.Create(_T("STATIC"),_T("TrendLogWnd"),WS_VISIBLE|WS_CHILD,m_rcClient,this,6001);
-	// TODO: Add your specialized code here and/or call the base class
+	
 }
 void CTrendLogView::Fresh()
 {
@@ -68,7 +68,7 @@ void CTrendLogView::Fresh()
 void CTrendLogView::OnBnClickedGobackbutton()
 {
 	((CMainFrame*)(theApp.m_pMainWnd))->SwitchToPruductType(0);
-	// TODO: Add your control notification handler code here
+	
 }
 
 void CTrendLogView::OnSize(UINT nType, int cx, int cy)
@@ -87,17 +87,17 @@ void CTrendLogView::OnSize(UINT nType, int cx, int cy)
 	}
 	
 
-	// TODO: Add your message handler code here
+	
 }
 
 void CTrendLogView::OnBnClickedSavebutton()
 {
-	// TODO: Add your control notification handler code here
+	
 }
 
 void CTrendLogView::OnBnClickedLoadbutton()
 {
-	// TODO: Add your control notification handler code here
+	
 }
 
 int CTrendLogView::OnCreate(LPCREATESTRUCT lpCreateStruct)
@@ -105,7 +105,7 @@ int CTrendLogView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CFormView::OnCreate(lpCreateStruct) == -1)
 		return -1;
 	GetClientRect(&m_rcClient);
-	// TODO:  Add your specialized creation code here
+	
 
 	return 0;
 }

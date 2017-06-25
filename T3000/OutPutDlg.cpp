@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "OutPutDlg.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "AfxMessageDialog.h"
 #include "MainFrm.h"
 #include "../SQLiteDriver/CppSQLite3.h"
@@ -602,7 +602,7 @@ BOOL COutPutDlg::OnInitDialog()
 
 void COutPutDlg::OnOK()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	//CDialog::OnOK();
 }
@@ -5526,7 +5526,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 
 BOOL COutPutDlg::PreTranslateMessage(MSG* pMsg) 
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message == WM_KEYDOWN  )
 	{		
 		if(pMsg->wParam == VK_RETURN )
@@ -8979,5 +8979,5 @@ void COutPutDlg::SetModelButton()
 
 void COutPutDlg::OnBnClickedButtonModel11()
 {
-	// TODO: Add your control notification handler code here
+	
 }

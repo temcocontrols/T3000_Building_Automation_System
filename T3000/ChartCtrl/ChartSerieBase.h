@@ -88,7 +88,7 @@ public:
 	void ClearSerie();
 
 	//! Returns the number of points in the series.
-	unsigned GetPointsCount() const  { return m_vPoints.GetPointsCount(); }
+	unsigned GetPointsCount() const { return m_vPoints.GetPointsCount(); }
 
 	//! Retrieves the minimum and maxium Y values of the series.
 	/**
@@ -99,7 +99,7 @@ public:
 		@return
 			false if the series doesn't contain data or is invisible
 	**/
-	bool GetSerieYMinMax(double& Min, double& Max)  const;
+	bool GetSerieYMinMax(double& Min, double& Max) const;
 	//! Retrieves the minimum and maxium X values of the series.
 	/**
 		@param Min
@@ -109,7 +109,7 @@ public:
 		@return
 			false if the series doesn't contain data or is invisible
 	**/
-	bool GetSerieXMinMax(double& Min, double& Max)  const;
+	bool GetSerieXMinMax(double& Min, double& Max) const;
 	//! Retrieves the minimum and maxium screen X values of the series.
 	/**
 		@param Min
@@ -119,7 +119,7 @@ public:
 		@return
 			false if the series doesn't contain data or is invisible
 	**/
-	bool GetSerieXScreenMinMax(double& Min, double& Max)  const;
+	bool GetSerieXScreenMinMax(double& Min, double& Max) const;
 	//! Retrieves the minimum and maxium screen Y values of the series.
 	/**
 		@param Min
@@ -129,7 +129,7 @@ public:
 		@return
 			false if the series doesn't contain data or is invisible
 	**/
-	bool GetSerieYScreenMinMax(double& Min, double& Max)  const;
+	bool GetSerieYScreenMinMax(double& Min, double& Max) const;
 
 	//! Creates and attaches a balloon label on a point of the series.
 	/**
@@ -208,13 +208,13 @@ protected:
 	bool GetVisiblePoints(unsigned& uFirst, unsigned& uLast) const;
 
 	//! Called by the control to check if an event occured on the series.
-	bool OnMouseEvent(CChartMouseListener::MouseEvent mouseEvent, 
-					const CPoint& screenPoint);
+	bool OnMouseEvent(CChartMouseListener::MouseEvent mouseEvent,
+	                  const CPoint& screenPoint);
 
 	//! The helper class containing all the data points.
 	CChartPointsArray<T> m_vPoints;
 	//! Index of the last point drawn
-	unsigned m_uLastDrawnPoint;		
+	unsigned m_uLastDrawnPoint;
 
 private:
 	//! Draws the labels of the series.
@@ -228,4 +228,3 @@ private:
 };
 
 #include "ChartSerieBase.inl"
-

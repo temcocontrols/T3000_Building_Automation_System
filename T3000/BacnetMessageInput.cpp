@@ -54,7 +54,7 @@ BOOL CBacnetMessageInput::OnInitDialog()
 	m_edit_return.setFont(24,14,NULL,_T("Arial"));
 
 	m_edit_return.SetFocus();
-	// TODO:  Add extra initialization here
+	
 
 	return FALSE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -63,7 +63,7 @@ BOOL CBacnetMessageInput::OnInitDialog()
 
 BOOL CBacnetMessageInput::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -71,7 +71,7 @@ BOOL CBacnetMessageInput::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetMessageInput::OnBnClickedOk()
 {
-	// TODO: Add your control notification handler code here
+	
 	GetDlgItem(IDC_EDIT_BACNET_MESSAGE_INPUT)->GetWindowTextW(bacnet_message_return_string);
 	CDialogEx::OnOK();
 }
@@ -79,7 +79,7 @@ void CBacnetMessageInput::OnBnClickedOk()
 
 void CBacnetMessageInput::OnBnClickedCancel()
 {
-	// TODO: Add your control notification handler code here
+	
 	bacnet_message_return_string.Empty();
 	CDialogEx::OnCancel();
 }

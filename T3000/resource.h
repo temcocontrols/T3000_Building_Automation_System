@@ -298,6 +298,7 @@
 #define IDB_BITMAP_TOOLBAR_DISABLE      674
 #define IDD_DIALOG_BACNET_ADD_VIRTUAL_DEVICE 675
 #define IDD_DIALOG_FREE_COOLING         676
+#define IDD_DIALOG_REMOTE_PORT_WARNING  677
 #define IDD_DIALOG16                    679
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
@@ -2057,7 +2058,6 @@
 #define IDC_EDIT_ID_COLLISION_3         2170
 #define IDC_BUTTON_UPDATE_T3000         2170
 #define IDC_EDIT_PACKET_ERROR_1         2171
-#define IDC_BTN_EDIT_CUSTOMER_RANGE     2171
 #define IDC_EDIT_PACKET_ERROR_2         2172
 #define IDC_EDIT_BUILDINGNAME           2172
 #define IDC_BTN_EDIT_CUSTOMER_VAR_RANGE 2172
@@ -2236,6 +2236,9 @@
 #define IDC_EDIT_NETWORKID              2342
 #define IDC_EDIT_PIC_VERSION            2343
 #define IDC_STATIC_PIC_VERSION          2344
+#define IDC_STATIC_REMOTE_PORT_WARNING  2996
+#define IDC_CHECK_REMOTE_PORT_WARNING   2997
+#define IDC_STATIC_IGNORE_TEXT          2998
 #define IDC_BUTTON_MODEL11              3000
 #define IDC_BUTTON_MODEL1               3000
 #define IDC_BUTTON_MODEL12              3001
@@ -2253,6 +2256,7 @@
 #define IDC_SLIDERCONTROL1              3833
 #define IDC_SLIDERCONTROL2              3834
 #define IDC_SLIDERCONTROL3              3835
+#define IDC_BTN_EDIT_CUSTOMER_RANGE     5714
 #define IDC_EDIT_TIMEOUT_3              5715
 #define IDC_BUTTON_SYNC_TIME            5716
 #define IDC_STATIC_BAC_SETTING_SD_CARD  5817
@@ -2443,6 +2447,19 @@
 #define IDC_RADIO_VAR_CUS_3             15595
 #define IDC_RADIO_VAR_CUS_4             15596
 #define IDC_RADIO_VAR_CUS_5             15597
+#define IDC_RADIO101                    15598
+#define IDC_RADIO102                    15599
+#define IDC_RADIO103                    15600
+#define IDC_RADIO104                    15601
+#define IDC_RADIO105                    15602
+#define IDC_RADIO106                    15603
+#define IDC_RADIO107                    15604
+#define IDC_RADIO108                    15605
+#define IDC_RADIO109                    15606
+#define IDC_RADIO110                    15607
+#define IDC_RADIO111                    15608
+#define IDC_RADIO112                    15609
+#define IDC_RADIO113                    15610
 #define IDC_RADIO_NEW200                19484
 #define ID_TIMEBASE_1HOUR               19485
 #define IDC_STATIC__LOGIN_NAME          32709
@@ -2685,6 +2702,7 @@
 #define ID_MODE_ONLINEMODE              34060
 #define ID_MODE_OFFLIN                  34061
 #define ID_MODE_OFFLINEMODE             34062
+#define ID_TOOLS_PHCHART                34063
 #define ID_HELP_USING_UPDATE            34904
 #define ID_DATABASE_BACNETTOOL          34905
 #define IDD_DIALOG_BACNET_PROGRAM       34906
@@ -2758,8 +2776,13 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
+<<<<<<< HEAD
 #define _APS_NEXT_RESOURCE_VALUE        686
 #define _APS_NEXT_COMMAND_VALUE         34063
+=======
+#define _APS_NEXT_RESOURCE_VALUE        687
+#define _APS_NEXT_COMMAND_VALUE         34064
+>>>>>>> master
 #define _APS_NEXT_CONTROL_VALUE         2345
 #define _APS_NEXT_SYMED_VALUE           320
 #endif

@@ -318,7 +318,7 @@ BOOL CFlexSlideWnd::CreateFlexSlideBar(
 void CFlexSlideWnd::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-	// TODO: Add your message handler code here
+	
 	// Do not call CStatic::OnPaint() for painting messages
 	
 	
@@ -345,7 +345,7 @@ void CFlexSlideWnd::OnPaint()
 
 void CFlexSlideWnd::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 
 	m_pThumbOpter->OnLButtonDown(point);
 	//MoveStep(point);
@@ -382,14 +382,14 @@ int CFlexSlideWnd::CalcPixelNumOfTicLength()
 }
 // BOOL CFlexSlideWnd::OnEraseBkgnd(CDC* pDC)
 // {
-// 	// TODO: Add your message handler code here and/or call default
+// 	 
 // 	
 // 	return CStatic::OnEraseBkgnd(pDC);
 // }
 
 void CFlexSlideWnd::OnMouseMove(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if (nFlags)
 	{
 	    
@@ -404,7 +404,7 @@ void CFlexSlideWnd::OnMouseMove(UINT nFlags, CPoint point)
 
 void CFlexSlideWnd::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	m_pThumbOpter->OnLButtonUp(point);
 	Invalidate(TRUE);
 

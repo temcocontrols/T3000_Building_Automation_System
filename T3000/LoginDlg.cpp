@@ -88,7 +88,7 @@ BOOL CLoginDlg::OnInitDialog()
 
 void CLoginDlg::OnBnClickedCancel()
 {
-	// TODO: Add your control notification handler code here
+	
 	OnCancel();
 }
 
@@ -96,5 +96,5 @@ void CLoginDlg::OnDestroy()
 {
 	CDialog::OnDestroy();
 	 
-	// TODO: Add your message handler code here
+	
 }

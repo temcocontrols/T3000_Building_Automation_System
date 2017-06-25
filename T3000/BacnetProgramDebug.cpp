@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "BacnetProgramDebug.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "afxdialogex.h"
 #include "BacnetRange.h"
 unsigned int point_number = 0;
@@ -53,7 +53,7 @@ BOOL CBacnetProgramDebug::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	SetTimer(UPDATE_DEBUG_DATA_TIMER,5000,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -62,7 +62,7 @@ BOOL CBacnetProgramDebug::OnInitDialog()
 
 BOOL CBacnetProgramDebug::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN) 
 	{
 		CRect list_rect,win_rect;
@@ -82,7 +82,7 @@ BOOL CBacnetProgramDebug::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetProgramDebug::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	KillTimer(UPDATE_DEBUG_DATA_TIMER);
 	CDialogEx::OnCancel();
 }
@@ -90,7 +90,7 @@ void CBacnetProgramDebug::OnCancel()
 
 void CBacnetProgramDebug::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	KillTimer(UPDATE_DEBUG_DATA_TIMER);
 	CDialogEx::OnClose();
 }
@@ -362,7 +362,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 
 
 				//这样加实在是情非得已，老毛非得加一堆条件，还要smart;
-				if((bacnet_device_type == BIG_MINIPANEL) || ((bacnet_device_type == SMALL_MINIPANEL)) || (bacnet_device_type == TINY_MINIPANEL))
+				if((bacnet_device_type == BIG_MINIPANEL) || ((bacnet_device_type == SMALL_MINIPANEL)) || (bacnet_device_type == TINY_MINIPANEL) || (bacnet_device_type == TINY_EX_MINIPANEL))
 				{
 					if(bacnet_device_type == BIG_MINIPANEL)
 					{
@@ -379,18 +379,21 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 						digital_special_output_count = TINY_MINIPANEL_OUT_D;
 						analog_special_output_count = TINY_MINIPANEL_OUT_A;
 					}
+					else if (bacnet_device_type == TINY_EX_MINIPANEL)
+					{
+						digital_special_output_count = TINYEX_MINIPANEL_OUT_D;
+						analog_special_output_count = TINYEX_MINIPANEL_OUT_A;
+					}
 					if(point_number < (digital_special_output_count +analog_special_output_count) )
 					{
 						if(m_Output_data.at(point_number).hw_switch_status == HW_SW_OFF)
 						{
 							m_program_debug_list.SetItemText(0,OUTPUT_HW_SWITCH,_T("MAN-OFF"));
-							//m_program_debug_list.SetCellEnabled(i,OUTPUT_VALUE,0);
 							m_program_debug_list.SetCellEnabled(0,OUTPUT_AUTO_MANUAL,0);
 						}
 						else if(m_Output_data.at(point_number).hw_switch_status == HW_SW_HAND)
 						{
 							m_program_debug_list.SetItemText(0,OUTPUT_HW_SWITCH,_T("MAN-ON"));
-							//m_program_debug_list.SetCellEnabled(i,OUTPUT_VALUE,0);
 							m_program_debug_list.SetCellEnabled(0,OUTPUT_AUTO_MANUAL,0);
 						}
 						else
@@ -448,9 +451,6 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 				m_program_debug_list.SetCellEnabled(0,OUTPUT_UNITE,0);
 				if(m_Output_data.at(point_number).digital_analog == BAC_UNITS_ANALOG)
 				{
-					//m_program_debug_list.SetCellEnabled(i,OUTPUT_0_PERSENT,1);
-					//m_program_debug_list.SetCellEnabled(i,OUTPUT_100_PERSENT,1);
-
 					m_program_debug_list.SetCellEnabled(0,OUTPUT_LOW_VOLTAGE,1);
 					m_program_debug_list.SetCellEnabled(0,OUTPUT_HIGH_VOLTAGE,1);
 					m_program_debug_list.SetCellEnabled(0,OUTPUT_PWM_PERIOD,1);
@@ -1623,7 +1623,7 @@ LRESULT CBacnetProgramDebug::Fresh_Program_Debug_Item(WPARAM wParam,LPARAM lPara
 void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 	*pResult = 0;
 
 
@@ -2118,9 +2118,6 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 
 					m_program_debug_list.SetCellEnabled(0,INPUT_CAL,1);
 					m_program_debug_list.SetCellEnabled(0,INPUT_UNITE,1);
-					//m_program_debug_list.SetItemText(Changed_Item,OUTPUT_100_PERSENT,_T("10"));
-					//m_program_debug_list.SetCellEnabled(Changed_Item,OUTPUT_100_PERSENT,1);
-
 					float temp_float_value;
 					temp_float_value = ((float)m_Input_data.at(point_number).value) / 1000;
 					cstemp_value.Format(_T("%.2f"),temp_float_value);
@@ -2130,7 +2127,6 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 				{
 					m_Input_data.at(point_number).digital_analog =  BAC_UNITS_DIGITAL;
 					m_Input_data.at(point_number).range =  bac_range_number_choose;
-					//m_program_debug_list.SetItemText(Changed_Item,INPUT_RANGE,INPUT_Digital_Units_Show[bac_range_number_choose]);		
 
 					m_program_debug_list.SetItemText(0,INPUT_CAL,_T(""));
 					m_program_debug_list.SetCellEnabled(0,INPUT_CAL,0);
@@ -2142,7 +2138,6 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 					CStringArray temparray;
 					if((bac_range_number_choose >= 23) && (bac_range_number_choose <= 30))
 					{
-						//temp1.Format(_T("%s"), temp_unit_no_index[bac_range_number_choose - 23]);
 						temp1 = temp_unit_no_index[bac_range_number_choose - 23];
 					}
 					else
@@ -2178,7 +2173,6 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 			int cmp_ret = memcmp(&m_temp_Input_data[point_number],&m_Input_data.at(point_number),sizeof(Str_in_point));
 			if(cmp_ret!=0)
 			{
-				//m_program_debug_list.SetItemBkColor(lRow,lCol,LIST_ITEM_CHANGED_BKCOLOR);
 				temp_task_info.Format(_T("Write Input List Item%d .Changed to \"%s\" "),point_number + 1,New_CString);
 				Post_Write_Message(g_bac_instance,WRITEINPUT_T3000,(int8_t)point_number,(int8_t)point_number,sizeof(Str_in_point),m_input_dlg_hwnd,temp_task_info,lRow,lCol);
 			}
@@ -2487,7 +2481,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 
 void CBacnetProgramDebug::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	switch(nIDEvent)
 	{
 	case 2:
@@ -2539,7 +2533,7 @@ void CBacnetProgramDebug::OnTimer(UINT_PTR nIDEvent)
 
 void CBacnetProgramDebug::OnNMKillfocusDatetimepickerPrgVariable(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: Add your control notification handler code here
+	
 	if(!m_prg_debug_variable_time_picker.IsWindowVisible())
 		return;
 	if(m_Variable_data.at(point_number).range != 20)

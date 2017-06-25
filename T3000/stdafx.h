@@ -75,6 +75,8 @@ using namespace Gdiplus;
 
 #include "T3000_Help_Map.h"
 
+//#include <CppUnitTest.h>
+//using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 //#pragma  comment(lib,"ISP.lib")
 //#pragma  comment(lib,"RegisterMonitor.lib")
 #import "C:\Program Files\Common Files\System\ado\msado15.dll" no_namespace rename("EOF","EndOfFile") rename("BOF","FirstOfFile")

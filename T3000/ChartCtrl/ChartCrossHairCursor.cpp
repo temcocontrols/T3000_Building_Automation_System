@@ -24,10 +24,10 @@
 #include "ChartCtrl.h"
 
 CChartCrossHairCursor::CChartCrossHairCursor(CChartCtrl* pParent,
-											 CChartAxis* pHorizAxis, 
-											 CChartAxis* pVertAxis)
-  : CChartCursor(pParent), m_pHorizontalAxis(pHorizAxis), m_pVerticalAxis(pVertAxis),
-    m_lXPos(0), m_lYPos(0)
+                                             CChartAxis* pHorizAxis,
+                                             CChartAxis* pVertAxis)
+	: CChartCursor(pParent), m_pHorizontalAxis(pHorizAxis), m_pVerticalAxis(pVertAxis),
+	  m_lXPos(0), m_lYPos(0)
 {
 }
 
@@ -37,7 +37,7 @@ CChartCrossHairCursor::~CChartCrossHairCursor()
 
 void CChartCrossHairCursor::Draw(CDC* pDC)
 {
-	CPen NewPen(PS_SOLID,1,m_colCursor);
+	CPen NewPen(PS_SOLID, 1, m_colCursor);
 	CPen* pOldPen = pDC->SelectObject(&NewPen);
 
 	CRect plottingRect = m_pParentCtrl->GetPlottingRect();

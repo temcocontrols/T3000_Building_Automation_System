@@ -7,10 +7,10 @@
 #include "afxdialogex.h"
 #include "CM5/ud_str.h"
 #include "Bacnet_Include.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include <math.h>
 
-#include "gloab_define.h"
+#include "global_define.h"
 #include "BacnetRange.h"
 #include "MainFrm.h"
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
@@ -110,7 +110,7 @@ BOOL CBacnetInput::OnInitDialog()
 	//m_static.bkColor(RGB(0,255,255));
 	m_input_item_info.setFont(20,14,NULL,_T("Arial"));
 #endif
-	// TODO:  Add extra initialization here
+	
 	Initial_List();
 	PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
    
@@ -189,6 +189,22 @@ void CBacnetInput::Reload_Unit_Type()
 				ListCtrlEx::CStrList strlist;
 				strlist.push_back(Units_Analog_Only);
 				m_input_list.SetCellStringList(i, INPUT_RANGE, strlist);		
+			}
+		}
+	}
+	else if (bacnet_device_type == TINY_EX_MINIPANEL)
+	{
+		if (TINYEX_MINIPANEL_IN_A > (int)m_Input_data.size())
+			initial_count = (int)m_Input_data.size();
+		else
+			initial_count = TINYEX_MINIPANEL_IN_A;
+		for (int i = 0;i<initial_count;i++)
+		{
+			if (ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_RANGE))
+			{
+				ListCtrlEx::CStrList strlist;
+				strlist.push_back(Units_Analog_Only);
+				m_input_list.SetCellStringList(i, INPUT_RANGE, strlist);
 			}
 		}
 	}
@@ -326,7 +342,7 @@ void CBacnetInput::Initial_List()
 
 void CBacnetInput::OnBnClickedOk()
 {
-	// TODO: Add your control notification handler code here
+	
 //	CDialogEx::OnOK();
 }
 
@@ -545,6 +561,11 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 	{
 		INPUT_LIMITE_ITEM_COUNT = 19;
 		Minipanel_device = 0;
+	}
+	else if (bacnet_device_type == TINY_EX_MINIPANEL)
+	{
+		//INPUT_LIMITE_ITEM_COUNT = 8;
+		Minipanel_device = 1;
 	}
 	else
 	{
@@ -952,7 +973,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 
 
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
  
 	CString temp_cstring;
 	long lRow,lCol;
@@ -1150,6 +1171,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 		if(!read_customer_unit)
 		{
 
+
 			int temp_invoke_id = -1;
 			int send_status = true;
 			int	resend_count = 0;
@@ -1192,6 +1214,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 			}
 
 		}
+
 		bac_range_number_choose = m_Input_data.at(lRow).range;
 
 		if(m_Input_data.at(lRow).digital_analog == BAC_UNITS_ANALOG)
@@ -1385,7 +1408,7 @@ static int move_direction = 1;
 static long ticktime = 0;
 void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 
 
 	switch(nIDEvent)
@@ -1508,7 +1531,7 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 
 void CBacnetInput::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	ShowWindow(FALSE);
 	return;
 
@@ -1518,7 +1541,7 @@ void CBacnetInput::OnClose()
 }
 void CBacnetInput::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
 //	CDialogEx::OnCancel();
 }
@@ -1526,7 +1549,7 @@ void CBacnetInput::OnCancel()
 
 BOOL CBacnetInput::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if((pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN))
 	{
 		CRect list_rect,win_rect;
@@ -1741,7 +1764,7 @@ Go to the Help ID
 
 BOOL CBacnetInput::OnHelpInfo(HELPINFO* pHelpInfo)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	 
 	/* if (m_latest_protocol==PROTOCOL_BACNET_IP){*/
 		 HWND hWnd;
@@ -1761,7 +1784,7 @@ void CBacnetInput::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 
-	// TODO: Add your message handler code here
+	
 	CRect rc;
 	GetClientRect(rc);
 	if(m_input_list.m_hWnd != NULL)
@@ -1782,14 +1805,14 @@ void CBacnetInput::OnMove(int x, int y)
 
 	//BringWindowToTop();
 	//SetActiveWindow();
-	// TODO: Add your message handler code here
+	
 	
 }
 
 
 void CBacnetInput::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if(nID == SC_MAXIMIZE)
 	{
 		if(window_max == false)

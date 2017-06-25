@@ -427,21 +427,21 @@ void CARDDlg::OnBnClickedOk()
 
 void CARDDlg::OnBnClickedRadioNetDevice()
 {
-	// TODO: Add your control notification handler code here
+	
 	Enable_Net_UI(1);
 }
 
 
 void CARDDlg::OnBnClickedRadio2()
 {
-	// TODO: Add your control notification handler code here
+	
 	Enable_Net_UI(0);
 }
 
 
 void CARDDlg::OnBnClickedButtonLocalMstpDevice()
 {
-	// TODO: Add your control notification handler code here
+	
 	CppSQLite3DB SqliteDBBuilding;
 	CppSQLite3Table table;
 	CppSQLite3Query q;
@@ -793,5 +793,5 @@ void CARDDlg::OnEnKillfocusEditTypeId()
 
 //void CARDDlg::OnEnKillfocusEditAddDeviceModbusId()
 //{
-//    // TODO: Add your control notification handler code here
+//    
 //}

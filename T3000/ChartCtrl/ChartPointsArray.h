@@ -52,9 +52,9 @@ public:
 	~CChartPointsArray();
 
 	//! Returns the number of points currently stored.
-	unsigned GetPointsCount() const   { return m_iCurrentPoints; }
+	unsigned GetPointsCount() const { return m_iCurrentPoints; }
 	//! Sets the size by which the internal buffer is increased when reallocation occurs
-	void SetResize(int iResize)  { m_iResize = iResize; }
+	void SetResize(int iResize) { m_iResize = iResize; }
 
 	//! Adds a new point in the array.
 	/**
@@ -93,9 +93,9 @@ public:
 	const T& operator[](unsigned Index) const;
 
 	//! Retrieves the minimum and maximum X values of the points stored in the array.
-	bool GetSerieXMinMax(double& Min, double& Max)  const;
+	bool GetSerieXMinMax(double& Min, double& Max) const;
 	//! Retrieves the minimum and maximum Y values of the points stored in the array.
-	bool GetSerieYMinMax(double& Min, double& Max)  const;
+	bool GetSerieYMinMax(double& Min, double& Max) const;
 
 	//! Specifies how the points should be ordered in the array.
 	/**
@@ -107,7 +107,7 @@ public:
 	**/
 	void SetOrdering(PointsOrdering newOrdering);
 	//! Retrieves the ordering of the points in the array.
-	PointsOrdering GetOrdering() const  { return m_Ordering; } 
+	PointsOrdering GetOrdering() const { return m_Ordering; }
 	//! Refreshes the point ordering.
 	void ReorderPoints();
 
@@ -125,12 +125,12 @@ public:
 			This parameter will store the index of the last visible point
 		@return false if no points are in the array. 
 	**/
-	bool GetVisiblePoints(double dAxisMin, double dAxisMax, 
-						  unsigned& uFirstPt, unsigned& uLastPt) const;
-	
+	bool GetVisiblePoints(double dAxisMin, double dAxisMax,
+	                      unsigned& uFirstPt, unsigned& uLastPt) const;
+
 
 	//! Returns the internal buffer of the array
-	T* GetInternalBuffer() const	{ return m_pPoints; }
+	T* GetInternalBuffer() const { return m_pPoints; }
 
 private:
 	//! Caches the minimum X value.

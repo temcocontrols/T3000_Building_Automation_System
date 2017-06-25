@@ -10,8 +10,8 @@
 
 #include "CM5/ud_str.h"
 #include "Bacnet_Include.h"
-#include "globle_function.h"
-#include "gloab_define.h"
+#include "global_function.h"
+#include "global_define.h"
 #include "BacnetRange.h"
 #include "BacnetScheduleTime.h"
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
@@ -94,7 +94,7 @@ LRESULT  BacnetWeeklyRoutine::WeeklyMessageCallBack(WPARAM wParam, LPARAM lParam
 
 BOOL BacnetWeeklyRoutine::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN) 
 	{
 		CRect list_rect,win_rect;
@@ -153,7 +153,7 @@ BOOL BacnetWeeklyRoutine::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	SetWindowTextW(_T("SCHEDULE"));
-	// TODO:  Add extra initialization here
+	
 	Initial_List();
 	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_SCHEDUAL);
 	SetIcon(m_hIcon,TRUE);
@@ -510,7 +510,7 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_List(WPARAM wParam,LPARAM lParam)
 void BacnetWeeklyRoutine::OnNMClickListBacWeekly(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 
 	DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
 	CPoint point( LOWORD(dwPos), HIWORD(dwPos));
@@ -537,7 +537,7 @@ void BacnetWeeklyRoutine::OnNMClickListBacWeekly(NMHDR *pNMHDR, LRESULT *pResult
 
 void BacnetWeeklyRoutine::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	ShowWindow(FALSE);
 	return;
 	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
@@ -548,7 +548,7 @@ void BacnetWeeklyRoutine::OnClose()
 
 void BacnetWeeklyRoutine::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
 //	CDialogEx::OnCancel();
 }
@@ -557,7 +557,7 @@ void BacnetWeeklyRoutine::OnCancel()
 
 void BacnetWeeklyRoutine::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_WEEKLY))  )	//GSM连接时不要刷新;
 	{
 	PostMessage(WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
@@ -570,7 +570,7 @@ void BacnetWeeklyRoutine::OnTimer(UINT_PTR nIDEvent)
 void BacnetWeeklyRoutine::OnNMDblclkListWeeklySchedule(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 	OnBnClickedButtonWeeklyScheduleEdit();
 	*pResult = 0;
 }
@@ -578,7 +578,7 @@ void BacnetWeeklyRoutine::OnNMDblclkListWeeklySchedule(NMHDR *pNMHDR, LRESULT *p
 
 void BacnetWeeklyRoutine::OnBnClickedButtonWeeklyScheduleEdit()
 {
-	// TODO: Add your control notification handler code here
+	
 	for (int i=0;i<m_weeklyr_list.GetItemCount();++i)
 	{
 		if(m_weeklyr_list.GetCellChecked(i,0))
@@ -622,7 +622,7 @@ void BacnetWeeklyRoutine::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 
-	// TODO: Add your message handler code here
+	
 	CRect rc;
 	GetClientRect(rc);
 	if(m_weeklyr_list.m_hWnd != NULL)
@@ -637,7 +637,7 @@ void BacnetWeeklyRoutine::OnSize(UINT nType, int cx, int cy)
 
 void BacnetWeeklyRoutine::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 
 	if(nID == SC_MAXIMIZE)
 	{

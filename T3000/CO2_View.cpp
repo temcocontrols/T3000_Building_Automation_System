@@ -1,11 +1,10 @@
 // CO2_View.cpp : implementation file
 // CO2 coded by Fance 2013 07 20
 // Already finished CO2 with RS485.
-
 #include "stdafx.h"
 #include "T3000.h"
 #include "CO2_View.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "CM5\MyOwnListCtrl.h"
 #include "../SQLiteDriver/CppSQLite3.h"
 #include <bitset>
@@ -174,7 +173,9 @@ void CCO2_View::Dump(CDumpContext& dc) const
 }
 #endif
 #endif //_DEBUG
-
+/// <summary>
+/// Load CO2's Window
+/// </summary>
 void CCO2_View::Fresh()
 {
     g_NEED_MULTI_READ = FALSE;
@@ -263,13 +264,14 @@ void CCO2_View::Fresh()
 
 
 
-//         if(RefreshThread==NULL)
-//             RefreshThread = CreateThread(NULL,NULL,StartRefresh,this,NULL,NULL);
+
 
 
 
 }
-
+/// <summary>
+/// Show ,Hide some window Fields ,according to different devices
+/// </summary>
 void CCO2_View::SH_Window(){
     CString temp_id;
     float m_fFirmwareVersion=0;
@@ -501,7 +503,9 @@ void CCO2_View::SH_Window(){
 
     }
 }
-
+/// <summary>
+/// Load CO2's page
+/// </summary>
 void CCO2_View::Fresh_CO2(){
      Initial_List();
      C02_SHOW_TEMP();
@@ -907,7 +911,7 @@ void CCO2_View::OnBnClickedCo2Enableidbutton()
     CEreaseDlg Dlg;
     Dlg.DoModal();
     g_bPauseMultiRead = FALSE;
-    // TODO: Add your control notification handler code here
+    
     //if(m_co2_idAdressEdit.IsWindowEnabled())
     //{
     //	m_co2_idAdressEdit.EnableWindow(FALSE);
@@ -927,13 +931,13 @@ END_EVENTSINK_MAP()
 
 void CCO2_View::ClickMsflexgridCo2()
 {
-    // TODO: Add your message handler code here
+    
 }
 
 
 void CCO2_View::OnCbnSelchangeComboCo2SensorSel()
 {
-    // TODO: Add your control notification handler code here
+    
     UpdateData();
     int temp_cursel = m_sensor_sel.GetCurSel();
     if(temp_cursel != product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT])
@@ -1025,7 +1029,7 @@ LRESULT  CCO2_View::ResumeCO2MessageCallBack(WPARAM wParam, LPARAM lParam)
 
 void CCO2_View::OnCbnSelchangeCo2TempUnit()
 {
-    // TODO: Add your control notification handler code here
+    
     UpdateData();
     if (m_nCurCol==2)
     {
@@ -1071,7 +1075,7 @@ void CCO2_View::OnCbnSelchangeCo2TempUnit()
 
 BOOL CCO2_View::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: Add your specialized code here and/or call the base class
+    
 
     if(pMsg->message == WM_KEYDOWN  )
     {
@@ -1161,7 +1165,7 @@ BOOL CCO2_View::PreTranslateMessage(MSG* pMsg)
 
 void CCO2_View::OnEnKillfocusEditInternalTemp()
 {
-    // TODO: Add your control notification handler code here
+    
     UpdateData();
     int ivalue=0;
     ivalue = m_f_internal_temp *10;
@@ -1187,7 +1191,7 @@ HBRUSH CCO2_View::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 {
     HBRUSH hbr = CFormView::OnCtlColor(pDC, pWnd, nCtlColor);
 
-    // TODO:  Change any attributes of the DC here
+    
     for (int i=0;i<(int)Change_Color_ID.size();i++)
     {
         if(/*nCtlColor==CTLCOLOR_EDIT &&*/pWnd->GetDlgCtrlID()==Change_Color_ID.at(i))//ע���˴��ģ�pWnd->��������ûЧ��
@@ -1199,14 +1203,14 @@ HBRUSH CCO2_View::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
         }
 
     }
-    // TODO:  Return a different brush if the default is not desired
+    
     return hbr;
 }
 
 
 void CCO2_View::OnEnKillfocusEditExternalTemp()
 {
-    // TODO: Add your control notification handler code here
+    
     UpdateData();
     int ivalue=0;
     ivalue = m_f_external_temp *10;
@@ -1255,7 +1259,7 @@ void CCO2_View::OnEnKillfocusCo2PrepareAlarmSetpoint()
 
 void CCO2_View::OnEnKillfocusCo2AlarmSetpoint()
 {
-    // TODO: Add your control notification handler code here
+    
     UpdateData();
     if (m_product_type == 3)
     {
@@ -1279,7 +1283,7 @@ void CCO2_View::OnEnKillfocusCo2AlarmSetpoint()
 
 void CCO2_View::OnEnKillfocusCo2CalibratingOffset()
 {
-    // TODO: Add your control notification handler code here
+    
     UpdateData();
     if (m_product_type == 3)
     {
@@ -1303,7 +1307,7 @@ void CCO2_View::OnEnKillfocusCo2CalibratingOffset()
 
 void CCO2_View::OnBnClickedRadioAlarmManual()
 {
-    // TODO: Add your control notification handler code here
+    
     unsigned short temp_value;
     temp_value = product_register_value[CO2_485_MODBUS_ALARM_AUTO_MANUAL] | 0x80;
     if(temp_value != product_register_value[CO2_485_MODBUS_ALARM_AUTO_MANUAL])
@@ -1317,7 +1321,7 @@ void CCO2_View::OnBnClickedRadioAlarmManual()
 
 void CCO2_View::OnBnClickedRadioAlarmAuto()
 {
-    // TODO: Add your control notification handler code here
+    
     unsigned short temp_value;
     temp_value = product_register_value[CO2_485_MODBUS_ALARM_AUTO_MANUAL] & 0x7f;
     if(temp_value != product_register_value[CO2_485_MODBUS_ALARM_AUTO_MANUAL])
@@ -1330,7 +1334,7 @@ void CCO2_View::OnBnClickedRadioAlarmAuto()
 
 void CCO2_View::OnCbnSelchangeCo2AlarmState()
 {
-    // TODO: Add your control notification handler code here
+    
     UpdateData();
     int temp_item =	m_co2_alarm_state.GetCurSel();
     int write_value =0;
@@ -1428,19 +1432,19 @@ void CCO2_View::OnInitialUpdate()
     //CO2_Thread=AfxBeginThread(_ReadCo2MultiRegisters,this,THREAD_PRIORITY_NORMAL,0,0,NULL );
     //CO2_Thread->SuspendThread();
 
-    // TODO: Add your specialized code here and/or call the base class
+    
 }
 
 void CCO2_View::OnNMKillfocusCo2Datetimepicker1(NMHDR *pNMHDR, LRESULT *pResult)
 {
-    // TODO: Add your control notification handler code here
+    
     *pResult = 0;
     Check_DayTime();
 }
 
 void CCO2_View::OnNMKillfocusCo2DatetimepickerTime(NMHDR *pNMHDR, LRESULT *pResult)
 {
-    // TODO: Add your control notification handler code here
+    
     *pResult = 0;
     Check_HourTime();
 }
@@ -1517,7 +1521,7 @@ void CCO2_View::Check_HourTime()
 
 void CCO2_View::OnBnClickedButtonCo2SyncTime()
 {
-    // TODO: Add your control notification handler code here
+    
     CTime TimeTemp=TimeTemp.GetCurrentTime();
     m_co2_time_picker.SetTime(&TimeTemp);
     m_co2_day_picker.SetTime(&TimeTemp);
@@ -1555,7 +1559,7 @@ void CCO2_View::OnBnClickedButtonCo2SyncTime()
 
 void CCO2_View::OnBnClickedRadioPasswordEnable()
 {
-    // TODO: Add your control notification handler code here
+    
     if(product_register_value[CO2_485_MODBUS_PASSWORD_ENABLE] != TRUE)
     {
         Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_485_MODBUS_PASSWORD_ENABLE,1,
@@ -1565,7 +1569,7 @@ void CCO2_View::OnBnClickedRadioPasswordEnable()
 
 void CCO2_View::OnBnClickedRadioPasswordDisable()
 {
-    // TODO: Add your control notification handler code here
+    
     if(product_register_value[CO2_485_MODBUS_PASSWORD_ENABLE] != FALSE)
     {
         Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_485_MODBUS_PASSWORD_ENABLE,0,
@@ -1575,7 +1579,7 @@ void CCO2_View::OnBnClickedRadioPasswordDisable()
 
 void CCO2_View::OnEnKillfocusEditCo2Passwor()
 {
-    // TODO: Add your control notification handler code here
+    
     UpdateData();
     if(m_cs_password.GetLength()!=4)
     {
@@ -1614,7 +1618,7 @@ void CCO2_View::OnEnKillfocusEditCo2Passwor()
 
 void CCO2_View::OnEnKillfocusEditCo2BlockTime()
 {
-    // TODO: Add your control notification handler code here
+    
     UpdateData();
     if(m_co2_block_time != product_register_value[CO2_485_MODBUS_MENU_BLOCK_SECONDS])
     {
@@ -1625,7 +1629,7 @@ void CCO2_View::OnEnKillfocusEditCo2BlockTime()
 
 void CCO2_View::OnEnKillfocusEditCo2BacklightTime()
 {
-    // TODO: Add your control notification handler code here
+    
     UpdateData();
     if(m_co2_backlight_time != product_register_value[CO2_485_MODBUS_BACKLIGHT_KEEP_SECONDS])
     {
@@ -1636,7 +1640,7 @@ void CCO2_View::OnEnKillfocusEditCo2BacklightTime()
 
 LRESULT CCO2_View::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
-    // TODO: Add your specialized code here and/or call the base class
+    
     if(MsgT3000ViewFresh==message)
     {
         if(this->IsWindowVisible())	//add by Fance ,if window not visible, it's unnecessary to fresh it;
@@ -1647,7 +1651,7 @@ LRESULT CCO2_View::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
 void CCO2_View::OnBnClickedBtnCo2Refresh()
 {
-    // TODO: Add your control notification handler code here
+    
 
 }
 extern  HANDLE Read_Mute;
@@ -1839,7 +1843,7 @@ LRESULT  CCO2_View::DealMessage(WPARAM wParam,LPARAM lParam)
 
 void CCO2_View::OnEnKillfocusCo2AlarmOnTime()
 {
-    // TODO: Add your control notification handler code here
+    
     UpdateData();
     if(m_alarm_on_time != product_register_value[CO2_485_MODBUS_PRE_ALARM_SETTING_ON_TIME])
     {
@@ -1851,7 +1855,7 @@ void CCO2_View::OnEnKillfocusCo2AlarmOnTime()
 
 void CCO2_View::OnEnKillfocusCo2AlarmOffTime()
 {
-    // TODO: Add your control notification handler code here
+    
     UpdateData();
     if(m_alarm_off_time != product_register_value[CO2_485_MODBUS_PRE_ALARM_SETTING_OFF_TIME])
     {
@@ -1867,7 +1871,7 @@ void CCO2_View::OnEnKillfocusCo2AlarmOffTime()
 
 void CCO2_View::OnBnClickedRadioHumidityHeatEnable()
 {
-    // TODO: Add your control notification handler code here
+    
     if(product_register_value[CO2_485_MODBUS_HUM_SENSOR_HEATING] != TRUE)
     {
         Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_485_MODBUS_HUM_SENSOR_HEATING,1,
@@ -1877,7 +1881,7 @@ void CCO2_View::OnBnClickedRadioHumidityHeatEnable()
 
 void CCO2_View::OnBnClickedRadioHumidityHeatDisable()
 {
-    // TODO: Add your control notification handler code here
+    
     if(product_register_value[CO2_485_MODBUS_PASSWORD_ENABLE] != FALSE)
     {
         Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_485_MODBUS_HUM_SENSOR_HEATING,0,
@@ -2545,7 +2549,7 @@ void CCO2_View::OnLButtonDown(CPoint point)
 //void CCO2_View::OnBnDropDownDownbutton(NMHDR *pNMHDR, LRESULT *pResult)
 //{
 //	LPNMBCDROPDOWN pDropDown = reinterpret_cast<LPNMBCDROPDOWN>(pNMHDR);
-//	// TODO: Add your control notification handler code here
+//	
 //	*pResult = 0;
 //}
 
@@ -2928,8 +2932,10 @@ void CCO2_View::Initial_InputList(){
       f_external_temp = (float)i_external_temp / 10;
       CString  TempValue,StrAM;
 
-
-      if(product_register_value[124] == 0)//�ڲ�
+	  /// <summary>
+	  /// Here ,according to 124 value ,to read different register value.
+	  /// </summary>
+      if(product_register_value[124] == 0)
       {
           TempValue.Format(_T("%0.1f"),f_internal_temp);
       }
@@ -2954,11 +2960,6 @@ void CCO2_View::Initial_InputList(){
         m_input_list.SetItemText(1,4,_T("UNUSED"));
         strTemp.Format (_T("%d"),product_register_value[111]);
         m_input_list.SetItemText(2,4,strTemp);
-
-
-
-
-
 
   }
 
@@ -3132,7 +3133,8 @@ else if (m_product_type == 3)
     m_output_list.InsertColumn(2, _T("Range"), 45, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_output_list.InsertColumn(3, _T("Min Out Scale"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_output_list.InsertColumn(4, _T("Max Out Scale"), 85, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-    g_hwnd_now = this->m_hWnd;
+	m_output_list.InsertColumn(5, _T("Unit"), 85, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	g_hwnd_now = this->m_hWnd;
 
     m_output_list.InsertItem(0,_T("1"));
     m_output_list.InsertItem(1,_T("2"));
@@ -3164,19 +3166,99 @@ else if (m_product_type == 3)
     m_output_list.SetItemText(1,2,strTemp);
     m_output_list.SetItemText(2,2,strTemp);
 
+	float tc =(float)((short) product_register_value[128]);
+	if (product_register_value[125] == 0)
+	{
+		strTemp.Format(_T("%.1f"),tc/10 );
+	}
+	else
+	{
+		strTemp.Format(_T("%.1f"), CTwoF(tc/10));
+	}
 
-    strTemp.Format (_T("%d"),product_register_value[128]);
+   
     m_output_list.SetItemText(0,3,strTemp);
-    strTemp.Format (_T("%d"),product_register_value[129]);
+
+	tc = (float)((short)product_register_value[129]);
+	if (product_register_value[125] == 0)
+	{
+		strTemp.Format(_T("%.1f"), tc / 10);
+	}
+	else
+	{
+		strTemp.Format(_T("%.1f"), CTwoF(tc / 10));
+	}
+
+  
     m_output_list.SetItemText(0,4,strTemp);
-    strTemp.Format (_T("%d"),product_register_value[130]);
+
+	tc = (float)((short)product_register_value[130]);
+	if (product_register_value[125] == 0)
+	{
+		strTemp.Format(_T("%.1f"), tc / 10);
+	}
+	else
+	{
+		strTemp.Format(_T("%.1f"), CTwoF(tc / 10));
+	}
+    
     m_output_list.SetItemText(1,3,strTemp);
-    strTemp.Format (_T("%d"),product_register_value[131]);
+	tc = (float)((short)product_register_value[131]);
+	if (product_register_value[125] == 0)
+	{
+		strTemp.Format(_T("%.1f"), tc / 10);
+	}
+	else
+	{
+		strTemp.Format(_T("%.1f"), CTwoF(tc / 10));
+	}
     m_output_list.SetItemText(1,4,strTemp);
-    strTemp.Format (_T("%d"),product_register_value[132]);
+	tc = (float)((short)product_register_value[132]);
+	if (product_register_value[125] == 0)
+	{
+		strTemp.Format(_T("%.1f"), tc / 10);
+	}
+	else
+	{
+		strTemp.Format(_T("%.1f"), CTwoF(tc / 10));
+	}
     m_output_list.SetItemText(2,3,strTemp);
-    strTemp.Format (_T("%d"),product_register_value[133]);
+	tc = (float)((short)product_register_value[133]);
+	if (product_register_value[125] == 0)
+	{
+		strTemp.Format(_T("%.1f"), tc / 10);
+	}
+	else
+	{
+		strTemp.Format(_T("%.1f"), CTwoF(tc / 10));
+	}
     m_output_list.SetItemText(2,4,strTemp);
+
+
+
+	CString strTemp1, strTemp2, strUnit, strHUM, strCO2;
+	strTemp1.Format(_T("%cC"), 176);
+	strTemp2.Format(_T("%cF"), 176);
+
+	if (product_register_value[125] == 0)
+	{
+
+
+		strUnit = strTemp1;
+	}
+	else if (product_register_value[125] == 1)
+	{
+
+
+		strUnit = strTemp2;
+	}
+	m_output_list.SetItemText(0, 5, strUnit);
+	strTemp = L"%";
+
+	m_output_list.SetItemText(1, 5, strTemp);
+
+	strTemp = L"ppm";
+	m_output_list.SetItemText(2, 5, strTemp);
 
     m_output_list.ShowWindow (SW_SHOW);
 
@@ -3264,6 +3346,15 @@ else
     }
 }
 
+float CCO2_View::CTwoF(float tc)
+{
+	return (((tc * 9) / 5) + 320) / 10.0;
+}
+
+float CCO2_View::FTwoC(float tf)
+{
+	return (5 * (10 * tf - 320)) / 9;
+}
 // *************************************************************************************
 // 	input: input the unit type
 //	output: get the  ratio
@@ -3561,8 +3652,12 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
         if (m_product_type == 3)
         {
             CString New_CString =  m_output_list.GetItemText(Changed_Item,Changed_SubItem);
-            int ItemValue = _wtoi(New_CString);
+            int ItemValue = (int)(_wtof(New_CString)*10);
 
+			if (product_register_value[125]!=0&&Changed_Item == 0)
+			{
+				ItemValue = (int)(FTwoC(_wtof(New_CString)) * 10);
+			}
             if (Changed_SubItem == 3)
             {
                     int RegAddress = 128 + 2*Changed_Item;
@@ -3575,10 +3670,7 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
                             product_register_value[RegAddress]=ItemValue;
                             PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
                         }
-
                     }
-
-
             }
             if (Changed_SubItem == 4)
             {
@@ -3592,7 +3684,6 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
                         product_register_value[RegAddress]=ItemValue;
                         PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
                     }
-
                 }
             }
 
@@ -3801,6 +3892,7 @@ void CCO2_View::OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult){
                 }
 
                 PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
+				Initial_OutputList();
             }
             else
             {
@@ -4154,18 +4246,103 @@ LRESULT CCO2_View::Fresh_Lists(WPARAM wParam,LPARAM lParam){
             m_output_list.SetItemText(2,2,strTemp);
 
 
-            strTemp.Format (_T("%d"),product_register_value[128]);
-            m_output_list.SetItemText(0,3,strTemp);
-            strTemp.Format (_T("%d"),product_register_value[129]);
-            m_output_list.SetItemText(0,4,strTemp);
-            strTemp.Format (_T("%d"),product_register_value[130]);
-            m_output_list.SetItemText(1,3,strTemp);
-            strTemp.Format (_T("%d"),product_register_value[131]);
-            m_output_list.SetItemText(1,4,strTemp);
-            strTemp.Format (_T("%d"),product_register_value[132]);
-            m_output_list.SetItemText(2,3,strTemp);
-            strTemp.Format (_T("%d"),product_register_value[133]);
-            m_output_list.SetItemText(2,4,strTemp);
+			float tc = (float)((short)product_register_value[128]);
+			if (product_register_value[125] == 0)
+			{
+				strTemp.Format(_T("%.1f"), tc / 10);
+			}
+			else
+			{
+				strTemp.Format(_T("%.1f"), CTwoF(tc / 10));
+			}
+
+
+			m_output_list.SetItemText(0, 3, strTemp);
+
+			tc = (float)((short)product_register_value[129]);
+			if (product_register_value[125] == 0)
+			{
+				strTemp.Format(_T("%.1f"), tc / 10);
+			}
+			else
+			{
+				strTemp.Format(_T("%.1f"), CTwoF(tc / 10));
+			}
+
+
+			m_output_list.SetItemText(0, 4, strTemp);
+
+			tc = (float)((short)product_register_value[130]);
+			if (product_register_value[125] == 0)
+			{
+				strTemp.Format(_T("%.1f"), tc / 10);
+			}
+			else
+			{
+				strTemp.Format(_T("%.1f"), CTwoF(tc / 10));
+			}
+
+			m_output_list.SetItemText(1, 3, strTemp);
+			tc = (float)((short)product_register_value[131]);
+			if (product_register_value[125] == 0)
+			{
+				strTemp.Format(_T("%.1f"), tc / 10);
+			}
+			else
+			{
+				strTemp.Format(_T("%.1f"), CTwoF(tc / 10));
+			}
+			m_output_list.SetItemText(1, 4, strTemp);
+			tc = (float)((short)product_register_value[132]);
+			if (product_register_value[125] == 0)
+			{
+				strTemp.Format(_T("%.1f"), tc / 10);
+			}
+			else
+			{
+				strTemp.Format(_T("%.1f"), CTwoF(tc / 10));
+			}
+			m_output_list.SetItemText(2, 3, strTemp);
+			tc = (float)((short)product_register_value[133]);
+			if (product_register_value[125] == 0)
+			{
+				strTemp.Format(_T("%.1f"), tc / 10);
+			}
+			else
+			{
+				strTemp.Format(_T("%.1f"), CTwoF(tc / 10));
+			}
+			m_output_list.SetItemText(2, 4, strTemp);
+
+
+
+			CString strTemp1, strTemp2, strUnit, strHUM, strCO2;
+			strTemp1.Format(_T("%cC"), 176);
+			strTemp2.Format(_T("%cF"), 176);
+
+			if (product_register_value[125] == 0)
+			{
+
+
+				strUnit = strTemp1;
+			}
+			else if (product_register_value[125] == 1)
+			{
+
+
+				strUnit = strTemp2;
+			}
+			m_output_list.SetItemText(0, 5, strUnit);
+			strTemp = L"%";
+
+			m_output_list.SetItemText(1, 5, strTemp);
+
+			strTemp = L"ppm";
+			m_output_list.SetItemText(2, 5, strTemp);
+
+
+
+			 
 
             m_output_list.ShowWindow (SW_SHOW);
         }

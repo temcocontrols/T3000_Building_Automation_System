@@ -632,7 +632,7 @@ for(int i=1;i<11;i++)
 
 LRESULT CTempHumSensorForm::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if (message==HUM_SENSOR_CHANGEING_MESSAGE)
 	{
 		Changing_Data();
@@ -797,7 +797,7 @@ void CTempHumSensorForm::OnDestroy()
 	hFirstThread=NULL;
 	CFormView::OnDestroy();
 
-	// TODO: Add your message handler code here
+	
 }
 
 
@@ -816,7 +816,7 @@ void CTempHumSensorForm::OnEnSetfocusEditHumValue()
 
 BOOL CTempHumSensorForm::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(WM_KEYDOWN == pMsg->message)
 	{
 

@@ -267,14 +267,14 @@ void CWriteSingleRegisterDlg::OnBnClickedOk()
 
 void CWriteSingleRegisterDlg::OnBnClickedRadioSingleReg()
 {
-	// TODO: Add your control notification handler code here
+	
 	m_function=0;
 }
 
 
 void CWriteSingleRegisterDlg::OnBnClickedRadioMultipleReg()
 {
-	// TODO: Add your control notification handler code here
+	
 	m_function=1;
 }
 
@@ -282,7 +282,7 @@ void CWriteSingleRegisterDlg::OnBnClickedRadioMultipleReg()
 void CWriteSingleRegisterDlg::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-	// TODO: Add your message handler code here
+	
 	// Do not call CDialogEx::OnPaint() for painting messages
 	m_editor_value.SetSel(0,-1);
 	m_editor_value.SetFocus();

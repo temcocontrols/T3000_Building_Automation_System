@@ -7,7 +7,7 @@
 #include "stdarg.h"
 #include "schedule.h"
 #include "global_variable_extern.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "../SQLiteDriver/CppSQLite3.h"
 #include "Global_Struct.h"
 #include "define.h"

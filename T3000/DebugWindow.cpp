@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "DebugWindow.h"
 #include "afxdialogex.h"
-#include "globle_function.h"
+#include "global_function.h"
 
 // CDebugWindow dialog
 
@@ -54,7 +54,7 @@ BOOL CDebugWindow::OnInitDialog()
 	CDialogEx::OnInitDialog();
 	::SetWindowPos(this->m_hWnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
 	//::SetWindowPos(this->m_hWnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
-	// TODO:  Add extra initialization here
+	
 	Logfile_path.Empty();
 	m_is_pause = false;
 	SetWindowLong(this->GetSafeHwnd(),GWL_EXSTYLE,GetWindowLong(this->GetSafeHwnd(),GWL_EXSTYLE)^0x80000);  
@@ -95,7 +95,7 @@ LRESULT CDebugWindow::ShowString(WPARAM wParam,LPARAM lParam)
 
 BOOL CDebugWindow::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message == WM_KEYDOWN)
 	{
 		if((pMsg->wParam == VK_RETURN))
@@ -107,7 +107,7 @@ BOOL CDebugWindow::PreTranslateMessage(MSG* pMsg)
 //隐藏调试窗口;
 void CDebugWindow::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	ShowWindow(SW_HIDE);
 	//CDialogEx::OnClose();
 }
@@ -133,24 +133,23 @@ void CDebugWindow::Change_Transparency(int persent)
 
 void CDebugWindow::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 		int persent = ((CSliderCtrl *)GetDlgItem(IDC_SLIDER_DEBUG))->GetPos();
 		Change_Transparency(persent);
-		//Invalidate();
 	CDialogEx::OnHScroll(nSBCode, nPos, pScrollBar);
 }
 
 
 void CDebugWindow::OnBnClickedButtonDebugClearall()
 {
-	// TODO: Add your control notification handler code here
+	
 	m_debug_listbox.ResetContent();
 }
 
 //pause or resume the message , post from other window. just for debug .
 void CDebugWindow::OnBnClickedButtonDebugPause()
 {
-	// TODO: Add your control notification handler code here
+	
 	if(m_is_pause)
 	{
 		m_is_pause = false;
@@ -172,7 +171,7 @@ void CDebugWindow::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 
-	// TODO: Add your message handler code here
+	
 	if(m_debug_listbox.GetSafeHwnd()==NULL)   return;
 	CRect rect;
 	this->GetClientRect(&rect);
@@ -184,7 +183,7 @@ void CDebugWindow::OnSize(UINT nType, int cx, int cy)
 
 void CDebugWindow::OnBnClickedButtonDebugSave()
 {
-	// TODO: Add your control notification handler code here
+	
 	CTime temp_time = CTime::GetCurrentTime();
 	CString strtime = temp_time.Format(_T("%I_%M_%S_%p"));
 	Logfile_path = g_achive_folder + _T("\\") + strtime + _T(".txt");
@@ -218,7 +217,7 @@ void CDebugWindow::OnDestroy()
 {
 	CDialogEx::OnDestroy();
 
-	// TODO: Add your message handler code here
+	
 	if (m_plogFile)
 	{
 		delete m_plogFile;
@@ -229,7 +228,7 @@ void CDebugWindow::OnDestroy()
 
 void CDebugWindow::OnBnClickedButtonDebugNumToTime()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString temp_cs;
 	GetDlgItemText(IDC_EDIT_DEBUG_TIME_NUMBER,temp_cs.GetBuffer(MAX_PATH),MAX_PATH);
 	temp_cs.ReleaseBuffer();
@@ -262,7 +261,7 @@ void CDebugWindow::OnBnClickedButtonDebugNumToTime()
 
 void CDebugWindow::OnBnClickedButtonDebugTimeToNum()
 {
-	// TODO: Add your control notification handler code here
+	
 	CTime temp_start_day;
 	CTime temp_start_time;
 	m__day.GetTime(temp_start_day);
@@ -285,7 +284,7 @@ void CDebugWindow::OnBnClickedButtonDebugTimeToNum()
 
 void CDebugWindow::OnCbnSelchangeComboDebugChoose()
 {
-	// TODO: Add your control notification handler code here
+	
 	CString temp_string;
 	int nSel = m_debug_window_combo_show.GetCurSel();	
 	m_debug_window_combo_show.GetLBText(nSel,temp_string);

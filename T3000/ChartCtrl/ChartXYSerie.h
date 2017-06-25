@@ -25,17 +25,18 @@
 //! Structure containing a point data with X and Y values
 struct SChartXYPoint
 {
-	SChartXYPoint() : X(0.0), Y(0.0)  
-	{ 
-		#ifndef NO_USER_DATA
+	SChartXYPoint() : X(0.0), Y(0.0)
+	{
+#ifndef NO_USER_DATA
 		pUserData = NULL;
-		#endif
+#endif
 	}
-	SChartXYPoint(double XVal, double YVal) : X(XVal), Y(YVal)  
-	{ 
-		#ifndef NO_USER_DATA
+
+	SChartXYPoint(double XVal, double YVal) : X(XVal), Y(YVal)
+	{
+#ifndef NO_USER_DATA
 		pUserData = NULL;
-		#endif
+#endif
 	}
 
 	double GetX() const { return X; }
@@ -49,10 +50,10 @@ struct SChartXYPoint
 	double X;
 	//! The point Y value.
 	double Y;
-	#ifndef NO_USER_DATA
+#ifndef NO_USER_DATA
 	//! Optional user data.
-	void *pUserData;
-	#endif
+	void* pUserData;
+#endif
 };
 
 //! Specialization of a CChartSerieBase for series having data with an X and an Y value.
@@ -107,7 +108,7 @@ public:
 		@param NewVal 
 			The new Y value of the point
 	**/
-	void   SetYPointValue(unsigned PointIndex, double NewVal);
+	void SetYPointValue(unsigned PointIndex, double NewVal);
 	//! Sets the X value of a specific point in the series.
 	/**
 		The control is refreshed to display the change.
@@ -116,8 +117,8 @@ public:
 		@param NewVal 
 			The new X value of the point
 	**/
-	void   SetXPointValue(unsigned PointIndex, double NewVal);	
-	
+	void SetXPointValue(unsigned PointIndex, double NewVal);
+
 #ifndef NO_USER_DATA
 	//! Sets user data for a specific point. 
 	/**
@@ -125,7 +126,7 @@ public:
 		definitions. This is usefull when you don't want to have an additional pointer
 		stored for each points in your series.
 	**/
-	void  SetUserData(unsigned uPointIndex, void* pData);
+	void SetUserData(unsigned uPointIndex, void* pData);
 	//! Retrieves user data for a specific point. 
 	/**
 		User data can be disabled by adding the flag NO_USER_DATA in the preprocessor
@@ -149,8 +150,8 @@ protected:
 		@param pSecondControlPoints
 			This parameter will store the secondary control points of the bezier curve
 	**/
-	void GetBezierControlPoints(unsigned uFirst, unsigned uLast, SChartXYPoint* &pKnots,
-				SChartXYPoint* &pFirstControlPoints, SChartXYPoint* &pSecondControlPoints) const;
+	void GetBezierControlPoints(unsigned uFirst, unsigned uLast, SChartXYPoint* & pKnots,
+	                            SChartXYPoint* & pFirstControlPoints, SChartXYPoint* & pSecondControlPoints) const;
 
 private:
 	double* GetFirstControlPoints(double* rhs, int Count) const;

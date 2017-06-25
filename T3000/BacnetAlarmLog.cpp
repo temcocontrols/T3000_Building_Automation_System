@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "BacnetAlarmLog.h"
 #include "afxdialogex.h"
-#include "globle_function.h"
+#include "global_function.h"
 
 
 
@@ -52,7 +52,7 @@ BOOL CBacnetAlarmLog::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	SetWindowTextW(_T("ALARM"));
-	// TODO:  Add extra initialization here
+	
 	Initial_List();
 	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_ALARM);
 	SetIcon(m_hIcon,TRUE);
@@ -107,7 +107,7 @@ LRESULT  CBacnetAlarmLog::AlarmLogMessageCallBack(WPARAM wParam, LPARAM lParam)
 
 BOOL CBacnetAlarmLog::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN) 
 	{
 		CRect list_rect,win_rect;
@@ -172,18 +172,6 @@ void CBacnetAlarmLog::Initial_List()
 
 		for (int x=0;x<ALARMLOG_COL_NUMBER;x++)//设置背景色，白灰间隔，看起来不那么累;
 		{
-
-			//if(ListCtrlEx::ComboBox == m_alarmlog_list.GetColumnType(ALARMLOG_DEL))
-			//{
-			//	ListCtrlEx::CStrList strlist;
-			//	for (int y=0;y<(int)sizeof(Yes_No)/sizeof(Yes_No[0]);y++)
-			//	{
-			//		strlist.push_back(Yes_No[y]);
-			//	}
-			//	m_alarmlog_list.SetCellStringList(i, ALARMLOG_DEL, strlist);		
-			//}
-
-
 			if((i%2)==0)
 				m_alarmlog_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR);
 			else
@@ -321,7 +309,7 @@ LRESULT CBacnetAlarmLog::Fresh_Alarmlog_List(WPARAM wParam,LPARAM lParam)
 
 void CBacnetAlarmLog::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if((this->IsWindowVisible()) && (Gsm_communication == false) &&  (this->m_hWnd  == ::GetActiveWindow())  )	//GSM连接时不要刷新;
 	{
 		PostMessage(WM_REFRESH_BAC_ALARMLOG_LIST,NULL,NULL);
@@ -336,7 +324,7 @@ void CBacnetAlarmLog::OnTimer(UINT_PTR nIDEvent)
 //void CBacnetAlarmLog::OnHdnItemclickListAlarmlog(NMHDR *pNMHDR, LRESULT *pResult)
 //{
 //	LPNMHEADER phdr = reinterpret_cast<LPNMHEADER>(pNMHDR);
-//	// TODO: Add your control notification handler code here
+//	
 //	*pResult = 0;
 //}
 
@@ -344,7 +332,7 @@ void CBacnetAlarmLog::OnTimer(UINT_PTR nIDEvent)
 void CBacnetAlarmLog::OnClickListAlarmlog(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 	long lRow,lCol;
 	m_alarmlog_list.Set_Edit(true);
 	DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
@@ -435,7 +423,7 @@ void CBacnetAlarmLog::OnClickListAlarmlog(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CBacnetAlarmLog::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	ShowWindow(FALSE);
 	return;
 	KillTimer(1);
@@ -447,7 +435,7 @@ void CBacnetAlarmLog::OnClose()
 
 void CBacnetAlarmLog::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
 	//CDialogEx::OnCancel();
 }
@@ -513,13 +501,13 @@ void CBacnetAlarmLog::OnSize(UINT nType, int cx, int cy)
 
 		//GetDlgItem(IDC_BUTTON_PROGRAM_EDIT)->MoveWindow(rc.left + 20 ,rc.bottom - 60 , 120,50);
 	}
-	// TODO: Add your message handler code here
+	
 }
 
 
 void CBacnetAlarmLog::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if(nID == SC_MAXIMIZE)
 	{
 		if(window_max == false)

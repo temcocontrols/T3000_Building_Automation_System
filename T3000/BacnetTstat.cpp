@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "BacnetTstat.h"
 #include "afxdialogex.h"
-#include "globle_function.h"
+#include "global_function.h"
 
 // CBacnetTstat dialog
 Str_TstatInfo_point m_temp_tstat_data[BAC_TSTAT_COUNT];
@@ -43,11 +43,11 @@ BOOL CBacnetTstat::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  Add extra initialization here
+	
 	Initial_List();
 	PostMessage(WM_REFRESH_BAC_TSTAT_LIST,NULL,NULL);
 	ShowWindow(FALSE);
-	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -55,7 +55,7 @@ BOOL CBacnetTstat::OnInitDialog()
 
 BOOL CBacnetTstat::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN) 
 	{
 		return 1;
@@ -389,13 +389,7 @@ LRESULT CBacnetTstat::Fresh_Tstat_Item(WPARAM wParam,LPARAM lParam)
 
 void CBacnetTstat::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
-	if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
-	{
-		//PostMessage(WM_REFRESH_BAC_TSTAT_LIST,NULL,NULL);
-		//if(bac_select_device_online)
-		//	Post_Refresh_Message(g_bac_instance,READTSTAT_T3000,0,BAC_TSTAT_COUNT - 1,sizeof(Str_TstatInfo_point),BAC_TSTAT_GROUP);
-	}
+	 
 
 	CDialogEx::OnTimer(nIDEvent);
 }
@@ -403,7 +397,7 @@ void CBacnetTstat::OnTimer(UINT_PTR nIDEvent)
 
 void CBacnetTstat::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
 	//CDialogEx::OnCancel();
 }

@@ -61,8 +61,8 @@ public:
 		@param bUnderline
 			Specifies if the text is underlined
 	**/
-	void SetFont(const TChartString& strFaceName, int iPointSize, 
-				 bool bItalic=false, bool bBold=false, bool bUnderline=false);
+	void SetFont(const TChartString& strFaceName, int iPointSize,
+	             bool bItalic = false, bool bBold = false, bool bUnderline = false);
 
 	//! Select this font in the device context passed in argument.
 	/**
@@ -81,7 +81,7 @@ public:
 	void SetVertical(bool bVertical);
 
 	//! Assignement operator.
-	void operator=(const CChartFont& objectSrc);       
+	void operator=(const CChartFont& objectSrc);
 
 private:
 	//! The font face name

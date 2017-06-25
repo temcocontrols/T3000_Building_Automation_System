@@ -115,13 +115,13 @@ private:
 			The number of months to add to the date.
 		@return the resulting date.
 	**/
-	COleDateTime AddMonthToDate(const COleDateTime& Date, 
-								int iMonthsToAdd) const;
+	COleDateTime AddMonthToDate(const COleDateTime& Date,
+	                            int iMonthsToAdd) const;
 
 	double GetTickBeforeVal(double dValue) const;
 
 	//! Format of the date/time tick labels
-	TChartString m_strDTTickFormat;		
+	TChartString m_strDTTickFormat;
 	//! Specifies if the tick labels format is automatic
 	bool m_bAutoTickFormat;
 	//! Specifies the base time interval for ticks

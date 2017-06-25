@@ -33,14 +33,14 @@
 	The data points are connected by line segments. The curve can also
 	be smoothed.
 **/
-class CChartLineSerie : public CChartXYSerie  
+class CChartLineSerie : public CChartXYSerie
 {
 public:
 	//! Returns the pen style (plain, dashed, dotted, ...)
 	/**
 		For a list of pen styles available, see the CreatePen function in MSDN.
 	**/
-	int  GetPenStyle() const        { return m_iPenStyle; }
+	int GetPenStyle() const { return m_iPenStyle; }
 	//! Sets the pen style (plain, dashed, dotted, ...)
 	/**
 		For a list of pen styles available, see the CreatePen function in MSDN.
@@ -48,7 +48,7 @@ public:
 	void SetPenStyle(int NewStyle);
 
 	//! Returns the pen width
-	int	 GetWidth() const       { return m_iLineWidth; }
+	int GetWidth() const { return m_iLineWidth; }
 	//! Sets the pen width
 	void SetWidth(int PenWidth);
 	//! Enables the smoothing of the curve (slower).
@@ -81,7 +81,7 @@ private:
 		@param rectBitmap
 			The rectangle in which to draw the legend icon
 	**/
-    void DrawLegend(CDC* pDC, const CRect& rectBitmap) const;
+	void DrawLegend(CDC* pDC, const CRect& rectBitmap) const;
 
 	//! Draws the most recent points of the series.
 	/**
@@ -96,11 +96,11 @@ private:
 		@param pDC
 			The device context used to draw
 	**/
-	void DrawAll(CDC *pDC);
+	void DrawAll(CDC* pDC);
 
 	//! Checks whether a point is close to a line segment
-	bool IsNearLine(long Axl, long Ayl,long Bxl, 
-					long Byl, long Cxl, long Cyl) const;
+	bool IsNearLine(long Axl, long Ayl, long Bxl,
+	                long Byl, long Cxl, long Cyl) const;
 
 
 	//! The pen width

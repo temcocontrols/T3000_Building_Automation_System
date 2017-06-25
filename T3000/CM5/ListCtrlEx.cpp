@@ -111,7 +111,7 @@ CImageList* CListCtrlEx::SetImageList( CImageList* pImageList, int nImageListTyp
 
 void ListCtrlEx::CListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	//Get_clicked_mouse_position(select_raw,select_col);
 	if(m_support_key)
 	{
@@ -1710,7 +1710,7 @@ void ListCtrlEx::CListCtrlEx::OnRButtonDown(UINT nFlags, CPoint point)
 void ListCtrlEx::CListCtrlEx::OnLvnBeginlabeledit(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	NMLVDISPINFO *pDispInfo = reinterpret_cast<NMLVDISPINFO*>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 	if (!GetCellEnabled(pDispInfo->item.iItem, pDispInfo->item.iSubItem))
 	{
 		*pResult = 1;
@@ -1723,7 +1723,7 @@ void ListCtrlEx::CListCtrlEx::OnLvnBeginlabeledit(NMHDR *pNMHDR, LRESULT *pResul
 void ListCtrlEx::CListCtrlEx::OnLvnEndlabeledit(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	NMLVDISPINFO *pDispInfo = reinterpret_cast<NMLVDISPINFO*>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 	// Update the item text with the new text
 	int Changed_item=0;
 	int Changed_subitem=0;
@@ -1930,7 +1930,7 @@ void CListCtrlEx::PostSortItems( vector<DWORD_PTR> &vec2StoreData )
 
 void ListCtrlEx::CListCtrlEx::PreSubclassWindow()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 //	ASSERT( GetStyle() & LVS_REPORT );	//Fance
 	CListCtrl::PreSubclassWindow();
 //	VERIFY(m_ctlSortHead.SubclassWindow(this->GetHeaderCtrl()->GetSafeHwnd()) );

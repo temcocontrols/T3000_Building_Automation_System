@@ -309,11 +309,11 @@ void CAddBuilding::ClickAddbuildingMsflexgrid()
 void CAddBuilding::EnterCellAddbuildingMsflexgrid()
 {
 	
-	// TODO: Add your message handler code here
+	
 }
 void CAddBuilding::SelChangeAddbuildingMsflexgrid()
 {
-	// TODO: Add your message handler code here
+	
 }
 void CAddBuilding::ReloadAddBuildingDB()
 {
@@ -588,7 +588,7 @@ void CAddBuilding::Update_Recorder()
 
 void CAddBuilding::OnBnClickedExit()
 {
-	// TODO: Add your control notification handler code here
+	
 	m_Changed=TRUE;
 	   if (m_Changed)
 	   {
@@ -599,7 +599,7 @@ void CAddBuilding::OnBnClickedExit()
 }
 void CAddBuilding::OnBnClickedOk()
 {
-	// TODO: Add your control notification handler code here
+	
 
 		SaveAll();//scan，常要特意选择一个COM，即使看到的是正确也要选一下，否则就说串口号不对
 // 		CMainFrame* pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
@@ -609,13 +609,13 @@ void CAddBuilding::OnBnClickedOk()
 void CAddBuilding::OnEnSetfocusAddbuidingSetedit()
 {
 
-	// TODO: Add your control notification handler code here
+	
 
 }
 
 BOOL CAddBuilding::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->wParam == VK_RETURN )
 	{ 
 		GetDlgItem(ID_EXIT)->SetFocus();
@@ -696,7 +696,7 @@ void CAddBuilding::OnBuildingDelete()
 }
 void CAddBuilding::PostNcDestroy()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 
 	if(pNCScanThread!=NULL)
 	{
@@ -723,7 +723,7 @@ void CAddBuilding::PostNcDestroy()
 
 void CAddBuilding::OnStnClickedStatic1()
 {
-	// TODO: Add your control notification handler code here
+	
 }
 
 void CAddBuilding::OnCbnSelendokAddbuidingSelectcombo()

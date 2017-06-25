@@ -5,7 +5,7 @@
 #include "BuildTable1.h"
 #include "stdafx.h"
 #include "T3000.h"
-#include "globle_function.h"
+#include "global_function.h"
 
 
 #define	SLIDER_RANGE 65535
@@ -134,7 +134,7 @@ END_MESSAGE_MAP()
 
 void CBuildTable1::OnBnClickedOk()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	//OnOK();
 }
 
@@ -371,7 +371,7 @@ void CBuildTable1::to_fresh()
 
 void CBuildTable1::OnTimer(UINT nIDEvent)
 {
-	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	
 	to_fresh();//fresh	
 	CDialog::OnTimer(nIDEvent);
 }
@@ -381,7 +381,7 @@ void CBuildTable1::OnDestroy()
 	CDialog::OnDestroy();
 
 	KillTimer(1);//killtimer
-	// TODO: 在此处添加消息处理程序代码
+	
 }
 
  
@@ -391,133 +391,133 @@ void CBuildTable1::OnDestroy()
 
 void CBuildTable1::OnEnChangeEdit1()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+	
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 	
-	// TODO:  在此添加控件通知处理程序代码
+	//   在此添加控件通知处理程序代码
 	IsModfied=true;
 }
 
 void CBuildTable1::OnEnChangeEdit8()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+	
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-	// TODO:  在此添加控件通知处理程序代码
+	//   在此添加控件通知处理程序代码
 	IsModfied=true;
 }
 
 void CBuildTable1::OnEnChangeEdit9()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+	
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-	// TODO:  在此添加控件通知处理程序代码
+	//   在此添加控件通知处理程序代码
 	IsModfied=true;
 }
 
 void CBuildTable1::OnEnChangeEdit13()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+	
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-	// TODO:  在此添加控件通知处理程序代码
+	//   在此添加控件通知处理程序代码
 	IsModfied=true;
 }
 
 void CBuildTable1::OnEnChangeEdit14()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+	
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-	// TODO:  在此添加控件通知处理程序代码
+	//   在此添加控件通知处理程序代码
 	IsModfied=true;
 }
 
 void CBuildTable1::OnEnChangeEdit15()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+	
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-	// TODO:  在此添加控件通知处理程序代码
+	//   在此添加控件通知处理程序代码
 	IsModfied=true;
 }
 
 void CBuildTable1::OnEnChangeEdit16()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+	
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-	// TODO:  在此添加控件通知处理程序代码
+	//   在此添加控件通知处理程序代码
 	IsModfied=true;
 }
 
 void CBuildTable1::OnEnChangeEdit17()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+	
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-	// TODO:  在此添加控件通知处理程序代码
+	//   在此添加控件通知处理程序代码
 	IsModfied=true;
 }
 
 void CBuildTable1::OnEnChangeEdit18()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+	
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-	// TODO:  在此添加控件通知处理程序代码
+	//   在此添加控件通知处理程序代码
 	IsModfied=true;
 }
 
 void CBuildTable1::OnEnChangeEdit19()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+	
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-	// TODO:  在此添加控件通知处理程序代码
+	//   在此添加控件通知处理程序代码
 	IsModfied=true;
 }
 
 void CBuildTable1::OnEnChangeEdit20()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+	
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-	// TODO:  在此添加控件通知处理程序代码
+	//   在此添加控件通知处理程序代码
 	IsModfied=true;
 }
 
 void CBuildTable1::OnEnChangeEdit12()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+	
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-	// TODO:  在此添加控件通知处理程序代码
+	//   在此添加控件通知处理程序代码
 	IsModfied=true;
 }
 
@@ -534,7 +534,7 @@ void CBuildTable1::OnEnKillfocusEdit1()
 
 void CBuildTable1::OnEnKillfocusEdit8()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 // if(m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 // {
 // 	float ftemp;
@@ -607,7 +607,7 @@ void CBuildTable1::OnEnKillfocusEdit9()
 
 void CBuildTable1::OnEnKillfocusEdit13()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 // 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 // 	{
 // 		float ftemp;
@@ -645,7 +645,7 @@ void CBuildTable1::OnEnKillfocusEdit13()
 
 void CBuildTable1::OnEnKillfocusEdit14()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 // 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION) 
 // 	{
 // 		float ftemp;
@@ -682,7 +682,7 @@ void CBuildTable1::OnEnKillfocusEdit14()
 
 void CBuildTable1::OnEnKillfocusEdit15()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 // 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 // 	{
 // 		float ftemp;
@@ -722,7 +722,7 @@ void CBuildTable1::OnEnKillfocusEdit15()
 
 void CBuildTable1::OnEnKillfocusEdit16()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 // 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 // 	{
 // 		float ftemp;
@@ -761,7 +761,7 @@ void CBuildTable1::OnEnKillfocusEdit16()
 
 void CBuildTable1::OnEnKillfocusEdit17()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 // 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 // 	{
 // 		float ftemp;
@@ -799,7 +799,7 @@ void CBuildTable1::OnEnKillfocusEdit17()
 
 void CBuildTable1::OnEnKillfocusEdit18()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	
 // 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 // 	{
@@ -839,7 +839,7 @@ void CBuildTable1::OnEnKillfocusEdit18()
 
 void CBuildTable1::OnEnKillfocusEdit19()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 // 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION) 
 // 	{
 // 		float ftemp;
@@ -880,7 +880,7 @@ void CBuildTable1::OnEnKillfocusEdit19()
 
 void CBuildTable1::OnEnKillfocusEdit20()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 // 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 // 	{
 // 		float ftemp;
@@ -919,7 +919,7 @@ void CBuildTable1::OnEnKillfocusEdit20()
 
 void CBuildTable1::OnEnKillfocusEdit12()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	if(IsModfied)
 	{
 		UpdateData();		
@@ -952,22 +952,22 @@ void CBuildTable1::OnEnKillfocusEdit12()
 }
 void CBuildTable1::OnEnChangeEdit10()
 {
-    // TODO:  如果该控件是 RICHEDIT 控件，则它将不会
+    
     // 发送该通知，除非重写 CDialog::OnInitDialog()
     // 函数并调用 CRichEditCtrl().SetEventMask()，
     // 同时将 ENM_CHANGE 标志“或”运算到掩码中。
     IsModfied=true;
-    // TODO:  在此添加控件通知处理程序代码
+    //   在此添加控件通知处理程序代码
 }
 
 void CBuildTable1::OnEnSetfocusEdit10()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    
     KillTimer(1);//killtimer
 }
 BOOL CBuildTable1::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: 在此添加专用代码和/或调用基类
+	
 	if(pMsg->message == WM_KEYDOWN  )
 	{
 		if(pMsg->wParam == VK_RETURN)
@@ -984,7 +984,7 @@ BOOL CBuildTable1::PreTranslateMessage(MSG* pMsg)
 
 void CBuildTable1::OnBnClickedCancel()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	//SaveInfoDataToRegister();
 	OnCancel();
 }

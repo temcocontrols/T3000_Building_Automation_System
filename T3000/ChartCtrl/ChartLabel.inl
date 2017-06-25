@@ -21,28 +21,28 @@
 
 #include "ChartCtrl.h"
 
-template<class PointType>
-CChartLabel<PointType>::CChartLabel(CChartCtrl* pParentCtrl, 
-									CChartSerieBase<PointType>* pParentSeries) 
-  : m_iFontSize(100),m_strFontName(_T("Microsoft Sans Serif")), 
-    m_strLabelText(_T("")), m_pLabelProvider(NULL), m_pParentCtrl(pParentCtrl),	
-	m_pParentSeries(pParentSeries)
+template <class PointType>
+CChartLabel<PointType>::CChartLabel(CChartCtrl* pParentCtrl,
+                                    CChartSerieBase<PointType>* pParentSeries)
+	: m_iFontSize(100), m_strFontName(_T("Microsoft Sans Serif")),
+	  m_strLabelText(_T("")), m_pLabelProvider(NULL), m_pParentCtrl(pParentCtrl),
+	  m_pParentSeries(pParentSeries)
 {
 }
 
-template<class PointType>
+template <class PointType>
 CChartLabel<PointType>::~CChartLabel()
 {
 }
 
-template<class PointType>
-void CChartLabel<PointType>::SetLabelText(const TChartString& strText)  
-{ 
-	m_strLabelText = strText; 
+template <class PointType>
+void CChartLabel<PointType>::SetLabelText(const TChartString& strText)
+{
+	m_strLabelText = strText;
 	m_pParentCtrl->RefreshCtrl();
 }
 
-template<class PointType>
+template <class PointType>
 void CChartLabel<PointType>::SetFont(int nPointSize, const TChartString& strFaceName)
 {
 	m_iFontSize = nPointSize;
@@ -50,10 +50,9 @@ void CChartLabel<PointType>::SetFont(int nPointSize, const TChartString& strFace
 	m_pParentCtrl->RefreshCtrl();
 }
 
-template<class PointType>
+template <class PointType>
 void CChartLabel<PointType>::SetVisisble(bool bVisible)
 {
 	m_bIsVisible = bVisible;
 	m_pParentCtrl->RefreshCtrl();
 }
-

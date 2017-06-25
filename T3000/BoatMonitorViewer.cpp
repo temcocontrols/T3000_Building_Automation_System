@@ -189,7 +189,7 @@ void CBoatMonitorViewer::OnInitialUpdate()
 {
     CFormView::OnInitialUpdate();
                                                                                                                   
-    // TODO: Add your specialized code here and/or call the base class
+    
 }
 void CBoatMonitorViewer::Initial_List(){
 int Number = product_register_value[52];

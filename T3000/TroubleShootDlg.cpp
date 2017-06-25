@@ -255,7 +255,9 @@ BOOL CTroubleShootDlg::ChangeNetDeviceIP(CString strIP){
 		FD_SET(h_scan_Broad, &fdSocket);
 // 		fd_set fdSocket;
 // 		FD_ZERO(&fdSocket);	
-// 		FD_SET(h_scan_Broad, &fdSocket);
+// 		FD_SET(h_scan_Broad, &fdSocket);
+
+
 
 		nRet = ::sendto(h_scan_Broad,(char*)pSendBuf,nSendLen,0,(sockaddr*)&h_bcast,sizeof(h_bcast));
 		if (nRet == SOCKET_ERROR)
@@ -460,7 +462,7 @@ void CTroubleShootDlg::SetNode(tree_product product_Node){
 void CTroubleShootDlg::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-	// TODO: Add your message handler code here
+	
 	// Do not call CDialogEx::OnPaint() for painting messages
 	CMemDC memDC(dc,this);
 	CRect rcClient;

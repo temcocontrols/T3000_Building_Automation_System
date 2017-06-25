@@ -8,7 +8,7 @@
 #include "Schedule_grid.h"
 
 #include "AnnualRout_InsertDia.h"
-#include "globle_function.h"
+#include "global_function.h"
 // Annual_Routines 对话框
 #define GRID_ROW_NUMBER 16
 #define GRID_COL_NUMBER 3
@@ -300,7 +300,7 @@ BOOL Annual_Routines::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// TODO:  在此添加额外的初始化
+	
 	load_grid();
 	NET_WORK_SET_TIMER
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -313,13 +313,13 @@ END_EVENTSINK_MAP()
 
 void Annual_Routines::ClickMsflexgrid1()
 {
-	// TODO: 在此处添加消息处理程序代码
+	
 	on_select();		
 }
 
 void Annual_Routines::OnEnSetfocusEdit1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	NET_WORK_KILL_TIMER
 	UpdateData(true);
 	m_before_focus_string=m_sChange;
@@ -327,7 +327,7 @@ void Annual_Routines::OnEnSetfocusEdit1()
 
 void Annual_Routines::OnEnKillfocusEdit1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	NET_WORK_SET_TIMER
 	UpdateData(true);
 	m_FlexGrid.put_TextMatrix(row_row,row_col,m_sChange);//设置文本信息
@@ -339,7 +339,7 @@ void Annual_Routines::OnEnKillfocusEdit1()
 
 void Annual_Routines::OnCbnSetfocusCombo1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	NET_WORK_KILL_TIMER
 	UpdateData(true);
 	CString str_temp;
@@ -353,7 +353,7 @@ void Annual_Routines::OnCbnKillfocusCombo1()
 	if(strLabel.IsEmpty())
 		return;
 
-	// TODO: 在此添加控件通知处理程序代码
+	
 	NET_WORK_SET_TIMER
 	UpdateData(true);
 	CString str_temp;
@@ -451,7 +451,7 @@ void Annual_Routines::down_move()
 
 BOOL Annual_Routines::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: 在此添加专用代码和/或调用基类
+	
 	if(pMsg->message == WM_KEYDOWN  )
 	{		
 		if(pMsg->wParam == VK_INSERT )
@@ -482,19 +482,19 @@ BOOL Annual_Routines::PreTranslateMessage(MSG* pMsg)
 void Annual_Routines::OnDestroy()
 {
 	CDialog::OnDestroy();
-	// TODO: 在此处添加消息处理程序代码
+	
 	NET_WORK_KILL_TIMER
 }
 
 void Annual_Routines::OnBnClickedOk()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	OnOK();
 }
 
 void Annual_Routines::OnBnClickedButton1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	CString str;
 	str.Format(_T("Are you sure to clear %d"),row_row);
 	if(IDOK==AfxMessageBox(str,MB_OKCANCEL))
@@ -511,7 +511,7 @@ void Annual_Routines::OnBnClickedButton1()
 
 void Annual_Routines::OnTimer(UINT nIDEvent)
 {
-	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	
 	load_grid();
 	CDialog::OnTimer(nIDEvent);
 }

@@ -8,8 +8,8 @@
 
 #include "CM5/ud_str.h"
 #include "Bacnet_Include.h"
-#include "globle_function.h"
-#include "gloab_define.h"
+#include "global_function.h"
+#include "global_define.h"
 #include "BacnetRange.h"
 
 #include "AnnualRout_InsertDia.h"
@@ -94,7 +94,7 @@ LRESULT  BacnetAnnualRoutine::AnnualMessageCallBack(WPARAM wParam, LPARAM lParam
 
 BOOL BacnetAnnualRoutine::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN) 
 	{
 		CRect list_rect,win_rect;
@@ -147,7 +147,7 @@ BOOL BacnetAnnualRoutine::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	SetWindowTextW(_T("HOLIDAY"));
-	// TODO:  Add extra initialization here
+	
 	Initial_List();
 	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_HOLIDAY);
 	SetIcon(m_hIcon,TRUE);
@@ -231,7 +231,7 @@ void BacnetAnnualRoutine::Initial_List()
 
 void BacnetAnnualRoutine::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	ShowWindow(FALSE);
 	return;
 	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
@@ -243,7 +243,7 @@ void BacnetAnnualRoutine::OnClose()
 
 void BacnetAnnualRoutine::OnCancel()
 {
-	// TODO: Add your specialized code here and/or call the base class
+	
 	//KillTimer(1);
 	//m_annual_dlg_hwnd = NULL;
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
@@ -254,7 +254,7 @@ void BacnetAnnualRoutine::OnCancel()
 void BacnetAnnualRoutine::OnNMClickListBacAnnuleList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 
 	DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
 	CPoint point( LOWORD(dwPos), HIWORD(dwPos));
@@ -479,7 +479,7 @@ LRESULT BacnetAnnualRoutine::Fresh_Annual_Routine_Item(WPARAM wParam,LPARAM lPar
 
 void BacnetAnnualRoutine::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_ANNUAL))  )	//GSM连接时不要刷新;
 	{
 	PostMessage(WM_REFRESH_BAC_ANNUAL_LIST,NULL,NULL);
@@ -491,7 +491,7 @@ void BacnetAnnualRoutine::OnTimer(UINT_PTR nIDEvent)
 
 void BacnetAnnualRoutine::OnBnClickedButtonAnnualEdit()
 {
-	// TODO: Add your control notification handler code here
+	
 	for (int i=0;i<m_annualr_list.GetItemCount();++i)
 	{
 		if(m_annualr_list.GetCellChecked(i,0))
@@ -519,7 +519,7 @@ void BacnetAnnualRoutine::Unreg_Hotkey()
 void BacnetAnnualRoutine::OnNMDblclkListAnnuleList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
+	
 	OnBnClickedButtonAnnualEdit();
 	*pResult = 0;
 }
@@ -549,7 +549,7 @@ void BacnetAnnualRoutine::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 
-	// TODO: Add your message handler code here
+	
 	CRect rc;
 	GetClientRect(rc);
 	if(m_annualr_list.m_hWnd != NULL)
@@ -565,7 +565,7 @@ void BacnetAnnualRoutine::OnSize(UINT nType, int cx, int cy)
 
 void BacnetAnnualRoutine::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if(nID == SC_MAXIMIZE)
 	{
 		if(window_max == false)

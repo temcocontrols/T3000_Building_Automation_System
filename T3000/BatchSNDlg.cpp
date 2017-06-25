@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "BatchSNDlg.h"
 #include "afxdialogex.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "excel9.h"
 DWORD WINAPI _Batch_Flash_SN(LPVOID pParam)
 {
@@ -75,7 +75,7 @@ END_MESSAGE_MAP()
 
 void CBatchSNDlg::OnBnClickedOk()
 {
-    // TODO: Add your control notification handler code here
+    
    // CDialogEx::OnOK();
    CString ModbusID;
    Batch_SN Temp;
@@ -383,7 +383,7 @@ void CBatchSNDlg::OnBnClickedCalibrationPointReport()
 
 BOOL CBatchSNDlg::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: Add your specialized code here and/or call the base class
+    
     if(pMsg->message == WM_KEYDOWN  )
     {
         if(pMsg->wParam == VK_RETURN)

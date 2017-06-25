@@ -42,7 +42,7 @@ END_MESSAGE_MAP()
 
 void CChangeIDDlg::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
+	 
 	if(nIDEvent==1)
 	{
 		CDialog::OnCancel();
@@ -80,7 +80,7 @@ BOOL CChangeIDDlg::OnInitDialog()
 void CChangeIDDlg::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-	// TODO: Add your message handler code here
+	
 	// Do not call CDialog::OnPaint() for painting messages
 
 	CRect rcClient;
@@ -139,7 +139,7 @@ void CChangeIDDlg::OnBnKillfocusRadio1()
 
 void CChangeIDDlg::OnBnClickedOk()
 {
-	// TODO: Add your control notification handler code here
+	
 	OnOK();
 }
 

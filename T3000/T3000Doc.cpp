@@ -24,7 +24,7 @@ END_MESSAGE_MAP()
 
 CT3000Doc::CT3000Doc()
 {
-	// TODO: add one-time construction code here
+	// 
 
 }
 
@@ -37,7 +37,7 @@ BOOL CT3000Doc::OnNewDocument()
 	if (!CDocument::OnNewDocument())
 		return FALSE;
 
-	// TODO: add reinitialization code here
+	
 	// (SDI documents will reuse this document)
 
 	return TRUE;
@@ -52,11 +52,11 @@ void CT3000Doc::Serialize(CArchive& ar)
 {
 	if (ar.IsStoring())
 	{
-		// TODO: add storing code here
+		//  add storing code here
 	}
 	else
 	{
-		// TODO: add loading code here
+		//  add loading code here
 	}
 }
 
