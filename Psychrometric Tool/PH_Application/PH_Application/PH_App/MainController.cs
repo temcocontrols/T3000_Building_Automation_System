@@ -3142,6 +3142,7 @@ namespace PH_App
                     {
                         chart1.Series.RemoveAt(chart1.Series.IndexOf(newLineSeries.Name));
                     }
+                   
                     newLineSeries.MarkerSize = 1;
                     newLineSeries.ChartType = SeriesChartType.Line;
                     if (thickness_value <= 0)
@@ -3166,6 +3167,7 @@ namespace PH_App
                     //--This  means the series is present....
                     chart1.Series.RemoveAt(chart1.Series.IndexOf(newLineSeries.Name));
                 }
+                
                 newLineSeries.MarkerSize = 1;
                 newLineSeries.ChartType = SeriesChartType.Line;
                 if (thickness_value <= 0)

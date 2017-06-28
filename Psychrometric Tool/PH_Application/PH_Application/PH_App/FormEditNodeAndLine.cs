@@ -333,107 +333,6 @@ namespace PH_App
           
 
         }
-        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            //dataGridView1.EndEdit();
-            if (dataGridView1.CurrentCell.Value == null)
-            {
-                return;
-            }
-
-            if (sender == null || e == null)
-            {
-                dataGridView1.EndEdit();
-                return;
-            }
-            //dataGridView1.
-            // MessageBox.Show("Line1280 : ");
-            //--For temperature source
-            if ((e.RowIndex >= 0 && e.RowIndex < bcs.listNodeInfoValues.Count) && (e.ColumnIndex == 1))
-            {
-                if (sender == null || e == null)
-                {
-                    dataGridView1.EndEdit();
-                    return;
-                }
-            }
-            //-------For pressure source
-            else if ((e.RowIndex >= 0 && e.RowIndex < bcs.listNodeInfoValues.Count) && (e.ColumnIndex == 4))
-            {
-                if (sender == null || e == null)
-                {
-                    dataGridView1.EndEdit();
-                    return;
-                }
-            }
-
-            try
-            {
-                //--This one is new one
-                //This part contains the cell click values
-                if ((e.RowIndex >= 0 && e.RowIndex < bcs.listNodeInfoValues.Count) && (e.ColumnIndex == 7))
-                {
-                    if (colorDialog1.ShowDialog() == DialogResult.OK)
-                    {
-                        DataGridViewButtonCell buttonCell = (DataGridViewButtonCell)dataGridView1.Rows[e.RowIndex].Cells[7];
-                        buttonCell.FlatStyle = FlatStyle.Popup;
-                        buttonCell.Style.BackColor = colorDialog1.Color;//System.Drawing.Color.Red;
-                                                                        //--We need to update to db as well
-
-                        try
-                        {
-                            //--Once the name is changed it has to save the changes
-                            //string finalSize = dataGridView1.CurrentCell.Value.ToString();
-                            string nodeIDVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[2].Value.ToString();
-                            string nameVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value.ToString();//--This contains the name
-                            string temperature_Source = "";
-                            string value = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();//--This contains the name
-                            if (value == "Web" || value == "Manual")
-                            {
-                                temperature_Source = value;//dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();//--This contains the name
-                            }
-                            else
-                            {
-                                temperature_Source = "Device";
-                            }
-
-
-                            string pressure_source = "";
-
-                            string pressureSourceVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString();//--This contains the name
-                            if (pressureSourceVal == "Web" || pressureSourceVal == "Manual")
-                            {
-                                pressure_source = pressureSourceVal;//dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString();//--This contains the name
-
-                            }
-                            else
-                            {
-                                pressure_source = "Device";
-                            }
-
-                            double xVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[6].Value.ToString());
-                            // double yVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
-                            double pressure = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
-                            // bcs.CalculateYFromXandHumidity(xVal, humidity / 100);
-                            double yVal = pressure;//bcs.y_coord_value;
-
-                            // string showTextVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[7].Value.ToString();
-                            Color colorVal = colorDialog1.Color;   //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[8].Style.BackColor;
-                            int nodeSizeVal = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[8].Value.ToString());
-                           // int AirFlow = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[9].Value.ToString());
-
-                            // UpdateDataValueAndRefreshDGV(nodeIDVal, xVal, yVal, sourceVal, nameVal, labelVal, colorVal, showTextVal, nodeSizeVal);
-                            updateNodeInfoBasedOnPresentValue(nodeIDVal, xVal, yVal, temperature_Source, pressure_source, nameVal, colorVal, nodeSizeVal);
-                        }
-                        catch { }
-                    }
-                }
-
-            }
-            catch { }
-
-
-        }
         public void RefreshChartAndDGVForMixNodeFunction()
         {
             //--Refreshing data
@@ -3147,14 +3046,159 @@ namespace PH_App
 
                 ////==Cell clicked function is triggered
 
-                //if (e.RowIndex >= 0)
-                //{
-                //    DataGridViewRow row = dataGridView2.Rows[e.RowIndex];
-                //   // EnergyCalculationForProcess(row);//SELECTED ROW
-                //}
+                if (e.RowIndex >= 0)
+                {
+                    DataGridViewRow row = dataGridView2.Rows[e.RowIndex];
+                     EnergyCalculationForProcess(row);//SELECTED ROW
+                }
             }
             catch { }
         }
+
+        /// <summary>
+        /// For process calculation
+        /// </summary>
+        /// <param name="dgv_row"></param>
+        public void EnergyCalculationForProcess(DataGridViewRow dgv_row)
+        {
+            //now lets calculate every parameters...
+            string id = dgv_row.Cells[0].Value.ToString();
+            string LineName = dgv_row.Cells[1].Value.ToString();
+            Color LineColorValue = dgv_row.Cells[4].Style.BackColor;//dgv_row.Cells[1].Value.ToString();
+            string prevNodeID = dgv_row.Cells[6].Value.ToString();
+            string nextNodeID = dgv_row.Cells[7].Value.ToString();
+            Series lineseriesID = new Series(dgv_row.Cells[8].Value.ToString());
+            int thickness = int.Parse(dgv_row.Cells[5].Value.ToString());
+
+
+            CalculateProcessParameterForEnergy(id, prevNodeID, nextNodeID, lineseriesID, LineColorValue, thickness, LineName);
+
+        }
+        public class TempDataType1
+        {
+            public string id { get; set; } //--for identifying which point is selected..
+            public double xVal { get; set; }//--this is the values that represent the point in a chart
+            public double yVal { get; set; }
+            // public string source { get; set; }
+
+            public string temperature_source { get; set; }
+            public string pressure_source { get; set; }
+
+            public string name { get; set; }
+            //public string label { get; set; }
+            public Color colorValue { get; set; }
+            // public string showItemText { get; set; } //--No need now for this one
+            public int marker_Size { get; set; }
+
+            //public double airFlow { get; set; }
+            public string lastUpdatedDate { get; set; }
+
+        }
+        List<TempDataType1> temporaryNodeValueStoreForRedrawLine = new List<TempDataType1>();
+        //--Redraw line function
+        public void CalculateProcessParameterForEnergy(string id, string prevNodeID, string nextNodeID, Series lineSeriesID, Color colorVal, int thickness_value, string name)
+        {
+           
+            temporaryNodeValueStoreForRedrawLine.Clear();//Clearing the values of the list
+         
+            /*
+            We need to calculate the previous node id values and the next node id values.
+            */
+            //First for previous node id
+            for (int i = 0; i < bcs.listNodeInfoValues.Count; i++)
+            {
+                if (prevNodeID == bcs.listNodeInfoValues[i].ID)
+                {
+                    //This is a node : i.e start end of the node
+                  
+                    temporaryNodeValueStoreForRedrawLine.Add(new TempDataType1
+                    {
+                        id = bcs.listNodeInfoValues[i].ID,
+                        xVal = bcs.listNodeInfoValues[i].xVal,
+                        yVal = bcs.listNodeInfoValues[i].yVal,
+                        // source = menuStripNodeInfoValues[i].source,
+                        temperature_source = bcs.listNodeInfoValues[i].temperature_source,
+                        pressure_source = bcs.listNodeInfoValues[i].pressure_source,
+                        name = bcs.listNodeInfoValues[i].name,
+                        // label = menuStripNodeInfoValues[i].label,
+                        // showItemText = menuStripNodeInfoValues[i].showItemText,
+                        colorValue = bcs.listNodeInfoValues[i].colorValue,
+                        marker_Size = bcs.listNodeInfoValues[i].marker_Size
+                      //  airFlow = bcs.menuStripNodeInfoValues[i].airFlow
+
+                    });
+
+                    break;//Break form loop
+                }
+            }
+
+            //Second for the next node id
+            for (int i = 0; i < bcs.listNodeInfoValues.Count; i++)
+            {
+                if (nextNodeID == bcs.listNodeInfoValues[i].ID)
+                {
+                    //This is a node : i.e start end of the node
+                    //We need to store the node every information in 0 index.
+              temporaryNodeValueStoreForRedrawLine.Add(new TempDataType1
+                    {
+                        id = bcs.listNodeInfoValues[i].ID,
+                        xVal = bcs.listNodeInfoValues[i].xVal,
+                        yVal = bcs.listNodeInfoValues[i].yVal,
+                        // source = menuStripNodeInfoValues[i].source,
+                        temperature_source = bcs.listNodeInfoValues[i].temperature_source,
+                        pressure_source = bcs.listNodeInfoValues[i].pressure_source,
+                        name = bcs.listNodeInfoValues[i].name,
+                        // label = menuStripNodeInfoValues[i].label,
+                        // showItemText = menuStripNodeInfoValues[i].showItemText,
+                        colorValue = bcs.listNodeInfoValues[i].colorValue,
+                        marker_Size = bcs.listNodeInfoValues[i].marker_Size
+                        //airFlow = bcs.menuStripNodeInfoValues[i].airFlow
+
+                    });
+
+                    break;//Break form loop
+                }
+            }
+
+            if (temporaryNodeValueStoreForRedrawLine.Count > 0)
+            {
+
+               // string sequenceDetected = temporaryNodeValueStoreForRedrawLine[0].name + " to " + temporaryNodeValueStoreForRedrawLine[1].name;
+
+
+                 MathOperation mth = new MathOperation();
+                //Math.Round(mth.IAPWS_IF97_TowParameterEquivalentFxn("T", "P", bcs.listNodeInfoValues[i].yVal * 1000000, "H", bcs.listNodeInfoValues[i].xVal * 1000, fmain.lbFluidName.Text), 2) - 273.15; //CoolProp.PropsSI()//Now in degreecelcius
+                double temperatureValueNode1 = Math.Round(mth.IAPWS_IF97_TowParameterEquivalentFxn("T", "P", temporaryNodeValueStoreForRedrawLine[0].yVal * 1000000, "H", temporaryNodeValueStoreForRedrawLine[0].xVal * 1000, fmain.lbFluidName.Text), 2) - 273.15; //CoolProp.PropsSI()//Now in degreecelcius
+                double temperatureValueNode2 = Math.Round(mth.IAPWS_IF97_TowParameterEquivalentFxn("T", "P", temporaryNodeValueStoreForRedrawLine[1].yVal * 1000000, "H", temporaryNodeValueStoreForRedrawLine[1].xVal * 1000, fmain.lbFluidName.Text), 2) - 273.15; //CoolProp.PropsSI()//Now in degreecelcius
+                lb_process.Text = name;
+                lb_process.ForeColor = colorVal;
+                lb_process.BackColor = Color.White;
+                lb_node_one_name.Text = temporaryNodeValueStoreForRedrawLine[0].name.ToString();
+                lb_node_one_name.ForeColor = temporaryNodeValueStoreForRedrawLine[0].colorValue;
+                lb_node_one_name.BackColor = Color.White;
+
+                lb_node_two_name.Text = temporaryNodeValueStoreForRedrawLine[1].name.ToString();
+                lb_node_two_name.ForeColor = temporaryNodeValueStoreForRedrawLine[1].colorValue;
+                lb_node_two_name.BackColor = Color.White;
+
+                lb_dbt_node1_value.Text = Math.Round(temperatureValueNode1,2).ToString();
+                lb_dbt_node2_value.Text = Math.Round(temperatureValueNode2, 2).ToString();
+
+                lb_enthalpy_node1_value.Text = Math.Round(temporaryNodeValueStoreForRedrawLine[0].xVal, 2).ToString();
+                lb_enthalpy_node2_value.Text = Math.Round(temporaryNodeValueStoreForRedrawLine[1].xVal, 2).ToString();
+
+                lb_Pressure_node1.Text= Math.Round(temporaryNodeValueStoreForRedrawLine[0].yVal, 2).ToString();
+                lb_Pressure_node2.Text = Math.Round(temporaryNodeValueStoreForRedrawLine[1].yVal, 2).ToString();
+
+
+
+            }//close of temporary node value
+
+            // }//--Close of LOCK
+        }
+
+
+
         public void LineUpdateAndReload(string lineid, string prevNodeID, string nextNodeID, Color color, int thickness, Series lineseries, string name, int status)
         {
 
@@ -3211,6 +3255,107 @@ namespace PH_App
                 */
             }
             catch { }
+        }
+
+        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            //dataGridView1.EndEdit();
+            if (dataGridView1.CurrentCell.Value == null)
+            {
+                return;
+            }
+
+            if (sender == null || e == null)
+            {
+                dataGridView1.EndEdit();
+                return;
+            }
+            //dataGridView1.
+            // MessageBox.Show("Line1280 : ");
+            //--For temperature source
+            if ((e.RowIndex >= 0 && e.RowIndex < bcs.listNodeInfoValues.Count) && (e.ColumnIndex == 1))
+            {
+                if (sender == null || e == null)
+                {
+                    dataGridView1.EndEdit();
+                    return;
+                }
+            }
+            //-------For pressure source
+            else if ((e.RowIndex >= 0 && e.RowIndex < bcs.listNodeInfoValues.Count) && (e.ColumnIndex == 4))
+            {
+                if (sender == null || e == null)
+                {
+                    dataGridView1.EndEdit();
+                    return;
+                }
+            }
+
+            try
+            {
+                //--This one is new one
+                //This part contains the cell click values
+                if ((e.RowIndex >= 0 && e.RowIndex < bcs.listNodeInfoValues.Count) && (e.ColumnIndex == 7))
+                {
+                    if (colorDialog1.ShowDialog() == DialogResult.OK)
+                    {
+                        DataGridViewButtonCell buttonCell = (DataGridViewButtonCell)dataGridView1.Rows[e.RowIndex].Cells[7];
+                        buttonCell.FlatStyle = FlatStyle.Popup;
+                        buttonCell.Style.BackColor = colorDialog1.Color;//System.Drawing.Color.Red;
+                                                                        //--We need to update to db as well
+
+                        try
+                        {
+                            //--Once the name is changed it has to save the changes
+                            //string finalSize = dataGridView1.CurrentCell.Value.ToString();
+                            string nodeIDVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[2].Value.ToString();
+                            string nameVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value.ToString();//--This contains the name
+                            string temperature_Source = "";
+                            string value = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();//--This contains the name
+                            if (value == "Web" || value == "Manual")
+                            {
+                                temperature_Source = value;//dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();//--This contains the name
+                            }
+                            else
+                            {
+                                temperature_Source = "Device";
+                            }
+
+
+                            string pressure_source = "";
+
+                            string pressureSourceVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString();//--This contains the name
+                            if (pressureSourceVal == "Web" || pressureSourceVal == "Manual")
+                            {
+                                pressure_source = pressureSourceVal;//dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].Value.ToString();//--This contains the name
+
+                            }
+                            else
+                            {
+                                pressure_source = "Device";
+                            }
+
+                            double xVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[6].Value.ToString());
+                            // double yVal = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
+                            double pressure = double.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value.ToString());
+                            // bcs.CalculateYFromXandHumidity(xVal, humidity / 100);
+                            double yVal = pressure;//bcs.y_coord_value;
+
+                            // string showTextVal = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[7].Value.ToString();
+                            Color colorVal = colorDialog1.Color;   //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[8].Style.BackColor;
+                            int nodeSizeVal = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[8].Value.ToString());
+                            // int AirFlow = int.Parse(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[9].Value.ToString());
+
+                            // UpdateDataValueAndRefreshDGV(nodeIDVal, xVal, yVal, sourceVal, nameVal, labelVal, colorVal, showTextVal, nodeSizeVal);
+                            updateNodeInfoBasedOnPresentValue(nodeIDVal, xVal, yVal, temperature_Source, pressure_source, nameVal, colorVal, nodeSizeVal);
+                        }
+                        catch { }
+                    }
+                }
+
+            }
+            catch { }
+
         }
 
         private void dataGridView2_CellEndEdit(object sender, DataGridViewCellEventArgs e)

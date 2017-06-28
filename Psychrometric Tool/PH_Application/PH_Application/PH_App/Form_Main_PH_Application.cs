@@ -108,7 +108,7 @@ namespace PH_App
                 }
                  }
                 // mc.LoadForPH(fluidName,this,Xmin,Xmax,Ymin,Ymax,xDiv,yDiv,xFlag,yFlag);//--
-                mc.LoadForPH(fluidName, this, Xmin, Xmax, Ymin, Ymax);//--
+                mc.LoadForPH(fluidName, this, Xmin, Xmax, Ymin, Ymax);
                 phChart.Series.Add(seriesPoint);
                 phChart.Series.Add(mc.series1);
                //MessageBox.Show("Enthaly val(temp = 60deg,pre=20mpa) ="+Math.Round((CoolProp.PropsSI("H", "P", 40 * 1000000, "T", (10 + 273.15), "water") / 1000), 2));
@@ -146,8 +146,8 @@ namespace PH_App
                     var yVal = Math.Pow(10, (result.ChartArea.AxisY.PixelPositionToValue(pos.Y)));
                     xCoord = xVal;
                     yCoord = yVal;
-                    // tooltip.Show("X=" + xVal + ", Y=" + yVal, this.phChart,
-                    //  pos.X, pos.Y - 15);
+                    //tooltip.Show("X=" + xVal + ", Y=" + yVal, this.phChart,
+                    //pos.X, pos.Y - 15);
 
                 }
             }
@@ -269,7 +269,6 @@ namespace PH_App
             {
                 this.Enabled = false;//optional, better target a panel or specific controls
                 this.UseWaitCursor = true;//from the Form/Window instance
-
                 mc.DeleteNode(sender, e, this, phChart);
             }
             finally
@@ -329,7 +328,6 @@ namespace PH_App
         {
             //--Load as template file
             mc.LoadTemplate(sender, e, this, phChart);
-
         }
 
         private void excelExportToolStripMenuItem_Click(object sender, EventArgs e)
@@ -351,7 +349,7 @@ namespace PH_App
         private void backgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
             //--Background worker
-            //MessageBox.Show("Do worker");
+            //--MessageBox.Show("Do worker");
             mc.RefreshDataFromDeviceAndWeb(this);
         }
 
@@ -425,25 +423,24 @@ namespace PH_App
 
         private void lbFluidName_Click(object sender, EventArgs e)
         {
-            //--This is function for on click for fluid info
-            FormFluidSelection f = new FormFluidSelection(mc, this);
-            f.ShowDialog();
-
+            if (mc.FlagForLockUnlock == 0) //Flag is enabled
+            {
+                //--This is function for on click for fluid info
+                FormFluidSelection f = new FormFluidSelection(mc, this);
+                f.ShowDialog();
+            }
         }
 
         private void lbFluidName_MouseHover(object sender, EventArgs e)
-        {
-            //
+        {            
             lbFluidName.BorderStyle = BorderStyle.FixedSingle;
-            lbFluidName.ForeColor = Color.Blue;
-            
+            lbFluidName.ForeColor = Color.Blue;            
         }
 
         private void Form_Main_PH_Application_MouseHover(object sender, EventArgs e)
         {
             lbFluidName.ForeColor = Color.Black;
             lbFluidName.BorderStyle = BorderStyle.None;
-
         }
 
         private void phChart_MouseHover(object sender, EventArgs e)
@@ -456,6 +453,26 @@ namespace PH_App
         {
             lbFluidName.ForeColor = Color.Black;
             lbFluidName.BorderStyle = BorderStyle.None;
+        }
+
+        private void Form_Main_PH_Application_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(Keys.F1 == e.KeyCode)
+            {
+                try
+                {
+                    string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                    string file = dir + @"\manual_ph_chart.chm";
+                    if (File.Exists(file))
+                    {
+                        Help.ShowHelp(this, file);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
         }
 
         public void RefreshChartListForTrashBoxRestore(Form_Main_PH_Application Fmain)

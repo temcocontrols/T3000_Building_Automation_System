@@ -64,8 +64,29 @@
             this.label3 = new System.Windows.Forms.Label();
             this.colorDialog2 = new System.Windows.Forms.ColorDialog();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+            this.label5 = new System.Windows.Forms.Label();
+            this.lb_process = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.lb_node_one_name = new System.Windows.Forms.Label();
+            this.lb_node_two_name = new System.Windows.Forms.Label();
+            this.lb_dbt = new System.Windows.Forms.Label();
+            this.lb_unit_degCelcius = new System.Windows.Forms.Label();
+            this.lb_dbt_node1_value = new System.Windows.Forms.Label();
+            this.lb_dbt_node2_value = new System.Windows.Forms.Label();
+            this.label18 = new System.Windows.Forms.Label();
+            this.label17 = new System.Windows.Forms.Label();
+            this.lb_Pressure_node1 = new System.Windows.Forms.Label();
+            this.lb_Pressure_node2 = new System.Windows.Forms.Label();
+            this.label38 = new System.Windows.Forms.Label();
+            this.label37 = new System.Windows.Forms.Label();
+            this.lb_enthalpy_node1_value = new System.Windows.Forms.Label();
+            this.lb_enthalpy_node2_value = new System.Windows.Forms.Label();
+            this.lb_horizontal_line = new System.Windows.Forms.Label();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // saveFD
@@ -278,10 +299,132 @@
             resources.ApplyResources(this.label3, "label3");
             this.label3.Name = "label3";
             // 
+            // label5
+            // 
+            resources.ApplyResources(this.label5, "label5");
+            this.label5.Name = "label5";
+            // 
+            // lb_process
+            // 
+            resources.ApplyResources(this.lb_process, "lb_process");
+            this.lb_process.Name = "lb_process";
+            // 
+            // label7
+            // 
+            resources.ApplyResources(this.label7, "label7");
+            this.label7.Name = "label7";
+            // 
+            // label8
+            // 
+            resources.ApplyResources(this.label8, "label8");
+            this.label8.Name = "label8";
+            // 
+            // lb_node_one_name
+            // 
+            resources.ApplyResources(this.lb_node_one_name, "lb_node_one_name");
+            this.lb_node_one_name.Name = "lb_node_one_name";
+            // 
+            // lb_node_two_name
+            // 
+            resources.ApplyResources(this.lb_node_two_name, "lb_node_two_name");
+            this.lb_node_two_name.Name = "lb_node_two_name";
+            // 
+            // lb_dbt
+            // 
+            resources.ApplyResources(this.lb_dbt, "lb_dbt");
+            this.lb_dbt.Name = "lb_dbt";
+            // 
+            // lb_unit_degCelcius
+            // 
+            resources.ApplyResources(this.lb_unit_degCelcius, "lb_unit_degCelcius");
+            this.lb_unit_degCelcius.Name = "lb_unit_degCelcius";
+            // 
+            // lb_dbt_node1_value
+            // 
+            resources.ApplyResources(this.lb_dbt_node1_value, "lb_dbt_node1_value");
+            this.lb_dbt_node1_value.Name = "lb_dbt_node1_value";
+            // 
+            // lb_dbt_node2_value
+            // 
+            resources.ApplyResources(this.lb_dbt_node2_value, "lb_dbt_node2_value");
+            this.lb_dbt_node2_value.Name = "lb_dbt_node2_value";
+            // 
+            // label18
+            // 
+            resources.ApplyResources(this.label18, "label18");
+            this.label18.Name = "label18";
+            // 
+            // label17
+            // 
+            resources.ApplyResources(this.label17, "label17");
+            this.label17.Name = "label17";
+            // 
+            // lb_Pressure_node1
+            // 
+            resources.ApplyResources(this.lb_Pressure_node1, "lb_Pressure_node1");
+            this.lb_Pressure_node1.Name = "lb_Pressure_node1";
+            // 
+            // lb_Pressure_node2
+            // 
+            resources.ApplyResources(this.lb_Pressure_node2, "lb_Pressure_node2");
+            this.lb_Pressure_node2.Name = "lb_Pressure_node2";
+            // 
+            // label38
+            // 
+            resources.ApplyResources(this.label38, "label38");
+            this.label38.Name = "label38";
+            // 
+            // label37
+            // 
+            resources.ApplyResources(this.label37, "label37");
+            this.label37.Name = "label37";
+            // 
+            // lb_enthalpy_node1_value
+            // 
+            resources.ApplyResources(this.lb_enthalpy_node1_value, "lb_enthalpy_node1_value");
+            this.lb_enthalpy_node1_value.Name = "lb_enthalpy_node1_value";
+            // 
+            // lb_enthalpy_node2_value
+            // 
+            resources.ApplyResources(this.lb_enthalpy_node2_value, "lb_enthalpy_node2_value");
+            this.lb_enthalpy_node2_value.Name = "lb_enthalpy_node2_value";
+            // 
+            // lb_horizontal_line
+            // 
+            this.lb_horizontal_line.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            resources.ApplyResources(this.lb_horizontal_line, "lb_horizontal_line");
+            this.lb_horizontal_line.Name = "lb_horizontal_line";
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.lb_horizontal_line);
+            this.groupBox1.Controls.Add(this.lb_enthalpy_node2_value);
+            this.groupBox1.Controls.Add(this.lb_enthalpy_node1_value);
+            this.groupBox1.Controls.Add(this.label37);
+            this.groupBox1.Controls.Add(this.label38);
+            this.groupBox1.Controls.Add(this.lb_Pressure_node2);
+            this.groupBox1.Controls.Add(this.lb_Pressure_node1);
+            this.groupBox1.Controls.Add(this.label17);
+            this.groupBox1.Controls.Add(this.label18);
+            this.groupBox1.Controls.Add(this.lb_dbt_node2_value);
+            this.groupBox1.Controls.Add(this.lb_dbt_node1_value);
+            this.groupBox1.Controls.Add(this.lb_unit_degCelcius);
+            this.groupBox1.Controls.Add(this.lb_dbt);
+            this.groupBox1.Controls.Add(this.lb_node_two_name);
+            this.groupBox1.Controls.Add(this.lb_node_one_name);
+            this.groupBox1.Controls.Add(this.label8);
+            this.groupBox1.Controls.Add(this.label7);
+            this.groupBox1.Controls.Add(this.lb_process);
+            this.groupBox1.Controls.Add(this.label5);
+            resources.ApplyResources(this.groupBox1, "groupBox1");
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.TabStop = false;
+            // 
             // FormEditNodeAndLine
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.dataGridView2);
             this.Controls.Add(this.label1);
@@ -293,6 +436,8 @@
             this.Load += new System.EventHandler(this.FormEditNodeAndLine_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -327,5 +472,25 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn equivalentEnthalpy;
         private System.Windows.Forms.DataGridViewButtonColumn color;
         private System.Windows.Forms.DataGridViewTextBoxColumn nodeSize;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label lb_process;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label lb_node_one_name;
+        private System.Windows.Forms.Label lb_node_two_name;
+        private System.Windows.Forms.Label lb_dbt;
+        private System.Windows.Forms.Label lb_unit_degCelcius;
+        private System.Windows.Forms.Label lb_dbt_node1_value;
+        private System.Windows.Forms.Label lb_dbt_node2_value;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.Label lb_Pressure_node1;
+        private System.Windows.Forms.Label lb_Pressure_node2;
+        private System.Windows.Forms.Label label38;
+        private System.Windows.Forms.Label label37;
+        private System.Windows.Forms.Label lb_enthalpy_node1_value;
+        private System.Windows.Forms.Label lb_enthalpy_node2_value;
+        private System.Windows.Forms.Label lb_horizontal_line;
+        private System.Windows.Forms.GroupBox groupBox1;
     }
 }

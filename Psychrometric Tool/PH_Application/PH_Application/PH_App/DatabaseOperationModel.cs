@@ -573,8 +573,6 @@ namespace PH_App
                 command.ExecuteNonQuery();
             }
 
-
-
         }
 
         public void UpdateIDOneSelectBuildingInPsychro()

@@ -589,9 +589,11 @@
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.groupBox4ttt);
             this.Controls.Add(this.phChart);
+            this.KeyPreview = true;
             this.Name = "Form_Main_PH_Application";
             this.Load += new System.EventHandler(this.Form_Main_PH_Application_Load);
             this.Shown += new System.EventHandler(this.Form_Main_PH_Application_Shown);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form_Main_PH_Application_KeyDown);
             this.MouseHover += new System.EventHandler(this.Form_Main_PH_Application_MouseHover);
             ((System.ComponentModel.ISupportInitialize)(this.phChart)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();

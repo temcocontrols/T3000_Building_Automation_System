@@ -261,6 +261,177 @@
   <data name="groupBox4ttt.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Bottom, Left</value>
   </data>
+  <data name="&gt;&gt;label5.Name" xml:space="preserve">
+    <value>label5</value>
+  </data>
+  <data name="&gt;&gt;label5.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label5.Parent" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;label5.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;label4.Name" xml:space="preserve">
+    <value>label4</value>
+  </data>
+  <data name="&gt;&gt;label4.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label4.Parent" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;label4.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;label3.Name" xml:space="preserve">
+    <value>label3</value>
+  </data>
+  <data name="&gt;&gt;label3.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label3.Parent" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;label3.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="&gt;&gt;labelline1.Name" xml:space="preserve">
+    <value>labelline1</value>
+  </data>
+  <data name="&gt;&gt;labelline1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;labelline1.Parent" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;labelline1.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="&gt;&gt;lbEntropy.Name" xml:space="preserve">
+    <value>lbEntropy</value>
+  </data>
+  <data name="&gt;&gt;lbEntropy.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lbEntropy.Parent" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;lbEntropy.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="&gt;&gt;label25.Name" xml:space="preserve">
+    <value>label25</value>
+  </data>
+  <data name="&gt;&gt;label25.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label25.Parent" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;label25.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="&gt;&gt;lbTemperature.Name" xml:space="preserve">
+    <value>lbTemperature</value>
+  </data>
+  <data name="&gt;&gt;lbTemperature.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lbTemperature.Parent" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;lbTemperature.ZOrder" xml:space="preserve">
+    <value>6</value>
+  </data>
+  <data name="&gt;&gt;lbTemperatureIndicator.Name" xml:space="preserve">
+    <value>lbTemperatureIndicator</value>
+  </data>
+  <data name="&gt;&gt;lbTemperatureIndicator.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lbTemperatureIndicator.Parent" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;lbTemperatureIndicator.ZOrder" xml:space="preserve">
+    <value>7</value>
+  </data>
+  <data name="&gt;&gt;lbEnthalpy.Name" xml:space="preserve">
+    <value>lbEnthalpy</value>
+  </data>
+  <data name="&gt;&gt;lbEnthalpy.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lbEnthalpy.Parent" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;lbEnthalpy.ZOrder" xml:space="preserve">
+    <value>8</value>
+  </data>
+  <data name="&gt;&gt;label23fewfe.Name" xml:space="preserve">
+    <value>label23fewfe</value>
+  </data>
+  <data name="&gt;&gt;label23fewfe.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label23fewfe.Parent" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;label23fewfe.ZOrder" xml:space="preserve">
+    <value>9</value>
+  </data>
+  <data name="&gt;&gt;lbPressure.Name" xml:space="preserve">
+    <value>lbPressure</value>
+  </data>
+  <data name="&gt;&gt;lbPressure.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lbPressure.Parent" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;lbPressure.ZOrder" xml:space="preserve">
+    <value>10</value>
+  </data>
+  <data name="&gt;&gt;label21ffae.Name" xml:space="preserve">
+    <value>label21ffae</value>
+  </data>
+  <data name="&gt;&gt;label21ffae.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label21ffae.Parent" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;label21ffae.ZOrder" xml:space="preserve">
+    <value>11</value>
+  </data>
+  <data name="groupBox4ttt.Location" type="System.Drawing.Point, System.Drawing">
+    <value>8, 37</value>
+  </data>
+  <data name="groupBox4ttt.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>2, 3, 2, 3</value>
+  </data>
+  <data name="groupBox4ttt.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>2, 3, 2, 3</value>
+  </data>
+  <data name="groupBox4ttt.Size" type="System.Drawing.Size, System.Drawing">
+    <value>47, 603</value>
+  </data>
+  <data name="groupBox4ttt.TabIndex" type="System.Int32, mscorlib">
+    <value>50</value>
+  </data>
+  <data name="&gt;&gt;groupBox4ttt.Name" xml:space="preserve">
+    <value>groupBox4ttt</value>
+  </data>
+  <data name="&gt;&gt;groupBox4ttt.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;groupBox4ttt.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;groupBox4ttt.ZOrder" xml:space="preserve">
+    <value>11</value>
+  </data>
   <data name="label5.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
@@ -654,35 +825,8 @@
   <data name="&gt;&gt;label21ffae.ZOrder" xml:space="preserve">
     <value>11</value>
   </data>
-  <data name="groupBox4ttt.Location" type="System.Drawing.Point, System.Drawing">
-    <value>8, 37</value>
-  </data>
-  <data name="groupBox4ttt.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 3, 2, 3</value>
-  </data>
-  <data name="groupBox4ttt.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 3, 2, 3</value>
-  </data>
-  <data name="groupBox4ttt.Size" type="System.Drawing.Size, System.Drawing">
-    <value>47, 603</value>
-  </data>
-  <data name="groupBox4ttt.TabIndex" type="System.Int32, mscorlib">
-    <value>50</value>
-  </data>
-  <data name="&gt;&gt;groupBox4ttt.Name" xml:space="preserve">
-    <value>groupBox4ttt</value>
-  </data>
-  <data name="&gt;&gt;groupBox4ttt.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;groupBox4ttt.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;groupBox4ttt.ZOrder" xml:space="preserve">
-    <value>11</value>
-  </data>
   <data name="gb_showstatus.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Bottom, Right</value>
+    <value>Bottom, Left, Right</value>
   </data>
   <data name="&gt;&gt;lbTest4.Name" xml:space="preserve">
     <value>lbTest4</value>
@@ -829,10 +973,10 @@
     <value>11</value>
   </data>
   <data name="gb_showstatus.Location" type="System.Drawing.Point, System.Drawing">
-    <value>51, 608</value>
+    <value>59, 608</value>
   </data>
   <data name="gb_showstatus.Size" type="System.Drawing.Size, System.Drawing">
-    <value>1032, 32</value>
+    <value>1024, 32</value>
   </data>
   <data name="gb_showstatus.TabIndex" type="System.Int32, mscorlib">
     <value>54</value>
@@ -982,7 +1126,7 @@
     <value>True</value>
   </data>
   <data name="lbPrintTest.Location" type="System.Drawing.Point, System.Drawing">
-    <value>129, 13</value>
+    <value>171, 12</value>
   </data>
   <data name="lbPrintTest.Size" type="System.Drawing.Size, System.Drawing">
     <value>35, 13</value>

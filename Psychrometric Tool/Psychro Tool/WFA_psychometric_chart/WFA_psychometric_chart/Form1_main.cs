@@ -6843,7 +6843,7 @@ namespace WFA_psychometric_chart
 
                                         FlagForNodeDelete = 0;//flag is ready OFF , Node NOT SELECTED
                                         deleteNodeToolStripMenuItem.Enabled = false;//Turn of the delet button
-                                        //nodeID_ForDeletingNode = idSelected;
+                                        nodeID_ForDeletingNode = idSelected;
                                         //=============end of flag for deleting===========//
 
                                     }
@@ -16005,6 +16005,25 @@ namespace WFA_psychometric_chart
         private void groupBox4ttt_Enter(object sender, EventArgs e)
         {
 
+        }
+
+        private void Form1_main_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode == Keys.F1)
+            {
+
+                try
+                {
+                    string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                    string file = dir + @"\PsychometricHelp.chm";
+                    if(File.Exists(file))
+                    Help.ShowHelp(this, file);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
         }
 
 
