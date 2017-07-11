@@ -46,7 +46,6 @@ namespace PH_App
             
         }
 
-
         string fluidName = "Water";//"1-Butene"; // "Water";//"n-Propane";//Acetone//Ammonia//Krypton//Nitrogen //Note for Air not working //Argon//CarbonDioxide// not working p-Xylene//R134a
 
         //--Pulling the fluid info 
@@ -103,7 +102,7 @@ namespace PH_App
                                 Xmax = fluidDetail.Xmax; //--No prob
                                 Ymin = fluidDetail.Ymin;
                                 Ymax = fluidDetail.Ymax;
-                            }
+                   }
                 }
                 }
                  }
@@ -148,13 +147,11 @@ namespace PH_App
                     yCoord = yVal;
                     //tooltip.Show("X=" + xVal + ", Y=" + yVal, this.phChart,
                     //pos.X, pos.Y - 15);
-
                 }
             }
-
-            mc.Chart_MouseDown(sender, e,this, MousePosition);
-            
+            mc.Chart_MouseDown(sender, e,this, MousePosition);            
         }
+
         double xCoord=0, yCoord=0;
         private void quickNodeInsertToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -245,14 +242,24 @@ namespace PH_App
             mc.chart_MouseMove(sender, e, phChart, this);
             }catch(Exception ex)
             {
-
+                
             }
         }
-
+        int countClicks = 0;
         private void phChart_MouseClick(object sender, MouseEventArgs e)
         {
             mc.chart_MouseClick(sender, e, phChart,this);
-           
+
+            if (mc.FlagForLockUnlock == 1) //Flag is disenabled
+            {
+                countClicks++;
+                if(countClicks == 3)
+                {
+                    MessageBox.Show("Please unlock the lock icon and proceed forward!");
+                    countClicks = 0;
+                }
+            }
+
         }
 
         private void clearChartToolStripMenuItem_Click(object sender, EventArgs e)
@@ -473,6 +480,17 @@ namespace PH_App
                     MessageBox.Show(ex.Message);
                 }
             }
+        }
+
+        private void printToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //--Print 
+            mc.printHeatMap(this.phChart);
+        }
+
+        private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            mc.saveAsImageHeatMap(this.phChart,this);
         }
 
         public void RefreshChartListForTrashBoxRestore(Form_Main_PH_Application Fmain)

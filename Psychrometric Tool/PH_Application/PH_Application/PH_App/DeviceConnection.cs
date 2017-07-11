@@ -8,14 +8,14 @@ namespace PH_App
     {
         //Now here we are going to get the connected device value
 
-        ////Lets build the function we need to do the task 
+        ////--Lets build the function we need to do the task 
         //public class ca{
         //    public  string deviceName { get; set; }
         //    public string deviceInstance { get; set; }
         //    public string ConnectedPort { get; set; }
         //}
        
-        /// <summary>
+      /// <summary>
         /// This function is used to scan bacnet devices  connected 
         /// </summary>
         /// <returns>returns the list of devices</returns>

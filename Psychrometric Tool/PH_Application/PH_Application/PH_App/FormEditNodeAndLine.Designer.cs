@@ -29,37 +29,18 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEditNodeAndLine));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
             this.saveFD = new System.Windows.Forms.SaveFileDialog();
             this.label2 = new System.Windows.Forms.Label();
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
-            this.lineID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.lineName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.startNodeID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.endNodeID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.linecolor = new System.Windows.Forms.DataGridViewButtonColumn();
-            this.thickness = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.prevNodeID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.nextNodeID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.lineSeriesValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.lineStatus = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.label1 = new System.Windows.Forms.Label();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.name = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.CB_DGV_Temperature_Source = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.nodeID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.temp = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.CB_DGV_Pressure_Source = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.humidity = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.equivalentEnthalpy = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.color = new System.Windows.Forms.DataGridViewButtonColumn();
-            this.nodeSize = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.colorDialog2 = new System.Windows.Forms.ColorDialog();
@@ -84,6 +65,35 @@
             this.lb_enthalpy_node2_value = new System.Windows.Forms.Label();
             this.lb_horizontal_line = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.lineID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.lineName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.startNodeID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.endNodeID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.linecolor = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.thickness = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.prevNodeID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.nextNodeID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.lineSeriesValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.lineStatus = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.T1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.T2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.P1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.P2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.E1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.E2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.changeInEnergy = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.lbEnthalpyChange = new System.Windows.Forms.Label();
+            this.lbEnthalpyChangeUnit = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
+            this.name = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.CB_DGV_Temperature_Source = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.nodeID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.temp = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.CB_DGV_Pressure_Source = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.humidity = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.equivalentEnthalpy = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.color = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.nodeSize = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -111,7 +121,14 @@
             this.prevNodeID,
             this.nextNodeID,
             this.lineSeriesValue,
-            this.lineStatus});
+            this.lineStatus,
+            this.T1,
+            this.T2,
+            this.P1,
+            this.P2,
+            this.E1,
+            this.E2,
+            this.changeInEnergy});
             resources.ApplyResources(this.dataGridView2, "dataGridView2");
             this.dataGridView2.Name = "dataGridView2";
             this.dataGridView2.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dataGridView2_CellBeginEdit);
@@ -123,74 +140,6 @@
             this.dataGridView2.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dataGridView2_DataError);
             this.dataGridView2.SelectionChanged += new System.EventHandler(this.dataGridView2_SelectionChanged);
             this.dataGridView2.MouseHover += new System.EventHandler(this.dataGridView2_MouseHover);
-            // 
-            // lineID
-            // 
-            resources.ApplyResources(this.lineID, "lineID");
-            this.lineID.Name = "lineID";
-            this.lineID.ReadOnly = true;
-            this.lineID.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // lineName
-            // 
-            resources.ApplyResources(this.lineName, "lineName");
-            this.lineName.Name = "lineName";
-            this.lineName.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // startNodeID
-            // 
-            resources.ApplyResources(this.startNodeID, "startNodeID");
-            this.startNodeID.Name = "startNodeID";
-            this.startNodeID.ReadOnly = true;
-            this.startNodeID.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // endNodeID
-            // 
-            resources.ApplyResources(this.endNodeID, "endNodeID");
-            this.endNodeID.Name = "endNodeID";
-            this.endNodeID.ReadOnly = true;
-            this.endNodeID.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // linecolor
-            // 
-            resources.ApplyResources(this.linecolor, "linecolor");
-            this.linecolor.Name = "linecolor";
-            this.linecolor.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            // 
-            // thickness
-            // 
-            resources.ApplyResources(this.thickness, "thickness");
-            this.thickness.Name = "thickness";
-            this.thickness.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // prevNodeID
-            // 
-            resources.ApplyResources(this.prevNodeID, "prevNodeID");
-            this.prevNodeID.Name = "prevNodeID";
-            this.prevNodeID.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // nextNodeID
-            // 
-            resources.ApplyResources(this.nextNodeID, "nextNodeID");
-            this.nextNodeID.Name = "nextNodeID";
-            this.nextNodeID.ReadOnly = true;
-            this.nextNodeID.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // lineSeriesValue
-            // 
-            resources.ApplyResources(this.lineSeriesValue, "lineSeriesValue");
-            this.lineSeriesValue.Name = "lineSeriesValue";
-            this.lineSeriesValue.ReadOnly = true;
-            this.lineSeriesValue.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // lineStatus
-            // 
-            this.lineStatus.FalseValue = "false";
-            resources.ApplyResources(this.lineStatus, "lineStatus");
-            this.lineStatus.IndeterminateValue = "0";
-            this.lineStatus.Name = "lineStatus";
-            this.lineStatus.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.lineStatus.TrueValue = "true";
             // 
             // label1
             // 
@@ -216,78 +165,6 @@
             this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick);
             this.dataGridView1.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellEndEdit);
             this.dataGridView1.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.dataGridView1_EditingControlShowing_1);
-            // 
-            // name
-            // 
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.name.DefaultCellStyle = dataGridViewCellStyle1;
-            resources.ApplyResources(this.name, "name");
-            this.name.Name = "name";
-            this.name.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // CB_DGV_Temperature_Source
-            // 
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.CB_DGV_Temperature_Source.DefaultCellStyle = dataGridViewCellStyle2;
-            this.CB_DGV_Temperature_Source.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
-            resources.ApplyResources(this.CB_DGV_Temperature_Source, "CB_DGV_Temperature_Source");
-            this.CB_DGV_Temperature_Source.Name = "CB_DGV_Temperature_Source";
-            this.CB_DGV_Temperature_Source.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            // 
-            // nodeID
-            // 
-            resources.ApplyResources(this.nodeID, "nodeID");
-            this.nodeID.Name = "nodeID";
-            this.nodeID.ReadOnly = true;
-            this.nodeID.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // temp
-            // 
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.temp.DefaultCellStyle = dataGridViewCellStyle3;
-            resources.ApplyResources(this.temp, "temp");
-            this.temp.Name = "temp";
-            this.temp.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // CB_DGV_Pressure_Source
-            // 
-            this.CB_DGV_Pressure_Source.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
-            resources.ApplyResources(this.CB_DGV_Pressure_Source, "CB_DGV_Pressure_Source");
-            this.CB_DGV_Pressure_Source.Name = "CB_DGV_Pressure_Source";
-            // 
-            // humidity
-            // 
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.humidity.DefaultCellStyle = dataGridViewCellStyle4;
-            resources.ApplyResources(this.humidity, "humidity");
-            this.humidity.Name = "humidity";
-            this.humidity.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // equivalentEnthalpy
-            // 
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.equivalentEnthalpy.DefaultCellStyle = dataGridViewCellStyle5;
-            resources.ApplyResources(this.equivalentEnthalpy, "equivalentEnthalpy");
-            this.equivalentEnthalpy.Name = "equivalentEnthalpy";
-            this.equivalentEnthalpy.ReadOnly = true;
-            this.equivalentEnthalpy.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // color
-            // 
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.color.DefaultCellStyle = dataGridViewCellStyle6;
-            resources.ApplyResources(this.color, "color");
-            this.color.Name = "color";
-            this.color.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            // 
-            // nodeSize
-            // 
-            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.nodeSize.DefaultCellStyle = dataGridViewCellStyle7;
-            resources.ApplyResources(this.nodeSize, "nodeSize");
-            this.nodeSize.Name = "nodeSize";
-            this.nodeSize.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // label4
             // 
@@ -397,6 +274,9 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.lbEnthalpyChange);
+            this.groupBox1.Controls.Add(this.lbEnthalpyChangeUnit);
+            this.groupBox1.Controls.Add(this.label11);
             this.groupBox1.Controls.Add(this.lb_horizontal_line);
             this.groupBox1.Controls.Add(this.lb_enthalpy_node2_value);
             this.groupBox1.Controls.Add(this.lb_enthalpy_node1_value);
@@ -419,6 +299,203 @@
             resources.ApplyResources(this.groupBox1, "groupBox1");
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.TabStop = false;
+            // 
+            // lineID
+            // 
+            resources.ApplyResources(this.lineID, "lineID");
+            this.lineID.Name = "lineID";
+            this.lineID.ReadOnly = true;
+            this.lineID.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // lineName
+            // 
+            resources.ApplyResources(this.lineName, "lineName");
+            this.lineName.Name = "lineName";
+            this.lineName.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // startNodeID
+            // 
+            resources.ApplyResources(this.startNodeID, "startNodeID");
+            this.startNodeID.Name = "startNodeID";
+            this.startNodeID.ReadOnly = true;
+            this.startNodeID.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // endNodeID
+            // 
+            resources.ApplyResources(this.endNodeID, "endNodeID");
+            this.endNodeID.Name = "endNodeID";
+            this.endNodeID.ReadOnly = true;
+            this.endNodeID.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // linecolor
+            // 
+            resources.ApplyResources(this.linecolor, "linecolor");
+            this.linecolor.Name = "linecolor";
+            this.linecolor.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            // 
+            // thickness
+            // 
+            resources.ApplyResources(this.thickness, "thickness");
+            this.thickness.Name = "thickness";
+            this.thickness.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // prevNodeID
+            // 
+            resources.ApplyResources(this.prevNodeID, "prevNodeID");
+            this.prevNodeID.Name = "prevNodeID";
+            this.prevNodeID.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // nextNodeID
+            // 
+            resources.ApplyResources(this.nextNodeID, "nextNodeID");
+            this.nextNodeID.Name = "nextNodeID";
+            this.nextNodeID.ReadOnly = true;
+            this.nextNodeID.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // lineSeriesValue
+            // 
+            resources.ApplyResources(this.lineSeriesValue, "lineSeriesValue");
+            this.lineSeriesValue.Name = "lineSeriesValue";
+            this.lineSeriesValue.ReadOnly = true;
+            this.lineSeriesValue.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // lineStatus
+            // 
+            this.lineStatus.FalseValue = "false";
+            resources.ApplyResources(this.lineStatus, "lineStatus");
+            this.lineStatus.IndeterminateValue = "0";
+            this.lineStatus.Name = "lineStatus";
+            this.lineStatus.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.lineStatus.TrueValue = "true";
+            // 
+            // T1
+            // 
+            resources.ApplyResources(this.T1, "T1");
+            this.T1.Name = "T1";
+            this.T1.ReadOnly = true;
+            // 
+            // T2
+            // 
+            resources.ApplyResources(this.T2, "T2");
+            this.T2.Name = "T2";
+            this.T2.ReadOnly = true;
+            // 
+            // P1
+            // 
+            resources.ApplyResources(this.P1, "P1");
+            this.P1.Name = "P1";
+            this.P1.ReadOnly = true;
+            // 
+            // P2
+            // 
+            resources.ApplyResources(this.P2, "P2");
+            this.P2.Name = "P2";
+            this.P2.ReadOnly = true;
+            // 
+            // E1
+            // 
+            resources.ApplyResources(this.E1, "E1");
+            this.E1.Name = "E1";
+            this.E1.ReadOnly = true;
+            // 
+            // E2
+            // 
+            resources.ApplyResources(this.E2, "E2");
+            this.E2.Name = "E2";
+            this.E2.ReadOnly = true;
+            // 
+            // changeInEnergy
+            // 
+            resources.ApplyResources(this.changeInEnergy, "changeInEnergy");
+            this.changeInEnergy.Name = "changeInEnergy";
+            this.changeInEnergy.ReadOnly = true;
+            // 
+            // lbEnthalpyChange
+            // 
+            resources.ApplyResources(this.lbEnthalpyChange, "lbEnthalpyChange");
+            this.lbEnthalpyChange.Name = "lbEnthalpyChange";
+            // 
+            // lbEnthalpyChangeUnit
+            // 
+            resources.ApplyResources(this.lbEnthalpyChangeUnit, "lbEnthalpyChangeUnit");
+            this.lbEnthalpyChangeUnit.Name = "lbEnthalpyChangeUnit";
+            // 
+            // label11
+            // 
+            resources.ApplyResources(this.label11, "label11");
+            this.label11.Name = "label11";
+            // 
+            // name
+            // 
+            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.name.DefaultCellStyle = dataGridViewCellStyle8;
+            resources.ApplyResources(this.name, "name");
+            this.name.Name = "name";
+            this.name.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // CB_DGV_Temperature_Source
+            // 
+            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.CB_DGV_Temperature_Source.DefaultCellStyle = dataGridViewCellStyle9;
+            this.CB_DGV_Temperature_Source.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
+            resources.ApplyResources(this.CB_DGV_Temperature_Source, "CB_DGV_Temperature_Source");
+            this.CB_DGV_Temperature_Source.Name = "CB_DGV_Temperature_Source";
+            this.CB_DGV_Temperature_Source.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            // 
+            // nodeID
+            // 
+            resources.ApplyResources(this.nodeID, "nodeID");
+            this.nodeID.Name = "nodeID";
+            this.nodeID.ReadOnly = true;
+            this.nodeID.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // temp
+            // 
+            dataGridViewCellStyle10.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.temp.DefaultCellStyle = dataGridViewCellStyle10;
+            resources.ApplyResources(this.temp, "temp");
+            this.temp.Name = "temp";
+            this.temp.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // CB_DGV_Pressure_Source
+            // 
+            this.CB_DGV_Pressure_Source.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
+            resources.ApplyResources(this.CB_DGV_Pressure_Source, "CB_DGV_Pressure_Source");
+            this.CB_DGV_Pressure_Source.Name = "CB_DGV_Pressure_Source";
+            // 
+            // humidity
+            // 
+            dataGridViewCellStyle11.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.humidity.DefaultCellStyle = dataGridViewCellStyle11;
+            resources.ApplyResources(this.humidity, "humidity");
+            this.humidity.Name = "humidity";
+            this.humidity.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // equivalentEnthalpy
+            // 
+            dataGridViewCellStyle12.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.equivalentEnthalpy.DefaultCellStyle = dataGridViewCellStyle12;
+            resources.ApplyResources(this.equivalentEnthalpy, "equivalentEnthalpy");
+            this.equivalentEnthalpy.Name = "equivalentEnthalpy";
+            this.equivalentEnthalpy.ReadOnly = true;
+            this.equivalentEnthalpy.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // color
+            // 
+            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle13.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.color.DefaultCellStyle = dataGridViewCellStyle13;
+            resources.ApplyResources(this.color, "color");
+            this.color.Name = "color";
+            this.color.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            // 
+            // nodeSize
+            // 
+            dataGridViewCellStyle14.SelectionBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.nodeSize.DefaultCellStyle = dataGridViewCellStyle14;
+            resources.ApplyResources(this.nodeSize, "nodeSize");
+            this.nodeSize.Name = "nodeSize";
+            this.nodeSize.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // FormEditNodeAndLine
             // 
@@ -453,25 +530,6 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ColorDialog colorDialog2;
         private System.Windows.Forms.ColorDialog colorDialog1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn lineID;
-        private System.Windows.Forms.DataGridViewTextBoxColumn lineName;
-        private System.Windows.Forms.DataGridViewTextBoxColumn startNodeID;
-        private System.Windows.Forms.DataGridViewTextBoxColumn endNodeID;
-        private System.Windows.Forms.DataGridViewButtonColumn linecolor;
-        private System.Windows.Forms.DataGridViewTextBoxColumn thickness;
-        private System.Windows.Forms.DataGridViewTextBoxColumn prevNodeID;
-        private System.Windows.Forms.DataGridViewTextBoxColumn nextNodeID;
-        private System.Windows.Forms.DataGridViewTextBoxColumn lineSeriesValue;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn lineStatus;
-        private System.Windows.Forms.DataGridViewTextBoxColumn name;
-        private System.Windows.Forms.DataGridViewComboBoxColumn CB_DGV_Temperature_Source;
-        private System.Windows.Forms.DataGridViewTextBoxColumn nodeID;
-        private System.Windows.Forms.DataGridViewTextBoxColumn temp;
-        private System.Windows.Forms.DataGridViewComboBoxColumn CB_DGV_Pressure_Source;
-        private System.Windows.Forms.DataGridViewTextBoxColumn humidity;
-        private System.Windows.Forms.DataGridViewTextBoxColumn equivalentEnthalpy;
-        private System.Windows.Forms.DataGridViewButtonColumn color;
-        private System.Windows.Forms.DataGridViewTextBoxColumn nodeSize;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label lb_process;
         private System.Windows.Forms.Label label7;
@@ -492,5 +550,34 @@
         private System.Windows.Forms.Label lb_enthalpy_node2_value;
         private System.Windows.Forms.Label lb_horizontal_line;
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn lineID;
+        private System.Windows.Forms.DataGridViewTextBoxColumn lineName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn startNodeID;
+        private System.Windows.Forms.DataGridViewTextBoxColumn endNodeID;
+        private System.Windows.Forms.DataGridViewButtonColumn linecolor;
+        private System.Windows.Forms.DataGridViewTextBoxColumn thickness;
+        private System.Windows.Forms.DataGridViewTextBoxColumn prevNodeID;
+        private System.Windows.Forms.DataGridViewTextBoxColumn nextNodeID;
+        private System.Windows.Forms.DataGridViewTextBoxColumn lineSeriesValue;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn lineStatus;
+        private System.Windows.Forms.DataGridViewTextBoxColumn T1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn T2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn P1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn P2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn E1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn E2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn changeInEnergy;
+        private System.Windows.Forms.Label lbEnthalpyChange;
+        private System.Windows.Forms.Label lbEnthalpyChangeUnit;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.DataGridViewTextBoxColumn name;
+        private System.Windows.Forms.DataGridViewComboBoxColumn CB_DGV_Temperature_Source;
+        private System.Windows.Forms.DataGridViewTextBoxColumn nodeID;
+        private System.Windows.Forms.DataGridViewTextBoxColumn temp;
+        private System.Windows.Forms.DataGridViewComboBoxColumn CB_DGV_Pressure_Source;
+        private System.Windows.Forms.DataGridViewTextBoxColumn humidity;
+        private System.Windows.Forms.DataGridViewTextBoxColumn equivalentEnthalpy;
+        private System.Windows.Forms.DataGridViewButtonColumn color;
+        private System.Windows.Forms.DataGridViewTextBoxColumn nodeSize;
     }
 }

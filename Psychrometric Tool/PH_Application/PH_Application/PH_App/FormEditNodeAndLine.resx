@@ -120,9 +120,6 @@
   <metadata name="saveFD.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>34, 40</value>
   </metadata>
-  <metadata name="label2.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
   <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="label2.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -133,7 +130,7 @@
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="label2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>16, 270</value>
+    <value>19, 235</value>
   </data>
   <data name="label2.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>2, 0, 2, 0</value>
@@ -162,92 +159,62 @@
   <metadata name="lineID.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="lineID.HeaderText" xml:space="preserve">
-    <value>Line ID</value>
-  </data>
-  <data name="lineID.Visible" type="System.Boolean, mscorlib">
-    <value>False</value>
-  </data>
   <metadata name="lineName.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="lineName.HeaderText" xml:space="preserve">
-    <value>Line Name</value>
-  </data>
   <metadata name="startNodeID.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="startNodeID.HeaderText" xml:space="preserve">
-    <value>Start Node Name</value>
-  </data>
   <metadata name="endNodeID.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="endNodeID.HeaderText" xml:space="preserve">
-    <value>End Node Name</value>
-  </data>
   <metadata name="linecolor.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="linecolor.HeaderText" xml:space="preserve">
-    <value>Color</value>
-  </data>
-  <data name="linecolor.Width" type="System.Int32, mscorlib">
-    <value>40</value>
-  </data>
   <metadata name="thickness.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="thickness.HeaderText" xml:space="preserve">
-    <value>Thickness</value>
-  </data>
-  <data name="thickness.Width" type="System.Int32, mscorlib">
-    <value>60</value>
-  </data>
   <metadata name="prevNodeID.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="prevNodeID.HeaderText" xml:space="preserve">
-    <value>Prev node id</value>
-  </data>
-  <data name="prevNodeID.Visible" type="System.Boolean, mscorlib">
-    <value>False</value>
-  </data>
   <metadata name="nextNodeID.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="nextNodeID.HeaderText" xml:space="preserve">
-    <value>Next node id</value>
-  </data>
-  <data name="nextNodeID.Visible" type="System.Boolean, mscorlib">
-    <value>False</value>
-  </data>
   <metadata name="lineSeriesValue.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="lineSeriesValue.HeaderText" xml:space="preserve">
-    <value>line series</value>
-  </data>
-  <data name="lineSeriesValue.Visible" type="System.Boolean, mscorlib">
-    <value>False</value>
-  </data>
   <metadata name="lineStatus.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="lineStatus.HeaderText" xml:space="preserve">
-    <value>Show Name</value>
-  </data>
-  <data name="lineStatus.Width" type="System.Int32, mscorlib">
-    <value>80</value>
-  </data>
+  <metadata name="T1.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="T2.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="P1.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="P2.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="E1.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="E2.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="changeInEnergy.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
   <data name="dataGridView2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>8, 294</value>
+    <value>11, 259</value>
   </data>
   <data name="dataGridView2.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>2, 3, 2, 3</value>
   </data>
   <data name="dataGridView2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>543, 246</value>
+    <value>543, 206</value>
   </data>
   <data name="dataGridView2.TabIndex" type="System.Int32, mscorlib">
     <value>14</value>
@@ -303,60 +270,27 @@
   <metadata name="name.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="name.HeaderText" xml:space="preserve">
-    <value>Name</value>
-  </data>
   <metadata name="CB_DGV_Temperature_Source.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="CB_DGV_Temperature_Source.HeaderText" xml:space="preserve">
-    <value>Temperature Source</value>
-  </data>
-  <data name="nodeID.HeaderText" xml:space="preserve">
-    <value>Node ID</value>
-  </data>
-  <data name="nodeID.Visible" type="System.Boolean, mscorlib">
-    <value>False</value>
-  </data>
   <metadata name="temp.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="temp.HeaderText" xml:space="preserve">
-    <value>Temperature(°C)</value>
-  </data>
   <metadata name="CB_DGV_Pressure_Source.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="CB_DGV_Pressure_Source.HeaderText" xml:space="preserve">
-    <value>Pressure Source</value>
-  </data>
   <metadata name="humidity.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="humidity.HeaderText" xml:space="preserve">
-    <value>Pressure[MPa]</value>
-  </data>
   <metadata name="equivalentEnthalpy.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="equivalentEnthalpy.HeaderText" xml:space="preserve">
-    <value>Equivalent Enthalpy</value>
-  </data>
   <metadata name="color.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="color.HeaderText" xml:space="preserve">
-    <value>Color</value>
-  </data>
-  <data name="color.Width" type="System.Int32, mscorlib">
-    <value>40</value>
-  </data>
   <metadata name="nodeSize.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="nodeSize.HeaderText" xml:space="preserve">
-    <value>Node Size</value>
-  </data>
   <data name="dataGridView1.Location" type="System.Drawing.Point, System.Drawing">
     <value>11, 22</value>
   </data>
@@ -364,7 +298,7 @@
     <value>2, 3, 2, 3</value>
   </data>
   <data name="dataGridView1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>784, 237</value>
+    <value>843, 202</value>
   </data>
   <data name="dataGridView1.TabIndex" type="System.Int32, mscorlib">
     <value>12</value>
@@ -388,19 +322,19 @@
     <value>NoControl</value>
   </data>
   <data name="label4.Location" type="System.Drawing.Point, System.Drawing">
-    <value>243, 270</value>
+    <value>246, 235</value>
   </data>
   <data name="label4.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>2, 0, 2, 0</value>
   </data>
   <data name="label4.Size" type="System.Drawing.Size, System.Drawing">
-    <value>415, 13</value>
+    <value>315, 13</value>
   </data>
   <data name="label4.TabIndex" type="System.Int32, mscorlib">
     <value>17</value>
   </data>
   <data name="label4.Text" xml:space="preserve">
-    <value>Note : Start Node Name and End Node Name are non-editable other fields are editable</value>
+    <value>Note : Line Name, Color, Thickness and Show Name are editable</value>
   </data>
   <data name="&gt;&gt;label4.Name" xml:space="preserve">
     <value>label4</value>
@@ -490,7 +424,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;label5.ZOrder" xml:space="preserve">
-    <value>18</value>
+    <value>21</value>
   </data>
   <data name="lb_process.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -526,7 +460,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;lb_process.ZOrder" xml:space="preserve">
-    <value>17</value>
+    <value>20</value>
   </data>
   <data name="label7.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -562,7 +496,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;label7.ZOrder" xml:space="preserve">
-    <value>16</value>
+    <value>19</value>
   </data>
   <data name="label8.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -598,7 +532,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;label8.ZOrder" xml:space="preserve">
-    <value>15</value>
+    <value>18</value>
   </data>
   <data name="lb_node_one_name.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -634,7 +568,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;lb_node_one_name.ZOrder" xml:space="preserve">
-    <value>14</value>
+    <value>17</value>
   </data>
   <data name="lb_node_two_name.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -670,7 +604,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;lb_node_two_name.ZOrder" xml:space="preserve">
-    <value>13</value>
+    <value>16</value>
   </data>
   <data name="lb_dbt.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -703,7 +637,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;lb_dbt.ZOrder" xml:space="preserve">
-    <value>12</value>
+    <value>15</value>
   </data>
   <data name="lb_unit_degCelcius.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -736,7 +670,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;lb_unit_degCelcius.ZOrder" xml:space="preserve">
-    <value>11</value>
+    <value>14</value>
   </data>
   <data name="lb_dbt_node1_value.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -769,7 +703,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;lb_dbt_node1_value.ZOrder" xml:space="preserve">
-    <value>10</value>
+    <value>13</value>
   </data>
   <data name="lb_dbt_node2_value.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -802,7 +736,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;lb_dbt_node2_value.ZOrder" xml:space="preserve">
-    <value>9</value>
+    <value>12</value>
   </data>
   <data name="label18.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -835,7 +769,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;label18.ZOrder" xml:space="preserve">
-    <value>8</value>
+    <value>11</value>
   </data>
   <data name="label17.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -868,7 +802,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;label17.ZOrder" xml:space="preserve">
-    <value>7</value>
+    <value>10</value>
   </data>
   <data name="lb_Pressure_node1.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -901,7 +835,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;lb_Pressure_node1.ZOrder" xml:space="preserve">
-    <value>6</value>
+    <value>9</value>
   </data>
   <data name="lb_Pressure_node2.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -934,7 +868,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;lb_Pressure_node2.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>8</value>
   </data>
   <data name="label38.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -967,7 +901,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;label38.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>7</value>
   </data>
   <data name="label37.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -1000,7 +934,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;label37.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>6</value>
   </data>
   <data name="lb_enthalpy_node1_value.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -1033,7 +967,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;lb_enthalpy_node1_value.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>5</value>
   </data>
   <data name="lb_enthalpy_node2_value.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -1066,7 +1000,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;lb_enthalpy_node2_value.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>4</value>
   </data>
   <data name="lb_horizontal_line.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
@@ -1090,10 +1024,46 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;lb_horizontal_line.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="&gt;&gt;lbEnthalpyChange.Name" xml:space="preserve">
+    <value>lbEnthalpyChange</value>
+  </data>
+  <data name="&gt;&gt;lbEnthalpyChange.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lbEnthalpyChange.Parent" xml:space="preserve">
+    <value>groupBox1</value>
+  </data>
+  <data name="&gt;&gt;lbEnthalpyChange.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
+  <data name="&gt;&gt;lbEnthalpyChangeUnit.Name" xml:space="preserve">
+    <value>lbEnthalpyChangeUnit</value>
+  </data>
+  <data name="&gt;&gt;lbEnthalpyChangeUnit.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lbEnthalpyChangeUnit.Parent" xml:space="preserve">
+    <value>groupBox1</value>
+  </data>
+  <data name="&gt;&gt;lbEnthalpyChangeUnit.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;label11.Name" xml:space="preserve">
+    <value>label11</value>
+  </data>
+  <data name="&gt;&gt;label11.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label11.Parent" xml:space="preserve">
+    <value>groupBox1</value>
+  </data>
+  <data name="&gt;&gt;label11.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
   <data name="groupBox1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>555, 294</value>
+    <value>558, 259</value>
   </data>
   <data name="groupBox1.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>2, 3, 2, 3</value>
@@ -1102,7 +1072,7 @@
     <value>2, 3, 2, 3</value>
   </data>
   <data name="groupBox1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>303, 246</value>
+    <value>303, 206</value>
   </data>
   <data name="groupBox1.TabIndex" type="System.Int32, mscorlib">
     <value>18</value>
@@ -1122,6 +1092,306 @@
   <data name="&gt;&gt;groupBox1.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
+  <metadata name="lineID.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="lineID.HeaderText" xml:space="preserve">
+    <value>Line ID</value>
+  </data>
+  <data name="lineID.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
+  <metadata name="lineName.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="lineName.HeaderText" xml:space="preserve">
+    <value>Line Name</value>
+  </data>
+  <metadata name="startNodeID.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="startNodeID.HeaderText" xml:space="preserve">
+    <value>Start Node Name</value>
+  </data>
+  <metadata name="endNodeID.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="endNodeID.HeaderText" xml:space="preserve">
+    <value>End Node Name</value>
+  </data>
+  <metadata name="linecolor.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="linecolor.HeaderText" xml:space="preserve">
+    <value>Color</value>
+  </data>
+  <data name="linecolor.Width" type="System.Int32, mscorlib">
+    <value>40</value>
+  </data>
+  <metadata name="thickness.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="thickness.HeaderText" xml:space="preserve">
+    <value>Thickness</value>
+  </data>
+  <data name="thickness.Width" type="System.Int32, mscorlib">
+    <value>60</value>
+  </data>
+  <metadata name="prevNodeID.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="prevNodeID.HeaderText" xml:space="preserve">
+    <value>Prev node id</value>
+  </data>
+  <data name="prevNodeID.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
+  <metadata name="nextNodeID.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="nextNodeID.HeaderText" xml:space="preserve">
+    <value>Next node id</value>
+  </data>
+  <data name="nextNodeID.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
+  <metadata name="lineSeriesValue.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="lineSeriesValue.HeaderText" xml:space="preserve">
+    <value>line series</value>
+  </data>
+  <data name="lineSeriesValue.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
+  <metadata name="lineStatus.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="lineStatus.HeaderText" xml:space="preserve">
+    <value>Show Name</value>
+  </data>
+  <data name="lineStatus.Width" type="System.Int32, mscorlib">
+    <value>80</value>
+  </data>
+  <metadata name="T1.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="T1.HeaderText" xml:space="preserve">
+    <value>T1</value>
+  </data>
+  <metadata name="T2.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="T2.HeaderText" xml:space="preserve">
+    <value>T2</value>
+  </data>
+  <metadata name="P1.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="P1.HeaderText" xml:space="preserve">
+    <value>P1</value>
+  </data>
+  <metadata name="P2.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="P2.HeaderText" xml:space="preserve">
+    <value>P2</value>
+  </data>
+  <metadata name="E1.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="E1.HeaderText" xml:space="preserve">
+    <value>E1</value>
+  </data>
+  <metadata name="E2.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="E2.HeaderText" xml:space="preserve">
+    <value>E2</value>
+  </data>
+  <metadata name="changeInEnergy.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="changeInEnergy.HeaderText" xml:space="preserve">
+    <value>E2-E1</value>
+  </data>
+  <data name="lbEnthalpyChange.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="lbEnthalpyChange.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="lbEnthalpyChange.Location" type="System.Drawing.Point, System.Drawing">
+    <value>211, 168</value>
+  </data>
+  <data name="lbEnthalpyChange.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>2, 0, 2, 0</value>
+  </data>
+  <data name="lbEnthalpyChange.Size" type="System.Drawing.Size, System.Drawing">
+    <value>41, 13</value>
+  </data>
+  <data name="lbEnthalpyChange.TabIndex" type="System.Int32, mscorlib">
+    <value>44</value>
+  </data>
+  <data name="lbEnthalpyChange.Text" xml:space="preserve">
+    <value>label36</value>
+  </data>
+  <data name="&gt;&gt;lbEnthalpyChange.Name" xml:space="preserve">
+    <value>lbEnthalpyChange</value>
+  </data>
+  <data name="&gt;&gt;lbEnthalpyChange.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lbEnthalpyChange.Parent" xml:space="preserve">
+    <value>groupBox1</value>
+  </data>
+  <data name="&gt;&gt;lbEnthalpyChange.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="lbEnthalpyChangeUnit.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="lbEnthalpyChangeUnit.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="lbEnthalpyChangeUnit.Location" type="System.Drawing.Point, System.Drawing">
+    <value>109, 164</value>
+  </data>
+  <data name="lbEnthalpyChangeUnit.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>2, 0, 2, 0</value>
+  </data>
+  <data name="lbEnthalpyChangeUnit.Size" type="System.Drawing.Size, System.Drawing">
+    <value>37, 13</value>
+  </data>
+  <data name="lbEnthalpyChangeUnit.TabIndex" type="System.Int32, mscorlib">
+    <value>43</value>
+  </data>
+  <data name="lbEnthalpyChangeUnit.Text" xml:space="preserve">
+    <value>KJ/Kg</value>
+  </data>
+  <data name="&gt;&gt;lbEnthalpyChangeUnit.Name" xml:space="preserve">
+    <value>lbEnthalpyChangeUnit</value>
+  </data>
+  <data name="&gt;&gt;lbEnthalpyChangeUnit.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lbEnthalpyChangeUnit.Parent" xml:space="preserve">
+    <value>groupBox1</value>
+  </data>
+  <data name="&gt;&gt;lbEnthalpyChangeUnit.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="label11.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="label11.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="label11.Location" type="System.Drawing.Point, System.Drawing">
+    <value>8, 168</value>
+  </data>
+  <data name="label11.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>2, 0, 2, 0</value>
+  </data>
+  <data name="label11.Size" type="System.Drawing.Size, System.Drawing">
+    <value>88, 13</value>
+  </data>
+  <data name="label11.TabIndex" type="System.Int32, mscorlib">
+    <value>42</value>
+  </data>
+  <data name="label11.Text" xml:space="preserve">
+    <value>Enthalpy Change</value>
+  </data>
+  <data name="&gt;&gt;label11.Name" xml:space="preserve">
+    <value>label11</value>
+  </data>
+  <data name="&gt;&gt;label11.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label11.Parent" xml:space="preserve">
+    <value>groupBox1</value>
+  </data>
+  <data name="&gt;&gt;label11.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <metadata name="name.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="name.HeaderText" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="name.MinimumWidth" type="System.Int32, mscorlib">
+    <value>10</value>
+  </data>
+  <data name="name.Width" type="System.Int32, mscorlib">
+    <value>110</value>
+  </data>
+  <metadata name="CB_DGV_Temperature_Source.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="CB_DGV_Temperature_Source.HeaderText" xml:space="preserve">
+    <value>Temperature Source</value>
+  </data>
+  <data name="CB_DGV_Temperature_Source.Width" type="System.Int32, mscorlib">
+    <value>110</value>
+  </data>
+  <data name="nodeID.HeaderText" xml:space="preserve">
+    <value>Node ID</value>
+  </data>
+  <data name="nodeID.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
+  <metadata name="temp.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="temp.HeaderText" xml:space="preserve">
+    <value>Temperature(°C)</value>
+  </data>
+  <data name="temp.Width" type="System.Int32, mscorlib">
+    <value>110</value>
+  </data>
+  <metadata name="CB_DGV_Pressure_Source.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="CB_DGV_Pressure_Source.HeaderText" xml:space="preserve">
+    <value>Pressure Source</value>
+  </data>
+  <data name="CB_DGV_Pressure_Source.Width" type="System.Int32, mscorlib">
+    <value>110</value>
+  </data>
+  <metadata name="humidity.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="humidity.HeaderText" xml:space="preserve">
+    <value>Pressure[MPa]</value>
+  </data>
+  <data name="humidity.Width" type="System.Int32, mscorlib">
+    <value>110</value>
+  </data>
+  <metadata name="equivalentEnthalpy.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="equivalentEnthalpy.HeaderText" xml:space="preserve">
+    <value>Equivalent Enthalpy</value>
+  </data>
+  <data name="equivalentEnthalpy.Width" type="System.Int32, mscorlib">
+    <value>110</value>
+  </data>
+  <metadata name="color.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="color.HeaderText" xml:space="preserve">
+    <value>Color</value>
+  </data>
+  <data name="color.Width" type="System.Int32, mscorlib">
+    <value>40</value>
+  </data>
+  <metadata name="nodeSize.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="nodeSize.HeaderText" xml:space="preserve">
+    <value>Node Size</value>
+  </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -1132,7 +1402,7 @@
     <value>6, 13</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>932, 571</value>
+    <value>871, 472</value>
   </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
@@ -3580,6 +3850,18 @@
   <data name="&gt;&gt;saveFD.Type" xml:space="preserve">
     <value>System.Windows.Forms.SaveFileDialog, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;colorDialog2.Name" xml:space="preserve">
+    <value>colorDialog2</value>
+  </data>
+  <data name="&gt;&gt;colorDialog2.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ColorDialog, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;colorDialog1.Name" xml:space="preserve">
+    <value>colorDialog1</value>
+  </data>
+  <data name="&gt;&gt;colorDialog1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ColorDialog, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;lineID.Name" xml:space="preserve">
     <value>lineID</value>
   </data>
@@ -3640,6 +3922,48 @@
   <data name="&gt;&gt;lineStatus.Type" xml:space="preserve">
     <value>System.Windows.Forms.DataGridViewCheckBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;T1.Name" xml:space="preserve">
+    <value>T1</value>
+  </data>
+  <data name="&gt;&gt;T1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;T2.Name" xml:space="preserve">
+    <value>T2</value>
+  </data>
+  <data name="&gt;&gt;T2.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;P1.Name" xml:space="preserve">
+    <value>P1</value>
+  </data>
+  <data name="&gt;&gt;P1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;P2.Name" xml:space="preserve">
+    <value>P2</value>
+  </data>
+  <data name="&gt;&gt;P2.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;E1.Name" xml:space="preserve">
+    <value>E1</value>
+  </data>
+  <data name="&gt;&gt;E1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;E2.Name" xml:space="preserve">
+    <value>E2</value>
+  </data>
+  <data name="&gt;&gt;E2.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;changeInEnergy.Name" xml:space="preserve">
+    <value>changeInEnergy</value>
+  </data>
+  <data name="&gt;&gt;changeInEnergy.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;name.Name" xml:space="preserve">
     <value>name</value>
   </data>
@@ -3693,18 +4017,6 @@
   </data>
   <data name="&gt;&gt;nodeSize.Type" xml:space="preserve">
     <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;colorDialog2.Name" xml:space="preserve">
-    <value>colorDialog2</value>
-  </data>
-  <data name="&gt;&gt;colorDialog2.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ColorDialog, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;colorDialog1.Name" xml:space="preserve">
-    <value>colorDialog1</value>
-  </data>
-  <data name="&gt;&gt;colorDialog1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ColorDialog, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>FormEditNodeAndLine</value>

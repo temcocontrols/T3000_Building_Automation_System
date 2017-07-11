@@ -1,4 +1,10 @@
-﻿using System;
+﻿/*
+ * Project : PH application
+ * Author Name : Bhoj bahadur karki
+ * Date : 2017-July-4th 
+ * Contact : nishantkarki2013@hotmail.com
+ */
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -8,6 +14,7 @@ using System.Data;
 using System.Windows.Forms;
 using System.Drawing;
 using System.Windows.Forms.DataVisualization.Charting;
+using System.Globalization;
 
 namespace PH_App
 {
@@ -188,7 +195,7 @@ namespace PH_App
                 string tbl_line_value = " CREATE TABLE  IF NOT EXISTS tbl_" + buildingNameSelected + "_line_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_lineID varchar(255) ,lineID string,prevNodeID varchar(255),nextNodeID varchar(255),lineColorValue varchar(255),lineSeriesID varchar(255),thickness varchar(255),name varchar(255), status INTEGER)";
                 //string tbl_mix_node_info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_mix_node_info  ( count INTEGER PRIMARY KEY AUTOINCREMENT,nodeID varchar(255),chartID varchar(255),previousNodeID varchar(255),nextNodeID varchar(255) )";
                 string tbl_node_data_related_T3000 = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_data_related_T3000  (count INTEGER PRIMARY KEY AUTOINCREMENT, nodeID varchar(255), param1_panelID varchar(255), param1_inputIndex varchar(255), param2_panelID varchar(255), param2_inputIndex varchar(255)) ";
-                string tbl_node_value = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),name varchar(255),temperature_source varchar(255),pressure_source varchar(255),colorValue varchar(255),nodeSize varchar(255),lastUpdatedDate varchar(255))";
+                string tbl_node_value = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),name varchar(255),temperature_source varchar(255),pressure_source varchar(255),colorValue varchar(255),nodeSize varchar(255),lastUpdatedXValue varchar(255),lastUpdatedYValue varchar(255))";
 
 
                 string tbl_TemperatureHumiditySourceInfo = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_TemperaturePressureSourceInfo(count INTEGER PRIMARY KEY AUTOINCREMENT,NodeID varchar(255), chartID varchar(255) ,TemperatureSourceInfo VARCHAR(255),PressureSourceInfo varchar(255))";
@@ -680,7 +687,7 @@ namespace PH_App
                 //string tbl_mix_node_info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_mix_node_info  ( count INTEGER PRIMARY KEY AUTOINCREMENT,nodeID varchar(255),chartID varchar(255),previousNodeID varchar(255),nextNodeID varchar(255) )";
                 string tbl_node_data_related_T3000 = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_data_related_T3000  (count INTEGER PRIMARY KEY AUTOINCREMENT, nodeID varchar(255), param1_panelID varchar(255), param1_inputIndex varchar(255), param2_panelID varchar(255), param2_inputIndex varchar(255)) ";
                 //string tbl_node_value = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),name varchar(255),temperature_source varchar(255),humidity_source varchar(255),colorValue varchar(255),nodeSize varchar(255),airFlow varchar(225),lastUpdatedDate varchar(255))";
-                string tbl_node_value = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),name varchar(255),temperature_source varchar(255),pressure_source varchar(255),colorValue varchar(255),nodeSize varchar(255),lastUpdatedDate varchar(255))";
+                string tbl_node_value = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),name varchar(255),temperature_source varchar(255),pressure_source varchar(255),colorValue varchar(255),nodeSize varchar(255),lastUpdatedXValue varchar(255),lastUpdatedYValue varchar(255))";//,lastUpdatedDate varchar(255))";
 
                 string tbl_TemperatureHumiditySourceInfo = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_TemperaturePressureSourceInfo(count INTEGER PRIMARY KEY AUTOINCREMENT,NodeID varchar(255), chartID varchar(255) ,TemperatureSourceInfo VARCHAR(255),PressureSourceInfo varchar(255))";
                 //string tbl_Weather_Controller_Restor_Info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Weather_Controller_Restor_Info(count INTEGER PRIMARY KEY AUTOINCREMENT,BuildingName varchar(255), ControllerNameInfo varchar(255) ,TemperatureParameterInfo VARCHAR(255),HumidityParameterInfo varchar(255),TempValue varchar(255),HumValue varchar(255))";
@@ -1065,7 +1072,7 @@ namespace PH_App
                 //string tbl_mix_node_info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_mix_node_info  ( count INTEGER PRIMARY KEY AUTOINCREMENT,nodeID varchar(255),chartID varchar(255),previousNodeID varchar(255),nextNodeID varchar(255) )";
                 string tbl_node_data_related_T3000 = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_data_related_T3000  (count INTEGER PRIMARY KEY AUTOINCREMENT, nodeID varchar(255), param1_panelID varchar(255), param1_inputIndex varchar(255), param2_panelID varchar(255), param2_inputIndex varchar(255)) ";
                 // string tbl_node_value = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),name varchar(255),temperature_source varchar(255),humidity_source varchar(255),colorValue varchar(255),nodeSize varchar(255),airFlow varchar(225),lastUpdatedDate varchar(255))";
-                string tbl_node_value = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),name varchar(255),temperature_source varchar(255),pressure_source varchar(255),colorValue varchar(255),nodeSize varchar(255),lastUpdatedDate varchar(255))";
+                string tbl_node_value = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_node_value(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),name varchar(255),temperature_source varchar(255),pressure_source varchar(255),colorValue varchar(255),nodeSize varchar(255),lastUpdatedXValue varchar(255),lastUpdatedYValue varchar(255))";//,lastUpdatedDate varchar(255))";
 
                 string tbl_TemperatureHumiditySourceInfo = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_TemperaturePressureSourceInfo(count INTEGER PRIMARY KEY AUTOINCREMENT,NodeID varchar(255), chartID varchar(255) ,TemperatureSourceInfo VARCHAR(255),PressureSourceInfo varchar(255))";
                 //string tbl_Weather_Controller_Restor_Info = "CREATE TABLE IF NOT EXISTS tbl_" + buildingNameSelected + "_Weather_Controller_Restor_Info(count INTEGER PRIMARY KEY AUTOINCREMENT,BuildingName varchar(255), ControllerNameInfo varchar(255) ,TemperatureParameterInfo VARCHAR(255),HumidityParameterInfo varchar(255),TempValue varchar(255),HumValue varchar(255))";
@@ -1681,7 +1688,7 @@ namespace PH_App
                 //for node info
                 //--Modified to new: This one was intial query
                 //string sql = "create table IF NOT EXISTS " + tableForNode + "(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),source varchar(255),name varchar(255),label varchar(255),colorValue varchar(255),showTextItem varchar(255),nodeSize varchar(255))";
-                string sql = "create table IF NOT EXISTS " + tableForNode + "(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),name varchar(255),temperature_source varchar(255),pressure_source varchar(255),colorValue varchar(255),nodeSize varchar(255),lastUpdatedDate varchar(255))";
+                string sql = "create table IF NOT EXISTS " + tableForNode + "(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),name varchar(255),temperature_source varchar(255),pressure_source varchar(255),colorValue varchar(255),nodeSize varchar(255),lastUpdatedXValue varchar(255),lastUpdatedYValue varchar(255))";//,lastUpdatedDate varchar(255))";
                 SQLiteCommand command = new SQLiteCommand(sql, connection);
                 command.ExecuteNonQuery();
 
@@ -1995,8 +2002,9 @@ namespace PH_App
                             // showItemText = reader["showTextItem"].ToString(),
                             marker_Size = int.Parse(reader["nodeSize"].ToString()),
                             //airFlow = int.Parse(reader["airFlow"].ToString()),
-                            lastUpdatedDate = reader["lastUpdatedDate"].ToString()
-                           
+                            //lastUpdatedDate = reader["lastUpdatedDate"].ToString()
+                            lastUpdatedXValue = reader["lastUpdatedXValue"].ToString(),
+                            lastUpdatedYValue = reader["lastUpdatedYValue"].ToString()
 
 
                         });
@@ -2100,7 +2108,8 @@ namespace PH_App
             using (SQLiteConnection connection = new SQLiteConnection(connString))
             {
                 connection.Open();
-                string sql_string = "insert into " + tableName + "(chart_respective_nodeID,nodeID,xValue,yValue,temperature_source,pressure_source,name,colorValue,nodeSize,lastUpdatedDate) VALUES(@chartid,@id,@xVal,@yVal,@temperature_source,@pressure_source,@name,@colorVal,@node_size_value,@lastUpdateDate)";
+                //string sql_string = "insert into " + tableName + "(chart_respective_nodeID,nodeID,xValue,yValue,temperature_source,pressure_source,name,colorValue,nodeSize,lastUpdatedDate) VALUES(@chartid,@id,@xVal,@yVal,@temperature_source,@pressure_source,@name,@colorVal,@node_size_value,@lastUpdateDate)";
+                string sql_string = "insert into " + tableName + "(chart_respective_nodeID,nodeID,xValue,yValue,temperature_source,pressure_source,name,colorValue,nodeSize,lastUpdatedXValue,lastUpdatedYValue) VALUES(@chartid,@id,@xVal,@yVal,@temperature_source,@pressure_source,@name,@colorVal,@node_size_value,@lastUpdateDateX,@lastUpdateDateY)";
                 SQLiteCommand command = new SQLiteCommand(sql_string, connection);
                 command.CommandType = CommandType.Text;
                 command.Parameters.AddWithValue("@chartid", chart_respective_nodeID);
@@ -2113,8 +2122,8 @@ namespace PH_App
                 command.Parameters.AddWithValue("@colorVal", ColorTranslator.ToHtml(colorValue));
                 command.Parameters.AddWithValue("@node_size_value", nodeSizeValue);
                 //command.Parameters.AddWithValue("@airFlow", airFlow);
-                command.Parameters.AddWithValue("@lastUpdateDate", DateTime.Now);//Lets store the date time in the node values
-
+                command.Parameters.AddWithValue("@lastUpdateDateX", DateTime.Now.ToString("G",DateTimeFormatInfo.InvariantInfo));//Lets store the date time in the node values
+                command.Parameters.AddWithValue("@lastUpdateDateY", DateTime.Now.ToString("G", DateTimeFormatInfo.InvariantInfo));
                 command.ExecuteNonQuery();
             }
 
@@ -2284,9 +2293,10 @@ namespace PH_App
                             marker_Size = int.Parse(reader["nodeSize"].ToString()),
                             temperature_source = reader["temperature_source"].ToString(),
                             pressure_source = reader["pressure_source"].ToString(),
-                           // airFlow = double.Parse(reader["airFlow"].ToString()),
-                            lastUpdatedDate = reader["lastUpdatedDate"].ToString()
-
+                            // airFlow = double.Parse(reader["airFlow"].ToString()),
+                            //lastUpdatedDate = reader["lastUpdatedDate"].ToString()
+                            lastUpdatedXValue = reader["lastUpdatedDateXValue"].ToString(),
+                            lastUpdatedYValue = reader["lastUpdatedDateYValue"].ToString()
 
 
                         });
@@ -2563,8 +2573,9 @@ namespace PH_App
             //public string showTextItem { get; set; }
             public int nodeSize { get; set; }
            // public int airFlow { get; set; }
-            public string lastUpdatedDate { get; set; }
-
+            //public string lastUpdatedDate { get; set; }
+            public string lastUpdatedXValue { get; set; }
+            public string lastUpdatedYValue { get; set; }
         }
         
         public class chartDetailDT_X
@@ -2737,9 +2748,10 @@ namespace PH_App
                             colorValue = reader1["colorValue"].ToString(),
                             // showTextItem = reader1["showTextItem"].ToString(),
                             nodeSize = int.Parse(reader1["nodeSize"].ToString()),
-                           // airFlow = int.Parse(reader1["airFlow"].ToString()),
-                            lastUpdatedDate = reader1["lastUpdatedDate"].ToString()
-
+                            // airFlow = int.Parse(reader1["airFlow"].ToString()),
+                            //lastUpdatedDate = reader1["lastUpdatedDate"].ToString()
+                            lastUpdatedXValue = reader1["lastUpdatedXValue"].ToString(),
+                            lastUpdatedYValue = reader1["lastUpdatedYValue"].ToString()
                         });
                     }
 
@@ -2926,7 +2938,7 @@ namespace PH_App
                 command3.ExecuteNonQuery();
 
                 //for node info
-                string sql = "create table IF NOT EXISTS " + tableForNode + "(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),temperature_source varchar(255),pressure_source varchar(255),name varchar(255),colorValue varchar(255),nodeSize varchar(255),lastUpdatedDate varchar(255))";
+                string sql = "create table IF NOT EXISTS " + tableForNode + "(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),temperature_source varchar(255),pressure_source varchar(255),name varchar(255),colorValue varchar(255),nodeSize varchar(255),lastUpdatedXValue varchar(255),lastUpdatedYValue varchar(255))";//,lastUpdatedDate varchar(255))";
                 SQLiteCommand command = new SQLiteCommand(sql, connection);
                 command.ExecuteNonQuery();
 
@@ -2992,7 +3004,8 @@ namespace PH_App
                 //--Now lest input the node id
                 foreach (var ch in nodeInfoPulledForSaving)
                 {
-                    string sql_string = "insert into " + nodeTableName + " (chart_respective_nodeID,nodeID,xValue,yValue,temperature_source,pressure_source,name,colorValue,nodeSize,lastUpdatedDate) VALUES(@chartid,@id,@xVal,@yVal,@tempsource,@prsource,@name,@colorVal,@node_size_value,@lastUpdatedValue)";
+                    //string sql_string = "insert into " + nodeTableName + " (chart_respective_nodeID,nodeID,xValue,yValue,temperature_source,pressure_source,name,colorValue,nodeSize,lastUpdatedDate) VALUES(@chartid,@id,@xVal,@yVal,@tempsource,@prsource,@name,@colorVal,@node_size_value,@lastUpdatedValue)";
+                    string sql_string = "insert into " + nodeTableName + " (chart_respective_nodeID,nodeID,xValue,yValue,temperature_source,pressure_source,name,colorValue,nodeSize,lastUpdateXValue,lastUpdatedYValue) VALUES(@chartid,@id,@xVal,@yVal,@tempsource,@prsource,@name,@colorVal,@node_size_value,@lastUpdatedX,@lastUpdatedY)";
                     SQLiteCommand command = new SQLiteCommand(sql_string, m_dbConnection);
                     command.CommandType = CommandType.Text;
                     command.Parameters.AddWithValue("@chartid", ch.chart_respective_nodeID);
@@ -3006,8 +3019,9 @@ namespace PH_App
                     command.Parameters.AddWithValue("@colorVal", ch.colorValue);
                     //command.Parameters.AddWithValue("@text", ch.showTextItem);
                     command.Parameters.AddWithValue("@node_size_value", ch.nodeSize);
-                   // command.Parameters.AddWithValue("@airflow", ch.airFlow);
-                    command.Parameters.AddWithValue("@lastUpdatedValue", ch.lastUpdatedDate);
+                    // command.Parameters.AddWithValue("@airflow", ch.airFlow);
+                    command.Parameters.AddWithValue("@lastUpdatedX", ch.lastUpdatedXValue);
+                    command.Parameters.AddWithValue("@lastUpdatedY", ch.lastUpdatedYValue);
                     command.ExecuteNonQuery();
                 }
 
@@ -3370,8 +3384,11 @@ namespace PH_App
                                 colorValue = reader1["colorValue"].ToString(),
                                 //showTextItem = reader1["showTextItem"].ToString(),
                                 nodeSize = int.Parse(reader1["nodeSize"].ToString()),
-                               // airFlow = int.Parse(reader1["airFlow"].ToString()),
-                                lastUpdatedDate = reader1["lastUpdatedDate"].ToString()
+                                // airFlow = int.Parse(reader1["airFlow"].ToString()),
+                                // lastUpdatedDate = reader1["lastUpdatedDate"].ToString()
+                                lastUpdatedXValue = reader1["lastUpdatedXValue"].ToString(),
+                                lastUpdatedYValue = reader1["lastUpdatedYValue"].ToString()
+
                             });
                         }
 
@@ -3645,7 +3662,8 @@ namespace PH_App
                 //--Now lest input the node id
                 foreach (var ch in nodeInfoPulledForSaving_For_Load)
                 {
-                    string sql_string = "insert into " + nodeTableName + " (chart_respective_nodeID,nodeID,xValue,yValue,temperature_source,pressure_source,name,colorValue,nodeSize,lastUpdatedDate) VALUES(@chartid,@id,@xVal,@yVal,@temperature_source,@pressure_source,@name,@colorVal,@node_size_value,@lastupdateddate)";
+                    // string sql_string = "insert into " + nodeTableName + " (chart_respective_nodeID,nodeID,xValue,yValue,temperature_source,pressure_source,name,colorValue,nodeSize,lastUpdatedDate) VALUES(@chartid,@id,@xVal,@yVal,@temperature_source,@pressure_source,@name,@colorVal,@node_size_value,@lastupdateddate)";
+                    string sql_string = "insert into " + nodeTableName + " (chart_respective_nodeID,nodeID,xValue,yValue,temperature_source,pressure_source,name,colorValue,nodeSize,lastUpdatedXValue,lastUpdatedYValue) VALUES(@chartid,@id,@xVal,@yVal,@temperature_source,@pressure_source,@name,@colorVal,@node_size_value,@lastupdatedX,@lastupdatedY)";
                     SQLiteCommand command = new SQLiteCommand(sql_string, m_dbConnection);
                     command.CommandType = CommandType.Text;
                     command.Parameters.AddWithValue("@chartid", ch.chart_respective_nodeID);
@@ -3661,7 +3679,8 @@ namespace PH_App
                     //command.Parameters.AddWithValue("@text", ch.showTextItem);
                     command.Parameters.AddWithValue("@node_size_value", ch.nodeSize);
                    // command.Parameters.AddWithValue("@airflow", ch.airFlow);
-                    command.Parameters.AddWithValue("@lastupdateddate", ch.lastUpdatedDate);
+                    command.Parameters.AddWithValue("@lastupdatedX", ch.lastUpdatedXValue);
+                    command.Parameters.AddWithValue("@lastupdatedY", ch.lastUpdatedYValue);
                     command.ExecuteNonQuery();
                 }
 
@@ -3887,7 +3906,9 @@ namespace PH_App
                             // showTextItem = reader1["showTextItem"].ToString(),
                             nodeSize = int.Parse(reader1["nodeSize"].ToString()),
                             //airFlow = int.Parse(reader1["airFlow"].ToString()),
-                            lastUpdatedDate = reader1["lastUpdatedDate"].ToString()
+                            // lastUpdatedDate = reader1["lastUpdatedDate"].ToString()
+                            lastUpdatedXValue = reader1["lastUpdatedXValue"].ToString(),
+                            lastUpdatedYValue = reader1["lastUpdatedYValue"].ToString()
 
                         });
                     }
@@ -4160,7 +4181,8 @@ namespace PH_App
                 command3.ExecuteNonQuery();
 
                 //for node info
-                string sql = "create table IF NOT EXISTS " + tableForNode + "(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),temperature_source varchar(255),pressure_source varchar(255),name varchar(255),colorValue varchar(255),nodeSize varchar(255),airFlow varchar(255),lastUpdatedDate varchar(255))";
+                //string sql = "create table IF NOT EXISTS " + tableForNode + "(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),temperature_source varchar(255),pressure_source varchar(255),name varchar(255),colorValue varchar(255),nodeSize varchar(255),airFlow varchar(255),lastUpdatedDate varchar(255))";
+                string sql = "create table IF NOT EXISTS " + tableForNode + "(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),temperature_source varchar(255),pressure_source varchar(255),name varchar(255),colorValue varchar(255),nodeSize varchar(255),airFlow varchar(255),lastUpdatedXValue varchar(255),lastUpdatedYValue varchar(255))";
                 SQLiteCommand command = new SQLiteCommand(sql, connection);
                 command.ExecuteNonQuery();
 
@@ -4472,7 +4494,8 @@ namespace PH_App
             using (SQLiteConnection connection = new SQLiteConnection(connString))
             {
                 connection.Open();
-                string sql_string = "UPDATE " + tableName + "   set  xValue =@xVal ,  yValue=@yVal, temperature_source=@tempSource,pressure_source=@pressureSource ,name=@name,  colorValue=@colorVal, nodeSize=@node_size_value ,lastUpdatedDate= @date  where nodeID  =@id";
+                //string sql_string = "UPDATE " + tableName + "   set  xValue =@xVal ,  yValue=@yVal, temperature_source=@tempSource,pressure_source=@pressureSource ,name=@name,  colorValue=@colorVal, nodeSize=@node_size_value ,lastUpdatedDate= @date  where nodeID  =@id";
+                string sql_string = "UPDATE " + tableName + "   set  xValue =@xVal ,  yValue=@yVal, temperature_source=@tempSource,pressure_source=@pressureSource ,name=@name,  colorValue=@colorVal, nodeSize=@node_size_value ,lastUpdatedXValue= @date,lastUpdatedYValue= @dateY  where nodeID  =@id";
                 SQLiteCommand command = new SQLiteCommand(sql_string, connection);
                 command.CommandType = CommandType.Text;
                 command.Parameters.AddWithValue("@xVal", xVal.ToString());
@@ -4486,7 +4509,8 @@ namespace PH_App
                 //command.Parameters.AddWithValue("@text", showItemText);
                // command.Parameters.AddWithValue("@airflow", airFlow.ToString());
                 command.Parameters.AddWithValue("@node_size_value", nodeSizeValue);
-                command.Parameters.AddWithValue("@date", DateTime.Now); //This is the date presented at what time the update  was performed
+                command.Parameters.AddWithValue("@date", DateTime.Now.ToString("G", DateTimeFormatInfo.InvariantInfo)); //This is the date presented at what time the update  was performed
+                command.Parameters.AddWithValue("@dateY", DateTime.Now.ToString("G", DateTimeFormatInfo.InvariantInfo));
                 command.Parameters.AddWithValue("@id", id);
                 //MessageBox.Show("selected value = " + cb_station_names.SelectedItem.ToString());
                 command.ExecuteNonQuery();
@@ -4998,11 +5022,12 @@ namespace PH_App
             using (SQLiteConnection connection = new SQLiteConnection(connString))
             {
                 connection.Open();
-                string sql_string = "UPDATE " + tableName + "   set  xValue =@xVal , lastUpdatedDate=@date   where nodeID  =@id";
+                //string sql_string = "UPDATE " + tableName + "   set  xValue =@xVal , lastUpdatedDate=@date   where nodeID  =@id";
+                string sql_string = "UPDATE " + tableName + "   set  xValue =@xVal , lastUpdatedXValue=@date   where nodeID  =@id";
                 SQLiteCommand command = new SQLiteCommand(sql_string, connection);
                 command.CommandType = CommandType.Text;
                 command.Parameters.AddWithValue("@xVal", xVal.ToString());              
-                command.Parameters.AddWithValue("@date", DateTime.Now.ToString());
+                command.Parameters.AddWithValue("@date", DateTime.Now.ToString("G", DateTimeFormatInfo.InvariantInfo));
                 command.Parameters.AddWithValue("@id", id);
                 //MessageBox.Show("selected value = " + cb_station_names.SelectedItem.ToString());
                 command.ExecuteNonQuery();
@@ -5022,13 +5047,14 @@ namespace PH_App
             using (SQLiteConnection connection = new SQLiteConnection(connString))
             {
                 connection.Open();
-                string sql_string = "UPDATE " + tableName + "   set   yValue=@yVal, lastUpdatedDate=@date  where nodeID  =@id";
+                //string sql_string = "UPDATE " + tableName + "   set   yValue=@yVal, lastUpdatedDate=@date  where nodeID  =@id";
+                string sql_string = "UPDATE " + tableName + "   set   yValue=@yVal, lastUpdatedYValue=@date  where nodeID  =@id";
                 SQLiteCommand command = new SQLiteCommand(sql_string, connection);
                 command.CommandType = CommandType.Text;
                 // command.Parameters.AddWithValue("@xVal", xVal.ToString());
                 command.Parameters.AddWithValue("@yVal", yVal.ToString());
                
-                command.Parameters.AddWithValue("@date", DateTime.Now.ToString());
+                command.Parameters.AddWithValue("@date", DateTime.Now.ToString("G", DateTimeFormatInfo.InvariantInfo));
                 command.Parameters.AddWithValue("@id", id);
                 //MessageBox.Show("selected value = " + cb_station_names.SelectedItem.ToString());
                 command.ExecuteNonQuery();
@@ -5089,8 +5115,9 @@ namespace PH_App
                         // showItemText = reader["showTextItem"].ToString(),
                         marker_Size = int.Parse(reader["nodeSize"].ToString()),
                         //airFlow = int.Parse(reader["airFlow"].ToString()),
-                        lastUpdatedDate = reader["lastUpdatedDate"].ToString()
-
+                        // lastUpdatedDate = reader["lastUpdatedDate"].ToString()
+                        lastUpdatedXValue = reader["lastUpdatedXValue"].ToString(),
+                        lastUpdatedYValue = reader["lastUpdatedYValue"].ToString()
 
                     });
                 }

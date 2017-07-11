@@ -960,95 +960,7 @@ namespace PH_App
                         pressure_sourceValue = pressure_value_for_Device;
                         indexForSource = 2;
                     }
-
-
-                    //--Samething for humidity
-                    //var dgvcbc1 = CB_DGV_Humidity_Source;//dataGridView1.Rows[0].Cells[4];
-                    //dgvcbc1.Items.Clear();
-                    //dgvcbc1.Items.Add("Manual");
-                    //dgvcbc1.Items.Add("Web");
-                    //if (bcs.menuStripNodeInfoValues[i].humidity_source == "Device")
-                    //{
-                    //    dgvcbc1.Items.Add(humidity_sourceValue);
-
-                    //}
-                    //else
-                    //{
-                    //    dgvcbc1.Items.Add("Device");
-                    //}
-
-                    // DataGridViewComboBoxColumn cb = (DataGridViewComboBoxColumn)showText;
-                    //cb.Items[0].ToString();
-                    // MessageBox.Show("source VALUE MEMBER= " + CB_DGV_Source.Items[indexForSource]);
-                   // bcs.enthalpyHumidityCalculatorForXYvalue(bcs.menuStripNodeInfoValues[i].xVal, bcs.menuStripNodeInfoValues[i].yVal);
-
-                    //if (bcs.listNodeInfoValues[i].pressure_source == "Mix")
-                    //{
-                    //    //string[] row = new string[] { bcs.menuStripNodeInfoValues[i].name,"Manual", bcs.menuStripNodeInfoValues[i].id, Math.Round(bcs.menuStripNodeInfoValues[i].xVal, 2).ToString(),"Manual", Math.Round(bcs.humDataGridValue, 2).ToString(), Math.Round(bcs.enthalpyDataGridView, 2).ToString(), " ", bcs.menuStripNodeInfoValues[i].marker_Size.ToString(), bcs.menuStripNodeInfoValues[i].airFlow.ToString() };
-                    //    //dataGridView1.Rows.Add(row);
-
-                    //    dataGridView1.Rows.Add();//After adding rows assigning the values to the Rows 2 datagridviewComboboxCell
-
-                    //    //--This one if for temperature 
-                    //    DataGridViewComboBoxCell cb = (DataGridViewComboBoxCell)dataGridView1.Rows[i].Cells[1];
-                    //    cb.Items.Clear();
-                    //    cb.Items.Add("Manual");
-                    //    cb.Items.Add("Web");
-                    //    if (bcs.listNodeInfoValues[i].temperature_source == "Device")
-                    //    {
-                    //        cb.Items.Add(temperature_value_For_Device);
-
-                    //    }
-                    //    else
-                    //    {
-                    //        cb.Items.Add("Device");
-
-                    //    }
-
-                    //    //--For humidity
-                    //    DataGridViewComboBoxCell cb_Hum = (DataGridViewComboBoxCell)dataGridView1.Rows[i].Cells[4];
-                    //    cb_Hum.Items.Clear();
-                    //    cb_Hum.Items.Add("Manual");
-                    //    cb_Hum.Items.Add("Web");
-                    //    if (bcs.listNodeInfoValues[i].pressure_source == "Device")
-                    //    {
-                    //        cb_Hum.Items.Add(pressure_value_for_Device);
-
-                    //    }
-                    //    else
-                    //    {
-                    //        cb_Hum.Items.Add("Device");
-                    //    }
-                    //    //--Now assigning the values , for mix node
-                    //    dataGridView1.Rows[i].Cells[0].Value = bcs.listNodeInfoValues[i].name;
-                    //    dataGridView1.Rows[i].Cells[1].Value = "Manual"; //bcs.menuStripNodeInfoValues[i].name;
-                    //    dataGridView1.Rows[i].Cells[2].Value = bcs.listNodeInfoValues[i].ID;
-                    //    dataGridView1.Rows[i].Cells[3].Value = Math.Round(bcs.listNodeInfoValues[i].xVal, 2).ToString();
-                    //    dataGridView1.Rows[i].Cells[4].Value = "Manual";
-                    //    dataGridView1.Rows[i].Cells[5].Value = "";//Math.Round(bcs.humDataGridValue, 2).ToString();//"Manual";
-                    //    dataGridView1.Rows[i].Cells[6].Value = Math.Round(bcs.listNodeInfoValues[i].xVal, 2).ToString();//Math.Round(bcs.enthalpyDataGridView, 2).ToString();//"Manual";
-                    //    dataGridView1.Rows[i].Cells[7].Value = "";
-                    //    dataGridView1.Rows[i].Cells[8].Value = bcs.listNodeInfoValues[i].marker_Size.ToString();//"Manual";
-                    //    //dataGridView1.Rows[i].Cells[9].Value = bcs.menuStripNodeInfoValues[i].airFlow.ToString(); //"Manual";
-
-
-
-
-
-                    //    //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[4].ReadOnly = false;
-                    //    //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].ReadOnly = false;
-                    //    //indexForParticularRow
-                    //    dataGridView1.Rows[indexForParticularRow].Cells[1].ReadOnly = true;
-                    //    dataGridView1.Rows[indexForParticularRow].Cells[3].ReadOnly = true;
-                    //    dataGridView1.Rows[indexForParticularRow].Cells[4].ReadOnly = true;
-                    //    dataGridView1.Rows[indexForParticularRow].Cells[5].ReadOnly = true;
-                    //    dataGridView1.Rows[indexForParticularRow].Cells[6].ReadOnly = true;
-                    //   // dataGridView1.Rows[indexForParticularRow].Cells[9].ReadOnly = true;
-
-                    //}
-                    //else
-                    //{
-
+                    
                         // string[] row = new string[] { bcs.menuStripNodeInfoValues[i].name,  CB_DGV_Temperature_Source.Items[temperature_indexValue].ToString(), bcs.menuStripNodeInfoValues[i].id, Math.Round(bcs.menuStripNodeInfoValues[i].xVal, 2).ToString(),CB_DGV_Humidity_Source.Items[indexForSource].ToString() ,Math.Round(bcs.humDataGridValue, 2).ToString(), Math.Round(bcs.enthalpyDataGridView, 2).ToString(), " ", bcs.menuStripNodeInfoValues[i].marker_Size.ToString(),bcs.menuStripNodeInfoValues[i].airFlow.ToString() };
                         // string[] row = new string[] { bcs.menuStripNodeInfoValues[i].name, temperature_value, bcs.menuStripNodeInfoValues[i].id, Math.Round(bcs.menuStripNodeInfoValues[i].xVal, 2).ToString(), CB_DGV_Humidity_Source.Items[indexForSource].ToString(), Math.Round(bcs.humDataGridValue, 2).ToString(), Math.Round(bcs.enthalpyDataGridView, 2).ToString(), " ", bcs.menuStripNodeInfoValues[i].marker_Size.ToString(), bcs.menuStripNodeInfoValues[i].airFlow.ToString() };
                         //--This one is for enabling or dissabling a particualr row
@@ -1295,8 +1207,8 @@ namespace PH_App
              Lets store the node1 and node2 parameters in variables.
              */
             //--variables to store info of two nodes
-            string idNode1 = "", lastUpdatedDateNode1 = "", humiditySourceNode1 = "", temperatureSourceNode1 = "", nameNode1 = "";
-            string idNode2 = "", lastUpdatedDateNode2 = "", humiditySourceNode2 = "", temperatureSourceNode2 = "", nameNode2 = "";
+            string idNode1 = "", lastUpdatedDateNode1XValue = "", lastUpdatedDateNode1YValue = "", pressureScourceNode1 = "", temperatureSourceNode1 = "", nameNode1 = "";
+            string idNode2 = "", lastUpdatedDateNode2XValue = "", lastUpdatedDateNode2YValue = "", pressureSourceNode2 = "", temperatureSourceNode2 = "", nameNode2 = "";
             double xValueNode1 = 0, yValueNode1 = 0;
             double xValueNode2 = 0, yValueNode2 = 0;
             //int airFlowNode1 = 0, airFlowNode2 = 0;
@@ -1316,8 +1228,9 @@ namespace PH_App
                         {
                             nameNode1 = startNodeName = bcs.listNodeInfoValues[x].name;
                             idNode1 = bcs.listNodeInfoValues[x].ID;
-                            lastUpdatedDateNode1 = bcs.listNodeInfoValues[x].lastUpdatedDate;
-                            humiditySourceNode1 = bcs.listNodeInfoValues[x].pressure_source;
+                            lastUpdatedDateNode1XValue = bcs.listNodeInfoValues[x].lastUpdatedXValue;
+                            lastUpdatedDateNode1YValue = bcs.listNodeInfoValues[x].lastUpdatedYValue;
+                            pressureScourceNode1 = bcs.listNodeInfoValues[x].pressure_source;
                             temperatureSourceNode1 = bcs.listNodeInfoValues[x].temperature_source;
                             //nameNode1 =
                             xValueNode1 = bcs.listNodeInfoValues[x].xVal;
@@ -1335,8 +1248,9 @@ namespace PH_App
                         {
                             nameNode2 = endNodeName = bcs.listNodeInfoValues[v].name;
                             idNode2 = bcs.listNodeInfoValues[v].ID;
-                            lastUpdatedDateNode2 = bcs.listNodeInfoValues[v].lastUpdatedDate;
-                            humiditySourceNode2 = bcs.listNodeInfoValues[v].pressure_source;
+                            lastUpdatedDateNode2XValue = bcs.listNodeInfoValues[v].lastUpdatedXValue;
+                            lastUpdatedDateNode2YValue = bcs.listNodeInfoValues[v].lastUpdatedYValue;
+                            pressureSourceNode2 = bcs.listNodeInfoValues[v].pressure_source;
                             temperatureSourceNode2 = bcs.listNodeInfoValues[v].temperature_source;
                             //nameNode1 =
                             xValueNode2 = bcs.listNodeInfoValues[v].xVal;
@@ -1350,11 +1264,11 @@ namespace PH_App
                     //Lets calculate some energy parameters such as DBT, Relative humidity,humidity ratio,,
                     //specific volume, mass flow rate,enthalpy, Total energy flow, and heat change.
 
-                    //--Lets make a function which returns all the other values
-                    // EnergyParameterCalculationForTwoNodes(xValueNode1, yValueNode1, airFlowNode1, xValueNode2, yValueNode2, airFlowNode2);
-                    //double relativeHumidity1, relativeHumidity2, spVol1, spVol2, massFlowRate1, massFlowRate2, enthalpy1, enthalpy2, totalEnergyFlow1, totalEnergyFlow2, heatChange;
-                    //now lets display...                    
-                    string[] row = new string[] { bcs.listLineInfoValues[i].ID, bcs.listLineInfoValues[i].name, startNodeName, endNodeName, "", bcs.listLineInfoValues[i].lineThickness.ToString(), bcs.listLineInfoValues[i].prevNodeId.ToString(), bcs.listLineInfoValues[i].nextNodeId.ToString(), bcs.listLineInfoValues[i].lineSeriesID.ToString(), "" };//, Math.Round(xValueNode1, 2).ToString(), Math.Round(relativeHumidity1, 2).ToString(), Math.Round(yValueNode1, 2).ToString(), Math.Round(spVol1, 2).ToString(), Math.Round(massFlowRate1, 2).ToString(), Math.Round(enthalpy1, 2).ToString(), Math.Round(totalEnergyFlow1, 2).ToString(), Math.Round(xValueNode2, 2).ToString(), Math.Round(relativeHumidity2, 2).ToString(), Math.Round(yValueNode2, 2).ToString(), Math.Round(spVol2, 2).ToString(), Math.Round(massFlowRate2, 2).ToString(), Math.Round(enthalpy2, 2).ToString(), Math.Round(totalEnergyFlow2, 2).ToString(), Math.Round(heatChangeForBoth, 2).ToString() };
+                    //--Calculate energy values
+                    EnergyParameterCalculationForTwoNodes(xValueNode1, yValueNode1, xValueNode2, yValueNode2);
+
+                     //now lets display...                    
+                    string[] row = new string[] { bcs.listLineInfoValues[i].ID, bcs.listLineInfoValues[i].name, startNodeName, endNodeName, "", bcs.listLineInfoValues[i].lineThickness.ToString(), bcs.listLineInfoValues[i].prevNodeId.ToString(), bcs.listLineInfoValues[i].nextNodeId.ToString(), bcs.listLineInfoValues[i].lineSeriesID.ToString(), "",node1Temperature.ToString(), node2Temperature.ToString(), node1Pressure.ToString(), node2Pressure.ToString(), node1Enthalpy.ToString(), node2Enthalpy.ToString(),heatChange.ToString() };
                     dataGridView2.Rows.Add(row);
 
                     DataGridViewButtonCell buttonCell = (DataGridViewButtonCell)dataGridView2.Rows[i].Cells[4];
@@ -1384,6 +1298,27 @@ namespace PH_App
             //  dataGridView1.Enabled = true;
 
         }
+
+        public double node1Temperature=0, node2Temperature=0, node1Pressure=0, node2Pressure=0, node1Enthalpy=0, node2Enthalpy=0, heatChange=0;
+
+        public void EnergyParameterCalculationForTwoNodes(double node1_X_Value, double node1_Y_Value,  double node2_X_Value, double node2_Y_Value)
+        {
+            node1Enthalpy =Math.Round( node1_X_Value,3);
+            node2Enthalpy = Math.Round(node2_X_Value,3);
+            node1Pressure = Math.Round(node1_Y_Value,3);
+            node2Pressure = Math.Round(node2_Y_Value,3);
+
+            //--For temperature 
+            MathOperation mth = new MathOperation();
+            //Math.Round(mth.IAPWS_IF97_TowParameterEquivalentFxn("T", "P", bcs.listNodeInfoValues[i].yVal * 1000000, "H", bcs.listNodeInfoValues[i].xVal * 1000, fmain.lbFluidName.Text), 2) - 273.15; //CoolProp.PropsSI()//Now in degreecelcius
+            node1Temperature = Math.Round(mth.IAPWS_IF97_TowParameterEquivalentFxn("T", "P", node1_Y_Value * 1000000, "H", node1_X_Value * 1000, fmain.lbFluidName.Text), 3) - 273.15; //CoolProp.PropsSI()//Now in degreecelcius
+           node2Temperature = Math.Round(mth.IAPWS_IF97_TowParameterEquivalentFxn("T", "P", node2_Y_Value * 1000000, "H", node2_X_Value * 1000, fmain.lbFluidName.Text), 3) - 273.15; //CoolProp.PropsSI()//Now in degreecelcius
+
+            heatChange = Math.Round(node2_X_Value - node1_X_Value,3);
+            
+
+        }
+
         private void dataGridView1_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
         {
             try
@@ -3168,8 +3103,8 @@ namespace PH_App
 
                  MathOperation mth = new MathOperation();
                 //Math.Round(mth.IAPWS_IF97_TowParameterEquivalentFxn("T", "P", bcs.listNodeInfoValues[i].yVal * 1000000, "H", bcs.listNodeInfoValues[i].xVal * 1000, fmain.lbFluidName.Text), 2) - 273.15; //CoolProp.PropsSI()//Now in degreecelcius
-                double temperatureValueNode1 = Math.Round(mth.IAPWS_IF97_TowParameterEquivalentFxn("T", "P", temporaryNodeValueStoreForRedrawLine[0].yVal * 1000000, "H", temporaryNodeValueStoreForRedrawLine[0].xVal * 1000, fmain.lbFluidName.Text), 2) - 273.15; //CoolProp.PropsSI()//Now in degreecelcius
-                double temperatureValueNode2 = Math.Round(mth.IAPWS_IF97_TowParameterEquivalentFxn("T", "P", temporaryNodeValueStoreForRedrawLine[1].yVal * 1000000, "H", temporaryNodeValueStoreForRedrawLine[1].xVal * 1000, fmain.lbFluidName.Text), 2) - 273.15; //CoolProp.PropsSI()//Now in degreecelcius
+                double temperatureValueNode1 = Math.Round(mth.IAPWS_IF97_TowParameterEquivalentFxn("T", "P", temporaryNodeValueStoreForRedrawLine[0].yVal * 1000000, "H", temporaryNodeValueStoreForRedrawLine[0].xVal * 1000, fmain.lbFluidName.Text), 3) - 273.15; //CoolProp.PropsSI()//Now in degreecelcius
+                double temperatureValueNode2 = Math.Round(mth.IAPWS_IF97_TowParameterEquivalentFxn("T", "P", temporaryNodeValueStoreForRedrawLine[1].yVal * 1000000, "H", temporaryNodeValueStoreForRedrawLine[1].xVal * 1000, fmain.lbFluidName.Text), 3) - 273.15; //CoolProp.PropsSI()//Now in degreecelcius
                 lb_process.Text = name;
                 lb_process.ForeColor = colorVal;
                 lb_process.BackColor = Color.White;
@@ -3181,16 +3116,16 @@ namespace PH_App
                 lb_node_two_name.ForeColor = temporaryNodeValueStoreForRedrawLine[1].colorValue;
                 lb_node_two_name.BackColor = Color.White;
 
-                lb_dbt_node1_value.Text = Math.Round(temperatureValueNode1,2).ToString();
-                lb_dbt_node2_value.Text = Math.Round(temperatureValueNode2, 2).ToString();
+                lb_dbt_node1_value.Text = Math.Round(temperatureValueNode1,3).ToString();
+                lb_dbt_node2_value.Text = Math.Round(temperatureValueNode2, 3).ToString();
 
-                lb_enthalpy_node1_value.Text = Math.Round(temporaryNodeValueStoreForRedrawLine[0].xVal, 2).ToString();
-                lb_enthalpy_node2_value.Text = Math.Round(temporaryNodeValueStoreForRedrawLine[1].xVal, 2).ToString();
+                lb_enthalpy_node1_value.Text = Math.Round(temporaryNodeValueStoreForRedrawLine[0].xVal, 3).ToString();
+                lb_enthalpy_node2_value.Text = Math.Round(temporaryNodeValueStoreForRedrawLine[1].xVal, 3).ToString();
 
-                lb_Pressure_node1.Text= Math.Round(temporaryNodeValueStoreForRedrawLine[0].yVal, 2).ToString();
-                lb_Pressure_node2.Text = Math.Round(temporaryNodeValueStoreForRedrawLine[1].yVal, 2).ToString();
+                lb_Pressure_node1.Text= Math.Round(temporaryNodeValueStoreForRedrawLine[0].yVal, 3).ToString();
+                lb_Pressure_node2.Text = Math.Round(temporaryNodeValueStoreForRedrawLine[1].yVal, 3).ToString();
 
-
+                lbEnthalpyChange.Text = Math.Round((temporaryNodeValueStoreForRedrawLine[1].xVal - temporaryNodeValueStoreForRedrawLine[0].xVal), 3).ToString();
 
             }//close of temporary node value
 
