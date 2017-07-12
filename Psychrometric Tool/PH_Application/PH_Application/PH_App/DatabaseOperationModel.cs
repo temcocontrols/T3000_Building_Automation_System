@@ -2122,8 +2122,10 @@ namespace PH_App
                 command.Parameters.AddWithValue("@colorVal", ColorTranslator.ToHtml(colorValue));
                 command.Parameters.AddWithValue("@node_size_value", nodeSizeValue);
                 //command.Parameters.AddWithValue("@airFlow", airFlow);
-                command.Parameters.AddWithValue("@lastUpdateDateX", DateTime.Now.ToString("G",DateTimeFormatInfo.InvariantInfo));//Lets store the date time in the node values
-                command.Parameters.AddWithValue("@lastUpdateDateY", DateTime.Now.ToString("G", DateTimeFormatInfo.InvariantInfo));
+                //command.Parameters.AddWithValue("@lastUpdateDateX", DateTime.Now.ToString("G",DateTimeFormatInfo.InvariantInfo));
+                //command.Parameters.AddWithValue("@lastUpdateDateY", DateTime.Now.ToString("G", DateTimeFormatInfo.InvariantInfo));
+                command.Parameters.AddWithValue("@lastUpdateDateX", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture));//Lets store the date time in the node values
+                command.Parameters.AddWithValue("@lastUpdateDateY", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture));
                 command.ExecuteNonQuery();
             }
 
@@ -2364,44 +2366,6 @@ namespace PH_App
                 command.ExecuteNonQuery();
 
             }//Close of using
-
-
-            ///===========This one is for deleting the mix node information form chart==========//
-            //string tableNameForMixValue = "tbl_" + selectedBuildingList[0].BuildingName + "_mix_node_info";
-            //using (SQLiteConnection connection = new SQLiteConnection(connString1))
-            //{
-            //    connection.Open();
-            //    string queryString = "delete from " + tableNameForMixValue + " where chartID = @id_value_x";
-            //    SQLiteCommand command = new SQLiteCommand(queryString, connection);
-            //    command.Parameters.AddWithValue("@id_value_x", chartID);
-            //    command.ExecuteNonQuery();
-
-            //}//Close of using
-
-            //--For clearing source and humidity info
-            //using (SQLiteConnection connection = new SQLiteConnection(connString1))
-            //{
-            //    connection.Open();
-            //    string queryString = "delete from " + tableTempHumSourceInfo + " where chartID = @id_value_x";
-            //    SQLiteCommand command = new SQLiteCommand(queryString, connection);
-            //    command.Parameters.AddWithValue("@id_value_x", chartID);
-            //    command.ExecuteNonQuery();
-
-            //}//Close of using
-
-
-            ////--Now lets delete the chart actual content for the tbl_..._chart_detail table
-
-            //string chartDetailTableName = "tbl_" + selectedBuildingList[0].BuildingName + "_chart_detail";
-            //using (SQLiteConnection connection = new SQLiteConnection(connString1))
-            //{
-            //    connection.Open();
-            //    string queryString = "delete from " + chartDetailTableName + " where chartID = @id_value";
-            //    SQLiteCommand command = new SQLiteCommand(queryString, connection);
-            //    command.Parameters.AddWithValue("@id_value", chartID);
-            //    command.ExecuteNonQuery();
-
-            //}//Close of using
 
 
         }
@@ -2837,69 +2801,7 @@ namespace PH_App
                         });
                     }
                 }
-
-                //--Now reading the chart info
-                //SQLiteCommand cmd4 = new SQLiteCommand(sql_for_CF_Detail, conx);
-                //SQLiteDataReader reader4 = cmd4.ExecuteReader();
-                //while (reader4.Read())
-                //{
-
-                //    if (reader4["id"].ToString() != "")
-                //    {
-                //        ComfortZonesDetailForSaving.Add(new dataTypeForCF
-                //        {
-                //            id = reader4["id"].ToString(),
-                //            name = reader4["name"].ToString(),
-                //            min_temp = reader4["min_temp"].ToString(), //this is in string formate
-                //            max_temp = reader4["max_temp"].ToString(),
-                //            min_hum = reader4["min_hum"].ToString(),
-                //            max_hum = reader4["max_hum"].ToString(),
-                //            colorValue = ColorTranslator.FromHtml(reader4["colorValue"].ToString())
-                //        });
-                //    }
-                //}
-
-                ////--Now reading the last part associated comfortzone with each chart
-                //SQLiteCommand cmd5 = new SQLiteCommand(sql_for_CF_Setting, conx);
-                //SQLiteDataReader reader5 = cmd5.ExecuteReader();
-
-                //while (reader5.Read())
-                //{
-                //    if (reader5["chartID"].ToString() != "")
-                //    {
-                //        //This is the reading part of the data...
-                //        comfortZoneInforForEachChartForSaving.Add(new datatype_for_comfortzone
-                //        {
-                //            chartid = reader5["chartID"].ToString(),//reader["chartID"].ToString(),
-                //            comfortzoneid = reader5["comfort_zone_ID"].ToString(),
-                //            status = reader5["status"].ToString()
-                //        });
-                //    }
-                //}
-
-
-
-                ////==For mix node loading up 
-                //SQLiteCommand cmd6 = new SQLiteCommand(sql_for_mix_node_info, conx);
-                //SQLiteDataReader reader6 = cmd6.ExecuteReader();
-
-                //while (reader6.Read())
-                //{
-                //    if (reader6["chartID"].ToString() != "")
-                //    {
-                //        //This is the reading part of the data...
-                //        mixNodeInfoListForSaveConfiguration.Add(new dataTypeFor_mix_node_info
-                //        {
-                //            ChartID = reader6["chartID"].ToString(),//reader["chartID"].ToString(),
-                //            nodeID = reader6["nodeID"].ToString(),
-                //            previousNodeID = reader6["previousNodeID"].ToString(),
-                //            nextNodeID = reader6["nextNodeID"].ToString(),
-                //        });
-                //    }
-                //}
-
-
-
+                
             } //close of using statement 
 
 
@@ -3082,51 +2984,7 @@ namespace PH_App
                     //command.Parameters.AddWithValue("@status", ch.status);
                     command.ExecuteNonQuery();
                 }
-
-
-                ////--Information about detail comfortzone
-
-                //foreach (var ch in ComfortZonesDetailForSaving)
-                //{
-
-                //    string sql_string = "insert into " + tableForCF_Detail + "(id,name,min_temp,max_temp,min_hum,max_hum,colorValue) VALUES(@id,@name,@min_t,@max_t,@min_h,@max_h,@color)";
-                //    SQLiteCommand command = new SQLiteCommand(sql_string, m_dbConnection);
-                //    command.CommandType = CommandType.Text;
-
-                //    command.Parameters.AddWithValue("@id", ch.id);
-                //    command.Parameters.AddWithValue("@name", ch.name);
-                //    command.Parameters.AddWithValue("@min_t", ch.min_temp.ToString());
-                //    command.Parameters.AddWithValue("@max_t", ch.max_temp.ToString());
-                //    command.Parameters.AddWithValue("@min_h", ch.min_hum.ToString());
-                //    command.Parameters.AddWithValue("@max_h", ch.max_hum.ToString());
-                //    command.Parameters.AddWithValue("@color", ColorTranslator.ToHtml(ch.colorValue));
-                //    command.ExecuteNonQuery();
-
-
-
-                //}
-
-                ////================MixNodeInfo=====================//
-                //foreach (var ch in mixNodeInfoListForSaveConfiguration)
-                //{
-
-                //    string sql_string1 = "insert into " + tableForMixNode + "(chartID,nodeID,previousNodeID,nextNodeID) VALUES(@chartid,@nodeid,@prevnodeid,@nextnodeid)";
-                //    SQLiteCommand command = new SQLiteCommand(sql_string1, m_dbConnection);
-                //    command.CommandType = CommandType.Text;
-
-                //    command.Parameters.AddWithValue("@chartid", ch.ChartID);
-                //    command.Parameters.AddWithValue("@nodeid", ch.nodeID);
-                //    command.Parameters.AddWithValue("@prevnodeid", ch.previousNodeID.ToString());
-                //    command.Parameters.AddWithValue("@nextnodeid", ch.nextNodeID.ToString());
-                //    //command.Parameters.AddWithValue("@min_h", ch.min_hum.ToString());
-                //    //command.Parameters.AddWithValue("@max_h", ch.max_hum.ToString());
-                //    //command.Parameters.AddWithValue("@color", ColorTranslator.ToHtml(ch.colorValue));
-                //    command.ExecuteNonQuery();
-
-
-
-                //}
-
+                
 
             } //Close of using
 
@@ -5026,8 +4884,9 @@ namespace PH_App
                 string sql_string = "UPDATE " + tableName + "   set  xValue =@xVal , lastUpdatedXValue=@date   where nodeID  =@id";
                 SQLiteCommand command = new SQLiteCommand(sql_string, connection);
                 command.CommandType = CommandType.Text;
-                command.Parameters.AddWithValue("@xVal", xVal.ToString());              
-                command.Parameters.AddWithValue("@date", DateTime.Now.ToString("G", DateTimeFormatInfo.InvariantInfo));
+                command.Parameters.AddWithValue("@xVal", xVal.ToString());
+                //command.Parameters.AddWithValue("@date", DateTime.Now.ToString("G", DateTimeFormatInfo.InvariantInfo));
+                command.Parameters.AddWithValue("@date", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture));
                 command.Parameters.AddWithValue("@id", id);
                 //MessageBox.Show("selected value = " + cb_station_names.SelectedItem.ToString());
                 command.ExecuteNonQuery();
@@ -5053,8 +4912,9 @@ namespace PH_App
                 command.CommandType = CommandType.Text;
                 // command.Parameters.AddWithValue("@xVal", xVal.ToString());
                 command.Parameters.AddWithValue("@yVal", yVal.ToString());
-               
-                command.Parameters.AddWithValue("@date", DateTime.Now.ToString("G", DateTimeFormatInfo.InvariantInfo));
+
+                //command.Parameters.AddWithValue("@date", DateTime.Now.ToString("G", DateTimeFormatInfo.InvariantInfo));
+                command.Parameters.AddWithValue("@date", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture));
                 command.Parameters.AddWithValue("@id", id);
                 //MessageBox.Show("selected value = " + cb_station_names.SelectedItem.ToString());
                 command.ExecuteNonQuery();
@@ -5230,7 +5090,7 @@ namespace PH_App
                 //SqlDataAdapter dataAdapter = new SqlDataAdapter(queryString, connection.ConnectionString); //connection.ConnectionString is the connection string
                 reader = command.ExecuteReader();
 
-            }//Close of using          
+            }//Close of using
 
         }
 
@@ -5262,7 +5122,7 @@ namespace PH_App
                 //SqlDataAdapter dataAdapter = new SqlDataAdapter(queryString, connection.ConnectionString); //connection.ConnectionString is the connection string
                 reader = command.ExecuteReader();
 
-            }//Close of using          
+            }//Close of using
 
         }
 
@@ -5335,12 +5195,8 @@ namespace PH_App
                 }
             }
 
-        }  //Close of the function  
-
-
+        }  //Close of the function
         //====================End of trash box db oparation================//
-
-
-
+        
     }
 }

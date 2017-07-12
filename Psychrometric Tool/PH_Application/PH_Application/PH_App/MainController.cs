@@ -1,12 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-/*
- * Project : PH application
- * Author Name : Bhoj bahadur karki
- * Date : 2017-July-4th 
- * Contact : nishantkarki2013@hotmail.com
- */
 using System.ComponentModel;
 using System.Configuration;
 using System.Drawing;
@@ -20,7 +14,12 @@ using System.Windows.Forms.DataVisualization.Charting;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.Xml;
 using System.Globalization;
-
+/*
+ * Project : PH application
+ * Author Name : Bhoj bahadur karki
+ * Date : 2017-July-4th 
+ * Contact : nishantkarki2013@hotmail.com
+ */
 namespace PH_App
 {
     /// <summary>
@@ -2736,47 +2735,76 @@ namespace PH_App
                         }
                     }
 
-                    //=========End of insert series===========//
-
-                    //==========For arrow line removing =========//arrowSeriesTracker
-                    /*
-                    if (chart1.InvokeRequired)
+                //=========End of insert series===========//
+                //==========For cross removal==========//
+               /* if (chart1.InvokeRequired)
+                {
+                    foreach (var item in listCrossMarkSeries)
                     {
-                        foreach (var item in arrowSeriesTracker)
+                        if (chart1.Series.IndexOf(item) != -1)
                         {
-                            if (chart1.Series.IndexOf(item.Name) != -1)
-                            {
-                                // Series Exists do nothing
-                                chart1.Invoke(new Action(() => chart1.Series.Remove(item)));
-                            }
+                            // Series Exists do nothing
+                            chart1.Invoke(new Action(() => chart1.Series.RemoveAt(chart1.Series.IndexOf(item))));
                         }
                     }
-                    else
+                }
+                else
+                {
+                    foreach (var item in listCrossMarkSeries)
                     {
-                        foreach (var item in arrowSeriesTracker)
+                        if (chart1.Series.IndexOf(item) != -1)
                         {
-                            if (chart1.Series.IndexOf(item.Name) != -1)
-                            {
-                                // Series Exists do nothing
-                                chart1.Series.Remove(item);
-                            }
+                            // Series Exists do nothing
+                            chart1.Series.RemoveAt(chart1.Series.IndexOf(item));
                         }
-                       
-                     }
+                    }
 
-                    //--Now also clear the arrowSeriesTracker
-                    arrowSeriesTracker.Clear();//
-                    //Resetting the count 
-                    countArrowSeries = 0;
+                }
 
-                    */
+             */
 
-                    //=================End fo arrow line remove===//
+                //==========For cross removal end===//
 
 
+                //==========For arrow line removing =========//arrowSeriesTracker
+                /*
+                if (chart1.InvokeRequired)
+                {
+                    foreach (var item in arrowSeriesTracker)
+                    {
+                        if (chart1.Series.IndexOf(item.Name) != -1)
+                        {
+                            // Series Exists do nothing
+                            chart1.Invoke(new Action(() => chart1.Series.Remove(item)));
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var item in arrowSeriesTracker)
+                    {
+                        if (chart1.Series.IndexOf(item.Name) != -1)
+                        {
+                            // Series Exists do nothing
+                            chart1.Series.Remove(item);
+                        }
+                    }
+
+                 }
+
+                //--Now also clear the arrowSeriesTracker
+                arrowSeriesTracker.Clear();//
+                //Resetting the count 
+                countArrowSeries = 0;
+
+                */
+
+                //=================End fo arrow line remove===//
 
 
-                    if (listNodeInfoValues.Count > 0)
+
+
+                if (listNodeInfoValues.Count > 0)
                     {
                         if(flagDontEraseSeries == 1)
                         {
@@ -2955,13 +2983,20 @@ namespace PH_App
             //}
         }//--Close of the actual function....
 
+        /// <summary>
+        /// List contains information about the  cross marks drawn
+        /// </summary>
+        List<string> listCrossMarkSeries = new List<string>();
 
         public void ReDrawPoints( Chart chart1, Series s1, double x, double y, Color c, string source_temperature, string pressure_source, string name1, string labelValueText, int marker_size_value,string nodeID,string lastUpdatedXValue,string lastUpdatedYValue)
         {
             // lock (this) { 
             string s = "source \t\n temperature: " + source_temperature + ",\t\n Pressure  :  " + pressure_source + "\n Name        :" + name1;// + "\nindex=" + indexForSeriesNodePoint;
-                                                                                                                                               //s1.ChartType = SeriesChartType.Point;
-                                                                                                                                               // /*
+
+            Color sampleColor = c;
+            //s1.ChartType = SeriesChartType.Point;
+              
+            // /*
             if (listDeviceStatus.Count > 0)
             {
                 
@@ -2983,20 +3018,40 @@ namespace PH_App
                         {
                             //--One string 
                             var obj = new DateTimeSubtractor();
-                            string agoTime1 = obj.SubtractTwoTime(DateTime.Parse(lastUpdatedXValue),DateTime.Parse( DateTime.Now.ToString("G", DateTimeFormatInfo.InvariantInfo)));
-                            string agoTime2 = obj.SubtractTwoTime(DateTime.Parse(lastUpdatedYValue),DateTime.Parse( DateTime.Now.ToString("G", DateTimeFormatInfo.InvariantInfo)));
+                            string agoTime1 = obj.SubtractTwoTime(DateTime.Parse(lastUpdatedXValue),DateTime.Parse(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)));
+                            string agoTime2 = obj.SubtractTwoTime(DateTime.Parse(lastUpdatedYValue),DateTime.Parse(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)));
                             s = "source \t\n temperature: " + source_temperature + "[Offline,Last Update:" + agoTime1 + " ago],\t\n Pressure  :  " + pressure_source + "[Offline,Last Update:" + agoTime2 + " ago]\n Name        :" + name1;
+                            //--Drawing the cross mark
+                            // var objLC = new LogarithmicCrossSign();                            
+                            //List<string> listSereis = LogarithmicCrossSign.CrossSign(x, y, chart1, marker_size_value, nodeID, c);
+                            //foreach (var a in listSereis)
+                            //{
+                            //    listCrossMarkSeries.Add(a);
+                            //}
+
+                            sampleColor = Color.LightGray;
+
+
                         } else if (item.parameter1Status == "OFF")
                         {
                           
                             //--Both are off
                             var obj = new DateTimeSubtractor();
-                            DateTime d1 = DateTime.Parse(lastUpdatedXValue);
-                            DateTime d2 = DateTime.Parse(DateTime.Now.ToString("G", DateTimeFormatInfo.InvariantInfo));
-                           //  MessageBox.Show("param1 off \n d1= " + d1+",\n d2="+d2);
-                            string agoTime1 = obj.SubtractTwoTime(d1, d2);
+                            DateTime d1x = DateTime.Parse(lastUpdatedXValue);
+                            // DateTime d2 = DateTime.Parse(DateTime.Now.ToString("G", DateTimeFormatInfo.InvariantInfo));
+                            DateTime d2x = DateTime.Parse(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture));
+                            string agoTime1 = obj.SubtractTwoTime(d1x, d2x);
+                            //MessageBox.Show("param1 off \n datetime1= " + d1 + ",\n datetimeNow2=" + d2+"\nAGO="+agoTime1);
                             s = "source \t\n temperature: " + source_temperature + "[Offline,Last Update:" + agoTime1 + " ago],\t\n Pressure  :  " + pressure_source + "\n Name        :" + name1;
-                          //  MessageBox.Show("Parame1 off end :"+ agoTime1);
+                            //  MessageBox.Show("Parame1 off end :"+ agoTime1);
+                            //--Drawing the cross mark
+                            // var objLC = new LogarithmicCrossSign();
+                            //List<string> listSereis = LogarithmicCrossSign.CrossSign(x, y, chart1, marker_size_value, nodeID, c);
+                            //foreach (var a in listSereis)
+                            //{
+                            //    listCrossMarkSeries.Add(a);
+                            //}
+                            sampleColor = Color.LightGray;
                         }
                         else if (item.parameter2Status == "OFF")
                         {
@@ -3004,10 +3059,17 @@ namespace PH_App
                             var obj = new DateTimeSubtractor();
                             // string agoTime1 = obj.SubtractTwoTime(DateTime.Parse(lastUpdatedXValue), DateTime.Now);
                             DateTime d1 = DateTime.Parse(lastUpdatedYValue);
-                            DateTime d2 = DateTime.Parse(DateTime.Now.ToString("G", DateTimeFormatInfo.InvariantInfo));
+                            DateTime d2 = DateTime.Parse(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture));
                             string agoTime2 = obj.SubtractTwoTime(d1,d2);
                             s = "source \t\n temperature: " + source_temperature + ",\t\n Pressure  :  " + pressure_source + "[Offline,Last Update:" + agoTime2 + " ago]\n Name        :" + name1;
-
+                            //--Drawing the cross mark
+                            //var objLC = new LogarithmicCrossSign();
+                            //List<string> listSereis = LogarithmicCrossSign.CrossSign(x, y, chart1, marker_size_value, nodeID, c);
+                            //foreach (var a in listSereis)
+                            //{
+                            //    listCrossMarkSeries.Add(a);
+                            //}
+                            sampleColor = Color.LightGray;
                         } else
                         {
                             //--Both are manual so dont so any things
@@ -3051,7 +3113,7 @@ namespace PH_App
                         s1.Points.AddXY(x, y);
                         s1.Points[indexForSeriesNodePoint].ToolTip = s;
                         s1.Points[indexForSeriesNodePoint].Label = labelValueText;
-                        s1.Points[indexForSeriesNodePoint].Color = c;
+                        s1.Points[indexForSeriesNodePoint].Color = sampleColor;//c;
                         s1.Points[indexForSeriesNodePoint].MarkerStyle = MarkerStyle.Circle;
                         s1.Points[indexForSeriesNodePoint].MarkerSize = marker_size_value;
                     });
@@ -3066,7 +3128,7 @@ namespace PH_App
                 //chart1.Series["My Series"].Points[indexForSeriesNodePoint].ToolTip = s;
                 s1.Points[indexForSeriesNodePoint].ToolTip = s;
                 s1.Points[indexForSeriesNodePoint].Label = labelValueText;
-                s1.Points[indexForSeriesNodePoint].Color = c;
+                s1.Points[indexForSeriesNodePoint].Color = sampleColor;//c;
                 s1.Points[indexForSeriesNodePoint].MarkerStyle = MarkerStyle.Circle;
                 //s1.Points[indexForSeriesNodePoint].Color = c;
                 s1.Points[indexForSeriesNodePoint].MarkerSize = marker_size_value;
@@ -3207,9 +3269,7 @@ namespace PH_App
                 {
                     //This is a node : i.e start end of the node
                     //We need to store the node every information in 0 index.
-
                     // temporaryNodeValueStore[1].Equals(menuStripNodeInfoValues[i]);
-
                     //temporaryNodeValueStore = menuStripNodeInfoValues.GetRange(i, 1);
                     //The index of this values will be temporaryNodeValueStore[1] ==> 1
                     temporaryNodeValueStoreForRedrawLine.Add(new DataTypeForNode
@@ -3880,48 +3940,11 @@ namespace PH_App
 
 
             series1.ChartType = SeriesChartType.Point;
-            //int r, g, b;
-            //series1.MarkerSize = 20;
-            //series1.MarkerStyle = MarkerStyle.Circle;
-            //series1.Points.AddXY(xval, yval);
-            //string s = "source :\nTemperature Source " + temperature_sourceGlobal + "\nHumidity Source" + humidity_sourceGlobal + "\n Name : " + tbName;
-            //series1.Points[index].Color = colorValue;
-            //series1.Points[index].ToolTip = s;
+           
             int countNumberOfNodes = listNodeInfoValues.Count;//for no data 0 for 1 index =1 and so on
             //--we faced problem here code123
             SetNode(series1, countNumberOfNodes, xval, yval, name, c1, markerSize, temperatureSource, pressureSource);
-
-            //string labelStringValue = null;
-            //labeling part
-            //if (comboboxItemText == "Label")
-            //{
-            //    //label is selected
-            //    labelStringValue = tbLabel;
-            //}
-            //else if (comboboxItemText == "Name")
-            //{
-            //Name is selected
-            // labelStringValue = tbName;
-            //}
-            //else
-            //{
-            //    //Source is selected
-            //    labelStringValue = tbSource;
-            //}
-
-            //  series1.Points[index].Label = labelStringValue;
-
-            //  MessageBox.Show("value xval =" + xval + ",yval = " + yval);
-            //series1.Points[index_series++].Color = colorValue;//blue
-            //    MessageBox.Show("end re");
-            //index_series++;
-            //series1.Enabled = true;
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show(ex.Message);
-            //}
-
+            
             //now lets move on to storing those values and futher porcessing it...
 
 

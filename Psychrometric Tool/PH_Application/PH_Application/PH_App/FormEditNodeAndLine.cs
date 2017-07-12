@@ -3234,6 +3234,12 @@ namespace PH_App
                 {
                     if (colorDialog1.ShowDialog() == DialogResult.OK)
                     {
+                        if(colorDialog1.Color == Color.LightGray)
+                        {
+                            MessageBox.Show("You can not chose this color. It is used for system notification");
+                            return;
+                        }
+
                         DataGridViewButtonCell buttonCell = (DataGridViewButtonCell)dataGridView1.Rows[e.RowIndex].Cells[7];
                         buttonCell.FlatStyle = FlatStyle.Popup;
                         buttonCell.Style.BackColor = colorDialog1.Color;//System.Drawing.Color.Red;

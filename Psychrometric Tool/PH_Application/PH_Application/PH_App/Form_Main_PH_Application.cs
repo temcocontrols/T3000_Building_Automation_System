@@ -105,7 +105,7 @@ namespace PH_App
                    }
                 }
                 }
-                 }
+                }
                 // mc.LoadForPH(fluidName,this,Xmin,Xmax,Ymin,Ymax,xDiv,yDiv,xFlag,yFlag);//--
                 mc.LoadForPH(fluidName, this, Xmin, Xmax, Ymin, Ymax);
                 phChart.Series.Add(seriesPoint);
@@ -236,8 +236,8 @@ namespace PH_App
 
         private void phChart_MouseMove(object sender, MouseEventArgs e)
         {
-            try { 
-           
+            try
+            {            
             //mc.chart_MouseMove(sender, e, phChart, this, xCoord, yCoord);
             mc.chart_MouseMove(sender, e, phChart, this);
             }catch(Exception ex)

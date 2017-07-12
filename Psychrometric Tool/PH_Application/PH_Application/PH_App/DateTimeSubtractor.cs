@@ -9,8 +9,8 @@ namespace PH_App
         {
             TimeSpan diff =  Now- first ; //DateTime.Now - DateTime.Today;
             string formatted = "";
-            //if (diff.Days != 0 && diff.Hours !=0)
-            //{
+            if (diff.Days != 0 && diff.Hours != 0)
+            {
                 formatted = string.Format(
                                    CultureInfo.CurrentCulture,
                                    "{0}D:{1}H:{2}M:{3}S",
@@ -18,34 +18,21 @@ namespace PH_App
                                    diff.Hours,
                                    diff.Minutes,               
                                    diff.Seconds);
-            /*
+           
             }
             else if (diff.Days == 0 && diff.Hours == 0 && diff.Minutes == 0)
             {
-                formatted = string.Format(
-                                   CultureInfo.CurrentCulture,
-                                   "{3} seconds",                                   
-                                   diff.Seconds);
+                formatted = diff.Seconds + " S";
             }
             else if (diff.Days == 0 && diff.Hours == 0)
             {
-                formatted = string.Format(
-                                   CultureInfo.CurrentCulture,
-                                   "{2} minutes, {3} seconds",                                  
-                                   diff.Minutes,
-                                   diff.Seconds);
+                formatted = diff.Minutes + "M," + diff.Seconds + "S";
             }else if(diff.Days == 0)
             {
-                formatted = string.Format(
-                                   CultureInfo.CurrentCulture,
-                                   "{1} hours, {2} minutes, {3} seconds",
-                                   
-                                   diff.Hours,
-                                   diff.Minutes,
-                                   diff.Seconds);
+                formatted = diff.Hours + "H," + diff.Minutes + "M," + diff.Seconds + "S";
 
             }
-            */
+           //*/
                 return formatted;
         }
     }
