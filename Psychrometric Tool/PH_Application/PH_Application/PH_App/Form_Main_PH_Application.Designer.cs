@@ -379,11 +379,13 @@
             // 
             this.printToolStripMenuItem.Name = "printToolStripMenuItem";
             resources.ApplyResources(this.printToolStripMenuItem, "printToolStripMenuItem");
+            this.printToolStripMenuItem.Click += new System.EventHandler(this.printToolStripMenuItem_Click);
             // 
             // saveAsToolStripMenuItem
             // 
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
             resources.ApplyResources(this.saveAsToolStripMenuItem, "saveAsToolStripMenuItem");
+            this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
             // 
             // saveConfigurationToolStripMenuItem
             // 
@@ -589,9 +591,11 @@
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.groupBox4ttt);
             this.Controls.Add(this.phChart);
+            this.KeyPreview = true;
             this.Name = "Form_Main_PH_Application";
             this.Load += new System.EventHandler(this.Form_Main_PH_Application_Load);
             this.Shown += new System.EventHandler(this.Form_Main_PH_Application_Shown);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form_Main_PH_Application_KeyDown);
             this.MouseHover += new System.EventHandler(this.Form_Main_PH_Application_MouseHover);
             ((System.ComponentModel.ISupportInitialize)(this.phChart)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();

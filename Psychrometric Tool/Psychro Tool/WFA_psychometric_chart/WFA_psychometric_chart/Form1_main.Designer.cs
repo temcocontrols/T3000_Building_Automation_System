@@ -81,6 +81,7 @@
             this.trashBoxToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gridViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.excelExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.heatMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.printToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -148,6 +149,7 @@
             this.lb_devicestatusshow = new System.Windows.Forms.Label();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.pb_lock_unlock = new System.Windows.Forms.PictureBox();
+            this.historicalPlotToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.groupBox4ttt.SuspendLayout();
@@ -336,7 +338,9 @@
             this.historyPlotToolStripMenuItem1,
             this.trashBoxToolStripMenuItem,
             this.gridViewToolStripMenuItem,
-            this.excelExportToolStripMenuItem});
+            this.excelExportToolStripMenuItem,
+            this.heatMapToolStripMenuItem,
+            this.historicalPlotToolStripMenuItem});
             this.optionToolStripMenuItem.Name = "optionToolStripMenuItem";
             resources.ApplyResources(this.optionToolStripMenuItem, "optionToolStripMenuItem");
             // 
@@ -387,6 +391,12 @@
             this.excelExportToolStripMenuItem.Name = "excelExportToolStripMenuItem";
             resources.ApplyResources(this.excelExportToolStripMenuItem, "excelExportToolStripMenuItem");
             this.excelExportToolStripMenuItem.Click += new System.EventHandler(this.excelExportToolStripMenuItem_Click);
+            // 
+            // heatMapToolStripMenuItem
+            // 
+            this.heatMapToolStripMenuItem.Name = "heatMapToolStripMenuItem";
+            resources.ApplyResources(this.heatMapToolStripMenuItem, "heatMapToolStripMenuItem");
+            this.heatMapToolStripMenuItem.Click += new System.EventHandler(this.heatMapToolStripMenuItem_Click);
             // 
             // menuStrip1
             // 
@@ -583,6 +593,7 @@
             // dataGridView1
             // 
             this.dataGridView1.AllowUserToAddRows = false;
+            resources.ApplyResources(this.dataGridView1, "dataGridView1");
             this.dataGridView1.BackgroundColor = System.Drawing.SystemColors.Control;
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
@@ -596,7 +607,6 @@
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.id,
             this.name});
-            resources.ApplyResources(this.dataGridView1, "dataGridView1");
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersVisible = false;
             this.dataGridView1.TabStop = false;
@@ -857,6 +867,12 @@
             this.pb_lock_unlock.TabStop = false;
             this.pb_lock_unlock.Click += new System.EventHandler(this.pb_lock_unlock_Click);
             // 
+            // historicalPlotToolStripMenuItem
+            // 
+            this.historicalPlotToolStripMenuItem.Name = "historicalPlotToolStripMenuItem";
+            resources.ApplyResources(this.historicalPlotToolStripMenuItem, "historicalPlotToolStripMenuItem");
+            this.historicalPlotToolStripMenuItem.Click += new System.EventHandler(this.historicalPlotToolStripMenuItem_Click);
+            // 
             // Form1_main
             // 
             resources.ApplyResources(this, "$this");
@@ -875,9 +891,11 @@
             this.Controls.Add(this.menuStrip1);
             this.ForeColor = System.Drawing.SystemColors.ControlText;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1_main";
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_main_KeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
@@ -971,6 +989,8 @@
         public System.Windows.Forms.Label lb_realtimeshow;
         public System.Windows.Forms.Label lb_web_status;
         public System.Windows.Forms.Label lb_device_status;
+        private System.Windows.Forms.ToolStripMenuItem heatMapToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem historicalPlotToolStripMenuItem;
     }
 }
 

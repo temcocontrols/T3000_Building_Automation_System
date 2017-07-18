@@ -13,6 +13,7 @@ namespace PH_App
         [STAThread]
         static void Main()
         {
+            try { 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
@@ -35,6 +36,10 @@ namespace PH_App
             // BuildingOperation b = fm.bo;//new BuildingOperation();
 
             Application.Run(fm);// new Form_Main_PH_Application()
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
     }
 }

@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WFA_psychometric_chart
 {
@@ -47,7 +44,7 @@ namespace WFA_psychometric_chart
             using (SQLiteConnection connection = new SQLiteConnection(connString))
             {
                 connection.Open();
-                string sql_string = "insert into " + tableName + "(chart_respective_nodeID,nodeID,xValue,yValue,temperature_source,humidity_source,name,colorValue,nodeSize,airFlow,lastUpdatedDate) VALUES(@chartid,@id,@xVal,@yVal,@temperature_source,@humidity_source,@name,@colorVal,@node_size_value,@airFlow,@lastUpdateDate)";
+                string sql_string = "insert into " + tableName + "(chart_respective_nodeID,nodeID,xValue,yValue,temperature_source,humidity_source,name,colorValue,nodeSize,airFlow,lastUpdatedXValue,lastUpdatedYValue) VALUES(@chartid,@id,@xVal,@yVal,@temperature_source,@humidity_source,@name,@colorVal,@node_size_value,@airFlow,@lastUpdateDate,@lastUpdateDate2)";
                 SQLiteCommand command = new SQLiteCommand(sql_string, connection);
                 command.CommandType = CommandType.Text;
                 command.Parameters.AddWithValue("@chartid", chart_respective_nodeID);
@@ -60,8 +57,8 @@ namespace WFA_psychometric_chart
                 command.Parameters.AddWithValue("@colorVal", ColorTranslator.ToHtml(colorValue));              
                 command.Parameters.AddWithValue("@node_size_value", nodeSizeValue);
                 command.Parameters.AddWithValue("@airFlow", airFlow);
-                command.Parameters.AddWithValue("@lastUpdateDate", DateTime.Now);//Lets store the date time in the node values
-                                                                     
+                command.Parameters.AddWithValue("@lastUpdateDate", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture));//Lets store the date time in the node values
+                command.Parameters.AddWithValue("@lastUpdateDate2", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture));
                 command.ExecuteNonQuery();
             }
   
@@ -105,7 +102,7 @@ namespace WFA_psychometric_chart
                 //command.Parameters.AddWithValue("@text", showItemText);
                 command.Parameters.AddWithValue("@node_size_value", nodeSizeValue);
                 command.Parameters.AddWithValue("@airflowValue", airflow);
-           //     command.Parameters.AddWithValue("@lastUpdatedDate", lastUpdatedDateValue);
+               // command.Parameters.AddWithValue("@lastUpdatedDate", lastUpdatedDateValue);
                 command.Parameters.AddWithValue("@id", id);
                 command.ExecuteNonQuery();
             }
