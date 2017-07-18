@@ -656,8 +656,6 @@ namespace WFA_psychometric_chart
                             }
 
 
-
-
                         }//close of foreach...
 
                         //lets print the values. if we are rightr

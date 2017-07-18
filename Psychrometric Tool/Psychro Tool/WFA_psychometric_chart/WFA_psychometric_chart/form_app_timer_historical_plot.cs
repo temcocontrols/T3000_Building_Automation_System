@@ -87,7 +87,7 @@ namespace WFA_psychometric_chart
                 string connString = @"Data Source=" + databaseFile + ";Version=3;";
 
 
-                // MessageBox.Show("connection string = " + connString);
+                //MessageBox.Show("connection string = " + connString);
 
 
                 SQLiteConnection connection = new SQLiteConnection(connString);
@@ -98,7 +98,6 @@ namespace WFA_psychometric_chart
                 reader = comm.ExecuteReader();
                 while (reader.Read())
                 {
-
                     //string selecte_location = reader["id"].ToString()+","+reader["country"].ToString() + "," + reader["state"].ToString() + "," + reader["city"].ToString();
                     //stored_location.Add(selecte_location);
 
@@ -305,7 +304,7 @@ namespace WFA_psychometric_chart
                 }//close of if checkedItem>0
                 else
                 {
-                    MessageBox.Show(WFA_psychometric_chart.Properties.Resources.Please_Select_one_or_more_hour);
+                  //  MessageBox.Show(WFA_psychometric_chart.Properties.Resources.Please_Select_one_or_more_hour);
                 }
 
             }//close of if
@@ -345,7 +344,7 @@ namespace WFA_psychometric_chart
                     for (int i = 1; i <= 24; i++)
                     {
                         checkedListBox1.SetItemChecked(i, true);
-
+                        
                     }
 
 
