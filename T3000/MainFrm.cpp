@@ -2987,8 +2987,13 @@ void CMainFrame::ScanTstatInDB(void)
             q.nextRow();
             m_subNetLst.push_back(temBuildingInfo);
         }
-        if(m_subNetLst.size()<=0)
-            AfxMessageBox(_T("There is no default building,please select a building First！"));
+		if (m_subNetLst.size() <= 0)
+		{
+		//	AfxMessageBox(_T("There is no default building,please select a building First！"));
+			//AfxMessageBox("There is no default building,please select a building First！");
+			MessageBox(_T("There is no default building,please select a building First."));
+		}
+           
 
         
 
