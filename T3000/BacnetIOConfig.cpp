@@ -74,7 +74,9 @@ BOOL CBacnetIOConfig::ExtproductIDisValiable(unsigned char temp_id)
 {
 	if ((temp_id != PM_T322AI) &&
 		(temp_id != PM_T38AI8AO6DO) &&
-		(temp_id != PM_MINIPANEL))
+		(temp_id != PM_MINIPANEL)&&
+		(temp_id != PM_MINIPANEL_ARM)
+		)
 	{
 		return false;
 	}

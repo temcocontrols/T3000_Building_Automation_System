@@ -854,6 +854,10 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 			{
 				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("CM5"));
 			}
+			else if (bacnet_device_type == PM_MINIPANEL_ARM)
+			{
+				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3Controller(ARM)"));
+			}
 			else if(bacnet_device_type == BIG_MINIPANEL)
 			{
 				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-BB"));
@@ -870,6 +874,8 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 			{
 				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("Unknown device"));
 			}
+
+			//((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3Controller(ARM)"));
 
 			if((Device_Basic_Setting.reg.mini_type == BIG_MINIPANEL) || 
 				(Device_Basic_Setting.reg.mini_type == SMALL_MINIPANEL) ||

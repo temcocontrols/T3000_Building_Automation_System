@@ -718,6 +718,7 @@ BOOL IS_Temco_Product(int product_model)
 			case   PM_CO2_RS485				   :
 			case   PM_CO2_NODE				   :
 			case   PM_MINIPANEL				   :
+			case   PM_MINIPANEL_ARM					:
 			case   PM_CS_SM_AC				   :
 			case   PM_CS_SM_DC				   :
 			case   PM_CS_RSM_AC				   :
@@ -3443,8 +3444,10 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 				bacnet_device_type = TINY_MINIPANEL;
 			else if (Device_Basic_Setting.reg.mini_type == TINY_EX_MINIPANEL)
 				bacnet_device_type = TINY_EX_MINIPANEL;
+			else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM)
+				bacnet_device_type = MINIPANELARM;
 			else
-				bacnet_device_type = PRODUCT_CM5;
+				bacnet_device_type = MINIPANELARM;
 			my_temp_point = my_temp_point + 1;	//中间 minitype  和 debug  没什么用;
 			Device_Basic_Setting.reg.pro_info.harware_rev = *(my_temp_point++);
 			Device_Basic_Setting.reg.pro_info.firmware0_rev_main = *(my_temp_point++);
@@ -4042,7 +4045,7 @@ void Inial_Product_map()
 	product_map.insert(map<int,CString>::value_type(PM_T34AO,_T("T3-4AO")));
 	product_map.insert(map<int,CString>::value_type(PM_T36CT,_T("T3-6CT")));
 	product_map.insert(map<int,CString>::value_type(PM_MINIPANEL,_T("T3-BB/LB/TB")));
-
+	product_map.insert(map<int, CString>::value_type(PM_MINIPANEL_ARM, _T("T3-BB/LB/TB(ARM)")));
 	product_map.insert(map<int,CString>::value_type(PM_PRESSURE,_T("Pressure Sensor")));
 	product_map.insert(map<int,CString>::value_type(PM_HUM_R,_T("HUM-R")));
 	product_map.insert(map<int,CString>::value_type(PM_T322AI,_T("T3-22I")));
@@ -8411,7 +8414,10 @@ void SaveBacnetConfigFile(CString &SaveConfigFilePath)
 bool Is_Bacnet_Device(unsigned short n_product_class_id)
 {
     if((n_product_class_id == PM_CM5) ||
-            (n_product_class_id == PM_MINIPANEL))
+            (n_product_class_id == PM_MINIPANEL)
+		||
+		(n_product_class_id == PM_MINIPANEL_ARM)
+		)
     {
         return true;
     }

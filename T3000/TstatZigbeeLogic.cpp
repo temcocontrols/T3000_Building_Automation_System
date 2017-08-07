@@ -127,7 +127,7 @@ UINT   CTstatZigbeeLogic::GetZigbeeInfo(LPVOID lpVoid)
 	{
 		return 0;
 	}
-	if(product_id == PM_MINIPANEL)
+	if(product_id == PM_MINIPANEL|| product_id == PM_MINIPANEL_ARM)
 	{
 		mparent->HandleOneMinipanel(g_tstat_id);
 	}

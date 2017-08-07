@@ -268,6 +268,9 @@ CString CTStat_Dev::GetProductName()
 	case PM_MINIPANEL:
 		strProductName="T3-BB/LB/TB";
 		break;
+	case PM_MINIPANEL_ARM:
+		strProductName = "T3-BB/LB/TB(ARM)";
+		break;
     case PM_AirQuality:
         strProductName="Air Quality";
         break;

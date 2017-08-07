@@ -293,7 +293,7 @@ void CARDDlg::OnBnClickedOk()
                int seialnumber = DataBuffer[0]+DataBuffer[1]*255+DataBuffer[2]*255*255+DataBuffer[3]*255*255*255;
                strParentSerialNumber.Format(_T("%d"),seialnumber);  
                ParnetModbusID = DataBuffer[6];
-               if (DataBuffer[7]==PM_MINIPANEL||DataBuffer[7]==PM_CM5)
+               if (DataBuffer[7]==PM_MINIPANEL||DataBuffer[7]==PM_CM5|| DataBuffer[7] == PM_MINIPANEL_ARM)
                {     memset(DataBuffer,0xffff,16);
                      int miniport = m_minipanel_comport.GetCurSel();
                      DataBuffer[0]= read_modbus_id;
