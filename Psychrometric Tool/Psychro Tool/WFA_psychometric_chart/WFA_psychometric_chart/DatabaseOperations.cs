@@ -135,8 +135,7 @@ namespace WFA_psychometric_chart
                 command.Parameters.AddWithValue("@nodeid", node_id);
                 command.Parameters.AddWithValue("@chart_id", chartID);
                 command.Parameters.AddWithValue("@prevnodeid", prevNodeID);
-                command.Parameters.AddWithValue("@nextnodeid", nextNodeID);
-         
+                command.Parameters.AddWithValue("@nextnodeid", nextNodeID);         
                 command.ExecuteNonQuery();
             }
 

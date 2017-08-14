@@ -1035,14 +1035,12 @@ namespace WFA_psychometric_chart
         int flagForTimer = 0;
         public void InitTimerForDevice()
         {
-
            // MessageBox.Show("inside timer");
             flagForTimer = 1;
             atimer = new System.Timers.Timer();
             atimer.Enabled = true;
             atimer.Elapsed += timer1_Tick_For_Device;
             atimer.Interval = 1000 * 12; //x seconds[ 1000 ms * x  =  x seconds]//12 seconds
-
         }
 
      
@@ -1303,11 +1301,8 @@ namespace WFA_psychometric_chart
                                 else
                                 {
                                     lb_device_status.Text = "connected";
-                                }
-                                
-
-                            }
-                 
+                                }                               
+                            }                 
                         }
                         else
                         {
@@ -1373,9 +1368,7 @@ namespace WFA_psychometric_chart
                    //  UpdateNodeInfoToDB(node.id, temperature_Val, y_value, node.source, node.name, node.label, node.colorValue, node.showItemText, node.marker_Size);
                    UpdateNodeInfoToDBForTemeperatureFromHardware(node.id, temperature_Val);//This is completed
                 }
-
-                        
-
+                
                         //==============THIS ONE IF FOR ONLINE OFFLINE==========
                         //  lb_web_status.Text = "active";                            
                         //=====================END OF ONLINE OFFLINE============           
@@ -1493,7 +1486,6 @@ namespace WFA_psychometric_chart
                             //{
                             //    //First is humidity and second is enthalpy
                             //}
-
                         }
                         else
                         {

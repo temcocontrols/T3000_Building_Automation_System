@@ -215,13 +215,13 @@ namespace WFA_psychometric_chart
 
                         string connString1 = @"Data Source=" + databaseFile + ";Version=3;";
 
-                        using (SQLiteConnection connection1 = new SQLiteConnection(connString1))
-                         {
-                      connection1.Open();
+                           using (SQLiteConnection connection1 = new SQLiteConnection(connString1))
+                            {
+                            connection1.Open();
 
-                      //string sql_query = "Select * from tbl_data_stored_temp_hum_one_year WHERE date_current = " + day_list[i] + " , hour_current = " + hour_al[h] + " AND station_name = "+ station_name +" ; ";
-                      //lets pass this string to a query which does the pulling part.
-                      SQLiteDataReader reader1 = null;
+                            //string sql_query = "Select * from tbl_data_stored_temp_hum_one_year WHERE date_current = " + day_list[i] + " , hour_current = " + hour_al[h] + " AND station_name = "+ station_name +" ; ";
+                            //lets pass this string to a query which does the pulling part.
+                            SQLiteDataReader reader1 = null;
                             SQLiteCommand command1 = new SQLiteCommand("Select * from tbl_historical_data WHERE date_current BETWEEN @date_first AND @date_second AND ID=@id_value", connection1);
                             command1.Parameters.AddWithValue("@date_first", dtp1.Value);
                             command1.Parameters.AddWithValue("@date_second", dtp2.Value);
@@ -306,7 +306,6 @@ namespace WFA_psychometric_chart
                 {
                   //  MessageBox.Show(WFA_psychometric_chart.Properties.Resources.Please_Select_one_or_more_hour);
                 }
-
             }//close of if
             
         }//close of the main function .
@@ -315,11 +314,8 @@ namespace WFA_psychometric_chart
         {
             //lets enable the event and see what happens ..
             first_enable = 1;//event enabler , this is done to see if the value is changed or not if both the value of To and From
-                             //is changed then we make the calculation..
-
+            //is changed then we make the calculation..
             plot_on_first_graph();
-
-
         }
 
         private void dtp2_event_onValue_Change(object sender, EventArgs e)
@@ -344,7 +340,7 @@ namespace WFA_psychometric_chart
                     for (int i = 1; i <= 24; i++)
                     {
                         checkedListBox1.SetItemChecked(i, true);
-                        
+                        //checkedListBox1.CheckedItems.IndexOf(i).Equals(true);
                     }
 
 

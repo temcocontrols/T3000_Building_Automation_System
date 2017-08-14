@@ -1,4 +1,11 @@
-﻿using System;
+﻿/*
+ * Project : PH application
+ * Author Name : Bhoj bahadur karki
+ * Date : 2017-July-4th 
+ * Contact : nishantkarki2013@hotmail.com
+ * Company :Temcocontrols pvt. ltd.
+ */
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,12 +21,7 @@ using System.Windows.Forms.DataVisualization.Charting;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.Xml;
 using System.Globalization;
-/*
- * Project : PH application
- * Author Name : Bhoj bahadur karki
- * Date : 2017-July-4th 
- * Contact : nishantkarki2013@hotmail.com
- */
+
 namespace PH_App
 {
     /// <summary>
@@ -3592,8 +3594,7 @@ namespace PH_App
                 s1.Points[4].Label = "4";
                 chart1.Series.Add(s1);
             }
-            //*/  
-            
+            //*/              
             /*     
             //--Now calculating the distance form x1,y1t
             double dist_a1_b1 = Math.Sqrt(Math.Pow((x1 - a1), 2) + Math.Pow((y1 - b1),2)); //0
@@ -3705,13 +3706,11 @@ namespace PH_App
                     s1.Points.AddXY(px1, py1);
                     chart1.Series.Add(s1);
             }
-
             //--For s2
             if (chart1.InvokeRequired)
             {
                 chart1.Invoke((MethodInvoker)delegate
                 {
-
                     if (chart1.Series.IndexOf(s2.Name) != -1)
                     {
                         chart1.Series.RemoveAt(chart1.Series.IndexOf(s2.Name));
@@ -3724,11 +3723,9 @@ namespace PH_App
                     s2.Points.AddXY(px2, py2);
                     chart1.Series.Add(s2);
                 });
-
             }
             else
             {
-
                 if (chart1.Series.IndexOf(s2.Name) != -1)
                 {
                     chart1.Series.RemoveAt(chart1.Series.IndexOf(s2.Name));
@@ -5478,6 +5475,7 @@ namespace PH_App
                     //param1 value is temperature 
 
                     //double x_Value = 0.00;//For temperature value pulling 
+                    //--Could be ON, OFF or Manual
                     string parameter1Status = "";
                     string parameter2Status = "";
 
@@ -5510,7 +5508,8 @@ namespace PH_App
                                 //This meand the value is humidity and temperature so we process like wise
                                 //This gets the value
                                // MessageBox.Show("Hi ,com" + commumicationSuccesValue);
-                                if (commumicationSuccesValue == false) {
+                                if (commumicationSuccesValue == false)
+                                {
                                     //return;
                                     //--Not return goto pressure
                                     parameter1Status = "OFF";

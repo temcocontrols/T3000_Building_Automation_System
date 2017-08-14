@@ -82,6 +82,7 @@
             this.gridViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.excelExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.heatMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.historicalPlotToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.printToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -149,7 +150,6 @@
             this.lb_devicestatusshow = new System.Windows.Forms.Label();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.pb_lock_unlock = new System.Windows.Forms.PictureBox();
-            this.historicalPlotToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.groupBox4ttt.SuspendLayout();
@@ -394,9 +394,15 @@
             // 
             // heatMapToolStripMenuItem
             // 
-            this.heatMapToolStripMenuItem.Name = "heatMapToolStripMenuItem";
             resources.ApplyResources(this.heatMapToolStripMenuItem, "heatMapToolStripMenuItem");
+            this.heatMapToolStripMenuItem.Name = "heatMapToolStripMenuItem";
             this.heatMapToolStripMenuItem.Click += new System.EventHandler(this.heatMapToolStripMenuItem_Click);
+            // 
+            // historicalPlotToolStripMenuItem
+            // 
+            resources.ApplyResources(this.historicalPlotToolStripMenuItem, "historicalPlotToolStripMenuItem");
+            this.historicalPlotToolStripMenuItem.Name = "historicalPlotToolStripMenuItem";
+            this.historicalPlotToolStripMenuItem.Click += new System.EventHandler(this.historicalPlotToolStripMenuItem_Click);
             // 
             // menuStrip1
             // 
@@ -866,12 +872,6 @@
             this.pb_lock_unlock.Name = "pb_lock_unlock";
             this.pb_lock_unlock.TabStop = false;
             this.pb_lock_unlock.Click += new System.EventHandler(this.pb_lock_unlock_Click);
-            // 
-            // historicalPlotToolStripMenuItem
-            // 
-            this.historicalPlotToolStripMenuItem.Name = "historicalPlotToolStripMenuItem";
-            resources.ApplyResources(this.historicalPlotToolStripMenuItem, "historicalPlotToolStripMenuItem");
-            this.historicalPlotToolStripMenuItem.Click += new System.EventHandler(this.historicalPlotToolStripMenuItem_Click);
             // 
             // Form1_main
             // 

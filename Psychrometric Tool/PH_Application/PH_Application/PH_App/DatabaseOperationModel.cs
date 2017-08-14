@@ -986,8 +986,6 @@ namespace PH_App
                 //}
                 //catch { }
                 Application.Exit();
-
-
             }
 
         }
@@ -997,14 +995,7 @@ namespace PH_App
             //--lets do try catch
             try
             {
-                //--This is where we are going to create all the database  and tables of sqlite
-                //string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                //string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
-
-                //string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                //string databasePath1 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                //string databaseFile = databasePath1 + @"\db_psychrometric_project.s3db";
-
+                
                 string databaseFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
 
                 //string connString = @"Data Source=" + databaseFile1 + ";Version=3;";
@@ -2907,7 +2898,7 @@ namespace PH_App
                 foreach (var ch in nodeInfoPulledForSaving)
                 {
                     //string sql_string = "insert into " + nodeTableName + " (chart_respective_nodeID,nodeID,xValue,yValue,temperature_source,pressure_source,name,colorValue,nodeSize,lastUpdatedDate) VALUES(@chartid,@id,@xVal,@yVal,@tempsource,@prsource,@name,@colorVal,@node_size_value,@lastUpdatedValue)";
-                    string sql_string = "insert into " + nodeTableName + " (chart_respective_nodeID,nodeID,xValue,yValue,temperature_source,pressure_source,name,colorValue,nodeSize,lastUpdateXValue,lastUpdatedYValue) VALUES(@chartid,@id,@xVal,@yVal,@tempsource,@prsource,@name,@colorVal,@node_size_value,@lastUpdatedX,@lastUpdatedY)";
+                    string sql_string = "insert into " + nodeTableName + " (chart_respective_nodeID,nodeID,xValue,yValue,temperature_source,pressure_source,name,colorValue,nodeSize,lastUpdatedXValue,lastUpdatedYValue) VALUES(@chartid,@id,@xVal,@yVal,@tempsource,@prsource,@name,@colorVal,@node_size_value,@lastUpdatedX,@lastUpdatedY)";
                     SQLiteCommand command = new SQLiteCommand(sql_string, m_dbConnection);
                     command.CommandType = CommandType.Text;
                     command.Parameters.AddWithValue("@chartid", ch.chart_respective_nodeID);
@@ -2946,7 +2937,6 @@ namespace PH_App
                     command.Parameters.AddWithValue("@lnName", ch.name);
                     command.Parameters.AddWithValue("@lnStatus", ch.status);
                     command.ExecuteNonQuery();
-
                     // command.ExecuteNonQuery();
                 }
 
@@ -3186,7 +3176,6 @@ namespace PH_App
                                 chart_respective_nodeID = reader["chart_respective_nodeID"].ToString(),
                                 chart_respective_lineID = reader["chart_respective_lineID"].ToString(),
                                 enableChartStatus = reader["enableChartStatus"].ToString()
-
                             });
                         }
                     }
@@ -3812,7 +3801,7 @@ namespace PH_App
 
                     if (nodeInfoPulledForSaving[i].temperature_source == "Device" || nodeInfoPulledForSaving[i].pressure_source == "Device")
                     {
-                        string sql_forDevice = "SELECT * From  " + tableNameDevice + "  WHERE nodeID = " + nodeInfoPulledForSaving[i].nodeID;
+                        string sql_forDevice = "SELECT * From  " + tableNameDevice + "  where nodeID = '" + nodeInfoPulledForSaving[i].nodeID + "'";
 
                         //--Pulling data for device info
                         SQLiteCommand cmd3 = new SQLiteCommand(sql_forDevice, conx);
@@ -4040,7 +4029,7 @@ namespace PH_App
 
                 //for node info
                 //string sql = "create table IF NOT EXISTS " + tableForNode + "(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),temperature_source varchar(255),pressure_source varchar(255),name varchar(255),colorValue varchar(255),nodeSize varchar(255),airFlow varchar(255),lastUpdatedDate varchar(255))";
-                string sql = "create table IF NOT EXISTS " + tableForNode + "(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),temperature_source varchar(255),pressure_source varchar(255),name varchar(255),colorValue varchar(255),nodeSize varchar(255),airFlow varchar(255),lastUpdatedXValue varchar(255),lastUpdatedYValue varchar(255))";
+                string sql = "create table IF NOT EXISTS " + tableForNode + "(count INTEGER PRIMARY KEY AUTOINCREMENT,chart_respective_nodeID varchar(255) ,nodeID VARCHAR(255),xValue varchar(255),yValue varchar(255),temperature_source varchar(255),pressure_source varchar(255),name varchar(255),colorValue varchar(255),nodeSize varchar(255),lastUpdatedXValue varchar(255),lastUpdatedYValue varchar(255))";
                 SQLiteCommand command = new SQLiteCommand(sql, connection);
                 command.ExecuteNonQuery();
 
@@ -4055,14 +4044,14 @@ namespace PH_App
                 command5.ExecuteNonQuery();
 
                 //These tables are for comfort zone...
-                string sql6 = "create table IF NOT EXISTS  " + tableforComfortZoneDetail + "  ( count INTEGER PRIMARY KEY AUTOINCREMENT,id varchar(255) ,name varchar(255),min_temp varchar(255),max_temp varchar(255),min_hum varchar(255), max_hum  varchar(255) ,colorValue varchar(255)  )";
-                SQLiteCommand command6 = new SQLiteCommand(sql6, connection);
-                command6.ExecuteNonQuery();
+                //string sql6 = "create table IF NOT EXISTS  " + tableforComfortZoneDetail + "  ( count INTEGER PRIMARY KEY AUTOINCREMENT,id varchar(255) ,name varchar(255),min_temp varchar(255),max_temp varchar(255),min_hum varchar(255), max_hum  varchar(255) ,colorValue varchar(255)  )";
+                //SQLiteCommand command6 = new SQLiteCommand(sql6, connection);
+                //command6.ExecuteNonQuery();
 
 
-                string sql7 = "create table IF NOT EXISTS  " + tableForChartComfortZoneSetting + "  ( count INTEGER PRIMARY KEY AUTOINCREMENT,chartID varchar(255) ,comfort_zone_ID varchar(255),status varchar(255) )";
-                SQLiteCommand command7 = new SQLiteCommand(sql7, connection);
-                command7.ExecuteNonQuery();
+                //string sql7 = "create table IF NOT EXISTS  " + tableForChartComfortZoneSetting + "  ( count INTEGER PRIMARY KEY AUTOINCREMENT,chartID varchar(255) ,comfort_zone_ID varchar(255),status varchar(255) )";
+                //SQLiteCommand command7 = new SQLiteCommand(sql7, connection);
+                //command7.ExecuteNonQuery();
 
                 string sql8 = "create table IF NOT EXISTS  " + tableFluidInfo + "  ( count INTEGER PRIMARY KEY AUTOINCREMENT,chartID varchar(255) ,fluidName varchar(255) )";
                 SQLiteCommand command8 = new SQLiteCommand(sql8, connection);
