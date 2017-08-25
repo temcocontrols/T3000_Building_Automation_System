@@ -156,6 +156,7 @@
     <Compile Include="DataGridViewDisplay.Designer.cs">
       <DependentUpon>DataGridViewDisplay.cs</DependentUpon>
     </Compile>
+    <Compile Include="DateTimeSubtractor.cs" />
     <Compile Include="DeviceAndParameterProcess.cs" />
     <Compile Include="DeviceConnection.cs" />
     <Compile Include="DeviceInput.cs">

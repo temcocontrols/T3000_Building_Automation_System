@@ -609,7 +609,7 @@ namespace WFA_psychometric_chart
                         //MessageBox.Show("api_url = " + api_url);
                         var data = wc.DownloadString(api_url);
                         //its a test...                       
-                      //  MessageBox.Show("data = " + data);
+                        //MessageBox.Show("data = " + data);
                         //lets parse the data provided...
                         //and store it into dynamic list...
                         //lets reset the list first..
@@ -654,8 +654,6 @@ namespace WFA_psychometric_chart
 
                                 });
                             }
-
-
 
 
                         }//close of foreach...

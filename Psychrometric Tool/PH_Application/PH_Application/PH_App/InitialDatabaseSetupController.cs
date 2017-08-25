@@ -1,4 +1,10 @@
-﻿using System;
+﻿/*
+ * Project : PH application
+ * Author Name : Bhoj bahadur karki
+ * Date : 2017-July-4th 
+ * Contact : nishantkarki2013@hotmail.com
+ */
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
@@ -76,9 +82,7 @@ namespace PH_App
                         }
                     }
                 }
-
             }
-
 
         }
 
@@ -143,8 +147,7 @@ namespace PH_App
                     UpdateIDOneSelectBuildingInPsychro();
                     SelectBuildingInPsychro("Default_Building");//Selecting the default building
 
-                }
-                
+                }                
             }
             else
             {
@@ -153,7 +156,6 @@ namespace PH_App
                 if (selectedBuildingFromT3000 != "")
                 {
                     //--sqlite new databse creation
-
                     if (buildingSelected[0].Building_Name != "" && buildingSelected[0].country != "" && buildingSelected[0].city != "")
                     {
                         sqlite_database_creation(selectedBuildingFromT3000, buildingSelected[0].country, buildingSelected[0].state, buildingSelected[0].city, buildingSelected[0].street, buildingSelected[0].longitude, buildingSelected[0].latitude, buildingSelected[0].elevation, buildingSelected[0].Building_Name, buildingSelected[0].EngineeringUnits);
@@ -174,17 +176,14 @@ namespace PH_App
                             //string databasePath133 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                             //string databaseFile = databasePath133 + @"\db_psychrometric_project.s3db";
                             //string databaseFile1 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\" + ConfigurationManager.AppSettings["databaseName"];//databasePath1 + @"\db_psychrometric_project.s3db";
-
                             if (File.Exists(databaseFile))
                             {
                                 File.Delete(databaseFile);
-
                             }
                             Environment.Exit(0);
                             Application.Exit();
                         }//Close of else
                     }
-
                 }
                 else
                 {
@@ -197,7 +196,6 @@ namespace PH_App
 
         public void sqlite_database_creation_For_UpdateCondition(string buildingNameSelected, string country, string state, string city, string street, string longitude, string latitude, string elevation, string EngineeringUnits)
         {
-
             //--lets do try catch
             //try
             //{
@@ -224,9 +222,6 @@ namespace PH_App
             // MessageBox.Show(ex.Message);
             //}         
         }
-
-
-
-
+        
     }
 }

@@ -45,28 +45,34 @@ namespace PH_App
 
 
                 mc.DataGridView_Show_Data(fmain);
-                //--Now after showing we need to pull the chart list 
-                
-                    if (columnIndex == 0 || columnIndex == 1)
-                    {
-                        var eventArgs = new DataGridViewCellEventArgs(columnIndex, rowIndex);
-                        //or setting the selected cells manually before executing the function
-                        fmain.dataGridView1.Rows[rowIndex].Cells[columnIndex].Selected = true;
-                        fmain.dataGridView1_CellClick(this, eventArgs);
-                      
-                    }
+                            //--Now after showing we need to pull the chart list 
 
-                }
+                //if (columnIndex >0 )
+                // {
+                                // var eventArgs = new DataGridViewCellEventArgs(columnIndex, rowIndex);
+                                // //or setting the selected cells manually before executing the function
+                                //fmain.dataGridView1.Rows[rowIndex].Cells[columnIndex].Selected = true;
+                                //fmain.dataGridView1_CellClick(this, eventArgs);
+
+                     var eventArgs = new DataGridViewCellEventArgs(0, 0);
+                      //or setting the selected cells manually before executing the function
+                     fmain.dataGridView1.Rows[0].Cells[0].Selected = true;
+                    fmain.dataGridView1_CellClick(this, eventArgs);
+
+
+                 //}
+
+                 }
                else
                 {
-                    if (fmain.dataGridView1.RowCount > 0)
-                    {
-                        var eventArgs = new DataGridViewCellEventArgs(1, 0);
-                        //or setting the selected cells manually before executing the function
-                        fmain.dataGridView1.Rows[0].Cells[1].Selected = true;
-                        fmain.dataGridView1_CellClick(this, eventArgs);
-                    }
-                }
+                            if (fmain.dataGridView1.RowCount > 0)
+                            {
+                                var eventArgs = new DataGridViewCellEventArgs(1, 0);
+                                //or setting the selected cells manually before executing the function
+                                fmain.dataGridView1.Rows[0].Cells[1].Selected = true;
+                                fmain.dataGridView1_CellClick(this, eventArgs);
+                            }
+               }
             }
 
             }else

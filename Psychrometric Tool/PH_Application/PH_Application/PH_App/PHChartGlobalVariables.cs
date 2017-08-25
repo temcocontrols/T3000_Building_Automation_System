@@ -29,8 +29,9 @@ namespace PH_App
             public string name { get; set; }
             public Color colorValue { get; set; }
             public int marker_Size { get; set; }
-            public string lastUpdatedDate { get; set; }
-
+            //public string lastUpdatedDate { get; set; }
+            public string lastUpdatedXValue { get; set; }
+            public string lastUpdatedYValue { get; set; }
 
         }
         public List<DataTypeForNode> listNodeInfoValues = new List<DataTypeForNode>();
@@ -156,16 +157,7 @@ namespace PH_App
 
 
 
-
-
-
-
         //============Variable form main controllerclass===========//
-
-
-
-
-
 
 
 

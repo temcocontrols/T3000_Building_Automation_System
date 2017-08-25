@@ -1662,8 +1662,8 @@ namespace WFA_psychometric_chart
              Lets store the node1 and node2 parameters in variables.
              */
              //--variables to store info of two nodes
-            string idNode1="", lastUpdatedDateNode1 = "", humiditySourceNode1 = "", temperatureSourceNode1 = "", nameNode1 = "";
-            string idNode2 = "", lastUpdatedDateNode2 = "", humiditySourceNode2 = "", temperatureSourceNode2 = "", nameNode2 = "";
+            string idNode1="", lastUpdatedDateNode1XValue = "", lastUpdatedDateNode1YValue = "", humiditySourceNode1 = "", temperatureSourceNode1 = "", nameNode1 = "";
+            string idNode2 = "", lastUpdatedDateNode2XValue = "", lastUpdatedDateNode2YValue = "", humiditySourceNode2 = "", temperatureSourceNode2 = "", nameNode2 = "";
             double xValueNode1=0, yValueNode1=0;
             double xValueNode2=0, yValueNode2=0;
             int airFlowNode1=0, airFlowNode2=0;
@@ -1683,7 +1683,8 @@ namespace WFA_psychometric_chart
                         {
                             nameNode1 = startNodeName = bcs.menuStripNodeInfoValues[x].name;
                             idNode1 = bcs.menuStripNodeInfoValues[x].id;
-                            lastUpdatedDateNode1 = bcs.menuStripNodeInfoValues[x].lastUpdatedDate;
+                            lastUpdatedDateNode1XValue = bcs.menuStripNodeInfoValues[x].lastUpdatedXValue;
+                            lastUpdatedDateNode1YValue = bcs.menuStripNodeInfoValues[x].lastUpdatedYValue;
                             humiditySourceNode1 = bcs.menuStripNodeInfoValues[x].humidity_source;
                             temperatureSourceNode1 = bcs.menuStripNodeInfoValues[x].temperature_source;
                             //nameNode1 =
@@ -1702,7 +1703,8 @@ namespace WFA_psychometric_chart
                         {
                             nameNode2 = endNodeName = bcs.menuStripNodeInfoValues[v].name;
                             idNode2 = bcs.menuStripNodeInfoValues[v].id;
-                            lastUpdatedDateNode2 = bcs.menuStripNodeInfoValues[v].lastUpdatedDate;
+                            lastUpdatedDateNode2XValue = bcs.menuStripNodeInfoValues[v].lastUpdatedXValue;
+                            lastUpdatedDateNode2YValue = bcs.menuStripNodeInfoValues[v].lastUpdatedYValue;
                             humiditySourceNode2 = bcs.menuStripNodeInfoValues[v].humidity_source;
                             temperatureSourceNode2 = bcs.menuStripNodeInfoValues[v].temperature_source;
                             //nameNode1 =
