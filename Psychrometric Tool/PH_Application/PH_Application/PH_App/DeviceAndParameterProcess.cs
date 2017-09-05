@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿/*
+ * Project : PH application
+ * Author Name : Bhoj bahadur karki
+ * Date : 2017-July-4th 
+ * Contact : nishantkarki2013@hotmail.com
+ */
 namespace PH_App
 {
     class DeviceAndParameterProcess
@@ -15,16 +15,12 @@ namespace PH_App
      /// <param name="variableName"></param>
      /// <param name="variableNumber"></param>
         public double InputDeviceInfoAndValue(int controllerInstanceID,string variableName, int variableNumber)
-        {
-            
-
+        {                    
             /*
              Task by this function : 
              1. Filter which object to call.
-             2. call a function and a value
-             3. 
+             2. call a function and a value            
              */
-
             string inputNameForYabee = "";
             if(variableName == "VAR")
             {
@@ -55,9 +51,7 @@ namespace PH_App
             }
             //db.ScanForDevice();
             return valueFromDevice;
-
         }
-
 
         /// <summary>
         /// Not used
@@ -67,13 +61,6 @@ namespace PH_App
         {
             return 0;
         }
-
-
-
-
-
-
-
 
     }
 }

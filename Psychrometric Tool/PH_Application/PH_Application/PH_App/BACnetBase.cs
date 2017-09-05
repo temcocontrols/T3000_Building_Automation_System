@@ -28,7 +28,6 @@
  * Ported from project at http://bacnet.sourceforge.net/
  */
 
-using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO.BACnet.Serialize;

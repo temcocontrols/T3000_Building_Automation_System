@@ -73,7 +73,6 @@ namespace PH_App
             }
             return result;
         }
-
         // Apply a transformation to a vector (point):
         public float[] VectorMultiply(float[] vector)
         {
