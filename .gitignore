@@ -14,7 +14,7 @@
 *.sdf
 *.opensdf
 **/ipch/
-**/Release/
+
 **/*.bin
 
 **/*.Opt
