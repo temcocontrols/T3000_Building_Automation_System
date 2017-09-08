@@ -2749,14 +2749,20 @@ void CDialogCM5_BacNet::Fresh()
 			{
 				int ret = 0;
 				ret = temp_buffer[2];
-				if(ret == BIG_MINIPANEL)
+				if (ret == BIG_MINIPANEL)
 					bacnet_device_type = BIG_MINIPANEL;
-				else if(ret == SMALL_MINIPANEL)
+				else if (ret == SMALL_MINIPANEL)
 					bacnet_device_type = SMALL_MINIPANEL;
-				else if(ret == TINY_MINIPANEL)
+				else if (ret == TINY_MINIPANEL)
 					bacnet_device_type = TINY_MINIPANEL;
 				else if (ret == TINY_EX_MINIPANEL)
 					bacnet_device_type = TINY_EX_MINIPANEL;
+				else if (ret == MINIPANELARM)
+					bacnet_device_type = MINIPANELARM;
+				else if (ret == MINIPANELARM_LB)
+					bacnet_device_type = MINIPANELARM_LB;
+				else if (ret == MINIPANELARM_TB)
+					bacnet_device_type = MINIPANELARM_TB;
 				else
 					bacnet_device_type = PRODUCT_CM5;
 			}

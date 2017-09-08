@@ -3446,8 +3446,12 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 				bacnet_device_type = TINY_EX_MINIPANEL;
 			else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM)
 				bacnet_device_type = MINIPANELARM;
+			else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_LB)
+				bacnet_device_type = MINIPANELARM_LB;
+			else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_TB)
+				bacnet_device_type = MINIPANELARM_TB;
 			else
-				bacnet_device_type = MINIPANELARM;
+				bacnet_device_type = PM_CM5;
 			my_temp_point = my_temp_point + 1;	//中间 minitype  和 debug  没什么用;
 			Device_Basic_Setting.reg.pro_info.harware_rev = *(my_temp_point++);
 			Device_Basic_Setting.reg.pro_info.firmware0_rev_main = *(my_temp_point++);

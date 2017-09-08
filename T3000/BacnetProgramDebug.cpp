@@ -362,14 +362,14 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 
 
 				//这样加实在是情非得已，老毛非得加一堆条件，还要smart;
-				if((bacnet_device_type == BIG_MINIPANEL) || ((bacnet_device_type == SMALL_MINIPANEL)) || (bacnet_device_type == TINY_MINIPANEL) || (bacnet_device_type == TINY_EX_MINIPANEL))
+				if((bacnet_device_type == BIG_MINIPANEL || bacnet_device_type == MINIPANELARM || bacnet_device_type == MINIPANELARM_TB || bacnet_device_type == MINIPANELARM_LB || bacnet_device_type == MINIPANELARM_LB || bacnet_device_type == MINIPANELARM_TB) || ((bacnet_device_type == SMALL_MINIPANEL)) || (bacnet_device_type == TINY_MINIPANEL) || (bacnet_device_type == TINY_EX_MINIPANEL))
 				{
-					if(bacnet_device_type == BIG_MINIPANEL)
+					if (bacnet_device_type == BIG_MINIPANEL || bacnet_device_type == MINIPANELARM)
 					{
 						digital_special_output_count = BIG_MINIPANEL_OUT_D;
 						analog_special_output_count = BIG_MINIPANEL_OUT_A;
 					}
-					else if(bacnet_device_type == SMALL_MINIPANEL)
+					else if(bacnet_device_type == SMALL_MINIPANEL || bacnet_device_type == MINIPANELARM_LB)
 					{
 						digital_special_output_count = SMALL_MINIPANEL_OUT_D;
 						analog_special_output_count = SMALL_MINIPANEL_OUT_A;
@@ -379,7 +379,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 						digital_special_output_count = TINY_MINIPANEL_OUT_D;
 						analog_special_output_count = TINY_MINIPANEL_OUT_A;
 					}
-					else if (bacnet_device_type == TINY_EX_MINIPANEL)
+					else if (bacnet_device_type == TINY_EX_MINIPANEL || bacnet_device_type == MINIPANELARM_TB)
 					{
 						digital_special_output_count = TINYEX_MINIPANEL_OUT_D;
 						analog_special_output_count = TINYEX_MINIPANEL_OUT_A;

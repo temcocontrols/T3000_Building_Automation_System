@@ -772,7 +772,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				((CStatic *)GetDlgItem(IDC_STATIC_BAC_SETTING_SD_CARD))->SetWindowTextW(_T("unknown"));
 			}
 
-			if((bacnet_device_type == BIG_MINIPANEL) || (bacnet_device_type == SMALL_MINIPANEL) || (bacnet_device_type == TINY_MINIPANEL) || (bacnet_device_type == TINY_EX_MINIPANEL) || (bacnet_device_type == PRODUCT_CM5))
+			if((bacnet_device_type == BIG_MINIPANEL || bacnet_device_type == MINIPANELARM || bacnet_device_type == MINIPANELARM_LB || bacnet_device_type == MINIPANELARM_TB) || (bacnet_device_type == SMALL_MINIPANEL) || (bacnet_device_type == TINY_MINIPANEL) || (bacnet_device_type == TINY_EX_MINIPANEL) || (bacnet_device_type == PRODUCT_CM5))
 			{
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->ResetContent();
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->AddString(Device_Serial_Port_Status[NOUSE]);
@@ -854,11 +854,19 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 			{
 				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("CM5"));
 			}
-			else if (bacnet_device_type == PM_MINIPANEL_ARM)
+			else if (bacnet_device_type == MINIPANELARM)
 			{
-				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3Controller(ARM)"));
+				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-BB(ARM)"));
 			}
-			else if(bacnet_device_type == BIG_MINIPANEL)
+			else if (bacnet_device_type == MINIPANELARM_LB)
+			{
+				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-LB(ARM)"));
+			}
+			else if (bacnet_device_type == MINIPANELARM_TB)
+			{
+				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-TB(ARM)"));
+			}
+			else if (bacnet_device_type == BIG_MINIPANEL)
 			{
 				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-BB"));
 			}
@@ -877,11 +885,14 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 
 			//((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3Controller(ARM)"));
 
-			if((Device_Basic_Setting.reg.mini_type == BIG_MINIPANEL) || 
-				(Device_Basic_Setting.reg.mini_type == SMALL_MINIPANEL) ||
-				(Device_Basic_Setting.reg.mini_type == TINY_MINIPANEL) || 
+			if(
+				(bacnet_device_type == BIG_MINIPANEL || bacnet_device_type == MINIPANELARM) ||
+				(Device_Basic_Setting.reg.mini_type == SMALL_MINIPANEL || bacnet_device_type == MINIPANELARM_LB) ||
+				(Device_Basic_Setting.reg.mini_type == TINY_MINIPANEL || bacnet_device_type == MINIPANELARM_TB) ||
 				(Device_Basic_Setting.reg.mini_type == TINY_EX_MINIPANEL) ||
-				(Device_Basic_Setting.reg.mini_type == PRODUCT_CM5))
+				(Device_Basic_Setting.reg.mini_type == PRODUCT_CM5)
+				
+				)
 			{
 				temp_hw_version.Format(_T("%d"),Device_Basic_Setting.reg.pro_info.harware_rev);
 				temp_pic_version.Format(_T("%d"),Device_Basic_Setting.reg.pro_info.frimware1_rev);
