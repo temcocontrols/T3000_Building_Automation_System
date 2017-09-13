@@ -46,7 +46,7 @@ END_MESSAGE_MAP()
 CT3000App::CT3000App()
 {
 	m_bHiColorIcons = TRUE;
-	CurrentT3000Version=_T("    2017.9.7");
+	CurrentT3000Version=_T("    2017.9.12");
 	T3000_Version = 20531;
 	m_lastinterface=19;
 }
@@ -1102,10 +1102,16 @@ void CT3000App::CopyDirectory(CString strSrcPath,CString strDstPath)
 	else
 		AfxMessageBox(_T("Failed"));
   }
+#include"Tstatrangedlg.h"
 void CT3000App::OnVersionInfo()
 {
-	CString strHistotyFile=g_strExePth+_T("history.txt");
-	ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);
+	CTstatRangeDlg dlg;
+	dlg.DoModal();
+	int rangevalue = dlg.m_current_range;
+
+	/*CString strHistotyFile=g_strExePth+_T("history.txt");
+	ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);*/
+	
 }
 
 BOOL CT3000App::haveRegister()
