@@ -30,8 +30,12 @@
 <<<<<<< HEAD
     <PlatformToolset>v100</PlatformToolset>
 =======
+<<<<<<< HEAD
+    <PlatformToolset>v100</PlatformToolset>
+=======
     <PlatformToolset>v140</PlatformToolset>
 >>>>>>> master
+>>>>>>> Alex
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -129,6 +133,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX86</TargetMachine>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <UACUIAccess>true</UACUIAccess>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

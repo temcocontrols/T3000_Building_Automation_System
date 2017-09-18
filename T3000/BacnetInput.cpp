@@ -144,7 +144,7 @@ void CBacnetInput::Reload_Unit_Type()
 	}
 
 	int initial_count = 0;
-	if(bacnet_device_type == BIG_MINIPANEL)	//Special Initial
+	if(bacnet_device_type == BIG_MINIPANEL|| bacnet_device_type == MINIPANELARM)	//Special Initial
 	{	
 		if(BIG_MINIPANEL_IN_A > (int)m_Input_data.size()) 
 			initial_count = (int)m_Input_data.size();
@@ -160,7 +160,7 @@ void CBacnetInput::Reload_Unit_Type()
 			}
 		}
 	}
-	else if(bacnet_device_type == SMALL_MINIPANEL)
+	else if(bacnet_device_type == SMALL_MINIPANEL || bacnet_device_type == MINIPANELARM_LB)
 	{
 		if(SMALL_MINIPANEL_IN_A > (int)m_Input_data.size()) 
 			initial_count = (int)m_Input_data.size();
@@ -192,7 +192,7 @@ void CBacnetInput::Reload_Unit_Type()
 			}
 		}
 	}
-	else if (bacnet_device_type == TINY_EX_MINIPANEL)
+	else if (bacnet_device_type == TINY_EX_MINIPANEL || bacnet_device_type == MINIPANELARM_TB)
 	{
 		if (TINYEX_MINIPANEL_IN_A > (int)m_Input_data.size())
 			initial_count = (int)m_Input_data.size();
@@ -559,7 +559,8 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 	}
 	else if (bacnet_device_type == PID_T36CTA)
 	{
-		INPUT_LIMITE_ITEM_COUNT = 19;
+		/*INPUT_LIMITE_ITEM_COUNT = 19;*/
+        INPUT_LIMITE_ITEM_COUNT = 24;
 		Minipanel_device = 0;
 	}
 	else if (bacnet_device_type == TINY_EX_MINIPANEL)

@@ -64,6 +64,8 @@
 #define PM_WATER_SENSOR                         71
 #define PM_T3_LC            72
 #define PM_PWMETER			73
+#define PM_MINIPANEL_ARM            74
+
 
 #define PM_TSTAT8_WIFI 91
 #define PM_TSTAT8_OCC 92

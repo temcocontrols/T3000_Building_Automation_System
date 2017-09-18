@@ -184,6 +184,9 @@ CString CTStat_Net::GetProductName()
 	case PM_MINIPANEL:
 	    strProductName="T3-BB/LB/TB";
 		break;
+	case PM_MINIPANEL_ARM:
+		strProductName = "T3-BB/LB/TB(ARM)";
+		break;
     case PM_CO2_NET:
         strProductName="CO2 Net";
         break;

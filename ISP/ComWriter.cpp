@@ -1574,6 +1574,18 @@ BOOL CComWriter::UpdataDeviceInformation_ex(unsigned short device_productID)
     {
         return TRUE;
     }
+	else if (((prodcutname.CompareNoCase(_T("co2net")) == 0)
+		|| (prodcutname.CompareNoCase(_T("co2rs485")) == 0)
+		|| (prodcutname.CompareNoCase(_T("humnet")) == 0)
+		|| (prodcutname.CompareNoCase(_T("humrs485")) == 0)
+		|| (prodcutname.CompareNoCase(_T("psnet")) == 0)
+		)
+		&& (hexproductname.CompareNoCase(_T("co2all")) == 0)
+		)
+	{
+		return TRUE;
+	}
+
     else if ((hexproductname.CompareNoCase(_T("tstat6"))==0)&&(prodcutname.CompareNoCase(_T("tstat5i"))==0))
     {
         return TRUE;
@@ -1689,6 +1701,19 @@ BOOL CComWriter::UpdataDeviceInformation(int& ID)
     {
         Ret_Result= TRUE;
     }
+
+	else if (((prodcutname.CompareNoCase(_T("co2net")) == 0)
+		|| (prodcutname.CompareNoCase(_T("co2rs485")) == 0)
+		|| (prodcutname.CompareNoCase(_T("humnet")) == 0)
+		|| (prodcutname.CompareNoCase(_T("humrs485")) == 0)
+		|| (prodcutname.CompareNoCase(_T("psnet")) == 0)
+		)
+		&& (hexproductname.CompareNoCase(_T("co2all")) == 0)
+		)
+	{
+		return TRUE;
+	}
+
     else if ((hexproductname.CompareNoCase(_T("tstat6"))==0)&&(prodcutname.CompareNoCase(_T("tstat5i"))==0))
     {
         Ret_Result= TRUE;

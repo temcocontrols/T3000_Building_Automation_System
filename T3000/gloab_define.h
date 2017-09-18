@@ -997,6 +997,9 @@ const int WINDOW_REMOTE_POINT = 13;
 const int KEY_INSERT = 1020;
 
 
+<<<<<<< HEAD
+ 
+=======
 typedef enum
 {		
 	PRODUCT_CM5 = 0,						//10A + 8 D			//10D									   //IN				//OUT	
@@ -1009,6 +1012,7 @@ typedef enum
 	PID_T36CTA = 95,
 	
 };
+>>>>>>> Alex
 
 const int BIG_MINIPANEL_IN_A = 32;
 const int BIG_MINIPANEL_IN_D = 0;	//If  this place is not 0 ,need code.

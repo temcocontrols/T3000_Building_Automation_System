@@ -2195,7 +2195,7 @@ int CTStatScanner::GetAllNodeFromDataBase()
                 
                     str_product_id=m_q.getValuebyName(L"Product_class_ID");
 
-                if((_wtoi(str_product_id) == PM_MINIPANEL) ||(_wtoi(str_product_id) == PM_CM5))
+                if((_wtoi(str_product_id) == PM_MINIPANEL) ||(_wtoi(str_product_id) == PM_CM5)|| (_wtoi(str_product_id) == PM_MINIPANEL_ARM))
                 {
                     CString strprotocol;
 
@@ -2747,7 +2747,7 @@ void CTStatScanner::AddNewNetToDB()
 			//≤Â»Î
 			CString temp_pro4;
 			bool is_bacnet_device = false;
-			if((m_refresh_net_device_data.at(i).product_id == PM_MINIPANEL) || (m_refresh_net_device_data.at(i).product_id == PM_CM5))
+			if((m_refresh_net_device_data.at(i).product_id == PM_MINIPANEL)|| (m_refresh_net_device_data.at(i).product_id == PM_MINIPANEL_ARM) || (m_refresh_net_device_data.at(i).product_id == PM_CM5))
 				is_bacnet_device = true;
 			if(is_bacnet_device)
 				temp_pro4.Format(_T("%d"),PROTOCOL_BACNET_IP);
@@ -3240,7 +3240,7 @@ void CTStatScanner::ScanSubnetFromEthernetDevice()//scan
 	int controller_counter = 0;
 	for (int i=0;i<m_refresh_net_device_data.size();i++)
 	{
-		if((m_refresh_net_device_data.at(i).product_id != PM_MINIPANEL) && (m_refresh_net_device_data.at(i).product_id != PM_CM5))
+		if((m_refresh_net_device_data.at(i).product_id != PM_MINIPANEL)&& (m_refresh_net_device_data.at(i).product_id != PM_MINIPANEL_ARM) && (m_refresh_net_device_data.at(i).product_id != PM_CM5))
 		{
 			continue;
 		}
@@ -3260,7 +3260,7 @@ void CTStatScanner::ScanSubnetFromEthernetDevice()//scan
 
 	for (int i=0;i<m_refresh_net_device_data.size();i++)
 	{
-		if((m_refresh_net_device_data.at(i).product_id != PM_MINIPANEL) && (m_refresh_net_device_data.at(i).product_id != PM_CM5))
+		if((m_refresh_net_device_data.at(i).product_id != PM_MINIPANEL)&& (m_refresh_net_device_data.at(i).product_id != PM_MINIPANEL_ARM) && (m_refresh_net_device_data.at(i).product_id != PM_CM5))
 		{
 			continue;
 		}
@@ -3993,6 +3993,7 @@ BOOL CTStatScanner::IsNetDevice(const CString& strDevType)
             || nDeviceType == PM_NC
             || nDeviceType == PM_CO2_NET
             || nDeviceType == PM_MINIPANEL
+		|| nDeviceType == PM_MINIPANEL_ARM
             || nDeviceType == PM_CM5
 			|| nDeviceType == STM32_CO2_NET)
     {

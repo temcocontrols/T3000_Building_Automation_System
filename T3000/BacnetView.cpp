@@ -853,7 +853,8 @@ LRESULT CDialogCM5_BacNet::Change_Next_Panel(WPARAM wParam,LPARAM lParam)
 		for (int i=0;i< pFrame->m_product.size();i++)
 		{
 			if((pFrame->m_product.at(i).product_class_id != PM_MINIPANEL) &&
-				(pFrame->m_product.at(i).product_class_id !=PM_CM5))
+				(pFrame->m_product.at(i).product_class_id !=PM_CM5) &&
+				(pFrame->m_product.at(i).product_class_id != PM_MINIPANEL_ARM))
 			{
 				continue;
 			}
@@ -878,7 +879,8 @@ LRESULT CDialogCM5_BacNet::Change_Next_Panel(WPARAM wParam,LPARAM lParam)
 		for (int i=0;i< pFrame->m_product.size();i++)
 		{
 			if((pFrame->m_product.at(i).product_class_id != PM_MINIPANEL) &&
-				(pFrame->m_product.at(i).product_class_id !=PM_CM5))
+				(pFrame->m_product.at(i).product_class_id !=PM_CM5) &&
+				(pFrame->m_product.at(i).product_class_id != PM_MINIPANEL_ARM))
 			{
 				continue;
 			}
@@ -2747,14 +2749,20 @@ void CDialogCM5_BacNet::Fresh()
 			{
 				int ret = 0;
 				ret = temp_buffer[2];
-				if(ret == BIG_MINIPANEL)
+				if (ret == BIG_MINIPANEL)
 					bacnet_device_type = BIG_MINIPANEL;
-				else if(ret == SMALL_MINIPANEL)
+				else if (ret == SMALL_MINIPANEL)
 					bacnet_device_type = SMALL_MINIPANEL;
-				else if(ret == TINY_MINIPANEL)
+				else if (ret == TINY_MINIPANEL)
 					bacnet_device_type = TINY_MINIPANEL;
 				else if (ret == TINY_EX_MINIPANEL)
 					bacnet_device_type = TINY_EX_MINIPANEL;
+				else if (ret == MINIPANELARM)
+					bacnet_device_type = MINIPANELARM;
+				else if (ret == MINIPANELARM_LB)
+					bacnet_device_type = MINIPANELARM_LB;
+				else if (ret == MINIPANELARM_TB)
+					bacnet_device_type = MINIPANELARM_TB;
 				else
 					bacnet_device_type = PRODUCT_CM5;
 			}
@@ -5426,8 +5434,15 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 			
 		}
 	}
-	if((!read_customer_unit) && pFrame->m_product.at(selected_product_index).protocol != MODBUS_RS485 && ((pFrame->m_product.at(selected_product_index).product_class_id ==PM_CM5 ) ||
-								  (pFrame->m_product.at(selected_product_index).product_class_id ==PM_MINIPANEL )	))
+	if((!read_customer_unit) && pFrame->m_product.at(selected_product_index).protocol != MODBUS_RS485 
+		&& (
+			(pFrame->m_product.at(selected_product_index).product_class_id ==PM_CM5 ) 
+			||
+			(pFrame->m_product.at(selected_product_index).product_class_id ==PM_MINIPANEL )	
+			||
+			(pFrame->m_product.at(selected_product_index).product_class_id == PM_MINIPANEL_ARM)
+			)
+	  )
 	{
 		if(GetPrivateData_Blocking(g_bac_instance,READUNIT_T3000,0,BAC_CUSTOMER_UNITS_COUNT - 1,sizeof(Str_Units_element)) > 0)
 		{
@@ -5440,7 +5455,10 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
       if((!read_analog_customer_unit) && 
 		pFrame->m_product.at(selected_product_index).protocol != MODBUS_RS485 && 
 		((pFrame->m_product.at(selected_product_index).product_class_id ==PM_CM5 ) ||
-		(pFrame->m_product.at(selected_product_index).product_class_id ==PM_MINIPANEL )	))
+		(pFrame->m_product.at(selected_product_index).product_class_id ==PM_MINIPANEL )
+			||
+			(pFrame->m_product.at(selected_product_index).product_class_id == PM_MINIPANEL_ARM)
+			))
 	{
 		CString temp_cs;
 		if(GetPrivateData_Blocking(g_bac_instance,READANALOG_CUS_TABLE_T3000,0,3,sizeof(Str_table_point)) > 0)
@@ -6083,7 +6101,7 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
 	 str_object_instance.Format(_T("%u"),temp_object_instance);
 	 str_panel_number.Format(_T("%u"),temp_panel_number);
 	 str_serialid.Format(_T("%u"), pFrame->m_product.at(selected_product_index).serial_number);
-	 if(read_data[MODBUS_PRODUCT_MODEL] == PM_MINIPANEL)
+	 if(read_data[MODBUS_PRODUCT_MODEL] == PM_MINIPANEL|| read_data[MODBUS_PRODUCT_MODEL] == PM_MINIPANEL_ARM)
 	 {
 		 // 同步 本地数据库 的资料 ， panel number 和 实例号需与设备匹配;
 		 if((temp_panel_number != pFrame->m_product.at(selected_product_index).panel_number) || (temp_object_instance != pFrame->m_product.at(selected_product_index).object_instance))

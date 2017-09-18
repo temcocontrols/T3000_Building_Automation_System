@@ -166,7 +166,10 @@ void SaveModbusConfigFile_Cache(CString &SaveConfigFilePath,char *npoint,unsigne
 int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path);
 int LoadBacnetConfigFile_Cache(LPCTSTR tem_read_path);
 int LoadModbusConfigFile_Cache(LPCTSTR tem_read_path);
+
 int LoadMiniModbusConfigFile(LPCTSTR tem_read_path);
+//For MINIPanel ARM
+int LoadMiniModbusConfigFile_MINIARM(LPCTSTR tem_read_path);
 void Copy_Data_From_485_to_Bacnet(unsigned short *start_point);
 int handle_read_monitordata_ex(char *npoint,int nlength);
 int handle_read_pic_data_ex(char *npoint,int nlength);

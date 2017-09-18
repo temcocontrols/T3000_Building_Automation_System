@@ -426,6 +426,7 @@ BOOL CFlash_Multy::IsOurNetDevice(int DevType)
             || DevType == PM_NC
             || DevType == PM_CO2_NET
             || DevType == PM_MINIPANEL
+		|| DevType == PM_MINIPANEL_ARM
             || DevType == PM_CM5
 			|| DevType == STM32_CO2_NET)
     {
@@ -1290,7 +1291,7 @@ DWORD WINAPI  CFlash_Multy::multy_check_online(LPVOID lpVoid)
             if (ret > 0)
             {
                 softrev =0.0;
-                if(DataBuffer[7] == PM_CM5 || DataBuffer[7] == PM_MINIPANEL)
+                if(DataBuffer[7] == PM_CM5 || DataBuffer[7] == PM_MINIPANEL || DataBuffer[7] == PM_MINIPANEL_ARM)
                 {
                     softrev = (float)DataBuffer[5]+((float)DataBuffer[4])/10;
 

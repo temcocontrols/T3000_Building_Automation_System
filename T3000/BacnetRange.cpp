@@ -632,13 +632,13 @@ void BacnetRange::Initial_static()
 		}
 
 		// Big  input27 - 32  small 11 - 16  tiny 6 - 11 range  T3-22 1-11 ÀïÃæÓÐ¸ßËÙÂö³å.  ÆäËûµÄ ÉèÖÃ´Ërange ¶¼ÊÇµÍËÙÂö³å;
-		if((bacnet_device_type == BIG_MINIPANEL) && (input_list_line >=26) && (input_list_line <=31))
+		if((bacnet_device_type == BIG_MINIPANEL || bacnet_device_type == MINIPANELARM) && (input_list_line >=26) && (input_list_line <=31))
 		{
 			GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. Pulse Count (Fast 100Hz)"));
 			GetDlgItem(IDC_RADIO69)->EnableWindow(FALSE);	
 			GetDlgItem(IDC_RADIO87)->EnableWindow(TRUE);
 		}
-		else if((bacnet_device_type == SMALL_MINIPANEL) && (input_list_line >=10) && (input_list_line <=16))
+		else if((bacnet_device_type == SMALL_MINIPANEL || bacnet_device_type == MINIPANELARM_LB) && (input_list_line >=10) && (input_list_line <=16))
 		{
 			GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. Pulse Count (Fast 100Hz)"));
 			GetDlgItem(IDC_RADIO69)->EnableWindow(FALSE);	
@@ -650,7 +650,7 @@ void BacnetRange::Initial_static()
 			GetDlgItem(IDC_RADIO69)->EnableWindow(FALSE);	
 			GetDlgItem(IDC_RADIO87)->EnableWindow(TRUE);
 		}
-		else if ((bacnet_device_type == TINY_EX_MINIPANEL) && (input_list_line >= 0) && (input_list_line <= 7))
+		else if ((bacnet_device_type == TINY_EX_MINIPANEL || bacnet_device_type == MINIPANELARM_TB) && (input_list_line >= 0) && (input_list_line <= 7))
 		{
 			GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. Pulse Count (Fast 100Hz)"));
 			GetDlgItem(IDC_RADIO69)->EnableWindow(FALSE);

@@ -59,7 +59,7 @@ void CBacnetAddVirtualDevice::UI_Initial()
 	for (mtiterator=product_map.begin();mtiterator!=product_map.end();++mtiterator)
 	{
 		((CComboBox *)GetDlgItem(IDC_COMBO_VIRTUAL_PID_NAME))->AddString(mtiterator->second);
-		if(mtiterator->first== PM_MINIPANEL)
+		if(mtiterator->first== PM_MINIPANEL|| mtiterator->first == PM_MINIPANEL_ARM)
 		{
 			((CComboBox *)GetDlgItem(IDC_COMBO_VIRTUAL_PID_NAME))->SetWindowTextW(mtiterator->second);
 			GetDlgItem(IDC_EDIT_VIRTUAL_PID)->SetWindowTextW(_T("35"));

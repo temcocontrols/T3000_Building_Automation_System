@@ -718,6 +718,7 @@ BOOL IS_Temco_Product(int product_model)
 			case   PM_CO2_RS485				   :
 			case   PM_CO2_NODE				   :
 			case   PM_MINIPANEL				   :
+			case   PM_MINIPANEL_ARM					:
 			case   PM_CS_SM_AC				   :
 			case   PM_CS_SM_DC				   :
 			case   PM_CS_RSM_AC				   :
@@ -3443,8 +3444,14 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 				bacnet_device_type = TINY_MINIPANEL;
 			else if (Device_Basic_Setting.reg.mini_type == TINY_EX_MINIPANEL)
 				bacnet_device_type = TINY_EX_MINIPANEL;
+			else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM)
+				bacnet_device_type = MINIPANELARM;
+			else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_LB)
+				bacnet_device_type = MINIPANELARM_LB;
+			else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_TB)
+				bacnet_device_type = MINIPANELARM_TB;
 			else
-				bacnet_device_type = PRODUCT_CM5;
+				bacnet_device_type = PM_CM5;
 			my_temp_point = my_temp_point + 1;	//中间 minitype  和 debug  没什么用;
 			Device_Basic_Setting.reg.pro_info.harware_rev = *(my_temp_point++);
 			Device_Basic_Setting.reg.pro_info.firmware0_rev_main = *(my_temp_point++);
@@ -4042,7 +4049,7 @@ void Inial_Product_map()
 	product_map.insert(map<int,CString>::value_type(PM_T34AO,_T("T3-4AO")));
 	product_map.insert(map<int,CString>::value_type(PM_T36CT,_T("T3-6CT")));
 	product_map.insert(map<int,CString>::value_type(PM_MINIPANEL,_T("T3-BB/LB/TB")));
-
+	product_map.insert(map<int, CString>::value_type(PM_MINIPANEL_ARM, _T("T3-BB/LB/TB(ARM)")));
 	product_map.insert(map<int,CString>::value_type(PM_PRESSURE,_T("Pressure Sensor")));
 	product_map.insert(map<int,CString>::value_type(PM_HUM_R,_T("HUM-R")));
 	product_map.insert(map<int,CString>::value_type(PM_T322AI,_T("T3-22I")));
@@ -6883,6 +6890,106 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
     return 0;
 }
 
+//For MINIPanel ARM
+int LoadMiniModbusConfigFile_MINIARM(LPCTSTR tem_read_path)
+{
+	CString FilePath;
+	FilePath.Format(_T("%s"), tem_read_path);
+	CFileFind temp_find;
+	if (!temp_find.FindFile(FilePath))
+		return -1;
+
+	CFile myfile(tem_read_path, CFile::modeRead);
+	char *pBuf;
+	DWORD dwFileLen;
+	dwFileLen = myfile.GetLength();
+	pBuf = new char[dwFileLen + 1];
+	memset(pBuf, 0, dwFileLen);
+	pBuf[dwFileLen] = 0;
+	myfile.Read(pBuf, dwFileLen);     //MFC   CFile 类 很方便
+	myfile.Close();
+	//MessageBox(pBuf);
+	char * temp_point = pBuf;
+	if (temp_point[0] != 4)
+		return -1;
+	temp_point = temp_point + 1;
+
+	unsigned long temp_file_time;
+	memcpy(&temp_file_time, temp_point, 4);
+
+	CTime temp_time_now = CTime::GetCurrentTime();
+	unsigned long temp_cur_long_time = temp_time_now.GetTime();
+
+	//如果485 的prg时间 是三天以前的  或者485文件的时间大于现在的时间，这个prg 文件 就不要了;
+	//if((temp_cur_long_time - temp_file_time > 259200) || (temp_file_time > temp_cur_long_time))
+	//{
+	//	return -1;
+	//}
+	temp_point = temp_point + 4;
+
+	unsigned short temp_buffer[50000];
+	memset(temp_buffer, 0, 50000 * 2);
+
+	unsigned short write_buffer[200];
+
+	memcpy(temp_buffer, temp_point, dwFileLen - 5);
+
+	memcpy(&Device_Basic_Setting.reg, temp_buffer, 400); //Setting 的400个字节;
+														 //g_progress_persent = (i+1)*100 / 32;	
+	int total_count = BAC_OUTPUT_ITEM_COUNT + BAC_INPUT_ITEM_COUNT;
+	int resent_count = 0;
+	for (int i = 0;i<BAC_OUTPUT_ITEM_COUNT;i++)
+	{
+		memcpy(&m_Output_data.at(i), temp_buffer + 200 + i * 23, sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
+
+		memset(write_buffer, 0, sizeof(write_buffer));
+		memcpy(write_buffer, &m_Output_data.at(i), sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
+		for (int x = 0;x<200;x++)
+		{
+			write_buffer[x] = htons(write_buffer[x]);
+		}
+		if (Write_Multi_org_short(g_tstat_id, write_buffer, 10000 + 23 * i, 23, 10)> 0)
+		{
+			resent_count++;
+			g_progress_persent = (resent_count * 100) / total_count;
+		}
+		else
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write config file timeout!"));
+			g_progress_persent = 0;
+			return -1;
+		}
+		Sleep(10);
+	}
+	SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write  output OK!"));
+	for (int j = 0;j<BAC_INPUT_ITEM_COUNT;j++)
+	{
+		memcpy(&m_Input_data.at(j), temp_buffer + 200 + 23 * 64 + j * 23, sizeof(Str_in_point)); //Input 46 个字节 ;
+
+		memset(write_buffer, 0, sizeof(write_buffer));
+		memcpy(write_buffer, &m_Input_data.at(j), sizeof(Str_in_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
+		for (int Z = 0;Z<200;Z++)
+		{
+			write_buffer[Z] = htons(write_buffer[Z]);
+		}
+		if (Write_Multi_org_short(g_tstat_id, write_buffer, BAC_IN_START_REG + 23 * j, 23, 10)>0)
+		{
+			resent_count++;
+			g_progress_persent = (resent_count * 100) / total_count;
+
+		}
+		else
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write config file timeout!"));
+			g_progress_persent = 0;
+			return -1;
+		}
+		Sleep(10);
+	}
+	SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write input OK!"));
+	return 1;
+
+}
 
 int LoadMiniModbusConfigFile(LPCTSTR tem_read_path)
 {
@@ -8311,7 +8418,10 @@ void SaveBacnetConfigFile(CString &SaveConfigFilePath)
 bool Is_Bacnet_Device(unsigned short n_product_class_id)
 {
     if((n_product_class_id == PM_CM5) ||
-            (n_product_class_id == PM_MINIPANEL))
+            (n_product_class_id == PM_MINIPANEL)
+		||
+		(n_product_class_id == PM_MINIPANEL_ARM)
+		)
     {
         return true;
     }

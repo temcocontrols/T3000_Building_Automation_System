@@ -13,6 +13,10 @@
 #include "global_variable_extern.h"
 #include "LanguageLocale.h"
 
+
+
+
+
 extern int g_MainScreenLevel;
 extern int g_ParamLevel;
 extern int g_OutPutLevel;
@@ -217,7 +221,7 @@ public:
 // Implementation
 	UINT  m_nAppLook;
 	BOOL  m_bHiColorIcons;
-
+        BOOL IsWow64() ;
 	BOOL RegisterOcx(LPCTSTR   OcxFileName);
 	virtual void PreLoadState();
 	virtual void LoadCustomState();

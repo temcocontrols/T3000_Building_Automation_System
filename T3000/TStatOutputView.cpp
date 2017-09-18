@@ -758,22 +758,45 @@ void CTStatOutputView::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
         }
         if (m_tstat_output_data.at(lRow).Range.RegValue==0)//Manual+Range=on/off
         {
-            bitset<16> RegValue(m_tstat_output_data.at(lRow).Value.RegValue);
-            if (m_tstat_output_data.at(lRow).Value.StrValue.CompareNoCase(Global_String_NO)==0)//如果当前的值是 ON
-            {
-                pwrite_info->Changed_Name.Format(_T("%s,From %s to %s"),m_tstat_output_data.at(lRow).OutputName.StrValue,m_tstat_output_data.at(lRow).Value.StrValue,Global_String_OFF);
-                pwrite_info->address=m_tstat_output_data.at(lRow).Value.regAddress;
-                RegValue[lRow]=false;
-                pwrite_info->new_value=RegValue.to_ulong();
-            } 
-            else
-            {
-                pwrite_info->Changed_Name.Format(_T("%s,From %s to %s"),m_tstat_output_data.at(lRow).OutputName.StrValue,m_tstat_output_data.at(lRow).Value.StrValue,Global_String_NO);
-                pwrite_info->address=m_tstat_output_data.at(lRow).Value.regAddress;
-                RegValue[lRow]=true;
-                pwrite_info->new_value=RegValue.to_ulong();
-            }
-            IS_SEND=TRUE;
+			if (lRow>4)
+			{
+				  
+				if (m_tstat_output_data.at(lRow).Value.StrValue.CompareNoCase(Global_String_NO) == 0)//如果当前的值是 ON
+				{
+					pwrite_info->Changed_Name.Format(_T("%s,From %s to %s"), m_tstat_output_data.at(lRow).OutputName.StrValue, m_tstat_output_data.at(lRow).Value.StrValue, Global_String_OFF);
+					pwrite_info->address = m_tstat_output_data.at(lRow).Value.regAddress;
+					 
+					pwrite_info->new_value = 0;
+				}
+				else
+				{
+					pwrite_info->Changed_Name.Format(_T("%s,From %s to %s"), m_tstat_output_data.at(lRow).OutputName.StrValue, m_tstat_output_data.at(lRow).Value.StrValue, Global_String_NO);
+					pwrite_info->address = m_tstat_output_data.at(lRow).Value.regAddress;
+					 
+					pwrite_info->new_value = 1;
+				}
+				IS_SEND = TRUE;
+			}
+			else
+			{
+				bitset<16> RegValue(m_tstat_output_data.at(lRow).Value.RegValue);
+				if (m_tstat_output_data.at(lRow).Value.StrValue.CompareNoCase(Global_String_NO) == 0)//如果当前的值是 ON
+				{
+					pwrite_info->Changed_Name.Format(_T("%s,From %s to %s"), m_tstat_output_data.at(lRow).OutputName.StrValue, m_tstat_output_data.at(lRow).Value.StrValue, Global_String_OFF);
+					pwrite_info->address = m_tstat_output_data.at(lRow).Value.regAddress;
+					RegValue[lRow] = false;
+					pwrite_info->new_value = RegValue.to_ulong();
+				}
+				else
+				{
+					pwrite_info->Changed_Name.Format(_T("%s,From %s to %s"), m_tstat_output_data.at(lRow).OutputName.StrValue, m_tstat_output_data.at(lRow).Value.StrValue, Global_String_NO);
+					pwrite_info->address = m_tstat_output_data.at(lRow).Value.regAddress;
+					RegValue[lRow] = true;
+					pwrite_info->new_value = RegValue.to_ulong();
+				}
+				IS_SEND = TRUE;
+			}
+            
         }
 
     }

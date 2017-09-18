@@ -37,7 +37,7 @@ void CTstatRangeDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STATIC_RANGE_ENTER_UNITS, m_static_range_units_select);
 	//DDX_Radio(pDX, IDC_RADIO_T_0, m_input_Analog_select);
 	DDX_Text(pDX, IDC_EDIT_RANGE_SELECT, m_current_range);
-	DDV_MinMaxInt(pDX, m_current_range, 0, 13);
+	DDV_MinMaxInt(pDX, m_current_range, 0, 14);
 
 
 
@@ -107,6 +107,7 @@ BEGIN_MESSAGE_MAP(CTstatRangeDlg, CDialogEx)
     ON_BN_CLICKED(IDC_RADIO_5V, &CTstatRangeDlg::OnBnClickedRadio5v)
     ON_BN_CLICKED(IDC_RADIO_10V, &CTstatRangeDlg::OnBnClickedRadio10v)
 	ON_BN_CLICKED(IDC_RADIO_T_13, &CTstatRangeDlg::OnBnClickedRadioT13)
+	ON_BN_CLICKED(IDC_RADIO_T_14, &CTstatRangeDlg::OnBnClickedRadioT14)
 END_MESSAGE_MAP()
 
 
@@ -151,7 +152,7 @@ void CTstatRangeDlg::Initial_window(){
 	m_show_unit.ShowWindow(TRUE);
 	temp_cs.Format(_T("%d"),m_input_Analog_select);
 	((CEdit *)GetDlgItem(IDC_EDIT_RANGE_SELECT))->SetWindowTextW(temp_cs);
-	 for (int i=IDC_RADIO_T_0;i<=IDC_RADIO_T_13;i++)
+	 for (int i=IDC_RADIO_T_0;i<=IDC_RADIO_T_14;i++)
 	 {
 	    ((CButton *)GetDlgItem(i))->SetCheck(0);
 	 }
@@ -245,7 +246,7 @@ void CTstatRangeDlg::OnTimer(UINT_PTR nIDEvent)
 	}
 	else
 		break;
-	if((nfocusid >= IDC_RADIO_T_0) && (nfocusid <= IDC_RADIO_T_13))
+	if((nfocusid >= IDC_RADIO_T_0) && (nfocusid <= IDC_RADIO_T_14))
 	{
 		//bac_ranges_type = INPUT_RANGE_DIGITAL_TYPE;
 	}
@@ -365,7 +366,7 @@ void CTstatRangeDlg::OnCancel()
 }
 void CTstatRangeDlg::Click_Radio(){
 	  m_input_Analog_select = 0;
-	for (int i=IDC_RADIO_T_0;i<=IDC_RADIO_T_13;i++)
+	for (int i=IDC_RADIO_T_0;i<=IDC_RADIO_T_14;i++)
 	{
 		if (((CButton *)GetDlgItem(i))->GetCheck()==1)
 		{
@@ -1816,4 +1817,10 @@ void CTstatRangeDlg::OnBnClickedRadio10v()
 void CTstatRangeDlg::OnBnClickedRadioT13()
 {
 	  Click_Radio();
+}
+
+
+void CTstatRangeDlg::OnBnClickedRadioT14()
+{
+	Click_Radio();
 }

@@ -144,7 +144,7 @@ void CBacnetOutput::Reload_Unit_Type()
 
 	int d_initial_count = 0;
 	int a_initial_count = 0;
-	if(bacnet_device_type == BIG_MINIPANEL)	//Special Initial
+	if(bacnet_device_type == BIG_MINIPANEL || bacnet_device_type == MINIPANELARM)	//Special Initial
 	{	
 		#ifdef NEED_ANALOG_DIGITAL_ONLY
 		if(BIG_MINIPANEL_OUT_D > (int)m_Output_data.size()) 
@@ -175,7 +175,7 @@ void CBacnetOutput::Reload_Unit_Type()
 		#endif
 		m_output_list.SetColumnWidth(OUTPUT_HW_SWITCH,80);
 	}
-	else if(bacnet_device_type == SMALL_MINIPANEL)
+	else if(bacnet_device_type == SMALL_MINIPANEL || bacnet_device_type == MINIPANELARM_LB)
 	{
 		#ifdef NEED_ANALOG_DIGITAL_ONLY
 		if(SMALL_MINIPANEL_OUT_D > (int)m_Output_data.size()) 
@@ -206,7 +206,8 @@ void CBacnetOutput::Reload_Unit_Type()
 		#endif
 		m_output_list.SetColumnWidth(OUTPUT_HW_SWITCH,80);
 	}
-	else if((bacnet_device_type == TINY_MINIPANEL) || ((bacnet_device_type == TINY_EX_MINIPANEL)))
+	else if((bacnet_device_type == TINY_MINIPANEL) 
+		   || ((bacnet_device_type == TINY_EX_MINIPANEL) || bacnet_device_type == MINIPANELARM_TB))
 	{
 #ifdef NEED_ANALOG_DIGITAL_ONLY
 		if(TINY_MINIPANEL_OUT_D > (int)m_Output_data.size()) 
@@ -366,13 +367,13 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 
 	int digital_special_output_count = 0;
 	int analog_special_output_count = 0;
-	if(bacnet_device_type == BIG_MINIPANEL)
+	if (bacnet_device_type == BIG_MINIPANEL || bacnet_device_type == MINIPANELARM)
 	{
 		digital_special_output_count = BIG_MINIPANEL_OUT_D;
 		analog_special_output_count = BIG_MINIPANEL_OUT_A;
 		Minipanel_device = 1;
 	}
-	else if(bacnet_device_type == SMALL_MINIPANEL)
+	else if(bacnet_device_type == SMALL_MINIPANEL || bacnet_device_type == MINIPANELARM_LB)
 	{
 		digital_special_output_count = SMALL_MINIPANEL_OUT_D;
 		analog_special_output_count = SMALL_MINIPANEL_OUT_A;
@@ -384,7 +385,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		analog_special_output_count = TINY_MINIPANEL_OUT_A;
 		Minipanel_device = 1;
 	}
-	else if (bacnet_device_type == TINY_EX_MINIPANEL)
+	else if (bacnet_device_type == TINY_EX_MINIPANEL || bacnet_device_type == MINIPANELARM_TB)
 	{
 		digital_special_output_count = TINYEX_MINIPANEL_OUT_D;
 		analog_special_output_count = TINYEX_MINIPANEL_OUT_A;
@@ -565,8 +566,11 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		m_output_list.SetItemText(i,OUTPUT_LOW_VOLTAGE,low_voltage);	
 		m_output_list.SetItemText(i,OUTPUT_HIGH_VOLTAGE,high_voltage);	
 		//这样加实在是情非得已，老毛非得加一堆条件，还要smart;
-		if((bacnet_device_type == BIG_MINIPANEL) || ((bacnet_device_type == SMALL_MINIPANEL)) || (bacnet_device_type == TINY_MINIPANEL) || (bacnet_device_type == TINY_EX_MINIPANEL) ||
-			(bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PWM_TRANSDUCER))
+		if(
+			(bacnet_device_type == BIG_MINIPANEL || bacnet_device_type == MINIPANELARM || bacnet_device_type == MINIPANELARM_LB || bacnet_device_type == MINIPANELARM_TB)
+			|| ((bacnet_device_type == SMALL_MINIPANEL)) || (bacnet_device_type == TINY_MINIPANEL) || (bacnet_device_type == TINY_EX_MINIPANEL) ||
+			(bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PWM_TRANSDUCER)
+            )
 		{
 			if(i < (digital_special_output_count +analog_special_output_count) )
 			{

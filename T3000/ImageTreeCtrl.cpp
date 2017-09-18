@@ -419,7 +419,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
                         int  int_product_type = pFrame->m_product.at(i).product_class_id;
 
 
-                        if((int_product_type == PM_MINIPANEL) || (int_product_type == PM_CM5) )//||(int_product_type == PM_TSTAT6)
+                        if((int_product_type == PM_MINIPANEL) || (int_product_type == PM_CM5) || (int_product_type == PM_MINIPANEL_ARM))//||(int_product_type == PM_TSTAT6)
                         {
                             WritePrivateProfileStringW(temp_serial,_T("NewName"),m_name_new,g_achive_device_name_path);
                             WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("1"),g_achive_device_name_path);
