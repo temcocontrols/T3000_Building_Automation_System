@@ -46,8 +46,18 @@ END_MESSAGE_MAP()
 CT3000App::CT3000App()
 {
 	m_bHiColorIcons = TRUE;
+<<<<<<< HEAD
 	CurrentT3000Version=_T("    2017.9.12");
+=======
+<<<<<<< HEAD
+	CurrentT3000Version=_T("    2017.5.5");
+	T3000_Version = 20316;
+
+=======
+	CurrentT3000Version=_T("    2017.5.31 ");
+>>>>>>> Alex
 	T3000_Version = 20531;
+>>>>>>> master
 	m_lastinterface=19;
 }
 // The one and only CT3000App object
@@ -306,10 +316,16 @@ void CT3000App::UpdateDB()
 /// <returns></returns>
 BOOL CT3000App::InitInstance()
 {
+<<<<<<< HEAD
+	GetModulePath();
+	CString strSource = g_strExePth + L"T3000Controls.dll";
+	//TODO: call AfxInitRichEdit2() to initialize richedit2 library.
+=======
 	 
 	GetModulePath();
 	CString strSource = g_strExePth + L"T3000Controls.dll";
 	//
+>>>>>>> master
 	try
 	{
 		//if (ReadDLLRegAsm()<1)
@@ -390,7 +406,11 @@ BOOL CT3000App::InitInstance()
 		//  	}
 		// 	
 		//	versionstring=ImageString.g(index_start);
+<<<<<<< HEAD
+
+=======
 	//	Logger::WriteMessage("T3000 Unit Tester Begin....");
+>>>>>>> master
 		CWinAppEx::InitInstance();
 		HRESULT hr;
 		//

@@ -27,7 +27,15 @@
     <UseOfAtl>false</UseOfAtl>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
+<<<<<<< HEAD
     <PlatformToolset>v100</PlatformToolset>
+=======
+<<<<<<< HEAD
+    <PlatformToolset>v100</PlatformToolset>
+=======
+    <PlatformToolset>v140</PlatformToolset>
+>>>>>>> master
+>>>>>>> Alex
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>

@@ -50,7 +50,7 @@ BOOL CISPApp::InitInstance()
 	InitCommonControlsEx(&InitCtrls);
 
 	CWinAppEx::InitInstance();
-
+	 
 	if (!AfxSocketInit())
 	{
 		if(!auto_flash_mode)

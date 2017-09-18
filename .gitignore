@@ -52,6 +52,9 @@
 **/*.MNL
 **/*.MAX
 /T3000.VC.db
+<<<<<<< HEAD
+=======
 /*.opendb
 /Psychrometric Tool/T3000 Output_VS2015
 /Psychrometric Tool/WFA_psychometric_chart/packages
+>>>>>>> master

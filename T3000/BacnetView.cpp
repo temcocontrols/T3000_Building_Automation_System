@@ -3252,6 +3252,7 @@ DWORD WINAPI  MSTP_Write_Command_Thread(LPVOID lpVoid)
 			}
 			else
 			{
+				
 				temp_cstring->Format(_T("Write input item %d success!\r\n"),i+1);
 				m_finished_count ++;
 				m_persent = m_finished_count * 100 / m_total_count;
@@ -3266,6 +3267,29 @@ DWORD WINAPI  MSTP_Write_Command_Thread(LPVOID lpVoid)
 	return 0;
 }
 
+<<<<<<< HEAD
+
+//DWORD WINAPI Write_Data_Into_Db(LPVOID lpVoid)
+//{
+//	for (int i = 0; i < BAC_INPUT_ITEM_COUNT; i++)
+//	{
+//		Save_InputData_to_db(i, g_selected_serialnumber);
+//	}
+//
+//	for (int i = 0; i < BAC_OUTPUT_ITEM_COUNT; i++)
+//	{
+//		Save_OutputData_to_db(i, g_selected_serialnumber);
+//	}
+//
+//	for (int i = 0; i < BAC_VARIABLE_ITEM_COUNT; i++)
+//	{
+//		Save_VariableData_to_db(i, g_selected_serialnumber);
+//	}
+//
+//	write_indb_thread = NULL;
+//	return 0;
+//}
+=======
 DWORD WINAPI Write_Data_Into_Db(LPVOID lpVoid)
 {
 	for (int i = 0;i<BAC_INPUT_ITEM_COUNT;i++)
@@ -3286,6 +3310,7 @@ DWORD WINAPI Write_Data_Into_Db(LPVOID lpVoid)
 	write_indb_thread = NULL;
 	return 0;
 }
+>>>>>>> master
 
 DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
 {

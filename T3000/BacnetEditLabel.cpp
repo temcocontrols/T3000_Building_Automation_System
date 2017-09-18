@@ -843,6 +843,17 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					m_edit_auto_manual.SetWindowTextW(m_AutoManual);
 					m_edit_value.SetWindowTextW(m_value);
 
+<<<<<<< HEAD
+					if(digital_status != 2)
+					{
+						//如果是数字量 就 disable 对话框 ，用来响应 click的改变事件;
+						m_edit_value.EnableWindow(FALSE);
+					}
+					else
+					{
+						m_edit_value.EnableWindow(TRUE);
+					}
+=======
 					//if(digital_status != 2)
 					//{
 					//	//如果是数字量 就 disable 对话框 ，用来响应 click的改变事件;
@@ -852,6 +863,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					//{
 					//	m_edit_value.EnableWindow(TRUE);
 					//}
+>>>>>>> master
 				}
 			}
 			break;
@@ -877,6 +889,9 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					{			
 						m_AutoManual = _T("Manual");	
 
+<<<<<<< HEAD
+							m_edit_value.EnableWindow(true);
+=======
 						if (digital_status != 2)
 						{
 							//如果是数字量 就 disable 对话框 ，用来响应 click的改变事件;
@@ -888,6 +903,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 						}
 
 						//	m_edit_value.EnableWindow(true);
+>>>>>>> master
 					}
 					else
 					{
@@ -897,7 +913,19 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					m_edit_auto_manual.SetWindowTextW(m_AutoManual);
 					m_edit_value.SetWindowTextW(m_value);
 
+<<<<<<< HEAD
+					if (digital_status != 2)
+					{
+						//如果是数字量 就 disable 对话框 ，用来响应 click的改变事件;
+						m_edit_value.EnableWindow(FALSE);
+					}
+					else
+					{
+						m_edit_value.EnableWindow(TRUE);
+					}
+=======
 
+>>>>>>> master
 				}
 			}
 			break;
@@ -940,7 +968,19 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					}
 					m_edit_auto_manual.SetWindowTextW(m_AutoManual);
 					m_edit_value.SetWindowTextW(m_value);
+<<<<<<< HEAD
+					if (digital_status != 2)
+					{
+						//如果是数字量 就 disable 对话框 ，用来响应 click的改变事件;
+						m_edit_value.EnableWindow(FALSE);
+					}
+					else
+					{
+						m_edit_value.EnableWindow(TRUE);
+					}
+=======
 
+>>>>>>> master
 
 				}
 			}

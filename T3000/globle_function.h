@@ -207,6 +207,7 @@ void  LoadRegistersGraphicMode();
 void  LoadRegistersGraphicMode_AQ();
 void  LoadRegistersGraphicMode_HUMTEMPSENSOR();
 void  LoadRegistersGraphicMode_CO2485();
+void  LoadRegistersGraphicMode_STM32Pressure();
 BOOL  ReadLineFromHexFile(CFile& file, char* pBuffer);
 int Get_Binfile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info);
 int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info);
@@ -246,6 +247,7 @@ bool Output_data_to_string(unsigned char  temp_output_index,
 	CString &temp_out_decom,
 	CString &temp_out_label);
 	bool Save_OutputData_to_db(unsigned char  temp_output_index );
-	bool Save_AVData_to_db();
+	 
+	bool Save_VariableData_to_db(unsigned char  temp_output_index, unsigned int nserialnumber);
 	CString GetGUID();
 #endif

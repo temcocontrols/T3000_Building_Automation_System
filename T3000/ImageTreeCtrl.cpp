@@ -942,6 +942,7 @@ int CImageTreeCtrl::get_item_level(HTREEITEM hItem)
 
 void CImageTreeCtrl::turn_item_image(HTREEITEM hItem,bool state)
 {
+ 
 //tree0412  //屏蔽下面原有的
 #if 0
 	int brother_nImage,brother_nSelectedImage;
