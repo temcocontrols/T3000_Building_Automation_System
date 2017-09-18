@@ -1157,7 +1157,7 @@ extern vector <Tstat_Input_Struct> m_tstat_input_data;
 
 extern vector <Tstat_Output_Struct> m_tstat_output_data;
 extern CString analog_range[11];
-extern CString analog_range_TSTAT6[14];
+extern CString analog_range_TSTAT6[15];
 extern CString INPUT_FUNS[8];
 extern CString Interlock[6];
 extern CString ONTPUT_FUNS[];

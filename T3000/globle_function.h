@@ -247,7 +247,6 @@ bool Output_data_to_string(unsigned char  temp_output_index,
 	CString &temp_out_decom,
 	CString &temp_out_label);
 	bool Save_OutputData_to_db(unsigned char  temp_output_index );
-	 
-	bool Save_VariableData_to_db(unsigned char  temp_output_index, unsigned int nserialnumber);
+	bool Save_AVData_to_db();
 	CString GetGUID();
 #endif

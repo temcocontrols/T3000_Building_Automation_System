@@ -423,12 +423,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 	{
 		OUTPUT_LIMITE_ITEM_COUNT = 8;
 	}
-<<<<<<< HEAD
-	else if (
-		(bacnet_device_type == PID_T36CTA))
-=======
 	else if ((bacnet_device_type == PID_T36CTA))
->>>>>>> master
 	{
 		OUTPUT_LIMITE_ITEM_COUNT = 2;
 	}

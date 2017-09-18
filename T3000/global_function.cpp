@@ -3957,7 +3957,7 @@ void local_handler_conf_private_trans_ack(
     {
         CString temp_file;
         CString temp_serial;
-        temp_serial.Format(_T("%u.prg"),g_selected_serialnumber);
+        temp_serial.Format(_T("%u.prog"),g_selected_serialnumber);
         temp_file = g_achive_folder + _T("\\") + temp_serial;
         SaveBacnetConfigFile_Cache(temp_file);
         //TRACE(_T("Save config file cache\r\n"));
@@ -6006,7 +6006,7 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
         CString FilePath;
         if(write_to_device)	//如果是客户手动load 就让客户选择路径，不是手动load就说明是读缓存;
         {
-            CFileDialog dlg(true,_T("*.prg"),_T(" "),OFN_HIDEREADONLY ,_T("Prg files (*.prg)|*.prg||"),NULL,0);
+            CFileDialog dlg(true,_T("*.prog"),_T(" "),OFN_HIDEREADONLY ,_T("Prg files (*.prog)|*.prog||"),NULL,0);
             if(IDOK!=dlg.DoModal())
                 return -1;
             FilePath=dlg.GetPathName();
@@ -9882,14 +9882,19 @@ void LoadTstat_OutputData()
         }
         else
         {
-            //comments by Fance ,此前没有 348 -》对应 t6的598  ，现在有了。;所以该不该改为现在的？？？
-            int nValueTemp = product_register_value[MODBUS_PWM_OUT4]; //348 //598
-            strTemp.Format(_T("%d%%"), nValueTemp);
-            m_tstat_output_data.at(i-1).Value.regAddress=MODBUS_PWM_OUT4;
-            m_tstat_output_data.at(i-1).Value.RegValue=nValueTemp;
-            m_tstat_output_data.at(i-1).Value.StrValue=strTemp;
+            ////comments by Fance ,此前没有 348 -》对应 t6的598  ，现在有了。;所以该不该改为现在的？？？
+			 
+				 
+		 
 
-            m_tstat_output_data.at(i-1).Unit.StrValue = _T("%");
+			int nValueTemp = product_register_value[MODBUS_PWM_OUT4]; //348 //598
+			strTemp.Format(_T("%d%%"), nValueTemp);
+			m_tstat_output_data.at(i-1).Value.regAddress= MODBUS_PWM_OUT4;
+			m_tstat_output_data.at(i-1).Value.RegValue=nValueTemp;
+			m_tstat_output_data.at(i-1).Value.StrValue=strTemp;
+
+			m_tstat_output_data.at(i-1).Unit.StrValue = _T("%");
+
         }
 
     }

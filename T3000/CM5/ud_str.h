@@ -740,7 +740,7 @@ typedef enum
 {
 	NOUSE,MAIN_MSTP,MAIN_MODBUS,MAIN_PTP,SUB_GSM,MAIN_ZIG,SUB_ZIG,SUB_MODBUS,MSTP_MASTER, RS232_METER,MAX_COM_TYPE
 };
-
+ 
 typedef struct
 {
 	//uint8_t sn[4];

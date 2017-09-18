@@ -1833,6 +1833,8 @@
 #define IDC_BUTTON_SETTING_GSM_MODUAL   1993
 #define IDC_STATIC_MAX_DAY              1994
 #define IDC_RICHEDIT21_AT_COMMAND_RECEIVE 1994
+#define IDC_BUTTON_SETTING_GSM_MODUAL2  1994
+#define IDC_BUTTON_SETTING_DONE         1994
 #define IDC_STATIC_MIN_DAY              1995
 #define IDC_EDIT_SEND                   1995
 #define IDC_COMBO_TYPE                  1996
@@ -2777,13 +2779,8 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-<<<<<<< HEAD
-#define _APS_NEXT_RESOURCE_VALUE        686
-#define _APS_NEXT_COMMAND_VALUE         34063
-=======
-#define _APS_NEXT_RESOURCE_VALUE        687
+#define _APS_NEXT_RESOURCE_VALUE        688
 #define _APS_NEXT_COMMAND_VALUE         34064
->>>>>>> master
 #define _APS_NEXT_CONTROL_VALUE         2345
 #define _APS_NEXT_SYMED_VALUE           320
 #endif

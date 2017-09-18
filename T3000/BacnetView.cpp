@@ -943,7 +943,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read data : OK!"));
 					CString temp_file;
 					CString temp_serial;
-					temp_serial.Format(_T("%u.prg"),g_selected_serialnumber);
+					temp_serial.Format(_T("%u.prog"),g_selected_serialnumber);
 					temp_file = g_achive_folder + _T("\\") + temp_serial;
 					//SaveBacnetConfigFile(temp_file);
 					SaveBacnetConfigFile_Cache(temp_file);
@@ -3252,7 +3252,6 @@ DWORD WINAPI  MSTP_Write_Command_Thread(LPVOID lpVoid)
 			}
 			else
 			{
-				
 				temp_cstring->Format(_T("Write input item %d success!\r\n"),i+1);
 				m_finished_count ++;
 				m_persent = m_finished_count * 100 / m_total_count;
@@ -3267,29 +3266,6 @@ DWORD WINAPI  MSTP_Write_Command_Thread(LPVOID lpVoid)
 	return 0;
 }
 
-<<<<<<< HEAD
-
-//DWORD WINAPI Write_Data_Into_Db(LPVOID lpVoid)
-//{
-//	for (int i = 0; i < BAC_INPUT_ITEM_COUNT; i++)
-//	{
-//		Save_InputData_to_db(i, g_selected_serialnumber);
-//	}
-//
-//	for (int i = 0; i < BAC_OUTPUT_ITEM_COUNT; i++)
-//	{
-//		Save_OutputData_to_db(i, g_selected_serialnumber);
-//	}
-//
-//	for (int i = 0; i < BAC_VARIABLE_ITEM_COUNT; i++)
-//	{
-//		Save_VariableData_to_db(i, g_selected_serialnumber);
-//	}
-//
-//	write_indb_thread = NULL;
-//	return 0;
-//}
-=======
 DWORD WINAPI Write_Data_Into_Db(LPVOID lpVoid)
 {
 	for (int i = 0;i<BAC_INPUT_ITEM_COUNT;i++)
@@ -3310,7 +3286,6 @@ DWORD WINAPI Write_Data_Into_Db(LPVOID lpVoid)
 	write_indb_thread = NULL;
 	return 0;
 }
->>>>>>> master
 
 DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
 {
@@ -4941,7 +4916,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 				{
 					CString temp_file;
 					CString temp_serial;
-					temp_serial.Format(_T("%u.prg"),g_selected_serialnumber);
+					temp_serial.Format(_T("%u.prog"),g_selected_serialnumber);
 					temp_file = g_achive_folder + _T("\\") + temp_serial;
 					//SaveBacnetConfigFile(temp_file);
 					SaveBacnetConfigFile_Cache(temp_file);
@@ -5228,7 +5203,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 
 	CString achive_file_path;
 	CString temp_serial;
-	temp_serial.Format(_T("%d.prg"),g_selected_serialnumber);
+	temp_serial.Format(_T("%d.prog"),g_selected_serialnumber);
 	achive_file_path = g_achive_folder + _T("\\") + temp_serial;
 
 	if(m_user_level == LOGIN_SUCCESS_GRAPHIC_MODE)
@@ -5287,7 +5262,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 				CString offline_folder;
 				offline_folder = g_strBuildingFolder + pFrame->m_strCurMainBuildingName;
 				CreateDirectory(offline_folder,NULL);//
-				offline_prg_path = offline_folder + _T("\\Offline.prg");
+				offline_prg_path = offline_folder + _T("\\Offline.prog");
 
 				LoadBacnetConfigFile(false,offline_prg_path);
 				PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,BAC_READ_ALL_LIST);
@@ -5778,7 +5753,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 	int pid_con_reg = 0;
 	if(n_read_product_type == T38AI8AO6DO)
 	{
-		output_reg = 4; // (6+8)*23 = 322
+		output_reg = 4; // (6+8)*23 = 322/100 = 4
 		input_reg =  2; //  23 * 8 = 184
 	}
 	else if(n_read_product_type == PID_T322AI)
@@ -5804,7 +5779,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 	else if (n_read_product_type == PID_T36CTA)
 	{
 		output_reg = 1;       //(1)*23 = 322
-		input_reg = 5;       //23 * 12 = 506
+		input_reg = 6;       //23 * 12 = 506
 	}
 	else if(n_read_product_type == STM32_HUM_NET)
 	{
@@ -5856,7 +5831,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 				str_serialid.Format(_T("%u"), pFrame->m_product.at(selected_product_index).serial_number);
 				CString achive_file_path;
 				CString temp_serial;
-				achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prg");
+				achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
 
 				SaveModbusConfigFile_Cache(achive_file_path,NULL,3200*2);
 
@@ -5902,7 +5877,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 				str_serialid.Format(_T("%u"), pFrame->m_product.at(selected_product_index).serial_number);
 				CString achive_file_path;
 				CString temp_serial;
-				achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prg");
+				achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
 
 				SaveModbusConfigFile_Cache(achive_file_path,NULL,3200*2);
 
@@ -5979,7 +5954,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 				//str_serialid.Format(_T("%u"), pFrame->m_product.at(selected_product_index).serial_number);
 				//CString achive_file_path;
 				//CString temp_serial;
-				//achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prg");
+				//achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
 
 				//SaveModbusConfigFile_Cache(achive_file_path,NULL,3200*2);
 
@@ -6021,7 +5996,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 				str_serialid.Format(_T("%u"), pFrame->m_product.at(selected_product_index).serial_number);
 				CString achive_file_path;
 				CString temp_serial;
-				achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prg");
+				achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
 
 				SaveModbusConfigFile_Cache(achive_file_path,NULL,3200*2);
 
@@ -6125,7 +6100,7 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
 
 	 CString achive_file_path;
 	 CString temp_serial;
-	 achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prg");
+	 achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
 
 
 	 if(LoadModbusConfigFile_Cache(achive_file_path)< 0)

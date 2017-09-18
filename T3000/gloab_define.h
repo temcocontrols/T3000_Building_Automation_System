@@ -997,22 +997,7 @@ const int WINDOW_REMOTE_POINT = 13;
 const int KEY_INSERT = 1020;
 
 
-<<<<<<< HEAD
  
-=======
-typedef enum
-{		
-	PRODUCT_CM5 = 0,						//10A + 8 D			//10D									   //IN				//OUT	
-	BIG_MINIPANEL = 1,						//32 A				//12D   12A
-	SMALL_MINIPANEL = 2,		//16 A				//6 D	4 A
-	TINY_MINIPANEL = 3,	
-	PID_T322AI = 43,
-	T38AI8AO6DO = 44,
-	PID_T3PT12 = 46,
-	PID_T36CTA = 95,
-	
-};
->>>>>>> Alex
 
 const int BIG_MINIPANEL_IN_A = 32;
 const int BIG_MINIPANEL_IN_D = 0;	//If  this place is not 0 ,need code.

@@ -299,11 +299,7 @@ void CAllNodesDiaolg::OnCbnSelchangeCombo1()
 
 void CAllNodesDiaolg::OnEnKillfocusTextedit()
 {
-<<<<<<< HEAD
-	// TODO: Add your control notification handler code here
-=======
 	
->>>>>>> master
 	if (m_nCurRow == 0)
 		return;
 	if (m_FlexGrid.get_RowSel() == 0)
@@ -419,11 +415,7 @@ void CAllNodesDiaolg::OnEnSetfocusTextedit()
 
 BOOL CAllNodesDiaolg::PreTranslateMessage(MSG* pMsg)
 {
-<<<<<<< HEAD
-	// TODO: Add your specialized code here and/or call the base class
-=======
 	
->>>>>>> master
 	if (pMsg->wParam == VK_RETURN)
 	{
 		GetDlgItem(IDC_EXITBUTTON)->SetFocus();
