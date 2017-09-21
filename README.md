@@ -36,7 +36,7 @@ maurice (at) temcocontrols (dot) com
 
 ![T3000_screen_capture_6](http://www.4shared.com/download/e5UYnrBu/6_online.bmp)     
 
-![T3000_screen_capture_7](http://www.4shared.com/download/Zrxsrpt1/7_online.bmp)     
+![T3000_screen_capture_7] (https://rawgit.com/temcocontrols/T3000_Building_Automation_System/master/image/T3000%20network_800.jpg)
 
 ![T3000_screen_capture_11](http://www.4shared.com/download/vu8fHhq5/11_online.bmp)     
 
