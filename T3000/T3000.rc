@@ -71,7 +71,6 @@ END
 
 IDR_HTML_OUTPUTTABLEDLG HTML                    "OutputTableDlg.htm"
 
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
@@ -1380,7 +1379,7 @@ BEGIN
     CONTROL         "",IDC_LIST_FIND_TSTAT_ID,"SysListView32",LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,410,7,60,207
 END
 
-IDD_DIALOG_BACNET_SETTING DIALOGEX 0, 0, 523, 493
+IDD_DIALOG_BACNET_SETTING DIALOGEX 0, 0, 523, 437
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_CAPTION | WS_VSCROLL | WS_SYSMENU | WS_THICKFRAME
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
@@ -1421,9 +1420,9 @@ BEGIN
     LTEXT           "RS485 SUB :",IDC_STATIC,19,209,41,8
     LTEXT           "Zigbee :",IDC_STATIC,19,225,45,8
     LTEXT           "RS485 Main :",IDC_STATIC,19,244,43,8
-    COMBOBOX        IDC_COMBO_BACNET_SETTING_COM0,70,207,65,94,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    COMBOBOX        IDC_COMBO_BACNET_SETTING_COM1,70,225,65,94,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    COMBOBOX        IDC_COMBO_BACNET_SETTING_COM2,70,244,65,94,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_BACNET_SETTING_COM0,70,207,65,94,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_BACNET_SETTING_COM1,70,225,65,94,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_BACNET_SETTING_COM2,70,244,65,94,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Clear Device",IDC_BUTTON_SETTING_LDF,414,19,94,28
     COMBOBOX        IDC_COMBO_BACNET_SETTING_BAUDRATE0,148,207,54,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO_BACNET_SETTING_BAUDRATE1,148,225,54,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -2036,7 +2035,7 @@ BEGIN
     CONTROL         "10.  Close/Open",IDC_RADIO_T_10,"Button",BS_AUTORADIOBUTTON,199,78,68,10
     CONTROL         "11.10K Thermistor Type3",IDC_RADIO_T_11,"Button",BS_AUTORADIOBUTTON,199,98,104,10
     CONTROL         "12.0-20ma",IDC_RADIO_T_12,"Button",BS_AUTORADIOBUTTON,199,116,104,10
-    CONTROL         "13.Voltage",IDC_RADIO_T_13,"Button",BS_AUTORADIOBUTTON,199,132,104,10
+    CONTROL         "13.50K Thermistor",IDC_RADIO_T_13,"Button",BS_AUTORADIOBUTTON,199,132,104,10
     EDITTEXT        IDC_EDIT_RANGE_SELECT,86,1,39,17,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     CTEXT           "",IDC_STATIC_RANGE_UNITE_SHOW,259,1,168,18,WS_BORDER
     ICON            IDI_ICON_SELECT,IDC_STATIC_SELECT_RANGE,10,18,20,20
@@ -2092,6 +2091,7 @@ BEGIN
     GROUPBOX        "",IDC_STATIC,311,22,41,103
     CONTROL         "0-5v",IDC_RADIO_5V,"Button",BS_AUTORADIOBUTTON,317,31,31,10
     CONTROL         "0-10v",IDC_RADIO_10V,"Button",BS_AUTORADIOBUTTON,317,45,35,10
+    CONTROL         "14.Voltage",IDC_RADIO_T_14,"Button",BS_AUTORADIOBUTTON,199,146,104,10
 END
 
 IDD_DIALOG_MAIN_DEFAULT DIALOGEX 0, 0, 351, 209
@@ -3314,7 +3314,6 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 504
         TOPMARGIN, 9
-        BOTTOMMARGIN, 491
     END
 
     IDD_DIALOG_THE_SAME_DEVICE, DIALOG
@@ -6120,75 +6119,40 @@ END
 //
 
 IDB_BITMAP48            BITMAP                  "res\\Toolbar-48.bmp"
-
 IDB_MENUBAROWN_BITMAP16 BITMAP                  "res\\menu_imgeOwn16.bmp"
-
 IDR_TOOLBAR_VER25049    BITMAP                  "res\\toolbar1.bmp"
-
 IDB_BITMAP_V25049       BITMAP                  "res\\Toolbar_V25049.bmp"
-
 M->FF                   BITMAP                  "res\\MFouct.bmp"
-
 M->FU                   BITMAP                  "res\\MUp.bmp"
-
 APPLYX                  BITMAP                  "res\\ApplyDisable.bmp"
-
 APPLYD                  BITMAP                  "res\\ApplyDown.bmp"
-
 APPLYF                  BITMAP                  "res\\ApplyFouct.bmp"
-
 APPLYU                  BITMAP                  "res\\ApplyUp.bmp"
-
 CLEARX                  BITMAP                  "res\\ClearDisable.bmp"
-
 CLEARD                  BITMAP                  "res\\ClearDown.bmp"
-
 CLEARF                  BITMAP                  "res\\ClearFouct.bmp"
-
 CLEARU                  BITMAP                  "res\\ClearUp.bmp"
-
 M->FX                   BITMAP                  "res\\MDisable.bmp"
-
 M->FD                   BITMAP                  "res\\MDown.bmp"
-
 IDB_BITMAP_SCHEDULE     BITMAP                  "res\\Schedule0607.bmp"
-
 IDC_AIR_FLOW_BACK       BITMAP                  "res\\Back.bmp"
-
 IDB_BITMAP_TMCO_LOGO    BITMAP                  "res\\temcologo.bmp"
-
 IDB_LED                 BITMAP                  "res\\LED Table Button.bmp"
-
 IDB_LCD                 BITMAP                  "res\\LCD Table Button.bmp"
-
 IDB_BITMAP_V25050_CONNECTED BITMAP                  "res\\bitmap_v_Connected.bmp"
-
 IDB_BITMAP_TEMCOLOGO    BITMAP                  "res\\temco_logo.bmp"
-
 IDB_BITMAP5             BITMAP                  "res\\default view.bmp"
-
 IDB_BITMAP_LOGIN        BITMAP                  "res\\Login.bmp"
-
 IDB_BITMAP_BUILDING_DEFAULT BITMAP                  "res\\T3000Building.bmp"
-
 IDR_TOOLBAR_BACNET      BITMAP                  "res\\bmp_bacnet.bmp"
-
 IDB_BITMAP7             BITMAP                  "res\\bmp00001.bmp"
-
 IDB_BITMAP_BACNET_MENU_BIT BITMAP                  "res\\bacnet_menu_bit.bmp"
-
 IDB_BITMAP_ALARM_BROWN  BITMAP                  "res\\AlarmsBrown.bmp"
-
 IDB_BITMAP_ALARM_GREEN  BITMAP                  "res\\AlarmsGreen.bmp"
-
 IDB_BITMAP_ALARM_RED    BITMAP                  "res\\AlarmsRed.bmp"
-
 IDB_BITMAP9             BITMAP                  "res\\bitmap9.bmp"
-
 IDB_BITMAP_TSTAT_PID_MODEL BITMAP                  "res\\PIDBUTTON.bmp"
-
 IDB_BITMAP_TOOLBAR_DISABLE BITMAP                  "res\\toolbar_disable.bmp"
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -6309,61 +6273,33 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_ICON_REFRESH        ICON                    "res\\Refresh.ico"
-
 IDI_ICON_EXIT           ICON                    "res\\Exit.ico"
-
 IDI_ICON_OK             ICON                    "res\\OK.ico"
-
 IDI_ICON_SCAN_PRODUCT   ICON                    "res\\Scan.ico"
-
 IDI_ICON_DEFAULT_ICON   ICON                    "res\\relay.ico"
-
 IDI_ICON_SWITCH_ON      ICON                    "res\\switch_on.ico"
-
 IDI_ICON_SWITCH_OFF     ICON                    "res\\switch_off.ico"
-
 IDI_ICON_SELECT         ICON                    "res\\Select.ico"
-
 IDI_ICON_LABEL_LOCK     ICON                    "res\\lock.ico"
-
 IDI_ICON_LABEL_UNLOCK   ICON                    "res\\unlock.ico"
-
 IDI_ICON_DEFAULT_VARIABLE ICON                    "res\\default_icon\\Variables.ico"
-
 IDI_ICON_DEFAULT_PROGRAM ICON                    "res\\default_icon\\Programs.ico"
-
 IDI_ICON_DEFAULT_HOLIDAY ICON                    "res\\default_icon\\Holidays.ico"
-
 IDI_ICON_DEFAULT_SCHEDUAL ICON                    "res\\default_icon\\schedual.ico"
-
 IDI_ICON_DEFAULT_TRENDLOG ICON                    "res\\default_icon\\TrendLogs.ico"
-
 IDI_ICON_DEFAULT_PID    ICON                    "res\\default_icon\\PID.ico"
-
 IDI_ICON_LOADING_1      ICON                    "res\\loading_icon\\Step1.ico"
-
 IDI_ICON_LOADING_2      ICON                    "res\\loading_icon\\Step2.ico"
-
 IDI_ICON_LOADING_3      ICON                    "res\\loading_icon\\Step3.ico"
-
 IDI_ICON_LOADING_4      ICON                    "res\\loading_icon\\Step4.ico"
-
 IDI_ICON_LOADING_5      ICON                    "res\\loading_icon\\Step5.ico"
-
 IDI_ICON_LOADING_6      ICON                    "res\\loading_icon\\Step6.ico"
-
 IDI_ICON_DEFAULT_ALARM  ICON                    "res\\default_icon\\Alarms.ico"
-
 IDI_ICON_DEFAULT_NETWORKPOINT ICON                    "res\\default_icon\\RemotePoints.ico"
-
 IDI_ICON_DEFAULT_SETTING ICON                    "res\\default_icon\\Configuration.ico"
-
 IDI_ICON_DEFAULT_GRAPHIC ICON                    "res\\default_icon\\Graphics2.ico"
-
 IDI_ICON_DEFAULT_OUTPUT ICON                    "res\\default_icon\\outputs2.ico"
-
 IDI_ICON_INPUT_DEFAULT  ICON                    "res\\default_icon\\inputs.ico"
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -6372,14 +6308,12 @@ IDI_ICON_INPUT_DEFAULT  ICON                    "res\\default_icon\\inputs.ico"
 
 IDR_MFC16DLL1           MFC16DLL                "res\\MFC16API.dll"
 
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // T3000DB
 //
 
 IDR_T3000DB1            T3000DB                 "res\\T3000.db"
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -6388,14 +6322,12 @@ IDR_T3000DB1            T3000DB                 "res\\T3000.db"
 
 IDR_BUILDINGDB1         BUILDINGDB              "res\\Building.db"
 
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // MONITOR_DB
 //
 
 IDR_MONITOR_DB2         MONITOR_DB              "res\\monitor_.bin"
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -6463,6 +6395,16 @@ BEGIN
 END
 
 IDD_DIALOG_BACNET_RANGES AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_DIALOG_TSTAT_RANGES AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_DIALOG_BACNET_SETTING AFX_DIALOG_LAYOUT
 BEGIN
     0
 END
@@ -9534,35 +9476,20 @@ END
 //
 
 IDB_HOTTOOLBAR          BITMAP                  "res\\hottool.bmp"
-
 IDB_COLDTOOLBAR         BITMAP                  "res\\coldtool.bmp"
-
 IDB_MENUBAR             BITMAP                  "res\\menu_img.bmp"
-
 IDR_MAINFRAME           BITMAP                  "res\\Toolbar.bmp"
-
 IDR_MAINFRAME_256       BITMAP                  "res\\Toolbar256.bmp"
-
 IDR_MYTOOLBAR           BITMAP                  "res\\toolbar2.bmp"
-
 IDB_TREENODE_BMP        BITMAP                  "res\\treenode.bmp"
-
 IDB_DOWNBMP             BITMAP                  "res\\bmp_down.bmp"
-
 IDB_UPBMP               BITMAP                  "res\\bmp_up.bmp"
-
 IDB_CUSTM_TOOLBARBITMAP BITMAP                  "res\\ToolbarOwn.bmp"
-
 IDB_CUSTM_COLDBITMAP    BITMAP                  "res\\ToolbarOwn.bmp"
-
 IDB_MENUBAROWN_BITMAP   BITMAP                  "res\\menu_imgeOwn.bmp"
-
 IDB_CHECKNO_BITMAP      BITMAP                  "res\\checkno.bmp"
-
 IDB_CHECK_BITMAP        BITMAP                  "res\\check.bmp"
-
 IDB_BITMAP2             BITMAP                  "res\\bitmap2.bmp"
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -9831,9 +9758,7 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\serialnum.ico"
-
 IDR_T3000TYPE           ICON                    "res\\T3000Doc.ico"
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
