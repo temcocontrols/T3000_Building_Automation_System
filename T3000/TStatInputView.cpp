@@ -107,7 +107,7 @@ UINT BackMainUIFresh_TstatInput(LPVOID pParam)
             }
             CString achive_file_path;
             CString temp_serial;
-            temp_serial.Format(_T("%d.prg"),g_selected_serialnumber);
+            temp_serial.Format(_T("%d.prog"),g_selected_serialnumber);
             achive_file_path = g_achive_folder + _T("\\") + temp_serial;
             Save_Product_Value_Cache(achive_file_path);
 

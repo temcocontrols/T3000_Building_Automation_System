@@ -747,6 +747,7 @@ BOOL IS_Temco_Product(int product_model)
 			case   STM32_HUM_RS485			   :
 			case   STM32_PRESSURE_NET		   :
 			case   STM32_PRESSURE_RS3485	   :
+			case   PM_T3_LC						:
 			       return TRUE;
 			default:
 			       return FALSE;
@@ -4058,6 +4059,7 @@ void Inial_Product_map()
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT8_OCC,_T("TStat8_Occ")));
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT7_ARM,_T("TStat7_ARM")));
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT8_220V,_T("TStat8_220V")));
+	product_map.insert(map<int, CString>::value_type(PM_T3_LC, _T("T3_LC")));
 
 
 }
@@ -10633,6 +10635,10 @@ void LoadRegistersGraphicMode()
         LoadRegistersGraphicMode_CO2485();
     }
     break;
+	case STM32_PRESSURE_NET:
+	{
+		LoadRegistersGraphicMode_STM32Pressure();
+	}
     }
 }
 
@@ -10690,6 +10696,26 @@ void LoadRegistersGraphicMode_CO2485()
     g_calibration_module_data.Factory_Hum.regAddress  =717;
     g_calibration_module_data.Factory_Hum.StrValue =_T("Pressure");
 }
+void LoadRegistersGraphicMode_STM32Pressure()
+{
+	g_calibration_module_data.Current_Frequency.regAddress = 710;
+	g_calibration_module_data.Current_Frequency.StrValue = _T("AD");
+
+	g_calibration_module_data.User_Table_Selection.regAddress = 774;
+	g_calibration_module_data.User_Table_Point_Number.regAddress = 737;
+	g_calibration_module_data.User_Offset.regAddress = 770;
+	g_calibration_module_data.User_Offset.RegValue = (short)product_register_value[770];
+	g_calibration_module_data.User_Fre.regAddress = 739;
+	g_calibration_module_data.User_Fre.StrValue = _T("AD");
+	g_calibration_module_data.User_Hum.regAddress = 738;
+	g_calibration_module_data.User_Hum.StrValue = _T("Pressure");
+
+	g_calibration_module_data.Factory_Fre.regAddress = 718;
+	g_calibration_module_data.Factory_Fre.StrValue = _T("AD");
+	g_calibration_module_data.Factory_Hum.regAddress = 717;
+	g_calibration_module_data.Factory_Hum.StrValue = _T("Pressure");
+}
+
 BOOL ReadLineFromHexFile(CFile& file, char* pBuffer)
 {
     //当hex文件中每一行的文件超过了256个字符的时候，我们就认为这个hex文件出现了问题

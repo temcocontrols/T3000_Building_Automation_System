@@ -59,7 +59,7 @@ DWORD WINAPI _BackFreshing_TempHumSensorForm(LPVOID pParam)
 		memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
 		CString achive_file_path;
 		CString temp_serial;
-		temp_serial.Format(_T("%d.prg"),g_selected_serialnumber);
+		temp_serial.Format(_T("%d.prog"),g_selected_serialnumber);
 		achive_file_path = g_achive_folder + _T("\\") + temp_serial;
 		Save_Product_Value_Cache(achive_file_path);
 		::PostMessage(dlg->m_hWnd,HUM_SENSOR_CHANGEING_MESSAGE,0,0);

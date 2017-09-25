@@ -207,6 +207,7 @@ void  LoadRegistersGraphicMode();
 void  LoadRegistersGraphicMode_AQ();
 void  LoadRegistersGraphicMode_HUMTEMPSENSOR();
 void  LoadRegistersGraphicMode_CO2485();
+void  LoadRegistersGraphicMode_STM32Pressure();
 BOOL  ReadLineFromHexFile(CFile& file, char* pBuffer);
 int Get_Binfile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info);
 int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info);

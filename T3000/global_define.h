@@ -950,8 +950,9 @@ const CString Device_Serial_Port_Status[] =
 	_T("Main Zigbee"),
 	_T("Sub Zigbee"),
 	_T("Modbus Master"),
-	_T("RS232 Meter"),
-	_T("MSTP Master")
+	_T("MSTP Master"),
+	_T("RS232 Meter")
+	
 };
 
 const CString Variable_Analog_Units_Array[] = 
