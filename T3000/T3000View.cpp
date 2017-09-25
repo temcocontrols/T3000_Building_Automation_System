@@ -5451,7 +5451,7 @@ void CT3000View::Initial_Max_Min()
     }
 
 
-    /*int currentTemp= product_register_value[MODBUS_TEMPRATURE_CHIP]/10;
+    int currentTemp= product_register_value[MODBUS_TEMPRATURE_CHIP]/10;
     if (currentTemp<DayMin)
     {
 
@@ -5468,10 +5468,9 @@ void CT3000View::Initial_Max_Min()
     	while((DayMax%5)!=0){
     		++DayMax;
     	}
-    }*/
+    }
 
-    //DayMax=Round_SetPoint(DayMax);
-    //DayMin=Round_SetPoint(DayMin);
+	 
 }
 int CT3000View::GetRoundNumber(int number)
 {

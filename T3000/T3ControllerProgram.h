@@ -10,6 +10,9 @@ public:
 	/*int GetPrivateData(uint32_t deviceid, uint8_t command, uint8_t start_instance, uint8_t end_instance, int16_t entitysize);
 	int GetPrivateData_Blocking(uint32_t deviceid, uint8_t command, uint8_t start_instance, uint8_t end_instance, int16_t entitysize);
 */
-
+	int WriteProgramData(uint32_t deviceid, uint8_t n_command, uint8_t start_instance, uint8_t end_instance, uint8_t npackage);
+	 
+	bool Check_FullLabel_Exsit(LPCTSTR m_new_fulllabel);
+	bool Check_Label_Exsit(LPCTSTR m_new_fulllabel);
 };
 
