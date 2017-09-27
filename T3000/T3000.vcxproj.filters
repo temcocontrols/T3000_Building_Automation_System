@@ -675,6 +675,9 @@
     <ClCompile Include="global_function.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="T3ControllerProgram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -1765,6 +1768,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="global_define.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T3ControllerProgram.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

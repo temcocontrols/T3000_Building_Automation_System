@@ -2339,7 +2339,6 @@
 #define IDC_RADIO_T_13                  9864
 #define IDC_RADIO_T_14                  9865
 #define IDC_STATIC_SPLIT_WINDOW         9866
-
 #define IDC_CHANGE_ID                   9867
 #define IDC_EDIT_INTER                  10000
 #define IDC_STATIC_SEETING_SERIAL_NUMBER 15491

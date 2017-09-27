@@ -18,5 +18,8 @@ public:
 	void SplitStringToArray(CStringArray &saArray, CString sSource, CString sToken);
 	void Inial_Product_map();
 	void Initial_Product();
+	CString ShowT3DefaultName();
+private: 
+	CString m_strIpAddress;
 };
 

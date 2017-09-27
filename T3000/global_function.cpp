@@ -1899,11 +1899,6 @@ int GetProgramData(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance
         return -2;
 }
 
-
-
-
-
-
 int GetProgramData_Blocking(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance,uint8_t npackgae)
 {
     int temp_invoke_id = -1;
@@ -4048,8 +4043,8 @@ void Inial_Product_map()
 	product_map.insert(map<int,CString>::value_type(PM_T3PERFORMANCE,_T("T3-Performance")));
 	product_map.insert(map<int,CString>::value_type(PM_T34AO,_T("T3-4AO")));
 	product_map.insert(map<int,CString>::value_type(PM_T36CT,_T("T3-6CT")));
-	product_map.insert(map<int,CString>::value_type(PM_MINIPANEL,_T("T3-BB/LB/TB")));
-	product_map.insert(map<int, CString>::value_type(PM_MINIPANEL_ARM, _T("T3-BB/LB/TB(ARM)")));
+	product_map.insert(map<int,CString>::value_type(PM_MINIPANEL,_T("T3Controller")));
+	product_map.insert(map<int, CString>::value_type(PM_MINIPANEL_ARM, _T("T3Controller(ARM)")));
 	product_map.insert(map<int,CString>::value_type(PM_PRESSURE,_T("Pressure Sensor")));
 	product_map.insert(map<int,CString>::value_type(PM_HUM_R,_T("HUM-R")));
 	product_map.insert(map<int,CString>::value_type(PM_T322AI,_T("T3-22I")));

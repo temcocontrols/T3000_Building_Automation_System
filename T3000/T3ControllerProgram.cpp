@@ -4,6 +4,7 @@
 #include"global_function.h"
 CT3ControllerProgram::CT3ControllerProgram()
 {
+	m_strIpAddress = L"192.168.0.4";
 }
 
 
@@ -346,8 +347,8 @@ void CT3ControllerProgram::Initial_Product()
 	product_map.insert(map<int, CString>::value_type(PM_T3PERFORMANCE, _T("T3-Performance")));
 	product_map.insert(map<int, CString>::value_type(PM_T34AO, _T("T3-4AO")));
 	product_map.insert(map<int, CString>::value_type(PM_T36CT, _T("T3-6CT")));
-	product_map.insert(map<int, CString>::value_type(PM_MINIPANEL, _T("T3-BB/LB/TB")));
-	product_map.insert(map<int, CString>::value_type(PM_MINIPANEL_ARM, _T("T3-BB/LB/TB(ARM)")));
+	product_map.insert(map<int, CString>::value_type(PM_MINIPANEL, _T("T3Controller")));
+	product_map.insert(map<int, CString>::value_type(PM_MINIPANEL_ARM, _T("T3Controller(ARM)")));
 	product_map.insert(map<int, CString>::value_type(PM_PRESSURE, _T("Pressure Sensor")));
 	product_map.insert(map<int, CString>::value_type(PM_HUM_R, _T("HUM-R")));
 	product_map.insert(map<int, CString>::value_type(PM_T322AI, _T("T3-22I")));
@@ -369,4 +370,9 @@ void CT3ControllerProgram::Initial_Product()
 	product_map.insert(map<int, CString>::value_type(PM_T3_LC, _T("T3_LC")));
 
 
+}
+
+CString CT3ControllerProgram::ShowT3DefaultName()
+{
+	return _T("T3Controller:") + m_strIpAddress;
 }
