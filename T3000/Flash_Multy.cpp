@@ -595,7 +595,7 @@ BOOL CFlash_Multy::Product_Firmware_Check(CString ProductName,CString FirmwareFi
 		{
 			Ret_Result= TRUE;
 		}	
-		else if ((hexproductname.CompareNoCase(_T("T38IO"))==0)&&(ProductName.CompareNoCase(_T("T3-BB/LB/TB"))==0))
+		else if ((hexproductname.CompareNoCase(_T("T38IO"))==0)&&(ProductName.CompareNoCase(_T("T3Controller"))==0))
 		{
 			Ret_Result= TRUE;
 		}	

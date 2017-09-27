@@ -309,6 +309,7 @@
     <ClCompile Include="T38AI16O.cpp" />
     <ClCompile Include="T38AI8AO.cpp" />
     <ClCompile Include="T38I13O.cpp" />
+    <ClCompile Include="T3ControllerProgram.cpp" />
     <ClCompile Include="T3ModulesOutputDlg.cpp" />
     <ClCompile Include="T3ModulesView.cpp" />
     <ClCompile Include="T3RangeDlg.cpp" />
@@ -614,6 +615,7 @@
     <ClInclude Include="T38AI16O.h" />
     <ClInclude Include="T38AI8AO.h" />
     <ClInclude Include="T38I13O.h" />
+    <ClInclude Include="T3ControllerProgram.h" />
     <ClInclude Include="T3ModulesOutputDlg.h" />
     <ClInclude Include="T3ModulesView.h" />
     <ClInclude Include="T3RangeDlg.h" />
