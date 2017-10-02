@@ -1,23 +1,16 @@
-// Scintilla source code edit control
-/** @file DocumentAccessor.h
- ** Implementation of BufferAccess and StylingAccess on a Scintilla
- ** rapid easy access to contents of a Scintilla.
- **/
-// Copyright 1998-2001 by Neil Hodgson <neilh@scintilla.org>
-// The License.txt file describes the conditions under which this software may be distributed.
 
-#ifdef SCI_NAMESPACE
-namespace Scintilla {
+#ifdef T3000_HUMSENSORS
+namespace T3000_HumSensor {
 #endif
 
-class Document;
+ 
 
 /**
  */
-class DocumentAccessor : public Accessor {
-	// Private so DocumentAccessor objects can not be copied
-	DocumentAccessor(const DocumentAccessor &source) : Accessor(), props(source.props) {}
-	DocumentAccessor &operator=(const DocumentAccessor &) { return *this; }
+class HumSensor : public Accessor {
+	// Private so HumSensor objects can not be copied
+	HumSensor(const HumSensor &source) : Accessor(), props(source.props) {}
+	HumSensor &operator=(const HumSensor &) { return *this; }
 
 protected:
 	Document *pdoc;
@@ -37,13 +30,13 @@ protected:
 	void Fill(int position);
 
 public:
-	DocumentAccessor(Document *pdoc_, PropSet &props_, WindowID id_=0) : 
+	HumSensor(Document *pdoc_, PropSet &props_, WindowID id_=0) : 
 		Accessor(), pdoc(pdoc_), props(props_), id(id_),
 		lenDoc(-1), validLen(0), chFlags(0), chWhile(0), 
 		startSeg(0), startPosStyling(0),
 		mask(127) { // Initialize the mask to be big enough for any lexer.
 	}
-	~DocumentAccessor();
+	~HumSensor();
 	bool Match(int pos, const char *s);
 	char StyleAt(int position);
 	int GetLine(int position);
