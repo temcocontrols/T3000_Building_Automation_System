@@ -1,8 +1,5 @@
 #pragma once
 
-
-// CCalibartionHT dialog
-
 class CCalibartionHT : public CDialogEx
 {
 	DECLARE_DYNAMIC(CCalibartionHT)
