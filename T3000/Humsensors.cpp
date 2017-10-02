@@ -9,7 +9,7 @@
 
 #include "PropSet.h"
 #include "Accessor.h"
-#include "HumSensor.h"
+#include "DocumentAccessor.h"
 #include "SplitVector.h"
 #include "Partitioning.h"
 #include "RunStyles.h"
@@ -23,10 +23,10 @@
 using namespace T3000_HumSensor;
 #endif
 
-HumSensor::~HumSensor() {
+DocumentAccessor::~DocumentAccessor() {
 }
 
-bool HumSensor::InternalIsLeadByte(char ch) {
+bool DocumentAccessor::InternalIsLeadByte(char ch) {
 	if (SC_CP_UTF8 == codePage)
 		// For lexing, all characters >= 0x80 are treated the
 		// same so none is considered a lead byte.
@@ -35,7 +35,7 @@ bool HumSensor::InternalIsLeadByte(char ch) {
 		return Platform::IsDBCSLeadByte(codePage, ch);
 }
 
-void HumSensor::Fill(int position) {
+void DocumentAccessor::Fill(int position) {
 	if (lenDoc == -1)
 		lenDoc = pdoc->Length();
 	startPos = position - slopSize;
@@ -51,7 +51,7 @@ void HumSensor::Fill(int position) {
 	buf[endPos-startPos] = '\0';
 }
 
-bool HumSensor::Match(int pos, const char *s) {
+bool DocumentAccessor::Match(int pos, const char *s) {
 	for (int i=0; *s; i++) {
 		if (*s != SafeGetCharAt(pos+i))
 			return false;
@@ -60,49 +60,49 @@ bool HumSensor::Match(int pos, const char *s) {
 	return true;
 }
 
-char HumSensor::StyleAt(int position) {
+char DocumentAccessor::StyleAt(int position) {
 	// Mask off all bits which aren't in the 'mask'.
 	return static_cast<char>(pdoc->StyleAt(position) & mask);
 }
 
-int HumSensor::GetLine(int position) {
+int DocumentAccessor::GetLine(int position) {
 	return pdoc->LineFromPosition(position);
 }
 
-int HumSensor::LineStart(int line) {
+int DocumentAccessor::LineStart(int line) {
 	return pdoc->LineStart(line);
 }
 
-int HumSensor::LevelAt(int line) {
+int DocumentAccessor::LevelAt(int line) {
 	return pdoc->GetLevel(line);
 }
 
-int HumSensor::Length() {
+int DocumentAccessor::Length() {
 	if (lenDoc == -1)
 		lenDoc = pdoc->Length();
 	return lenDoc;
 }
 
-int HumSensor::GetLineState(int line) {
+int DocumentAccessor::GetLineState(int line) {
 	return pdoc->GetLineState(line);
 }
 
-int HumSensor::SetLineState(int line, int state) {
+int DocumentAccessor::SetLineState(int line, int state) {
 	return pdoc->SetLineState(line, state);
 }
 
-void HumSensor::StartAt(unsigned int start, char chMask) {
+void DocumentAccessor::StartAt(unsigned int start, char chMask) {
 	// Store the mask specified for use with StyleAt.
 	mask = chMask;
 	pdoc->StartStyling(start, chMask);
 	startPosStyling = start;
 }
 
-void HumSensor::StartSegment(unsigned int pos) {
+void DocumentAccessor::StartSegment(unsigned int pos) {
 	startSeg = pos;
 }
 
-void HumSensor::ColourTo(unsigned int pos, int chAttr) {
+void DocumentAccessor::ColourTo(unsigned int pos, int chAttr) {
 	// Only perform styling if non empty range
 	if (pos != startSeg - 1) {
 		PLATFORM_ASSERT(pos >= startSeg);
@@ -128,11 +128,11 @@ void HumSensor::ColourTo(unsigned int pos, int chAttr) {
 	startSeg = pos+1;
 }
 
-void HumSensor::SetLevel(int line, int level) {
+void DocumentAccessor::SetLevel(int line, int level) {
 	pdoc->SetLevel(line, level);
 }
 
-void HumSensor::Flush() {
+void DocumentAccessor::Flush() {
 	startPos = extremePosition;
 	lenDoc = -1;
 	if (validLen > 0) {
@@ -142,7 +142,7 @@ void HumSensor::Flush() {
 	}
 }
 
-int HumSensor::IndentAmount(int line, int *flags, PFNIsCommentLeader pfnIsCommentLeader) {
+int DocumentAccessor::IndentAmount(int line, int *flags, PFNIsCommentLeader pfnIsCommentLeader) {
 	int end = Length();
 	int spaceFlags = 0;
 
@@ -188,7 +188,7 @@ int HumSensor::IndentAmount(int line, int *flags, PFNIsCommentLeader pfnIsCommen
 		return indent;
 }
 
-void HumSensor::IndicatorFill(int start, int end, int indicator, int value) {
+void DocumentAccessor::IndicatorFill(int start, int end, int indicator, int value) {
 	pdoc->decorations.SetCurrentIndicator(indicator);
 	pdoc->DecorationFillRange(start, value, end - start);
 }
