@@ -1,8 +1,4 @@
-////////////////////////////////////////////////////////////////
-// CT3000HelpSystem 1997 Microsoft Systems Journal. 
-// If this code works, it was written by Paul DiLascia.
-// If not, I don't know who wrote it.
-//
+
 #include "StdAfx.h"
 #include "T3000HelpSystem.h"
 
