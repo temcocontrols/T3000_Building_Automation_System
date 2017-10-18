@@ -2,7 +2,7 @@
 /////////////////////////////////  Includes  //////////////////////////////////
 
 #include "stdafx.h"
-#include "ScintillaDocView.h"
+#include "CT3000DocView.h"
 //#include "resource.h"
 
 
@@ -13,21 +13,21 @@
 #endif
 
 #define IDC_REGULAR_EXPRESSION	1
-#define IDD_SCINTILLA_FINDDLGORD 1
-#define IDD_SCINTILLA_REPLACEDLGORD 1
-#define IDS_SCINTILLA_DEFAULT_PRINT_HEADER 1
-#define IDS_SCINTILLA_DEFAULT_PRINT_FOOTER 1
+#define IDD_CT3000_FINDDLGORD 1
+#define IDD_CT3000_REPLACEDLGORD 1
+#define IDS_CT3000_DEFAULT_PRINT_HEADER 1
+#define IDS_CT3000_DEFAULT_PRINT_FOOTER 1
 
 ////////////////////////////////// Implementation /////////////////////////////
 
-class _SCINTILLA_EDIT_STATE
+class _CT3000_EDIT_STATE
 {
 public:
 //Constructors / Destructors
-	_SCINTILLA_EDIT_STATE();
+	_CT3000_EDIT_STATE();
 
 //Member variables
-	CScintillaFindReplaceDlg* pFindReplaceDlg;    //find or replace dialog
+	CCT3000FindReplaceDlg* pFindReplaceDlg;    //find or replace dialog
 	BOOL                      bFindOnly;          //Is pFindReplace the find or replace?
 	CString                   strFind;            //last find string
 	CString                   strReplace;         //last replace string
@@ -37,7 +37,7 @@ public:
   BOOL                      bRegularExpression; //TRUE==regular expression search, FALSE==not
 };
 
-_SCINTILLA_EDIT_STATE::_SCINTILLA_EDIT_STATE() : bRegularExpression(FALSE),
+_CT3000_EDIT_STATE::_CT3000_EDIT_STATE() : bRegularExpression(FALSE),
                                                  pFindReplaceDlg(NULL),
                	                                 bWord(FALSE),
                                                  bFindOnly(TRUE),
@@ -46,32 +46,32 @@ _SCINTILLA_EDIT_STATE::_SCINTILLA_EDIT_STATE() : bRegularExpression(FALSE),
 {
 }
 
-_SCINTILLA_EDIT_STATE _scintillaEditState;
+_CT3000_EDIT_STATE _CT3000EditState;
 
 
-BEGIN_MESSAGE_MAP(CScintillaFindReplaceDlg, CFindReplaceDialog)
+BEGIN_MESSAGE_MAP(CCT3000FindReplaceDlg, CFindReplaceDialog)
   ON_BN_CLICKED(IDC_REGULAR_EXPRESSION, OnRegularExpression)
 END_MESSAGE_MAP()
 
-CScintillaFindReplaceDlg::CScintillaFindReplaceDlg(): m_bRegularExpression(FALSE)
+CCT3000FindReplaceDlg::CCT3000FindReplaceDlg(): m_bRegularExpression(FALSE)
 {
 }
 
-BOOL CScintillaFindReplaceDlg::Create(BOOL bFindDialogOnly,	LPCTSTR lpszFindWhat, LPCTSTR lpszReplaceWith, DWORD dwFlags, CWnd* pParentWnd)
+BOOL CCT3000FindReplaceDlg::Create(BOOL bFindDialogOnly,	LPCTSTR lpszFindWhat, LPCTSTR lpszReplaceWith, DWORD dwFlags, CWnd* pParentWnd)
 {
   //Tell Windows to use our dialog instead of the standard one
   m_fr.hInstance = AfxGetResourceHandle();
   m_fr.Flags |= FR_ENABLETEMPLATE;
   if (bFindDialogOnly)
-    m_fr.lpTemplateName = MAKEINTRESOURCE(IDD_SCINTILLA_FINDDLGORD);
+    m_fr.lpTemplateName = MAKEINTRESOURCE(IDD_CT3000_FINDDLGORD);
   else
-    m_fr.lpTemplateName = MAKEINTRESOURCE(IDD_SCINTILLA_REPLACEDLGORD);
+    m_fr.lpTemplateName = MAKEINTRESOURCE(IDD_CT3000_REPLACEDLGORD);
 
   //Let the base class do its thing
   return CFindReplaceDialog::Create(bFindDialogOnly,	lpszFindWhat, lpszReplaceWith, dwFlags, pParentWnd);
 }
 
-BOOL CScintillaFindReplaceDlg::OnInitDialog() 
+BOOL CCT3000FindReplaceDlg::OnInitDialog() 
 {
   //let the base class do its thing
 	BOOL bReturn = CFindReplaceDialog::OnInitDialog();
@@ -84,7 +84,7 @@ BOOL CScintillaFindReplaceDlg::OnInitDialog()
 	return bReturn;
 }
 
-void CScintillaFindReplaceDlg::OnRegularExpression() 
+void CCT3000FindReplaceDlg::OnRegularExpression() 
 {
   //Save the state of the Regular expression checkbox into a member variable
   CButton* pCtrl = static_cast<CButton*>(GetDlgItem(IDC_REGULAR_EXPRESSION));
@@ -94,11 +94,11 @@ void CScintillaFindReplaceDlg::OnRegularExpression()
 
 
 
-IMPLEMENT_DYNCREATE(CScintillaView, CView)
+IMPLEMENT_DYNCREATE(CCT3000View, CView)
 
-const UINT _ScintillaMsgFindReplace = ::RegisterWindowMessage(FINDMSGSTRING);
+const UINT _CT3000MsgFindReplace = ::RegisterWindowMessage(FINDMSGSTRING);
 
-BEGIN_MESSAGE_MAP(CScintillaView, CView)
+BEGIN_MESSAGE_MAP(CCT3000View, CView)
 	ON_WM_PAINT()
 	ON_UPDATE_COMMAND_UI(ID_EDIT_CUT, OnUpdateNeedSel)
 	ON_UPDATE_COMMAND_UI(ID_EDIT_PASTE, OnUpdateNeedPaste)
@@ -129,10 +129,10 @@ BEGIN_MESSAGE_MAP(CScintillaView, CView)
 	ON_COMMAND(ID_FILE_PRINT, CView::OnFilePrint)
 	ON_COMMAND(ID_FILE_PRINT_DIRECT, CView::OnFilePrint)
  	ON_COMMAND(ID_FILE_PRINT_PREVIEW, CView::OnFilePrintPreview)
-	ON_REGISTERED_MESSAGE(_ScintillaMsgFindReplace, OnFindReplaceCmd)
+	ON_REGISTERED_MESSAGE(_CT3000MsgFindReplace, OnFindReplaceCmd)
 END_MESSAGE_MAP()
 
-CScintillaView::CScintillaView() : m_rMargin(0, 0, 0, 0), 
+CCT3000View::CCT3000View() : m_rMargin(0, 0, 0, 0), 
                                    m_bFirstSearch(TRUE),
                                    m_bUseROFileAttributeDuringLoading(TRUE),
                                    m_bPrintHeader(TRUE), 
@@ -142,14 +142,14 @@ CScintillaView::CScintillaView() : m_rMargin(0, 0, 0, 0),
   m_bUsingMetric = UserWantsMetric();
 }
 
-CScintillaCtrl& CScintillaView::GetCtrl()
+CCT3000Ctrl& CCT3000View::GetCtrl()
 { 
-  CScintillaCtrl& ctrl = m_Edit;
+  CCT3000Ctrl& ctrl = m_Edit;
 
   return ctrl; 
 }
 
-void CScintillaView::LoadMarginSettings(const CString& sSection)
+void CCT3000View::LoadMarginSettings(const CString& sSection)
 {
   //Get the margin values 
   CWinApp* pApp = AfxGetApp();
@@ -160,7 +160,7 @@ void CScintillaView::LoadMarginSettings(const CString& sSection)
 	m_rMargin.bottom = pApp->GetProfileInt(sSection, _T("BottomMargin"), m_rMargin.bottom);
 }
 
-void CScintillaView::SaveMarginSettings(const CString& sSection)
+void CCT3000View::SaveMarginSettings(const CString& sSection)
 {
   //Write out the margin values 
   CWinApp* pApp = AfxGetApp();
@@ -171,15 +171,15 @@ void CScintillaView::SaveMarginSettings(const CString& sSection)
 	pApp->WriteProfileInt(sSection, _T("BottomMargin"), m_rMargin.bottom);
 }
 
-void CScintillaView::OnDestroy()
+void CCT3000View::OnDestroy()
 {
-  //Close Find/Replace dialog if this is the last CScintillaView
-	if (_scintillaEditState.pFindReplaceDlg)
+  //Close Find/Replace dialog if this is the last CCT3000View
+	if (_CT3000EditState.pFindReplaceDlg)
 	{
 		CWinApp* pApp = AfxGetApp();
 
-    //Count up the number of CScintillaView's we have (excluding this one)
-    int nScintillaViews = 0;
+    //Count up the number of CCT3000View's we have (excluding this one)
+    int nCT3000Views = 0;
 
 		//no doc manager - no templates
 		if (pApp->m_pDocManager)
@@ -187,38 +187,38 @@ void CScintillaView::OnDestroy()
 			//walk all templates
 			CDocTemplate* pTemplate;
 			POSITION pos = pApp->m_pDocManager->GetFirstDocTemplatePosition();
-			while (pos && (nScintillaViews == 0))
+			while (pos && (nCT3000Views == 0))
 			{
 				pTemplate = pApp->m_pDocManager->GetNextDocTemplate(pos);
 				ASSERT(pTemplate);
 
 				//walk all documents in the template
 				POSITION pos2 = pTemplate->GetFirstDocPosition();
-				while (pos2 && (nScintillaViews == 0))
+				while (pos2 && (nCT3000Views == 0))
 				{
 					CDocument* pDoc = pTemplate->GetNextDoc(pos2);
 					ASSERT(pDoc);
 
 					//walk all views in the document
 					POSITION pos3 = pDoc->GetFirstViewPosition();
-					while (pos3 && (nScintillaViews == 0))
+					while (pos3 && (nCT3000Views == 0))
 					{
 						CView* pView = pDoc->GetNextView(pos3);
 						ASSERT(pView);
-						// if we find another CScintillaView, skip code that closes find dialog
-						if (pView->IsKindOf(RUNTIME_CLASS(CScintillaView)) && (pView != this) && ::IsWindow(pView->GetSafeHwnd()))
-							++nScintillaViews;
+						// if we find another CCT3000View, skip code that closes find dialog
+						if (pView->IsKindOf(RUNTIME_CLASS(CCT3000View)) && (pView != this) && ::IsWindow(pView->GetSafeHwnd()))
+							++nCT3000Views;
 					}
 				}
 			}
 		}
 
-    //Close down the find/replace dialog if we are the last CScintillaView
-		if (nScintillaViews == 0)
+    //Close down the find/replace dialog if we are the last CCT3000View
+		if (nCT3000Views == 0)
     {
-      if (::IsWindow(_scintillaEditState.pFindReplaceDlg->m_hWnd))
-			  _scintillaEditState.pFindReplaceDlg->SendMessage(WM_CLOSE);
-		  _scintillaEditState.pFindReplaceDlg = NULL;
+      if (::IsWindow(_CT3000EditState.pFindReplaceDlg->m_hWnd))
+			  _CT3000EditState.pFindReplaceDlg->SendMessage(WM_CLOSE);
+		  _CT3000EditState.pFindReplaceDlg = NULL;
     }
 	}
 
@@ -226,31 +226,31 @@ void CScintillaView::OnDestroy()
   CView::OnDestroy();
 }
 
-void CScintillaView::DeleteContents()
+void CCT3000View::DeleteContents()
 {
 	ASSERT_VALID(this);
 	ASSERT(m_hWnd != NULL);
 
-  CScintillaCtrl& rCtrl = GetCtrl();
+  CCT3000Ctrl& rCtrl = GetCtrl();
 	rCtrl.ClearAll();
   rCtrl.EmptyUndoBuffer();
 }
 
-void CScintillaView::OnDraw(CDC*)
+void CCT3000View::OnDraw(CDC*)
 {
 	ASSERT(FALSE);
 }
 
-void CScintillaView::OnPaint()
+void CCT3000View::OnPaint()
 {
 	// this is done to avoid CView::OnPaint
 	Default();
 }
 
-BOOL CScintillaView::OnPreparePrinting(CPrintInfo* pInfo)
+BOOL CCT3000View::OnPreparePrinting(CPrintInfo* pInfo)
 {
   //Determine if we should allow selection printing
-  CScintillaCtrl& rCtrl = GetCtrl();
+  CCT3000Ctrl& rCtrl = GetCtrl();
 
   long nStartChar = rCtrl.GetSelectionStart();
   long nEndChar = rCtrl.GetSelectionEnd();
@@ -267,11 +267,11 @@ BOOL CScintillaView::OnPreparePrinting(CPrintInfo* pInfo)
   return DoPreparePrinting(pInfo);
 }
 
-void CScintillaView::OnBeginPrinting(CDC* /*pDC*/, CPrintInfo* pInfo)
+void CCT3000View::OnBeginPrinting(CDC* /*pDC*/, CPrintInfo* pInfo)
 {
 	ASSERT_VALID(this);
 
-  CScintillaCtrl& rCtrl = GetCtrl();
+  CCT3000Ctrl& rCtrl = GetCtrl();
 
 	//initialize page start vector
 	ASSERT(m_aPageStart.GetSize() == 0);
@@ -284,7 +284,7 @@ void CScintillaView::OnBeginPrinting(CDC* /*pDC*/, CPrintInfo* pInfo)
 	ASSERT_VALID(this);
 }
 
-BOOL CScintillaView::PaginateTo(CDC* pDC, CPrintInfo* pInfo)
+BOOL CCT3000View::PaginateTo(CDC* pDC, CPrintInfo* pInfo)
 {
 	ASSERT_VALID(this);
 	ASSERT_VALID(pDC);
@@ -315,7 +315,7 @@ BOOL CScintillaView::PaginateTo(CDC* pDC, CPrintInfo* pInfo)
 	return bResult;
 }
 
-void CScintillaView::OnPrepareDC(CDC* pDC, CPrintInfo* pInfo)
+void CCT3000View::OnPrepareDC(CDC* pDC, CPrintInfo* pInfo)
 {
   //Validate our parameters
 	ASSERT_VALID(this);
@@ -338,12 +338,12 @@ void CScintillaView::OnPrepareDC(CDC* pDC, CPrintInfo* pInfo)
   }
 }
 
-void CScintillaView::PrintHeader(CDC* pDC, CPrintInfo* /*pInfo*/, RangeToFormat& frPrint)
+void CCT3000View::PrintHeader(CDC* pDC, CPrintInfo* /*pInfo*/, RangeToFormat& frPrint)
 {
   //By Default we print "Document Name - Printed on Date" as well as a line separator below the text
   //Derived classes are of course free to implement their own version of PrintHeader
   CString sHeader;
-  AfxFormatString2(sHeader, IDS_SCINTILLA_DEFAULT_PRINT_HEADER, GetDocument()->GetTitle(), COleDateTime::GetCurrentTime().Format());
+  AfxFormatString2(sHeader, IDS_CT3000_DEFAULT_PRINT_HEADER, GetDocument()->GetTitle(), COleDateTime::GetCurrentTime().Format());
 
   //Setup the DC
   pDC->SetTextColor(RGB(0, 0, 0));
@@ -362,19 +362,19 @@ void CScintillaView::PrintHeader(CDC* pDC, CPrintInfo* /*pInfo*/, RangeToFormat&
   //Restore the DC
   pDC->SetTextAlign(nAlign);
 
-  //Adjust the place where scintilla will draw the text
+  //Adjust the place where CT3000 will draw the text
   if (frPrint.rc.top < (frPrint.rcPage.top + nHeaderDepth))
     frPrint.rc.top = frPrint.rcPage.top + nHeaderDepth;
 }
 
-void CScintillaView::PrintFooter(CDC* pDC, CPrintInfo* pInfo, RangeToFormat& frPrint)
+void CCT3000View::PrintFooter(CDC* pDC, CPrintInfo* pInfo, RangeToFormat& frPrint)
 {
   //By Default we print "Page X" as well as a line separator above the text
   //Derived classes are of course free to implement their own version of PrintFooter
   CString sPage;
   sPage.Format(_T("%d"), pInfo->m_nCurPage);
   CString sFooter;
-  AfxFormatString1(sFooter, IDS_SCINTILLA_DEFAULT_PRINT_FOOTER, sPage);
+  AfxFormatString1(sFooter, IDS_CT3000_DEFAULT_PRINT_FOOTER, sPage);
 
   //Setup the DC
   pDC->SetTextColor(RGB(0, 0, 0));
@@ -393,19 +393,19 @@ void CScintillaView::PrintFooter(CDC* pDC, CPrintInfo* pInfo, RangeToFormat& frP
   //Restore the DC
   pDC->SetTextAlign(nAlign);
 
-  //Adjust the place where scintilla will draw the text
+  //Adjust the place where CT3000 will draw the text
   if (frPrint.rc.bottom > (frPrint.rcPage.bottom - nFooterDepth))
     frPrint.rc.bottom = frPrint.rcPage.bottom - nFooterDepth;
 }
 
-BOOL CScintillaView::UserWantsMetric()
+BOOL CCT3000View::UserWantsMetric()
 {
   TCHAR localeInfo[3];
   GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_IMEASURE, localeInfo, 3);
   return (localeInfo[0] == _T('0')) ;
 }
 
-long CScintillaView::PrintPage(CDC* pDC, CPrintInfo* pInfo, long nIndexStart, long nIndexStop)
+long CCT3000View::PrintPage(CDC* pDC, CPrintInfo* pInfo, long nIndexStart, long nIndexStop)
 {
 	ASSERT_VALID(this);
 	ASSERT_VALID(pDC);
@@ -435,7 +435,7 @@ long CScintillaView::PrintPage(CDC* pDC, CPrintInfo* pInfo, long nIndexStart, lo
 		rMargins = m_rMargin;
 
   //We take the page size from the pInfo member variable (decrement the right and
-  //bottom values by 1 to suit Scintilla)
+  //bottom values by 1 to suit CT3000)
 	rfPrint.rcPage.left = pInfo->m_rectDraw.left;
 	rfPrint.rcPage.top = pInfo->m_rectDraw.top;
 	rfPrint.rcPage.right = pInfo->m_rectDraw.right - 1;
@@ -463,7 +463,7 @@ long CScintillaView::PrintPage(CDC* pDC, CPrintInfo* pInfo, long nIndexStart, lo
   return GetCtrl().FormatRange(TRUE, &rfPrint);
 }
 
-void CScintillaView::OnPrint(CDC* pDC, CPrintInfo* pInfo)
+void CCT3000View::OnPrint(CDC* pDC, CPrintInfo* pInfo)
 {
 	ASSERT_VALID(this);
 	ASSERT_VALID(pDC);
@@ -502,27 +502,27 @@ void CScintillaView::OnPrint(CDC* pDC, CPrintInfo* pInfo)
 	}
 }
 
-void CScintillaView::OnEndPrinting(CDC*, CPrintInfo*)
+void CCT3000View::OnEndPrinting(CDC*, CPrintInfo*)
 {
 	ASSERT_VALID(this);
 	m_aPageStart.RemoveAll();
 }
 
-void CScintillaView::OnUpdateNeedPaste(CCmdUI* pCmdUI)
+void CCT3000View::OnUpdateNeedPaste(CCmdUI* pCmdUI)
 {
 	ASSERT_VALID(this);
 	pCmdUI->Enable(GetCtrl().CanPaste());
 }
 
-void CScintillaView::OnUpdateNeedText(CCmdUI* pCmdUI)
+void CCT3000View::OnUpdateNeedText(CCmdUI* pCmdUI)
 {
 	ASSERT_VALID(this);
 	pCmdUI->Enable(GetCtrl().GetTextLength() != 0);
 }
 
-void CScintillaView::OnUpdateNeedTextAndFollowingText(CCmdUI* pCmdUI)
+void CCT3000View::OnUpdateNeedTextAndFollowingText(CCmdUI* pCmdUI)
 {
-  CScintillaCtrl& rCtrl = GetCtrl();
+  CCT3000Ctrl& rCtrl = GetCtrl();
 
 	ASSERT_VALID(this);
 
@@ -532,27 +532,27 @@ void CScintillaView::OnUpdateNeedTextAndFollowingText(CCmdUI* pCmdUI)
 	pCmdUI->Enable(nLength && (nStartChar != nLength));
 }
 
-void CScintillaView::OnUpdateNeedFind(CCmdUI* pCmdUI)
+void CCT3000View::OnUpdateNeedFind(CCmdUI* pCmdUI)
 {
 	ASSERT_VALID(this);
-	pCmdUI->Enable(GetCtrl().GetLength() != 0 && !_scintillaEditState.strFind.IsEmpty());
+	pCmdUI->Enable(GetCtrl().GetLength() != 0 && !_CT3000EditState.strFind.IsEmpty());
 }
 
-void CScintillaView::OnUpdateEditUndo(CCmdUI* pCmdUI)
+void CCT3000View::OnUpdateEditUndo(CCmdUI* pCmdUI)
 {
 	ASSERT_VALID(this);
 	pCmdUI->Enable(GetCtrl().CanUndo());
 }
 
-void CScintillaView::OnUpdateEditRedo(CCmdUI* pCmdUI)
+void CCT3000View::OnUpdateEditRedo(CCmdUI* pCmdUI)
 {
 	ASSERT_VALID(this);
 	pCmdUI->Enable(GetCtrl().CanRedo());
 }
 
-void CScintillaView::OnUpdateNeedSel(CCmdUI* pCmdUI)
+void CCT3000View::OnUpdateNeedSel(CCmdUI* pCmdUI)
 {
-  CScintillaCtrl& rCtrl = GetCtrl();
+  CCT3000Ctrl& rCtrl = GetCtrl();
   
 	ASSERT_VALID(this);
   long nStartChar = rCtrl.GetSelectionStart();
@@ -560,78 +560,78 @@ void CScintillaView::OnUpdateNeedSel(CCmdUI* pCmdUI)
 	pCmdUI->Enable(nStartChar != nEndChar);
 }
 
-void CScintillaView::OnEditCut()
+void CCT3000View::OnEditCut()
 {
 	ASSERT_VALID(this);
 	GetCtrl().Cut();
 }
 
-void CScintillaView::OnEditCopy()
+void CCT3000View::OnEditCopy()
 {
 	ASSERT_VALID(this);
 	GetCtrl().Copy();
 }
 
-void CScintillaView::OnEditPaste()
+void CCT3000View::OnEditPaste()
 {
 	ASSERT_VALID(this);
 	GetCtrl().Paste();
 }
 
-void CScintillaView::OnEditClear()
+void CCT3000View::OnEditClear()
 {
 	ASSERT_VALID(this);
 	GetCtrl().Clear();
 }
 
-void CScintillaView::OnEditUndo()
+void CCT3000View::OnEditUndo()
 {
 	ASSERT_VALID(this);
 	GetCtrl().Undo();
 }
 
-void CScintillaView::OnEditRedo()
+void CCT3000View::OnEditRedo()
 {
 	ASSERT_VALID(this);
 	GetCtrl().Redo();
 }
 
-void CScintillaView::OnEditSelectAll()
+void CCT3000View::OnEditSelectAll()
 {
 	ASSERT_VALID(this);
 	GetCtrl().SelectAll();
 }
 
-void CScintillaView::OnEditFind()
+void CCT3000View::OnEditFind()
 {
 	ASSERT_VALID(this);
 	OnEditFindReplace(TRUE);
 }
 
-void CScintillaView::OnEditReplace()
+void CCT3000View::OnEditReplace()
 {
 	ASSERT_VALID(this);
 	OnEditFindReplace(FALSE);
 }
 
-void CScintillaView::OnEditRepeat()
+void CCT3000View::OnEditRepeat()
 {
 	ASSERT_VALID(this);
-	if (!FindText(_scintillaEditState.strFind, _scintillaEditState.bNext, _scintillaEditState.bCase, _scintillaEditState.bWord, _scintillaEditState.bRegularExpression))
-		TextNotFound(_scintillaEditState.strFind, _scintillaEditState.bNext, _scintillaEditState.bCase, _scintillaEditState.bWord, _scintillaEditState.bRegularExpression, FALSE);
+	if (!FindText(_CT3000EditState.strFind, _CT3000EditState.bNext, _CT3000EditState.bCase, _CT3000EditState.bWord, _CT3000EditState.bRegularExpression))
+		TextNotFound(_CT3000EditState.strFind, _CT3000EditState.bNext, _CT3000EditState.bCase, _CT3000EditState.bWord, _CT3000EditState.bRegularExpression, FALSE);
 }
 
-void CScintillaView::AdjustFindDialogPosition()
+void CCT3000View::AdjustFindDialogPosition()
 {
-	ASSERT(_scintillaEditState.pFindReplaceDlg);
-  CScintillaCtrl& rCtrl = GetCtrl();
+	ASSERT(_CT3000EditState.pFindReplaceDlg);
+  CCT3000Ctrl& rCtrl = GetCtrl();
   int nStart = rCtrl.GetSelectionStart();
 	CPoint point;
   point.x = rCtrl.PointXFromPosition(nStart);
   point.y = rCtrl.PointYFromPosition(nStart);
 	ClientToScreen(&point);
 	CRect rectDlg;
-	_scintillaEditState.pFindReplaceDlg->GetWindowRect(&rectDlg);
+	_CT3000EditState.pFindReplaceDlg->GetWindowRect(&rectDlg);
 	if (rectDlg.PtInRect(point))
 	{
 		if (point.y > rectDlg.Height())
@@ -642,100 +642,100 @@ void CScintillaView::AdjustFindDialogPosition()
 			if (point.y + rectDlg.Height() < nVertExt)
 				rectDlg.OffsetRect(0, 40 + point.y - rectDlg.top);
 		}
-		_scintillaEditState.pFindReplaceDlg->MoveWindow(&rectDlg);
+		_CT3000EditState.pFindReplaceDlg->MoveWindow(&rectDlg);
 	}
 }
 
-CScintillaFindReplaceDlg* CScintillaView::CreateFindReplaceDialog()
+CCT3000FindReplaceDlg* CCT3000View::CreateFindReplaceDialog()
 {
-  return new CScintillaFindReplaceDlg;
+  return new CCT3000FindReplaceDlg;
 }
 
-void CScintillaView::OnEditFindReplace(BOOL bFindOnly)
+void CCT3000View::OnEditFindReplace(BOOL bFindOnly)
 {
 	ASSERT_VALID(this);
 
 	m_bFirstSearch = TRUE;
-	if (_scintillaEditState.pFindReplaceDlg != NULL)
+	if (_CT3000EditState.pFindReplaceDlg != NULL)
 	{
-		if (_scintillaEditState.bFindOnly == bFindOnly)
+		if (_CT3000EditState.bFindOnly == bFindOnly)
 		{
-			_scintillaEditState.pFindReplaceDlg->SetActiveWindow();
-			_scintillaEditState.pFindReplaceDlg->ShowWindow(SW_SHOW);
+			_CT3000EditState.pFindReplaceDlg->SetActiveWindow();
+			_CT3000EditState.pFindReplaceDlg->ShowWindow(SW_SHOW);
 			return;
 		}
 		else
 		{
-			ASSERT(_scintillaEditState.bFindOnly != bFindOnly);
-			_scintillaEditState.pFindReplaceDlg->SendMessage(WM_CLOSE);
-			ASSERT(_scintillaEditState.pFindReplaceDlg == NULL);
+			ASSERT(_CT3000EditState.bFindOnly != bFindOnly);
+			_CT3000EditState.pFindReplaceDlg->SendMessage(WM_CLOSE);
+			ASSERT(_CT3000EditState.pFindReplaceDlg == NULL);
 			ASSERT_VALID(this);
 		}
 	}
-  CScintillaCtrl& rCtrl = GetCtrl();
+  CCT3000Ctrl& rCtrl = GetCtrl();
 	CString strFind(rCtrl.GetSelText());
 	//if selection is empty or spans multiple lines use old find text
 	if (strFind.IsEmpty() || (strFind.FindOneOf(_T("\n\r")) != -1))
-		strFind = _scintillaEditState.strFind;
+		strFind = _CT3000EditState.strFind;
 
-	CString strReplace(_scintillaEditState.strReplace);
-	_scintillaEditState.pFindReplaceDlg = CreateFindReplaceDialog();
-	ASSERT(_scintillaEditState.pFindReplaceDlg != NULL);
+	CString strReplace(_CT3000EditState.strReplace);
+	_CT3000EditState.pFindReplaceDlg = CreateFindReplaceDialog();
+	ASSERT(_CT3000EditState.pFindReplaceDlg != NULL);
 	DWORD dwFlags = NULL;
-	if (_scintillaEditState.bNext)
+	if (_CT3000EditState.bNext)
 		dwFlags |= FR_DOWN;
-	if (_scintillaEditState.bCase)
+	if (_CT3000EditState.bCase)
 		dwFlags |= FR_MATCHCASE;
-	if (_scintillaEditState.bWord)
+	if (_CT3000EditState.bWord)
 		dwFlags |= FR_WHOLEWORD;
-  if (_scintillaEditState.bRegularExpression)
-    _scintillaEditState.pFindReplaceDlg->SetRegularExpression(TRUE);
+  if (_CT3000EditState.bRegularExpression)
+    _CT3000EditState.pFindReplaceDlg->SetRegularExpression(TRUE);
 
-	if (!_scintillaEditState.pFindReplaceDlg->Create(bFindOnly, strFind, strReplace, dwFlags, this))
+	if (!_CT3000EditState.pFindReplaceDlg->Create(bFindOnly, strFind, strReplace, dwFlags, this))
 	{
-		_scintillaEditState.pFindReplaceDlg = NULL;
+		_CT3000EditState.pFindReplaceDlg = NULL;
 		ASSERT_VALID(this);
 		return;
 	}
-	ASSERT(_scintillaEditState.pFindReplaceDlg != NULL);
-	_scintillaEditState.bFindOnly = bFindOnly;
-	_scintillaEditState.pFindReplaceDlg->SetActiveWindow();
-	_scintillaEditState.pFindReplaceDlg->ShowWindow(SW_SHOW);
+	ASSERT(_CT3000EditState.pFindReplaceDlg != NULL);
+	_CT3000EditState.bFindOnly = bFindOnly;
+	_CT3000EditState.pFindReplaceDlg->SetActiveWindow();
+	_CT3000EditState.pFindReplaceDlg->ShowWindow(SW_SHOW);
 	ASSERT_VALID(this);
 }
 
-void CScintillaView::OnFindNext(LPCTSTR lpszFind, BOOL bNext, BOOL bCase, BOOL bWord, BOOL bRegularExpression)
+void CCT3000View::OnFindNext(LPCTSTR lpszFind, BOOL bNext, BOOL bCase, BOOL bWord, BOOL bRegularExpression)
 {
 	ASSERT_VALID(this);
-	_scintillaEditState.strFind = lpszFind;
-	_scintillaEditState.bCase = bCase;
-	_scintillaEditState.bWord = bWord;
-	_scintillaEditState.bNext = bNext;
-  _scintillaEditState.bRegularExpression = bRegularExpression;
+	_CT3000EditState.strFind = lpszFind;
+	_CT3000EditState.bCase = bCase;
+	_CT3000EditState.bWord = bWord;
+	_CT3000EditState.bNext = bNext;
+  _CT3000EditState.bRegularExpression = bRegularExpression;
 
-	if (!FindText(_scintillaEditState.strFind, bNext, bCase, bWord, bRegularExpression))
-		TextNotFound(_scintillaEditState.strFind, bNext, bCase, bWord, bRegularExpression, FALSE);
+	if (!FindText(_CT3000EditState.strFind, bNext, bCase, bWord, bRegularExpression))
+		TextNotFound(_CT3000EditState.strFind, bNext, bCase, bWord, bRegularExpression, FALSE);
 	else
 		AdjustFindDialogPosition();
 	ASSERT_VALID(this);
 }
 
-void CScintillaView::OnReplaceSel(LPCTSTR lpszFind, BOOL bNext, BOOL bCase,	BOOL bWord, BOOL bRegularExpression, LPCTSTR lpszReplace)
+void CCT3000View::OnReplaceSel(LPCTSTR lpszFind, BOOL bNext, BOOL bCase,	BOOL bWord, BOOL bRegularExpression, LPCTSTR lpszReplace)
 {
 	ASSERT_VALID(this);
-	_scintillaEditState.strFind = lpszFind;
-	_scintillaEditState.strReplace = lpszReplace;
-	_scintillaEditState.bCase = bCase;
-	_scintillaEditState.bWord = bWord;
-	_scintillaEditState.bNext = bNext;
-  _scintillaEditState.bRegularExpression = bRegularExpression;
+	_CT3000EditState.strFind = lpszFind;
+	_CT3000EditState.strReplace = lpszReplace;
+	_CT3000EditState.bCase = bCase;
+	_CT3000EditState.bWord = bWord;
+	_CT3000EditState.bNext = bNext;
+  _CT3000EditState.bRegularExpression = bRegularExpression;
 
-  CScintillaCtrl& rCtrl = GetCtrl();
+  CCT3000Ctrl& rCtrl = GetCtrl();
 
-	if (!SameAsSelected(_scintillaEditState.strFind, bCase, bWord, bRegularExpression))
+	if (!SameAsSelected(_CT3000EditState.strFind, bCase, bWord, bRegularExpression))
 	{
-		if (!FindText(_scintillaEditState.strFind, bNext, bCase, bWord, bRegularExpression))
-			TextNotFound(_scintillaEditState.strFind, bNext, bCase, bWord, bRegularExpression, TRUE);
+		if (!FindText(_CT3000EditState.strFind, bNext, bCase, bWord, bRegularExpression))
+			TextNotFound(_CT3000EditState.strFind, bNext, bCase, bWord, bRegularExpression, TRUE);
 		else
 			AdjustFindDialogPosition();
 		return;
@@ -744,46 +744,46 @@ void CScintillaView::OnReplaceSel(LPCTSTR lpszFind, BOOL bNext, BOOL bCase,	BOOL
   if (bRegularExpression)
   {
     rCtrl.TargetFromSelection();
-    rCtrl.ReplaceTargetRE(_scintillaEditState.strReplace.GetLength(), _scintillaEditState.strReplace);    
+    rCtrl.ReplaceTargetRE(_CT3000EditState.strReplace.GetLength(), _CT3000EditState.strReplace);    
   }
   else
-  	GetCtrl().ReplaceSel(_scintillaEditState.strReplace);
-	if (!FindText(_scintillaEditState.strFind, bNext, bCase, bWord, bRegularExpression))
-		TextNotFound(_scintillaEditState.strFind, bNext, bCase, bWord, bRegularExpression, TRUE);
+  	GetCtrl().ReplaceSel(_CT3000EditState.strReplace);
+	if (!FindText(_CT3000EditState.strFind, bNext, bCase, bWord, bRegularExpression))
+		TextNotFound(_CT3000EditState.strFind, bNext, bCase, bWord, bRegularExpression, TRUE);
 	else
 		AdjustFindDialogPosition();
 	ASSERT_VALID(this);
 }
 
-void CScintillaView::OnReplaceAll(LPCTSTR lpszFind, LPCTSTR lpszReplace, BOOL bCase, BOOL bWord, BOOL bRegularExpression)
+void CCT3000View::OnReplaceAll(LPCTSTR lpszFind, LPCTSTR lpszReplace, BOOL bCase, BOOL bWord, BOOL bRegularExpression)
 {
 	ASSERT_VALID(this);
-	_scintillaEditState.strFind = lpszFind;
-	_scintillaEditState.strReplace = lpszReplace;
-	_scintillaEditState.bCase = bCase;
-	_scintillaEditState.bWord = bWord;
-	_scintillaEditState.bNext = TRUE;
-  _scintillaEditState.bRegularExpression = bRegularExpression;
+	_CT3000EditState.strFind = lpszFind;
+	_CT3000EditState.strReplace = lpszReplace;
+	_CT3000EditState.bCase = bCase;
+	_CT3000EditState.bWord = bWord;
+	_CT3000EditState.bNext = TRUE;
+  _CT3000EditState.bRegularExpression = bRegularExpression;
 
 	CWaitCursor wait;
 
   //Set the selection to the begining of the document to ensure all text is replaced in the document
-  CScintillaCtrl& rCtrl = GetCtrl();
+  CCT3000Ctrl& rCtrl = GetCtrl();
   rCtrl.SetSel(0, 0);
 
   //Do the replacments
 	rCtrl.HideSelection(TRUE, FALSE);
   BOOL bFoundSomething = FALSE;
-	while (FindTextSimple(_scintillaEditState.strFind, _scintillaEditState.bNext, bCase, bWord, bRegularExpression))
+	while (FindTextSimple(_CT3000EditState.strFind, _CT3000EditState.bNext, bCase, bWord, bRegularExpression))
   {
     bFoundSomething = TRUE;
     if (bRegularExpression)
     {
       rCtrl.TargetFromSelection();
-      rCtrl.ReplaceTargetRE(_scintillaEditState.strReplace.GetLength(), _scintillaEditState.strReplace);
+      rCtrl.ReplaceTargetRE(_CT3000EditState.strReplace.GetLength(), _CT3000EditState.strReplace);
     }
     else
-		  rCtrl.ReplaceSel(_scintillaEditState.strReplace);
+		  rCtrl.ReplaceSel(_CT3000EditState.strReplace);
   }
 
   //Restore the old selection
@@ -791,31 +791,31 @@ void CScintillaView::OnReplaceAll(LPCTSTR lpszFind, LPCTSTR lpszReplace, BOOL bC
 
   //Inform the user if we could not find anything
   if (!bFoundSomething)
-    TextNotFound(_scintillaEditState.strFind, _scintillaEditState.bNext, bCase, bWord, bRegularExpression, TRUE);
+    TextNotFound(_CT3000EditState.strFind, _CT3000EditState.bNext, bCase, bWord, bRegularExpression, TRUE);
 
 	ASSERT_VALID(this);
 }
 
-LRESULT CScintillaView::OnFindReplaceCmd(WPARAM /*wParam*/, LPARAM lParam)
+LRESULT CCT3000View::OnFindReplaceCmd(WPARAM /*wParam*/, LPARAM lParam)
 {
 	ASSERT_VALID(this);
 
-	CScintillaFindReplaceDlg* pDialog = static_cast<CScintillaFindReplaceDlg*>(CFindReplaceDialog::GetNotifier(lParam));
+	CCT3000FindReplaceDlg* pDialog = static_cast<CCT3000FindReplaceDlg*>(CFindReplaceDialog::GetNotifier(lParam));
 	ASSERT(pDialog != NULL);
-	ASSERT(pDialog == _scintillaEditState.pFindReplaceDlg);
+	ASSERT(pDialog == _CT3000EditState.pFindReplaceDlg);
 
 	if (pDialog->IsTerminating())
-		_scintillaEditState.pFindReplaceDlg = NULL;
+		_CT3000EditState.pFindReplaceDlg = NULL;
 	else if (pDialog->FindNext())
 		OnFindNext(pDialog->GetFindString(), pDialog->SearchDown(), pDialog->MatchCase(), pDialog->MatchWholeWord(), pDialog->GetRegularExpression());
 	else if (pDialog->ReplaceCurrent())
 	{
-		ASSERT(!_scintillaEditState.bFindOnly);
+		ASSERT(!_CT3000EditState.bFindOnly);
 		OnReplaceSel(pDialog->GetFindString(), pDialog->SearchDown(), pDialog->MatchCase(), pDialog->MatchWholeWord(), pDialog->GetRegularExpression(), pDialog->GetReplaceString());
 	}
 	else if (pDialog->ReplaceAll())
 	{
-		ASSERT(!_scintillaEditState.bFindOnly);
+		ASSERT(!_CT3000EditState.bFindOnly);
 		OnReplaceAll(pDialog->GetFindString(), pDialog->GetReplaceString(), pDialog->MatchCase(), pDialog->MatchWholeWord(), pDialog->GetRegularExpression());
 	}
 	ASSERT_VALID(this);
@@ -823,9 +823,9 @@ LRESULT CScintillaView::OnFindReplaceCmd(WPARAM /*wParam*/, LPARAM lParam)
 	return 0;
 }
 
-BOOL CScintillaView::SameAsSelected(LPCTSTR lpszCompare, BOOL bCase, BOOL bWord, BOOL bRegularExpression)
+BOOL CCT3000View::SameAsSelected(LPCTSTR lpszCompare, BOOL bCase, BOOL bWord, BOOL bRegularExpression)
 {
-  CScintillaCtrl& rCtrl = GetCtrl();
+  CCT3000Ctrl& rCtrl = GetCtrl();
 
   //check length first
 	int nStartChar = rCtrl.GetSelectionStart();                           //get the selection size    
@@ -834,7 +834,7 @@ BOOL CScintillaView::SameAsSelected(LPCTSTR lpszCompare, BOOL bCase, BOOL bWord,
   if (!bRegularExpression && (nLen != (size_t)(nEndChar - nStartChar))) //if not a regular expression...
     return FALSE;                                                       //...sizes must match,
 
-  //Now use the advanced search functionality of scintilla to determine the result
+  //Now use the advanced search functionality of CT3000 to determine the result
   int iFlags = bCase ? SCFIND_MATCHCASE : 0;
   iFlags |= bWord ? SCFIND_WHOLEWORD : 0;
   iFlags |= bRegularExpression ? SCFIND_REGEXP : 0;
@@ -847,18 +847,18 @@ BOOL CScintillaView::SameAsSelected(LPCTSTR lpszCompare, BOOL bCase, BOOL bWord,
   return (rCtrl.GetTargetStart() == nStartChar) && (rCtrl.GetTargetEnd() == nEndChar);
 }
 
-BOOL CScintillaView::FindText(LPCTSTR lpszFind, BOOL bNext, BOOL bCase, BOOL bWord, BOOL bRegularExpression)
+BOOL CCT3000View::FindText(LPCTSTR lpszFind, BOOL bNext, BOOL bCase, BOOL bWord, BOOL bRegularExpression)
 {
 	ASSERT_VALID(this);
 	CWaitCursor wait;
 	return FindTextSimple(lpszFind, bNext, bCase, bWord, bRegularExpression);
 }
 
-BOOL CScintillaView::FindTextSimple(LPCTSTR lpszFind, BOOL bNext, BOOL bCase, BOOL bWord, BOOL bRegularExpression)
+BOOL CCT3000View::FindTextSimple(LPCTSTR lpszFind, BOOL bNext, BOOL bCase, BOOL bWord, BOOL bRegularExpression)
 {
 	USES_CONVERSION;
 
-  CScintillaCtrl& rCtrl = GetCtrl();
+  CCT3000Ctrl& rCtrl = GetCtrl();
 
 	ASSERT(lpszFind != NULL);
 	TextToFind ft;
@@ -868,7 +868,7 @@ BOOL CScintillaView::FindTextSimple(LPCTSTR lpszFind, BOOL bNext, BOOL bCase, BO
 		m_bFirstSearch = FALSE;
 
 #ifdef _UNICODE
-	CScintillaCtrl::W2UTF8(lpszFind, -1, ft.lpstrText);
+	CCT3000Ctrl::W2UTF8(lpszFind, -1, ft.lpstrText);
 #else
 	ft.lpstrText = T2A(const_cast<LPTSTR>(lpszFind));
 #endif
@@ -912,7 +912,7 @@ BOOL CScintillaView::FindTextSimple(LPCTSTR lpszFind, BOOL bNext, BOOL bCase, BO
 
   if (!bNext)
   {
-    //Swap the start and end positions which Scintilla uses to flag backward searches
+    //Swap the start and end positions which CT3000 uses to flag backward searches
     int ncpMinTemp = ft.chrg.cpMin;
     ft.chrg.cpMin = ft.chrg.cpMax;
     ft.chrg.cpMax = ncpMinTemp;
@@ -929,29 +929,29 @@ BOOL CScintillaView::FindTextSimple(LPCTSTR lpszFind, BOOL bNext, BOOL bCase, BO
   return bFound;
 }
 
-long CScintillaView::FindAndSelect(DWORD dwFlags, TextToFind& ft)
+long CCT3000View::FindAndSelect(DWORD dwFlags, TextToFind& ft)
 {
-  CScintillaCtrl& rCtrl = GetCtrl();
+  CCT3000Ctrl& rCtrl = GetCtrl();
 	long index = rCtrl.FindText(dwFlags, &ft);
 	if (index != -1) // i.e. we found something
     rCtrl.SetSel(ft.chrgText.cpMin, ft.chrgText.cpMax);
 	return index;
 }
 
-void CScintillaView::TextNotFound(LPCTSTR /*lpszFind*/, BOOL /*bNext*/, BOOL /*bCase*/, BOOL /*bWord*/, BOOL /*bRegularExpression*/, BOOL /*bReplaced*/)
+void CCT3000View::TextNotFound(LPCTSTR /*lpszFind*/, BOOL /*bNext*/, BOOL /*bCase*/, BOOL /*bWord*/, BOOL /*bRegularExpression*/, BOOL /*bReplaced*/)
 {
 	ASSERT_VALID(this);
 	m_bFirstSearch = TRUE;
   MessageBeep(MB_ICONHAND);
 }
 
-void CScintillaView::OnSetFocus(CWnd* /*pOldWnd*/) 
+void CCT3000View::OnSetFocus(CWnd* /*pOldWnd*/) 
 {
   //Give the focus to the child control
 	m_Edit.SetFocus();
 }
 
-void CScintillaView::OnSize(UINT nType, int cx, int cy) 
+void CCT3000View::OnSize(UINT nType, int cx, int cy) 
 {
   //Let the base class do its thing
 	CView::OnSize(nType, cx, cy);
@@ -962,30 +962,30 @@ void CScintillaView::OnSize(UINT nType, int cx, int cy)
   m_Edit.MoveWindow(&r);	
 }
 
-BOOL CScintillaView::OnEraseBkgnd(CDC* /*pDC*/) 
+BOOL CCT3000View::OnEraseBkgnd(CDC* /*pDC*/) 
 {
-  //We do nothing here, because the scintilla control takes up the entire 
+  //We do nothing here, because the CT3000 control takes up the entire 
   //client area of our view;
 	return TRUE;
 }
 
-void CScintillaView::OnActivateView(BOOL bActivate, CView* pActivateView, CView* pDeactiveView)
+void CCT3000View::OnActivateView(BOOL bActivate, CView* pActivateView, CView* pDeactiveView)
 {
 	//need to set owner of Find/Replace dialog
-	if (_scintillaEditState.pFindReplaceDlg && pActivateView == this)
-		_scintillaEditState.pFindReplaceDlg->m_fr.hwndOwner = m_hWnd;
+	if (_CT3000EditState.pFindReplaceDlg && pActivateView == this)
+		_CT3000EditState.pFindReplaceDlg->m_fr.hwndOwner = m_hWnd;
 
   //let the base class do its thing
 	CView::OnActivateView(bActivate, pActivateView, pDeactiveView);
 }
 
-int CScintillaView::OnCreate(LPCREATESTRUCT lpCreateStruct) 
+int CCT3000View::OnCreate(LPCREATESTRUCT lpCreateStruct) 
 {
   //let the base class do its thing
 	if (CView::OnCreate(lpCreateStruct) == -1)
 		return -1;
 	
-  //Create the scintilla edit control  
+  //Create the CT3000 edit control  
   CRect r(0,0,0,0);
   if (!m_Edit.Create(WS_CHILD|WS_VISIBLE|WS_TABSTOP, r, this, 0))
     return -1;
@@ -994,18 +994,18 @@ int CScintillaView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 }
 
 #ifdef _DEBUG
-void CScintillaView::AssertValid() const
+void CCT3000View::AssertValid() const
 {
   //Let the base class do its thing
 	CView::AssertValid();
 
 	ASSERT_VALID(&m_aPageStart);
 
-	if (_scintillaEditState.pFindReplaceDlg != NULL)
-		ASSERT_VALID(_scintillaEditState.pFindReplaceDlg);
+	if (_CT3000EditState.pFindReplaceDlg != NULL)
+		ASSERT_VALID(_CT3000EditState.pFindReplaceDlg);
 }
 
-void CScintillaView::Dump(CDumpContext& dc) const
+void CCT3000View::Dump(CDumpContext& dc) const
 {
   //Let the base class do its thing
 	CView::Dump(dc);
@@ -1014,25 +1014,25 @@ void CScintillaView::Dump(CDumpContext& dc) const
   AFX_DUMP1(dc, "\nbUseROFileAttributeDuringLoading = ", m_bUseROFileAttributeDuringLoading);
 
 	AFX_DUMP0(dc, "\n Static Member Data:");
-	if (_scintillaEditState.pFindReplaceDlg != NULL)
+	if (_CT3000EditState.pFindReplaceDlg != NULL)
 	{
-		AFX_DUMP1(dc, "\npFindReplaceDlg = ",	static_cast<void*>(_scintillaEditState.pFindReplaceDlg));
-		AFX_DUMP1(dc, "\nbFindOnly = ", _scintillaEditState.bFindOnly);
+		AFX_DUMP1(dc, "\npFindReplaceDlg = ",	static_cast<void*>(_CT3000EditState.pFindReplaceDlg));
+		AFX_DUMP1(dc, "\nbFindOnly = ", _CT3000EditState.bFindOnly);
 	}
-	AFX_DUMP1(dc, "\nstrFind = ", _scintillaEditState.strFind);
-	AFX_DUMP1(dc, "\nstrReplace = ", _scintillaEditState.strReplace);
-	AFX_DUMP1(dc, "\nbCase = ", _scintillaEditState.bCase);
-	AFX_DUMP1(dc, "\nbWord = ", _scintillaEditState.bWord);
-	AFX_DUMP1(dc, "\nbNext = ", _scintillaEditState.bNext);
-  AFX_DUMP1(dc, "\nbRegularExpression = ", _scintillaEditState.bRegularExpression);
+	AFX_DUMP1(dc, "\nstrFind = ", _CT3000EditState.strFind);
+	AFX_DUMP1(dc, "\nstrReplace = ", _CT3000EditState.strReplace);
+	AFX_DUMP1(dc, "\nbCase = ", _CT3000EditState.bCase);
+	AFX_DUMP1(dc, "\nbWord = ", _CT3000EditState.bWord);
+	AFX_DUMP1(dc, "\nbNext = ", _CT3000EditState.bNext);
+  AFX_DUMP1(dc, "\nbRegularExpression = ", _CT3000EditState.bRegularExpression);
 }
 #endif //_DEBUG
 
-void CScintillaView::Serialize(CArchive& ar)
+void CCT3000View::Serialize(CArchive& ar)
 {
 	ASSERT_VALID(this);
 	
-  CScintillaCtrl& rCtrl = GetCtrl();
+  CCT3000Ctrl& rCtrl = GetCtrl();
 
   if (ar.IsLoading())
   {
@@ -1091,7 +1091,7 @@ void CScintillaView::Serialize(CArchive& ar)
   }
 }
 
-void CScintillaView::OnFilePageSetup() 
+void CCT3000View::OnFilePageSetup() 
 {
   //Display a standard page setup dialog
 	CPageSetupDialog dlg;
@@ -1133,125 +1133,125 @@ void CScintillaView::OnFilePageSetup()
 	}
 }
 
-void CScintillaView::OnStyleNeeded(SCNotification* /*pSCNotification*/)
+void CCT3000View::OnStyleNeeded(SCNotification* /*pSCNotification*/)
 {
   //By default do nothing, derived classes may want to do something
 }
 
-void CScintillaView::OnCharAdded(SCNotification* /*pSCNotification*/)
+void CCT3000View::OnCharAdded(SCNotification* /*pSCNotification*/)
 {
   //By default do nothing, derived classes may want to do something
 }
 
-void CScintillaView::OnSavePointReached(SCNotification* /*pSCNotification*/)
+void CCT3000View::OnSavePointReached(SCNotification* /*pSCNotification*/)
 {
   //By default do nothing, derived classes may want to do something
 }
 
-void CScintillaView::OnSavePointLeft(SCNotification* /*pSCNotification*/)
+void CCT3000View::OnSavePointLeft(SCNotification* /*pSCNotification*/)
 {
   //By default do nothing, derived classes may want to do something
 }
 
-void CScintillaView::OnModifyAttemptRO(SCNotification* /*pSCNotification*/)
+void CCT3000View::OnModifyAttemptRO(SCNotification* /*pSCNotification*/)
 {
   //By default do nothing, derived classes may want to do something
 }
 
-void CScintillaView::OnDoubleClick(SCNotification* /*pSCNotification*/)
+void CCT3000View::OnDoubleClick(SCNotification* /*pSCNotification*/)
 {
   //By default do nothing, derived classes may want to do something
 }
 
-void CScintillaView::OnUpdateUI(SCNotification* /*pSCNotification*/)
+void CCT3000View::OnUpdateUI(SCNotification* /*pSCNotification*/)
 {
   //By default do nothing, derived classes may want to do something
 }
 
-void CScintillaView::OnModified(SCNotification* /*pSCNotification*/)
+void CCT3000View::OnModified(SCNotification* /*pSCNotification*/)
 {
   //By default do nothing, derived classes may want to do something
 }
 
-void CScintillaView::OnMacroRecord(SCNotification* /*pSCNotification*/)
+void CCT3000View::OnMacroRecord(SCNotification* /*pSCNotification*/)
 {
   //By default do nothing, derived classes may want to do something
 }
 
-void CScintillaView::OnMarginClick(SCNotification* pSCNotification)
+void CCT3000View::OnMarginClick(SCNotification* pSCNotification)
 {
   //By default get the line where the click occured and toggle its fold state
-  CScintillaCtrl& rCtrl = GetCtrl();
+  CCT3000Ctrl& rCtrl = GetCtrl();
   int nLine = rCtrl.LineFromPosition(pSCNotification->position);
   rCtrl.ToggleFold(nLine);
 }
 
-void CScintillaView::OnNeedShown(SCNotification* /*pSCNotification*/)
+void CCT3000View::OnNeedShown(SCNotification* /*pSCNotification*/)
 {
   //By default do nothing, derived classes may want to do something
 }
 
-void CScintillaView::OnPainted(SCNotification* /*pSCNotification*/)
+void CCT3000View::OnPainted(SCNotification* /*pSCNotification*/)
 {
   //By default do nothing, derived classes may want to do something
 }
 
-void CScintillaView::OnUserListSelection(SCNotification* /*pSCNotification*/)
+void CCT3000View::OnUserListSelection(SCNotification* /*pSCNotification*/)
 {
   //By default do nothing, derived classes may want to do something
 }
 
-void CScintillaView::OnDwellStart(SCNotification* /*pSCNotification*/)
+void CCT3000View::OnDwellStart(SCNotification* /*pSCNotification*/)
 {
   //By default do nothing, derived classes may want to do something
 }
 
-void CScintillaView::OnDwellEnd(SCNotification* /*pSCNotification*/)
+void CCT3000View::OnDwellEnd(SCNotification* /*pSCNotification*/)
 {
   //By default do nothing, derived classes may want to do something
 }
 
-void CScintillaView::OnZoom(SCNotification* /*pSCNotification*/)
+void CCT3000View::OnZoom(SCNotification* /*pSCNotification*/)
 {
   //By default do nothing, derived classes may want to do something
 }
 
-void CScintillaView::OnHotSpotClick(SCNotification* /*pSCNotification*/)
+void CCT3000View::OnHotSpotClick(SCNotification* /*pSCNotification*/)
 {
   //By default do nothing, derived classes may want to do something
 }
 
-void CScintillaView::OnHotSpotDoubleClick(SCNotification* /*pSCNotification*/)
+void CCT3000View::OnHotSpotDoubleClick(SCNotification* /*pSCNotification*/)
 {
   //By default do nothing, derived classes may want to do something
 }
 
-void CScintillaView::OnCallTipClick(SCNotification* /*pSCNotification*/)
+void CCT3000View::OnCallTipClick(SCNotification* /*pSCNotification*/)
 {
   //By default do nothing, derived classes may want to do something
 }
 
-void CScintillaView::OnAutoCSelection(SCNotification* /*pSCNotification*/)
+void CCT3000View::OnAutoCSelection(SCNotification* /*pSCNotification*/)
 {
   //By default do nothing, derived classes may want to do something
 }
 
-void CScintillaView::OnChange()
+void CCT3000View::OnChange()
 {
   //By default do nothing, derived classes may want to do something
 }
 
-void CScintillaView::OnSetFocus()
+void CCT3000View::OnSetFocus()
 {
   //By default do nothing, derived classes may want to do something
 }
 
-void CScintillaView::OnKillFocus()
+void CCT3000View::OnKillFocus()
 {
   //By default do nothing, derived classes may want to do something
 }
 
-BOOL CScintillaView::OnCommand(WPARAM wParam, LPARAM lParam)
+BOOL CCT3000View::OnCommand(WPARAM wParam, LPARAM lParam)
 {
   HWND hWndControl = reinterpret_cast<HWND>(lParam);
   
@@ -1288,13 +1288,13 @@ BOOL CScintillaView::OnCommand(WPARAM wParam, LPARAM lParam)
   return CView::OnCommand(wParam, lParam);
 }
 
-BOOL CScintillaView::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
+BOOL CCT3000View::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
   NMHDR* pNMHdr = reinterpret_cast<NMHDR*>(lParam);
   ASSERT(pNMHdr);
 
   //Is it a notification from the embedded control
-  CScintillaCtrl& rCtrl = GetCtrl();
+  CCT3000Ctrl& rCtrl = GetCtrl();
   if (pNMHdr->hwndFrom == rCtrl.GetSafeHwnd())
   {
     SCNotification* pSCNotification = reinterpret_cast<SCNotification*>(lParam);
@@ -1419,14 +1419,14 @@ BOOL CScintillaView::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 
 
 
-IMPLEMENT_DYNAMIC(CScintillaDoc, CDocument)
+IMPLEMENT_DYNAMIC(CCT3000Doc, CDocument)
 
-CScintillaDoc::CScintillaDoc()
+CCT3000Doc::CCT3000Doc()
 {
 	ASSERT_VALID(this);
 }
 
-CScintillaView* CScintillaDoc::GetView() const
+CCT3000View* CCT3000Doc::GetView() const
 {
 	//find the first view - if there are no views
 	//we must return NULL
@@ -1434,22 +1434,22 @@ CScintillaView* CScintillaDoc::GetView() const
 	if (pos == NULL)
 		return NULL;
 
-	//find the first view that is a CScintillaView
+	//find the first view that is a CCT3000View
 	CView* pView;
 	while (pos != NULL)
 	{
 		pView = GetNextView(pos);
-		if (pView->IsKindOf(RUNTIME_CLASS(CScintillaView)))
-			return static_cast<CScintillaView*>(pView);
+		if (pView->IsKindOf(RUNTIME_CLASS(CCT3000View)))
+			return static_cast<CCT3000View*>(pView);
 	}
 
 	//can't find one--return NULL
 	return NULL;
 }
 
-void CScintillaDoc::SetModifiedFlag(BOOL bModified)
+void CCT3000Doc::SetModifiedFlag(BOOL bModified)
 {
-  CScintillaView* pView = GetView();
+  CCT3000View* pView = GetView();
 //  ASSERT(pView);
 
   if (pView != 0 && bModified == FALSE)
@@ -1458,9 +1458,9 @@ void CScintillaDoc::SetModifiedFlag(BOOL bModified)
   m_bModified = bModified;
 }
 
-BOOL CScintillaDoc::IsModified()
+BOOL CCT3000Doc::IsModified()
 {
-  CScintillaView* pView = GetView();
+  CCT3000View* pView = GetView();
 	if (pView == 0)
 		return m_bModified;
 //  ASSERT(pView);
@@ -1468,35 +1468,35 @@ BOOL CScintillaDoc::IsModified()
 	return m_bModified || pView->GetCtrl().GetModify();
 }
 
-void CScintillaDoc::DeleteContents()
+void CCT3000Doc::DeleteContents()
 {
   //let the base class do its thing
 	CDocument::DeleteContents();
 
   //Ask our accompanying view to delete its contents
 	CWaitCursor wait;
-	CScintillaView* pView = GetView();
+	CCT3000View* pView = GetView();
   if (pView)
     pView->DeleteContents();
 }
 
-void CScintillaDoc::Serialize(CArchive& ar)
+void CCT3000Doc::Serialize(CArchive& ar)
 {
-	CScintillaView* pView = GetView();
+	CCT3000View* pView = GetView();
 	ASSERT(pView);
 	pView->Serialize(ar);
 }
 
-BOOL CScintillaDoc::OnSaveDocument(LPCTSTR lpszPathName)
+BOOL CCT3000Doc::OnSaveDocument(LPCTSTR lpszPathName)
 {
   //Let the base class do its thing
 	BOOL bSuccess = CDocument::OnSaveDocument(lpszPathName);
   if (bSuccess)
   {
-		CScintillaView* pView = GetView();
+		CCT3000View* pView = GetView();
 		ASSERT(pView);
 		
-		CScintillaCtrl& rCtrl = pView->GetCtrl();
+		CCT3000Ctrl& rCtrl = pView->GetCtrl();
 
 		//Tell the control that the document has now been saved
 		rCtrl.SetSavePoint();
@@ -1508,13 +1508,13 @@ BOOL CScintillaDoc::OnSaveDocument(LPCTSTR lpszPathName)
 
 
 #ifdef _DEBUG
-void CScintillaDoc::AssertValid() const
+void CCT3000Doc::AssertValid() const
 {
   //Let the base class do its thing
 	CDocument::AssertValid();
 }
 
-void CScintillaDoc::Dump(CDumpContext& dc) const
+void CCT3000Doc::Dump(CDumpContext& dc) const
 {
   //let the base class do its thing
 	CDocument::Dump(dc);

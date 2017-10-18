@@ -5,29 +5,29 @@
 
 #pragma once
 
-#ifndef __SCINTILLADOCVIEW_H__
-#define __SCINTILLADOCVIEW_H__
+#ifndef __CT3000DOCVIEW_H__
+#define __CT3000DOCVIEW_H__
 
 
-#include "ScintillaCtrl.h"
+#include "CT3000Ctrl.h"
 
 #ifndef __AFXTEMPL_H__
 #pragma message("To avoid this message please put afxtempl.h into your pre compiled header (normally stdafx.h)")
 #include <afxtempl.h>
 #endif //__AFXTEMPL_H__
 
-#ifndef SCINTILLADOCVIEW_EXT_CLASS
-#define SCINTILLADOCVIEW_EXT_CLASS
+#ifndef CT3000DOCVIEW_EXT_CLASS
+#define CT3000DOCVIEW_EXT_CLASS
 #endif
 
 
 //////////////////// Classes //////////////////////////////////////////////////
 
-class SCINTILLADOCVIEW_EXT_CLASS CScintillaFindReplaceDlg : public CFindReplaceDialog
+class CT3000DOCVIEW_EXT_CLASS CCT3000FindReplaceDlg : public CFindReplaceDialog
 {
 public:
 //Constructors / Destructors
-  CScintillaFindReplaceDlg();
+  CCT3000FindReplaceDlg();
 
 //Methods
   BOOL Create(BOOL bFindDialogOnly, LPCTSTR lpszFindWhat, LPCTSTR lpszReplaceWith = NULL, DWORD dwFlags = FR_DOWN, CWnd* pParentWnd = NULL);
@@ -45,14 +45,14 @@ protected:
 	DECLARE_MESSAGE_MAP()
 };
 
-class SCINTILLADOCVIEW_EXT_CLASS CScintillaView : public CView
+class CT3000DOCVIEW_EXT_CLASS CCT3000View : public CView
 {
 public:
 //Constructors / Destructors
-  CScintillaView();
+  CCT3000View();
 
 //Methods
-  CScintillaCtrl& GetCtrl();
+  CCT3000Ctrl& GetCtrl();
 	void            SetMargins(const CRect& rMargin) { m_rMargin = rMargin; };
 	CRect           GetMargins() const { return m_rMargin; };
   BOOL            GetUseROFileAttributeDuringLoading() const { return m_bUseROFileAttributeDuringLoading; };
@@ -86,7 +86,7 @@ protected:
 	virtual BOOL SameAsSelected(LPCTSTR lpszCompare, BOOL bCase, BOOL bWord, BOOL bRegularExpression);
 	virtual long FindAndSelect(DWORD dwFlags, TextToFind& ft);
   virtual void AdjustFindDialogPosition();
-  virtual CScintillaFindReplaceDlg* CreateFindReplaceDialog();
+  virtual CCT3000FindReplaceDlg* CreateFindReplaceDialog();
 
 //Misc methods
 	virtual void OnDraw(CDC*);
@@ -125,11 +125,11 @@ protected:
   virtual void OnKillFocus();
 
 //Member variables
-  CScintillaCtrl   m_Edit;                             //The scintilla control
+  CCT3000Ctrl   m_Edit;                             //The CT3000 control
 	CArray<int, int> m_aPageStart;                       //array of starting pages
 	CRect            m_rMargin;                          //Margin for printing
 	BOOL             m_bFirstSearch;                     //Is this the first search
-  BOOL             m_bUseROFileAttributeDuringLoading; //Should we check the RO file attribute to see if the file should be opened in read only mode by scintilla
+  BOOL             m_bUseROFileAttributeDuringLoading; //Should we check the RO file attribute to see if the file should be opened in read only mode by CT3000
   BOOL             m_bPrintHeader;                     //Should Headers be printed?
   BOOL             m_bPrintFooter;                     //Should Footers be printed?
   BOOL             m_bUsingMetric;                     //TRUE if the margin is specified in Metric units, else FALSE implies imperial
@@ -163,20 +163,20 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 
-  DECLARE_DYNCREATE(CScintillaView)
+  DECLARE_DYNCREATE(CCT3000View)
 
-  friend class CScintillaDoc;
+  friend class CCT3000Doc;
 };
 
-class SCINTILLADOCVIEW_EXT_CLASS CScintillaDoc : public CDocument
+class CT3000DOCVIEW_EXT_CLASS CCT3000Doc : public CDocument
 {
 protected: // create from serialization only
-	CScintillaDoc();
-	DECLARE_DYNAMIC(CScintillaDoc)
+	CCT3000Doc();
+	DECLARE_DYNAMIC(CCT3000Doc)
 
 //Attributes
 public:
-	virtual CScintillaView* GetView() const;
+	virtual CCT3000View* GetView() const;
 
 //Implementation
 public:
@@ -192,4 +192,4 @@ public:
 #endif
 };
 
-#endif //__SCINTILLADOCVIEW_H__
+#endif //__CT3000DOCVIEW_H__
