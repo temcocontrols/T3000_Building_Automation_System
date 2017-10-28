@@ -19,7 +19,7 @@ CNewTstatSchedulesDlg::CNewTstatSchedulesDlg(CWnd* pParent /*=NULL*/)
 	 
 		m_curRow = 0;
 		m_curCol = 0;
-		memset(m_SchduleBuffer, 0xFF, 100);
+		memset(m_SchduleBuffer, 0xFF, 121);
 }
 
 CNewTstatSchedulesDlg::~CNewTstatSchedulesDlg()
@@ -46,6 +46,7 @@ BEGIN_MESSAGE_MAP(CNewTstatSchedulesDlg, CDialogEx)
 	ON_BN_CLICKED(IDOK, &CNewTstatSchedulesDlg::OnBnClickedOk)
 	ON_BN_CLICKED(IDC_CHECK_ENABLE_SCHEDULE, &CNewTstatSchedulesDlg::OnBnClickedCheckEnableSchedule)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST1, &CNewTstatSchedulesDlg::OnNMDblclkList1)
+	ON_WM_HELPINFO()
 END_MESSAGE_MAP()
 
 
@@ -54,18 +55,18 @@ END_MESSAGE_MAP()
 
 int CNewTstatSchedulesDlg::GetEventNumber(int DayIndex)
 {
-	int RegNumber = DayIndex / 6;
-	int Position = DayIndex % 6;
-	std::bitset<16> RegBits(m_SchduleBuffer[96+RegNumber]);
+	int RegNumber = DayIndex / 2;
+	int Position = DayIndex % 2;
+	std::bitset<8> RegBits(m_SchduleBuffer[96+RegNumber]);
 	
-	int eventNumber = 2 * RegBits[2*Position + 1] + RegBits[2*Position];
+	int eventNumber =4*RegBits[3* Position+2]+ 2 * RegBits[3*Position + 1] + RegBits[3*Position];
 
 	return eventNumber;
 }
 void CNewTstatSchedulesDlg::LoadSheduleDataAndColor()
 {
 		
-	Read_Multi(g_tstat_id, m_SchduleBuffer, 813, 104, 5);
+	Read_Multi(g_tstat_id, m_SchduleBuffer, 813, 121, 5);
 	
 	for (int i=0;i<48;i++)
 	{
@@ -211,11 +212,13 @@ BOOL CNewTstatSchedulesDlg::OnInitDialog()
 	m_strScheduleMode[1]=L"Home";
 	m_strScheduleMode[2]=L"Work";
 	m_strScheduleMode[3]=L"Sleep";
-	
+	m_strScheduleMode[4]=L"Away";
+
 	m_COLScheduleMode[0] = RGB(238, 44, 44);
 	m_COLScheduleMode[1] = RGB(153, 50, 204);
 	m_COLScheduleMode[2] = RGB(143, 188, 143);
 	m_COLScheduleMode[3] = RGB(238, 44, 44);
+	m_COLScheduleMode[4] = RGB(60, 179, 113);
 
 	LoadSheduleDataAndColor();
 	WeeeklyList.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
@@ -242,6 +245,7 @@ BOOL CNewTstatSchedulesDlg::OnInitDialog()
 	strlist.push_back(L"Home");
 	strlist.push_back(L"Work");
 	strlist.push_back(L"Sleep");
+	strlist.push_back(L"Away");
 	list<Schedule_Node>::iterator it;
 	int index=0;
 	for (it = m_ScheduleList.begin();it!=m_ScheduleList.end();++it)
@@ -1262,4 +1266,21 @@ void CNewTstatSchedulesDlg::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
 	if (lRow < 0)
 		return;
 	*pResult = 0;
+}
+
+#include "Tstat_HelpDoc.h"	
+BOOL CNewTstatSchedulesDlg::OnHelpInfo(HELPINFO* pHelpInfo)
+{
+	// TODO: Add your message handler code here and/or call default
+	
+
+
+		HWND hWnd;
+
+	if (pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szTstatHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
+	else
+		hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szTstatHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_MANAGING_SCHEDULES_IN_T3000);
+
+	return (hWnd != NULL);
+	return CDialogEx::OnHelpInfo(pHelpInfo);
 }

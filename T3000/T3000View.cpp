@@ -6225,17 +6225,17 @@ void CT3000View::Read_SliderData()
 
 
 
-
+#include "Tstat_HelpDoc.h"
 BOOL CT3000View::OnHelpInfo(HELPINFO* pHelpInfo)
 {
-     
-    /* T3000_help.chm::/T3000_Help/How%20to%20use%20T3000/How%20to%20use%20T3000,basicly.htm*/
-    CString filename=g_strExePth+_T("T3000_help.chm::/T3000_Help/How to use T3000/How to use T3000,basicly.htm");
-    ::HtmlHelp(
-        NULL,
-        filename.GetBuffer(),
-        HH_DISPLAY_TOPIC,
-        NULL);
+	HWND hWnd;
+
+	if (pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szTstatHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
+	else
+		hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szTstatHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_COVER_PAGE_TSTAT);
+
+	return (hWnd != NULL);
+
     return CFormView::OnHelpInfo(pHelpInfo);
 }
 
