@@ -258,4 +258,5 @@ public:
 	afx_msg void OnBnClickedButtonShowModbusId();
 
 	int m_time_left  ;
+	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 };

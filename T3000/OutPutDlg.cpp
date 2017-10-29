@@ -197,6 +197,7 @@ BEGIN_MESSAGE_MAP(COutPutDlg, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON_MODEL5, &COutPutDlg::OnBnClickedButtonModel5)
  
 	 
+	ON_WM_HELPINFO()
 END_MESSAGE_MAP()
 
 BOOL COutPutDlg::OnInitDialog()
@@ -8980,4 +8981,20 @@ void COutPutDlg::SetModelButton()
 void COutPutDlg::OnBnClickedButtonModel11()
 {
 	
+}
+#include "Tstat_HelpDoc.h"	
+
+
+
+BOOL COutPutDlg::OnHelpInfo(HELPINFO* pHelpInfo)
+{
+	// TODO: Add your message handler code here and/or call default
+	HWND hWnd;
+
+	if (pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szTstatHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
+	else
+		hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szTstatHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_PID_HEAT_COOL_TSTAT);
+
+	return (hWnd != NULL);
+	return CDialog::OnHelpInfo(pHelpInfo);
 }

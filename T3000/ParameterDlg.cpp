@@ -320,7 +320,8 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON_ZIGBEE, &CParameterDlg::OnBnClickedButtonZigbee)
 	ON_EN_KILLFOCUS(IDC_EDIT_SHOWID, &CParameterDlg::OnEnKillfocusEditShowid)
 	ON_BN_CLICKED(IDC_BUTTON_SHOW_MODBUS_ID, &CParameterDlg::OnBnClickedButtonShowModbusId)
-	END_MESSAGE_MAP()
+		ON_WM_HELPINFO()
+		END_MESSAGE_MAP()
 
 	/// <summary>
 	/// back fresh
@@ -5873,4 +5874,18 @@ void CParameterDlg::OnTimer(UINT_PTR nIDEvent)
 
 	}
 	CDialog::OnTimer(nIDEvent);
+}
+#include "Tstat_HelpDoc.h"
+BOOL CParameterDlg::OnHelpInfo(HELPINFO* pHelpInfo)
+{
+
+	HWND hWnd;
+
+	if (pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szTstatHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
+	else
+		hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szTstatHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_ONE_HEAT_ONE_COOL_SETTING);
+
+	return (hWnd != NULL);
+
+	return CDialog::OnHelpInfo(pHelpInfo);
 }

@@ -103,8 +103,8 @@ public:
 	COLORREF GetItemColor(int Row,int Col); 
 	void SetValueItem(int Row,int Col,int Val); 
 	int GetDayScheduleCount(int Col);
-	CString m_strScheduleMode[4];
-	COLORREF m_COLScheduleMode[4];
+	CString m_strScheduleMode[6];
+	COLORREF m_COLScheduleMode[6];
 	CString m_oldtext;
 	afx_msg void OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult);
 	int m_curRow;
@@ -119,7 +119,7 @@ public:
 	void LoadSheduleDataAndColor();
 	int GetEventNumber(int DayIndex);
 	int PowerFour(int number,int index);
-	unsigned short m_SchduleBuffer[104];
+	unsigned short m_SchduleBuffer[121];
  
 	Event WeeklyEvent[48];
 	DayEvent m_Monday;
@@ -134,4 +134,5 @@ public:
 	 
 	afx_msg void OnBnClickedCheckEnableSchedule();
 	afx_msg void OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 };
