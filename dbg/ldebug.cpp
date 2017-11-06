@@ -4,9 +4,9 @@
 
 
 #define ldebug_c
-#define LUA_CORE
+#define T3000Program_CORE
 
-#include "lua.h"
+#include "T3000Program.h"
 
 #include "lapi.h"
 #include "lcode.h"
@@ -23,21 +23,21 @@
 
 
 
-static const char *getfuncname (lua_State *L, CallInfo *ci, const char **name);
+static const char *getfuncname (T3000Program_State *L, CallInfo *ci, const char **name);
 
 
-static int currentpc (lua_State *L, CallInfo *ci) {
-  if (!isLua(ci)) return -1;  /* function is not a Lua function? */
+static int currentpc (T3000Program_State *L, CallInfo *ci) {
+  if (!isT3000Program(ci)) return -1;  /* function is not a T3000Program function? */
   if (ci == L->ci)
     ci->savedpc = L->savedpc;
   return pcRel(ci->savedpc, ci_func(ci)->l.p);
 }
 
 
-static int currentline (lua_State *L, CallInfo *ci) {
+static int currentline (T3000Program_State *L, CallInfo *ci) {
   int pc = currentpc(L, ci);
   if (pc < 0)
-    return -1;  /* only active lua functions have current-line information */
+    return -1;  /* only active T3000Program functions have current-line information */
   else
     return getline(ci_func(ci)->l.p, pc);
 }
@@ -46,7 +46,7 @@ static int currentline (lua_State *L, CallInfo *ci) {
 /*
 ** this function can be called asynchronous (e.g. during a signal)
 */
-LUA_API int lua_sethook (lua_State *L, lua_Hook func, int mask, int count) {
+T3000Program_API int T3000Program_sethook (T3000Program_State *L, T3000Program_Hook func, int mask, int count) {
   if (func == NULL || mask == 0) {  /* turn off hooks? */
     mask = 0;
     func = NULL;
@@ -59,28 +59,28 @@ LUA_API int lua_sethook (lua_State *L, lua_Hook func, int mask, int count) {
 }
 
 
-LUA_API lua_Hook lua_gethook (lua_State *L) {
+T3000Program_API T3000Program_Hook T3000Program_gethook (T3000Program_State *L) {
   return L->hook;
 }
 
 
-LUA_API int lua_gethookmask (lua_State *L) {
+T3000Program_API int T3000Program_gethookmask (T3000Program_State *L) {
   return L->hookmask;
 }
 
 
-LUA_API int lua_gethookcount (lua_State *L) {
+T3000Program_API int T3000Program_gethookcount (T3000Program_State *L) {
   return L->basehookcount;
 }
 
 
-LUA_API int lua_getstack (lua_State *L, int level, lua_Debug *ar) {
+T3000Program_API int T3000Program_getstack (T3000Program_State *L, int level, T3000Program_Debug *ar) {
   int status;
   CallInfo *ci;
-  lua_lock(L);
+  T3000Program_lock(L);
   for (ci = L->ci; level > 0 && ci > L->base_ci; ci--) {
     level--;
-    if (f_isLua(ci))  /* Lua function? */
+    if (f_isT3000Program(ci))  /* T3000Program function? */
       level -= ci->tailcalls;  /* skip lost tail calls */
   }
   if (level == 0 && ci > L->base_ci) {  /* level found? */
@@ -92,21 +92,21 @@ LUA_API int lua_getstack (lua_State *L, int level, lua_Debug *ar) {
     ar->i_ci = 0;
   }
   else status = 0;  /* no such level */
-  lua_unlock(L);
+  T3000Program_unlock(L);
   return status;
 }
 
 
-static Proto *getluaproto (CallInfo *ci) {
-  return (isLua(ci) ? ci_func(ci)->l.p : NULL);
+static Proto *getT3000Programproto (CallInfo *ci) {
+  return (isT3000Program(ci) ? ci_func(ci)->l.p : NULL);
 }
 
 
-static const char *findlocal (lua_State *L, CallInfo *ci, int n) {
+static const char *findlocal (T3000Program_State *L, CallInfo *ci, int n) {
   const char *name;
-  Proto *fp = getluaproto(ci);
-  if (fp && (name = luaF_getlocalname(fp, n, currentpc(L, ci))) != NULL)
-    return name;  /* is a local variable in a Lua function */
+  Proto *fp = getT3000Programproto(ci);
+  if (fp && (name = T3000ProgramF_getlocalname(fp, n, currentpc(L, ci))) != NULL)
+    return name;  /* is a local variable in a T3000Program function */
   else {
     StkId limit = (ci == L->ci) ? L->top : (ci+1)->func;
     if (limit - ci->base >= n && n > 0)  /* is 'n' inside 'ci' stack? */
@@ -117,30 +117,30 @@ static const char *findlocal (lua_State *L, CallInfo *ci, int n) {
 }
 
 
-LUA_API const char *lua_getlocal (lua_State *L, const lua_Debug *ar, int n) {
+T3000Program_API const char *T3000Program_getlocal (T3000Program_State *L, const T3000Program_Debug *ar, int n) {
   CallInfo *ci = L->base_ci + ar->i_ci;
   const char *name = findlocal(L, ci, n);
-  lua_lock(L);
+  T3000Program_lock(L);
   if (name)
-      luaA_pushobject(L, ci->base + (n - 1));
-  lua_unlock(L);
+      T3000ProgramA_pushobject(L, ci->base + (n - 1));
+  T3000Program_unlock(L);
   return name;
 }
 
 
-LUA_API const char *lua_setlocal (lua_State *L, const lua_Debug *ar, int n) {
+T3000Program_API const char *T3000Program_setlocal (T3000Program_State *L, const T3000Program_Debug *ar, int n) {
   CallInfo *ci = L->base_ci + ar->i_ci;
   const char *name = findlocal(L, ci, n);
-  lua_lock(L);
+  T3000Program_lock(L);
   if (name)
       setobjs2s(L, ci->base + (n - 1), L->top - 1);
   L->top--;  /* pop value */
-  lua_unlock(L);
+  T3000Program_unlock(L);
   return name;
 }
 
 
-static void funcinfo (lua_Debug *ar, Closure *cl) {
+static void funcinfo (T3000Program_Debug *ar, Closure *cl) {
   if (cl->c.isC) {
     ar->source = "=[C]";
     ar->linedefined = -1;
@@ -151,39 +151,39 @@ static void funcinfo (lua_Debug *ar, Closure *cl) {
     ar->source = getstr(cl->l.p->source);
     ar->linedefined = cl->l.p->linedefined;
     ar->lastlinedefined = cl->l.p->lastlinedefined;
-    ar->what = (ar->linedefined == 0) ? "main" : "Lua";
+    ar->what = (ar->linedefined == 0) ? "main" : "T3000Program";
   }
-  luaO_chunkid(ar->short_src, ar->source, LUA_IDSIZE);
+  T3000ProgramO_chunkid(ar->short_src, ar->source, T3000Program_IDSIZE);
 }
 
 
-static void info_tailcall (lua_Debug *ar) {
+static void info_tailcall (T3000Program_Debug *ar) {
   ar->name = ar->namewhat = "";
   ar->what = "tail";
   ar->lastlinedefined = ar->linedefined = ar->currentline = -1;
   ar->source = "=(tail call)";
-  luaO_chunkid(ar->short_src, ar->source, LUA_IDSIZE);
+  T3000ProgramO_chunkid(ar->short_src, ar->source, T3000Program_IDSIZE);
   ar->nups = 0;
 }
 
 
-static void collectvalidlines (lua_State *L, Closure *f) {
+static void collectvalidlines (T3000Program_State *L, Closure *f) {
   if (f == NULL || f->c.isC) {
     setnilvalue(L->top);
   }
   else {
-    Table *t = luaH_new(L, 0, 0);
+    Table *t = T3000ProgramH_new(L, 0, 0);
     int *lineinfo = f->l.p->lineinfo;
     int i;
     for (i=0; i<f->l.p->sizelineinfo; i++)
-      setbvalue(luaH_setnum(L, t, lineinfo[i]), 1);
+      setbvalue(T3000ProgramH_setnum(L, t, lineinfo[i]), 1);
     sethvalue(L, L->top, t); 
   }
   incr_top(L);
 }
 
 
-static int auxgetinfo (lua_State *L, const char *what, lua_Debug *ar,
+static int auxgetinfo (T3000Program_State *L, const char *what, T3000Program_Debug *ar,
                     Closure *f, CallInfo *ci) {
   int status = 1;
   if (f == NULL) {
@@ -213,7 +213,7 @@ static int auxgetinfo (lua_State *L, const char *what, lua_Debug *ar,
         break;
       }
       case 'L':
-      case 'f':  /* handled by lua_getinfo */
+      case 'f':  /* handled by T3000Program_getinfo */
         break;
       default: status = 0;  /* invalid option */
     }
@@ -222,21 +222,21 @@ static int auxgetinfo (lua_State *L, const char *what, lua_Debug *ar,
 }
 
 
-LUA_API int lua_getinfo (lua_State *L, const char *what, lua_Debug *ar) {
+T3000Program_API int T3000Program_getinfo (T3000Program_State *L, const char *what, T3000Program_Debug *ar) {
   int status;
   Closure *f = NULL;
   CallInfo *ci = NULL;
-  lua_lock(L);
+  T3000Program_lock(L);
   if (*what == '>') {
     StkId func = L->top - 1;
-    luai_apicheck(L, ttisfunction(func));
+    T3000Programi_apicheck(L, ttisfunction(func));
     what++;  /* skip the '>' */
     f = clvalue(func);
     L->top--;  /* pop function */
   }
   else if (ar->i_ci != 0) {  /* no tail call? */
     ci = L->base_ci + ar->i_ci;
-    lua_assert(ttisfunction(ci->func));
+    T3000Program_assert(ttisfunction(ci->func));
     f = clvalue(ci->func);
   }
   status = auxgetinfo(L, what, ar, f, ci);
@@ -247,7 +247,7 @@ LUA_API int lua_getinfo (lua_State *L, const char *what, lua_Debug *ar) {
   }
   if (strchr(what, 'L'))
     collectvalidlines(L, f);
-  lua_unlock(L);
+  T3000Program_unlock(L);
   return status;
 }
 
@@ -268,8 +268,8 @@ LUA_API int lua_getinfo (lua_State *L, const char *what, lua_Debug *ar) {
 
 static int precheck (const Proto *pt) {
   check(pt->maxstacksize <= MAXSTACK);
-  lua_assert(pt->numparams+(pt->is_vararg & VARARG_HASARG) <= pt->maxstacksize);
-  lua_assert(!(pt->is_vararg & VARARG_NEEDSARG) ||
+  T3000Program_assert(pt->numparams+(pt->is_vararg & VARARG_HASARG) <= pt->maxstacksize);
+  T3000Program_assert(!(pt->is_vararg & VARARG_NEEDSARG) ||
               (pt->is_vararg & VARARG_HASARG));
   check(pt->sizeupvalues <= pt->nups);
   check(pt->sizelineinfo == pt->sizecode || pt->sizelineinfo == 0);
@@ -278,9 +278,9 @@ static int precheck (const Proto *pt) {
 }
 
 
-#define checkopenop(pt,pc)	luaG_checkopenop((pt)->code[(pc)+1])
+#define checkopenop(pt,pc)	T3000ProgramG_checkopenop((pt)->code[(pc)+1])
 
-int luaG_checkopenop (Instruction i) {
+int T3000ProgramG_checkopenop (Instruction i) {
   switch (GET_OPCODE(i)) {
     case OP_CALL:
     case OP_TAILCALL:
@@ -406,7 +406,7 @@ static Instruction symbexec (const Proto *pt, int lastpc, int reg) {
           checkreg(pt, a+b-1);
         }
         c--;  /* c = num. returns */
-        if (c == LUA_MULTRET) {
+        if (c == T3000Program_MULTRET) {
           check(checkopenop(pt, pc));
         }
         else if (c != 0)
@@ -441,7 +441,7 @@ static Instruction symbexec (const Proto *pt, int lastpc, int reg) {
         check((pt->is_vararg & VARARG_ISVARARG) &&
              !(pt->is_vararg & VARARG_NEEDSARG));
         b--;
-        if (b == LUA_MULTRET) check(checkopenop(pt, pc));
+        if (b == T3000Program_MULTRET) check(checkopenop(pt, pc));
         checkreg(pt, a+b-1);
         break;
       }
@@ -458,7 +458,7 @@ static Instruction symbexec (const Proto *pt, int lastpc, int reg) {
 /* }====================================================== */
 
 
-int luaG_checkcode (const Proto *pt) {
+int T3000ProgramG_checkcode (const Proto *pt) {
   return (symbexec(pt, pt->sizecode, NO_REG) != 0);
 }
 
@@ -471,21 +471,21 @@ static const char *kname (Proto *p, int c) {
 }
 
 
-static const char *getobjname (lua_State *L, CallInfo *ci, int stackpos,
+static const char *getobjname (T3000Program_State *L, CallInfo *ci, int stackpos,
                                const char **name) {
-  if (isLua(ci)) {  /* a Lua function? */
+  if (isT3000Program(ci)) {  /* a T3000Program function? */
     Proto *p = ci_func(ci)->l.p;
     int pc = currentpc(L, ci);
     Instruction i;
-    *name = luaF_getlocalname(p, stackpos+1, pc);
+    *name = T3000ProgramF_getlocalname(p, stackpos+1, pc);
     if (*name)  /* is a local? */
       return "local";
     i = symbexec(p, pc, stackpos);  /* try symbolic execution */
-    lua_assert(pc != -1);
+    T3000Program_assert(pc != -1);
     switch (GET_OPCODE(i)) {
       case OP_GETGLOBAL: {
         int g = GETARG_Bx(i);  /* global index */
-        lua_assert(ttisstring(&p->k[g]));
+        T3000Program_assert(ttisstring(&p->k[g]));
         *name = svalue(&p->k[g]);
         return "global";
       }
@@ -518,10 +518,10 @@ static const char *getobjname (lua_State *L, CallInfo *ci, int stackpos,
 }
 
 
-static const char *getfuncname (lua_State *L, CallInfo *ci, const char **name) {
+static const char *getfuncname (T3000Program_State *L, CallInfo *ci, const char **name) {
   Instruction i;
-  if ((isLua(ci) && ci->tailcalls > 0) || !isLua(ci - 1))
-    return NULL;  /* calling function is not Lua (or is unknown) */
+  if ((isT3000Program(ci) && ci->tailcalls > 0) || !isT3000Program(ci - 1))
+    return NULL;  /* calling function is not T3000Program (or is unknown) */
   ci--;  /* calling function */
   i = ci_func(ci)->l.p->code[currentpc(L, ci)];
   if (GET_OPCODE(i) == OP_CALL || GET_OPCODE(i) == OP_TAILCALL ||
@@ -541,75 +541,75 @@ static int isinstack (CallInfo *ci, const TValue *o) {
 }
 
 
-void luaG_typeerror (lua_State *L, const TValue *o, const char *op) {
+void T3000ProgramG_typeerror (T3000Program_State *L, const TValue *o, const char *op) {
   const char *name = NULL;
-  const char *t = luaT_typenames[ttype(o)];
+  const char *t = T3000ProgramT_typenames[ttype(o)];
   const char *kind = (isinstack(L->ci, o)) ?
                          getobjname(L, L->ci, cast_int(o - L->base), &name) :
                          NULL;
   if (kind)
-    luaG_runerror(L, "attempt to %s %s " LUA_QS " (a %s value)",
+    T3000ProgramG_runerror(L, "attempt to %s %s " T3000Program_QS " (a %s value)",
                 op, kind, name, t);
   else
-    luaG_runerror(L, "attempt to %s a %s value", op, t);
+    T3000ProgramG_runerror(L, "attempt to %s a %s value", op, t);
 }
 
 
-void luaG_concaterror (lua_State *L, StkId p1, StkId p2) {
+void T3000ProgramG_concaterror (T3000Program_State *L, StkId p1, StkId p2) {
   if (ttisstring(p1) || ttisnumber(p1)) p1 = p2;
-  lua_assert(!ttisstring(p1) && !ttisnumber(p1));
-  luaG_typeerror(L, p1, "concatenate");
+  T3000Program_assert(!ttisstring(p1) && !ttisnumber(p1));
+  T3000ProgramG_typeerror(L, p1, "concatenate");
 }
 
 
-void luaG_aritherror (lua_State *L, const TValue *p1, const TValue *p2) {
+void T3000ProgramG_aritherror (T3000Program_State *L, const TValue *p1, const TValue *p2) {
   TValue temp;
-  if (luaV_tonumber(p1, &temp) == NULL)
+  if (T3000ProgramV_tonumber(p1, &temp) == NULL)
     p2 = p1;  /* first operand is wrong */
-  luaG_typeerror(L, p2, "perform arithmetic on");
+  T3000ProgramG_typeerror(L, p2, "perform arithmetic on");
 }
 
 
-int luaG_ordererror (lua_State *L, const TValue *p1, const TValue *p2) {
-  const char *t1 = luaT_typenames[ttype(p1)];
-  const char *t2 = luaT_typenames[ttype(p2)];
+int T3000ProgramG_ordererror (T3000Program_State *L, const TValue *p1, const TValue *p2) {
+  const char *t1 = T3000ProgramT_typenames[ttype(p1)];
+  const char *t2 = T3000ProgramT_typenames[ttype(p2)];
   if (t1[2] == t2[2])
-    luaG_runerror(L, "attempt to compare two %s values", t1);
+    T3000ProgramG_runerror(L, "attempt to compare two %s values", t1);
   else
-    luaG_runerror(L, "attempt to compare %s with %s", t1, t2);
+    T3000ProgramG_runerror(L, "attempt to compare %s with %s", t1, t2);
   return 0;
 }
 
 
-static void addinfo (lua_State *L, const char *msg) {
+static void addinfo (T3000Program_State *L, const char *msg) {
   CallInfo *ci = L->ci;
-  if (isLua(ci)) {  /* is Lua code? */
-    char buff[LUA_IDSIZE];  /* add file:line information */
+  if (isT3000Program(ci)) {  /* is T3000Program code? */
+    char buff[T3000Program_IDSIZE];  /* add file:line information */
     int line = currentline(L, ci);
-    luaO_chunkid(buff, getstr(getluaproto(ci)->source), LUA_IDSIZE);
-    luaO_pushfstring(L, "%s:%d: %s", buff, line, msg);
+    T3000ProgramO_chunkid(buff, getstr(getT3000Programproto(ci)->source), T3000Program_IDSIZE);
+    T3000ProgramO_pushfstring(L, "%s:%d: %s", buff, line, msg);
   }
 }
 
 
-void luaG_errormsg (lua_State *L) {
+void T3000ProgramG_errormsg (T3000Program_State *L) {
   if (L->errfunc != 0) {  /* is there an error handling function? */
     StkId errfunc = restorestack(L, L->errfunc);
-    if (!ttisfunction(errfunc)) luaD_throw(L, LUA_ERRERR);
+    if (!ttisfunction(errfunc)) T3000ProgramD_throw(L, T3000Program_ERRERR);
     setobjs2s(L, L->top, L->top - 1);  /* move argument */
     setobjs2s(L, L->top - 1, errfunc);  /* push function */
     incr_top(L);
-    luaD_call(L, L->top - 2, 1);  /* call it */
+    T3000ProgramD_call(L, L->top - 2, 1);  /* call it */
   }
-  luaD_throw(L, LUA_ERRRUN);
+  T3000ProgramD_throw(L, T3000Program_ERRRUN);
 }
 
 
-void luaG_runerror (lua_State *L, const char *fmt, ...) {
+void T3000ProgramG_runerror (T3000Program_State *L, const char *fmt, ...) {
   va_list argp;
   va_start(argp, fmt);
-  addinfo(L, luaO_pushvfstring(L, fmt, argp));
+  addinfo(L, T3000ProgramO_pushvfstring(L, fmt, argp));
   va_end(argp);
-  luaG_errormsg(L);
+  T3000ProgramG_errormsg(L);
 }
 
