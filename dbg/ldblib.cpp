@@ -5,9 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "lua.h"
-#include "lualib.h"
-#include "luadebug.h"
+#include "T3000Debug.h"
+#include "T3000Debuglib.h"
+#include "T3000Debugdebug.h"
 #include "ldblib.h"
 
 #line 282 "ldb.nw"
@@ -42,7 +42,7 @@ static void command_line (void);
 
 #line 811 "ldb.nw"
 static void ldb_linehook (int line);
-static void ldb_callhook (lua_Object func, char *file, int line);
+static void ldb_callhook (T3000Debug_Object func, char *file, int line);
 
 #line 861 "ldb.nw"
 static void execute_command (char *s);
@@ -160,26 +160,26 @@ static int create_action (char *body, char *params)
 {
   char s[512];
   int i;
-  lua_beginblock ();
+  T3000Debug_beginblock ();
     sprintf (s, "function dummy (%s) %s end", params, body);
-    if (lua_dostring(s))
-      lua_error ("ldb: incorrect action format");
-    lua_pushobject (lua_getglobal ("dummy"));
-    i = lua_ref (1);
-  lua_endblock ();
+    if (T3000Debug_dostring(s))
+      T3000Debug_error ("ldb: incorrect action format");
+    T3000Debug_pushobject (T3000Debug_getglobal ("dummy"));
+    i = T3000Debug_ref (1);
+  T3000Debug_endblock ();
   return i;
 }
 
 #line 258 "ldb.nw"
 static void do_action (int action, char *arg)
 {
-  lua_Object func;
-  lua_beginblock ();
-    func = lua_getref (action);
+  T3000Debug_Object func;
+  T3000Debug_beginblock ();
+    func = T3000Debug_getref (action);
     if (arg)
-      lua_pushstring (arg);
-    lua_callfunction (func);
-  lua_endblock ();
+      T3000Debug_pushstring (arg);
+    T3000Debug_callfunction (func);
+  T3000Debug_endblock ();
 }
 
 #line 2014 "ldb.nw"
@@ -237,7 +237,7 @@ static void ldbI_delete (location *loc)
     if (marks[i].loc.line == loc->line)
       if (!strcmp (marks[i].loc.file, loc->file))
       {
-        lua_unref (marks[i].code);
+        T3000Debug_unref (marks[i].code);
         last_mark--;
         marks[i] = marks[last_mark];
         return;
@@ -276,7 +276,7 @@ static void ldbI_setdisplay (int func_ref)
       return;
     }
   if (last_expr == MAX_EXPRESSIONS)
-    lua_error ("ldb: too many expressions to display");
+    T3000Debug_error ("ldb: too many expressions to display");
   exprs[last_expr] = func_ref;
   last_expr++;
 }
@@ -299,7 +299,7 @@ static void ldbI_setGAction (char *expr)
   if (ldbI_existGAction ())
   {
     free (GActionString);
-    lua_unref (GActionFunc);
+    T3000Debug_unref (GActionFunc);
   }
   if (expr)
   {
@@ -319,31 +319,31 @@ static void ldbI_setGAction (char *expr)
 #line 189 "ldb.nw"
 static void update_location (int level, int line)
 {
-  lua_Object f = lua_stackedfunction (level);
-  if (f == LUA_NOOBJECT)		/* beware! Not tested properly */
+  T3000Debug_Object f = T3000Debug_stackedfunction (level);
+  if (f == T3000Debug_NOOBJECT)		/* beware! Not tested properly */
   {
     curr_loc.file=NULL;
     curr_loc.line=0;
     return;
   }
-  lua_funcinfo (f, &curr_loc.file, &curr_loc.line);
-  if ((line != -1)  || ((line = lua_currentline (f)) != -1))
+  T3000Debug_funcinfo (f, &curr_loc.file, &curr_loc.line);
+  if ((line != -1)  || ((line = T3000Debug_currentline (f)) != -1))
     curr_loc.line = line;
 }
 
 #line 375 "ldb.nw"
 static void disable_hooks (void)
 {
-  if (lua_callhook)
+  if (T3000Debug_callhook)
   {
-    lua_callhook = NULL;
+    T3000Debug_callhook = NULL;
     call_on = ON_HOOK;
   }
   else
     call_on = DONT_TURN_ON;
-  if (lua_linehook)
+  if (T3000Debug_linehook)
   {
-    lua_linehook = NULL;
+    T3000Debug_linehook = NULL;
     line_on = ON_HOOK;
   }
   else
@@ -354,10 +354,10 @@ static void disable_hooks (void)
 static void restore_hooks (void)
 {
   if (call_on == ON_HOOK)
-    lua_callhook = ldb_callhook;
+    T3000Debug_callhook = ldb_callhook;
   call_on = OFF_HOOK;
   if (line_on == ON_HOOK)
-    lua_linehook = ldb_linehook;
+    T3000Debug_linehook = ldb_linehook;
   line_on = OFF_HOOK;
 }
 
@@ -365,7 +365,7 @@ static void restore_hooks (void)
 static void enable_linehook (void)
 {
   if (line_on == OFF_HOOK)
-    lua_linehook = ldb_linehook;
+    T3000Debug_linehook = ldb_linehook;
   else if (line_on == DONT_TURN_ON)
     line_on = ON_HOOK;
 }
@@ -374,7 +374,7 @@ static void enable_linehook (void)
 static void enable_callhook (void)
 {
   if (call_on == OFF_HOOK)
-    lua_callhook = ldb_callhook;
+    T3000Debug_callhook = ldb_callhook;
   else if (call_on == DONT_TURN_ON)
     call_on = ON_HOOK;
 }
@@ -384,10 +384,10 @@ static void maybe_disable_hooks (void)
 {
   if (!ldbI_existbreak() && !ldbI_existGAction() && IN_RUN_MODE)
   {
-    lua_linehook = NULL;
+    T3000Debug_linehook = NULL;
     if (line_on == ON_HOOK)
       line_on = DONT_TURN_ON;
-    lua_callhook = NULL;
+    T3000Debug_callhook = NULL;
     if (call_on == ON_HOOK)
       call_on = DONT_TURN_ON;
   }
@@ -517,17 +517,17 @@ static void show_expressions (void)
   int i;
   for (i=0; i<last_expr; i++)
   {
-    lua_beginblock ();
+    T3000Debug_beginblock ();
       if (ldbI_exprfunc (i) != 0)
       {
         char s[255+1+7];
-        lua_Object expr = lua_getref (ldbI_exprfunc(i));
-        char *e = lua_getstring (expr);
+        T3000Debug_Object expr = T3000Debug_getref (ldbI_exprfunc(i));
+        char *e = T3000Debug_getstring (expr);
         fprintf (stderr, "%d: %s = ", i+1, e);
         sprintf (s, "print(%255s)", e);
-        lua_dostring (s);
+        T3000Debug_dostring (s);
       }
-    lua_endblock ();
+    T3000Debug_endblock ();
   }
 }
 
@@ -575,7 +575,7 @@ static void execute_command (char *s)
     s[1] = old_command;
   }
   if (s[0] != '\'')
-    lua_dostring (s);
+    T3000Debug_dostring (s);
   else
   {
     if (s[1])
@@ -606,45 +606,45 @@ static void shortcut_init (void)
 static int local_env (int level)
 {
   char       *name;
-  lua_Object func = lua_stackedfunction (level);
-  lua_Object table;
-  lua_Object local;
+  T3000Debug_Object func = T3000Debug_stackedfunction (level);
+  T3000Debug_Object table;
+  T3000Debug_Object local;
   int        n = 1;
-  if (func == LUA_NOOBJECT)
+  if (func == T3000Debug_NOOBJECT)
     return 0;
-  else if (lua_iscfunction (func))
+  else if (T3000Debug_iscfunction (func))
     return -1;
 
-  lua_beginblock ();
-    table = lua_getref (global_ref);
-    while ((local = lua_getlocal (func, n, &name)) != LUA_NOOBJECT)
+  T3000Debug_beginblock ();
+    table = T3000Debug_getref (global_ref);
+    while ((local = T3000Debug_getlocal (func, n, &name)) != T3000Debug_NOOBJECT)
     {
-      lua_Object value;
-      lua_beginblock ();
+      T3000Debug_Object value;
+      T3000Debug_beginblock ();
         
 #line 971 "ldb.nw"
-value = lua_getglobal (name);
-if (!lua_isnil (value))
+value = T3000Debug_getglobal (name);
+if (!T3000Debug_isnil (value))
 {
-  lua_pushobject (table);
-  lua_pushstring (name);
-  lua_pushobject (value);
-  lua_settable ();
+  T3000Debug_pushobject (table);
+  T3000Debug_pushstring (name);
+  T3000Debug_pushobject (value);
+  T3000Debug_settable ();
 }
 
 #line 956 "ldb.nw"
 
         
 #line 985 "ldb.nw"
-lua_pushobject (local);
-lua_setglobal (name);
+T3000Debug_pushobject (local);
+T3000Debug_setglobal (name);
 
 #line 957 "ldb.nw"
 
-      lua_endblock ();
+      T3000Debug_endblock ();
       n++;
     }
-  lua_endblock ();
+  T3000Debug_endblock ();
   return 1;
 }
 
@@ -652,72 +652,72 @@ lua_setglobal (name);
 static int global_env (int level)
 {
   char       *name;
-  lua_Object func = lua_stackedfunction (level);
-  lua_Object table;
+  T3000Debug_Object func = T3000Debug_stackedfunction (level);
+  T3000Debug_Object table;
   int        n = 1;
-  if (func == LUA_NOOBJECT)
+  if (func == T3000Debug_NOOBJECT)
     return 0;
-  else if (lua_iscfunction (func))
+  else if (T3000Debug_iscfunction (func))
     return -1;
 
-  lua_beginblock ();
-    table = lua_getref (global_ref);
-    while (lua_getlocal (func, n, &name) != LUA_NOOBJECT)
+  T3000Debug_beginblock ();
+    table = T3000Debug_getref (global_ref);
+    while (T3000Debug_getlocal (func, n, &name) != T3000Debug_NOOBJECT)
     {
-      lua_Object global;
-      lua_beginblock ();
+      T3000Debug_Object global;
+      T3000Debug_beginblock ();
         
 #line 1035 "ldb.nw"
-lua_pushobject (lua_getglobal (name));
-lua_setlocal (func, n);
+T3000Debug_pushobject (T3000Debug_getglobal (name));
+T3000Debug_setlocal (func, n);
 
 #line 1023 "ldb.nw"
 
         
 #line 1044 "ldb.nw"
 /* global = global_ref[name] */
-lua_pushobject (table);
-lua_pushstring (name);
-global = lua_gettable ();
+T3000Debug_pushobject (table);
+T3000Debug_pushstring (name);
+global = T3000Debug_gettable ();
 /* name = global */
-lua_pushobject (global);
-lua_setglobal (name);
+T3000Debug_pushobject (global);
+T3000Debug_setglobal (name);
 /* global_ref[name] = nil */
-lua_pushobject (table);
-lua_pushstring (name);
-lua_pushnil ();
-lua_settable ();
+T3000Debug_pushobject (table);
+T3000Debug_pushstring (name);
+T3000Debug_pushnil ();
+T3000Debug_settable ();
 
 #line 1024 "ldb.nw"
 
-      lua_endblock ();
+      T3000Debug_endblock ();
       n++;
     }
-  lua_endblock ();
+  T3000Debug_endblock ();
   return 1;
 }
 
 #line 1150 "ldb.nw"
 static int get_location (int p1, location *loc)
 {
-  lua_Object o1 = lua_getparam (p1);
-  lua_Object o2 = lua_getparam (p1+1);
-  if (lua_isfunction (o1))
+  T3000Debug_Object o1 = T3000Debug_getparam (p1);
+  T3000Debug_Object o2 = T3000Debug_getparam (p1+1);
+  if (T3000Debug_isfunction (o1))
   {
-    lua_funcinfo (o1, &(loc->file), &(loc->line));
+    T3000Debug_funcinfo (o1, &(loc->file), &(loc->line));
     return LDB_CALL_FUNCTION;
   }
-  else if (lua_isnumber (o1))
+  else if (T3000Debug_isnumber (o1))
   {
-    loc->line = (int)lua_getnumber (o1);
-    if (lua_isstring (o2))
-      loc->file = lua_getstring (o2);
+    loc->line = (int)T3000Debug_getnumber (o1);
+    if (T3000Debug_isstring (o2))
+      loc->file = T3000Debug_getstring (o2);
     else
       loc->file = curr_loc.file;
     return LDB_LINE_NUMBER;
   }
   else
-    lua_error ("Invalid identification of source point");
+    T3000Debug_error ("Invalid identification of source point");
 
   /* unreachable code. just to avoid warning messages */
   return LDB_CALL_FUNCTION;	
@@ -739,7 +739,7 @@ static void list_lines (char *file_name, int first_line, int num_lines)
   int i;
   char buffer[TAM_BUF+1];
   if ((arq = fopen(file_name, "r")) == NULL)
-    lua_error ("can't open file");
+    T3000Debug_error ("can't open file");
   for (i=1; i<first_line; i++)
     fgets (buffer, TAM_BUF, arq);
   for (i=0; i<num_lines; i++)
@@ -754,11 +754,11 @@ static void list_lines (char *file_name, int first_line, int num_lines)
 #line 1958 "ldb.nw"
 static void ldb_error (void)
 {
-  lua_Object o = lua_getparam(1);
-  if (lua_isstring (o))
-    fprintf (stderr, "lua: %s\n", lua_getstring(o));
+  T3000Debug_Object o = T3000Debug_getparam(1);
+  if (T3000Debug_isstring (o))
+    fprintf (stderr, "T3000Debug: %s\n", T3000Debug_getstring(o));
   else
-    fprintf(stderr, "lua: unknown error\n");
+    fprintf(stderr, "T3000Debug: unknown error\n");
   enable_linehook ();
   enable_callhook ();
   stop_now = 1;
@@ -769,31 +769,31 @@ static void arg_error(char *funcname)
 {
   char buff[100];
   sprintf (buff, "incorrect arguments to function `%s'", funcname);
-  lua_error (buff);
+  T3000Debug_error (buff);
 }
 
 #line 2279 "ldb.nw"
 static char *check_string (int numArg, char *funcname)
 {
-  lua_Object o = lua_getparam(numArg);
-  if (!lua_isstring(o))
+  T3000Debug_Object o = T3000Debug_getparam(numArg);
+  if (!T3000Debug_isstring(o))
     arg_error(funcname);
-  return lua_getstring (o);
+  return T3000Debug_getstring (o);
 }
 
 #line 2293 "ldb.nw"
 static int check_number (int numArg, char *funcname)
 {
-  lua_Object o = lua_getparam(numArg);
-  if (!lua_isnumber(o))
+  T3000Debug_Object o = T3000Debug_getparam(numArg);
+  if (!T3000Debug_isnumber(o))
     arg_error(funcname);
-  return (int)lua_getnumber(o);
+  return (int)T3000Debug_getnumber(o);
 }
 
 #line 2306 "ldb.nw"
 static int get_opt_number (int numArg, int def, char *funcname)
 {
-  return (lua_getparam(numArg) == LUA_NOOBJECT) ? def :
+  return (T3000Debug_getparam(numArg) == T3000Debug_NOOBJECT) ? def :
                               (int)check_number(numArg, funcname);
 }
 
@@ -802,15 +802,15 @@ void load_config_file (void)
 {
   char *config_file_name = getenv("LDB_CONFIG");
   if (config_file_name == NULL)
-    config_file_name = "ldbrc.lua";
-  if (lua_dofile(config_file_name) != 0)
+    config_file_name = "ldbrc.T3000Debug";
+  if (T3000Debug_dofile(config_file_name) != 0)
   {
     char *home = getenv("HOME");
     config_file_name = malloc ((strlen(home)+11)*sizeof(char));
     strcpy (config_file_name, home);
-    strcpy (config_file_name+strlen(home), "/ldbrc.lua");
-    if (lua_dofile(config_file_name) != 0)
-      fprintf (stderr, "Warning: Lua debugger cannot load its configuration"
+    strcpy (config_file_name+strlen(home), "/ldbrc.T3000Debug");
+    if (T3000Debug_dofile(config_file_name) != 0)
+      fprintf (stderr, "Warning: T3000Debug debugger cannot load its configuration"
 		" file (%s)\n", config_file_name);
     free (config_file_name);
   }
@@ -855,7 +855,7 @@ static void ldb_depth (void)
     curr_level = level;
   else
     local_env (curr_level+2);
-  lua_pushnumber (curr_level);
+  T3000Debug_pushnumber (curr_level);
 }
 
 #line 1288 "ldb.nw"
@@ -863,16 +863,16 @@ static void ldb_display (void)
 {
   int value;
   char *s = check_string (1, "display");
-  lua_pushstring (s);
-  value = lua_ref (1);
+  T3000Debug_pushstring (s);
+  value = T3000Debug_ref (1);
   ldbI_setdisplay (value);
 }
 
 #line 1313 "ldb.nw"
 static void ldb_doalways (void)
 {
-  lua_Object o = lua_getparam (1);
-  if (o == LUA_NOOBJECT)
+  T3000Debug_Object o = T3000Debug_getparam (1);
+  if (o == T3000Debug_NOOBJECT)
     ldbI_setGAction (NULL);
   else
     ldbI_setGAction (check_string (1, "doalways"));
@@ -910,39 +910,39 @@ static void ldb_dump (void)
 {
   char       *name;
   int level = get_opt_number(1, 2, "dump");
-  lua_Object func = lua_stackedfunction (level);
-  lua_Object local;
+  T3000Debug_Object func = T3000Debug_stackedfunction (level);
+  T3000Debug_Object local;
   int        n = 1;
-  if (func == LUA_NOOBJECT)
+  if (func == T3000Debug_NOOBJECT)
     return;
-  else if (lua_iscfunction (func))
+  else if (T3000Debug_iscfunction (func))
     return;
 
-  lua_beginblock ();
+  T3000Debug_beginblock ();
     
 #line 1442 "ldb.nw"
-while ((local = lua_getlocal (func, n, &name)) != LUA_NOOBJECT)
+while ((local = T3000Debug_getlocal (func, n, &name)) != T3000Debug_NOOBJECT)
 {
-  lua_beginblock ();
+  T3000Debug_beginblock ();
     fprintf (stderr, "%s = ", name);
-    lua_pushobject (local);
-    lua_callfunction (lua_getglobal ("print"));
-  lua_endblock ();
+    T3000Debug_pushobject (local);
+    T3000Debug_callfunction (T3000Debug_getglobal ("print"));
+  T3000Debug_endblock ();
   n++;
 }
 
 #line 1428 "ldb.nw"
 
-  lua_endblock ();
+  T3000Debug_endblock ();
 }
 
 #line 1459 "ldb.nw"
 static void ldb_file (void)
 {
   if (curr_loc.file)
-    lua_pushstring (curr_loc.file);
+    T3000Debug_pushstring (curr_loc.file);
   else
-    lua_pushnil ();
+    T3000Debug_pushnil ();
 }
 
 #line 1487 "ldb.nw"
@@ -955,7 +955,7 @@ static void ldb_finish (void)
   enable_linehook ();
   enable_callhook ();
 /*
-  lua_pushnumber (-1);
+  T3000Debug_pushnumber (-1);
   ldb_next ();
 */
 }
@@ -985,60 +985,60 @@ static void ldb_goto (void)
 static void ldb_hooks (void)
 {
   int i = 0;
-  if (lua_linehook == ldb_linehook)
+  if (T3000Debug_linehook == ldb_linehook)
     i++;
-  if (lua_callhook == ldb_callhook)
+  if (T3000Debug_callhook == ldb_callhook)
     i+=2;
-  lua_pushnumber (i);
+  T3000Debug_pushnumber (i);
 }
 
 #line 1595 "ldb.nw"
 static void ldb_line (void)
 {
-  lua_pushnumber (curr_loc.line);
+  T3000Debug_pushnumber (curr_loc.line);
 }
 
 #line 1615 "ldb.nw"
 static void ldb_list (void)
 {
-  lua_Object o1 = lua_getparam (1);
-  lua_Object o2 = lua_getparam (2);
-  lua_Object o3 = lua_getparam (3);
+  T3000Debug_Object o1 = T3000Debug_getparam (1);
+  T3000Debug_Object o2 = T3000Debug_getparam (2);
+  T3000Debug_Object o3 = T3000Debug_getparam (3);
   unsigned num_lines = 0;		/* to avoid warnings */
   int first_line;
   char *file_name;
   
 #line 1644 "ldb.nw"
-if (lua_isnumber(o1))
+if (T3000Debug_isnumber(o1))
 
 #line 1668 "ldb.nw"
 {
-  num_lines = lua_getnumber(o1);
-  if (lua_isfunction(o2))
-    lua_funcinfo (o2, &file_name, &first_line);  
-  else if (lua_isstring (o2) && !lua_isnumber(o2))
+  num_lines = T3000Debug_getnumber(o1);
+  if (T3000Debug_isfunction(o2))
+    T3000Debug_funcinfo (o2, &file_name, &first_line);  
+  else if (T3000Debug_isstring (o2) && !T3000Debug_isnumber(o2))
   {
     first_line = 1;
-    file_name = lua_getstring(o2);
+    file_name = T3000Debug_getstring(o2);
   }
   else
   {
-    first_line = lua_isnumber(o2) ? lua_getnumber(o2) :
+    first_line = T3000Debug_isnumber(o2) ? T3000Debug_getnumber(o2) :
 	(curr_loc.line==0 ? 1 : curr_loc.line);
-    file_name = lua_isstring(o3) ? lua_getstring (o3) : curr_loc.file;
+    file_name = T3000Debug_isstring(o3) ? T3000Debug_getstring (o3) : curr_loc.file;
   }
 }
 
 #line 1645 "ldb.nw"
 
-else if (lua_isstring(o1))
+else if (T3000Debug_isstring(o1))
 {
   num_lines = -1;
   first_line = 1;
-  file_name = lua_getstring(o1);
+  file_name = T3000Debug_getstring(o1);
 }
 else
-  lua_error ("first parameter must be a number");
+  T3000Debug_error ("first parameter must be a number");
 
 #line 1623 "ldb.nw"
 
@@ -1088,8 +1088,8 @@ static void ldb_step (void)
 #line 1833 "ldb.nw"
 static void ldb_stop (void)
 {
-  lua_Object o = lua_getparam (1);
-  if (o != LUA_NOOBJECT && lua_isnil(o))
+  T3000Debug_Object o = T3000Debug_getparam (1);
+  if (o != T3000Debug_NOOBJECT && T3000Debug_isnil(o))
     return;
   stop_now = 1;
   enable_linehook ();
@@ -1122,24 +1122,24 @@ static void ldb_up (void)
 static void ldb_where (void)
 {
   int first_level = 0;
-  lua_Object func;
-  lua_Object o = lua_getparam (1);
-  if (lua_isnumber (o))
-    first_level = (int)lua_getnumber (o);
+  T3000Debug_Object func;
+  T3000Debug_Object o = T3000Debug_getparam (1);
+  if (T3000Debug_isnumber (o))
+    first_level = (int)T3000Debug_getnumber (o);
   fprintf(stderr, "Active Stack:\n");
-  while ((func = lua_stackedfunction(first_level++)) != LUA_NOOBJECT)
+  while ((func = T3000Debug_stackedfunction(first_level++)) != T3000Debug_NOOBJECT)
   {
     char *name;
     int currentline;
     char *filename;
     int linedefined;
     fprintf(stderr, "\t");
-    lua_funcinfo(func, &filename, &linedefined);
+    T3000Debug_funcinfo(func, &filename, &linedefined);
     if (linedefined == 0)
       fprintf(stderr, "main of %s", filename);
     else
     {
-      switch (*lua_getobjname(func, &name))
+      switch (*T3000Debug_getobjname(func, &name))
       {
         case 'g':
           fprintf(stderr, "function %s", name);
@@ -1155,7 +1155,7 @@ static void ldb_where (void)
       else
         fprintf(stderr, " (%s:%d)", filename, linedefined);
     }
-    if ((currentline = lua_currentline(func)) > 0)
+    if ((currentline = T3000Debug_currentline(func)) > 0)
       fprintf(stderr, " - at line %d", currentline);
     fprintf(stderr, "\n");
   }
@@ -1174,9 +1174,9 @@ static void ldb_linehook (int line)
 }
 
 #line 598 "ldb.nw"
-static void ldb_callhook (lua_Object func, char *file, int line)
+static void ldb_callhook (T3000Debug_Object func, char *file, int line)
 {
-  if (func == LUA_NOOBJECT)
+  if (func == T3000Debug_NOOBJECT)
     return_procedure (file, line);
   else
     call_procedure (file, line);
@@ -1190,7 +1190,7 @@ static void ldb_callhook (lua_Object func, char *file, int line)
 #line 2331 "ldb.nw"
 static struct FuncList {
   char *name;
-  lua_CFunction func;
+  T3000Debug_CFunction func;
 } FuncList [] = {
                 
 #line 1204 "ldb.nw"
@@ -1282,17 +1282,17 @@ void ldblib_open (void)
   ldbI_initexprs ();
   
 #line 915 "ldb.nw"
-lua_pushobject (lua_createtable ());
-global_ref = lua_ref (1);
+T3000Debug_pushobject (T3000Debug_createtable ());
+global_ref = T3000Debug_ref (1);
 
 #line 2366 "ldb.nw"
 
   for (i = 0; i < SizeFuncList; i++)
-    lua_register(FuncList[i].name, FuncList[i].func);
+    T3000Debug_register(FuncList[i].name, FuncList[i].func);
   shortcut_init ();
   load_config_file ();
-  lua_pushcfunction (ldb_error);
-  lua_setglobal ("error");
+  T3000Debug_pushcfunction (ldb_error);
+  T3000Debug_setglobal ("error");
 }
 
 
