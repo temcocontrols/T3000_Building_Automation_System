@@ -110,6 +110,7 @@ BEGIN_MESSAGE_MAP(CBacnetSetting, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_SETTING_IO_CONFIG, &CBacnetSetting::OnBnClickedButtonSettingIoConfig)
 	ON_BN_CLICKED(IDC_BUTTON_REBOOT_DEVICE, &CBacnetSetting::OnBnClickedButtonRebootDevice)
 	ON_WM_VSCROLL()
+	ON_BN_CLICKED(IDC_BUTTON_ZONE_SCHEDULE, &CBacnetSetting::OnBnClickedButtonZoneSchedule)
 END_MESSAGE_MAP()
 
 
@@ -2148,3 +2149,12 @@ void CBacnetSetting::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 }
 
 
+
+#include "GroupScheduleDlg.h"
+void CBacnetSetting::OnBnClickedButtonZoneSchedule()
+{
+	CString strIPAddress;
+	GetDlgItem(IDC_IPADDRESS_BAC_IP)->GetWindowTextW(strIPAddress);
+	CGroupScheduleDlg dlg(NULL, strIPAddress);
+	dlg.DoModal();
+}

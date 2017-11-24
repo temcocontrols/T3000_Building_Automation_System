@@ -46,7 +46,7 @@ END_MESSAGE_MAP()
 CT3000App::CT3000App()
 {
 	m_bHiColorIcons = TRUE;
-	CurrentT3000Version=_T("    2017.10.28");
+	CurrentT3000Version=_T("    2017.11.14");
 	T3000_Version = 201028;
 	m_lastinterface=19;
 }
@@ -898,6 +898,7 @@ BOOL CT3000App::InitInstance()
 
        m_szAppPath  = g_strExePth;
        m_szHelpFile = theApp.m_szAppPath + L"T3000_Help.chm";
+	   m_szTstatHelpFile = theApp.m_szAppPath + L"HelpDoc//" + L"TStat8_Help.chm";
 // 		CString g_configfile_path =g_strExePth + g_strStartInterface_config;
 // 		m_lastinterface= 19 ;//GetPrivateProfileInt(_T("T3000_START"),_T("Interface"),19,g_configfile_path); //由 杜帆 16-03-17屏蔽；进入不同的界面引起 T3000打开时报错。
 // 		g_selected_serialnumber=GetPrivateProfileInt(_T("T3000_START"),_T("SerialNumber"),0,g_configfile_path);

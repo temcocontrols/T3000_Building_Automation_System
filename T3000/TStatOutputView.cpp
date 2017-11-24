@@ -38,6 +38,7 @@ BEGIN_MESSAGE_MAP(CTStatOutputView, CFormView)
     ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_Output_Item)	
     ON_NOTIFY(NM_CLICK, IDC_LIST_OUTPUT, &CTStatOutputView::OnNMClickListOutput)
     ON_WM_SIZE()
+	ON_WM_HELPINFO()
 END_MESSAGE_MAP()
 
 
@@ -1349,4 +1350,20 @@ BOOL CTStatOutputView::PreTranslateMessage(MSG* pMsg)
         }
     }
     return CFormView::PreTranslateMessage(pMsg);
+}
+
+#include "Tstat_HelpDoc.h"
+BOOL CTStatOutputView::OnHelpInfo(HELPINFO* pHelpInfo)
+{
+	// TODO: Add your message handler code here and/or call default
+	
+
+	HWND hWnd;
+
+	if (pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szTstatHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
+	else
+		hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szTstatHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OUTPUTTABLE_TSTAT);
+
+	return (hWnd != NULL);
+	return CFormView::OnHelpInfo(pHelpInfo);
 }

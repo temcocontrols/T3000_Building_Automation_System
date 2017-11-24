@@ -300,6 +300,8 @@
 #define IDD_DIALOG_FREE_COOLING         676
 #define IDD_DIALOG_REMOTE_PORT_WARNING  677
 #define IDD_DIALOG16                    679
+#define IDD_DIALOG_MINIPANEL_GROUP_SCHEDULE 688
+#define IDD_DIALOG_MODBUS_BACNET_ROUTER 690
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -420,6 +422,7 @@
 #define IDC_COMBO_BAC_PROPERTY          1042
 #define IDC_COMBO_AM                    1042
 #define IDC_COMBO_DATAFORMAT            1042
+#define IDC_COMBO_REV                   1042
 #define IDC_EDIT9                       1043
 #define IDC_TIMELEFT_EDIT               1043
 #define IDC_DEF_SETPOINT_EDT            1043
@@ -1239,6 +1242,7 @@
 #define IDC_TEST_TEMP3                  1580
 #define IDC_START                       1584
 #define IDC_STOP                        1585
+#define IDC_START2                      1585
 #define IDC_CONTINUE                    1586
 #define IDC_DISPLAY_CONFIG              1586
 #define IDC_INPUT_1                     1588
@@ -2238,6 +2242,9 @@
 #define IDC_EDIT_NETWORKID              2342
 #define IDC_EDIT_PIC_VERSION            2343
 #define IDC_STATIC_PIC_VERSION          2344
+#define IDC_BUTTON_ZONE_SCHEDULE        2345
+#define IDC_COMBO_PRODUCTNAME           2346
+#define IDC_BUTTON_BLXFILE              2347
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -2462,6 +2469,9 @@
 #define IDC_RADIO111                    15608
 #define IDC_RADIO112                    15609
 #define IDC_RADIO113                    15610
+#define IDC_RADIO114                    15611
+#define IDC_RADIO115                    15612
+#define IDC_RADIO116                    15613
 #define IDC_RADIO_NEW200                19484
 #define ID_TIMEBASE_1HOUR               19485
 #define IDC_STATIC__LOGIN_NAME          32709
@@ -2705,6 +2715,7 @@
 #define ID_MODE_OFFLIN                  34061
 #define ID_MODE_OFFLINEMODE             34062
 #define ID_TOOLS_PHCHART                34063
+#define ID_TOOLS_MODBUSTOBACNETROUTER   34064
 #define ID_HELP_USING_UPDATE            34904
 #define ID_DATABASE_BACNETTOOL          34905
 #define IDD_DIALOG_BACNET_PROGRAM       34906
@@ -2778,9 +2789,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        688
-#define _APS_NEXT_COMMAND_VALUE         34064
-#define _APS_NEXT_CONTROL_VALUE         2345
+#define _APS_NEXT_RESOURCE_VALUE        692
+#define _APS_NEXT_COMMAND_VALUE         34065
+#define _APS_NEXT_CONTROL_VALUE         2348
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

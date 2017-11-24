@@ -326,8 +326,6 @@ LRESULT CBacnetProgramEdit::Fresh_Program_RichEdit(WPARAM wParam,LPARAM lParam)
 	SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Decode success!"));
 	Initial_static();	
 	CString temp;
-
-
 	int  len = 0;
 	len =  strlen(my_display); //str.length();
 	int  unicodeLen = ::MultiByteToWideChar( CP_ACP,0, my_display,-1,NULL,0 );  
@@ -518,7 +516,7 @@ void CBacnetProgramEdit::Syntax_analysis()
 
 void CBacnetProgramEdit::OnSend()
 {
-	
+	//reset the program buffer
 	memset(program_code[program_list_line],0,2000);
 
 	renumvar = 1;

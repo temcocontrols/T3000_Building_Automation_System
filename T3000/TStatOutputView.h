@@ -43,6 +43,7 @@ public:
     virtual BOOL PreTranslateMessage(MSG* pMsg);
     
     
+	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 };
 
 

@@ -370,6 +370,9 @@ void CT3ControllerProgram::Initial_Product()
 	product_map.insert(map<int, CString>::value_type(PM_T3_LC, _T("T3_LC")));
 
 
+
+
+
 }
 
 CString CT3ControllerProgram::ShowT3DefaultName()

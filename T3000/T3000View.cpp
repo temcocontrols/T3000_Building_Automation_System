@@ -3995,15 +3995,15 @@ void CT3000View::OnBnClickedBtnSynctime()
 
     szTime[0] =(BYTE)(time.GetYear()%100);
     int nRet = write_one(g_tstat_id,MODBUS_YEAR, szTime[0]);
-	if (product_register_value[7] == PM_TSTAT8
+	/*if (product_register_value[7] == PM_TSTAT8
 		|| product_register_value[7] == PM_TSTAT8_WIFI
 		|| product_register_value[7] == PM_TSTAT8_OCC
-		|| product_register_value[7] == PM_TSTAT7_ARM
+		|| product_register_value[7] == PM_TSTAT7_ARMX
 		|| product_register_value[7] == PM_TSTAT8_220V)
 	{
 		 
 		write_one(g_tstat_id, MODBUS_YEAR, time.GetYear());
-	}
+	}*/
     Sleep(1000);
     szTime[1] = (BYTE)(time.GetMonth());
     nRet = write_one(g_tstat_id, MODBUS_MONTH, szTime[1]);

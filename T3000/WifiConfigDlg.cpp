@@ -239,3 +239,7 @@ void CWifiConfigDlg::OnBnClickedOk()
 
 	CDialogEx::OnOK();
 }
+
+
+
+  

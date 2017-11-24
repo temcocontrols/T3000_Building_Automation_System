@@ -748,6 +748,7 @@ BOOL IS_Temco_Product(int product_model)
 			case   STM32_HUM_RS485			   :
 			case   STM32_PRESSURE_NET		   :
 			case   STM32_PRESSURE_RS3485	   :
+			case   STM32_CO2_NODE:
 			case   PM_T3_LC:
 			       return TRUE;
 			default:
@@ -4065,25 +4066,22 @@ void Inial_Product_map()
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT8_220V,_T("TStat8_220V")));
 	product_map.insert(map<int, CString>::value_type(PM_T3_LC, _T("T3_LC")));
 
+	product_map.insert(map<int, CString>::value_type(STM32_CO2_NET, _T("CO2 Net")));
+	product_map.insert(map<int, CString>::value_type(STM32_CO2_RS485, _T("CO2")));
+	product_map.insert(map<int, CString>::value_type(STM32_HUM_NET, _T("Hum Net")));
+	product_map.insert(map<int, CString>::value_type(STM32_HUM_RS485, _T("Hum")));
+	product_map.insert(map<int, CString>::value_type(STM32_PRESSURE_NET, _T("Pressure Net")));
+	product_map.insert(map<int, CString>::value_type(STM32_PRESSURE_RS3485, _T("Pressure")));
+	product_map.insert(map<int, CString>::value_type(STM32_CO2_NODE, _T("CO2 Node")));
 
 }
 
 
 CString GetProductName(int ModelID)
 {
-	/*map <int,CString>::iterator myiterator;
-
-	myiterator =product_map.find(ModelID);
-	if(myiterator != product_map.end())
-	{
-		return myiterator->second;
-	}
-	else
-	{
-		 return _T("");	
-	}*/
+	 
 	return product_map[ModelID];
-	  //_T("");	
+ 
 }
 
 

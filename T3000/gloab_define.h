@@ -792,36 +792,7 @@ const CString Input_List_Analog_Units[] =
 	 _T("HZ")
 };
 
-const CString Input_Analog_Units_Array[] =
-{
-	 _T("Unused"),
-	 _T("Y3K -40 to 150"),
-	 _T("Y3K -40 to 300"),
-	 _T("10K -40 to 120"),
-	 _T("10K -40 to 250"),
-	 _T("G3K -40 to 120"),
-	 _T("G3K -40 to 250"),
-	 _T("KM10K -40 to 120"),
-	 _T("KM10K -40 to 250"),
-	 _T("A10K -50 to 110"),
-	 _T("A10K -60 to 200"),
-	 _T("0.0 to 5.0"),
-	 _T("0.0 to 100"),
-	 _T("0.0 to 20"),
-	 _T("0.0 to 20"),
-	 _T("Pulse Count (Slow 1Hz)"),
-	 _T("0.0 to 3000"),
-	 _T("0 to 100"),
-	 _T("0 to 100"),
-	  _T("0.0 to 10.0"),
-	  _T("Table 1"),
-	  _T("Table 2"),
-	  _T("Table 3"),
-	  _T("Table 4"),
-	  _T("Table 5"),
-	  _T("Pulse Count (Fast 100Hz)"),
-	  _T("Frequency")
-};
+
 
 const CString Output_Analog_Units_Array[] = 
 {

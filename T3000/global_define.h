@@ -58,10 +58,10 @@ typedef struct
 	unsigned short length;
 	unsigned char commad;
 }Black_head_struct;
-struct Batch_SN{
-    int ModbusID;
-    int SN;
-    BOOL Result;
+struct Batch_SN {
+	int ModbusID;
+	int SN;
+	BOOL Result;
 };
 typedef struct
 {
@@ -103,7 +103,7 @@ const int KEY_COMMAND = 11;
 
 const int KEY_ERROR_LABEL = 255;
 
-typedef struct  
+typedef struct
 {
 	long startpos;
 	long endpos;
@@ -111,7 +111,7 @@ typedef struct
 	unsigned int key_type;
 }Str_char_pos_color;
 
-typedef struct 
+typedef struct
 {
 	char HEAD_1;
 	char HEAD_2;
@@ -130,7 +130,7 @@ typedef struct
 typedef enum
 {
 	GET_SERIAL_NUMBER = 1,
-	DOWNLOAD_FILE	= 2,
+	DOWNLOAD_FILE = 2,
 	UPLOAD_FILE = 3,
 	DOWNLOAD_NEW_FILE = 4,	//用于区别  DOWNLOAD_FILE ， 代表新的下载利用3K下载;
 	GET_MD5_VALUE = 99,
@@ -198,9 +198,9 @@ const int DOWNLOAD_MD5_CHECK_PASS = 21;
 #define WM_SCREENEDIT_CLOSE WM_USER + 1232
 
 //const int BACNETIP_PORT =  47808;
-const int BACNETIP_PORT =  47808;
+const int BACNETIP_PORT = 47808;
 const int TEMCO_SERVER_PORT = 31234;
-const int UDP_BROADCAST_PORT =1234;
+const int UDP_BROADCAST_PORT = 1234;
 const int RECV_RESPONSE_PORT = 4321;
 #define UPD_BROADCAST_QRY_MSG 100
 #define RESPONSE_MSG          UPD_BROADCAST_QRY_MSG+1
@@ -209,7 +209,7 @@ const int RECV_RESPONSE_PORT = 4321;
 const int MODBUS_RS485 = 0;
 const int MODBUS_TCPIP = 1;
 const int MODBUS_BACNET_MSTP = 2;
-const int PROTOCOL_BACNET_IP   = 3;
+const int PROTOCOL_BACNET_IP = 3;
 const int PROTOCOL_GSM = 4;
 const int PROTOCOL_REMOTE_IP = 6;
 const int PROTOCOL_BIP_TO_MSTP = 10;
@@ -226,10 +226,10 @@ const int READ_DIGITAL = 2;
 #define WM_COMMAND_WHO_IS  1
 #define MENU_CLICK			2
 
-const COLORREF LIST_ITEM_CHANGED_BKCOLOR = RGB(255,0,0);
+const COLORREF LIST_ITEM_CHANGED_BKCOLOR = RGB(255, 0, 0);
 const COLORREF LIST_ITEM_DEFAULT_BKCOLOR = GetSysColor(COLOR_WINDOW);
-const COLORREF LIST_ITEM_DEFAULT_BKCOLOR_GRAY = RGB(235,235,235);
-const COLORREF LIST_ITEM_SELECTED = RGB(150,150,200);
+const COLORREF LIST_ITEM_DEFAULT_BKCOLOR_GRAY = RGB(235, 235, 235);
+const COLORREF LIST_ITEM_SELECTED = RGB(150, 150, 200);
 
 const bool REFRESH_ON_ITEM = TRUE;
 
@@ -247,7 +247,7 @@ const int TYPE_INPUT = 1;
 const int TYPE_OUTPUT = 2;
 const int TYPE_PROGRAM = 3;
 const int TYPE_VARIABLE = 4;
-const int TYPE_WEEKLY =5;
+const int TYPE_WEEKLY = 5;
 const int TYPE_ANNUAL = 6;
 const int TYPE_CONTROLLER = 8;
 const int TYPE_SCREENS = 9;
@@ -319,13 +319,13 @@ const int BAC_RESULTS_OK = 1;
 const int BAC_RESULTS_FAIL = 0;
 
 const int BAC_UNITS_DIGITAL = 0;
-const int BAC_UNITS_ANALOG  = 1;
+const int BAC_UNITS_ANALOG = 1;
 
 const int BAC_AUTO = 0;
 const int BAC_MANUAL = 1;
 
 const int BAC_DECOM_YES = 0;
-const int BAC_DECOM_NO  = 1;
+const int BAC_DECOM_NO = 1;
 
 const int BAC_READ_GROUP_NUMBER = 4;
 
@@ -367,7 +367,7 @@ const int BAC_READ_SCREEN_REMAINDER = BAC_READ_SCREEN_GROUP_NUMBER - 1;
 const int BAC_READ_MONOTOR_REMAINDER = BAC_READ_MONITOR_GROUP_NUMBER - 1;
 const int BAC_READ_ALARMLOG_REMAINDER = BAC_READ_ALARMLOG_GROUP_NUMBER - 1;
 const int BAC_READ_TSTAT_REMAINDER = BAC_READ_TSTAT_GROUP_NUMBER - 1;
-const int BAC_READ_GRPHIC_LABEL_REMAINDER	= BAC_READ_GRPHIC_LABEL_GROUP_NUMBER - 1;
+const int BAC_READ_GRPHIC_LABEL_REMAINDER = BAC_READ_GRPHIC_LABEL_GROUP_NUMBER - 1;
 const int BAC_REMOTE_POINT_GROUP_REMAINDER = BAC_REMOTE_POINT_GROUP_NUMBER - 1;
 
 
@@ -410,8 +410,8 @@ const int BAC_EXTIO_COUNT = 12;
 
 
 
-const int BAC_INPUT_GROUP = (BAC_INPUT_ITEM_COUNT + BAC_READ_INPUT_GROUP_NUMBER - 1)  / BAC_READ_INPUT_GROUP_NUMBER;
-const int BAC_OUTPUT_GROUP = (BAC_OUTPUT_ITEM_COUNT + BAC_READ_OUTPUT_GROUP_NUMBER -1)  / BAC_READ_OUTPUT_GROUP_NUMBER;
+const int BAC_INPUT_GROUP = (BAC_INPUT_ITEM_COUNT + BAC_READ_INPUT_GROUP_NUMBER - 1) / BAC_READ_INPUT_GROUP_NUMBER;
+const int BAC_OUTPUT_GROUP = (BAC_OUTPUT_ITEM_COUNT + BAC_READ_OUTPUT_GROUP_NUMBER - 1) / BAC_READ_OUTPUT_GROUP_NUMBER;
 const int BAC_VARIABLE_GROUP = (BAC_VARIABLE_ITEM_COUNT + BAC_READ_VARIABLE_GROUP_NUMBER - 1) / BAC_READ_VARIABLE_GROUP_NUMBER;
 
 const int BAC_PROGRAM_GROUP = (BAC_PROGRAM_ITEM_COUNT + BAC_READ_PROGRAM_GROUP_NUMBER - 1) / BAC_READ_PROGRAM_GROUP_NUMBER;
@@ -426,14 +426,14 @@ const int BAC_TIME_COMMAND_GROUP = 1;
 const int BAC_BASIC_SETTING_GROUP = 1;
 const int BAC_VARIABLE_CUS_UNIT_GROUP = 1;
 const int BAC_HOLIDAYCODE_GROUP = BAC_ANNUAL_CODE_COUNT;
-const int BAC_SCREEN_GROUP = (BAC_SCREEN_COUNT + BAC_READ_SCREEN_GROUP_NUMBER -1) / BAC_READ_SCREEN_GROUP_NUMBER;
+const int BAC_SCREEN_GROUP = (BAC_SCREEN_COUNT + BAC_READ_SCREEN_GROUP_NUMBER - 1) / BAC_READ_SCREEN_GROUP_NUMBER;
 const int BAC_MONITOR_GROUP = (BAC_MONITOR_COUNT + BAC_READ_MONITOR_GROUP_NUMBER - 1) / BAC_READ_MONITOR_GROUP_NUMBER;
 const int BAC_CONNECT_WITH_DEVICE_GROUP = 1;
 const int BAC_ALARMLOG_GROUP = (BAC_ALARMLOG_COUNT + BAC_READ_ALARMLOG_GROUP_NUMBER - 1) / BAC_READ_ALARMLOG_GROUP_NUMBER;
 const int BAC_TSTAT_GROUP = (BAC_TSTAT_COUNT + BAC_READ_TSTAT_GROUP_NUMBER - 1) / BAC_READ_TSTAT_GROUP_NUMBER;
 const int BAC_CUSTOMER_UNIT_GROUP = (BAC_CUSTOMER_UNITS_COUNT + BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER - 1) / BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER;
 const int BAC_USER_LOGIN_GROUP = (BAC_USER_LOGIN_COUNT + BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER - 1) / BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER;
-const int BAC_GRPHIC_LABEL_GROUP = (BAC_GRPHIC_LABEL_COUNT + BAC_READ_GRPHIC_LABEL_GROUP_NUMBER - 1)/ BAC_READ_GRPHIC_LABEL_GROUP_NUMBER;
+const int BAC_GRPHIC_LABEL_GROUP = (BAC_GRPHIC_LABEL_COUNT + BAC_READ_GRPHIC_LABEL_GROUP_NUMBER - 1) / BAC_READ_GRPHIC_LABEL_GROUP_NUMBER;
 const int BAC_REMOTE_POINT_GROUP = (BAC_REMOTE_POINT_COUNT + BAC_REMOTE_POINT_GROUP_NUMBER - 1) / BAC_REMOTE_POINT_GROUP_NUMBER;
 
 const int BAC_SHOW_CONNECT_RESULTS = 1;
@@ -441,7 +441,7 @@ const int BAC_SHOW_MISSION_RESULTS = 3;
 
 const int BAC_LIST_REFRESH_TIME = 15000;//ms
 
-  
+
 const int SCHEDULE_TIME_NUM = 0;
 const int SCHEDULE_TIME_MONDAY = 1;
 const int SCHEDULE_TIME_TUESDAY = 2;
@@ -486,7 +486,7 @@ struct Client_Info
 	int object_instance;
 	int pannel_number;
 	unsigned char protocol;
-	
+
 };
 
 struct _Resend_Read_Info
@@ -536,7 +536,7 @@ struct refresh_net_label_info
 	unsigned int serial_number;
 };
 
-struct _Refresh_Info 
+struct _Refresh_Info
 {
 	_Resend_Read_Info Read_Variable_Info[BAC_VARIABLE_GROUP];
 	_Resend_Read_Info Read_Input_Info[BAC_INPUT_GROUP];
@@ -561,7 +561,7 @@ struct _Refresh_Info
 	_Resend_Read_Info Read_Remote_Point_Info[BAC_REMOTE_POINT_GROUP];
 };
 
-struct _Refresh_Write_Info 
+struct _Refresh_Write_Info
 {
 	_Resend_Read_Info Write_Variable_Info[BAC_VARIABLE_GROUP];
 	_Resend_Read_Info Write_Input_Info[BAC_INPUT_GROUP];
@@ -637,29 +637,29 @@ const int UNITS_TYPE_CUSTOM = 2;
 const int INPUT_ANOLAG_UNITE_COUNT = 19;
 const int VARIABLE_ANALOG_UNITE_COUNT = 34;
 
-const CString ExtIO_Product[] = 
+const CString ExtIO_Product[] =
 {
 	_T("T3_8AI8AO6DO"),
 	_T("T3_22I")
 };
-const int ExtIO_ProductId[] = 
+const int ExtIO_ProductId[] =
 {
 	44,
 	43
 };
 
-const int ExtIO_INPUT_COUNT[] = 
+const int ExtIO_INPUT_COUNT[] =
 {
 	8,
 	22
 };
-const int ExtIO_OUTPUT_COUNT[] = 
+const int ExtIO_OUTPUT_COUNT[] =
 {
 	14,
 	0
 };
 
-const CString ExtIO_Port[] = 
+const CString ExtIO_Port[] =
 {
 	_T("RS485 Sub"),
 	_T("Zigbee"),
@@ -667,14 +667,14 @@ const CString ExtIO_Port[] =
 };
 
 
-const CString Units_Type[]=
+const CString Units_Type[] =
 {
 	_T("Analog"),
 	_T("Digital")
 	//_T("Custom dig")
 };
 
-const CString PID_Time_Type[]=
+const CString PID_Time_Type[] =
 {
 	_T("Hour"),
 	_T("Min")
@@ -684,19 +684,19 @@ const CString PID_Time_Type[]=
 const CString Units_Analog_Only = _T("Analog");
 const CString Units_Digital_Only = _T("Digital");
 
-const CString Yes_No[] = 
+const CString Yes_No[] =
 {
 	_T("NO"),
 	_T("YES")
 };
 
-const CString ACK_UNACK[] = 
+const CString ACK_UNACK[] =
 {
 	_T(""),
 	_T("ACK")
 };
 
-const CString Digital_Units_Array[] = 
+const CString Digital_Units_Array[] =
 {
 	_T("Unused"),
 	_T("Off/On"),
@@ -728,7 +728,7 @@ const CString Digital_Units_Array[] =
 //	_T("")
 //};
 
-const CString Output_Analog_Units_Show[] = 
+const CString Output_Analog_Units_Show[] =
 {
 	_T(""),
 	_T("Volts"),
@@ -736,7 +736,7 @@ const CString Output_Analog_Units_Show[] =
 	_T("psi"),
 	_T("%"),
 	_T("%Cls"),
-	_T("ma"),	
+	_T("ma"),
 };
 
 const CString OutPut_List_Analog_Range[] =
@@ -766,93 +766,99 @@ const CString OutPut_List_Analog_Units[] =
 const CString Input_List_Analog_Units[] =
 {
 	_T(""),
-	 _T("Deg.C"),
-	 _T("Deg.F"),
-	 _T("Deg.C"),
-	 _T("Deg.F"),
-	 _T("Deg.C"),
-	 _T("Deg.F"),
-	 _T("Deg.C"),
-	 _T("Deg.F"),
-	 _T("Deg.C"),
-	 _T("Deg.F"),
-	 _T("Volts"),
-	 _T("Amps"),
-	 _T("ma"),
-	 _T("psi"),
-	 _T("counts"),
-	 _T("FPM"),
-	 _T("%(0-5V)"),
-	 _T("%(4-20ma)"),
-	 _T("Volts"),
-	 _T(""),
-	 _T(""),
-	 _T(""),
-	 _T(""),
-	 _T(""),
-	 _T("counts"),
-	 _T("HZ"),
+	_T("Deg.C"),
+	_T("Deg.F"),
+	_T("Deg.C"),
+	_T("Deg.F"),
+	_T("Deg.C"),
+	_T("Deg.F"),
+	_T("Deg.C"),
+	_T("Deg.F"),
+	_T("Deg.C"),
+	_T("Deg.F"),
+	_T("Volts"),
+	_T("Amps"),
+	_T("ma"),
+	_T("psi"),
+	_T("counts"),
+	_T("FPM"),
+	_T("%(0-5V)"),
+	_T("%(4-20ma)"),
+	_T("Volts"),
+	_T(""),
+	_T(""),
+	_T(""),
+	_T(""),
+	_T(""),
+	_T("counts"),
+	_T("HZ"),
 
-	 _T("%"),
-	 _T("PPM"),
-	 _T("inWc"),
-	 _T("Kpa"),
-	 _T("Psi"),
-	 _T("mmHg"),
-	 _T("inHg"),
-	 _T("Kgcm"),
-	 _T("atmos"),
-	 _T("bar"),
-	 _T(" "),
-	 _T(" "),
-	 _T(" ")
+	_T("%"),
+	_T("PPM"),
+	_T("inWc"),
+	_T("Kpa"),
+	_T("Psi"),
+	_T("mmHg"),
+	_T("inHg"),
+	_T("Kgcm"),
+	_T("atmos"),
+	_T("bar"),
+	_T(" "),
+	_T(" "),
+	_T(" "),
+	_T("Amps"),
+	_T("Amps"),
+	_T("Amps")
 };
 
 const CString Input_Analog_Units_Array[] =
 {
-	 _T("Unused"),
-	 _T("Y3K -40 to 150"),
-	 _T("Y3K -40 to 300"),
-	 _T("10K -40 to 120"),
-	 _T("10K -40 to 250"),
-	 _T("G3K -40 to 120"),
-	 _T("G3K -40 to 250"),
-	 _T("KM10K -40 to 120"),
-	 _T("KM10K -40 to 250"),
-	 _T("A10K -50 to 110"),
-	 _T("A10K -60 to 200"),
-	 _T("0.0 to 5.0"),
-	 _T("0.0 to 100"),
-	 _T("0.0 to 20"),
-	 _T("0.0 to 20"),
-	 _T("Pulse Count (Slow 1Hz)"),
-	 _T("0.0 to 3000"),
-	 _T("0 to 100"),
-	 _T("0 to 100"),
-	  _T("0.0 to 10.0"),
-	  _T("Table 1"),
-	  _T("Table 2"),
-	  _T("Table 3"),
-	  _T("Table 4"),
-	  _T("Table 5"),
-	  _T("Pulse Count (Fast 100Hz)"),
-	  _T("Frequency"),
-	  _T("Humidty %"),
-	  _T("CO2  PPM"),
-	  _T("Pressure   inWc"),
-	  _T("Pressure   Kpa"),
-	  _T("Pressure   Psi"),
-	  _T("Pressure   mmHg"),
-	  _T("Pressure   inHg"),
-	  _T("Pressure   Kgcm"),
-	  _T("Pressure   atmos"),
-	  _T("Pressure   bar"),
-	  _T("Reserved"),
-	  _T("Reserved"),
-	  _T("Reserved")
+	_T("Unused"),
+	_T("Y3K -40 to 150"),
+	_T("Y3K -40 to 300"),
+	_T("10K -40 to 120"),
+	_T("10K -40 to 250"),
+	_T("G3K -40 to 120"),
+	_T("G3K -40 to 250"),
+	_T("KM10K -40 to 120"),
+	_T("KM10K -40 to 250"),
+	_T("A10K -50 to 110"),
+	_T("A10K -60 to 200"),
+	_T("0.0 to 5.0"),
+	_T("0.0 to 100"),
+	_T("0.0 to 20"),
+	_T("0.0 to 20"),
+	_T("Pulse Count (Slow 1Hz)"),
+	_T("0.0 to 3000"),
+	_T("0 to 100"),
+	_T("0 to 100"),
+	_T("0.0 to 10.0"),
+	_T("Table 1"),
+	_T("Table 2"),
+	_T("Table 3"),
+	_T("Table 4"),
+	_T("Table 5"),
+	_T("Pulse Count (Fast 100Hz)"),
+	_T("Frequency"),
+	_T("Humidty %"),
+	_T("CO2  PPM"),
+	_T("Pressure   inWc"),
+	_T("Pressure   Kpa"),
+	_T("Pressure   Psi"),
+	_T("Pressure   mmHg"),
+	_T("Pressure   inHg"),
+	_T("Pressure   Kgcm"),
+	_T("Pressure   atmos"),
+	_T("Pressure   bar"),
+	_T("Reserved"),
+	_T("Reserved"),
+	_T("Reserved"),
+	_T("20Amps"),
+	_T("50Amps"),
+	_T("75Amps"),
 };
 
-const CString Output_Analog_Units_Array[] = 
+const CString Output_Analog_Units_Array[] =
 {
 	_T("Unused"),
 	_T("0.0 -> 10   Volts"),
@@ -869,7 +875,7 @@ const CString Time_Server_Name[] =
 	_T("ntp.sjtu.edu.cn"),
 	_T("time.nist.gov"),
 	_T("time.windows.com")
-	
+
 };
 
 const signed short Time_Zone_Value[] =
@@ -952,10 +958,10 @@ const CString Device_Serial_Port_Status[] =
 	_T("Modbus Master"),
 	_T("MSTP Master"),
 	_T("RS232 Meter")
-	
+
 };
 
-const CString Variable_Analog_Units_Array[] = 
+const CString Variable_Analog_Units_Array[] =
 {
 	_T("Unused"),
 	_T("Deg.C"),
@@ -1018,7 +1024,7 @@ const int WINDOW_WEEKLY = 6;
 const int WINDOW_ANNUAL = 7;
 const int WINDOW_MONITOR = 8;
 const int WINDOW_ALARMLOG = 9;
-const int WINDOW_TSTAT	= 10;
+const int WINDOW_TSTAT = 10;
 const int WINDOW_SETTING = 11;
 const int WINDOW_USER_LOGIN = 12;
 const int WINDOW_REMOTE_POINT = 13;
@@ -1029,11 +1035,11 @@ const int KEY_INSERT = 1020;
 
 
 typedef enum
-{		
+{
 	PRODUCT_CM5 = 0,						//10A + 8 D			//10D									   //IN				//OUT	
 	BIG_MINIPANEL = 1,						//32 A				//12D   12A
 	SMALL_MINIPANEL = 2,		//16 A				//6 D	4 A
-	TINY_MINIPANEL = 3,	
+	TINY_MINIPANEL = 3,
 	TINY_EX_MINIPANEL = 4,
 	MINIPANELARM = 5,
 	MINIPANELARM_LB = 6,
@@ -1042,7 +1048,7 @@ typedef enum
 	T38AI8AO6DO = 44,
 	PID_T3PT12 = 46,
 	PID_T36CTA = 95,
-	
+
 };
 
 const int BIG_MINIPANEL_IN_A = 32;
@@ -1102,7 +1108,7 @@ const CString PANEL_SUBNET_NAME[] =
 	_T("RS485 Main")
 };
 
-const CString Baudrate_Array[] = 
+const CString Baudrate_Array[] =
 {
 	_T("1200"),
 	_T("2400"),
@@ -1136,8 +1142,8 @@ enum
 enum
 {
 	SCAN_STATUS_WAIT = 1,
-	SCAN_STATUS_RUNNING ,
-	SCAN_STATUS_FINISHED ,
+	SCAN_STATUS_RUNNING,
+	SCAN_STATUS_FINISHED,
 	SCAN_STATUS_FAILED,
 	SCAN_STATUS_SKIP
 };
@@ -1191,7 +1197,7 @@ const int LABEL_ICON_VALUE = 3;
 const int LABEL_ICON_FULL_DESCRIPTION = 4;
 const int LABEL_ICON_LABEL = 5;
 const int LABEL_ICON_SHOW_VALUE = 6;
-const CString Label_Display_Array[] = 
+const CString Label_Display_Array[] =
 {
 	_T("Value"),
 	_T("Full Description"),
@@ -1213,7 +1219,7 @@ const int LABEL_TEXT_LEFT = 1;
 const int  LABEL_TEXT_TOP = 2;
 const int  LABEL_TEXT_RIGHT = 3;
 
-const CString Label_Text_Place[] = 
+const CString Label_Text_Place[] =
 {
 	_T("Bottom"),
 	_T("Left"),
@@ -1232,7 +1238,7 @@ const int  LABEL_ICON_SMALL = 0;
 const int LABEL_ICON_NORMAL = 1;
 const int  LABEL_ICON_LARGE = 2;
 
-const CString Label_ICON_SIZE[] = 
+const CString Label_ICON_SIZE[] =
 {
 	_T("Small"),
 	_T("Normal"),
@@ -1265,7 +1271,7 @@ const int ENABLE_LABEL = 1;
 const int EMPTY_LABEL = 2;
 
 const int SCREEN_HOTKEY_COUNT = 9;
-const int m_screenHotKeyID[SCREEN_HOTKEY_COUNT] = 
+const int m_screenHotKeyID[SCREEN_HOTKEY_COUNT] =
 {
 	4001,
 	4002,
@@ -1278,7 +1284,7 @@ const int m_screenHotKeyID[SCREEN_HOTKEY_COUNT] =
 	4009
 };
 
-typedef map<int,CString> pidname_map;
+typedef map<int, CString> pidname_map;
 
 struct AddressMap
 {
@@ -1319,9 +1325,9 @@ const CString Building_Baudrate[] =
 {
 	_T("9600"),
 	_T("19200"),
-    _T("38400"),
-    _T("57600"),
-    _T("115200")
+	_T("38400"),
+	_T("57600"),
+	_T("115200")
 };
 
 #define  DEFAULT_PRG_TEXT_COLOR			RGB(0,0,255)
@@ -1331,7 +1337,7 @@ const CString Building_Baudrate[] =
 #define  DEFAULT_PRG_ERROR_LABEL_COLOR	RGB(255,0,0)
 
 
-const CString Program_Fonts[] = 
+const CString Program_Fonts[] =
 {
 	_T("Default"),
 	_T("Arial"),
@@ -1352,7 +1358,7 @@ const CString Program_Fonts[] =
 	_T("Arial Narrow")
 };
 
-const CString JumperStatus[]=
+const CString JumperStatus[] =
 {
 	_T("Thermistor Dry Contact"),
 	_T("4-20 ma"),//_T("4-20 ma / 0-24 V"),
@@ -1431,7 +1437,7 @@ const int TSTAT_INPUT_CUST_FIELD = 9;
 
 const int TSTAT_INPUT_COL_NUMBER = 10;
 
-const CString Input_Range_Array[7] = 
+const CString Input_Range_Array[7] =
 {
 	_T("Not Used"),
 	_T("10K(-40->120)"),
@@ -1457,57 +1463,57 @@ const CString Input_Filter_Array[8] =
 
 
 
-const CString Input_Unit[42]=
+const CString Input_Unit[42] =
 {
-	_T("Not Used"), 
+	_T("Not Used"),
 	_T("℃"),
-	_T("℉"), 
-	_T("FPM"), 
-	_T("Pa"), 
-	_T("KPa"), 
-	_T("psi"), 
-	_T("in_w"), 
-	_T("Watts"), 
-	_T("KW"), 
+	_T("℉"),
+	_T("FPM"),
+	_T("Pa"),
+	_T("KPa"),
+	_T("psi"),
+	_T("in_w"),
+	_T("Watts"),
+	_T("KW"),
 	_T("KWH"),
-	_T("Volt"), 
-	_T("KV"), 
-	_T("Amps"), 
-	_T("mA"), 
-	_T("CFM"), 
-	_T("Sec"), 
-	_T("Min"), 
-	_T("Hours"), 
-	_T("Days"), 
-	_T("time_unit"), 
+	_T("Volt"),
+	_T("KV"),
+	_T("Amps"),
+	_T("mA"),
+	_T("CFM"),
+	_T("Sec"),
+	_T("Min"),
+	_T("Hours"),
+	_T("Days"),
+	_T("time_unit"),
 	_T("ohms"),
-	_T("procent"), 
-	_T("RH"), 
-	_T("ppm"), 
-	_T("counts"), 
-	_T("Open"), 
-	_T("CFH"), 
-	_T("GPM"), 
-	_T("GPH"), 
-	_T("GAL"), 
-	_T("CF"), 
-	_T("BTU"), 
+	_T("procent"),
+	_T("RH"),
+	_T("ppm"),
+	_T("counts"),
+	_T("Open"),
+	_T("CFH"),
+	_T("GPM"),
+	_T("GPH"),
+	_T("GAL"),
+	_T("CF"),
+	_T("BTU"),
 	_T("CMH"),
-	_T("custom1"), 
-	_T("custom2"), 
-	_T("custom3"), 
-	_T("custom4"), 
-	_T("custom5"), 
-	_T("custom6"), 
-	_T("custom7"), 
+	_T("custom1"),
+	_T("custom2"),
+	_T("custom3"),
+	_T("custom4"),
+	_T("custom5"),
+	_T("custom6"),
+	_T("custom7"),
 	_T("custom8")
 };
 
-const CString Input_Unit_Digit[2]=
-{ 
+const CString Input_Unit_Digit[2] =
+{
 	_T("Not Used"),
 	_T("ON/OFF")
-} ;
+};
 
 
 
@@ -1524,15 +1530,15 @@ const CString Decom_Array[3] =
 
 
 #pragma region ExtIO
-const int EXTIO_NUM					= 0;
-const int EXTIO_HARDWARE			= 1;
-const int EXTIO_PORT				= 2;
-const int EXTIO_ID					= 3;
-const int EXTIO_LAST_CONTACT		= 4;
-const int EXTIO_INPUTS_IO			= 5;
-const int EXTIO_OUTPUTS_IO			= 6;
+const int EXTIO_NUM = 0;
+const int EXTIO_HARDWARE = 1;
+const int EXTIO_PORT = 2;
+const int EXTIO_ID = 3;
+const int EXTIO_LAST_CONTACT = 4;
+const int EXTIO_INPUTS_IO = 5;
+const int EXTIO_OUTPUTS_IO = 6;
 
-const int EXTIO_COL_NUMBER  = 7;
+const int EXTIO_COL_NUMBER = 7;
 #pragma endregion ExtIO
 
 #pragma region OUTPUT_DEFINE
@@ -1643,22 +1649,22 @@ typedef struct
 
 
 const int LENGTH_MODBUS_SETTING = 200;
-const int LENGTH_MODBUS_OUTPUT = (45 + 1)/2 *  BAC_OUTPUT_ITEM_COUNT ;//  23*64;
-const int LENGTH_MODBUS_INPUT = (46 + 1) / 2  * BAC_INPUT_ITEM_COUNT;	 // 23 * 64;
+const int LENGTH_MODBUS_OUTPUT = (45 + 1) / 2 * BAC_OUTPUT_ITEM_COUNT;//  23*64;
+const int LENGTH_MODBUS_INPUT = (46 + 1) / 2 * BAC_INPUT_ITEM_COUNT;	 // 23 * 64;
 const int LENGTH_MODBUS_VARIABLE = (39 + 1) / 2 * BAC_VARIABLE_ITEM_COUNT; // 20 * 128;
-const int LENGTH_MODBUS_PRG = (37 + 1) /2 * BAC_PROGRAM_ITEM_COUNT; // 19 * 16
-const int LENGTH_MODBUS_SCHEDULE = (42 + 1) / 2  * BAC_SCHEDULE_COUNT; // 21 * 8;
-const int LENGTH_MODBUS_HOLIDAY =  (33 + 1) / 2 * BAC_HOLIDAY_COUNT;   //17 * 4
-const int LENGTH_MODBUS_PRG_CODE = 400 * 5 / 2 * BAC_PROGRAMCODE_ITEM_COUNT ; // 1000 * 16;
-const int LENGTH_MODBUS_SCHEDULE_CODE = WEEKLY_SCHEDULE_SIZE / 2 * BAC_WEEKLYCODE_ROUTINES_COUNT ; // 72 * 8;
-const int LENGTH_MODBUS_HOLIDAY_CODE = ANNUAL_CODE_SIZE /2 ;
+const int LENGTH_MODBUS_PRG = (37 + 1) / 2 * BAC_PROGRAM_ITEM_COUNT; // 19 * 16
+const int LENGTH_MODBUS_SCHEDULE = (42 + 1) / 2 * BAC_SCHEDULE_COUNT; // 21 * 8;
+const int LENGTH_MODBUS_HOLIDAY = (33 + 1) / 2 * BAC_HOLIDAY_COUNT;   //17 * 4
+const int LENGTH_MODBUS_PRG_CODE = 400 * 5 / 2 * BAC_PROGRAMCODE_ITEM_COUNT; // 1000 * 16;
+const int LENGTH_MODBUS_SCHEDULE_CODE = WEEKLY_SCHEDULE_SIZE / 2 * BAC_WEEKLYCODE_ROUTINES_COUNT; // 72 * 8;
+const int LENGTH_MODBUS_HOLIDAY_CODE = ANNUAL_CODE_SIZE / 2;
 
 
 //以下是 bacnet 寄存器 映射到modbus的位置;
-const int REG_SETTING_START_ADDRESS  = BAC_SETTING_START_REG;
+const int REG_SETTING_START_ADDRESS = BAC_SETTING_START_REG;
 const int REG_OUTPUT_START_ADDRESS = REG_SETTING_START_ADDRESS + LENGTH_MODBUS_SETTING; //10000
 const int REG_INPUT_START_ADDRESS = REG_OUTPUT_START_ADDRESS + LENGTH_MODBUS_OUTPUT;	//11472
-const int REG_VARIABLE_START_ADDRESS  = REG_INPUT_START_ADDRESS + LENGTH_MODBUS_INPUT;	//12944
+const int REG_VARIABLE_START_ADDRESS = REG_INPUT_START_ADDRESS + LENGTH_MODBUS_INPUT;	//12944
 const int REG_PRG_START_ADDRESS = REG_VARIABLE_START_ADDRESS + LENGTH_MODBUS_VARIABLE;  //15504
 const int REG_SCHEDULE_START_ADDRESS = REG_PRG_START_ADDRESS + LENGTH_MODBUS_PRG;		//15808
 
@@ -1710,7 +1716,7 @@ const int REG_SCHEDULE_START_ADDRESS = REG_PRG_START_ADDRESS + LENGTH_MODBUS_PRG
 #define BLACK_PC_GROUND_HEIGHT     BLACK_GROUND_HEIGHT
 
 
-//从机 发起的 FF 55 后面的 请求位;
+																						//从机 发起的 FF 55 后面的 请求位;
 typedef enum
 {
 	SEND_MINIPANEL_INFO = 1,
@@ -1753,7 +1759,7 @@ typedef struct
 
 
 
-const int day_of_month[] = 
+const int day_of_month[] =
 {
 	31,
 	29,
@@ -1771,18 +1777,18 @@ const int day_of_month[] =
 
 const int day_in_this_year[] =
 {
-	0,       
+	0,
 	day_of_month[0],
 	day_of_month[0] + day_of_month[1],
 	day_of_month[0] + day_of_month[1] + day_of_month[2],
-	day_of_month[0] + day_of_month[1] + day_of_month[2] +day_of_month[3],
-	day_of_month[0] + day_of_month[1] + day_of_month[2] +day_of_month[3] + +day_of_month[4],
-	day_of_month[0] + day_of_month[1] + day_of_month[2] +day_of_month[3] + +day_of_month[4] + day_of_month[5],
-	day_of_month[0] + day_of_month[1] + day_of_month[2] +day_of_month[3] + +day_of_month[4] + day_of_month[5] + day_of_month[6],
-	day_of_month[0] + day_of_month[1] + day_of_month[2] +day_of_month[3] + +day_of_month[4] + day_of_month[5] + day_of_month[6] + day_of_month[7],
-	day_of_month[0] + day_of_month[1] + day_of_month[2] +day_of_month[3] + +day_of_month[4] + day_of_month[5] + day_of_month[6] + day_of_month[7] + day_of_month[8] ,
-	day_of_month[0] + day_of_month[1] + day_of_month[2] +day_of_month[3] + +day_of_month[4] + day_of_month[5] + day_of_month[6] + day_of_month[7] + day_of_month[8] + day_of_month[9],
-	day_of_month[0] + day_of_month[1] + day_of_month[2] +day_of_month[3] + +day_of_month[4] + day_of_month[5] + day_of_month[6] + day_of_month[7] + day_of_month[8] + day_of_month[9] + day_of_month[10],
+	day_of_month[0] + day_of_month[1] + day_of_month[2] + day_of_month[3],
+	day_of_month[0] + day_of_month[1] + day_of_month[2] + day_of_month[3] + +day_of_month[4],
+	day_of_month[0] + day_of_month[1] + day_of_month[2] + day_of_month[3] + +day_of_month[4] + day_of_month[5],
+	day_of_month[0] + day_of_month[1] + day_of_month[2] + day_of_month[3] + +day_of_month[4] + day_of_month[5] + day_of_month[6],
+	day_of_month[0] + day_of_month[1] + day_of_month[2] + day_of_month[3] + +day_of_month[4] + day_of_month[5] + day_of_month[6] + day_of_month[7],
+	day_of_month[0] + day_of_month[1] + day_of_month[2] + day_of_month[3] + +day_of_month[4] + day_of_month[5] + day_of_month[6] + day_of_month[7] + day_of_month[8] ,
+	day_of_month[0] + day_of_month[1] + day_of_month[2] + day_of_month[3] + +day_of_month[4] + day_of_month[5] + day_of_month[6] + day_of_month[7] + day_of_month[8] + day_of_month[9],
+	day_of_month[0] + day_of_month[1] + day_of_month[2] + day_of_month[3] + +day_of_month[4] + day_of_month[5] + day_of_month[6] + day_of_month[7] + day_of_month[8] + day_of_month[9] + day_of_month[10],
 };
 
 
@@ -1807,7 +1813,7 @@ struct stLoginMessage
 typedef union
 {
 	unsigned char all_data[T3000_CONNECT_LENGTH];
-	struct  
+	struct
 	{
 		unsigned int m_serial_number; //T3000想要连接的 序列号;
 		stLoginMessage login_message;
@@ -1822,25 +1828,25 @@ typedef union
 
 #pragma pack(pop)//恢复对齐状态 
 
-enum PTP_COMMAND_TYPE{
-	COMMAND_RECEIVE_HEART_BEAT				= 0x01,
-	COMMAND_RECEIVE_SERIAL					= 0x02,
-	COMMAND_REPLY_DEVICE_INFO				= 0x03,
-	COMMAND_REPLY_T3000_INFO				= 0x04,
-	COMMAND_T3000_REQUEST					= 0x05,
-	COMMAND_DEVICE_SEND_SERIAL_TO_SERVER	= 0x06,
-	COMMAND_DEVICE_SEND_HEART_BEAT_TO_SERVER= 0x07,
-	COMMAND_T3000_SEND_TO_DEVICE_MAKEHOLE   = 0x08,
-	COMMAND_DEVICE_SEND_TO_T3000_MAKEHOLE   = 0x09,
-	COMMAND_MINI_SEDN_T3000_DONE			= 0x10,
-	COMMAND_T3000_KEYI_FA_MESSAGE			= 0x11,
-	COMMAND_T3000_HOLE_SUCCESS_OR_NOT		= 0x12,
-	COMMAND_REPLY_MK_HOLE_SUCCESS			= 0x13,
-	COMMAND_COMMUNICATION_VERSION_ERROR     = 0x64,
-	COMMAND_COMMAND_UNKNOWN					= 0x65,
-	COMMAND_DEVICE_NOT_CONNECT_ERROR		= 0x66,
-	COMMAND_DEVICE_NO_HEARTBEAT_ERROR		= 0x67,
-	COMMAND_PASSWORD_ERROR					= 0x68
+enum PTP_COMMAND_TYPE {
+	COMMAND_RECEIVE_HEART_BEAT = 0x01,
+	COMMAND_RECEIVE_SERIAL = 0x02,
+	COMMAND_REPLY_DEVICE_INFO = 0x03,
+	COMMAND_REPLY_T3000_INFO = 0x04,
+	COMMAND_T3000_REQUEST = 0x05,
+	COMMAND_DEVICE_SEND_SERIAL_TO_SERVER = 0x06,
+	COMMAND_DEVICE_SEND_HEART_BEAT_TO_SERVER = 0x07,
+	COMMAND_T3000_SEND_TO_DEVICE_MAKEHOLE = 0x08,
+	COMMAND_DEVICE_SEND_TO_T3000_MAKEHOLE = 0x09,
+	COMMAND_MINI_SEDN_T3000_DONE = 0x10,
+	COMMAND_T3000_KEYI_FA_MESSAGE = 0x11,
+	COMMAND_T3000_HOLE_SUCCESS_OR_NOT = 0x12,
+	COMMAND_REPLY_MK_HOLE_SUCCESS = 0x13,
+	COMMAND_COMMUNICATION_VERSION_ERROR = 0x64,
+	COMMAND_COMMAND_UNKNOWN = 0x65,
+	COMMAND_DEVICE_NOT_CONNECT_ERROR = 0x66,
+	COMMAND_DEVICE_NO_HEARTBEAT_ERROR = 0x67,
+	COMMAND_PASSWORD_ERROR = 0x68
 };
 
 typedef struct IspModeInfo
@@ -1856,8 +1862,8 @@ typedef struct IspModeInfo
 typedef union
 {
 	uint8_t all[400];
-	struct 
-	{  
+	struct
+	{
 		UCHAR command;
 		UCHAR command_reserve;
 		UCHAR length;
@@ -1899,7 +1905,7 @@ typedef union
 }Str_UPD_SCAN;
 
 
-const int REFRESH_LIST_NOW  = 2000;
+const int REFRESH_LIST_NOW = 2000;
 
 const CString DEFAULT_ICON = _T("Default.icon");
 

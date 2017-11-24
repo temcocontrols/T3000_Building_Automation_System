@@ -3995,7 +3995,10 @@ BOOL CTStatScanner::IsNetDevice(const CString& strDevType)
             || nDeviceType == PM_MINIPANEL
 		|| nDeviceType == PM_MINIPANEL_ARM
             || nDeviceType == PM_CM5
-			|| nDeviceType == STM32_CO2_NET)
+			|| nDeviceType == STM32_CO2_NET
+		|| nDeviceType == STM32_HUM_NET
+		|| nDeviceType == STM32_PRESSURE_NET
+		|| nDeviceType == STM32_CO2_NODE)
     {
         return TRUE;
     }

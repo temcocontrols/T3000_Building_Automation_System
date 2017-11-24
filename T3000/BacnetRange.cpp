@@ -108,7 +108,7 @@ BOOL BacnetRange::OnInitDialog()
 			((CButton *)GetDlgItem(i))->EnableWindow(FALSE);
 		}
 
-		for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
+		for (int i = IDC_RADIO101;i <= IDC_RADIO116;i++)
 		{
 			((CButton *)GetDlgItem(i))->EnableWindow(FALSE);
 		}
@@ -331,7 +331,7 @@ void BacnetRange::Initial_static()
 			GetDlgItem(i)->ShowWindow(false);
 		}
 
-		for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
+		for (int i = IDC_RADIO101;i <= IDC_RADIO116;i++)
 		{
 			GetDlgItem(i)->ShowWindow(false);
 		}
@@ -463,7 +463,7 @@ void BacnetRange::Initial_static()
 			GetDlgItem(i)->ShowWindow(false);
 		}
 
-		for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
+		for (int i = IDC_RADIO101;i <= IDC_RADIO116;i++)
 		{
 			GetDlgItem(i)->ShowWindow(false);
 		}
@@ -585,7 +585,7 @@ void BacnetRange::Initial_static()
 			((CButton *)GetDlgItem(i))->ShowWindow(1);
 		}
 
-		for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
+		for (int i = IDC_RADIO101;i <= IDC_RADIO116;i++)
 		{
 			CRect c1;
 			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
@@ -836,7 +836,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 				break;
 
 
-			if(((nfocusid >= IDC_RADIO54) && (nfocusid <= IDC_RADIO72)) || ((nfocusid >= IDC_RADIO81) && (nfocusid <= IDC_RADIO88)) || ( (nfocusid>= IDC_RADIO101) && (nfocusid <= IDC_RADIO113)))
+			if(((nfocusid >= IDC_RADIO54) && (nfocusid <= IDC_RADIO72)) || ((nfocusid >= IDC_RADIO81) && (nfocusid <= IDC_RADIO88)) || ( (nfocusid>= IDC_RADIO101) && (nfocusid <= IDC_RADIO116)))
 			{
 				bac_ranges_type = INPUT_RANGE_ANALOG_TYPE;
 				click_radio = true;
@@ -964,7 +964,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 					}
 				}
 
-				for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
+				for (int i = IDC_RADIO101;i <= IDC_RADIO116;i++)
 				{
 					if (((CButton *)GetDlgItem(i))->GetCheck())
 					{
@@ -1186,7 +1186,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 							m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 							m_rang_pic.Invalidate(TRUE);
 						}
-						else if ((m_input_Analog_select >= 27) && (m_input_Analog_select <= 39))
+						else if ((m_input_Analog_select >= 27) && (m_input_Analog_select <= 42))
 						{
 							int temp_value;
 							temp_value = m_input_Analog_select - 27;
@@ -1213,14 +1213,16 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 						{
 							((CButton *)GetDlgItem(i))->SetCheck(false);
 						}
+						for (int i = IDC_RADIO73;i <= IDC_RADIO80;i++)
+						{
+							((CButton *)GetDlgItem(i))->SetCheck(false);
+						}
 						for (int i=IDC_RADIO89;i<=IDC_RADIO99;i++)
 						{
 							((CButton *)GetDlgItem(i))->SetCheck(false);
 						}
-						for (int i=IDC_RADIO73;i<=IDC_RADIO80;i++)
-						{
-							((CButton *)GetDlgItem(i))->SetCheck(false);
-						}
+						
+						
 					}
 				}
 				else if((bac_ranges_type == OUTPUT_RANGE_ANALOG_TYPE) || (initial_dialog == 3))
@@ -1340,7 +1342,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 							((CButton *)GetDlgItem(i))->SetCheck(false);
 						}
 
-						for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
+						for (int i = IDC_RADIO101;i <= IDC_RADIO116;i++)
 						{
 							((CButton *)GetDlgItem(i))->SetCheck(false);
 						}
@@ -1675,7 +1677,7 @@ void BacnetRange::Timer2_handle()
 				((CButton *)GetDlgItem(i))->SetCheck(false);
 			}
 
-			for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
+			for (int i = IDC_RADIO101;i <= IDC_RADIO116;i++)
 			{
 				((CButton *)GetDlgItem(i))->SetCheck(false);
 			}
@@ -1751,7 +1753,7 @@ void BacnetRange::Timer2_handle()
 
 			}
 		}
-		else if(sel_value <= 69)
+		else if(sel_value <= 72)
 		{
 			bac_ranges_type = INPUT_RANGE_ANALOG_TYPE;
 			for (int i=IDC_RADIO35;i<=IDC_RADIO46;i++)
@@ -1792,7 +1794,7 @@ void BacnetRange::Timer2_handle()
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
 			}
-			else if ((sel_value >= 57) && (sel_value <= 69))
+			else if ((sel_value >= 57) && (sel_value <= 72))
 			{
 				int temp_delt = 0;
 				temp_delt = sel_value - 57;
@@ -1826,7 +1828,7 @@ void BacnetRange::Timer2_handle()
 			{
 				((CButton *)GetDlgItem(i))->SetCheck(false);
 			}
-			for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
+			for (int i = IDC_RADIO101;i <= IDC_RADIO116;i++)
 			{
 				((CButton *)GetDlgItem(i))->SetCheck(false);
 			}
@@ -1849,7 +1851,7 @@ void BacnetRange::Timer2_handle()
 				delta_temp = sel_value - 50;
 				((CButton *)GetDlgItem(IDC_RADIO82 + delta_temp))->SetCheck(true);
 			}
-			else if ((sel_value >= 57) && (sel_value <= 69))
+			else if ((sel_value >= 57) && (sel_value <= 72))
 			{
 				int delta_temp = 0;
 				delta_temp = sel_value - 57;
