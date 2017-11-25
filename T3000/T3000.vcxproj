@@ -241,6 +241,7 @@
     <ClCompile Include="Flash_Multy.cpp" />
     <ClCompile Include="global_function.cpp" />
     <ClCompile Include="GraphicMode.cpp" />
+    <ClCompile Include="GroupScheduleDlg.cpp" />
     <ClCompile Include="HexFileParser.cpp" />
     <ClCompile Include="IONameConfig.cpp" />
     <ClCompile Include="ISPModeSlove.cpp" />
@@ -266,6 +267,7 @@
     <ClCompile Include="LoginDlg.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="ManageAccountDlg.cpp" />
+    <ClCompile Include="ModbusToBacnetRouterDlg.cpp" />
     <ClCompile Include="msflexgrid1.cpp" />
     <ClCompile Include="MySocket.cpp" />
     <ClCompile Include="NetworkControllView.cpp" />
@@ -581,11 +583,13 @@
     <ClInclude Include="global_function.h" />
     <ClInclude Include="global_struct.h" />
     <ClInclude Include="GraphicMode.h" />
+    <ClInclude Include="GroupScheduleDlg.h" />
     <ClInclude Include="HexFileParser.h" />
     <ClInclude Include="IONameConfig.h" />
     <ClInclude Include="ISPModeSlove.h" />
     <ClInclude Include="LanguageLocale.h" />
     <ClInclude Include="LCOutNameConfig.h" />
+    <ClInclude Include="ModbusToBacnetRouterDlg.h" />
     <ClInclude Include="Modbus_LIB.h" />
     <ClInclude Include="NewHumChamberView.h" />
     <ClInclude Include="NewTstatSchedulesDlg.h" />
@@ -630,6 +634,7 @@
     <ClInclude Include="TStatOutputView.h" />
     <ClInclude Include="TstatRangeDlg.h" />
     <ClInclude Include="TstatZigbeeLogic.h" />
+    <ClInclude Include="Tstat_HelpDoc.h" />
     <ClInclude Include="WeeklySchedule.h" />
     <ClInclude Include="AddBuilding.h" />
     <ClInclude Include="AfxMessageDialog.h" />

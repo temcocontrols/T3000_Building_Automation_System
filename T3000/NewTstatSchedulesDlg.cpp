@@ -16,10 +16,10 @@ IMPLEMENT_DYNAMIC(CNewTstatSchedulesDlg, CDialogEx)
 CNewTstatSchedulesDlg::CNewTstatSchedulesDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CNewTstatSchedulesDlg::IDD, pParent)
 {
-	 
-		m_curRow = 0;
-		m_curCol = 0;
-		memset(m_SchduleBuffer, 0xFF, 121);
+
+	m_curRow = 0;
+	m_curCol = 0;
+	memset(m_SchduleBuffer, 0xFF, 121);
 }
 
 CNewTstatSchedulesDlg::~CNewTstatSchedulesDlg()
@@ -39,14 +39,13 @@ void CNewTstatSchedulesDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CNewTstatSchedulesDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_INSERT, &CNewTstatSchedulesDlg::OnBnClickedButtonInsert)
 	ON_BN_CLICKED(IDC_BUTTON_DELETE, &CNewTstatSchedulesDlg::OnBnClickedButtonDelete)
-	ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_Input_Item)
+	ON_MESSAGE(WM_LIST_ITEM_CHANGED, Fresh_Input_Item)
 	ON_NOTIFY(NM_CLICK, IDC_LIST1, &CNewTstatSchedulesDlg::OnNMClickList1)
 	ON_NOTIFY(NM_KILLFOCUS, IDC_DATETIMEPICKER1_SCHEDUAL, &CNewTstatSchedulesDlg::OnNMKillfocusDatetimepicker1Schedual)
 	ON_BN_CLICKED(IDC_BUTTON_SCHEDULE_COPY_BTN, &CNewTstatSchedulesDlg::OnBnClickedButtonScheduleCopyBtn)
 	ON_BN_CLICKED(IDOK, &CNewTstatSchedulesDlg::OnBnClickedOk)
 	ON_BN_CLICKED(IDC_CHECK_ENABLE_SCHEDULE, &CNewTstatSchedulesDlg::OnBnClickedCheckEnableSchedule)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST1, &CNewTstatSchedulesDlg::OnNMDblclkList1)
-	ON_WM_HELPINFO()
 END_MESSAGE_MAP()
 
 
@@ -55,28 +54,41 @@ END_MESSAGE_MAP()
 
 int CNewTstatSchedulesDlg::GetEventNumber(int DayIndex)
 {
-	int RegNumber = DayIndex / 2;
-	int Position = DayIndex % 2;
-	std::bitset<8> RegBits(m_SchduleBuffer[96+RegNumber]);
-	
-	int eventNumber =4*RegBits[3* Position+2]+ 2 * RegBits[3*Position + 1] + RegBits[3*Position];
+	int RegNumber = DayIndex / 6;//2个事件占用一个寄存器
+	int Position = DayIndex % 6;//偶数位在后面，奇数高位
+	int int32value = m_SchduleBuffer[96 + 2 * RegNumber] + m_SchduleBuffer[96 + 2 * RegNumber + 1] * PowerFour(2, 16);
+	std::bitset<32> RegBits(int32value);
+	int eventNumber = 0;
+	if (Position<2)
+	{
+		eventNumber = 4 * RegBits[3 * Position + 2] + 2 * RegBits[3 * Position + 1] + RegBits[3 * Position];
+	}
+	else if (Position < 4)
+	{
+		eventNumber = 4 * RegBits[3 * Position + 4] + 2 * RegBits[3 * Position + 3] + RegBits[3 * Position + 2];
+	}
+	else
+	{
+		eventNumber = 4 * RegBits[3 * Position + 6] + 2 * RegBits[3 * Position + 5] + RegBits[3 * Position + 4];
+	}
+
 
 	return eventNumber;
 }
 void CNewTstatSchedulesDlg::LoadSheduleDataAndColor()
 {
-		
+
 	Read_Multi(g_tstat_id, m_SchduleBuffer, 813, 121, 5);
-	
-	for (int i=0;i<48;i++)
+
+	for (int i = 0;i<48;i++)
 	{
 		Schedule_Node SN;
 		WeeklyEvent[i].Day = i / 6;
-		if (m_SchduleBuffer[2 * i]>23|| m_SchduleBuffer[2 * i + 1]>59)
+		if (m_SchduleBuffer[2 * i]>23 || m_SchduleBuffer[2 * i + 1]>59)
 		{
 			continue;
 		}
-		if (m_SchduleBuffer[2*i] == 0 && m_SchduleBuffer[2 * i + 1]==0)
+		if (m_SchduleBuffer[2 * i] == 0 && m_SchduleBuffer[2 * i + 1] == 0)
 		{
 			continue;
 		}
@@ -88,7 +100,7 @@ void CNewTstatSchedulesDlg::LoadSheduleDataAndColor()
 		if (WeeklyEvent[i].Day == 0)
 		{
 			SN.Monday = WeeklyEvent[i].Event_Number;
-		} 
+		}
 		else if (WeeklyEvent[i].Day == 1)
 		{
 			SN.Tuesday = WeeklyEvent[i].Event_Number;
@@ -128,73 +140,73 @@ void CNewTstatSchedulesDlg::LoadSheduleDataAndColor()
 		if (it->Monday == 0 && index != 0)
 		{
 			COLORREF PreviousScheduleColor = GetItemColor(index - 1, 2);
-			 
+
 			it->Col_Monday = PreviousScheduleColor;
 		}
 
-		 
+
 
 		it->Col_Tuesday = m_COLScheduleMode[it->Tuesday];
 		if (it->Tuesday == 0 && index != 0)
 		{
 			COLORREF PreviousScheduleColor = GetItemColor(index - 1, 3);
-			 
+
 			it->Col_Tuesday = PreviousScheduleColor;
 		}
 
-		 
+
 
 		it->Col_Wednesday = m_COLScheduleMode[it->Wednesday];
 		if (it->Wednesday == 0 && index != 0)
 		{
 			COLORREF PreviousScheduleColor = GetItemColor(index - 1, 4);
-		 
+
 			it->Col_Wednesday = PreviousScheduleColor;
 		}
 
-		 
+
 
 		it->Col_Thursday = m_COLScheduleMode[it->Thursday];
 		if (it->Thursday == 0 && index != 0)
 		{
 			COLORREF PreviousScheduleColor = GetItemColor(index - 1, 5);
-			 
+
 			it->Col_Thursday = PreviousScheduleColor;
 		}
 
-	 
+
 		it->Col_Friday = m_COLScheduleMode[it->Friday];
 		if (it->Friday == 0 && index != 0)
 		{
 			COLORREF PreviousScheduleColor = GetItemColor(index - 1, 6);
-			 
+
 			it->Col_Friday = PreviousScheduleColor;
 		}
 
-	 
+
 
 		it->Col_Saturday = m_COLScheduleMode[it->Saturday];
 		if (it->Saturday == 0 && index != 0)
 		{
 			COLORREF PreviousScheduleColor = GetItemColor(index - 1, 7);
-			 
+
 			it->Col_Saturday = PreviousScheduleColor;
 		}
 
-	 
+
 		it->Col_Sunday = m_COLScheduleMode[it->Sunday];
 		if (it->Sunday == 0 && index != 0)
 		{
 			COLORREF PreviousScheduleColor = GetItemColor(index - 1, 8);
-			 
+
 			it->Col_Sunday = PreviousScheduleColor;
 		}
- 
+
 		it->Col_Holiday = m_COLScheduleMode[it->Holiday];
 		if (it->Holiday == 0 && index != 0)
 		{
 			COLORREF PreviousScheduleColor = GetItemColor(index - 1, 9);
-		 
+
 			it->Col_Holiday = PreviousScheduleColor;
 		}
 
@@ -208,11 +220,11 @@ void CNewTstatSchedulesDlg::LoadSheduleDataAndColor()
 BOOL CNewTstatSchedulesDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-	m_strScheduleMode[0]=L"";
-	m_strScheduleMode[1]=L"Home";
-	m_strScheduleMode[2]=L"Work";
-	m_strScheduleMode[3]=L"Sleep";
-	m_strScheduleMode[4]=L"Away";
+	m_strScheduleMode[0] = L"";
+	m_strScheduleMode[1] = L"Home";
+	m_strScheduleMode[2] = L"Work";
+	m_strScheduleMode[3] = L"Sleep";
+	m_strScheduleMode[4] = L"Away";
 
 	m_COLScheduleMode[0] = RGB(238, 44, 44);
 	m_COLScheduleMode[1] = RGB(153, 50, 204);
@@ -221,9 +233,9 @@ BOOL CNewTstatSchedulesDlg::OnInitDialog()
 	m_COLScheduleMode[4] = RGB(60, 179, 113);
 
 	LoadSheduleDataAndColor();
-	WeeeklyList.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
+	WeeeklyList.ModifyStyle(0, LVS_SINGLESEL | LVS_REPORT | LVS_SHOWSELALWAYS);
 	//m_input_list.SetExtendedStyle(m_input_list.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
-	WeeeklyList.SetExtendedStyle(WeeeklyList.GetExtendedStyle() |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
+	WeeeklyList.SetExtendedStyle(WeeeklyList.GetExtendedStyle() | LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
 	WeeeklyList.InsertColumn(0, _T("Item"), 40, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
 	WeeeklyList.InsertColumn(1, _T("Time"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
 	WeeeklyList.InsertColumn(2, _T("Monday"), 80, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
@@ -234,11 +246,11 @@ BOOL CNewTstatSchedulesDlg::OnInitDialog()
 	WeeeklyList.InsertColumn(7, _T("Saturday"), 80, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	WeeeklyList.InsertColumn(8, _T("Sunday"), 80, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	WeeeklyList.InsertColumn(9, _T("Holiday"), 80, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	WeeeklyList.SetBkColor(RGB(205,201,201)) ;
-	
-	 
+	WeeeklyList.SetBkColor(RGB(205, 201, 201));
+
+
 	g_hwnd_now = this->m_hWnd;
-	
+
 	ListCtrlEx::CStrList strlist;
 	strlist.clear();
 	strlist.push_back(L"");
@@ -247,60 +259,60 @@ BOOL CNewTstatSchedulesDlg::OnInitDialog()
 	strlist.push_back(L"Sleep");
 	strlist.push_back(L"Away");
 	list<Schedule_Node>::iterator it;
-	int index=0;
-	for (it = m_ScheduleList.begin();it!=m_ScheduleList.end();++it)
+	int index = 0;
+	for (it = m_ScheduleList.begin();it != m_ScheduleList.end();++it)
 	{
-		 
-		 
+
+
 		CString strTime;
-		int Item=index+1;
-		strTime.Format(_T("%d"),Item);
-		WeeeklyList.InsertItem(index,strTime);
-		strTime.Format(_T("%02d:%02d"),it->Hour,it->Minite);
-		WeeeklyList.SetItemBkColor(index,0,RGB(255,255,255),0);
-		WeeeklyList.SetItemText(index,1,strTime);
-		WeeeklyList.SetItemBkColor(index,1,RGB(255,255,255),0);
+		int Item = index + 1;
+		strTime.Format(_T("%d"), Item);
+		WeeeklyList.InsertItem(index, strTime);
+		strTime.Format(_T("%02d:%02d"), it->Hour, it->Minite);
+		WeeeklyList.SetItemBkColor(index, 0, RGB(255, 255, 255), 0);
+		WeeeklyList.SetItemText(index, 1, strTime);
+		WeeeklyList.SetItemBkColor(index, 1, RGB(255, 255, 255), 0);
 		WeeeklyList.SetWhetherShowBkCol(false);
 		//设置Combox
 		for (int col = 2;col<10;col++)
 		{
 			WeeeklyList.SetCellStringList(index, col, strlist);
 		}
-		WeeeklyList.SetItemText(index,2,m_strScheduleMode[it->Monday]);
-		WeeeklyList.SetItemBkColor(index,2,it->Col_Monday,0);
-		WeeeklyList.SetItemText(index,3,m_strScheduleMode[it->Tuesday]);
-		WeeeklyList.SetItemBkColor(index,3,it->Col_Tuesday,0);
-		WeeeklyList.SetItemText(index,4,m_strScheduleMode[it->Wednesday]);
-		WeeeklyList.SetItemBkColor(index,4,it->Col_Wednesday,0);
-		WeeeklyList.SetItemText(index,5,m_strScheduleMode[it->Thursday]);
-		WeeeklyList.SetItemBkColor(index,5,it->Col_Thursday,0);
-		WeeeklyList.SetItemText(index,6,m_strScheduleMode[it->Friday]);
-		WeeeklyList.SetItemBkColor(index,6,it->Col_Friday,0);
-		WeeeklyList.SetItemText(index,7,m_strScheduleMode[it->Saturday]);
-		WeeeklyList.SetItemBkColor(index,7,it->Col_Saturday,0);
-		WeeeklyList.SetItemText(index,8,m_strScheduleMode[it->Sunday]);
-		WeeeklyList.SetItemBkColor(index,8,it->Col_Sunday,0);
+		WeeeklyList.SetItemText(index, 2, m_strScheduleMode[it->Monday]);
+		WeeeklyList.SetItemBkColor(index, 2, it->Col_Monday, 0);
+		WeeeklyList.SetItemText(index, 3, m_strScheduleMode[it->Tuesday]);
+		WeeeklyList.SetItemBkColor(index, 3, it->Col_Tuesday, 0);
+		WeeeklyList.SetItemText(index, 4, m_strScheduleMode[it->Wednesday]);
+		WeeeklyList.SetItemBkColor(index, 4, it->Col_Wednesday, 0);
+		WeeeklyList.SetItemText(index, 5, m_strScheduleMode[it->Thursday]);
+		WeeeklyList.SetItemBkColor(index, 5, it->Col_Thursday, 0);
+		WeeeklyList.SetItemText(index, 6, m_strScheduleMode[it->Friday]);
+		WeeeklyList.SetItemBkColor(index, 6, it->Col_Friday, 0);
+		WeeeklyList.SetItemText(index, 7, m_strScheduleMode[it->Saturday]);
+		WeeeklyList.SetItemBkColor(index, 7, it->Col_Saturday, 0);
+		WeeeklyList.SetItemText(index, 8, m_strScheduleMode[it->Sunday]);
+		WeeeklyList.SetItemBkColor(index, 8, it->Col_Sunday, 0);
 		WeeeklyList.SetItemText(index, 9, m_strScheduleMode[it->Holiday]);
 		WeeeklyList.SetItemBkColor(index, 9, it->Col_Holiday, 0);
 
 		index++;
-	 
+
 	}
-	
+
 	if (product_register_value[MODBUS_SCHEDULE_ON_OFF] == 1)
 	{
-		 
-			((CButton *)GetDlgItem(IDC_CHECK_ENABLE_SCHEDULE))->SetCheck(1);
+
+		((CButton *)GetDlgItem(IDC_CHECK_ENABLE_SCHEDULE))->SetCheck(1);
 	}
 	else
 	{
 
-		   ((CButton *)GetDlgItem(IDC_CHECK_ENABLE_SCHEDULE))->SetCheck(0);
+		((CButton *)GetDlgItem(IDC_CHECK_ENABLE_SCHEDULE))->SetCheck(0);
 	}
-	
+
 	WeeeklyList.GetFocus();
 	return FALSE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+				   // EXCEPTION: OCX Property Pages should return FALSE
 }
 void CNewTstatSchedulesDlg::Fresh_List()
 {
@@ -310,22 +322,23 @@ void CNewTstatSchedulesDlg::Fresh_List()
 	strlist.push_back(L"Home");
 	strlist.push_back(L"Work");
 	strlist.push_back(L"Sleep");
-	 
+	strlist.push_back(L"Away");
+
 	list<Schedule_Node>::iterator it;
-	int index=0;
-	for (it = m_ScheduleList.begin();it!=m_ScheduleList.end();++it)
+	int index = 0;
+	for (it = m_ScheduleList.begin();it != m_ScheduleList.end();++it)
 	{
 
 
 		CString strTime;
-		int Item=index+1;
-		strTime.Format(_T("%d"),Item);
-		WeeeklyList.SetItemText(index,0,strTime);
-		WeeeklyList.SetItemBkColor(index,0,RGB(255,255,255),0);
-		strTime.Format(_T("%02d:%02d"),it->Hour,it->Minite);
+		int Item = index + 1;
+		strTime.Format(_T("%d"), Item);
+		WeeeklyList.SetItemText(index, 0, strTime);
+		WeeeklyList.SetItemBkColor(index, 0, RGB(255, 255, 255), 0);
+		strTime.Format(_T("%02d:%02d"), it->Hour, it->Minite);
 		/*WeeeklyList.InsertItem(index++,L"");*/
-		WeeeklyList.SetItemText(index,1,strTime);
-		WeeeklyList.SetItemBkColor(index,1,RGB(255,255,255),0);
+		WeeeklyList.SetItemText(index, 1, strTime);
+		WeeeklyList.SetItemBkColor(index, 1, RGB(255, 255, 255), 0);
 		WeeeklyList.SetWhetherShowBkCol(false);
 		//设置Combox
 		for (int col = 2;col<10;col++)
@@ -333,78 +346,78 @@ void CNewTstatSchedulesDlg::Fresh_List()
 			WeeeklyList.SetCellStringList(index, col, strlist);
 
 		}
-		WeeeklyList.SetItemText(index,2,m_strScheduleMode[it->Monday]);
-		WeeeklyList.SetItemBkColor(index,2,m_COLScheduleMode[it->Monday],0);
+		WeeeklyList.SetItemText(index, 2, m_strScheduleMode[it->Monday]);
+		WeeeklyList.SetItemBkColor(index, 2, m_COLScheduleMode[it->Monday], 0);
 		it->Col_Monday = m_COLScheduleMode[it->Monday];
-		if (it->Monday == 0&&index!=0)
+		if (it->Monday == 0 && index != 0)
 		{
-			COLORREF PreviousScheduleColor=GetItemColor(index-1,2); 
-			WeeeklyList.SetItemBkColor(index,2,PreviousScheduleColor,0);
+			COLORREF PreviousScheduleColor = GetItemColor(index - 1, 2);
+			WeeeklyList.SetItemBkColor(index, 2, PreviousScheduleColor, 0);
 			it->Col_Monday = PreviousScheduleColor;
 		}
-		  
-		WeeeklyList.SetItemText(index,3,m_strScheduleMode[it->Tuesday]);
-		WeeeklyList.SetItemBkColor(index,3,m_COLScheduleMode[it->Tuesday],0);
-		
+
+		WeeeklyList.SetItemText(index, 3, m_strScheduleMode[it->Tuesday]);
+		WeeeklyList.SetItemBkColor(index, 3, m_COLScheduleMode[it->Tuesday], 0);
+
 		it->Col_Tuesday = m_COLScheduleMode[it->Tuesday];
-		if (it->Tuesday == 0&&index!=0)
+		if (it->Tuesday == 0 && index != 0)
 		{
-			COLORREF PreviousScheduleColor=GetItemColor(index-1,3); 
-			WeeeklyList.SetItemBkColor(index,3,PreviousScheduleColor,0);
+			COLORREF PreviousScheduleColor = GetItemColor(index - 1, 3);
+			WeeeklyList.SetItemBkColor(index, 3, PreviousScheduleColor, 0);
 			it->Col_Tuesday = PreviousScheduleColor;
 		}
 
-		WeeeklyList.SetItemText(index,4,m_strScheduleMode[it->Wednesday]);
-		WeeeklyList.SetItemBkColor(index,4,m_COLScheduleMode[it->Wednesday],0);
+		WeeeklyList.SetItemText(index, 4, m_strScheduleMode[it->Wednesday]);
+		WeeeklyList.SetItemBkColor(index, 4, m_COLScheduleMode[it->Wednesday], 0);
 
 		it->Col_Wednesday = m_COLScheduleMode[it->Wednesday];
-		if (it->Wednesday == 0&&index!=0)
+		if (it->Wednesday == 0 && index != 0)
 		{
-			COLORREF PreviousScheduleColor=GetItemColor(index-1,4); 
-			WeeeklyList.SetItemBkColor(index,4,PreviousScheduleColor,0);
+			COLORREF PreviousScheduleColor = GetItemColor(index - 1, 4);
+			WeeeklyList.SetItemBkColor(index, 4, PreviousScheduleColor, 0);
 			it->Col_Wednesday = PreviousScheduleColor;
 		}
 
-		WeeeklyList.SetItemText(index,5,m_strScheduleMode[it->Thursday]);
-		WeeeklyList.SetItemBkColor(index,5,m_COLScheduleMode[it->Thursday],0);
+		WeeeklyList.SetItemText(index, 5, m_strScheduleMode[it->Thursday]);
+		WeeeklyList.SetItemBkColor(index, 5, m_COLScheduleMode[it->Thursday], 0);
 
 		it->Col_Thursday = m_COLScheduleMode[it->Thursday];
-		if (it->Thursday == 0&&index!=0)
+		if (it->Thursday == 0 && index != 0)
 		{
-			COLORREF PreviousScheduleColor=GetItemColor(index-1,5); 
-			WeeeklyList.SetItemBkColor(index,5,PreviousScheduleColor,0);
+			COLORREF PreviousScheduleColor = GetItemColor(index - 1, 5);
+			WeeeklyList.SetItemBkColor(index, 5, PreviousScheduleColor, 0);
 			it->Col_Thursday = PreviousScheduleColor;
 		}
 
-		WeeeklyList.SetItemText(index,6,m_strScheduleMode[it->Friday]);
-		WeeeklyList.SetItemBkColor(index,6,m_COLScheduleMode[it->Friday],0);
+		WeeeklyList.SetItemText(index, 6, m_strScheduleMode[it->Friday]);
+		WeeeklyList.SetItemBkColor(index, 6, m_COLScheduleMode[it->Friday], 0);
 
 		it->Col_Friday = m_COLScheduleMode[it->Friday];
-		if (it->Friday == 0&&index!=0)
+		if (it->Friday == 0 && index != 0)
 		{
-			COLORREF PreviousScheduleColor=GetItemColor(index-1,6); 
-			WeeeklyList.SetItemBkColor(index,6,PreviousScheduleColor,0);
+			COLORREF PreviousScheduleColor = GetItemColor(index - 1, 6);
+			WeeeklyList.SetItemBkColor(index, 6, PreviousScheduleColor, 0);
 			it->Col_Friday = PreviousScheduleColor;
 		}
 
-		WeeeklyList.SetItemText(index,7,m_strScheduleMode[it->Saturday]);
-		WeeeklyList.SetItemBkColor(index,7,m_COLScheduleMode[it->Saturday],0);
+		WeeeklyList.SetItemText(index, 7, m_strScheduleMode[it->Saturday]);
+		WeeeklyList.SetItemBkColor(index, 7, m_COLScheduleMode[it->Saturday], 0);
 
 		it->Col_Saturday = m_COLScheduleMode[it->Saturday];
-		if (it->Saturday == 0&&index!=0)
+		if (it->Saturday == 0 && index != 0)
 		{
-			COLORREF PreviousScheduleColor=GetItemColor(index-1,7); 
-			WeeeklyList.SetItemBkColor(index,7,PreviousScheduleColor,0);
+			COLORREF PreviousScheduleColor = GetItemColor(index - 1, 7);
+			WeeeklyList.SetItemBkColor(index, 7, PreviousScheduleColor, 0);
 			it->Col_Saturday = PreviousScheduleColor;
 		}
 
-		WeeeklyList.SetItemText(index,8,m_strScheduleMode[it->Sunday]);
-		WeeeklyList.SetItemBkColor(index,8,m_COLScheduleMode[it->Sunday],0);
+		WeeeklyList.SetItemText(index, 8, m_strScheduleMode[it->Sunday]);
+		WeeeklyList.SetItemBkColor(index, 8, m_COLScheduleMode[it->Sunday], 0);
 		it->Col_Sunday = m_COLScheduleMode[it->Sunday];
-		if (it->Sunday == 0&&index!=0)
+		if (it->Sunday == 0 && index != 0)
 		{
-			COLORREF PreviousScheduleColor=GetItemColor(index-1,8); 
-			WeeeklyList.SetItemBkColor(index,8,PreviousScheduleColor,0);
+			COLORREF PreviousScheduleColor = GetItemColor(index - 1, 8);
+			WeeeklyList.SetItemBkColor(index, 8, PreviousScheduleColor, 0);
 			it->Col_Sunday = PreviousScheduleColor;
 		}
 
@@ -425,36 +438,40 @@ void CNewTstatSchedulesDlg::Fresh_List()
 
 int CNewTstatSchedulesDlg::getvalue(CString modelname)
 {
-	if (modelname.CompareNoCase(m_strScheduleMode[0])==0)
+	if (modelname.CompareNoCase(m_strScheduleMode[0]) == 0)
 	{
 		return 0;
 	}
-	else if (modelname.CompareNoCase(m_strScheduleMode[1])==0)
+	else if (modelname.CompareNoCase(m_strScheduleMode[1]) == 0)
 	{
 		return 1;
 	}
-	else if (modelname.CompareNoCase(m_strScheduleMode[2])==0)
+	else if (modelname.CompareNoCase(m_strScheduleMode[2]) == 0)
 	{
 		return 2;
 	}
-	else if (modelname.CompareNoCase(m_strScheduleMode[3])==0)
+	else if (modelname.CompareNoCase(m_strScheduleMode[3]) == 0)
 	{
 		return 3;
 	}
-	 
+	else if (modelname.CompareNoCase(m_strScheduleMode[4]) == 0)
+	{
+		return 4;
+	}
+
 	return -1;
-	 
+
 }
 
-int CNewTstatSchedulesDlg::GetValueItem(int Row,int Col)
+int CNewTstatSchedulesDlg::GetValueItem(int Row, int Col)
 {
 	list<Schedule_Node>::iterator it = GetNode(Row);
 	int ReturnValue = -1;
 	switch (Col)
 	{
 	case 1:
-	     ReturnValue = it->Hour*60+it->Minite;
-		 break;
+		ReturnValue = it->Hour * 60 + it->Minite;
+		break;
 	case 2:
 		ReturnValue = it->Monday;
 		break;
@@ -484,7 +501,7 @@ int CNewTstatSchedulesDlg::GetValueItem(int Row,int Col)
 	}
 	return ReturnValue;
 }
-COLORREF CNewTstatSchedulesDlg::GetItemColor(int Row,int Col)
+COLORREF CNewTstatSchedulesDlg::GetItemColor(int Row, int Col)
 {
 	list<Schedule_Node>::iterator it = GetNode(Row);
 	COLORREF ReturnValue = -1;
@@ -518,13 +535,13 @@ COLORREF CNewTstatSchedulesDlg::GetItemColor(int Row,int Col)
 		ReturnValue = -1;
 	}
 	return ReturnValue;
-	
+
 }
-void CNewTstatSchedulesDlg::SetValueItem(int Row,int Col,int Val)
+void CNewTstatSchedulesDlg::SetValueItem(int Row, int Col, int Val)
 {
-	int position=0;
-	 
-	for (list<Schedule_Node>::iterator index = m_ScheduleList.begin();index !=m_ScheduleList.end() ;++index)
+	int position = 0;
+
+	for (list<Schedule_Node>::iterator index = m_ScheduleList.begin();index != m_ScheduleList.end();++index)
 	{
 		if (position == Row)
 		{
@@ -532,97 +549,97 @@ void CNewTstatSchedulesDlg::SetValueItem(int Row,int Col,int Val)
 			switch (Col)
 			{
 			case 1:
-				   index->Hour = Val/60;
-				   index->Minite = Val - index->Hour*60;
-				   break;
+				index->Hour = Val / 60;
+				index->Minite = Val - index->Hour * 60;
+				break;
 			case 2:
-				   index->Monday = Val;
-				break;		 
-			case 3:			 
-				   index->Tuesday = Val ;
-				break;		 
-			case 4:			 
-				   index->Wednesday = Val;
-				break;		 
-			case 5:			 
-				   index->Thursday = Val;
-				break;		 
-			case 6:			 
-				   index->Friday = Val;
-				break;		 
-			case 7:			 
-				   index->Saturday = Val;
-				break;		 
-			case 8:			 
+				index->Monday = Val;
+				break;
+			case 3:
+				index->Tuesday = Val;
+				break;
+			case 4:
+				index->Wednesday = Val;
+				break;
+			case 5:
+				index->Thursday = Val;
+				break;
+			case 6:
+				index->Friday = Val;
+				break;
+			case 7:
+				index->Saturday = Val;
+				break;
+			case 8:
 				index->Sunday = Val;
-				break;		 
+				break;
 			case 9:
 				index->Holiday = Val;
 				break;
-			
+
 			}
 			break;
 		}
 		position++;
 
-	} 
+	}
 }
 int CNewTstatSchedulesDlg::GetDayScheduleCount(int Col)
 {
 	int ScheduleCount = 0;
-	for (list<Schedule_Node>::iterator index = m_ScheduleList.begin();index !=m_ScheduleList.end() ;++index)
+	for (list<Schedule_Node>::iterator index = m_ScheduleList.begin();index != m_ScheduleList.end();++index)
 	{
-		 
-		 if (Col == 2 && index->Monday!=0)
-		 {	
-			 ScheduleCount++; 
-		 } 
-		 else  if (Col == 3 && index->Tuesday!=0)
-		 {
-			ScheduleCount++; 
-		 }
-		 else  if (Col == 4 && index->Wednesday!=0)
-		 {
-		  ScheduleCount++; 
-		 }
-		 else  if (Col == 5 && index->Thursday!=0)
-		 {
-		  ScheduleCount++; 
-		 }
-		 else  if (Col == 6 && index->Friday!=0)
-		 {
-		  ScheduleCount++; 
-		 }
-		 else  if (Col == 7 && index->Saturday!=0)
-		 {
-		  ScheduleCount++; 
-		 }
-		 else  if (Col == 8 && index->Sunday!=0)
-		 {
-		  ScheduleCount++; 
-		 }
-		 else  if (Col == 9 && index->Holiday != 0)
-		 {
-			 ScheduleCount++;
-		 }
-	} 
+
+		if (Col == 2 && index->Monday != 0)
+		{
+			ScheduleCount++;
+		}
+		else  if (Col == 3 && index->Tuesday != 0)
+		{
+			ScheduleCount++;
+		}
+		else  if (Col == 4 && index->Wednesday != 0)
+		{
+			ScheduleCount++;
+		}
+		else  if (Col == 5 && index->Thursday != 0)
+		{
+			ScheduleCount++;
+		}
+		else  if (Col == 6 && index->Friday != 0)
+		{
+			ScheduleCount++;
+		}
+		else  if (Col == 7 && index->Saturday != 0)
+		{
+			ScheduleCount++;
+		}
+		else  if (Col == 8 && index->Sunday != 0)
+		{
+			ScheduleCount++;
+		}
+		else  if (Col == 9 && index->Holiday != 0)
+		{
+			ScheduleCount++;
+		}
+	}
 
 	return ScheduleCount;
 }
-LRESULT CNewTstatSchedulesDlg::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
-{ 
+LRESULT CNewTstatSchedulesDlg::Fresh_Input_Item(WPARAM wParam, LPARAM lParam)
+{
 	int Changed_Item = (int)wParam;
 	int Changed_SubItem = (int)lParam;
-	CString New_CString =  WeeeklyList.GetItemText(Changed_Item,Changed_SubItem);
+	CString New_CString = WeeeklyList.GetItemText(Changed_Item, Changed_SubItem);
 	BOOL is_change = FALSE;
 	if (Changed_SubItem>1)
 	{
-		int tempvalue = getvalue(New_CString); 
-		if (tempvalue==0||(GetDayScheduleCount(Changed_SubItem)<=6))
+		int tempvalue = getvalue(New_CString);
+		if (tempvalue == 0 || (GetDayScheduleCount(Changed_SubItem) <= 6))
 		{
-			if (GetValueItem(Changed_Item,Changed_SubItem)!=tempvalue)
+			if (GetValueItem(Changed_Item, Changed_SubItem) != tempvalue)
 			{
-				SetValueItem(Changed_Item,Changed_SubItem,tempvalue);
+				SetValueItem(Changed_Item, Changed_SubItem, tempvalue);
 				is_change = TRUE;
 			}
 		}
@@ -632,65 +649,65 @@ LRESULT CNewTstatSchedulesDlg::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 			is_change = TRUE;
 		}
 
-		
+
 	}
 	if (Changed_SubItem == 1)
 	{
 		CStringArray temparray;
-		SplitCStringA(temparray,New_CString,_T(":"));
-		if (temparray.GetSize()<=1)
+		SplitCStringA(temparray, New_CString, _T(":"));
+		if (temparray.GetSize() <= 1)
 		{
 			AfxMessageBox(_T("The time that you input is not correct!"));
-		   is_change = TRUE;
+			is_change = TRUE;
 		}
 		int Hour = _wtoi(temparray[0]);
 		int minute = _wtoi(temparray[1]);
-		int tempvalue = Hour*60+minute;
-		
-		if (GetValueItem(Changed_Item,Changed_SubItem)!=tempvalue)
+		int tempvalue = Hour * 60 + minute;
+
+		if (GetValueItem(Changed_Item, Changed_SubItem) != tempvalue)
 		{
-			SetValueItem(Changed_Item,Changed_SubItem,tempvalue);
+			SetValueItem(Changed_Item, Changed_SubItem, tempvalue);
 			is_change = TRUE;
 		}
-		 
+
 	}
-	 
+
 	Fresh_List();
-	 
+
 
 	return 0;
 }
 
-BOOL CNewTstatSchedulesDlg::Insert_Schdule(Schedule_Node SR,int POS)
+BOOL CNewTstatSchedulesDlg::Insert_Schdule(Schedule_Node SR, int POS)
 {
-	 int insert_time =SR.Hour*60+SR.Minite;
+	int insert_time = SR.Hour * 60 + SR.Minite;
 	BOOL is_exsit = FALSE;
- 
-	for (list<Schedule_Node>::iterator index = m_ScheduleList.begin();index !=m_ScheduleList.end() ;++index)
+
+	for (list<Schedule_Node>::iterator index = m_ScheduleList.begin();index != m_ScheduleList.end();++index)
 	{
-		int ST=index->Hour*60+index->Minite;
+		int ST = index->Hour * 60 + index->Minite;
 
 		if (ST == insert_time)
 		{
 			is_exsit = TRUE;
 		}
 	}
-	
-	int position=0;
+
+	int position = 0;
 	if (!is_exsit)
 	{
-		for (list<Schedule_Node>::iterator index = m_ScheduleList.begin();index !=m_ScheduleList.end() ;++index)
+		for (list<Schedule_Node>::iterator index = m_ScheduleList.begin();index != m_ScheduleList.end();++index)
 		{
 			if (position == POS)//找到了要插入的位置
 			{
-			    m_ScheduleList.insert(index,SR);
+				m_ScheduleList.insert(index, SR);
 				/*return TRUE;*/
 			}
 			position++;
-		} 
-		
+		}
+
 	}
-	if (position!=POS)//没有找到要插入的位置，就直接添加到列表里面
+	if (position != POS)//没有找到要插入的位置，就直接添加到列表里面
 	{
 		m_ScheduleList.push_back(SR);
 	}
@@ -702,26 +719,26 @@ BOOL CNewTstatSchedulesDlg::Insert_Schdule(Schedule_Node SR,int POS)
 
 BOOL CNewTstatSchedulesDlg::InsertAndUpdate_Schdule(Schedule_Node SR)
 {
- 	if (m_ScheduleList.size()<=0)
- 	{
- 		m_ScheduleList.push_back(SR);
- 	}
- 	else
- 	{
- 		int insert_time = SR.Hour * 60 + SR.Minite;
- 		BOOL is_exsit = FALSE;
- 		int POS = -1;
- 		for (list<Schedule_Node>::iterator index = m_ScheduleList.begin(); index != m_ScheduleList.end(); ++index)
- 		{
- 			int ST = index->Hour * 60 + index->Minite;
- 
- 			if (ST == insert_time)
- 			{
- 				 is_exsit = TRUE;
-                if (SR.Monday!=0)
-                {
+	if (m_ScheduleList.size() <= 0)
+	{
+		m_ScheduleList.push_back(SR);
+	}
+	else
+	{
+		int insert_time = SR.Hour * 60 + SR.Minite;
+		BOOL is_exsit = FALSE;
+		int POS = -1;
+		for (list<Schedule_Node>::iterator index = m_ScheduleList.begin(); index != m_ScheduleList.end(); ++index)
+		{
+			int ST = index->Hour * 60 + index->Minite;
+
+			if (ST == insert_time)
+			{
+				is_exsit = TRUE;
+				if (SR.Monday != 0)
+				{
 					index->Monday = SR.Monday;
-                }
+				}
 				if (SR.Tuesday != 0)
 				{
 					index->Tuesday = SR.Tuesday;
@@ -751,81 +768,81 @@ BOOL CNewTstatSchedulesDlg::InsertAndUpdate_Schdule(Schedule_Node SR)
 					index->Holiday = SR.Holiday;
 				}
 
-                  
- 			}
- 			 
- 
- 		}
-        if (!is_exsit)
-        {
+
+			}
+
+
+		}
+		if (!is_exsit)
+		{
 			m_ScheduleList.push_back(SR);
-        }
- 	 
- 	}
-	
+		}
+
+	}
+
 	m_ScheduleList.sort();
 	return FALSE;
 }
 BOOL CNewTstatSchedulesDlg::Delete_Schdule(int POS)
 {
-        int position=0;
-	 
-		for (list<Schedule_Node>::iterator index = m_ScheduleList.begin();index !=m_ScheduleList.end() ;++index)
-		{
-			if (position == POS)
-			{
-			   // m_ScheduleList.insert(index,SR);
-				m_ScheduleList.erase(index);
-				return TRUE;
-			}
-			position++;
-		} 
-	 
-	return FALSE;
-}
-list<Schedule_Node>::iterator CNewTstatSchedulesDlg::GetNode(int POS){
-	int position=0;
-	list<Schedule_Node>::iterator returnnode = m_ScheduleList.begin();
-	for (list<Schedule_Node>::iterator index = m_ScheduleList.begin();index !=m_ScheduleList.end() ;index++)
+	int position = 0;
+
+	for (list<Schedule_Node>::iterator index = m_ScheduleList.begin();index != m_ScheduleList.end();++index)
 	{
 		if (position == POS)
 		{
-			 
-			returnnode= index;
+			// m_ScheduleList.insert(index,SR);
+			m_ScheduleList.erase(index);
+			return TRUE;
+		}
+		position++;
+	}
+
+	return FALSE;
+}
+list<Schedule_Node>::iterator CNewTstatSchedulesDlg::GetNode(int POS) {
+	int position = 0;
+	list<Schedule_Node>::iterator returnnode = m_ScheduleList.begin();
+	for (list<Schedule_Node>::iterator index = m_ScheduleList.begin();index != m_ScheduleList.end();index++)
+	{
+		if (position == POS)
+		{
+
+			returnnode = index;
 		}
 		position++;
 
-	} 
+	}
 	return returnnode;
-}  
+}
 void CNewTstatSchedulesDlg::OnBnClickedButtonInsert()
 {
 
- 
 
 
- 
-		CSetTimeDlg dlg;
-		if (dlg.DoModal() == IDOK)
+
+
+	CSetTimeDlg dlg;
+	if (dlg.DoModal() == IDOK)
+	{
+		CString temp = dlg.m_strTime;
+		Schedule_Node sr;
+		CStringArray aaa;
+		SplitCStringA(aaa, temp, L":");
+		if (aaa.GetSize() >= 2)
 		{
-			CString temp = dlg.m_strTime;
-			Schedule_Node sr;
-			CStringArray aaa;
-			SplitCStringA(aaa, temp, L":");
-			if (aaa.GetSize() >= 2)
-			{
-				sr.Hour = _wtoi(aaa[0]);
-				sr.Minite = _wtoi(aaa[1]);
-				InsertAndUpdate_Schdule(sr);
+			sr.Hour = _wtoi(aaa[0]);
+			sr.Minite = _wtoi(aaa[1]);
+			InsertAndUpdate_Schdule(sr);
 
-				WeeeklyList.InsertItem(WeeeklyList.GetRowCount(), L"");
-			}
-
-			Fresh_List();
-
+			WeeeklyList.InsertItem(WeeeklyList.GetRowCount(), L"");
 		}
 
- 
+		Fresh_List();
+
+	}
+
+
 
 
 
@@ -845,23 +862,23 @@ void CNewTstatSchedulesDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	CString temp_cstring;
-	long lRow,lCol;
-	 
-	DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
-	CPoint point( LOWORD(dwPos), HIWORD(dwPos));
+	long lRow, lCol;
+
+	DWORD dwPos = GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
+	CPoint point(LOWORD(dwPos), HIWORD(dwPos));
 	WeeeklyList.ScreenToClient(&point);
 	LVHITTESTINFO lvinfo;
-	lvinfo.pt=point;
-	lvinfo.flags=LVHT_ABOVE;
-	int nItem=WeeeklyList.SubItemHitTest(&lvinfo);
+	lvinfo.pt = point;
+	lvinfo.flags = LVHT_ABOVE;
+	int nItem = WeeeklyList.SubItemHitTest(&lvinfo);
 
 	lRow = lvinfo.iItem;
 	lCol = lvinfo.iSubItem;
 
 
-	if(lRow>WeeeklyList.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+	if (lRow>WeeeklyList.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
 		return;
-	if(lRow<0)
+	if (lRow<0)
 		return;
 
 	m_curRow = lRow;
@@ -869,24 +886,24 @@ void CNewTstatSchedulesDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	if (m_curCol == 0)
 	{
 		Fresh_List();
-		WeeeklyList.SetItemBkColor(lRow,-1,LIST_ITEM_SELECTED);
+		WeeeklyList.SetItemBkColor(lRow, -1, LIST_ITEM_SELECTED);
 	}
 
 	else if (m_curCol>1)
 	{
-		CString New_CString =  WeeeklyList.GetItemText(lRow,lCol);
-		if(GetDayScheduleCount(lCol)>=6&&New_CString.IsEmpty())
+		CString New_CString = WeeeklyList.GetItemText(lRow, lCol);
+		if (GetDayScheduleCount(lCol) >= 6 && New_CString.IsEmpty())
 		{
 			WeeeklyList.Set_Edit(false);
 			/*AfxMessageBox(L"Can't be more than 6 !");
 			is_change = TRUE;*/
-			MessageBox(_T("Can't be more than 6 tasks!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+			MessageBox(_T("Can't be more than 6 tasks!"), _T("Warning"), MB_OK | MB_ICONINFORMATION);
 		}
 		else
 		{
 			WeeeklyList.Set_Edit(true);
 		}
-	} 
+	}
 	else if (m_curCol == 1)
 	{
 		/*int Time = GetValueItem(lRow, lCol);
@@ -915,7 +932,7 @@ void CNewTstatSchedulesDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 	else
 	{
-		
+
 	}
 
 	*pResult = 0;
@@ -924,9 +941,9 @@ void CNewTstatSchedulesDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CNewTstatSchedulesDlg::OnNMKillfocusDatetimepicker1Schedual(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	
+
 	CTime temp_time;CString temp_cs;
-	int chour,cmin;
+	int chour, cmin;
 	m_schedual_time_picker.GetTime(temp_time);
 	chour = temp_time.GetHour();
 	cmin = temp_time.GetMinute();
@@ -937,10 +954,10 @@ void CNewTstatSchedulesDlg::OnNMKillfocusDatetimepicker1Schedual(NMHDR *pNMHDR, 
 
 BOOL CNewTstatSchedulesDlg::PreTranslateMessage(MSG* pMsg)
 {
-	
+
 	if (pMsg->message == WM_KEYDOWN)
 	{
-		if (GetFocus()->GetDlgCtrlID() ==IDC_LIST1 )
+		if (GetFocus()->GetDlgCtrlID() == IDC_LIST1)
 		{
 			if (pMsg->wParam == VK_DELETE)
 			{
@@ -952,21 +969,21 @@ BOOL CNewTstatSchedulesDlg::PreTranslateMessage(MSG* pMsg)
 				OnBnClickedButtonInsert();
 				return TRUE;
 			}
-// 			else if (pMsg->wParam == VK_RETURN)
-// 			{
-// 				 
-// 				CRect list_rect, win_rect;
-// 				WeeeklyList.GetWindowRect(list_rect);
-// 				ScreenToClient(&list_rect);
-// 				::GetWindowRect(this->m_hWnd, win_rect);
-// 				WeeeklyList.Set_My_WindowRect(win_rect);
-// 				WeeeklyList.Set_My_ListRect(list_rect);
-// 				WeeeklyList.Get_clicked_mouse_position();
-// 				 
-// 				return TRUE;
-// 			}
+			// 			else if (pMsg->wParam == VK_RETURN)
+			// 			{
+			// 				 
+			// 				CRect list_rect, win_rect;
+			// 				WeeeklyList.GetWindowRect(list_rect);
+			// 				ScreenToClient(&list_rect);
+			// 				::GetWindowRect(this->m_hWnd, win_rect);
+			// 				WeeeklyList.Set_My_WindowRect(win_rect);
+			// 				WeeeklyList.Set_My_ListRect(list_rect);
+			// 				WeeeklyList.Get_clicked_mouse_position();
+			// 				 
+			// 				return TRUE;
+			// 			}
 		}
-		
+
 
 	}
 	return CDialogEx::PreTranslateMessage(pMsg);
@@ -974,26 +991,26 @@ BOOL CNewTstatSchedulesDlg::PreTranslateMessage(MSG* pMsg)
 
 void CNewTstatSchedulesDlg::CopyFromMonToFri()
 {
-	 
+
 	for (list<Schedule_Node>::iterator index = m_ScheduleList.begin(); index != m_ScheduleList.end(); ++index)
 	{
-		 
+
 		index->Tuesday = index->Wednesday = index->Thursday = index->Friday = index->Monday;
 
 	}
 }
 void CNewTstatSchedulesDlg::OnBnClickedButtonScheduleCopyBtn()
 {
- 
+
 
 	CopyFromMonToFri();
-	 Fresh_List();
+	Fresh_List();
 }
 
 int CNewTstatSchedulesDlg::PowerFour(int number, int index)
 {
 	int retvalue = 1;
-	for (int i = 1;i<=index;i++)
+	for (int i = 1;i <= index;i++)
 	{
 		retvalue = retvalue * number;
 	}
@@ -1001,12 +1018,12 @@ int CNewTstatSchedulesDlg::PowerFour(int number, int index)
 }
 void CNewTstatSchedulesDlg::OnBnClickedOk()
 {
-	 
+
 	for (list<Schedule_Node>::iterator index = m_ScheduleList.begin(); index != m_ScheduleList.end(); ++index)
 	{
 
 		//index->Tuesday = index->Wednesday = index->Thursday = index->Friday = index->Monday;
-		if (index->Monday !=0)
+		if (index->Monday != 0)
 		{
 			Event temEvent;
 			temEvent.Day = 0;
@@ -1098,97 +1115,438 @@ void CNewTstatSchedulesDlg::OnBnClickedOk()
 
 	}
 	unsigned short TimeBuffer[100];
-	int EventNumber=0;
+	int EventNumber[2] = { 0,0 };
 	int i = 0;
 	memset(TimeBuffer, 0xff, sizeof(unsigned short) * 12);
-	for ( i=0;i<(int)m_Monday.size();i++)
+	for (i = 0;i<(int)m_Monday.size();i++)
 	{
-		
+
 		TimeBuffer[2 * i] = m_Monday.at(i).Hour;
-		TimeBuffer[2 * i+1] = m_Monday.at(i).Minite;
-		EventNumber += m_Monday.at(i).Event_Number*PowerFour(4, i);
+		TimeBuffer[2 * i + 1] = m_Monday.at(i).Minite;
+		if (i<2)
+		{
+			if (i<1)
+			{
+				EventNumber[0] += m_Monday.at(0).Event_Number*PowerFour(2, 0);
+			}
+			else
+			{
+				EventNumber[0] += m_Monday.at(1).Event_Number*PowerFour(2, 3);
+			}
+
+
+		}
+		else if (i<4)
+		{
+			if (i<3)
+			{
+				EventNumber[0] += m_Monday.at(2).Event_Number*PowerFour(2, 8);
+			}
+			else
+			{
+				EventNumber[0] += m_Monday.at(3).Event_Number*PowerFour(2, 11);
+			}
+
+
+		}
+		else
+		{
+			if (i<5)
+			{
+				EventNumber[1] += m_Monday.at(4).Event_Number*PowerFour(2, 0);
+			}
+			else
+			{
+				EventNumber[1] += m_Monday.at(5).Event_Number*PowerFour(2, 3);
+			}
+
+
+		}
+
 	}
+
+
+
+
+
 	Write_Multi_short(g_tstat_id, TimeBuffer, 813, 12);
-	write_one(g_tstat_id, 909, EventNumber);
+	write_one(g_tstat_id, 909, EventNumber[0]);
+	write_one(g_tstat_id, 910, EventNumber[1]);
+
 	memset(TimeBuffer, 0xff, sizeof(unsigned short) * 12);
-	EventNumber = 0;
+	EventNumber[0] = 0;
+	EventNumber[1] = 0;
 	for (i = 0; i < (int)m_Tuesday.size(); i++)
 	{
-		 
+
 		TimeBuffer[2 * i] = m_Tuesday.at(i).Hour;
 		TimeBuffer[2 * i + 1] = m_Tuesday.at(i).Minite;
-		EventNumber += m_Tuesday.at(i).Event_Number*PowerFour(4, i);
+		if (i < 2)
+		{
+			if (i < 1)
+			{
+				EventNumber[0] += m_Tuesday.at(0).Event_Number*PowerFour(2, 0);
+			}
+			else
+			{
+				EventNumber[0] += m_Tuesday.at(1).Event_Number*PowerFour(2, 3);
+			}
+
+
+		}
+		else if (i < 4)
+		{
+			if (i < 3)
+			{
+				EventNumber[0] += m_Tuesday.at(2).Event_Number*PowerFour(2, 8);
+			}
+			else
+			{
+				EventNumber[0] += m_Tuesday.at(3).Event_Number*PowerFour(2, 11);
+			}
+
+
+		}
+		else
+		{
+			if (i < 5)
+			{
+				EventNumber[1] += m_Tuesday.at(4).Event_Number*PowerFour(2, 0);
+			}
+			else
+			{
+				EventNumber[1] += m_Tuesday.at(5).Event_Number*PowerFour(2, 3);
+			}
+
+
+		}
 	}
-	Write_Multi_short(g_tstat_id, TimeBuffer, 813+12*1, 12);
-	write_one(g_tstat_id, 910, EventNumber);
+
+
+	Write_Multi_short(g_tstat_id, TimeBuffer, 813 + 12 * 1, 12);
+	write_one(g_tstat_id, 911, EventNumber[0]);
+	write_one(g_tstat_id, 912, EventNumber[1]);
 	memset(TimeBuffer, 0xff, sizeof(unsigned short) * 12);
-	EventNumber = 0;
+	EventNumber[0] = 0;
+	EventNumber[1] = 0;
 	for (i = 0; i < (int)m_Wednesday.size(); i++)
 	{
-		 
+
 		TimeBuffer[2 * i] = m_Wednesday.at(i).Hour;
 		TimeBuffer[2 * i + 1] = m_Wednesday.at(i).Minite;
-		EventNumber += m_Wednesday.at(i).Event_Number*PowerFour(4, i);
+
+		if (i < 2)
+		{
+			if (i < 1)
+			{
+				EventNumber[0] += m_Wednesday.at(0).Event_Number*PowerFour(2, 0);
+			}
+			else
+			{
+				EventNumber[0] += m_Wednesday.at(1).Event_Number*PowerFour(2, 3);
+			}
+
+
+		}
+		else if (i < 4)
+		{
+			if (i < 3)
+			{
+				EventNumber[0] += m_Wednesday.at(2).Event_Number*PowerFour(2, 8);
+			}
+			else
+			{
+				EventNumber[0] += m_Wednesday.at(3).Event_Number*PowerFour(2, 11);
+			}
+
+
+		}
+		else
+		{
+			if (i < 5)
+			{
+				EventNumber[1] += m_Wednesday.at(4).Event_Number*PowerFour(2, 0);
+			}
+			else
+			{
+				EventNumber[1] += m_Wednesday.at(5).Event_Number*PowerFour(2, 3);
+			}
+
+
+		}
 	}
+
+
 	Write_Multi_short(g_tstat_id, TimeBuffer, 813 + 12 * 2, 12);
-	write_one(g_tstat_id, 911, EventNumber);
+	write_one(g_tstat_id, 913, EventNumber[0]);
+	write_one(g_tstat_id, 914, EventNumber[1]);
 	memset(TimeBuffer, 0xff, sizeof(unsigned short) * 12);
-	EventNumber = 0;
+	EventNumber[0] = 0;
+	EventNumber[1] = 0;
 	for (i = 0; i < (int)m_Thursday.size(); i++)
 	{
-	 
+
 		TimeBuffer[2 * i] = m_Thursday.at(i).Hour;
 		TimeBuffer[2 * i + 1] = m_Thursday.at(i).Minite;
-		EventNumber += m_Thursday.at(i).Event_Number*PowerFour(4, i);
+		if (i < 2)
+		{
+			if (i < 1)
+			{
+				EventNumber[0] += m_Thursday.at(0).Event_Number*PowerFour(2, 0);
+			}
+			else
+			{
+				EventNumber[0] += m_Thursday.at(1).Event_Number*PowerFour(2, 3);
+			}
+
+
+		}
+		else if (i < 4)
+		{
+			if (i < 3)
+			{
+				EventNumber[0] += m_Thursday.at(2).Event_Number*PowerFour(2, 8);
+			}
+			else
+			{
+				EventNumber[0] += m_Thursday.at(3).Event_Number*PowerFour(2, 11);
+			}
+
+
+		}
+		else
+		{
+			if (i < 5)
+			{
+				EventNumber[1] += m_Thursday.at(4).Event_Number*PowerFour(2, 0);
+			}
+			else
+			{
+				EventNumber[1] += m_Thursday.at(5).Event_Number*PowerFour(2, 3);
+			}
+
+
+		}
 	}
+
+
+
+
 	Write_Multi_short(g_tstat_id, TimeBuffer, 813 + 12 * 3, 12);
-	write_one(g_tstat_id, 912, EventNumber);
+	write_one(g_tstat_id, 915, EventNumber[0]);
+	write_one(g_tstat_id, 916, EventNumber[1]);
 	memset(TimeBuffer, 0xff, sizeof(unsigned short) * 12);
-	EventNumber = 0;
+	EventNumber[0] = 0;
+	EventNumber[1] = 0;
 	for (i = 0; i < (int)m_Friday.size(); i++)
 	{
-		 
+
 		TimeBuffer[2 * i] = m_Friday.at(i).Hour;
 		TimeBuffer[2 * i + 1] = m_Friday.at(i).Minite;
-		EventNumber += m_Friday.at(i).Event_Number*PowerFour(4, i);
+		if (i < 2)
+		{
+			if (i < 1)
+			{
+				EventNumber[0] += m_Friday.at(0).Event_Number*PowerFour(2, 0);
+			}
+			else
+			{
+				EventNumber[0] += m_Friday.at(1).Event_Number*PowerFour(2, 3);
+			}
+
+
+		}
+		else if (i < 4)
+		{
+			if (i < 3)
+			{
+				EventNumber[0] += m_Friday.at(2).Event_Number*PowerFour(2, 8);
+			}
+			else
+			{
+				EventNumber[0] += m_Friday.at(3).Event_Number*PowerFour(2, 11);
+			}
+
+
+		}
+		else
+		{
+			if (i < 5)
+			{
+				EventNumber[1] += m_Friday.at(4).Event_Number*PowerFour(2, 0);
+			}
+			else
+			{
+				EventNumber[1] += m_Friday.at(5).Event_Number*PowerFour(2, 3);
+			}
+
+
+		}
 	}
+
+
 	Write_Multi_short(g_tstat_id, TimeBuffer, 813 + 12 * 4, 12);
-	write_one(g_tstat_id, 913, EventNumber);
+	write_one(g_tstat_id, 917, EventNumber[0]);
+	write_one(g_tstat_id, 918, EventNumber[1]);
 
 	memset(TimeBuffer, 0xff, sizeof(unsigned short) * 12);
-	EventNumber = 0;
+	EventNumber[0] = 0;
+	EventNumber[1] = 0;
 	for (i = 0; i < (int)m_Saturday.size(); i++)
 	{
-	 
+
 		TimeBuffer[2 * i] = m_Saturday.at(i).Hour;
 		TimeBuffer[2 * i + 1] = m_Saturday.at(i).Minite;
-		EventNumber += m_Saturday.at(i).Event_Number*PowerFour(4, i);
+		if (i < 2)
+		{
+			if (i < 1)
+			{
+				EventNumber[0] += m_Saturday.at(0).Event_Number*PowerFour(2, 0);
+			}
+			else
+			{
+				EventNumber[0] += m_Saturday.at(1).Event_Number*PowerFour(2, 3);
+			}
+
+
+		}
+		else if (i < 4)
+		{
+			if (i < 3)
+			{
+				EventNumber[0] += m_Saturday.at(2).Event_Number*PowerFour(2, 8);
+			}
+			else
+			{
+				EventNumber[0] += m_Saturday.at(3).Event_Number*PowerFour(2, 11);
+			}
+
+
+		}
+		else
+		{
+			if (i < 5)
+			{
+				EventNumber[1] += m_Saturday.at(4).Event_Number*PowerFour(2, 0);
+			}
+			else
+			{
+				EventNumber[1] += m_Saturday.at(5).Event_Number*PowerFour(2, 3);
+			}
+
+
+		}
 	}
+
+
 	Write_Multi_short(g_tstat_id, TimeBuffer, 813 + 12 * 5, 12);
-	write_one(g_tstat_id, 914, EventNumber);
+	write_one(g_tstat_id, 919, EventNumber[0]);
+	write_one(g_tstat_id, 920, EventNumber[1]);
 
 	memset(TimeBuffer, 0xff, sizeof(unsigned short) * 12);
-	EventNumber = 0;
+	EventNumber[0] = 0;
+	EventNumber[1] = 0;
 	for (i = 0; i < (int)m_Sunday.size(); i++)
 	{
-	 
+
 		TimeBuffer[2 * i] = m_Sunday.at(i).Hour;
 		TimeBuffer[2 * i + 1] = m_Sunday.at(i).Minite;
-		EventNumber += m_Sunday.at(i).Event_Number*PowerFour(4, i);
+		if (i < 2)
+		{
+			if (i < 1)
+			{
+				EventNumber[0] += m_Sunday.at(0).Event_Number*PowerFour(2, 0);
+			}
+			else
+			{
+				EventNumber[0] += m_Sunday.at(1).Event_Number*PowerFour(2, 3);
+			}
+
+
+		}
+		else if (i < 4)
+		{
+			if (i < 3)
+			{
+				EventNumber[0] += m_Sunday.at(2).Event_Number*PowerFour(2, 8);
+			}
+			else
+			{
+				EventNumber[0] += m_Sunday.at(3).Event_Number*PowerFour(2, 11);
+			}
+
+
+		}
+		else
+		{
+			if (i < 5)
+			{
+				EventNumber[1] += m_Sunday.at(4).Event_Number*PowerFour(2, 0);
+			}
+			else
+			{
+				EventNumber[1] += m_Sunday.at(5).Event_Number*PowerFour(2, 3);
+			}
+
+
+		}
 	}
+
 	Write_Multi_short(g_tstat_id, TimeBuffer, 813 + 12 * 6, 12);
-	write_one(g_tstat_id, 915, EventNumber);
+	write_one(g_tstat_id, 921, EventNumber[0]);
+	write_one(g_tstat_id, 922, EventNumber[1]);
 	memset(TimeBuffer, 0xff, sizeof(unsigned short) * 12);
-	EventNumber = 0;
+	EventNumber[0] = 0;
+	EventNumber[1] = 0;
 	for (i = 0; i < (int)m_Holiday.size(); i++)
 	{
-	 
+
 		TimeBuffer[2 * i] = m_Holiday.at(i).Hour;
 		TimeBuffer[2 * i + 1] = m_Holiday.at(i).Minite;
-		EventNumber += m_Holiday.at(i).Event_Number*PowerFour(4, i);
+		if (i < 2)
+		{
+			if (i < 1)
+			{
+				EventNumber[0] += m_Holiday.at(0).Event_Number*PowerFour(2, 0);
+			}
+			else
+			{
+				EventNumber[0] += m_Holiday.at(1).Event_Number*PowerFour(2, 3);
+			}
+
+
+		}
+		else if (i < 4)
+		{
+			if (i < 3)
+			{
+				EventNumber[0] += m_Holiday.at(2).Event_Number*PowerFour(2, 8);
+			}
+			else
+			{
+				EventNumber[0] += m_Holiday.at(3).Event_Number*PowerFour(2, 11);
+			}
+
+
+		}
+		else
+		{
+			if (i < 5)
+			{
+				EventNumber[1] += m_Holiday.at(4).Event_Number*PowerFour(2, 0);
+			}
+			else
+			{
+				EventNumber[1] += m_Holiday.at(5).Event_Number*PowerFour(2, 3);
+			}
+
+
+		}
 	}
+
 	Write_Multi_short(g_tstat_id, TimeBuffer, 813 + 12 * 7, 12);
-	write_one(g_tstat_id, 916, EventNumber);
+	write_one(g_tstat_id, 923, EventNumber[0]);
+	write_one(g_tstat_id, 924, EventNumber[1]);
 
 
 	AfxMessageBox(_T("Write Successfully"));
@@ -1205,7 +1563,7 @@ void CNewTstatSchedulesDlg::OnBnClickedCheckEnableSchedule()
 		{
 			product_register_value[MODBUS_SCHEDULE_ON_OFF] = 1;
 			((CButton *)GetDlgItem(IDC_CHECK_ENABLE_SCHEDULE))->SetCheck(1);
-		} 
+		}
 	}
 	else
 	{
@@ -1216,13 +1574,13 @@ void CNewTstatSchedulesDlg::OnBnClickedCheckEnableSchedule()
 			((CButton *)GetDlgItem(IDC_CHECK_ENABLE_SCHEDULE))->SetCheck(0);
 		}
 	}
-	
+
 }
 
 
 void CNewTstatSchedulesDlg::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	 
+
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	CString temp_cstring;
 	long lRow, lCol;
@@ -1239,48 +1597,31 @@ void CNewTstatSchedulesDlg::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
 	lCol = lvinfo.iSubItem;
 
 
- 
-		 CSetTimeDlg dlg;
-		 if (dlg.DoModal() == IDOK)
-		 {
-			 CString temp = dlg.m_strTime;
-			 Schedule_Node sr;
-			 CStringArray aaa;
-			 SplitCStringA(aaa, temp, L":");
-			 if (aaa.GetSize() >= 2)
-			 {
-				 sr.Hour = _wtoi(aaa[0]);
-				 sr.Minite = _wtoi(aaa[1]);
-				 InsertAndUpdate_Schdule(sr);
-				 
-				 WeeeklyList.InsertItem(WeeeklyList.GetRowCount(), L"");
-			 }
-			 
-			 Fresh_List();
 
-		 }
-		 
-	 
-	
-	
+	CSetTimeDlg dlg;
+	if (dlg.DoModal() == IDOK)
+	{
+		CString temp = dlg.m_strTime;
+		Schedule_Node sr;
+		CStringArray aaa;
+		SplitCStringA(aaa, temp, L":");
+		if (aaa.GetSize() >= 2)
+		{
+			sr.Hour = _wtoi(aaa[0]);
+			sr.Minite = _wtoi(aaa[1]);
+			InsertAndUpdate_Schdule(sr);
+
+			WeeeklyList.InsertItem(WeeeklyList.GetRowCount(), L"");
+		}
+
+		Fresh_List();
+
+	}
+
+
+
+
 	if (lRow < 0)
 		return;
 	*pResult = 0;
-}
-
-#include "Tstat_HelpDoc.h"	
-BOOL CNewTstatSchedulesDlg::OnHelpInfo(HELPINFO* pHelpInfo)
-{
-	// TODO: Add your message handler code here and/or call default
-	
-
-
-		HWND hWnd;
-
-	if (pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szTstatHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
-	else
-		hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szTstatHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_MANAGING_SCHEDULES_IN_T3000);
-
-	return (hWnd != NULL);
-	return CDialogEx::OnHelpInfo(pHelpInfo);
 }

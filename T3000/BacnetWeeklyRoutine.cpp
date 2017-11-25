@@ -500,6 +500,7 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_List(WPARAM wParam,LPARAM lParam)
 			break;
 		}
 	}
+	
 	copy_data_to_ptrpanel(TYPE_WEEKLY);
 	return 0;
 }

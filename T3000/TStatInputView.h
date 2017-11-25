@@ -40,6 +40,7 @@ virtual void OnInitialUpdate();
 afx_msg void OnSize(UINT nType, int cx, int cy);
  CWinThread* m_Fresh_BackgroundThreadHandle;
  virtual BOOL PreTranslateMessage(MSG* pMsg);
+ afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 };
 
 

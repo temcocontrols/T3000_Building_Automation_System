@@ -160,6 +160,7 @@ BEGIN_MESSAGE_MAP(CTStatInputView, CFormView)
     ON_NOTIFY(NM_CLICK, IDC_LIST1, &CTStatInputView::OnNMClickList1)
     ON_WM_SIZE()
 
+	ON_WM_HELPINFO()
 END_MESSAGE_MAP()
 
 
@@ -1070,4 +1071,22 @@ BOOL CTStatInputView::PreTranslateMessage(MSG* pMsg)
         }
     }
     return CFormView::PreTranslateMessage(pMsg);
+}
+
+#include "Tstat_HelpDoc.h"	
+BOOL CTStatInputView::OnHelpInfo(HELPINFO* pHelpInfo)
+{
+	// TODO: Add your message handler code here and/or call default
+
+
+	HWND hWnd;
+
+	if (pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szTstatHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
+	else
+		hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szTstatHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_INPUTTABLE_TSTAT);
+
+	return (hWnd != NULL);
+
+	
+	return CFormView::OnHelpInfo(pHelpInfo);
 }

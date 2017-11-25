@@ -678,6 +678,12 @@
     <ClCompile Include="T3ControllerProgram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GroupScheduleDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ModbusToBacnetRouterDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -1771,6 +1777,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="T3ControllerProgram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tstat_HelpDoc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GroupScheduleDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ModbusToBacnetRouterDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

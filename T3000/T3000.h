@@ -277,6 +277,7 @@ public:
 public:
 	CString m_szAppPath;
 	CString m_szHelpFile;
+	CString m_szTstatHelpFile;
 };
 
 extern CT3000App theApp;

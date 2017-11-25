@@ -108,6 +108,7 @@ public:
 	afx_msg void OnBnClickedButtonRebootDevice();
 	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	void InitScrollbar();
+	afx_msg void OnBnClickedButtonZoneSchedule();
 };
 
 

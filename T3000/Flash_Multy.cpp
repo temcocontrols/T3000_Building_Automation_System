@@ -428,7 +428,12 @@ BOOL CFlash_Multy::IsOurNetDevice(int DevType)
             || DevType == PM_MINIPANEL
 		|| DevType == PM_MINIPANEL_ARM
             || DevType == PM_CM5
-			|| DevType == STM32_CO2_NET)
+			|| DevType == STM32_CO2_NET
+		|| DevType == STM32_HUM_NET
+		|| DevType == STM32_PRESSURE_NET
+		|| DevType == STM32_CO2_NODE
+		
+		)
     {
         return TRUE;
     }
