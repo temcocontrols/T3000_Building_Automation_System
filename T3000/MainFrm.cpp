@@ -8007,6 +8007,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					bac_select_device_online = true;
                     nSerialNumber=read_data[0]+read_data[1]*256+read_data[2]*256*256+read_data[3]*256*256*256;
                     Device_Type = read_data[7];
+					 
                     CString Temp_product_name = GetProductName(Device_Type);
                     if(!IS_Temco_Product(Device_Type))
                     {
@@ -8409,7 +8410,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					}
 
 
-                    GetIONanme();
+                //    GetIONanme();
                     if (product_type==T3000_6_ADDRESS)
                     {
                         LoadTstat_InputData();

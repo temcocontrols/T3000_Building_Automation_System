@@ -50,6 +50,21 @@ public:
 	CComboBox m_combox_productname;
 	CComboBox m_combox_rev;
 	vector<ModbusToBacnetRouter> m_vecMd2BT;
+	vector<CString> m_vecYesNo;
+
+	vector<CString> m_vecVariableType;
+	vector<CString> m_vecDataFormat;
+	vector<CString> m_vecDataRW;
+	vector<CString> m_vecBacnetType;
+
+	vector<CString> m_GroupUnits;
+	vector<CString> m_UnitValue;
+	
 	virtual BOOL OnInitDialog();
 	afx_msg void OnBnClickedButtonBlxfile();
+public:
+	vector<CString> GetUnitValueByGroupUnit(CString strGroupUnit);
+	vector<CString> GetDataFormatByVariable(CString strVariable);
+	vector<CString> GetRWByVariableDataFormat(CString strVariable, CString strDataFormat);
+	vector<CString> GetBacnetType(CString strVariable, CString strDataFormat,CString RW);
 };

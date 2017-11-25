@@ -9617,7 +9617,6 @@ BEGIN
         MENUITEM "PH Chart",                    ID_TOOLS_PHCHART
         MENUITEM "Option",                      ID_TOOLS_OPTION
         MENUITEM "&DisConnect \tCtrl+D",        ID_DISCONNECT2
-        MENUITEM "Modbus To Bacnet Router",     ID_TOOLS_MODBUSTOBACNETROUTER
     END
     POPUP "&View"
     BEGIN
@@ -9664,6 +9663,7 @@ BEGIN
         MENUITEM "&Remote Points       (Alt - T)", ID_CONTROL_TSTAT
         MENUITEM "Customer &Units       (Alt - U)", ID_CONTROL_CUSTOMERUNITS
         MENUITEM "&Configuration         (Alt - E)", ID_CONTROL_SETTINGS
+        MENUITEM "Modbus To Bacnet Router",     ID_TOOLS_MODBUSTOBACNETROUTER
     END
     POPUP "&Miscellaneous"
     BEGIN
