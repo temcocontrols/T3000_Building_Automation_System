@@ -62,9 +62,15 @@ public:
 	
 	virtual BOOL OnInitDialog();
 	afx_msg void OnBnClickedButtonBlxfile();
+ 
+	afx_msg LRESULT Fresh_Input_Item(WPARAM wParam, LPARAM lParam);
+ 
 public:
 	vector<CString> GetUnitValueByGroupUnit(CString strGroupUnit);
 	vector<CString> GetDataFormatByVariable(CString strVariable);
 	vector<CString> GetRWByVariableDataFormat(CString strVariable, CString strDataFormat);
 	vector<CString> GetBacnetType(CString strVariable, CString strDataFormat,CString RW);
+ 
+	afx_msg void OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult);
+ 
 };
