@@ -5452,8 +5452,8 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 
 
 	}
-	if (write_indb_thread == NULL)
-		write_indb_thread = CreateThread(NULL, NULL, Write_Data_Into_Db, this, NULL, NULL);
+	  /*if (write_indb_thread == NULL)
+		  write_indb_thread = CreateThread(NULL, NULL, Write_Data_Into_Db, this, NULL, NULL);*/
 	WritePrivateProfileStringW(_T("LastView"),_T("ViewSerialNumber"),temp_serial_number,g_cstring_ini_path);
 	WritePrivateProfileStringW(_T("LastView"),_T("ViewPid"),_T("35"),g_cstring_ini_path);
 	SetTimer(BAC_SET_LAST_UI,1000,NULL);

@@ -3,12 +3,15 @@
 #include "CM5/ListCtrlEx.h"
 #include "MainFrm.h"
 #include "afxwin.h"
+#include <vector>
+using namespace  std;
 // CProductRegisterListView form view
 struct CustomProductTable_T{
     int ModelNo;
     CString  Reg_Description;
     int Reg_ID;
     CString Para_Type;
+	CString Para_Type1;
 	int function_code;
     int  Counts_Number;
     CString  Property;
@@ -16,6 +19,9 @@ struct CustomProductTable_T{
     CString DataFormat;
 	CString SN;
 	int caculate;
+	CString Unit;
+	CString Default;
+
 };
 class CProductRegisterListView : public CFormView
 {
@@ -45,6 +51,7 @@ public:
     void Fresh(void);
 	void SetStart(BOOL Start);
     void Initial_List(void);
+	void ShowDataInList();
     virtual void OnInitialUpdate();
     void LoadDataSheet();
 	void Import_CustomProductTable();
@@ -88,7 +95,7 @@ public:
 	CString m_array_modbus_function[8];
 	CString m_array_caculate[3];
 	
-	 
+	 vector<CString> m_dataformat;
 };
 
 

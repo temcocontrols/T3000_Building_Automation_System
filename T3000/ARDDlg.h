@@ -50,4 +50,7 @@ public:
     CComboBox m_minipanel_comport;
 	int GetNewProductID();
 	int GetNewSerialNumber();
+	//afx_msg void OnCbnSelchangeComboAddDeviceComport();
+//	afx_msg void OnBnClickedCheckOnlineOffline();
+//	CButton m_offlineButton;
 };

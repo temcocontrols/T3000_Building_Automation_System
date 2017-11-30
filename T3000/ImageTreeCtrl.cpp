@@ -20,6 +20,7 @@ enum ECmdHandler {
 	ID_SORT_BY_FLOOR,
 	ID_PING_CMD,
 	ID_ADD_VIRTUAL_DEVICE,
+	ID_ADD_CUSTOM_DEVICE,
 	ID_MAX_CMD
 };
 
@@ -140,6 +141,7 @@ CImageTreeCtrl::CImageTreeCtrl()
 	m_Commandmap[ID_SORT_BY_FLOOR]		        = &CImageTreeCtrl::SortByFloor;
 	m_Commandmap[ID_PING_CMD]		        = &CImageTreeCtrl::PingDevice;
 	m_Commandmap[ID_ADD_VIRTUAL_DEVICE]     = &CImageTreeCtrl::HandleAddVirtualDevice;
+	m_Commandmap[ID_ADD_CUSTOM_DEVICE]      = &CImageTreeCtrl::HandleAddCustomDevice;
 	old_hItem = NULL;
 	m_serial_number = 0;
 	is_focus = false;
@@ -225,7 +227,13 @@ bool CImageTreeCtrl::HandleAddVirtualDevice(HTREEITEM)
 	popdlg.DoModal();
 	return true;
 }
-
+#include "ARDDlg.h"
+bool CImageTreeCtrl::HandleAddCustomDevice(HTREEITEM)
+{
+	CARDDlg popdlg;
+	popdlg.DoModal();
+	return true;
+}
 bool CImageTreeCtrl::SortByConnection(HTREEITEM hItem) 
 {
 	if(product_sort_way != SORT_BY_CONNECTION)
@@ -1612,9 +1620,13 @@ void CImageTreeCtrl::DisplayContextOtherMenu(CPoint & point) {
 
 		VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_CONNECTION, _T("Sort By Connection")));
 		VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_FLOOR, _T("Sort By Floor")));
-		
+		VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_CUSTOM_DEVICE, _T("Add Custom Device Register List")));
+
 		if((m_virtual_tree_item != NULL) && (hItem == m_virtual_tree_item))
+			{
 			VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_VIRTUAL_DEVICE, _T("Add Virtual Device")));
+			VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_CUSTOM_DEVICE, _T("Add Custom Device Register List")));
+			}
 		if(menu.GetMenuItemCount() > 0)
 			menu.TrackPopupMenu(TPM_LEFTALIGN, point.x, point.y, this);
 }
