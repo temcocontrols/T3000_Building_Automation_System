@@ -43,6 +43,44 @@ END_MESSAGE_MAP()
 BOOL CModbusToBacnetRouterDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
+ 
+	m_vecVariableType.push_back(L"_1_Input_Bit");
+	m_vecVariableType.push_back(L"_3_Input_Register");
+	m_vecVariableType.push_back(L"_0_Coil_Bit");
+	m_vecVariableType.push_back(L"_4_Holding_Register");
+
+	m_vecDataFormat.push_back(L"_1_Input_Bit");
+	m_vecDataFormat.push_back(L"_1_Input_Bit");
+	m_vecDataFormat.push_back(L"_1_Input_Bit");
+	m_vecDataFormat.push_back(L"_1_Input_Bit");
+	m_vecDataFormat.push_back(L"_1_Input_Bit");
+	m_vecDataFormat.push_back(L"_1_Input_Bit");
+	m_vecDataFormat.push_back(L"_1_Input_Bit");
+
+	m_GroupUnits.push_back(L"Bacnet_Units");
+	m_GroupUnits.push_back(L"Acceleration");
+	m_GroupUnits.push_back(L"Area");
+	m_GroupUnits.push_back(L"Currency");
+	m_GroupUnits.push_back(L"Electrical");
+	m_GroupUnits.push_back(L"Energy");
+	m_GroupUnits.push_back(L"Enthalpy");
+	m_GroupUnits.push_back(L"Entropy");
+	m_GroupUnits.push_back(L"Force");
+	m_GroupUnits.push_back(L"Frequency");
+	m_GroupUnits.push_back(L"Humidity");
+	m_GroupUnits.push_back(L"Length");
+	m_GroupUnits.push_back(L"Light");
+	m_GroupUnits.push_back(L"Mass");
+	m_GroupUnits.push_back(L"Mass_Flow");
+	m_GroupUnits.push_back(L"Power");
+	m_GroupUnits.push_back(L"Pressure");
+	m_GroupUnits.push_back(L"Temperature");
+	m_GroupUnits.push_back(L"Time");
+	m_GroupUnits.push_back(L"Torque");
+	m_GroupUnits.push_back(L"Velocity");
+	m_GroupUnits.push_back(L"Volume");
+	m_GroupUnits.push_back(L"Volumetric_Flow");
+	m_GroupUnits.push_back(L"Other");
 	g_hwnd_now = this->m_hWnd;
 	m_vecYesNo.push_back(L"NO");
 	m_vecYesNo.push_back(L"YES");
@@ -107,11 +145,14 @@ BOOL CModbusToBacnetRouterDlg::OnInitDialog()
 	
 	
 
+
 	m_vecDataRW.push_back(L"R_Only");
 	m_vecDataRW.push_back(L"R_W");
 
 
-	for (int i = 0;i < 20;i++)
+
+	for (int i = 0;i < 255;i++)
+ 
 	{
 		ModbusToBacnetRouter tmpnode;
 		tmpnode.Poll_YES_NO=L"YES";
@@ -399,6 +440,7 @@ vector<CString> CModbusToBacnetRouterDlg::GetUnitValueByGroupUnit(CString strGro
 				vecTmp.push_back(L"BTUS_PER_POUND");
 					vecTmp.push_back(L"KILOJOULES_PER_KILOGRAM_DRY_AIR");
 						vecTmp.push_back(L"MEGAJOULES_PER_KILOGRAM_DRY_AIR");
+ 
 
 	}
 	else if (strGroupUnit.CompareNoCase(L"Entropy") == 0)
@@ -1055,7 +1097,660 @@ vector<CString> CModbusToBacnetRouterDlg::GetBacnetType(CString strVariable, CSt
 	 
 	return vecTmp;
 }
+ 
 
+	}
+	else if (strGroupUnit.CompareNoCase(L"Entropy") == 0)
+	{
+		vecTmp.clear();
+ 
+
+		vecTmp.push_back(L"JOULES_PER_DEGREE_KELVIN");
+			vecTmp.push_back(L"JOULES_PER_KILOGRAM_DEGREE_KELVIN");
+				vecTmp.push_back(L"KILOJOULES_PER_DEGREE_KELVIN");
+					vecTmp.push_back(L"MEGAJOULES_PER_DEGREE_KELVIN");
+	}
+	else if (strGroupUnit.CompareNoCase(L"Force") == 0)
+	{
+		vecTmp.clear();
+		vecTmp.push_back(L"NEWTON");
+	}
+	else if (strGroupUnit.CompareNoCase(L"Frequency") == 0)
+	{
+		vecTmp.clear();
+	 
+
+
+		vecTmp.push_back(L"CYCLES_PER_HOUR");
+			vecTmp.push_back(L"CYCLES_PER_MINUTE");
+				vecTmp.push_back(L"HERTZ");
+					vecTmp.push_back(L"KILOHERTZ");
+						vecTmp.push_back(L"MEGAHERTZ");
+							vecTmp.push_back(L"PER_HOUR");
+
+	}
+	else if (strGroupUnit.CompareNoCase(L"Humidity") == 0)
+	{
+		vecTmp.clear();
+		vecTmp.push_back(L"GRAMS_OF_WATER_PER_KILOGRAM_DRY_AIR");
+		vecTmp.push_back(L"PERCENT_RELATIVE_HUMIDITY");
+	}
+	else if (strGroupUnit.CompareNoCase(L"Length") == 0)
+	{
+		vecTmp.clear();
+		vecTmp.push_back(L"MILLIMETER");
+			vecTmp.push_back(L"METERS");
+				vecTmp.push_back(L"INCH");
+					vecTmp.push_back(L"FEET");
+						vecTmp.push_back(L"CENTIMETERS");
+							vecTmp.push_back(L"KILOMETERS");
+								vecTmp.push_back(L"MICROMETERS");
+	}
+	else if (strGroupUnit.CompareNoCase(L"Light") == 0)
+	{
+		vecTmp.clear();
+		 
+
+
+		vecTmp.push_back(L"WATTS_PER_SQUARE_FOOT");
+			vecTmp.push_back(L"WATTS_PER_SQUARE_METER");
+				vecTmp.push_back(L"LUMEN");
+					vecTmp.push_back(L"LUX");
+						vecTmp.push_back(L"FOOT_CANDLES");
+							vecTmp.push_back(L"CANDELAS");
+								vecTmp.push_back(L"CANDELAS_PER_SQUARE_METER");
+	}
+	else if (strGroupUnit.CompareNoCase(L"Mass") == 0)
+	{
+		vecTmp.clear();
+
+		vecTmp.push_back(L"KILOGRAMS");
+			vecTmp.push_back(L"POUNDS_MASS");
+				vecTmp.push_back(L"TONS");
+					vecTmp.push_back(L"GRAMS");
+						vecTmp.push_back(L"MILLIGRAMS");
+
+
+		 
+	}
+	else if (strGroupUnit.CompareNoCase(L"Mass_Flow") == 0)
+	{
+		vecTmp.clear();
+
+	 
+		
+		vecTmp.push_back(L"KILOGRAMS_PER_SECOND");
+			vecTmp.push_back(L"KILOGRAMS_PER_MINUTE");
+				vecTmp.push_back(L"KILOGRAMS_PER_HOUR");
+					vecTmp.push_back(L"POUNDS_MASS_PER_MINUTE");
+						vecTmp.push_back(L"POUNDS_MASS_PER_HOUR");
+							vecTmp.push_back(L"POUNDS_MASS_PER_SECOND");
+								vecTmp.push_back(L"GRAMS_PER_SECOND");
+									vecTmp.push_back(L"GRAMS_PER_MINUTE");
+										vecTmp.push_back(L"TONS_PER_HOUR");
+
+
+	}
+	else if (strGroupUnit.CompareNoCase(L"Power") == 0)
+	{
+		vecTmp.clear();
+ 
+
+
+		vecTmp.push_back(L"WATTS");
+			vecTmp.push_back(L"KILOWATTS");
+				vecTmp.push_back(L"MEGAWATTS");
+					vecTmp.push_back(L"BTU_PER_HOUR");
+						vecTmp.push_back(L"HORSEPOWER");
+							vecTmp.push_back(L"TONS_REFRIGERATIONS");
+								vecTmp.push_back(L"MILLIWATTS");
+									vecTmp.push_back(L"KILO_BTUS_PER_HOUR");
+
+	}
+	else if (strGroupUnit.CompareNoCase(L"Pressure") == 0)
+	{
+		vecTmp.clear();
+		 
+		 
+		vecTmp.push_back(L"PASCALS");
+			vecTmp.push_back(L"KILOPASCAL");
+				vecTmp.push_back(L"BAR");
+			vecTmp.push_back(L"POUNDS_FORCE_PER_SQUARE_INCH");
+			vecTmp.push_back(L"CENTIMETERS_OF_WATER");
+			vecTmp.push_back(L"INCHES_OF_WATER");
+			vecTmp.push_back(L"MILLIMETERS_OF_MERCURY");
+			vecTmp.push_back(L"CENTIMETERS_OF_MERCURY");
+			vecTmp.push_back(L"INCHES_OF_MERCURY");
+			vecTmp.push_back(L"HECTOPASCALS");
+			vecTmp.push_back(L"MILLIBARS");
+			vecTmp.push_back(L"MILLIMETERS_OF_WATER");
+	}
+	else if (strGroupUnit.CompareNoCase(L"Temperature") == 0)
+	{
+		vecTmp.clear();
+		    vecTmp.push_back(L"DEGREES_CELSIUS");
+			vecTmp.push_back(L"DEGREES_KELVIN");
+			vecTmp.push_back(L"DEGREES_FAHRENHEIT");
+			vecTmp.push_back(L"DEGREE_DAYS_CELSIUS");
+			vecTmp.push_back(L"DEGREE_DAYS_FAHRENHEIT");
+			vecTmp.push_back(L"DELTA_DEGREE_FAHRENHEIT");
+			vecTmp.push_back(L"DELTA_DEGREE_KELVIN");
+			vecTmp.push_back(L"DEGREE_KELVIN_PER_HOUR");
+			vecTmp.push_back(L"DEGREE_KELVIN_PER_MINUTE");
+	}
+	else if (strGroupUnit.CompareNoCase(L"Time") == 0)
+	{
+		vecTmp.clear();
+
+		    vecTmp.push_back(L"YEAR");
+			vecTmp.push_back(L"MONTH");
+			vecTmp.push_back(L"WEEK");
+			vecTmp.push_back(L"DAY");
+			vecTmp.push_back(L"HOUR");
+			vecTmp.push_back(L"MINUTE");
+			vecTmp.push_back(L"SECOND");
+			vecTmp.push_back(L"HUNDREDTHS_SECONDS");
+			vecTmp.push_back(L"MILLISECONDS");
+	}
+	else if (strGroupUnit.CompareNoCase(L"Torque") == 0)
+	{
+		vecTmp.clear();
+		vecTmp.push_back(L"NEWTON_METERS");
+	}
+	else if (strGroupUnit.CompareNoCase(L"Velocity") == 0)
+	{
+		vecTmp.clear();
+
+		    vecTmp.push_back(L"METERS_PER_SECOND");
+			vecTmp.push_back(L"KILOMETERS_PER_HOUR");
+			vecTmp.push_back(L"FEET_PER_SECOND");
+			vecTmp.push_back(L"FEET_PER_MINUTE");
+			vecTmp.push_back(L"MILES_PER_HOUR");
+			vecTmp.push_back(L"MILLIMETERS_PER_SECOND");
+			vecTmp.push_back(L"MILLIMETERS_PER_MINUTE");
+			vecTmp.push_back(L"METERS_PER_MINUTE");
+			vecTmp.push_back(L"METERS_PER_HOUR");
+
+	}
+	else if (strGroupUnit.CompareNoCase(L"Volume") == 0)
+	{
+		vecTmp.clear();
+
+	 
+
+
+		    vecTmp.push_back(L"CUBIC_FEET");
+			vecTmp.push_back(L"CUBIC_METERS");
+			vecTmp.push_back(L"IMPERIAL_GALLONS");
+			vecTmp.push_back(L"LITERS");
+			vecTmp.push_back(L"US_GALLONS");
+			vecTmp.push_back(L"MILLILITERS");
+
+	}
+	else if (strGroupUnit.CompareNoCase(L"Volumetric_Flow") == 0)
+	{
+		vecTmp.clear();
+		    vecTmp.push_back(L"CUBIC_FEET_PER_MINUTE");
+			vecTmp.push_back(L"CUBIC_METERS_PER_SECOND");
+			vecTmp.push_back(L"IMPERIAL_GALLONS_PER_MINUTE");
+			vecTmp.push_back(L"LITERS_PER_SECOND");
+			vecTmp.push_back(L"LITERS_PER_MINUTE");
+			vecTmp.push_back(L"US_GALLONS_PER_MINUTE");
+			vecTmp.push_back(L"CUBIC_MATERS_PER_HOUR");
+			vecTmp.push_back(L"LITERS_PER_HOUR");
+			vecTmp.push_back(L"CUBIC_FEET_PER_SECOND");
+			vecTmp.push_back(L"CUBIC_METERS_PER_MINUTE");
+			vecTmp.push_back(L"CUBIC_FEET_PER_HOUR");
+			vecTmp.push_back(L"US_GALLONS_PER_HOUR");
+			vecTmp.push_back(L"MILLILITERS_PER_SECOND");
+
+	}
+	else if (strGroupUnit.CompareNoCase(L"Other") == 0)
+	{
+		vecTmp.clear();
+		    vecTmp.push_back(L"DEGREES_ANGULAR");
+			vecTmp.push_back(L"DEGREES_CELSIUS_PER_HOUR");
+			vecTmp.push_back(L"DEGREES_CELSIUS_PER_MINUTE");
+			vecTmp.push_back(L"DEGREES_FAHRENHEIT_PER_HOUR");
+			vecTmp.push_back(L"DEGREES_FAHRENHEIT_PER_MINUTE");
+			vecTmp.push_back(L"NO_UNITS");
+			vecTmp.push_back(L"PARTS_PER_MILLION");
+			vecTmp.push_back(L"PARTS_PER_BILLION");
+			vecTmp.push_back(L"PERCENT");
+			vecTmp.push_back(L"PERCENT_PER_SECOND");
+			vecTmp.push_back(L"PER_MINUTE");
+			vecTmp.push_back(L"PER_SECOND");
+			vecTmp.push_back(L"PSI_PER_DEGREE_FAHRENHEIT");
+			vecTmp.push_back(L"RADIANS");
+			vecTmp.push_back(L"REVOLUTIONS_PER_MINUTE");
+			vecTmp.push_back(L"KILOWATT_HOURS_PER_SQUARE_METER");
+			vecTmp.push_back(L"KILOWATT_HOURS_PER_SQUARE_FOOT");
+			vecTmp.push_back(L"MEGAJOULES_PER_SQUARE_METER");
+			vecTmp.push_back(L"MEGAJOULES_PER_SQUARE_FOOT");
+			vecTmp.push_back(L"WATTS_PER_SQUARE_METER_DEGREE_KELVIN");
+			vecTmp.push_back(L"PERCENT_OBSCURATION_PER_FOOT");
+			vecTmp.push_back(L"PERCENT_OBSCURATION_PER_METER");
+			vecTmp.push_back(L"JOULE_SECONDS");
+			vecTmp.push_back(L"RADIANS_PER_SECOND");
+			vecTmp.push_back(L"SQUARE_METERS_PER_NEWTON");
+			vecTmp.push_back(L"KILOGRAMS_PER_CUBIC_METER");
+			vecTmp.push_back(L"NEWTON_SECONDS");
+			vecTmp.push_back(L"NEWTONS_PER_METER");
+			vecTmp.push_back(L"WATTS_PER_METER_PER_DEGREE_KELVIN");
+			vecTmp.push_back(L"PER_MILE");
+			vecTmp.push_back(L"GRAMS_PER_GRAM");
+			vecTmp.push_back(L"KILOGRAMS_PER_KILOGRAM");
+			vecTmp.push_back(L"GRAMS_PER_KILOGRAM");
+			vecTmp.push_back(L"MILLIGRAMS_PER_GRAM");
+			vecTmp.push_back(L"MILLIGRAMS_PER_KILOGRAM");
+			vecTmp.push_back(L"GRAMS_PER_MILLILITER");
+			vecTmp.push_back(L"GRAMS_PER_LITER");
+			vecTmp.push_back(L"MILLIGRAMS_PER_LITER");
+			vecTmp.push_back(L"MICROGRAMS_PER_LITER");
+			vecTmp.push_back(L"GRAMS_PER_CUBIC_METER");
+			vecTmp.push_back(L"MILLIGRAMS_PER_CUBIC_METER");
+			vecTmp.push_back(L"MICROGRAMS_PER_CUBIC_METER");
+			vecTmp.push_back(L"NANOGRAMS_PER_CUBIC_METER");
+			vecTmp.push_back(L"GRAMS_PER_CUBIC_CENTIMETER");
+			vecTmp.push_back(L"BECQUERELS");
+			vecTmp.push_back(L"KILOBECQUERELS");
+			vecTmp.push_back(L"KILOBECQUERELS");
+			vecTmp.push_back(L"MEGABECQUERELS");
+			vecTmp.push_back(L"GRAY");
+			vecTmp.push_back(L"MILLIGRAY");
+			vecTmp.push_back(L"MICROGRAY");
+			vecTmp.push_back(L"SIEVERTS");
+			vecTmp.push_back(L"MILLISIEVERTS");
+			vecTmp.push_back(L"MICROSIEVERTS");
+			vecTmp.push_back(L"MICROSIEVERTS_PER_HOUR");
+			vecTmp.push_back(L"DECIBELS_A");
+			vecTmp.push_back(L"NEPHELOMETRIC_TURBIDITY_UNIT");
+			vecTmp.push_back(L"PH");
+			vecTmp.push_back(L"GRAMS_PER_SQUARE_METER");
+			vecTmp.push_back(L"MINUTES_PER_DEGREE_KELVIN");
+	}
+	else
+	{
+		vecTmp.clear();
+	}
+
+	return vecTmp;
+}
+vector<CString> CModbusToBacnetRouterDlg::GetDataFormatByVariable(CString strVariable)
+{
+	vector<CString> vecTmp;
+	if (strVariable.CompareNoCase(L"_4_Holding_Register") == 0)
+	{
+		  
+
+		   vecTmp.clear();
+		    vecTmp.push_back(L"16 Bit Unsigned Integer");
+			vecTmp.push_back(L"16 Bit Signed Integer");
+			vecTmp.push_back(L"32 Bit Unsigned Integer HI_LO");
+			vecTmp.push_back(L"32 Bit Signed Integer HI_LO");
+			vecTmp.push_back(L"32 Bit Unsigned Integer LO_HI");
+			vecTmp.push_back(L"32 Bit Signed Integer LO_HI");
+			vecTmp.push_back(L"Floating Point HI_LO");
+			vecTmp.push_back(L"Floating Point LO_HI");
+			vecTmp.push_back(L"_16 Bit   Bit Pick");
+			vecTmp.push_back(L"_32 Bit   Bit Pick HI_LO");
+			vecTmp.push_back(L"_32 Bit   Bit Pick LO_HI");
+   }
+	else if (strVariable.CompareNoCase(L"_0_Coil_Bit") == 0 || strVariable.CompareNoCase(L"_1_Input_Bit") == 0)
+	{
+		vecTmp.clear();
+		vecTmp.push_back(L"bit");
+	}
+	else if (strVariable.CompareNoCase(L"_3_Input_Register") == 0)
+	{
+		vecTmp.clear();
+	 
+		    vecTmp.push_back(L"16 Bit Unsigned Integer");
+			vecTmp.push_back(L"16 Bit Signed Integer");
+			vecTmp.push_back(L"32 Bit Unsigned Integer HI_LO");
+			vecTmp.push_back(L"32 Bit Signed Integer HI_LO");
+			vecTmp.push_back(L"32 Bit Unsigned Integer LO_HI");
+			vecTmp.push_back(L"32 Bit Signed Integer LO_HI");
+			vecTmp.push_back(L"Floating Point HI_LO");
+			vecTmp.push_back(L"Floating Point LO_HI");
+			vecTmp.push_back(L"_16 Bit   Bit Pick");
+			vecTmp.push_back(L"_32 Bit   Bit Pick HI_LO");
+			vecTmp.push_back(L"_32 Bit   Bit Pick LO_HI");
+
+	}
+	else if (strVariable.CompareNoCase(L"Area") == 0)
+	{
+		vecTmp.clear();
+		vecTmp.push_back(L"SQUARE_METERS");
+		vecTmp.push_back(L"SQUARE_FEET");
+		vecTmp.push_back(L"SQUARE_INCHES");
+		vecTmp.push_back(L"SQUARE_CENTIMETERS");
+	}
+	return vecTmp;
+}
+vector<CString> CModbusToBacnetRouterDlg::GetRWByVariableDataFormat(CString strVariable, CString strDataFormat)
+{
+
+
+	vector<CString> vecTmp;
+	if (
+		(strVariable.CompareNoCase(L"_4_Holding_Register") == 0 && strDataFormat.CompareNoCase(L"16BitUnsignedInteger") == 0) ||
+		(strVariable.CompareNoCase(L"_4_Holding_Register") == 0 && strDataFormat.CompareNoCase(L"16BitSignedInteger") == 0) ||
+		(strVariable.CompareNoCase(L"_4_Holding_Register") == 0 && strDataFormat.CompareNoCase(L"32BitUnsignedIntegerHI_LO") == 0) ||
+		(strVariable.CompareNoCase(L"_4_Holding_Register") == 0 && strDataFormat.CompareNoCase(L"32BitSignedIntegerHI_LO") == 0) ||
+		(strVariable.CompareNoCase(L"_4_Holding_Register") == 0 && strDataFormat.CompareNoCase(L"32BitSignedIntegerLO_HI") == 0) ||
+		(strVariable.CompareNoCase(L"_4_Holding_Register") == 0 && strDataFormat.CompareNoCase(L"32BitUnsignedIntegerLO_HI") == 0) ||
+		(strVariable.CompareNoCase(L"_4_Holding_Register") == 0 && strDataFormat.CompareNoCase(L"FloatingPointHI_LO") == 0) ||
+		(strVariable.CompareNoCase(L"_4_Holding_Register") == 0 && strDataFormat.CompareNoCase(L"FloatingPointLO_HI") == 0) ||
+		(strVariable.CompareNoCase(L"_4_Holding_Register") == 0 && strDataFormat.CompareNoCase(L"_16BitBitPick") == 0) ||
+		(strVariable.CompareNoCase(L"_4_Holding_Register") == 0 && strDataFormat.CompareNoCase(L"_32BitBitPickHI_LO") == 0) ||
+		(strVariable.CompareNoCase(L"_4_Holding_Register") == 0 && strDataFormat.CompareNoCase(L"_32BitBitPickLO_HI") == 0) ||
+		(strVariable.CompareNoCase(L"_0_Coil_BitBit") == 0)
+		)
+	{
+		vecTmp.push_back(L"R_W");
+		vecTmp.push_back(L"R_Only");
+	}
+	else if (
+		(strVariable.CompareNoCase(L"_3_Input_Register") == 0 && strDataFormat.CompareNoCase(L"16BitUnsignedInteger") == 0) ||
+		(strVariable.CompareNoCase(L"_3_Input_Register") == 0 && strDataFormat.CompareNoCase(L"16BitSignedInteger") == 0) ||
+		(strVariable.CompareNoCase(L"_3_Input_Register") == 0 && strDataFormat.CompareNoCase(L"32BitUnsignedIntegerHI_LO") == 0) ||
+		(strVariable.CompareNoCase(L"_3_Input_Register") == 0 && strDataFormat.CompareNoCase(L"32BitSignedIntegerHI_LO") == 0) ||
+		(strVariable.CompareNoCase(L"_3_Input_Register") == 0 && strDataFormat.CompareNoCase(L"32BitSignedIntegerLO_HI") == 0) ||
+		(strVariable.CompareNoCase(L"_3_Input_Register") == 0 && strDataFormat.CompareNoCase(L"32BitUnsignedIntegerLO_HI") == 0) ||
+		(strVariable.CompareNoCase(L"_3_Input_Register") == 0 && strDataFormat.CompareNoCase(L"FloatingPointHI_LO") == 0) ||
+		(strVariable.CompareNoCase(L"_3_Input_Register") == 0 && strDataFormat.CompareNoCase(L"FloatingPointLO_HI") == 0) ||
+		(strVariable.CompareNoCase(L"_3_Input_Register") == 0 && strDataFormat.CompareNoCase(L"_16BitBitPick") == 0) ||
+		(strVariable.CompareNoCase(L"_3_Input_Register") == 0 && strDataFormat.CompareNoCase(L"_32BitBitPickHI_LO") == 0) ||
+		(strVariable.CompareNoCase(L"_3_Input_Register") == 0 && strDataFormat.CompareNoCase(L"_32BitBitPickLO_HI") == 0) ||
+		(strVariable.CompareNoCase(L"_1_Input_BitBits") == 0)
+		)
+	{
+		vecTmp.push_back(L"R_Only");
+	}
+	return vecTmp;
+}
+vector<CString> CModbusToBacnetRouterDlg::GetBacnetType(CString strVariable, CString strDataFormat, CString RW)
+{
+	vector<CString> vecTmp;
+	if (strVariable.CompareNoCase(L"_4_Holding_Register") == 0 && strDataFormat.CompareNoCase(L"16BitUnsignedInteger") == 0 && RW.CompareNoCase(L"R_W") == 0)
+	{
+		vecTmp.push_back(L"AO");
+		/*  Future 1
+		  Future 2
+		  Future 3
+		  Future 4
+		  Future 5*/
+	}
+	else if (strVariable.CompareNoCase(L"_4_Holding_Register") == 0 && strDataFormat.CompareNoCase(L"16BitUnsignedInteger") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"AI");
+		/*Future 1
+		Future 2
+		Future 3
+		Future 4
+		Future 5*/
+	}
+	else   if (strVariable.CompareNoCase(L"_4_Holding_Register") == 0 && strDataFormat.CompareNoCase(L"16BitSignedInteger") == 0 && RW.CompareNoCase(L"R_W") == 0)
+	{
+		vecTmp.push_back(L"AO");
+		/*Future 1
+		Future 2
+		Future 3
+		Future 4
+		Future 5*/
+	}
+	else if (strVariable.CompareNoCase(L"_4_Holding_Register") == 0 && strDataFormat.CompareNoCase(L"16BitSignedInteger") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"AI");
+		/*Future 1
+		Future 2
+		Future 3
+		Future 4
+		Future 5*/
+	}
+	else   if (strVariable.CompareNoCase(L"_4_Holding_Register32") == 0 && strDataFormat.CompareNoCase(L"BitUnsignedIntegerHI_LO") == 0 && RW.CompareNoCase(L"R_W") == 0)
+	  {
+		  vecTmp.push_back(L"AO");
+			  vecTmp.push_back(L"UVRW");
+			 /* Future 2
+			  Future 3
+			  Future 4
+			  Future 5*/
+	  }
+	else  if (strVariable.CompareNoCase(L"_4_Holding_Register32") == 0 && strDataFormat.CompareNoCase(L"BitUnsignedIntegerHI_LO") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	  {
+		  vecTmp.push_back(L"AI");
+			  vecTmp.push_back(L"UVRO");
+			  /*Future 2
+			  Future 3
+			  Future 4
+			  Future 5*/
+	  }
+	  else  if (strVariable.CompareNoCase(L"_4_Holding_Register32") == 0 && strDataFormat.CompareNoCase(L"BitSignedIntegerHI_LO") == 0 && RW.CompareNoCase(L"R_W") == 0)
+	  {
+		  vecTmp.push_back(L"AO");
+			  vecTmp.push_back(L"IVRW");
+			  /* Future 2
+			   Future 3
+			   Future 4
+			   Future 5*/
+	  }
+	  else   if (strVariable.CompareNoCase(L"_4_Holding_Register32") == 0 && strDataFormat.CompareNoCase(L"BitSignedIntegerHI_LO") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	  {
+		  vecTmp.push_back(L"AI");
+			  vecTmp.push_back(L"IVRO");
+			 /* Future 2
+			  Future 3
+			  Future 4
+			  Future 5*/
+	  }
+	  else	   if (strVariable.CompareNoCase(L"_4_Holding_Register32") == 0 && strDataFormat.CompareNoCase(L"BitSignedIntegerLO_HI") == 0 && RW.CompareNoCase(L"R_W") == 0)
+	  {
+		  vecTmp.push_back(L"AO");
+			  vecTmp.push_back(L"IVRW");
+			  /*Future 2
+			  Future 3
+			  Future 4
+			  Future 5*/
+	  }
+	  else   if (strVariable.CompareNoCase(L"_4_Holding_Register32") == 0 && strDataFormat.CompareNoCase(L"BitSignedIntegerLO_HI") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	  {
+		  vecTmp.push_back(L"AI");
+			  vecTmp.push_back(L"IVRO");
+			 /* Future 2
+			  Future 3
+			  Future 4
+			  Future 5*/
+	  }
+	  
+	  else   if (strVariable.CompareNoCase(L"_4_Holding_Register32") == 0 && strDataFormat.CompareNoCase(L"BitUnsignedIntegerLO_HI") == 0 && RW.CompareNoCase(L"R_W") == 0)
+	  {
+		  vecTmp.push_back(L"AO");
+			  vecTmp.push_back(L"UVRW");
+			/*  Future 2
+			  Future 3
+			  Future 4
+			  Future 5*/
+	 
+	  }
+	  else if (strVariable.CompareNoCase(L"_4_Holding_Register32") == 0 && strDataFormat.CompareNoCase(L"BitUnsignedIntegerLO_HI") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	  {
+		  vecTmp.push_back(L"AI");
+			  vecTmp.push_back(L"UVRO");
+			 /* Future 2
+			  Future 3
+			  Future 4
+			  Future 5*/
+	  }
+
+	  else if (strVariable.CompareNoCase(L"_4_Holding_Register") == 0 && strDataFormat.CompareNoCase(L"FloatingPointHI_LO") == 0 && RW.CompareNoCase(L"R_W") == 0)
+		  {
+			  vecTmp.push_back(L"AO");
+				 /* Future 1
+				  Future 2
+				  Future 3
+				  Future 4
+				  Future 5*/
+		  }
+
+	  else if (strVariable.CompareNoCase(L"_4_Holding_Register") == 0 && strDataFormat.CompareNoCase(L"FloatingPointHI_LO") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+			  {
+				  vecTmp.push_back(L"AI");
+					 /* Future 1
+					  Future 2
+					  Future 3
+					  Future 4
+					  Future 5*/
+			  }
+
+	  else if (strVariable.CompareNoCase(L"_4_Holding_Register") == 0 && strDataFormat.CompareNoCase(L"FloatingPointLO_HI") == 0 && RW.CompareNoCase(L"R_W") == 0)
+				  {
+					  vecTmp.push_back(L"AO");
+						/*  Future 1
+						  Future 2
+						  Future 3
+						  Future 4
+						  Future 5*/
+				  }
+				  
+	  else if (strVariable.CompareNoCase(L"_4_Holding_Register") == 0 && strDataFormat.CompareNoCase(L"FloatingPointLO_HI") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	  {
+		  vecTmp.push_back(L"AI");
+							 ///* Future 1
+							 // Future 2
+							 // Future 3
+							 // Future 4
+							 // Future 5*/
+	  }
+	  else if (strVariable.CompareNoCase(L"_4_Holding_Register") == 0 && strDataFormat.CompareNoCase(L"_16BitBitPick") == 0 && RW.CompareNoCase(L"R_W") == 0)
+	  {
+		  vecTmp.push_back(L"BO");
+	  }
+	  else if (strVariable.CompareNoCase(L"_4_Holding_Register") == 0 && strDataFormat.CompareNoCase(L"_16BitBitPick") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	  {
+		  vecTmp.push_back(L"BI");
+	  }
+	  else if (strVariable.CompareNoCase(L"_4_Holding_Register") == 0 && strDataFormat.CompareNoCase(L"_32BitBitPickHI_LO") == 0 && RW.CompareNoCase(L"R_W") == 0)
+	  {
+		  vecTmp.push_back(L"BO");
+	  }
+	  else if (strVariable.CompareNoCase(L"_4_Holding_Register") == 0 && strDataFormat.CompareNoCase(L"_32BitBitPickHI_LO") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	  {
+		  vecTmp.push_back(L"BI");
+	  }
+	  else if (strVariable.CompareNoCase(L"_4_Holding_Register") == 0 && strDataFormat.CompareNoCase(L"_32BitBitPickLO_HI") == 0 && RW.CompareNoCase(L"R_W") == 0)
+	  {
+		  vecTmp.push_back(L"BO");
+	  }
+	  else if (strVariable.CompareNoCase(L"_4_Holding_Register") == 0 && strDataFormat.CompareNoCase(L"_32BitBitPickLO_HI") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	  {
+		  vecTmp.push_back(L"BI");
+	  }
+	  else if (strVariable.CompareNoCase(L"_0_Coil_Bit") == 0 && strDataFormat.CompareNoCase(L"Bit") == 0 && RW.CompareNoCase(L"R_W") == 0)
+	  {
+		  vecTmp.push_back(L"BO");
+	  }
+	  else if (strVariable.CompareNoCase(L"_0_Coil_Bit") == 0 && strDataFormat.CompareNoCase(L"Bit") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	  {
+		  vecTmp.push_back(L"BI");
+	  }
+	  else if (strVariable.CompareNoCase(L"_3_Input_Register") == 0 && strDataFormat.CompareNoCase(L"16BitUnsignedInteger") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	  {
+		  vecTmp.push_back(L"AI");
+			 /* Future 1
+			  Future 2
+			  Future 3
+			  Future 4
+			  Future 5*/
+	  }
+	  else if (strVariable.CompareNoCase(L"_3_Input_Register") == 0 && strDataFormat.CompareNoCase(L"16BitSignedInteger") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	  {
+		  vecTmp.push_back(L"AI");
+			 /* Future 1
+			  Future 2
+			  Future 3
+			  Future 4
+			  Future 5*/
+	  }
+	  else if (strVariable.CompareNoCase(L"_3_Input_Register") == 0 && strDataFormat.CompareNoCase(L"32BitUnsignedIntegerHI_LO") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	  {
+		  vecTmp.push_back(L"AI");
+		  vecTmp.push_back(L"UVRO");
+			  /*Future 2
+			  Future 3
+			  Future 4
+			  Future 5*/
+	  }
+	  else if (strVariable.CompareNoCase(L"_3_Input_Register") == 0 && strDataFormat.CompareNoCase(L"32BitSignedIntegerHI_LO") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	  {
+		  vecTmp.push_back(L"AI");
+	      vecTmp.push_back(L"IVRO");
+			 /* Future 2
+			  Future 3
+			  Future 4
+			  Future 5*/
+	  }
+	  else if (strVariable.CompareNoCase(L"_3_Input_Register") == 0 && strDataFormat.CompareNoCase(L"32BitSignedIntegerLO_HI") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	  {
+		  vecTmp.push_back(L"AI");
+			  vecTmp.push_back(L"IVRO");
+			/*  Future 2
+			  Future 3
+			  Future 4
+			  Future 5*/
+	  }
+	  else if (strVariable.CompareNoCase(L"_3_Input_Register") == 0 && strDataFormat.CompareNoCase(L"32BitUnsignedIntegerLO_HI") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	  {
+		  vecTmp.push_back(L"AI");
+			  vecTmp.push_back(L"UVRO");
+			 /* Future 2
+			  Future 3
+			  Future 4
+			  Future 5*/
+	  }
+	  else if (strVariable.CompareNoCase(L"_3_Input_Register") == 0 && strDataFormat.CompareNoCase(L"FloatingPointHI_LO") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	  {
+		  vecTmp.push_back(L"AI");
+			 /* Future 1
+			  Future 2
+			  Future 3
+			  Future 4
+			  Future 5*/
+	  }
+	  else if (strVariable.CompareNoCase(L"_3_Input_Register") == 0 && strDataFormat.CompareNoCase(L"FloatingPointLO_HI") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	  {
+		  vecTmp.push_back(L"AI");
+			 /* Future 1
+			  Future 2
+			  Future 3
+			  Future 4
+			  Future 5*/
+	  }
+	  else if (strVariable.CompareNoCase(L"_3_Input_Register") == 0 && strDataFormat.CompareNoCase(L"_16BitBitPick") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	  {
+		  vecTmp.push_back(L"BI");
+	  }
+
+	  else if (strVariable.CompareNoCase(L"_3_Input_Register") == 0 && strDataFormat.CompareNoCase(L"_32BitBitPickHI_LO") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	  {
+		  vecTmp.push_back(L"BI");
+	  }
+
+	  else if (strVariable.CompareNoCase(L"_3_Input_Register") == 0 && strDataFormat.CompareNoCase(L"_32BitBitPickLO_HI") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	  {
+		  vecTmp.push_back(L"BI");
+	  }
+	  else if (strVariable.CompareNoCase(L"_1_Input_Bit") == 0 && strDataFormat.CompareNoCase(L"Bit") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	  {
+		  vecTmp.push_back(L"BI");
+	  }
+	  else
+	  {
+	  }
+
+	  return vecTmp;
+}
 void CModbusToBacnetRouterDlg::OnBnClickedButtonBlxfile()
 {
 	 
@@ -1077,7 +1772,7 @@ void CModbusToBacnetRouterDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
     m_datalist.SubItemHitTest(&lvinfo);
 	lRow = lvinfo.iItem;
 	lCol = lvinfo.iSubItem;
-	//5= ˝æ›∏Ò Ω
+	//5=Êï∞ÊçÆÊ†ºÂºè
 	if (lRow<m_vecMd2BT.size()&&lCol==5)
 	{
 		m_vecDataFormat = GetDataFormatByVariable(m_vecMd2BT[lRow].Modbus_Variable_Type);
@@ -1092,7 +1787,7 @@ void CModbusToBacnetRouterDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 			m_datalist.SetCellStringList(lRow, 5, strlist);
 		}
 	}
-	//11=∂¡–¥ Ù–‘µƒ≈–∂œ
+	//11=ËØªÂÜôÂ±ûÊÄßÁöÑÂà§Êñ≠
 	if (lRow < m_vecMd2BT.size() && lCol == 11)
 	{
 		m_vecDataRW = GetRWByVariableDataFormat(m_vecMd2BT[lRow].Modbus_Variable_Type, m_vecMd2BT[lRow].Data_Format);
@@ -1106,7 +1801,7 @@ void CModbusToBacnetRouterDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 			m_datalist.SetCellStringList(lRow, 11, strlist);
 		}
 	}
-	//12=Bacnet Type ≈–∂œ
+	//12=Bacnet Type Âà§Êñ≠
 	if (lRow < m_vecMd2BT.size() && lCol == 12)
 	{
 		m_vecBacnetType = GetBacnetType(m_vecMd2BT[lRow].Modbus_Variable_Type, m_vecMd2BT[lRow].Data_Format, m_vecMd2BT[lRow].Read_Only_Or_RW);
