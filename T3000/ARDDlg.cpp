@@ -31,6 +31,7 @@ BOOL CARDDlg::OnInitDialog()
 		m_add_device_com_port.AddString(m_szComm[i]);
 	}
 	m_add_device_com_port.SetCurSel(0);
+	
 
 	m_add_device_baudrate.InsertString(0,_T("9600"));
 	m_add_device_baudrate.InsertString(1,_T("19200"));
@@ -38,7 +39,7 @@ BOOL CARDDlg::OnInitDialog()
 	m_add_device_baudrate.InsertString(3,_T("57600"));
 	m_add_device_baudrate.InsertString(4,_T("115200"));
 	m_add_device_baudrate.SetCurSel(1);
-	m_add_device_modbus_id.SetWindowText(_T("255"));
+	m_add_device_modbus_id.SetWindowText(_T("1"));
 
 	CString	g_configfile_path = g_strExePth + _T("T3000_config.ini");
 	CString strIP;
@@ -57,6 +58,35 @@ BOOL CARDDlg::OnInitDialog()
 	((CEdit*)GetDlgItem(IDC_EDIT_SERIAL_NUMBER))->SetReadOnly(TRUE);
 	strIP.Format(_T("%d"), GetNewSerialNumber());
 	GetDlgItem(IDC_EDIT_SERIAL_NUMBER)->SetWindowText(strIP);
+
+
+
+
+	if (offline_mode)
+	{
+		GetDlgItem(IDOK)->SetWindowTextW(L"Add");
+
+		GetDlgItem(IDC_RADIO_NET_DEVICE)->EnableWindow(FALSE);
+		GetDlgItem(IDC_IPADDRESS1)->EnableWindow(FALSE);
+		GetDlgItem(IDC_PORT)->EnableWindow(FALSE);
+		GetDlgItem(IDC_COMBO1)->EnableWindow(FALSE);
+		GetDlgItem(IDC_RADIO2)->EnableWindow(FALSE);
+		GetDlgItem(IDC_COMBO_ADD_DEVICE_COMPORT)->EnableWindow(FALSE);
+		GetDlgItem(IDC_COMBO_ADD_DEVICE_BAUDRATE)->EnableWindow(FALSE);
+
+	}
+	else
+	{
+		GetDlgItem(IDOK)->SetWindowTextW(L"Connect");
+		GetDlgItem(IDC_RADIO_NET_DEVICE)->EnableWindow(TRUE);
+		GetDlgItem(IDC_IPADDRESS1)->EnableWindow(TRUE);
+		GetDlgItem(IDC_PORT)->EnableWindow(TRUE);
+		GetDlgItem(IDC_COMBO1)->EnableWindow(TRUE);
+		GetDlgItem(IDC_RADIO2)->EnableWindow(TRUE);
+		GetDlgItem(IDC_COMBO_ADD_DEVICE_COMPORT)->EnableWindow(TRUE);
+		GetDlgItem(IDC_COMBO_ADD_DEVICE_BAUDRATE)->EnableWindow(TRUE);
+	}
+
 	return TRUE; 
 }
 
@@ -89,16 +119,17 @@ CARDDlg::~CARDDlg()
 
 void CARDDlg::DoDataExchange(CDataExchange* pDX)
 {
-    CDialogEx::DoDataExchange(pDX);
-    DDX_Control(pDX, IDC_IPADDRESS1, m_ipaddress);
-    DDX_Control(pDX, IDC_PORT, m_porteditor);
-    DDX_Control(pDX, IDC_COMBO_ADD_DEVICE_COMPORT, m_add_device_com_port);
-    DDX_Control(pDX, IDC_COMBO_ADD_DEVICE_BAUDRATE, m_add_device_baudrate);
-    DDX_Control(pDX, IDC_EDIT_ADD_DEVICE_MODBUS_ID, m_add_device_modbus_id);
-    DDX_Text(pDX, IDC_EDIT_SERIAL_NUMBER, m_Serial_Number);
-    DDX_Text(pDX, IDC_EDIT_TYPE_ID, m_type_id);
-    DDX_Control(pDX, IDC_COMBO_PRODUCT_NAME, m_combox_productname);
-    DDX_Control(pDX, IDC_COMBO1, m_minipanel_comport);
+	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_IPADDRESS1, m_ipaddress);
+	DDX_Control(pDX, IDC_PORT, m_porteditor);
+	DDX_Control(pDX, IDC_COMBO_ADD_DEVICE_COMPORT, m_add_device_com_port);
+	DDX_Control(pDX, IDC_COMBO_ADD_DEVICE_BAUDRATE, m_add_device_baudrate);
+	DDX_Control(pDX, IDC_EDIT_ADD_DEVICE_MODBUS_ID, m_add_device_modbus_id);
+	DDX_Text(pDX, IDC_EDIT_SERIAL_NUMBER, m_Serial_Number);
+	DDX_Text(pDX, IDC_EDIT_TYPE_ID, m_type_id);
+	DDX_Control(pDX, IDC_COMBO_PRODUCT_NAME, m_combox_productname);
+	DDX_Control(pDX, IDC_COMBO1, m_minipanel_comport);
+	//  DDX_Control(pDX, IDC_CHECK_ONLINE_OFFLINE, m_offlineButton);
 }
 
 
@@ -109,8 +140,7 @@ BEGIN_MESSAGE_MAP(CARDDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_LOCAL_MSTP_DEVICE, &CARDDlg::OnBnClickedButtonLocalMstpDevice)
     ON_CBN_DROPDOWN(IDC_COMBO_PRODUCT_NAME, &CARDDlg::OnCbnDropdownComboProductName)
     ON_CBN_SELCHANGE(IDC_COMBO_PRODUCT_NAME, &CARDDlg::OnCbnSelchangeComboProductName)
- //   ON_EN_KILLFOCUS(IDC_EDIT_TYPE_ID, &CARDDlg::OnEnKillfocusEditTypeId)
-//    ON_EN_KILLFOCUS(IDC_EDIT_ADD_DEVICE_MODBUS_ID, &CARDDlg::OnEnKillfocusEditAddDeviceModbusId)
+//	ON_BN_CLICKED(IDC_CHECK_ONLINE_OFFLINE, &CARDDlg::OnBnClickedCheckOnlineOffline)
 END_MESSAGE_MAP()
 
 
@@ -154,61 +184,69 @@ void CARDDlg::OnBnClickedOk()
 	   temp_baudrate = GetLastSuccessBaudrate();
    }
 
-   if(m_is_net_device)
+   if (!offline_mode)
    {
-	   m_ipaddress.GetWindowText(ip);
-	   m_porteditor.GetWindowText(strport);
-	   if (ip.IsEmpty()||strport.IsEmpty())
+	   if (m_is_net_device)
 	   {
-		   AfxMessageBox(_T("ip or port can not be empty!"));
-		   return;
+		   m_ipaddress.GetWindowText(ip);
+		   m_porteditor.GetWindowText(strport);
+		   if (ip.IsEmpty() || strport.IsEmpty())
+		   {
+			   AfxMessageBox(_T("ip or port can not be empty!"));
+			   return;
+		   }
+		   short port = _wtoi(strport);
+		   SetCommunicationType(1);
+		   is_open = Open_Socket2(ip, port);
+		   StrProtocol = _T("1");
 	   }
-	   short port=_wtoi(strport);
-	   SetCommunicationType(1);
-	   is_open=Open_Socket2(ip,port);
-       StrProtocol=_T("1");
+	   else
+	   {
+		   SetCommunicationType(0);
+		   close_com();
+
+		   m_add_device_com_port.GetWindowTextW(temp_cs_port);
+		   m_add_device_baudrate.GetWindowTextW(temp_baud);
+
+		   nComport = _wtoi(temp_cs_port.Mid(3));
+		   int nbaudrate = _wtoi(temp_baud);
+
+
+		   // 		if((nbaudrate != 19200) && (nbaudrate != 9600))
+		   // 		{
+		   // 			is_open = false;
+		   // 		}
+		   // 		else
+		   // 		{
+		   if (nComport > 0)
+		   {
+			   BOOL  bret = open_com(nComport);
+			   Change_BaudRate(nbaudrate);
+			   if (bret)
+				   is_open = true;
+			   else
+				   is_open = false;
+		   }
+		   else
+		   {
+			   is_open = false;
+		   }
+		   /*}*/
+		   StrProtocol = _T("0");
+
+
+	   }
    }
    else
    {
-	   SetCommunicationType(0);
-	   close_com();
-
-	   m_add_device_com_port.GetWindowTextW(temp_cs_port);
-	   m_add_device_baudrate.GetWindowTextW(temp_baud);
-	   
-	    nComport = _wtoi(temp_cs_port.Mid(3));
-		int nbaudrate = _wtoi(temp_baud);
-		
-
-// 		if((nbaudrate != 19200) && (nbaudrate != 9600))
-// 		{
-// 			is_open = false;
-// 		}
-// 		else
-// 		{
-			if(nComport > 0)
-			{
-				BOOL  bret = open_com(nComport);
-				Change_BaudRate(nbaudrate);
-				if(bret)
-					is_open = true;
-				else
-					is_open = false;
-			}
-			else
-			{
-				is_open = false;
-			}
-		/*}*/
-          StrProtocol=_T("0");
-
-
+	   ip =L"192.168.0.3";
+	   strport=L"502";
+	   temp_cs_port=L"COM3";
+	   temp_baud = L"19200";
+	   StrProtocol = _T("0");
    }
 
-
-   
-
-   if (is_open)
+   if (is_open||offline_mode)
    {
 	  
 	   CString strSql;
@@ -237,8 +275,17 @@ void CARDDlg::OnBnClickedOk()
 	   strSubBuildingName= pFrame->m_strCurSubBuldingName;
 	   int SN=m_Serial_Number;
        strSID.Format(_T("%d"),SN);
-	   strFloorName=_T("floor1");
-	   strRoomName=_T("room1");
+	   /*if (offline_mode)
+	   {*/
+		   strFloorName = _T("floor1");
+		   strRoomName = _T("floor1");
+		   /* }
+			else
+			{
+				strFloorName = _T("floor1");
+				strRoomName = _T("room1");
+			}*/
+	 
 	   strProName.Format(_T("%s:%d--%d"),Product_Name,SN,read_modbus_id);
 	   strProType.Format(_T("%d"),product_type_id);
 	   strProID.Format(_T("%d"),read_modbus_id);
@@ -285,129 +332,160 @@ void CARDDlg::OnBnClickedOk()
                 strCustomer=_T("1");
            }
             CString strParentSerialNumber;
-           if (GetCommunicationType()==1)
-           {
-               unsigned short DataBuffer[16];
-                memset(DataBuffer,0xffff,16);
-               Read_Multi(255,DataBuffer,0,16);
-               int seialnumber = DataBuffer[0]+DataBuffer[1]*255+DataBuffer[2]*255*255+DataBuffer[3]*255*255*255;
-               strParentSerialNumber.Format(_T("%d"),seialnumber);  
-               ParnetModbusID = DataBuffer[6];
-               if (DataBuffer[7]==PM_MINIPANEL||DataBuffer[7]==PM_CM5|| DataBuffer[7] == PM_MINIPANEL_ARM)
-               {     memset(DataBuffer,0xffff,16);
-                     int miniport = m_minipanel_comport.GetCurSel();
-                     DataBuffer[0]= read_modbus_id;
-                     DataBuffer[1]= product_type_id;
-                     DataBuffer[2]= miniport;
+			if (!offline_mode)
+			{
+				if (GetCommunicationType() == 1)
+				{
+					unsigned short DataBuffer[16];
+					memset(DataBuffer, 0xffff, 16);
+					Read_Multi(255, DataBuffer, 0, 16);
+					int seialnumber = DataBuffer[0] + DataBuffer[1] * 255 + DataBuffer[2] * 255 * 255 + DataBuffer[3] * 255 * 255 * 255;
+					strParentSerialNumber.Format(_T("%d"), seialnumber);
+					ParnetModbusID = DataBuffer[6];
+					if (DataBuffer[7] == PM_MINIPANEL || DataBuffer[7] == PM_CM5 || DataBuffer[7] == PM_MINIPANEL_ARM)
+					{
+						memset(DataBuffer, 0xffff, 16);
+						int miniport = m_minipanel_comport.GetCurSel();
+						DataBuffer[0] = read_modbus_id;
+						DataBuffer[1] = product_type_id;
+						DataBuffer[2] = miniport;
 
-                     unsigned int loword,hiword;
-                     loword=m_Serial_Number & 0xffff;
+						unsigned int loword, hiword;
+						loword = m_Serial_Number & 0xffff;
 
-                     DataBuffer[3]=loword&0xff;
-                     DataBuffer[4]=(loword >> 8);
+						DataBuffer[3] = loword & 0xff;
+						DataBuffer[4] = (loword >> 8);
 
-                     hiword=(m_Serial_Number >> 16) & 0xffff;
+						hiword = (m_Serial_Number >> 16) & 0xffff;
 
-                     DataBuffer[5]=  hiword&0xff;
-                     DataBuffer[6]=  (hiword >> 8);
-                     Product_Name.Delete(16,Product_Name.GetLength());
-                     char p[16];
-                     memset(p,0xff,16);
-                     
-                     WideCharToMultiByte( CP_ACP, 0, Product_Name.GetBuffer(), -1, p, 16, NULL, NULL );
-                     Product_Name.ReleaseBuffer();
-                     
-                     union temp_char{
-                     char ch_temp[16];
-                     unsigned short sh_temp[8];
-                     };
-                     temp_char char_To_short;
-                     for (int i=0;i<8;i++)
-                     {
-                       char_To_short.sh_temp[i]=0;
-                     }
-                     /*  for (int i=0;i<16;i++)
-                     {
-                     char_To_short.ch_temp[i]=p[i];
-                     }*/
-                     char_To_short.ch_temp[0]=p[1];
-                     char_To_short.ch_temp[1]=p[0];
-                     char_To_short.ch_temp[2]=p[3];
-                     char_To_short.ch_temp[3]=p[2];
-                     char_To_short.ch_temp[4]=p[5];
-                     char_To_short.ch_temp[5]=p[4];
-                     char_To_short.ch_temp[6]=p[7];
-                     char_To_short.ch_temp[7]=p[6];
-                     char_To_short.ch_temp[8]=p[9];
-                     char_To_short.ch_temp[9]=p[8];
-                     char_To_short.ch_temp[10]=p[11];
-                     char_To_short.ch_temp[11]=p[10];
-                     char_To_short.ch_temp[12]=p[13];
-                     char_To_short.ch_temp[13]=p[12];
-                     char_To_short.ch_temp[14]=p[15];
-                     char_To_short.ch_temp[15]=p[14];
+						DataBuffer[5] = hiword & 0xff;
+						DataBuffer[6] = (hiword >> 8);
+						Product_Name.Delete(16, Product_Name.GetLength());
+						char p[16];
+						memset(p, 0xff, 16);
 
-                     for(int i=0;i<8;i++)
-                     {
-                         DataBuffer[7+i]=char_To_short.sh_temp[i]; 
-                     }
-                    
-                  int ret=  Write_Multi_short(ParnetModbusID,DataBuffer,280,16,5); 
-                   if (ret>0)
-                  {
-                        AfxMessageBox(_T("Add OK"));
-                        return;
-                  } 
+						WideCharToMultiByte(CP_ACP, 0, Product_Name.GetBuffer(), -1, p, 16, NULL, NULL);
+						Product_Name.ReleaseBuffer();
 
-               }
-               
-                
-		          strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,Protocol,Custom,Parent_SerialNum,EPsize) values('"
-		        	   +pFrame->m_strCurMainBuildingName+"','"
-		        	   +pFrame->m_strCurMainBuildingName +"','"
-		        	   +strSID+"','"
-		        	   +strFloorName+"','"
-		        	   +strRoomName+"','"
-		        	   +strProName+"','"
-		        	   +strProType+"','"
-		        	   +strProID+"','"
-		        	   +strScreenID+"','"
-		        	   +strBaudrate+"','"
-		        	   +strGraphicID+"','"
-		        	   +strHdVersion+"','"
-		        	   +strStVersion+"','"
-		        	   +strCom+"','"
-                      +StrProtocol+"','"
-                      +strCustomer+"','"
-                      +strParentSerialNumber+"','"
-		        	   +strEPSize+"')"));
+						union temp_char {
+							char ch_temp[16];
+							unsigned short sh_temp[8];
+						};
+						temp_char char_To_short;
+						for (int i = 0;i<8;i++)
+						{
+							char_To_short.sh_temp[i] = 0;
+						}
+						/*  for (int i=0;i<16;i++)
+						{
+						char_To_short.ch_temp[i]=p[i];
+						}*/
+						char_To_short.ch_temp[0] = p[1];
+						char_To_short.ch_temp[1] = p[0];
+						char_To_short.ch_temp[2] = p[3];
+						char_To_short.ch_temp[3] = p[2];
+						char_To_short.ch_temp[4] = p[5];
+						char_To_short.ch_temp[5] = p[4];
+						char_To_short.ch_temp[6] = p[7];
+						char_To_short.ch_temp[7] = p[6];
+						char_To_short.ch_temp[8] = p[9];
+						char_To_short.ch_temp[9] = p[8];
+						char_To_short.ch_temp[10] = p[11];
+						char_To_short.ch_temp[11] = p[10];
+						char_To_short.ch_temp[12] = p[13];
+						char_To_short.ch_temp[13] = p[12];
+						char_To_short.ch_temp[14] = p[15];
+						char_To_short.ch_temp[15] = p[14];
 
-               }
-               else
-               {
-                   strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,Protocol,Custom,EPsize) values('"
-                       +pFrame->m_strCurMainBuildingName+"','"
-                       +pFrame->m_strCurMainBuildingName +"','"
-                       +strSID+"','"
-                       +strFloorName+"','"
-                       +strRoomName+"','"
-                       +strProName+"','"
-                       +strProType+"','"
-                       +strProID+"','"
-                       +strScreenID+"','"
-                       +strBaudrate+"','"
-                       +strGraphicID+"','"
-                       +strHdVersion+"','"
-                       +strStVersion+"','"
-                       +strCom+"','"
-                       +StrProtocol+"','"
-                       +strCustomer+"','"
-                       +strEPSize+"')"));
-               }
+						for (int i = 0;i<8;i++)
+						{
+							DataBuffer[7 + i] = char_To_short.sh_temp[i];
+						}
+
+						int ret = Write_Multi_short(ParnetModbusID, DataBuffer, 280, 16, 5);
+						if (ret>0)
+						{
+							AfxMessageBox(_T("Add OK"));
+							return;
+						}
+
+					}
+
+
+					strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,Protocol,Custom,Parent_SerialNum,EPsize) values('"
+						+ pFrame->m_strCurMainBuildingName + "','"
+						+ pFrame->m_strCurMainBuildingName + "','"
+						+ strSID + "','"
+						+ strFloorName + "','"
+						+ strRoomName + "','"
+						+ strProName + "','"
+						+ strProType + "','"
+						+ strProID + "','"
+						+ strScreenID + "','"
+						+ strBaudrate + "','"
+						+ strGraphicID + "','"
+						+ strHdVersion + "','"
+						+ strStVersion + "','"
+						+ strCom + "','"
+						+ StrProtocol + "','"
+						+ strCustomer + "','"
+						+ strParentSerialNumber + "','"
+						+ strEPSize + "')"));
+
+				}
+				else
+				{
+					strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,Protocol,Custom,EPsize) values('"
+						+ pFrame->m_strCurMainBuildingName + "','"
+						+ pFrame->m_strCurMainBuildingName + "','"
+						+ strSID + "','"
+						+ strFloorName + "','"
+						+ strRoomName + "','"
+						+ strProName + "','"
+						+ strProType + "','"
+						+ strProID + "','"
+						+ strScreenID + "','"
+						+ strBaudrate + "','"
+						+ strGraphicID + "','"
+						+ strHdVersion + "','"
+						+ strStVersion + "','"
+						+ strCom + "','"
+						+ StrProtocol + "','"
+						+ strCustomer + "','"
+						+ strEPSize + "')"));
+				}
+			}
+			else
+			{
+				strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,Protocol,Custom,EPsize) values('"
+					+ pFrame->m_strCurMainBuildingName + "','"
+					+ pFrame->m_strCurMainBuildingName + "','"
+					+ strSID + "','"
+					+ strFloorName + "','"
+					+ strRoomName + "','"
+					+ strProName + "','"
+					+ strProType + "','"
+					+ strProID + "','"
+					+ strScreenID + "','"
+					+ strBaudrate + "','"
+					+ strGraphicID + "','"
+					+ strHdVersion + "','"
+					+ strStVersion + "','"
+					+ strCom + "','"
+					+ StrProtocol + "','"
+					+ strCustomer + "','"
+					+ strEPSize + "')"));
+			}
+         
 		   SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 		   SqliteDBBuilding.closedb();
-		   AfxMessageBox(_T("Add OK!"));
-           CDialogEx::OnOK();
+		   /* AfxMessageBox(_T("Add OK!"));
+			CDialogEx::OnOK();*/
+		   MessageBox(_T("Add  device success"));
+		   PostMessage(WM_CLOSE, NULL, NULL);
+		   ::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING, 0, 0);
+
+
 	   }
 	   
 	   catch (CException* e)
@@ -782,16 +860,39 @@ void CARDDlg::OnEnKillfocusEditTypeId()
         
          StrSql.Format(_T("Insert into ProductsTypeRegisterTables(ProductType,ProductName) Values(%d,'%s')"),ProductID,ProductName);
          SqliteDBT3000.execDML((UTF8MBSTR)StrSql);
-          
           SqliteDBT3000.closedb();
      }
-     
-
-
 }
 
 
 //void CARDDlg::OnEnKillfocusEditAddDeviceModbusId()
 //{
 //    
+//}
+// void CARDDlg::OnCbnSelchangeComboAddDeviceComport()
+// {
+//      CString strComName;
+// 	 m_add_device_com_port.GetWindowTextW(strComName);
+// 	 if (strComName.CompareNoCase(L"OfflineDevice")==0)
+// 	 {
+// 	     GetDlgItem(IDOK)->SetWindowTextW(L"Add");
+// 	 }
+// }
+
+
+//void CARDDlg::OnBnClickedCheckOnlineOffline()
+//{
+//    int checked = m_offlineButton.GetCheck();
+//	if (checked)
+//	{
+//	    GetDlgItem(IDOK)->SetWindowTextW(L"Add");
+//
+//		IDC_RADIO_NET_DEVICE
+//		IDC_IPADDRESS1
+//
+//	} 
+//	else
+//	{
+//		GetDlgItem(IDOK)->SetWindowTextW(L"Connect");
+//	}
 //}

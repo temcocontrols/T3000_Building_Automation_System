@@ -21,6 +21,7 @@ public:
 	virtual bool SortByFloor(HTREEITEM hItem)  ;
 	virtual bool PingDevice(HTREEITEM hItem) ;
 	bool HandleAddVirtualDevice(HTREEITEM);
+	bool HandleAddCustomDevice(HTREEITEM);
      virtual bool    DoDeleteItem(HTREEITEM);
 
 	

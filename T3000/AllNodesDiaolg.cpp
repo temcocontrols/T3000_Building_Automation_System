@@ -591,8 +591,6 @@ void CAllNodesDiaolg::OnBnClickedArd()
 		OnInitDialog();
 		m_bChanged = TRUE;
 	}
-
-
 }
 
 void CAllNodesDiaolg::ReloadAddBuildingDB()
