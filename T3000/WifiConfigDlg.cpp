@@ -51,14 +51,14 @@ END_MESSAGE_MAP()
 
 void CWifiConfigDlg::OnPaint()
 {
-	CPaintDC dc(this); // device context for painting
-					   
-					   // Do not call CDialogEx::OnPaint() for painting messages
-
-	CRect   rect;
-//	CPaintDC   dc(this);
-	GetClientRect(rect);
-	dc.FillSolidRect(rect, RGB(51, 153, 255));   //设置为绿色背景
+//	CPaintDC dc(this); // device context for painting
+//					   
+//					   // Do not call CDialogEx::OnPaint() for painting messages
+//
+//	CRect   rect;
+////	CPaintDC   dc(this);
+//	GetClientRect(rect);
+//	dc.FillSolidRect(rect, RGB(51, 153, 255));   //设置为绿色背景
 
 }
 
@@ -72,13 +72,19 @@ BOOL CWifiConfigDlg::OnInitDialog()
 	strtemp.Format(_T("%02X-%02X-%02X-%02X-%02X-%02X"), product_register_value[CO2_NET_MODBUS_MAC_ADDRESS_START], product_register_value[CO2_NET_MODBUS_MAC_ADDRESS_START + 1], product_register_value[CO2_NET_MODBUS_MAC_ADDRESS_START + 2], product_register_value[CO2_NET_MODBUS_MAC_ADDRESS_START + 3], product_register_value[CO2_NET_MODBUS_MAC_ADDRESS_START + 4], product_register_value[CO2_NET_MODBUS_MAC_ADDRESS_START + 5]);
 	m_Edit_MacAddress.SetWindowText(strtemp);
 	 
-	 
+	
 
 	int   CO2_NET_MODBUS_IP_ADDRESS_START = 47;
 	m_ipaddress.SetAddress((BYTE)product_register_value[CO2_NET_MODBUS_IP_ADDRESS_START],
 		(BYTE)product_register_value[CO2_NET_MODBUS_IP_ADDRESS_START + 1],
 		(BYTE)product_register_value[CO2_NET_MODBUS_IP_ADDRESS_START + 2],
 		(BYTE)product_register_value[CO2_NET_MODBUS_IP_ADDRESS_START + 3]);
+
+	m_address[0] = (BYTE)product_register_value[CO2_NET_MODBUS_IP_ADDRESS_START];
+	m_address[1] = (BYTE)product_register_value[CO2_NET_MODBUS_IP_ADDRESS_START + 1];
+	m_address[2] = (BYTE)product_register_value[CO2_NET_MODBUS_IP_ADDRESS_START + 2];
+	m_address[3] = (BYTE)product_register_value[CO2_NET_MODBUS_IP_ADDRESS_START + 3];
+
 	int   CO2_NET_MODBUS_SUBNET_MASK_ADDRESS_START = 51;
 	m_ipaddress.ShowWindow(TRUE);
 	m_Subnet_Mask.SetAddress((BYTE)product_register_value[CO2_NET_MODBUS_SUBNET_MASK_ADDRESS_START],
@@ -235,7 +241,29 @@ void CWifiConfigDlg::OnEnKillfocusEdit2()
 
 void CWifiConfigDlg::OnBnClickedOk()
 {
-	 
+	int ret[4];
+	BYTE address1, address2, address3, address4;
+	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS2))->GetAddress(address1, address2, address3, address4);
+
+	//dufan : 当IP地址 有变化时才写寄存器
+	if ((m_address[0] != ret[0]) ||
+		(m_address[1] != ret[1]) ||
+		(m_address[2] != ret[2]) ||
+		(m_address[3] != ret[3]))
+	{
+		ret[0] = write_one(g_tstat_id, 47, address1);
+		ret[3] = write_one(g_tstat_id, 50, address4);
+		ret[1] = write_one(g_tstat_id, 48, address2);
+		ret[2] = write_one(g_tstat_id, 49, address3);
+
+		if ((ret[0] && ret[1] && ret[2] && ret[3]) == false)
+		{
+			MessageBox(_T("Warning!"), _T("Change IP Address Failed!"), MB_OK | MB_ICONINFORMATION);
+			return;
+		}
+	}
+
+
 
 	CDialogEx::OnOK();
 }

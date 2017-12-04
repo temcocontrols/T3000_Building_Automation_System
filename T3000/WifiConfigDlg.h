@@ -40,4 +40,7 @@ public:
 	CEdit m_Edit_SSID;
 	CEdit m_Edit_Key;
 	afx_msg void OnBnClickedOk();
+
+private:
+	BYTE m_address[4];
 };
