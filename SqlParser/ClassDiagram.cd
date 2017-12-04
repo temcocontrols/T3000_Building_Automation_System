@@ -1,0 +1,186 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Font Name="Segoe UI" Size="9" />
+  <Class Name="Parser.ForUpdateTag" Collapsed="true">
+    <Position X="4" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>ForUpdateTag.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAEAAIAAgAQAAgAAAAAAAAAAAABAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parser.MatchForUpdateTagAttribute" Collapsed="true">
+    <Position X="11.25" Y="3.5" Width="2.25" />
+    <TypeIdentifier>
+      <FileName>ForUpdateTag.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAQAAgAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parser.FromTag" Collapsed="true">
+    <Position X="4" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>FromTag.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAABAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parser.MatchFromTagAttribute" Collapsed="true">
+    <Position X="11.25" Y="1.5" Width="2.25" />
+    <TypeIdentifier>
+      <FileName>FromTag.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parser.GroupByTag" Collapsed="true">
+    <Position X="4" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>GroupByTag.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAEAAIAAgAQAAgAAAAAAAAAAAABAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parser.MatchGroupByTagAttribute" Collapsed="true">
+    <Position X="11.25" Y="6.5" Width="2.25" />
+    <TypeIdentifier>
+      <FileName>GroupByTag.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAQAAgAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parser.OrderByTag" Collapsed="true">
+    <Position X="4" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>OrderByTag.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAEAAIAAgAQAAgAAAAAAAAAAAABAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parser.MatchOrderByTagAttribute" Collapsed="true">
+    <Position X="11.25" Y="4.5" Width="2.25" />
+    <TypeIdentifier>
+      <FileName>OrderByTag.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAQAAgAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parser.QuotedIdentifierTag" Collapsed="true">
+    <Position X="4" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>QuotedIdentifierTag.cs</FileName>
+      <HashCode>AAQAACAAEAAAAAAAICAAAAAAAAAAAAAAAAAAAABAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parser.MatchQuotedIdentifierTagAttribute" Collapsed="true">
+    <Position X="11.25" Y="8.5" Width="2.25" />
+    <TypeIdentifier>
+      <FileName>QuotedIdentifierTag.cs</FileName>
+      <HashCode>AAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parser.SelectTag" Collapsed="true">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>SelectTag.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAABAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parser.MatchSelectTagAttribute" Collapsed="true">
+    <Position X="11.25" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <FileName>SelectTag.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parser.SimpleOneWordTag" Collapsed="true">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>SimpleOneWordTag.cs</FileName>
+      <HashCode>IAQQACAAEAAAAAAAACAAAAQEAAAAAAAAABAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parser.MatchSimpleOneWordTagAttribute" Collapsed="true">
+    <Position X="8.5" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <FileName>SimpleOneWordTag.cs</FileName>
+      <HashCode>AAAAAgAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parser.SimpleTwoWordTag" Collapsed="true">
+    <Position X="2.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>SimpleTwoWordTag.cs</FileName>
+      <HashCode>AAAQACAAAAAAAAAAAIAAAAAAAgAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parser.MatchSimpleTwoWordTagAttribute" Collapsed="true">
+    <Position X="8.5" Y="3.5" Width="2.5" />
+    <TypeIdentifier>
+      <FileName>SimpleTwoWordTag.cs</FileName>
+      <HashCode>AAAAAgAAAAAAAAAAAIAAAAAAAgAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parser.StartWith" Collapsed="true">
+    <Position X="4" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>StartWith.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAEAAIAAgAQAAgAAAAAAAAAAAABAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parser.MatchStartWithTagAttribute" Collapsed="true">
+    <Position X="11.25" Y="5.5" Width="2.25" />
+    <TypeIdentifier>
+      <FileName>StartWith.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAQAAgAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parser.StringLiteralTag" Collapsed="true">
+    <Position X="4" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>StringLiteralTag.cs</FileName>
+      <HashCode>AAQAACAAEAAAAAAAICAAAAAAAAAAAAAAAAAAAABAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parser.MatchStringLiteralTagAttribute" Collapsed="true">
+    <Position X="11.25" Y="7.5" Width="2.25" />
+    <TypeIdentifier>
+      <FileName>StringLiteralTag.cs</FileName>
+      <HashCode>AAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parser.TagBase" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>TagBase.cs</FileName>
+      <HashCode>AAQgACAAEAAAIEAAASAAAAIACAACAAAAAxEgBAAAICA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parser.MatchTagAttributeBase" Collapsed="true">
+    <Position X="6.5" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <FileName>TagBase.cs</FileName>
+      <HashCode>AAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parser.WhereTag" Collapsed="true">
+    <Position X="4" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>WhereTag.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAABAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parser.MatchWhereTagAttribute" Collapsed="true">
+    <Position X="11.25" Y="2.5" Width="2.25" />
+    <TypeIdentifier>
+      <FileName>WhereTag.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parser.BracesTag" Collapsed="true">
+    <Position X="4" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>BracesTag.cs</FileName>
+      <HashCode>AAQAACAQEAAAAgAAICAAAAAAAAAAAAAAAABAAABAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Parser.MatchBracesTagAttribute" Collapsed="true">
+    <Position X="11.25" Y="9.5" Width="2.25" />
+    <TypeIdentifier>
+      <FileName>BracesTag.cs</FileName>
+      <HashCode>AAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+</ClassDiagram>
