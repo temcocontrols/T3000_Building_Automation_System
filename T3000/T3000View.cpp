@@ -969,9 +969,29 @@ void CT3000View::InitSliderBars2()
         }
         
 
-		m_daySlider.SetRange(DayMax * 10.0F, DayMin * 10.0F);
-		m_daySlider.SetZoneValues(dHeatSP * 10.0F, dCoolSP * 10.0F);
+		m_daySlider.SetRange(DayMax, DayMin);
+		m_daySlider.SetZoneValues(dHeatSP, dCoolSP);
 		m_daySlider.put_TwoSliderMode(FALSE);
+		if (g_unint)
+		{
+			m_daySlider.put_AdditionalText(L"C");
+		} 
+		else
+		{
+			m_daySlider.put_AdditionalText(L"F");
+		}
+		m_nightSlider.SetRange(DayMax , DayMin );
+		m_nightSlider.SetZoneValues(nHeatSP , nCoolSP );
+		m_nightSlider.put_TwoSliderMode(FALSE);
+		if (g_unint)
+		{
+			m_nightSlider.put_AdditionalText(L"C");
+		}
+		else
+		{
+			m_nightSlider.put_AdditionalText(L"F");
+		}
+
     }
 
 
@@ -4228,6 +4248,14 @@ void CT3000View::InitFlexSliderBars()
 			m_nightSlider.SetRange(nRangeMax, nRangeMin);
 			m_nightSlider.SetZoneValues(nCoolSP + 1, nHeatSP);//??
 			m_nightSlider.put_TwoSliderMode(TRUE);
+			if (g_unint)
+			{
+				m_nightSlider.put_AdditionalText(L"C");
+			} 
+			else
+			{
+				m_nightSlider.put_AdditionalText(L"F");
+			}
 
             //stat6
 
@@ -4276,7 +4304,14 @@ void CT3000View::InitFlexSliderBars()
 			m_nightSlider.SetRange(nRangeMax, nRangeMin);
 			m_nightSlider.SetZoneValues(nCoolSP, nHeatSP);
 			m_nightSlider.put_TwoSliderMode(FALSE);
-
+			if (g_unint)
+			{
+				m_nightSlider.put_AdditionalText(L"C");
+			}
+			else
+			{
+				m_nightSlider.put_AdditionalText(L"F");
+			}
             //stat6
 
             
@@ -4426,7 +4461,7 @@ void CT3000View::InitFanSpeed()
     int sel = set_real_fan_select();
     m_FanComBox.SetCurSel(sel);
 
-	m_FanComBox.ResetContent();
+	
 
 	if (product_register_value[7] == PM_TSTAT8
 		|| product_register_value[7] == PM_TSTAT8_WIFI
@@ -4434,6 +4469,7 @@ void CT3000View::InitFanSpeed()
 		|| product_register_value[7] == PM_TSTAT7_ARM
 		|| product_register_value[7] == PM_TSTAT8_220V)
 	{
+		m_FanComBox.ResetContent();
 		switch (product_register_value[MODBUS_FAN_MODE])		//122   105
 		{
 		case 0:
@@ -4483,7 +4519,7 @@ void CT3000View::InitFanSpeed()
 			break;
 		}
 	}
-	sel = set_real_fan_select();
+	 sel = set_real_fan_select();
 	 m_FanComBox.SetCurSel(sel);
 }
 
@@ -5443,32 +5479,48 @@ void CT3000View::Initial_Max_Min()
         DayMax = GetRoundMM(TRUE,dCoolSP,nCoolSP,1.1);
         DayMin = GetRoundMM(FALSE,dHeatSP,nHeatSP,0.9);
 
-		int i_Temperature_Max = 2 + (short)product_register_value[MODBUS_TEMPRATURE_CHIP] / 10;
-		int i_Temperature_min = (short)product_register_value[MODBUS_TEMPRATURE_CHIP] / 10 - 2;
-		if (DayMax < i_Temperature_Max) DayMax = i_Temperature_Max;
-		if (DayMin > i_Temperature_min) DayMin = i_Temperature_min;
+		if (product_register_value[7]==PM_PM5E||product_register_value[7]==PM_TSTAT5E)
+		{
+		} 
+		else
+		{
+			int i_Temperature_Max = 2 + (short)product_register_value[MODBUS_TEMPRATURE_CHIP] / 10;
+			int i_Temperature_min = (short)product_register_value[MODBUS_TEMPRATURE_CHIP] / 10 - 2;
+			if (DayMax < i_Temperature_Max) DayMax = i_Temperature_Max;
+			if (DayMin > i_Temperature_min) DayMin = i_Temperature_min;
+		}
+		
 
     }
 
 
-    int currentTemp= product_register_value[MODBUS_TEMPRATURE_CHIP]/10;
-    if (currentTemp<DayMin)
-    {
 
-    	DayMin=currentTemp;
-    	while((DayMin%5)!=0){
-    		--DayMin;
-    	}
-    }
 
-    if (currentTemp>DayMax)
-    {
 
-    	DayMax=currentTemp;
-    	while((DayMax%5)!=0){
-    		++DayMax;
-    	}
-    }
+	if (product_register_value[7] == PM_PM5E || product_register_value[7] == PM_TSTAT5E)
+	{
+	}
+	else
+	{
+		int currentTemp = product_register_value[MODBUS_TEMPRATURE_CHIP] / 10;
+		if (currentTemp < DayMin)
+		{
+
+			DayMin = currentTemp;
+			while ((DayMin % 5) != 0) {
+				--DayMin;
+			}
+		}
+
+		if (currentTemp > DayMax)
+		{
+
+			DayMax = currentTemp;
+			while ((DayMax % 5) != 0) {
+				++DayMax;
+			}
+		}
+	}
 
 	 
 }
