@@ -531,6 +531,13 @@ void CBacnetProgramEdit::OnSend()
 	memset( ( void* )editbuf, 0, sizeof( char ) * ( iTextLen + 1 ) );
 	::WideCharToMultiByte( CP_ACP,0,tempcs,-1,editbuf,iTextLen,NULL,NULL );
 
+	//2017/ 12 / 04   dufan 不允许使用 在THEN 中嵌套使用IF ，否则 解码时会出错。暂时找不出更好的解决办法。
+	if (tempcs.Find(_T("THEN IF")) != -1)
+	{
+		MessageBox(_T("Don't allowed use nested 'IF'."));
+		return;
+	}
+
 	Encode_Program();
 	if(error == -1)
 	{

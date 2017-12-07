@@ -16,7 +16,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (Simplified, PRC) resources
+// 中文(简体，中国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
@@ -2787,7 +2787,7 @@ BEGIN
     LTEXT           "Gateway:",IDC_STATIC,37,111,32,8
     LTEXT           "MAC:",IDC_STATIC,49,127,18,8
     CONTROL         "",IDC_IPADDRESS1,"SysIPAddress32",WS_DISABLED | WS_TABSTOP,78,92,100,15
-    CONTROL         "",IDC_IPADDRESS2,"SysIPAddress32",WS_DISABLED | WS_TABSTOP,77,57,100,15
+    CONTROL         "",IDC_IPADDRESS2,"SysIPAddress32",WS_TABSTOP,77,57,100,15
     COMBOBOX        IDC_COMBO_NETWORK_TYPE,77,9,100,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_EDIT1,77,26,100,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_EDIT2,77,41,99,14,ES_AUTOHSCROLL
@@ -6600,12 +6600,12 @@ BEGIN
     ID_BUILDINGCONFIGDB     "BuildingConfig"
 END
 
-#endif    // Chinese (Simplified, PRC) resources
+#endif    // 中文(简体，中国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
+// 英语(美国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
@@ -10173,12 +10173,12 @@ BEGIN
     ID_BUILDINGCONFIGDB     "Show building config"
 END
 
-#endif    // English (United States) resources
+#endif    // 英语(美国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// English (United Kingdom) resources
+// 英语(英国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
@@ -10284,7 +10284,7 @@ BEGIN
     0
 END
 
-#endif    // English (United Kingdom) resources
+#endif    // 英语(英国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
