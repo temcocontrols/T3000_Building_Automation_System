@@ -4130,7 +4130,13 @@ void CParameterDlg::Reflesh_ParameterDlg()
     // 		348	2	Full	W/R	(Day)Occupied  cooling setpoint (day cooling setpoint)
     // 		349	2	Full	W/R	(Day)Occupied  heating setpoint (day heating setpoint)
 
+	int TempSel = product_register_value[MODBUS_TEMP_SELECT];
+	if (TempSel < 2)
+	{
+		TempSel = 2;
+	}
 
+	m_InputSelect1.SetCurSel(TempSel - 2);
 
     if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8)
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
