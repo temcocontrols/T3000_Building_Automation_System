@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by T3000.rc
+// Microsoft Visual C++ 生成的包含文件。
+// 供 T3000.rc 使用
 //
 #define IDCANCEL2                       3
 #define IDCWRITEONE                     3
@@ -2247,6 +2247,7 @@
 #define IDC_BUTTON_BLXFILE              2347
 #define IDC_STATIC_DELAYBETWEENLOOPS    2349
 #define IDC_STATIC_DELAY_BETWEENITEMS   2350
+#define IDC_LIST_BAC_TSTAT_SCHEDULE     2351
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -2529,6 +2530,8 @@
 #define IDI_ICON_DEFAULT_ICON           32758
 #define IDD_DIALOG_BACNET_REMOTE_POINT  32758
 #define IDI_ICON_SWITCH_ON              32759
+#define IDD_DIALOG_BACNET_WEEKLY_ROUTINES1 32759
+#define IDD_DIALOG_BACNET_TSTAT_SCHEDULE 32759
 #define IDI_ICON_SWITCH_OFF             32760
 #define IDC_LIST_GSM_CONNECTION         32761
 #define IDC_BUTTON_STOP_SERVER          32762
@@ -2791,9 +2794,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        692
+#define _APS_NEXT_RESOURCE_VALUE        693
 #define _APS_NEXT_COMMAND_VALUE         34065
-#define _APS_NEXT_CONTROL_VALUE         2351
+#define _APS_NEXT_CONTROL_VALUE         2352
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

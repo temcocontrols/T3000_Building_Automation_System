@@ -1,6 +1,13 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
+2017-12-08 Update by Fance
+1. 新增Minipanel界面下 tstat的schedule界面
+2. 修复扫描时 对重复数据的处理
+3.T3000的bacnet不在应答whois
+4.解决 在22I的input界面往TSTAT8的input界面切换时始终无法切的问题。
+5.新增Minipanel ARM 版本的 com0口支持全波特率。
+
 2017 - 03 - 13 Update by Fance
 1. 优化了在delete 树 产品时，重新加载 数据库  的问题.
 2. 解决掉sort by floor 代码bug.
@@ -1894,6 +1901,7 @@ void CDialogCM5_BacNet::Initial_All_Point()
 	m_Tstat_data.clear();
 	m_customer_unit_data.clear();
 	m_user_login_data.clear();
+	m_tatat_schedule_data.clear();
 	//vector <Str_TstatInfo_point> m_Tstat_data;
 	for(int i=0;i<BAC_INPUT_ITEM_COUNT;i++)
 	{
@@ -2019,6 +2027,19 @@ void CDialogCM5_BacNet::Initial_All_Point()
 		Str_Extio_point temp_extio_point;
 		memset(&temp_extio_point,0,sizeof(Str_Extio_point));
 		m_extio_config_data.push_back(temp_extio_point);
+	}
+
+	for (int i=0;i<BAC_TSTAT_SCHEDULE;i++)
+	{
+		Str_tstat_schedule temp_tstat_schedule;
+		memset(&temp_tstat_schedule, 0, sizeof(Str_tstat_schedule));
+		m_tatat_schedule_data.push_back(temp_tstat_schedule);
+
+		//m_tatat_schedule_data.at(i).tstat.id = i + 1;
+		//m_tatat_schedule_data.at(i).tstat.on_line = i % 2;
+		//m_tatat_schedule_data.at(i).tstat.schedule = i % 9;
+		//m_tatat_schedule_data.at(i).tstat.flag = 0x80;
+
 	}
 
 }

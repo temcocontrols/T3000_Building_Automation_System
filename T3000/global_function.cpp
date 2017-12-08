@@ -1351,6 +1351,9 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
 		//	if((entitysize<0)||(entitysize>400))
 		//		entitysize = 0;
 		//	break;
+	case WRITE_TSTATE_SCHEDULE_T3000:
+		entitysize = sizeof(Str_tstat_schedule);
+		break;
 	case WRITEVARIABLE_T3000:
 		entitysize = sizeof(Str_variable_point);
 		break;
@@ -1469,6 +1472,12 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
         }
 
         break;
+	case WRITE_TSTATE_SCHEDULE_T3000:
+		for (int i = 0; i<(end_instance - start_instance + 1); i++)
+		{
+			memcpy_s(SendBuffer + i * sizeof(Str_tstat_schedule) + HEADER_LENGTH, sizeof(Str_tstat_schedule), &m_tatat_schedule_data.at(i + start_instance), sizeof(Str_tstat_schedule));
+		}
+		break;
     case  WRITEUNIT_T3000:
         for (int i=0; i<(end_instance-start_instance + 1); i++)
         {
@@ -2283,6 +2292,60 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 				my_temp_point = my_temp_point + 15;
 			}
 		}
+		break;
+	case READ_TSTATE_SCHEDULE_T3000:
+	{
+		if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_tstat_schedule)) != 0)
+			return -1;	//得到的结构长度错误;
+		block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_tstat_schedule);
+		//m_Input_data_length = block_length;
+		my_temp_point = (char *)Temp_CS.value + 3;
+		start_instance = *my_temp_point;
+		my_temp_point++;
+		end_instance = *my_temp_point;
+		my_temp_point++;
+		my_temp_point = my_temp_point + 2;
+
+		if (end_instance == (BAC_TSTAT_SCHEDULE - 1))
+			end_flag = true;
+		for (i = start_instance; i <= end_instance; i++)
+		{
+			//if ((i >= 20) || (i<0))
+			//{
+			//	m_tatat_schedule_data.at(20).tstat.id = 0;
+			//	end_flag = true;
+			//	b_stop_read_tstat_schedule = false;
+			//	return READ_TSTATE_SCHEDULE_T3000;
+			//}
+
+			m_tatat_schedule_data.at(i).tstat.id = *(my_temp_point++);
+			m_tatat_schedule_data.at(i).tstat.on_line = *(my_temp_point++);
+			m_tatat_schedule_data.at(i).tstat.schedule = *(my_temp_point++);
+			m_tatat_schedule_data.at(i).tstat.flag = *(my_temp_point++);
+			memcpy_s(m_tatat_schedule_data.at(i).tstat.name, 14, my_temp_point, 14);
+			my_temp_point = my_temp_point + 15;
+
+#if 0
+			m_tatat_schedule_data.at(i).tstat.id = i+1;
+			m_tatat_schedule_data.at(i).tstat.on_line = i%2;
+			m_tatat_schedule_data.at(i).tstat.schedule = i%9;
+			m_tatat_schedule_data.at(i).tstat.flag = 0x80;
+			memcpy_s(m_tatat_schedule_data.at(i).tstat.name, 14, my_temp_point, 14);
+			my_temp_point = my_temp_point + 15;
+
+			//测试代码
+			if (i > 20)
+				m_tatat_schedule_data.at(i).tstat.id = 0;
+#endif
+			if (m_tatat_schedule_data.at(i).tstat.id == 0)
+			{
+				b_stop_read_tstat_schedule = true;
+				return READ_TSTATE_SCHEDULE_T3000;
+			}
+			b_stop_read_tstat_schedule = false;
+		}
+	}
+		return READ_TSTATE_SCHEDULE_T3000;
 		break;
 	case READ_REMOTE_POINT:
 		{
@@ -3920,6 +3983,10 @@ void local_handler_conf_private_trans_ack(
             ::PostMessage(m_controller_dlg_hwnd,WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
         copy_data_to_ptrpanel(TYPE_ALL);
         break;
+	case READ_TSTATE_SCHEDULE_T3000:
+		if (each_end_flag)
+			::PostMessage(m_tstat_schedule_dlg_hwnd, WM_REFRESH_BAC_TSTAT_SCHEDULE_LIST, NULL, NULL);
+		break;
     case READSCREEN_T3000:
         if(each_end_flag)
             ::PostMessage(m_screen_dlg_hwnd,WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
@@ -4603,7 +4670,8 @@ void Init_Service_Handlers(	void)
     Device_Init(NULL);
 
     /* we need to handle who-is to support dynamic device binding */
-    apdu_set_unconfirmed_handler(SERVICE_UNCONFIRMED_WHO_IS, handler_who_is);
+	//2017 12 07  由杜帆屏蔽 客户不希望T3000 回Who is 的信息。
+    //apdu_set_unconfirmed_handler(SERVICE_UNCONFIRMED_WHO_IS, handler_who_is);
     apdu_set_unconfirmed_handler(SERVICE_UNCONFIRMED_I_AM, LocalIAmHandler);
 
 

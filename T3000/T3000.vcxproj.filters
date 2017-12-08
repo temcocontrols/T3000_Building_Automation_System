@@ -684,6 +684,9 @@
     <ClCompile Include="ModbusToBacnetRouterDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BacnetTstatSchedule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -1786,6 +1789,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ModbusToBacnetRouterDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetTstatSchedule.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
