@@ -9329,6 +9329,20 @@ end_condition :
 
             str_serialid.Format(_T("%u"),m_refresh_net_device_data.at(y).nSerial);
             product_class_id.Format(_T("%u"),m_refresh_net_device_data.at(y).product_id);
+
+			CppSQLite3Query query_serial;
+			strSql.Format(_T("select * from ALL_NODE where Serial_ID='%s'"), str_serialid);
+
+			query_serial = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+			//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+
+			if (!query_serial.eof())
+			{
+				continue; //如果查询到有重复的就不插入
+			}
+
+
+
             if (IS_Temco_Product(m_refresh_net_device_data.at(y).product_id))
             {
                 is_custom = _T("0");
@@ -11474,7 +11488,7 @@ void CMainFrame::OnControlInputs()
         }
         else
         {
-           MessageBox(_T("This device doesn’t have a input menu item"));
+           MessageBox(_T("This device doesn't have a input menu item"));
         }
 
     }
@@ -11541,7 +11555,7 @@ void CMainFrame::OnControlPrograms()
     }
     else
     {
-       MessageBox(_T("This device doesn’t have a programs menu item"));
+       MessageBox(_T("This device doesn't have a programs menu item"));
     }
 }
 
@@ -11679,7 +11693,7 @@ void CMainFrame::OnControlOutputs()
         }
         else
         {
-			MessageBox(_T("This device doesn’t have a output menu item"));
+			MessageBox(_T("This device doesn't have a output menu item"));
         }
         //MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
     }
@@ -11744,7 +11758,7 @@ void CMainFrame::OnControlVariables()
     }
     else
     {
-       MessageBox(_T("This device doesn’t have a variable menu item"));
+       MessageBox(_T("This device doesn't have a variable menu item"));
     }
 }
 
@@ -11918,7 +11932,7 @@ void CMainFrame::OnControlAnnualroutines()
         }
 		 
         else
-			MessageBox(_T("This device doesn’t have a holidays menu item"));
+			MessageBox(_T("This device doesn't have a holidays menu item"));
     }
 }
 #include "ParameterDlg.h"
@@ -12007,7 +12021,7 @@ void CMainFrame::OnControlSettings()
             dlg.DoModal();
         }
         else
-           MessageBox(_T("This device doesn’t have a configuration menu item"));
+           MessageBox(_T("This device doesn't have a configuration menu item"));
     }
 }
 
@@ -12024,7 +12038,7 @@ void CMainFrame::OnMiscellaneousLoaddescriptors()
     }
     else
     {
-		 MessageBox(_T("This device doesn’t have a menu item"));
+		 MessageBox(_T("This device doesn't have a menu item"));
     }
 }
 
@@ -12043,7 +12057,7 @@ void CMainFrame::OnMiscellaneousUpdatemini()
     }
     else
     {
-        MessageBox(_T("This device doesn’t have a  menu item"));
+        MessageBox(_T("This device doesn't have a  menu item"));
     }
 }
 
@@ -12141,7 +12155,7 @@ void CMainFrame::OnControlControllers()
     }
     else
     {
-       MessageBox(_T("This device doesn’t have a pid menu item"));
+       MessageBox(_T("This device doesn't have a pid menu item"));
     }
 }
 
@@ -12312,7 +12326,7 @@ void CMainFrame::OnControlMonitors()
     }
     else
     {
-        MessageBox(_T("This device doesn’t have a trendlog menu item"));
+        MessageBox(_T("This device doesn't have a trendlog menu item"));
     }
 
     //CBacnetMonitor Dlg;
@@ -12424,7 +12438,7 @@ void CMainFrame::OnControlAlarmLog()
     }
     else
     {
-       MessageBox(_T("This device doesn’t have a alarms menu item"));
+       MessageBox(_T("This device doesn't have a alarms menu item"));
     }
 }
 
@@ -12447,7 +12461,7 @@ void CMainFrame::OnControlCustomerunits()
     }
     else
     {
-       MessageBox(_T("This device doesn’t have a custom units menu item"));
+       MessageBox(_T("This device doesn't have a custom units menu item"));
     }
 #endif
 }
@@ -12636,7 +12650,7 @@ void CMainFrame::OnControlRemotePoint()
     }
     else
     {
-		MessageBox(_T("This device doesn’t have a menu item"));
+		MessageBox(_T("This device doesn't have a menu item"));
     }
 
 
@@ -12651,7 +12665,7 @@ void CMainFrame::ShowDebugWindow()
         DebugWindow = new CDebugWindow;
         DebugWindow->Create(IDD_DIALOG_DEBUG_TRACE, this);
         DebugWindow->ShowWindow(SW_HIDE);
-        g_Print = _T("Debug Time 15-05-28   Debug version 2.4");
+        g_Print = _T("Debug Time 16-12-05   Debug version 2.5");
         DFTrace(g_Print);
     }
 
@@ -12673,8 +12687,6 @@ void CMainFrame::OnUpdateConnect2(CCmdUI *pCmdUI)
 //建立TCP 服务器, GSM 会连接上来;
 void CMainFrame::OnMiscellaneousGsmconnection()
 {
-    
-
     if(Tcp_Server_Window == NULL)
     {
         Tcp_Server_Window = new CTCP_Server;
@@ -12687,7 +12699,6 @@ void CMainFrame::OnMiscellaneousGsmconnection()
     }
 
     return;
-
 }
 
 

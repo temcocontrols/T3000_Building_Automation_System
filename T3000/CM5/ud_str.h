@@ -72,6 +72,7 @@ typedef enum {
 		 READANALOG_CUS_TABLE_T3000    = 34,           /* read monitor updates*/
 		 READVARUNIT_T3000			= 36,
 		 READEXT_IO_T3000			= 37,
+		 READ_TSTATE_SCHEDULE_T3000 = 38,
 		 READ_REMOTE_POINT         = 40,
 
 
@@ -122,6 +123,7 @@ typedef enum {
 		 WRITEANALOG_CUS_TABLE_T3000	       = 134,
 		 WRITEVARUNIT_T3000			= 136,
 		 WRITEEXT_IO_T3000			= 137,
+		 WRITE_TSTATE_SCHEDULE_T3000= 138,
 		 WRITE_REMOTE_POINT         = 140,
 		 WRITE_AT_COMMAND			= 190,	//100 length
 		 WRITE_GRPHIC_LABEL_COMMAND  = 191,
@@ -449,6 +451,22 @@ typedef struct
 
 }	Str_controller_point; /* 3+4+4+3+4+1+1+4 = 24*/
 
+typedef union
+{
+	int8_t all[19];
+	struct
+	{
+		int8_t id;
+		int8_t on_line; // 0: offline    1: online
+		int8_t schedule;
+		int8_t flag;
+		char name[15];
+		/*  flag formate:
+		7   6  5  4  3   2   1  0
+		a/m  output state1 -  -  -  -  -
+		*/
+	}tstat;
+}Str_tstat_schedule; /*config roution */
 
 typedef struct
 {

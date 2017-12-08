@@ -1912,6 +1912,7 @@ HWND      m_at_command_hwnd = NULL;
 HWND      m_remote_point_hwnd = NULL;
 HWND	  m_program_debug_list_hwnd = NULL;
 HWND	  m_ext_io_dlg_hwmd = NULL;
+HWND      m_tstat_schedule_dlg_hwnd = NULL;
 
 HWND analog_cus_range_dlg=NULL;
 
@@ -1925,6 +1926,7 @@ vector <Str_annual_routine_point> m_Annual_data;
 vector <Str_schedual_time_point> m_Schedual_Time_data;
 vector <Str_controller_point> m_controller_data;
 vector <Control_group_point> m_screen_data;
+vector <Str_tstat_schedule> m_tatat_schedule_data;
 vector <Str_monitor_point> m_monitor_data;
 vector <_Bac_Scan_Com_Info> m_bac_scan_com_data;
 vector <_Bac_Scan_results_Info> m_bac_scan_result_data;
@@ -2103,6 +2105,7 @@ Global_Calibration_Module   g_calibration_module_data;
 CDialog *g_Draw_dlg=NULL;
 unsigned int g_progress_persent = 0;	//用来记录全局状态栏该显示的 进度 百分比;
 bool b_stop_read_grp_label = false;		//如果读到空的grp label 就不要继续读下一个了;
+bool b_stop_read_tstat_schedule = false;	//如果读到空的tstat 就不要继续读下一个了;
 
 CString Statuspanel;   //在状态栏显示panel 2-3;
 
