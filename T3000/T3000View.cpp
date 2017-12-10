@@ -2383,6 +2383,8 @@ void CT3000View::FreshIOGridTable()
         return;
     if(::GetFocus()==m_inNameEdt.m_hWnd)
         return;
+	// dufan 2017/12/05  解决在挂在PANEL下的 TSTAT8 与网络22I 在input界面切换时  始终无法切换至 TSTAT8的input 界面的bug
+	bacnet_device_type = -1;
 
     if (product_type==T3000_6_ADDRESS)
     {

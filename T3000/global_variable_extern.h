@@ -1049,6 +1049,7 @@ extern HWND		 m_program_debug_list_hwnd;
 extern HWND		 m_statusbar_hwnd ;
 extern HWND	     m_ext_io_dlg_hwmd ;
 extern HWND		 analog_cus_range_dlg;
+extern HWND      m_tstat_schedule_dlg_hwnd ;
 
 extern vector <Str_out_point> m_Output_data;
 extern vector <Str_in_point>  m_Input_data;
@@ -1059,6 +1060,7 @@ extern vector <Str_annual_routine_point> m_Annual_data;
 extern vector <Str_schedual_time_point> m_Schedual_Time_data;
 extern vector <Str_controller_point> m_controller_data;
 extern vector <Control_group_point> m_screen_data;
+extern vector <Str_tstat_schedule> m_tatat_schedule_data;
 extern vector <Str_monitor_point> m_monitor_data;
 extern vector <_Bac_Scan_Com_Info> m_bac_scan_com_data;
 extern vector <_Graphic_Value_Info> m_graphic_refresh_data;
@@ -1203,6 +1205,8 @@ extern CString g_cstring_ini_path;
 extern unsigned char product_sort_way;		//0 default   1 by connection      2 bu floor
 extern BOOL g_fresh_Graphic;
 extern bool b_stop_read_grp_label;		//如果读到空的grp label 就不要继续读下一个了;
+extern bool b_stop_read_tstat_schedule;	    //如果读到空的tstat 就不要继续读下一个了;
+
 extern Global_Calibration_Module   g_calibration_module_data;
  extern CDialog *g_Draw_dlg;
 extern unsigned int g_progress_persent ;	//用来记录全局状态栏该显示的 进度 百分比;

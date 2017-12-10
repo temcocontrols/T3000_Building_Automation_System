@@ -27,7 +27,7 @@
     <UseOfAtl>false</UseOfAtl>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -173,6 +173,7 @@
     <ClCompile Include="BacnetTool.cpp" />
     <ClCompile Include="BacnetToolReadProperty.cpp" />
     <ClCompile Include="BacnetTstat.cpp" />
+    <ClCompile Include="BacnetTstatSchedule.cpp" />
     <ClCompile Include="BacnetUserConfig.cpp" />
     <ClCompile Include="BacnetUserlogin.cpp" />
     <ClCompile Include="BacnetVarCusRang.cpp" />
@@ -502,6 +503,7 @@
     <ClInclude Include="BacnetTool.h" />
     <ClInclude Include="BacnetToolReadProperty.h" />
     <ClInclude Include="BacnetTstat.h" />
+    <ClInclude Include="BacnetTstatSchedule.h" />
     <ClInclude Include="BacnetUserConfig.h" />
     <ClInclude Include="BacnetUserlogin.h" />
     <ClInclude Include="BacnetVarCusRang.h" />

@@ -485,6 +485,18 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				m_edit_port.EnableWindow(false);
 			}
 
+			//版本大于46.1 的才有在setting 里面改port 的功能
+			if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 461)
+			{
+				CString temp_port;
+				temp_port.Format(_T("%u"), Device_Basic_Setting.reg.modbus_port);
+				GetDlgItem(IDC_BUTTON_ZONE_SCHEDULE)->EnableWindow(true);
+			}
+			else
+			{
+				GetDlgItem(IDC_BUTTON_ZONE_SCHEDULE)->EnableWindow(false);
+			}
+
 			if(Device_Basic_Setting.reg.en_plug_n_play == 1)
 			{
 				((CButton *)GetDlgItem(IDC_CHECK_SETTING_PAP))->SetCheck(true);
@@ -814,9 +826,22 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->ResetContent();
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE2))->ResetContent();
 
+				//Fandu 2017-12-07  新的arm板子的com0 支持所有的波特率.
+				if ((Device_Basic_Setting.reg.mini_type == MINIPANELARM) ||
+					(Device_Basic_Setting.reg.mini_type == MINIPANELARM_LB) ||
+					(Device_Basic_Setting.reg.mini_type == MINIPANELARM_TB))
+				{
+					for (int x = 0;x< (sizeof(Baudrate_Array) / sizeof(Baudrate_Array[0]) - 1);x++)
+					{
+						((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->AddString(Baudrate_Array[x]);
+					}
+				}
+				else
+				{
+					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->AddString(Baudrate_Array[UART_9600]);
+					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->AddString(Baudrate_Array[UART_19200]);
+				}
 
-				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->AddString(Baudrate_Array[UART_9600]);
-				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->AddString(Baudrate_Array[UART_19200]);
 
 
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->AddString(Baudrate_Array[UART_19200]);
@@ -826,15 +851,26 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE2))->AddString(Baudrate_Array[x]);
 				}
 
+				//Fandu 2017-12-07  新的arm板子的com0 支持所有的波特率.
+				if ((Device_Basic_Setting.reg.mini_type == MINIPANELARM) ||
+					(Device_Basic_Setting.reg.mini_type == MINIPANELARM_LB) ||
+					(Device_Basic_Setting.reg.mini_type == MINIPANELARM_TB))
+				{
+					if (Device_Basic_Setting.reg.com_baudrate0 < sizeof(Baudrate_Array) / sizeof(Baudrate_Array[0]))
+						((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->SetCurSel(Device_Basic_Setting.reg.com_baudrate0);
+				}
+				else
+				{
+					if (Device_Basic_Setting.reg.com_baudrate0 == UART_9600)
+					{
+						((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->SetCurSel(0);
+					}
+					else if (Device_Basic_Setting.reg.com_baudrate0 == UART_19200)
+					{
+						((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->SetCurSel(1);
+					}
+				}
 
-				if(Device_Basic_Setting.reg.com_baudrate0 == UART_9600)
-				{
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->SetCurSel(0);
-				}
-				else if(Device_Basic_Setting.reg.com_baudrate0 == UART_19200)
-				{
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->SetCurSel(1);
-				}
 
 
 				if(Device_Basic_Setting.reg.com_baudrate1 == UART_19200)
@@ -2150,11 +2186,49 @@ void CBacnetSetting::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
 
 
-#include "GroupScheduleDlg.h"
+#include "BacnetTstatSchedule.h"
+//#include "GroupScheduleDlg.h"
 void CBacnetSetting::OnBnClickedButtonZoneSchedule()
 {
-	CString strIPAddress;
-	GetDlgItem(IDC_IPADDRESS_BAC_IP)->GetWindowTextW(strIPAddress);
-	CGroupScheduleDlg dlg(NULL, strIPAddress);
+	b_stop_read_tstat_schedule = false;
+#if 1
+	for (int i = 0;i<BAC_TSTAT_SCHEDULE_GROUP;i++)
+	{
+		int end_temp_instance = 0;
+		int ret_n;
+		end_temp_instance = BAC_TSTAT_SCHEDULE_REMAINDER + (BAC_READ_TSTAT_SCHEDULE_GROUP_NUMBER)*i;
+		if (end_temp_instance >= BAC_TSTAT_SCHEDULE)
+			end_temp_instance = BAC_TSTAT_SCHEDULE - 1;
+		CString n_temp_result;
+		ret_n = GetPrivateData_Blocking(g_bac_instance, READ_TSTATE_SCHEDULE_T3000, (BAC_READ_TSTAT_SCHEDULE_GROUP_NUMBER)*i, end_temp_instance, sizeof(Str_tstat_schedule));
+		if (ret_n)
+		{
+			n_temp_result.Format(_T("Read Tstat From %d to %d success."), (BAC_READ_TSTAT_SCHEDULE_GROUP_NUMBER)*i, end_temp_instance);
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, n_temp_result);
+			Sleep(10);
+			if (b_stop_read_tstat_schedule)
+			{
+				n_temp_result.Format(_T("Reading tstat schedule complete"));
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, n_temp_result);
+				Sleep(10);
+				break;
+			}
+		}
+		else
+		{
+			n_temp_result.Format(_T("Reading tstat schedule From %d to %d failed."), (BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i, end_temp_instance);
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, n_temp_result);
+			return ;
+		}
+	}
+#endif
+	b_stop_read_tstat_schedule = false;
+	CBacnetTstatSchedule dlg;
 	dlg.DoModal();
+
+
+	//CString strIPAddress;
+	//GetDlgItem(IDC_IPADDRESS_BAC_IP)->GetWindowTextW(strIPAddress);
+	//CGroupScheduleDlg dlg(NULL, strIPAddress);
+	//dlg.DoModal();
 }
