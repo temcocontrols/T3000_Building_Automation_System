@@ -8,27 +8,29 @@
 #include <bitset>
 #include "WriteRegistersValueDlg.h"
 
-//0, _T("Function"), 23
-//1, _T("Modbus Address
-//	2, _T("Name"), 100, L
-//	3, _T("Length"), 120,
-//	4, _T("R/W"), 90, Lis
-//	5, _T("Value"), 90, L
-//	6, _T("Data Format"),
-//	7, _T("Caculation"),
-
-#define  _NUM_FUNCTION 0
-#define  _NUM_MODBUSADDRESS 1
-#define  _NUM_NAME 2
-#define  _NUM_NAME1 3
-#define  _NUM_UNIT 4
-#define  _NUM_LENGTH 5
-#define  _NUM_RW 6
-#define  _NUM_DEFAULT 7
-#define  _NUM_VALUE 8
-#define  _NUM_DATAFORMAT 9
-#define  _NUM_CAULATION 10
-#define  _NUM_DESCRIPTION 11
+#define _NUM_ITEM 0
+#define _NUM_POLLYESNO 1
+#define _NUM_NAME 2
+#define _NUM_FUNCTION 3
+#define _NUM_MODBUSADDRESS 4
+#define _NUM_LENGTH 5
+#define _NUM_VALUE 6
+#define _NUM_DATAFORMAT 7
+#define _NUM_BIT 8
+#define _NUM_Low_Actual 9
+#define _NUM_High_Actual 10
+#define _NUM_Low_Scale 11
+#define _NUM_High_Scale 12
+#define _NUM_RW 13
+#define _NUM_DEFAULT 14
+#define _NUM_Bacnet_Type 15
+#define _NUM_Bacnet_Object_Description 16
+#define _NUM_COV_Increment 17
+#define _NUM_Unit_Group 18
+#define _NUM_Unit_Value 19
+#define _NUM_Grouping_Y_N 20
+#define _NUM_Update_On_Reconnect 21
+#define _NUM_Modbus_DESCRIPTION 22
 
    CustomProductTable_T g_current_Node;
 // CProductRegisterListView
@@ -77,168 +79,168 @@
 				// int ret = Modbus_Standard_Read(ModbusID,DataBuffer,  function_code, Start_Address, Count_Number);
 				 int ret = Modbus_Standard_Read(ModbusID, &DataBuffer[0], function_code, Start_Address, Count_Number, &send_data[0], &rev_back_rawData[0], &Send_length, &Rev_length);
 
-				if (ret>0)
-                {
-                    /*
-                    说明：这里是把读到的值转化成字符串，值与值之间用逗号隔开
-                    然后把值赋值给结构体中的Value，在发出消息，把值显示出来
-                    */ 
-                    CString strValue = _T("");
-                    CString strTemp;
-                    if (Parent->m_register_data_sheet.at(i).DataFormat.CompareNoCase(_T("Signed"))==0)
-                    { 
-						if (Parent->m_register_data_sheet.at(i).caculate == 2)//Raw
-						{
-							int datavalue = 0 ;
-							for (int len=0;len<Count_Number;len++)
-							{
-								datavalue+=((int)pow((long double)256,Count_Number-len-1))*(short)DataBuffer[len];
-							}	
-							strValue.Format(_T("%d"),datavalue);
+				//if (ret>0)
+    //            {
+    //                /*
+    //                说明：这里是把读到的值转化成字符串，值与值之间用逗号隔开
+    //                然后把值赋值给结构体中的Value，在发出消息，把值显示出来
+    //                */ 
+    //                CString strValue = _T("");
+    //                CString strTemp;
+    //                if (Parent->m_register_data_sheet.at(i).DataFormat.CompareNoCase(_T("Signed"))==0)
+    //                { 
+				//		if (Parent->m_register_data_sheet.at(i).caculate == 2)//Raw
+				//		{
+				//			int datavalue = 0 ;
+				//			for (int len=0;len<Count_Number;len++)
+				//			{
+				//				datavalue+=((int)pow((long double)256,Count_Number-len-1))*(short)DataBuffer[len];
+				//			}	
+				//			strValue.Format(_T("%d"),datavalue);
 
-						}
-						else if (Parent->m_register_data_sheet.at(i).caculate == 1)
-						{
-							int datavalue = 0 ;
-							for (int len=0;len<Count_Number;len++)
-							{
-								datavalue+=((int)pow((long double)256,len))*(short)DataBuffer[len];
-							}	
-							strValue.Format(_T("%d"),datavalue);
-						}
-						else
-						{
-							for (int len=0;len<Count_Number;len++)
-							{
-								strTemp.Format(_T("%d"),(short)DataBuffer[len]);
-								strValue+=strTemp;
-								if (len+1!=Count_Number)
-								{
-									strValue+=_T(",");
-								} 
-							}
-						}
+				//		}
+				//		else if (Parent->m_register_data_sheet.at(i).caculate == 1)
+				//		{
+				//			int datavalue = 0 ;
+				//			for (int len=0;len<Count_Number;len++)
+				//			{
+				//				datavalue+=((int)pow((long double)256,len))*(short)DataBuffer[len];
+				//			}	
+				//			strValue.Format(_T("%d"),datavalue);
+				//		}
+				//		else
+				//		{
+				//			for (int len=0;len<Count_Number;len++)
+				//			{
+				//				strTemp.Format(_T("%d"),(short)DataBuffer[len]);
+				//				strValue+=strTemp;
+				//				if (len+1!=Count_Number)
+				//				{
+				//					strValue+=_T(",");
+				//				} 
+				//			}
+				//		}
 
 
 
-                    }
-                    else if (Parent->m_register_data_sheet.at(i).DataFormat.CompareNoCase(_T("Unsigned"))==0)
-                    { 
-						if (Parent->m_register_data_sheet.at(i).caculate == 2)//Raw
-						{
-							int datavalue = 0 ;
-							for (int len=0;len<Count_Number;len++)
-							{
-								datavalue+=((int)pow((long double)256,Count_Number-len-1))*DataBuffer[len];
-							}	
-							strValue.Format(_T("%d"),datavalue);
+    //                }
+    //                else if (Parent->m_register_data_sheet.at(i).DataFormat.CompareNoCase(_T("Unsigned"))==0)
+    //                { 
+				//		if (Parent->m_register_data_sheet.at(i).caculate == 2)//Raw
+				//		{
+				//			int datavalue = 0 ;
+				//			for (int len=0;len<Count_Number;len++)
+				//			{
+				//				datavalue+=((int)pow((long double)256,Count_Number-len-1))*DataBuffer[len];
+				//			}	
+				//			strValue.Format(_T("%d"),datavalue);
 
-						}
-						else if (Parent->m_register_data_sheet.at(i).caculate == 1)
-						{
-							int datavalue = 0 ;
-							for (int len=0;len<Count_Number;len++)
-							{
-								datavalue+=((int)pow((long double)256,len))*DataBuffer[len];
-							}	
-							strValue.Format(_T("%d"),datavalue);
-						}
-						else
-						{
-							for (int len=0;len<Count_Number;len++)
-							{
-								strTemp.Format(_T("%d"),DataBuffer[len]);
-								strValue+=strTemp;
-								if (len+1!=Count_Number)
-								{
-									strValue+=_T(",");
-								} 
-							}
-						}
+				//		}
+				//		else if (Parent->m_register_data_sheet.at(i).caculate == 1)
+				//		{
+				//			int datavalue = 0 ;
+				//			for (int len=0;len<Count_Number;len++)
+				//			{
+				//				datavalue+=((int)pow((long double)256,len))*DataBuffer[len];
+				//			}	
+				//			strValue.Format(_T("%d"),datavalue);
+				//		}
+				//		else
+				//		{
+				//			for (int len=0;len<Count_Number;len++)
+				//			{
+				//				strTemp.Format(_T("%d"),DataBuffer[len]);
+				//				strValue+=strTemp;
+				//				if (len+1!=Count_Number)
+				//				{
+				//					strValue+=_T(",");
+				//				} 
+				//			}
+				//		}
 
-                    }
-                    else if (Parent->m_register_data_sheet.at(i).DataFormat.CompareNoCase(_T("Hex"))==0)
-                    { 
-                        
-						if (Parent->m_register_data_sheet.at(i).caculate == 2)//Raw
-						{
-							int datavalue = 0 ;
-							for (int len=0;len<Count_Number;len++)
-							{
-								datavalue+=((int)pow((long double)256,Count_Number-len-1))*DataBuffer[len];
-							}	
-							strValue.Format(_T("0x%X"),datavalue);
+    //                }
+    //                else if (Parent->m_register_data_sheet.at(i).DataFormat.CompareNoCase(_T("Hex"))==0)
+    //                { 
+    //                    
+				//		if (Parent->m_register_data_sheet.at(i).caculate == 2)//Raw
+				//		{
+				//			int datavalue = 0 ;
+				//			for (int len=0;len<Count_Number;len++)
+				//			{
+				//				datavalue+=((int)pow((long double)256,Count_Number-len-1))*DataBuffer[len];
+				//			}	
+				//			strValue.Format(_T("0x%X"),datavalue);
 
-						}
-						else if (Parent->m_register_data_sheet.at(i).caculate == 1)
-						{
-							int datavalue = 0 ;
-							for (int len=0;len<Count_Number;len++)
-							{
-								datavalue+=((int)pow((long double)256,len))*DataBuffer[len];
-							}	
-							strValue.Format(_T("0x%X"),datavalue);
-						}
-						else
-						{
-							for (int len=0;len<Count_Number;len++)
-							{
-								strTemp.Format(_T("0x%04X"),DataBuffer[len]);
-								strValue+=strTemp;
-								if (len+1!=Count_Number)
-								{
-									strValue+=_T(",");
-								} 
-							}
-						}
-                    } 
-                    else if (Parent->m_register_data_sheet.at(i).DataFormat.CompareNoCase(_T("Binary"))==0)
-                    { 
-                        for (int len=0;len<Count_Number;len++)
-                        {
-                            bitset<16> BitRegValue(DataBuffer[len]);
-                           // strTemp.Format(_T("%d"),DataBuffer[len]);
-                          //  strTemp.Format(_T("%s"),BitRegValue.to_string().c_str());
-                            strTemp = BitRegValue.to_string().c_str();
-                            strValue+=strTemp;
-                            if (len+1!=Count_Number)
-                            {
-                                strValue+=_T(",");
-                            } 
+				//		}
+				//		else if (Parent->m_register_data_sheet.at(i).caculate == 1)
+				//		{
+				//			int datavalue = 0 ;
+				//			for (int len=0;len<Count_Number;len++)
+				//			{
+				//				datavalue+=((int)pow((long double)256,len))*DataBuffer[len];
+				//			}	
+				//			strValue.Format(_T("0x%X"),datavalue);
+				//		}
+				//		else
+				//		{
+				//			for (int len=0;len<Count_Number;len++)
+				//			{
+				//				strTemp.Format(_T("0x%04X"),DataBuffer[len]);
+				//				strValue+=strTemp;
+				//				if (len+1!=Count_Number)
+				//				{
+				//					strValue+=_T(",");
+				//				} 
+				//			}
+				//		}
+    //                } 
+    //                else if (Parent->m_register_data_sheet.at(i).DataFormat.CompareNoCase(_T("Binary"))==0)
+    //                { 
+    //                    for (int len=0;len<Count_Number;len++)
+    //                    {
+    //                        bitset<16> BitRegValue(DataBuffer[len]);
+    //                       // strTemp.Format(_T("%d"),DataBuffer[len]);
+    //                      //  strTemp.Format(_T("%s"),BitRegValue.to_string().c_str());
+    //                        strTemp = BitRegValue.to_string().c_str();
+    //                        strValue+=strTemp;
+    //                        if (len+1!=Count_Number)
+    //                        {
+    //                            strValue+=_T(",");
+    //                        } 
 
-                        }
-                    } 
-                    else if (Parent->m_register_data_sheet.at(i).DataFormat.CompareNoCase(_T("Char"))==0)
-                    { 
-                        for (int len=0;len<Count_Number;len++)
-                        {
-                            strTemp.Format(_T("%c"),(DataBuffer[len]&0xFF00)>>8);
-                            strValue+=strTemp;
-                            strTemp.Format(_T("%c"),DataBuffer[len]&0x00FF);
-                            strValue+=strTemp;
-                             if (len+1!=Count_Number)
-                             {
-                                 strValue+=_T(",");
-                             } 
+    //                    }
+    //                } 
+    //                else if (Parent->m_register_data_sheet.at(i).DataFormat.CompareNoCase(_T("Char"))==0)
+    //                { 
+    //                    for (int len=0;len<Count_Number;len++)
+    //                    {
+    //                        strTemp.Format(_T("%c"),(DataBuffer[len]&0xFF00)>>8);
+    //                        strValue+=strTemp;
+    //                        strTemp.Format(_T("%c"),DataBuffer[len]&0x00FF);
+    //                        strValue+=strTemp;
+    //                         if (len+1!=Count_Number)
+    //                         {
+    //                             strValue+=_T(",");
+    //                         } 
 
-                        }
-                    }
-                    else
-                    {
-                        for (int len=0;len<Count_Number;len++)
-                        {
-                            strTemp.Format(_T("%d"),DataBuffer[len]);
-                            strValue+=strTemp;
-                            if (len+1!=Count_Number)
-                            {
-                                strValue+=_T(",");
-                            } 
+    //                    }
+    //                }
+    //                else
+    //                {
+    //                    for (int len=0;len<Count_Number;len++)
+    //                    {
+    //                        strTemp.Format(_T("%d"),DataBuffer[len]);
+    //                        strValue+=strTemp;
+    //                        if (len+1!=Count_Number)
+    //                        {
+    //                            strValue+=_T(",");
+    //                        } 
 
-                        }
-                    }
-                    Parent->m_register_data_sheet.at(i).Value = strValue;
-                     PostMessage(g_hwnd_now,WM_REFRESH_BAC_INPUT_LIST,1U,i);  
-                }
+    //                    }
+    //                }
+    //                Parent->m_register_data_sheet.at(i).Value = strValue;
+    //                 PostMessage(g_hwnd_now,WM_REFRESH_BAC_INPUT_LIST,1U,i);  
+    //            }
                 #endif
               
              }
@@ -258,33 +260,55 @@ CProductRegisterListView::CProductRegisterListView()
 {
    
     m_BackgroundTreadHandle = NULL;
-    m_string_dataformat = _T("Signed");
-    m_string_property = _T("Read Only");
+ 
     m_short_counts = 1;
     m_string_paratypes = _T("");
     m_sort_type= 0;//默认排序
 	m_value_format = 0;
- 	m_array_modbus_function[0] = L"Read Coils";
- 	m_array_modbus_function[1] = L"Read Discrete Inputs";
- 	m_array_modbus_function[2] = L"Read Holding Registers";
- 	m_array_modbus_function[3] = L"Read Input Registers";
-	m_array_modbus_function[4] = L"Write Single Coil";
-	m_array_modbus_function[5] = L"Write Single Register";
-	m_array_modbus_function[6] = L"Write Multiple Coils";
-	m_array_modbus_function[7] = L"Write Multiple Registers";
+  
+	m_vecDataRW.clear();
+	m_vecDataRW.push_back(L"R_Only");
+	m_vecDataRW.push_back(L"R_W");
 
-	m_array_caculate[0] = L"Raw Data";
-	m_array_caculate[1] = L"ASC";
-	m_array_caculate[2] = L"DEC";
+ 
+   
 
-	m_dataformat.push_back(_T("Signed"));
-	m_dataformat.push_back(_T("Unsigned"));
-	m_dataformat.push_back(_T("Hex"));
-	m_dataformat.push_back(_T("Binary"));
-	m_dataformat.push_back(_T("Char"));
-	m_dataformat.push_back(L"Long");
-	m_dataformat.push_back(L"float");
-	m_dataformat.push_back(L"double");
+	m_vecVariableType.push_back(L"Read_Coils");
+	m_vecVariableType.push_back(L"Read_Discrete_Inputs");
+	m_vecVariableType.push_back(L"Read_Holding_Registers");
+	m_vecVariableType.push_back(L"Read_Input_Registers");
+
+	m_vecVariableType.push_back(L"Write_Single_Coil");
+	m_vecVariableType.push_back(L"Write_Single_Register");
+	m_vecVariableType.push_back(L"Write_Multiple_Coils");
+	m_vecVariableType.push_back(L"Write_Multiple_Registers");
+
+
+	m_GroupUnits.clear();
+	m_GroupUnits.push_back(L"Other");
+	m_GroupUnits.push_back(L"Volumetric_Flow");
+	m_GroupUnits.push_back(L"Volume");
+	m_GroupUnits.push_back(L"Velocity");
+	m_GroupUnits.push_back(L"Torque");
+	m_GroupUnits.push_back(L"Time");
+	m_GroupUnits.push_back(L"Temperature");
+	m_GroupUnits.push_back(L"Pressure");
+	m_GroupUnits.push_back(L"Power");
+	m_GroupUnits.push_back(L"Mass_Flow");
+	m_GroupUnits.push_back(L"Mass");
+	m_GroupUnits.push_back(L"Light");
+	m_GroupUnits.push_back(L"Length");
+	m_GroupUnits.push_back(L"Humidity");
+	m_GroupUnits.push_back(L"Frequency");
+	m_GroupUnits.push_back(L"Force");
+	m_GroupUnits.push_back(L"Entropy");
+	m_GroupUnits.push_back(L"Enthalpy");
+	m_GroupUnits.push_back(L"Energy");
+	m_GroupUnits.push_back(L"Electrical");
+	m_GroupUnits.push_back(L"Currency");
+	m_GroupUnits.push_back(L"Area");
+	m_GroupUnits.push_back(L"Acceleration");
+	m_GroupUnits.push_back(L"Bacnet_Units");
 
 }
 
@@ -326,6 +350,7 @@ BEGIN_MESSAGE_MAP(CProductRegisterListView, CFormView)
     ON_EN_CHANGE(IDC_EDIT_DELAY_LOOP, &CProductRegisterListView::OnEnChangeEditDelayLoop)
     ON_EN_CHANGE(IDC_EDIT_DELAY_ITEMS, &CProductRegisterListView::OnEnChangeEditDelayItems)
 	 
+	ON_NOTIFY(NM_DBLCLK, IDC_LIST_CUSTOM_LIST, &CProductRegisterListView::OnNMDblclkListCustomList)
 END_MESSAGE_MAP()
 
 
@@ -358,7 +383,8 @@ void CProductRegisterListView::OnSize(UINT nType, int cx, int cy)
         // m_MsDataGrid.SetWindowPos(this,ViewRect.top,ViewRect.left,ViewRect.Width(),ViewRect.Height(),SWP_SHOWWINDOW|SWP_NOZORDER);
         if (m_register_list.GetSafeHwnd())
         {
-            m_register_list.MoveWindow(CRect(0,50,ViewRect.Width(),ViewRect.Height()),TRUE);
+           // m_register_list.MoveWindow(CRect(0,50,ViewRect.Width(),ViewRect.Height()),TRUE);
+			m_register_list.MoveWindow(CRect(0, 0, ViewRect.Width(), ViewRect.Height()), TRUE);
         }
 
     }
@@ -385,6 +411,24 @@ void CProductRegisterListView::Fresh(void)
 		GetDlgItem(IDC_EDIT_DELAY_LOOP)->ShowWindow(FALSE);
 		GetDlgItem(IDC_STATIC_DELAY_BETWEENITEMS)->ShowWindow(FALSE);
 		GetDlgItem(IDC_EDIT_DELAY_ITEMS)->ShowWindow(FALSE);
+
+		GetDlgItem(IDC_STATIC_DEFAULT_PSETTING)->ShowWindow(FALSE);
+		GetDlgItem(IDC_STATIC_SORT)->ShowWindow(FALSE);
+		GetDlgItem(IDC_STATIC_ASC)->ShowWindow(FALSE);
+		GetDlgItem(IDC_STATIC_DESC)->ShowWindow(FALSE);
+		GetDlgItem(IDC_BUTTON4)->ShowWindow(FALSE);
+
+
+		GetDlgItem(IDC_UPBUTTON)->ShowWindow(FALSE);
+		GetDlgItem(IDC_DOWNBUTTON)->ShowWindow(FALSE);
+
+		GetDlgItem(IDC_STATIC_COUNT_NUMBER)->ShowWindow(FALSE);
+		GetDlgItem(IDC_EDIT_COUNTS)->ShowWindow(FALSE);
+		GetDlgItem(IDC_STATIC_PROPERTY)->ShowWindow(FALSE);
+		GetDlgItem(IDC_STATIC_DATAFORMAT)->ShowWindow(FALSE);
+
+		GetDlgItem(IDC_COMBO_PROPERTY)->ShowWindow(FALSE);
+		GetDlgItem(IDC_COMBO_DATAFORMAT)->ShowWindow(FALSE);
 	} 
 	else
 	{
@@ -403,14 +447,14 @@ void CProductRegisterListView::Fresh(void)
 	}
     
 	m_combox_dataformat.ResetContent();
-	for (int i=0;i<m_dataformat.size();i++)
+	for (int i=0;i<m_vecDataFormat.size();i++)
 	{
-		m_combox_dataformat.AddString(m_dataformat[i]);
+		m_combox_dataformat.AddString(m_vecDataFormat[i]);
 	}
 	m_combox_dataformat.SetCurSel(0);
     LoadDataSheet();
     Initial_List();
-    SetTimer(1,10,NULL);
+     
 	if (!offline_mode)
 	{
 		if (m_BackgroundTreadHandle)
@@ -423,6 +467,29 @@ void CProductRegisterListView::Fresh(void)
   
 }
 
+//#define _NUM_POLLYESNO 0
+//#define _NUM_NAME 1
+//#define _NUM_FUNCTION 2
+//#define _NUM_MODBUSADDRESS 3
+//#define _NUM_LENGTH 4
+//#define _NUM_VALUE 5
+//#define _NUM_DATAFORMAT 6
+//#define _NUM_BIT 7
+//#define _NUM_Low_Actual 8
+//#define _NUM_High_Actual 9
+//#define _NUM_Low_Scale 10
+//#define _NUM_High_Scale 11
+//#define _NUM_RW 12
+//#define _NUM_DEFAULT 13
+//#define _NUM_Bacnet_Type 14
+//#define _NUM_Bacnet_Object_Description 15
+//#define _NUM_COV_Increment 16
+//#define _NUM_Unit_Group 17
+//#define _NUM_Unit_Value 18
+//#define _NUM_Modbus_DESCRIPTION 19
+//#define _NUM_Grouping_Y_N 20
+//#define _NUM_Update_On_Reconnect 21
+//#define _NUM_Modbus_DESCRIPTION 22
 
 void CProductRegisterListView::Initial_List(void)
 {
@@ -433,19 +500,30 @@ void CProductRegisterListView::Initial_List(void)
     while(m_register_list.DeleteColumn(0));
     m_register_list.ModifyStyle(0,LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
     m_register_list.SetExtendedStyle(m_register_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));
-	m_register_list.InsertColumn(_NUM_FUNCTION, _T("Function"), 230, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_register_list.InsertColumn(_NUM_ITEM, _T("Item"), 230, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_register_list.InsertColumn(_NUM_POLLYESNO, _T("Poll Y/N"), 230, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_register_list.InsertColumn(_NUM_NAME, _T("Bacnet Object Name"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_register_list.InsertColumn(_NUM_FUNCTION, _T("Modbus Variable Type"), 230, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_register_list.InsertColumn(_NUM_MODBUSADDRESS, _T("Modbus Address"), 180, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
-    m_register_list.InsertColumn(_NUM_NAME, _T("Name"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_register_list.InsertColumn(_NUM_NAME1, _T("Alias"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_register_list.InsertColumn(_NUM_UNIT, _T("Units"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_register_list.InsertColumn(_NUM_LENGTH, _T("Length"), 120, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_register_list.InsertColumn(_NUM_RW, _T("Access"), 90, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-    m_register_list.InsertColumn(_NUM_VALUE, _T("Value"), 90, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_register_list.InsertColumn(_NUM_DEFAULT, _T("Default"), 90, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-    m_register_list.InsertColumn(_NUM_DATAFORMAT, _T("Data Format"), 90, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_register_list.InsertColumn(_NUM_CAULATION, _T("Caculation"), 90, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_register_list.InsertColumn(_NUM_DESCRIPTION, _T("Description"), 90, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-    
+	m_register_list.InsertColumn(_NUM_VALUE, _T("Value"), 90, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_register_list.InsertColumn(_NUM_DATAFORMAT, _T("Data Format"), 90, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_register_list.InsertColumn(_NUM_BIT, _T("Bit #"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_register_list.InsertColumn(_NUM_Low_Actual, _T("Low Actual"), 100, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_register_list.InsertColumn(_NUM_High_Actual, _T("High Actual"), 100, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_register_list.InsertColumn(_NUM_Low_Scale, _T("Low Scale"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_register_list.InsertColumn(_NUM_High_Scale, _T("High Scale"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_register_list.InsertColumn(_NUM_RW, _T("R/W"), 90, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_register_list.InsertColumn(_NUM_DEFAULT, _T("Default"), 90, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_register_list.InsertColumn(_NUM_Bacnet_Type, _T("Bacnet Type"), 120, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_register_list.InsertColumn(_NUM_Bacnet_Object_Description, _T("Bacnet Object Description"), 200, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_register_list.InsertColumn(_NUM_COV_Increment, _T("COV Increment"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_register_list.InsertColumn(_NUM_Unit_Group, _T("Unit Group"), 100, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_register_list.InsertColumn(_NUM_Unit_Value, _T("Unit Value"), 100, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_register_list.InsertColumn(_NUM_Grouping_Y_N, _T("Grouping YES / NO"), 200, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_register_list.InsertColumn(_NUM_Update_On_Reconnect, _T("Update On Reconnect"), 200, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_register_list.InsertColumn(_NUM_Modbus_DESCRIPTION, _T("Register Description"), 200, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	
 	ShowDataInList();
 }
 void CProductRegisterListView::ShowDataInList()
@@ -453,109 +531,63 @@ void CProductRegisterListView::ShowDataInList()
     CString strTemp;
 	for (int i = 0;i<(int)m_register_data_sheet.size();i++)
 	{
-
-		strTemp.Format(_T("%s"), GetFunctionName(m_register_data_sheet.at(i).function_code));
+		strTemp.Format(_T("%d"), i + 1);
 		m_register_list.InsertItem(i, strTemp);
+		m_register_list.SetItemText(i, _NUM_POLLYESNO, m_register_data_sheet.at(i).Poll_YES_NO);
+		
+
+		m_register_list.SetItemText(i, _NUM_NAME, m_register_data_sheet.at(i).Bacnet_Object_Name);
+		
+		strTemp.Format(_T("%s"), GetFunctionName(m_register_data_sheet.at(i).function_code));
+		m_register_list.SetItemText(i, _NUM_FUNCTION, strTemp);
+	
+
 		strTemp.Format(_T("%d"), m_register_data_sheet.at(i).Reg_ID);
 		m_register_list.SetItemText(i, _NUM_MODBUSADDRESS, strTemp);
-		m_register_list.SetItemText(i, _NUM_NAME, m_register_data_sheet.at(i).Para_Type);
-		m_register_list.SetItemText(i, _NUM_NAME1, m_register_data_sheet.at(i).Para_Type1);
-		m_register_list.SetItemText(i, _NUM_UNIT, m_register_data_sheet.at(i).Unit);
 		strTemp.Format(_T("%d"), m_register_data_sheet.at(i).Counts_Number);
 		m_register_list.SetItemText(i, _NUM_LENGTH, strTemp);
-		strTemp.Format(_T("%s"), m_register_data_sheet.at(i).Property);
+
+		m_register_list.SetItemText(i, _NUM_DATAFORMAT, m_register_data_sheet.at(i).DataFormat);
+		
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(i).Bit_1);
+		m_register_list.SetItemText(i, _NUM_BIT, strTemp);
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(i).Low_Actual);
+		m_register_list.SetItemText(i, _NUM_Low_Actual, strTemp);
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(i).High_Actual);
+		m_register_list.SetItemText(i, _NUM_High_Actual, strTemp);
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(i).Low_Scale);
+		m_register_list.SetItemText(i, _NUM_Low_Scale, strTemp);
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(i).High_Scale);
+		m_register_list.SetItemText(i, _NUM_High_Scale, strTemp);
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(i).Read_Only_Or_RW);
 		m_register_list.SetItemText(i, _NUM_RW, strTemp);
-		strTemp.Format(_T("%s"), m_register_data_sheet.at(i).Value);
-		m_register_list.SetItemText(i, _NUM_VALUE, strTemp);
-		strTemp.Format(_T("%s"), m_register_data_sheet.at(i).DataFormat);
-		m_register_list.SetItemText(i, _NUM_DATAFORMAT, strTemp);
-		strTemp.Format(_T("%s"), GetCalName(m_register_data_sheet.at(i).caculate));
-		m_register_list.SetItemText(i, _NUM_CAULATION, strTemp);
-		m_register_list.SetItemText(i, _NUM_DEFAULT, m_register_data_sheet.at(i).Default);
-		m_register_list.SetItemText(i, _NUM_DESCRIPTION, m_register_data_sheet.at(i).Reg_Description);
-		if (ListCtrlEx::ComboBox == m_register_list.GetColumnType(_NUM_FUNCTION))
-		{
-			ListCtrlEx::CStrList strlist;
-			for (int i = 0;i<4;i++)
-			{
-				strlist.push_back(m_array_modbus_function[i]);
-			}
-			m_register_list.SetCellStringList(i, _NUM_FUNCTION, strlist);
-		}
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(i).Default);
+		m_register_list.SetItemText(i, _NUM_DEFAULT, strTemp);
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(i).Bacnet_Type);
+		m_register_list.SetItemText(i, _NUM_Bacnet_Type, strTemp);
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(i).Bacnet_Object_Description);
+		m_register_list.SetItemText(i, _NUM_Bacnet_Object_Description, strTemp);
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(i).COV_Increment);
+		m_register_list.SetItemText(i, _NUM_COV_Increment, strTemp);
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(i).Unit_Group);
+		m_register_list.SetItemText(i, _NUM_Unit_Group, strTemp);
+		
 
-		if (ListCtrlEx::ComboBox == m_register_list.GetColumnType(_NUM_RW))
-		{
-			ListCtrlEx::CStrList strlist;
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(i).Unit_Value);
+		m_register_list.SetItemText(i, _NUM_Unit_Value, strTemp);
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(i).Grouping_YES_NO);
+		m_register_list.SetItemText(i, _NUM_Grouping_Y_N, strTemp);
+		
 
-			strlist.push_back(_T("Read Only"));
-			strlist.push_back(_T("R/W"));
-			m_register_list.SetCellStringList(i, _NUM_RW, strlist);
-		}  //Signed;Unsigned;Hex;Binary
-		if (ListCtrlEx::ComboBox == m_register_list.GetColumnType(_NUM_DATAFORMAT))
-		{
-			ListCtrlEx::CStrList strlist;
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(i).Update_On_Reconnect);
+		m_register_list.SetItemText(i, _NUM_Update_On_Reconnect, strTemp);
+		
 
-
-			for (int i = 0;i<m_dataformat.size();i++)
-			{
-				strlist.push_back(m_dataformat[i]);
-			}
-
-			m_register_list.SetCellStringList(i, _NUM_DATAFORMAT, strlist);
-		}
-		if (ListCtrlEx::ComboBox == m_register_list.GetColumnType(_NUM_CAULATION))
-		{
-			ListCtrlEx::CStrList strlist;
-			for (int i = 0; i < 3; i++)
-			{
-				strlist.push_back(m_array_caculate[i]);
-			}
-			m_register_list.SetCellStringList(i, _NUM_CAULATION, strlist);
-		}
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(i).Reg_Description);
+		m_register_list.SetItemText(i, _NUM_Modbus_DESCRIPTION, strTemp);
+		 
 	}
 
-	m_register_list.InsertItem(m_register_data_sheet.size(), GetFunctionName(3));
-	//m_register_list.SetItemText(m_register_data_sheet.size(), 3, GetFunctionName(3));
-	if (ListCtrlEx::ComboBox == m_register_list.GetColumnType(_NUM_FUNCTION))
-	{
-		ListCtrlEx::CStrList strlist;
-		for (int i = 0; i < 4; i++)
-		{
-			strlist.push_back(m_array_modbus_function[i]);
-		}
-		m_register_list.SetCellStringList(m_register_data_sheet.size(), _NUM_FUNCTION, strlist);
-	}
-	if (ListCtrlEx::ComboBox == m_register_list.GetColumnType(_NUM_RW))
-	{
-		ListCtrlEx::CStrList strlist;
-		strlist.push_back(_T("Read Only"));
-		strlist.push_back(_T("R/W"));
-		m_register_list.SetCellStringList(m_register_data_sheet.size(), _NUM_RW, strlist);
-	}
-	if (ListCtrlEx::ComboBox == m_register_list.GetColumnType(_NUM_DATAFORMAT))
-	{
-		ListCtrlEx::CStrList strlist;
-
-		/*strlist.push_back(_T("Signed"));
-		strlist.push_back(_T("Unsigned"));
-		strlist.push_back(_T("Hex"));
-		strlist.push_back(_T("Binary"));
-		strlist.push_back(_T("Char"));*/
-		for (int i = 0;i < m_dataformat.size();i++)
-		{
-			strlist.push_back(m_dataformat[i]);
-		}
-		m_register_list.SetCellStringList(m_register_data_sheet.size(), _NUM_DATAFORMAT, strlist);
-	}
-	if (ListCtrlEx::ComboBox == m_register_list.GetColumnType(_NUM_CAULATION))
-	{
-		ListCtrlEx::CStrList strlist;
-		for (int i = 0; i < 3; i++)
-		{
-			strlist.push_back(m_array_caculate[i]);
-		}
-		m_register_list.SetCellStringList(m_register_data_sheet.size(), _NUM_CAULATION, strlist);
-	}
 	m_register_list.ShowWindow(SW_SHOW);
 }
 void CProductRegisterListView::OnInitialUpdate()
@@ -644,6 +676,7 @@ void CProductRegisterListView::LoadDataSheet(){
    CustomProductTable_T Struc_Temp;
    CppSQLite3DB SqliteDBT3000;
    CppSQLite3Query q;
+    
    SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 
    if (m_sort_type == 0)
@@ -670,24 +703,36 @@ void CProductRegisterListView::LoadDataSheet(){
    q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
    while(!q.eof())
    {
-	   Struc_Temp.SN = q.getValuebyName(L"SN");
+	   
 
 	   Struc_Temp.ModelNo = q.getIntField("ModelNo", -1);//
-	   Struc_Temp.Reg_Description = q.getValuebyName(L"Reg_Description");//
+	   Struc_Temp.Poll_YES_NO = q.getValuebyName(L"Poll_YES_NO",L"Yes");
+	   Struc_Temp.Bacnet_Object_Name = q.getValuebyName(L"Bacnet_Object_Name",L"Object Name");//
 	   Struc_Temp.Reg_ID = q.getIntField("Reg_ID", -1);//
-	   Struc_Temp.Para_Type = q.getValuebyName(L"Para_Type");//
-	   Struc_Temp.Para_Type1 = q.getValuebyName(L"Para_Type1");//
-	   Struc_Temp.Counts_Number = q.getIntField("Counts_Number");//
-	   Struc_Temp.Property = q.getValuebyName(L"Property");//  
-	   Struc_Temp.DataFormat = q.getValuebyName(L"DataFormat");//
-	   Struc_Temp.function_code = q.getIntField("Function_Code");
-	   Struc_Temp.caculate = q.getIntField("Caculate");
-	   Struc_Temp.Unit = q.getValuebyName(L"UNIT");//
-	   Struc_Temp.Default = q.getValuebyName(L"Default1");//
+	   Struc_Temp.Reg_Description = q.getValuebyName(L"Reg_Description",L"Description");//
+	   Struc_Temp.function_code = q.getIntField("Function_Code",3);
+	   Struc_Temp.Counts_Number = q.getIntField("Counts_Number",1);//
+	   Struc_Temp.DataFormat = q.getValuebyName(L"DataFormat",L"16 Bit Unsigned Integer");//
+	   Struc_Temp.SN = q.getValuebyName(L"SN",GetGUID());
+	   Struc_Temp.Default = q.getValuebyName(L"Default1",L"");//  
+	   Struc_Temp.Bit_1 = q.getValuebyName(L"Bit_1",L"NONE");//
+	   Struc_Temp.Low_Actual = q.getValuebyName(L"Low_Actual",L"0");//
+	   Struc_Temp.High_Actual = q.getValuebyName(L"High_Actual",L"1");//
+	   Struc_Temp.Low_Scale = q.getValuebyName(L"Low_Scale",L"0");//
+	   Struc_Temp.High_Scale = q.getValuebyName(L"High_Scale",L"1");//
+	   Struc_Temp.Read_Only_Or_RW = q.getValuebyName(L"Read_Only_Or_RW",L"R_Only");//
+	   Struc_Temp.Bacnet_Type = q.getValuebyName(L"Bacnet_Type",L"AI");//
+	   Struc_Temp.Bacnet_Object_Description = q.getValuebyName(L"Bacnet_Object_Description",L"");//
+	   Struc_Temp.COV_Increment = q.getValuebyName(L"COV_Increment",L"0");//
+	   Struc_Temp.Unit_Group = q.getValuebyName(L"Unit_Group",L"Other");//
+	   Struc_Temp.Unit_Value = q.getValuebyName(L"Unit_Value", L"NO UNITS");//
+	   Struc_Temp.Grouping_YES_NO = q.getValuebyName(L"Grouping_YES_NO",L"YES");//
+	   Struc_Temp.Update_On_Reconnect = q.getValuebyName(L"Update_On_Reconnect", L"NO");//
+
 	   if (Struc_Temp.SN.IsEmpty())
 	   {
 		   Struc_Temp.SN = GetGUID();
-		   StrSql.Format(_T("Update  CustomProductTable  Set SN = '%s' Where ModelNo = %d and Reg_ID = %d and Function_Code = %d  "), 
+		   StrSql.Format(_T("Update  CustomProductTable  Set SN = '%s' Where ModelNo = %d and Reg_ID = %d and Function_Code = %d"), 
 			   Struc_Temp.SN, Struc_Temp.ModelNo, Struc_Temp.Reg_ID, Struc_Temp.function_code);
 		   SqliteDBT3000.execDML((UTF8MBSTR)StrSql);
 	   }
@@ -720,7 +765,7 @@ LRESULT CProductRegisterListView::Fresh_Input_List(WPARAM wParam,LPARAM lParam){
      if (fresh_type == 1)
      {
          
-		 strTemp.Format(_T("%s"),GetFunctionName(m_register_data_sheet.at(fresh_row).function_code));
+		/* strTemp.Format(_T("%s"),GetFunctionName(m_register_data_sheet.at(fresh_row).function_code));
          m_register_list.SetItemText(fresh_row,_NUM_FUNCTION,strTemp);
 		 strTemp.Format(_T("%d"), m_register_data_sheet.at(fresh_row).Reg_ID);
          m_register_list.SetItemText(fresh_row,_NUM_MODBUSADDRESS, strTemp);
@@ -737,7 +782,7 @@ LRESULT CProductRegisterListView::Fresh_Input_List(WPARAM wParam,LPARAM lParam){
 
 		 strTemp.Format(_T("%s"),GetCalName(m_register_data_sheet.at(fresh_row).caculate));
 		 m_register_list.SetItemText(fresh_row, _NUM_CAULATION, strTemp);
-         m_register_list.SetItemBkColor(fresh_row,-1,RGB(255,255,255));
+         m_register_list.SetItemBkColor(fresh_row,-1,RGB(255,255,255));*/
      }
      if (fresh_type == 2)
      {
@@ -757,27 +802,42 @@ LRESULT CProductRegisterListView::Change_Input_Item(WPARAM wParam,LPARAM lParam)
     int lRow = (int)wParam;
     int lCol = (int)lParam; 
     CString StrSql;
-	BOOL is_last = FALSE;
-	if (lRow == m_register_data_sheet.size())
+	 
+	if (lRow >= m_register_data_sheet.size())
 	{
-		is_last = TRUE;
+		return 0;
 	}
- 
+	CustomProductTable_T tmp = m_register_data_sheet.at(lRow);
+    
+	tmp.Poll_YES_NO = m_register_list.GetItemText(lRow, _NUM_POLLYESNO);
+	tmp.Bacnet_Object_Name = m_register_list.GetItemText(lRow, _NUM_NAME);//CString  Bacnet_Object_Name;
+	tmp.function_code = GetFunctionCode(m_register_list.GetItemText(lRow, _NUM_FUNCTION));
+	CString strAddress = m_register_list.GetItemText(lRow, _NUM_MODBUSADDRESS);
+	if(strAddress.IsEmpty())
+	{
 
-	CString Function_Name = m_register_list.GetItemText(lRow, _NUM_FUNCTION);
-	CString Reg_ID = m_register_list.GetItemText(lRow, _NUM_MODBUSADDRESS);
-    CString Para_Type = m_register_list.GetItemText(lRow,_NUM_NAME);
-	CString Para_Type1 = m_register_list.GetItemText(lRow, _NUM_NAME1);
-    CString Counts_Number = m_register_list.GetItemText(lRow,_NUM_LENGTH);
-    CString Property = m_register_list.GetItemText(lRow,_NUM_RW);
-    CString StrDataFormat = m_register_list.GetItemText(lRow,_NUM_DATAFORMAT);
-	CString strCalName = m_register_list.GetItemText(lRow,_NUM_CAULATION);
-	CString Reg_Description = m_register_list.GetItemText(lRow, _NUM_DESCRIPTION);
-	CString Unit = m_register_list.GetItemText(lRow, _NUM_UNIT);
-	CString Default = m_register_list.GetItemText(lRow, _NUM_DEFAULT);
-
-    int ProductModel = m_current_tree_node.product_class_id;
-    int Int_Counts_Number=_wtoi(Counts_Number);
+	}
+	tmp.Reg_ID = _wtoi();
+	tmp.Counts_Number = _wtoi(m_register_list.GetItemText(lRow, _NUM_LENGTH));;
+	 
+	tmp.DataFormat = m_register_list.GetItemText(lRow, _NUM_DATAFORMAT);
+	tmp.Bit_1 = m_register_list.GetItemText(lRow, _NUM_BIT);
+	tmp.Low_Actual = m_register_list.GetItemText(lRow, _NUM_Low_Actual);;
+	tmp.High_Actual = m_register_list.GetItemText(lRow, _NUM_High_Actual);;
+	tmp.Low_Scale = m_register_list.GetItemText(lRow, _NUM_Low_Scale);;
+	tmp.High_Scale = m_register_list.GetItemText(lRow, _NUM_High_Scale);;
+	tmp.Read_Only_Or_RW = m_register_list.GetItemText(lRow, _NUM_RW);;
+	tmp.Bacnet_Type = m_register_list.GetItemText(lRow, _NUM_Bacnet_Type);;
+	tmp.Bacnet_Object_Description = m_register_list.GetItemText(lRow, _NUM_Bacnet_Object_Description);;
+	tmp.COV_Increment = m_register_list.GetItemText(lRow, _NUM_COV_Increment);;
+	tmp.Unit_Group = m_register_list.GetItemText(lRow, _NUM_Unit_Group);;
+	tmp.Unit_Value = m_register_list.GetItemText(lRow, _NUM_Unit_Value);;
+	tmp.Grouping_YES_NO = m_register_list.GetItemText(lRow, _NUM_Grouping_Y_N);;
+	tmp.Update_On_Reconnect = m_register_list.GetItemText(lRow, _NUM_Update_On_Reconnect);;
+	tmp.Default = m_register_list.GetItemText(lRow, _NUM_DEFAULT);;
+	tmp.Reg_Description = m_register_list.GetItemText(lRow, _NUM_Modbus_DESCRIPTION);;
+	 
+    int Int_Counts_Number= tmp.Counts_Number;
     if (Int_Counts_Number>100)
     {   
         
@@ -786,87 +846,12 @@ LRESULT CProductRegisterListView::Change_Input_Item(WPARAM wParam,LPARAM lParam)
          m_register_list.SetItemText(lRow,lCol,StrSql);
         return 0;
     }
-    CustomProductTable_T Struct_Temp;
-  /*  if (lCol == 0)
-    {*/
+    //CustomProductTable_T Struct_Temp;
+ 
 	CppSQLite3DB SqliteDBT3000;
 	CppSQLite3Query q;
 	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
-       if (is_last)
-       {
 
-         if (lCol == _NUM_FUNCTION){
-            
-             StrSql.Format(_T("Select * From CustomProductTable Where ModelNo = %d and Reg_ID = %d and Function_Code = %d "),ProductModel,_wtoi(Reg_ID),GetFunctionCode(Function_Name));
-             q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
-             if(!q.eof()){
-                 CString strTips;
-                 strTips.Format(_T("Address=%s,Exists!"),Reg_ID);
-                 AfxMessageBox(strTips);
-                SqliteDBT3000.closedb();
-                 m_register_list.SetItemText(lRow,lCol,_T(""));
-                 return 0;
-             }
-			 CString strGUID = GetGUID();
-             StrSql.Format(_T("Insert INTO CustomProductTable(ModelNo,Reg_ID,Function_Code,Para_Type,Property,Counts_Number,DataFormat,Caculate,SN) VALUES (%d,%d,%d,'','%s',%d,'%s',%d,'%s')")
-                                ,ProductModel,_wtoi(Reg_ID), GetFunctionCode(Function_Name),m_string_property,m_short_counts,m_string_dataformat, 0,strGUID);
-             SqliteDBT3000.execDML((UTF8MBSTR)StrSql);
-             
-              Struct_Temp.ModelNo =  ProductModel;
-              Struct_Temp.Reg_ID =  _wtoi(Reg_ID);
-              Struct_Temp.Property=m_string_property;
-              Struct_Temp.Counts_Number = m_short_counts;
-              Struct_Temp.DataFormat = m_string_dataformat;
-			  Struct_Temp.function_code = GetFunctionCode(Function_Name);
-			  Struct_Temp.SN = strGUID;
-			  Struct_Temp.caculate = 0;
-              m_register_data_sheet.push_back(Struct_Temp);
-
-            m_register_list.InsertItem(m_register_data_sheet.size(),_T("")); //插入一行
-			m_register_list.SetItemText(m_register_data_sheet.size(), _NUM_FUNCTION, GetFunctionName(3));
-			m_register_list.SetItemText(m_register_data_sheet.size(), _NUM_FUNCTION, GetCalName(0));
-			if (ListCtrlEx::ComboBox == m_register_list.GetColumnType(_NUM_FUNCTION))
-			{
-				ListCtrlEx::CStrList strlist;
-				for (int i = 0; i < 4; i++)
-				{
-					strlist.push_back(m_array_modbus_function[i]);
-				}
-				m_register_list.SetCellStringList(m_register_data_sheet.size(), _NUM_FUNCTION, strlist);
-			}
-            if(ListCtrlEx::ComboBox == m_register_list.GetColumnType(_NUM_RW))
-            {
-                ListCtrlEx::CStrList strlist;
-                strlist.push_back(_T("Read Only"));
-                strlist.push_back(_T("R/W"));
-                m_register_list.SetCellStringList(m_register_data_sheet.size(), _NUM_RW, strlist);
-            }
-            if(ListCtrlEx::ComboBox == m_register_list.GetColumnType(_NUM_DATAFORMAT))
-            {
-                ListCtrlEx::CStrList strlist;
-				for (int i = 0;i < m_dataformat.size();i++)
-				{
-					strlist.push_back(m_dataformat[i]);
-				}
-				 
-                m_register_list.SetCellStringList(m_register_data_sheet.size(), _NUM_DATAFORMAT, strlist);
-            }
-			if (ListCtrlEx::ComboBox == m_register_list.GetColumnType(_NUM_CAULATION))
-			{
-				ListCtrlEx::CStrList strlist;
-				for (int i = 0; i < 3; i++)
-				{
-					strlist.push_back(m_array_caculate[i]);
-				}
-				m_register_list.SetCellStringList(m_register_data_sheet.size(), 7, strlist);
-			}
-            PostMessage(WM_REFRESH_BAC_INPUT_LIST,1U,lRow) ;
-         }
-          
-       } 
-       else
-       {
-            BOOL m_ischange = TRUE;
             if (lCol == _NUM_MODBUSADDRESS)
             {
                 if (Reg_ID.IsEmpty())
@@ -909,9 +894,9 @@ LRESULT CProductRegisterListView::Change_Input_Item(WPARAM wParam,LPARAM lParam)
                 PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0); 
              }
                     
-       }
+     
        SqliteDBT3000.closedb();
-       //LoadDataSheet();
+      
        
    
     return 0;
@@ -920,50 +905,7 @@ LRESULT CProductRegisterListView::Change_Input_Item(WPARAM wParam,LPARAM lParam)
    @1:Different Product responce to the different functionality
    @2:
 */           
-void CProductRegisterListView::OnNMClickList_output(NMHDR *pNMHDR, LRESULT *pResult){
 
-    LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-    CString temp_cstring;
-    long lRow,lCol;
-    m_register_list.Set_Edit(true);
-    DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
-    CPoint point( LOWORD(dwPos), HIWORD(dwPos));
-    m_register_list.ScreenToClient(&point);
-    LVHITTESTINFO lvinfo;
-    lvinfo.pt=point;
-    lvinfo.flags=LVHT_ABOVE;
-    int nItem=m_register_list.SubItemHitTest(&lvinfo);
-    BOOL Is_Range = FALSE;
-    int Range_Address = -1;
-    int Value_Address = -1;
-    int Value_Length = 0;
-    lRow = lvinfo.iItem;
-    lCol = lvinfo.iSubItem;
-
-    if(lRow>m_register_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
-        return;
-    if(lRow<0)
-        return; 
-
-    if (lCol == _NUM_VALUE)
-    {  
-	    if (offline_mode)
-	    {
-			return;
-	    }
-        g_current_Node = m_register_data_sheet.at(lRow);
-        if (g_current_Node.Property.CompareNoCase(_T("Read Only"))!=0)
-        {
-            m_isReading = FALSE;
-             
-            CWriteRegistersValueDlg dlg;
-            dlg.DoModal();
-            m_isReading = TRUE; 
-        }
-        
-    }
-    
-}
 
 void CProductRegisterListView::OnDestroy()
 {
@@ -1091,37 +1033,41 @@ void CProductRegisterListView::OnEnChangeEditDelayItems()
     // 
 }
 
+
+
+
+
 int CProductRegisterListView::GetFunctionCode(CString FunctionName)
 {
-	if (m_array_modbus_function[0].CompareNoCase(FunctionName)==0)
+	if (m_vecVariableType[0].CompareNoCase(FunctionName)==0)
 	{
 		return 1;
 	}
-	if (m_array_modbus_function[1].CompareNoCase(FunctionName) == 0)
+	if (m_vecVariableType[1].CompareNoCase(FunctionName) == 0)
 	{
 		return 2;
 	}
-	if (m_array_modbus_function[2].CompareNoCase(FunctionName) == 0)
+	if (m_vecVariableType[2].CompareNoCase(FunctionName) == 0)
 	{
 		return 3;
 	}
-	if (m_array_modbus_function[3].CompareNoCase(FunctionName) == 0)
+	if (m_vecVariableType[3].CompareNoCase(FunctionName) == 0)
 	{
 		return 4;
 	}
-	if (m_array_modbus_function[4].CompareNoCase(FunctionName) == 0)
+	if (m_vecVariableType[4].CompareNoCase(FunctionName) == 0)
 	{
 		return 5;
 	}
-	if (m_array_modbus_function[5].CompareNoCase(FunctionName) == 0)
+	if (m_vecVariableType[5].CompareNoCase(FunctionName) == 0)
 	{
 		return 6;
 	}
-	if (m_array_modbus_function[6].CompareNoCase(FunctionName) == 0)
+	if (m_vecVariableType[6].CompareNoCase(FunctionName) == 0)
 	{
 		return 15;
 	}
-	if (m_array_modbus_function[7].CompareNoCase(FunctionName) == 0)
+	if (m_vecVariableType[7].CompareNoCase(FunctionName) == 0)
 	{
 		return 16;
 	}
@@ -1132,42 +1078,42 @@ CString CProductRegisterListView::GetFunctionName(int FunctionCode)
 {
 	if (FunctionCode == 1)
 	{
-		return m_array_modbus_function[0];
+		return m_vecVariableType[0];
 	}
 	if (FunctionCode == 2)
 	{
-		return m_array_modbus_function[1];
+		return m_vecVariableType[1];
 	}
 	 
 	if (FunctionCode == 3)
 	{
-		return m_array_modbus_function[2];
+		return m_vecVariableType[2];
 	}
 	if (FunctionCode == 4)
 	{
-		return m_array_modbus_function[3];
+		return m_vecVariableType[3];
 	}
 	if (FunctionCode == 5)
 	{
-		return m_array_modbus_function[4];
+		return m_vecVariableType[4];
 	}
 	if (FunctionCode == 6)
 	{
-		return m_array_modbus_function[5];
+		return m_vecVariableType[5];
 	}
 	if (FunctionCode == 15)
 	{
-		return m_array_modbus_function[6];
+		return m_vecVariableType[6];
 	}
 	if (FunctionCode == 16)
 	{
-		return m_array_modbus_function[7];
+		return m_vecVariableType[7];
 	}
 }
 
 int CProductRegisterListView::GetCaculateCode(CString CalName)
 {
-	if (m_array_caculate[0].CompareNoCase(CalName) == 0)
+	/*if (m_array_caculate[0].CompareNoCase(CalName) == 0)
 	{
 		return 0;
 	}
@@ -1178,12 +1124,13 @@ int CProductRegisterListView::GetCaculateCode(CString CalName)
 	if (m_array_caculate[2].CompareNoCase(CalName) == 0)
 	{
 		return 2;
-	}
+	}*/
+	return 0;
 }
 
 CString CProductRegisterListView::GetCalName(int calcode)
 {
-	if (calcode == 0)
+	/*if (calcode == 0)
 	{
 		return m_array_caculate[0];
 	}
@@ -1195,5 +1142,1061 @@ CString CProductRegisterListView::GetCalName(int calcode)
 	if (calcode == 2)
 	{
 		return m_array_caculate[2];
+	}*/
+	return L"";
+}
+
+
+vector<CString> CProductRegisterListView::GetUnitValueByGroupUnit(CString strGroupUnit)
+{
+	vector<CString> vecTmp;
+	if (strGroupUnit.CompareNoCase(L"Acceleration") == 0)
+	{
+		vecTmp.clear();
+		vecTmp.push_back(L"METERS_PER_SECOND_PER_SECOND");
+	}
+	else if (strGroupUnit.CompareNoCase(L"Area") == 0)
+	{
+		vecTmp.clear();
+		vecTmp.push_back(L"SQUARE_METERS");
+		vecTmp.push_back(L"SQUARE_FEET");
+		vecTmp.push_back(L"SQUARE_INCHES");
+		vecTmp.push_back(L"SQUARE_CENTIMETERS");
+	}
+	else if (strGroupUnit.CompareNoCase(L"Currency") == 0)
+	{
+		vecTmp.clear();
+		vecTmp.push_back(L"CURRENCY1");
+		vecTmp.push_back(L"CURRENCY2");
+		vecTmp.push_back(L"CURRENCY3");
+		vecTmp.push_back(L"CURRENCY4");
+		vecTmp.push_back(L"CURRENCY5");
+		vecTmp.push_back(L"CURRENCY6");
+		vecTmp.push_back(L"CURRENCY7");
+		vecTmp.push_back(L"CURRENCY8");
+		vecTmp.push_back(L"CURRENCY9");
+		vecTmp.push_back(L"CURRENCY10");
+	}
+	else if (strGroupUnit.CompareNoCase(L"Electrical") == 0)
+	{
+		vecTmp.clear();
+		vecTmp.push_back(L"MILLIAMPERES");
+		vecTmp.push_back(L"AMPERES");
+		vecTmp.push_back(L"OHMS");
+		vecTmp.push_back(L"VOLTS");
+		vecTmp.push_back(L"KILOVOLTS");
+		vecTmp.push_back(L"MEGAVOLTS");
+		vecTmp.push_back(L"VOLT_AMPERES");
+		vecTmp.push_back(L"KILOVOLT_AMPERES");
+		vecTmp.push_back(L"MEGAVOLT_AMPERES");
+		vecTmp.push_back(L"VOLT_AMPERES_REACTIVE");
+
+		vecTmp.push_back(L"MEGAVOLT_AMPERES_REACTIVE");
+		vecTmp.push_back(L"DEGREES_PHASE");
+		vecTmp.push_back(L"POWER_FACTOR");
+		vecTmp.push_back(L"KILOHMS");
+		vecTmp.push_back(L"MEGOHMS");
+		vecTmp.push_back(L"MILLIVOLTS");
+		vecTmp.push_back(L"MILLIOHMS");
+		vecTmp.push_back(L"AMPERES_PER_METER");
+		vecTmp.push_back(L"AMPERES_PER_SQUARE_METER");
+		vecTmp.push_back(L"AMPERES_SQUARE_METERS");
+
+		vecTmp.push_back(L"FARADS");
+		vecTmp.push_back(L"HENRYS");
+		vecTmp.push_back(L"OHM_METERS");
+		vecTmp.push_back(L"SIEMENS");
+		vecTmp.push_back(L"SIEMENS_PER_METER");
+		vecTmp.push_back(L"TESLAS");
+		vecTmp.push_back(L"VOLTS_PER_DEGREE_KELVIN");
+		vecTmp.push_back(L"VOLTS_PER_METER");
+		vecTmp.push_back(L"WEBERS");
+		vecTmp.push_back(L"MICRO_SIEMENS");
+
+		vecTmp.push_back(L"DECIBELS");
+		vecTmp.push_back(L"DECIBELS_MILLIVOLT");
+		vecTmp.push_back(L"DECIBELS_VOLT");
+		vecTmp.push_back(L"MILLISIEMENS");
+	}
+	else if (strGroupUnit.CompareNoCase(L"Energy") == 0)
+	{
+		vecTmp.clear();
+		vecTmp.push_back(L"JOULES");
+		vecTmp.push_back(L"KILOJOULES");
+		vecTmp.push_back(L"WATT_HOURS");
+		vecTmp.push_back(L"KILOWATT_HOURS");
+		vecTmp.push_back(L"THERM");
+		vecTmp.push_back(L"TON_HOR");
+		vecTmp.push_back(L"KILOJOULES_PER_KILOGRAM");
+		vecTmp.push_back(L"MEGAJOULES");
+		vecTmp.push_back(L"MEGAWATT_HOURS");
+		vecTmp.push_back(L"KILO_BTUS");
+		vecTmp.push_back(L"MEGA_BTUS");
+		vecTmp.push_back(L"WATT_HOURS_REACTIVE");
+		vecTmp.push_back(L"KILOWATT_HOURS_REACTIVE");
+		vecTmp.push_back(L"MEGAWATT_HOURS_REACTIVE");
+	}
+	else if (strGroupUnit.CompareNoCase(L"Enthalpy") == 0)
+	{
+		vecTmp.clear();
+
+
+		vecTmp.push_back(L"JOULES_PER_KILOGRAM_DRY_AIR");
+		vecTmp.push_back(L"BTU_PER_POUND_DRY_AIR");
+		vecTmp.push_back(L"BTUS_PER_POUND");
+		vecTmp.push_back(L"KILOJOULES_PER_KILOGRAM_DRY_AIR");
+		vecTmp.push_back(L"MEGAJOULES_PER_KILOGRAM_DRY_AIR");
+
+	}
+	else if (strGroupUnit.CompareNoCase(L"Entropy") == 0)
+	{
+		vecTmp.clear();
+
+
+		vecTmp.push_back(L"JOULES_PER_DEGREE_KELVIN");
+		vecTmp.push_back(L"JOULES_PER_KILOGRAM_DEGREE_KELVIN");
+		vecTmp.push_back(L"KILOJOULES_PER_DEGREE_KELVIN");
+		vecTmp.push_back(L"MEGAJOULES_PER_DEGREE_KELVIN");
+	}
+	else if (strGroupUnit.CompareNoCase(L"Force") == 0)
+	{
+		vecTmp.clear();
+		vecTmp.push_back(L"NEWTON");
+	}
+	else if (strGroupUnit.CompareNoCase(L"Frequency") == 0)
+	{
+		vecTmp.clear();
+
+
+
+		vecTmp.push_back(L"CYCLES_PER_HOUR");
+		vecTmp.push_back(L"CYCLES_PER_MINUTE");
+		vecTmp.push_back(L"HERTZ");
+		vecTmp.push_back(L"KILOHERTZ");
+		vecTmp.push_back(L"MEGAHERTZ");
+		vecTmp.push_back(L"PER_HOUR");
+
+	}
+	else if (strGroupUnit.CompareNoCase(L"Humidity") == 0)
+	{
+		vecTmp.clear();
+		vecTmp.push_back(L"GRAMS_OF_WATER_PER_KILOGRAM_DRY_AIR");
+		vecTmp.push_back(L"PERCENT_RELATIVE_HUMIDITY");
+	}
+	else if (strGroupUnit.CompareNoCase(L"Length") == 0)
+	{
+		vecTmp.clear();
+		vecTmp.push_back(L"MILLIMETER");
+		vecTmp.push_back(L"METERS");
+		vecTmp.push_back(L"INCH");
+		vecTmp.push_back(L"FEET");
+		vecTmp.push_back(L"CENTIMETERS");
+		vecTmp.push_back(L"KILOMETERS");
+		vecTmp.push_back(L"MICROMETERS");
+	}
+	else if (strGroupUnit.CompareNoCase(L"Light") == 0)
+	{
+		vecTmp.clear();
+
+
+
+		vecTmp.push_back(L"WATTS_PER_SQUARE_FOOT");
+		vecTmp.push_back(L"WATTS_PER_SQUARE_METER");
+		vecTmp.push_back(L"LUMEN");
+		vecTmp.push_back(L"LUX");
+		vecTmp.push_back(L"FOOT_CANDLES");
+		vecTmp.push_back(L"CANDELAS");
+		vecTmp.push_back(L"CANDELAS_PER_SQUARE_METER");
+	}
+	else if (strGroupUnit.CompareNoCase(L"Mass") == 0)
+	{
+		vecTmp.clear();
+
+		vecTmp.push_back(L"KILOGRAMS");
+		vecTmp.push_back(L"POUNDS_MASS");
+		vecTmp.push_back(L"TONS");
+		vecTmp.push_back(L"GRAMS");
+		vecTmp.push_back(L"MILLIGRAMS");
+
+
+
+	}
+	else if (strGroupUnit.CompareNoCase(L"Mass_Flow") == 0)
+	{
+		vecTmp.clear();
+
+
+
+		vecTmp.push_back(L"KILOGRAMS_PER_SECOND");
+		vecTmp.push_back(L"KILOGRAMS_PER_MINUTE");
+		vecTmp.push_back(L"KILOGRAMS_PER_HOUR");
+		vecTmp.push_back(L"POUNDS_MASS_PER_MINUTE");
+		vecTmp.push_back(L"POUNDS_MASS_PER_HOUR");
+		vecTmp.push_back(L"POUNDS_MASS_PER_SECOND");
+		vecTmp.push_back(L"GRAMS_PER_SECOND");
+		vecTmp.push_back(L"GRAMS_PER_MINUTE");
+		vecTmp.push_back(L"TONS_PER_HOUR");
+
+
+	}
+	else if (strGroupUnit.CompareNoCase(L"Power") == 0)
+	{
+		vecTmp.clear();
+
+
+
+		vecTmp.push_back(L"WATTS");
+		vecTmp.push_back(L"KILOWATTS");
+		vecTmp.push_back(L"MEGAWATTS");
+		vecTmp.push_back(L"BTU_PER_HOUR");
+		vecTmp.push_back(L"HORSEPOWER");
+		vecTmp.push_back(L"TONS_REFRIGERATIONS");
+		vecTmp.push_back(L"MILLIWATTS");
+		vecTmp.push_back(L"KILO_BTUS_PER_HOUR");
+
+	}
+	else if (strGroupUnit.CompareNoCase(L"Pressure") == 0)
+	{
+		vecTmp.clear();
+
+
+		vecTmp.push_back(L"PASCALS");
+		vecTmp.push_back(L"KILOPASCAL");
+		vecTmp.push_back(L"BAR");
+		vecTmp.push_back(L"POUNDS_FORCE_PER_SQUARE_INCH");
+		vecTmp.push_back(L"CENTIMETERS_OF_WATER");
+		vecTmp.push_back(L"INCHES_OF_WATER");
+		vecTmp.push_back(L"MILLIMETERS_OF_MERCURY");
+		vecTmp.push_back(L"CENTIMETERS_OF_MERCURY");
+		vecTmp.push_back(L"INCHES_OF_MERCURY");
+		vecTmp.push_back(L"HECTOPASCALS");
+		vecTmp.push_back(L"MILLIBARS");
+		vecTmp.push_back(L"MILLIMETERS_OF_WATER");
+	}
+	else if (strGroupUnit.CompareNoCase(L"Temperature") == 0)
+	{
+		vecTmp.clear();
+		vecTmp.push_back(L"DEGREES_CELSIUS");
+		vecTmp.push_back(L"DEGREES_KELVIN");
+		vecTmp.push_back(L"DEGREES_FAHRENHEIT");
+		vecTmp.push_back(L"DEGREE_DAYS_CELSIUS");
+		vecTmp.push_back(L"DEGREE_DAYS_FAHRENHEIT");
+		vecTmp.push_back(L"DELTA_DEGREE_FAHRENHEIT");
+		vecTmp.push_back(L"DELTA_DEGREE_KELVIN");
+		vecTmp.push_back(L"DEGREE_KELVIN_PER_HOUR");
+		vecTmp.push_back(L"DEGREE_KELVIN_PER_MINUTE");
+	}
+	else if (strGroupUnit.CompareNoCase(L"Time") == 0)
+	{
+		vecTmp.clear();
+
+		vecTmp.push_back(L"YEAR");
+		vecTmp.push_back(L"MONTH");
+		vecTmp.push_back(L"WEEK");
+		vecTmp.push_back(L"DAY");
+		vecTmp.push_back(L"HOUR");
+		vecTmp.push_back(L"MINUTE");
+		vecTmp.push_back(L"SECOND");
+		vecTmp.push_back(L"HUNDREDTHS_SECONDS");
+		vecTmp.push_back(L"MILLISECONDS");
+	}
+	else if (strGroupUnit.CompareNoCase(L"Torque") == 0)
+	{
+		vecTmp.clear();
+		vecTmp.push_back(L"NEWTON_METERS");
+	}
+	else if (strGroupUnit.CompareNoCase(L"Velocity") == 0)
+	{
+		vecTmp.clear();
+
+		vecTmp.push_back(L"METERS_PER_SECOND");
+		vecTmp.push_back(L"KILOMETERS_PER_HOUR");
+		vecTmp.push_back(L"FEET_PER_SECOND");
+		vecTmp.push_back(L"FEET_PER_MINUTE");
+		vecTmp.push_back(L"MILES_PER_HOUR");
+		vecTmp.push_back(L"MILLIMETERS_PER_SECOND");
+		vecTmp.push_back(L"MILLIMETERS_PER_MINUTE");
+		vecTmp.push_back(L"METERS_PER_MINUTE");
+		vecTmp.push_back(L"METERS_PER_HOUR");
+
+	}
+	else if (strGroupUnit.CompareNoCase(L"Volume") == 0)
+	{
+		vecTmp.clear();
+
+
+
+
+		vecTmp.push_back(L"CUBIC_FEET");
+		vecTmp.push_back(L"CUBIC_METERS");
+		vecTmp.push_back(L"IMPERIAL_GALLONS");
+		vecTmp.push_back(L"LITERS");
+		vecTmp.push_back(L"US_GALLONS");
+		vecTmp.push_back(L"MILLILITERS");
+
+	}
+	else if (strGroupUnit.CompareNoCase(L"Volumetric_Flow") == 0)
+	{
+		vecTmp.clear();
+		vecTmp.push_back(L"CUBIC_FEET_PER_MINUTE");
+		vecTmp.push_back(L"CUBIC_METERS_PER_SECOND");
+		vecTmp.push_back(L"IMPERIAL_GALLONS_PER_MINUTE");
+		vecTmp.push_back(L"LITERS_PER_SECOND");
+		vecTmp.push_back(L"LITERS_PER_MINUTE");
+		vecTmp.push_back(L"US_GALLONS_PER_MINUTE");
+		vecTmp.push_back(L"CUBIC_MATERS_PER_HOUR");
+		vecTmp.push_back(L"LITERS_PER_HOUR");
+		vecTmp.push_back(L"CUBIC_FEET_PER_SECOND");
+		vecTmp.push_back(L"CUBIC_METERS_PER_MINUTE");
+		vecTmp.push_back(L"CUBIC_FEET_PER_HOUR");
+		vecTmp.push_back(L"US_GALLONS_PER_HOUR");
+		vecTmp.push_back(L"MILLILITERS_PER_SECOND");
+
+	}
+	else if (strGroupUnit.CompareNoCase(L"Other") == 0)
+	{
+		vecTmp.clear();
+		vecTmp.push_back(L"DEGREES_ANGULAR");
+		vecTmp.push_back(L"DEGREES_CELSIUS_PER_HOUR");
+		vecTmp.push_back(L"DEGREES_CELSIUS_PER_MINUTE");
+		vecTmp.push_back(L"DEGREES_FAHRENHEIT_PER_HOUR");
+		vecTmp.push_back(L"DEGREES_FAHRENHEIT_PER_MINUTE");
+		vecTmp.push_back(L"NO_UNITS");
+		vecTmp.push_back(L"PARTS_PER_MILLION");
+		vecTmp.push_back(L"PARTS_PER_BILLION");
+		vecTmp.push_back(L"PERCENT");
+		vecTmp.push_back(L"PERCENT_PER_SECOND");
+		vecTmp.push_back(L"PER_MINUTE");
+		vecTmp.push_back(L"PER_SECOND");
+		vecTmp.push_back(L"PSI_PER_DEGREE_FAHRENHEIT");
+		vecTmp.push_back(L"RADIANS");
+		vecTmp.push_back(L"REVOLUTIONS_PER_MINUTE");
+		vecTmp.push_back(L"KILOWATT_HOURS_PER_SQUARE_METER");
+		vecTmp.push_back(L"KILOWATT_HOURS_PER_SQUARE_FOOT");
+		vecTmp.push_back(L"MEGAJOULES_PER_SQUARE_METER");
+		vecTmp.push_back(L"MEGAJOULES_PER_SQUARE_FOOT");
+		vecTmp.push_back(L"WATTS_PER_SQUARE_METER_DEGREE_KELVIN");
+		vecTmp.push_back(L"PERCENT_OBSCURATION_PER_FOOT");
+		vecTmp.push_back(L"PERCENT_OBSCURATION_PER_METER");
+		vecTmp.push_back(L"JOULE_SECONDS");
+		vecTmp.push_back(L"RADIANS_PER_SECOND");
+		vecTmp.push_back(L"SQUARE_METERS_PER_NEWTON");
+		vecTmp.push_back(L"KILOGRAMS_PER_CUBIC_METER");
+		vecTmp.push_back(L"NEWTON_SECONDS");
+		vecTmp.push_back(L"NEWTONS_PER_METER");
+		vecTmp.push_back(L"WATTS_PER_METER_PER_DEGREE_KELVIN");
+		vecTmp.push_back(L"PER_MILE");
+		vecTmp.push_back(L"GRAMS_PER_GRAM");
+		vecTmp.push_back(L"KILOGRAMS_PER_KILOGRAM");
+		vecTmp.push_back(L"GRAMS_PER_KILOGRAM");
+		vecTmp.push_back(L"MILLIGRAMS_PER_GRAM");
+		vecTmp.push_back(L"MILLIGRAMS_PER_KILOGRAM");
+		vecTmp.push_back(L"GRAMS_PER_MILLILITER");
+		vecTmp.push_back(L"GRAMS_PER_LITER");
+		vecTmp.push_back(L"MILLIGRAMS_PER_LITER");
+		vecTmp.push_back(L"MICROGRAMS_PER_LITER");
+		vecTmp.push_back(L"GRAMS_PER_CUBIC_METER");
+		vecTmp.push_back(L"MILLIGRAMS_PER_CUBIC_METER");
+		vecTmp.push_back(L"MICROGRAMS_PER_CUBIC_METER");
+		vecTmp.push_back(L"NANOGRAMS_PER_CUBIC_METER");
+		vecTmp.push_back(L"GRAMS_PER_CUBIC_CENTIMETER");
+		vecTmp.push_back(L"BECQUERELS");
+		vecTmp.push_back(L"KILOBECQUERELS");
+		vecTmp.push_back(L"KILOBECQUERELS");
+		vecTmp.push_back(L"MEGABECQUERELS");
+		vecTmp.push_back(L"GRAY");
+		vecTmp.push_back(L"MILLIGRAY");
+		vecTmp.push_back(L"MICROGRAY");
+		vecTmp.push_back(L"SIEVERTS");
+		vecTmp.push_back(L"MILLISIEVERTS");
+		vecTmp.push_back(L"MICROSIEVERTS");
+		vecTmp.push_back(L"MICROSIEVERTS_PER_HOUR");
+		vecTmp.push_back(L"DECIBELS_A");
+		vecTmp.push_back(L"NEPHELOMETRIC_TURBIDITY_UNIT");
+		vecTmp.push_back(L"PH");
+		vecTmp.push_back(L"GRAMS_PER_SQUARE_METER");
+		vecTmp.push_back(L"MINUTES_PER_DEGREE_KELVIN");
+	}
+	else
+	{
+		vecTmp.clear();
+	}
+
+	return vecTmp;
+}
+vector<CString> CProductRegisterListView::GetDataFormatByVariable(CString strVariable)
+{
+	vector<CString> vecTmp;
+	if (strVariable.CompareNoCase(L"Read_Holding_Registers") == 0)
+	{
+
+
+		vecTmp.clear();
+		vecTmp.push_back(L"16 Bit Unsigned Integer");
+		vecTmp.push_back(L"16 Bit Signed Integer");
+		vecTmp.push_back(L"32 Bit Unsigned Integer HI_LO");
+		vecTmp.push_back(L"32 Bit Signed Integer HI_LO");
+		vecTmp.push_back(L"32 Bit Unsigned Integer LO_HI");
+		vecTmp.push_back(L"32 Bit Signed Integer LO_HI");
+		vecTmp.push_back(L"Floating Point HI_LO");
+		vecTmp.push_back(L"Floating Point LO_HI");
+		vecTmp.push_back(L"_16 Bit   Bit Pick");
+		vecTmp.push_back(L"_32 Bit   Bit Pick HI_LO");
+		vecTmp.push_back(L"_32 Bit   Bit Pick LO_HI");
+	}
+	else if (strVariable.CompareNoCase(L"Read_Coils") == 0 || strVariable.CompareNoCase(L"Read_Discrete_Inputs") == 0)
+	{
+		vecTmp.clear();
+		vecTmp.push_back(L"bit");
+	}
+	else if (strVariable.CompareNoCase(L"Read_Input_Registers") == 0)
+	{
+		vecTmp.clear();
+
+		vecTmp.push_back(L"16 Bit Unsigned Integer");
+		vecTmp.push_back(L"16 Bit Signed Integer");
+		vecTmp.push_back(L"32 Bit Unsigned Integer HI_LO");
+		vecTmp.push_back(L"32 Bit Signed Integer HI_LO");
+		vecTmp.push_back(L"32 Bit Unsigned Integer LO_HI");
+		vecTmp.push_back(L"32 Bit Signed Integer LO_HI");
+		vecTmp.push_back(L"Floating Point HI_LO");
+		vecTmp.push_back(L"Floating Point LO_HI");
+		vecTmp.push_back(L"_16 Bit   Bit Pick");
+		vecTmp.push_back(L"_32 Bit   Bit Pick HI_LO");
+		vecTmp.push_back(L"_32 Bit   Bit Pick LO_HI");
+
+	}
+	else if (strVariable.CompareNoCase(L"Area") == 0)
+	{
+		vecTmp.clear();
+		vecTmp.push_back(L"SQUARE_METERS");
+		vecTmp.push_back(L"SQUARE_FEET");
+		vecTmp.push_back(L"SQUARE_INCHES");
+		vecTmp.push_back(L"SQUARE_CENTIMETERS");
+	}
+
+	return vecTmp;
+
+}
+vector<CString> CProductRegisterListView::GetRWByVariableDataFormat(CString strVariable, CString strDataFormat)
+{
+
+
+	vector<CString> vecTmp;
+	if (
+		(strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"16 Bit Unsigned Integer") == 0) ||
+		(strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"16 Bit Signed Integer") == 0) ||
+		(strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"32 Bit Unsigned Integer HI_LO") == 0) ||
+		(strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"32 Bit Signed Integer HI_LO") == 0) ||
+		(strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"32 Bit Signed Integer LO_HI") == 0) ||
+		(strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"32 Bit Unsigned Integer LO_HI") == 0) ||
+		(strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"Floating Point HI_LO") == 0) ||
+		(strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"Floating Point LO_HI") == 0) ||
+		(strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"_16 Bit Bit Pick") == 0) ||
+		(strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"_32 Bit Bit Pick HI_LO") == 0) ||
+		(strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"_32 Bit Bit Pick LO_HI") == 0) ||
+		(strVariable.CompareNoCase(L"Read_Coils") == 0)
+		)
+	{
+		vecTmp.push_back(L"R_W");
+		vecTmp.push_back(L"R_Only");
+	}
+	else if (
+		(strVariable.CompareNoCase(L"Read_Input_Registers") == 0 && strDataFormat.CompareNoCase(L"16 Bit Unsigned Integer") == 0) ||
+		(strVariable.CompareNoCase(L"Read_Input_Registers") == 0 && strDataFormat.CompareNoCase(L"16 Bit Signed Integer") == 0) ||
+		(strVariable.CompareNoCase(L"Read_Input_Registers") == 0 && strDataFormat.CompareNoCase(L"32 Bit Unsigned Integer HI_LO") == 0) ||
+		(strVariable.CompareNoCase(L"Read_Input_Registers") == 0 && strDataFormat.CompareNoCase(L"32 Bit Signed Integer HI_LO") == 0) ||
+		(strVariable.CompareNoCase(L"Read_Input_Registers") == 0 && strDataFormat.CompareNoCase(L"32 Bit Signed Integer LO_HI") == 0) ||
+		(strVariable.CompareNoCase(L"Read_Input_Registers") == 0 && strDataFormat.CompareNoCase(L"32 Bit Unsigned Integer LO_HI") == 0) ||
+		(strVariable.CompareNoCase(L"Read_Input_Registers") == 0 && strDataFormat.CompareNoCase(L"Floating Point HI_LO") == 0) ||
+		(strVariable.CompareNoCase(L"Read_Input_Registers") == 0 && strDataFormat.CompareNoCase(L"Floating Point LO_HI") == 0) ||
+		(strVariable.CompareNoCase(L"Read_Input_Registers") == 0 && strDataFormat.CompareNoCase(L"_16 Bit Bit Pick") == 0) ||
+		(strVariable.CompareNoCase(L"Read_Input_Registers") == 0 && strDataFormat.CompareNoCase(L"_32 Bit Bit Pick HI_LO") == 0) ||
+		(strVariable.CompareNoCase(L"Read_Input_Registers") == 0 && strDataFormat.CompareNoCase(L"_32 Bit Bit Pick LO_HI") == 0) ||
+		(strVariable.CompareNoCase(L"Read_Discrete_Inputs") == 0)
+		)
+	{
+		vecTmp.push_back(L"R_Only");
+	}
+
+	return vecTmp;
+}
+vector<CString> CProductRegisterListView::GetBacnetType(CString strVariable, CString strDataFormat, CString RW)
+{
+	vector<CString> vecTmp;
+	if (strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"16 Bit Unsigned Integer") == 0 && RW.CompareNoCase(L"R_W") == 0)
+	{
+		vecTmp.push_back(L"AO");
+		/*  Future 1
+		Future 2
+		Future 3
+		Future 4
+		Future 5*/
+	}
+	else if (strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"16 Bit Unsigned Integer") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"AI");
+		/*Future 1
+		Future 2
+		Future 3
+		Future 4
+		Future 5*/
+	}
+	else if (strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"16 Bit Signed Integer") == 0 && RW.CompareNoCase(L"R_W") == 0)
+	{
+		vecTmp.push_back(L"AO");
+		/*Future 1
+		Future 2
+		Future 3
+		Future 4
+		Future 5*/
+	}
+	else if (strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"16 Bit Signed Integer") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"AI");
+		/*Future 1
+		Future 2
+		Future 3
+		Future 4
+		Future 5*/
+	}
+	else if (strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"Bit Unsigned Integer HI_LO") == 0 && RW.CompareNoCase(L"R_W") == 0)
+	{
+		vecTmp.push_back(L"AO");
+		vecTmp.push_back(L"UVRW");
+		/* Future 2
+		Future 3
+		Future 4
+		Future 5*/
+	}
+	else if (strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"Bit Unsigned Integer HI_LO") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"AI");
+		vecTmp.push_back(L"UVRO");
+		/*Future 2
+		Future 3
+		Future 4
+		Future 5*/
+	}
+	else if (strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"Bit Signed Integer HI_LO") == 0 && RW.CompareNoCase(L"R_W") == 0)
+	{
+		vecTmp.push_back(L"AO");
+		vecTmp.push_back(L"IVRW");
+		/* Future 2
+		Future 3
+		Future 4
+		Future 5*/
+	}
+	else if (strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"Bit Signed Integer HI_LO") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"AI");
+		vecTmp.push_back(L"IVRO");
+		/* Future 2
+		Future 3
+		Future 4
+		Future 5*/
+	}
+	else if (strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"Bit Signed Integer LO_HI") == 0 && RW.CompareNoCase(L"R_W") == 0)
+	{
+		vecTmp.push_back(L"AO");
+		vecTmp.push_back(L"IVRW");
+		/*Future 2
+		Future 3
+		Future 4
+		Future 5*/
+	}
+	else if (strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"Bit Signed Integer LO_HI") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"AI");
+		vecTmp.push_back(L"IVRO");
+		/* Future 2
+		Future 3
+		Future 4
+		Future 5*/
+	}
+	else if (strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"Bit Unsigned Integer LO_HI") == 0 && RW.CompareNoCase(L"R_W") == 0)
+	{
+		vecTmp.push_back(L"AO");
+		vecTmp.push_back(L"UVRW");
+		/*  Future 2
+		Future 3
+		Future 4
+		Future 5*/
+
+	}
+	else if (strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"Bit Unsigned Integer LO_HI") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"AI");
+		vecTmp.push_back(L"UVRO");
+		/* Future 2
+		Future 3
+		Future 4
+		Future 5*/
+	}
+
+	else if (strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"Floating Point HI_LO") == 0 && RW.CompareNoCase(L"R_W") == 0)
+	{
+		vecTmp.push_back(L"AO");
+		/* Future 1
+		Future 2
+		Future 3
+		Future 4
+		Future 5*/
+	}
+
+	else if (strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"Floating Point HI_LO") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"AI");
+		/* Future 1
+		Future 2
+		Future 3
+		Future 4
+		Future 5*/
+	}
+
+	else if (strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"Floating Point LO_HI") == 0 && RW.CompareNoCase(L"R_W") == 0)
+	{
+		vecTmp.push_back(L"AO");
+		/*  Future 1
+		Future 2
+		Future 3
+		Future 4
+		Future 5*/
+	}
+
+	else if (strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"Floating Point LO_HI") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"AI");
+		///* Future 1
+		// Future 2
+		// Future 3
+		// Future 4
+		// Future 5*/
+	}
+	else if (strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"_16 Bit Bit Pick") == 0 && RW.CompareNoCase(L"R_W") == 0)
+	{
+		vecTmp.push_back(L"BO");
+	}
+	else if (strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"_16 Bit Bit Pick") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"BI");
+	}
+	else if (strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"_32 Bit Bit Pick HI_LO") == 0 && RW.CompareNoCase(L"R_W") == 0)
+	{
+		vecTmp.push_back(L"BO");
+	}
+	else if (strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"_32 Bit Bit Pick HI_LO") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"BI");
+	}
+	else if (strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"_32 Bit Bit Pick LO_HI") == 0 && RW.CompareNoCase(L"R_W") == 0)
+	{
+		vecTmp.push_back(L"BO");
+	}
+	else if (strVariable.CompareNoCase(L"Read_Holding_Registers") == 0 && strDataFormat.CompareNoCase(L"_32 Bit Bit Pick LO_HI") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"BI");
+	}
+	else if (strVariable.CompareNoCase(L"Read_Coils") == 0 && strDataFormat.CompareNoCase(L"Bit") == 0 && RW.CompareNoCase(L"R_W") == 0)
+	{
+		vecTmp.push_back(L"BO");
+	}
+	else if (strVariable.CompareNoCase(L"Read_Coils") == 0 && strDataFormat.CompareNoCase(L"Bit") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"BI");
+	}
+	else if (strVariable.CompareNoCase(L"Read_Input_Registers") == 0 && strDataFormat.CompareNoCase(L"16 Bit Unsigned Integer") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"AI");
+		/* Future 1
+		Future 2
+		Future 3
+		Future 4
+		Future 5*/
+	}
+	else if (strVariable.CompareNoCase(L"Read_Input_Registers") == 0 && strDataFormat.CompareNoCase(L"16 Bit Signed Integer") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"AI");
+		/* Future 1
+		Future 2
+		Future 3
+		Future 4
+		Future 5*/
+	}
+	else if (strVariable.CompareNoCase(L"Read_Input_Registers") == 0 && strDataFormat.CompareNoCase(L"32 Bit Unsigned Integer HI_LO") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"AI");
+		vecTmp.push_back(L"UVRO");
+		/*Future 2
+		Future 3
+		Future 4
+		Future 5*/
+	}
+	else if (strVariable.CompareNoCase(L"Read_Input_Registers") == 0 && strDataFormat.CompareNoCase(L"32 Bit Signed Integer HI_LO") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"AI");
+		vecTmp.push_back(L"IVRO");
+		/* Future 2
+		Future 3
+		Future 4
+		Future 5*/
+	}
+	else if (strVariable.CompareNoCase(L"Read_Input_Registers") == 0 && strDataFormat.CompareNoCase(L"32 Bit Signed Integer LO_HI") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"AI");
+		vecTmp.push_back(L"IVRO");
+		/*  Future 2
+		Future 3
+		Future 4
+		Future 5*/
+	}
+	else if (strVariable.CompareNoCase(L"Read_Input_Registers") == 0 && strDataFormat.CompareNoCase(L"32 Bit Unsigned Integer LO_HI") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"AI");
+		vecTmp.push_back(L"UVRO");
+		/* Future 2
+		Future 3
+		Future 4
+		Future 5*/
+	}
+	else if (strVariable.CompareNoCase(L"Read_Input_Registers") == 0 && strDataFormat.CompareNoCase(L"Floating Point HI_LO") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"AI");
+		/* Future 1
+		Future 2
+		Future 3
+		Future 4
+		Future 5*/
+	}
+	else if (strVariable.CompareNoCase(L"Read_Input_Registers") == 0 && strDataFormat.CompareNoCase(L"Floating Point LO_HI") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"AI");
+		/* Future 1
+		Future 2
+		Future 3
+		Future 4
+		Future 5*/
+	}
+	else if (strVariable.CompareNoCase(L"Read_Input_Registers") == 0 && strDataFormat.CompareNoCase(L"_16 Bit Bit Pick") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"BI");
+	}
+
+	else if (strVariable.CompareNoCase(L"Read_Input_Registers") == 0 && strDataFormat.CompareNoCase(L"_32 Bit Bit Pick HI_LO") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"BI");
+	}
+
+	else if (strVariable.CompareNoCase(L"Read_Input_Registers") == 0 && strDataFormat.CompareNoCase(L"_32 Bit Bit Pick LO_HI") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"BI");
+	}
+	else if (strVariable.CompareNoCase(L"Read_Discrete_Inputs") == 0 && strDataFormat.CompareNoCase(L"Bit") == 0 && RW.CompareNoCase(L"R_Only") == 0)
+	{
+		vecTmp.push_back(L"BI");
+	}
+	else
+	{
+	}
+
+
+	return vecTmp;
+}
+
+
+void CProductRegisterListView::OnNMClickList_output(NMHDR *pNMHDR, LRESULT *pResult) {
+
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	CString temp_cstring;
+	long lRow, lCol;
+	m_register_list.Set_Edit(true);
+	DWORD dwPos = GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
+	CPoint point(LOWORD(dwPos), HIWORD(dwPos));
+	m_register_list.ScreenToClient(&point);
+	LVHITTESTINFO lvinfo;
+	lvinfo.pt = point;
+	lvinfo.flags = LVHT_ABOVE;
+	int nItem = m_register_list.SubItemHitTest(&lvinfo);
+	BOOL Is_Range = FALSE;
+	int Range_Address = -1;
+	int Value_Address = -1;
+	int Value_Length = 0;
+	lRow = lvinfo.iItem;
+	lCol = lvinfo.iSubItem;
+
+	if (lRow>m_register_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+		return;
+	if (lRow<0)
+		return;
+	if (lRow<m_register_data_sheet.size())
+	{
+		if (lCol == _NUM_VALUE)
+		{
+			if (offline_mode)
+			{
+				return;
+			}
+			g_current_Node = m_register_data_sheet.at(lRow);
+			if (g_current_Node.Read_Only_Or_RW.CompareNoCase(_T("Read Only")) != 0)
+			{
+				m_isReading = FALSE;
+
+				CWriteRegistersValueDlg dlg;
+				dlg.DoModal();
+				m_isReading = TRUE;
+			}
+
+		}
+
+		if (lCol == _NUM_POLLYESNO)
+		{
+			if (ListCtrlEx::ComboBox == m_register_list.GetColumnType(_NUM_POLLYESNO))
+			{
+				ListCtrlEx::CStrList strlist;
+				for (int aaa = 0; aaa <m_vecYesNo.size(); aaa++)
+				{
+					strlist.push_back(m_vecYesNo[aaa]);
+				}
+				m_register_list.SetCellStringList(lRow, _NUM_POLLYESNO, strlist);
+			}
+		}
+		if (lCol == _NUM_FUNCTION)
+		{
+			if (ListCtrlEx::ComboBox == m_register_list.GetColumnType(_NUM_FUNCTION))
+			{
+				ListCtrlEx::CStrList strlist;
+				for (int aaa = 0; aaa < m_vecVariableType.size(); aaa++)
+				{
+					strlist.push_back(m_vecVariableType[aaa]);
+				}
+				m_register_list.SetCellStringList(lRow, _NUM_FUNCTION, strlist);
+			}
+		}
+		if (lCol == _NUM_Unit_Group)
+		{
+			if (ListCtrlEx::ComboBox == m_register_list.GetColumnType(_NUM_Unit_Group))
+			{
+				ListCtrlEx::CStrList strlist;
+				for (int aaa = 0; aaa < m_GroupUnits.size(); aaa++)
+				{
+					strlist.push_back(m_GroupUnits[aaa]);
+				}
+				m_register_list.SetCellStringList(lRow, _NUM_Unit_Group, strlist);
+			}
+		}
+		
+
+		//5=数据格式
+		if (lCol == _NUM_DATAFORMAT)
+		{
+			m_vecDataFormat = GetDataFormatByVariable(GetFunctionName(m_register_data_sheet[lRow].function_code));
+
+			if (ListCtrlEx::ComboBox == m_register_list.GetColumnType(_NUM_DATAFORMAT))
+			{
+				ListCtrlEx::CStrList strlist;
+				for (int aaa = 0; aaa < m_vecDataFormat.size(); aaa++)
+				{
+					strlist.push_back(m_vecDataFormat[aaa]);
+				}
+				m_register_list.SetCellStringList(lRow, _NUM_DATAFORMAT, strlist);
+			}
+		}
+		//11=读写属性的判断
+		if (lCol == _NUM_RW)
+		{
+			m_vecDataRW = GetRWByVariableDataFormat(GetFunctionName(m_register_data_sheet[lRow].function_code), m_register_data_sheet[lRow].DataFormat);
+			if (ListCtrlEx::ComboBox == m_register_list.GetColumnType(_NUM_RW))
+			{
+				ListCtrlEx::CStrList strlist;
+				for (int aaa = 0; aaa < m_vecDataRW.size(); aaa++)
+				{
+					strlist.push_back(m_vecDataRW[aaa]);
+				}
+				m_register_list.SetCellStringList(lRow, _NUM_RW, strlist);
+			}
+		}
+		//12=Bacnet Type 判断
+		if (lCol == _NUM_Bacnet_Type)
+		{
+			m_vecBacnetType = GetBacnetType(GetFunctionName(m_register_data_sheet[lRow].function_code), m_register_data_sheet[lRow].DataFormat, m_register_data_sheet[lRow].Read_Only_Or_RW);
+			if (ListCtrlEx::ComboBox == m_register_list.GetColumnType(_NUM_Bacnet_Type))
+			{
+				ListCtrlEx::CStrList strlist;
+				for (int aaa = 0; aaa < m_vecBacnetType.size(); aaa++)
+				{
+					strlist.push_back(m_vecBacnetType[aaa]);
+				}
+				m_register_list.SetCellStringList(lRow, _NUM_Bacnet_Type, strlist);
+			}
+		}
+		//
+		if (lCol == _NUM_Unit_Value)
+		{
+			m_UnitValue = GetUnitValueByGroupUnit(m_register_data_sheet[lRow].Unit_Group);
+			if (ListCtrlEx::ComboBox == m_register_list.GetColumnType(_NUM_Unit_Value))
+			{
+				ListCtrlEx::CStrList strlist;
+				for (int aaa = 0; aaa < m_UnitValue.size(); aaa++)
+				{
+					strlist.push_back(m_UnitValue[aaa]);
+				}
+				m_register_list.SetCellStringList(lRow, _NUM_Unit_Value, strlist);
+			}
+		}
+
+		if (lCol == _NUM_Grouping_Y_N)
+		{
+			if (ListCtrlEx::ComboBox == m_register_list.GetColumnType(_NUM_Grouping_Y_N))
+			{
+				ListCtrlEx::CStrList strlist;
+				for (int aaa = 0; aaa < m_vecYesNo.size(); aaa++)
+				{
+					strlist.push_back(m_vecYesNo[aaa]);
+				}
+				m_register_list.SetCellStringList(lRow, _NUM_Grouping_Y_N, strlist);
+			}
+		}
+
+		if (lCol == _NUM_Update_On_Reconnect)
+		{
+			if (ListCtrlEx::ComboBox == m_register_list.GetColumnType(_NUM_Update_On_Reconnect))
+			{
+				ListCtrlEx::CStrList strlist;
+				for (int aaa = 0; aaa < m_vecYesNo.size(); aaa++)
+				{
+					strlist.push_back(m_vecYesNo[aaa]);
+				}
+				m_register_list.SetCellStringList(lRow, _NUM_Update_On_Reconnect, strlist);
+			}
+		}
+		
+
+	}
+}
+void CProductRegisterListView::OnNMDblclkListCustomList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	CString temp_cstring;
+	long lRow, lCol;
+	m_register_list.Set_Edit(true);
+	DWORD dwPos = GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
+	CPoint point(LOWORD(dwPos), HIWORD(dwPos));
+	m_register_list.ScreenToClient(&point);
+	LVHITTESTINFO lvinfo;
+	lvinfo.pt = point;
+	lvinfo.flags = LVHT_ABOVE;
+	int nItem = m_register_list.SubItemHitTest(&lvinfo);
+	BOOL Is_Range = FALSE;
+	int Range_Address = -1;
+	int Value_Address = -1;
+	int Value_Length = 0;
+	lRow = lvinfo.iItem;
+	lCol = lvinfo.iSubItem;
+
+	if (lRow<0||lRow > m_register_list.GetItemCount()) 
+	{
+		CustomProductTable_T tmp;
+		
+		tmp.ModelNo= m_current_tree_node.product_class_id;
+		tmp.Poll_YES_NO=L"YES";
+		tmp.Bacnet_Object_Name=L"BNameDemo";//CString  Bacnet_Object_Name;
+		tmp.function_code = 3;
+		tmp.Reg_ID = -1;
+		tmp.Counts_Number=1;
+		tmp.Value=L"0";
+		tmp.DataFormat=L"16 Bit Unsigned Integer";
+		tmp.Bit_1=L"NONE";
+		tmp.Low_Actual=L"0";
+		tmp.High_Actual=L"1";
+		tmp.Low_Scale=L"0";
+		tmp.High_Scale=L"1";
+		tmp.Read_Only_Or_RW=L"R_Only";
+		tmp.Bacnet_Type=L"AI";
+		tmp.Bacnet_Object_Description=L"Description";
+		tmp.COV_Increment=L"0";
+		tmp.Unit_Group=L"Other";
+		tmp.Unit_Value=L"NO_UNITS";
+		tmp.Grouping_YES_NO=L"Yes";
+		tmp.Update_On_Reconnect="NO";
+		tmp.Default=L"Default";
+		tmp.Reg_Description=L"Decription";
+		tmp.SN=GetGUID();
+		int row = m_register_list.GetRowCount()-1;
+		FreshOneRowInGrid(row, tmp, 0);
+		m_register_data_sheet.push_back(tmp);
+
+
+	}
+
+
+	*pResult = 0;
+}
+void CProductRegisterListView::FreshOneRowInGrid(int Row, CustomProductTable_T tp, int operator_Grid)
+{
+	CString strTemp;
+	if (operator_Grid == 0)//插入到最后一行
+	{
+		strTemp.Format(_T("%d"), Row + 1);
+		m_register_list.InsertItem(Row, strTemp);
+		m_register_list.SetItemText(Row, _NUM_POLLYESNO, tp.Poll_YES_NO);
+
+
+		m_register_list.SetItemText(Row, _NUM_NAME, tp.Bacnet_Object_Name);
+
+		strTemp.Format(_T("%s"), GetFunctionName(tp.function_code));
+		m_register_list.SetItemText(Row, _NUM_FUNCTION, strTemp);
+
+
+		strTemp.Format(_T("%d"), tp.Reg_ID);
+		m_register_list.SetItemText(Row, _NUM_MODBUSADDRESS, strTemp);
+		strTemp.Format(_T("%d"), tp.Counts_Number);
+		m_register_list.SetItemText(Row, _NUM_LENGTH, strTemp);
+
+		m_register_list.SetItemText(Row, _NUM_DATAFORMAT, tp.DataFormat);
+
+		strTemp.Format(_T("%s"), tp.Bit_1);
+		m_register_list.SetItemText(Row, _NUM_BIT, strTemp);
+		strTemp.Format(_T("%s"), tp.Low_Actual);
+		m_register_list.SetItemText(Row, _NUM_Low_Actual, strTemp);
+		strTemp.Format(_T("%s"), tp.High_Actual);
+		m_register_list.SetItemText(Row, _NUM_High_Actual, strTemp);
+		strTemp.Format(_T("%s"), tp.Low_Scale);
+		m_register_list.SetItemText(Row, _NUM_Low_Scale, strTemp);
+		strTemp.Format(_T("%s"), tp.High_Scale);
+		m_register_list.SetItemText(Row, _NUM_High_Scale, strTemp);
+		strTemp.Format(_T("%s"), tp.Read_Only_Or_RW);
+		m_register_list.SetItemText(Row, _NUM_RW, strTemp);
+		strTemp.Format(_T("%s"), tp.Default);
+		m_register_list.SetItemText(Row, _NUM_DEFAULT, strTemp);
+		strTemp.Format(_T("%s"), tp.Bacnet_Type);
+		m_register_list.SetItemText(Row, _NUM_Bacnet_Type, strTemp);
+		strTemp.Format(_T("%s"), tp.Bacnet_Object_Description);
+		m_register_list.SetItemText(Row, _NUM_Bacnet_Object_Description, strTemp);
+		strTemp.Format(_T("%s"), tp.COV_Increment);
+		m_register_list.SetItemText(Row, _NUM_COV_Increment, strTemp);
+		strTemp.Format(_T("%s"), tp.Unit_Group);
+		m_register_list.SetItemText(Row, _NUM_Unit_Group, strTemp);
+
+
+		strTemp.Format(_T("%s"), tp.Unit_Value);
+		m_register_list.SetItemText(Row, _NUM_Unit_Value, strTemp);
+		strTemp.Format(_T("%s"), tp.Grouping_YES_NO);
+		m_register_list.SetItemText(Row, _NUM_Grouping_Y_N, strTemp);
+
+
+		strTemp.Format(_T("%s"), tp.Update_On_Reconnect);
+		m_register_list.SetItemText(Row, _NUM_Update_On_Reconnect, strTemp);
+
+
+		strTemp.Format(_T("%s"), tp.Reg_Description);
+		m_register_list.SetItemText(Row, _NUM_Modbus_DESCRIPTION, strTemp);
+	}
+	else if (operator_Grid == 1)//更新改行的数据
+	{
+
+	}
+	else if (operator_Grid == 2)//删除改行的数据
+	{
+
 	}
 }

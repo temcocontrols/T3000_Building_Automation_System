@@ -16,7 +16,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 中文(简体，中国) resources
+// Chinese (Simplified, PRC) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
@@ -2263,11 +2263,11 @@ IDD_DIALOG_CUSTOMER_PRODUCT_VIEW DIALOGEX 0, 0, 689, 497
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_BORDER
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         "",IDC_LIST_CUSTOM_LIST,"SysListView32",LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,0,49,689,431
-    LTEXT           "Default Parameters Setting:",IDC_STATIC,4,1,90,8
-    LTEXT           "Counts Number",IDC_STATIC,101,3,50,8
-    LTEXT           "Property",IDC_STATIC,160,3,29,8
-    LTEXT           "DataFormat",IDC_STATIC,200,2,39,8
+    CONTROL         "",IDC_LIST_CUSTOM_LIST,"SysListView32",LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,0,1,689,489
+    LTEXT           "Default Parameters Setting:",IDC_STATIC_DEFAULT_PSETTING,4,1,90,8
+    LTEXT           "Counts Number",IDC_STATIC_COUNT_NUMBER,101,3,50,8
+    LTEXT           "Property",IDC_STATIC_PROPERTY,160,3,29,8
+    LTEXT           "DataFormat",IDC_STATIC_DATAFORMAT,200,2,39,8
     EDITTEXT        IDC_EDIT_COUNTS,100,15,40,14,ES_AUTOHSCROLL
     COMBOBOX        IDC_COMBO_PROPERTY,149,16,48,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Add Parameters Type",IDC_BUTTON_PARAMETER_TYPE,615,2,74,14,NOT WS_VISIBLE
@@ -2282,9 +2282,9 @@ BEGIN
     LTEXT           "Delay Between Items(ms)",IDC_STATIC_DELAY_BETWEENITEMS,344,2,83,8
     EDITTEXT        IDC_EDIT_DELAY_LOOP,260,14,77,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_EDIT_DELAY_ITEMS,344,13,77,14,ES_AUTOHSCROLL
-    LTEXT           "ASC",IDC_STATIC,43,8,14,8
-    LTEXT           "DES",IDC_STATIC,71,9,14,8
-    LTEXT           "Sorting",IDC_STATIC,13,8,24,8
+    LTEXT           "ASC",IDC_STATIC_ASC,43,8,14,8
+    LTEXT           "DES",IDC_STATIC_DESC,71,9,14,8
+    LTEXT           "Sorting",IDC_STATIC_SORT,13,8,24,8
 END
 
 IDD_DIALOG_PRODUCTREGISTER_WRITE DIALOGEX 0, 0, 340, 272
@@ -6620,12 +6620,12 @@ BEGIN
     ID_BUILDINGCONFIGDB     "BuildingConfig"
 END
 
-#endif    // 中文(简体，中国) resources
+#endif    // Chinese (Simplified, PRC) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// 英语(美国) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
@@ -10193,12 +10193,12 @@ BEGIN
     ID_BUILDINGCONFIGDB     "Show building config"
 END
 
-#endif    // 英语(美国) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// 英语(英国) resources
+// English (United Kingdom) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
@@ -10304,7 +10304,7 @@ BEGIN
     0
 END
 
-#endif    // 英语(英国) resources
+#endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
