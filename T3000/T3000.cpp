@@ -59,7 +59,7 @@ UINT UpdateT3000Background(LPVOID pParam)
   TCHAR exeFullPath[MAX_PATH+1]; //
   GetModuleFileName(NULL, exeFullPath, MAX_PATH); //
   (_tcsrchr(exeFullPath, _T('\\')))[1] = 0;//
-#if 0//åˆ¤æ–­ç½‘ç«™æ˜¯å¦æœ‰æ–°ç‰ˆæœ¬ï¼Œç½‘ç»œè¿æ¥ä¸æ˜¯æˆ–è€…æ²¡æœ‰æ–°ç‰ˆæœ¬ï¼Œç›´æ¥è¿›å…¥
+#if 0//ÅĞ¶ÏÍøÕ¾ÊÇ·ñÓĞĞÂ°æ±¾£¬ÍøÂçÁ¬½Ó²»ÊÇ»òÕßÃ»ÓĞĞÂ°æ±¾£¬Ö±½Ó½øÈë
   CString T3000updatepath;
   T3000updatepath=(CString)exeFullPath+_T("T3000Update.exe");
 
@@ -116,15 +116,15 @@ BOOL CT3000App::user_login()
 // CT3000App initialization
 BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
 {
-	LPCTSTR   pszDllName   =   OcxFileName   ;			//ActiveXæ§ä»¶çš„è·¯å¾„åŠæ–‡ä»¶å       
-	HINSTANCE   hLib   =   LoadLibrary(pszDllName);    //è£…è½½ActiveXæ§ä»¶   
+	LPCTSTR   pszDllName   =   OcxFileName   ;			//ActiveX¿Ø¼şµÄÂ·¾¶¼°ÎÄ¼şÃû       
+	HINSTANCE   hLib   =   LoadLibrary(pszDllName);    //×°ÔØActiveX¿Ø¼ş   
 	if   (hLib   <   (HINSTANCE)HINSTANCE_ERROR)   
 	{   
 		return   FALSE;   
 	}   
 	FARPROC   lpDllEntryPoint;     
-	lpDllEntryPoint   =   GetProcAddress(hLib,(LPCSTR)(_T("DllRegisterServer")));     //è·å–æ³¨å†Œå‡½æ•°DllRegisterServeråœ°å€   
-	if(lpDllEntryPoint!=NULL)														 //è°ƒç”¨æ³¨å†Œå‡½æ•°DllRegisterServer   
+	lpDllEntryPoint   =   GetProcAddress(hLib,(LPCSTR)(_T("DllRegisterServer")));     //»ñÈ¡×¢²áº¯ÊıDllRegisterServerµØÖ·   
+	if(lpDllEntryPoint!=NULL)														 //µ÷ÓÃ×¢²áº¯ÊıDllRegisterServer   
 	{   
 		if(FAILED((*lpDllEntryPoint)()))   
 		{//   AfxMessageBox(_T("false"));
@@ -233,13 +233,13 @@ void CT3000App::UpdateDB()
 		q.finalize();
 		SqliteDBT3000.closedb();
 
-        remove((UTF8MBSTR)g_strDatabasefilepath);//åˆ æ‰åŸæœ‰çš„æ•°æ®åº“
+        remove((UTF8MBSTR)g_strDatabasefilepath);//É¾µôÔ­ÓĞµÄÊı¾İ¿â
 
         CString FilePath;
         HANDLE hFind;
         WIN32_FIND_DATA wfd;
         hFind = FindFirstFile(g_strDatabasefilepath, &wfd);//
-        if (hFind==INVALID_HANDLE_VALUE)//ä¸å­˜åœ¨è¯¥æ–‡ä»¶
+        if (hFind==INVALID_HANDLE_VALUE)//²»´æÔÚ¸ÃÎÄ¼ş
         {
            
             FilePath=g_strExePth+_T("Database\\T3000.db");
@@ -490,7 +490,7 @@ BOOL CT3000App::InitInstance()
 			HANDLE hFind_folder = FindFirstFile(g_achive_folder, &fd);
 			if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
-				//ç›®å½•å­˜åœ¨
+				//Ä¿Â¼´æÔÚ
 				ret = TRUE;
 
 			}
@@ -509,7 +509,7 @@ BOOL CT3000App::InitInstance()
 			hFind_folder = FindFirstFile(g_achive_folder_temp_txt, &fd);
 			if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
-				//ç›®å½•å­˜åœ¨
+				//Ä¿Â¼´æÔÚ
 				ret = TRUE;
 
 			}
@@ -529,7 +529,7 @@ BOOL CT3000App::InitInstance()
 			hFind_folder = FindFirstFile(g_achive_folder_temp_db, &fd);
 			if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
-				//ç›®å½•å­˜åœ¨
+				//Ä¿Â¼´æÔÚ
 				ret = TRUE;
 
 			}
@@ -591,15 +591,15 @@ BOOL CT3000App::InitInstance()
 
 
 
-#if 1//å¦‚æœæ²’æœ‰T3000 çš„æƒ…æ³ä¸‹
+#if 1//Èç¹û›]ÓĞT3000 µÄÇé›rÏÂ
 
 			CString FilePath;
  
 			hFind = FindFirstFile(g_strDatabasefilepath, &wfd);//
-			if (hFind==INVALID_HANDLE_VALUE)//è¯´æ˜å½“å‰ç›®å½•ä¸‹æ— t3000.mdb
+			if (hFind==INVALID_HANDLE_VALUE)//ËµÃ÷µ±Ç°Ä¿Â¼ÏÂÎŞt3000.mdb
 			{
 				
-				//æ²¡æœ‰æ‰¾åˆ°å°±åˆ›å»ºä¸€ä¸ªé»˜è®¤çš„æ•°æ®åº“
+				//Ã»ÓĞÕÒµ½¾Í´´½¨Ò»¸öÄ¬ÈÏµÄÊı¾İ¿â
 				FilePath=g_strExePth+_T("Database\\T3000.db");
 				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000DB1), _T("T3000DB"));   
 				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
@@ -624,9 +624,9 @@ BOOL CT3000App::InitInstance()
 			HANDLE hFind_Monitor;//
 			WIN32_FIND_DATA wfd_monitor;//
 			hFind_Monitor = FindFirstFile(g_achive_monitor_datatbase_path, &wfd_monitor);//
-			if (hFind_Monitor==INVALID_HANDLE_VALUE)//è¯´æ˜å½“å‰ç›®å½•ä¸‹æ— MonitorData.db
+			if (hFind_Monitor==INVALID_HANDLE_VALUE)//ËµÃ÷µ±Ç°Ä¿Â¼ÏÂÎŞMonitorData.db
 			{
-				//æ²¡æœ‰æ‰¾åˆ°å°±åˆ›å»ºä¸€ä¸ªé»˜è®¤çš„æ•°æ®åº“
+				//Ã»ÓĞÕÒµ½¾Í´´½¨Ò»¸öÄ¬ÈÏµÄÊı¾İ¿â
 				FilePath_Monitor= g_achive_monitor_datatbase_path;
 				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MONITOR_DB2), _T("MONITOR_DB"));   
 				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
@@ -645,11 +645,11 @@ BOOL CT3000App::InitInstance()
 			//CADO tempado;
 			//BOOL Ret=tempado.OnInitADOConn();
 			CBADO tempado;
-			tempado.SetDBPath(g_achive_monitor_datatbase_path);	//æš‚æ—¶ä¸åˆ›å»ºæ–°æ•°æ®åº“
+			tempado.SetDBPath(g_achive_monitor_datatbase_path);	//ÔİÊ±²»´´½¨ĞÂÊı¾İ¿â
 			tempado.OnInitADOConn(); 
 
 
-			if (tempado.IsHaveTable(tempado,_T("Version")))//æœ‰Versionè¡¨
+			if (tempado.IsHaveTable(tempado,_T("Version")))//ÓĞVersion±í
 			{
 				CString sql=_T("Select * from Version");
 				tempado.m_pRecordset=tempado.OpenRecordset(sql);
@@ -690,7 +690,7 @@ BOOL CT3000App::InitInstance()
 
 			if (First_Start)
 			{
-				//åˆ›å»ºDefault_Building
+				//´´½¨Default_Building
 				CString filebuildingPath;//=g_strBuildingFolder+m_Building.at(i).Main_BuildingName+_T("\\"); 
 				filebuildingPath.Format(_T("%sDefault_Building\\"),g_strBuildingFolder);
 				CreateDirectory(g_strBuildingFolder,NULL);
@@ -706,7 +706,7 @@ BOOL CT3000App::InitInstance()
 				//create building db file
 
 				hFind = FindFirstFile(filebuildingPath, &wfd);//
-				if (hFind==INVALID_HANDLE_VALUE)//è¯´æ˜å½“å‰ç›®å½•ä¸‹æ— t3000.mdb
+				if (hFind==INVALID_HANDLE_VALUE)//ËµÃ÷µ±Ç°Ä¿Â¼ÏÂÎŞt3000.mdb
 				{
 
 					HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_BUILDINGDB1), _T("BUILDINGDB"));   
@@ -762,7 +762,7 @@ BOOL CT3000App::InitInstance()
 
 
 
-			//å…ˆä¸è€ƒè™‘å‡çº§çš„æƒ…å†µ
+			//ÏÈ²»¿¼ÂÇÉı¼¶µÄÇé¿ö
 #if 0
 		 	int Ret=JudgeDB();
 			if (!Ret)
@@ -900,7 +900,7 @@ BOOL CT3000App::InitInstance()
        m_szHelpFile = theApp.m_szAppPath + L"T3000_Help.chm";
 	   m_szTstatHelpFile = theApp.m_szAppPath + L"HelpDoc//" + L"TStat8_Help.chm";
 // 		CString g_configfile_path =g_strExePth + g_strStartInterface_config;
-// 		m_lastinterface= 19 ;//GetPrivateProfileInt(_T("T3000_START"),_T("Interface"),19,g_configfile_path); //ç”± æœå¸† 16-03-17å±è”½ï¼›è¿›å…¥ä¸åŒçš„ç•Œé¢å¼•èµ· T3000æ‰“å¼€æ—¶æŠ¥é”™ã€‚
+// 		m_lastinterface= 19 ;//GetPrivateProfileInt(_T("T3000_START"),_T("Interface"),19,g_configfile_path); //ÓÉ ¶Å·« 16-03-17ÆÁ±Î£»½øÈë²»Í¬µÄ½çÃæÒıÆğ T3000´ò¿ªÊ±±¨´í¡£
 // 		g_selected_serialnumber=GetPrivateProfileInt(_T("T3000_START"),_T("SerialNumber"),0,g_configfile_path);
 // 		if (m_lastinterface!=19&&m_lastinterface!=24)
 // 		{
@@ -945,7 +945,7 @@ BOOL CT3000App::InitInstance()
 		//vcredist_x86.zip
 
 		//	::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\vcredist_x86.zip"), _T(""), _T(""), SW_SHOW);
-		//è¿™ä¸ªè¦å…ˆè¯•è¯•ï¼Œå½“ç”µè„‘æ²¡æœ‰å®‰è£…è¿™ä¸ªæ–‡ä»¶æ—¶ï¼Œå¦‚ä½•æ•è·è¿™ä¸ªä¿¡æ¯ï¼Œç„¶åå†æ‰§è¡Œè¿™ä¸ªã€‚
+		//Õâ¸öÒªÏÈÊÔÊÔ£¬µ±µçÄÔÃ»ÓĞ°²×°Õâ¸öÎÄ¼şÊ±£¬ÈçºÎ²¶»ñÕâ¸öĞÅÏ¢£¬È»ºóÔÙÖ´ĞĞÕâ¸ö¡£
 
 
 		AfxMessageBox(_T("Database error! Please restart again ."));
@@ -1153,7 +1153,7 @@ int CT3000App::GetSoftInstallDays()
 	CFile::GetStatus(strPath,fileStatus);
 
 	//timeSpan=curTime-fileStatus.m_ctime;
-	timeSpan=curTime-fileStatus.m_mtime;//è¿™ä¸ªæ˜¯ä¿®æ”¹æ—¶é—´ï¼Œä¸è®ºä½ CUTï¼ŒCOPYéƒ½ä¸ä¼šä¿®æ”¹çš„
+	timeSpan=curTime-fileStatus.m_mtime;//Õâ¸öÊÇĞŞ¸ÄÊ±¼ä£¬²»ÂÛÄãCUT£¬COPY¶¼²»»áĞŞ¸ÄµÄ
 
 	return (int)timeSpan.GetDays();
 }

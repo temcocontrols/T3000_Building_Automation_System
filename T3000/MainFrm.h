@@ -561,4 +561,5 @@ public:
 		afx_msg void OnUpdateModeOfflinemode(CCmdUI *pCmdUI);
 		afx_msg void OnToolsPhchart();
 		afx_msg void OnToolsModbustobacnetrouter();
+		afx_msg void OnToolsProgrameditortest();
 };

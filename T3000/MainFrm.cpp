@@ -422,6 +422,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	 ON_UPDATE_COMMAND_UI(ID_MODE_OFFLINEMODE, &CMainFrame::OnUpdateModeOfflinemode)
 		ON_COMMAND(ID_TOOLS_PHCHART, &CMainFrame::OnToolsPhchart)
 		ON_COMMAND(ID_TOOLS_MODBUSTOBACNETROUTER, &CMainFrame::OnToolsModbustobacnetrouter)
+		ON_COMMAND(ID_TOOLS_PROGRAMEDITORTEST, &CMainFrame::OnToolsProgrameditortest)
 		END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -15814,4 +15815,11 @@ void CMainFrame::OnToolsModbustobacnetrouter()
 {
 	CModbusToBacnetRouterDlg dlg;
 	dlg.DoModal();
+}
+
+#include"ProgramEditorTestDlg.h"
+void CMainFrame::OnToolsProgrameditortest()
+{
+	CProgramEditorTestDlg  dlg;
+		dlg.DoModal();
 }
