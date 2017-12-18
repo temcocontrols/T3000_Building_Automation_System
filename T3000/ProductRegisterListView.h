@@ -8,20 +8,29 @@ using namespace  std;
 // CProductRegisterListView form view
 struct CustomProductTable_T{
     int ModelNo;
-    CString  Reg_Description;
-    int Reg_ID;
-    CString Para_Type;
-	CString Para_Type1;
+	CString  Poll_YES_NO;
+	CString Bacnet_Object_Name;//CString  Bacnet_Object_Name;
 	int function_code;
-    int  Counts_Number;
-    CString  Property;
-    CString Value;
-    CString DataFormat;
-	CString SN;
-	int caculate;
-	CString Unit;
+    int Reg_ID;
+	int  Counts_Number;
+	CString Value;
+	CString DataFormat;
+	CString  Bit_1;
+	CString  Low_Actual;
+	CString  High_Actual;
+	CString  Low_Scale;
+	CString  High_Scale;
+	CString  Read_Only_Or_RW;
+	CString  Bacnet_Type;
+	CString  Bacnet_Object_Description;
+	CString  COV_Increment;
+	CString  Unit_Group;
+	CString  Unit_Value;
+	CString  Grouping_YES_NO;
+	CString   Update_On_Reconnect;
 	CString Default;
-
+	CString  Reg_Description;
+	CString SN;
 };
 class CProductRegisterListView : public CFormView
 {
@@ -92,10 +101,28 @@ public:
 	CString GetFunctionName(int  FunctionCode);
 	int GetCaculateCode(CString CalName);
 	CString GetCalName(int calcode);
-	CString m_array_modbus_function[8];
-	CString m_array_caculate[3];
-	
-	 vector<CString> m_dataformat;
+ 
+    
+
+	vector<CString> m_vecYesNo;
+
+	vector<CString> m_vecVariableType;
+	vector<CString> m_vecDataFormat;
+	vector<CString> m_vecDataRW;
+	vector<CString> m_vecBacnetType;
+
+	vector<CString> m_GroupUnits;
+	vector<CString> m_UnitValue;
+
+
+public:
+	vector<CString> GetUnitValueByGroupUnit(CString strGroupUnit);
+	vector<CString> GetDataFormatByVariable(CString strVariable);
+	vector<CString> GetRWByVariableDataFormat(CString strVariable, CString strDataFormat);
+	vector<CString> GetBacnetType(CString strVariable, CString strDataFormat, CString RW);
+	void FreshOneRowInGrid(int Row, CustomProductTable_T tp, int operator_Grid);
+
+	afx_msg void OnNMDblclkListCustomList(NMHDR *pNMHDR, LRESULT *pResult);
 };
 
 

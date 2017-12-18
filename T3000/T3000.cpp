@@ -46,7 +46,6 @@ END_MESSAGE_MAP()
 CT3000App::CT3000App()
 {
 	m_bHiColorIcons = TRUE;
-
     char strASCIICompileTime[128] = { 0 };
     sprintf(strASCIICompileTime, "    %s ", __DATE__);
 
@@ -57,18 +56,18 @@ CT3000App::CT3000App()
     CurrentT3000Version.ReleaseBuffer();
 
     //******************************************************
-    // Release °æ±¾·¢²¼Ê±ÆÁ±Î´Ë¶Î£¬´Ë¶Î Ö÷ÒªÓÃÓÚµ÷ÊÔÊ± ÏÔÊ¾ ¾ßÌåÊÇ ¼¸µãÖÓµÄ°æ±¾.
+    // Release ï¿½æ±¾ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Î´Ë¶Î£ï¿½ï¿½Ë¶ï¿½ ï¿½ï¿½Òªï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½Ê± ï¿½ï¿½Ê¾ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ÓµÄ°æ±¾.
 #if 1
-    char strTime[128] = { 0 }; // È¡Ð¡Ê±µ± Ð¡°æ±¾ºÅ;
+    char strTime[128] = { 0 }; // È¡Ð¡Ê±ï¿½ï¿½ Ð¡ï¿½æ±¾ï¿½ï¿½;
     CString Test_Version;
     memcpy(strTime, __TIME__, 2);
     MultiByteToWideChar(CP_ACP, 0, (char *)strTime, (int)strlen(strTime) + 1, Test_Version.GetBuffer(MAX_PATH), MAX_PATH);
     Test_Version.ReleaseBuffer();
-	CurrentT3000Version= CurrentT3000Version + _T(" Version ") + Test_Version; //¶Å·« : Release °æ·¢²¼µÄÊ±ºò Õâ¾äÆÁ±Îµô¾ÍºÃÁË £¬»á×Ô¶¯»ñÈ¡±àÒëµÄÈÕÆÚ.
+	CurrentT3000Version= CurrentT3000Version + _T(" Version ") + Test_Version; //ï¿½Å·ï¿½ : Release ï¿½æ·¢ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Îµï¿½Íºï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
 #endif 
     //*******************************************************
 
-	T3000_Version = 201028; //¶Å·«£º²»Òª³¬¹ý65535  , ÒòÎª×Ô¶¯ÏÂÔØ¸üÐÂ µÄµØ·½ÓÐÁ½¸ö ×Ö½ÚµÄÏÞÖÆ.
+	T3000_Version = 201028; //ï¿½Å·ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½65535  , ï¿½ï¿½Îªï¿½Ô¶ï¿½ï¿½ï¿½ï¿½Ø¸ï¿½ï¿½ï¿½ ï¿½ÄµØ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö½Úµï¿½ï¿½ï¿½ï¿½ï¿½.
 	m_lastinterface=19;
 }
 // The one and only CT3000App object
