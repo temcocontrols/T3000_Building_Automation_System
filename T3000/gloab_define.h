@@ -1213,17 +1213,6 @@ const int P_GSM = 4;
 const int P_AUTO = 5;
 const int P_REMOTE_DEVICE = 6;
 
-//const CString Building_Protocol[] =
-//{
-//	_T("Modbus 485"),
-//	_T("Modbus TCP"),
-//	_T("Bacnet MSTP"),
-//	_T("Bacnet IP"),
-//	_T("GSM"),
-//	_T("Auto"),
-//	_T("Remote Device")
-//
-//};
 
 const CString Building_Protocol[] =
 {

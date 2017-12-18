@@ -1,6 +1,12 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
+2017-12-13 Update by Fance
+1.串口二  支持  MSTP_MASTER.
+2.修复list 在利用鼠标移动时 有些list 显示的背景色杂乱无章的问题
+3.修复设备状态显示不正常的问题。
+4.Tstat Schedual 控制增加DaySetpoint NightSetpoint SleepSetpoint AwakeSetpoint
+
 2017-12-08 Update by Fance
 1. 新增Minipanel界面下 tstat的schedule界面
 2. 修复扫描时 对重复数据的处理

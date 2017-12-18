@@ -46,8 +46,28 @@ END_MESSAGE_MAP()
 CT3000App::CT3000App()
 {
 	m_bHiColorIcons = TRUE;
-	CurrentT3000Version=_T("    2017.12.10");
-	T3000_Version = 201028;
+    char strASCIICompileTime[128] = { 0 };
+    sprintf(strASCIICompileTime, "    %s ", __DATE__);
+
+
+
+
+    MultiByteToWideChar(CP_ACP, 0, (char *)strASCIICompileTime, (int)strlen(strASCIICompileTime) + 1, CurrentT3000Version.GetBuffer(MAX_PATH), MAX_PATH);
+    CurrentT3000Version.ReleaseBuffer();
+
+    //******************************************************
+    // Release �汾����ʱ��δ˶Σ��˶� ��Ҫ���ڵ���ʱ ��ʾ ������ �����ӵİ汾.
+#if 1
+    char strTime[128] = { 0 }; // ȡСʱ�� С�汾��;
+    CString Test_Version;
+    memcpy(strTime, __TIME__, 2);
+    MultiByteToWideChar(CP_ACP, 0, (char *)strTime, (int)strlen(strTime) + 1, Test_Version.GetBuffer(MAX_PATH), MAX_PATH);
+    Test_Version.ReleaseBuffer();
+	CurrentT3000Version= CurrentT3000Version + _T(" Version ") + Test_Version; //�ŷ� : Release �淢����ʱ�� �����ε�ͺ��� �����Զ���ȡ���������.
+#endif 
+    //*******************************************************
+
+	T3000_Version = 201028; //�ŷ�����Ҫ����65535  , ��Ϊ�Զ����ظ��� �ĵط������ �ֽڵ�����.
 	m_lastinterface=19;
 }
 // The one and only CT3000App object

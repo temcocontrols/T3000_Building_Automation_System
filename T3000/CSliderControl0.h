@@ -1,5 +1,6 @@
 // Machine generated IDispatch wrapper class(es) created with Add Class from Typelib Wizard
 
+//#import "..\\..\\T3000Controls\\bin\\Release\\T3000Controls.tlb" no_namespace
 #import "..\\..\\T3000Controls\\bin\\Release\\T3000Controls.tlb" no_namespace
 // CSliderControl0 wrapper class
 

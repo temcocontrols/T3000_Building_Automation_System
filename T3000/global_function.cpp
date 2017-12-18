@@ -2308,43 +2308,33 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 
 		if (end_instance == (BAC_TSTAT_SCHEDULE - 1))
 			end_flag = true;
-		for (i = start_instance; i <= end_instance; i++)
-		{
-			//if ((i >= 20) || (i<0))
-			//{
-			//	m_tatat_schedule_data.at(20).tstat.id = 0;
-			//	end_flag = true;
-			//	b_stop_read_tstat_schedule = false;
-			//	return READ_TSTATE_SCHEDULE_T3000;
-			//}
+        for (i = start_instance; i <= end_instance; i++)
+        {
+            m_tatat_schedule_data.at(i).tstat.id = *(my_temp_point++);
+            m_tatat_schedule_data.at(i).tstat.schedule = *(my_temp_point++);
+            m_tatat_schedule_data.at(i).tstat.flag = *(my_temp_point++);
+            my_temp_point = my_temp_point + 12;
+            m_tatat_schedule_data.at(i).tstat.on_line = *(my_temp_point++);
+            memcpy_s(m_tatat_schedule_data.at(i).tstat.name, 14, my_temp_point, 14);
+            my_temp_point = my_temp_point + 15;
+            m_tatat_schedule_data.at(i).tstat.daysetpoint = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            my_temp_point = my_temp_point + 2;
+            m_tatat_schedule_data.at(i).tstat.nightsetpoint = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            my_temp_point = my_temp_point + 2;
+            m_tatat_schedule_data.at(i).tstat.awakesetpoint = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            my_temp_point = my_temp_point + 2;
+            m_tatat_schedule_data.at(i).tstat.sleepsetpoint = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            my_temp_point = my_temp_point + 2;
 
-			m_tatat_schedule_data.at(i).tstat.id = *(my_temp_point++);
-			m_tatat_schedule_data.at(i).tstat.on_line = *(my_temp_point++);
-			m_tatat_schedule_data.at(i).tstat.schedule = *(my_temp_point++);
-			m_tatat_schedule_data.at(i).tstat.flag = *(my_temp_point++);
-			memcpy_s(m_tatat_schedule_data.at(i).tstat.name, 14, my_temp_point, 14);
-			my_temp_point = my_temp_point + 15;
 
-#if 0
-			m_tatat_schedule_data.at(i).tstat.id = i+1;
-			m_tatat_schedule_data.at(i).tstat.on_line = i%2;
-			m_tatat_schedule_data.at(i).tstat.schedule = i%9;
-			m_tatat_schedule_data.at(i).tstat.flag = 0x80;
-			memcpy_s(m_tatat_schedule_data.at(i).tstat.name, 14, my_temp_point, 14);
-			my_temp_point = my_temp_point + 15;
-
-			//测试代码
-			if (i > 20)
-				m_tatat_schedule_data.at(i).tstat.id = 0;
-#endif
-			if (m_tatat_schedule_data.at(i).tstat.id == 0)
-			{
-				b_stop_read_tstat_schedule = true;
-				return READ_TSTATE_SCHEDULE_T3000;
-			}
-			b_stop_read_tstat_schedule = false;
-		}
-	}
+            if (m_tatat_schedule_data.at(i).tstat.id == 0)
+            {
+                b_stop_read_tstat_schedule = true;
+                return READ_TSTATE_SCHEDULE_T3000;
+            }
+            b_stop_read_tstat_schedule = false;
+        }
+    }
 		return READ_TSTATE_SCHEDULE_T3000;
 		break;
 	case READ_REMOTE_POINT:
@@ -3919,6 +3909,10 @@ void local_handler_conf_private_trans_ack(
             ::PostMessage(analog_cus_range_dlg,WM_REFRESH_BAC_ANALOGCUSRANGE_LIST,NULL,NULL);
     }
     break;
+    case READ_TSTATE_SCHEDULE_T3000:
+        if (m_tstat_schedule_dlg_hwnd != NULL)
+            ::PostMessage(m_tstat_schedule_dlg_hwnd, WM_REFRESH_BAC_TSTAT_SCHEDULE_LIST, NULL, NULL);
+        break;
     case READ_AT_COMMAND:
     {
         ::PostMessage(m_at_command_hwnd,WM_REFRESH_BAC_AT_COMMAND,NULL,NULL);
@@ -3983,10 +3977,6 @@ void local_handler_conf_private_trans_ack(
             ::PostMessage(m_controller_dlg_hwnd,WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
         copy_data_to_ptrpanel(TYPE_ALL);
         break;
-	case READ_TSTATE_SCHEDULE_T3000:
-		if (each_end_flag)
-			::PostMessage(m_tstat_schedule_dlg_hwnd, WM_REFRESH_BAC_TSTAT_SCHEDULE_LIST, NULL, NULL);
-		break;
     case READSCREEN_T3000:
         if(each_end_flag)
             ::PostMessage(m_screen_dlg_hwnd,WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
