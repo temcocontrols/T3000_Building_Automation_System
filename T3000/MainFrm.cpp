@@ -2499,7 +2499,6 @@ void CMainFrame::LoadProductFromDB()
 							tree_product m_product_temp;
 							m_product_temp.product_item  =hSubItem;
 
-
 							strSql=q.getValuebyName(L"Serial_ID");
 
 							long temp_serial_id = (long)(_wtoi64(strSql));
@@ -7012,7 +7011,7 @@ void CMainFrame::OnToolRefreshLeftTreee()
 #include "ScanDlg.h"
 void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 {
-     
+
 	CppSQLite3DB SqliteDBT3000;
 	CppSQLite3DB SqliteDBBuilding;
 	CppSQLite3Table table;
@@ -7244,6 +7243,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             m_product.at(i).status_last_time[1] = false;
                             m_product.at(i).status_last_time[2] = false;
                             m_product.at(i).status = false;
+
                             //MessageBox(_T("Device is offline!"));
                             if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
                             {
@@ -7813,38 +7813,6 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 
 #if 1
-                        //ISPTool Config
-                        /*	CString filename;
-                        CString flashmethod;
-                        CString id;
-                        CString comport;
-                        CString BD;
-                        CString ip;
-                        CString ipport;
-
-
-                        CString subnote;
-                        CString subID;*/
-
-
-                        //CString ProductHexBinName,StrTemp;
-                        //CString StrBinHexPath,StrULRPath;
-                        //GetProductFPTAndLocalPath(product_Node.product_class_id,StrULRPath,ProductHexBinName);
-                        //StrBinHexPath = g_strExePth;
-                        //StrBinHexPath+=_T("firmware\\");
-
-                        //StrTemp.Format(_T("%s\\"),GetProductName(product_Node.product_class_id));
-                        //StrBinHexPath+=StrTemp;
-                        //StrBinHexPath+=ProductHexBinName;
-
-                        //HANDLE hFind;//
-                        //WIN32_FIND_DATA wfd;//
-                        //hFind = FindFirstFile(StrBinHexPath, &wfd);//
-                        //if ((hFind!=INVALID_HANDLE_VALUE)&&(!StrULRPath.IsEmpty()))//说明当前目录下无t3000.mdb
-                        //{
-                        //	filename=StrBinHexPath;
-                        //}
-
 
                         id.Format(_T("%d"),g_tstat_id);
                         comport.Format(_T("COM%d"),nComPort);
@@ -7893,10 +7861,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                         m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Device is Offline!"));
                         m_pDialogInfo->ShowWindow(SW_SHOW);
                     }
-//                     while(m_pDialogInfo->IsWindowVisible()){
-//                         Sleep(50);
-//                         continue;
-//                     }
+
                     if (pDlg !=NULL)
                     {
                         pDlg->ShowWindow(SW_HIDE);
@@ -7961,13 +7926,6 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             }
                         }
 
-                        //}
-// 						else
-// 						{
-// 							CString tempcs;
-// 							tempcs.Format(_T("The device serial number is %d,the database saved is %d \r\nPlease delete it and rescan."),nSerialNumber,nSelectSerialNumber);
-// 							MessageBox(tempcs);
-// 						}
                     }
                 }
             }
@@ -7989,10 +7947,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                         m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Device is offline,Please check the connection!"));
                         m_pDialogInfo->ShowWindow(SW_SHOW);
                     }
-//                     while(m_pDialogInfo->IsWindowVisible()){
-//                         Sleep(50);
-//                         continue;
-//                     }
+
                     if (pDlg !=NULL)
                     {
                         pDlg->ShowWindow(SW_HIDE);
@@ -8019,10 +7974,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(tempcs);
                             m_pDialogInfo->ShowWindow(SW_SHOW);
                         }
-//                         while(m_pDialogInfo->IsWindowVisible()){
-//                             Sleep(50);
-//                             continue;
-//                         }
+
                         if (pDlg !=NULL)
                         {
 							pDlg->ShowWindow(SW_HIDE);
@@ -8036,14 +7988,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     }
                     if(nSerialNumber>=0)
                     {
-//if(nSerialNumber==nSelectSerialNumber)
                         bOnLine=TRUE;
-// 						else
-// 						{
-// 							CString tempcs;
-// 							tempcs.Format(_T("The device serial number is %d,the database saved is %d \r\nPlease delete it and rescan."),nSerialNumber,nSelectSerialNumber);
-// 							MessageBox(tempcs);
-// 						}
                     }
                 }
             }
@@ -8767,7 +8712,14 @@ do_connect_success:
 		g_llRxCount = g_llRxCount + 4;
 		Sleep(1);
 		return;
-do_conncet_failed:
+	do_conncet_failed:
+
+		//Fandu 2017/12/13 设备离线时 更新 数据库设备状态字段。因为有太多地方调用  重新加载数据库的函数，导致如果不更新状态显示不正常.
+		CString strUpdateSql;
+		strUpdateSql.Format(_T("update ALL_NODE set Online_Status = 0 where Serial_ID = %u and protocol = 1"), g_selected_serialnumber);
+		SqliteDBBuilding.execDML((UTF8MBSTR)strUpdateSql);
+	    SqliteDBBuilding.closedb();
+
 		if(hretryThread == NULL)
 		{
 			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("T3000 can't connect to your device ,it will try again in 20 seconds."));
@@ -9427,6 +9379,30 @@ end_condition :
         }
 
     }
+
+	//Fandu 2017/12/13 新增批量处理在线状态，修改数据库状态字段.
+	CString strUpdateSql;
+	if (m_refresh_net_device_data.size() == 0)
+	{
+		strUpdateSql.Format(_T("update ALL_NODE set Online_Status	= 0 where protocol = 1"));
+		SqliteDBBuilding.execDML((UTF8MBSTR)strUpdateSql);
+	}
+	else
+	{
+		CString composite_serial;
+		for (int i = 0;i < m_refresh_net_device_data.size();i++)
+		{
+			CString temp1;
+			if (i != 0)
+				composite_serial = composite_serial + _T(",");
+			temp1.Format(_T("%u"), m_refresh_net_device_data.at(i).nSerial);
+			composite_serial = composite_serial + temp1;
+		}
+		strUpdateSql.Format(_T("update ALL_NODE set Online_Status = 0 where Serial_ID not in (%s) and protocol = 1"), composite_serial);
+		strUpdateSql.Format(_T("update ALL_NODE set Online_Status = 1 where Serial_ID in (%s) and protocol = 1"), composite_serial);
+		SqliteDBBuilding.execDML((UTF8MBSTR)strUpdateSql);
+	}
+
     SqliteDBBuilding.closedb();
     if(find_new_device)
         PostMessage(WM_MYMSG_REFRESHBUILDING,0,0);
@@ -9577,7 +9553,7 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
                 //SetPaneConnectionPrompt(_T("Online!"));
             }
             //SetPaneConnectionPrompt(_T("Online!"));
-            m_pTreeViewCrl->turn_item_image(tp.product_item ,true);
+				m_pTreeViewCrl->turn_item_image(tp.product_item, true);
 
         }
         else  // 替换offline的图片
@@ -9588,7 +9564,7 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
                 //SetPaneConnectionPrompt(_T("Offline!"));
             }
 			// if(g_selected_serialnumber != m_product.at(i).serial_number)
-				 m_pTreeViewCrl->turn_item_image(tp.product_item ,false);
+				m_pTreeViewCrl->turn_item_image(tp.product_item, false);
 			 //else if((g_selected_serialnumber == m_product.at(i).serial_number) && (tp.product_class_id	== PM_MINIPANEL))
 			 //{
 				// TRACE(_T("Select panel offline \n"));
