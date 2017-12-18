@@ -687,6 +687,9 @@
     <ClCompile Include="BacnetTstatSchedule.cpp">
       <Filter>Bacnet</Filter>
     </ClCompile>
+    <ClCompile Include="ProgramEditorTestDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -1792,6 +1795,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BacnetTstatSchedule.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProgramEditorTestDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

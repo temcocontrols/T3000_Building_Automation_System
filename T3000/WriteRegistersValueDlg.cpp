@@ -171,12 +171,12 @@ BOOL CWriteRegistersValueDlg::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
 
-    m_string_counts.Format(_T("%d"),g_current_Node.Counts_Number);
+   /* m_string_counts.Format(_T("%d"),g_current_Node.Counts_Number);
     m_string_dataformats.Format(_T("%s"),g_current_Node.DataFormat);
     m_string_address.Format(_T("%d"),g_current_Node.Reg_ID);
     m_string_functions.Format(_T("%s"),g_current_Node.Reg_Description);
     m_sting_property.Format(_T("%s"),g_current_Node.Property);
-    m_string_type.Format(_T("%s"),g_current_Node.Para_Type);
+    m_string_type.Format(_T("%s"),g_current_Node.Para_Type);*/
     CStringArray ValueAarry;
     SplitCStringA(ValueAarry,g_current_Node.Value,_T(","));
     m_list_value_set.ResetContent();
