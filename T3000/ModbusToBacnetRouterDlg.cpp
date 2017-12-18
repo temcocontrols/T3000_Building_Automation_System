@@ -43,44 +43,6 @@ END_MESSAGE_MAP()
 BOOL CModbusToBacnetRouterDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
- 
-	m_vecVariableType.push_back(L"_1_Input_Bit");
-	m_vecVariableType.push_back(L"_3_Input_Register");
-	m_vecVariableType.push_back(L"_0_Coil_Bit");
-	m_vecVariableType.push_back(L"_4_Holding_Register");
-
-	m_vecDataFormat.push_back(L"_1_Input_Bit");
-	m_vecDataFormat.push_back(L"_1_Input_Bit");
-	m_vecDataFormat.push_back(L"_1_Input_Bit");
-	m_vecDataFormat.push_back(L"_1_Input_Bit");
-	m_vecDataFormat.push_back(L"_1_Input_Bit");
-	m_vecDataFormat.push_back(L"_1_Input_Bit");
-	m_vecDataFormat.push_back(L"_1_Input_Bit");
-
-	m_GroupUnits.push_back(L"Bacnet_Units");
-	m_GroupUnits.push_back(L"Acceleration");
-	m_GroupUnits.push_back(L"Area");
-	m_GroupUnits.push_back(L"Currency");
-	m_GroupUnits.push_back(L"Electrical");
-	m_GroupUnits.push_back(L"Energy");
-	m_GroupUnits.push_back(L"Enthalpy");
-	m_GroupUnits.push_back(L"Entropy");
-	m_GroupUnits.push_back(L"Force");
-	m_GroupUnits.push_back(L"Frequency");
-	m_GroupUnits.push_back(L"Humidity");
-	m_GroupUnits.push_back(L"Length");
-	m_GroupUnits.push_back(L"Light");
-	m_GroupUnits.push_back(L"Mass");
-	m_GroupUnits.push_back(L"Mass_Flow");
-	m_GroupUnits.push_back(L"Power");
-	m_GroupUnits.push_back(L"Pressure");
-	m_GroupUnits.push_back(L"Temperature");
-	m_GroupUnits.push_back(L"Time");
-	m_GroupUnits.push_back(L"Torque");
-	m_GroupUnits.push_back(L"Velocity");
-	m_GroupUnits.push_back(L"Volume");
-	m_GroupUnits.push_back(L"Volumetric_Flow");
-	m_GroupUnits.push_back(L"Other");
 	g_hwnd_now = this->m_hWnd;
 	m_vecYesNo.push_back(L"NO");
 	m_vecYesNo.push_back(L"YES");
@@ -145,14 +107,11 @@ BOOL CModbusToBacnetRouterDlg::OnInitDialog()
 	
 	
 
-
 	m_vecDataRW.push_back(L"R_Only");
 	m_vecDataRW.push_back(L"R_W");
 
 
-
-	for (int i = 0;i < 255;i++)
- 
+	for (int i = 0;i < 20;i++)
 	{
 		ModbusToBacnetRouter tmpnode;
 		tmpnode.Poll_YES_NO=L"YES";
@@ -440,7 +399,6 @@ vector<CString> CModbusToBacnetRouterDlg::GetUnitValueByGroupUnit(CString strGro
 				vecTmp.push_back(L"BTUS_PER_POUND");
 					vecTmp.push_back(L"KILOJOULES_PER_KILOGRAM_DRY_AIR");
 						vecTmp.push_back(L"MEGAJOULES_PER_KILOGRAM_DRY_AIR");
- 
 
 	}
 	else if (strGroupUnit.CompareNoCase(L"Entropy") == 0)
@@ -1313,7 +1271,6 @@ vector<CString> CModbusToBacnetRouterDlg::GetBacnetType(CString strVariable, CSt
 	 
 	return vecTmp;
 }
- 
 vector<CString> CModbusToBacnetRouterDlg::GetDataFormatByVariable(CString strVariable)
 {
 	vector<CString> vecTmp;
@@ -1366,14 +1323,10 @@ vector<CString> CModbusToBacnetRouterDlg::GetDataFormatByVariable(CString strVar
 	}
 	return vecTmp;
 }
-
-
 void CModbusToBacnetRouterDlg::OnBnClickedButtonBlxfile()
 {
 	 
 }
-
-
 void CModbusToBacnetRouterDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
@@ -1389,7 +1342,7 @@ void CModbusToBacnetRouterDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
     m_datalist.SubItemHitTest(&lvinfo);
 	lRow = lvinfo.iItem;
 	lCol = lvinfo.iSubItem;
-	//5=数据格式
+	//5=��ݸ�ʽ
 	if (lRow<m_vecMd2BT.size()&&lCol==5)
 	{
 		m_vecDataFormat = GetDataFormatByVariable(m_vecMd2BT[lRow].Modbus_Variable_Type);
@@ -1404,7 +1357,7 @@ void CModbusToBacnetRouterDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 			m_datalist.SetCellStringList(lRow, 5, strlist);
 		}
 	}
-	//11=读写属性的判断
+	//11=��д���Ե��ж�
 	if (lRow < m_vecMd2BT.size() && lCol == 11)
 	{
 		m_vecDataRW = GetRWByVariableDataFormat(m_vecMd2BT[lRow].Modbus_Variable_Type, m_vecMd2BT[lRow].Data_Format);
@@ -1418,7 +1371,7 @@ void CModbusToBacnetRouterDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 			m_datalist.SetCellStringList(lRow, 11, strlist);
 		}
 	}
-	//12=Bacnet Type 判断
+	//12=Bacnet Type �ж�
 	if (lRow < m_vecMd2BT.size() && lCol == 12)
 	{
 		m_vecBacnetType = GetBacnetType(m_vecMd2BT[lRow].Modbus_Variable_Type, m_vecMd2BT[lRow].Data_Format, m_vecMd2BT[lRow].Read_Only_Or_RW);
