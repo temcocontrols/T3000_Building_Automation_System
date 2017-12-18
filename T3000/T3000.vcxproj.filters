@@ -685,7 +685,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BacnetTstatSchedule.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

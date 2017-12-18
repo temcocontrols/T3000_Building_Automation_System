@@ -46,8 +46,29 @@ END_MESSAGE_MAP()
 CT3000App::CT3000App()
 {
 	m_bHiColorIcons = TRUE;
-	CurrentT3000Version=_T("    2017.12.05");
-	T3000_Version = 201028;
+
+    char strASCIICompileTime[128] = { 0 };
+    sprintf(strASCIICompileTime, "    %s ", __DATE__);
+
+
+
+
+    MultiByteToWideChar(CP_ACP, 0, (char *)strASCIICompileTime, (int)strlen(strASCIICompileTime) + 1, CurrentT3000Version.GetBuffer(MAX_PATH), MAX_PATH);
+    CurrentT3000Version.ReleaseBuffer();
+
+    //******************************************************
+    // Release 版本发布时屏蔽此段，此段 主要用于调试时 显示 具体是 几点钟的版本.
+#if 1
+    char strTime[128] = { 0 }; // 取小时当 小版本号;
+    CString Test_Version;
+    memcpy(strTime, __TIME__, 2);
+    MultiByteToWideChar(CP_ACP, 0, (char *)strTime, (int)strlen(strTime) + 1, Test_Version.GetBuffer(MAX_PATH), MAX_PATH);
+    Test_Version.ReleaseBuffer();
+	CurrentT3000Version= CurrentT3000Version + _T(" Version ") + Test_Version; //杜帆 : Release 版发布的时候 这句屏蔽掉就好了 ，会自动获取编译的日期.
+#endif 
+    //*******************************************************
+
+	T3000_Version = 201028; //杜帆：不要超过65535  , 因为自动下载更新 的地方有两个 字节的限制.
 	m_lastinterface=19;
 }
 // The one and only CT3000App object

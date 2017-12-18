@@ -2190,8 +2190,15 @@ void CBacnetSetting::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 //#include "GroupScheduleDlg.h"
 void CBacnetSetting::OnBnClickedButtonZoneSchedule()
 {
-	b_stop_read_tstat_schedule = false;
-#if 1
+	b_stop_read_tstat_schedule = false;  //是否继续读取标志，若后面数据为空则退出循环体.
+
+    //在获取前清空缓存值.
+    for (int i = 0;i < BAC_TSTAT_SCHEDULE;i++)
+    {
+        Str_tstat_schedule temp_tstat_schedule;
+        memset(&m_tatat_schedule_data.at(i).all, 0, sizeof(Str_tstat_schedule));
+    }
+
 	for (int i = 0;i<BAC_TSTAT_SCHEDULE_GROUP;i++)
 	{
 		int end_temp_instance = 0;
@@ -2221,7 +2228,7 @@ void CBacnetSetting::OnBnClickedButtonZoneSchedule()
 			return ;
 		}
 	}
-#endif
+
 	b_stop_read_tstat_schedule = false;
 	CBacnetTstatSchedule dlg;
 	dlg.DoModal();
