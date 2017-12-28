@@ -7,14 +7,14 @@
 using namespace  std;
 // CProductRegisterListView form view
 struct CustomProductTable_T{
-    int ModelNo;
+         int ModelNo;
 	CString  Poll_YES_NO;
-	CString Bacnet_Object_Name;//CString  Bacnet_Object_Name;
-	int function_code;
-    int Reg_ID;
-	int  Counts_Number;
-	CString Value;
-	CString DataFormat;
+	CString  Bacnet_Object_Name;//CString  Bacnet_Object_Name;
+	int      function_code;
+    int      Reg_ID;
+	int      Counts_Number;
+	CString  Value;
+	CString  DataFormat;
 	CString  Bit_1;
 	CString  Low_Actual;
 	CString  High_Actual;
@@ -27,10 +27,10 @@ struct CustomProductTable_T{
 	CString  Unit_Group;
 	CString  Unit_Value;
 	CString  Grouping_YES_NO;
-	CString   Update_On_Reconnect;
-	CString Default;
+	CString  Update_On_Reconnect;
+	CString  Default;
 	CString  Reg_Description;
-	CString SN;
+	CString  SN;
 };
 class CProductRegisterListView : public CFormView
 {
@@ -101,8 +101,6 @@ public:
 	CString GetFunctionName(int  FunctionCode);
 	int GetCaculateCode(CString CalName);
 	CString GetCalName(int calcode);
- 
-    
 
 	vector<CString> m_vecYesNo;
 
