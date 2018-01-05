@@ -121,6 +121,9 @@ public:
 	void FreshOneRowInGrid(int Row, CustomProductTable_T tp, int operator_Grid);
 
 	afx_msg void OnNMDblclkListCustomList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnCbnSelchangeComboProductList();
+	CComboBox m_combox_productname;
+	afx_msg void OnBnClickedButtonExportexcelfile();
 };
 
 

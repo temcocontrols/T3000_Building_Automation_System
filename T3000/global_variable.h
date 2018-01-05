@@ -2198,3 +2198,7 @@ CString bacnet_message_return_string;  //得到的输入字符串
 pidname_map product_map;
 bool offline_mode = false; //全局离线模式判断;
 CString offline_prg_path;   //离线模式得prg 保存路径;
+
+
+
+bool custom_bacnet_register_listview = true;

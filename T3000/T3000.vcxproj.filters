@@ -685,9 +685,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BacnetTstatSchedule.cpp">
-      <Filter>Bacnet</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ProgramEditorTestDlg.cpp">
+    <ClCompile Include="TemcoStandardBacnetToolDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1033,6 +1033,9 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="ClassDiagram.cd" />
+    <None Include="res\bacnet_menu_bit_TEST.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">
@@ -1797,7 +1800,7 @@
     <ClInclude Include="BacnetTstatSchedule.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ProgramEditorTestDlg.h">
+    <ClInclude Include="TemcoStandardBacnetToolDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

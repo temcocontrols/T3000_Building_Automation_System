@@ -303,17 +303,33 @@ void CBuildingConfigration::Initial_Building_List()
         m_building_config_list.InsertItem(i,_T(""));
 
         m_building_config_list.SetItemText(i,BC_MAINNAME,m_BuildNameLst.at(i).MainBuildingName);
+        //m_building_config_list.SetItemText(i,BC_SUBNAME,m_BuildNameLst.at(i).Sub_NetName);
 
 
-        if(m_BuildNameLst.at(i).Protocol.CompareNoCase(_T("Auto")) == 0) // AUTO时 需要使能的表格
+        for (int z=0; z<(sizeof(Building_Protocol)/sizeof(Building_Protocol[0])); z++)
+        {
+            if(m_BuildNameLst.at(i).Protocol.CompareNoCase(Building_Protocol[z]) == 0)
+            {
+                m_BuildNameLst.at(i).protocol_index = z;
+                break;
+            }
+            else
+            {
+                m_BuildNameLst.at(i).protocol_index = P_AUTO;
+            }
+        }
+
+        if(m_BuildNameLst.at(i).protocol_index == INDEX_AUTO)
         {
             m_building_config_list.SetCellEnabled(i,BC_IPADDRESS,0);
             m_building_config_list.SetCellEnabled(i,BC_IPPORT,0);
             m_building_config_list.SetCellEnabled(i,BC_COMPORT,0);
             m_building_config_list.SetCellEnabled(i,BC_BAUDRATE,0);
         }
-
-        if(m_BuildNameLst.at(i).Protocol.CompareNoCase(_T("Remote Device")) == 0)   // == REMOTE_DEVICE  需要使能的表格
+        //if( (m_BuildNameLst.at(i).protocol_index == P_MODBUS_TCP) ||
+        //	(m_BuildNameLst.at(i).protocol_index == P_BACNET_IP) ||
+        //	(m_BuildNameLst.at(i).protocol_index == P_REMOTE_DEVICE))
+        if(m_BuildNameLst.at(i).protocol_index == INDEX_REMOTE_DEVICE)
         {
             m_building_config_list.SetCellEnabled(i,BC_IPADDRESS,1);
             m_building_config_list.SetCellEnabled(i,BC_IPPORT,1);
@@ -321,9 +337,9 @@ void CBuildingConfigration::Initial_Building_List()
             m_building_config_list.SetCellEnabled(i,BC_BAUDRATE,0);
         }
 
-		if ((m_BuildNameLst.at(i).Protocol.CompareNoCase(_T("Modbus 485")) == 0) ||     //   MODBUS_485
-			(m_BuildNameLst.at(i).Protocol.CompareNoCase(_T("Bacnet MSTP")) == 0))      //   BACNET_MSTP
-		{
+        if( (m_BuildNameLst.at(i).protocol_index == INDEX_MODBUS_485) ||
+                (m_BuildNameLst.at(i).protocol_index == INDEX_BACNET_MSTP))
+        {
             m_building_config_list.SetCellEnabled(i,BC_IPADDRESS,0);
             m_building_config_list.SetCellEnabled(i,BC_IPPORT,0);
             m_building_config_list.SetCellEnabled(i,BC_COMPORT,1);
@@ -336,17 +352,16 @@ void CBuildingConfigration::Initial_Building_List()
 
 
         CString m_show_protocol;
-		m_show_protocol = m_BuildNameLst.at(i).Protocol;
-        //if(m_BuildNameLst.at(i).protocol_index == INDEX_MODBUS_485)
-        //    m_show_protocol = _T("Modbus 485");
-        //else if(m_BuildNameLst.at(i).protocol_index == INDEX_MODBUS_TCP)
-        //    m_show_protocol = _T("Modbus TCP");
-        //else if(m_BuildNameLst.at(i).protocol_index == INDEX_BACNET_MSTP)
-        //    m_show_protocol = _T("Bacnet MSTP");
-        //else if(m_BuildNameLst.at(i).protocol_index == INDEX_REMOTE_DEVICE)
-        //    m_show_protocol = _T("Remote Device");
-        //else
-        //    m_show_protocol = _T("Auto");
+        if(m_BuildNameLst.at(i).protocol_index == INDEX_MODBUS_485)
+            m_show_protocol = _T("Modbus 485");
+        else if(m_BuildNameLst.at(i).protocol_index == INDEX_MODBUS_TCP)
+            m_show_protocol = _T("Modbus TCP");
+        else if(m_BuildNameLst.at(i).protocol_index == INDEX_BACNET_MSTP)
+            m_show_protocol = _T("Bacnet MSTP");
+        else if(m_BuildNameLst.at(i).protocol_index == INDEX_REMOTE_DEVICE)
+            m_show_protocol = _T("Remote Device");
+        else
+            m_show_protocol = _T("Auto");
 
         m_building_config_list.SetItemText(i,BC_PROTOCOL,m_show_protocol);
         m_building_config_list.SetItemText(i,BC_IPADDRESS,m_BuildNameLst.at(i).IPAddress_Domain);
@@ -471,25 +486,39 @@ void CBuildingConfigration::Fresh_List_Row()
         m_building_config_list.InsertItem(i,_T(""));
 
         m_building_config_list.SetItemText(i,BC_MAINNAME,m_BuildNameLst.at(i).MainBuildingName);
-  
-		if (m_BuildNameLst.at(i).Protocol.CompareNoCase(_T("Auto")) == 0) // AUTO时 需要使能的表格
-		{
-			m_building_config_list.SetCellEnabled(i, BC_IPADDRESS, 0);
-			m_building_config_list.SetCellEnabled(i, BC_IPPORT, 0);
-			m_building_config_list.SetCellEnabled(i, BC_COMPORT, 0);
-			m_building_config_list.SetCellEnabled(i, BC_BAUDRATE, 0);
-		}
+        //m_building_config_list.SetItemText(i,BC_SUBNAME,m_BuildNameLst.at(i).Sub_NetName);
 
-		if (m_BuildNameLst.at(i).Protocol.CompareNoCase(_T("Modbus TCP")) == 0)     //   MODBUS_TCP
-		{
-			m_building_config_list.SetCellEnabled(i, BC_IPADDRESS, 1);
-			m_building_config_list.SetCellEnabled(i, BC_IPPORT, 1);
-			m_building_config_list.SetCellEnabled(i, BC_COMPORT, 0);
-			m_building_config_list.SetCellEnabled(i, BC_BAUDRATE, 0);
-		}
 
-		if ((m_BuildNameLst.at(i).Protocol.CompareNoCase(_T("Modbus 485")) == 0) ||    //   MODBUS_485
-			(m_BuildNameLst.at(i).Protocol.CompareNoCase(_T("Modbus TCP")) == 0) )    //    MODBUS_TCP
+        for (int z=0; z<(sizeof(Building_Protocol)/sizeof(Building_Protocol[0])); z++)
+        {
+            if(m_BuildNameLst.at(i).Protocol.CompareNoCase(Building_Protocol[z]) == 0)
+            {
+                m_BuildNameLst.at(i).protocol_index = z;
+                break;
+            }
+            else
+            {
+                m_BuildNameLst.at(i).protocol_index = P_AUTO;
+            }
+        }
+        if(m_BuildNameLst.at(i).protocol_index == P_AUTO)
+        {
+            m_building_config_list.SetCellEnabled(i,BC_IPADDRESS,0);
+            m_building_config_list.SetCellEnabled(i,BC_IPPORT,0);
+            m_building_config_list.SetCellEnabled(i,BC_COMPORT,0);
+            m_building_config_list.SetCellEnabled(i,BC_BAUDRATE,0);
+        }
+        if( (m_BuildNameLst.at(i).protocol_index == P_MODBUS_TCP) ||
+                (m_BuildNameLst.at(i).protocol_index == P_BACNET_IP))
+        {
+            m_building_config_list.SetCellEnabled(i,BC_IPADDRESS,1);
+            m_building_config_list.SetCellEnabled(i,BC_IPPORT,1);
+            m_building_config_list.SetCellEnabled(i,BC_COMPORT,0);
+            m_building_config_list.SetCellEnabled(i,BC_BAUDRATE,0);
+        }
+
+        if( (m_BuildNameLst.at(i).protocol_index == P_MODBUS_485) ||
+                (m_BuildNameLst.at(i).protocol_index == P_BACNET_MSTP))
         {
             m_building_config_list.SetCellEnabled(i,BC_IPADDRESS,0);
             m_building_config_list.SetCellEnabled(i,BC_IPPORT,0);
@@ -500,7 +529,7 @@ void CBuildingConfigration::Fresh_List_Row()
             m_building_config_list.SetItemText(i,BC_ITEM,_T("Selected"));
         else
             m_building_config_list.SetItemText(i,BC_ITEM,_T(""));
-        m_building_config_list.SetItemText(i,BC_PROTOCOL, m_BuildNameLst.at(i).Protocol);
+        m_building_config_list.SetItemText(i,BC_PROTOCOL,Building_Protocol[m_BuildNameLst.at(i).protocol_index]);
         m_building_config_list.SetItemText(i,BC_IPADDRESS,m_BuildNameLst.at(i).IPAddress_Domain);
         m_building_config_list.SetItemText(i,BC_IPPORT,m_BuildNameLst.at(i).IP_Port);
         m_building_config_list.SetItemText(i,BC_COMPORT,m_BuildNameLst.at(i).Comport);
@@ -538,12 +567,27 @@ void CBuildingConfigration::Fresh_List_Row()
             m_building_config_list.SetCellStringList(i, BC_COMPORT, strlist);
         }
 
+// 		for (int x=0;x<BC_COL_NUMBER;x++)
+// 		{
+// 			if((i%2)==0)
+// 				m_building_config_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR);
+// 			else
+// 				m_building_config_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR_GRAY);
+// 		}
     }
 
     int last_new_item = (int)m_BuildNameLst.size();
     CString temp_cs;
     temp_cs.Format(_T("%d"),last_new_item + 1);
     m_building_config_list.InsertItem(last_new_item,_T(""));
+// 	for (int x=0;x<BC_COL_NUMBER;x++)
+// 	{
+// 		if((last_new_item%2)==0)
+// 			m_building_config_list.SetItemBkColor(last_new_item,x,LIST_ITEM_DEFAULT_BKCOLOR);
+// 		else
+// 			m_building_config_list.SetItemBkColor(last_new_item,x,LIST_ITEM_DEFAULT_BKCOLOR_GRAY);
+// 	}
+
     if(ListCtrlEx::ComboBox == m_building_config_list.GetColumnType(BC_PROTOCOL))
     {
         ListCtrlEx::CStrList strlist;
@@ -575,6 +619,71 @@ void CBuildingConfigration::Fresh_List_Row()
     }
 
     m_building_config_list.ShowWindow(SW_SHOW);
+//// for (int i=0;i<(int)m_BuildNameLst.size();i++)
+//// {
+//	CString temp_item;
+//	temp_item.Format(_T("%d"),m_changedRow+1);
+////	m_building_config_list.InsertItem(m_changedRow,_T(""));
+//
+//	m_building_config_list.SetItemText(m_changedRow,BC_MAINNAME,m_BuildNameLst.at(m_changedRow).MainBuildingName);
+//	//m_building_config_list.SetItemText(m_changedRow,BC_SUBNAME,m_BuildNameLst.at(m_changedRow).Sub_NetName);
+//
+//
+//	for (int z=0;z<(sizeof(Building_Protocol)/sizeof(Building_Protocol[0]));z++)
+//	{
+//		if(m_BuildNameLst.at(m_changedRow).Protocol.CompareNoCase(Building_Protocol[z]) == 0)
+//		{
+//			m_BuildNameLst.at(m_changedRow).protocol_index = z;
+//			break;
+//		}
+//		else
+//		{
+//			m_BuildNameLst.at(m_changedRow).protocol_index = P_AUTO;
+//		}
+//	}
+//	if(m_BuildNameLst.at(m_changedRow).protocol_index == P_AUTO)
+//	{
+//		m_building_config_list.SetCellEnabled(m_changedRow,BC_IPADDRESS,0);
+//		m_building_config_list.SetCellEnabled(m_changedRow,BC_IPPORT,0);
+//		m_building_config_list.SetCellEnabled(m_changedRow,BC_COMPORT,0);
+//		m_building_config_list.SetCellEnabled(m_changedRow,BC_BAUDRATE,0);
+//
+//	}
+//	if( (m_BuildNameLst.at(m_changedRow).protocol_index == P_MODBUS_TCP) ||
+//		(m_BuildNameLst.at(m_changedRow).protocol_index == P_BACNET_IP))
+//	{
+//		m_building_config_list.SetCellEnabled(m_changedRow,BC_IPADDRESS,1);
+//		m_building_config_list.SetCellEnabled(m_changedRow,BC_IPPORT,1);
+//		m_building_config_list.SetCellEnabled(m_changedRow,BC_COMPORT,0);
+//		m_building_config_list.SetCellEnabled(m_changedRow,BC_BAUDRATE,0);
+//	}
+//
+//	if( (m_BuildNameLst.at(m_changedRow).protocol_index == P_MODBUS_485) ||
+//		(m_BuildNameLst.at(m_changedRow).protocol_index == P_BACNET_MSTP))
+//	{
+//		m_building_config_list.SetCellEnabled(m_changedRow,BC_IPADDRESS,0);
+//		m_building_config_list.SetCellEnabled(m_changedRow,BC_IPPORT,0);
+//		m_building_config_list.SetCellEnabled(m_changedRow,BC_COMPORT,1);
+//		m_building_config_list.SetCellEnabled(m_changedRow,BC_BAUDRATE,1);
+//	}
+//
+//	if(m_BuildNameLst.at(m_changedRow).b_selected)
+//		m_building_config_list.SetItemText(m_changedRow,BC_ITEM,_T("Selected"));
+//	else
+//		m_building_config_list.SetItemText(m_changedRow,BC_ITEM,_T(""));
+//
+//	m_building_config_list.SetItemText(m_changedRow,BC_PROTOCOL,Building_Protocol[m_BuildNameLst.at(m_changedRow).protocol_index]);
+//	m_building_config_list.SetItemText(m_changedRow,BC_IPADDRESS,m_BuildNameLst.at(m_changedRow).IPAddress_Domain);
+//	m_building_config_list.SetItemText(m_changedRow,BC_IPPORT,m_BuildNameLst.at(m_changedRow).IP_Port);
+//	m_building_config_list.SetItemText(m_changedRow,BC_COMPORT,m_BuildNameLst.at(m_changedRow).Comport);
+//	m_building_config_list.SetItemText(m_changedRow,BC_BAUDRATE,m_BuildNameLst.at(m_changedRow).BaudRate);
+//	m_building_config_list.SetItemText(m_changedRow,BC_BUILDINGPATH,m_BuildNameLst.at(m_changedRow).BuildingPath);
+
+
+
+
+
+//}
 }
 void CBuildingConfigration::Update_Building()
 {
@@ -1138,9 +1247,22 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
         CString Baudrate = m_building_config_list.GetItemText(m_changedRow,BC_BAUDRATE);
 
 
+        int protocol_index=-1;
+        for (int z=0; z<(sizeof(Building_Protocol)/sizeof(Building_Protocol[0])); z++)
+        {
+            if(cs_temp.CompareNoCase(Building_Protocol[z]) == 0)
+            {
+                protocol_index = z;
+                break;
+            }
+            else
+            {
+                protocol_index = P_AUTO;
+            }
+        }
 
 
-		if (cs_temp.CompareNoCase(_T("Auto")) == 0)    //只有填写远程的时候需要填写IP地址和端口;
+        if(protocol_index == INDEX_AUTO)	//只有填写远程的时候需要填写IP地址和端口;
         {
             m_building_config_list.SetCellEnabled(Changed_Item,BC_IPADDRESS,0);
             m_building_config_list.SetCellEnabled(Changed_Item,BC_IPPORT,0);
@@ -1153,8 +1275,8 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
             m_building_config_list.SetItemText(m_changedRow,BC_BAUDRATE,NO_APPLICATION);
 
         }
-		else if((cs_temp.CompareNoCase(_T("Modbus TCP")) == 0)  ||   
-			    (cs_temp.CompareNoCase(_T("Remote Device")) == 0))      
+        else if( (protocol_index == P_MODBUS_TCP) ||(protocol_index == P_BACNET_IP) ||	(protocol_index == INDEX_REMOTE_DEVICE))
+            //	else if( protocol_index == INDEX_REMOTE_DEVICE)
         {
             m_building_config_list.SetCellEnabled(Changed_Item,BC_IPADDRESS,1);
             m_building_config_list.SetCellEnabled(Changed_Item,BC_IPPORT,1);
@@ -1188,8 +1310,9 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 				Dlg.DoModal();
 			}
         }
-		if ((cs_temp.CompareNoCase(_T("Modbus 485")) == 0) ||   
-			(cs_temp.CompareNoCase(_T("Bacnet MSTP")) == 0))      
+
+        if( (protocol_index == INDEX_MODBUS_485) ||
+                (protocol_index == INDEX_BACNET_MSTP))
         {
             m_building_config_list.SetCellEnabled(Changed_Item,BC_IPADDRESS,0);
             m_building_config_list.SetCellEnabled(Changed_Item,BC_IPPORT,0);
