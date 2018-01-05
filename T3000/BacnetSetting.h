@@ -109,6 +109,7 @@ public:
 	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	void InitScrollbar();
 	afx_msg void OnBnClickedButtonZoneSchedule();
+	afx_msg void OnControlIoNetConfig();
 };
 
 

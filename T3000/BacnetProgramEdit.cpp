@@ -1070,7 +1070,7 @@ int CBacnetProgramEdit::Bacnet_Show_Debug(CString &retselstring)
 	default:
 		break;
 	}
-	return true;
+
 }
 
 bool need_syntax = false;

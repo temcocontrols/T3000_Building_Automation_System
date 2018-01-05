@@ -1,0 +1,329 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{EE493B17-8185-406C-881F-1144092F01CB}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TemcoStandardBacnetTool</RootNamespace>
+    <AssemblyName>TemcoStandardBacnetTool</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+    <DocumentationFile>
+    </DocumentationFile>
+    <RegisterForComInterop>true</RegisterForComInterop>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RegisterForComInterop>true</RegisterForComInterop>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Search.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CalendarView">
+      <HintPath>.\Resources\EmbeddedDll\CalendarView.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="PacketDotNet">
+      <HintPath>.\Resources\EmbeddedDll\PacketDotNet.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SharpPcap">
+      <HintPath>.\Resources\EmbeddedDll\SharpPcap.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="ZedGraph">
+      <HintPath>.\Resources\EmbeddedDll\ZedGraph.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AlarmSummary.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AlarmSummary.Designer.cs">
+      <DependentUpon>AlarmSummary.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BACnetBase.cs" />
+    <Compile Include="BACnetClient.cs" />
+    <Compile Include="BACnetTransport.cs" />
+    <Compile Include="BacnetTransportEthernet.cs" />
+    <Compile Include="BACnetTransportIPv6.cs" />
+    <Compile Include="BacnetTransportSerial.cs" />
+    <Compile Include="BBMDEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BBMDEditor.Designer.cs">
+      <DependentUpon>BBMDEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CalendarEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CalendarEditor.Designer.cs">
+      <DependentUpon>CalendarEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ComUtilities.cs" />
+    <Compile Include="CreateObject.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CreateObject.Designer.cs">
+      <DependentUpon>CreateObject.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceCommunicationControlDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceCommunicationControlDialog.Designer.cs">
+      <DependentUpon>DeviceCommunicationControlDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceStorage.cs" />
+    <Compile Include="DynamicPropertyGridContainer.cs" />
+    <Compile Include="FileTransfers.cs" />
+    <Compile Include="ForeignRegistry.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ForeignRegistry.designer.cs">
+      <DependentUpon>ForeignRegistry.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GenericInputBox.cs" />
+    <Compile Include="MainDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainDialog.Designer.cs">
+      <DependentUpon>MainDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NotificationEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NotificationEditor.designer.cs">
+      <DependentUpon>NotificationEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="ProgressDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ProgressDialog.Designer.cs">
+      <DependentUpon>ProgressDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScheduleDisplay.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ScheduleDisplay.Designer.cs">
+      <DependentUpon>ScheduleDisplay.cs</DependentUpon>
+    </Compile>
+    <Compile Include="T3000BacnetTool.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="T3000BacnetTool.Designer.cs">
+      <DependentUpon>T3000BacnetTool.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TreeView.cs" />
+    <Compile Include="TrendLogDisplay.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TrendLogDisplay.Designer.cs">
+      <DependentUpon>TrendLogDisplay.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SearchDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SearchDialog.Designer.cs">
+      <DependentUpon>SearchDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SettingsDialog.Designer.cs">
+      <DependentUpon>SettingsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SourceAddressDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SourceAddressDialog.Designer.cs">
+      <DependentUpon>SourceAddressDialog.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="AlarmSummary.resx">
+      <DependentUpon>AlarmSummary.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BBMDEditor.resx">
+      <DependentUpon>BBMDEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CalendarEditor.resx">
+      <DependentUpon>CalendarEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CreateObject.resx">
+      <DependentUpon>CreateObject.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceCommunicationControlDialog.resx">
+      <DependentUpon>DeviceCommunicationControlDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ForeignRegistry.resx">
+      <DependentUpon>ForeignRegistry.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainDialog.resx">
+      <DependentUpon>MainDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NotificationEditor.resx">
+      <DependentUpon>NotificationEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProgressDialog.resx">
+      <DependentUpon>ProgressDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="ScheduleDisplay.resx">
+      <DependentUpon>ScheduleDisplay.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="T3000BacnetTool.resx">
+      <DependentUpon>T3000BacnetTool.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TrendLogDisplay.resx">
+      <DependentUpon>TrendLogDisplay.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SearchDialog.resx">
+      <DependentUpon>SearchDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SettingsDialog.resx">
+      <DependentUpon>SettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SourceAddressDialog.resx">
+      <DependentUpon>SourceAddressDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="YabeDeviceDescriptor.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <None Include="Resources\cross.png" />
+    <None Include="Resources\add.png" />
+    <None Include="Resources\note.png" />
+    <None Include="Resources\database.png" />
+    <None Include="Resources\magnifier.png" />
+    <None Include="Resources\eye.png" />
+    <None Include="Resources\clock.png" />
+    <None Include="Resources\information.png" />
+    <None Include="Resources\application_form.png" />
+    <None Include="Resources\transmit.png" />
+    <None Include="Resources\world.png" />
+    <None Include="Resources\chart_line.png" />
+    <None Include="Resources\calendar_view_week.png" />
+    <None Include="Resources\bell.png" />
+    <None Include="Resources\date.png" />
+    <Content Include="ReadSinglePropDescr.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <EmbeddedResource Include="ReadSinglePropDescrDefault.xml" />
+    <None Include="Resources\error.png" />
+    <None Include="Resources\book_open.png" />
+    <None Include="Resources\database_go1.png" />
+    <None Include="Resources\database_edit.png" />
+    <None Include="Resources\database_delete.png" />
+    <None Include="Resources\text_smallcaps.png" />
+    <None Include="Resources\find.png" />
+    <None Include="Resources\pencil_add.png" />
+    <None Include="Resources\pencil_delete.png" />
+    <None Include="Resources\monitor.png" />
+    <EmbeddedResource Include="Resources\EmbeddedDll\CalendarView.dll" />
+    <EmbeddedResource Include="Resources\EmbeddedDll\PacketDotNet.dll" />
+    <EmbeddedResource Include="Resources\EmbeddedDll\SharpPcap.dll" />
+    <EmbeddedResource Include="Resources\EmbeddedDll\ZedGraph.dll" />
+    <Content Include="Search.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 Client Profile %28x86 et x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

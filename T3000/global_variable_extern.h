@@ -1289,3 +1289,5 @@ extern CString bacnet_message_return_string;  //得到的输入字符串
 extern pidname_map product_map;
 extern bool offline_mode ; //全局离线模式判断;
 extern CString offline_prg_path;   //离线模式得prg 保存路径;
+
+extern bool custom_bacnet_register_listview;

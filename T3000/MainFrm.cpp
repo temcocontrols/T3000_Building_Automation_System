@@ -422,7 +422,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	 ON_UPDATE_COMMAND_UI(ID_MODE_OFFLINEMODE, &CMainFrame::OnUpdateModeOfflinemode)
 		ON_COMMAND(ID_TOOLS_PHCHART, &CMainFrame::OnToolsPhchart)
 		ON_COMMAND(ID_TOOLS_MODBUSTOBACNETROUTER, &CMainFrame::OnToolsModbustobacnetrouter)
-		ON_COMMAND(ID_TOOLS_PROGRAMEDITORTEST, &CMainFrame::OnToolsProgrameditortest)
+		ON_COMMAND(ID_CONTROL_MODBUSBACNETREGISTERLISTVIEW, &CMainFrame::OnControlModbus)
+		ON_COMMAND(ID_CONTROL_IO_NET_CONFIG, &CMainFrame::OnControlIoNetConfig)
 		END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -913,13 +914,14 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     }
 #endif
 
-    uiToolbarHotID =  IDB_BITMAP7 ;
-    uiToolbarColdID = IDB_BITMAP7 ;
-    uiMenuID =	IDB_BITMAP_BACNET_MENU_BIT ;//
+    uiToolbarHotID = IDB_BITMAP7;
+    uiToolbarColdID = IDB_BITMAP7;
+    uiMenuID = IDB_BITMAP_BACNET_MENU_BIT;//
 	
 
-
+	
     if (!m_testtoolbar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP | CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC,CRect(1,1,1,1),IDR_TOOLBAR_BACNET) ||
+		 
             !m_testtoolbar.LoadToolBar(IDR_TOOLBAR_BACNET,uiToolbarColdID, uiMenuID, FALSE /* Not locked */, IDB_BITMAP_TOOLBAR_DISABLE, 0, uiToolbarHotID))
 
     {
@@ -927,7 +929,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
         return -1;//fail to create
     }
 
-
+	//m_testtoolbar.RemoveAllButtons();
+	
     ///////////////////////////////////////////////////////////////////////////////////
 
     if (!m_wndWorkSpace.Create (_T("Building View"), this, CRect (0, 0, 300, 800),
@@ -935,7 +938,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
                                 WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN  | CBRS_LEFT ))//| CBRS_FLOAT_MULTI
     {
         TRACE0("Failed to create Workspace bar\n");
-
         return FALSE;// fail to create
     }
 
@@ -1535,7 +1537,7 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
               int const PM_CS_SM_DC = 37;
               int const PM_CS_RSM_AC = 38;
               int const PM_CS_RSM_DC = 39;*/
-
+			custom_bacnet_register_listview = false;
             CString Product_Custom = m_product.at(i).Custom;
             m_current_tree_node = m_product.at(i);
             if (Product_Custom.CompareNoCase(_T("1")) == 0/* ||
@@ -2498,6 +2500,7 @@ void CMainFrame::LoadProductFromDB()
 
 							tree_product m_product_temp;
 							m_product_temp.product_item  =hSubItem;
+
 
 							strSql=q.getValuebyName(L"Serial_ID");
 
@@ -7011,7 +7014,7 @@ void CMainFrame::OnToolRefreshLeftTreee()
 #include "ScanDlg.h"
 void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 {
-
+     
 	CppSQLite3DB SqliteDBT3000;
 	CppSQLite3DB SqliteDBBuilding;
 	CppSQLite3Table table;
@@ -7243,7 +7246,6 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             m_product.at(i).status_last_time[1] = false;
                             m_product.at(i).status_last_time[2] = false;
                             m_product.at(i).status = false;
-
                             //MessageBox(_T("Device is offline!"));
                             if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
                             {
@@ -7813,6 +7815,38 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 
 #if 1
+                        //ISPTool Config
+                        /*	CString filename;
+                        CString flashmethod;
+                        CString id;
+                        CString comport;
+                        CString BD;
+                        CString ip;
+                        CString ipport;
+
+
+                        CString subnote;
+                        CString subID;*/
+
+
+                        //CString ProductHexBinName,StrTemp;
+                        //CString StrBinHexPath,StrULRPath;
+                        //GetProductFPTAndLocalPath(product_Node.product_class_id,StrULRPath,ProductHexBinName);
+                        //StrBinHexPath = g_strExePth;
+                        //StrBinHexPath+=_T("firmware\\");
+
+                        //StrTemp.Format(_T("%s\\"),GetProductName(product_Node.product_class_id));
+                        //StrBinHexPath+=StrTemp;
+                        //StrBinHexPath+=ProductHexBinName;
+
+                        //HANDLE hFind;//
+                        //WIN32_FIND_DATA wfd;//
+                        //hFind = FindFirstFile(StrBinHexPath, &wfd);//
+                        //if ((hFind!=INVALID_HANDLE_VALUE)&&(!StrULRPath.IsEmpty()))//说明当前目录下无t3000.mdb
+                        //{
+                        //	filename=StrBinHexPath;
+                        //}
+
 
                         id.Format(_T("%d"),g_tstat_id);
                         comport.Format(_T("COM%d"),nComPort);
@@ -7861,7 +7895,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                         m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Device is Offline!"));
                         m_pDialogInfo->ShowWindow(SW_SHOW);
                     }
-
+//                     while(m_pDialogInfo->IsWindowVisible()){
+//                         Sleep(50);
+//                         continue;
+//                     }
                     if (pDlg !=NULL)
                     {
                         pDlg->ShowWindow(SW_HIDE);
@@ -7926,6 +7963,13 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             }
                         }
 
+                        //}
+// 						else
+// 						{
+// 							CString tempcs;
+// 							tempcs.Format(_T("The device serial number is %d,the database saved is %d \r\nPlease delete it and rescan."),nSerialNumber,nSelectSerialNumber);
+// 							MessageBox(tempcs);
+// 						}
                     }
                 }
             }
@@ -7947,7 +7991,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                         m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Device is offline,Please check the connection!"));
                         m_pDialogInfo->ShowWindow(SW_SHOW);
                     }
-
+//                     while(m_pDialogInfo->IsWindowVisible()){
+//                         Sleep(50);
+//                         continue;
+//                     }
                     if (pDlg !=NULL)
                     {
                         pDlg->ShowWindow(SW_HIDE);
@@ -7974,7 +8021,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(tempcs);
                             m_pDialogInfo->ShowWindow(SW_SHOW);
                         }
-
+//                         while(m_pDialogInfo->IsWindowVisible()){
+//                             Sleep(50);
+//                             continue;
+//                         }
                         if (pDlg !=NULL)
                         {
 							pDlg->ShowWindow(SW_HIDE);
@@ -7988,7 +8038,14 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     }
                     if(nSerialNumber>=0)
                     {
+//if(nSerialNumber==nSelectSerialNumber)
                         bOnLine=TRUE;
+// 						else
+// 						{
+// 							CString tempcs;
+// 							tempcs.Format(_T("The device serial number is %d,the database saved is %d \r\nPlease delete it and rescan."),nSerialNumber,nSelectSerialNumber);
+// 							MessageBox(tempcs);
+// 						}
                     }
                 }
             }
@@ -8712,14 +8769,7 @@ do_connect_success:
 		g_llRxCount = g_llRxCount + 4;
 		Sleep(1);
 		return;
-	do_conncet_failed:
-
-		//Fandu 2017/12/13 设备离线时 更新 数据库设备状态字段。因为有太多地方调用  重新加载数据库的函数，导致如果不更新状态显示不正常.
-		CString strUpdateSql;
-		strUpdateSql.Format(_T("update ALL_NODE set Online_Status = 0 where Serial_ID = %u and protocol = 1"), g_selected_serialnumber);
-		SqliteDBBuilding.execDML((UTF8MBSTR)strUpdateSql);
-	    SqliteDBBuilding.closedb();
-
+do_conncet_failed:
 		if(hretryThread == NULL)
 		{
 			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("T3000 can't connect to your device ,it will try again in 20 seconds."));
@@ -9379,30 +9429,6 @@ end_condition :
         }
 
     }
-
-	//Fandu 2017/12/13 新增批量处理在线状态，修改数据库状态字段.
-	CString strUpdateSql;
-	if (m_refresh_net_device_data.size() == 0)
-	{
-		strUpdateSql.Format(_T("update ALL_NODE set Online_Status	= 0 where protocol = 1"));
-		SqliteDBBuilding.execDML((UTF8MBSTR)strUpdateSql);
-	}
-	else
-	{
-		CString composite_serial;
-		for (int i = 0;i < m_refresh_net_device_data.size();i++)
-		{
-			CString temp1;
-			if (i != 0)
-				composite_serial = composite_serial + _T(",");
-			temp1.Format(_T("%u"), m_refresh_net_device_data.at(i).nSerial);
-			composite_serial = composite_serial + temp1;
-		}
-		strUpdateSql.Format(_T("update ALL_NODE set Online_Status = 0 where Serial_ID not in (%s) and protocol = 1"), composite_serial);
-		strUpdateSql.Format(_T("update ALL_NODE set Online_Status = 1 where Serial_ID in (%s) and protocol = 1"), composite_serial);
-		SqliteDBBuilding.execDML((UTF8MBSTR)strUpdateSql);
-	}
-
     SqliteDBBuilding.closedb();
     if(find_new_device)
         PostMessage(WM_MYMSG_REFRESHBUILDING,0,0);
@@ -9553,7 +9579,7 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
                 //SetPaneConnectionPrompt(_T("Online!"));
             }
             //SetPaneConnectionPrompt(_T("Online!"));
-				m_pTreeViewCrl->turn_item_image(tp.product_item, true);
+            m_pTreeViewCrl->turn_item_image(tp.product_item ,true);
 
         }
         else  // 替换offline的图片
@@ -9564,7 +9590,7 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
                 //SetPaneConnectionPrompt(_T("Offline!"));
             }
 			// if(g_selected_serialnumber != m_product.at(i).serial_number)
-				m_pTreeViewCrl->turn_item_image(tp.product_item, false);
+				 m_pTreeViewCrl->turn_item_image(tp.product_item ,false);
 			 //else if((g_selected_serialnumber == m_product.at(i).serial_number) && (tp.product_class_id	== PM_MINIPANEL))
 			 //{
 				// TRACE(_T("Select panel offline \n"));
@@ -12363,12 +12389,12 @@ void CMainFrame::OnPaint()
     // Do not call CFrameWndEx::OnPaint() for painting messages
 }
 
-
+#include "TemcoStandardBacnetToolDlg.h"
 void CMainFrame::OnDatabaseBacnettool()
 {
     //CBacnetAlarmWindow dlg;
     //dlg.DoModal();
-    CBacnetTool dlg;
+	CTemcoStandardBacnetToolDlg dlg;
     dlg.DoModal();
     
 }
@@ -15156,7 +15182,14 @@ BOOL CMainFrame::OnToolTipNotify(UINT id,NMHDR *Pnmhdr,LRESULT *pResult)
             {
                 pTTT->lpszText = _T("Buildings [Alt-B]\r\nDatabase of all buildings, connect to a different site or go offline to set up a new one");
             }
-
+			else if (pBtn->m_nID == ID_TOOLS_MODBUSTOBACNETROUTER)
+			{
+				pTTT->lpszText = _T("Subnetwork Devices [Alt-D]\r\nDevices which connect to this devices subnetwork(s)");
+			}
+			else if (pBtn->m_nID == ID_CONTROL_IO_NET_CONFIG)
+			{
+				pTTT->lpszText = _T("Bacnet IO Configuration");
+			}
             pTTT->hinst = AfxGetResourceHandle();
         }
     }
@@ -15793,9 +15826,30 @@ void CMainFrame::OnToolsModbustobacnetrouter()
 	dlg.DoModal();
 }
 
-#include"ProgramEditorTestDlg.h"
-void CMainFrame::OnToolsProgrameditortest()
+
+void CMainFrame::OnControlModbus()
 {
-	CProgramEditorTestDlg  dlg;
-		dlg.DoModal();
+	HideBacnetWindow();
+	custom_bacnet_register_listview = true;
+	SwitchToPruductType(DLG_DIALOG_CUSTOM_VIEW);
+
+}
+
+#include "BacnetIOConfig.h"
+void CMainFrame::OnControlIoNetConfig()
+{
+	if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 438)
+	{
+		MessageBox(_T("This feature need the newest firmware."));
+		return;
+	}
+
+
+	if (GetPrivateData_Blocking(g_bac_instance, READEXT_IO_T3000, 0, BAC_EXTIO_COUNT - 1, sizeof(Str_Extio_point)) < 0)
+	{
+		MessageBox(_T("Read data timeout"));
+		return;
+	}
+	CBacnetIOConfig IOdlg;
+	IOdlg.DoModal();
 }
