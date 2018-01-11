@@ -493,6 +493,9 @@ void CProductRegisterListView::Fresh(void)
 		{
 			GetDlgItem(IDC_READ_DEVICE)->SetWindowText(_T("Start Read"));
 		}
+
+		
+
 	}
     
 	m_combox_dataformat.ResetContent();
@@ -507,7 +510,7 @@ void CProductRegisterListView::Fresh(void)
 	{
 		m_combox_productname.AddString(iter->second);
 	}
-
+	
 	//GetProductName()
     LoadDataSheet();
     Initial_List();
