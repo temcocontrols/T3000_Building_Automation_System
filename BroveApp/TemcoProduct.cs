@@ -14,5 +14,6 @@ namespace BroveApp
         public string Price { get; set; }
         public string Weight { get; set; }
         public string ImagesLink { get; set; }
+        public string SKU { get; set; }
     }
 }

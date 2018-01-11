@@ -1,6 +1,6 @@
 ﻿namespace BroveApp
 {
-    partial class MainFrm
+    partial class Form1
     {
         /// <summary>
         /// Required designer variable.
@@ -42,6 +42,9 @@
             this.textBox_Price = new System.Windows.Forms.TextBox();
             this.textBox_Weight = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
+            this.button_UP = new System.Windows.Forms.Button();
+            this.button_Down = new System.Windows.Forms.Button();
+            this.Save = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_Image)).BeginInit();
@@ -53,7 +56,7 @@
             this.dataGridView1.Location = new System.Drawing.Point(0, 28);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowTemplate.Height = 23;
-            this.dataGridView1.Size = new System.Drawing.Size(651, 560);
+            this.dataGridView1.Size = new System.Drawing.Size(651, 534);
             this.dataGridView1.TabIndex = 0;
             this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick);
             // 
@@ -87,6 +90,7 @@
             this.pictureBox_Image.Location = new System.Drawing.Point(858, 28);
             this.pictureBox_Image.Name = "pictureBox_Image";
             this.pictureBox_Image.Size = new System.Drawing.Size(372, 271);
+            this.pictureBox_Image.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox_Image.TabIndex = 3;
             this.pictureBox_Image.TabStop = false;
             // 
@@ -168,11 +172,44 @@
             this.label5.TabIndex = 12;
             this.label5.Text = "Description";
             // 
-            // MainFrm
+            // button_UP
+            // 
+            this.button_UP.Location = new System.Drawing.Point(119, 568);
+            this.button_UP.Name = "button_UP";
+            this.button_UP.Size = new System.Drawing.Size(75, 23);
+            this.button_UP.TabIndex = 14;
+            this.button_UP.Text = "Up Page";
+            this.button_UP.UseVisualStyleBackColor = true;
+            this.button_UP.Click += new System.EventHandler(this.button_UP_Click);
+            // 
+            // button_Down
+            // 
+            this.button_Down.Location = new System.Drawing.Point(328, 568);
+            this.button_Down.Name = "button_Down";
+            this.button_Down.Size = new System.Drawing.Size(75, 23);
+            this.button_Down.TabIndex = 15;
+            this.button_Down.Text = "Down Page";
+            this.button_Down.UseVisualStyleBackColor = true;
+            this.button_Down.Click += new System.EventHandler(this.button_Down_Click);
+            // 
+            // Save
+            // 
+            this.Save.Location = new System.Drawing.Point(661, 226);
+            this.Save.Name = "Save";
+            this.Save.Size = new System.Drawing.Size(181, 43);
+            this.Save.TabIndex = 16;
+            this.Save.Text = "Save";
+            this.Save.UseVisualStyleBackColor = true;
+            this.Save.Click += new System.EventHandler(this.Save_Click);
+            // 
+            // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1258, 589);
+            this.Controls.Add(this.Save);
+            this.Controls.Add(this.button_Down);
+            this.Controls.Add(this.button_UP);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.textBox_Weight);
             this.Controls.Add(this.textBox_Price);
@@ -187,8 +224,9 @@
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
-            this.Name = "MainFrm";
+            this.Name = "Form1";
             this.Text = "BroProductsList";
+            this.SizeChanged += new System.EventHandler(this.Form1_SizeChanged);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
@@ -214,6 +252,9 @@
         private System.Windows.Forms.TextBox textBox_Price;
         private System.Windows.Forms.TextBox textBox_Weight;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Button button_UP;
+        private System.Windows.Forms.Button button_Down;
+        private System.Windows.Forms.Button Save;
     }
 }
 
