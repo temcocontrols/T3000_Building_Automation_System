@@ -12,17 +12,18 @@
 extern int pointtotext(char *buf,Point_Net *point);
 // CBacnetEditLabel dialog
 extern char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network, byte panel, int *netpresent);
-int GetInputLabel(int index,CString &ret_label);
-int GetInputFullLabel(int index,CString &ret_full_label);
+int GetInputLabel(int index, CString &ret_label, Point_Net * npoint = NULL);
+int GetInputFullLabel(int index, CString &ret_full_label, Point_Net * npoint = NULL);
+
 //int GetInputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Auto_M);
 int GetInputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Auto_M,int &digital_value);
-int GetOutputLabel(int index,CString &ret_label);
-int GetOutputFullLabel(int index,CString &ret_full_label);
+int GetOutputLabel(int index,CString &ret_label, Point_Net * npoint = NULL);
+int GetOutputFullLabel(int index,CString &ret_full_label, Point_Net * npoint = NULL);
 //int GetOutputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Auto_M);
 int GetOutputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Auto_M,int &digital_value);
 
-int GetVariableLabel(int index,CString &ret_label);
-int GetVariableFullLabel(int index,CString &ret_full_label);
+int GetVariableLabel(int index,CString &ret_label, Point_Net * npoint = NULL);
+int GetVariableFullLabel(int index,CString &ret_full_label, Point_Net * npoint = NULL);
 
 //int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Auto_M);
 int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Auto_M,int &digital_value);
@@ -753,17 +754,18 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 	MoveWindow(lpPoint.x,lpPoint.y,add_temprect.Width(),add_temprect.Height(),1);
 	GetDlgItem(IDC_EDIT_LABEL_VALUE)->SetFocus();
 
-	if((temp_info.nMain_Panel != Station_NUM)/* || (temp_info.nSub_Panel != Station_NUM)*/)
-	{
-		PostMessage(WM_CLOSE,NULL,NULL);
-		return ;
-	}
+    //Fandu 2018 01 12 在 panel2 界面 group screen 里 访问 panel 3的  ，所以屏蔽掉.
+	//if((temp_info.nMain_Panel != Station_NUM)/* || (temp_info.nSub_Panel != Station_NUM)*/)
+	//{
+	//	PostMessage(WM_CLOSE,NULL,NULL);
+	//	return ;
+	//}
 
 
 	if(temp_info.nSub_Panel != Station_NUM)
 	{
 		Point_Net temp_point;
-		temp_point.panel = Station_NUM;
+		temp_point.panel = temp_info.nMain_Panel;
 		temp_point.sub_panel = temp_info.nSub_Panel;
 		temp_point.point_type = temp_info.nPoint_type;
 		temp_point.number = temp_info.nPoint_number;

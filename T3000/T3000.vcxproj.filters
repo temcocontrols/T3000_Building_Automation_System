@@ -690,6 +690,9 @@
     <ClCompile Include="TemcoStandardBacnetToolDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ParameterExtDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -1033,9 +1036,6 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="ClassDiagram.cd" />
-    <None Include="res\bacnet_menu_bit_TEST.bmp">
-      <Filter>Resource Files</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">
@@ -1801,6 +1801,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TemcoStandardBacnetToolDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ParameterExtDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

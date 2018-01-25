@@ -3,7 +3,7 @@
 #include "DownloadSocket.h"
 #include "afxwin.h"
 // Dowmloadfile dialog
-
+#include "CM5/CStatic/staticex.h"
 
 
 
@@ -39,11 +39,15 @@ public:
 	afx_msg void OnBnClickedButton1();
 	afx_msg void OnBnClickedButtonFileDownloadOnly();
 	void Start_Download();
+    void Start_Download_Ftp();
 	unsigned char m_download_product_type;
 	afx_msg void OnBnClickedButtonUpdateT3000();
 	void AutoFlashFirmware();
 	void CreateProductFolderMap();
 	CString GetProdcutFtpPath(int nproductid);
+    static DWORD WINAPI  FtpDownloadThread(LPVOID lpVoid);
+    CStaticEx m_static_persent;
+    CString download_file_name;
 };
 
 

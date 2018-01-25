@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "ProductRegisterListView.h"
- #include "../SQLiteDriver/CppSQLite3.h"
+#include "../SQLiteDriver/CppSQLite3.h"
 #include <bitset>
 #include "WriteRegistersValueDlg.h"
 
@@ -32,103 +32,103 @@
 #define _NUM_Update_On_Reconnect 21
 #define _NUM_Modbus_DESCRIPTION 22
 
-   CustomProductTable_T g_current_Node;
+CustomProductTable_T g_current_Node;
 // CProductRegisterListView
-  UINT _Background_Read(LPVOID pParam){
-    CProductRegisterListView* Parent=(CProductRegisterListView*)(pParam);
-    while(TRUE){
-        if (!Parent->IsWindowVisible())
-        {
-           g_bPauseMultiRead = FALSE; 
-           return 0 ;
-        }
-        if (!is_connect())
-        {
-           Sleep(1000);
-           continue;
-        }
-        if (!Parent->m_isReading)
-        {
-            Sleep(1000);
-            continue;
-        }
-       int ModbusID=Parent->m_current_tree_node.product_id;
-            
-        for (int i =0;i<(int)Parent->m_register_data_sheet.size();i++)
-        {
-              PostMessage(g_hwnd_now,WM_REFRESH_BAC_INPUT_LIST,2U,i);
-             int Count_Number = Parent->m_register_data_sheet.at(i).Counts_Number;
-             unsigned short Start_Address = Parent->m_register_data_sheet.at(i).Reg_ID;
-			 unsigned short function_code = Parent->m_register_data_sheet.at(i).function_code;
-             if (Count_Number > 0)
-             {            
-              unsigned short  DataBuffer[100];
-            
-                 while (!Parent->m_isReading)
-                 {
-                     Sleep(500);
-                     continue;
-                 }
-                 Sleep(Parent->m_UINT_delay_items);
-                 // Read_Multi(ModbusID,DataBuffer,Start_Address,Count_Number)
+UINT _Background_Read(LPVOID pParam) {
+	CProductRegisterListView* Parent = (CProductRegisterListView*)(pParam);
+	while (TRUE) {
+		if (!Parent->IsWindowVisible())
+		{
+			g_bPauseMultiRead = FALSE;
+			return 0;
+		}
+		if (!is_connect())
+		{
+			Sleep(1000);
+			continue;
+		}
+		if (!Parent->m_isReading)
+		{
+			Sleep(1000);
+			continue;
+		}
+		int ModbusID = Parent->m_current_tree_node.product_id;
 
-                #if 1
-				 unsigned char rev_back_rawData[300], send_data[100];
-				 int Send_length;
-				 int Rev_length;
+		for (int i = 0; i<(int)Parent->m_register_data_sheet.size(); i++)
+		{
+			PostMessage(g_hwnd_now, WM_REFRESH_BAC_INPUT_LIST, 2U, i);
+			int Count_Number = Parent->m_register_data_sheet.at(i).Counts_Number;
+			unsigned short Start_Address = Parent->m_register_data_sheet.at(i).Reg_ID;
+			unsigned short function_code = Parent->m_register_data_sheet.at(i).function_code;
+			if (Count_Number > 0)
+			{
+				unsigned short  DataBuffer[100];
+
+				while (!Parent->m_isReading)
+				{
+					Sleep(500);
+					continue;
+				}
+				Sleep(Parent->m_UINT_delay_items);
+				// Read_Multi(ModbusID,DataBuffer,Start_Address,Count_Number)
+
+#if 1
+				unsigned char rev_back_rawData[300], send_data[100];
+				int Send_length;
+				int Rev_length;
 				// int ret = Modbus_Standard_Read(ModbusID,DataBuffer,  function_code, Start_Address, Count_Number);
-				 int ret = Modbus_Standard_Read(ModbusID, &DataBuffer[0], function_code, Start_Address, Count_Number, &send_data[0], &rev_back_rawData[0], &Send_length, &Rev_length);
+				int ret = Modbus_Standard_Read(ModbusID, &DataBuffer[0], function_code, Start_Address, Count_Number, &send_data[0], &rev_back_rawData[0], &Send_length, &Rev_length);
 
 				if (ret>0)
-                {
-                    /*
-                    说明：这里是把读到的值转化成字符串，值与值之间用逗号隔开
-                    然后把值赋值给结构体中的Value，在发出消息，把值显示出来
-                    */ 
+				{
+					/*
+					说明：这里是把读到的值转化成字符串，值与值之间用逗号隔开
+					然后把值赋值给结构体中的Value，在发出消息，把值显示出来
+					*/
 					/* 16 Bit Unsigned Integer
-					 16 Bit Signed Integer
-					 32 Bit Unsigned Integer HI_LO
-					 32 Bit Signed Integer HI_LO
-					 32 Bit Unsigned Integer LO_HI
-					 32 Bit Signed Integer LO_HI
-					 Floating Point HI_LO
-					 Floating Point LO_HI
-					 _16 Bit   Bit Pick
-					 _32 Bit   Bit Pick HI_LO
-					 _32 Bit   Bit Pick LO_HI
-					 Bit*/
+					16 Bit Signed Integer
+					32 Bit Unsigned Integer HI_LO
+					32 Bit Signed Integer HI_LO
+					32 Bit Unsigned Integer LO_HI
+					32 Bit Signed Integer LO_HI
+					Floating Point HI_LO
+					Floating Point LO_HI
+					_16 Bit   Bit Pick
+					_32 Bit   Bit Pick HI_LO
+					_32 Bit   Bit Pick LO_HI
+					Bit*/
 
 
-                    CString strValue = _T("");
-                    CString strTemp;
-                    if (Parent->m_register_data_sheet.at(i).DataFormat.CompareNoCase(_T("16 Bit Signed Integer"))==0)
-                    { 
-						
-							for (int len=0;len<Count_Number;len++)
+					CString strValue = _T("");
+					CString strTemp;
+					if (Parent->m_register_data_sheet.at(i).DataFormat.CompareNoCase(_T("16 Bit Signed Integer")) == 0)
+					{
+
+						for (int len = 0; len<Count_Number; len++)
+						{
+							strTemp.Format(_T("%d"), (short)DataBuffer[len]);
+							strValue += strTemp;
+							if (len + 1 != Count_Number)
 							{
-								strTemp.Format(_T("%d"),(short)DataBuffer[len]);
-								strValue+=strTemp;
-								if (len+1!=Count_Number)
-								{
-									strValue+=_T(",");
-								} 
+								strValue += _T(",");
 							}
-                    }
-                    else if (Parent->m_register_data_sheet.at(i).DataFormat.CompareNoCase(_T("16 Bit Unsigned Integer"))==0)
-                    { 
-							for (int len=0;len<Count_Number;len++)
+						}
+					}
+					else if (Parent->m_register_data_sheet.at(i).DataFormat.CompareNoCase(_T("16 Bit Unsigned Integer")) == 0)
+					{
+						for (int len = 0; len<Count_Number; len++)
+						{
+							strTemp.Format(_T("%d"), DataBuffer[len]);
+							strValue += strTemp;
+							if (len + 1 != Count_Number)
 							{
-								strTemp.Format(_T("%d"),DataBuffer[len]);
-								strValue+=strTemp;
-								if (len+1!=Count_Number)
-								{
-									strValue+=_T(",");
-								} 
+								strValue += _T(",");
 							}
-                    }
-                    else if (Parent->m_register_data_sheet.at(i).DataFormat.CompareNoCase(_T("32 Bit Unsigned Integer HI_LO"))==0)
-                    { 
-                        
+						}
+					}
+					else if (Parent->m_register_data_sheet.at(i).DataFormat.CompareNoCase(_T("32 Bit Unsigned Integer HI_LO")) == 0)
+					{
+
 						for (int len = 0; len < Count_Number; len++)
 						{
 							strTemp.Format(_T("%d"), DataBuffer[len]);
@@ -138,9 +138,9 @@
 								strValue += _T(",");
 							}
 						}
-                    } 
-                    else if (Parent->m_register_data_sheet.at(i).DataFormat.CompareNoCase(_T("32 Bit Signed Integer HI_LO"))==0)
-                    { 
+					}
+					else if (Parent->m_register_data_sheet.at(i).DataFormat.CompareNoCase(_T("32 Bit Signed Integer HI_LO")) == 0)
+					{
 						for (int len = 0; len < Count_Number; len++)
 						{
 							strTemp.Format(_T("%d"), DataBuffer[len]);
@@ -150,9 +150,9 @@
 								strValue += _T(",");
 							}
 						}
-                    } 
-                    else if (Parent->m_register_data_sheet.at(i).DataFormat.CompareNoCase(_T("32 Bit Unsigned Integer LO_HI"))==0)
-                    { 
+					}
+					else if (Parent->m_register_data_sheet.at(i).DataFormat.CompareNoCase(_T("32 Bit Unsigned Integer LO_HI")) == 0)
+					{
 						for (int len = 0; len < Count_Number; len++)
 						{
 							strTemp.Format(_T("%d"), DataBuffer[len]);
@@ -162,7 +162,7 @@
 								strValue += _T(",");
 							}
 						}
-                    }
+					}
 					else if (Parent->m_register_data_sheet.at(i).DataFormat.CompareNoCase(_T("32 Bit Signed Integer LO_HI")) == 0)
 					{
 						for (int len = 0; len < Count_Number; len++)
@@ -248,7 +248,7 @@
 						}
 					}
 					else
-                    {
+					{
 						for (int len = 0; len < Count_Number; len++)
 						{
 							strTemp.Format(_T("%d"), DataBuffer[len]);
@@ -258,42 +258,42 @@
 								strValue += _T(",");
 							}
 						}
-                    }
-                    Parent->m_register_data_sheet.at(i).Value = strValue;
-                    PostMessage(g_hwnd_now,WM_REFRESH_BAC_INPUT_LIST,1U,i);  
-                }
-                #endif
-              
-             }
-             
-        }
-      
-        Sleep(Parent->m_UINT_delay_loop);
-    }
-    
-  }
+					}
+					Parent->m_register_data_sheet.at(i).Value = strValue;
+					PostMessage(g_hwnd_now, WM_REFRESH_BAC_INPUT_LIST, 1U, i);
+				}
+#endif
+
+			}
+
+		}
+
+		Sleep(Parent->m_UINT_delay_loop);
+	}
+
+}
 IMPLEMENT_DYNCREATE(CProductRegisterListView, CFormView)
 
 CProductRegisterListView::CProductRegisterListView()
 	: CFormView(CProductRegisterListView::IDD)
-    , m_UINT_delay_loop(2000)
-    , m_UINT_delay_items(500)
+	, m_UINT_delay_loop(2000)
+	, m_UINT_delay_items(500)
 {
-   
-    m_BackgroundTreadHandle = NULL;
- 
-    m_short_counts = 1;
-    m_string_paratypes = _T("");
-    m_sort_type= 0;//默认排序
+
+	m_BackgroundTreadHandle = NULL;
+
+	m_short_counts = 1;
+	m_string_paratypes = _T("");
+	m_sort_type = 0;//默认排序
 	m_value_format = 0;
-  
+
 	m_vecDataRW.clear();
 	m_vecDataRW.push_back(L"R_Only");
 	m_vecDataRW.push_back(L"R_W");
 	m_vecYesNo.clear();
 	m_vecYesNo.push_back(L"NO");
 	m_vecYesNo.push_back(L"YES");
-   
+
 
 	m_vecVariableType.push_back(L"Read_Coils");
 	m_vecVariableType.push_back(L"Read_Discrete_Inputs");
@@ -360,19 +360,19 @@ void CProductRegisterListView::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CProductRegisterListView, CFormView)
-    ON_WM_SIZE()
-    ON_MESSAGE(WM_REFRESH_BAC_INPUT_LIST,Fresh_Input_List)
-    ON_MESSAGE(WM_LIST_ITEM_CHANGED,Change_Input_Item)
-    ON_NOTIFY(NM_CLICK, IDC_LIST_CUSTOM_LIST, &CProductRegisterListView::OnNMClickList_output)
-    ON_WM_DESTROY()
-    ON_BN_CLICKED(IDC_READ_DEVICE, &CProductRegisterListView::OnBnClickedReadDevice)
-    ON_BN_CLICKED(IDC_BUTTON4, &CProductRegisterListView::OnBnClickedButton4)
-    ON_BN_CLICKED(IDC_DOWNBUTTON, &CProductRegisterListView::OnBnClickedDownbutton)
-    ON_BN_CLICKED(IDC_UPBUTTON, &CProductRegisterListView::OnBnClickedUpbutton)
-    ON_WM_TIMER()
-    ON_EN_CHANGE(IDC_EDIT_DELAY_LOOP, &CProductRegisterListView::OnEnChangeEditDelayLoop)
-    ON_EN_CHANGE(IDC_EDIT_DELAY_ITEMS, &CProductRegisterListView::OnEnChangeEditDelayItems)
-	 
+	ON_WM_SIZE()
+	ON_MESSAGE(WM_REFRESH_BAC_INPUT_LIST, Fresh_Input_List)
+	ON_MESSAGE(WM_LIST_ITEM_CHANGED, Change_Input_Item)
+	ON_NOTIFY(NM_CLICK, IDC_LIST_CUSTOM_LIST, &CProductRegisterListView::OnNMClickList_output)
+	ON_WM_DESTROY()
+	ON_BN_CLICKED(IDC_READ_DEVICE, &CProductRegisterListView::OnBnClickedReadDevice)
+	ON_BN_CLICKED(IDC_BUTTON4, &CProductRegisterListView::OnBnClickedButton4)
+	ON_BN_CLICKED(IDC_DOWNBUTTON, &CProductRegisterListView::OnBnClickedDownbutton)
+	ON_BN_CLICKED(IDC_UPBUTTON, &CProductRegisterListView::OnBnClickedUpbutton)
+	ON_WM_TIMER()
+	ON_EN_CHANGE(IDC_EDIT_DELAY_LOOP, &CProductRegisterListView::OnEnChangeEditDelayLoop)
+	ON_EN_CHANGE(IDC_EDIT_DELAY_ITEMS, &CProductRegisterListView::OnEnChangeEditDelayItems)
+
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST_CUSTOM_LIST, &CProductRegisterListView::OnNMDblclkListCustomList)
 	ON_CBN_SELCHANGE(IDC_COMBO_PRODUCT_LIST, &CProductRegisterListView::OnCbnSelchangeComboProductList)
 	ON_BN_CLICKED(IDC_BUTTON_EXPORTEXCELFILE, &CProductRegisterListView::OnBnClickedButtonExportexcelfile)
@@ -395,37 +395,37 @@ void CProductRegisterListView::Dump(CDumpContext& dc) const
 #endif
 #endif //_DEBUG
 
- 
+
 void CProductRegisterListView::OnSize(UINT nType, int cx, int cy)
 {
-    CFormView::OnSize(nType, cx, cy);
-    if (nType==SIZE_RESTORED)
-    {
+	CFormView::OnSize(nType, cx, cy);
+	if (nType == SIZE_RESTORED)
+	{
 
-        CRect ViewRect;
-        GetClientRect(&ViewRect);
-        //TRACE(_T(" View:T=%d,B=%d,L=%d,R=%d\n"),ViewRect.top,ViewRect.bottom,ViewRect.left,ViewRect.right);
-        // m_MsDataGrid.SetWindowPos(this,ViewRect.top,ViewRect.left,ViewRect.Width(),ViewRect.Height(),SWP_SHOWWINDOW|SWP_NOZORDER);
-       if (custom_bacnet_register_listview)
-       {
-		   if (m_register_list.GetSafeHwnd())
-		   {
-			   // m_register_list.MoveWindow(CRect(0,50,ViewRect.Width(),ViewRect.Height()),TRUE);
-			   m_register_list.MoveWindow(CRect(0, 30, ViewRect.Width(), ViewRect.Height()), TRUE);
-		   }
-       } 
-       else
-       {
-		   if (m_register_list.GetSafeHwnd())
-		   {
-			   // m_register_list.MoveWindow(CRect(0,50,ViewRect.Width(),ViewRect.Height()),TRUE);
-			   m_register_list.MoveWindow(CRect(0, 0, ViewRect.Width(), ViewRect.Height()), TRUE);
-		   }
-       }
-		
+		CRect ViewRect;
+		GetClientRect(&ViewRect);
+		//TRACE(_T(" View:T=%d,B=%d,L=%d,R=%d\n"),ViewRect.top,ViewRect.bottom,ViewRect.left,ViewRect.right);
+		// m_MsDataGrid.SetWindowPos(this,ViewRect.top,ViewRect.left,ViewRect.Width(),ViewRect.Height(),SWP_SHOWWINDOW|SWP_NOZORDER);
+		if (custom_bacnet_register_listview)
+		{
+			if (m_register_list.GetSafeHwnd())
+			{
+				// m_register_list.MoveWindow(CRect(0,50,ViewRect.Width(),ViewRect.Height()),TRUE);
+				m_register_list.MoveWindow(CRect(0, 30, ViewRect.Width(), ViewRect.Height()), TRUE);
+			}
+		}
+		else
+		{
+			if (m_register_list.GetSafeHwnd())
+			{
+				// m_register_list.MoveWindow(CRect(0,50,ViewRect.Width(),ViewRect.Height()),TRUE);
+				m_register_list.MoveWindow(CRect(0, 0, ViewRect.Width(), ViewRect.Height()), TRUE);
+			}
+		}
 
-    }
-    
+
+	}
+
 }
 
 void CProductRegisterListView::SetStart(BOOL Start)
@@ -435,10 +435,10 @@ void CProductRegisterListView::SetStart(BOOL Start)
 void CProductRegisterListView::Fresh(void)
 {
 	//Import_CustomProductTable();
-    close_com();
-    g_bPauseMultiRead = TRUE;
-    m_upButton.SetImage(IDB_UPBMP);
-    m_downButton.SetImage(IDB_DOWNBMP);
+	close_com();
+	g_bPauseMultiRead = TRUE;
+	m_upButton.SetImage(IDB_UPBMP);
+	m_downButton.SetImage(IDB_DOWNBMP);
 	CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
 	if (!custom_bacnet_register_listview)
 	{
@@ -452,9 +452,33 @@ void CProductRegisterListView::Fresh(void)
 		GetDlgItem(IDC_STATIC_PRODUCTNAME)->ShowWindow(TRUE);
 		GetDlgItem(IDC_COMBO_PRODUCT_LIST)->ShowWindow(TRUE);
 	}
-	
+	GetDlgItem(IDC_READ_DEVICE)->ShowWindow(FALSE);
+	GetDlgItem(IDC_STATIC_DELAYBETWEENLOOPS)->ShowWindow(FALSE);
+	GetDlgItem(IDC_EDIT_DELAY_LOOP)->ShowWindow(FALSE);
+	GetDlgItem(IDC_STATIC_DELAY_BETWEENITEMS)->ShowWindow(FALSE);
+	GetDlgItem(IDC_EDIT_DELAY_ITEMS)->ShowWindow(FALSE);
+
+	GetDlgItem(IDC_STATIC_DEFAULT_PSETTING)->ShowWindow(FALSE);
+	GetDlgItem(IDC_STATIC_SORT)->ShowWindow(FALSE);
+	GetDlgItem(IDC_STATIC_ASC)->ShowWindow(FALSE);
+	GetDlgItem(IDC_STATIC_DESC)->ShowWindow(FALSE);
+	GetDlgItem(IDC_BUTTON4)->ShowWindow(FALSE);
+
+
+	GetDlgItem(IDC_UPBUTTON)->ShowWindow(FALSE);
+	GetDlgItem(IDC_DOWNBUTTON)->ShowWindow(FALSE);
+
+	GetDlgItem(IDC_STATIC_COUNT_NUMBER)->ShowWindow(FALSE);
+	GetDlgItem(IDC_EDIT_COUNTS)->ShowWindow(FALSE);
+	GetDlgItem(IDC_STATIC_PROPERTY)->ShowWindow(FALSE);
+	GetDlgItem(IDC_STATIC_DATAFORMAT)->ShowWindow(FALSE);
+
+	GetDlgItem(IDC_COMBO_PROPERTY)->ShowWindow(FALSE);
+	GetDlgItem(IDC_COMBO_DATAFORMAT)->ShowWindow(FALSE);
+	GetDlgItem(IDC_BUTTON_EXPORTEXCELFILE)->ShowWindow(FALSE);
 	if (offline_mode)
 	{
+		GetDlgItem(IDC_BUTTON_EXPORTEXCELFILE)->ShowWindow(TRUE);
 		GetDlgItem(IDC_READ_DEVICE)->ShowWindow(FALSE);
 		GetDlgItem(IDC_STATIC_DELAYBETWEENLOOPS)->ShowWindow(FALSE);
 		GetDlgItem(IDC_EDIT_DELAY_LOOP)->ShowWindow(FALSE);
@@ -478,10 +502,10 @@ void CProductRegisterListView::Fresh(void)
 
 		GetDlgItem(IDC_COMBO_PROPERTY)->ShowWindow(FALSE);
 		GetDlgItem(IDC_COMBO_DATAFORMAT)->ShowWindow(FALSE);
-	} 
+	}
 	else
 	{
-		
+
 		/* m_isReading=*/
 		pFrame->ConnectDevice(m_current_tree_node);
 		m_isReading = TRUE;
@@ -493,38 +517,35 @@ void CProductRegisterListView::Fresh(void)
 		{
 			GetDlgItem(IDC_READ_DEVICE)->SetWindowText(_T("Start Read"));
 		}
-
-		
-
 	}
-    
+
 	m_combox_dataformat.ResetContent();
-	for (int i=0;i<m_vecDataFormat.size();i++)
+	for (int i = 0; i<m_vecDataFormat.size(); i++)
 	{
 		m_combox_dataformat.AddString(m_vecDataFormat[i]);
 	}
 	m_combox_dataformat.SetCurSel(0);
 
-	 
+
 	for (pidname_map::iterator iter = product_map.begin(); iter != product_map.end(); iter++)
 	{
 		m_combox_productname.AddString(iter->second);
 	}
-	
+
 	//GetProductName()
-    LoadDataSheet();
-    Initial_List();
-     
-	if ((!offline_mode)&&(!custom_bacnet_register_listview))
+	LoadDataSheet();
+	Initial_List();
+
+	if ((!offline_mode) && (!custom_bacnet_register_listview))
 	{
-		if (m_BackgroundTreadHandle)
+		/*if (m_BackgroundTreadHandle)
 		{
 			BOOL bRet = TerminateThread(m_BackgroundTreadHandle->m_hThread, 0);
 			m_BackgroundTreadHandle = NULL;
 		}
-		m_BackgroundTreadHandle = AfxBeginThread(_Background_Read, this);
+		m_BackgroundTreadHandle = AfxBeginThread(_Background_Read, this);*/
 	}
-  
+
 }
 
 //#define _NUM_POLLYESNO 0
@@ -553,19 +574,19 @@ void CProductRegisterListView::Fresh(void)
 
 void CProductRegisterListView::Initial_List(void)
 {
-    g_hwnd_now =  this->m_hWnd;
-    CString strTemp;
-    m_register_list.ShowWindow(SW_HIDE);
-    m_register_list.DeleteAllItems();
-    while(m_register_list.DeleteColumn(0));
-    m_register_list.ModifyStyle(0,LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
-    m_register_list.SetExtendedStyle(m_register_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));
-	m_register_list.InsertColumn(_NUM_ITEM, _T("Item"), 230, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_register_list.InsertColumn(_NUM_POLLYESNO, _T("Poll Y/N"), 230, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	g_hwnd_now = this->m_hWnd;
+	CString strTemp;
+	m_register_list.ShowWindow(SW_HIDE);
+	m_register_list.DeleteAllItems();
+	while (m_register_list.DeleteColumn(0));
+	m_register_list.ModifyStyle(0, LVS_SINGLESEL | LVS_REPORT | LVS_SHOWSELALWAYS);
+	m_register_list.SetExtendedStyle(m_register_list.GetExtendedStyle() | LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));
+	m_register_list.InsertColumn(_NUM_ITEM, _T("Item"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_register_list.InsertColumn(_NUM_POLLYESNO, _T("Poll Y/N"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_register_list.InsertColumn(_NUM_NAME, _T("Bacnet Object Name"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_register_list.InsertColumn(_NUM_FUNCTION, _T("Modbus Variable Type"), 230, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-    m_register_list.InsertColumn(_NUM_MODBUSADDRESS, _T("Modbus Address"), 180, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
-    m_register_list.InsertColumn(_NUM_LENGTH, _T("Length"), 120, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_register_list.InsertColumn(_NUM_FUNCTION, _T("Modbus Variable Type"), 120, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_register_list.InsertColumn(_NUM_MODBUSADDRESS, _T("Modbus Address"), 120, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
+	m_register_list.InsertColumn(_NUM_LENGTH, _T("Length"), 120, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_register_list.InsertColumn(_NUM_VALUE, _T("Value"), 90, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_register_list.InsertColumn(_NUM_DATAFORMAT, _T("Data Format"), 90, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_register_list.InsertColumn(_NUM_BIT, _T("Bit #"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -583,24 +604,24 @@ void CProductRegisterListView::Initial_List(void)
 	m_register_list.InsertColumn(_NUM_Grouping_Y_N, _T("Grouping YES / NO"), 200, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_register_list.InsertColumn(_NUM_Update_On_Reconnect, _T("Update On Reconnect"), 200, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_register_list.InsertColumn(_NUM_Modbus_DESCRIPTION, _T("Register Description"), 200, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	
+
 	ShowDataInList();
 }
 void CProductRegisterListView::ShowDataInList()
 {
-    CString strTemp;
-	for (int i = 0;i<(int)m_register_data_sheet.size();i++)
+	CString strTemp;
+	for (int i = 0; i<(int)m_register_data_sheet.size(); i++)
 	{
 		strTemp.Format(_T("%d"), i + 1);
 		m_register_list.InsertItem(i, strTemp);
 		m_register_list.SetItemText(i, _NUM_POLLYESNO, m_register_data_sheet.at(i).Poll_YES_NO);
-		
+
 
 		m_register_list.SetItemText(i, _NUM_NAME, m_register_data_sheet.at(i).Bacnet_Object_Name);
-		
+
 		strTemp.Format(_T("%s"), GetFunctionName(m_register_data_sheet.at(i).function_code));
 		m_register_list.SetItemText(i, _NUM_FUNCTION, strTemp);
-	
+
 
 		strTemp.Format(_T("%d"), m_register_data_sheet.at(i).Reg_ID);
 		m_register_list.SetItemText(i, _NUM_MODBUSADDRESS, strTemp);
@@ -608,7 +629,7 @@ void CProductRegisterListView::ShowDataInList()
 		m_register_list.SetItemText(i, _NUM_LENGTH, strTemp);
 
 		m_register_list.SetItemText(i, _NUM_DATAFORMAT, m_register_data_sheet.at(i).DataFormat);
-		
+
 		strTemp.Format(_T("%s"), m_register_data_sheet.at(i).Bit_1);
 		m_register_list.SetItemText(i, _NUM_BIT, strTemp);
 		strTemp.Format(_T("%s"), m_register_data_sheet.at(i).Low_Actual);
@@ -631,35 +652,35 @@ void CProductRegisterListView::ShowDataInList()
 		m_register_list.SetItemText(i, _NUM_COV_Increment, strTemp);
 		strTemp.Format(_T("%s"), m_register_data_sheet.at(i).Unit_Group);
 		m_register_list.SetItemText(i, _NUM_Unit_Group, strTemp);
-		
+
 
 		strTemp.Format(_T("%s"), m_register_data_sheet.at(i).Unit_Value);
 		m_register_list.SetItemText(i, _NUM_Unit_Value, strTemp);
 		strTemp.Format(_T("%s"), m_register_data_sheet.at(i).Grouping_YES_NO);
 		m_register_list.SetItemText(i, _NUM_Grouping_Y_N, strTemp);
-		
+
 
 		strTemp.Format(_T("%s"), m_register_data_sheet.at(i).Update_On_Reconnect);
 		m_register_list.SetItemText(i, _NUM_Update_On_Reconnect, strTemp);
-		
+
 
 		strTemp.Format(_T("%s"), m_register_data_sheet.at(i).Reg_Description);
 		m_register_list.SetItemText(i, _NUM_Modbus_DESCRIPTION, strTemp);
-		 
+
 	}
 
 	m_register_list.ShowWindow(SW_SHOW);
 }
 void CProductRegisterListView::OnInitialUpdate()
 {
-    CFormView::OnInitialUpdate();  
+	CFormView::OnInitialUpdate();
 }
 void CProductRegisterListView::Import_CustomProductTable()
 {
 	CString StrSql;
 	CustomProductTable_T Struc_Temp;
 	CppSQLite3DB SqliteDBT3000;
-	CppSQLite3Query q,q1;
+	CppSQLite3Query q, q1;
 	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 
 
@@ -667,247 +688,247 @@ void CProductRegisterListView::Import_CustomProductTable()
 	q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
 	while (!q.eof())
 	{
-		     CString TableName = q.getValuebyName(L"TableName");
-			 
-			 if (TableName.IsEmpty())
-			 {
-				 q.nextRow();
-				 continue;
-			 }
-		     int modelid = q.getIntField("ProductType");
-			 CString RegName = q.getValuebyName(L"Col_RegName");
-			 CString RegID = q.getValuebyName(L"Col_RegAddress");
-			 if (modelid !=21 )
-			 {
-				 q.nextRow();
-				 continue;
-			 }
-			/*if (modelid>=1&&modelid<=19)
+		CString TableName = q.getValuebyName(L"TableName");
+
+		if (TableName.IsEmpty())
+		{
+			q.nextRow();
+			continue;
+		}
+		int modelid = q.getIntField("ProductType");
+		CString RegName = q.getValuebyName(L"Col_RegName");
+		CString RegID = q.getValuebyName(L"Col_RegAddress");
+		if (modelid != 21)
+		{
+			q.nextRow();
+			continue;
+		}
+		/*if (modelid>=1&&modelid<=19)
+		{
+		StrSql.Format(_T("Select %s,%s, From %s "), RegName, RegID, TableName);
+		}
+		else
+		{*/
+		StrSql.Format(_T("Select %s,%s From %s "), RegName, RegID, TableName);
+
+		/*}*/
+
+
+		q1 = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
+		while (!q1.eof())
+		{
+			CString ModbusName = q1.getValuebyName(RegName);
+			CString ModbusID = q1.getValuebyName(RegID);
+			CString comments;
+			if (ModbusName.CompareNoCase(L"RESERVED") == 0 || ModbusName.IsEmpty())
 			{
-				StrSql.Format(_T("Select %s,%s, From %s "), RegName, RegID, TableName);
-			} 
-			else
-			{*/
-				StrSql.Format(_T("Select %s,%s From %s "), RegName, RegID, TableName);
-
-			/*}*/
-			 
-			 
-			 q1 = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
-			 while (!q1.eof())
-			 {
-				 CString ModbusName = q1.getValuebyName(RegName);
-				 CString ModbusID = q1.getValuebyName(RegID);
-				 CString comments;
-				  if (ModbusName.CompareNoCase(L"RESERVED")==0||ModbusName.IsEmpty())
-				  {
-					  q1.nextRow();
-					  continue;
-				  }
-			   
-
-				StrSql.Format(_T("Insert Into CustomProductTable(ModelNo,Para_Type,Reg_ID,SN) Values (%d,'%s',%d,'%s') ")
-					, modelid
-					, ModbusName
-					, _wtoi(ModbusID)
-					, GetGUID()
-				);
-
-			    TRACE(StrSql);
-				TRACE(L"\n");
-			    
-				SqliteDBT3000.execDML((UTF8MBSTR)StrSql);
-				 
 				q1.nextRow();
-			 }
-			 q1.finalize();
-			 break;
-			 q.nextRow();
+				continue;
+			}
+
+
+			StrSql.Format(_T("Insert Into CustomProductTable(ModelNo,Para_Type,Reg_ID,SN) Values (%d,'%s',%d,'%s') ")
+				, modelid
+				, ModbusName
+				, _wtoi(ModbusID)
+				, GetGUID()
+			);
+
+			TRACE(StrSql);
+			TRACE(L"\n");
+
+			SqliteDBT3000.execDML((UTF8MBSTR)StrSql);
+
+			q1.nextRow();
+		}
+		q1.finalize();
+		break;
+		q.nextRow();
 	}
 	q.finalize();
 	SqliteDBT3000.closedb();
 
-	 
+
 }
-void CProductRegisterListView::LoadDataSheet(){
-    CString StrSql;
-    _variant_t temp_variant ;
-   int ProductModel = m_current_tree_node.product_class_id;
-   CustomProductTable_T Struc_Temp;
-   CppSQLite3DB SqliteDBT3000;
-   CppSQLite3Query q;
-    
-   SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+void CProductRegisterListView::LoadDataSheet() {
+	CString StrSql;
+	_variant_t temp_variant;
+	int ProductModel = m_current_tree_node.product_class_id;
+	CustomProductTable_T Struc_Temp;
+	CppSQLite3DB SqliteDBT3000;
+	CppSQLite3Query q;
 
-   if (m_sort_type == 0)
-   {  
-        StrSql.Format(_T("Select * From CustomProductTable Where ModelNo = %d  "),ProductModel);
-   }
-   else if (m_sort_type == 1)
-   {
-       StrSql.Format(_T("Select * From CustomProductTable Where ModelNo = %d  ORDER BY Reg_ID DESC"),ProductModel);
-   }
-   else if(m_sort_type == 2)
-   {
-      StrSql.Format(_T("Select * From CustomProductTable Where ModelNo = %d  ORDER BY Reg_ID ASC"),ProductModel);
-   }
-   else
-   {
-      StrSql.Format(_T("Select * From CustomProductTable Where ModelNo = %d  "),ProductModel);
-	//  StrSql.Format(_T("Select * From CustomProductTable Where ModelNo = %d  "), ProductModel);
-   }
-                                                      // 
-  
-    m_register_data_sheet.clear();
-  
-   q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
-   while(!q.eof())
-   {
-	   
+	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 
-	   Struc_Temp.ModelNo = q.getIntField("ModelNo", -1);//
-	   Struc_Temp.Poll_YES_NO = q.getValuebyName(L"Poll_YES_NO",L"Yes");
-	   Struc_Temp.Bacnet_Object_Name = q.getValuebyName(L"Bacnet_Object_Name",L"Object Name");//
-	   Struc_Temp.Reg_ID = q.getIntField("Reg_ID", -1);//
-	   Struc_Temp.Reg_Description = q.getValuebyName(L"Reg_Description",L"Description");//
-	   Struc_Temp.function_code = q.getIntField("Function_Code",3);
-	   Struc_Temp.Counts_Number = q.getIntField("Counts_Number",1);//
-	   Struc_Temp.DataFormat = q.getValuebyName(L"DataFormat",L"16 Bit Unsigned Integer");//
-	   Struc_Temp.SN = q.getValuebyName(L"SN",GetGUID());
-	   Struc_Temp.Default = q.getValuebyName(L"Default1",L"");//  
-	   Struc_Temp.Bit_1 = q.getValuebyName(L"Bit_1",L"NONE");//
-	   Struc_Temp.Low_Actual = q.getValuebyName(L"Low_Actual",L"0");//
-	   Struc_Temp.High_Actual = q.getValuebyName(L"High_Actual",L"1");//
-	   Struc_Temp.Low_Scale = q.getValuebyName(L"Low_Scale",L"0");//
-	   Struc_Temp.High_Scale = q.getValuebyName(L"High_Scale",L"1");//
-	   Struc_Temp.Read_Only_Or_RW = q.getValuebyName(L"Read_Only_Or_RW",L"R_Only");//
-	   Struc_Temp.Bacnet_Type = q.getValuebyName(L"Bacnet_Type",L"AI");//
-	   Struc_Temp.Bacnet_Object_Description = q.getValuebyName(L"Bacnet_Object_Description",L"");//
-	   Struc_Temp.COV_Increment = q.getValuebyName(L"COV_Increment",L"0");//
-	   Struc_Temp.Unit_Group = q.getValuebyName(L"Unit_Group",L"Other");//
-	   Struc_Temp.Unit_Value = q.getValuebyName(L"Unit_Value", L"NO UNITS");//
-	   Struc_Temp.Grouping_YES_NO = q.getValuebyName(L"Grouping_YES_NO",L"YES");//
-	   Struc_Temp.Update_On_Reconnect = q.getValuebyName(L"Update_On_Reconnect", L"NO");//
+	if (m_sort_type == 0)
+	{
+		StrSql.Format(_T("Select * From CustomProductTable Where ModelNo = %d  "), ProductModel);
+	}
+	else if (m_sort_type == 1)
+	{
+		StrSql.Format(_T("Select * From CustomProductTable Where ModelNo = %d  ORDER BY Reg_ID DESC"), ProductModel);
+	}
+	else if (m_sort_type == 2)
+	{
+		StrSql.Format(_T("Select * From CustomProductTable Where ModelNo = %d  ORDER BY Reg_ID ASC"), ProductModel);
+	}
+	else
+	{
+		StrSql.Format(_T("Select * From CustomProductTable Where ModelNo = %d  "), ProductModel);
+		//  StrSql.Format(_T("Select * From CustomProductTable Where ModelNo = %d  "), ProductModel);
+	}
+	// 
 
-	   if (Struc_Temp.SN.IsEmpty())
-	   {
-		   Struc_Temp.SN = GetGUID();
-		   StrSql.Format(_T("Update  CustomProductTable  Set SN = '%s' Where ModelNo = %d and Reg_ID = %d and Function_Code = %d"), 
-			   Struc_Temp.SN, Struc_Temp.ModelNo, Struc_Temp.Reg_ID, Struc_Temp.function_code);
-		   SqliteDBT3000.execDML((UTF8MBSTR)StrSql);
-	   }
-	           
-       m_register_data_sheet.push_back(Struc_Temp);
-          
-       q.nextRow();
-   }
+	m_register_data_sheet.clear();
 
-    SqliteDBT3000.closedb();
+	q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
+	while (!q.eof())
+	{
+
+
+		Struc_Temp.ModelNo = q.getIntField("ModelNo", -1);//
+		Struc_Temp.Poll_YES_NO = q.getValuebyName(L"Poll_YES_NO", L"Yes");
+		Struc_Temp.Bacnet_Object_Name = q.getValuebyName(L"Bacnet_Object_Name", L"Object Name");//
+		Struc_Temp.Reg_ID = q.getIntField("Reg_ID", -1);//
+		Struc_Temp.Reg_Description = q.getValuebyName(L"Reg_Description", L"Description");//
+		Struc_Temp.function_code = q.getIntField("Function_Code", 3);
+		Struc_Temp.Counts_Number = q.getIntField("Counts_Number", 1);//
+		Struc_Temp.DataFormat = q.getValuebyName(L"DataFormat", L"16 Bit Unsigned Integer");//
+		Struc_Temp.SN = q.getValuebyName(L"SN", GetGUID());
+		Struc_Temp.Default = q.getValuebyName(L"Default1", L"");//  
+		Struc_Temp.Bit_1 = q.getValuebyName(L"Bit_1", L"NONE");//
+		Struc_Temp.Low_Actual = q.getValuebyName(L"Low_Actual", L"0");//
+		Struc_Temp.High_Actual = q.getValuebyName(L"High_Actual", L"1");//
+		Struc_Temp.Low_Scale = q.getValuebyName(L"Low_Scale", L"0");//
+		Struc_Temp.High_Scale = q.getValuebyName(L"High_Scale", L"1");//
+		Struc_Temp.Read_Only_Or_RW = q.getValuebyName(L"Read_Only_Or_RW", L"R_Only");//
+		Struc_Temp.Bacnet_Type = q.getValuebyName(L"Bacnet_Type", L"AI");//
+		Struc_Temp.Bacnet_Object_Description = q.getValuebyName(L"Bacnet_Object_Description", L"");//
+		Struc_Temp.COV_Increment = q.getValuebyName(L"COV_Increment", L"0");//
+		Struc_Temp.Unit_Group = q.getValuebyName(L"Unit_Group", L"Other");//
+		Struc_Temp.Unit_Value = q.getValuebyName(L"Unit_Value", L"NO UNITS");//
+		Struc_Temp.Grouping_YES_NO = q.getValuebyName(L"Grouping_YES_NO", L"YES");//
+		Struc_Temp.Update_On_Reconnect = q.getValuebyName(L"Update_On_Reconnect", L"NO");//
+
+		if (Struc_Temp.SN.IsEmpty())
+		{
+			Struc_Temp.SN = GetGUID();
+			StrSql.Format(_T("Update  CustomProductTable  Set SN = '%s' Where ModelNo = %d and Reg_ID = %d and Function_Code = %d"),
+				Struc_Temp.SN, Struc_Temp.ModelNo, Struc_Temp.Reg_ID, Struc_Temp.function_code);
+			SqliteDBT3000.execDML((UTF8MBSTR)StrSql);
+		}
+
+		m_register_data_sheet.push_back(Struc_Temp);
+
+		q.nextRow();
+	}
+
+	SqliteDBT3000.closedb();
 }
-LRESULT CProductRegisterListView::Fresh_Input_List(WPARAM wParam,LPARAM lParam){
-  	
-        CString strTemp;
-     int fresh_type = (int)wParam;
-     int fresh_row =(int) lParam;
-     if (fresh_type == 0)
-     {
-       LoadDataSheet();
-       g_hwnd_now =  this->m_hWnd;
-       m_register_list.DeleteAllItems();
-	   ShowDataInList();
-     }
-     if (fresh_type == 1)
-     {
-		 m_register_list.SetItemText(fresh_row, _NUM_POLLYESNO, m_register_data_sheet.at(fresh_row).Poll_YES_NO);
+LRESULT CProductRegisterListView::Fresh_Input_List(WPARAM wParam, LPARAM lParam) {
+
+	CString strTemp;
+	int fresh_type = (int)wParam;
+	int fresh_row = (int)lParam;
+	if (fresh_type == 0)
+	{
+		LoadDataSheet();
+		g_hwnd_now = this->m_hWnd;
+		m_register_list.DeleteAllItems();
+		ShowDataInList();
+	}
+	if (fresh_type == 1)
+	{
+		m_register_list.SetItemText(fresh_row, _NUM_POLLYESNO, m_register_data_sheet.at(fresh_row).Poll_YES_NO);
 
 
-		 m_register_list.SetItemText(fresh_row, _NUM_NAME, m_register_data_sheet.at(fresh_row).Bacnet_Object_Name);
+		m_register_list.SetItemText(fresh_row, _NUM_NAME, m_register_data_sheet.at(fresh_row).Bacnet_Object_Name);
 
-		 strTemp.Format(_T("%s"), GetFunctionName(m_register_data_sheet.at(fresh_row).function_code));
-		 m_register_list.SetItemText(fresh_row, _NUM_FUNCTION, strTemp);
-
-
-		 strTemp.Format(_T("%d"), m_register_data_sheet.at(fresh_row).Reg_ID);
-		 m_register_list.SetItemText(fresh_row, _NUM_MODBUSADDRESS, strTemp);
-		 strTemp.Format(_T("%d"), m_register_data_sheet.at(fresh_row).Counts_Number);
-		 m_register_list.SetItemText(fresh_row, _NUM_LENGTH, strTemp);
-
-		 m_register_list.SetItemText(fresh_row, _NUM_DATAFORMAT, m_register_data_sheet.at(fresh_row).DataFormat);
-
-		 strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).Bit_1);
-		 m_register_list.SetItemText(fresh_row, _NUM_BIT, strTemp);
-		 strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).Low_Actual);
-		 m_register_list.SetItemText(fresh_row, _NUM_Low_Actual, strTemp);
-		 strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).High_Actual);
-		 m_register_list.SetItemText(fresh_row, _NUM_High_Actual, strTemp);
-		 strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).Low_Scale);
-		 m_register_list.SetItemText(fresh_row, _NUM_Low_Scale, strTemp);
-		 strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).High_Scale);
-		 m_register_list.SetItemText(fresh_row, _NUM_High_Scale, strTemp);
-		 strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).Read_Only_Or_RW);
-		 m_register_list.SetItemText(fresh_row, _NUM_RW, strTemp);
-		 strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).Default);
-		 m_register_list.SetItemText(fresh_row, _NUM_DEFAULT, strTemp);
-		 strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).Bacnet_Type);
-		 m_register_list.SetItemText(fresh_row, _NUM_Bacnet_Type, strTemp);
-		 strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).Bacnet_Object_Description);
-		 m_register_list.SetItemText(fresh_row, _NUM_Bacnet_Object_Description, strTemp);
-		 strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).COV_Increment);
-		 m_register_list.SetItemText(fresh_row, _NUM_COV_Increment, strTemp);
-		 strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).Unit_Group);
-		 m_register_list.SetItemText(fresh_row, _NUM_Unit_Group, strTemp);
+		strTemp.Format(_T("%s"), GetFunctionName(m_register_data_sheet.at(fresh_row).function_code));
+		m_register_list.SetItemText(fresh_row, _NUM_FUNCTION, strTemp);
 
 
-		 strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).Unit_Value);
-		 m_register_list.SetItemText(fresh_row, _NUM_Unit_Value, strTemp);
-		 strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).Grouping_YES_NO);
-		 m_register_list.SetItemText(fresh_row, _NUM_Grouping_Y_N, strTemp);
+		strTemp.Format(_T("%d"), m_register_data_sheet.at(fresh_row).Reg_ID);
+		m_register_list.SetItemText(fresh_row, _NUM_MODBUSADDRESS, strTemp);
+		strTemp.Format(_T("%d"), m_register_data_sheet.at(fresh_row).Counts_Number);
+		m_register_list.SetItemText(fresh_row, _NUM_LENGTH, strTemp);
+
+		m_register_list.SetItemText(fresh_row, _NUM_DATAFORMAT, m_register_data_sheet.at(fresh_row).DataFormat);
+
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).Bit_1);
+		m_register_list.SetItemText(fresh_row, _NUM_BIT, strTemp);
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).Low_Actual);
+		m_register_list.SetItemText(fresh_row, _NUM_Low_Actual, strTemp);
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).High_Actual);
+		m_register_list.SetItemText(fresh_row, _NUM_High_Actual, strTemp);
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).Low_Scale);
+		m_register_list.SetItemText(fresh_row, _NUM_Low_Scale, strTemp);
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).High_Scale);
+		m_register_list.SetItemText(fresh_row, _NUM_High_Scale, strTemp);
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).Read_Only_Or_RW);
+		m_register_list.SetItemText(fresh_row, _NUM_RW, strTemp);
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).Default);
+		m_register_list.SetItemText(fresh_row, _NUM_DEFAULT, strTemp);
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).Bacnet_Type);
+		m_register_list.SetItemText(fresh_row, _NUM_Bacnet_Type, strTemp);
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).Bacnet_Object_Description);
+		m_register_list.SetItemText(fresh_row, _NUM_Bacnet_Object_Description, strTemp);
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).COV_Increment);
+		m_register_list.SetItemText(fresh_row, _NUM_COV_Increment, strTemp);
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).Unit_Group);
+		m_register_list.SetItemText(fresh_row, _NUM_Unit_Group, strTemp);
 
 
-		 strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).Update_On_Reconnect);
-		 m_register_list.SetItemText(fresh_row, _NUM_Update_On_Reconnect, strTemp);
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).Unit_Value);
+		m_register_list.SetItemText(fresh_row, _NUM_Unit_Value, strTemp);
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).Grouping_YES_NO);
+		m_register_list.SetItemText(fresh_row, _NUM_Grouping_Y_N, strTemp);
 
 
-		 strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).Reg_Description);
-		 m_register_list.SetItemText(fresh_row, _NUM_Modbus_DESCRIPTION, strTemp);
-		 
-     }
-     if (fresh_type == 2)
-     { 
-        m_register_list.SetItemBkColor(fresh_row,-1,RGB(50,50,180));
-     }
-     if (fresh_type == 3)
-     {
-       m_register_list.SetItemBkColor(fresh_row,-1,RGB(0,0,0));
-     }
-    return 0;
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).Update_On_Reconnect);
+		m_register_list.SetItemText(fresh_row, _NUM_Update_On_Reconnect, strTemp);
+
+
+		strTemp.Format(_T("%s"), m_register_data_sheet.at(fresh_row).Reg_Description);
+		m_register_list.SetItemText(fresh_row, _NUM_Modbus_DESCRIPTION, strTemp);
+
+	}
+	if (fresh_type == 2)
+	{
+		m_register_list.SetItemBkColor(fresh_row, -1, RGB(50, 50, 180));
+	}
+	if (fresh_type == 3)
+	{
+		m_register_list.SetItemBkColor(fresh_row, -1, RGB(0, 0, 0));
+	}
+	return 0;
 }
 
-LRESULT CProductRegisterListView::Change_Input_Item(WPARAM wParam,LPARAM lParam){
+LRESULT CProductRegisterListView::Change_Input_Item(WPARAM wParam, LPARAM lParam) {
 
-    UpdateData(TRUE);
-    int lRow = (int)wParam;
-    int lCol = (int)lParam; 
-    CString StrSql;
-	 
+	UpdateData(TRUE);
+	int lRow = (int)wParam;
+	int lCol = (int)lParam;
+	CString StrSql;
+
 	if (lRow >= m_register_data_sheet.size())
 	{
 		return 0;
 	}
 	CustomProductTable_T tmp = m_register_data_sheet.at(lRow);
-    
+
 	tmp.Poll_YES_NO = m_register_list.GetItemText(lRow, _NUM_POLLYESNO);
 	tmp.Bacnet_Object_Name = m_register_list.GetItemText(lRow, _NUM_NAME);//CString  Bacnet_Object_Name;
 	tmp.function_code = GetFunctionCode(m_register_list.GetItemText(lRow, _NUM_FUNCTION));
 	CString strAddress = m_register_list.GetItemText(lRow, _NUM_MODBUSADDRESS);
-	if(strAddress.IsEmpty())
+	if (strAddress.IsEmpty())
 	{
 		AfxMessageBox(L"Reg Address can't be null");
 		return 0;
 	}
 	tmp.Reg_ID = _wtoi(strAddress);
 	tmp.Counts_Number = _wtoi(m_register_list.GetItemText(lRow, _NUM_LENGTH));;
-	 
+
 	tmp.DataFormat = m_register_list.GetItemText(lRow, _NUM_DATAFORMAT);
 	tmp.Bit_1 = m_register_list.GetItemText(lRow, _NUM_BIT);
 	tmp.Low_Actual = m_register_list.GetItemText(lRow, _NUM_Low_Actual);;
@@ -924,173 +945,173 @@ LRESULT CProductRegisterListView::Change_Input_Item(WPARAM wParam,LPARAM lParam)
 	tmp.Update_On_Reconnect = m_register_list.GetItemText(lRow, _NUM_Update_On_Reconnect);;
 	tmp.Default = m_register_list.GetItemText(lRow, _NUM_DEFAULT);;
 	tmp.Reg_Description = m_register_list.GetItemText(lRow, _NUM_Modbus_DESCRIPTION);;
-	 
-    int Int_Counts_Number= tmp.Counts_Number;
-    if (Int_Counts_Number>100)
-    {   
-         AfxMessageBox(_T("Counts Number should be less than 100"));
-         StrSql.Format(_T("%d"),m_register_data_sheet.at(lRow).Counts_Number);
-         m_register_list.SetItemText(lRow,lCol,StrSql);
-        return 0;
-    }
-    //CustomProductTable_T Struct_Temp;
- 
+
+	int Int_Counts_Number = tmp.Counts_Number;
+	if (Int_Counts_Number>100)
+	{
+		AfxMessageBox(_T("Counts Number should be less than 100"));
+		StrSql.Format(_T("%d"), m_register_data_sheet.at(lRow).Counts_Number);
+		m_register_list.SetItemText(lRow, lCol, StrSql);
+		return 0;
+	}
+	//CustomProductTable_T Struct_Temp;
+
 	CppSQLite3DB SqliteDBT3000;
 	CppSQLite3Query q;
 	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 
-    StrSql.Format(_T("Update  CustomProductTable  Set Poll_YES_NO = '%s' ,Bacnet_Object_Name = '%s' ,Reg_ID = %d ,Counts_Number = %d ,Reg_Description = '%s' ,Function_Code=%d,DataFormat='%s',Default1='%s',Bit_1='%s',Low_Actual='%s'  ,High_Actual='%s'  ,Low_Scale='%s'  ,High_Scale='%s'  ,Read_Only_Or_RW='%s',Bacnet_Type='%s',Bacnet_Object_Description='%s',COV_Increment='%s',Unit_Group='%s',Unit_Value='%s'  ,Grouping_YES_NO='%s'  ,Update_On_Reconnect='%s'  Where SN = '%s' "), 
-		                tmp.Poll_YES_NO,tmp.Bacnet_Object_Name,tmp.Reg_ID
-		                , tmp.Counts_Number,tmp.Reg_Description,tmp.function_code,
- 		                  tmp.DataFormat, tmp.Default, tmp.Bit_1,tmp.Low_Actual,
- 	                      tmp.High_Actual,tmp.Low_Scale,tmp.High_Scale,
-  		                  tmp.Read_Only_Or_RW,tmp.Bacnet_Type,tmp.Bacnet_Object_Description, 
- 		                  tmp.COV_Increment, tmp.Unit_Group,tmp.Unit_Value, tmp.Grouping_YES_NO,
-  		                  tmp.Update_On_Reconnect,tmp.SN
-                           );
-            
-    SqliteDBT3000.execDML((UTF8MBSTR)StrSql);
+	StrSql.Format(_T("Update  CustomProductTable  Set Poll_YES_NO = '%s' ,Bacnet_Object_Name = '%s' ,Reg_ID = %d ,Counts_Number = %d ,Reg_Description = '%s' ,Function_Code=%d,DataFormat='%s',Default1='%s',Bit_1='%s',Low_Actual='%s'  ,High_Actual='%s'  ,Low_Scale='%s'  ,High_Scale='%s'  ,Read_Only_Or_RW='%s',Bacnet_Type='%s',Bacnet_Object_Description='%s',COV_Increment='%s',Unit_Group='%s',Unit_Value='%s'  ,Grouping_YES_NO='%s'  ,Update_On_Reconnect='%s'  Where SN = '%s' "),
+		tmp.Poll_YES_NO, tmp.Bacnet_Object_Name, tmp.Reg_ID
+		, tmp.Counts_Number, tmp.Reg_Description, tmp.function_code,
+		tmp.DataFormat, tmp.Default, tmp.Bit_1, tmp.Low_Actual,
+		tmp.High_Actual, tmp.Low_Scale, tmp.High_Scale,
+		tmp.Read_Only_Or_RW, tmp.Bacnet_Type, tmp.Bacnet_Object_Description,
+		tmp.COV_Increment, tmp.Unit_Group, tmp.Unit_Value, tmp.Grouping_YES_NO,
+		tmp.Update_On_Reconnect, tmp.SN
+	);
+
+	SqliteDBT3000.execDML((UTF8MBSTR)StrSql);
 	m_register_data_sheet.at(lRow) = tmp;
- 
-                PostMessage(WM_REFRESH_BAC_INPUT_LIST,1U,lRow) ;
- 
-       SqliteDBT3000.closedb();
-      
-       
-   
-    return 0;
+
+	PostMessage(WM_REFRESH_BAC_INPUT_LIST, 1U, lRow);
+
+	SqliteDBT3000.closedb();
+
+
+
+	return 0;
 }
 
 /*
-   @1:Different Product responce to the different functionality
-   @2:
-*/           
+@1:Different Product responce to the different functionality
+@2:
+*/
 
 
 void CProductRegisterListView::OnDestroy()
 {
-    g_bPauseMultiRead = FALSE;
-    if (m_BackgroundTreadHandle) 
-    {
-        if (WaitForSingleObject(m_BackgroundTreadHandle->m_hThread, 3000) == WAIT_OBJECT_0)
-        {
+	g_bPauseMultiRead = FALSE;
+	if (m_BackgroundTreadHandle)
+	{
+		if (WaitForSingleObject(m_BackgroundTreadHandle->m_hThread, 3000) == WAIT_OBJECT_0)
+		{
 
-        }
-        else
-        {		
-            BOOL bRet = TerminateThread(m_BackgroundTreadHandle->m_hThread,0);
-            //delete m_pFreshMultiRegisters;
-            m_BackgroundTreadHandle=NULL;
-        }
+		}
+		else
+		{
+			BOOL bRet = TerminateThread(m_BackgroundTreadHandle->m_hThread, 0);
+			//delete m_pFreshMultiRegisters;
+			m_BackgroundTreadHandle = NULL;
+		}
 
-    }
-    close_com();
-    CFormView::OnDestroy();
+	}
+	close_com();
+	CFormView::OnDestroy();
 
-    
+
 }
 
 
 void CProductRegisterListView::OnBnClickedReadDevice()
 {
-  
-    if (m_isReading)
-    {
-        
-        m_isReading = FALSE;
-         GetDlgItem(IDC_READ_DEVICE)->SetWindowText(_T("Start Read"));
-    } 
-    else
-    {
-       m_isReading = TRUE;
-       GetDlgItem(IDC_READ_DEVICE)->SetWindowText(_T("Stop Read"));
-    } 
+
+	if (m_isReading)
+	{
+
+		m_isReading = FALSE;
+		GetDlgItem(IDC_READ_DEVICE)->SetWindowText(_T("Start Read"));
+	}
+	else
+	{
+		m_isReading = TRUE;
+		GetDlgItem(IDC_READ_DEVICE)->SetWindowText(_T("Stop Read"));
+	}
 }
 
 
 void CProductRegisterListView::OnBnClickedButton4()
 {
-    if (m_sort_type != 0)    //防止已经是默认排序了，还狂点默认排序
-    {
-     m_sort_type = 0;
-     SendMessage(WM_REFRESH_BAC_INPUT_LIST,0,0); 
-     if (m_BackgroundTreadHandle) 
-     {
-         BOOL bRet = TerminateThread(m_BackgroundTreadHandle->m_hThread,0);   
-         m_BackgroundTreadHandle=NULL;
-     }
-     m_BackgroundTreadHandle = AfxBeginThread(_Background_Read,this);
-    }
-    
-    
+	if (m_sort_type != 0)    //防止已经是默认排序了，还狂点默认排序
+	{
+		m_sort_type = 0;
+		SendMessage(WM_REFRESH_BAC_INPUT_LIST, 0, 0);
+		if (m_BackgroundTreadHandle)
+		{
+			BOOL bRet = TerminateThread(m_BackgroundTreadHandle->m_hThread, 0);
+			m_BackgroundTreadHandle = NULL;
+		}
+		m_BackgroundTreadHandle = AfxBeginThread(_Background_Read, this);
+	}
+
+
 }
 
 
 void CProductRegisterListView::OnBnClickedDownbutton()
 {
-  
-    if (m_sort_type != 1)
-    {
-        m_sort_type = 1;
-        SendMessage(WM_REFRESH_BAC_INPUT_LIST,0,0); 
-        if (m_BackgroundTreadHandle) 
-        {
-            BOOL bRet = TerminateThread(m_BackgroundTreadHandle->m_hThread,0);   
-            m_BackgroundTreadHandle=NULL;
-        }
-        m_BackgroundTreadHandle = AfxBeginThread(_Background_Read,this);
-    }
+
+	if (m_sort_type != 1)
+	{
+		m_sort_type = 1;
+		SendMessage(WM_REFRESH_BAC_INPUT_LIST, 0, 0);
+		if (m_BackgroundTreadHandle)
+		{
+			BOOL bRet = TerminateThread(m_BackgroundTreadHandle->m_hThread, 0);
+			m_BackgroundTreadHandle = NULL;
+		}
+		m_BackgroundTreadHandle = AfxBeginThread(_Background_Read, this);
+	}
 
 }
 
 
 void CProductRegisterListView::OnBnClickedUpbutton()
 {
-   
-    if (m_sort_type != 2)
-    {
-        m_sort_type = 2;
-        SendMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
-        if (m_BackgroundTreadHandle) 
-        {
-            BOOL bRet = TerminateThread(m_BackgroundTreadHandle->m_hThread,0);   
-            m_BackgroundTreadHandle=NULL;
-        }
-        m_BackgroundTreadHandle = AfxBeginThread(_Background_Read,this); 
-    }
+
+	if (m_sort_type != 2)
+	{
+		m_sort_type = 2;
+		SendMessage(WM_REFRESH_BAC_INPUT_LIST, 0, 0);
+		if (m_BackgroundTreadHandle)
+		{
+			BOOL bRet = TerminateThread(m_BackgroundTreadHandle->m_hThread, 0);
+			m_BackgroundTreadHandle = NULL;
+		}
+		m_BackgroundTreadHandle = AfxBeginThread(_Background_Read, this);
+	}
 }
 
 
 void CProductRegisterListView::OnTimer(UINT_PTR nIDEvent)
 {
-     
-      if (nIDEvent == 1)
-      {
-        //UpdateData();
-      }
-    CFormView::OnTimer(nIDEvent);
+
+	if (nIDEvent == 1)
+	{
+		//UpdateData();
+	}
+	CFormView::OnTimer(nIDEvent);
 }
 
 
 void CProductRegisterListView::OnEnChangeEditDelayLoop()
 {
-    
-    // send this notification unless you override the CFormView::OnInitDialog()
-    // function and call CRichEditCtrl().SetEventMask()
-    // with the ENM_CHANGE flag ORed into the mask.
-       UpdateData();
-    // 
+
+	// send this notification unless you override the CFormView::OnInitDialog()
+	// function and call CRichEditCtrl().SetEventMask()
+	// with the ENM_CHANGE flag ORed into the mask.
+	UpdateData();
+	// 
 }
 
 
 void CProductRegisterListView::OnEnChangeEditDelayItems()
 {
-    
-    // send this notification unless you override the CFormView::OnInitDialog()
-    // function and call CRichEditCtrl().SetEventMask()
-    // with the ENM_CHANGE flag ORed into the mask.
-      UpdateData();
-    // 
+
+	// send this notification unless you override the CFormView::OnInitDialog()
+	// function and call CRichEditCtrl().SetEventMask()
+	// with the ENM_CHANGE flag ORed into the mask.
+	UpdateData();
+	// 
 }
 
 
@@ -1099,7 +1120,7 @@ void CProductRegisterListView::OnEnChangeEditDelayItems()
 
 int CProductRegisterListView::GetFunctionCode(CString FunctionName)
 {
-	if (m_vecVariableType[0].CompareNoCase(FunctionName)==0)
+	if (m_vecVariableType[0].CompareNoCase(FunctionName) == 0)
 	{
 		return 1;
 	}
@@ -1131,7 +1152,7 @@ int CProductRegisterListView::GetFunctionCode(CString FunctionName)
 	{
 		return 16;
 	}
- 
+
 }
 
 CString CProductRegisterListView::GetFunctionName(int FunctionCode)
@@ -1144,7 +1165,7 @@ CString CProductRegisterListView::GetFunctionName(int FunctionCode)
 	{
 		return m_vecVariableType[1];
 	}
-	 
+
 	if (FunctionCode == 3)
 	{
 		return m_vecVariableType[2];
@@ -1175,15 +1196,15 @@ int CProductRegisterListView::GetCaculateCode(CString CalName)
 {
 	/*if (m_array_caculate[0].CompareNoCase(CalName) == 0)
 	{
-		return 0;
+	return 0;
 	}
 	if (m_array_caculate[1].CompareNoCase(CalName) == 0)
 	{
-		return 1;
+	return 1;
 	}
 	if (m_array_caculate[2].CompareNoCase(CalName) == 0)
 	{
-		return 2;
+	return 2;
 	}*/
 	return 0;
 }
@@ -1192,16 +1213,16 @@ CString CProductRegisterListView::GetCalName(int calcode)
 {
 	/*if (calcode == 0)
 	{
-		return m_array_caculate[0];
+	return m_array_caculate[0];
 	}
 	if (calcode == 1)
 	{
-		return m_array_caculate[1];
+	return m_array_caculate[1];
 	}
 
 	if (calcode == 2)
 	{
-		return m_array_caculate[2];
+	return m_array_caculate[2];
 	}*/
 	return L"";
 }
@@ -2038,7 +2059,7 @@ void CProductRegisterListView::OnNMClickList_output(NMHDR *pNMHDR, LRESULT *pRes
 				m_register_list.SetCellStringList(lRow, _NUM_Unit_Group, strlist);
 			}
 		}
-		
+
 
 		//5=数据格式
 		if (lCol == _NUM_DATAFORMAT)
@@ -2123,7 +2144,7 @@ void CProductRegisterListView::OnNMClickList_output(NMHDR *pNMHDR, LRESULT *pRes
 				m_register_list.SetCellStringList(lRow, _NUM_Update_On_Reconnect, strlist);
 			}
 		}
-		
+
 
 	}
 }
@@ -2147,34 +2168,34 @@ void CProductRegisterListView::OnNMDblclkListCustomList(NMHDR *pNMHDR, LRESULT *
 	lRow = lvinfo.iItem;
 	lCol = lvinfo.iSubItem;
 
-	if (lRow<0||lRow > m_register_list.GetItemCount()) 
+	if (lRow<0 || lRow > m_register_list.GetItemCount())
 	{
 		CustomProductTable_T tmp;
-		
-		tmp.ModelNo= m_current_tree_node.product_class_id;
-		tmp.Poll_YES_NO=L"YES";
-		tmp.Bacnet_Object_Name=L"BNameDemo";//CString  Bacnet_Object_Name;
+
+		tmp.ModelNo = m_current_tree_node.product_class_id;
+		tmp.Poll_YES_NO = L"YES";
+		tmp.Bacnet_Object_Name = L"BNameDemo";//CString  Bacnet_Object_Name;
 		tmp.function_code = 3;
 		tmp.Reg_ID = -1;
-		tmp.Counts_Number=1;
-		tmp.Value=L"0";
-		tmp.DataFormat=L"16 Bit Unsigned Integer";
-		tmp.Bit_1=L"NONE";
-		tmp.Low_Actual=L"0";
-		tmp.High_Actual=L"1";
-		tmp.Low_Scale=L"0";
-		tmp.High_Scale=L"1";
-		tmp.Read_Only_Or_RW=L"R_Only";
-		tmp.Bacnet_Type=L"AI";
-		tmp.Bacnet_Object_Description=L"Description";
-		tmp.COV_Increment=L"0";
-		tmp.Unit_Group=L"Other";
-		tmp.Unit_Value=L"NO_UNITS";
-		tmp.Grouping_YES_NO=L"Yes";
-		tmp.Update_On_Reconnect="NO";
-		tmp.Default=L"Default";
-		tmp.Reg_Description=L"Description";
-		tmp.SN=GetGUID();
+		tmp.Counts_Number = 1;
+		tmp.Value = L"0";
+		tmp.DataFormat = L"16 Bit Unsigned Integer";
+		tmp.Bit_1 = L"NONE";
+		tmp.Low_Actual = L"0";
+		tmp.High_Actual = L"1";
+		tmp.Low_Scale = L"0";
+		tmp.High_Scale = L"1";
+		tmp.Read_Only_Or_RW = L"R_Only";
+		tmp.Bacnet_Type = L"AI";
+		tmp.Bacnet_Object_Description = L"Description";
+		tmp.COV_Increment = L"0";
+		tmp.Unit_Group = L"Other";
+		tmp.Unit_Value = L"NO_UNITS";
+		tmp.Grouping_YES_NO = L"Yes";
+		tmp.Update_On_Reconnect = "NO";
+		tmp.Default = L"Default";
+		tmp.Reg_Description = L"Description";
+		tmp.SN = GetGUID();
 		int row = m_register_list.GetRowCount();
 		FreshOneRowInGrid(row, tmp, 0);
 		m_register_data_sheet.push_back(tmp);
@@ -2185,9 +2206,9 @@ void CProductRegisterListView::OnNMDblclkListCustomList(NMHDR *pNMHDR, LRESULT *
 		CString StrSql;
 		StrSql.Format(_T("Insert Into  CustomProductTable(ModelNo,Poll_YES_NO,Bacnet_Object_Name,Reg_ID,Reg_Description,Function_Code,Counts_Number,DataFormat,SN,Default1,Bit_1,Low_Actual,High_Actual,Low_Scale,High_Scale,Read_Only_Or_RW,Bacnet_Type,Bacnet_Object_Description,COV_Increment,Unit_Group,Unit_Value,Grouping_YES_NO,Update_On_Reconnect) \
                         Values(%d,'%s','%s',%d,'%s',%d,%d,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"),
-			tmp.ModelNo,tmp.Poll_YES_NO, tmp.Bacnet_Object_Name, tmp.Reg_ID
-			, tmp.Reg_Description,tmp.Counts_Number, tmp.function_code,
-			tmp.DataFormat,tmp.SN,tmp.Default, tmp.Bit_1, tmp.Low_Actual,
+			tmp.ModelNo, tmp.Poll_YES_NO, tmp.Bacnet_Object_Name, tmp.Reg_ID
+			, tmp.Reg_Description, tmp.Counts_Number, tmp.function_code,
+			tmp.DataFormat, tmp.SN, tmp.Default, tmp.Bit_1, tmp.Low_Actual,
 			tmp.High_Actual, tmp.Low_Scale, tmp.High_Scale,
 			tmp.Read_Only_Or_RW, tmp.Bacnet_Type, tmp.Bacnet_Object_Description,
 			tmp.COV_Increment, tmp.Unit_Group, tmp.Unit_Value, tmp.Grouping_YES_NO,
@@ -2273,23 +2294,23 @@ void CProductRegisterListView::OnCbnSelchangeComboProductList()
 {
 	CString strProductName;
 	int index = m_combox_productname.GetCurSel();
-	 m_combox_productname.GetLBText(index,strProductName);
-	
+	m_combox_productname.GetLBText(index, strProductName);
+
 	//m_combox_productname.GetLBText()
 	for (pidname_map::iterator iter = product_map.begin(); iter != product_map.end(); iter++)
 	{
 		//m_combox_productname.AddString(iter->second);
-		if (strProductName.CompareNoCase(iter->second)==0)
+		if (strProductName.CompareNoCase(iter->second) == 0)
 		{
 			m_current_tree_node.product_class_id = iter->first;
 		}
 	}
-	 
+
 	LoadDataSheet();
 	Initial_List();
 }
 
- 
+
 #include "excel9.h"
 void CProductRegisterListView::OnBnClickedButtonExportexcelfile()
 {
@@ -2337,12 +2358,12 @@ void CProductRegisterListView::OnBnClickedButtonExportexcelfile()
 	m_combox_productname.GetLBText(index, strProductName);
 
 
- 
+
 	range.SetItem(_variant_t((long)(1)), _variant_t((long)(1)), _variant_t(strProductName));
 
- 
+
 	strProductName = L"Item";
-	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_ITEM+1)), _variant_t(strProductName));
+	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_ITEM + 1)), _variant_t(strProductName));
 	strProductName = L"Poll Y/N";
 	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_POLLYESNO + 1)), _variant_t(strProductName));
 	strProductName = L"Bacnet Object Name";
@@ -2390,9 +2411,9 @@ void CProductRegisterListView::OnBnClickedButtonExportexcelfile()
 
 	range.AttachDispatch(sheet.GetCells());
 
-	for (int i = 0;i < (int)m_register_list.GetRowCount();i++)
+	for (int i = 0; i < (int)m_register_list.GetRowCount(); i++)
 	{
- 		CurrentRow = 3 +  i;
+		CurrentRow = 3 + i;
 		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_ITEM);
 		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_ITEM + 1)), _variant_t(strProductName));
 		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_POLLYESNO);
@@ -2419,7 +2440,7 @@ void CProductRegisterListView::OnBnClickedButtonExportexcelfile()
 		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_Low_Scale + 1)), _variant_t(strProductName));
 		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_High_Scale);
 		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_High_Scale + 1)), _variant_t(strProductName));
-		 
+
 		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_RW);
 		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_RW + 1)), _variant_t(strProductName));
 		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_DEFAULT);
@@ -2440,7 +2461,7 @@ void CProductRegisterListView::OnBnClickedButtonExportexcelfile()
 		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_Update_On_Reconnect + 1)), _variant_t(strProductName));
 		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_Modbus_DESCRIPTION);
 		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_Modbus_DESCRIPTION + 1)), _variant_t(strProductName));
- 
+
 
 
 	}

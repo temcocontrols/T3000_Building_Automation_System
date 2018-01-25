@@ -8,6 +8,7 @@
 #include "AfxMessageDialog.h"
 #include "MainFrm.h"
 #include "../SQLiteDriver/CppSQLite3.h"
+#include "Tstat_HelpDoc.h"
 // COutPutDlg dialog
  
 IMPLEMENT_DYNAMIC(COutPutDlg, CDialog)
@@ -305,12 +306,12 @@ BOOL COutPutDlg::OnInitDialog()
 
 
         GetDlgItem(IDC_STATIC_FAN_MODE_NAME)->ShowWindow(FALSE);
-        GetDlgItem(IDC_STATIC_FAN_OFF)->ShowWindow(FALSE);
-        GetDlgItem(IDC_STATIC_FAN_ON)->ShowWindow(FALSE);
-        GetDlgItem(IDC_STATIC_FAN_LOW)->ShowWindow(FALSE);
-        GetDlgItem(IDC_STATIC_MID)->ShowWindow(FALSE);
-       
-        GetDlgItem(IDC_STATIC_FAN_AUTO)->ShowWindow(FALSE);
+        //GetDlgItem(IDC_STATIC_FAN_OFF)->ShowWindow(FALSE);   //Fan 2018 01 17 即便没有fan名字也要现实默认名字，否则光秃秃的 show 一个button  太不合情理
+        //GetDlgItem(IDC_STATIC_FAN_ON)->ShowWindow(FALSE);
+        //GetDlgItem(IDC_STATIC_FAN_LOW)->ShowWindow(FALSE);
+        //GetDlgItem(IDC_STATIC_MID)->ShowWindow(FALSE);
+        //GetDlgItem(IDC_STATIC_FAN_AUTO)->ShowWindow(FALSE);
+
         GetDlgItem(IDC_STATIC_FAN_HEAT)->ShowWindow(FALSE);
         GetDlgItem(IDC_STATIC_FAN_COOL)->ShowWindow(FALSE);
         GetDlgItem(IDC_EDIT_FAN_OFF_NAME)->ShowWindow(FALSE);
@@ -523,7 +524,8 @@ BOOL COutPutDlg::OnInitDialog()
 
 		GetWindowPlacement(&wp);
 
-		wp.rcNormalPosition.bottom += 120;
+        if(wp.rcNormalPosition.bottom<1038)      //重新调用 OnInitDialog时 会反复增加;
+		    wp.rcNormalPosition.bottom += 120;
 
 		SetWindowPlacement(&wp);
 
@@ -6736,99 +6738,7 @@ void COutPutDlg::FreshGrid_PID1tstat6()
   
     
     int nFan=get_real_fan_select();
-    if (nFan == 0 && product_register_value[7] == PM_TSTAT7)
-    {
-        if(m_pwm_row1!=-1)
-        {
 
-            for(int col = 1 ;col <=(m_PID1_heat_stages+m_PID1_cool_stages+1);col++)
-            {
-                int nValue=0;
-                if(col < (m_PID1_heat_stages+1))
-                    pos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - col ;
-                else
-                    pos = col - (m_PID1_heat_stages+1);			
-                tstatval = product_register_value[323+ pos];
-                int indext=-1;
-
-
-                nValue=product_register_value[725+pos];//modify by Fance  341  591
-
-                nValue=nValue>>4;
-                switch(nValue)
-                {
-                case 0:
-                    strTemp=_T("Closed");
-                    break;
-                case 1:
-                    strTemp=_T("Open");
-                    break;
-                case 2:
-                    strTemp="0-100";
-                    break;
-                case 3:
-                    strTemp=_T("50-100");
-                    break;
-                case 4:
-                    strTemp=_T("0-50");
-                    break;
-                default:
-                    strTemp=_T("");
-                }
-                if(pid_select2[3]==1||pid_select2[row-1]==2)
-                    FLEX_GRID1_PUT_COLOR_STR(m_pwm_row1,col,strTemp);//col +1
-                else
-                    FLEX_GRID1_PUT_STR(m_pwm_row1,col,strTemp);//col +1
-
-            }
-        }	
-        if(m_pwm_row2!=-1)
-        {
-            for(int col = 1 ;col <=(m_PID1_heat_stages+m_PID1_cool_stages+1);col++)
-            {
-                int nValue=0;
-                if(col < (m_PID1_heat_stages+1))
-                    pos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - col ;
-                else
-                    pos = col - (m_PID1_heat_stages+1);			
-                tstatval = product_register_value[323+ pos];
-                int indext=-1;
-
-                //nValue=multi_register_value[341+pos];//这项没找到对应项		 //Annul by Fance
-                nValue=product_register_value[725+pos];//modify by Fance  341  591
-
-                nValue=nValue&0x0f;
-                switch(nValue)
-                {
-                case 0:
-                    strTemp=_T("Closed");
-                    break;
-                case 1:
-                    strTemp=_T("Open");
-                    break;
-                case 2:
-                    strTemp=_T("0-100");
-                    break;
-                case 3:
-                    strTemp=_T("50-100");
-                    break;
-                case 4:
-                    strTemp=_T("0-50");
-                    break;
-                default:
-                    strTemp=_T("");
-                }
-
-                if(pid_select2[4]==1||pid_select2[row-1]==2)
-                    FLEX_GRID1_PUT_COLOR_STR(m_pwm_row2,col,strTemp);//col +1
-                else
-                    FLEX_GRID1_PUT_STR(m_pwm_row2,col,strTemp);//col +1
-                //totalrows
-            }
-        }
-    }
-    else
-    {
         if(m_pwm_row1!=-1)
         {
 
@@ -6918,7 +6828,6 @@ void COutPutDlg::FreshGrid_PID1tstat6()
                 //totalrows
             }
         }
-    }
 	//Free Cool:
 #if 1
 	for( row = 1;row<=totalrows;row++)//****************************
@@ -8863,8 +8772,9 @@ void COutPutDlg::OnBnClickedButtonModel1()
 	{
 
 		product_register_value[MODBUS_FAN_SPEED]=g_ifanStatus;
+        OnInitDialog();
 	} 
-	FreshGrids();
+	
 }
 
 
@@ -8877,7 +8787,7 @@ void COutPutDlg::OnBnClickedButtonModel2()
 
 		product_register_value[MODBUS_FAN_SPEED]=g_ifanStatus;
 	} 
-	FreshGrids();
+    OnInitDialog();
 }
 
 
@@ -8890,7 +8800,7 @@ void COutPutDlg::OnBnClickedButtonModel3()
 
 		product_register_value[MODBUS_FAN_SPEED]=g_ifanStatus;
 	} 
-	FreshGrids();
+    OnInitDialog();
 }
 
 
@@ -8903,7 +8813,7 @@ void COutPutDlg::OnBnClickedButtonModel4()
 
 		product_register_value[MODBUS_FAN_SPEED]=g_ifanStatus;
 	} 
-	FreshGrids();
+    OnInitDialog();
 }
 
 
@@ -8916,7 +8826,7 @@ void COutPutDlg::OnBnClickedButtonModel5()
 
 		product_register_value[MODBUS_FAN_SPEED]=g_ifanStatus;
 	} 
-	FreshGrids();
+    OnInitDialog();
 }
 
 void COutPutDlg::SetModelButton()
@@ -8982,7 +8892,7 @@ void COutPutDlg::OnBnClickedButtonModel11()
 {
 	
 }
-#include "Tstat_HelpDoc.h"	
+	
 
 
 

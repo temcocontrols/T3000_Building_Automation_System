@@ -26,7 +26,7 @@
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);  
 
 LPFN_ISWOW64PROCESS fnIsWow64Process;  
-const int g_versionNO=20161205;
+const int g_versionNO=20180120;
 
 
 #ifdef _DEBUG
@@ -46,8 +46,29 @@ END_MESSAGE_MAP()
 CT3000App::CT3000App()
 {
 	m_bHiColorIcons = TRUE;
-	CurrentT3000Version=_T("    2017.12.10");
-	T3000_Version = 201028;
+
+    char strASCIICompileTime[128] = { 0 };
+    sprintf(strASCIICompileTime, "    %s ", __DATE__);
+
+
+
+
+    MultiByteToWideChar(CP_ACP, 0, (char *)strASCIICompileTime, (int)strlen(strASCIICompileTime) + 1, CurrentT3000Version.GetBuffer(MAX_PATH), MAX_PATH);
+    CurrentT3000Version.ReleaseBuffer();
+
+    //******************************************************
+    // Release 版本发布时屏蔽此段，此段 主要用于调试时 显示 具体是 几点钟的版本.
+#ifdef _DEBUG
+    char strTime[128] = { 0 }; // 取小时当 小版本号;
+    CString Test_Version;  //   TIME 和DATE    
+    memcpy(strTime, __TIME__, 2);
+    MultiByteToWideChar(CP_ACP, 0, (char *)strTime, (int)strlen(strTime) + 1, Test_Version.GetBuffer(MAX_PATH), MAX_PATH);
+    Test_Version.ReleaseBuffer();
+	CurrentT3000Version= CurrentT3000Version + _T(" Version ") + Test_Version; //杜帆 : Release 版发布的时候 这句屏蔽掉就好了 ，会自动获取编译的日期.
+#endif 
+    //*******************************************************
+    
+	T3000_Version = 20180120; //
 	m_lastinterface=19;
 }
 // The one and only CT3000App object
@@ -59,26 +80,7 @@ UINT UpdateT3000Background(LPVOID pParam)
   TCHAR exeFullPath[MAX_PATH+1]; //
   GetModuleFileName(NULL, exeFullPath, MAX_PATH); //
   (_tcsrchr(exeFullPath, _T('\\')))[1] = 0;//
-#if 0//判断网站是否有新版本，网络连接不是或者没有新版本，直接进入
-  CString T3000updatepath;
-  T3000updatepath=(CString)exeFullPath+_T("T3000Update.exe");
 
-  if (T3000App->JudgeT3000Version())
-  {
-	  int ret = AfxMessageBox(_T("Find new version Do you want to update?"),MB_YESNOCANCEL ,3);
-	  if ( ret == IDYES)
-	  {
-
-		  ShellExecute(NULL, _T("open"), T3000updatepath.GetBuffer(), NULL, NULL, SW_SHOWNORMAL);
-		  //	WinExecAndWait(T3000updatepath.GetBuffer(),NULL,NULL,0);
-	  }
-	  //KillProcessFromName(_T("T3000.exe")) ;
-	 /* T3000App->ExitInstance();*/
-	  return FALSE;
-
-  }
-  return TRUE;
-#endif
 return TRUE;
 }
 
@@ -317,17 +319,11 @@ BOOL CT3000App::InitInstance()
 			CopyFile(strSource, L"C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\T3000Controls.dll", FALSE);
 			// ::ShellExecute(NULL, _T("open"), _T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe T3000Controls.dll"), _T(""), _T(""), SW_SHOW); 
 			ShellExecute(NULL, _T("open"), _T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe"), L"C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\T3000Controls.dll", NULL, SW_HIDE);
-		
 			strSource = g_strExePth + L"TemcoStandardBacnetTool.dll";
 			CopyFile(strSource, L"C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\TemcoStandardBacnetTool.dll", FALSE);
 			// ::ShellExecute(NULL, _T("open"), _T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe T3000Controls.dll"), _T(""), _T(""), SW_SHOW); 
 			ShellExecute(NULL, _T("open"), _T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe"), L"C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\TemcoStandardBacnetTool.dll", NULL, SW_HIDE);
 
-
-
-			/*	SetDLLRegAsm(1);*/
-// 			AfxMessageBox(L"Restart T3000,Please");
-// 			return FALSE;
 		}
 		
 		// InitCommonControlsEx() is required on Windows XP if an application
@@ -345,59 +341,6 @@ BOOL CT3000App::InitInstance()
 
 		BOOL First_Start=TRUE;
 
-
-		//CString CO2Timer;
-		//CO2Timer=GetProductFirmwareTimeFromTemcoWebsite(_T("http://temcocontrols.com/ftp/firmware/MINIPANEL/"),_T("minipanel.bin"));
-		//AfxMessageBox(CO2Timer);
-		//  	CString ftp_T3000Version;
-		//  	ftp_T3000Version=GetContentFromURL(_T("http://temcocontrols.com/ftp/firmware/CO2/CO2-W/"));
-		//  	//AfxBeginThread(UpdateT3000Background,this);
-		//  	CStringArray HtmlArray;
-		//  	HtmlArray.RemoveAll();
-		//  	SplitCStringA(HtmlArray,ftp_T3000Version,_T("<hr>"));
-		//  	CString ImageString;
-		//  	if (HtmlArray.GetSize()>1)
-		//  	{
-		//  	   ImageString=HtmlArray[1];
-		//  	   HtmlArray.RemoveAll();
-		//  	   SplitCStringA(HtmlArray,ImageString,_T("<img"));
-		// 	   ImageString.Empty();
-		//  	   for (int i=0;i<HtmlArray.GetSize();i++)
-		//  	   {
-		//  		   if (HtmlArray[i].Find(_T("CO2-W.hex"))!=-1)
-		//  		   {
-		//  			   ImageString=HtmlArray[i];
-		//  			   break;
-		//  		   }
-		//  	   }
-		// 	   CString VersionString;
-		// 	   HtmlArray.RemoveAll();
-		// 	   
-		// 	   if(ImageString.GetLength()>1)
-		// 	   {
-		// 	      SplitCStringA(HtmlArray,ImageString,_T("</a>"));
-		// 	   }
-		// 	   if(HtmlArray.GetSize()>0)
-		// 	   {
-		// 	     ImageString=HtmlArray[1];
-		// 	   }
-		// 	   //               20-Nov-2014 00:36  152K
-		// 	   ImageString.TrimLeft();
-		// 	   ImageString.TrimRight();
-		// 	   HtmlArray.RemoveAll();
-		// 	   if(ImageString.GetLength()>1)
-		// 	   {
-		// 		   SplitCStringA(HtmlArray,ImageString,_T("  "));
-		// 	   }
-		// 	   if (HtmlArray.GetSize()>0)
-		// 	   {
-		// 	      VersionString=HtmlArray[0];
-		// 	   }
-		// 
-		//  	 
-		//  	}
-		// 	
-		//	versionstring=ImageString.g(index_start);
 	//	Logger::WriteMessage("T3000 Unit Tester Begin....");
 		CWinAppEx::InitInstance();
 		HRESULT hr;
@@ -555,23 +498,6 @@ BOOL CT3000App::InitInstance()
 			HANDLE hFind;
 			WIN32_FIND_DATA wfd;
 
-// 			CString SqliteDLLPath=GetExePath(true)+L"sqlite3.dll";
-// 			hFind = FindFirstFile(SqliteDLLPath, &wfd);
-// 			if (hFind==INVALID_HANDLE_VALUE)
-// 			{
-// 
-// 				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_SQLITE3DLL1), _T("SQLITE3DLL"));   
-// 				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
-// 				LPVOID lpExe = LockResource(hGlobal);   
-// 				CFile file;
-// 				if(file.Open(SqliteDLLPath, CFile::modeCreate | CFile::modeWrite))    
-// 					file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
-// 				file.Close();    
-// 				::UnlockResource(hGlobal);   
-// 				::FreeResource(hGlobal);
-// 			}
-			//IDR_MFC16DLL1
-
 			CString MFC16DLLPath=GetExePath(true)+L"MFC16API.dll";
 			hFind = FindFirstFile(MFC16DLLPath, &wfd);
 			if (hFind==INVALID_HANDLE_VALUE)
@@ -648,44 +574,6 @@ BOOL CT3000App::InitInstance()
 			}  //
 			FindClose(hFind_Monitor);//
 
-#if 0
-			int versionno_monitor = 0;
-			//CADO tempado;
-			//BOOL Ret=tempado.OnInitADOConn();
-			CBADO tempado;
-			tempado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
-			tempado.OnInitADOConn(); 
-
-
-			if (tempado.IsHaveTable(tempado,_T("Version")))//有Version表
-			{
-				CString sql=_T("Select * from Version");
-				tempado.m_pRecordset=tempado.OpenRecordset(sql);
-				tempado.m_pRecordset->MoveFirst();
-				while (!tempado.m_pRecordset->EndOfFile)
-				{
-					versionno_monitor=tempado.m_pRecordset->GetCollect(_T("VersionNO"));
-					tempado.m_pRecordset->MoveNext();
-				}
-				tempado.CloseRecordset();
-
-
-			} 
-
-			if (versionno_monitor < 20150922)
-			{
-				CString StrSql;
-				StrSql=_T("ALTER TABLE MonitorData ADD COLUMN Temp_Data Integer");
-				tempado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
-				StrSql=_T("ALTER TABLE MonitorData ADD COLUMN DisplayTime varchar(255)");
-				tempado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
-
-
-				StrSql=_T("INSERT INTO Version VALUES(20150922,'Add Temp and Time')");
-				tempado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
-			}
-			tempado.CloseConn(); 
-#endif
 
 
 
@@ -733,16 +621,6 @@ BOOL CT3000App::InitInstance()
 				int index= filebuildingPath.Find(_T("Database"));
 				filebuildingPath.Delete(0,index);
 
-				CString sql;
-				/*CADO ado; 
-				ado.OnInitADOConn();
-
-				sql.Format(_T("update Building set Building_Path = '%s'  where  Main_BuildingName = 'Default_Building' "),filebuildingPath);
-
-				ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
-
-				ado.CloseConn();*/
-
 
 			}
 
@@ -766,33 +644,6 @@ BOOL CT3000App::InitInstance()
 			//
 			//RegCloseKey(hkey);
 
-
-
-
-
-			//先不考虑升级的情况
-#if 0
-		 	int Ret=JudgeDB();
-			if (!Ret)
-			{
-				FilePath=g_strExePth+_T("Database\\T3000.db");
-				DeleteFile(FilePath.GetBuffer());
-				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000DB1), _T("T3000DB"));   
-				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
-
-
-				LPVOID lpExe = LockResource(hGlobal);   
-				CFile file;
-				if(file.Open(FilePath, CFile::modeCreate | CFile::modeWrite))    
-					file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
-				file.Close();    
-				::UnlockResource(hGlobal);   
-				::FreeResource(hGlobal);
-				//JudgeDB();
-
-			}
-
-#endif
               UpdateDB();
 
 			//Sleep(1000);
@@ -877,22 +728,6 @@ BOOL CT3000App::InitInstance()
 		GdiplusStartupInput gdiplusStartupInput;//
 		GdiplusStartup(&g_gdiplusToken, &gdiplusStartupInput, NULL);//
 
-#if 1
- 
-
-
-
-		//if (g_bPrivilegeMannage)
-		//{//for just quick debug,only on this computer
-		//	if(!user_login())
-		//	{
-		//		AfxMessageBox(_T("Error password!"));	
-		//		return false;
-		//	}
-
-		//}
-
-#endif
 
 		 ((CMainFrame*)m_pMainWnd)->InitViews();//
 		CString strTile;
@@ -907,18 +742,6 @@ BOOL CT3000App::InitInstance()
        m_szAppPath  = g_strExePth;
        m_szHelpFile = theApp.m_szAppPath + L"T3000_Help.chm";
 	   m_szTstatHelpFile = theApp.m_szAppPath + L"HelpDoc//" + L"TStat8_Help.chm";
-// 		CString g_configfile_path =g_strExePth + g_strStartInterface_config;
-// 		m_lastinterface= 19 ;//GetPrivateProfileInt(_T("T3000_START"),_T("Interface"),19,g_configfile_path); //由 杜帆 16-03-17屏蔽；进入不同的界面引起 T3000打开时报错。
-// 		g_selected_serialnumber=GetPrivateProfileInt(_T("T3000_START"),_T("SerialNumber"),0,g_configfile_path);
-// 		if (m_lastinterface!=19&&m_lastinterface!=24)
-// 		{
-// 			((CMainFrame*)m_pMainWnd)->SwitchToPruductType(m_lastinterface);
-// 		}
-// 		else
-// 		{
-// 			((CMainFrame*)m_pMainWnd)->SwitchToPruductType(19);
-// 		}
-
 
 	}
 	catch (...)
@@ -1069,8 +892,6 @@ void CT3000App::InitModeName()
 		g_strTstat5e=file.GetProfileString(_T("Section 11"),_T("Product1E"),_T("Tstat5E"));
 		g_strTstat5h=file.GetProfileString(_T("Section 12"),_T("Product1H"),_T("Tstat5H"));
 
-// 		g_strTstat6=file.GetProfileString(_T("Section 13"),_T("Product6"),_T("Tstat6"));
-// 		g_strTstat7=file.GetProfileString(_T("Section 14"),_T("Product7"),_T("Tstat7"));
 	}
 	FindClose(hFile);
 }

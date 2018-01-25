@@ -389,7 +389,10 @@ void CNewHumChamberView::Dump(CDumpContext& dc) const
 void CNewHumChamberView::Fresh(){
 	g_bPauseMultiRead = TRUE;
 	 m_tstatID=g_tstat_id;
-        
+     m_th800_value[0] = 0;
+     m_th800_value[1] = 0;
+     m_th800_value[2] = 0;
+     m_th800_value[3] = 0;
  Read_Multi(m_tstatID,m_SN,876,55);
  Read_Multi(m_tstatID,&m_SN[55],876+55,55);
 Initial_RegisterList();
@@ -2874,6 +2877,27 @@ void CNewHumChamberView::OnBnClickedButtonStart()
 		 
 	}
 }
+
+
+
+void CNewHumChamberView::start() {
+    CString Str_USB;
+    GetDlgItem(IDC_COMBO_USB_TESTO)->GetWindowText(Str_USB);
+
+
+    for (int i = 0;i<4;i++)
+    {
+        m_value[i] = 0;
+    }
+    m_isstart = true;
+    if (m_pFreshMultiRegisters == NULL)
+    {
+        m_pFreshMultiRegisters = AfxBeginThread(_Read_Testo, this);
+    }
+
+}
+
+#if 0
 void CNewHumChamberView::start(){
 	CString Str_USB;
 	GetDlgItem(IDC_COMBO_USB_TESTO)->GetWindowText(Str_USB);
@@ -2903,6 +2927,25 @@ void CNewHumChamberView::start(){
 	}
 	
 }
+#endif
+
+int ReadTH800Data(short reveivevalue[])
+{
+    int  read_ret = read_one(255, 12);
+    if (read_ret > 0)
+    {
+        reveivevalue[0] = read_ret;
+    }
+
+    read_ret = read_one(255, 17);
+    if (read_ret > 0)
+    {
+        reveivevalue[1] = read_ret;
+    }
+
+    return 1;
+}
+
 extern bool has_change_connect_ip;
 void CNewHumChamberView::read_testo(){
    // Sleep(1000);
@@ -2920,22 +2963,24 @@ void CNewHumChamberView::read_testo(){
 	} 
 	else
 	{
-		ReadTestoDeviceData(m_value);
+		//ReadTestoDeviceData(m_value);
+        ReadTH800Data(m_th800_value);
+#if 0
 		temp_value[0] = temp_value[1] = temp_value[2] = temp_value[3] = 0;
 		temp_value[0] = (short)m_value[0];
 		temp_value[3] = (short)m_value[1];
 		temp_value[1] = (short)(m_value[3] * 10);    //Êª¶È
 		temp_value[2] = (short)(m_value[2] * 10);	//ÎÂ¶È
-
+#endif
 
 	 
 		 	CString key_word_temp; CString temp_value_cstring;
 		 
-			temp_value_cstring.Format(_T("%d"), temp_value[0]); 
+			temp_value_cstring.Format(_T("%d"), m_th800_value[0]);
 			WritePrivateProfileStringW(_T("EnhancedRegister"), L"VALUE_0", temp_value_cstring, save_data_ini_file_path);
-			temp_value_cstring.Format(_T("%d"), temp_value[2]);
+			temp_value_cstring.Format(_T("%d"), m_th800_value[2]);
 			WritePrivateProfileStringW(_T("EnhancedRegister"), L"VALUE_1", temp_value_cstring, save_data_ini_file_path);
-			temp_value_cstring.Format(_T("%d"), temp_value[1]);
+			temp_value_cstring.Format(_T("%d"), m_th800_value[1]);
 			WritePrivateProfileStringW(_T("EnhancedRegister"), L"VALUE_2", temp_value_cstring, save_data_ini_file_path);
 		 
 	}
@@ -3064,10 +3109,15 @@ LRESULT CNewHumChamberView::WindowProc(UINT message, WPARAM wParam, LPARAM lPara
 		m_edit_co2.SetWindowTextW(StrTemp);
 		StrTemp.Format(_T("%0.0f Pa"),m_value[1]);
 		m_edit_presure.SetWindowTextW(StrTemp);
-		StrTemp.Format(_T("%0.1f C"),m_value[2]);
-		m_edit_temp.SetWindowTextW(StrTemp);
-		StrTemp.Format(_T("%0.1f %%"),m_value[3]);
-		m_edit_hum.SetWindowTextW(StrTemp);
+		//StrTemp.Format(_T("%0.1f C"),m_value[2]);
+		//m_edit_temp.SetWindowTextW(StrTemp);
+		//StrTemp.Format(_T("%0.1f %%"),m_value[3]);
+		//m_edit_hum.SetWindowTextW(StrTemp);
+        StrTemp.Format(_T("%0.2f C"), ((float)m_th800_value[0])/100);
+        m_edit_temp.SetWindowTextW(StrTemp);
+        StrTemp.Format(_T("%0.1f %%"), ((float)m_th800_value[1])/10);
+        m_edit_hum.SetWindowTextW(StrTemp);
+
 		StrTemp.Format(_T("Read Testo Times=%0.0f,Write Times=%0.0f"),m_times,m_Write_times);
 		m_libel_times.SetWindowTextW(StrTemp);
 		

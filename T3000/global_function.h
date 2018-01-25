@@ -112,9 +112,9 @@ BOOL Post_Write_Message(uint32_t deviceid,int8_t command,int8_t start_instance,i
 int GetProgramData(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance,uint8_t npackgae);
 int GetProgramData_Blocking(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance,uint8_t npackgae);
 int GetPrivateData(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize);
-int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize);
+int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize, uint8_t retrytime = 10);
 
-int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t nIndex,int8_t ntype_ad, uint16_t ntotal_seg,uint16_t nseg_index,MonitorUpdateData* up_data);
+int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t nIndex,int8_t ntype_ad, uint32_t ntotal_seg, uint32_t nseg_index,MonitorUpdateData* up_data);
 int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char start_instance,unsigned char end_instance);
 int WriteProgramData(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,uint8_t end_instance ,uint8_t npackage);
 int WriteProgramData_Blocking(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,uint8_t end_instance ,uint8_t npackage);
@@ -141,7 +141,7 @@ char * intervaltotextfull(char *textbuf, long seconds , unsigned minutes , unsig
 	 BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
   void local_rp_ack_print_data(	BACNET_READ_PROPERTY_DATA * data);
  bool Initial_bac(int comport = 0,CString bind_local_ip = _T(""));
-  bool Open_bacnetSocket2(CString strIPAdress,short nPort,SOCKET &mysocket);
+  bool Open_bacnetSocket2(CString strIPAdress,unsigned short nPort,SOCKET &mysocket);
   unsigned char Str_to_Byte(CString need_conver);
   void Init_Service_Handlers(void);
 CString GetProductName(int ModelID);

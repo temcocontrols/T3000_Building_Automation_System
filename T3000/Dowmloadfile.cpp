@@ -8,6 +8,7 @@
 #include "global_function.h"
 #include "MainFrm.h"
 #include "Class/md5.h"
+#include "ULRBindCallback.h"
 // Dowmloadfile dialog
 #define DOWNLOAD_AND_UPDATE  1
 #define DOWNLOAD_ONLY        2
@@ -55,8 +56,9 @@ Dowmloadfile::~Dowmloadfile()
 
 void Dowmloadfile::DoDataExchange(CDataExchange* pDX)
 {
-	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_LIST_DOWNLOAD_INFO, m_download_info);
+    CDialogEx::DoDataExchange(pDX);
+    DDX_Control(pDX, IDC_LIST_DOWNLOAD_INFO, m_download_info);
+    DDX_Control(pDX, IDC_STATIC_FTP_PERSENT, m_static_persent);
 }
 
 
@@ -73,7 +75,416 @@ END_MESSAGE_MAP()
 HANDLE Downloadfile_Thread;
 DWORD download_threadid;
 extern int malloc_download_memory_size;
+
+
+
+LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam, LPARAM lParam)
+{
+    //static bool insert_a_new_line = false;
+    int ncommand = (int)wParam;
+    if (ncommand == DOWNLOAD_CONNECT_SUCCESS)
+    {
+        //unsigned char IPAddress[4];
+        //((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_TEMCO_IP))->GetAddress(IPAddress[0],IPAddress[1],IPAddress[2],IPAddress[3]);
+        CString retmessage;
+        retmessage.Format(_T("Connect to newfirmware.com at IP="));
+        retmessage = retmessage + new_firmware_ip + _T(" Success");
+
+        m_download_info.InsertString(m_download_info.GetCount(), retmessage);
+        m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
+        if (Downloadfile_Thread == NULL)
+            Downloadfile_Thread = CreateThread(NULL, NULL, DownLoadFileProcess, this, NULL, &download_threadid);
+        else
+        {
+            TerminateThread(Downloadfile_Thread, 0);
+            Downloadfile_Thread = CreateThread(NULL, NULL, DownLoadFileProcess, this, NULL, &download_threadid);
+        }
+
+    }
+    else if (ncommand == DOWNLOAD_DISCONNEC)
+    {
+        CString retmessage;
+        retmessage.Format(_T("Disconnected with server!"));
+        m_download_info.InsertString(m_download_info.GetCount(), retmessage);
+        m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
+        GetDlgItem(IDC_BUTTON_START_DOWNLOAD)->EnableWindow(true);
+        GetDlgItem(IDC_BUTTON_FILE_DOWNLOAD_ONLY)->EnableWindow(true);
+        TCP_File_Socket.Close();
+    }
+    else if (ncommand == DOWNLOAD_CONNECT_FAILED)
+    {
+
+        CString retmessage;
+        retmessage.Format(_T("Connect to server failed!Please try again!"));
+        m_download_info.InsertString(m_download_info.GetCount(), retmessage);
+        m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
+        TCP_File_Socket.Close();
+        GetDlgItem(IDC_BUTTON_START_DOWNLOAD)->EnableWindow(true);
+        GetDlgItem(IDC_BUTTON_FILE_DOWNLOAD_ONLY)->EnableWindow(true);
+
+        if (MessageBox(_T("Do you want download firmware manually from website?"), _T("Download"), MB_YESNO) == IDYES)
+        {
+            CString excute_path;
+            if (!productfolder.IsEmpty())
+            {
+                excute_path = _T("http://www.temcocontrols.com/ftp/firmware/") + productfolder;
+                ShellExecute(NULL, L"open", excute_path, NULL, NULL, SW_SHOWNORMAL);
+            }
+            return 0;
+        }
+
+    }
+    else if (ncommand == DOWNLOAD_CLOSE_SOCKET)
+    {
+
+        CString ApplicationFolder;
+        GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+        PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
+        ApplicationFolder.ReleaseBuffer();
+        ISPtool_path = ApplicationFolder + _T("\\ISP.exe");
+
+        AutoFlashConfigPath = ApplicationFolder + _T("//AutoFlashFile.ini");
+
+        CString temp_isp_info;
+        CString exe_folder;
+        GetModuleFileName(NULL, exe_folder.GetBuffer(MAX_PATH), MAX_PATH);
+        PathRemoveFileSpec(exe_folder.GetBuffer(MAX_PATH));
+        exe_folder.ReleaseBuffer();
+
+
+        //CString mypath = exe_folder + _T("\\Database\\Firmware");
+        //mypath = mypath + _T("\\") + download_file_name;
+        CString mypath;
+        mypath = download_file_name;
+        WritePrivateProfileStringW(_T("Data"), _T("FirmwarePath"), mypath, AutoFlashConfigPath);
+
+
+        temp_isp_info.Format(_T("FirmwarePath = "));
+        temp_isp_info = temp_isp_info + mypath;
+        m_download_info.InsertString(m_download_info.GetCount(), temp_isp_info);
+        m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
+        //if (m_download_product_type == 199) //如果下载的是T3000;
+        //{
+        //    //调用解压;
+        //}
+        if (download_and_update == DOWNLOAD_ONLY)
+        {
+            if (flash_multi_auto)
+            {
+                //保存下载的位置,产品号 等信息;
+
+                for (int z = 0;z<download_info_type.size();z++)
+                {
+                    if (m_download_product_type == download_info_type.at(z).download_product_type)
+                    {
+                        WideCharToMultiByte(CP_ACP, 0, mypath.GetBuffer(), -1, download_info_type.at(z).firmware_file_path, 255, NULL, NULL);
+                        break;
+                    }
+                }
+                Sleep(1000);
+                PostMessage(WM_CLOSE, NULL, NULL);
+
+            }
+            GetDlgItem(IDC_BUTTON_START_DOWNLOAD)->EnableWindow(true);
+            GetDlgItem(IDC_BUTTON_FILE_DOWNLOAD_ONLY)->EnableWindow(true);
+            return 0;
+        }
+        KillProcessFromName(_T("ISP.exe"));
+
+        bool is_sub_device = false;
+        CString temp_deal_ip = m_product_isp_auto_flash.BuildingInfo.strIp;
+        if (!temp_deal_ip.IsEmpty())
+        {
+            CStringArray temparray;
+            SplitCStringA(temparray, temp_deal_ip, _T("."));
+            if (temparray.GetSize() == 4)
+            {
+                if (m_product_isp_auto_flash.note_parent_serial_number == 0)
+                    is_sub_device = false;
+                else
+                    is_sub_device = true;
+            }
+        }
+
+
+        //bool is_sub_device = (bool)IsNetDevice(m_product_isp_auto_flash.product_class_id);
+
+
+        WritePrivateProfileStringW(_T("Data"), _T("Command"), _T("1"), AutoFlashConfigPath);
+        if (m_product_isp_auto_flash.BuildingInfo.strIp.IsEmpty() ||
+            (m_product_isp_auto_flash.baudrate == 19200) ||
+            (m_product_isp_auto_flash.baudrate == 115200))//串口
+        {
+            CString temp_baudrate;
+            temp_baudrate.Format(_T("%d"), m_product_isp_auto_flash.baudrate);
+            WritePrivateProfileStringW(_T("Data"), _T("COM_OR_NET"), _T("COM"), AutoFlashConfigPath);
+            CString cs_comport;
+            cs_comport.Format(_T("COM%d"), m_product_isp_auto_flash.ncomport);
+            WritePrivateProfileStringW(_T("Data"), _T("COMPORT"), cs_comport, AutoFlashConfigPath);
+            //WritePrivateProfileStringW(_T("Data"),_T("Baudrate"),_T("19200"),AutoFlashConfigPath);
+            WritePrivateProfileStringW(_T("Data"), _T("Baudrate"), temp_baudrate, AutoFlashConfigPath);
+
+            CString nflash_id;
+            nflash_id.Format(_T("%d"), m_product_isp_auto_flash.product_id);
+            WritePrivateProfileStringW(_T("Data"), _T("ID"), nflash_id, AutoFlashConfigPath);
+
+            temp_isp_info.Format(_T("Communications port : "));
+            temp_isp_info = temp_isp_info + cs_comport;
+            m_download_info.InsertString(m_download_info.GetCount(), temp_isp_info);
+            temp_isp_info.Format(_T("ISP baudrate : %d"), m_product_isp_auto_flash.baudrate);
+            m_download_info.InsertString(m_download_info.GetCount(), temp_isp_info);
+            temp_isp_info.Format(_T("Device ID :"));
+            temp_isp_info = temp_isp_info + nflash_id;
+            m_download_info.InsertString(m_download_info.GetCount(), temp_isp_info);
+        }
+        else
+        {
+            WritePrivateProfileStringW(_T("Data"), _T("COM_OR_NET"), _T("NET"), AutoFlashConfigPath);
+            WritePrivateProfileStringW(_T("Data"), _T("IPAddress"), m_product_isp_auto_flash.BuildingInfo.strIp, AutoFlashConfigPath);
+            if ((m_product_isp_auto_flash.ncomport == 0) || (m_product_isp_auto_flash.ncomport == 47808))
+            {
+                m_product_isp_auto_flash.ncomport = 10000;
+            }
+            temp_isp_info.Format(_T("Communications port : network"));
+            m_download_info.InsertString(m_download_info.GetCount(), temp_isp_info);
+            temp_isp_info.Format(_T("IP Address : "));
+            temp_isp_info = temp_isp_info + m_product_isp_auto_flash.BuildingInfo.strIp;
+            m_download_info.InsertString(m_download_info.GetCount(), temp_isp_info);
+
+
+            CString n_tcpport;
+            n_tcpport.Format(_T("%d"), m_product_isp_auto_flash.ncomport);
+
+            temp_isp_info.Format(_T("Port : "));
+            temp_isp_info = temp_isp_info + n_tcpport;
+            m_download_info.InsertString(m_download_info.GetCount(), temp_isp_info);
+
+            WritePrivateProfileStringW(_T("Data"), _T("IPPort"), n_tcpport, AutoFlashConfigPath);
+            if (is_sub_device)
+            {
+                WritePrivateProfileStringW(_T("Data"), _T("Subnote"), _T("1"), AutoFlashConfigPath);
+                CString nsub_id;
+                nsub_id.Format(_T("%d"), m_product_isp_auto_flash.product_id);
+                WritePrivateProfileStringW(_T("Data"), _T("SubID"), nsub_id, AutoFlashConfigPath);
+
+                temp_isp_info.Format(_T("Device is subnote."));
+                m_download_info.InsertString(m_download_info.GetCount(), temp_isp_info);
+            }
+            else
+            {
+                WritePrivateProfileStringW(_T("Data"), _T("Subnote"), _T("0"), AutoFlashConfigPath);
+            }
+
+            temp_isp_info.Format(_T("Please wait!ISP is running!"));
+            m_download_info.InsertString(m_download_info.GetCount(), temp_isp_info);
+        }
+
+        HANDLE Call_ISP_Application = NULL;
+        Call_ISP_Application = CreateThread(NULL, NULL, isp_thread, this, NULL, NULL);
+
+
+    }
+    else if (ncommand == DOWNLOAD_PERSENT)
+    {
+
+        int npersent = (int)lParam;
+        CString persent_message;
+        persent_message.Format(_T("Downloading now:  %d%%"), npersent);
+        //bool is_the_first = true;
+        //if(!is_the_first)
+        m_download_info.DeleteString(m_download_info.GetCount() - 1);
+
+        //m_download_info.AddString(persent_message);
+        m_download_info.InsertString(m_download_info.GetCount(), persent_message);
+        m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
+    }
+    else if (ncommand == DOWNLOAD_FINISHED)
+    {
+        CString complete_message;
+        complete_message.Format(_T("File download complete. "));
+        //m_download_info.AddString(complete_message);
+        m_download_info.InsertString(m_download_info.GetCount(), complete_message);
+
+        complete_message.Format(_T("Local file path : "));
+        complete_message = complete_message + Folder_Path;
+        //m_download_info.InsertString(m_download_info.GetCount(),complete_message);
+
+        //m_download_info.SetTopIndex(m_download_info.GetCount()-1);
+    }
+    else if (ncommand == DOWNLOAD_FILE_INFO)
+    {
+        CString nfile_name;
+        CString nfile_size;
+        MultiByteToWideChar(CP_ACP, 0, download_filename, (int)strlen((char *)download_filename) + 1, nfile_name.GetBuffer(MAX_PATH), MAX_PATH);
+        nfile_name.ReleaseBuffer();
+        nfile_size.Format(_T("File size about %d KB "), malloc_download_memory_size / 1024);
+        CString show_message;
+        show_message = _T("File name  ") + nfile_name + _T("   .") + nfile_size;
+        m_download_info.InsertString(m_download_info.GetCount(), show_message);
+        m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
+    }
+    else if (ncommand == DOWNLOAD_T3000_NO_UPDATE)
+    {
+        CString show_message;
+        show_message = _T("Your T3000 is up-to-date");
+        m_download_info.InsertString(m_download_info.GetCount(), show_message);
+        m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
+    }
+    else if (ncommand == DOWNLOAD_NOT_FIND_LOCAL)
+    {
+        CString complete_message;
+        complete_message.Format(_T("Local file doesn't exist, downloading from server now."));
+        m_download_info.InsertString(m_download_info.GetCount(), complete_message);
+        //complete_message.Format(_T("Check MD5 value over!"));
+        //m_download_info.InsertString(m_download_info.GetCount(),complete_message);
+        m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
+
+
+
+        complete_message.Format(_T("Version Details."));
+        m_download_info.InsertString(m_download_info.GetCount(), complete_message);
+        complete_message.Format(_T("Device Firmware: %.1f"), m_product_isp_auto_flash.software_version);
+        m_download_info.InsertString(m_download_info.GetCount(), complete_message);
+        complete_message.Format(_T("Newfirmware.com: %.1f"), ((float)download_fw_version) / 10);
+        m_download_info.InsertString(m_download_info.GetCount(), complete_message);
+        complete_message.Format(_T("               "));
+        m_download_info.InsertString(m_download_info.GetCount(), complete_message);
+    }
+    else if (ncommand == DOWNLOAD_LOCAL_EXSIT)
+    {
+        CString complete_message;
+        complete_message.Format(_T("Local Firmware  already exist in the Firmware folder.MD5 checksum value matches.  "));
+        m_download_info.InsertString(m_download_info.GetCount(), complete_message);
+        m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
+    }
+    else if (ncommand == DOWNLOAD_RESULTS)
+    {
+        GetDlgItem(IDC_BUTTON_START_DOWNLOAD)->EnableWindow(true);
+        GetDlgItem(IDC_BUTTON_FILE_DOWNLOAD_ONLY)->EnableWindow(true);
+        KillTimer(1);
+        int ret_results = GetPrivateProfileInt(_T("Data"), _T("Command"), 0, AutoFlashConfigPath);
+        CString ret_message;
+        switch (ret_results)
+        {
+        case NO_COMMAND:
+        case START_AUTO_FLASH_COMMAND:
+        case FAILED_NORESPONSED:
+            ret_message.Format(_T("No response from device,please try again!"));
+            m_download_info.InsertString(m_download_info.GetCount(), ret_message);
+            m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
+            break;
+        case FLASH_SUCCESS:
+        {
+            ret_message.Format(_T("ISP succeed!"));
+            m_download_info.InsertString(m_download_info.GetCount(), ret_message);
+            m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
+        }
+        break;
+        case FAILED_UNKNOW_ERROR:
+        {
+            ret_message.Format(_T("Download error! "));
+            m_download_info.InsertString(m_download_info.GetCount(), ret_message);
+            m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
+        }
+        break;
+        }
+
+        CFileFind configfind;
+        if (configfind.FindFile(AutoFlashConfigPath))
+        {
+            DeleteFile(AutoFlashConfigPath);
+        }
+    }
+    else if (ncommand == RETURN_ERROR)
+    {
+        CString show_error_message;
+        int file_error_type = (int)lParam;
+        bool download_failed = false;
+        switch (file_error_type)
+        {
+        case NO_MD5_FILE_EXSIT:
+        {
+            show_error_message.Format(_T("Sorry, the firmware update service is temporarily offline or your file cannot be found."));
+
+            m_download_info.InsertString(m_download_info.GetCount(), show_error_message);
+            m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
+
+            show_error_message.Format(_T(" Please navigate to this link and manually download the firmware:http://www.temcocontrols.com/ftp/firmware/"));
+            download_failed = true;
+        }
+        break;
+        case DOWNLOAD_FILE_ERROR:
+        {
+            show_error_message.Format(_T("Download file from server failed!"));
+            download_failed = true;
+        }
+
+        break;
+        case HOST_BUSY:
+        {
+            show_error_message.Format(_T("Host busy,please try again later!"));
+            download_failed = true;
+        }
+        break;
+        case DOWNLOAD_MD5_FAILED:
+        {
+            show_error_message.Format(_T("Check MD5 value failed!Please retry again!"));
+            download_failed = true;
+        }
+        break;
+        case DOWNLOAD_MD5_CHECK_PASS:
+        {
+            string temp_md5 = MD5(ifstream(HEX_BIN_FILE_PATH)).toString();
+            CString MD5_value;
+            MD5_value = temp_md5.c_str();
+            CString temp_show;
+            temp_show.Format(_T("The File MD5 is :"));
+            temp_show = temp_show + MD5_value;
+            m_download_info.InsertString(m_download_info.GetCount(), temp_show);
+            show_error_message.Format(_T("Check MD5 value with server Pass."));
+            download_failed = false;
+        }
+        break;
+        default:
+        {
+            show_error_message.Format(_T("Unknown error,please try again later!"));
+            download_failed = true;
+        }
+        break;
+
+        }
+
+        if (download_failed)
+        {
+            if (flash_multi_auto)
+            {
+                PostMessage(WM_CLOSE, NULL, NULL);
+            }
+            else
+            {
+
+
+                if (MessageBox(_T("Do you want download firmware manually from website?"), _T("Download"), MB_YESNO) == IDYES)
+                {
+                    CString excute_path;
+                    if (!productfolder.IsEmpty())
+                    {
+                        excute_path = _T("http://www.temcocontrols.com/ftp/firmware/") + productfolder;
+                        ShellExecute(NULL, L"open", excute_path, NULL, NULL, SW_SHOWNORMAL);
+                    }
+                    //ShellExecute(NULL, L"open", L"http://www.temcocontrols.com/ftp/firmware/", NULL, NULL, SW_SHOWNORMAL);
+                }
+
+            }
+        }
+        m_download_info.InsertString(m_download_info.GetCount(), show_error_message);
+        m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
+    }
+    return 0;
+}
+
 // Dowmloadfile message handlers
+#if 0
 LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 {
 	//static bool insert_a_new_line = false;
@@ -486,7 +897,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 	}
 	return 0;
 }
-
+#endif
 DWORD WINAPI  Dowmloadfile::isp_thread(LPVOID lpVoid)
 {
 	//Write_Config_Info
@@ -741,8 +1152,8 @@ void Dowmloadfile::CreateProductFolderMap()
 	//product_folder_map
 	
 	product_folder_map.insert(map <int,CString>::value_type(PM_TSTAT5B,_T("Tstat5/Tstat5LED")));
-	product_folder_map.insert(map <int,CString>::value_type(PM_MINIPANEL,_T("CM5/cm5_rev38.6.bin")));
-	product_folder_map.insert(map <int, CString>::value_type(PM_MINIPANEL_ARM, _T("CM5/cm5_rev38.6.bin")));
+	product_folder_map.insert(map <int,CString>::value_type(PM_MINIPANEL,_T("T3_BB_LB_TB")));
+	product_folder_map.insert(map <int, CString>::value_type(PM_MINIPANEL_ARM, _T("T3_BB_LB_TB")));
 	product_folder_map.insert(map <int,CString>::value_type(PM_TSTAT6,_T("Tstat6/128kChip")));
 	Sleep(1);
 }
@@ -764,6 +1175,13 @@ BOOL Dowmloadfile::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
+    m_static_persent.SetWindowTextW(_T(""));
+    m_static_persent.textColor(RGB(255, 0, 0));
+    //m_static_persent.bkColor(RGB(0,255,255));
+    m_static_persent.setFont(18, 10, NULL, _T("Arial"));
+    m_static_persent.ShowWindow(SW_HIDE);
+
+    GetDlgItem(IDC_PROGRESS_FTP_DOWNLOAD)->ShowWindow(SW_HIDE);
 	
 	CreateProductFolderMap();
 
@@ -812,8 +1230,6 @@ BOOL Dowmloadfile::OnInitDialog()
 		WritePrivateProfileStringW(_T("Setting"),_T("TemcoServerIP"),_T("192.168.0.4"),temp_db_ini_folder);
 	}
 
-	//hostent* host = gethostbyname("www.temcocontrols.poweredbyclear.com");  //这是以前的域名 
-	//hostent* host = gethostbyname("14i5f38013.iok.la");
 
 	if((isp_mode_firmware_auto == false) && (isp_mode_is_cancel == false))
 	{
@@ -834,7 +1250,7 @@ BOOL Dowmloadfile::OnInitDialog()
 
 	if(is_local_temco_net == false)
 	{
-
+#if 0
 		hostent* host = gethostbyname("newfirmware.com");
 		if(host == NULL)
 		{
@@ -863,6 +1279,7 @@ BOOL Dowmloadfile::OnInitDialog()
 		temp_message.Format(_T("Internet access!"));
 		m_download_info.InsertString(m_download_info.GetCount(),temp_message);
 		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
+#endif
 	}
 	else
 	{
@@ -897,7 +1314,116 @@ BOOL Dowmloadfile::PreTranslateMessage(MSG* pMsg)
 }
 
 
+HANDLE hDownloadFtpThread = NULL;
+void Dowmloadfile::Start_Download_Ftp()
+{
+    
+    SetTimer(1, 200, NULL);
+    wait_download_and_isp_finished = false;
+    Add_log_count = 1;
+    replace_count = 1;
+    m_download_info.ResetContent();
 
+    m_static_persent.ShowWindow(SW_SHOW);
+    GetDlgItem(IDC_PROGRESS_FTP_DOWNLOAD)->ShowWindow(SW_SHOW);
+    if(hDownloadFtpThread == NULL)
+        hDownloadFtpThread = CreateThread(NULL, NULL, FtpDownloadThread, this, NULL, NULL);
+}
+
+
+DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
+{
+    //Write_Config_Info
+    Dowmloadfile *pParent = (Dowmloadfile *)lpVoid;
+    CString CS_Info;
+    CBindCallback cbc;
+    cbc.m_pdlg = pParent;
+    unsigned int ftp_version_date = 0;
+    unsigned int local_version_date = 0;
+    CString DesDownloadFilePath;
+    CString DownloadIniFilePath;
+    CString CheckVersionIniFilePath;
+    CString T3000FtpPath;//测试用;
+    CString temp_download_path;
+    CFileFind tempfind;
+    CString strFileName;
+
+    bool download_ret = false;
+    DownloadIniFilePath = Folder_Path + _T("//ProductPath.ini");
+    CheckVersionIniFilePath = Folder_Path + _T("//CheckVersionPath.ini");
+    download_ret = URLDownloadToFile(NULL, _T("https://temcocontrols.com/ftp/firmware/ProductPath.ini"), DownloadIniFilePath, 0, NULL);
+    //T3000_FTP_Version = GetPrivateProfileIntW(_T("Version"), _T("T3000Version"), 0, DownloadIniFilePath);
+
+    CString str_product_section;
+
+    str_product_section.Format(_T("%d"), pParent->m_download_product_type);
+    GetPrivateProfileString(_T("ProductPath"), str_product_section, _T(""), temp_download_path.GetBuffer(MAX_PATH), MAX_PATH, DownloadIniFilePath);
+    temp_download_path.ReleaseBuffer();
+
+    ftp_version_date = GetPrivateProfileInt(_T("LastUpdateTime"), str_product_section, 0, DownloadIniFilePath);
+    local_version_date = GetPrivateProfileInt(_T("LastUpdateTime"), str_product_section, 0, CheckVersionIniFilePath);
+
+
+
+    if (temp_download_path.IsEmpty())  //此产品没有找到对应的下载目录;
+    {
+        CS_Info.Format(_T("Can't find the firmware file on the webside."));
+        pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
+        pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
+        goto ftp_download_end;
+    }
+
+    T3000FtpPath = _T("https://www.temcocontrols.com/ftp/firmware/") + temp_download_path;
+
+
+    strFileName  = PathFindFileName(T3000FtpPath);  //根据组合的下载路径，获取最后得文件名
+
+
+    DesDownloadFilePath = Folder_Path + _T("\\") + strFileName;     
+
+
+
+    if ((local_version_date == ftp_version_date) && (ftp_version_date != 0) && tempfind.FindFile(DesDownloadFilePath))  //与FTP上相等 并且存在;
+    {
+        pParent->download_file_name = DesDownloadFilePath;
+        CS_Info.Format(_T("The file has been downloaded."));
+        pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
+        pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
+    }
+    else
+    {
+        download_ret = URLDownloadToFile(NULL, T3000FtpPath, DesDownloadFilePath, 0, &cbc); // 根据配置文档配置好的路径去下载.下载到指定目录，并记录目录位置;
+        if (download_ret == S_FALSE)
+        {
+            CS_Info.Format(_T("Download failded!"));
+            pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
+            pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
+            goto ftp_download_end;
+        }
+        else
+        {
+            //GetPrivateProfileInt(_T("LastUpdateTime"), str_product_section, 0, CheckVersionIniFilePath);
+            CString temp_version;
+            temp_version.Format(_T("%u"), ftp_version_date);
+            WritePrivateProfileStringW(_T("LastUpdateTime"), str_product_section, temp_version, CheckVersionIniFilePath);
+            pParent->download_file_name = DesDownloadFilePath;
+            CS_Info.Format(_T("Download finished."));
+            pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
+            pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
+        }
+    }
+
+
+    ::PostMessage(downloadfile_hwnd, WM_DOWNLOADFILE_MESSAGE, DOWNLOAD_CLOSE_SOCKET, NULL);
+
+ftp_download_end:
+
+    hDownloadFtpThread = NULL;
+    pParent->m_static_persent.ShowWindow(SW_HIDE);
+    pParent->GetDlgItem(IDC_PROGRESS_FTP_DOWNLOAD)->ShowWindow(SW_HIDE);
+
+    return true;
+}
 
 void Dowmloadfile::Start_Download()
 {
@@ -1141,14 +1667,16 @@ void Dowmloadfile::OnBnClickedButtonStartDownload()
 {
 	
 	download_and_update = DOWNLOAD_AND_UPDATE;
-	Start_Download();
+	//Start_Download();
+    Start_Download_Ftp();
 }
 
 void Dowmloadfile::OnBnClickedButtonFileDownloadOnly()
 {
 	
 	download_and_update = DOWNLOAD_ONLY;
-	Start_Download();
+	//Start_Download();
+    Start_Download_Ftp();
 }
 
 void Dowmloadfile::AutoFlashFirmware()

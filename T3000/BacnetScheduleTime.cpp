@@ -50,6 +50,23 @@ BOOL CBacnetScheduleTime::OnInitDialog()
 	
 	PostMessage(WM_REFRESH_BAC_SCHEDULE_LIST,NULL,NULL);
 
+    //2017 12 28 优化显示 ，在弹出 的schedule 界面 优先显示 label 的值，如果label为空值就默认显示Schedule加序号. 
+    CString temp_des2;
+    MultiByteToWideChar(CP_ACP, 0, (char *)m_Weekly_data.at(weekly_list_line).label, (int)strlen((char *)m_Weekly_data.at(weekly_list_line).label) + 1,
+        temp_des2.GetBuffer(MAX_PATH), MAX_PATH);
+    temp_des2.ReleaseBuffer();
+
+    CString window_text;
+    if (temp_des2.IsEmpty())
+    {
+        window_text.Format(_T("Schedule %d"), weekly_list_line + 1);
+    }
+    else
+    {
+        window_text = temp_des2;
+    }
+
+    SetWindowText(window_text);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }

@@ -14,6 +14,7 @@
 #include "BacnetGraphic.h"
 #include "BacnetWait.h"
 #include "BADO/BADO.h"
+void BitToString(int digtal_or_analog, int nIndex);
 #define  WM_MONITOR_USER_MESSAGE WM_USER + 902
 #define  WM_FLASH_CHANGE         WM_USER + 903
 extern char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network,unsigned char & sub_panel, byte panel , int *netpresent);
@@ -28,9 +29,11 @@ static int old_monitor_line = -1;
 extern BacnetWait *WaitDlg;
 HANDLE h_read_monitordata_thread = NULL;
 Str_MISC Device_Misc_Data_Old;
-unsigned char read_monitor_sd_ret = false;
+//unsigned char read_monitor_sd_ret = false;
 bool read_temp_local_tem_package = true; //开始点的时候只读最后10包并保存为临时数据;
 
+CString ReadPackage;
+int ncontinue_read_data = true; //如果变更了刻度或进度条，就退出之前正在读的循环,需要读新的刻度;
 
 IMPLEMENT_DYNAMIC(CBacnetMonitor, CDialogEx)
 extern char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network, byte panel, int *netpresent);
@@ -159,7 +162,7 @@ BOOL CBacnetMonitor::OnInitDialog()
 	CDialogEx::OnInitDialog();
 	old_monitor_line = -1;
 	SetWindowTextW(_T("Trend Log"));
-	
+    //StringToBit();
 	Initial_List();
 	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_TRENDLOG);
 	SetIcon(m_hIcon,TRUE);
@@ -1227,21 +1230,15 @@ void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
 			//}
 		}
 
-
-
-
-
-
 		CString strSql;
 		CBADO monitor_bado;
 		monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//删除里面的临时数据;
 		monitor_bado.OnInitADOConn(); 
-		strSql.Format(_T("delete * from MonitorData where Flag=1"),g_selected_serialnumber,monitor_list_line);
+		strSql.Format(_T("delete * from MonitorData where Flag=1"));
 		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
 		monitor_bado.CloseConn();
 
 		//WritePrivateProfileString(_T("Setting"),_T("MonitorValueIgnoreMax"),_T("10000000"),g_cstring_ini_path);
-
 		h_read_monitordata_thread =CreateThread(NULL,NULL,Readmonitorthreadfun,this,NULL, NULL);
 	}
 
@@ -1252,6 +1249,7 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteAll()
 	memset(monitor_database_flag ,1,24);
 	if(IDYES != MessageBox(_T("Do you want to delete all device monitor data which saved in SD card?"),_T("Warning"),MB_YESNO))
 		return;
+    Check_New_DB();
 	if(Write_Private_Data_Blocking(DELETE_MONITOR_DATABASE,0,0) > 0)
 	{
 		CString temp_serial;
@@ -1298,6 +1296,8 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteLocal()
 	temp_cs.Format(_T("Do you want delete local data saved in T3000?"),monitor_list_line + 1);
 	if(IDYES != MessageBox(temp_cs,_T("Warning"),MB_YESNO))
 		return;
+
+    Check_New_DB();
 
 	CString temp_serial;
 	temp_serial.Format(_T("%u"),g_selected_serialnumber);
@@ -1391,178 +1391,222 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteSelected()
 
 
 
-unsigned char read_monitordata(int digtal_or_analog)
+
+int read_monitordata(int digtal_or_analog,unsigned int timeleft,unsigned int timeright)
 {
-	timestart = time(NULL);
-	MonitorUpdateData temp;
-	memset(&temp,0,sizeof(MonitorUpdateData));
-	//temp.nsize = 10000;
-	//timesec1970 = (unsigned long)time(NULL);
-	//temp.oldest_time =timesec1970 - 43200;
-	//temp.most_recent_time = timestart + 43200;
+    timestart = time(NULL);
+    MonitorUpdateData temp;
+    memset(&temp, 0, sizeof(MonitorUpdateData));
+    //temp.nsize = 10000;
+    //timesec1970 = (unsigned long)time(NULL);
+    //temp.oldest_time =timesec1970 - 43200;
+    //temp.most_recent_time = timestart + 43200;
 
 
-	//unsigned long nTime = temp.oldest_time;   //nTime类型为unsigned long
-	//unsigned long nTime1 = temp.most_recent_time;  //nTime类型为unsigned long
-	//CTime objTime(nTime);   //CTime类型变量直接获取时间值
-	//CTime objTime1(nTime1);   //CTime类型变量直接获取时间值
-	////string strTime;    //格式化string变量
-	////strTime.Format("d-d-d d:d:d", objTime.GetYear(), objTime.GetMonth(), objTime.GetDay(),objTime.GetHour(), objTime.GetMinute(), objTime.GetSecond());
+    //unsigned long nTime = temp.oldest_time;   //nTime类型为unsigned long
+    //unsigned long nTime1 = temp.most_recent_time;  //nTime类型为unsigned long
+    //CTime objTime(nTime);   //CTime类型变量直接获取时间值
+    //CTime objTime1(nTime1);   //CTime类型变量直接获取时间值
+    ////string strTime;    //格式化string变量
+    ////strTime.Format("d-d-d d:d:d", objTime.GetYear(), objTime.GetMonth(), objTime.GetDay(),objTime.GetHour(), objTime.GetMinute(), objTime.GetSecond());
 
-	//g_Print.Format(_T("Read Start Time %d-%d-%d %d:%d:%d   %d"), objTime.GetYear(), objTime.GetMonth(), objTime.GetDay(),objTime.GetHour(), objTime.GetMinute(), objTime.GetSecond(),temp.oldest_time);
-	//DFTrace(g_Print);
-	//g_Print.Format(_T("Read End Time %d-%d-%d %d:%d:%d   %d"), objTime1.GetYear(), objTime1.GetMonth(), objTime1.GetDay(),objTime1.GetHour(), objTime1.GetMinute(), objTime1.GetSecond(),temp.most_recent_time);
-	//DFTrace(g_Print);
-	int ret = -2;
-	int send_count = 0;
-	//int time_count = 0;//用于动态计时只要有回复继续下一包;.
-	int recieve_flag = 0;
-	CString cs_my_temp;
-	cs_my_temp = _T("");
-	//if(WaitDlg)
-	//{
-	//	WaitDlg->Set_Show_String(cs_my_temp);
-	//	WaitDlg->Set_Pos(0);
-	//}
-	//else
-	//	return false;
+    //g_Print.Format(_T("Read Start Time %d-%d-%d %d:%d:%d   %d"), objTime.GetYear(), objTime.GetMonth(), objTime.GetDay(),objTime.GetHour(), objTime.GetMinute(), objTime.GetSecond(),temp.oldest_time);
+    //DFTrace(g_Print);
+    //g_Print.Format(_T("Read End Time %d-%d-%d %d:%d:%d   %d"), objTime1.GetYear(), objTime1.GetMonth(), objTime1.GetDay(),objTime1.GetHour(), objTime1.GetMinute(), objTime1.GetSecond(),temp.most_recent_time);
+    //DFTrace(g_Print);
+    int ret = -2;
+    //int send_count = 0;
+    //int time_count = 0;//用于动态计时只要有回复继续下一包;.
+    int recieve_flag = 0;
+    CString cs_my_temp;
+    cs_my_temp = _T("");
+    //if(WaitDlg)
+    //{
+    //	WaitDlg->Set_Show_String(cs_my_temp);
+    //	WaitDlg->Set_Pos(0);
+    //}
+    //else
+    //	return false;
+    temp.oldest_time = timeleft;
+    temp.most_recent_time = timeright;
+#if 0
+    static int test_time = 0;
+    temp.oldest_time = timestart - 10800 - test_time;
+    temp.most_recent_time = timestart - 3600 - test_time;
+    CString test_1;
+    CString test_2;
+    test_1.Format(_T("开始时间 %u"), temp.oldest_time);
+    test_2.Format(_T("结束时间 %u"), temp.oldest_time);
 
-	m_monitor_head.total_seg = 0;
-	m_monitor_head.seg_index = 0;
-	for (int i=0;i<5;i++)
-	{
-		recieve_flag = false;
-		ret = GetMonitorBlockData(g_bac_instance,READMONITORDATA_T3000,monitor_list_line,digtal_or_analog,0,0,&temp);	
-		if(ret < 0)
-		{
-			Sleep(SEND_COMMAND_DELAY_TIME);
-			continue;
-		}
-		for(int time_loop=0;time_loop<2000;time_loop++)
-		{
-			Sleep(1);
-			if(tsm_invoke_id_free(ret))
-			{
-				recieve_flag = true;
-				break;
-			}
-		} 
-		if(recieve_flag)
-		{
-			break;
-		}
-		else if((recieve_flag == false) &&( i == 5))
-		{
-			g_progress_persent = 0;
-			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read monitor data timeout!"));
-			return MONITOR_READ_TIMEOUT;
-		}
-	}
+    CString strTime;
+    wchar_t temp_char[200];
+    time_t scale_time;
+    CTime time_scaletime;
+    scale_time = temp.oldest_time;
+    time_scaletime = scale_time;
 
-	CString temp_db_ini_folder;
-	temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
-	CString temp_serial;
-	CString temp_monitor_index;
-	if(digtal_or_analog == BAC_UNITS_ANALOG)
-		temp_monitor_index.Format(_T("Index_%d"),monitor_list_line);
-	else
-		temp_monitor_index.Format(_T("Digital_Index_%d"),monitor_list_line);
+    strTime = time_scaletime.Format("  %m/%d \r\n%H:%M:%S");
+    test_1 = test_1 + strTime;
 
-	temp_serial.Format(_T("%u"),g_selected_serialnumber);
-	int temp_index = GetPrivateProfileInt(temp_serial,temp_monitor_index,-1,temp_db_ini_folder) + 1;
+    scale_time = temp.most_recent_time;
+    time_scaletime = scale_time;
+    strTime = time_scaletime.Format("  %m/%d \r\n%H:%M:%S");
+    test_2 = test_2 + strTime;
+    DFTrace(test_1);
+    DFTrace(test_2);
+    test_time = test_time + 3600;
 
-	if(m_monitor_head.total_seg == 0)
-		return MONITOR_READ_NO_DATA;
+#endif 
 
-	if(temp_index > m_monitor_head.total_seg)
-		return true;
+    m_monitor_head.total_seg = 0;
+    m_monitor_head.seg_index = 0;
 
-	int temp_value = 0;
-	if(read_temp_local_tem_package)
-	{
-		if((m_monitor_head.total_seg > TEMP_DATA_READ_COUNT) && (temp_index < m_monitor_head.total_seg - TEMP_DATA_READ_COUNT))
-			temp_value = m_monitor_head.total_seg - TEMP_DATA_READ_COUNT;
-		else
-			temp_value = temp_index;
-	}
-	else
-	{
-		temp_value = temp_index;
-	}
+    for (int i = 0;i<5;i++)
+    {
+        recieve_flag = false;
+        ret = GetMonitorBlockData(g_bac_instance, READMONITORDATA_T3000, monitor_list_line, digtal_or_analog, 0, 0, &temp);
+        if (ret < 0)
+        {
+            Sleep(SEND_COMMAND_DELAY_TIME);
+            continue;
+        }
+        for (int time_loop = 0;time_loop<2000;time_loop++)
+        {
+            Sleep(1);
+            if (tsm_invoke_id_free(ret))
+            {
+                recieve_flag = true;
+                break;
+            }
+        }
+        if (recieve_flag)
+        {
+            break;
+        }
+        else if ((recieve_flag == false) && (i == 5))
+        {
+            g_progress_persent = 0;
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read monitor data timeout!"));
+            return MONITOR_READ_TIMEOUT;
+        }
+    }
 
 
+    unsigned int  start_read_index = 0;
+    unsigned int  end_read_index = 0;
+    start_read_index = m_monitor_head.seg_index;
+    end_read_index = m_monitor_head.seg_index + m_monitor_head.total_seg;
+    if ((start_read_index == end_read_index) && (start_read_index == 0))
+    {
+        //没有数据，开始结束都为0
+        return 0;
+    }
+    //for (int read_index = temp_value;read_index <= m_monitor_head.total_seg;read_index++)
+    for (unsigned int read_index = start_read_index;read_index <= end_read_index;read_index++)
+    {
+        if (ncontinue_read_data == false) //如果有操作来了，退出线程更新循环.
+        {
+            g_progress_persent = 100;
+            return -1;
+        }
 
-	for (int read_index= temp_value ;read_index<=m_monitor_head.total_seg;read_index++)
-	{
-		if(Device_Basic_Setting.reg.sd_exist != 2)
-		{
-			if(m_monitor_head.total_seg >= 2)
-			{
-			   break;
-			}
-		}
 
-		cs_my_temp.Format(_T("Read Data %d / %d"),read_index - temp_index,m_monitor_head.total_seg - temp_index);
-		SetPaneString(BAC_SHOW_MISSION_RESULTS,cs_my_temp);
+        if (digtal_or_analog == BAC_UNITS_ANALOG)
+        {
+            if (read_index < read_analog_package.size())
+            {
+                if ((read_analog_package.at(read_index) == true) && (read_index != m_monitor_head.seg_index + m_monitor_head.total_seg))  //已经读过的;
+                    continue;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+        else
+        {
+            if (read_index < read_dig_package.size())
+            {
+                if ((read_dig_package.at(read_index) == true) && (read_index != m_monitor_head.seg_index + m_monitor_head.total_seg))  //已经读过的;
+                    continue;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+        cs_my_temp.Format(_T("Read Data %d / %d"), read_index - start_read_index, end_read_index - start_read_index);
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, cs_my_temp);
 
-		//WaitDlg->Set_Show_String(cs_my_temp);
-		int pos = 100;
-		if(m_monitor_head.total_seg != temp_index)
-		 pos = ((read_index - temp_index) * 100 ) / (m_monitor_head.total_seg - temp_index);
-		if(pos > 100)
-			pos = 100;
+        //WaitDlg->Set_Show_String(cs_my_temp);
+        int pos = 100;
+        if(end_read_index - start_read_index != 0)
+            pos = ((read_index - start_read_index) * 100) / (end_read_index - start_read_index);
+        if (pos > 100)
+            pos = 100;
 
-		g_progress_persent = pos;
-		//WaitDlg->Set_Pos(pos);
-		for (int i=0;i<5;i++)
-		{
-			recieve_flag = false;
-			CString temp_cs1;
-			temp_cs1.Format(_T("Read index = %x , Digital_Analog = %d"),read_index,digtal_or_analog);
-			//DFTrace(temp_cs1);
-			ret = GetMonitorBlockData(g_bac_instance,READMONITORDATA_T3000,monitor_list_line,digtal_or_analog,m_monitor_head.total_seg,read_index,&temp);	
-			if(ret < 0)
-			{
-				Sleep(SEND_COMMAND_DELAY_TIME);
-				continue;
-			}
-			for(int time_loop=0;time_loop<1500;time_loop++)
-			{
-				Sleep(1);
-				if(tsm_invoke_id_free(ret))
-				{
-					recieve_flag = true;
-					break;
-				}
-			} 
-			if(recieve_flag)
-			{
-				break;
-			}
-			else if((recieve_flag == false) &&( i == 5))
-			{
-				g_progress_persent = 0;
-				SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read monitor data timeout!"));
-				return MONITOR_READ_TIMEOUT;
-			}
-		}
-		if(recieve_flag)
-		{
-			continue;
-		}
-		else
-		{
-			g_progress_persent = 0;
-			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read monitor data timeout!"));
-			return false;
-		}
+        g_progress_persent = pos;
+        //WaitDlg->Set_Pos(pos);
+        for (int i = 0;i<5;i++)
+        {
+            recieve_flag = false;
+            CString temp_cs1;
+            temp_cs1.Format(_T("Read index = %x , Digital_Analog = %d"), read_index, digtal_or_analog);
+            //DFTrace(temp_cs1);
+            ret = GetMonitorBlockData(g_bac_instance, READMONITORDATA_T3000, monitor_list_line, digtal_or_analog, read_index /*m_monitor_head.total_seg*/, read_index, &temp);
+            if (ret < 0)
+            {
+                Sleep(SEND_COMMAND_DELAY_TIME);
+                continue;
+            }
+            //send_count++;
+            //if (send_count > 20)
+            //    return true;
+            for (int time_loop = 0;time_loop<1500;time_loop++)
+            {
+                Sleep(1);
+                if (tsm_invoke_id_free(ret))
+                {
+                    if (digtal_or_analog == BAC_UNITS_ANALOG)
+                    {
+                        read_analog_package[read_index] = true;
+                    }
+                    else
+                    {
+                        read_dig_package[read_index] = true;
+                    }
+                    recieve_flag = true;
 
-	}
-	SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read monitor data : OK!"));
-	g_progress_persent = 100;
-	return true;
+                    break;
+                }
+            }
+            if (recieve_flag)
+            {
+                break;
+            }
+            else if ((recieve_flag == false) && (i == 5))
+            {
+                g_progress_persent = 0;
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read monitor data timeout!"));
+                return MONITOR_READ_TIMEOUT;
+            }
+        }
+        if (recieve_flag)
+        {
+            continue;
+        }
+        else
+        {
+            g_progress_persent = 0;
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read monitor data timeout!"));
+            return false;
+        }
+
+    }
+    SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read monitor data : OK!"));
+    g_progress_persent = 100;
+    return true;
 }
-
 
 
 
@@ -1570,31 +1614,8 @@ DWORD WINAPI  CBacnetMonitor::Readmonitorthreadfun(LPVOID lpVoid)
 {
 	//Write_Config_Info
 	CBacnetMonitor *pParent = (CBacnetMonitor *)lpVoid;
-	read_monitor_sd_ret = false;
-	unsigned char analog_ret = false;
-	unsigned char digital_ret = false;
-	read_temp_local_tem_package = true;
-	analog_ret = read_monitordata(BAC_UNITS_ANALOG) ;
-
-	
-
-	digital_ret =  read_monitordata(BAC_UNITS_DIGITAL) ;
-
-
-	if((analog_ret == MONITOR_READ_TIMEOUT) || (digital_ret == MONITOR_READ_TIMEOUT))
-	{
-		read_monitor_sd_ret = MONITOR_READ_TIMEOUT;
-	}
-	else if((analog_ret == MONITOR_READ_NO_DATA) && (digital_ret == MONITOR_READ_NO_DATA))
-	{
-		read_monitor_sd_ret = MONITOR_READ_NO_DATA;
-	}
-	else
-	{
-		read_monitor_sd_ret = MONITOR_READ_SUCCESS;
-	}
-	read_temp_local_tem_package = false;
-
+    pParent->GetMonitorReadPackage(BAC_UNITS_ANALOG, monitor_list_line);
+    pParent->GetMonitorReadPackage(BAC_UNITS_DIGITAL, monitor_list_line);
 	pParent->PostMessage(WM_MONITOR_USER_MESSAGE,MONITOR_MESSAGE_CREATE,0);
 
 
@@ -1727,8 +1748,9 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 	bool analog_data = true;//1为Analog;
 
 
-	m_monitor_head.total_seg =  (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0];
-	my_temp_point = my_temp_point + 2;
+	//m_monitor_head.total_seg =  (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0];
+    my_temp_point = my_temp_point + 2;
+
 	m_monitor_head.command = *(my_temp_point++);
 	m_monitor_head.index = *(my_temp_point++);
 	m_monitor_head.type = *(my_temp_point++);
@@ -1742,11 +1764,14 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 	
 	//m_monitor_head.total_seg = (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0];
 	//my_temp_point = my_temp_point + 2;
-	m_monitor_head.seg_index = (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0]; 
-	my_temp_point = my_temp_point + 2;
-
+	//m_monitor_head.seg_index = (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0]; 
+	//my_temp_point = my_temp_point + 2;
+    m_monitor_head.seg_index = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+    my_temp_point = my_temp_point + 4;
+    m_monitor_head.total_seg = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+    my_temp_point = my_temp_point + 4;
 	//在调试界面中打印出接收到得字符;
-	if(((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_MONITOR_DATA_ONLY)) /*&& (m_monitor_head.special == 0)*/)
+	if(((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA)) /*&& (m_monitor_head.special == 0)*/)
 	{
 		for (int i = 0; i< nlength ; i++)
 		{
@@ -1758,9 +1783,15 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 				n_temp_print = n_temp_print + _T("---");
 		}
 		DFTrace(n_temp_print);
+        CString temp1;
+        if(m_monitor_head.type == BAC_UNITS_DIGITAL)
+            temp1.Format(_T("数字开始包:%u  -  结束包: %u"), m_monitor_head.seg_index, m_monitor_head.total_seg);
+        else if(m_monitor_head.type == BAC_UNITS_ANALOG)
+            temp1.Format(_T("模拟开始包:%u  -  结束包: %u"), m_monitor_head.seg_index, m_monitor_head.total_seg);
+        DFTrace(temp1);
 	}
 
-	if(nlength!= 420)	//每包必发420个字节;
+	if(nlength!= 426)	//每包必发420个字节;
 		return 0;
 	if(m_monitor_head.type == BAC_UNITS_ANALOG)
 		analog_data = true;
@@ -1769,30 +1800,6 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 	else
 		return 0;
 
-	CString temp_db_ini_folder;
-	temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
-	CString temp_serial;
-	CString temp_monitor_index;
-	if(analog_data)
-		temp_monitor_index.Format(_T("Index_%d"),monitor_list_line);
-	else
-		temp_monitor_index.Format(_T("Digital_Index_%d"),monitor_list_line);
-	temp_serial.Format(_T("%u"),g_selected_serialnumber);
-	int temp_index = GetPrivateProfileInt(temp_serial,temp_monitor_index,-1,temp_db_ini_folder);
-	if(temp_index == -1)
-	{
-		WritePrivateProfileStringW(temp_serial,temp_monitor_index,_T("0"),temp_db_ini_folder);
-	}
-	else if((temp_sd_exsit == 0) && (temp_index > 0)) //如果 sd 卡还不存在;
-	{
-		WritePrivateProfileString(temp_serial,temp_monitor_index,NULL,temp_db_ini_folder);
-	}
-
-
-	if((temp_index >= m_monitor_head.seg_index) && (temp_index != 0))
-		return 1;
-	if(temp_index >= m_monitor_head.total_seg)	//如果数据库里面的 index 已经比设备里面的 多，就说明已经读过了;不需要再往数据库里面存了;
-		return 1;
 
 	CBADO monitor_bado;
 	monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
@@ -1818,23 +1825,17 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 		temp_data.value = ((unsigned char)my_temp_point[0])<<24 | ((unsigned char)my_temp_point[1]<<16) | ((unsigned char)my_temp_point[2])<<8 | ((unsigned char)my_temp_point[3]);
 		my_temp_point = my_temp_point + 4;
 
-		temp_data.mark =  (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0];
-		my_temp_point = my_temp_point + 2;
-		if(monitor_list_line != temp_data.index)
-		{
-			if(((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_MONITOR_DATA_ONLY)))
-			{
-				if(i!= (loop_count -1))
-				{
-					n_temp_print.Format(_T("monitor_list_line != temp_data.index"));
-					DFTrace(n_temp_print);
-				}
+        temp_data.mark = (unsigned char)my_temp_point[1] << 8 | (unsigned char)my_temp_point[0];
+        my_temp_point = my_temp_point + 2;
 
-			}
-			continue;
-		}
-		if(temp_data.mark != 0x0A0D)	//0d0a
-			break;
+        //if (((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_MONITOR_DATA_ONLY) || (debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA)))
+        //{
+
+        //        DFTrace(n_temp_print);
+        //}
+
+        if (temp_data.mark != 0x0A0D)	//0d0a
+            break;
 		if((temp_data.time == 0) ) //说明后面是无用的数据;填充的是0
 		{
 			if(((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_MONITOR_DATA_ONLY)))
@@ -1942,6 +1943,12 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 
 		CString strSql;
 		strSql.Format(_T("insert into MonitorData values('%s',#%s#,%u,%d,%u,%u,'%s')"),temp_type,display_time,temp_data.time,temp_data.value,  analog_data ,temp_flag,Label_Des);
+
+#ifdef _DEBUG
+        CString tem1111;
+        tem1111 = strSql + _T("\r\n");
+        TRACE(tem1111);
+#endif
 		//strSql.Format(_T("insert into MonitorData values('%s',%d,%u,%u,%u,'%s','%s')"),temp_type,temp_data.value,temp_data.time , analog_data ,temp_flag,display_time,Label_Des);
 		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
 
@@ -1950,6 +1957,7 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 	}
 	bool delete_temp_db_data = false;
 
+#if 0
 	if((m_monitor_head.special != 1) && (m_monitor_head.seg_index != 0))
 	{
 		CString temp_write_index;
@@ -1975,7 +1983,7 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 		delete_temp_db_data = true;
 		//DFTrace(temp_write_index);
 	}
-
+#endif
 
 	monitor_bado.CloseConn();
 
@@ -2119,4 +2127,133 @@ BOOL CBacnetMonitor::OnHelpInfo(HELPINFO* pHelpInfo)
 // 	}
 
 	return CDialogEx::OnHelpInfo(pHelpInfo);
+}
+
+BOOL CBacnetMonitor::GetMonitorReadPackage(int digtal_or_analog,int nIndex)
+{
+    CString temp_serial;
+    CString temp_monitor_index;
+    CString temp_db_ini_folder;
+    temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
+    if (digtal_or_analog == BAC_UNITS_ANALOG)
+        temp_monitor_index.Format(_T("Index_%d"), monitor_list_line);
+    else
+        temp_monitor_index.Format(_T("Digital_Index_%d"), monitor_list_line);
+
+    temp_serial.Format(_T("%u"), g_selected_serialnumber);
+    GetPrivateProfileString(temp_serial, temp_monitor_index, _T(""), ReadPackage.GetBuffer(GRAPHIC_MAX_PACKAGE * 2 + 100), GRAPHIC_MAX_PACKAGE *2 + 100, g_cstring_ini_path);
+    ReadPackage.ReleaseBuffer();
+    if (ReadPackage.GetLength() != GRAPHIC_MAX_PACKAGE * 2)
+        ReadPackage.Empty();
+    if (ReadPackage.IsEmpty())
+    {
+        //赋值初始值
+        CString temp1 = _T("0000000000000000");
+        for (int i = 0; i < GRAPHIC_MAX_PACKAGE/8; i++)
+        {
+            ReadPackage = ReadPackage + temp1;
+        }
+        WritePrivateProfileString(temp_serial, temp_monitor_index, ReadPackage, g_cstring_ini_path);
+
+    }
+
+
+    StringToBit(digtal_or_analog);
+    return 0;
+}
+
+//将二进制存值ini文件中;
+void BitToString(int digtal_or_analog, int nIndex)
+{
+    CString temp_serial;
+    CString temp_monitor_index;
+    CString temp_db_ini_folder;
+    temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
+    if (digtal_or_analog == BAC_UNITS_ANALOG)
+        temp_monitor_index.Format(_T("Index_%d"), monitor_list_line);
+    else
+        temp_monitor_index.Format(_T("Digital_Index_%d"), monitor_list_line);
+    temp_serial.Format(_T("%u"), g_selected_serialnumber);
+
+    CString WriteValue;
+    if (digtal_or_analog == BAC_UNITS_ANALOG)
+    {
+        for (int i = 0;i < GRAPHIC_MAX_PACKAGE;i++)
+        {
+            CString TempChar;
+            char temp1 = 0x00;
+            for (int j = 0; j < 8; j++)
+            {
+                if (read_analog_package.test(8 * i + j))
+                {
+                    temp1 = temp1 | (1 << j);
+                }
+            }
+            TempChar.Format(_T("%02x"), (unsigned char)temp1);
+            WriteValue = WriteValue + TempChar;
+        }
+     
+    }
+    else
+    {
+        for (int i = 0;i < GRAPHIC_MAX_PACKAGE;i++)
+        {
+            CString TempChar;
+            char temp1 = 0x00;
+            for (int j = 0; j < 8; j++)
+            {
+                if (read_dig_package.test(8 * i + j))
+                {
+                    temp1 = temp1 | (1 << j);
+                }
+            }
+            TempChar.Format(_T("%02x"), (unsigned char)temp1);
+            WriteValue = WriteValue + TempChar;
+        }
+    }
+    WritePrivateProfileString(temp_serial, temp_monitor_index, WriteValue, g_cstring_ini_path);
+
+}
+
+void CBacnetMonitor::StringToBit(int digtal_or_analog)
+{
+    //ReadPackage = _T("1122334455667788");//测试
+    for (int i = 0;i < GRAPHIC_MAX_PACKAGE;i++)
+    {
+        CString temp1;
+        temp1 = ReadPackage.Mid(2*i,2);
+        temp1.MakeUpper();
+        unsigned char nvalue = Str_to_Byte(temp1);
+        //unsigned char nvalue = _wtoi(temp1);
+        bitset<8> temp_data((char)nvalue);
+        if (digtal_or_analog == BAC_UNITS_ANALOG)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (temp_data.test(j))
+                {
+                    read_analog_package[8 * i + j] = true;
+                }
+                else
+                {
+                    read_analog_package[8 * i + j] = false;
+                }
+            }
+        }
+        else
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (temp_data.test(j))
+                {
+                    read_dig_package[8 * i + j] = true;
+                }
+                else
+                {
+                    read_dig_package[8 * i + j] = false;
+                }
+            }
+        }
+
+    }
 }
