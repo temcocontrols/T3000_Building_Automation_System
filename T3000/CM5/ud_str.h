@@ -453,40 +453,20 @@ typedef struct
 
 typedef union
 {
-	int8_t all[39];
+	int8_t all[19];
 	struct
 	{
 		int8_t id;
+		int8_t on_line; // 0: offline    1: online
 		int8_t schedule;
 		int8_t flag;
-        unsigned short reserved_reg[6];
-        int8_t on_line; // 0: offline    1: online
 		char name[15];
-		unsigned short daysetpoint;
-		unsigned short nightsetpoint;
-		unsigned short awakesetpoint;
-		unsigned short sleepsetpoint;
-
 		/*  flag formate:
 		7   6  5  4  3   2   1  0
 		a/m  output state1 -  -  -  -  -
 		*/
 	}tstat;
 }Str_tstat_schedule; /*config roution */
-
-//暂时不做成灵活性这么强的
-//typedef struct
-//{
-//	int8_t all[40];
-//	struct
-//	{
-//		char flag;                         //是否有用到 use or not ，  0 ：无用     1：有用
-//		unsigned short register_pos;       //Modbus 寄存器 0-65535
-//		char opertion;                     // 0:readwrite  1 :read only    2 :write only  对此寄存器的操作方式  
-//		char headline[30];                 //显示在TSTAT SCHEDUAL 里面的抬头.
-//		char reserved[6];                  //保留项.
-//	}tstat;
-//}Str_reg_customer_def;
 
 typedef struct
 {
@@ -776,9 +756,8 @@ typedef union
 
 typedef enum
 {
-	NOUSE,MAIN_MSTP,MAIN_MODBUS,MAIN_PTP,SUB_GSM,MAIN_ZIG,SUB_ZIG,SUB_MODBUS, RS232_METER, MSTP_MASTER,MAX_COM_TYPE
+	NOUSE,MAIN_MSTP,MAIN_MODBUS,MAIN_PTP,SUB_GSM,MAIN_ZIG,SUB_ZIG,SUB_MODBUS,MSTP_MASTER, RS232_METER,MAX_COM_TYPE
 };
-
  
 typedef struct
 {

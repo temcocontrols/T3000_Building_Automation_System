@@ -422,7 +422,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	 ON_UPDATE_COMMAND_UI(ID_MODE_OFFLINEMODE, &CMainFrame::OnUpdateModeOfflinemode)
 		ON_COMMAND(ID_TOOLS_PHCHART, &CMainFrame::OnToolsPhchart)
 		ON_COMMAND(ID_TOOLS_MODBUSTOBACNETROUTER, &CMainFrame::OnToolsModbustobacnetrouter)
-		ON_COMMAND(ID_TOOLS_PROGRAMEDITORTEST, &CMainFrame::OnToolsProgrameditortest)
+		ON_COMMAND(ID_CONTROL_MODBUSBACNETREGISTERLISTVIEW, &CMainFrame::OnControlModbus)
+		ON_COMMAND(ID_CONTROL_IO_NET_CONFIG, &CMainFrame::OnControlIoNetConfig)
 		END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -913,13 +914,14 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     }
 #endif
 
-    uiToolbarHotID =  IDB_BITMAP7 ;
-    uiToolbarColdID = IDB_BITMAP7 ;
-    uiMenuID =	IDB_BITMAP_BACNET_MENU_BIT ;//
+    uiToolbarHotID = IDB_BITMAP7;
+    uiToolbarColdID = IDB_BITMAP7;
+    uiMenuID = IDB_BITMAP_BACNET_MENU_BIT;//
 	
 
-
+	
     if (!m_testtoolbar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP | CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC,CRect(1,1,1,1),IDR_TOOLBAR_BACNET) ||
+		 
             !m_testtoolbar.LoadToolBar(IDR_TOOLBAR_BACNET,uiToolbarColdID, uiMenuID, FALSE /* Not locked */, IDB_BITMAP_TOOLBAR_DISABLE, 0, uiToolbarHotID))
 
     {
@@ -927,7 +929,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
         return -1;//fail to create
     }
 
-
+	//m_testtoolbar.RemoveAllButtons();
+	
     ///////////////////////////////////////////////////////////////////////////////////
 
     if (!m_wndWorkSpace.Create (_T("Building View"), this, CRect (0, 0, 300, 800),
@@ -935,7 +938,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
                                 WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN  | CBRS_LEFT ))//| CBRS_FLOAT_MULTI
     {
         TRACE0("Failed to create Workspace bar\n");
-
         return FALSE;// fail to create
     }
 
@@ -1535,7 +1537,7 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
               int const PM_CS_SM_DC = 37;
               int const PM_CS_RSM_AC = 38;
               int const PM_CS_RSM_DC = 39;*/
-
+			custom_bacnet_register_listview = false;
             CString Product_Custom = m_product.at(i).Custom;
             m_current_tree_node = m_product.at(i);
             if (Product_Custom.CompareNoCase(_T("1")) == 0/* ||
@@ -2498,6 +2500,7 @@ void CMainFrame::LoadProductFromDB()
 
 							tree_product m_product_temp;
 							m_product_temp.product_item  =hSubItem;
+
 
 							strSql=q.getValuebyName(L"Serial_ID");
 
@@ -7011,7 +7014,7 @@ void CMainFrame::OnToolRefreshLeftTreee()
 #include "ScanDlg.h"
 void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 {
-
+     
 	CppSQLite3DB SqliteDBT3000;
 	CppSQLite3DB SqliteDBBuilding;
 	CppSQLite3Table table;
@@ -7243,7 +7246,6 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             m_product.at(i).status_last_time[1] = false;
                             m_product.at(i).status_last_time[2] = false;
                             m_product.at(i).status = false;
-
                             //MessageBox(_T("Device is offline!"));
                             if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
                             {
@@ -7813,6 +7815,38 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 
 #if 1
+                        //ISPTool Config
+                        /*	CString filename;
+                        CString flashmethod;
+                        CString id;
+                        CString comport;
+                        CString BD;
+                        CString ip;
+                        CString ipport;
+
+
+                        CString subnote;
+                        CString subID;*/
+
+
+                        //CString ProductHexBinName,StrTemp;
+                        //CString StrBinHexPath,StrULRPath;
+                        //GetProductFPTAndLocalPath(product_Node.product_class_id,StrULRPath,ProductHexBinName);
+                        //StrBinHexPath = g_strExePth;
+                        //StrBinHexPath+=_T("firmware\\");
+
+                        //StrTemp.Format(_T("%s\\"),GetProductName(product_Node.product_class_id));
+                        //StrBinHexPath+=StrTemp;
+                        //StrBinHexPath+=ProductHexBinName;
+
+                        //HANDLE hFind;//
+                        //WIN32_FIND_DATA wfd;//
+                        //hFind = FindFirstFile(StrBinHexPath, &wfd);//
+                        //if ((hFind!=INVALID_HANDLE_VALUE)&&(!StrULRPath.IsEmpty()))//说明当前目录下无t3000.mdb
+                        //{
+                        //	filename=StrBinHexPath;
+                        //}
+
 
                         id.Format(_T("%d"),g_tstat_id);
                         comport.Format(_T("COM%d"),nComPort);
@@ -7861,7 +7895,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                         m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Device is Offline!"));
                         m_pDialogInfo->ShowWindow(SW_SHOW);
                     }
-
+//                     while(m_pDialogInfo->IsWindowVisible()){
+//                         Sleep(50);
+//                         continue;
+//                     }
                     if (pDlg !=NULL)
                     {
                         pDlg->ShowWindow(SW_HIDE);
@@ -7926,6 +7963,13 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             }
                         }
 
+                        //}
+// 						else
+// 						{
+// 							CString tempcs;
+// 							tempcs.Format(_T("The device serial number is %d,the database saved is %d \r\nPlease delete it and rescan."),nSerialNumber,nSelectSerialNumber);
+// 							MessageBox(tempcs);
+// 						}
                     }
                 }
             }
@@ -7947,7 +7991,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                         m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Device is offline,Please check the connection!"));
                         m_pDialogInfo->ShowWindow(SW_SHOW);
                     }
-
+//                     while(m_pDialogInfo->IsWindowVisible()){
+//                         Sleep(50);
+//                         continue;
+//                     }
                     if (pDlg !=NULL)
                     {
                         pDlg->ShowWindow(SW_HIDE);
@@ -7974,7 +8021,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(tempcs);
                             m_pDialogInfo->ShowWindow(SW_SHOW);
                         }
-
+//                         while(m_pDialogInfo->IsWindowVisible()){
+//                             Sleep(50);
+//                             continue;
+//                         }
                         if (pDlg !=NULL)
                         {
 							pDlg->ShowWindow(SW_HIDE);
@@ -7988,7 +8038,14 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     }
                     if(nSerialNumber>=0)
                     {
+//if(nSerialNumber==nSelectSerialNumber)
                         bOnLine=TRUE;
+// 						else
+// 						{
+// 							CString tempcs;
+// 							tempcs.Format(_T("The device serial number is %d,the database saved is %d \r\nPlease delete it and rescan."),nSerialNumber,nSelectSerialNumber);
+// 							MessageBox(tempcs);
+// 						}
                     }
                 }
             }
@@ -8712,14 +8769,7 @@ do_connect_success:
 		g_llRxCount = g_llRxCount + 4;
 		Sleep(1);
 		return;
-	do_conncet_failed:
-
-		//Fandu 2017/12/13 设备离线时 更新 数据库设备状态字段。因为有太多地方调用  重新加载数据库的函数，导致如果不更新状态显示不正常.
-		CString strUpdateSql;
-		strUpdateSql.Format(_T("update ALL_NODE set Online_Status = 0 where Serial_ID = %u and protocol = 1"), g_selected_serialnumber);
-		SqliteDBBuilding.execDML((UTF8MBSTR)strUpdateSql);
-	    SqliteDBBuilding.closedb();
-
+do_conncet_failed:
 		if(hretryThread == NULL)
 		{
 			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("T3000 can't connect to your device ,it will try again in 20 seconds."));
@@ -9379,30 +9429,6 @@ end_condition :
         }
 
     }
-
-	//Fandu 2017/12/13 新增批量处理在线状态，修改数据库状态字段.
-	CString strUpdateSql;
-	if (m_refresh_net_device_data.size() == 0)
-	{
-		strUpdateSql.Format(_T("update ALL_NODE set Online_Status	= 0 where protocol = 1"));
-		SqliteDBBuilding.execDML((UTF8MBSTR)strUpdateSql);
-	}
-	else
-	{
-		CString composite_serial;
-		for (int i = 0;i < m_refresh_net_device_data.size();i++)
-		{
-			CString temp1;
-			if (i != 0)
-				composite_serial = composite_serial + _T(",");
-			temp1.Format(_T("%u"), m_refresh_net_device_data.at(i).nSerial);
-			composite_serial = composite_serial + temp1;
-		}
-		strUpdateSql.Format(_T("update ALL_NODE set Online_Status = 0 where Serial_ID not in (%s) and protocol = 1"), composite_serial);
-		strUpdateSql.Format(_T("update ALL_NODE set Online_Status = 1 where Serial_ID in (%s) and protocol = 1"), composite_serial);
-		SqliteDBBuilding.execDML((UTF8MBSTR)strUpdateSql);
-	}
-
     SqliteDBBuilding.closedb();
     if(find_new_device)
         PostMessage(WM_MYMSG_REFRESHBUILDING,0,0);
@@ -9553,7 +9579,7 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
                 //SetPaneConnectionPrompt(_T("Online!"));
             }
             //SetPaneConnectionPrompt(_T("Online!"));
-				m_pTreeViewCrl->turn_item_image(tp.product_item, true);
+            m_pTreeViewCrl->turn_item_image(tp.product_item ,true);
 
         }
         else  // 替换offline的图片
@@ -9564,7 +9590,7 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
                 //SetPaneConnectionPrompt(_T("Offline!"));
             }
 			// if(g_selected_serialnumber != m_product.at(i).serial_number)
-				m_pTreeViewCrl->turn_item_image(tp.product_item, false);
+				 m_pTreeViewCrl->turn_item_image(tp.product_item ,false);
 			 //else if((g_selected_serialnumber == m_product.at(i).serial_number) && (tp.product_class_id	== PM_MINIPANEL))
 			 //{
 				// TRACE(_T("Select panel offline \n"));
@@ -12363,12 +12389,12 @@ void CMainFrame::OnPaint()
     // Do not call CFrameWndEx::OnPaint() for painting messages
 }
 
-
+#include "TemcoStandardBacnetToolDlg.h"
 void CMainFrame::OnDatabaseBacnettool()
 {
     //CBacnetAlarmWindow dlg;
     //dlg.DoModal();
-    CBacnetTool dlg;
+	CTemcoStandardBacnetToolDlg dlg;
     dlg.DoModal();
     
 }
@@ -13902,1152 +13928,8 @@ BOOL CMainFrame::OnHelpInfo(HELPINFO* pHelpInfo)
 /// </summary>
 void CMainFrame::OnFileExportregiseterslist()
 {
-    CStdioFile* m_pFile;
-	CppSQLite3DB SqliteDBT3000;
-	CppSQLite3Table table;
-	CppSQLite3Query q;
-    CString  Product_Head_File_Name;
-    CString strFilter;
-    CString strFilename;
-    CString strTemp;
-    CString RegisterName;
-    CString RegisterID;
-    CString logstr;
-    _variant_t  temp_variant;
-
-    BOOL IS_Write=TRUE;
-    m_pFile = new CStdioFile;//txt
-    CString HeadFold = g_strExePth;
-
-    HeadFold += _T("Product Head File");
-    CreateDirectory(HeadFold,NULL);
-
-    Product_Head_File_Name =HeadFold;
-
-    _Application app;
-    Workbooks books;
-    _Workbook book;
-    Worksheets sheets;
-    _Worksheet sheet;
-    Range range;
-    Range rgMyRge1, rgMyRge2;
-    COleVariant covTrue((short)TRUE), covFalse((short)FALSE), covOptional((long)DISP_E_PARAMNOTFOUND, VT_ERROR);
-
-    strFilename=g_strExePth+_T("ModbusBacnetRegistersList.xls");
-    if(!app.CreateDispatch(_T("Excel.Application"),NULL))
-    {
-        AfxMessageBox(_T("Create Excel false!"));
-        return;
-    }
-    books.AttachDispatch(app.GetWorkbooks());
-    book.AttachDispatch(books.Add(_variant_t(strFilename)));
-    sheets.AttachDispatch(book.GetWorksheets());
-
-
-
-
-
-    //CS3000
-#if 1
-
-
-    Product_Head_File_Name=_T("");
-    //Product_Head_File_Name = HeadFold;
-    Product_Head_File_Name   = HeadFold+ _T("\\CS3000.h");
-
-    m_pFile->Open(Product_Head_File_Name.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate );
-
-    logstr=_T("");
-    logstr=_T("//CS3000 Head \n");
-    m_pFile->SeekToEnd();
-    m_pFile->WriteString(logstr.GetBuffer());
-    m_pFile->WriteString(_T("\n"));
-    m_pFile->Flush();
-
-    sheet.AttachDispatch(sheets.GetItem(_variant_t("CS3000")));
-    range.AttachDispatch(sheet.GetCells());
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(1)),_variant_t(_T("Address")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(2)),_variant_t(_T("Register Name")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(3)),_variant_t(_T("Register Description")));
-    int Rows=2;
-     
-	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
-    CString StrSql;
-    StrSql=_T("Select * from CS3000 ");
-    q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
-   
-    
-    while(!q.eof())
-    {
-
-         
-		strTemp = q.getValuebyName(L"RegName");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(2)),_variant_t(strTemp));
-        strTemp.TrimRight();
-        strTemp.TrimLeft();
-        if (strTemp.CompareNoCase(_T("RESERVED"))!=0&&!strTemp.IsEmpty())
-        {
-            IS_Write = TRUE ;
-            RegisterName = strTemp;
-        }
-        else
-        {
-            IS_Write = FALSE ;
-        }
-
-
-
-         
-		strTemp = q.getValuebyName(L"RegID");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(1)),_variant_t(strTemp));
-        RegisterID = strTemp;
-
-		strTemp = q.getValuebyName(L"RegDiscription");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(3)),_variant_t(strTemp));
-
-        if (IS_Write)
-        {
-            logstr.Format(_T("#define  %s  %s \n"),RegisterName,RegisterID);
-            m_pFile->SeekToEnd();
-            m_pFile->WriteString(logstr.GetBuffer());
-        }
-
-
-
-        Rows++;
-
-        q.nextRow();
-
-    }
-    m_pFile->Flush();
-    m_pFile->Close();
-    
-#endif
-
-
-
-
-    //AQ
-#if 1
-
-    Product_Head_File_Name=_T("");
-    //Product_Head_File_Name = HeadFold;
-    Product_Head_File_Name   = HeadFold+ _T("\\Air Quanlity.h");
-
-    m_pFile->Open(Product_Head_File_Name.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate );
-
-    logstr=_T("");
-    logstr=_T("//AQ Head \n");
-    m_pFile->SeekToEnd();
-    m_pFile->WriteString(logstr.GetBuffer());
-    m_pFile->WriteString(_T("\n"));
-    m_pFile->Flush();
-
-
-    sheet.AttachDispatch(sheets.GetItem(_variant_t("Air Quality")));
-    range.AttachDispatch(sheet.GetCells());
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(1)),_variant_t(_T("Address")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(2)),_variant_t(_T("Register Name")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(3)),_variant_t(_T("Register Description")));
-    Rows=2;
-
-
-    StrSql=_T("Select * from AirQuanlity_Reglist ");
-    q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
-    while(!q.eof())
-    {
-         
-		strTemp = q.getValuebyName(L"RegID");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(1)),_variant_t(strTemp));
-
-        RegisterID = strTemp;
-
-
-		strTemp = q.getValuebyName(L"RegName");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(2)),_variant_t(strTemp));
-
-        strTemp.TrimRight();
-        strTemp.TrimLeft();
-        if (strTemp.CompareNoCase(_T("RESERVED"))!=0&&!strTemp.IsEmpty())
-        {
-            IS_Write = TRUE ;
-            RegisterName = strTemp;
-        }
-        else
-        {
-            IS_Write = FALSE ;
-        }
-
-
-       
-
-		strTemp = q.getValuebyName(L"RegFullDescription");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(3)),_variant_t(strTemp));
-
-        Rows++;
-
-        if (IS_Write)
-        {
-            logstr.Format(_T("#define  %s  %s \n"),RegisterName,RegisterID);
-            m_pFile->SeekToEnd();
-            m_pFile->WriteString(logstr.GetBuffer());
-        }
-
-
-        q.nextRow();
-
-    }
-
-    m_pFile->Flush();
-    m_pFile->Close();
-
-
-    
-
-
-#endif
-
-    //T3 Modules
-#if 1
-    CString Str_T3_8AI8AO , Str_T3_8AI16O, Str_T3_8I13O, Str_T3_32AI,Str_T3_4AO, Str_T3_6CT, Str_T3_28IN, Str_T3_PT10;
-
-    CStdioFile* m_pFile_8AI8AO = new CStdioFile;
-    CStdioFile* m_pFile_8AI16O = new CStdioFile;
-    CStdioFile* m_pFile_8I13O  = new CStdioFile;
-    CStdioFile* m_pFile_32AI   = new CStdioFile;
-    CStdioFile* m_pFile_6CT    = new CStdioFile;
-    CStdioFile* m_pFile_28IN   = new CStdioFile;
-    CStdioFile* m_pFile_PT10   = new CStdioFile;
-    CStdioFile* m_pFile_4AO    = new CStdioFile;
-
-    Str_T3_8AI8AO   = HeadFold+ _T("\\T3_8AI8AO.h");
-    Str_T3_8AI16O	= HeadFold+ _T("\\T3_8AI16O.h");
-    Str_T3_8I13O	= HeadFold+ _T("\\T3_8I13O.h");
-    Str_T3_32AI		= HeadFold+ _T("\\T3_32AI.h");
-    Str_T3_6CT		= HeadFold+ _T("\\T3_6CT.h");
-    Str_T3_28IN		= HeadFold+ _T("\\T3_28IN.h");
-    Str_T3_PT10		= HeadFold+ _T("\\T3_PT10.h");
-    Str_T3_4AO      = HeadFold+ _T("\\T3_4AO.h");
-    //m_pFile->Open(Product_Head_File_Name.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate );
-    m_pFile_8AI8AO->Open(Str_T3_8AI8AO.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate );
-    m_pFile_8AI16O->Open(Str_T3_8AI16O.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate );
-    m_pFile_8I13O->Open(Str_T3_8I13O.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate );
-    m_pFile_32AI->Open(Str_T3_32AI.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate );
-    m_pFile_6CT->Open(Str_T3_6CT.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate );
-    m_pFile_28IN->Open(Str_T3_28IN.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate );
-    m_pFile_PT10->Open(Str_T3_PT10.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate );
-    m_pFile_4AO->Open(Str_T3_4AO.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate );
-
-    logstr=_T("");
-    logstr=_T("//8AI8AO Head \n");
-    m_pFile_8AI8AO->SeekToEnd();
-    m_pFile_8AI8AO->WriteString(logstr.GetBuffer());
-    m_pFile_8AI8AO->WriteString(_T("\n"));
-    m_pFile_8AI8AO->Flush();
-
-    logstr=_T("");
-    logstr=_T("//8AI16O Head \n");
-    m_pFile_8AI16O->SeekToEnd();
-    m_pFile_8AI16O->WriteString(logstr.GetBuffer());
-    m_pFile_8AI16O->WriteString(_T("\n"));
-    m_pFile_8AI16O->Flush();
-
-    logstr=_T("");
-    logstr=_T("//8I13O Head \n");
-    m_pFile_8I13O->SeekToEnd();
-    m_pFile_8I13O->WriteString(logstr.GetBuffer());
-    m_pFile_8I13O->WriteString(_T("\n"));
-    m_pFile_8I13O->Flush();
-
-    logstr=_T("");
-    logstr=_T("//32AI Head \n");
-    m_pFile_32AI->SeekToEnd();
-    m_pFile_32AI->WriteString(logstr.GetBuffer());
-    m_pFile_32AI->WriteString(_T("\n"));
-    m_pFile_32AI->Flush();
-
-    logstr=_T("");
-    logstr=_T("//6CT Head \n");
-    m_pFile_6CT->SeekToEnd();
-    m_pFile_6CT->WriteString(logstr.GetBuffer());
-    m_pFile_6CT->WriteString(_T("\n"));
-    m_pFile_6CT->Flush();
-
-    logstr=_T("");
-    logstr=_T("//28IN Head \n");
-    m_pFile_28IN->SeekToEnd();
-    m_pFile_28IN->WriteString(logstr.GetBuffer());
-    m_pFile_28IN->WriteString(_T("\n"));
-    m_pFile_28IN->Flush();
-
-    logstr=_T("");
-    logstr=_T("//PT10 Head \n");
-    m_pFile_PT10->SeekToEnd();
-    m_pFile_PT10->WriteString(logstr.GetBuffer());
-    m_pFile_PT10->WriteString(_T("\n"));
-    m_pFile_PT10->Flush();
-
-    logstr=_T("");
-    logstr=_T("//4AO Head \n");
-    m_pFile_4AO->SeekToEnd();
-    m_pFile_4AO->WriteString(logstr.GetBuffer());
-    m_pFile_4AO->WriteString(_T("\n"));
-    m_pFile_4AO->Flush();
-
-
-
-    sheet.AttachDispatch(sheets.GetItem(_variant_t("T3 Modules")));
-    range.AttachDispatch(sheet.GetCells());
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(1)),_variant_t(_T("Address")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(2)),_variant_t(_T("T3-8AI8AO")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(3)),_variant_t(_T("T3-8AI8AO Description")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(4)),_variant_t(_T("T3-8AI16O")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(5)),_variant_t(_T("T3-8AI16O Description")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(6)),_variant_t(_T("T3-8I13O")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(7)),_variant_t(_T("T3-8I13O Description")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(8)),_variant_t(_T("T3-32AI")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(9)),_variant_t(_T("T3-32AI Description")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(10)),_variant_t(_T("T3-32AI")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(11)),_variant_t(_T("T3-32AI Description")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(12)),_variant_t(_T("T3-6CT")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(13)),_variant_t(_T("T3-6CT Description")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(14)),_variant_t(_T("T3-28IN")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(15)),_variant_t(_T("T3-28IN Description")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(16)),_variant_t(_T("T3-PT10")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(17)),_variant_t(_T("T3-PT10 Description")));
-    Rows=2;
-
-
-    StrSql=_T("Select * from T3_RegisterList ");
-	q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
-	 
- 
-    while(!q.eof())
-    {
-        
-		strTemp = q.getValuebyName(L"RegID");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(1)),_variant_t(strTemp));
-        RegisterID = strTemp;
-
-        
-		strTemp = q.getValuebyName(L"T3_8AI8AO");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(2)),_variant_t(strTemp));
-        strTemp.TrimRight();
-        strTemp.TrimLeft();
-        if (strTemp.CompareNoCase(_T("RESERVED"))!=0&&!strTemp.IsEmpty())
-        {
-            IS_Write = TRUE ;
-            RegisterName = strTemp;
-        }
-        else
-        {
-            IS_Write = FALSE ;
-        }
-
-        if (IS_Write)
-        {
-            logstr.Format(_T("#define  %s  %s \n"),RegisterName,RegisterID);
-            m_pFile_8AI8AO->SeekToEnd();
-            m_pFile_8AI8AO->WriteString(logstr.GetBuffer());
-        }
-
-         
-		strTemp = q.getValuebyName(L"T3_8AI8AO_DESCRIPTION");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(3)),_variant_t(strTemp));
-
-
- 
-		strTemp = q.getValuebyName(L"T3-8AI16O");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(4)),_variant_t(strTemp));
-        strTemp.TrimRight();
-        strTemp.TrimLeft();
-        if (strTemp.CompareNoCase(_T("RESERVED"))!=0&&!strTemp.IsEmpty())
-        {
-            IS_Write = TRUE ;
-            RegisterName = strTemp;
-        }
-        else
-        {
-            IS_Write = FALSE ;
-        }
-
-        if (IS_Write)
-        {
-            logstr.Format(_T("#define  %s  %s \n"),RegisterName,RegisterID);
-            m_pFile_8AI16O->SeekToEnd();
-            m_pFile_8AI16O->WriteString(logstr.GetBuffer());
-        }
-
-
-         
-		strTemp = q.getValuebyName(L"T3-8AI16O_DESCRIPTION");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(5)),_variant_t(strTemp));
-
-		 
-		strTemp = q.getValuebyName(L"T3-8I13O");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(6)),_variant_t(strTemp));
-        strTemp.TrimRight();
-        strTemp.TrimLeft();
-        if (strTemp.CompareNoCase(_T("RESERVED"))!=0&&!strTemp.IsEmpty())
-        {
-            IS_Write = TRUE ;
-            RegisterName = strTemp;
-        }
-        else
-        {
-            IS_Write = FALSE ;
-        }
-
-        if (IS_Write)
-        {
-            logstr.Format(_T("#define  %s  %s \n"),RegisterName,RegisterID);
-            m_pFile_8I13O ->SeekToEnd();
-            m_pFile_8I13O ->WriteString(logstr.GetBuffer());
-        }
-
-
-         
-		strTemp = q.getValuebyName(L"T3-8I13O_DESCRIPTION");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(7)),_variant_t(strTemp));
-
-        
-		strTemp = q.getValuebyName(L"T3-32AI");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(8)),_variant_t(strTemp));
-        strTemp.TrimRight();
-        strTemp.TrimLeft();
-        if (strTemp.CompareNoCase(_T("RESERVED"))!=0&&!strTemp.IsEmpty())
-        {
-            IS_Write = TRUE ;
-            RegisterName = strTemp;
-        }
-        else
-        {
-            IS_Write = FALSE ;
-        }
-
-        if (IS_Write)
-        {
-            logstr.Format(_T("#define  %s  %s \n"),RegisterName,RegisterID);
-            m_pFile_32AI->SeekToEnd();
-            m_pFile_32AI->WriteString(logstr.GetBuffer());
-        }
-
-
-         
-		strTemp = q.getValuebyName(L"T3-32AI_DESCRIPTION");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(9)),_variant_t(strTemp));
-
-        
-		strTemp = q.getValuebyName(L"T3-4AO");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(10)),_variant_t(strTemp));
-        strTemp.TrimRight();
-        strTemp.TrimLeft();
-        if (strTemp.CompareNoCase(_T("RESERVED"))!=0&&!strTemp.IsEmpty())
-        {
-            IS_Write = TRUE ;
-            RegisterName = strTemp;
-        }
-        else
-        {
-            IS_Write = FALSE ;
-        }
-
-        if (IS_Write)
-        {
-            logstr.Format(_T("#define  %s  %s \n"),RegisterName,RegisterID);
-            m_pFile_4AO->SeekToEnd();
-            m_pFile_4AO->WriteString(logstr.GetBuffer());
-        }
-
-        
-		strTemp = q.getValuebyName(L"T3-4AO_DESCRIPTION");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(11)),_variant_t(strTemp));
-
-
-        
-		strTemp = q.getValuebyName(L"T3-6CT");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(12)),_variant_t(strTemp));
-        strTemp.TrimRight();
-        strTemp.TrimLeft();
-        if (strTemp.CompareNoCase(_T("RESERVED"))!=0&&!strTemp.IsEmpty())
-        {
-            IS_Write = TRUE ;
-            RegisterName = strTemp;
-        }
-        else
-        {
-            IS_Write = FALSE ;
-        }
-
-        if (IS_Write)
-        {
-            logstr.Format(_T("#define  %s  %s \n"),RegisterName,RegisterID);
-            m_pFile_6CT->SeekToEnd();
-            m_pFile_6CT->WriteString(logstr.GetBuffer());
-        }
-
-
-       
-		strTemp = q.getValuebyName(L"T3-6CT_DESCRIPTION");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(13)),_variant_t(strTemp));
-
-
-       
-			strTemp = q.getValuebyName(L"T3-28IN");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(14)),_variant_t(strTemp));
-
-        strTemp.TrimRight();
-        strTemp.TrimLeft();
-        if (strTemp.CompareNoCase(_T("RESERVED"))!=0&&!strTemp.IsEmpty())
-        {
-            IS_Write = TRUE ;
-            RegisterName = strTemp;
-        }
-        else
-        {
-            IS_Write = FALSE ;
-        }
-
-        if (IS_Write)
-        {
-            logstr.Format(_T("#define  %s  %s \n"),RegisterName,RegisterID);
-            m_pFile_28IN->SeekToEnd();
-            m_pFile_28IN->WriteString(logstr.GetBuffer());
-        }
-
-        
-		strTemp = q.getValuebyName(L"T3-28IN_DESCRIPTION");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(15)),_variant_t(strTemp));
-
-
-        
-		strTemp = q.getValuebyName(L"T3-RTD");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(16)),_variant_t(strTemp));
-
-        strTemp.TrimRight();
-        strTemp.TrimLeft();
-        if (strTemp.CompareNoCase(_T("RESERVED"))!=0&&!strTemp.IsEmpty())
-        {
-            IS_Write = TRUE ;
-            RegisterName = strTemp;
-        }
-        else
-        {
-            IS_Write = FALSE ;
-        }
-
-        if (IS_Write)
-        {
-            logstr.Format(_T("#define  %s  %s \n"),RegisterName,RegisterID);
-            m_pFile_PT10->SeekToEnd();
-            m_pFile_PT10->WriteString(logstr.GetBuffer());
-        }
-
-
-         
-		strTemp = q.getValuebyName(L"T3-RTD_DESCRIPTION");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(17)),_variant_t(strTemp));
-
-
-
-
-        Rows++;
-
-        q.nextRow();
-
-    }
-
-  
-
-    m_pFile_8AI8AO->Flush();
-    m_pFile_8AI16O->Flush();
-    m_pFile_8I13O->Flush();
-    m_pFile_32AI->Flush();
-    m_pFile_6CT->Flush();
-    m_pFile_28IN->Flush();
-    m_pFile_PT10->Flush();
-    m_pFile_4AO->Flush();
-
-    m_pFile_8AI8AO->Close();
-    m_pFile_8AI16O->Close();
-    m_pFile_8I13O->Close();
-    m_pFile_32AI->Close();
-    m_pFile_6CT->Close();
-    m_pFile_28IN->Close();
-    m_pFile_PT10->Close();
-    m_pFile_4AO->Close();
-
-
-    delete m_pFile_8AI8AO;
-    delete m_pFile_8AI16O;
-    delete m_pFile_8I13O;
-    delete m_pFile_32AI;
-    delete m_pFile_6CT;
-    delete m_pFile_28IN;
-    delete m_pFile_PT10;
-    delete m_pFile_4AO;
-
-
-
-#endif
-
-    //Pressure Sensor
-#if 1
-    Product_Head_File_Name=_T("");
-    //Product_Head_File_Name = HeadFold;
-    Product_Head_File_Name   = HeadFold+ _T("\\Pressure Sensor.h");
-
-    m_pFile->Open(Product_Head_File_Name.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate );
-
-    logstr=_T("");
-    logstr=_T("//Pressure Sensor Head \n");
-    m_pFile->SeekToEnd();
-    m_pFile->WriteString(logstr.GetBuffer());
-    m_pFile->WriteString(_T("\n"));
-    m_pFile->Flush();
-
-    sheet.AttachDispatch(sheets.GetItem(_variant_t("Pressure Sensor")));
-    range.AttachDispatch(sheet.GetCells());
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(1)),_variant_t(_T("Address")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(2)),_variant_t(_T("Register Name")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(3)),_variant_t(_T("Register Description")));
-    Rows=2;
-
-
-    StrSql=_T("Select * from PS_Registerlist ");
-	q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
-    
-    while(!q.eof())
-    {
-         
-		strTemp = q.getValuebyName(L"RegID");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(1)),_variant_t(strTemp));
-        RegisterID = strTemp;
-
-       
-		strTemp = q.getValuebyName(L"Reg_Name");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(2)),_variant_t(strTemp));
-        strTemp.TrimRight();
-        strTemp.TrimLeft();
-        if (strTemp.CompareNoCase(_T("RESERVED"))!=0&&!strTemp.IsEmpty())
-        {
-            IS_Write = TRUE ;
-            RegisterName = strTemp;
-        }
-        else
-        {
-            IS_Write = FALSE ;
-        }
-
-        if (IS_Write)
-        {
-            logstr.Format(_T("#define  %s  %s \n"),RegisterName,RegisterID);
-            m_pFile->SeekToEnd();
-            m_pFile->WriteString(logstr.GetBuffer());
-        }
-
-
-         
-		strTemp = q.getValuebyName(L"Reg_FulDescription");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(3)),_variant_t(strTemp));
-
-        Rows++;
-
-        q.nextRow();
-
-    }
-
-    m_pFile->Flush();
-    m_pFile->Close();
-     
-#endif
-
-    //MiniPanel
-#if 1
-
-    Product_Head_File_Name=_T("");
-    //Product_Head_File_Name = HeadFold;
-    Product_Head_File_Name   = HeadFold+ _T("\\MiniPanel.h");
-
-    m_pFile->Open(Product_Head_File_Name.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate );
-
-    logstr=_T("");
-    logstr=_T("//MiniPanel Head \n");
-    m_pFile->SeekToEnd();
-    m_pFile->WriteString(logstr.GetBuffer());
-    m_pFile->WriteString(_T("\n"));
-    m_pFile->Flush();
-
-    sheet.AttachDispatch(sheets.GetItem(_variant_t("MiniPanel")));
-    range.AttachDispatch(sheet.GetCells());
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(1)),_variant_t(_T("Address")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(2)),_variant_t(_T("Register Name")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(3)),_variant_t(_T("Register Description")));
-    Rows=2;
-
-
-    StrSql=_T("Select * from MiniPanel_Registerlist ");
-     q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
-    while(!q.eof())
-    {
-     
-		strTemp = q.getValuebyName(L"RegID");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(1)),_variant_t(strTemp));
-        RegisterID = strTemp;
-
-        
-		strTemp = q.getValuebyName(L"Reg_Name");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(2)),_variant_t(strTemp));
-
-        if (strTemp.CompareNoCase(_T("RESERVED"))!=0&&!strTemp.IsEmpty())
-        {
-            IS_Write = TRUE ;
-            RegisterName = strTemp;
-        }
-        else
-        {
-            IS_Write = FALSE ;
-        }
-
-        if(IS_Write)
-        {
-            logstr.Format(_T("#define  %s  %s \n"),RegisterName,RegisterID);
-            m_pFile->SeekToEnd();
-            m_pFile->WriteString(logstr.GetBuffer());
-        }
-
-        
-		strTemp = q.getValuebyName(L"Register_Description");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(3)),_variant_t(strTemp));
-
-        Rows++;
-
-        q.nextRow();
-
-    }
-
-    m_pFile->Flush();
-    m_pFile->Close();
-
-    
-#endif
-
-    //Humidity_Sensor
-#if 1
-    Product_Head_File_Name=_T("");
-    //Product_Head_File_Name = HeadFold;
-    Product_Head_File_Name   = HeadFold+ _T("\\Humidity Sensor.h");
-
-    m_pFile->Open(Product_Head_File_Name.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate );
-
-    logstr=_T("");
-    logstr=_T("//Humidity Sensor Head \n");
-    m_pFile->SeekToEnd();
-    m_pFile->WriteString(logstr.GetBuffer());
-    m_pFile->WriteString(_T("\n"));
-    m_pFile->Flush();
-
-    sheet.AttachDispatch(sheets.GetItem(_variant_t("Humidity Sensor")));
-    range.AttachDispatch(sheet.GetCells());
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(1)),_variant_t(_T("Address")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(2)),_variant_t(_T("Register Name")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(3)),_variant_t(_T("Register Description")));
-    Rows=2;
-
-
-    StrSql=_T("Select * from Humidity_Sensor ");
-     q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
-    while(!q.eof())
-    {
-         
-		strTemp = q.getValuebyName(L"RegID");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(1)),_variant_t(strTemp));
-        RegisterID = strTemp ;
-
-       
-		strTemp = q.getValuebyName(L"Reg_Name");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(2)),_variant_t(strTemp));
-
-        strTemp.TrimRight();
-        strTemp.TrimLeft();
-        if (strTemp.CompareNoCase(_T("RESERVED"))!=0&&!strTemp.IsEmpty())
-        {
-            IS_Write = TRUE ;
-            RegisterName = strTemp;
-        }
-        else
-        {
-            IS_Write = FALSE ;
-        }
-
-        if (IS_Write)
-        {
-            logstr.Format(_T("#define  %s  %s \n"),RegisterName,RegisterID);
-            m_pFile->SeekToEnd();
-            m_pFile->WriteString(logstr.GetBuffer());
-        }
-
-
-      
-		strTemp = q.getValuebyName(L"Reg_Full_Description");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(3)),_variant_t(strTemp));
-
-        Rows++;
-
-        q.nextRow();
-
-    }
-    m_pFile->Flush();
-    m_pFile->Close();
-    
-#endif
-//Tstat5
-#if 1
-
-
-    CString Str_Tstat5LED , Str_Tstat5LCD;
-    CStdioFile* m_pFile_Tstat5LED = new CStdioFile;
-    CStdioFile* m_pFile_Tstat5LCD = new CStdioFile;
-
-    Str_Tstat5LED   = HeadFold+ _T("\\Tstat5LED.h");
-    Str_Tstat5LCD	= HeadFold+ _T("\\Tstat5LCD.h");
-
-    m_pFile_Tstat5LED->Open(Str_Tstat5LED.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate );
-    m_pFile_Tstat5LCD->Open(Str_Tstat5LCD.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate );
-
-
-    logstr=_T("");
-    logstr=_T("//Tstat5 LED Head \n");
-    m_pFile_Tstat5LED->SeekToEnd();
-    m_pFile_Tstat5LED->WriteString(logstr.GetBuffer());
-    m_pFile_Tstat5LED->WriteString(_T("\n"));
-    m_pFile_Tstat5LED->Flush();
-
-    logstr=_T("");
-    logstr=_T("//Tstat5 LCD Head \n");
-    m_pFile_Tstat5LCD->SeekToEnd();
-    m_pFile_Tstat5LCD->WriteString(logstr.GetBuffer());
-    m_pFile_Tstat5LCD->WriteString(_T("\n"));
-    m_pFile_Tstat5LCD->Flush();
-
-
-    sheet.AttachDispatch(sheets.GetItem(_variant_t("Tstat5LED&&Tstat5LCD")));
-    range.AttachDispatch(sheet.GetCells());
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(1)),_variant_t(_T("Address")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(2)),_variant_t(_T("TSTAT5LED AddressName")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(3)),_variant_t(_T("TSTAT5LED Description")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(4)),_variant_t(_T("TSTAT5LCD AddressName")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(5)),_variant_t(_T("TSTAT5LCD Description")));
-    Rows=2;
-
-
-    StrSql=_T("Select * from T3000_Register_Address_By_ID ");
-       q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
-    while(!q.eof())
-    {
-      
-		strTemp = q.getValuebyName(L"Register_Address");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(1)),_variant_t(strTemp));
-        RegisterID = strTemp;
-
-         
-		strTemp = q.getValuebyName(L"TSTAT5_LED_AddressName");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(2)),_variant_t(strTemp));
-        strTemp.TrimRight();
-        strTemp.TrimLeft();
-        if (strTemp.CompareNoCase(_T("RESERVED"))!=0&&!strTemp.IsEmpty())
-        {
-            IS_Write = TRUE ;
-            RegisterName = strTemp;
-        }
-        else
-        {
-            IS_Write = FALSE ;
-        }
-
-        if (IS_Write)
-        {
-            logstr.Format(_T("#define  %s  %s \n"),RegisterName,RegisterID);
-            m_pFile_Tstat5LCD->SeekToEnd();
-            m_pFile_Tstat5LCD->WriteString(logstr.GetBuffer());
-        }
-
-
-      
-		strTemp = q.getValuebyName(L"TSTAT5_LED_INSTRUCTION");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(3)),_variant_t(strTemp));
-
-      
-		strTemp = q.getValuebyName(L"TSTAT5_LCD_AddressName");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(4)),_variant_t(strTemp));
-        strTemp.TrimRight();
-        strTemp.TrimLeft();
-        if (strTemp.CompareNoCase(_T("RESERVED"))!=0&&!strTemp.IsEmpty())
-        {
-            IS_Write = TRUE ;
-            RegisterName = strTemp;
-        }
-        else
-        {
-            IS_Write = FALSE ;
-        }
-
-        if (IS_Write)
-        {
-            logstr.Format(_T("#define  %s  %s \n"),RegisterName,RegisterID);
-            m_pFile_Tstat5LED->SeekToEnd();
-            m_pFile_Tstat5LED->WriteString(logstr.GetBuffer());
-        }
-
-
-        
-		strTemp = q.getValuebyName(L"TSTAT5_LCD_INSTRUCTION");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(5)),_variant_t(strTemp));
-
-        Rows++;
-
-        q.nextRow();
-
-    }
-
-    m_pFile_Tstat5LCD->Flush();
-    m_pFile_Tstat5LCD->Close();
-    delete m_pFile_Tstat5LCD;
-
-    m_pFile_Tstat5LED->Flush();
-    m_pFile_Tstat5LED->Close();
-    delete m_pFile_Tstat5LED;
-
- 
-#endif
-    //Tstat 5 I-6-7
-#if 1
-
-    Product_Head_File_Name=_T("");
-    //Product_Head_File_Name = HeadFold;
-    Product_Head_File_Name   = HeadFold+ _T("\\Tstat5I_6_7.h");
-
-    m_pFile->Open(Product_Head_File_Name.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate );
-
-    logstr=_T("");
-    logstr=_T("//Tstat5I_6_7 Head \n");
-    m_pFile->SeekToEnd();
-    m_pFile->WriteString(logstr.GetBuffer());
-    m_pFile->WriteString(_T("\n"));
-    m_pFile->Flush();
-
-
-    sheet.AttachDispatch(sheets.GetItem(_variant_t("Tstat5I&&Tstat6&&Tstat7")));
-    range.AttachDispatch(sheet.GetCells());
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(1)),_variant_t(_T("Address")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(2)),_variant_t(_T("Register Name")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(3)),_variant_t(_T("Register Description")));
-    Rows=2;
-
-
-    StrSql=_T("Select * from T3000_Register_Address_By_ID ");
-   q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
-    while(!q.eof())
-    {
-         
-		strTemp = q.getValuebyName(L"Register_Address");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(1)),_variant_t(strTemp));
-
-        RegisterID = strTemp;
-
-      
-		strTemp = q.getValuebyName(L"TSTAT6_AddressName");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(2)),_variant_t(strTemp));
-        strTemp.TrimRight();
-        strTemp.TrimLeft();
-        if (strTemp.CompareNoCase(_T("RESERVED"))!=0&&!strTemp.IsEmpty())
-        {
-            IS_Write = TRUE ;
-            RegisterName = strTemp;
-        }
-        else
-        {
-            IS_Write = FALSE ;
-        }
-
-        if (IS_Write)
-        {
-            logstr.Format(_T("#define  %s  %s \n"),RegisterName,RegisterID);
-            m_pFile->SeekToEnd();
-            m_pFile->WriteString(logstr.GetBuffer());
-        }
-
-     
-		strTemp = q.getValuebyName(L"TSTAT6_INSTRUCTION");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(3)),_variant_t(strTemp));
-
-        Rows++;
-
-       q.nextRow();
-
-    }
-
-    m_pFile->Flush();
-    m_pFile->Close();
-
-    
-#endif
-
-    //CO2-W
-#if 1
-
-    Product_Head_File_Name=_T("");
-    //Product_Head_File_Name = HeadFold;
-    Product_Head_File_Name   = HeadFold+ _T("\\CO2_W.h");
-
-    m_pFile->Open(Product_Head_File_Name.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate );
-
-    logstr=_T("");
-    logstr=_T("//CO2 W \n");
-    m_pFile->SeekToEnd();
-    m_pFile->WriteString(logstr.GetBuffer());
-    m_pFile->WriteString(_T("\n"));
-    m_pFile->Flush();
-
-
-    sheet.AttachDispatch(sheets.GetItem(_variant_t("CO2-W")));
-    range.AttachDispatch(sheet.GetCells());
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(1)),_variant_t(_T("Address")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(2)),_variant_t(_T("Register Name")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(3)),_variant_t(_T("Register Description")));
-    Rows=2;
-
-
-    StrSql=_T("Select * from CO2RS485RegList ");
-   q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
-    while(!q.eof())
-    {
-        
-		strTemp = q.getValuebyName(L"RegID");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(1)),_variant_t(strTemp));
-
-        RegisterID = strTemp ;
-
-      
-		strTemp = q.getValuebyName(L"485_Name_V3");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(2)),_variant_t(strTemp));
-        strTemp.TrimRight();
-        strTemp.TrimLeft();
-        if (strTemp.CompareNoCase(_T("RESERVED"))!=0&&!strTemp.IsEmpty())
-        {
-            IS_Write = TRUE ;
-            RegisterName = strTemp;
-        }
-        else
-        {
-            IS_Write = FALSE ;
-        }
-
-        if (IS_Write)
-        {
-            logstr.Format(_T("#define  %s  %s \n"),RegisterName,RegisterID);
-            m_pFile->SeekToEnd();
-            m_pFile->WriteString(logstr.GetBuffer());
-        }
-
-
-      
-		strTemp = q.getValuebyName(L"485_INSTRUCTION_V3");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(3)),_variant_t(strTemp));
-
-        Rows++;
-
-        q.nextRow();
-
-    }
-
-    m_pFile->Flush();
-    m_pFile->Close();
- 
-#endif
-
-    //CO2-W+Ethernet
-#if 1
-
-    Product_Head_File_Name=_T("");
-    //Product_Head_File_Name = HeadFold;
-    Product_Head_File_Name   = HeadFold+ _T("\\CO2_Ethernet.h");
-
-    m_pFile->Open(Product_Head_File_Name.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate );
-
-    logstr=_T("");
-    logstr=_T("//CO2  Ethernet \n");
-    m_pFile->SeekToEnd();
-    m_pFile->WriteString(logstr.GetBuffer());
-    m_pFile->WriteString(_T("\n"));
-    m_pFile->Flush();
-
-
-    sheet.AttachDispatch(sheets.GetItem(_variant_t("CO2-W+Ethernet")));
-    range.AttachDispatch(sheet.GetCells());
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(1)),_variant_t(_T("Address")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(2)),_variant_t(_T("Register Name")));
-    range.SetItem(_variant_t((long)(1)),_variant_t((long)(3)),_variant_t(_T("Register Description")));
-    Rows=2;
-
-
-    StrSql=_T("Select * from CO2NETRegList ");
-    q = SqliteDBT3000.execQuery((UTF8MBSTR)StrSql);
-    while(!q.eof())
-    {
-     
-		strTemp = q.getValuebyName(L"RegID");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(1)),_variant_t(strTemp));
-        RegisterID = strTemp;
-        
-		strTemp = q.getValuebyName(L"NET_Name");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(2)),_variant_t(strTemp));
-        strTemp.TrimRight();
-        strTemp.TrimLeft();
-        if (strTemp.CompareNoCase(_T("RESERVED"))!=0&&!strTemp.IsEmpty())
-        {
-            IS_Write = TRUE ;
-            RegisterName = strTemp;
-        }
-        else
-        {
-            IS_Write = FALSE ;
-        }
-
-        if (IS_Write)
-        {
-            logstr.Format(_T("#define  %s  %s \n"),RegisterName,RegisterID);
-            m_pFile->SeekToEnd();
-            m_pFile->WriteString(logstr.GetBuffer());
-        }
-
-
-         
-		strTemp = q.getValuebyName(L"NET_Description");
-        range.SetItem(_variant_t((long)(Rows)),_variant_t((long)(3)),_variant_t(strTemp));
-
-        Rows++;
-
-        q.nextRow();
-
-    }
-    m_pFile->Flush();
-
- 
-#endif
-
-
-    m_pFile->Close();
-    delete m_pFile;
-
-    SqliteDBT3000.closedb();
-    app.SetVisible(true);
-    range.ReleaseDispatch();
-    sheet.ReleaseDispatch();
-    sheets.ReleaseDispatch();
-    book.ReleaseDispatch();
-    books.ReleaseDispatch();
-    app.ReleaseDispatch();
+	CString strHistotyFile = g_strExePth + _T("ModbusBacnetRegistersList.xls");
+	ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);
 }
 
 
@@ -15156,7 +14038,14 @@ BOOL CMainFrame::OnToolTipNotify(UINT id,NMHDR *Pnmhdr,LRESULT *pResult)
             {
                 pTTT->lpszText = _T("Buildings [Alt-B]\r\nDatabase of all buildings, connect to a different site or go offline to set up a new one");
             }
-
+			else if (pBtn->m_nID == ID_TOOLS_MODBUSTOBACNETROUTER)
+			{
+				pTTT->lpszText = _T("Subnetwork Devices [Alt-D]\r\nDevices which connect to this devices subnetwork(s)");
+			}
+			else if (pBtn->m_nID == ID_CONTROL_IO_NET_CONFIG)
+			{
+				pTTT->lpszText = _T("Bacnet IO Configuration");
+			}
             pTTT->hinst = AfxGetResourceHandle();
         }
     }
@@ -15164,12 +14053,6 @@ BOOL CMainFrame::OnToolTipNotify(UINT id,NMHDR *Pnmhdr,LRESULT *pResult)
     return true;
 
 }
-
-
-
-
-
-
 
 INT_PTR CMainFrame::OnToolHitTest(CPoint point, TOOLINFO* pTI) const
 {
@@ -15793,9 +14676,30 @@ void CMainFrame::OnToolsModbustobacnetrouter()
 	dlg.DoModal();
 }
 
-#include"ProgramEditorTestDlg.h"
-void CMainFrame::OnToolsProgrameditortest()
+
+void CMainFrame::OnControlModbus()
 {
-	CProgramEditorTestDlg  dlg;
-		dlg.DoModal();
+	HideBacnetWindow();
+	custom_bacnet_register_listview = true;
+	SwitchToPruductType(DLG_DIALOG_CUSTOM_VIEW);
+
+}
+
+#include "BacnetIOConfig.h"
+void CMainFrame::OnControlIoNetConfig()
+{
+	if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 438)
+	{
+		MessageBox(_T("This feature need the newest firmware."));
+		return;
+	}
+
+
+	if (GetPrivateData_Blocking(g_bac_instance, READEXT_IO_T3000, 0, BAC_EXTIO_COUNT - 1, sizeof(Str_Extio_point)) < 0)
+	{
+		MessageBox(_T("Read data timeout"));
+		return;
+	}
+	CBacnetIOConfig IOdlg;
+	IOdlg.DoModal();
 }

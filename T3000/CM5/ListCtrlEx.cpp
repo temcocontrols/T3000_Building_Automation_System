@@ -125,18 +125,11 @@ void ListCtrlEx::CListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				m_select_col = m_select_col - 1;
 
 				SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
-				if (m_show_bk_color)
-				{
-					if ((old_select_raw % 2) == 0)	//恢复前景和 背景 颜色;
-						SetItemBkColor(old_select_raw, old_select_col, LIST_ITEM_DEFAULT_BKCOLOR, 0);
-					else
-						SetItemBkColor(old_select_raw, old_select_col, LIST_ITEM_DEFAULT_BKCOLOR_GRAY, 0);
-				}
-				else
-				{
-					SetItemBkColor(old_select_raw, old_select_col, LIST_ITEM_DEFAULT_BKCOLOR, 0);
-				}
 
+				if((old_select_raw%2)==0)	//恢复前景和 背景 颜色;
+					SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR,0);
+				else
+					SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
 
 				RedrawItems(m_select_raw,m_select_raw);
 				return ;
@@ -153,19 +146,10 @@ void ListCtrlEx::CListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 					SetCellChecked(m_select_raw,0,1);
 				}
 				SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
-
-				if (m_show_bk_color)
-				{
-					if ((old_select_raw % 2) == 0)	//恢复前景和 背景 颜色;
-						SetItemBkColor(old_select_raw, old_select_col, LIST_ITEM_DEFAULT_BKCOLOR, 0);
-					else
-						SetItemBkColor(old_select_raw, old_select_col, LIST_ITEM_DEFAULT_BKCOLOR_GRAY, 0);
-				}
+				if((old_select_raw%2)==0)	//恢复前景和 背景 颜色;
+					SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR,0);
 				else
-				{
-					SetItemBkColor(old_select_raw, old_select_col, LIST_ITEM_DEFAULT_BKCOLOR, 0);
-				}
-
+					SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
 
 				RedrawItems(m_select_raw,m_select_raw);
 				RedrawItems(old_select_raw,old_select_raw);
@@ -193,19 +177,10 @@ void ListCtrlEx::CListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 			{
 				m_select_col = m_select_col + 1;
 				SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
-
-				if (m_show_bk_color)
-				{
-					if ((old_select_raw % 2) == 0)	//恢复前景和 背景 颜色;
-						SetItemBkColor(old_select_raw, old_select_col, LIST_ITEM_DEFAULT_BKCOLOR, 0);
-					else
-						SetItemBkColor(old_select_raw, old_select_col, LIST_ITEM_DEFAULT_BKCOLOR_GRAY, 0);
-				}
+				if((old_select_raw%2)==0)	//恢复前景和 背景 颜色;
+					SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR,0);
 				else
-				{
-					SetItemBkColor(old_select_raw, old_select_col, LIST_ITEM_DEFAULT_BKCOLOR, 0);
-				}
-
+					SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
 
 				RedrawItems(m_select_raw,m_select_raw);
 				return ;
@@ -222,19 +197,10 @@ void ListCtrlEx::CListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 					SetCellChecked(m_select_raw,0,1);
 				}
 				SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
-
-				if (m_show_bk_color)
-				{
-					if ((old_select_raw % 2) == 0)	//恢复前景和 背景 颜色;
-						SetItemBkColor(old_select_raw, old_select_col, LIST_ITEM_DEFAULT_BKCOLOR, 0);
-					else
-						SetItemBkColor(old_select_raw, old_select_col, LIST_ITEM_DEFAULT_BKCOLOR_GRAY, 0);
-				}
+				if((old_select_raw%2)==0)	//恢复前景和 背景 颜色;
+					SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR,0);
 				else
-				{
-					SetItemBkColor(old_select_raw, old_select_col, LIST_ITEM_DEFAULT_BKCOLOR, 0);
-				}
-
+					SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
 				RedrawItems(m_select_raw,m_select_raw);
 				RedrawItems(old_select_raw,old_select_raw);
 
@@ -351,20 +317,10 @@ CListCtrlEx::CellIndex CListCtrlEx::Point2Cell(const CPoint &point)
 			if((old_select_raw != m_select_raw) || (old_select_col != m_select_col ))	//判断是否为选中的同一个;
 			{
 				SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
-
-                //2017/12/14 Fandu Modify  在需选择需要间隔背景色的表格，选中的恢复默认色时 恢复为 系统默认颜色.
-                if (m_show_bk_color)
-                {
-                    if ((old_select_raw % 2) == 0)	//恢复前景和 背景 颜色;
-                        SetItemBkColor(old_select_raw, old_select_col, LIST_ITEM_DEFAULT_BKCOLOR, 0);
-                    else
-                    {
-                        SetItemBkColor(old_select_raw, old_select_col, LIST_ITEM_DEFAULT_BKCOLOR_GRAY, 0);
-                    }
-                }
-                else
-                    SetItemBkColor(old_select_raw, old_select_col, LIST_ITEM_DEFAULT_BKCOLOR, 0);
-
+				if((old_select_raw%2)==0)	//恢复前景和 背景 颜色;
+					SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR,0);
+				else
+					SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
 				if(m_select_raw != old_select_raw)	//如果是换行了，就两行都要刷新;
 				{
 					RedrawItems(m_select_raw,m_select_raw);
@@ -374,9 +330,14 @@ CListCtrlEx::CellIndex CListCtrlEx::Point2Cell(const CPoint &point)
 				{
 					RedrawItems(m_select_raw,m_select_raw);
 				}
+
 			}
 		
+
 	
+
+
+
 		for (int nCol=0; nCol<nColCnt; ++nCol)
 		{
 			if (GetCellRect(nRow, nCol, rcItem))

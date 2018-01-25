@@ -46,10 +46,6 @@ void Init_Service_Handlers_Tool(void);
 void LocalIAmHandler_Tool(	uint8_t * service_request,	uint16_t service_len,	BACNET_ADDRESS * src);
 void Localhandler_read_property_ack_tool(	uint8_t * service_request,	uint16_t service_len,
 						BACNET_ADDRESS * src,	BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
-
-
-void Localhandler_write_property_ack_tool(uint8_t * service_request, uint16_t service_len,
-    BACNET_ADDRESS * src, BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
 IMPLEMENT_DYNAMIC(CBacnetTool, CDialogEx)
 
 CBacnetTool::CBacnetTool(CWnd* pParent /*=NULL*/)
@@ -231,9 +227,6 @@ void Init_Service_Handlers_Tool(void)
 	//apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_READ_PROPERTY,Read_Property_feed_back);
 
 	apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_READ_PROPERTY,	Localhandler_read_property_ack_tool);
-
-
-    apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_WRITE_PROPERTY, Localhandler_write_property_ack_tool);
 	/* set the handler for all the services we don't implement */
 	/* It is required to send the proper reject message... */
 	apdu_set_unrecognized_service_handler_handler
@@ -343,54 +336,7 @@ void CBacnetTool::OnBnClickedButtonBacToolExit()
 	Send_WhoIs_Global(-1, -1);
 }
 
-int Write_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, int property_id)
-{
-    // uint32_t device_id = 0;
-    bool status = false;
-    unsigned max_apdu = 0;
-    BACNET_ADDRESS src;
-    bool next_device = false;
-    static unsigned index = 0;
-    static unsigned property = 0;
-    /* list of required (and some optional) properties in the
-    Device Object
-    note: you could just loop through
-    all the properties in all the objects. */
-    int object_props[] = {
-        property_id//PROP_MODEL_NAME//PROP_OBJECT_LIST
-    };
 
-        BACNET_APPLICATION_DATA_VALUE test123 = { 0x00 };
-        test123.tag = 7;
-        test123.context_specific = false;
-        test123.type.Character_String.length = 10;
-        strcpy(test123.type.Character_String.value, "1123");
-
-
-
-        g_invoke_id =  Send_Write_Property_Request(deviceid,
-            object_type, deviceid,
-            (BACNET_PROPERTY_ID)object_props[property], &test123,
-            1,
-            BACNET_ARRAY_ALL);
-
-       // g_invoke_id = Send_Write_Property_Request(deviceid, object_type, deviceid, (BACNET_PROPERTY_ID)object_props[property], &test123, 1, BACNET_ARRAY_ALL);
-        while (1)
-        {
-            Sleep(10);
-            if (tsm_invoke_id_free(g_invoke_id))
-            {
-                break;
-            }
-            else
-                continue;
-        }
-
-
-
-        return 1;
-
-}
 
 //extern  MSTP_Port;
 //volatile struct mstp_port_struct_t MSTP_Port;
@@ -476,26 +422,6 @@ int Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type,int proper
 }
 
 
-void Localhandler_write_property_ack_tool(
-    uint8_t * service_request,
-    uint16_t service_len,
-    BACNET_ADDRESS * src,
-    BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data)
-{
-    int len = 0;
-    BACNET_READ_PROPERTY_DATA data;
-
-    (void)src;
-    (void)service_data;        /* we could use these... */
-    len = rp_ack_decode_service_request(service_request, service_len, &data);
-    //char my_pro_name[100];
-    //char * temp = get_prop_name();
-    //strcpy_s(my_pro_name,100,temp);
-    Sleep(1);
-}
-
-
-
 void Localhandler_read_property_ack_tool(
 	uint8_t * service_request,
 	uint16_t service_len,
@@ -567,7 +493,6 @@ void CBacnetTool::OnBnClickedButtonBacToolTest2()
 	Dlg.DoModal();
 	if(!read_property_cancel)
 	{
-        //Write_Properties(object_instance, (BACNET_OBJECT_TYPE)object_identifier, property_identifier);
 		Read_Properties(object_instance,(BACNET_OBJECT_TYPE)object_identifier,property_identifier/*PROP_OBJECT_LIST*/);
 	}
 		

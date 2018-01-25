@@ -30,13 +30,4 @@ public:
 	afx_msg LRESULT Fresh_TSTAT_Schedule_List(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT Fresh_TSTAT_Schedule_Item(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnNMClickListBacTstatSchedule(NMHDR *pNMHDR, LRESULT *pResult);
-    static	DWORD WINAPI  WriteGroupRegThreadfun(LPVOID lpVoid);
-    static  DWORD WINAPI  ReadGroupRegThreadfun(LPVOID lpVoid);
-    int m_group_id;
-    unsigned short m_group_value;
-    int m_group_index;
-private:
-	int m_list_count;  // 有效条数
-public:
-    afx_msg void OnTimer(UINT_PTR nIDEvent);
 };

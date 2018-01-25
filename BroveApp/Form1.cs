@@ -25,52 +25,38 @@ using WooCommerceNET.Base;
 namespace BroveApp
 {
 
-    public partial class MainFrm : Form
+    public partial class Form1 : Form
     {
         private IList<TemcoProduct> ITemcoProduct = new List<TemcoProduct>();
 
+        public int PageID = 1;
         //定义一个BindingList的学生链表
 
         private BindingList<TemcoProduct> BTProduct;
 
-        public MainFrm()
+        RestAPI rest;//= new RestAPI("https://www.bravocontrols.com/wp-json/wc/v2", "ck_5635f9d0ce065a46aecf8bb2a92fcccc1d5efd5a", "cs_85135c93196d8c186a60a4e6d9a12441e595140a");
+        WCObject wc; //= new WCObject(rest);
+        int m_current_Row;
+        int m_current_Col;
+        
+        public Form1()
         {
             InitializeComponent();
+              rest= new RestAPI("https://www.bravocontrols.com/wp-json/wc/v2", "ck_5635f9d0ce065a46aecf8bb2a92fcccc1d5efd5a", "cs_85135c93196d8c186a60a4e6d9a12441e595140a");
+              wc= new WCObject(rest);
+            m_current_Row = 0;
+            m_current_Col = 0;
         }
 
-        private async void getProductsToolStripMenuItem_Click(object sender, EventArgs e)
+        private  void getProductsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            RestAPI rest = new RestAPI("", "", "");
-            WCObject wc = new WCObject(rest);
-
-            //Get all products
-            var products = await wc.Product.GetAll();
-
-            Thread.Sleep(2000);
-            
-            for (int i = 0; i < products.Count; i++)
-            {
-                // textBox3.Text += products[i].name + "\n";
-                //listBox1.Items.Insert(i, products[i].name);
-                TemcoProduct tp = new TemcoProduct();
-                tp.ID = products[i].id.ToString();
-                tp.Name = products[i].name.ToString();
-                tp.Description = products[i].description.ToString();
-                tp.Price = products[i].price.ToString();
-                tp.Weight = products[i].weight.ToString();
-                tp.ImagesLink = products[i].images[0].src.ToString();
-                ITemcoProduct.Add(tp);
-            }
-
-            BTProduct = new BindingList<TemcoProduct>(ITemcoProduct);
-
-            this.dataGridView1.DataSource = BTProduct;
+            ShowData();
         }
 
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            //string rowIndex = e.RowIndex.ToString();
-            //string colIndex = e.ColumnIndex.ToString();
+             m_current_Row = e.RowIndex;
+             m_current_Col = e.ColumnIndex;
 
             TemcoProduct tp = new TemcoProduct();
             tp = ITemcoProduct[e.RowIndex];
@@ -88,6 +74,76 @@ namespace BroveApp
             webBrowser_Description.DocumentText = tp.Description;
 
 
+        }
+
+        private void button_UP_Click(object sender, EventArgs e)
+        {
+            if(PageID>1)
+            {
+                --PageID;
+            }
+            else
+            {
+              //  button_UP.Enabled = false;
+            }
+            ShowData();
+        }
+
+
+        private async void ShowData()
+        {
+            
+
+            //Get all products
+            var  products = await wc.Product.GetAll(new Dictionary<string, string>() {
+                { "page", PageID.ToString() } });
+
+            Thread.Sleep(2000);
+            ITemcoProduct.Clear();
+            for (int i = 0; i < (int)products.Count; i++)
+            {
+                // textBox3.Text += products[i].name + "\n";
+                //listBox1.Items.Insert(i, products[i].name);
+                TemcoProduct tp = new TemcoProduct();
+                tp.ID = products[i].id.ToString();
+                tp.Name = products[i].name.ToString();
+                tp.Description = products[i].description.ToString();
+                tp.Price = products[i].price.ToString();
+                tp.Weight = products[i].weight.ToString();
+                tp.ImagesLink = products[i].images[0].src.ToString();
+                tp.SKU = products[i].sku;
+                ITemcoProduct.Add(tp);
+            }
+
+            BTProduct = new BindingList<TemcoProduct>(ITemcoProduct);
+
+            this.dataGridView1.DataSource = BTProduct;
+        }
+
+        private void button_Down_Click(object sender, EventArgs e)
+        {
+            ++PageID;
+            ShowData();
+        }
+        private async void SaveData()
+        {
+
+          //  Product pd = new Product { name = textBox_Name.Text };
+
+            Product pd = new Product { price = 10.0M };
+            await wc.Product.Update(Convert.ToInt32(ITemcoProduct[m_current_Row].ID), pd);
+        }
+        private void Save_Click(object sender, EventArgs e)
+        {
+
+            SaveData();
+            MessageBox.Show("OK");
+        }
+
+        private void Form1_SizeChanged(object sender, EventArgs e)
+        {
+            webBrowser_Description.Width = this.Width - dataGridView1.Width;
+            webBrowser_Description.Height = this.Height - pictureBox_Image.Height;
         }
     }
 }
