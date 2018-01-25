@@ -244,9 +244,9 @@ CT3000View::CT3000View()
 CT3000View::~CT3000View()
 {
      
-
-	m_daySlider.Dispose();
-	m_nightSlider.Dispose();
+    //Fandu 2017 /12/20  解决Debug 模式下 此处抛出异常.
+	//m_daySlider.Dispose();
+	//m_nightSlider.Dispose();
 }
 
 void CT3000View::DoDataExchange(CDataExchange* pDX)
@@ -4521,7 +4521,7 @@ void CT3000View::InitFanSpeed()
 			break;
 		}
 	}
-	 sel = set_real_fan_select();
+	sel = set_real_fan_select();
 	 m_FanComBox.SetCurSel(sel);
 }
 
@@ -5481,48 +5481,32 @@ void CT3000View::Initial_Max_Min()
         DayMax = GetRoundMM(TRUE,dCoolSP,nCoolSP,1.1);
         DayMin = GetRoundMM(FALSE,dHeatSP,nHeatSP,0.9);
 
-		if (product_register_value[7]==PM_PM5E||product_register_value[7]==PM_TSTAT5E)
-		{
-		} 
-		else
-		{
-			int i_Temperature_Max = 2 + (short)product_register_value[MODBUS_TEMPRATURE_CHIP] / 10;
-			int i_Temperature_min = (short)product_register_value[MODBUS_TEMPRATURE_CHIP] / 10 - 2;
-			if (DayMax < i_Temperature_Max) DayMax = i_Temperature_Max;
-			if (DayMin > i_Temperature_min) DayMin = i_Temperature_min;
-		}
-		
+		int i_Temperature_Max = 2 + (short)product_register_value[MODBUS_TEMPRATURE_CHIP] / 10;
+		int i_Temperature_min = (short)product_register_value[MODBUS_TEMPRATURE_CHIP] / 10 - 2;
+		if (DayMax < i_Temperature_Max) DayMax = i_Temperature_Max;
+		if (DayMin > i_Temperature_min) DayMin = i_Temperature_min;
 
     }
 
 
+    int currentTemp= product_register_value[MODBUS_TEMPRATURE_CHIP]/10;
+    if (currentTemp<DayMin)
+    {
 
+    	DayMin=currentTemp;
+    	while((DayMin%5)!=0){
+    		--DayMin;
+    	}
+    }
 
+    if (currentTemp>DayMax)
+    {
 
-	if (product_register_value[7] == PM_PM5E || product_register_value[7] == PM_TSTAT5E)
-	{
-	}
-	else
-	{
-		int currentTemp = product_register_value[MODBUS_TEMPRATURE_CHIP] / 10;
-		if (currentTemp < DayMin)
-		{
-
-			DayMin = currentTemp;
-			while ((DayMin % 5) != 0) {
-				--DayMin;
-			}
-		}
-
-		if (currentTemp > DayMax)
-		{
-
-			DayMax = currentTemp;
-			while ((DayMax % 5) != 0) {
-				++DayMax;
-			}
-		}
-	}
+    	DayMax=currentTemp;
+    	while((DayMax%5)!=0){
+    		++DayMax;
+    	}
+    }
 
 	 
 }

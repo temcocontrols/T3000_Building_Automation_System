@@ -70,9 +70,12 @@ public:
 	unsigned int flash_step;//ÉÁË¸µÄÑÕÉ«¿ØÖÆ;
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 	void Check_New_DB();
+    BOOL GetMonitorReadPackage(int digtal_or_analog, int nIndex);
+    void StringToBit(int digtal_or_analog);
+   
 };
 
-unsigned char read_monitordata(int digtal_or_analog = 1);
+int read_monitordata(int digtal_or_analog = 1,unsigned int lefttime = 0,unsigned int righttime = 0);
 
 //const int MONITOR_NUM = 0;
 //const int MONITOR_LABEL = 1;

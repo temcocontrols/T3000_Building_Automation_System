@@ -1,6 +1,12 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
+2017-12-13 Update by Fance
+1.串口二  支持  MSTP_MASTER.
+2.修复list 在利用鼠标移动时 有些list 显示的背景色杂乱无章的问题
+3.修复设备状态显示不正常的问题。
+4.Tstat Schedual 控制增加DaySetpoint NightSetpoint SleepSetpoint AwakeSetpoint
+
 2017-12-08 Update by Fance
 1. 新增Minipanel界面下 tstat的schedule界面
 2. 修复扫描时 对重复数据的处理
@@ -2522,7 +2528,6 @@ void CDialogCM5_BacNet::InitialBacnetWindow()
 	}
 }
 
-
 //__declspec(dllexport) HANDLE	Get_RS485_Handle();
 static bool already_retry = false;
 bool has_change_connect_ip = true;
@@ -2630,10 +2635,11 @@ void CDialogCM5_BacNet::Fresh()
 		{
 			initial_once_ip = true;
 		}
-		//else
-		//{
-		//	DFTrace(_T("Initial_bac function failed!"));
-		//}
+		else
+		{
+			DFTrace(_T("Initial_bac function failed!"));
+            return;
+		}
 	}
 	else
 	{
@@ -2669,7 +2675,7 @@ void CDialogCM5_BacNet::Fresh()
 #endif
 	BacNet_hwd = this->m_hWnd;
 
-#ifndef test_ptp
+
 	CString temp_cs;
 	temp_cs.Format(_T("%d"),g_bac_instance);
 	GetDlgItem(IDC_STATIC_CM_DEVICE_ID)->SetWindowTextW(temp_cs);
@@ -2931,9 +2937,9 @@ void CDialogCM5_BacNet::Fresh()
 					CString str_baudrate;
 					CString hw_instance;
 					CString sw_mac;
-					hw_instance.Format(_T("%d"),g_bac_instance);
-					sw_mac.Format(_T("%d"),g_mac);
-					str_serialid.Format(_T("%d"),pFrame->m_product.at(selected_product_index).serial_number);
+					hw_instance.Format(_T("%u"),g_bac_instance);
+					sw_mac.Format(_T("%u"),g_mac);
+					str_serialid.Format(_T("%u"),pFrame->m_product.at(selected_product_index).serial_number);
 					str_baudrate =pFrame->m_product.at(selected_product_index).BuildingInfo.strIp;
 					//TRACE(_T("update ALL_NODE set Software_Ver =\r\n"));
 					CppSQLite3DB SqliteDBBuilding;
@@ -2954,7 +2960,7 @@ void CDialogCM5_BacNet::Fresh()
 						AfxMessageBox(e->ErrorMessage());
 					}
 					SqliteDBBuilding.closedb();
-					::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
+					//::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
 				}
 				::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,START_BACNET_TIMER,0);
 				CString temp_info;
@@ -2980,18 +2986,6 @@ void CDialogCM5_BacNet::Fresh()
 		pFrame->m_product.at(selected_product_index).status_last_time[2] = false;
 		::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,CONNECT_TO_MODBUS_FAILED,0);
 	}
-
-
-
-#endif
-
-	//prevent when user doesn't click the bacnet device,the view also initial ,It's a waste of resource;
-#if 1
-
-	
-
-#endif
-
 
 }
 
@@ -5290,7 +5284,11 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 			}
 			else if(LoadBacnetConfigFile_Cache(achive_file_path) < 0 )
 			{
-				PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,BAC_READ_ALL_LIST);
+                if (g_protocol == PROTOCOL_BACNET_IP)
+                {
+                    pFrame->Show_Wait_Dialog_And_ReadBacnet();
+                }
+				//PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,BAC_READ_ALL_LIST);
 			}
 		}
 
@@ -5394,39 +5392,33 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 				WritePrivateProfileStringW(temp_serial_number,NULL,NULL,g_achive_device_name_path);
 			}
 		}
-		else	//设备的比较新 更新至本地;
+		else	//设备的比较新
 		{
-			CString temp_device_panel_name;
-			MultiByteToWideChar( CP_ACP, 0, Device_Basic_Setting.reg.panel_name, (int)strlen(Device_Basic_Setting.reg.panel_name)+1,temp_device_panel_name.GetBuffer(MAX_PATH), MAX_PATH );
-			temp_device_panel_name.ReleaseBuffer();
-			temp_device_panel_name.Remove('\'');
-			temp_device_panel_name.Remove('\%');
-			if((!temp_device_panel_name.IsEmpty()) && (temp_device_panel_name.GetLength() <20))
-			{
-				if(temp_device_panel_name.CompareNoCase(pFrame->m_product.at(selected_product_index).NameShowOnTree) != 0)
-				{
-					CppSQLite3DB SqliteDBBuilding;
-					CppSQLite3Table table;
-					CppSQLite3Query q;
-					SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
-
-
-
-					CString strSql;
-					strSql.Format(_T("update ALL_NODE set Product_name='%s' where Serial_ID ='%s'"),temp_device_panel_name,temp_serial_number);
-					SqliteDBBuilding.execDML((UTF8MBSTR)strSql); 
-
-	
-					if(selected_product_index < pFrame->m_product.size())
-					{
-						pFrame->m_pTreeViewCrl->SetItemText(pFrame->m_product.at(selected_product_index).product_item,temp_device_panel_name);
-						pFrame->m_product.at(selected_product_index).NameShowOnTree = temp_device_panel_name;
-					}
-
-					SqliteDBBuilding.closedb();
-				}
-			}
-
+            //20171219 杜帆屏蔽  //不在去判断更新，有时候点击的时候会出现两个同名的设备，可能是Setting结构重名了。
+			//CString temp_device_panel_name;
+			//MultiByteToWideChar( CP_ACP, 0, Device_Basic_Setting.reg.panel_name, (int)strlen(Device_Basic_Setting.reg.panel_name)+1,temp_device_panel_name.GetBuffer(MAX_PATH), MAX_PATH );
+			//temp_device_panel_name.ReleaseBuffer();
+			//temp_device_panel_name.Remove('\'');
+			//temp_device_panel_name.Remove('\%');
+			//if((!temp_device_panel_name.IsEmpty()) && (temp_device_panel_name.GetLength() <20))
+			//{
+			//	if(temp_device_panel_name.CompareNoCase(pFrame->m_product.at(selected_product_index).NameShowOnTree) != 0)
+			//	{
+			//		CppSQLite3DB SqliteDBBuilding;
+			//		CppSQLite3Table table;
+			//		CppSQLite3Query q;
+			//		SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+			//		CString strSql;
+			//		strSql.Format(_T("update ALL_NODE set Product_name='%s' where Serial_ID ='%s'"),temp_device_panel_name,temp_serial_number);
+			//		SqliteDBBuilding.execDML((UTF8MBSTR)strSql); 
+			//		if(selected_product_index < pFrame->m_product.size())
+			//		{
+			//			pFrame->m_pTreeViewCrl->SetItemText(pFrame->m_product.at(selected_product_index).product_item,temp_device_panel_name);
+			//			pFrame->m_product.at(selected_product_index).NameShowOnTree = temp_device_panel_name;
+			//		}
+			//		SqliteDBBuilding.closedb();
+			//	}
+			//}
 			
 		}
 	}

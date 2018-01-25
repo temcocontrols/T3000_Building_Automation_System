@@ -134,4 +134,5 @@ public:
     afx_msg void OnBnClickedRadio10v();
 	afx_msg void OnBnClickedRadioT13();
 	afx_msg void OnBnClickedRadioT14();
+    void Show4_20maUI(bool nshow);
 };

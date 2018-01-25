@@ -43,12 +43,12 @@ enum ERightDragHandler {
               int brandrate = 0;
               int ModbusID=0;
              CString strSql,temp_serial;
-            int sn=pFrame->m_product.at(i).serial_number;
-            temp_serial.Format(_T("%d"),sn);
+            unsigned int sn=pFrame->m_product.at(i).serial_number;
+            temp_serial.Format(_T("%u"),sn);
             int  int_product_type = pFrame->m_product.at(i).product_class_id;
             
-            if (product_register_value[714] == 0x56)
-            {
+            //if (product_register_value[714] == 0x56)
+            //{
                 int communicationType = pFrame->m_product.at(i).protocol;  
                 ModbusID = pFrame->m_product.at(i).product_id;
                 SetCommunicationType(communicationType);
@@ -80,7 +80,7 @@ enum ERightDragHandler {
                 else
                 {
                     strIPAddress = pFrame->m_product.at(i).BuildingInfo.strIp;
-                    IPPort = _wtoi(pFrame->m_product.at(i).BuildingInfo.strIpPort);
+                    IPPort = pFrame->m_product.at(i).ncomport;
                     if (Open_Socket2(strIPAddress,IPPort))
                     {
                         if(dlg->m_name_new.GetLength()> 17)	//长度不能大于结构体定义的长度;
@@ -105,7 +105,7 @@ enum ERightDragHandler {
                 }
 
                 
-            } 
+            //} 
 
             break;
          }
@@ -214,7 +214,7 @@ bool CImageTreeCtrl::DoEditLabel(HTREEITEM hItem)
 
 bool CImageTreeCtrl::PingDevice(HTREEITEM hItem) 
 {
-	::PostMessage(MainFram_hwd,6677,(WPARAM)hItem,NULL);
+	::PostMessage(MainFram_hwd, WM_PING_MESSAGE,(WPARAM)hItem,NULL);
 //	m_strPingIP = strIP;
 
 	return true;
@@ -635,20 +635,17 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
 			SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
             strSql.Format(_T("update ALL_NODE set Product_name='%s' where Product_name='%s' and Serial_ID='%s'"),m_name_new,m_name_old,temp_serial);
-             SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+            SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
             SqliteDBBuilding.closedb();
 
-            if( product_register_value[714] == 0x56) 
+            if (m_name_new.GetLength() > 16)	//长度不能大于结构体定义的长度;
             {
-
-                if(m_name_new.GetLength()> 16)	//长度不能大于结构体定义的长度;
-                {
-                    m_name_new.Delete(16,m_name_new.GetLength()-16);
-                }
-                WritePrivateProfileStringW(temp_serial,_T("NewName"),m_name_new,g_achive_device_name_path);
-                WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("1"),g_achive_device_name_path);
-                CreateThread(NULL,NULL,_Background_Write_Name,this,NULL,0);
+                m_name_new.Delete(16, m_name_new.GetLength() - 16);
             }
+            WritePrivateProfileStringW(temp_serial, _T("NewName"), m_name_new, g_achive_device_name_path);
+            WritePrivateProfileStringW(temp_serial, _T("WriteFlag"), _T("1"), g_achive_device_name_path);
+            CreateThread(NULL, NULL, _Background_Write_Name, this, NULL, 0);
+
             return TRUE;
       }
     }
@@ -1152,6 +1149,7 @@ void CImageTreeCtrl::turn_item_image(HTREEITEM hItem,bool state)
 	case 17:
 	case 19:
 	case 21:
+    case 25: //Add by Fandu . Fix the problem.When Tstat8 as a subnet device connect to the T3 controller ,It's online status is abnormal. 
 		if(state == true)
 		{
 			brother_nImage--;
@@ -1159,6 +1157,7 @@ void CImageTreeCtrl::turn_item_image(HTREEITEM hItem,bool state)
 		}
 		break;
 	case 22:
+    case 24:
 	   if (state == false)
 	   {
 		   brother_nImage++;

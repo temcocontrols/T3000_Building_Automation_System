@@ -337,7 +337,7 @@ const int BAC_READ_PID_GROUP_NUMBER = 10;
 const int BAC_READ_SCHEDULE_GROUP_NUMBER = 10;
 const int BAC_READ_HOLIDAY_GROUP_NUMBER = 8;
 
-const int BAC_READ_TSTAT_SCHEDULE_GROUP_NUMBER = 20;
+const int BAC_READ_TSTAT_SCHEDULE_GROUP_NUMBER = 10;
 
 const int BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER = 8;
 
@@ -960,10 +960,10 @@ const CString Device_Serial_Port_Status[] =
 	_T("Main Zigbee"),
 	_T("Sub Zigbee"),
 	_T("Modbus Master"),
-	_T("MSTP Master"),
-	_T("RS232 Meter")
-
+	_T("RS232 Meter"),
+	_T("MSTP Master")
 };
+
 
 const CString Variable_Analog_Units_Array[] =
 {
@@ -1008,13 +1008,14 @@ const CString Variable_Analog_Units_Array[] =
 struct _Graphic_Value_Info
 {
 	uint32_t deviceid;
-	int8_t command;
+    uint8_t command;
 	int8_t value_type;
 	int8_t value_item;
 	unsigned short entitysize;
 	CRelayLabel* control_pt;
 	HWND hWnd;
 };
+
 
 
 const int WINDOW_TAB_COUNT = 14; //多少个Window 嵌入在TAB里面;
@@ -1125,6 +1126,7 @@ const CString Baudrate_Array[] =
 	_T("76800"),
 	_T("115200"),	//9
 	_T("921600"),
+    _T("57600")  //11
 };
 
 typedef struct
@@ -1184,6 +1186,14 @@ typedef struct
 	uint8_t ntext_place;
 	uint8_t n_iconsize;
 }Bacnet_Label_Info;
+
+
+typedef struct
+{
+    unsigned int ndeviceid;
+    unsigned char npanelnum;
+
+}Bacnet_RemotePoint_Info;
 
 const int LABEL_MOUSE_NORMAL = 0;
 const int LABEL_MOUSE_ON = 1;
@@ -1304,17 +1314,6 @@ const int P_GSM = 4;
 const int P_AUTO = 5;
 const int P_REMOTE_DEVICE = 6;
 
-//const CString Building_Protocol[] =
-//{
-//	_T("Modbus 485"),
-//	_T("Modbus TCP"),
-//	_T("Bacnet MSTP"),
-//	_T("Bacnet IP"),
-//	_T("GSM"),
-//	_T("Auto"),
-//	_T("Remote Device")
-//
-//};
 
 const CString Building_Protocol[] =
 {
@@ -1388,7 +1387,12 @@ const int TSTAT_SCHEDULE_SCHEDULES = 4;
 const int TSTAT_SCHEDULE_SCHEDULES_AM = 5;
 const int TSTAT_SCHEDULE_SCHEDULES_VALUE = 6;
 
-const int TSTAT_SCHEDULE_COL_NUMBER = 7;
+const int TSTAT_SCHEDULE_DSP_VALUE = 7;
+const int TSTAT_SCHEDULE_NSP_VALUE = 8;
+const int TSTAT_SCHEDULE_AWAKESP_VALUE = 9;
+const int TSTAT_SCHEDULE_SLEEPSP_VALUE = 10;
+
+const int TSTAT_SCHEDULE_COL_NUMBER = 11;
 const int TSTAT_SCHEDULE_REFRESH_TIME = 4000;
 #pragma endregion TSTAT_SCHEDULE_DIFINE
 
@@ -1928,4 +1932,4 @@ const int REFRESH_LIST_NOW = 2000;
 
 const CString DEFAULT_ICON = _T("Default.icon");
 
-
+const int GRAPHIC_MAX_PACKAGE = 8192 * 3;

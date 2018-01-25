@@ -72,7 +72,7 @@ BOOL CWifiConfigDlg::OnInitDialog()
 	strtemp.Format(_T("%02X-%02X-%02X-%02X-%02X-%02X"), product_register_value[CO2_NET_MODBUS_MAC_ADDRESS_START], product_register_value[CO2_NET_MODBUS_MAC_ADDRESS_START + 1], product_register_value[CO2_NET_MODBUS_MAC_ADDRESS_START + 2], product_register_value[CO2_NET_MODBUS_MAC_ADDRESS_START + 3], product_register_value[CO2_NET_MODBUS_MAC_ADDRESS_START + 4], product_register_value[CO2_NET_MODBUS_MAC_ADDRESS_START + 5]);
 	m_Edit_MacAddress.SetWindowText(strtemp);
 	 
-	 
+	
 
 	int   CO2_NET_MODBUS_IP_ADDRESS_START = 47;
 	m_ipaddress.SetAddress((BYTE)product_register_value[CO2_NET_MODBUS_IP_ADDRESS_START],
@@ -246,12 +246,10 @@ void CWifiConfigDlg::OnBnClickedOk()
 	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS2))->GetAddress(address1, address2, address3, address4);
 
 	//dufan : 当IP地址 有变化时才写寄存器
-	if (
-		(m_address[0] != ret[0]) ||
+	if ((m_address[0] != ret[0]) ||
 		(m_address[1] != ret[1]) ||
 		(m_address[2] != ret[2]) ||
-		(m_address[3] != ret[3])
-	   )
+		(m_address[3] != ret[3]))
 	{
 		ret[0] = write_one(g_tstat_id, 47, address1);
 		ret[3] = write_one(g_tstat_id, 50, address4);

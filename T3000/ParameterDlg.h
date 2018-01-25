@@ -259,4 +259,9 @@ public:
 
 	int m_time_left  ;
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
+    CEdit m_edit_dterm;
+    CEdit m_edit_sampling_interval;
+    afx_msg void OnEnKillfocusEditDterm();
+    afx_msg void OnEnKillfocusEditSamplingInterval();
+    afx_msg void OnBnClickedButtonParameterExt();
 };

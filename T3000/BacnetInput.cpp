@@ -1626,8 +1626,7 @@ BOOL CBacnetInput::PreTranslateMessage(MSG* pMsg)
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
-
-int GetInputLabel(int index,CString &ret_label)
+int GetInputLabel(int index, CString &ret_label, Point_Net * npoint )
 {
 	if(index >= BAC_INPUT_ITEM_COUNT)
 	{
@@ -1640,14 +1639,24 @@ int GetInputLabel(int index,CString &ret_label)
 		ret_label.GetBuffer(MAX_PATH), MAX_PATH );
 	ret_label.ReleaseBuffer();
 	ret_label = ret_label.Trim();
-	if(ret_label.IsEmpty())
-	{
-		ret_label.Format(_T("IN%d"),index+1);
-	}
+
+        if (ret_label.IsEmpty())
+        {
+            if (npoint == NULL)
+            {
+                ret_label.Format(_T("IN%d"), index + 1);
+            }
+            else
+            {
+                ret_label.Format(_T("%dIN%d"), npoint->panel, npoint->number + 1);
+            }
+        }
+
+
 	return 1;
 }
 
-int GetInputFullLabel(int index,CString &ret_full_label)
+int GetInputFullLabel(int index,CString &ret_full_label, Point_Net * npoint)
 {
 	if(index >= BAC_INPUT_ITEM_COUNT)
 	{
@@ -1661,7 +1670,14 @@ int GetInputFullLabel(int index,CString &ret_full_label)
 	ret_full_label = ret_full_label.Trim();
 	if(ret_full_label.IsEmpty())
 	{
-		ret_full_label.Format(_T("IN%d"),index+1);
+        if (npoint == NULL)
+        {
+            ret_full_label.Format(_T("IN%d"), index + 1);
+        }
+        else
+        {
+            ret_full_label.Format(_T("%dIN%d"), npoint->panel, npoint->number + 1);
+        }
 	}
 	return 1;
 }

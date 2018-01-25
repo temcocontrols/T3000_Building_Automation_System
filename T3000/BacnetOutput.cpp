@@ -1481,8 +1481,7 @@ void CBacnetOutput::OnCancel()
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
 }
 
-
-int GetOutputLabel(int index,CString &ret_label)
+int GetOutputLabel(int index, CString &ret_label, Point_Net * npoint)
 {
 	if(index >= BAC_OUTPUT_ITEM_COUNT)
 	{
@@ -1500,14 +1499,17 @@ int GetOutputLabel(int index,CString &ret_label)
 	temp_cs = temp_cs.Trim();
 	if(temp_cs.IsEmpty())
 	{
-		temp_cs.Format(_T("OUT%u"),index + 1);
+        if(npoint == NULL)
+		    temp_cs.Format(_T("OUT%u"),index + 1);
+        else
+            temp_cs.Format(_T("%dOUT%u"),npoint->panel, index + 1);
 		ret_label = temp_cs;
 	}
 
 	return 1;
 }
 
-int GetOutputFullLabel(int index,CString &ret_full_label)
+int GetOutputFullLabel(int index,CString &ret_full_label , Point_Net * npoint)
 {
 	if(index >= BAC_OUTPUT_ITEM_COUNT)
 	{
@@ -1524,7 +1526,10 @@ int GetOutputFullLabel(int index,CString &ret_full_label)
 	temp_cs = temp_cs.Trim();
 	if(temp_cs.IsEmpty())
 	{
-		temp_cs.Format(_T("OUT%u"),index + 1);
+        if (npoint == NULL)
+		    temp_cs.Format(_T("OUT%u"),index + 1);
+        else
+            temp_cs.Format(_T("%dOUT%u"), npoint->panel, index + 1);
 		ret_full_label = temp_cs;
 	}
 

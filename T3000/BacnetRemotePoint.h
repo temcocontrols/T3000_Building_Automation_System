@@ -42,5 +42,6 @@ const int REMOTE_TPYE = 4;
 const int REMOTE_VALUE = 5;
 const int REMOTE_DEVICE_STATUS = 6;
 const int REMOTE_DESCRIPTION = 7;
+const int REMOTE_TIME_REMAINING = 8;
 
-const int REMOTE_COL_NUMBER = 8;
+const int REMOTE_COL_NUMBER = 9;

@@ -1160,7 +1160,7 @@ extern vector <Tstat_Input_Struct> m_tstat_input_data;
 extern vector <Tstat_Output_Struct> m_tstat_output_data;
 extern CString analog_range[11];
 extern CString analog_range_TSTAT6[15];
-extern CString INPUT_FUNS[8];
+extern CString INPUT_FUNS[13];
 extern CString Interlock[6];
 extern CString ONTPUT_FUNS[];
 
@@ -1280,6 +1280,9 @@ extern COLORREF	  nDefaultclrTxt;
 
 extern int bacnet_view_number;
 extern int input_item_select_for_range;
+
+extern bitset<65536*3> read_analog_package;  //用于记录trendlog 已经记录了哪些模拟包
+extern bitset<65536*3> read_dig_package;     //用于记录trendlog 已经记录了哪些数字包
 
 extern int graphic_view_index ;
 extern CString grapgic_view_name[3];

@@ -2039,9 +2039,22 @@ bool read_write_bacnet_config = false;	//读写Bacnet config 的时候禁止刷新 List;
  // CString analog_range[ANALOG_RANG_NUMBER]={_T("Raw"),_T("10KC Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor"),_T("Off/On")};
  // CString analog_range[ANALOG_RANG_NUMBER]={_T("Raw"),_T("10KF Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor"),_T("Off/On")};
  CString analog_range[11]={_T("UNUSED"),_T("10K Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor1"),_T("Off/On"),_T("Custom Sensor2"),_T("Occupied/Unoccupied"),_T("Unoccupied/Occupied"),_T("Open/Close"),_T("Close/Open")};
- CString analog_range_TSTAT6[15]={_T("-"),_T("10K Thermistor Type2"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor1"),_T("Off/On"),_T("Custom Sensor2"),_T("Occupied/Unoccupied"),_T("Unoccupied/Occupied"),_T("Open/Close"),_T("Close/Open"),_T("10K Thermistor Type3"),_T("0-20ma"), _T("50K Thermistor"), _T("Voltage")};
+ CString analog_range_TSTAT6[15]={_T("-"),_T("10K Thermistor Type2"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor1"),_T("Off/On"),_T("Custom Sensor2"),_T("Occupied/Unoccupied"),_T("Unoccupied/Occupied"),_T("Open/Close"),_T("Close/Open"),_T("10K Thermistor Type3"),_T("4-20ma"), _T("50K Thermistor"), _T("Voltage")};
 
- CString INPUT_FUNS[8]={_T("Normal"),_T("Freeze Protect"),_T("Occupancy Sensor"),_T("Sweep Off"),_T("Clock"),_T("Changeover Mode"),_T("Outside Temp"),_T("Airflow")};
+ CString INPUT_FUNS[13]=
+ {_T("Normal"),
+  _T("Freeze Protect"),
+  _T("Occupancy Sensor"),
+  _T("Sweep Off"),
+  _T("Clock"),
+  _T("Changeover Mode"),
+  _T("Outside Temp"),
+  _T("Airflow"),
+  _T("Heat"),
+  _T("Cool"), 
+  _T("Potentionmeter"), 
+  _T("Temperature"), 
+  _T("Fan")};
 
 
  CString Interlock[6]={_T("ON"),_T("DI1"),_T("AI1") ,_T("AI2"),_T("TIMER OR"),_T("TIMER AND")};
@@ -2189,6 +2202,9 @@ COLORREF	  nDefaultclrTxt;
 
 int bacnet_view_number = TYPE_INPUT;
 int input_item_select_for_range = 0;
+
+bitset<65536*3> read_analog_package; //用于记录trendlog 已经记录了哪些模拟包
+bitset<65536*3> read_dig_package;    //用于记录trendlog 已经记录了哪些数字包
 
 int graphic_view_index ;
 CString grapgic_view_name[3];

@@ -281,6 +281,7 @@
     <ClCompile Include="OXBitmapButton.cpp" />
     <ClCompile Include="OXToolTipCtrl.cpp" />
     <ClCompile Include="ParameterDlg.cpp" />
+    <ClCompile Include="ParameterExtDlg.cpp" />
     <ClCompile Include="ping.cpp" />
     <ClCompile Include="PressureSensorForm.cpp" />
     <ClCompile Include="ProductRegisterListView.cpp" />
@@ -366,7 +367,6 @@
     <None Include="res\ApplyUp.bmp" />
     <None Include="res\Back.bmp" />
     <None Include="res\bacnet_menu_bit.bmp" />
-    <None Include="res\bacnet_menu_bit_TEST.bmp" />
     <None Include="res\bitmap1.bmp" />
     <None Include="res\bitmap2.bmp" />
     <None Include="res\bitmap4.bmp" />
@@ -601,6 +601,7 @@
     <ClInclude Include="OXDllExt.h" />
     <ClInclude Include="OXMainRes.h" />
     <ClInclude Include="OXToolTipCtrl.h" />
+    <ClInclude Include="ParameterExtDlg.h" />
     <ClInclude Include="ping.h" />
     <ClInclude Include="PressureSensorForm.h" />
     <ClInclude Include="ProductModel.h" />

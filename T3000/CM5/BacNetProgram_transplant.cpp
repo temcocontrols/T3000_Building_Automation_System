@@ -7515,7 +7515,7 @@ void init_info_table( void )
 				ptr_panel.info[i].name = "AO";
 				break;
 			case BAC_DO:
-				ptr_panel.info[i].name = "DO";
+				ptr_panel.info[i].name = "BO";  //change DO to BO.
 				break;
 			default:
 				{

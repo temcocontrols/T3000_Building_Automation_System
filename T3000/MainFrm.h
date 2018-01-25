@@ -237,11 +237,7 @@ public://scan
 	
 	CScanDbWaitDlg*		m_pWaitScanDlg;	
 
-public:
-	void OnLabel();
-	void OnLabe2();
-	void OnLabe3();
-                
+
 // Operations
 public:
 	CMFCStatusBar& GetStatusBar ()
@@ -309,7 +305,7 @@ public:
 	static DWORD WINAPI  Read_Bacnet_Thread(LPVOID lpVoid);
 	static DWORD WINAPI  Read_Modbus_10000(LPVOID lpVoid);
 	static DWORD WINAPI  Write_Modbus_10000(LPVOID lpVoid);
-	void OnMBP();
+    static DWORD WINAPI  Write_Modbus_tstat_cfg(LPVOID lpVoid);
 	void SwitchToPruductType(int nIndex);
 	void OnFileOpen();
 	void OnLoadConfigFile();
@@ -406,12 +402,7 @@ public:
 	//HTREEITEM				m_htiCurSel;  // 记录当前点击树节点
 	CString						m_strFileVersion;
 
-	void EnableMyToolBarButton(int nIndex, int nID, BOOL bEnable);
 public:
-//	afx_msg void OnDatabaseTemcoproducts();
-
-	void ReadExcel();
-
 	unsigned short tempchange[512];//for tstat6
 	unsigned short temptstat6[512];
 	unsigned short nFlag;
@@ -438,8 +429,7 @@ public:
 	afx_msg LRESULT OnHotKey(WPARAM wParam,LPARAM lParam);
 	 
 	bool mbPollDlgOpen;
-protected:
-	//afx_msg LRESULT OnMbpollClosed(WPARAM wParam, LPARAM lParam);
+
 public:
 	CString					m_strPingIP;	
 	void ShowDebugWindow();
@@ -465,7 +455,6 @@ public:
 	afx_msg void OnPaint();
 	afx_msg void OnControlAlarmLog();
 	afx_msg void OnMenuCheckupdate();
-/*	afx_msg void OnDatabasePv();*/
 	afx_msg void OnControlRemotePoint();
 
     afx_msg void OnUpdateConnect2(CCmdUI *pCmdUI);
@@ -476,7 +465,6 @@ public:
 	afx_msg LRESULT CMainFrame::PingDevice(WPARAM wParam, LPARAM lParam);
 	void OnTestPing(const CString& strIP);
     UINT m_nStyle;
-	afx_msg void OnHelpUpdatefirmware();
 	afx_msg void OnUpdateStatusBar(CCmdUI *pCmdUI);
 	afx_msg void OnHelpFeedbacktotemco();
 	afx_msg void OnControlCustomerunits();
@@ -537,7 +525,6 @@ public:
 	afx_msg void OnUpdateControlSettings(CCmdUI *pCmdUI);
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 	afx_msg void OnFileExportregiseterslist();
-   // afx_msg void OnToolProductsregistersmaintenance();
     afx_msg void OnToolRegistersmaintenancesystem();
     afx_msg void OnToolFlashsn();
  	//virtual void GetMessageString(UINT nID, CString& rMessage) const;

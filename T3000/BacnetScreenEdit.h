@@ -69,7 +69,6 @@ public:
 	afx_msg LRESULT  Delete_Label_Handle(WPARAM wParam, LPARAM lParam);
 	virtual void OnCancel();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
-	afx_msg void OnBnClickedButtonAdd();
 	afx_msg void OnBnClickedButtonScreenExit();
 	afx_msg void OnBnClickedButtonDelete();
 	void AddLabel(unsigned char point_type,uint8_t point_number,uint8_t main_panel,uint8_t sub_panel,unsigned int point_x,unsigned int point_y);
@@ -99,6 +98,9 @@ public:
 	bool m_full_screen_mode;
 //	afx_msg void OnRButtonDblClk(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
+    static DWORD WINAPI  ReadAllPanelThreadfun(LPVOID lpVoid);
+    static DWORD WINAPI  ReadGroupDataThreadfun(LPVOID lpVoid);
+    afx_msg void OnClose();
 };
 
 #define LOCK_ICON_SIZE_X 48
