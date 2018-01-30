@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by T3000.rc
+// Microsoft Visual C++ 生成的包含文件。
+// 供 T3000.rc 使用
 //
 #define IDCANCEL2                       3
 #define IDCWRITEONE                     3
@@ -304,6 +304,7 @@
 #define IDD_DIALOG_MODBUS_BACNET_ROUTER 690
 #define IDB_BITMAP_NEW_BACNET_MENU_BIT  693
 #define IDD_DIALOG_TEMCO_STANDARD_BACNET_TOOL 694
+#define IDD_PARAMETERDIALOG_EXT         698
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -335,6 +336,7 @@
 #define IDC_EDIT_TYPE                   1027
 #define IDC_EDIT_DELAY_ITEMS            1027
 #define IDC_EDIT_COUNTRYNAME            1027
+#define IDC_EDIT_PARA_EXT_TIME_REMAINING 1027
 #define IDC_OUTPUT3_DELAY_OFF_EDIT      1028
 #define IDC_CUR_TEMP                    1028
 #define IDC_EDIT42                      1028
@@ -345,6 +347,7 @@
 #define IDC_EDIT_TEMP                   1028
 #define IDC_EDIT_DATAFORMATS            1028
 #define IDC_EDIT_STATE                  1028
+#define IDC_EDIT_PARA_EXT_MIN_PWM       1028
 #define IDC_BUTTON3                     1029
 #define IDC_DELAYTABBTN                 1029
 #define IDC_OUTPUT5_DELAY_OFF_EDIT      1029
@@ -2260,6 +2263,20 @@
 #define IDC_COMBO_PRODUCT_LIST          2358
 #define IDC_BUTTON_EXPORTEXCELFILE      2359
 #define IDC_T3000BACNETTOOL1            2360
+#define IDC_EDIT_TSTAT_4_20_UNITS       2361
+#define IDC_EDIT_TSTAT_4MA_VALUE        2362
+#define IDC_EDIT__20MA_VALUE            2363
+#define IDC_STATIC_TSTAT_GRP1           2364
+#define IDC_STATIC_TSTAT_UNITS          2365
+#define IDC_STATIC_TSTAT_4_MA           2366
+#define IDC_STATIC_TATSTA_20_MA         2367
+#define IDC_PROGRESS_FTP_DOWNLOAD       2368
+#define IDC_STATIC_FTP_PERSENT          2369
+#define IDC_EDIT_SAMPLING_INTERVAL      2370
+#define IDC_EDIT_DTERM                  2371
+#define IDC_BUTTON_PARAMETER_EXT        2372
+#define IDC_EDIT_PARA_EXT_DELAY         2373
+#define IDC_BUTTON_PARA_EXT_OK          2374
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -2733,9 +2750,10 @@
 #define ID_MODE_OFFLINEMODE             34062
 #define ID_TOOLS_PHCHART                34063
 #define ID_TOOLS_MODBUSTOBACNETROUTER   34064
-#define ID_CONTROL_MODBUSBACNETREGISTERLISTVIEW 34065
+#define ID_TOOLS_BACNETTOOL             34065
 #define ID_CONTROL_I                    34066
 #define ID_CONTROL_IO_NET_CONFIG        34067
+#define ID_CONTROL_MODBUSBACNETREGISTERLISTVIEW 34068
 #define ID_HELP_USING_UPDATE            34904
 #define ID_DATABASE_BACNETTOOL          34905
 #define IDD_DIALOG_BACNET_PROGRAM       34906
@@ -2809,9 +2827,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        697
+#define _APS_NEXT_RESOURCE_VALUE        700
 #define _APS_NEXT_COMMAND_VALUE         34068
-#define _APS_NEXT_CONTROL_VALUE         2361
+#define _APS_NEXT_CONTROL_VALUE         2375
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

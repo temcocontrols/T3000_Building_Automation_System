@@ -1008,7 +1008,7 @@ void CBacnetVariable::OnCancel()
 
 
 
-int GetVariableLabel(int index,CString &ret_label)
+int GetVariableLabel(int index,CString &ret_label, Point_Net * npoint)
 {
 	if(index >= BAC_VARIABLE_ITEM_COUNT)
 	{
@@ -1026,7 +1026,10 @@ int GetVariableLabel(int index,CString &ret_label)
 	temp_cs = temp_cs.Trim();
 	if(temp_cs.IsEmpty())
 	{
-		temp_cs.Format(_T("VAR%u"),index + 1);
+        if (npoint == NULL)
+            temp_cs.Format(_T("VAR%u"), index + 1);
+        else
+            temp_cs.Format(_T("%dVAR%u"), npoint->panel, index + 1);
 		ret_label = temp_cs;
 	}
 
@@ -1034,7 +1037,7 @@ int GetVariableLabel(int index,CString &ret_label)
 	return 1;
 }
 
-int GetVariableFullLabel(int index,CString &ret_full_label)
+int GetVariableFullLabel(int index,CString &ret_full_label, Point_Net * npoint)
 {
 	if(index >= BAC_VARIABLE_ITEM_COUNT)
 	{
@@ -1051,7 +1054,10 @@ int GetVariableFullLabel(int index,CString &ret_full_label)
 	temp_cs = temp_cs.Trim();
 	if(temp_cs.IsEmpty())
 	{
-		temp_cs.Format(_T("VAR%u"),index + 1);
+        if (npoint == NULL)
+		    temp_cs.Format(_T("VAR%u"),index + 1);
+        else
+            temp_cs.Format(_T("%dVAR%u"), npoint->panel, index + 1);
 		ret_full_label = temp_cs;
 	}
 
@@ -1084,7 +1090,7 @@ int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &
 	{
 		if(m_Variable_data.at(i).range>30)
 		{
-			ret_cstring = _T("Range Error");
+			ret_cstring = _T(" ");
 			return RANGE_ERROR;
 		}
 		else
@@ -1098,7 +1104,7 @@ int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &
 			}
 			else
 			{
-				ret_cstring = _T("Range Error");
+				ret_cstring = _T(" ");
 				return RANGE_ERROR;
 			}
 
@@ -1149,7 +1155,7 @@ int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &
 		}
 		else
 		{
-			ret_cstring = _T("Range Error");
+			ret_cstring = _T(" ");
 			ret_cstring.Empty();
 			return RANGE_ERROR;
 		}

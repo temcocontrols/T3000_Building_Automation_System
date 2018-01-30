@@ -107,7 +107,8 @@ public:
 	void Get_Input_Unit();
 	void Reset_X_Y_Parameter();
 	int MaxMinRound(int Data,bool UP);
-	bool re_calc_max_and_min(int y_max,int y_min,int &ret_y_max,int &ret_y_min,int scale=4);
+    void Initial_Scale_Time();  //给X轴的时间和 刻度 赋值
+	bool re_calc_max_and_min(int y_max,int y_min,int &ret_y_max,int &ret_y_min,int scale=2);
 public:
 	PointF last_used_point;
 	PointF mDigitalYLabelPoint[14];
@@ -128,6 +129,8 @@ public:
 	int m_Digital_Y_HIGHT;
 	int mdigital_count_intervel;
 	int mdigital_height;
+    int m_analog_count;
+    int m_digital_count;
 protected:
 	int x_axis_total_time ;//x轴 总共 目前的时间;
 	float y_axis_total_value;//y轴 总共 目前最大值 减最小值;

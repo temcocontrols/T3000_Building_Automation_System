@@ -1671,12 +1671,12 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
     return -2;
 }
 
-int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize)
+int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize,uint8_t retrytime)
 {
 
     int send_status = true;
     
-    for (int z=0; z<10; z++)
+    for (int z=0; z<retrytime; z++)
     {
 		int temp_invoke_id = -1;
 		int	resend_count = 0;
@@ -1684,7 +1684,7 @@ int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_inst
         do
         {
             resend_count ++;
-            if(resend_count>10)
+            if(resend_count>retrytime)
             {
                 send_status = false;
                 break;
@@ -1965,7 +1965,7 @@ Get Bacnet Monitor Private Data
 <param name="ntype" > Analog data or digital data
 */
 /************************************************************************/
-int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t nIndex,int8_t ntype_ad, uint16_t ntotal_seg,uint16_t nseg_index,MonitorUpdateData* up_data)
+int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t nIndex,int8_t ntype_ad, uint32_t ntotal_seg, uint32_t nseg_index,MonitorUpdateData* up_data)
 {
     
 
@@ -2308,43 +2308,33 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 
 		if (end_instance == (BAC_TSTAT_SCHEDULE - 1))
 			end_flag = true;
-		for (i = start_instance; i <= end_instance; i++)
-		{
-			//if ((i >= 20) || (i<0))
-			//{
-			//	m_tatat_schedule_data.at(20).tstat.id = 0;
-			//	end_flag = true;
-			//	b_stop_read_tstat_schedule = false;
-			//	return READ_TSTATE_SCHEDULE_T3000;
-			//}
+        for (i = start_instance; i <= end_instance; i++)
+        {
+            m_tatat_schedule_data.at(i).tstat.id = *(my_temp_point++);
+            m_tatat_schedule_data.at(i).tstat.schedule = *(my_temp_point++);
+            m_tatat_schedule_data.at(i).tstat.flag = *(my_temp_point++);
+            my_temp_point = my_temp_point + 12;
+            m_tatat_schedule_data.at(i).tstat.on_line = *(my_temp_point++);
+            memcpy_s(m_tatat_schedule_data.at(i).tstat.name, 14, my_temp_point, 14);
+            my_temp_point = my_temp_point + 15;
+            m_tatat_schedule_data.at(i).tstat.daysetpoint = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            my_temp_point = my_temp_point + 2;
+            m_tatat_schedule_data.at(i).tstat.nightsetpoint = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            my_temp_point = my_temp_point + 2;
+            m_tatat_schedule_data.at(i).tstat.awakesetpoint = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            my_temp_point = my_temp_point + 2;
+            m_tatat_schedule_data.at(i).tstat.sleepsetpoint = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            my_temp_point = my_temp_point + 2;
 
-			m_tatat_schedule_data.at(i).tstat.id = *(my_temp_point++);
-			m_tatat_schedule_data.at(i).tstat.on_line = *(my_temp_point++);
-			m_tatat_schedule_data.at(i).tstat.schedule = *(my_temp_point++);
-			m_tatat_schedule_data.at(i).tstat.flag = *(my_temp_point++);
-			memcpy_s(m_tatat_schedule_data.at(i).tstat.name, 14, my_temp_point, 14);
-			my_temp_point = my_temp_point + 15;
 
-#if 0
-			m_tatat_schedule_data.at(i).tstat.id = i+1;
-			m_tatat_schedule_data.at(i).tstat.on_line = i%2;
-			m_tatat_schedule_data.at(i).tstat.schedule = i%9;
-			m_tatat_schedule_data.at(i).tstat.flag = 0x80;
-			memcpy_s(m_tatat_schedule_data.at(i).tstat.name, 14, my_temp_point, 14);
-			my_temp_point = my_temp_point + 15;
-
-			//测试代码
-			if (i > 20)
-				m_tatat_schedule_data.at(i).tstat.id = 0;
-#endif
-			if (m_tatat_schedule_data.at(i).tstat.id == 0)
-			{
-				b_stop_read_tstat_schedule = true;
-				return READ_TSTATE_SCHEDULE_T3000;
-			}
-			b_stop_read_tstat_schedule = false;
-		}
-	}
+            if (m_tatat_schedule_data.at(i).tstat.id == 0)
+            {
+                b_stop_read_tstat_schedule = true;
+                return READ_TSTATE_SCHEDULE_T3000;
+            }
+            b_stop_read_tstat_schedule = false;
+        }
+    }
 		return READ_TSTATE_SCHEDULE_T3000;
 		break;
 	case READ_REMOTE_POINT:
@@ -2379,7 +2369,7 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 				m_remote_point_data.at(i).product_id = *(my_temp_point++);
 				m_remote_point_data.at(i).count = *(my_temp_point++);
 				m_remote_point_data.at(i).read_write = *(my_temp_point++);
-				m_remote_point_data.at(i).change = *(my_temp_point++);
+				m_remote_point_data.at(i).time_remaining = *(my_temp_point++);
 
 			}
 		}
@@ -2420,14 +2410,14 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 				m_graphic_label_data.at(i).reg.nMain_Panel = *(my_temp_point++);
 				m_graphic_label_data.at(i).reg.nSub_Panel = *(my_temp_point++);
 
-				//下面的做法不合理，懒得改了，留给后面维护的人;  从一个panel 的prg 导入另一个panel 的prg  他们的 panel number 不同 会出现很多问题;
-				if(m_graphic_label_data.at(i).reg.nMain_Panel == m_graphic_label_data.at(i).reg.nSub_Panel)
-				{
-					if(m_graphic_label_data.at(i).reg.nMain_Panel != Station_NUM)
-					{
-						m_graphic_label_data.at(i).reg.nMain_Panel = m_graphic_label_data.at(i).reg.nSub_Panel = Station_NUM;
-					}
-				}
+				////下面的做法不合理，懒得改了，留给后面维护的人;  从一个panel 的prg 导入另一个panel 的prg  他们的 panel number 不同 会出现很多问题;
+				//if(m_graphic_label_data.at(i).reg.nMain_Panel == m_graphic_label_data.at(i).reg.nSub_Panel)
+				//{
+				//	if(m_graphic_label_data.at(i).reg.nMain_Panel != Station_NUM)
+				//	{
+				//		m_graphic_label_data.at(i).reg.nMain_Panel = m_graphic_label_data.at(i).reg.nSub_Panel = Station_NUM;
+				//	}
+				//}
 				m_graphic_label_data.at(i).reg.nPoint_type = *(my_temp_point++);
 				m_graphic_label_data.at(i).reg.nPoint_number = *(my_temp_point++);
 				m_graphic_label_data.at(i).reg.nPoint_x = ((unsigned char)my_temp_point[1]<<8) | ((unsigned char)my_temp_point[0]);
@@ -3591,7 +3581,13 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 			handle_read_monitordata_ex((char *)Temp_CS.value,len_value_type);
 			return READMONITORDATA_T3000;
 		}
-		break;
+        break;
+    case READMONITORPACKAGE_T3000:
+       {
+
+        return  READMONITORPACKAGE_T3000;
+       }
+    break;
 	case READ_REMOTE_DEVICE_DB:
 		{
 			if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Str_Remote_TstDB))!=0)
@@ -3919,6 +3915,10 @@ void local_handler_conf_private_trans_ack(
             ::PostMessage(analog_cus_range_dlg,WM_REFRESH_BAC_ANALOGCUSRANGE_LIST,NULL,NULL);
     }
     break;
+    case READ_TSTATE_SCHEDULE_T3000:
+        if (m_tstat_schedule_dlg_hwnd != NULL)
+            ::PostMessage(m_tstat_schedule_dlg_hwnd, WM_REFRESH_BAC_TSTAT_SCHEDULE_LIST, NULL, NULL);
+        break;
     case READ_AT_COMMAND:
     {
         ::PostMessage(m_at_command_hwnd,WM_REFRESH_BAC_AT_COMMAND,NULL,NULL);
@@ -3983,10 +3983,6 @@ void local_handler_conf_private_trans_ack(
             ::PostMessage(m_controller_dlg_hwnd,WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
         copy_data_to_ptrpanel(TYPE_ALL);
         break;
-	case READ_TSTATE_SCHEDULE_T3000:
-		if (each_end_flag)
-			::PostMessage(m_tstat_schedule_dlg_hwnd, WM_REFRESH_BAC_TSTAT_SCHEDULE_LIST, NULL, NULL);
-		break;
     case READSCREEN_T3000:
         if(each_end_flag)
             ::PostMessage(m_screen_dlg_hwnd,WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
@@ -4420,7 +4416,7 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
 
 	if((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
 	{
-		g_Print.Format(_T("Find object instance %s , panel %s "),bac_cs_device_id, bac_cs_mac );
+		g_Print.Format(_T("Find object instance %s "),bac_cs_device_id );
 		DFTrace(g_Print);
 	}
 
@@ -4489,20 +4485,25 @@ bool Initial_bac(int comport,CString bind_local_ip)
     if(comport == 0)	//
     {
 #endif
-        int ret_1 ;
-        if(bind_local_ip.IsEmpty())
-        {
-            ret_1= Open_bacnetSocket2(_T(""),BACNETIP_PORT,my_sokect);
-        }
-        else
-        {
-            ret_1= Open_bacnetSocket2(bind_local_ip,BACNETIP_PORT,my_sokect);
-        }
 
-        if(ret_1 < 0)
+        //2017-12-20  杜帆修改  尝试绑定本地的通讯 UDP 47808 端口 ，若绑定失败就尝试其他端口;
+        bool port_bind_results = false;
+        for (int i = 0;i < 3;i++)
+        {
+            if (bind_local_ip.IsEmpty())
+            {
+                port_bind_results = Open_bacnetSocket2(_T(""), BACNETIP_PORT + i, my_sokect);
+            }
+            else
+            {
+                port_bind_results = Open_bacnetSocket2(bind_local_ip, BACNETIP_PORT + i, my_sokect);
+            }
+            if (port_bind_results)  //如果绑定47808端口失败 尝试绑定其他端口
+                break;
+        }
+        if(!port_bind_results)
             return false;
-        //	Open_Socket2(_T("127.0.0.1"),6002);
-        //	 = (int)GetCommunicationHandle();
+
         bip_set_socket(my_sokect);
         //bip_set_port(49338);
 		bip_set_port(htons(47808));
@@ -4646,11 +4647,8 @@ DWORD WINAPI   MSTP_Receive(LPVOID lpVoid)
 {
     BACNET_ADDRESS src = {0};
     uint16_t pdu_len;
-    //int *mparent = (int *)lpVoid;
-    //int protocol_new = *mparent;
 
     uint8_t Rx_Buf[MAX_MPDU] = { 0 };
-    //while(mparent->m_MSTP_THREAD)
     g_mstp_flag=true;
     while(g_mstp_flag)
     {
@@ -4951,18 +4949,12 @@ unsigned char Str_to_Byte(CString need_conver)
 extern char local_network_ip[255];
 extern CString local_enthernet_ip;
 //socket dll.
-bool Open_bacnetSocket2(CString strIPAdress,short nPort,SOCKET &mysocket)
+bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysocket)
 {
 
     int nNetTimeout=3000;//1 second.
     WSADATA wsaData;
     WORD sockVersion = MAKEWORD(2, 2);
-
-    //if (m_hSocket!=INVALID_SOCKET)
-    //{
-    //	::closesocket(m_hSocket);
-    //	m_hSocket=NULL;
-    //}
 
     if(::WSAStartup(sockVersion, &wsaData) != 0)
     {
@@ -4979,6 +4971,7 @@ bool Open_bacnetSocket2(CString strIPAdress,short nPort,SOCKET &mysocket)
         mysocket=NULL;
         return FALSE;
     }
+
     sockaddr_in servAddr;
     servAddr.sin_family = AF_INET;
     servAddr.sin_port = htons(nPort);
@@ -5010,23 +5003,12 @@ bool Open_bacnetSocket2(CString strIPAdress,short nPort,SOCKET &mysocket)
 
 
     int bind_ret =	bind(mysocket, (struct sockaddr*)&servAddr, sizeof(servAddr));
-    //if(bind_ret<0)
-    //{
-    //	//AfxMessageBox(_T("Locol port 47808 is not valiable"));
-
-    //}
-
-
-    //char pTemp[20];
-    //pTemp=W2A(strIPAdress);
-
-
-    //servAddr.sin_addr.S_un.S_addr =inet_addr("192.168.0.28");
-    //	servAddr.sin_addr.S_un.S_addr =inet_addr((LPSTR)(LPCTSTR)strIPAdress);
-    //servAddr.sin_addr.S_un.S_addr = INADDR_ANY;//
-    //	servAddr.sin_addr.S_un.S_addr = (inet_addr(W2A(strIPAdress)));
-    //	u_long ul=1;
-    //	ioctlsocket(m_hSocket,FIONBIO,(u_long*)&ul);
+    if(bind_ret != 0)
+    {
+        DFTrace(_T("Local UDP port 47808 is not available."));
+        //AfxMessageBox(_T("Local UDP port 47808 is not available."));
+        return false;
+    }
 
     setsockopt(mysocket,SOL_SOCKET,SO_SNDTIMEO,(char *)&nNetTimeout,sizeof(int));
 
@@ -5036,19 +5018,6 @@ bool Open_bacnetSocket2(CString strIPAdress,short nPort,SOCKET &mysocket)
     BOOL bBroadcast=TRUE;
     setsockopt(mysocket,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
 
-
-    //char ABC[10];
-    //ABC[0]=0X11;
-    //ABC[1]=0X22;
-    //sendto(mysocket,ABC,2,NULL,(struct sockaddr *) &servAddr,sizeof(sockaddr));
-    //if(::connect(mysocket,(sockaddr*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
-    //{
-    //	DWORD dwErr = WSAGetLastError();
-    //	//AfxMessageBox(_T(" Failed connect() \n"));
-    //	::closesocket(mysocket);
-    //	mysocket=NULL;
-    //	return FALSE;
-    //}
     return TRUE;
 }
 
@@ -8814,9 +8783,10 @@ void DFTrace(LPCTSTR lpCString)
     static int count = 0;
     CTime print_time=CTime::GetCurrentTime();
     CString str=print_time.Format("%H:%M:%S    ");
-
+    CString cs_index;
+    cs_index.Format(_T("%04d "), count);
     PrintText[count].Empty();
-    PrintText[count] =str + nCString;
+    PrintText[count] = cs_index + str + nCString;
     PostMessage(h_debug_window,WM_ADD_DEBUG_CSTRING,(WPARAM)PrintText[count].GetBuffer(),NULL);
     count = (count ++) % 900;
 
@@ -9323,7 +9293,7 @@ void LoadTstat_InputData()
         m_tstat_input_data.at(i-1).Function.RegValue=nValue;
         strTemp=INPUT_FUNS[0];
         m_tstat_input_data.at(i-1).Function.StrValue=strTemp;
-        if (nValue>=0&&nValue<8)//tstat6
+        if (nValue>=0&&nValue<13)//tstat6
         {
             strTemp=INPUT_FUNS[nValue];
             m_tstat_input_data.at(i-1).Function.StrValue=strTemp;
@@ -9388,6 +9358,10 @@ void LoadTstat_InputData()
             nValue=product_register_value[MODBUS_ANALOG_INPUT1+i-1];		//367  131
             strTemp.Format(_T("%0.1f"),  (float)nValue);
         }
+        else if (m_crange == 12)
+        {
+            strTemp.Format(_T("%.1f"), ((float)product_register_value[MODBUS_ANALOG_INPUT1 + i - 1])/10);
+        }
         else
         {
             strTemp.Format(_T("%d"),product_register_value[MODBUS_ANALOG_INPUT1+i-1]);
@@ -9395,8 +9369,29 @@ void LoadTstat_InputData()
 
 
         //Unit
-        CString strValueUnit=GetTempUnit(m_crange, 1);
-        m_tstat_input_data.at(i-1).Unit.StrValue=strValueUnit;
+        if (m_crange == 12)
+        {
+            CString temp_unit;
+            char cTemp1[255];
+            memset(cTemp1, 0, 255);
+            short high_short = product_register_value[981];
+            short low_short = product_register_value[982];
+            memcpy(cTemp1, &high_short, 2);
+            memcpy(cTemp1 + 2, &low_short, 2);
+            MultiByteToWideChar(CP_ACP, 0, (char *)cTemp1, (int)strlen(cTemp1) + 1,
+                temp_unit.GetBuffer(MAX_PATH), MAX_PATH);
+            temp_unit.Trim();
+            if (temp_unit.GetLength() > 4)
+                temp_unit = temp_unit.Left(4);
+            temp_unit.ReleaseBuffer();
+            m_tstat_input_data.at(i - 1).Unit.StrValue = temp_unit;
+        }
+        else
+        {
+            CString strValueUnit = GetTempUnit(m_crange, 1);
+            m_tstat_input_data.at(i - 1).Unit.StrValue = strValueUnit;
+        }
+
 
 
         m_tstat_input_data.at(i-1).Value.regAddress=MODBUS_ANALOG_INPUT1+i-1;

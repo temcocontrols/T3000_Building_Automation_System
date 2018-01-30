@@ -158,6 +158,15 @@ void CTstatRangeDlg::Initial_window(){
 	 }
 	  ((CButton *)GetDlgItem(IDC_RADIO_T_0+m_input_Analog_select))->SetCheck(1);
 	 
+      if (m_input_Analog_select == 12)
+      {
+          Show4_20maUI(true);
+      }
+      else
+      {
+          Show4_20maUI(false);
+      }
+
 	  m_show_unit.SetWindowTextW(analog_range_TSTAT6[m_input_Analog_select]);
 	  CRect c13;
 	  GetDlgItem(IDC_RADIO_T_0 + m_input_Analog_select)->GetWindowRect(c13);   //获取控件的位置 ，饼调整位置;
@@ -381,7 +390,7 @@ void CTstatRangeDlg::Click_Radio(){
 }
 void CTstatRangeDlg::OnBnClickedOk()
 {
-  if (m_input_Analog_select == 4|| m_input_Analog_select==6)
+  if (m_input_Analog_select == 4|| m_input_Analog_select==6 || m_input_Analog_select == 12)
   {
       if(!CheckDataisRight())
       {
@@ -521,6 +530,47 @@ void CTstatRangeDlg::OnBnClickedOk()
 
          //}
 
+     }
+     else if (m_input_Analog_select == 12)
+     {
+         //fandu 2018 01 05  TSTAT 4-20ma 对应2个点的table;
+         //979 4ma 对应的最小值
+         //980 20ma 对应的最大值
+         CString temp_units;
+         CString temp_4_value;
+         CString temp_20_value;
+         GetDlgItemText(IDC_EDIT_TSTAT_4_20_UNITS, temp_units);
+         GetDlgItemText(IDC_EDIT_TSTAT_4MA_VALUE, temp_4_value);
+         GetDlgItemText(IDC_EDIT__20MA_VALUE, temp_20_value);
+         int int_4_value = _wtof(temp_4_value) * 10;
+         if (int_4_value > 6553)
+         {
+             MessageBox(_T("Value can not larger thean 6553"));
+         }
+         int int_20_value = _wtof(temp_20_value) * 10;
+         if (int_20_value > 6553)
+         {
+             MessageBox(_T("Value can not larger thean 6553"));
+         }
+         if(temp_units.GetLength()>4)
+            temp_units = temp_units.Left(4);
+         char cTemp1[255];
+         memset(cTemp1, 0, 255);
+         WideCharToMultiByte(CP_ACP, 0, temp_units.GetBuffer(), -1, cTemp1, 255, NULL, NULL);
+         short high_short = 0;
+         short low_short = 0;
+         memcpy(&high_short, cTemp1, 2);
+         memcpy(&low_short, cTemp1+2, 2);
+
+         write_one(g_tstat_id, 979, (short)int_4_value);
+         write_one(g_tstat_id, 980, (short)int_20_value);
+         write_one(g_tstat_id, 981, high_short);
+         write_one(g_tstat_id, 982, low_short);
+         product_register_value[979] = (short)int_4_value;
+         product_register_value[980] = (short)int_20_value;
+         product_register_value[981] = high_short;
+         product_register_value[982] = low_short;
+         
      }
  }
 void CTstatRangeDlg::OnBnClickedRadioT0()
@@ -1820,7 +1870,57 @@ void CTstatRangeDlg::OnBnClickedRadioT13()
 }
 
 
+void CTstatRangeDlg::Show4_20maUI(bool nshow)
+{
+    if (nshow)
+    {
+        GetDlgItem(IDC_STATIC_TSTAT_GRP1)->ShowWindow(SW_SHOW);
+        GetDlgItem(IDC_STATIC_TSTAT_UNITS)->ShowWindow(SW_SHOW);
+        GetDlgItem(IDC_STATIC_TSTAT_4_MA)->ShowWindow(SW_SHOW);
+        GetDlgItem(IDC_STATIC_TATSTA_20_MA)->ShowWindow(SW_SHOW);
+        GetDlgItem(IDC_EDIT_TSTAT_4_20_UNITS)->ShowWindow(SW_SHOW);
+        GetDlgItem(IDC_EDIT_TSTAT_4MA_VALUE)->ShowWindow(SW_SHOW);
+        GetDlgItem(IDC_EDIT__20MA_VALUE)->ShowWindow(SW_SHOW);
+
+        CString temp_units;
+        CString temp_4_value;
+        CString temp_20_value;
+
+
+        char cTemp1[255];
+        memset(cTemp1, 0, 255);
+        short high_short = product_register_value[981];
+        short low_short = product_register_value[982];
+
+        temp_4_value.Format(_T("%0.1f"), ((float)product_register_value[979])/10);
+        temp_20_value.Format(_T("%0.1f"), ((float)product_register_value[980])/10);
+
+        memcpy(cTemp1,&high_short, 2);
+        memcpy(cTemp1 + 2 ,&low_short, 2);
+
+        MultiByteToWideChar(CP_ACP, 0, (char *)cTemp1, (int)strlen(cTemp1) + 1,
+            temp_units.GetBuffer(MAX_PATH), MAX_PATH);
+        temp_units.ReleaseBuffer();
+
+        GetDlgItem(IDC_EDIT_TSTAT_4_20_UNITS)->SetWindowTextW(temp_units);
+        GetDlgItem(IDC_EDIT_TSTAT_4MA_VALUE)->SetWindowTextW(temp_4_value);
+        GetDlgItem(IDC_EDIT__20MA_VALUE)->SetWindowTextW(temp_20_value);
+    }
+    else
+    {
+        GetDlgItem(IDC_STATIC_TSTAT_GRP1)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_STATIC_TSTAT_UNITS)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_STATIC_TSTAT_4_MA)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_STATIC_TATSTA_20_MA)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_EDIT_TSTAT_4_20_UNITS)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_EDIT_TSTAT_4MA_VALUE)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_EDIT__20MA_VALUE)->ShowWindow(SW_HIDE);
+    }
+    
+}
+
 void CTstatRangeDlg::OnBnClickedRadioT14()
 {
-	Click_Radio();
+
 }
+

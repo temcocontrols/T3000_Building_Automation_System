@@ -13,9 +13,11 @@
 #include "BacnetIOConfig.h"
 #include "MainFrm.h"
 #include "../SQLiteDriver/CppSQLite3.h"
+#include "BacnetTstatSchedule.h"
 // CBacnetSetting dialog
 extern bool cancle_send ;
 bool show_user_list_window = false;
+CBacnetTstatSchedule *BacnetTstatSchedule_Window = NULL;
 
 #define TIMER_SYNC_TIMER    1
 #define TIMER_REFRESH_READ    2
@@ -111,7 +113,6 @@ BEGIN_MESSAGE_MAP(CBacnetSetting, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_REBOOT_DEVICE, &CBacnetSetting::OnBnClickedButtonRebootDevice)
 	ON_WM_VSCROLL()
 	ON_BN_CLICKED(IDC_BUTTON_ZONE_SCHEDULE, &CBacnetSetting::OnBnClickedButtonZoneSchedule)
-	//ON_COMMAND(ID_CONTROL_IO_NET_CONFIG, &CBacnetSetting::OnControlIoNetConfig)
 END_MESSAGE_MAP()
 
 
@@ -421,18 +422,10 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 	 LONG n_tempBias;
 	 n_tempBias = 0 - lp_time_zone.Bias;
 	 n_tempBias = (n_tempBias/60)*100;
+     CTime temp_time;
+     temp_time = CTime::GetCurrentTime();
+	 
 
-	 //判断 minipanel 的时区 与本地电脑时区是否一致，不一致自动更改;
-	 /*if(Device_Basic_Setting.reg.time_zone != n_tempBias)
-	 {
-		 Device_Basic_Setting.reg.time_zone = n_tempBias;
-		 if(Write_Private_Data_Blocking(WRITE_SETTING_COMMAND,0,0) > 0)
-		 {
-			 CString temp_task_info;
-			 temp_task_info.Format(_T("SYNC Time zone OK!"));
-			 SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_task_info);
-		 }
-	 }*/
 
 	switch(command_type)
 	{
@@ -832,7 +825,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 					(Device_Basic_Setting.reg.mini_type == MINIPANELARM_LB) ||
 					(Device_Basic_Setting.reg.mini_type == MINIPANELARM_TB))
 				{
-					for (int x = 0;x< (sizeof(Baudrate_Array) / sizeof(Baudrate_Array[0]) - 1);x++)
+					for (int x = 0;x< (sizeof(Baudrate_Array) / sizeof(Baudrate_Array[0]));x++)
 					{
 						((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->AddString(Baudrate_Array[x]);
 					}
@@ -847,7 +840,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->AddString(Baudrate_Array[UART_19200]);
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->EnableWindow(FALSE);
-				for (int x=0;x< (sizeof(Baudrate_Array)/sizeof(Baudrate_Array[0]) - 1);x++)
+				for (int x=0;x< (sizeof(Baudrate_Array)/sizeof(Baudrate_Array[0]));x++)
 				{
 					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE2))->AddString(Baudrate_Array[x]);
 				}
@@ -991,6 +984,11 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 		break;
 	case TIME_COMMAND:
 		{
+        //20180108 Fan判断 minipanel 的大体时间是否一致，不一致自动更改;
+        if ((Device_time.ti_min != temp_time.GetMinute()) ||
+            (Device_time.ti_hour != temp_time.GetHour()))
+            OnBnClickedBtnBacSYNCTime();
+
 			#pragma  region about_time
 			if(Device_time.year<2000)
 				temp_year = Device_time.year + 2000;
@@ -2191,8 +2189,15 @@ void CBacnetSetting::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 //#include "GroupScheduleDlg.h"
 void CBacnetSetting::OnBnClickedButtonZoneSchedule()
 {
-	b_stop_read_tstat_schedule = false;
-#if 1
+	b_stop_read_tstat_schedule = false;  //是否继续读取标志，若后面数据为空则退出循环体.
+
+    //在获取前清空缓存值.
+    for (int i = 0;i < BAC_TSTAT_SCHEDULE;i++)
+    {
+        Str_tstat_schedule temp_tstat_schedule;
+        memset(&m_tatat_schedule_data.at(i).all, 0, sizeof(Str_tstat_schedule));
+    }
+
 	for (int i = 0;i<BAC_TSTAT_SCHEDULE_GROUP;i++)
 	{
 		int end_temp_instance = 0;
@@ -2222,10 +2227,21 @@ void CBacnetSetting::OnBnClickedButtonZoneSchedule()
 			return ;
 		}
 	}
-#endif
+
 	b_stop_read_tstat_schedule = false;
-	CBacnetTstatSchedule dlg;
-	dlg.DoModal();
+
+    //显示非模态对话框;
+    if (BacnetTstatSchedule_Window != NULL)
+    {
+        delete BacnetTstatSchedule_Window;
+        BacnetTstatSchedule_Window = NULL;
+    }
+    BacnetTstatSchedule_Window = new CBacnetTstatSchedule;
+    BacnetTstatSchedule_Window->Create(IDD_DIALOG_BACNET_TSTAT_SCHEDULE, this);
+    BacnetTstatSchedule_Window->ShowWindow(SW_SHOW);
+
+	//CBacnetTstatSchedule dlg;
+	//dlg.DoModal();
 
 
 	//CString strIPAddress;
@@ -2235,21 +2251,4 @@ void CBacnetSetting::OnBnClickedButtonZoneSchedule()
 }
 
 
-void CBacnetSetting::OnControlIoNetConfig()
-{
-	//版本大于38.6 的才有在setting 里面改port 的功能
-	if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 438)
-	{
-		MessageBox(_T("This feature need the newest firmware."));
-		return;
-	}
 
-
-	if (GetPrivateData_Blocking(g_bac_instance, READEXT_IO_T3000, 0, BAC_EXTIO_COUNT - 1, sizeof(Str_Extio_point)) < 0)
-	{
-		MessageBox(_T("Read data timeout"));
-		return;
-	}
-	CBacnetIOConfig IOdlg;
-	IOdlg.DoModal();
-}

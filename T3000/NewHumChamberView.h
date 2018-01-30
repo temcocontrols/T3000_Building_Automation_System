@@ -55,6 +55,7 @@ public://涉及到的成员变量
     int m_nCurCol;
     bool m_isstart;
     float m_value[4];
+    short m_th800_value[4];
     CWinThread* m_pFreshMultiRegisters;
     double m_times;
     double m_Write_times;

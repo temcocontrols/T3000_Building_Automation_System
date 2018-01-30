@@ -362,8 +362,8 @@ DWORD WINAPI UnzipFileThread(LPVOID lPvoid)
 
 	if(installthread == NULL)
 	{
-		m_static_step = UPDATE_STEP_INSTALL;
 		Sleep(1000);
+		m_static_step = UPDATE_STEP_INSTALL;
 		installthread = CreateThread(NULL,NULL,InstallFileThread,mparent,NULL,NULL);
 		CloseHandle(installthread);
 	}
@@ -470,134 +470,109 @@ BOOL KillProcessFromName(CString strProcessName)
 
 }
 
+//    //URLDownloadToFile(NULL, _T("https://temcocontrols.com/ftp/software/09T3000Software.zip"),
+    //    _T("C:\\09T3000Software.zip"), 0, NULL);
+#include "ULRBindCallback.h"
+
 DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
 {
+    CUpdateDlg * mparent = (CUpdateDlg *)lPvoid;
+    CString T3000FtpPath;
 
-	CUpdateDlg * mparent = (CUpdateDlg *)lPvoid;
+    if (is_local_temco_net == FALSE)
+    {
+        CString temp_t3000_path;
+        CS_Info.Format(_T("Checking for updates ...."));
+        bool download_ret = false;
+        DownloadIniFilePath = DownloadFileFolder + _T("//T3000Version.ini");
+        download_ret = URLDownloadToFile(NULL, _T("https://temcocontrols.com/ftp/firmware/ProductPath.ini"), DownloadIniFilePath, 0, NULL);
+        T3000_FTP_Version = GetPrivateProfileIntW(_T("Version"), _T("T3000Version"), 0, DownloadIniFilePath);
 
+        GetPrivateProfileString(_T("Version"), _T("T3000FTP_PATH"), _T("software/20T3000Update.zip"), temp_t3000_path.GetBuffer(MAX_PATH), MAX_PATH, DownloadIniFilePath);
+        temp_t3000_path.ReleaseBuffer();
+        T3000FtpPath = _T("https://temcocontrols.com/ftp/") + temp_t3000_path;
+        if ((PC_T3000_Version < T3000_FTP_Version) || (PC_T3000_Version == 0))
+        {
+            CS_Info.Format(_T("New version available, downloading now."));
+        }
+        else
+        {
+            CS_Info.Format(_T("Your T3000.exe is up-to-date"));
+            m_static_step = UPDATE_STEP_READY_TO_CLOASE;
+            getftpthread = NULL;
+            return 0;
+        }
+        Sleep(2000);
+    }
 
-	if(is_local_temco_net == FALSE)
-	{
-		CS_Info.Format(_T("Connecting to server...."));
-		bool conncect_ret = ConnectToFtp(_T("server139.web-hosting.com"),_T("temcoftp@temcocontrols.com"),_T("BwpNXWPgE7hg"));
-		//bool conncect_ret = ConnectToFtp(_T("sftp://ftp.bravocontrols.com"),_T("bravoftp"),_T("gbx@3PJcVbD}"));
-		
-		if(conncect_ret == false)
-		{
-			CS_Info.Format(_T("Connect to server failed.Please check your network."));
-			Sleep(3000);
-			m_static_step = UPDATE_STEP_READY_TO_CLOASE;
-			getftpthread = NULL;
-			return 0;
-		}
-		CS_Info.Format(_T("Checking for updates ...."));
-		bool download_ret = false;
-		//download_ret = DownloadFileFromFtp(_T("//software//T3000Version.ini") ,DownloadFileFolder);
-		download_ret = DownloadFileFromFtp(_T("//T3000Version.ini"), DownloadFileFolder);
-		if(download_ret == false)
-		{
-			CS_Info.Format(_T("Check version  from FTP Server failed."));
-			Sleep(2000);
-			DisconnectFtp();
-			getftpthread = NULL;
-			m_static_step = UPDATE_STEP_READY_TO_CLOASE;
-			return 0;
-		}
-		DownloadIniFilePath = DownloadFileFolder + _T("//T3000Version.ini");
-		T3000_FTP_Version = GetPrivateProfileIntW(_T("Version"),_T("T3000Version"),0,DownloadIniFilePath);
-		if(T3000_FTP_Version == 0)
-		{
-			CS_Info.Format(_T("Connect to server failded!"));
-			m_static_step = UPDATE_STEP_READY_TO_CLOASE;
-			getftpthread = NULL;
-			return 0;
-		}
+    m_static_step = UPDATE_STEP_DOWNLOAD;
 
+    if (is_local_temco_net == FALSE)
+    {
+        bool download_ret = false;
+        //download_ret = DownloadFileFromFtp(_T("//software//T3000Update.zip"), DownloadFileFolder);
+        CBindCallback cbc;
+        cbc.m_pdlg = mparent;
 
-		if((PC_T3000_Version < T3000_FTP_Version) || (PC_T3000_Version == 0 ))
-		{
-			CS_Info.Format(_T("New version available, downloading now."));
-		}
-		else
-		{
-			CS_Info.Format(_T("Your T3000.exe is up-to-date"));
-			m_static_step = UPDATE_STEP_READY_TO_CLOASE;
-			getftpthread = NULL;
-			return 0;
-		}
-	}
+        DesDownloadFilePath = DownloadFileFolder + _T("\\T3000Update.zip");
+        download_ret = URLDownloadToFile(NULL, T3000FtpPath, DesDownloadFilePath, 0, &cbc); // 根据配置文档配置好的路径去下载.
 
-	KillProcessFromName(_T("T3000.exe")) ;
-	KillProcessFromName(_T("ISP.exe")) ;
-	m_static_step = UPDATE_STEP_DOWNLOAD;
+        if (download_ret == S_FALSE)
+        {
+            CS_Info.Format(_T("Download failded!"));
+            m_static_step = UPDATE_STEP_READY_TO_CLOASE;
+            getftpthread = NULL;
+            return 0;
+        }
+        else
+        {
+            CS_Info.Format(_T("Download finished."));
+        }
+    }
+    else
+    {
+        bool copy_ret = false;
+        CString temp123;
+        temp123 = DownloadFileFolder + _T("\\T3000Update.zip");
+        DesDownloadFilePath = temp123;
+        copy_ret = CopyFileW(_T("Z:\\TemcoSoftware\\Release\\T3000InstallShield\\T3000Update.zip"), temp123, FALSE);
+        if (copy_ret)
+        {
+            for (int j = 1;j <= 10;j++)
+            {
+                local_persent = j * 10;
+                CS_Info.Format(_T("Downloading (%d%%)"), local_persent);
+                Sleep(800);
+            }
+            CS_Info.Format(_T("Install success!"));
 
-	if(is_local_temco_net == FALSE)
-	{
-		bool download_ret = false;
-		download_ret = DownloadFileFromFtp(_T("//software//T3000Update.zip") ,DownloadFileFolder);
-
-		if(download_ret)
-			CS_Info.Format(_T("Download finished."));
-		else
-		{
-			//bool http_download_ret;
-			//CS_Info.Format(_T("Trying download from http server."));
-			//http_download_ret = mparent->DownloadFileHttp(_T("http://www.temcocontrols.com/ftp/software/T3000Update.zip"),DownloadFileFolder + _T("\\T3000Update.zip"));
-			//
-
-			CS_Info.Format(_T("Download from FTP Server failed."));
-			Sleep(2000);
-			DisconnectFtp();
-			getftpthread = NULL;
-			 m_static_step = UPDATE_STEP_READY_TO_CLOASE;
-			return 0;
-		}
-		DisconnectFtp();
-		CS_Info.Format(_T("Disconnect with server."));
-		DesDownloadFilePath = DownloadFileFolder + _T("\\T3000Update.zip");
-	}
-	else
-	{
-		bool copy_ret = false;
-		CString temp123;
-		temp123 = DownloadFileFolder + _T("\\T3000Update.zip");
-		DesDownloadFilePath = temp123;
-		copy_ret =  CopyFileW(_T("Z:\\TemcoSoftware\\Release\\T3000InstallShield\\T3000Update.zip"),temp123,FALSE);
-		//copy_ret = CopyDirW(_T("Z:\\TemcoSoftware\\Release\\T3000ForInstallation\\T3000Update.zip"),DownloadFileFolder,FALSE);
-		if(copy_ret)
-		{
-			for (int j=1 ;j<=10;j++)
-			{
-				local_persent = j*10;
-				CS_Info.Format(_T("Downloading (%d%%)"),local_persent);
-				Sleep(800);
-			}
-			CS_Info.Format(_T("Install success!"));
-
-		}
-		else
-		{
-			CS_Info.Format(_T("Install failed!"));
-			return 0;
-		}
-	}
+        }
+        else
+        {
+            CS_Info.Format(_T("Install failed!"));
+            return 0;
+        }
+    }
 
 
-	//这里要检测是否下载完毕;
+    //这里要检测是否下载完毕;
 
 
 download_pass:
 
-	if(unzipthread == NULL)
-	{
-	 m_static_step = UPDATE_STEP_UNCOMPRESS;
-		unzipthread = CreateThread(NULL,NULL,UnzipFileThread,mparent,NULL,NULL);
-		CloseHandle(unzipthread);
-	}
+    if (unzipthread == NULL)
+    {
+        KillProcessFromName(_T("T3000.exe"));
+        KillProcessFromName(_T("ISP.exe"));
+
+        m_static_step = UPDATE_STEP_UNCOMPRESS;
+        unzipthread = CreateThread(NULL, NULL, UnzipFileThread, mparent, NULL, NULL);
+        CloseHandle(unzipthread);
+    }
 
 
-	getftpthread = NULL;
-	return 0 ;
+    getftpthread = NULL;
+    return 0;
 }
 
 void CUpdateDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -700,10 +675,10 @@ static	int pic_static_step = 0;
 			int finished_persent = 0;
 			if(is_local_temco_net == false)
 			{
-				GetFtpTransferPersent(&total_byte,&finished_bye,&finished_persent);
-				temp_cs.Format(_T("%d/%d (Kb)   %d%%"),finished_bye/1024,total_byte/1024,finished_persent);
-				m_static_persent.SetWindowTextW(temp_cs);
-				m_progress.SetPos(finished_persent);
+				//GetFtpTransferPersent(&total_byte,&finished_bye,&finished_persent);
+				//temp_cs.Format(_T("%d/%d (Kb)   %d%%"),finished_bye/1024,total_byte/1024,finished_persent);
+				//m_static_persent.SetWindowTextW(temp_cs);
+				//m_progress.SetPos(finished_persent);
 			}
 			else
 			{

@@ -14,6 +14,16 @@
 #include "MainFrm.h"
 // CBacnetRemotePoint dialog
 
+#define COIL_REG  23
+#define DIS_INPUT_REG 24
+#define INPUT_REG    25
+#define MB_REG    26
+
+#define BAC_AV  27
+#define BAC_AI  28
+#define BAC_AO  29
+#define BAC_DO  30
+
 IMPLEMENT_DYNAMIC(CBacnetRemotePoint, CDialogEx)
 
 CBacnetRemotePoint::CBacnetRemotePoint(CWnd* pParent /*=NULL*/)
@@ -77,7 +87,8 @@ void CBacnetRemotePoint::Initial_List()
 	m_remote_point_list.InsertColumn(REMOTE_VALUE, _T("Value"), 120, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_remote_point_list.InsertColumn(REMOTE_DEVICE_STATUS, _T("Status"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_remote_point_list.InsertColumn(REMOTE_DESCRIPTION, _T("Description"), 200, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	
+    m_remote_point_list.InsertColumn(REMOTE_TIME_REMAINING, _T("Time Remaining"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+    
 	m_remote_point_hwnd = this->m_hWnd;
 	m_remote_point_list.SetListHwnd(this->m_hWnd);
 	//g_hwnd_now = m_screen_dlg_hwnd;
@@ -186,6 +197,7 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 		CString temp_reg_number;
 		CString temp_reg_value;
 		CString temp_status;
+        CString temp_time_remaining;
 		unsigned char dev_id = 0;
 		unsigned short dev_reg = 0;
 		int  dev_value = 0;
@@ -215,17 +227,7 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 		temp_reg_number.Format(_T("%u"),dev_reg);
 
 		temp_reg_value.Format(_T("%d"),(m_remote_point_data.at(i).point_value));
-
-#define COIL_REG  23
-#define DIS_INPUT_REG 24
-#define INPUT_REG    25
-#define MB_REG    26
-
-#define BAC_AV  27
-#define BAC_AI  28
-#define BAC_AO  29
-#define BAC_DO  30
-
+        temp_time_remaining.Format(_T("%d"), m_remote_point_data.at(i).time_remaining);
 
 		unsigned char t_type;
 		t_type = m_remote_point_data.at(i).point.point_type & 0x1F;
@@ -250,7 +252,7 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 		else if (t_type == BAC_AO + 1)
 			temp_type = _T("AO");
 		else if (t_type == BAC_DO + 1)
-			temp_type = _T("DO");
+			temp_type = _T("BO");
 #if 0
 		if(dev_reg == 0)
 		{

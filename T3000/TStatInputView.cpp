@@ -468,7 +468,7 @@ LRESULT CTStatInputView::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 		  return 0;
 	     }
 		 int func=0;
-		 for (int i=0;i<8;i++)
+		 for (int i=0;i<13;i++)
 		 {
 		   if (New_CString.CompareNoCase(INPUT_FUNS[i])==0)
 		   {
