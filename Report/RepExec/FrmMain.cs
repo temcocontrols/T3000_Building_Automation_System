@@ -70,9 +70,9 @@ namespace Utils.Report.Exec
             // 
             // btnExecute
             // 
-            this.btnExecute.Location = new System.Drawing.Point(8, 424);
+            this.btnExecute.Location = new System.Drawing.Point(10, 457);
             this.btnExecute.Name = "btnExecute";
-            this.btnExecute.Size = new System.Drawing.Size(160, 23);
+            this.btnExecute.Size = new System.Drawing.Size(192, 24);
             this.btnExecute.TabIndex = 17;
             this.btnExecute.Text = "Tune up and execute report";
             this.btnExecute.Click += new System.EventHandler(this.btnExecute_Click);
@@ -80,18 +80,18 @@ namespace Utils.Report.Exec
             // btnClose
             // 
             this.btnClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnClose.Location = new System.Drawing.Point(432, 424);
+            this.btnClose.Location = new System.Drawing.Point(518, 457);
             this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(75, 23);
+            this.btnClose.Size = new System.Drawing.Size(90, 24);
             this.btnClose.TabIndex = 20;
             this.btnClose.Text = "Close";
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
             // btnMake
             // 
-            this.btnMake.Location = new System.Drawing.Point(176, 424);
+            this.btnMake.Location = new System.Drawing.Point(211, 457);
             this.btnMake.Name = "btnMake";
-            this.btnMake.Size = new System.Drawing.Size(160, 23);
+            this.btnMake.Size = new System.Drawing.Size(192, 24);
             this.btnMake.TabIndex = 18;
             this.btnMake.Text = "Make report";
             this.btnMake.Click += new System.EventHandler(this.btnMake_Click);
@@ -104,10 +104,10 @@ namespace Utils.Report.Exec
             this.colHdrDescr});
             this.lvRep.FullRowSelect = true;
             this.lvRep.HideSelection = false;
-            this.lvRep.Location = new System.Drawing.Point(8, 12);
+            this.lvRep.Location = new System.Drawing.Point(10, 13);
             this.lvRep.MultiSelect = false;
             this.lvRep.Name = "lvRep";
-            this.lvRep.Size = new System.Drawing.Size(504, 296);
+            this.lvRep.Size = new System.Drawing.Size(604, 319);
             this.lvRep.TabIndex = 1;
             this.lvRep.UseCompatibleStateImageBehavior = false;
             this.lvRep.View = System.Windows.Forms.View.Details;
@@ -129,34 +129,34 @@ namespace Utils.Report.Exec
             // 
             // txtTemplDir
             // 
-            this.txtTemplDir.Location = new System.Drawing.Point(122, 344);
+            this.txtTemplDir.Location = new System.Drawing.Point(146, 370);
             this.txtTemplDir.Name = "txtTemplDir";
-            this.txtTemplDir.Size = new System.Drawing.Size(356, 20);
+            this.txtTemplDir.Size = new System.Drawing.Size(428, 21);
             this.txtTemplDir.TabIndex = 11;
             this.txtTemplDir.Text = "txtTemplDir";
             // 
             // txtOutDir
             // 
-            this.txtOutDir.Location = new System.Drawing.Point(122, 368);
+            this.txtOutDir.Location = new System.Drawing.Point(146, 396);
             this.txtOutDir.Name = "txtOutDir";
-            this.txtOutDir.Size = new System.Drawing.Size(356, 20);
+            this.txtOutDir.Size = new System.Drawing.Size(428, 21);
             this.txtOutDir.TabIndex = 14;
             this.txtOutDir.Text = "txtOutDir";
             // 
             // lblTemplDir
             // 
-            this.lblTemplDir.Location = new System.Drawing.Point(16, 346);
+            this.lblTemplDir.Location = new System.Drawing.Point(19, 373);
             this.lblTemplDir.Name = "lblTemplDir";
-            this.lblTemplDir.Size = new System.Drawing.Size(100, 16);
+            this.lblTemplDir.Size = new System.Drawing.Size(120, 17);
             this.lblTemplDir.TabIndex = 10;
             this.lblTemplDir.Text = "Template directory";
             this.lblTemplDir.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // lblOutDir
             // 
-            this.lblOutDir.Location = new System.Drawing.Point(16, 370);
+            this.lblOutDir.Location = new System.Drawing.Point(19, 398);
             this.lblOutDir.Name = "lblOutDir";
-            this.lblOutDir.Size = new System.Drawing.Size(100, 16);
+            this.lblOutDir.Size = new System.Drawing.Size(120, 18);
             this.lblOutDir.TabIndex = 13;
             this.lblOutDir.Text = "Output directory";
             this.lblOutDir.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -165,9 +165,9 @@ namespace Utils.Report.Exec
             // 
             this.btnBrowseOutDir.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnBrowseOutDir.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnBrowseOutDir.Location = new System.Drawing.Point(484, 368);
+            this.btnBrowseOutDir.Location = new System.Drawing.Point(581, 396);
             this.btnBrowseOutDir.Name = "btnBrowseOutDir";
-            this.btnBrowseOutDir.Size = new System.Drawing.Size(24, 20);
+            this.btnBrowseOutDir.Size = new System.Drawing.Size(29, 22);
             this.btnBrowseOutDir.TabIndex = 15;
             this.btnBrowseOutDir.Text = "...";
             this.btnBrowseOutDir.Click += new System.EventHandler(this.btnBrowseOutDir_Click);
@@ -176,27 +176,27 @@ namespace Utils.Report.Exec
             // 
             this.btnBrowseDllDir.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnBrowseDllDir.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnBrowseDllDir.Location = new System.Drawing.Point(484, 320);
+            this.btnBrowseDllDir.Location = new System.Drawing.Point(581, 345);
             this.btnBrowseDllDir.Name = "btnBrowseDllDir";
-            this.btnBrowseDllDir.Size = new System.Drawing.Size(23, 20);
+            this.btnBrowseDllDir.Size = new System.Drawing.Size(27, 21);
             this.btnBrowseDllDir.TabIndex = 9;
             this.btnBrowseDllDir.Text = "...";
             this.btnBrowseDllDir.Click += new System.EventHandler(this.btnBrowseDllDir_Click);
             // 
             // lblDllDir
             // 
-            this.lblDllDir.Location = new System.Drawing.Point(16, 322);
+            this.lblDllDir.Location = new System.Drawing.Point(19, 347);
             this.lblDllDir.Name = "lblDllDir";
-            this.lblDllDir.Size = new System.Drawing.Size(100, 16);
+            this.lblDllDir.Size = new System.Drawing.Size(120, 17);
             this.lblDllDir.TabIndex = 7;
             this.lblDllDir.Text = "DLL directory";
             this.lblDllDir.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // txtDllDir
             // 
-            this.txtDllDir.Location = new System.Drawing.Point(122, 320);
+            this.txtDllDir.Location = new System.Drawing.Point(146, 345);
             this.txtDllDir.Name = "txtDllDir";
-            this.txtDllDir.Size = new System.Drawing.Size(356, 20);
+            this.txtDllDir.Size = new System.Drawing.Size(428, 21);
             this.txtDllDir.TabIndex = 8;
             this.txtDllDir.Text = "txtDllDir";
             // 
@@ -204,18 +204,18 @@ namespace Utils.Report.Exec
             // 
             this.btnBrowseTemplDir.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnBrowseTemplDir.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnBrowseTemplDir.Location = new System.Drawing.Point(484, 344);
+            this.btnBrowseTemplDir.Location = new System.Drawing.Point(581, 370);
             this.btnBrowseTemplDir.Name = "btnBrowseTemplDir";
-            this.btnBrowseTemplDir.Size = new System.Drawing.Size(24, 20);
+            this.btnBrowseTemplDir.Size = new System.Drawing.Size(29, 22);
             this.btnBrowseTemplDir.TabIndex = 12;
             this.btnBrowseTemplDir.Text = "...";
             this.btnBrowseTemplDir.Click += new System.EventHandler(this.btnBrowseTemplDir_Click);
             // 
             // btnReload
             // 
-            this.btnReload.Location = new System.Drawing.Point(352, 424);
+            this.btnReload.Location = new System.Drawing.Point(422, 457);
             this.btnReload.Name = "btnReload";
-            this.btnReload.Size = new System.Drawing.Size(75, 23);
+            this.btnReload.Size = new System.Drawing.Size(90, 24);
             this.btnReload.TabIndex = 19;
             this.btnReload.Text = "Reload";
             this.btnReload.Click += new System.EventHandler(this.btnReload_Click);
@@ -223,15 +223,15 @@ namespace Utils.Report.Exec
             // chkShowErr
             // 
             this.chkShowErr.AutoSize = true;
-            this.chkShowErr.Location = new System.Drawing.Point(122, 394);
+            this.chkShowErr.Location = new System.Drawing.Point(146, 424);
             this.chkShowErr.Name = "chkShowErr";
-            this.chkShowErr.Size = new System.Drawing.Size(179, 17);
+            this.chkShowErr.Size = new System.Drawing.Size(210, 16);
             this.chkShowErr.TabIndex = 16;
             this.chkShowErr.Text = "Show errors during loading DLLs";
             // 
             // FrmMain
             // 
-            this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+            this.AutoScaleBaseSize = new System.Drawing.Size(6, 14);
             this.ClientSize = new System.Drawing.Size(522, 464);
             this.Controls.Add(this.txtDllDir);
             this.Controls.Add(this.txtOutDir);
