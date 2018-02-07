@@ -284,7 +284,6 @@
     <ClCompile Include="ping.cpp" />
     <ClCompile Include="PressureSensorForm.cpp" />
     <ClCompile Include="ProductRegisterListView.cpp" />
-    <ClCompile Include="ProgramEditorTestDlg.cpp" />
     <ClCompile Include="RefreshTreeThread.cpp" />
     <ClCompile Include="RegisterWriteValueDlg.cpp" />
     <ClCompile Include="RelayLabel.cpp" />
@@ -320,6 +319,7 @@
     <ClCompile Include="T3RTDView.cpp" />
     <ClCompile Include="TCP_Server.cpp" />
     <ClCompile Include="TemcoDataGrid.cpp" />
+    <ClCompile Include="TemcoStandardBacnetToolDlg.cpp" />
     <ClCompile Include="TempHumSensorForm.cpp" />
     <ClCompile Include="Timer_Calibrate.cpp" />
     <ClCompile Include="TrendLogView.cpp" />
@@ -366,6 +366,7 @@
     <None Include="res\ApplyUp.bmp" />
     <None Include="res\Back.bmp" />
     <None Include="res\bacnet_menu_bit.bmp" />
+    <None Include="res\bacnet_menu_bit_TEST.bmp" />
     <None Include="res\bitmap1.bmp" />
     <None Include="res\bitmap2.bmp" />
     <None Include="res\bitmap4.bmp" />
@@ -604,7 +605,6 @@
     <ClInclude Include="PressureSensorForm.h" />
     <ClInclude Include="ProductModel.h" />
     <ClInclude Include="ProductRegisterListView.h" />
-    <ClInclude Include="ProgramEditorTestDlg.h" />
     <ClInclude Include="RegisterViewerDlg.h" />
     <ClInclude Include="RegisterWriteValueDlg.h" />
     <ClInclude Include="RemotePtpLogin.h" />
@@ -631,6 +631,7 @@
     <ClInclude Include="TargetGrid.h" />
     <ClInclude Include="TCP_Server.h" />
     <ClInclude Include="TemcoDataGrid.h" />
+    <ClInclude Include="TemcoStandardBacnetToolDlg.h" />
     <ClInclude Include="TempHumSensorForm.h" />
     <ClInclude Include="TrendLogWnd.h" />
     <ClInclude Include="TroubleShootDlg.h" />

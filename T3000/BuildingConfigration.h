@@ -23,7 +23,7 @@ typedef struct Building_Config
 	CString IP_Port;
 	CString Comport;
 	CString BaudRate;
-	//unsigned int protocol_index;    //2017 12 12 由fandu 取消index ，用index 代码太过于混乱，新加其他协议时 不方便判断
+	unsigned int protocol_index;
 	CString BuildingPath;
 
 	CString Longitude;

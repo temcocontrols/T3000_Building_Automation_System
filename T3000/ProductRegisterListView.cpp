@@ -351,11 +351,12 @@ void CProductRegisterListView::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_COUNTS, m_short_counts);
 	DDX_Control(pDX, IDC_COMBO_PARA_TYPES, m_combox_paratypes);
 	DDX_CBString(pDX, IDC_COMBO_PARA_TYPES, m_string_paratypes);
-	DDX_Control(pDX,IDC_UPBUTTON , m_upButton);
-	DDX_Control(pDX,IDC_DOWNBUTTON , m_downButton);
+	DDX_Control(pDX, IDC_UPBUTTON, m_upButton);
+	DDX_Control(pDX, IDC_DOWNBUTTON, m_downButton);
 	DDX_Text(pDX, IDC_EDIT_DELAY_LOOP, m_UINT_delay_loop);
 	DDX_Text(pDX, IDC_EDIT_DELAY_ITEMS, m_UINT_delay_items);
-	 
+
+	DDX_Control(pDX, IDC_COMBO_PRODUCT_LIST, m_combox_productname);
 }
 
 BEGIN_MESSAGE_MAP(CProductRegisterListView, CFormView)
@@ -373,6 +374,8 @@ BEGIN_MESSAGE_MAP(CProductRegisterListView, CFormView)
     ON_EN_CHANGE(IDC_EDIT_DELAY_ITEMS, &CProductRegisterListView::OnEnChangeEditDelayItems)
 	 
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST_CUSTOM_LIST, &CProductRegisterListView::OnNMDblclkListCustomList)
+	ON_CBN_SELCHANGE(IDC_COMBO_PRODUCT_LIST, &CProductRegisterListView::OnCbnSelchangeComboProductList)
+	ON_BN_CLICKED(IDC_BUTTON_EXPORTEXCELFILE, &CProductRegisterListView::OnBnClickedButtonExportexcelfile)
 END_MESSAGE_MAP()
 
 
@@ -403,11 +406,23 @@ void CProductRegisterListView::OnSize(UINT nType, int cx, int cy)
         GetClientRect(&ViewRect);
         //TRACE(_T(" View:T=%d,B=%d,L=%d,R=%d\n"),ViewRect.top,ViewRect.bottom,ViewRect.left,ViewRect.right);
         // m_MsDataGrid.SetWindowPos(this,ViewRect.top,ViewRect.left,ViewRect.Width(),ViewRect.Height(),SWP_SHOWWINDOW|SWP_NOZORDER);
-        if (m_register_list.GetSafeHwnd())
-        {
-           // m_register_list.MoveWindow(CRect(0,50,ViewRect.Width(),ViewRect.Height()),TRUE);
-			m_register_list.MoveWindow(CRect(0, 0, ViewRect.Width(), ViewRect.Height()), TRUE);
-        }
+       if (custom_bacnet_register_listview)
+       {
+		   if (m_register_list.GetSafeHwnd())
+		   {
+			   // m_register_list.MoveWindow(CRect(0,50,ViewRect.Width(),ViewRect.Height()),TRUE);
+			   m_register_list.MoveWindow(CRect(0, 30, ViewRect.Width(), ViewRect.Height()), TRUE);
+		   }
+       } 
+       else
+       {
+		   if (m_register_list.GetSafeHwnd())
+		   {
+			   // m_register_list.MoveWindow(CRect(0,50,ViewRect.Width(),ViewRect.Height()),TRUE);
+			   m_register_list.MoveWindow(CRect(0, 0, ViewRect.Width(), ViewRect.Height()), TRUE);
+		   }
+       }
+		
 
     }
     
@@ -425,7 +440,19 @@ void CProductRegisterListView::Fresh(void)
     m_upButton.SetImage(IDB_UPBMP);
     m_downButton.SetImage(IDB_DOWNBMP);
 	CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
-	m_current_tree_node = pFrame->m_current_tree_node;
+	if (!custom_bacnet_register_listview)
+	{
+		m_current_tree_node = pFrame->m_current_tree_node;
+		GetDlgItem(IDC_STATIC_PRODUCTNAME)->ShowWindow(FALSE);
+		GetDlgItem(IDC_COMBO_PRODUCT_LIST)->ShowWindow(FALSE);
+
+	}
+	else
+	{
+		GetDlgItem(IDC_STATIC_PRODUCTNAME)->ShowWindow(TRUE);
+		GetDlgItem(IDC_COMBO_PRODUCT_LIST)->ShowWindow(TRUE);
+	}
+	
 	if (offline_mode)
 	{
 		GetDlgItem(IDC_READ_DEVICE)->ShowWindow(FALSE);
@@ -466,6 +493,9 @@ void CProductRegisterListView::Fresh(void)
 		{
 			GetDlgItem(IDC_READ_DEVICE)->SetWindowText(_T("Start Read"));
 		}
+
+		
+
 	}
     
 	m_combox_dataformat.ResetContent();
@@ -474,10 +504,18 @@ void CProductRegisterListView::Fresh(void)
 		m_combox_dataformat.AddString(m_vecDataFormat[i]);
 	}
 	m_combox_dataformat.SetCurSel(0);
+
+	 
+	for (pidname_map::iterator iter = product_map.begin(); iter != product_map.end(); iter++)
+	{
+		m_combox_productname.AddString(iter->second);
+	}
+	
+	//GetProductName()
     LoadDataSheet();
     Initial_List();
      
-	if (!offline_mode)
+	if ((!offline_mode)&&(!custom_bacnet_register_listview))
 	{
 		if (m_BackgroundTreadHandle)
 		{
@@ -922,6 +960,7 @@ LRESULT CProductRegisterListView::Change_Input_Item(WPARAM wParam,LPARAM lParam)
    
     return 0;
 }
+
 /*
    @1:Different Product responce to the different functionality
    @2:
@@ -2228,4 +2267,191 @@ void CProductRegisterListView::FreshOneRowInGrid(int Row, CustomProductTable_T t
 	{
 
 	}
+}
+
+void CProductRegisterListView::OnCbnSelchangeComboProductList()
+{
+	CString strProductName;
+	int index = m_combox_productname.GetCurSel();
+	 m_combox_productname.GetLBText(index,strProductName);
+	
+	//m_combox_productname.GetLBText()
+	for (pidname_map::iterator iter = product_map.begin(); iter != product_map.end(); iter++)
+	{
+		//m_combox_productname.AddString(iter->second);
+		if (strProductName.CompareNoCase(iter->second)==0)
+		{
+			m_current_tree_node.product_class_id = iter->first;
+		}
+	}
+	 
+	LoadDataSheet();
+	Initial_List();
+}
+
+ 
+#include "excel9.h"
+void CProductRegisterListView::OnBnClickedButtonExportexcelfile()
+{
+	CString  Product_Head_File_Name;
+	CString strFilter;
+	CString strFilename;
+	CString strTemp;
+	CString RegisterName;
+	CString RegisterID;
+	CString logstr;
+	_variant_t  temp_variant;
+	_Application app;
+	Workbooks books;
+	_Workbook book;
+	Worksheets sheets;
+	_Worksheet sheet;
+	Range range;
+	Range rgMyRge1, rgMyRge2;
+	COleVariant covTrue((short)TRUE), covFalse((short)FALSE), covOptional((long)DISP_E_PARAMNOTFOUND, VT_ERROR);
+
+	int CurrentRow;
+
+
+	if (!app.CreateDispatch(_T("Excel.Application"), NULL))
+	{
+		AfxMessageBox(_T("Create Excel false!"));
+		return;
+	}
+	//遍历所有行  
+	strFilename = g_strExePth + _T("RegisterListTemplate.xls");
+
+	books.AttachDispatch(app.GetWorkbooks());
+	book.AttachDispatch(books.Add(_variant_t(strFilename)));
+
+	sheets.AttachDispatch(book.GetWorksheets());
+	sheet.AttachDispatch(sheets.GetItem(_variant_t("Sheet1")));
+
+	range.AttachDispatch(sheet.GetCells());
+	CString ContentData;
+	CTime time = CTime::GetCurrentTime();
+
+
+	CString strProductName;
+	int index = m_combox_productname.GetCurSel();
+	m_combox_productname.GetLBText(index, strProductName);
+
+
+ 
+	range.SetItem(_variant_t((long)(1)), _variant_t((long)(1)), _variant_t(strProductName));
+
+ 
+	strProductName = L"Item";
+	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_ITEM+1)), _variant_t(strProductName));
+	strProductName = L"Poll Y/N";
+	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_POLLYESNO + 1)), _variant_t(strProductName));
+	strProductName = L"Bacnet Object Name";
+	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_NAME + 1)), _variant_t(strProductName));
+	strProductName = L"Modbus Variable Type";
+	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_FUNCTION + 1)), _variant_t(strProductName));
+	strProductName = L"Modbus Address";
+	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_MODBUSADDRESS + 1)), _variant_t(strProductName));
+	strProductName = L"Length";
+	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_LENGTH + 1)), _variant_t(strProductName));
+	strProductName = L"Value";
+	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_VALUE + 1)), _variant_t(strProductName));
+	strProductName = L"Data Format";
+	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_DATAFORMAT + 1)), _variant_t(strProductName));
+	strProductName = L"Bit #";
+	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_BIT + 1)), _variant_t(strProductName));
+	strProductName = L"Low Actual";
+	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_Low_Actual + 1)), _variant_t(strProductName));
+	strProductName = L"High Actual";
+	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_High_Actual + 1)), _variant_t(strProductName));
+	strProductName = L"Low Scale";
+	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_Low_Scale + 1)), _variant_t(strProductName));
+	strProductName = L"High Scale";
+	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_High_Scale + 1)), _variant_t(strProductName));
+	strProductName = L"R/W";
+	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_RW + 1)), _variant_t(strProductName));
+	strProductName = L"Default";
+	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_DEFAULT + 1)), _variant_t(strProductName));
+	strProductName = L"Bacnet Type";
+	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_Bacnet_Type + 1)), _variant_t(strProductName));
+	strProductName = L"Bacnet Object Description";
+	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_Bacnet_Object_Description + 1)), _variant_t(strProductName));
+	strProductName = L"COV Increment";
+	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_COV_Increment + 1)), _variant_t(strProductName));
+	strProductName = L"Unit Group";
+	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_Unit_Group + 1)), _variant_t(strProductName));
+	strProductName = L"Unit Value";
+	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_Unit_Value + 1)), _variant_t(strProductName));
+	strProductName = L"Grouping YES / NO";
+	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_Grouping_Y_N + 1)), _variant_t(strProductName));
+	strProductName = L"Update On Reconnect";
+	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_Update_On_Reconnect + 1)), _variant_t(strProductName));
+	strProductName = L"Register Description";
+	range.SetItem(_variant_t((long)(2)), _variant_t((long)(_NUM_Modbus_DESCRIPTION + 1)), _variant_t(strProductName));
+
+	range.AttachDispatch(sheet.GetCells());
+
+	for (int i = 0;i < (int)m_register_list.GetRowCount();i++)
+	{
+ 		CurrentRow = 3 +  i;
+		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_ITEM);
+		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_ITEM + 1)), _variant_t(strProductName));
+		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_POLLYESNO);
+		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_POLLYESNO + 1)), _variant_t(strProductName));
+		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_NAME);
+		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_NAME + 1)), _variant_t(strProductName));
+		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_FUNCTION);
+		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_FUNCTION + 1)), _variant_t(strProductName));
+		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_MODBUSADDRESS);
+		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_MODBUSADDRESS + 1)), _variant_t(strProductName));
+		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_LENGTH);
+		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_LENGTH + 1)), _variant_t(strProductName));
+		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_VALUE);
+		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_VALUE + 1)), _variant_t(strProductName));
+		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_DATAFORMAT);
+		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_DATAFORMAT + 1)), _variant_t(strProductName));
+		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_BIT);
+		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_BIT + 1)), _variant_t(strProductName));
+		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_Low_Actual);
+		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_Low_Actual + 1)), _variant_t(strProductName));
+		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_High_Actual);
+		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_High_Actual + 1)), _variant_t(strProductName));
+		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_Low_Scale);
+		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_Low_Scale + 1)), _variant_t(strProductName));
+		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_High_Scale);
+		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_High_Scale + 1)), _variant_t(strProductName));
+		 
+		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_RW);
+		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_RW + 1)), _variant_t(strProductName));
+		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_DEFAULT);
+		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_DEFAULT + 1)), _variant_t(strProductName));
+		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_Bacnet_Type);
+		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_Bacnet_Type + 1)), _variant_t(strProductName));
+		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_Bacnet_Object_Description);
+		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_Bacnet_Object_Description + 1)), _variant_t(strProductName));
+		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_COV_Increment);
+		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_COV_Increment + 1)), _variant_t(strProductName));
+		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_Unit_Group);
+		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_Unit_Group + 1)), _variant_t(strProductName));
+		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_Unit_Value);
+		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_Unit_Value + 1)), _variant_t(strProductName));
+		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_Grouping_Y_N);
+		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_Grouping_Y_N + 1)), _variant_t(strProductName));
+		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_Update_On_Reconnect);
+		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_Update_On_Reconnect + 1)), _variant_t(strProductName));
+		strProductName = m_register_list.GetItemText(CurrentRow, _NUM_Modbus_DESCRIPTION);
+		range.SetItem(_variant_t((long)(CurrentRow)), _variant_t((long)(_NUM_Modbus_DESCRIPTION + 1)), _variant_t(strProductName));
+ 
+
+
+	}
+
+	AfxMessageBox(_T("Export Completely"));
+
+	app.SetVisible(true);
+	range.ReleaseDispatch();
+	sheet.ReleaseDispatch();
+	sheets.ReleaseDispatch();
+	book.ReleaseDispatch();
+	books.ReleaseDispatch();
+	app.ReleaseDispatch();
 }

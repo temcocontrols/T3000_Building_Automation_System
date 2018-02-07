@@ -111,6 +111,7 @@ BEGIN_MESSAGE_MAP(CBacnetSetting, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_REBOOT_DEVICE, &CBacnetSetting::OnBnClickedButtonRebootDevice)
 	ON_WM_VSCROLL()
 	ON_BN_CLICKED(IDC_BUTTON_ZONE_SCHEDULE, &CBacnetSetting::OnBnClickedButtonZoneSchedule)
+	//ON_COMMAND(ID_CONTROL_IO_NET_CONFIG, &CBacnetSetting::OnControlIoNetConfig)
 END_MESSAGE_MAP()
 
 
@@ -2190,15 +2191,8 @@ void CBacnetSetting::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 //#include "GroupScheduleDlg.h"
 void CBacnetSetting::OnBnClickedButtonZoneSchedule()
 {
-	b_stop_read_tstat_schedule = false;  //是否继续读取标志，若后面数据为空则退出循环体.
-
-    //在获取前清空缓存值.
-    for (int i = 0;i < BAC_TSTAT_SCHEDULE;i++)
-    {
-        Str_tstat_schedule temp_tstat_schedule;
-        memset(&m_tatat_schedule_data.at(i).all, 0, sizeof(Str_tstat_schedule));
-    }
-
+	b_stop_read_tstat_schedule = false;
+#if 1
 	for (int i = 0;i<BAC_TSTAT_SCHEDULE_GROUP;i++)
 	{
 		int end_temp_instance = 0;
@@ -2228,7 +2222,7 @@ void CBacnetSetting::OnBnClickedButtonZoneSchedule()
 			return ;
 		}
 	}
-
+#endif
 	b_stop_read_tstat_schedule = false;
 	CBacnetTstatSchedule dlg;
 	dlg.DoModal();
@@ -2238,4 +2232,24 @@ void CBacnetSetting::OnBnClickedButtonZoneSchedule()
 	//GetDlgItem(IDC_IPADDRESS_BAC_IP)->GetWindowTextW(strIPAddress);
 	//CGroupScheduleDlg dlg(NULL, strIPAddress);
 	//dlg.DoModal();
+}
+
+
+void CBacnetSetting::OnControlIoNetConfig()
+{
+	//版本大于38.6 的才有在setting 里面改port 的功能
+	if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 438)
+	{
+		MessageBox(_T("This feature need the newest firmware."));
+		return;
+	}
+
+
+	if (GetPrivateData_Blocking(g_bac_instance, READEXT_IO_T3000, 0, BAC_EXTIO_COUNT - 1, sizeof(Str_Extio_point)) < 0)
+	{
+		MessageBox(_T("Read data timeout"));
+		return;
+	}
+	CBacnetIOConfig IOdlg;
+	IOdlg.DoModal();
 }
