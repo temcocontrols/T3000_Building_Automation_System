@@ -1,8 +1,5 @@
 
 
-// DynamicHelp.cpp : implementation file
-//
-
 #include "stdafx.h"
 #include "resource.h"
 #include "DynamicHelp.h"
@@ -14,8 +11,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-/////////////////////////////////////////////////////////////////////////////
-// CDynamicHelp
+
 
 const int min_w= 80;
 const int min_h= 50;
@@ -59,11 +55,6 @@ BEGIN_MESSAGE_MAP(CDynamicHelp, CControlBar)
 	ON_NOTIFY_EX_RANGE(TTN_NEEDTEXT, 0, 0xFFFF, OnToolTipGetText)
 	ON_MESSAGE(WM_USER, OnDelayedResize)
 END_MESSAGE_MAP()
-
-/////////////////////////////////////////////////////////////////////////////
-// CDynamicHelp message handlers
-
-//-----------------------------------------------------------------------------
 
 CSize CDynamicHelp::CalcFixedLayout(BOOL stretch, BOOL horz)
 {

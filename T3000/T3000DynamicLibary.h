@@ -37,12 +37,6 @@ public:
 	bool Create(CWnd* parent_wnd, UINT id);
 
 
-// Overrides
-  // ClassWizard generated virtual function overrides
-  //{{AFX_VIRTUAL(CDynamicHelp)
-  //}}AFX_VIRTUAL
-
-// Implementation
 public:
 	virtual ~CDynamicHelp();
 	virtual void DoPaint(CDC* dc);
@@ -52,7 +46,7 @@ public:
 	CSize CalcLayout(DWORD mode, int length);
 	virtual void OnBarStyleChange(DWORD old_style, DWORD new_style);
 
-  // Generated message map functions
+
 protected:
 	//{{AFX_MSG(CDynamicHelp)
 	afx_msg BOOL OnEraseBkgnd(CDC* dc);
@@ -74,9 +68,6 @@ protected:
 	LRESULT OnDelayedResize(WPARAM, LPARAM);
 };
 
-/////////////////////////////////////////////////////////////////////////////
 
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Developer Studio will insert additional declarations immediately before the previous line.
 
-#endif // !defined(AFX_ELEMENTBAR_H__3BAE8904_36AA_11D2_809C_ABC7258C6120__INCLUDED_)
+#endif
