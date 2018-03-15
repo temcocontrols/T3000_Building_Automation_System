@@ -16,7 +16,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (Simplified, PRC) resources
+// 中文(简体，中国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
@@ -163,12 +163,12 @@ BEGIN
     ID_MENU_ABOUT           "About ISPTool"
 END
 
-#endif    // Chinese (Simplified, PRC) resources
+#endif    // 中文(简体，中国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
+// 英语(美国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
@@ -283,8 +283,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 4,8,4,0
- PRODUCTVERSION 4,8,4,0
+ FILEVERSION 5,0,9,0
+ PRODUCTVERSION 5,0,9,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x21L
@@ -299,13 +299,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "FileVersion", "4.8.7.0"
+            VALUE "FileVersion", "5.0.9.0"
             VALUE "InternalName", "ISP.exe"
             VALUE "OriginalFilename", "ISP.exe"
             VALUE "ProductName", "ISP Tool"
-            VALUE "ProductVersion", "4.8.7.0"
-            VALUE "SpecialBuild", "4.8.7"
-            VALUE "TemcoCopyright", "Copyright 1999-2016 (c).  All rights reserved."
+            VALUE "ProductVersion", "5.0.9.0"
+            VALUE "SpecialBuild", "5.0.9"
+            VALUE "TemcoCopyright", "Copyright 1999-2018 (c).  All rights reserved."
         END
     END
     BLOCK "VarFileInfo"
@@ -378,11 +378,11 @@ END
 STRINGTABLE
 BEGIN
     IDS_ABOUTBOX            "&About NEWISP..."
-    IDS_STR_VIRSIONNUM      "Version 5.0.8"
+    IDS_STR_VIRSIONNUM      "Version 5.0.9"
     IDP_SOCKETS_INIT_FAILED "Windows sockets initialization failed."
 END
 
-#endif    // English (United States) resources
+#endif    // 英语(美国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

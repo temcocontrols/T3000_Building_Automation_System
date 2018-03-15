@@ -265,6 +265,7 @@ const int TYPE_READ_GRAPHIC_LABEL_INFO = 20;
 const int TYPE_READ_REMOTE_POINT_INFO = 21;
 
 const int TYPE_TSTAT_MAIN_INFOR = 22;
+const int TYPE_PANEL = 23;
 
 const int DELETE_WINDOW_MSG = 200;
 const int START_BACNET_TIMER = 201;
@@ -947,7 +948,7 @@ const CString DDNS_Server_Name[] =
 	_T("www.3322.org"),
 	_T("www.dyndns.com"),
 	_T("www.no-ip.com"),
-	_T("newfirmware.com")
+    _T("dynu.com")
 };
 
 const CString Device_Serial_Port_Status[] =
@@ -1715,6 +1716,17 @@ const int REG_SCHEDULE_START_ADDRESS = REG_PRG_START_ADDRESS + LENGTH_MODBUS_PRG
 #define BAC_ALARMS    15
 #define BAC_WR_TIME   16
 #define BAC_AR_Y      17
+
+#define COIL_REG  23
+#define DIS_INPUT_REG 24
+#define INPUT_REG    25
+#define MB_REG    26
+
+#define BAC_AV         27
+#define BAC_AI  28
+#define BAC_AO  29
+#define BAC_DO  30
+
 #define BAC_MAIN		255
 
 
@@ -1933,3 +1945,13 @@ const int REFRESH_LIST_NOW = 2000;
 const CString DEFAULT_ICON = _T("Default.icon");
 
 const int GRAPHIC_MAX_PACKAGE = 8192 * 3;
+
+const int CONFILIC_SUBID = 0;
+const int CONFILIC_PANEL_ID = 1;
+const int CONFILIC_IPADDRESS = 2;
+
+const int SD_STATUS_UNKNOWN = 0;
+const int SD_STATUS_NO = 1;
+const int SD_STATUS_NORMAL = 2;
+const int SD_STATUS_FILESYSTEM_ERROR = 3;
+

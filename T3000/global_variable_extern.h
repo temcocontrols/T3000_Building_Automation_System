@@ -1261,6 +1261,10 @@ extern refresh_net_device device_same_panel_2;
 
 extern refresh_net_device device_id_data_1;
 extern refresh_net_device device_id_data_2;
+
+extern refresh_net_device device_ip_conflict_1;
+extern refresh_net_device device_ip_conflict_2;
+
 extern bool edit_confilct_mode ;
 
 extern bool scaning_mode ;

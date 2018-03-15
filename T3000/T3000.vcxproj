@@ -34,6 +34,7 @@
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v100</PlatformToolset>
+    <CLRSupport>false</CLRSupport>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
     <PlatformToolset>v140</PlatformToolset>
@@ -294,6 +295,7 @@
     <ClCompile Include="SetPtDayDlg.cpp" />
     <ClCompile Include="SetptGraphicBar.cpp" />
     <ClCompile Include="SetTimeDlg.cpp" />
+    <ClCompile Include="ShowMessageDlg.cpp" />
     <ClCompile Include="StatusbarCtrl.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -582,7 +584,6 @@
     <ClInclude Include="FileOperations.h" />
     <ClInclude Include="fileRW.h" />
     <ClInclude Include="Flash_Multy.h" />
-    <ClInclude Include="gloab_define.h" />
     <ClInclude Include="global_define.h" />
     <ClInclude Include="global_function.h" />
     <ClInclude Include="global_struct.h" />
@@ -611,6 +612,7 @@
     <ClInclude Include="RemotePtpLogin.h" />
     <ClInclude Include="Scanwaydlg.h" />
     <ClInclude Include="SetTimeDlg.h" />
+    <ClInclude Include="ShowMessageDlg.h" />
     <ClInclude Include="StaticDlg.h" />
     <ClInclude Include="StatusbarCtrl.h" />
     <ClInclude Include="T3000DefaultView.h" />

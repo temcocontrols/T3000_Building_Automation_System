@@ -289,7 +289,7 @@ protected:
 	afx_msg LRESULT  AllWriteMessageCallBack(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT Refresh_RX_TX_Count(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT Retry_Connect_Message(WPARAM wParam, LPARAM lParam);
-	 
+    afx_msg LRESULT ReConnect_Message(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT Delete_Write_New_Dlg(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT  ReadConfigFromDeviceMessageCallBack(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
@@ -297,6 +297,7 @@ protected:
 public:
 	BOOL  CheckDeviceStatus(int refresh_com);
 	void  CheckDuplicate();
+    void  CheckIPDuplicate();
 	//void	SaveBacnetConfigFile();
 	//void	LoadBacnetConfigFile();
 	void  Show_Wait_Dialog_And_SendConfigMessage();
@@ -445,6 +446,7 @@ public:
 	afx_msg void OnControlControllers();
 	afx_msg void OnControlScreens();
 	afx_msg void OnControlMonitors();
+    afx_msg void OnControlPanel();
 	afx_msg void OnHelpGetlanguageconfigfile();
 	afx_msg void OnLanguageEnglish();
 	afx_msg void OnLanguage34010();
@@ -515,6 +517,7 @@ public:
 	afx_msg void OnUpdateControlOutputs(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateControlVariables(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateControlPrograms(CCmdUI *pCmdUI);
+    afx_msg void OnUpdateControlPanel(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateControlScreens(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateControlControllers(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateControlWeekly(CCmdUI *pCmdUI);

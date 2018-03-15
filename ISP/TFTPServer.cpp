@@ -1085,10 +1085,10 @@ unsigned short TFTPServer::AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,
 	return temp_data.reg.modbus_port;
 }
 
-
+CString ShowTFTPMessage;
 BOOL TFTPServer::StartServer()
 {
-	RefreshNetWorkDeviceListByUDPFunc();
+	   RefreshNetWorkDeviceListByUDPFunc();
 	   TCP_Flash_CMD_Socket.Connect(ISP_Device_IP,m_nClientPort);
 	   Sleep(2000);
 
@@ -1139,11 +1139,16 @@ BOOL TFTPServer::StartServer()
 		
         while(1)
         {
+            if (!ShowTFTPMessage.IsEmpty())
+            {
+                OutPutsStatusInfo(ShowTFTPMessage, FALSE);
+                ShowTFTPMessage.Empty();
+            }
             switch(ISP_STEP)
             {
             case ISP_SEND_FLASH_COMMAND:
 				nRet = 0;
-                if((mode_send_flash_try_time++)<10)
+                if((mode_send_flash_try_time++)<15)
                 {
 
                     //SendFlashCommand();
@@ -1179,7 +1184,7 @@ BOOL TFTPServer::StartServer()
 
 
 
-                    strTips.Format(_T("Communication with device.(Remain time:%d)"),10-mode_send_flash_try_time);
+                    strTips.Format(_T("Communication with device.(Remain time:%d)"),15-mode_send_flash_try_time);
                     OutPutsStatusInfo(strTips, TRUE);
                 }
                 else
@@ -1219,6 +1224,37 @@ BOOL TFTPServer::StartServer()
                     strTips.Format(_T("The Device IP is %d.%d.%d.%d"),Byte_ISP_Device_IP[0],Byte_ISP_Device_IP[1],Byte_ISP_Device_IP[2],Byte_ISP_Device_IP[3]);
                     OutPutsStatusInfo(strTips, FALSE);
                     OutPutsStatusInfo(_T(""), FALSE);
+                    int b_same_subnet_ip = false;
+                    CString ipaddr;
+                    ipaddr.Format(_T("%d.%d.%d"), Byte_ISP_Device_IP[0], Byte_ISP_Device_IP[1], Byte_ISP_Device_IP[2]);
+                    CString PC_IP;
+                    for (int i = 0; i < g_Vector_Subnet.size(); i++)
+                    {
+                        CString temp_ip;
+                        temp_ip = g_Vector_Subnet.at(i).StrIP;
+                        if (temp_ip.CompareNoCase(_T("0.0.0.0") ) == 0)
+                            continue;
+                        PC_IP = PC_IP + temp_ip + _T("  ");
+                        CStringArray temp_ip_array;
+                        SplitCStringA(temp_ip_array, temp_ip, _T("."));
+                        CString cs_ret;
+                        cs_ret.Format(_T("%s.%s.%s"), temp_ip_array.GetAt(0), temp_ip_array.GetAt(1), temp_ip_array.GetAt(2));
+                        if (cs_ret.CompareNoCase(ipaddr) == 0)
+                        {
+                            b_same_subnet_ip = true;
+                            break;
+                        }
+                    }
+
+                    if (b_same_subnet_ip == false)
+                    {
+                        strTips.Format(_T("PC IP is "));
+                        strTips = strTips + PC_IP ;
+                        OutPutsStatusInfo(strTips, FALSE);
+                        OutPutsStatusInfo(_T("Please Chnage your PC's IP address to the same subnet."), FALSE);
+                        OutPutsStatusInfo(_T(""), FALSE);
+                    }
+
                 }
 
                 if((device_jump_from_runtime == true)&&(has_wait_device_into_bootloader == false))
@@ -1379,6 +1415,13 @@ StopServer:
 		WriteFinish(nRet);
    
     return TRUE;
+}
+
+void  TFTPServer::TFTPMessage(LPTSTR sMessage)
+{
+    CString strTips;
+    strTips = _T("TTTTTTTTTTTTTTTTTTTTT");
+    OutPutsStatusInfo(strTips, FALSE);
 }
  
 bool TFTPServer::Send_Tftp_File()

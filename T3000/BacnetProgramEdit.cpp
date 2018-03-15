@@ -1028,26 +1028,21 @@ int CBacnetProgramEdit::Bacnet_Show_Debug(CString &retselstring)
 	point_number = temp_number - 1;
 	point_type = temp_point_type;
 
+    //fandu 修复 部分 input output debug 模式无法正常弹出的问题
 	switch(point_type)
 	{
 	case BAC_OUT:
-		{
-			if(point_number >= BAC_OUTPUT_ITEM_COUNT)
+    case BAC_IN:
+    case BAC_PID:
+    case BAC_VAR:
+			if((point_number >= BAC_OUTPUT_ITEM_COUNT) && (point_type == BAC_OUT))
 				break;
-		}
-	case BAC_IN:
-		{
-			if(point_number >= BAC_INPUT_ITEM_COUNT)
+			if((point_number >= BAC_INPUT_ITEM_COUNT) && (point_type == BAC_IN))
 				break;
-		}
-	case BAC_PID:
-		{
-			if(point_number >= BAC_PID_COUNT)
+			if((point_number >= BAC_PID_COUNT) && (point_type == BAC_PID))
 				break;
-		}
-	case BAC_VAR:
-		{
-			if(point_number >= BAC_VARIABLE_ITEM_COUNT)
+
+			if((point_number >= BAC_VARIABLE_ITEM_COUNT) && (point_type == BAC_VAR))
 				break;
 
 			if(Program_Debug_Window != NULL)
@@ -1064,7 +1059,7 @@ int CBacnetProgramEdit::Bacnet_Show_Debug(CString &retselstring)
 			Program_Debug_Window->SetWindowTextW(Select_string);
 			Program_Debug_Window->ShowWindow(TRUE);
 			return true;
-		}
+
 		break;
 
 	default:

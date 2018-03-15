@@ -234,8 +234,8 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
 	if(temp_number != 0)	//Vector 里面是 0开始 , 这里如果是INPUT1  那值为1  直接减一 存起来 用;
 		temp_number = temp_number - 1;
 
-
-		if((temp_point_type == 23) || (temp_point_type == 24) || (temp_point_type == 25) || (temp_point_type == 26))
+    char temp_1 = temp_point_type & 0x1F;
+		if((temp_1 == 23) || (temp_1 == 24) || (temp_1 == 25) || (temp_1 == 26))
 		{
 			temp_number = temp_number + 1;
 		}
@@ -1684,7 +1684,7 @@ void CBacnetScreenEdit::OnPaint()
             }
 
         }
-		else if(m_bac_label_vector.at(i).nSub_Panel != Station_NUM)
+		else if((m_bac_label_vector.at(i).nSub_Panel != Station_NUM) && (m_bac_label_vector.at(i).nSub_Panel != 0))
 		{
 			Point_Net temp_point;
 			temp_point.panel = Station_NUM;

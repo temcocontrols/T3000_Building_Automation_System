@@ -3528,7 +3528,8 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 		if (*num_panel==0)
 		{
 			*num_panel = panel;
-			sub_panel = *num_panel;
+			//sub_panel = *num_panel; //填VAR1 之类的 subpanel 改为0 
+            sub_panel = 0;
 			itoa((int)(*num_panel),(char *)fance_sub_pc,10);
 		}
 		//if ( *num_panel>32 && strlen(pc) )
@@ -3641,11 +3642,13 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 						strcat(buf,".");
 						strcat(buf,pc);
 						strcat(buf,p);
-						if((*num_panel !=Station_NUM ) || (sub_panel != Station_NUM))
-						{
-							*num_point = *num_point & 0x000000ff;
-							strcpy(tok,buf);
-						}
+
+                        //FANDU  2018 01 26 现在开始要慢慢支持访问其他panel 的数据，所以 判断不等于本地panel的需要拿掉;
+						//if((*num_panel !=Station_NUM ) || (sub_panel != Station_NUM))
+						//{
+						//	*num_point = *num_point & 0x000000ff;
+						//	strcpy(tok,buf);
+						//}
 
 #endif
 						//		return tok;
@@ -3969,7 +3972,9 @@ int local_request(int panel, int network)
 
 int local_request_ex(int panel, int sub_panel, int network)
 {
-	if((panel == Station_NUM) && (sub_panel == Station_NUM) && localnetwork(network) )
+    //2018 01 26   subpanel 都变为0 
+	//if((panel == Station_NUM) && (sub_panel == Station_NUM) && localnetwork(network) )
+    if ((panel == Station_NUM) && localnetwork(network))
 		return 1;
 	else
 		return 0;
@@ -4050,7 +4055,7 @@ char *look_label_ex(int panel,int sub_panel, int point_type, int num, int networ
 	char *p=NULL;
 	// if(local_panel)
 	if( local_request_ex(panel,sub_panel, network) )
-		if((panel == Station_NUM) && (sub_panel == Station_NUM))
+		//if((panel == Station_NUM) && (sub_panel == Station_NUM))
 		{
 			switch (point_type) 
 			{
@@ -5742,7 +5747,8 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 					if ((vars_table[cur_index].type == POINT_VAR) || (vars_table[cur_index].type == LABEL_VAR))
 					{
 
-						if(( (unsigned char)vars_table[cur_index].panel == Station_NUM ) && (( (unsigned char)vars_table[cur_index].sub_panel == Station_NUM )))
+						if( ( ( (unsigned char)vars_table[cur_index].panel == Station_NUM ) && (  (unsigned char)vars_table[cur_index].sub_panel == Station_NUM  )  )  ||
+                            (   (unsigned char)vars_table[cur_index].panel == Station_NUM ) && (  (unsigned char)vars_table[cur_index].sub_panel == 0 ) )
 						{
 							if((vars_table[cur_index].point_type & 0x1F) == 2/*ENUM_VAR*/ )
 							{
@@ -5778,25 +5784,27 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 							memcpy(&cod_line[Byte],&point,sizeof(MyPoint));
 							Byte += sizeof(MyPoint);
 						}
-						else if(( (unsigned char)vars_table[cur_index].panel == Station_NUM ) && ((unsigned char)vars_table[cur_index].sub_panel != Station_NUM ))	//Minipanel 下面的TSTAT
+						else if(( (unsigned char)vars_table[cur_index].panel == Station_NUM ) && ((unsigned char)vars_table[cur_index].sub_panel != Station_NUM )  && 
+                                 ((unsigned char)vars_table[cur_index].sub_panel != 0 ))	//Minipanel 下面的TSTAT
 						{
 							unsigned char high_3bit = 0;
 							cod_line[Byte++]=REMOTE_POINT_PRG;
-							if(((unsigned char)vars_table[cur_index].point_type == COIL_REG) ||
-								((unsigned char)vars_table[cur_index].point_type == DIS_INPUT_REG) ||
-								((unsigned char)vars_table[cur_index].point_type == INPUT_REG) ||
-								((unsigned char)vars_table[cur_index].point_type == MB_REG) ||
-								((unsigned char)vars_table[cur_index].point_type == BAC_AV) ||
-								((unsigned char)vars_table[cur_index].point_type == BAC_AI) ||
-								((unsigned char)vars_table[cur_index].point_type == BAC_AO) ||
-								((unsigned char)vars_table[cur_index].point_type == BAC_DO))
+                            unsigned char temp_point_type = (unsigned char) (vars_table[cur_index].point_type & 0x1F);
+							if((temp_point_type == COIL_REG) ||
+								(temp_point_type == DIS_INPUT_REG) ||
+								(temp_point_type == INPUT_REG) ||
+								(temp_point_type == MB_REG) ||
+								(temp_point_type == BAC_AV) ||
+								(temp_point_type == BAC_AI) ||
+								(temp_point_type == BAC_AO) ||
+								(temp_point_type == BAC_DO))
 							{
 								point.number     = (unsigned char)((vars_table[cur_index].num_point) & 0x00ff);
 								high_3bit = ((vars_table[cur_index].num_point) & 0xff00) >> 3;
 							}
 							else
 							{
-								point.number     = (unsigned char)((vars_table[cur_index].num_point-1) & 0x00ff);
+                                point.number = (unsigned char)((vars_table[cur_index].num_point-1) & 0x00ff);
 								if(vars_table[cur_index].num_point > 0)
 									high_3bit = ((vars_table[cur_index].num_point-1) & 0xff00) >> 3;
 								else
@@ -6838,6 +6846,24 @@ int pointtotext(char *buf,Point_Net *point)
 
 	num= (point->number) + high_3_bit*256  ;
 
+    //if ((point->point_type == COIL_REG) ||
+    //    (point->point_type == DIS_INPUT_REG) ||
+    //    (point->point_type == INPUT_REG) ||
+    //    (point->point_type == MB_REG) ||
+    //    (point->point_type == BAC_AV) ||
+    //    (point->point_type == BAC_AI) ||
+    //    (point->point_type == BAC_AO) ||
+    //    (point->point_type == BAC_DO))
+    //{
+    //    num_point = num_point;
+    //}
+    //else
+    //{
+    //    if (num_point > 0)
+    //        num_point = num_point - 1;
+    //}
+
+
 	panel=point->panel;
 	point_type= (point->point_type ) & 0x1F;
 	sub_panel = point->sub_panel;
@@ -6867,13 +6893,31 @@ int pointtotext(char *buf,Point_Net *point)
 	ptr_panel.info[1].name = "IN";
 	ptr_panel.info[2].name = "VAR";
 
-	if((point->panel == point->sub_panel) && (point->panel == Station_NUM))
-	{
-		//老毛不愿意 看到minipanel 显示为1-1-var10   如果panel是1的情况 直接显示var10 或者它的label;
-		strcat(buf,ptr_panel.info[point_type].name);//Fance
-		strcat(buf,itoa(num+1,x,10));
-		return 0;
-	}
+	//if((point->panel == point->sub_panel) && (point->panel == Station_NUM))
+	//{
+	//	//老毛不愿意 看到minipanel 显示为1-1-var10   如果panel是1的情况 直接显示var10 或者它的label;
+	//	strcat(buf,ptr_panel.info[point_type].name);//Fance
+	//	strcat(buf,itoa(num+1,x,10));
+	//	return 0;
+	//}
+
+    if (((point->panel != 0) && (point->sub_panel == 0)) ||
+        ((point->panel == point->sub_panel) && (point->panel == Station_NUM)))
+    {
+        //老毛不愿意 看到minipanel 显示为1-1-var10   如果panel是1的情况 直接显示var10 或者它的label;
+        strcat(buf, itoa(point->panel, x, 10));
+        strcat(buf, ptr_panel.info[point_type].name);//Fance
+        if ((point_type == BAC_AV) ||
+            (point_type == BAC_AI) ||
+            (point_type == BAC_AO) ||
+            (point_type == BAC_DO))
+        {
+            strcat(buf, itoa(num, x, 10));
+        }
+        else
+            strcat(buf, itoa(num + 1, x, 10));
+        return 0;
+    }
 
 
 	strcat(buf,itoa(panel,x,10));
@@ -6890,6 +6934,7 @@ int pointtotext(char *buf,Point_Net *point)
 	else
 		strcat(buf,ptr_panel.info[point_type].name);//Fance
 	//这4个比较特别  是0基址;
+    point->point_type = (point->point_type) & 0x1F;
 	if((point->point_type == COIL_REG) ||
 		(point->point_type == DIS_INPUT_REG) ||
 		(point->point_type == INPUT_REG) ||

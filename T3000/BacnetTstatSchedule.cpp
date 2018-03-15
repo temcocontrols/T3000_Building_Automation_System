@@ -52,6 +52,12 @@ BOOL CBacnetTstatSchedule::OnInitDialog()
 	Initial_List();
 	Fresh_TSTAT_Schedule_List(NULL, NULL);
     SetWindowText(_T("Group Schedule Setting"));
+
+    //使list的长宽 和对话框一样大;
+    CRect windowrect;
+    GetWindowRect(windowrect);
+    ::SetWindowPos(m_bac_tstat_sch_list.m_hWnd, NULL, windowrect.left, windowrect.top, windowrect.Width() - 20, windowrect.Height(), SWP_NOMOVE);
+
     SetTimer(1, 7000, NULL);
     ::SetWindowPos(this->m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	return TRUE;  // return TRUE unless you set the focus to a control

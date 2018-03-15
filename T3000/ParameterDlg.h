@@ -90,6 +90,7 @@ public:
 
 	afx_msg LRESULT  ResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT  ReadDataCallBack(WPARAM wParam, LPARAM lParam);
+    afx_msg LRESULT  ReadDataRefreshUI(WPARAM wParam, LPARAM lParam);
 	void Refresh();
 	void Refresh6();
 	void Reflesh_ParameterDlg();
@@ -191,7 +192,7 @@ public:
 	afx_msg void OnEnKillfocusEditPid2offsetpoint();
 	//	afx_msg void OnKillFocus(CWnd* pNewWnd);
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
-
+    
 public:
 	CBrush m_brush;
 	afx_msg void OnTimer(UINT_PTR nIDEvent);

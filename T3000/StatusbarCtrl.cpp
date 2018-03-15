@@ -371,7 +371,8 @@ void CMyStatusbarCtrl::DrawStatusBar(HDC my_hdc)
 			Rx_array[persent_array_count] = g_llRxCount;
 			if (Rx_array[persent_array_count] > Rx_array[0])
 			{
-				m_health_persent = ((Rx_array[persent_array_count] - Rx_array[0]) * 100) / (Tx_array[persent_array_count] - Tx_array[0]);
+                if(Tx_array[persent_array_count] != Tx_array[0])
+				    m_health_persent = ((Rx_array[persent_array_count] - Rx_array[0]) * 100) / (Tx_array[persent_array_count] - Tx_array[0]);
 				if (m_health_persent > 100)
 					m_health_persent = 100;
 			}
@@ -393,7 +394,8 @@ void CMyStatusbarCtrl::DrawStatusBar(HDC my_hdc)
 			Rx_array[99] = g_llRxCount;
 			if (Rx_array[99] > Rx_array[0])
 			{
-				m_health_persent = ((Rx_array[99] - Rx_array[0]) * 100) / (Tx_array[99] - Tx_array[0]);
+                if(Tx_array[99] != Tx_array[0])
+				    m_health_persent = ((Rx_array[99] - Rx_array[0]) * 100) / (Tx_array[99] - Tx_array[0]);
 				if (m_health_persent > 100)
 					m_health_persent = 100;
 			}
@@ -480,6 +482,8 @@ void CMyStatusbarCtrl::DrawStatusBar(HDC my_hdc)
 	delete BlackBrush;
 	delete CharacterblkBrush;
 	delete ProgressblkBrush;
+    delete HealthGreenBrush;  //2018 03 02 fanduÌí¼Ó  
+    delete HealthRedBrush;    //2018 03 02 fanduÌí¼Ó  
 }
 
 void CMyStatusbarCtrl::OnPaint()

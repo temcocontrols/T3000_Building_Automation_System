@@ -40,7 +40,7 @@ typedef struct _Product_IP_ID
 /////////////////////////////////////////////////////////////////////////////
 // CAkingSocket
 
-
+extern CString ShowTFTPMessage; //用于显示一些结果;
 extern int ISP_STEP;
 extern BYTE Byte_ISP_Device_IP[4];
 extern bool device_has_replay_lan_IP;
@@ -103,19 +103,24 @@ void MySocket::OnReceive(int nErrorCode)
 			memcpy_s(temp_data,sizeof(temp_data),receive_buf,11);//copy the first 11 byte and check
 			if(!strcmp(temp_data,"ReceiveDHCP"))
 			{
+                memset(Byte_ISP_Device_IP, 0, 4);
+                memset(Product_Name, 0, 12);
 				memcpy_s(Byte_ISP_Device_IP,sizeof(Byte_ISP_Device_IP),receive_buf+11,4);//copy the first 11 byte and check
-                memcpy_s(Product_Name,sizeof(Product_Name),receive_buf+15,12);//copy the first 11 byte and check
+                memcpy_s(Product_Name,sizeof(Product_Name),receive_buf+15,11);//copy the first 11 byte and check
 			    CString DeviceProductName ,FileProductName;
-				for (int i=0;i<12;i++)
-				{
-					DeviceProductName.AppendFormat(_T("%c"),Product_Name[i]);
-				}
-				for (int i=0;i<10;i++)
-				{
-					FileProductName.AppendFormat(_T("%c"),global_fileInfor.product_name[i]);
-				}
+
+                MultiByteToWideChar(CP_ACP, 0, (char *)Product_Name,(int)strlen((char *)Product_Name) + 1, DeviceProductName.GetBuffer(MAX_PATH), MAX_PATH);
+                DeviceProductName.ReleaseBuffer();
+                DeviceProductName = DeviceProductName.Left(11);
+
+                MultiByteToWideChar(CP_ACP, 0, (char *)global_fileInfor.product_name, (int)strlen((char *)global_fileInfor.product_name) + 1, FileProductName.GetBuffer(MAX_PATH), MAX_PATH);
+                FileProductName.ReleaseBuffer();
+                FileProductName = FileProductName.Left(11);
+
 				FileProductName.Trim();
 				DeviceProductName.Trim();
+               
+                ShowTFTPMessage = FileProductName + _T("  ") + DeviceProductName;
 				if (DeviceProductName.CompareNoCase(FileProductName)!=0)
 				{
 					CString strTip;
@@ -127,13 +132,17 @@ void MySocket::OnReceive(int nErrorCode)
 
 					}
 					else if(((DeviceProductName.CompareNoCase(_T("MINI")) == 0) && (FileProductName.CompareNoCase(_T("Minipanel")) == 0)) ||
-						((DeviceProductName.CompareNoCase(_T("Minipanel")) == 0) && (FileProductName.CompareNoCase(_T("MINI")) == 0 )))
+						((DeviceProductName.CompareNoCase(_T("Minipanel")) == 0) && (FileProductName.CompareNoCase(_T("MINI")) == 0 ))  ||
+                        ((DeviceProductName.CompareNoCase(_T("CO2NET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0)) ||  // 2018 0307 有人把 CO2NET 改为CO2ALL了，导致匹配不到，无法烧写.为了兼容，加特例.
+                        ((DeviceProductName.CompareNoCase(_T("UMNET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0)) ||
+                        ((DeviceProductName.CompareNoCase(_T("PSNET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0)))
 					{
 
 					}
 					else
 					{
 						strTip.Format(_T("Your device is %s,but your bin file is fit for %s"),DeviceProductName.GetBuffer(),FileProductName.GetBuffer());
+                        ShowTFTPMessage = strTip;
 						CAsyncSocket::OnReceive(nErrorCode);
 						return;
 					}
@@ -155,19 +164,25 @@ void MySocket::OnReceive(int nErrorCode)
 			memcpy_s(temp_data,sizeof(temp_data),receive_buf,11);//copy the first 11 byte and check
 			if(!strcmp(temp_data,"ReceiveDHCP"))
 			{
+                memset(Byte_ISP_Device_IP, 0, 4);
+                memset(Product_Name, 0, 12);
+
 				memcpy_s(Byte_ISP_Device_IP,sizeof(Byte_ISP_Device_IP),receive_buf+11,4);//copy the first 11 byte and check
 				memcpy_s(Product_Name,sizeof(Product_Name),receive_buf+15,12);//copy the first 11 byte and check
 				CString DeviceProductName ,FileProductName;
-				for (int i=0;i<12;i++)
-				{
-					DeviceProductName.AppendFormat(_T("%c"),Product_Name[i]);
-				}
-				for (int i=0;i<10;i++)
-				{
-					FileProductName.AppendFormat(_T("%c"),global_fileInfor.product_name[i]);
-				}
+
+                MultiByteToWideChar(CP_ACP, 0, (char *)Product_Name, (int)strlen((char *)Product_Name) + 1, DeviceProductName.GetBuffer(MAX_PATH), MAX_PATH);
+                DeviceProductName.ReleaseBuffer();
+                DeviceProductName = DeviceProductName.Left(11);
+
+                MultiByteToWideChar(CP_ACP, 0, (char *)global_fileInfor.product_name, (int)strlen((char *)global_fileInfor.product_name) + 1, FileProductName.GetBuffer(MAX_PATH), MAX_PATH);
+                FileProductName.ReleaseBuffer();
+                FileProductName = FileProductName.Left(11);
+
+
 				FileProductName.Trim();
 				DeviceProductName.Trim();
+                ShowTFTPMessage = FileProductName + _T("  ") + DeviceProductName;
 				if ((DeviceProductName.CompareNoCase(FileProductName)!=0) && (!DeviceProductName.IsEmpty()))
 				{
 					if((FileProductName.CompareNoCase(_T("HUMNET")) == 0) ||
@@ -179,7 +194,10 @@ void MySocket::OnReceive(int nErrorCode)
 						return;
 					}
 					else if(((DeviceProductName.CompareNoCase(_T("MINI")) == 0) && (FileProductName.CompareNoCase(_T("Minipanel")) == 0)) ||
-						((DeviceProductName.CompareNoCase(_T("Minipanel")) == 0) && (FileProductName.CompareNoCase(_T("MINI")) == 0)))
+						((DeviceProductName.CompareNoCase(_T("Minipanel")) == 0) && (FileProductName.CompareNoCase(_T("MINI")) == 0))  ||
+                        ((DeviceProductName.CompareNoCase(_T("CO2NET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0)) ||  //特殊情况加入的.
+                        ((DeviceProductName.CompareNoCase(_T("UMNET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0))  ||
+                        ((DeviceProductName.CompareNoCase(_T("PSNET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0)))
 					{
 						ISP_STEP =ISP_Send_TFTP_PAKAGE;
 					}

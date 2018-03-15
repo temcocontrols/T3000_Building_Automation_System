@@ -2182,6 +2182,9 @@ refresh_net_device device_id_data_2;
 refresh_net_device device_same_panel_1;
 refresh_net_device device_same_panel_2;
 
+refresh_net_device device_ip_conflict_1;
+refresh_net_device device_ip_conflict_2;
+
 bool edit_confilct_mode = false;
 
 bool scaning_mode = false;

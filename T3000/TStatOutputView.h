@@ -16,12 +16,14 @@ public:
 
 public:
 	enum { IDD = IDD_DIALOG_TSTAT_OUTPUT };
+
 #ifdef _DEBUG
-	virtual void AssertValid() const;
+    virtual void AssertValid() const;
 #ifndef _WIN32_WCE
-	virtual void Dump(CDumpContext& dc) const;
+    virtual void Dump(CDumpContext& dc) const;
 #endif
 #endif
+
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support

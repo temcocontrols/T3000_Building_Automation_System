@@ -2892,6 +2892,8 @@ BOOL CISPDlg::DetectBraudrate ()
 
 }
 
+
+
 void CISPDlg::OnMenuFlashsn()
 {
 

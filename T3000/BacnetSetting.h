@@ -109,6 +109,12 @@ public:
 	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	void InitScrollbar();
 	afx_msg void OnBnClickedButtonZoneSchedule();
+    afx_msg void OnBnClickedButtonSettingDone();
+
+    int m_reboot_time_left; //用来记录reboot 的时间;
+    afx_msg void OnBnClickedRadioSettingSyncPc();
+    afx_msg void OnBnClickedRadioSettingLcdOn();
+    afx_msg void OnBnClickedRadioSettingLcdOff();
 };
 
 

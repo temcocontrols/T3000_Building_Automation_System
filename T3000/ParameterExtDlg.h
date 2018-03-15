@@ -30,4 +30,5 @@ public:
     afx_msg void OnEnKillfocusEditParaExtDelay();
     afx_msg void OnEnKillfocusEditParaExtMinPwm();
     afx_msg void OnBnClickedButtonParaExtOk();
+    afx_msg void OnEnKillfocusEditParaExtTimeRemaining();
 };

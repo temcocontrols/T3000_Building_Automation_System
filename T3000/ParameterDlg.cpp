@@ -38,6 +38,8 @@ extern int Mdb_Adress_Map;
 //#define PID_CO2													   13
 //#define PID_HUM													   14
 //#define PID_AIRFLOW_SENSOR										   15
+
+static DWORD WINAPI hReadKillFocsData(LPVOID pParam);
 #define NUM_INPUT_SETTING 17
 CString INPUT_SETTING[NUM_INPUT_SETTING]=
 {
@@ -279,6 +281,8 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
 
     ON_MESSAGE(MY_RESUME_DATA, ResumeMessageCallBack)
     ON_MESSAGE(MY_READ_DATA_CALLBACK, ReadDataCallBack)
+    ON_MESSAGE(WM_KILLFOCS_READ_DATA, ReadDataRefreshUI)
+    
 
     //ON_WM_KILLFOCUS()
     ON_WM_CTLCOLOR()
@@ -401,7 +405,15 @@ BOOL CParameterDlg::OnInitDialog()
 	m_gUnit.AddString(_T("°F"));
 
 
-
+    //Fandu 20180127  TSTAT8 才显示 额外新增的 TSTAT 参数对话框的 按钮;
+    if (product_register_value[7] == PM_TSTAT8)
+    {
+        GetDlgItem(IDC_BUTTON_PARAMETER_EXT)->ShowWindow(SW_SHOW);
+    }
+    else
+    {
+        GetDlgItem(IDC_BUTTON_PARAMETER_EXT)->ShowWindow(SW_HIDE);
+    }
 
 	if (g_ParamLevel == 1)
 	{
@@ -2655,186 +2667,6 @@ void CParameterDlg::OnCbnKillfocusCombo4()
 }
 
 
-void CParameterDlg::OnEnKillfocusEditCspd()
-{
-    UpdateData();
-    if(product_register_value[MODBUS_DAY_COOLING_SETPOINT]==m_coolsp*10)	//Add this to judge weather this value need to change.
-        return;
-
-	int nheatsp = m_heatsp * 10;
-	int nsetpoint = m_setpoint * 10;
-	int ncoolsp = m_coolsp * 10;
-
-
-	if (ncoolsp <= nsetpoint && ncoolsp > nheatsp)
-	{
-		m_setpoint = (m_coolsp + m_heatsp) / 2;
-		m_cooldb = m_coolsp - m_setpoint;
-		m_heatdb = m_setpoint - m_heatsp;
-
-		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_DAY_SETPOINT, m_setpoint * 10,
-			product_register_value[MODBUS_DAY_SETPOINT], this->m_hWnd, IDC_EDIT31, _T("DAY SETPOINT"));
-		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_DAY_COOLING_DEADBAND, m_cooldb * 10,
-			product_register_value[MODBUS_DAY_COOLING_DEADBAND], this->m_hWnd, IDC_EDIT_CDBDN, _T("DAY COOLING DEADBAND"));
-
-		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_DAY_HEATING_DEADBAND, m_heatdb * 10,
-			product_register_value[MODBUS_DAY_HEATING_DEADBAND], this->m_hWnd, IDC_EDIT34, _T("DAY HEATING DEADBAND"));
-
-
-	}
-	else if(ncoolsp<=nheatsp)
-	{
-		m_setpoint = m_coolsp - m_cooldb;
-		m_heatsp = m_setpoint - m_heatdb;
-		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_DAY_SETPOINT, m_setpoint * 10,
-			product_register_value[MODBUS_DAY_SETPOINT], this->m_hWnd, IDC_EDIT31, _T("DAY SETPOINT"));
-
-	}
-	else
-	{
-		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_DAY_COOLING_SETPOINT, m_coolsp * 10,
-			product_register_value[MODBUS_DAY_COOLING_SETPOINT], this->m_hWnd, IDC_EDIT_CSPD, _T("DAY COOLING SETPOINT"));
-
-	}
-	UpdateData(FALSE);
- 
-}
-
-void CParameterDlg::OnEnKillfocusEditCdbdn()
-{
-    UpdateData();
-    if(product_register_value[MODBUS_DAY_COOLING_DEADBAND]==m_cooldb*10)	//Add this to judge weather this value need to change.
-        return;
-    Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_DAY_COOLING_DEADBAND,m_cooldb*10,
-                        product_register_value[MODBUS_DAY_COOLING_DEADBAND],this->m_hWnd,IDC_EDIT_CDBDN,_T("DAY COOLING DEADBAND"));
-	m_coolsp = m_cooldb + m_setpoint;
-
-	UpdateData(FALSE);
-}
-
-void CParameterDlg::OnEnKillfocusEdit31()
-{
-    UpdateData();
-    if((short)product_register_value[MODBUS_DAY_SETPOINT]==m_setpoint*10)	//Add this to judge weather this value need to change.
-        return;
-    Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_DAY_SETPOINT,m_setpoint*10,
-                        product_register_value[MODBUS_DAY_SETPOINT],this->m_hWnd,IDC_EDIT31,_T("DAY SETPOINT"));
-	m_coolsp = m_setpoint + m_cooldb;
-	m_heatsp = m_setpoint - m_heatdb;
-	UpdateData(FALSE);
-}
-
-void CParameterDlg::OnEnKillfocusEdit34()
-{
-    UpdateData();
-    if(write_one(g_tstat_id,MODBUS_DAY_HEATING_DEADBAND,m_heatdb*10)<0)//Modify by Fance  2013 04 11
-        MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-    else
-        product_register_value[MODBUS_DAY_HEATING_DEADBAND] = m_heatdb*10;
-	m_heatsp = m_setpoint - m_heatdb;
-	UpdateData(FALSE);
-}
-
-void CParameterDlg::OnEnKillfocusEdit37()
-{
-    UpdateData();
-    if(product_register_value[MODBUS_DAY_HEATING_SETPOINT]==m_heatsp*10)	//Add this to judge weather this value need to change.
-        return;
-	int nheatsp = m_heatsp * 10;
-	int nsetpoint = m_setpoint * 10;
-	int ncoolsp = m_coolsp * 10;
-
-	if (nheatsp >= nsetpoint&&nheatsp<ncoolsp)
-	{
-		m_setpoint = (m_coolsp + m_heatsp) / 2;
-		m_cooldb = m_coolsp - m_setpoint;
-		m_heatdb = m_setpoint - m_heatsp;
-
-		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_DAY_SETPOINT, m_setpoint * 10,
-			product_register_value[MODBUS_DAY_SETPOINT], this->m_hWnd, IDC_EDIT31, _T("DAY SETPOINT"));
-		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_DAY_COOLING_DEADBAND, m_cooldb * 10,
-			product_register_value[MODBUS_DAY_COOLING_DEADBAND], this->m_hWnd, IDC_EDIT_CDBDN, _T("DAY COOLING DEADBAND"));
-
-		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_DAY_HEATING_DEADBAND, m_heatdb * 10,
-			product_register_value[MODBUS_DAY_HEATING_DEADBAND], this->m_hWnd, IDC_EDIT34, _T("DAY HEATING DEADBAND"));
-		 
-
-	}
-	else if (nheatsp>=ncoolsp)
-	{
-		m_setpoint = m_heatsp + m_heatdb;
-		m_coolsp = m_setpoint + m_cooldb;
-		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_DAY_SETPOINT, m_setpoint * 10,
-			product_register_value[MODBUS_DAY_SETPOINT], this->m_hWnd, IDC_EDIT31, _T("DAY SETPOINT"));
-
-	}
-	 
-	else
-	{
-		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_DAY_HEATING_SETPOINT, m_heatsp * 10,
-			product_register_value[MODBUS_DAY_HEATING_SETPOINT], this->m_hWnd, IDC_EDIT37, _T("DAY HEATING SETPOINT"));
-
-	}
-
-	UpdateData(FALSE);
-}
-
-void CParameterDlg::OnEnKillfocusEditCspnn()
-{
-    UpdateData();
-    if(product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]==m_coolspN*10)	//Add this to judge weather this value need to change.
-        return;
-
-	int nheatsp = m_heatspN * 10;
-	int nsetpoint = m_setpointN * 10;
-	int ncoolsp = m_cooldbN * 10;
-
-	if (ncoolsp <= nsetpoint && ncoolsp>nheatsp)
-	{
-		m_setpointN = (m_heatspN + m_coolspN) / 2;
-		m_heatdbN = m_setpointN - m_heatspN;
-		m_cooldbN = m_coolspN - m_setpointN;
-		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_NIGHT_SETPOINT, m_setpointN * 10,
-			product_register_value[MODBUS_NIGHT_SETPOINT], this->m_hWnd, IDC_EDIT32, _T("NIGHT SETPOINT"));
-		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_NIGHT_HEATING_DEADBAND, m_heatdbN * 10,
-			product_register_value[MODBUS_NIGHT_HEATING_DEADBAND], this->m_hWnd, IDC_EDIT35, _T("NIGHT HEATING DEADBAND"));
-		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_NIGHT_COOLING_DEADBAND, m_cooldbN * 10,
-			product_register_value[MODBUS_NIGHT_COOLING_DEADBAND], this->m_hWnd, IDC_EDIT_CDBNN, _T("NIGHT COOLING DEADBAND"));
-
-	}
-	else if(ncoolsp <= nheatsp)
-	{
-		m_setpointN = m_coolspN - m_cooldbN;
-		m_heatspN = m_setpointN - m_heatdbN;
-		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_NIGHT_SETPOINT, m_setpointN * 10,
-			product_register_value[MODBUS_NIGHT_SETPOINT], this->m_hWnd, IDC_EDIT32, _T("NIGHT SETPOINT"));
-	}
-	else
-	{
-		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_NIGHT_COOLING_SETPOINT, m_coolspN * 10,
-			product_register_value[MODBUS_NIGHT_COOLING_SETPOINT], this->m_hWnd, IDC_EDIT_CSPNN, _T("NIGHT COOLING SETPOINT"));
-	}
-
-	UpdateData(FALSE);
-}
-
-//Recode by Fance
-void CParameterDlg::OnEnKillfocusEditCdbnn()
-{
-
-    UpdateData();
-    if(product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]==m_cooldbN*10)	//Add this to judge weather this value need to change.
-        return;
-    Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_COOLING_DEADBAND,m_cooldbN*10,
-                        product_register_value[MODBUS_NIGHT_COOLING_DEADBAND],this->m_hWnd,IDC_EDIT_CDBNN,_T("NIGHT COOLING DEADBAND"));
-	m_coolspN = m_setpointN + m_cooldbN;
-	UpdateData(FALSE);
-}
-
-
-
-
-
 //-------------------------------------------------------
 //Annul by Fance ,it not support t6
 //void CParameterDlg::OnEnKillfocusEditCdbnn()
@@ -2846,74 +2678,6 @@ void CParameterDlg::OnEnKillfocusEditCdbnn()
 //	EndWaitCursor();
 //}
 
-void CParameterDlg::OnEnKillfocusEdit32()
-{
-    UpdateData();
-
-    if((short)product_register_value[MODBUS_NIGHT_SETPOINT]==m_setpointN*10)	//Add this to judge weather this value need to change.
-        return;
-
-    Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_SETPOINT,m_setpointN*10,
-                        product_register_value[MODBUS_NIGHT_SETPOINT],this->m_hWnd,IDC_EDIT32,_T("NIGHT SETPOINT"));
-
-	m_coolspN = m_setpointN + m_cooldbN;
-	m_heatspN = m_setpointN - m_heatdbN;
-	UpdateData(FALSE);
-}
-
-void CParameterDlg::OnEnKillfocusEdit35()
-{
-    UpdateData();
-    if(product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]==m_heatdbN*10)	//Add this to judge weather this value need to change.
-        return;
-
-    Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_HEATING_DEADBAND,m_heatdbN*10,
-                        product_register_value[MODBUS_NIGHT_HEATING_DEADBAND],this->m_hWnd,IDC_EDIT35,_T("NIGHT HEATING DEADBAND"));
-
-	m_heatdbN = m_setpointN + m_heatdbN;
-	UpdateData(FALSE);
-}
-
-void CParameterDlg::OnEnKillfocusEdit38()
-{
-    UpdateData();
-    if(product_register_value[MODBUS_NIGHT_HEATING_SETPOINT] == m_heatspN*10)
-        return;
-
-	int nheatsp = m_heatspN * 10;
-	int nsetpoint = m_setpointN * 10;
-	int ncoolsp = m_cooldbN * 10;
-
-	if (nheatsp >= nsetpoint && nheatsp<ncoolsp)
-	{
-		m_setpointN = (m_heatspN + m_coolspN) / 2;
-		m_heatdbN = m_setpointN - m_heatspN;
-		m_cooldbN = m_coolspN - m_setpointN;
-		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_NIGHT_SETPOINT, m_setpointN * 10,
-			product_register_value[MODBUS_NIGHT_SETPOINT], this->m_hWnd, IDC_EDIT32, _T("NIGHT SETPOINT"));
-		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_NIGHT_HEATING_DEADBAND, m_heatdbN * 10,
-			product_register_value[MODBUS_NIGHT_HEATING_DEADBAND], this->m_hWnd, IDC_EDIT35, _T("NIGHT HEATING DEADBAND"));
-		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_NIGHT_COOLING_DEADBAND, m_cooldbN * 10,
-			product_register_value[MODBUS_NIGHT_COOLING_DEADBAND], this->m_hWnd, IDC_EDIT_CDBNN, _T("NIGHT COOLING DEADBAND"));
-
-	}
-	else if(nheatsp>=ncoolsp)
-	{
-		m_setpointN = m_heatspN + m_heatdbN;
-		m_coolspN = m_setpointN + m_cooldbN;
-		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_NIGHT_SETPOINT, m_setpointN * 10,
-			product_register_value[MODBUS_NIGHT_SETPOINT], this->m_hWnd, IDC_EDIT32, _T("NIGHT SETPOINT"));
-
-	}
-	else
-	{
-		Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_NIGHT_HEATING_SETPOINT, m_heatspN * 10,
-			product_register_value[MODBUS_NIGHT_HEATING_SETPOINT], this->m_hWnd, IDC_EDIT38, _T("NIGHT HEATING SETPOINT"));
-	}
-
-
-	UpdateData(FALSE);
-}
 CString CParameterDlg::GetInputValue(int InputNo) //这个是行号，如果是Input的话，要在这个基础上加1
 {
 //所以InputNO=InputNo+1;
@@ -3965,6 +3729,41 @@ void CParameterDlg::Reflesh_ParameterDlg()
         GetDlgItem(IDC_EDIT_TSTAT_NAME)->ShowWindow(SW_HIDE);
     }
 
+
+    if (product_register_value[7] == PM_TSTAT8)
+    {
+        short temp_buffer[10] = { 0 };
+        temp_buffer[0] = htons( product_register_value[753]) ;
+        temp_buffer[1] = htons(product_register_value[754]) ;
+        temp_buffer[2] = htons(product_register_value[755]);
+        temp_buffer[3] = htons(product_register_value[756]);
+        
+        CString temp_Name;
+        MultiByteToWideChar(CP_ACP, 0, (char *)temp_buffer,
+            (int)strlen((char *)temp_buffer) + 1,
+            temp_Name.GetBuffer(MAX_PATH), MAX_PATH);
+        temp_Name.ReleaseBuffer();
+
+        GetDlgItem(IDC_STATIC_DAYSETPOINT)->SetWindowTextW(temp_Name);
+        GetDlgItem(IDC_STATIC_DAYN)->SetWindowTextW(temp_Name);
+
+
+        short temp_buffer2[10] = { 0 };
+        temp_buffer2[0] = htons(product_register_value[737]);
+        temp_buffer2[1] = htons(product_register_value[738]);
+        temp_buffer2[2] = htons(product_register_value[739]);
+        temp_buffer2[3] = htons(product_register_value[740]);
+
+        CString temp_Name2;
+        MultiByteToWideChar(CP_ACP, 0, (char *)temp_buffer2,
+            (int)strlen((char *)temp_buffer2) + 1,
+            temp_Name2.GetBuffer(MAX_PATH), MAX_PATH);
+        temp_Name2.ReleaseBuffer();
+
+        GetDlgItem(IDC_STATIC_NIGHTN)->SetWindowTextW(temp_Name2);
+
+    }
+
     if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7] == PM_TSTAT5i)
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 		)
@@ -4349,6 +4148,12 @@ void CParameterDlg::OnEnKillfocusEditPid2offsetpoint()
                         product_register_value[275],this->m_hWnd,IDC_EDIT_PID2OFFSETPOINT,_T("Pid2 off setpoint"));
 }
 
+LRESULT  CParameterDlg::ReadDataRefreshUI(WPARAM wParam, LPARAM lParam)
+{
+    Reflesh_ParameterDlg();
+    UpdateData(FALSE);
+    return 1;
+}
 
 LRESULT  CParameterDlg::ReadDataCallBack(WPARAM wParam, LPARAM lParam)
 {
@@ -5898,3 +5703,171 @@ void CParameterDlg::OnBnClickedButtonParameterExt()
     CParameterExtDlg dlg;
     dlg.DoModal();
 }
+
+HANDLE hkillfocu = NULL;
+DWORD WINAPI hReadKillFocsData(LPVOID pParam)
+{
+    CParameterDlg* pdlg = (CParameterDlg*)pParam;
+    Sleep(1500);
+    int read_ret;
+    read_ret = Read_Multi(g_tstat_id, &product_register_value[300], 300, 100, 3);
+    if (read_ret >= 0)
+    {
+        ::PostMessage(pdlg->m_hWnd, WM_KILLFOCS_READ_DATA, 0, 0);
+    }
+    hkillfocu = NULL;
+    return true;
+}
+//Day setpoint 
+
+void CParameterDlg::OnEnKillfocusEdit31()
+{
+    UpdateData();
+    if ((short)product_register_value[MODBUS_DAY_SETPOINT] == m_setpoint * 10)	//Add this to judge weather this value need to change.
+        return;
+    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_DAY_SETPOINT, m_setpoint * 10,
+        product_register_value[MODBUS_DAY_SETPOINT], this->m_hWnd, IDC_EDIT31, _T("DAY SETPOINT"));
+    product_register_value[MODBUS_DAY_SETPOINT] = m_setpoint * 10;
+    if(hkillfocu == NULL)
+        hkillfocu = CreateThread(NULL, NULL, hReadKillFocsData, this, NULL, 0);
+}
+
+//Day Heat SP
+void CParameterDlg::OnEnKillfocusEdit37()
+{
+    UpdateData();
+    if (product_register_value[MODBUS_DAY_HEATING_SETPOINT] == m_heatsp * 10)	//Add this to judge weather this value need to change.
+        return;
+
+
+    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_DAY_HEATING_SETPOINT, m_heatsp * 10,
+        product_register_value[MODBUS_DAY_HEATING_SETPOINT], this->m_hWnd, IDC_EDIT37, _T("DAY HEATING SETPOINT"));
+    product_register_value[MODBUS_DAY_HEATING_SETPOINT] = m_heatsp * 10;
+    if (hkillfocu == NULL)
+        hkillfocu = CreateThread(NULL, NULL, hReadKillFocsData, this, NULL, 0);
+}
+
+
+void CParameterDlg::OnEnKillfocusEditCspd()
+{
+    UpdateData();
+    if (product_register_value[MODBUS_DAY_COOLING_SETPOINT] == m_coolsp * 10)	//Add this to judge weather this value need to change.
+        return;
+
+    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_DAY_COOLING_SETPOINT, m_coolsp * 10,
+        product_register_value[MODBUS_DAY_COOLING_SETPOINT], this->m_hWnd, IDC_EDIT_CSPD, _T("DAY COOLING SETPOINT"));
+
+    product_register_value[MODBUS_DAY_COOLING_SETPOINT] = m_coolsp * 10;
+    if (hkillfocu == NULL)
+        hkillfocu = CreateThread(NULL, NULL, hReadKillFocsData, this, NULL, 0);
+}
+
+
+void CParameterDlg::OnEnKillfocusEditCdbdn()
+{
+    UpdateData();
+    if (product_register_value[MODBUS_DAY_COOLING_DEADBAND] == m_cooldb * 10)	//Add this to judge weather this value need to change.
+        return;
+    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_DAY_COOLING_DEADBAND, m_cooldb * 10,
+        product_register_value[MODBUS_DAY_COOLING_DEADBAND], this->m_hWnd, IDC_EDIT_CDBDN, _T("DAY COOLING DEADBAND"));
+    product_register_value[MODBUS_DAY_COOLING_DEADBAND] = m_cooldb * 10;
+    if (hkillfocu == NULL)
+        hkillfocu = CreateThread(NULL, NULL, hReadKillFocsData, this, NULL, 0);
+}
+
+
+void CParameterDlg::OnEnKillfocusEdit34()
+{
+    UpdateData();
+    if (write_one(g_tstat_id, MODBUS_DAY_HEATING_DEADBAND, m_heatdb * 10)<0)//Modify by Fance  2013 04 11
+        MessageBox(_T("Write Register Fail!Please try it again!"), _T("Warning"), MB_OK | MB_ICONINFORMATION);
+    else
+        product_register_value[MODBUS_DAY_HEATING_DEADBAND] = m_heatdb * 10;
+
+    product_register_value[MODBUS_DAY_HEATING_DEADBAND] = m_heatdb * 10;
+    if (hkillfocu == NULL)
+        hkillfocu = CreateThread(NULL, NULL, hReadKillFocsData, this, NULL, 0);
+
+}
+
+
+void CParameterDlg::OnEnKillfocusEdit32()
+{
+    UpdateData();
+
+    if ((short)product_register_value[MODBUS_NIGHT_SETPOINT] == m_setpointN * 10)	//Add this to judge weather this value need to change.
+        return;
+
+    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_NIGHT_SETPOINT, m_setpointN * 10,
+        product_register_value[MODBUS_NIGHT_SETPOINT], this->m_hWnd, IDC_EDIT32, _T("NIGHT SETPOINT"));
+
+    product_register_value[MODBUS_NIGHT_SETPOINT] = m_setpointN * 10;
+    if (hkillfocu == NULL)
+        hkillfocu = CreateThread(NULL, NULL, hReadKillFocsData, this, NULL, 0);
+}
+
+
+void CParameterDlg::OnEnKillfocusEdit38()
+{
+    UpdateData();
+    if (product_register_value[MODBUS_NIGHT_HEATING_SETPOINT] == m_heatspN * 10)
+        return;
+
+    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_NIGHT_HEATING_SETPOINT, m_heatspN * 10,
+        product_register_value[MODBUS_NIGHT_HEATING_SETPOINT], this->m_hWnd, IDC_EDIT38, _T("NIGHT HEATING SETPOINT"));
+    product_register_value[MODBUS_NIGHT_HEATING_SETPOINT] = m_heatspN * 10;
+    if (hkillfocu == NULL)
+        hkillfocu = CreateThread(NULL, NULL, hReadKillFocsData, this, NULL, 0);
+
+}
+
+
+
+void CParameterDlg::OnEnKillfocusEditCspnn()
+{
+    UpdateData();
+    if (product_register_value[MODBUS_NIGHT_COOLING_SETPOINT] == m_coolspN * 10)	//Add this to judge weather this value need to change.
+        return;
+
+    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_NIGHT_COOLING_SETPOINT, m_coolspN * 10,
+        product_register_value[MODBUS_NIGHT_COOLING_SETPOINT], this->m_hWnd, IDC_EDIT_CSPNN, _T("NIGHT COOLING SETPOINT"));
+    product_register_value[MODBUS_NIGHT_COOLING_SETPOINT] = m_coolspN * 10;
+    if (hkillfocu == NULL)
+        hkillfocu = CreateThread(NULL, NULL, hReadKillFocsData, this, NULL, 0);
+}
+
+
+//Recode by Fance
+void CParameterDlg::OnEnKillfocusEditCdbnn()
+{
+
+    UpdateData();
+    if (product_register_value[MODBUS_NIGHT_COOLING_DEADBAND] == m_cooldbN * 10)	//Add this to judge weather this value need to change.
+        return;
+    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_NIGHT_COOLING_DEADBAND, m_cooldbN * 10,
+        product_register_value[MODBUS_NIGHT_COOLING_DEADBAND], this->m_hWnd, IDC_EDIT_CDBNN, _T("NIGHT COOLING DEADBAND"));
+    product_register_value[MODBUS_NIGHT_COOLING_DEADBAND] = m_cooldbN * 10;
+    if (hkillfocu == NULL)
+        hkillfocu = CreateThread(NULL, NULL, hReadKillFocsData, this, NULL, 0);
+}
+
+
+
+void CParameterDlg::OnEnKillfocusEdit35()
+{
+    UpdateData();
+    if (product_register_value[MODBUS_NIGHT_HEATING_DEADBAND] == m_heatdbN * 10)	//Add this to judge weather this value need to change.
+        return;
+
+    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, MODBUS_NIGHT_HEATING_DEADBAND, m_heatdbN * 10,
+        product_register_value[MODBUS_NIGHT_HEATING_DEADBAND], this->m_hWnd, IDC_EDIT35, _T("NIGHT HEATING DEADBAND"));
+
+    product_register_value[MODBUS_NIGHT_HEATING_DEADBAND] = m_heatdbN * 10;
+    if (hkillfocu == NULL)
+        hkillfocu = CreateThread(NULL, NULL, hReadKillFocsData, this, NULL, 0);
+}
+
+
+
+
+

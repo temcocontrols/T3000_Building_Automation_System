@@ -2,6 +2,7 @@
 #include "CM5\CStatic\staticex.h"
 #include "afxwin.h"
 #include "../SQLiteDriver/CppSQLite3.h"
+#include "global_variable_extern.h"
 // CDuplicateIdDetected dialog
 
 class CDuplicateIdDetected : public CDialogEx
@@ -61,5 +62,13 @@ public:
     CppSQLite3Query m_q;
 
 	int duplicate_mode;
-	afx_msg void OnStnClickedStaticNetworkTitle();
+    BOOL ChangeNetDeviceIP(CString soldIP, CString newstrIP, unsigned int nSerialNum);
+
+    CString original_ip1;
+    CString original_ip2;
+    CString cschaned_ip1;
+    CString cschaned_ip2;
+
+    bool ip1_need_change;
+    bool ip2_need_change;
 };

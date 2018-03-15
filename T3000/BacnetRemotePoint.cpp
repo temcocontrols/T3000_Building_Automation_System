@@ -270,7 +270,8 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 		m_remote_point_list.SetItemText(i,REMOTE_DEVICE_ID,temp_device_id);
 		m_remote_point_list.SetItemText(i,REMOTE_REG,temp_reg_number);
 		m_remote_point_list.SetItemText(i,REMOTE_VALUE,temp_reg_value);
-
+        m_remote_point_list.SetItemText(i, REMOTE_TIME_REMAINING, temp_time_remaining);
+        
 		if (m_remote_point_data.at(i).device_online)
 		{
 			temp_status.Format(_T("OK"));

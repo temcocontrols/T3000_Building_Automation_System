@@ -693,6 +693,9 @@
     <ClCompile Include="ParameterExtDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ShowMessageDlg.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -1374,9 +1377,6 @@
     <ClInclude Include="BacnetWait.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="gloab_define.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CustomSTable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1804,6 +1804,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ParameterExtDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ShowMessageDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -339,7 +339,9 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_List(WPARAM wParam,LPARAM lParam)
 		unsigned temp_network = m_monitor_data.at(monitor_list_line).inputs[i].network;
 		byte lowbyte_point_type = temp_point_type & 0x1F;	//高3位用于 存放
 
-		if(((temp_panel == 0) || (m_monitor_data.at(monitor_list_line).inputs[i].sub_panel == 0)) ||(lowbyte_point_type > ENUM_AR_DATA))
+        //2018 01 26   sub panel 可以为0 代表访问本地;
+        //if (((temp_panel == 0) || (m_monitor_data.at(monitor_list_line).inputs[i].sub_panel == 0)) || (lowbyte_point_type > BAC_AV + 10))
+		if((temp_panel == 0) || (lowbyte_point_type > BAC_DO + 1))
 		{
 			m_monitor_data.at(monitor_list_line).inputs[i].network = 0;	//发 现panel 是0  就说明这个数据是无效的,先设置为初始化值;
 			m_monitor_data.at(monitor_list_line).inputs[i].number = 0;
@@ -360,12 +362,36 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_List(WPARAM wParam,LPARAM lParam)
 		temp_point.point_type = temp_point_type ;//temp_point_type;
 		temp_point.sub_panel = m_monitor_data.at(monitor_list_line).inputs[i].sub_panel;
 
+        //if ((temp_point_type == COIL_REG) ||
+        //    (temp_point_type == DIS_INPUT_REG) ||
+        //    (temp_point_type == INPUT_REG) ||
+        //    (temp_point_type == MB_REG) ||
+        //    (temp_point_type == BAC_AV) ||
+        //    (temp_point_type == BAC_AI) ||
+        //    (temp_point_type == BAC_AO) ||
+        //    (temp_point_type == BAC_DO))
+        //{
+        //    temp_point.number = temp_point.number - 1;
+        //}
+
+        //if ((temp_point_type == BAC_AV) ||
+        //    (temp_point_type == BAC_AI) ||
+        //    (temp_point_type == BAC_AO) ||
+        //    (temp_point_type == BAC_DO))
+        //{
+        //    temp_point.number = temp_point.number - 1;
+        //}
+
+
 		memset(q,0,30);
 		pointtotext(q,&temp_point);
 		temppoint = q;
 		char buf[100];
 		memset(buf,0,100);
-		if((m_monitor_data.at(monitor_list_line).inputs[i].panel == Station_NUM) && (m_monitor_data.at(monitor_list_line).inputs[i].sub_panel == Station_NUM))
+        //2018 01 26 
+		//if((m_monitor_data.at(monitor_list_line).inputs[i].panel == Station_NUM) && (m_monitor_data.at(monitor_list_line).inputs[i].sub_panel == Station_NUM))
+        if (((m_monitor_data.at(monitor_list_line).inputs[i].panel == Station_NUM) && (m_monitor_data.at(monitor_list_line).inputs[i].sub_panel == Station_NUM)) ||
+            ((m_monitor_data.at(monitor_list_line).inputs[i].panel == Station_NUM) && (m_monitor_data.at(monitor_list_line).inputs[i].sub_panel == 0)))
 		{
 			char *temp_label =NULL;
 			byte point_type,var_type;
@@ -418,28 +444,33 @@ void CBacnetMonitor::Set_Input_Range_And_count()
 		byte temp_panel = m_monitor_data.at(monitor_list_line).inputs[i].panel;
 		byte temp_point_type = m_monitor_data.at(monitor_list_line).inputs[i].point_type;
 		byte temp_number = 0;
+
 		if(m_monitor_data.at(monitor_list_line).inputs[i].number > 0)
 			temp_number =  m_monitor_data.at(monitor_list_line).inputs[i].number ;//- 1;
 
 		unsigned temp_network = m_monitor_data.at(monitor_list_line).inputs[i].network;
-		if((temp_panel == 0) || (temp_sub_panel == 0))
+
+        char and_pointtype = temp_point_type & 0x1F;
+        //2018 01 26 fandu subpanel 可以为0  为0 代表访问本身的. 
+		//if((temp_panel == 0) || (temp_sub_panel == 0))
+        if ((temp_panel == 0))
 			continue;
 
-		//如果不是，就说明是远程的点;
-		if((temp_sub_panel!=Station_NUM) || (temp_panel != Station_NUM))
-		{
-			temp_input_count ++;
-			temp_analog_count ++;
-			temp_monitor_data_analog.inputs[temp_analog_count - 1].panel =  temp_panel;
-			temp_monitor_data_analog.inputs[temp_analog_count - 1].point_type = temp_point_type;
-			temp_monitor_data_analog.inputs[temp_analog_count - 1].number = temp_number ;
-			temp_monitor_data_analog.inputs[temp_analog_count - 1].network = temp_network;
-			temp_monitor_data_analog.inputs[temp_analog_count - 1].sub_panel = temp_sub_panel;
-			temp_monitor_data_analog.range[temp_analog_count - 1] = 0;
-			continue;
-		}
+		//如果不是，就说明是远程的点; //2018 01 26 开始要支持monitor 加远程的点;
+		//if((temp_sub_panel!=Station_NUM) || (temp_panel != Station_NUM))
+		//{
+		//	temp_input_count ++;
+		//	temp_analog_count ++;
+		//	temp_monitor_data_analog.inputs[temp_analog_count - 1].panel =  temp_panel;
+		//	temp_monitor_data_analog.inputs[temp_analog_count - 1].point_type = temp_point_type;
+		//	temp_monitor_data_analog.inputs[temp_analog_count - 1].number = temp_number ;
+		//	temp_monitor_data_analog.inputs[temp_analog_count - 1].network = temp_network;
+		//	temp_monitor_data_analog.inputs[temp_analog_count - 1].sub_panel = temp_sub_panel;
+		//	temp_monitor_data_analog.range[temp_analog_count - 1] = 0;
+		//	continue;
+		//}
 
-		if( temp_point_type == ENUM_OUT + 1)
+		if(and_pointtype == ENUM_OUT + 1)
 		{
 			temp_input_count ++;
 			if(m_Output_data.at(temp_number).digital_analog == 1)
@@ -463,7 +494,7 @@ void CBacnetMonitor::Set_Input_Range_And_count()
 			}
 				temp_monitor_data_analog.range[temp_analog_count - 1] = m_Output_data.at(temp_number).range;
 		}
-		else if(temp_point_type == ENUM_IN + 1)
+		else if(and_pointtype == ENUM_IN + 1)
 		{
 			temp_input_count++;
 			if(m_Input_data.at(temp_number).digital_analog == 1)
@@ -486,7 +517,7 @@ void CBacnetMonitor::Set_Input_Range_And_count()
 			}
 			temp_monitor_data_analog.range[temp_analog_count - 1] = m_Input_data.at(temp_number).range;
 		}
-		else if(temp_point_type == ENUM_VAR + 1)
+		else if(and_pointtype == ENUM_VAR + 1)
 		{
 			temp_input_count++;
 			if(m_Variable_data.at(temp_number).digital_analog == 1)
@@ -508,7 +539,46 @@ void CBacnetMonitor::Set_Input_Range_And_count()
 				temp_monitor_data_digital.inputs[temp_digital_count - 1].sub_panel = temp_sub_panel;
 			}
 			temp_monitor_data_analog.range[temp_analog_count - 1] = m_Variable_data.at(temp_number).range;
-		}
+        }
+        else if ((and_pointtype == BAC_AV + 1) ||
+                 (and_pointtype == BAC_AI + 1) ||
+                 (and_pointtype == BAC_AO + 1) )
+        {
+            temp_input_count++;
+            temp_analog_count++;
+            temp_monitor_data_analog.inputs[temp_analog_count - 1].panel = temp_panel;
+            temp_monitor_data_analog.inputs[temp_analog_count - 1].point_type = temp_point_type;
+            temp_monitor_data_analog.inputs[temp_analog_count - 1].number = temp_number;
+            temp_monitor_data_analog.inputs[temp_analog_count - 1].network = temp_network;
+            temp_monitor_data_analog.inputs[temp_analog_count - 1].sub_panel = temp_sub_panel;
+
+            temp_monitor_data_analog.range[temp_analog_count - 1] = 0; //不知道AV 的单位
+        }
+        else if (and_pointtype == BAC_DO + 1)
+        {
+            temp_input_count++;
+            temp_digital_count++;
+            temp_monitor_data_digital.inputs[temp_digital_count - 1].panel = temp_panel;
+            temp_monitor_data_digital.inputs[temp_digital_count - 1].point_type = temp_point_type;
+            temp_monitor_data_digital.inputs[temp_digital_count - 1].number = temp_number;
+            temp_monitor_data_digital.inputs[temp_digital_count - 1].network = temp_network;
+            temp_monitor_data_digital.inputs[temp_digital_count - 1].sub_panel = temp_sub_panel;
+        }
+        else if((and_pointtype == COIL_REG + 1) ||
+            (and_pointtype == DIS_INPUT_REG + 1) ||
+            (and_pointtype == INPUT_REG + 1) ||
+            (and_pointtype == MB_REG + 1))
+        {
+            temp_input_count++;
+            temp_analog_count++;
+            temp_monitor_data_analog.inputs[temp_analog_count - 1].panel = temp_panel;
+            temp_monitor_data_analog.inputs[temp_analog_count - 1].point_type = temp_point_type;
+            temp_monitor_data_analog.inputs[temp_analog_count - 1].number = temp_number;
+            temp_monitor_data_analog.inputs[temp_analog_count - 1].network = temp_network;
+            temp_monitor_data_analog.inputs[temp_analog_count - 1].sub_panel = temp_sub_panel;
+
+            temp_monitor_data_analog.range[temp_analog_count - 1] = 0; //不知道AV 的单位
+        }
 
 	}
 	int test1 = sizeof(Point_Net);
@@ -565,8 +635,24 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
 	if(label!=NULL)
 	{
 		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].network = 1;//目前不知道network 怎么处理;
-		if(num_point > 0)
-			num_point = num_point - 1;
+        char temp_point = point_type & 0x1F;
+        if ((temp_point == COIL_REG) ||
+            (temp_point == DIS_INPUT_REG) ||
+            (temp_point == INPUT_REG) ||
+            (temp_point == MB_REG) ||
+            (temp_point == BAC_AV) ||
+            (temp_point == BAC_AI) ||
+            (temp_point == BAC_AO) ||
+            (temp_point == BAC_DO))
+        {
+            num_point = num_point;
+        }
+        else
+        {
+            if (num_point > 0)
+                num_point = num_point - 1;
+        }
+
 		//point type 存的时候加1  ,原始 out = 0，in = 1 ，var = 2; 存进去是 out = 1; in = 2, var = 3;
 		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].number = num_point;
 		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].panel = num_panel;
@@ -589,12 +675,12 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
 
 		for (int i=0 ; i< MAX_POINTS_IN_MONITOR;i++)
 		{
-			if((m_monitor_data[monitor_list_line].inputs[i].panel != m_monitor_data[monitor_list_line].inputs[i].sub_panel) ||
-				(m_monitor_data[monitor_list_line].inputs[i].panel != Station_NUM))
-			{
-				m_monitor_data[monitor_list_line].range[i] = 0;
-				continue;
-			}
+			//if((m_monitor_data[monitor_list_line].inputs[i].panel != m_monitor_data[monitor_list_line].inputs[i].sub_panel) ||
+			//	(m_monitor_data[monitor_list_line].inputs[i].panel != Station_NUM))
+			//{
+			//	m_monitor_data[monitor_list_line].range[i] = 0;
+			//	continue;
+			//}
 			switch(m_monitor_data[monitor_list_line].inputs[i].point_type)
 			{
 			case BAC_VAR + 1://Variable
@@ -615,6 +701,12 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
 						m_monitor_data[monitor_list_line].range[i] = m_Output_data.at(m_monitor_data[monitor_list_line].inputs[i].number).range;
 				}
 				break;
+            case BAC_AV + 1: //AV
+                {
+                if (m_monitor_data[monitor_list_line].inputs[i].number < BAC_VARIABLE_ITEM_COUNT)
+                    m_monitor_data[monitor_list_line].range[i] = 0; // range 不知道是啥 先赋值为0 ; 
+                }
+            break;
 			default:
 				m_monitor_data[monitor_list_line].range[i] = 0;
 				break;

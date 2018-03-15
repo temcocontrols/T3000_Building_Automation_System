@@ -67,6 +67,8 @@ public:
 	afx_msg void OnStnClickedEditIconPath2();
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	bool m_allow_change;
+    int horizontalDPI;
+    int verticalDPI;
 };
 
 const int CHANGE_AUTO_MANUAL = 1;

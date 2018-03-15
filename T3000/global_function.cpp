@@ -1077,8 +1077,8 @@ BOOL Post_Thread_Message(UINT MsgType,
     }
     if(!find_id)
         Change_Color_ID.push_back(CTRL_ID);
-    else
-        return FALSE;
+    //else
+    //    return FALSE;
 
     if(!PostThreadMessage(nThreadID,MY_WRITE_ONE,(WPARAM)My_Write_Struct,NULL))//post thread msg
     {
@@ -3573,6 +3573,9 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 			memcpy_s(Device_Basic_Setting.reg.sntp_server,30,my_temp_point,30);
 			my_temp_point = my_temp_point + 30;
 			Device_Basic_Setting.reg.zegbee_exsit = *(my_temp_point++);
+            Device_Basic_Setting.reg.LCD_Display = *(my_temp_point++);
+            Device_Basic_Setting.reg.flag_time_sync_pc = *(my_temp_point++);
+            Device_Basic_Setting.reg.time_sync_auto_manual = *(my_temp_point++);
 			return READ_SETTING_COMMAND;
 		}
 		break;
@@ -4108,7 +4111,7 @@ void Inial_Product_map()
 	product_map.insert(map<int,CString>::value_type(PM_T34AO,_T("T3-4AO")));
 	product_map.insert(map<int,CString>::value_type(PM_T36CT,_T("T3-6CT")));
 	product_map.insert(map<int,CString>::value_type(PM_MINIPANEL,_T("T3Controller")));
-	product_map.insert(map<int, CString>::value_type(PM_MINIPANEL_ARM, _T("T3Controller(ARM)")));
+	product_map.insert(map<int, CString>::value_type(PM_MINIPANEL_ARM, _T("T3Controller")));
 	product_map.insert(map<int,CString>::value_type(PM_PRESSURE,_T("Pressure Sensor")));
 	product_map.insert(map<int,CString>::value_type(PM_HUM_R,_T("HUM-R")));
 	product_map.insert(map<int,CString>::value_type(PM_T322AI,_T("T3-22I")));
@@ -4486,9 +4489,10 @@ bool Initial_bac(int comport,CString bind_local_ip)
     {
 #endif
 
-        //2017-12-20  杜帆修改  尝试绑定本地的通讯 UDP 47808 端口 ，若绑定失败就尝试其他端口;
+        //2017-12-20  杜帆修改  尝试绑定本地的通讯 UDP 47809 端口 ，若绑定失败就尝试其他端口;
+        //T3000 不在绑定47808端口了，改为绑定 47809以后得端口，为了 同时能使用其他bacnet软件.
         bool port_bind_results = false;
-        for (int i = 0;i < 3;i++)
+        for (int i = 1;i <= 3;i++)
         {
             if (bind_local_ip.IsEmpty())
             {
@@ -4951,7 +4955,22 @@ extern CString local_enthernet_ip;
 //socket dll.
 bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysocket)
 {
+    bool find_network =false;
+    for (int i = 0; i < g_Vector_Subnet.size(); i++)
+    {
+        if (strIPAdress.CompareNoCase(g_Vector_Subnet.at(i).StrIP) == 0)
+        {
+            find_network = true;
+            break;
+        }
+    }
 
+    if (find_network == false)
+    {
+        refresh_tree_status_immediately = true;
+        return false;
+    }
+    
     int nNetTimeout=3000;//1 second.
     WSADATA wsaData;
     WORD sockVersion = MAKEWORD(2, 2);
@@ -5005,7 +5024,7 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
     int bind_ret =	bind(mysocket, (struct sockaddr*)&servAddr, sizeof(servAddr));
     if(bind_ret != 0)
     {
-        DFTrace(_T("Local UDP port 47808 is not available."));
+        //DFTrace(_T("Local UDP port 47808 is not available."));
         //AfxMessageBox(_T("Local UDP port 47808 is not available."));
         return false;
     }
@@ -5729,13 +5748,23 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
         h_siBind.sin_family=AF_INET;
         h_siBind.sin_addr.s_addr =  inet_addr(local_network_ip);
         //h_siBind.sin_addr.s_addr=INADDR_ANY;
-        h_siBind.sin_port= htons(57619);
-        // h_siBind.sin_port=AF_INET;
-        //   ::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
-        if( -1 == bind(h_Broad,(SOCKADDR*)&h_siBind,sizeof(h_siBind)))//把网卡地址强行绑定到Socket
+        for (int i = 0; i < 5; i++)
         {
-            goto END_REFRESH_SCAN;
+            h_siBind.sin_port = htons(57619+i);
+            int ret_bind = 0;
+            ret_bind = bind(h_Broad, (SOCKADDR*)&h_siBind, sizeof(h_siBind));//把网卡地址强行绑定到Socket
+            if (ret_bind != 0)
+            {
+                TRACE(_T("scan bind port failed.\r\n"));
+                continue;
+            }
+            else
+            {
+                break;
+            }
         }
+
+
         int time_out=0;
         BOOL bTimeOut = FALSE;
         while(!bTimeOut)//!pScanner->m_bNetScanFinish)  // 超时结束
@@ -6733,6 +6762,28 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
 		else
 		{
 			char * temp_point = temp_buffer;
+
+            int original_panel = 0;
+            char * cacl_panel = temp_buffer;
+            memset(&Device_Basic_Setting, 0, sizeof(Str_Setting_Info));
+            cacl_panel = cacl_panel + BAC_INPUT_ITEM_COUNT*sizeof(Str_in_point)
+                + BAC_OUTPUT_ITEM_COUNT* sizeof(Str_out_point)
+                + BAC_VARIABLE_ITEM_COUNT* sizeof(Str_variable_point)
+                + BAC_PROGRAM_ITEM_COUNT* sizeof(Str_program_point)
+                + BAC_PID_COUNT * sizeof(Str_controller_point)
+                + BAC_SCREEN_COUNT * sizeof(Control_group_point)
+                + BAC_GRPHIC_LABEL_COUNT * sizeof(Str_label_point)
+                + BAC_USER_LOGIN_COUNT * sizeof(Str_userlogin_point)
+                + BAC_CUSTOMER_UNITS_COUNT * sizeof(Str_Units_element)
+                + BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT* sizeof(Str_table_point);
+            memcpy(&Device_Basic_Setting, cacl_panel, sizeof(Str_Setting_Info));
+
+            if ((Device_Basic_Setting.reg.panel_type == PM_MINIPANEL) ||
+                (Device_Basic_Setting.reg.panel_type == PM_MINIPANEL_ARM))
+            {
+                original_panel = Device_Basic_Setting.reg.panel_number;
+            }
+
 			for (int i=0; i<BAC_INPUT_ITEM_COUNT; i++)
 			{
 				memcpy(&m_Input_data.at(i),temp_point ,sizeof(Str_in_point));
@@ -6761,10 +6812,21 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
 			{
 				memcpy(&m_controller_data.at(i),temp_point,sizeof(Str_controller_point));
 				temp_point = temp_point + sizeof(Str_controller_point);
-				if((m_controller_data.at(i).input.panel != Station_NUM) && (m_controller_data.at(i).input.panel != 0))	 //在load prg 的时候 如果加载的panel != 自己的 就变成自己的
-					m_controller_data.at(i).input.panel = Station_NUM;
-				if((m_controller_data.at(i).setpoint.panel != Station_NUM) &&  (m_controller_data.at(i).setpoint.panel != 0) )	 //在load prg 的时候 如果加载的panel != 自己的 就变成自己的
-					m_controller_data.at(i).setpoint.panel = Station_NUM;
+
+                //fandu  20180130  原来panel 1 的  1.2.var3   加载至  panel 4  ,   要修改为4.2.var3.
+                if ((m_controller_data.at(i).input.panel == original_panel) && (original_panel != 0))
+                {
+                    m_controller_data.at(i).input.panel = Station_NUM;
+                }
+
+                if ((m_controller_data.at(i).setpoint.panel == original_panel) && (original_panel != 0))
+                {
+                    m_controller_data.at(i).setpoint.panel = Station_NUM;
+                }
+				//if((m_controller_data.at(i).input.panel != Station_NUM) && (m_controller_data.at(i).input.panel != 0))	 //在load prg 的时候 如果加载的panel != 自己的 就变成自己的
+				//	m_controller_data.at(i).input.panel = Station_NUM;
+				//if((m_controller_data.at(i).setpoint.panel != Station_NUM) &&  (m_controller_data.at(i).setpoint.panel != 0) )	 //在load prg 的时候 如果加载的panel != 自己的 就变成自己的
+				//	m_controller_data.at(i).setpoint.panel = Station_NUM;
 			}
 
 			for (int i=0; i<BAC_SCREEN_COUNT; i++)
@@ -6777,11 +6839,25 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
 			{
 				memcpy(&m_graphic_label_data.at(i),temp_point,sizeof(Str_label_point));
 				temp_point = temp_point + sizeof(Str_label_point);
-				if((m_graphic_label_data.at(i).reg.nMain_Panel != Station_NUM) && (m_graphic_label_data.at(i).reg.nMain_Panel != 0))
-				{
-					m_graphic_label_data.at(i).reg.nMain_Panel = Station_NUM;
-					m_graphic_label_data.at(i).reg.nSub_Panel = Station_NUM;
-				}
+
+                //fandu  20180130  原来panel 1 的  1.2.var3   加载至  panel 4  ,   要修改为4.2.var3.
+                if ((m_graphic_label_data.at(i).reg.nMain_Panel == original_panel) && (original_panel != 0))
+                {
+                    if ((m_graphic_label_data.at(i).reg.nMain_Panel == m_graphic_label_data.at(i).reg.nSub_Panel) &&
+                          m_graphic_label_data.at(i).reg.nMain_Panel != 0)
+                    {
+                        m_graphic_label_data.at(i).reg.nMain_Panel = Station_NUM;
+                        m_graphic_label_data.at(i).reg.nSub_Panel = 0;
+                    }
+                    else
+                        m_graphic_label_data.at(i).reg.nMain_Panel = Station_NUM;
+                }
+
+				//if((m_graphic_label_data.at(i).reg.nMain_Panel != Station_NUM) && (m_graphic_label_data.at(i).reg.nMain_Panel != 0))
+				//{
+				//	m_graphic_label_data.at(i).reg.nMain_Panel = Station_NUM;
+				//	m_graphic_label_data.at(i).reg.nSub_Panel = Station_NUM;
+				//}
 			}
 
 			for (int i=0; i<BAC_USER_LOGIN_COUNT; i++)
@@ -6824,14 +6900,26 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
 				temp_point = temp_point + sizeof(Str_monitor_point);
 				for (int x=0;x<MAX_POINTS_IN_MONITOR;x++)
 				{
-					if(m_monitor_data.at(i).inputs[x].panel != Station_NUM)	 //在load prg 的时候 如果加载的panel != 自己的 就变成自己的
-					{
-						if((m_monitor_data.at(i).inputs[x].panel == m_monitor_data.at(i).inputs[x].sub_panel) && (m_monitor_data.at(i).inputs[x].panel != 0))
-						{
-							m_monitor_data.at(i).inputs[x].sub_panel = Station_NUM;
-							m_monitor_data.at(i).inputs[x].panel = Station_NUM;
-						}
-					}
+                    //fandu  20180130  原来panel 1 的  1.2.var3   加载至  panel 4  ,   要修改为4.2.var3.
+                    if ((m_monitor_data.at(i).inputs[x].panel == original_panel) && (original_panel != 0))
+                    {
+                        if ((m_monitor_data.at(i).inputs[x].panel == m_monitor_data.at(i).inputs[x].sub_panel) &&
+                            m_monitor_data.at(i).inputs[x].panel != 0)
+                        {
+                            m_monitor_data.at(i).inputs[x].panel = Station_NUM;
+                            m_monitor_data.at(i).inputs[x].sub_panel = 0;
+                        }
+                        else
+                            m_monitor_data.at(i).inputs[x].panel = Station_NUM;
+                    }
+					//if(m_monitor_data.at(i).inputs[x].panel != Station_NUM)	 //在load prg 的时候 如果加载的panel != 自己的 就变成自己的
+					//{
+					//	if((m_monitor_data.at(i).inputs[x].panel == m_monitor_data.at(i).inputs[x].sub_panel) && (m_monitor_data.at(i).inputs[x].panel != 0))
+					//	{
+					//		m_monitor_data.at(i).inputs[x].sub_panel = Station_NUM;
+					//		m_monitor_data.at(i).inputs[x].panel = Station_NUM;
+					//	}
+					//}
 				}
 			}
 
