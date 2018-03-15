@@ -348,7 +348,7 @@ void CT3ControllerProgram::Initial_Product()
 	product_map.insert(map<int, CString>::value_type(PM_T34AO, _T("T3-4AO")));
 	product_map.insert(map<int, CString>::value_type(PM_T36CT, _T("T3-6CT")));
 	product_map.insert(map<int, CString>::value_type(PM_MINIPANEL, _T("T3Controller")));
-	product_map.insert(map<int, CString>::value_type(PM_MINIPANEL_ARM, _T("T3Controller(ARM)")));
+	product_map.insert(map<int, CString>::value_type(PM_MINIPANEL_ARM, _T("T3Controller")));
 	product_map.insert(map<int, CString>::value_type(PM_PRESSURE, _T("Pressure Sensor")));
 	product_map.insert(map<int, CString>::value_type(PM_HUM_R, _T("HUM-R")));
 	product_map.insert(map<int, CString>::value_type(PM_T322AI, _T("T3-22I")));

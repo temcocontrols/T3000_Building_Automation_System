@@ -47,16 +47,18 @@ END_MESSAGE_MAP()
 #ifdef _DEBUG
 void CTStatOutputView::AssertValid() const
 {
-	CFormView::AssertValid();
+	//CFormView::AssertValid();
 }
 
 #ifndef _WIN32_WCE
 void CTStatOutputView::Dump(CDumpContext& dc) const
 {
-	CFormView::Dump(dc);
+	//CFormView::Dump(dc);
 }
 #endif
 #endif //_DEBUG
+
+
 
 LRESULT  CTStatOutputView::OutputMessageCallBack(WPARAM wParam, LPARAM lParam)
 {
@@ -940,9 +942,10 @@ void   CTStatOutputView::Fresh_One_Item(int row){
     m_output_list.SetItemText(row,TStat_Signal_Type ,m_tstat_output_data.at(row).Signal_Type.StrValue);
 }
 
-void CTStatOutputView::Fresh(){
-Initial_ListFor_Tstat();
- PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
+void CTStatOutputView::Fresh()
+{
+    Initial_ListFor_Tstat();
+    PostMessage(WM_REFRESH_BAC_OUTPUT_LIST, NULL, NULL);
 }
 
 void CTStatOutputView::OnInitialUpdate()

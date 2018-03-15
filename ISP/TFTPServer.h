@@ -90,9 +90,8 @@ public:
 	void SetDHCP_Data();
 	bool IP_is_Local();
 	bool Send_Tftp_File();
-
 	BOOL StartServer_Old_Protocol();
-	 
+    void  TFTPMessage(LPTSTR sMessage);
 
 	void GetIPMaskGetWay();
 	UINT RefreshNetWorkDeviceListByUDPFunc();

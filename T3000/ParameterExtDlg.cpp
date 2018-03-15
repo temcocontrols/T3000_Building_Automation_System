@@ -34,6 +34,7 @@ BEGIN_MESSAGE_MAP(CParameterExtDlg, CDialogEx)
     ON_EN_KILLFOCUS(IDC_EDIT_PARA_EXT_DELAY, &CParameterExtDlg::OnEnKillfocusEditParaExtDelay)
     ON_EN_KILLFOCUS(IDC_EDIT_PARA_EXT_MIN_PWM, &CParameterExtDlg::OnEnKillfocusEditParaExtMinPwm)
     ON_BN_CLICKED(IDC_BUTTON_PARA_EXT_OK, &CParameterExtDlg::OnBnClickedButtonParaExtOk)
+    ON_EN_KILLFOCUS(IDC_EDIT_PARA_EXT_TIME_REMAINING, &CParameterExtDlg::OnEnKillfocusEditParaExtTimeRemaining)
 END_MESSAGE_MAP()
 
 
@@ -48,9 +49,9 @@ BOOL CParameterExtDlg::OnInitDialog()
     CString temp_time_left;
     CString temp_min_pwm;
 
-    temp_delay_time.Format(_T("%d"), product_register_value[801]);
-    temp_time_left.Format(_T("%d"),  product_register_value[802]);
-    temp_min_pwm.Format(_T("%d"),    product_register_value[803]);
+    temp_delay_time.Format(_T("%d"), product_register_value[804]);
+    temp_time_left.Format(_T("%d"),  product_register_value[805]);
+    temp_min_pwm.Format(_T("%d"),    product_register_value[806]);
 
     // TODO:  在此添加额外的初始化
     m_edit_delay_time.SetWindowTextW(temp_delay_time);
@@ -76,7 +77,16 @@ BOOL CParameterExtDlg::OnInitDialog()
 BOOL CParameterExtDlg::PreTranslateMessage(MSG* pMsg)
 {
     // TODO: 在此添加专用代码和/或调用基类
-
+    if (pMsg->message == WM_KEYDOWN)
+    {
+        if (pMsg->wParam == VK_RETURN)
+        {
+            CWnd *temp_focus = GetFocus();	//Maurice require ,click enter and the cursor still in this edit or combobox.
+            GetDlgItem(IDC_BUTTON_PARA_EXT_OK)->SetFocus();
+            temp_focus->SetFocus();
+            return 1;
+        }
+    }
     return CDialogEx::PreTranslateMessage(pMsg);
 }
 
@@ -90,17 +100,26 @@ void CParameterExtDlg::OnEnKillfocusEditParaExtDelay()
     CString strText;
     m_edit_delay_time.GetWindowText(strText);
     int nValue = _wtoi(strText);
-    if (nValue < 0 || nValue > 255)
+    if (nValue < 0 || nValue > 65535)
     {
-        AfxMessageBox(_T("Heating Cooling  To  Coasting  Delay Time Must between 0 and 255"));
+        AfxMessageBox(_T("Relay1 Open Minimum Time (s) Must between 0 and 65535"));
         return;
     }
 
-    if ((short)product_register_value[801] == nValue)	//Add this to judge weather this value need to change.
+    if ((short)product_register_value[804] == nValue)	//Add this to judge weather this value need to change.
         return;
 
-    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, 801, nValue,
-        (short)product_register_value[801], this->m_hWnd, IDC_ESETPOINTHI, _T("Heating Cooling  To  Coasting  Delay Time"));
+    if (write_one(g_tstat_id, 804, short(nValue)) > 0)
+    {
+        product_register_value[804] = nValue;
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Set Relay1 Open Minimum Time Success"));
+    }
+    else
+    {
+        CString temp_cs;
+        temp_cs.Format(_T("%d"), product_register_value[804]);
+        m_edit_delay_time.SetWindowTextW(temp_cs);
+    }
 
 }
 
@@ -117,18 +136,26 @@ void CParameterExtDlg::OnEnKillfocusEditParaExtMinPwm()
     CString strText;
     m_edit_min_pwm.GetWindowText(strText);
     int nValue = _wtoi(strText);
-    if (nValue < 0 || nValue > 100)
+    if (nValue < 0 || nValue > 65535)
     {
-        AfxMessageBox(_T("Heating Cooling  To  Coasting   Minimum PWM Must between 0 and 100"));
+        AfxMessageBox(_T("Relay2 Open \nMinimum Time (s) Must between 0 and 65535"));
         return;
     }
 
-    if ((short)product_register_value[803] == nValue)	//Add this to judge weather this value need to change.
+    if ((short)product_register_value[806] == nValue)	//Add this to judge weather this value need to change.
         return;
 
-    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, 803, nValue,
-        (short)product_register_value[803], this->m_hWnd, IDC_ESETPOINTHI, _T("Heating Cooling  To  Coasting  Delay Time"));
-
+    if (write_one(g_tstat_id, 806, short(nValue)) > 0)
+    {
+        product_register_value[806] = nValue;
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Set Relay3 Open Minimum Time Success"));
+    }
+    else
+    {
+        CString temp_cs;
+        temp_cs.Format(_T("%d"), product_register_value[806]);
+        m_edit_min_pwm.SetWindowTextW(temp_cs);
+    }
 }
 
 
@@ -136,4 +163,38 @@ void CParameterExtDlg::OnBnClickedButtonParaExtOk()
 {
     // TODO: 在此添加控件通知处理程序代码
     PostMessage(WM_CLOSE, NULL, NULL);
+}
+
+
+void CParameterExtDlg::OnEnKillfocusEditParaExtTimeRemaining()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    if (g_ParamLevel == 1)
+        return;
+
+    CString strText;
+    m_edit_time_remaining.GetWindowText(strText);
+    int nValue = _wtoi(strText);
+    if (nValue < 0 || nValue > 65535)
+    {
+        AfxMessageBox(_T("Relay2 Open \nMinimum Time (s) Must between 0 and 65535"));
+        return;
+    }
+
+    if ((short)product_register_value[805] == nValue)	//Add this to judge weather this value need to change.
+        return;
+
+    if (write_one(g_tstat_id, 805, short(nValue)) > 0)
+    {
+        product_register_value[805] = nValue;
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Set Relay2 Open Minimum Time Success"));
+    }
+    else
+    {
+        CString temp_cs;
+        temp_cs.Format(_T("%d"), product_register_value[805]);
+        m_edit_min_pwm.SetWindowTextW(temp_cs);
+    }
+
+
 }

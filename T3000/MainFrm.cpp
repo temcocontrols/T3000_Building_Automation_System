@@ -264,6 +264,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
     ON_MESSAGE(MY_RESUME_DATA, AllWriteMessageCallBack)
     ON_MESSAGE(MY_RX_TX_COUNT, Refresh_RX_TX_Count)
     ON_MESSAGE(MY_RETRY_MESSAGE, Retry_Connect_Message)
+    ON_MESSAGE(MY_RETRY_IP_CHANGE_MESSAGE, ReConnect_Message)
     ON_MESSAGE(WM_DELETE_NEW_MESSAGE_DLG, Delete_Write_New_Dlg)
     ON_MESSAGE(WM_HOTKEY, &CMainFrame::OnHotKey)
     ON_WM_CREATE()
@@ -301,6 +302,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
     ON_COMMAND(ID_CONTROL_MAIN, &CMainFrame::OnControlMain)
     ON_COMMAND(ID_CONTROL_INPUTS, &CMainFrame::OnControlInputs)
     ON_COMMAND(ID_CONTROL_PROGRAMS, &CMainFrame::OnControlPrograms)
+    ON_COMMAND(ID_CONTROL_PANEL, &CMainFrame::OnControlPanel)
     ON_COMMAND(ID_CONTROL_OUTPUTS, &CMainFrame::OnControlOutputs)
     ON_COMMAND(ID_CONTROL_VARIABLES, &CMainFrame::OnControlVariables)
     ON_COMMAND(ID_CONTROL_WEEKLY, &CMainFrame::OnControlWeekly)
@@ -347,6 +349,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
     ON_UPDATE_COMMAND_UI(ID_CONTROL_ANNUALROUTINES, &CMainFrame::OnUpdateControlAnnualroutines)
     ON_UPDATE_COMMAND_UI(ID_CONTROL_MONITORS, &CMainFrame::OnUpdateControlMonitors)
     ON_UPDATE_COMMAND_UI(ID_CONTROL_ALARM_LOG, &CMainFrame::OnUpdateControlAlarmLog)
+    ON_UPDATE_COMMAND_UI(ID_CONTROL_PANEL, &CMainFrame::OnUpdateControlPanel)
     ON_UPDATE_COMMAND_UI(ID_CONTROL_TSTAT, &CMainFrame::OnUpdateControlTstat)
     ON_UPDATE_COMMAND_UI(ID_CONTROL_SETTINGS, &CMainFrame::OnUpdateControlSettings)
     ON_COMMAND(ID_TOOL_DETECTONLINEPRODUCTS, &CMainFrame::OnToolDetectonlineproducts)
@@ -4758,7 +4761,7 @@ read_end_thread:
 	 hwait_read_thread = NULL;
 	 Mession_ret.Format(_T("Read data Timeout,Please Try again."));
 	 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
-	 AfxMessageBox(_T("Read data Timeout,Please Try again."));
+	 //AfxMessageBox(_T("Read data Timeout,Please Try again."));
 	 return 1;
 
 }
@@ -5346,6 +5349,23 @@ LRESULT CMainFrame::Retry_Connect_Message(WPARAM wParam, LPARAM lParam)
 	DoConnectToANode( hTreeItem_retry );
 		hretryThread = NULL;
 	return 0;
+}
+
+LRESULT CMainFrame::ReConnect_Message(WPARAM wParam, LPARAM lParam)
+{
+    for (int i = 0; i < m_product.size(); i++)
+    {
+        if (g_selected_serialnumber == m_product.at(i).serial_number)
+        {
+            hTreeItem_retry = m_product.at(i).product_item;
+            break;
+        }
+    }
+
+
+    DoConnectToANode(hTreeItem_retry);
+    hretryThread = NULL;
+    return 0;
 }
 
 
@@ -7846,7 +7866,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 
 do_connect_success:
-		hTreeItem_retry = NULL;
+		//hTreeItem_retry = NULL;
 		g_llRxCount = g_llRxCount + 4;
 		Sleep(1);
 		return;
@@ -7895,9 +7915,38 @@ void CMainFrame::GetAllTreeItems( HTREEITEM hItem, vector<HTREEITEM>& szTreeItem
         }
     }
 }
+
+
+void CMainFrame::CheckIPDuplicate()
+{
+    bool find_ip_conflict = false;
+    //探索重复IP;  m_refresh_net_device_data
+    for (int i = 0; i < m_refresh_net_device_data.size(); i++)
+    {
+        if (m_refresh_net_device_data.size() <= 1)
+            break;
+        if (m_refresh_net_device_data.at(i).parent_serial_number != 0)
+            continue;
+        for (int j = i + 1; j < m_refresh_net_device_data.size(); j++)
+        {
+            if (m_refresh_net_device_data.at(j).parent_serial_number != 0)
+                continue;
+
+            if (m_refresh_net_device_data.at(i).ip_address.CompareNoCase(m_refresh_net_device_data.at(j).ip_address) == 0)
+            {
+                find_ip_conflict = true;
+                /*device_ip_conflict_1*/ device_id_data_1 = m_refresh_net_device_data.at(i);
+                /*device_ip_conflict_2*/ device_id_data_2 = m_refresh_net_device_data.at(j);
+                edit_confilct_mode = true;
+                ::PostMessageW(MainFram_hwd, WM_HADNLE_DUPLICATE_ID, CONFILIC_IPADDRESS, NULL);
+                return;
+            }
+        }
+    }
+}
+
 void CMainFrame::CheckDuplicate()
 {
-
 	sort(m_refresh_net_device_data.begin(),m_refresh_net_device_data.end(),sort_by_minipanel_pid	);
 
 	vector <refresh_net_device> temp_device;
@@ -7939,13 +7988,12 @@ void CMainFrame::CheckDuplicate()
 
 			edit_confilct_mode = true;
 
-			::PostMessageW(MainFram_hwd,WM_HADNLE_DUPLICATE_ID,1,NULL);
+			::PostMessageW(MainFram_hwd,WM_HADNLE_DUPLICATE_ID, CONFILIC_PANEL_ID,NULL);
 			return;
 		}
-
-
-
 	}
+
+
 	if(!edit_confilct_mode)
 	{
 		int m_datasize = m_refresh_net_device_data.size(); 
@@ -7968,7 +8016,7 @@ void CMainFrame::CheckDuplicate()
 							find_confilicat_id = true;
 							edit_confilct_mode = true;
 
-							::PostMessageW(MainFram_hwd,WM_HADNLE_DUPLICATE_ID,NULL,NULL);
+							::PostMessageW(MainFram_hwd,WM_HADNLE_DUPLICATE_ID, CONFILIC_SUBID,NULL);
 							break;
 						}
 					}
@@ -8466,8 +8514,10 @@ end_condition :
 		}
         //将回复 协议不是1 的 网络设备  状态设置为 offline. 
 		strUpdateSql.Format(_T("update ALL_NODE set Online_Status = 0 where Serial_ID not in (%s) and protocol = 1"), composite_serial);
-		strUpdateSql.Format(_T("update ALL_NODE set Online_Status = 1 where Serial_ID in (%s) and protocol = 1"), composite_serial);
 		SqliteDBBuilding.execDML((UTF8MBSTR)strUpdateSql);
+
+        strUpdateSql.Format(_T("update ALL_NODE set Online_Status = 1 where Serial_ID in (%s) and protocol = 1"), composite_serial);
+        SqliteDBBuilding.execDML((UTF8MBSTR)strUpdateSql);
 	}
 
     SqliteDBBuilding.closedb();
@@ -8583,18 +8633,12 @@ LRESULT  CMainFrame::HandleDuplicateID(WPARAM wParam, LPARAM lParam)
 	int temp_type =  GetCommunicationType();
 
 	b_pause_refresh_tree = true;
-#ifndef DEBUG
-    if (duplicate_mode == 0)
-    {
-        CDuplicateIdDetected Dlg(0, NULL);
-        Dlg.DoModal();
-    }
-    else
-    {
-        CDuplicateIdDetected Dlg(1, NULL);
-        Dlg.DoModal();
-    }
-#endif // DEBUG
+//#ifndef DEBUG
+
+    CDuplicateIdDetected Dlg(duplicate_mode, NULL);
+    Dlg.DoModal();
+
+//#endif // DEBUG
 
 
 
@@ -8696,7 +8740,7 @@ UINT _FreshTreeView(LPVOID pParam )
     CString g_strT3000LogString;
     CMainFrame* pMain = (CMainFrame*)pParam;
     int int_refresh_com = 0;
-    
+    refresh_tree_status_immediately = true;
     while(1)
     {
 #if 0
@@ -8775,15 +8819,15 @@ UINT _FreshTreeView(LPVOID pParam )
 			continue;
 		}
 
-        while(1)
-        {
-            if(no_mouse_keyboard_event_enable_refresh)//判断如果一段时间无人操作，才刷新tree，要不然串口资源会经常冲突;
-            {
-                break;
-            }
+        //while(1)
+        //{
+        //    if(no_mouse_keyboard_event_enable_refresh)//判断如果一段时间无人操作，才刷新tree，要不然串口资源会经常冲突;
+        //    {
+        //        break;
+        //    }
 
-            Sleep(100);
-        }
+        //    Sleep(100);
+        //}
 
         WaitForSingleObject(Read_Mutex,INFINITE);//Add by Fance .
         if(b_pause_refresh_tree)
@@ -8804,31 +8848,39 @@ UINT _FreshTreeView(LPVOID pParam )
             ReleaseMutex(Read_Mutex);
             continue;
         }
-
-		pMain->CheckDuplicate();
-
+        if(edit_confilct_mode == false)
+		    pMain->CheckDuplicate();
+        if (edit_confilct_mode == false)
+            pMain->CheckIPDuplicate();
         pMain->DoFreshAll();
         ReleaseMutex(Read_Mutex);//Add by Fance .
         int_refresh_com = (++int_refresh_com) %4;
 
-		bool find_same_serial_number = false;
-		for (int z=0;z<pMain->m_product.size();z++)
-		{
-			for (int y=z+1;y<pMain->m_product.size();y++)
-			{
-				if(pMain->m_product.at(z).serial_number == pMain->m_product.at(y).serial_number)
-				{
-					find_same_serial_number = true;
-					break;
-				}
-			}
-		}
+        try {
+            bool find_same_serial_number = false;
+            for (int z = 0;z<pMain->m_product.size();z++)
+            {
+                for (int y = z + 1;y<pMain->m_product.size();y++)
+                {
+                    if (pMain->m_product.at(z).serial_number == pMain->m_product.at(y).serial_number)
+                    {
+                        find_same_serial_number = true;
+                        break;
+                    }
+                }
+            }
 
-		if(find_same_serial_number)
-		{
-			pMain->DeleteConflictInDB();
-		}
+            if (find_same_serial_number)
+            {
+                pMain->DeleteConflictInDB();
+            }
+        }
+        catch (_com_error *e)
+        {
+            Sleep(1);
+        }
 		
+
     }
 
     return 1;
@@ -9363,6 +9415,8 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                 }
                 else
                 {
+                    if(My_Write_Struct->address < 1024)
+                        product_register_value[My_Write_Struct->address] = My_Write_Struct->new_value;
                     ::PostMessage(My_Write_Struct->hwnd,MY_RESUME_DATA,(WPARAM)WRITE_SUCCESS,(LPARAM)My_Write_Struct);
                 }
             }
@@ -10002,6 +10056,7 @@ void CMainFrame::OnControlMain()
 
 void CMainFrame::OnControlInputs()
 {
+    g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
     if(  (g_protocol == PROTOCOL_BACNET_IP) || 
 		 (g_protocol == MODBUS_BACNET_MSTP) || 
 		 (g_protocol == PROTOCOL_BIP_TO_MSTP)||
@@ -10135,9 +10190,15 @@ void CMainFrame::OnControlInputs()
 		global_interface = BAC_IN;
 }
 
+void CMainFrame::OnControlPanel()
+{
+    bacnet_view_number = TYPE_PANEL;
+    HideBacnetWindow();
+}
 
 void CMainFrame::OnControlPrograms()
 {
+    g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
     if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
     {
         if((m_user_level ==	LOGIN_SUCCESS_GRAPHIC_MODE) ||
@@ -10194,6 +10255,7 @@ void CMainFrame::OnControlPrograms()
 
 void CMainFrame::OnControlOutputs()
 {
+    g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
 	// new_device_support_mini_ui  主要是为了支持 旧版本的T3进入以前的界面;
     if((g_protocol == PROTOCOL_BACNET_IP) || 
 		 (g_protocol == MODBUS_BACNET_MSTP) || 
@@ -10324,7 +10386,7 @@ void CMainFrame::OnControlOutputs()
 
 void CMainFrame::OnControlVariables()
 {
-    
+    g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
     if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
     {
         if((m_user_level ==	LOGIN_SUCCESS_GRAPHIC_MODE) ||
@@ -10382,7 +10444,7 @@ void CMainFrame::OnControlVariables()
 #include "NewTstatSchedulesDlg.h"
 void CMainFrame::OnControlWeekly()
 {
-    
+    g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
     if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
     {
         if((m_user_level !=	LOGIN_SUCCESS_ROUTINE_MODE) &&
@@ -10457,6 +10519,7 @@ void CMainFrame::OnControlWeekly()
 
 void CMainFrame::OnControlAnnualroutines()
 { 
+    g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
     if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
     {
         if((m_user_level !=	LOGIN_SUCCESS_ROUTINE_MODE) &&
@@ -10521,7 +10584,7 @@ void CMainFrame::OnControlAnnualroutines()
 
 void CMainFrame::OnControlSettings()
 {
-    
+    g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
     if((g_protocol == PROTOCOL_BACNET_IP) || 
 		(g_protocol == PROTOCOL_BIP_TO_MSTP) || 
 		(g_protocol == MODBUS_BACNET_MSTP) ||
@@ -12197,6 +12260,25 @@ void CMainFrame::OnUpdateControlPrograms(CCmdUI *pCmdUI)
     pCmdUI->SetCheck(bacnet_view_number == TYPE_PROGRAM);
 }
 
+void CMainFrame::OnUpdateControlPanel(CCmdUI *pCmdUI)
+{
+    //  Add your command update UI handler code here
+    //static bool test_bool = true;
+    //if (test_bool)
+    //{
+    //    pCmdUI->Enable(FALSE);
+    //    test_bool = false;
+    //}
+    //else
+    //{
+    //    pCmdUI->Enable(true);
+    //    test_bool = true;
+    //}
+
+    pCmdUI->SetCheck(bacnet_view_number == TYPE_PANEL);
+}
+
+
 
 void CMainFrame::OnUpdateControlScreens(CCmdUI *pCmdUI)
 {
@@ -12383,6 +12465,10 @@ BOOL CMainFrame::OnToolTipNotify(UINT id,NMHDR *Pnmhdr,LRESULT *pResult)
             else if(pBtn->m_nID ==  ID_CONTROL_ALARM_LOG)
             {
                 pTTT->lpszText = _T("Alarms [ Alt-A ]\r\nCurrent and past alarm events");
+            }
+            else if (pBtn->m_nID == ID_CONTROL_PANEL)
+            {
+                pTTT->lpszText = _T("SubPanel [ Alt-E ]\r\nPanel and Sub panel");
             }
             else if(pBtn->m_nID ==  ID_CONTROL_TSTAT)
             {
@@ -12665,7 +12751,7 @@ void CMainFrame::Reset_Window_Pos()
 		if(ProgramEdit_Window)
 		{
 			if(ProgramEdit_Window->IsWindowVisible())
-				::SetWindowPos(ProgramEdit_Window->m_hWnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
+				::SetWindowPos(ProgramEdit_Window->m_hWnd, HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
 		}
 	}
 }

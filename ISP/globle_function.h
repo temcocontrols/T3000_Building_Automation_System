@@ -31,4 +31,5 @@ int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info,int Address)
 BOOL ReadLineFromHexFile(CFile& file, char* pBuffer);
 BOOL DoHEXCRC( TS_UC* szBuf, int nLen);
 BOOL Ping(const CString& strIP, CWnd* pWndEcho);
+void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken);
 #endif

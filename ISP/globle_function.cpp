@@ -911,3 +911,42 @@ BOOL Ping(const CString& strIP, CWnd* pWndEcho)
 	pPing = NULL;
 	return FALSE;
 }
+
+
+//This function coded by Fance,used to split the cstring to each part.
+void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken)
+{
+    CString sTempSource, sTempSplitted;
+
+    sTempSource = sSource;
+
+    int nPos = sTempSource.Find(sToken);
+
+    //--if there are no token in the string, then add itself and return.
+    if (nPos == -1)
+        saArray.Add(sTempSource);
+    else
+    {
+        while (sTempSource.GetLength() > 0)
+        {
+            nPos = sTempSource.Find(sToken);
+            if (nPos == -1)
+            {
+                saArray.Add(sTempSource.Trim());
+                break;
+            }
+            else if (nPos == 0)
+            {
+                sTempSource = sTempSource.Mid(sToken.GetLength(), sTempSource.GetLength());
+                continue;
+            }
+            else
+            {
+                sTempSplitted = sTempSource.Mid(0, nPos);
+                saArray.Add(sTempSplitted.Trim());
+                sTempSource = sTempSource.Mid(nPos + sToken.GetLength(), sTempSource.GetLength());
+            }
+        }
+    }
+
+}

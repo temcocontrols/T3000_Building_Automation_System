@@ -65,7 +65,7 @@ BOOL CDebugWindow::OnInitDialog()
 		MYFUNC    fun    =    NULL;      //取¨?得Ì?SetLayeredWindowAttributes函¡¥数ºy指?针?     
 		fun=(MYFUNC)GetProcAddress(hInst,    "SetLayeredWindowAttributes");      
 		if(fun)
-			fun(this->GetSafeHwnd(),0,188,LWA_ALPHA);   //0,1,2,3,4,   
+			fun(this->GetSafeHwnd(),0,255,LWA_ALPHA);   //0,1,2,3,4,   
 		 FreeLibrary(hInst); 
 	} 
 	h_debug_window = this->m_hWnd;
@@ -176,8 +176,8 @@ void CDebugWindow::OnSize(UINT nType, int cx, int cy)
 	CRect rect;
 	this->GetClientRect(&rect);
 	CPoint pot = rect.TopLeft();
-	m_debug_listbox.SetWindowPos(NULL, pot.x+10, pot.y+60, 
-		rect.Width()- 45, rect.Height() - 80, NULL);
+	m_debug_listbox.SetWindowPos(NULL, pot.x+10, pot.y+130, 
+		rect.Width()- 30, rect.Height() - 130, NULL);
 }
 
 

@@ -14,6 +14,8 @@
 #include "MainFrm.h"
 #include "../SQLiteDriver/CppSQLite3.h"
 #include "BacnetTstatSchedule.h"
+#include "ping.h"
+#include "ShowMessageDlg.h"
 // CBacnetSetting dialog
 extern bool cancle_send ;
 bool show_user_list_window = false;
@@ -21,6 +23,7 @@ CBacnetTstatSchedule *BacnetTstatSchedule_Window = NULL;
 
 #define TIMER_SYNC_TIMER    1
 #define TIMER_REFRESH_READ    2
+#define TIMER_IP_CHANGED_RECONNECT 3
 #define TIMER_REFRESH_READ_DELAY    15000
 
 IMPLEMENT_DYNAMIC(CBacnetSetting, CDialogEx)
@@ -85,7 +88,7 @@ BEGIN_MESSAGE_MAP(CBacnetSetting, CDialogEx)
 	ON_EN_KILLFOCUS(IDC_EDIT_SETTING_PANEL, &CBacnetSetting::OnEnKillfocusEditSettingPanel)
 	ON_EN_KILLFOCUS(IDC_EDIT_SETTING_NODES_LABEL_SETTING, &CBacnetSetting::OnEnKillfocusEditSettingNodesLabelSetting)
 	ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_TIME_SERVER, &CBacnetSetting::OnCbnSelchangeComboBacnetSettingTimeServer)
-	ON_BN_CLICKED(IDC_CHECK_SETTING_SYNC_TIME, &CBacnetSetting::OnBnClickedCheckSettingSyncTime)
+	ON_BN_CLICKED(IDC_RADIO_SETTING_SYNC_TIME, &CBacnetSetting::OnBnClickedCheckSettingSyncTime)
 	ON_EN_KILLFOCUS(IDC_EDIT_DYNDNS_USER_NAME, &CBacnetSetting::OnEnKillfocusEditDyndnsUserName)
 	ON_EN_KILLFOCUS(IDC_EDIT_DYNDNS_PASSWORD, &CBacnetSetting::OnEnKillfocusEditDyndnsPassword)
 	ON_EN_KILLFOCUS(IDC_EDIT_DYNDNS_DOMAIN, &CBacnetSetting::OnEnKillfocusEditDyndnsDomain)
@@ -113,6 +116,10 @@ BEGIN_MESSAGE_MAP(CBacnetSetting, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_REBOOT_DEVICE, &CBacnetSetting::OnBnClickedButtonRebootDevice)
 	ON_WM_VSCROLL()
 	ON_BN_CLICKED(IDC_BUTTON_ZONE_SCHEDULE, &CBacnetSetting::OnBnClickedButtonZoneSchedule)
+    ON_BN_CLICKED(IDC_BUTTON_SETTING_DONE, &CBacnetSetting::OnBnClickedButtonSettingDone)
+    ON_BN_CLICKED(IDC_RADIO_SETTING_SYNC_PC, &CBacnetSetting::OnBnClickedRadioSettingSyncPc)
+    ON_BN_CLICKED(IDC_RADIO_SETTING_LCD_ON, &CBacnetSetting::OnBnClickedRadioSettingLcdOn)
+    ON_BN_CLICKED(IDC_RADIO_SETTING_LCD_OFF, &CBacnetSetting::OnBnClickedRadioSettingLcdOff)
 END_MESSAGE_MAP()
 
 
@@ -253,15 +260,58 @@ void CBacnetSetting::OnBnClickedBtnBacWriteTime()
 
 void CBacnetSetting::OnBnClickedBtnBacIPAuto()
 {
+    UCHAR temp_data = 0;
+    temp_data = Device_Basic_Setting.reg.tcp_type;
 	Device_Basic_Setting.reg.tcp_type = 1;
 
-	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->EnableWindow(FALSE);
-	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->EnableWindow(FALSE);
-	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(FALSE);
+
+
 
 	CString temp_task_info;
-	temp_task_info.Format(_T("Change  DHCP auto "));
-	Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
+    temp_task_info.Format(_T("IP address has been changed! \r\nRebooting now! Please wait."));
+	//Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
+
+    if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
+    {
+        //更改失败恢复原状;
+        Device_Basic_Setting.reg.tcp_type = temp_data;
+        if (Device_Basic_Setting.reg.tcp_type == 0)
+        {
+            ((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_AUTO))->SetCheck(false);
+            ((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_STATIC))->SetCheck(true);
+        }
+        else if (Device_Basic_Setting.reg.tcp_type == 1)
+        {
+            ((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_AUTO))->SetCheck(true);
+            ((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_STATIC))->SetCheck(false);
+        }
+        ((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->EnableWindow(true);
+        ((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->EnableWindow(true);
+        ((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(true);
+    }
+    else
+    {
+        //更改成功
+        ((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->EnableWindow(FALSE);
+        ((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->EnableWindow(FALSE);
+        ((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(FALSE);
+
+
+        CShowMessageDlg dlg;
+        CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+        dlg.SetStaticText(temp_task_info);
+        //dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
+        dlg.SetStaticTextColor(RGB(0, 0, 255));
+        dlg.SetStaticTextSize(25, 20);
+        dlg.SetProgressAutoClose(300, 100, EVENT_IP_AUTO);
+        dlg.SetHwnd(pFrame->m_hWnd, MY_RETRY_IP_CHANGE_MESSAGE);
+        dlg.DoModal();
+        refresh_tree_status_immediately = true;
+    }
+
+
+
+
 }
 
 void CBacnetSetting::OnBnClickedBtnBacIPStatic()
@@ -271,7 +321,7 @@ void CBacnetSetting::OnBnClickedBtnBacIPStatic()
 	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->EnableWindow(true);
 	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(true);
 }
-
+extern HTREEITEM  hTreeItem_retry ;
 void CBacnetSetting::OnBnClickedBtnBacIPChange()
 {
 	BYTE address1,address2,address3,address4;
@@ -280,6 +330,33 @@ void CBacnetSetting::OnBnClickedBtnBacIPChange()
 	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->GetAddress(address1,address2,address3,address4);
 	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->GetAddress(subnet1,subnet2,subnet3,subnet4);
 	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->GetAddress(gatway1,gatway2,gatway3,gatway4);
+
+
+    if (0 == (address1 != Device_Basic_Setting.reg.ip_addr[0] || address2 != Device_Basic_Setting.reg.ip_addr[1] || address3 != Device_Basic_Setting.reg.ip_addr[2] || address4 != Device_Basic_Setting.reg.ip_addr[3] ||
+        subnet1 != Device_Basic_Setting.reg.subnet[0] || subnet2 != Device_Basic_Setting.reg.subnet[1] || subnet3 != Device_Basic_Setting.reg.subnet[2] || subnet4 != Device_Basic_Setting.reg.subnet[3] ||
+        gatway1 != Device_Basic_Setting.reg.gate_addr[0] || gatway2 != Device_Basic_Setting.reg.gate_addr[1] || gatway3 != Device_Basic_Setting.reg.gate_addr[2] || gatway4 != Device_Basic_Setting.reg.gate_addr[3]))
+    {
+        //fandu 20180201 如果没有变更就不要往设备里写了。
+        return;
+    }
+
+    CString strIP;
+    strIP.Format(_T("%u.%u.%u.%u"), address1, address2, address3, address4);
+    CPing p1;
+    CPingReply pr1;
+    //如果是修改网关和子网掩码 就不用测试是否ping的通.
+    if (address1 != Device_Basic_Setting.reg.ip_addr[0] || address2 != Device_Basic_Setting.reg.ip_addr[1] || address3 != Device_Basic_Setting.reg.ip_addr[2] || address4 != Device_Basic_Setting.reg.ip_addr[3])
+    {
+        if (p1.Ping1((LPCTSTR)strIP, pr1))
+        {
+            //如果ping 的通就说明要改的IP地址是存在的，有人在用的;
+
+            MessageBox(_T("This IP address has been occupied"), _T("Warning"));
+            return;
+        }
+    }
+    
+
 
 		Device_Basic_Setting.reg.ip_addr[0] = address1;
 		Device_Basic_Setting.reg.ip_addr[1] = address2;
@@ -314,7 +391,7 @@ void CBacnetSetting::OnBnClickedBtnBacIPChange()
 			CString strnewipadress;
 			strnewipadress.Format(_T("%u.%u.%u.%u"),address1,address2,address3,address4);
 			CString temp_task_info;
-			temp_task_info.Format(_T("Change IP Address Information OK!"));
+			temp_task_info.Format(_T("IP address has been changed! \r\nRebooting now! Please wait."));
 
 			CString strSql;
 			CppSQLite3DB SqliteDBBuilding;
@@ -334,12 +411,35 @@ void CBacnetSetting::OnBnClickedBtnBacIPChange()
 			    q.nextRow();
 			}
 			 
-			CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-			pFrame->m_product.at(selected_product_index).BuildingInfo.strIp = strnewipadress;
-			MessageBox(temp_task_info);
-			refresh_tree_status_immediately = true;
-		}
+            refresh_tree_status_immediately = true;
+            CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
 
+            for (int i = 0; i < pFrame->m_product.size(); i++)
+            {
+                if (g_selected_serialnumber == pFrame->m_product.at(i).serial_number)
+                {
+                    pFrame->m_product.at(i).BuildingInfo.strIp = strIP;
+                    break;
+                }
+            }
+
+            
+            CShowMessageDlg dlg;
+
+            dlg.SetStaticText(temp_task_info);
+            //dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
+            dlg.SetStaticTextColor(RGB(0, 0, 255));
+            dlg.SetStaticTextSize(25, 20);
+            dlg.SetProgressAutoClose(250, 100, EVENT_IP_STATIC_CHANGE);
+            dlg.SetChangedIPaddress(strIP);
+            dlg.SetHwnd(pFrame->m_hWnd, MY_RETRY_IP_CHANGE_MESSAGE);
+            dlg.DoModal();
+
+            return;
+
+		}
+        //m_reboot_time_left = 10;
+        //SetTimer(TIMER_IP_CHANGED_RECONNECT, 1000, NULL);
 
 }
 
@@ -431,7 +531,6 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 	{
 	case READ_SETTING_COMMAND:
 		{
-
 			((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->SetAddress(Device_Basic_Setting.reg.ip_addr[0],
 				Device_Basic_Setting.reg.ip_addr[1],Device_Basic_Setting.reg.ip_addr[2],Device_Basic_Setting.reg.ip_addr[3]);
 			((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->SetAddress(Device_Basic_Setting.reg.subnet[0],
@@ -479,11 +578,11 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				m_edit_port.EnableWindow(false);
 			}
 
+            //20180201 fandu  ARM 的 板子才有 zone schedual 这个功能
 			//版本大于46.1 的才有在setting 里面改port 的功能
-			if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 461)
+			if ((Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 461) 
+                && (Device_Basic_Setting.reg.pro_info.bootloader_rev >= 49))
 			{
-				CString temp_port;
-				temp_port.Format(_T("%u"), Device_Basic_Setting.reg.modbus_port);
 				GetDlgItem(IDC_BUTTON_ZONE_SCHEDULE)->EnableWindow(true);
 			}
 			else
@@ -617,11 +716,14 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				CString temp_dyndns_password;
 				CString temp_dyndns_domain;
 				MultiByteToWideChar( CP_ACP, 0, (char *)Device_Basic_Setting.reg.dyndns_user, 	(int)strlen((char *)Device_Basic_Setting.reg.dyndns_user)+1,temp_dyndns_user.GetBuffer(MAX_PATH), MAX_PATH );
-				temp_dyndns_user.ReleaseBuffer();	
+				temp_dyndns_user.ReleaseBuffer();
+                temp_dyndns_user = temp_dyndns_user.Left(31);
 				MultiByteToWideChar( CP_ACP, 0, (char *)Device_Basic_Setting.reg.dyndns_pass, 	(int)strlen((char *)Device_Basic_Setting.reg.dyndns_pass)+1,temp_dyndns_password.GetBuffer(MAX_PATH), MAX_PATH );
 				temp_dyndns_password.ReleaseBuffer();	
+                temp_dyndns_password = temp_dyndns_password.Left(31);
 				MultiByteToWideChar( CP_ACP, 0, (char *)Device_Basic_Setting.reg.dyndns_domain, 	(int)strlen((char *)Device_Basic_Setting.reg.dyndns_domain)+1,temp_dyndns_domain.GetBuffer(MAX_PATH), MAX_PATH );
 				temp_dyndns_domain.ReleaseBuffer();	
+                temp_dyndns_domain = temp_dyndns_domain.Left(31);
 				m_dyndns_user.SetWindowTextW(temp_dyndns_user);
 				m_dyndns_password.SetWindowTextW(temp_dyndns_password);
 				m_dyndns_domain.SetWindowTextW(temp_dyndns_domain);
@@ -646,86 +748,111 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				((CButton *)GetDlgItem(IDC_BUTTON_BAC_SHOW_ZIGBEE))->EnableWindow(FALSE);
 			}
 			
+            if (Device_Basic_Setting.reg.LCD_Display == 0)
+            {
+                //1 常灭
+                ((CButton *)GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->SetCheck(false);
+                ((CButton *)GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->SetCheck(true);
+            }
+            else if (Device_Basic_Setting.reg.LCD_Display == 1)
+            {
+                //1 常亮
+                ((CButton *)GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->SetCheck(true);
+                ((CButton *)GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->SetCheck(false);
+            }
 
 			if(Device_Basic_Setting.reg.en_sntp == 0)
 			{
 				GetDlgItem(IDC_STATIC_SETTING_TIMER_SERVER)->ShowWindow(FALSE);
-				GetDlgItem(IDC_CHECK_SETTING_SYNC_TIME)->ShowWindow(FALSE);
+				GetDlgItem(IDC_RADIO_SETTING_SYNC_TIME)->ShowWindow(FALSE);
 				GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER)->ShowWindow(FALSE);
 
 				GetDlgItem(IDC_STATIC_SETTING_TIME_ZONE)->ShowWindow(FALSE);
 				GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE)->ShowWindow(FALSE);			
 			}
-			else
-			{
-				GetDlgItem(IDC_STATIC_SETTING_TIMER_SERVER)->ShowWindow(TRUE);
-				GetDlgItem(IDC_CHECK_SETTING_SYNC_TIME)->ShowWindow(TRUE);
-				GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER)->ShowWindow(TRUE);
-				GetDlgItem(IDC_STATIC_SETTING_TIME_ZONE)->ShowWindow(TRUE);
-				GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE)->ShowWindow(TRUE);	
+            else
+            {
+                GetDlgItem(IDC_STATIC_SETTING_TIMER_SERVER)->ShowWindow(TRUE);
+                GetDlgItem(IDC_RADIO_SETTING_SYNC_TIME)->ShowWindow(TRUE);
+                GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER)->ShowWindow(TRUE);
+                GetDlgItem(IDC_STATIC_SETTING_TIME_ZONE)->ShowWindow(TRUE);
+                GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE)->ShowWindow(TRUE);
 
-				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->ResetContent();
-				for(int j=0;j<sizeof(Time_Server_Name)/sizeof(Time_Server_Name[0]);j++)
-				{
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->AddString(Time_Server_Name[j]);
-				}
-				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->ResetContent();
-				for (int z=0;z< sizeof(Time_Zone_Name)/sizeof(Time_Zone_Name[0]);z++)
-				{
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->AddString(Time_Zone_Name[z]);
-					if(Device_Basic_Setting.reg.time_zone == Time_Zone_Value[z])
-						((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->SetWindowTextW(Time_Zone_Name[z]);
-				}
+                ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->ResetContent();
+                for (int j = 0;j < sizeof(Time_Server_Name) / sizeof(Time_Server_Name[0]);j++)
+                {
+                    ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->AddString(Time_Server_Name[j]);
+                }
+                ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->ResetContent();
+                for (int z = 0;z < sizeof(Time_Zone_Name) / sizeof(Time_Zone_Name[0]);z++)
+                {
+                    ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->AddString(Time_Zone_Name[z]);
+                    if (Device_Basic_Setting.reg.time_zone == Time_Zone_Value[z])
+                        ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->SetWindowTextW(Time_Zone_Name[z]);
+                }
 
-				if(Device_Basic_Setting.reg.en_sntp == 1)	//disable
-				{
-					((CButton *)GetDlgItem(IDC_CHECK_SETTING_SYNC_TIME))->SetCheck(false);
-					//((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(Time_Server_Name[0]);
+                if (Device_Basic_Setting.reg.time_sync_auto_manual == 0)
+                {
+                    GetDlgItem(IDC_DATE_PICKER)->EnableWindow(false);
+                    GetDlgItem(IDC_TIME_PICKER)->EnableWindow(false);
+                    GetDlgItem(IDC_BAC_SYNC_LOCAL_PC)->EnableWindow(false);
 
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetCurSel(0);
-				}
-				else if(Device_Basic_Setting.reg.en_sntp == 2)
-				{
-					((CButton *)GetDlgItem(IDC_CHECK_SETTING_SYNC_TIME))->SetCheck(true);
-					//((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(Time_Server_Name[0]);
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetCurSel(0);
-				}
-				else if(Device_Basic_Setting.reg.en_sntp == 3)
-				{
-					((CButton *)GetDlgItem(IDC_CHECK_SETTING_SYNC_TIME))->SetCheck(true);
-					//((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(Time_Server_Name[1]);
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetCurSel(1);
-				}
-				else if(Device_Basic_Setting.reg.en_sntp == 4)
-				{
-					((CButton *)GetDlgItem(IDC_CHECK_SETTING_SYNC_TIME))->SetCheck(true);
-					//((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(Time_Server_Name[2]);
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetCurSel(2);
-				}
-				else if(Device_Basic_Setting.reg.en_sntp == 5)
-				{
-					((CButton *)GetDlgItem(IDC_CHECK_SETTING_SYNC_TIME))->SetCheck(true);
+                    GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER)->EnableWindow(true);
+                    GetDlgItem(IDC_BUTTON_SYNC_TIME)->EnableWindow(true);
 
-					CString temp_cs1;
-					MultiByteToWideChar( CP_ACP, 0, Device_Basic_Setting.reg.sntp_server, (int)strlen((char *)Device_Basic_Setting.reg.sntp_server)+1, 
-						temp_cs1.GetBuffer(MAX_PATH), MAX_PATH );
-					temp_cs1.ReleaseBuffer();
-				
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->AddString(temp_cs1);
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetCurSel(3);
-					//((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(temp_cs1);
-				}
-				//else if(Device_Basic_Setting.reg.en_sntp == 6)
-				//{
-				//	((CButton *)GetDlgItem(IDC_CHECK_SETTING_SYNC_TIME))->SetCheck(true);
-				//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(Time_Server_Name[4]);
-				//}
-				else//如果里面的值错了 就自动复位为第一个 同步服务器;
-				{
-					Device_Basic_Setting.reg.en_sntp = 2;
-				}
-			}
+                    ((CButton *)GetDlgItem(IDC_RADIO_SETTING_SYNC_TIME))->SetCheck(true);
+                    ((CButton *)GetDlgItem(IDC_RADIO_SETTING_SYNC_PC))->SetCheck(false);
 
+                    if ((Device_Basic_Setting.reg.en_sntp == 2) ||
+                        (Device_Basic_Setting.reg.en_sntp == 3) ||
+                        (Device_Basic_Setting.reg.en_sntp == 4) ||
+                        (Device_Basic_Setting.reg.en_sntp == 5))
+                    {
+
+
+                        if (Device_Basic_Setting.reg.en_sntp == 2)
+                        {
+                            ((CButton *)GetDlgItem(IDC_RADIO_SETTING_SYNC_TIME))->SetCheck(true);
+                            ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetCurSel(0);
+                        }
+                        if (Device_Basic_Setting.reg.en_sntp == 3)
+                        {
+                            ((CButton *)GetDlgItem(IDC_RADIO_SETTING_SYNC_TIME))->SetCheck(true);
+                            ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetCurSel(1);
+                        }
+                        else if (Device_Basic_Setting.reg.en_sntp == 4)
+                        {
+                            ((CButton *)GetDlgItem(IDC_RADIO_SETTING_SYNC_TIME))->SetCheck(true);
+                            ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetCurSel(2);
+                        }
+                        if (Device_Basic_Setting.reg.en_sntp == 5)
+                        {
+                            ((CButton *)GetDlgItem(IDC_RADIO_SETTING_SYNC_TIME))->SetCheck(true);
+
+                            CString temp_cs1;
+                            MultiByteToWideChar(CP_ACP, 0, Device_Basic_Setting.reg.sntp_server, (int)strlen((char *)Device_Basic_Setting.reg.sntp_server) + 1,
+                                temp_cs1.GetBuffer(MAX_PATH), MAX_PATH);
+                            temp_cs1.ReleaseBuffer();
+
+                            ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->AddString(temp_cs1);
+                            ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetCurSel(3);
+                        }
+                    }
+                }
+                else if (Device_Basic_Setting.reg.time_sync_auto_manual == 1)
+                {
+                    GetDlgItem(IDC_DATE_PICKER)->EnableWindow(true);
+                    GetDlgItem(IDC_TIME_PICKER)->EnableWindow(true);
+                    GetDlgItem(IDC_BAC_SYNC_LOCAL_PC)->EnableWindow(true);
+                    GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER)->EnableWindow(false);
+                    GetDlgItem(IDC_BUTTON_SYNC_TIME)->EnableWindow(false);
+
+
+                    ((CButton *)GetDlgItem(IDC_RADIO_SETTING_SYNC_TIME))->SetCheck(false);
+                    ((CButton *)GetDlgItem(IDC_RADIO_SETTING_SYNC_PC))->SetCheck(true);
+                }
+
+            }
 			CString temp_panel_number;
 			CString temp_nodes_label;
 			if(Device_Basic_Setting.reg.en_panel_name)
@@ -766,14 +893,18 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 
 			}
 
-			if(Device_Basic_Setting.reg.sd_exist == 1)
+			if(Device_Basic_Setting.reg.sd_exist == SD_STATUS_NO)
 			{
 				((CStatic *)GetDlgItem(IDC_STATIC_BAC_SETTING_SD_CARD))->SetWindowTextW(_T("No SD Card"));
 			}
-			else if(Device_Basic_Setting.reg.sd_exist == 2)
+			else if(Device_Basic_Setting.reg.sd_exist == SD_STATUS_NORMAL)
 			{
 				((CStatic *)GetDlgItem(IDC_STATIC_BAC_SETTING_SD_CARD))->SetWindowTextW(_T("Normal"));
 			}
+            else if (Device_Basic_Setting.reg.sd_exist == SD_STATUS_FILESYSTEM_ERROR)
+            {
+                ((CStatic *)GetDlgItem(IDC_STATIC_BAC_SETTING_SD_CARD))->SetWindowTextW(_T("File System error,Only supprot FAT32"));
+            }
 			else
 			{
 				((CStatic *)GetDlgItem(IDC_STATIC_BAC_SETTING_SD_CARD))->SetWindowTextW(_T("unknown"));
@@ -887,15 +1018,15 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 			}
 			else if (bacnet_device_type == MINIPANELARM)
 			{
-				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-BB(ARM)"));
+				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-BB"));
 			}
 			else if (bacnet_device_type == MINIPANELARM_LB)
 			{
-				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-LB(ARM)"));
+				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-LB"));
 			}
 			else if (bacnet_device_type == MINIPANELARM_TB)
 			{
-				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-TB(ARM)"));
+				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-TB"));
 			}
 			else if (bacnet_device_type == BIG_MINIPANEL)
 			{
@@ -914,7 +1045,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("Unknown device"));
 			}
 
-			//((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3Controller(ARM)"));
+			//((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3Controller"));
 
 			if(
 				(bacnet_device_type == BIG_MINIPANEL || bacnet_device_type == MINIPANELARM) ||
@@ -984,10 +1115,13 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 		break;
 	case TIME_COMMAND:
 		{
+
         //20180108 Fan判断 minipanel 的大体时间是否一致，不一致自动更改;
-        if ((Device_time.ti_min != temp_time.GetMinute()) ||
-            (Device_time.ti_hour != temp_time.GetHour()))
+        if (Device_Basic_Setting.reg.flag_time_sync_pc == 1)
+        {
             OnBnClickedBtnBacSYNCTime();
+        }
+
 
 			#pragma  region about_time
 			if(Device_time.year<2000)
@@ -1136,6 +1270,23 @@ void CBacnetSetting::OnTimer(UINT_PTR nIDEvent)
 
 	}
 	break;
+    case TIMER_IP_CHANGED_RECONNECT:
+    {
+        m_reboot_time_left--;
+        if (m_reboot_time_left <= 0)
+        {
+            KillTimer(TIMER_IP_CHANGED_RECONNECT);
+            CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+            ::PostMessage(pFrame->m_hWnd, MY_RETRY_MESSAGE, NULL, NULL);
+        }
+        else
+        {
+            CString Show_Results;
+            Show_Results.Format(_T("System is restarting %d . Please wait!"), m_reboot_time_left);
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, Show_Results);
+        }
+    }
+        break;
 	default:
 		break;
 	}
@@ -1523,7 +1674,7 @@ void CBacnetSetting::OnCbnSelchangeComboBacnetSettingTimeServer()
 		Device_Basic_Setting.reg.en_sntp = 5;
 	else if(nSel == 4)
 		Device_Basic_Setting.reg.en_sntp = 6;
-	((CButton *)GetDlgItem(IDC_CHECK_SETTING_SYNC_TIME))->SetCheck(true);
+	((CButton *)GetDlgItem(IDC_RADIO_SETTING_SYNC_TIME))->SetCheck(true);
 	CString temp_task_info;
 	temp_task_info.Format(_T("Change sntp time server to "));
 	temp_task_info = temp_task_info + temp_string;
@@ -1535,21 +1686,35 @@ void CBacnetSetting::OnCbnSelchangeComboBacnetSettingTimeServer()
 void CBacnetSetting::OnBnClickedCheckSettingSyncTime()
 {
 	
-	CString temp_task_info;
-	if(Device_Basic_Setting.reg.en_sntp == 1)
-	{
-		Device_Basic_Setting.reg.en_sntp = 2;
-		((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(Time_Server_Name[0]);
-		temp_task_info.Format(_T("Enable sntp "));
-	}
-	else
-	{
-		Device_Basic_Setting.reg.en_sntp = 1;
-		((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetWindowTextW(Time_Server_Name[0]);
-		temp_task_info.Format(_T("Disable sntp "));
-	}
+    CString temp_task_info;
+    temp_task_info.Format(_T("Change configuration to Synchronize with the time server "));
 
-	Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
+    GetDlgItem(IDC_DATE_PICKER)->EnableWindow(false);
+    GetDlgItem(IDC_TIME_PICKER)->EnableWindow(false);
+    GetDlgItem(IDC_BAC_SYNC_LOCAL_PC)->EnableWindow(false);
+    GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER)->EnableWindow(true);
+    GetDlgItem(IDC_BUTTON_SYNC_TIME)->EnableWindow(true);
+
+    Device_Basic_Setting.reg.time_sync_auto_manual = 0;
+    Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
+
+
+
+    if (Device_Basic_Setting.reg.en_sntp == 2)
+    {
+        ((CButton *)GetDlgItem(IDC_RADIO_SETTING_SYNC_TIME))->SetCheck(true);
+        ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetCurSel(0);
+    }
+    if (Device_Basic_Setting.reg.en_sntp == 3)
+    {
+        ((CButton *)GetDlgItem(IDC_RADIO_SETTING_SYNC_TIME))->SetCheck(true);
+        ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetCurSel(1);
+    }
+    else if (Device_Basic_Setting.reg.en_sntp == 4)
+    {
+        ((CButton *)GetDlgItem(IDC_RADIO_SETTING_SYNC_TIME))->SetCheck(true);
+        ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->SetCurSel(2);
+    }
 
 }
 
@@ -1934,7 +2099,21 @@ void CBacnetSetting::OnCbnKillfocusComboBacnetSettingTimeServer()
 			(temp_string.CompareNoCase(Time_Server_Name[1])  == 0) ||
 			(temp_string.CompareNoCase(Time_Server_Name[2])  == 0))
 		{
-
+            if (temp_string.CompareNoCase(Time_Server_Name[0]) == 0)
+            {
+                Device_Basic_Setting.reg.en_sntp = 2;
+            }
+            else if (temp_string.CompareNoCase(Time_Server_Name[1]) == 0)
+            {
+                Device_Basic_Setting.reg.en_sntp = 3;
+            }
+            else if (temp_string.CompareNoCase(Time_Server_Name[2]) == 0)
+            {
+                Device_Basic_Setting.reg.en_sntp = 4;
+            }
+            CString temp_task_info;
+            temp_task_info.Format(_T("Change sntp server "));
+            Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
 		}
 		else
 		{
@@ -2189,6 +2368,8 @@ void CBacnetSetting::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 //#include "GroupScheduleDlg.h"
 void CBacnetSetting::OnBnClickedButtonZoneSchedule()
 {
+
+
 	b_stop_read_tstat_schedule = false;  //是否继续读取标志，若后面数据为空则退出循环体.
 
     //在获取前清空缓存值.
@@ -2252,3 +2433,53 @@ void CBacnetSetting::OnBnClickedButtonZoneSchedule()
 
 
 
+
+
+void CBacnetSetting::OnBnClickedButtonSettingDone()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    OnBnClickedBtnBacIPChange();
+}
+
+
+void CBacnetSetting::OnBnClickedRadioSettingSyncPc()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString temp_task_info;
+    temp_task_info.Format(_T(" Synchronize with Local PC "));
+
+    GetDlgItem(IDC_DATE_PICKER)->EnableWindow(true);
+    GetDlgItem(IDC_TIME_PICKER)->EnableWindow(true);
+    GetDlgItem(IDC_BAC_SYNC_LOCAL_PC)->EnableWindow(true);
+    GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER)->EnableWindow(false);
+    GetDlgItem(IDC_BUTTON_SYNC_TIME)->EnableWindow(false);
+
+    Device_Basic_Setting.reg.time_sync_auto_manual = 1;
+
+    Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
+
+}
+
+
+void CBacnetSetting::OnBnClickedRadioSettingLcdOn()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString temp_task_info;
+    temp_task_info.Format(_T(" Change LCD Background Light ON "));
+
+    Device_Basic_Setting.reg.LCD_Display = 1;
+
+    Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
+}
+
+
+void CBacnetSetting::OnBnClickedRadioSettingLcdOff()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString temp_task_info;
+    temp_task_info.Format(_T(" Change LCD Background Light OFF "));
+
+    Device_Basic_Setting.reg.LCD_Display = 0;
+
+    Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
+}

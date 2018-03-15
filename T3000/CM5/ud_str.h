@@ -753,10 +753,11 @@ typedef union
 		uint8_t en_dyndns;  // 0 - no  1 - disable 2 - enable
 		uint8_t dyndns_provider;  // 0- www.3322.org 1-www.dyndns.com  2 - www.no-ip.com
 		uint16_t dyndns_update_time;  // xx min
-		uint8_t en_sntp;  // 0 - no  1 - disable 
+		uint8_t en_sntp;  // 0 - no  1 - disable  
 		//0xca780265			202.120.2.101 ntp.sjtu.edu.cn      2
 		//0x1838b28c            24.56.178.140 time.nist.gov			3
 		//0xd248912d			210.72.145.45  NTSC					4
+        //自动要求跟PC同步                                          200 
 		signed short time_zone;
 		unsigned int n_serial_number;
 
@@ -764,7 +765,7 @@ typedef union
 
 		 uint16_t mstp_network_number;
 		 uint8_t BBMD_EN;
-		 uint8_t sd_exist;  // 1 -no    2- yes
+		 uint8_t sd_exist;  // 1 -no    2- yes         3 文件格式不对.
 		 unsigned short modbus_port;
 		 unsigned char modbus_id;
 		 unsigned int object_instance ;
@@ -773,6 +774,9 @@ typedef union
 
 		 char sntp_server[30];
 		 unsigned char zegbee_exsit;
+         unsigned char LCD_Display; //1: 常亮  0：常闭;
+         unsigned char flag_time_sync_pc;  // 0: 不需要   1:同步.
+         unsigned char time_sync_auto_manual;  // 0 和时间服务器同步   1：和PC 时间同步;;
 	}reg;
 }Str_Setting_Info;
 

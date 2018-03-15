@@ -1,6 +1,19 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
+2018-0312 Update by Fance
+1.修复 部分 input output debug 模式无法正常弹出的问题
+2.修复 TSTAT8  setpoint ，现在修改值能够正常反应实际状态了.
+3. T3000的把车net 端口不在占用 标准的 47808端口了
+4. T3controller 增加 修改 LCD 显示 模式
+
+2018-0130 Update by Fance
+1.在加载prg文件的时候，变更 修改 panel 的方式.
+2.支持subpanel 为0 ，以前跟main 一样.
+3.toorbar和menu 菜单 新增network 和panel 的图标.
+4.minipanel 优化修改 IP地址 ，优化等候方式及界面;有冲突的IP 不允许设置;
+5.当广播发送 收到 两个设备的IP地址冲突时，回弹出更改视窗，修改IP地址;
+
 2017-12-13 Update by Fance
 1.串口二  支持  MSTP_MASTER.
 2.修复list 在利用鼠标移动时 有些list 显示的背景色杂乱无章的问题
@@ -3194,11 +3207,11 @@ void CDialogCM5_BacNet::Show_Wait_Dialog_And_SendMessage(int read_list_type)
 			WaitDlg->Create(IDD_DIALOG_BACNET_WAIT,this);
 			WaitDlg->ShowWindow(SW_HIDE);
 
-
-			RECT RECT_SET1;
-			GetClientRect(&RECT_SET1);
-			ClientToScreen(&RECT_SET1);
-			WaitDlg->MoveWindow(RECT_SET1.left + 50,RECT_SET1.bottom - 19,800,20);		
+            //2018 02 26 dufan 屏蔽  异常报错，这段应该没有用到.
+			//RECT RECT_SET1;
+			//GetClientRect(&RECT_SET1);
+			//ClientToScreen(&RECT_SET1);
+			//WaitDlg->MoveWindow(RECT_SET1.left + 50,RECT_SET1.bottom - 19,800,20);		
 	}
 
 	//::PostMessage(BacNet_hwd,WM_SEND_OVER,0,0);

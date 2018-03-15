@@ -53,6 +53,8 @@ IMPLEMENT_DYNAMIC(CBacnetEditLabel, CDialogEx)
 CBacnetEditLabel::CBacnetEditLabel(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CBacnetEditLabel::IDD, pParent)
 {
+    horizontalDPI = 96;
+    verticalDPI = 96;
 	m_allow_change = true;
 }
 
@@ -110,7 +112,14 @@ BOOL CBacnetEditLabel::OnInitDialog()
 	m_edit_label = this->m_hWnd;
 
 
+    CDC *desktopDc;
+    desktopDc = GetDC();
+    horizontalDPI = GetDeviceCaps(*desktopDc, LOGPIXELSX);
+    verticalDPI = GetDeviceCaps(*desktopDc, LOGPIXELSY);
 
+    CString temp_debug;
+    temp_debug.Format(_T("Horizon DPI is %d , Vertical DPI is %d"), horizontalDPI, verticalDPI);
+    DFTrace(temp_debug);
 
 	POINT lpPoint;
 	GetCursorPos(&lpPoint);
@@ -243,7 +252,8 @@ BOOL CBacnetEditLabel::PreTranslateMessage(MSG* pMsg)
 		{
 			if(GetFocus()->GetDlgCtrlID() == IDC_EDIT_LABEL_VALUE)
 			{
-				if((label_info.nSub_Panel == Station_NUM) && (label_info.nMain_Panel == Station_NUM))
+				if(((label_info.nSub_Panel == Station_NUM) && (label_info.nMain_Panel == Station_NUM)) ||
+                    ((label_info.nSub_Panel == 0) && (label_info.nMain_Panel == Station_NUM)))
 					PostMessage(WM_EDIT_CHANGE_VALUE,CHANGE_VALUE,NULL);
 
 				return 0;
@@ -443,6 +453,8 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 			}
 			else if(ncommand == CHANGE_VALUE)
 			{
+                if (m_Variable_data.at(label_info.nPoint_number).auto_manual == BAC_AUTO) //如果是
+                    return 0;
 				if(m_Variable_data.at(label_info.nPoint_number).digital_analog == BAC_UNITS_ANALOG)
 				{
 					CString temp_analog_value;
@@ -454,8 +466,6 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 				}
 				else if(m_Variable_data.at(label_info.nPoint_number).digital_analog == BAC_UNITS_DIGITAL)
 				{
-					if (m_Variable_data.at(label_info.nPoint_number).auto_manual == BAC_AUTO) //如果是
-						return 0;
 					if((m_Variable_data.at(label_info.nPoint_number).range < 23) &&(m_Variable_data.at(label_info.nPoint_number).range !=0))
 						temp_unit = Digital_Units_Array[m_Variable_data.at(label_info.nPoint_number).range];
 					else if((m_Variable_data.at(label_info.nPoint_number).range >=23) && (m_Variable_data.at(label_info.nPoint_number).range <= 30))
@@ -600,6 +610,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 		break;
 	}
 
+    GetDlgItem(IDC_BUTTON_LABEL_EXIT)->SetFocus();
 
 	return 0;
 }
@@ -761,8 +772,8 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 	//	return ;
 	//}
 
-
-	if(temp_info.nSub_Panel != Station_NUM)
+    //2018 01 29 最新的 subpanel 为0 也是代表自己的
+	if((temp_info.nSub_Panel != Station_NUM) && (temp_info.nSub_Panel != 0))
 	{
 		Point_Net temp_point;
 		temp_point.panel = temp_info.nMain_Panel;
@@ -1190,7 +1201,8 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 void CBacnetEditLabel::OnStnClickedStaticEditLabelAutoManual()
 {
 	
-	if((label_info.nSub_Panel == Station_NUM) && (label_info.nMain_Panel == Station_NUM))
+	if(((label_info.nSub_Panel == Station_NUM) && (label_info.nMain_Panel == Station_NUM)) ||
+        ((label_info.nSub_Panel == 0) && (label_info.nMain_Panel == Station_NUM)))
 		PostMessage(WM_EDIT_CHANGE_VALUE,CHANGE_AUTO_MANUAL,NULL);
 	return;
 }
@@ -1285,8 +1297,14 @@ void CBacnetEditLabel::ChangeWindowPos(bool nshow)
 
 	if(nshow)
 	{
+        int horizontalDPI;
+        int verticalDPI;
+        if ((horizontalDPI > 96) || (verticalDPI > 96))
+            MoveWindow(temprec.left, temprec.top, 670, 430);
+        else
 			MoveWindow(temprec.left,temprec.top,530,340);
 			GetDlgItem(IDC_EDIT_ICON_PATH)->ShowWindow(1);
+            GetDlgItem(IDC_EDIT_ICON_PATH2)->ShowWindow(1);
 			GetDlgItem(IDC_STATIC_EDIT_TEXT_PLACE)->ShowWindow(1);
 			GetDlgItem(IDC_STATIC_EDIT_ICON_SIZE)->ShowWindow(1);
 			GetDlgItem(IDC_STATIC_ICON_PATH)->ShowWindow(1);
@@ -1296,8 +1314,12 @@ void CBacnetEditLabel::ChangeWindowPos(bool nshow)
 	}
 	else
 	{
-		MoveWindow(temprec.left,temprec.top,530,210);
+        if ((horizontalDPI > 96) || (verticalDPI > 96))
+            MoveWindow(temprec.left, temprec.top, 670, 270);
+        else
+		    MoveWindow(temprec.left,temprec.top,530,210);
 		GetDlgItem(IDC_EDIT_ICON_PATH)->ShowWindow(0);
+        GetDlgItem(IDC_EDIT_ICON_PATH2)->ShowWindow(0);
 		GetDlgItem(IDC_STATIC_EDIT_TEXT_PLACE)->ShowWindow(0);
 		GetDlgItem(IDC_STATIC_EDIT_ICON_SIZE)->ShowWindow(0);
 		GetDlgItem(IDC_STATIC_ICON_PATH)->ShowWindow(0);

@@ -26,7 +26,7 @@
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);  
 
 LPFN_ISWOW64PROCESS fnIsWow64Process;  
-const int g_versionNO=20180120;
+const int g_versionNO= 20180309;
 
 
 #ifdef _DEBUG
@@ -68,7 +68,7 @@ CT3000App::CT3000App()
 #endif 
     //*******************************************************
     
-	T3000_Version = 20180120; //
+	T3000_Version = 20180309; //
 	m_lastinterface=19;
 }
 // The one and only CT3000App object
@@ -316,6 +316,7 @@ BOOL CT3000App::InitInstance()
 	{
 		//if (ReadDLLRegAsm()<1)
 		{
+#if 1 // 杜帆屏蔽  ， 许多杀毒软件 检测到  RegAsm.exe 的访问不合法， 报病毒;
 			CopyFile(strSource, L"C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\T3000Controls.dll", FALSE);
 			// ::ShellExecute(NULL, _T("open"), _T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe T3000Controls.dll"), _T(""), _T(""), SW_SHOW); 
 			ShellExecute(NULL, _T("open"), _T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe"), L"C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\T3000Controls.dll", NULL, SW_HIDE);
@@ -323,7 +324,7 @@ BOOL CT3000App::InitInstance()
 			CopyFile(strSource, L"C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\TemcoStandardBacnetTool.dll", FALSE);
 			// ::ShellExecute(NULL, _T("open"), _T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe T3000Controls.dll"), _T(""), _T(""), SW_SHOW); 
 			ShellExecute(NULL, _T("open"), _T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe"), L"C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\TemcoStandardBacnetTool.dll", NULL, SW_HIDE);
-
+#endif
 		}
 		
 		// InitCommonControlsEx() is required on Windows XP if an application

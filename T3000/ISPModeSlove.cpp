@@ -51,7 +51,7 @@ BOOL CISPModeSlove::OnInitDialog()
 
 	
 	Initial_static();
-	timer_count = 30;
+	timer_count = 60;
 	SetTimer(1, 1000,NULL);
 	return TRUE; // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
