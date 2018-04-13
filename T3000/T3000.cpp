@@ -26,7 +26,7 @@
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);  
 
 LPFN_ISWOW64PROCESS fnIsWow64Process;  
-const int g_versionNO= 20180309;
+const int g_versionNO= 20180408;
 
 
 #ifdef _DEBUG
@@ -68,7 +68,7 @@ CT3000App::CT3000App()
 #endif 
     //*******************************************************
     
-	T3000_Version = 20180309; //
+	T3000_Version = 20180408; //
 	m_lastinterface=19;
 }
 // The one and only CT3000App object
@@ -936,9 +936,9 @@ void CT3000App::CopyDirectory(CString strSrcPath,CString strDstPath)
 #include"Tstatrangedlg.h"
 void CT3000App::OnVersionInfo()
 {
-	CTstatRangeDlg dlg;
-	dlg.DoModal();
-	int rangevalue = dlg.m_current_range;
+	//CTstatRangeDlg dlg;
+	//dlg.DoModal();
+	//int rangevalue = dlg.m_current_range;
 
 	/*CString strHistotyFile=g_strExePth+_T("history.txt");
 	ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);*/

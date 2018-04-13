@@ -20,10 +20,11 @@
 extern bool cancle_send ;
 bool show_user_list_window = false;
 CBacnetTstatSchedule *BacnetTstatSchedule_Window = NULL;
-
+LONG n_tempBias;
 #define TIMER_SYNC_TIMER    1
 #define TIMER_REFRESH_READ    2
 #define TIMER_IP_CHANGED_RECONNECT 3
+#define TIMER_CONTROL_BUTTON       4
 #define TIMER_REFRESH_READ_DELAY    15000
 
 IMPLEMENT_DYNAMIC(CBacnetSetting, CDialogEx)
@@ -247,7 +248,8 @@ void CBacnetSetting::OnBnClickedBtnBacSYNCTime()
 
 	//GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(TRUE);
 	Get_Time_Edit_By_Control();
-
+    Device_Basic_Setting.reg.time_zone = n_tempBias;
+    Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0);
 }
 
 void CBacnetSetting::OnBnClickedBtnBacWriteTime()
@@ -324,6 +326,12 @@ void CBacnetSetting::OnBnClickedBtnBacIPStatic()
 extern HTREEITEM  hTreeItem_retry ;
 void CBacnetSetting::OnBnClickedBtnBacIPChange()
 {
+    unsigned short test_array[1000];
+    int ntest_ret = GetPrivateBacnetToModbusData(g_bac_instance, 0, 100, test_array);
+    Sleep(1000);
+    Sleep(2000);
+
+    return;
 	BYTE address1,address2,address3,address4;
 	BYTE subnet1, subnet2, subnet3, subnet4;
 	BYTE gatway1,gatway2,gatway3,gatway4;
@@ -334,7 +342,8 @@ void CBacnetSetting::OnBnClickedBtnBacIPChange()
 
     if (0 == (address1 != Device_Basic_Setting.reg.ip_addr[0] || address2 != Device_Basic_Setting.reg.ip_addr[1] || address3 != Device_Basic_Setting.reg.ip_addr[2] || address4 != Device_Basic_Setting.reg.ip_addr[3] ||
         subnet1 != Device_Basic_Setting.reg.subnet[0] || subnet2 != Device_Basic_Setting.reg.subnet[1] || subnet3 != Device_Basic_Setting.reg.subnet[2] || subnet4 != Device_Basic_Setting.reg.subnet[3] ||
-        gatway1 != Device_Basic_Setting.reg.gate_addr[0] || gatway2 != Device_Basic_Setting.reg.gate_addr[1] || gatway3 != Device_Basic_Setting.reg.gate_addr[2] || gatway4 != Device_Basic_Setting.reg.gate_addr[3]))
+        gatway1 != Device_Basic_Setting.reg.gate_addr[0] || gatway2 != Device_Basic_Setting.reg.gate_addr[1] || gatway3 != Device_Basic_Setting.reg.gate_addr[2] || gatway4 != Device_Basic_Setting.reg.gate_addr[3]) ||
+        m_tcp_type != Device_Basic_Setting.reg.tcp_type)
     {
         //fandu 20180201 如果没有变更就不要往设备里写了。
         return;
@@ -388,6 +397,7 @@ void CBacnetSetting::OnBnClickedBtnBacIPChange()
 		else
 		{
 			//在Ip 修改成功后 更新数据库;
+            m_tcp_type = Device_Basic_Setting.reg.tcp_type;
 			CString strnewipadress;
 			strnewipadress.Format(_T("%u.%u.%u.%u"),address1,address2,address3,address4);
 			CString temp_task_info;
@@ -519,9 +529,9 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 	memset(&lp_time_zone,0,sizeof(TIME_ZONE_INFORMATION));
 
 	::GetTimeZoneInformation(&lp_time_zone);
-	 LONG n_tempBias;
+
 	 n_tempBias = 0 - lp_time_zone.Bias;
-	 n_tempBias = (n_tempBias/60)*100;
+	 n_tempBias = (n_tempBias*100)/60;
      CTime temp_time;
      temp_time = CTime::GetCurrentTime();
 	 
@@ -540,6 +550,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 
 			if(Device_Basic_Setting.reg.tcp_type == 1)
 			{
+                m_tcp_type = 1;
 				((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_AUTO))->SetCheck(true);
 				((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_STATIC))->SetCheck(false);
 				((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->EnableWindow(FALSE);
@@ -548,6 +559,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 			}
 			else if(Device_Basic_Setting.reg.tcp_type == 0)
 			{
+                m_tcp_type = 0;
 				((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_AUTO))->SetCheck(false);
 				((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_STATIC))->SetCheck(true);
 				((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->EnableWindow(true);
@@ -718,12 +730,15 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				MultiByteToWideChar( CP_ACP, 0, (char *)Device_Basic_Setting.reg.dyndns_user, 	(int)strlen((char *)Device_Basic_Setting.reg.dyndns_user)+1,temp_dyndns_user.GetBuffer(MAX_PATH), MAX_PATH );
 				temp_dyndns_user.ReleaseBuffer();
                 temp_dyndns_user = temp_dyndns_user.Left(31);
+                temp_dyndns_user = temp_dyndns_user.Trim();
 				MultiByteToWideChar( CP_ACP, 0, (char *)Device_Basic_Setting.reg.dyndns_pass, 	(int)strlen((char *)Device_Basic_Setting.reg.dyndns_pass)+1,temp_dyndns_password.GetBuffer(MAX_PATH), MAX_PATH );
 				temp_dyndns_password.ReleaseBuffer();	
                 temp_dyndns_password = temp_dyndns_password.Left(31);
+                temp_dyndns_password = temp_dyndns_password.Trim();
 				MultiByteToWideChar( CP_ACP, 0, (char *)Device_Basic_Setting.reg.dyndns_domain, 	(int)strlen((char *)Device_Basic_Setting.reg.dyndns_domain)+1,temp_dyndns_domain.GetBuffer(MAX_PATH), MAX_PATH );
 				temp_dyndns_domain.ReleaseBuffer();	
                 temp_dyndns_domain = temp_dyndns_domain.Left(31);
+                temp_dyndns_domain = temp_dyndns_domain.Trim();
 				m_dyndns_user.SetWindowTextW(temp_dyndns_user);
 				m_dyndns_password.SetWindowTextW(temp_dyndns_password);
 				m_dyndns_domain.SetWindowTextW(temp_dyndns_domain);
@@ -1287,6 +1302,10 @@ void CBacnetSetting::OnTimer(UINT_PTR nIDEvent)
         }
     }
         break;
+    case TIMER_CONTROL_BUTTON:
+        KillTimer(TIMER_CONTROL_BUTTON);
+        GetDlgItem(IDC_BUTTON_SETTING_USER_LIST)->EnableWindow(TRUE);
+        break;
 	default:
 		break;
 	}
@@ -1438,6 +1457,7 @@ void CBacnetSetting::OnCbnSelchangeComboBacnetSettingBaudrate0()
 }
 
 
+
 void CBacnetSetting::OnCbnSelchangeComboBacnetSettingBaudrate1()
 {
 	
@@ -1510,7 +1530,8 @@ void CBacnetSetting::OnBnClickedButtonSettingAddIntoDb()
 
 void CBacnetSetting::OnBnClickedButtonSettingUserList()
 {
-	
+    GetDlgItem(IDC_BUTTON_SETTING_USER_LIST)->EnableWindow(FALSE);
+    SetTimer(TIMER_CONTROL_BUTTON, 4000, NULL);
 	show_user_list_window = true;
 	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_READ_USER_LOGIN_INFO);
 }

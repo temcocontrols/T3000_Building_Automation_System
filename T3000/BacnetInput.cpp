@@ -530,7 +530,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 {
 
 	int Fresh_Item;
-	int isFreshOne = (int)lParam;
+	int isFreshOne = (bool)lParam;
 	int  Minipanel_device = 1;
 	if(bacnet_device_type == T38AI8AO6DO)
 	{
@@ -674,6 +674,8 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		if(isFreshOne)
 		{
 			i = Fresh_Item;
+            if (i >= m_Input_data.size())
+                return 1;
 		}
 
 		if(i>=input_item_limit_count)
@@ -1217,7 +1219,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 		}
 
 		bac_range_number_choose = m_Input_data.at(lRow).range;
-
+        input_item_select_for_range = lRow;
 		if(m_Input_data.at(lRow).digital_analog == BAC_UNITS_ANALOG)
 		{
 			bac_ranges_type = INPUT_RANGE_ANALOG_TYPE;

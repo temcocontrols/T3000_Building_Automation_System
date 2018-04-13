@@ -1067,6 +1067,7 @@ extern vector <_Graphic_Value_Info> m_graphic_refresh_data;
 extern vector <_Bac_Scan_results_Info> m_bac_scan_result_data;
 extern vector <Alarm_point> m_alarmlog_data;
 extern vector <refresh_net_device> m_refresh_net_device_data;
+extern vector <refresh_net_device> m_T3BB_device_data;
 extern vector <Str_TstatInfo_point> m_Tstat_data;
 extern vector <Str_Remote_TstDB> m_remote_device_db;
 extern vector <Str_Units_element> m_customer_unit_data;
@@ -1096,7 +1097,7 @@ extern unsigned char weeklt_time_schedule[BAC_SCHEDULE_COUNT][WEEKLY_SCHEDULE_SI
 extern unsigned char program_code[BAC_PROGRAM_ITEM_COUNT][2000];//暂定2000;
 extern int program_code_length[BAC_PROGRAM_ITEM_COUNT];
 
-
+extern int controller_counter ; //记录扫描的子节点
 extern CString bac_cs_mac;
 extern CString bac_cs_device_id;
 //extern CString bac_cs_vendor_id;
@@ -1298,3 +1299,5 @@ extern bool offline_mode ; //全局离线模式判断;
 extern CString offline_prg_path;   //离线模式得prg 保存路径;
 
 extern bool custom_bacnet_register_listview;
+
+extern Str_modbus_reg bacnet_to_modbus_struct; //用于bacnet 协议转换为modbus 协议的结构

@@ -1153,9 +1153,37 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					CString temp_icon_path_screen;
 					if(temp_info.nPoint_number < BAC_SCREEN_COUNT)
 					{
-						MultiByteToWideChar( CP_ACP, 0, (char *)m_screen_data.at(temp_info.nPoint_number).picture_file,(int)strlen((char *)m_screen_data.at(temp_info.nPoint_number).picture_file)+1, 
-							temp_icon_path_screen.GetBuffer(MAX_PATH), MAX_PATH );
-						temp_icon_path_screen.ReleaseBuffer();	
+                        CString ApplicationFolder;
+                        CString image_fordor;
+                        GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+                        PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
+                        ApplicationFolder.ReleaseBuffer();
+                        CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+                        image_fordor = ApplicationFolder + _T("\\Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
+                        CFileFind temp_find;
+                        if (temp_find.FindFile(image_fordor) == 0)
+                        {
+                            CreateDirectory(image_fordor, NULL);
+                        }
+                        CString new_file_path;
+                        CString FileName;
+
+                        MultiByteToWideChar(CP_ACP, 0, (char *)temp_info.ico_name, (int)strlen((char *)temp_info.ico_name) + 1,
+                            FileName.GetBuffer(MAX_PATH), MAX_PATH);
+                        FileName.ReleaseBuffer();
+
+                        new_file_path = image_fordor + _T("\\") + FileName;
+                        
+                        if (temp_find.FindFile(new_file_path) == 0)
+                        {
+                            MultiByteToWideChar(CP_ACP, 0, (char *)m_screen_data.at(temp_info.nPoint_number).picture_file, (int)strlen((char *)m_screen_data.at(temp_info.nPoint_number).picture_file) + 1,
+                                temp_icon_path_screen.GetBuffer(MAX_PATH), MAX_PATH);
+                            temp_icon_path_screen.ReleaseBuffer();
+                        }
+                        else
+                        {
+                            temp_icon_path_screen = FileName;
+                        }
 					}
 					else
 					{
@@ -1164,7 +1192,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 
 
 					m_edit_icon_path.SetWindowTextW(temp_icon_path_screen);
-					m_edit_icon_path.EnableWindow(false);
+					m_edit_icon_path.EnableWindow(true);
 
 				}
 			}
@@ -1297,14 +1325,15 @@ void CBacnetEditLabel::ChangeWindowPos(bool nshow)
 
 	if(nshow)
 	{
-        int horizontalDPI;
-        int verticalDPI;
         if ((horizontalDPI > 96) || (verticalDPI > 96))
             MoveWindow(temprec.left, temprec.top, 670, 430);
         else
 			MoveWindow(temprec.left,temprec.top,530,340);
 			GetDlgItem(IDC_EDIT_ICON_PATH)->ShowWindow(1);
-            GetDlgItem(IDC_EDIT_ICON_PATH2)->ShowWindow(1);
+            if((label_info.nPoint_type == BAC_IN) ||(label_info.nPoint_type == BAC_OUT) || (label_info.nPoint_type == BAC_VAR))
+                GetDlgItem(IDC_EDIT_ICON_PATH2)->ShowWindow(1);
+            else
+                GetDlgItem(IDC_EDIT_ICON_PATH2)->ShowWindow(0);
 			GetDlgItem(IDC_STATIC_EDIT_TEXT_PLACE)->ShowWindow(1);
 			GetDlgItem(IDC_STATIC_EDIT_ICON_SIZE)->ShowWindow(1);
 			GetDlgItem(IDC_STATIC_ICON_PATH)->ShowWindow(1);

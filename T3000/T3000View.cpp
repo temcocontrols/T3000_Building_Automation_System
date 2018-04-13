@@ -6,27 +6,17 @@
 #include "T3000Doc.h"
 #include "T3000View.h"
 #include "global_function.h"
-//#include "global_variable.h"
 #include "global_variable_extern.h"
 #include "ParameterDlg.h"
-
-
 #include "OutPutDlg.h"
 #include "InputSetDlg.h"
 #include "OutputSetDlg.h"
 #include "AfxMessageDialog.h"
-
 #include "LedsDialog.h"
-
-
 #include "TStatScheduleDlg.h"
 #include "TstatZigbeeLogic.h"
-
- 
 #include "DisplayConfig.h"
-
 #include "HtmlHelp.h"
-
 #include "DisplayConfig.h"
 #include "LedsDialog.h"
  #include "../SQLiteDriver/CppSQLite3.h"
@@ -6408,7 +6398,7 @@ BOOL CT3000View::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
 void CT3000View::DayHandleMovedSlidercontrol1(const VARIANT& sender, float newValue)
 {
 		BOOL TwoPoint = m_daySlider.get_TwoSliderMode();
-		int nMin, nMax;
+		//int nMin, nMax;
 		int nHeatSP, nCoolSP, nSP;
 		int nHDB;
 		int nCDB;
@@ -6420,8 +6410,8 @@ void CT3000View::DayHandleMovedSlidercontrol1(const VARIANT& sender, float newVa
 			|| product_register_value[7] == PM_TSTAT8_220V) || (product_register_value[7] == PM_TSTAT5i))
 		{
 			int Increment = product_register_value[MODBUS_SETPOINT_INCREASE];
-			nMax = (int)(m_daySlider.get_TopValue() * 10);
-			nMin = (int)(m_daySlider.get_BottomValue() * 10);
+			//nMax = (int)(m_daySlider.get_TopValue() * 10);
+			//nMin = (int)(m_daySlider.get_BottomValue() * 10);
 			 
 			if (TwoPoint)
 			{
@@ -6743,26 +6733,35 @@ void CT3000View::NightHandleMovedSlidercontrol1(const VARIANT& sender, float new
 			int	Tstat_nSP = (short)product_register_value[MODBUS_NIGHT_SETPOINT];
 			int	Tstat_nCoolSP = (short)product_register_value[MODBUS_NIGHT_COOLING_SETPOINT];
 			int	Tstat_nHeatSP = (short)product_register_value[MODBUS_NIGHT_HEATING_SETPOINT];
-			int NightSP = Tstat_nSP;
+			int NightSP = nSP;
 			if (Tstat_nSP != nSP)
 			{
 
-
+                bool setpoint_flag = false; //若 被 最小或最大值限制, 就要判断 要不要 刷新界面。
 				if (NightSP < nRangeMin * 10)  //  ||
 				{
 					NightSP = nRangeMin * 10;
+                    CString temp_cs;
+                    temp_cs.Format(_T("Setpoint can't lower than MIN_SETPOINT , MIN_SETPOINT value is %d"), nRangeMin);
+                    MessageBox(temp_cs, _T("Warning"), MB_OK);
+                    setpoint_flag = true;
 				}
 				if (nSP > nRangeMax * 10)
 				{
 					NightSP = nRangeMax * 10;
+                    CString temp_cs;
+                    temp_cs.Format(_T("Setpoint can't larger than MAX_SETPOINT , MIN_SETPOINT value is %d"), nRangeMax);
+                    MessageBox(temp_cs, _T("Warning"), MB_OK);
+                    setpoint_flag = true;
 				}
 
 				int ret = write_one(g_tstat_id, MODBUS_NIGHT_SETPOINT, NightSP, 5);//t6 350
-				if (ret < 0)
+				if ((ret < 0) || setpoint_flag)
 				{
 					/*AfxMessageBox(_T("Write Fail!"));*/
 					m_active_key_mouse = FALSE;
-					InitFlexSliderBars_tstat6();
+					//InitFlexSliderBars_tstat6();
+                    Fresh();
 					return;
 				}
 				product_register_value[MODBUS_NIGHT_SETPOINT] = NightSP;

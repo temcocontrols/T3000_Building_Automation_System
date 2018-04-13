@@ -1967,16 +1967,19 @@ void CBacnetScreenEdit::OnPaint()
 		int right_point = 0;
 		int botton_point = 0;
 		int cstring_length = 0;
+        cstring_length = cs_show_info.GetLength();
+        if (cstring_length == 0)
+            cstring_length = 3;
+        right_point = cstring_length * 8;
 		if(m_bac_label_vector.at(i).nMouse_Status == LABEL_MOUSE_ON_LB_DOWN)
 		{
 			Pen *myRectangle_pen;
 
-			cstring_length = cs_show_info.GetLength();
-			if(cstring_length == 0)
-				cstring_length = 10;
+			
+
 			x_point = pointF.X - 2;
 			y_point = pointF.Y - 2;
-			right_point =  cstring_length * 10;
+
 			botton_point =  30;
 
 			myRectangle_pen = new Pen(Color(255,0,255,255));
@@ -1985,8 +1988,7 @@ void CBacnetScreenEdit::OnPaint()
 			delete myRectangle_pen;
 		}
 
-
-
+        m_bac_label_vector.at(i).x_length = right_point;
 
 		if((m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_LABEL) ||
 			(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_VALUE) ||
@@ -2018,9 +2020,40 @@ void CBacnetScreenEdit::OnPaint()
 				}
 				else
 				{
-					MultiByteToWideChar( CP_ACP, 0, (char *)m_screen_data.at(temp_index).picture_file,(int)strlen((char *)m_screen_data.at(temp_index).picture_file)+1, 
-						temp_cstring.GetBuffer(MAX_PATH), MAX_PATH );
-					temp_cstring.ReleaseBuffer();
+                    CString ApplicationFolder;
+                    CString image_fordor;
+                    GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+                    PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
+                    ApplicationFolder.ReleaseBuffer();
+                    CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+                    image_fordor = ApplicationFolder + _T("\\Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
+                    CFileFind temp_find;
+                    if (temp_find.FindFile(image_fordor) == 0)
+                    {
+                        CreateDirectory(image_fordor, NULL);
+                    }
+                    CString new_file_path;
+                    CString FileName;
+
+                    MultiByteToWideChar(CP_ACP, 0, (char *)m_bac_label_vector.at(i).ico_name, (int)strlen((char *)m_bac_label_vector.at(i).ico_name) + 1,
+                        FileName.GetBuffer(MAX_PATH), MAX_PATH);
+                    FileName.ReleaseBuffer();
+
+                    new_file_path = image_fordor + _T("\\") + FileName;
+
+                    if (temp_find.FindFile(new_file_path) == 0)
+                    {
+                        MultiByteToWideChar(CP_ACP, 0, (char *)m_screen_data.at(temp_index).picture_file, (int)strlen((char *)m_screen_data.at(temp_index).picture_file) + 1,
+                            temp_cstring.GetBuffer(MAX_PATH), MAX_PATH);
+                        temp_cstring.ReleaseBuffer();
+                    }
+                    else
+                    {
+                        temp_cstring = FileName;
+                    }
+
+
+
 					icon_full_path = m_building_image_folder + _T("\\") + temp_cstring ;//_T("sample1.bmp");
 				}
 
@@ -2210,12 +2243,13 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 	for (int i=0;i<m_bac_label_vector.size();i++)
 	{
 		int rect_x = m_bac_label_vector.at(i).nPoint_x;
-		int rect_x_right = rect_x + 160;
+		//int rect_x_right = rect_x + 160;
+        int rect_x_right = rect_x + m_bac_label_vector.at(i).x_length;
 		int rect_y = m_bac_label_vector.at(i).nPoint_y;
 		int rect_y_botton = rect_y + 30;
 
 		int x_l_exp_value = 10;
-		int x_r_exp_value = 20;
+		int x_r_exp_value = 0;
 		int y_top_exp_value = 3;
 		int y_btn_exp_value = 3;
 
@@ -2723,9 +2757,18 @@ void CBacnetScreenEdit::SaveBacLabel(int nItem)
 	if(nItem>=(int)m_bac_label_vector.size())
 		return;
 	::GetWindowRect(BacNet_hwd,&mynew_rect);	//获取 view的窗体大小;
+    unsigned short temp_x_value;
+    unsigned short temp_y_value;
 
-	m_graphic_label_data.at( m_bac_label_vector.at(nItem).nLabel_index).reg.nPoint_x = (m_bac_label_vector.at(nItem).nPoint_x * 1000)/m_paint_right_limit;
-	m_graphic_label_data.at( m_bac_label_vector.at(nItem).nLabel_index).reg.nPoint_y = (m_bac_label_vector.at(nItem).nPoint_y * 1000)/m_paint_botton_limit;
+    //m_bac_label_vector.at(nItem).nPoint_x = m_bac_label_vector.at(nItem).nPoint_x - m_bac_label_vector.at(nItem).nPoint_x % 16;
+    //m_bac_label_vector.at(nItem).nPoint_y = m_bac_label_vector.at(nItem).nPoint_y - m_bac_label_vector.at(nItem).nPoint_y % 10;
+
+    temp_x_value = (m_bac_label_vector.at(nItem).nPoint_x * 1000) / m_paint_right_limit ;
+    temp_y_value = (m_bac_label_vector.at(nItem).nPoint_y * 1000) / m_paint_botton_limit ;
+	m_graphic_label_data.at( m_bac_label_vector.at(nItem).nLabel_index).reg.nPoint_x = temp_x_value;
+	m_graphic_label_data.at( m_bac_label_vector.at(nItem).nLabel_index).reg.nPoint_y = temp_y_value;
+
+    Invalidate();
 }
 
 

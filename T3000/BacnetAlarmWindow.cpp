@@ -75,10 +75,6 @@ BOOL CBacnetAlarmWindow::OnInitDialog()
 		IMAGE_BITMAP,0,0,  
 		LR_LOADMAP3DCOLORS);
 
-
-
-
-	
 	::SetWindowPos(this->m_hWnd,HWND_TOPMOST,0,0,32,24,SWP_NOMOVE|SWP_SHOWWINDOW);
 
 	m_static_bac_alarm.SetWindowTextW(_T("ALARM"));

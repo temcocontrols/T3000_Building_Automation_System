@@ -49,6 +49,7 @@ public:
 	afx_msg void OnBnClickedRadio78();
 	afx_msg void OnBnClickedRadio79();
 	afx_msg void OnBnClickedRadio80();
+    void UpdateCustomerRangeText();
 };
 
 const CString Range_Type[] =

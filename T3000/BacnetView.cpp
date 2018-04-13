@@ -1,6 +1,29 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
+//使用VS2010 编译需删除 c:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cvtres.exe 来确保用更高版本的 来转换资源文件
+
+2018-0409 Update by Fance
+1.支持同时扫描
+2.开启T3000 默认进入的设备 由上次成功的连接决定.
+3.修复 在设置 custom  range是 digitalrange 意外弹出 的问题;
+4.在T3BB点击和电脑同步的时候 时区也一并同步 .
+
+2018-04-02  Update by Fance
+1. 支持 T3-6CTA 通过MODBUS 485 正常访问
+2. 串口  多线程同时扫描  ， 修改底层 动态库 。（改动较大）
+
+
+1.  The subpanel can be zero , ex:  1.0.VAR3
+2.  Tool bar and menu and new icon , it will show the subpanel.Function not finished ,but ICON already added.
+3.  Optimize the UI , when changing the IP address , if it is occupied by other PC or device , it will mention user can't use this IP.
+4.  T3000 can auto find the device has the same IP address , and will pop up message to guide the user change one of the IP Address.
+5. T3 controller can change LCD mode on the setting UI.
+6. T3000 will release the UDP port 47808 when user want to use it in other software.
+7. Fix the controll logic of  TSTAT8 setpoint in the parameter UI.
+8. Fix the T3 controller , some of the input and output can't show the detail information when user in program edit interface ,Fix bugs  press 'Insert' ,nothing happen.
+
+
 2018-0312 Update by Fance
 1.修复 部分 input output debug 模式无法正常弹出的问题
 2.修复 TSTAT8  setpoint ，现在修改值能够正常反应实际状态了.
@@ -5096,14 +5119,14 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 					if(already_retry == false)
 					{
 						//如果 TCP能连接上， 而没有回复UDP的包，就用TCP 发送软复位命令给板子;
-						SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("No who is command response!"));
-						if(IDYES == MessageBox(_T("No bacnet command reply from panel .Do you want reset the network of this panel"),_T("Warning"),MB_YESNO))
-						{
-							write_one(g_tstat_id,33,151,1);
+						SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("No bacnet command response!"));
+						//if(IDYES == MessageBox(_T("No bacnet command reply from panel .Do you want reset the network of this panel"),_T("Warning"),MB_YESNO))
+						//{
+						//	write_one(g_tstat_id,33,151,1);
 
-							SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Reset the network , please wait!"));
+						//	SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Reset the network , please wait!"));
 
-						}
+						//}
 						click_resend_time = 10;
 						already_retry = true;
 

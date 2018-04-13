@@ -760,6 +760,9 @@ void CProductRegisterListView::LoadDataSheet() {
 
 	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 
+    if (ProductModel == PM_MINIPANEL_ARM)
+        ProductModel = PM_MINIPANEL;
+
 	if (m_sort_type == 0)
 	{
 		StrSql.Format(_T("Select * From CustomProductTable Where ModelNo = %d  "), ProductModel);

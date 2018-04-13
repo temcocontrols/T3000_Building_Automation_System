@@ -6,7 +6,7 @@ using namespace std;
 
 CModbus::CModbus()
 {
-	m_hSerial = 0;
+    m_hSerial = 0;
 	m_LATENCY_TIME_COM = 100;
 	m_LATENCY_TIME_NET = 100;
 	m_hSocket_for_list = NULL;

@@ -1842,6 +1842,90 @@ int GetPrivateData(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint
 
 
 
+/************************************************************************/
+/*
+Author: Fance
+Get  Private  Bacnet  To  ModbusData
+//这个函数用来通过bacnet命令读取modbus 的相关寄存器
+*/
+/************************************************************************/
+int GetPrivateBacnetToModbusData(uint32_t deviceid, int16_t start_reg, int16_t readlength, unsigned short *data_out)
+{
+    int n_ret = 0;
+    bacnet_to_modbus_struct.org_nlength = readlength;
+    bacnet_to_modbus_struct.org_start_add = start_reg;
+    uint8_t apdu[480] = { 0 };
+    uint8_t test_value[480] = { 0 };
+    int apdu_len = 0;
+    int private_data_len = 0;
+    unsigned max_apdu = 0;
+    BACNET_APPLICATION_DATA_VALUE data_value = { 0 };
+    BACNET_PRIVATE_TRANSFER_DATA private_data = { 0 };
+    bool status = false;
+
+    private_data.vendorID = BACNET_VENDOR_ID;
+    private_data.serviceNumber = 1;
+
+
+    char SendBuffer[1000];
+    memset(SendBuffer, 0, 1000);
+    char * temp_buffer = SendBuffer;
+    Str_bacnet_to_modbus_header private_data_chunk;
+
+
+
+    int HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
+
+    HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
+    private_data_chunk.total_length = PRIVATE_HEAD_LENGTH;
+    private_data_chunk.command = BACNET_TO_MODBUS_COMMAND;
+    private_data_chunk.start_reg = start_reg; // 测试
+    private_data_chunk.nlength = readlength;
+    Set_transfer_length(PRIVATE_HEAD_LENGTH);
+    status = bacapp_parse_application_data(BACNET_APPLICATION_TAG_OCTET_STRING, (char *)&private_data_chunk, &data_value);
+
+    private_data_len = bacapp_encode_application_data(&test_value[0], &data_value);
+    private_data.serviceParameters = &test_value[0];
+    private_data.serviceParametersLen = private_data_len;
+
+    BACNET_ADDRESS dest = { 0 };
+
+    status = address_get_by_device(deviceid, &max_apdu, &dest);
+    if (status)
+    {
+        g_llTxCount++;
+        n_ret = Send_ConfirmedPrivateTransfer(&dest, &private_data);
+
+        if (n_ret >= 0)
+        {
+            for (int i = 0; i<300; i++)
+            {
+                Sleep(10);
+                if (tsm_invoke_id_free(n_ret))
+                {
+                    if (bacnet_to_modbus_struct.org_nlength != bacnet_to_modbus_struct.nlength)
+                        return -3;
+                    if (bacnet_to_modbus_struct.org_start_add != bacnet_to_modbus_struct.start_add)
+                        return -4;
+                    if (readlength != bacnet_to_modbus_struct.nlength)
+                        return -5;
+                    memcpy(data_out, bacnet_to_modbus_struct.ndata, 2 * bacnet_to_modbus_struct.nlength);
+                    return readlength;
+                }
+                else
+                    continue;
+            }
+        }
+    }
+    else
+        return -2;
+
+
+
+}
+
+
+
 
 /************************************************************************/
 /*
@@ -3585,6 +3669,12 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 			return READMONITORDATA_T3000;
 		}
         break;
+    case BACNET_TO_MODBUS_COMMAND:
+        {
+             handle_bacnet_to_modbus_data((char *)Temp_CS.value, len_value_type);
+        return BACNET_TO_MODBUS_COMMAND;
+        }
+    break;
     case READMONITORPACKAGE_T3000:
        {
 
@@ -4955,12 +5045,30 @@ extern CString local_enthernet_ip;
 //socket dll.
 bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysocket)
 {
+    //2018 03 21 Fandu 解决 PCIP地址频繁变化导致的 bind 数据库以前的错误IP ，以至于 无法正常通讯的问题.
     bool find_network =false;
     for (int i = 0; i < g_Vector_Subnet.size(); i++)
     {
-        if (strIPAdress.CompareNoCase(g_Vector_Subnet.at(i).StrIP) == 0)
+        CStringArray temp_strip;
+        SplitCStringA(temp_strip, strIPAdress, _T("."));
+        CString temp_ip;
+        temp_ip.Format(_T("%s.%s.%s"), temp_strip.GetAt(0), temp_strip.GetAt(1), temp_strip.GetAt(2));
+
+        CString PC_IP;
+        PC_IP = g_Vector_Subnet.at(i).StrIP;
+        CStringArray temp_pc_strip;
+        SplitCStringA(temp_pc_strip, PC_IP, _T("."));
+        CString temp_pc_ip;
+        temp_pc_ip.Format(_T("%s.%s.%s"), temp_pc_strip.GetAt(0), temp_pc_strip.GetAt(1), temp_pc_strip.GetAt(2));
+
+        if (temp_pc_ip.CompareNoCase(_T("0.0.0")) == 0)
+            continue;
+
+
+        if (temp_ip.CompareNoCase(temp_pc_ip) == 0)
         {
             find_network = true;
+            strIPAdress = g_Vector_Subnet.at(i).StrIP;
             break;
         }
     }
@@ -9353,7 +9461,11 @@ void LoadTstat_InputData()
 		strTemp = L"0";
         nValue=product_register_value[MODBUS_ANALOG1_RANGE+i-1];	//189
         nValue &= 0x7F;//去掉最高位
-        
+
+        //2018 04 02 Fandu 增加此异常处理 ，若不加，当值异常时，程序崩溃.
+        int nsize = sizeof(analog_range_TSTAT6) / sizeof(analog_range_TSTAT6[0]);
+        if (nValue >= nsize)
+            nValue = 0;
         strTemp=analog_range_TSTAT6[nValue];
         
         m_crange=nValue;
@@ -12825,5 +12937,98 @@ bool Save_VariableData_to_db(unsigned char  temp_output_index, unsigned int nser
 	SqliteDBBuilding.closedb();
 
 
+}
+
+
+//val         the value that you want to write to the register
+//the return value == -1 ,no connecting
+//the return value == -2 ,try it again
+//the return value == -3,Maybe that have more than 2 Tstat is connecting
+//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
+//the return value == -5 ,the input have some trouble
+//the return value == -6 , the bus has bannet protocol,scan stop;
+//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
+//清空串口缓冲区
+//the return value is the register address
+//Sleep(50);       //must use this function to slow computer
+int g_CheckTstatOnline_nocritical(unsigned char  devLo, unsigned char devHi, bool bComm_Type, int ncomport)
+{
+
+    BOOL EnableRefreshTreeView_original_value = g_bEnableRefreshTreeView;
+    g_bEnableRefreshTreeView = false;
+    int j = -1;
+    // ensure no other threads attempt to access modbus communications
+    //CSingleLock singleLock(&register_critical_section);
+    //singleLock.Lock();
+    // call the modbus DLL method
+    j = CheckTstatOnline_nocretical(devLo, devHi, bComm_Type, ncomport);
+    // free the modbus communications for other threads
+    //singleLock.Unlock();
+    // increment the number of transmissions we have done
+    g_llTxCount++;
+    // check for other errors
+    // increment the number or replies we have received
+    if (j != -1 && j != -4)
+    {
+        g_llRxCount++;
+    }
+    // check for running in the main GUI thread
+    if (AfxGetMainWnd()->GetActiveWindow() != NULL)
+    {
+
+        // construct status message string
+        CString str;
+        str.Format(_T("San Command [Tx=%d Rx=%d Err=%d]"),
+            g_llTxCount, g_llRxCount, g_llTxCount - g_llRxCount);
+
+        //Display it
+        ((CMFCStatusBar *)AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR))->SetPaneText(0, str.GetString());
+
+    }
+    g_bEnableRefreshTreeView |= EnableRefreshTreeView_original_value;
+    return j;
+}
+
+
+//This function code by Fance du for handle bacnet to modbus data;
+int handle_bacnet_to_modbus_data(char *npoint, int nlength)
+{
+    Str_bacnet_to_modbus_header private_data_receive;
+    char * my_temp_point = npoint;
+    char * temp_print = my_temp_point;
+    temp_print = my_temp_point;
+
+    private_data_receive.total_length =  (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0];
+    my_temp_point = my_temp_point + 2;
+    private_data_receive.command = *(my_temp_point++);
+    private_data_receive.start_reg = (unsigned char)my_temp_point[1] << 8 | (unsigned char)my_temp_point[0];
+    my_temp_point = my_temp_point + 2;
+    private_data_receive.nlength = (unsigned char)my_temp_point[1] << 8 | (unsigned char)my_temp_point[0];
+    my_temp_point = my_temp_point + 2;
+
+    bacnet_to_modbus_struct.nlength = private_data_receive.nlength;
+    bacnet_to_modbus_struct.start_add = bacnet_to_modbus_struct.org_start_add;
+    if (bacnet_to_modbus_struct.nlength == 0)
+        return 0;
+    if (bacnet_to_modbus_struct.nlength != bacnet_to_modbus_struct.org_nlength)
+        return 0;
+    if (bacnet_to_modbus_struct.start_add != bacnet_to_modbus_struct.org_start_add)
+        return 0;
+
+    if (private_data_receive.total_length != (2 * private_data_receive.nlength))
+        return 0;
+
+    if (bacnet_to_modbus_struct.nlength <= 200)
+    {
+        memcpy(bacnet_to_modbus_struct.ndata, my_temp_point, 2 * bacnet_to_modbus_struct.nlength);
+        //因为下位机回传的大小端与电脑相反,需要转换为以下位机的为准
+        for (int i = 0; i < nlength; i++)
+        {
+            bacnet_to_modbus_struct.ndata[i] = htons(bacnet_to_modbus_struct.ndata[i]);
+        }
+        my_temp_point = my_temp_point + 2 * bacnet_to_modbus_struct.nlength;
+    }
+    //bacnet_to_modbus_struct
+    return 0;
 }
 

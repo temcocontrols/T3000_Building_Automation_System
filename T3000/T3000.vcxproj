@@ -566,7 +566,6 @@
     <ClInclude Include="CM5\user_data.h" />
     <ClInclude Include="CO2NetView.h" />
     <ClInclude Include="CO2_View.h" />
-    <ClInclude Include="CommandWindow.h" />
     <ClInclude Include="ConfigFileHandler.h" />
     <ClInclude Include="ConnectRemoteServer.h" />
     <ClInclude Include="CustomSTable.h" />
@@ -595,7 +594,6 @@
     <ClInclude Include="LanguageLocale.h" />
     <ClInclude Include="LCOutNameConfig.h" />
     <ClInclude Include="ModbusToBacnetRouterDlg.h" />
-    <ClInclude Include="Modbus_LIB.h" />
     <ClInclude Include="NewHumChamberView.h" />
     <ClInclude Include="NewTstatSchedulesDlg.h" />
     <ClInclude Include="OXBitmapButton.h" />
@@ -631,7 +629,6 @@
     <ClInclude Include="T3ModulesView.h" />
     <ClInclude Include="T3RangeDlg.h" />
     <ClInclude Include="T3RTDView.h" />
-    <ClInclude Include="TargetGrid.h" />
     <ClInclude Include="TCP_Server.h" />
     <ClInclude Include="TemcoDataGrid.h" />
     <ClInclude Include="TemcoStandardBacnetToolDlg.h" />
@@ -667,9 +664,7 @@
     <ClInclude Include="GridFlashDlg.h" />
     <ClInclude Include="GridLoad.h" />
     <ClInclude Include="hangeIDDlg.h" />
-    <ClInclude Include="HumChamber.h" />
     <ClInclude Include="ImageTreeCtrl.h" />
-    <ClInclude Include="ImportDatabaseDlg.h" />
     <ClInclude Include="IniFile.h" />
     <ClInclude Include="InputSetDlg.h" />
     <ClInclude Include="IODisplayBar.h" />

@@ -518,7 +518,9 @@ CString GetProductName(int ModelID)
 	case PM_PWMETER:
 		strProductName = "PWMETER";
 		break;
-
+    case PM_WEATHER_STATION:
+        strProductName = "WS";
+        break;
 	default:
 		strProductName.Format(_T("Model ID:%d is out of control"),ModelID);
 		break;
