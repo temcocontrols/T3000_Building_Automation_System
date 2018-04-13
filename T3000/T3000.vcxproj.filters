@@ -698,9 +698,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="OutputTableDlg.htm">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="res\ApplyDisable.bmp">
       <Filter>Resource Files</Filter>
     </None>
@@ -1039,6 +1036,7 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="ClassDiagram.cd" />
+    <None Include="OutputTableDlg.htm" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">
@@ -1116,13 +1114,7 @@
     <ClInclude Include="hangeIDDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HumChamber.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ImageTreeCtrl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ImportDatabaseDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IniFile.h">
@@ -1396,9 +1388,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RegisterViewerDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TargetGrid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TemcoDataGrid.h">
@@ -1710,9 +1699,6 @@
     <ClInclude Include="T3000Option.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommandWindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="RemotePtpLogin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1759,9 +1745,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BTUMeterDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Modbus_LIB.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BacnetVarCusRang.h">

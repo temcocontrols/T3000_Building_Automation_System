@@ -1950,6 +1950,7 @@ char m_at_write_buf[100];
 char m_at_read_buf[450];
 
 vector <int> exsit_panel_number;
+vector <refresh_net_device> m_T3BB_device_data;
 vector <refresh_net_device> m_refresh_net_device_data;
 vector <GSM_connection_info> m_gsm_connect_info;
 vector <Scan_Info> m_scan_info;
@@ -1960,7 +1961,7 @@ char picture_data_buffer[400]; //用来存每包 pic 的数据.
 Str_picture_header m_picture_head; //传图片的 头，结构其实是和 monitor same.
 int Monitor_Input__Data[14][1000];	
 
-
+int controller_counter = 0; //记录扫描的子节点
 
 
 
@@ -2221,3 +2222,5 @@ CString offline_prg_path;   //离线模式得prg 保存路径;
 
 
 bool custom_bacnet_register_listview = true;
+
+Str_modbus_reg bacnet_to_modbus_struct;  //用于bacnet 协议转换为modbus 协议的结构

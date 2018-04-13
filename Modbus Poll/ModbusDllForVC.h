@@ -12,10 +12,12 @@ INPUT int write_multi_tap(unsigned char device_var,unsigned char *to_write,unsig
 INPUT int read_multi_tap(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
 
 INPUT bool open_com(int m_com);
+INPUT bool open_com_nocretical(int m_com);
 INPUT void close_com();
 INPUT bool is_connect();
 INPUT int CheckTstatOnline(unsigned char devLo=1,unsigned char devHi=254);
 INPUT bool Change_BaudRate(int new_baurate);
+INPUT bool Change_BaudRate_NoCretical(int new_baudrate, int ncomport);
 INPUT bool SetComm_Timeouts(LPCOMMTIMEOUTS lpCommTimeouts);
 INPUT void SetComnicationHandle(int nType,HANDLE hCommunication);
 INPUT bool Open_Socket(CString strIPAdress);

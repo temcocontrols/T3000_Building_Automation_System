@@ -134,7 +134,7 @@ __declspec(dllexport)    void Send_WhoIs_Global(
         BACNET_READ_ACCESS_DATA * read_access_data);
 
 /* returns the invoke ID for confirmed request, or 0 if failed */
-    uint8_t Send_Write_Property_Request(
+ __declspec(dllexport)   uint8_t Send_Write_Property_Request(
         uint32_t device_id,     /* destination device */
         BACNET_OBJECT_TYPE object_type,
         uint32_t object_instance,

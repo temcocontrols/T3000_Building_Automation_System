@@ -119,8 +119,19 @@ void MySocket::OnReceive(int nErrorCode)
 
 				FileProductName.Trim();
 				DeviceProductName.Trim();
+
+                FileProductName.MakeUpper();
+                DeviceProductName.MakeUpper();
                
-                ShowTFTPMessage = FileProductName + _T("  ") + DeviceProductName;
+                if (FileProductName.CompareNoCase(DeviceProductName) == 0)
+                {
+                    ShowTFTPMessage = _T("Ready to check the firmware and panel.");
+                }
+                else
+                {
+                    ShowTFTPMessage = _T("Firmware: ") +  FileProductName + _T("  ") + _T("Panel: ") + DeviceProductName;
+                }
+                    
 				if (DeviceProductName.CompareNoCase(FileProductName)!=0)
 				{
 					CString strTip;
@@ -141,7 +152,7 @@ void MySocket::OnReceive(int nErrorCode)
 					}
 					else
 					{
-						strTip.Format(_T("Your device is %s,but your bin file is fit for %s"),DeviceProductName.GetBuffer(),FileProductName.GetBuffer());
+						strTip.Format(_T("Your device is %s,but the file is fit for %s"),DeviceProductName.GetBuffer(),FileProductName.GetBuffer());
                         ShowTFTPMessage = strTip;
 						CAsyncSocket::OnReceive(nErrorCode);
 						return;
@@ -179,10 +190,20 @@ void MySocket::OnReceive(int nErrorCode)
                 FileProductName.ReleaseBuffer();
                 FileProductName = FileProductName.Left(11);
 
-
+                FileProductName.MakeUpper();
+                DeviceProductName.MakeUpper();
 				FileProductName.Trim();
 				DeviceProductName.Trim();
-                ShowTFTPMessage = FileProductName + _T("  ") + DeviceProductName;
+
+                if (FileProductName.CompareNoCase(DeviceProductName) == 0)
+                {
+                    ShowTFTPMessage = _T("Check the firmware and panel success.");
+                }
+                else
+                {
+                    ShowTFTPMessage = _T("Firmware: ") + FileProductName + _T("  ") + _T("Panel: ") + DeviceProductName;
+                }
+
 				if ((DeviceProductName.CompareNoCase(FileProductName)!=0) && (!DeviceProductName.IsEmpty()))
 				{
 					if((FileProductName.CompareNoCase(_T("HUMNET")) == 0) ||

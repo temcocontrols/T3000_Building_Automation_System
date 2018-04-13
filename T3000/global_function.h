@@ -43,9 +43,11 @@ int modbus_read_multi_value(
 
 int read_one(unsigned char device_var,unsigned short address,int retry_times=3);
 int g_CheckTstatOnline_a(unsigned char  devLo,unsigned char devHi, bool bComm_Type);
+int g_CheckTstatOnline_nocritical(unsigned char  devLo, unsigned char devHi, bool bComm_Type,int ncomport);
 int g_NetController_CheckTstatOnline_a(unsigned char  devLo,unsigned char  devHi, bool bComm_Type);
 int g_MINI_CheckTstatOnline_a(unsigned char devLo,unsigned char devHi, bool bComm_Type,int NET_COM);
 int write_one(unsigned char device_var,unsigned short address,short value,int retry_times=3);
+int write_one_multy_thread(unsigned char device_var, unsigned short address, short value, int retry_times = 3, int nindex = 0);
 int Write_Multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times=3);
 int Write_Multi_short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length,int retry_times=3);
 int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,int retry_times=3);
@@ -63,7 +65,7 @@ float get_curtstat_version();
 
 
 
-
+int handle_bacnet_to_modbus_data(char *npoint, int nlength);
 
 //
 void SetPaneString(int nIndext,CString str);
@@ -113,6 +115,7 @@ int GetProgramData(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance
 int GetProgramData_Blocking(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance,uint8_t npackgae);
 int GetPrivateData(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize);
 int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize, uint8_t retrytime = 10);
+int GetPrivateBacnetToModbusData(uint32_t deviceid, int16_t start_reg, int16_t readlength, unsigned short *data_out);//Bacnet 协议转换为 modbus 协议;
 
 int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t nIndex,int8_t ntype_ad, uint32_t ntotal_seg, uint32_t nseg_index,MonitorUpdateData* up_data);
 int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char start_instance,unsigned char end_instance);

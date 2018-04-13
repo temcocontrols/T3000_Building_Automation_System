@@ -8,16 +8,15 @@
 
 // CScanDbWaitDlg dialog
 CRect Scan_rect;
+extern HANDLE * hScanTCPData ; //用于网络多网络同时扫描
 IMPLEMENT_DYNAMIC(CScanDbWaitDlg, CDialog)
 
 CScanDbWaitDlg::CScanDbWaitDlg(CWnd* pParent /*=NULL*/)
     : CDialog(CScanDbWaitDlg::IDD, pParent)
-    , m_strNetScanInfo(_T(""))
-    , m_strComScanInfo(_T(""))
 {
     m_pScaner = NULL;
     g_bCancelScan=FALSE;
-    m_strNetScanInfo = _T("Net Scan : Start UDP Scan.");
+    n_time_count = 0;
 }
 
 CScanDbWaitDlg::~CScanDbWaitDlg()
@@ -28,9 +27,8 @@ void CScanDbWaitDlg::DoDataExchange(CDataExchange* pDX)
 {
     CDialog::DoDataExchange(pDX);
     DDX_Text(pDX, IDC_INFOSTATIC, m_strInfopromp);
-    DDX_Text(pDX, IDC_INFO_NET, m_strNetScanInfo);
-    DDX_Text(pDX, IDC_INFO_COM, m_strComScanInfo);
     DDX_Control(pDX, IDC_LIST_SCAN, m_scan_com_list);
+    DDX_Control(pDX, IDC_INFOSTATIC, m_waiting_title);
 }
 
 
@@ -40,6 +38,7 @@ BEGIN_MESSAGE_MAP(CScanDbWaitDlg, CDialog)
     ON_BN_CLICKED(IDC_EXITBUTTON, &CScanDbWaitDlg::OnBnClickedExitbutton)
     ON_WM_TIMER()
 
+    ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 
@@ -68,10 +67,22 @@ void CScanDbWaitDlg::OnBnClickedExitbutton()
 {
     
     g_bCancelScan=TRUE;
-    m_pScaner->StopScan();
+
 
 	//pScanner->m_bNetScanFinish = TRUE; // at this time, two thread end, all scan end
 	TerminateThread(hwait_scan_thread, 0);
+    TerminateThread(m_pScaner->m_pScanTCP_to_485Thread, 0);
+
+    for (int i = 0; i < controller_counter; i++)
+    {
+        if (hScanTCPData[i] != NULL)
+        {
+            TerminateThread(hScanTCPData[i], 0);
+            hScanTCPData[i] = NULL;
+        }
+    }
+    m_pScaner->StopScan();
+    Sleep(1000);
 	m_pScaner->SendScanEndMsg();
 
     OnCancel();
@@ -83,6 +94,10 @@ HWND scan_wait_dlg;
 BOOL CScanDbWaitDlg::OnInitDialog()
 {
     CDialog::OnInitDialog();
+    m_waiting_title.textColor(RGB(20, 20, 20));
+    //m_edit_display.bkColor(RGB(255, 255, 255));
+    m_waiting_title.setFont(20, 14, NULL, _T("Arial"));
+
     g_bCancelScan=FALSE;
     SetTimer(1,100,NULL);
     SetTimer(2,200,NULL);
@@ -169,9 +184,17 @@ void CScanDbWaitDlg::OnTimer(UINT_PTR nIDEvent)
                 CString strTemp;
                 CString strTip;
                 strTip.Format(_T("T3000 is scanning, please wait%s"), m_strDot);
-
-                m_strInfopromp=strTip;
-
+                if (m_pScaner->m_saving_data == false)
+                    m_strInfopromp = strTip;
+                else
+                {
+                    n_time_count++;
+                    int ncount = n_time_count / 20;
+                    if (ncount >= 3)
+                        ncount = 3;
+                    m_strInfopromp = Scan_Ret_Info[ncount] + m_strDot;
+                }
+                
                 UpdateData(FALSE);
             }
         }
@@ -196,8 +219,6 @@ void CScanDbWaitDlg::OnTimer(UINT_PTR nIDEvent)
             int ret_val = memcmp(&m_scan_info_buffer.at(x),&m_scan_info.at(x),sizeof(Scan_Info));
             if(ret_val == 0)
                 continue;
-
-
 
             CString temp_notes;
             MultiByteToWideChar( CP_ACP, 0, m_scan_info.at(x).scan_notes,(int)strlen(m_scan_info.at(x).scan_notes)+1,
@@ -262,7 +283,7 @@ void CScanDbWaitDlg::Initial_List()
     m_scan_com_list.SetExtendedStyle(m_scan_com_list.GetExtendedStyle() |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
     m_scan_com_list.InsertColumn(SCAN_MODE, _T("Scanning Mode"), 120, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
     //m_scan_com_list.InsertColumn(SCAN_BAUDRATE, _T("Baudrate"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-    m_scan_com_list.InsertColumn(SCAN_SKIP, _T("Skip"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+    //m_scan_com_list.InsertColumn(SCAN_SKIP, _T("Skip"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_scan_com_list.InsertColumn(SCAN_STATUS, _T("Status"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_scan_com_list.InsertColumn(SCAN_FOUND, _T("Reply"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_scan_com_list.InsertColumn(SCAN_NOTES, _T("Notes"), 480, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -292,7 +313,7 @@ void CScanDbWaitDlg::Initial_List()
     scan_mode = _T("Ethernet Scan");
     m_scan_com_list.InsertItem(0,scan_mode);
     //m_scan_com_list.SetItemText(i*2,SCAN_BAUDRATE,_T("9600"));
-    m_scan_com_list.SetItemText(0,SCAN_SKIP,_T("No"));
+    //m_scan_com_list.SetItemText(0,SCAN_SKIP,_T("No"));
     m_scan_com_list.SetItemText(0,SCAN_STATUS,_T("Wait"));
     m_scan_com_list.SetItemText(0,SCAN_FOUND,_T("0"));
 
@@ -338,7 +359,7 @@ void CScanDbWaitDlg::Initial_List()
             scan_mode = temp_serialport.at(i) +_T("        ") + c_strBaudate[baudrate];
             m_scan_com_list.InsertItem(i*NUMBER_BAUDRATE+baudrate+1,scan_mode);
              //m_scan_com_list.SetItemText(i*2,SCAN_BAUDRATE,_T("9600"));
-            m_scan_com_list.SetItemText(i*NUMBER_BAUDRATE +baudrate+1,SCAN_SKIP,_T("No"));
+            //m_scan_com_list.SetItemText(i*NUMBER_BAUDRATE +baudrate+1,SCAN_SKIP,_T("No"));
             m_scan_com_list.SetItemText(i*NUMBER_BAUDRATE +baudrate+1,SCAN_STATUS,_T("Wait"));
             m_scan_com_list.SetItemText(i*NUMBER_BAUDRATE +baudrate+1,SCAN_FOUND,_T("0"));
         }
@@ -369,7 +390,7 @@ void CScanDbWaitDlg::Initial_List()
 	scan_mode = _T(" ");
 	m_scan_com_list.InsertItem(ncount*NUMBER_BAUDRATE + 1,scan_mode);
 	//m_scan_com_list.SetItemText(i*2,SCAN_BAUDRATE,_T("9600"));
-	m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 1,SCAN_SKIP,_T(" "));
+	//m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 1,SCAN_SKIP,_T(" "));
 	m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 1,SCAN_STATUS,_T(" "));
 	m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 1,SCAN_FOUND,_T(" "));
 	if(b_remote_connection)
@@ -379,14 +400,14 @@ void CScanDbWaitDlg::Initial_List()
 	else
 		scan_mode = _T("");
 	m_scan_com_list.InsertItem(ncount*NUMBER_BAUDRATE + 2,scan_mode);
-	m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 2,SCAN_SKIP,_T(" "));
+	//m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 2,SCAN_SKIP,_T(" "));
 	m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 2,SCAN_STATUS,_T(" "));
 	m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 2,SCAN_FOUND,_T(" "));
 
-	if(b_remote_connection)
-	{
-		 m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 2,SCAN_SKIP,_T("No"));
-	}
+	//if(b_remote_connection)
+	//{
+	//	 m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 2,SCAN_SKIP,_T("No"));
+	//}
 
     for (int x=0; x<m_scan_info.size(); x++)
     {
@@ -410,5 +431,22 @@ void CScanDbWaitDlg::Initial_List()
 #endif
     }
 
+    for (int j = 0; j < 100; j++)
+    {
+        m_scan_com_list.InsertItem(ncount*NUMBER_BAUDRATE + 3 + j, scan_mode);
+    }
+    
 
+}
+
+
+void CScanDbWaitDlg::OnSize(UINT nType, int cx, int cy)
+{
+    CDialog::OnSize(nType, cx, cy);
+
+    // TODO: 在此处添加消息处理程序代码
+    CRect temp_mynew_rect;
+    ::GetWindowRect(this->m_hWnd, &temp_mynew_rect);	//获取 view的窗体大小;
+
+    ::SetWindowPos(m_scan_com_list.m_hWnd, NULL, temp_mynew_rect.left, temp_mynew_rect.top, temp_mynew_rect.Width() -30, temp_mynew_rect.Height(), SWP_NOMOVE);
 }

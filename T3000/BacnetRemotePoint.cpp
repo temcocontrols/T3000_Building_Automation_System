@@ -216,6 +216,7 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 			m_remote_point_list.SetItemText(i, REMOTE_TPYE, _T(""));
 			m_remote_point_list.SetItemText(i,REMOTE_DEVICE_STATUS,_T(""));
 			m_remote_point_list.SetItemText(i,REMOTE_DESCRIPTION,_T(""));
+            m_remote_point_list.SetItemText(i, REMOTE_TIME_REMAINING, _T(""));  //修复当远程的点不在的时候  时间还在显示的问题;
 			continue;
 		}
 
@@ -294,6 +295,7 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 			m_remote_point_list.SetItemText(i,REMOTE_VALUE,_T(""));
 			m_remote_point_list.SetItemText(i,REMOTE_DEVICE_STATUS,_T(""));
 			m_remote_point_list.SetItemText(i,REMOTE_DESCRIPTION,_T(""));
+            m_remote_point_list.SetItemText(i, REMOTE_TIME_REMAINING, _T(""));
 			continue;
 		}
 

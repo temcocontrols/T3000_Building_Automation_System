@@ -58,6 +58,7 @@ public:
 	  int write_multi(TS_UC device_var, TS_UC *to_write, TS_US start_address, TS_US length);
 	  int Read_One_log(TS_UC device_var, TS_US address, unsigned char *put_senddate_into_here, unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
 	  int Write_One(TS_UC device_var, TS_US address, TS_US val);
+      int Write_One_Multy_Thread(TS_UC device_var, TS_US address, TS_US val, int nindex);
 	  int Write_One_log(TS_UC device_var, TS_US address, TS_US val, 
 		  unsigned char *put_senddate_into_here, unsigned char *put_revdata_into_here,
 		  int* sendDataLength, int* recvDataLength);

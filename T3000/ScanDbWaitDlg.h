@@ -2,9 +2,10 @@
 #include "afxcmn.h"
 //#include "TStatScanner.h"
 #include "CM5/ListCtrlEx.h"
+#include "afxwin.h"
 // CScanDbWaitDlg dialog
 
-
+#include "CM5/CStatic/staticex.h"
 
 class CTStatScanner;
 class CScanDbWaitDlg : public CDialog
@@ -37,16 +38,17 @@ public:
 	CString m_strDot;
 
 	CTStatScanner*		m_pScaner;
-	CString m_strNetScanInfo;
-	CString m_strComScanInfo;
 	ListCtrlEx::CListCtrlEx m_scan_com_list;
+    CStaticEx m_waiting_title;
+    int n_time_count; //用于计数。
+    afx_msg void OnSize(UINT nType, int cx, int cy);
 };
 
 const int SCAN_MODE = 0;
 //const int SCAN_BAUDRATE = 1;
-const int SCAN_SKIP = 1;
-const int SCAN_STATUS = 2;
-const int SCAN_FOUND = 3;
-const int SCAN_NOTES = 4;
+//const int SCAN_SKIP = 1;
+const int SCAN_STATUS = 1;
+const int SCAN_FOUND = 2;
+const int SCAN_NOTES = 3;
 
-const int SCAN_ALL_COLUME = 5;
+const int SCAN_ALL_COLUME = 4;

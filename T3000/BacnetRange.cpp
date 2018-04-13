@@ -1895,9 +1895,40 @@ void BacnetRange::OnBnClickedCancel()
 }
 
 
+void BacnetRange::UpdateCustomerRangeText()
+{
+
+    for (int i = 0;i < BAC_CUSTOMER_UNITS_COUNT; i++)
+    {
+        MultiByteToWideChar(CP_ACP, 0, (char *)m_customer_unit_data.at(i).digital_units_off, (int)strlen((char *)m_customer_unit_data.at(i).digital_units_off) + 1,
+            temp_off[i].GetBuffer(MAX_PATH), MAX_PATH);
+        temp_off[i].ReleaseBuffer();
+        if (temp_off[i].GetLength() >= 12)
+            temp_off[i].Empty();
+
+        MultiByteToWideChar(CP_ACP, 0, (char *)m_customer_unit_data.at(i).digital_units_on, (int)strlen((char *)m_customer_unit_data.at(i).digital_units_on) + 1,
+            temp_on[i].GetBuffer(MAX_PATH), MAX_PATH);
+        temp_on[i].ReleaseBuffer();
+        if (temp_on[i].GetLength() >= 12)
+            temp_on[i].Empty();
+
+        CString unit_index;
+        unit_index.Format(_T("%d.     "), i + 23);
+
+        temp_unit[i] = unit_index + temp_off[i] + _T("/") + temp_on[i];
+        temp_unit_no_index[i] = temp_off[i] + _T("/") + temp_on[i];
+
+    }
+
+    for (int j = 0;j <= 7; j++)
+    {
+        GetDlgItem(IDC_RADIO73 + j)->SetWindowTextW(temp_unit[j]);
+    }
+}
+
 void BacnetRange::OnBnClickedBtnEditCustomerRange()
 {
-	
+
 	CBacnetCustomerDigitalRange dlg;
 	dlg.DoModal();
 
@@ -1947,54 +1978,54 @@ void BacnetRange::OnBnClickedBtnEditCustomerVarRange()
 void BacnetRange::OnBnClickedRadio73()
 {
 	
-	OnBnClickedBtnEditCustomerRange();
+    UpdateCustomerRangeText();
 }
 
 
 void BacnetRange::OnBnClickedRadio74()
 {
 	
-	//OnBnClickedBtnEditCustomerRange();
+    UpdateCustomerRangeText();
 }
 
 
 void BacnetRange::OnBnClickedRadio75()
 {
 	
-	OnBnClickedBtnEditCustomerRange();
+    UpdateCustomerRangeText();
 }
 
 
 void BacnetRange::OnBnClickedRadio76()
 {
 	
-	OnBnClickedBtnEditCustomerRange();
+    UpdateCustomerRangeText();
 }
 
 
 void BacnetRange::OnBnClickedRadio77()
 {
 	
-	OnBnClickedBtnEditCustomerRange();
+    UpdateCustomerRangeText();
 }
 
 
 void BacnetRange::OnBnClickedRadio78()
 {
 	
-	OnBnClickedBtnEditCustomerRange();
+    UpdateCustomerRangeText();
 }
 
 
 void BacnetRange::OnBnClickedRadio79()
 {
 	
-	OnBnClickedBtnEditCustomerRange();
+    UpdateCustomerRangeText();
 }
 
 
 void BacnetRange::OnBnClickedRadio80()
 {
 	
-	OnBnClickedBtnEditCustomerRange();
+    UpdateCustomerRangeText();
 }

@@ -104,6 +104,7 @@ typedef enum {
          READMONITORPACKAGE_T3000   = 89,           /* read monitor belong to which package   */
 		 READ_AT_COMMAND			= 90,	//450 length
 		 READ_GRPHIC_LABEL_COMMAND  = 91,
+         BACNET_TO_MODBUS_COMMAND   = 94,
 		 READPIC_T3000				= 95,
 		 READ_MISC					= 96,
 		 READ_REMOTE_DEVICE_DB		= 97,
@@ -264,6 +265,14 @@ typedef struct
 
 }Str_user_data_header;
 
+typedef struct
+{
+    uint16_t  		total_length;        /*	total length to be received or sent	*/
+    uint8_t		command;
+    uint16_t    start_reg;            //开始的寄存器
+    uint16_t		nlength;          //读写的长度
+
+}Str_bacnet_to_modbus_header;
 
 typedef struct
 {
@@ -278,7 +287,14 @@ typedef struct
 
 }Str_sub_user_data_header;
 
-
+typedef struct
+{
+    uint16_t start_add;
+    uint16_t nlength;
+    uint16_t org_start_add; // 用于校验数据的正确性
+    uint16_t org_nlength;   // 用于校验数据的正确性
+    unsigned short ndata[400];
+}Str_modbus_reg;
 
 typedef enum 
 { 

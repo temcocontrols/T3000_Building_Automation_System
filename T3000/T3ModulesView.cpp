@@ -808,7 +808,7 @@ void CT3ModulesView::Fresh()
     }
     else
     {
-        AfxMessageBox(_T("This Product is not T3 Modules!")) ;
+        //AfxMessageBox(_T("This Product is not T3 Modules!")) ;
     }
     m_T3_Input_List.ShowWindow(SW_SHOW);
 
@@ -1867,7 +1867,7 @@ LRESULT CT3ModulesView::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
     }
     else
     {
-        AfxMessageBox(_T("This Product is not T3 Modules!")) ;
+        //AfxMessageBox(_T("This Product is not T3 Modules!")) ;
     }
 
 

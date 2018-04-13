@@ -88,6 +88,10 @@ public:
 
 	// 搜索网口设备
  	BOOL ScanNetworkDevice(); 
+
+    // 搜索网口下的串口设备
+    BOOL ScanTCPtoRS485SubPort();
+
  	// 搜索串口设备
  	BOOL ScanComDevice();
 
@@ -102,12 +106,13 @@ public:
 	// 是否正在搜索串口设备
 	BOOL		IsComScanRunning();
 	// 搜索函数
-	void		background_binarysearch(int nComPort);
+	void		background_binarysearch(int nComPort, int nItem,int nbaudrate);
 
-	void modbusip_to_modbus485(int nComPort,int nBaudrate, BYTE devLo, BYTE devHi);
+	void modbusip_to_modbus485(int nComPort,int nBaudrate, LPCTSTR s_ipaddr,int n_tcpport, unsigned int parents_serial, int list_count, BYTE devLo, BYTE devHi, int nindex_value = 0);
+
 
 	// bForTstat = TRUE : scan tstat, = FALSE : scan NC
-	void		binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo=1, BYTE devHi=254);
+	void		binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo=1, BYTE devHi=254, int nItem = 0,int nbaudrate = 19200);
 	// bForTstat = TRUE : scan tstat, = FALSE : scan  MINI Pannel
 	//void		MINI_binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo=1, BYTE devHi=254,int NET_COM=1);
 	void        OneByOneSearchforComDevice(int nComPort, bool bForTStat=FALSE, BYTE devLo=1, BYTE devHi=254);
@@ -170,9 +175,10 @@ public:
 	void SetSubnetInfo(vector<Building_info>& szSubnets);
 	void SetBaudRate(const CString& strBaudrate);
 	
-	void ScanSubnetFromEthernetDevice(); //当检测到minipanel 后,在结束所有串口的网络扫描后，单独对此类设备扫描下面是否有连接其他设备;
+	int ScanSubnetFromEthernetDevice(); //当检测到minipanel 后,在结束所有串口的网络扫描后，单独对此类设备扫描下面是否有连接其他设备;
 
 	void Initial_Scan_Info();
+    void NetWork_Sub_Scan_Info();
 	void ScanAll();
 	void WaitScan();//scan
 	int  m_scantype;
@@ -192,7 +198,8 @@ public:
 	BOOL ReadOneCheckOnline(int nCOMPort); // 读255，确定是否只有一个Tstat连接。
 
 	BOOL IsNetDevice(const CString& strDevType);
-
+    bool m_saving_data;
+    int com_count; // 记录com 和常规的个数;
 public:
 	unsigned int * exsit_serial_array;
 	int serial_array_length;
@@ -206,7 +213,7 @@ public:
 	CEvent*							m_eScanComEnd;
 	//CEvent*							m_eScanComOneByOneEnd;
 	CEvent*							m_eScanNCEnd;
-	
+    CEvent*                     m_eScan_tcp_to_485_End;
 
 	CEvent*							m_eScanOldNCEnd;
 	CEvent*						m_eScanBacnetIpEnd;
@@ -226,6 +233,8 @@ public:
 	CWinThread*					m_pScanNCThread;
 	CWinThread*                  m_pCheckSubnetThread;
 	CWinThread*					m_pScanTstatThread;
+
+    CWinThread*					m_pScanTCP_to_485Thread;
 	//CWinThread*					m_pScanTstatOneByOneThread;
 	//CWinThread*					m_pWaitScanThread;
 	bool						m_com_scan_end;
@@ -241,6 +250,10 @@ public:
 	int							m_device_baudrate;
 	int							m_device_com_port;
 	unsigned int				m_parent_serialnum;
+
+    static	DWORD WINAPI   ScanComThreadNoCritical(LPVOID lpVoid);
+    static	DWORD WINAPI   ScanTCPSubPortThreadNoCritical(LPVOID lpVoid);
+    unsigned int               scan_com_value;
 protected:
 	BOOL								m_bComScanRunning;		// 是否是Com scan, TRUE = scan com, FALSE = scan net
 	int									m_ScannedNum;

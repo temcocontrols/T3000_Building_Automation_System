@@ -343,7 +343,7 @@ void CDuplicateIdDetected::Initial_static()
 	if(duplicate_mode == CONFILIC_SUBID)
 		m_static_title.SetWindowTextW(_T("Each device on the RS485 network needs a unique network ID or communications will fail.\r\nYou can change the ID using a plug and play feature built into the device.\r\nWould you like to change the address to the new ID?"));
 	else if(duplicate_mode == CONFILIC_PANEL_ID)
-		m_static_title.SetWindowTextW(_T("Each device on the same network needs a unique panel number or communications will mess.\r\nWould you like to change the panel number to the new value?"));
+		m_static_title.SetWindowTextW(_T("Each device on the same network needs a unique panel number or communications will fail.\r\nWould you like to change the panel number to the new value?"));
     else if(duplicate_mode == CONFILIC_IPADDRESS)
         m_static_title.SetWindowTextW(_T("Each device on the ethernet network needs a unique IP address or communications will fail.\r\nWould you like to change the IP address to a new IP?"));
 	m_static_title.textColor(RGB(0,0,0));

@@ -1143,6 +1143,8 @@ BOOL TFTPServer::StartServer()
             {
                 OutPutsStatusInfo(ShowTFTPMessage, FALSE);
                 ShowTFTPMessage.Empty();
+                strTips.Format(_T(" "));
+                OutPutsStatusInfo(strTips, FALSE);
             }
             switch(ISP_STEP)
             {
@@ -1185,7 +1187,7 @@ BOOL TFTPServer::StartServer()
 
 
                     strTips.Format(_T("Communication with device.(Remain time:%d)"),15-mode_send_flash_try_time);
-                    OutPutsStatusInfo(strTips, TRUE);
+                    OutPutsStatusInfo(strTips, true);
                 }
                 else
                 {
@@ -1263,7 +1265,7 @@ BOOL TFTPServer::StartServer()
                     OutPutsStatusInfo(_T(""), FALSE);
                     for (int i=0; i<7; i++)
                     {
-                        strTips.Format(_T("Wait the device jump to bootloader.(%ds)"),7-i);
+                        strTips.Format(_T(" Setting device to firmware update mode...(%ds)"),7-i);
                         OutPutsStatusInfo(strTips, TRUE);
                         Sleep(1000);
                     }

@@ -1642,13 +1642,15 @@ BOOL CComWriter::UpdataDeviceInformation(int& ID)
  
 
 
-
-
-
-    for (int i=0; i<10; i++)
-    {
-        hexproductname.AppendFormat(_T("%c"),global_fileInfor.product_name[i]);
-    }
+    MultiByteToWideChar(CP_ACP, 0, (char *)global_fileInfor.product_name,
+        (int)strlen(global_fileInfor.product_name) + 1,
+        hexproductname.GetBuffer(MAX_PATH), MAX_PATH);
+    hexproductname.ReleaseBuffer();
+    hexproductname.Left(10);
+    //for (int i=0; i<10; i++)
+    //{
+    //    hexproductname.AppendFormat(_T("%c"),global_fileInfor.product_name[i]);
+    //}
 	CString Temco_logo;
 	MultiByteToWideChar( CP_ACP, 0, (char *)global_fileInfor.company,
 		(int)strlen(global_fileInfor.company)+1,

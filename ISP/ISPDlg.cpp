@@ -1,6 +1,7 @@
-// 4.7.1 版本 改动 公司内部获取 序列号的方式 改为从 数据库获取;
 // ISPDlg.cpp : implementation file
-//
+// 5.1.0  支持Weather Station 用串口烧写.
+// 5.0.9  网络部分烧写 信息提示优化
+// 4.7.1 版本 改动 公司内部获取 序列号的方式 改为从 数据库获取;
 
 #include "stdafx.h"
 #include "ISP.h"

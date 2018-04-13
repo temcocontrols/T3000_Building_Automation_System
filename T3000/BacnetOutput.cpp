@@ -357,7 +357,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 {
     bool need_refresh_all = false; 
 	int Fresh_Item;
-	int isFreshOne = (int)lParam;
+	int isFreshOne = (bool)lParam;
 	int  Minipanel_device = 1;
 	int Fresh_List_Now = (int)wParam;
 	if( Fresh_List_Now == REFRESH_LIST_NOW)
@@ -521,6 +521,8 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		if(isFreshOne)
 		{
 			i = Fresh_Item;
+            if (i >= m_Output_data.size())
+                return 1;
 		}
 
 		if(i>=output_item_limit_count)

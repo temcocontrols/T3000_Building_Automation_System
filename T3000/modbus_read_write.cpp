@@ -289,3 +289,18 @@ int write_one(unsigned char device_var,unsigned short address,short value,int re
 	g_bEnableRefreshTreeView |= bTemp;
 	return j;
 }
+
+int write_one_multy_thread(unsigned char device_var, unsigned short address, short value, int retry_times,int nindex)
+{
+    short temp_value = value;
+    int j = 0;
+    for (int i = 0;i<retry_times;i++)
+    {
+        j = Write_One_Multy_Thread(device_var, address, temp_value, nindex);
+        if (j != -2 && j != -3)
+        {
+            return j;//return right success
+        }
+    }
+    return j;
+}

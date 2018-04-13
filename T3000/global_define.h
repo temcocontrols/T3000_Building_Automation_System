@@ -894,6 +894,7 @@ const signed short Time_Zone_Value[] =
 	-600,
 	-500,
 	-400,
+    -350,
 	-300,
 	-200,
 	-100,
@@ -901,12 +902,17 @@ const signed short Time_Zone_Value[] =
 	100,
 	200,
 	300,
+    350,
 	400,
+    450,
 	500,
+    550,
 	600,
+    650,
 	700,
 	800,
 	900,
+    950,
 	1000,
 	1100,
 	1200,
@@ -924,6 +930,7 @@ const CString Time_Zone_Name[] =
 	_T("(UTC - 06:00) , Central Standard Time , Galapagos Time"),
 	_T("(UTC - 05:00) , Eastern Standard Time"),
 	_T("(UTC - 04:00) , Atlantic Standard Time , Bolivia Time"),
+    _T("(UTC - 03:30) , Newfoundland"),
 	_T("(UTC - 03:00) , Atlantic Daylight Time , Amazon Summer Time"),
 	_T("(UTC - 02:00) , Fernando de Noronha Time , Oscar Time Zone"),
 	_T("(UTC - 01:00) , Azores Time , Cape Verde Time"),
@@ -931,12 +938,17 @@ const CString Time_Zone_Name[] =
 	_T("(UTC + 01:00) , Alpha Time Zone"),
 	_T("(UTC + 02:00) , Central Africa Time , Central European Summer Time"),
 	_T("(UTC + 03:00) , Charlie Time Zone , Eastern Africa Time"),
+    _T("(UTC + 03:30) , Tehran"),
 	_T("(UTC + 04:00) , Armenia Time , Azerbaijan Time"),
+    _T("(UTC + 04:30) , Kabul"),
 	_T("(UTC + 05:00) , Armenia Summer Time , Aqtobe Time"),
+    _T("(UTC + 05:30) , Sri Jayawardenepura"),
 	_T("(UTC + 06:00) , Bangladesh Standard Time , Bhutan Time"),
+    _T("(UTC + 06:30) , Yangon"),
 	_T("(UTC + 07:00) , Christmas Island Time , Davis Time"),
 	_T("(UTC + 08:00) , China Standard Time , Hotel Time Zone"),
 	_T("(UTC + 09:00) , Australian Western Daylight Time"),
+    _T("(UTC + 09:30) , Darwin"),
 	_T("(UTC + 10:00) , Chamorro Standard Time , Kilo Time Zone"),
 	_T("(UTC + 11:00) , Lima ,Vanuatu , Lima "),
 	_T("(UTC + 12:00) , Anadyr Time , Fiji Time , Gilbert Island Time"),
@@ -1186,6 +1198,7 @@ typedef struct
 	char ico_name_2[20];
 	uint8_t ntext_place;
 	uint8_t n_iconsize;
+    int x_length; // 用来确定标签是否点击，以及点击的宽度.
 }Bacnet_Label_Info;
 
 
@@ -1548,7 +1561,13 @@ const CString Decom_Array[3] =
 	_T("Shorted")
 };
 
-
+const CString Scan_Ret_Info[4] = 
+{
+    _T("Scaning results are being merged."),
+    _T("Confirm scanning results."),
+    _T("Resolving Modbus ID and IP conflicts."),
+    _T("Scan finished,saving data into database.Please wait!"),
+};
 
 #pragma endregion INPUT_DEFINE
 

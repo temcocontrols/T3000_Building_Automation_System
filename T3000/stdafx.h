@@ -103,16 +103,19 @@ INPUT int Modbus_Standard_Read(unsigned char device_var, unsigned short *put_dat
 	int* sendDataLength, int* recvDataLength
 );
 INPUT bool open_com(int m_com);
+INPUT bool open_com_nocretical(int m_com);
 INPUT void close_com();
+INPUT void close_com_nocritical(int ncomport);
 INPUT bool is_connect();
 INPUT int CheckTstatOnline(unsigned char devLo=1,unsigned char devHi=254);
 INPUT bool Change_BaudRate(int new_baurate);
+INPUT bool Change_BaudRate_NoCretical(int new_baudrate, int ncomport);
 INPUT bool SetComm_Timeouts(LPCOMMTIMEOUTS lpCommTimeouts);
 INPUT void SetComnicationHandle(int nType,HANDLE hCommunication);
 INPUT void SetCommunicationType(int nType);
 INPUT int NetController_CheckTstatOnline(unsigned char devLo=1,unsigned char devHi=254);
 INPUT bool Open_Socket2(CString strIPAdress,short nPort);
-
+INPUT bool Open_Socket2_multy_thread(CString strIPAdress, short nPort, int nindex);
 INPUT void SetLastSuccessBaudrate(int nbaudrate);
 INPUT void SetLastOpenedComport(int ncom_port);
 INPUT void SetLastCommunicationType(int n_commnication_type);
@@ -129,17 +132,20 @@ INPUT int CheckTstatOnline_a(unsigned char  devLo,unsigned char devHi, bool bCom
 INPUT int MINI_CheckTstatOnline_a(unsigned char devLo,unsigned char devHi, bool bComm_Type,int NET_COM=1);
 //INPUT int MINI_CheckTstatOnline2_a(unsigned char devLo,unsigned char devHi, bool bComm_Type,int NET_COM=1);
 
+INPUT int CheckTstatOnline_nocretical(unsigned char  devLo, unsigned char devHi, bool bComm_Type, int ncomport);
+
 INPUT int Read_One2(unsigned char  device_var,unsigned short  address, bool bComm_Type);
 INPUT int Write_One2(unsigned char  device_var,unsigned short  address,unsigned short  value, bool bComm_Type);
 //OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length);
 INPUT int read_multi2(unsigned char device_var,unsigned short  *put_data_into_here,unsigned short  start_address,int length, bool bComm_Type);
-
+INPUT int read_multi2_nocretical(unsigned char device_var, unsigned short *put_data_into_here, unsigned short start_address, int length, bool bComm_Type,int ncomport);
 INPUT void close_T3000_log_file();//scan
 INPUT void write_T3000_log_file( CString StrTips);//scan
 INPUT void Create_T3000_log_file();//scan
 
 INPUT CString Get_NowTime();
 INPUT int Write_One(unsigned char device_var,unsigned short address,unsigned short value);
+INPUT int Write_One_Multy_Thread(unsigned char device_var, unsigned short address, unsigned short val, int nindex);
 INPUT int Read_One(unsigned char device_var,unsigned short address);
 INPUT int write_multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
 //INPUT int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);

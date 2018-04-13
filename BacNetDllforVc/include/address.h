@@ -53,7 +53,7 @@ __declspec(dllexport)    bool address_get_by_device(
         unsigned *max_apdu,
         BACNET_ADDRESS * src);
 
-    bool address_get_by_index(
+__declspec(dllexport)    bool address_get_by_index(
         unsigned index,
         uint32_t * device_id,
         unsigned *max_apdu,
@@ -63,7 +63,7 @@ __declspec(dllexport)    bool address_get_by_device(
         BACNET_ADDRESS * src,
         uint32_t * device_id);
 
-    unsigned address_count(
+__declspec(dllexport)    unsigned address_count(
         void);
 
     bool address_match(
