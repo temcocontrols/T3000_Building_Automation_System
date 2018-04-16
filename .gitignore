@@ -12,6 +12,8 @@
 /**/.svn
 *.suo
 
+*.user
+
 *.pdb
 
 *.sdf
