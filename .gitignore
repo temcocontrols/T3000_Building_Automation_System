@@ -10,8 +10,12 @@
 
 **/Debug/
 /**/.svn
+*.suo
+
 *.pdb
+
 *.sdf
+
 *.opensdf
 **/ipch/
 *.APS
