@@ -3477,6 +3477,11 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
                     WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Delay Between Time"),_T("1000"),g_configfile_path);
 
                     WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Connect Timeout"),_T("3000"),g_configfile_path);
+
+                    CString temp_modbus_id;
+                    temp_modbus_id.Format(_T("%d"), tree_node.product_id);
+                    WritePrivateProfileStringW(_T("MBPOLL_Setting"), _T("Modbus ID"), temp_modbus_id, g_configfile_path);
+
                 }
                 else
                 {
@@ -3489,6 +3494,10 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
                     WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Response Timeout"),_T("1000"),g_configfile_path);
                     WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Delay Between Time"),_T("1000"),g_configfile_path);
                     WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Connect Timeout"),_T("3000"),g_configfile_path);
+
+                    CString temp_modbus_id;
+                    temp_modbus_id.Format(_T("%d"), tree_node.product_id);
+                    WritePrivateProfileStringW(_T("MBPOLL_Setting"), _T("Modbus ID"), temp_modbus_id, g_configfile_path);
                 }
 
                 return TRUE;
@@ -3529,6 +3538,9 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
                     WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Response Timeout"),_T("1000"),g_configfile_path);
                     WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Delay Between Time"),_T("1000"),g_configfile_path);
                     WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Connect Timeout"),_T("3000"),g_configfile_path);
+                    CString temp_modbus_id;
+                    temp_modbus_id.Format(_T("%d"), tree_node.product_id);
+                    WritePrivateProfileStringW(_T("MBPOLL_Setting"), _T("Modbus ID"), temp_modbus_id, g_configfile_path);
                 }
                 else
                 {
@@ -3539,6 +3551,9 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
                     WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Response Timeout"),_T("1000"),g_configfile_path);
                     WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Delay Between Time"),_T("1000"),g_configfile_path);
                     WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Connect Timeout"),_T("3000"),g_configfile_path);
+                    CString temp_modbus_id;
+                    temp_modbus_id.Format(_T("%d"), tree_node.product_id);
+                    WritePrivateProfileStringW(_T("MBPOLL_Setting"), _T("Modbus ID"), temp_modbus_id, g_configfile_path);
                 }
                 return TRUE;
             }
@@ -3779,6 +3794,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 					(temp_it->product_class_id == PM_MINIPANEL|| temp_it->product_class_id == PM_MINIPANEL_ARM)*/)
 				{
 					DoConnectToANode(temp_it->product_item);
+                    break;
 				}
 			}
 			
@@ -5325,6 +5341,11 @@ LRESULT  CMainFrame::ReadConfigFromDeviceMessageCallBack(WPARAM wParam, LPARAM l
     msg_result = MKBOOL(wParam);
     if(msg_result)
     {
+        CFileFind cfindtempfile;
+        if (cfindtempfile.FindFile(SaveConfigFilePath))
+        {
+            DeleteFile(SaveConfigFilePath);
+        }
 		SaveBacnetBinaryFile(SaveConfigFilePath);
         //SaveBacnetConfigFile(SaveConfigFilePath);
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Save config file success!"));
@@ -5535,11 +5556,11 @@ void CMainFrame::SaveConfigFile()
         {
 
             SaveConfigFilePath=dlg.GetPathName();
-            CFileFind cfindtempfile;
-            if(cfindtempfile.FindFile(SaveConfigFilePath))
-            {
-                DeleteFile(SaveConfigFilePath);
-            }
+            //CFileFind cfindtempfile;
+            //if(cfindtempfile.FindFile(SaveConfigFilePath))
+            //{
+            //    DeleteFile(SaveConfigFilePath);
+            //}
 
             //协议时bacnet ，用户点击 File save时 先调用线程读取所有需要存的资料；在发送消息回来 调用SaveBacnetConfigFile;
             //::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_SVAE_CONFIG);
@@ -6420,9 +6441,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                                 dlg.SetNode(m_product.at(i));
                                 if (dlg.DoModal()==IDOK)
                                 {
-                                    is_OK=dlg.is_ok;
+                                    is_OK=dlg.b_changeip_ok;
 									refresh_tree_status_immediately = true;//在改完IP后立刻在去扫描，更新数据库;
                                 }
+                                return;
                             }
                             else
                             {
@@ -6644,7 +6666,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 g_mac = m_product.at(i).panel_number;
                 bac_gloab_panel = g_mac;
                 g_gloab_bac_comport = m_product.at(i).ncomport;
-
+                g_gloab_bac_baudrate = m_product.at(i).baudrate;
                 if(m_product.at(i).protocol == PROTOCOL_GSM)
                 {
                     if(!TCP_Server_Running)

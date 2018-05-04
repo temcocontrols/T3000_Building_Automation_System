@@ -13,7 +13,6 @@ extern int initial_dialog;
 
 extern int pointtotext_for_controller(char *buf,Point_T3000 *point);
 extern char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network, byte panel, int *netpresent);
-// CBacnetProgramDebug dialog
 #define UPDATE_DEBUG_DATA_TIMER           3
 IMPLEMENT_DYNAMIC(CBacnetProgramDebug, CDialogEx)
 
@@ -1734,7 +1733,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 
 				//CString temp_cs = m_program_debug_list.GetItemText(Changed_Item,Changed_SubItem);
 				BacnetRange dlg;
-				//点击产品的时候 需要读customer units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
+				//点击产品的时候 需要读custom units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
 				if(!read_customer_unit)
 				{
 
