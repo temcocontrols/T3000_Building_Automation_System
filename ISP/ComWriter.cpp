@@ -143,9 +143,12 @@ BOOL CComWriter::WriteCommandtoReset()
         return FALSE;
     }
 
-    int nRet = Write_One(m_szMdbIDs[0],16,127);   // 进入ISP模式
+    int nRet = Write_One(m_szMdbIDs[0],16,127);   // Enter ISP mode
     //Sleep(2000);
     //Add by Fance  如果从应用代码跳入 ISP  16写127后  需要读 11号寄存器  11号 大于1  说明跳转成功，否则继续等待;
+//TBD: Explain this comment better
+// If you want to read 11th register 11th or more than 1 when you jump from the application code to the ISP 16 write 127, the jump succeeds, otherwise wait
+     
     strTips = _T("Wait device jump to isp mode!");
     OutPutsStatusInfo(strTips);
     int re_count = 0;
@@ -167,8 +170,7 @@ BOOL CComWriter::WriteCommandtoReset()
     int ModelID= read_one(m_szMdbIDs[0],7,5);
     if (ModelID>0)
     {
-        if (ModelID==6||ModelID==7||ModelID==8)//Tstat6,7检测芯片大小，其余用串口烧写的都不检测
-        {
+        if (ModelID==6||ModelID==7||ModelID==8)//Tstat6,7,8 Detecting chip flash size，        {
             int Chipsize=read_one(m_szMdbIDs[0],11,5);
 
 
@@ -176,7 +178,7 @@ BOOL CComWriter::WriteCommandtoReset()
             {
                 if (m_nHexFileType==0)
                 {
-                    strTips = _T("|hex file   matches with the chip!");
+                    strTips = _T("|hex file flash size matches with the device CPU!");
                     OutPutsStatusInfo(strTips);
                 }
                 else
@@ -191,7 +193,7 @@ BOOL CComWriter::WriteCommandtoReset()
                         }
                         ii++;
                     }
-                    strTips = _T("|hex file doesn't match with the chip!");
+                    strTips = _T("|hex file doesn't match the device CPU!");
                     OutPutsStatusInfo(strTips);
                     return FALSE;
                 }
@@ -220,13 +222,13 @@ BOOL CComWriter::WriteCommandtoReset()
                         }
                         ii++;
                     }
-                    strTips = _T("|hex file doesn't match with the chip!");
+                    strTips = _T("|hex file doesn't match the device CPU!");
                     OutPutsStatusInfo(strTips);
                     return FALSE;
                 }
                 else
                 {
-                    strTips = _T("|hex file   matches with the chip!");
+                    strTips = _T("|hex file   matches with the device!");
                     OutPutsStatusInfo(strTips);
                 }
             }
@@ -254,7 +256,7 @@ UINT Flash_Modebus_Device(LPVOID pParam)
     int nFlashRet=0;
     UINT i=0;
     int nFailureNum = 0;
-    CString strTips_isp1 = _T("Wait device jump to ISP mode.");
+    CString strTips_isp1 = _T("Wait for the device jump to update mode.");
 
     if(GetCommunicationType()==1)
     {
@@ -271,7 +273,7 @@ UINT Flash_Modebus_Device(LPVOID pParam)
         {
             CString strTemp;
             //strTemp.Format(_T("COM%d"), m_nComPort);
-            CString strTips = _T("|Connect to ") +  pWriter->m_strIPAddr + _T(" successful.");
+            CString strTips = _T("|Connection to ") +  pWriter->m_strIPAddr + _T(" successful.");
             pWriter->OutPutsStatusInfo(strTips, FALSE);
             // AddStringToOutPuts(strTips);
             SetCommunicationType(1);
@@ -279,7 +281,7 @@ UINT Flash_Modebus_Device(LPVOID pParam)
     }
 
 
-    //先判断设备在不在线;
+    //First test if the device is online;
     unsigned short temp_read_reg[50];
     memset(temp_read_reg,0,50);
 
@@ -310,7 +312,7 @@ UINT Flash_Modebus_Device(LPVOID pParam)
                 retry_count++;
                 if(retry_count > 5)
                 {
-                    CString strTips_isp = _T("Sub device is off line,please check the connection.");
+                    CString strTips_isp = _T("Subnet device is off line,please check the connection.");
                     pWriter->OutPutsStatusInfo(strTips_isp);
                     nFlashRet = false;
                     goto end_tcp_flash_mode;
@@ -328,7 +330,7 @@ UINT Flash_Modebus_Device(LPVOID pParam)
             pWriter->OutPutsStatusInfo(strTips_isp);
             if(temp_read_reg[11] <=1)
             {
-//             CString strTips_isp = _T("Check isp firmware version failed.(reg11 error)");
+//             CString strTips_isp = _T("Check the firmware version failed.(reg11 error)");
 //             pWriter->OutPutsStatusInfo(strTips_isp);
 //             nFlashRet = false;
 //             goto end_tcp_flash_mode;
@@ -336,7 +338,7 @@ UINT Flash_Modebus_Device(LPVOID pParam)
 
             while(test_count <=8)
             {
-                int nRet = Write_One(pWriter->m_szMdbIDs[i],16,127);   // 进入ISP模式
+                int nRet = Write_One(pWriter->m_szMdbIDs[i],16,127);   // Enter ISP mode
                 if(nRet >= 0)
                     break;
                 if(nRet < 0)
@@ -351,13 +353,13 @@ UINT Flash_Modebus_Device(LPVOID pParam)
                 }
 
                 CString temp_1234;
-                temp_1234.Format(_T("Write start isp command to device.(%d)"),8 - test_count);
+                temp_1234.Format(_T("Send flash update command to device.(%d)"),8 - test_count);
                 pWriter->OutPutsStatusInfo(temp_1234,true);
 
             }
 
 
-            Sleep(2000);	//等待设备进入ISP
+            Sleep(2000);	//Wait for device to enter ISP
 
             CString strID;
             strID.Format(_T("|--------------->>ID-%d-<<---------------"), pWriter->m_szMdbIDs[i]);
@@ -379,7 +381,7 @@ UINT Flash_Modebus_Device(LPVOID pParam)
                 int ModelID= temp_read_reg[7];
                 if (ModelID>0)
                 {
-                    if (ModelID==6||ModelID==7||ModelID==8)//Tstat6,7检测芯片大小，其余用串口烧写的都不检测
+                    if (ModelID==6||ModelID==7||ModelID==8)//Tstat6,7 Detect chip flash size
                     {
                         Chipsize_6 = temp_read_reg[11];
 
@@ -388,7 +390,7 @@ UINT Flash_Modebus_Device(LPVOID pParam)
                         {
                             if (pWriter->m_nHexFileType==0)
                             {
-                                strTips = _T("|hex file   matches with the chip!");
+                                strTips = _T("|hex file   matches the device CPU!");
                                 pWriter->OutPutsStatusInfo(strTips);
                                 Flag_HEX_BIN=TRUE;
                             }
@@ -404,7 +406,7 @@ UINT Flash_Modebus_Device(LPVOID pParam)
                                     }
                                     ii++;
                                 }
-                                strTips = _T("|hex file doesn't match with the chip!");
+                                strTips = _T("|hex file doesn't match with the device CPU!");
                                 pWriter->OutPutsStatusInfo(strTips);
                                 Flag_HEX_BIN=FALSE;
                             }
@@ -433,13 +435,13 @@ UINT Flash_Modebus_Device(LPVOID pParam)
                                     }
                                     ii++;
                                 }
-                                strTips = _T("|hex file doesn't match with the chip!");
+                                strTips = _T("|hex file doesn't match the device CPU!");
                                 pWriter->OutPutsStatusInfo(strTips);
                                 Flag_HEX_BIN=FALSE;
                             }
                             else
                             {
-                                strTips = _T("|hex file   matches with the chip!");
+                                strTips = _T("|hex file   matches the device CPU!");
                                 pWriter->OutPutsStatusInfo(strTips);
                                 Flag_HEX_BIN=TRUE;
                             }
@@ -458,8 +460,8 @@ UINT Flash_Modebus_Device(LPVOID pParam)
                     goto	 end_tcp_flash_mode;
                 }
                 int Chipsize = 0;
-                //  pWriter->OutPutsStatusInfo(_T("The device can't match with the hex"));
-#if 1		//复位
+                //  pWriter->OutPutsStatusInfo(_T("The device doesn’t match with the hex file"));
+#if 1		//Reset
                 if (ModelID==6||ModelID==7||ModelID==8)
                     Chipsize = Chipsize_6;
                 else
@@ -629,7 +631,7 @@ UINT Flash_Modebus_Device(LPVOID pParam)
                     }
 
 
-                    Sleep(1000); //must if not ,have some wrong
+                    Sleep(1000); //Must delay here to give CPU time to write
                 }
 
             }
@@ -704,7 +706,7 @@ end_tcp_flash_mode :
 
 
 //////////////////////////////////////////////////////////////////////////
-//the return value 1,successful,   return < 0 ,have some trouble
+//the return value 1,successful,   return < 0 , fail
 int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_UC *register_data_orginal, LPVOID pParam)
 {
     CComWriter* pWriter = (CComWriter*)pParam;
@@ -712,7 +714,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
     TS_UC *register_data=register_data_orginal;
     unsigned int ii=0;
 
-    //*************inspect the flash that last flash position ***********************
+    //*************inspect the flash at the last flash position ***********************
     int x = Read_One(m_ID,0xee10);
 
 
@@ -768,7 +770,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
                         ii=0;
                 else
                 {
-                    return -2;//error -2 Unable to Initialize...
+                    return -2;// Unable to Initialize...
                 }
             }
             while(ii);
@@ -817,7 +819,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
             ii=0;//to the register 0000
         }
     }
-    else  // 读ee10 失败？
+    else  // Failed to read Eeprom chip?
     {
         //from 0000 flash update
         ii=0;//from 0000 register flash
@@ -866,7 +868,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
 
         //********************write register 16 value 0x1f **************
         ii=0;
-        Sleep(7000);//must have this ,the Tstat need
+        Sleep(7000);//Delay required while device writes to flash
 
 
         do
@@ -887,7 +889,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
 
         //***************send data to com*************************
         ii=0;//to the register 0000
-    } // 读ee10 的处理结束
+    } //End of reading EEprom chip
 
     int persentfinished=0;
     CString srtInfo;
@@ -920,13 +922,13 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
             }
             else
             {
-                //srtInfo.Format(_T("Communication was interrupted.Tryiny connect agina!"));
+                //srtInfo.Format(_T("Communication was interrupted.Trying to connect again!"));
                 //pWriter->OutPutsStatusInfo(srtInfo, TRUE);
-                Sleep(5000);//如果 5次失败，则 等待5s后在开始继续续传2次。
+                Sleep(5000);//After 5 fails, wait for 5s and try two more times.
 
                 if(itemp<RETRY_TIMES+3)
                 {
-                    Read_One(255,1);//作用是如果断开连接之后这个里面会自动 打开上次连接的端口的;
+                    Read_One(255,1);//If the connection is disconnected automatically open the last port;
                     if(-2==write_multi(m_ID,&register_data[ii],ii,128))//to write multiple 128 bytes
                         itemp++;
                     else
@@ -934,7 +936,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
                 }
                 else
                 {
-                    return -8;//the com connection is wrong! error -8
+                    return -8;//the com connection failed! error -8
                 }
 
             }
@@ -964,7 +966,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
     return 1;
 }
 //////////////////////////////////////////////////////////////////////////
-//the return value 1,successful,   return < 0 ,have some trouble
+//the return value 1,successful,   return < 0 ,fail
 int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_number_parameter, TS_UC *register_data_orginal, LPVOID pParam)
 {
     CComWriter* pWriter = (CComWriter*)pParam;
@@ -1120,8 +1122,8 @@ void CComWriter::OutPutsStatusInfo(const CString& strInfo, BOOL bReplace)
 
 
 //////////////////////////////////////////////////////////////////////////
-// flash 完了，不论成功还是失败，都通知父窗口
-// 参数就是flash线程的返回值
+// Flash finished, regardless of success or failure, notify the parent window
+// parameter is the return value of the flash thread
 void CComWriter::WriteFinish(int nFlashFlag)
 {
     int	nRet =PostMessage(m_pParentWnd->m_hWnd, WM_FLASH_FINISH, 0, LPARAM(nFlashFlag));
@@ -1231,11 +1233,13 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
             if (pWriter->UpdataDeviceInformation(pWriter->m_szMdbIDs[i]))
             {
 
-                int nRet = Write_One(pWriter->m_szMdbIDs[i],16,127);   // 进入ISP模式
+                int nRet = Write_One(pWriter->m_szMdbIDs[i],16,127);   // Enter ISP mode
                 if(nRet < 0)
-                    Write_One(pWriter->m_szMdbIDs[i],16,127);   // 进入ISP模式
+                    Write_One(pWriter->m_szMdbIDs[i],16,127);   // Enter ISP mode
 
-                //Add by Fance  如果从应用代码跳入 ISP  16写127后  需要读 11号寄存器  11号 大于1  说明跳转成功，否则继续等待;
+                //TBD: explain this comment better
+ /*  If you jump from the application code to the ISP 16 write 127, you need to read 11th register 11th number greater than 1 description of the jump success, otherwise continue to wait; */
+
                 strTips = _T("Wait device jump to isp mode!");
                 pWriter->OutPutsStatusInfo(strTips);
                 int re_count = 0;
@@ -1256,8 +1260,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                 int ModelID= read_one(pWriter->m_szMdbIDs[i],7,5);
                 if (ModelID>0)
                 {
-                    if (ModelID==6||ModelID==7||ModelID==8)//Tstat6,7检测芯片大小，其余用串口烧写的都不检测
-                    {
+                    if (ModelID==6||ModelID==7||ModelID==8)//Tstat6,7,8 Detect CPU flash size.                     {
                         int Chipsize=read_one(pWriter->m_szMdbIDs[i],11,5);
                         if(Chipsize < 0)
                         {
@@ -1286,7 +1289,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                                     }
                                     ii++;
                                 }
-                                strTips = _T("|hex file doesn't match with the chip!");
+                                strTips = _T("|hex file doesn't match with the device CPU!");
                                 pWriter->OutPutsStatusInfo(strTips);
                                 Flag_HEX_BIN=FALSE;
 
@@ -1307,13 +1310,13 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                                     ii++;
                                 }
 
-                                strTips = _T("|hex file doesn't match with the chip!");
+                                strTips = _T("|hex file doesn't match with the device CPU!");
                                 pWriter->OutPutsStatusInfo(strTips);
                                 Flag_HEX_BIN=FALSE;
                             }
                             else
                             {
-                                strTips = _T("|hex file   matches with the chip!");
+                                strTips = _T("|hex file   matches with the device CPU!");
                                 pWriter->OutPutsStatusInfo(strTips);
                                 Flag_HEX_BIN=TRUE;
                             }
@@ -1325,7 +1328,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                     Flag_HEX_BIN=TRUE;
                 }
 
-                // pWriter->OutPutsStatusInfo(_T("The device can't match with the hex"));
+                // pWriter->OutPutsStatusInfo(_T("The device doesn’t match with the hex file"));
 #if 1		//复位
                 int Chipsize=read_one(pWriter->m_szMdbIDs[i],11,5);
                 if (Chipsize<37)	//64K
@@ -1455,12 +1458,11 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                     }
                 }
 
-                Sleep(500); //must if not ,have some wrong
+                Sleep(500); //Must delay here
 
             }
 
-            if(nFlashRet > 0) // flash 成功
-            {
+            if(nFlashRet > 0) // flash success            {
                 CString strText;
                 strText.Format(_T("|ID %d: Programming successful."), pWriter->m_szMdbIDs[i]);
                 pWriter->OutPutsStatusInfo(strText);
@@ -1592,7 +1594,7 @@ BOOL CComWriter::UpdataDeviceInformation_ex(unsigned short device_productID)
     }
     else
     {
-        strtips.Format(_T("Your device is %s   Your hex file is fit for %s "),prodcutname.GetBuffer(),hexproductname.GetBuffer());
+        strtips.Format(_T("Your device is %s   but the hex file is for %s "),prodcutname.GetBuffer(),hexproductname.GetBuffer());
         OutPutsStatusInfo(strtips,false);
         return FALSE;
     }
@@ -1722,7 +1724,7 @@ BOOL CComWriter::UpdataDeviceInformation(int& ID)
     }
     else
     {
-        strtips.Format(_T("Your device is %s   Your hex file is fit for %s "),prodcutname.GetBuffer(),hexproductname.GetBuffer());
+        strtips.Format(_T("Your device is %s   but the hex file is for %s "),prodcutname.GetBuffer(),hexproductname.GetBuffer());
         OutPutsStatusInfo(strtips,false);
         return FALSE;
     }
@@ -1731,7 +1733,7 @@ BOOL CComWriter::UpdataDeviceInformation(int& ID)
     {
         if (Device_infor[4]==global_fileInfor.software_low&&Device_infor[5]==global_fileInfor.software_high)
         {
-            strtips.Format(_T("The current firmware already is latest version"),prodcutname.GetBuffer(),hexproductname.GetBuffer());
+            strtips.Format(_T("The firmware is already up to date"),prodcutname.GetBuffer(),hexproductname.GetBuffer());
             OutPutsStatusInfo(strtips,false);
             return FALSE;
         }
@@ -1835,7 +1837,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 
                 Sleep (2000);
                 nRet = Read_One(pWriter->m_szMdbIDs[i],11);
-				//等待设备进入ISP 模式,有的设备跳转比较慢，没读到的情况下 休眠后再次尝试;
+				//Wait for the device to enter the ISP mode, some devices jump slower than others, can’t read after reboot, retry;
                 if (nRet <= 0)
                 {
 					 Sleep(3000);
@@ -1843,7 +1845,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 					 if(nRet<= 0)
 					 {
 						 if(!auto_flash_mode)
-							 AfxMessageBox(_T("Fail to enter ISP Mode!"));
+							 AfxMessageBox(_T("Failed to enter ISP Mode!"));
 						 goto end_isp_flash;
 					 }
                 }
@@ -1852,7 +1854,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
        //         {
        //             if (GetCommunicationType () == 0)
        //             {
-       //                 nRet = Write_One (pWriter->m_szMdbIDs[i],15,4); //把主程序波特率切换到 115200
+       //                 nRet = Write_One (pWriter->m_szMdbIDs[i],15,4); //Switch the main program baud rate to 115200
        //                 close_com ();
        //                 if(open_com(pWriter->m_nComPort)==false)
        //                 {
@@ -1902,7 +1904,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                 ii=0;
                 if(Read_One(m_ID,0xee10)==0x40 || Read_One(m_ID,0xee10)==0x1f) // 读ee10， why？
                 {
-                    if(IDOK==AfxMessageBox(_T("Previous Update was interrupted.\nPress OK to Resume.\nCancel to Restart."),MB_OKCANCEL))  // 选确定
+                    if(IDOK==AfxMessageBox(_T("Previous Update was interrupted.\nPress OK to Resume.\nCancel to Restart."),MB_OKCANCEL))  // Select OK
                     {
                         ii=0xEE00+17;
                         int l=0;//temp;<200
@@ -2020,7 +2022,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                         ii=0;//to the register 0000
                     }
                 }
-                else  // 读ee10 失败？
+                else  // Read Eeprom chip failed？
                 {
                     //from 0000 flash update
                     ii=0;//from 0000 register flash
@@ -2123,7 +2125,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 
                     //***************send data to com*************************
                     ii=0;//to the register 0000
-                } // 读ee10 的处理结束
+                } // Read Eeprom chip done
 
 #endif
 
@@ -2156,7 +2158,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                     CString strTemp=_T("");
                     strTemp.Format(_T("%d;"), pWriter->m_szMdbIDs[i]);
 
-                    strFailureList+=strTemp;  // flash多个使用
+                    strFailureList+=strTemp;  // flash Multiple use
                     switch(nFlashRet)
                     {
                     case -1:
@@ -2198,7 +2200,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 
                 }
 
-                Sleep(500); //must if not ,have some wrong
+                Sleep(500); //Must delay
 
             }
 
@@ -2229,7 +2231,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
             //{
             //    if (pWriter->m_index_Baudrate>=0)
             //    {
-            //        Write_One (pWriter->m_szMdbIDs[i],15,pWriter->m_index_Baudrate); //切回当前的波特率
+            //        Write_One (pWriter->m_szMdbIDs[i],15,pWriter->m_index_Baudrate); //Reduce the current baud rate
             //    }
             //}
 
