@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "FreezeFunctionDlg.h"
 #include "afxdialogex.h"
-#include "globle_function.h"
+#include "global_function.h"
 
 
 // CFreezeFunctionDlg dialog

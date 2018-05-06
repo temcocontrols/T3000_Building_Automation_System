@@ -19,7 +19,7 @@
 #include "stdafx.h"
 #include "MySocket.h"
 #include "TFTPServer.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "Global_Struct.h"
 extern CString Failed_Message;
 extern Bin_Info        global_fileInfor;

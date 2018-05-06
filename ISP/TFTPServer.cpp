@@ -5,7 +5,7 @@
 #include "ISPDlg.h"
 #include "Iphlpapi.h"
 #include "MySocket.h"
-#include "globle_function.h"
+#include "global_function.h"
 CString local_enthernet_ip;
  Bin_Info        global_fileInfor;
 ////#include <vector>			//Vector templates

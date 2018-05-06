@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "HexFileParser.h"
-#include "globle_function.h"
+#include "global_function.h"
 
 
 extern bool auto_flash_mode;

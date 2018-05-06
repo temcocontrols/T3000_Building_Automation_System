@@ -52,7 +52,7 @@ extern int my_lengthcode;// the length of the edit of code
 #pragma endregion
 
 
-extern uint8_t globle_network_number ;
+extern uint8_t global_network_number ;
 extern BacnetScreen *Screen_Window;
 extern CBacnetProgram *Program_Window;
 extern CBacnetInput *Input_Window ;
@@ -4631,7 +4631,7 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
 
     //TRACE(_T("Find ") + bac_cs_device_id +_T("  ") + bac_cs_mac + _T("\r\n"));
 
-    //g_Print = _T("Globle Who is Find ") + bac_cs_device_id +_T("  ") + bac_cs_mac;
+    //g_Print = _T("Global Who is Find ") + bac_cs_device_id +_T("  ") + bac_cs_mac;
     //DFTrace(g_Print);
     _Bac_Scan_Com_Info temp_1;
     temp_1.device_id = device_id;

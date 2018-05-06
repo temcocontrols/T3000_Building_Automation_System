@@ -5,7 +5,7 @@
 #include "ISP.h"
 #include "NCFlashDlg.h"
 #include "ISPDlg.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "BinFileParser.h"
 #include "TFTPServer.h"
 extern bool auto_flash_mode;

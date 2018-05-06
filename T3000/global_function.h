@@ -1,5 +1,5 @@
-#ifndef _GLOBLE_FUNCTION_H
-#define _GLOBLE_FUNCTION_H
+#ifndef _GLOBAL_FUNCTION_H
+#define _GLOBAL_FUNCTION_H
 
 #pragma region For_Bacnet
 #include "CM5/ud_str.h"

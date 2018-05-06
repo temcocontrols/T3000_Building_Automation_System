@@ -6,7 +6,7 @@
 #include "stdafx.h"
 #include "ISP.h"
 #include "ISPDlg.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "JPGLoader.h"
 #include "afxwin.h"
 #include "Splash.h"

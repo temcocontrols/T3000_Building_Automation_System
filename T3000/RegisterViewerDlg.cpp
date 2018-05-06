@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 #include "MainFrm.h"
  #include "../SQLiteDriver/CppSQLite3.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "TemcoDataGrid.h"
 
 #define BACK_CELL RGB(139,137,137)

@@ -6,7 +6,7 @@
 	#include "MainFrm.h"
 	#include "GridFlashDlg.h"
 	#include "global_variable_extern.h"
-	#include "globle_function.h"
+	#include "global_function.h"
 	#include "AfxMessageDialog.h"
 
 
@@ -43,7 +43,7 @@
 	//**************************************************inspect the flash that last flash position **
 			if(read_one(m_ID,0xee10)<0)//retry times is better
 			{
-				//read_one from globle_function.h
+				//read_one from global_function.h
 				//the return value == -1 ,no connecting
 				//AfxMessageBox("before write,need to open the com!");
 				//close_com();

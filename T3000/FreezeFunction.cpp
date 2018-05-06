@@ -6,7 +6,7 @@
 #include "FreezeFunction.h"
 #include "afxdialogex.h"
 
-#include "globle_function.h"
+#include "global_function.h"
 // CFreezeFunction ¶Ô»°¿ò
 
 IMPLEMENT_DYNAMIC(CFreezeFunction, CDialog)
