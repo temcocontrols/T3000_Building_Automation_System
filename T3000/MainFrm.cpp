@@ -1577,7 +1577,7 @@ void CMainFrame::LoadProductFromDB()
 	{
 
 
-		cs_temp_baudrate=q.getValuebyName(L"Braudrate");//
+		cs_temp_baudrate=q.getValuebyName(L"Baudrate");//
 
 		if(!cs_temp_baudrate.IsEmpty())
 		{
@@ -1586,7 +1586,7 @@ void CMainFrame::LoadProductFromDB()
 		else
 		{
 			cs_temp_protocol=_T("19200");
-			strSql.Format(_T("update Building set Braudrate='19200' where Main_BuildingName ='%s'"), m_strCurMainBuildingName);
+			strSql.Format(_T("update Building set Baudrate='19200' where Main_BuildingName ='%s'"), m_strCurMainBuildingName);
 			SqliteDBT3000.execDML((UTF8MBSTR)strSql);
 		}
 
@@ -1668,7 +1668,7 @@ void CMainFrame::LoadProductFromDB()
 
 
 
-		temBuildingInfo.strBaudRate=q.getValuebyName(L"Braudrate");
+		temBuildingInfo.strBaudRate=q.getValuebyName(L"Baudrate");
 
 
 
@@ -2618,11 +2618,11 @@ void CMainFrame::ScanTstatInDB(void)
         CString StrIp;
         if((current_building_protocol == P_MODBUS_485) || (current_building_protocol == P_BACNET_MSTP))
         {
-			cs_temp_baudrate = table.getValuebyName("Braudrate");
+			cs_temp_baudrate = table.getValuebyName("Baudrate");
             if(cs_temp_baudrate.IsEmpty())
             {
                 cs_temp_protocol=_T("19200");
-                strSql.Format(_T("update Building set Braudrate='19200' where Main_BuildingName ='%s'"), m_strCurMainBuildingName);
+                strSql.Format(_T("update Building set Baudrate='19200' where Main_BuildingName ='%s'"), m_strCurMainBuildingName);
                 SqliteDB.execDML((UTF8MBSTR)strSql);
             }
 
@@ -2663,7 +2663,7 @@ void CMainFrame::ScanTstatInDB(void)
             temBuildingInfo.strIpPort = q.getValuebyName(L"Ip_Port");
             temBuildingInfo.hCommunication=NULL;
 			temBuildingInfo.strMainBuildingname = q.getValuebyName(L"Main_BuildingName");
-            temBuildingInfo.strBaudRate = q.getValuebyName(L"Braudrate"); 
+            temBuildingInfo.strBaudRate = q.getValuebyName(L"Baudrate"); 
 
             CString Building_DBpath;
             nDefault=q.getIntField("Default_SubBuilding");

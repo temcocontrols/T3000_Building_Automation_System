@@ -215,7 +215,7 @@ void CT3000App::UpdateDB()
 				stemp_building.Com_Port = q.getValuebyName(L"Com_Port");
 				stemp_building.Ip_Address = q.getValuebyName(L"Ip_Address");
 				stemp_building.Ip_Port = q.getValuebyName(L"Ip_Port");
-				stemp_building.Braudrate = q.getValuebyName(L"Braudrate");
+				stemp_building.Baudrate = q.getValuebyName(L"Baudrate");
 				stemp_building.Default_SubBuilding = q.getIntField("Default_SubBuilding");
 				stemp_building.Building_Path = q.getValuebyName(L"Building_Path");
 				stemp_building.Longitude = q.getValuebyName(L"Longitude");
@@ -276,14 +276,14 @@ void CT3000App::UpdateDB()
 
 		for (int j=0;j<m_Building.size();j++)
 		{
-			StrSql.Format(_T("Insert Into Building(Main_BuildingName,Building_Name,Protocal,Com_Port,Ip_Address,Ip_Port,Braudrate,Default_SubBuilding,Building_Path,Longitude,Elevation,ID,country,state,city,street,ZIP,EngineeringUnits) Values('%s','%s','%s','%s','%s','%s','%s',%d,'%s','%s','%s',%d,'%s','%s','%s','%s','%s','%s')"),
+			StrSql.Format(_T("Insert Into Building(Main_BuildingName,Building_Name,Protocal,Com_Port,Ip_Address,Ip_Port,Baudrate,Default_SubBuilding,Building_Path,Longitude,Elevation,ID,country,state,city,street,ZIP,EngineeringUnits) Values('%s','%s','%s','%s','%s','%s','%s',%d,'%s','%s','%s',%d,'%s','%s','%s','%s','%s','%s')"),
 				m_Building.at(j).Main_BuildingName,
 				m_Building.at(j).Building_Name,
 				m_Building.at(j).Protocal,
 				m_Building.at(j).Com_Port,
 				m_Building.at(j).Ip_Address,
 				m_Building.at(j).Ip_Port,
-				m_Building.at(j).Braudrate,
+				m_Building.at(j).Baudrate,
 				m_Building.at(j).Default_SubBuilding,
 				m_Building.at(j).Building_Path,
 				m_Building.at(j).Longitude,
