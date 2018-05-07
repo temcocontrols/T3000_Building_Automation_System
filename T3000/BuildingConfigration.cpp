@@ -1568,7 +1568,7 @@ void CBuildingConfigration::OnBnClickedBuildingButtonAdd()
     try
     {
         BOOL bDefault =FALSE;
-        strSql.Format(_T("insert into Building (Main_BuildingName,Building_Name,Protocal,Com_Port,Ip_Address,Ip_Port,Braudrate) values('"+strMainBuildName+"','"+strSubBuildingName+"','"+strProtocol+"','"+strCOMPort+"','"+strIP+"','"+strIpPort+"','"+strCOMPortBraud+"')"));
+        strSql.Format(_T("insert into Building (Main_BuildingName,Building_Name,Protocal,Com_Port,Ip_Address,Ip_Port,Braudrate) values('"+strMainBuildName+"','"+strSubBuildingName+"','"+strProtocol+"','"+strCOMPort+"','"+strIP+"','"+strIpPort+"','"+strCOMPortBaud+"')"));
         m_SqliteDBT3000.execDML((UTF8MBSTR)strSql);
     }
     catch(_com_error *e)
