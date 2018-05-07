@@ -1,6 +1,6 @@
 #pragma once
 #include "msflexgrid1.h"
-#include "globle_function.h"
+#include "global_function.h"
 
 #define FLEXGRID_CELL_COLOR						13421772
 #define FLEXGRID_CELL_GRAY_COLOR				13421772

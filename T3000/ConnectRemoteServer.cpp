@@ -94,8 +94,6 @@ void CConnectRemoteServer::OnPaint()
 	{
 		WarningMessagePoint.X = 25;
 		WarningMessagePoint.Y = 45 + z * 25;
-		//CString temp_cs = ConnectMessage[static_step];
-		//step1_message.Format(_T("%d. Connect newfirmware.com "),CONNECT_NEWFIRMWARE_SERVER);
 		mygraphics->DrawString(ConnectMessage[z], -1, &WarningMessageFont, WarningMessagePoint, &WarningMessageColor);
 	}
 end_connect_paint:

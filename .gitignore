@@ -10,11 +10,17 @@
 
 **/Debug/
 /**/.svn
+*.suo
+
+*.user
+
 *.pdb
+
 *.sdf
+
 *.opensdf
 **/ipch/
-
+*.APS
 **/*.bin
 
 **/*.Opt
@@ -58,3 +64,4 @@
 /Psychrometric Tool/T3000 Output_VS2015
 /Psychrometric Tool/WFA_psychometric_chart/packages
 >>>>>>> master
+**/*.pui

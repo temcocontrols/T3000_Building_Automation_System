@@ -1187,7 +1187,7 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 
 			//CString temp_cs = m_output_list.GetItemText(Changed_Item,Changed_SubItem);
 			BacnetRange dlg;
-			//点击产品的时候 需要读customer units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
+			//点击产品的时候 需要读custom units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
 			if(!read_customer_unit)
 			{
 

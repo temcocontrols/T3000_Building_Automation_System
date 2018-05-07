@@ -252,6 +252,9 @@ void CScanDbWaitDlg::OnTimer(UINT_PTR nIDEvent)
                 case SCAN_STATUS_SKIP:
                     m_scan_com_list.SetItemText(x,SCAN_STATUS,_T("Skip"));
                     break;
+                case SCAN_STATUS_DETECTING:
+                    m_scan_com_list.SetItemText(x, SCAN_STATUS, _T("Detecting"));
+                    break;
                 default:
                     break;
                 }

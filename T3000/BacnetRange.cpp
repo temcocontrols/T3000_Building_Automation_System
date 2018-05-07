@@ -246,7 +246,6 @@ void BacnetRange::Initial_static()
 
 		for (int i=IDC_RADIO1;i<=IDC_RADIO34;i++)
 		{
-				//GetDlgItem(i)->ShowWindow(true);
 			CRect c1; 
 			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
 			ScreenToClient(c1);  
@@ -256,7 +255,6 @@ void BacnetRange::Initial_static()
 		}
 		for (int i=IDC_RADIO_VAR_CUS_1;i<=IDC_RADIO_VAR_CUS_5;i++)
 		{
-			//GetDlgItem(i)->ShowWindow(true);
 			CRect c1; 
 			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
 			ScreenToClient(c1);  
@@ -284,7 +282,6 @@ void BacnetRange::Initial_static()
 		GetDlgItem(IDC_RADIO1)->ShowWindow(false);
 		for (int i=IDC_RADIO35;i<=IDC_RADIO46;i++)
 		{
-			//GetDlgItem(i)->ShowWindow(false);
 			CRect c1; 
 			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
 			ScreenToClient(c1);  
@@ -294,7 +291,6 @@ void BacnetRange::Initial_static()
 
 		for (int i=IDC_RADIO89;i<=IDC_RADIO99;i++)
 		{
-			//GetDlgItem(i)->ShowWindow(false);
 			CRect c1; 
 			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
 			ScreenToClient(c1);  
@@ -431,7 +427,7 @@ void BacnetRange::Initial_static()
 			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 50,c1.top ,0,0,SWP_NOZORDER|SWP_NOSIZE);
 			GetDlgItem(i)->ShowWindow(true);
 		}
-		for (int i=IDC_RADIO73;i<=IDC_RADIO80;i++)	//Digital Customer
+		for (int i=IDC_RADIO73;i<=IDC_RADIO80;i++)	//Digital Custom
 		{
 			CRect c1; 
 			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;

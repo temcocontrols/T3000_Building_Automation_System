@@ -10,7 +10,7 @@
 #include "Modbus PollDoc.h"
 
 #include "global_variable_extern.h"
-#include "globle_Function.h"
+#include "global_Function.h"
 #include "ModbusDllforVC.h"
 #include "global_struct.h"
 #include "AutoRichEditCtrl.h"

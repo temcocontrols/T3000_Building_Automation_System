@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "ISP.h"
 #include "LightCtrlFlashDlg.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "ISPDlg.h"
 #include "HexFileParser.h"
 #include "BinFileParser.h"

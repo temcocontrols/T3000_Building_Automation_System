@@ -115,7 +115,7 @@
     <ClInclude Include="ConnectionSetup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="globle_Function.h">
+    <ClInclude Include="global_Function.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="global_variable_extern.h">
@@ -387,7 +387,7 @@
     <ClCompile Include="ConnectionSetup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="globle_function.cpp">
+    <ClCompile Include="global_function.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ReadWriteDefinitionDlg.cpp">

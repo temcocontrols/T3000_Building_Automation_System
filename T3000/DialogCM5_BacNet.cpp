@@ -35,7 +35,7 @@
 #include "BacnetOutput.h"
 #include "BacnetProgram.h"
 #include "BacnetVariable.h"
-#include "globle_function.h"
+#include "global_function.h"
 
 #include "gloab_define.h"
 #include "datalink.h"

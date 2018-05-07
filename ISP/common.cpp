@@ -6,26 +6,29 @@
 #define TRUE_OR_FALSE	true
 #define SLEEP_TIME		50
 #define  LATENCY_TIME_COM	60      // 串口延迟，必须600，设为500或更小时，通过NC scan TStat容易失败
+                                   // Serial port delay, must be 60 or more milliseconds TBD: Clarify this comment
+
 #define  LATENCY_TIME_NET	100
 
 
 	//******************************extern variable
-	extern TS_US Register_value[MaxRegisterNum];           //got the register value
-	extern TS_UC device;                         //Tstat ID,255 is for all
-	extern CString m_com_num;						//com1 or com2
-	extern CMutex mutex;//multithreading lock
- 	extern HANDLE m_hSerial;//串口句柄
-	extern OVERLAPPED m_osRead, m_osWrite, m_osMulWrite; // 用于重叠读/写
-	extern TS_UC  gval[13];//the data that get from com
-	extern TS_UC  serinumber_in_dll[4];//only read_one function ,when read 10,
-    extern TS_UC  pval[13];//the data that send from com
-	extern TS_UC  multi_read_val[256];//the register value is put into here,by multi_read function//the number must less 256
+	extern TS_US Register_value[MaxRegisterNum];  //Get the register value
+	extern TS_UC device;                          //Device ID,255 is for global
+	extern CString m_com_num;				//com1 or com2
+	extern CMutex mutex;					//multithreading lock
+ 	extern HANDLE m_hSerial;				// Serial Handle
+	extern OVERLAPPED m_osRead, m_osWrite, m_osMulWrite; // 用于重叠读/写, for overlapping read/write
+	extern TS_UC  gval[13];			//the data buffer for the received com port data
+	extern TS_UC  serinumber_in_dll[4];	//only read_one function ,when read 10,
+      extern TS_UC  pval[13];			//the data sent from the com port
+	extern TS_UC  multi_read_val[256];		//the register value is put here by the multi_read function
+//the number must less than 256
 	static int baudrate_in_dll=0;
 	static int open_com_port_number_in_dll=65535;
-	static int old_or_new_scan_protocal_in_dll=1;//1==new protocal;2==old protocal
+	static int old_or_new_scan_protocal_in_dll=1;	//1==new protocol;2==old protocol
 
 extern 	SOCKET m_hSocket;	
-int g_Commu_type=0;//0:serial modus//
+int g_Commu_type=0;						//0:serial modbus//
 
 //CMutex scan_mutex;
 
@@ -51,51 +54,54 @@ CStdioFile* g_fileScanLog = NULL;
 /*
 OUTPUT bool open_com(TS_UC m_com)
 {	
-	//open com ,if you want to open "com1",the m_com equal 0;if you want to open "com2",the m_com equal 1
-	//you will get the handle to com,m_hSerial,is a extern variable
+	//open com port, M_com = 0 = com1, 1 = com2 and so on
+	//will return the handle to com, m_hSerial,is an external variable
 	//the return value ,true is ok,false is failure
 	if(open_com_port_number_in_dll==m_com)
 	{
 		Change_BaudRate(19200);
-		return true;///////////////////////////same com port ,opened by multi times,it's badly.
+		return true;///////////////////////////only open a com port once 
 	}
 	if(m_hSerial != NULL)  
-	{//关闭串口
+	{//close serial port
 		CloseHandle(m_hSerial);
 		m_hSerial = NULL;
 	}
-	/////////////////////////////////////////////////////////////////////加入的串口通信部分
+	/////////////////////////////////////////////////////////////////////加入的串口通信部分 , Joined Serial Comms Part
 	switch(m_com)
 	{
-	case 1:					m_hSerial = CreateFile(_T("COM1:"),//串口句柄，打开串口
+	case 1:					m_hSerial = CreateFile(_T("COM1:"),//Serial handle, open serial port
 							GENERIC_READ | GENERIC_WRITE,
 							0,
 							NULL,
 							OPEN_EXISTING,
 							FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,是另外的形式，表示的是异步通信，能同时读写;0为同步读写
+                                                                                                                                      //is a different form, the expression is asynchronous communication, can read and write at the same time, 0 for synchronous Read and write
+ 
 							NULL);break;
-	case 2:			        m_hSerial = CreateFile(_T("COM2:"),//串口句柄，打开串口
+	case 2:			        m_hSerial = CreateFile(_T("COM2:"),//Serial handle, open serial port
 							GENERIC_READ | GENERIC_WRITE,
 							0,
 							NULL,
 							OPEN_EXISTING,
 							FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,是另外的形式，表示的是异步通信，能同时读写;0为同步读写
+                                                             // same comment as above, 0 for synchronous R/W
 							NULL);break;
-	case 3:					m_hSerial = CreateFile(_T("COM3:"),//串口句柄，打开串口
+	case 3:					m_hSerial = CreateFile(_T("COM3:"),//Serial handle, open serial port
 							GENERIC_READ | GENERIC_WRITE,
 							0,
 							NULL,
 							OPEN_EXISTING,
-							FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,是另外的形式，表示的是异步通信，能同时读写;0为同步读写
+							FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,是另外的形式，表示的是异步通信，能同时读写;0为同步读写, same  comment as above
 							NULL);break;
-	case 4:			        m_hSerial = CreateFile(_T("COM4:"),//串口句柄，打开串口
+	case 4:			        m_hSerial = CreateFile(_T("COM4:"),//Serial handle, open serial port
 							GENERIC_READ | GENERIC_WRITE,
 							0,
 							NULL,
 							OPEN_EXISTING,
-							FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,是另外的形式，表示的是异步通信，能同时读写;0为同步读写
+							FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,是另外的形式，表示的是异步通信，能同时读写;0为同步读写, same comment as above
 							NULL);break;
-	case 5:					m_hSerial = CreateFile(_T("COM5:"),//串口句柄，打开串口
+	case 5:					m_hSerial = CreateFile(_T("COM5:"),//Serial handle, open serial port
 							GENERIC_READ | GENERIC_WRITE,
 							0,
 							NULL,
@@ -131,7 +137,7 @@ OUTPUT bool open_com(TS_UC m_com)
 							OPEN_EXISTING,
 							FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,是另外的形式，表示的是异步通信，能同时读写;0为同步读写
 							NULL);break;
-	default :				m_hSerial = CreateFile(_T("COM1:"),//串口句柄，打开串口
+	default :				m_hSerial = CreateFile(_T("COM1:"),//串口句柄，打开串口, serial handle, open serial port
 							GENERIC_READ | GENERIC_WRITE,
 							0,
 							NULL,
@@ -152,7 +158,7 @@ OUTPUT bool open_com(TS_UC m_com)
     }
     DCB  PortDCB;    
     PortDCB.DCBlength = sizeof(DCB); 
-    // 默认串口参数
+    // 默认串口参数, default serial port parameters
     if(!GetCommState(m_hSerial, &PortDCB))
 	{
 		CloseHandle(m_hSerial);
@@ -160,8 +166,8 @@ OUTPUT bool open_com(TS_UC m_com)
 		return false;
 	}	
 	//not to change the baudate
-    PortDCB.BaudRate = 19200; // baud//attention ,if it is wrong,can't write the com
-    PortDCB.ByteSize = 8;     // Number of bits/byte, 4-8 
+    PortDCB.BaudRate = 19200; // Caution, if baud rate is wrong you can't write to the com port
+    PortDCB.ByteSize = 8;     // Number of bytes, 4-8 
     PortDCB.Parity = NOPARITY; 
     PortDCB.StopBits = ONESTOPBIT;  
     if (! SetCommState(m_hSerial, &PortDCB))
@@ -219,13 +225,13 @@ OUTPUT bool open_com(TS_UC m_com)
 	{
 		//the second time
 		//val         the value that you want to write to the register
-		//the return value == -1 ,no connecting
-		//the return value == -2 ,try it again
-		//the return value == -3,Maybe that have more than 2 Tstat is connecting
-		//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
-		//the return value == -5 ,the input have some trouble
-		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-		//清空串口缓冲区
+		//the return value == -1 ,no connection
+		//the return value == -2 ,retry
+		//the return value == -3, may have more than 2 devices connecting
+		//the return value == -4 ,between devLo and devHi,no device is detected
+		//the return value == -5 ,the input buffer is bad 
+		//the return value >=1 ,the devLo!=devHi, may have 2 devices connecting
+		//empty the serial port buffer
 		//the return value is the register address
 		if(devLo<1 || devHi>254)
 			return -5;
@@ -234,9 +240,9 @@ OUTPUT bool open_com(TS_UC m_com)
 			gval[i]=0;/////////////////////////////////////////clear buffer
 		TS_UC  pval[6];
 		TS_US crc;
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		DWORD m_had_send_data_number;//Number of bytes sent
 		pval[0] = 255;											
-		pval[1] = 25;  //put comments here,
+		pval[1] = 25;  //TBD: need comments here,
 		pval[2] = devHi;
 		pval[3] = devLo;
 		crc = CRC16(pval,4);
@@ -258,12 +264,12 @@ OUTPUT bool open_com(TS_UC m_com)
 
 		ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
 		PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear buffer
-		int fState=WriteFile(m_hSerial,// 句柄
-			pval,// 数据缓冲区地址
-			6,// 数据大小
-			&m_had_send_data_number,// 返回发送出去的字节数
+		int fState=WriteFile(m_hSerial,//Handle
+			pval,// Data buffer address
+			6,// Data size
+			&m_had_send_data_number,// Returns the number of bytes sent
 			&m_osWrite);
-		if(!fState)// 不支持重叠	
+		if(!fState)// Overlflow not supported
 		{
 			if(GetLastError()==ERROR_IO_PENDING)
 			{
@@ -279,8 +285,8 @@ OUTPUT bool open_com(TS_UC m_com)
 		//	TRACE("%d T:%x %x %x %x %x %x\n",ddd,pval[0],pval[1],pval[2],pval[3],pval[4],pval[5]);
 		//CloseHandle(m_osWrite.hEvent);
 		///////////////////////////up is write
-		Sleep(LATENCY_TIME_COM);//because that scan have a delay lower 75ms
-		/////////////**************down is read
+		Sleep(LATENCY_TIME_COM);//Scan has a delay lower than 75ms
+		/////////////**************below is read
 		ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
 		memset(&m_osRead, 0, sizeof(OVERLAPPED));
 		if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
@@ -288,12 +294,12 @@ OUTPUT bool open_com(TS_UC m_com)
 		m_osRead.Offset = 0;
 		m_osRead.OffsetHigh = 0;
 		////////////////////////////////////////////////clear com error
-		fState=ReadFile(m_hSerial,// 句柄
-			gval,// 数据缓冲区地址
-			13,// 数据大小
-			&m_had_send_data_number,// 返回发送出去的字节数
+		fState=ReadFile(m_hSerial,// Handle
+			gval,// Data buffer Address
+			13,// Data Size
+			&m_had_send_data_number,// Returns the number of bytes sent
 			&m_osRead);
-		if(!fState)// 不支持重叠	
+		if(!fState)// Overflow not supported
 		{
 			if(GetLastError()==ERROR_IO_PENDING)
 			{
@@ -328,12 +334,12 @@ OUTPUT bool open_com(TS_UC m_com)
 			old_or_new_scan_protocal_in_dll=2;
 			if(gval[0]==0 && gval[1]==0 && gval[2]==0 && gval[3]==0 && gval[4]==0)
 			{
-				Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
-				return -4;              //no response ,no connection
+				Sleep(SLEEP_TIME);	//Need a delay here or this can fail. 
+				return -4;             //No response, no connection
 			}
-			// added by zgq; find this situation: t3000 can find a comport, 
-			//which don't connect a tstat, but write file to the com, will receive the same data with send, 
-			// infact the com port don't work fine. But it never give you a wrong data.
+			// TBD: Explain this better: found this situation: t3000 can find a comport 
+			//which didn’t connect to a device, but write file to the com, will receive the same data with send, 
+			// infact the com port is bad but it gave OK data
 			if(gval[0]==pval[0] && gval[1]==pval[1] && gval[2]==pval[2] && gval[3]==pval[3] && gval[4]==pval[4] && gval[5]==pval[5])
 			{
 				Sleep(SLEEP_TIME);
@@ -343,25 +349,26 @@ OUTPUT bool open_com(TS_UC m_com)
 			//////////////////////////////////////////////////////////////////////////
 			if(gval[5]!=0 || gval[6]!=0)//to inspect
 			{
-				Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+				Sleep(SLEEP_TIME);//Need a delay here
 				return -3;
 			}
 			if((gval[0]!=pval[0]) || (gval[1]!=25))
 			{
-				Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+				Sleep(SLEEP_TIME);//Need a delay here
 				return -2;
 			}
 			crc=CRC16(gval,3);
 			if( (gval[3]!=((crc>>8) & 0xff)) || (gval[4]!=(crc & 0xff)))
 			{
-				Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+				Sleep(SLEEP_TIME);//Need a delay here
 				return -2;
 			}
 		}
 		else
-		{// new scan protocal,if many old tstat ,get into here ,scan result is oK too.
+		{// TBD: Explain this better
+             //New scan protocol,if many old devices scan result is oK too.
 			old_or_new_scan_protocal_in_dll=1;
-			Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+			Sleep(SLEEP_TIME);//Need a delay here
 			if(gval[9]!=0 || gval[10]!=0 || gval[11]!=0 || gval[12]!=0)//to inspect
 				return -3;
 			if((gval[0]!=pval[0]) || (gval[1]!=25))
@@ -390,14 +397,14 @@ OUTPUT bool open_com(TS_UC m_com)
 	if(g_Commu_type==1)
 	{
 		//the second time
-		//val         the value that you want to write to the register
-		//the return value == -1 ,no connecting
+		//val         the value that will be written to the register
+		//the return value == -1 ,no connection
 		//the return value == -2 ,try it again
-		//the return value == -3,Maybe that have more than 2 Tstat is connecting
-		//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
-		//the return value == -5 ,the input have some trouble
-		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-		//清空串口缓冲区
+		//the return value == -3, May have more than 2 devices
+		//the return value == -4 ,between devLo and devHi, no device was detected ,
+		//the return value == -5 ,the input buffer is bad
+		//the return value >=1 ,the devLo!=devHi, May have 2 devices connecting
+		//Empty the serial port buffer
 		//the return value is the register address
 
 		if(devLo<1 || devHi>254)
@@ -408,7 +415,7 @@ OUTPUT bool open_com(TS_UC m_com)
 
 		TS_UC  pval[10];
 //		TS_US crc;
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//Number of bytes sent
 		pval[0]=1;
 		pval[1]=2;
 		pval[2]=3;
@@ -458,23 +465,23 @@ OUTPUT bool open_com(TS_UC m_com)
 			}
 			if((gval[0]!=255) || (gval[1]!=25))
 			{
-				//		Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+				//		Sleep(SLEEP_TIME);//Need a delay here
 				return -2;
 			} 
 			/*
 			crc=CRC16(gval,3);
 			if( (gval[3]!=((crc>>8) & 0xff)) || (gval[4]!=(crc & 0xff)))
 			{
-				//		Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+				//		Sleep(SLEEP_TIME);// Need a delay here
 				return -2;
 			}
 			*/
 
 		}
 		else
-		{// new scan protocal,if many old tstat ,get into here ,scan result is oK too.
+		{// new scan protocol,if many old devices scan result is OK too.
 			old_or_new_scan_protocal_in_dll=1;
-			Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+			Sleep(SLEEP_TIME);// Need a delay here
 
 				
 			//if(gval[7]!=0 || gval[8]!=0 || gval[9]!=0 || gval[10]!=0)//to inspect
@@ -514,15 +521,15 @@ OUTPUT bool open_com(TS_UC m_com)
 	if(g_Commu_type==0)
 	{
 		//val         the value that you want to write to the register
-		//the return value == -1 ,no connecting
-		//the return value == -2 ,try it again
-		//the return value == -3,Maybe that have more than 2 Tstat is connecting
-		//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
-		//the return value == -5 ,the input have some trouble
-		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-		//清空串口缓冲区
+		//the return value == -1 ,no connection
+		//the return value == -2 ,retry
+		//the return value == -3, may have more than 2 devices connecting
+		//the return value == -4 ,between devLo and devHi,no device detected
+		//the return value == -5 ,the input buffer had some trouble
+		//the return value >=1 ,the devLo!=devHi, may have 2 devices connecting
+		// empty the serial port buffer
 		//the return value is the register address
-		//Sleep(50);       //must use this function to slow computer
+		//Sleep(50);       //Need a delay here
 		if(devLo<1 || devHi>254)
 			return -5;
 		if(m_hSerial==NULL)
@@ -549,7 +556,7 @@ OUTPUT bool open_com(TS_UC m_com)
 			return the_return_value;
 		}  
 		else if(old_or_new_scan_protocal_in_dll==2)
-		{//old protocal
+		{//old protocol
 			if(the_return_value==-2 || the_return_value==-3 || the_return_value==-4)
 				return the_return_value;
 			int i=0;
@@ -570,15 +577,15 @@ OUTPUT bool open_com(TS_UC m_com)
 	if(g_Commu_type==1)//
 	{
 		//val         the value that you want to write to the register
-		//the return value == -1 ,no connecting
-		//the return value == -2 ,try it again
-		//the return value == -3,Maybe that have more than 2 Tstat is connecting
-		//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
-		//the return value == -5 ,the input have some trouble
-		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-		//清空串口缓冲区
+		//the return value == -1 ,no connection
+		//the return value == -2 ,retry
+		//the return value == -3, may have more than 2 devices connecting
+		//the return value == -4 ,between devLo and devHi,no devices detected
+		//the return value == -5 ,the input buffer is bad
+		//the return value >=1 ,the devLo!=devHi, may have 2 devices connecting
+		//Empty the serial port buffer
 		//the return value is the register address
-		//Sleep(50);       //must use this function to slow computer
+		//Sleep(50);       //Need a delay here
 		if(devLo<1 || devHi>254)
 			return -5;
 		if (m_hSocket==INVALID_SOCKET)
@@ -605,7 +612,7 @@ OUTPUT bool open_com(TS_UC m_com)
 			return the_return_value;
 		}
 		else if(old_or_new_scan_protocal_in_dll==2)
-		{//old protocal
+		{//old protocol
 // 			if(the_return_value==-2 || the_return_value==-3 || the_return_value==-4)
 // 				return the_return_value;
 // 			int i=0;
@@ -634,7 +641,7 @@ OUTPUT bool open_com(TS_UC m_com)
   bool Change_BaudRate(TS_US new_baudrate)
 {
 
-    ///配置串口
+    //Configure the serial port
 	if(new_baudrate!=9600 && new_baudrate!=19200)
 		return false;
 	if(baudrate_in_dll==new_baudrate)
@@ -643,7 +650,7 @@ OUTPUT bool open_com(TS_UC m_com)
 		baudrate_in_dll=new_baudrate;
     DCB  PortDCB;    
     PortDCB.DCBlength = sizeof(DCB); 
-    // 默认串口参数
+    // Default serial port parameters
 	int i=0;
 	bool successful=false;//true==do it success;false==do it failure
 	for(i=0;i<10;i++)
@@ -655,7 +662,7 @@ OUTPUT bool open_com(TS_UC m_com)
 	if(successful==false)
 		return false;
 	//not to change the baudate
-    PortDCB.BaudRate = new_baudrate; // baud//attention ,if it is wrong,can't write the com
+     PortDCB.BaudRate = new_baudrate; // baud,if it is wrong then the write will fail. 
     PortDCB.ByteSize = 8;     // Number of bits/byte, 4-8 
     PortDCB.Parity = NOPARITY; 
     PortDCB.StopBits = ONESTOPBIT;  
@@ -663,7 +670,7 @@ OUTPUT bool open_com(TS_UC m_com)
 	for(i=0;i<10;i++)
 	if(SetCommState(m_hSerial, &PortDCB))
 	{
-			///L"配置串口失败";
+			///Configure Serial port failed
 		successful=true;
 		break;
 	}
@@ -674,7 +681,7 @@ OUTPUT bool open_com(TS_UC m_com)
 	return SetCommTimeouts(m_hSerial,lpCommTimeouts) == TRUE;
 }
 //socket dll.
-  bool Open_Socket(CString strIPAdress)//打开Socket
+  bool Open_Socket(CString strIPAdress)//打开Open Socket
 {
 	if(g_Commu_type==0)
 		return false;
@@ -708,13 +715,15 @@ OUTPUT bool open_com(TS_UC m_com)
 		servAddr.sin_family = AF_INET;
 		servAddr.sin_port = htons(6001);
 		// 注意，这里要填写服务器程序（TCPServer程序）所在机器的IP地址
+          //TBD: explain this better
+                         //Note that the IP address of the machine where the server program (TCPServer) is to be filled in
 		//servAddr.sin_addr.S_un.S_addr =inet_addr("192.168.0.28");
 		servAddr.sin_addr.S_un.S_addr =inet_addr((LPSTR)(LPCTSTR)strIPAdress);
 	//	u_long ul=1;
 	//	ioctlsocket(m_hSocket,FIONBIO,(u_long*)&ul);
 		//发送时限
 		setsockopt(m_hSocket,SOL_SOCKET,SO_SNDTIMEO,(char *)&nNetTimeout,sizeof(int));
-		//接收时限
+		//Receive time limit
 		setsockopt(m_hSocket,SOL_SOCKET,SO_RCVTIMEO,(char *)&nNetTimeout,sizeof(int));
 		if(::connect(m_hSocket,(sockaddr*)&servAddr, sizeof(servAddr)) == -1)
 		{
@@ -769,9 +778,9 @@ OUTPUT bool open_com(TS_UC m_com)
 		servAddr.sin_addr.S_un.S_addr = (inet_addr(W2A(strIPAdress)));
 	//	u_long ul=1;
 	//	ioctlsocket(m_hSocket,FIONBIO,(u_long*)&ul);
-	//发送时限
+	// Send time
 	setsockopt(m_hSocket,SOL_SOCKET,SO_SNDTIMEO,(char *)&nNetTimeout,sizeof(int));
-	//接收时限
+	//Receive time limit
 	setsockopt(m_hSocket,SOL_SOCKET,SO_RCVTIMEO,(char *)&nNetTimeout,sizeof(int));
 	if(::connect(m_hSocket,(sockaddr*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
 	{
@@ -818,13 +827,13 @@ OUTPUT bool open_com(TS_UC m_com)
 		//the return value ,-2 is wrong
 		//the return value == -1 ,no connecting
 		//return value == -3 ,no response
-		//清空串口缓冲区
+		//Empty serial port buffer
 		//TS_UC  gval[8]={'\0'};//the data that get
 		//      TS_UC  pval[9];
 		for(int i=0;i<11;i++)
 			gval[i]=0;/////////////////////////////////////////clear buffer
 		TS_US crc;		
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		DWORD m_had_send_data_number;// Number of bytes sent
 		pval[0] = device_var;
 		pval[1] = 3;
 		pval[2] = address>>8 & 0xFF ;
@@ -853,12 +862,12 @@ OUTPUT bool open_com(TS_UC m_com)
 		m_osWrite.Offset = 0;
 		m_osWrite.OffsetHigh = 0 ;
 
-		int fState=WriteFile(m_hSerial,// 句柄
-			pval,// 数据缓冲区地址
-			8,// 数据大小
-			&m_had_send_data_number,// 返回发送出去的字节数
+		int fState=WriteFile(m_hSerial,// Handle
+			pval,// Data buffer address
+			8,// Data size
+			&m_had_send_data_number,//Returns the number of bytes sent
 			&m_osWrite);
-		if(!fState)// 不支持重叠	
+		if(!fState)// Overflow not supported
 		{
 			if(GetLastError()==ERROR_IO_PENDING)
 			{
@@ -883,21 +892,21 @@ OUTPUT bool open_com(TS_UC m_com)
 		if(address==10)
 		{
 			serinumber_in_dll[0]=serinumber_in_dll[1]=serinumber_in_dll[2]=serinumber_in_dll[3]=0;//this line is for new protocal			
-			fState=ReadFile(m_hSerial,// 句柄
-				gval,// 数据缓冲区地址
-				11,// 数据大小
-				&m_had_send_data_number,// 返回发送出去的字节数
+			fState=ReadFile(m_hSerial,//Handle
+				gval,//Data buffer Address
+				11,// Data size
+				&m_had_send_data_number,//Returns the number of bytes sent
 				&m_osRead);
 		}
 		else
 		{
-			fState=ReadFile(m_hSerial,// 句柄
-				gval,// 数据缓冲区地址
-				7,// 数据大小
-				&m_had_send_data_number,// 返回发送出去的字节数
+			fState=ReadFile(m_hSerial,// 句柄 , Handle
+				gval,//Data buffer Address
+				7,//Data size
+				&m_had_send_data_number,//returns the number of bytes sent
 				&m_osRead);
 		}
-		if(!fState)// 不支持重叠	
+		if(!fState)//Overlap not supported
 		{
 			if(GetLastError()==ERROR_IO_PENDING)
 			{
@@ -956,9 +965,9 @@ OUTPUT bool open_com(TS_UC m_com)
 	{  
 		//address        the register
 		//the return value ,-2 is wrong
-		//the return value == -1 ,no connecting
+		//the return value == -1 ,not connecting
 		//return value == -3 ,no response
-		//清空串口缓冲区
+		//Empty the serial port buffer
 		//TS_UC  gval[8]={'\0'};//the data that get
 		//      TS_UC  pval[9];
 
@@ -990,7 +999,7 @@ OUTPUT bool open_com(TS_UC m_com)
 		for(int i=0;i<11;i++)
 			gval[i]=0;/////////////////////////////////////////clear buffer
 //		TS_US crc;		
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//已经发送的数据的字节数, Number of bytes sent
 
 		pval[0] = device_var;
 		pval[1] = 3;
@@ -1165,32 +1174,32 @@ OUTPUT bool open_com(TS_UC m_com)
 		Sleep(50);
 		if(address!=10)
 		{
-			fState=WriteFile(m_hSerial,// 句柄
-				pval,// 数据缓冲区地址
-				8,// 数据大小
-				&m_had_send_data_number,// 返回发送出去的字节数
+			fState=WriteFile(m_hSerial,// 句柄, Handle
+				pval,//Data buffer address
+				8,//Data size
+				&m_had_send_data_number,//Returns the number of bytes sent
 				&m_osWrite);
 		}
 		else
 		{//==10 register
 			if(serinumber_in_dll[0]==0 && serinumber_in_dll[1]==0 && serinumber_in_dll[2]==0 && serinumber_in_dll[3]==0)
 			{//old protocal
-				fState=WriteFile(m_hSerial,// 句柄
-					pval,// 数据缓冲区地址
-					8,// 数据大小
-					&m_had_send_data_number,// 返回发送出去的字节数
+				fState=WriteFile(m_hSerial,// 句柄, Handle
+					pval,//Databuffer address
+					8,//Data size
+					&m_had_send_data_number,//Bytes sent
 					&m_osWrite);
 			}
 			else
-			{//new protocal
-				fState=WriteFile(m_hSerial,// 句柄
-					pval,// 数据缓冲区地址
-					12,// 数据大小
-					&m_had_send_data_number,// 返回发送出去的字节数
+			{//new protocol
+				fState=WriteFile(m_hSerial,// 句柄 , handle
+					pval,//Data buffer Address
+					12,//Data size
+					&m_had_send_data_number,//Returns # bytes sent 
 					&m_osWrite);
 			}
 		}
-		if(!fState)// 不支持重叠	
+		if(!fState)//Overflow not supported
 		{
 			if(GetLastError()==ERROR_IO_PENDING)
 			{
@@ -1214,32 +1223,32 @@ OUTPUT bool open_com(TS_UC m_com)
 		Sleep(LATENCY_TIME_COM);
 		if(address!=10)
 		{
-			fState=ReadFile(m_hSerial,// 句柄
-				gval,// 数据缓冲区地址
-				8,// 数据大小
-				&m_had_send_data_number,// 返回发送出去的字节数
+			fState=ReadFile(m_hSerial,// 句柄, Handle
+				gval,//Data buffer address
+				8,//Data size
+				&m_had_send_data_number,//Returns the number of bytes sent
 				&m_osRead);
 		}
 		else
 		{
 			if(serinumber_in_dll[0]==0 && serinumber_in_dll[1]==0 && serinumber_in_dll[2]==0 && serinumber_in_dll[3]==0)
 			{//old protocal
-				fState=ReadFile(m_hSerial,// 句柄
-					gval,// 数据缓冲区地址
-					8,// 数据大小
-					&m_had_send_data_number,// 返回发送出去的字节数
+				fState=ReadFile(m_hSerial,		//Handle
+					gval,					//Data buffer address
+					8,					//Data size
+					&m_had_send_data_number, 	//Returns # of bytes sent
 					&m_osRead);
 			}
 			else
 			{//new protocal
-				fState=ReadFile(m_hSerial,// 句柄
-					gval,// 数据缓冲区地址
-					12,// 数据大小
-					&m_had_send_data_number,// 返回发送出去的字节数
+				fState=ReadFile(m_hSerial,		//Handle
+					gval,					//Data buffer address
+					12,					//Data size
+					&m_had_send_data_number,	//Returns # of bytes sent 
 					&m_osRead);
 			}
 		}
-		if(!fState)// 不支持重叠	
+		if(!fState)			//Overflow not supported
 		{
 			if(GetLastError()==ERROR_IO_PENDING)
 			{
@@ -1262,13 +1271,13 @@ OUTPUT bool open_com(TS_UC m_com)
 			if(gval[0]==0 && gval[1]==0 && gval[2]==0 && gval[3]==0 && gval[4]==0 && gval[5]==0 && gval[6]==0 && gval[7]==0)
 				return -3;
 			if(serinumber_in_dll[0]==0 && serinumber_in_dll[1]==0 && serinumber_in_dll[2]==0 && serinumber_in_dll[3]==0)
-			{//old protocal
+			{//old protocol
 				for(int i=0;i<8;i++)
 					if(gval[i]!=pval[i])
 						return -2;
 			}
 			else
-			{//new protocal
+			{//new protocol
 				//			crc=CRC16(gval,10);
 				//			if(gval[6]!=((crc>>8)&0xff))
 				//				return -2;
@@ -1287,11 +1296,11 @@ OUTPUT bool open_com(TS_UC m_com)
 	
 	if(g_Commu_type==1)//tcp.
 	{
-		//address        the register
+		//address of the register
 		//val         the value that you want to write to the register
-		//the return value == -1 ,no connecting
+		//the return value == -1 ,no connection
 		//the return value == -3 , no response
-		//清空串口缓冲区
+		//Empty the serial port buffer
 		
 		//TS_UC data[12];
 		TS_UC data[16];
@@ -1315,7 +1324,7 @@ OUTPUT bool open_com(TS_UC m_com)
 		data[3]=4;
 		data[4]=5;
 		data[5]=6;
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//已经发送的数据的字节数, # of bytes sent
 		data[6] = device_var;
 		data[7] = 6;
 		data[8] = address>>8 & 0xFF ;
@@ -1347,13 +1356,13 @@ OUTPUT bool open_com(TS_UC m_com)
 		for(int i=0;i<=11;i++)
 			gval[i]=0;/////////////////////////////////////////clear buffer
 //		TS_US crc;		
-	//	DWORD m_had_send_data_number;//已经发送的数据的字节数
+	//	DWORD m_had_send_data_number;//已经发送的数据的字节数, Number of bytes sent
 		pval[0] = device_var;
 		pval[1] = 6;
 		pval[2] = address>>8 & 0xFF ;
 		pval[3] = address & 0xFF;
 		if(address==10 && (serinumber_in_dll[0]!=0 || serinumber_in_dll[1]!=0 || serinumber_in_dll[2]!=0 || serinumber_in_dll[3]!=0))
-			pval[4]=0x55;/////////////////////////////new protocal or write_one 10
+			pval[4]=0x55;/////////////////////////////new protocol or write_one 10
 		else
 			pval[4] = (val>>8) & 0xff;//number hi
 		pval[5] = val & 0xff;//number lo
@@ -1362,13 +1371,13 @@ OUTPUT bool open_com(TS_UC m_com)
 		for(int i=0;i<=11;i++)
 			gval[i]=0;/////////////////////////////////////////clear buffer
 		TS_US crc;		
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		DWORD m_had_send_data_number;//已经发送的数据的字节数, Num of bytes sent
 		pval[0] = device_var;
 		pval[1] = 6;
 		pval[2] = address>>8 & 0xFF ;
 		pval[3] = address & 0xFF;
 		if(address==10 && (serinumber_in_dll[0]!=0 || serinumber_in_dll[1]!=0 || serinumber_in_dll[2]!=0 || serinumber_in_dll[3]!=0))
-			pval[4]=0x55;/////////////////////////////new protocal or write_one 10
+			pval[4]=0x55;/////////////////////////////new protocol or write_one 10
 		else
 			pval[4] = (val>>8) & 0xff;//number hi
 		pval[5] = val & 0xff;//number lo
@@ -1435,7 +1444,7 @@ OUTPUT bool open_com(TS_UC m_com)
 						return -2;
 			}
 			else
-			{//new protocal
+			{//new protocol
 				//			crc=CRC16(gval,10);
 				//			if(gval[6]!=((crc>>8)&0xff))
 				//				return -2;
@@ -1463,14 +1472,14 @@ OUTPUT bool open_com(TS_UC m_com)
 	if(g_Commu_type==0)
 	{
 		//device_var is the Tstat ID
-		//the return value == -1 ,no connecting
+		//the return value == -1 ,no connection
 
 		TS_UC to_send_data[300]={'\0'};
 		HCURSOR hc;//load mouse cursor
 		hc = LoadCursor(NULL,IDC_WAIT);
 		hc = SetCursor(hc);
-		//to_send_data is the array that you want to put data into
-		//length is the number of register,that you want to read
+		//send_data is the array to store the register data
+		//length is the number of registers that will be read
 		//start_address is the start register
 		TS_UC data_to_send[8]={'\0'};//the array to used in writefile()
 		data_to_send[0]=device_var;//slave address
@@ -1483,7 +1492,7 @@ OUTPUT bool open_com(TS_UC m_com)
 		data_to_send[6]=(crc>>8) & 0xff;
 		data_to_send[7]=crc & 0xff;
 
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		DWORD m_had_send_data_number;//已经发送的数据的字节数, Num of bytes sent
 		if(m_hSerial==NULL)
 		{		
 			return -1;
@@ -1500,13 +1509,13 @@ OUTPUT bool open_com(TS_UC m_com)
 			return -2; 
 		m_osMulWrite.Offset = 0;
 		m_osMulWrite.OffsetHigh = 0 ;
-		///////////////////////////////////////////////////////send the to read message
-		int fState=WriteFile(m_hSerial,// 句柄
-			data_to_send,// 数据缓冲区地址
-			8,// 数据大小
-			&m_had_send_data_number,// 返回发送出去的字节数
+		///////////////////////////////////////////////////////send the read message
+		int fState=WriteFile(m_hSerial,// 句柄, Handle
+			data_to_send,//Data buffer address
+			8,//Data size
+			&m_had_send_data_number,//Returns the # of bytes sent
 			&m_osMulWrite);
-		if(!fState)// 不支持重叠	
+		if(!fState)//Overflow not supported
 		{
 			if(GetLastError()==ERROR_IO_PENDING)
 			{
@@ -1527,12 +1536,12 @@ OUTPUT bool open_com(TS_UC m_com)
 		m_osRead.Offset = 0;
 		m_osRead.OffsetHigh = 0 ;
 		////////////////////////////////////////////////clear com error
-		fState=ReadFile(m_hSerial,// 句柄
-			to_send_data,// 数据缓冲区地址
-			length*2+5,// 数据大小
-			&m_had_send_data_number,// 返回发送出去的字节数
+		fState=ReadFile(m_hSerial,// 句柄, Handle
+			to_send_data,//Buffer Addres
+			length*2+5,//Data size
+			&m_had_send_data_number,//Returns the number of bytes sent
 			&m_osRead);
-		if(!fState)// 不支持重叠	
+		if(!fState)//Overflow not supported
 		{
 			if(GetLastError()==ERROR_IO_PENDING)
 			{
@@ -1558,7 +1567,7 @@ OUTPUT bool open_com(TS_UC m_com)
 	{
 		/*
 		//device_var is the Tstat ID
-		//the return value == -1 ,no connecting
+		//the return value == -1 ,no connection
 		TS_UC to_send_data[700]={'\0'};
 		HCURSOR hc;//load mouse cursor
 		hc = LoadCursor(NULL,IDC_WAIT);
@@ -1577,7 +1586,7 @@ OUTPUT bool open_com(TS_UC m_com)
 		data_to_send[6]=(crc>>8) & 0xff;
 		data_to_send[7]=crc & 0xff;
 
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		DWORD m_had_send_data_number;//已经发送的数据的字节数, Number of bytes sent
 		if(m_hSocket==INVALID_SOCKET)
 		{		
 			return -1;
@@ -1631,7 +1640,7 @@ OUTPUT bool open_com(TS_UC m_com)
 		//data_to_send[6]=(crc>>8) & 0xff;
 		//data_to_send[7]=crc & 0xff;/
 
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//已经发送的数据的字节数, Number of bytes sent
 		if(m_hSocket==INVALID_SOCKET)
 		{
 			return -1;
@@ -1668,7 +1677,7 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 	if(g_Commu_type==0)//
 	{
 		//the return value ,-2 is wrong
-		//the return value == -1 ,no connecting
+		//the return value == -1 ,no connection
 		HCURSOR hc;//load mouse cursor
 		TS_UC data_to_write[600]={'\0'};
 		data_to_write[0]=device_var;
@@ -1677,7 +1686,8 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		data_to_write[3]=start_address & 0xff;
 		data_to_write[4]=0;
 		data_to_write[5]=length;
-		data_to_write[6]=length;//128 is better ,if you send more than 128, the ron software will meet some trouble,because it is too long one times,can not finish on time;on time
+		data_to_write[6]=length;//if you send more than 128 bytes
+                                  //the command cannot finish on time -> problem 
 		for(int i=0;i<length;i++)
 			data_to_write[7+i]=to_write[i];
 	//	TS_US crc=CRC16(data_to_write,i+7);
@@ -1691,7 +1701,7 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		hc = LoadCursor(NULL,IDC_WAIT);
 		hc = SetCursor(hc);
 		//length is the data length,if you want to write 128 bite,the length == 128
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		DWORD m_had_send_data_number;//已经发送的数据的字节数, Number of bytes sent
 		if(m_hSerial==NULL)
 		{
 			return -1;
@@ -1709,17 +1719,17 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		m_osMulWrite.Offset = 0;
 		m_osMulWrite.OffsetHigh = 0 ;
 		///////////////////////////////////////////////////////send the to read message
-		int fState=WriteFile(m_hSerial,// 句柄
-			data_to_write,// 数据缓冲区地址
-			length+9,// 数据大小
-			&m_had_send_data_number,// 返回发送出去的字节数
+		int fState=WriteFile(m_hSerial,// 句柄, Handle
+			data_to_write,//Data buffer address
+			length+9,//Data size
+			&m_had_send_data_number,//Returns the number of bytes sent
 			&m_osMulWrite);
-		if(!fState)// 不支持重叠	
+		if(!fState)//Doesn’t support overflow. 
 		{
 			if(GetLastError()==ERROR_IO_PENDING)
 			{
 				//WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+				GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待, wait
 			}
 			else
 				m_had_send_data_number=0;
@@ -1734,17 +1744,17 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		m_osRead.OffsetHigh = 0 ;
 		Sleep(LATENCY_TIME_COM);
 		////////////////////////////////////////////////clear com error
-		fState=ReadFile(m_hSerial,// 句柄
-			gval,// 数据缓冲区地址
-			8,// 数据大小
-			&m_had_send_data_number,// 返回发送出去的字节数
+		fState=ReadFile(m_hSerial,// 句柄, handle
+			gval,//Address of buffer
+			8,//Data size
+			&m_had_send_data_number,//Number of bytes sent
 			&m_osRead);
-		if(!fState)// 不支持重叠	
+		if(!fState)//Overflow not supported
 		{
 			if(GetLastError()==ERROR_IO_PENDING)
 			{
 				//WaitForSingleObject(m_osRead.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+				GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待, wait
 			}
 			else
 				m_had_send_data_number=0;
@@ -1781,7 +1791,7 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		data_to_write[9]=start_address & 0xff;
 		data_to_write[10]=0;
 		data_to_write[11]=length;
-		data_to_write[12]=length;//128 is better ,if you send more than 128, the ron software will meet some trouble,because it is too long one times,can not finish on time;on time
+		data_to_write[12]=length;//128 is max, longer and the routine cannot finish in time. 
 		for(int i=0;i<length;i++)
 			data_to_write[13+i]=to_write[i];
 		
@@ -1792,8 +1802,8 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 	//	data_to_write[i+8]=crc & 0xff;
 		hc = LoadCursor(NULL,IDC_WAIT);
 		hc = SetCursor(hc);
-		//length is the data length,if you want to write 128 bite,the length == 128
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		//length is the data length, for 128 bytes, the length == 128
+//		DWORD m_had_send_data_number;//已经发送的数据的字节数, # of bytes sent
 		if(m_hSocket==INVALID_SOCKET)
 		{
 			return -1;
@@ -1822,13 +1832,13 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 	if(g_Commu_type==0)
 	{
 		//val         the value that you want to write to the register
-		//the return value == -1 ,no connecting
+		//the return value == -1 ,no connection
 		//the return value == -2 ,try it again
-		//the return value == -3,Maybe that have more than 2 Tstat is connecting
-		//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
-		//the return value == -5 ,the input have some trouble
-		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-		//清空串口缓冲区
+		//the return value == -3, May have more than 2 Devices connecting at this address
+		//the return value == -4 ,between devLo and devHi,no Device is connected in this range
+		//the return value == -5 ,the receive buffer had some trouble TBD: explain this
+		//the return value >=1 ,the devLo!=devHi, may have 2 devices is connecting at this address
+		//empty the serial port buffer
 		//the return value is the register address
 
 		//Sleep(150);       //must use this function to slow computer
@@ -1879,13 +1889,13 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 	if(g_Commu_type==1)//tcp
 	{
 		//val         the value that you want to write to the register
-		//the return value == -1 ,no connecting
-		//the return value == -2 ,try it again
-		//the return value == -3,Maybe that have more than 2 Tstat is connecting
-		//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
-		//the return value == -5 ,the input have some trouble
-		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-		//清空串口缓冲区
+		//the return value == -1 ,no connection
+		//the return value == -2 ,try again
+		//the return value == -3,May have more than 2 devices is connecting at this address
+		//the return value == -4 ,between devLo and devHi, no device is detected in this range
+		//the return value == -5 ,the receive buffer may have some trouble
+		//the return value >=1 ,the devLo!=devHi, may have 2 devices connecting
+		//Empty the serial port buffer
 		//the return value is the register address
 		//Sleep(50);       //must use this function to slow computer
 		if(devLo<1 || devHi>254)
@@ -1944,12 +1954,12 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 	{
 		//the second time
 		//val         the value that you want to write to the register
-		//the return value == -1 ,no connecting
+		//the return value == -1 ,no connection
 		//the return value == -2 ,try it again
-		//the return value == -3,Maybe that have more than 2 Tstat is connecting
-		//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
-		//the return value == -5 ,the input have some trouble
-		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
+		//the return value == -3, may have more than 2 devices connecting
+		//the return value == -4 , between devLo and devHi,no device detected
+		//the return value == -5 ,the input buffer may have some problem
+		//the return value >=1 ,the devLo!=devHi, may have 2 devices connecting
 		//清空串口缓冲区
 		//the return value is the register address
 
@@ -1960,7 +1970,7 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 			gval[i]=0;/////////////////////////////////////////clear buffer
 		TS_UC  pval[6];
 		TS_US crc;
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		DWORD m_had_send_data_number;//已经发送的数据的字节数, # of Bytes sent
 		pval[0] = 255;											
 		pval[1] = 26;  //put comments here,
 		pval[2] = devHi;
@@ -1986,17 +1996,17 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 
 		ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
 		PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear buffer
-		int fState=WriteFile(m_hSerial,// 句柄
-			pval,// 数据缓冲区地址
-			6,// 数据大小
-			&m_had_send_data_number,// 返回发送出去的字节数
+		int fState=WriteFile(m_hSerial,// 句柄, Handle
+			pval,//Data buffer address
+			6,//Data size
+			&m_had_send_data_number,//Returns # of bytes sent
 			&m_osWrite);
-		if(!fState)//不支持重叠
+		if(!fState)//不支持重叠, Overflow not supported
 		{
 			if(GetLastError()==ERROR_IO_PENDING)
 			{
 				//WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+				GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待, Wait
 				//			if(GetLastError()==ERROR_IO_INCOMPLETE)
 				//				AfxMessageBox("wrong1");
 			}
@@ -2016,17 +2026,17 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		m_osRead.Offset = 0;
 		m_osRead.OffsetHigh = 0;
 		////////////////////////////////////////////////clear com error
-		fState=ReadFile(m_hSerial,// 句柄
-			gval,// 数据缓冲区地址
-			13,// 数据大小
-			&m_had_send_data_number,// 返回发送出去的字节数
+		fState=ReadFile(m_hSerial,// 句柄, Handle
+			gval,//Buffer address
+			13,//size
+			&m_had_send_data_number,//bytese sent
 			&m_osRead);
-		if(!fState)// 不支持重叠	
+		if(!fState)		//Overflow not supported
 		{
 			if(GetLastError()==ERROR_IO_PENDING)
 			{
 				//WaitForSingleObject(m_osRead.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+				GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待, Wait
 			}
 			else
 				m_had_send_data_number=0;
@@ -2053,30 +2063,30 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 			old_or_new_scan_protocal_in_dll=2;
 			if(gval[0]==0 && gval[1]==0 && gval[2]==0 && gval[3]==0 && gval[4]==0)
 			{
-				Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+				Sleep(SLEEP_TIME);//Delay required here
 				return -4;              //no response ,no connection
 			}
 			if(gval[5]!=0 || gval[6]!=0)//to inspect
 			{
-				Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+				Sleep(SLEEP_TIME);// Delay required here
 				return -3;
 			}
 			if((gval[0]!=pval[0]) || (gval[1]!=26))
 			{
-				Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+				Sleep(SLEEP_TIME);// Delay required here 
 				return -2;
 			}
 			crc=CRC16(gval,3);
 			if( (gval[3]!=((crc>>8) & 0xff)) || (gval[4]!=(crc & 0xff)))
 			{
-				Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+				Sleep(SLEEP_TIME);// Delay required here 
 				return -2;
 			}
 		}
 		else
-		{// new scan protocal,if many old tstat ,get into here ,scan result is oK too.
+		{// new scan protocol,if many old devices, get into here and scan result is OK too.
 			old_or_new_scan_protocal_in_dll=1;
-			Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+			Sleep(SLEEP_TIME);//Need a delay here
 			if(gval[9]!=0 || gval[10]!=0 || gval[11]!=0 || gval[12]!=0)//to inspect
 				return -3;
 			if((gval[0]!=pval[0]) || (gval[1]!=25))
@@ -2106,13 +2116,13 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 	{
 		//the second time
 		//val         the value that you want to write to the register
-		//the return value == -1 ,no connecting
-		//the return value == -2 ,try it again
-		//the return value == -3,Maybe that have more than 2 Tstat is connecting
-		//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
-		//the return value == -5 ,the input have some trouble
-		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-		//清空串口缓冲区
+		//the return value == -1 ,no connection
+		//the return value == -2 ,try again
+		//the return value == -3, maybe have more than 2 devices connecting
+		//the return value == -4 , between devLo and devHi,no device is detected
+		//the return value == -5 ,the buffer has some problem
+		//the return value >=1 ,the devLo!=devHi, may have 2 devices connecting
+		//Empty the serial port buffer
 		//the return value is the register address
 		if(devLo<1 || devHi>254)
 			return -5;
@@ -2122,7 +2132,7 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 			gval[i]=0;/////////////////////////////////////////clear buffer
 		TS_UC  pval[10];
 //		TS_US crc;
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//已经发送的数据的字节数, Number of bytes sent
 
 		
 		pval[0]=1;
@@ -2176,7 +2186,7 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 			}
 		}
 		else
-		{// new scan protocal,if many old tstat ,get into here ,scan result is oK too.
+		{// new scan protocol,if many old tstat ,get into here ,scan result is oK too.
 			old_or_new_scan_protocal_in_dll=1;
 			//	Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
 			if(gval[9]!=0 || gval[10]!=0 || gval[11]!=0 || gval[12]!=0)//to inspect
@@ -2239,20 +2249,20 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 
   bool open_com(int m_com)
 {	
-	//open com ,if you want to open "com1",the m_com equal 0;if you want to open "com2",the m_com equal 1
-	//you will get the handle to com,m_hSerial,is a extern variable
+	//open com , for com1 use m_com = 0, for "com2", m_com = 1 and so on. 
+	//you will get the handle to com,m_hSerial,is an extern variable
 	//the return value ,true is ok,false is failure
 	if(open_com_port_number_in_dll==m_com)
 	{
 		Change_BaudRate(19200);
-		return true;///////////////////////////same com port ,opened by multi times,it's badly.
+		return true;///////////////////////////Don’t open the same port multiple times.
 	}
 	if(m_hSerial != NULL)  
-	{//关闭串口
+	{//关闭串口, Close the serial port
 		CloseHandle(m_hSerial);
 		m_hSerial = NULL;
 	}
-	/////////////////////////////////////////////////////////////////////加入的串口通信部分
+	/////////////////////////////////////////////////////////////////////加入的串口通信部分, Joined serial communications part
 // 	LPCSTR lpComNum[6];
 // 	ZeroMemory(lpComNum, )
 
@@ -2268,12 +2278,14 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		strCom = _T("\\\\.\\COM")+strCom;
 	}
 	
-	m_hSerial = CreateFile( strCom, //strCom,//串口句柄，打开串口
+	m_hSerial = CreateFile( strCom, //strCom,//串口句柄，打开串口, Serial Handle, open serial port
 								GENERIC_READ | GENERIC_WRITE,
 								0,
 								NULL,
 								OPEN_EXISTING,
 								FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,是另外的形式，表示的是异步通信，能同时读写;0为同步读写
+// Different form, the expression is asynchronous communication, R/W at the same time, 0 for synchronous Read and write TBD: Explain this a little better please. 
+
 								NULL);
 
 
@@ -2290,15 +2302,15 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 	}
 	DCB  PortDCB;    
 	PortDCB.DCBlength = sizeof(DCB); 
-	// 默认串口参数
+	// 默认串口参数, Default serial port paramters
 	if(!GetCommState(m_hSerial, &PortDCB))
 	{
 		CloseHandle(m_hSerial);
 		m_hSerial = NULL;
 		return false;
 	}	
-	//not to change the baudate
-	PortDCB.BaudRate = 19200; // baud//attention ,if it is wrong,can't write the com
+	//don’t change the baudate
+	PortDCB.BaudRate = 19200; // baud//If it’s the wrong baud rate you can’t write
 	PortDCB.ByteSize = 8;     // Number of bits/byte, 4-8 
 	PortDCB.Parity = NOPARITY; 
 	PortDCB.StopBits = ONESTOPBIT;  
@@ -2334,16 +2346,16 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 	if(bComm_Type==0)//serial
 	{
 		//address        the register
-		//the return value ,-2 is wrong
-		//the return value == -1 ,no connecting
+		//the return value ,-2 bad comms
+		//the return value == -1 ,no connection
 		//return value == -3 ,no response
-		//清空串口缓冲区
-		//TS_UC  gval[8]={'\0'};//the data that get
+		//Empty the serial port buffer
+		//TS_UC  gval[8]={'\0'};//the data which was read
 		//      TS_UC  pval[9];
 		for(int i=0;i<11;i++)
 			gval[i]=0;/////////////////////////////////////////clear buffer
 		TS_US crc;		
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		DWORD m_had_send_data_number;//已经发送的数据的字节数, Num of bytes sent
 		pval[0] = device_var;
 		pval[1] = 3;
 		pval[2] = address>>8 & 0xFF ;
@@ -2372,17 +2384,17 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		m_osWrite.Offset = 0;
 		m_osWrite.OffsetHigh = 0 ;
 
-		int fState=WriteFile(m_hSerial,// 句柄
-			pval,// 数据缓冲区地址
-			8,// 数据大小
-			&m_had_send_data_number,// 返回发送出去的字节数
+		int fState=WriteFile(m_hSerial,// 句柄, Handle
+			pval,//Address of buffer
+			8,//length
+			&m_had_send_data_number,//returns # of bytes sent
 			&m_osWrite);
-		if(!fState)// 不支持重叠	
+		if(!fState)//Overflow not supported
 		{
 			if(GetLastError()==ERROR_IO_PENDING)
 			{
 				//WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+				GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待, wait
 				//			if(GetLastError()==ERROR_IO_PENDING)
 				//				AfxMessageBox("wrong1");
 			}
@@ -2402,21 +2414,21 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		if(address==10)
 		{
 			serinumber_in_dll[0]=serinumber_in_dll[1]=serinumber_in_dll[2]=serinumber_in_dll[3]=0;//this line is for new protocal			
-			fState=ReadFile(m_hSerial,// 句柄
-				gval,// 数据缓冲区地址
-				11,// 数据大小
-				&m_had_send_data_number,// 返回发送出去的字节数
+			fState=ReadFile(m_hSerial,// 句柄, Handle
+				gval,// 数据缓冲区地址 , Adderss 
+				11,//length
+				&m_had_send_data_number,//num of bytes sent
 				&m_osRead);
 		}
 		else
 		{
-			fState=ReadFile(m_hSerial,// 句柄
-				gval,// 数据缓冲区地址
-				7,// 数据大小
-				&m_had_send_data_number,// 返回发送出去的字节数
+			fState=ReadFile(m_hSerial,// 句柄 , Handle
+				gval,//Address of buffer
+				7,//length
+				&m_had_send_data_number,//Num of bytes sent. 
 				&m_osRead);
 		}
-		if(!fState)// 不支持重叠	
+		if(!fState)//Oveerflow not supported
 		{
 			if(GetLastError()==ERROR_IO_PENDING)
 			{
@@ -2441,7 +2453,7 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		else
 		{
 			if(gval[7]!=0 || gval[8]!=0 || gval[9]!=0 || gval[10]!=0)
-			{//new protocal
+			{//new protocol
 				if(gval[0]!=pval[0] || gval[1]!=pval[1] || gval[2]!=6 )//6
 					return -2;
 				crc=CRC16(gval,9);
@@ -2475,9 +2487,9 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 	{  
 		//address        the register
 		//the return value ,-2 is wrong
-		//the return value == -1 ,no connecting
+		//the return value == -1 ,no connection
 		//return value == -3 ,no response
-		//清空串口缓冲区
+		//Empty the serial port buffer
 		//TS_UC  gval[8]={'\0'};//the data that get
 		//      TS_UC  pval[9];
 
@@ -2509,7 +2521,7 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		for(int i=0;i<11;i++)
 			gval[i]=0;/////////////////////////////////////////clear buffer
 //		TS_US crc;		
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//已经发送的数据的字节数, # of bytes sent
 
 		pval[0] = device_var;
 		pval[1] = 3;
@@ -2628,7 +2640,7 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		for(int i=0;i<=11;i++)
 			gval[i]=0;/////////////////////////////////////////clear buffer
 		TS_US crc;		
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		DWORD m_had_send_data_number;//已经发送的数据的字节数, Num of bytes sent
 		pval[0] = device_var;
 		pval[1] = 6;
 		pval[2] = address>>8 & 0xFF ;
@@ -2684,37 +2696,37 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		Sleep(50);
 		if(address!=10)
 		{
-			fState=WriteFile(m_hSerial,// 句柄
-				pval,// 数据缓冲区地址
-				8,// 数据大小
-				&m_had_send_data_number,// 返回发送出去的字节数
+			fState=WriteFile(m_hSerial,// 句柄, Handle
+				pval,//Address of buffer
+				8,//length
+				&m_had_send_data_number,//return number of bytes sent
 				&m_osWrite);
 		}
 		else
 		{//==10 register
 			if(serinumber_in_dll[0]==0 && serinumber_in_dll[1]==0 && serinumber_in_dll[2]==0 && serinumber_in_dll[3]==0)
 			{//old protocal
-				fState=WriteFile(m_hSerial,// 句柄
-					pval,// 数据缓冲区地址
-					8,// 数据大小
-					&m_had_send_data_number,// 返回发送出去的字节数
+				fState=WriteFile(m_hSerial,// 句柄 handle
+					pval,//address
+					8,//len
+					&m_had_send_data_number,// 返回发送出去的字节数 , bytes sent
 					&m_osWrite);
 			}
 			else
-			{//new protocal
-				fState=WriteFile(m_hSerial,// 句柄
-					pval,// 数据缓冲区地址
-					12,// 数据大小
-					&m_had_send_data_number,// 返回发送出去的字节数
+			{//new protocol
+				fState=WriteFile(m_hSerial,// 句柄, handle
+					pval,//address
+					12,//len
+					&m_had_send_data_number,//returns the number of bytes sent
 					&m_osWrite);
 			}
 		}
-		if(!fState)// 不支持重叠	
+		if(!fState)//Overflow not supported
 		{
 			if(GetLastError()==ERROR_IO_PENDING)
 			{
 				//WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+				GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待, wait
 				//			if(GetLastError()==ERROR_IO_INCOMPLETE)
 				//				AfxMessageBox("wrong1");
 			}
@@ -2733,32 +2745,32 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		Sleep(LATENCY_TIME_COM);
 		if(address!=10)
 		{
-			fState=ReadFile(m_hSerial,// 句柄
-				gval,// 数据缓冲区地址
-				8,// 数据大小
-				&m_had_send_data_number,// 返回发送出去的字节数
+			fState=ReadFile(m_hSerial,// 句柄, handle
+				gval,//buffer address
+				8,//len
+				&m_had_send_data_number,//returns the number of bytes sent
 				&m_osRead);
 		}
 		else
 		{
 			if(serinumber_in_dll[0]==0 && serinumber_in_dll[1]==0 && serinumber_in_dll[2]==0 && serinumber_in_dll[3]==0)
 			{//old protocal
-				fState=ReadFile(m_hSerial,// 句柄
-					gval,// 数据缓冲区地址
-					8,// 数据大小
-					&m_had_send_data_number,// 返回发送出去的字节数
+				fState=ReadFile(m_hSerial,// 句柄, Handle
+					gval,//address of buffer
+					8,//len
+					&m_had_send_data_number,//return # of bytes sent
 					&m_osRead);
 			}
 			else
-			{//new protocal
-				fState=ReadFile(m_hSerial,// 句柄
-					gval,// 数据缓冲区地址
-					12,// 数据大小
-					&m_had_send_data_number,// 返回发送出去的字节数
+			{//new protocol
+				fState=ReadFile(m_hSerial,// 句柄 , handle
+					gval,//address of buffer
+					12,//len
+					&m_had_send_data_number,//returns # bytes sent
 					&m_osRead);
 			}
 		}
-		if(!fState)// 不支持重叠	
+		if(!fState)//Overflow not supported
 		{
 			if(GetLastError()==ERROR_IO_PENDING)
 			{
@@ -2808,7 +2820,7 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 	{
 		//address        the register
 		//val         the value that you want to write to the register
-		//the return value == -1 ,no connecting
+		//the return value == -1 ,no connection
 		//the return value == -3 , no response
 		//清空串口缓冲区
 		
@@ -2834,13 +2846,13 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		data[3]=4;
 		data[4]=5;
 		data[5]=6;
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//已经发送的数据的字节数, # of bytes sent
 		data[6] = device_var;
 		data[7] = 6;
 		data[8] = address>>8 & 0xFF ;
 		data[9] = address & 0xFF;
 		if(address==10 && (serinumber_in_dll[0]!=0 || serinumber_in_dll[1]!=0 || serinumber_in_dll[2]!=0 || serinumber_in_dll[3]!=0))
-			data[10]=0x55;/////////////////////////////new protocal or write_one 10
+			data[10]=0x55;/////////////////////////////new protocol or write_one 10
 		else
 			data[10] = (val>>8) & 0xff;//number hi
 		data[11] = val & 0xff;//number lo
@@ -2853,7 +2865,7 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 			}
 			else
 			{
-				//* uncommend by zgq; we use net work scan tstat through NC
+				//* uncommented by zgq; we use net work scan devices through gateway
 				data[12]=serinumber_in_dll[0];
 				data[13]=serinumber_in_dll[1];
 				data[14]=serinumber_in_dll[2];
@@ -2866,7 +2878,7 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		for(int i=0;i<=11;i++)
 			gval[i]=0;/////////////////////////////////////////clear buffer
 //		TS_US crc;		
-	//	DWORD m_had_send_data_number;//已经发送的数据的字节数
+	//	DWORD m_had_send_data_number;//已经发送的数据的字节数, Num of bytes sent
 		pval[0] = device_var;
 		pval[1] = 6;
 		pval[2] = address>>8 & 0xFF ;
@@ -2881,13 +2893,13 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		for(int i=0;i<=11;i++)
 			gval[i]=0;/////////////////////////////////////////clear buffer
 		TS_US crc;		
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		DWORD m_had_send_data_number;//已经发送的数据的字节数, Num of bytes sent
 		pval[0] = device_var;
 		pval[1] = 6;
 		pval[2] = address>>8 & 0xFF ;
 		pval[3] = address & 0xFF;
 		if(address==10 && (serinumber_in_dll[0]!=0 || serinumber_in_dll[1]!=0 || serinumber_in_dll[2]!=0 || serinumber_in_dll[3]!=0))
-			pval[4]=0x55;/////////////////////////////new protocal or write_one 10
+			pval[4]=0x55;/////////////////////////////new protocol or write_one 10
 		else
 			pval[4] = (val>>8) & 0xff;//number hi
 		pval[5] = val & 0xff;//number lo
@@ -2983,16 +2995,16 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 	if(bComm_Type==0)
 	{
 		//val         the value that you want to write to the register
-		//the return value == -1 ,no connecting
-		//the return value == -2 ,try it again
-		//the return value == -3,Maybe that have more than 2 Tstat is connecting
-		//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
-		//the return value == -5 ,the input have some trouble
-		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-		//清空串口缓冲区
+		//the return value == -1 ,no connection
+		//the return value == -2 ,try again
+		//the return value == -3, may have more than 2 devices connecting
+		//the return value == -4 ,between devLo and devHi,no device is detected
+		//the return value == -5 ,the input buffer has some trouble
+		//the return value >=1 ,the devLo!=devHi, maybe have 2 devices connecting
+		//Empty the serial port buffer
 		//the return value is the register address
 
-		//Sleep(150);       //must use this function to slow computer
+		//Sleep(150);       //Delay, allow time for device to switch to reply mode
 		if(devLo<1 || devHi>254)
 			return -5;
 		if(m_hSerial==NULL)
@@ -3019,7 +3031,7 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 			return the_return_value;
 		}
 		else if(old_or_new_scan_protocal_in_dll==2)
-		{//old protocal
+		{//old protocol
 			if(the_return_value==-2 || the_return_value==-3 || the_return_value==-4)
 				return the_return_value;
 			int i=0;
@@ -3040,13 +3052,13 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 	if(bComm_Type==1)//tcp
 	{
 		//val         the value that you want to write to the register
-		//the return value == -1 ,no connecting
+		//the return value == -1 ,no connection
 		//the return value == -2 ,try it again
-		//the return value == -3,Maybe that have more than 2 Tstat is connecting
-		//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
+		//the return value == -3,May have more than 2 devices connecting
+		//the return value == -4 ,between devLo and devHi,no device is detected ,
 		//the return value == -5 ,the input have some trouble
-		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-		//清空串口缓冲区
+		//the return value >=1 ,the devLo!=devHi, may have 2 devices connecting
+		//Empty the serial port buffer
 		//the return value is the register address
 		//Sleep(50);       //must use this function to slow computer
 		if(devLo<1 || devHi>254)
@@ -3105,13 +3117,13 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 	{
 		//the second time
 		//val         the value that you want to write to the register
-		//the return value == -1 ,no connecting
+		//the return value == -1 ,no connection
 		//the return value == -2 ,try it again
-		//the return value == -3,Maybe that have more than 2 Tstat is connecting
-		//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
-		//the return value == -5 ,the input have some trouble
-		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-		//清空串口缓冲区
+		//the return value == -3, maybe have more than 2 devices connecting
+		//the return value == -4 ,between devLo and devHi,no device is detected ,
+		//the return value == -5 ,the buffer has some trouble
+		//the return value >=1 ,the devLo!=devHi, may have 2 devices connecting
+		//Empty the serial port buffer
 		//the return value is the register address
 
 		if(devLo<1 || devHi>254)
@@ -3121,7 +3133,7 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 			gval[i]=0;/////////////////////////////////////////clear buffer
 		TS_UC  pval[6];
 		TS_US crc;
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		DWORD m_had_send_data_number;//已经发送的数据的字节数, Number of bytes sent
 		pval[0] = 255;											
 		pval[1] = 26;  //put comments here,
 		pval[2] = devHi;
@@ -3147,12 +3159,12 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 
 		ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
 		PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear buffer
-		int fState=WriteFile(m_hSerial,// 句柄
-			pval,// 数据缓冲区地址
-			6,// 数据大小
-			&m_had_send_data_number,// 返回发送出去的字节数
+		int fState=WriteFile(m_hSerial,// 句柄 , Handle
+			pval,//Buffer Address
+			6,//len
+			&m_had_send_data_number,//Return the number of bytes
 			&m_osWrite);
-		if(!fState)//不支持重叠
+		if(!fState)//不支持重叠 , Overflow not supported. 
 		{
 			if(GetLastError()==ERROR_IO_PENDING)
 			{
@@ -3167,7 +3179,7 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		//	TRACE("%d T:%x %x %x %x %x %x\n",ddd,pval[0],pval[1],pval[2],pval[3],pval[4],pval[5]);
 		//CloseHandle(m_osWrite.hEvent);
 		///////////////////////////up is write
-		Sleep(LATENCY_TIME_COM);//SLEEP_TIME);//because that scan have a delay lower 75ms
+		Sleep(LATENCY_TIME_COM);//SLEEP_TIME);//Scan has a delay less than 75ms
 	//	Sleep(300);
 		/////////////**************down is read
 		ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
@@ -3177,17 +3189,17 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		m_osRead.Offset = 0;
 		m_osRead.OffsetHigh = 0;
 		////////////////////////////////////////////////clear com error
-		fState=ReadFile(m_hSerial,// 句柄
-			gval,// 数据缓冲区地址
-			13,// 数据大小
-			&m_had_send_data_number,// 返回发送出去的字节数
+		fState=ReadFile(m_hSerial,// 句柄, Handle
+			gval,//Buffer address
+			13,//len
+			&m_had_send_data_number,//returns the num of bytes sent
 			&m_osRead);
-		if(!fState)// 不支持重叠	
+		if(!fState)//Overflow not supported
 		{
 			if(GetLastError()==ERROR_IO_PENDING)
 			{
 				//WaitForSingleObject(m_osRead.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+				GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待, Wait
 			}
 			else
 				m_had_send_data_number=0;
@@ -3224,20 +3236,20 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 			}
 			if((gval[0]!=pval[0]) || (gval[1]!=26))
 			{
-				Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+				Sleep(SLEEP_TIME);//Delay required here
 				return -2;
 			}
 			crc=CRC16(gval,3);
 			if( (gval[3]!=((crc>>8) & 0xff)) || (gval[4]!=(crc & 0xff)))
 			{
-				Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+				Sleep(SLEEP_TIME);//Delay required here
 				return -2;
 			}
 		}
 		else
-		{// new scan protocal,if many old tstat ,get into here ,scan result is oK too.
+		{// new scan protocol,if many old devices, scan result is OK too.
 			old_or_new_scan_protocal_in_dll=1;
-			Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+			Sleep(SLEEP_TIME);//Delay required here
 			if(gval[9]!=0 || gval[10]!=0 || gval[11]!=0 || gval[12]!=0)//to inspect
 				return -3;
 			if((gval[0]!=pval[0]) || (gval[1]!=25))
@@ -3267,13 +3279,13 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 	{
 		//the second time
 		//val         the value that you want to write to the register
-		//the return value == -1 ,no connecting
-		//the return value == -2 ,try it again
-		//the return value == -3,Maybe that have more than 2 Tstat is connecting
-		//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
-		//the return value == -5 ,the input have some trouble
-		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-		//清空串口缓冲区
+		//the return value == -1 ,no connection
+		//the return value == -2 , Retry
+		//the return value == -3, May have more than 2 devices connecting
+		//the return value == -4 ,between devLo and devHi,no device detected
+		//the return value == -5 ,the input buffer had trouble
+		//the return value >=1 ,the devLo!=devHi, may have 2 devices connecting
+		//Empty the buffer
 		//the return value is the register address
 		if(devLo<1 || devHi>254)
 			return -5;
@@ -3283,7 +3295,7 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 			gval[i]=0;/////////////////////////////////////////clear buffer
 		TS_UC  pval[10];
 //		TS_US crc;
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//已经发送的数据的字节数, Num of bytes sent
 
 		
 		pval[0]=1;
@@ -3318,7 +3330,7 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 			memcpy(gval,(void*)&rvdata[6],sizeof(rvdata)-6);
 		}
 		if(gval[8]==0 && gval[9]==0 && gval[10]==0 && gval[11]==0 && gval[12]==0)
-		{//old scan protocal
+		{//old scan protocol
 			old_or_new_scan_protocal_in_dll=2;
 			if(gval[0]==0 && gval[1]==0 && gval[2]==0 && gval[3]==0 && gval[4]==0)
 			{
@@ -3337,7 +3349,7 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 			}
 		}
 		else
-		{// new scan protocal,if many old tstat ,get into here ,scan result is oK too.
+		{// new scan protocol,if many old devices scan result is oK too.
 			old_or_new_scan_protocal_in_dll=1;
 			//	Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
 			if(gval[9]!=0 || gval[10]!=0 || gval[11]!=0 || gval[12]!=0)//to inspect
@@ -3374,8 +3386,8 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		HCURSOR hc;//load mouse cursor
 		hc = LoadCursor(NULL,IDC_WAIT);
 		hc = SetCursor(hc);
-		//to_send_data is the array that you want to put data into
-		//length is the number of register,that you want to read
+		//to_send_data is the array where the data to be sent is buffered
+		//length is the number of register that you will read
 		//start_address is the start register
 		TS_UC data_to_send[8]={'\0'};//the array to used in writefile()
 		data_to_send[0]=device_var;//slave address
@@ -3388,7 +3400,7 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		data_to_send[6]=(crc>>8) & 0xff;
 		data_to_send[7]=crc & 0xff;
 
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		DWORD m_had_send_data_number;//已经发送的数据的字节数, Num of bytes sent
 		if(m_hSerial==NULL)
 		{		
 			return -1;
@@ -3406,17 +3418,17 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		m_osMulWrite.Offset = 0;
 		m_osMulWrite.OffsetHigh = 0 ;
 		///////////////////////////////////////////////////////send the to read message
-		int fState=WriteFile(m_hSerial,// 句柄
-			data_to_send,// 数据缓冲区地址
-			8,// 数据大小
-			&m_had_send_data_number,// 返回发送出去的字节数
+		int fState=WriteFile(m_hSerial,// 句柄, Handle
+			data_to_send,//Address of buffer
+			8,//len
+			&m_had_send_data_number,//Returns num of bytes sent. 
 			&m_osMulWrite);
-		if(!fState)// 不支持重叠	
+		if(!fState)//Overflow not supported
 		{
 			if(GetLastError()==ERROR_IO_PENDING)
 			{
 				//WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+				GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待, wait
 			}
 			else
 				m_had_send_data_number=0;
@@ -3432,17 +3444,17 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		m_osRead.Offset = 0;
 		m_osRead.OffsetHigh = 0 ;
 		////////////////////////////////////////////////clear com error
-		fState=ReadFile(m_hSerial,// 句柄
-			to_send_data,// 数据缓冲区地址
-			length*2+5,// 数据大小
-			&m_had_send_data_number,// 返回发送出去的字节数
+		fState=ReadFile(m_hSerial,// 句柄, handle
+			to_send_data,//buffer address
+			length*2+5,//len
+			&m_had_send_data_number,//Number of bytes sent
 			&m_osRead);
-		if(!fState)// 不支持重叠	
+		if(!fState)//overflow not supported
 		{
 			if(GetLastError()==ERROR_IO_PENDING)
 			{
 				//WaitForSingleObject(m_osRead.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+				GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待, wait
 			}
 			else
 				m_had_send_data_number=0;
@@ -3463,13 +3475,13 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 	{
 		/*
 		//device_var is the Tstat ID
-		//the return value == -1 ,no connecting
+		//the return value == -1 ,no connection
 		TS_UC to_send_data[700]={'\0'};
 		HCURSOR hc;//load mouse cursor
 		hc = LoadCursor(NULL,IDC_WAIT);
 		hc = SetCursor(hc);
-		//to_send_data is the array that you want to put data into
-		//length is the number of register,that you want to read
+		//to_send_data is the array where the send data is buffered. 
+		//length is the number of registers that will be read 
 		//start_address is the start register
 		TS_UC data_to_send[8]={'\0'};//the array to used in writefile()
 		data_to_send[0]=device_var;//slave address
@@ -3482,7 +3494,7 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		data_to_send[6]=(crc>>8) & 0xff;
 		data_to_send[7]=crc & 0xff;
 
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		DWORD m_had_send_data_number;//已经发送的数据的字节数, Num of bytes sent
 		if(m_hSocket==INVALID_SOCKET)
 		{		
 			return -1;
@@ -3513,7 +3525,7 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		hc = LoadCursor(NULL,IDC_WAIT);
 		hc = SetCursor(hc);
 		//to_send_data is the array that you want to put data into
-		//length is the number of register,that you want to read
+		//length is the number of registers that will be read
 		//start_address is the start register
 		TS_UC data_to_send[12]={'\0'};//the array to used in writefile()
 		data_to_send[0]=1;
@@ -3536,7 +3548,7 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		//data_to_send[6]=(crc>>8) & 0xff;
 		//data_to_send[7]=crc & 0xff;/
 
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//已经发送的数据的字节数, # of bytes sent
 		if(m_hSocket==INVALID_SOCKET)
 		{
 			return -1;
@@ -3575,13 +3587,13 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 	{
 		//the second time
 		//val         the value that you want to write to the register
-		//the return value == -1 ,no connecting
-		//the return value == -2 ,try it again
-		//the return value == -3,Maybe that have more than 2 Tstat is connecting
-		//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
-		//the return value == -5 ,the input have some trouble
-		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-		//清空串口缓冲区
+		//the return value == -1 ,no connection
+		//the return value == -2 , retry
+		//the return value == -3, May have more than 2 devices connecting
+		//the return value == -4 ,between devLo and devHi,no device is detected,
+		//the return value == -5 ,the input buffer has some sort of trouble
+		//the return value >=1 ,the devLo!=devHi,Maybe have 2 devices connecting
+		// Empty the serial port
 		//the return value is the register address
 		if(devLo<1 || devHi>254)
 			return -5;
@@ -3590,7 +3602,7 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 			gval[i]=0;/////////////////////////////////////////clear buffer
 		TS_UC  pval[6];
 		TS_US crc;
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		DWORD m_had_send_data_number;// Number of bytes sent
 		pval[0] = 255;											
 		pval[1] = 25;  //put comments here,
 		pval[2] = devHi;
@@ -3614,17 +3626,17 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 
 		ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
 		PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear buffer
-		int fState=WriteFile(m_hSerial,// 句柄
-			pval,// 数据缓冲区地址
-			6,// 数据大小
-			&m_had_send_data_number,// 返回发送出去的字节数
+		int fState=WriteFile(m_hSerial,// Handle
+			pval,// Data Buffer Address
+			6,// Data size
+			&m_had_send_data_number,// Returns the number of bytes sent
 			&m_osWrite);
-		if(!fState)// 不支持重叠	
+		if(!fState)// Overlflow Not Supported	
 		{
 			if(GetLastError()==ERROR_IO_PENDING)
 			{
 				//WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+				GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// Wait
 				//			if(GetLastError()==ERROR_IO_INCOMPLETE)
 				//				AfxMessageBox("wrong1");
 			}
@@ -3644,12 +3656,12 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 		m_osRead.Offset = 0;
 		m_osRead.OffsetHigh = 0;
 		////////////////////////////////////////////////clear com error
-		fState=ReadFile(m_hSerial,// 句柄
-			gval,// 数据缓冲区地址
-			13,// 数据大小
-			&m_had_send_data_number,// 返回发送出去的字节数
+		fState=ReadFile(m_hSerial,// Handle
+			gval,// Data buffer Address
+			13,// Data size
+			&m_had_send_data_number,// Returns the number of bytes sent
 			&m_osRead);
-		if(!fState)// 不支持重叠	
+		if(!fState)// Overlflow Not Supported	
 		{
 			if(GetLastError()==ERROR_IO_PENDING)
 			{
@@ -3710,12 +3722,14 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 			old_or_new_scan_protocal_in_dll=2;
 			if(gval[0]==0 && gval[1]==0 && gval[2]==0 && gval[3]==0 && gval[4]==0)
 			{
-				Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+				Sleep(SLEEP_TIME);//Delay required here
 				return -4;              //no response ,no connection
 			}
-			// added by zgq; find this situation: t3000 can find a comport, 
-			//which don't connect a tstat, but write file to the com, will receive the same data with send, 
-			// infact the com port don't work fine. But it never give you a wrong data.
+			// TBD: Clarify this comment. 
+                 //T3000 finds a com port 
+			//which doesnt connect to a devicew, but write file to the com, will receive the same data with send, 
+			// infact the com port is bad. But it never give you a wrong data.
+                    
 			if(gval[0]==pval[0] && gval[1]==pval[1] && gval[2]==pval[2] && gval[3]==pval[3] && gval[4]==pval[4] && gval[5]==pval[5])
 			{
 				Sleep(SLEEP_TIME);
@@ -3725,23 +3739,23 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 			//////////////////////////////////////////////////////////////////////////
 			if(gval[5]!=0 || gval[6]!=0)//to inspect
 			{
-				Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+				Sleep(SLEEP_TIME);//Need a delay here
 				return -3;
 			}
 			if((gval[0]!=pval[0]) || (gval[1]!=25))
 			{
-				Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+				Sleep(SLEEP_TIME);//Need a delay here
 				return -2;
 			}
 			crc=CRC16(gval,3);
 			if( (gval[3]!=((crc>>8) & 0xff)) || (gval[4]!=(crc & 0xff)))
 			{
-				Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+				Sleep(SLEEP_TIME);//Need a delay here
 				return -2;
 			}
 		}
 		else
-		{// new scan protocal,if many old tstat ,get into here ,scan result is oK too.
+		{// new scan protocol,if many old devices ,get into here and scan result is OK too.
 			old_or_new_scan_protocal_in_dll=1;
 			Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
 			if(gval[9]!=0 || gval[10]!=0 || gval[11]!=0 || gval[12]!=0)//to inspect
@@ -3773,13 +3787,13 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 	{
 		//the second time
 		//val         the value that you want to write to the register
-		//the return value == -1 ,no connecting
-		//the return value == -2 ,try it again
-		//the return value == -3,Maybe that have more than 2 Tstat is connecting
-		//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
-		//the return value == -5 ,the input have some trouble
+		//the return value == -1 ,no connection
+		//the return value == -2 ,retry
+		//the return value == -3, may have more than 2 devices is connecting
+		//the return value == -4 , between devLo and devHi, no device is detected
+		//the return value == -5 ,the input buffer has trouble. 
 		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-		//清空串口缓冲区
+		//Empty the serial port buffer
 		//the return value is the register address
 
 		if(devLo<1 || devHi>254)
@@ -3790,7 +3804,7 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 
 		TS_UC  pval[10];
 //		TS_US crc;
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//Number of bytes of data sent
 		pval[0]=1;
 		pval[1]=2;
 		pval[2]=3;
@@ -3831,33 +3845,33 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
  			old_or_new_scan_protocal_in_dll=2;
 			if(gval[0]==0 && gval[1]==0 && gval[2]==0 && gval[3]==0 && gval[4]==0)
 			{
-				Sleep(SLEEP_TIME+8);//be must ,if not use this ,will found some trouble
+				Sleep(SLEEP_TIME+8);//Need a delay here
 				return -4;              //no response ,no connection
 			}
 			if(gval[5]!=0 || gval[6]!=0)//to inspect
 			{
-				Sleep(SLEEP_TIME+8);//be must ,if not use this ,will found some trouble
+				Sleep(SLEEP_TIME+8);// Need a delay here
 				return -3;
 			}
 			if((gval[0]!=255) || (gval[1]!=25))
 			{
-				//		Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+				//		Sleep(SLEEP_TIME);// Need a delay here
 				return -2;
 			} 
 			/*
 			crc=CRC16(gval,3);
 			if( (gval[3]!=((crc>>8) & 0xff)) || (gval[4]!=(crc & 0xff)))
 			{
-				//		Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+				//		Sleep(SLEEP_TIME);// Need a delay here 
 				return -2;
 			}
 			*/
 
 		}
 		else
-		{// new scan protocal,if many old tstat ,get into here ,scan result is oK too.
+		{// new scan protocol,if many old devices then scan result is OK too.
 			old_or_new_scan_protocal_in_dll=1;
-			Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+			Sleep(SLEEP_TIME);// Need a delay here 
 
 				
 			//if(gval[7]!=0 || gval[8]!=0 || gval[9]!=0 || gval[10]!=0)//to inspect
@@ -3897,15 +3911,15 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 	if(bComm_Type==0)
 	{
 		//val         the value that you want to write to the register
-		//the return value == -1 ,no connecting
-		//the return value == -2 ,try it again
-		//the return value == -3,Maybe that have more than 2 Tstat is connecting
-		//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
+		//the return value == -1 ,no connection
+		//the return value == -2 ,retry
+		//the return value == -3, may have more than 2 devices is connecting
+		//the return value == -4 ,between devLo and devHi,no devices detected
 		//the return value == -5 ,the input have some trouble
-		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-		//清空串口缓冲区
+		//the return value >=1 ,the devLo!=devHi,May have 2 devices connecting
+		//Empty the serial port buffer
 		//the return value is the register address
-		//Sleep(50);       //must use this function to slow computer
+		//Sleep(50);       // Need a delay here 
 		if(devLo<1 || devHi>254)
 			return -5;
 		if(m_hSerial==NULL)
@@ -3953,15 +3967,15 @@ int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 	if(bComm_Type==1)//
 	{
 		//val         the value that you want to write to the register
-		//the return value == -1 ,no connecting
-		//the return value == -2 ,try it again
-		//the return value == -3,Maybe that have more than 2 Tstat is connecting
-		//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
-		//the return value == -5 ,the input have some trouble
-		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-		//清空串口缓冲区
+		//the return value == -1 ,no connection
+		//the return value == -2 ,retry
+		//the return value == -3, Maybe have more than 2 devices connecting
+		//the return value == -4 , between devLo and devHi,no device is detected
+		//the return value == -5 ,the input buffer has some problem
+		//the return value >=1 ,the devLo!=devHi, may have 2 devices connecting
+		//Empty the serial port buffer
 		//the return value is the register address
-		//Sleep(50);       //must use this function to slow computer
+		//Sleep(50);       //Need a delay here (before anyway)
 		if(devLo<1 || devHi>254)
 			return -5;
 		if (m_hSocket==INVALID_SOCKET)
