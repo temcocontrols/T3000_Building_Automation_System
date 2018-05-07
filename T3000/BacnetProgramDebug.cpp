@@ -360,7 +360,6 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 				m_program_debug_list.SetItemText(0,OUTPUT_HIGH_VOLTAGE,high_voltage);	
 
 
-				//这样加实在是情非得已，老毛非得加一堆条件，还要smart;
 				if((bacnet_device_type == BIG_MINIPANEL || bacnet_device_type == MINIPANELARM || bacnet_device_type == MINIPANELARM_TB || bacnet_device_type == MINIPANELARM_LB || bacnet_device_type == MINIPANELARM_LB || bacnet_device_type == MINIPANELARM_TB) || ((bacnet_device_type == SMALL_MINIPANEL)) || (bacnet_device_type == TINY_MINIPANEL) || (bacnet_device_type == TINY_EX_MINIPANEL))
 				{
 					if (bacnet_device_type == BIG_MINIPANEL || bacnet_device_type == MINIPANELARM)

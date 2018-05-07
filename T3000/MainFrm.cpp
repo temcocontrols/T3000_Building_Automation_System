@@ -32,7 +32,7 @@ CMyStatusbarCtrl * statusbar = NULL;
 
 #include "hangeIDDlg.h"
 #include "LightingController/LightingController.h"//Lightingcontroller
-#include "NewHumChamberView.h"
+
 #include "CO2_View.h"
 //#include "MbpGlobals.h"
 #include "Dialog_Progess.h"
@@ -589,7 +589,7 @@ void CMainFrame::InitViews()
     //m_pViews[DLG_DIALOGMINIPANEL_VIEW]=(CView*) new CDialgMiniPanel();//Mini Panel
     m_pViews[DLG_AIRQUALITY_VIEW]=(CView*) new CAirQuality;//AirQuality
     m_pViews[DLG_LIGHTINGCONTROLLER_VIEW]=(CView*) new CLightingController;//Lightingcontroller
-    m_pViews[DLG_HUMCHAMBER]=(CView*) new CNewHumChamberView;
+ //   m_pViews[DLG_HUMCHAMBER]=(CView*) new CNewHumChamberView;
     m_pViews[DLG_CO2_VIEW]=(CView*) new CCO2_View;
     m_pViews[DLG_CO2_NET_VIEW]=(CView*)new CCO2NetView;
     m_pViews[DLG_BACNET_VIEW]=(CView*) new CDialogCM5_BacNet; //CM5
@@ -621,7 +621,7 @@ void CMainFrame::InitViews()
 
     for (int nView =1; nView < NUMVIEWS; nView++)
     {
-        if(nView == DLG_DIALOGCM5_VIEW||nView == DLG_DIALOGMINIPANEL_VIEW)
+        if(nView == DLG_DIALOGCM5_VIEW||nView == DLG_DIALOGMINIPANEL_VIEW || nView == DLG_HUMCHAMBER)
             continue;
         m_pViews[nView]->Create(NULL, NULL,
                                 (AFX_WS_DEFAULT_VIEW & ~WS_VISIBLE),
@@ -1577,7 +1577,7 @@ void CMainFrame::LoadProductFromDB()
 	{
 
 
-		cs_temp_baudrate=q.getValuebyName(L"Baudrate");//
+		cs_temp_baudrate=q.getValuebyName(L"Braudrate");//
 
 		if(!cs_temp_baudrate.IsEmpty())
 		{
@@ -1586,7 +1586,7 @@ void CMainFrame::LoadProductFromDB()
 		else
 		{
 			cs_temp_protocol=_T("19200");
-			strSql.Format(_T("update Building set Baudrate='19200' where Main_BuildingName ='%s'"), m_strCurMainBuildingName);
+			strSql.Format(_T("update Building set Braudrate='19200' where Main_BuildingName ='%s'"), m_strCurMainBuildingName);
 			SqliteDBT3000.execDML((UTF8MBSTR)strSql);
 		}
 
@@ -1668,7 +1668,7 @@ void CMainFrame::LoadProductFromDB()
 
 
 
-		temBuildingInfo.strBaudRate=q.getValuebyName(L"Baudrate");
+		temBuildingInfo.strBaudRate=q.getValuebyName(L"Braudrate");
 
 
 
@@ -1714,8 +1714,8 @@ void CMainFrame::LoadProductFromDB()
 
 
 	HTREEITEM hlocalnetwork=NULL;
-	//老毛个神经病 ，改来改去 ，出尔反尔. 要求选择远程连接的时候 不显示 本地的设备.
-	//潜在问题是客户一不小心选中remote 后 ，这样改会出现 扫描不到的情况.即使扫描到了 ，老毛要求不显示本地的设备，客户会抱怨 扫不到.
+	//要求选择远程连接的时候 不显示 本地的设备.
+	//潜在问题是客户一不小心选中remote 后 ，这样改会出现 扫描不到的情况.即使扫描到了 ，要求不显示本地的设备，客户会抱怨 扫不到.
 	if(b_remote_connection == false)
 	{
 		if((current_building_protocol == P_MODBUS_TCP) || (current_building_protocol == P_AUTO))
@@ -2609,7 +2609,7 @@ void CMainFrame::ScanTstatInDB(void)
             SqliteDB.execDML((UTF8MBSTR)strSql);
         }
 		current_building_protocol = P_AUTO;
-		//简直是脑残，老毛.要求这样瞎几把改. //不管客户选什么鸡吧协议 ， 都要能扫到所有设备.那不就是TMD只有Auto 了吗？还选个P啊;
+		
 
         CString StrComport;
         CString StrBaudrate;
@@ -2618,11 +2618,11 @@ void CMainFrame::ScanTstatInDB(void)
         CString StrIp;
         if((current_building_protocol == P_MODBUS_485) || (current_building_protocol == P_BACNET_MSTP))
         {
-			cs_temp_baudrate = table.getValuebyName("Baudrate");
+			cs_temp_baudrate = table.getValuebyName("Braudrate");
             if(cs_temp_baudrate.IsEmpty())
             {
                 cs_temp_protocol=_T("19200");
-                strSql.Format(_T("update Building set Baudrate='19200' where Main_BuildingName ='%s'"), m_strCurMainBuildingName);
+                strSql.Format(_T("update Building set Braudrate='19200' where Main_BuildingName ='%s'"), m_strCurMainBuildingName);
                 SqliteDB.execDML((UTF8MBSTR)strSql);
             }
 
@@ -2663,7 +2663,7 @@ void CMainFrame::ScanTstatInDB(void)
             temBuildingInfo.strIpPort = q.getValuebyName(L"Ip_Port");
             temBuildingInfo.hCommunication=NULL;
 			temBuildingInfo.strMainBuildingname = q.getValuebyName(L"Main_BuildingName");
-            temBuildingInfo.strBaudRate = q.getValuebyName(L"Baudrate"); 
+            temBuildingInfo.strBaudRate = q.getValuebyName(L"Braudrate"); 
 
             CString Building_DBpath;
             nDefault=q.getIntField("Default_SubBuilding");
@@ -3916,7 +3916,7 @@ here:
     case DLG_HUMCHAMBER:
     {
         m_nCurView=DLG_HUMCHAMBER;
-        ((CNewHumChamberView*)m_pViews[m_nCurView])->Fresh();
+    //    ((CNewHumChamberView*)m_pViews[m_nCurView])->Fresh();
     }
     break;
     case  DLG_CO2_VIEW:
@@ -8858,10 +8858,9 @@ UINT _FreshTreeView(LPVOID pParam )
 
 
 		    m_refresh_net_device_data.clear();
-        //if((current_building_protocol == P_AUTO) || (current_building_protocol == P_MODBUS_TCP) || (current_building_protocol == P_BACNET_IP))
-        //{//简直是脑残，老毛.要求这样瞎几把改. //不管客户选什么鸡吧协议 ， 都要能扫到所有设备.那不就是TMD只有Auto 了吗？还选个P啊;
+
             RefreshNetWorkDeviceListByUDPFunc();
-        //}
+
 
         if(!pMain->CheckDeviceStatus(int_refresh_com))
         {
@@ -11324,7 +11323,7 @@ void CMainFrame::OnUpdateStatusBar(CCmdUI *pCmdUI)
     pCmdUI->Enable(TRUE);
 
 }
-#include "MailFeedbackDlg.h"
+
 void CMainFrame::OnHelpFeedbacktotemco()
 {
     m_product_isp_auto_flash.baudrate = m_product.at(selected_product_index).baudrate;

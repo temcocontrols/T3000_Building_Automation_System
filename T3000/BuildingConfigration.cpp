@@ -590,7 +590,7 @@ void CBuildingConfigration::Update_Building()
     try
     {
         CString strSql;
-        strSql.Format(_T("update Building set Protocal='%s',Ip_Address='%s',Ip_Port='%s',Com_Port='%s',Baudrate='%s' where Building_Path='%s'  "),
+        strSql.Format(_T("update Building set Protocal='%s',Ip_Address='%s',Ip_Port='%s',Com_Port='%s',Braudrate='%s' where Building_Path='%s'  "),
                       BuildingTemp.Protocol,BuildingTemp.IPAddress_Domain,BuildingTemp.IP_Port,BuildingTemp.Comport,BuildingTemp.BaudRate,BuildingTemp.BuildingPath);
         SqliteDBT3000.execDML((UTF8MBSTR)strSql);
 
@@ -1004,7 +1004,7 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
                         sql.Format(_T("Insert into Building_ALL(Building_Name,Default_Build) values('%s','%d')"),BCTemp.MainBuildingName.GetBuffer(),0);
                         SqliteDBT3000.execDML((UTF8MBSTR)sql);
 
-                        sql.Format(_T("Insert into Building(Main_BuildingName,Building_Name,Protocal,Default_SubBuilding,Building_Path,Com_Port,Ip_Address,IP_Port,Baudrate) values('%s','%s','%s','%d','%s' ,'%s','%s','%s','%s')"),
+                        sql.Format(_T("Insert into Building(Main_BuildingName,Building_Name,Protocal,Default_SubBuilding,Building_Path,Com_Port,Ip_Address,IP_Port,Braudrate) values('%s','%s','%s','%d','%s' ,'%s','%s','%s','%s')"),
                                    BCTemp.MainBuildingName.GetBuffer(),BCTemp.MainBuildingName.GetBuffer(),BCTemp.Protocol.GetBuffer(),0,BCTemp.BuildingPath.GetBuffer(),
                                    BCTemp.Comport,
                                    BCTemp.IPAddress_Domain,
@@ -1363,7 +1363,7 @@ void CBuildingConfigration::LoadBuildingConfigDB()
         temp_building.Comport=m_q.getValuebyName(L"Com_Port");//
          
 
-        temp_building.BaudRate=m_q.getValuebyName(L"Baudrate");//
+        temp_building.BaudRate=m_q.getValuebyName(L"Braudrate");//
         
         //Building_Path
         temp_building.BuildingPath=m_q.getValuebyName(L"Building_Path");//
@@ -1568,7 +1568,7 @@ void CBuildingConfigration::OnBnClickedBuildingButtonAdd()
     try
     {
         BOOL bDefault =FALSE;
-        strSql.Format(_T("insert into Building (Main_BuildingName,Building_Name,Protocal,Com_Port,Ip_Address,Ip_Port,Baudrate) values('"+strMainBuildName+"','"+strSubBuildingName+"','"+strProtocol+"','"+strCOMPort+"','"+strIP+"','"+strIpPort+"','"+strCOMPortBaud+"')"));
+        strSql.Format(_T("insert into Building (Main_BuildingName,Building_Name,Protocal,Com_Port,Ip_Address,Ip_Port,Braudrate) values('"+strMainBuildName+"','"+strSubBuildingName+"','"+strProtocol+"','"+strCOMPort+"','"+strIP+"','"+strIpPort+"','"+strCOMPortBraud+"')"));
         m_SqliteDBT3000.execDML((UTF8MBSTR)strSql);
     }
     catch(_com_error *e)

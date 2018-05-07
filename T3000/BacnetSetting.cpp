@@ -201,16 +201,6 @@ void CBacnetSetting::Get_Time_Edit_By_Control()
         CTime temp_start(start_year, start_month, start_day, start_hour, start_minute, start_sec);
        
         Device_time.new_time.n_time = temp_time_long;
-        //Device_time.new_time.time_zone = n_tempBias;
-        //if (DaylightBias != 0)
-        //{
-        //    Device_time.new_time.time_zone_summer_daytime = 1;
-        //}
-        //else
-        //{
-        //    Device_time.new_time.time_zone_summer_daytime = 0;
-        //    //Device_time.new_time.n_time = temp_time_long;
-        //}
         memset(Device_time.new_time.reserved, 0, 3);
     }
 

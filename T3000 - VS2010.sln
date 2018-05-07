@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "T3000", "T3000\T3000.vcxproj", "{F7226464-C41C-4909-BF74-97328B72FFC8}"
 	ProjectSection(ProjectDependencies) = postProject
 		{ECE89A1C-344C-4B1C-B6A7-6266F9BB607A} = {ECE89A1C-344C-4B1C-B6A7-6266F9BB607A}
@@ -225,8 +227,8 @@ Global
 		{76CA38FC-61AC-4D71-B926-8F55406C9542}.Unicode Release|Win32.Build.0 = Release|Win32
 		{76CA38FC-61AC-4D71-B926-8F55406C9542}.Unicode Release|x64.ActiveCfg = Release|Win32
 		{D78A3406-8DF2-45A9-9390-7D05E8E66AC6}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{D78A3406-8DF2-45A9-9390-7D05E8E66AC6}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
-		{D78A3406-8DF2-45A9-9390-7D05E8E66AC6}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{D78A3406-8DF2-45A9-9390-7D05E8E66AC6}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{D78A3406-8DF2-45A9-9390-7D05E8E66AC6}.Debug|Mixed Platforms.Build.0 = Debug|Win32
 		{D78A3406-8DF2-45A9-9390-7D05E8E66AC6}.Debug|Win32.ActiveCfg = Debug|Win32
 		{D78A3406-8DF2-45A9-9390-7D05E8E66AC6}.Debug|Win32.Build.0 = Debug|Win32
 		{D78A3406-8DF2-45A9-9390-7D05E8E66AC6}.Debug|x64.ActiveCfg = Debug|x64
