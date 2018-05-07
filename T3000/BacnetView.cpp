@@ -107,7 +107,6 @@
 4. PID 增加时间 积分参数.
 
 2017 - 01 - 7 Update by Fance
-1. 艹，新的一年，新的吐槽，周六还要上班。靠。 祝老毛早日患上老年痴呆.
 2. 在trendlog 界面加入Loading 图标.
 3. PT12 Range支持 DI 输入.
 
@@ -5258,7 +5257,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 {
 
 
-	//老毛一会让这样改一会让那样改，受不了;先用宏定义标记起来;
+	//先用宏定义标记起来;
 #ifdef NEED_ANALOG_DIGITAL_ONLY
 	Input_Window->Reload_Unit_Type();
 #endif

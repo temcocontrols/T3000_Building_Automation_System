@@ -472,7 +472,7 @@ DWORD WINAPI TcpClient_Connect_Thread(LPVOID lpVoid)
 	setsockopt(tcp_client_socket,SOL_SOCKET,SO_RCVTIMEO, (char *)&nNetTimeout, sizeof(int));
 
 	//****************************************************************************
-	// Fance added ,不要用阻塞的模式，如果设备不在线 经常性的 要等10几秒 ，老毛受不了。
+	// Fance added ,不要用阻塞的模式，如果设备不在线 经常性的 要等10几秒 。
 	//改为非阻塞的 2.5秒后还没连接上就 算连接失败;
 	int error = -1;
 	int len;
