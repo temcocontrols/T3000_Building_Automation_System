@@ -1,3 +1,7 @@
+//This is a file created by Alex, I beleive it belongs in a database rather than a text file. 
+//TBD: Move this to a DB(?)
+
+
   _NUM_POLLYESNO, _T("Poll Y/N"), 230, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	_NUM_NAME, _T("Bacnet Object Name"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	_NUM_FUNCTION, _T("Modbus Variable Type"), 230, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
