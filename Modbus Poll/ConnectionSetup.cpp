@@ -149,13 +149,13 @@ void CConnectionSetup::OnInitUI()
     m_edit_response_timeout.SetWindowText(StrTemp);
 
     Fresh_UI();
-    //从文件中填充配置
+    //To populate a configuration from a file
 
 }
 void CConnectionSetup::Fresh_UI()
 {
 
-    if (m_Commication_Type==0)//串口通信
+    if (m_Commication_Type==0)//Serial communication
     {
         GetDlgItem(IDC_COMBOBOX_COMPORT)->EnableWindow(TRUE);
         GetDlgItem(IDC_COMBOBOX_BRADRATE)->EnableWindow(TRUE);

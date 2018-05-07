@@ -640,9 +640,9 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
 
                     pScan->SetComPort(n);
                     bool bRet = Change_BaudRate_NoCretical(m_scan_info.at(j).scan_baudrate, n);
-                    CString strBraudrate;
-                    strBraudrate.Format(_T("%d"), m_scan_info.at(j).scan_baudrate);
-                    pScan->SetBaudRate(strBraudrate);
+                    CString strBaudrate;
+                    strBaudrate.Format(_T("%d"), m_scan_info.at(j).scan_baudrate);
+                    pScan->SetBaudRate(strBaudrate);
                     scan_baudrate = m_scan_info.at(j).scan_baudrate;
 
                     ASSERT(bRet);
@@ -2364,9 +2364,9 @@ UINT _ScanTstatThread2(LPVOID pParam)
 
                         pScan->SetComPort(n);
                         bool bRet = Change_BaudRate(m_scan_info.at(j).scan_baudrate);
-                        CString strBraudrate;
-                        strBraudrate.Format (_T("%d"),m_scan_info.at(j).scan_baudrate);
-                        pScan->SetBaudRate(strBraudrate);
+                        CString strBaudrate;
+                        strBaudrate.Format (_T("%d"),m_scan_info.at(j).scan_baudrate);
+                        pScan->SetBaudRate(strBaudrate);
                         scan_baudrate = m_scan_info.at(j).scan_baudrate;
 
                         ASSERT(bRet);

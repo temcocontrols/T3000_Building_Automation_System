@@ -6,6 +6,10 @@
 /T3000 Output
 /T3000 Output_VS2015
 
+# Visual Studio 2015 cache/options directory
+.vs/
+**/*.cache
+
 **/Thumbs.db
 
 **/Debug/
