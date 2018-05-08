@@ -58,7 +58,7 @@ CString Protocal;
 CString Com_Port;
 CString Ip_Address;
 CString Ip_Port;
-CString Braudrate;
+CString Baudrate;
 BOOL Default_SubBuilding;
 CString Building_Path;
 CString Longitude;

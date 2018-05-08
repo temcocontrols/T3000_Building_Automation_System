@@ -270,7 +270,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\globle_function.cpp"
+				RelativePath=".\global_function.cpp"
 				>
 			</File>
 			<File
@@ -617,7 +617,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\globle_function.h"
+				RelativePath=".\global_function.h"
 				>
 			</File>
 			<File

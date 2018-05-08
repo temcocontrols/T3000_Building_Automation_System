@@ -95,6 +95,7 @@ public:
  	// 搜索串口设备
  	BOOL ScanComDevice();
 
+    BOOL ScanDetectComData();
 	BOOL ScanRemoteIPDevice(); //扫描 远程设备;
 	BOOL ScanBacnetIPDevice();//扫描 bacnet IP 设备;
 	BOOL ScanBacnetMstpDevice(); //扫描Bacnet MSTP 设备;

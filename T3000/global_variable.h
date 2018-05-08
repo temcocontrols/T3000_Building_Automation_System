@@ -875,7 +875,7 @@ char charr[600][2][600] ={
 {"INPUT","Lookup Table 2 - 4.5V value   Sensor value that corresponds to 4.5V"},{"INPUT","Lookup Table 2 - 5.0V value   Sensor value that corresponds to 5.0V"},
 {"INPUT","Humidity Control Register, 0 = defautl, write 1 here to set to fac calib, "},{"INPUT","Current humidity sensor value"},
 {"INPUT","Update calibration data,  when set to 1, tstat will update the calibration data to PIC"},{"INPUT","Calibration points number, value can be single or two point calibration for the Tstat6"},
-{"INPUT","Decide which calibration table will be used. 0 = default table 1 = customer table"},
+{"INPUT","Decide which calibration table will be used. 0 = default table 1 = custom table"},
 
 //202-272
 {"OUTPUT","Determine the output1 mode. Output1 always is ON/OFF mode"},{"OUTPUT","Determine the output2 mode. Output2 always is ON/OFF mode"},

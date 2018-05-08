@@ -29,7 +29,7 @@ void CBTUMeterDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_MODEL, m_edit_model);
 	DDX_Control(pDX, IDC_EDIT_FV, m_edit_fv);
 	DDX_Control(pDX, IDC_EDIT_HV, m_edit_hv);
-	DDX_Control(pDX, IDC_CO2_BRAUDRATECOMBO, m_combox_baudrate);
+	DDX_Control(pDX, IDC_CO2_BAUDRATECOMBO, m_combox_baudrate);
 }
 
 BEGIN_MESSAGE_MAP(CBTUMeterDlg, CFormView)

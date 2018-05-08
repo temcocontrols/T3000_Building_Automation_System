@@ -26,7 +26,7 @@ public:
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedRefreshbutton();
 //	afx_msg void OnBnClickedEnableidbutton();
-	afx_msg void OnCbnSelendcancelBraudratecombo();
+	afx_msg void OnCbnSelendcancelBaudratecombo();
 	afx_msg void OnCbnSelchangePowermodelcombo();
 	afx_msg void OnCbnSelchangeKeypadlockcombo();
 	afx_msg void OnCbnSelchangeDisplaycombo();
@@ -103,7 +103,7 @@ public:
 public:
  
 	//CEdit m_idAdressEdit;
-	CComboBox m_braudRateCombox;
+	CComboBox m_baudRateCombox;
 	CComboBox m_keySelectCombox;
 	CComboBox m_powerupModelCombox;
 	CComboBox m_displayCombox;
