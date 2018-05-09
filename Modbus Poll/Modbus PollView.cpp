@@ -560,7 +560,6 @@ void CModbusPollView::Fresh_Data(){
 	    m_MsDataGrid.SetColumnCount(m_grid_cols);
 		m_MsDataGrid.SetFixedRowCount(1);
 		m_MsDataGrid.SetFixedColumnCount(1);
-   
 	}
 	CATCH (CMemoryException, e)
 	{

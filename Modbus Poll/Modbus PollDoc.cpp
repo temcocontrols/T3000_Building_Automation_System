@@ -206,7 +206,7 @@ BOOL CModbusPollDoc::OnOpenDocument(LPCTSTR lpszPathName)
 	if (!CDocument::OnOpenDocument(lpszPathName))
 		return FALSE;
 
- 
+	  
 
 	return TRUE;
 }
