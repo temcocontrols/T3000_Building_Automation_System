@@ -520,7 +520,6 @@ void CMainFrame::Read_Config(){
 	m_port=GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("IP Port"),6001,g_configfile_path);
 	m_connecttimeout=GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("Connect Timeout"),1000,g_configfile_path);
     m_responsetimeout =GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("Response Timeout"),1000,g_configfile_path);
-
 }
 void CMainFrame::OnConnectionQuickconnectf5()
 {
@@ -740,7 +739,6 @@ void Update_ViewData(CView* MBPollView){
 			return;
 		}
 		//DataBuffer=pMBPollView->m_DataBuffer;
-        pMBPollView->m_Slave_ID = GetPrivateProfileInt(_T("MBPOLL_Setting"), _T("Modbus ID"), 255, g_configfile_path);
 		ID=pMBPollView->m_Slave_ID;
 		startAdd=pMBPollView->m_address;
 		quantity=pMBPollView->m_Quantity;

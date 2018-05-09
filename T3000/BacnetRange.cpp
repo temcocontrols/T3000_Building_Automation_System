@@ -8,7 +8,10 @@
    6. It should have @#$%.
    7. It should able to %$#@
 */
-
+// ÖÂÎ´À´Ð¡»ï°éµÄ´Ê:
+// ²»ÒªÎÊÎªÊ²Ã´¿´²»¶®rang £¬´´½¨´Ë¶Ô»°¿òµÄÊ±ºò £¬ÎªÁË±ÜÃâ´´½¨ºÜ¶à´°¿Ú ºÍ´¥·¢ºÜ¶à ÊÂ¼þ £¬¾ÍÓÃÁË ÕâÖÖ movewindow ºÍhide µÄ
+//  ¶ÀÌØÐ´·¨£¬Ë­ÖªµÀÀÏÃ«Ò»Ö±¸Ä¸Ä¸Ä £¬¸ÄµÄ Î¬»¤ÆðÀ´Ô½À´Ô½Âé·³£¬²Ùµ°;
+//   ¶Å·«
 #include "stdafx.h"
 #include "T3000.h"
 #include "BacnetRange.h"
@@ -22,7 +25,7 @@ CBacnetAnalogCusRang * bac_analog_window = NULL;
 static int temp_static_value = 0;
 int old_bac_range_number_choose = 0;
 int initial_dialog = 0;
-bool move_window_to_right = true; 
+bool move_window_to_right = true; //µã»÷table ºó´´½¨³öÀ´µÄ´°ÌåÒÆ¶¯µ½ÓÒ±ßÈ¥;
 // BacnetRange dialog
 
 IMPLEMENT_DYNAMIC(BacnetRange, CDialogEx)
@@ -243,6 +246,7 @@ void BacnetRange::Initial_static()
 
 		for (int i=IDC_RADIO1;i<=IDC_RADIO34;i++)
 		{
+				//GetDlgItem(i)->ShowWindow(true);
 			CRect c1; 
 			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
 			ScreenToClient(c1);  
@@ -252,6 +256,7 @@ void BacnetRange::Initial_static()
 		}
 		for (int i=IDC_RADIO_VAR_CUS_1;i<=IDC_RADIO_VAR_CUS_5;i++)
 		{
+			//GetDlgItem(i)->ShowWindow(true);
 			CRect c1; 
 			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
 			ScreenToClient(c1);  
@@ -279,6 +284,7 @@ void BacnetRange::Initial_static()
 		GetDlgItem(IDC_RADIO1)->ShowWindow(false);
 		for (int i=IDC_RADIO35;i<=IDC_RADIO46;i++)
 		{
+			//GetDlgItem(i)->ShowWindow(false);
 			CRect c1; 
 			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
 			ScreenToClient(c1);  
@@ -288,6 +294,7 @@ void BacnetRange::Initial_static()
 
 		for (int i=IDC_RADIO89;i<=IDC_RADIO99;i++)
 		{
+			//GetDlgItem(i)->ShowWindow(false);
 			CRect c1; 
 			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
 			ScreenToClient(c1);  
@@ -424,7 +431,7 @@ void BacnetRange::Initial_static()
 			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 50,c1.top ,0,0,SWP_NOZORDER|SWP_NOSIZE);
 			GetDlgItem(i)->ShowWindow(true);
 		}
-		for (int i=IDC_RADIO73;i<=IDC_RADIO80;i++)	//Digital Custom
+		for (int i=IDC_RADIO73;i<=IDC_RADIO80;i++)	//Digital Customer
 		{
 			CRect c1; 
 			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;

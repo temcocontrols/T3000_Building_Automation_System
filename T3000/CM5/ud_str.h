@@ -90,7 +90,7 @@ typedef enum {
 		 WRITESCREEN_T3000         = 100+ENUM_GRP+1,        /* write screens        */
 		 WRITEARRAY_T3000          = 100+ENUM_ARRAY+1,      /* write arrays         */
 		  WRITEALARM_T3000		   = 100+ ENUM_ALARMM + 1, /* write alarm */
-		  WRITEUNIT_T3000          = 114,                 /* write custom units*/
+		  WRITEUNIT_T3000          = 114,                 /* write customer units*/
 		  WRITEUSER_T3000            = 115,
 		 WRITETIMESCHEDULE_T3000   = 100+ENUM_WR_TIME+1,    /* write time schedule  */
 		 WRITEANNUALSCHEDULE_T3000 = 100+ENUM_AR_DATA+1,     /* write annual schedule*/
@@ -101,11 +101,10 @@ typedef enum {
 		 //READ_COMMAND_50           = 50,
 		 WRITE_COMMAND_50          = 150,
 		 
-         READ_NEW_TIME_COMMAND      = 88,           /* read new time            */  //2018 04 17 新的读时间命令
          READMONITORPACKAGE_T3000   = 89,           /* read monitor belong to which package   */
 		 READ_AT_COMMAND			= 90,	//450 length
 		 READ_GRPHIC_LABEL_COMMAND  = 91,
-         READ_BACNET_TO_MODBUS_COMMAND   = 94,
+         BACNET_TO_MODBUS_COMMAND   = 94,
 		 READPIC_T3000				= 95,
 		 READ_MISC					= 96,
 		 READ_REMOTE_DEVICE_DB		= 97,
@@ -128,10 +127,9 @@ typedef enum {
 		 WRITEEXT_IO_T3000			= 137,
 		 WRITE_TSTATE_SCHEDULE_T3000= 138,
 		 WRITE_REMOTE_POINT         = 140,
-         WRITE_NEW_TIME_COMMAND     = 188,  //2018 04 17 新的写时间命令
 		 WRITE_AT_COMMAND			= 190,	//100 length
 		 WRITE_GRPHIC_LABEL_COMMAND  = 191,
-         WRITE_BACNET_TO_MODBUS_COMMAND = 194,
+
 		 WRITEPIC_T3000        = 195,
 		 WRITE_MISC                  = 196,
 		 WRITE_SPECIAL_COMMAND = 197,
@@ -418,43 +416,20 @@ typedef struct
 
 }	Str_annual_routine_point;   /* 21+9+2=32 bytes*/
 
-typedef union
+typedef struct
 {
-    struct
-    {
-        unsigned long n_time;
-        signed short time_zone;
-        unsigned char time_zone_summer_daytime;
-        unsigned char reserved[3];
-    }new_time;
-    struct
-    {
-        	byte  ti_sec;         // 0-59
-        	byte  ti_min;         // 0-59
-        	byte  ti_hour;           // 0-23
-        	byte  dayofmonth;   // 1-31
-        	byte  dayofweek;        // 0-6 ; 0=Sunday
-        	byte  month;          // 0-11
-        	byte  year;           // year - 1900
-        	WORD   dayofyear;    // 0-365 gmtime
-        	signed char isdst;
-    }old_time;
-}Time_block_mini;
+	byte  ti_sec;         // 0-59
+	byte  ti_min;         // 0-59
+	byte  ti_hour;           // 0-23
+	byte  dayofmonth;   // 1-31
+	byte  dayofweek;        // 0-6 ; 0=Sunday
+	byte  month;          // 0-11
+	byte  year;           // year - 1900
+	WORD   dayofyear;    // 0-365 gmtime
+	signed char isdst;
 
-//typedef struct
-//{
-//	byte  ti_sec;         // 0-59
-//	byte  ti_min;         // 0-59
-//	byte  ti_hour;           // 0-23
-//	byte  dayofmonth;   // 1-31
-//	byte  dayofweek;        // 0-6 ; 0=Sunday
-//	byte  month;          // 0-11
-//	byte  year;           // year - 1900
-//	WORD   dayofyear;    // 0-365 gmtime
-//	signed char isdst;
-//
-//
-//} Time_block_mini;
+
+} Time_block_mini;
 
 typedef struct
 {
@@ -817,8 +792,7 @@ typedef union
 		 unsigned char zegbee_exsit;
          unsigned char LCD_Display; //1: 常亮  0：常闭;
          unsigned char flag_time_sync_pc;  // 0: 不需要   1:同步.
-         unsigned char time_sync_auto_manual;  // 0 和时间服务器同步   1：和PC 时间同步
-         unsigned char sync_time_results;      //与时间服务器同步的结果 0 失败         1成功   注：只有在 reset_default 写99 要求同步后才去读次位用以判断同步结果;
+         unsigned char time_sync_auto_manual;  // 0 和时间服务器同步   1：和PC 时间同步;;
 	}reg;
 }Str_Setting_Info;
 

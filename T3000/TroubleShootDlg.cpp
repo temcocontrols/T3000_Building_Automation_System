@@ -44,13 +44,11 @@ void CTroubleShootDlg::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CTroubleShootDlg, CDialogEx)
-	//ON_BN_CLICKED(IDOK, &CTroubleShootDlg::OnBnClickedOk)
+	ON_BN_CLICKED(IDOK, &CTroubleShootDlg::OnBnClickedOk)
 //	ON_BN_CLICKED(IDC_BUTTON1, &CTroubleShootDlg::OnBnClickedButton1)
 //	ON_BN_CLICKED(IDC_BUTTON2, &CTroubleShootDlg::OnBnClickedButton2)
 //	ON_BN_CLICKED(IDC_BUTTON4, &CTroubleShootDlg::OnBnClickedButton4)
 ON_WM_PAINT()
-ON_BN_CLICKED(ID_CHANGE_ID_OK, &CTroubleShootDlg::OnBnClickedChangeIdOk)
-ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -143,10 +141,10 @@ BOOL CTroubleShootDlg::ChangeNetDeviceIP(CString strIP){
 	fd_set fdSocket;
 	BYTE buffer[512] = {0};
 	BYTE pSendBuf[1024];
-	ZeroMemory(pSendBuf, 1024);
+	ZeroMemory(pSendBuf, 255);
 	pSendBuf[0] = 0x66;
 	memcpy(pSendBuf + 1, (BYTE*)&END_FLAG, 4);
-	int nSendLen = 17 + 4;
+	int nSendLen = 17;
 	int time_out=0;
 	USES_CONVERSION;
 	CString stroldipaddress,strnewipadress,strlocalipaddress,strnewsubnet,strnewgateway;
@@ -253,12 +251,12 @@ BOOL CTroubleShootDlg::ChangeNetDeviceIP(CString strIP){
 		pSendBuf[15]=ia.S_un.S_un_b.s_b3;
 		pSendBuf[16]=ia.S_un.S_un_b.s_b4;
 
-        memcpy(&pSendBuf[17], &m_net_product_node.serial_number, 4);
 		FD_ZERO(&fdSocket);	
 		FD_SET(h_scan_Broad, &fdSocket);
 // 		fd_set fdSocket;
 // 		FD_ZERO(&fdSocket);	
 // 		FD_SET(h_scan_Broad, &fdSocket);
+
 
 
 		nRet = ::sendto(h_scan_Broad,(char*)pSendBuf,nSendLen,0,(sockaddr*)&h_bcast,sizeof(h_bcast));
@@ -322,6 +320,27 @@ BOOL CTroubleShootDlg::ChangeNetDeviceIP(CString strIP){
 				CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 				::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
 
+					//Sleep(8000);
+
+				//	SetCommunicationType(1);
+// 					if (!Open_Socket2(strnewipadress,_wtoi(m_net_product_node.BuildingInfo.strIpPort)))
+// 					{
+// 						stroldipaddress=strnewipadress;
+// 						MessageBox(_T("Fail!"));
+// 						 ret= FALSE;
+// 					}
+// 					else
+// 					{
+// 						close_com();
+// 					}
+
+					 
+					//m_flexGrid.put_TextMatrix(row_flags,NEW_IPADRESS,strnewipadress);
+					
+					//AfxMessageBox(_T("Change the ip successfully!"));
+					//ret=TRUE;
+					
+					//return TRUE;
 				break;
 				}
 
@@ -415,39 +434,23 @@ void CTroubleShootDlg::SaveNewIPAddress(CString newip,CString oldip){
 	//m_pCon->Close(); 
 	 SqliteDBBuilding.closedb();
 }
-
-HANDLE handle_change_ip = NULL;
-
-DWORD WINAPI  CTroubleShootDlg::thread_change_ip(LPVOID lpVoid)
+void CTroubleShootDlg::OnBnClickedOk()
 {
-    CTroubleShootDlg *pParent = (CTroubleShootDlg *)lpVoid;
-
-    int ret_results = 0;
-    pParent->b_changeip_ok = 0;
-    for (int i = 0; i < 3; i++)
-    {
-        ret_results = pParent->ChangeNetDeviceIP(pParent->m_net_product_node.BuildingInfo.strIp);
-        if (ret_results == 1)
-        {
-            pParent->b_changeip_ok = 1;
-            break;
-        }
-    }
-
-    if (pParent->b_changeip_ok)
-    {
-        //CDialog::OnOK();
-        ::PostMessage(pParent->m_hWnd, WM_CLOSE, NULL, NULL);
-    }
-
-    handle_change_ip = NULL;
-    return 1;
+   
+is_ok=    ChangeNetDeviceIP(m_net_product_node.BuildingInfo.strIp);
+if (is_ok)
+{
+CDialog::OnOK();
 }
+ 
+}
+/*void CTroubleShootDlg::FreshUI(){*/
+	//CString StrTemp;
+	//m_current_product.Format(_T("%s(%s:%s) SN=%d \nThe device is connected to the ip(%s) of the network card.\n there are in different subnet ,so T3000 can't connect to your device. "),GetProductName(m_net_product_node.product_class_id),m_net_product_node.BuildingInfo.strIp,m_net_product_node.BuildingInfo.strIpPort,m_net_product_node.serial_number,m_net_product_node.NetworkCard_Address);
+//	m_connection_status=_T("Do you want to fix the ip of your device?\n If Yes ,We will try to change the ip of your device .\n If No ,We will do nothing.");
+//	UpdateData(FALSE);
 
-
-
-
-
+/*}*/
 
 
 void CTroubleShootDlg::SetNode(tree_product product_Node){
@@ -525,42 +528,4 @@ void CTroubleShootDlg::OnPaint()
 	mygraphics->DrawString(StrTempPCIP, -1, &WarningMessageFont, WarningMessagePoint,&WarningMessageColor);
 	//Bitmap bitmap(hBitmap_login,NULL);
 	//graphics.DrawImage(&bitmap,0 ,0,test_rect.Width(),test_rect.Height());
-}
-
-
-void CTroubleShootDlg::OnBnClickedChangeIdOk()
-{
-    // TODO: 在此添加控件通知处理程序代码
-    b_changeip_ok = false;
-    SetTimer(1, 1000 ,NULL);
-    GetDlgItem(ID_CHANGE_ID_OK)->EnableWindow(false);
-    handle_change_ip = CreateThread(NULL, NULL, thread_change_ip, this, NULL, NULL);
-}
-
-
-void CTroubleShootDlg::OnTimer(UINT_PTR nIDEvent)
-{
-    // TODO: 在此添加消息处理程序代码和/或调用默认值
-    switch (nIDEvent)
-    {
-    case 1:
-        if (handle_change_ip == NULL)
-        {
-            KillTimer(1);
-            GetDlgItem(ID_CHANGE_ID_OK)->EnableWindow(true);
-            if (b_changeip_ok == false)
-            {
-                MessageBox(_T("Change IP address timeout!"), _T("Warning"), MB_OK);
-            }
-            else
-            {
-                MessageBox(_T("Change IP address success!"), _T("Message"), MB_OK);
-            }
-        }
-        break;
-    default:
-        break;
-    }
-
-    CDialogEx::OnTimer(nIDEvent);
 }

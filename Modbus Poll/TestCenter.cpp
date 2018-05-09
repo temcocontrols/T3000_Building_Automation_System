@@ -6,7 +6,7 @@
 #include "TestCenter.h"
 #include "afxdialogex.h"
 #include "ModbusDllforVc.h"
-#include "global_function.h"
+#include "globle_function.h"
 
 // TestCenter dialog
 

@@ -1607,11 +1607,8 @@ int read_monitordata(int digtal_or_analog,unsigned int timeleft,unsigned int tim
         {
             if (read_index < read_analog_package.size())
             {
-				// See the corresponding comment below as to why direct indexing of bitset is valid here.
-				if (read_analog_package[read_index] && (read_index != m_monitor_head.seg_index + m_monitor_head.total_seg))
-				{
-					continue;
-				}
+                if ((read_analog_package.at(read_index) == true) && (read_index != m_monitor_head.seg_index + m_monitor_head.total_seg))  //已经读过的;
+                    continue;
             }
             else
             {
@@ -1622,13 +1619,8 @@ int read_monitordata(int digtal_or_analog,unsigned int timeleft,unsigned int tim
         {
             if (read_index < read_dig_package.size())
             {
-				// Using 'at' for indexing is not really required here due to the below two facts:
-				// 1. The conditional check above ensures we are well within the bounds
-				// 2. The starting index is anyway 0 and incremented by 1, hence -ve bound check not necessary.
-				if (read_dig_package[read_index] && (read_index != m_monitor_head.seg_index + m_monitor_head.total_seg))
-				{
-					continue;
-				}
+                if ((read_dig_package.at(read_index) == true) && (read_index != m_monitor_head.seg_index + m_monitor_head.total_seg))  //已经读过的;
+                    continue;
             }
             else
             {

@@ -292,7 +292,7 @@ bool CFlashSN::Connect_To_Server(CString strIPAdress,short nPort)
 	setsockopt(m_hSocket,SOL_SOCKET,SO_RCVTIMEO,(char *)&nNetTimeout,sizeof(int));
 
 	//****************************************************************************
-	// Fance added ,不要用阻塞的模式，如果设备不在线 经常性的 要等10几秒
+	// Fance added ,不要用阻塞的模式，如果设备不在线 经常性的 要等10几秒 ，老毛受不了。
 	//改为非阻塞的 2.5秒后还没连接上就 算连接失败;
 	int error = -1;int len;
 	len = sizeof(int);
@@ -404,14 +404,33 @@ void CFlashSN::FlashTstatSN()
 	hiword=(m_nSerialNumber >> 16) & 0xffff;
 	if (open_com(m_nComPort))
 	{
-      Change_BaudRate (m_nBraudrate);
+     /*   unsigned short Serial[4];
+        int i=0;
+        while(i<5){
+        int ret=read_multi(m_nMBID,Serial,0,4);
+        if (ret>0)
+        {
+        break;
+        }
+        ++i;
+        }*/
+        
+		//int nSerialNumber = 
+		//	Read_One(m_nMBID,0) +
+		//	Read_One(m_nMBID,1) * 256 +
+		//	Read_One(m_nMBID,2) * 65536 +           // 256 * 256 
+		//	Read_One(m_nMBID,3) * 16777216 ;// 256 *256 *256
+
+       /* if (nSerialNumber!=0)
+        {*/
+        Change_BaudRate (m_nBraudrate);
         if (m_nProductModel!=102)
         {
             Write_One(m_nMBID,16,142);
             Sleep(10*1000);
         }
 
-     
+      /*  }*/
 		
 	if(Write_One(m_nMBID,0,loword)>0 && Write_One(m_nMBID,2,hiword)>0)
 	{		
@@ -446,7 +465,19 @@ void CFlashSN::FlashTstatSN()
 		for(int j=0;j<f_l_temp.GetLength();j++)
 			software_version[j]=(char)f_l_temp.GetAt(j);
 
-		
+		//fstream tstat;
+
+		////tstat.open(_T("z:\\Serial_Records\\serial_records.txt"),ios_base::out | ios_base::app);
+		//tstat.open(_T("e:\\serial_records.txt"),ios_base::out | ios_base::app);
+		//if(tstat.is_open())
+		//{
+		//	tstat	<<endl<<m_nSerialNumber                    //serialnumber
+		//			<<_T(", ")<<m_strProductModel                //product_model
+		//			<<_T(", ")<<m_nHardWareVersion           //hardware version
+		//			<<_T(", ")<<nSWVersion				        //software version
+		//			<<_T(", ")<<month<<_T("-")<<day<<_T("-")<<year;        //the time									
+		//}
+		//tstat.close();
 		CString stringlog;
 		stringlog.Format(_T("%d,%s,%d,%s,%d-%d-%d"),
 			m_nSerialNumber,
@@ -475,7 +506,7 @@ void CFlashSN::FlashTstatSN()
 
 		}
 		CString index;
-		index.Format(_T("SN=%d has been written sucessfully."),m_nSerialNumber);
+		index.Format(_T("SN=%d have been written,sucessfully."),m_nSerialNumber);
 		if(!auto_flash_mode)
 			AfxMessageBox(index);
 	}
@@ -487,7 +518,7 @@ void CFlashSN::FlashTstatSN()
 			Read_One(m_nMBID,2) * 65536 +           // 256 * 256 
 			Read_One(m_nMBID , 3) * 16777216 ;// 256 *256 *256
 		CString index;
-		index.Format(_T("SN:%d has not been written."),m_nSerialNumber);
+		index.Format(_T("SN:%d have not been overwritten."),m_nSerialNumber);
 		if(!auto_flash_mode)
 			AfxMessageBox(index);
 	}
@@ -497,7 +528,7 @@ void CFlashSN::FlashTstatSN()
 	else
 	{
 		if(!auto_flash_mode)
-			AfxMessageBox(_T("Cannot open COM Port"));
+			AfxMessageBox(_T("COM Can't Open"));
 	}
 
 	 
@@ -514,11 +545,11 @@ void CFlashSN::FlashNCSN()
 	if(m_nSerialNumber<=0)//can't fine the serialnumber file on z drive
 	{
 		if(!auto_flash_mode)
-			AfxMessageBox(_T("WARNING : Get serial number from the server failed."));
+			AfxMessageBox(_T("WARNING : Get serial number from server failed."));
 		return;
 	}
 	CString serial_id;
-	serial_id.Format(_T("Got Serial number from server : %u"),m_nSerialNumber);
+	serial_id.Format(_T("Get Serial number from server : %u"),m_nSerialNumber);
 	if(!auto_flash_mode)
 		AfxMessageBox(serial_id);
 	//m_nSerialNumber=GetNewSerialNumber();// get last serialnumber of the file
@@ -535,7 +566,7 @@ void CFlashSN::FlashNCSN()
 	if(m_nSerialNumber==-1)//can't fine the serialnumber file on z drive
 	{
 		if(!auto_flash_mode)
-			AfxMessageBox(_T("WARNING : Can't find serial number file on Z Drive."));
+			AfxMessageBox(_T("WARNING : Can't find serial number file on Z driver."));
 		return;
 	}
 	
@@ -583,7 +614,19 @@ void CFlashSN::FlashNCSN()
 			for(int j=0;j<f_l_temp.GetLength();j++)
 				software_version[j]=(char)f_l_temp.GetAt(j);
 
-			
+			//fstream tstat;
+
+			////tstat.open(_T("z:\\Serial_Records\\serial_records.txt"),ios_base::out | ios_base::app);
+			//tstat.open(_T("e:\\serial_records.txt"),ios_base::out | ios_base::app);
+			//if(tstat.is_open())
+			//{
+			//	tstat	<<endl<<m_nSerialNumber                    //serialnumber
+			//			<<_T(", ")<<m_strProductModel                //product_model
+			//			<<_T(", ")<<m_nHardWareVersion           //hardware version
+			//			<<_T(", ")<<nSWVersion				        //software version
+			//			<<_T(", ")<<month<<_T("-")<<day<<_T("-")<<year;        //the time									
+			//}
+			//tstat.close();
 
 #pragma region Save_SerialNumber
 			CString stringlog;
@@ -626,7 +669,7 @@ void CFlashSN::FlashNCSN()
 				Read_One(255,2) * 65536 +           // 256 * 256 
 				Read_One(255 , 3) * 16777216 ;// 256 *256 *256
 			CString index;
-			index.Format(_T("SN:%d has not been written."),m_nSerialNumber);
+			index.Format(_T("SN:%d have not been overwritten."),m_nSerialNumber);
 			if(!auto_flash_mode)
 				AfxMessageBox(index);
 		}

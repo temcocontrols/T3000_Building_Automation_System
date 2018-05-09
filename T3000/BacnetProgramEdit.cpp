@@ -19,11 +19,12 @@ extern char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_t
 CBacnetProgramDebug * Program_Debug_Window = NULL;
 extern int error;
 extern char *pmes;
-
+//extern int Station_NUM;
+//extern int program_list_line;
 vector <Str_char_pos_color> m_prg_label_error_color;	//用于highlight 关键字用;
 vector <Str_char_pos_color> m_prg_char_color;	//用于highlight 关键字用;
 vector <Str_char_pos_color> buffer_prg_char_color; //用于防止频繁更新界面引起的闪烁问题;
-
+// CBacnetProgramEdit dialog
 CString program_string;
 CString AnalysisString;
  char editbuf[25000];
@@ -178,8 +179,12 @@ void CBacnetProgramEdit::SetRicheditFont(long nStartchar,long nEndchar,DWORD nCo
 	cf.dwMask|=CFM_SIZE;
 	cf.yHeight =250; //设置高度
 	cf.dwMask|=CFM_FACE;
+	//_tcscpy(cf.szFaceName ,_T("SimSun-ExtB"));
+	//_tcscpy(cf.szFaceName ,_T("Times New Roman"));
+	//	strcpy(cf.szFaceName ,_T("隶书")); //设置字体
 	_tcscpy(cf.szFaceName , prg_character_font);
-
+	//_tcscpy(cf.szFaceName ,_T("NSimSun"));
+	//
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(nStartchar,nEndchar);
 	((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSelectionCharFormat(cf);
 

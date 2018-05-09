@@ -5848,8 +5848,7 @@ void CT3000View::FreshCtrl()
         break;
     }
     //if(product_register_value[184] & 1)
-
-    if(product_register_value[MODBUS_FAN_SPEED] != 0)	//184
+    if(product_register_value[MODBUS_INFO_BYTE] & 1)	//184
     {
         m_bOccupied=TRUE;
         CButton* pBtn = (CButton*)GetDlgItem(IDC_UNOCCUPIED_MARK);

@@ -9,7 +9,7 @@
 #include "EnumSerial.h"
 
 #include "global_variable_extern.h"
-#include "global_function.h"
+#include "globle_function.h"
 #include "ModbusDllforVC.h"
 
 // CConnectionSetup dialog
@@ -149,13 +149,13 @@ void CConnectionSetup::OnInitUI()
     m_edit_response_timeout.SetWindowText(StrTemp);
 
     Fresh_UI();
-    //To populate a configuration from a file
+    //从文件中填充配置
 
 }
 void CConnectionSetup::Fresh_UI()
 {
 
-    if (m_Commication_Type==0)//Serial communication
+    if (m_Commication_Type==0)//串口通信
     {
         GetDlgItem(IDC_COMBOBOX_COMPORT)->EnableWindow(TRUE);
         GetDlgItem(IDC_COMBOBOX_BRADRATE)->EnableWindow(TRUE);
