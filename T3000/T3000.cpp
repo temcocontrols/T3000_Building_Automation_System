@@ -26,7 +26,7 @@
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);  
 
 LPFN_ISWOW64PROCESS fnIsWow64Process;  
-const int g_versionNO= 20180426;
+const int g_versionNO= 20180408;
 
 
 #ifdef _DEBUG
@@ -68,7 +68,7 @@ CT3000App::CT3000App()
 #endif 
     //*******************************************************
     
-	T3000_Version = 20180426; //
+	T3000_Version = 20180408; //
 	m_lastinterface=19;
 }
 // The one and only CT3000App object
@@ -215,7 +215,7 @@ void CT3000App::UpdateDB()
 				stemp_building.Com_Port = q.getValuebyName(L"Com_Port");
 				stemp_building.Ip_Address = q.getValuebyName(L"Ip_Address");
 				stemp_building.Ip_Port = q.getValuebyName(L"Ip_Port");
-				stemp_building.Baudrate = q.getValuebyName(L"Braudrate");
+				stemp_building.Braudrate = q.getValuebyName(L"Braudrate");
 				stemp_building.Default_SubBuilding = q.getIntField("Default_SubBuilding");
 				stemp_building.Building_Path = q.getValuebyName(L"Building_Path");
 				stemp_building.Longitude = q.getValuebyName(L"Longitude");
@@ -283,7 +283,7 @@ void CT3000App::UpdateDB()
 				m_Building.at(j).Com_Port,
 				m_Building.at(j).Ip_Address,
 				m_Building.at(j).Ip_Port,
-				m_Building.at(j).Baudrate,
+				m_Building.at(j).Braudrate,
 				m_Building.at(j).Default_SubBuilding,
 				m_Building.at(j).Building_Path,
 				m_Building.at(j).Longitude,
@@ -311,37 +311,19 @@ BOOL CT3000App::InitInstance()
 	 
 	GetModulePath();
 	CString strSource = g_strExePth + L"T3000Controls.dll";
-
-    //2018 04 23 修复bug 默写操作系统不是C盘的情况安装控件失败
-    //解决办法  获取系统所在盘符 ，然后采取对应操作.
-    CString Local_System_Path;
-    TCHAR szPath[MAX_PATH];
-    DWORD ret;
-    ret = GetWindowsDirectory(szPath, MAX_PATH);
-    if (!ret) 
-        Local_System_Path = _T("C:\\Windows");
-    else
-        Local_System_Path = szPath;
+	//
 	try
 	{
 		//if (ReadDLLRegAsm()<1)
 		{
 #if 1 // 杜帆屏蔽  ， 许多杀毒软件 检测到  RegAsm.exe 的访问不合法， 报病毒;
-            CString temp_dotnet_path;
-            CString temp_t3000controlldll_path;
-            CString temp_bacnetdll;
-            CString temp_Regasm_path;
-            temp_dotnet_path = Local_System_Path + _T("\\Microsoft.NET\\Framework\\v4.0.30319");
-            temp_t3000controlldll_path = temp_dotnet_path + _T("\\T3000Controls.dll");
-            temp_bacnetdll = temp_dotnet_path + _T("\\TemcoStandardBacnetTool.dll");
-            temp_Regasm_path = temp_dotnet_path + _T("\\RegAsm.exe");
-			CopyFile(strSource, temp_t3000controlldll_path, FALSE);
+			CopyFile(strSource, L"C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\T3000Controls.dll", FALSE);
 			// ::ShellExecute(NULL, _T("open"), _T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe T3000Controls.dll"), _T(""), _T(""), SW_SHOW); 
-			ShellExecute(NULL, _T("open"), temp_Regasm_path, temp_t3000controlldll_path, NULL, SW_HIDE);
+			ShellExecute(NULL, _T("open"), _T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe"), L"C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\T3000Controls.dll", NULL, SW_HIDE);
 			strSource = g_strExePth + L"TemcoStandardBacnetTool.dll";
-			CopyFile(strSource, temp_bacnetdll, FALSE);
+			CopyFile(strSource, L"C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\TemcoStandardBacnetTool.dll", FALSE);
 			// ::ShellExecute(NULL, _T("open"), _T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe T3000Controls.dll"), _T(""), _T(""), SW_SHOW); 
-			ShellExecute(NULL, _T("open"), temp_Regasm_path, temp_bacnetdll, NULL, SW_HIDE);
+			ShellExecute(NULL, _T("open"), _T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe"), L"C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\TemcoStandardBacnetTool.dll", NULL, SW_HIDE);
 #endif
 		}
 		

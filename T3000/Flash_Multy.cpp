@@ -122,7 +122,7 @@ BOOL CFlash_Multy::OnInitDialog()
 		temp.strSN= m_flash_multy_list.GetItemText(i,FLASH_SERIAL_NUMBER);
 		temp.nID = m_flash_multy_list.GetItemText(i,FLASH_ID);
 		temp.ncomport = m_flash_multy_list.GetItemText(i,FLASH_COM_PORT);
-		temp.nBaudrate = m_flash_multy_list.GetItemText(i,FLASH_BAUDRATE);
+		temp.nBraudrate = m_flash_multy_list.GetItemText(i,FLASH_BAUDRATE);
 		temp.nIPaddress = m_flash_multy_list.GetItemText(i,FLASH_IPADDRESS);
 		temp.nipport = m_flash_multy_list.GetItemText(i,FLASH_IPPORT);
 		temp.devicename=m_flash_multy_list.GetItemText(i,FLASH_PRODUCT_NAME);
@@ -231,7 +231,7 @@ void CFlash_Multy::Initial_List()
     m_flash_multy_list.InsertColumn(FLASH_ID, _T("Panel ID"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_flash_multy_list.InsertColumn(FLASH_PRODUCT_NAME, _T("Name"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_flash_multy_list.InsertColumn(FLASH_COM_PORT, _T("Com"), 40, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_flash_multy_list.InsertColumn(FLASH_BAUDRATE,_T("Baudrate"),40,ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_flash_multy_list.InsertColumn(FLASH_BAUDRATE,_T("Braudrate"),40,ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_flash_multy_list.InsertColumn(FLASH_IPADDRESS, _T("IP"), 120, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_flash_multy_list.InsertColumn(FLASH_IPPORT, _T("Port"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_flash_multy_list.InsertColumn(FLASH_SUB_NOTE, _T("Is Sub"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -272,7 +272,7 @@ void CFlash_Multy::Initial_List()
         CString nID;
         CString nProductName;
         CString nComport;
-		CString nBaudrate;
+		CString nBraudrate;
         CString nIPAddress;
         CString nIP_Port;
         CString n_is_sub;
@@ -298,7 +298,7 @@ void CFlash_Multy::Initial_List()
 			else
 			{
 				nComport.Format(_T("%d"),pFrame->m_product.at(i).ncomport);
-				nBaudrate.Format(_T("%d"),pFrame->m_product.at(i).baudrate);			
+				nBraudrate.Format(_T("%d"),pFrame->m_product.at(i).baudrate);			
 				nIP_Port.Empty();
 				nIPAddress.Empty();
 			}
@@ -326,7 +326,7 @@ void CFlash_Multy::Initial_List()
         m_flash_multy_list.SetItemText(i,FLASH_ID,nID);
         m_flash_multy_list.SetItemText(i,FLASH_PRODUCT_NAME,nProductName);
         m_flash_multy_list.SetItemText(i,FLASH_COM_PORT,nComport);
-		m_flash_multy_list.SetItemText(i,FLASH_BAUDRATE,nBaudrate);
+		m_flash_multy_list.SetItemText(i,FLASH_BAUDRATE,nBraudrate);
         m_flash_multy_list.SetItemText(i,FLASH_IPADDRESS,nIPAddress);
         m_flash_multy_list.SetItemText(i,FLASH_IPPORT,nIP_Port);
         m_flash_multy_list.SetItemText(i,FLASH_SUB_NOTE,n_is_sub);
@@ -607,6 +607,8 @@ BOOL CFlash_Multy::Product_Firmware_Check(CString ProductName,CString FirmwareFi
 		
         else
         {
+//             strtips.Format(_T("Your device is %s   Your hex file is fit for %s "),prodcutname.GetBuffer(),hexproductname.GetBuffer());
+//             OutPutsStatusInfo(strtips,false);
             Ret_Result= FALSE;
         }
 
@@ -644,6 +646,15 @@ void CFlash_Multy::SetAutoConfig(Str_flash_device ndevice_info)
     WritePrivateProfileStringW(_T("Data"),_T("Command"),_T("1"),AutoFlashConfigPath);
     if(ndevice_info.nIPaddress.IsEmpty())//串口
     {
+// 		WritePrivateProfileStringW(_T("Data"),_T("COM_OR_NET"),_T("COM"),Config_Path);
+// 		CString cs_comport;
+// 		cs_comport = _T("COM") +  ndevice_info.ncomport;
+// 		WritePrivateProfileStringW(_T("Data"),_T("COMPORT"),cs_comport,Config_Path);
+// 		WritePrivateProfileStringW(_T("Data"),_T("Baudrate"),_T("19200"),Config_Path);
+//
+// 		CString nflash_id;
+// 		nflash_id = ndevice_info.nID;
+// 		WritePrivateProfileStringW(_T("Data"),_T("ID"),nflash_id,Config_Path);
         WritePrivateProfileStringW(_T("Data"),_T("COM_OR_NET"),_T("COM"),AutoFlashConfigPath);
         CString cs_comport;
         cs_comport = _T("COM") +  ndevice_info.ncomport;
@@ -668,9 +679,34 @@ void CFlash_Multy::SetAutoConfig(Str_flash_device ndevice_info)
     }
     else
     {
-        WritePrivateProfileStringW(_T("Data"),_T("COM_OR_NET"),_T("NET"),AutoFlashConfigPath);
+        /*	WritePrivateProfileStringW(_T("Data"),_T("COM_OR_NET"),_T("NET"),AutoFlashConfigPath);
         WritePrivateProfileStringW(_T("Data"),_T("IPAddress"),ndevice_info.nIPaddress,AutoFlashConfigPath);
 
+        CString n_tcpport;
+        n_tcpport = ndevice_info.nipport;
+
+        WritePrivateProfileStringW(_T("Data"),_T("IPPort"),n_tcpport,AutoFlashConfigPath);
+        if(ndevice_info.b_is_sub == true)
+        {
+        WritePrivateProfileStringW(_T("Data"),_T("Subnote"),_T("1"),AutoFlashConfigPath);
+        CString nsub_id;
+        nsub_id = ndevice_info.nID;
+        WritePrivateProfileStringW(_T("Data"),_T("SubID"),nsub_id,AutoFlashConfigPath);
+        }
+        else
+        {
+        WritePrivateProfileStringW(_T("Data"),_T("Subnote"),_T("0"),AutoFlashConfigPath);
+        }*/
+
+
+
+        WritePrivateProfileStringW(_T("Data"),_T("COM_OR_NET"),_T("NET"),AutoFlashConfigPath);
+        WritePrivateProfileStringW(_T("Data"),_T("IPAddress"),ndevice_info.nIPaddress,AutoFlashConfigPath);
+//         if((_wtoi(ndevice_info.nipport) == 0) || (_wtoi(ndevice_info.nipport) == 47808))
+//         {
+//            // m_product_isp_auto_flash.ncomport = 10000;
+//            ndevice_info.nipport = L"10000";
+//         }
         temp_isp_info.Format(_T("Communications port : network"));
         m_multy_flash_listbox.InsertString(m_multy_flash_listbox.GetCount(),temp_isp_info);
         temp_isp_info.Format(_T("IP Address : "));
@@ -720,7 +756,11 @@ void CFlash_Multy::OnBnClickedButtonStatrt()
 {
     
     UpdateData();
-
+    /*if (m_Start)
+    {
+        m_Start =FALSE;
+        return;
+    } */
     SetTimer(1,200,NULL);
     int nflashitemcount = 0;
     CString StrTemp;
@@ -743,7 +783,7 @@ void CFlash_Multy::OnBnClickedButtonStatrt()
         temp.strSN= m_flash_multy_list.GetItemText(i,FLASH_SERIAL_NUMBER);
         temp.nID = m_flash_multy_list.GetItemText(i,FLASH_ID);
         temp.ncomport = m_flash_multy_list.GetItemText(i,FLASH_COM_PORT);
-		temp.nBaudrate = m_flash_multy_list.GetItemText(i,FLASH_BAUDRATE);
+		temp.nBraudrate = m_flash_multy_list.GetItemText(i,FLASH_BAUDRATE);
         temp.nIPaddress = m_flash_multy_list.GetItemText(i,FLASH_IPADDRESS);
         temp.nipport = m_flash_multy_list.GetItemText(i,FLASH_IPPORT);
         temp.devicename=m_flash_multy_list.GetItemText(i,FLASH_PRODUCT_NAME);
@@ -890,7 +930,7 @@ DWORD WINAPI  CFlash_Multy::multy_isp_thread(LPVOID lpVoid)
     CFlash_Multy *pParent = (CFlash_Multy *)lpVoid;
     int nflashdevicecount = (int)flash_device.size();
     int comport=0;
-	int baudrate = 0;
+	int braudrate = 0;
     BOOL IS_COM=TRUE;
     CString currentIp;
     int Port;
@@ -975,7 +1015,7 @@ DWORD WINAPI  CFlash_Multy::multy_isp_thread(LPVOID lpVoid)
         if (!flash_device.at(i).ncomport.IsEmpty())//说明是非串口设备
         {
             comport=_wtoi(flash_device.at(i).ncomport);
-			baudrate = _wtoi(flash_device.at(i).nBaudrate);
+			braudrate = _wtoi(flash_device.at(i).nBraudrate);
             IS_COM=TRUE;
         }
         else
@@ -991,7 +1031,7 @@ DWORD WINAPI  CFlash_Multy::multy_isp_thread(LPVOID lpVoid)
             if (open_com(comport))
             {
                 is_connect_device=TRUE;
-				Change_BaudRate(baudrate);
+				Change_BaudRate(braudrate);
             }
             else
             {
@@ -1171,7 +1211,7 @@ DWORD WINAPI  CFlash_Multy::multy_check_online(LPVOID lpVoid)
 
     int nflashdevicecount = (int)flash_device.size();
     int comport=0;
-	int baudrate = 19200;
+	int braudrate = 19200;
     BOOL IS_COM=TRUE;
     CString currentIp;
     int Port;
@@ -1195,7 +1235,7 @@ DWORD WINAPI  CFlash_Multy::multy_check_online(LPVOID lpVoid)
         if (!flash_device.at(i).ncomport.IsEmpty())//说明是非串口设备
         {
             comport=_wtoi(flash_device.at(i).ncomport);
-			baudrate = _wtoi(flash_device.at(i).nBaudrate);
+			braudrate = _wtoi(flash_device.at(i).nBraudrate);
             IS_COM=TRUE;
         }
         else
@@ -1227,7 +1267,7 @@ DWORD WINAPI  CFlash_Multy::multy_check_online(LPVOID lpVoid)
             if (open_com(comport))
             {
                 is_connect_device=TRUE;
-				Change_BaudRate(baudrate);
+				Change_BaudRate(braudrate);
             }
             else
             {

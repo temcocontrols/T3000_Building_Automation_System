@@ -129,7 +129,7 @@ public:
     afx_msg void OnEnKillfocusEditName();
     afx_msg void OnCbnSelchangeRangecombo();
 	CComboBox m_brandrateBoxbox;
-	afx_msg void OnCbnSelchangeBaudratecombo();
+	afx_msg void OnCbnSelchangeBraudratecombo();
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	afx_msg void OnDestroy();
 	void EnterCellMsflexgridOutput();

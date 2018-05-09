@@ -46,7 +46,7 @@ public:
 	afx_msg void OnEnKillfocusEditBipport();
 	afx_msg void OnCbnSelchangeComboMstpModbus();
 	afx_msg void OnEnKillfocusEditMstpMac();
-	afx_msg void OnCbnKillfocusBaudratecombo();
+	afx_msg void OnCbnKillfocusBraudratecombo();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnBnClickedButtonWifiConfig();
 	CEdit m_Edit_AESPassword;

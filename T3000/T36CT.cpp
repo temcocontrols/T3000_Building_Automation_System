@@ -82,14 +82,14 @@ void T36CT::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_MSFLEXGRID_INPUT2, m_msflexgrid_Ainput);
 	DDX_Control(pDX, IDC_EDIT_NAME, m_inNameEdt);
 	DDX_Control(pDX, IDC_RANGECOMBO, m_comboxRange);
-	DDX_Control(pDX, IDC_BAUDRATECOMBO, m_brandrateBoxbox);
+	DDX_Control(pDX, IDC_BRAUDRATECOMBO, m_brandrateBoxbox);
 }
 
 BEGIN_MESSAGE_MAP(T36CT, CFormView)
     ON_BN_CLICKED(IDC_CHANGEID, &T36CT::OnBnClickedChangeid)
    // ON_EN_KILLFOCUS(IDC_EDIT_NAME, &T36CT::OnEnKillfocusEditName)
     ON_CBN_SELCHANGE(IDC_RANGECOMBO, &T36CT::OnCbnSelchangeRangecombo)
-	ON_CBN_SELCHANGE(IDC_BAUDRATECOMBO, &T36CT::OnCbnSelchangeBaudratecombo)
+	ON_CBN_SELCHANGE(IDC_BRAUDRATECOMBO, &T36CT::OnCbnSelchangeBraudratecombo)
 	ON_WM_DESTROY()
 	ON_BN_CLICKED(IDC_BUTTON_RESET, &T36CT::OnBnClickedButtonReset)
 END_MESSAGE_MAP()
@@ -1154,7 +1154,7 @@ void T36CT::OnCbnSelchangeRangecombo()
 }
 
 
-void T36CT::OnCbnSelchangeBaudratecombo()
+void T36CT::OnCbnSelchangeBraudratecombo()
 {
    int sel=m_brandrateBoxbox.GetCurSel();
    int bandrate;

@@ -21,9 +21,6 @@ extern bool cancle_send ;
 bool show_user_list_window = false;
 CBacnetTstatSchedule *BacnetTstatSchedule_Window = NULL;
 LONG n_tempBias;
-LONG DaylightBias = 0;
-int pc_time_to_basic_delt = 0; //用于时间转换 ，各个时区之间。
-int panel_time_to_basic_delt = 0; 
 #define TIMER_SYNC_TIMER    1
 #define TIMER_REFRESH_READ    2
 #define TIMER_IP_CHANGED_RECONNECT 3
@@ -154,56 +151,37 @@ void CBacnetSetting::OnBnClickedButtonBacTest()
 	temp_cs_show.Format(_T("Read time "));
 	Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
 
+	//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
+
+
 }
 
 
 void CBacnetSetting::Get_Time_Edit_By_Control()
 {
-    CString temp_task_info;
-    if (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub <= 469)
-    {
-        CTime temp_day;
-        m_cm5_date_picker.GetTime(temp_day);
+	CTime temp_day;
 
-        int temp_year = temp_day.GetYear();
-        if (temp_year > 2000)
-            temp_year = temp_year - 2000;
-        Device_time.old_time.year = temp_year;
-        Device_time.old_time.month = temp_day.GetMonth();
-        Device_time.old_time.dayofmonth = temp_day.GetDay();
-        Device_time.old_time.dayofweek = temp_day.GetDayOfWeek() - 1;
-        Device_time.old_time.dayofyear = 1;
+	m_cm5_date_picker.GetTime(temp_day);
+
+	int temp_year	= temp_day.GetYear();
+	if(temp_year > 2000)
+		temp_year = temp_year - 2000;
+	Device_time.year = temp_year;
+	Device_time.month = temp_day.GetMonth();
+	Device_time.dayofmonth = temp_day.GetDay();
+	Device_time.dayofweek = temp_day.GetDayOfWeek() -1;
+	Device_time.dayofyear = 1;
 
 
-        CTime temp_time;
-        m_cm5_time_picker.GetTime(temp_time);
-        Device_time.old_time.ti_hour = temp_time.GetHour();
-        Device_time.old_time.ti_min = temp_time.GetMinute();
-        Device_time.old_time.ti_sec = temp_time.GetSecond();
-
-        temp_task_info.Format(_T("Write Device Time.Changed to %02d-%02d %02d:%02d  "),
-            Device_time.old_time.month, Device_time.old_time.dayofmonth,
-            Device_time.old_time.ti_hour, Device_time.old_time.ti_min);
-    }
-    else
-    {
-        CTime temp_start_day;
-        CTime temp_start_time;
-        m_cm5_date_picker.GetTime(temp_start_day);
-        m_cm5_time_picker.GetTime(temp_start_time);
-        int start_year = temp_start_day.GetYear();
-        int start_month = temp_start_day.GetMonth();
-        int start_day = temp_start_day.GetDay();
-        int start_hour = temp_start_time.GetHour();
-        int start_minute = temp_start_time.GetMinute();
-        int start_sec = temp_start_time.GetSecond();
-        unsigned long  temp_time_long = time(NULL);
-        CTime temp_start(start_year, start_month, start_day, start_hour, start_minute, start_sec);
-       
-        Device_time.new_time.n_time = temp_time_long;
-        memset(Device_time.new_time.reserved, 0, 3);
-    }
-
+	CTime temp_time;
+	m_cm5_time_picker.GetTime(temp_time);
+	Device_time.ti_hour = temp_time.GetHour();
+	Device_time.ti_min = temp_time.GetMinute();
+	Device_time.ti_sec = temp_time.GetSecond();
+	CString temp_task_info;
+	temp_task_info.Format(_T("Write Device Time.Changed to %02d-%02d %02d:%02d  "),
+		Device_time.month,Device_time.dayofmonth,
+		Device_time.ti_hour,Device_time.ti_min);
 	Post_Write_Message(g_bac_instance,RESTARTMINI_COMMAND,0,0,sizeof(Time_block_mini),this->m_hWnd,temp_task_info);
 }
 
@@ -212,6 +190,7 @@ void CBacnetSetting::OnNMKillfocusDatePicker(NMHDR *pNMHDR, LRESULT *pResult)
 	
 
 	Get_Time_Edit_By_Control();
+	//GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(0);
 	*pResult = 0;
 }
 
@@ -220,6 +199,7 @@ void CBacnetSetting::OnNMKillfocusTimePicker(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	
 	Get_Time_Edit_By_Control();
+	//GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(0);
 	*pResult = 0;
 }
 
@@ -228,6 +208,8 @@ void CBacnetSetting::OnNMKillfocusTimePicker(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CBacnetSetting::OnNMSetfocusDatePicker(NMHDR *pNMHDR, LRESULT *pResult)
 {
+	
+	//GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(TRUE);
 	Get_Time_Edit_By_Control();
 	*pResult = 0;
 }
@@ -235,6 +217,8 @@ void CBacnetSetting::OnNMSetfocusDatePicker(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CBacnetSetting::OnNMSetfocusTimePicker(NMHDR *pNMHDR, LRESULT *pResult)
 {
+	
+	//GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(TRUE);
 	Get_Time_Edit_By_Control();
 	*pResult = 0;
 }
@@ -244,38 +228,7 @@ void CBacnetSetting::OnBnClickedBtnBacSYNCTime()
 	CTime	TimeTemp;
 	CTime temp_time;
 	int nyear,nmonth,nday,nhour,nmin,nsec;
-
-    unsigned long  temp_time_long = time(NULL);
-
-    time_t scale_time = temp_time_long;
-
-    if (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 469)
-    {
-        panel_time_to_basic_delt = Device_Basic_Setting.reg.time_zone * 360 / 10;
-        //因为本地CDateTimeCtrl 在设置时间的时候 会默认 加上 电脑的时区，但是显示的时候要显示 设备所选时区，所以 要 变换.
-        if (Device_Basic_Setting.reg.time_zone_summer_daytime == 0)
-            scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt;
-        else if (Device_Basic_Setting.reg.time_zone_summer_daytime == 1)
-            scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt + 3600; //如果选中夏令时 需要显示的时候加一个小时
-        else
-            scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt; // 其他值当作没有夏令时处理.
-
-        //如果本地是夏令时  要求传递给 设备的是 不带夏令时的时间.
-        //if (DaylightBias != 0)
-        //{
-        //    scale_time = scale_time - 3600;
-        //}
-
-    }
-
-    temp_time = scale_time;
-
-
-
-
-
-
-	//temp_time = CTime::GetCurrentTime();
+	temp_time = CTime::GetCurrentTime();
 	if(temp_time.GetYear()<2000)
 		nyear = temp_time.GetYear() + 2000;
 	else
@@ -293,8 +246,9 @@ void CBacnetSetting::OnBnClickedBtnBacSYNCTime()
 	//m_cm5_date_picker.SetFormat(_T("YY/MM/DD"));
 	m_cm5_date_picker.SetTime(&TimeTemp);
 
+	//GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(TRUE);
 	Get_Time_Edit_By_Control();
-    //Device_Basic_Setting.reg.time_zone = n_tempBias;
+    Device_Basic_Setting.reg.time_zone = n_tempBias;
     Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0);
 }
 
@@ -317,6 +271,8 @@ void CBacnetSetting::OnBnClickedBtnBacIPAuto()
 
 	CString temp_task_info;
     temp_task_info.Format(_T("IP address has been changed! \r\nRebooting now! Please wait."));
+	//Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
+
     if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
     {
         //更改失败恢复原状;
@@ -370,46 +326,12 @@ void CBacnetSetting::OnBnClickedBtnBacIPStatic()
 extern HTREEITEM  hTreeItem_retry ;
 void CBacnetSetting::OnBnClickedBtnBacIPChange()
 {
-#if 0
     unsigned short test_array[1000];
-    memset(test_array, 0, 2000);
-    int ntest_ret = GetPrivateBacnetToModbusData(95237, 0, 100, test_array);
+    int ntest_ret = GetPrivateBacnetToModbusData(g_bac_instance, 0, 100, test_array);
     Sleep(1000);
-    if (ntest_ret > 0)
-    {
-        CString total_char_test;
-        if ((debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA) || (debug_item_show == DEBUG_SHOW_ALL))
-        {
-            char * temp_print_test = NULL;
-            temp_print_test = (char *)&test_array;
-            for (int i = 0; i< ntest_ret; i++)
-            {
-                CString temp_char_test;
-                temp_char_test.Format(_T("%02x"), (unsigned char)*temp_print_test);
-                temp_char_test.MakeUpper();
-                temp_print_test++;
-                total_char_test = total_char_test + temp_char_test + _T(" ");
-            }
-            DFTrace(total_char_test);
-        }
-    }
-    else
-    {
-        DFTrace(_T("No replay"));
-    }
+    Sleep(2000);
 
     return;
-    //memset(test_array, 0, 2000);
-    //memcpy(test_array, "11223344556677889900AABBCC", 46);
-    //int ntest_ret =  WritePrivateBacnetToModbusData(g_bac_instance, 10000, 23, test_array);
-    //Sleep(2000);
-
-    //memset(test_array, 0, 2000);
-    //test_array[0] = 0x04;
-    //int ntest_ret = WritePrivateBacnetToModbusData(g_bac_instance, 205, 1, test_array);
-    //Sleep(2000);
-    //return;
-#endif
 	BYTE address1,address2,address3,address4;
 	BYTE subnet1, subnet2, subnet3, subnet4;
 	BYTE gatway1,gatway2,gatway3,gatway4;
@@ -607,18 +529,12 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 	memset(&lp_time_zone,0,sizeof(TIME_ZONE_INFORMATION));
 
 	::GetTimeZoneInformation(&lp_time_zone);
-     DaylightBias = lp_time_zone.DaylightBias;
-
-     //CString temp_1111111111;
-     //temp_1111111111.Format(_T("DaylightBias = %d"), DaylightBias);
-     //DFTrace(temp_1111111111);
 
 	 n_tempBias = 0 - lp_time_zone.Bias;
 	 n_tempBias = (n_tempBias*100)/60;
      CTime temp_time;
      temp_time = CTime::GetCurrentTime();
 	 
-     pc_time_to_basic_delt = n_tempBias * 360 / 10;
 
 
 	switch(command_type)
@@ -841,12 +757,10 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 			if(Device_Basic_Setting.reg.zegbee_exsit == 0x74)
 			{
 				((CButton *)GetDlgItem(IDC_BUTTON_BAC_SHOW_ZIGBEE))->EnableWindow(TRUE);
-                GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1)->EnableWindow(TRUE);
 			}
 			else
 			{
 				((CButton *)GetDlgItem(IDC_BUTTON_BAC_SHOW_ZIGBEE))->EnableWindow(FALSE);
-                GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1)->EnableWindow(FALSE);
 			}
 			
             if (Device_Basic_Setting.reg.LCD_Display == 0)
@@ -942,8 +856,8 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
                 }
                 else if (Device_Basic_Setting.reg.time_sync_auto_manual == 1)
                 {
-                    //GetDlgItem(IDC_DATE_PICKER)->EnableWindow(true);
-                    //GetDlgItem(IDC_TIME_PICKER)->EnableWindow(true);
+                    GetDlgItem(IDC_DATE_PICKER)->EnableWindow(true);
+                    GetDlgItem(IDC_TIME_PICKER)->EnableWindow(true);
                     GetDlgItem(IDC_BAC_SYNC_LOCAL_PC)->EnableWindow(true);
                     GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER)->EnableWindow(false);
                     GetDlgItem(IDC_BUTTON_SYNC_TIME)->EnableWindow(false);
@@ -1015,7 +929,10 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 			{
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->ResetContent();
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->AddString(Device_Serial_Port_Status[NOUSE]);
+				//((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->AddString(Device_Serial_Port_Status[MAIN_PTP]);
+				//((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->AddString(Device_Serial_Port_Status[MAIN_ZIG]);
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->AddString(Device_Serial_Port_Status[SUB_MODBUS]);
+				//((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->AddString(Device_Serial_Port_Status[SUB_GSM]);
 
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->ResetContent();
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->AddString(Device_Serial_Port_Status[NOUSE]);
@@ -1031,6 +948,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->AddString(Device_Serial_Port_Status[MSTP_MASTER]);
 
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->EnableWindow(TRUE);
+				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->EnableWindow(TRUE);
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->EnableWindow(TRUE);
 				if(Device_Basic_Setting.reg.com0_config < MAX_COM_TYPE)
 					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->SetWindowTextW(Device_Serial_Port_Status[Device_Basic_Setting.reg.com0_config]);
@@ -1214,55 +1132,23 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 		{
 
         //20180108 Fan判断 minipanel 的大体时间是否一致，不一致自动更改;
-        if (Device_Basic_Setting.reg.time_sync_auto_manual == 1)
+        if (Device_Basic_Setting.reg.flag_time_sync_pc == 1)
         {
-            if (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 469)
-            {
-                unsigned long  temp_time_long = time(NULL);
-                //if (abs(long(temp_time_long - Device_time.new_time.n_time)) > 600)
-                //    OnBnClickedBtnBacSYNCTime();
-            }
-            else
-            {
-                //OnBnClickedBtnBacSYNCTime();
-            }
-
+            OnBnClickedBtnBacSYNCTime();
         }
 
 
 			#pragma  region about_time
-
-        if (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub <= 469)
-        {
-            if (Device_time.old_time.year < 2000)
-                temp_year = Device_time.old_time.year + 2000;
-            if ((Device_time.old_time.month == 0) || (Device_time.old_time.dayofmonth == 0))
-                return 1;
-            TimeTemp = CTime(temp_year, Device_time.old_time.month, Device_time.old_time.dayofmonth, Device_time.old_time.ti_hour, Device_time.old_time.ti_min, Device_time.old_time.ti_sec);
-        }
-        else
-        {
-            unsigned long  temp_time_long123    = time(NULL);
-            unsigned long  temp_time_long = Device_time.new_time.n_time;
-
-
-            panel_time_to_basic_delt  = Device_Basic_Setting.reg.time_zone * 360 / 10;
-
-            //因为本地CDateTimeCtrl 在设置时间的时候 会默认 加上 电脑的时区，但是显示的时候要显示 设备所选时区，所以 要 变换.
-            time_t scale_time;
-            if(Device_Basic_Setting.reg.time_zone_summer_daytime == 0)
-                scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt;
-            else if(Device_Basic_Setting.reg.time_zone_summer_daytime == 1)
-                scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt + 3600; //如果选中夏令时 需要显示的时候加一个小时
-            else
-                scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt; // 其他值当作没有夏令时处理.
-            TimeTemp = scale_time;
-        }
-        //减去系统现在的时区 ，然后在加上 minipanel自己的时区.
+			if(Device_time.year<2000)
+				temp_year = Device_time.year + 2000;
+			if((Device_time.month == 0) || (Device_time.dayofmonth == 0))
+				return 1;
+			TimeTemp = CTime(temp_year,Device_time.month,Device_time.dayofmonth,Device_time.ti_hour,Device_time.ti_min,Device_time.ti_sec);
 
 
 			m_cm5_time_picker.SetFormat(_T("HH:mm"));
 			m_cm5_time_picker.SetTime(&TimeTemp);
+
 			//m_cm5_date_picker.SetFormat(_T("YY/MM/DD"));
 			m_cm5_date_picker.SetTime(&TimeTemp);
 			#pragma endregion about_time
@@ -1287,8 +1173,8 @@ BOOL CBacnetSetting::OnInitDialog()
 	SetWindowTextW(_T("Setting"));
 	m_setting_dlg_hwnd = this->m_hWnd;
 	g_hwnd_now = m_setting_dlg_hwnd;
-	m_cm5_date_picker.EnableWindow(0);
-	m_cm5_time_picker.EnableWindow(0);
+	m_cm5_date_picker.EnableWindow(1);
+	m_cm5_time_picker.EnableWindow(1);
 	GetDlgItem(IDC_BAC_SYNC_LOCAL_PC)->EnableWindow(1);
 	//GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(FALSE);
 	m_cm5_time_picker.SetFormat(_T("HH:mm"));
@@ -1361,10 +1247,11 @@ void CBacnetSetting::OnTimer(UINT_PTR nIDEvent)
 		{
 			   ::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_SETTING);
 			   KillTimer(TIMER_SYNC_TIMER);
-               //判断同步结果是否成功
-               if(Device_Basic_Setting.reg.sync_time_results != 1)
+
+			   if((Device_Basic_Setting.reg.time_update_since_1970 < 1420041600)  || (Device_Basic_Setting.reg.time_update_since_1970 > 1735660800))
 			   {
 				   MessageBox(_T("SYNC time failed , No Reply from server"));
+				   //SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("SYNC time failed , No Reply from server")); 
 			   }
 			   else
 			   {
@@ -1376,7 +1263,6 @@ void CBacnetSetting::OnTimer(UINT_PTR nIDEvent)
 				    SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("SYNC time sucess")); 
 					((CEdit *)GetDlgItem(IDC_EDIT_SETTING_LAST_UPDATE_TIME))->SetWindowTextW(strTime);
 			   }
-               ((CButton *)GetDlgItem(IDC_BUTTON_SYNC_TIME))->EnableWindow(TRUE);
 
 		}
 		break;
@@ -2036,8 +1922,7 @@ void CBacnetSetting::OnCbnSelchangeComboBacnetSettingTimeZone()
 	temp_task_info.Format(_T("Change Time Zone to "));
 	temp_task_info = temp_task_info + temp_string;
 	Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
-    Sleep(1000);
-    OnBnClickedButtonBacTest();
+
 }
 
 
@@ -2186,11 +2071,11 @@ void CBacnetSetting::OnBnClickedButtonSyncTime()
 	}
 	else
 	{
-		SetTimer(TIMER_SYNC_TIMER,4000,NULL);
+		SetTimer(TIMER_SYNC_TIMER,3000,NULL);
 		//SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Send SYNC time success!"));
 	}
 
-
+	((CButton *)GetDlgItem(IDC_BUTTON_SYNC_TIME))->EnableWindow(TRUE);
 	
 }
 
@@ -2213,8 +2098,6 @@ void CBacnetSetting::OnBnClickedCheckSettingZoneDaylightTime()
 
 	Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
 
-    Sleep(1000);
-    OnBnClickedButtonBacTest();
 }
 
 
@@ -2586,8 +2469,8 @@ void CBacnetSetting::OnBnClickedRadioSettingSyncPc()
     CString temp_task_info;
     temp_task_info.Format(_T(" Synchronize with Local PC "));
 
-    //GetDlgItem(IDC_DATE_PICKER)->EnableWindow(true);
-    //GetDlgItem(IDC_TIME_PICKER)->EnableWindow(true);
+    GetDlgItem(IDC_DATE_PICKER)->EnableWindow(true);
+    GetDlgItem(IDC_TIME_PICKER)->EnableWindow(true);
     GetDlgItem(IDC_BAC_SYNC_LOCAL_PC)->EnableWindow(true);
     GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER)->EnableWindow(false);
     GetDlgItem(IDC_BUTTON_SYNC_TIME)->EnableWindow(false);

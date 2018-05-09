@@ -6895,7 +6895,7 @@ int pointtotext(char *buf,Point_Net *point)
 
 	//if((point->panel == point->sub_panel) && (point->panel == Station_NUM))
 	//{
-	//	//不愿意 看到minipanel 显示为1-1-var10   如果panel是1的情况 直接显示var10 或者它的label;
+	//	//老毛不愿意 看到minipanel 显示为1-1-var10   如果panel是1的情况 直接显示var10 或者它的label;
 	//	strcat(buf,ptr_panel.info[point_type].name);//Fance
 	//	strcat(buf,itoa(num+1,x,10));
 	//	return 0;
@@ -6904,7 +6904,7 @@ int pointtotext(char *buf,Point_Net *point)
     if (((point->panel != 0) && (point->sub_panel == 0)) ||
         ((point->panel == point->sub_panel) && (point->panel == Station_NUM)))
     {
-        //不愿意 看到minipanel 显示为1-1-var10   如果panel是1的情况 直接显示var10 或者它的label;
+        //老毛不愿意 看到minipanel 显示为1-1-var10   如果panel是1的情况 直接显示var10 或者它的label;
         strcat(buf, itoa(point->panel, x, 10));
         strcat(buf, ptr_panel.info[point_type].name);//Fance
         if ((point_type == BAC_AV) ||

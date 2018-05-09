@@ -68,7 +68,7 @@ void CCO2_View::DoDataExchange(CDataExchange* pDX)
 {
 	CFormView::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_ID_CO2_EDIT, m_co2_idAdressEdit);
-	DDX_Control(pDX, IDC_CO2_BAUDRATECOMBO, m_co2_baudRateCombox);
+	DDX_Control(pDX, IDC_CO2_BRAUDRATECOMBO, m_co2_braudRateCombox);
 	DDX_Text(pDX, IDC_FIRMWARV_CO2_EDIT, m_co2_firmwareversion);
 	DDX_Text(pDX, IDC_HARDWAREV_CO2_EDIT, m_co2_hardwareversion);
 	DDX_Text(pDX, IDC_SERIALNUM_CO2_EDIT, m_co2_serialNumber);
@@ -142,7 +142,7 @@ BEGIN_MESSAGE_MAP(CCO2_View, CFormView)
 
     ON_WM_TIMER()
     ON_EN_KILLFOCUS(IDC_ID_CO2_EDIT, &CCO2_View::OnEnKillfocusIdCo2Edit)
-    ON_CBN_SELCHANGE(IDC_CO2_BAUDRATECOMBO, &CCO2_View::OnCbnSelchangeCo2Baudratecombo)
+    ON_CBN_SELCHANGE(IDC_CO2_BRAUDRATECOMBO, &CCO2_View::OnCbnSelchangeCo2Braudratecombo)
     ON_MESSAGE(WM_LIST_ITEM_CHANGED,Change_Item_List)
     ON_MESSAGE(WM_REFRESH_BAC_INPUT_LIST,Fresh_Lists)
     ON_NOTIFY(NM_CLICK, IDC_LIST_INPUT_AQ, &CCO2_View::OnNMClickList_Input)
@@ -294,9 +294,9 @@ void CCO2_View::SH_Window(){
     {
        GetDlgItem (IDC_PRODUCT_NAME)->SetWindowTextW(L"CO2");
         if(product_register_value[CO2_485_MODBUS_BAUDRATE]>=0&&product_register_value[CO2_485_MODBUS_BAUDRATE]<=1)
-            m_co2_baudRateCombox.SetCurSel(product_register_value[CO2_485_MODBUS_BAUDRATE]);
+            m_co2_braudRateCombox.SetCurSel(product_register_value[CO2_485_MODBUS_BAUDRATE]);
         else
-            m_co2_baudRateCombox.SetCurSel(0);
+            m_co2_braudRateCombox.SetCurSel(0);
 
         CString temp_firmversion;
         temp_firmversion.Format(_T("%0.2f"),((float)(product_register_value[CO2_485_MODBUS_VERSION_NUMBER_HI]*256+product_register_value[CO2_485_MODBUS_VERSION_NUMBER_LO]))/10.0);
@@ -310,7 +310,7 @@ void CCO2_View::SH_Window(){
         GetDlgItem(IDC_STATIC_PRE_ALARM_SETPOINT3)->ShowWindow(SW_HIDE);
 
 
-          GetDlgItem(IDC_CO2_BAUDRATECOMBO)->ShowWindow(SW_SHOW);
+          GetDlgItem(IDC_CO2_BRAUDRATECOMBO)->ShowWindow(SW_SHOW);
         GetDlgItem(IDC_STATIC_RELATIVE_HUMIDITY)->ShowWindow(SW_SHOW);
         GetDlgItem(IDC_EDIT_CO2_HUMIDITY)->ShowWindow(SW_SHOW);
         GetDlgItem(IDC_STATIC_PERCENT)->ShowWindow(SW_SHOW);
@@ -364,7 +364,7 @@ void CCO2_View::SH_Window(){
 //         GetDlgItem(IDC_TEMP_SENSOR)->ShowWindow(SW_HIDE);
 //         GetDlgItem(IDC_HUM_SENSOR)->ShowWindow(SW_HIDE);
 
-         GetDlgItem(IDC_STATIC_BAUDRATE)->ShowWindow(SW_SHOW);
+         GetDlgItem(IDC_STATIC_BRAUDRATE)->ShowWindow(SW_SHOW);
 
 
     }
@@ -378,14 +378,14 @@ void CCO2_View::SH_Window(){
           GetDlgItem(IDC_STATIC_PRE_ALARM_SETPOINT3)->ShowWindow(SW_HIDE);
 
           if(product_register_value[CO2_485_MODBUS_BAUDRATE]>=0&&product_register_value[CO2_485_MODBUS_BAUDRATE]<=1)
-              m_co2_baudRateCombox.SetCurSel(product_register_value[CO2_485_MODBUS_BAUDRATE]);
+              m_co2_braudRateCombox.SetCurSel(product_register_value[CO2_485_MODBUS_BAUDRATE]);
           else
-              m_co2_baudRateCombox.SetCurSel(0);
+              m_co2_braudRateCombox.SetCurSel(0);
 
         GetDlgItem(IDC_CO2_DATETIMEPICKER_TIME)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_CO2_DATETIMEPICKER1)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_BUTTON_CO2_SYNC_TIME)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_CO2_BAUDRATECOMBO)->ShowWindow(SW_SHOW);
+        GetDlgItem(IDC_CO2_BRAUDRATECOMBO)->ShowWindow(SW_SHOW);
 
         GetDlgItem(IDC_STATIC_INPUT_SETTING)->ShowWindow(SW_SHOW);
         GetDlgItem(IDC_LIST_INPUT_AQ)->ShowWindow(SW_SHOW);
@@ -433,7 +433,7 @@ void CCO2_View::SH_Window(){
 
         GetDlgItem(IDC_TEMP_SENSOR)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_HUM_SENSOR)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_STATIC_BAUDRATE)->ShowWindow(SW_SHOW);
+        GetDlgItem(IDC_STATIC_BRAUDRATE)->ShowWindow(SW_SHOW);
     }
     else
     {
@@ -447,9 +447,9 @@ void CCO2_View::SH_Window(){
         GetDlgItem(IDC_STATIC_PPM)->ShowWindow(SW_HIDE);
 
 
-		 GetDlgItem(IDC_STATIC_BAUDRATE)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_CO2_BAUDRATECOMBO)->ShowWindow(SW_SHOW);
-		m_co2_baudRateCombox.SetCurSel(product_register_value[15]);
+		 GetDlgItem(IDC_STATIC_BRAUDRATE)->ShowWindow(SW_SHOW);
+        GetDlgItem(IDC_CO2_BRAUDRATECOMBO)->ShowWindow(SW_SHOW);
+		m_co2_braudRateCombox.SetCurSel(product_register_value[15]);
 
 
         GetDlgItem(IDC_STATIC_PRE_ALARM_SETPOINT2)->ShowWindow(SW_HIDE);
@@ -2731,7 +2731,7 @@ void CCO2_View::OnEnKillfocusIdCo2Edit()
 }
 
 #include "MainFrm.h"
-void CCO2_View::OnCbnSelchangeCo2Baudratecombo()
+void CCO2_View::OnCbnSelchangeCo2Braudratecombo()
 {
     g_bPauseMultiRead = TRUE;
 	int temp_write_ret = 0;
@@ -2745,7 +2745,7 @@ void CCO2_View::OnCbnSelchangeCo2Baudratecombo()
 	{
 		RegAddress = 15;
 	}
-   temp_write_ret = write_one(g_tstat_id, RegAddress, m_co2_baudRateCombox.GetCurSel());
+   temp_write_ret = write_one(g_tstat_id, RegAddress, m_co2_braudRateCombox.GetCurSel());
    if(temp_write_ret < 0)	//��ʱ���ж������⣬�豸���Լ����в������ڻأ����»ز�����.
    {
 	   MessageBox(_T("Write timeout."));
@@ -2753,13 +2753,13 @@ void CCO2_View::OnCbnSelchangeCo2Baudratecombo()
    }
    else
    {
-	   SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Change baudrate success!"));
+	   SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Change braudrate success!"));
    }
    // MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
     /*else
-    product_register_value[CO2_485_MODBUS_BAUDRATE] = m_co2_baudRateCombox.GetCurSel();*/
+    product_register_value[CO2_485_MODBUS_BAUDRATE] = m_co2_braudRateCombox.GetCurSel();*/
     CString SqlText;
-    if (m_co2_baudRateCombox.GetCurSel()==0)
+    if (m_co2_braudRateCombox.GetCurSel()==0)
     {
         SqlText.Format(_T("update ALL_NODE set Bautrate = '9600' where Serial_ID='%d'"),get_serialnumber());
          Change_BaudRate(9600);

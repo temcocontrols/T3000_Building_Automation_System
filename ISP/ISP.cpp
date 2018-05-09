@@ -6,7 +6,7 @@
 #include "ISP.h"
 #include "ISPDlg.h"
 #include "Global_Struct.h"
-#include "global_function.h"
+#include "globle_function.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif

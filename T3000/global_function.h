@@ -1,5 +1,5 @@
-#ifndef _GLOBAL_FUNCTION_H
-#define _GLOBAL_FUNCTION_H
+#ifndef _GLOBLE_FUNCTION_H
+#define _GLOBLE_FUNCTION_H
 
 #pragma region For_Bacnet
 #include "CM5/ud_str.h"
@@ -116,7 +116,6 @@ int GetProgramData_Blocking(uint32_t deviceid,uint8_t start_instance,uint8_t end
 int GetPrivateData(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize);
 int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize, uint8_t retrytime = 10);
 int GetPrivateBacnetToModbusData(uint32_t deviceid, int16_t start_reg, int16_t readlength, unsigned short *data_out);//Bacnet 协议转换为 modbus 协议;
-int WritePrivateBacnetToModbusData(uint32_t deviceid, int16_t start_reg, uint16_t writelength, unsigned short *data_in);
 
 int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t nIndex,int8_t ntype_ad, uint32_t ntotal_seg, uint32_t nseg_index,MonitorUpdateData* up_data);
 int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char start_instance,unsigned char end_instance);
@@ -144,7 +143,7 @@ char * intervaltotextfull(char *textbuf, long seconds , unsigned minutes , unsig
 	 BACNET_ADDRESS * src,
 	 BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
   void local_rp_ack_print_data(	BACNET_READ_PROPERTY_DATA * data);
- bool Initial_bac(int comport = 0,CString bind_local_ip = _T(""),int n_baudrate = 19200);
+ bool Initial_bac(int comport = 0,CString bind_local_ip = _T(""));
   bool Open_bacnetSocket2(CString strIPAdress,unsigned short nPort,SOCKET &mysocket);
   unsigned char Str_to_Byte(CString need_conver);
   void Init_Service_Handlers(void);

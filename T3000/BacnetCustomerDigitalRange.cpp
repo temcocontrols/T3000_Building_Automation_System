@@ -276,7 +276,7 @@ void CBacnetCustomerDigitalRange::OnNMClickListCustomerDigitalRange(NMHDR *pNMHD
 	if(cmp_ret!=0)
 	{
 		m_customer_dig_range_list.SetItemBkColor(lRow,lCol,LIST_ITEM_CHANGED_BKCOLOR);
-		temp_task_info.Format(_T("Write Custom Digital Units Item%d .Changed to \"%s\" "),lRow + 1,New_CString);
+		temp_task_info.Format(_T("Write Customer Digital Units Item%d .Changed to \"%s\" "),lRow + 1,New_CString);
 		Post_Write_Message(g_bac_instance,WRITEUNIT_T3000,(int8_t)lRow,(int8_t)lRow,sizeof(Str_Units_element),m_customer_digital_range_dlg_hwnd,temp_task_info,lRow,lCol);
 	}
 
