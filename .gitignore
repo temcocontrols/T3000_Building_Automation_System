@@ -5,7 +5,7 @@
 
 /T3000 Output
 /T3000 Output_VS2015
-/.vs
+# /.vs  <Need .vs in the repo for changes to the Visual Studio project files. 
 **/Thumbs.db
 
 **/Debug/
