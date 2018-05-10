@@ -5,7 +5,7 @@
 
 /T3000 Output
 /T3000 Output_VS2015
-
+/.vs
 **/Thumbs.db
 
 **/Debug/
@@ -67,3 +67,7 @@
 Modbus Poll/Modbus PollDoc.cpp
 Modbus Poll/Modbus PollDoc.cpp
 Modbus Poll/Modbus PollView.cpp
+
+>>>Ultraedit User interface and cache
+**/*.pui
+**/*.cache
