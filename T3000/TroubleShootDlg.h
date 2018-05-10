@@ -26,6 +26,9 @@ public:
 
 
 	virtual BOOL OnInitDialog();
+	afx_msg void OnBnClickedOk();
+//	afx_msg void OnBnClickedButton1();
+ 
 	void SetNode(tree_product product_Node);
  
 	BOOL TestPing(const CString& strIP);
@@ -50,9 +53,6 @@ public:
 //	afx_msg void OnBnClickedButton4();
 
 	CStaticEx m_edit_newip;
-	BOOL  b_changeip_ok;
+	BOOL  is_ok;
 	afx_msg void OnPaint();
-    static DWORD WINAPI  thread_change_ip(LPVOID lpVoid);
-    afx_msg void OnBnClickedChangeIdOk();
-    afx_msg void OnTimer(UINT_PTR nIDEvent);
 };

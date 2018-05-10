@@ -385,7 +385,7 @@ enum {
 	MODBUS_HUM_PIC_UPDATE,			//
 	MODBUS_HUM_CAL_NUM,				//
 	MODBUS_HUM_CAL_EREASE,			//
-	MODBUS_HUM_CURRENT_DEFAULT,		// //decide which table will run, default tabel or custom table   current=1 default=0
+	MODBUS_HUM_CURRENT_DEFAULT,		// //decide which table will run, default tabel or customer table   current=1 default=0
 	MODBUS_HUM_PICDATAOK,	        // picdataok
 	MODBUS_HUM_OFFSETFLAG,				//380  slope 
 	MODBUS_HUMCOUNT1_H ,		    //381  sensor frequency	   //these parameters must be continued,it won't work  if have blank,don't know why

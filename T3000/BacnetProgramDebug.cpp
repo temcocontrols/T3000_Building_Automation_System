@@ -13,6 +13,7 @@ extern int initial_dialog;
 
 extern int pointtotext_for_controller(char *buf,Point_T3000 *point);
 extern char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network, byte panel, int *netpresent);
+// CBacnetProgramDebug dialog
 #define UPDATE_DEBUG_DATA_TIMER           3
 IMPLEMENT_DYNAMIC(CBacnetProgramDebug, CDialogEx)
 
@@ -360,6 +361,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 				m_program_debug_list.SetItemText(0,OUTPUT_HIGH_VOLTAGE,high_voltage);	
 
 
+				//这样加实在是情非得已，老毛非得加一堆条件，还要smart;
 				if((bacnet_device_type == BIG_MINIPANEL || bacnet_device_type == MINIPANELARM || bacnet_device_type == MINIPANELARM_TB || bacnet_device_type == MINIPANELARM_LB || bacnet_device_type == MINIPANELARM_LB || bacnet_device_type == MINIPANELARM_TB) || ((bacnet_device_type == SMALL_MINIPANEL)) || (bacnet_device_type == TINY_MINIPANEL) || (bacnet_device_type == TINY_EX_MINIPANEL))
 				{
 					if (bacnet_device_type == BIG_MINIPANEL || bacnet_device_type == MINIPANELARM)
@@ -1732,7 +1734,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 
 				//CString temp_cs = m_program_debug_list.GetItemText(Changed_Item,Changed_SubItem);
 				BacnetRange dlg;
-				//点击产品的时候 需要读custom units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
+				//点击产品的时候 需要读customer units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
 				if(!read_customer_unit)
 				{
 

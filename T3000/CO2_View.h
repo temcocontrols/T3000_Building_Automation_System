@@ -101,7 +101,7 @@ public:
 	void Show_Each_Edit_Time();
 	CComboBox m_co2_alarm_state;
 	CComboBox m_co2_temp_unit;
-	CComboBox m_co2_baudRateCombox;
+	CComboBox m_co2_braudRateCombox;
 	CComboBox m_sensor_sel;
 	CButton m_co2_alarm_mode_ctr;
 	BOOL m_alarm_ctrl_manual_auto;
@@ -350,7 +350,7 @@ public:
 	CEdit m_test_edit;
     int m_product_type; //1.CO2,2.Pressure sensor,3 CO2 Node
 	afx_msg void OnEnKillfocusIdCo2Edit();
-	afx_msg void OnCbnSelchangeCo2Baudratecombo();
+	afx_msg void OnCbnSelchangeCo2Braudratecombo();
     ListCtrlEx::CListCtrlEx m_input_list;
     ListCtrlEx::CListCtrlEx m_output_list;
     void Initial_InputList();

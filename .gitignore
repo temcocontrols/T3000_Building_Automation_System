@@ -5,11 +5,7 @@
 
 /T3000 Output
 /T3000 Output_VS2015
-
-# Visual Studio 2015 cache/options directory
-.vs/
-**/*.cache
-
+# /.vs  <Need .vs in the repo for changes to the Visual Studio project files. 
 **/Thumbs.db
 
 **/Debug/
@@ -68,4 +64,10 @@
 /Psychrometric Tool/T3000 Output_VS2015
 /Psychrometric Tool/WFA_psychometric_chart/packages
 >>>>>>> master
+Modbus Poll/Modbus PollDoc.cpp
+Modbus Poll/Modbus PollDoc.cpp
+Modbus Poll/Modbus PollView.cpp
+
+>>>Ultraedit User interface and cache
 **/*.pui
+**/*.cache

@@ -2,13 +2,6 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-struct baudrate_def
-{
-    int ncomport;
-    int baudrate;
-    int test_ret;
-};
-
 #include "define.h"
 OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length);
 OUTPUT int Read_One(TS_UC device_var,TS_US address);
@@ -96,5 +89,4 @@ OUTPUT int Modbus_Standard_Read(TS_UC device_var, TS_US *put_data_into_here,int 
 	unsigned char *put_revdata_into_here,
 	int* sendDataLength, int* recvDataLength);
 OUTPUT int SendData(TS_US *to_write,TS_US length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here,int* sendDataLength, int* recvDataLength,BOOL CHECK_CRC) ;
-OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret);
 #endif

@@ -8,7 +8,7 @@
 
 
 #include "global_variable_extern.h"
-#include "global_function.h"
+#include "globle_function.h"
 #include "ModbusDllForVC.h"
  
 

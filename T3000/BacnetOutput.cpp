@@ -562,6 +562,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		
 		m_output_list.SetItemText(i,OUTPUT_LOW_VOLTAGE,low_voltage);	
 		m_output_list.SetItemText(i,OUTPUT_HIGH_VOLTAGE,high_voltage);	
+		//这样加实在是情非得已，老毛非得加一堆条件，还要smart;
 		if(
 			(bacnet_device_type == BIG_MINIPANEL || bacnet_device_type == MINIPANELARM || bacnet_device_type == MINIPANELARM_LB || bacnet_device_type == MINIPANELARM_TB)
 			|| ((bacnet_device_type == SMALL_MINIPANEL)) || (bacnet_device_type == TINY_MINIPANEL) || (bacnet_device_type == TINY_EX_MINIPANEL) ||
@@ -1186,7 +1187,7 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 
 			//CString temp_cs = m_output_list.GetItemText(Changed_Item,Changed_SubItem);
 			BacnetRange dlg;
-			//点击产品的时候 需要读custom units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
+			//点击产品的时候 需要读customer units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
 			if(!read_customer_unit)
 			{
 

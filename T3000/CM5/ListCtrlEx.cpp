@@ -1022,7 +1022,7 @@ int CListCtrlEx::GetColumnFmt(int nCol)
 	return LVCFMT_CENTER;
 }
 //////////////////////////////////////////////////////////////////////////
-// custom draw
+// customer draw
 //Add color , item subitem by Fance Du.
 void CListCtrlEx::OnNMCustomdraw(NMHDR *pNMHDR, LRESULT *pResult)
 {

@@ -414,6 +414,9 @@
     <ClCompile Include="TempHumSensorForm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="NewHumChamberView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="DllFunction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -670,6 +673,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="global_function.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="T3ControllerProgram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GroupScheduleDlg.cpp">

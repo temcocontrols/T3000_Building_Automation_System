@@ -1,0 +1,127 @@
+  _NUM_POLLYESNO, _T("Poll Y/N"), 230, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	_NUM_NAME, _T("Bacnet Object Name"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	_NUM_FUNCTION, _T("Modbus Variable Type"), 230, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+    _NUM_MODBUSADDRESS, _T("Modbus Address"), 180, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
+    _NUM_LENGTH, _T("Length"), 120, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	_NUM_VALUE, _T("Value"), 90, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	_NUM_DATAFORMAT, _T("Data Format"), 90, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	_NUM_BIT, _T("Bit #"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	_NUM_Low_Actual, _T("Low Actual"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	_NUM_High_Actual, _T("High Actual"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	_NUM_Low_Scale, _T("Low Scale"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	_NUM_High_Scale, _T("High Scale"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	_NUM_RW, _T("R/W"), 90, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	_NUM_DEFAULT, _T("Default"), 90, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	_NUM_Bacnet_Type, _T("Bacnet Type"), 120, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	_NUM_Bacnet_Object_Description, _T("Bacnet Object Description"), 200, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	_NUM_COV_Increment, _T("COV Increment"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	_NUM_Unit_Group, _T("Unit Group"), 100, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	_NUM_Unit_Value, _T("Unit Value"), 100, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	_NUM_Grouping_Y_N, _T("Grouping YES / NO"), 200, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	_NUM_Update_On_Reconnect, _T("Update On Reconnect"), 200, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	_NUM_Modbus_DESCRIPTION, _T("Register Description"), 200, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	 
+        int ModelNo;
+	CString  Poll_YES_NO;
+	CString Bacnet_Object_Name;//CString  Bacnet_Object_Name;
+	int function_code;
+        int Reg_ID;
+	int  Counts_Number;
+	CString Value;
+	CString DataFormat;
+	CString  Bit_1;
+	CString  Low_Actual;
+	CString  High_Actual;
+	CString  Low_Scale;
+	CString  High_Scale;
+	CString  Read_Only_Or_RW;
+	CString  Bacnet_Type;
+	CString  Bacnet_Object_Description;
+	CString  COV_Increment;
+	CString  Unit_Group;
+	CString  Unit_Value;
+	CString  Grouping_YES_NO;
+	CString   Update_On_Reconnect;
+	CString Default;
+	CString  Reg_Description;
+	CString SN;
+
+
+
+CREATE TABLE `CustomProductTable` (
+	`RecNo`	INTEGER,
+	`ModelNo`	INTEGER,
+	`Poll_YES_NO`	TEXT,
+	`Bacnet_Object_Name`	CHAR,
+	`Reg_ID`	INTEGER,
+	` Reg_Description`	TEXT,
+	`Function_Code`	INTEGER,
+	`Counts_Number`	INTEGER,
+	`DataFormat`	TEXT,
+	`SN`	TEXT,
+	`Default1`	TEXT,
+	`Bit_1`	TEXT,
+	`Low_Actual`	TEXT,
+	`High_Actual`	TEXT,
+	`Low_Scale`	TEXT,
+	`High_Scale`	TEXT,
+	`Read_Only_Or_RW`	TEXT,
+	`Bacnet_Type`	TEXT,
+	`Bacnet_Object_Description`	TEXT,
+	`COV_Increment`	TEXT,
+	`Unit_Group`	TEXT,
+	`Unit_Value`	TEXT,
+	`Grouping_YES_NO`	TEXT,
+	`Update_On_Reconnect`	TEXT
+);
+#define _NUM_ITEM 0
+#define _NUM_POLLYESNO 1
+#define _NUM_NAME 2
+#define _NUM_FUNCTION 3
+#define _NUM_MODBUSADDRESS 4
+#define _NUM_LENGTH 5
+#define _NUM_VALUE 6
+#define _NUM_DATAFORMAT 7
+#define _NUM_BIT 8
+#define _NUM_Low_Actual 9
+#define _NUM_High_Actual 10
+#define _NUM_Low_Scale 11
+#define _NUM_High_Scale 12
+#define _NUM_RW 13
+#define _NUM_DEFAULT 14
+#define _NUM_Bacnet_Type 15
+#define _NUM_Bacnet_Object_Description 16
+#define _NUM_COV_Increment 17
+#define _NUM_Unit_Group 18
+#define _NUM_Unit_Value 19
+#define _NUM_Grouping_Y_N 20
+#define _NUM_Update_On_Reconnect 21
+#define _NUM_Modbus_DESCRIPTION 22
+
+
+CREATE TABLE `CustomProductTable` (
+	`RecNo`	INTEGER,
+	`ModelNo`	INTEGER,
+	`Poll_YES_NO`	TEXT,
+	`Bacnet_Object_Name`	CHAR,
+	`Reg_ID`	INTEGER,
+	`Reg_Description`	TEXT,
+	`Function_Code`	INTEGER,
+	`Counts_Number`	INTEGER,
+	`DataFormat`	TEXT,
+	`SN`	TEXT,
+	`Default1`	TEXT,
+	`Bit_1`	TEXT,
+	`Low_Actual`	TEXT,
+	`High_Actual`	TEXT,
+	`Low_Scale`	TEXT,
+	`High_Scale`	TEXT,
+	`Read_Only_Or_RW`	TEXT,
+	`Bacnet_Type`	TEXT,
+	`Bacnet_Object_Description`	TEXT,
+	`COV_Increment`	TEXT,
+	`Unit_Group`	TEXT,
+	`Unit_Value`	TEXT,
+	`Grouping_YES_NO`	TEXT,
+	`Update_On_Reconnect`	TEXT
+);

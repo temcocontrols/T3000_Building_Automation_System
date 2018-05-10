@@ -720,6 +720,118 @@ void CGridLoad::OnBnClickedAllcheck()
 	}
 }
 
+//void CGridLoad::OnCbnSelchangeSublist()
+//{
+//	return;
+//
+//	const CString strSERIALNO= _T("Serial#");
+//	const CString strMBID = _T("ID");
+//	const CString strBAUDRATE = _T("Baudrate");
+//	const CString strHWVERSION= _T("Hardware version");
+//	const CString strSWVERSION= _T("Software version");
+//	const CString strDEVICETYPE= _T("Device");
+//	const CString strFILENAME = _T("Configure File");
+//	const CString strENABLE = _T("Enable");
+//	const CString strSTATUS= _T("Status");
+//	const CString strCONNECTION= _T("Connetion");
+//	const CString stLOADEVENT= _T("Load Event");
+//
+//	int nRows=m_FlexGrid.get_Rows();
+//	for(int i=0;i<nRows;i++)
+//	{
+//		for(int k=0;k<11;k++)
+//		{
+//		//	m_FlexGrid.
+//		}
+//	}
+//	m_grid_load.clear();
+//	m_FlexGrid.Clear();
+//
+//
+//	int nSelect=m_SubListCtrl.GetCurSel();
+//	if(nSelect<0)
+//		return;
+//	CString strCurSubNet;
+//	CString strMainBuilding;
+//	m_SubListCtrl.GetLBText(nSelect,strCurSubNet);
+//	if(strCurSubNet.IsEmpty())
+//		return;
+//	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+//	strMainBuilding=pFrame->m_strCurMainBuildingName;
+//	if(strMainBuilding.IsEmpty())
+//		return;
+//	CString str_temp;
+//	CBADO bado;
+//	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+//	bado.OnInitADOConn(); 
+//
+//	str_temp.Format(_T("select * from ALL_NODE where MainBuilding_Name = '%s' and Building_Name = '%s'"),strMainBuilding,strCurSubNet);
+//	//pRs->Open(str_temp.GetString(),_variant_t((IDispatch *)pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+//	bado.m_pRecordset=bado.OpenRecordset(str_temp);
+//	if(bado.m_pRecordset!=NULL||bado.m_pRecordset->GetRecordCount()<=0)
+//	{
+//// 		if(pRs->State) 
+//// 			pRs->Close(); 
+//// 		if(pCon->State)
+//// 			pCon->Close(); 
+//    bado.CloseRecordset();
+//	bado.CloseConn();  
+//		return;
+//	}
+//	_variant_t temp_variant;
+//	CString strTemp;
+//
+//	while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+//	{
+//		GRID_LOAD temp_grid_flash;
+//		temp_variant=bado.m_pRecordset->GetCollect("Serial_ID");//
+//		if(temp_variant.vt!=VT_NULL)
+//			strTemp=temp_variant;
+//		else
+//			strTemp=_T("");
+//		temp_grid_flash.serialnumber=_wtoi(strTemp);
+//
+//		temp_variant=bado.m_pRecordset->GetCollect("Product_ID");//
+//		if(temp_variant.vt!=VT_NULL)
+//			strTemp=temp_variant;
+//		else
+//			strTemp=_T("");
+//		temp_grid_flash.ID=_wtoi(strTemp);
+//
+//		temp_variant=bado.m_pRecordset->GetCollect(_T("Bautrate"));//
+//		if(temp_variant.vt!=VT_NULL)
+//			strTemp=temp_variant;
+//		else
+//			strTemp=_T("");
+//		temp_grid_flash.baudrate=_wtoi(strTemp);
+//		
+//		temp_variant=bado.m_pRecordset->GetCollect(_T("Hardware_Ver"));//
+//		if(temp_variant.vt!=VT_NULL)
+//			strTemp=temp_variant;
+//		else
+//			strTemp=_T("");
+//		temp_grid_flash.hardware_revisin=(short)_wtof(strTemp);
+//
+//		temp_variant=bado.m_pRecordset->GetCollect(_T("Software_Ver"));//
+//		if(temp_variant.vt!=VT_NULL)
+//			strTemp=temp_variant;
+//		else
+//			strTemp=_T("");
+//		temp_grid_flash.software_version=(short)_wtof(strTemp);
+//
+//		temp_variant=bado.m_pRecordset->GetCollect(_T("EPsize"));//
+//		if(temp_variant.vt!=VT_NULL)
+//			strTemp=temp_variant;
+//		else
+//			strTemp=_T("");
+//		temp_grid_flash.EpSize=_wtoi(strTemp);
+//
+//		m_grid_load.push_back(temp_grid_flash);
+//		bado.m_pRecordset->MoveNext();
+//	}
+//	bado.CloseRecordset();
+//	bado.CloseConn();  
+//}
 BEGIN_EVENTSINK_MAP(CGridLoad, CDialog)
 	ON_EVENT(CGridLoad, IDC_MSFLEXGRID1, DISPID_CLICK, CGridLoad::ClickMsflexgrid1, VTS_NONE)
 END_EVENTSINK_MAP()

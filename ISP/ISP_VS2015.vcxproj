@@ -145,7 +145,7 @@
     <ClCompile Include="ConfigFileHandler.cpp" />
     <ClCompile Include="FlashBase.cpp" />
     <ClCompile Include="FlashSN.cpp" />
-    <ClCompile Include="global_function.cpp" />
+    <ClCompile Include="globle_function.cpp" />
     <ClCompile Include="Hex386Writer.cpp" />
     <ClCompile Include="HexFileParser.cpp" />
     <ClCompile Include="ISP.cpp">
@@ -175,7 +175,7 @@
     <ClInclude Include="FlashBase.h" />
     <ClInclude Include="FlashSN.h" />
     <ClInclude Include="Global_Struct.h" />
-    <ClInclude Include="global_function.h" />
+    <ClInclude Include="globle_function.h" />
     <ClInclude Include="Hex386Writer.h" />
     <ClInclude Include="HexFileParser.h" />
     <ClInclude Include="ISP.h" />

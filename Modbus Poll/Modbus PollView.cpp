@@ -115,8 +115,8 @@ CModbusPollView::CModbusPollView()
 CModbusPollView::~CModbusPollView()
 {
 	 
-    //2018 04 17 dufan  如果是成功的连接过 打开MB POLL 通过配置文件读取 modbus id ， 关闭时 恢复默认255.
-    WritePrivateProfileStringW(_T("MBPOLL_Setting"), _T("Modbus ID"), _T("255"), g_configfile_path);
+
+
 // 	if(m_MultiRead_handle != NULL)
 // 		TerminateThread(m_MultiRead_handle, 0);
 // 	m_MultiRead_handle=NULL;
@@ -560,6 +560,7 @@ void CModbusPollView::Fresh_Data(){
 	    m_MsDataGrid.SetColumnCount(m_grid_cols);
 		m_MsDataGrid.SetFixedRowCount(1);
 		m_MsDataGrid.SetFixedColumnCount(1);
+   
 	}
 	CATCH (CMemoryException, e)
 	{
