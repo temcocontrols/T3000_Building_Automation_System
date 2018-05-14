@@ -6,7 +6,7 @@
 #include "afxdialogex.h"
 
  
-#include "globle_function.h"
+#include "global_function.h"
  
 #include "ModbusDllForVC.h"
 

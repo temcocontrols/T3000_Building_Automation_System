@@ -6,7 +6,7 @@
 #include "WriteMultiRegistersDlg.h"
 #include "afxdialogex.h"
 #include "EnterValueDlg.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "Enter_Value_BinaryDlg.h"
 #include "ModbusDllForVC.h"
 // CWriteMultiRegistersDlg dialog

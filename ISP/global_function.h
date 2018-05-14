@@ -1,5 +1,5 @@
-#ifndef GLOBLE_FUNCTION_H
-#define GLOBLE_FUNCTION_H
+#ifndef GLOBAL_FUNCTION_H
+#define GLOBAL_FUNCTION_H
 #include "stdafx.h"
 #include "Global_Struct.h"
 

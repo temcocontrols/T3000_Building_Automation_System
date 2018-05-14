@@ -10,7 +10,7 @@
 #include "Modbus PollDoc.h"
 
 #include "global_variable_extern.h"
-#include "globle_Function.h"
+#include "global_Function.h"
 #include "ModbusDllforVC.h"
 #include "global_struct.h"
 #include "AutoRichEditCtrl.h"
@@ -64,11 +64,11 @@ private:
 public:
   CAutoRichEditCtrl m_Tx_Rx;
 	afx_msg void OnSize(UINT nType, int cx, int cy);
-	//自定义函数
+	//Custom functions
 public:
    void Fresh_View();
    void Fresh_Data();
-   //给出下标，返回数据字串
+   //Give subscript, return data string
    CString Get_Data(int index);
    CString Get_Data_No_Address(int index);
 

@@ -1164,7 +1164,8 @@ enum
 	SCAN_STATUS_RUNNING,
 	SCAN_STATUS_FINISHED,
 	SCAN_STATUS_FAILED,
-	SCAN_STATUS_SKIP
+	SCAN_STATUS_SKIP,
+    SCAN_STATUS_DETECTING
 };
 
 typedef struct
@@ -1816,7 +1817,7 @@ typedef struct
 const int day_of_month[] =
 {
 	31,
-	29,
+	28,
 	31,
 	30,
 	31,

@@ -51,6 +51,12 @@ using namespace std;  // Ensure that the namespace is set to std
 // 传递给 COleObjectFactory 构造函数之外，此宏与 IMPLEMENT_OLECREATE 相同。
 // 对于自动化控制器所请求的每一个自动化代理对象,
 // 需要分别启动一个该应用程序的实例。
+// TBD: Clarify this machine trnaslation 
+// In addition to the bMultiInstance Parameters of TRUE 
+// Passed to COleObjectFactory Constructor，This macro and IMPLEMENT_OLECREATE are the same
+// For each Automation agent object requested by the automation controller,
+// You need to start an instance of the application separately.
+
 #ifndef IMPLEMENT_OLECREATE2
 #define IMPLEMENT_OLECREATE2(class_name, external_name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) \
 	AFX_DATADEF COleObjectFactory class_name::factory(class_name::guid, \
