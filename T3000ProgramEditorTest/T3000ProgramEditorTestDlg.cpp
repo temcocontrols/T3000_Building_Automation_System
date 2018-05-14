@@ -64,6 +64,7 @@ BEGIN_MESSAGE_MAP(CT3000ProgramEditorTestDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDOK, &CT3000ProgramEditorTestDlg::OnBnClickedOk)
 END_MESSAGE_MAP()
 
 
@@ -152,3 +153,10 @@ HCURSOR CT3000ProgramEditorTestDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void CT3000ProgramEditorTestDlg::OnBnClickedOk()
+{
+	// TODO: Add your control notification handler code here
+	CDialogEx::OnOK();
+}
