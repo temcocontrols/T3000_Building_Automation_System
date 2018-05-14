@@ -785,7 +785,7 @@ OUTPUT bool Open_Socket2(CString strIPAdress,short nPort)
     setsockopt(m_hSocket,SOL_SOCKET,SO_RCVTIMEO,(char *)&nNetTimeout,sizeof(int));
 
     //****************************************************************************
-    // Fance added ,不要用阻塞的模式，如果设备不在线 经常性的 要等10几秒 ，老毛受不了。
+    // Fance added ,不要用阻塞的模式，如果设备不在线 经常性的 要等10几秒 
     //改为非阻塞的 2.5秒后还没连接上就 算连接失败;
     int error = -1;
     int len;
@@ -897,7 +897,7 @@ OUTPUT bool Open_Socket2_multy_thread(CString strIPAdress, short nPort,int ninde
     setsockopt(m_hSocket, SOL_SOCKET, SO_RCVTIMEO, (char *)&nNetTimeout, sizeof(int));
 
     //****************************************************************************
-    // Fance added ,不要用阻塞的模式，如果设备不在线 经常性的 要等10几秒 ，老毛受不了。
+    // Fance added ,不要用阻塞的模式，如果设备不在线 经常性的 要等10几秒
     //改为非阻塞的 2.5秒后还没连接上就 算连接失败;
     int error = -1;
     int len;
@@ -5002,13 +5002,15 @@ OUTPUT bool open_com_nocretical(int m_com)
         strCom = _T("\\\\.\\COM")+strCom;
     }
 
-    m_hSerial = CreateFile( strCom, //strCom,//串口句柄，打开串口
-                            GENERIC_READ | GENERIC_WRITE,
-                            0,
-                            NULL,
-                            OPEN_EXISTING,
-                            FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,是另外的形式，表示的是异步通信，能同时读写;0为同步读写
-                            NULL);
+     m_hSerial = CreateFile(strCom, //strCom,//串口句柄，打开串口
+         GENERIC_READ | GENERIC_WRITE,
+         0,
+         NULL,
+         OPEN_EXISTING,
+         FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,是另外的形式，表示的是异步通信，能同时读写;0为同步读写
+         NULL);
+
+
     m_com_h_serial[m_com] = m_hSerial;
 
     if(m_hSerial == INVALID_HANDLE_VALUE)
@@ -5049,13 +5051,12 @@ OUTPUT bool open_com_nocretical(int m_com)
     CommTimeouts.WriteTotalTimeoutMultiplier = 20;
     CommTimeouts.WriteTotalTimeoutConstant = 200;
 
-#if 0 //lsc 
-    CommTimeouts.ReadIntervalTimeout = 1000;
-    CommTimeouts.ReadTotalTimeoutMultiplier = 1000;
-    CommTimeouts.ReadTotalTimeoutConstant = 1000;
-    CommTimeouts.WriteTotalTimeoutMultiplier = 1000;
-    CommTimeouts.WriteTotalTimeoutConstant = 1000;
-#endif
+//测试
+    //CommTimeouts.ReadIntervalTimeout = 0;
+    //CommTimeouts.ReadTotalTimeoutMultiplier = 0;
+    //CommTimeouts.ReadTotalTimeoutConstant = 0;
+    //CommTimeouts.WriteTotalTimeoutMultiplier = 20;
+    //CommTimeouts.WriteTotalTimeoutConstant = 200;
 
 
     if (!SetCommTimeouts(m_hSerial, &CommTimeouts))
@@ -9473,5 +9474,287 @@ OUTPUT bool Open_Socket_For_All(CString strIPAdress, short nPort)
     last_connected_port = nPort;
     return TRUE;
 }
+
+
+//校验总线上的数据,是否有bacnet 的55  FF 的 数据
+int check_bacnet_data(unsigned char * buffer, int nlength)
+{
+    if (nlength <= 2)
+        return -1;
+    unsigned char * nlast_point = buffer + nlength - 1;
+    unsigned char * npoint = buffer;
+    int no_token_count = 0; //连续多个字节没有搜到0x55的个数 
+    int token_count = 0;
+    while ((npoint - buffer) < (nlength - 1))
+    {
+        if (no_token_count > 100)
+        {
+            return -2; //总线无bacnet 55  ff 数据
+        }
+        if (*npoint != 0x55)
+        {
+            no_token_count++;
+            npoint++;
+            continue;
+        }
+
+        if (*(npoint + 1) != 0xff)
+        {
+            no_token_count++;
+            npoint++;
+            continue;
+        }
+        npoint++;
+        token_count++;
+        if(token_count >= 3)  //一帧数据出现 55 FF 的个数达到3个就判定为有 bacnet mstp存在
+           return 1;
+    }
+}
+
+
+
+
+/* Test_Comport return
+    1  发现两个周期的 55 FF 存在
+    0  代表总线无数据
+    -1 有数据 但长度不足 8个字节
+    -2 监视很50个token 以上 但没有发现 55 FF
+    -3 检查完长度超过最后得 都没有发现 55 FF
+*/
+OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
+{
+    if (open_com_nocretical(comport) == false)
+        return -1;
+
+    bool found_bacnet_data = false;
+    int n_no_data_online_count = 0;
+    for (int i = 0; i < sizeof(ArrayBaudate) / sizeof(ArrayBaudate[0]); i++)
+    {
+        ntest_ret[i].ncomport = comport;
+        ntest_ret[i].baudrate = ArrayBaudate[i];
+        ntest_ret[i].test_ret = 0;
+        if (found_bacnet_data)
+        {
+            ntest_ret[i].test_ret = -2;
+            continue;
+        }
+        //Speed up scan , if no data online ,check 2 times ,then stop.
+        if (n_no_data_online_count >= 2)
+        {
+            ntest_ret[i].test_ret = 0;
+            continue;
+        }
+        Change_BaudRate_NoCretical(ArrayBaudate[i], comport);
+
+        unsigned char test_data[400];
+        memset(test_data, 0, 400);
+        //read_multi2_nocretical(255, test_data, 2000, 100, 0, comport);
+
+        HANDLE m_hSerial = NULL;
+        m_hSerial = m_com_h_serial[comport];
+        //device_var is the Tstat ID
+        //the return value == -1 ,no connecting
+
+        TS_C to_send_data[600] = { '\0' };
+        HCURSOR hc;//load mouse cursor
+        hc = LoadCursor(NULL, IDC_WAIT);
+        hc = SetCursor(hc);
+        //to_send_data is the array that you want to put data into
+        //length is the number of register,that you want to read
+        //start_address is the start register
+        TS_UC data_to_send[8] = { '\0' }; //the array to used in writefile()
+        data_to_send[0] = 255;//slave address
+        data_to_send[1] = 3;//function multiple
+        data_to_send[2] = 2000 >> 8 & 0xff;//starting address hi
+        data_to_send[3] = 2000 & 0xff;//starting address lo
+        data_to_send[4] = 100 >> 8 & 0xff;//quantity of registers hi
+        data_to_send[5] = 100 & 0xff;//quantity of registers lo
+        TS_US crc = CRC16(data_to_send, 6);
+        data_to_send[6] = (crc >> 8) & 0xff +20;
+        data_to_send[7] = crc & 0xff + 20;
+
+        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        if (m_hSerial == NULL)
+        {
+            return -1;
+        }
+        ////////////////////////////////////////////////clear com error
+        COMSTAT ComStat;
+        DWORD dwErrorFlags;
+
+        ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
+        PurgeComm(m_hSerial, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);//clear read buffer && write buffer
+                                                                                            ////////////////////////////////////////////////////////////overlapped declare
+        CString nSection;
+        nSection.Format(_T("MulTestBacnetWrite_%d"), comport);
+
+        memset(&m_osMulWrite, 0, sizeof(OVERLAPPED));
+        if ((m_osMulWrite.hEvent = CreateEvent(NULL, true, false, nSection)) == NULL)
+            return -2;
+        m_osMulWrite.Offset = 0;
+        m_osMulWrite.OffsetHigh = 0;
+        ///////////////////////////////////////////////////////send the to read message
+        int fState = WriteFile(m_hSerial,// 句柄
+            data_to_send,// 数据缓冲区地址
+            8,// 数据大小
+            &m_had_send_data_number,// 返回发送出去的字节数
+            &m_osMulWrite);
+        if (!fState)// 不支持重叠
+        {
+            if (GetLastError() == ERROR_IO_PENDING)
+            {
+                //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
+                GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+            }
+            else
+                m_had_send_data_number = 0;
+        }
+        ///////////////////////////up is write
+        /////////////**************down is read
+
+        Sleep(LATENCY_TIME_COM);
+        CString nReadSection;
+        nReadSection.Format(_T("MulTestBacnetRead_%d_%d"), comport, ntest_ret[i].baudrate);
+        ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
+        memset(&m_osRead, 0, sizeof(OVERLAPPED));
+        if ((m_osRead.hEvent = CreateEvent(NULL, true, false, nReadSection)) == NULL)
+            return -2;
+        m_osRead.Offset = 0;
+        m_osRead.OffsetHigh = 0;
+        ////////////////////////////////////////////////clear com error
+        fState = ReadFile(m_hSerial,// 句柄
+            to_send_data,// 数据缓冲区地址
+            100 * 2 + 5,// 数据大小
+            &m_had_send_data_number,// 返回发送出去的字节数
+            &m_osRead);
+        if (!fState)// 不支持重叠
+        {
+            if (GetLastError() == ERROR_IO_PENDING)
+            {
+                //WaitForSingleObject(m_osRead.hEvent,INFINITE);
+                GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+            }
+            else
+                m_had_send_data_number = 0;
+        }
+        ///////////////////////////////////////////////////////////
+        //if (to_send_data[0] != device_var || to_send_data[1] != 3 || to_send_data[2] != length * 2)
+        //    return -2;
+        //crc = CRC16(to_send_data, length * 2 + 3);
+        //if (to_send_data[length * 2 + 3] != ((crc >> 8) & 0xff))
+        //    return -2;
+        //if (to_send_data[length * 2 + 4] != (crc & 0xff))
+        //    return -2;
+        memcpy(test_data, to_send_data, 200);
+        //for (int i = 0; i<200; i++)
+        //    test_data[i] = to_send_data[3 + 2 * i] * 256 + to_send_data[4 + 2 * i];
+
+
+
+        if (m_had_send_data_number > 0)
+        {
+            n_no_data_online_count = 0;
+            ntest_ret[i].test_ret = check_bacnet_data((unsigned char *)test_data, m_had_send_data_number);
+            if (ntest_ret[i].test_ret != 1)
+                continue;
+            found_bacnet_data = true;
+        }
+        else
+        {
+            n_no_data_online_count++;
+            ntest_ret[i].test_ret = 0;
+            continue;
+        }
+
+    }
+#if 0
+    HANDLE m_hSerial = NULL;
+    m_hSerial = m_com_h_serial[comport];
+
+    COMSTAT  stat;
+    DWORD error;
+
+    bool found_bacnet_data = false;
+    for (int i = 0; i < sizeof(ArrayBaudate) / sizeof(ArrayBaudate[0]); i++)
+    {
+        ntest_ret[i].baudrate = ArrayBaudate[i];
+        ntest_ret[i].test_ret = 0;
+        if (found_bacnet_data)
+        {
+            ntest_ret[i].test_ret = -2;
+            continue;
+        }
+        Change_BaudRate_NoCretical(ArrayBaudate[i], comport);
+
+
+        char buf[1024];
+        memset(buf, 0, 1024);
+        int buf_len = 1024;
+        unsigned long r_len = 0;
+        buf[0] = '\0';
+
+
+        for (int j = 0;j < 30;j++)
+        {
+            Sleep(100);
+            if (ClearCommError(m_hSerial, &error, &stat) && error > 0)    //清除错误
+            {
+                PurgeComm(m_hSerial, PURGE_RXABORT | PURGE_RXCLEAR); /*清除输入缓冲区*/
+                continue;
+            }
+
+            if (!stat.cbInQue)// 缓冲区无数据
+                continue;
+
+            buf_len = min((int)(buf_len - 1), (int)stat.cbInQue);
+
+            memset(&m_osRead, 0, sizeof(OVERLAPPED));
+            CString nSection;
+            nSection.Format(_T("ReadTestCom_%d"), comport);
+
+            if ((m_osRead.hEvent = CreateEvent(NULL, true, false, nSection)) == NULL)
+                continue;
+            m_osRead.Offset = 0;
+            m_osRead.OffsetHigh = 0;
+
+
+            if (!ReadFile(m_hSerial, buf, buf_len, &r_len, &m_osRead)) //2000 下 ReadFile 始终返回 True
+            {
+                if (GetLastError() == ERROR_IO_PENDING) // 结束异步I/O
+                {
+                    if (!GetOverlappedResult(m_hSerial, &m_osRead, &r_len, false))
+                    {
+                        if (GetLastError() != ERROR_IO_INCOMPLETE)//其他错误
+                            r_len = 0;
+                    }
+                }
+                else
+                    r_len = 0;
+            }
+            if (r_len < 20)
+                continue;
+            buf[r_len] = '\0';
+            break;
+        }
+
+        if (r_len > 0)
+        {
+            ntest_ret[i].test_ret = check_bacnet_data((unsigned char *)buf, buf_len);
+            if (ntest_ret[i].test_ret != 1)
+                continue;
+            found_bacnet_data = true;
+
+        }
+
+    }
+#endif
+    
+
+
+    close_com_nocritical(comport);
+    return 1;
+
+}
+
 
 

@@ -364,9 +364,8 @@ BOOL CBacnetGraphic::OnInitDialog()
 	InitDC();
 
 	test_hwnd = this->m_hWnd;
-	//Init_14_Static();
 
-	
+
 	CRect Graphic_Window_Rect;
 	GetWindowRect(Graphic_Window_Rect);
 	window_width = Graphic_Window_Rect.right - Graphic_Window_Rect.left;

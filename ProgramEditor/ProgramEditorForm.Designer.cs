@@ -1,6 +1,6 @@
 ﻿namespace T3000.Forms
 {
-    partial class ProgramEditorForm:
+    partial class ProgramEditorForm
     {
         /// <summary>
         /// Required designer variable.

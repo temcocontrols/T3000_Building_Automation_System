@@ -125,6 +125,15 @@ int     MONTHCAL_CalculateDayOfWeek(SYSTEMTIME *date, BOOL inplace);
 int     MONTHCAL_MonthLength(int month, int year);
 void    MONTHCAL_GetMonth(SYSTEMTIME *date, INT months);
 
+void     MONTHCAL_GetSel_Month_Day(int * nmonth, int* nday);
+
+void CMultipleMonthCalCtrl::MONTHCAL_GetSelDay_Month(int * nmonth, int* nday)
+{
+    MONTHCAL_GetSel_Month_Day(nmonth, nday);
+
+}
+
+
 int     getDifference(const SYSTEMTIME & start, const SYSTEMTIME & end)
 {
 	return ((int)(end.wYear * 12) + end.wMonth) - ((int)(start.wYear * 12) + start.wMonth);

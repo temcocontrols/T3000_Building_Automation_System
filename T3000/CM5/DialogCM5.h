@@ -2,7 +2,7 @@
 #include "afxwin.h"
 
 #include "../msflexgrid1.h"
-#include "../globle_function.h"
+#include "../global_function.h"
 #include "../Weekly_Routines.h"
 #include "../Annual_Routines.h"
 #include "../Config_Routines.h"

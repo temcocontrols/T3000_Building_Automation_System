@@ -227,7 +227,8 @@ void AnnualRout_InsertDia::load()
 {
 
 	set_day_state(TO_CLEAR_MONTH_CTRL);//clear month ctrl	
-	if (m_offline)
+
+    if (m_offline)
 	{
 		for (int i=0;i<ONE_YEAR_BETYS;i++)
 		{
@@ -244,61 +245,52 @@ void AnnualRout_InsertDia::load()
 		else if (product_register_value[7] == PM_TSTAT8 || (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
 		{
 
-			Read_Multi(g_tstat_id, the_days, 918, ONE_YEAR_BETYS);
+			Read_Multi(g_tstat_id, the_days, 925, ONE_YEAR_BETYS);
 		}
 		else
 			Read_Multi(g_tstat_id, the_days, MODBUS_AR_TIME_FIRST + ONE_YEAR_BETYS*(m_addr - 1), ONE_YEAR_BETYS);//get from network
 		int i = 0, j = 0;
 		for (i = 0; i < ONE_YEAR_BETYS; i++)
 		{
+            memcpy(&pDayState[0], &the_days[0], 4);
+            //pDayState[month - 1] = the_days[i];
 			if (the_days[i] != 0xFF)
 				break;
 		}
-		  
-		if ((product_register_value[7] != PM_TSTAT8) || (nFlag != PM_TSTAT8_WIFI) || (nFlag != PM_TSTAT8_OCC) || (nFlag != PM_TSTAT7_ARM) || (nFlag != PM_TSTAT8_220V))
-		{
-			if (i == ONE_YEAR_BETYS)
-			{
-				unsigned char temp_uc[ONE_YEAR_BETYS];
-				for (i = 0; i < ONE_YEAR_BETYS; i++)
-				{
-					the_days[i] = 0;
-					temp_uc[i] = 0;
+        unsigned char the_char_days[ONE_YEAR_BETYS];
 
+        for (int i = 0; i < ONE_YEAR_BETYS; i++)
+        {
+            the_char_days[i] = the_days[i];
+        }
 
-				}
-				if (m_strtype.CompareNoCase(_T("Lightingcontroller")) == 0)
-					Write_Multi(g_tstat_id, temp_uc, 5752 + ONE_YEAR_BETYS*(m_addr - 1), ONE_YEAR_BETYS);
-				else
-					Write_Multi(g_tstat_id, temp_uc, MODBUS_AR_TIME_FIRST + ONE_YEAR_BETYS*(m_addr - 1), ONE_YEAR_BETYS);
-			}
-		}
-		else
-		{
-			if (i == ONE_YEAR_BETYS)
-			{
-				for (i = 0; i < ONE_YEAR_BETYS; i++)
-				{
+        for (int i = 0;i<12;i++)
+        {
+            if (i == 0)
+            {
+                memcpy_s(&pDayState[i], 4, &the_char_days[i * 4], 4);
+            }
+            else
+            {
+                long long temp_data = 0;
+                int start_byte = 0;
+                int move_bit = 0;
+                start_byte = day_in_this_year[i] / 8;// = 3  //day_in_this_year[i]/8
+                move_bit = day_in_this_year[i] % 8;// = 7  day_in_this_year[i]%8
 
-					write_one(g_tstat_id, 918 + i, 0);
+                memcpy_s(&temp_data, 5, &the_char_days[start_byte], 5);
+                temp_data = temp_data >> move_bit;
+                temp_data = temp_data % (0x0100000000);
 
-				}
-			}
-		}
+                DWORD temp_dw;
+                temp_dw = (DWORD)temp_data;
+                memcpy_s(&pDayState[i], 4, &temp_dw, 4);
+
+            }
+
+        }
+        m_month_ctrl.SetDayState(12, pDayState);
 	}
-	
-
- 
-	
-	if(is_leap==true)
-	{   //366 days
-		leap_year();
-	}
-	else
-	{//365 days
-		no_leap_year();
-	}
-	//SetPaneString(RIGHT_BUTTON_MENU_MESSAGE);
 }
 
 BOOL AnnualRout_InsertDia::OnInitDialog()
@@ -789,6 +781,13 @@ void AnnualRout_InsertDia::OnAnnualroutClear()
 			ttt[i]=0;
 		if(m_strtype.CompareNoCase(_T("Lightingcontroller")) == 0)
 			Write_Multi(g_tstat_id,ttt,5752 + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);
+        else if (m_strtype.CompareNoCase(_T("Tstat8")) == 0)
+        {
+            for (int i = 0; i < ONE_YEAR_BETYS; i++)
+            {
+                write_one(g_tstat_id, 925 + i, 0);
+            }
+        }
 		else
 			Write_Multi(g_tstat_id,ttt,MODBUS_AR_TIME_FIRST + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);
 		NET_WORK_SLEEP_BETWEEN_WRITE_READ
@@ -925,13 +924,23 @@ void AnnualRout_InsertDia::OnMcnSelectBacMonthcalendar(NMHDR *pNMHDR, LRESULT *p
 	
 	//Get last selected item
 	LPSELECTION_ITEM current = pSelChange->selectionInfo.first;
+    if (current == NULL)
+    {
+        return;
+    }
 	while(current->next)
 	{
 		current = current->next;
 	}
 
-	int Clicked_month = current->date.wMonth;
-	int Clicked_day = current->date.wDay;
+    int Clicked_month = current->date.wMonth;
+    int Clicked_day = current->date.wDay;
+
+    m_month_ctrl.MONTHCAL_GetSelDay_Month(&Clicked_month, &Clicked_day);
+
+
+
+    
 	if (m_offline)
 	{
 		CString str;
@@ -956,18 +965,51 @@ void AnnualRout_InsertDia::OnMcnSelectBacMonthcalendar(NMHDR *pNMHDR, LRESULT *p
 		int nFlag = product_register_value[7];
 		if (g_protocol != PROTOCOL_BACNET_IP)
 		{
-			CString str;
-			str.Format(_T("%d-%d"), Clicked_month, Clicked_day);
-			int day_number = the_day_number(str);
-			int l = 1, m;
-			int address_offset = day_number / 8;
-			m = day_number % 8;//bit day
-			for (int j = 0; j < m; j++)
-				l *= 2;
-			the_days[day_number / 8] = the_days[day_number / 8] ^ l;//Òì»ò¡£
+			//CString str;
+			//str.Format(_T("%d-%d"), Clicked_month, Clicked_day);
+			//int day_number = the_day_number(str);
+			//int l = 1, m;
+			//int address_offset = day_number / 8;
+			//m = day_number % 8;//bit day
+			//for (int j = 0; j < m; j++)
+			//	l *= 2;
+			//the_days[day_number / 8] = the_days[day_number / 8] ^ l;//Òì»ò¡£
+
+#if 1
+            int day_in_year = day_in_this_year[Clicked_month - 1] + Clicked_day;
+            int charactor_control = (day_in_year - 1) / 8;
+            int control_bit = (day_in_year - 1) % 8;
+            if (((pDayState[Clicked_month - 1] >> Clicked_day - 1) & 0x00000001) == 1)
+            {
+                pDayState[Clicked_month - 1] &= ~(1 << Clicked_day - 1);   // 4th day
+                the_days[charactor_control] &= ~(1 << control_bit);
+            }
+            else
+            {
+                pDayState[Clicked_month - 1] |= 1 << Clicked_day - 1;   // 4th day
+                the_days[charactor_control] |= 1 << control_bit;
+            }
+#endif
+
+
 			if ((product_register_value[7] == PM_TSTAT8) || (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
 			{
-				int ret = write_one(g_tstat_id, 918 + address_offset, the_days[address_offset]);
+                //int address_offset = 0;
+                //unsigned short nvalue = 0;
+                //address_offset = charactor_control / 2;
+                //if (charactor_control % 2 == 0)
+                //    nvalue = the_days[charactor_control] + the_days[charactor_control + 1] * 256;
+                //else
+                //    nvalue = +the_days[charactor_control - 1] + the_days[charactor_control] * 256;
+				int ret = write_one(g_tstat_id, 925 + charactor_control, the_days[charactor_control]);
+
+                //static int test_int_abc = 0;
+                //test_int_abc++;
+                //CString temp_cs1;
+                //temp_cs1.Format(_T("Trace select event %d  %d  Month:%d  Day:%d reg:%d  value:%d\r\n"), test_int_abc, the_days[charactor_control], Clicked_month, Clicked_day, 925 + charactor_control, the_days[charactor_control]);
+                //DFTrace(temp_cs1);
+
+                Sleep(1);
 			}
 			else
 			{
@@ -982,7 +1024,7 @@ void AnnualRout_InsertDia::OnMcnSelectBacMonthcalendar(NMHDR *pNMHDR, LRESULT *p
 
 
 			NET_WORK_SLEEP_BETWEEN_WRITE_READ
-		    load();
+//		    load();
 		}
 		else
 		{

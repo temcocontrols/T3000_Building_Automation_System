@@ -187,7 +187,7 @@
     <ClInclude Include="gloab_define.h" />
     <ClInclude Include="global_struct.h" />
     <ClInclude Include="global_variable.h" />
-    <ClInclude Include="globle_Function.h" />
+    <ClInclude Include="global_Function.h" />
     <ClInclude Include="global_variable_extern.h" />
     <ClInclude Include="GridCtrl_src\CellRange.h" />
     <ClInclude Include="GridCtrl_src\GridCell.h" />
@@ -261,7 +261,7 @@
     <ClCompile Include="EnumSerial.cpp" />
     <ClCompile Include="excel9.cpp" />
     <ClCompile Include="FileView.cpp" />
-    <ClCompile Include="globle_function.cpp" />
+    <ClCompile Include="global_function.cpp" />
     <ClCompile Include="GridCtrl_src\GridCell.cpp" />
     <ClCompile Include="GridCtrl_src\GridCellBase.cpp" />
     <ClCompile Include="GridCtrl_src\GridCtrl.cpp" />

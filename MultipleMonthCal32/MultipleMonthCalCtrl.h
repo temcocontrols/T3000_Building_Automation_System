@@ -28,7 +28,7 @@ public:
 	void	SelectDate(const SYSTEMTIME & date);
 	void	SelectDates(const std::vector<SYSTEMTIME> & dates);
 	void	UnselectAll();
-
+    void    MONTHCAL_GetSelDay_Month(int * nmonth, int* nday);
 	BOOL	SetDayState(int count, MONTHDAYSTATE * states);
 
 protected:
