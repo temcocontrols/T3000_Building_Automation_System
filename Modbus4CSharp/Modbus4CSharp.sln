@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerminalModbus4CSharp", "Terminal\TerminalModbus4CSharp.csproj", "{C2A49FBA-4203-46B8-BEF9-2B0AB39559E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modbus4CSharpLib", "Core\Modbus4CSharpLib.csproj", "{D23147B2-B88F-47BA-98A4-8F2E8C492522}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C2A49FBA-4203-46B8-BEF9-2B0AB39559E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2A49FBA-4203-46B8-BEF9-2B0AB39559E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2A49FBA-4203-46B8-BEF9-2B0AB39559E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2A49FBA-4203-46B8-BEF9-2B0AB39559E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D23147B2-B88F-47BA-98A4-8F2E8C492522}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D23147B2-B88F-47BA-98A4-8F2E8C492522}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D23147B2-B88F-47BA-98A4-8F2E8C492522}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D23147B2-B88F-47BA-98A4-8F2E8C492522}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
