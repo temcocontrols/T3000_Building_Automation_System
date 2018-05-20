@@ -10,8 +10,9 @@
     using System.Drawing;
     using System.ComponentModel;
     using PRGReaderLibrary;
-
-  
+    using System.Runtime.InteropServices;
+    [Guid("C5B9E15C-F44C-465F-BA06-D35F248D7D8D")]
+    [ClassInterface(ClassInterfaceType.None)]
 
     public partial class ProgramEditorForm : Form
     {
@@ -386,6 +387,13 @@
                 SettingsBag.Left = editTextBox.Width - SettingsBag.Width;
             }
         }
+
+        [ComRegisterFunction()]
+        public static void RegisterClass(Type type) => ComUtilities.RegisterControlClass(type);
+
+        [ComUnregisterFunction()]
+        public static void UnregisterClass(Type type) => ComUtilities.UnregisterControlClass(type);
+
     }
 
 

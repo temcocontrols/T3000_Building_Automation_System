@@ -3846,7 +3846,7 @@ void CTStatScanner::Initial_Scan_Info()
     else
     {
         temp_scan_info.scan_skip = true;
-        temp_scan_info.scan_status = SCAN_STATUS_SKIP;
+        temp_scan_info.scan_status = SCAN_STATUS_WAIT;
         temp_scan_info.scan_baudrate = 38400;
     }
 
@@ -4692,7 +4692,23 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
         {
             pScan->m_eScanBacnetIpEnd->SetEvent();
         }
+<<<<<<< HEAD
         //is_in_scan_mode = false;
+=======
+        //m_scan_info.at(scan_bacnet_ip_item).scan_status = SCAN_STATUS_FINISHED;
+        //pScan->m_bStopScan = TRUE;
+
+        temphandle = Get_RS485_Handle();
+        if (temphandle != NULL)
+        {
+            TerminateThread((HANDLE)Get_Thread1(), 0);
+            TerminateThread((HANDLE)Get_Thread2(), 0);
+
+            CloseHandle(temphandle);
+            Set_RS485_Handle(NULL);
+        }
+        m_scan_info.at(scan_bacnet_ip_item).scan_status = SCAN_STATUS_FINISHED;
+>>>>>>> 16f951e4dc1ccd60c5ad13a7476e318c452b6160
         return 1;
     }
 
@@ -4904,6 +4920,11 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
  
 
 end_mstp_thread:
+<<<<<<< HEAD
+=======
+    m_scan_info.at(scan_bacnet_ip_item).scan_status = SCAN_STATUS_FINISHED;
+    HANDLE temphandle;
+>>>>>>> 16f951e4dc1ccd60c5ad13a7476e318c452b6160
     if (pScan->m_eScanBacnetIpEnd->m_hObject)
     {
         pScan->m_eScanBacnetIpEnd->SetEvent();

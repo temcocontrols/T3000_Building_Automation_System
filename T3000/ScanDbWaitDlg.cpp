@@ -389,10 +389,9 @@ void CScanDbWaitDlg::Initial_List()
 
 	scan_mode = _T(" ");
 	m_scan_com_list.InsertItem(ncount*NUMBER_BAUDRATE + 1,scan_mode);
-	//m_scan_com_list.SetItemText(i*2,SCAN_BAUDRATE,_T("9600"));
-	//m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 1,SCAN_SKIP,_T(" "));
-	m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 1,SCAN_STATUS,_T(" "));
-	m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 1,SCAN_FOUND,_T(" "));
+    m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 1, SCAN_MODE, _T("Bacnet     MSTP"));
+	m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 1,SCAN_STATUS, _T("Wait"));
+	m_scan_com_list.SetItemText(ncount*NUMBER_BAUDRATE + 1,SCAN_FOUND, _T("0"));
 	if(b_remote_connection)
 	{
 		scan_mode = _T("Remote IP Device");

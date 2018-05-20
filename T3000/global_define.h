@@ -1816,7 +1816,7 @@ typedef struct
 const int day_of_month[] =
 {
 	31,
-	29,
+	28,
 	31,
 	30,
 	31,

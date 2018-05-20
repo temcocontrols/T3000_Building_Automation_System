@@ -115,7 +115,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam, LPARAM lParam)
     {
 
         CString retmessage;
-        retmessage.Format(_T("Connect to server failed!Please try again!"));
+        retmessage.Format(_T("Connection to server failed! Please try again!"));
         m_download_info.InsertString(m_download_info.GetCount(), retmessage);
         m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
         TCP_File_Socket.Close();
@@ -1009,9 +1009,10 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
     else
     {
         download_ret = URLDownloadToFile(NULL, T3000FtpPath, DesDownloadFilePath, 0, &cbc); // 根据配置文档配置好的路径去下载.下载到指定目录，并记录目录位置;
+        																																										//Download path according to the configuration file and record the directory location;
         if (download_ret == S_FALSE)
         {
-            CS_Info.Format(_T("Download failded!"));
+            CS_Info.Format(_T("Download failed!"));
             pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
             pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
             goto ftp_download_end;

@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <RegisterForComInterop>true</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,22 +33,23 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="FastColoredTextBox">
-      <HintPath>Windows\FastColoredTextBox.dll</HintPath>
+      <HintPath>DLL\FastColoredTextBox.dll</HintPath>
     </Reference>
-    <Reference Include="Irony, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ca48ace7223ead47, processorArchitecture=MSIL">
-      <HintPath>Windows\Irony.dll</HintPath>
+    <Reference Include="Irony">
+      <HintPath>DLL\Irony.dll</HintPath>
     </Reference>
     <Reference Include="PRGReaderLibrary">
-      <HintPath>Windows\PRGReaderLibrary.dll</HintPath>
+      <HintPath>DLL\PRGReaderLibrary.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="T3000Grammar">
-      <HintPath>Windows\T3000Grammar.dll</HintPath>
+      <HintPath>DLL\T3000Grammar.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComUtilities.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="ProgramEditorForm.cs">
       <SubType>Form</SubType>
