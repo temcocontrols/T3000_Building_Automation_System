@@ -81,12 +81,18 @@ void CShowMessageDlg::SetProgressAutoClose( int mi_seconds,int time_count, int n
 
 }
 
+
 void CShowMessageDlg::SetHwnd(HWND h_hwnd ,int nMessage)
 {
     m_message_hwnd = h_hwnd;
     m_message = nMessage;
 }
 
+// MSTP 用于确认 whois 是否有回复;
+void CShowMessageDlg::SetMstpDeviceInfo(_Bac_Scan_Com_Info deviceinfo)
+{
+    m_mstp_device_info = deviceinfo;
+}
 
 
 BOOL CShowMessageDlg::OnInitDialog()
@@ -193,6 +199,28 @@ DWORD WINAPI CShowMessageDlg::ShowMessageThread(LPVOID lPvoid)
                 hShowMessageHandle = NULL;
                 return true;
             }
+        }
+        else if (mparent->mevent == EVENT_MSTP_CONNECTION_ESTABLISH)
+        {
+            Send_WhoIs_Global(-1, -1);
+            for (int i = 0; i<100; i++)
+            {
+                mparent->m_pos = i;
+                Sleep(1000);
+
+                for (int j = 0; j < m_bac_scan_com_data.size(); j++)
+                {
+                    if ((mparent->m_mstp_device_info.device_id == m_bac_scan_com_data.at(j).device_id) &&
+                        (mparent->m_mstp_device_info.macaddress == m_bac_scan_com_data.at(j).macaddress))
+                    {
+                        ::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
+                        hShowMessageHandle = NULL;
+                        return true;
+                    }
+                }
+
+            }
+            ::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
         }
 
     hShowMessageHandle = NULL;

@@ -69,8 +69,8 @@ static uint16_t Treply_timeout = 260;
 /* node must wait for a remote node to begin using a token or replying to */
 /* a Poll For Master frame: 20 milliseconds. (Implementations may use */
 /* larger values for this timeout, not to exceed 100 milliseconds.) */
-//static uint8_t Tusage_timeout = 50;
-static uint8_t Tusage_timeout = 20;//Fance default is 50
+static uint8_t Tusage_timeout = 95/*50*/;
+
 /* Timer that indicates line silence - and functions */
 static uint32_t Timer_Silence(
     void *pArg)
@@ -139,8 +139,6 @@ uint16_t dlmstp_receive(
     /* see if there is a packet available, and a place
        to put the reply (if necessary) and process it */
     wait_status = WaitForSingleObject(Receive_Packet_Flag, timeout);
-
-	
     if (wait_status == WAIT_OBJECT_0) {
         if (Receive_Packet.ready) {
             if (Receive_Packet.pdu_len) {
@@ -168,19 +166,14 @@ static void dlmstp_receive_fsm_task(
     bool received_frame;
 
     (void) pArg;
-    //(void) SetThreadPriority(GetCurrentThread(),
-    //    THREAD_PRIORITY_TIME_CRITICAL);	//ԭʼ
-	(void) SetThreadPriority(GetCurrentThread(),
-		THREAD_PRIORITY_NORMAL);
-	
+    (void) SetThreadPriority(GetCurrentThread(),
+        THREAD_PRIORITY_TIME_CRITICAL);
     for (;;) {
         /* only do receive state machine while we don't have a frame */
         if ((MSTP_Port.ReceivedValidFrame == false) &&
             (MSTP_Port.ReceivedInvalidFrame == false)) {
             do {
-
-                RS485_Check_UART_Data(&MSTP_Port);//接收RS485总线的数据
-
+                RS485_Check_UART_Data(&MSTP_Port);
                 MSTP_Receive_Frame_FSM(&MSTP_Port);
                 received_frame = MSTP_Port.ReceivedValidFrame ||
                     MSTP_Port.ReceivedInvalidFrame;
@@ -199,23 +192,18 @@ static void dlmstp_master_fsm_task(
     DWORD dwMilliseconds = 0;
 
     (void) pArg;
-    //(void) SetThreadPriority(GetCurrentThread(),
-    //    THREAD_PRIORITY_TIME_CRITICAL); //ԭʼ
-	(void) SetThreadPriority(GetCurrentThread(),
-		THREAD_PRIORITY_NORMAL);
+    (void) SetThreadPriority(GetCurrentThread(),
+        THREAD_PRIORITY_TIME_CRITICAL);
     for (;;) {
         switch (MSTP_Port.master_state) {
             case MSTP_MASTER_STATE_IDLE:
                 dwMilliseconds = Tno_token;
-				//dwMilliseconds =0;
                 break;
             case MSTP_MASTER_STATE_WAIT_FOR_REPLY:
                 dwMilliseconds = Treply_timeout;
                 break;
             case MSTP_MASTER_STATE_POLL_FOR_MASTER:
                 dwMilliseconds = Tusage_timeout;
-				//dwMilliseconds = 5;//Fance
-
                 break;
             default:
                 dwMilliseconds = 0;
@@ -291,10 +279,10 @@ uint16_t MSTP_Get_Send(
         return 0;
     }
     /* load destination MAC address */
-    if (Transmit_Packet.address.mac_len == 1) {
+    if (Transmit_Packet.address.mac_len) {
         destination = Transmit_Packet.address.mac[0];
     } else {
-        return 0;
+        destination = MSTP_BROADCAST_ADDRESS;
     }
     if ((MAX_HEADER + Transmit_Packet.pdu_len) > MAX_MPDU) {
         return 0;
@@ -413,9 +401,13 @@ static bool dlmstp_compare_data_expecting_reply(
     if (request.npdu_data.protocol_version != reply.npdu_data.protocol_version) {
         return false;
     }
+#if 0
+    /* the NDPU priority doesn't get passed through the stack, and
+       all outgoing messages have NORMAL priority */
     if (request.npdu_data.priority != reply.npdu_data.priority) {
         return false;
     }
+#endif
     if (!bacnet_address_same(&request.address, &reply.address)) {
         return false;
     }
@@ -668,12 +660,12 @@ bool dlmstp_init(
         (unsigned) MSTP_Port.Nmax_info_frames);
 #endif
     //hThread1 = _beginthread(dlmstp_receive_fsm_task, 4096, &arg_value);
-	  hThread1 = _beginthread(dlmstp_receive_fsm_task, 0, &arg_value);
+	  hThread1 = _beginthread(dlmstp_receive_fsm_task, 4096, &arg_value);
     if (hThread1 == 0) {
         fprintf(stderr, "Failed to start recive FSM task\n");
     }
     //hThread2 = _beginthread(dlmstp_master_fsm_task, 4096, &arg_value);
-	  hThread2 = _beginthread(dlmstp_master_fsm_task, 0, &arg_value);
+	  hThread2 = _beginthread(dlmstp_master_fsm_task, 4096, &arg_value);
     if (hThread2 == 0) {
         fprintf(stderr, "Failed to start Master Node FSM task\n");
     }

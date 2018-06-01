@@ -9577,6 +9577,7 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
         DWORD m_had_send_data_number;//已经发送的数据的字节数
         if (m_hSerial == NULL)
         {
+            continue;
             return -1;
         }
         ////////////////////////////////////////////////clear com error
@@ -9591,7 +9592,10 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
 
         memset(&m_osMulWrite, 0, sizeof(OVERLAPPED));
         if ((m_osMulWrite.hEvent = CreateEvent(NULL, true, false, nSection)) == NULL)
-            return -2;
+        {
+            continue;
+            //return -2;
+        }
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0;
         ///////////////////////////////////////////////////////send the to read message
@@ -9613,13 +9617,16 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
         ///////////////////////////up is write
         /////////////**************down is read
 
-        Sleep(LATENCY_TIME_COM);
+        Sleep(LATENCY_TIME_COM*10);
         CString nReadSection;
         nReadSection.Format(_T("MulTestBacnetRead_%d_%d"), comport, ntest_ret[i].baudrate);
         ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
         if ((m_osRead.hEvent = CreateEvent(NULL, true, false, nReadSection)) == NULL)
-            return -2;
+        {
+            continue;
+            //return -2;
+        }
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0;
         ////////////////////////////////////////////////clear com error

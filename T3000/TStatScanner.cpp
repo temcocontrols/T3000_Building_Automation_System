@@ -33,10 +33,13 @@ int scan_baudrate =0;
 vector <refresh_net_device> m_tstat_net_device_data;
 int reply_count = 0;
 
-HANDLE * hScanComData = NULL; //ÓÃÓÚ´®¿Ú¶àÏß³ÌÍ¬Ê±É¨Ãè
-DWORD * nScanThreadID = NULL; //ÓÃÓÚ´®¿Ú¶àÏß³ÌÍ¬Ê±É¨Ãè
+vector <baudrate_def> m_com_mstp_detect;
+HANDLE hdetect_mstp_thread = NULL;
 
-HANDLE * hScanTCPData = NULL; //ÓÃÓÚÍøÂç¶àÍøÂçÍ¬Ê±É¨Ãè
+HANDLE * hScanComData = NULL; //ç”¨äºä¸²å£å¤šçº¿ç¨‹åŒæ—¶æ‰«æ
+DWORD * nScanThreadID = NULL; //ç”¨äºä¸²å£å¤šçº¿ç¨‹åŒæ—¶æ‰«æ
+
+HANDLE * hScanTCPData = NULL; //ç”¨äºç½‘ç»œå¤šç½‘ç»œåŒæ—¶æ‰«æ
 DWORD * nScanTCPThreadID = NULL;
 
 const int TCP_COMM_PORT = 6001;
@@ -71,7 +74,7 @@ UINT SCAN_TCP_TO485_THREAD(LPVOID pParam);
 UINT _ScanTstatThread2(LPVOID pParam);
 //UINT _WaitScanThread(LPVOID pParam);
 DWORD WINAPI  _WaitScanThread(LPVOID lpVoid);
-
+DWORD WINAPI  Detect_Mstp_thread(LPVOID lpVoid);
 UINT _ScanOldNC(LPVOID pParam);
 void Show_Scan_Data(LPCTSTR nstrInfo ,unsigned int nitem);
 CTStatScanner::CTStatScanner(void)
@@ -156,6 +159,12 @@ CTStatScanner::~CTStatScanner(void)
 		m_eScanComEnd = NULL;
 		TerminateThread(m_pScanTstatThread,0);m_pScanTstatThread=NULL;
         //m_eScanNetEnd = NULL;
+    }
+
+    if (hdetect_mstp_thread != NULL)
+    {
+        TerminateThread(hdetect_mstp_thread, 0);
+        hdetect_mstp_thread = NULL;
     }
 
     if(m_eScanBacnetIpEnd !=NULL)
@@ -295,7 +304,7 @@ BOOL CTStatScanner::ScanNetworkDevice()
 
     m_pScanNCThread = AfxBeginThread(_ScanNCByUDPFunc,this);//lsc
 
-    CWinThread * pTempThread= AfxBeginThread(_ScanOldNC, this);//Õâ¸öÊÇÎªÉ¨ÃèNCÏÂÃæµÄTSTAT
+    CWinThread * pTempThread= AfxBeginThread(_ScanOldNC, this);//è¿™ä¸ªæ˜¯ä¸ºæ‰«æNCä¸‹é¢çš„TSTAT
 
     //m_pWaitScanThread = AfxBeginThread(_WaitScanThread, this);
     return TRUE;
@@ -311,26 +320,31 @@ BOOL CTStatScanner::ScanTCPtoRS485SubPort()
     return 1;
 }
 
+
+BOOL CTStatScanner::ScanDetectComData()
+{
+    m_szComs.clear();
+    GetSerialComPortNumber1(m_szComs);
+
+    hdetect_mstp_thread = CreateThread(NULL, NULL, Detect_Mstp_thread, this, NULL, NULL);
+
+    return 0;
+}
+
 BOOL CTStatScanner::ScanComDevice()//02
 {
     //background_binarysearch_netcontroller();
     //GetAllComPort();
-
+    m_com_mstp_detect.clear();
     m_szComs.clear();
     GetSerialComPortNumber1(m_szComs);
 
-// 	if (m_szComs.size() <= 0)
-// 	{
-//
-// 		return FALSE;
-// 	}
 
-
-    SetCommunicationType(0);   //ÉèÖÃÎª´®¿ÚÍ¨ĞÅ·½Ê½
+    SetCommunicationType(0);   //è®¾ç½®ä¸ºä¸²å£é€šä¿¡æ–¹å¼
     close_com();
     if (m_szComs.size() >= 1)
     {
-        hScanComData = new HANDLE[(int)m_szComs.size()];	//´´½¨ ¶ÔÓ¦¸öÊıµÄHandle;
+        hScanComData = new HANDLE[(int)m_szComs.size()];	//åˆ›å»º å¯¹åº”ä¸ªæ•°çš„Handle;
         nScanThreadID = new DWORD[(int)m_szComs.size()];
         memset(hScanComData, 0, m_szComs.size() * sizeof(HANDLE));
         memset(nScanThreadID, 0, m_szComs.size() * sizeof(DWORD));
@@ -338,7 +352,7 @@ BOOL CTStatScanner::ScanComDevice()//02
         {
             this->scan_com_value = i;
             hScanComData[i] = CreateThread(NULL, NULL, ScanComThreadNoCritical, this /*&i*/, NULL, nScanThreadID+i);
-            Sleep(100); //Õâ¸öÊÇ±ØĞëµÄ,·ñÔòÏß³Ì»áÂÒ;
+            Sleep(100); //è¿™ä¸ªæ˜¯å¿…é¡»çš„,å¦åˆ™çº¿ç¨‹ä¼šä¹±;
             ::CloseHandle(hScanComData[i]);
         }
     }
@@ -366,12 +380,12 @@ DWORD WINAPI   CTStatScanner::ScanTCPSubPortThreadNoCritical(LPVOID lpVoid)
         }
     }
     list_count = pScan->com_count + ncount;
-    //ÅĞ¶ÏËù»Ø¸´µÄÍøÂçÉè±¸ ÊÇ·ñÄÜÖ§³ÖÏòÏÂÀ©Õ¹ Éè±¸.Fandu
+    //åˆ¤æ–­æ‰€å›å¤çš„ç½‘ç»œè®¾å¤‡ æ˜¯å¦èƒ½æ”¯æŒå‘ä¸‹æ‰©å±• è®¾å¤‡.Fandu
     if ((m_T3BB_device_data.at(ncount).product_id != PM_MINIPANEL)
         && (m_T3BB_device_data.at(ncount).product_id != PM_MINIPANEL_ARM)
         && (m_T3BB_device_data.at(ncount).product_id != PM_CM5))
     {
-        //Çå¿Õ ¾ä±úºÍÏß³ÌID£»
+        //æ¸…ç©º å¥æŸ„å’Œçº¿ç¨‹IDï¼›
         hScanTCPData[ncount] = NULL;
         nScanTCPThreadID[ncount] = NULL;
         m_scan_info.at(list_count).scan_status = SCAN_STATUS_FINISHED;
@@ -385,7 +399,7 @@ DWORD WINAPI   CTStatScanner::ScanTCPSubPortThreadNoCritical(LPVOID lpVoid)
     int							m_device_com_port;
     unsigned int				m_parent_serialnum;
 
-    //¿ªÆô×Ó¼¯É¨Ãè;
+    //å¼€å¯å­é›†æ‰«æ;
     CString strIP;
     int net_port;
     strIP = m_T3BB_device_data.at(ncount).ip_address;
@@ -419,9 +433,16 @@ DWORD WINAPI   CTStatScanner::ScanTCPSubPortThreadNoCritical(LPVOID lpVoid)
                     return 1;
                 }
 
+
+
                 if (sub_com == 1)
                 {
-                    m_device_baudrate = _wtoi(Baudrate_Array[UART_38400]);
+                    if (m_T3BB_device_data.at(ncount).zigbee_exsit != 1)
+                    {
+                        break;
+                    }
+
+                    m_device_baudrate = _wtoi(Baudrate_Array[UART_19200]);
                     m_device_com_port = sub_com;
                 }
                 else
@@ -437,19 +458,10 @@ DWORD WINAPI   CTStatScanner::ScanTCPSubPortThreadNoCritical(LPVOID lpVoid)
                     pScan->modbusip_to_modbus485(sub_com, m_device_baudrate, strIP, net_port, m_temp_parent_serialnum, list_count, 1, 254, nindex_value);
                 else
                 {
-                    DFTrace(_T("write 96 97 failed"));
+                    //DFTrace(_T("write 96 97 failed"));
                     continue;
                 }
-                if (sub_com == 1)
-                {
-                    break;
-                }
 
-                //Fandu ×îĞÂµÄarm °å×ÓMain ºÍsub ¶¼Ö§³ÖËùÓĞ ²¨ÌØÂÊ;
-                //if ((sub_com == 0) && (sub_baudrate == UART_19200))
-                //{
-                //    break;
-                //}
             }
 
         }
@@ -478,7 +490,7 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
     DWORD nthreadid = GetCurrentThreadId();
     CTStatScanner* pScan = (CTStatScanner*)(lpVoid);
     int ncount;// *(int *)lpVoid;
-
+    int scan_item ;
     for (int i = 0; i < pScan->m_szComs.size(); i++)
     {
 
@@ -489,8 +501,13 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
         }
     }
 
+    do
+    {
+        Sleep(100);
+    } while (hdetect_mstp_thread != NULL);
     //if (ncount == 0)
     //    Sleep(100000);
+
 
     UINT i = 0;
 
@@ -499,9 +516,85 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
 
     CString tc = strComPort.Mid(3);
 
-    int n = _wtoi(tc);
-    int scan_item = 0;
 
+#if 1  //æµ‹è¯•ä¸­
+
+        baudrate_def temp_baudrate_ret[20] = { 0 }; //ç”¨äºæ£€æµ‹ä¸²å£MSTPæ•°æ®
+        int com_port = _wtoi(tc);
+
+        for (int j = 0; j < m_scan_info.size(); j++)
+        {
+            scan_item = -1;
+            if (com_port == m_scan_info.at(j).scan_com_port)
+            {
+                scan_item = j;
+            }
+
+            if (scan_item != -1)
+            {
+                m_scan_info.at(scan_item).scan_status = SCAN_STATUS_DETECTING;
+                memset(m_scan_info.at(scan_item).scan_notes, 0, 250);
+                memcpy(m_scan_info.at(scan_item).scan_notes, "Automatic detecting ,please wait!", strlen("Automatic detecting ,please wait!"));
+            }
+        }
+
+
+        Test_Comport(com_port, temp_baudrate_ret);
+        for (int j = 0; j < 20; j++)
+        {
+            if (temp_baudrate_ret[j].ncomport == 0)
+                break;
+            m_com_mstp_detect.push_back(temp_baudrate_ret[j]);
+        }
+
+        for (int j = 0; j < m_scan_info.size(); j++)
+        {
+            scan_item = -1;
+            if (com_port == m_scan_info.at(j).scan_com_port)
+            {
+                scan_item = j;
+            }
+
+            if (scan_item != -1)
+            {
+                memset(m_scan_info.at(scan_item).scan_notes, 0, 250);
+                memcpy(m_scan_info.at(scan_item).scan_notes, "Ready to scan,please wait!", strlen("Ready to scan,please wait!"));
+                for (int x = 0; x < m_com_mstp_detect.size(); x++)
+                {
+                    if ((m_com_mstp_detect.at(x).baudrate == m_scan_info.at(scan_item).scan_baudrate) &&
+                        (m_com_mstp_detect.at(x).ncomport == m_scan_info.at(scan_item).scan_com_port))
+                    {
+                        if (m_com_mstp_detect.at(x).test_ret == 1)
+                        {
+                            memset(m_scan_info.at(scan_item).scan_notes, 0, 250);
+                            memcpy(m_scan_info.at(scan_item).scan_notes, "Found Bacnet MSTP data!", strlen("Found Bacnet MSTP data!"));
+                        }
+                        else if (m_com_mstp_detect.at(x).test_ret == 0)
+                        {
+                            memset(m_scan_info.at(scan_item).scan_notes, 0, 250);
+                            memcpy(m_scan_info.at(scan_item).scan_notes, "There is no data on the transmission line!", strlen("There is no data on the transmission line."));
+                        }
+                        else /*if (m_com_mstp_detect.at(x).test_ret < 0)*/
+                        {
+                            memset(m_scan_info.at(scan_item).scan_notes, 0, 250);
+                            memcpy(m_scan_info.at(scan_item).scan_notes, "Invalid data on the transmission line!(Maybe baudrate not correct)", strlen("Invalid data on the transmission line!(Maybe baudrate not correct)"));
+                        }
+                        break;
+                    }
+                }
+
+                m_scan_info.at(scan_item).scan_status = SCAN_STATUS_WAIT;
+
+            }
+        }
+
+#endif
+
+    int n = _wtoi(tc);
+
+
+    ////æš‚æ—¶è¦release å‡ºå» æ²¡æµ‹è¯•å…ˆå±è”½
+    int contain_mstp = 0;
 
     for (int j = 0; j < m_scan_info.size(); j++)
     {
@@ -517,15 +610,37 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
         {
             if (!m_scan_info.at(scan_item).scan_skip)
             {
+
+                for (int x = 0; x < m_com_mstp_detect.size(); x++)
+                {
+                    if ((m_com_mstp_detect.at(x).baudrate == m_scan_info.at(scan_item).scan_baudrate) &&
+                        (m_com_mstp_detect.at(x).ncomport == m_scan_info.at(scan_item).scan_com_port))
+                    {
+                        if ((m_com_mstp_detect.at(x).test_ret != 1) &&
+                            (m_com_mstp_detect.at(x).test_ret != 0))
+                        {
+                            contain_mstp = 1;
+                            break;
+                        }
+                    }
+                }
+
+                if (contain_mstp == 1)
+                {
+                    m_scan_info.at(scan_item).scan_status = SCAN_STATUS_FINISHED;
+                    memset(m_scan_info.at(scan_item).scan_notes, 0, 250);
+                    memcpy(m_scan_info.at(scan_item).scan_notes, "Bacnet MSTP token found! Scan finished", strlen("Bacnet MSTP token found! Scan finished"));
+                    continue;
+                }
                 if (pScan->OpenCom(n))
                 {
 
 
                     pScan->SetComPort(n);
                     bool bRet = Change_BaudRate_NoCretical(m_scan_info.at(j).scan_baudrate, n);
-                    CString strBraudrate;
-                    strBraudrate.Format(_T("%d"), m_scan_info.at(j).scan_baudrate);
-                    pScan->SetBaudRate(strBraudrate);
+                    CString strBaudrate;
+                    strBaudrate.Format(_T("%d"), m_scan_info.at(j).scan_baudrate);
+                    pScan->SetBaudRate(strBaudrate);
                     scan_baudrate = m_scan_info.at(j).scan_baudrate;
 
                     ASSERT(bRet);
@@ -547,7 +662,7 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
                     m_scan_info.at(scan_item).scan_status = SCAN_STATUS_FAILED;
                     memset(m_scan_info.at(scan_item).scan_notes, 0, 250);
                     memcpy(m_scan_info.at(scan_item).scan_notes, "Cannot open the COM Port", strlen("Cannot open the COM Port"));
-                    // ²»ÄÜ´ò¿ª´®¿ÚX£¬ÌáÊ¾ĞÅÏ¢
+                    // ä¸èƒ½æ‰“å¼€ä¸²å£Xï¼Œæç¤ºä¿¡æ¯
                     TRACE(_T("Cannot open the COM%d\n"), n);
                     CString str;
                     str.Format(_T("Cannot open the COM%d\n"), n);
@@ -559,7 +674,7 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
 
     g_ScnnedNum = 254;
 
-    //Çå¿Õ ¾ä±úºÍÏß³ÌID£»
+    //æ¸…ç©º å¥æŸ„å’Œçº¿ç¨‹IDï¼›
     hScanComData[ncount] = NULL;
     nScanThreadID[ncount] = NULL;
     return 0;
@@ -983,7 +1098,7 @@ void CTStatScanner::modbusip_to_modbus485(int nComPort, int nBaudrate, LPCTSTR s
         }
         else
         {
-#if 0  //ÓÉ¶Å·« 20180408 ÆÁ±Î É¨Ãè×Ó½ÚµãµÄÊ±ºò ÔİÊ±²»¿¼ÂÇ ÏÂÒ»¼¶ ID³åÍ»µÄÎÊÌâ;
+#if 0  //ç”±æœå¸† 20180408 å±è”½ æ‰«æå­èŠ‚ç‚¹çš„æ—¶å€™ æš‚æ—¶ä¸è€ƒè™‘ ä¸‹ä¸€çº§ IDå†²çªçš„é—®é¢˜;
             m_szRepeatedID[devLo] = devLo;
             TRACE(_T("Scan one with same ID = %d\n"), devLo);
             do
@@ -1129,7 +1244,7 @@ void CTStatScanner::modbusip_to_modbus485(int nComPort, int nBaudrate, LPCTSTR s
 
 }
 
-//2018 03 30 Õâ¸öº¯Êı»¹ĞèÒª¸ÄÔì £¬¶àÏß³ÌÍ¬ÊÂÉ¨ÃèÊ± ĞèÒª±£´æºÃ²¨ÌØÂÊ
+//2018 03 30 è¿™ä¸ªå‡½æ•°è¿˜éœ€è¦æ”¹é€  ï¼Œå¤šçº¿ç¨‹åŒäº‹æ‰«ææ—¶ éœ€è¦ä¿å­˜å¥½æ³¢ç‰¹ç‡
 void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo, BYTE devHi, int nItem , int nbaudrate)
 {
 
@@ -1170,7 +1285,7 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 
 
     int a = g_CheckTstatOnline_nocritical(devLo, devHi, bForTStat, nComPort);
-    if(a ==-6)//×ÜÏßÉÏ´æÔÚbacnetĞ­Òé£¬modbusĞ­ÒéÎŞ·¨É¨Ãè;
+    if(a ==-6)//æ€»çº¿ä¸Šå­˜åœ¨bacnetåè®®ï¼Œmodbusåè®®æ— æ³•æ‰«æ;
     {
         CString temp_cs;
         temp_cs.Format(_T("Com%d"),nComPort);
@@ -1232,7 +1347,7 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
         BOOL bFindSameID=false;
         int nPos=-1;
 //		temp.baudrate=m_baudrate2;
-//      ¼æÈİĞ¡Ò¶µÄPressure
+//      å…¼å®¹å°å¶çš„Pressure
         unsigned short SerialNum[10];
         memset(SerialNum,0,sizeof(SerialNum));
         int nRet=0;
@@ -1560,13 +1675,13 @@ BOOL CTStatScanner::CheckTheSameSubnet(CString strIP)
     strHostIP.Format(_T("%d.%d.%d.%d"), sa.sin_addr.S_un.S_un_b.s_b1,sa.sin_addr.S_un.S_un_b.s_b2,sa.sin_addr.S_un.S_un_b.s_b3,sa.sin_addr.S_un.S_un_b.s_b4);
     //AfxMessageBox(strIP);
 
-    // ÊÇ·ñÊÇÍ¬Ò»×ÓÍø
+    // æ˜¯å¦æ˜¯åŒä¸€å­ç½‘
     if ( ia.S_un.S_un_b.s_b1 == sa.sin_addr.S_un.S_un_b.s_b1 &&
             ia.S_un.S_un_b.s_b2 == sa.sin_addr.S_un.S_un_b.s_b2 &&
             ia.S_un.S_un_b.s_b3 == sa.sin_addr.S_un.S_un_b.s_b3
        )
     {
-        // ÊÇÍ¬Ò»×ÓÍø£¬µ«ÊÇÁ¬½Ó²»ÉÏ£¬ÄÇÃ´ÌáÊ¾¼ì²éÉè±¸Á¬½Ó
+        // æ˜¯åŒä¸€å­ç½‘ï¼Œä½†æ˜¯è¿æ¥ä¸ä¸Šï¼Œé‚£ä¹ˆæç¤ºæ£€æŸ¥è®¾å¤‡è¿æ¥
         // 		CString strTip;
         // 		strTip.Format(_T("Can not set up the connection with %s, please check its IP address and net cable. "), strIP);
         // 		AfxMessageBox(strTip);
@@ -1585,17 +1700,21 @@ UINT SCAN_TCP_TO485_THREAD(LPVOID pParam)
 {
     CTStatScanner* pScanner = (CTStatScanner*)pParam;
     int ncount = 0;
-    //ÕâÀï²»½öÒªµÈ ÍøÂçÏß³ÌÉ¨ÃèÍê »¹ÒªµÈ ´®¿ÚÏß³Ì É¨ÃèÍê ,µ×²ã¿âÔİÊ±»¹²»Ö§³Ö ´®¿ÚºÍÍøÂçµÄModbus Í¬Ê±Í¨Ñ¶;
+    //è¿™é‡Œä¸ä»…è¦ç­‰ ç½‘ç»œçº¿ç¨‹æ‰«æå®Œ è¿˜è¦ç­‰ ä¸²å£çº¿ç¨‹ æ‰«æå®Œ ,åº•å±‚åº“æš‚æ—¶è¿˜ä¸æ”¯æŒ ä¸²å£å’Œç½‘ç»œçš„Modbus åŒæ—¶é€šè®¯;
     WaitForSingleObject(pScanner->m_eScanNCEnd->m_hObject, INFINITE);
 
-    WaitForSingleObject(pScanner->m_eScanComEnd->m_hObject, INFINITE);
-
-    //Èç¹ûÖĞÍ¾ÍË³öÁË£¬¾Í²»ÒªÔÚÉ¨Ãè ¶ş¼¶×Ó½Ó¿ÚÁË;
+    //å³å°†release æ‰€ä»¥å…ˆå±è”½
+#if 1
+    WaitForSingleObject(pScanner->m_eScanComEnd->m_hObject, INFINITE);  //ç­‰å¾…ä¸²å£ modbusé€šè®¯æ‰«æå®Œæ¯•;
+    pScanner->m_eScanComEnd->SetEvent();  // ç”¨å®Œè¿™ä¸ªé€šçŸ¥åè¦é‡Šæ”¾ å› ä¸ºMSTPçš„ é‚£ä¸ªçº¿ç¨‹ä¹Ÿåœ¨åˆ¤æ–­è¿™ä¸ªä¿¡å· æ˜¯å¦æœ‰è¢«é€šçŸ¥;
+    
+    //å¦‚æœä¸­é€”é€€å‡ºäº†ï¼Œå°±ä¸è¦åœ¨æ‰«æ äºŒçº§å­æ¥å£äº†;
     if (pScanner->m_bStopScan)
     {
         pScanner->m_eScan_tcp_to_485_End->SetEvent();
         return 1;
     }
+#endif
 
     ncount = pScanner->ScanSubnetFromEthernetDevice();
 
@@ -1686,7 +1805,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
             h_siBind.sin_addr.s_addr =  inet_addr(local_network_ip);
             //	h_siBind.sin_port=
             h_siBind.sin_port= htons(57629);
-            if( -1 == bind(h_scan_Broad,(SOCKADDR*)&h_siBind,sizeof(h_siBind)))//°ÑÍø¿¨µØÖ·Ç¿ĞĞ°ó¶¨µ½Socket
+            if( -1 == bind(h_scan_Broad,(SOCKADDR*)&h_siBind,sizeof(h_siBind)))//æŠŠç½‘å¡åœ°å€å¼ºè¡Œç»‘å®šåˆ°Socket
             {
                 continue;
             }
@@ -1745,7 +1864,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
             /////////////////////////////////////////////////////////////////////////*/
             int time_out=0;
             BOOL bTimeOut = FALSE;
-            while(!bTimeOut)//!pScanner->m_bNetScanFinish)  // ³¬Ê±½áÊø
+            while(!bTimeOut)//!pScanner->m_bNetScanFinish)  // è¶…æ—¶ç»“æŸ
             {
                 time_out++;
                 if(time_out>3)
@@ -1832,7 +1951,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
                                 int n = 1;
                                 BOOL bFlag=FALSE;
                                 //////////////////////////////////////////////////////////////////////////
-                                // ¼ì²âIPÖØ¸´
+                                // æ£€æµ‹IPé‡å¤
                                 DWORD dwValidIP = 0;
                                 memcpy((BYTE*)&dwValidIP, pSendBuf+n, 4);
                                 while(dwValidIP != END_FLAG)
@@ -1851,7 +1970,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
                                 }
                                 //////////////////////////////////////////////////////////////////////////
                                 bFlag = FALSE;
-                                if (!bFlag)	//²»ÅĞ¶Ï IpÊÇ·ñÖØ¸´£¬ÒòÎª MinipanelÄÜ¹ÒÔØTSTATµÄÉè±¸ »á½«µ×ÏÂµÄÉè±¸Ò²»Ø¸´¹ıÀ´;
+                                if (!bFlag)	//ä¸åˆ¤æ–­ Ipæ˜¯å¦é‡å¤ï¼Œå› ä¸º Minipanelèƒ½æŒ‚è½½TSTATçš„è®¾å¤‡ ä¼šå°†åº•ä¸‹çš„è®¾å¤‡ä¹Ÿå›å¤è¿‡æ¥;
                                 {
                                     
                                     pScanner->AddNCToList(buffer, nRet, h_scan_siBind);
@@ -1921,24 +2040,8 @@ END_SCAN:
 
     }
 
-
-
-
-
-
-
-
-
-
-
 	if(is_delete_tstat_scanner == false)
 		pScanner->m_eScanNCEnd->SetEvent();
-
-    TRACE(_T("UDP End Scan! \n"));
-
-    //############################
-
-    //############################
 
     return 1;
 }
@@ -2005,17 +2108,17 @@ int CTStatScanner::AddNCToList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	my_temp_point = my_temp_point + 20;
 	temp_data.reg.object_instance_4 = *(my_temp_point++);
 	temp_data.reg.object_instance_3 = *(my_temp_point++);
-	temp_data.reg.isp_mode = *(my_temp_point++);	//isp_mode = 0 ±íÊ¾ÔÚÓ¦ÓÃ´úÂë £¬·Ç0 ±íÊ¾ÔÚbootload.
+	temp_data.reg.isp_mode = *(my_temp_point++);	//isp_mode = 0 è¡¨ç¤ºåœ¨åº”ç”¨ä»£ç  ï¼Œé0 è¡¨ç¤ºåœ¨bootload.
 	if(temp_data.reg.isp_mode != 0)
 	{
-		//¼ÇÂ¼Õâ¸öµÄĞÅÏ¢,Èç¹û¶ÌÊ±¼ä¶à´Î³öÏÖ ¾ÍÅĞ¶¨ÔÚbootloadÏÂÃæ£¬Ö»ÊÇÅ¼¶û³öÏÖÒ»´Î±íÊ¾Ö»ÊÇÇ¡ºÃ¿ª»úÊÕµ½µÄ.
+		//è®°å½•è¿™ä¸ªçš„ä¿¡æ¯,å¦‚æœçŸ­æ—¶é—´å¤šæ¬¡å‡ºç° å°±åˆ¤å®šåœ¨bootloadä¸‹é¢ï¼Œåªæ˜¯å¶å°”å‡ºç°ä¸€æ¬¡è¡¨ç¤ºåªæ˜¯æ°å¥½å¼€æœºæ”¶åˆ°çš„.
 		return	 0;
 	}
 	DWORD nSerial=temp_data.reg.serial_low + temp_data.reg.serial_low_2 *256+temp_data.reg.serial_low_3*256*256+temp_data.reg.serial_low_4*256*256*256;
 	CString nip_address;
 	nip_address.Format(_T("%u.%u.%u.%u"),temp_data.reg.ip_address_1,temp_data.reg.ip_address_2,temp_data.reg.ip_address_3,temp_data.reg.ip_address_4);
 	CString nproduct_name = GetProductName(temp_data.reg.product_id);
-	if(nproduct_name.IsEmpty())	//Èç¹û²úÆ·ºÅ Ã»¶¨Òå¹ı£¬²»ÈÏÊ¶Õâ¸ö²úÆ· ¾Íexit;
+	if(nproduct_name.IsEmpty())	//å¦‚æœäº§å“å· æ²¡å®šä¹‰è¿‡ï¼Œä¸è®¤è¯†è¿™ä¸ªäº§å“ å°±exit;
 	{
 		if (temp_data.reg.product_id<220)
 		{
@@ -2259,9 +2362,9 @@ UINT _ScanTstatThread2(LPVOID pParam)
 
                         pScan->SetComPort(n);
                         bool bRet = Change_BaudRate(m_scan_info.at(j).scan_baudrate);
-                        CString strBraudrate;
-                        strBraudrate.Format (_T("%d"),m_scan_info.at(j).scan_baudrate);
-                        pScan->SetBaudRate(strBraudrate);
+                        CString strBaudrate;
+                        strBaudrate.Format (_T("%d"),m_scan_info.at(j).scan_baudrate);
+                        pScan->SetBaudRate(strBaudrate);
                         scan_baudrate = m_scan_info.at(j).scan_baudrate;
 
                         ASSERT(bRet);
@@ -2283,7 +2386,7 @@ UINT _ScanTstatThread2(LPVOID pParam)
                         m_scan_info.at(scan_item).scan_status = SCAN_STATUS_FAILED;
                         memset(m_scan_info.at(scan_item).scan_notes,0,250);
                         memcpy(m_scan_info.at(scan_item).scan_notes,"Cannot open the COM Port",strlen("Cannot open the COM Port"));
-                        // ²»ÄÜ´ò¿ª´®¿ÚX£¬ÌáÊ¾ĞÅÏ¢
+                        // ä¸èƒ½æ‰“å¼€ä¸²å£Xï¼Œæç¤ºä¿¡æ¯
                         TRACE(_T("Cannot open the COM%d\n"), n);
                         CString str;
                         str.Format(_T("Cannot open the COM%d\n"), n);
@@ -2380,20 +2483,20 @@ extern HWND scan_wait_dlg;
 void CTStatScanner::SendScanEndMsg()
 {
     //m_pParent->PostMessage(WM_SCANFINISH, 0, 0);
-    // scanÍê³É£¬¿ªÊ¼³åÍ»¼ì²é
+    // scanå®Œæˆï¼Œå¼€å§‹å†²çªæ£€æŸ¥
 
-    // ºÏ²¢Í¬ÀàÏî
+    // åˆå¹¶åŒç±»é¡¹
     //if (!m_isChecksubnet)
     {
         m_saving_data = true;
         CombineScanResult();
-        GetBuildingName();	// »ñµÃµ±Ç°Ñ¡ÔñµÄbuildingname
+        GetBuildingName();	// è·å¾—å½“å‰é€‰æ‹©çš„buildingname
         GetAllNodeFromDataBase();
         FindNetConflict();
         ResolveNetConflict();
 
 
-        //GetBuildingName();	// »ñµÃµ±Ç°Ñ¡ÔñµÄbuildingname
+        //GetBuildingName();	// è·å¾—å½“å‰é€‰æ‹©çš„buildingname
 
         FindComConflict();
 
@@ -2410,7 +2513,7 @@ void CTStatScanner::SendScanEndMsg()
 
         if( m_refresh_net_device_data.size() == 0 && m_szNCScanRet.size()==0 && m_szTstatScandRet.size() == 0)
         {
-            //AfxMessageBox(_T("Can't find any device. Please check configure and connection, then try again."));//scan,ÔÚÓĞĞ©»ú×ÓÉÏ£¬×ÜÌáÊ¾Õâ¸ö£¬µ«À´»á¼ÌĞø½øĞĞÉ¨Ãè
+            //AfxMessageBox(_T("Can't find any device. Please check configure and connection, then try again."));//scan,åœ¨æœ‰äº›æœºå­ä¸Šï¼Œæ€»æç¤ºè¿™ä¸ªï¼Œä½†æ¥ä¼šç»§ç»­è¿›è¡Œæ‰«æ
 
            // m_pParent->PostMessage(WM_ADDTREENODE);
 			SetCommunicationType(1);
@@ -2489,7 +2592,7 @@ void CTStatScanner::ResetRepeatedID()
 }
 
 
-// ´ò¿ªÊı¾İ¿â£¬È»ºóÈ¥È¥±È½Ï³åÍ»
+// æ‰“å¼€æ•°æ®åº“ï¼Œç„¶åå»å»æ¯”è¾ƒå†²çª
 int CTStatScanner::GetAllNodeFromDataBase()
 {
 
@@ -2542,7 +2645,7 @@ int CTStatScanner::GetAllNodeFromDataBase()
                 }
                 else
                 {
-                    ((CTStat_Net*)(pNode))->SetProtocol(1);//1Îªmodebus ip
+                    ((CTStat_Net*)(pNode))->SetProtocol(1);//1ä¸ºmodebus ip
                 }
 
 
@@ -2621,7 +2724,7 @@ int CTStatScanner::GetAllNodeFromDataBase()
 }
 
 
-// ¶Ô±ÈÊı¾İ¿â
+// å¯¹æ¯”æ•°æ®åº“
 void CTStatScanner::FindComConflict()
 {
 
@@ -2641,12 +2744,12 @@ void CTStatScanner::FindComConflict()
             int nAddr = m_szComNodes[j]->GetDevID();
             if (nRtID == nSID)
             {
-                //¼ÓÉÏ buildingnameµÈË½»õ
+                //åŠ ä¸Š buildingnameç­‰ç§è´§
                 pInfo->m_pDev->SetBuildingName(m_szComNodes[j]->GetBuildingName());
                 pInfo->m_pDev->SetFloorName(m_szComNodes[j]->GetFloorName());
                 pInfo->m_pDev->SetRoomName(m_szComNodes[j]->GetRoomName());
                 pInfo->m_pDev->SetSubnetName(m_szComNodes[j]->GetSubnetName());
-                if (nAddr != nRtAddr) // ĞèÒª½ÃÕı
+                if (nAddr != nRtAddr) // éœ€è¦çŸ«æ­£
                 {
                     pInfo->m_bConflict = TRUE;
                     pInfo->m_nSourceID = nRtAddr;
@@ -2658,7 +2761,7 @@ void CTStatScanner::FindComConflict()
     }
 }
 
-// ½â¾ö³åÍ»
+// è§£å†³å†²çª
 void  CTStatScanner::ResolveComConflict()
 { 
     for (UINT  i = 0; i  < m_szComConfNodes.size(); i++)
@@ -2744,7 +2847,7 @@ void  CTStatScanner::ResolveComConflict()
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Èç¹ûSerial IDÏàÍ¬£¬¶øIP²»Í¬£¬ÊÓÎª³åÍ»
+// å¦‚æœSerial IDç›¸åŒï¼Œè€ŒIPä¸åŒï¼Œè§†ä¸ºå†²çª
 void CTStatScanner::FindNetConflict()
 {
     for (UINT i = 0; i < m_szNCScanRet.size(); i++)
@@ -2767,11 +2870,11 @@ void CTStatScanner::FindNetConflict()
             float db_sw_version = m_szNetNodes[j]->GetSoftwareVersion();
             int db_ip_port = m_szNetNodes[j]->GetIPPort();
             int db_modbus_id = m_szNetNodes[j]->GetDevID();
-            //¼ÓÉÏ buildingnameµÈË½»õ
+            //åŠ ä¸Š buildingnameç­‰ç§è´§
 
             if (nScanID == nSID)
             {
-                if ((dwScanIP != dwIP) ||(hw_version != db_hw_version) || (sw_version != db_sw_version) || (ip_port != db_ip_port) || (modbus_id != db_modbus_id) ) // ĞèÒª½ÃÕı
+                if ((dwScanIP != dwIP) ||(hw_version != db_hw_version) || (sw_version != db_sw_version) || (ip_port != db_ip_port) || (modbus_id != db_modbus_id) ) // éœ€è¦çŸ«æ­£
                 {
                     pInfo->m_pNet->SetBuildingName(m_szNetNodes[j]->GetBuildingName());
                     pInfo->m_pNet->SetFloorName(m_szNetNodes[j]->GetFloorName());
@@ -2826,7 +2929,7 @@ void CTStatScanner::CompareNetToComConflict()
 // 				 dlg.m_StrCom=ComInfor;
 // 				 if (dlg.DoModal()==IDOK)
 // 				 {
-//  					 if (!dlg.m_Bool_Check_Net)//²»Ìí¼ÓNet
+//  					 if (!dlg.m_Bool_Check_Net)//ä¸æ·»åŠ Net
 //  					 {
                 /*  for (vector<_NetDeviceInfo*>::iterator it=m_szNCScanRet.begin();it!=m_szNCScanRet.end();++it)
                   {
@@ -2875,7 +2978,7 @@ void CTStatScanner::CompareNetToComConflict()
 
 
 //////////////////////////////////////////////////////////////////////////
-// Èç¹ûSerial IDÏàÍ¬£¬¶øIP²»Í¬£¬ÄÇÃ´ĞŞ¸ÄÊı¾İ¿âÖĞµÄID
+// å¦‚æœSerial IDç›¸åŒï¼Œè€ŒIPä¸åŒï¼Œé‚£ä¹ˆä¿®æ”¹æ•°æ®åº“ä¸­çš„ID
 void  CTStatScanner::ResolveNetConflict()
 {
  
@@ -2969,7 +3072,7 @@ void CTStatScanner::AddNewTStatToDB()
     {
         bIsNew = TRUE;
         int nSID = m_szTstatScandRet[i]->m_pDev->GetSerialID();
-        //É¾µô ´æÔÚµÄĞòÁĞºÅ
+        //åˆ æ‰ å­˜åœ¨çš„åºåˆ—å·
         try
         {
 
@@ -3075,7 +3178,7 @@ void CTStatScanner::AddNewNetToDB()
 		}
 		else
 		{
-			//²åÈë
+			//æ’å…¥
 			CString temp_pro4;
 			bool is_bacnet_device = false;
 			if((m_refresh_net_device_data.at(i).product_id == PM_MINIPANEL)|| (m_refresh_net_device_data.at(i).product_id == PM_MINIPANEL_ARM) || (m_refresh_net_device_data.at(i).product_id == PM_CM5))
@@ -3170,8 +3273,8 @@ void CTStatScanner::AddNewNetToDB()
 //             }
 //         }
 
-		//²»¼ÓÕâ¾ä»°ÄÜ½â¾öÉ¨Ãèºó Ãû×Ö»á±äµô
-		//µ«ÊÇ¼ÓÁË »á³öÏÖ DBÊÇ¿ÕµÄÊ±ºò  Ã÷Ã÷É¨Ãèµ½ÁË Éè±¸£¬È´ÒªµÈºÜ³¤Ê±¼ä ¿¿ºóÌ¨É¨Ãè ²ÅÏÔÊ¾³öÀ´;
+		//ä¸åŠ è¿™å¥è¯èƒ½è§£å†³æ‰«æå åå­—ä¼šå˜æ‰
+		//ä½†æ˜¯åŠ äº† ä¼šå‡ºç° DBæ˜¯ç©ºçš„æ—¶å€™  æ˜æ˜æ‰«æåˆ°äº† è®¾å¤‡ï¼Œå´è¦ç­‰å¾ˆé•¿æ—¶é—´ é åå°æ‰«æ æ‰æ˜¾ç¤ºå‡ºæ¥;
 #if 1
 
 
@@ -3290,7 +3393,7 @@ void CTStatScanner::WriteOneNetInfoToDB( _NetDeviceInfo* pInfo)
     
 
     CString strEPSize;
-    if(pInfo->m_pNet->GetProtocol()== PROTOCOL_BACNET_IP)//Èç¹ûÊÇbacnetip ĞèÒªÍùÊı¾İ¿âÀï±£´æ Ğ­Òé 3 ¾ÍÊÇbacnetip;
+    if(pInfo->m_pNet->GetProtocol()== PROTOCOL_BACNET_IP)//å¦‚æœæ˜¯bacnetip éœ€è¦å¾€æ•°æ®åº“é‡Œä¿å­˜ åè®® 3 å°±æ˜¯bacnetip;
     {
         CString temp_pro = _T("3");
         strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Custom,Online_Status)					  values('"
@@ -3524,20 +3627,6 @@ BOOL CTStatScanner::IsAllScanFinished()
 
 void CTStatScanner::StopScan()
 {
-// 	if( WaitForSingleObject(m_eScanComEnd, 0) != WAIT_OBJECT_0 )
-// 	{
-// 		//SetEvent(m_eScanComEnd);
-// 		m_eScanComEnd->SetEvent(); // ×ÔÈ»½áÊø
-// 		//TerminateThread(m_pScanTstatThread,0);
-// 	}
-//
-// 	if(WaitForSingleObject(m_eScanNetEnd, 0) != WAIT_OBJECT_0 )
-// 	{
-// 		//SetEvent(m_eScanNetEnd);
-// 		m_eScanNetEnd->SetEvent(); // ×ÔÈ»½áÊø
-// 		//TerminateThread(m_pScanNCThread,0);
-// 	}
-
     m_bStopScan = TRUE;
 }
 
@@ -3585,7 +3674,7 @@ int CTStatScanner::ScanSubnetFromEthernetDevice()//scan
 		{
 			continue;
 		}
-        m_T3BB_device_data.push_back(m_refresh_net_device_data.at(i)); //ÓÃÓÚ¼ÇÂ¼ĞèÒªÉ¨Ãè×Ó½Ó¿ÚµÄÉè±¸ÓĞÄÄĞ©¡£
+        m_T3BB_device_data.push_back(m_refresh_net_device_data.at(i)); //ç”¨äºè®°å½•éœ€è¦æ‰«æå­æ¥å£çš„è®¾å¤‡æœ‰å“ªäº›ã€‚
 		controller_counter ++ ;
 	}
 
@@ -3595,20 +3684,20 @@ int CTStatScanner::ScanSubnetFromEthernetDevice()//scan
     }
     NetWork_Sub_Scan_Info();
 
-    //¿ªÆô¶àÏß³ÌÉ¨ÃèÍøÂçÉè±¸ÏÂÃæµÄ¹ÒÔØµÄÉè±¸.
-    SetCommunicationType(1);   //ÉèÖÃÎª´®¿ÚÍ¨ĞÅ·½Ê½
+    //å¼€å¯å¤šçº¿ç¨‹æ‰«æç½‘ç»œè®¾å¤‡ä¸‹é¢çš„æŒ‚è½½çš„è®¾å¤‡.
+    SetCommunicationType(1);   //è®¾ç½®ä¸ºä¸²å£é€šä¿¡æ–¹å¼
     close_com();
-    if (controller_counter >= 1)   //Èç¹ûÓĞÉ¨µ½ÄÜ¹»¹ÒÔØµÄÍøÂçÉè±¸¾Í¿ªÆôÉ¨Ãè;
+    if (controller_counter >= 1)   //å¦‚æœæœ‰æ‰«åˆ°èƒ½å¤ŸæŒ‚è½½çš„ç½‘ç»œè®¾å¤‡å°±å¼€å¯æ‰«æ;
     {
         int nsize = controller_counter;
-        hScanTCPData = new HANDLE[(int)nsize];	//´´½¨ ¶ÔÓ¦¸öÊıµÄHandle;
+        hScanTCPData = new HANDLE[(int)nsize];	//åˆ›å»º å¯¹åº”ä¸ªæ•°çš„Handle;
         nScanTCPThreadID = new DWORD[(int)nsize];
         memset(hScanTCPData, 0, nsize * sizeof(HANDLE));
         memset(nScanTCPThreadID, 0, nsize * sizeof(DWORD));
         for (int i = 0;i<(int)nsize;i++)
         {
             hScanTCPData[i] = CreateThread(NULL, NULL, ScanTCPSubPortThreadNoCritical, this , NULL, nScanTCPThreadID + i);
-            Sleep(100); //Õâ¸öÊÇ±ØĞëµÄ,·ñÔòÏß³Ì»áÂÒ;
+            Sleep(100); //è¿™ä¸ªæ˜¯å¿…é¡»çš„,å¦åˆ™çº¿ç¨‹ä¼šä¹±;
             ::CloseHandle(hScanTCPData[i]);
         }
 
@@ -3626,7 +3715,7 @@ int CTStatScanner::ScanSubnetFromEthernetDevice()//scan
 
 
 
-// ´úÂë¸Ä±à×Ôvoid CMainFrame::binarySearchforview_networkcontroller(BYTE devLo, BYTE devHi)
+// ä»£ç æ”¹ç¼–è‡ªvoid CMainFrame::binarySearchforview_networkcontroller(BYTE devLo, BYTE devHi)
 UINT _ScanOldNC(LPVOID pParam)
 {
     CTStatScanner *pScan = (CTStatScanner*) pParam;
@@ -3654,7 +3743,7 @@ UINT _ScanOldNC(LPVOID pParam)
 }
 
 
-// ´úÂë¸Ä±à×Ôvoid CMainFrame::binarySearchforview_networkcontroller(BYTE devLo, BYTE devHi)
+// ä»£ç æ”¹ç¼–è‡ªvoid CMainFrame::binarySearchforview_networkcontroller(BYTE devLo, BYTE devHi)
 void CTStatScanner::ScanOldNC(BYTE devLo, BYTE devHi)
 {
     TRACE(_T("start TCP scan^^^^^^^^^ \n"));
@@ -3896,6 +3985,9 @@ void CTStatScanner::ScanAll()
     Initial_Scan_Info();
 
     b_pause_refresh_tree = true ;
+
+    ScanDetectComData();//æ£€æµ‹ä¸²å£æ•°æ®;
+
     ScanComDevice();
 
 
@@ -3918,6 +4010,90 @@ void CTStatScanner::ScanAll()
 
 }
 
+DWORD WINAPI  Detect_Mstp_thread(LPVOID lpVoid)
+{
+    Sleep(1000);
+    BOOL Flag = FALSE;
+    CTStatScanner* pScanner = (CTStatScanner*)(lpVoid);
+#if 0
+    for (int m = 0; m < pScanner->m_szComs.size(); m++)
+    {
+        baudrate_def temp_baudrate_ret[20] = { 0 }; //ç”¨äºæ£€æµ‹ä¸²å£MSTPæ•°æ®
+        CString temp_cstring;
+        temp_cstring = pScanner->m_szComs.at(m).Right(pScanner->m_szComs.at(m).GetLength() - 3);
+        int com_port = _wtoi(temp_cstring);
+
+        for (int j = 0; j < m_scan_info.size(); j++)
+        {
+            scan_item = -1;
+            if (com_port == m_scan_info.at(j).scan_com_port)
+            {
+                scan_item = j;
+            }
+
+            if (scan_item != -1)
+            {
+                m_scan_info.at(scan_item).scan_status = SCAN_STATUS_DETECTING;
+                memset(m_scan_info.at(scan_item).scan_notes, 0, 250);
+                memcpy(m_scan_info.at(scan_item).scan_notes, "Automatic detecting ,please wait!", strlen("Automatic detecting ,please wait!"));
+            }
+        }
+
+
+        Test_Comport(com_port, temp_baudrate_ret);
+        for (int j = 0; j < 20; j++)
+        {
+            if (temp_baudrate_ret[j].ncomport == 0)
+                break;
+            m_com_mstp_detect.push_back(temp_baudrate_ret[j]);
+        }
+
+        for (int j = 0; j < m_scan_info.size(); j++)
+        {
+            scan_item = -1;
+            if (com_port == m_scan_info.at(j).scan_com_port)
+            {
+                scan_item = j;
+            }
+
+            if (scan_item != -1)
+            {
+                memset(m_scan_info.at(scan_item).scan_notes, 0, 250);
+                memcpy(m_scan_info.at(scan_item).scan_notes, "Ready to scan,please wait!", strlen("Ready to scan,please wait!"));
+                for (int  x = 0; x < m_com_mstp_detect.size(); x++)
+                {
+                    if ((m_com_mstp_detect.at(x).baudrate == m_scan_info.at(scan_item).scan_baudrate) &&
+                        (m_com_mstp_detect.at(x).ncomport == m_scan_info.at(scan_item).scan_com_port))
+                    {
+                        if (m_com_mstp_detect.at(x).test_ret == 1)
+                        {
+                            memset(m_scan_info.at(scan_item).scan_notes, 0, 250);
+                            memcpy(m_scan_info.at(scan_item).scan_notes, "Found Bacnet MSTP data!", strlen("Found Bacnet MSTP data!"));
+                        }
+                        else if (m_com_mstp_detect.at(x).test_ret == 0)
+                        {
+                            memset(m_scan_info.at(scan_item).scan_notes, 0, 250);
+                            memcpy(m_scan_info.at(scan_item).scan_notes, "There is no data on the transmission line!", strlen("There is no data on the transmission line."));
+                        }
+                        else if (m_com_mstp_detect.at(x).test_ret < 0)
+                        {
+                            memset(m_scan_info.at(scan_item).scan_notes, 0, 250);
+                            memcpy(m_scan_info.at(scan_item).scan_notes, "Invalid data on the transmission line!(Maybe baudrate not correct)", strlen("Invalid data on the transmission line!(Maybe baudrate not correct)"));
+                        }
+                        break;
+                    }
+                }
+
+                m_scan_info.at(scan_item).scan_status = SCAN_STATUS_WAIT;
+
+            }
+        }
+
+    }
+#endif
+    hdetect_mstp_thread = NULL;
+    return 1;
+}
 
 
 DWORD WINAPI  _WaitScanThread(LPVOID lpVoid)
@@ -3925,73 +4101,24 @@ DWORD WINAPI  _WaitScanThread(LPVOID lpVoid)
 {
     Sleep(1000);
     BOOL Flag = FALSE;
-	 CTStatScanner* pScanner = (CTStatScanner*)(lpVoid);
-    //switch(pScanner->m_scantype)
-    //{
-    //case 1:
-    //    if (WaitForSingleObject(pScanner->m_eScanComEnd->m_hObject, INFINITE) == WAIT_OBJECT_0)
-    //        Flag = TRUE;
-    //    break;
-    //case 2:
-    //    if ((WaitForSingleObject(pScanner->m_eScanNCEnd->m_hObject, INFINITE) == WAIT_OBJECT_0 )
-    //            &&(WaitForSingleObject(pScanner->m_eScanOldNCEnd->m_hObject, INFINITE) == WAIT_OBJECT_0 ))
-    //        Flag = FALSE;
-    //    break;
-    //case 3:
-    //    //if ((WaitForSingleObject(pScanner->m_eScanNCEnd->m_hObject, INFINITE) == WAIT_OBJECT_0 )
-    //    //	&&(WaitForSingleObject(pScanner->m_eScanOldNCEnd->m_hObject, INFINITE) == WAIT_OBJECT_0 )
-    //    //	&& (WaitForSingleObject(pScanner->m_eScanComEnd->m_hObject, INFINITE) == WAIT_OBJECT_0 )
-    //    //	&&  (WaitForSingleObject(pScanner->m_eScanBacnetIpEnd->m_hObject, INFINITE) == WAIT_OBJECT_0 ))
-    //    //	Flag = TRUE;
-    //    
-    //    //if (WaitForSingleObject(pScanner->m_eScanNCEnd->m_hObject, INFINITE) == WAIT_OBJECT_0)
-    //    //if (WaitForSingleObject(pScanner->m_eScan_tcp_to_485_End->m_hObject, INFINITE) == WAIT_OBJECT_0 )
-    //    //{
-            if(WaitForSingleObject(pScanner->m_eScanOldNCEnd->m_hObject, INFINITE) == WAIT_OBJECT_0)
+    CTStatScanner* pScanner = (CTStatScanner*)(lpVoid);
+    if (WaitForSingleObject(pScanner->m_eScanOldNCEnd->m_hObject, INFINITE) == WAIT_OBJECT_0)
+    {
+        if (WaitForSingleObject(pScanner->m_eScanBacnetIpEnd->m_hObject, INFINITE) == WAIT_OBJECT_0)
+        {
+            if ((WaitForSingleObject(pScanner->m_eScanRemoteIPEnd->m_hObject, INFINITE) == WAIT_OBJECT_0))
             {
-                if(WaitForSingleObject(pScanner->m_eScanBacnetIpEnd->m_hObject, INFINITE) == WAIT_OBJECT_0)
-                {
-                    //if(WaitForSingleObject(pScanner->m_eScanComEnd->m_hObject, INFINITE) == WAIT_OBJECT_0)
-                    //{
-                        if((WaitForSingleObject(pScanner->m_eScanRemoteIPEnd->m_hObject, INFINITE) == WAIT_OBJECT_0))
-                        {
-                            Flag = TRUE;
-                            //break;
-                        }
-                    //}
-                }
+                Flag = TRUE;
             }
-//        Flag = FALSE;
-//
-//        break;
-//    case 4:
-//
-//// 		if (WaitForSingleObject(pScanner->m_eScanComOneByOneEnd->m_hObject, INFINITE) == WAIT_OBJECT_0)
-//// 			Flag = FALSE;
-//        break;
-//    case 5:
-//        if ((WaitForSingleObject(pScanner->m_eScanNCEnd->m_hObject, INFINITE) == WAIT_OBJECT_0 ))
-//            Flag = FALSE;
-//        break;
-//    default:
-//    {
-//       // b_pause_refresh_tree = false;
-//        pScanner->m_bNetScanFinish = TRUE; // at this time, two thread end, all scan end
-//        hwait_scan_thread = NULL;
-//        return 0;
-//    }
-//
-//    }
+        }
+    }
+
     WaitForSingleObject(pScanner->m_eScan_tcp_to_485_End->m_hObject, INFINITE);
 
 
     if (Flag)
     {
 		scan_item = 0;
-
-		//m_scan_info.at(0).scan_status = SCAN_STATUS_RUNNING;
-		//pScanner->ScanSubnetFromEthernetDevice();
-
         pScanner->SendScanEndMsg();
         pScanner->m_bNetScanFinish = TRUE; // at this time, two thread end, all scan end
     }
@@ -4001,7 +4128,6 @@ DWORD WINAPI  _WaitScanThread(LPVOID lpVoid)
 
         if (!pScanner->m_thesamesubnet)
         {
-
             pScanner->SendScanEndMsg();
         }
         else
@@ -4012,7 +4138,6 @@ DWORD WINAPI  _WaitScanThread(LPVOID lpVoid)
 
     }
     pScanner->m_bNetScanFinish = TRUE;
-    //b_pause_refresh_tree = false;
     hwait_scan_thread = NULL;
     return 1;
 }
@@ -4044,7 +4169,7 @@ void CTStatScanner::CombineScanResult()
 
 
 const int TABLE_NODE_NUM_REG = 7000;
-const int TABLE_NODE_SIZE = 20;				// Ò»¸önodeÕ¼ÓÃ20¼Ä´æÆ÷
+const int TABLE_NODE_SIZE = 20;				// ä¸€ä¸ªnodeå ç”¨20å¯„å­˜å™¨
 void  CTStatScanner::ReadNCTable(_NetDeviceInfo* pNCInfo)
 {
     int nAddr = pNCInfo->m_pNet->GetDevID();
@@ -4356,7 +4481,7 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
 
     CStringArray temparray;
     SplitCStringA(temparray,strIP,_T("."));
-    if((temparray.GetSize()==4))	//ÓĞ3¸ö  . 4¶Î
+    if((temparray.GetSize()==4))	//æœ‰3ä¸ª  . 4æ®µ
     {
         CString temp_0;
         CString temp_1;
@@ -4380,12 +4505,12 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
             }
 
         }
-        else	//·ñÔòÅĞ¶ÏÎª ÓòÃû;
+        else	//å¦åˆ™åˆ¤æ–­ä¸º åŸŸå;
         {
             is_domain = true;
         }
     }
-    else	//ÅĞ¶ÏÎª ÓòÃû;
+    else	//åˆ¤æ–­ä¸º åŸŸå;
     {
         is_domain = true;
     }
@@ -4433,7 +4558,7 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
         //DFTrace(strInfo);
         //pScan->ShowBacnetComScanInfo(strInfo);
 
-        if((int)m_bac_scan_result_data.size()>= ready_to_read_count)	//´ïµ½·µ»ØµÄ¸öÊıºó¾Íbreak;
+        if((int)m_bac_scan_result_data.size()>= ready_to_read_count)	//è¾¾åˆ°è¿”å›çš„ä¸ªæ•°åå°±break;
             break;
         TRACE(_T("gloab scan = %d\r\n"),ready_to_read_count);
         for (int i=0; i<ready_to_read_count; i++)
@@ -4488,7 +4613,7 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
 	  Show_Scan_Data(_T("Found remote device."),scan_remote_ip_item);
 
     CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-    //unsigned int temp_serial_number = pFrame->m_product.at(selected_product_index).serial_number;//ÒÔĞòÁĞºÅµÄÎÄ¼şÃû±£´æ;
+    //unsigned int temp_serial_number = pFrame->m_product.at(selected_product_index).serial_number;//ä»¥åºåˆ—å·çš„æ–‡ä»¶åä¿å­˜;
     for (int i=0; i<(int)m_bac_scan_result_data.size(); i++)
     {
         //int temp1 = m_FlexGrid.get_Rows();
@@ -4525,7 +4650,7 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
         if(count >= 1)
             find_exsit = true;
 
-        if(!find_exsit)//Ã»ÓĞ·¢ÏÖÏàÍ¬µÄĞòÁĞºÅ¾Í²åÈë;
+        if(!find_exsit)//æ²¡æœ‰å‘ç°ç›¸åŒçš„åºåˆ—å·å°±æ’å…¥;
         {
             //changed_items = temp1 -1;
             CString m_protocol_temp;
@@ -4620,7 +4745,7 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
             find_exsit = true;
 
 
-        if(!find_exsit)//Ã»ÓĞ·¢ÏÖÏàÍ¬µÄĞòÁĞºÅ¾Í²åÈë;
+        if(!find_exsit)//æ²¡æœ‰å‘ç°ç›¸åŒçš„åºåˆ—å·å°±æ’å…¥;
         {
             CString m_protocol_temp;
             m_protocol_temp.Format(_T("%u"),P_REMOTE_DEVICE);
@@ -4672,90 +4797,117 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
     return 1;
 }
 
-//ĞèÒªÏÈÈÃ´®¿ÚµÄmodbus É¨Íê£¬ÄÇÀï»á¼ÇÂ¼ÓĞÄÄĞ©´®¿Ú´æÔÚ bacnetµÄĞ­Òé.
-//ÔÚÉ¨ÃèbacnetµÄÊ±ºò ½«bacnet ip É¨ÃèÍêºó£¬ÒªÈ¥ÒÀ´ÎÉ¨Ãè ´®¿ÚµÄMS/TP
+//éœ€è¦å…ˆè®©ä¸²å£çš„modbus æ‰«å®Œï¼Œé‚£é‡Œä¼šè®°å½•æœ‰å“ªäº›ä¸²å£å­˜åœ¨ bacnetçš„åè®®.
+//åœ¨æ‰«æbacnetçš„æ—¶å€™ å°†bacnet ip æ‰«æå®Œåï¼Œè¦å»ä¾æ¬¡æ‰«æ ä¸²å£çš„MS/TP
 //Scan bacnet
 UINT _ScanBacnetMSTPThread(LPVOID pParam)
 {
     CTStatScanner* pScan = (CTStatScanner*)(pParam);
+    vector <_Bac_Scan_Com_Info> m_temp_com_data;
+    vector <_Bac_Scan_results_Info> m_temp_result_data;
 
+    WaitForSingleObject(pScan->m_eScanComEnd->m_hObject, INFINITE);  //ç­‰å¾…ä¸²å£ modbusé€šè®¯æ‰«æå®Œæ¯•;
+    pScan->m_eScanComEnd->SetEvent();   // ç”¨å®Œè¿™ä¸ªé€šçŸ¥åè¦é‡Šæ”¾ å› ä¸ºBACNET è½¬ modbus çš„ é‚£ä¸ªçº¿ç¨‹ä¹Ÿåœ¨åˆ¤æ–­è¿™ä¸ªä¿¡å· æ˜¯å¦æœ‰è¢«é€šçŸ¥;
 
-    //if (pScan->m_eScanBacnetIpEnd->m_hObject)
+    //å¦‚æœä¸è¦MSTPæ‰«æ å°±æ‰“å¼€ä¸‹é¢ä»£ç 
+    //if(m_scan_info.at(scan_bacnet_ip_item).scan_skip)
     //{
-    //	pScan->m_eScanBacnetIpEnd->SetEvent();
+    //    if (pScan->m_eScanBacnetIpEnd->m_hObject)
+    //    {
+    //        pScan->m_eScanBacnetIpEnd->SetEvent();
+    //    }
+    //    //is_in_scan_mode = false;
+    //    return 1;
     //}
-    //is_in_scan_mode = false;
-    //return 1;
-    if(m_scan_info.at(scan_bacnet_ip_item).scan_skip)
-    {
-        if (pScan->m_eScanBacnetIpEnd->m_hObject)
-        {
-            pScan->m_eScanBacnetIpEnd->SetEvent();
-        }
-<<<<<<< HEAD
-        //is_in_scan_mode = false;
-=======
-        //m_scan_info.at(scan_bacnet_ip_item).scan_status = SCAN_STATUS_FINISHED;
-        //pScan->m_bStopScan = TRUE;
 
-        temphandle = Get_RS485_Handle();
-        if (temphandle != NULL)
-        {
-            TerminateThread((HANDLE)Get_Thread1(), 0);
-            TerminateThread((HANDLE)Get_Thread2(), 0);
-
-            CloseHandle(temphandle);
-            Set_RS485_Handle(NULL);
-        }
-        m_scan_info.at(scan_bacnet_ip_item).scan_status = SCAN_STATUS_FINISHED;
->>>>>>> 16f951e4dc1ccd60c5ad13a7476e318c452b6160
-        return 1;
-    }
-
-    m_bac_scan_com_data.clear();	//Çå¿ÕÉÏ´ÎÉ¨ÃèµÄÒÅÁôÊı¾İ;
+    m_bac_scan_com_data.clear();	//æ¸…ç©ºä¸Šæ¬¡æ‰«æçš„é—ç•™æ•°æ®;
     m_bac_scan_result_data.clear();
-
+    m_temp_result_data.clear();
     //scaning_mode = true;
     m_scan_info.at(scan_bacnet_ip_item).scan_status = SCAN_STATUS_RUNNING;
 
 
-	//µÈ´®¿ÚµÄmodbus µÄ ÍêÈ«ÊÍ·ÅÁËÖ®ºóÔÚ¿ªÊ¼ É¨Ãè bacnet µÄmstp £¬ ²»È»µÄ»° ÆäËûµØ·½µÄclose_COM ÈİÒ×³öÏÖ Òì³£±¨´í;
-	 if(WaitForSingleObject(pScan->m_eScanComEnd->m_hObject, INFINITE) == WAIT_OBJECT_0)
-	 {
+	////ç­‰ä¸²å£çš„modbus çš„ å®Œå…¨é‡Šæ”¾äº†ä¹‹ååœ¨å¼€å§‹ æ‰«æ bacnet çš„mstp ï¼Œ ä¸ç„¶çš„è¯ å…¶ä»–åœ°æ–¹çš„close_COM å®¹æ˜“å‡ºç° å¼‚å¸¸æŠ¥é”™;
+	// if(WaitForSingleObject(pScan->m_eScanComEnd->m_hObject, INFINITE) == WAIT_OBJECT_0)
+	// {
 
-	 }
-	   pScan->m_eScanComEnd->SetEvent();
+	// }
+	//   pScan->m_eScanComEnd->SetEvent();
 #if 1 // bacnet mstp
-    //for (int i=0;i<pScan->m_bacnetComs.size();i++)
-    //{
+
+    //int n_comport = 1;
+    //int n_baudrate = 19200;
+    //int n_find_mstp = 1;
+
+    int n_comport = 0;
+    int n_baudrate = 19200;
+    int n_find_mstp = false;
+    for (int j = 0; j < m_com_mstp_detect.size(); j++)
+    {
+        if (m_com_mstp_detect.at(j).test_ret == 1)
+        {
+            n_find_mstp = true;
+            n_comport = m_com_mstp_detect.at(j).ncomport;
+            n_baudrate = m_com_mstp_detect.at(j).baudrate;
+            break;
+        }
+    }
+    //å‘å¸ƒç‰ˆæœ¬ å…ˆå¿½ç•¥ bacnet çš„éƒ¨åˆ† ä¸æ‰«æ 
+    if (n_find_mstp == false)
+    {
+        HANDLE temphandle1;
+        if (pScan->m_eScanBacnetIpEnd->m_hObject)
+        {
+            pScan->m_eScanBacnetIpEnd->SetEvent();
+        }
+        //m_scan_info.at(scan_bacnet_ip_item).scan_status = SCAN_STATUS_FINISHED;
+        //pScan->m_bStopScan = TRUE;
+
+        temphandle1 = Get_RS485_Handle();
+        if (temphandle1 != NULL)
+        {
+            TerminateThread((HANDLE)Get_Thread1(), 0);
+            TerminateThread((HANDLE)Get_Thread2(), 0);
+
+            CloseHandle(temphandle1);
+            Set_RS485_Handle(NULL);
+        }
+        m_scan_info.at(scan_bacnet_ip_item).scan_status = SCAN_STATUS_FINISHED;
+        return 1;
+    }
 
     CString temp_cs;
-    int temp_port = current_building_comport;
-    Initial_bac(temp_port);
-    TRACE(_T("Now scan with COM%d\r\n"),temp_port);
+    CString temp_cstring;
+    //temp_cstring = pScan->m_szComs.at(i).Right(pScan->m_szComs.at(i).GetLength() - 3);
 
-    for (int i=0; i<100; i++)
+    int temp_port = n_comport;// current_building_comport;
+
+
+
+    int ret_results;
+
+
+    Initial_bac(temp_port,_T(""), n_baudrate);
+    TRACE(_T("Now scan with COM%d\r\n"),temp_port);
+    Sleep(5000);//ç­‰å¾…å‡ ç§’è®©MSTP çš„token è¿è¡Œèµ·æ¥.
+    for (int i=0; i<15; i++)
     {
         CString strInfo;
-        strInfo.Format(_T("Send MSTP command time left(%d)"),100-i);
+        strInfo.Format(_T("Send MSTP command time left(%d)"),15-i);
         memset(m_scan_info.at(scan_bacnet_ip_item).scan_notes,0,250);
         char temp_char[250];
         WideCharToMultiByte( CP_ACP, 0, strInfo.GetBuffer(), -1, temp_char, 250, NULL, NULL );
         memcpy(m_scan_info.at(scan_bacnet_ip_item).scan_notes,temp_char,250);
-
-        //pScan->ShowBacnetComScanInfo(strInfo);
         Send_WhoIs_Global(-1,-1);
-        Sleep(1000);
-        if((m_bac_scan_com_data.size() > 0) && (i > 20))
+        Sleep(2000);
+        m_scan_info.at(scan_bacnet_ip_item).scan_found = m_bac_scan_com_data.size();
+        if((m_bac_scan_com_data.size() > 0) && (i > 10))
             break;
     }
 
 
-
-
-    for (int j=0; j<5; j++)
-    {
         int ready_to_read_count =	m_bac_scan_com_data.size();
+        m_temp_com_data = m_bac_scan_com_data;
         CString strInfo1;
         CString strInfo;
 
@@ -4767,52 +4919,63 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
         memcpy(m_scan_info.at(scan_bacnet_ip_item).scan_notes,temp_char,250);
 
 
-        if((int)m_bac_scan_result_data.size()>= ready_to_read_count)	//´ïµ½·µ»ØµÄ¸öÊıºó¾Íbreak;
-            break;
+        //if((int)m_bac_scan_result_data.size()>= ready_to_read_count)	//è¾¾åˆ°è¿”å›çš„ä¸ªæ•°åå°±break;
+        //    break;
         TRACE(_T("gloab scan = %d\r\n"),ready_to_read_count);
         for (int i=0; i<ready_to_read_count; i++)
         {
-            int	resend_count = 0;
-            do
+            unsigned short test_array[1000];
+            int ntest_ret = 0;
+
+            memset(test_array, 0, 2000);
+            for (int j = 0; j < 50; j++)
             {
-                resend_count ++;
-                if(resend_count>50)
+                ntest_ret = GetPrivateBacnetToModbusData(m_temp_com_data.at(i).device_id, 0, 100, test_array);
+                if (ntest_ret >= 0)
+                {
+                    _Bac_Scan_results_Info  temp_info;
+                    temp_info.serialnumber = test_array[0] + test_array[1] * 256 + test_array[2] * 256 * 256 + test_array[3] * 256 * 256 * 256;
+                    temp_info.product_type = test_array[7];
+                    temp_info.modbus_addr = test_array[6];
+                    temp_info.panel_number = m_temp_com_data.at(i).macaddress;
+                    temp_info.software_version = 0;
+                    temp_info.hardware_version = 0;
+                    temp_info.m_protocol = PROTOCOL_MSTP_TP_MODBUS;
+                    temp_info.device_id = m_temp_com_data.at(i).device_id;
+
+                    temp_info.ipaddress[0] = test_array[47];
+                    temp_info.ipaddress[1] = test_array[48];
+                    temp_info.ipaddress[2] = test_array[49];
+                    temp_info.ipaddress[3] = test_array[50];
+
+                    m_temp_result_data.push_back(temp_info);
                     break;
-                g_invoke_id = GetPrivateData(
-                                  m_bac_scan_com_data.at(i).device_id,
-                                  GETSERIALNUMBERINFO,
-                                  0,
-                                  0,
-                                  sizeof(Str_Serial_info));
-
-                Sleep(SEND_COMMAND_DELAY_TIME);
+                }
+                Sleep(200);
             }
-            while (g_invoke_id<0);
-            Sleep(2000);
-            //} while (!tsm_invoke_id_free(g_invoke_id));
-
+            Sleep(1000);
         }
-    }
 
 
-    //}
+
+
 #endif
-	CppSQLite3DB SqliteDBBuilding;
-	CppSQLite3Table table;
-	CppSQLite3Query q;
+    CppSQLite3DB SqliteDBBuilding;
+    CppSQLite3Table table;
+    CppSQLite3Query q;
 	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
 
-    int ret_3 = 0;
-    if(m_bac_scan_com_data.size()==0)
+    int ret_receive_mstp_count = 0;
+    if(m_temp_com_data.size()==0)
     {
-        AfxMessageBox(_T("No device reply who is!"));
+        //AfxMessageBox(_T("No device reply who is!"));
         goto end_mstp_thread;
     }
     else
     {
-        ret_3 =	m_bac_scan_result_data.size();
-        if(ret_3 > 0)
+        ret_receive_mstp_count = m_temp_result_data.size();
+        if(ret_receive_mstp_count > 0)
         {
             //AfxMessageBox(_T("Receive 99"));
         }
@@ -4823,124 +4986,75 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
         }
     }
 
-    //m_scan_info.at(scan_bacnet_ip_item).scan_found = ret_3;
-    //CString bac_strInfo;
-    //bac_strInfo.Format(_T("Scan  Bacnetip.Found %d recognizable Bacnet device"),ret_3);
-    //pScan->ShowBacnetComScanInfo(bac_strInfo);
-
-
-    //memset(m_scan_info.at(scan_bacnet_ip_item).scan_notes,0,250);
-    //char temp_char[250];
-    //WideCharToMultiByte( CP_ACP, 0, bac_strInfo.GetBuffer(), -1, temp_char, 250, NULL, NULL );
-    //memcpy(m_scan_info.at(scan_bacnet_ip_item).scan_notes,temp_char,250);
-
     CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-    //TRACE(_T("serial scan = %d\r\n"),ret_3);
-    for (int l=0; l<ret_3; l++)
+    for (int l=0; l<ret_receive_mstp_count; l++)
     {
         CString temp_serial_number;
-        temp_serial_number.Format(_T("%u"),m_bac_scan_result_data.at(l).serialnumber);
-        CString str_temp;
-        str_temp.Format(_T("select * from ALL_NODE where Serial_ID = '%s'"),temp_serial_number);
-
         CString temp_baud;
-        temp_baud.Format(_T("%u"),current_building_baudrate);
-
-
-		q = SqliteDBBuilding.execQuery((UTF8MBSTR)str_temp);
-		table = SqliteDBBuilding.getTable((UTF8MBSTR)str_temp);
-        int count =table.numRows();
-         
-
+        CString str_temp;
         CString temp_pname;
-        temp_pname = GetProductName(m_bac_scan_result_data.at(l).product_type);
         CString temp_modbusid;
-        temp_modbusid.Format(_T("%u"),m_bac_scan_result_data.at(l).modbus_addr);
         CString temp_view_name;
-        temp_view_name = temp_pname + _T(":") + temp_serial_number + _T("-") + temp_modbusid;
         CString temp_protocol;
-        temp_protocol.Format(_T("%d"),P_BACNET_MSTP);
-
         CString temp_product_id_string;
-        temp_product_id_string.Format(_T("%d"),m_bac_scan_result_data.at(l).product_type);
-
         CString temp_port_string;
-        temp_port_string.Format(_T("%d"),current_building_comport);
-
         CString temp_object_instance;
         CString temp_panel_number;
-        temp_object_instance.Format(_T("%u"),m_bac_scan_result_data.at(l).device_id);
-        temp_panel_number.Format(_T("%u"),m_bac_scan_result_data.at(l).panel_number);
+        int count;
+        temp_serial_number.Format(_T("%u"), m_temp_result_data.at(l).serialnumber);
+        str_temp.Format(_T("select * from ALL_NODE where Serial_ID = '%s'"),temp_serial_number);
+        temp_baud.Format(_T("%u"), n_baudrate);
+		q = SqliteDBBuilding.execQuery((UTF8MBSTR)str_temp);
+		table = SqliteDBBuilding.getTable((UTF8MBSTR)str_temp);
+        count =table.numRows();
+         
+
+
+        temp_pname = GetProductName(m_temp_result_data.at(l).product_type);
+        temp_modbusid.Format(_T("%u"), m_temp_result_data.at(l).modbus_addr);
+        temp_view_name = temp_pname + _T(":") + temp_serial_number + _T("-") + temp_modbusid;
+        temp_protocol.Format(_T("%d"), PROTOCOL_MSTP_TP_MODBUS);
+        temp_product_id_string.Format(_T("%d"), m_temp_result_data.at(l).product_type);
+        temp_port_string.Format(_T("%d"), n_comport);
+        temp_object_instance.Format(_T("%u"), m_temp_result_data.at(l).device_id);
+        temp_panel_number.Format(_T("%u"), m_temp_result_data.at(l).panel_number);
 
         if(count>= 1)
         {
-            str_temp.Format(_T("update ALL_NODE set Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='%s',Product_name = '%s',Online_Status = 1,Hardware_Ver = '%s',Software_Ver = ' %s' where Serial_ID = '%s'"),temp_baud,temp_port_string,temp_product_id_string,temp_protocol,
+            str_temp.Format(_T("update ALL_NODE set Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='%s',Product_name = '%s',Online_Status = 1,Object_Instance = '%s',Panal_Number = ' %s' where Serial_ID = '%s'"),temp_baud,temp_port_string,temp_product_id_string,temp_protocol,
                             temp_view_name,temp_object_instance,temp_panel_number,temp_serial_number);
         }
         else
         {
-            str_temp.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Custom)   values('"
-                               +pFrame->m_strCurMainBuildingName+"','"+pFrame->m_strCurSubBuldingName+"','""','"+temp_serial_number+"','floor1','room1','"+temp_view_name+"','"+temp_product_id_string+"','"+temp_modbusid+"','""','"+temp_baud+"','Default_Building_PIC.bmp','"+temp_object_instance+"','"+temp_panel_number+"','"+temp_port_string+"','0','"+temp_protocol+"','1','0')"));
+            str_temp.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Custom,Parent_SerialNum,Panal_Number,Object_Instance)   values('"
+                               +pFrame->m_strCurMainBuildingName+"','"+pFrame->m_strCurSubBuldingName+"','""','"+temp_serial_number+"','floor1','room1','"+temp_view_name+"','"+temp_product_id_string+"','"+temp_modbusid+"','""','"+temp_baud+"','Default_Building_PIC.bmp','"+temp_object_instance+"','"+temp_panel_number+"','"+temp_port_string+"','0','"+temp_protocol+"','1','0','0', '"+ temp_panel_number +"','" + temp_object_instance + "')"));
 
         }
          SqliteDBBuilding.execDML((UTF8MBSTR)str_temp);
     }
 
-#if 0
-    for (int l=0; l<ret_3; l++)
-    {
-        CTStat_Dev* pTemp = new CTStat_Dev;
-        _ComDeviceInfo* pInfo = new _ComDeviceInfo;
-        pInfo->m_pDev = pTemp;
-        pTemp->SetSerialID(m_bac_scan_result_data.at(l).serialnumber);
-        pTemp->SetDevID(m_bac_scan_result_data.at(l).modbus_addr);
-        pTemp->SetProductType(m_bac_scan_result_data.at(l).product_type);
-
-        pTemp->SetProtocol(2);//2¾ÍÊÇbacnet;
-        pTemp->SetHardwareVersion(m_bac_scan_result_data.at(l).device_id);		//ÓÃHW Version ´úÌæbacnetµÄ instance ID
-        pTemp->SetSoftwareVersion(m_bac_scan_result_data.at(l).panel_number);
-        pTemp->SetBaudRate(19200);//scan
-        pTemp->SetComPort(5);
-        // hardware_version
-        pTemp->SetBuildingName(pScan->m_strBuildingName);
-        pTemp->SetSubnetName(pScan->m_strSubNet);
-
-
-
-
-        pScan->m_szTstatScandRet.push_back(pInfo);
-    }
-#endif
-    /*bac_strInfo.Format(_T("Scan finished"));
-    memset(m_scan_info.at(scan_bacnet_ip_item).scan_notes,0,250);
-    memset(temp_char,0,250);
-    WideCharToMultiByte( CP_ACP, 0, bac_strInfo.GetBuffer(), -1, temp_char, 250, NULL, NULL );
-    memcpy(m_scan_info.at(scan_bacnet_ip_item).scan_notes,temp_char,250);*/
-
- 
 
 end_mstp_thread:
-<<<<<<< HEAD
-=======
     m_scan_info.at(scan_bacnet_ip_item).scan_status = SCAN_STATUS_FINISHED;
     HANDLE temphandle;
->>>>>>> 16f951e4dc1ccd60c5ad13a7476e318c452b6160
     if (pScan->m_eScanBacnetIpEnd->m_hObject)
     {
         pScan->m_eScanBacnetIpEnd->SetEvent();
     }
     //m_scan_info.at(scan_bacnet_ip_item).scan_status = SCAN_STATUS_FINISHED;
     //pScan->m_bStopScan = TRUE;
-    HANDLE temphandle;
-    temphandle = Get_RS485_Handle();
-    if(temphandle !=NULL)
-    {
-        TerminateThread((HANDLE)Get_Thread1(),0);
-        TerminateThread((HANDLE)Get_Thread2(),0);
 
-        CloseHandle(temphandle);
-        Set_RS485_Handle(NULL);
-    }
+    close_bac_com();
+
+    //temphandle = Get_RS485_Handle();
+    //if(temphandle !=NULL)
+    //{
+    //    TerminateThread((HANDLE)Get_Thread1(),0);
+    //    TerminateThread((HANDLE)Get_Thread2(),0);
+
+    //    CloseHandle(temphandle);
+    //    Set_RS485_Handle(NULL);
+    //}
 
     //is_in_scan_mode = false;
     return 1;

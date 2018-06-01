@@ -21,7 +21,7 @@ public:
 	virtual bool SortByFloor(HTREEITEM hItem)  ;
 	virtual bool PingDevice(HTREEITEM hItem) ;
 	bool HandleAddVirtualDevice(HTREEITEM);
-	bool HandleAddCustomDevice(HTREEITEM);
+	bool HandleAddCustomDevice(HTREEITEM hItem);
      virtual bool    DoDeleteItem(HTREEITEM);
 
 	
@@ -52,6 +52,8 @@ cmdmap_t	m_Commandmap;
 public:
 BOOL UpdateDataToDB_Floor();
 BOOL UpdateDataToDB_Connect();
+void Inial_ProductName_map();
+int PanelName_Map(int product_type);
 bool CanInsertItem(HTREEITEM hItem);
 bool CanDeleteItem(HTREEITEM hItem);
 	virtual bool	CanEditLabel(HTREEITEM hItem);

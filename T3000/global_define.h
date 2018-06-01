@@ -213,6 +213,7 @@ const int PROTOCOL_BACNET_IP = 3;
 const int PROTOCOL_GSM = 4;
 const int PROTOCOL_REMOTE_IP = 6;
 const int PROTOCOL_BIP_TO_MSTP = 10;
+const int PROTOCOL_MSTP_TP_MODBUS = 11;
 const int PROTOCOL_UNKNOW = 255;
 
 const int BAC_WAIT_NORMAL_READ = 0;
@@ -470,7 +471,7 @@ struct _Bac_Scan_Com_Info
 struct _Bac_Scan_results_Info
 {
 	unsigned int device_id;
-	char ipaddress[6];
+	unsigned char ipaddress[6];
 	unsigned char modbus_addr;
 	unsigned char product_type;
 	unsigned int serialnumber;
@@ -533,6 +534,7 @@ struct refresh_net_device
 	CString NetCard_Address;
 	CString show_label_name;
 	unsigned short bacnetip_port;
+    int zigbee_exsit;
 };
 
 struct refresh_net_label_info
@@ -645,23 +647,27 @@ const int VARIABLE_ANALOG_UNITE_COUNT = 34;
 const CString ExtIO_Product[] =
 {
 	_T("T3_8AI8AO6DO"),
-	_T("T3_22I")
+	_T("T3_22I"),
+    _T("T3_PT12")
 };
 const int ExtIO_ProductId[] =
 {
 	44,
-	43
+	43,
+    46
 };
 
 const int ExtIO_INPUT_COUNT[] =
 {
 	8,
-	22
+	22,
+    12
 };
 const int ExtIO_OUTPUT_COUNT[] =
 {
 	14,
-	0
+	0,
+    0
 };
 
 const CString ExtIO_Port[] =
@@ -749,10 +755,10 @@ const CString OutPut_List_Analog_Range[] =
 	_T(""),
 	_T("0.0 -> 10"),
 	_T("0.0 -> 100"),
-	_T("0.0 -> 20"),
+	_T("4   -> 20"),
 	_T("0.0 -> 100"),
 	_T("0.0 -> 100"),
-	_T("0.0 -> 20"),
+	_T("4   -> 20"),
 	_T("0.0 -> 100")
 };
 
@@ -831,8 +837,8 @@ const CString Input_Analog_Units_Array[] =
 	_T("A10K -60 to 200"),
 	_T("0.0 to 5.0"),
 	_T("0.0 to 100"),
-	_T("0.0 to 20"),
-	_T("0.0 to 20"),
+	_T("4 to 20"),
+	_T("4 to 20"),
 	_T("Pulse Count (Slow 1Hz)"),
 	_T("0.0 to 3000"),
 	_T("0 to 100"),
@@ -868,10 +874,10 @@ const CString Output_Analog_Units_Array[] =
 	_T("Unused"),
 	_T("0.0 -> 10   Volts"),
 	_T("0.0 -> 100  %Open"),
-	_T("0.0 -> 20   psi"),
+	_T("4   -> 20   psi"),
 	_T("0.0 -> 100  %"),
 	_T("0.0 -> 100  %Cls"),
-	_T("0.0 -> 20   ma"),
+	_T("4   -> 20   ma"),
 	_T("0.0 -> 100  PWM")
 };
 
@@ -1958,6 +1964,12 @@ typedef union
 	}reg;
 }Str_UPD_SCAN;
 
+typedef struct bac_mstp_com
+{
+    bool status;
+    int  ncomport;
+    int  nbaudrate;
+}Str_bac_mstp_com;
 
 const int REFRESH_LIST_NOW = 2000;
 

@@ -9,7 +9,7 @@
 #include "global_function.h"
 #include "MainFrm.h"
 // T332AI
-CString Range_Unit_T332AI[]={_T("RAW DATA"),_T("TYPE2 10K C"),_T("TYPE2 10K F"),_T("0-100%"),_T("ON/OFF"),_T("OFF/ON"),_T("Pulse Input"),_T("Lighting Control"),_T("TYPE3 10K C"),_T("TYPE3 10K F"),_T("NO USE"),_T("0-5V"),_T("0-10V"),_T("0-20ma")};
+CString Range_Unit_T332AI[]={_T("RAW DATA"),_T("TYPE2 10K C"),_T("TYPE2 10K F"),_T("0-100%"),_T("ON/OFF"),_T("OFF/ON"),_T("Pulse Input"),_T("Lighting Control"),_T("TYPE3 10K C"),_T("TYPE3 10K F"),_T("NO USE"),_T("0-5V"),_T("0-10V"),_T("4-20ma")};
 
 IMPLEMENT_DYNCREATE(T332AI, CFormView)
 
@@ -278,7 +278,7 @@ void T332AI::InitialDialog(){
 		}
 		else if (13==product_register_value[Range1+i-1])
 		{
-			strresult=_T("0-20ma");
+			strresult=_T("4-20ma");
 		}
 
 		m_msflexgrid_input.put_TextMatrix(i,1,strresult);
@@ -477,7 +477,7 @@ void T332AI::ClickMsflexgridInput()
 		m_comboxRange.AddString(_T("NO USE"));
 		m_comboxRange.AddString(_T("0-5V"));
 		m_comboxRange.AddString(_T("0-10V"));
-		m_comboxRange.AddString(_T("0-20ma"));
+		m_comboxRange.AddString(_T("4-20ma"));
 
 		m_comboxRange.ShowWindow(SW_SHOW);
 

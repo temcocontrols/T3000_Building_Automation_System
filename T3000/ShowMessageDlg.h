@@ -7,6 +7,7 @@
 const int EVENT_AUTO_CLOSE = 0;
 const int EVENT_IP_AUTO = 1;
 const int EVENT_IP_STATIC_CHANGE = 2;
+const int EVENT_MSTP_CONNECTION_ESTABLISH = 3;
 
 class CShowMessageDlg : public CDialogEx
 {
@@ -46,12 +47,15 @@ public:
     HWND m_message_hwnd ;  //用于回传消息;
     int m_message ;
 
+    _Bac_Scan_Com_Info m_mstp_device_info;  // MSTP 用于确认 whois 是否有回复;
+
     void SetStaticText(LPCTSTR lpszTitleText);
     void SetStaticTextBackgroundColor(COLORREF TitleTextBackColor);
     void SetStaticTextSize(int size_length, int size_width);
     void SetStaticTextColor(COLORREF TitleTextBackColor);
     void SetProgressAutoClose( int mi_seconds, int time_count, int nEvent = EVENT_AUTO_CLOSE);
     void SetHwnd(HWND h_hwnd, int nMessage);
+    void SetMstpDeviceInfo(_Bac_Scan_Com_Info deviceinfo); // MSTP 用于确认 whois 是否有回复;
     CStaticEx m_static_title;
     CStaticEx m_static_persent;
     afx_msg void OnTimer(UINT_PTR nIDEvent);

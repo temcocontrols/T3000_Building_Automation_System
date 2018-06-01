@@ -369,7 +369,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 				{
 					m_Output_data.at(label_info.nPoint_number).auto_manual = 1;	//Manual = 1;
 					show_temp = _T("Manual");
-					if (m_Output_data.at(label_info.nPoint_number).digital_analog == BAC_UNITS_DIGITAL)
+					if (m_Output_data.at(label_info.nPoint_number).digital_analog == BAC_UNITS_ANALOG)
 						m_edit_value.EnableWindow(true);
 
 				}
@@ -424,7 +424,10 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 				}
 				
 			}
-
+            else
+            {
+                return 0;
+            }
 			CString temp_task_info;
 			temp_task_info.Format(_T("Write Output List Item%d .Changed to \"%s\" "),label_info.nPoint_number,show_temp);
 			Post_Write_Message(g_bac_instance,WRITEOUTPUT_T3000,label_info.nPoint_number,label_info.nPoint_number,sizeof(Str_out_point),m_edit_label ,temp_task_info);
@@ -444,7 +447,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 				{
 					m_Variable_data.at(label_info.nPoint_number).auto_manual = 1;	//Manual = 1;
 					show_temp = _T("Manual");
-					if (m_Variable_data.at(label_info.nPoint_number).digital_analog == BAC_UNITS_DIGITAL)
+					if (m_Variable_data.at(label_info.nPoint_number).digital_analog == BAC_UNITS_ANALOG)
 						m_edit_value.EnableWindow(true);
 
 				}

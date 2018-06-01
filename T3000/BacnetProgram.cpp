@@ -401,8 +401,15 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 
 void CBacnetProgram::OnBnClickedButtonProgramEdit()
 {
-	
-
+	//2018 05 23 解决在切换panel时 ， 选中的 program_list_line 的值需要重新获取.
+    for (int i = 0;i<m_program_list.GetItemCount();++i)
+    {
+        if (m_program_list.GetCellChecked(i, 0))
+        {
+            program_list_line = i;
+            break;
+        }
+    }
 
 	CString temp_show_info;
 	temp_show_info.Format(_T("Reading program code %d ..."),program_list_line + 1);

@@ -1042,9 +1042,6 @@
     <ClInclude Include="TrendLogWnd.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="WeeklySchedule.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="AddBuilding.h">
       <Filter>Header Files</Filter>
     </ClInclude>

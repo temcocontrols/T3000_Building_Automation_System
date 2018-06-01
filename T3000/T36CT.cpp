@@ -525,7 +525,7 @@ for(int i = 1;i<=6;i++)
     }
     else if (13==product_register_value[RANGE_INPUT1+i-1])
     {
-        strresult=_T("0-20 ma");
+        strresult=_T("4-20 ma");
     }
 
     m_msflexgrid_input.put_TextMatrix(i,2,strresult);
@@ -679,7 +679,7 @@ for(int i = 1;i<=10;i++)
     }
     else if (13==product_register_value[RANGE_INPUT7+i-1])
     {
-        strresult=_T("0-20 ma");
+        strresult=_T("4-20 ma");
     }
 
     m_msflexgrid_Ainput.put_TextMatrix(i,2,strresult);
@@ -880,7 +880,7 @@ void T36CT::ClickMsflexgridInput()
         m_comboxRange.AddString(_T("NO USE"));
         m_comboxRange.AddString(_T("0-5V"));
         m_comboxRange.AddString(_T("0-10V"));
-        m_comboxRange.AddString(_T("0-20 ma"));
+        m_comboxRange.AddString(_T("4-20 ma"));
 
         m_comboxRange.ShowWindow(SW_SHOW);
         m_comboxRange.BringWindowToTop();
@@ -956,7 +956,7 @@ void T36CT::ClickMsflexgridInput2()
         m_comboxRange.AddString(_T("NO USE"));
         m_comboxRange.AddString(_T("0-5V"));
         m_comboxRange.AddString(_T("0-10V"));
-        m_comboxRange.AddString(_T("0-20 ma"));
+        m_comboxRange.AddString(_T("4-20 ma"));
         m_comboxRange.ShowWindow(SW_SHOW);
         m_comboxRange.BringWindowToTop();
         m_comboxRange.SetFocus(); //»ñÈ¡½¹µã

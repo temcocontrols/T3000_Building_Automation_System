@@ -266,7 +266,7 @@ void CBacnetInput::Initial_List()
 	m_input_list.InsertColumn(INPUT_CAL_OPERATION, _T("Sign"), 50, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_FITLER, _T("Filter"), 60, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_DECOM, _T("Status"), 60, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	m_input_list.InsertColumn(INPUT_JUMPER, _T("Jumper"), 90, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_input_list.InsertColumn(INPUT_JUMPER, _T("Signal Type"), 90, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_LABLE, _T("Label"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 
 	m_input_list.InsertColumn(INPUT_EXTERNAL, _T("External"), 0, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
@@ -911,6 +911,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 				(temp_pid == PM_T38AI8AO6DO) ||
 				(temp_pid == PM_T36CT) ||
 				(temp_pid == PM_T36CTA)||
+                (temp_pid == PM_T3PT12) ||
 				(temp_pid == PM_T3_LC)
 				)
 			{
@@ -1170,54 +1171,53 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	{
 		BacnetRange dlg;
 
-		//点击产品的时候 需要读customer units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
-		if(!read_customer_unit)
-		{
 
+        if (g_protocol != PROTOCOL_MSTP_TP_MODBUS) // MSTP_转MUDBUS 协议，因为10000以后没有自定义的CUSTOM 表;
+        {
+            if (!read_customer_unit)//点击产品的时候 需要读custom units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
+            {
+                int temp_invoke_id = -1;
+                int send_status = true;
+                int	resend_count = 0;
+                for (int z = 0;z < 3;z++)
+                {
+                    do
+                    {
+                        resend_count++;
+                        if (resend_count > 5)
+                        {
+                            send_status = false;
+                            break;
+                        }
+                        temp_invoke_id = GetPrivateData(
+                            g_bac_instance,
+                            READUNIT_T3000,
+                            0,
+                            BAC_CUSTOMER_UNITS_COUNT - 1,
+                            sizeof(Str_Units_element));
+                        Sleep(SEND_COMMAND_DELAY_TIME);
+                    } while (temp_invoke_id < 0);
+                    if (send_status)
+                    {
+                        for (int z = 0;z < 1000;z++)
+                        {
+                            Sleep(1);
+                            if (tsm_invoke_id_free(temp_invoke_id))
+                            {
+                                read_customer_unit = true;
+                                break;
+                            }
+                            else
+                                continue;
+                        }
 
-			int temp_invoke_id = -1;
-			int send_status = true;
-			int	resend_count = 0;
-			for (int z=0;z<3;z++)
-			{
-				do 
-				{
-					resend_count ++;
-					if(resend_count>5)
-					{
-						send_status = false;
-						break;
-					}
-					temp_invoke_id =  GetPrivateData(
-						g_bac_instance,
-						READUNIT_T3000,
-						0,
-						BAC_CUSTOMER_UNITS_COUNT - 1,
-						sizeof(Str_Units_element));		
+                    }
+                    if (read_customer_unit)
+                        break;
+                }
 
-					Sleep(SEND_COMMAND_DELAY_TIME);
-				} while (temp_invoke_id<0);
-				if(send_status)
-				{
-					for (int z=0;z<1000;z++)
-					{
-						Sleep(1);
-						if(tsm_invoke_id_free(temp_invoke_id))
-						{
-							read_customer_unit = true;
-							break;
-						}
-						else
-							continue;
-					}
-
-				}
-				if(read_customer_unit)
-					break;
-			}
-
-		}
-
+            }
+        }
 		bac_range_number_choose = m_Input_data.at(lRow).range;
         input_item_select_for_range = lRow;
 		if(m_Input_data.at(lRow).digital_analog == BAC_UNITS_ANALOG)
@@ -1430,7 +1430,7 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 				PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
 				if((bac_select_device_online)&& (g_protocol == PROTOCOL_BACNET_IP))
 					Post_Refresh_Message(g_bac_instance,READINPUT_T3000,0,BAC_INPUT_ITEM_COUNT - 1,sizeof(Str_in_point), BAC_INPUT_GROUP);
-				else if((bac_select_device_online) && ((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP)))
+				else if((bac_select_device_online) && ((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP) || (g_protocol == PROTOCOL_MSTP_TP_MODBUS)))
 				{
 					if(read_each_485_fun_thread == NULL)
 					{
