@@ -5,7 +5,7 @@
 #include <fstream>
 #include "ISP.h"
 #include "TstatFlashDlg.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "ISPDlg.h"
 #include "HexFileParser.h"
 #include "BinFileParser.h"

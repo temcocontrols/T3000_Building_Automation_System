@@ -1,6 +1,7 @@
 
+
 #include "stdafx.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "Windows.h"
 #include "ModbusDllForVC.h"
 #include "gloab_define.h"

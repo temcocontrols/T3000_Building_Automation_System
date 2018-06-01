@@ -174,7 +174,7 @@
     <ClInclude Include="gloab_define.h" />
     <ClInclude Include="global_struct.h" />
     <ClInclude Include="global_variable.h" />
-    <ClInclude Include="globle_Function.h" />
+    <ClInclude Include="global_Function.h" />
     <ClInclude Include="global_variable_extern.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="Modbus Poll.h" />
@@ -227,7 +227,7 @@
     <ClCompile Include="EnterValueDlg.cpp" />
     <ClCompile Include="Enter_Value_BinaryDlg.cpp" />
     <ClCompile Include="excel9.cpp" />
-    <ClCompile Include="globle_function.cpp" />
+    <ClCompile Include="global_function.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="Modbus Poll.cpp" />
     <ClCompile Include="Modbus PollDoc.cpp" />

@@ -252,6 +252,9 @@ void CScanDbWaitDlg::OnTimer(UINT_PTR nIDEvent)
                 case SCAN_STATUS_SKIP:
                     m_scan_com_list.SetItemText(x,SCAN_STATUS,_T("Skip"));
                     break;
+                case SCAN_STATUS_DETECTING:
+                    m_scan_com_list.SetItemText(x, SCAN_STATUS, _T("Detecting"));
+                    break;
                 default:
                     break;
                 }
@@ -410,7 +413,7 @@ void CScanDbWaitDlg::Initial_List()
 
     for (int x=0; x<m_scan_info.size(); x++)
     {
-#if 0	//不扫描的东西  也不显示 skip.很多小白客户 不看手册 反应给老毛 。老毛一句话 Auto.脑残。
+#if 0	
 
         if(m_scan_info.at(x).scan_skip)
         {
