@@ -52,7 +52,7 @@ extern int my_lengthcode;// the length of the edit of code
 #pragma endregion
 
 
-extern uint8_t globle_network_number ;
+extern uint8_t global_network_number ;
 extern BacnetScreen *Screen_Window;
 extern CBacnetProgram *Program_Window;
 extern CBacnetInput *Input_Window ;
@@ -871,7 +871,7 @@ CString GetTempUnit(int nRange, int nPIDNO)
     }
     else if(nRange==4)
     {
-        //Customer Sersor
+        //Custom Sersor
         if(nPIDNO==1)
         {
             int m_271=product_register_value[MODBUS_UNITS1_HIGH];//271 390
@@ -1897,23 +1897,19 @@ int GetPrivateBacnetToModbusData(uint32_t deviceid, uint16_t start_reg, int16_t 
     BACNET_APPLICATION_DATA_VALUE data_value = { 0 };
     BACNET_PRIVATE_TRANSFER_DATA private_data = { 0 };
     bool status = false;
-
     private_data.vendorID = BACNET_VENDOR_ID;
     private_data.serviceNumber = 1;
-
 
     char SendBuffer[1000];
     memset(SendBuffer, 0, 1000);
     char * temp_buffer = SendBuffer;
     Str_bacnet_to_modbus_header private_data_chunk;
 
-
-
     int HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
 
     HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
     private_data_chunk.total_length = PRIVATE_HEAD_LENGTH;
-    private_data_chunk.command = BACNET_TO_MODBUS_COMMAND;
+    private_data_chunk.command = READ_BACNET_TO_MODBUS_COMMAND;
     private_data_chunk.start_reg = start_reg; // 测试
     private_data_chunk.nlength = readlength;
     Set_transfer_length(PRIVATE_HEAD_LENGTH);
@@ -1951,20 +1947,17 @@ int GetPrivateBacnetToModbusData(uint32_t deviceid, uint16_t start_reg, int16_t 
                     continue;
             }
         }
-
         else
         {
             Sleep(1000);
             return -6;
         }
-
     }
     else
     {
         Sleep(2000);  //address 
         return -2;
     }
-
 
     return -7;
 }
@@ -2074,8 +2067,8 @@ int WritePrivateBacnetToModbusData(uint32_t deviceid, int16_t start_reg, uint16_
         return -2;
 
 
-
 }
+
 
 
 
@@ -3346,51 +3339,59 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 			my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
 			if(block_length!=sizeof(Time_block_mini))
 				return -1;
-			Device_time.ti_sec = *(my_temp_point ++);
-			Device_time.ti_min = *(my_temp_point ++);
-			Device_time.ti_hour = *(my_temp_point ++);
-			Device_time.dayofmonth = *(my_temp_point ++);
-			Device_time.dayofweek = *(my_temp_point ++);
-			Device_time.month = *(my_temp_point ++);
-			Device_time.year = *(my_temp_point ++);
+            if (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub <= 469)
+            {
+                //::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,NULL,NULL);
+                //byte  ti_min;         // 0-59
+                //byte  ti_hour;           // 0-23
+                //byte  dayofmonth;   // 1-31
+                //byte  month;          // 0-11
+                //byte  year;           // year - 1900
+                //byte  dayofweek;        // 0-6 ; 0=Sunday
+                //int   dayofyear;    // 0-365 gmtime
+                //signed char isdst;
+
+                Device_time.old_time.ti_sec = *(my_temp_point++);
+                Device_time.old_time.ti_min = *(my_temp_point++);
+                Device_time.old_time.ti_hour = *(my_temp_point++);
+                Device_time.old_time.dayofmonth = *(my_temp_point++);
+                Device_time.old_time.dayofweek = *(my_temp_point++);
+                Device_time.old_time.month = *(my_temp_point++);
+                Device_time.old_time.year = *(my_temp_point++);
+
+                temp_struct_value = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+                Device_time.old_time.dayofyear = temp_struct_value;
+                my_temp_point = my_temp_point + 2;
+
+                Device_time.old_time.isdst = *(my_temp_point++);
+
+                if (Device_time.old_time.ti_sec >= 60)
+                    Device_time.old_time.ti_sec = 0;
+                if (Device_time.old_time.ti_min >= 60)
+                    Device_time.old_time.ti_min = 0;
+                if (Device_time.old_time.ti_hour >= 24)
+                    Device_time.old_time.ti_hour = 0;
+                if ((Device_time.old_time.dayofmonth >= 32) || (Device_time.old_time.dayofmonth == 0))
+                    Device_time.old_time.dayofmonth = 1;
+                if ((Device_time.old_time.month>12) || (Device_time.old_time.month == 0))
+                    Device_time.old_time.month = 1;
+                if ((Device_time.old_time.year>50))
+                    Device_time.old_time.year = 13;
+                if ((Device_time.old_time.dayofweek >7) || (Device_time.old_time.dayofweek == 0))
+                    Device_time.old_time.dayofweek = 1;
+                if ((Device_time.old_time.dayofyear >366) || (Device_time.old_time.dayofyear == 0))
+                    Device_time.old_time.dayofyear = 1;
+            }
+            else
+            {
+                Device_time.new_time.n_time = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+                my_temp_point = my_temp_point + 4;
+                Device_time.new_time.time_zone = *(my_temp_point++);
+                Device_time.new_time.time_zone_summer_daytime = *(my_temp_point++);
+
+            }
 
 
-
-			//temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
-			//Device_time.dayofyear = temp_struct_value;
-			//my_temp_point = my_temp_point + 4;
-
-			temp_struct_value = ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
-			Device_time.dayofyear = temp_struct_value;
-			my_temp_point = my_temp_point + 2;
-
-			Device_time.isdst = *(my_temp_point ++);
-
-			if(Device_time.ti_sec>=60)
-				Device_time.ti_sec=0;
-			if(Device_time.ti_min>=60)
-				Device_time.ti_min=0;
-			if(Device_time.ti_hour>=24)
-				Device_time.ti_hour=0;
-			if((Device_time.dayofmonth>=32)||(Device_time.dayofmonth==0))
-				Device_time.dayofmonth=1;
-			if((Device_time.month>12) || (Device_time.month == 0))
-				Device_time.month = 1;
-			if((Device_time.year>50))
-				Device_time.year = 13;
-			if((Device_time.dayofweek >7) || (Device_time.dayofweek == 0))
-				Device_time.dayofweek = 1;
-			if((Device_time.dayofyear >366) || (Device_time.dayofyear == 0))
-				Device_time.dayofyear = 1;
-			//::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,NULL,NULL);
-			//byte  ti_min;         // 0-59
-			//byte  ti_hour;           // 0-23
-			//byte  dayofmonth;   // 1-31
-			//byte  month;          // 0-11
-			//byte  year;           // year - 1900
-			//byte  dayofweek;        // 0-6 ; 0=Sunday
-			//int   dayofyear;    // 0-365 gmtime
-			//signed char isdst;
 
 
 			return TIME_COMMAND;
@@ -3813,6 +3814,7 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
             Device_Basic_Setting.reg.LCD_Display = *(my_temp_point++);
             Device_Basic_Setting.reg.flag_time_sync_pc = *(my_temp_point++);
             Device_Basic_Setting.reg.time_sync_auto_manual = *(my_temp_point++);
+            Device_Basic_Setting.reg.sync_time_results = *(my_temp_point++);
 			return READ_SETTING_COMMAND;
 		}
 		break;
@@ -3822,10 +3824,10 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 			return READMONITORDATA_T3000;
 		}
         break;
-    case BACNET_TO_MODBUS_COMMAND:
+    case READ_BACNET_TO_MODBUS_COMMAND:
         {
              handle_bacnet_to_modbus_data((char *)Temp_CS.value, len_value_type);
-        return BACNET_TO_MODBUS_COMMAND;
+        return READ_BACNET_TO_MODBUS_COMMAND;
         }
     break;
     case READMONITORPACKAGE_T3000:
@@ -4258,7 +4260,8 @@ void local_handler_conf_private_trans_ack(
         break;
     }
 
-    if((each_end_flag) && (bac_read_which_list != BAC_READ_ALL_LIST) && (bac_read_which_list != BAC_READ_SVAE_CONFIG))
+    if(((each_end_flag) && (bac_read_which_list != BAC_READ_ALL_LIST) && (bac_read_which_list != BAC_READ_SVAE_CONFIG)) ||
+        (bac_read_which_list == BAC_READ_BASIC_SETTING_COMMAND)) //Setting 要特殊存一下
     {
         CString temp_file;
         CString temp_serial;
@@ -4668,7 +4671,7 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
 
     //TRACE(_T("Find ") + bac_cs_device_id +_T("  ") + bac_cs_mac + _T("\r\n"));
 
-    //g_Print = _T("Globle Who is Find ") + bac_cs_device_id +_T("  ") + bac_cs_mac;
+    //g_Print = _T("Global Who is Find ") + bac_cs_device_id +_T("  ") + bac_cs_mac;
     //DFTrace(g_Print);
     _Bac_Scan_Com_Info temp_1;
     temp_1.device_id = device_id;
@@ -4714,7 +4717,7 @@ void close_bac_com()
 SOCKET my_sokect;
 extern void  init_info_table( void );
 extern void Init_table_bank();
-bool Initial_bac(int comport,CString bind_local_ip)
+bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
 {
 
     BACNET_ADDRESS src =
@@ -4853,7 +4856,7 @@ bool Initial_bac(int comport,CString bind_local_ip)
         //}
         close_com();
 
-        dlmstp_set_baud_rate(38400);
+        dlmstp_set_baud_rate(n_baudrate);
         //		dlmstp_set_baud_rate(19200);
         dlmstp_set_mac_address(0);
         dlmstp_set_max_info_frames(DEFAULT_MAX_INFO_FRAMES);
@@ -5590,7 +5593,6 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	temp.panal_number = temp_data.reg.station_number;
 
 	temp.bacnetip_port = temp_data.reg.bacnetip_port;
-
     temp.zigbee_exsit = temp_data.reg.zigbee_exsit;
     char * temp_point = NULL;
     refresh_net_label_info temp_label;
@@ -5638,10 +5640,9 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 
 
 
-
 	if((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
 	{
-		g_Print.Format(_T("Serial = %u     ID = %d ,ip = %s  , Product name : %s ,obj = %u ,panel = %u,isp_mode = %d"),nSerial,temp_data.reg.modbus_id,nip_address ,nproduct_name,temp.object_instance,temp.panal_number,temp_data.reg.isp_mode);
+		g_Print.Format(_T("Serial = %12u     ID = %d ,ip = %s  , Product name : %s ,Name:%s, obj = %u ,panel = %u,isp_mode = %d"),nSerial,temp_data.reg.modbus_id,nip_address ,nproduct_name, cs_temp_label,temp.object_instance,temp.panal_number,temp_data.reg.isp_mode);
 		DFTrace(g_Print);
 	}
 
@@ -5718,45 +5719,45 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	}
 
 
-	char * temp_point = NULL;
-	refresh_net_label_info temp_label;
-	temp_point = temp_data.reg.panel_name;
-	if(( (unsigned char)temp_point[0] != 0xff) && ((unsigned char)temp_point[1] != 0xff) && ((unsigned char)temp_point[0] != 0x00))
-	{
-		memcpy(temp_label.label_name,&temp_point[0],20);
-		temp_point = temp_point + 20;
-		CString cs_temp_label;
-		MultiByteToWideChar( CP_ACP, 0, (char *)temp_label.label_name, (int)strlen((char *)temp_label.label_name)+1,
-			cs_temp_label.GetBuffer(MAX_PATH), MAX_PATH );
-		cs_temp_label.ReleaseBuffer();
-		if(cs_temp_label.GetLength() > 20)
-			cs_temp_label = cs_temp_label.Left(20);
-		temp_label.serial_number = (unsigned int)nSerial;
-		CString temp_serial_number;
-		temp_serial_number.Format(_T("%u"),temp_label.serial_number);
-		int need_to_write_into_device = GetPrivateProfileInt(temp_serial_number,_T("WriteFlag"),0,g_achive_device_name_path);
-		if(need_to_write_into_device == 0)
-		{
-			bool found_device = false;
-			bool found_device_new_name = false;
-			for (int i=0; i<m_refresh_net_device_data.size(); i++)
-			{
-				if(temp_label.serial_number == m_refresh_net_device_data.at(i).nSerial)
-				{
-					if(cs_temp_label.CompareNoCase( m_refresh_net_device_data.at(i).show_label_name) == 0)
-					{
-						found_device_new_name = false;
-					}
-					else
-					{
-						m_refresh_net_device_data.at(i).show_label_name = cs_temp_label;
-						found_device_new_name = true;
-					}
-					break;
-				}
-			}
-		}
-	}
+	//char * temp_point = NULL;
+	//refresh_net_label_info temp_label;
+	//temp_point = temp_data.reg.panel_name;
+	//if(( (unsigned char)temp_point[0] != 0xff) && ((unsigned char)temp_point[1] != 0xff) && ((unsigned char)temp_point[0] != 0x00))
+	//{
+	//	memcpy(temp_label.label_name,&temp_point[0],20);
+	//	temp_point = temp_point + 20;
+	//	CString cs_temp_label;
+	//	MultiByteToWideChar( CP_ACP, 0, (char *)temp_label.label_name, (int)strlen((char *)temp_label.label_name)+1,
+	//		cs_temp_label.GetBuffer(MAX_PATH), MAX_PATH );
+	//	cs_temp_label.ReleaseBuffer();
+	//	if(cs_temp_label.GetLength() > 20)
+	//		cs_temp_label = cs_temp_label.Left(20);
+	//	temp_label.serial_number = (unsigned int)nSerial;
+	//	CString temp_serial_number;
+	//	temp_serial_number.Format(_T("%u"),temp_label.serial_number);
+	//	int need_to_write_into_device = GetPrivateProfileInt(temp_serial_number,_T("WriteFlag"),0,g_achive_device_name_path);
+	//	if(need_to_write_into_device == 0)
+	//	{
+	//		bool found_device = false;
+	//		bool found_device_new_name = false;
+	//		for (int i=0; i<m_refresh_net_device_data.size(); i++)
+	//		{
+	//			if(temp_label.serial_number == m_refresh_net_device_data.at(i).nSerial)
+	//			{
+	//				if(cs_temp_label.CompareNoCase( m_refresh_net_device_data.at(i).show_label_name) == 0)
+	//				{
+	//					found_device_new_name = false;
+	//				}
+	//				else
+	//				{
+	//					m_refresh_net_device_data.at(i).show_label_name = cs_temp_label;
+	//					found_device_new_name = true;
+	//				}
+	//				break;
+	//			}
+	//		}
+	//	}
+	//}
 
 
 

@@ -11,7 +11,7 @@
 #pragma once
 
 #include "HexFileParser.h"
-#include "globle_function.h"
+#include "global_function.h"
 
 
 class CComWriter

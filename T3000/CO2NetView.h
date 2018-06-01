@@ -275,7 +275,7 @@ CBrush m_brush;
     CEdit m_edit_SN;
     CEdit m_Edit_FVevsion;
     CEdit m_Edit_HardVer;
-    CComboBox m_Combox_braudrate;
+    CComboBox m_Combox_baudrate;
     CEdit m_Edit_RHum;
     CButton m_AlarmSetting_M;
     CButton m_AlarmSetting_Auto;

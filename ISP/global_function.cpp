@@ -1,18 +1,18 @@
 #include "stdafx.h"
-#include "globle_function.h"
+#include "global_function.h"
 #include "MyPing.h"
 #include "HexFileParser.h"
 extern bool auto_flash_mode;
 int turn_hex_str_to_ten_num(char *source)
 {//can only turn two char(hex string) to int
-	//return -1,the wrong input ,the char number>2;or the input char is not hex string;
+	//return -1,invalid input ,the char number>2;or the input char is not hex string;
 	//int a=strlen(source);
 /*	if(a!=2)
 	{
-		AfxMessageBox("wrong input!\nthat the length of the input string !=2!");
+		AfxMessageBox("Invalid Data!\nLength is not 2!");
 		for(a=0;a<3;a++)
 			*source='\0';
-		return -1;//input wrong 1
+		return -1;//invalid data 1
 	}*/
 	int j=0,k=0,l=0;
 	for(int i=0;i<2;i++)//***********************************2
@@ -47,7 +47,7 @@ int turn_hex_str_to_ten_num(char *source)
 			default: 
 				{
 					if(!auto_flash_mode)
-						AfxMessageBox(_T("wrong input!\nin the turn_hex_str_to_ten_num function!"), MB_ICONWARNING);
+						AfxMessageBox(_T("Invalid Data!\nin the routine turn_hex_str_to_baseten_function!"), MB_ICONWARNING);
 					return -1;//2
 				}
 			}
@@ -65,16 +65,16 @@ int turn_hex_str_to_ten_num(char *source)
 }
 unsigned short turn_4_hex_char_to_unsigned_short(char *source)
 {//can only turn four char(hex string) to int
-	//return -1,the wrong input ,the char number>4;or the input char is not hex string;
+	//return -1,invalid data ,the char number>4;or the input char is not hex string;
 
 	int a=strlen(source);
 	if(a>4)
 	{
 		if(!auto_flash_mode)
-			AfxMessageBox(_T("wrong input!\nthat the length of the input string !=2!"), MB_ICONWARNING);
+			AfxMessageBox(_T("Invalid Data!\nthe length of the input string is not = 2!"), MB_ICONWARNING);
 		for(int i=0;i<a;i++)
 			*source='\0';
-		return -1;//input wrong 1
+		return -1;//invaid data 1
 	}
 	unsigned short k=0,l=0;
 	for(int j=0;j<a;j++)
@@ -105,7 +105,7 @@ unsigned short turn_4_hex_char_to_unsigned_short(char *source)
 		case 'E':k=14;break;
 		case 'F':k=15;break;
 
-		//default: AfxMessageBox("wrong input!\nthat input is not a hex string!");return -1;//2
+		//default: AfxMessageBox("invalid data!\nthe input is not a hex string!");return -1;//2
 		default: return -1;//2
 		}
 		l*=16;
@@ -300,7 +300,7 @@ BOOL BinFileValidation(const CString& strFileName)
 }
 CCriticalSection register_critical_section1; 
 
-// 这个是原始的
+// This is the original.
 int read_one(unsigned char device_var,unsigned short address,int retry_times)
 {
 	//programmer can control retry times,by parameter retry_times	
@@ -333,7 +333,7 @@ int read_one(unsigned char device_var,unsigned short address,int retry_times)
 	//SetPaneString(0,str);
 	return j;
 }
-CString GetProductName(int ModelID)
+CString GetProductName(int ModelID) //TBD: Change this to an array
 {
 	CString strProductName;
 	switch(ModelID)
@@ -522,7 +522,7 @@ CString GetProductName(int ModelID)
         strProductName = "WS";
         break;
 	default:
-		strProductName.Format(_T("Model ID:%d is out of control"),ModelID);
+		strProductName.Format(_T("Model ID:%d is not valid"),ModelID);
 		break;
 	}
 	return strProductName;
@@ -551,18 +551,18 @@ void ExtractString(CStringArray& arr, const CString strSrc, const CString sep)
 	if(str.IsEmpty())
 		return;
 
-	// 开始分解
+	// Start decomposition
 	int pos = str.Find(sep);
 	while (pos != -1)
 	{
-		//if(!str.Left(pos).IsEmpty()) // 如有必要也可在此Trim后再判断是否为空，为空则舍弃
+		//if(!str.Left(pos).IsEmpty()) // Look for empty string, then discard
 		arr.Add(str.Left(pos));
 
 		str = str.Mid(pos + sep.GetLength());
 		pos = str.Find(sep);
 	}
 
-	arr.Add(str); // think
+	arr.Add(str); // 
 }
 
 BOOL DoHEXCRC( TS_UC* szBuf, int nLen)
@@ -581,7 +581,7 @@ BOOL DoHEXCRC( TS_UC* szBuf, int nLen)
 
 BOOL ReadLineFromHexFile(CFile& file, char* pBuffer)
 {
-	//当hex文件中每一行的文件超过了256个字符的时候，我们就认为这个hex文件出现了问题
+	//If the row has more than 256 chars there is a problem with the hex file. 
 	int linecharnum=0;
 	char c;
 	int nRet = file.Read(&c, 1);
@@ -591,9 +591,9 @@ BOOL ReadLineFromHexFile(CFile& file, char* pBuffer)
 		++linecharnum;
 		*pBuffer++ = c;
 		//TRACE(_T("\n%c"),c);
-		if (c == 0x0d) // 回车
+		if (c == 0x0d) // Enter
 		{
-			file.Read(&c, 1);  // 读一个换行
+			file.Read(&c, 1);  // Read a newline
 			*pBuffer++ = c;
 			TRACE(_T("%s"),pBuffer);
 			return TRUE;
@@ -616,207 +616,7 @@ BOOL ReadLineFromHexFile(CFile& file, char* pBuffer)
 
 int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info,int Address)
 {
-//	CFileFind fFind;
-//	if(!fFind.FindFile(filepath))
-//		return FILE_NOT_FIND;
-//
-//	//pBuf = new char[0x20000];
-//		
-//	CString strGetData;
-//	int nBufCount = 0;
-////*****************inspect the file*********************
-//
-//
-//	DWORD dwHiAddr = 0; // 高位地址
-//	char readbuffer[256];
-//	ZeroMemory(readbuffer, 256);
-//	unsigned	char m_DeviceInfor[20];
-//	memset(m_DeviceInfor,0,20);
-//	CFile hexfile;
-//	if(hexfile.Open(filepath,CFile::modeRead))
-//	{
-//		unsigned int nLineNum=0;
-//
-//
-//		ZeroMemory(readbuffer, 256);
-//		hexfile.Seek(0, CFile::begin);
-//		while(ReadLineFromHexFile(hexfile, readbuffer))
-//		{
-//				nLineNum++;						//the line number that the wrong hex file;
-//                CString bufferlen;
-//                CString bufferaddress;         
-//                bufferlen.Format(_T("%c%c"),readbuffer[1],readbuffer[2]);
-//                bufferaddress.Format(_T("%c%c%c%c"),readbuffer[3],readbuffer[4],readbuffer[5],readbuffer[6]);
-//
-//				if (IS_RAM)
-//				{
-//					if (bufferaddress.CompareNoCase(_T("0200"))!=0)
-//					{
-//						continue;
-//					}
-//				} 
-//				else
-//				{
-//					if (bufferaddress.CompareNoCase(_T("0100"))!=0)
-//					{
-//						continue;
-//					}
-//				}
-//               
-//				unsigned char get_hex[128]={0};
-//				//get hex data,it is get from the line char
-//				//the number is (i-1)
-//				//int nLen = strGetData.GetLength();
-//				for(UINT i=0; i<strlen(readbuffer); i++) // 去掉冒号
-//				{
-//					readbuffer[i]=readbuffer[i+1];
-//				}
-//
-//				int nLen = strlen(readbuffer)-2; // 不算回车换行的长度
-//				if(strlen(readbuffer)%2==0)
-//				turn_hex_file_line_to_unsigned_char(readbuffer);//turn every char to int 
-//				else
-//				{
-//					return BAD_HEX_FILE;
-//				}
-//				turn_int_to_unsigned_char(readbuffer,nLen,get_hex);//turn to hex 
-//				if(get_hex[3]==1)	//for to seektobegin() function,because to end of the file
-//					break;
-//// 				if(!DoHEXCRC( get_hex, nLen/2))
-//// 				{
-//// 					return BAD_HEX_FILE;
-//// 				}
-//				 char TempChar[32];
-//				for (int i=0;i<31;i++)
-//				{
-//					TempChar[i]=get_hex[i+4];
-//				}
-//				TempChar[31]='\0';
-// 
-//				 
-//                 CString Product_String;
-// 				 MultiByteToWideChar( CP_ACP, 0, (char *)TempChar, 
-// 					 (int)strlen(TempChar)+1, 
-// 					 Product_String.GetBuffer(MAX_PATH), MAX_PATH );
-// 				 Product_String.ReleaseBuffer();		
-// 				 Product_String.MakeUpper();
-//
-//
-//
-//				 if(Product_String.Find(_T("CO2")) !=-1)
-//				 {
-//					  ret_bin_Info.company[0]='T';
-//					  ret_bin_Info.company[1]='E';
-//					  ret_bin_Info.company[2]='M';
-//					  ret_bin_Info.company[3]='C';
-//					  ret_bin_Info.company[4]='O';
-//					  ret_bin_Info.product_name[0]='C';
-//					  ret_bin_Info.product_name[1]='O';
-//					  ret_bin_Info.product_name[2]='2';
-//					  ret_bin_Info.product_name[3]=0;
-//					  ret_bin_Info.product_name[4]=0;
-//					  ret_bin_Info.product_name[5]=0;
-//					  ret_bin_Info.product_name[6]=0;
-//					  ret_bin_Info.product_name[7]=0;
-//					  ret_bin_Info.product_name[8]=0;
-//					  ret_bin_Info.product_name[9]=0;
-//
-//					  ret_bin_Info.software_high=TempChar[5];
-//					   ret_bin_Info.software_low=TempChar[4];
-//					  
-//					  return READ_SUCCESS;
-//				 }
-//
-//
-//
-//				int temp;
-//				char temp_buf[64];
-//				memset(temp_buf,0,64);
-//                
-//				if (bufferlen.CompareNoCase(_T("20"))==0)
-//				{
-//					for (int i=0;i<64;i++)
-//					{
-//						temp_buf[i]=readbuffer[i+8];
-//					}
-//				} 
-//
-//				if (bufferlen.CompareNoCase(_T("10"))==0)
-//				{
-//					for (int i=0;i<32;i++)
-//					{
-//						temp_buf[i]=readbuffer[i+8];
-//					}
-//					hexfile.Seek(0, CFile::begin);
-//					while(ReadLineFromHexFile(hexfile, readbuffer))
-//					{
-//						bufferlen.Format(_T("%c%c"),readbuffer[1],readbuffer[2]);
-//						bufferaddress.Format(_T("%c%c%c%c"),readbuffer[3],readbuffer[4],readbuffer[5],readbuffer[6]);
-//						if (bufferaddress.CompareNoCase(_T("0110"))!=0)
-//						{
-//							continue;
-//						}
-//						for(UINT i=0; i<strlen(readbuffer); i++) // 去掉冒号
-//						{
-//							readbuffer[i]=readbuffer[i+1];
-//						}
-//						int nLen = strlen(readbuffer)-2; // 不算回车换行的长度
-//						if(strlen(readbuffer)%2==0)
-//							turn_hex_file_line_to_unsigned_char(readbuffer);//turn every char to int 
-//						else
-//						{
-//							return BAD_HEX_FILE;
-//						}
-//						turn_int_to_unsigned_char(readbuffer,nLen,get_hex);//turn to hex 
-//
-//						int bufferlength=_wtoi(bufferlen);
-//
-//						int i=32;
-//						for (int j=0;j<2*bufferlength;j++)
-//						{
-//							temp_buf[i]=readbuffer[j+8];
-//							i++;
-//						}
-//
-//					}
-//
-//				}
-//			 
-//
-//					for (int i=0;i<20;i++)
-//					{   
-//						temp=temp_buf[2*i]*16+temp_buf[2*i+1];
-//						m_DeviceInfor[i]=temp;
-//					}
-//					memcpy_s(&ret_bin_Info,20,m_DeviceInfor,20);
-//
-//					if(strlen(ret_bin_Info.product_name) > 200)
-//						return NO_VERSION_INFO;
-//
-//					char temocolog[6];
-//					memcpy_s(temocolog,5,ret_bin_Info.company,5);
-//					temocolog[5] = 0;
-//
-//					CString Temco_logo;
-//					MultiByteToWideChar( CP_ACP, 0, (char *)temocolog, 
-//						(int)strlen(temocolog)+1, 
-//						Temco_logo.GetBuffer(MAX_PATH), MAX_PATH );
-//					Temco_logo.ReleaseBuffer();		
-//					Temco_logo.MakeUpper();
-//					if(Temco_logo.CompareNoCase(_T("TEMCO")) != 0)
-//					{
-//						return NO_VERSION_INFO;
-//					}
-//
-//
-//					ret_bin_Info.software_low = m_DeviceInfor[15];
-//					ret_bin_Info.software_high =m_DeviceInfor[16];
-//					return READ_SUCCESS;
-//			 
-//
-//
-//		}
-//	}
+
 
 char*			pFileBuffer;
 CHexFileParser* pHexFile = new CHexFileParser;
@@ -915,7 +715,7 @@ BOOL Ping(const CString& strIP, CWnd* pWndEcho)
 }
 
 
-//This function coded by Fance,used to split the cstring to each part.
+//Split the cstring to each of its components.
 void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken)
 {
     CString sTempSource, sTempSplitted;
@@ -924,7 +724,7 @@ void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken)
 
     int nPos = sTempSource.Find(sToken);
 
-    //--if there are no token in the string, then add itself and return.
+    //--if there are no tokens in the string then add itself and return.
     if (nPos == -1)
         saArray.Add(sTempSource);
     else

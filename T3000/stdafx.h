@@ -4,6 +4,15 @@
 // but are changed infrequently
 
 #pragma once
+
+struct baudrate_def
+{
+    int ncomport;
+    int baudrate;
+    int test_ret;
+};
+
+
 #define _SECURE_SCL 0
 
 #ifndef _SECURE_ATL
@@ -142,7 +151,7 @@ INPUT int read_multi2_nocretical(unsigned char device_var, unsigned short *put_d
 INPUT void close_T3000_log_file();//scan
 INPUT void write_T3000_log_file( CString StrTips);//scan
 INPUT void Create_T3000_log_file();//scan
-
+INPUT int Test_Comport(int comport, baudrate_def * ntest_ret);
 INPUT CString Get_NowTime();
 INPUT int Write_One(unsigned char device_var,unsigned short address,unsigned short value);
 INPUT int Write_One_Multy_Thread(unsigned char device_var, unsigned short address, unsigned short val, int nindex);

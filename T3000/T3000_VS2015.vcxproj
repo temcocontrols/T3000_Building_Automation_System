@@ -241,7 +241,7 @@
     <ClCompile Include="EreaseDlg.cpp" />
     <ClCompile Include="excel9.cpp" />
     <ClCompile Include="FreeCoolDlg.cpp" />
-    <ClCompile Include="globle_function.cpp" />
+    <ClCompile Include="global_function.cpp" />
     <ClCompile Include="GraphicView.cpp" />
     <ClCompile Include="GridButton.cpp" />
     <ClCompile Include="GridFlashDlg.cpp" />
@@ -592,7 +592,7 @@
     <ClInclude Include="FreeCoolDlg.h" />
     <ClInclude Include="global_variable.h" />
     <ClInclude Include="global_variable_extern.h" />
-    <ClInclude Include="globle_function.h" />
+    <ClInclude Include="global_function.h" />
     <ClInclude Include="GraphicView.h" />
     <ClInclude Include="GridButton.h" />
     <ClInclude Include="GridFlashDlg.h" />

@@ -90,7 +90,7 @@
     <ClCompile Include="FreeCoolDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="globle_function.cpp">
+    <ClCompile Include="global_function.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GraphicView.cpp">
@@ -995,7 +995,7 @@
     <ClInclude Include="global_variable_extern.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="globle_function.h">
+    <ClInclude Include="global_function.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GraphicView.h">

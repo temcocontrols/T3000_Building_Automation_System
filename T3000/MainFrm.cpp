@@ -32,7 +32,7 @@ CMyStatusbarCtrl * statusbar = NULL;
 
 #include "hangeIDDlg.h"
 #include "LightingController/LightingController.h"//Lightingcontroller
-#include "NewHumChamberView.h"
+
 #include "CO2_View.h"
 //#include "MbpGlobals.h"
 #include "Dialog_Progess.h"
@@ -589,7 +589,7 @@ void CMainFrame::InitViews()
     //m_pViews[DLG_DIALOGMINIPANEL_VIEW]=(CView*) new CDialgMiniPanel();//Mini Panel
     m_pViews[DLG_AIRQUALITY_VIEW]=(CView*) new CAirQuality;//AirQuality
     m_pViews[DLG_LIGHTINGCONTROLLER_VIEW]=(CView*) new CLightingController;//Lightingcontroller
-    m_pViews[DLG_HUMCHAMBER]=(CView*) new CNewHumChamberView;
+ //   m_pViews[DLG_HUMCHAMBER]=(CView*) new CNewHumChamberView;
     m_pViews[DLG_CO2_VIEW]=(CView*) new CCO2_View;
     m_pViews[DLG_CO2_NET_VIEW]=(CView*)new CCO2NetView;
     m_pViews[DLG_BACNET_VIEW]=(CView*) new CDialogCM5_BacNet; //CM5
@@ -621,7 +621,7 @@ void CMainFrame::InitViews()
 
     for (int nView =1; nView < NUMVIEWS; nView++)
     {
-        if(nView == DLG_DIALOGCM5_VIEW||nView == DLG_DIALOGMINIPANEL_VIEW)
+        if(nView == DLG_DIALOGCM5_VIEW||nView == DLG_DIALOGMINIPANEL_VIEW || nView == DLG_HUMCHAMBER)
             continue;
         m_pViews[nView]->Create(NULL, NULL,
                                 (AFX_WS_DEFAULT_VIEW & ~WS_VISIBLE),
@@ -1714,8 +1714,8 @@ void CMainFrame::LoadProductFromDB()
 
 
 	HTREEITEM hlocalnetwork=NULL;
-	//老毛个神经病 ，改来改去 ，出尔反尔. 要求选择远程连接的时候 不显示 本地的设备.
-	//潜在问题是客户一不小心选中remote 后 ，这样改会出现 扫描不到的情况.即使扫描到了 ，老毛要求不显示本地的设备，客户会抱怨 扫不到.
+	//要求选择远程连接的时候 不显示 本地的设备.
+	//潜在问题是客户一不小心选中remote 后 ，这样改会出现 扫描不到的情况.即使扫描到了 ，要求不显示本地的设备，客户会抱怨 扫不到.
 	if(b_remote_connection == false)
 	{
 		if((current_building_protocol == P_MODBUS_TCP) || (current_building_protocol == P_AUTO))
@@ -2609,7 +2609,7 @@ void CMainFrame::ScanTstatInDB(void)
             SqliteDB.execDML((UTF8MBSTR)strSql);
         }
 		current_building_protocol = P_AUTO;
-		//简直是脑残，老毛.要求这样瞎几把改. //不管客户选什么鸡吧协议 ， 都要能扫到所有设备.那不就是TMD只有Auto 了吗？还选个P啊;
+		
 
         CString StrComport;
         CString StrBaudrate;
@@ -3477,6 +3477,11 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
                     WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Delay Between Time"),_T("1000"),g_configfile_path);
 
                     WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Connect Timeout"),_T("3000"),g_configfile_path);
+
+                    CString temp_modbus_id;
+                    temp_modbus_id.Format(_T("%d"), tree_node.product_id);
+                    WritePrivateProfileStringW(_T("MBPOLL_Setting"), _T("Modbus ID"), temp_modbus_id, g_configfile_path);
+
                 }
                 else
                 {
@@ -3489,6 +3494,10 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
                     WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Response Timeout"),_T("1000"),g_configfile_path);
                     WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Delay Between Time"),_T("1000"),g_configfile_path);
                     WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Connect Timeout"),_T("3000"),g_configfile_path);
+
+                    CString temp_modbus_id;
+                    temp_modbus_id.Format(_T("%d"), tree_node.product_id);
+                    WritePrivateProfileStringW(_T("MBPOLL_Setting"), _T("Modbus ID"), temp_modbus_id, g_configfile_path);
                 }
 
                 return TRUE;
@@ -3529,6 +3538,9 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
                     WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Response Timeout"),_T("1000"),g_configfile_path);
                     WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Delay Between Time"),_T("1000"),g_configfile_path);
                     WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Connect Timeout"),_T("3000"),g_configfile_path);
+                    CString temp_modbus_id;
+                    temp_modbus_id.Format(_T("%d"), tree_node.product_id);
+                    WritePrivateProfileStringW(_T("MBPOLL_Setting"), _T("Modbus ID"), temp_modbus_id, g_configfile_path);
                 }
                 else
                 {
@@ -3539,6 +3551,9 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
                     WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Response Timeout"),_T("1000"),g_configfile_path);
                     WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Delay Between Time"),_T("1000"),g_configfile_path);
                     WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Connect Timeout"),_T("3000"),g_configfile_path);
+                    CString temp_modbus_id;
+                    temp_modbus_id.Format(_T("%d"), tree_node.product_id);
+                    WritePrivateProfileStringW(_T("MBPOLL_Setting"), _T("Modbus ID"), temp_modbus_id, g_configfile_path);
                 }
                 return TRUE;
             }
@@ -3779,6 +3794,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 					(temp_it->product_class_id == PM_MINIPANEL|| temp_it->product_class_id == PM_MINIPANEL_ARM)*/)
 				{
 					DoConnectToANode(temp_it->product_item);
+                    break;
 				}
 			}
 			
@@ -3900,7 +3916,7 @@ here:
     case DLG_HUMCHAMBER:
     {
         m_nCurView=DLG_HUMCHAMBER;
-        ((CNewHumChamberView*)m_pViews[m_nCurView])->Fresh();
+    //    ((CNewHumChamberView*)m_pViews[m_nCurView])->Fresh();
     }
     break;
     case  DLG_CO2_VIEW:
@@ -5326,6 +5342,11 @@ LRESULT  CMainFrame::ReadConfigFromDeviceMessageCallBack(WPARAM wParam, LPARAM l
     msg_result = MKBOOL(wParam);
     if(msg_result)
     {
+        CFileFind cfindtempfile;
+        if (cfindtempfile.FindFile(SaveConfigFilePath))
+        {
+            DeleteFile(SaveConfigFilePath);
+        }
 		SaveBacnetBinaryFile(SaveConfigFilePath);
         //SaveBacnetConfigFile(SaveConfigFilePath);
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Save config file success!"));
@@ -5536,11 +5557,11 @@ void CMainFrame::SaveConfigFile()
         {
 
             SaveConfigFilePath=dlg.GetPathName();
-            CFileFind cfindtempfile;
-            if(cfindtempfile.FindFile(SaveConfigFilePath))
-            {
-                DeleteFile(SaveConfigFilePath);
-            }
+            //CFileFind cfindtempfile;
+            //if(cfindtempfile.FindFile(SaveConfigFilePath))
+            //{
+            //    DeleteFile(SaveConfigFilePath);
+            //}
 
             //协议时bacnet ，用户点击 File save时 先调用线程读取所有需要存的资料；在发送消息回来 调用SaveBacnetConfigFile;
             //::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_SVAE_CONFIG);
@@ -6421,9 +6442,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                                 dlg.SetNode(m_product.at(i));
                                 if (dlg.DoModal()==IDOK)
                                 {
-                                    is_OK=dlg.is_ok;
+                                    is_OK=dlg.b_changeip_ok;
 									refresh_tree_status_immediately = true;//在改完IP后立刻在去扫描，更新数据库;
                                 }
+                                return;
                             }
                             else
                             {
@@ -6645,7 +6667,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 g_mac = m_product.at(i).panel_number;
                 bac_gloab_panel = g_mac;
                 g_gloab_bac_comport = m_product.at(i).ncomport;
-
+                g_gloab_bac_baudrate = m_product.at(i).baudrate;
                 if(m_product.at(i).protocol == PROTOCOL_GSM)
                 {
                     if(!TCP_Server_Running)
@@ -8838,11 +8860,9 @@ UINT _FreshTreeView(LPVOID pParam )
         }
 
 
-
         m_refresh_net_device_data.clear();
 
         RefreshNetWorkDeviceListByUDPFunc();
-
 
 
         if (!pMain->CheckDeviceStatus(int_refresh_com))
@@ -11325,7 +11345,7 @@ void CMainFrame::OnUpdateStatusBar(CCmdUI *pCmdUI)
     pCmdUI->Enable(TRUE);
 
 }
-#include "MailFeedbackDlg.h"
+
 void CMainFrame::OnHelpFeedbacktotemco()
 {
     m_product_isp_auto_flash.baudrate = m_product.at(selected_product_index).baudrate;
