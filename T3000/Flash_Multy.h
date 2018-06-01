@@ -11,7 +11,7 @@ typedef struct
     CString devicename;
     CString strSN;
     CString ncomport;
-	CString nBaudrate;
+	CString nBraudrate;
     CString nIPaddress;
     CString nipport;
     bool	b_is_sub;

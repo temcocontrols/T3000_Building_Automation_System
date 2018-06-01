@@ -59,7 +59,7 @@ const int NUMVIEWS = 29;
 
 
 extern int g_gloab_bac_comport;
-extern int g_gloab_bac_baudrate;
+
 const int REGISTER_USE_ZIGBEE_485 = 640;
 union UNION_INPUT_NAME{
 	unsigned short reg_value[4];

@@ -3,6 +3,7 @@
 /*
 //使用VS2010 编译需删除 c:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cvtres.exe 来确保用更高版本的 来转换资源文件
 
+
 2018 05 29 
 1.T3系列 扩展IO支持 T3-PT12 
 2.支持更改名字  HUM CO2 PRESSURE .
@@ -29,6 +30,7 @@
 4. Fix the group window , the status of the  second ICON path not  correct.
 5. Fix the bug when changing the range of T3TB,  the custom digital range window unexpected popup.
 6. optimize the custom experience when changing T3 controller's IP address.
+
 
 2018-0409 Update by Fance
 1.支持同时扫描
@@ -118,6 +120,7 @@
 4. PID 增加时间 积分参数.
 
 2017 - 01 - 7 Update by Fance
+1. 艹，新的一年，新的吐槽，周六还要上班。靠。 祝老毛早日患上老年痴呆.
 2. 在trendlog 界面加入Loading 图标.
 3. PT12 Range支持 DI 输入.
 
@@ -180,7 +183,7 @@
 3. 不回广播的T3-BB 在线状态 不受 广播的影响;
 4. Building 里面输入序列号后，保存起来;
 5. ScreenEdit 里面 客户满意手动选择icon的时候用 default icon.
-6. Analog custom tabel 在input 界面显示其单位.
+6. Analog customer tabel 在input 界面显示其单位.
 7. 修复一个线程里面删数据库 可能由于vector 引起的 崩溃问题;
 
 2016 - 06 - 03 Update by Fance
@@ -394,8 +397,8 @@ Merge with Alex .
 2. Add Analog input range -> High speed count;
 
 2015 - 10 - 20
-1. Add custom analog range when choose the input range.
-2. Custom can delete trend log data.
+1. Add customer analog range when choose the input range.
+2. Customer can delete trend log data.
 3. Read monitor data can refresh data.
 4. Schedules add a button for copy Monday-Friday data.
 
@@ -489,7 +492,7 @@ Update by Fance
 2015 - 06 - 26
 Update by Fance
 1>>When click bacnet products , it connect faster than before .
-2>>Bacnet program IDE. Add operate '&' and "|"  feature. eg: 10  VAR1 = 17 & 14.Custom wants program to controls the TSTAT register by bit.
+2>>Bacnet program IDE. Add operate '&' and "|"  feature. eg: 10  VAR1 = 17 & 14.Customer wants program to controls the TSTAT register by bit.
 
 2015 - 06 - 25
 Update by Fance
@@ -796,7 +799,6 @@ Update by Fance
 //bool CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data);
 //bool need_to_read_description = true;
 int g_gloab_bac_comport = 1;
-int g_gloab_bac_baudrate = 19200;
 CString temp_device_id,temp_mac,temp_vendor_id;
 HANDLE hwait_thread;
 CString Re_Initial_Bac_Socket_IP;
@@ -2660,7 +2662,7 @@ void CDialogCM5_BacNet::Fresh()
 			connect_mstp_thread =CreateThread(NULL,NULL,Mstp_Connect_Thread,this,NULL, NULL);
 		return;
 		set_datalink_protocol(2);
-		Initial_bac(g_gloab_bac_comport,_T(""), g_gloab_bac_baudrate);
+		Initial_bac(g_gloab_bac_comport);
 		if(g_bac_instance>0)
 			Send_WhoIs_Global(-1, -1);
 		::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,START_BACNET_TIMER,0);
@@ -2716,8 +2718,6 @@ void CDialogCM5_BacNet::Fresh()
 	}
 	else
 	{
-
-
 		if(pFrame->m_product.at(selected_product_index).NetworkCard_Address.CompareNoCase(Re_Initial_Bac_Socket_IP) != 0)
 		{
 			closesocket(my_sokect);
@@ -5278,7 +5278,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 {
 
 
-	//先用宏定义标记起来;
+	//老毛一会让这样改一会让那样改，受不了;先用宏定义标记起来;
 #ifdef NEED_ANALOG_DIGITAL_ONLY
 	Input_Window->Reload_Unit_Type();
 #endif
@@ -6254,7 +6254,7 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
 DWORD WINAPI  Mstp_Connect_Thread(LPVOID lpVoid)
 {
 	set_datalink_protocol(2);
-	Initial_bac(g_gloab_bac_comport,_T(""), g_gloab_bac_baudrate);
+	Initial_bac(g_gloab_bac_comport);
 
 	bool find_exsit = false;
 	for (int i=0;i<10;i++)

@@ -5,16 +5,16 @@
 #include "ISPDlg.h"
 #include "Iphlpapi.h"
 #include "MySocket.h"
-#include "global_function.h"
+#include "globle_function.h"
 CString local_enthernet_ip;
  Bin_Info        global_fileInfor;
-////#include <vector>			//Vector templates
-////using  std::vector;			//Namespaces
+////#include <vector>			//矢量模板
+////using  std::vector;			//命名空间
 //#include "define.h"
 #pragma  comment(lib,"Iphlpapi.lib")
 static bool need_show_device_ip = true;
 UINT _StartSeverFunc(LPVOID pParam);
-extern bool auto_flash_mode;	//Used for automatic burning;
+extern bool auto_flash_mode;	//用于自动烧写，不要弹框;
 char sendbuf[45];
 extern CString g_strFlashInfo;
 extern unsigned int Remote_timeout;
@@ -24,8 +24,8 @@ extern unsigned int Remote_timeout;
 
 const int TFTP_PORT = 69;
 
-const int nLocalDhcp_Port = 67;			// Server Local 67
-const int nSendDhcp_Port = 68;			// client Remote 68
+const int nLocalDhcp_Port = 67;			// Server本地67
+const int nSendDhcp_Port = 68;			// client目的68
 CString Failed_Message;
 
 typedef struct _Product_IP_ID
@@ -146,7 +146,7 @@ int TFTPServer::InitSocket()
     return TRUE;
 }
 
-// Broadcast notification 
+// 广播通知NC
 const int UDP_BROADCAST_PORT = 1234;
 void TFTPServer::BroadCastToClient()
 {
@@ -184,13 +184,13 @@ void TFTPServer::BroadCastToClient()
 }
 
 
-//  Accept Request
+// 接受Request
 int TFTPServer::RecvRequest()
 {
     BYTE szBuf[512];
     ZeroMemory(szBuf, 512);
 
-    SOCKADDR_IN  siRecvRead; // Receive read request，Used to bind
+    SOCKADDR_IN  siRecvRead; // 接收read request，用来绑定
     siRecvRead.sin_family = AF_INET;
     siRecvRead.sin_port = htons(TFTP_PORT);
     siRecvRead.sin_addr.s_addr = htonl(INADDR_ANY);// inet_addr(_T("192.168.0.3"))
@@ -292,7 +292,7 @@ int TFTPServer::SendProcess()
         }
         if (nResend <= 0)
         {
-            // 5 times, over.
+            // 重发了5次，结束
             return 0;
         }
     }
@@ -301,7 +301,7 @@ int TFTPServer::SendProcess()
 }
 
 
-// Send data
+// 发送数据
 int TFTPServer::SendData(BYTE* szBuf, int nLen)
 {
     TFTP_DATA_PACK tdp;
@@ -323,7 +323,7 @@ int TFTPServer::SendData(BYTE* szBuf, int nLen)
     {
         nRet = sendto(m_soSend,(char*)(&tdp), sizeof(tdp),0, (sockaddr*)&m_siClient, nAddrLen);
     }
-    else  // Last package, do not send useless data
+    else  // 最后一个包，不要发无用数据
     {
         nRet = sendto(m_soSend,(char*)(&tdp), nLen+4, 0, (sockaddr*)&m_siClient, nAddrLen);
     }
@@ -343,7 +343,7 @@ int TFTPServer::SendData(BYTE* szBuf, int nLen)
 }
 
 
-// Send data
+// 发送数据
 int TFTPServer::SendDataNew(BYTE* szBuf, int nLen)
 {
     TFTP_DATA_PACK tdp;
@@ -367,7 +367,7 @@ int TFTPServer::SendDataNew(BYTE* szBuf, int nLen)
 
 
 
-// Send data
+// 发送数据
 //int TFTPServer::SendData(BYTE* szBuf, int nLen)
 //{
 //	TFTP_DATA_PACK tdp;
@@ -389,7 +389,7 @@ int TFTPServer::SendDataNew(BYTE* szBuf, int nLen)
 //	{
 //		nRet = sendto(m_soSend,(char*)(&tdp), sizeof(tdp),0, (sockaddr*)&m_siClient, nAddrLen);
 //	}
-//	else  // Last package, do not send useless data
+//	else  // 最后一个包，不要发无用数据
 //	{
 //		nRet = sendto(m_soSend,(char*)(&tdp), nLen+4, 0, (sockaddr*)&m_siClient, nAddrLen);
 //	}
@@ -425,7 +425,7 @@ int TFTPServer::SendEndDataPack()
     return nRet;
 }
 
-// Accept ACK
+// 接受ACK
 int TFTPServer::RecvACK()
 {
     TFTP_ACK ta;
@@ -454,16 +454,16 @@ void TFTPServer::ReleaseAll()
 {
     if (m_sock)
     {
-        closesocket(m_sock);					// Receive tftp request socket,  Bind to port 69
+        closesocket(m_sock);					// 接收tftp request socket, 绑定了69端口
     }
     if (m_soSend)
     {
-        closesocket(m_soSend);				//  Send socket，Send tftp data
+        closesocket(m_soSend);				// 发送socket，发送tftp数据的
     }
 
     if (m_soRecv)
     {
-        closesocket(m_soRecv);				// Receive socket，Receive tftp ack
+        closesocket(m_soRecv);				// 接收socket，接收tftp ack的
     }
 
 
@@ -650,7 +650,7 @@ void TFTPServer::GetIPMaskGetWay()
 	{
 
 	}
-	if(pAdapterInfo !=NULL)	// If not released, memory leaks causing crash;
+	if(pAdapterInfo !=NULL)	//Add by Fance . 如果不释放，会内存泄露 ，引起程序崩溃; 2015-10-22
 		free(pAdapterInfo);
 }
 
@@ -715,13 +715,13 @@ UINT TFTPServer::RefreshNetWorkDeviceListByUDPFunc()
 
 		// h_siBind.sin_port=AF_INET;
 		//   ::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
-		if( -1 == bind(h_Broad,(SOCKADDR*)&h_siBind,sizeof(h_siBind)))//Bind the network card address forcibly to Socket
+		if( -1 == bind(h_Broad,(SOCKADDR*)&h_siBind,sizeof(h_siBind)))//把网卡地址强行绑定到Socket
 		{
 			goto END_REFRESH_SCAN;
 		}
 		int time_out=0;
 		BOOL bTimeOut = FALSE;
-		while(!bTimeOut)//!pScanner->m_bNetScanFinish)  // Timeout ended
+		while(!bTimeOut)//!pScanner->m_bNetScanFinish)  // 超时结束
 		{
 			time_out++;
 			if(time_out>1)
@@ -802,7 +802,7 @@ UINT TFTPServer::RefreshNetWorkDeviceListByUDPFunc()
 							int n = 1;
 							BOOL bFlag=FALSE;
 							//////////////////////////////////////////////////////////////////////////
-							// Detect duplicate IP’s 
+							// 检测IP重复
 							DWORD dwValidIP = 0;
 							memcpy((BYTE*)&dwValidIP, pSendBuf+n, 4);
 							while(dwValidIP != END_FLAG)
@@ -927,7 +927,7 @@ typedef union
 		char panel_name[20];
 		UCHAR object_instance_4;
 		UCHAR object_instance_3;
-		UCHAR isp_mode;  //Non 0 in ISP mode, 0 in the application code; 60th byte
+		UCHAR isp_mode;  //非0 在isp mode   , 0 在应用代码;    第60个字节
 	}reg;
 }Str_UPD_SCAN;
 unsigned short TFTPServer::AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
@@ -988,13 +988,13 @@ unsigned short TFTPServer::AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,
 	my_temp_point = my_temp_point + 20;
 	temp_data.reg.object_instance_4 = *(my_temp_point++);
 	temp_data.reg.object_instance_3 = *(my_temp_point++);
-	temp_data.reg.isp_mode = *(my_temp_point++);	//isp_mode = 0 The expression is in the application code, not 0 in Bootload. TBD: clarify this comment
+	temp_data.reg.isp_mode = *(my_temp_point++);	//isp_mode = 0 表示在应用代码 ，非0 表示在bootload.
 
 	DWORD nSerial=temp_data.reg.serial_low + temp_data.reg.serial_low_2 *256+temp_data.reg.serial_low_3*256*256+temp_data.reg.serial_low_4*256*256*256;
 	CString nip_address;
 	nip_address.Format(_T("%u.%u.%u.%u"),temp_data.reg.ip_address_1,temp_data.reg.ip_address_2,temp_data.reg.ip_address_3,temp_data.reg.ip_address_4);
 	CString nproduct_name = GetProductName(temp_data.reg.product_id);
-	if(nproduct_name.IsEmpty())	//Exit if the product number is not defined;
+	if(nproduct_name.IsEmpty())	//如果产品号 没定义过，不认识这个产品 就exit;
 	{
 		if (temp_data.reg.product_id<220)
 		{
@@ -1028,8 +1028,6 @@ unsigned short TFTPServer::AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,
 	if(temp_data.reg.isp_mode != 0)
 	{
 		//记录这个的信息,如果短时间多次出现 就判定在bootload下面，只是偶尔出现一次表示只是恰好开机收到的.
-             // Record this information, if a short time several times to determine under the Bootload, only occasionally appear only once to the boot received. TBD: Clarify this comment
-
 #if 0
 		IspModeInfo temp_info;
 		temp_info.ipaddress[0] = temp_data.reg.ip_address_1;
@@ -1060,7 +1058,7 @@ unsigned short TFTPServer::AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,
 			{
 				g_isp_device_info.at(temp_index).first_time = temp_info.first_time;
 				need_isp_device = g_isp_device_info.at(temp_index);
-				if(temp_data.reg.isp_mode == 2) //T3 controller will return some special bootloader fail mode info 
+				if(temp_data.reg.isp_mode == 2) //Minipanel 会回传特殊的 bootloader 坏掉的信息
 				{
 					isp_mode_error_code = 2;
 					::PostMessageW(MainFram_hwd,WM_HADNLE_ISP_MODE_DEVICE,2,NULL);
@@ -1113,7 +1111,7 @@ BOOL TFTPServer::StartServer()
         int nSendNum = m_nDataBufLen;
 
         BYTE byCommand[64] = {0};
-        byCommand[0] = 0xEE;	// Command, 2 bytes, 0xee10, command to start with flash
+        byCommand[0] = 0xEE;	// 命令，2字节，0xEE10，作为flash开始的命令
         byCommand[1] = 0x10;	//
 
         BYTE szBuf[512];
@@ -1129,7 +1127,7 @@ BOOL TFTPServer::StartServer()
         int mode_has_lanip_try_time=0;
         int mode_flash_over_try_time=0;
         total_retry=0;
-        has_enter_dhcp_has_lanip_block =false;//Used to confirm the state of 2 threads to avoid isp_step jumps. TBD: explain this better
+        has_enter_dhcp_has_lanip_block =false;//用于确认 2个线程的状态，避免ISP_STEP跳动。
         int has_wait_device_into_bootloader = false;
 
 
@@ -1161,16 +1159,16 @@ BOOL TFTPServer::StartServer()
 					int send_ret=TCP_Flash_CMD_Socket.Send(byCommand,sizeof(byCommand),0);
                    // int send_ret=TCP_Flash_CMD_Socket.SendTo(byCommand,sizeof(byCommand),m_nClientPort,ISP_Device_IP,0);
                     TRACE(_T("send_ret = %d\r\n"),send_ret);
-                    if(send_ret<0)	//Try TCP connection again if send fails
+                    if(send_ret<0)	//如果发送失败 就尝试 再次进行TCP连接
                     {
-						//TRACE(_T("Send EEprom data failed!"));
+						//TRACE(_T("Send ee10 failed!"));
                         //TCP_Flash_CMD_Socket.Connect(ISP_Device_IP,m_nClientPort);
                     }
 
                     SetDHCP_Data();
 
 
-                    //if(IP_is_Local())//If it's local, send it as broadcast DHCP
+                    //if(IP_is_Local())//如果是本地的 就用广播的 方式 发送 DHCP
                     //{
                     dhcp_package_is_broadcast = true;
                     BOOL bBroadcast=TRUE;
@@ -1196,13 +1194,13 @@ BOOL TFTPServer::StartServer()
                     //nRet=StartServer_Old_Protocol();
                     //if(nRet==0)
                     //{
-                    strTips = _T("No Connection! Please check the network connection.");
+                    strTips = _T("No Connection!Please check the network connection.");
                     OutPutsStatusInfo(strTips, FALSE);
                     //}
 
 
                     goto StopServer;
-                    //if(some_device_reply_the_broadcast == true)	//This is used to support multiple broadcasts in bootload mode, and if so print the responses
+                    //if(some_device_reply_the_broadcast == true)	//这个是用来支持 多个 在bootload中回复的 广播，如果有 则 先打印其中有几个回复
                     //{
                     //	CString temp_pro_cs;
                     //	temp_pro_cs.Format(_T("Find %d device in ISP mode"),Product_Info.size());
@@ -1255,7 +1253,7 @@ BOOL TFTPServer::StartServer()
                         strTips.Format(_T("PC IP is "));
                         strTips = strTips + PC_IP ;
                         OutPutsStatusInfo(strTips, FALSE);
-                        OutPutsStatusInfo(_T("Please Change your PC's IP address to the same subnet."), FALSE);
+                        OutPutsStatusInfo(_T("Please Chnage your PC's IP address to the same subnet."), FALSE);
                         OutPutsStatusInfo(_T(""), FALSE);
                     }
 
@@ -1274,7 +1272,7 @@ BOOL TFTPServer::StartServer()
                     OutPutsStatusInfo(_T(""), FALSE);
                 }
 #if 1
-				if(dhcp_package_is_broadcast == true)//If it's a broadcast, change the device IP TBD: explain this better 
+				if(dhcp_package_is_broadcast == true)//如果是用广播的方式 要把界面上的 IP地址改为 NC/LC回复的 IP；
 				{
 					ISP_Device_IP.Empty();
 					ISP_Device_IP.Format(_T("%d.%d.%d.%d"),Byte_ISP_Device_IP[0],Byte_ISP_Device_IP[1],Byte_ISP_Device_IP[2],Byte_ISP_Device_IP[3]);
@@ -1405,7 +1403,7 @@ StopServer:
             }
 
             //Sleep(5000); //if flash success, wait 5 seconds for LC or NC to start into runtime.
-            //if not , the user click flash, it will fail.
+            //if not , the user click flash, it will be not success.
         }
         else
         {
@@ -1706,7 +1704,7 @@ DWORD TFTPServer::GetLocalIP()
     {
         return 0;
     }
-    //SOCKADDR_IN sockAddress;   // unreferenced local variable
+    //SOCKADDR_IN sockAddress;   // commented by zgq;2010-12-06; unreferenced local variable
     long nLocalIP=inet_addr(pAdapterInfo.IpAddressList.IpAddress.String);
 
     return htonl(nLocalIP);
@@ -1737,7 +1735,7 @@ int TFTPServer::GetDHCPData(BYTE* pBuf, int nLen)
     memcpy(pBuf+nLocalIP4,byIP , 4);
 
     //////////////////////////////////////////////////////////////////////////
-    // Assign IP address 
+    // 分配界面设置的IP
     const int nIPPos = 0x10;
     DWORD dwClientIP = m_dwClientIP;
     ZeroMemory(byIP,4);
@@ -1846,7 +1844,7 @@ int TFTPServer::SendFlashCommand()
     //nRet = bind(soFalsh, (SOCKADDR *) &siSend, sizeof(siSend));
 
     BYTE byCommand[64] = {0};
-    byCommand[0] = 0xEE;	// Command, 2 bytes, 0xee10, command to start flash
+    byCommand[0] = 0xEE;	// 命令，2字节，0xEE10，作为flash开始的命令
     byCommand[1] = 0x10;	//
 
 
@@ -1872,8 +1870,8 @@ int TFTPServer::SendFlashCommand()
 
 
 //////////////////////////////////////////////////////////////////////////
-// Flash finished, notify the parent window
-// parameter is the return value of the flash thread
+// flash 完了，不论成功还是失败，都通知父窗口
+// 参数就是flash线程的返回值
 void TFTPServer::WriteFinish(int nFlashFlag)
 {
     int	nRet =PostMessage(m_pDlg->m_hWnd, WM_FLASH_FINISH, 0, LPARAM(nFlashFlag));

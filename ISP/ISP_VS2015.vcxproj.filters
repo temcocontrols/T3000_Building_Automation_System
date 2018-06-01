@@ -30,7 +30,7 @@
     <ClCompile Include="FlashSN.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="global_function.cpp">
+    <ClCompile Include="globle_function.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Hex386Writer.cpp">
@@ -104,7 +104,7 @@
     <ClInclude Include="Global_Struct.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="global_function.h">
+    <ClInclude Include="globle_function.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Hex386Writer.h">

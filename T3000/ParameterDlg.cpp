@@ -121,7 +121,7 @@ void CParameterDlg::DoDataExchange(CDataExchange* pDX)
 {
     CDialog::DoDataExchange(pDX);
     //DDX_Control(pDX, IDC_IDADDRESSEDIT, m_idAdressEdit);
-    DDX_Control(pDX, IDC_BAUDRATECOMBO, m_baudRateCombox);
+    DDX_Control(pDX, IDC_BRAUDRATECOMBO, m_braudRateCombox);
     DDX_Control(pDX, IDC_COMBO2, m_keySelectCombox);
     DDX_Control(pDX, IDC_POWERMODELCOMBO, m_powerupModelCombox);
     DDX_Control(pDX, IDC_DISPLAYCOMBO, m_displayCombox);
@@ -201,7 +201,7 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
     ON_BN_CLICKED(IDOK, &CParameterDlg::OnBnClickedOk)
     ON_BN_CLICKED(IDC_REFRESHBUTTON, &CParameterDlg::OnBnClickedRefreshbutton)
 //    ON_BN_CLICKED(IDC_ENABLEIDBUTTON, &CParameterDlg::OnBnClickedEnableidbutton)
-    ON_CBN_SELENDCANCEL(IDC_BAUDRATECOMBO, &CParameterDlg::OnCbnSelendcancelBaudratecombo)
+    ON_CBN_SELENDCANCEL(IDC_BRAUDRATECOMBO, &CParameterDlg::OnCbnSelendcancelBraudratecombo)
     ON_CBN_SELCHANGE(IDC_POWERMODELCOMBO, &CParameterDlg::OnCbnSelchangePowermodelcombo)
     ON_CBN_SELCHANGE(IDC_KEYPADLOCKCOMBO, &CParameterDlg::OnCbnSelchangeKeypadlockcombo)
     ON_CBN_SELCHANGE(IDC_DISPLAYCOMBO, &CParameterDlg::OnCbnSelchangeDisplaycombo)
@@ -386,19 +386,19 @@ BOOL CParameterDlg::OnInitDialog()
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 		)
 	{
-		m_baudRateCombox.ResetContent();
-		m_baudRateCombox.AddString(L"9600");
-		m_baudRateCombox.AddString(L"19200");
-		m_baudRateCombox.AddString(L"38400");
-		m_baudRateCombox.AddString(L"57600");
-		m_baudRateCombox.AddString(L"115200");
+		m_braudRateCombox.ResetContent();
+		m_braudRateCombox.AddString(L"9600");
+		m_braudRateCombox.AddString(L"19200");
+		m_braudRateCombox.AddString(L"38400");
+		m_braudRateCombox.AddString(L"57600");
+		m_braudRateCombox.AddString(L"115200");
 
 	}
 	else
 	{
-		m_baudRateCombox.ResetContent();
-		m_baudRateCombox.AddString(L"9600");
-		m_baudRateCombox.AddString(L"19200");
+		m_braudRateCombox.ResetContent();
+		m_braudRateCombox.AddString(L"9600");
+		m_braudRateCombox.AddString(L"19200");
 	}
 
 	m_gUnit.AddString(_T("°C"));
@@ -1046,20 +1046,20 @@ void CParameterDlg::OnEnKillfocusValuposedit()
     //g_bPauseMultiRead = FALSE;
 }
 
-void CParameterDlg::OnCbnSelendcancelBaudratecombo()
+void CParameterDlg::OnCbnSelendcancelBraudratecombo()
 {
 
     if(g_ParamLevel==1)
         return;
 
-    if(product_register_value[MODBUS_BAUDRATE]==m_baudRateCombox.GetCurSel())	//Add this to judge weather this value need to change.
+    if(product_register_value[MODBUS_BAUDRATE]==m_braudRateCombox.GetCurSel())	//Add this to judge weather this value need to change.
         return;
 
-   /* Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_BAUDRATE,m_baudRateCombox.GetCurSel(),
-                        product_register_value[MODBUS_BAUDRATE],this->m_hWnd,IDC_BAUDRATECOMBO,_T("BAUDRATE"));*/
+   /* Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_BAUDRATE,m_braudRateCombox.GetCurSel(),
+                        product_register_value[MODBUS_BAUDRATE],this->m_hWnd,IDC_BRAUDRATECOMBO,_T("BAUDRATE"));*/
 
-	int ret = write_one(g_tstat_id,MODBUS_BAUDRATE,m_baudRateCombox.GetCurSel());
-    int index_brandrate = m_baudRateCombox.GetCurSel(); 
+	int ret = write_one(g_tstat_id,MODBUS_BAUDRATE,m_braudRateCombox.GetCurSel());
+    int index_brandrate = m_braudRateCombox.GetCurSel(); 
 	int brandrate = 19200;
 
 	if (index_brandrate ==0)
@@ -1101,10 +1101,10 @@ void CParameterDlg::OnCbnSelendcancelBaudratecombo()
 
     //g_bPauseMultiRead = TRUE;
 
-    //if(write_one(g_tstat_id, MODBUS_BAUDRATE, m_baudRateCombox.GetCurSel())<0)	//Modify by Fance
+    //if(write_one(g_tstat_id, MODBUS_BAUDRATE, m_braudRateCombox.GetCurSel())<0)	//Modify by Fance
     //	MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
     //else
-    //	product_register_value[MODBUS_BAUDRATE] = m_baudRateCombox.GetCurSel();
+    //	product_register_value[MODBUS_BAUDRATE] = m_braudRateCombox.GetCurSel();
     //g_bPauseMultiRead = FALSE;
 }
 
@@ -1142,16 +1142,49 @@ void CParameterDlg::OnCbnSelchangeKeypadlockcombo()
                         product_register_value[MODBUS_SPECIAL_MENU_LOCK],this->m_hWnd,IDC_KEYPADLOCKCOMBO,_T("SPECIAL MENU LOCK"));
 
 
-    
+    //g_bPauseMultiRead = TRUE;
+    //if(write_one(g_tstat_id, MODBUS_SPECIAL_MENU_LOCK, m_keyLockCombox.GetCurSel())<0)	//133  396
+    //	{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);g_bPauseMultiRead = FALSE;return;}
+    //else
+    //	product_register_value[MODBUS_SPECIAL_MENU_LOCK] =  m_keyLockCombox.GetCurSel();
+    //g_bPauseMultiRead = FALSE;
 }
 
+//Annul by Fance 2013 04 15
 
+//void CParameterDlg::OnCbnSelendcancelBraudratecombo()
+//{
+//
+//	if(g_ParamLevel==1)
+//		return;
+//	g_bPauseMultiRead = TRUE;
+//	int nRet = write_one(g_tstat_id, 185, m_braudRateCombox.GetCurSel());
+//	g_bPauseMultiRead = FALSE;
+//}
+
+//void CParameterDlg::OnCbnSelchangePowermodelcombo()
+//{
+//
+//	if(g_ParamLevel==1)
+//		return;
+//	g_bPauseMultiRead = TRUE;
+//	write_one(g_tstat_id, 133, m_keyLockCombox.GetCurSel());	//this place has a  obvious error.  not m_keyLockCombox. recode by Fance
+//	g_bPauseMultiRead = FALSE;
+//}
+//
+//
+//void CParameterDlg::OnCbnSelchangeKeypadlockcombo()
+//{
+//		g_bPauseMultiRead = TRUE;
+//	write_one(g_tstat_id, 133, m_keyLockCombox.GetCurSel());
+//	g_bPauseMultiRead = FALSE;
+//}
 
 void CParameterDlg::OnCbnSelchangeDisplaycombo()
 {
     if(g_ParamLevel==1)
         return;
-    if(product_register_value[MODBUS_DISPLAY]==m_displayCombox.GetCurSel())	//Check if value has changed.
+    if(product_register_value[MODBUS_DISPLAY]==m_displayCombox.GetCurSel())	//Add this to judge weather this value need to change.
         return;
 
     Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_DISPLAY,m_displayCombox.GetCurSel(),
@@ -1165,7 +1198,7 @@ void CParameterDlg::OnCbnSelchangeSequencecombox()
     if(g_ParamLevel==1)
         return;
 
-    if(product_register_value[MODBUS_SEQUENCE]==m_SequenceCombox.GetCurSel())	//Check if value has changed.
+    if(product_register_value[MODBUS_SEQUENCE]==m_SequenceCombox.GetCurSel())	//Add this to judge weather this value need to change.
         return;
 
     Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_SEQUENCE,m_SequenceCombox.GetCurSel(),
@@ -1180,7 +1213,7 @@ void CParameterDlg::OnCbnSelchangeHcchangecombo()
 {
     if(g_ParamLevel==1)
         return;
-    if(product_register_value[MODBUS_HEAT_COOL_CONFIG]==m_hcChangeCombox.GetCurSel())	//Check if value has changed.
+    if(product_register_value[MODBUS_HEAT_COOL_CONFIG]==m_hcChangeCombox.GetCurSel())	//Add this to judge weather this value need to change.
         return;
 
     Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_HEAT_COOL_CONFIG,m_hcChangeCombox.GetCurSel(),
@@ -1199,7 +1232,7 @@ void CParameterDlg::OnEnKillfocusPowsetpomitedit()
     m_powerSetPointEdit.GetWindowText(strTemp);
     if(strTemp.IsEmpty())
         return;
-    if(product_register_value[MODBUS_POWERUP_SETPOINT]==_wtoi(strTemp))		//Check if value has changed.
+    if(product_register_value[MODBUS_POWERUP_SETPOINT]==_wtoi(strTemp))		//if not changed ,return  .Add by Fance
         return;
 
     Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_POWERUP_SETPOINT,_wtoi(strTemp),
@@ -1222,7 +1255,7 @@ void CParameterDlg::OnEnKillfocusStincreaedit()	//recode by Fance,for support T6
         MessageBox(_T("Please Input the value between 0 - 1 "),_T("Warning"),MB_OK | MB_ICONINFORMATION);
         nvalue = 10;
     }
-    if(product_register_value[MODBUS_SETPOINT_INCREASE] == nvalue)	//Check if value has changed.
+    if(product_register_value[MODBUS_SETPOINT_INCREASE] == nvalue)	//if not changed ,return  .Add by Fance
         return;
 
 
@@ -1242,7 +1275,7 @@ void CParameterDlg::OnEnKillfocusDefSetpointEdt()
     if (strTemp.IsEmpty())
         return;
 
-    if(product_register_value[MODBUS_DEFAULT_SETPOINT]==_wtoi(strTemp))	//Check if value has changed.
+    if(product_register_value[MODBUS_DEFAULT_SETPOINT]==_wtoi(strTemp))	//Add this to judge weather this value need to change.
         return;
 
     Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_DEFAULT_SETPOINT,_wtoi(strTemp),
@@ -1269,11 +1302,11 @@ void CParameterDlg::OnEnKillfocusInfileredit()
         ndata=0;
     if (ndata>100)
         ndata=100;
-    if(product_register_value[MODBUS_FILTER] == ndata) //Check if value has changed.
+    if(product_register_value[MODBUS_FILTER] == ndata) //if not changed ,return  .Add by Fance
         return;//213  142
 
 
-    if(product_register_value[MODBUS_FILTER]==ndata)	//Check if value has changed.
+    if(product_register_value[MODBUS_FILTER]==ndata)	//Add this to judge weather this value need to change.
         return;
 
     Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_FILTER,ndata,
@@ -1290,7 +1323,7 @@ void CParameterDlg::OnEnKillfocusCycleedit()
     if (strTemp.IsEmpty())
         return;
     int nValue=_wtoi(strTemp);
-    if(product_register_value[MODBUS_CYCLING_DELAY] ==nValue)	//Check if value has changed.
+    if(product_register_value[MODBUS_CYCLING_DELAY] ==nValue)	//if not changed ,return  .Add by Fance
         return;
 
     Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_CYCLING_DELAY,nValue,
@@ -1372,7 +1405,7 @@ void CParameterDlg::OnEnKillfocusTimerleft()
 
 
 
-    if(product_register_value[MODBUS_ROTATION_TIME_LEFT]==_wtoi(strTemp))	//Check if value has changed.
+    if(product_register_value[MODBUS_ROTATION_TIME_LEFT]==_wtoi(strTemp))	//Add this to judge weather this value need to change.
         return;
 
     Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_ROTATION_TIME_LEFT,_wtoi(strTemp),
@@ -1391,7 +1424,7 @@ void CParameterDlg::OnCbnSelchangeTimerdelectcombo()
     {
         sel++;
     }
-    if(product_register_value[MODBUS_TIMER_SELECT]==sel)	//Check if value has changed.
+    if(product_register_value[MODBUS_TIMER_SELECT]==sel)	//Add this to judge weather this value need to change.
         return;
 
     Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_TIMER_SELECT,sel,
@@ -1419,7 +1452,7 @@ void CParameterDlg::OnEnKillfocusTimeedit()
     if (strTemp.IsEmpty())
         return;
 
-    if(product_register_value[MODBUS_OVERRIDE_TIMER_LEFT] ==nValue)	//Check if value has changed.
+    if(product_register_value[MODBUS_OVERRIDE_TIMER_LEFT] ==nValue)	//if not changed ,return  .
         return;
 
     //m_hWnd
@@ -1445,7 +1478,7 @@ void CParameterDlg::OnEnKillfocusOverridetimeedit()
     if (strTemp.IsEmpty())
         return;
 
-    if(product_register_value[MODBUS_OVERRIDE_TIMER] ==nValue)	//Check if value has changed.
+    if(product_register_value[MODBUS_OVERRIDE_TIMER] ==nValue)	//if not changed ,return  .
         return;
 
 
@@ -1509,7 +1542,7 @@ void CParameterDlg::OnCbnSelchangeInputselect1()
         }
     }
    
-    if(product_register_value[MODBUS_TEMP_SELECT]==sel)//Check if value has changed.
+    if(product_register_value[MODBUS_TEMP_SELECT]==sel)//Add this to judge weather this value need to change.
         return;
     product_register_value[MODBUS_TEMP_SELECT] = sel;
     Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_TEMP_SELECT,sel,
@@ -1542,7 +1575,7 @@ void CParameterDlg::OnCbnSelchangeInputselect2()
         Reflesh_ParameterDlg();
         return;
     }
-    if(product_register_value[MODBUS_INPUT1_SELECT]==TempValue)	//Check if value has changed.
+    if(product_register_value[MODBUS_INPUT1_SELECT]==TempValue)	//Add this to judge weather this value need to change.
         return;
     Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_INPUT1_SELECT,TempValue,
                         product_register_value[MODBUS_INPUT1_SELECT],this->m_hWnd,IDC_INPUTSELECT2,_T("INPUT1_SELECT"));
@@ -2746,9 +2779,9 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
     //185	110	1	Low byte	W/R(Reboot after write)	Bau - Baudrate, 0=9600, 1=19.2kbaud
     if(product_register_value[MODBUS_BAUDRATE]>=0&&product_register_value[MODBUS_BAUDRATE]<=4)	//110
-        m_baudRateCombox.SetCurSel(product_register_value[MODBUS_BAUDRATE]);//110 //Modify by Fance
+        m_braudRateCombox.SetCurSel(product_register_value[MODBUS_BAUDRATE]);//110 //Modify by Fance
     else
-        m_baudRateCombox.SetCurSel(0);
+        m_braudRateCombox.SetCurSel(0);
 
 
 

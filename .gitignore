@@ -63,11 +63,9 @@
 /*.opendb
 /Psychrometric Tool/T3000 Output_VS2015
 /Psychrometric Tool/WFA_psychometric_chart/packages
->>>>>>> master
-Modbus Poll/Modbus PollDoc.cpp
-Modbus Poll/Modbus PollDoc.cpp
-Modbus Poll/Modbus PollView.cpp
+
 
 >>>Ultraedit User interface and cache
 **/*.pui
 **/*.cache
+>>>>>>> 16f951e4dc1ccd60c5ad13a7476e318c452b6160

@@ -1,12 +1,12 @@
 // ISPDlg.cpp : implementation file
-// 5.1.0  Added new product: weather station
-// 5.0.9  Optimize Network writing speed
-// 4.7.1 New method for retrieving serial numbers
+// 5.1.0  支持Weather Station 用串口烧写.
+// 5.0.9  网络部分烧写 信息提示优化
+// 4.7.1 版本 改动 公司内部获取 序列号的方式 改为从 数据库获取;
 
 #include "stdafx.h"
 #include "ISP.h"
 #include "ISPDlg.h"
-#include "global_function.h"
+#include "globle_function.h"
 #include "JPGLoader.h"
 #include "afxwin.h"
 #include "Splash.h"
@@ -38,9 +38,6 @@ const TCHAR c_strDBFileName[]=_T("Database\\t3000.mdb") ;
 const int BOOTLOADER_FILE_SIZE = 16384;
 /*这个变量虽然和DLL中的变量相同，但是他们两个没有关系，DLL中的该变量是被封装起来了
 如果想改变dll中的g_Commu_type 通过函数 SetCommunicationType*/
-
-/* These variables are the same as the variables in the communications DLL but they are separate, the variables in the DLL are encapsulated. If you want to change the G_commu_type in the DLL use the function Setcommunicationtype */
- 
 int g_Commu_type=0;
 UINT _PingThread(LPVOID pParam);
  
@@ -380,7 +377,7 @@ BOOL CISPDlg::OnInitDialog()
         }
         else
         {
-            ModifyStyleEx(WS_EX_APPWINDOW,WS_EX_TOOLWINDOW); //This line changes the properties of the window;
+            ModifyStyleEx(WS_EX_APPWINDOW,WS_EX_TOOLWINDOW); //这句话改变窗口的属性;
             SetWindowPos(NULL,0,0,0,0,0);
             auto_flash_mode = true;
             GetPrivateProfileStringW(_T("Data"),_T("ID"),_T("255"),id.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
@@ -420,7 +417,7 @@ BOOL CISPDlg::OnInitDialog()
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //Show splash screen
+    //展示启动图片
 
 
     if(!auto_flash_mode)
@@ -431,7 +428,7 @@ BOOL CISPDlg::OnInitDialog()
     ////////////////////////////////////////////////////////////////////////////
 
 
-    ////g_Commu_type=0;	//Initial write for COM port
+    ////g_Commu_type=0;	//初始的为COM口烧写
     //((CButton *)GetDlgItem(IDC_COM))->SetCheck(TRUE);
     if (flashmethod.CompareNoCase(L"COM")==0)
     {
@@ -445,10 +442,10 @@ BOOL CISPDlg::OnInitDialog()
 
    
     FLASH_SUBID=FALSE;
-    //Class COM口
+    //初始化COM口
     InitCombox();
-    //Initialization of log files
-    //Path to log file
+    //日志文件的初始化
+    //日志文件的路径
     m_strLogFileName=g_strExePath+c_strLogFileName;
     if (!m_plogFile->Open(m_strLogFileName.GetString(),CStdioFile::modeRead))
     {
@@ -762,8 +759,7 @@ void CISPDlg::OnBnClickedButtonSelfile()
     //    pHexFile->SetFileName(m_strHexFileName);
     //    pFileBuffer = new char[c_nHexFileBufLen];
     //    memset(pFileBuffer, 0xFF, c_nHexFileBufLen);
-    //    int nDataSize = pHexFile->GetHexFileBuffer(pFileBuffer, c_nHexFileBufLen);
-                // Gets the file's buffer
+    //    int nDataSize = pHexFile->GetHexFileBuffer(pFileBuffer, c_nHexFileBufLen);//获取文件的buffer
 
     //    if (!pHexFile->Is_RAM_HEXType())
     //    {
@@ -849,7 +845,7 @@ void CISPDlg::OnBnClickedButtonFlash()
 
 
     UpdateData();
-    SaveParamToConfigFile();	//Save data entered by the user
+    SaveParamToConfigFile();	//保存用户输入的数据
 
     m_FlashTimes = m_cfgFileHandler.GetFlashTimes();
 
@@ -884,7 +880,7 @@ void CISPDlg::OnBnClickedButtonFlash()
 
     default:
     {
-        //Undefined type state
+        //这个是不存在的类型状态
     }
     }
 
@@ -892,7 +888,7 @@ void CISPDlg::OnBnClickedButtonFlash()
   
 
 }
-//Here's how to determine what kind of device is plugged into the PC.
+//这里要想办法判断插入电脑上的是何种设备
 unsigned int CISPDlg::Judge_Flash_Type()
 {
     if (g_Commu_type==0)
@@ -925,8 +921,8 @@ static int total_success_count = 0;
 afx_msg LRESULT CISPDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
 {
 
-    int nRet = lParam; // 线程中有消息弹出，这里就不弹了, popup message in the thread
-    // flash all done, release the resources
+    int nRet = lParam; // 线程中有消息弹出，这里就不弹了
+    // flash完了，释放资源
     if (m_pComWriter)
     {
         delete m_pComWriter;
@@ -974,7 +970,7 @@ afx_msg LRESULT CISPDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
     
 	if(auto_flash_mode)
     {
-        auto_flash_mode = false;	//Flash completed, allow manual shutdown;
+        auto_flash_mode = false;	//烧入已经完成，允许手动关闭;
         if(nRet)
         {
             WritePrivateProfileStringW(_T("Data"),_T("Command"),_T("2"),AutoFlashConfigPath);	//FLASH_SUCCESS
@@ -1041,7 +1037,7 @@ afx_msg LRESULT CISPDlg::OnReplaceStatusInfo(WPARAM wParam, LPARAM lParam)
 
 
 ////////////////////////////////////////////////////////////////////////////
-// Parameters BOOL, =TRUE replace the current line, =FALSE add a new line
+// 参数 BOOL, =TRUE replace the current line, =FALSE add a new line
 void CISPDlg::UpdateStatusInfo(const CString& strInfo, BOOL bReplace)
 {
     int nLineCount = m_lbStatusInfo.GetCount();
@@ -1167,7 +1163,7 @@ void CISPDlg::SaveFlashSNParamToFile()
 
 }
 //For Old UI
-//Triggered when you select page
+//选择page的时候触发的
 CString CISPDlg::GetCurSelPageStr()
 {
     CString strPageInfo = CString(c_strCfgTstatSection);
@@ -1268,7 +1264,7 @@ BOOL CISPDlg::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
     return CDialog::OnCopyData(pWnd, pCopyDataStruct);
     /*return CDialog::OnCopyData(pWnd, pCopyDataStruct);*/
 }
-//Click the COM Port button setting
+//点击COM口按钮的设置
 void CISPDlg::OnBnClickedCom()
 {
     GetDlgItem(IDC_COM)->SetWindowText(_T("Input more than one ID"));
@@ -1277,7 +1273,7 @@ void CISPDlg::OnBnClickedCom()
     g_Commu_type=0;
     COM_NET_Set_ReadOnly();
 }
-//Available Settings
+//可用性设置
 void CISPDlg::COM_NET_Set_ReadOnly()
 {
     if (COM_INPUT)
@@ -1362,7 +1358,12 @@ void CISPDlg::OnBnClickedCheckFlashSubid()
     // set_SUBID();
 }
 
-
+/*
+Author:	Alex
+Date: 2012-10-25
+Function:
+Initial COM Port
+*/
 void CISPDlg::InitCombox(void)
 {
     vector<CString> szComms;
@@ -1388,9 +1389,12 @@ void CISPDlg::InitCombox(void)
         }
     }
 }
-// Function:
-// Choose com port,Flash Device.
-
+/*
+Author:	Alex
+Date: 2012-10-25
+Function:
+Choose com port,Flash Tstat.
+*/
 BOOL CISPDlg::FlashTstat(void)
 {
     int TempID=0;
@@ -1458,7 +1462,7 @@ BOOL CISPDlg::FlashTstat(void)
   //                  }
   //                  if (times>=5)
   //                  {
-  //                      temp.Format(_T("ISPTool Can't connect to %d,device may be offline!\n"),TempID);
+  //                      temp.Format(_T("ISPTool Can't connect to %d,device maybe offline!\n"),TempID);
   //                      UpdateStatusInfo(temp,false);
   //                      if(auto_flash_mode)
   //                      {
@@ -1610,11 +1614,11 @@ BOOL CISPDlg::FlashNC_LC(void)
 Author:	Alex
 Date: 2012-10-30
 Function:
-Write hex files to the subnet through TCP/IP Via Gateway 
+通过tcp/ip，烧写hex文件
+主要是通过NC/LC
 flash tstat/input/output board.
 BOOL FlashSubID(void)
 */
-
 BOOL CISPDlg::FlashSubID(void)
 {
     if(!ValidMdbIDStringSUBID())
@@ -1636,7 +1640,7 @@ BOOL CISPDlg::ValidMdbIDStringSUBID()
         else
         {
             CString temp;
-            temp.Format(_T("The sub node ID is invalid. Please try scanning again first"));
+            temp.Format(_T("The sub nodes ID is invalid. We suggest you scan the device ,and try again"));
             UpdateStatusInfo(temp,false);
             PostMessage(WM_FLASH_FINISH, 0, LPARAM(0));
         }
@@ -1686,7 +1690,7 @@ int CISPDlg::GetModbusIDSUBID(vector<int>& szMdbIDs)
             if (!(nID > 0 && nID <= 255))
             {
                 CString strTips;
-                strTips.Format(_T("Error : Wrong Modbus ID : %d. Please input correct ID."), nID);
+                strTips.Format(_T("Error : Wrong Modbus ID : %d. Please input right ID."), nID);
                 UpdateStatusInfo(strTips, FALSE);
                 if(!auto_flash_mode)
                     AfxMessageBox(strTips);
@@ -1694,11 +1698,11 @@ int CISPDlg::GetModbusIDSUBID(vector<int>& szMdbIDs)
             }
             szMdbIDs.push_back(nID);
         }
-        // 		else if(nPos == 0) // In the first
+        // 		else if(nPos == 0) // 在第一位
         // 		{
         // 		}
 
-        if (nPos < 0 || (nPos == strSrc.GetLength())) // Not found in the last 
+        if (nPos < 0 || (nPos == strSrc.GetLength())) // 找不到或者位于最后一位
         {
             return TRUE;
         }
@@ -1857,7 +1861,7 @@ void CISPDlg::FlashByEthernet()
 
         m_pFileBuffer = new char[c_nBinFileBufLen];
         memset(m_pFileBuffer, 0xFF, c_nBinFileBufLen);
-        nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nBinFileBufLen);//Get the file's buffer
+        nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nBinFileBufLen);//获取文件的buffer
 
 
 //         if (!pHexFile->Is_RAM_HEXType())
@@ -1906,7 +1910,7 @@ void CISPDlg::FlashByEthernet()
     {
         CString strTips1 =_T("|Error: The file is not a properly formatted BIN file.");
         UpdateStatusInfo(strTips1, FALSE);
-        CString strTips2 =_T("|Please select another file.");
+        CString strTips2 =_T("|Please reselect a right file.");
         UpdateStatusInfo(strTips2, FALSE);
         //AfxMessageBox(strTips1+strTips2, MB_OK);
     }
@@ -1956,7 +1960,7 @@ BOOL CISPDlg::FileValidation(const CString& strFileName)
     //  if (g_Commu_type==0 && !HexFileValidation(strFileName))
     //  {
     //      CString strTips;
-    //      strTips = _T("|To Update using the Com port please select a *.HEX file");
+    //      strTips = _T("|To Update over Com port, please select a *.HEX file");
     //if(!auto_flash_mode)
     //	 AfxMessageBox(strTips);
     //      UpdateStatusInfo(strTips, FALSE);
@@ -1966,7 +1970,7 @@ BOOL CISPDlg::FileValidation(const CString& strFileName)
     //  {
     //      CString strTips;
     //      //strTips.Format(_T("%s isn't a BIN file."), strFileName);
-    //      strTips = _T("|To Update over Ethernet please select a *.BIN file");
+    //      strTips = _T("|To Updating over Ethernet, please select a *.BIN file");
     //if(!auto_flash_mode)
     //	AfxMessageBox(strTips);
     //      UpdateStatusInfo(strTips, FALSE);
@@ -1987,7 +1991,10 @@ BOOL CISPDlg::FileValidation(const CString& strFileName)
     return FALSE;
 }
 /*
-Function: verify ID from user
+Author:	Alex
+Date: 2012-10-25
+Function:
+verify ID that customer input.
 */
 BOOL CISPDlg::ValidMdbIDString(void)
 {
@@ -1996,7 +2003,7 @@ BOOL CISPDlg::ValidMdbIDString(void)
     if (strModbusID==_T(""))
     {
         if(!auto_flash_mode)
-            AfxMessageBox(_T("Please input device IDs"));
+            AfxMessageBox(_T("Please input IDs"));
         return FALSE;
     }
     else
@@ -2008,7 +2015,7 @@ BOOL CISPDlg::ValidMdbIDString(void)
         {
             if (strModbusID.GetAt(i) != ';')
             {
-                CString strTips =_T("|Error: Modbus ID not valid.");
+                CString strTips =_T("|Error: Modbus ID invalidation.");
                 UpdateStatusInfo(strTips, FALSE);
                 //AfxMessageBox(strTips);
                 return FALSE;
@@ -2043,14 +2050,14 @@ int CISPDlg::GetModbusID(vector<int>& szMdbIDs)
             if (!(nID > 0 && nID <= 255))
             {
                 CString strTips;
-                strTips.Format(_T("|Error : Wrong Modbus ID : %d. Please input a valid ID."), nID);
+                strTips.Format(_T("|Error : Wrong Modbus ID : %d. Please input right ID."), nID);
                 UpdateStatusInfo(strTips, FALSE);
                 //AfxMessageBox(strTips);
                 return FALSE;
             }
             szMdbIDs.push_back(nID);
         }
-        if (nPos < 0 || (nPos == strSrc.GetLength())) // Not found in the last
+        if (nPos < 0 || (nPos == strSrc.GetLength())) // 找不到或者位于最后一位
         {
             return TRUE;
         }
@@ -2086,7 +2093,7 @@ void CISPDlg::FlashByCom()
 
 
 // 	 CString temp;
-// 	 UpdateStatusInfo(_T(">>>>>Hex File Information<<<<<"), FALSE);
+// 	 UpdateStatusInfo(_T(">>>>>The Hex Information<<<<<"), FALSE);
 //
 // 	 temp.Format(_T("Company Name: "));
 // 	 for (int i=0;i<5;i++)
@@ -2103,7 +2110,7 @@ void CISPDlg::FlashByCom()
 // 	 UpdateStatusInfo(temp,FALSE);
 // 	 float rev;
 // 	 rev=((float)(temp1.software_high*256+temp1.software_low))/10;
-// 	 temp.Format(_T("Hex File Version: %0.1f"),rev);
+// 	 temp.Format(_T("The Hex Version: %0.1f"),rev);
 // 	 UpdateStatusInfo(temp,FALSE);
     //ShowHexBinInfor();
     //unsigned short chip_size=temp1.reserved[2];
@@ -2112,7 +2119,7 @@ void CISPDlg::FlashByCom()
 
     m_pFileBuffer = new char[c_nHexFileBufLen];
     memset(m_pFileBuffer, 0xFF, c_nHexFileBufLen);
-    int nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nHexFileBufLen);//Get the file's buffer
+    int nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nHexFileBufLen);//获取文件的buffer
 
     if(nDataSize > 0)
     {
@@ -2157,7 +2164,7 @@ void CISPDlg::FlashByCom()
         int nRet = m_pComWriter->BeginWirteByCom();
 
         // Disable flash button
-        if (nRet != 0) // Started writing.
+        if (nRet != 0) // 表示开始写了
         {
             EnableFlash(FALSE);
         }
@@ -2166,7 +2173,7 @@ void CISPDlg::FlashByCom()
     {
         CString strTips1 =_T("|File error: The file is not a properly formatted HEX file.");
         UpdateStatusInfo(strTips1, FALSE);
-        CString strTips2 =_T("|Please select another file.");
+        CString strTips2 =_T("|Please reselect a right file.");
         UpdateStatusInfo(strTips2, FALSE);
         if(!auto_flash_mode)
             AfxMessageBox(strTips1+strTips2, MB_OK);
@@ -2191,7 +2198,7 @@ void CISPDlg::OnBnClickedButtonPing2()
     if (strIP.GetLength() <= 6)
     {
         if(!auto_flash_mode)
-            AfxMessageBox(_T("Please Input an IP address."));
+            AfxMessageBox(_T("Please Input a right IP address."));
         return;
     }
     OnTestPing(strIP);
@@ -2223,7 +2230,7 @@ void Split_Cstring(CString Str,vector<CString>& ret_str,CString split_str)
     }
 
 }
-//Update the product information that is being flashed
+//更新正在刷新的产品信息
 afx_msg LRESULT CISPDlg::Show_Flash_DeviceInfor(WPARAM wParam, LPARAM lParam)
 {
     CString Device_info = CString(LPTSTR(lParam));
@@ -2237,7 +2244,7 @@ afx_msg LRESULT CISPDlg::Show_Flash_DeviceInfor(WPARAM wParam, LPARAM lParam)
     }
 
     int DeviceModel=-1;
-    //DeviceModel=read_multi(ID,&Device_infor[0],0,10);//Get the model number that is being flashed, returns the name of the product
+    //DeviceModel=read_multi(ID,&Device_infor[0],0,10);//获得了正在刷新的Model号-更加Model号码-返回产品的名字
 
     m_ModelName=GetProductName(US_Device_infor[7]);
     if (m_ModelName.Find(_T("ERROR"))!=0)
@@ -2280,8 +2287,8 @@ BOOL CISPDlg::Show_Flash_DeviceInfor_NET()
     if (Open_Socket2(strIP,m_IPPort))
     {
         int DeviceModel=-1;
-        DeviceModel=read_one(255,MODBUS_PRODUCT_MODEL);//Get the model number that is being flashed, returns the name of the product
-        if (DeviceModel<0)//Modbus does not communicate, 
+        DeviceModel=read_one(255,MODBUS_PRODUCT_MODEL);//获得了正在刷新的Model号-更加Model号码-返回产品的名字
+        if (DeviceModel<0)//Modbus 不通信，说明有可能在bootloader
         {
             return TRUE;
         }
@@ -2302,7 +2309,7 @@ BOOL CISPDlg::Show_Flash_DeviceInfor_NET()
 
         if (m_ModelName.Find(_T("ERROR"))!=0)
         {
-            float tstat_version2=(float)read_one(255,MODBUS_VERSION_NUMBER_LO); //device version
+            float tstat_version2=(float)read_one(255,MODBUS_VERSION_NUMBER_LO); //tstat version
             if(tstat_version2<=0)
                 m_FirmVer.Format(_T("%0.1f"),tstat_version2);
             if(tstat_version2 >=240 && tstat_version2 <250)
@@ -2334,7 +2341,7 @@ BOOL CISPDlg::Show_Flash_DeviceInfor_NET()
     else
     {
         CString tips;
-        tips.Format(_T("IP:%s,Port:%d can't open,You can Ping to test the connection"),strIP,m_IPPort);
+        tips.Format(_T("IP:%s,Port:%d can't open,You can press Ping for test connection"),strIP,m_IPPort);
         UpdateStatusInfo(tips,FALSE);
         return FALSE;
     }
@@ -2347,7 +2354,7 @@ CString CISPDlg::Get_NET_Infor(CString strIPAdress,short nPort)
     if (Open_Socket2(strIPAdress,nPort))
     {
         int DeviceModel=-1;
-        DeviceModel=read_one(255,MODBUS_PRODUCT_MODEL);//Got the model number of device, returns the name of the product
+        DeviceModel=read_one(255,MODBUS_PRODUCT_MODEL);//获得了正在刷新的Model号-更加Model号码-返回产品的名字
         modelname=GetProductName(DeviceModel);
         //m_ModelName.Format(_T("%d"),DeviceModel);
         if(modelname.Find(_T("ERROR"))!=-1)
@@ -2359,7 +2366,7 @@ CString CISPDlg::Get_NET_Infor(CString strIPAdress,short nPort)
     else
     {
         CString tips;
-        tips.Format(_T("IP:%s,Port:%d can't open, press Ping to test the connection"),strIPAdress,nPort);
+        tips.Format(_T("IP:%s,Port:%d can't open,You can press Ping for test connection"),strIPAdress,nPort);
         UpdateStatusInfo(tips,FALSE);
     }
 
@@ -2384,7 +2391,9 @@ void CISPDlg::OnBnClickedClearLog()
 }
 
 
-//* Write log information to a file 
+/*
+把日志信息写入文件
+*/
 void CISPDlg::OnBnClickedSaveLog()
 {
     if (m_lbStatusInfo.GetCount()!=0)
@@ -2408,22 +2417,22 @@ void CISPDlg::OnBnClickedSaveLog()
 
         }
 
-        //Open File
+        //打开文件
         //LPCSTR filename=m_strLogFileName.GetBuffer();
         //ShellExecute(NULL, "open","Log_info.txt",NULL, NULL, SW_SHOWNORMAL);
         ShellExecute(this->m_hWnd, _T("open"), m_strLogFileName, NULL, NULL, SW_SHOWNORMAL);
     }
     else
     {
-        //Empty log
+        //没有日志内容
     }
 
 
 }
-//Command events can be triggered only when responding to context menus
+//只有响应上下文菜单的时候，才可以触发Command事件
 void CISPDlg::OnContextMenu(CWnd*  pWnd , CPoint  point )
 {
-    //CPoint pt;	  //Gets the position of the mouse when no longer OnContextMenu
+    //CPoint pt;	  //当不再OnContextMenu 时，获取鼠标的位置
     //::GetCursorPos(&pt);
     //
     CRect rect;
@@ -2436,7 +2445,7 @@ void CISPDlg::OnContextMenu(CWnd*  pWnd , CPoint  point )
         if ((m_lbStatusInfo.GetCount()>0)&&pBtn->IsWindowEnabled())
         {
             CMenu menu;
-            menu.LoadMenu(IDR_MENU1);//Menu Resource ID
+            menu.LoadMenu(IDR_MENU1);//菜单资源ID
             menu.GetSubMenu(0)->TrackPopupMenu(TPM_LEFTALIGN|TPM_LEFTBUTTON,point.x,point.y,this);     //m_newListCtrl是CListCtrl对象
             menu.DestroyMenu();
         }
@@ -2444,7 +2453,12 @@ void CISPDlg::OnContextMenu(CWnd*  pWnd , CPoint  point )
     }
 
 }
-/* Function: According to Model Name,return the hex file prefix of the Device Model Name */
+/*
+Author:	Alex
+Date: 2012-11-2
+Function:
+According to Model Name,return the hex file prefix of the Device Model Name
+*/
 CString CISPDlg::GetFilePrefix_FromDB(const CString& ModeName)
 {
     _ConnectionPtr m_pConnection;
@@ -2459,17 +2473,13 @@ CString CISPDlg::GetFilePrefix_FromDB(const CString& ModeName)
     catch(_com_error e)
     {
         if(!auto_flash_mode)
-            AfxMessageBox(_T("The database connection failed to confirm that the database Demo.mdb is under the current path!"));
+            AfxMessageBox(_T("数据库连接失败，确认数据库Demo.mdb是否在当前路径下!"));
     }
     _RecordsetPtr m_pRecordset;
     m_pRecordset.CreateInstance(__uuidof(Recordset));
 
     // 在ADO操作中建议语句中要常用try...catch()来捕获错误信息，
     // 因为它有时会经常出现一些意想不到的错误。jingzhou xu
-       // The Try...catch () is used in the proposed statement in the ADO operation to catch the error message.
-     //Because it can return unexpected errors.
-    
-    
     try
     {
         CString sql;
@@ -2485,7 +2495,7 @@ CString CISPDlg::GetFilePrefix_FromDB(const CString& ModeName)
     CString str_FilePrefix=_T("");
     try
     {
-        if(!m_pRecordset->EndOfFile)  //Indicates that the product table has valid data
+        if(!m_pRecordset->EndOfFile)  //说明Product表中有符合条件的数据
         {
             m_pRecordset->MoveFirst();
             var = m_pRecordset->GetCollect("HexPrefix");
@@ -2494,7 +2504,7 @@ CString CISPDlg::GetFilePrefix_FromDB(const CString& ModeName)
         }
         else
         {
-            //AfxMessageBox(_T("The data in the table is empty"));	 //No qualifying data, return NULL
+            //AfxMessageBox(_T("表内数据为空"));	 //无符合条件的数据，返回空
 
             //return str_FilePrefix;
         }
@@ -2513,12 +2523,14 @@ CString CISPDlg::GetFilePrefix_FromDB(const CString& ModeName)
 
 }
 /*
+Author:	Alex
+Date: 2012-11-6
 Function:
-Determine if the name of the device is compatible with the selected file
-There are three possible situations
-1.Match
-2.No match
-3.The database does not exist
+判断设备的名字和选择的文件是不是相符合
+有三种情况
+1.符合
+2.不符合
+3.数据库中不存在
 */
 int CISPDlg::Judge_Model_Version()
 {
@@ -2533,7 +2545,7 @@ int CISPDlg::Judge_Model_Version()
     {
         return NO_HEXFILEPREFIX;
     }
-    else if (flashfileName.Find(File_Prefix)!=-1) //String Lookup
+    else if (flashfileName.Find(File_Prefix)!=-1) //字符串查找
     {
         return OK_HEXFILEPREFIX;
     }
@@ -2558,8 +2570,11 @@ void CISPDlg::OnMenuAbout()
     dlg.DoModal();
 }
 /*
+Author:	Alex
+Date: 2012-11-2
 Function:
-Extracts the name of a file from a user-selected file path，
+从用户选择的文件路径中提取文件的名字，
+这样就不会作为无判断
 */
 CString CISPDlg::GetFileName_FromFilePath()
 {
@@ -2573,7 +2588,7 @@ CString CISPDlg::GetFileName_FromFilePath()
 void CISPDlg::OnBnClickedShowHex()
 {
     UpdateData();
-    SaveParamToConfigFile();	//Save data entered by the user
+    SaveParamToConfigFile();	//保存用户输入的数据
 
 
     if (m_pFileBuffer)
@@ -2587,7 +2602,7 @@ void CISPDlg::OnBnClickedShowHex()
 
     m_pFileBuffer = new char[c_nHexFileBufLen];
     memset(m_pFileBuffer, 0xFF, c_nHexFileBufLen);
-    int nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nHexFileBufLen);//Get the file buffer
+    int nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nHexFileBufLen);//获取文件的buffer
     TS_UC *Databuff=(TS_UC*)m_pFileBuffer;
     int ii=0;
     CString aline_hex(_T(""));
@@ -2631,7 +2646,7 @@ void CISPDlg::FlashSN()
             return;
         }
     }
-    UpdateStatusInfo(_T("Detecting braudrate finished"), FALSE);
+    UpdateStatusInfo(_T("Detecting your Braudrate ,Finished"), FALSE);
     CFlashSN* pFlashSN = new CFlashSN;
     int nComport = GetComPortNo();
 
@@ -2643,7 +2658,7 @@ void CISPDlg::FlashSN()
     if(!GetModbusID(m_szMdbIDs))
     {
         if(!auto_flash_mode)
-            AfxMessageBox(_T("Please input a device ID "));
+            AfxMessageBox(_T("Please input a slave ID "));
         return ;
     }
     int nHWVerison;
@@ -2706,7 +2721,7 @@ void CISPDlg::OnMenuCheckhex()
 
         m_pFileBuffer = new char[c_nHexFileBufLen];
         memset(m_pFileBuffer, 0xFF, c_nHexFileBufLen);
-        int nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nHexFileBufLen);//Gets the file's buffer
+        int nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nHexFileBufLen);//获取文件的buffer
         CString hexinfor=_T("The Hex For ");
         hexinfor+=pHexFile->Get_HexInfor();
         CString strFilesize;
@@ -2737,7 +2752,7 @@ void CISPDlg::OnMenuCheckhex()
 
 
             CString hexinfor=_T("The Bin For ");
-            hexinfor.Format(_T("This Bin file is for a device called %s"),m_strProductName.GetBuffer());
+            hexinfor.Format(_T("The Bin file is for the firmware of %s"),m_strProductName.GetBuffer());
             GetDlgItem(IDC_BIN_INFORMATION)->SetWindowText(hexinfor);
 
 
@@ -2783,7 +2798,7 @@ void CISPDlg::OnTimer(UINT_PTR nIDEvent)
 			break;
 		}
 		CString test_info;
-		test_info.Format(_T("Next test will start in %d (s)"),start_test_time);
+		test_info.Format(_T("Next test will start after %d (s)"),start_test_time);
 
 
 		int nCount = test_info.GetLength();
@@ -2806,7 +2821,7 @@ void CISPDlg::OnTimer(UINT_PTR nIDEvent)
 
 BOOL CISPDlg::DetectBraudrate ()
 {
-    UpdateStatusInfo(_T("Detecting the com port baudrate......"), FALSE);
+    UpdateStatusInfo(_T("Detecting your Braudrate......"), FALSE);
     m_szMdbIDs.clear ();
     GetModbusID (m_szMdbIDs);
     if (m_szMdbIDs.size ()<=0)
@@ -2835,7 +2850,7 @@ BOOL CISPDlg::DetectBraudrate ()
         {
             // m_combox_baudrate.SetCurSel (braudrate);
 
-            strTips.Format (_T("Detecting the com port baudrate:%s,Successful."),strBraudrate);
+            strTips.Format (_T("Detecting your Braudrate:%s,Successfully."),strBraudrate);
             UpdateStatusInfo(strTips, FALSE);
 
             return TRUE;
@@ -2853,7 +2868,7 @@ BOOL CISPDlg::DetectBraudrate ()
             {
                 m_combox_baudrate.SetCurSel (braudrate);
 
-                strTips.Format (_T("Detecting your Baudrate:%d,Successful."),intBraudreate);
+                strTips.Format (_T("Detecting your Braudrate:%d,Successfully."),intBraudreate);
                 UpdateStatusInfo(strTips, FALSE);
 
                 return TRUE;
@@ -2861,16 +2876,16 @@ BOOL CISPDlg::DetectBraudrate ()
             }
             else
             {
-                strTips.Format (_T("Detecting your Baudrate:%d,Failed."),intBraudreate);
+                strTips.Format (_T("Detecting your Braudrate:%d,Unsuccessfully."),intBraudreate);
                 UpdateStatusInfo(strTips, FALSE);
             }
         }
-        strTips.Format (_T("Detecting your current baudrate: Finished"));
+        strTips.Format (_T("Detecting your current Braudrate: Finished"));
         UpdateStatusInfo(strTips, FALSE);
         close_com ();
     }
 
-    strTips.Format (_T("Detecting your Baudrate: Failed"));
+    strTips.Format (_T("Detecting your Braudrate: Failed"));
     UpdateStatusInfo(strTips, FALSE);
 
     return FALSE;

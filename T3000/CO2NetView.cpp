@@ -86,7 +86,7 @@ void CCO2NetView::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SERIALNUM_CO2_EDIT, m_edit_SN);
 	DDX_Control(pDX, IDC_FIRMWARV_CO2_EDIT, m_Edit_FVevsion);
 	DDX_Control(pDX, IDC_HARDWAREV_CO2_EDIT, m_Edit_HardVer);
-	DDX_Control(pDX, IDC_CO2_BAUDRATECOMBO, m_Combox_baudrate);
+	DDX_Control(pDX, IDC_CO2_BRAUDRATECOMBO, m_Combox_braudrate);
 	DDX_Control(pDX, IDC_EDIT_CO2_HUMIDITY, m_Edit_RHum);
 	DDX_Control(pDX, IDC_RADIO_ALARM_MANUAL, m_AlarmSetting_M);
 	DDX_Control(pDX, IDC_RADIO_ALARM_AUTO, m_AlarmSetting_Auto);
@@ -404,18 +404,18 @@ void CCO2NetView::Initial_Window()
     strTemp.Format(_T("%u"),product_register_value[CO2_NET_MODBUS_HARDWARE_REV]);
     m_Edit_HardVer.SetWindowText(strTemp);
 
-    m_Combox_baudrate.ResetContent();
-    m_Combox_baudrate.AddString(_T("9600"));
-    m_Combox_baudrate.AddString(_T("19200"));
-	m_Combox_baudrate.AddString(_T("38400"));
-	m_Combox_baudrate.AddString(_T("57600"));
-	m_Combox_baudrate.AddString(_T("115200"));
+    m_Combox_braudrate.ResetContent();
+    m_Combox_braudrate.AddString(_T("9600"));
+    m_Combox_braudrate.AddString(_T("19200"));
+	m_Combox_braudrate.AddString(_T("38400"));
+	m_Combox_braudrate.AddString(_T("57600"));
+	m_Combox_braudrate.AddString(_T("115200"));
 	if (product_register_value[7] == STM32_CO2_NET||product_register_value[7] == STM32_CO2_RS485)
 	{
 		CO2_NET_MODBUS_BAUDRATE = 15;
 	}
 	 
-    m_Combox_baudrate.SetCurSel(product_register_value[CO2_NET_MODBUS_BAUDRATE]);
+    m_Combox_braudrate.SetCurSel(product_register_value[CO2_NET_MODBUS_BAUDRATE]);
     float fTemp;
     fTemp = (float)product_register_value[CO2_NET_MODBUS_HUMIDITY]/10;
     if(fTemp>100)

@@ -785,7 +785,7 @@ OUTPUT bool Open_Socket2(CString strIPAdress,short nPort)
     setsockopt(m_hSocket,SOL_SOCKET,SO_RCVTIMEO,(char *)&nNetTimeout,sizeof(int));
 
     //****************************************************************************
-    // Fance added ,不要用阻塞的模式，如果设备不在线 经常性的 要等10几秒 
+    // Fance added ,不要用阻塞的模式，如果设备不在线 经常性的 要等10几秒 ，老毛受不了。
     //改为非阻塞的 2.5秒后还没连接上就 算连接失败;
     int error = -1;
     int len;
@@ -897,7 +897,7 @@ OUTPUT bool Open_Socket2_multy_thread(CString strIPAdress, short nPort,int ninde
     setsockopt(m_hSocket, SOL_SOCKET, SO_RCVTIMEO, (char *)&nNetTimeout, sizeof(int));
 
     //****************************************************************************
-    // Fance added ,不要用阻塞的模式，如果设备不在线 经常性的 要等10几秒
+    // Fance added ,不要用阻塞的模式，如果设备不在线 经常性的 要等10几秒 ，老毛受不了。
     //改为非阻塞的 2.5秒后还没连接上就 算连接失败;
     int error = -1;
     int len;
@@ -5002,15 +5002,13 @@ OUTPUT bool open_com_nocretical(int m_com)
         strCom = _T("\\\\.\\COM")+strCom;
     }
 
-     m_hSerial = CreateFile(strCom, //strCom,//串口句柄，打开串口
-         GENERIC_READ | GENERIC_WRITE,
-         0,
-         NULL,
-         OPEN_EXISTING,
-         FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,是另外的形式，表示的是异步通信，能同时读写;0为同步读写
-         NULL);
-
-
+    m_hSerial = CreateFile( strCom, //strCom,//串口句柄，打开串口
+                            GENERIC_READ | GENERIC_WRITE,
+                            0,
+                            NULL,
+                            OPEN_EXISTING,
+                            FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,是另外的形式，表示的是异步通信，能同时读写;0为同步读写
+                            NULL);
     m_com_h_serial[m_com] = m_hSerial;
 
     if(m_hSerial == INVALID_HANDLE_VALUE)
@@ -5051,12 +5049,13 @@ OUTPUT bool open_com_nocretical(int m_com)
     CommTimeouts.WriteTotalTimeoutMultiplier = 20;
     CommTimeouts.WriteTotalTimeoutConstant = 200;
 
-//测试
-    //CommTimeouts.ReadIntervalTimeout = 0;
-    //CommTimeouts.ReadTotalTimeoutMultiplier = 0;
-    //CommTimeouts.ReadTotalTimeoutConstant = 0;
-    //CommTimeouts.WriteTotalTimeoutMultiplier = 20;
-    //CommTimeouts.WriteTotalTimeoutConstant = 200;
+#if 0 //lsc 
+    CommTimeouts.ReadIntervalTimeout = 1000;
+    CommTimeouts.ReadTotalTimeoutMultiplier = 1000;
+    CommTimeouts.ReadTotalTimeoutConstant = 1000;
+    CommTimeouts.WriteTotalTimeoutMultiplier = 1000;
+    CommTimeouts.WriteTotalTimeoutConstant = 1000;
+#endif
 
 
     if (!SetCommTimeouts(m_hSerial, &CommTimeouts))
@@ -9476,6 +9475,8 @@ OUTPUT bool Open_Socket_For_All(CString strIPAdress, short nPort)
 }
 
 
+<<<<<<< HEAD
+=======
 //校验总线上的数据,是否有bacnet 的55  FF 的 数据
 int check_bacnet_data(unsigned char * buffer, int nlength)
 {
@@ -9765,3 +9766,4 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
 
 
 
+>>>>>>> 16f951e4dc1ccd60c5ad13a7476e318c452b6160

@@ -6,7 +6,7 @@
 #include "resource.h"  // e.g. resource.h
 
 #include "Splash.h"  // e.g. splash.h
-#include "global_function.h"
+#include "globle_function.h"
 
 
 
