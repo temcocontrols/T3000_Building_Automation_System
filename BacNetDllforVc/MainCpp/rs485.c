@@ -212,14 +212,11 @@ static void RS485_Configure_Status(
         RS485_Print_Error();
     }
     /* configure the COM port timeout values */
-    //ctNew.ReadIntervalTimeout = MAXDWORD;
-	ctNew.ReadIntervalTimeout = MAXDWORD;
-    ctNew.ReadTotalTimeoutMultiplier = 0;
-   // ctNew.ReadTotalTimeoutConstant = 10;//Fance default 1000
-	ctNew.ReadTotalTimeoutConstant = 0;//Fance
-	ctNew.WriteTotalTimeoutMultiplier = 0;
-	ctNew.WriteTotalTimeoutConstant = 0;
-
+    ctNew.ReadIntervalTimeout = MAXDWORD;
+    ctNew.ReadTotalTimeoutMultiplier = 1 /*MAXDWORD*/;
+    ctNew.ReadTotalTimeoutConstant = 3;
+    ctNew.WriteTotalTimeoutMultiplier = 1;
+    ctNew.WriteTotalTimeoutConstant = 3;
     if (!SetCommTimeouts(RS485_Handle, &ctNew)) {
         RS485_Print_Error();
     }
@@ -462,9 +459,11 @@ void RS485_Send_Frame(
         baud = RS485_Get_Baud_Rate();
         /* wait about 40 bit times since reception */
         if (baud == 9600)
-            turnaround_time = 4;
+            turnaround_time = 6/*4*/;
         else if (baud == 19200)
-            turnaround_time = 2;
+            turnaround_time = 3/*2*/;
+        else if (baud == 38400)
+            turnaround_time = 3;
         else
             turnaround_time = 2;
         while (mstp_port->SilenceTimer(NULL) < turnaround_time) {

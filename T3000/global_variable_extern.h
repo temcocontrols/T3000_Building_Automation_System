@@ -58,6 +58,7 @@ extern int  MDAY,MNIGHT;
 extern int nCom;
 extern	CString program_path;
 extern	int g_tstat_id;
+extern  int g_mstp_deviceid; //用于全局根据Device id 访问 MSTP 。
 extern unsigned int g_serialNum;
 extern	BOOL g_tstat_id_changed;
 extern  BOOL g_bPauseMultiRead;     // for background read register
@@ -1297,7 +1298,7 @@ extern CString bacnet_message_return_string;  //得到的输入字符串
 extern pidname_map product_map;
 extern bool offline_mode ; //全局离线模式判断;
 extern CString offline_prg_path;   //离线模式得prg 保存路径;
-
+extern bac_mstp_com g_mstp_com; // 全局mstp com 口 连接状态
 extern bool custom_bacnet_register_listview;
 
 extern Str_modbus_reg bacnet_to_modbus_struct; //用于bacnet 协议转换为modbus 协议的结构

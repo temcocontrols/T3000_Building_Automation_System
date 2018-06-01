@@ -117,7 +117,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>setupapi.lib.;$(SolutionDir)SQLiteDriver\sqlite3.lib;MultipleMonthCal32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>setupapi.lib.;$(SolutionDir)SQLiteDriver\sqlite3.lib;$(SolutionDir)T3000 Output\release\MultipleMonthCal32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\T3000 Output\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -638,7 +638,6 @@
     <ClInclude Include="TstatRangeDlg.h" />
     <ClInclude Include="TstatZigbeeLogic.h" />
     <ClInclude Include="Tstat_HelpDoc.h" />
-    <ClInclude Include="WeeklySchedule.h" />
     <ClInclude Include="AddBuilding.h" />
     <ClInclude Include="AfxMessageDialog.h" />
     <ClInclude Include="AllNodesDiaolg.h" />

@@ -147,6 +147,7 @@ CImageTreeCtrl::CImageTreeCtrl()
 	is_focus = false;
 	tree_offline_mode = false;
 	m_virtual_tree_item = NULL;
+    Inial_ProductName_map();
 }
 
 CImageTreeCtrl::~CImageTreeCtrl()
@@ -228,8 +229,21 @@ bool CImageTreeCtrl::HandleAddVirtualDevice(HTREEITEM)
 	return true;
 }
 #include "ARDDlg.h"
-bool CImageTreeCtrl::HandleAddCustomDevice(HTREEITEM)
+bool CImageTreeCtrl::HandleAddCustomDevice(HTREEITEM hItem)
 {
+    bool findhitem = false;
+    int hitem_index = 0;
+    CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+    for (UINT i = 0; i < pFrame->m_product.size(); i++)
+    {
+        if (hItem == pFrame->m_product.at(i).product_item)
+        {
+            findhitem = true;
+            hitem_index = i;
+            break;
+        }
+    }
+
 	CARDDlg popdlg;
 	popdlg.DoModal();
 	return true;
@@ -537,6 +551,31 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
 
 	return TRUE;
 }
+
+typedef map<int, int> panelname_map;
+panelname_map g_panelname_map;
+
+void CImageTreeCtrl::Inial_ProductName_map()
+{
+    g_panelname_map.insert(map<int,int>::value_type(STM32_PRESSURE_NET,901));
+    g_panelname_map.insert(map<int, int>::value_type(STM32_PRESSURE_RS3485, 901));
+
+}
+
+int CImageTreeCtrl::PanelName_Map(int product_type)
+{
+    map<int, int>::iterator iter;
+    int test1;
+    iter = g_panelname_map.find(product_type);
+    if (iter != g_panelname_map.end())
+    {
+        test1 = g_panelname_map.at(product_type);
+        return test1;
+    }
+   
+    return 715; // 如果没有默认按照从715 开始 8个寄存器.
+}
+
 BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
        if (m_level==0)
        {
@@ -546,6 +585,12 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
        {
           return FALSE;
        }
+
+
+       int ccc = PanelName_Map(22);
+
+       ccc = PanelName_Map(99);
+
     CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
     for (int i=0;i< pFrame->m_product.size();i++){
       if (m_hSelItem == pFrame->m_product.at(i).product_item)
@@ -560,7 +605,8 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
             int sn=pFrame->m_product.at(i).serial_number;
             temp_serial.Format(_T("%d"),sn);
             int  int_product_type = pFrame->m_product.at(i).product_class_id;
-
+            int panel_name_start_reg = 0;  //获取对应产品号
+            panel_name_start_reg = PanelName_Map(int_product_type);
             /* if( int_product_type == PM_TSTAT6) 
             {
             WritePrivateProfileStringW(temp_serial,_T("NewName"),m_name_new,g_achive_device_name_path);
@@ -573,8 +619,8 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
 
             
              // int_product_type == PM_TSTAT6
-            if (FALSE)
-            {
+            //if ((int_product_type != PM_MINIPANEL) && (int_product_type != PM_MINIPANEL_ARM))
+            //{
                 int communicationType = pFrame->m_product.at(i).protocol;  
                 ModbusID = pFrame->m_product.at(i).product_id;
                 SetCommunicationType(communicationType);
@@ -593,7 +639,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
                         WideCharToMultiByte( CP_ACP, 0, m_name_new.GetBuffer(), -1, cTemp1, 16, NULL, NULL ); 
                         unsigned char Databuffer[16];
                         memcpy_s(Databuffer,16,cTemp1,16);
-                        if (Write_Multi(ModbusID,Databuffer,715,16,10)<0)
+                        if (Write_Multi(ModbusID,Databuffer, panel_name_start_reg,16,10)<0)
                         {
                             
                         }
@@ -606,7 +652,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
                 else
                 {
                     strIPAddress = pFrame->m_product.at(i).BuildingInfo.strIp;
-                    IPPort = _wtoi(pFrame->m_product.at(i).BuildingInfo.strIpPort);
+                    IPPort = pFrame->m_product.at(i).ncomport;
                     if (Open_Socket2(strIPAddress,IPPort))
                     {
                         if(m_name_new.GetLength()> 17)	//长度不能大于结构体定义的长度;
@@ -619,7 +665,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
                         WideCharToMultiByte( CP_ACP, 0, m_name_new.GetBuffer(), -1, cTemp1, 16, NULL, NULL ); 
                         unsigned char Databuffer[16];
                         memcpy_s(Databuffer,16,cTemp1,16);
-                        if (Write_Multi(ModbusID,Databuffer,715,16,10)<0)
+                        if (Write_Multi(ModbusID,Databuffer, panel_name_start_reg,16,10)<0)
                         {
                                 WritePrivateProfileStringW(temp_serial,_T("NewName"),m_name_new,g_achive_device_name_path);
                                 WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("1"),g_achive_device_name_path);
@@ -628,7 +674,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
                     }
                       
                 }
-            }
+            //}
 			CppSQLite3DB SqliteDBBuilding;
 			CppSQLite3Table table;
 			CppSQLite3Query q;
@@ -1619,12 +1665,12 @@ void CImageTreeCtrl::DisplayContextOtherMenu(CPoint & point) {
 
 		VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_CONNECTION, _T("Sort By Connection")));
 		VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_FLOOR, _T("Sort By Floor")));
-		VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_CUSTOM_DEVICE, _T("Add Custom Device Register List")));
+		VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_CUSTOM_DEVICE, _T("Add Custom Device")));
 
 		if((m_virtual_tree_item != NULL) && (hItem == m_virtual_tree_item))
 			{
 			VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_VIRTUAL_DEVICE, _T("Add Virtual Device")));
-			VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_CUSTOM_DEVICE, _T("Add Custom Device Register List")));
+			VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_CUSTOM_DEVICE, _T("Add Custom Device")));
 			}
 		if(menu.GetMenuItemCount() > 0)
 			menu.TrackPopupMenu(TPM_LEFTALIGN, point.x, point.y, this);
@@ -1637,22 +1683,6 @@ void CImageTreeCtrl::DisplayContextMenu(CPoint & point) {
 	HTREEITEM hItem = HitTest(pt, &flags);
 	bool bOnItem = (flags & TVHT_ONITEM) != 0;
 
-// 	CMenu add;
-// 	VERIFY(add.CreatePopupMenu());
-// 	if(bOnItem) {
-// 		if(CanInsertItem(GetParentItem(hItem)))
-// 			VERIFY(add.AppendMenu(MF_STRING, ID_ADD_SIBLING, _T("New Sibling\tINS")));
-// 		if(CanInsertItem(hItem))
-// 			VERIFY(add.AppendMenu(MF_STRING, ID_ADD_CHILD, _T("New Child Item\tCtrl+INS")));
-// 	}
-// 	if(CanInsertItem(0))
-// 		VERIFY(add.AppendMenu(MF_STRING, ID_ADD_ROOT, _T("New Root Item\tShift+INS")));
-
-// 	CMenu sort;
-// 	VERIFY(sort.CreatePopupMenu());
-// 	VERIFY(sort.AppendMenu(MF_STRING, ID_SORT_LEVEL, _T("Current Level\tCtrl+S")));
-// 	VERIFY(sort.AppendMenu(MF_STRING, ID_SORT_LEVELANDBELOW, _T("Current Level And Below\tCtrl+Shift+S")));
-
 	CMenu menu;
 	VERIFY(menu.CreatePopupMenu());
 	if(bOnItem) 
@@ -1664,18 +1694,9 @@ void CImageTreeCtrl::DisplayContextMenu(CPoint & point) {
 			VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_CONNECTION, _T("Sort By Connection")));
 			VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_FLOOR, _T("Sort By Floor")));
 			VERIFY(menu.AppendMenu(MF_STRING, ID_PING_CMD, _T("Ping")));
-			
+            VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_CUSTOM_DEVICE, _T("Add Custom Device")));
 		}
-// 		if(CanDeleteItem(hItem))
-// 			VERIFY(menu.AppendMenu(MF_STRING, ID_DELETE, _T("Delete\tDEL")));
 	}
-// 	if(add.GetMenuItemCount() > 0)
-// 		VERIFY(menu.AppendMenu(MF_POPUP, UINT(add.GetSafeHmenu()), _T("Add")));
-// 	if(bOnItem) {
-// 		if(menu.GetMenuItemCount() > 0)
-// 			VERIFY(menu.AppendMenu(MF_SEPARATOR));
-// 		VERIFY(menu.AppendMenu(MF_POPUP, UINT(sort.GetSafeHmenu()), _T("Sort")));
-// 	}
 
 	//ExtendContextMenu(menu);
 

@@ -1,13 +1,5 @@
 ﻿// BacnetRange.cpp : implementation file
 //  Code by Fance
-/* 1.Why not?
-   2. How do we $%$#@
-   3. I don't want ^%$#%^
-   4. It should be like this.
-   5. It's waste of time.
-   6. It should have @#$%.
-   7. It should able to %$#@
-*/
 
 #include "stdafx.h"
 #include "T3000.h"

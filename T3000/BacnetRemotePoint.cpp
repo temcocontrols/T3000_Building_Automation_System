@@ -207,7 +207,8 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 			i = Fresh_Item;
 		}
 
-		if(m_remote_point_data.at(i).point.sub_panel == 0)
+        //因为subpanel 老毛要求 也能够为0  所以
+        if ((m_remote_point_data.at(i).point.sub_panel == 0) && (m_remote_point_data.at(i).point.panel == 0))
 		{
 			m_remote_point_list.SetItemText(i, REMOTE_MAIN_ID, _T(""));
 			m_remote_point_list.SetItemText(i,REMOTE_DEVICE_ID,_T(""));

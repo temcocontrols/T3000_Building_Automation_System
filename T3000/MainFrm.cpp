@@ -47,7 +47,7 @@ CMyStatusbarCtrl * statusbar = NULL;
 extern CDialog_Progess *WaitRead_Data_Dlg;
 //////////////////////////////
 //#include "isp/CDialogISPTOOL.h"
-
+#include "ShowMessageDlg.h"
 #include "IONameConfig.h"
 
 #include "DialogCM5_BacNet.h"
@@ -4086,16 +4086,17 @@ void CMainFrame::Scan_Product()
     HANDLE temphandle;//如果用户点击Scan，而 bacnet的线程还在继续工作，需要先结束这两个线程;
     if(bac_net_initial_once)
     {
-        temphandle = Get_RS485_Handle();
-        if(temphandle !=NULL)
-        {
-            TerminateThread((HANDLE)Get_Thread1(),0);
-            TerminateThread((HANDLE)Get_Thread2(),0);
+        close_bac_com();
+        //temphandle = Get_RS485_Handle();
+        //if(temphandle !=NULL)
+        //{
+        //    TerminateThread((HANDLE)Get_Thread1(),0);
+        //    TerminateThread((HANDLE)Get_Thread2(),0);
 
-            CloseHandle(temphandle);
-            Set_RS485_Handle(NULL);
-            bac_net_initial_once = false;
-        }
+        //    CloseHandle(temphandle);
+        //    Set_RS485_Handle(NULL);
+        //    bac_net_initial_once = false;
+        //}
     }
 
     SetTimer(SCAN_TIMER,100,NULL);//lsc
@@ -6829,21 +6830,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 			HideBacnetWindow();
 
-
-            HANDLE temphandle;
-            if(bac_net_initial_once)
-            {
-                temphandle = Get_RS485_Handle();
-                if(temphandle !=NULL)
-                {
-                    TerminateThread((HANDLE)Get_Thread1(),0);
-                    TerminateThread((HANDLE)Get_Thread2(),0);
-
-                    CloseHandle(temphandle);
-                    Set_RS485_Handle(NULL);
-                    bac_net_initial_once = false;
-                }
-            }
+            if((m_product.at(i).protocol != PROTOCOL_MSTP_TP_MODBUS) && (m_product.at(i).protocol != MODBUS_BACNET_MSTP))
+                close_bac_com();
 
             //************************************
             strTemp.Format(_T("\ng_tstat_id =%d   product_id =%d\n"),g_tstat_id,product_Node.product_id);
@@ -6886,7 +6874,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 {
                     strTemp.Format(_T("Connect\n"));
                     TRACE(strTemp);
-                    BOOL bRet = ConnectDevice(product_Node);//ConnectSubBuilding(product_Node.BuildingInfo);
+                    if ((product_Node.protocol != PROTOCOL_MSTP_TP_MODBUS) && (product_Node.protocol != MODBUS_BACNET_MSTP))
+                          ConnectDevice(product_Node);//ConnectSubBuilding(product_Node.BuildingInfo);
                    // SetLastCommunicationType(1); //不可理解为什么要这么做，屏蔽 by 杜帆 06 03 31;
 					ip=product_Node.BuildingInfo.strIp;
 					ipport.Format(_T("%d"),product_Node.ncomport);
@@ -7046,10 +7035,33 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 if ((m_nbaudrat !=9600 ) && (m_nbaudrat !=19200) && (m_nbaudrat != 38400)&& (m_nbaudrat != 57600)&& (m_nbaudrat != 115200))
                     m_nbaudrat = 19200;
                 Change_BaudRate(m_nbaudrat);
+                if (product_Node.protocol == PROTOCOL_MSTP_TP_MODBUS)
+                {
+                    g_protocol = PROTOCOL_MSTP_TP_MODBUS;
+                    g_mstp_deviceid = product_Node.object_instance;
+                    Initial_bac(product_Node.ncomport, _T(""), product_Node.baudrate);
 
+                    CShowMessageDlg TempDlg;
+                    TempDlg.SetStaticText(_T("Establish Bacnet MSTP connection , please wait!"));
+                    //dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
+                    TempDlg.SetStaticTextColor(RGB(0, 0, 255));
+                    TempDlg.SetStaticTextSize(25, 20);
+                    TempDlg.SetProgressAutoClose(250, 100, EVENT_MSTP_CONNECTION_ESTABLISH);
+
+                    _Bac_Scan_Com_Info tempinfo;
+                    tempinfo.device_id = g_mstp_deviceid;
+                    tempinfo.macaddress = product_Node.panel_number;
+                    TempDlg.SetMstpDeviceInfo(tempinfo);
+
+                    TempDlg.DoModal();
+                }
 
                 register_critical_section.Lock();
-                int nmultyRet=Read_Multi(g_tstat_id,&read_data[0],0,10,3);
+                int nmultyRet=Read_Multi(g_tstat_id,&read_data[0],0,10,6);
+                if (nmultyRet >= 0)
+                {
+                    Sleep(1);
+                }
                 register_critical_section.Unlock();
                 if(nmultyRet <0)
                 {
@@ -8839,30 +8851,21 @@ UINT _FreshTreeView(LPVOID pParam )
 			continue;
 		}
 
-        //while(1)
-        //{
-        //    if(no_mouse_keyboard_event_enable_refresh)//判断如果一段时间无人操作，才刷新tree，要不然串口资源会经常冲突;
-        //    {
-        //        break;
-        //    }
 
-        //    Sleep(100);
-        //}
-
-        WaitForSingleObject(Read_Mutex,INFINITE);//Add by Fance .
-        if(b_pause_refresh_tree)
+        WaitForSingleObject(Read_Mutex, INFINITE);//Add by Fance .
+        if (b_pause_refresh_tree)
         {
             ReleaseMutex(Read_Mutex);//Add by Fance .
             continue;
         }
 
 
-		    m_refresh_net_device_data.clear();
+        m_refresh_net_device_data.clear();
 
-            RefreshNetWorkDeviceListByUDPFunc();
+        RefreshNetWorkDeviceListByUDPFunc();
 
 
-        if(!pMain->CheckDeviceStatus(int_refresh_com))
+        if (!pMain->CheckDeviceStatus(int_refresh_com))
         {
             ReleaseMutex(Read_Mutex);
             continue;
@@ -10081,7 +10084,19 @@ void CMainFrame::OnControlMain()
 void CMainFrame::OnControlInputs()
 {
     g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
-    if(  (g_protocol == PROTOCOL_BACNET_IP) || 
+
+    //if (g_protocol == PROTOCOL_MSTP_TP_MODBUS)
+    //{
+    //    hide_485_progress = false;
+    //    ::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, bacnet_device_type, BAC_IN);//第二个参数 In
+    //    ::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, NULL, NULL);
+    //    bacnet_view_number = TYPE_INPUT;
+    //    global_interface = BAC_IN;
+    //    return;
+    //}
+
+    if((g_protocol == PROTOCOL_MSTP_TP_MODBUS) ||
+        (g_protocol == PROTOCOL_BACNET_IP) || 
 		 (g_protocol == MODBUS_BACNET_MSTP) || 
 		 (g_protocol == PROTOCOL_BIP_TO_MSTP)||
 		 ((g_protocol == MODBUS_RS485 ) && 
@@ -10176,7 +10191,7 @@ void CMainFrame::OnControlInputs()
         {
             Create_Thread_Read_Item(TYPE_INPUT);
         }
-		else if((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP))
+		else if((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP) || (g_protocol == PROTOCOL_MSTP_TP_MODBUS))
 		{
 			hide_485_progress = false;
 			::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, bacnet_device_type, BAC_IN);//第二个参数 In
@@ -10282,7 +10297,8 @@ void CMainFrame::OnControlOutputs()
 {
     g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
 	// new_device_support_mini_ui  主要是为了支持 旧版本的T3进入以前的界面;
-    if((g_protocol == PROTOCOL_BACNET_IP) || 
+    if ((g_protocol == PROTOCOL_MSTP_TP_MODBUS) ||
+          (g_protocol == PROTOCOL_BACNET_IP) || 
 		 (g_protocol == MODBUS_BACNET_MSTP) || 
 		 (g_protocol == PROTOCOL_BIP_TO_MSTP) || 
 		  
@@ -10376,7 +10392,7 @@ void CMainFrame::OnControlOutputs()
         {
             Create_Thread_Read_Item(TYPE_OUTPUT);
         }
-		else if((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP))
+		else if((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP) || (g_protocol == PROTOCOL_MSTP_TP_MODBUS))
 		{
 			::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
 			::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type,BAC_OUT);//第二个参数 OUT
@@ -11005,11 +11021,17 @@ void CMainFrame::OnPaint()
 }
 
 #include "TemcoStandardBacnetToolDlg.h"
+CTemcoStandardBacnetToolDlg *BacnetTool_Window = NULL;;
 void CMainFrame::OnDatabaseBacnettool()
 {
-	CTemcoStandardBacnetToolDlg dlg;
-    dlg.DoModal();
-    
+    if (BacnetTool_Window != NULL)
+    {
+        delete BacnetTool_Window;
+        BacnetTool_Window = NULL;
+    }
+    BacnetTool_Window = new CTemcoStandardBacnetToolDlg;
+    BacnetTool_Window->Create(IDD_DIALOG_TEMCO_STANDARD_BACNET_TOOL, this);
+    BacnetTool_Window->ShowWindow(SW_SHOW);
 }
 
 void CMainFrame::OnControlAlarmLog()

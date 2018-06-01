@@ -74,6 +74,7 @@ BOOL CBacnetIOConfig::ExtproductIDisValiable(unsigned char temp_id)
 {
 	if ((temp_id != PM_T322AI) &&
 		(temp_id != PM_T38AI8AO6DO) &&
+        (temp_id != PM_T3PT12) &&
 		(temp_id != PM_MINIPANEL)&&
 		(temp_id != PM_MINIPANEL_ARM)
 		)
@@ -125,7 +126,7 @@ void CBacnetIOConfig::Initial_List()
 		if (ListCtrlEx::ComboBox == m_ext_io_config_list.GetColumnType(EXTIO_HARDWARE))
 		{
 			ListCtrlEx::CStrList strlist;
-			for (int aaa = 0; aaa < (int)sizeof(Units_Type) / sizeof(ExtIO_Product[0]); aaa++)
+			for (int aaa = 0; aaa < (int)sizeof(ExtIO_Product) / sizeof(ExtIO_Product[0]); aaa++)
 			{
 				strlist.push_back(ExtIO_Product[aaa]);
 			}
@@ -150,6 +151,13 @@ void CBacnetIOConfig::Initial_List()
 				m_ext_io_config_list.SetItemBkColor(i, x, LIST_ITEM_DEFAULT_BKCOLOR_GRAY);
 		}
 	}
+
+    if (m_ext_io_config_list.GetItemCount() == 0)
+    {
+        m_ext_io_config_list.ShowWindow(SW_SHOW);
+        return;
+    }
+
 	m_ext_io_config_list.SetItemText(0, EXTIO_PORT,_T("N/A"));
 	m_ext_io_config_list.SetItemText(0, EXTIO_ID,_T("N/A"));
 	m_ext_io_config_list.SetItemText(0, EXTIO_LAST_CONTACT,_T("N/A"));
@@ -229,7 +237,22 @@ LRESULT CBacnetIOConfig::Fresh_Extio_List(WPARAM wParam, LPARAM lParam)
 		CString temp_in;
 		CString temp_out;
 		temp_in.Format(_T("%s-%s"), temp_input_start, temp_input_end);
-		temp_out.Format(_T("%s-%s"), temp_output_start, temp_output_end);
+
+        temp_out.Format(_T("%s-%s"), temp_output_start, temp_output_end);
+        for (int j = 0; j < sizeof(ExtIO_ProductId) / sizeof(ExtIO_ProductId[0]); j++)
+        {
+            if (m_extio_config_data.at(i).reg.product_id == ExtIO_ProductId[j])
+            {
+                if (ExtIO_OUTPUT_COUNT[j] == 0)
+                {
+                    temp_out.Format(_T("N/A"));
+                }
+                break;
+            }
+        }
+
+
+
 		m_ext_io_config_list.SetItemText(i, EXTIO_NUM, temp_item);
 		m_ext_io_config_list.SetItemText(i, EXTIO_HARDWARE, temp_product_name);
 		m_ext_io_config_list.SetItemText(i, EXTIO_PORT, temp_port);
@@ -249,15 +272,16 @@ void CBacnetIOConfig::CaculateIOCount(int nitem)
 		//CString temp_pidtype =  m_ext_io_config_list.GetItemText(i,EXTIO_HARDWARE);
 		int pid_sequence = 0;
 
+        //遍历ext产品，判断选中的是哪一个扩展设备;
+        for (int j = 0; j < sizeof(ExtIO_ProductId)/sizeof(ExtIO_ProductId[0]); j++)
+        {
+            if (m_extio_config_data.at(i).reg.product_id == ExtIO_ProductId[j])
+            {
+                pid_sequence = j;
+                break;
+            }
+        }
 
-		if (m_extio_config_data.at(i).reg.product_id == ExtIO_ProductId[0])
-		{
-			pid_sequence = 0;
-		}
-		else if (m_extio_config_data.at(i).reg.product_id == ExtIO_ProductId[1])
-		{
-			pid_sequence = 1;
-		}
 		m_ext_io_config_list.SetItemText(i, EXTIO_HARDWARE, ExtIO_Product[pid_sequence]);
 
 		m_extio_config_data.at(i).reg.product_id = ExtIO_ProductId[pid_sequence];
@@ -269,7 +293,7 @@ void CBacnetIOConfig::CaculateIOCount(int nitem)
 
 
 		CString temp_output;
-		if (pid_sequence == 1) // 没有输出output的情况
+		if (ExtIO_OUTPUT_COUNT[pid_sequence] == 0) // 没有输出output的情况
 		{
 			m_extio_config_data.at(i).reg.output_end = m_extio_config_data.at(i - 1).reg.output_end;
 			temp_output.Format(_T("N/A"));
@@ -361,7 +385,7 @@ void CBacnetIOConfig::OnBnClickedButtonExtioAdd()
 	if (ListCtrlEx::ComboBox == m_ext_io_config_list.GetColumnType(EXTIO_HARDWARE))
 	{
 		ListCtrlEx::CStrList strlist;
-		for (int aaa = 0; aaa < (int)sizeof(Units_Type) / sizeof(ExtIO_Product[0]); aaa++)
+		for (int aaa = 0; aaa < (int)sizeof(ExtIO_Product) / sizeof(ExtIO_Product[0]); aaa++)
 		{
 			strlist.push_back(ExtIO_Product[aaa]);
 		}
