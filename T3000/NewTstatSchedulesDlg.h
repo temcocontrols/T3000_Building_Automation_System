@@ -82,7 +82,7 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
-	ListCtrlEx::CListCtrlEx WeeeklyList;
+	ListCtrlEx::CListCtrlEx WeeklyList;
 	CDateTimeCtrl m_start_time;
 	CDateTimeCtrl m_end_time;
 	afx_msg void OnBnClickedButtonInsert();
@@ -103,7 +103,7 @@ public:
 	COLORREF GetItemColor(int Row,int Col); 
 	void SetValueItem(int Row,int Col,int Val); 
 	int GetDayScheduleCount(int Col);
-	CString m_strScheduleMode[6];
+	CString m_strScheduleMode[10];
 	COLORREF m_COLScheduleMode[6];
 	CString m_oldtext;
 	afx_msg void OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult);

@@ -7,6 +7,7 @@
 #include "afxdialogex.h"
 #include "ping.h"
 HANDLE hShowMessageHandle = NULL;
+extern HANDLE hwait_read_thread;
 // CShowMessageDlg ¶Ô»°¿ò
 
 IMPLEMENT_DYNAMIC(CShowMessageDlg, CDialogEx)
@@ -202,16 +203,17 @@ DWORD WINAPI CShowMessageDlg::ShowMessageThread(LPVOID lPvoid)
         }
         else if (mparent->mevent == EVENT_MSTP_CONNECTION_ESTABLISH)
         {
-            Send_WhoIs_Global(-1, -1);
             for (int i = 0; i<100; i++)
             {
+                if(i%10 == 0)
+                    Send_WhoIs_Global(-1, -1);
                 mparent->m_pos = i;
                 Sleep(1000);
 
-                for (int j = 0; j < m_bac_scan_com_data.size(); j++)
+                for (int j = 0; j < m_bac_handle_Iam_data.size(); j++)
                 {
-                    if ((mparent->m_mstp_device_info.device_id == m_bac_scan_com_data.at(j).device_id) &&
-                        (mparent->m_mstp_device_info.macaddress == m_bac_scan_com_data.at(j).macaddress))
+                    if ((mparent->m_mstp_device_info.device_id == m_bac_handle_Iam_data.at(j).device_id) &&
+                        (mparent->m_mstp_device_info.macaddress == m_bac_handle_Iam_data.at(j).macaddress))
                     {
                         ::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
                         hShowMessageHandle = NULL;
@@ -220,6 +222,21 @@ DWORD WINAPI CShowMessageDlg::ShowMessageThread(LPVOID lPvoid)
                 }
 
             }
+            ::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
+        }
+        else if (mparent->mevent == EVENT_FIRST_LOAD_PROG)
+        {
+            Sleep(500);
+            while(hwait_read_thread != NULL)
+            {
+                if (g_progress_persent != 0)
+                {
+                    mparent->m_pos = g_progress_persent;
+                    mparent->static_percent.Format(_T("%d%%"), g_progress_persent);
+                }
+                Sleep(100);
+            }
+            mparent->KillTimer(1);
             ::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
         }
 

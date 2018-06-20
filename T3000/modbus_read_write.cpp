@@ -247,6 +247,27 @@ int write_one_org(unsigned char device_var,unsigned short address,short value,in
 // 	CString str;
 // 	str.Format(_T("ID :%d Writing %d"),device_var,address);
 // 	SetPaneString(0,str);
+
+    //2018 0606 在底层公共读写函数增加对不同协议的处理
+    if (g_protocol == PROTOCOL_MSTP_TO_MODBUS)
+    {
+        int n_ret = 0;
+        for (int i = 0; i < retry_times; i++)
+        {
+            g_llTxCount++;
+            n_ret = WritePrivateBacnetToModbusData(g_mstp_deviceid, address, 1, (unsigned short *)(&value));
+            if (n_ret >= 0)
+            {
+                g_llRxCount++;
+                return n_ret;
+            }
+            Sleep(1000);
+        }
+        return n_ret;
+    }
+
+
+
 	short temp_value=value;
 	if(address==101 && temp_value<0)
 	{//for the temperature is below zero;;;;;;;;-23.3
@@ -281,7 +302,24 @@ int write_one_org(unsigned char device_var,unsigned short address,short value,in
 	return j;
 }
 int write_one(unsigned char device_var,unsigned short address,short value,int retry_times)
-{//retry 
+{
+    //2018 0606 在底层公共读写函数增加对不同协议的处理
+    if (g_protocol == PROTOCOL_MSTP_TO_MODBUS)
+    {
+        int n_ret = 0;
+        for (int i = 0; i < retry_times; i++)
+        {
+            g_llTxCount++;
+            n_ret = WritePrivateBacnetToModbusData(g_mstp_deviceid, address, 1, (unsigned short *)(&value));
+            if (n_ret >= 0)
+            {
+                g_llRxCount++;
+                return n_ret;
+            }
+            Sleep(1000);
+        }
+        return n_ret;
+    }
 
 	BOOL bTemp = g_bEnableRefreshTreeView;
 	g_bEnableRefreshTreeView = FALSE;

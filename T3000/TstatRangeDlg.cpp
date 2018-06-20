@@ -1838,11 +1838,59 @@ void CTstatRangeDlg::OnBnClickedRadio5v()
     {
         ((CButton*)GetDlgItem(IDC_RADIO_5V))->SetCheck(0);
         ((CButton*)GetDlgItem(IDC_RADIO_10V))->SetCheck(1);  
+
+        GetDlgItem(IDC_STATIC_BOTTOM_0)->SetWindowTextW(_T("0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_1)->SetWindowTextW(_T("1.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_2)->SetWindowTextW(_T("2.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_3)->SetWindowTextW(_T("3.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_4)->SetWindowTextW(_T("4.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_5)->SetWindowTextW(_T("5.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_6)->SetWindowTextW(_T("6.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_7)->SetWindowTextW(_T("7.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_8)->SetWindowTextW(_T("8.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_9)->SetWindowTextW(_T("9.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_10)->SetWindowTextW(_T("10V"));
+
+        GetDlgItem(IDC_STATIC_RIGHT_0)->SetWindowTextW(_T("0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_1)->SetWindowTextW(_T("1.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_2)->SetWindowTextW(_T("2.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_3)->SetWindowTextW(_T("3.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_4)->SetWindowTextW(_T("4.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_5)->SetWindowTextW(_T("5.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_6)->SetWindowTextW(_T("6.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_7)->SetWindowTextW(_T("7.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_8)->SetWindowTextW(_T("8.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_9)->SetWindowTextW(_T("9.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_10)->SetWindowTextW(_T("10V"));
     } 
     else
     {
         ((CButton*)GetDlgItem(IDC_RADIO_5V))->SetCheck(1);
         ((CButton*)GetDlgItem(IDC_RADIO_10V))->SetCheck(0);
+
+        GetDlgItem(IDC_STATIC_BOTTOM_0)->SetWindowTextW(_T("0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_1)->SetWindowTextW(_T("0.5V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_2)->SetWindowTextW(_T("1.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_3)->SetWindowTextW(_T("1.5V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_4)->SetWindowTextW(_T("2.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_5)->SetWindowTextW(_T("2.5V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_6)->SetWindowTextW(_T("3.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_7)->SetWindowTextW(_T("3.5V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_8)->SetWindowTextW(_T("4.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_9)->SetWindowTextW(_T("4.5V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_10)->SetWindowTextW(_T("5.0V"));
+
+        GetDlgItem(IDC_STATIC_RIGHT_0)->SetWindowTextW(_T("0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_1)->SetWindowTextW(_T("0.5V"));
+        GetDlgItem(IDC_STATIC_RIGHT_2)->SetWindowTextW(_T("1.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_3)->SetWindowTextW(_T("1.5V"));
+        GetDlgItem(IDC_STATIC_RIGHT_4)->SetWindowTextW(_T("2.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_5)->SetWindowTextW(_T("2.5V"));
+        GetDlgItem(IDC_STATIC_RIGHT_6)->SetWindowTextW(_T("3.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_7)->SetWindowTextW(_T("3.5V"));
+        GetDlgItem(IDC_STATIC_RIGHT_8)->SetWindowTextW(_T("4.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_9)->SetWindowTextW(_T("4.5V"));
+        GetDlgItem(IDC_STATIC_RIGHT_10)->SetWindowTextW(_T("5.0V"));
     }
 }
 
@@ -1854,12 +1902,59 @@ void CTstatRangeDlg::OnBnClickedRadio10v()
     {
         ((CButton*)GetDlgItem(IDC_RADIO_5V))->SetCheck(0);
         ((CButton*)GetDlgItem(IDC_RADIO_10V))->SetCheck(1);  
+
+        GetDlgItem(IDC_STATIC_BOTTOM_0)->SetWindowTextW(_T("0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_1)->SetWindowTextW(_T("1.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_2)->SetWindowTextW(_T("2.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_3)->SetWindowTextW(_T("3.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_4)->SetWindowTextW(_T("4.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_5)->SetWindowTextW(_T("5.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_6)->SetWindowTextW(_T("6.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_7)->SetWindowTextW(_T("7.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_8)->SetWindowTextW(_T("8.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_9)->SetWindowTextW(_T("9.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_10)->SetWindowTextW(_T("10V"));
+
+        GetDlgItem(IDC_STATIC_RIGHT_0)->SetWindowTextW(_T("0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_1)->SetWindowTextW(_T("1.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_2)->SetWindowTextW(_T("2.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_3)->SetWindowTextW(_T("3.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_4)->SetWindowTextW(_T("4.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_5)->SetWindowTextW(_T("5.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_6)->SetWindowTextW(_T("6.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_7)->SetWindowTextW(_T("7.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_8)->SetWindowTextW(_T("8.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_9)->SetWindowTextW(_T("9.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_10)->SetWindowTextW(_T("10V"));
     } 
     else
     {
         ((CButton*)GetDlgItem(IDC_RADIO_5V))->SetCheck(1);
         ((CButton*)GetDlgItem(IDC_RADIO_10V))->SetCheck(0);
 
+        GetDlgItem(IDC_STATIC_BOTTOM_0)->SetWindowTextW(_T("0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_1)->SetWindowTextW(_T("0.5V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_2)->SetWindowTextW(_T("1.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_3)->SetWindowTextW(_T("1.5V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_4)->SetWindowTextW(_T("2.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_5)->SetWindowTextW(_T("2.5V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_6)->SetWindowTextW(_T("3.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_7)->SetWindowTextW(_T("3.5V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_8)->SetWindowTextW(_T("4.0V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_9)->SetWindowTextW(_T("4.5V"));
+        GetDlgItem(IDC_STATIC_BOTTOM_10)->SetWindowTextW(_T("5.0V"));
+
+        GetDlgItem(IDC_STATIC_RIGHT_0)->SetWindowTextW(_T("0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_1)->SetWindowTextW(_T("0.5V"));
+        GetDlgItem(IDC_STATIC_RIGHT_2)->SetWindowTextW(_T("1.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_3)->SetWindowTextW(_T("1.5V"));
+        GetDlgItem(IDC_STATIC_RIGHT_4)->SetWindowTextW(_T("2.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_5)->SetWindowTextW(_T("2.5V"));
+        GetDlgItem(IDC_STATIC_RIGHT_6)->SetWindowTextW(_T("3.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_7)->SetWindowTextW(_T("3.5V"));
+        GetDlgItem(IDC_STATIC_RIGHT_8)->SetWindowTextW(_T("4.0V"));
+        GetDlgItem(IDC_STATIC_RIGHT_9)->SetWindowTextW(_T("4.5V"));
+        GetDlgItem(IDC_STATIC_RIGHT_10)->SetWindowTextW(_T("5.0V"));
     }
 }
 

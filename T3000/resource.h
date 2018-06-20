@@ -306,6 +306,7 @@
 #define IDD_DIALOG_TEMCO_STANDARD_BACNET_TOOL 694
 #define IDD_PARAMETERDIALOG_EXT         698
 #define IDD_AA_SHOWMESSAGE              703
+#define IDD_DIALOG_TSTAT_ICON_SETTING   706
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -728,7 +729,7 @@
 #define IDC_CHECK56                     1130
 #define IDC_COMBO_TIMESERVERLIST2       1130
 #define IDC_COMBO_BACNET_SETTING_BAUDRATE2 1130
-#define IDC_BAUDRATECOMBO              1131
+#define IDC_BAUDRATECOMBO               1131
 #define IDC_CHECK57                     1131
 #define IDC_COMBO_ENABLE_INOUTPUT       1131
 #define IDC_COMBO_TYPE_INOUTPUT         1131
@@ -1283,7 +1284,7 @@
 #define IDC_HARDWAREV_CO2_EDIT          1603
 #define IDC_SAVE2                       1603
 #define IDC_MBPOLL_GRID1                1603
-#define IDC_CO2_BAUDRATECOMBO          1604
+#define IDC_CO2_BAUDRATECOMBO           1604
 #define IDC_LINE1                       1604
 #define IDC_MBPOLL_GRID2                1604
 #define IDC_CO2_ENABLEIDBUTTON          1605
@@ -2021,7 +2022,7 @@
 #define IDC_DATETIMEPICKER_DEBUG_TIME_DAY 2137
 #define IDC_TEMP_SENSOR                 2137
 #define IDC_DATETIMEPICKER_DEBUG_TIME_SECOND 2138
-#define IDC_STATIC_BAUDRATE            2138
+#define IDC_STATIC_BAUDRATE             2138
 #define IDC_BUTTON_DEBUG_NUM_TO_TIME    2139
 #define IDC_SHOWID                      2139
 #define IDC_BUTTON_DEBUG_TIME_TO_NUM    2140
@@ -2286,6 +2287,33 @@
 #define IDC_RADIO_SETTING_LCD_ON        2380
 #define IDC_RADIO_SETTING_LCD_OFF       2381
 #define ID_CHANGE_ID_OK                 2382
+#define IDC_BUTTON_SCHEDULE_SUBNET      2383
+#define IDC_STATIC_BOTTOM               2384
+#define IDC_STATIC_BOTTOM_0             2384
+#define IDC_STATIC_BOTTOM_1             2385
+#define IDC_STATIC_BOTTOM_2             2386
+#define IDC_STATIC_BOTTOM_3             2387
+#define IDC_STATIC_BOTTOM_4             2388
+#define IDC_STATIC_BOTTOM_5             2389
+#define IDC_STATIC_BOTTOM_6             2390
+#define IDC_STATIC_BOTTOM_7             2391
+#define IDC_STATIC_BOTTOM_8             2392
+#define IDC_STATIC_BOTTOM_9             2393
+#define IDC_STATIC_BOTTOM_10            2394
+#define IDC_STATIC_RIGHT_0              2395
+#define IDC_STATIC_RIGHT_1              2396
+#define IDC_STATIC_RIGHT_2              2397
+#define IDC_STATIC_RIGHT_3              2398
+#define IDC_STATIC_RIGHT_4              2399
+#define IDC_STATIC_RIGHT_5              2400
+#define IDC_STATIC_RIGHT_6              2401
+#define IDC_STATIC_RIGHT_7              2402
+#define IDC_STATIC_RIGHT_8              2403
+#define IDC_STATIC_RIGHT_9              2404
+#define IDC_STATIC_RIGHT_10             2405
+#define IDC_BUTTON_ICON_SETTING         2406
+#define IDC_BUTTON_ICON_OK              2407
+#define IDC_BUTTON_ICON_CANCEL          2408
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -2515,6 +2543,7 @@
 #define IDC_RADIO116                    15613
 #define IDC_RADIO_NEW200                19484
 #define ID_TIMEBASE_1HOUR               19485
+#define IDC_RADIO_NEW201                19485
 #define IDC_STATIC__LOGIN_NAME          32709
 #define IDC_STATIC_LOGIN_PASSWORD       32710
 #define IDC_EDIT_LOGIN_USERNAME         32711
@@ -2838,9 +2867,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        705
+#define _APS_NEXT_RESOURCE_VALUE        708
 #define _APS_NEXT_COMMAND_VALUE         34070
-#define _APS_NEXT_CONTROL_VALUE         2383
+#define _APS_NEXT_CONTROL_VALUE         2409
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

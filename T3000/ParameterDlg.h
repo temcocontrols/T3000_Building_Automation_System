@@ -265,4 +265,5 @@ public:
     afx_msg void OnEnKillfocusEditDterm();
     afx_msg void OnEnKillfocusEditSamplingInterval();
     afx_msg void OnBnClickedButtonParameterExt();
+    afx_msg void OnBnClickedButtonIconSetting();
 };

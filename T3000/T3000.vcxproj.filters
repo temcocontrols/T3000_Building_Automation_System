@@ -40,6 +40,9 @@
     <Filter Include="SQLiteDriver">
       <UniqueIdentifier>{f5dd6a0a-ef09-4c01-9e96-3c87708d5311}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\TSTAT">
+      <UniqueIdentifier>{ac478693-4668-4cf6-99ba-2ec0374f5348}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AddBuilding.cpp">
@@ -689,6 +692,9 @@
     </ClCompile>
     <ClCompile Include="ShowMessageDlg.cpp">
       <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="TstatIconSetting.cpp">
+      <Filter>Source Files\TSTAT</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1781,6 +1787,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ShowMessageDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TstatIconSetting.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

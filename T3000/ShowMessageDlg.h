@@ -8,6 +8,7 @@ const int EVENT_AUTO_CLOSE = 0;
 const int EVENT_IP_AUTO = 1;
 const int EVENT_IP_STATIC_CHANGE = 2;
 const int EVENT_MSTP_CONNECTION_ESTABLISH = 3;
+const int EVENT_FIRST_LOAD_PROG = 4;
 
 class CShowMessageDlg : public CDialogEx
 {
