@@ -552,29 +552,29 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
 	return TRUE;
 }
 
-typedef map<int, int> panelname_map;
-panelname_map g_panelname_map;
-
-void CImageTreeCtrl::Inial_ProductName_map()
-{
-    g_panelname_map.insert(map<int,int>::value_type(STM32_PRESSURE_NET,901));
-    g_panelname_map.insert(map<int, int>::value_type(STM32_PRESSURE_RS3485, 901));
-
-}
-
-int CImageTreeCtrl::PanelName_Map(int product_type)
-{
-    map<int, int>::iterator iter;
-    int test1;
-    iter = g_panelname_map.find(product_type);
-    if (iter != g_panelname_map.end())
-    {
-        test1 = g_panelname_map.at(product_type);
-        return test1;
-    }
-   
-    return 715; // 如果没有默认按照从715 开始 8个寄存器.
-}
+//typedef map<int, int> panelname_map;
+//panelname_map g_panelname_map;
+//
+//void CImageTreeCtrl::Inial_ProductName_map()
+//{
+//    g_panelname_map.insert(map<int,int>::value_type(STM32_PRESSURE_NET,901));
+//    g_panelname_map.insert(map<int, int>::value_type(STM32_PRESSURE_RS3485, 901));
+//
+//}
+//
+//int CImageTreeCtrl::PanelName_Map(int product_type)
+//{
+//    map<int, int>::iterator iter;
+//    int test1;
+//    iter = g_panelname_map.find(product_type);
+//    if (iter != g_panelname_map.end())
+//    {
+//        test1 = g_panelname_map.at(product_type);
+//        return test1;
+//    }
+//   
+//    return 715; // 如果没有默认按照从715 开始 8个寄存器.
+//}
 
 BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
        if (m_level==0)

@@ -190,7 +190,7 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
 
 	int time_out = 0;
 	BOOL bTimeOut = FALSE;
-	m_bac_scan_com_data.clear();
+	m_bac_handle_Iam_data.clear();
 
 
 	while (!bTimeOut)//!pScanner->m_bNetScanFinish)  // ³¬Ê±½áÊø
@@ -213,7 +213,7 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
 		continue;//Test ///////////////////////////////////////////////////////////////////////////////////
 	}//end of while
 
-	if (m_bac_scan_com_data.size() == 0)
+	if (m_bac_handle_Iam_data.size() == 0)
 	{
 		AfxMessageBox(_T("No device response!"));
 		if (CM5_hThread != NULL)
@@ -230,7 +230,7 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
 #pragma region getserialnumber
 	for (int j = 0; j < 5; j++)
 	{
-		int ready_to_read_count = m_bac_scan_com_data.size();
+		int ready_to_read_count = m_bac_handle_Iam_data.size();
 
 		CString strInfo;
 		strInfo.Format(_T("Scan  Bacnetip.Found %d BACNET device"), ready_to_read_count);
@@ -249,7 +249,7 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
 				if (resend_count > 50)
 					break;
 				g_invoke_id = GetPrivateData(
-					m_bac_scan_com_data.at(i).device_id,
+					m_bac_handle_Iam_data.at(i).device_id,
 					GETSERIALNUMBERINFO,
 					0,
 					0,

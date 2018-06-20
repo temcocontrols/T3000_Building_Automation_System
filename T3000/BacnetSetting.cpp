@@ -16,6 +16,7 @@
 #include "BacnetTstatSchedule.h"
 #include "ping.h"
 #include "ShowMessageDlg.h"
+#include "BacnetTstatSchedule.h"
 // CBacnetSetting dialog
 extern bool cancle_send ;
 bool show_user_list_window = false;
@@ -2502,7 +2503,7 @@ void CBacnetSetting::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
 
 
-#include "BacnetTstatSchedule.h"
+
 //#include "GroupScheduleDlg.h"
 void CBacnetSetting::OnBnClickedButtonZoneSchedule()
 {
@@ -2558,15 +2559,6 @@ void CBacnetSetting::OnBnClickedButtonZoneSchedule()
     BacnetTstatSchedule_Window = new CBacnetTstatSchedule;
     BacnetTstatSchedule_Window->Create(IDD_DIALOG_BACNET_TSTAT_SCHEDULE, this);
     BacnetTstatSchedule_Window->ShowWindow(SW_SHOW);
-
-	//CBacnetTstatSchedule dlg;
-	//dlg.DoModal();
-
-
-	//CString strIPAddress;
-	//GetDlgItem(IDC_IPADDRESS_BAC_IP)->GetWindowTextW(strIPAddress);
-	//CGroupScheduleDlg dlg(NULL, strIPAddress);
-	//dlg.DoModal();
 }
 
 

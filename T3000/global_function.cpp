@@ -94,6 +94,25 @@ CString* pstrInfo = new CString(strInfo);
 
 int read_one(unsigned char device_var,unsigned short address,int retry_times)
 {
+    if ((g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
+    {
+        unsigned short ret_value = 0;
+        int n_ret = 0;
+        for (int i = 0; i < retry_times; i++)
+        {
+            g_llTxCount++;
+            n_ret = GetPrivateBacnetToModbusData(g_mstp_deviceid, address, 1, &ret_value);
+            if (n_ret >= 0)
+            {
+                g_llRxCount++;
+                return ret_value;
+            }
+            Sleep(1000);
+        }
+        return -2;
+    }
+
+
     CString g_strT3000LogString;
     int value;
     int j = modbus_read_one_value( value, device_var, address, retry_times );
@@ -236,6 +255,32 @@ void SetPaneString(int nIndext,CString str)
 }
 int Write_Multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times)
 {
+    //2018 0606 在底层公共读写函数增加对不同协议的处理
+    if ((g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
+    {
+        unsigned short temp_short_data[200];
+        memset(temp_short_data, 0, 400);
+        memcpy(temp_short_data, to_write, length);
+        for (int i = 0; i < (length+1)/2; i++)
+        {
+            temp_short_data[i] = htons(temp_short_data[i]);
+        }
+
+        int n_ret = 0;
+        for (int i = 0; i < retry_times; i++)
+        {
+            g_llTxCount++;
+            n_ret = WritePrivateBacnetToModbusData(g_mstp_deviceid, start_address, (length+1)/2, (unsigned short *)temp_short_data);
+            if (n_ret >= 0)
+            {
+                g_llRxCount++;
+                return n_ret;
+            }
+            Sleep(1000);
+        }
+        return n_ret;
+    }
+
     BOOL bTemp = g_bEnableRefreshTreeView;
     g_bEnableRefreshTreeView = FALSE;
     int j = Write_Multi_org(device_var, to_write, start_address, length, retry_times);
@@ -265,6 +310,26 @@ int Write_Multi(unsigned char device_var,unsigned char *to_write,unsigned short 
 }
 int Write_Multi_short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length,int retry_times)
 {
+
+    //2018 0606 在底层公共读写函数增加对不同协议的处理
+    if ((g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
+    {
+        int n_ret = 0;
+        for (int i = 0; i < retry_times; i++)
+        {
+            g_llTxCount++;
+            n_ret = WritePrivateBacnetToModbusData(g_mstp_deviceid, start_address, length, (unsigned short *)to_write);
+            if (n_ret >= 0)
+            {
+                g_llRxCount++;
+                return n_ret;
+            }
+            Sleep(1000);
+        }
+        return n_ret;
+    }
+
+
     BOOL bTemp = g_bEnableRefreshTreeView;
     g_bEnableRefreshTreeView = FALSE;
     int j = Write_Multi_org_short(device_var, to_write, start_address, length, retry_times);
@@ -326,7 +391,7 @@ int Write_Multi_org(unsigned char device_var,unsigned char *to_write,unsigned sh
 int Write_Multi_org_short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length,int retry_times)
 {
     //2018 0525 在底层公共读写函数增加对不同协议的处理
-    if (g_protocol == PROTOCOL_MSTP_TP_MODBUS)
+    if ((g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
     {
         int n_ret = 0;
         for (int i = 0; i < retry_times; i++)
@@ -401,7 +466,7 @@ This does NOT lock the critical section.
 //	int retry_times );
 int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,int retry_times)
 {
-    if (g_protocol == PROTOCOL_MSTP_TP_MODBUS)
+    if ((g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
     {
         int n_ret = 0;
         for (int i = 0; i < retry_times; i++)
@@ -410,6 +475,24 @@ int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsig
             n_ret = GetPrivateBacnetToModbusData(g_mstp_deviceid, start_address, length, put_data_into_here);
             if (n_ret >= 0)
             {
+                if ((debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA) || (debug_item_show == DEBUG_SHOW_ALL))
+                {
+                    CString total_char_test;
+                    //total_char_test = _T("Read MSTP To Modbus : ");
+                    total_char_test.Format(_T("Read MSTP To Modbus %d , %d:"), start_address, length);
+                    unsigned short * temp_print_test = NULL;
+                    temp_print_test = put_data_into_here;
+                    for (int i = 0; i< length; i++)
+                    {
+                        CString temp_char_test;
+                        temp_char_test.Format(_T("%04x"), (unsigned char)*temp_print_test);
+                        temp_char_test.MakeUpper();
+                        temp_print_test++;
+                        total_char_test = total_char_test + temp_char_test + _T(" ");
+                    }
+                    DFTrace(total_char_test);
+                }
+
                 g_llRxCount++;
                 return n_ret;
             }
@@ -1029,7 +1112,7 @@ BOOL Post_Write_Message(uint32_t deviceid,int8_t command,int8_t start_instance,i
     pmy_write_info->hWnd = hWnd;
     pmy_write_info->ItemInfo.nRow = nRow;
     pmy_write_info->ItemInfo.nCol = nCol;
-    if ((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP) || (g_protocol == PROTOCOL_MSTP_TP_MODBUS))
+    if ((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
 	{
 		if(!PostThreadMessage(nThreadID,MY_RS485_WRITE_LIST,(WPARAM)pmy_write_info,NULL))//post thread msg
 		{
@@ -1949,13 +2032,13 @@ int GetPrivateBacnetToModbusData(uint32_t deviceid, uint16_t start_reg, int16_t 
         }
         else
         {
-            Sleep(1000);
+            Sleep(3000);
             return -6;
         }
     }
     else
     {
-        Sleep(2000);  //address 
+        Sleep(3000);  //address 
         return -2;
     }
 
@@ -4647,15 +4730,20 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
     address_add(device_id, max_apdu, src);
 
 
-
+    _Bac_Scan_Com_Info temp_1;
     //g_bac_instance =device_id;
 #if 1
     if(src->mac_len==6)
     {
         bac_cs_mac.Format(_T("%d"),src->mac[3]);
+        temp_1.nprotocol = HANDLE_I_AM_BIP;
+        memcpy(temp_1.ipaddress, src->mac, 6);
     }
-    else if(src->mac_len==1)
-        bac_cs_mac.Format(_T("%d"),src->mac[0]);
+    else if (src->mac_len == 1)
+    {
+        bac_cs_mac.Format(_T("%d"), src->mac[0]);
+        temp_1.nprotocol = HANDLE_I_AM_MSTP;
+    }
     else
         return;
 #endif
@@ -4669,20 +4757,15 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
 		DFTrace(g_Print);
 	}
 
-    //TRACE(_T("Find ") + bac_cs_device_id +_T("  ") + bac_cs_mac + _T("\r\n"));
-
-    //g_Print = _T("Global Who is Find ") + bac_cs_device_id +_T("  ") + bac_cs_mac;
-    //DFTrace(g_Print);
-    _Bac_Scan_Com_Info temp_1;
     temp_1.device_id = device_id;
     //	temp_1.vendor_id = vendor_id;
     temp_1.macaddress = _wtoi(bac_cs_mac);
 
     int find_exsit = false;
-    for (int i=0; i<(int)m_bac_scan_com_data.size(); i++)
+    for (int i=0; i<(int)m_bac_handle_Iam_data.size(); i++)
     {
-        if((m_bac_scan_com_data.at(i).device_id == temp_1.device_id)
-                && (m_bac_scan_com_data.at(i).macaddress == temp_1.macaddress))
+        if((m_bac_handle_Iam_data.at(i).device_id == temp_1.device_id)
+                && (m_bac_handle_Iam_data.at(i).macaddress == temp_1.macaddress))
         {
             find_exsit = true;
         }
@@ -4690,10 +4773,10 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
 
     if(!find_exsit)
     {
-        m_bac_scan_com_data.push_back(temp_1);
+        m_bac_handle_Iam_data.push_back(temp_1);
     }
 
-    ::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,WM_COMMAND_WHO_IS,NULL);
+    //::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,WM_COMMAND_WHO_IS,NULL);
     return;
 
 }
@@ -4710,7 +4793,7 @@ void close_bac_com()
 
         CloseHandle(temphandle);
         Set_RS485_Handle(NULL);
-        g_mstp_com.status = 0;
+        //g_mstp_com.status = 0;
     }
 }
 
@@ -4832,18 +4915,22 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
     }
     else
     {
-        if ((g_mstp_com.status == 0) ||((g_mstp_com.status == 1) && ((g_mstp_com.ncomport != comport) || (g_mstp_com.nbaudrate != m_nbaudrat))))
-        {
+        initial_bip = false;
+        set_datalink_protocol(MODBUS_BACNET_MSTP);
+        //if ((g_mstp_com.status == 0) ||((g_mstp_com.status == 1) && ((g_mstp_com.ncomport != comport) || (g_mstp_com.nbaudrate != m_nbaudrat))))
+       // {
+       //    close_bac_com();
+            m_bac_handle_Iam_data.clear();
+       //     g_mstp_com.status = 1;
+       //     g_mstp_com.ncomport = comport;
+       //     g_mstp_com.nbaudrate = m_nbaudrat;
+       // }
+       // else
+       // {
             close_bac_com();
-            m_bac_scan_com_data.clear();
-            g_mstp_com.status = 1;
-            g_mstp_com.ncomport = comport;
-            g_mstp_com.nbaudrate = m_nbaudrat;
-        }
-        else
-        {
-            return true;
-        }
+       //     m_bac_handle_Iam_data.clear();
+            //return true;
+       // }
         //HANDLE temphandle;
         //temphandle = Get_RS485_Handle();
         //if(temphandle !=NULL)
@@ -5561,11 +5648,11 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	my_temp_point = my_temp_point + 20;
 	temp_data.reg.object_instance_4 = *(my_temp_point++);
 	temp_data.reg.object_instance_3 = *(my_temp_point++);
-	temp_data.reg.isp_mode = *(my_temp_point++);	//isp_mode = 0 表示在应用代码 ，非0 表示在bootload.
+	temp_data.reg.isp_mode = *(my_temp_point++);	//isp_mode = 0 表示在应用代码 ，1 表示在bootload.  2表示坏掉了    3 表示是MSTP
 	temp_data.reg.bacnetip_port =  ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
 	my_temp_point= my_temp_point + 2;
 	temp_data.reg.zigbee_exsit =  *(my_temp_point++); // 1 代表存在，其他任何代表不存在;
-
+    temp_data.reg.subnet_protocol = *(my_temp_point++);   //0 旧的 modbus   12 ： PROTOCOL_BIP_T0_MSTP_TO_MODBUS
 	DWORD nSerial=temp_data.reg.serial_low + temp_data.reg.serial_low_2 *256+temp_data.reg.serial_low_3*256*256+temp_data.reg.serial_low_4*256*256*256;
 	CString nip_address;
 	nip_address.Format(_T("%u.%u.%u.%u"),temp_data.reg.ip_address_1,temp_data.reg.ip_address_2,temp_data.reg.ip_address_3,temp_data.reg.ip_address_4);
@@ -5594,6 +5681,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 
 	temp.bacnetip_port = temp_data.reg.bacnetip_port;
     temp.zigbee_exsit = temp_data.reg.zigbee_exsit;
+    temp.nprotocol = temp_data.reg.subnet_protocol;
     char * temp_point = NULL;
     refresh_net_label_info temp_label;
     temp_point = temp_data.reg.panel_name;
@@ -5646,7 +5734,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 		DFTrace(g_Print);
 	}
 
-	if(temp_data.reg.isp_mode != 0)
+	if((temp_data.reg.isp_mode == 1) || (temp_data.reg.isp_mode == 2))
 	{
 		//记录这个的信息,如果短时间多次出现 就判定在bootload下面，只是偶尔出现一次表示只是恰好开机收到的.
 		IspModeInfo temp_info;
@@ -13238,4 +13326,29 @@ int handle_bacnet_to_modbus_data(char *npoint, int nlength)
     //bacnet_to_modbus_struct
     return 0;
 }
+
+
+
+
+void Inial_ProductName_map()
+{
+    g_panelname_map.insert(map<int, int>::value_type(STM32_PRESSURE_NET, 901));
+    g_panelname_map.insert(map<int, int>::value_type(STM32_PRESSURE_RS3485, 901));
+
+}
+
+int PanelName_Map(int product_type)
+{
+    map<int, int>::iterator iter;
+    int test1;
+    iter = g_panelname_map.find(product_type);
+    if (iter != g_panelname_map.end())
+    {
+        test1 = g_panelname_map.at(product_type);
+        return test1;
+    }
+
+    return 715; // 如果没有默认按照从715 开始 8个寄存器.
+}
+
 
