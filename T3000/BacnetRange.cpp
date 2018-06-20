@@ -1,17 +1,6 @@
 ﻿// BacnetRange.cpp : implementation file
 //  Code by Fance
-/* 1.Why not?
-   2. How do we $%$#@
-   3. I don't want ^%$#%^
-   4. It should be like this.
-   5. It's waste of time.
-   6. It should have @#$%.
-   7. It should able to %$#@
-*/
-// ÖÂÎ´À´Ð¡»ï°éµÄ´Ê:
-// ²»ÒªÎÊÎªÊ²Ã´¿´²»¶®rang £¬´´½¨´Ë¶Ô»°¿òµÄÊ±ºò £¬ÎªÁË±ÜÃâ´´½¨ºÜ¶à´°¿Ú ºÍ´¥·¢ºÜ¶à ÊÂ¼þ £¬¾ÍÓÃÁË ÕâÖÖ movewindow ºÍhide µÄ
-//  ¶ÀÌØÐ´·¨£¬Ë­ÖªµÀÀÏÃ«Ò»Ö±¸Ä¸Ä¸Ä £¬¸ÄµÄ Î¬»¤ÆðÀ´Ô½À´Ô½Âé·³£¬²Ùµ°;
-//   ¶Å·«
+
 #include "stdafx.h"
 #include "T3000.h"
 #include "BacnetRange.h"
@@ -25,7 +14,7 @@ CBacnetAnalogCusRang * bac_analog_window = NULL;
 static int temp_static_value = 0;
 int old_bac_range_number_choose = 0;
 int initial_dialog = 0;
-bool move_window_to_right = true; //µã»÷table ºó´´½¨³öÀ´µÄ´°ÌåÒÆ¶¯µ½ÓÒ±ßÈ¥;
+bool move_window_to_right = true; 
 // BacnetRange dialog
 
 IMPLEMENT_DYNAMIC(BacnetRange, CDialogEx)

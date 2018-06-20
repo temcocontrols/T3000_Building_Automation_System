@@ -178,10 +178,11 @@ LRESULT CBacnetScheduleTime::Fresh_Schedual_List(WPARAM wParam,LPARAM lParam)
 		//过滤不合理的时间，不合理的显示空;
 		for (int i=0;i<8;i++)
 		{
+
 			if((m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[i][j].time_minutes >59) ||
 				(m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[i][j].time_hours >23)	||
-				((m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[i][j].time_minutes == 0)&&
-				(m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[i][j].time_hours == 0)))
+				((m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[i][j].time_minutes == 0)
+                    &&(m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[i][j].time_hours == 0)))
 			{
 				temp_show.Empty();
 			}
@@ -190,6 +191,15 @@ LRESULT CBacnetScheduleTime::Fresh_Schedual_List(WPARAM wParam,LPARAM lParam)
 				temp_show.Format(_T("%02d:%02d"),m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[i][j].time_hours,
 					m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[i][j].time_minutes);
 			}
+
+            //2018 05 31 切尔西要求 如果 第二行有值 ，第一行又是 00:00 的时候 默认情况是隐藏的，这时候要显示出来;
+            if ((i == 0) && temp_show.IsEmpty() &&
+                ((m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[1][j].time_minutes != 0)
+                    || (m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[1][j].time_hours != 0)))
+            {
+                temp_show.Format(_T("00:00"));
+            }
+
 			m_schedule_time_list.SetItemText(i,j+1,temp_show);
 		}
 	}

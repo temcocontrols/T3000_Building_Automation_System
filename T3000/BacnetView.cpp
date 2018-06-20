@@ -2,6 +2,17 @@
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
 //使用VS2010 编译需删除 c:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cvtres.exe 来确保用更高版本的 来转换资源文件
+
+2018 05 29 
+1.T3系列 扩展IO支持 T3-PT12 
+2.支持更改名字  HUM CO2 PRESSURE .
+3.mstp 通讯参数修改.
+4.Bacnet Tool 改为非模态窗口, 支持多个窗口同时工作;
+5.解决在切换panel时 ， 哪一个program是选中状态需要重新获取.否则会读到其他不相关的 program
+6.修复network point 中 subpanel 为0 时 的显示问题.
+7.优化扫描，若设备没有Zigbee ，不再会进行此项扫描
+8.修复Screen 中 output 和variable  由 Auto 改为manual时  点击无法更改 digital 值的问题.
+
 2018 04 27
 1. 没有Zigbee的设备 Com1 不允许修改 ，以免误导客户.
 
@@ -107,7 +118,6 @@
 4. PID 增加时间 积分参数.
 
 2017 - 01 - 7 Update by Fance
-1. 艹，新的一年，新的吐槽，周六还要上班。靠。 祝老毛早日患上老年痴呆.
 2. 在trendlog 界面加入Loading 图标.
 3. PT12 Range支持 DI 输入.
 
@@ -2590,7 +2600,12 @@ void CDialogCM5_BacNet::Fresh()
 
 	g_bPauseMultiRead = true; // 只要在minipanel的界面 就暂停 读 寄存器的那个线程;
 
-	if ((g_protocol!=PROTOCOL_BACNET_IP) && (g_protocol != MODBUS_BACNET_MSTP)  && (g_protocol != PROTOCOL_BIP_TO_MSTP) && (g_protocol != MODBUS_RS485) && (g_protocol != MODBUS_TCPIP))
+	if ((g_protocol!=PROTOCOL_BACNET_IP) && 
+        (g_protocol != MODBUS_BACNET_MSTP)  && 
+        (g_protocol != PROTOCOL_BIP_TO_MSTP) && 
+        (g_protocol != MODBUS_RS485) && 
+        (g_protocol != MODBUS_TCPIP) &&
+        (g_protocol != PROTOCOL_MSTP_TP_MODBUS))
 	{
 		return;
 	}
@@ -2671,6 +2686,11 @@ void CDialogCM5_BacNet::Fresh()
 		BacNet_hwd = this->m_hWnd;
 		return;
 	}
+    else if (pFrame->m_product.at(selected_product_index).protocol == PROTOCOL_MSTP_TP_MODBUS)
+    {
+        BacNet_hwd = this->m_hWnd;
+        return;
+    }
 
 	bip_setgsm(false);
 	Gsm_communication = false;
@@ -5258,7 +5278,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 {
 
 
-	//老毛一会让这样改一会让那样改，受不了;先用宏定义标记起来;
+	//先用宏定义标记起来;
 #ifdef NEED_ANALOG_DIGITAL_ONLY
 	Input_Window->Reload_Unit_Type();
 #endif
@@ -5906,6 +5926,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 				if(Output_Window->IsWindowVisible())
 					::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
 			}
+            g_progress_persent = 100;
 		}
 		break;
 	case BAC_IN:   //IN
@@ -5953,6 +5974,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 				if(Input_Window->IsWindowVisible())
 					::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
 			}
+            g_progress_persent = 100;
 			
 		}
 		for (int i = 0;i < 3;i++)

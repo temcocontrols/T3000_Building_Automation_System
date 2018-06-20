@@ -148,7 +148,7 @@ void CAirQuality::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX,IDC_LIST_FACTORY, m_factory_list);
 	DDX_Control(pDX, IDC_EDIT_CAL, m_edit_calibration);
 	DDX_Control(pDX, IDC_EDIT_MAX_AQ, m_max_scale_aq_edit);
-	DDX_Control(pDX, IDC_CO2_BRAUDRATECOMBO, m_Combox_braudrate);
+	DDX_Control(pDX, IDC_CO2_BAUDRATECOMBO, m_Combox_baudrate);
 }
 
 BEGIN_MESSAGE_MAP(CAirQuality, CFormView)
@@ -175,7 +175,7 @@ BEGIN_MESSAGE_MAP(CAirQuality, CFormView)
 	ON_BN_CLICKED(IDC_GRAPIC, &CAirQuality::OnBnClickedButton_Graphic)
 	ON_BN_CLICKED(IDC_RADIO_TRANDUCER, &CAirQuality::OnBnClickedButton_Tranducer)
 	ON_BN_CLICKED(IDC_RADIO_pid, &CAirQuality::OnBnClickedButton_PID)
-	ON_CBN_SELENDCANCEL(IDC_CO2_BRAUDRATECOMBO, &CAirQuality::OnCbnSelendcancelBraudratecombo)
+	ON_CBN_SELENDCANCEL(IDC_CO2_BAUDRATECOMBO, &CAirQuality::OnCbnSelendcancelBaudratecombo)
 END_MESSAGE_MAP()
 
 BEGIN_EVENTSINK_MAP(CAirQuality, CDialog)
@@ -201,12 +201,12 @@ void CAirQuality::Dump(CDumpContext& dc) const
 // CAirQuality message handlers
 void CAirQuality::Fresh()
 {
-	m_Combox_braudrate.ResetContent();
-	m_Combox_braudrate.AddString(_T("9600"));
-	m_Combox_braudrate.AddString(_T("19200"));
-	m_Combox_braudrate.AddString(_T("38400"));
-	m_Combox_braudrate.AddString(_T("57600"));
-	m_Combox_braudrate.AddString(_T("115200"));
+	m_Combox_baudrate.ResetContent();
+	m_Combox_baudrate.AddString(_T("9600"));
+	m_Combox_baudrate.AddString(_T("19200"));
+	m_Combox_baudrate.AddString(_T("38400"));
+	m_Combox_baudrate.AddString(_T("57600"));
+	m_Combox_baudrate.AddString(_T("115200"));
 
 	g_NEED_MULTI_READ = FALSE;
 	int AddressValue = -1;
@@ -298,16 +298,16 @@ void CAirQuality::Fresh()
 	}
 }
 
-void CAirQuality::OnCbnSelendcancelBraudratecombo()
+void CAirQuality::OnCbnSelendcancelBaudratecombo()
 {
-	if (product_register_value[MODBUS_BAUDRATE] == m_Combox_braudrate.GetCurSel()) //Add this to judge weather this value need to change.
+	if (product_register_value[MODBUS_BAUDRATE] == m_Combox_baudrate.GetCurSel()) //Add this to judge weather this value need to change.
 		return;
 
-	/* Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_BAUDRATE,m_braudRateCombox.GetCurSel(),
-	                     product_register_value[MODBUS_BAUDRATE],this->m_hWnd,IDC_BRAUDRATECOMBO,_T("BAUDRATE"));*/
+	/* Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_BAUDRATE,m_baudRateCombox.GetCurSel(),
+	                     product_register_value[MODBUS_BAUDRATE],this->m_hWnd,IDC_BAUDRATECOMBO,_T("BAUDRATE"));*/
 
-	int ret = write_one(g_tstat_id, MODBUS_BAUDRATE, m_Combox_braudrate.GetCurSel());
-	int index_brandrate = m_Combox_braudrate.GetCurSel();
+	int ret = write_one(g_tstat_id, MODBUS_BAUDRATE, m_Combox_baudrate.GetCurSel());
+	int index_brandrate = m_Combox_baudrate.GetCurSel();
 	int brandrate = 19200;
 
 	if (index_brandrate == 0)
@@ -564,7 +564,7 @@ void CAirQuality::ShowAirqualityDialog()
 	// 		strTemp=_T("19200");
 	// 	}
 	// 	m_edit_baudrate.SetWindowTextW(strTemp);
-	m_Combox_braudrate.SetCurSel(product_register_value[MODBUS_BAUDRATE]);
+	m_Combox_baudrate.SetCurSel(product_register_value[MODBUS_BAUDRATE]);
 
 	m_combox_displayer.ResetContent();
 	if (product_register_value[7] == PM_HUM_R)

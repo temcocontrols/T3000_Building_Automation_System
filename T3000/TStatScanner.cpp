@@ -433,9 +433,16 @@ DWORD WINAPI   CTStatScanner::ScanTCPSubPortThreadNoCritical(LPVOID lpVoid)
                     return 1;
                 }
 
+
+
                 if (sub_com == 1)
                 {
-                    m_device_baudrate = _wtoi(Baudrate_Array[UART_38400]);
+                    if (m_T3BB_device_data.at(ncount).zigbee_exsit != 1)
+                    {
+                        break;
+                    }
+
+                    m_device_baudrate = _wtoi(Baudrate_Array[UART_19200]);
                     m_device_com_port = sub_com;
                 }
                 else
@@ -454,16 +461,7 @@ DWORD WINAPI   CTStatScanner::ScanTCPSubPortThreadNoCritical(LPVOID lpVoid)
                     //DFTrace(_T("write 96 97 failed"));
                     continue;
                 }
-                if (sub_com == 1)
-                {
-                    break;
-                }
 
-                //Fandu 最新的arm 板子Main 和sub 都支持所有 波特率;
-                //if ((sub_com == 0) && (sub_baudrate == UART_19200))
-                //{
-                //    break;
-                //}
             }
 
         }
@@ -640,9 +638,9 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
 
                     pScan->SetComPort(n);
                     bool bRet = Change_BaudRate_NoCretical(m_scan_info.at(j).scan_baudrate, n);
-                    CString strBraudrate;
-                    strBraudrate.Format(_T("%d"), m_scan_info.at(j).scan_baudrate);
-                    pScan->SetBaudRate(strBraudrate);
+                    CString strBaudrate;
+                    strBaudrate.Format(_T("%d"), m_scan_info.at(j).scan_baudrate);
+                    pScan->SetBaudRate(strBaudrate);
                     scan_baudrate = m_scan_info.at(j).scan_baudrate;
 
                     ASSERT(bRet);
@@ -2364,9 +2362,9 @@ UINT _ScanTstatThread2(LPVOID pParam)
 
                         pScan->SetComPort(n);
                         bool bRet = Change_BaudRate(m_scan_info.at(j).scan_baudrate);
-                        CString strBraudrate;
-                        strBraudrate.Format (_T("%d"),m_scan_info.at(j).scan_baudrate);
-                        pScan->SetBaudRate(strBraudrate);
+                        CString strBaudrate;
+                        strBaudrate.Format (_T("%d"),m_scan_info.at(j).scan_baudrate);
+                        pScan->SetBaudRate(strBaudrate);
                         scan_baudrate = m_scan_info.at(j).scan_baudrate;
 
                         ASSERT(bRet);
@@ -3937,7 +3935,7 @@ void CTStatScanner::Initial_Scan_Info()
     else
     {
         temp_scan_info.scan_skip = true;
-        temp_scan_info.scan_status = SCAN_STATUS_SKIP;
+        temp_scan_info.scan_status = SCAN_STATUS_WAIT;
         temp_scan_info.scan_baudrate = 38400;
     }
 
@@ -4837,6 +4835,10 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
 	//   pScan->m_eScanComEnd->SetEvent();
 #if 1 // bacnet mstp
 
+    //int n_comport = 1;
+    //int n_baudrate = 19200;
+    //int n_find_mstp = 1;
+
     int n_comport = 0;
     int n_baudrate = 19200;
     int n_find_mstp = false;
@@ -4850,9 +4852,10 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
             break;
         }
     }
+    //发布版本 先忽略 bacnet 的部分 不扫描 
     if (n_find_mstp == false)
     {
-        HANDLE temphandle;
+        HANDLE temphandle1;
         if (pScan->m_eScanBacnetIpEnd->m_hObject)
         {
             pScan->m_eScanBacnetIpEnd->SetEvent();
@@ -4860,15 +4863,16 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
         //m_scan_info.at(scan_bacnet_ip_item).scan_status = SCAN_STATUS_FINISHED;
         //pScan->m_bStopScan = TRUE;
 
-        temphandle = Get_RS485_Handle();
-        if (temphandle != NULL)
+        temphandle1 = Get_RS485_Handle();
+        if (temphandle1 != NULL)
         {
             TerminateThread((HANDLE)Get_Thread1(), 0);
             TerminateThread((HANDLE)Get_Thread2(), 0);
 
-            CloseHandle(temphandle);
+            CloseHandle(temphandle1);
             Set_RS485_Handle(NULL);
         }
+        m_scan_info.at(scan_bacnet_ip_item).scan_status = SCAN_STATUS_FINISHED;
         return 1;
     }
 
@@ -4885,31 +4889,21 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
 
     Initial_bac(temp_port,_T(""), n_baudrate);
     TRACE(_T("Now scan with COM%d\r\n"),temp_port);
-
-    for (int i=0; i<30; i++)
+    Sleep(5000);//等待几秒让MSTP 的token 运行起来.
+    for (int i=0; i<15; i++)
     {
         CString strInfo;
-        strInfo.Format(_T("Send MSTP command time left(%d)"),30-i);
+        strInfo.Format(_T("Send MSTP command time left(%d)"),15-i);
         memset(m_scan_info.at(scan_bacnet_ip_item).scan_notes,0,250);
         char temp_char[250];
         WideCharToMultiByte( CP_ACP, 0, strInfo.GetBuffer(), -1, temp_char, 250, NULL, NULL );
         memcpy(m_scan_info.at(scan_bacnet_ip_item).scan_notes,temp_char,250);
-
-        //pScan->ShowBacnetComScanInfo(strInfo);
         Send_WhoIs_Global(-1,-1);
         Sleep(2000);
         m_scan_info.at(scan_bacnet_ip_item).scan_found = m_bac_scan_com_data.size();
-        if((m_bac_scan_com_data.size() > 0) && (i > 25))
+        if((m_bac_scan_com_data.size() > 0) && (i > 10))
             break;
     }
-
-
-    
-
-    //for (int j=0; j<5; j++)
-    //{
-
-        
 
 
         int ready_to_read_count =	m_bac_scan_com_data.size();
@@ -4934,7 +4928,7 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
             int ntest_ret = 0;
 
             memset(test_array, 0, 2000);
-            for (int j = 0; j < 10000; j++)
+            for (int j = 0; j < 50; j++)
             {
                 ntest_ret = GetPrivateBacnetToModbusData(m_temp_com_data.at(i).device_id, 0, 100, test_array);
                 if (ntest_ret >= 0)
@@ -4946,41 +4940,22 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
                     temp_info.panel_number = m_temp_com_data.at(i).macaddress;
                     temp_info.software_version = 0;
                     temp_info.hardware_version = 0;
-                    temp_info.m_protocol = P_BACNET_MSTP;
+                    temp_info.m_protocol = PROTOCOL_MSTP_TP_MODBUS;
                     temp_info.device_id = m_temp_com_data.at(i).device_id;
+
+                    temp_info.ipaddress[0] = test_array[47];
+                    temp_info.ipaddress[1] = test_array[48];
+                    temp_info.ipaddress[2] = test_array[49];
+                    temp_info.ipaddress[3] = test_array[50];
+
                     m_temp_result_data.push_back(temp_info);
                     break;
                 }
                 Sleep(200);
             }
-            
-
             Sleep(1000);
-            if (ntest_ret > 0)
-            {
-                Sleep(1000);
-            }
-            //int	resend_count = 0;
-            //do
-            //{
-            //    resend_count ++;
-            //    if(resend_count>50)
-            //        break;
-            //    g_invoke_id = GetPrivateData(
-            //                      m_bac_scan_com_data.at(i).device_id,
-            //                      GETSERIALNUMBERINFO,
-            //                      0,
-            //                      0,
-            //                      sizeof(Str_Serial_info));
-
-            //    Sleep(SEND_COMMAND_DELAY_TIME);
-            //}
-            //while (g_invoke_id<0);
-            //Sleep(2000);
-            //} while (!tsm_invoke_id_free(g_invoke_id));
-
         }
-    //}
+
 
 
 
@@ -5038,7 +5013,7 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
         temp_pname = GetProductName(m_temp_result_data.at(l).product_type);
         temp_modbusid.Format(_T("%u"), m_temp_result_data.at(l).modbus_addr);
         temp_view_name = temp_pname + _T(":") + temp_serial_number + _T("-") + temp_modbusid;
-        temp_protocol.Format(_T("%d"),P_BACNET_MSTP);
+        temp_protocol.Format(_T("%d"), PROTOCOL_MSTP_TP_MODBUS);
         temp_product_id_string.Format(_T("%d"), m_temp_result_data.at(l).product_type);
         temp_port_string.Format(_T("%d"), n_comport);
         temp_object_instance.Format(_T("%u"), m_temp_result_data.at(l).device_id);
@@ -5046,13 +5021,13 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
 
         if(count>= 1)
         {
-            str_temp.Format(_T("update ALL_NODE set Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='%s',Product_name = '%s',Online_Status = 1,Hardware_Ver = '%s',Software_Ver = ' %s' where Serial_ID = '%s'"),temp_baud,temp_port_string,temp_product_id_string,temp_protocol,
+            str_temp.Format(_T("update ALL_NODE set Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='%s',Product_name = '%s',Online_Status = 1,Object_Instance = '%s',Panal_Number = ' %s' where Serial_ID = '%s'"),temp_baud,temp_port_string,temp_product_id_string,temp_protocol,
                             temp_view_name,temp_object_instance,temp_panel_number,temp_serial_number);
         }
         else
         {
-            str_temp.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Custom)   values('"
-                               +pFrame->m_strCurMainBuildingName+"','"+pFrame->m_strCurSubBuldingName+"','""','"+temp_serial_number+"','floor1','room1','"+temp_view_name+"','"+temp_product_id_string+"','"+temp_modbusid+"','""','"+temp_baud+"','Default_Building_PIC.bmp','"+temp_object_instance+"','"+temp_panel_number+"','"+temp_port_string+"','0','"+temp_protocol+"','1','0')"));
+            str_temp.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Custom,Parent_SerialNum,Panal_Number,Object_Instance)   values('"
+                               +pFrame->m_strCurMainBuildingName+"','"+pFrame->m_strCurSubBuldingName+"','""','"+temp_serial_number+"','floor1','room1','"+temp_view_name+"','"+temp_product_id_string+"','"+temp_modbusid+"','""','"+temp_baud+"','Default_Building_PIC.bmp','"+temp_object_instance+"','"+temp_panel_number+"','"+temp_port_string+"','0','"+temp_protocol+"','1','0','0', '"+ temp_panel_number +"','" + temp_object_instance + "')"));
 
         }
          SqliteDBBuilding.execDML((UTF8MBSTR)str_temp);
@@ -5060,6 +5035,7 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
 
 
 end_mstp_thread:
+    m_scan_info.at(scan_bacnet_ip_item).scan_status = SCAN_STATUS_FINISHED;
     HANDLE temphandle;
     if (pScan->m_eScanBacnetIpEnd->m_hObject)
     {
@@ -5068,15 +5044,17 @@ end_mstp_thread:
     //m_scan_info.at(scan_bacnet_ip_item).scan_status = SCAN_STATUS_FINISHED;
     //pScan->m_bStopScan = TRUE;
 
-    temphandle = Get_RS485_Handle();
-    if(temphandle !=NULL)
-    {
-        TerminateThread((HANDLE)Get_Thread1(),0);
-        TerminateThread((HANDLE)Get_Thread2(),0);
+    close_bac_com();
 
-        CloseHandle(temphandle);
-        Set_RS485_Handle(NULL);
-    }
+    //temphandle = Get_RS485_Handle();
+    //if(temphandle !=NULL)
+    //{
+    //    TerminateThread((HANDLE)Get_Thread1(),0);
+    //    TerminateThread((HANDLE)Get_Thread2(),0);
+
+    //    CloseHandle(temphandle);
+    //    Set_RS485_Handle(NULL);
+    //}
 
     //is_in_scan_mode = false;
     return 1;

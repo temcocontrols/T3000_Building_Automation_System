@@ -325,9 +325,24 @@ int Write_Multi_org(unsigned char device_var,unsigned char *to_write,unsigned sh
 
 int Write_Multi_org_short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length,int retry_times)
 {
-    // 	CString str;
-    // 	str.Format(_T("ID :%d Multi writing start :%d Amount: %d"),device_var,start_address,length);
-    // 	SetPaneString(2,str);
+    //2018 0525 在底层公共读写函数增加对不同协议的处理
+    if (g_protocol == PROTOCOL_MSTP_TP_MODBUS)
+    {
+        int n_ret = 0;
+        for (int i = 0; i < retry_times; i++)
+        {
+            g_llTxCount++;
+            n_ret = WritePrivateBacnetToModbusData(g_mstp_deviceid, start_address, length, to_write);
+            if (n_ret >= 0)
+            {
+                g_llRxCount++;
+                return n_ret;
+            }
+            Sleep(1000);
+        }
+        return n_ret;
+    }
+
     int j=0;
     for(int i=0; i<retry_times; i++)
     {
@@ -373,7 +388,11 @@ New code should use modbus_read_multi_value() directly.
 
 This does NOT lock the critical section.
 
+
+
+
 */
+
 //extern int modbus_read_multi_value(
 //	unsigned short *put_data_into_here,
 //	unsigned char device_var,
@@ -382,6 +401,22 @@ This does NOT lock the critical section.
 //	int retry_times );
 int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,int retry_times)
 {
+    if (g_protocol == PROTOCOL_MSTP_TP_MODBUS)
+    {
+        int n_ret = 0;
+        for (int i = 0; i < retry_times; i++)
+        {
+            g_llTxCount++;
+            n_ret = GetPrivateBacnetToModbusData(g_mstp_deviceid, start_address, length, put_data_into_here);
+            if (n_ret >= 0)
+            {
+                g_llRxCount++;
+                return n_ret;
+            }
+            Sleep(1000);
+        }
+        return n_ret;
+    }
     int ret=modbus_read_multi_value(
                 put_data_into_here,
                 device_var,
@@ -994,7 +1029,7 @@ BOOL Post_Write_Message(uint32_t deviceid,int8_t command,int8_t start_instance,i
     pmy_write_info->hWnd = hWnd;
     pmy_write_info->ItemInfo.nRow = nRow;
     pmy_write_info->ItemInfo.nCol = nCol;
-	if((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP))
+    if ((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP) || (g_protocol == PROTOCOL_MSTP_TP_MODBUS))
 	{
 		if(!PostThreadMessage(nThreadID,MY_RS485_WRITE_LIST,(WPARAM)pmy_write_info,NULL))//post thread msg
 		{
@@ -1849,7 +1884,7 @@ Get  Private  Bacnet  To  ModbusData
 //这个函数用来通过bacnet命令读取modbus 的相关寄存器
 */
 /************************************************************************/
-int GetPrivateBacnetToModbusData(uint32_t deviceid, int16_t start_reg, int16_t readlength, unsigned short *data_out)
+int GetPrivateBacnetToModbusData(uint32_t deviceid, uint16_t start_reg, int16_t readlength, unsigned short *data_out)
 {
     int n_ret = 0;
     bacnet_to_modbus_struct.org_nlength = readlength;
@@ -1894,7 +1929,7 @@ int GetPrivateBacnetToModbusData(uint32_t deviceid, int16_t start_reg, int16_t r
 
         if (n_ret >= 0)
         {
-            for (int i = 0; i<300; i++)
+            for (int i = 0; i<500; i++)
             {
                 Sleep(10);
                 if (tsm_invoke_id_free(n_ret))
@@ -1913,11 +1948,16 @@ int GetPrivateBacnetToModbusData(uint32_t deviceid, int16_t start_reg, int16_t r
             }
         }
         else
+        {
+            Sleep(1000);
             return -6;
+        }
     }
     else
+    {
+        Sleep(2000);  //address 
         return -2;
-
+    }
 
     return -7;
 }
@@ -1964,7 +2004,7 @@ int WritePrivateBacnetToModbusData(uint32_t deviceid, int16_t start_reg, uint16_
     Set_transfer_length(private_data_chunk.total_length);
     memcpy_s(SendBuffer, PRIVATE_HEAD_LENGTH, &private_data_chunk, PRIVATE_HEAD_LENGTH);
 
-    memcpy(temp_data, data_in, writelength);
+    memcpy(temp_data, data_in, writelength*2);
     //电脑和设备大小端不一致，这里以设备为准.
     for (int i = 0; i < writelength; i++)
     {
@@ -4658,6 +4698,22 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
 
 }
 
+
+void close_bac_com()
+{
+    HANDLE temphandle;
+    temphandle = Get_RS485_Handle();
+    if (temphandle != NULL)
+    {
+        TerminateThread((HANDLE)Get_Thread1(), 0);
+        TerminateThread((HANDLE)Get_Thread2(), 0);
+
+        CloseHandle(temphandle);
+        Set_RS485_Handle(NULL);
+        g_mstp_com.status = 0;
+    }
+}
+
 SOCKET my_sokect;
 extern void  init_info_table( void );
 extern void Init_table_bank();
@@ -4688,12 +4744,11 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
 
 
 
-#ifndef test_ptp
 
-#if 1
+
     if(comport == 0)	//
     {
-#endif
+
 
         //2017-12-20  杜帆修改  尝试绑定本地的通讯 UDP 47809 端口 ，若绑定失败就尝试其他端口;
         //T3000 不在绑定47808端口了，改为绑定 47809以后得端口，为了 同时能使用其他bacnet软件.
@@ -4718,13 +4773,12 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
         //bip_set_port(49338);
 		bip_set_port(htons(47808));
 		
-        //	int test_port = bip_get_port();
-#if 1
+
         static in_addr BIP_Broadcast_Address;
         BIP_Broadcast_Address.S_un.S_addr =  inet_addr("255.255.255.255");
         //BIP_Broadcast_Address.S_un.S_addr =  inet_addr("192.168.0.177");
         bip_set_broadcast_addr((uint32_t)BIP_Broadcast_Address.S_un.S_addr);
-#endif
+
         PHOSTENT  hostinfo;
         char  name[255];
         CString  cs_myip;
@@ -4775,21 +4829,31 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
             CM5_hThread = NULL;
         }
         CM5_hThread =CreateThread(NULL,NULL,MSTP_Receive,NULL,NULL, &nThreadID_x);
-
-#if 1
     }
     else
     {
-        HANDLE temphandle;
-        temphandle = Get_RS485_Handle();
-        if(temphandle !=NULL)
+        if ((g_mstp_com.status == 0) ||((g_mstp_com.status == 1) && ((g_mstp_com.ncomport != comport) || (g_mstp_com.nbaudrate != m_nbaudrat))))
         {
-            TerminateThread((HANDLE)Get_Thread1(),0);
-            TerminateThread((HANDLE)Get_Thread2(),0);
-
-            CloseHandle(temphandle);
-            Set_RS485_Handle(NULL);
+            close_bac_com();
+            m_bac_scan_com_data.clear();
+            g_mstp_com.status = 1;
+            g_mstp_com.ncomport = comport;
+            g_mstp_com.nbaudrate = m_nbaudrat;
         }
+        else
+        {
+            return true;
+        }
+        //HANDLE temphandle;
+        //temphandle = Get_RS485_Handle();
+        //if(temphandle !=NULL)
+        //{
+        //    TerminateThread((HANDLE)Get_Thread1(),0);
+        //    TerminateThread((HANDLE)Get_Thread2(),0);
+
+        //    CloseHandle(temphandle);
+        //    Set_RS485_Handle(NULL);
+        //}
         close_com();
 
         dlmstp_set_baud_rate(n_baudrate);
@@ -4799,19 +4863,6 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
         dlmstp_set_max_master(DEFAULT_MAX_MASTER);
         memset(my_port,0,50);
 
-        //CString Program_Path,Program_ConfigFile_Path;
-        //int g_com=0;
-        //GetModuleFileName(NULL,Program_Path.GetBuffer(MAX_PATH),MAX_PATH);
-        //PathRemoveFileSpec(Program_Path.GetBuffer(MAX_PATH) );
-        //Program_Path.ReleaseBuffer();
-        //Program_ConfigFile_Path = Program_Path + _T("\\MyConfig.ini");
-
-        /*CFileFind fFind;
-        if(!fFind.FindFile(Program_ConfigFile_Path))
-        {
-        WritePrivateProfileStringW(_T("Setting"),_T("ComPort"),_T("1"),Program_ConfigFile_Path);
-        }
-        g_com = GetPrivateProfileInt(_T("Setting"),_T("ComPort"),1,Program_ConfigFile_Path);*/
         CString temp_cs;
         //temp_cs.Format(_T("COM%d"),g_com);
         temp_cs.Format(_T("COM%d"),comport);
@@ -4826,9 +4877,7 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
 
         set_datalink_protocol(MODBUS_BACNET_MSTP);
         datalink_get_broadcast_address(&broadcast_address);
-        //    print_address("Broadcast", &broadcast_address);
         datalink_get_my_address(&my_address);
-        //		print_address("Address", &my_address);
         int * comport_parameter = new int;
         *comport_parameter = MODBUS_BACNET_MSTP;
         if(CM5_hThread!=NULL)
@@ -4838,9 +4887,6 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
         }
         CM5_hThread =CreateThread(NULL,NULL,MSTP_Receive,comport_parameter,NULL, &nThreadID_x);
     }
-#endif
-
-#endif //nodef ptp
 
     if(!bac_net_initial_once)
     {
@@ -5547,7 +5593,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	temp.panal_number = temp_data.reg.station_number;
 
 	temp.bacnetip_port = temp_data.reg.bacnetip_port;
-
+    temp.zigbee_exsit = temp_data.reg.zigbee_exsit;
     char * temp_point = NULL;
     refresh_net_label_info temp_label;
     temp_point = temp_data.reg.panel_name;
@@ -5565,10 +5611,11 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
         temp_label.serial_number = (unsigned int)nSerial;
         CString temp_serial_number;
         temp_serial_number.Format(_T("%u"), temp_label.serial_number);
-        int need_to_write_into_device = GetPrivateProfileInt(temp_serial_number, _T("WriteFlag"), 0, g_achive_device_name_path);
-        if (need_to_write_into_device == 0)
-        {
-            temp.show_label_name = cs_temp_label;
+        temp.show_label_name = cs_temp_label;
+        //int need_to_write_into_device = GetPrivateProfileInt(temp_serial_number, _T("WriteFlag"), 0, g_achive_device_name_path);
+       // if (need_to_write_into_device == 0)
+        //{
+        //    temp.show_label_name = cs_temp_label;
             
             //bool found_device = false;
             //bool found_device_new_name = false;
@@ -5588,7 +5635,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
             //        break;
             //    }
             //}
-        }
+        //}
     }
 
 

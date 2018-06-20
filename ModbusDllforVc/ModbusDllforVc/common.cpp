@@ -785,7 +785,7 @@ OUTPUT bool Open_Socket2(CString strIPAdress,short nPort)
     setsockopt(m_hSocket,SOL_SOCKET,SO_RCVTIMEO,(char *)&nNetTimeout,sizeof(int));
 
     //****************************************************************************
-    // Fance added ,不要用阻塞的模式，如果设备不在线 经常性的 要等10几秒 ，老毛受不了。
+    // Fance added ,不要用阻塞的模式，如果设备不在线 经常性的 要等10几秒 
     //改为非阻塞的 2.5秒后还没连接上就 算连接失败;
     int error = -1;
     int len;
@@ -897,7 +897,7 @@ OUTPUT bool Open_Socket2_multy_thread(CString strIPAdress, short nPort,int ninde
     setsockopt(m_hSocket, SOL_SOCKET, SO_RCVTIMEO, (char *)&nNetTimeout, sizeof(int));
 
     //****************************************************************************
-    // Fance added ,不要用阻塞的模式，如果设备不在线 经常性的 要等10几秒 ，老毛受不了。
+    // Fance added ,不要用阻塞的模式，如果设备不在线 经常性的 要等10几秒
     //改为非阻塞的 2.5秒后还没连接上就 算连接失败;
     int error = -1;
     int len;
@@ -9527,6 +9527,7 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
         return -1;
 
     bool found_bacnet_data = false;
+    int n_no_data_online_count = 0;
     for (int i = 0; i < sizeof(ArrayBaudate) / sizeof(ArrayBaudate[0]); i++)
     {
         ntest_ret[i].ncomport = comport;
@@ -9535,6 +9536,12 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
         if (found_bacnet_data)
         {
             ntest_ret[i].test_ret = -2;
+            continue;
+        }
+        //Speed up scan , if no data online ,check 2 times ,then stop.
+        if (n_no_data_online_count >= 2)
+        {
+            ntest_ret[i].test_ret = 0;
             continue;
         }
         Change_BaudRate_NoCretical(ArrayBaudate[i], comport);
@@ -9569,6 +9576,7 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
         DWORD m_had_send_data_number;//已经发送的数据的字节数
         if (m_hSerial == NULL)
         {
+            continue;
             return -1;
         }
         ////////////////////////////////////////////////clear com error
@@ -9583,7 +9591,10 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
 
         memset(&m_osMulWrite, 0, sizeof(OVERLAPPED));
         if ((m_osMulWrite.hEvent = CreateEvent(NULL, true, false, nSection)) == NULL)
-            return -2;
+        {
+            continue;
+            //return -2;
+        }
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0;
         ///////////////////////////////////////////////////////send the to read message
@@ -9605,13 +9616,16 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
         ///////////////////////////up is write
         /////////////**************down is read
 
-        Sleep(LATENCY_TIME_COM);
+        Sleep(LATENCY_TIME_COM*10);
         CString nReadSection;
         nReadSection.Format(_T("MulTestBacnetRead_%d_%d"), comport, ntest_ret[i].baudrate);
         ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
         if ((m_osRead.hEvent = CreateEvent(NULL, true, false, nReadSection)) == NULL)
-            return -2;
+        {
+            continue;
+            //return -2;
+        }
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0;
         ////////////////////////////////////////////////clear com error
@@ -9646,6 +9660,7 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
 
         if (m_had_send_data_number > 0)
         {
+            n_no_data_online_count = 0;
             ntest_ret[i].test_ret = check_bacnet_data((unsigned char *)test_data, m_had_send_data_number);
             if (ntest_ret[i].test_ret != 1)
                 continue;
@@ -9653,6 +9668,7 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
         }
         else
         {
+            n_no_data_online_count++;
             ntest_ret[i].test_ret = 0;
             continue;
         }

@@ -171,6 +171,7 @@ BOOL CComWriter::WriteCommandtoReset()
     if (ModelID>0)
     {
         if (ModelID==6||ModelID==7||ModelID==8)//Tstat6,7,8 Detecting chip flash size£¬        {
+        {
             int Chipsize=read_one(m_szMdbIDs[0],11,5);
 
 
@@ -1261,6 +1262,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                 if (ModelID>0)
                 {
                     if (ModelID==6||ModelID==7||ModelID==8)//Tstat6,7,8 Detect CPU flash size.                     {
+                    {
                         int Chipsize=read_one(pWriter->m_szMdbIDs[i],11,5);
                         if(Chipsize < 0)
                         {
@@ -1463,6 +1465,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
             }
 
             if(nFlashRet > 0) // flash success            {
+            {
                 CString strText;
                 strText.Format(_T("|ID %d: Programming successful."), pWriter->m_szMdbIDs[i]);
                 pWriter->OutPutsStatusInfo(strText);

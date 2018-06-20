@@ -43,6 +43,7 @@ CString CurrentT3000Version ;
 int nCom;
 //CString program_path=_T("");
 int g_tstat_id=255;
+int g_mstp_deviceid; //用于全局根据Device id 访问 MSTP 。 
 unsigned int g_serialNum=0;
 BOOL g_tstat_id_changed=FALSE;
 BOOL g_bPauseMultiRead=FALSE;
@@ -2219,7 +2220,7 @@ pidname_map product_map;
 bool offline_mode = false; //全局离线模式判断;
 CString offline_prg_path;   //离线模式得prg 保存路径;
 
-
+bac_mstp_com g_mstp_com; // 全局mstp com 口 连接状态
 
 bool custom_bacnet_register_listview = true;
 

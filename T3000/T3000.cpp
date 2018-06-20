@@ -26,7 +26,7 @@
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);  
 
 LPFN_ISWOW64PROCESS fnIsWow64Process;  
-const int g_versionNO= 20180426;
+const int g_versionNO= 20180518;
 
 
 #ifdef _DEBUG
@@ -68,7 +68,7 @@ CT3000App::CT3000App()
 #endif 
     //*******************************************************
     
-	T3000_Version = 20180426; //
+	T3000_Version = 20180518; //
 	m_lastinterface=19;
 }
 // The one and only CT3000App object
@@ -215,7 +215,7 @@ void CT3000App::UpdateDB()
 				stemp_building.Com_Port = q.getValuebyName(L"Com_Port");
 				stemp_building.Ip_Address = q.getValuebyName(L"Ip_Address");
 				stemp_building.Ip_Port = q.getValuebyName(L"Ip_Port");
-				stemp_building.Braudrate = q.getValuebyName(L"Braudrate");
+				stemp_building.Baudrate = q.getValuebyName(L"Braudrate");
 				stemp_building.Default_SubBuilding = q.getIntField("Default_SubBuilding");
 				stemp_building.Building_Path = q.getValuebyName(L"Building_Path");
 				stemp_building.Longitude = q.getValuebyName(L"Longitude");
@@ -283,7 +283,7 @@ void CT3000App::UpdateDB()
 				m_Building.at(j).Com_Port,
 				m_Building.at(j).Ip_Address,
 				m_Building.at(j).Ip_Port,
-				m_Building.at(j).Braudrate,
+				m_Building.at(j).Baudrate,
 				m_Building.at(j).Default_SubBuilding,
 				m_Building.at(j).Building_Path,
 				m_Building.at(j).Longitude,

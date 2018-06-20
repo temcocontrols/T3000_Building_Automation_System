@@ -79,6 +79,9 @@ typedef struct
 
 COMCTL32_SysColor  comctl32_color;
 
+int sel_month = 1;
+int sel_day = 1;
+
 VOID
 COMCTL32_RefreshSysColors(void)
 {
@@ -227,7 +230,7 @@ static inline INT MONTHCAL_GetCalCount(const MONTHCAL_INFO *infoPtr)
 static inline void MONTHCAL_NotifySelectionChange(const MONTHCAL_INFO *infoPtr)
 {
     NMSELCHANGEEX nmsc;
-
+    return;
     nmsc.nmhdr.hwndFrom = infoPtr->hwndSelf;
     nmsc.nmhdr.idFrom   = ::GetWindowLongPtr(infoPtr->hwndSelf, GWLP_ID);
     nmsc.nmhdr.code     = MCN_SELCHANGE;
@@ -240,7 +243,7 @@ static inline void MONTHCAL_NotifySelectionChange(const MONTHCAL_INFO *infoPtr)
 static inline void MONTHCAL_NotifySelect(const MONTHCAL_INFO *infoPtr)
 {
     NMSELCHANGEEX nmsc;
-
+    return;
     nmsc.nmhdr.hwndFrom = infoPtr->hwndSelf;
     nmsc.nmhdr.idFrom   = ::GetWindowLongPtr(infoPtr->hwndSelf, GWLP_ID);
     nmsc.nmhdr.code     = MCN_SELECT;
@@ -2203,6 +2206,12 @@ MONTHCAL_LButtonDown(MONTHCAL_INFO *infoPtr, LPARAM lParam)
 }
 
 
+void MONTHCAL_GetSel_Month_Day(int *nmonth, int * nday)
+{
+    *nmonth = sel_month;
+    *nday = sel_day;
+}
+
 static LRESULT
 MONTHCAL_LButtonUp(MONTHCAL_INFO *infoPtr, LPARAM lParam)
 {
@@ -2221,23 +2230,32 @@ MONTHCAL_LButtonUp(MONTHCAL_INFO *infoPtr, LPARAM lParam)
   }
 
   ReleaseCapture();
-
+ // n_click_month = infoPtr->
   /* always send NM_RELEASEDCAPTURE notification */
+#if 0
   nmhdr.hwndFrom = infoPtr->hwndSelf;
   nmhdr.idFrom   = ::GetWindowLongPtr(infoPtr->hwndSelf, GWLP_ID);
   nmhdr.code     = NM_RELEASEDCAPTURE;
-
   SendMessageW(infoPtr->hwndNotify, WM_NOTIFY, nmhdr.idFrom, (LPARAM)&nmhdr);
-
-  if(!(infoPtr->status & MC_SEL_LBUTDOWN)) return 0;
-
+#endif
   ht.cbSize = sizeof(MCHITTESTINFO);
   ht.pt.x = (short)LOWORD(lParam);
   ht.pt.y = (short)HIWORD(lParam);
   hit = MONTHCAL_HitTest(infoPtr, &ht);
-
+  sel_month = infoPtr->focusedSel.wMonth;
+  sel_day = infoPtr->focusedSel.wDay;
   infoPtr->status = MC_SEL_LBUTUP;
   MONTHCAL_SetDayFocus(infoPtr, NULL);
+
+  NMSELCHANGEEX nmsc;
+  nmsc.nmhdr.hwndFrom = infoPtr->hwndSelf;
+  nmsc.nmhdr.idFrom = ::GetWindowLongPtr(infoPtr->hwndSelf, GWLP_ID);
+  nmsc.nmhdr.code = MCN_SELECT;
+  nmsc.selectionInfo = infoPtr->selectionInfo;
+  SendMessageW(infoPtr->hwndNotify, WM_NOTIFY, nmsc.nmhdr.idFrom, (LPARAM)&nmsc);
+
+  if (!(infoPtr->status & MC_SEL_LBUTDOWN))
+      return 0;
 
   return 0;
 }

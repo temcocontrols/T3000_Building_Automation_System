@@ -23,7 +23,7 @@ CString Range_Units[15] =
     _T("NO USE"),
     _T("0-5V"),
     _T("0-10V"),
-    _T("0-20 ma"),
+    _T("4-20 ma"),
     _T("Pulse Count (Fast 100Hz)")
 };
 

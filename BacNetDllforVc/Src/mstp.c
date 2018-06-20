@@ -138,7 +138,7 @@ static inline void printf_master(
 /* At 9600 baud, 60 bit times would be about 6.25 milliseconds */
 /* const uint16_t Tframe_abort = 1 + ((1000 * 60) / 9600); */
 #ifndef Tframe_abort
-#define Tframe_abort 95
+#define Tframe_abort 90 /*95*/
 #endif
 
 /* The maximum time a node may wait after reception of a frame that expects */
@@ -157,7 +157,6 @@ static inline void printf_master(
 /* larger values for this timeout, not to exceed 300 milliseconds.) */
 #ifndef Treply_timeout
 #define Treply_timeout 295
-//#define Treply_timeout 255 //lib default 295
 #endif
 
 /* The minimum time without a DataAvailable or ReceiveError event that a */
@@ -165,8 +164,7 @@ static inline void printf_master(
 /* a Poll For Master frame: 20 milliseconds. (Implementations may use */
 /* larger values for this timeout, not to exceed 100 milliseconds.) */
 #ifndef Tusage_timeout
-#define Tusage_timeout 95	
-//#define Tusage_timeout 20//Fance
+#define Tusage_timeout 95
 #endif
 
 /* we need to be able to increment without rolling over */
@@ -255,12 +253,12 @@ void MSTP_Receive_Frame_FSM(
     volatile struct mstp_port_struct_t *mstp_port)
 {
     MSTP_RECEIVE_STATE receive_state = mstp_port->receive_state;
-	printf_receive
-		("MSTP Rx: State=%s Data=%02X hCRC=%02X Index=%u EC=%u DateLen=%u Silence=%u\n",
-		mstptext_receive_state(mstp_port->receive_state),
-		mstp_port->DataRegister, mstp_port->HeaderCRC, mstp_port->Index,
-		mstp_port->EventCount, mstp_port->DataLength,
-		mstp_port->SilenceTimer((void *) mstp_port));
+    //printf_receive
+    //    ("MSTP Rx: State=%s Data=%02X hCRC=%02X Index=%u EC=%u DateLen=%u Silence=%u\n",
+    //    mstptext_receive_state(mstp_port->receive_state),
+    //    mstp_port->DataRegister, mstp_port->HeaderCRC, mstp_port->Index,
+    //    mstp_port->EventCount, mstp_port->DataLength,
+    //    mstp_port->SilenceTimer((void *) mstp_port));
     switch (mstp_port->receive_state) {
             /* In the IDLE state, the node waits for the beginning of a frame. */
         case MSTP_RECEIVE_STATE_IDLE:
@@ -290,7 +288,7 @@ void MSTP_Receive_Frame_FSM(
             /* In the PREAMBLE state, the node waits for the second octet of the preamble. */
         case MSTP_RECEIVE_STATE_PREAMBLE:
             /* Timeout */
-            if (mstp_port->SilenceTimer((void *) mstp_port) > Tframe_abort) {
+            if (mstp_port->SilenceTimer((void *) mstp_port) > Tframe_abort ) {
                 /* a correct preamble has not been received */
                 /* wait for the start of a frame. */
                 mstp_port->receive_state = MSTP_RECEIVE_STATE_IDLE;
@@ -400,8 +398,7 @@ void MSTP_Receive_Frame_FSM(
                         /* BadCRC */
                         /* indicate that an error has occurred during
                            the reception of a frame */
-                    //    mstp_port->ReceivedInvalidFrame = true;
-						OutputDebugString(L"ReceivedInvalidFrame \r\n");
+                        mstp_port->ReceivedInvalidFrame = true;
                         printf_receive_error
                             ("MSTP: Rx Header: BadCRC [%02X]\n",
                             mstp_port->DataRegister);
@@ -864,8 +861,6 @@ bool MSTP_Master_Node_FSM(
                 }
             } else {
                 /* SendMaintenancePFM */
-				Set_MSTP_Connect_Status(0);//Fance
-
                 mstp_port->Poll_Station = next_poll_station;
                 MSTP_Create_And_Send_Frame(mstp_port,
                     FRAME_TYPE_POLL_FOR_MASTER, mstp_port->Poll_Station,
@@ -884,7 +879,6 @@ bool MSTP_Master_Node_FSM(
                     /* Enter the IDLE state to process the frame. */
                     mstp_port->master_state = MSTP_MASTER_STATE_IDLE;
                     transition_now = true;
-					Set_MSTP_Connect_Status(1);//Fance
                 }
             } else {
                 if (mstp_port->RetryCount < Nretry_token) {
@@ -914,8 +908,6 @@ bool MSTP_Master_Node_FSM(
                     /* find a new successor to TS */
                     mstp_port->master_state =
                         MSTP_MASTER_STATE_POLL_FOR_MASTER;
-
-					Set_MSTP_Connect_Status(0);//Fance
                 }
             }
             break;
@@ -936,11 +928,7 @@ bool MSTP_Master_Node_FSM(
             } else {
                 ns_timeout =
                     Tno_token + (Tslot * (mstp_port->This_Station + 1));
-                mm_timeout =
-                    Tno_token + (Tslot * (mstp_port->Nmax_master + 1));
-                if ((mstp_port->SilenceTimer((void *) mstp_port) < ns_timeout)
-                    || (mstp_port->SilenceTimer((void *) mstp_port) >
-                        mm_timeout)) {
+                if (mstp_port->SilenceTimer((void *) mstp_port) < ns_timeout) {
                     /* GenerateToken */
                     /* Assume that this node is the lowest numerical address  */
                     /* on the network and is empowered to create a token.  */
@@ -978,11 +966,10 @@ bool MSTP_Master_Node_FSM(
             /* In the POLL_FOR_MASTER state, the node listens for a reply to */
             /* a previously sent Poll For Master frame in order to find  */
             /* a successor node. */
-            if (mstp_port->ReceivedValidFrame == true) 
-			{
+            if (mstp_port->ReceivedValidFrame == true) {
                 if ((mstp_port->DestinationAddress == mstp_port->This_Station)
-                    && (mstp_port->FrameType ==  FRAME_TYPE_REPLY_TO_POLL_FOR_MASTER)) 
-				{
+                    && (mstp_port->FrameType ==
+                        FRAME_TYPE_REPLY_TO_POLL_FOR_MASTER)) {
                     /* ReceivedReplyToPFM */
                     mstp_port->SoleMaster = false;
                     mstp_port->Next_Station = mstp_port->SourceAddress;
@@ -995,9 +982,7 @@ bool MSTP_Master_Node_FSM(
                     mstp_port->TokenCount = 0;
                     mstp_port->RetryCount = 0;
                     mstp_port->master_state = MSTP_MASTER_STATE_PASS_TOKEN;
-                } 
-				else 
-				{
+                } else {
                     /* ReceivedUnexpectedFrame */
                     /* An unexpected frame was received.  */
                     /* This may indicate the presence of multiple tokens. */
@@ -1007,13 +992,10 @@ bool MSTP_Master_Node_FSM(
                     transition_now = true;
                 }
                 mstp_port->ReceivedValidFrame = false;
-            } //Fance
-			else if ((mstp_port->SilenceTimer((void *) mstp_port) > Tusage_timeout) ||(mstp_port->ReceivedInvalidFrame == true)) 
-			//else if ((mstp_port->SilenceTimer((void *) mstp_port) > 20) ||(mstp_port->ReceivedInvalidFrame == true)) 
-			{
-				//Set_MSTP_Connect_Status(false);//Fance
-                if (mstp_port->SoleMaster == true) 
-				{
+            } else if ((mstp_port->SilenceTimer((void *) mstp_port) >
+                    Tusage_timeout) ||
+                (mstp_port->ReceivedInvalidFrame == true)) {
+                if (mstp_port->SoleMaster == true) {
                     /* SoleMaster */
                     /* There was no valid reply to the periodic poll  */
                     /* by the sole known master for other masters. */
@@ -1021,14 +1003,8 @@ bool MSTP_Master_Node_FSM(
                     /* mstp_port->TokenCount++; removed in 2004 */
                     mstp_port->master_state = MSTP_MASTER_STATE_USE_TOKEN;
                     transition_now = true;
-					//Set_MSTP_Connect_Status(true);//Fance
-
-                } 
-				else 
-				{
-					
-                    if (mstp_port->Next_Station != mstp_port->This_Station) 
-					{
+                } else {
+                    if (mstp_port->Next_Station != mstp_port->This_Station) {
                         /* DoneWithPFM */
                         /* There was no valid reply to the maintenance  */
                         /* poll for a master at address PS.  */
@@ -1039,11 +1015,8 @@ bool MSTP_Master_Node_FSM(
                             NULL, 0);
                         mstp_port->RetryCount = 0;
                         mstp_port->master_state = MSTP_MASTER_STATE_PASS_TOKEN;
-                    } 
-					else 
-					{
-                        if (next_poll_station != mstp_port->This_Station) 
-						{
+                    } else {
+                        if (next_poll_station != mstp_port->This_Station) {
                             /* SendNextPFM */
                             mstp_port->Poll_Station = next_poll_station;
                             /* Transmit a Poll For Master frame to PS. */
@@ -1053,9 +1026,7 @@ bool MSTP_Master_Node_FSM(
                                 mstp_port->This_Station, NULL, 0);
                             mstp_port->RetryCount = 0;
                             /* Re-enter the current state. */
-                        } 
-						else 
-						{
+                        } else {
                             /* DeclareSoleMaster */
                             /* to indicate that this station is the only master */
                             mstp_port->SoleMaster = true;
@@ -1076,7 +1047,7 @@ bool MSTP_Master_Node_FSM(
             /* FIXME: MSTP_Get_Reply waits for a matching reply, but
                if the next queued message doesn't match, then we
                sit here for Treply_delay doing nothing */
-        length = (unsigned) MSTP_Get_Reply(mstp_port, 0);
+            length = (unsigned) MSTP_Get_Reply(mstp_port, 0);
             if (length > 0) {
                 /* Reply */
                 /* If a reply is available from the higher layers  */
@@ -1145,7 +1116,7 @@ void MSTP_Slave_Node_FSM(
                     /* The ANSWER_DATA_REQUEST state is entered when a  */
                     /* BACnet Data Expecting Reply, a Test_Request, or  */
                     /* a proprietary frame that expects a reply is received. */
-             length = (unsigned) MSTP_Get_Reply(mstp_port, 0);
+                    length = (unsigned) MSTP_Get_Reply(mstp_port, 0);
                     if (length > 0) {
                         /* Reply */
                         /* If a reply is available from the higher layers  */

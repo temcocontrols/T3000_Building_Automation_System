@@ -1,0 +1,6 @@
+[submodule "T3000_CrossPlatform"]
+	path = T3000_CrossPlatform
+	url = https://github.com/temcocontrols/T3000_CrossPlatform.git
+[submodule "PartsAndVendors"]
+	path = PartsAndVendors
+	url = https://github.com/temcocontrols/PartsAndVendors.git

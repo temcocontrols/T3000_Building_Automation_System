@@ -5,7 +5,7 @@
 
 /T3000 Output
 /T3000 Output_VS2015
-
+# /.vs  <Need .vs in the repo for changes to the Visual Studio project files. 
 **/Thumbs.db
 
 **/Debug/
@@ -63,5 +63,9 @@
 /*.opendb
 /Psychrometric Tool/T3000 Output_VS2015
 /Psychrometric Tool/WFA_psychometric_chart/packages
->>>>>>> master
+
+
+>>>Ultraedit User interface and cache
 **/*.pui
+**/*.cache
+>>>>>>> 16f951e4dc1ccd60c5ad13a7476e318c452b6160

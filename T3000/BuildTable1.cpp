@@ -607,77 +607,36 @@ void CBuildTable1::OnEnKillfocusEdit9()
 
 void CBuildTable1::OnEnKillfocusEdit13()
 {
-	
-// 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
-// 	{
-// 		float ftemp;
-// 		CString strtxt;
-// 		GetDlgItem(IDC_EDIT13)->GetWindowText(strtxt);
-// 		ftemp=(float)_wtof(strtxt);
-// 
-// 		strtxt.Format(_T("%.1f"),ftemp);
-// 		GetDlgItem(IDC_EDIT13)->SetWindowText(strtxt);
-// 		ftemp=(float)_wtof(strtxt);
-// 		m_slider4_i=(int)(ftemp*10);
-// 	}
-// 	else
-// 	{
-		int ftemp;
-		CString strtxt;
-		GetDlgItem(IDC_EDIT13)->GetWindowText(strtxt);
-		ftemp=_wtoi(strtxt);
-		/*if (ftemp<0)
-		{
-			AfxMessageBox(_T("your input can not be negative"));
-			to_fresh();
-			return;
-		}*/
 
-		strtxt.Format(_T("%d"),ftemp);
-		GetDlgItem(IDC_EDIT13)->SetWindowText(strtxt);
-		ftemp=_wtoi(strtxt);
-		m_slider4_i=ftemp;
-	//}
+    int ftemp;
+    CString strtxt;
+    GetDlgItem(IDC_EDIT13)->GetWindowText(strtxt);
+    ftemp = _wtoi(strtxt);
 
-	refresh();
+    strtxt.Format(_T("%d"), ftemp);
+    GetDlgItem(IDC_EDIT13)->SetWindowText(strtxt);
+    ftemp = _wtoi(strtxt);
+    m_slider4_i = ftemp;
+
+
+    refresh();
 
 }
 
 void CBuildTable1::OnEnKillfocusEdit14()
 {
-	
-// 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION) 
-// 	{
-// 		float ftemp;
-// 		CString strtxt;
-// 		GetDlgItem(IDC_EDIT14)->GetWindowText(strtxt);
-// 		ftemp=(float)_wtof(strtxt);
-// 
-// 		strtxt.Format(_T("%.1f"),ftemp);
-// 		GetDlgItem(IDC_EDIT14)->SetWindowText(strtxt);
-// 		ftemp=(float)_wtof(strtxt);
-// 		m_slider5_i=(int)(ftemp*10);
-// 	}
-// 	else
-// 	{
-		int ftemp;
-		CString strtxt;
-		GetDlgItem(IDC_EDIT14)->GetWindowText(strtxt);
-		ftemp=_wtoi(strtxt);
-	/*	if (ftemp<0)
-		{
-			AfxMessageBox(_T("your input can not be negative"));
-			to_fresh();
-			return;
-		}*/
-		strtxt.Format(_T("%d"),ftemp);
-		GetDlgItem(IDC_EDIT14)->SetWindowText(strtxt);
-		ftemp=_wtoi(strtxt);
-		m_slider5_i=ftemp;
-	//}
 
-	//UpdateData();		
-	refresh();
+    int ftemp;
+    CString strtxt;
+    GetDlgItem(IDC_EDIT14)->GetWindowText(strtxt);
+    ftemp = _wtoi(strtxt);
+
+    strtxt.Format(_T("%d"), ftemp);
+    GetDlgItem(IDC_EDIT14)->SetWindowText(strtxt);
+    ftemp = _wtoi(strtxt);
+    m_slider5_i = ftemp;
+
+    refresh();
 }
 
 void CBuildTable1::OnEnKillfocusEdit15()

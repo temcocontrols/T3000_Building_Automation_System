@@ -82,14 +82,14 @@ void T36CT::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_MSFLEXGRID_INPUT2, m_msflexgrid_Ainput);
 	DDX_Control(pDX, IDC_EDIT_NAME, m_inNameEdt);
 	DDX_Control(pDX, IDC_RANGECOMBO, m_comboxRange);
-	DDX_Control(pDX, IDC_BRAUDRATECOMBO, m_brandrateBoxbox);
+	DDX_Control(pDX, IDC_BAUDRATECOMBO, m_brandrateBoxbox);
 }
 
 BEGIN_MESSAGE_MAP(T36CT, CFormView)
     ON_BN_CLICKED(IDC_CHANGEID, &T36CT::OnBnClickedChangeid)
    // ON_EN_KILLFOCUS(IDC_EDIT_NAME, &T36CT::OnEnKillfocusEditName)
     ON_CBN_SELCHANGE(IDC_RANGECOMBO, &T36CT::OnCbnSelchangeRangecombo)
-	ON_CBN_SELCHANGE(IDC_BRAUDRATECOMBO, &T36CT::OnCbnSelchangeBraudratecombo)
+	ON_CBN_SELCHANGE(IDC_BAUDRATECOMBO, &T36CT::OnCbnSelchangeBaudratecombo)
 	ON_WM_DESTROY()
 	ON_BN_CLICKED(IDC_BUTTON_RESET, &T36CT::OnBnClickedButtonReset)
 END_MESSAGE_MAP()
@@ -525,7 +525,7 @@ for(int i = 1;i<=6;i++)
     }
     else if (13==product_register_value[RANGE_INPUT1+i-1])
     {
-        strresult=_T("0-20 ma");
+        strresult=_T("4-20 ma");
     }
 
     m_msflexgrid_input.put_TextMatrix(i,2,strresult);
@@ -679,7 +679,7 @@ for(int i = 1;i<=10;i++)
     }
     else if (13==product_register_value[RANGE_INPUT7+i-1])
     {
-        strresult=_T("0-20 ma");
+        strresult=_T("4-20 ma");
     }
 
     m_msflexgrid_Ainput.put_TextMatrix(i,2,strresult);
@@ -880,7 +880,7 @@ void T36CT::ClickMsflexgridInput()
         m_comboxRange.AddString(_T("NO USE"));
         m_comboxRange.AddString(_T("0-5V"));
         m_comboxRange.AddString(_T("0-10V"));
-        m_comboxRange.AddString(_T("0-20 ma"));
+        m_comboxRange.AddString(_T("4-20 ma"));
 
         m_comboxRange.ShowWindow(SW_SHOW);
         m_comboxRange.BringWindowToTop();
@@ -956,7 +956,7 @@ void T36CT::ClickMsflexgridInput2()
         m_comboxRange.AddString(_T("NO USE"));
         m_comboxRange.AddString(_T("0-5V"));
         m_comboxRange.AddString(_T("0-10V"));
-        m_comboxRange.AddString(_T("0-20 ma"));
+        m_comboxRange.AddString(_T("4-20 ma"));
         m_comboxRange.ShowWindow(SW_SHOW);
         m_comboxRange.BringWindowToTop();
         m_comboxRange.SetFocus(); //»ñÈ¡½¹µã
@@ -1154,7 +1154,7 @@ void T36CT::OnCbnSelchangeRangecombo()
 }
 
 
-void T36CT::OnCbnSelchangeBraudratecombo()
+void T36CT::OnCbnSelchangeBaudratecombo()
 {
    int sel=m_brandrateBoxbox.GetCurSel();
    int bandrate;

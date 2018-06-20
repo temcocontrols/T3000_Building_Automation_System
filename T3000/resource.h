@@ -728,7 +728,7 @@
 #define IDC_CHECK56                     1130
 #define IDC_COMBO_TIMESERVERLIST2       1130
 #define IDC_COMBO_BACNET_SETTING_BAUDRATE2 1130
-#define IDC_BRAUDRATECOMBO              1131
+#define IDC_BAUDRATECOMBO              1131
 #define IDC_CHECK57                     1131
 #define IDC_COMBO_ENABLE_INOUTPUT       1131
 #define IDC_COMBO_TYPE_INOUTPUT         1131
@@ -1283,7 +1283,7 @@
 #define IDC_HARDWAREV_CO2_EDIT          1603
 #define IDC_SAVE2                       1603
 #define IDC_MBPOLL_GRID1                1603
-#define IDC_CO2_BRAUDRATECOMBO          1604
+#define IDC_CO2_BAUDRATECOMBO          1604
 #define IDC_LINE1                       1604
 #define IDC_MBPOLL_GRID2                1604
 #define IDC_CO2_ENABLEIDBUTTON          1605
@@ -2021,7 +2021,7 @@
 #define IDC_DATETIMEPICKER_DEBUG_TIME_DAY 2137
 #define IDC_TEMP_SENSOR                 2137
 #define IDC_DATETIMEPICKER_DEBUG_TIME_SECOND 2138
-#define IDC_STATIC_BRAUDRATE            2138
+#define IDC_STATIC_BAUDRATE            2138
 #define IDC_BUTTON_DEBUG_NUM_TO_TIME    2139
 #define IDC_SHOWID                      2139
 #define IDC_BUTTON_DEBUG_TIME_TO_NUM    2140

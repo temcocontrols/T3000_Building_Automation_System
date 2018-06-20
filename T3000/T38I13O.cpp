@@ -9,7 +9,7 @@
 #include "MainFrm.h"
 #include "WriteSingleRegDlg.h"
 #include "Dialog_Progess.h"
-CString Range_Unit[]={_T("RAW DATA"),_T("TYPE2 10K C"),_T("TYPE2 10K F"),_T("0-100%"),_T("ON/OFF"),_T("OFF/ON"),_T("Pulse Input"),_T("Lighting Control"),_T("TYPE3 10K C"),_T("TYPE3 10K F"),_T("NO USE"),_T("0-5V"),_T("0-10V"),_T("0-20ma")};
+CString Range_Unit[]={_T("RAW DATA"),_T("TYPE2 10K C"),_T("TYPE2 10K F"),_T("0-100%"),_T("ON/OFF"),_T("OFF/ON"),_T("Pulse Input"),_T("Lighting Control"),_T("TYPE3 10K C"),_T("TYPE3 10K F"),_T("NO USE"),_T("0-5V"),_T("0-10V"),_T("4-20ma")};
  
 #define  WM_FRESH_T38I13O WM_USER+1005
 DWORD WINAPI  _ReadMulti_T38I13ORegisters(LPVOID pParam){
@@ -477,7 +477,7 @@ for(int i = 1;i<=8;i++)
 	}
 	else if (13==product_register_value[RANGE_INPUT1+i-1])
 	{
-		strresult=_T("0-20 ma");
+		strresult=_T("4-20 ma");
 	}
 
 	m_msflexgrid_input.put_TextMatrix(i,3,strresult);
@@ -764,7 +764,7 @@ void T38I13O::ClickMsflexgridInput()
 		m_comboxRange.AddString(_T("NO USE"));
 		m_comboxRange.AddString(_T("0-5V"));
 		m_comboxRange.AddString(_T("0-10V"));
-		m_comboxRange.AddString(_T("0-20ma"));
+		m_comboxRange.AddString(_T("4-20ma"));
 
 		m_comboxRange.ShowWindow(SW_SHOW);
 
@@ -1439,7 +1439,7 @@ LRESULT T38I13O::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 						}
 						else if (13==product_register_value[RANGE_INPUT1+i-1])
 						{
-							strresult=_T("0-20 ma");
+							strresult=_T("4-20 ma");
 						}
 		
 						m_msflexgrid_input.put_TextMatrix(i,3,strresult);

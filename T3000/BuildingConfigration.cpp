@@ -1449,14 +1449,14 @@ void CBuildingConfigration::OnBnClickedBuildingButtonAdd()
     CString strIP;
     CString strIpPort;
     CString strCOMPort;
-    CString strCOMPortBraud;
+    CString strCOMPortBaud;
     strMainBuildName =  m_building_config_list.GetItemText(last_count,BC_MAINNAME);
 //	strSubBuildingName = m_building_config_list.GetItemText(last_count,BC_SUBNAME);
     strProtocol =  m_building_config_list.GetItemText(last_count,BC_PROTOCOL);
     strIP = m_building_config_list.GetItemText(last_count,BC_IPADDRESS);
     strIpPort = m_building_config_list.GetItemText(last_count,BC_IPPORT);
     strCOMPort = m_building_config_list.GetItemText(last_count,BC_COMPORT);
-    strCOMPortBraud = m_building_config_list.GetItemText(last_count,BC_BAUDRATE);
+    strCOMPortBaud = m_building_config_list.GetItemText(last_count,BC_BAUDRATE);
     if(strMainBuildName.IsEmpty())
     {
         MessageBox(_T("Warning!Main Building is empty!"));
@@ -1535,7 +1535,7 @@ void CBuildingConfigration::OnBnClickedBuildingButtonAdd()
             MessageBox(_T("Warning!Com port is empty!"));
             return;
         }
-        else if(strCOMPortBraud.IsEmpty())
+        else if(strCOMPortBaud.IsEmpty())
         {
             MessageBox(_T("Warning!Baudrate is empty!"));
             return;
@@ -1568,7 +1568,7 @@ void CBuildingConfigration::OnBnClickedBuildingButtonAdd()
     try
     {
         BOOL bDefault =FALSE;
-        strSql.Format(_T("insert into Building (Main_BuildingName,Building_Name,Protocal,Com_Port,Ip_Address,Ip_Port,Braudrate) values('"+strMainBuildName+"','"+strSubBuildingName+"','"+strProtocol+"','"+strCOMPort+"','"+strIP+"','"+strIpPort+"','"+strCOMPortBraud+"')"));
+        strSql.Format(_T("insert into Building (Main_BuildingName,Building_Name,Protocal,Com_Port,Ip_Address,Ip_Port,Braudrate) values('"+strMainBuildName+"','"+strSubBuildingName+"','"+strProtocol+"','"+strCOMPort+"','"+strIP+"','"+strIpPort+"','"+strCOMPortBaud+"')"));
         m_SqliteDBT3000.execDML((UTF8MBSTR)strSql);
     }
     catch(_com_error *e)
