@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "NetworkControllView.h"
-#include "global_function.h"
+#include "globle_function.h"
 #include "Weekly_Routines.h"
 #include "Annual_Routines.h"
 #include "Config_Routines.h"

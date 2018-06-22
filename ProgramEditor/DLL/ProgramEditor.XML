@@ -1,0 +1,227 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ProgramEditor</name>
+    </assembly>
+    <members>
+        <member name="T:T3000.Forms.SendEventHandler">
+            <summary>
+            Delegate to event handler Send
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="T:T3000.Forms.ProgramEditorForm">
+            <summary>
+            ProgramEditor Form
+            </summary>
+        </member>
+        <member name="P:T3000.Forms.ProgramEditorForm.Identifiers">
+            <summary>
+            Required copy of Control Points Labels just for semantic validations
+            </summary>
+        </member>
+        <member name="P:T3000.Forms.ProgramEditorForm.Caption">
+            <summary>
+            Form caption
+            </summary>
+        </member>
+        <member name="F:T3000.Forms.ProgramEditorForm.functions">
+            <summary>
+            Stack of recursive examined functions, counting subexpressions
+            </summary>
+        </member>
+        <member name="F:T3000.Forms.ProgramEditorForm.branches">
+            <summary>
+            Stack of recursive examined branches, counting subexpressions
+            </summary>
+        </member>
+        <member name="E:T3000.Forms.ProgramEditorForm.Send">
+            <summary>
+            Event Send
+            </summary>
+        </member>
+        <member name="M:T3000.Forms.ProgramEditorForm.OnSend(T3000.Forms.SendEventArgs)">
+            <summary>
+            Overridable OnSend Event Handler
+            </summary>
+        </member>
+        <member name="M:T3000.Forms.ProgramEditorForm.#ctor">
+            <summary>
+            Default constructor of ProgramEditorForm
+            Use: SetCode(string) to assign program code to Editor.
+            </summary>
+        </member>
+        <member name="M:T3000.Forms.ProgramEditorForm.GetNextLineNumber">
+            <summary>
+            Get next line number
+            </summary>
+            <returns>new line number (string)</returns>
+        </member>
+        <member name="M:T3000.Forms.ProgramEditorForm.LinesValidator">
+            <summary>
+            Try to renumber all lines and their references.
+            Show errors as semantic ones.
+            </summary>
+        </member>
+        <member name="M:T3000.Forms.ProgramEditorForm.SetCode(System.String)">
+            <summary>
+            Set code to EditBox, ProgramCode is automatically parsed. 
+            </summary>
+            <param name="code">String contaning plain text Control Basic with numbered lines {Not Bytes Encoded Programs}</param>
+        </member>
+        <member name="M:T3000.Forms.ProgramEditorForm.ClearCode">
+            <summary>
+            Clear editBox only.
+            If you want to update/clear the inner code, use SetCode
+            </summary>
+        </member>
+        <member name="M:T3000.Forms.ProgramEditorForm.ToString">
+            <summary>
+            Override of ToString -> GetCode
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:T3000.Forms.ProgramEditorForm.GetCode">
+            <summary>
+            Get current code
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:T3000.Forms.ProgramEditorForm.ParseCode(System.Boolean)">
+            <summary>
+            Forces parsing the code contained in EditTextBox
+            </summary>
+        </member>
+        <member name="M:T3000.Forms.ProgramEditorForm.ShowCompilerErrors">
+            <summary>
+            Updates Compile Errors Gridview
+            </summary>
+        </member>
+        <member name="M:T3000.Forms.ProgramEditorForm.gridCompileErrors_CellDoubleClick(System.Object,System.Windows.Forms.DataGridViewCellEventArgs)">
+            <summary>
+            Allows to position over token at selected error.
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:T3000.Forms.ProgramEditorForm.ShowSourcePosition(System.Int32,System.Int32)">
+            <summary>
+            Shows a caret in editTextBox for a selected token
+            </summary>
+            <param name="position"></param>
+            <param name="length"></param>
+        </member>
+        <member name="M:T3000.Forms.ProgramEditorForm.editTextBox_TextChangedDelayed(System.Object,FastColoredTextBoxNS.TextChangedEventArgs)">
+            <summary>
+            Parse code delayed after editing program.
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:T3000.Forms.ProgramEditorForm.RefreshCode">
+            <summary>
+            Refresh, reload assigned code into editBox
+            </summary>
+        </member>
+        <member name="M:T3000.Forms.ProgramEditorForm.LoadFile">
+            <summary>
+            Open file dialog to load a text file into editor
+            </summary>
+        </member>
+        <member name="M:T3000.Forms.ProgramEditorForm.cmdSend_Click(System.Object,System.EventArgs)">
+            <summary>
+            User call to SendCode event
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:T3000.Forms.ProgramEditorForm.SendCode">
+            <summary>
+            Triggers SendCode Event
+            </summary>
+        </member>
+        <member name="M:T3000.Forms.ProgramEditorForm.SaveFile">
+            <summary>
+            Open File dialog to save a copy of program code into a file.
+            </summary>
+        </member>
+        <member name="M:T3000.Forms.ProgramEditorForm.ProcessTokens">
+            <summary>
+            Pre-process tokens from parser
+            </summary>
+            <remarks>Expressions are converted to RPN</remarks>
+        </member>
+        <member name="M:T3000.Forms.ProgramEditorForm.GetExpression(System.Int32@,System.Boolean@)">
+            <summary>
+            Parse tokens from infix notation into postfix (RPN)
+            </summary>
+            <param name="Index">Start Index</param>
+            <param name="Cancel">Cancel processing because of at least one semantic error</param>
+            <returns>RPN Expression, ready to be encoded</returns>
+        </member>
+        <member name="F:T3000.Forms.ProgramEditorForm.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:T3000.Forms.ProgramEditorForm.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:T3000.Forms.ProgramEditorForm.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="T:T3000.Forms.SendEventArgs">
+            <summary>
+            Send Event Arguments
+            Code and tokens list
+            </summary>
+        </member>
+        <member name="M:T3000.Forms.SendEventArgs.#ctor(System.String,System.Collections.Generic.List{PRGReaderLibrary.Utilities.EditorTokenInfo})">
+            <summary>
+            Preprocessed token list, constructor
+            Usually receives a copy of token list from ProgramEditorForm
+            </summary>
+            <param name="code">Copy of plain text code</param>
+            <param name="tokens">Preprocessed Tokens List</param>
+        </member>
+        <member name="P:T3000.Forms.SendEventArgs.Code">
+            <summary>
+            Plain text code with numbered lines
+            </summary>
+        </member>
+        <member name="P:T3000.Forms.SendEventArgs.Tokens">
+            <summary>
+            List of Tokens
+            </summary>
+        </member>
+        <member name="M:T3000.Forms.SendEventArgs.ToString">
+            <summary>
+            Send EventArgs ToString() override
+            </summary>
+            <returns>string concatenation of all tokens</returns>
+        </member>
+        <member name="T:ProgramEditor.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:ProgramEditor.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:ProgramEditor.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+    </members>
+</doc>

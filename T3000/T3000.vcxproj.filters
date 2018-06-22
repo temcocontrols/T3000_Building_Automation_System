@@ -696,6 +696,9 @@
     <ClCompile Include="TstatIconSetting.cpp">
       <Filter>Source Files\TSTAT</Filter>
     </ClCompile>
+        <ClCompile Include="NewT3000ProgramEditorDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ApplyDisable.bmp">
@@ -1790,6 +1793,10 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TstatIconSetting.h">
+       <ClInclude Include="NewT3000ProgramEditorDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
