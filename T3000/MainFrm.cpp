@@ -464,16 +464,24 @@ UINT _ReadMultiRegisters(LPVOID pParam)
             Sleep(10);
             continue;
         }
+        if ((g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
+        {
+            Sleep(5000);
+            continue;
+        }
+
         bFirst=FALSE;
         WaitForSingleObject(Read_Mutex,INFINITE);
 
-        int nRet =read_one(g_tstat_id,6,2);
 
-        if(nRet<0)
-        {
-            ReleaseMutex(Read_Mutex);//Add by Fance .
-            continue;
-        }
+
+        //int nRet =read_one(g_tstat_id,6,2);
+
+        //if(nRet<0)
+        //{
+        //    ReleaseMutex(Read_Mutex);//Add by Fance .
+        //    continue;
+        //}
 
         for(int i=0; i<17; i++) //Modify by Fance , tstat 6 has more register than 512;
         {
@@ -2055,7 +2063,11 @@ void CMainFrame::LoadProductFromDB()
 
 						m_product_temp.BuildingInfo=m_subNetLst.at(m_nCurSubBuildingIndex);
 						//20120423
-						if(((strSql.CompareNoCase(_T("19200")) == 0)) || (strSql.CompareNoCase(_T("9600")) == 0) || ((strSql.CompareNoCase(_T("38400")) == 0)))
+						if(((strSql.CompareNoCase(_T("19200")) == 0)) || 
+                            (strSql.CompareNoCase(_T("9600")) == 0) || 
+                            (strSql.CompareNoCase(_T("38400")) == 0) ||
+                            (strSql.CompareNoCase(_T("57600")) == 0) ||
+                            (strSql.CompareNoCase(_T("115200")) == 0))
 						{
 							m_product_temp.BuildingInfo.strIp.Empty();
 							m_product_temp.BuildingInfo.strBaudRate = strSql;
@@ -4730,36 +4742,45 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 		 memset(program_code[z],0,2000);		 //清零;
 		 for (int x=0;x<5;x++)
 		 {
-			 int send_status = true;
-			 int resend_count = 0;
-			 int temp_invoke_id = -1;
-			 do 
-			 {
-				 resend_count ++;
-				 if(resend_count>RESEND_COUNT)
-					 goto read_end_thread;
-				 temp_invoke_id = GetProgramData(g_bac_instance,z,z,x);
-				 Sleep(SEND_COMMAND_DELAY_TIME);
-			 } while (temp_invoke_id<0);
+             for (int z = 0;z < 3;z++) //重试次数
+             {
+
+                 int send_status = true;
+                 int resend_count = 0;
+                 int temp_invoke_id = -1;
+                 do
+                 {
+                     resend_count++;
+                     if (resend_count > RESEND_COUNT)
+                     {
+                         send_status = false;
+                         Sleep(200);
+                         break;
+                         //goto read_end_thread;
+                     }
+                     temp_invoke_id = GetProgramData(g_bac_instance, z, z, x);
+                     Sleep(SEND_COMMAND_DELAY_TIME * 2);
+                 } while (temp_invoke_id < 0);
 
 
-			 if(send_status)
-			 {
-				 for (int i=0;i<3000;i++)
-				 {
-					 Sleep(1);
-					 if(tsm_invoke_id_free(temp_invoke_id))
-					 {
-						  read_success_count ++ ;
-						 goto	read_program_part_success;
-					 }
-				 }
-				 Mession_ret.Format(_T("Read program code %d part %d timeout."),z,x);
-				 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
-				 goto read_end_thread;
+                 if (send_status)
+                 {
+                     for (int i = 0;i < 3000;i++)
+                     {
+                         Sleep(2);
+                         if (tsm_invoke_id_free(temp_invoke_id))
+                         {
+                             read_success_count++;
+                             goto	read_program_part_success;
+                         }
+                     }
+                     Sleep(500);
+                 }
+             }
+             Mession_ret.Format(_T("Read program code %d part %d timeout."), z, x); //如果重试3次都失败就跳转至 失败;
+             SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+             goto read_end_thread;
 
-
-			 }
 			 read_program_part_success:
 
 			  g_progress_persent = read_success_count * 100 /read_total_count;
@@ -6374,10 +6395,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				hLastTreeItem = hSelItem;
 			}
 
-			m_pTreeViewCrl->SetSelectItem(hTreeItem);//在线的时候才将颜色变红;
-			m_pTreeViewCrl->SetSelectSerialNumber(product_Node.serial_number);
-			g_selected_serialnumber = m_product.at(i).serial_number;
-			g_bac_instance = NULL;
+
 
 			g_llTxCount = g_llTxCount + 1;
             int Scan_Product_ID=m_product.at(i).product_class_id;
@@ -6390,6 +6408,12 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             int nTRet=-1;
             //g_tstat_id=m_product.at(i).product_id;
             product_Node=m_product.at(i);
+
+            m_pTreeViewCrl->SetSelectItem(hTreeItem);//在线的时候才将颜色变红;
+            m_pTreeViewCrl->SetSelectSerialNumber(product_Node.serial_number);
+            g_selected_serialnumber = product_Node.serial_number;
+            g_bac_instance = NULL;
+
             selected_product_index = i;//记录目前选中的是哪一个 产品;用于后面自动更新firmware;
             selected_tree_item = hTreeItem;
             Statuspanel.Empty();
@@ -6420,7 +6444,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             //if(1)//GSM  模块
             if((m_product.at(i).protocol != MODBUS_BACNET_MSTP) && (m_product.at(i).protocol != PROTOCOL_GSM) && (m_product.at(i).protocol != PROTOCOL_REMOTE_IP)&&(m_product.at(i).protocol!=MODBUS_RS485))
             {
-                if(!m_product.at(i).BuildingInfo.strIp.IsEmpty())
+                if((!m_product.at(i).BuildingInfo.strIp.IsEmpty()) && (m_product.at(i).protocol != PROTOCOL_MSTP_TO_MODBUS))
                 {
 
                     CScanDlg scandlg;
@@ -6830,7 +6854,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 			HideBacnetWindow();
 
-            if((m_product.at(i).protocol != PROTOCOL_MSTP_TP_MODBUS) && (m_product.at(i).protocol != MODBUS_BACNET_MSTP))
+            if((m_product.at(i).protocol != PROTOCOL_MSTP_TO_MODBUS) && (m_product.at(i).protocol != MODBUS_BACNET_MSTP))
                 close_bac_com();
 
             //************************************
@@ -6874,8 +6898,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 {
                     strTemp.Format(_T("Connect\n"));
                     TRACE(strTemp);
-                    if ((product_Node.protocol != PROTOCOL_MSTP_TP_MODBUS) && (product_Node.protocol != MODBUS_BACNET_MSTP))
-                          ConnectDevice(product_Node);//ConnectSubBuilding(product_Node.BuildingInfo);
+                    if ((product_Node.protocol != PROTOCOL_MSTP_TO_MODBUS) && (product_Node.protocol != MODBUS_BACNET_MSTP))
+                        ConnectDevice(product_Node);//ConnectSubBuilding(product_Node.BuildingInfo);
+                    else
+                        g_CommunicationType = 0;
                    // SetLastCommunicationType(1); //不可理解为什么要这么做，屏蔽 by 杜帆 06 03 31;
 					ip=product_Node.BuildingInfo.strIp;
 					ipport.Format(_T("%d"),product_Node.ncomport);
@@ -7021,12 +7047,30 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     }
                 }
             }
-
-            m_strCurSubBuldingName=product_Node.BuildingInfo.strBuildingName;
-            BOOL bOnLine=FALSE;
-            UINT nSerialNumber=0;
+            m_strCurSubBuldingName = product_Node.BuildingInfo.strBuildingName;
+            BOOL bOnLine = FALSE;
+            UINT nSerialNumber = 0;
             int Device_Type = 0;
             unsigned short read_data[10];
+
+            if (product_Node.protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)
+            {
+                if (initial_bip == false)
+                {
+                    Initial_bac(0, product_Node.NetworkCard_Address);
+                    initial_bip = true;
+                    Sleep(50);
+                    Send_WhoIs_Global(-1, -1);
+                    Sleep(50);
+                }
+                g_mstp_deviceid = product_Node.object_instance;
+                Device_Type = product_Node.product_class_id;
+                g_protocol = PROTOCOL_BIP_T0_MSTP_TO_MODBUS;
+                goto start_read_reg_data;
+            }
+              
+
+
             if (g_CommunicationType==0)
             {
                 //m_nbaudrat=_wtoi(product_Node.BuildingInfo.strBaudRate);
@@ -7035,9 +7079,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 if ((m_nbaudrat !=9600 ) && (m_nbaudrat !=19200) && (m_nbaudrat != 38400)&& (m_nbaudrat != 57600)&& (m_nbaudrat != 115200))
                     m_nbaudrat = 19200;
                 Change_BaudRate(m_nbaudrat);
-                if (product_Node.protocol == PROTOCOL_MSTP_TP_MODBUS)
+                if (product_Node.protocol == PROTOCOL_MSTP_TO_MODBUS)
                 {
-                    g_protocol = PROTOCOL_MSTP_TP_MODBUS;
+                    g_protocol = PROTOCOL_MSTP_TO_MODBUS;
                     g_mstp_deviceid = product_Node.object_instance;
                     Initial_bac(product_Node.ncomport, _T(""), product_Node.baudrate);
 
@@ -7229,15 +7273,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 }
                 return;
             }
-            /*
-            Comment by:Alex
-            Date:2013/04/10
-            Purpose:
-            这个的目的的当是通过TCP连接的时候，把读到的寄存器读到
-            multi_register_value_tcp
-            适用于网络口，大数据量
-            */
-            //Device_Type=read_one(g_tstat_id,7,10);
+
+start_read_reg_data:
+
             CString achive_file_path;
             CString temp_serial;
             temp_serial.Format(_T("%u.prog"),g_selected_serialnumber);
@@ -7306,10 +7344,6 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 }
                 else if(Device_Type > 0)
                 {
-                    int Use_zigee = 0;
-                    int power_value = 1;
-					
-					
                     int length = 10;
                     nFlag = Device_Type;
                     int it = 0;
@@ -7353,22 +7387,14 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
                     if(product_type == T3000_6_ADDRESS)
                     {
-						Use_zigee= read_one(g_tstat_id,120,5);
-						power_value = 1;
-						if (Use_zigee == 1)
-						{
-							/*power_value = 4;
-							length = 10;*/
-						}
-                        
                         register_critical_section.Lock();
                         int i;
                         it =0;
                         float progress;
-                        for(i=0; i<(length*power_value); i++)	//暂定为0 ，因为TSTAT6 目前为600多
+                        for(i=0; i<(length); i++)	//暂定为0 ，因为TSTAT6 目前为600多
                         {
                             int itemp = 0;
-                            itemp = Read_Multi(g_tstat_id,&multi_register_value[i*(100/power_value)],i*(100/power_value),100/power_value,5);
+                            itemp = Read_Multi(g_tstat_id,&multi_register_value[i*100],i*100,100,5);
                             if(itemp < 0)
                             {
                                 break;
@@ -7377,13 +7403,13 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             {
                                 if (pDlg!=NULL)
                                 {
-                                    progress=float((it+1)*(100/(9*power_value)));
+                                    progress=float((it+1)*(100/9));
                                     //pDlg->ShowProgress(int(progress),int(progress));
                                     g_progress_persent = progress;
                                 }
                             }
                             it++;
-                            Sleep(20 * power_value);
+                            Sleep(20);
                         }
                         g_tstat_id_changed=FALSE;
                         register_critical_section.Unlock();
@@ -7392,15 +7418,15 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     else if (product_type == T3000_T3_MODULES)
                     {
                         length =4;
-                        power_value = 1;
+                        //power_value = 1;
                         register_critical_section.Lock();
                         int i;
                         it =0;
                         float progress;
-                        for(i=0; i<(length*power_value); i++)	//暂定为0 ，因为TSTAT6 目前为600多
+                        for(i=0; i<length; i++)	//暂定为0 ，因为TSTAT6 目前为600多
                         {
                             int itemp = 0;
-                            itemp = Read_Multi(g_tstat_id,&multi_register_value[i*(100/power_value)],i*(100/power_value),100/power_value,5);
+                            itemp = Read_Multi(g_tstat_id,&multi_register_value[i*100],i*100,100,5);
                             if(itemp < 0)
                             {
                                 break;
@@ -7409,29 +7435,29 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             {
                                 if (pDlg!=NULL)
                                 {
-                                    progress=float((it+1)*(100/(length*power_value)));
+                                    progress=float((it+1)*(100/length));
                                     //pDlg->ShowProgress(int(progress),int(progress));
                                     g_progress_persent = progress;
                                 }
                             }
                             it++;
-                            Sleep(20 * power_value);
+                            Sleep(20 );
                         }
                         g_tstat_id_changed=FALSE;
                         register_critical_section.Unlock();
                     }
                     else
                     {
-                        power_value = 1;
+                        //power_value = 1;
                         length = 9;
                         register_critical_section.Lock();
                         int i;
 						it = 0;
                         float progress;
-                        for(i=0; i<(length*power_value); i++)	 
+                        for(i=0; i<length; i++)	 
                         {
                             int itemp = 0;
-                            itemp = Read_Multi(g_tstat_id,&multi_register_value[i*(100/power_value)],i*(100/power_value),100/power_value,5);
+                            itemp = Read_Multi(g_tstat_id,&multi_register_value[i*100],i*100,100,5);
                             if(itemp < 0)
                             {
                                 break;
@@ -7440,13 +7466,13 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             {
                                 if (pDlg!=NULL)
                                 {
-                                    progress=float((it+1)*(100/(9*power_value)));
+                                    progress=float((it+1)*(100/9));
                                     //pDlg->ShowProgress(int(progress),int(progress));
                                     g_progress_persent = progress;
                                 }
                             }
                             it++;
-                            Sleep(20 * power_value);
+                            Sleep(20);
                         }
                         g_tstat_id_changed=FALSE;
                         register_critical_section.Unlock();
@@ -8294,7 +8320,8 @@ end_condition :
 
 
     }
-
+    unsigned short mstp_array[1000];
+    int nret_read_bac = 0;
 
 	CppSQLite3DB SqliteDBBuilding;
 	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
@@ -8329,6 +8356,11 @@ end_condition :
         str_panel_number.Format(_T("%u"),m_refresh_net_device_data.at(y).panal_number);
         if(db_exsit)	//数据库存在，就查看是否要更新;
         {
+            //如果是BIP 转MSTP 对已经存在的 不作刷新动作;  //需解决的问题是 已经存在的 子设备 如何刷新？
+            if (m_refresh_net_device_data.at(y).nprotocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)
+            {
+                continue;
+            }
             if((m_refresh_net_device_data.at(y).ip_address.CompareNoCase(m_product.at(n_index).BuildingInfo.strIp) != 0) ||
                     (m_refresh_net_device_data.at(y).NetCard_Address.CompareNoCase(m_product.at(n_index).NetworkCard_Address) != 0) ||
                     (m_refresh_net_device_data.at(y).nport != m_product.at(n_index).ncomport) ||
@@ -8505,6 +8537,24 @@ end_condition :
 				temp_pro3.Format(_T("%u"),PROTOCOL_BACNET_IP);
 				strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('"+m_strCurMainBuildingName+"','"+m_strCurSubBuldingName+"','"+NetwordCard_Address+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','""','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','"+str_hw_version+"','"+str_fw_version+"','"+str_n_port+"','0','"+temp_pro3+"','1','"+str_parents_serial +"' ,'"+str_panel_number +"' ,'"+str_object_instance +"' ,'"+is_custom +"' )"));
 			}
+            else if (m_refresh_net_device_data.at(y).nprotocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)
+            {
+                if (initial_bip == true)
+                {
+                    nret_read_bac = GetPrivateBacnetToModbusData(m_refresh_net_device_data.at(y).object_instance, 0, 100, mstp_array);
+                    if (nret_read_bac == 100)
+                    {
+                        product_class_id.Format(_T("%d"), mstp_array[7]);
+                        //序列号这里肯定还有问题 ，因为客户的instance 可能会认为更改;
+                        //str_serialid.Format(_T("%u"), mstp_array[0] + mstp_array[1] * 256 + mstp_array[2] * 256 * 256 + mstp_array[3] * 256 * 256 * 256);
+                        CString temp_pro4;
+                        temp_pro4.Format(_T("%u"), PROTOCOL_BIP_T0_MSTP_TO_MODBUS);
+                        strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('" + m_strCurMainBuildingName + "','" + m_strCurSubBuldingName + "','" + NetwordCard_Address + "','" + str_serialid + "','floor1','room1','" + product_name + "','" + product_class_id + "','" + modbusid + "','""','" + str_ip_address + "','T3000_Default_Building_PIC.bmp','" + str_hw_version + "','" + str_fw_version + "','" + str_n_port + "','0','" + temp_pro4 + "','1','" + str_parents_serial + "' ,'" + str_panel_number + "' ,'" + str_object_instance + "' ,'" + is_custom + "' )"));
+                    }
+
+                }
+
+            }
             else
 			{
 				CString temp_pro4;
@@ -8545,10 +8595,10 @@ end_condition :
 			composite_serial = composite_serial + temp1;
 		}
         //将回复 协议不是1 的 网络设备  状态设置为 offline. 
-		strUpdateSql.Format(_T("update ALL_NODE set Online_Status = 0 where Serial_ID not in (%s) and protocol = 1"), composite_serial);
+		strUpdateSql.Format(_T("update ALL_NODE set Online_Status = 0 where Serial_ID not in (%s) and (protocol = 1  or protocol = %d )"), composite_serial, PROTOCOL_BIP_T0_MSTP_TO_MODBUS);
 		SqliteDBBuilding.execDML((UTF8MBSTR)strUpdateSql);
 
-        strUpdateSql.Format(_T("update ALL_NODE set Online_Status = 1 where Serial_ID in (%s) and protocol = 1"), composite_serial);
+        strUpdateSql.Format(_T("update ALL_NODE set Online_Status = 1 where Serial_ID in (%s) and (protocol = 1 or protocol = %d)"), composite_serial, PROTOCOL_BIP_T0_MSTP_TO_MODBUS);
         SqliteDBBuilding.execDML((UTF8MBSTR)strUpdateSql);
 	}
 
@@ -10085,7 +10135,7 @@ void CMainFrame::OnControlInputs()
 {
     g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
 
-    //if (g_protocol == PROTOCOL_MSTP_TP_MODBUS)
+    //if (g_protocol == PROTOCOL_MSTP_TO_MODBUS)
     //{
     //    hide_485_progress = false;
     //    ::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, bacnet_device_type, BAC_IN);//第二个参数 In
@@ -10095,7 +10145,19 @@ void CMainFrame::OnControlInputs()
     //    return;
     //}
 
-    if((g_protocol == PROTOCOL_MSTP_TP_MODBUS) ||
+    if (product_type == CS3000 || product_register_value[7] == PM_TSTAT6 || product_register_value[7] == PM_TSTAT5i || product_register_value[7] == PM_TSTAT7 || product_register_value[7] == PM_TSTAT8
+        || (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V))
+    {
+
+        SwitchToPruductType(DLG_DIALOG_TSTAT_INPUT_VIEW);
+        bacnet_view_number = TYPE_INPUT;
+        global_interface = BAC_IN;
+        return;
+    }
+
+
+    if( (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS) ||
+        (g_protocol == PROTOCOL_MSTP_TO_MODBUS) ||
         (g_protocol == PROTOCOL_BACNET_IP) || 
 		 (g_protocol == MODBUS_BACNET_MSTP) || 
 		 (g_protocol == PROTOCOL_BIP_TO_MSTP)||
@@ -10191,7 +10253,7 @@ void CMainFrame::OnControlInputs()
         {
             Create_Thread_Read_Item(TYPE_INPUT);
         }
-		else if((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP) || (g_protocol == PROTOCOL_MSTP_TP_MODBUS))
+		else if((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS))
 		{
 			hide_485_progress = false;
 			::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, bacnet_device_type, BAC_IN);//第二个参数 In
@@ -10210,12 +10272,12 @@ void CMainFrame::OnControlInputs()
             AfxMessageBox(_T("NO Connection,Please connect your device frist!"));
             return;
         }
-        if (product_type==CS3000||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8
-			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V))
-        {
+   //     if (product_type==CS3000||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8
+			//|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V))
+   //     {
 
-            SwitchToPruductType(DLG_DIALOG_TSTAT_INPUT_VIEW);
-        }
+   //         SwitchToPruductType(DLG_DIALOG_TSTAT_INPUT_VIEW);
+   //     }
         else if (product_type == T3000_T3_MODULES )
         {
             SwitchToPruductType(DLG_DIALOG_T3_INPUTS_VIEW);
@@ -10296,8 +10358,18 @@ void CMainFrame::OnControlPrograms()
 void CMainFrame::OnControlOutputs()
 {
     g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
+
+    if (product_type == T3000_6_ADDRESS || product_register_value[7] == PM_CS_RSM_AC || product_register_value[7] == PM_CS_RSM_DC)
+    {
+        SwitchToPruductType(DLG_DIALOG_TSTAT_OUTPUT_VIEW);
+        bacnet_view_number = TYPE_OUTPUT;
+        global_interface = BAC_OUT;
+        return;
+    }
+
 	// new_device_support_mini_ui  主要是为了支持 旧版本的T3进入以前的界面;
-    if ((g_protocol == PROTOCOL_MSTP_TP_MODBUS) ||
+    if ((g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS) ||
+          (g_protocol == PROTOCOL_MSTP_TO_MODBUS) ||
           (g_protocol == PROTOCOL_BACNET_IP) || 
 		 (g_protocol == MODBUS_BACNET_MSTP) || 
 		 (g_protocol == PROTOCOL_BIP_TO_MSTP) || 
@@ -10392,7 +10464,7 @@ void CMainFrame::OnControlOutputs()
         {
             Create_Thread_Read_Item(TYPE_OUTPUT);
         }
-		else if((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP) || (g_protocol == PROTOCOL_MSTP_TP_MODBUS))
+		else if((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
 		{
 			::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
 			::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type,BAC_OUT);//第二个参数 OUT
@@ -10407,12 +10479,7 @@ void CMainFrame::OnControlOutputs()
     else
     {
 
-        if (product_type==T3000_6_ADDRESS||product_register_value[7]==PM_CS_RSM_AC||product_register_value[7]==PM_CS_RSM_DC)
-        {
-            SwitchToPruductType(DLG_DIALOG_TSTAT_OUTPUT_VIEW);
-            bacnet_view_number = TYPE_OUTPUT;
-        }
-        else if (product_type == T3000_T3_MODULES )
+        if (product_type == T3000_T3_MODULES )
         {
             SwitchToPruductType(DLG_DIALOG_T3_OUTPUTS_VIEW);
             bacnet_view_number = TYPE_OUTPUT;

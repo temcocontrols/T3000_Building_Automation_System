@@ -326,6 +326,7 @@
     <ClCompile Include="TrendLogView.cpp" />
     <ClCompile Include="TrendLogWnd.cpp" />
     <ClCompile Include="TroubleShootDlg.cpp" />
+    <ClCompile Include="TstatIconSetting.cpp" />
     <ClCompile Include="TStatInputView.cpp" />
     <ClCompile Include="TStatOutputView.cpp" />
     <ClCompile Include="TstatRangeDlg.cpp" />
@@ -633,6 +634,7 @@
     <ClInclude Include="TempHumSensorForm.h" />
     <ClInclude Include="TrendLogWnd.h" />
     <ClInclude Include="TroubleShootDlg.h" />
+    <ClInclude Include="TstatIconSetting.h" />
     <ClInclude Include="TStatInputView.h" />
     <ClInclude Include="TStatOutputView.h" />
     <ClInclude Include="TstatRangeDlg.h" />

@@ -213,7 +213,8 @@ const int PROTOCOL_BACNET_IP = 3;
 const int PROTOCOL_GSM = 4;
 const int PROTOCOL_REMOTE_IP = 6;
 const int PROTOCOL_BIP_TO_MSTP = 10;
-const int PROTOCOL_MSTP_TP_MODBUS = 11;
+const int PROTOCOL_MSTP_TO_MODBUS = 11;
+const int PROTOCOL_BIP_T0_MSTP_TO_MODBUS = 12;
 const int PROTOCOL_UNKNOW = 255;
 
 const int BAC_WAIT_NORMAL_READ = 0;
@@ -463,10 +464,15 @@ const int SCHEDULE_TIME_HOLIDAY2 = 9;
 const int WEEKLY_SCHEDULE_SIZE = 144;
 const int ANNUAL_CODE_SIZE = 46;
 
+const int HANDLE_I_AM_MSTP = 0;
+const int HANDLE_I_AM_BIP = 1;
+
 struct _Bac_Scan_Com_Info
 {
-	int device_id;
-	int macaddress;
+    int nprotocol;  // 0 MSTP     1 BIP
+    unsigned char ipaddress[6];   //前四位位IP地址  后两位位端口号
+    int device_id;
+    int macaddress;
 };
 struct _Bac_Scan_results_Info
 {
@@ -535,6 +541,7 @@ struct refresh_net_device
 	CString show_label_name;
 	unsigned short bacnetip_port;
     int zigbee_exsit;
+    int nprotocol;
 };
 
 struct refresh_net_label_info
@@ -748,6 +755,8 @@ const CString Output_Analog_Units_Show[] =
 	_T("%"),
 	_T("%Cls"),
 	_T("ma"),
+    _T("Volts"),
+    _T("%"),
 };
 
 const CString OutPut_List_Analog_Range[] =
@@ -759,7 +768,8 @@ const CString OutPut_List_Analog_Range[] =
 	_T("0.0 -> 100"),
 	_T("0.0 -> 100"),
 	_T("4   -> 20"),
-	_T("0.0 -> 100")
+	_T("0.0 -> 100"),
+    _T("2   -> 10"),
 };
 
 const CString OutPut_List_Analog_Units[] =
@@ -771,7 +781,8 @@ const CString OutPut_List_Analog_Units[] =
 	_T("%"),
 	_T("%Cls"),
 	_T("ma"),
-	_T("%PWM")
+	_T("%PWM"),
+    _T("%")
 };
 
 const CString Input_List_Analog_Units[] =
@@ -792,7 +803,7 @@ const CString Input_List_Analog_Units[] =
 	_T("ma"),
 	_T("psi"),
 	_T("counts"),
-	_T("FPM"),
+	_T("%(0-10V)"),
 	_T("%(0-5V)"),
 	_T("%(4-20ma)"),
 	_T("Volts"),
@@ -840,7 +851,7 @@ const CString Input_Analog_Units_Array[] =
 	_T("4 to 20"),
 	_T("4 to 20"),
 	_T("Pulse Count (Slow 1Hz)"),
-	_T("0.0 to 3000"),
+	_T("0 to 100"),
 	_T("0 to 100"),
 	_T("0 to 100"),
 	_T("0.0 to 10.0"),
@@ -878,7 +889,8 @@ const CString Output_Analog_Units_Array[] =
 	_T("0.0 -> 100  %"),
 	_T("0.0 -> 100  %Cls"),
 	_T("4   -> 20   ma"),
-	_T("0.0 -> 100  PWM")
+	_T("0.0 -> 100  PWM"),
+    _T("2   -> 10   Volts"),
 };
 
 const CString Time_Server_Name[] =
@@ -1962,6 +1974,7 @@ typedef union
 		UCHAR isp_mode;  //非0 在isp mode   , 0 在应用代码;    第60个字节
 		USHORT bacnetip_port;	//bacnet 的端口号;
 		UCHAR  zigbee_exsit;	// 1 代表有zigbee模块;
+        UCHAR  subnet_protocol;   //0 旧的 modbus   12 ： PROTOCOL_BIP_T0_MSTP_TO_MODBUS
 	}reg;
 }Str_UPD_SCAN;
 
@@ -1987,3 +2000,4 @@ const int SD_STATUS_NO = 1;
 const int SD_STATUS_NORMAL = 2;
 const int SD_STATUS_FILESYSTEM_ERROR = 3;
 
+typedef map<int, int> panelname_map;

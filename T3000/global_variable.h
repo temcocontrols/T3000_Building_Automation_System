@@ -1929,7 +1929,7 @@ vector <Str_controller_point> m_controller_data;
 vector <Control_group_point> m_screen_data;
 vector <Str_tstat_schedule> m_tatat_schedule_data;
 vector <Str_monitor_point> m_monitor_data;
-vector <_Bac_Scan_Com_Info> m_bac_scan_com_data;
+vector <_Bac_Scan_Com_Info> m_bac_handle_Iam_data;
 vector <_Bac_Scan_results_Info> m_bac_scan_result_data;
 vector <Alarm_point> m_alarmlog_data;
 vector <Str_TstatInfo_point> m_Tstat_data;
@@ -2223,5 +2223,8 @@ CString offline_prg_path;   //离线模式得prg 保存路径;
 bac_mstp_com g_mstp_com; // 全局mstp com 口 连接状态
 
 bool custom_bacnet_register_listview = true;
-
+bool initial_bip = false;
 Str_modbus_reg bacnet_to_modbus_struct;  //用于bacnet 协议转换为modbus 协议的结构
+
+
+panelname_map g_panelname_map;

@@ -1172,7 +1172,8 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 		BacnetRange dlg;
 
 
-        if (g_protocol != PROTOCOL_MSTP_TP_MODBUS) // MSTP_转MUDBUS 协议，因为10000以后没有自定义的CUSTOM 表;
+        if ((g_protocol != PROTOCOL_MSTP_TO_MODBUS) &&
+            (g_protocol != PROTOCOL_BIP_T0_MSTP_TO_MODBUS))// MSTP_转MUDBUS 协议，因为10000以后没有自定义的CUSTOM 表;
         {
             if (!read_customer_unit)//点击产品的时候 需要读custom units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
             {
@@ -1430,7 +1431,7 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 				PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
 				if((bac_select_device_online)&& (g_protocol == PROTOCOL_BACNET_IP))
 					Post_Refresh_Message(g_bac_instance,READINPUT_T3000,0,BAC_INPUT_ITEM_COUNT - 1,sizeof(Str_in_point), BAC_INPUT_GROUP);
-				else if((bac_select_device_online) && ((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP) || (g_protocol == PROTOCOL_MSTP_TP_MODBUS)))
+				else if((bac_select_device_online) && ((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)))
 				{
 					if(read_each_485_fun_thread == NULL)
 					{

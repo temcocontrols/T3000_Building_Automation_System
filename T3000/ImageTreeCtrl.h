@@ -52,8 +52,8 @@ cmdmap_t	m_Commandmap;
 public:
 BOOL UpdateDataToDB_Floor();
 BOOL UpdateDataToDB_Connect();
-void Inial_ProductName_map();
-int PanelName_Map(int product_type);
+//void Inial_ProductName_map();
+//int PanelName_Map(int product_type);
 bool CanInsertItem(HTREEITEM hItem);
 bool CanDeleteItem(HTREEITEM hItem);
 	virtual bool	CanEditLabel(HTREEITEM hItem);

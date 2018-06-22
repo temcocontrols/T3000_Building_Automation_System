@@ -308,6 +308,7 @@ void BacnetRange::Initial_static()
 			GetDlgItem(i)->ShowWindow(false);
 		}
 		GetDlgItem(IDC_RADIO_NEW200)->ShowWindow(false);
+        GetDlgItem(IDC_RADIO_NEW201)->ShowWindow(false);
 		
 		
 
@@ -371,6 +372,11 @@ void BacnetRange::Initial_static()
 				temp_cs.Format(_T("%d"),bac_range_number_choose + 30);
 				GetDlgItem(IDC_RADIO_NEW200)->SetFocus();
 			}
+            else if (bac_ranges_type == 8)
+            {
+                temp_cs.Format(_T("%d"), bac_range_number_choose + 30);
+                GetDlgItem(IDC_RADIO_NEW201)->SetFocus();
+            }
 
 		}
 		else
@@ -387,23 +393,32 @@ void BacnetRange::Initial_static()
 		for (int i=IDC_RADIO47;i<=IDC_RADIO53;i++)	//Output analog
 		{
 			CRect c2; 
-			GetDlgItem(i)->GetWindowRect(c2);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+			GetDlgItem(i)->GetWindowRect(c2);   
 			ScreenToClient(c2);  
-			GetDlgItem(i)->SetWindowPos(NULL,c2.left - 400,c2.top - 70,0,0,SWP_NOZORDER|SWP_NOSIZE);
+			GetDlgItem(i)->SetWindowPos(NULL,c2.left - 780,c2.top - 70,0,0,SWP_NOZORDER|SWP_NOSIZE);
 
 			GetDlgItem(i)->ShowWindow(true);
 		}
 		CRect temp_200; 
-		GetDlgItem(IDC_RADIO_NEW200)->GetWindowRect(temp_200);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+		GetDlgItem(IDC_RADIO_NEW200)->GetWindowRect(temp_200);   
 		ScreenToClient(temp_200);  
-		GetDlgItem(IDC_RADIO_NEW200)->SetWindowPos(NULL,temp_200.left - 400,temp_200.top - 70,0,0,SWP_NOZORDER|SWP_NOSIZE);
+		GetDlgItem(IDC_RADIO_NEW200)->SetWindowPos(NULL,temp_200.left - 780,temp_200.top - 70,0,0,SWP_NOZORDER|SWP_NOSIZE);
 		GetDlgItem(IDC_RADIO_NEW200)->ShowWindow(true);
+
+        CRect temp_201;
+        GetDlgItem(IDC_RADIO_NEW201)->GetWindowRect(temp_201);
+        ScreenToClient(temp_201);
+        GetDlgItem(IDC_RADIO_NEW201)->SetWindowPos(NULL, temp_201.left - 780, temp_201.top - 70, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+        GetDlgItem(IDC_RADIO_NEW201)->ShowWindow(true);
+
+
+
 
 		GetDlgItem(IDC_RADIO47)->ShowWindow(false);
 		for (int i=IDC_RADIO35;i<=IDC_RADIO46;i++)	//Digital
 		{
 			CRect c1; 
-			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+			GetDlgItem(i)->GetWindowRect(c1);   
 			ScreenToClient(c1);  
 			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 50,c1.top ,0,0,SWP_NOZORDER|SWP_NOSIZE);
 			GetDlgItem(i)->ShowWindow(true);
@@ -464,7 +479,7 @@ void BacnetRange::Initial_static()
 		CRect c3;
 		GetDlgItem(IDC_STATIC_ANALOG_UNITS)->GetWindowRect(c3);   
 		ScreenToClient(c3);  
-		GetDlgItem(IDC_STATIC_ANALOG_UNITS)->SetWindowPos(NULL,c3.left - 400,c3.top - 50,0,0,SWP_NOZORDER|SWP_NOSIZE);
+		GetDlgItem(IDC_STATIC_ANALOG_UNITS)->SetWindowPos(NULL,c3.left - 780,c3.top - 50,0,0,SWP_NOZORDER|SWP_NOSIZE);
 
 		CRect c2; 
 		GetDlgItem(IDC_STATIC_DIGITAL_UNITS)->GetWindowRect(c2);   
@@ -846,6 +861,11 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 				bac_ranges_type = OUTPUT_RANGE_ANALOG_TYPE;
 				click_radio = true;
 			}
+            else if (nfocusid == IDC_RADIO_NEW201)
+            {
+                bac_ranges_type = OUTPUT_RANGE_ANALOG_TYPE;
+                click_radio = true;
+            }
 			else if((nfocusid >= IDC_RADIO35) && (nfocusid <= IDC_RADIO46))
 			{
 					bac_ranges_type = INPUT_RANGE_DIGITAL_TYPE;
@@ -1068,6 +1088,11 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 				{
 					m_output_Analog_select = 7;
 				}
+
+                if (((CButton *)GetDlgItem(IDC_RADIO_NEW201))->GetCheck())
+                {
+                    m_output_Analog_select = 8;
+                }
 			}
 
 
@@ -1228,8 +1253,21 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 							GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowTextW(temp_cs_number);
 						}
 
-						CRect c4;
-						GetDlgItem(IDC_RADIO47 + m_output_Analog_select)->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+                        CRect c4;
+                        if (m_output_Analog_select <= 6)
+                        {
+                            GetDlgItem(IDC_RADIO47 + m_output_Analog_select)->GetWindowRect(c4);   
+                        }
+                        else if (m_output_Analog_select == 7)
+                        {
+                            GetDlgItem(IDC_RADIO_NEW200)->GetWindowRect(c4);   
+                        }
+                        else if (m_output_Analog_select == 8)
+                        {
+                            GetDlgItem(IDC_RADIO_NEW201)->GetWindowRect(c4);
+                        }
+						
+						
 						ScreenToClient(c4);  
 						m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 						m_rang_pic.Invalidate(TRUE);
@@ -1341,6 +1379,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 							((CButton *)GetDlgItem(i))->SetCheck(false);
 						}
 						((CButton *)GetDlgItem(IDC_RADIO_NEW200))->SetCheck(false);
+                        ((CButton *)GetDlgItem(IDC_RADIO_NEW201))->SetCheck(false);
 					}
 				}
 			
@@ -1535,6 +1574,7 @@ void BacnetRange::Timer2_handle()
 				((CButton *)GetDlgItem(i))->SetCheck(false);
 			}
 			((CButton *)GetDlgItem(IDC_RADIO_NEW200))->SetCheck(false);
+            ((CButton *)GetDlgItem(IDC_RADIO_NEW201))->SetCheck(false);
 
 			m_output_Analog_select = 0;
 			if(sel_value<=11)
@@ -1609,7 +1649,7 @@ void BacnetRange::Timer2_handle()
 				((CButton *)GetDlgItem(IDC_RADIO73 + sel_value - 23))->SetCheck(true);
 			}
 		}
-		else if(sel_value <= 37)
+		else if(sel_value <= 38)
 		{
 			bac_ranges_type = OUTPUT_RANGE_ANALOG_TYPE;
 			for (int i=IDC_RADIO35;i<=IDC_RADIO46;i++)
@@ -1635,10 +1675,19 @@ void BacnetRange::Timer2_handle()
 			{
 				((CButton *)GetDlgItem(i))->SetCheck(false);
 			}
-			if(sel_value == 37)
-				((CButton *)GetDlgItem(IDC_RADIO_NEW200))->SetCheck(true);
+            if (sel_value == 37)
+            {
+                ((CButton *)GetDlgItem(IDC_RADIO_NEW200))->SetCheck(true);
+            }
 			else
 				((CButton *)GetDlgItem(IDC_RADIO_NEW200))->SetCheck(false);
+
+            if (sel_value == 38)
+            {
+                ((CButton *)GetDlgItem(IDC_RADIO_NEW201))->SetCheck(true);
+            }
+            else
+                ((CButton *)GetDlgItem(IDC_RADIO_NEW201))->SetCheck(false);
 
 			((CButton *)GetDlgItem(IDC_RADIO47 + m_output_Analog_select))->SetCheck(true);
 		}
@@ -2014,3 +2063,6 @@ void BacnetRange::OnBnClickedRadio80()
 	
     UpdateCustomerRangeText();
 }
+
+
+

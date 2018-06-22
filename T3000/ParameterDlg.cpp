@@ -330,6 +330,7 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
         ON_EN_KILLFOCUS(IDC_EDIT_DTERM, &CParameterDlg::OnEnKillfocusEditDterm)
         ON_EN_KILLFOCUS(IDC_EDIT_SAMPLING_INTERVAL, &CParameterDlg::OnEnKillfocusEditSamplingInterval)
         ON_BN_CLICKED(IDC_BUTTON_PARAMETER_EXT, &CParameterDlg::OnBnClickedButtonParameterExt)
+        ON_BN_CLICKED(IDC_BUTTON_ICON_SETTING, &CParameterDlg::OnBnClickedButtonIconSetting)
         END_MESSAGE_MAP()
 
 	/// <summary>
@@ -381,6 +382,15 @@ BOOL CParameterDlg::OnInitDialog()
 
 	CDialog::OnInitDialog();
 
+    if (product_register_value[7] == PM_TSTAT7 ||
+        product_register_value[7] == PM_TSTAT8)
+    {
+        GetDlgItem(IDC_BUTTON_ICON_SETTING)->EnableWindow(TRUE);
+    }
+    else
+    {
+        GetDlgItem(IDC_BUTTON_ICON_SETTING)->EnableWindow(FALSE);
+    }
 
 	if (product_register_value[7] == PM_TSTAT8
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
@@ -5838,3 +5848,11 @@ void CParameterDlg::OnEnKillfocusEdit35()
 
 
 
+
+#include "TstatIconSetting.h"
+void CParameterDlg::OnBnClickedButtonIconSetting()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CTstatIconSetting dlg;
+    dlg.DoModal();
+}

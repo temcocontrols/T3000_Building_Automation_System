@@ -862,6 +862,10 @@ DWORD WINAPI UpdateDataThreadPro(LPVOID lPvoid)
         for (int i = 0;i<1000;i++)
         {
             Sleep(5);
+            if (ncontinue_read_data == false)
+            {
+                break;      //如果有按键触发 ，更新线程要立刻启动区刷新数据;
+            }
             if (!flag_continue_thread)
             {
                 updatedatathread = NULL;
