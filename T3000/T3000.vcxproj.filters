@@ -690,6 +690,9 @@
     <ClCompile Include="TemcoStandardBacnetToolDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="NewT3000ProgramEditorDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -1801,6 +1804,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TemcoStandardBacnetToolDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NewT3000ProgramEditorDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CProgramEditor0.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

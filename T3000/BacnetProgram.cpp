@@ -11,7 +11,7 @@
 #include "Bacnet_Include.h"
 #include "global_function.h"
 #include "BacnetProgramEdit.h"
-
+#include "NewT3000ProgramEditorDlg.h"
 #include "global_define.h"
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 
@@ -30,6 +30,7 @@ CBacnetProgram::CBacnetProgram(CWnd* pParent /*=NULL*/)
 {
 	program_list_line = 0;
 	window_max = true;
+	
 }
 
 CBacnetProgram::~CBacnetProgram()
@@ -56,6 +57,7 @@ BEGIN_MESSAGE_MAP(CBacnetProgram, CDialogEx)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST_PROGRAM, &CBacnetProgram::OnNMDblclkListProgram)
 	ON_WM_SIZE()
 	ON_WM_SYSCOMMAND()
+	ON_BN_CLICKED(IDC_BUTTON1, &CBacnetProgram::OnBnClickedButton1)
 END_MESSAGE_MAP()
 
 
@@ -108,6 +110,20 @@ LRESULT CBacnetProgram::OnHotKey(WPARAM wParam,LPARAM lParam)
 		}
 		OnBnClickedButtonProgramEdit();
 	}
+	if (wParam == KEY_INSERT_CONTROL)
+	{
+		for (int i = 0;i < m_program_list.GetItemCount();++i)
+		{
+			if (m_program_list.GetCellChecked(i, 0))
+			{
+				program_list_line = i;
+				break;
+			}
+		}
+		/*CNewT3000ProgramEditorDlg dlg;
+		dlg.DoModal();*/
+	}
+	
 	return 0;
 }
 
@@ -132,11 +148,13 @@ BOOL CBacnetProgram::OnInitDialog()
 void CBacnetProgram::Reg_Hotkey()
 {
 	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//Insert¼ü
+	RegisterHotKey(GetSafeHwnd(), KEY_INSERT_CONTROL, MOD_CONTROL , VK_INSERT);//Insert¼ü
 }
 
 void CBacnetProgram::Unreg_Hotkey()
 {
 	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
+	UnregisterHotKey(GetSafeHwnd(), KEY_INSERT_CONTROL);
 }
 
 void CBacnetProgram::Initial_List()
@@ -397,13 +415,21 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
+void CBacnetProgram::OnBnClickedButton1()
+{
+	CString temp_show_info;
+	temp_show_info.Format(_T("Reading program code %d ..."), program_list_line + 1);
+	SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_show_info);
 
+	CNewT3000ProgramEditorDlg dlg;
+	dlg.DoModal();
+}
 
 void CBacnetProgram::OnBnClickedButtonProgramEdit()
 {
 	
 
-
+ 
 	CString temp_show_info;
 	temp_show_info.Format(_T("Reading program code %d ..."),program_list_line + 1);
 	SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_show_info); 
@@ -567,7 +593,7 @@ BOOL CBacnetProgram::PreTranslateMessage(MSG* pMsg)
 
 		return 1; 
 	}
-
+	 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
@@ -699,6 +725,8 @@ void CBacnetProgram::OnSize(UINT nType, int cx, int cy)
 		m_program_list.MoveWindow(rc.left,rc.top,rc.Width(),rc.Height() - 80);
 
 		GetDlgItem(IDC_BUTTON_PROGRAM_EDIT)->MoveWindow(rc.left + 20 ,rc.bottom - 60 , 120,50);
+
+		GetDlgItem(IDC_BUTTON1)->MoveWindow(rc.left + 160, rc.bottom - 60, 200, 50);
 	}
 }
 
@@ -727,3 +755,6 @@ void CBacnetProgram::OnSysCommand(UINT nID, LPARAM lParam)
 
 	CDialogEx::OnSysCommand(nID, lParam);
 }
+
+
+

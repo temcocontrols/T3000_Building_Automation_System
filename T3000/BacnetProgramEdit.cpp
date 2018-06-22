@@ -348,7 +348,34 @@ LRESULT CBacnetProgramEdit::Fresh_Program_RichEdit(WPARAM wParam,LPARAM lParam)
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetWindowTextW(temp1);
 	m_edit_changed = false;
 	program_string = temp1;
+	
+	if (!program_string.IsEmpty())
+	{
+		CppSQLite3DB SqliteDBT3000;
+		CppSQLite3DB SqliteDBBuilding;
+		CppSQLite3Table table;
+		CppSQLite3Query q;
+		SqliteDBT3000.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+		CString strSql;
+		strSql.Format(_T("SELECT COUNT(*) FROM sqlite_master where type = 'table' and name = 'PRG_CODE'"));
+		q = SqliteDBT3000.execQuery((UTF8MBSTR)strSql);
+		if(q.eof()) {
+			strSql.Format(_T("CREATE TABLE PRG_CODE (Station_NUM INTEGER, program_list_line integer, CODE TEXT)"));
+			SqliteDBT3000.execDML((UTF8MBSTR)strSql);
+		}
+		 
+	 
+		strSql.Format(_T("Delete From PRG_CODE where Station_NUM=%d AND program_list_line=%d"), Station_NUM, program_list_line);
+		int test = SqliteDBT3000.execDML((UTF8MBSTR)strSql);
+		strSql.Format(_T("INSERT INTO PRG_CODE VALUES(%d,%d,'%s')"), Station_NUM, program_list_line, program_string);
+		test = SqliteDBT3000.execDML((UTF8MBSTR)strSql);
+		SqliteDBT3000.closedb();
+	}
+	 
+
+
 	UpdateDataProgramText();
+
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(-1,-1);
 	return 0;
 }
@@ -1194,6 +1221,7 @@ BOOL CBacnetProgramEdit::PreTranslateMessage(MSG* pMsg)
 		Run_once_mutex = false;
 		return TRUE;
 	}
+	
 	else if(pMsg->message == WM_KEYDOWN)
 	{
 		if(GetFocus())

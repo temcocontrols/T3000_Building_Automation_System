@@ -71,7 +71,6 @@ END
 
 IDR_HTML_OUTPUTTABLEDLG HTML                    "OutputTableDlg.htm"
 
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
@@ -477,6 +476,7 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,511,333,50,14,NOT WS_VISIBLE
     CONTROL         "",IDC_LIST_PROGRAM,"SysListView32",LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,4,15,551,293
     PUSHBUTTON      "Programming",IDC_BUTTON_PROGRAM_EDIT,10,314,71,33
+    PUSHBUTTON      "Programming[New Editor]",IDC_BUTTON1,86,313,79,34
 END
 
 IDD_DIALOG_BACNET_OUTPUT DIALOGEX 0, 0, 757, 445
@@ -2858,14 +2858,12 @@ BEGIN
     CONTROL         "",IDC_TCHECKBOX5,"{E21C6EB6-FEC9-4962-B2D5-1E904B33C3F8}",WS_TABSTOP,289,290,12,13
 END
 
-IDD_DIALOG16 DIALOGEX 0, 0, 309, 177
+IDD_DIALOG16 DIALOGEX 0, 0, 541, 297
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Dialog"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,198,156,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,252,156,50,14
-    CONTROL         "",IDC_TCHECKBOX1,"{E21C6EB6-FEC9-4962-B2D5-1E904B33C3F8}",WS_TABSTOP,82,42,60,25
+    CONTROL         "",IDC_FORMS1,"{E8789EA8-CA99-48DF-B920-1A1DCB4FF6AD}",WS_TABSTOP,0,0,541,297
 END
 
 IDD_DIALOG_MINIPANEL_GROUP_SCHEDULE DIALOGEX 0, 0, 465, 421
@@ -2904,6 +2902,13 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_T3000BACNETTOOL1,
                     "{52374044-6019-4885-B14B-21EBDD1AA6CA}",WS_TABSTOP,0,1,853,461
+END
+
+IDD_DIALOG_NEW_PROGRAMEDITOR DIALOGEX 0, 0, 565, 339
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "New Program Editor"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
 END
 
 
@@ -3782,9 +3787,7 @@ BEGIN
     IDD_DIALOG16, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 302
         TOPMARGIN, 7
-        BOTTOMMARGIN, 170
     END
 
     IDD_DIALOG_MINIPANEL_GROUP_SCHEDULE, DIALOG
@@ -3808,6 +3811,14 @@ BEGIN
 
     IDD_DIALOG_TEMCO_STANDARD_BACNET_TOOL, DIALOG
     BEGIN
+    END
+
+    IDD_DIALOG_NEW_PROGRAMEDITOR, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 558
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 332
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -6141,47 +6152,6 @@ BEGIN
     0
 END
 
-IDD_DIALOG16 DLGINIT
-BEGIN
-    IDC_TCHECKBOX1, 0x376, 618, 0
-0x0000, 0x0000, 0x0100, 0x0000, 0xff00, 0xffff, 0x01ff, 0x0000, 0x0000, 
-0x0000, 0x0400, 0x0001, 0x0000, 0x531c, 0x7379, 0x6574, 0x2e6d, 0x6f43, 
-0x6c6c, 0x6365, 0x6974, 0x6e6f, 0x2e73, 0x6148, 0x6873, 0x6174, 0x6c62, 
-0x0765, 0x0000, 0x0a00, 0x6f4c, 0x6461, 0x6146, 0x7463, 0x726f, 0x5607, 
-0x7265, 0x6973, 0x6e6f, 0x4308, 0x6d6f, 0x6170, 0x6572, 0x1072, 0x6148, 
-0x6873, 0x6f43, 0x6564, 0x7250, 0x766f, 0x6469, 0x7265, 0x4808, 0x7361, 
-0x5368, 0x7a69, 0x0465, 0x654b, 0x7379, 0x5606, 0x6c61, 0x6575, 0x0073, 
-0x0300, 0x0003, 0x0505, 0x080b, 0x531c, 0x7379, 0x6574, 0x2e6d, 0x6f43, 
-0x6c6c, 0x6365, 0x6974, 0x6e6f, 0x2e73, 0x4349, 0x6d6f, 0x6170, 0x6572, 
-0x2472, 0x7953, 0x7473, 0x6d65, 0x432e, 0x6c6f, 0x656c, 0x7463, 0x6f69, 
-0x736e, 0x492e, 0x6148, 0x6873, 0x6f43, 0x6564, 0x7250, 0x766f, 0x6469, 
-0x7265, 0xec08, 0x3851, 0x133f, 0x0000, 0x0a00, 0x250a, 0x0000, 0x0900, 
-0x0002, 0x0000, 0x0309, 0x0000, 0x1000, 0x0002, 0x0000, 0x0010, 0x0000, 
-0x0406, 0x0000, 0x0700, 0x4954, 0x6174, 0x696c, 0x0663, 0x0005, 0x0000, 
-0x4c08, 0x636f, 0x7461, 0x6f69, 0x066e, 0x0006, 0x0000, 0x540a, 0x6e55, 
-0x6564, 0x6c72, 0x6e69, 0x0665, 0x0007, 0x0000, 0x5408, 0x6261, 0x6e49, 
-0x6564, 0x0678, 0x0008, 0x0000, 0x4e04, 0x6d61, 0x0665, 0x0009, 0x0000, 
-0x5404, 0x7865, 0x0674, 0x000a, 0x0000, 0x5405, 0x6f42, 0x646c, 0x0b06, 
-0x0000, 0x0c00, 0x5354, 0x6f68, 0x5077, 0x6369, 0x7574, 0x6572, 0x0c06, 
-0x0000, 0x0a00, 0x6843, 0x6365, 0x436b, 0x6c6f, 0x726f, 0x0d06, 0x0000, 
-0x0800, 0x4354, 0x6568, 0x6b63, 0x6465, 0x0e06, 0x0000, 0x0a00, 0x4654, 
-0x6e6f, 0x4374, 0x6c6f, 0x726f, 0x0f06, 0x0000, 0x0a00, 0x5354, 0x7274, 
-0x6b69, 0x6f65, 0x7475, 0x1006, 0x0000, 0x0400, 0x6953, 0x657a, 0x1106, 
-0x0000, 0x0900, 0x4654, 0x6e6f, 0x5374, 0x7a69, 0x0665, 0x0012, 0x0000, 
-0x540a, 0x6142, 0x6b63, 0x6f43, 0x6f6c, 0x0672, 0x0013, 0x0000, 0x5408, 
-0x6143, 0x7470, 0x6f69, 0x106e, 0x0003, 0x0000, 0x0010, 0x0000, 0x1406, 
-0x0000, 0x0500, 0x6146, 0x736c, 0x0665, 0x0015, 0x0000, 0x3004, 0x202c, 
-0x0930, 0x0014, 0x0000, 0x1706, 0x0000, 0x0100, 0x0630, 0x0018, 0x0000, 
-0x4315, 0x6e6f, 0x7274, 0x6c6f, 0x7841, 0x6f53, 0x7275, 0x6963, 0x676e, 
-0x6953, 0x6574, 0x1906, 0x0000, 0x0900, 0x4354, 0x6568, 0x6b63, 0x6f42, 
-0x0978, 0x0014, 0x0000, 0x1409, 0x0000, 0x0600, 0x001b, 0x0000, 0x5203, 
-0x6465, 0x1409, 0x0000, 0x0600, 0x001d, 0x0000, 0x4205, 0x616c, 0x6b63, 
-0x1409, 0x0000, 0x0600, 0x001f, 0x0000, 0x3906, 0x2c30, 0x3420, 0x0631, 
-0x0020, 0x0000, 0x3102, 0x0630, 0x0021, 0x0000, 0x5705, 0x6968, 0x6574, 
-0x1909, 0x0000, 0x0b00, 
-    0
-END
-
 IDD_DIALOG_TEMCO_STANDARD_BACNET_TOOL DLGINIT
 BEGIN
     IDC_T3000BACNETTOOL1, 0x376, 371, 0
@@ -6209,6 +6179,37 @@ BEGIN
     0
 END
 
+IDD_DIALOG16 DLGINIT
+BEGIN
+    IDC_FORMS1, 0x376, 441, 0
+0x0000, 0x0000, 0x0100, 0x0000, 0xff00, 0xffff, 0x01ff, 0x0000, 0x0000, 
+0x0000, 0x0400, 0x0001, 0x0000, 0x531c, 0x7379, 0x6574, 0x2e6d, 0x6f43, 
+0x6c6c, 0x6365, 0x6974, 0x6e6f, 0x2e73, 0x6148, 0x6873, 0x6174, 0x6c62, 
+0x0765, 0x0000, 0x0a00, 0x6f4c, 0x6461, 0x6146, 0x7463, 0x726f, 0x5607, 
+0x7265, 0x6973, 0x6e6f, 0x4308, 0x6d6f, 0x6170, 0x6572, 0x1072, 0x6148, 
+0x6873, 0x6f43, 0x6564, 0x7250, 0x766f, 0x6469, 0x7265, 0x4808, 0x7361, 
+0x5368, 0x7a69, 0x0465, 0x654b, 0x7379, 0x5606, 0x6c61, 0x6575, 0x0073, 
+0x0300, 0x0003, 0x0505, 0x080b, 0x531c, 0x7379, 0x6574, 0x2e6d, 0x6f43, 
+0x6c6c, 0x6365, 0x6974, 0x6e6f, 0x2e73, 0x4349, 0x6d6f, 0x6170, 0x6572, 
+0x2472, 0x7953, 0x7473, 0x6d65, 0x432e, 0x6c6f, 0x656c, 0x7463, 0x6f69, 
+0x736e, 0x492e, 0x6148, 0x6873, 0x6f43, 0x6564, 0x7250, 0x766f, 0x6469, 
+0x7265, 0xec08, 0x3851, 0x0a3f, 0x0000, 0x0a00, 0x110a, 0x0000, 0x0900, 
+0x0002, 0x0000, 0x0309, 0x0000, 0x1000, 0x0002, 0x0000, 0x0008, 0x0000, 
+0x0406, 0x0000, 0x0400, 0x6953, 0x657a, 0x0506, 0x0000, 0x0400, 0x6f43, 
+0x6564, 0x0606, 0x0000, 0x0700, 0x6143, 0x7470, 0x6f69, 0x066e, 0x0007, 
+0x0000, 0x4108, 0x7475, 0x536f, 0x7a69, 0x0665, 0x0008, 0x0000, 0x5408, 
+0x6261, 0x6e49, 0x6564, 0x0678, 0x0009, 0x0000, 0x4c08, 0x636f, 0x7461, 
+0x6f69, 0x066e, 0x000a, 0x0000, 0x4e04, 0x6d61, 0x0665, 0x000b, 0x0000, 
+0x410c, 0x7475, 0x536f, 0x7a69, 0x4d65, 0x646f, 0x1065, 0x0003, 0x0000, 
+0x0008, 0x0000, 0x0c06, 0x0000, 0x0800, 0x3138, 0x2c32, 0x3420, 0x3338, 
+0x0d06, 0x0000, 0x0000, 0x0d09, 0x0000, 0x0600, 0x000e, 0x0000, 0x5404, 
+0x7572, 0x0665, 0x000f, 0x0000, 0x3001, 0x1006, 0x0000, 0x0400, 0x2c30, 
+0x3020, 0x1106, 0x0000, 0x1100, 0x7250, 0x676f, 0x6172, 0x456d, 0x6964, 
+0x6f74, 0x4672, 0x726f, 0x066d, 0x0012, 0x0000, 0x470d, 0x6f72, 0x4177, 
+0x646e, 0x6853, 0x6972, 0x6b6e, "\013" 
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -6216,77 +6217,41 @@ END
 //
 
 IDB_BITMAP48            BITMAP                  "res\\Toolbar-48.bmp"
-
 IDB_MENUBAROWN_BITMAP16 BITMAP                  "res\\menu_imgeOwn16.bmp"
-
 IDR_TOOLBAR_VER25049    BITMAP                  "res\\toolbar1.bmp"
-
 IDB_BITMAP_V25049       BITMAP                  "res\\Toolbar_V25049.bmp"
-
 M->FF                   BITMAP                  "res\\MFouct.bmp"
-
 M->FU                   BITMAP                  "res\\MUp.bmp"
-
 APPLYX                  BITMAP                  "res\\ApplyDisable.bmp"
-
 APPLYD                  BITMAP                  "res\\ApplyDown.bmp"
-
 APPLYF                  BITMAP                  "res\\ApplyFouct.bmp"
-
 APPLYU                  BITMAP                  "res\\ApplyUp.bmp"
-
 CLEARX                  BITMAP                  "res\\ClearDisable.bmp"
-
 CLEARD                  BITMAP                  "res\\ClearDown.bmp"
-
 CLEARF                  BITMAP                  "res\\ClearFouct.bmp"
-
 CLEARU                  BITMAP                  "res\\ClearUp.bmp"
-
 M->FX                   BITMAP                  "res\\MDisable.bmp"
-
 M->FD                   BITMAP                  "res\\MDown.bmp"
-
 IDB_BITMAP_SCHEDULE     BITMAP                  "res\\Schedule0607.bmp"
-
 IDC_AIR_FLOW_BACK       BITMAP                  "res\\Back.bmp"
-
 IDB_BITMAP_TMCO_LOGO    BITMAP                  "res\\temcologo.bmp"
-
 IDB_LED                 BITMAP                  "res\\LED Table Button.bmp"
-
 IDB_LCD                 BITMAP                  "res\\LCD Table Button.bmp"
-
 IDB_BITMAP_V25050_CONNECTED BITMAP                  "res\\bitmap_v_Connected.bmp"
-
 IDB_BITMAP_TEMCOLOGO    BITMAP                  "res\\temco_logo.bmp"
-
 IDB_BITMAP5             BITMAP                  "res\\default view.bmp"
-
 IDB_BITMAP_LOGIN        BITMAP                  "res\\Login.bmp"
-
 IDB_BITMAP_BUILDING_DEFAULT BITMAP                  "res\\T3000Building.bmp"
-
 IDR_TOOLBAR_BACNET      BITMAP                  "res\\bmp_bacnet.bmp"
-
 IDB_BITMAP7             BITMAP                  "res\\bmp00001.bmp"
-
 IDB_BITMAP_BACNET_MENU_BIT BITMAP                  "res\\bacnet_menu_bit.bmp"
-
 IDB_BITMAP_ALARM_BROWN  BITMAP                  "res\\AlarmsBrown.bmp"
-
 IDB_BITMAP_ALARM_GREEN  BITMAP                  "res\\AlarmsGreen.bmp"
-
 IDB_BITMAP_ALARM_RED    BITMAP                  "res\\AlarmsRed.bmp"
-
 IDB_BITMAP9             BITMAP                  "res\\bitmap9.bmp"
-
 IDB_BITMAP_TSTAT_PID_MODEL BITMAP                  "res\\PIDBUTTON.bmp"
-
 IDB_BITMAP_TOOLBAR_DISABLE BITMAP                  "res\\toolbar_disable.bmp"
-
 IDB_BITMAP_NEW_BACNET_MENU_BIT BITMAP                  "res\\bacnet_menu_bit_TEST.bmp"
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -6337,7 +6302,7 @@ END
 
 IDR_MENU_PROGRAM_EDIT MENU
 BEGIN
-    MENUITEM "Send (F2)",                   ID_SEND
+    MENUITEM "Send (F2)",                   ID_SCAN
     MENUITEM "Clear (F3)",                  ID_CLEAR
     MENUITEM "Load File (F7)",              ID_LOADFILE
     MENUITEM "Save File (F6)",              ID_SAVEFILE
@@ -6408,61 +6373,33 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_ICON_REFRESH        ICON                    "res\\Refresh.ico"
-
 IDI_ICON_EXIT           ICON                    "res\\Exit.ico"
-
 IDI_ICON_OK             ICON                    "res\\OK.ico"
-
 IDI_ICON_SCAN_PRODUCT   ICON                    "res\\Scan.ico"
-
 IDI_ICON_DEFAULT_ICON   ICON                    "res\\relay.ico"
-
 IDI_ICON_SWITCH_ON      ICON                    "res\\switch_on.ico"
-
 IDI_ICON_SWITCH_OFF     ICON                    "res\\switch_off.ico"
-
 IDI_ICON_SELECT         ICON                    "res\\Select.ico"
-
 IDI_ICON_LABEL_LOCK     ICON                    "res\\lock.ico"
-
 IDI_ICON_LABEL_UNLOCK   ICON                    "res\\unlock.ico"
-
 IDI_ICON_DEFAULT_VARIABLE ICON                    "res\\default_icon\\Variables.ico"
-
 IDI_ICON_DEFAULT_PROGRAM ICON                    "res\\default_icon\\Programs.ico"
-
 IDI_ICON_DEFAULT_HOLIDAY ICON                    "res\\default_icon\\Holidays.ico"
-
 IDI_ICON_DEFAULT_SCHEDUAL ICON                    "res\\default_icon\\schedual.ico"
-
 IDI_ICON_DEFAULT_TRENDLOG ICON                    "res\\default_icon\\TrendLogs.ico"
-
 IDI_ICON_DEFAULT_PID    ICON                    "res\\default_icon\\PID.ico"
-
 IDI_ICON_LOADING_1      ICON                    "res\\loading_icon\\Step1.ico"
-
 IDI_ICON_LOADING_2      ICON                    "res\\loading_icon\\Step2.ico"
-
 IDI_ICON_LOADING_3      ICON                    "res\\loading_icon\\Step3.ico"
-
 IDI_ICON_LOADING_4      ICON                    "res\\loading_icon\\Step4.ico"
-
 IDI_ICON_LOADING_5      ICON                    "res\\loading_icon\\Step5.ico"
-
 IDI_ICON_LOADING_6      ICON                    "res\\loading_icon\\Step6.ico"
-
 IDI_ICON_DEFAULT_ALARM  ICON                    "res\\default_icon\\Alarms.ico"
-
 IDI_ICON_DEFAULT_NETWORKPOINT ICON                    "res\\default_icon\\RemotePoints.ico"
-
 IDI_ICON_DEFAULT_SETTING ICON                    "res\\default_icon\\Configuration.ico"
-
 IDI_ICON_DEFAULT_GRAPHIC ICON                    "res\\default_icon\\Graphics2.ico"
-
 IDI_ICON_DEFAULT_OUTPUT ICON                    "res\\default_icon\\outputs2.ico"
-
 IDI_ICON_INPUT_DEFAULT  ICON                    "res\\default_icon\\inputs.ico"
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -6471,14 +6408,12 @@ IDI_ICON_INPUT_DEFAULT  ICON                    "res\\default_icon\\inputs.ico"
 
 IDR_MFC16DLL1           MFC16DLL                "res\\MFC16API.dll"
 
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // T3000DB
 //
 
 IDR_T3000DB1            T3000DB                 "res\\T3000.db"
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -6487,14 +6422,12 @@ IDR_T3000DB1            T3000DB                 "res\\T3000.db"
 
 IDR_BUILDINGDB1         BUILDINGDB              "res\\Building.db"
 
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // MONITOR_DB
 //
 
 IDR_MONITOR_DB2         MONITOR_DB              "res\\monitor_.bin"
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -6592,6 +6525,16 @@ BEGIN
 END
 
 IDD_DIALOG_TEMCO_STANDARD_BACNET_TOOL AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_DIALOG_NEW_PROGRAMEDITOR AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_DIALOG_BACNET_PROGRAM AFX_DIALOG_LAYOUT
 BEGIN
     0
 END
@@ -9667,35 +9610,20 @@ END
 //
 
 IDB_HOTTOOLBAR          BITMAP                  "res\\hottool.bmp"
-
 IDB_COLDTOOLBAR         BITMAP                  "res\\coldtool.bmp"
-
 IDB_MENUBAR             BITMAP                  "res\\menu_img.bmp"
-
 IDR_MAINFRAME           BITMAP                  "res\\Toolbar.bmp"
-
 IDR_MAINFRAME_256       BITMAP                  "res\\Toolbar256.bmp"
-
 IDR_MYTOOLBAR           BITMAP                  "res\\toolbar2.bmp"
-
 IDB_TREENODE_BMP        BITMAP                  "res\\treenode.bmp"
-
 IDB_DOWNBMP             BITMAP                  "res\\bmp_down.bmp"
-
 IDB_UPBMP               BITMAP                  "res\\bmp_up.bmp"
-
 IDB_CUSTM_TOOLBARBITMAP BITMAP                  "res\\ToolbarOwn.bmp"
-
 IDB_CUSTM_COLDBITMAP    BITMAP                  "res\\ToolbarOwn.bmp"
-
 IDB_MENUBAROWN_BITMAP   BITMAP                  "res\\menu_imgeOwn.bmp"
-
 IDB_CHECKNO_BITMAP      BITMAP                  "res\\checkno.bmp"
-
 IDB_CHECK_BITMAP        BITMAP                  "res\\check.bmp"
-
 IDB_BITMAP2             BITMAP                  "res\\bitmap2.bmp"
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -9967,9 +9895,7 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\serialnum.ico"
-
 IDR_T3000TYPE           ICON                    "res\\T3000Doc.ico"
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
