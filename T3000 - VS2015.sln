@@ -24,8 +24,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "T3000Controls", "T3000Contr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModbusPoll", "Modbus Poll\ModbusPoll.vcxproj", "{7ECEC3E5-9E56-40C5-8043-9B472536F566}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProgramEditor", "ProgramEditor\ProgramEditor.csproj", "{E8507121-5342-46C9-A158-228A6870CDFD}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -340,46 +338,6 @@ Global
 		{7ECEC3E5-9E56-40C5-8043-9B472536F566}.Unicode Release|Win32.Build.0 = Release|Win32
 		{7ECEC3E5-9E56-40C5-8043-9B472536F566}.Unicode Release|x64.ActiveCfg = Release|Win32
 		{7ECEC3E5-9E56-40C5-8043-9B472536F566}.Unicode Release|x64.Build.0 = Release|Win32
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Debug|Win32.Build.0 = Debug|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Debug|x64.Build.0 = Debug|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Release|Win32.ActiveCfg = Release|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Release|Win32.Build.0 = Release|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Release|x64.ActiveCfg = Release|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Release|x64.Build.0 = Release|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Template|Any CPU.ActiveCfg = Release|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Template|Any CPU.Build.0 = Release|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Template|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Template|Mixed Platforms.Build.0 = Release|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Template|Win32.ActiveCfg = Release|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Template|Win32.Build.0 = Release|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Template|x64.ActiveCfg = Release|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Template|x64.Build.0 = Release|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Unicode Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Unicode Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Unicode Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Unicode Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Unicode Debug|Win32.ActiveCfg = Debug|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Unicode Debug|Win32.Build.0 = Debug|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Unicode Debug|x64.ActiveCfg = Debug|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Unicode Debug|x64.Build.0 = Debug|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Unicode Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Unicode Release|Any CPU.Build.0 = Release|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Unicode Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Unicode Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Unicode Release|Win32.ActiveCfg = Release|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Unicode Release|Win32.Build.0 = Release|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Unicode Release|x64.ActiveCfg = Release|Any CPU
-		{E8507121-5342-46C9-A158-228A6870CDFD}.Unicode Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
