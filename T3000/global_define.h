@@ -1068,6 +1068,7 @@ const int WINDOW_REMOTE_POINT = 13;
 
 
 const int KEY_INSERT = 1020;
+const int KEY_INSERT_CONTROL = 1021;
 
 
 typedef enum

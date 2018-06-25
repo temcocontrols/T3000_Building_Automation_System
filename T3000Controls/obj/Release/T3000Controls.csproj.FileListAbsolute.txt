@@ -1,0 +1,16 @@
+E:\T3000_Building_Automation_System\T3000Controls\bin\Release\T3000Controls.dll
+E:\T3000_Building_Automation_System\T3000Controls\bin\Release\T3000Controls.pdb
+E:\T3000_Building_Automation_System\T3000Controls\bin\Release\T3000Controls.tlb
+E:\T3000_Building_Automation_System\T3000Controls\obj\Release\T3000Controls.csprojResolveAssemblyReference.cache
+E:\T3000_Building_Automation_System\T3000Controls\obj\Release\T3000Controls.BackgroundControl.resources
+E:\T3000_Building_Automation_System\T3000Controls\obj\Release\T3000Controls.SliderControl.resources
+E:\T3000_Building_Automation_System\T3000Controls\obj\Release\T3000Controls.HandleControl.resources
+E:\T3000_Building_Automation_System\T3000Controls\obj\Release\T3000Controls.SetPointsControl.resources
+E:\T3000_Building_Automation_System\T3000Controls\obj\Release\T3000Controls.IndicatorControl.resources
+E:\T3000_Building_Automation_System\T3000Controls\obj\Release\T3000Controls.TransparentLabel.resources
+E:\T3000_Building_Automation_System\T3000Controls\obj\Release\T3000Controls.Forms.Form1.resources
+E:\T3000_Building_Automation_System\T3000Controls\obj\Release\T3000Controls.Forms.SetPointsForm.resources
+E:\T3000_Building_Automation_System\T3000Controls\obj\Release\T3000Controls.Properties.Resources.resources
+E:\T3000_Building_Automation_System\T3000Controls\obj\Release\T3000Controls.csproj.GenerateResource.Cache
+E:\T3000_Building_Automation_System\T3000Controls\obj\Release\T3000Controls.dll
+E:\T3000_Building_Automation_System\T3000Controls\obj\Release\T3000Controls.pdb
