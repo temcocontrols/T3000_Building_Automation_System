@@ -2,6 +2,7 @@
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
 //使用VS2010 编译需删除 c:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cvtres.exe 来确保用更高版本的 来转换资源文件
+1. Fix the program bug "10 28AO5 = 3" when open again it show "10  = 3"
 
 2018 05 29 
 1.T3系列 扩展IO支持 T3-PT12 

@@ -6809,7 +6809,7 @@ int pointtotext(char *buf,Point_T3000 *point)
 		return 1;
 	}
 
-	if(point_type > 16)
+	if(point_type > BAC_DO)
 	{
 		buf[0]=0;
 		return 1;

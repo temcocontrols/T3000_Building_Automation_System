@@ -9539,7 +9539,7 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
             continue;
         }
         //Speed up scan , if no data online ,check 2 times ,then stop.
-        if (n_no_data_online_count >= 2)
+        if (n_no_data_online_count >= 3)
         {
             ntest_ret[i].test_ret = 0;
             continue;

@@ -148,6 +148,7 @@ CImageTreeCtrl::CImageTreeCtrl()
 	tree_offline_mode = false;
 	m_virtual_tree_item = NULL;
     Inial_ProductName_map();
+    m_hSelItem = NULL;
 }
 
 CImageTreeCtrl::~CImageTreeCtrl()
@@ -1363,6 +1364,8 @@ void CImageTreeCtrl::FlashSelectItem(HTREEITEM hItem)
 {
 	if(tree_offline_mode == false)
 		return;
+    if (hItem == NULL)
+        return;
 	static int flash_count = 1;
 	flash_count = flash_count %3  + 1;
 	if(flash_count == 1)
