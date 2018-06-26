@@ -259,4 +259,7 @@ bool Save_VariableData_to_db(unsigned char  temp_output_index, unsigned int nser
 	bool Save_OutputData_to_db(unsigned char  temp_output_index );
 	bool Save_AVData_to_db();
 	CString GetGUID();
+
+    void Inial_ProductName_map();
+    int PanelName_Map(int product_type);
 #endif

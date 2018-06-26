@@ -14,6 +14,8 @@
 #include "global_define.h"
 #include "BacnetRange.h"
 #include "BacnetScheduleTime.h"
+#include "BacnetTstatSchedule.h"
+extern CBacnetTstatSchedule *BacnetTstatSchedule_Window ;
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 
 // BacnetWeeklyRoutine dialog
@@ -45,6 +47,7 @@ BEGIN_MESSAGE_MAP(BacnetWeeklyRoutine, CDialogEx)
 	ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_Weekly_Routine_Item)
 
 	ON_BN_CLICKED(IDC_BUTTON_WEEKLY_EDIT, &BacnetWeeklyRoutine::OnBnClickedButtonWeeklyScheduleEdit)
+    ON_BN_CLICKED(IDC_BUTTON_SCHEDULE_SUBNET, &BacnetWeeklyRoutine::OnBnClickedButtonWeeklysubPanelScheduleEdit)
 	//ON_MESSAGE(MY_RESUME_DATA, WeeklyResumeMessageCallBack)
 	ON_NOTIFY(NM_CLICK, IDC_LIST_BAC_WEEKLY, &BacnetWeeklyRoutine::OnNMClickListBacWeekly)
 	ON_WM_CLOSE()
@@ -576,6 +579,60 @@ void BacnetWeeklyRoutine::OnNMDblclkListWeeklySchedule(NMHDR *pNMHDR, LRESULT *p
 	*pResult = 0;
 }
 
+void BacnetWeeklyRoutine::OnBnClickedButtonWeeklysubPanelScheduleEdit()
+{
+
+    b_stop_read_tstat_schedule = false;  //是否继续读取标志，若后面数据为空则退出循环体.
+
+                                         //在获取前清空缓存值.
+    for (int i = 0;i < BAC_TSTAT_SCHEDULE;i++)
+    {
+        Str_tstat_schedule temp_tstat_schedule;
+        memset(&m_tatat_schedule_data.at(i).all, 0, sizeof(Str_tstat_schedule));
+    }
+
+    for (int i = 0;i<BAC_TSTAT_SCHEDULE_GROUP;i++)
+    {
+        int end_temp_instance = 0;
+        int ret_n;
+        end_temp_instance = BAC_TSTAT_SCHEDULE_REMAINDER + (BAC_READ_TSTAT_SCHEDULE_GROUP_NUMBER)*i;
+        if (end_temp_instance >= BAC_TSTAT_SCHEDULE)
+            end_temp_instance = BAC_TSTAT_SCHEDULE - 1;
+        CString n_temp_result;
+        ret_n = GetPrivateData_Blocking(g_bac_instance, READ_TSTATE_SCHEDULE_T3000, (BAC_READ_TSTAT_SCHEDULE_GROUP_NUMBER)*i, end_temp_instance, sizeof(Str_tstat_schedule));
+        if (ret_n)
+        {
+            n_temp_result.Format(_T("Read Tstat From %d to %d success."), (BAC_READ_TSTAT_SCHEDULE_GROUP_NUMBER)*i, end_temp_instance);
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, n_temp_result);
+            Sleep(10);
+            if (b_stop_read_tstat_schedule)
+            {
+                n_temp_result.Format(_T("Reading tstat schedule complete"));
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, n_temp_result);
+                Sleep(10);
+                break;
+            }
+        }
+        else
+        {
+            n_temp_result.Format(_T("Reading tstat schedule From %d to %d failed."), (BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i, end_temp_instance);
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, n_temp_result);
+            return;
+        }
+    }
+
+    b_stop_read_tstat_schedule = false;
+
+    //显示非模态对话框;
+    if (BacnetTstatSchedule_Window != NULL)
+    {
+        delete BacnetTstatSchedule_Window;
+        BacnetTstatSchedule_Window = NULL;
+    }
+    BacnetTstatSchedule_Window = new CBacnetTstatSchedule;
+    BacnetTstatSchedule_Window->Create(IDD_DIALOG_BACNET_TSTAT_SCHEDULE, this);
+    BacnetTstatSchedule_Window->ShowWindow(SW_SHOW);
+}
 
 void BacnetWeeklyRoutine::OnBnClickedButtonWeeklyScheduleEdit()
 {
@@ -631,6 +688,7 @@ void BacnetWeeklyRoutine::OnSize(UINT nType, int cx, int cy)
 		::SetWindowPos(this->m_hWnd, HWND_TOP, 0,0, 0,0,  SWP_NOSIZE | SWP_NOMOVE);
 		m_weeklyr_list.MoveWindow(rc.left,rc.top,rc.Width(),rc.Height() - 80);
 		GetDlgItem(IDC_BUTTON_WEEKLY_EDIT)->MoveWindow(rc.left + 20 ,rc.bottom - 60 , 120,50);
+        GetDlgItem(IDC_BUTTON_SCHEDULE_SUBNET)->MoveWindow(rc.left + 200, rc.bottom - 60, 160, 50);  //随着窗体的移动  移动 按键 和表格的位置;
 	}
 
 }

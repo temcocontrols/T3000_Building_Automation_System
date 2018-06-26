@@ -97,8 +97,7 @@ public:
 
     BOOL ScanDetectComData();
 	BOOL ScanRemoteIPDevice(); //扫描 远程设备;
-	BOOL ScanBacnetIPDevice();//扫描 bacnet IP 设备;
-	BOOL ScanBacnetMstpDevice(); //扫描Bacnet MSTP 设备;
+	BOOL ScanBacnetMSTPDevice();//扫描Bacnet MSTP 设备;
 	void SetComPort(int nCom);
 	BOOL CheckTheSameSubnet(CString strIP);
 public:
@@ -202,6 +201,7 @@ public:
     bool m_saving_data;
     int com_count; // 记录com 和常规的个数;
 public:
+    bool is_delete_tstat_scanner ;
 	unsigned int * exsit_serial_array;
 	int serial_array_length;
 	//vector<CTStat_Dev*>		m_szTstatScandRet;

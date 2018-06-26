@@ -46,7 +46,7 @@ const int TCP_COMM_PORT = 6001;
 extern int g_ScnnedNum;
 extern bool b_pause_refresh_tree ;
 
-bool is_delete_tstat_scanner = false;
+
 
 extern char local_network_ip[255];
 extern CString local_enthernet_ip;
@@ -2040,7 +2040,7 @@ END_SCAN:
 
     }
 
-	if(is_delete_tstat_scanner == false)
+	if(pScanner->is_delete_tstat_scanner == false)
 		pScanner->m_eScanNCEnd->SetEvent();
 
     return 1;
@@ -2109,6 +2109,17 @@ int CTStatScanner::AddNCToList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	temp_data.reg.object_instance_4 = *(my_temp_point++);
 	temp_data.reg.object_instance_3 = *(my_temp_point++);
 	temp_data.reg.isp_mode = *(my_temp_point++);	//isp_mode = 0 表示在应用代码 ，非0 表示在bootload.
+    temp_data.reg.bacnetip_port = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+    my_temp_point = my_temp_point + 2;
+    temp_data.reg.zigbee_exsit = *(my_temp_point++);
+    temp_data.reg.subnet_protocol = *(my_temp_point++);
+
+    if (temp_data.reg.subnet_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)
+    {
+        //点击扫描，暂时忽略掉回复的BIP 转MSTP 时的加入数据库的操作;
+        return	 0;
+    }
+
 	if(temp_data.reg.isp_mode != 0)
 	{
 		//记录这个的信息,如果短时间多次出现 就判定在bootload下面，只是偶尔出现一次表示只是恰好开机收到的.
@@ -2434,7 +2445,7 @@ UINT _ScanTstatThread2(LPVOID pParam)
     }
 
 
-	if(is_delete_tstat_scanner == false)
+	if(pScan->is_delete_tstat_scanner == false)
 	{
 		if (pScan->m_eScanComEnd)
 		{
@@ -3995,7 +4006,7 @@ void CTStatScanner::ScanAll()
 
 
 
-    ScanBacnetIPDevice();
+    ScanBacnetMSTPDevice();
 
     ScanRemoteIPDevice();
 
@@ -4425,16 +4436,10 @@ void CTStatScanner::writetxt()
         m_pFile->Close();
     }
 }
-BOOL CTStatScanner::ScanBacnetIPDevice()
+BOOL CTStatScanner::ScanBacnetMSTPDevice()
 {
     m_szComs.clear();
     GetSerialComPortNumber1(m_szComs);
-
-    //if (m_szComs.size() <= 0)
-    //{
-    //	//AfxMessageBox(_T("Can't scan without any com port installed."));
-    //	return FALSE;
-    //}
     m_pScanBacnetIPThread = AfxBeginThread(_ScanBacnetMSTPThread,this);
     return TRUE;
 }
@@ -4472,7 +4477,7 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
 
 
     m_bac_scan_result_data.clear();
-    m_bac_scan_com_data.clear();
+    m_bac_handle_Iam_data.clear();
 
 
     CString strIP;
@@ -4544,7 +4549,7 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
     {
         Send_WhoIs_remote_ip(Remote_IP_Address);
         Sleep(2000);
-        ready_to_read_count =	m_bac_scan_com_data.size();
+        ready_to_read_count =	m_bac_handle_Iam_data.size();
 
 
         strInfo.Format(_T("Scan  Remote device.(%d+1)"),j);
@@ -4570,7 +4575,7 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
                 if(resend_count>50)
                     break;
                 g_invoke_id = GetPrivateData(
-                                  m_bac_scan_com_data.at(i).device_id,
+                                  m_bac_handle_Iam_data.at(i).device_id,
                                   GETSERIALNUMBERINFO,
                                   0,
                                   0,
@@ -4820,7 +4825,7 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
     //    return 1;
     //}
 
-    m_bac_scan_com_data.clear();	//清空上次扫描的遗留数据;
+    m_bac_handle_Iam_data.clear();	//清空上次扫描的遗留数据;
     m_bac_scan_result_data.clear();
     m_temp_result_data.clear();
     //scaning_mode = true;
@@ -4835,10 +4840,10 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
 	//   pScan->m_eScanComEnd->SetEvent();
 #if 1 // bacnet mstp
 
-    //int n_comport = 1;
-    //int n_baudrate = 19200;
+    //int n_comport = 2;
+    //int n_baudrate = 115200;
     //int n_find_mstp = 1;
-
+#if 1
     int n_comport = 0;
     int n_baudrate = 19200;
     int n_find_mstp = false;
@@ -4875,7 +4880,7 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
         m_scan_info.at(scan_bacnet_ip_item).scan_status = SCAN_STATUS_FINISHED;
         return 1;
     }
-
+#endif
     CString temp_cs;
     CString temp_cstring;
     //temp_cstring = pScan->m_szComs.at(i).Right(pScan->m_szComs.at(i).GetLength() - 3);
@@ -4900,14 +4905,14 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
         memcpy(m_scan_info.at(scan_bacnet_ip_item).scan_notes,temp_char,250);
         Send_WhoIs_Global(-1,-1);
         Sleep(2000);
-        m_scan_info.at(scan_bacnet_ip_item).scan_found = m_bac_scan_com_data.size();
-        if((m_bac_scan_com_data.size() > 0) && (i > 10))
+        m_scan_info.at(scan_bacnet_ip_item).scan_found = m_bac_handle_Iam_data.size();
+        if((m_bac_handle_Iam_data.size() > 0) && (i > 10))
             break;
     }
 
 
-        int ready_to_read_count =	m_bac_scan_com_data.size();
-        m_temp_com_data = m_bac_scan_com_data;
+        int ready_to_read_count =	m_bac_handle_Iam_data.size();
+        m_temp_com_data = m_bac_handle_Iam_data;
         CString strInfo1;
         CString strInfo;
 
@@ -4940,7 +4945,7 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
                     temp_info.panel_number = m_temp_com_data.at(i).macaddress;
                     temp_info.software_version = 0;
                     temp_info.hardware_version = 0;
-                    temp_info.m_protocol = PROTOCOL_MSTP_TP_MODBUS;
+                    temp_info.m_protocol = PROTOCOL_MSTP_TO_MODBUS;
                     temp_info.device_id = m_temp_com_data.at(i).device_id;
 
                     temp_info.ipaddress[0] = test_array[47];
@@ -5013,7 +5018,7 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
         temp_pname = GetProductName(m_temp_result_data.at(l).product_type);
         temp_modbusid.Format(_T("%u"), m_temp_result_data.at(l).modbus_addr);
         temp_view_name = temp_pname + _T(":") + temp_serial_number + _T("-") + temp_modbusid;
-        temp_protocol.Format(_T("%d"), PROTOCOL_MSTP_TP_MODBUS);
+        temp_protocol.Format(_T("%d"), PROTOCOL_MSTP_TO_MODBUS);
         temp_product_id_string.Format(_T("%d"), m_temp_result_data.at(l).product_type);
         temp_port_string.Format(_T("%d"), n_comport);
         temp_object_instance.Format(_T("%u"), m_temp_result_data.at(l).device_id);

@@ -31,7 +31,7 @@ BOOL CARDDlg::OnInitDialog()
 		m_add_device_com_port.AddString(m_szComm[i]);
 	}
 	m_add_device_com_port.SetCurSel(0);
-	
+    
 
 	m_add_device_baudrate.InsertString(0,_T("9600"));
 	m_add_device_baudrate.InsertString(1,_T("19200"));
@@ -52,7 +52,7 @@ BOOL CARDDlg::OnInitDialog()
 	m_porteditor.SetWindowText(strIP);
     m_minipanel_comport.SetCurSel(0);
 	((CButton *)GetDlgItem(IDC_RADIO_NET_DEVICE))->SetCheck(TRUE);//я║ио
-	Enable_Net_UI(true);
+	
     OnCbnDropdownComboProductName();
 	((CEdit*)GetDlgItem(IDC_EDIT_TYPE_ID))->SetReadOnly(TRUE);
 	((CEdit*)GetDlgItem(IDC_EDIT_SERIAL_NUMBER))->SetReadOnly(TRUE);
@@ -86,7 +86,7 @@ BOOL CARDDlg::OnInitDialog()
 		GetDlgItem(IDC_COMBO_ADD_DEVICE_COMPORT)->EnableWindow(TRUE);
 		GetDlgItem(IDC_COMBO_ADD_DEVICE_BAUDRATE)->EnableWindow(TRUE);
 	}
-
+    Enable_Net_UI(true);
 	return TRUE; 
 }
 
@@ -553,7 +553,7 @@ void CARDDlg::OnBnClickedButtonLocalMstpDevice()
 
 		for (int j=0;j<5;j++)
 		{
-			int ready_to_read_count =	m_bac_scan_com_data.size();
+			int ready_to_read_count =	m_bac_handle_Iam_data.size();
 
 			CString strInfo;
 			strInfo.Format(_T("Scan  Bacnet mstp.Found %d BACNET device"),ready_to_read_count);
@@ -569,7 +569,7 @@ void CARDDlg::OnBnClickedButtonLocalMstpDevice()
 					if(resend_count>50)
 						break;
 					g_invoke_id = GetPrivateData(
-						m_bac_scan_com_data.at(i).device_id,
+						m_bac_handle_Iam_data.at(i).device_id,
 						GETSERIALNUMBERINFO,
 						0,
 						0,

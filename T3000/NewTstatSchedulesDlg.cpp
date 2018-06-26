@@ -30,7 +30,7 @@ CNewTstatSchedulesDlg::~CNewTstatSchedulesDlg()
 void CNewTstatSchedulesDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_LIST1, WeeeklyList);
+	DDX_Control(pDX, IDC_LIST1, WeeklyList);
 
 	DDX_Control(pDX, IDC_DATETIMEPICKER1_SCHEDUAL, m_schedual_time_picker);
 }
@@ -233,20 +233,20 @@ BOOL CNewTstatSchedulesDlg::OnInitDialog()
 	m_COLScheduleMode[4] = RGB(60, 179, 113);
 
 	LoadSheduleDataAndColor();
-	WeeeklyList.ModifyStyle(0, LVS_SINGLESEL | LVS_REPORT | LVS_SHOWSELALWAYS);
+	WeeklyList.ModifyStyle(0, LVS_SINGLESEL | LVS_REPORT | LVS_SHOWSELALWAYS);
 	//m_input_list.SetExtendedStyle(m_input_list.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
-	WeeeklyList.SetExtendedStyle(WeeeklyList.GetExtendedStyle() | LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
-	WeeeklyList.InsertColumn(0, _T("Item"), 40, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
-	WeeeklyList.InsertColumn(1, _T("Time"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
-	WeeeklyList.InsertColumn(2, _T("Monday"), 80, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
-	WeeeklyList.InsertColumn(3, _T("Tuesday"), 80, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	WeeeklyList.InsertColumn(4, _T("Wednesday"), 80, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	WeeeklyList.InsertColumn(5, _T("Thursday"), 80, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	WeeeklyList.InsertColumn(6, _T("Friday"), 80, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	WeeeklyList.InsertColumn(7, _T("Saturday"), 80, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	WeeeklyList.InsertColumn(8, _T("Sunday"), 80, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	WeeeklyList.InsertColumn(9, _T("Holiday"), 80, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	WeeeklyList.SetBkColor(RGB(205, 201, 201));
+	WeeklyList.SetExtendedStyle(WeeklyList.GetExtendedStyle() | LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
+	WeeklyList.InsertColumn(0, _T("Item"), 40, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
+	WeeklyList.InsertColumn(1, _T("Time"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
+	WeeklyList.InsertColumn(2, _T("Monday"), 80, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
+	WeeklyList.InsertColumn(3, _T("Tuesday"), 80, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	WeeklyList.InsertColumn(4, _T("Wednesday"), 80, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	WeeklyList.InsertColumn(5, _T("Thursday"), 80, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	WeeklyList.InsertColumn(6, _T("Friday"), 80, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	WeeklyList.InsertColumn(7, _T("Saturday"), 80, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	WeeklyList.InsertColumn(8, _T("Sunday"), 80, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	WeeklyList.InsertColumn(9, _T("Holiday"), 80, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	WeeklyList.SetBkColor(RGB(205, 201, 201));
 
 
 	g_hwnd_now = this->m_hWnd;
@@ -267,33 +267,33 @@ BOOL CNewTstatSchedulesDlg::OnInitDialog()
 		CString strTime;
 		int Item = index + 1;
 		strTime.Format(_T("%d"), Item);
-		WeeeklyList.InsertItem(index, strTime);
+		WeeklyList.InsertItem(index, strTime);
 		strTime.Format(_T("%02d:%02d"), it->Hour, it->Minite);
-		WeeeklyList.SetItemBkColor(index, 0, RGB(255, 255, 255), 0);
-		WeeeklyList.SetItemText(index, 1, strTime);
-		WeeeklyList.SetItemBkColor(index, 1, RGB(255, 255, 255), 0);
-		WeeeklyList.SetWhetherShowBkCol(false);
+		WeeklyList.SetItemBkColor(index, 0, RGB(255, 255, 255), 0);
+		WeeklyList.SetItemText(index, 1, strTime);
+		WeeklyList.SetItemBkColor(index, 1, RGB(255, 255, 255), 0);
+		WeeklyList.SetWhetherShowBkCol(false);
 		//设置Combox
 		for (int col = 2;col<10;col++)
 		{
-			WeeeklyList.SetCellStringList(index, col, strlist);
+			WeeklyList.SetCellStringList(index, col, strlist);
 		}
-		WeeeklyList.SetItemText(index, 2, m_strScheduleMode[it->Monday]);
-		WeeeklyList.SetItemBkColor(index, 2, it->Col_Monday, 0);
-		WeeeklyList.SetItemText(index, 3, m_strScheduleMode[it->Tuesday]);
-		WeeeklyList.SetItemBkColor(index, 3, it->Col_Tuesday, 0);
-		WeeeklyList.SetItemText(index, 4, m_strScheduleMode[it->Wednesday]);
-		WeeeklyList.SetItemBkColor(index, 4, it->Col_Wednesday, 0);
-		WeeeklyList.SetItemText(index, 5, m_strScheduleMode[it->Thursday]);
-		WeeeklyList.SetItemBkColor(index, 5, it->Col_Thursday, 0);
-		WeeeklyList.SetItemText(index, 6, m_strScheduleMode[it->Friday]);
-		WeeeklyList.SetItemBkColor(index, 6, it->Col_Friday, 0);
-		WeeeklyList.SetItemText(index, 7, m_strScheduleMode[it->Saturday]);
-		WeeeklyList.SetItemBkColor(index, 7, it->Col_Saturday, 0);
-		WeeeklyList.SetItemText(index, 8, m_strScheduleMode[it->Sunday]);
-		WeeeklyList.SetItemBkColor(index, 8, it->Col_Sunday, 0);
-		WeeeklyList.SetItemText(index, 9, m_strScheduleMode[it->Holiday]);
-		WeeeklyList.SetItemBkColor(index, 9, it->Col_Holiday, 0);
+		WeeklyList.SetItemText(index, 2, m_strScheduleMode[it->Monday]);
+		WeeklyList.SetItemBkColor(index, 2, it->Col_Monday, 0);
+		WeeklyList.SetItemText(index, 3, m_strScheduleMode[it->Tuesday]);
+		WeeklyList.SetItemBkColor(index, 3, it->Col_Tuesday, 0);
+		WeeklyList.SetItemText(index, 4, m_strScheduleMode[it->Wednesday]);
+		WeeklyList.SetItemBkColor(index, 4, it->Col_Wednesday, 0);
+		WeeklyList.SetItemText(index, 5, m_strScheduleMode[it->Thursday]);
+		WeeklyList.SetItemBkColor(index, 5, it->Col_Thursday, 0);
+		WeeklyList.SetItemText(index, 6, m_strScheduleMode[it->Friday]);
+		WeeklyList.SetItemBkColor(index, 6, it->Col_Friday, 0);
+		WeeklyList.SetItemText(index, 7, m_strScheduleMode[it->Saturday]);
+		WeeklyList.SetItemBkColor(index, 7, it->Col_Saturday, 0);
+		WeeklyList.SetItemText(index, 8, m_strScheduleMode[it->Sunday]);
+		WeeklyList.SetItemBkColor(index, 8, it->Col_Sunday, 0);
+		WeeklyList.SetItemText(index, 9, m_strScheduleMode[it->Holiday]);
+		WeeklyList.SetItemBkColor(index, 9, it->Col_Holiday, 0);
 
 		index++;
 
@@ -310,7 +310,7 @@ BOOL CNewTstatSchedulesDlg::OnInitDialog()
 		((CButton *)GetDlgItem(IDC_CHECK_ENABLE_SCHEDULE))->SetCheck(0);
 	}
 
-	WeeeklyList.GetFocus();
+	WeeklyList.GetFocus();
 	return FALSE;  // return TRUE unless you set the focus to a control
 				   // EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -333,101 +333,101 @@ void CNewTstatSchedulesDlg::Fresh_List()
 		CString strTime;
 		int Item = index + 1;
 		strTime.Format(_T("%d"), Item);
-		WeeeklyList.SetItemText(index, 0, strTime);
-		WeeeklyList.SetItemBkColor(index, 0, RGB(255, 255, 255), 0);
+		WeeklyList.SetItemText(index, 0, strTime);
+		WeeklyList.SetItemBkColor(index, 0, RGB(255, 255, 255), 0);
 		strTime.Format(_T("%02d:%02d"), it->Hour, it->Minite);
-		/*WeeeklyList.InsertItem(index++,L"");*/
-		WeeeklyList.SetItemText(index, 1, strTime);
-		WeeeklyList.SetItemBkColor(index, 1, RGB(255, 255, 255), 0);
-		WeeeklyList.SetWhetherShowBkCol(false);
+		/*WeeklyList.InsertItem(index++,L"");*/
+		WeeklyList.SetItemText(index, 1, strTime);
+		WeeklyList.SetItemBkColor(index, 1, RGB(255, 255, 255), 0);
+		WeeklyList.SetWhetherShowBkCol(false);
 		//设置Combox
 		for (int col = 2;col<10;col++)
 		{
-			WeeeklyList.SetCellStringList(index, col, strlist);
+			WeeklyList.SetCellStringList(index, col, strlist);
 
 		}
-		WeeeklyList.SetItemText(index, 2, m_strScheduleMode[it->Monday]);
-		WeeeklyList.SetItemBkColor(index, 2, m_COLScheduleMode[it->Monday], 0);
+		WeeklyList.SetItemText(index, 2, m_strScheduleMode[it->Monday]);
+		WeeklyList.SetItemBkColor(index, 2, m_COLScheduleMode[it->Monday], 0);
 		it->Col_Monday = m_COLScheduleMode[it->Monday];
 		if (it->Monday == 0 && index != 0)
 		{
 			COLORREF PreviousScheduleColor = GetItemColor(index - 1, 2);
-			WeeeklyList.SetItemBkColor(index, 2, PreviousScheduleColor, 0);
+			WeeklyList.SetItemBkColor(index, 2, PreviousScheduleColor, 0);
 			it->Col_Monday = PreviousScheduleColor;
 		}
 
-		WeeeklyList.SetItemText(index, 3, m_strScheduleMode[it->Tuesday]);
-		WeeeklyList.SetItemBkColor(index, 3, m_COLScheduleMode[it->Tuesday], 0);
+		WeeklyList.SetItemText(index, 3, m_strScheduleMode[it->Tuesday]);
+		WeeklyList.SetItemBkColor(index, 3, m_COLScheduleMode[it->Tuesday], 0);
 
 		it->Col_Tuesday = m_COLScheduleMode[it->Tuesday];
 		if (it->Tuesday == 0 && index != 0)
 		{
 			COLORREF PreviousScheduleColor = GetItemColor(index - 1, 3);
-			WeeeklyList.SetItemBkColor(index, 3, PreviousScheduleColor, 0);
+			WeeklyList.SetItemBkColor(index, 3, PreviousScheduleColor, 0);
 			it->Col_Tuesday = PreviousScheduleColor;
 		}
 
-		WeeeklyList.SetItemText(index, 4, m_strScheduleMode[it->Wednesday]);
-		WeeeklyList.SetItemBkColor(index, 4, m_COLScheduleMode[it->Wednesday], 0);
+		WeeklyList.SetItemText(index, 4, m_strScheduleMode[it->Wednesday]);
+		WeeklyList.SetItemBkColor(index, 4, m_COLScheduleMode[it->Wednesday], 0);
 
 		it->Col_Wednesday = m_COLScheduleMode[it->Wednesday];
 		if (it->Wednesday == 0 && index != 0)
 		{
 			COLORREF PreviousScheduleColor = GetItemColor(index - 1, 4);
-			WeeeklyList.SetItemBkColor(index, 4, PreviousScheduleColor, 0);
+			WeeklyList.SetItemBkColor(index, 4, PreviousScheduleColor, 0);
 			it->Col_Wednesday = PreviousScheduleColor;
 		}
 
-		WeeeklyList.SetItemText(index, 5, m_strScheduleMode[it->Thursday]);
-		WeeeklyList.SetItemBkColor(index, 5, m_COLScheduleMode[it->Thursday], 0);
+		WeeklyList.SetItemText(index, 5, m_strScheduleMode[it->Thursday]);
+		WeeklyList.SetItemBkColor(index, 5, m_COLScheduleMode[it->Thursday], 0);
 
 		it->Col_Thursday = m_COLScheduleMode[it->Thursday];
 		if (it->Thursday == 0 && index != 0)
 		{
 			COLORREF PreviousScheduleColor = GetItemColor(index - 1, 5);
-			WeeeklyList.SetItemBkColor(index, 5, PreviousScheduleColor, 0);
+			WeeklyList.SetItemBkColor(index, 5, PreviousScheduleColor, 0);
 			it->Col_Thursday = PreviousScheduleColor;
 		}
 
-		WeeeklyList.SetItemText(index, 6, m_strScheduleMode[it->Friday]);
-		WeeeklyList.SetItemBkColor(index, 6, m_COLScheduleMode[it->Friday], 0);
+		WeeklyList.SetItemText(index, 6, m_strScheduleMode[it->Friday]);
+		WeeklyList.SetItemBkColor(index, 6, m_COLScheduleMode[it->Friday], 0);
 
 		it->Col_Friday = m_COLScheduleMode[it->Friday];
 		if (it->Friday == 0 && index != 0)
 		{
 			COLORREF PreviousScheduleColor = GetItemColor(index - 1, 6);
-			WeeeklyList.SetItemBkColor(index, 6, PreviousScheduleColor, 0);
+			WeeklyList.SetItemBkColor(index, 6, PreviousScheduleColor, 0);
 			it->Col_Friday = PreviousScheduleColor;
 		}
 
-		WeeeklyList.SetItemText(index, 7, m_strScheduleMode[it->Saturday]);
-		WeeeklyList.SetItemBkColor(index, 7, m_COLScheduleMode[it->Saturday], 0);
+		WeeklyList.SetItemText(index, 7, m_strScheduleMode[it->Saturday]);
+		WeeklyList.SetItemBkColor(index, 7, m_COLScheduleMode[it->Saturday], 0);
 
 		it->Col_Saturday = m_COLScheduleMode[it->Saturday];
 		if (it->Saturday == 0 && index != 0)
 		{
 			COLORREF PreviousScheduleColor = GetItemColor(index - 1, 7);
-			WeeeklyList.SetItemBkColor(index, 7, PreviousScheduleColor, 0);
+			WeeklyList.SetItemBkColor(index, 7, PreviousScheduleColor, 0);
 			it->Col_Saturday = PreviousScheduleColor;
 		}
 
-		WeeeklyList.SetItemText(index, 8, m_strScheduleMode[it->Sunday]);
-		WeeeklyList.SetItemBkColor(index, 8, m_COLScheduleMode[it->Sunday], 0);
+		WeeklyList.SetItemText(index, 8, m_strScheduleMode[it->Sunday]);
+		WeeklyList.SetItemBkColor(index, 8, m_COLScheduleMode[it->Sunday], 0);
 		it->Col_Sunday = m_COLScheduleMode[it->Sunday];
 		if (it->Sunday == 0 && index != 0)
 		{
 			COLORREF PreviousScheduleColor = GetItemColor(index - 1, 8);
-			WeeeklyList.SetItemBkColor(index, 8, PreviousScheduleColor, 0);
+			WeeklyList.SetItemBkColor(index, 8, PreviousScheduleColor, 0);
 			it->Col_Sunday = PreviousScheduleColor;
 		}
 
-		WeeeklyList.SetItemText(index, 9, m_strScheduleMode[it->Holiday]);
-		WeeeklyList.SetItemBkColor(index, 9, m_COLScheduleMode[it->Holiday], 0);
+		WeeklyList.SetItemText(index, 9, m_strScheduleMode[it->Holiday]);
+		WeeklyList.SetItemBkColor(index, 9, m_COLScheduleMode[it->Holiday], 0);
 		it->Col_Holiday = m_COLScheduleMode[it->Holiday];
 		if (it->Holiday == 0 && index != 0)
 		{
 			COLORREF PreviousScheduleColor = GetItemColor(index - 1, 9);
-			WeeeklyList.SetItemBkColor(index, 9, PreviousScheduleColor, 0);
+			WeeklyList.SetItemBkColor(index, 9, PreviousScheduleColor, 0);
 			it->Col_Holiday = PreviousScheduleColor;
 		}
 
@@ -630,7 +630,7 @@ LRESULT CNewTstatSchedulesDlg::Fresh_Input_Item(WPARAM wParam, LPARAM lParam)
 {
 	int Changed_Item = (int)wParam;
 	int Changed_SubItem = (int)lParam;
-	CString New_CString = WeeeklyList.GetItemText(Changed_Item, Changed_SubItem);
+	CString New_CString = WeeklyList.GetItemText(Changed_Item, Changed_SubItem);
 	BOOL is_change = FALSE;
 	if (Changed_SubItem>1)
 	{
@@ -835,7 +835,7 @@ void CNewTstatSchedulesDlg::OnBnClickedButtonInsert()
 			sr.Minite = _wtoi(aaa[1]);
 			InsertAndUpdate_Schdule(sr);
 
-			WeeeklyList.InsertItem(WeeeklyList.GetRowCount(), L"");
+			WeeklyList.InsertItem(WeeklyList.GetRowCount(), L"");
 		}
 
 		Fresh_List();
@@ -851,9 +851,9 @@ void CNewTstatSchedulesDlg::OnBnClickedButtonInsert()
 
 void CNewTstatSchedulesDlg::OnBnClickedButtonDelete()
 {
-	if (WeeeklyList.GetRowCount()>0)
+	if (WeeklyList.GetRowCount()>0)
 	{
-		WeeeklyList.DeleteItem(m_curRow);
+		WeeklyList.DeleteItem(m_curRow);
 		Delete_Schdule(m_curRow);
 	}
 }
@@ -866,17 +866,17 @@ void CNewTstatSchedulesDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 
 	DWORD dwPos = GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
 	CPoint point(LOWORD(dwPos), HIWORD(dwPos));
-	WeeeklyList.ScreenToClient(&point);
+	WeeklyList.ScreenToClient(&point);
 	LVHITTESTINFO lvinfo;
 	lvinfo.pt = point;
 	lvinfo.flags = LVHT_ABOVE;
-	int nItem = WeeeklyList.SubItemHitTest(&lvinfo);
+	int nItem = WeeklyList.SubItemHitTest(&lvinfo);
 
 	lRow = lvinfo.iItem;
 	lCol = lvinfo.iSubItem;
 
 
-	if (lRow>WeeeklyList.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+	if (lRow>WeeklyList.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
 		return;
 	if (lRow<0)
 		return;
@@ -886,22 +886,22 @@ void CNewTstatSchedulesDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	if (m_curCol == 0)
 	{
 		Fresh_List();
-		WeeeklyList.SetItemBkColor(lRow, -1, LIST_ITEM_SELECTED);
+		WeeklyList.SetItemBkColor(lRow, -1, LIST_ITEM_SELECTED);
 	}
 
 	else if (m_curCol>1)
 	{
-		CString New_CString = WeeeklyList.GetItemText(lRow, lCol);
+		CString New_CString = WeeklyList.GetItemText(lRow, lCol);
 		if (GetDayScheduleCount(lCol) >= 6 && New_CString.IsEmpty())
 		{
-			WeeeklyList.Set_Edit(false);
+			WeeklyList.Set_Edit(false);
 			/*AfxMessageBox(L"Can't be more than 6 !");
 			is_change = TRUE;*/
 			MessageBox(_T("Can't be more than 6 tasks!"), _T("Warning"), MB_OK | MB_ICONINFORMATION);
 		}
 		else
 		{
-			WeeeklyList.Set_Edit(true);
+			WeeklyList.Set_Edit(true);
 		}
 	}
 	else if (m_curCol == 1)
@@ -909,13 +909,13 @@ void CNewTstatSchedulesDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 		/*int Time = GetValueItem(lRow, lCol);
 		m_hour = Time / 60;
 		m_minute = Time - m_hour * 60;
-		WeeeklyList.SetItemText(lRow, lCol, L"");
+		WeeklyList.SetItemText(lRow, lCol, L"");
 		m_schedual_time_picker.ShowWindow(SW_SHOW);
 		CRect list_rect, win_rect;
-		WeeeklyList.GetWindowRect(list_rect);
+		WeeklyList.GetWindowRect(list_rect);
 		GetWindowRect(win_rect);
 		CRect myrect;
-		WeeeklyList.GetSubItemRect(lRow, lCol, LVIR_BOUNDS, myrect);
+		WeeklyList.GetSubItemRect(lRow, lCol, LVIR_BOUNDS, myrect);
 		myrect.left = myrect.left + list_rect.left - win_rect.left;
 		myrect.right = myrect.right + list_rect.left - win_rect.left;
 		myrect.top = myrect.top + 11;
@@ -973,12 +973,12 @@ BOOL CNewTstatSchedulesDlg::PreTranslateMessage(MSG* pMsg)
 			// 			{
 			// 				 
 			// 				CRect list_rect, win_rect;
-			// 				WeeeklyList.GetWindowRect(list_rect);
+			// 				WeeklyList.GetWindowRect(list_rect);
 			// 				ScreenToClient(&list_rect);
 			// 				::GetWindowRect(this->m_hWnd, win_rect);
-			// 				WeeeklyList.Set_My_WindowRect(win_rect);
-			// 				WeeeklyList.Set_My_ListRect(list_rect);
-			// 				WeeeklyList.Get_clicked_mouse_position();
+			// 				WeeklyList.Set_My_WindowRect(win_rect);
+			// 				WeeklyList.Set_My_ListRect(list_rect);
+			// 				WeeklyList.Get_clicked_mouse_position();
 			// 				 
 			// 				return TRUE;
 			// 			}
@@ -1587,11 +1587,11 @@ void CNewTstatSchedulesDlg::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
 
 	DWORD dwPos = GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
 	CPoint point(LOWORD(dwPos), HIWORD(dwPos));
-	WeeeklyList.ScreenToClient(&point);
+	WeeklyList.ScreenToClient(&point);
 	LVHITTESTINFO lvinfo;
 	lvinfo.pt = point;
 	lvinfo.flags = LVHT_ABOVE;
-	int nItem = WeeeklyList.SubItemHitTest(&lvinfo);
+	int nItem = WeeklyList.SubItemHitTest(&lvinfo);
 
 	lRow = lvinfo.iItem;
 	lCol = lvinfo.iSubItem;
@@ -1611,7 +1611,7 @@ void CNewTstatSchedulesDlg::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
 			sr.Minite = _wtoi(aaa[1]);
 			InsertAndUpdate_Schdule(sr);
 
-			WeeeklyList.InsertItem(WeeeklyList.GetRowCount(), L"");
+			WeeklyList.InsertItem(WeeklyList.GetRowCount(), L"");
 		}
 
 		Fresh_List();

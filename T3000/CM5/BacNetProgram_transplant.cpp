@@ -6910,7 +6910,11 @@ int pointtotext(char *buf,Point_Net *point)
         if ((point_type == BAC_AV) ||
             (point_type == BAC_AI) ||
             (point_type == BAC_AO) ||
-            (point_type == BAC_DO))
+            (point_type == BAC_DO) ||
+            (point_type == COIL_REG) ||
+            (point_type == DIS_INPUT_REG) ||
+            (point_type == INPUT_REG) ||
+            (point_type == MB_REG) )
         {
             strcat(buf, itoa(num, x, 10));
         }

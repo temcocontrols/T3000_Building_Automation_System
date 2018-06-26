@@ -13,6 +13,13 @@
 7.优化扫描，若设备没有Zigbee ，不再会进行此项扫描
 8.修复Screen 中 output 和variable  由 Auto 改为manual时  点击无法更改 digital 值的问题.
 
+1. Support using Temco Bacnet tool and T3000 at the same time
+2. Modify the Bacnet MSTP parameter to improve the communication.
+3. Fix when the subpanel is 0 , the network point can't show in the UI.
+4. Scanning -> If device don't have Zigbee module , don't scan this device using Zigbee.
+5. Fix the screen edit interface , change the output and variable digital value from auto to manual ,the value can't change .
+
+
 2018 04 27
 1. 没有Zigbee的设备 Com1 不允许修改 ，以免误导客户.
 
@@ -793,8 +800,7 @@ Update by Fance
 #include "MainFrm.h"
 #include "BacnetScreenEdit.h"
 #include "BacnetRemotePoint.h"
-//bool CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data);
-//bool need_to_read_description = true;
+#include "ShowMessageDlg.h"
 int g_gloab_bac_comport = 1;
 int g_gloab_bac_baudrate = 19200;
 CString temp_device_id,temp_mac,temp_vendor_id;
@@ -841,6 +847,8 @@ extern bool show_user_list_window ;
 HANDLE connect_mstp_thread = NULL; // 当点击MSTP的设备时开启 连接的线程;
 HANDLE read_rs485_thread = NULL; // RS485的设备 通用;
 HANDLE write_indb_thread = NULL; //将资料写入数据库的线程;
+
+HANDLE hbip_whois_thread = NULL; //处理回复 I am 线程
 
 int n_read_product_type = 0;
 int n_read_list_flag = -1;
@@ -1521,7 +1529,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 	case START_BACNET_TIMER:
 		{
 			DFTrace(_T("Connect to the device use the modbus ip and port success!"));
-			m_bac_scan_com_data.clear();
+			m_bac_handle_Iam_data.clear();
 			if(m_is_remote_device)
 			{
 				Send_WhoIs_remote_ip(remote_ip_address);
@@ -2605,7 +2613,8 @@ void CDialogCM5_BacNet::Fresh()
         (g_protocol != PROTOCOL_BIP_TO_MSTP) && 
         (g_protocol != MODBUS_RS485) && 
         (g_protocol != MODBUS_TCPIP) &&
-        (g_protocol != PROTOCOL_MSTP_TP_MODBUS))
+        (g_protocol != PROTOCOL_BIP_T0_MSTP_TO_MODBUS) &&
+        (g_protocol != PROTOCOL_MSTP_TO_MODBUS))
 	{
 		return;
 	}
@@ -2686,7 +2695,12 @@ void CDialogCM5_BacNet::Fresh()
 		BacNet_hwd = this->m_hWnd;
 		return;
 	}
-    else if (pFrame->m_product.at(selected_product_index).protocol == PROTOCOL_MSTP_TP_MODBUS)
+    else if (pFrame->m_product.at(selected_product_index).protocol == PROTOCOL_MSTP_TO_MODBUS)
+    {
+        BacNet_hwd = this->m_hWnd;
+        return;
+    }
+    else if (pFrame->m_product.at(selected_product_index).protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)
     {
         BacNet_hwd = this->m_hWnd;
         return;
@@ -2694,9 +2708,10 @@ void CDialogCM5_BacNet::Fresh()
 
 	bip_setgsm(false);
 	Gsm_communication = false;
-	static bool initial_once_ip = false;
+
+
 #ifndef test_ptp
-	if(initial_once_ip == false)
+	if(initial_bip == false)
 	{
 		
 		g_gloab_bac_comport = 0;
@@ -2706,7 +2721,7 @@ void CDialogCM5_BacNet::Fresh()
 		
 		if((!offline_mode) &&(Initial_bac(g_gloab_bac_comport,pFrame->m_product.at(selected_product_index).NetworkCard_Address)))
 		{
-			initial_once_ip = true;
+            initial_bip = true;
 		}
 		else
 		{
@@ -2727,7 +2742,7 @@ void CDialogCM5_BacNet::Fresh()
 				Re_Initial_Bac_Socket_IP = pFrame->m_product.at(selected_product_index).NetworkCard_Address;
 			}
 		}
-
+        set_datalink_protocol(PROTOCOL_BACNET_IP);
 		bip_set_socket(my_sokect);
 		 bip_set_port(htons(47808));
 		in_addr BIP_Address;
@@ -2740,7 +2755,7 @@ void CDialogCM5_BacNet::Fresh()
 
 
 		if(g_bac_instance>0)
-			Send_WhoIs_Global(-1, -1);
+			Send_WhoIs_Global(g_bac_instance, g_bac_instance);
 	}
 
 	//
@@ -3214,14 +3229,14 @@ LRESULT CDialogCM5_BacNet::Fresh_UI(WPARAM wParam,LPARAM lParam)
 	CTime	TimeTemp;
 	switch(command_type)
 	{
-	case WM_COMMAND_WHO_IS:
-		temp_cs.Format(_T("%d"),g_bac_instance);
-		GetDlgItem(IDC_STATIC_CM_DEVICE_ID)->SetWindowTextW(temp_cs);
-		temp_cs.Format(_T("%d"),g_mac);
-		GetDlgItem(IDC_STATIC_CM5_MAC)->SetWindowTextW(temp_cs);
+	//case WM_COMMAND_WHO_IS:
+		//temp_cs.Format(_T("%d"),g_bac_instance);
+		//GetDlgItem(IDC_STATIC_CM_DEVICE_ID)->SetWindowTextW(temp_cs);
+		//temp_cs.Format(_T("%d"),g_mac);
+		//GetDlgItem(IDC_STATIC_CM5_MAC)->SetWindowTextW(temp_cs);
 		//Station_NUM = g_mac;
 
-		break;
+		//break;
 
 	case MENU_CLICK:
 
@@ -3301,9 +3316,9 @@ DWORD WINAPI  MSTP_Write_Command_Thread(LPVOID lpVoid)
 		else
 			Send_WhoIs_Global(-1, -1);
 		Sleep(1000);
-		for (int i=0;i<(int)m_bac_scan_com_data.size();i++)
+		for (int i=0;i<(int)m_bac_handle_Iam_data.size();i++)
 		{
-			if(m_bac_scan_com_data.at(i).device_id == g_bac_instance)
+			if(m_bac_handle_Iam_data.at(i).device_id == g_bac_instance)
 			{
 				find_exsit = true;
 				break;
@@ -3385,7 +3400,7 @@ DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
 	int m_finished_count = 0;
 	int m_total_count = 0;
 
-	//m_bac_scan_com_data.clear();
+	//m_bac_handle_Iam_data.clear();
 	bool find_exsit = false;
 	for (int z=0;z<3;z++)
 	{
@@ -3394,9 +3409,9 @@ DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
 		else
 			Send_WhoIs_Global(-1, -1);
 		Sleep(1000);
-		for (int i=0;i<(int)m_bac_scan_com_data.size();i++)
+		for (int i=0;i<(int)m_bac_handle_Iam_data.size();i++)
 		{
-			if(m_bac_scan_com_data.at(i).device_id == g_bac_instance)
+			if(m_bac_handle_Iam_data.at(i).device_id == g_bac_instance)
 			{
 				find_exsit = true;
 				break;
@@ -4995,7 +5010,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 			{
 				g_bPauseMultiRead = true; // 只要在minipanel的界面 就暂停 读 寄存器的那个线程;
 				if(!Gsm_communication)
-					m_bac_scan_com_data.clear();
+					m_bac_handle_Iam_data.clear();
 				if(g_bac_instance>0)
 					Send_WhoIs_Global(-1, -1);
 
@@ -5048,11 +5063,11 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 			if(m_is_remote_device)
 				Send_WhoIs_remote_ip(remote_ip_address);
 			else
-				Send_WhoIs_Global(-1, -1);
+				Send_WhoIs_Global(g_bac_instance, g_bac_instance);
 			bool find_exsit = false;
-			for (int i=0;i<(int)m_bac_scan_com_data.size();i++)
+			for (int i=0;i<(int)m_bac_handle_Iam_data.size();i++)
 			{
-				if(m_bac_scan_com_data.at(i).device_id == g_bac_instance)
+				if(m_bac_handle_Iam_data.at(i).device_id == g_bac_instance)
 				{
 					find_exsit = true;
 					KillTimer(BAC_READ_SETTING_TIMER);
@@ -5067,6 +5082,9 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 
 			if(find_exsit)
 			{
+                if(hbip_whois_thread == NULL)
+                    hbip_whois_thread = CreateThread(NULL, NULL, Handle_Bip_whois_Thread, this, NULL, NULL);
+
 				int temp_invoke_id = -1;
 				int send_status = true;
 				int	resend_count = 0;
@@ -5362,6 +5380,16 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
                 if (g_protocol == PROTOCOL_BACNET_IP)
                 {
                     pFrame->Show_Wait_Dialog_And_ReadBacnet();
+
+                    CShowMessageDlg dlg;
+                    CString temp_task_info;
+                    temp_task_info.Format(_T("This is the first time the device has been accessed , the data is being read"));
+                    dlg.SetStaticText(temp_task_info);
+                    //dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
+                    dlg.SetStaticTextColor(RGB(0, 0, 255));
+                    dlg.SetStaticTextSize(25, 20);
+                    dlg.SetProgressAutoClose(250, 100, EVENT_FIRST_LOAD_PROG);
+                    dlg.DoModal();
                 }
 				//PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,BAC_READ_ALL_LIST);
 			}
@@ -6106,6 +6134,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 	return 0;
 }
 
+
 DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
 {
 	close_com();
@@ -6267,9 +6296,9 @@ DWORD WINAPI  Mstp_Connect_Thread(LPVOID lpVoid)
 		Send_WhoIs_Global(-1, -1);
 		Sleep(1500);
 
-		for (int i=0;i<(int)m_bac_scan_com_data.size();i++)
+		for (int i=0;i<(int)m_bac_handle_Iam_data.size();i++)
 		{
-			if(m_bac_scan_com_data.at(i).device_id == g_bac_instance)
+			if(m_bac_handle_Iam_data.at(i).device_id == g_bac_instance)
 			{
 				find_exsit = true;
 				break;
@@ -6355,80 +6384,49 @@ BOOL CDialogCM5_BacNet::PreTranslateMessage(MSG* pMsg)
     }
 	return CFormView::PreTranslateMessage(pMsg);
 }
-#if 0
 
-#include<stdio.h>
-#include<stdlib.h>
-
-//链表定义
-typedef struct node{
-	int data;
-	struct node *next;
-}link;
-
-//构造链表
-link * create_link(link *head)
+DWORD WINAPI Handle_Bip_whois_Thread(LPVOID lpvoid)
 {
-	int data[5];
-	int i=0;
-	while(i<5)
-	{
-		scanf("%d",&data[i]);
-		i++;
-	}
-	link *p=head;//p为每次链表更新后的最后一个节点
-	for (i=0;i<5;i++)
-	{
-		link *q=(link*)malloc(sizeof(link));
-		q->data=data[i];
-		q->next=NULL;
-		p->next=q;
-		p=q;
-	}
-	return head;
+    return 1;
+    Sleep(1);
+    vector <_Bac_Scan_Com_Info> temp_vector;
+    for (int i = 0; i < m_bac_handle_Iam_data.size(); i++)
+    {
+        CString temp_ip;
+        temp_ip.Format(_T("%d.%d.%d.%d"), m_bac_handle_Iam_data.at(i).ipaddress[0],
+            m_bac_handle_Iam_data.at(i).ipaddress[1],
+            m_bac_handle_Iam_data.at(i).ipaddress[2],
+            m_bac_handle_Iam_data.at(i).ipaddress[3]);
+        if ((IP_ADDRESS.CompareNoCase(temp_ip) == 0) && m_bac_handle_Iam_data.at(i).device_id != g_bac_instance)
+        {
+            //就说明下面挂载了 MSTP的设备;
+            temp_vector.push_back(m_bac_handle_Iam_data.at(i));
+        }
+    }
+    CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+
+    //pFrame->m_product.at(selected_product_index).object_instance
+
+    for (int i = 0; i < temp_vector.size(); i++)
+    {
+        bool find_device_instance = false;
+        for (int j = 0; j < pFrame->m_product.size(); j++)
+        {
+            if (temp_vector.at(i).device_id == pFrame->m_product.at(j).object_instance)
+            {
+                find_device_instance = true;
+                break;
+            }
+        }
+        if (find_device_instance)
+            continue;
+
+        unsigned short test_array[1000];
+        int nret = 0;
+        nret = GetPrivateBacnetToModbusData(temp_vector.at(i).device_id, 0, 100, test_array);
+        Sleep(1);
+    }
+    //IP_ADDRESS
+    hbip_whois_thread = NULL;
+    return 0;
 }
-
-//链表反向
-link * reserve_link(link *head)
-{
-	link *last=head->next;//last为链表最后一个节点，反向后为第一个节点
-	int num=1;
-	while (last->next!=NULL)
-	{
-		num++;
-		last=last->next;
-	}
-	link *p,*q;//p为链表更新后反向那端开始的最后一个节点
-	p=last;
-	int i;
-	for (i=num-1;i>=1;i--)
-	{
-		int j=1;
-		q=head->next;
-		while (j<i)//找出原向的第i各节点p
-		{
-			q=q->next;
-			j++;
-		}
-		p->next=q;
-		q->next=NULL;//此时节点q的next域是空，不加此句最后的两个节点会成环
-		p=q;
-	}
-	head->next=last;
-	return head;
-}
-
-int main()
-{
-	link *head=(link*)malloc(sizeof(link));
-	head->data=0;
-	head->next=NULL;
-
-	link *li=create_link(head);
-
-	link *relink=reserve_link(head);
-
-	return 0;
-}
-
-#endif
