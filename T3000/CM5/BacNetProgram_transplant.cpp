@@ -2292,14 +2292,32 @@ int get_token(void)
 				}
 			}        /* end of relaional statement check */
 
+
 			if ( strchr("+-*^/%&|=;()[]'," , *prog))
 			{    /* delimiter*/
-				*temp = *prog ;
-				prog++ ;
-				temp++ ;
-				*temp = '\0' ;
-				/*		print_vars();  /*		fprintf(pmes, "DELIMITER \n" ) ; */
-				return (token_type = DELIMITER ) ;
+                ////if ((strstr(prog, "(")) &&
+                ////    (strstr(prog, "(")) &&
+                ////    (//判断包含AV AI
+                ////    (strstr(prog, "AV") != NULL) ||
+                ////        (strstr(prog, "AI") != NULL) ||
+                ////        (strstr(prog, "AO") != NULL) ||
+                ////        (strstr(prog, "BO") != NULL)
+                ////        ))
+                ////{
+                ////    *temp = *prog;
+                ////    prog++;
+                ////    temp++;
+                ////    *temp = '\0';
+
+                ////}
+
+                    *temp = *prog;
+                    prog++;
+                    temp++;
+                    *temp = '\0';
+                    /*		print_vars();  /*		fprintf(pmes, "DELIMITER \n" ) ; */
+                    return (token_type = DELIMITER);
+
 			}
 
 			if ( *prog == '"') 
@@ -2597,17 +2615,18 @@ int define_var(char *tok, int t,int l,int c, int lstr)
 	unsigned char sub_panel_number = 0;
  char *label/*,test*/;
   byte point_type,var_type;
- int i,k,num_net,num_point,num_panel;
+ int i,ret_network,num_net,num_point,num_panel;
  var_type = num_point = point_type = 0;
- k=0;
+ ret_network =0;
  /*label=ispoint(tok,&num_point,&var_type,&point_type,&num_panel,&num_net,pedit->network,pedit->panel,&k);*/
  my_panel = Station_NUM;
 // label=ispoint(tok,&num_point,&var_type,&point_type,&num_panel,&num_net,my_network,my_panel,&k);
-  label=ispoint_ex(tok,&num_point,&var_type,&point_type,&num_panel,&num_net,my_network,sub_panel_number,my_panel,&k);
+  label=ispoint_ex(tok,&num_point,&var_type,&point_type,&num_panel,&num_net,my_network,sub_panel_number,my_panel,&ret_network);
  if(!label)
  {             // local var
-//  if ((strlen(token) == 1 ) && (token[0]>='A' && token[0]<='Z'))
-//  {
+  if ((strlen(token) == 1 ) && (token[0]>='A' && token[0]<='Z'))
+  {
+      //2018 07 20 dufan
 	 sntx_err(NOT_VAR); 
 	 error = 1;
 	 return 0;
@@ -2619,7 +2638,7 @@ int define_var(char *tok, int t,int l,int c, int lstr)
 		 {sntx_err(NOT_VAR); return 0;}
 		*label++;
 	 }
-//  }
+  }
  }
 
 
@@ -2658,8 +2677,8 @@ int define_var(char *tok, int t,int l,int c, int lstr)
 
 					//if ( !k ) num_net = 0xFFFF;
 					//vars_table[i].network = num_net;
-					if ( !k ) num_net = 1;
-					vars_table[i].network = 1;
+					//if ( !ret_network) num_net = 1;
+					vars_table[i].network = ret_network;
 
 					if (var_type==LABEL_VAR)
 					{
@@ -2838,7 +2857,8 @@ void sntx_err(int err, int err_true )
 	 "Output number is too large",
 	 "Input number is too large",
 	 "Variable number is too large",
-	 "Program code larger than 2000"
+	 "Program code larger than 2000",
+     "Use instance only support AV AI AO DO"      // 29 
 	} ;
 	if(!pmes) return;
 	if(pmes < mesbuf + ( 1024 - 100 ) )
@@ -3460,7 +3480,17 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 			*netpresent = *num_net;
 	}
 #endif
-	if (((q=strchr(token,'-'))!=NULL) || ((q=strchr(token,'.'))!=NULL))
+    int b_is_instance = false;
+    char * temp_next = token + 3;
+    int token_length = strlen(token);
+    char * temp_last = token + token_length - 1;
+    if (((q = strstr(token, "INS")) != NULL) && ((*(temp_next) >= '0') && (*(temp_next) <= '9'))     && ((*(temp_last) >= '0') && (*(temp_last) <= '9')))
+    {
+        b_is_instance = true;
+        Sleep(1);
+    }
+	
+    if (((q=strchr(token,'-'))!=NULL) || ((q=strchr(token,'.'))!=NULL))
 	{
 		memcpy(pc,token,min( (int)(q-token),10));
 		pc[min((int)(q-token),10)]=0;
@@ -3518,10 +3548,19 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 	}
 	else	//如果是直接var1 就代表 使用的是自己的 main和sub都是一个;Fance
 	{
-		for(l=0;l<3 && token[l]!=0;l++)
-			if (token[l]<'0' || token[l]>'9')
-				break;
-		q=token+l;
+        //因为要支持instance 所以数比较大，不局限于以前的 255那么大
+		//for(l=0;l<3 && token[l]!=0;l++)
+		//	if (token[l]<'0' || token[l]>'9')
+		//		break;
+        if (b_is_instance)
+            token = token + 3; //因为前面加了M
+
+        for (l = 0;l<10 && token[l] != 0;l++)
+            if (token[l]<'0' || token[l]>'9')
+                break;
+
+
+		    q=token+l;
 		memcpy(pc,token,l);
 		pc[l]=0;
 		*num_panel = atoi(pc);
@@ -3532,10 +3571,10 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
             sub_panel = 0;
 			itoa((int)(*num_panel),(char *)fance_sub_pc,10);
 		}
-		//if ( *num_panel>32 && strlen(pc) )
+#if 0   //需要支持 bacnet 的 instance 所以 屏蔽下面的255 主panel的限制.
 		if ( *num_panel>255 && strlen(pc) )
-			//return 0;
 			return(islabel(token,num_point,var_type,point_type,num_panel));
+#endif
 	}
 	//	strcpy_s(my_info_panel[0].name,4,"VAR");
 
@@ -3557,8 +3596,17 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 			}
 		}
 			
-				//if (!strcmp(pc,my_info_panel[k].name))
-				//	break;
+
+        // 例如 编程   123456IN4   会报错 ，因为这种利用object instance 去编程 只支持 AV AI AO DO
+        if ((*num_panel >= 256) || b_is_instance)
+        {
+            if ((k != BAC_AV) && (k != BAC_AI) && (k != BAC_AO) && (k != BAC_DO))
+            {
+                sntx_err(INSTANCE_NOT_SUPPORT); //instance 不支持 此 type. 
+                error = INSTANCE_NOT_SUPPORT;
+                return 0;
+            }
+        }
 
 		if (k<= MAX_FUNCTION_COUNT)
 		{
@@ -3597,12 +3645,14 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 				{
 					//														itoa(panel,buf,10);
 					buf[0] = 0;
+#if 0   //2018 07 10   network point 用来复用 给 object instance .
 					if(netpresent)
 						if(*netpresent)
 						{
 							itoa(*num_net,buf,10);
 							strcat(buf,".");
 						}
+#endif
 #if 0
 						itoa(*num_panel,&buf[strlen(buf)],10);
 						*num_point=atoi(p);
@@ -3636,12 +3686,30 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 						*point_type = *point_type | high_3bit;
 						//if(*num_panel<10 || *num_point<100)
 						//	strcat(buf,"-");
-						if(*num_panel<10 || *num_point< (8*256))
-							strcat(buf,".");
-						strcat(buf,fance_sub_pc);
-						strcat(buf,".");
-						strcat(buf,pc);
-						strcat(buf,p);
+                        if ((*num_panel >= 256) || (b_is_instance == true))
+                        {
+                            unsigned int temp_value = 0;
+                            temp_value = *num_panel;
+                            *netpresent = temp_value >> 16;
+                            *netpresent = *netpresent | 0x00000080;
+                            
+                            *num_panel = temp_value >> 8;
+                            *num_panel = *num_panel & 0x000000FF;
+
+                            sub_panel = (unsigned char)(temp_value & 0x000000FF);
+                            Sleep(1);
+                        }
+                        else
+                        {
+                            if (*num_panel<10 || *num_point< (8 * 256))
+                                strcat(buf, ".");
+                            strcat(buf, fance_sub_pc);
+                            strcat(buf, ".");
+                            strcat(buf, pc);
+                            strcat(buf, p);
+                        }
+
+
 
                         //FANDU  2018 01 26 现在开始要慢慢支持访问其他panel 的数据，所以 判断不等于本地panel的需要拿掉;
 						//if((*num_panel !=Station_NUM ) || (sub_panel != Station_NUM))
@@ -3809,42 +3877,7 @@ char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *
 	return(islabel(token,num_point,var_type,point_type,num_panel));//fance
 }
 
-////typedef struct
-////{
-////	char description[21];	      /*  (21 bytes; string)*/
-////	char label[9];		      /*  (9 bytes; string)*/
-////
-////	long value;		      /*  (4 bytes; float)*/
-////
-////	unsigned auto_manual	   : 1;  /*  (1 bit; 0=auto, 1=manual)*/
-////	unsigned digital_analog	: 1;  /*  (1 bit; 0=digital, 1=analog)*/
-////	unsigned control	      : 1;
-////	unsigned unused		   : 5;
-////	unsigned range          : 8; /*  (1 Byte ; variable_range_equate)*/
-////
-////}	Str_variable_point; /* 21+9+4+2 = 36*/
-////
-////
-////typedef struct
-////{
-////	char description[21]; 	       /* (21 bytes; string)*/
-////	char label[9];		       /* (9 bytes; string)*/
-////
-////	long value;		       /* (4 bytes; long) */
-////
-////	unsigned auto_manual	   : 1;  /* (1 bit; 0=auto, 1=manual)*/
-////	unsigned digital_analog : 1;  /* (1 bit; 0=digital, 1=analog)*/
-////	unsigned hw_switch_status	: 3;  /* (3 bits; 0-5)*/
-////	unsigned control        : 1;  /* (1 bit; 0=off, 1=on)*/
-////	unsigned digital_control: 1;  /* (1 bit)*/
-////	unsigned decom	       	: 1;  /* (1 bit; 0=ok, 1=point decommissioned)*/
-////	unsigned range          : 8;	/* (1 Byte ; output_range_equate)*/
-////
-////	byte m_del_low;  /* (1 Byte ; if analog then low)*/
-////	byte s_del_high; /* (1 Byte ; if analog then high)*/
-////	unsigned int delay_timer;      /* (2 bytes;  seconds,minutes)*/
-////
-////} Str_out_point;  /* 21+4+2+2+9 = 40 */
+
 Str_out_point My_outputs[10];
 Str_variable_point  My_vars[10];
 
@@ -4491,24 +4524,24 @@ void prescan2(void)
 													//fance strcpy(&pedit->comment[v1],token);
 													v1 += strlen(token)+1;
 										}
-										else
-										{
-										 if (!strcmp(strupr(token),"DATE"))
-													buf_v[i].v=_DATE;
-										 else if (!strcmp(strupr(token),"PTIME"))
-														buf_v[i].v=PTIME;
-												 else	if (!strcmp(strupr(token),"USER_A"))
-																buf_v[i].v=USER_A;
-															else if (!strcmp(strupr(token),"USER_B"))
-																		 buf_v[i].v=USER_B;
-																	 else	if (!strcmp(strupr(token),"BEEP"))
-																						buf_v[i].v=BEEP;
-																				else if (token_type==IDENTIFIER)
-																								 {
-																								buf_v[i].v=IDENTIFIER;
-																									strcpy(buf_v[i].var,token);
-																								 }
-										}
+                                        else
+                                        {
+                                            if (!strcmp(strupr(token), "DATE"))
+                                                buf_v[i].v = _DATE;
+                                            else if (!strcmp(strupr(token), "PTIME"))
+                                                buf_v[i].v = PTIME;
+                                            else	if (!strcmp(strupr(token), "USER_A"))
+                                                buf_v[i].v = USER_A;
+                                            else if (!strcmp(strupr(token), "USER_B"))
+                                                buf_v[i].v = USER_B;
+                                            else	if (!strcmp(strupr(token), "BEEP"))
+                                                buf_v[i].v = BEEP;
+                                            else if (token_type == IDENTIFIER)
+                                            {
+                                                buf_v[i].v = IDENTIFIER;
+                                                strcpy(buf_v[i].var, token);
+                                            }
+                                        }
 										n_var++;
 										i++;
 										get_token();
@@ -5746,8 +5779,41 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 				else
 					if ((vars_table[cur_index].type == POINT_VAR) || (vars_table[cur_index].type == LABEL_VAR))
 					{
+                        if ((unsigned char)vars_table[cur_index].network >= 128) //network 的最高位用来标识  是否是新的数据格式
+                        {
+                            unsigned char high_3bit;
+                            cod_line[Byte++] = REMOTE_POINT_PRG;
+                            if (((unsigned char)vars_table[cur_index].point_type == COIL_REG) ||
+                                ((unsigned char)vars_table[cur_index].point_type == DIS_INPUT_REG) ||
+                                ((unsigned char)vars_table[cur_index].point_type == INPUT_REG) ||
+                                ((unsigned char)vars_table[cur_index].point_type == MB_REG) ||
+                                ((unsigned char)vars_table[cur_index].point_type == BAC_AV) ||
+                                ((unsigned char)vars_table[cur_index].point_type == BAC_AI) ||
+                                ((unsigned char)vars_table[cur_index].point_type == BAC_AO) ||
+                                ((unsigned char)vars_table[cur_index].point_type == BAC_DO))
+                            {
+                                point.number = (unsigned char)((vars_table[cur_index].num_point) & 0x00ff);
+                                high_3bit = ((vars_table[cur_index].num_point) & 0xff00) >> 3;
+                            }
+                            else
+                            {
+                                point.number = (unsigned char)((vars_table[cur_index].num_point - 1) & 0x00ff);
+                                high_3bit = ((vars_table[cur_index].num_point - 1) & 0xff00) >> 3;
 
-						if( ( ( (unsigned char)vars_table[cur_index].panel == Station_NUM ) && (  (unsigned char)vars_table[cur_index].sub_panel == Station_NUM  )  )  ||
+                            }
+
+                            point.point_type = (vars_table[cur_index].point_type + 1) | high_3bit;
+                            //*point_type = *point_type | high_3bit;
+
+
+
+                            point.panel = vars_table[cur_index].panel;
+                            point.sub_panel = vars_table[cur_index].sub_panel;
+                            point.network = vars_table[cur_index].network;
+                            memcpy(&cod_line[Byte], &point, sizeof(Point_Net));
+                            Byte += sizeof(Point_Net);
+                        }
+						else if( ( ( (unsigned char)vars_table[cur_index].panel == Station_NUM ) && (  (unsigned char)vars_table[cur_index].sub_panel == Station_NUM  )  )  ||
                             (   (unsigned char)vars_table[cur_index].panel == Station_NUM ) && (  (unsigned char)vars_table[cur_index].sub_panel == 0 ) )
 						{
 							if((vars_table[cur_index].point_type & 0x1F) == 2/*ENUM_VAR*/ )
@@ -6809,7 +6875,7 @@ int pointtotext(char *buf,Point_T3000 *point)
 		return 1;
 	}
 
-	if(point_type > 16)
+	if(point_type > BAC_DO)
 	{
 		buf[0]=0;
 		return 1;
@@ -6923,6 +6989,41 @@ int pointtotext(char *buf,Point_Net *point)
         return 0;
     }
 
+    if (point->network >= 128) // 说明是新的格式，最高位用来标识.
+    {
+        unsigned int temp_value;
+        temp_value = ((point->network & 0x7F) << 16) + (point->panel << 8) + (point->sub_panel);
+        char temp_object_instance[10];
+        memset(temp_object_instance, 0, 10);
+        if (temp_value < 256)
+        {
+            strcpy(buf, "INS");
+            strcat(buf + 1, itoa(temp_value, temp_object_instance, 10));
+        }
+        else
+            strcat(buf, itoa(temp_value, temp_object_instance, 10));
+        if ((point->panel != point->sub_panel) && (point_type == VAR))
+            strcat(buf, "REG");//Fance	曰了狗了 ，3-25-VAR100  非要支持  3-25-REG100.
+        else
+            strcat(buf, ptr_panel.info[point_type].name);//Fance
+
+        point->point_type = (point->point_type) & 0x1F;
+        if ((point->point_type == COIL_REG) ||
+            (point->point_type == DIS_INPUT_REG) ||
+            (point->point_type == INPUT_REG) ||
+            (point->point_type == MB_REG) ||
+            (point->point_type == BAC_AV) ||
+            (point->point_type == BAC_AI) ||
+            (point->point_type == BAC_AO) ||
+            (point->point_type == BAC_DO))
+        {
+            strcat(buf, itoa(num, x, 10));
+        }
+        else
+            strcat(buf, itoa(num + 1, x, 10));
+        return 0;
+
+    }
 
 	strcat(buf,itoa(panel,x,10));
 	//strcat(buf,itoa(panel+1,x,10));//2015-03-03修改，从此panel number 不在减一;
@@ -7405,7 +7506,7 @@ void Init_table_bank()
 void init_info_table( void )
 {
 	int i;
-	memset( ptr_panel.info, 0, 18*sizeof( Info_Table ) );
+	memset( ptr_panel.info, 0, MAX_FUNCTION_COUNT *sizeof( Info_Table ) );
 	for( i=0; i<MAX_FUNCTION_COUNT + 1; i++ )
 	//for( i=0; i<18; i++ )
 	{

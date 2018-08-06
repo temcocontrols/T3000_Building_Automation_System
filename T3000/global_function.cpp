@@ -796,7 +796,17 @@ UINT get_serialnumber()
 
 BOOL IS_Temco_Product(int product_model)
 {
-
+    pidname_map::iterator it;
+    it = product_map.find(product_model);
+    if (it == product_map.end())
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+#if 0
 	switch(product_model)
 	{
 		    case   PM_TSTAT5B				   :
@@ -872,6 +882,7 @@ BOOL IS_Temco_Product(int product_model)
 			default:
 			       return FALSE;
 	}
+#endif
 }
 // Function : 获得单位名称，此单位用于Input Grid，Output Grid，Output Set Grid，主界面的Grid等等。
 // Param: int nRange: 指示当前的Range的选择值。函数应该根据Range的选择以及TStat的型号，
@@ -1944,7 +1955,7 @@ int GetPrivateData(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint
     BACNET_ADDRESS dest = { 0 };
 	if(offline_mode)
 	{
-		LoadBacnetConfigFile(false,offline_prg_path);
+		LoadBacnetBinaryFile(false,offline_prg_path);
 		return 1;
 	}
 
@@ -2208,7 +2219,7 @@ int GetProgramData(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance
 
 	if(offline_mode)
 	{
-		LoadBacnetConfigFile(false,offline_prg_path);
+		LoadBacnetBinaryFile(false,offline_prg_path);
 		return 1;
 	}
 
@@ -4112,7 +4123,7 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 				if(temp_on[i].GetLength() >= 12)
 					temp_on[i].Empty();
 
-				temp_unit_no_index[i] = temp_off[i] + _T("/") + temp_on[i];
+				Custom_Digital_Range[i] = temp_off[i] + _T("/") + temp_on[i];
 
 			}
 
@@ -4350,7 +4361,7 @@ void local_handler_conf_private_trans_ack(
         CString temp_serial;
         temp_serial.Format(_T("%u.prog"),g_selected_serialnumber);
         temp_file = g_achive_folder + _T("\\") + temp_serial;
-        SaveBacnetConfigFile_Cache(temp_file);
+        SaveBacnetBinaryFile(temp_file);
         //TRACE(_T("Save config file cache\r\n"));
     }
 
@@ -4454,7 +4465,8 @@ void Inial_Product_map()
 	product_map.insert(map<int,CString>::value_type(PM_CS_RSM_AC,_T("CS-RSM-AC")));
 	product_map.insert(map<int,CString>::value_type(PM_CS_RSM_DC,_T("CS-RSM-DC")));
 
-
+    
+    product_map.insert(map<int, CString>::value_type(PM_PWMETER, _T("Power_Meter")));
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT8_WIFI,_T("TStat8_Wifi")));
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT8_OCC,_T("TStat8_Occ")));
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT7_ARM,_T("TStat7_ARM")));
@@ -5807,47 +5819,6 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	}
 
 
-	//char * temp_point = NULL;
-	//refresh_net_label_info temp_label;
-	//temp_point = temp_data.reg.panel_name;
-	//if(( (unsigned char)temp_point[0] != 0xff) && ((unsigned char)temp_point[1] != 0xff) && ((unsigned char)temp_point[0] != 0x00))
-	//{
-	//	memcpy(temp_label.label_name,&temp_point[0],20);
-	//	temp_point = temp_point + 20;
-	//	CString cs_temp_label;
-	//	MultiByteToWideChar( CP_ACP, 0, (char *)temp_label.label_name, (int)strlen((char *)temp_label.label_name)+1,
-	//		cs_temp_label.GetBuffer(MAX_PATH), MAX_PATH );
-	//	cs_temp_label.ReleaseBuffer();
-	//	if(cs_temp_label.GetLength() > 20)
-	//		cs_temp_label = cs_temp_label.Left(20);
-	//	temp_label.serial_number = (unsigned int)nSerial;
-	//	CString temp_serial_number;
-	//	temp_serial_number.Format(_T("%u"),temp_label.serial_number);
-	//	int need_to_write_into_device = GetPrivateProfileInt(temp_serial_number,_T("WriteFlag"),0,g_achive_device_name_path);
-	//	if(need_to_write_into_device == 0)
-	//	{
-	//		bool found_device = false;
-	//		bool found_device_new_name = false;
-	//		for (int i=0; i<m_refresh_net_device_data.size(); i++)
-	//		{
-	//			if(temp_label.serial_number == m_refresh_net_device_data.at(i).nSerial)
-	//			{
-	//				if(cs_temp_label.CompareNoCase( m_refresh_net_device_data.at(i).show_label_name) == 0)
-	//				{
-	//					found_device_new_name = false;
-	//				}
-	//				else
-	//				{
-	//					m_refresh_net_device_data.at(i).show_label_name = cs_temp_label;
-	//					found_device_new_name = true;
-	//				}
-	//				break;
-	//			}
-	//		}
-	//	}
-	//}
-
-
 
 	return m_refresh_net_device_data.size();
 }
@@ -6461,7 +6432,7 @@ void Send_WhoIs_remote_ip(CString ipaddress_temp)
 
 
  
-int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
+int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path)
 {
     if((g_mac!=0) &&(g_bac_instance!=0))
     {
@@ -6513,6 +6484,7 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
 			for (int i=0; i<dwFileLen; i++)
 			{
 				*temp_buffer = *temp_buffer ^ 1;
+
 				temp_buffer ++;
 			}
 
@@ -7273,6 +7245,22 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
 			{
 				memcpy(&m_customer_unit_data.at(i),temp_point,sizeof(Str_Units_element));
 				temp_point = temp_point + sizeof(Str_Units_element);
+
+                //2018 07 23 对于虚拟设备 在加载时 解析 客户自定义的 range
+                MultiByteToWideChar(CP_ACP, 0, (char *)m_customer_unit_data.at(i).digital_units_off, (int)strlen((char *)m_customer_unit_data.at(i).digital_units_off) + 1,
+                    temp_off[i].GetBuffer(MAX_PATH), MAX_PATH);
+                temp_off[i].ReleaseBuffer();
+                if (temp_off[i].GetLength() >= 12)
+                    temp_off[i].Empty();
+
+                MultiByteToWideChar(CP_ACP, 0, (char *)m_customer_unit_data.at(i).digital_units_on, (int)strlen((char *)m_customer_unit_data.at(i).digital_units_on) + 1,
+                    temp_on[i].GetBuffer(MAX_PATH), MAX_PATH);
+                temp_on[i].ReleaseBuffer();
+                if (temp_on[i].GetLength() >= 12)
+                    temp_on[i].Empty();
+
+                Custom_Digital_Range[i] = temp_off[i] + _T("/") + temp_on[i];
+
 			}
 
 			for (int i=0; i<BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT; i++)
@@ -7699,7 +7687,7 @@ void Copy_Data_From_485_to_Bacnet(unsigned short *start_point)
 	//}
 }
 
-int LoadBacnetConfigFile_Cache(LPCTSTR tem_read_path)
+int LoadBacnetBinaryFile_Cache(LPCTSTR tem_read_path)
 {
     if((g_mac!=0) &&(g_bac_instance!=0))
     {
@@ -8184,6 +8172,113 @@ void SaveBacnetConfigFile_Cache(CString &SaveConfigFilePath)
         WriteFile(hFile,temp_buffer,dwFileLen,&dWrites,NULL);
         CloseHandle(hFile);
 
+    }
+}
+
+//用来初始化bacnet 内存;
+void ClearBacnetData()
+{
+    for (int i = 0; i<BAC_INPUT_ITEM_COUNT; i++)
+    {
+        memset(m_Input_data.at(i).description, 0, sizeof(Str_in_point));
+        sprintf((char *)m_Input_data.at(i).description, "IN%d", i + 1);
+        sprintf((char *)m_Input_data.at(i).label, "IN%d", i + 1);
+    }
+
+    for (int i = 0; i<BAC_OUTPUT_ITEM_COUNT; i++)
+    {
+        memset(m_Output_data.at(i).description, 0, sizeof(Str_out_point));
+        sprintf((char *)m_Output_data.at(i).description, "OUT%d", i + 1);
+        sprintf((char *)m_Output_data.at(i).label, "OUT%d", i + 1);
+    }
+
+
+    for (int i = 0; i<BAC_VARIABLE_ITEM_COUNT; i++)
+    {
+        memset(m_Variable_data.at(i).description, 0, sizeof(Str_variable_point));
+        sprintf((char *)m_Variable_data.at(i).description, "VAR%d", i + 1);
+        sprintf((char *)m_Variable_data.at(i).label, "VAR%d", i + 1);
+    }
+
+    for (int i = 0; i<BAC_PROGRAM_ITEM_COUNT; i++)
+    {
+        memset(m_Program_data.at(i).description, 0, sizeof(Str_program_point));
+        sprintf((char *)m_Program_data.at(i).description, "PRG%d", i + 1);
+        sprintf((char *)m_Program_data.at(i).label, "PRG%d", i + 1);
+    }
+
+    for (int i = 0; i<BAC_PID_COUNT; i++)
+    {
+        memset(&m_controller_data.at(i), 0, sizeof(Str_controller_point));
+    }
+
+    for (int i = 0; i<BAC_SCREEN_COUNT; i++)
+    {
+        memset(m_screen_data.at(i).description, 0, sizeof(Control_group_point));
+    }
+
+    for (int i = 0; i<BAC_GRPHIC_LABEL_COUNT; i++)
+    {
+        memset(&m_graphic_label_data.at(i), 0, sizeof(Str_label_point));
+    }
+
+    for (int i = 0; i<BAC_USER_LOGIN_COUNT; i++)
+    {
+        memset(&m_user_login_data.at(i), 0, sizeof(Str_userlogin_point));
+    }
+
+    for (int i = 0; i<BAC_CUSTOMER_UNITS_COUNT; i++)
+    {
+        memset(&m_customer_unit_data.at(i), 0, sizeof(Str_Units_element));
+    }
+
+    for (int i = 0; i<BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT; i++)
+    {
+        memset(&m_analog_custmer_range.at(i), 0, sizeof(Str_table_point));
+    }
+
+   // memcpy(temp_point, &Device_Basic_Setting, sizeof(Str_Setting_Info));
+    //temp_point = temp_point + sizeof(Str_Setting_Info);
+
+
+    for (int i = 0; i<BAC_SCHEDULE_COUNT; i++)
+    {
+        memset(&m_Weekly_data.at(i), 0, sizeof(Str_weekly_routine_point));
+        sprintf((char *)m_Weekly_data.at(i).description, "SCH%d", i + 1);
+        sprintf((char *)m_Weekly_data.at(i).label, "SCH%d", i + 1);
+    }
+
+    for (int i = 0; i<BAC_HOLIDAY_COUNT; i++)
+    {
+        memset(&m_Annual_data.at(i), 0, sizeof(Str_annual_routine_point));
+        sprintf((char *)m_Annual_data.at(i).description, "HOL%d", i + 1);
+        sprintf((char *)m_Annual_data.at(i).label, "HOL%d", i + 1);
+    }
+
+    for (int i = 0; i<BAC_MONITOR_COUNT; i++)
+    {
+        memset(&m_monitor_data.at(i), 0, sizeof(Str_monitor_point));
+        sprintf((char *)m_monitor_data.at(i).label, "AMON%d", i + 1);
+    }
+
+    for (int i = 0; i<BAC_WEEKLYCODE_ROUTINES_COUNT; i++)
+    {
+        memset(weeklt_time_schedule[i], 0, WEEKLY_SCHEDULE_SIZE);
+    }
+
+    for (int i = 0; i<BAC_HOLIDAY_COUNT; i++)
+    {
+        memset(g_DayState[i], 0, ANNUAL_CODE_SIZE);
+    }
+
+    for (int i = 0; i<BAC_PROGRAMCODE_ITEM_COUNT; i++)
+    {
+        memset(program_code[i], 0, 2000);
+    }
+
+    for (int i = 0; i<BAC_VARIABLE_CUS_UNIT_COUNT; i++)
+    {
+        memset(&m_variable_analog_unite.at(i), 0, sizeof(Str_variable_uint_point));
     }
 }
 
@@ -11806,7 +11901,7 @@ bool Output_data_to_string(unsigned char  temp_output_index,
 		else if((temp_output_data.range >= 23) && (temp_output_data.range <= 30))
 		{
 			if(receive_customer_unit)
-				temp_out_range = temp_unit_no_index[temp_output_data.range - 23];
+				temp_out_range = Custom_Digital_Range[temp_output_data.range - 23];
 			else
 				temp_out_range = Digital_Units_Array[0];
 		}
@@ -11826,7 +11921,7 @@ bool Output_data_to_string(unsigned char  temp_output_index,
 			else if((temp_output_data.range >=23) && (temp_output_data.range <= 30))
 			{
 				if(receive_customer_unit)
-					temp1 = temp_unit_no_index[temp_output_data.range - 23];
+					temp1 = Custom_Digital_Range[temp_output_data.range - 23];
 			}
 			else
 			{
@@ -11954,7 +12049,7 @@ bool Input_data_to_string(unsigned char  temp_input_index ,
 		{
 			if(receive_customer_unit)
 			{
-				temp_in_range = temp_unit_no_index[temp_input_data.range - 23];
+				temp_in_range = Custom_Digital_Range[temp_input_data.range - 23];
 			}
 			else
 				temp_in_range = Digital_Units_Array[0];
@@ -11979,7 +12074,7 @@ bool Input_data_to_string(unsigned char  temp_input_index ,
 			else if((temp_input_data.range >=23) && (temp_input_data.range <= 30))
 			{
 				if(receive_customer_unit)
-					temp1 = temp_unit_no_index[temp_input_data.range - 23];
+					temp1 = Custom_Digital_Range[temp_input_data.range - 23];
 			}
 
 			SplitCStringA(temparray,temp1,_T("/"));
@@ -12171,7 +12266,7 @@ bool Save_InputData_to_db(unsigned char  temp_input_index )
 		{
 			if(receive_customer_unit)
 			{
-				temp_in_range = temp_unit_no_index[temp_input_data.range - 23];
+				temp_in_range = Custom_Digital_Range[temp_input_data.range - 23];
 			}
 			else
 				temp_in_range = Digital_Units_Array[0];
@@ -12196,7 +12291,7 @@ bool Save_InputData_to_db(unsigned char  temp_input_index )
 			else if((temp_input_data.range >=23) && (temp_input_data.range <= 30))
 			{
 				if(receive_customer_unit)
-					temp1 = temp_unit_no_index[temp_input_data.range - 23];
+					temp1 = Custom_Digital_Range[temp_input_data.range - 23];
 			}
 
 			SplitCStringA(temparray,temp1,_T("/"));
@@ -12377,7 +12472,7 @@ bool Save_OutputData_to_db(unsigned char  temp_output_index)
 		else if((temp_output_data.range >= 23) && (temp_output_data.range <= 30))
 		{
 			if(receive_customer_unit)
-				temp_out_range = temp_unit_no_index[temp_output_data.range - 23];
+				temp_out_range = Custom_Digital_Range[temp_output_data.range - 23];
 			else
 				temp_out_range = Digital_Units_Array[0];
 		}
@@ -12397,7 +12492,7 @@ bool Save_OutputData_to_db(unsigned char  temp_output_index)
 			else if((temp_output_data.range >=23) && (temp_output_data.range <= 30))
 			{
 				if(receive_customer_unit)
-					temp1 = temp_unit_no_index[temp_output_data.range - 23];
+					temp1 = Custom_Digital_Range[temp_output_data.range - 23];
 			}
 			else
 			{
@@ -12533,7 +12628,7 @@ bool Save_AVData_to_db()
 				else if ((m_Variable_data.at(i).range >= 23) && (m_Variable_data.at(i).range <= 30))
 				{
 					if (receive_customer_unit)
-						temp_units = temp_unit_no_index[m_Variable_data.at(i).range - 23];
+						temp_units = Custom_Digital_Range[m_Variable_data.at(i).range - 23];
 				}
 				else
 				{
@@ -12740,7 +12835,7 @@ bool Save_InputData_to_db(unsigned char  temp_input_index, unsigned int nserialn
 		{
 			if (receive_customer_unit)
 			{
-				temp_in_range = temp_unit_no_index[temp_input_data.range - 23];
+				temp_in_range = Custom_Digital_Range[temp_input_data.range - 23];
 			}
 			else
 				temp_in_range = Digital_Units_Array[0];
@@ -12765,7 +12860,7 @@ bool Save_InputData_to_db(unsigned char  temp_input_index, unsigned int nserialn
 			else if ((temp_input_data.range >= 23) && (temp_input_data.range <= 30))
 			{
 				if (receive_customer_unit)
-					temp1 = temp_unit_no_index[temp_input_data.range - 23];
+					temp1 = Custom_Digital_Range[temp_input_data.range - 23];
 			}
 
 			SplitCStringA(temparray, temp1, _T("/"));
@@ -12956,7 +13051,7 @@ bool Save_OutputData_to_db(unsigned char  temp_output_index, unsigned int nseria
 		else if ((temp_output_data.range >= 23) && (temp_output_data.range <= 30))
 		{
 			if (receive_customer_unit)
-				temp_out_range = temp_unit_no_index[temp_output_data.range - 23];
+				temp_out_range = Custom_Digital_Range[temp_output_data.range - 23];
 			else
 				temp_out_range = Digital_Units_Array[0];
 		}
@@ -12976,7 +13071,7 @@ bool Save_OutputData_to_db(unsigned char  temp_output_index, unsigned int nseria
 			else if ((temp_output_data.range >= 23) && (temp_output_data.range <= 30))
 			{
 				if (receive_customer_unit)
-					temp1 = temp_unit_no_index[temp_output_data.range - 23];
+					temp1 = Custom_Digital_Range[temp_output_data.range - 23];
 			}
 			else
 			{
@@ -13139,7 +13234,7 @@ bool Save_VariableData_to_db(unsigned char  temp_output_index, unsigned int nser
 			else if ((m_Variable_data.at(i).range >= 23) && (m_Variable_data.at(i).range <= 30))
 			{
 				if (receive_customer_unit)
-					temp_units = temp_unit_no_index[m_Variable_data.at(i).range - 23];
+					temp_units = Custom_Digital_Range[m_Variable_data.at(i).range - 23];
 			}
 			else
 			{

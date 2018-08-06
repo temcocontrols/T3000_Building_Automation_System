@@ -128,6 +128,11 @@ public:
 	HTREEITEM m_virtual_tree_item;
 	bool tree_offline_mode;
 	void SetTreeOfflineMode(bool b_value);
+    virtual void PreSubclassWindow();
+    virtual INT_PTR OnToolHitTest(CPoint point, TOOLINFO* pTI) const;
+
+    afx_msg BOOL OnToolTipText(UINT id, NMHDR * pNMHDR, LRESULT * pResult);
+
 };
 
 

@@ -232,8 +232,8 @@ typedef struct
 typedef  struct
 {
 
-	int8_t description[STR_IN_DESCRIPTION_LENGTH]; 	      /* (21 bytes; string)*/
-	int8_t label[STR_IN_LABEL];		      	/* (9 bytes; string)*/
+    uint8_t description[STR_IN_DESCRIPTION_LENGTH]; 	      /* (21 bytes; string)*/
+    uint8_t label[STR_IN_LABEL];		      	/* (9 bytes; string)*/
 	int value;		     						/* (4 bytes; int32_t)*/
 	uint8_t  filter;  /* (3 bits; 0=1,1=2,2=4,3=8,4=16,5=32, 6=64,7=128,)*/
 	uint8_t decom;/* (1 bit; 0=ok, 1=point decommissioned)*/

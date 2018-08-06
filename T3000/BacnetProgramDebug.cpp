@@ -495,7 +495,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 					else if((m_Output_data.at(point_number).range >= 23) && (m_Output_data.at(point_number).range <= 30))
 					{
 						if(receive_customer_unit)
-							m_program_debug_list.SetItemText(0,OUTPUT_RANGE,temp_unit_no_index[m_Output_data.at(point_number).range - 23]);
+							m_program_debug_list.SetItemText(0,OUTPUT_RANGE,Custom_Digital_Range[m_Output_data.at(point_number).range - 23]);
 						else
 							m_program_debug_list.SetItemText(0,OUTPUT_RANGE,Digital_Units_Array[0]);
 					}
@@ -516,7 +516,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 						else if((m_Output_data.at(point_number).range >=23) && (m_Output_data.at(point_number).range <= 30))
 						{
 							if(receive_customer_unit)
-								temp1 = temp_unit_no_index[m_Output_data.at(point_number).range - 23];
+								temp1 = Custom_Digital_Range[m_Output_data.at(point_number).range - 23];
 						}
 						else
 						{
@@ -642,7 +642,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 						else if((m_Input_data.at(point_number).range >= 23) && (m_Input_data.at(point_number).range <= 30))
 						{
 							if(receive_customer_unit)
-								m_program_debug_list.SetItemText(0,INPUT_RANGE,temp_unit_no_index[m_Input_data.at(point_number).range - 23]);
+								m_program_debug_list.SetItemText(0,INPUT_RANGE,Custom_Digital_Range[m_Input_data.at(point_number).range - 23]);
 							else
 								m_program_debug_list.SetItemText(0,INPUT_RANGE,Digital_Units_Array[0]);
 						}
@@ -664,7 +664,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 							else if((m_Input_data.at(point_number).range >=23) && (m_Input_data.at(point_number).range <= 30))
 							{
 								if(receive_customer_unit)
-									temp1 = temp_unit_no_index[m_Input_data.at(point_number).range - 23];
+									temp1 = Custom_Digital_Range[m_Input_data.at(point_number).range - 23];
 							}
 
 
@@ -833,7 +833,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 						else if((m_Variable_data.at(point_number).range >=23) && (m_Variable_data.at(point_number).range <= 30))
 						{
 							if(receive_customer_unit)
-								temp1 = temp_unit_no_index[m_Variable_data.at(point_number).range - 23];
+								temp1 = Custom_Digital_Range[m_Variable_data.at(point_number).range - 23];
 						}
 						else
 						{
@@ -1114,7 +1114,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 										else if((m_Variable_data.at(x).range >=23) && (m_Variable_data.at(x).range <= 30))
 										{
 											if(receive_customer_unit)
-												temp1 = temp_unit_no_index[m_Variable_data.at(x).range - 23];
+												temp1 = Custom_Digital_Range[m_Variable_data.at(x).range - 23];
 										}
 
 										SplitCStringA(temparray,temp1,_T("/"));
@@ -1683,7 +1683,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 				else if((m_Output_data.at(point_number).range >=23) && (m_Output_data.at(point_number).range <= 30))
 				{
 					if(receive_customer_unit)
-						temp1 = temp_unit_no_index[m_Output_data.at(point_number).range - 23];
+						temp1 = Custom_Digital_Range[m_Output_data.at(point_number).range - 23];
 					else
 					{
 						m_program_debug_list.Set_Edit(false);
@@ -1839,8 +1839,8 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 
 					if((bac_range_number_choose >= 23) && (bac_range_number_choose <= 30))
 					{
-						//temp1.Format(_T("%s"), temp_unit_no_index[bac_range_number_choose - 23]);
-						temp1 = temp_unit_no_index[bac_range_number_choose - 23];
+						//temp1.Format(_T("%s"), Custom_Digital_Range[bac_range_number_choose - 23]);
+						temp1 = Custom_Digital_Range[bac_range_number_choose - 23];
 					}
 					else
 						temp1 = Digital_Units_Array[bac_range_number_choose];//22 is the sizeof the array
@@ -1918,7 +1918,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 				else if((m_Input_data.at(point_number).range >=23) && (m_Input_data.at(point_number).range <= 30))
 				{
 					if(receive_customer_unit)
-						temp1 = temp_unit_no_index[m_Input_data.at(point_number).range - 23];
+						temp1 = Custom_Digital_Range[m_Input_data.at(point_number).range - 23];
 					else
 					{
 						m_program_debug_list.Set_Edit(false);
@@ -2136,7 +2136,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 					CStringArray temparray;
 					if((bac_range_number_choose >= 23) && (bac_range_number_choose <= 30))
 					{
-						temp1 = temp_unit_no_index[bac_range_number_choose - 23];
+						temp1 = Custom_Digital_Range[bac_range_number_choose - 23];
 					}
 					else
 						temp1 = Digital_Units_Array[bac_range_number_choose];//22 is the sizeof the array
@@ -2195,7 +2195,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 				else if((m_Variable_data.at(point_number).range >=23) && (m_Variable_data.at(point_number).range <= 30))
 				{
 					if(receive_customer_unit)
-						temp1 = temp_unit_no_index[m_Variable_data.at(point_number).range - 23];
+						temp1 = Custom_Digital_Range[m_Variable_data.at(point_number).range - 23];
 					else
 					{
 						m_program_debug_list.Set_Edit(false);
@@ -2426,7 +2426,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 					CStringArray temparray;
 					if((bac_range_number_choose >= 23) && (bac_range_number_choose <= 30))
 					{
-						temp1 = temp_unit_no_index[bac_range_number_choose - 23];
+						temp1 = Custom_Digital_Range[bac_range_number_choose - 23];
 					}
 					else
 						temp1 = Digital_Units_Array[bac_range_number_choose];//22 is the sizeof the array

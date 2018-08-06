@@ -39,7 +39,7 @@ CMyStatusbarCtrl * statusbar = NULL;
 
 #include "excel9.h"
 #include "ParameterDlg.h"
-
+#include "Powermeter.h"
 #include "BacnetTool.h"
 #include "BacnetAlarmWindow.h"
 #include "Dialog_Progess.h"
@@ -617,6 +617,7 @@ void CMainFrame::InitViews()
     m_pViews[DLG_DIALOG_TSTAT_OUTPUT_VIEW]=(CView *)new CTStatOutputView;
     m_pViews[DLG_DIALOG_BOATMONITOR] = (CView *)new CBoatMonitorViewer;
 	m_pViews[DLG_DIALOG_BTUMETER] = (CView *)new CBTUMeterDlg;
+    m_pViews[DLG_DIALOG_POWERMETER] = (CView *)new CPowermeter;
     CDocument* pCurrentDoc = GetActiveDocument();
     CCreateContext newContext;
     newContext.m_pNewViewClass = NULL;
@@ -3075,7 +3076,7 @@ void CMainFrame::OnLoadConfigFile()
     if(g_protocol == PROTOCOL_BACNET_IP)
     {
         MainFram_hwd = this->m_hWnd;
-        LoadBacnetConfigFile(true,NULL);
+        LoadBacnetBinaryFile(true,NULL);
         return;
     }
 	else if(((g_protocol == MODBUS_RS485) || (g_protocol ==MODBUS_TCPIP)) &&  
@@ -4045,6 +4046,12 @@ here:
     {
         m_nCurView = DLG_DIALOG_BOATMONITOR;
         ((CBoatMonitorViewer*)m_pViews[m_nCurView])->Fresh();
+    }
+    break;
+    case DLG_DIALOG_POWERMETER:
+    {
+        m_nCurView = DLG_DIALOG_POWERMETER;
+        ((CPowermeter*)m_pViews[m_nCurView])->Fresh();
     }
     break;
         //here
@@ -6440,7 +6447,25 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     }
                 }
             }
+            if (m_product.at(i).protocol == PROTOCOL_VIRTUAL)
+            {
+                offline_mode = true;
+                set_offline_mode(offline_mode);
 
+                CString offline_folder;
+                offline_folder = g_strBuildingFolder + m_strCurMainBuildingName;
+
+                offline_folder = offline_folder + _T("\\VirtualDeviceData");
+
+                CString virtual_prg_filename;
+                virtual_prg_filename.Format(_T("%d"), m_product.at(i).serial_number);
+                offline_prg_path = offline_folder + _T("\\") + virtual_prg_filename + _T(".prog");
+            }
+            else
+            {
+                offline_mode = false;
+                set_offline_mode(offline_mode);
+            }
             //if(1)//GSM  模块
             if((m_product.at(i).protocol != MODBUS_BACNET_MSTP) && (m_product.at(i).protocol != PROTOCOL_GSM) && (m_product.at(i).protocol != PROTOCOL_REMOTE_IP)&&(m_product.at(i).protocol!=MODBUS_RS485))
             {
@@ -6625,6 +6650,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 			else if(product_Node.product_class_id == STM32_HUM_NET)
 				bacnet_device_type = STM32_HUM_NET;
+
+            product_register_value[7] = product_Node.product_class_id;
 
             g_serialNum = product_Node.serial_number;
             if((product_Node.product_class_id == PM_CM5) || 
@@ -7375,6 +7402,11 @@ start_read_reg_data:
                     {
                         product_type=T3000_T3_MODULES;
                     }
+                    else if(nFlag == PM_PWMETER)
+                    {
+                        product_type = T3000_T3_MODULES;
+                        
+                    }
                     else
                     {
                         product_type=nFlag;
@@ -7444,6 +7476,36 @@ start_read_reg_data:
                             Sleep(20 );
                         }
                         g_tstat_id_changed=FALSE;
+                        register_critical_section.Unlock();
+                    }
+                    else if (product_type == PM_PWMETER)
+                    {
+                        register_critical_section.Lock();
+                        int i;
+                        it = 0;
+                        length = 4;
+                        float progress;
+                        for (i = 0; i<4; i++)	
+                        {
+                            int itemp = 0;
+                            itemp = Read_Multi(g_tstat_id, &multi_register_value[i * 100], i * 100, 100, 5);
+                            if (itemp < 0)
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                if (pDlg != NULL)
+                                {
+                                    progress = float((it + 1)*(100 / 4));
+                                    //pDlg->ShowProgress(int(progress),int(progress));
+                                    g_progress_persent = progress;
+                                }
+                            }
+                            it++;
+                            Sleep(20);
+                        }
+                        g_tstat_id_changed = FALSE;
                         register_critical_section.Unlock();
                     }
                     else
@@ -7868,6 +7930,11 @@ start_read_reg_data:
                 bacnet_view_number = TYPE_TSTAT;
                 SwitchToPruductType(DLG_DIALOG_DEFAULT_T3000_VIEW);
             }
+            else if (nFlag == PM_PWMETER)
+            {
+                SwitchToPruductType(DLG_DIALOG_DEFAULT_T3000_VIEW);
+                //SwitchToPruductType(DLG_DIALOG_POWERMETER);
+            }
             else if(nFlag<PM_NC)
             {
 
@@ -7916,6 +7983,7 @@ start_read_reg_data:
             {
                 SwitchToPruductType(DLG_DIALOG_BOATMONITOR);
             }
+            break;
         }
     }
     SqliteDBT3000.closedb();
@@ -10050,7 +10118,7 @@ void CMainFrame::OnControlMain()
         if (product_type == T3000_6_ADDRESS)
         {
             //bacnet_view_number = TYPE_TSTAT_MAIN_INFOR;
-            bacnet_view_number = TYPE_TSTAT;
+            bacnet_view_number = TYPE_MAIN;
             SwitchToPruductType(DLG_T3000_VIEW);
         }
         else if (product_type == CS3000||product_register_value[7]==PM_T322AI || product_register_value[7] == PWM_TRANSDUCER ||product_register_value[7]==PM_T38AI8AO6DO || product_register_value[7]==PM_T3PT12
@@ -10278,7 +10346,7 @@ void CMainFrame::OnControlInputs()
 
    //         SwitchToPruductType(DLG_DIALOG_TSTAT_INPUT_VIEW);
    //     }
-        else if (product_type == T3000_T3_MODULES )
+        else if ((product_type == T3000_T3_MODULES ) && (product_register_value[7] != PM_PWMETER))
         {
             SwitchToPruductType(DLG_DIALOG_T3_INPUTS_VIEW);
         }
@@ -10294,8 +10362,8 @@ void CMainFrame::OnControlInputs()
 
 void CMainFrame::OnControlPanel()
 {
-    bacnet_view_number = TYPE_PANEL;
-    HideBacnetWindow();
+    //bacnet_view_number = TYPE_PANEL;
+    //HideBacnetWindow();
 }
 
 void CMainFrame::OnControlPrograms()
@@ -10478,8 +10546,7 @@ void CMainFrame::OnControlOutputs()
     }
     else
     {
-
-        if (product_type == T3000_T3_MODULES )
+        if ((product_type == T3000_T3_MODULES) && (product_register_value[7] != PM_PWMETER))
         {
             SwitchToPruductType(DLG_DIALOG_T3_OUTPUTS_VIEW);
             bacnet_view_number = TYPE_OUTPUT;
@@ -10690,7 +10757,7 @@ void CMainFrame::OnControlAnnualroutines()
 			MessageBox(_T("This device doesn't have a holidays menu item"));
     }
 }
-
+#include "PowerMeterList.h"
 void CMainFrame::OnControlSettings()
 {
     g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
@@ -10766,6 +10833,12 @@ void CMainFrame::OnControlSettings()
 			)
         {
             CParameterDlg dlg(this,GetProductName(product_register_value[7]));
+            dlg.DoModal();
+        }
+        else if (product_register_value[7] == PM_PWMETER)
+        {
+            //新增power meter 的弹出界面;
+            CPowerMeterList dlg;
             dlg.DoModal();
         }
         else
@@ -11188,7 +11261,7 @@ void CMainFrame::CreateOfflinePrgFile()
 	{
 		return;
 	}
-	if(LoadBacnetConfigFile_Cache(achive_file_path) < 0 )
+	if(LoadBacnetBinaryFile(false,achive_file_path) < 0 )
 	{
 		dwFileLen = 200000;	
 		hFile=CreateFile(offline_prg_path,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
@@ -13121,8 +13194,8 @@ void CMainFrame::OnToolsPsychrometry()
 
 void CMainFrame::OnToolsOption()
 {
-	 CT3000Option dlg;
-	 dlg.DoModal();
+	 //CT3000Option dlg;
+	 //dlg.DoModal();
 }
 
 

@@ -163,13 +163,14 @@ bool GetFileNameFromPath(CString ncstring,CString &cs_return);
 BOOL Ping(const CString& strIP, CWnd* pWndEcho);
  
 void Send_WhoIs_remote_ip(CString ipaddress);
+void ClearBacnetData(); //用来初始化bacnet 内存;
 void SaveBacnetBinaryFile(CString &SaveConfigFilePath);
 void SaveBacnetConfigFile(CString &SaveConfigFilePath);
 void SaveBacnetConfigFile_Cache(CString &SaveConfigFilePath);
 int SaveModbusConfigFile(CString &SaveConfigFilePath);
 void SaveModbusConfigFile_Cache(CString &SaveConfigFilePath,char *npoint,unsigned int bufferlength);
-int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path);
-int LoadBacnetConfigFile_Cache(LPCTSTR tem_read_path);
+int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path);
+int LoadBacnetBinaryFile_Cache(LPCTSTR tem_read_path);
 int LoadModbusConfigFile_Cache(LPCTSTR tem_read_path);
 
 int LoadMiniModbusConfigFile(LPCTSTR tem_read_path);

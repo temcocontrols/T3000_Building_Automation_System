@@ -61,6 +61,7 @@ public:
 	CEdit m_Edit_Network;
 	CEdit m_Edit_NodeID;
 	CEdit m_Edit_FrequenceID;
+    afx_msg void OnEnChangeEditAesEncrypt();
 };
 
 

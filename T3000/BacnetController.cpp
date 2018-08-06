@@ -496,7 +496,7 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 								else if((m_Variable_data.at(x).range >=23) && (m_Variable_data.at(x).range <= 30))
 								{
 									if(receive_customer_unit)
-										temp1 = temp_unit_no_index[m_Variable_data.at(x).range - 23];
+										temp1 = Custom_Digital_Range[m_Variable_data.at(x).range - 23];
 								}
 
 								SplitCStringA(temparray,temp1,_T("/"));
@@ -770,6 +770,12 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 				return 0;
 			}
 		}
+        else
+        {
+            m_controller_data.at(Changed_Item).input.number = 0;
+            m_controller_data.at(Changed_Item).input.panel = 0;//bac_gloab_panel;
+            m_controller_data.at(Changed_Item).input.point_type = 0;//1 means input point
+        }
 
 
 	}
@@ -847,89 +853,99 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 	if(Changed_SubItem == CONTROLLER_SETPOINT)
 	{
 		CString cs_temp = m_controller_list.GetItemText(Changed_Item,Changed_SubItem);
-		char cTemp1[255];
-		char temp_setpoint[250];
-		char * tempcs=NULL;
-		cs_temp = cs_temp.MakeUpper();
-		memset(cTemp1,0,255);
-		memset(temp_setpoint,0,250);
-		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+        if (cs_temp.IsEmpty() == true)
+        {
+            m_controller_data.at(Changed_Item).setpoint.number = 0;
+            m_controller_data.at(Changed_Item).setpoint.panel = 0;//bac_gloab_panel;
+            m_controller_data.at(Changed_Item).setpoint.point_type = 0;//1 means input point
+        }
+        else
+        {
+            char cTemp1[255];
+            char temp_setpoint[250];
+            char * tempcs = NULL;
+            cs_temp = cs_temp.MakeUpper();
+            memset(cTemp1, 0, 255);
+            memset(temp_setpoint, 0, 250);
+            WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL);
 
-		int temp_number=-1;
-		byte temp_value_type = -1;
-		byte temp_point_type=-1;
-		int temp_panel = -1;
-		int temp_net = -1;
-		int k=0;
-		//int temp1;
-		//Change the lable.ex: Change the
-		tempcs = ispoint(cTemp1,&temp_number,&temp_value_type,&temp_point_type,&temp_panel,&temp_net,0,bac_gloab_panel,&k);
-		if(tempcs!=NULL)
-		{
-			memcpy_s(temp_setpoint,250,tempcs,9);
-			//strcpy_s(temp_setpoint,tempcs);
-			//strcpy(temp_setpoint,tempcs);
-			CString temp_des2;
-			temp_des2.Empty();
+            int temp_number = -1;
+            byte temp_value_type = -1;
+            byte temp_point_type = -1;
+            int temp_panel = -1;
+            int temp_net = -1;
+            int k = 0;
+            //int temp1;
+            //Change the lable.ex: Change the
+            tempcs = ispoint(cTemp1, &temp_number, &temp_value_type, &temp_point_type, &temp_panel, &temp_net, 0, bac_gloab_panel, &k);
+            if (tempcs != NULL)
+            {
+                memcpy_s(temp_setpoint, 250, tempcs, 9);
+                //strcpy_s(temp_setpoint,tempcs);
+                //strcpy(temp_setpoint,tempcs);
+                CString temp_des2;
+                temp_des2.Empty();
 
-			MultiByteToWideChar( CP_ACP, 0, temp_setpoint, STR_VARIABLE_LABEL+1, 
-				temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
-			temp_des2.ReleaseBuffer();		
-			
-			m_controller_list.SetItemText(Changed_Item,CONTROLLER_SETPOINT,temp_des2);
+                MultiByteToWideChar(CP_ACP, 0, temp_setpoint, STR_VARIABLE_LABEL + 1,
+                    temp_des2.GetBuffer(MAX_PATH), MAX_PATH);
+                temp_des2.ReleaseBuffer();
+
+                m_controller_list.SetItemText(Changed_Item, CONTROLLER_SETPOINT, temp_des2);
 
 
-			if(temp_panel != bac_gloab_panel)
-			{
-				MessageBox(_T("Don't support other panel currently!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-				m_controller_list.SetItemText(Changed_Item,Changed_SubItem,_T(""));
-				return 0;
-			}
-			if(temp_number > 0)	//Setpoint 也是这样;从0 开始的;
-				temp_number = temp_number - 1;
-			temp_point_type = temp_point_type + 1; //OUTPUT=1, INPUT, VARIABLE 要错位;
-			m_controller_data.at(Changed_Item).setpoint.number = temp_number;
-			m_controller_data.at(Changed_Item).setpoint.panel = temp_panel;//bac_gloab_panel;
-			m_controller_data.at(Changed_Item).setpoint.point_type = temp_point_type;//1 means input point
+                if (temp_panel != bac_gloab_panel)
+                {
+                    MessageBox(_T("Don't support other panel currently!"), _T("Warning"), MB_OK | MB_ICONINFORMATION);
+                    m_controller_list.SetItemText(Changed_Item, Changed_SubItem, _T(""));
+                    return 0;
+                }
+                if (temp_number > 0)	//Setpoint 也是这样;从0 开始的;
+                    temp_number = temp_number - 1;
+                temp_point_type = temp_point_type + 1; //OUTPUT=1, INPUT, VARIABLE 要错位;
+                m_controller_data.at(Changed_Item).setpoint.number = temp_number;
+                m_controller_data.at(Changed_Item).setpoint.panel = temp_panel;//bac_gloab_panel;
+                m_controller_data.at(Changed_Item).setpoint.point_type = temp_point_type;//1 means input point
 
-			CString temp_des3;
-			if(temp_number < BAC_VARIABLE_ITEM_COUNT)
-			{
-				if(m_Variable_data.at(temp_number).range < VARIABLE_ANALOG_UNITE_COUNT)
-					temp_des3 = Variable_Analog_Units_Array[m_Variable_data.at(temp_number).range];
-				m_controller_list.SetItemText(Changed_Item,CONTROLLER_SETPOINTUNITS,temp_des3);
-			}
-			char tempAAAA[250];
-			memset(tempAAAA,0,250);
-			temp_des3.Empty();
-			if(m_Variable_data.at(temp_number).range  == 20 )
-			{
-				if((m_controller_data.at(Changed_Item).setpoint_value>=0)&&(m_controller_data.at(Changed_Item).setpoint_value<86400))
-					intervaltotext( tempAAAA, m_controller_data.at(Changed_Item).setpoint_value ,0 , 0);
+                CString temp_des3;
+                if (temp_number < BAC_VARIABLE_ITEM_COUNT)
+                {
+                    if (m_Variable_data.at(temp_number).range < VARIABLE_ANALOG_UNITE_COUNT)
+                        temp_des3 = Variable_Analog_Units_Array[m_Variable_data.at(temp_number).range];
+                    m_controller_list.SetItemText(Changed_Item, CONTROLLER_SETPOINTUNITS, temp_des3);
+                }
+                char tempAAAA[250];
+                memset(tempAAAA, 0, 250);
+                temp_des3.Empty();
+                if (m_Variable_data.at(temp_number).range == 20)
+                {
+                    if ((m_controller_data.at(Changed_Item).setpoint_value >= 0) && (m_controller_data.at(Changed_Item).setpoint_value<86400))
+                        intervaltotext(tempAAAA, m_controller_data.at(Changed_Item).setpoint_value, 0, 0);
 
-				MultiByteToWideChar( CP_ACP, 0, tempAAAA, strlen(tempAAAA) + 1, 
-					temp_des3.GetBuffer(MAX_PATH), MAX_PATH );
-				temp_des3.ReleaseBuffer();	
-			}
-			else
-			{
-				CString cstemp_value;
-				float temp_float_value;
-				temp_float_value = ((float)m_Variable_data.at(m_controller_data.at(Changed_Item).setpoint.number).value) / 1000;
-				temp_des3.Format(_T("%.1f"),temp_float_value);
+                    MultiByteToWideChar(CP_ACP, 0, tempAAAA, strlen(tempAAAA) + 1,
+                        temp_des3.GetBuffer(MAX_PATH), MAX_PATH);
+                    temp_des3.ReleaseBuffer();
+                }
+                else
+                {
+                    CString cstemp_value;
+                    float temp_float_value;
+                    temp_float_value = ((float)m_Variable_data.at(m_controller_data.at(Changed_Item).setpoint.number).value) / 1000;
+                    temp_des3.Format(_T("%.1f"), temp_float_value);
 
-			}
-	
-			m_controller_list.SetItemText(Changed_Item,CONTROLLER_SETVALUE,temp_des3);
+                }
 
-		}
-		else
-		{
-			CString temp_show_ret;
-			temp_show_ret = _T("\"") + cs_temp + _T("\"") + _T(" is a invalid label or keyword .");
-			SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_show_ret);
-			m_controller_list.SetItemText(Changed_Item,CONTROLLER_SETPOINT,_T(""));
-		}
+                m_controller_list.SetItemText(Changed_Item, CONTROLLER_SETVALUE, temp_des3);
+
+            }
+            else
+            {
+                CString temp_show_ret;
+                temp_show_ret = _T("\"") + cs_temp + _T("\"") + _T(" is a invalid label or keyword .");
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_show_ret);
+                m_controller_list.SetItemText(Changed_Item, CONTROLLER_SETPOINT, _T(""));
+            }
+        }
+
 	}
 
 	if(Changed_SubItem == CONTROLLER_PROPORTIONAL)

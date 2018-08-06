@@ -961,6 +961,10 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
     CString CheckVersionIniFilePath;
     CString T3000FtpPath;//测试用;
     CString temp_download_path;
+
+    CString revisionFtpPath;//保存revision 的本地路径
+    CString temp_revision_path;
+    CString DesDownloadRevisionPath;
     CFileFind tempfind;
     CString strFileName;
 
@@ -975,6 +979,9 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
     str_product_section.Format(_T("%d"), pParent->m_download_product_type);
     GetPrivateProfileString(_T("ProductPath"), str_product_section, _T(""), temp_download_path.GetBuffer(MAX_PATH), MAX_PATH, DownloadIniFilePath);
     temp_download_path.ReleaseBuffer();
+
+    GetPrivateProfileString(_T("RevisionFilePath"), str_product_section, _T(""), temp_revision_path.GetBuffer(MAX_PATH), MAX_PATH, DownloadIniFilePath);
+    temp_revision_path.ReleaseBuffer();
 
     ftp_version_date = GetPrivateProfileInt(_T("LastUpdateTime"), str_product_section, 0, DownloadIniFilePath);
     local_version_date = GetPrivateProfileInt(_T("LastUpdateTime"), str_product_section, 0, CheckVersionIniFilePath);
@@ -997,7 +1004,43 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
 
     DesDownloadFilePath = Folder_Path + _T("\\") + strFileName;     
 
+    //若存在 版本信息文件路径 就去下载并显示出来;
+    if (temp_revision_path.IsEmpty() == false)
+    {
+        revisionFtpPath = _T("https://www.temcocontrols.com/ftp/firmware/") + temp_revision_path;
+        strFileName = PathFindFileName(revisionFtpPath);  //根据组合的下载路径，获取最后得文件名
+        DesDownloadRevisionPath = Folder_Path + _T("\\") + strFileName;
+        download_ret = URLDownloadToFile(NULL, revisionFtpPath, DesDownloadRevisionPath, 0, &cbc);
+        if (download_ret == S_OK)
+        {
+            CFile myfile(DesDownloadRevisionPath, CFile::modeRead);
+            char *pBuf;
+            DWORD dwFileLen;
+            dwFileLen = myfile.GetLength();
+            pBuf = new char[dwFileLen + 1];
+            pBuf[dwFileLen] = 0;
+            myfile.Read(pBuf, dwFileLen);     //MFC   CFile 类 很方便
+            myfile.Close();
 
+            CString temp_revision_notes;
+            MultiByteToWideChar(CP_ACP, 0, pBuf, dwFileLen + 1, temp_revision_notes.GetBuffer(dwFileLen + 1), dwFileLen + 1);
+            temp_revision_notes.ReleaseBuffer();
+            CStringArray temparray;
+            SplitCStringA(temparray, temp_revision_notes, _T("\r\n"));
+
+            for (int j = 0; j < temparray.GetSize(); j++)
+            {
+                if (j > 20) //只展示前20行.
+                    break;
+                CS_Info.Format(_T("%s"), temparray.GetAt(j));
+                pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
+                pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
+                Sleep(10);
+            }
+
+            delete pBuf;
+        }
+    }
 
     if ((local_version_date == ftp_version_date) && (ftp_version_date != 0) && tempfind.FindFile(DesDownloadFilePath))  //与FTP上相等 并且存在;
     {

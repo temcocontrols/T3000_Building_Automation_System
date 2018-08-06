@@ -34,7 +34,7 @@ extern bool list_mouse_click;
 extern CString CurrentT3000Version;
 extern BOOL g_SelectChanged;
 //Fance_4
-extern unsigned short product_register_value[1024];
+extern unsigned short product_register_value[2000];
 extern int product_type ;
 extern int old_product_type;
 extern HWND      m_building_config_hwnd;
@@ -960,7 +960,7 @@ extern HTREEITEM selected_tree_item;
 extern CString temp_off[BAC_CUSTOMER_UNITS_COUNT];		//用于 保存 客户自定义的 单位;
 extern CString temp_on[BAC_CUSTOMER_UNITS_COUNT];
 extern CString temp_unit[BAC_CUSTOMER_UNITS_COUNT];
-extern CString temp_unit_no_index[BAC_CUSTOMER_UNITS_COUNT];
+extern CString Custom_Digital_Range[BAC_CUSTOMER_UNITS_COUNT];
 extern bool read_var_analog_cus_units;          //Var Cus units 自定义
 extern bool read_customer_unit;	//如果这个设备没有读过 customer unit这一项,就要尝试去读，以前老版本的没有;
 extern bool receive_customer_unit; //收到回复，flag就置 true;
