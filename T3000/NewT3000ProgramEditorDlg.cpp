@@ -45,6 +45,8 @@ BOOL CNewT3000ProgramEditorDlg::OnInitDialog()
 	SetWindowText(ShowProgramText);
 
 	CString strcode;
+
+#if 0
 	CppSQLite3DB SqliteDBT3000;
 	CppSQLite3Query q;
 	SqliteDBT3000.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
@@ -61,6 +63,7 @@ BOOL CNewT3000ProgramEditorDlg::OnInitDialog()
 	}
 	
 	SqliteDBT3000.closedb();
+#endif
 
 	// TODO:  Add extra initialization here
 	m_programeditor.put_Code(strcode);

@@ -144,7 +144,7 @@ void BacnetRange::Initial_static()
 	CRect Temp_Rect;
 	GetWindowRect(Temp_Rect);
 
-	if(receive_customer_unit)	//Èç¹û½ÓÊÜµ½ÁË customer unit µÄ»Ø¸´;
+	if((receive_customer_unit) || (offline_mode))
 	{
 
 		for(int i=0 ;i < BAC_CUSTOMER_UNITS_COUNT ; i++)
@@ -165,7 +165,7 @@ void BacnetRange::Initial_static()
 			unit_index.Format(_T("%d.     "),i+23);
 
 			temp_unit[i] =unit_index + temp_off[i] + _T("/") + temp_on[i];
-			temp_unit_no_index[i] = temp_off[i] + _T("/") + temp_on[i];
+			Custom_Digital_Range[i] = temp_off[i] + _T("/") + temp_on[i];
 
 		}
 		
@@ -1328,7 +1328,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 
 						if((bac_range_number_choose >= 23) && (bac_range_number_choose <=30))
 						{
-							m_show_unit.SetWindowTextW(temp_unit_no_index[bac_range_number_choose - 23]);
+							m_show_unit.SetWindowTextW(Custom_Digital_Range[bac_range_number_choose - 23]);
 						}
 						else
 							m_show_unit.SetWindowTextW(Digital_Units_Array[bac_range_number_choose]);
@@ -1950,7 +1950,7 @@ void BacnetRange::UpdateCustomerRangeText()
         unit_index.Format(_T("%d.     "), i + 23);
 
         temp_unit[i] = unit_index + temp_off[i] + _T("/") + temp_on[i];
-        temp_unit_no_index[i] = temp_off[i] + _T("/") + temp_on[i];
+        Custom_Digital_Range[i] = temp_off[i] + _T("/") + temp_on[i];
 
     }
 
@@ -1984,7 +1984,7 @@ void BacnetRange::OnBnClickedBtnEditCustomerRange()
 		unit_index.Format(_T("%d.     "),i+23);
 
 		temp_unit[i] =unit_index + temp_off[i] + _T("/") + temp_on[i];
-		temp_unit_no_index[i] = temp_off[i] + _T("/") + temp_on[i];
+		Custom_Digital_Range[i] = temp_off[i] + _T("/") + temp_on[i];
 
 	}
 

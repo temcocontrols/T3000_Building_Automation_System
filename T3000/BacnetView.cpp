@@ -2,6 +2,7 @@
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
 //使用VS2010 编译需删除 c:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cvtres.exe 来确保用更高版本的 来转换资源文件
+1. Fix the program bug "10 28AO5 = 3" when open again it show "10  = 3"
 
 2018 05 29 
 1.T3系列 扩展IO支持 T3-PT12 
@@ -1030,7 +1031,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					temp_serial.Format(_T("%u.prog"),g_selected_serialnumber);
 					temp_file = g_achive_folder + _T("\\") + temp_serial;
 					//SaveBacnetConfigFile(temp_file);
-					SaveBacnetConfigFile_Cache(temp_file);
+                    SaveBacnetBinaryFile(temp_file);
 				}
 
 
@@ -2710,59 +2711,76 @@ void CDialogCM5_BacNet::Fresh()
 	Gsm_communication = false;
 
 
-#ifndef test_ptp
-	if(initial_bip == false)
-	{
-		
-		g_gloab_bac_comport = 0;
-		set_datalink_protocol(2);
+    if (offline_mode == false)
+    {
+        if (initial_bip == false)
+        {
 
-		Re_Initial_Bac_Socket_IP = pFrame->m_product.at(selected_product_index).NetworkCard_Address;
-		
-		if((!offline_mode) &&(Initial_bac(g_gloab_bac_comport,pFrame->m_product.at(selected_product_index).NetworkCard_Address)))
-		{
-            initial_bip = true;
-		}
-		else
-		{
-			DFTrace(_T("Initial_bac function failed!"));
-            return;
-		}
-	}
-	else
-	{
+            g_gloab_bac_comport = 0;
+            set_datalink_protocol(2);
 
+            Re_Initial_Bac_Socket_IP = pFrame->m_product.at(selected_product_index).NetworkCard_Address;
 
-		if(pFrame->m_product.at(selected_product_index).NetworkCard_Address.CompareNoCase(Re_Initial_Bac_Socket_IP) != 0)
-		{
-			closesocket(my_sokect);
-			int ret_1 = Open_bacnetSocket2(pFrame->m_product.at(selected_product_index).NetworkCard_Address,BACNETIP_PORT,my_sokect);
-			if(ret_1 >= 0)
-			{
-				Re_Initial_Bac_Socket_IP = pFrame->m_product.at(selected_product_index).NetworkCard_Address;
-			}
-		}
-        set_datalink_protocol(PROTOCOL_BACNET_IP);
-		bip_set_socket(my_sokect);
-		 bip_set_port(htons(47808));
-		in_addr BIP_Address;
-		char temp_ip_2[100];
-		memset(temp_ip_2,0,100);
-		WideCharToMultiByte( CP_ACP, 0, pFrame->m_product.at(selected_product_index).NetworkCard_Address, -1, temp_ip_2, 255, NULL, NULL );
-		BIP_Address.S_un.S_addr =  inet_addr(temp_ip_2);
-		bip_set_addr((uint32_t)BIP_Address.S_un.S_addr);
+            if ((!offline_mode) && (Initial_bac(g_gloab_bac_comport, pFrame->m_product.at(selected_product_index).NetworkCard_Address)))
+            {
+                initial_bip = true;
+            }
+            else
+            {
+                DFTrace(_T("Initial_bac function failed!"));
+                return;
+            }
+        }
+        else
+        {
 
 
+            if (pFrame->m_product.at(selected_product_index).NetworkCard_Address.CompareNoCase(Re_Initial_Bac_Socket_IP) != 0)
+            {
+                closesocket(my_sokect);
+                int ret_1 = Open_bacnetSocket2(pFrame->m_product.at(selected_product_index).NetworkCard_Address, BACNETIP_PORT, my_sokect);
+                if (ret_1 >= 0)
+                {
+                    Re_Initial_Bac_Socket_IP = pFrame->m_product.at(selected_product_index).NetworkCard_Address;
+                }
+            }
+            set_datalink_protocol(PROTOCOL_BACNET_IP);
+            bip_set_socket(my_sokect);
+            bip_set_port(htons(47808));
+            in_addr BIP_Address;
+            char temp_ip_2[100];
+            memset(temp_ip_2, 0, 100);
+            WideCharToMultiByte(CP_ACP, 0, pFrame->m_product.at(selected_product_index).NetworkCard_Address, -1, temp_ip_2, 255, NULL, NULL);
+            BIP_Address.S_un.S_addr = inet_addr(temp_ip_2);
+            bip_set_addr((uint32_t)BIP_Address.S_un.S_addr);
 
-		if(g_bac_instance>0)
-			Send_WhoIs_Global(g_bac_instance, g_bac_instance);
-	}
+
+
+            if (g_bac_instance>0)
+                Send_WhoIs_Global(g_bac_instance, g_bac_instance);
+        }
+    }
+    else
+    {
+        receive_customer_unit = true;  // 虚拟设备很多地方判断是否有接收到了  客户的自定义range
+        //虚拟设备也需要初始化bacnet 的相关参数;
+        if (!bac_net_initial_once)
+        {
+            bac_net_initial_once = true;
+            timesec1970 = (unsigned long)time(NULL);
+            timestart = 0;
+            init_info_table();
+            Init_table_bank();
+        }
+        LoadBacnetBinaryFile(false, offline_prg_path);
+    }
+
 
 	//
 	//SetTimer(1,500,NULL);
 	SetTimer(BAC_TIMER_2_WHOIS,60000,NULL);//定时器2用于间隔发送 whois;不知道设备什么时候会被移除;
 	SetTimer(BAC_TIMER_3_CHECKALARM,1000,NULL); //Check whether need  show Alarm dialog.
-#endif
+
 	BacNet_hwd = this->m_hWnd;
 
 
@@ -3239,7 +3257,14 @@ LRESULT CDialogCM5_BacNet::Fresh_UI(WPARAM wParam,LPARAM lParam)
 		//break;
 
 	case MENU_CLICK:
-
+        if ((User_Login_Window->IsWindowVisible()) && (lParam != BAC_READ_USER_LOGIN_INFO))
+        {
+            CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+            pFrame->HideBacnetWindow();
+            User_Login_Window->ShowWindow(SW_NORMAL);
+            break;
+        }
+            
 		button_click = lParam;
 		tsm_free_all_invoke_id();//每次点击的时候都将所有INVOKE ID 清零;
 		if(button_click == WRITEPRGFLASH_COMMAND)
@@ -3838,7 +3863,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 
 	if(offline_mode)
 	{
-		LoadBacnetConfigFile(false,offline_prg_path);
+		LoadBacnetBinaryFile(false,offline_prg_path);
 		hwait_thread = NULL;
 		if(bac_read_which_list == BAC_READ_PROGRAMCODE_LIST)
 		{
@@ -5024,7 +5049,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 					temp_serial.Format(_T("%u.prog"),g_selected_serialnumber);
 					temp_file = g_achive_folder + _T("\\") + temp_serial;
 					//SaveBacnetConfigFile(temp_file);
-					SaveBacnetConfigFile_Cache(temp_file);
+                    SaveBacnetBinaryFile(temp_file);
 				}
 			}
 
@@ -5317,7 +5342,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 	if(m_user_level == LOGIN_SUCCESS_GRAPHIC_MODE)
 	{
 
-		if(LoadBacnetConfigFile_Cache(achive_file_path) < 0 )
+		if(LoadBacnetBinaryFile(false,achive_file_path) < 0 )
 			PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ALL);
 		m_bac_main_tab.SetCurSel(WINDOW_SCREEN);
 		for (int i=0;i<WINDOW_TAB_COUNT;i++)
@@ -5340,7 +5365,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 	}
 	else if(m_user_level == LOGIN_SUCCESS_ROUTINE_MODE)
 	{
-		if(LoadBacnetConfigFile_Cache(achive_file_path) < 0 )
+		if(LoadBacnetBinaryFile(false,achive_file_path) < 0 )
 			PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,BAC_READ_ALL_LIST);
 		m_bac_main_tab.SetCurSel(WINDOW_WEEKLY);
 		for (int i=0;i<WINDOW_TAB_COUNT;i++)
@@ -5367,15 +5392,11 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 		{
 			if(offline_mode)
 			{
-				CString offline_folder;
-				offline_folder = g_strBuildingFolder + pFrame->m_strCurMainBuildingName;
-				CreateDirectory(offline_folder,NULL);//
-				offline_prg_path = offline_folder + _T("\\Offline.prog");
-
-				LoadBacnetConfigFile(false,offline_prg_path);
+				LoadBacnetBinaryFile(false,offline_prg_path);
 				PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,BAC_READ_ALL_LIST);
 			}
-			else if(LoadBacnetConfigFile_Cache(achive_file_path) < 0 )
+            else if(LoadBacnetBinaryFile(false, achive_file_path) < 0)
+			//else if(LoadBacnetBinaryFile_Cache(achive_file_path) < 0 )
 			{
                 if (g_protocol == PROTOCOL_BACNET_IP)
                 {
@@ -5590,16 +5611,22 @@ void CDialogCM5_BacNet::Inital_Tab_Loaded_Parameter()
 	static unsigned int static_value_read = 0;
 	if(static_value_read == 0)
 	{
-		read_customer_unit = false;
-		receive_customer_unit = false;
-		read_analog_customer_unit = false;
+        if (offline_mode == false)
+        {
+            read_customer_unit = false;
+            receive_customer_unit = false;
+            read_analog_customer_unit = false;
+        }
 		static_value_read = g_selected_serialnumber ;
 	}
 	else if(static_value_read != g_selected_serialnumber) 
 	{
-		read_customer_unit = false;
-		read_analog_customer_unit = false;
-		receive_customer_unit = false;
+        if (offline_mode == false)
+        {
+            read_customer_unit = false;
+            read_analog_customer_unit = false;
+            receive_customer_unit = false;
+        }
 		static_value_read = g_selected_serialnumber;
 	}
 

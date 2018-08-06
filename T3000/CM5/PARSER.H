@@ -84,7 +84,7 @@ enum error_msg { SYNTAX , UNBAL_PARENS , NO_EXP , EQUALS_EXPECTED,
 									PAREN_EXPECTED , WHILE_EXPECTED, QUOTE_EXPECTED ,
 									NOT_TEMP , TOO_MANY_LVARS, NOT_LINE, GREATER_THEN_MAX,
 									TOOBIG, TOOMANYLINES, TOOMANYVARS, TOOMANYGOTO,
-									WARN_PANEL_MISSING, WARN_POINT_MISSING ,OUTPUT_BREAK,INPUT_BREAK,VARIABLE_BREAK,TOTAL_2000_BREAK} ;
+									WARN_PANEL_MISSING, WARN_POINT_MISSING ,OUTPUT_BREAK,INPUT_BREAK,VARIABLE_BREAK,TOTAL_2000_BREAK,INSTANCE_NOT_SUPPORT} ;
 
 
 //struct variable_table {
@@ -103,14 +103,14 @@ enum error_msg { SYNTAX , UNBAL_PARENS , NO_EXP , EQUALS_EXPECTED,
 struct variable_table {
 	char name[20];
 	char label[9];
-	char type;
-	char var_type;
+    unsigned char type;
+    unsigned char var_type;
 	int  l;
 	int  c;
 	unsigned char  network;
 	unsigned char  sub_panel;
-	char panel;
-	char point_type;
+    unsigned char panel;
+    unsigned char point_type;
 	//char num_point;
 	unsigned short num_point;
 };

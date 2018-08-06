@@ -215,6 +215,7 @@ const int PROTOCOL_REMOTE_IP = 6;
 const int PROTOCOL_BIP_TO_MSTP = 10;
 const int PROTOCOL_MSTP_TO_MODBUS = 11;
 const int PROTOCOL_BIP_T0_MSTP_TO_MODBUS = 12;
+const int PROTOCOL_VIRTUAL = 254;
 const int PROTOCOL_UNKNOW = 255;
 
 const int BAC_WAIT_NORMAL_READ = 0;
@@ -838,12 +839,12 @@ const CString Input_Analog_Units_Array[] =
 	_T("Unused"),
 	_T("Y3K -40 to 150"),
 	_T("Y3K -40 to 300"),
-	_T("10K -40 to 120"),
-	_T("10K -40 to 250"),
+	_T("10K Type2"),
+	_T("10K Type2"),
 	_T("G3K -40 to 120"),
 	_T("G3K -40 to 250"),
-	_T("KM10K -40 to 120"),
-	_T("KM10K -40 to 250"),
+	_T("10K Type3"),
+	_T("10K Type3"),
 	_T("A10K -50 to 110"),
 	_T("A10K -60 to 200"),
 	_T("0.0 to 5.0"),

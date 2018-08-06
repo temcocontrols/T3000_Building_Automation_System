@@ -600,9 +600,9 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
 
 	char *label=NULL/*,test*/;
 	byte point_type,var_type;
-	int k,num_net,num_point,num_panel;
+	int temp_net_work,num_net,num_point,num_panel;
 	var_type = num_point = point_type = 0;
-	k=0;
+    temp_net_work =0;
 	memcpy_s(&m_temp_monitor_data[monitor_list_line],sizeof(Str_monitor_point),&m_monitor_data.at(monitor_list_line),sizeof(Str_monitor_point));
 	New_CString.MakeUpper();
 	New_CString.Trim();
@@ -631,10 +631,10 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
 	//目前只支持在本Panel下面寻找 各个Label 和值;
 	//label=ispoint(cTemp1,&num_point,&var_type,&point_type,&num_panel,&num_net,0/*my_network*/,Station_NUM,&k);
 	unsigned char sub_panel_number = 0;
-	 label=ispoint_ex(cTemp1,&num_point,&var_type,&point_type,&num_panel,&num_net,0,sub_panel_number,Station_NUM,&k);
+	 label=ispoint_ex(cTemp1,&num_point,&var_type,&point_type,&num_panel,&num_net,0,sub_panel_number,Station_NUM,&temp_net_work);
 	if(label!=NULL)
 	{
-		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].network = 1;//目前不知道network 怎么处理;
+		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].network = temp_net_work;//目前不知道network 怎么处理;
         char temp_point = point_type & 0x1F;
         if ((temp_point == COIL_REG) ||
             (temp_point == DIS_INPUT_REG) ||

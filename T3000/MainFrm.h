@@ -55,7 +55,8 @@ const int DLG_DIALOG_TSTAT_INPUT_VIEW=25;
 const int DLG_DIALOG_TSTAT_OUTPUT_VIEW = 26;
 const int DLG_DIALOG_BOATMONITOR = 27;
 const int DLG_DIALOG_BTUMETER = 28;
-const int NUMVIEWS = 29;
+const int DLG_DIALOG_POWERMETER = 29;
+const int NUMVIEWS = 30;
 
 
 extern int g_gloab_bac_comport;
@@ -299,7 +300,7 @@ public:
 	void  CheckDuplicate();
     void  CheckIPDuplicate();
 	//void	SaveBacnetConfigFile();
-	//void	LoadBacnetConfigFile();
+	//void	LoadBacnetBinaryFile();
 	void  Show_Wait_Dialog_And_SendConfigMessage();
 	void  Show_Wait_Dialog_And_ReadBacnet();
 	static DWORD WINAPI  Send_Set_Config_Command_Thread(LPVOID lpVoid);

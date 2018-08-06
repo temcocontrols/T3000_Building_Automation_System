@@ -27,7 +27,7 @@ bool list_mouse_click = false;
 //#include "stdafx.h"
 unsigned short multi_register_value[1024]={-1};
 unsigned short multi_register_value_tcp[10000]={-1};
-unsigned short product_register_value[1024]={-1};
+unsigned short product_register_value[2000]={-1};
 
 int product_type = 0;
 int old_product_type = 0;
@@ -1824,7 +1824,7 @@ HTREEITEM selected_tree_item = NULL;
 CString temp_off[BAC_CUSTOMER_UNITS_COUNT];		//用于 保存 客户自定义的 单位;
 CString temp_on[BAC_CUSTOMER_UNITS_COUNT];
 CString temp_unit[BAC_CUSTOMER_UNITS_COUNT];
-CString temp_unit_no_index[BAC_CUSTOMER_UNITS_COUNT];
+CString Custom_Digital_Range[BAC_CUSTOMER_UNITS_COUNT];
 bool read_customer_unit;	//如果这个设备没有读过 customer unit这一项,就要尝试去读，以前老版本的没有;
 bool receive_customer_unit; //收到回复，flag就置 true;
 bool read_analog_customer_unit;  // 这个是模拟的cus tabel ;

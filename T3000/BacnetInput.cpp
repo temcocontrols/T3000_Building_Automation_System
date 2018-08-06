@@ -797,7 +797,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 			else if((m_Input_data.at(i).range >= 23) && (m_Input_data.at(i).range <= 30))
 			{
 				if(receive_customer_unit)
-				   m_input_list.SetItemText(i,INPUT_RANGE,temp_unit_no_index[m_Input_data.at(i).range - 23]);
+				   m_input_list.SetItemText(i,INPUT_RANGE,Custom_Digital_Range[m_Input_data.at(i).range - 23]);
 				else
 					m_input_list.SetItemText(i,INPUT_RANGE,Digital_Units_Array[0]);
 			}
@@ -819,7 +819,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 				else if((m_Input_data.at(i).range >=23) && (m_Input_data.at(i).range <= 30))
 				{
 					if(receive_customer_unit)
-						temp1 = temp_unit_no_index[m_Input_data.at(i).range - 23];
+						temp1 = Custom_Digital_Range[m_Input_data.at(i).range - 23];
 				}
 
 				SplitCStringA(temparray,temp1,_T("/"));
@@ -1072,7 +1072,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 		else if((m_Input_data.at(lRow).range >=23) && (m_Input_data.at(lRow).range <= 30))
 		{
 			if(receive_customer_unit)
-				temp1 = temp_unit_no_index[m_Input_data.at(lRow).range - 23];
+				temp1 = Custom_Digital_Range[m_Input_data.at(lRow).range - 23];
 			else
 			{
 				m_input_list.Set_Edit(false);
@@ -1316,7 +1316,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 				CStringArray temparray;
 				if((bac_range_number_choose >= 23) && (bac_range_number_choose <= 30))
 				{
-					temp1 = temp_unit_no_index[bac_range_number_choose - 23];
+					temp1 = Custom_Digital_Range[bac_range_number_choose - 23];
 				}
 				else
 					temp1 = Digital_Units_Array[bac_range_number_choose];//22 is the sizeof the array
@@ -1748,7 +1748,7 @@ int GetInputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Aut
 			else if((m_Input_data.at(i).range >=23) && (m_Input_data.at(i).range <= 30))
 			{
 				if(receive_customer_unit)
-					temp1 = temp_unit_no_index[m_Input_data.at(i).range - 23];
+					temp1 = Custom_Digital_Range[m_Input_data.at(i).range - 23];
 			}
 
 

@@ -2585,9 +2585,27 @@ bool CBacnetScreenEdit::UpdateDeviceLabelFlash()
 {
 	int ret_return = 0;
 
+    //离线模式下 重新计算 各个标签 的个数.因为此前 在线模式下是由 T3BB 计算的。
+    if (offline_mode)
+    {
+        for (int i = 0; i < BAC_SCREEN_COUNT; i++)
+        {
+            m_screen_data.at(m_graphic_label_data.at(i).reg.nScreen_index).update = 0;
+        }
+        for (int i = 0;i < BAC_GRPHIC_LABEL_COUNT;i++)
+        {
+            if ((g_selected_serialnumber == m_graphic_label_data.at(i).reg.nSerialNum) &&
+                (m_graphic_label_data.at(i).reg.label_status == 1) &&
+                (m_graphic_label_data.at(i).reg.nScreen_index < BAC_SCREEN_COUNT))
+            {
+                m_screen_data.at(m_graphic_label_data.at(i).reg.nScreen_index).update++;
+            }
+        }
+    }
+
+
 	for (int i=0;i<BAC_GRPHIC_LABEL_GROUP - 1;i++ )
 	{
-		
 		int cmp_ret = memcmp(&m_temp_graphic_label_data[i*BAC_READ_GRPHIC_LABEL_GROUP_NUMBER],&m_graphic_label_data.at(i*BAC_READ_GRPHIC_LABEL_GROUP_NUMBER),sizeof(Str_label_point) * BAC_READ_GRPHIC_LABEL_GROUP_NUMBER);
 		if(cmp_ret!=0)
 		{
