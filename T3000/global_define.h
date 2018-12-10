@@ -982,6 +982,13 @@ const CString DDNS_Server_Name[] =
     _T("dynu.com")
 };
 
+const CString Sys_Tstat_Mode_Name[] =
+{
+    _T("Auto Mode"),
+    _T("Cool Mode"),
+    _T("Heat Mode")
+};
+
 const CString Device_Serial_Port_Status[] =
 {
 	_T("Unused"),
@@ -1246,6 +1253,7 @@ const int LABEL_ICON_VALUE = 3;
 const int LABEL_ICON_FULL_DESCRIPTION = 4;
 const int LABEL_ICON_LABEL = 5;
 const int LABEL_ICON_SHOW_VALUE = 6;
+const int LABEL_ICON_ONLY = 7;
 const CString Label_Display_Array[] =
 {
 	_T("Value"),
@@ -1255,7 +1263,7 @@ const CString Label_Display_Array[] =
 	_T("Icon Description"),
 	_T("Icon Label"),
 	_T("Icon Value"),
-	_T(""),
+	_T("Icon Only"),
 	_T(""),
 	_T(""),
 };
@@ -1334,6 +1342,8 @@ const int m_screenHotKeyID[SCREEN_HOTKEY_COUNT] =
 };
 
 typedef map<int, CString> pidname_map;
+
+typedef map<int, CString> pid_reglist_map;
 
 struct AddressMap
 {
@@ -1757,19 +1767,22 @@ const int REG_SCHEDULE_START_ADDRESS = REG_PRG_START_ADDRESS + LENGTH_MODBUS_PRG
 #define BAC_WR_TIME   16
 #define BAC_AR_Y      17
 
-#define COIL_REG  23
+#define BAC_BI        20
+#define BAC_BV        21
+#define COIL_REG      23
 #define DIS_INPUT_REG 24
-#define INPUT_REG    25
-#define MB_REG    26
+#define INPUT_REG     25
+#define MB_REG        26
 
-#define BAC_AV         27
-#define BAC_AI  28
-#define BAC_AO  29
-#define BAC_DO  30
+#define BAC_AV        27
+#define BAC_AI        28
+#define BAC_AO        29
+#define BAC_DO        30
 
-#define BAC_MAIN		255
+#define BAC_MAX       31
+#define BAC_MAIN      255
 
-
+#define MAX_FUNCTION_COUNT    31
 #define MAX_OBJ_INSTANCE  4194303
 
 

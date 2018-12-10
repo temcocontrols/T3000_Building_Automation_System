@@ -66,6 +66,9 @@
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Template|Win32'" />
     <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</EmbedManifest>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -81,7 +84,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\BacNetDllforVc\;..\BacNetDllforVc\MainCpp\;..\BacNetDllforVc\include\;..\BacNetDllforVc\object\;..\BacNetDllforVc\handler\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -116,7 +119,7 @@
       <PrecompiledHeaderFile>StdAfx.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\BacNetDllforVc\;..\BacNetDllforVc\MainCpp\;..\BacNetDllforVc\include\;..\BacNetDllforVc\object\;..\BacNetDllforVc\handler\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -131,12 +134,16 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalLibraryDirectories>..\T3000 Output\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BacnetMstp.cpp" />
+    <ClCompile Include="BADO\BADO.cpp" />
     <ClCompile Include="BinFileParser.cpp" />
     <ClCompile Include="ComWriter.cpp" />
     <ClCompile Include="ConfigFileHandler.cpp" />
@@ -153,6 +160,7 @@
     <ClCompile Include="MyPing.cpp" />
     <ClCompile Include="MySocket.cpp" />
     <ClCompile Include="Splash.cpp" />
+    <ClCompile Include="StaticEx\staticex.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
@@ -162,6 +170,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\T3000\ProductModel.h" />
+    <ClInclude Include="BacnetMstp.h" />
     <ClInclude Include="BinFileParser.h" />
     <ClInclude Include="ComWriter.h" />
     <ClInclude Include="ConfigFileHandler.h" />

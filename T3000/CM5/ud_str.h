@@ -819,6 +819,8 @@ typedef union
          unsigned char flag_time_sync_pc;  // 0: 不需要   1:同步.
          unsigned char time_sync_auto_manual;  // 0 和时间服务器同步   1：和PC 时间同步
          unsigned char sync_time_results;      //与时间服务器同步的结果 0 失败         1成功   注：只有在 reset_default 写99 要求同步后才去读次位用以判断同步结果;
+         //unsigned char network_ID[3];   //三个口 用于编程的ID；
+         unsigned char mstp_id;         //MSTP_ID
 	}reg;
 }Str_Setting_Info;
 
@@ -1050,8 +1052,8 @@ typedef union
 
 typedef struct
 {
-	unsigned short value;         /* (2 bytes; ) */
-	int unit;         /* (4 bytes; ) */
+	unsigned short m_volts;         /* (2 bytes; ) */
+	int m_value;         /* (4 bytes; ) */
 
 } Tbl_point;     /* (size = 6 bytes); */
 

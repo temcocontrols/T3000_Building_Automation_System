@@ -151,6 +151,7 @@ char * intervaltotextfull(char *textbuf, long seconds , unsigned minutes , unsig
   void Init_Service_Handlers(void);
 CString GetProductName(int ModelID);
 void Inial_Product_map();
+void Inial_Product_Reglist_map();
 CString Get_Table_Name(int SerialNo,CString Type ,int Row);
 void    Insert_Update_Table_Name(int SerialNo,CString Type,int Row,CString TableName); 
 int Get_Unit_Process(CString Unit);
@@ -261,6 +262,8 @@ bool Save_VariableData_to_db(unsigned char  temp_output_index, unsigned int nser
 	bool Save_AVData_to_db();
 	CString GetGUID();
 
+    bool Open_Socket_Retry(CString strIPAdress, short nPort, int retry_time=3);
     void Inial_ProductName_map();
     int PanelName_Map(int product_type);
+    void switch_product_last_view();
 #endif

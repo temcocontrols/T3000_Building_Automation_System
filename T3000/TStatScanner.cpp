@@ -9,7 +9,7 @@
 #include "define.h"
 #include "bip.h"
 #include "rs485.h" // For call Get_RS485_Handle() function
-
+#include "T3000Option.h"
 //#include "global_variable.h"
 //#include "global_define.h"
 //AB means Add Building
@@ -67,12 +67,13 @@ struct _NCInfo
 };
 
 UINT _ScanRemote_IP_Thread(LPVOID pParam);
-UINT _ScanBacnetMSTPThread(LPVOID pParam);
+//UINT _ScanBacnetMSTPThread(LPVOID pParam);
 UINT _ScanNCByUDPFunc(LPVOID pParam);
 UINT SCAN_TCP_TO485_THREAD(LPVOID pParam);
 //UINT _ScanTstatThread(LPVOID pParam);
 UINT _ScanTstatThread2(LPVOID pParam);
 //UINT _WaitScanThread(LPVOID pParam);
+
 DWORD WINAPI  _WaitScanThread(LPVOID lpVoid);
 DWORD WINAPI  Detect_Mstp_thread(LPVOID lpVoid);
 UINT _ScanOldNC(LPVOID pParam);
@@ -353,7 +354,7 @@ BOOL CTStatScanner::ScanComDevice()//02
             this->scan_com_value = i;
             hScanComData[i] = CreateThread(NULL, NULL, ScanComThreadNoCritical, this /*&i*/, NULL, nScanThreadID+i);
             Sleep(100); //这个是必须的,否则线程会乱;
-            ::CloseHandle(hScanComData[i]);
+            //::CloseHandle(hScanComData[i]);
         }
     }
 
@@ -610,7 +611,8 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
         {
             if (!m_scan_info.at(scan_item).scan_skip)
             {
-
+                int temp_scan_item = 0;
+                int found_real_mstp = false;
                 for (int x = 0; x < m_com_mstp_detect.size(); x++)
                 {
                     if ((m_com_mstp_detect.at(x).baudrate == m_scan_info.at(scan_item).scan_baudrate) &&
@@ -620,18 +622,38 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
                             (m_com_mstp_detect.at(x).test_ret != 0))
                         {
                             contain_mstp = 1;
+                            continue;
+                        }
+                        else if (m_com_mstp_detect.at(x).test_ret == 1)
+                        {
+                            contain_mstp = 1;
+                            found_real_mstp = true;
+                            temp_scan_item = scan_item;
                             break;
                         }
+                      
                     }
                 }
 
-                if (contain_mstp == 1)
+                if (contain_mstp == 1) 
                 {
                     m_scan_info.at(scan_item).scan_status = SCAN_STATUS_FINISHED;
                     memset(m_scan_info.at(scan_item).scan_notes, 0, 250);
-                    memcpy(m_scan_info.at(scan_item).scan_notes, "Bacnet MSTP token found! Scan finished", strlen("Bacnet MSTP token found! Scan finished"));
+                    memcpy(m_scan_info.at(scan_item).scan_notes, "Garbage data received!", strlen("Garbage data received!"));
+
+                    if (found_real_mstp)
+                    {
+                        m_scan_info.at(temp_scan_item).scan_status = SCAN_STATUS_FINISHED;
+                        memset(m_scan_info.at(temp_scan_item).scan_notes, 0, 250);
+                        memcpy(m_scan_info.at(temp_scan_item).scan_notes, "Bacnet MSTP protocol is detected !", strlen("Bacnet MSTP protocol is detected !"));
+                    }
+
                     continue;
                 }
+
+
+
+
                 if (pScan->OpenCom(n))
                 {
 
@@ -3709,7 +3731,7 @@ int CTStatScanner::ScanSubnetFromEthernetDevice()//scan
         {
             hScanTCPData[i] = CreateThread(NULL, NULL, ScanTCPSubPortThreadNoCritical, this , NULL, nScanTCPThreadID + i);
             Sleep(100); //这个是必须的,否则线程会乱;
-            ::CloseHandle(hScanTCPData[i]);
+            //::CloseHandle(hScanTCPData[i]);
         }
 
         return nsize;
@@ -4440,7 +4462,8 @@ BOOL CTStatScanner::ScanBacnetMSTPDevice()
 {
     m_szComs.clear();
     GetSerialComPortNumber1(m_szComs);
-    m_pScanBacnetIPThread = AfxBeginThread(_ScanBacnetMSTPThread,this);
+   // m_pScanBacnetIPThread = AfxBeginThread(_ScanBacnetMSTPThread,this);
+    m_pScanBacnetIPThread = CreateThread(NULL, NULL, _ScanBacnetMSTPThread, this, NULL, NULL);
     return TRUE;
 }
 
@@ -4801,7 +4824,7 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
 
     return 1;
 }
-#include "T3000Option.h"
+
 
 int n_mstp_comport = 0;
 int n_mstp_baudrate = 19200;
@@ -4809,9 +4832,10 @@ int n_mstp_baudrate = 19200;
 //需要先让串口的modbus 扫完，那里会记录有哪些串口存在 bacnet的协议.
 //在扫描bacnet的时候 将bacnet ip 扫描完后，要去依次扫描 串口的MS/TP
 //Scan bacnet
-UINT _ScanBacnetMSTPThread(LPVOID pParam)
+DWORD WINAPI   CTStatScanner::_ScanBacnetMSTPThread(LPVOID lpVoid)
+//UINT _ScanBacnetMSTPThread(LPVOID pParam)
 {
-    CTStatScanner* pScan = (CTStatScanner*)(pParam);
+    CTStatScanner* pScan = (CTStatScanner*)(lpVoid);
     vector <_Bac_Scan_Com_Info> m_temp_com_data;
     vector <_Bac_Scan_results_Info> m_temp_result_data;
 
@@ -4867,12 +4891,27 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
             Set_RS485_Handle(NULL);
         }
         m_scan_info.at(scan_bacnet_ip_item).scan_status = SCAN_STATUS_FINISHED;
+        pScan->m_pScanBacnetIPThread = NULL;
         return 1;
     }
     else
     {
-        CT3000Option dlg;
-        dlg.DoModal();
+        bool found_mstp_port = false;
+        for (int j = 0; j < m_com_mstp_detect.size(); j++)
+        {
+            if (m_com_mstp_detect.at(j).test_ret == 1)
+            {
+                found_mstp_port = true;
+                n_mstp_comport = m_com_mstp_detect.at(j).ncomport;
+                n_mstp_baudrate = m_com_mstp_detect.at(j).baudrate;
+                break;
+            }
+        }
+        if (found_mstp_port == false)  //没有找到MSTP的波特率和com 口 才提示客户 自己选择;
+        {
+            CT3000Option dlg;
+            dlg.DoModal();
+        }
     }
 
     CString temp_cs;
@@ -4932,6 +4971,25 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
                 ntest_ret = GetPrivateBacnetToModbusData(m_temp_com_data.at(i).device_id, 0, 100, test_array);
                 if (ntest_ret >= 0)
                 {
+                    if ((debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA) || (debug_item_show == DEBUG_SHOW_ALL))
+                    {
+                        CString total_char_test;
+                        //total_char_test = _T("Read MSTP To Modbus : ");
+                        total_char_test.Format(_T("Read MSTP To Modbus %d , %d:"), 0, 100);
+                        unsigned short * temp_print_test = NULL;
+                        temp_print_test = test_array;
+                        for (int i = 0; i< 100; i++)
+                        {
+                            CString temp_char_test;
+                            temp_char_test.Format(_T("%04x"), (unsigned char)*temp_print_test);
+                            temp_char_test.MakeUpper();
+                            temp_print_test++;
+                            total_char_test = total_char_test + temp_char_test + _T(" ");
+                        }
+                        DFTrace(total_char_test);
+
+                    }
+
                     _Bac_Scan_results_Info  temp_info;
                     temp_info.serialnumber = test_array[0] + test_array[1] * 256 + test_array[2] * 256 * 256 + test_array[3] * 256 * 256 * 256;
                     temp_info.product_type = test_array[7];
@@ -5056,6 +5114,7 @@ end_mstp_thread:
     //}
 
     //is_in_scan_mode = false;
+    pScan->m_pScanBacnetIPThread = NULL;
     return 1;
 }
 

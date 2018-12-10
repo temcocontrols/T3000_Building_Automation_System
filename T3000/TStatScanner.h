@@ -230,7 +230,7 @@ public:
 	CWnd*							m_pParent;	
 	//CWinThread*					m_pScanBacnetMstpThread;
 	CWinThread*					m_pScanRemoteIPThread;
-	CWinThread*					m_pScanBacnetIPThread;
+	HANDLE					m_pScanBacnetIPThread;
 	CWinThread*					m_pScanNCThread;
 	CWinThread*                  m_pCheckSubnetThread;
 	CWinThread*					m_pScanTstatThread;
@@ -251,7 +251,7 @@ public:
 	int							m_device_baudrate;
 	int							m_device_com_port;
 	unsigned int				m_parent_serialnum;
-
+    static DWORD WINAPI   _ScanBacnetMSTPThread(LPVOID lpVoid);
     static	DWORD WINAPI   ScanComThreadNoCritical(LPVOID lpVoid);
     static	DWORD WINAPI   ScanTCPSubPortThreadNoCritical(LPVOID lpVoid);
     unsigned int               scan_com_value;

@@ -54,7 +54,7 @@ BOOL CT3000Option::OnInitDialog()
      {
          m_combox_language.AddString(m_szComs.at(i));
      }
-
+     ::SetWindowPos(this->m_hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
      m_option_baudrate.ResetContent();
      for (int x = 0;x< (sizeof(Baudrate_Array) / sizeof(Baudrate_Array[0]));x++)

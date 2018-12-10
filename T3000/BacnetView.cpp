@@ -2,6 +2,19 @@
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
 //使用VS2010 编译需删除 c:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cvtres.exe 来确保用更高版本的 来转换资源文件
+2018 11 27
+1. Setting 界面 Done 不在修改IP
+2. Setting Show LCD 只有BB 有，其他的需要隐藏;
+3. Monitor 处新增 SD卡状态显示;
+
+2018 09 03
+1.TSTAT8 输入根据 寄存器来判断 是否显示HUM CO2 和光强;
+
+2018 08 27
+1.加载或保存 TSTAT8的配置时 新增更多寄存器
+2.不在显示 初次加载TB 之类的对话框.
+
+
 1. Fix the program bug "10 28AO5 = 3" when open again it show "10  = 3"
 
 2018 05 29 
@@ -864,7 +877,7 @@ int n_read_list_flag = -1;
 // int m_Input_data_length;
 extern void  init_info_table( void );
 extern void Init_table_bank();
-
+CShowMessageDlg * ShowMessageDlg = NULL;
 IMPLEMENT_DYNCREATE(CDialogCM5_BacNet, CFormView)
 
 CDialogCM5_BacNet::CDialogCM5_BacNet()
@@ -1030,7 +1043,6 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					CString temp_serial;
 					temp_serial.Format(_T("%u.prog"),g_selected_serialnumber);
 					temp_file = g_achive_folder + _T("\\") + temp_serial;
-					//SaveBacnetConfigFile(temp_file);
                     SaveBacnetBinaryFile(temp_file);
 				}
 
@@ -5048,7 +5060,6 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 					CString temp_serial;
 					temp_serial.Format(_T("%u.prog"),g_selected_serialnumber);
 					temp_file = g_achive_folder + _T("\\") + temp_serial;
-					//SaveBacnetConfigFile(temp_file);
                     SaveBacnetBinaryFile(temp_file);
 				}
 			}
@@ -5281,32 +5292,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 	case BAC_SET_LAST_UI:
 		{
 			KillTimer(BAC_SET_LAST_UI);
-			int first_view_ui;
-			first_view_ui = (unsigned int)GetPrivateProfileInt(_T("LastView"),_T("FistLevelViewUI"),-1,g_cstring_ini_path);
-			if(first_view_ui == TYPE_OUTPUT)
-				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_OUTPUTS,BN_CLICKED),NULL);
-			else if(first_view_ui == TYPE_VARIABLE)
-				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_VARIABLES,BN_CLICKED),NULL);
-			else if(first_view_ui == TYPE_INPUT)
-				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_INPUTS,BN_CLICKED),NULL);
-			else if(first_view_ui == TYPE_PROGRAM)
-				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_PROGRAMS,BN_CLICKED),NULL);
-			else if(first_view_ui == TYPE_CONTROLLER)
-				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_CONTROLLERS,BN_CLICKED),NULL);
-			else if(first_view_ui == TYPE_SCREENS)
-				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_SCREENS,BN_CLICKED),NULL);
-			else if(first_view_ui == TYPE_WEEKLY)
-				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_WEEKLY,BN_CLICKED),NULL);
-			else if(first_view_ui == TYPE_ANNUAL)
-				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_ANNUALROUTINES,BN_CLICKED),NULL);
-			else if(first_view_ui == TYPE_MONITOR)
-				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_MONITORS,BN_CLICKED),NULL);
-			else if(first_view_ui == TYPE_ALARMLOG)
-				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_ALARM_LOG,BN_CLICKED),NULL);
-			else if(first_view_ui == TYPE_READ_REMOTE_POINT_INFO)
-				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_TSTAT,BN_CLICKED),NULL);
-			else if(first_view_ui == TYPE_SETTING)
-				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_SETTINGS,BN_CLICKED),NULL);
+            switch_product_last_view();
 		}
 		break;
 	default:
@@ -5401,16 +5387,28 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
                 if (g_protocol == PROTOCOL_BACNET_IP)
                 {
                     pFrame->Show_Wait_Dialog_And_ReadBacnet();
+#if 0
+                    if (ShowMessageDlg != NULL)
+                    {
+                        delete ShowMessageDlg;
+                        ShowMessageDlg = NULL;
+                    }
+                    ShowMessageDlg = new CShowMessageDlg;
 
-                    CShowMessageDlg dlg;
+
+
+                    //CShowMessageDlg dlg;
                     CString temp_task_info;
                     temp_task_info.Format(_T("This is the first time the device has been accessed , the data is being read"));
-                    dlg.SetStaticText(temp_task_info);
+                    ShowMessageDlg->SetStaticText(temp_task_info);
                     //dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
-                    dlg.SetStaticTextColor(RGB(0, 0, 255));
-                    dlg.SetStaticTextSize(25, 20);
-                    dlg.SetProgressAutoClose(250, 100, EVENT_FIRST_LOAD_PROG);
-                    dlg.DoModal();
+                    ShowMessageDlg->SetStaticTextColor(RGB(0, 0, 255));
+                    ShowMessageDlg->SetStaticTextSize(25, 20);
+                    ShowMessageDlg->SetProgressAutoClose(250, 100, EVENT_FIRST_LOAD_PROG);
+                    //dlg.DoModal();
+                    ShowMessageDlg->Create(IDD_AA_SHOWMESSAGE, this);
+                    ShowMessageDlg->ShowWindow(SW_HIDE);
+#endif
                 }
 				//PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,BAC_READ_ALL_LIST);
 			}

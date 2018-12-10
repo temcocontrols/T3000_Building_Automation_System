@@ -55,7 +55,7 @@ unsigned int customer_define_x_time = 3600;	// 客户定义的 x 的 长度;
 unsigned long customer_start_time = 0;
 unsigned long customer_end_time = 3600;
 bool use_customer_time = false;
-
+int no_space_auto_close = 0;
 bool contain_digital = false; //用于判断是否包含数字量;
 bool draw_graphic_finished = false;
 //extern unsigned char read_monitor_sd_ret;
@@ -476,11 +476,12 @@ int CBacnetGraphic::Search_data_from_db()
 		int temp_input_point_type = 0;
 		int temp_input_point_panel = 0;
 		int temp_input_point_sub_panel = 0;
-		int temp_input_network = 1;
+		int temp_input_network = 0;
 		temp_input_number = m_monitor_data.at(monitor_list_line).inputs[i].number;
 		temp_input_point_type = m_monitor_data.at(monitor_list_line).inputs[i].point_type;
 		temp_input_point_panel = m_monitor_data.at(monitor_list_line).inputs[i].panel;
 		temp_input_point_sub_panel = m_monitor_data.at(monitor_list_line).inputs[i].sub_panel;
+        temp_input_network = m_monitor_data.at(monitor_list_line).inputs[i].network;
 		cs_temp_input_index.Format(_T("%u_%u_%u_%u_%u"),temp_input_number,temp_input_point_type,temp_input_point_panel,temp_input_point_sub_panel,temp_input_network);
 
 		if(i<temp_number_of_analog)
@@ -792,7 +793,7 @@ DWORD WINAPI RefreshThreadPro(LPVOID lPvoid)
             Sleep(10);
             if (!flag_continue_thread)
             {
-                updatedatathread = NULL;
+                refreshthread = NULL;
                 return 0;
             }
         }
@@ -817,7 +818,7 @@ DWORD WINAPI UpdateDataThreadPro(LPVOID lPvoid)
     strSql = _T("delete * from MonitorData where Flag <> 0") + temp_time;
     monitor_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
     monitor_bado.CloseConn();
-
+    int n_update_shou_1_once = true;
     while (flag_continue_thread)
     {
         mparent->Initial_Scale_Time();
@@ -827,26 +828,42 @@ DWORD WINAPI UpdateDataThreadPro(LPVOID lPvoid)
         int read_dig_ret = 0;
         if (mparent->m_analog_count != 0)  //Fan如果不包含模拟量，就没有必要刷新读的数据;
         {
+            if(n_update_shou_1_once == true)
+                g_progress_persent = 1;
+            TRACE(_T("Start read BAC_UNITS_ANALOG \r\n"));
             read_analog_ret = read_monitordata(BAC_UNITS_ANALOG, m_time_left_time, m_time_monitor_now);
             if (read_analog_ret < 0)
             {
+                if (read_analog_ret == -5)
+                {
+                    no_space_auto_close = 20;
+                    g_progress_persent = 100;
+                    updatedatathread = NULL;
+                    return 0;
+                }
                 BitToString(BAC_UNITS_ANALOG, monitor_list_line);
                 continue;
             }
+            if (n_update_shou_1_once == true)
+                g_progress_persent = 100;
             BitToString(BAC_UNITS_ANALOG, monitor_list_line);
         }
         
         if (mparent->m_digital_count != 0)  //Fan 如果不包含数字量，就没有必要刷新读的数据;
         {
+            if (n_update_shou_1_once == true)
+                g_progress_persent = 1;
             read_dig_ret = read_monitordata(BAC_UNITS_DIGITAL, m_time_left_time, m_time_monitor_now);
             if (read_dig_ret < 0)
             {
                 BitToString(BAC_UNITS_DIGITAL, monitor_list_line);
                 continue;
             }
+            if (n_update_shou_1_once == true)
+                g_progress_persent = 100;
             BitToString(BAC_UNITS_DIGITAL, monitor_list_line);
         }
-
+        n_update_shou_1_once = false;
 
 
         //if (!refresh_ret)
@@ -956,6 +973,13 @@ DWORD WINAPI MyThreadPro(LPVOID lPvoid)
 			Sleep(10);
 		else
 			Sleep(500);
+
+        if (no_space_auto_close)
+        {
+            no_space_auto_close--;
+            if(no_space_auto_close == 0)
+                ::PostMessage(myhWnd, WM_CLOSE, NULL, NULL);
+        }
 		//flag_continue_thread = false;
 	}
 	mythread = NULL;
@@ -1047,6 +1071,16 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 		mygraphics->DrawString(_T("ON"), -1, &Scroll_font, scrollpointF,&Font_brush_on_off);
 	else
 		mygraphics->DrawString(_T("OFF"), -1, &Scroll_font, scrollpointF,&Font_brush_on_off);
+
+    if (no_space_auto_close)
+    {
+        scrollpointF.X = 500;
+        scrollpointF.Y = 200;
+        mygraphics->DrawString(_T("There is not enough space to store new data (selected trend log)."), -1, &Scroll_font, scrollpointF, &Font_brush_on_off);
+
+    }
+
+
 
 	delete Static_scroll_blackground_Brush;
 
@@ -2745,7 +2779,7 @@ void CBacnetGraphic::OnGraphicRight()
 		else
 		{
 			m_time_monitor_now = temp_cur_long_time;
-			MessageBox(_T("No more data!"));
+			//MessageBox(_T("No more data!"));
             flag_auto_scroll = true;
 		}
 	}

@@ -12,7 +12,7 @@
 
 #include "T3000DEF.H"
 #include "ROUTER.H"
-#define MAX_FUNCTION_COUNT    30
+
 #include "..\global_define.h"
 
 #pragma warning(disable:4309)
@@ -890,7 +890,7 @@ void get_label(void);
 char *islabel(char *token,int *num_point,byte *var_type,byte *point_type, int *num_panel);
 void prescan2(void) ; // find the location of all functions and global
 int prescan1(void) ; // find the location of all functions and global
-int define_var(char *token, int t=0/*FLOAT_TYPE*/,int l=0,int c=0, int lstr=0/*LENGTHSTRING*/);
+int define_var(char *token, int t=FLOAT_TYPE,int l=0,int c=0, int lstr=LENGTHSTRING);
 void assig_var(char *var_name, int value);
 void write_cod(int type,int n_var,int v1, char *var1, float fvar1,
 	int v2, char *var2, float fvar2,
@@ -2624,12 +2624,12 @@ int define_var(char *tok, int t,int l,int c, int lstr)
   label=ispoint_ex(tok,&num_point,&var_type,&point_type,&num_panel,&num_net,my_network,sub_panel_number,my_panel,&ret_network);
  if(!label)
  {             // local var
-  if ((strlen(token) == 1 ) && (token[0]>='A' && token[0]<='Z'))
+ // if ((strlen(token) == 1 ) && (token[0]>='A' && token[0]<='Z'))
   {
       //2018 07 20 dufan
-	 sntx_err(NOT_VAR); 
-	 error = 1;
-	 return 0;
+	 //sntx_err(NOT_VAR); 
+	 //error = 1;
+	 //return 0;
 	 var_type = LOCAL_VAR;
 	 label = tok;
 	 while( *label )
@@ -2685,18 +2685,18 @@ int define_var(char *tok, int t,int l,int c, int lstr)
 						strcpy(vars_table[i].label,label);
 					}
 	}
-	if(var_type==LOCAL_VAR)
-	{
-	if( c && t!=STRING_TYPE)
-	{
-		vars_table[i].var_type = t+FLOAT_TYPE_ARRAY-FLOAT_TYPE;
-	}
-	else
-	{
-	 if( tok[strlen(tok)-1]=='%' ) t = INTEGER_TYPE;
-	 if( tok[strlen(tok)-1]=='$' ) {t = STRING_TYPE; l=0; c=lstr;}
-	 vars_table[i].var_type = t;
-	}
+    if (var_type == LOCAL_VAR)
+    {
+        if (c && t != STRING_TYPE)
+        {
+            vars_table[i].var_type = t + FLOAT_TYPE_ARRAY - FLOAT_TYPE;
+        }
+        else
+        {
+            if (tok[strlen(tok) - 1] == '%') t = INTEGER_TYPE;
+            if (tok[strlen(tok) - 1] == '$') { t = STRING_TYPE; l = 0; c = lstr; }
+            vars_table[i].var_type = t;
+        }
 	vars_table[i].l = l;
 	vars_table[i].c = c;
 
@@ -3597,17 +3597,6 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 		}
 			
 
-        // 例如 编程   123456IN4   会报错 ，因为这种利用object instance 去编程 只支持 AV AI AO DO
-        if ((*num_panel >= 256) || b_is_instance)
-        {
-            if ((k != BAC_AV) && (k != BAC_AI) && (k != BAC_AO) && (k != BAC_DO))
-            {
-                sntx_err(INSTANCE_NOT_SUPPORT); //instance 不支持 此 type. 
-                error = INSTANCE_NOT_SUPPORT;
-                return 0;
-            }
-        }
-
 		if (k<= MAX_FUNCTION_COUNT)
 		{
 			if (p==NULL) 
@@ -3622,7 +3611,7 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 			}
 			else  if (((strlen(p)==1) && (*p=='0')) && 
 				((k!= COIL_REG) && (k!= DIS_INPUT_REG) && (k!= INPUT_REG) && (k!= MB_REG) &&
-				(k != BAC_AV) && (k != BAC_AI) && (k != BAC_AO) && (k != BAC_DO) ))
+				(k != BAC_AV) && (k != BAC_AI) && (k != BAC_AO) && (k != BAC_DO) && (k != BAC_BV) && (k != BAC_BI)))
 			{
 				memcpy(pmes,"error line : ",13);
 				pmes += 13;
@@ -3682,6 +3671,16 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 							
 						else
 							high_3bit = ((*num_point) & 0xff00) >> 3;
+
+                        if ((k == MB_REG) && (*num_point >=2000))
+                        {
+                            int temp_num_point = *num_point;
+                            temp_num_point = temp_num_point >> 11;
+                            temp_num_point = temp_num_point | 0x0080;
+                            *netpresent = temp_num_point; // 去Number 的 最高5位;
+
+                        }
+
 						*point_type = k;
 						*point_type = *point_type | high_3bit;
 						//if(*num_panel<10 || *num_point<100)
@@ -3701,7 +3700,7 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
                         }
                         else
                         {
-                            if (*num_panel<10 || *num_point< (8 * 256))
+                            //if (*num_panel<10 || *num_point< (8 * 256))
                                 strcat(buf, ".");
                             strcat(buf, fance_sub_pc);
                             strcat(buf, ".");
@@ -3734,6 +3733,8 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 			}
 		}
 	}
+
+
 	//return 0;
 	char * temp_ret = NULL;
 	temp_ret = islabel(token,num_point,var_type,point_type,num_panel);
@@ -3742,7 +3743,18 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 		sub_panel = panel;
 		return temp_ret;
 	}
-	//return(islabel(token,num_point,var_type,point_type,num_panel));//fance
+
+    //// 例如 编程   123456IN4   会报错 ，因为这种利用object instance 去编程 只支持 AV AI AO DO
+    if ((*num_panel >= 256) || b_is_instance)
+    {
+        if ((k != BAC_AV) && (k != BAC_AI) && (k != BAC_AO) && (k != BAC_DO) && (k != BAC_BI) && (k != BAC_BV))
+        {
+            sntx_err(INSTANCE_NOT_SUPPORT); //instance 不支持 此 type. 
+            error = INSTANCE_NOT_SUPPORT;
+            return 0;
+        }
+    }
+	return(islabel(token,num_point,var_type,point_type,num_panel));//fance
 }
 
 
@@ -5709,7 +5721,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 
 						 for(j=0;j<ind_local_table; )
 						 {
-							switch(local_table[j])
+							switch((unsigned char)local_table[j])
 							{
 								case FLOAT_TYPE:
 								case LONG_TYPE:
@@ -5723,7 +5735,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 									break;
 								default:
 								  {
-									switch(local_table[j])
+									switch((unsigned char)local_table[j])
 									{
 									case FLOAT_TYPE_ARRAY:
 									case LONG_TYPE_ARRAY:
@@ -5779,7 +5791,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 				else
 					if ((vars_table[cur_index].type == POINT_VAR) || (vars_table[cur_index].type == LABEL_VAR))
 					{
-                        if ((unsigned char)vars_table[cur_index].network >= 128) //network 的最高位用来标识  是否是新的数据格式
+                        if (((unsigned char)vars_table[cur_index].network >= 128) && (( ((unsigned char)vars_table[cur_index].point_type) & 0x1F) != MB_REG)) //network 的最高位用来标识  是否是新的数据格式
                         {
                             unsigned char high_3bit;
                             cod_line[Byte++] = REMOTE_POINT_PRG;
@@ -5787,6 +5799,8 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
                                 ((unsigned char)vars_table[cur_index].point_type == DIS_INPUT_REG) ||
                                 ((unsigned char)vars_table[cur_index].point_type == INPUT_REG) ||
                                 ((unsigned char)vars_table[cur_index].point_type == MB_REG) ||
+                                ((unsigned char)vars_table[cur_index].point_type == BAC_BV) ||
+                                ((unsigned char)vars_table[cur_index].point_type == BAC_BI) ||
                                 ((unsigned char)vars_table[cur_index].point_type == BAC_AV) ||
                                 ((unsigned char)vars_table[cur_index].point_type == BAC_AI) ||
                                 ((unsigned char)vars_table[cur_index].point_type == BAC_AO) ||
@@ -5860,6 +5874,8 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 								(temp_point_type == DIS_INPUT_REG) ||
 								(temp_point_type == INPUT_REG) ||
 								(temp_point_type == MB_REG) ||
+                                (temp_point_type == BAC_BV) ||
+                                (temp_point_type == BAC_BI) ||
 								(temp_point_type == BAC_AV) ||
 								(temp_point_type == BAC_AI) ||
 								(temp_point_type == BAC_AO) ||
@@ -5883,7 +5899,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 							//*point_type = *point_type | high_3bit;
 							point.panel = vars_table[cur_index].panel;
 							point.sub_panel = vars_table[cur_index].sub_panel ;
-							point.network = 1;
+							point.network = vars_table[cur_index].network;
 							memcpy(&cod_line[Byte],&point,sizeof(Point_Net));
 							Byte += sizeof(Point_Net);
 						}
@@ -5895,6 +5911,8 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 								((unsigned char)vars_table[cur_index].point_type == DIS_INPUT_REG) ||
 								((unsigned char)vars_table[cur_index].point_type == INPUT_REG) ||
 								((unsigned char)vars_table[cur_index].point_type == MB_REG) ||
+                                ((unsigned char)vars_table[cur_index].point_type == BAC_BV) ||
+                                ((unsigned char)vars_table[cur_index].point_type == BAC_BI) ||
 								((unsigned char)vars_table[cur_index].point_type == BAC_AV) ||
 								((unsigned char)vars_table[cur_index].point_type == BAC_AI) ||
 								((unsigned char)vars_table[cur_index].point_type == BAC_AO) ||
@@ -5917,7 +5935,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 
 							point.panel = vars_table[cur_index].panel;
 							point.sub_panel = vars_table[cur_index].sub_panel ;
-							point.network = 1;
+							point.network = vars_table[cur_index].network;
 							memcpy(&cod_line[Byte],&point,sizeof(Point_Net));
 							Byte += sizeof(Point_Net);
 						}
@@ -6089,6 +6107,8 @@ char *rtrim(char *text)
 	return text;
 }
 
+
+
 char * buf;
 char my_display[10240];
 
@@ -6122,7 +6142,7 @@ unsigned char cod;//,xtemp[15];
  bac_free_memory = 2000 - bac_program_size;
  pcode=code+2;
  memcpy(&bytes,code,2);
-// adjustint(&bytes, ptrprg->type);
+ //adjustint(&bytes, 0);
  
  bytes += 2+3;
  code += bytes;
@@ -6151,7 +6171,7 @@ unsigned char cod;//,xtemp[15];
  {
 	 if(!then_else)
 	 {
-		 if (*code!=0x01)
+		 if ((unsigned char)*code!=0x01)
 		 {
 			//printf("ERROR!!!!Desassambler!!!!!!!!!!!!!\n");
 			return NULL;
@@ -6164,7 +6184,7 @@ unsigned char cod;//,xtemp[15];
 		*buf++=' ';
 	 }
 	 else
-		 if (*code==0x01)
+		 if ((unsigned char)*code==0x01)
 				{
 				 then_else = 0;
 				 buf -= 3;
@@ -6278,7 +6298,7 @@ unsigned char cod;//,xtemp[15];
 																break;
 											case STRING:
 																len = *code++;
-																if (*code=='\r')
+																if ((unsigned char)*code=='\r')
 																{
 																 buf--;
 																}
@@ -6447,7 +6467,7 @@ unsigned char cod;//,xtemp[15];
 										 }
 									else {
 												i=1;
-												while(*code && i++<=3)
+												while(((unsigned char)*code) && i++<=3)
 													{
 													 itoa(*code,buf,10);
 													 buf += strlen(buf);
@@ -6641,20 +6661,22 @@ int desvar(void)
  int num_point,num_panel,num_net,k;
  unsigned char sub_panel = 0;
  p=buf;
- if (*code == ASSIGNARRAY )
+ if ((unsigned char)*code == ASSIGNARRAY )
  {
 	code++;
  }
  if ((unsigned char)*code >= 0x82 && (unsigned char)*code <= 0x9B)
  {
-	long n;
-  n = *((int *)(code+1));
-  int t=0,j,k,l,c,m;//lc,cc;
+	 long n = 0 ;
+    n = *((unsigned short *)(code + 1));
+  //n = *((int *)(code+1));  //杜帆屏蔽  实际只有两个字节  我把它改为 short
+  int t=0,j,k = 0,l,c,m = 0;//lc,cc;
 
   l = c = 0;
   for(j=0;j<ind_local_table; )
   {
-	  switch(local[j])
+      switch ((unsigned char)local[j])
+	  //switch(local[j])  //dufan 屏蔽
 	  {
 			case FLOAT_TYPE:
 			case LONG_TYPE:
@@ -6798,7 +6820,7 @@ else
 //						adjustlong((unsigned long *)&l, ptrprg->type);
 						f = (float)l / 1000.;
 						code += 4;
-						if( *code == TIME_FORMAT)
+						if((unsigned char)*code == TIME_FORMAT)
 						{
 							code++;
 							intervaltotext_old(buf, (long)f, 0, 0);
@@ -6932,8 +6954,12 @@ int pointtotext(char *buf,Point_Net *point)
 
 	panel=point->panel;
 	point_type= (point->point_type ) & 0x1F;
+    if ((point_type == MB_REG) && (point->network >=128))
+    {
+        num = (point->number)  + ((point->network -128)*8 + high_3_bit)*256;
+    }
 	sub_panel = point->sub_panel;
-	if(point_type > BAC_DO)
+	if(point_type > BAC_MAX)
 	{
 		error = -6;
 		return -6;
@@ -6977,6 +7003,8 @@ int pointtotext(char *buf,Point_Net *point)
             (point_type == BAC_AI) ||
             (point_type == BAC_AO) ||
             (point_type == BAC_DO) ||
+            (point_type == BAC_BV) ||
+            (point_type == BAC_BI) ||
             (point_type == COIL_REG) ||
             (point_type == DIS_INPUT_REG) ||
             (point_type == INPUT_REG) ||
@@ -6989,7 +7017,7 @@ int pointtotext(char *buf,Point_Net *point)
         return 0;
     }
 
-    if (point->network >= 128) // 说明是新的格式，最高位用来标识.
+    if ((point->network >= 128) && (point_type != MB_REG)) // 说明是新的格式，最高位用来标识.
     {
         unsigned int temp_value;
         temp_value = ((point->network & 0x7F) << 16) + (point->panel << 8) + (point->sub_panel);
@@ -7012,6 +7040,8 @@ int pointtotext(char *buf,Point_Net *point)
             (point->point_type == DIS_INPUT_REG) ||
             (point->point_type == INPUT_REG) ||
             (point->point_type == MB_REG) ||
+            (point->point_type == BAC_BV) ||
+            (point->point_type == BAC_BI) ||
             (point->point_type == BAC_AV) ||
             (point->point_type == BAC_AI) ||
             (point->point_type == BAC_AO) ||
@@ -7029,7 +7059,7 @@ int pointtotext(char *buf,Point_Net *point)
 	//strcat(buf,itoa(panel+1,x,10));//2015-03-03修改，从此panel number 不在减一;
 	//if(panel+1<10 || num+1 < 100)
 	//	strcat(buf,"-");
-	if(panel+1<10 || num+1 < (8*256))
+	//if(panel+1<10 || num+1 < (8*256))
 		strcat(buf,".");
 	strcat(buf,itoa(sub_panel,x,10));
 	strcat(buf,".");
@@ -7044,6 +7074,8 @@ int pointtotext(char *buf,Point_Net *point)
 		(point->point_type == DIS_INPUT_REG) ||
 		(point->point_type == INPUT_REG) ||
 		(point->point_type == MB_REG) ||
+        (point->point_type == BAC_BV) ||
+        (point->point_type == BAC_BI) ||
 		(point->point_type == BAC_AV) ||
 		(point->point_type == BAC_AI) ||
 		(point->point_type == BAC_AO) ||
@@ -7642,6 +7674,9 @@ void init_info_table( void )
 			//	//ptr_panel.info[i].str_size = 46;
 			//	ptr_panel.info[i].name = "REG";
 			//	break;
+            case BAC_BI:
+                ptr_panel.info[i].name = "BI";
+                break;
 			case COIL_REG:
 				ptr_panel.info[i].name = "MB_COIL";
 				break;
@@ -7667,6 +7702,9 @@ void init_info_table( void )
 			case BAC_DO:
 				ptr_panel.info[i].name = "BO";  //change DO to BO.
 				break;
+            case BAC_BV:
+                ptr_panel.info[i].name = "BV";
+                break;
 			default:
 				{
 					ptr_panel.info[i].name = "DEFAULT_NAME";

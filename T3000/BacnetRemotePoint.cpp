@@ -221,18 +221,31 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 			continue;
 		}
 
-		temp_main_panel.Format(_T("%u"), m_remote_point_data.at(i).point.panel);
-		temp_device_id.Format(_T("%u"),m_remote_point_data.at(i).point.sub_panel);
-		unsigned char high_3bit ;
-		high_3bit = (unsigned char)((( m_remote_point_data.at(i).point.point_type ) & 0xE0) >> 5);
-		dev_reg = high_3bit * 256 + m_remote_point_data.at(i).point.number;
-		temp_reg_number.Format(_T("%u"),dev_reg);
 
-		temp_reg_value.Format(_T("%d"),(m_remote_point_data.at(i).point_value));
-        temp_time_remaining.Format(_T("%d"), m_remote_point_data.at(i).time_remaining);
 
 		unsigned char t_type;
 		t_type = m_remote_point_data.at(i).point.point_type & 0x1F;
+
+        temp_main_panel.Format(_T("%u"), m_remote_point_data.at(i).point.panel);
+        temp_device_id.Format(_T("%u"), m_remote_point_data.at(i).point.sub_panel);
+        unsigned char high_3bit;
+        if ((t_type == MB_REG + 1) && (m_remote_point_data.at(i).point.network >= 128))
+        {
+            high_3bit = (unsigned char)(((m_remote_point_data.at(i).point.point_type) & 0xE0) >> 5);
+            dev_reg = m_remote_point_data.at(i).point.number + ((m_remote_point_data.at(i).point.network - 128) * 8 + high_3bit) * 256;
+        }
+        else
+        {
+            high_3bit = (unsigned char)(((m_remote_point_data.at(i).point.point_type) & 0xE0) >> 5);
+            dev_reg = high_3bit * 256 + m_remote_point_data.at(i).point.number;
+        }
+
+        temp_reg_number.Format(_T("%u"), dev_reg);
+
+        temp_reg_value.Format(_T("%d"), (m_remote_point_data.at(i).point_value));
+        temp_time_remaining.Format(_T("%d"), m_remote_point_data.at(i).time_remaining);
+
+
 		if (t_type == BAC_OUT + 1)
 			temp_type = _T("OUT");
 		else if(t_type == BAC_IN + 1)
@@ -255,6 +268,10 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 			temp_type = _T("AO");
 		else if (t_type == BAC_DO + 1)
 			temp_type = _T("BO");
+        else if (t_type == BAC_BV + 1)
+            temp_type = _T("BV");
+        else if (t_type == BAC_BI + 1)
+            temp_type = _T("BI");
 #if 0
 		if(dev_reg == 0)
 		{
@@ -287,7 +304,8 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 		}
 		m_remote_point_list.SetItemText(i,REMOTE_DEVICE_STATUS,temp_status);
 
-		if(dev_reg >= (sizeof(TSTAT_5ABCDFG_LED_ADDRESS)/sizeof(TSTAT_5ABCDFG_LED_ADDRESS[0])))
+		if((dev_reg >= (sizeof(TSTAT_5ABCDFG_LED_ADDRESS)/sizeof(TSTAT_5ABCDFG_LED_ADDRESS[0]))) &&
+            t_type != MB_REG + 1)
 		{
 			m_remote_point_list.SetItemText(i, REMOTE_MAIN_ID, _T(""));
 			m_remote_point_list.SetItemText(i, REMOTE_TPYE, _T(""));

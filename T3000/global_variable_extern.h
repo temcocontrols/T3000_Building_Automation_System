@@ -34,7 +34,7 @@ extern bool list_mouse_click;
 extern CString CurrentT3000Version;
 extern BOOL g_SelectChanged;
 //Fance_4
-extern unsigned short product_register_value[2000];
+extern unsigned short product_register_value[20000];
 extern int product_type ;
 extern int old_product_type;
 extern HWND      m_building_config_hwnd;
@@ -951,7 +951,11 @@ extern	int	MODBUS_PID3_OFF_OUTPUT_COOL3	   ;
 extern	int	MODBUS_PID3_OFF_OUTPUT_HEAT1	   ;
 extern	int	MODBUS_PID3_OFF_OUTPUT_HEAT2	   ;
 extern	int	MODBUS_PID3_OFF_OUTPUT_HEAT3	   ;
-
+extern int MODBUS_HEAT_COOL_MODE ;
+extern int MODBUS_PID3_DAY_SETPOINT;
+extern int MODBUS_PID3_NIGHT_SETPOINT;
+extern int MODBUS_PID_D_TERM ;
+extern int MODBUS_PID_SAMPLE_TIME ;
 
 extern int selected_product_index;
 extern HTREEITEM selected_tree_item;
@@ -972,6 +976,7 @@ extern int bacnet_device_type;
 extern int g_bac_instance;
 extern unsigned int g_sub_instace;
 extern unsigned int g_selected_serialnumber;
+extern unsigned int g_selected_product_id;
 extern unsigned short g_mac;
 extern HWND MainFram_hwd;
 extern HWND BacNet_hwd;//Used for send a message to father delete the dlg;
@@ -1051,7 +1056,7 @@ extern HWND		 m_statusbar_hwnd ;
 extern HWND	     m_ext_io_dlg_hwmd ;
 extern HWND		 analog_cus_range_dlg;
 extern HWND      m_tstat_schedule_dlg_hwnd ;
-
+extern HWND      m_t3000_log_window ;
 extern vector <Str_out_point> m_Output_data;
 extern vector <Str_in_point>  m_Input_data;
 extern vector <Str_program_point>  m_Program_data;
@@ -1115,6 +1120,7 @@ extern unsigned char my_ip[4];
 extern byte	g_DayState[8][ANNUAL_CODE_SIZE];
 extern CDialog *pDialog[14];
 extern CDialog *DebugWindow;
+extern CDialog *T3000LogWindow;
 extern CDialog *Tcp_Server_Window;
 extern CString PrintText[1000];
 extern CString g_Print;
@@ -1296,6 +1302,7 @@ extern bool graphic_view_visible[14];
 extern CString bacnet_message_input_title;
 extern CString bacnet_message_return_string;  //得到的输入字符串
 extern pidname_map product_map;
+extern pid_reglist_map product_reglist_map;
 extern bool offline_mode ; //全局离线模式判断;
 extern CString offline_prg_path;   //离线模式得prg 保存路径;
 extern bac_mstp_com g_mstp_com; // 全局mstp com 口 连接状态
