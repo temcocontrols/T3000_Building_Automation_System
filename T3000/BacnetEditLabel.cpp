@@ -655,12 +655,16 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 	 MultiByteToWideChar( CP_ACP, 0, (char *)temp_info.ico_name,(int)strlen((char *)temp_info.ico_name)+1, 
 		 temp_icon_path.GetBuffer(MAX_PATH), MAX_PATH );
 	 temp_icon_path.ReleaseBuffer();	
-	
+
 	 temp_icon_path.Trim();
 	 if (temp_icon_path.IsEmpty())
 	 {
 		 m_edit_icon_path.SetWindowTextW(DEFAULT_ICON);
 	 }
+     else
+     {
+         m_edit_icon_path.SetWindowTextW(temp_icon_path);
+     }
 	 
 	 //
 	 MultiByteToWideChar( CP_ACP, 0, (char *)temp_info.ico_name_2,(int)strlen((char *)temp_info.ico_name_2)+1, 
@@ -674,6 +678,9 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 		 m_edit_icon2_path.SetWindowTextW(DEFAULT_ICON);
 	 }
 	 
+
+  
+
 	switch(temp_info.nDisplay_Type)
 	{
 	case LABEL_SHOW_VALUE:
@@ -683,6 +690,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 	case LABEL_ICON_FULL_DESCRIPTION:
 	case LABEL_ICON_LABEL:
 	case LABEL_ICON_SHOW_VALUE:
+    case LABEL_ICON_ONLY:
 		{
 			m_edit_display.SetWindowTextW(Label_Display_Array[temp_info.nDisplay_Type]);
 			m_display_cs = Label_Display_Array[temp_info.nDisplay_Type];
@@ -1207,12 +1215,13 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 			}
 			break;
 		}
+        // digital_status 0-1 表示 ON OFF      2 表示是模拟量不是数字量;
 		if (digital_status == 2)
 		{
-			m_edit_icon2_path.ShowWindow(true);
+			m_edit_icon2_path.ShowWindow(false);
 		}
 		else
-			m_edit_icon2_path.ShowWindow(false);
+			m_edit_icon2_path.ShowWindow(true);
 
 	}
 	if(m_allow_change == false)
@@ -1312,10 +1321,17 @@ void CBacnetEditLabel::OnStnClickedStaticEditLabelDisplay()
 	}
 	else if(label_info.nDisplay_Type == LABEL_ICON_LABEL)
 	{
-		label_info.nDisplay_Type = LABEL_SHOW_VALUE;
+		label_info.nDisplay_Type = LABEL_ICON_ONLY;
 		m_edit_display.SetWindowTextW(Label_Display_Array[label_info.nDisplay_Type]);
 		ChangeWindowPos(0);
 	}
+    else if (label_info.nDisplay_Type == LABEL_ICON_ONLY)
+    {
+        label_info.nDisplay_Type = LABEL_SHOW_VALUE;
+        m_edit_display.SetWindowTextW(Label_Display_Array[label_info.nDisplay_Type]);
+        ChangeWindowPos(0);
+    }
+
 	nDefaultDisplayType  = label_info.nDisplay_Type ;
 	temp_cs.Format(_T("%u"),label_info.nDisplay_Type);
 	WritePrivateProfileStringW(_T("Setting"),_T("AddLabelDefaultDisplay"),temp_cs,g_cstring_ini_path);

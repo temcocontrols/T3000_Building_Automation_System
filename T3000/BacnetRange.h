@@ -50,6 +50,13 @@ public:
 	afx_msg void OnBnClickedRadio79();
 	afx_msg void OnBnClickedRadio80();
     void UpdateCustomerRangeText();
+    afx_msg void OnBnClickedRadio82();
+    afx_msg void OnBnClickedRadio83();
+    afx_msg void OnBnClickedRadio84();
+    afx_msg void OnBnClickedRadio85();
+    afx_msg void OnBnClickedRadio86();
+    void ShowAnalogCusRange();
+    int m_device_type;
 };
 
 const CString Range_Type[] =

@@ -784,11 +784,11 @@ BOOL Dowmloadfile::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-    string temp_md5 = MD5(ifstream(_T("C:\\Fance\\T3000\\T3000_Building_Automation_System\\T3000 Output\\release\\TemcoStandardBacnetTool.dll"))).toString();
+    //string temp_md5 = MD5(ifstream(_T("C:\\Fance\\T3000\\T3000_Building_Automation_System\\T3000 Output\\release\\TemcoStandardBacnetTool.dll"))).toString();
 
-    string temp_md1 = MD5(ifstream(_T("C:\\Fance\\T3000\\T3000_Building_Automation_System\\T3000 Output\\release\\T3000Controls.dll"))).toString();
+    //string temp_md1 = MD5(ifstream(_T("C:\\Fance\\T3000\\T3000_Building_Automation_System\\T3000 Output\\release\\T3000Controls.dll"))).toString();
 
-    string temp_md2 = MD5(ifstream(_T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe"))).toString();
+    //string temp_md2 = MD5(ifstream(_T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe"))).toString();
 
 
     m_static_persent.SetWindowTextW(_T(""));
@@ -967,14 +967,30 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
     CString DesDownloadRevisionPath;
     CFileFind tempfind;
     CString strFileName;
+    CString str_product_section;
 
-    bool download_ret = false;
+    HRESULT download_ret = NULL;
     DownloadIniFilePath = Folder_Path + _T("//ProductPath.ini");
     CheckVersionIniFilePath = Folder_Path + _T("//CheckVersionPath.ini");
     download_ret = URLDownloadToFile(NULL, _T("https://temcocontrols.com/ftp/firmware/ProductPath.ini"), DownloadIniFilePath, 0, NULL);
     //T3000_FTP_Version = GetPrivateProfileIntW(_T("Version"), _T("T3000Version"), 0, DownloadIniFilePath);
+    if (download_ret != S_OK)
+    {
+        CS_Info.Format(_T("The network connection is not available,please check the network connection"));
+        pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
+        pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
 
-    CString str_product_section;
+        if (INET_E_DOWNLOAD_FAILURE == download_ret)
+        {
+            CS_Info.Format(_T("This is an HTTPS(secure) address, click Tools, click Internet Options, click Advanced, and check to be sure the SSL and TLS protocols are enabled under the security section."));
+            pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
+            pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
+        }
+
+        goto ftp_download_end;
+    }
+    
+
 
     str_product_section.Format(_T("%d"), pParent->m_download_product_type);
     GetPrivateProfileString(_T("ProductPath"), str_product_section, _T(""), temp_download_path.GetBuffer(MAX_PATH), MAX_PATH, DownloadIniFilePath);
@@ -1416,7 +1432,22 @@ void Dowmloadfile::AutoFlashFirmware()
 
 void Dowmloadfile::OnBnClickedButtonUpdateT3000()
 {
-	
+    CString DownloadIniFilePath;
+    CString CheckVersionIniFilePath;
+    bool download_ret = false;
+    DownloadIniFilePath = Folder_Path + _T("//ProductPath.ini");
+    CheckVersionIniFilePath = Folder_Path + _T("//CheckVersionPath.ini");
+    download_ret = URLDownloadToFile(NULL, _T("https://temcocontrols.com/ftp/firmware/ProductPath.ini"), DownloadIniFilePath, 0, NULL);
+    //T3000_FTP_Version = GetPrivateProfileIntW(_T("Version"), _T("T3000Version"), 0, DownloadIniFilePath);
+    if ((download_ret != S_OK) && is_local_temco_net == false)  //如果不是本地的temco
+    {
+        CString CS_Info;
+        CS_Info.Format(_T("The network connection is not available,please check the network connection"));
+        m_download_info.InsertString(m_download_info.GetCount(), CS_Info);
+        m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
+        return;
+    }
+
 
 	CString tempApplicationFolder;
 	GetModuleFileName(NULL, tempApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);

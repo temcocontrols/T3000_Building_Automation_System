@@ -311,6 +311,9 @@
 #define IDD_DIALOG_NEW_PROGRAMEDITOR    707
 #define IDD_DIALOG_POWER_METER          710
 #define IDD_POWER_METER                 712
+#define IDD_DIALOG_LOG_WINDOW           714
+#define IDD_DIALOG_REGISTER_LIST        716
+#define IDD_DIALOG_CO2_NODE             718
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -343,6 +346,7 @@
 #define IDC_EDIT_DELAY_ITEMS            1027
 #define IDC_EDIT_COUNTRYNAME            1027
 #define IDC_EDIT_PARA_EXT_TIME_REMAINING 1027
+#define IDC_EDIT_MIN_VOLT_VALUE         1027
 #define IDC_OUTPUT3_DELAY_OFF_EDIT      1028
 #define IDC_CUR_TEMP                    1028
 #define IDC_EDIT42                      1028
@@ -354,6 +358,7 @@
 #define IDC_EDIT_DATAFORMATS            1028
 #define IDC_EDIT_STATE                  1028
 #define IDC_EDIT_PARA_EXT_MIN_PWM       1028
+#define IDC_EDIT_MIN_VALUE_VALUE        1028
 #define IDC_BUTTON3                     1029
 #define IDC_DELAYTABBTN                 1029
 #define IDC_OUTPUT5_DELAY_OFF_EDIT      1029
@@ -363,6 +368,7 @@
 #define IDC_EDIT_PROPERTY               1029
 #define IDC_EDIT_CITY                   1029
 #define IDC_EDIT57                      1029
+#define IDC_EDIT_MAX_VOLT_VALUE3        1029
 #define IDC_OUTPUT4_DELAY_OFF_EDIT      1030
 #define IDC_HUM1                        1030
 #define IDC_EDIT43                      1030
@@ -371,6 +377,7 @@
 #define IDC_EDIT_FUNCTIONS              1030
 #define IDC_EDIT_                       1030
 #define IDC_EDIT_STREET1                1030
+#define IDC_EDIT_MAX_VALUE_VALUE        1030
 #define IDC_OUTPUTBTN                   1031
 #define IDC_NUM_SENSOR                  1031
 #define IDC_EDIT44                      1031
@@ -729,6 +736,7 @@
 #define IDC_COMBO_OUTPUTTYPE            1129
 #define IDC_COMBO_SETTING_CO2           1129
 #define IDC_COMBO_MSTP_MODBUS           1129
+#define IDC_COMBO_CO2_NODE_PROTOCOL     1129
 #define IDC_POWERMODELCOMBO             1130
 #define IDC_CHECK56                     1130
 #define IDC_COMBO_TIMESERVERLIST2       1130
@@ -2332,6 +2340,56 @@
 #define IDC_EDIT_TOTAL_ENERGY           2418
 #define IDC_EDIT_RATIO_VALUE            2419
 #define IDC_BUTTON_POWER_OK             2420
+#define IDC_LIST_LOG_WINDOW             2422
+#define IDC_STATIC_SYS_MODE             2423
+#define IDC_COMBO_SYS_MODE              2424
+#define IDC_EDIT_NETWORK_SUB            2425
+#define IDC_EDIT_NETWORK_ZIGBEE         2426
+#define IDC_STATIC_CUSTOM_RANGE_GROUPBOX 2426
+#define IDC_EDIT_NETWORK_MAIN           2427
+#define IDC_STATIC_CUS_LABLE            2427
+#define IDC_STATIC_CUS_MIN_LABLE        2428
+#define IDC_EDITCUS_POINT_VALUE         2429
+#define IDC_STATIC_CUS_MIN_V_LABLE      2430
+#define IDC_LIST_REGISTER_VIEW          2430
+#define IDC_STATIC_CUS_MAX_LABLE2       2431
+#define IDC_EDIT_CO2_NODE_SERIALNUMBER  2431
+#define IDC_STATIC_CUS_MAX_V_LABLE2     2432
+#define IDC_EDIT_CO2_NODE_MODBUS_ID     2432
+#define IDC_COMBO_CO2_NODE_BAUDRATE     2433
+#define IDC_COMBO_CO2_NODE_TEMPERATURE_UNIT 2437
+#define IDC_EDIT_CO2_NODE_ROLL_TIME_INTERVAL 2438
+#define IDC_EDIT_CO2_NODE_BACKLIGHT_TIME 2439
+#define IDC_LIST_CO2_NODE_LIST          2440
+#define IDC_BUTTON_OK                   2441
+#define IDC_EDIT_FAIR_ALARM_SETPOINT    2442
+#define IDC_EDIT_POOR_ALARM_SETPOINT    2443
+#define IDC_RADIO_SCROLL1               2444
+#define IDC_RADIO_SCROLL2               2445
+#define IDC_RADIO_CO2_CAL_ENABLE        2445
+#define IDC_RADIO_SCROLL3               2446
+#define IDC_RADIO_CO2_CAL_DISABLE       2446
+#define IDC_RADIO_SCROLL4               2447
+#define IDC_STATIC_CO2_AUTO             2447
+#define IDC_RADIO_SCROLL5               2448
+#define IDC_STATIC_BAC_MONITOR_SD_CARD  2448
+#define IDC_RADIO_SCROLL6               2449
+#define IDC_RADIO_SCROLL7               2450
+#define IDC_RADIO_SCROLL8               2451
+#define IDC_RADIO_SCROLL9               2452
+#define IDC_RADIO_SCROLL10              2453
+#define IDC_RADIO_SCROLL11              2454
+#define IDC_RADIO_SCROLL12              2455
+#define IDC_RADIO_SCROLL13              2456
+#define IDC_RADIO_SCROLL14              2457
+#define IDC_RADIO_SCROLL15              2458
+#define IDC_RADIO_SCROLL16              2459
+#define IDC_RADIO_SCROLL17              2460
+#define IDC_RADIO_SCROLL18              2461
+#define IDC_RADIO_SCROLL19              2462
+#define IDC_RADIO_SCROLL20              2463
+#define IDC_RADIO_SCROLL21              2464
+#define IDC_RADIO_SCROLL22              2465
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -2885,9 +2943,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        714
+#define _APS_NEXT_RESOURCE_VALUE        723
 #define _APS_NEXT_COMMAND_VALUE         34070
-#define _APS_NEXT_CONTROL_VALUE         2421
+#define _APS_NEXT_CONTROL_VALUE         2449
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

@@ -8,6 +8,7 @@
 #include <bitset>
 #include "WriteRegistersValueDlg.h"
 
+
 #define _NUM_ITEM 0
 #define _NUM_POLLYESNO 1
 #define _NUM_NAME 2

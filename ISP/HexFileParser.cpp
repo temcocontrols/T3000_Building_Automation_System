@@ -234,7 +234,8 @@ WORD CHexFileParser::GetHighAddrFromFile(const CString& strLine)
 	turn_hex_file_line_to_unsigned_char(ch);
 	TS_UC szBuf[64] = {0};
 	turn_int_to_unsigned_char(ch, strLine.GetLength()-1, szBuf);
-	dwTemp = szBuf[4]*0x100 + szBuf[5];
+	//dwTemp = szBuf[4]*0x100 + szBuf[5];  杜帆屏蔽
+    dwTemp = szBuf[4] * 256 + szBuf[5];
     if (dwTemp>=800)
     {
         dwTemp-=0x800;
@@ -405,8 +406,9 @@ BOOL CHexFileParser::ReadExtLinearHexFile(CFile& hexfile, char* pBuf, int nBufLe
 	//while(NULL!=ar.ReadString(strGetData))	//循环读取文件，直到文件结束
 	while(ReadLineFromFile(hexfile, a))
 	{
+
 		// 取得高位地址，可能不止一处扩展
-		if( a[8] == '4')
+		if( a[8] == '4') 
 		{
 			CString strTemp(a);
 			dwHiAddr = GetHighAddrFromFile(strTemp);
@@ -416,9 +418,14 @@ BOOL CHexFileParser::ReadExtLinearHexFile(CFile& hexfile, char* pBuf, int nBufLe
 			{
 				m_szFlags.push_back(nBufCount);
 			}
-			// do CRC
-			continue;
-		}
+            // do CRC
+            continue;
+        }
+        else if ((a[8] == '5'))
+        {
+            continue;
+        }
+
 
 		//get a line from the file,check "crc" for total file
 		nLineNumErr++;	//the line number that the wrong hex file;

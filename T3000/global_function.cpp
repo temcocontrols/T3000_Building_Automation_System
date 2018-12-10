@@ -240,6 +240,12 @@ void SetPaneString(int nIndext,CString str)
     WideCharToMultiByte( CP_ACP, 0, str.GetBuffer(), -1, temp_cs, 255, NULL, NULL );
     PostMessage(m_statusbar_hwnd,WM_SHOW_STATUS_TEXT,(WPARAM)temp_cs,NULL);
 
+    if (m_t3000_log_window != NULL)
+    {
+        char * temp_cs2 = new char[255];
+        WideCharToMultiByte(CP_ACP, 0, str.GetBuffer(), -1, temp_cs2, 255, NULL, NULL);
+        PostMessage(m_t3000_log_window, WM_ADD_SHOWLOG_CSTRING, (WPARAM)temp_cs2, NULL);
+    }
     return;
     CMFCStatusBar * pStatusBar=NULL;
     if(AfxGetMainWnd()->GetActiveWindow()==NULL)//if this function is called by a thread ,return
@@ -494,6 +500,7 @@ int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsig
                 }
 
                 g_llRxCount++;
+                Sleep(100);
                 return n_ret;
             }
             Sleep(1000);
@@ -1102,13 +1109,27 @@ BOOL Post_Refresh_Message(uint32_t deviceid,int8_t command,int8_t start_instance
     pmy_refresh_info->end_instance = end_instance;
     pmy_refresh_info->entitysize = entitysize;
     pmy_refresh_info->block_size = block_size;
-    if(!PostThreadMessage(nThreadID,MY_BAC_REFRESH_LIST,(WPARAM)pmy_refresh_info,NULL))//post thread msg
+    if ((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
     {
-        return FALSE;
+        //if (!PostThreadMessage(nThreadID, MY_RS485_WRITE_LIST, (WPARAM)pmy_write_info, NULL))//post thread msg
+        //{
+        //    return FALSE;
+        //}
+        //else
+        //{
+        //    return TRUE;
+        //}
     }
     else
     {
-        return TRUE;
+        if (!PostThreadMessage(nThreadID, MY_BAC_REFRESH_LIST, (WPARAM)pmy_refresh_info, NULL))//post thread msg
+        {
+            return FALSE;
+        }
+        else
+        {
+            return TRUE;
+        }
     }
 }
 BOOL Post_Write_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize,HWND hWnd ,CString Task_Info ,int nRow,int nCol)
@@ -1833,7 +1854,7 @@ int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_inst
 	
         if(send_status)
         {
-            for (int i=0; i<300; i++)
+            for (int i=0; i<400; i++)
             {
                 Sleep(10);
                 if(tsm_invoke_id_free(temp_invoke_id))
@@ -2023,7 +2044,7 @@ int GetPrivateBacnetToModbusData(uint32_t deviceid, uint16_t start_reg, int16_t 
 
         if (n_ret >= 0)
         {
-            for (int i = 0; i<500; i++)
+            for (int i = 0; i<1000; i++)
             {
                 Sleep(10);
                 if (tsm_invoke_id_free(n_ret))
@@ -3095,9 +3116,9 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 				my_temp_point = my_temp_point + 9;
 				for (int j=0; j<16; j++)
 				{
-					m_analog_custmer_range.at(i).dat[j].value = ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+					m_analog_custmer_range.at(i).dat[j].m_volts = ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
 					my_temp_point = my_temp_point + 2;
-					m_analog_custmer_range.at(i).dat[j].unit =	((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+					m_analog_custmer_range.at(i).dat[j].m_value =	((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
 					my_temp_point = my_temp_point + 4;
 				}
 
@@ -3909,6 +3930,7 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
             Device_Basic_Setting.reg.flag_time_sync_pc = *(my_temp_point++);
             Device_Basic_Setting.reg.time_sync_auto_manual = *(my_temp_point++);
             Device_Basic_Setting.reg.sync_time_results = *(my_temp_point++);
+            Device_Basic_Setting.reg.mstp_id = *(my_temp_point++);
 			return READ_SETTING_COMMAND;
 		}
 		break;
@@ -4354,8 +4376,8 @@ void local_handler_conf_private_trans_ack(
         break;
     }
 
-    if(((each_end_flag) && (bac_read_which_list != BAC_READ_ALL_LIST) && (bac_read_which_list != BAC_READ_SVAE_CONFIG)) ||
-        (bac_read_which_list == BAC_READ_BASIC_SETTING_COMMAND)) //Setting 要特殊存一下
+    if(((each_end_flag) && (bac_read_which_list != BAC_READ_ALL_LIST) && (bac_read_which_list != BAC_READ_SVAE_CONFIG)) //||
+        /*(bac_read_which_list == BAC_READ_BASIC_SETTING_COMMAND)*/) //Setting 要特殊存一下
     {
         CString temp_file;
         CString temp_serial;
@@ -4406,6 +4428,80 @@ void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken)
 
 }
 
+void Inial_Product_Reglist_map()
+{
+    product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT5A, _T("Tstat 5 I-6-7-8")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT5B, _T("Tstat 5 I-6-7-8")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT5B2, _T("Tstat 5 I-6-7-8")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT5C, _T("Tstat 5 I-6-7-8")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT5D, _T("Tstat 5 I-6-7-8")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT5E, _T("Tstat 5 I-6-7-8")));
+
+
+    product_reglist_map.insert(map<int, CString>::value_type(PM_PM5E, _T("Tstat 5 I-6-7-8")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT5F, _T("Tstat 5 I-6-7-8")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT5G, _T("Tstat 5 I-6-7-8")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT5H, _T("Tstat 5 I-6-7-8")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT6, _T("Tstat 5 I-6-7-8")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT5i, _T("Tstat 5 I-6-7-8")));
+
+    product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT8, _T("Tstat 5 I-6-7-8")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_HUMTEMPSENSOR, _T("Humidity Sensor")));
+    product_reglist_map.insert(map<int, CString>::value_type(STM32_HUM_NET, _T("STM32-hum-w")));
+    product_reglist_map.insert(map<int, CString>::value_type(STM32_HUM_RS485, _T("STM32-hum-w")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_AirQuality, _T("Air Quality")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT7, _T("Tstat 5 I-6-7-8")));
+
+
+    product_reglist_map.insert(map<int, CString>::value_type(PM_CM5, _T("T3BBSeries")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_TSTATRUNAR, _T("Tstat 5 I-6-7-8")));
+
+    product_reglist_map.insert(map<int, CString>::value_type(PM_CO2_NET, _T("CO2-W+Ethernet")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_CO2_RS485, _T("CO2-W+Ethernet")));
+
+    product_reglist_map.insert(map<int, CString>::value_type(PM_PRESSURE_SENSOR, _T("Pressure")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_CO2_NODE, _T("CO2-Node")));
+
+    product_reglist_map.insert(map<int, CString>::value_type(PM_T3PT10, _T("T3 Modules")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_T3IOA, _T("T3 Modules")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_T332AI, _T("T3 Modules")));
+
+    product_reglist_map.insert(map<int, CString>::value_type(PM_T38AI16O, _T("T3 Modules")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_T38I13O, _T("T3 Modules")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_T3PERFORMANCE, _T("T3 Modules")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_T34AO, _T("T3 Modules")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_T36CT, _T("T3 Modules")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_MINIPANEL, _T("T3BBSeries")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_MINIPANEL_ARM, _T("T3BBSeries")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_PRESSURE, _T("Pressure")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_HUM_R, _T("CO2-R")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_T322AI, _T("T3 Modules")));
+    //product_map.insert(map<int, CString>::value_type(PWM_TRANSDUCER, _T("PWM_Tranducer")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_BTU_METER, _T("BTU Meter")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_T3PT12, _T("T3 Modules")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_T36CTA, _T("T3 Modules")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_T38AI8AO6DO, _T("T3 Modules")));
+    //product_map.insert(map<int, CString>::value_type(PM_CS_SM_AC, _T("CS-SM-AC")));
+    //product_map.insert(map<int, CString>::value_type(PM_CS_SM_DC, _T("CS-SM-DC")));
+    //product_map.insert(map<int, CString>::value_type(PM_CS_RSM_AC, _T("CS-RSM-AC")));
+    //product_map.insert(map<int, CString>::value_type(PM_CS_RSM_DC, _T("CS-RSM-DC")));
+
+
+    product_reglist_map.insert(map<int, CString>::value_type(PM_PWMETER, _T("Power Meter")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT8_WIFI, _T("Tstat 5 I-6-7-8")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT8_OCC, _T("Tstat 5 I-6-7-8")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT7_ARM, _T("Tstat 5 I-6-7-8")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT8_220V, _T("Tstat 5 I-6-7-8")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_T3_LC, _T("T3-LightController")));
+
+    product_reglist_map.insert(map<int, CString>::value_type(STM32_CO2_NET, _T("CO2-W+Ethernet")));
+    product_reglist_map.insert(map<int, CString>::value_type(STM32_CO2_RS485, _T("CO2-W+Ethernet")));
+    product_reglist_map.insert(map<int, CString>::value_type(STM32_HUM_NET, _T("STM32-hum-w")));
+    product_reglist_map.insert(map<int, CString>::value_type(STM32_HUM_RS485, _T("STM32-hum-w")));
+    product_reglist_map.insert(map<int, CString>::value_type(STM32_PRESSURE_NET, _T("Pressure")));
+    product_reglist_map.insert(map<int, CString>::value_type(STM32_PRESSURE_RS3485, _T("Pressure")));
+    product_reglist_map.insert(map<int, CString>::value_type(STM32_CO2_NODE, _T("CO2-W+Ethernet")));
+}
 
 void Inial_Product_map()
 {
@@ -4843,8 +4939,6 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
 
     if(comport == 0)	//
     {
-
-
         //2017-12-20  杜帆修改  尝试绑定本地的通讯 UDP 47809 端口 ，若绑定失败就尝试其他端口;
         //T3000 不在绑定47808端口了，改为绑定 47809以后得端口，为了 同时能使用其他bacnet软件.
         bool port_bind_results = false;
@@ -7139,8 +7233,12 @@ int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path)
 			char * temp_point = temp_buffer;
 
             int original_panel = 0;
+            int prg_panel = 0;
             char * cacl_panel = temp_buffer;
-            memset(&Device_Basic_Setting, 0, sizeof(Str_Setting_Info));
+            if (offline_mode)
+            {
+                memset(&Device_Basic_Setting, 0, sizeof(Str_Setting_Info));
+            }
             cacl_panel = cacl_panel + BAC_INPUT_ITEM_COUNT*sizeof(Str_in_point)
                 + BAC_OUTPUT_ITEM_COUNT* sizeof(Str_out_point)
                 + BAC_VARIABLE_ITEM_COUNT* sizeof(Str_variable_point)
@@ -7151,7 +7249,17 @@ int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path)
                 + BAC_USER_LOGIN_COUNT * sizeof(Str_userlogin_point)
                 + BAC_CUSTOMER_UNITS_COUNT * sizeof(Str_Units_element)
                 + BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT* sizeof(Str_table_point);
-            memcpy(&Device_Basic_Setting, cacl_panel, sizeof(Str_Setting_Info));
+            if (offline_mode)
+            {
+                //如果是离线模式 才把Setting的数据读出来，避免 Setting 那里 来回乱变.
+                memcpy(&Device_Basic_Setting, cacl_panel, sizeof(Str_Setting_Info));
+            }
+            else
+            {
+                Str_Setting_Info GetPrgSetting;
+                memcpy(&GetPrgSetting, cacl_panel, sizeof(Str_Setting_Info));
+                prg_panel = GetPrgSetting.reg.panel_number;
+            }
 
             if ((Device_Basic_Setting.reg.panel_type == PM_MINIPANEL) ||
                 (Device_Basic_Setting.reg.panel_type == PM_MINIPANEL_ARM))
@@ -7189,14 +7297,14 @@ int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path)
 				temp_point = temp_point + sizeof(Str_controller_point);
 
                 //fandu  20180130  原来panel 1 的  1.2.var3   加载至  panel 4  ,   要修改为4.2.var3.
-                if ((m_controller_data.at(i).input.panel == original_panel) && (original_panel != 0))
+                if ((m_controller_data.at(i).input.panel == prg_panel) && (original_panel != 0) && (prg_panel != 0))
                 {
-                    m_controller_data.at(i).input.panel = Station_NUM;
+                    m_controller_data.at(i).input.panel = original_panel;
                 }
 
-                if ((m_controller_data.at(i).setpoint.panel == original_panel) && (original_panel != 0))
+                if ((m_controller_data.at(i).setpoint.panel == prg_panel) && (original_panel != 0 ) && (prg_panel != 0))
                 {
-                    m_controller_data.at(i).setpoint.panel = Station_NUM;
+                    m_controller_data.at(i).setpoint.panel = original_panel;
                 }
 				//if((m_controller_data.at(i).input.panel != Station_NUM) && (m_controller_data.at(i).input.panel != 0))	 //在load prg 的时候 如果加载的panel != 自己的 就变成自己的
 				//	m_controller_data.at(i).input.panel = Station_NUM;
@@ -7216,16 +7324,9 @@ int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path)
 				temp_point = temp_point + sizeof(Str_label_point);
 
                 //fandu  20180130  原来panel 1 的  1.2.var3   加载至  panel 4  ,   要修改为4.2.var3.
-                if ((m_graphic_label_data.at(i).reg.nMain_Panel == original_panel) && (original_panel != 0))
+                if ((m_graphic_label_data.at(i).reg.nMain_Panel == prg_panel) && (original_panel != 0) && (prg_panel != 0))
                 {
-                    if ((m_graphic_label_data.at(i).reg.nMain_Panel == m_graphic_label_data.at(i).reg.nSub_Panel) &&
-                          m_graphic_label_data.at(i).reg.nMain_Panel != 0)
-                    {
-                        m_graphic_label_data.at(i).reg.nMain_Panel = Station_NUM;
-                        m_graphic_label_data.at(i).reg.nSub_Panel = 0;
-                    }
-                    else
-                        m_graphic_label_data.at(i).reg.nMain_Panel = Station_NUM;
+                        m_graphic_label_data.at(i).reg.nMain_Panel = original_panel;
                 }
 
 				//if((m_graphic_label_data.at(i).reg.nMain_Panel != Station_NUM) && (m_graphic_label_data.at(i).reg.nMain_Panel != 0))
@@ -7269,7 +7370,11 @@ int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path)
 				temp_point = temp_point + sizeof(Str_table_point);
 			}
 
-			memcpy(&Device_Basic_Setting,temp_point,sizeof(Str_Setting_Info));
+            if (offline_mode)
+            {
+                //如果是离线模式 才把Setting的数据读出来，避免 Setting 那里 来回乱变.
+                memcpy(&Device_Basic_Setting, temp_point, sizeof(Str_Setting_Info));
+            }
 			temp_point = temp_point + sizeof(Str_Setting_Info);
 
 
@@ -7292,25 +7397,10 @@ int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path)
 				for (int x=0;x<MAX_POINTS_IN_MONITOR;x++)
 				{
                     //fandu  20180130  原来panel 1 的  1.2.var3   加载至  panel 4  ,   要修改为4.2.var3.
-                    if ((m_monitor_data.at(i).inputs[x].panel == original_panel) && (original_panel != 0))
+                    if ((m_monitor_data.at(i).inputs[x].panel == prg_panel) && (original_panel != 0) && (prg_panel != 0))
                     {
-                        if ((m_monitor_data.at(i).inputs[x].panel == m_monitor_data.at(i).inputs[x].sub_panel) &&
-                            m_monitor_data.at(i).inputs[x].panel != 0)
-                        {
-                            m_monitor_data.at(i).inputs[x].panel = Station_NUM;
-                            m_monitor_data.at(i).inputs[x].sub_panel = 0;
-                        }
-                        else
-                            m_monitor_data.at(i).inputs[x].panel = Station_NUM;
+                            m_monitor_data.at(i).inputs[x].panel = original_panel;
                     }
-					//if(m_monitor_data.at(i).inputs[x].panel != Station_NUM)	 //在load prg 的时候 如果加载的panel != 自己的 就变成自己的
-					//{
-					//	if((m_monitor_data.at(i).inputs[x].panel == m_monitor_data.at(i).inputs[x].sub_panel) && (m_monitor_data.at(i).inputs[x].panel != 0))
-					//	{
-					//		m_monitor_data.at(i).inputs[x].sub_panel = Station_NUM;
-					//		m_monitor_data.at(i).inputs[x].panel = Station_NUM;
-					//	}
-					//}
 				}
 			}
 
@@ -8046,135 +8136,6 @@ void SaveModbusConfigFile_Cache(CString &SaveConfigFilePath,char *npoint,unsigne
 }
 
 
-void SaveBacnetConfigFile_Cache(CString &SaveConfigFilePath)
-{
-    if((g_mac!=0) &&(g_bac_instance!=0))
-    {
-        CString FilePath;
-        CStringArray temp_array1;
-
-        SplitCStringA(temp_array1,SaveConfigFilePath,_T("."));
-        int temp_array_size=0;
-        temp_array_size = temp_array1.GetSize();
-        if(temp_array1.GetSize()<=1)
-        {
-            //MessageBox(_T("Prg file error!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-            return;
-        }
-
-
-        int right_suffix = temp_array1.GetAt(temp_array_size - 1).GetLength();
-        int config_file_length = SaveConfigFilePath.GetLength();
-        if(config_file_length <= right_suffix)
-        {
-            //MessageBox(_T("Prg file error!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-            return;
-        }
-        CFileFind tempfind;
-        if(tempfind.FindFile(SaveConfigFilePath))
-        {
-            DeleteFile(SaveConfigFilePath);
-        }
-        char temp_buffer[50000];
-        char * temp_point = NULL;
-        memset(temp_buffer ,0,50000);
-        //FilePath = SaveConfigFilePath.Left( config_file_length -  right_suffix);
-        //FilePath = FilePath + _T("ini");
-        temp_buffer[0] = 4;
-        temp_point = temp_buffer + 1;
-        for (int i=0; i<BAC_INPUT_ITEM_COUNT; i++)
-        {
-            memcpy(temp_point ,(char *)m_Input_data.at(i).description,sizeof(Str_in_point));
-            temp_point = temp_point + sizeof(Str_in_point);
-        }
-
-        for (int i=0; i<BAC_OUTPUT_ITEM_COUNT; i++)
-        {
-            memcpy(temp_point,(char *)m_Output_data.at(i).description,sizeof(Str_out_point));
-            temp_point = temp_point + sizeof(Str_out_point);
-        }
-
-        for (int i=0; i<BAC_VARIABLE_ITEM_COUNT; i++)
-        {
-            memcpy(temp_point,(char *)m_Variable_data.at(i).description,sizeof(Str_variable_point));
-            temp_point = temp_point + sizeof(Str_variable_point);
-        }
-
-        for (int i=0; i<BAC_PROGRAM_ITEM_COUNT; i++)
-        {
-            memcpy(temp_point,(char *)m_Program_data.at(i).description,sizeof(Str_program_point));
-            temp_point = temp_point + sizeof(Str_program_point);
-        }
-
-        for (int i=0; i<BAC_PID_COUNT; i++)
-        {
-            memcpy(temp_point,&m_controller_data.at(i),sizeof(Str_controller_point));
-            temp_point = temp_point + sizeof(Str_controller_point);
-        }
-
-        for (int i=0; i<BAC_SCREEN_COUNT; i++)
-        {
-            memcpy(temp_point ,&m_screen_data.at(i),sizeof(Control_group_point));
-            temp_point = temp_point + sizeof(Control_group_point);
-        }
-
-
-        for (int i=0; i<BAC_SCHEDULE_COUNT; i++)
-        {
-            memcpy(temp_point ,&m_Weekly_data.at(i),sizeof(Str_weekly_routine_point));
-            temp_point = temp_point + sizeof(Str_weekly_routine_point);
-        }
-
-        for (int i=0; i<BAC_HOLIDAY_COUNT; i++)
-        {
-            memcpy(temp_point ,&m_Annual_data.at(i),sizeof(Str_annual_routine_point));
-            temp_point = temp_point + sizeof(Str_annual_routine_point);
-        }
-
-        for (int i=0; i<BAC_MONITOR_COUNT; i++)
-        {
-            memcpy(temp_point ,&m_monitor_data.at(i),sizeof(Str_monitor_point));
-            temp_point = temp_point + sizeof(Str_monitor_point);
-        }
-
-        for (int i=0; i<BAC_WEEKLYCODE_ROUTINES_COUNT; i++)
-        {
-            memcpy(temp_point ,weeklt_time_schedule[i],WEEKLY_SCHEDULE_SIZE);
-            temp_point = temp_point + WEEKLY_SCHEDULE_SIZE;
-        }
-
-        for (int i=0; i<BAC_HOLIDAY_COUNT; i++)
-        {
-            memcpy(temp_point ,g_DayState[i],ANNUAL_CODE_SIZE);
-            temp_point = temp_point + ANNUAL_CODE_SIZE;
-        }
-
-        memcpy(temp_point,&Device_Basic_Setting,sizeof(Str_Setting_Info));
-        temp_point = temp_point + sizeof(Str_Setting_Info);
-
-        for (int i=0; i<BAC_GRPHIC_LABEL_COUNT; i++)
-        {
-            memcpy(temp_point ,&m_graphic_label_data.at(i),sizeof(Str_label_point));
-            temp_point = temp_point + sizeof(Str_label_point);
-        }
-
-        CFileFind temp_file_find;
-        if(temp_file_find.FindFile(SaveConfigFilePath))
-        {
-            DeleteFile(SaveConfigFilePath);
-        }
-
-        DWORD dwFileLen;
-        dwFileLen = temp_point - temp_buffer;
-        HANDLE hFile;
-        hFile=CreateFile(SaveConfigFilePath,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
-        DWORD dWrites;
-        WriteFile(hFile,temp_buffer,dwFileLen,&dWrites,NULL);
-        CloseHandle(hFile);
-
-    }
-}
-
 //用来初始化bacnet 内存;
 void ClearBacnetData()
 {
@@ -8403,631 +8364,21 @@ void SaveBacnetBinaryFile(CString &SaveConfigFilePath)
 
 	int write_length = temp_point - original_point;
 
-	CFileFind tempfind;
-	if(tempfind.FindFile(SaveConfigFilePath))
-	{
-		DeleteFile(SaveConfigFilePath);
-	}
+	//CFileFind tempfind;
+	//if(tempfind.FindFile(SaveConfigFilePath))
+	//{
+	//	DeleteFile(SaveConfigFilePath);
+	//}
 
 
 	HANDLE hFile;
-	hFile=CreateFile(SaveConfigFilePath,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
+	hFile=CreateFile(SaveConfigFilePath,GENERIC_WRITE,0,NULL, CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
 
 	DWORD dWrites;
 	WriteFile(hFile,pBuf,write_length,&dWrites,NULL);
 	CloseHandle(hFile);
 	//if(pBuf)
 	//	delete pBuf;
-}
-
-void SaveBacnetConfigFile(CString &SaveConfigFilePath)
-{
-    if((g_mac!=0) &&(g_bac_instance!=0))
-    {
-        CString FilePath;
-        CStringArray temp_array1;
-
-        SplitCStringA(temp_array1,SaveConfigFilePath,_T("."));
-        int temp_array_size=0;
-        temp_array_size = temp_array1.GetSize();
-        if(temp_array1.GetSize()<=1)
-        {
-            //MessageBox(_T("Prg file error!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-            return;
-        }
-
-
-        int right_suffix = temp_array1.GetAt(temp_array_size - 1).GetLength();
-        int config_file_length = SaveConfigFilePath.GetLength();
-        if(config_file_length <= right_suffix)
-        {
-            //MessageBox(_T("Prg file error!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-            return;
-        }
-        FilePath = SaveConfigFilePath.Left( config_file_length -  right_suffix);
-        FilePath = FilePath + _T("ini");
-
-        WritePrivateProfileStringW(_T("Setting"),_T("Version"),_T("4"),FilePath);
-		//Version 3 加入了 BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT    BAC_GRPHIC_LABEL_COUNT    BAC_USER_LOGIN_COUNT    BAC_CUSTOMER_UNITS_COUNT
-		//Version 4 加入了setting
-        for (int i=0; i<BAC_INPUT_ITEM_COUNT; i++)
-        {
-            CString temp_input,temp_des,temp_csc;
-            temp_input.Format(_T("Input%d"),i);
-
-            MultiByteToWideChar( CP_ACP, 0, (char *)m_Input_data.at(i).description, (int)strlen((char *)m_Input_data.at(i).description)+1,
-                                 temp_des.GetBuffer(MAX_PATH), MAX_PATH );
-            temp_des.ReleaseBuffer();
-            CString temp_label;
-            MultiByteToWideChar( CP_ACP, 0, (char *)m_Input_data.at(i).label, (int)strlen((char *)m_Input_data.at(i).label)+1,
-                                 temp_label.GetBuffer(MAX_PATH), MAX_PATH );
-            temp_label.ReleaseBuffer();
-            temp_label.Replace(_T("-"),_T("_"));
-            WritePrivateProfileStringW(temp_input,_T("Description"),temp_des,FilePath);
-            WritePrivateProfileStringW(temp_input,_T("Label"),temp_label,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Input_data.at(i).auto_manual);
-            WritePrivateProfileStringW(temp_input,_T("Auto_Manual"),temp_csc,FilePath);
-            temp_csc.Format(_T("%d"),m_Input_data.at(i).value);
-            WritePrivateProfileStringW(temp_input,_T("Value"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Input_data.at(i).filter);
-            WritePrivateProfileStringW(temp_input,_T("Filter"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Input_data.at(i).decom);
-            WritePrivateProfileStringW(temp_input,_T("Decom"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Input_data.at(i).sub_id);
-            WritePrivateProfileStringW(temp_input,_T("Sen_On"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Input_data.at(i).sub_product);
-            WritePrivateProfileStringW(temp_input,_T("Sen_Off"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Input_data.at(i).control);
-            WritePrivateProfileStringW(temp_input,_T("Control"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Input_data.at(i).digital_analog);
-            WritePrivateProfileStringW(temp_input,_T("Digital_Analog"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Input_data.at(i).calibration_sign);
-            WritePrivateProfileStringW(temp_input,_T("Calibration_Sign"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Input_data.at(i).sub_number);
-            WritePrivateProfileStringW(temp_input,_T("Calibration_Increment"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Input_data.at(i).calibration_h);
-            WritePrivateProfileStringW(temp_input,_T("Unused"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Input_data.at(i).calibration_l);
-            WritePrivateProfileStringW(temp_input,_T("Calibration"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Input_data.at(i).range);
-            WritePrivateProfileStringW(temp_input,_T("Range"),temp_csc,FilePath);
-        }
-
-        for (int i=0; i<BAC_OUTPUT_ITEM_COUNT; i++)
-        {
-            CString temp_section,temp_des,temp_csc;
-            temp_section.Format(_T("Output%d"),i);
-
-            MultiByteToWideChar( CP_ACP, 0, (char *)m_Output_data.at(i).description, (int)strlen((char *)m_Output_data.at(i).description)+1,
-                                 temp_des.GetBuffer(MAX_PATH), MAX_PATH );
-            temp_des.ReleaseBuffer();
-            CString temp_label;
-            MultiByteToWideChar( CP_ACP, 0, (char *)m_Output_data.at(i).label, (int)strlen((char *)m_Output_data.at(i).label)+1,
-                                 temp_label.GetBuffer(MAX_PATH), MAX_PATH );
-            temp_label.ReleaseBuffer();
-            temp_label.Replace(_T("-"),_T("_"));
-            WritePrivateProfileStringW(temp_section,_T("Description"),temp_des,FilePath);
-            WritePrivateProfileStringW(temp_section,_T("Label"),temp_label,FilePath);
-            temp_csc.Format(_T("%d"),m_Output_data.at(i).value);
-            WritePrivateProfileStringW(temp_section,_T("Value"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).auto_manual);
-            WritePrivateProfileStringW(temp_section,_T("Auto_Manual"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).digital_analog);
-            WritePrivateProfileStringW(temp_section,_T("Digital_Analog"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).hw_switch_status);
-            WritePrivateProfileStringW(temp_section,_T("hw_switch_status"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).control);
-            WritePrivateProfileStringW(temp_section,_T("Control"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).digital_control);
-            WritePrivateProfileStringW(temp_section,_T("Digital_Control"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).decom);
-            WritePrivateProfileStringW(temp_section,_T("Decom"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).range);
-            WritePrivateProfileStringW(temp_section,_T("Range"),temp_csc,FilePath);
-
-            temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).sub_id);
-            WritePrivateProfileStringW(temp_section,_T("M_Del_Low"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).sub_product);
-            WritePrivateProfileStringW(temp_section,_T("S_Del_High"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).sub_number);
-            WritePrivateProfileStringW(temp_section,_T("Sub__number"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).pwm_period);
-            WritePrivateProfileStringW(temp_section,_T("Delay_Timer"),temp_csc,FilePath);
-        }
-
-        for (int i=0; i<BAC_VARIABLE_ITEM_COUNT; i++)
-        {
-            CString temp_section,temp_des,temp_csc;
-            temp_section.Format(_T("Variable%d"),i);
-
-            MultiByteToWideChar( CP_ACP, 0, (char *)m_Variable_data.at(i).description, (int)strlen((char *)m_Variable_data.at(i).description)+1,
-                                 temp_des.GetBuffer(MAX_PATH), MAX_PATH );
-            temp_des.ReleaseBuffer();
-            CString temp_label;
-            MultiByteToWideChar( CP_ACP, 0, (char *)m_Variable_data.at(i).label, (int)strlen((char *)m_Variable_data.at(i).label)+1,
-                                 temp_label.GetBuffer(MAX_PATH), MAX_PATH );
-            temp_label.ReleaseBuffer();
-            temp_label.Replace(_T("-"),_T("_"));
-            WritePrivateProfileStringW(temp_section,_T("Description"),temp_des,FilePath);
-            WritePrivateProfileStringW(temp_section,_T("Label"),temp_label,FilePath);
-
-            temp_csc.Format(_T("%d"),m_Variable_data.at(i).value);
-            WritePrivateProfileStringW(temp_section,_T("Value"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Variable_data.at(i).auto_manual);
-            WritePrivateProfileStringW(temp_section,_T("Auto_Manual"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Variable_data.at(i).digital_analog);
-            WritePrivateProfileStringW(temp_section,_T("Digital_Analog"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Variable_data.at(i).control);
-            WritePrivateProfileStringW(temp_section,_T("Control"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Variable_data.at(i).unused);
-            WritePrivateProfileStringW(temp_section,_T("Unused"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Variable_data.at(i).range);
-            WritePrivateProfileStringW(temp_section,_T("Range"),temp_csc,FilePath);
-        }
-
-        for (int i=0; i<BAC_PROGRAM_ITEM_COUNT; i++)
-        {
-            CString temp_section,temp_des,temp_csc;
-            temp_section.Format(_T("Program%d"),i);
-
-            MultiByteToWideChar( CP_ACP, 0, (char *)m_Program_data.at(i).description, (int)strlen((char *)m_Program_data.at(i).description)+1,
-                                 temp_des.GetBuffer(MAX_PATH), MAX_PATH );
-            temp_des.ReleaseBuffer();
-            CString temp_label;
-            MultiByteToWideChar( CP_ACP, 0, (char *)m_Program_data.at(i).label, (int)strlen((char *)m_Program_data.at(i).label)+1,
-                                 temp_label.GetBuffer(MAX_PATH), MAX_PATH );
-            temp_label.ReleaseBuffer();
-
-            WritePrivateProfileStringW(temp_section,_T("Description"),temp_des,FilePath);
-            WritePrivateProfileStringW(temp_section,_T("Label"),temp_label,FilePath);
-
-            temp_csc.Format(_T("%u"),(unsigned short)m_Program_data.at(i).bytes);
-            WritePrivateProfileStringW(temp_section,_T("Bytes"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Program_data.at(i).auto_manual);
-            WritePrivateProfileStringW(temp_section,_T("Auto_Manual"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Program_data.at(i).on_off);
-            WritePrivateProfileStringW(temp_section,_T("On_Off"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Program_data.at(i).com_prg);
-            WritePrivateProfileStringW(temp_section,_T("Com_Prg"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Program_data.at(i).errcode);
-            WritePrivateProfileStringW(temp_section,_T("Errcode"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Program_data.at(i).unused);
-            WritePrivateProfileStringW(temp_section,_T("Unused"),temp_csc,FilePath);
-
-        }
-
-        for (int i=0; i<BAC_PID_COUNT; i++)
-        {
-            CString temp_section,temp_des,temp_csc;
-            temp_section.Format(_T("Controller%d"),i);
-
-            temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).input.number);
-            WritePrivateProfileStringW(temp_section,_T("Input_Number"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).input.panel);
-            WritePrivateProfileStringW(temp_section,_T("Input_Panel"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).input.point_type);
-            WritePrivateProfileStringW(temp_section,_T("Input_Point_Type"),temp_csc,FilePath);
-            temp_csc.Format(_T("%d"),m_controller_data.at(i).input_value);
-            WritePrivateProfileStringW(temp_section,_T("Input_Value"),temp_csc,FilePath);
-            temp_csc.Format(_T("%d"),m_controller_data.at(i).value);
-            WritePrivateProfileStringW(temp_section,_T("Value"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).setpoint.number);
-            WritePrivateProfileStringW(temp_section,_T("Setpoint_Number"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).setpoint.panel);
-            WritePrivateProfileStringW(temp_section,_T("Setpoint_Panel"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).setpoint.point_type);
-            WritePrivateProfileStringW(temp_section,_T("Setpoint_Point_Type"),temp_csc,FilePath);
-
-            temp_csc.Format(_T("%d"),m_controller_data.at(i).setpoint_value);
-            WritePrivateProfileStringW(temp_section,_T("Setpoint_Value"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).units);
-            WritePrivateProfileStringW(temp_section,_T("Units"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).auto_manual);
-            WritePrivateProfileStringW(temp_section,_T("Auto_Manual"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).action);
-            WritePrivateProfileStringW(temp_section,_T("Action"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).repeats_per_min);
-            WritePrivateProfileStringW(temp_section,_T("Repeats_Per_Min"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).sample_time);
-            WritePrivateProfileStringW(temp_section,_T("Unused"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).prop_high);
-            WritePrivateProfileStringW(temp_section,_T("Prop_High"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).proportional);
-            WritePrivateProfileStringW(temp_section,_T("Proportional"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).reset);
-            WritePrivateProfileStringW(temp_section,_T("Reset"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).bias);
-            WritePrivateProfileStringW(temp_section,_T("Bias"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).rate);
-            WritePrivateProfileStringW(temp_section,_T("Rate"),temp_csc,FilePath);
-
-        }
-
-        for (int i=0; i<BAC_SCREEN_COUNT; i++)
-        {
-            CString temp_section,temp_des,temp_csc;
-            temp_section.Format(_T("Screen%d"),i);
-
-            MultiByteToWideChar( CP_ACP, 0, (char *)m_screen_data.at(i).description, (int)strlen((char *)m_screen_data.at(i).description)+1,
-                                 temp_des.GetBuffer(MAX_PATH), MAX_PATH );
-            temp_des.ReleaseBuffer();
-            CString temp_label;
-            MultiByteToWideChar( CP_ACP, 0, (char *)m_screen_data.at(i).label, (int)strlen((char *)m_screen_data.at(i).label)+1,
-                                 temp_label.GetBuffer(MAX_PATH), MAX_PATH );
-            temp_label.ReleaseBuffer();
-
-            CString temp_pic_file;
-            MultiByteToWideChar( CP_ACP, 0, (char *)m_screen_data.at(i).picture_file, (int)strlen((char *)m_screen_data.at(i).picture_file)+1,
-                                 temp_pic_file.GetBuffer(MAX_PATH), MAX_PATH );
-            temp_pic_file.ReleaseBuffer();
-
-            WritePrivateProfileStringW(temp_section,_T("Description"),temp_des,FilePath);
-            WritePrivateProfileStringW(temp_section,_T("Label"),temp_label,FilePath);
-            WritePrivateProfileStringW(temp_section,_T("Picture_file"),temp_pic_file,FilePath);
-
-            temp_csc.Format(_T("%u"),(unsigned short)m_screen_data.at(i).update);
-            WritePrivateProfileStringW(temp_section,_T("Update"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_screen_data.at(i).mode);
-            WritePrivateProfileStringW(temp_section,_T("Mode"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_screen_data.at(i).xcur_grp);
-            WritePrivateProfileStringW(temp_section,_T("Xcur_grp"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned short)m_screen_data.at(i).ycur_grp);
-            WritePrivateProfileStringW(temp_section,_T("Ycur_grp"),temp_csc,FilePath);
-        }
-
-#pragma region Version_3_Add
-
-		for (int i=0; i<BAC_GRPHIC_LABEL_COUNT; i++)
-		{
-			CString temp_section,temp_des,temp_csc;
-			CString temp_label_code;
-			temp_section.Format(_T("LabelData_%d"),i);
-
-			char temp_buffer[400];
-			memset(temp_buffer,0,400);
-			memcpy(temp_buffer,&m_graphic_label_data.at(i),sizeof(Str_label_point));
-
-			int temp_value = sizeof(Str_label_point);
-			temp_label_code.Empty();
-			for (int j=0; j<temp_value; j++)
-			{
-				temp_csc.Format(_T("%02x"),(unsigned char)(*(temp_buffer + j)));
-				temp_csc.MakeUpper();
-				temp_label_code = temp_label_code + temp_csc;
-			}
-
-			WritePrivateProfileStringW(_T("GraphicLabel"),temp_section,temp_label_code,FilePath);
-		}
-
-		for (int i=0; i<BAC_USER_LOGIN_COUNT; i++)
-		{
-			CString temp_section,temp_des,temp_csc;
-			CString temp_userlogin_code;
-			temp_section.Format(_T("Userlogin_%d"),i);
-
-			char login_buffer[400];
-			memset(login_buffer,0,400);
-			memcpy(login_buffer,&m_user_login_data.at(i),sizeof(Str_userlogin_point));
-
-
-			temp_userlogin_code.Empty();
-			for (int j=0; j<sizeof(Str_userlogin_point); j++)
-			{
-				temp_csc.Format(_T("%02x"),(unsigned char)(*(login_buffer + j)));
-				temp_csc.MakeUpper();
-				temp_userlogin_code = temp_userlogin_code + temp_csc;
-			}
-
-			WritePrivateProfileStringW(_T("LoginData"),temp_section,temp_userlogin_code,FilePath);
-		}
-
-
-
-		for (int i=0; i<BAC_CUSTOMER_UNITS_COUNT; i++)
-		{
-			CString temp_section,temp_des,temp_csc;
-			CString temp_units_code;
-			temp_section.Format(_T("UnitData_%d"),i);
-
-			char temp_buffer[400];
-			memset(temp_buffer,0,400);
-			memcpy(temp_buffer,&m_customer_unit_data.at(i),sizeof(Str_Units_element));
-
-
-			temp_units_code.Empty();
-			for (int j=0; j<sizeof(Str_Units_element); j++)
-			{
-				temp_csc.Format(_T("%02x"),(unsigned char)(*(temp_buffer + j)));
-				temp_csc.MakeUpper();
-				temp_units_code = temp_units_code + temp_csc;
-			}
-
-			WritePrivateProfileStringW(_T("Cust_Digital_Unit"),temp_section,temp_units_code,FilePath);
-		}
-
-		for (int i=0; i<BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT; i++)
-		{
-			CString temp_section,temp_des,temp_csc;
-			CString temp_alalog_table_code;
-			temp_section.Format(_T("AlalogTable_%d"),i);
-
-			char temp_buffer[400];
-			memset(temp_buffer,0,400);
-			memcpy(temp_buffer,&m_analog_custmer_range.at(i),sizeof(Str_table_point));
-
-
-			temp_alalog_table_code.Empty();
-			for (int j=0; j<sizeof(Str_table_point); j++)
-			{
-				temp_csc.Format(_T("%02x"),(unsigned char)(*(temp_buffer + j)));
-				temp_csc.MakeUpper();
-				temp_alalog_table_code = temp_alalog_table_code + temp_csc;
-			}
-
-			WritePrivateProfileStringW(_T("AlalogCusTable"),temp_section,temp_alalog_table_code,FilePath);
-		}
-
-#pragma endregion Version_3_Add
-		
-#pragma region Version_4_Add
-		for (int i=0; i<BAC_BASIC_SETTING_COUNT; i++)
-		{
-			CString temp_section,temp_des,temp_csc;
-			CString temp_setting_code;
-			temp_section.Format(_T("DeviceSetting_%d"),i);
-
-			char devicesetting_buffer[400];
-			memset(devicesetting_buffer,0,400);
-			memcpy(devicesetting_buffer,&Device_Basic_Setting.reg.ip_addr[0],sizeof(Str_Setting_Info));
-
-
-			temp_setting_code.Empty();
-			for (int j=0; j<sizeof(Str_Setting_Info); j++)
-			{
-				temp_csc.Format(_T("%02x"),(unsigned char)(*(devicesetting_buffer + j)));
-				temp_csc.MakeUpper();
-				temp_setting_code = temp_setting_code + temp_csc;
-			}
-
-			WritePrivateProfileStringW(_T("DeviceSetting"),temp_section,temp_setting_code,FilePath);
-		}
-#pragma endregion Version_4_Add
-
-        for (int i=0; i<BAC_SCHEDULE_COUNT; i++)
-        {
-            CString temp_input,temp_des,temp_csc;
-            temp_input.Format(_T("Weekly_Routines%d"),i);
-
-            MultiByteToWideChar( CP_ACP, 0, (char *)m_Weekly_data.at(i).description, (int)strlen((char *)m_Weekly_data.at(i).description)+1,
-                                 temp_des.GetBuffer(MAX_PATH), MAX_PATH );
-            temp_des.ReleaseBuffer();
-            CString temp_label;
-            MultiByteToWideChar( CP_ACP, 0, (char *)m_Weekly_data.at(i).label, (int)strlen((char *)m_Weekly_data.at(i).label)+1,
-                                 temp_label.GetBuffer(MAX_PATH), MAX_PATH );
-            temp_label.ReleaseBuffer();
-
-            WritePrivateProfileStringW(temp_input,_T("Description"),temp_des,FilePath);
-            WritePrivateProfileStringW(temp_input,_T("Label"),temp_label,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Weekly_data.at(i).value);
-            WritePrivateProfileStringW(temp_input,_T("Value"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Weekly_data.at(i).auto_manual);
-            WritePrivateProfileStringW(temp_input,_T("Auto_Manual"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Weekly_data.at(i).override_1_value);
-            WritePrivateProfileStringW(temp_input,_T("Override_1_Value"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Weekly_data.at(i).override_2_value);
-            WritePrivateProfileStringW(temp_input,_T("Override_2_Value"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Weekly_data.at(i).off);
-            WritePrivateProfileStringW(temp_input,_T("Off"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Weekly_data.at(i).unused);
-            WritePrivateProfileStringW(temp_input,_T("Unused"),temp_csc,FilePath);
-
-
-            temp_csc.Format(_T("%u"),(unsigned char)m_Weekly_data.at(i).override_1.number);
-            WritePrivateProfileStringW(temp_input,_T("Override_1_Number"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Weekly_data.at(i).override_1.panel);
-            WritePrivateProfileStringW(temp_input,_T("Override_1_Panel"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Weekly_data.at(i).override_1.point_type);
-            WritePrivateProfileStringW(temp_input,_T("Override_1_Point_Type"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Weekly_data.at(i).override_2.number);
-            WritePrivateProfileStringW(temp_input,_T("Override_2_number"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Weekly_data.at(i).override_2.panel);
-            WritePrivateProfileStringW(temp_input,_T("Override_2_Panel"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Weekly_data.at(i).override_2.point_type);
-            WritePrivateProfileStringW(temp_input,_T("Override_2_Point_Type"),temp_csc,FilePath);
-
-        }
-
-        for (int i=0; i<BAC_HOLIDAY_COUNT; i++)
-        {
-            CString temp_input,temp_des,temp_csc;
-            temp_input.Format(_T("Annual_Routines%d"),i);
-
-            MultiByteToWideChar( CP_ACP, 0, (char *)m_Annual_data.at(i).description, (int)strlen((char *)m_Annual_data.at(i).description)+1,
-                                 temp_des.GetBuffer(MAX_PATH), MAX_PATH );
-            temp_des.ReleaseBuffer();
-            CString temp_label;
-            MultiByteToWideChar( CP_ACP, 0, (char *)m_Annual_data.at(i).label, (int)strlen((char *)m_Annual_data.at(i).label)+1,
-                                 temp_label.GetBuffer(MAX_PATH), MAX_PATH );
-            temp_label.ReleaseBuffer();
-
-            WritePrivateProfileStringW(temp_input,_T("Description"),temp_des,FilePath);
-            WritePrivateProfileStringW(temp_input,_T("Label"),temp_label,FilePath);
-
-            temp_csc.Format(_T("%u"),(unsigned char)m_Annual_data.at(i).value);
-            WritePrivateProfileStringW(temp_input,_T("Value"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Annual_data.at(i).auto_manual);
-            WritePrivateProfileStringW(temp_input,_T("Auto_Manual"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_Annual_data.at(i).unused);
-            WritePrivateProfileStringW(temp_input,_T("Unused"),temp_csc,FilePath);
-        }
-
-        for (int i=0; i<BAC_MONITOR_COUNT; i++)
-        {
-            CString temp_monitor,temp_des,temp_csc;
-            temp_monitor.Format(_T("Monitor%d"),i);
-
-            CString temp_label;
-            MultiByteToWideChar( CP_ACP, 0, (char *)m_monitor_data.at(i).label, (int)strlen((char *)m_monitor_data.at(i).label)+1,
-                                 temp_label.GetBuffer(MAX_PATH), MAX_PATH );
-            temp_label.ReleaseBuffer();
-            WritePrivateProfileStringW(temp_monitor,_T("Label"),temp_label,FilePath);
-            unsigned char * temp_point = NULL;
-            CString temp_inputs;
-            for (int j=0; j<MAX_POINTS_IN_MONITOR; j++)
-            {
-                temp_point = &m_monitor_data.at(i).inputs[j].number;
-                for (int k=0; k<(int)sizeof(Point_Net); k++)
-                {
-                    temp_csc.Format(_T("%02x"),(unsigned char)(*(temp_point + k)));
-                    temp_csc.MakeUpper();
-                    temp_inputs = temp_inputs + temp_csc;
-                }
-            }
-            WritePrivateProfileStringW(temp_monitor,_T("Inputs"),temp_inputs,FilePath);
-            temp_point = NULL;
-            CString temp_range;
-
-            for (int x=0; x<MAX_POINTS_IN_MONITOR; x++)
-            {
-                temp_point = &m_monitor_data.at(i).range[x];
-                temp_csc.Format(_T("%02x"),*(temp_point));
-                temp_csc.MakeUpper();
-                temp_range = temp_range + temp_csc;
-            }
-            WritePrivateProfileStringW(temp_monitor,_T("Range"),temp_range,FilePath);
-
-            temp_csc.Format(_T("%u"),(unsigned char)m_monitor_data.at(i).second_interval_time);
-            WritePrivateProfileStringW(temp_monitor,_T("Second_Interval_Time"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_monitor_data.at(i).minute_interval_time);
-            WritePrivateProfileStringW(temp_monitor,_T("Minute_Interval_Time"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_monitor_data.at(i).hour_interval_time);
-            WritePrivateProfileStringW(temp_monitor,_T("Hour_Interval_Time"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_monitor_data.at(i).max_time_length);
-            WritePrivateProfileStringW(temp_monitor,_T("Max_Time_Length"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_monitor_data.at(i).num_inputs);
-            WritePrivateProfileStringW(temp_monitor,_T("Num_Inputs"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_monitor_data.at(i).an_inputs);
-            WritePrivateProfileStringW(temp_monitor,_T("An_Inputs"),temp_csc,FilePath);
-            temp_csc.Format(_T("%u"),(unsigned char)m_monitor_data.at(i).next_sample_time);
-            WritePrivateProfileStringW(temp_monitor,_T("next_sample_time"),temp_csc,FilePath);
-
-
-            temp_csc.Format(_T("%u"),(unsigned char)m_monitor_data.at(i).status);
-            WritePrivateProfileStringW(temp_monitor,_T("Status"),temp_csc,FilePath);
-
-        }
-
-        for (int i=0; i<BAC_WEEKLYCODE_ROUTINES_COUNT; i++)
-        {
-            unsigned char * temp_point = NULL;
-            temp_point = weeklt_time_schedule[i];
-            CString tempsection,temp_code,temp_csc;
-            tempsection.Format(_T("WeeklyRoutinesData_%d"),i);
-            for (int j=0; j<WEEKLY_SCHEDULE_SIZE; j++)
-            {
-                temp_csc.Format(_T("%02x"),(unsigned char)(*(temp_point + j)));
-                temp_csc.MakeUpper();
-                temp_code = temp_code + temp_csc;
-            }
-            WritePrivateProfileStringW(tempsection,_T("Data"),temp_code,FilePath);
-        }
-
-        for (int i=0; i<BAC_HOLIDAY_COUNT; i++)
-        {
-            unsigned char * temp_point = NULL;
-            temp_point = g_DayState[i];
-            CString tempsection,temp_code,temp_csc;
-            tempsection.Format(_T("AnnualRoutinesData_%d"),i);
-            for (int j=0; j<ANNUAL_CODE_SIZE; j++)
-            {
-                temp_csc.Format(_T("%02x"),(unsigned char)(*(temp_point + j)));
-                temp_csc.MakeUpper();
-                temp_code = temp_code + temp_csc;
-            }
-            WritePrivateProfileStringW(tempsection,_T("Data"),temp_code,FilePath);
-        }
-
-        for (int i=0; i<BAC_PROGRAMCODE_ITEM_COUNT; i++)
-        {
-            CString temp_section,temp_des,temp_csc;
-            CString temp_code;
-            unsigned char * temp_point = NULL;
-            temp_point = program_code[i];
-            temp_section.Format(_T("Program_Code%d"),i);
-
-            if(program_code_length[i] == 0)
-                continue;
-
-            program_code_length[i] = ((program_code_length[i] / 400) + 1) * 400;	//保存至 配置档的 都是400 一块
-
-            temp_csc.Format(_T("%d"),program_code_length[i]);
-            WritePrivateProfileStringW(temp_section,_T("Program_Length"),temp_csc,FilePath);
-
-            //将要保存的代码划分为N快存储，每块 100 ，ini文本一个段最多只有保存260;
-            //int save_part = program_code_length[i] /100  + 1;
-
-
-            temp_code.Empty();
-            for (int j=0; j<program_code_length[i]; j++)
-            {
-                temp_csc.Format(_T("%02x"),(unsigned char)(*(temp_point + j)));
-                temp_csc.MakeUpper();
-                temp_code = temp_code + temp_csc;
-            }
-            CString part_section;
-            part_section.Format(_T("Program_Code_Text"));
-            WritePrivateProfileStringW(temp_section,part_section,temp_code,FilePath);
-
-        }
-
-
-
-
-
-        CFile myfile(FilePath,CFile::modeRead);
-        char *pBuf;
-        DWORD dwFileLen;
-        dwFileLen=myfile.GetLength();
-        pBuf= new char[dwFileLen+1];
-        pBuf[dwFileLen]=0;
-        myfile.Read(pBuf,dwFileLen);     //MFC   CFile 类 很方便
-        myfile.Close();
-        //MessageBox(pBuf);
-        char * temp_buffer = pBuf;
-        for (int i=0; i<dwFileLen; i++)
-        {
-            *temp_buffer = *temp_buffer ^ 1;
-            temp_buffer ++;
-        }
-
-        //CString new_file;
-        //new_file = FilePath.Left(FilePath.GetLength()-3) + _T("prg");
-        CStringArray temp_array2;
-        SplitCStringA(temp_array2,SaveConfigFilePath,_T("."));
-        temp_array_size=0;
-        temp_array_size = temp_array2.GetSize();
-        right_suffix = temp_array2.GetAt(temp_array_size - 1).GetLength();
-        CString temp_FilePath = SaveConfigFilePath.Left( config_file_length -  right_suffix);
-        SaveConfigFilePath = temp_FilePath + _T("prg");
-
-
-        CFileFind tempfind;
-        if(tempfind.FindFile(SaveConfigFilePath))
-        {
-            DeleteFile(SaveConfigFilePath);
-        }
-
-
-        HANDLE hFile;
-        hFile=CreateFile(SaveConfigFilePath,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
-        DWORD dWrites;
-        WriteFile(hFile,pBuf,dwFileLen,&dWrites,NULL);
-        CloseHandle(hFile);
-        if(pBuf)
-            delete pBuf;
-        DeleteFile(FilePath);
-
-    }
 }
 
 
@@ -9772,11 +9123,22 @@ void LoadTstat_InputData()
     m_tstat_input_data.push_back(temp_tstat_input);
 
 #if 1//  g_strSensorName
-    strTemp.Format(_T("%.1f"),product_register_value[MODBUS_INTERNAL_THERMISTOR]/10.0);//216
-    temp_tstat_input.InputName.StrValue=g_strSensorName;
+    if(product_register_value[695] == 0)
+        strTemp.Format(_T("%.1f"),product_register_value[MODBUS_INTERNAL_THERMISTOR]/10.0);//130   Auto 的时候用 130时
+    else
+        strTemp.Format(_T("%.1f"), product_register_value[MODBUS_TEMPRATURE_CHIP] / 10.0);//121    Manual 用 121
+    if (g_strSensorName.Trim().IsEmpty())
+    {
+        temp_tstat_input.InputName.StrValue = _T("Temperature");
+    }
+    else
+        temp_tstat_input.InputName.StrValue=g_strSensorName;
     temp_tstat_input.Value.StrValue=strTemp;
     temp_tstat_input.Value.regAddress=MODBUS_INTERNAL_THERMISTOR;
-    temp_tstat_input.Value.RegValue=product_register_value[MODBUS_INTERNAL_THERMISTOR];
+    if (product_register_value[695] == 0)
+        temp_tstat_input.Value.RegValue=product_register_value[MODBUS_INTERNAL_THERMISTOR];
+    else
+        temp_tstat_input.Value.RegValue = product_register_value[MODBUS_TEMPRATURE_CHIP];
 
     temp_tstat_input.Unit.StrValue=strUnit;
     temp_tstat_input.AM.regAddress=695;
@@ -9806,7 +9168,14 @@ void LoadTstat_InputData()
 
 #endif
     strTemp.Empty();
-    temp_tstat_input.InputName.StrValue=g_strInHumName;
+
+    if (g_strInHumName.Trim().IsEmpty())
+    {
+        temp_tstat_input.InputName.StrValue = _T("Humidity");
+    }
+    else
+        temp_tstat_input.InputName.StrValue = g_strInHumName;
+
     m_tstat_input_data.push_back(temp_tstat_input);
 
     temp_tstat_input.InputName.StrValue=g_strInCO2;
@@ -9846,6 +9215,10 @@ void LoadTstat_InputData()
         m_tstat_input_data.at(i-1).Filter.regAddress=142+i;
         m_tstat_input_data.at(i-1).Filter.StrValue=strTemp;
 
+        strTemp.Format(_T("%d"), product_register_value[155 + i - 1]);
+        m_tstat_input_data.at(i - 1).Calibration.regAddress = 155 + i - 1;
+        m_tstat_input_data.at(i - 1).Calibration.StrValue = strTemp;
+        m_tstat_input_data.at(i - 1).Calibration.RegValue = product_register_value[155 + i - 1];
         //Range
         m_crange=0;
 		strTemp = L"0";
@@ -9856,6 +9229,8 @@ void LoadTstat_InputData()
         int nsize = sizeof(analog_range_TSTAT6) / sizeof(analog_range_TSTAT6[0]);
         if (nValue >= nsize)
             nValue = 0;
+        int nUnitValue = nValue;
+
         strTemp=analog_range_TSTAT6[nValue];
         
         m_crange=nValue;
@@ -9952,6 +9327,11 @@ void LoadTstat_InputData()
         {
             strTemp.Format(_T("%.1f"), ((float)product_register_value[MODBUS_ANALOG_INPUT1 + i - 1])/10);
         }
+        else if ((m_crange == 14) || (m_crange == (14 + 128)))
+        {
+            strTemp.Format(_T("%.2f"), ((float)product_register_value[MODBUS_ANALOG_INPUT1 + i - 1]) / 10);
+            m_tstat_input_data.at(i - 1).Unit.StrValue = _T("Volts");
+        }
         else
         {
             strTemp.Format(_T("%d"),product_register_value[MODBUS_ANALOG_INPUT1+i-1]);
@@ -9976,6 +9356,10 @@ void LoadTstat_InputData()
             temp_unit.ReleaseBuffer();
             m_tstat_input_data.at(i - 1).Unit.StrValue = temp_unit;
         }
+        else if (m_crange == 0)
+        {
+            m_tstat_input_data.at(i - 1).Unit.StrValue = _T("Volts");   //TSTAT input 在range 选择为unused 的时候  unit 显示为电压;
+        }
         else
         {
             CString strValueUnit = GetTempUnit(m_crange, 1);
@@ -9986,7 +9370,14 @@ void LoadTstat_InputData()
 
         m_tstat_input_data.at(i-1).Value.regAddress=MODBUS_ANALOG_INPUT1+i-1;
         m_tstat_input_data.at(i-1).Value.RegValue=product_register_value[MODBUS_ANALOG_INPUT1+i-1];
-        m_tstat_input_data.at(i-1).Value.StrValue=strTemp;
+        if (nUnitValue == 0)
+        {
+            CString temp_value;   //2018 08 20 在range 为0 的时候 输入值 显示为电压 保留两位小数;
+            temp_value.Format(_T("%.2f"), ((float)product_register_value[MODBUS_ANALOG_INPUT1 + i - 1])/100);
+            m_tstat_input_data.at(i - 1).Value.StrValue = temp_value;
+        }
+        else
+            m_tstat_input_data.at(i-1).Value.StrValue=strTemp;
     }
 
 #endif
@@ -10105,8 +9496,10 @@ void LoadTstat_InputData()
         m_tstat_input_data.at(10).Range.StrValue=NO_APPLICATION;
     }
 
+
     strTemp.Format(_T("%d"),product_register_value[MODBUS_VALUE_SENSOR]);
     // LUX
+
     m_tstat_input_data.at(11).AM.StrValue=NO_APPLICATION;
     m_tstat_input_data.at(11).CustomTable.StrValue=NO_APPLICATION;
     m_tstat_input_data.at(11).Filter.StrValue=NO_APPLICATION;
@@ -13432,6 +12825,48 @@ void Inial_ProductName_map()
 
 }
 
+bool Open_Socket_Retry(CString strIPAdress, short nPort,int retry_time)
+{
+    for (int i = 0; i < retry_time; i++)
+    {
+        bool nreslts = false;
+        nreslts = Open_Socket2(strIPAdress, nPort);
+        if (nreslts)
+            return true;
+    }
+    return false;
+}
+
+void switch_product_last_view()
+{
+    int first_view_ui;
+    first_view_ui = (unsigned int)GetPrivateProfileInt(_T("LastView"), _T("FistLevelViewUI"), -1, g_cstring_ini_path);
+    if (first_view_ui == TYPE_OUTPUT)
+        ::SendMessage(MainFram_hwd, WM_COMMAND, MAKEWPARAM(ID_CONTROL_OUTPUTS, BN_CLICKED), NULL);
+    else if (first_view_ui == TYPE_VARIABLE)
+        ::SendMessage(MainFram_hwd, WM_COMMAND, MAKEWPARAM(ID_CONTROL_VARIABLES, BN_CLICKED), NULL);
+    else if (first_view_ui == TYPE_INPUT)
+        ::SendMessage(MainFram_hwd, WM_COMMAND, MAKEWPARAM(ID_CONTROL_INPUTS, BN_CLICKED), NULL);
+    else if (first_view_ui == TYPE_PROGRAM)
+        ::SendMessage(MainFram_hwd, WM_COMMAND, MAKEWPARAM(ID_CONTROL_PROGRAMS, BN_CLICKED), NULL);
+    else if (first_view_ui == TYPE_CONTROLLER)
+        ::SendMessage(MainFram_hwd, WM_COMMAND, MAKEWPARAM(ID_CONTROL_CONTROLLERS, BN_CLICKED), NULL);
+    else if (first_view_ui == TYPE_SCREENS)
+        ::SendMessage(MainFram_hwd, WM_COMMAND, MAKEWPARAM(ID_CONTROL_SCREENS, BN_CLICKED), NULL);
+    else if (first_view_ui == TYPE_WEEKLY)
+        ::SendMessage(MainFram_hwd, WM_COMMAND, MAKEWPARAM(ID_CONTROL_WEEKLY, BN_CLICKED), NULL);
+    else if (first_view_ui == TYPE_ANNUAL)
+        ::SendMessage(MainFram_hwd, WM_COMMAND, MAKEWPARAM(ID_CONTROL_ANNUALROUTINES, BN_CLICKED), NULL);
+    else if (first_view_ui == TYPE_MONITOR)
+        ::SendMessage(MainFram_hwd, WM_COMMAND, MAKEWPARAM(ID_CONTROL_MONITORS, BN_CLICKED), NULL);
+    else if (first_view_ui == TYPE_ALARMLOG)
+        ::SendMessage(MainFram_hwd, WM_COMMAND, MAKEWPARAM(ID_CONTROL_ALARM_LOG, BN_CLICKED), NULL);
+    else if (first_view_ui == TYPE_READ_REMOTE_POINT_INFO)
+        ::SendMessage(MainFram_hwd, WM_COMMAND, MAKEWPARAM(ID_CONTROL_TSTAT, BN_CLICKED), NULL);
+    else if (first_view_ui == TYPE_SETTING)
+        ::SendMessage(MainFram_hwd, WM_COMMAND, MAKEWPARAM(ID_CONTROL_SETTINGS, BN_CLICKED), NULL);
+}
+
 int PanelName_Map(int product_type)
 {
     map<int, int>::iterator iter;
@@ -13445,5 +12880,3 @@ int PanelName_Map(int product_type)
 
     return 715; // 如果没有默认按照从715 开始 8个寄存器.
 }
-
-

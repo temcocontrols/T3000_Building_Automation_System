@@ -438,6 +438,7 @@ CString GetProductName(int ModelID) //TBD: Change this to an array
 		strProductName = _T("FWMTRANSDUCER");	  //
 		break;
 	case PM_MINIPANEL:
+    case PM_MINIPANEL_ARM :
 		strProductName = _T("MiniPanel");	  //
 		break;
 	case PM_PRESSURE:
@@ -520,6 +521,9 @@ CString GetProductName(int ModelID) //TBD: Change this to an array
 		break;
     case PM_WEATHER_STATION:
         strProductName = "WS";
+        break;
+    case STM32_PM25:
+        strProductName = "PM2.5";
         break;
 	default:
 		strProductName.Format(_T("Model ID:%d is not valid"),ModelID);
@@ -714,6 +718,35 @@ BOOL Ping(const CString& strIP, CWnd* pWndEcho)
 	return FALSE;
 }
 
+int Write_One_Retry(unsigned char device_var, unsigned short address, unsigned short value,int retry_time)
+{
+    int nret = 0;
+    for (int i = 0; i < retry_time; i++)
+    {
+        nret = Write_One(device_var, address, value);
+        if (nret < 0)
+        {
+            Sleep(300);
+            continue;
+        }
+        else
+            return nret;
+    }
+    return nret;
+    
+}
+
+bool Open_Socket_Retry(CString strIPAdress, short nPort, int retry_time)
+{
+    for (int i = 0; i < retry_time; i++)
+    {
+        bool nreslts = false;
+        nreslts = Open_Socket2(strIPAdress, nPort);
+        if (nreslts)
+            return true;
+    }
+    return false;
+}
 
 //Split the cstring to each of its components.
 void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken)

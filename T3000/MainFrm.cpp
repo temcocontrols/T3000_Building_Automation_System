@@ -100,6 +100,8 @@ HTREEITEM  hLastTreeItem =NULL;
 #include "../SQLiteDriver/CppSQLite3.h"
 #include "BTUMeterDlg.h"
 #include "ProductModel.h"
+#include "BacnetRegisterListView.h"
+#include "CO2_NodeView.h"
 bool b_create_status = false;
 const TCHAR c_strCfgFileName[] = _T("config.txt");
 //	配置文件名称，用于保存用户设置
@@ -618,6 +620,7 @@ void CMainFrame::InitViews()
     m_pViews[DLG_DIALOG_BOATMONITOR] = (CView *)new CBoatMonitorViewer;
 	m_pViews[DLG_DIALOG_BTUMETER] = (CView *)new CBTUMeterDlg;
     m_pViews[DLG_DIALOG_POWERMETER] = (CView *)new CPowermeter;
+    m_pViews[DLG_DIALOG_CO2_NODE] = (CView *)new CCO2_NodeView;
     CDocument* pCurrentDoc = GetActiveDocument();
     CCreateContext newContext;
     newContext.m_pNewViewClass = NULL;
@@ -722,6 +725,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     }
 
 	Inial_Product_map();
+    Inial_Product_Reglist_map();
     //////////////////////////////////////////////////////////////////////////////////
     CString strToolBarName;
     bNameValid = strToolBarName.LoadString(IDS_TOOLBAR_STANDARD);
@@ -1071,7 +1075,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     }
 	hThread = CreateThread(NULL, NULL, Get_All_Dlg_Message, this, NULL, &nThreadID);
 	hDeal_thread = CreateThread(NULL, NULL, Translate_My_Message, this, NULL, &nThreadID_Do);
-	m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
+	//m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
 	m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
 
 	SetTimer(FOR_LAST_VIEW_TIMER,2000,NULL);
@@ -3531,7 +3535,7 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
 
             g_CommunicationType=1;
             SetCommunicationType(g_CommunicationType);
-            bool b=Open_Socket2(tree_node.BuildingInfo.strIp,m_nIpPort);
+            bool b= Open_Socket_Retry(tree_node.BuildingInfo.strIp,m_nIpPort);
             bRet =b;
             CString strTips;
             strTips.Format(_T("Try to connect %s ,Port:%d"),tree_node.BuildingInfo.strIp,m_nIpPort);
@@ -3747,6 +3751,7 @@ void CMainFrame::OnScanDevice()
     Scan_Product();
 	if (m_pScanner != NULL)
 	{
+        
 		delete m_pScanner;
 		m_pScanner = NULL;
 	}
@@ -4052,6 +4057,12 @@ here:
     {
         m_nCurView = DLG_DIALOG_POWERMETER;
         ((CPowermeter*)m_pViews[m_nCurView])->Fresh();
+    }
+    break;
+    case DLG_DIALOG_CO2_NODE:
+    {
+        m_nCurView = DLG_DIALOG_CO2_NODE;
+        ((CCO2_NodeView*)m_pViews[m_nCurView])->Fresh();
     }
     break;
         //here
@@ -5376,7 +5387,6 @@ LRESULT  CMainFrame::ReadConfigFromDeviceMessageCallBack(WPARAM wParam, LPARAM l
             DeleteFile(SaveConfigFilePath);
         }
 		SaveBacnetBinaryFile(SaveConfigFilePath);
-        //SaveBacnetConfigFile(SaveConfigFilePath);
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Save config file success!"));
     }
     return 0;
@@ -6420,7 +6430,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             m_pTreeViewCrl->SetSelectSerialNumber(product_Node.serial_number);
             g_selected_serialnumber = product_Node.serial_number;
             g_bac_instance = NULL;
-
+            g_selected_product_id = product_Node.product_class_id;
             selected_product_index = i;//记录目前选中的是哪一个 产品;用于后面自动更新firmware;
             selected_tree_item = hTreeItem;
             Statuspanel.Empty();
@@ -6605,7 +6615,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                         CString IP=m_product.at(i).BuildingInfo.strIp;
                         int Port=m_product.at(i).ncomport;
                         SetCommunicationType(1);
-                        if ((!offline_mode)&&(!Open_Socket2(IP,Port)))
+                        if ((!offline_mode)&&(!Open_Socket_Retry(IP,Port)))
                         {
 							g_llTxCount = g_llTxCount + 4;
 							g_llerrCount = g_llerrCount + 4;
@@ -6918,6 +6928,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                         (product_Node.BuildingInfo.strIp.CompareNoCase(_T("19200"))==0) ||
                         (product_Node.BuildingInfo.strIp.CompareNoCase(_T("38400"))==0) ||
                         (product_Node.BuildingInfo.strIp.CompareNoCase(_T("57600"))==0) ||
+                        (product_Node.BuildingInfo.strIp.CompareNoCase(_T("76800")) == 0) ||
                         (product_Node.BuildingInfo.strIp.CompareNoCase(_T("115200"))) == 0))
             {
 
@@ -6989,7 +7000,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     {
                         close_com();
                     }
-                    Sleep(1000);
+                    Sleep(200);
                     BOOL  bret = open_com(nComPort);
                     if (!bret)	 //Try one more time
                     {
@@ -7103,7 +7114,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 //m_nbaudrat=_wtoi(product_Node.BuildingInfo.strBaudRate);
                 g_protocol=MODBUS_RS485;
                 m_nbaudrat= product_Node.baudrate;
-                if ((m_nbaudrat !=9600 ) && (m_nbaudrat !=19200) && (m_nbaudrat != 38400)&& (m_nbaudrat != 57600)&& (m_nbaudrat != 115200))
+                if ((m_nbaudrat !=9600 ) && (m_nbaudrat !=19200) && (m_nbaudrat != 38400)&& (m_nbaudrat != 57600)&& (m_nbaudrat != 76800) && (m_nbaudrat != 115200))
                     m_nbaudrat = 19200;
                 Change_BaudRate(m_nbaudrat);
                 if (product_Node.protocol == PROTOCOL_MSTP_TO_MODBUS)
@@ -7136,7 +7147,6 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 register_critical_section.Unlock();
                 if(nmultyRet <0)
                 {
-                    //AfxMessageBox(_T("Your comport is open ,but T3000 can't read your device."));//\nDatabase->Building config Database
 					bac_select_device_online = false;
                     if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
                     {
@@ -7886,6 +7896,10 @@ start_read_reg_data:
 				}
                 
             }
+            else if (nFlag == STM32_CO2_NODE)
+            {
+                SwitchToPruductType(DLG_DIALOG_CO2_NODE);
+            }
             else if(nFlag == PM_CO2_NET||nFlag == STM32_CO2_RS485|| nFlag == STM32_CO2_NET)//(nFlag == PM_CO2_NET)||
             {
                 SwitchToPruductType(DLG_CO2_NET_VIEW);
@@ -8189,6 +8203,8 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
 			
             if((m_product.at(i).protocol == MODBUS_RS485) && (rs485_scan_count == 0) && (temp_port > 0 ) && (m_product.at(i).BuildingInfo.strIp.IsEmpty()))
             {
+                continue;
+#if 0
                 if(refresh_com !=0 )
                     continue;
                 //register_critical_section.Lock();
@@ -8307,6 +8323,7 @@ end_condition :
 				m_product.at(i).status_last_time[0] = temp_online ;
 				m_product.at(i).status = m_product.at(i).status_last_time[0] || m_product.at(i).status_last_time[1] || m_product.at(i).status_last_time[2];
 				continue;
+#endif
             }
             else if(m_product.at(i).protocol == PROTOCOL_GSM)
             {
@@ -8618,6 +8635,11 @@ end_condition :
                         CString temp_pro4;
                         temp_pro4.Format(_T("%u"), PROTOCOL_BIP_T0_MSTP_TO_MODBUS);
                         strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('" + m_strCurMainBuildingName + "','" + m_strCurSubBuldingName + "','" + NetwordCard_Address + "','" + str_serialid + "','floor1','room1','" + product_name + "','" + product_class_id + "','" + modbusid + "','""','" + str_ip_address + "','T3000_Default_Building_PIC.bmp','" + str_hw_version + "','" + str_fw_version + "','" + str_n_port + "','0','" + temp_pro4 + "','1','" + str_parents_serial + "' ,'" + str_panel_number + "' ,'" + str_object_instance + "' ,'" + is_custom + "' )"));
+                    }
+                    else if (nret_read_bac < 0)
+                    {
+                        g_Print.Format(_T("Read instance %u ,  MSTP TO MODBUS  0 - 100   timeout!"), m_refresh_net_device_data.at(y).object_instance);
+                        DFTrace(g_Print);
                     }
 
                 }
@@ -10108,6 +10130,10 @@ void CMainFrame::OnViewCommunicatetraffic()
 
 void CMainFrame::OnControlMain()
 {
+    CString temp_ui;
+    temp_ui.Format(_T("%u"), TYPE_MAIN);
+    WritePrivateProfileString(_T("LastView"), _T("FistLevelViewUI"), temp_ui, g_cstring_ini_path);
+
     if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == PROTOCOL_BIP_TO_MSTP) || (g_protocol == MODBUS_BACNET_MSTP))
     {
         OnControlSettings();
@@ -10124,8 +10150,7 @@ void CMainFrame::OnControlMain()
         else if (product_type == CS3000||product_register_value[7]==PM_T322AI || product_register_value[7] == PWM_TRANSDUCER ||product_register_value[7]==PM_T38AI8AO6DO || product_register_value[7]==PM_T3PT12
 		|| product_register_value[7]==PM_T36CTA||product_register_value[7] == PM_T3_LC)
         {
-		 
-            bacnet_view_number = TYPE_TSTAT;
+            bacnet_view_number = TYPE_MAIN;
 			global_interface = BAC_MAIN;
             SwitchToPruductType(DLG_DIALOG_DEFAULT_T3000_VIEW);
         }
@@ -10168,7 +10193,7 @@ void CMainFrame::OnControlMain()
         {
             SwitchToPruductType(DLG_DIALOGT38AI8AO);
         }
-		else if(product_register_value[7] == PM_CO2_RS485||product_register_value[7] == PM_PRESSURE_SENSOR||product_register_value[7] == PM_CO2_NODE  )//(nFlag == PM_CO2_NET)||
+		else if(product_register_value[7] == PM_CO2_RS485||product_register_value[7] == PM_PRESSURE_SENSOR||product_register_value[7] == PM_CO2_NODE || product_register_value[7] == STM32_CO2_NODE)//(nFlag == PM_CO2_NET)||
 		{
 			if (product_register_value[14] == 6)
 			{
@@ -10212,7 +10237,7 @@ void CMainFrame::OnControlInputs()
     //    global_interface = BAC_IN;
     //    return;
     //}
-
+    
     if (product_type == CS3000 || product_register_value[7] == PM_TSTAT6 || product_register_value[7] == PM_TSTAT5i || product_register_value[7] == PM_TSTAT7 || product_register_value[7] == PM_TSTAT8
         || (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V))
     {
@@ -10760,6 +10785,10 @@ void CMainFrame::OnControlAnnualroutines()
 #include "PowerMeterList.h"
 void CMainFrame::OnControlSettings()
 {
+    CString temp_ui;
+    temp_ui.Format(_T("%u"), TYPE_MAIN);
+    WritePrivateProfileString(_T("LastView"), _T("FistLevelViewUI"), temp_ui, g_cstring_ini_path);
+
     g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
     if((g_protocol == PROTOCOL_BACNET_IP) || 
 		(g_protocol == PROTOCOL_BIP_TO_MSTP) || 
@@ -10823,7 +10852,7 @@ void CMainFrame::OnControlSettings()
 	             ||product_register_value[7]==STM32_HUM_NET )
 	{
 		HideBacnetWindow();
-		bacnet_view_number = TYPE_TSTAT;
+		bacnet_view_number = TYPE_SETTING;
 		SwitchToPruductType(DLG_DIALOG_DEFAULT_T3000_VIEW);
 	}
     else
@@ -11116,14 +11145,15 @@ void CMainFrame::OnControlMonitors()
 void CMainFrame::OnSizing(UINT fwSide, LPRECT pRect)
 {
     CFrameWndEx::OnSizing(fwSide, pRect);
-
-    
 }
+
+
 void CMainFrame::OnToolRegisterviewer()
 {
 	HideBacnetWindow();
-	SwitchToPruductType(DLG_DIALOG_CUSTOM_VIEW);
-
+    CBacnetRegisterListView ReglistViewDlg;
+    ReglistViewDlg.DoModal();
+    //KillProcessFromName(_T("EXCEL.EXE"));
 }
 
 #include "CM5/mygdiplus.h"

@@ -83,6 +83,7 @@ struct Tstat_Input_Struct{
 	Reg_Infor AM;
 	Reg_Infor Value;
 	Reg_Infor Unit;
+    Reg_Infor Calibration;
 	Reg_Infor Filter;
 	Reg_Infor Range;
 	Reg_Infor Function;

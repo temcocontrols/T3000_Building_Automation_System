@@ -4459,7 +4459,7 @@ void CParameterDlg::ShowPID3()
         CString strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN1], 1);
 
         CString temp,strTemp;
-        temp.Format(_T("%d"),product_register_value[MODBUS_AIRFLOW_SETPOINT]);
+        temp.Format(_T("%.1f"),((float)((short)product_register_value[MODBUS_PID3_DAY_SETPOINT]))/10);
         temp+=strUnit;
         GetDlgItem(IDC_SPSET4_PID3)->SetWindowText(temp);
         temp.Format(_T("%d"),product_register_value[MODBUS_MAX_SUPPLY_SETPOINT]);
@@ -4619,7 +4619,7 @@ void CParameterDlg::ShowPID3()
 			||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
         {
 
-            temp.Format(_T("%.1f"),((float)(short)product_register_value[705])/10);
+            temp.Format(_T("%.1f"),((float)(short)product_register_value[MODBUS_PID3_DAY_SETPOINT])/10);
             //temp+=strUnit;
             GetDlgItem(IDC_SETVALUE3_PID3)->SetWindowText(temp);
             temp.Format(_T("%d%%"),product_register_value[664]);
@@ -4630,7 +4630,7 @@ void CParameterDlg::ShowPID3()
             temp.Format(_T("%0.1f"),((float)(short)product_register_value[661])/10);
             GetDlgItem(IDC_EDIT52_PID3)->SetWindowText(temp);
 
-            temp.Format(_T("%0.1f"),((float)(short)product_register_value[706])/10);
+            temp.Format(_T("%0.1f"),((float)(short)product_register_value[MODBUS_PID3_NIGHT_SETPOINT])/10);
 
             GetDlgItem(IDC_EDIT_PID2OFFSETPOINT6)->SetWindowText(temp);
         }
@@ -4942,22 +4942,13 @@ void CParameterDlg::OnEnKillfocusSpset4Pid3()
     CString temp;
     //temp.Format(_T("%d"),product_register_value[MODBUS_SUPPLY_SETPOINT]);
     GetDlgItem(IDC_SPSET4_PID3)->GetWindowText(temp);
-    int Val=_wtoi(temp);
-    if (Val==product_register_value[MODBUS_SUPPLY_SETPOINT])
-    {
-        return;
-    }
-    int ret=write_one(g_tstat_id,MODBUS_SUPPLY_SETPOINT,Val);
-    if (ret>0)
-    {
-        product_register_value[MODBUS_SUPPLY_SETPOINT]=Val;
-        ShowPID3();
-    }
-    else
-    {
-        AfxMessageBox(_T("Fail"));
-    }
 
+    unsigned short temp_value = (unsigned short)(_wtof(temp)*10);
+    int ret = write_one(g_tstat_id, MODBUS_PID3_DAY_SETPOINT, temp_value);
+    if (ret > 0)
+    {
+        product_register_value[MODBUS_PID3_DAY_SETPOINT] = temp_value;
+    }
 
 }
 
