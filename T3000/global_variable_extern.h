@@ -1310,3 +1310,4 @@ extern bool custom_bacnet_register_listview;
 extern bool initial_bip ;
 extern Str_modbus_reg bacnet_to_modbus_struct; //用于bacnet 协议转换为modbus 协议的结构
 extern panelname_map g_panelname_map;
+extern CString HolLable[BAC_HOLIDAY_COUNT]; //用于动态加载List中的下拉框

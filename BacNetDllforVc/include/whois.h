@@ -37,6 +37,13 @@ __declspec(dllexport)   int whois_encode_apdu(
         int32_t low_limit,
         int32_t high_limit);
 
+int shutdown_mstp_encode_apdu(
+    uint8_t * apdu,
+    int32_t low_limit,
+    int32_t high_limit,
+    uint8_t mstp_id ,
+    uint8_t n_time);
+
 __declspec(dllexport)    int whois_decode_service_request(
         uint8_t * apdu,
         unsigned apdu_len,

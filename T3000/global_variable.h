@@ -2239,3 +2239,11 @@ Str_modbus_reg bacnet_to_modbus_struct;  //ÓÃÓÚbacnet Ğ­Òé×ª»»Îªmodbus Ğ­ÒéµÄ½á¹
 
 
 panelname_map g_panelname_map;
+
+CString HolLable[BAC_HOLIDAY_COUNT] =   //ÓÃÓÚ¶¯Ì¬¼ÓÔØListÖĞµÄÏÂÀ­¿ò
+{
+    _T("AR1"),
+    _T("AR2"),
+    _T("AR3"),
+    _T("AR4")
+};

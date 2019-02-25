@@ -31,4 +31,6 @@ public:
     afx_msg void OnEnKillfocusEditParaExtMinPwm();
     afx_msg void OnBnClickedButtonParaExtOk();
     afx_msg void OnEnKillfocusEditParaExtTimeRemaining();
+    CEdit m_zigbee_panid;
+    afx_msg void OnEnKillfocusEditZigbeePanId();
 };

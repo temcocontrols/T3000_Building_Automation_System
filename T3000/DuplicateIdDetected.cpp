@@ -385,8 +385,8 @@ void CDuplicateIdDetected::Initial_static()
     }
 
 
-	temp_user_text_1 = device_id_data_1.show_label_name;
-	temp_user_text_2 = device_id_data_2.show_label_name;
+    temp_user_text_1 = _T("Unknown");//device_id_data_1.show_label_name;
+	temp_user_text_2 = _T("Unknown");//device_id_data_2.show_label_name;
 
 	temp_product_id_1 = _T(" ");//GetProductName(device_id_data_1.product_id);
 	temp_product_id_2 = _T(" ");//GetProductName(device_id_data_2.product_id);

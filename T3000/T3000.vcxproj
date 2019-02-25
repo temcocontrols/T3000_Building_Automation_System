@@ -142,6 +142,7 @@
     <ClCompile Include="AutoRichEditCtrl.cpp" />
     <ClCompile Include="Bacnetaddintodb.cpp" />
     <ClCompile Include="BacnetAddLabel.cpp" />
+    <ClCompile Include="BacnetAddRemoteDevice.cpp" />
     <ClCompile Include="BacnetAddVirtualDevice.cpp" />
     <ClCompile Include="BacnetAlarmLog.cpp" />
     <ClCompile Include="ARDDlg.cpp" />
@@ -486,6 +487,7 @@
     <ClInclude Include="AutoRichEditCtrl.h" />
     <ClInclude Include="Bacnetaddintodb.h" />
     <ClInclude Include="BacnetAddLabel.h" />
+    <ClInclude Include="BacnetAddRemoteDevice.h" />
     <ClInclude Include="BacnetAddVirtualDevice.h" />
     <ClInclude Include="BacnetAlarmLog.h" />
     <ClInclude Include="ARDDlg.h" />

@@ -178,7 +178,7 @@ namespace ListCtrlEx
 
 		int CListCtrlEx::GetColumnLimitChar(int nColIndex);
 		void CListCtrlEx::SetColumnLimitChar(int nColIndex, int nlimitchar);
-		void CListCtrlEx::Setlistcolcharlimit(unsigned char ncol,unsigned char nlimitchar);
+		void CListCtrlEx::Setlistcolcharlimit(unsigned char ncol,unsigned char nlimitchar); //限制单元格 输入的最大字符个数;
 
 		ColumnType	GetColumnType(int nColIndex);
 		void				SetColumnType(int nColIndex, ColumnType eColType);

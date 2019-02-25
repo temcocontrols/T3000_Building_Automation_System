@@ -247,6 +247,7 @@ void CBacnetGraphic::Initial_Scale_Time()
     }
     else
     {
+#if 0
         graphic_last_time_value = GetPrivateProfileInt(_T("Setting"), _T("Graphic_last_time_value"), -1, g_cstring_ini_path);
         if (graphic_last_time_value == -1)
         {
@@ -254,6 +255,7 @@ void CBacnetGraphic::Initial_Scale_Time()
         }
         else
             m_time_monitor_now = graphic_last_time_value;
+#endif
     }
 
     if (graphic_last_scale_type == TIME_FIVE_MINUTE)
@@ -417,8 +419,8 @@ int CBacnetGraphic::Search_data_from_db()
 	//m_starttime = temp_time_start;
 	//m_endtime = temp_time_end;
 
-	m_starttime = m_time_monitor_now -  x_axis_total_time;
-	m_endtime = m_time_monitor_now ;
+	//m_starttime = m_time_monitor_now -  x_axis_total_time;
+	//m_endtime = m_time_monitor_now ;
 
 
 	unsigned int temp_serial_number = g_selected_serialnumber;
@@ -2194,12 +2196,12 @@ void CBacnetGraphic::InitialParameter(int base_time,float y_min_value,float y_ma
 {
 
 
-	if(flag_auto_scroll == false)
-	{
+	//if(flag_auto_scroll == false)
+	//{
 		CString cs_temp_value;
 		cs_temp_value.Format(_T("%d"),m_time_monitor_now);
 		WritePrivateProfileStringW(_T("Setting"),_T("Graphic_last_time_value"),cs_temp_value,g_cstring_ini_path);
-	}
+	//}
 
 	if(m_monitor_data.at(monitor_list_line).num_inputs > m_monitor_data.at(monitor_list_line).an_inputs )
 	{
@@ -2254,7 +2256,7 @@ void CBacnetGraphic::InitialParameter(int base_time,float y_min_value,float y_ma
 	}
 
 
-	SetXaxisScale(6);
+	SetXaxisScale(5);
 //	SetYaxisScale(5);
 	SetYaxisScale(2);
 	SetAnalogOrignPoint(PointF(250,30));
@@ -2291,9 +2293,29 @@ void CBacnetGraphic::InitialParameter(int base_time,float y_min_value,float y_ma
 	CalcOnePixelValue();
 	timestart = m_time_monitor_now - x_axis_total_time;
 	TRACE(_T("time from %u"),timestart);
-	//timestart = (timestart / 10) * 10;
-    timestart = (timestart / 60) * 60;
-	TRACE(_T(" to %u\n"),timestart);
+
+    if (m_time_selected <= TIME_ONE_HOUR)
+    {
+        timestart = (timestart / 60 + 1) * 60;
+    }
+    else if (m_time_selected == TIME_FOUR_HOUR)
+    {
+        timestart = (timestart / 3600 + 1) * 3600;
+    }
+    else if (m_time_selected == TIME_TWELVE_HOUR)
+    {
+        timestart = (timestart / 3600 + 1) * 3600;
+    }
+    else if (m_time_selected == TIME_ONE_DAY)
+    {
+        timestart = (timestart / 3600 + 1) * 3600;
+    }
+    else if (m_time_selected == TIME_FOUR_DAY)
+    {
+        timestart = (timestart / (3600*12)  + 1) * (3600*12);
+    }
+    
+	//TRACE(_T(" to %u\n"),timestart);
 	SetXaxisStartTime(timestart);
 
 
@@ -2742,7 +2764,7 @@ void CBacnetGraphic::OnGraphicLeft()
 	}
 	else
 	{
-		m_time_monitor_now =m_time_monitor_now -  x_axis_total_time;
+		m_time_monitor_now =m_time_monitor_now -  x_axis_total_time/2;
 	}
     flag_auto_scroll = false;
     ncontinue_read_data = false;
@@ -2771,10 +2793,10 @@ void CBacnetGraphic::OnGraphicRight()
 	{
 		CTime temp_time_now = CTime::GetCurrentTime();
 		unsigned long temp_cur_long_time = temp_time_now.GetTime();
-        if (temp_cur_long_time > (m_time_monitor_now + x_axis_total_time))
+        if (temp_cur_long_time > (m_time_monitor_now + x_axis_total_time/2))
         {
             ncontinue_read_data = false;
-            m_time_monitor_now = m_time_monitor_now + x_axis_total_time;
+            m_time_monitor_now = m_time_monitor_now + x_axis_total_time/2;
         }
 		else
 		{

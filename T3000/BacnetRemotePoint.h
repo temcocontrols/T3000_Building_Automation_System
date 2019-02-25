@@ -38,10 +38,11 @@ const int REMOTE_NUMBER = 0;
 const int REMOTE_MAIN_ID = 1;
 const int REMOTE_DEVICE_ID = 2;
 const int REMOTE_REG = 3;
-const int REMOTE_TPYE = 4;
-const int REMOTE_VALUE = 5;
-const int REMOTE_DEVICE_STATUS = 6;
-const int REMOTE_DESCRIPTION = 7;
-const int REMOTE_TIME_REMAINING = 8;
+const int REMOTE_INSTANCE = 4;
+const int REMOTE_TPYE = 5;
+const int REMOTE_VALUE = 6;
+const int REMOTE_DEVICE_STATUS = 7;
+const int REMOTE_DESCRIPTION = 8;
+const int REMOTE_TIME_REMAINING = 9;
 
-const int REMOTE_COL_NUMBER = 9;
+const int REMOTE_COL_NUMBER = 10;

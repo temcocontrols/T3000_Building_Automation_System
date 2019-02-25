@@ -23,6 +23,7 @@
 extern DWORD prg_text_color;
 extern DWORD prg_label_color;
 extern DWORD prg_command_color;
+extern DWORD prg_local_var_color;
 extern DWORD prg_function_color;
 
 extern int program_code_length[BAC_PROGRAM_ITEM_COUNT];
@@ -30,6 +31,8 @@ extern int program_list_line ;
 
 char *index_stack;
 char stack[300];
+
+char local_var_new_name[40][40] = { 0 };
 
 extern char editbuf[25000];//For Bacnet Program use
  static int time_count = 0; //Fance add for wait function.
@@ -2067,7 +2070,7 @@ int prescan1 (void)
 //							 fprintf(pmes," missing NEXT  \n");
 							 break;
 							 }
-						if( error) 	break;
+						if( error != -1) 	break;
 						get_token();
 						if ((token_type != IDENTIFIER) || tok==FINISHED || token_type == NL)
 								{sntx_err(SYNTAX);get_nl();break;}
@@ -2716,7 +2719,7 @@ int createlocaltable(int cur)
 	int t=0,j=0,k=0;
 	for(j=0;j<ind_local_table; )
 	{
-		switch(local_table[j])
+		switch((unsigned char)local_table[j])
 		{
 		case FLOAT_TYPE:
 		case LONG_TYPE:
@@ -2730,7 +2733,7 @@ int createlocaltable(int cur)
 			break;
 		default:
 			{
-				switch(local_table[j])
+				switch((unsigned char)local_table[j])
 				{
 				case FLOAT_TYPE_ARRAY:
 				case LONG_TYPE_ARRAY:
@@ -2986,7 +2989,7 @@ void parse_atom( float  *value )
 	int i/*,t*/ ;
 	int ftok;
 	char pt[14];
-	switch( token_type) 
+	switch((unsigned char)token_type)
 	{
 	case IDENTIFIER :
 	 if((ftok=look_up_func(token))==NOT)
@@ -4307,7 +4310,7 @@ int varoffsetlast(int cur)
 	int j,k;
 	for(j=0;j<ind_local_table; )
 	{
-		switch(local_table[j]){
+		switch((unsigned char)local_table[j]){
 		case FLOAT_TYPE:
 		case LONG_TYPE:
 			k = 4;
@@ -4320,7 +4323,7 @@ int varoffsetlast(int cur)
 			break;
 		default:
 			{
-				switch(local_table[j]){
+				switch((unsigned char)local_table[j]){
 				case FLOAT_TYPE_ARRAY:
 				case LONG_TYPE_ARRAY:
 					k = 4;
@@ -6690,7 +6693,7 @@ int desvar(void)
 					break;
 			default:
 				  {
-					switch(local[j])
+					switch((unsigned char)local[j])
 					{
 						case FLOAT_TYPE_ARRAY:
 						case LONG_TYPE_ARRAY:
@@ -6718,13 +6721,43 @@ int desvar(void)
 		m = j + 1;
 		j += 1 + k;
 
+
+#if 1
+        //此功能用来保存 Local var  变色的功能。
+        char temp_local_value[40];
+        memset(temp_local_value, 0, 40);
+        strcpy(temp_local_value, &local[j]);
+        bool find_exsit = false;
+        int next_add_count = 0;
+        for (int xy = 0; xy < 40; xy++)
+        {
+            if (strlen(local_var_new_name[xy]) <= 0)
+            {
+                next_add_count = xy;
+                break;
+            }
+            int compare_ret = strcmp(local_var_new_name[xy], temp_local_value);
+            if (compare_ret == 0)
+            {
+                find_exsit = true;
+                next_add_count = xy;
+                break;
+            }
+        }
+
+        if (find_exsit == false)
+        {
+            strcpy(local_var_new_name[next_add_count], temp_local_value);
+        }
+#endif
+
 		if( n < j )
 		{
 		 strcpy(p, &local[j]);
 		 p += strlen(p);
-
 		 break;
 		}
+
 		j += 1+strlen(&local[j]);
 	}
   code += 3;
@@ -7815,6 +7848,7 @@ void copy_data_to_ptrpanel(int Data_type)
 }
 #define  FUNCTION_TABEL  0
 #define  COMMAND_TABEL 1
+#define  LOCAL_VAR_TABEL 2
 void check_each_point(char *richeditchar,int item_count ,int ntype);
 void check_function_table(char *richeditchar ,int ntype);
 void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken);
@@ -7851,7 +7885,7 @@ void check_high_light()
 	check_each_point(temp_char,BAC_HOLIDAY_COUNT,AR);
 	check_function_table(temp_char,FUNCTION_TABEL);
 	check_function_table(temp_char,COMMAND_TABEL);
-
+    check_function_table(temp_char, LOCAL_VAR_TABEL);
 }
 
 void check_function_table(char *richeditchar ,int ntype)
@@ -7875,9 +7909,23 @@ void check_function_table(char *richeditchar ,int ntype)
 			loop_size = i;
 		}
 	}
+    else if (ntype == LOCAL_VAR_TABEL)
+    {
+        //extern char local_var_new_name[40][40];
+        for (int i = 0; i < 40; i++)
+        {
+            if (strlen(local_var_new_name[i]) == 0)
+            {
+                loop_size = i - 1;
+                break;
+            }
+        }
+    }
 	else
 		return;
 
+
+    //LOCAL_VAR_TABEL
 	for(int i = 0 ; i<loop_size+1 ; i++ )
 	{
 		char_source = richeditchar;
@@ -7898,6 +7946,11 @@ void check_function_table(char *richeditchar ,int ntype)
 			strcat_s(temp_label,20,table[i].command);
 			char_color =prg_command_color;// RGB(255,0,255);
 		}
+        else if (ntype == LOCAL_VAR_TABEL)
+        {
+            strcat_s(temp_label, 20, local_var_new_name[i]);
+            char_color = prg_local_var_color;//RGB(111, 111, 111);
+        }
 		else
 			return;
 			

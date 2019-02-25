@@ -2,6 +2,17 @@
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
 //使用VS2010 编译需删除 c:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cvtres.exe 来确保用更高版本的 来转换资源文件
+2018 12 21
+1. ScreenEdit 中 Sch 以及Hol 可以显示 ON OFF 值
+2. AR1 AR2 动态加载至  SCH的 combo 中
+3. 新增 BTU 界面  创建 resourcefile 的文件夹 以后资源文件都放在这个文件夹下更新
+4. Zigbee Pan ID   for TSTAT8 
+
+2018 12 11
+1. 修复CO2 NET 无法显示 MODBUS_DEW_PT  的值
+2. 修复CO2  Output2  value为负值的
+3. Graphic view 下面的时间刻度 整数化, 左右移动改25%.
+
 2018 11 27
 1. Setting 界面 Done 不在修改IP
 2. Setting Show LCD 只有BB 有，其他的需要隐藏;
@@ -5048,11 +5059,17 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 				g_bPauseMultiRead = true; // 只要在minipanel的界面 就暂停 读 寄存器的那个线程;
 				if(!Gsm_communication)
 					m_bac_handle_Iam_data.clear();
-				if(g_bac_instance>0)
-					Send_WhoIs_Global(-1, -1);
+
+
+
 
 				if(m_is_remote_device)
 					Send_WhoIs_remote_ip(remote_ip_address);
+                else
+                {
+                    if (g_bac_instance>0)
+                        Send_WhoIs_Global(-1, -1);
+                }
 
 				if(bac_select_device_online)
 				{
@@ -5884,7 +5901,9 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 {
 	unsigned char  read_device_id = 0;
 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-	read_device_id =  pFrame->m_product.at(selected_product_index).product_id;
+    if ((pFrame->m_product.size() == 0) || (selected_product_index  >= pFrame->m_product.size()))
+        return 0;
+	read_device_id = pFrame->m_product.at(selected_product_index).product_id;
 	bool read_result = true;
 	unsigned short read_data_buffer[3200];
 	memset(read_data_buffer,0,sizeof(unsigned short)*3200);
@@ -6092,15 +6111,6 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 				{
 					memcpy( &m_controller_data.at(i),&read_data_buffer[i*14],sizeof(Str_controller_point));
 				}
-
-				//CString str_serialid;
-				//str_serialid.Format(_T("%u"), pFrame->m_product.at(selected_product_index).serial_number);
-				//CString achive_file_path;
-				//CString temp_serial;
-				//achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
-
-				//SaveModbusConfigFile_Cache(achive_file_path,NULL,3200*2);
-
 
 				if(Controller_Window->IsWindowVisible())
 					::PostMessage(m_controller_dlg_hwnd,WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);

@@ -551,11 +551,11 @@ LRESULT CCO2_NodeView::Fresh_CO2_Node_List(WPARAM wParam, LPARAM lParam)
     temp_co2_min_value.Format(_T("%d"), product_register_value[132]);
     temp_co2_max_value.Format(_T("%d"), product_register_value[133]);
 
-    temp_temp_min_value.Format(_T("%d"), (short)product_register_value[128]);
-    temp_temp_max_value.Format(_T("%d"), (short)product_register_value[129]);
+    temp_temp_min_value.Format(_T("%.1f"), ((float)product_register_value[128])/10);
+    temp_temp_max_value.Format(_T("%.1f"), (float)product_register_value[129]/10);
 
-    temp_hum_min_value.Format(_T("%d"), product_register_value[130]);
-    temp_hum_max_value.Format(_T("%d"), product_register_value[131]);
+    temp_hum_min_value.Format(_T("%.1f"), ((float)product_register_value[130])/10);
+    temp_hum_max_value.Format(_T("%.1f"), ((float)product_register_value[131])/10);
 
     m_co2_node_list.SetItemText(ROW_CO2, CO2_NODE_MIN_VALUE, temp_co2_min_value);
     m_co2_node_list.SetItemText(ROW_TEMPERATURE, CO2_NODE_MIN_VALUE, temp_temp_min_value);

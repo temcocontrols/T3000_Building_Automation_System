@@ -66,6 +66,41 @@ int whois_encode_apdu(
     return apdu_len;
 }
 
+
+/* encode I-Am service  - use -1 for limit if you want unlimited */
+int shutdown_mstp_encode_apdu(
+    uint8_t * apdu,
+    int32_t low_limit,
+    int32_t high_limit,
+    uint8_t mstp_id,
+    uint8_t n_time)
+{
+    int len = 0;        /* length of each encoding */
+    int apdu_len = 0;   /* total length of the apdu, return value */
+
+    if (apdu) {
+        apdu[0] = PDU_TYPE_UNCONFIRMED_SERVICE_REQUEST;
+        apdu[1] = SERVICE_UNCONFIRMED_WHO_IS;   /* service choice */
+        apdu_len = 2;
+        /* optional limits - must be used as a pair */
+        if ((low_limit >= 0) && (low_limit <= BACNET_MAX_INSTANCE) &&
+            (high_limit >= 0) && (high_limit <= BACNET_MAX_INSTANCE)) {
+            len = encode_context_unsigned(&apdu[apdu_len], 0, low_limit);
+            apdu_len += len;
+            len = encode_context_unsigned(&apdu[apdu_len], 1, high_limit);
+            apdu_len += len;
+        }
+        apdu[apdu_len] = 0xDF;
+        apdu_len++;
+        apdu[apdu_len] = 0xFD;
+        apdu_len++;
+        apdu[apdu_len] = mstp_id;
+        apdu_len++;
+    }
+
+    return apdu_len;
+}
+
 /* decode the service request only */
 int whois_decode_service_request(
     uint8_t * apdu,

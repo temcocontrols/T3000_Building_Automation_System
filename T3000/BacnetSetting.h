@@ -123,6 +123,8 @@ public:
     CEdit m_network_zigbee;
     CEdit m_network_main;
     afx_msg void OnEnKillfocusEditSettingMstpId();
+    afx_msg void OnEnKillfocusEditSettingZeigbeePanid();
+    afx_msg void OnEnKillfocusEditSettingMaxMaster();
 };
 
 
