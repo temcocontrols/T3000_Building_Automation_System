@@ -26,7 +26,7 @@
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);  
 
 LPFN_ISWOW64PROCESS fnIsWow64Process;  
-const int g_versionNO= 20181206;
+const int g_versionNO= 20190222;
 
 
 #ifdef _DEBUG
@@ -66,7 +66,7 @@ CT3000App::CT3000App()
 #endif 
     //*******************************************************
     
-	T3000_Version = 20181206; //
+	T3000_Version = 20190222; //
 
 	m_lastinterface=19;
 }
@@ -412,7 +412,7 @@ BOOL CT3000App::InitInstance()
 			g_strDatabasefilepath=exeFullPath;//
 			g_strExePth=g_strDatabasefilepath;//
 
-
+            CreateDirectory(g_strExePth + _T("ResourceFile"), NULL);//creat database folder;//
             CString cs_update_folder;
             cs_update_folder = g_strDatabasefilepath + _T("Database") + _T("\\") + _T("Update");
             DeleteDirectory(cs_update_folder);

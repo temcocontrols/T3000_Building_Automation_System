@@ -670,7 +670,6 @@ void getLocalIp(void)
 
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-
     if (CFrameWndEx::OnCreate(lpCreateStruct) == -1)
         return -1;
 
@@ -699,7 +698,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     UINT uiMenuID;
 
     uiToolbarHotID =  IDB_BITMAP7 ;
-    uiToolbarColdID = IDB_BITMAP7 ;
+    uiToolbarColdID = IDB_BITMAP7;
     uiMenuID =	IDB_BITMAP_BACNET_MENU_BIT ;//
 	
 
@@ -1867,7 +1866,8 @@ void CMainFrame::LoadProductFromDB()
 				else if(z == REMOTE_CONNECTION)
 				{
 					temp_cs.Format(_T("%u"),PROTOCOL_REMOTE_IP);
-					strSql.Format(_T("select * from ALL_NODE where Building_Name = '%s' and Protocol = '%s'"),strBuilding,temp_cs);
+					//strSql.Format(_T("select * from ALL_NODE where Building_Name = '%s' and Protocol = '%s'"),strBuilding,temp_cs);
+                    strSql.Format(_T("select * from ALL_NODE where Building_Name = '%s'"), strBuilding);
 				}
 
 				q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
@@ -3764,6 +3764,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 {
     if(SCAN_TIMER==nIDEvent)
     {
+
         CString strTemp;
         if(m_bScanFinished)
         {
@@ -6477,7 +6478,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 set_offline_mode(offline_mode);
             }
             //if(1)//GSM  模块
-            if((m_product.at(i).protocol != MODBUS_BACNET_MSTP) && (m_product.at(i).protocol != PROTOCOL_GSM) && (m_product.at(i).protocol != PROTOCOL_REMOTE_IP)&&(m_product.at(i).protocol!=MODBUS_RS485))
+            if((m_product.at(i).protocol != MODBUS_BACNET_MSTP) && 
+                (m_product.at(i).protocol != PROTOCOL_GSM) && 
+                (m_product.at(i).protocol != PROTOCOL_REMOTE_IP)&&
+                (m_product.at(i).protocol!=MODBUS_RS485))
             {
                 if((!m_product.at(i).BuildingInfo.strIp.IsEmpty()) && (m_product.at(i).protocol != PROTOCOL_MSTP_TO_MODBUS))
                 {
@@ -8442,20 +8446,21 @@ end_condition :
         if(db_exsit)	//数据库存在，就查看是否要更新;
         {
             //如果是BIP 转MSTP 对已经存在的 不作刷新动作;  //需解决的问题是 已经存在的 子设备 如何刷新？
-            if (m_refresh_net_device_data.at(y).nprotocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)
-            {
-                continue;
-            }
+            //if (m_refresh_net_device_data.at(y).nprotocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)
+            //{
+            //    continue;
+            //}
             if((m_refresh_net_device_data.at(y).ip_address.CompareNoCase(m_product.at(n_index).BuildingInfo.strIp) != 0) ||
                     (m_refresh_net_device_data.at(y).NetCard_Address.CompareNoCase(m_product.at(n_index).NetworkCard_Address) != 0) ||
                     (m_refresh_net_device_data.at(y).nport != m_product.at(n_index).ncomport) ||
 					(m_refresh_net_device_data.at(y).product_id != m_product.at(n_index).product_class_id) ||
                     (m_refresh_net_device_data.at(y).modbusID != m_product.at(n_index).product_id) ||
                     (m_refresh_net_device_data.at(y).parent_serial_number != m_product.at(n_index).note_parent_serial_number) ||
-                    ((m_product.at(n_index).protocol != MODBUS_TCPIP) && (m_product.at(n_index).protocol != PROTOCOL_BACNET_IP) && (m_product.at(n_index).protocol != PROTOCOL_BIP_TO_MSTP)) ||
+                    //((m_product.at(n_index).protocol != MODBUS_TCPIP) && (m_product.at(n_index).protocol != PROTOCOL_BACNET_IP) && (m_product.at(n_index).protocol != PROTOCOL_BIP_TO_MSTP)) ||
+                    (m_refresh_net_device_data.at(y).nprotocol!= m_product.at(n_index).protocol ) ||
                     ((m_refresh_net_device_data.at(y).panal_number != m_product.at(n_index).panel_number) && (m_refresh_net_device_data.at(y).panal_number != 0)) ||
                     ((m_refresh_net_device_data.at(y).object_instance != m_product.at(n_index).object_instance) && (m_refresh_net_device_data.at(y).object_instance != 0)) ||
-                    ((m_refresh_net_device_data.at(y).show_label_name.CompareNoCase(m_product.at(n_index).NameShowOnTree) != 0)&& (!m_refresh_net_device_data.at(y).show_label_name.IsEmpty())) ||
+                    ((m_refresh_net_device_data.at(y).show_label_name.CompareNoCase(m_product.at(n_index).NameShowOnTree) != 0)&& (!m_refresh_net_device_data.at(y).show_label_name.IsEmpty()) && (m_refresh_net_device_data.at(y).nprotocol != PROTOCOL_BIP_T0_MSTP_TO_MODBUS) ) ||
 					(  abs((float)(m_refresh_net_device_data.at(y).sw_version - m_product.at(n_index).software_version*10)) >= 1 ) )
             {
 
@@ -8512,6 +8517,13 @@ end_condition :
                         CString temp_pro;
                         temp_pro.Format(_T("%u"),PROTOCOL_BIP_TO_MSTP);
                         strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s', Product_class_ID = '%s', Object_Instance = '%s' , Panal_Number = '%s' , Bautrate ='%s',Software_Ver = '%s' , Com_Port ='%s',Product_ID ='%s', Protocol ='%s',Product_name = '%s',Online_Status = 1 ,Parent_SerialNum = '%s' where Serial_ID = '%s'"),NetwordCard_Address,temp_product_class_id,str_object_instance,str_panel_number,str_ip_address_exist,str_fw_version,str_n_port,str_modbus_id,temp_pro,str_Product_name_view,str_parents_serial,str_serialid);
+                    }
+                    else if (m_refresh_net_device_data.at(y).nprotocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)
+                    {
+                        CString temp_pro;
+                        temp_pro.Format(_T("%u"), PROTOCOL_BIP_T0_MSTP_TO_MODBUS);
+                        strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s', Product_class_ID = '%s', Object_Instance = '%s' , Panal_Number = '%s' , Bautrate ='%s',Software_Ver = '%s' , Com_Port ='%s',Product_ID ='%s', Protocol ='%s',Online_Status = 1 ,Parent_SerialNum = '%s' where Serial_ID = '%s'"), NetwordCard_Address, temp_product_class_id, str_object_instance, str_panel_number, str_ip_address_exist, str_fw_version, str_n_port, str_modbus_id, temp_pro, str_parents_serial, str_serialid);
+
                     }
                     else
                         strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s', Product_class_ID = '%s', Object_Instance = '%s' , Panal_Number = '%s' ,  Bautrate ='%s',Software_Ver = '%s' ,Com_Port ='%s',Product_ID ='%s', Protocol ='1',Product_name = '%s',Online_Status = 1,Parent_SerialNum = '%s' where Serial_ID = '%s'"),NetwordCard_Address,temp_product_class_id,str_object_instance,str_panel_number,str_ip_address_exist,str_fw_version,str_n_port,str_modbus_id,str_Product_name_view,str_parents_serial,str_serialid);
@@ -8624,25 +8636,25 @@ end_condition :
 			}
             else if (m_refresh_net_device_data.at(y).nprotocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)
             {
-                if (initial_bip == true)
-                {
-                    nret_read_bac = GetPrivateBacnetToModbusData(m_refresh_net_device_data.at(y).object_instance, 0, 100, mstp_array);
-                    if (nret_read_bac == 100)
-                    {
-                        product_class_id.Format(_T("%d"), mstp_array[7]);
+                //if (initial_bip == true)
+                //{
+                //    nret_read_bac = GetPrivateBacnetToModbusData(m_refresh_net_device_data.at(y).object_instance, 0, 100, mstp_array);
+                //    if (nret_read_bac == 100)
+                //    {
+                //        product_class_id.Format(_T("%d"), mstp_array[7]);
                         //序列号这里肯定还有问题 ，因为客户的instance 可能会认为更改;
                         //str_serialid.Format(_T("%u"), mstp_array[0] + mstp_array[1] * 256 + mstp_array[2] * 256 * 256 + mstp_array[3] * 256 * 256 * 256);
                         CString temp_pro4;
                         temp_pro4.Format(_T("%u"), PROTOCOL_BIP_T0_MSTP_TO_MODBUS);
                         strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('" + m_strCurMainBuildingName + "','" + m_strCurSubBuldingName + "','" + NetwordCard_Address + "','" + str_serialid + "','floor1','room1','" + product_name + "','" + product_class_id + "','" + modbusid + "','""','" + str_ip_address + "','T3000_Default_Building_PIC.bmp','" + str_hw_version + "','" + str_fw_version + "','" + str_n_port + "','0','" + temp_pro4 + "','1','" + str_parents_serial + "' ,'" + str_panel_number + "' ,'" + str_object_instance + "' ,'" + is_custom + "' )"));
-                    }
-                    else if (nret_read_bac < 0)
-                    {
-                        g_Print.Format(_T("Read instance %u ,  MSTP TO MODBUS  0 - 100   timeout!"), m_refresh_net_device_data.at(y).object_instance);
-                        DFTrace(g_Print);
-                    }
+                //    }
+                //    else if (nret_read_bac < 0)
+                //    {
+                //        g_Print.Format(_T("Read instance %u ,  MSTP TO MODBUS  0 - 100   timeout!"), m_refresh_net_device_data.at(y).object_instance);
+                //        DFTrace(g_Print);
+                 //   }
 
-                }
+                //}
 
             }
             else
@@ -8908,7 +8920,10 @@ BOOL CALLBACK enum3Dinstall_two(HWND   hwnd,   LPARAM   lParam)
 
 UINT _FreshTreeView(LPVOID pParam )
 {
-    
+//#ifdef DEBUG
+//    return 1;
+//#endif // DEBUG
+
     CString g_strT3000LogString;
     CMainFrame* pMain = (CMainFrame*)pParam;
     int int_refresh_com = 0;
@@ -10226,6 +10241,37 @@ void CMainFrame::OnControlMain()
 
 void CMainFrame::OnControlInputs()
 {
+#if 0
+    m_testtoolbar.RemoveAllButtons();
+   // CMFCToolBar::ResetAllImages();
+
+    CMFCPopupMenu::SetForceMenuFocus(FALSE);
+    CMFCToolBar::SetSizes(CSize(32, 32), CSize(32, 32));
+    CMFCToolBar::SetMenuSizes(CSize(32, 32), CSize(24, 24));
+
+    UINT uiToolbarHotID;
+    UINT uiToolbarColdID;
+    UINT uiMenuID;
+
+    uiToolbarHotID = IDB_BITMAP_TOOLBAR_DISABLE;
+    uiToolbarColdID = IDB_BITMAP_TOOLBAR_DISABLE;
+    uiMenuID = IDB_BITMAP_BACNET_MENU_BIT;//
+
+
+
+    if (!m_testtoolbar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP | CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC, CRect(1, 1, 1, 1), IDR_TOOLBAR_BACNET) ||
+        !m_testtoolbar.LoadToolBar(IDR_TOOLBAR_BACNET, uiToolbarColdID, uiMenuID, FALSE /* Not locked */, IDB_BITMAP_TOOLBAR_DISABLE, 0, uiToolbarHotID))
+
+    {
+        TRACE0("Failed to create toolbar\n");
+        return ;//fail to create
+    }
+
+
+    m_wndToolBar.RedrawWindow();
+
+    return;
+#endif
     g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
 
     //if (g_protocol == PROTOCOL_MSTP_TO_MODBUS)
@@ -12963,6 +13009,15 @@ void CMainFrame::Reset_Window_Pos()
 				}
 			}
 			break;
+        case TYPE_ALARMLOG:
+            if (((CBacnetAlarmLog *)pDialog[WINDOW_ALARMLOG]) != NULL)
+            {
+                if (((CBacnetAlarmLog *)pDialog[WINDOW_ALARMLOG])->IsWindowVisible())
+                {
+                    ((CBacnetAlarmLog *)pDialog[WINDOW_ALARMLOG])->Reset_Alarm_Rect();
+                }
+            }
+            break;
 		default:
 			break;
 		}

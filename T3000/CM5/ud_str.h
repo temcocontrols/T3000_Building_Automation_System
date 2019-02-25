@@ -821,6 +821,8 @@ typedef union
          unsigned char sync_time_results;      //与时间服务器同步的结果 0 失败         1成功   注：只有在 reset_default 写99 要求同步后才去读次位用以判断同步结果;
          //unsigned char network_ID[3];   //三个口 用于编程的ID；
          unsigned char mstp_id;         //MSTP_ID
+         unsigned short zigbee_panid;
+         unsigned char max_master; //可设置的最大matser值  245 个
 	}reg;
 }Str_Setting_Info;
 
@@ -1006,7 +1008,7 @@ typedef struct
 	uint8_t count;//              : 8;
 	uint8_t read_write;//         : 2;    0 - read only 1- written
 	uint8_t time_remaining ;//          : 2; //远程点 剩余生命周期
-
+    uint32_t object_instance;
 } Str_remote_point; /* 1+5+4+2+2=14 bytes */
 
 

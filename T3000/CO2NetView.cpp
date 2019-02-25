@@ -1657,7 +1657,7 @@ void CCO2NetView::Initial_OutputList()
 		m_output_list.SetItemText(2,4,strTemp);
 
 		AddressValue =1260 - 1250;
-		strTemp.Format(_T("%0.1f"),(float)(short)(TempDataArray[AddressValue])/10.0);
+		strTemp.Format(_T("%d"),(unsigned short)(TempDataArray[AddressValue]));
 		m_output_list.SetItemText(2,5,strTemp);
  
 
@@ -1738,7 +1738,7 @@ void CCO2NetView::Initial_OutputList()
 		}
 		else if (output_range==3)
 		{
-			Temp=((float)((short)TempDataArray[3067] - 3060));
+			Temp=((float)((short)TempDataArray[3067 - 3060]));
 			Vtemp=(Temp)/100;
 			strTemp.Format(_T("%.2f ma"),Vtemp);
 		}
@@ -1824,7 +1824,8 @@ void CCO2NetView::Initial_VarList()
 		MODBUS_MIX_RATIO= 489;  //unit.g/kg
 		MODBUS_ENTHALPY= 490;  //unit.kJ/kg
 	}
-	else if (product_register_value[7] == STM32_CO2_RS485)
+	else if ((product_register_value[7] == STM32_CO2_RS485) ||
+              (product_register_value[7] == STM32_CO2_NET))
 	{
 		MODBUS_CF	=	201;
 		MODBUS_DEW_PT = 3049;   //unit.C
@@ -1842,7 +1843,12 @@ void CCO2NetView::Initial_VarList()
 		MODBUS_ENTHALPY= MODBUS_DEW_PT +4;  //unit.kJ/kg
 	}
 	Read_Multi(g_tstat_id,TempDataArray,MODBUS_DEW_PT,100);
-	if (product_register_value[7] == PM_HUMTEMPSENSOR||product_register_value[7] == PM_AirQuality||product_register_value[7]==PM_HUM_R||product_register_value[7] == STM32_CO2_RS485)
+	if (product_register_value[7] == PM_HUMTEMPSENSOR||
+        product_register_value[7] == PM_AirQuality||
+        product_register_value[7]==PM_HUM_R||
+        product_register_value[7] == STM32_CO2_RS485 ||
+        product_register_value[7] == STM32_CO2_NET
+        )
 	{
 		m_user_list.SetItemText(0,1,_T("Dew Point"));
 

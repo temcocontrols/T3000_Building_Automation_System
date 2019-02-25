@@ -22,6 +22,7 @@ public:
 	virtual bool PingDevice(HTREEITEM hItem) ;
 	bool HandleAddVirtualDevice(HTREEITEM);
 	bool HandleAddCustomDevice(HTREEITEM hItem);
+    bool HandleAddRemoteDevice(HTREEITEM);
      virtual bool    DoDeleteItem(HTREEITEM);
 
 	

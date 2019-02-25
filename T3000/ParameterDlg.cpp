@@ -3013,7 +3013,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
         if(product_register_value[382]>=5&&product_register_value[382]<=14) // input1
         {
 
-            strTemp=m_tstat_input_data.at(product_register_value[382]-5).Value.StrValue + m_tstat_input_data.at(product_register_value[382]-5).Unit.StrValue;
+            strTemp=m_tstat_input_data.at(product_register_value[382]-5 + 1).Value.StrValue + m_tstat_input_data.at(product_register_value[382]-5 + 1).Unit.StrValue;
             m_inputvalue1.SetWindowText(strTemp);
         }
         //else if(product_register_value[382]==6) // input2 //m_inputvalue1
@@ -3224,7 +3224,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
         if(product_register_value[383]>=5&&product_register_value[383]<=14) // input1
         {
 
-            strTemp=m_tstat_input_data.at(product_register_value[383]-5).Value.StrValue + m_tstat_input_data.at(product_register_value[383]-5).Unit.StrValue;
+            strTemp=m_tstat_input_data.at(product_register_value[383]-5 + 1).Value.StrValue + m_tstat_input_data.at(product_register_value[383]-5 + 1).Unit.StrValue;
             m_inputValue2.SetWindowText(strTemp);
         }
         else
@@ -4603,7 +4603,7 @@ void CParameterDlg::ShowPID3()
         if(product_register_value[RegAddress]>=5&&product_register_value[RegAddress]<=14) // input1
         {
 
-            strTemp=m_tstat_input_data.at(product_register_value[RegAddress]-5).Value.StrValue + m_tstat_input_data.at(product_register_value[RegAddress]-5).Unit.StrValue;
+            strTemp=m_tstat_input_data.at(product_register_value[RegAddress]-5 + 1).Value.StrValue + m_tstat_input_data.at(product_register_value[RegAddress]-5 + 1).Unit.StrValue;
             m_inputValue3.SetWindowText(strTemp);
         }
         else

@@ -132,6 +132,8 @@ BEGIN_MESSAGE_MAP(CBacnetSetting, CDialogEx)
     ON_EN_KILLFOCUS(IDC_EDIT_NETWORK_ZIGBEE, &CBacnetSetting::OnEnKillfocusEditNetworkZigbee)
     ON_EN_KILLFOCUS(IDC_EDIT_NETWORK_MAIN, &CBacnetSetting::OnEnKillfocusEditNetworkMain)
    // ON_EN_KILLFOCUS(IDC_EDIT_SETTING_MSTP_ID, &CBacnetSetting::OnEnKillfocusEditSettingMstpId)
+    ON_EN_KILLFOCUS(IDC_EDIT_SETTING_ZEIGBEE_PANID, &CBacnetSetting::OnEnKillfocusEditSettingZeigbeePanid)
+    ON_EN_KILLFOCUS(IDC_EDIT_SETTING_MAX_MASTER, &CBacnetSetting::OnEnKillfocusEditSettingMaxMaster)
 END_MESSAGE_MAP()
 
 
@@ -796,9 +798,6 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
                 ((CButton *)GetDlgItem(IDC_CHECK_SETTING_DYNDNS))->SetCheck(false);
                 }
 
-
-
-
                 ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->ResetContent();
                 ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->AddString(DDNS_Server_Name[0]);
                 ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->AddString(DDNS_Server_Name[1]);
@@ -869,11 +868,14 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
             {
                 ((CButton *)GetDlgItem(IDC_BUTTON_BAC_SHOW_ZIGBEE))->EnableWindow(TRUE);
                 GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1)->EnableWindow(TRUE);
+                ((CEdit *)GetDlgItem(IDC_EDIT_SETTING_ZEIGBEE_PANID))->EnableWindow(TRUE);
+                
             }
             else
             {
                 ((CButton *)GetDlgItem(IDC_BUTTON_BAC_SHOW_ZIGBEE))->EnableWindow(FALSE);
                 GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1)->EnableWindow(FALSE);
+                ((CEdit *)GetDlgItem(IDC_EDIT_SETTING_ZEIGBEE_PANID))->EnableWindow(FALSE);
             }
 
             if (Device_Basic_Setting.reg.LCD_Display == 0)
@@ -1251,7 +1253,15 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 			((CEdit *)GetDlgItem(IDC_EDIT_SETTING_MSTP_NETWORK))->SetWindowTextW(temp_mstp_network);
 			((CEdit *)GetDlgItem(IDC_EDIT_SETTING_BIP_NETWORK2))->SetWindowTextW(temp_bip_network);
 			((CEdit *)GetDlgItem(IDC_EDIT_SETTING_MODBUS_ID))->SetWindowTextW(temp_modbus_id);
-            //((CEdit *)GetDlgItem(IDC_EDIT_SETTING_MSTP_ID))->SetWindowTextW(temp_mstp_id);
+
+            CString cszigbeeanid;
+            cszigbeeanid.Format(_T("%d"), Device_Basic_Setting.reg.zigbee_panid);
+            ((CEdit *)GetDlgItem(IDC_EDIT_SETTING_ZEIGBEE_PANID))->SetWindowTextW(cszigbeeanid);
+            
+            CString csmax_master;
+            csmax_master.Format(_T("%u"), Device_Basic_Setting.reg.max_master);
+            ((CEdit *)GetDlgItem(IDC_EDIT_SETTING_MAX_MASTER))->SetWindowTextW(csmax_master);
+            
 		}
 		break;
 	case TIME_COMMAND:
@@ -2660,114 +2670,88 @@ void CBacnetSetting::OnBnClickedRadioSettingLcdOff()
 void CBacnetSetting::OnEnKillfocusEditNetworkSub()
 {
     // TODO: 在此添加控件通知处理程序代码
-    //CString temp_cstring;
-    //m_network_sub.GetWindowTextW(temp_cstring);
-    //int temp_value = 0;
-    //temp_value = _wtoi(temp_cstring);
-    //if ((temp_value <= 0) || (temp_value >= 255))
-    //{
-    //    SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Network data is invalid!"));
-    //}
-
-    //Device_Basic_Setting.reg.network_ID[0] = temp_value;
-
-    //if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
-    //{
-    //    SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change the sub network ID failed!"));
-    //    memset(Device_Basic_Setting.reg.dyndns_user, 0, DYNDNS_MAX_USERNAME_SIZE);
-    //    PostMessage(WM_FRESH_CM_LIST, READ_SETTING_COMMAND, NULL);
-    //}
-    //else
-    //{
-    //    SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change the sub network ID success!"));
-    //}
+ 
 }
 
 
 void CBacnetSetting::OnEnKillfocusEditNetworkZigbee()
 {
     // TODO: 在此添加控件通知处理程序代码
-    //CString temp_cstring;
-    //m_network_zigbee.GetWindowTextW(temp_cstring);
-    //int temp_value = 0;
-    //temp_value = _wtoi(temp_cstring);
-    //if ((temp_value <= 0) || (temp_value >= 255))
-    //{
-    //    SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Network data is invalid!"));
-    //}
-
-    //Device_Basic_Setting.reg.network_ID[1] = temp_value;
-
-    //if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
-    //{
-    //    SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change the second network ID failed!"));
-    //    memset(Device_Basic_Setting.reg.dyndns_user, 0, DYNDNS_MAX_USERNAME_SIZE);
-    //    PostMessage(WM_FRESH_CM_LIST, READ_SETTING_COMMAND, NULL);
-    //}
-    //else
-    //{
-    //    SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change the second network ID success!"));
-    //}
+ 
 }
 
 
 void CBacnetSetting::OnEnKillfocusEditNetworkMain()
 {
     // TODO: 在此添加控件通知处理程序代码
-    //CString temp_cstring;
-    //m_network_main.GetWindowTextW(temp_cstring);
-    //int temp_value = 0;
-    //temp_value = _wtoi(temp_cstring);
-    //if ((temp_value <= 0) || (temp_value >= 255))
-    //{
-    //    SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Network data is invalid!"));
-    //}
-
-    //Device_Basic_Setting.reg.network_ID[2] = temp_value;
-
-    //if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
-    //{
-    //    SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change the main network ID failed!"));
-    //    memset(Device_Basic_Setting.reg.dyndns_user, 0, DYNDNS_MAX_USERNAME_SIZE);
-    //    PostMessage(WM_FRESH_CM_LIST, READ_SETTING_COMMAND, NULL);
-    //}
-    //else
-    //{
-    //    SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change the main network ID success!"));
-    //}
+ 
 }
 
-//
-//void CBacnetSetting::OnEnKillfocusEditSettingMstpId()
-//{
-//    // TODO: 在此添加控件通知处理程序代码
-//   // BACNET_COMMUNICATION_ENABLE_DISABLE test123;
-//    
-//   // Send_Device_Communication_Control_Request(g_bac_instance, 12345, MAX_BACNET_COMMUNICATION_ENABLE_DISABLE, "123");
-//    CString temp_cstring;
-//    GetDlgItem(IDC_EDIT_SETTING_MSTP_ID)->GetWindowTextW(temp_cstring);
-//    unsigned int temp_mstp_id = unsigned int(_wtoi(temp_cstring));
-//
-//        CString temp_warning;
-//        temp_warning.Format(_T("Do you really want to change the MSTP ID to %u ?"), temp_mstp_id);
-//        if (IDYES == MessageBox(temp_warning, _T("Notoce"), MB_YESNO))
-//        {
-//            unsigned int old_mstp_id = Device_Basic_Setting.reg.mstp_id;	//写之前先保存起来；写失败 恢复原值;
-//            Device_Basic_Setting.reg.mstp_id = (unsigned int)temp_mstp_id;
-//            if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
-//            {
-//                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change MSTP ID failed!"));
-//                Device_Basic_Setting.reg.object_instance = old_mstp_id;
-//                PostMessage(WM_FRESH_CM_LIST, READ_SETTING_COMMAND, NULL);
-//            }
-//            else
-//            {
-//                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change MSTP ID success!"));
-//            }
-//        }
-//        else
-//        {
-//            PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//这里调用 刷新线程重新刷新会方便一点;
-//        }
-//    
-//}
+
+void CBacnetSetting::OnEnKillfocusEditSettingZeigbeePanid()
+{
+    // TODO: 在此添加控件通知处理程序代码
+
+    CString temp_cstring;
+    ((CEdit *)GetDlgItem(IDC_EDIT_SETTING_ZEIGBEE_PANID))->GetWindowTextW(temp_cstring);
+    int temp_panid = _wtoi(temp_cstring);
+    if ((temp_panid >0) && (temp_panid <65535) && (temp_panid != Device_Basic_Setting.reg.zigbee_panid))
+    {
+        CString temp_warning;
+        temp_warning.Format(_T("Do you really want to change the zigbee pan ID to %u ?"), temp_panid);
+        if (IDYES == MessageBox(temp_warning, _T("Notoce"), MB_YESNO))
+        {
+            unsigned short old_panid = Device_Basic_Setting.reg.zigbee_panid;	//写之前先保存起来；写失败 恢复原值;
+            Device_Basic_Setting.reg.zigbee_panid = (unsigned short)temp_panid;
+            if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change zigbee Pan id failed!"));
+                Device_Basic_Setting.reg.zigbee_panid = old_panid;
+                PostMessage(WM_FRESH_CM_LIST, READ_SETTING_COMMAND, NULL);
+            }
+            else
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change zigbee Pan id success!"));
+            }
+        }
+    }
+}
+
+
+void CBacnetSetting::OnEnKillfocusEditSettingMaxMaster()
+{
+    // TODO: 在此添加控件通知处理程序代码
+
+    CString temp_cstring;
+    GetDlgItemTextW(IDC_EDIT_SETTING_MAX_MASTER, temp_cstring);
+    unsigned int temp_max_master = unsigned int(_wtoi(temp_cstring));
+    if ((temp_max_master<1) || (temp_max_master >255))
+    {
+        MessageBox(_T("Invalid value."));
+        return;
+    }
+    if ((temp_max_master >0) && (temp_max_master <= 254) && (temp_max_master != Device_Basic_Setting.reg.max_master))
+    {
+        CString temp_warning;
+        temp_warning.Format(_T("Do you really want to change the max master to %u ?"), temp_max_master);
+        if (IDYES == MessageBox(temp_warning, _T("Notoce"), MB_YESNO))
+        {
+            unsigned char old_max_master = Device_Basic_Setting.reg.max_master;	//写之前先保存起来；写失败 恢复原值;
+            Device_Basic_Setting.reg.max_master = (unsigned char)temp_max_master;
+            if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change max master failed!"));
+                Device_Basic_Setting.reg.max_master = old_max_master;
+                PostMessage(WM_FRESH_CM_LIST, READ_SETTING_COMMAND, NULL);
+            }
+            else
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change max master success!"));
+            }
+        }
+        else
+        {
+            PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//这里调用 刷新线程重新刷新会方便一点;
+        }
+    }
+}

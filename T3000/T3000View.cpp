@@ -3841,8 +3841,8 @@ void CT3000View::OnCbnSelchangeFanspeedcombo()
     CMainFrame* pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
 
     //»Ö¸´T3000Ö÷Ïß³Ì
-    pMain->m_pFreshMultiRegisters->SuspendThread();
-    pMain->m_pRefreshThread->SuspendThread();
+    //pMain->m_pFreshMultiRegisters->SuspendThread();
+    //pMain->m_pRefreshThread->SuspendThread();
 
 //
 //int ret=0;
@@ -3856,8 +3856,12 @@ void CT3000View::OnCbnSelchangeFanspeedcombo()
     int ret=write_one(g_tstat_id, MODBUS_FAN_SPEED,sel);
     if (ret>0)
     {
-
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Set fan speed success!"));
         product_register_value[MODBUS_FAN_SPEED]=sel;
+    }
+    else
+    {
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Set fan speed failed!"));
     }
     /*m_FanComBox.SetCurSel(0);*/
 // 		}
@@ -3901,8 +3905,8 @@ void CT3000View::OnCbnSelchangeFanspeedcombo()
 		int sel = m_FanComBox.GetCurSel();
 
 	}
-    pMain->m_pFreshMultiRegisters->ResumeThread();
-    pMain->m_pRefreshThread->ResumeThread();//
+    //pMain->m_pFreshMultiRegisters->ResumeThread();
+    //pMain->m_pRefreshThread->ResumeThread();//
 }
 
 

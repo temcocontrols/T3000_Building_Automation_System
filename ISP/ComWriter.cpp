@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "ComWriter.h"
 #include "ISPDlg.h"
-
+extern unsigned int n_check_temco_firmware;
 extern bool auto_flash_mode;
 extern CString g_strFlashInfo;
  extern Bin_Info        global_fileInfor;
@@ -1524,7 +1524,8 @@ BOOL CComWriter::UpdataDeviceInformation_ex(unsigned short device_productID)
     CString hexproductname=_T("");
     //  int ret=read_multi(ID,&Device_infor[0],0,10);
 
-
+    if (n_check_temco_firmware == 0)
+        return 1;
 
     CString prodcutname=GetProductName(device_productID);
 	if (device_productID == 255 || device_productID == 0)
@@ -1611,6 +1612,8 @@ BOOL CComWriter::UpdataDeviceInformation_ex(unsigned short device_productID)
 
 BOOL CComWriter::UpdataDeviceInformation(int& ID)
 {
+    if (n_check_temco_firmware == 0)
+        return 1;
     CString strtips;
     unsigned short Device_infor[10];
     CString str_ret,temp;
@@ -1642,10 +1645,11 @@ BOOL CComWriter::UpdataDeviceInformation(int& ID)
 		return TRUE;
 	}
 	 
+    
 
     CString prodcutname=GetProductName(Device_infor[7]);
 
- 
+    
 
 
     MultiByteToWideChar(CP_ACP, 0, (char *)global_fileInfor.product_name,

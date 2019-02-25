@@ -2,7 +2,7 @@
 #include "HexFileParser.h"
 #include "global_function.h"
 
-
+extern unsigned int n_check_temco_firmware;
 extern bool auto_flash_mode;
  extern Bin_Info        global_fileInfor;
 CHexFileParser::CHexFileParser(void)
@@ -75,6 +75,8 @@ int  CHexFileParser::GetHexFileBuffer(char* pBuf, int nLen)
 		Temco_logo.GetBuffer(MAX_PATH), MAX_PATH );
 	Temco_logo.ReleaseBuffer();		
 	Temco_logo.MakeUpper();
+    if (n_check_temco_firmware == 0)
+        return nBufLen;
 	if(Temco_logo.CompareNoCase(_T("TEMCO")) != 0&&Temco_logo.Find(L"CO2")==-1)
 	{
 		//return NO_VERSION_INFO;

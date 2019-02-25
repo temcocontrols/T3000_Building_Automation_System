@@ -21,6 +21,7 @@ enum ECmdHandler {
 	ID_PING_CMD,
 	ID_ADD_VIRTUAL_DEVICE,
 	ID_ADD_CUSTOM_DEVICE,
+    ID_ADD_REMOTE_DEVICE,
 	ID_MAX_CMD
 };
 
@@ -142,6 +143,7 @@ CImageTreeCtrl::CImageTreeCtrl()
 	m_Commandmap[ID_PING_CMD]		        = &CImageTreeCtrl::PingDevice;
 	m_Commandmap[ID_ADD_VIRTUAL_DEVICE]     = &CImageTreeCtrl::HandleAddVirtualDevice;
 	m_Commandmap[ID_ADD_CUSTOM_DEVICE]      = &CImageTreeCtrl::HandleAddCustomDevice;
+    m_Commandmap[ID_ADD_REMOTE_DEVICE] =      &CImageTreeCtrl::HandleAddRemoteDevice;
 	old_hItem = NULL;
 	m_serial_number = 0;
 	is_focus = false;
@@ -254,6 +256,17 @@ bool CImageTreeCtrl::HandleAddCustomDevice(HTREEITEM hItem)
 	popdlg.DoModal();
 	return true;
 }
+
+#include "BacnetAddRemoteDevice.h"
+bool CImageTreeCtrl::HandleAddRemoteDevice(HTREEITEM)
+{
+    CBacnetAddRemoteDevice RemoteDlg;
+    RemoteDlg.DoModal();
+    CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+    ::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING, 0, 0);
+    return true;
+}
+
 bool CImageTreeCtrl::SortByConnection(HTREEITEM hItem) 
 {
 	if(product_sort_way != SORT_BY_CONNECTION)
@@ -1674,6 +1687,7 @@ void CImageTreeCtrl::DisplayContextOtherMenu(CPoint & point) {
 		VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_CONNECTION, _T("Sort By Connection")));
         VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_FLOOR, _T("Sort By Floor")));
         VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_CUSTOM_DEVICE, _T("Add Custom Device")));
+        VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_REMOTE_DEVICE, _T("Add Remote Device")));
 
         if ((m_virtual_tree_item != NULL) && (hItem == m_virtual_tree_item))
         {

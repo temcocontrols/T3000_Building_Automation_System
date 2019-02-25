@@ -231,7 +231,7 @@ const int READ_DIGITAL = 2;
 
 const COLORREF LIST_ITEM_CHANGED_BKCOLOR = RGB(255, 0, 0);
 const COLORREF LIST_ITEM_DEFAULT_BKCOLOR = GetSysColor(COLOR_WINDOW);
-const COLORREF LIST_ITEM_DEFAULT_BKCOLOR_GRAY = RGB(235, 235, 235);
+const COLORREF LIST_ITEM_DEFAULT_BKCOLOR_GRAY = RGB(225, 225, 225);
 const COLORREF LIST_ITEM_SELECTED = RGB(150, 150, 200);
 
 const bool REFRESH_ON_ITEM = TRUE;
@@ -354,7 +354,7 @@ const int BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER = 8;
 const int BAC_VARIABLE_CUS_UNIT_GROUP_NUMBER = 5;
 
 const int BAC_READ_GRPHIC_LABEL_GROUP_NUMBER = 6;
-const int BAC_REMOTE_POINT_GROUP_NUMBER = 25;
+const int BAC_REMOTE_POINT_GROUP_NUMBER = 20;
 const int BAC_ALALOG_CUSTMER_RANGE_TABLE_GROUP_NUMBER = 1;
 
 
@@ -1383,7 +1383,7 @@ const CString Building_Baudrate[] =
 #define  DEFAULT_PRG_COMMAND_COLOR		RGB(0,0,130)
 #define  DEFAULT_PRG_FUNCTION_COLOR		RGB(4,135,255)
 #define  DEFAULT_PRG_ERROR_LABEL_COLOR	RGB(255,0,0)
-
+#define  DEFAULT_PRG_LOCAL_VAR_COLOR    RGB(111, 111, 111)
 
 const CString Program_Fonts[] =
 {
@@ -2016,3 +2016,41 @@ const int SD_STATUS_NORMAL = 2;
 const int SD_STATUS_FILESYSTEM_ERROR = 3;
 
 typedef map<int, int> panelname_map;
+
+const CString RegisterView_Format[] =
+{
+    _T("Data_Format"),
+    _T("8 Bit Unsigned Integer"),
+    _T("8 Bit Signed Integer"),
+    _T("16 Bit Unsigned Integer"),
+    _T("16 Bit Signed Integer"),
+    _T("32 Bit Unsigned Integer HI_LO"),
+    _T("32 Bit Unsigned Integer LO_HI"),
+    _T("32 Bit Signed Integer HI_LO"),
+    _T("32 Bit Signed Integer LO_HI"),
+    _T("Floating HI_LO / 10"),
+    _T("Floating LO_HI / 10"),
+    _T("Floating HI_LO / 100"),
+    _T("Floating LO_HI / 100"),
+    _T("Floating HI_LO / 1000"),
+    _T("Floating LO_HI / 1000"),
+    _T("Character String HI_LO"),
+    _T("Character String LO_HI")
+};
+const int REGISTER_UNKNOWN = 0;
+const int REGISTER_8_BIT_UNSIGNED_INTEGER = 1;
+const int REGISTER_8_BIT_SIGNED_INTEGER = 2;
+const int REGISTER_16_BIT_UNSIGNED_INTEGER = 3;
+const int REGISTER_16_BIT_SIGNED_INTEGER = 4;
+const int REGISTER_32_BIT_UNSIGNED_INTEGER_HI_LO = 5;
+const int REGISTER_32_BIT_UNSIGNED_INTEGER_LO_HI = 6;
+const int REGISTER_32_BIT_SIGNED_INTEGER_HI_LO = 7;
+const int REGISTER_32_BIT_SIGNED_INTEGER_LO_HI = 8;
+const int REGISTER_FLOATING_HI_LO_DIV_10 = 9;
+const int REGISTER_FLOATING_LO_HI_DIV_10 = 10;
+const int REGISTER_FLOATING_HI_LO_DIV_100 = 11;
+const int REGISTER_FLOATING_LO_HI_DIV_100 = 12;
+const int REGISTER_FLOATING_HI_LO_DIV_1000 = 13;
+const int REGISTER_FLOATING_LO_HI_DIV_1000 = 14;
+const int REGISTER_CHARACTER_STRING_HI_LO = 15;
+const int REGISTER_CHARACTER_STRING_LO_HI = 16;

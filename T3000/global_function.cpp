@@ -2716,6 +2716,8 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 				m_remote_point_data.at(i).read_write = *(my_temp_point++);
 				m_remote_point_data.at(i).time_remaining = *(my_temp_point++);
 
+                m_remote_point_data.at(i).object_instance = ((unsigned char)my_temp_point[0]) << 24 | ((unsigned char)my_temp_point[1] << 16) | ((unsigned char)my_temp_point[2]) << 8 | ((unsigned char)my_temp_point[3]);
+                my_temp_point = my_temp_point + 4;
 			}
 		}
 		return READ_REMOTE_POINT;
@@ -3931,6 +3933,9 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
             Device_Basic_Setting.reg.time_sync_auto_manual = *(my_temp_point++);
             Device_Basic_Setting.reg.sync_time_results = *(my_temp_point++);
             Device_Basic_Setting.reg.mstp_id = *(my_temp_point++);
+            Device_Basic_Setting.reg.zigbee_panid = (unsigned char)my_temp_point[1] << 8 | (unsigned char)my_temp_point[0];
+            my_temp_point = my_temp_point + 2;
+            Device_Basic_Setting.reg.max_master = *(my_temp_point++);
 			return READ_SETTING_COMMAND;
 		}
 		break;
@@ -4946,7 +4951,7 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
         {
             if (bind_local_ip.IsEmpty())
             {
-                port_bind_results = Open_bacnetSocket2(_T(""), BACNETIP_PORT + i, my_sokect);
+                port_bind_results = Open_bacnetSocket2(_T("192.168.0.62"), BACNETIP_PORT + i, my_sokect);
             }
             else
             {
@@ -5402,6 +5407,7 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
 {
     //2018 03 21 Fandu 解决 PCIP地址频繁变化导致的 bind 数据库以前的错误IP ，以至于 无法正常通讯的问题.
     bool find_network =false;
+    GetIPMaskGetWay();
     for (int i = 0; i < g_Vector_Subnet.size(); i++)
     {
         CStringArray temp_strip;
@@ -5788,6 +5794,9 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	temp.bacnetip_port = temp_data.reg.bacnetip_port;
     temp.zigbee_exsit = temp_data.reg.zigbee_exsit;
     temp.nprotocol = temp_data.reg.subnet_protocol;
+
+    if (temp.nprotocol == MODBUS_RS485)   //通过64 命令回的 都属于网络的modbus tcp ，除非直接回 12 
+        temp.nprotocol = MODBUS_TCPIP;
     char * temp_point = NULL;
     refresh_net_label_info temp_label;
     temp_point = temp_data.reg.panel_name;
@@ -6461,7 +6470,7 @@ void Send_WhoIs_remote_ip(CString ipaddress_temp)
     {
         ipaddress  = ipaddress_temp;
     }
-
+    GetIPMaskGetWay();
     //SOCKADDR_IN bcast;.
     char temp_ip_address[20];
     WideCharToMultiByte( CP_ACP, 0, ipaddress.GetBuffer(), -1, temp_ip_address, 255, NULL, NULL );
@@ -6494,7 +6503,7 @@ void Send_WhoIs_remote_ip(CString ipaddress_temp)
     BOOL bTimeOut = FALSE;
     int nRet = 0;
     Sleep(1);
-    Initial_bac(0);
+  //  Initial_bac(0);
     while(!bTimeOut)//!pScanner->m_bNetScanFinish)  // 超时结束
     {
         time_out++;
@@ -7388,7 +7397,21 @@ int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path)
 			{
 				memcpy(&m_Annual_data.at(i),temp_point,sizeof(Str_annual_routine_point));
 				temp_point = temp_point + sizeof(Str_annual_routine_point);
+
+                CString temp_des2;
+                MultiByteToWideChar(CP_ACP, 0, (char *)m_Annual_data.at(i).label, (int)strlen((char *)m_Annual_data.at(i).label) + 1,
+                    temp_des2.GetBuffer(MAX_PATH), MAX_PATH);
+                temp_des2.ReleaseBuffer();
+                if (temp_des2.IsEmpty())
+                {
+                    HolLable[i].Format(_T("AR%d"), i+1);
+                }
+                else
+                {
+                    HolLable[i] = temp_des2;
+                }
 			}
+
 
 			for (int i=0; i<BAC_MONITOR_COUNT; i++)
 			{
@@ -7435,7 +7458,7 @@ int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path)
 
 
 
-
+        copy_data_to_ptrpanel(TYPE_ALL);
 
 
         if(write_to_device)	//如果是客户手动load 就让客户选择路径，不是手动load就说明是读缓存;

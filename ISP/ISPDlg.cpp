@@ -61,7 +61,7 @@ const TCHAR c_strDBFileName[]=_T("Database\\t3000.mdb") ;
  
 int g_Commu_type=0;
 UINT _PingThread(LPVOID pParam);
- 
+unsigned int n_check_temco_firmware = 1;
 unsigned int Remote_timeout = 1000;
 CString Auto_flash_SN_connect_IP;
 DWORD WINAPI GetFWFileProc(LPVOID lPvoid);
@@ -374,6 +374,11 @@ BOOL CISPDlg::OnInitDialog()
         subID
     );
 
+    n_check_temco_firmware = GetPrivateProfileInt(_T("Setting"), _T("Check_Temco_Firmware"), 1, SettingPath);
+    if (n_check_temco_firmware == 1)
+    {
+        WritePrivateProfileStringW(_T("Setting"), _T("Check_Temco_Firmware"), _T("1"), SettingPath);
+    }
 
     Remote_timeout = GetPrivateProfileInt(_T("Setting"),_T("REMOTE_TIMEOUT"),1000,SettingPath);
     if(Remote_timeout < 50)
@@ -644,7 +649,6 @@ struct ALL_PRODUCT_NAME_NODE {
     int id;
     CString name;
     int need_write_id;
-    int need_write_jumpcommand;
 };
 
 vector <ALL_PRODUCT_NAME_NODE> pid_name_map;
@@ -700,7 +704,6 @@ void CISPDlg::ShowProductNameFromIni()
         temp_value.id = _wtoi(temp_array.GetAt(i));
         temp_value.name = cs_name;
         temp_value.need_write_id = 0;
-        temp_value.need_write_jumpcommand = 0;
         for (int j = 0; j < temp_need_write_id.size(); j++)
         {
             if (temp_value.id == temp_need_write_id.at(j))
@@ -709,6 +712,7 @@ void CISPDlg::ShowProductNameFromIni()
                 break;
             }
         }
+
         
         pid_name_map.push_back(temp_value);
         ((CComboBox *)GetDlgItem(IDC_COMBO_PM))->AddString(cs_name);
@@ -2998,6 +3002,7 @@ void CISPDlg::OnMenuFlashsn()
 
 LRESULT CISPDlg::Fresh_CloseSN_fcuntion(WPARAM wParam, LPARAM lParam)
 {
+    Sleep(1000);
     KillTimer(SN_MAC_SHOW_TIMER);
     GetDlgItem(IDC_BUTTON_FLASH_SN)->EnableWindow(TRUE);
     GetDlgItem(IDC_CHECK_FLASH_MAC)->EnableWindow(TRUE);
@@ -3071,14 +3076,15 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
     int n_ret_id = 0;
     int n_ret = 0;
     n_ret = Write_One_Retry(temp_read_reg[6], 16, 142);
-    if ((n_ret < 0) && (b_com_or_ip == 0))
-    {
-        sn_mac_info.Format(_T("初始化写入命令失败"));
-        ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
-        return 1;
-    }
-    else
-    {
+    n_ret = Write_One_Retry(temp_read_reg[6], 16, 142);
+    //if ((n_ret < 0) && (b_com_or_ip == 0)  &&  (n_ignore_15_142_command == 0))
+    //{
+    //    sn_mac_info.Format(_T("初始化写入命令失败"));
+    //    ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
+    //    return 1;
+    //}
+    //else
+    //{
         sn_mac_info.Format(_T("初始化写入命令成功"));
         Sleep(1000);
 
@@ -3107,7 +3113,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
             Sleep(1000);
         }
 
-    }
+    //}
 
     CBADO monitor_bado;
     monitor_bado.SetDBPath(_T("Z:\\Serial_Records\\serial_records.mdb"));
@@ -3144,8 +3150,8 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
 
     int n_ret_low = 0;
     int n_ret_high = 0;
-    n_ret_low = Write_One_Retry(temp_read_reg[6], 0, low_serial);
-    n_ret_high = Write_One_Retry(temp_read_reg[6], 2, high_serial);
+    n_ret_low = Write_One_Retry(temp_read_reg[6], 0, low_serial,6);
+    n_ret_high = Write_One_Retry(temp_read_reg[6], 2, high_serial,6);
 
     if ((n_ret_low < 0) || (n_ret_high < 0))
     {
@@ -3159,7 +3165,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
         Sleep(1000);
     }
 
-    n_ret_id = Write_One_Retry(temp_read_reg[6], 6, temp_read_reg[6]);
+    n_ret_id = Write_One_Retry(temp_read_reg[6], 6, temp_read_reg[6],6);
     if (n_ret_id < 0)
     {
         sn_mac_info.Format(_T("写入Modbus ID失败"));
@@ -3175,7 +3181,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
     if (n_need_write_pid == 1)
     {
         //需要烧写新的产品号
-        int n_ret_pid = Write_One_Retry(temp_read_reg[6], 7, g_sn_product_id);
+        int n_ret_pid = Write_One_Retry(temp_read_reg[6], 7, g_sn_product_id,6);
         if (n_ret_id < 0)
         {
             sn_mac_info.Format(_T("写入产品ID：%d失败"), g_sn_product_id);
@@ -3191,7 +3197,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
     else
     {
         //需要烧写新原有的产品号  ，最好写一下，否则 产品号容易变掉.
-        int n_ret_pid = Write_One_Retry(temp_read_reg[6], 7, temp_read_reg[7]);
+        int n_ret_pid = Write_One_Retry(temp_read_reg[6], 7, temp_read_reg[7],6);
         if (n_ret_id < 0)
         {
             sn_mac_info.Format(_T("写入产品ID：%d失败"), temp_read_reg[7]);
@@ -3207,7 +3213,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
 
     
 
-    int n_ret_harware = Write_One_Retry(temp_read_reg[6], 8, g_write_hardware_version);
+    int n_ret_harware = Write_One_Retry(temp_read_reg[6], 8, g_write_hardware_version,6);
     if (n_ret_id < 0)
     {
         sn_mac_info.Format(_T("写入硬件版本号失败"));
@@ -3293,7 +3299,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
             ready_towrite_mac[1], ready_towrite_mac[2], ready_towrite_mac[3], ready_towrite_mac[4], ready_towrite_mac[5]);
         Sleep(1000);
 
-        int n_ret_harware = Write_One_Retry(temp_read_reg[6], 93, 1);
+        int n_ret_harware = Write_One_Retry(temp_read_reg[6], 93, 1,6);
         if (n_ret_id < 0)
         {
             sn_mac_info.Format(_T("写入MAC使能命令失败"));
@@ -3325,6 +3331,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
         if (n_mac_ret < 0)
         {
             sn_mac_info.Format(_T("写入MAC地址失败"));
+            Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
@@ -3336,7 +3343,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
     }
 
     sn_mac_info.Format(_T("所有操作已成功完成！"));
-
+    Sleep(1000);
     monitor_bado.CloseRecordset();
     monitor_bado.CloseConn();
 
@@ -3412,6 +3419,9 @@ void CISPDlg::OnBnClickedButtonFlashSn()
         }
     }
 
+ 
+    
+
 
     if (find_product_name == false)
     {
@@ -3445,6 +3455,10 @@ BOOL CAboutDlg::OnInitDialog()
     // TODO:  在此添加额外的初始化
     CString release_note;
     CString temp;
+    temp.Format(_T("Rev6.0.3  (2019-01-02)\r\n  1.Support PM5E don't check.\r\n"));
+    release_note = release_note + temp;
+    temp.Format(_T("Rev6.0.2  (2018-12-25)\r\n  1.Support don't check temco firmware.\r\n"));
+    release_note = release_note + temp;
     temp.Format(_T("Rev6.0.0  (2018-12-05)\r\n  1.Fix Hex flash ,using the old ISPTOOL may cause device reboot.\r\n  2.Support flash PM2.5\r\n"));
     release_note = release_note + temp;
     temp.Format(_T("Rev5.1.6  (2018-11-29)\r\n  1.Three times faster than before when flash by com port .\r\n"));

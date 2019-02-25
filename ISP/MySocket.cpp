@@ -21,6 +21,7 @@
 #include "TFTPServer.h"
 #include "global_function.h"
 #include "Global_Struct.h"
+extern unsigned int n_check_temco_firmware;
 extern CString Failed_Message;
 extern Bin_Info        global_fileInfor;
 typedef struct _Product_IP_ID 
@@ -150,6 +151,10 @@ void MySocket::OnReceive(int nErrorCode)
 					{
 
 					}
+                    else if (n_check_temco_firmware == 0)
+                    {
+                        Sleep(10);
+                    }
 					else
 					{
 						strTip.Format(_T("Your device is %s,but the file is fit for %s"),DeviceProductName.GetBuffer(),FileProductName.GetBuffer());
@@ -194,6 +199,13 @@ void MySocket::OnReceive(int nErrorCode)
                 DeviceProductName.MakeUpper();
 				FileProductName.Trim();
 				DeviceProductName.Trim();
+
+                if (n_check_temco_firmware == 0)
+                {
+                    ISP_STEP = ISP_Send_TFTP_PAKAGE;
+                    CAsyncSocket::OnReceive(nErrorCode);
+                    return;
+                }
 
                 if (FileProductName.CompareNoCase(DeviceProductName) == 0)
                 {

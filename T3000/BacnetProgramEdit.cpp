@@ -46,6 +46,7 @@ bool show_upper;
 DWORD prg_text_color;
 DWORD prg_label_color;
 DWORD prg_command_color;
+DWORD prg_local_var_color;
 DWORD prg_function_color;
 CString prg_character_font;
 bool prg_color_change;
@@ -192,6 +193,9 @@ void CBacnetProgramEdit::GetColor()
 	prg_label_color = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"),_T("Label Color"),DEFAULT_PRG_LABEL_COLOR,g_cstring_ini_path);
 	prg_command_color = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"),_T("Command Color"),DEFAULT_PRG_COMMAND_COLOR,g_cstring_ini_path);
 	prg_function_color = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"),_T("Function Color"),DEFAULT_PRG_FUNCTION_COLOR,g_cstring_ini_path);
+    prg_local_var_color = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"), _T("LOVAL_VAR Color"), DEFAULT_PRG_LOCAL_VAR_COLOR, g_cstring_ini_path);
+
+
 	show_upper = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"),_T("Upper Case"),1,g_cstring_ini_path);
 	GetPrivateProfileString(_T("Program_IDE_Color"),_T("Text Font"),_T("Arial"),prg_character_font.GetBuffer(MAX_PATH),MAX_PATH,g_cstring_ini_path);
 	prg_character_font.ReleaseBuffer();

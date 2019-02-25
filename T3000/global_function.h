@@ -231,39 +231,39 @@ BOOL BinFileValidation(const CString& strFileName);
 BOOL AllCharactorIsDigital(LPCTSTR lpszSrc);
 
 
-bool Input_data_to_string(unsigned char  temp_input_index ,
-	CString &temp_in_main_panel,
-	CString &temp_in_des,
-	CString &temp_in_auto_manual,
-	CString &temp_in_value,
-	CString &temp_in_units,
-	CString &temp_in_range,
-	CString &temp_in_cal,
-	CString &temp_cacl_sign,
-	CString &temp_in_filter,
-	CString &temp_in_decon,
-	CString &temp_in_jumper,
-	CString &temp_in_label);
-	bool Save_InputData_to_db(unsigned char  temp_input_index );
+bool Input_data_to_string(unsigned char  temp_input_index,
+    CString &temp_in_main_panel,
+    CString &temp_in_des,
+    CString &temp_in_auto_manual,
+    CString &temp_in_value,
+    CString &temp_in_units,
+    CString &temp_in_range,
+    CString &temp_in_cal,
+    CString &temp_cacl_sign,
+    CString &temp_in_filter,
+    CString &temp_in_decon,
+    CString &temp_in_jumper,
+    CString &temp_in_label);
+bool Save_InputData_to_db(unsigned char  temp_input_index);
 bool Output_data_to_string(unsigned char  temp_output_index,
-	CString &temp_out_panel,
-	CString &temp_out_des,
-	CString &temp_out_auto_manual,
-	CString &temp_out_value,
-	CString &temp_out_units,
-	CString &temp_out_range,
-	CString &temp_out_pwm_period,
-	CString &temp_out_decom,
-	CString &temp_out_label);
+    CString &temp_out_panel,
+    CString &temp_out_des,
+    CString &temp_out_auto_manual,
+    CString &temp_out_value,
+    CString &temp_out_units,
+    CString &temp_out_range,
+    CString &temp_out_pwm_period,
+    CString &temp_out_decom,
+    CString &temp_out_label);
 bool Save_InputData_to_db(unsigned char  temp_input_index, unsigned int nserialnumber);
 bool Save_OutputData_to_db(unsigned char  temp_output_index, unsigned int nserialnumber);
 bool Save_VariableData_to_db(unsigned char  temp_output_index, unsigned int nserialnumber);
-	bool Save_OutputData_to_db(unsigned char  temp_output_index );
-	bool Save_AVData_to_db();
-	CString GetGUID();
+bool Save_OutputData_to_db(unsigned char  temp_output_index);
+bool Save_AVData_to_db();
+CString GetGUID();
 
-    bool Open_Socket_Retry(CString strIPAdress, short nPort, int retry_time=3);
-    void Inial_ProductName_map();
-    int PanelName_Map(int product_type);
-    void switch_product_last_view();
+bool Open_Socket_Retry(CString strIPAdress, short nPort, int retry_time = 3);
+void Inial_ProductName_map();  //初始化 Panel Name 存放的位置 默认是714位置 
+int PanelName_Map(int product_type);  //查找 Panel  Name 存放的位置 没有找到就认为是从714位置开始的
+void switch_product_last_view();
 #endif

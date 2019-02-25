@@ -32,7 +32,7 @@ CString DesDownloadFilePath;
 CString UnzipFileFolder;
 CString T3000_ini_file_path;
 int PC_T3000_Version = 0;
-int T3000_FTP_Version = 0;
+unsigned int T3000_FTP_Version = 0;
 	int is_local_temco_net = false;
 	int local_persent = 0;
 //#pragma comment(lib,"..\\Debug\\MSVC10APIW.lib")
@@ -485,7 +485,26 @@ DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
         CS_Info.Format(_T("Checking for updates ...."));
         bool download_ret = false;
         DownloadIniFilePath = DownloadFileFolder + _T("//T3000Version.ini");
-        download_ret = URLDownloadToFile(NULL, _T("https://temcocontrols.com/ftp/firmware/ProductPath.ini"), DownloadIniFilePath, 0, NULL);
+        int retry_count_ini = 0;
+        while (1)
+        {
+            download_ret = URLDownloadToFile(NULL, _T("https://temcocontrols.com/ftp/firmware/ProductPath.ini"), DownloadIniFilePath, 0, NULL);
+            if (download_ret == S_FALSE)
+            {
+                retry_count_ini++;
+                CS_Info.Format(_T("Download failed and retrying!(%d)"), retry_count_ini);
+                Sleep(6000);
+            }
+            else
+            {
+                CS_Info.Format(_T("Download version information file success."));
+                Sleep(2000);
+                break;
+            }
+
+            if (retry_count_ini > 10)
+                break;
+        }
         T3000_FTP_Version = GetPrivateProfileIntW(_T("Version"), _T("T3000Version"), 0, DownloadIniFilePath);
 
         GetPrivateProfileString(_T("Version"), _T("T3000FTP_PATH"), _T("software/20T3000Update.zip"), temp_t3000_path.GetBuffer(MAX_PATH), MAX_PATH, DownloadIniFilePath);
@@ -515,7 +534,26 @@ DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
         cbc.m_pdlg = mparent;
 
         DesDownloadFilePath = DownloadFileFolder + _T("\\T3000Update.zip");
-        download_ret = URLDownloadToFile(NULL, T3000FtpPath, DesDownloadFilePath, 0, &cbc); // 根据配置文档配置好的路径去下载.
+
+        int retry_count = 0;
+        while(1)
+        {
+            download_ret = URLDownloadToFile(NULL, T3000FtpPath, DesDownloadFilePath, 0, &cbc); // 根据配置文档配置好的路径去下载.
+            if (download_ret == S_FALSE)
+            {
+                retry_count++;
+                CS_Info.Format(_T("Download failed and retrying!(%d)"), retry_count);
+                Sleep(6000);
+            }
+            else
+            {
+                break;
+            }
+
+            if (retry_count > 10)
+                break;
+        }
+       
 
         if (download_ret == S_FALSE)
         {

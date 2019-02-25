@@ -46,10 +46,11 @@ int GetScreenFullLabel(int index,CString &ret_full_label);
 
 int GetHolidayLabel(int index,CString &ret_label);
 int GetHolidayFullLabel(int index,CString &ret_full_label);
+int GetHolidayValue(int index, CString &Auto_M, CString &persend_data);
 
 int GetScheduleLabel(int index,CString &ret_label);
 int GetScheduleFullLabel(int index,CString &ret_full_label);
-
+int GetScheduleValue(int index, CString &Auto_M, CString &persend_data);
 int GetAmonLabel(int index,CString &ret_label);
 
 
@@ -1842,7 +1843,9 @@ void CBacnetScreenEdit::OnPaint()
 					{
 						int get_label_var = GetScheduleLabel(read_bac_index,cs_label);
 						int get_full_label_var = GetScheduleFullLabel(read_bac_index,cs_full_label);
-						if((get_label_var < 0) || (get_full_label_var < 0))
+                        int get_ret_var = GetScheduleValue(read_bac_index, cs_auto_m, cs_value);
+                        if ((get_ret_var <0) || (get_label_var < 0) || (get_full_label_var < 0))
+						//if((get_label_var < 0) || (get_full_label_var < 0))
 							label_invalid = true;
 					}
 					else
@@ -1855,7 +1858,9 @@ void CBacnetScreenEdit::OnPaint()
 					{
 						int get_label_var = GetHolidayLabel(read_bac_index,cs_label);
 						int get_full_label_var = GetHolidayFullLabel(read_bac_index,cs_full_label);
-						if((get_label_var < 0) || (get_full_label_var < 0))
+                        int get_ret_var = GetHolidayValue(read_bac_index, cs_auto_m, cs_value);
+                        if ((get_ret_var <0) || (get_label_var < 0) || (get_full_label_var < 0))
+						//if((get_label_var < 0) || (get_full_label_var < 0))
 							label_invalid = true;
 					}
 					else
