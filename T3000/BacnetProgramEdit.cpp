@@ -26,7 +26,7 @@ vector <Str_char_pos_color> buffer_prg_char_color; //ÓÃÓÚ·ÀÖ¹Æµ·±¸üĞÂ½çÃæÒıÆğµÄÉ
 
 CString program_string;
 CString AnalysisString;
- char editbuf[25000];
+  char editbuf[25000];
  extern char my_display[10240];
  extern int Encode_Program();
  extern int my_lengthcode;
