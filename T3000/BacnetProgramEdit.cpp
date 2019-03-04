@@ -26,7 +26,7 @@ vector <Str_char_pos_color> buffer_prg_char_color; //ÓÃÓÚ·ÀÖ¹Æµ·±¸üÐÂ½çÃæÒýÆðµÄÉ
 
 CString program_string;
 CString AnalysisString;
- char editbuf[25000];
+  char editbuf[25000];
  extern char my_display[10240];
  extern int Encode_Program();
  extern int my_lengthcode;
@@ -46,6 +46,7 @@ bool show_upper;
 DWORD prg_text_color;
 DWORD prg_label_color;
 DWORD prg_command_color;
+DWORD prg_local_var_color;
 DWORD prg_function_color;
 CString prg_character_font;
 bool prg_color_change;
@@ -192,6 +193,9 @@ void CBacnetProgramEdit::GetColor()
 	prg_label_color = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"),_T("Label Color"),DEFAULT_PRG_LABEL_COLOR,g_cstring_ini_path);
 	prg_command_color = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"),_T("Command Color"),DEFAULT_PRG_COMMAND_COLOR,g_cstring_ini_path);
 	prg_function_color = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"),_T("Function Color"),DEFAULT_PRG_FUNCTION_COLOR,g_cstring_ini_path);
+    prg_local_var_color = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"), _T("LOVAL_VAR Color"), DEFAULT_PRG_LOCAL_VAR_COLOR, g_cstring_ini_path);
+
+
 	show_upper = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"),_T("Upper Case"),1,g_cstring_ini_path);
 	GetPrivateProfileString(_T("Program_IDE_Color"),_T("Text Font"),_T("Arial"),prg_character_font.GetBuffer(MAX_PATH),MAX_PATH,g_cstring_ini_path);
 	prg_character_font.ReleaseBuffer();
@@ -343,29 +347,29 @@ LRESULT CBacnetProgramEdit::Fresh_Program_RichEdit(WPARAM wParam,LPARAM lParam)
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetWindowTextW(temp1);
 	m_edit_changed = false;
 	program_string = temp1;
-	
-	if (!program_string.IsEmpty())
-	{
-		CppSQLite3DB SqliteDBT3000;
-		CppSQLite3DB SqliteDBBuilding;
-		CppSQLite3Table table;
-		CppSQLite3Query q;
-		SqliteDBT3000.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
-		CString strSql;
-		strSql.Format(_T("SELECT COUNT(*) FROM sqlite_master where type = 'table' and name = 'PRG_CODE'"));
-		q = SqliteDBT3000.execQuery((UTF8MBSTR)strSql);
-		if(q.eof()) {
-			strSql.Format(_T("CREATE TABLE PRG_CODE (Station_NUM INTEGER, program_list_line integer, CODE TEXT)"));
-			SqliteDBT3000.execDML((UTF8MBSTR)strSql);
-		}
-		 
-	 
-		strSql.Format(_T("Delete From PRG_CODE where Station_NUM=%d AND program_list_line=%d"), Station_NUM, program_list_line);
-		int test = SqliteDBT3000.execDML((UTF8MBSTR)strSql);
-		strSql.Format(_T("INSERT INTO PRG_CODE VALUES(%d,%d,'%s')"), Station_NUM, program_list_line, program_string);
-		test = SqliteDBT3000.execDML((UTF8MBSTR)strSql);
-		SqliteDBT3000.closedb();
-	}
+
+	//if (!program_string.IsEmpty())
+	//{
+	//	CppSQLite3DB SqliteDBT3000;
+	//	CppSQLite3DB SqliteDBBuilding;
+	//	CppSQLite3Table table;
+	//	CppSQLite3Query q;
+	//	SqliteDBT3000.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+	//	CString strSql;
+	//	strSql.Format(_T("SELECT COUNT(*) FROM sqlite_master where type = 'table' and name = 'PRG_CODE'"));
+	//	q = SqliteDBT3000.execQuery((UTF8MBSTR)strSql);
+	//	if(q.eof()) {
+	//		strSql.Format(_T("CREATE TABLE PRG_CODE (Station_NUM INTEGER, program_list_line integer, CODE TEXT)"));
+	//		SqliteDBT3000.execDML((UTF8MBSTR)strSql);
+	//	}
+	//	 
+	// 
+	//	strSql.Format(_T("Delete From PRG_CODE where Station_NUM=%d AND program_list_line=%d"), Station_NUM, program_list_line);
+	//	int test = SqliteDBT3000.execDML((UTF8MBSTR)strSql);
+	//	strSql.Format(_T("INSERT INTO PRG_CODE VALUES(%d,%d,'%s')"), Station_NUM, program_list_line, program_string);
+	//	test = SqliteDBT3000.execDML((UTF8MBSTR)strSql);
+	//	SqliteDBT3000.closedb();
+	//}
 	 
 
 
@@ -431,7 +435,7 @@ void CBacnetProgramEdit::Syntax_analysis()
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetReadOnly(TRUE);
 	memset(program_code[program_list_line],0,2000);
 
-	renumvar = 1;
+	renumvar = 0;
 	error = -1; //Default no error;
 	CString tempcs;
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetWindowTextW(tempcs);
@@ -540,7 +544,7 @@ void CBacnetProgramEdit::OnSend()
 	//reset the program buffer
 	memset(program_code[program_list_line],0,2000);
 
-	renumvar = 1;
+	renumvar = 0;
 	error = -1; //Default no error;
 	CString tempcs;
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetWindowTextW(tempcs);
