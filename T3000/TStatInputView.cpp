@@ -13,6 +13,7 @@
 #include "TstatRangeDlg.h"
  
 #include "MainFrm.h"
+#include "Tstat_HelpDoc.h"
 // CTStatInputView
 UINT BackMainUIFresh_TstatInput(LPVOID pParam)
 {
@@ -271,13 +272,60 @@ LRESULT CTStatInputView::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
     
     CString strTemp;
     //
-    for(int i=0;i<(int)m_tstat_input_data.size();i++){
+    for(int i=0;i<(int)m_tstat_input_data.size();i++)
+    {
+        if (i > 8)
+        {
+            bitset<16> module_type(product_register_value[20]);
+            if (module_type.at(1) == true)
+            {
+                b_hum_sensor = true;
+            }
+            else
+            {
+                b_hum_sensor = false;
+            }
+            if ((i == 9) && (b_hum_sensor == false))
+            {
+                continue;
+            }
+
+            if (module_type.at(2) == true)
+            {
+                b_co2_sensor = true;
+            }
+            else
+            {
+                b_co2_sensor = false;
+            }
+
+            if ((i == 10) && (b_co2_sensor == false))
+            {
+                continue;
+            }
+
+            if (module_type.at(3) == true)
+            {
+                b_lux_sensor = true;
+            }
+            else
+            {
+                b_lux_sensor = false;
+            }
+
+
+            if ((i == 11) && (b_lux_sensor == false))
+            {
+                continue;
+            }
+        }
         m_input_list.SetItemText(i,1,m_tstat_input_data.at(i).InputName.StrValue);
         m_input_list.SetItemText(i,2,m_tstat_input_data.at(i).AM.StrValue);
         m_input_list.SetItemText(i,3,m_tstat_input_data.at(i).Value.StrValue);
         m_input_list.SetItemText(i,4,m_tstat_input_data.at(i).Unit.StrValue);
         m_input_list.SetItemText(i,5,m_tstat_input_data.at(i).Range.StrValue);
-        m_input_list.SetItemText(i,6,_T("Adjust..."));
+        m_input_list.SetItemText(i, 6, m_tstat_input_data.at(i).Calibration.StrValue);
+        //m_input_list.SetItemText(i,6,_T("Adjust..."));
         m_input_list.SetItemText(i,7,m_tstat_input_data.at(i).Filter.StrValue);
         m_input_list.SetItemText(i,8,m_tstat_input_data.at(i).Function.StrValue);
         m_input_list.SetItemText(i,9,m_tstat_input_data.at(i).CustomTable.StrValue);
@@ -291,7 +339,22 @@ LRESULT CTStatInputView::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
     int Changed_Item = (int)wParam;
 	int Changed_SubItem = (int)lParam;
 	CString New_CString =  m_input_list.GetItemText(Changed_Item,Changed_SubItem);
-	 
+	
+    if ((Changed_Item == 9) && (b_hum_sensor == false))
+    {
+        return 0;
+    }
+
+    if ((Changed_Item == 10) && (b_co2_sensor == false))
+    {
+        return 0;
+    }
+
+    if ((Changed_Item == 11) && (b_lux_sensor == false))
+    {
+        return 0;
+    }
+
 	BOOL IS_SEND=FALSE;
 	_MessageWriteOneInfo_List  *pwrite_info = new _MessageWriteOneInfo_List;
 	pwrite_info->list_type=LIST_TYPE_INPUT_TSTAT;
@@ -555,6 +618,23 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
         return;
     if(lRow<0)
         return;
+
+    //判断有无此传感器 没有 就不显示，并且不可操作.
+    if ((lRow == 9) && (b_hum_sensor == false))
+    {
+        return ;
+    }
+
+    if ((lRow == 10) && (b_co2_sensor == false))
+    {
+        return ;
+    }
+
+    if ((lRow == 11) && (b_lux_sensor == false))
+    {
+        return ;
+    }
+
     BOOL IS_SEND=FALSE;
     CString temp1;
     CStringArray temparray;
@@ -680,7 +760,7 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
                 CTstatRangeDlg   dlg;
                 int rangevalue=m_tstat_input_data.at(lRow).Range.RegValue;
                 dlg.m_current_range = rangevalue&0x7F;
-                for (int i=0;i<13;i++)
+                for (int i=0;i<15;i++)
                 {
                     if (m_tstat_input_data.at(lRow).Range.StrValue.CompareNoCase(analog_range_TSTAT6[i])==0)
                     {
@@ -900,6 +980,9 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 }
 void CTStatInputView::Fresh()
 {
+    b_hum_sensor = false;
+    b_co2_sensor = false;
+    b_lux_sensor = false;
   Initial_ListFor_Tstat();
   PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
   if (m_Fresh_BackgroundThreadHandle!=NULL)
@@ -1073,7 +1156,7 @@ BOOL CTStatInputView::PreTranslateMessage(MSG* pMsg)
     return CFormView::PreTranslateMessage(pMsg);
 }
 
-#include "Tstat_HelpDoc.h"	
+	
 BOOL CTStatInputView::OnHelpInfo(HELPINFO* pHelpInfo)
 {
 	// TODO: Add your message handler code here and/or call default

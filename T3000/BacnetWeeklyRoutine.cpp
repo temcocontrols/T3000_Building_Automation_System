@@ -18,6 +18,15 @@
 extern CBacnetTstatSchedule *BacnetTstatSchedule_Window ;
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 
+
+
+CString Hol_Old_Lable[BAC_HOLIDAY_COUNT] =
+{
+    _T("AR1"),
+    _T("AR2"),
+    _T("AR3"),
+    _T("AR4")
+};
 // BacnetWeeklyRoutine dialog
 
 IMPLEMENT_DYNAMIC(BacnetWeeklyRoutine, CDialogEx)
@@ -167,6 +176,7 @@ BOOL BacnetWeeklyRoutine::OnInitDialog()
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
+#include "BacnetAnnualRoutine.h"
 
 void BacnetWeeklyRoutine::Initial_List()
 {
@@ -232,11 +242,12 @@ void BacnetWeeklyRoutine::Initial_List()
 			ListCtrlEx::CStrList strlist;
 			CString temp1;
 			strlist.push_back(_T(" "));
-			for (int x=1;x<=BAC_HOLIDAY_COUNT;x++)
-			{
-				temp1.Format(_T("AR%d"),x);
-				strlist.push_back(temp1);
-			}
+            for (int x = 1;x <= BAC_HOLIDAY_COUNT;x++)
+            {
+
+                temp1.Format(_T("AR%d"), x);
+                strlist.push_back(temp1);
+            }
 			m_weeklyr_list.SetCellStringList(i, WEEKLY_ROUTINE_HOLIDAY1, strlist);
 		}
 
@@ -245,11 +256,11 @@ void BacnetWeeklyRoutine::Initial_List()
 			ListCtrlEx::CStrList strlist;
 			CString temp1;
 			strlist.push_back(_T(" "));
-			for (int x=1;x<=BAC_HOLIDAY_COUNT;x++)
-			{
-				temp1.Format(_T("AR%d"),x);
-				strlist.push_back(temp1);
-			}
+            for (int x = 1;x <= BAC_HOLIDAY_COUNT;x++)
+            {
+                temp1.Format(_T("AR%d"), x);
+                strlist.push_back(temp1);
+            }
 			m_weeklyr_list.SetCellStringList(i, WEEKLY_ROUTINE_HOLIDAY2, strlist);
 		}
 
@@ -356,6 +367,13 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_Routine_Item(WPARAM wParam,LPARAM lPar
 		}
 		else
 		{
+            int sel_index = 1;
+            for (int x = 0; x < BAC_HOLIDAY_COUNT; x++)
+            {
+                if (cs_temp.CompareNoCase(HolLable[x]) == 0)
+                    sel_index = x + 1;
+            }
+            
 			cs_temp = cs_temp.Right(1);
 			int temp_value = _wtoi(cs_temp);
 			m_Weekly_data.at(Changed_Item).override_1.panel = Station_NUM;
@@ -377,12 +395,18 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_Routine_Item(WPARAM wParam,LPARAM lPar
 		}
 		else
 		{
-			
-			cs_temp = cs_temp.Right(1);
-			int temp_value = _wtoi(cs_temp);
-			m_Weekly_data.at(Changed_Item).override_2.panel = Station_NUM;
-			m_Weekly_data.at(Changed_Item).override_2.point_type = BAC_HOL + 1;	
-			m_Weekly_data.at(Changed_Item).override_2.number = temp_value - 1;
+            int sel_index = 1;
+            for (int x = 0; x < BAC_HOLIDAY_COUNT; x++)
+            {
+                if (cs_temp.CompareNoCase(HolLable[x]) == 0)
+                    sel_index = x + 1;
+            }
+
+            cs_temp = cs_temp.Right(1);
+            int temp_value = _wtoi(cs_temp);
+            m_Weekly_data.at(Changed_Item).override_2.panel = Station_NUM;
+            m_Weekly_data.at(Changed_Item).override_2.point_type = BAC_HOL + 1;
+            m_Weekly_data.at(Changed_Item).override_2.number = temp_value - 1;
 		}
 
 	}
@@ -402,6 +426,22 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_List(WPARAM wParam,LPARAM lParam)
 
 	int Fresh_Item;
 	int isFreshOne = (int)lParam;
+
+    bool reset_combo_cell = false;
+    for (int i = 0; i < BAC_HOLIDAY_COUNT; i++)
+    {
+        if (HolLable[i].CompareNoCase(Hol_Old_Lable[i]) != 0)
+        {
+            Hol_Old_Lable[i] = HolLable[i];
+            reset_combo_cell = true;
+        }
+        else
+        {
+            continue;
+        }
+    }
+
+
 	if(isFreshOne == REFRESH_ON_ITEM)
 	{
 		Fresh_Item = (int)wParam;
@@ -415,7 +455,7 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_List(WPARAM wParam,LPARAM lParam)
 		}
 		else
 		{
-			return 0;
+			//return 0;
 		}
 	}
 
@@ -425,6 +465,18 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_List(WPARAM wParam,LPARAM lParam)
 		CString temp_item,temp_value,temp_cal,temp_filter,temp_status,temp_lable;
 		CString temp_des;
 		CString temp_units;
+
+        if (reset_combo_cell)
+        {
+            ListCtrlEx::CStrList strlist;
+            CString temp1;
+            strlist.push_back(_T(" "));
+            for (int x = 1;x <= BAC_HOLIDAY_COUNT;x++)
+            {
+                strlist.push_back(HolLable[x-1]);
+            }
+            m_weeklyr_list.SetCellStringList(i, WEEKLY_ROUTINE_HOLIDAY1, strlist);
+        }
 
 		if(isFreshOne)
 		{
@@ -475,11 +527,13 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_List(WPARAM wParam,LPARAM lParam)
 		m_weeklyr_list.SetItemText(i,WEEKLY_ROUTINE_LABEL,temp_des2);
 
 
-		if((m_Weekly_data.at(i).override_1.point_type == BAC_HOL + 1) && (m_Weekly_data.at(i).override_1.number < 8))
+		if((m_Weekly_data.at(i).override_1.point_type == BAC_HOL + 1) && (m_Weekly_data.at(i).override_1.number < BAC_HOLIDAY_COUNT))
 		{
-				CString temp_str;
-				temp_str.Format(_T("AR%d"),m_Weekly_data.at(i).override_1.number + 1);
-				m_weeklyr_list.SetItemText(i,WEEKLY_ROUTINE_HOLIDAY1,temp_str);
+				//CString temp_str;
+				//temp_str.Format(_T("AR%d"),m_Weekly_data.at(i).override_1.number + 1);
+				//m_weeklyr_list.SetItemText(i,WEEKLY_ROUTINE_HOLIDAY1,temp_str);
+                m_weeklyr_list.SetItemText(i, WEEKLY_ROUTINE_HOLIDAY1, HolLable[m_Weekly_data.at(i).override_1.number]);
+                
 		}
 		else
 		{
@@ -488,9 +542,10 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_List(WPARAM wParam,LPARAM lParam)
 
 		if((m_Weekly_data.at(i).override_2.point_type == BAC_HOL + 1) && (m_Weekly_data.at(i).override_2.number < 8))
 		{
-				CString temp_str;
-				temp_str.Format(_T("AR%d"),m_Weekly_data.at(i).override_2.number + 1);
-				m_weeklyr_list.SetItemText(i,WEEKLY_ROUTINE_HOLIDAY2,temp_str);
+				//CString temp_str;
+				//temp_str.Format(_T("AR%d"),m_Weekly_data.at(i).override_2.number + 1);
+				//m_weeklyr_list.SetItemText(i,WEEKLY_ROUTINE_HOLIDAY2,temp_str);
+            m_weeklyr_list.SetItemText(i, WEEKLY_ROUTINE_HOLIDAY2, HolLable[m_Weekly_data.at(i).override_2.number]);
 		}
 		else
 		{
@@ -762,6 +817,33 @@ int GetScheduleLabel(int index,CString &ret_label)
 
 	return 1;
 }
+
+
+int GetScheduleValue(int index, CString &Auto_M, CString &persend_data)
+{
+    if (index >= BAC_SCHEDULE_COUNT)
+    {
+        persend_data.Empty();
+        return -1;
+    }
+
+    if (m_Annual_data.at(index).auto_manual == 1)
+    {
+        Auto_M = _T("M");
+    }
+    else
+    {
+        Auto_M.Empty();
+    }
+
+    if (m_Weekly_data.at(index).value == 0)
+        persend_data = _T("OFF");
+    else
+        persend_data = _T("ON");
+
+    return 1;
+}
+
 
 int GetScheduleFullLabel(int index,CString &ret_full_label)
 {

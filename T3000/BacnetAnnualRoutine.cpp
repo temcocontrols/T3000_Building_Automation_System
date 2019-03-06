@@ -377,6 +377,16 @@ LRESULT BacnetAnnualRoutine::Fresh_Annual_Routine_List(WPARAM wParam,LPARAM lPar
 		temp_des2.ReleaseBuffer();
 		m_annualr_list.SetItemText(i,ANNUAL_ROUTINE_LABLE,temp_des2);
 
+        if (temp_des2.IsEmpty())
+        {
+            HolLable[i].Format(_T("AR%d"), i+1);
+        }
+        else
+        {
+            HolLable[i] = temp_des2;
+        }
+        
+
 		if(isFreshOne)
 		{
 			break;
@@ -638,6 +648,7 @@ int GetHolidayLabel(int index,CString &ret_label)
 	return 1;
 }
 
+
 int GetHolidayFullLabel(int index,CString &ret_full_label)
 {
 	if(index >= BAC_HOLIDAY_COUNT)
@@ -654,4 +665,33 @@ int GetHolidayFullLabel(int index,CString &ret_full_label)
 		ret_full_label.Format(_T("HOL%d"),index+1);
 	}
 	return 1;
+}
+
+int GetHolidayValue(int index, CString &Auto_M, CString &persend_data)
+{
+    CStringArray temparray;
+    CString temp1;
+    if (index >= BAC_HOLIDAY_COUNT)
+    {
+        persend_data.Empty();
+        return -1;
+    }
+    int i = index;
+
+    if (m_Annual_data.at(i).auto_manual == 1)
+    {
+        Auto_M = _T("M");
+    }
+    else
+    {
+        Auto_M.Empty();
+    }
+
+    if (m_Annual_data.at(i).value == 0)
+        persend_data = _T("OFF");
+    else
+        persend_data = _T("ON");
+
+
+    return 1;
 }

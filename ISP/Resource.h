@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by ISP.rc
+// Microsoft Visual C++ 生成的包含文件。
+// 供 ISP.rc 使用
 //
 #define IDM_ABOUTBOX                    0x0010
 #define IDD_ABOUTBOX                    100
@@ -41,6 +41,9 @@
 #define IDC_STATIC_POS                  1019
 #define IDC_EDIT1                       1021
 #define IDC_EDIT_SWVERSION              1021
+#define IDC_EDIT_MAC_ADDRESS            1021
+#define IDC_EDIT_ISP_ABOUT              1021
+#define IDC_EDIT_ISP                    1021
 #define IDC_OUTPUT                      1023
 #define IDC_IPADDRESS_NC                1025
 #define IDC_EDIT_NCPORT                 1026
@@ -76,11 +79,15 @@
 #define IDC_STATIC_HEX_BOOT             1055
 #define IDC_EDIT2                       1056
 #define IDC_FLASH_USER_ID               1056
+#define IDC_EDIT_RESTART_TIME           1056
+#define IDC_CHECK_FLASH_MAC             1058
+#define IDC_STATIC_SN_INFO              1059
 #define IDC_BUTTON_SETTING_OK           6001
 #define IDC_EDIT_SETTING_TIMEOUT        6021
 #define IDC_BUTTON2                     6050
 #define IDC_BUTTON_SETTING_CANCLE       6050
 #define IDC_BUTTON_SETTING_CANCEL       6050
+#define IDC_BUTTON_FLASH_SN             6050
 #define ID_MAIN_CLEAR                   32771
 #define ID_Menu                         32772
 #define ID_SAVE_LOG_INFO                32773
@@ -97,9 +104,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        142
+#define _APS_NEXT_RESOURCE_VALUE        144
 #define _APS_NEXT_COMMAND_VALUE         32782
-#define _APS_NEXT_CONTROL_VALUE         1058
+#define _APS_NEXT_CONTROL_VALUE         1060
 #define _APS_NEXT_SYMED_VALUE           106
 #endif
 #endif

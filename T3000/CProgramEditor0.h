@@ -1,6 +1,6 @@
 // Machine generated IDispatch wrapper class(es) created with Add Class from Typelib Wizard
 
-#import "..DLLs\\ProgramEditor\\bin\\Debug\\ProgramEditor.tlb" no_namespace
+#import "..\\ProgramEditor\\bin\\Debug\\ProgramEditor.tlb" no_namespace
 // CProgramEditor0 wrapper class
 
 class CProgramEditor0 : public CWnd

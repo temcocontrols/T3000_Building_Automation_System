@@ -83,6 +83,7 @@ void CBacnetRemotePoint::Initial_List()
 	m_remote_point_list.InsertColumn(REMOTE_MAIN_ID, _T("Main Panel"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_remote_point_list.InsertColumn(REMOTE_DEVICE_ID, _T("Device ID"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_remote_point_list.InsertColumn(REMOTE_REG, _T("Point number"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+    m_remote_point_list.InsertColumn(REMOTE_INSTANCE, _T("Object instance"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_remote_point_list.InsertColumn(REMOTE_TPYE, _T("Type"), 120, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_remote_point_list.InsertColumn(REMOTE_VALUE, _T("Value"), 120, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_remote_point_list.InsertColumn(REMOTE_DEVICE_STATUS, _T("Status"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
@@ -191,6 +192,8 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 
 	for (int i=0;i<(int)m_remote_point_data.size();i++)
 	{
+        CString temp_obj_instance;
+        unsigned int m_obj_instance;
 		CString temp_type;
 		CString temp_main_panel;
 		CString temp_device_id;
@@ -218,21 +221,40 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 			m_remote_point_list.SetItemText(i,REMOTE_DEVICE_STATUS,_T(""));
 			m_remote_point_list.SetItemText(i,REMOTE_DESCRIPTION,_T(""));
             m_remote_point_list.SetItemText(i, REMOTE_TIME_REMAINING, _T(""));  //修复当远程的点不在的时候  时间还在显示的问题;
+            m_remote_point_list.SetItemText(i, REMOTE_INSTANCE, _T(""));
 			continue;
 		}
 
-		temp_main_panel.Format(_T("%u"), m_remote_point_data.at(i).point.panel);
-		temp_device_id.Format(_T("%u"),m_remote_point_data.at(i).point.sub_panel);
-		unsigned char high_3bit ;
-		high_3bit = (unsigned char)((( m_remote_point_data.at(i).point.point_type ) & 0xE0) >> 5);
-		dev_reg = high_3bit * 256 + m_remote_point_data.at(i).point.number;
-		temp_reg_number.Format(_T("%u"),dev_reg);
-
-		temp_reg_value.Format(_T("%d"),(m_remote_point_data.at(i).point_value));
-        temp_time_remaining.Format(_T("%d"), m_remote_point_data.at(i).time_remaining);
-
+        if (m_remote_point_data.at(i).object_instance != 0)
+            temp_obj_instance.Format(_T("%u"), (m_remote_point_data.at(i).object_instance));
+        else
+            temp_obj_instance.Empty();
 		unsigned char t_type;
 		t_type = m_remote_point_data.at(i).point.point_type & 0x1F;
+
+        temp_main_panel.Format(_T("%u"), m_remote_point_data.at(i).point.panel);
+        temp_device_id.Format(_T("%u"), m_remote_point_data.at(i).point.sub_panel);
+        unsigned char high_3bit;
+        if ((t_type == MB_REG + 1) && (m_remote_point_data.at(i).point.network >= 128))
+        {
+            high_3bit = (unsigned char)(((m_remote_point_data.at(i).point.point_type) & 0xE0) >> 5);
+            dev_reg = m_remote_point_data.at(i).point.number + ((m_remote_point_data.at(i).point.network - 128) * 8 + high_3bit) * 256;
+        }
+        else
+        {
+            high_3bit = (unsigned char)(((m_remote_point_data.at(i).point.point_type) & 0xE0) >> 5);
+            dev_reg = high_3bit * 256 + m_remote_point_data.at(i).point.number;
+        }
+
+
+
+
+        temp_reg_number.Format(_T("%u"), dev_reg);
+
+        temp_reg_value.Format(_T("%d"), (m_remote_point_data.at(i).point_value));
+        temp_time_remaining.Format(_T("%d"), m_remote_point_data.at(i).time_remaining);
+
+
 		if (t_type == BAC_OUT + 1)
 			temp_type = _T("OUT");
 		else if(t_type == BAC_IN + 1)
@@ -255,6 +277,10 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 			temp_type = _T("AO");
 		else if (t_type == BAC_DO + 1)
 			temp_type = _T("BO");
+        else if (t_type == BAC_BV + 1)
+            temp_type = _T("BV");
+        else if (t_type == BAC_BI + 1)
+            temp_type = _T("BI");
 #if 0
 		if(dev_reg == 0)
 		{
@@ -270,6 +296,8 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 		m_remote_point_list.SetItemText(i, REMOTE_TPYE, temp_type);
 		m_remote_point_list.SetItemText(i, REMOTE_MAIN_ID, temp_main_panel);
 		m_remote_point_list.SetItemText(i,REMOTE_DEVICE_ID,temp_device_id);
+        m_remote_point_list.SetItemText(i, REMOTE_INSTANCE, temp_obj_instance);
+        
 		m_remote_point_list.SetItemText(i,REMOTE_REG,temp_reg_number);
 		m_remote_point_list.SetItemText(i,REMOTE_VALUE,temp_reg_value);
         m_remote_point_list.SetItemText(i, REMOTE_TIME_REMAINING, temp_time_remaining);
@@ -287,7 +315,8 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 		}
 		m_remote_point_list.SetItemText(i,REMOTE_DEVICE_STATUS,temp_status);
 
-		if(dev_reg >= (sizeof(TSTAT_5ABCDFG_LED_ADDRESS)/sizeof(TSTAT_5ABCDFG_LED_ADDRESS[0])))
+		if((dev_reg >= (sizeof(TSTAT_5ABCDFG_LED_ADDRESS)/sizeof(TSTAT_5ABCDFG_LED_ADDRESS[0]))) &&
+            t_type != MB_REG + 1)
 		{
 			m_remote_point_list.SetItemText(i, REMOTE_MAIN_ID, _T(""));
 			m_remote_point_list.SetItemText(i, REMOTE_TPYE, _T(""));
@@ -297,6 +326,7 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 			m_remote_point_list.SetItemText(i,REMOTE_DEVICE_STATUS,_T(""));
 			m_remote_point_list.SetItemText(i,REMOTE_DESCRIPTION,_T(""));
             m_remote_point_list.SetItemText(i, REMOTE_TIME_REMAINING, _T(""));
+            m_remote_point_list.SetItemText(i, REMOTE_INSTANCE, _T(""));
 			continue;
 		}
 
@@ -491,7 +521,3 @@ void CBacnetRemotePoint::OnTimer(UINT_PTR nIDEvent)
 
 	CDialogEx::OnTimer(nIDEvent);
 }
-
-
-
-

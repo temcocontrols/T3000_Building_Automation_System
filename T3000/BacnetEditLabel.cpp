@@ -38,10 +38,11 @@ int GetScreenFullLabel(int index,CString &ret_full_label);
 
 int GetHolidayLabel(int index,CString &ret_label);
 int GetHolidayFullLabel(int index,CString &ret_full_label);
+int GetHolidayValue(int index, CString &Auto_M, CString &persend_data);
 
 int GetScheduleLabel(int index,CString &ret_label);
 int GetScheduleFullLabel(int index,CString &ret_full_label);
-
+int GetScheduleValue(int index, CString &Auto_M, CString &persend_data);
 int GetAmonLabel(int index,CString &ret_label);
 
 
@@ -317,7 +318,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 					else if((m_Input_data.at(label_info.nPoint_number).range >=23) && (m_Input_data.at(label_info.nPoint_number).range <= 30))
 					{
 						if(receive_customer_unit)
-							temp_unit = temp_unit_no_index[m_Input_data.at(label_info.nPoint_number).range - 23];
+							temp_unit = Custom_Digital_Range[m_Input_data.at(label_info.nPoint_number).range - 23];
 						else
 						{
 							return 0;
@@ -396,7 +397,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 					else if((m_Output_data.at(label_info.nPoint_number).range >=23) && (m_Output_data.at(label_info.nPoint_number).range <= 30))
 					{
 						if(receive_customer_unit)
-							temp_unit = temp_unit_no_index[m_Output_data.at(label_info.nPoint_number).range - 23];
+							temp_unit = Custom_Digital_Range[m_Output_data.at(label_info.nPoint_number).range - 23];
 						else
 						{
 							return 0;
@@ -474,7 +475,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 					else if((m_Variable_data.at(label_info.nPoint_number).range >=23) && (m_Variable_data.at(label_info.nPoint_number).range <= 30))
 					{
 						if(receive_customer_unit)
-							temp_unit = temp_unit_no_index[m_Variable_data.at(label_info.nPoint_number).range - 23];
+							temp_unit = Custom_Digital_Range[m_Variable_data.at(label_info.nPoint_number).range - 23];
 						else
 						{
 							return 0;
@@ -655,12 +656,16 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 	 MultiByteToWideChar( CP_ACP, 0, (char *)temp_info.ico_name,(int)strlen((char *)temp_info.ico_name)+1, 
 		 temp_icon_path.GetBuffer(MAX_PATH), MAX_PATH );
 	 temp_icon_path.ReleaseBuffer();	
-	
+
 	 temp_icon_path.Trim();
 	 if (temp_icon_path.IsEmpty())
 	 {
 		 m_edit_icon_path.SetWindowTextW(DEFAULT_ICON);
 	 }
+     else
+     {
+         m_edit_icon_path.SetWindowTextW(temp_icon_path);
+     }
 	 
 	 //
 	 MultiByteToWideChar( CP_ACP, 0, (char *)temp_info.ico_name_2,(int)strlen((char *)temp_info.ico_name_2)+1, 
@@ -674,6 +679,9 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 		 m_edit_icon2_path.SetWindowTextW(DEFAULT_ICON);
 	 }
 	 
+
+  
+
 	switch(temp_info.nDisplay_Type)
 	{
 	case LABEL_SHOW_VALUE:
@@ -683,6 +691,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 	case LABEL_ICON_FULL_DESCRIPTION:
 	case LABEL_ICON_LABEL:
 	case LABEL_ICON_SHOW_VALUE:
+    case LABEL_ICON_ONLY:
 		{
 			m_edit_display.SetWindowTextW(Label_Display_Array[temp_info.nDisplay_Type]);
 			m_display_cs = Label_Display_Array[temp_info.nDisplay_Type];
@@ -1043,10 +1052,11 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					m_original_name.Format(_T("%d-HOL%d"),temp_info.nMain_Panel,temp_info.nPoint_number + 1);
 					GetHolidayLabel(temp_info.nPoint_number,m_label_name);
 					GetHolidayFullLabel(temp_info.nPoint_number,m_full_label_name);
+                    GetHolidayValue(temp_info.nPoint_number, m_AutoManual, m_value);
 					m_static_point.SetWindowTextW(m_original_name);
 					m_static_label.SetWindowTextW(m_label_name);
 					m_static_full_label.SetWindowTextW(m_full_label_name);
-					m_edit_value.SetWindowTextW(m_original_name);
+					m_edit_value.SetWindowTextW(m_value);
 					m_edit_value.EnableWindow(false);
 
 					if(m_Annual_data.at(temp_info.nPoint_number).auto_manual == 0)
@@ -1207,12 +1217,20 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 			}
 			break;
 		}
-		if (digital_status == 2)
-		{
-			m_edit_icon2_path.ShowWindow(true);
-		}
-		else
-			m_edit_icon2_path.ShowWindow(false);
+        // digital_status 0-1 表示 ON OFF      2 表示是模拟量不是数字量;
+        if ((digital_status == 0) || (digital_status == 1))
+        {
+            m_edit_icon2_path.ShowWindow(true);
+        }
+        else
+            m_edit_icon2_path.ShowWindow(false);
+
+		//if (digital_status == 2)
+		//{
+		//	m_edit_icon2_path.ShowWindow(false);
+		//}
+		//else
+		//	m_edit_icon2_path.ShowWindow(true);
 
 	}
 	if(m_allow_change == false)
@@ -1312,10 +1330,17 @@ void CBacnetEditLabel::OnStnClickedStaticEditLabelDisplay()
 	}
 	else if(label_info.nDisplay_Type == LABEL_ICON_LABEL)
 	{
-		label_info.nDisplay_Type = LABEL_SHOW_VALUE;
+		label_info.nDisplay_Type = LABEL_ICON_ONLY;
 		m_edit_display.SetWindowTextW(Label_Display_Array[label_info.nDisplay_Type]);
 		ChangeWindowPos(0);
 	}
+    else if (label_info.nDisplay_Type == LABEL_ICON_ONLY)
+    {
+        label_info.nDisplay_Type = LABEL_SHOW_VALUE;
+        m_edit_display.SetWindowTextW(Label_Display_Array[label_info.nDisplay_Type]);
+        ChangeWindowPos(0);
+    }
+
 	nDefaultDisplayType  = label_info.nDisplay_Type ;
 	temp_cs.Format(_T("%u"),label_info.nDisplay_Type);
 	WritePrivateProfileStringW(_T("Setting"),_T("AddLabelDefaultDisplay"),temp_cs,g_cstring_ini_path);

@@ -68,6 +68,8 @@ __declspec(dllexport)    void Send_WhoIs_Global(
         int32_t low_limit,
         int32_t high_limit);
 
+__declspec(dllexport) void ShutDownMstpGlobal(uint8_t mstp_id);
+
     void Send_WhoIs_Local(
         int32_t low_limit,
         int32_t high_limit);
@@ -81,6 +83,11 @@ __declspec(dllexport)    void Send_WhoIs_Global(
         BACNET_ADDRESS * target_address,
         int32_t low_limit,
         int32_t high_limit);
+
+    void ShutDownMstp_To_Network(
+        BACNET_ADDRESS * target_address,
+        uint8_t mstp_id,
+        uint8_t n_time);
 
     void Send_WhoHas_Object(
         int32_t low_limit,
@@ -159,7 +166,7 @@ __declspec(dllexport)    void Send_WhoIs_Global(
         char *password);
 
 /* returns the invoke ID for confirmed request, or 0 if failed */
-    uint8_t Send_Device_Communication_Control_Request(
+    __declspec(dllexport)   uint8_t Send_Device_Communication_Control_Request(
         uint32_t device_id,
         uint16_t timeDuration,  /* 0=optional */
         BACNET_COMMUNICATION_ENABLE_DISABLE state,

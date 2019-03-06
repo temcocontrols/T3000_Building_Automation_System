@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "StatusbarCtrl.h"
 #include "afxdialogex.h"
-
+#include "T3000LogWindow.h"
 
 HDC status_gloab_hdc;
 HDC status_hMemDC;
@@ -80,11 +80,13 @@ BEGIN_MESSAGE_MAP(CMyStatusbarCtrl, CDialogEx)
 	ON_MESSAGE(WM_SHOW_STATUS_TEXT,ShowProgressText)
 	ON_WM_CLOSE()
 	ON_WM_PAINT()
+    ON_WM_LBUTTONDBLCLK()
 END_MESSAGE_MAP()
 
 
 // CMyStatusbarCtrl message handlers
-
+CString temp_statusbar_log_path;
+int n_count = 0;
 HANDLE mystatusbarthread = NULL;
 
 BOOL CMyStatusbarCtrl::OnInitDialog()
@@ -97,6 +99,17 @@ BOOL CMyStatusbarCtrl::OnInitDialog()
 		mystatusbarthread = CreateThread(NULL,NULL, MyStatusBarThread, this,NULL,NULL);
 		CloseHandle(mystatusbarthread);
 	}
+
+
+
+    CString ApplicationFolder;
+    GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+    PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
+    ApplicationFolder.ReleaseBuffer();
+    temp_statusbar_log_path = ApplicationFolder + _T("\\Database\\temp\\statusbarlog.ini");
+
+    WritePrivateProfileStringW(_T("Setting"),NULL, NULL, temp_statusbar_log_path);
+    WritePrivateProfileStringW(_T("Log"), NULL, NULL, temp_statusbar_log_path);
 
 	InitStatusBarDC();
 	return TRUE; // return TRUE unless you set the focus to a control
@@ -501,8 +514,38 @@ LRESULT CMyStatusbarCtrl::ShowProgressText(WPARAM wParam, LPARAM lParam)
 	                    temp_des2.GetBuffer(MAX_PATH), MAX_PATH);
 	temp_des2.ReleaseBuffer();
 
+    CString temp_count;
+    temp_count.Format(_T("%d"), n_count);
+
+    WritePrivateProfileStringW(_T("Setting"), _T("LogCount"), temp_count, temp_statusbar_log_path);
+    WritePrivateProfileStringW(_T("Log"), temp_count, temp_des2, temp_statusbar_log_path);
+
+    n_count = (n_count++) % 200;
+
 	cs_show_status_info = temp_des2;
 	if (temp_my_cs != NULL)
 		delete temp_my_cs;
 	return 0;
+}
+
+
+void CMyStatusbarCtrl::OnLButtonDblClk(UINT nFlags, CPoint point)
+{
+    // TODO: 在此添加消息处理程序代码和/或调用默认值
+    if (T3000LogWindow == NULL)
+    {
+        T3000LogWindow = new CT3000LogWindow;
+        T3000LogWindow->Create(IDD_DIALOG_LOG_WINDOW, this);
+        T3000LogWindow->ShowWindow(SW_HIDE);
+
+    }
+
+    if (T3000LogWindow->IsWindowVisible())
+    {
+    }
+    else
+        T3000LogWindow->ShowWindow(SW_SHOW);
+
+
+    CDialogEx::OnLButtonDblClk(nFlags, point);
 }

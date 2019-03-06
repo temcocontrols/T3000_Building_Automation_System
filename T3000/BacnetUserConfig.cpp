@@ -564,7 +564,7 @@ void CBacnetUserConfig::OnBnClickedButtonUserOk()
 			else
 			{
 				SetDlgItemTextW(IDC_EDIT_USER_PASSWORD,_T(""));
-				MessageBox(_T("Password error"),_T("Warning"),MB_OK);	
+				MessageBox(_T("User name or password error"),_T("Warning"),MB_OK);	
 				GetDlgItem(IDC_EDIT_USER_PASSWORD)->SetFocus();
 				return;
 			}

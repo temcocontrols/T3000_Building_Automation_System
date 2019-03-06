@@ -153,6 +153,9 @@ BEGIN_MESSAGE_MAP(CCO2NetView, CFormView)
 
     ON_WM_CTLCOLOR()
 	ON_EN_KILLFOCUS(IDC_EDIT_NAME, &CCO2NetView::OnEnKillfocusEditName)
+    ON_BN_CLICKED(IDC_RADIO_CO2_CAL_ENABLE, &CCO2NetView::OnBnClickedRadioCo2CalEnable)
+    ON_BN_CLICKED(IDC_RADIO_CO2_CAL_DISABLE, &CCO2NetView::OnBnClickedRadioCo2CalDisable)
+    ON_BN_CLICKED(IDC_RADIO_HUMIDITY_HEAT_ENABLE, &CCO2NetView::OnBnClickedRadioHumidityHeatEnable)
 END_MESSAGE_MAP()
 
 
@@ -193,7 +196,18 @@ void CCO2NetView::Fresh()
       //register_critical_section.Unlock();
 
     Initial_Window();
-	
+   
+    product_register_value[3131] = read_one(g_tstat_id, 3131);
+    if (product_register_value[3131] == 0)
+    {
+        ((CButton *)GetDlgItem(IDC_RADIO_CO2_CAL_ENABLE))->SetCheck(1);
+        ((CButton *)GetDlgItem(IDC_RADIO_CO2_CAL_DISABLE))->SetCheck(0);
+    }
+    else if(product_register_value[3131] == 1)
+    {
+        ((CButton *)GetDlgItem(IDC_RADIO_CO2_CAL_ENABLE))->SetCheck(0);
+        ((CButton *)GetDlgItem(IDC_RADIO_CO2_CAL_DISABLE))->SetCheck(1);
+    }
 	if (product_register_value[7] == STM32_CO2_RS485)
 	{
 		GetDlgItem(IDC_STATIC_IP_INFOR)->ShowWindow(SW_HIDE);
@@ -1400,38 +1414,40 @@ void CCO2NetView::Check_HourTime()
 
 void CCO2NetView::OnBnClickedBtnCo2Refresh()
 {
-    CDialog_Progess* pDlg = new CDialog_Progess(this,1,100);
+    //CDialog_Progess* pDlg = new CDialog_Progess(this,1,100);
     //创建对话框窗口
-    pDlg->Create(IDD_DIALOG10_Progress, this);
+    //pDlg->Create(IDD_DIALOG10_Progress, this);
 
     //居中显示
     //pDlg->CenterWindow();
     //void MoveWindow( LPCRECT lpRect, BOOL bRepaint = TRUE );
     //pDlg->MoveWindow(100,100,500,1000);
-    pDlg->ShowProgress(0,0);
+    //pDlg->ShowProgress(0,0);
     //显示对话框窗口
-    pDlg->ShowWindow(SW_SHOW);
-    RECT RECT_SET1;
-    GetClientRect(&RECT_SET1);
-    pDlg->MoveWindow(RECT_SET1.left+400,RECT_SET1.bottom-19,RECT_SET1.right/2+20,20);
+    //pDlg->ShowWindow(SW_SHOW);
+   // RECT RECT_SET1;
+   // GetClientRect(&RECT_SET1);
+    //pDlg->MoveWindow(RECT_SET1.left+400,RECT_SET1.bottom-19,RECT_SET1.right/2+20,20);
     float progress;
     int it=0;
-    for(int i=0; i<27; i++)
+    for(int i=0; i<4; i++)
     {
         Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100);
-        if (pDlg!=NULL)
-        {
-            progress=float((it+1)*(100/27));
-            pDlg->ShowProgress(int(progress),(int)progress);
+       // if (pDlg!=NULL)
+       // {
+            progress=float((it+1)*(100/4));
+            g_progress_persent = progress;
+            //pDlg->ShowProgress(int(progress),(int)progress);
             ++it;
-        }
+       // }
+            Sleep(100);
     }
     Initial_Window();
-    pDlg->ShowProgress(100,100);
-    pDlg->ShowWindow(SW_HIDE);
-    if(pDlg!=NULL)
-        delete pDlg;
-    pDlg=NULL;
+   // pDlg->ShowProgress(100,100);
+   // pDlg->ShowWindow(SW_HIDE);
+   // if(pDlg!=NULL)
+   //     delete pDlg;
+   // pDlg=NULL;
 
 }
 
@@ -1641,7 +1657,7 @@ void CCO2NetView::Initial_OutputList()
 		m_output_list.SetItemText(2,4,strTemp);
 
 		AddressValue =1260 - 1250;
-		strTemp.Format(_T("%0.1f"),(float)(short)(TempDataArray[AddressValue])/10.0);
+		strTemp.Format(_T("%d"),(unsigned short)(TempDataArray[AddressValue]));
 		m_output_list.SetItemText(2,5,strTemp);
  
 
@@ -1722,7 +1738,7 @@ void CCO2NetView::Initial_OutputList()
 		}
 		else if (output_range==3)
 		{
-			Temp=((float)((short)TempDataArray[3067] - 3060));
+			Temp=((float)((short)TempDataArray[3067 - 3060]));
 			Vtemp=(Temp)/100;
 			strTemp.Format(_T("%.2f ma"),Vtemp);
 		}
@@ -1808,7 +1824,8 @@ void CCO2NetView::Initial_VarList()
 		MODBUS_MIX_RATIO= 489;  //unit.g/kg
 		MODBUS_ENTHALPY= 490;  //unit.kJ/kg
 	}
-	else if (product_register_value[7] == STM32_CO2_RS485)
+	else if ((product_register_value[7] == STM32_CO2_RS485) ||
+              (product_register_value[7] == STM32_CO2_NET))
 	{
 		MODBUS_CF	=	201;
 		MODBUS_DEW_PT = 3049;   //unit.C
@@ -1826,7 +1843,12 @@ void CCO2NetView::Initial_VarList()
 		MODBUS_ENTHALPY= MODBUS_DEW_PT +4;  //unit.kJ/kg
 	}
 	Read_Multi(g_tstat_id,TempDataArray,MODBUS_DEW_PT,100);
-	if (product_register_value[7] == PM_HUMTEMPSENSOR||product_register_value[7] == PM_AirQuality||product_register_value[7]==PM_HUM_R||product_register_value[7] == STM32_CO2_RS485)
+	if (product_register_value[7] == PM_HUMTEMPSENSOR||
+        product_register_value[7] == PM_AirQuality||
+        product_register_value[7]==PM_HUM_R||
+        product_register_value[7] == STM32_CO2_RS485 ||
+        product_register_value[7] == STM32_CO2_NET
+        )
 	{
 		m_user_list.SetItemText(0,1,_T("Dew Point"));
 
@@ -2009,4 +2031,32 @@ void CCO2NetView::OnEnKillfocusEditName()
 
 	}
 	 
+}
+
+
+void CCO2NetView::OnBnClickedRadioCo2CalEnable()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    if (product_register_value[3131] != 0)
+    {
+        Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, 3131, 0,
+            product_register_value[3131], this->m_hWnd, IDC_RADIO_CO2_CAL_ENABLE, _T("Auto Calibration Enable"));
+    }
+}
+
+
+void CCO2NetView::OnBnClickedRadioCo2CalDisable()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    if (product_register_value[3131] != 1)
+    {
+        Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, 3131, 1,
+            product_register_value[3131], this->m_hWnd, IDC_RADIO_CO2_CAL_ENABLE, _T("Auto Calibration Disable"));
+    }
+}
+
+
+void CCO2NetView::OnBnClickedRadioHumidityHeatEnable()
+{
+    // TODO: 在此添加控件通知处理程序代码
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include "afxwin.h"
 
 
 // CT3000Option dialog
@@ -22,4 +23,8 @@ public:
 	CComboBox m_combox_language;
 	virtual BOOL OnInitDialog();
 	afx_msg void OnCbnSelchangeComboLanguage();
+    CComboBox m_option_baudrate;
+    afx_msg void OnBnClickedOk();
+    afx_msg void OnTimer(UINT_PTR nIDEvent);
+    int show_time_left;
 };

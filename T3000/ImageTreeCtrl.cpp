@@ -21,6 +21,7 @@ enum ECmdHandler {
 	ID_PING_CMD,
 	ID_ADD_VIRTUAL_DEVICE,
 	ID_ADD_CUSTOM_DEVICE,
+    ID_ADD_REMOTE_DEVICE,
 	ID_MAX_CMD
 };
 
@@ -142,12 +143,15 @@ CImageTreeCtrl::CImageTreeCtrl()
 	m_Commandmap[ID_PING_CMD]		        = &CImageTreeCtrl::PingDevice;
 	m_Commandmap[ID_ADD_VIRTUAL_DEVICE]     = &CImageTreeCtrl::HandleAddVirtualDevice;
 	m_Commandmap[ID_ADD_CUSTOM_DEVICE]      = &CImageTreeCtrl::HandleAddCustomDevice;
+    m_Commandmap[ID_ADD_REMOTE_DEVICE] =      &CImageTreeCtrl::HandleAddRemoteDevice;
 	old_hItem = NULL;
 	m_serial_number = 0;
 	is_focus = false;
 	tree_offline_mode = false;
 	m_virtual_tree_item = NULL;
     Inial_ProductName_map();
+    m_hSelItem = NULL;
+
 }
 
 CImageTreeCtrl::~CImageTreeCtrl()
@@ -166,6 +170,10 @@ BEGIN_MESSAGE_MAP(CImageTreeCtrl, CTreeCtrl)
 	ON_WM_KILLFOCUS()
 	ON_WM_SETFOCUS()
 	ON_WM_TIMER()
+
+    ON_NOTIFY_EX_RANGE(TTN_NEEDTEXTW, 0, 0xFFFF, OnToolTipText)
+    ON_NOTIFY_EX_RANGE(TTN_NEEDTEXTA, 0, 0xFFFF, OnToolTipText)
+
 END_MESSAGE_MAP()
 void CImageTreeCtrl::OnContextCmd(UINT id) {
 	HTREEITEM hCur = GetSelectedItem();
@@ -248,6 +256,17 @@ bool CImageTreeCtrl::HandleAddCustomDevice(HTREEITEM hItem)
 	popdlg.DoModal();
 	return true;
 }
+
+#include "BacnetAddRemoteDevice.h"
+bool CImageTreeCtrl::HandleAddRemoteDevice(HTREEITEM)
+{
+    CBacnetAddRemoteDevice RemoteDlg;
+    RemoteDlg.DoModal();
+    CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+    ::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING, 0, 0);
+    return true;
+}
+
 bool CImageTreeCtrl::SortByConnection(HTREEITEM hItem) 
 {
 	if(product_sort_way != SORT_BY_CONNECTION)
@@ -1363,6 +1382,8 @@ void CImageTreeCtrl::FlashSelectItem(HTREEITEM hItem)
 {
 	if(tree_offline_mode == false)
 		return;
+    if (hItem == NULL)
+        return;
 	static int flash_count = 1;
 	flash_count = flash_count %3  + 1;
 	if(flash_count == 1)
@@ -1664,16 +1685,16 @@ void CImageTreeCtrl::DisplayContextOtherMenu(CPoint & point) {
 		VERIFY(menu.CreatePopupMenu());
 
 		VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_CONNECTION, _T("Sort By Connection")));
-		VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_FLOOR, _T("Sort By Floor")));
-		VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_CUSTOM_DEVICE, _T("Add Custom Device")));
+        VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_FLOOR, _T("Sort By Floor")));
+        VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_CUSTOM_DEVICE, _T("Add Custom Device")));
+        VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_REMOTE_DEVICE, _T("Add Remote Device")));
 
-		if((m_virtual_tree_item != NULL) && (hItem == m_virtual_tree_item))
-			{
-			VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_VIRTUAL_DEVICE, _T("Add Virtual Device")));
-			VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_CUSTOM_DEVICE, _T("Add Custom Device")));
-			}
-		if(menu.GetMenuItemCount() > 0)
-			menu.TrackPopupMenu(TPM_LEFTALIGN, point.x, point.y, this);
+        if ((m_virtual_tree_item != NULL) && (hItem == m_virtual_tree_item))
+        {
+            VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_VIRTUAL_DEVICE, _T("Add Virtual Device")));
+        }
+        if (menu.GetMenuItemCount() > 0)
+            menu.TrackPopupMenu(TPM_LEFTALIGN, point.x, point.y, this);
 }
 
 void CImageTreeCtrl::DisplayContextMenu(CPoint & point) {
@@ -1775,4 +1796,176 @@ void CImageTreeCtrl::OnTimer(UINT_PTR nIDEvent)
 	//temp_item_text = offline_mode_string + _T("  Offline Mode");
 	//SetItemText(m_hSelItem,temp_item_text);
 	CTreeCtrl::OnTimer(nIDEvent);
+}
+
+
+void CImageTreeCtrl::PreSubclassWindow()
+{
+    // TODO: 在此添加专用代码和/或调用基类
+
+    CTreeCtrl::PreSubclassWindow();
+
+    EnableToolTips(TRUE);
+
+}
+
+
+INT_PTR CImageTreeCtrl::OnToolHitTest(CPoint point, TOOLINFO* pTI) const
+{
+    // TODO: 在此添加专用代码和/或调用基类
+    RECT rect;
+
+    UINT nFlags;
+    HTREEITEM hitem = HitTest(point, &nFlags);
+    if (nFlags & TVHT_ONITEMICON)
+    {
+        CImageList *pImg = GetImageList(TVSIL_NORMAL);
+        IMAGEINFO imageinfo;
+        pImg->GetImageInfo(0, &imageinfo);
+
+        GetItemRect(hitem, &rect, TRUE);
+        rect.right = rect.left - 2;
+        rect.left -= (imageinfo.rcImage.right + 2);
+
+        pTI->hwnd = m_hWnd;
+        pTI->uId = (UINT)hitem;
+        pTI->lpszText = LPSTR_TEXTCALLBACK;
+        pTI->rect = rect;
+        return pTI->uId;
+    }
+    else if (nFlags & TVHT_ONITEMLABEL)
+    {
+        GetItemRect(hitem, &rect, TRUE);
+
+        pTI->hwnd = m_hWnd;
+
+        pTI->uId = (UINT_PTR)hitem;
+
+        pTI->lpszText = LPSTR_TEXTCALLBACK;
+
+        pTI->rect = rect;
+
+        return pTI->uId;
+    }
+    else if (nFlags & TVHT_ONITEMSTATEICON)
+    {
+        CImageList *pImg = GetImageList(TVSIL_NORMAL);
+        IMAGEINFO imageinfo;
+        pImg->GetImageInfo(0, &imageinfo);
+
+        GetItemRect(hitem, &rect, TRUE);
+        rect.right = rect.left - (imageinfo.rcImage.right + 2);
+
+        pImg = GetImageList(TVSIL_STATE);
+        rect.left = rect.right - imageinfo.rcImage.right;
+
+        pTI->hwnd = m_hWnd;
+        pTI->uId = (UINT)hitem;
+        pTI->lpszText = LPSTR_TEXTCALLBACK;
+        pTI->rect = rect;
+
+        // return value should be different from that used for item icon
+        return pTI->uId * 2;
+    }
+    return -1;
+
+    return CTreeCtrl::OnToolHitTest(point, pTI);
+}
+
+BOOL CImageTreeCtrl::OnToolTipText(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
+{
+    // need to handle both ANSI and UNICODE versions of the message
+    TOOLTIPTEXTA* pTTTA = (TOOLTIPTEXTA*)pNMHDR;
+    TOOLTIPTEXTW* pTTTW = (TOOLTIPTEXTW*)pNMHDR;
+    CString strTipText;
+    UINT nID = pNMHDR->idFrom;
+
+    // Do not process the message from built in tooltip
+    if (nID == (UINT)m_hWnd &&
+        ((pNMHDR->code == TTN_NEEDTEXTA && pTTTA->uFlags & TTF_IDISHWND) ||
+        (pNMHDR->code == TTN_NEEDTEXTW && pTTTW->uFlags & TTF_IDISHWND)))
+        return FALSE;
+
+    // Get the mouse position
+    const MSG* pMessage;
+    CPoint pt;
+    pMessage = GetCurrentMessage();
+    ASSERT(pMessage);
+    pt = pMessage->pt;
+    ScreenToClient(&pt);
+
+    UINT nFlags;
+    HTREEITEM hitem = HitTest(pt, &nFlags);
+
+    strTipText.Format(_T("%s"), GetItemText((HTREEITEM)nID));  //get item text
+
+    DWORD dw = (DWORD)GetItemData((HTREEITEM)nID); //get item data
+
+    CString* ItemData = (CString*)dw; //CAST item data
+#if 0
+    if (ItemData != NULL)
+
+    {
+
+        //CString s = ItemData; //pure virtual function
+
+        strTipText = CString(_T(" ")) + *ItemData  + _T("\r\n Test"); //add node text to node data text
+
+    }
+#endif
+#ifndef _UNICODE
+
+    if (pNMHDR->code == TTN_NEEDTEXTA)
+
+        lstrcpyn(pTTTA->szText, strTipText, 80);
+
+    else
+
+        _mbstowcsz(pTTTW->szText, strTipText, 80);
+
+#else
+
+    if (pNMHDR->code == TTN_NEEDTEXTA)
+
+        _wcstombsz(pTTTA->szText, strTipText, 80);
+
+    else
+
+        lstrcpyn(pTTTW->szText, strTipText, 80);
+
+    CString TestAA;
+    TestAA = _T("\r\n111111111111111\r\n22222222222222");
+    lstrcatW(pTTTW->szText, TestAA);
+    //lstrcpyn(pTTTW->szText, TestAA, 80);
+#endif
+
+#if 0
+    if (nFlags & TVHT_ONITEMICON)
+    {
+        int nImage, nSelImage;
+        GetItemImage((HTREEITEM)nID, nImage, nSelImage);
+        strTipText.Format(_T("Image : %d11111111111\r\n22222222222222\r\n33333333333"), nImage);
+    }
+    else
+    {
+        strTipText.Format(_T("State : %d"), GetItemState((HTREEITEM)nID,
+            TVIS_STATEIMAGEMASK));
+    }
+
+
+#ifndef _UNICODE
+    if (pNMHDR->code == TTN_NEEDTEXTA)
+        lstrcpyn(pTTTA->szText, strTipText, 80);
+    else
+        _mbstowcsz(pTTTW->szText, strTipText, 80);
+#else
+    if (pNMHDR->code == TTN_NEEDTEXTA)
+        _wcstombsz(pTTTA->szText, strTipText, 80);
+    else
+        lstrcpyn(pTTTW->szText, strTipText, 80);
+#endif
+#endif
+    *pResult = 0;
+
+    return TRUE; // message was handled
 }

@@ -5,7 +5,7 @@
 
 #define MaxAddressNum   255
 #define MaxRegisterNum  320
-#define BAUDRATENUMBER  5
+#define BAUDRATENUMBER  6
 typedef unsigned char	TS_UC   ;
 typedef char			TS_C    ;
 typedef unsigned short	TS_US   ;

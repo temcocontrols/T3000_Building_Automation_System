@@ -1521,8 +1521,11 @@ LRESULT CFlash_Multy::MultyFlashMessage(WPARAM wParam,LPARAM lParam)
         m_flash_multy_list.SetItemTextColor(sub_parameter,-1,CONFIG_COLOR_CONFIG_FLASH_GOOD);
         //m_flash_multy_list.SetItemText(sub_parameter,FLASH_RESULTS,_T("Sucessful"));
         m_flash_multy_list.SetItemText(sub_parameter,FLASH_CONFIG_RESULTS,_T("Sucessful"));
-        StrSql.Format(_T("Update BatchFlashResult Set ConfigResult = 3 Where SN = %d "),_wtoi(flash_device.at(sub_parameter-1).strSN));
-        SqliteDBBuilding.execDML((UTF8MBSTR)StrSql);
+        //if (sub_parameter > 0)
+        //{
+        //    StrSql.Format(_T("Update BatchFlashResult Set ConfigResult = 3 Where SN = %d "), _wtoi(flash_device.at(sub_parameter - 1).strSN));
+        //    SqliteDBBuilding.execDML((UTF8MBSTR)StrSql);
+        //}
     }
     break;
     case CHANGE_THE_ITEM_COLOR_LESS_RED:

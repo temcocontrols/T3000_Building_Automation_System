@@ -46,10 +46,11 @@ int GetScreenFullLabel(int index,CString &ret_full_label);
 
 int GetHolidayLabel(int index,CString &ret_label);
 int GetHolidayFullLabel(int index,CString &ret_full_label);
+int GetHolidayValue(int index, CString &Auto_M, CString &persend_data);
 
 int GetScheduleLabel(int index,CString &ret_label);
 int GetScheduleFullLabel(int index,CString &ret_full_label);
-
+int GetScheduleValue(int index, CString &Auto_M, CString &persend_data);
 int GetAmonLabel(int index,CString &ret_label);
 
 
@@ -866,11 +867,11 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 	Invalidate(1);
 	::SetWindowPos(this->m_hWnd,HWND_TOP,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
 
-    if(h_read_all_panel_des_thread == NULL)
-       h_read_all_panel_des_thread = CreateThread(NULL, NULL, ReadAllPanelThreadfun, this, NULL, NULL);
+    //if(h_read_all_panel_des_thread == NULL)
+    //   h_read_all_panel_des_thread = CreateThread(NULL, NULL, ReadAllPanelThreadfun, this, NULL, NULL);
 
-    if(h_refresh_group_thread == NULL)
-       h_refresh_group_thread = CreateThread(NULL, NULL, ReadGroupDataThreadfun, this, NULL, NULL);
+    //if(h_refresh_group_thread == NULL)
+    //   h_refresh_group_thread = CreateThread(NULL, NULL, ReadGroupDataThreadfun, this, NULL, NULL);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -1391,6 +1392,7 @@ int CBacnetScreenEdit::JudgeClickItem(CPoint & point)
 		else if((m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_VALUE) ||
 			(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_FULL_DESCRIPTION) ||
 			(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_LABEL) ||
+            (m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_ONLY) ||
 			(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_SHOW_VALUE))
 		{
 			int temp_index = 0;
@@ -1841,7 +1843,9 @@ void CBacnetScreenEdit::OnPaint()
 					{
 						int get_label_var = GetScheduleLabel(read_bac_index,cs_label);
 						int get_full_label_var = GetScheduleFullLabel(read_bac_index,cs_full_label);
-						if((get_label_var < 0) || (get_full_label_var < 0))
+                        int get_ret_var = GetScheduleValue(read_bac_index, cs_auto_m, cs_value);
+                        if ((get_ret_var <0) || (get_label_var < 0) || (get_full_label_var < 0))
+						//if((get_label_var < 0) || (get_full_label_var < 0))
 							label_invalid = true;
 					}
 					else
@@ -1854,7 +1858,9 @@ void CBacnetScreenEdit::OnPaint()
 					{
 						int get_label_var = GetHolidayLabel(read_bac_index,cs_label);
 						int get_full_label_var = GetHolidayFullLabel(read_bac_index,cs_full_label);
-						if((get_label_var < 0) || (get_full_label_var < 0))
+                        int get_ret_var = GetHolidayValue(read_bac_index, cs_auto_m, cs_value);
+                        if ((get_ret_var <0) || (get_label_var < 0) || (get_full_label_var < 0))
+						//if((get_label_var < 0) || (get_full_label_var < 0))
 							label_invalid = true;
 					}
 					else
@@ -1941,6 +1947,9 @@ void CBacnetScreenEdit::OnPaint()
 			case LABEL_ICON_SHOW_VALUE:
 				cs_show_info = cs_value + _T("  ") + cs_unit + _T("  ") + cs_auto_m;
 				break;
+            case LABEL_ICON_ONLY:
+                cs_show_info.Empty();
+                break;
 			default:
 				{
 					cs_show_info = _T("Label Invalid");
@@ -1992,6 +2001,7 @@ void CBacnetScreenEdit::OnPaint()
 
 		if((m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_LABEL) ||
 			(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_VALUE) ||
+            (m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_ONLY) ||
 			(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_SHOW_VALUE) ||
 			(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_FULL_DESCRIPTION))
 		{
@@ -2009,6 +2019,7 @@ void CBacnetScreenEdit::OnPaint()
 					temp2_cstring.GetBuffer(MAX_PATH), MAX_PATH );
 				temp2_cstring.ReleaseBuffer();
 			//}
+
 
 			if(m_bac_label_vector.at(i).nPoint_type == BAC_GRP)
 			{
@@ -2227,7 +2238,10 @@ void CBacnetScreenEdit::OnPaint()
 			mygraphics->DrawImage(&icon_bitmap,0 ,0,LOCK_ICON_SIZE_X,LOCK_ICON_SIZE_Y);
 		}
 
-
+        if (m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_ONLY)
+        {
+            cs_show_info = _T(" ");
+        }
 		mygraphics->DrawString(cs_show_info, -1, &unitfont, pointF, &txt_color_brush);
 		delete mygraphics;
 	}
@@ -2324,6 +2338,7 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 			break;
 		}
 		else if(((m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_VALUE) ||
+            (m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_ONLY) ||
 			(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_SHOW_VALUE) ||
 			(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_FULL_DESCRIPTION) ||
 			(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_LABEL)) /*&& (screen_lock_label == false)*/)
@@ -2585,9 +2600,27 @@ bool CBacnetScreenEdit::UpdateDeviceLabelFlash()
 {
 	int ret_return = 0;
 
+    //离线模式下 重新计算 各个标签 的个数.因为此前 在线模式下是由 T3BB 计算的。
+    if (offline_mode)
+    {
+        for (int i = 0; i < BAC_SCREEN_COUNT; i++)
+        {
+            m_screen_data.at(m_graphic_label_data.at(i).reg.nScreen_index).update = 0;
+        }
+        for (int i = 0;i < BAC_GRPHIC_LABEL_COUNT;i++)
+        {
+            if ((g_selected_serialnumber == m_graphic_label_data.at(i).reg.nSerialNum) &&
+                (m_graphic_label_data.at(i).reg.label_status == 1) &&
+                (m_graphic_label_data.at(i).reg.nScreen_index < BAC_SCREEN_COUNT))
+            {
+                m_screen_data.at(m_graphic_label_data.at(i).reg.nScreen_index).update++;
+            }
+        }
+    }
+
+
 	for (int i=0;i<BAC_GRPHIC_LABEL_GROUP - 1;i++ )
 	{
-		
 		int cmp_ret = memcmp(&m_temp_graphic_label_data[i*BAC_READ_GRPHIC_LABEL_GROUP_NUMBER],&m_graphic_label_data.at(i*BAC_READ_GRPHIC_LABEL_GROUP_NUMBER),sizeof(Str_label_point) * BAC_READ_GRPHIC_LABEL_GROUP_NUMBER);
 		if(cmp_ret!=0)
 		{
@@ -2656,15 +2689,15 @@ void CBacnetScreenEdit::OnTimer(UINT_PTR nIDEvent)
 		{
 			if(this->IsWindowVisible())
 			{
-				//for (int i=0;i<(int)m_graphic_refresh_data.size();i++)
-				//{
-				//	Post_Refresh_One_Message(m_graphic_refresh_data.at(i).deviceid,
-				//		m_graphic_refresh_data.at(i).command,
-				//		m_graphic_refresh_data.at(i).value_item,
-				//		m_graphic_refresh_data.at(i).value_item,
-				//		m_graphic_refresh_data.at(i).entitysize);
-				//	//m_graphic_refresh_data.at(i).control_pt->Invalidate();
-				//}
+				for (int i=0;i<(int)m_graphic_refresh_data.size();i++)
+				{
+					Post_Refresh_One_Message(m_graphic_refresh_data.at(i).deviceid,
+						m_graphic_refresh_data.at(i).command,
+						m_graphic_refresh_data.at(i).value_item,
+						m_graphic_refresh_data.at(i).value_item,
+						m_graphic_refresh_data.at(i).entitysize);
+					//m_graphic_refresh_data.at(i).control_pt->Invalidate();
+				}
 				Invalidate(0);
 			}
 		}

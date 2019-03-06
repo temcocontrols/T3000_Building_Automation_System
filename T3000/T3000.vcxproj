@@ -142,6 +142,7 @@
     <ClCompile Include="AutoRichEditCtrl.cpp" />
     <ClCompile Include="Bacnetaddintodb.cpp" />
     <ClCompile Include="BacnetAddLabel.cpp" />
+    <ClCompile Include="BacnetAddRemoteDevice.cpp" />
     <ClCompile Include="BacnetAddVirtualDevice.cpp" />
     <ClCompile Include="BacnetAlarmLog.cpp" />
     <ClCompile Include="ARDDlg.cpp" />
@@ -164,6 +165,7 @@
     <ClCompile Include="BacnetProgramEdit.cpp" />
     <ClCompile Include="BacnetProgramSetting.cpp" />
     <ClCompile Include="BacnetRange.cpp" />
+    <ClCompile Include="BacnetRegisterListView.cpp" />
     <ClCompile Include="BacnetRemotePoint.cpp" />
     <ClCompile Include="BacnetRemotePortWarning.cpp" />
     <ClCompile Include="BacnetScheduleTime.cpp" />
@@ -223,6 +225,7 @@
     <ClCompile Include="CM5\MyOwnListCtrl.cpp" />
     <ClCompile Include="CM5\PointItem.cpp" />
     <ClCompile Include="CO2NetView.cpp" />
+    <ClCompile Include="CO2_NodeView.cpp" />
     <ClCompile Include="CO2_View.cpp" />
     <ClCompile Include="ConfigFileHandler.cpp" />
     <ClCompile Include="Config_Routines.cpp" />
@@ -284,6 +287,8 @@
     <ClCompile Include="ParameterDlg.cpp" />
     <ClCompile Include="ParameterExtDlg.cpp" />
     <ClCompile Include="ping.cpp" />
+    <ClCompile Include="Powermeter.cpp" />
+    <ClCompile Include="PowerMeterList.cpp" />
     <ClCompile Include="PressureSensorForm.cpp" />
     <ClCompile Include="ProductRegisterListView.cpp" />
     <ClCompile Include="RefreshTreeThread.cpp" />
@@ -304,6 +309,7 @@
     <ClCompile Include="T3000.cpp" />
     <ClCompile Include="T3000DefaultView.cpp" />
     <ClCompile Include="T3000Doc.cpp" />
+    <ClCompile Include="T3000LogWindow.cpp" />
     <ClCompile Include="T3000Option.cpp" />
     <ClCompile Include="T3000RegAddress.cpp" />
     <ClCompile Include="T3000UpdateDlg.cpp" />
@@ -481,6 +487,7 @@
     <ClInclude Include="AutoRichEditCtrl.h" />
     <ClInclude Include="Bacnetaddintodb.h" />
     <ClInclude Include="BacnetAddLabel.h" />
+    <ClInclude Include="BacnetAddRemoteDevice.h" />
     <ClInclude Include="BacnetAddVirtualDevice.h" />
     <ClInclude Include="BacnetAlarmLog.h" />
     <ClInclude Include="ARDDlg.h" />
@@ -500,6 +507,7 @@
     <ClInclude Include="BacnetProgramEdit.h" />
     <ClInclude Include="BacnetProgramSetting.h" />
     <ClInclude Include="BacnetRange.h" />
+    <ClInclude Include="BacnetRegisterListView.h" />
     <ClInclude Include="BacnetRemotePoint.h" />
     <ClInclude Include="BacnetScreenEdit.h" />
     <ClInclude Include="BacnetSetting.h" />
@@ -523,6 +531,7 @@
     <ClInclude Include="BuildingConfigEditDlg.h" />
     <ClInclude Include="BuildingConfigration.h" />
     <ClInclude Include="CalibartionHT.h" />
+    <ClInclude Include="CApplication0.h" />
     <ClInclude Include="ChartCtrl\ChartAxis.h" />
     <ClInclude Include="ChartCtrl\ChartAxisLabel.h" />
     <ClInclude Include="ChartCtrl\ChartBalloonLabel.h" />
@@ -565,10 +574,17 @@
     <ClInclude Include="CM5\ud_str.h" />
     <ClInclude Include="CM5\user_data.h" />
     <ClInclude Include="CO2NetView.h" />
+    <ClInclude Include="CO2_Node.h" />
+    <ClInclude Include="CO2_NodeView.h" />
     <ClInclude Include="CO2_View.h" />
     <ClInclude Include="ConfigFileHandler.h" />
     <ClInclude Include="ConnectRemoteServer.h" />
+    <ClInclude Include="CRange0.h" />
     <ClInclude Include="CustomSTable.h" />
+    <ClInclude Include="CWorkbook0.h" />
+    <ClInclude Include="CWorkbooks0.h" />
+    <ClInclude Include="CWorksheet0.h" />
+    <ClInclude Include="CWorksheets0.h" />
     <ClInclude Include="DebugWindow.h" />
     <ClInclude Include="DetectOnlineDlg.h" />
     <ClInclude Include="DialogCM5_BacNet.h" />
@@ -602,6 +618,8 @@
     <ClInclude Include="OXToolTipCtrl.h" />
     <ClInclude Include="ParameterExtDlg.h" />
     <ClInclude Include="ping.h" />
+    <ClInclude Include="Powermeter.h" />
+    <ClInclude Include="PowerMeterList.h" />
     <ClInclude Include="PressureSensorForm.h" />
     <ClInclude Include="ProductModel.h" />
     <ClInclude Include="ProductRegisterListView.h" />
@@ -614,6 +632,7 @@
     <ClInclude Include="StaticDlg.h" />
     <ClInclude Include="StatusbarCtrl.h" />
     <ClInclude Include="T3000DefaultView.h" />
+    <ClInclude Include="T3000LogWindow.h" />
     <ClInclude Include="T3000Option.h" />
     <ClInclude Include="T3000UpdateDlg.h" />
     <ClInclude Include="T3000_Default_MainView.h" />
@@ -738,9 +757,6 @@
   <ProjectExtensions>
     <VisualStudio>
       <UserProperties RESOURCE_FILE="T3000.rc" _x007B_232E456A-87C3-11D1-8BE3-0000F8754DA1_x007D_="CMonthview1" _x007B_6262D3A0-531B-11CF-91F6-C2863C385E30_x007D_="CMsflexgrid1" _x007B_3A2B370C-BA0A-11D1-B137-0000F8753F5D_x007D_="CMschart1" />
-    </VisualStudio>
-    <VisualStudio>
-      <UserProperties _x007B_E8789EA8-CA99-48DF-B920-1A1DCB4FF6AD_x007D_="CForms1" _x007B_3A2B370C-BA0A-11D1-B137-0000F8753F5D_x007D_="CMschart1" RESOURCE_FILE="T3000.rc" _x007B_6262D3A0-531B-11CF-91F6-C2863C385E30_x007D_="CMsflexgrid1" _x007B_232E456A-87C3-11D1-8BE3-0000F8754DA1_x007D_="CMonthview1" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

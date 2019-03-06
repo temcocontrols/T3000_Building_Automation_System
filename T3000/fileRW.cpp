@@ -22,7 +22,7 @@
 #define CO2NODE_VAR_NUM 15
 #define NET_WORK_CONTROLLER_NUM 24
 #define TSTAT26_VAR_NUM 163
-#define TSTAT26_VAR_NUM_TSTAT67 389
+#define TSTAT26_VAR_NUM_TSTAT67  392
 #define NET_WORK_DEFFERENT_TSTAT_FILE "NET WORK\n"
 #define INPUTCARD_NUM 24
 #define GROUP_NUM 40
@@ -480,14 +480,14 @@ _TCHAR * TSTATVAR_CONST_26[] = {                  //attention:该数组中的值，不要
 };
 _TCHAR * TSTATVAR_CONST_67[] = {                  //attention:该数组中的值，不要有完全包含的出现
 	_T("COOL HEAT MODE"),																																																																																						
-	_T("MODE OPERATION"),																																																																																						
+	//_T("MODE OPERATION"),																																																																																						
 	_T("SEQUENCE"),																																																																																						
 	_T("DEGC OR F"),																																																																																						
 	_T("FAN MODE"),																																																																																						
 	_T("POWERUP MODE"),																																																																																						
 	_T("AUTO ONLY"),																																																																																						
-	_T("FACTORY DEFAULTS"),																																																																																						
-	_T("INFO BYTE"),																																																																																						
+	//_T("FACTORY DEFAULTS"),																																																																																						
+	//_T("INFO BYTE"),																																																																																						
 	//_T("BAUDRATE"),																																																																																						
 	_T("OVERRIDE TIMER"),																																																																																						
 	_T("OVERRIDE TIMER LEFT"),																																																																																						
@@ -871,7 +871,10 @@ _TCHAR * TSTATVAR_CONST_67[] = {                  //attention:该数组中的值，不要
 	_T("	 PID3 OFF OUTPUT COOL3 	")	,
 	_T("	 PID3 OFF OUTPUT HEAT1   	")	,
 	_T("	 PID3 OFF OUTPUT HEAT2 	")	,
-	_T("	 PID3 OFF OUTPUT HEAT3 	")		
+	_T("	 PID3 OFF OUTPUT HEAT3 	")	,
+    _T("     MODBUS_HEAT_COOL_MODE  ")  ,
+    _T("     MODBUS_PID_D_TERM  "),
+    _T("     MODBUS_PID_SAMPLE_TIME  ")
 };
 _TCHAR * CO2NODEVAR_CONST_25[] = {                  //attention:该数组中的值，不要有完全包含的出现
     _T("CO2 Calibration Offset"),		
@@ -2277,14 +2280,17 @@ void var_write_Tstat67(wofstream & out)
 		MODBUS_PID3_OFF_OUTPUT_COOL3 	,
 		MODBUS_PID3_OFF_OUTPUT_HEAT1   ,
 		MODBUS_PID3_OFF_OUTPUT_HEAT2 	,
-		MODBUS_PID3_OFF_OUTPUT_HEAT3  
+		MODBUS_PID3_OFF_OUTPUT_HEAT3  ,
+            MODBUS_HEAT_COOL_MODE ,
+            MODBUS_PID_D_TERM,
+            MODBUS_PID_SAMPLE_TIME,
+
 	};
 	//used by save2file functiojn
 	CString str1;
 	
 			for(int i=0;i<TSTAT26_VAR_NUM_TSTAT67;i++)
 			{
-				 
 			    str1.Format(_T("%d,\t%d,\t%s"),tstat67_register_var[i],product_register_value[tstat67_register_var[i]],TSTATVAR_CONST_67[i]);
 				_Twrite_to_file_a_line(out,str1);
 				if((i%5)==4)
@@ -3639,6 +3645,10 @@ Reg_Infor Reg_Infor_Temp;
 	temp=wcsstr(temp,_T(","));
 	temp++;	
 	int register_id=_wtoi(buf);
+    if (register_id == 101)
+    {
+        return;  //2018 08 22  TSTAT 现在的版本 COOL HEAT MODE ,这个寄存器 不让写.
+    }
 	int register_value=_wtoi(temp);
 	int j;
 	int register_122=0;
@@ -3651,28 +3661,29 @@ Reg_Infor Reg_Infor_Temp;
 		//comment on 09-02-03
 		*/
 
-	else if(register_id==MODBUS_FAN_MODE )
-	{
-		int real_fan_number=get_real_number_fan_speeds(fan_number);
-		if(register_value!=real_fan_number && real_fan_number!=-1)
-		{
-			register_122=-100;
-			register_value=real_fan_number;/////////////^-^ 
-		}
-		j=write_one(now_tstat_id,register_id,register_value);	
-	}
+	//else if(register_id==MODBUS_FAN_MODE )
+	//{
+	//	int real_fan_number=get_real_number_fan_speeds(fan_number);
+	//	if(register_value!=real_fan_number && real_fan_number!=-1)
+	//	{
+	//		register_122=-100;
+	//		register_value=real_fan_number;/////////////^-^ 
+	//	}
+	//	j=write_one(now_tstat_id,register_id,register_value);	
+	//}
 	else
 		j=write_one(now_tstat_id,register_id,register_value);	
+#if 0   //20180911 杜帆屏蔽 T5需要，但现在不维护;
 	if(register_id==185)
 	{
 		Sleep(14000);	
 		//if(register_value==1)Change_BaudRate(19200);
 		//if(register_value==0)Change_BaudRate(9600);
 	}
-
+#endif 
 	if(j==-2 && tstat_version<25 && tstat_version >0)  ////////////////////////if the version is 24.4 ,write_one some register will restart,for example 118,121
 	{
-		Sleep(14000);	
+		//Sleep(14000);	//20180911 杜帆屏蔽 T5需要，但现在不维护;
 		j=write_one(now_tstat_id,register_id,register_value);	
 	}
 	Reg_Infor_Temp.regAddress=register_id;
@@ -4347,7 +4358,7 @@ void Save2File_ForTwoFilesTSTAT67( TCHAR* fn )
 
 	_Twrite_to_file_a_line(out,_T("Tstat Config File"));//added the header marker.
 	CString T3000Version;
-	T3000Version.Format(_T("T3000 Version:%s"),CurrentT3000Version);
+	T3000Version.Format(_T("T3000 Version:%s"), CurrentT3000Version);
 	_Twrite_to_file_a_line(out,T3000Version);//added the header marker.
 	//int nModelID = read_one(g_tstat_id, 7);
 	CString strProductClassName = GetProductName(product_register_value[7]);
@@ -4418,7 +4429,7 @@ void Save2File_ForTwoFilesTSTAT67( TCHAR* fn )
 	save_write_input_output(out);	
 	//_Twrite_to_file_a_line(out,_T("OK!"));//space
 	save_write_TStatAllLabel(out);
-
+    save_write_TStatSchedual(out);
 	return;
 
 	_Twrite_to_file_a_line(out,_T("//END CONFIG 1 ********************************// "));//space
@@ -5364,6 +5375,7 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 			get_var_write_var(inf,tstat_version,p_log_file,&load_file_one_time);//////a line //////////// a line
 			write_input_output_var(inf,tstat_version,p_log_file,&load_file_one_time);
 			write_TStatAllLabel(inf,tstat_version,p_log_file,&load_file_one_time);
+            write_TStatSchedual(inf, tstat_version, p_log_file, &load_file_one_time);
 		//	write_one(now_tstat_id,MODBUS_UPDATE_STATUS,143);//////
 			//reset 
 			//write_one(now_tstat_id,184,0);//184 register,to no restart,when you write the 185,118,121,128 register
@@ -7803,3 +7815,108 @@ SqliteDBBuilding.closedb();
 	 _Twrite_to_file_a_line(out,str1);
 	 _Twrite_to_file_a_line(out,_T("//Model Name Config END"));
  }
+
+
+
+ //    813 - 824
+ //    825 - 836
+ //    837 - 848
+ //    849 - 859
+ //    860 - 872
+ //    873 - 884
+ //    885 - 896
+ //    897 - 908
+ //    CHARLY 15:13 : 06
+ //    909 - 971单写
+ void save_write_TStatSchedual(wofstream & out)
+ {
+     CString cs_write_string;
+     CString temo_cs;
+     _Twrite_to_file_a_line(out, _T("//Schedual Config"));//space
+
+     for (int i = 813; i <= 971; i++)
+     {
+         temo_cs.Format(_T("%d "), product_register_value[i]);
+         cs_write_string = cs_write_string + temo_cs;
+     }
+     _Twrite_to_file_a_line(out, cs_write_string);
+     cs_write_string.Empty();
+     _Twrite_to_file_a_line(out, _T("//Schedual Config END"));
+ }
+
+
+ void write_TStatSchedual(wifstream & inf, float tstat_version, CStdioFile *p_log_file, load_file_every_step *p_log_file_one_time)
+ {
+     TCHAR buf[1024];
+     int inputno = 0;
+     int LabelNumber = 0;
+     CString strText;
+     int confirm_flag = 0; // 用于判断  Schedual Config 是否存在的 标志位;
+     while (!inf.eof())
+     {
+         inf.getline(buf, 1024);
+
+         if (confirm_flag == 0)
+         {
+             if (wcsstr(buf, _T("//Schedual Config")) != NULL)
+             {
+                 confirm_flag = 1;
+                 continue;
+             }
+             return ;
+         }
+         if (confirm_flag == 2)
+         {
+             if (wcsstr(buf, _T("//Schedual Config END")) != NULL)
+             {
+                 break;
+             }
+             return ;
+         }
+
+
+
+         TCHAR *temp = buf;
+         CString temp_cstring = temp;
+         CStringArray temp_array;
+         SplitCStringA(temp_array, temp_cstring, _T(" "));
+         
+         for (int i = 813; i <= 971; i++)
+         {
+             int temp_value = 0;
+             temp_value = _wtoi(temp_array.GetAt(i - 813));
+             product_register_value[i] = temp_value;
+         }
+
+
+         //    813 - 824
+         //    825 - 836
+         //    837 - 848
+         //    849 - 859
+         //    860 - 872
+         //    873 - 884
+         //    885 - 896
+         //    897 - 908
+         //    CHARLY 15:13 : 06
+         //    909 - 971单写
+
+         int n_ret[9] = {0};
+         n_ret[0]=  Write_Multi_org_short(g_tstat_id, &product_register_value[813], 813, 824 - 813 + 1, 5);
+         n_ret[1] = Write_Multi_org_short(g_tstat_id, &product_register_value[825], 825, 836 - 825 + 1, 5);
+         n_ret[2] = Write_Multi_org_short(g_tstat_id, &product_register_value[837], 837, 848 - 837 + 1, 5);
+         n_ret[3] = Write_Multi_org_short(g_tstat_id, &product_register_value[849], 849, 859 - 849 + 1, 5);
+         n_ret[4] = Write_Multi_org_short(g_tstat_id, &product_register_value[860], 860, 872 - 860 + 1, 5);
+         n_ret[5] = Write_Multi_org_short(g_tstat_id, &product_register_value[873], 873, 884 - 873 + 1, 5);
+         n_ret[6] = Write_Multi_org_short(g_tstat_id, &product_register_value[885], 885, 896 - 885 + 1, 5);
+         n_ret[7] = Write_Multi_org_short(g_tstat_id, &product_register_value[897], 897, 908 - 897 + 1, 5);
+
+         for (int i = 909; i <= 971; i++)
+         {
+             write_one(g_tstat_id, i, product_register_value[i]);
+         }
+
+         confirm_flag = 2;
+     }
+
+ }
+

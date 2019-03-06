@@ -7,7 +7,7 @@
 #include "afxwin.h"
 #include "TstatFlashDlg.h"
 #include "ConfigFileHandler.h"
-
+#include "StaticEx\staticex.h"
 
 enum NC_FLASH_TYPE
 {
@@ -166,7 +166,7 @@ public:
 	int							m_nTabSel;
 	
 	BOOL						m_bShowSN;					// 是否显示隐藏的界面。
-   
+    BOOL                         m_enable_sn_mac;
     
 	map<int, CString>	m_mapModel;
 
@@ -241,7 +241,7 @@ public:
 	CString m_FirmVer;
 	CString m_HardVer;
 	 
- 
+    void ShowProductNameFromIni();
 	short m_IPPort;
     void InitISPUI();
     void initFlashSN();
@@ -254,8 +254,6 @@ public:
 
 	afx_msg void OnMenuApp();
 	afx_msg void OnMenuAbout();
-	afx_msg void OnBnClickedShowHex();
-    afx_msg void OnBnClickedFlashSn();
 	afx_msg void OnMenuSetting();
 
 	afx_msg void OnMenuCheckhex();
@@ -269,4 +267,8 @@ public:
 	int m_isRAM;
 	int m_FlashTimes;
 	int m_Brandrate;
+    afx_msg void OnBnClickedButtonFlashSn();
+    CStaticEx m_static_info;
+    static DWORD WINAPI  SN_MAC_Threadfun(LPVOID lpVoid);
+    afx_msg LRESULT Fresh_CloseSN_fcuntion(WPARAM wParam, LPARAM lParam);
 };

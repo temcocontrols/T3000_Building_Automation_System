@@ -32,5 +32,6 @@ public:
 
 	int m_health_persent;
 
+    afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
 };
 

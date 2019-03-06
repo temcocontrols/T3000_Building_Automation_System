@@ -6,6 +6,7 @@
 #include "BacnetAddVirtualDevice.h"
 #include "afxdialogex.h"
 #include "MainFrm.h"
+#include "global_function.h"
 
 // CBacnetAddVirtualDevice dialog
 
@@ -106,6 +107,7 @@ void CBacnetAddVirtualDevice::OnBnClickedButtonVirtualOk()
 {
 	
 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+    int nproduct_id = 0;
 	CString temp_main_building;
 	CString temp_sub_building;
 	CString str_serialid;
@@ -129,12 +131,31 @@ void CBacnetAddVirtualDevice::OnBnClickedButtonVirtualOk()
 	GetDlgItemText(IDC_EDIT_VIRTUAL_LABEL_NAME,pid_name);
 	GetDlgItemText(IDC_EDIT_VIRTUAL_PID,pid_class_value);
 	GetDlgItemText(IDC_EDIT_VIRTUAL_MODBUS_ID,modbus_id);
+    nproduct_id = _wtoi(pid_class_value);
 	str_object_instance = str_serialid;
 	str_panel_number = modbus_id ;
 	CppSQLite3DB SqliteDBBuilding;
 	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 	CString strSql;
-	temp_pro3.Format(_T("%u"),PROTOCOL_BACNET_IP);
+	temp_pro3.Format(_T("%u"), PROTOCOL_VIRTUAL);
+
+    if ((nproduct_id == PM_MINIPANEL) || (nproduct_id == PM_MINIPANEL_ARM))
+    {
+        CString offline_folder;
+        offline_folder = g_strBuildingFolder + pFrame->m_strCurMainBuildingName;
+        pFrame->HideBacnetWindow();
+        CreateDirectory(offline_folder, NULL);//
+        offline_folder = offline_folder + _T("\\VirtualDeviceData");
+        CreateDirectory(offline_folder, NULL);//
+        CString virtual_prg_filename;
+        virtual_prg_filename.Format(_T("%s"), str_serialid);
+        g_mac = _wtoi( modbus_id);
+        g_bac_instance = _wtof(str_object_instance);
+        offline_prg_path = offline_folder + _T("\\") +  virtual_prg_filename +_T(".prog");
+        ClearBacnetData();
+        SaveBacnetBinaryFile(offline_prg_path);
+    }
+
 	strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,\
 		Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Com_Port,EPsize,\
 		Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)  \

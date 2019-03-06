@@ -80,6 +80,11 @@ CListCtrlEx::CListCtrlEx()
 	m_dt_left = true;
 	m_support_col0_edit = false; //默认第0列 不允许编辑;
 	m_window_hwnd = NULL;
+
+    m_bEnableTips = TRUE;
+    m_toolTip.Create(this);
+    m_toolTip.SetMaxTipWidth(300);
+    m_toolTip.SetDelayTime(1000);
 }
 
 CListCtrlEx::~CListCtrlEx()
@@ -99,6 +104,7 @@ BEGIN_MESSAGE_MAP(CListCtrlEx, CListCtrl)
 	ON_NOTIFY_REFLECT(LVN_COLUMNCLICK, &CListCtrlEx::OnLvnColumnclick)
 	ON_WM_DESTROY()
 	ON_WM_DRAWITEM()
+    ON_WM_MOUSEMOVE()
 END_MESSAGE_MAP()
 
 //////////////////////////////////////////////////////////////////////////
@@ -2019,4 +2025,59 @@ void ListCtrlEx::CListCtrlEx::OnDestroy()
  
  
 
- 
+
+
+void ListCtrlEx::CListCtrlEx::OnMouseMove(UINT nFlags, CPoint point)
+{
+    // TODO: 在此添加消息处理程序代码和/或调用默认值
+    //如果开启文本提示
+    if (m_bEnableTips)
+    {
+        CString str;
+        LVHITTESTINFO lvhti;
+
+        // 判断鼠标当前所在的位置(行, 列)
+        lvhti.pt = point;
+        SubItemHitTest(&lvhti);
+
+        //如果鼠标移动到另一个单元格内, 则进行处理; 否则, 不做处理
+        if ((lvhti.iItem != m_nItem) || (lvhti.iSubItem != m_nSubItem))
+        {
+            // 保存当前鼠标所在的(行,列)
+            m_nItem = lvhti.iItem;
+            m_nSubItem = lvhti.iSubItem;
+
+            // 如果鼠标移动到一个合法的单元格内,则显示新的提示信息
+            // 否则, 不显示提示
+            if ((m_nItem != -1) && (m_nSubItem != -1))
+            {
+                // @@@@@@@@ 在这里修改要显示的提示信息
+                // 这里仅仅是一个例子---获得当前单元格的文字信息, 并设置为新的提示信息
+                str = GetItemText(m_nItem, m_nSubItem);
+                m_toolTip.AddTool(this, str);
+                // 显示提示框
+                m_toolTip.Pop();
+            }
+            else
+            {
+                m_toolTip.AddTool(this, _T(""));
+                m_toolTip.Pop();
+            }
+        }
+    }
+
+
+    CListCtrl::OnMouseMove(nFlags, point);
+}
+
+
+BOOL ListCtrlEx::CListCtrlEx::PreTranslateMessage(MSG* pMsg)
+{
+    // TODO: 在此添加专用代码和/或调用基类
+
+    if (m_toolTip.GetSafeHwnd())
+    {
+        m_toolTip.RelayEvent(pMsg);
+    }
+    return CListCtrl::PreTranslateMessage(pMsg);
+}

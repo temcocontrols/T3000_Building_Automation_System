@@ -305,6 +305,24 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_List(WPARAM wParam,LPARAM lParam)
 	int temp_input_count = 0;
 	int temp_analog_count = 0;
 	char q[30];
+
+    if (Device_Basic_Setting.reg.sd_exist == SD_STATUS_NO)
+    {
+        ((CStatic *)GetDlgItem(IDC_STATIC_BAC_MONITOR_SD_CARD))->SetWindowTextW(_T("No SD Card"));
+    }
+    else if (Device_Basic_Setting.reg.sd_exist == SD_STATUS_NORMAL)
+    {
+        ((CStatic *)GetDlgItem(IDC_STATIC_BAC_MONITOR_SD_CARD))->SetWindowTextW(_T("Normal"));
+    }
+    else if (Device_Basic_Setting.reg.sd_exist == SD_STATUS_FILESYSTEM_ERROR)
+    {
+        ((CStatic *)GetDlgItem(IDC_STATIC_BAC_MONITOR_SD_CARD))->SetWindowTextW(_T("File System error,Only supprot FAT32"));
+    }
+    else
+    {
+        ((CStatic *)GetDlgItem(IDC_STATIC_BAC_MONITOR_SD_CARD))->SetWindowTextW(_T("Unknown"));
+    }
+
 	if(monitor_list_line == BAC_MONITOR_COUNT - 1)
 	{
 		m_monitor_input_list.SetItemText(0,1,System_Log[0]);
@@ -330,6 +348,7 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_List(WPARAM wParam,LPARAM lParam)
 		char tempchar[50];
 		char *temppoint = NULL;
 		byte temp_panel = m_monitor_data.at(monitor_list_line).inputs[i].panel;
+        byte temp_sub_panel = m_monitor_data.at(monitor_list_line).inputs[i].sub_panel;
 		byte temp_point_type = m_monitor_data.at(monitor_list_line).inputs[i].point_type;
 		//point type 取的时候减1  ,设备里 out = 1，in = 2 ，var = 3; 取出来是 out = 0; in = 1, var = 2;
 		if(temp_point_type > 0)
@@ -341,7 +360,7 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_List(WPARAM wParam,LPARAM lParam)
 
         //2018 01 26   sub panel 可以为0 代表访问本地;
         //if (((temp_panel == 0) || (m_monitor_data.at(monitor_list_line).inputs[i].sub_panel == 0)) || (lowbyte_point_type > BAC_AV + 10))
-		if((temp_panel == 0) || (lowbyte_point_type > BAC_DO + 1))
+		if(((temp_panel == 0) && (temp_sub_panel == 0)) || (lowbyte_point_type > BAC_DO + 1))
 		{
 			m_monitor_data.at(monitor_list_line).inputs[i].network = 0;	//发 现panel 是0  就说明这个数据是无效的,先设置为初始化值;
 			m_monitor_data.at(monitor_list_line).inputs[i].number = 0;
@@ -453,7 +472,7 @@ void CBacnetMonitor::Set_Input_Range_And_count()
         char and_pointtype = temp_point_type & 0x1F;
         //2018 01 26 fandu subpanel 可以为0  为0 代表访问本身的. 
 		//if((temp_panel == 0) || (temp_sub_panel == 0))
-        if ((temp_panel == 0))
+        if ((temp_panel == 0) && (temp_sub_panel == 0))
 			continue;
 
 		//如果不是，就说明是远程的点; //2018 01 26 开始要支持monitor 加远程的点;
@@ -554,7 +573,9 @@ void CBacnetMonitor::Set_Input_Range_And_count()
 
             temp_monitor_data_analog.range[temp_analog_count - 1] = 0; //不知道AV 的单位
         }
-        else if (and_pointtype == BAC_DO + 1)
+        else if ((and_pointtype == BAC_DO + 1) ||
+                 (and_pointtype == BAC_BV + 1) ||
+                 (and_pointtype == BAC_BI + 1) )
         {
             temp_input_count++;
             temp_digital_count++;
@@ -600,9 +621,9 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
 
 	char *label=NULL/*,test*/;
 	byte point_type,var_type;
-	int k,num_net,num_point,num_panel;
+	int temp_net_work,num_net,num_point,num_panel;
 	var_type = num_point = point_type = 0;
-	k=0;
+    temp_net_work =0;
 	memcpy_s(&m_temp_monitor_data[monitor_list_line],sizeof(Str_monitor_point),&m_monitor_data.at(monitor_list_line),sizeof(Str_monitor_point));
 	New_CString.MakeUpper();
 	New_CString.Trim();
@@ -631,15 +652,17 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
 	//目前只支持在本Panel下面寻找 各个Label 和值;
 	//label=ispoint(cTemp1,&num_point,&var_type,&point_type,&num_panel,&num_net,0/*my_network*/,Station_NUM,&k);
 	unsigned char sub_panel_number = 0;
-	 label=ispoint_ex(cTemp1,&num_point,&var_type,&point_type,&num_panel,&num_net,0,sub_panel_number,Station_NUM,&k);
+	 label=ispoint_ex(cTemp1,&num_point,&var_type,&point_type,&num_panel,&num_net,0,sub_panel_number,Station_NUM,&temp_net_work);
 	if(label!=NULL)
 	{
-		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].network = 1;//目前不知道network 怎么处理;
+		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].network = temp_net_work;//目前不知道network 怎么处理;
         char temp_point = point_type & 0x1F;
         if ((temp_point == COIL_REG) ||
             (temp_point == DIS_INPUT_REG) ||
             (temp_point == INPUT_REG) ||
             (temp_point == MB_REG) ||
+            (temp_point == BAC_BV) ||
+            (temp_point == BAC_BI) ||
             (temp_point == BAC_AV) ||
             (temp_point == BAC_AI) ||
             (temp_point == BAC_AO) ||
@@ -658,6 +681,7 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
 		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].panel = num_panel;
 		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].sub_panel = sub_panel_number;
 		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].point_type = point_type + 1;
+        m_monitor_data.at(monitor_list_line).inputs[Changed_Item].network = temp_net_work;
 		char temp_input[250];
 		memset(temp_input,0,250);
 		strcpy(temp_input,label);
@@ -1562,7 +1586,7 @@ int read_monitordata(int digtal_or_analog,unsigned int timeleft,unsigned int tim
             Sleep(SEND_COMMAND_DELAY_TIME);
             continue;
         }
-        for (int time_loop = 0;time_loop<2000;time_loop++)
+        for (int time_loop = 0;time_loop<5000;time_loop++)
         {
             Sleep(1);
             if (tsm_invoke_id_free(ret))
@@ -1608,11 +1632,11 @@ int read_monitordata(int digtal_or_analog,unsigned int timeleft,unsigned int tim
             if (read_index < read_analog_package.size())
             {
                 if ((read_analog_package.at(read_index) == true) && (read_index != m_monitor_head.seg_index + m_monitor_head.total_seg))  //已经读过的;
-                    continue;
+                    continue; 
             }
             else
             {
-                return 0;
+                return -5;
             }
         }
         else
@@ -1624,7 +1648,7 @@ int read_monitordata(int digtal_or_analog,unsigned int timeleft,unsigned int tim
             }
             else
             {
-                return 0;
+                return -5;
             }
         }
         cs_my_temp.Format(_T("Read Data %d / %d"), read_index - start_read_index, end_read_index - start_read_index);
@@ -1643,8 +1667,8 @@ int read_monitordata(int digtal_or_analog,unsigned int timeleft,unsigned int tim
         {
             recieve_flag = false;
             CString temp_cs1;
-            temp_cs1.Format(_T("Read index = %x , Digital_Analog = %d"), read_index, digtal_or_analog);
-            //DFTrace(temp_cs1);
+            temp_cs1.Format(_T("Read index = %x , Digital_Analog = %d\r\n"), read_index, digtal_or_analog);
+            TRACE(temp_cs1);
             ret = GetMonitorBlockData(g_bac_instance, READMONITORDATA_T3000, monitor_list_line, digtal_or_analog, read_index /*m_monitor_head.total_seg*/, read_index, &temp);
             if (ret < 0)
             {
@@ -1654,7 +1678,7 @@ int read_monitordata(int digtal_or_analog,unsigned int timeleft,unsigned int tim
             //send_count++;
             //if (send_count > 20)
             //    return true;
-            for (int time_loop = 0;time_loop<1500;time_loop++)
+            for (int time_loop = 0;time_loop<3000;time_loop++)
             {
                 Sleep(1);
                 if (tsm_invoke_id_free(ret))
@@ -1912,7 +1936,8 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 
 		temp_data.point.panel = *(my_temp_point++); 
 		temp_data.point.sub_panel = *(my_temp_point++); 
-		temp_data.point.network = 1;my_temp_point ++; //*(my_temp_point++);  目前不考虑 多个net 的情况 ;
+		//temp_data.point.network = 1;my_temp_point ++; //*(my_temp_point++);  目前不考虑 多个net 的情况 ;
+        temp_data.point.network = *(my_temp_point++);
 		
 		temp_data.value = ((unsigned char)my_temp_point[0])<<24 | ((unsigned char)my_temp_point[1]<<16) | ((unsigned char)my_temp_point[2])<<8 | ((unsigned char)my_temp_point[3]);
 		my_temp_point = my_temp_point + 4;
@@ -1940,7 +1965,7 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 			}
 			break;
 		}
-		if(temp_data.point.point_type > 10)
+		if(temp_data.point.point_type > BAC_MAX)
 		{
 			if(((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_MONITOR_DATA_ONLY)))
 			{
@@ -1953,8 +1978,10 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 			break;
 		}
 
+#if 0   //支持其他instance了
 		if(temp_data.point.panel != Station_NUM)	//如果数据point 不是本panel 估计就是传错了值;
 			continue;
+#endif
 		if((temp_data.time < 1420041600)  || (temp_data.time > 1735660800))	//时间范围 2015-1-1  ->2049-12-30  ，不在此时间的数据无效;
 		{
 			continue;
@@ -1981,16 +2008,53 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 			else
 			temp_type_word = _T("REG");
 		}
+        else if (temp_data.point.point_type == BAC_BI + 1)
+        {
+            temp_type_word = _T("BI");
+        }
+        else if (temp_data.point.point_type == BAC_AV + 1)
+        {
+            temp_type_word = _T("AV");
+        }
+        else if (temp_data.point.point_type == BAC_AI + 1)
+        {
+            temp_type_word = _T("AI");
+        }
+        else if (temp_data.point.point_type == BAC_AO + 1)
+        {
+            temp_type_word = _T("AO");
+        }
+        else if (temp_data.point.point_type == BAC_DO + 1)
+        {
+            temp_type_word = _T("DO");
+        }
+        else if (temp_data.point.point_type == BAC_BV + 1)
+        {
+            temp_type_word = _T("BV");
+        }
 		else
 		{
 			temp_type_word = _T("NA");
 		}
-		if((temp_data.point.panel == temp_data.point.sub_panel) && (temp_data.point.panel == Station_NUM))
-		{
-			Label_Des.Format(_T("%s%u"),temp_type_word,temp_data.point.number+1);
-		}
-		else
-			Label_Des.Format(_T("%u-%u-%s%u"),temp_data.point.panel,temp_data.point.sub_panel,temp_type_word,temp_data.point.number+1);
+        if (temp_data.point.network >= 128)
+        {
+            char temp_buffer[30];
+            memset(temp_buffer, 0, 30);
+            pointtotext(temp_buffer, &temp_data.point);
+            MultiByteToWideChar(CP_ACP, 0, (char *)temp_buffer, (int)strlen((char *)temp_buffer) + 1,
+                Label_Des.GetBuffer(MAX_PATH), MAX_PATH);
+            Label_Des.ReleaseBuffer();
+        }
+        else
+        {
+            if ((temp_data.point.panel == temp_data.point.sub_panel) && (temp_data.point.panel == Station_NUM))
+            {
+                Label_Des.Format(_T("%s%u"), temp_type_word, temp_data.point.number + 1);
+            }
+            else
+                Label_Des.Format(_T("%u-%u-%s%u"), temp_data.point.panel, temp_data.point.sub_panel, temp_type_word, temp_data.point.number + 1);
+        }
+
 
 
 		CString temp_value_test;

@@ -148,14 +148,22 @@ BOOL CTstatRangeDlg::OnInitDialog()
 
 void CTstatRangeDlg::Initial_window(){
      
-	CString temp_cs;
-	m_show_unit.ShowWindow(TRUE);
-	temp_cs.Format(_T("%d"),m_input_Analog_select);
-	((CEdit *)GetDlgItem(IDC_EDIT_RANGE_SELECT))->SetWindowTextW(temp_cs);
+
 	 for (int i=IDC_RADIO_T_0;i<=IDC_RADIO_T_14;i++)
 	 {
 	    ((CButton *)GetDlgItem(i))->SetCheck(0);
 	 }
+     if (m_input_Analog_select > 128)
+         m_input_Analog_select = m_input_Analog_select - 128;
+
+     if (m_input_Analog_select > 14)
+         m_input_Analog_select = 0;
+
+     CString temp_cs;
+     m_show_unit.ShowWindow(TRUE);
+     temp_cs.Format(_T("%d"), m_input_Analog_select);
+     ((CEdit *)GetDlgItem(IDC_EDIT_RANGE_SELECT))->SetWindowTextW(temp_cs);
+
 	  ((CButton *)GetDlgItem(IDC_RADIO_T_0+m_input_Analog_select))->SetCheck(1);
 	 
       if (m_input_Analog_select == 12)
@@ -2016,6 +2024,23 @@ void CTstatRangeDlg::Show4_20maUI(bool nshow)
 
 void CTstatRangeDlg::OnBnClickedRadioT14()
 {
+    m_input_Analog_select = 0;
 
+    if ((((CButton *)GetDlgItem(IDC_RADIO_5V))->GetCheck() == FALSE) &&
+        (((CButton *)GetDlgItem(IDC_RADIO_10V))->GetCheck() == FALSE))
+    {
+        ((CButton *)GetDlgItem(IDC_RADIO_5V))->SetCheck(True);
+        m_current_range = 14;
+    }
+    else if(   ((CButton *) GetDlgItem(IDC_RADIO_5V))->GetCheck() == TRUE)
+    {
+        m_current_range = 14;   //// 5V - 14 
+    }
+    else if (((CButton *)GetDlgItem(IDC_RADIO_10V))->GetCheck() == TRUE)
+    {
+        m_current_range = 142;  //10 V --  142
+    }
+    m_input_Analog_select = m_current_range;
+    PostMessage(WM_TSTAT_RANGE, 0, 0);
 }
 

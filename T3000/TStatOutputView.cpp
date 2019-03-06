@@ -716,12 +716,12 @@ void CTStatOutputView::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
     CString temp1;
     CStringArray temparray;
     New_CString =  m_output_list.GetItemText(lRow,lCol);
-    if (New_CString.CompareNoCase(NO_APPLICATION)==0)
-    {
-        m_output_list.Set_Edit(false);
-        IS_SEND=FALSE;
-        return ;
-    }
+    //if (New_CString.CompareNoCase(NO_APPLICATION)==0)
+    //{
+    //    m_output_list.Set_Edit(false);
+    //    IS_SEND=FALSE;
+    //    return ;
+    //}
     _MessageWriteOneInfo_List  *pwrite_info = new _MessageWriteOneInfo_List;
     pwrite_info->list_type=LIST_TYPE_OUTPUT_TSTAT;
     if(lCol == TStat_AM)

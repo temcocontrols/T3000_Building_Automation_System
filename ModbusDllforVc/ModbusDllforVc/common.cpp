@@ -48,6 +48,7 @@ const int ArrayBaudate[BAUDRATENUMBER] = {
     19200,
     38400,
     57600,
+    76800,
     115200
     };
 OUTPUT void SetLastSuccessBaudrate(int nbaudrate)
@@ -1891,10 +1892,11 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
                 	*/
             }
         }
-        nTemp=gval[3];
-        if(nTemp==255)
-            nTemp=-1;
-        return (gval[3]*256+gval[4]);
+        nTemp = gval[3];
+        //2018 09 26 Fandu  фа╠н
+        //if(nTemp==255)
+        //    nTemp=-1;
+        return (gval[3] * 256 + gval[4]);
     }
     return -1; //add by Fance
 //	singlock.Unlock();
@@ -4876,7 +4878,7 @@ OUTPUT bool open_com(int m_com)
     //the return value ,true is ok,false is failure
     if (open_com_port_number_in_dll == m_com)
     {
-        Change_BaudRate(19200);
+        //Change_BaudRate(19200);
         return true;///////////////////////////same com port ,opened by multi times,it's badly.
     }
     if (m_hSerial != NULL)
@@ -9524,8 +9526,11 @@ int check_bacnet_data(unsigned char * buffer, int nlength)
 OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
 {
     if (open_com_nocretical(comport) == false)
-        return -1;
+    {
+        Sleep(11000);
 
+        return -1;
+    }
     bool found_bacnet_data = false;
     int n_no_data_online_count = 0;
     for (int i = 0; i < sizeof(ArrayBaudate) / sizeof(ArrayBaudate[0]); i++)
@@ -9539,7 +9544,7 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
             continue;
         }
         //Speed up scan , if no data online ,check 2 times ,then stop.
-        if (n_no_data_online_count >= 2)
+        if (n_no_data_online_count >= 3)
         {
             ntest_ret[i].test_ret = 0;
             continue;

@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
+    <Filter Include="Source Files\StaticEx">
+      <UniqueIdentifier>{8755eade-b9f0-4f96-a30a-0d95c9408d48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BADO">
+      <UniqueIdentifier>{29f34de1-2c45-4ee4-9b0e-5dd189f54956}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BinFileParser.cpp">
@@ -67,6 +73,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MyPing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StaticEx\staticex.cpp">
+      <Filter>Source Files\StaticEx</Filter>
+    </ClCompile>
+    <ClCompile Include="BADO\BADO.cpp">
+      <Filter>Source Files\BADO</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetMstp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -138,6 +153,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\T3000\ProductModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetMstp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

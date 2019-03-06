@@ -9,7 +9,7 @@
 #include "define.h"
 #include "bip.h"
 #include "rs485.h" // For call Get_RS485_Handle() function
-
+#include "T3000Option.h"
 //#include "global_variable.h"
 //#include "global_define.h"
 //AB means Add Building
@@ -67,12 +67,13 @@ struct _NCInfo
 };
 
 UINT _ScanRemote_IP_Thread(LPVOID pParam);
-UINT _ScanBacnetMSTPThread(LPVOID pParam);
+//UINT _ScanBacnetMSTPThread(LPVOID pParam);
 UINT _ScanNCByUDPFunc(LPVOID pParam);
 UINT SCAN_TCP_TO485_THREAD(LPVOID pParam);
 //UINT _ScanTstatThread(LPVOID pParam);
 UINT _ScanTstatThread2(LPVOID pParam);
 //UINT _WaitScanThread(LPVOID pParam);
+
 DWORD WINAPI  _WaitScanThread(LPVOID lpVoid);
 DWORD WINAPI  Detect_Mstp_thread(LPVOID lpVoid);
 UINT _ScanOldNC(LPVOID pParam);
@@ -353,7 +354,7 @@ BOOL CTStatScanner::ScanComDevice()//02
             this->scan_com_value = i;
             hScanComData[i] = CreateThread(NULL, NULL, ScanComThreadNoCritical, this /*&i*/, NULL, nScanThreadID+i);
             Sleep(100); //这个是必须的,否则线程会乱;
-            ::CloseHandle(hScanComData[i]);
+            //::CloseHandle(hScanComData[i]);
         }
     }
 
@@ -610,7 +611,8 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
         {
             if (!m_scan_info.at(scan_item).scan_skip)
             {
-
+                int temp_scan_item = 0;
+                int found_real_mstp = false;
                 for (int x = 0; x < m_com_mstp_detect.size(); x++)
                 {
                     if ((m_com_mstp_detect.at(x).baudrate == m_scan_info.at(scan_item).scan_baudrate) &&
@@ -620,18 +622,38 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
                             (m_com_mstp_detect.at(x).test_ret != 0))
                         {
                             contain_mstp = 1;
+                            continue;
+                        }
+                        else if (m_com_mstp_detect.at(x).test_ret == 1)
+                        {
+                            contain_mstp = 1;
+                            found_real_mstp = true;
+                            temp_scan_item = scan_item;
                             break;
                         }
+                      
                     }
                 }
 
-                if (contain_mstp == 1)
+                if (contain_mstp == 1) 
                 {
                     m_scan_info.at(scan_item).scan_status = SCAN_STATUS_FINISHED;
                     memset(m_scan_info.at(scan_item).scan_notes, 0, 250);
-                    memcpy(m_scan_info.at(scan_item).scan_notes, "Bacnet MSTP token found! Scan finished", strlen("Bacnet MSTP token found! Scan finished"));
+                    memcpy(m_scan_info.at(scan_item).scan_notes, "Garbage data received!", strlen("Garbage data received!"));
+
+                    if (found_real_mstp)
+                    {
+                        m_scan_info.at(temp_scan_item).scan_status = SCAN_STATUS_FINISHED;
+                        memset(m_scan_info.at(temp_scan_item).scan_notes, 0, 250);
+                        memcpy(m_scan_info.at(temp_scan_item).scan_notes, "Bacnet MSTP protocol is detected !", strlen("Bacnet MSTP protocol is detected !"));
+                    }
+
                     continue;
                 }
+
+
+
+
                 if (pScan->OpenCom(n))
                 {
 
@@ -3709,7 +3731,7 @@ int CTStatScanner::ScanSubnetFromEthernetDevice()//scan
         {
             hScanTCPData[i] = CreateThread(NULL, NULL, ScanTCPSubPortThreadNoCritical, this , NULL, nScanTCPThreadID + i);
             Sleep(100); //这个是必须的,否则线程会乱;
-            ::CloseHandle(hScanTCPData[i]);
+            //::CloseHandle(hScanTCPData[i]);
         }
 
         return nsize;
@@ -4440,7 +4462,8 @@ BOOL CTStatScanner::ScanBacnetMSTPDevice()
 {
     m_szComs.clear();
     GetSerialComPortNumber1(m_szComs);
-    m_pScanBacnetIPThread = AfxBeginThread(_ScanBacnetMSTPThread,this);
+   // m_pScanBacnetIPThread = AfxBeginThread(_ScanBacnetMSTPThread,this);
+    m_pScanBacnetIPThread = CreateThread(NULL, NULL, _ScanBacnetMSTPThread, this, NULL, NULL);
     return TRUE;
 }
 
@@ -4802,28 +4825,30 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
     return 1;
 }
 
+
+int n_mstp_comport = 0;
+int n_mstp_baudrate = 19200;
+
 //需要先让串口的modbus 扫完，那里会记录有哪些串口存在 bacnet的协议.
 //在扫描bacnet的时候 将bacnet ip 扫描完后，要去依次扫描 串口的MS/TP
 //Scan bacnet
-UINT _ScanBacnetMSTPThread(LPVOID pParam)
+DWORD WINAPI   CTStatScanner::_ScanBacnetMSTPThread(LPVOID lpVoid)
+//UINT _ScanBacnetMSTPThread(LPVOID pParam)
 {
-    CTStatScanner* pScan = (CTStatScanner*)(pParam);
+    CTStatScanner* pScan = (CTStatScanner*)(lpVoid);
     vector <_Bac_Scan_Com_Info> m_temp_com_data;
     vector <_Bac_Scan_results_Info> m_temp_result_data;
 
-    WaitForSingleObject(pScan->m_eScanComEnd->m_hObject, INFINITE);  //等待串口 modbus通讯扫描完毕;
-    pScan->m_eScanComEnd->SetEvent();   // 用完这个通知后要释放 因为BACNET 转 modbus 的 那个线程也在判断这个信号 是否有被通知;
+    int n_count = 0;
+    while ((pScan->m_com_scan_end == false) && (n_count < 30))
+    {
+        n_count++;
+        Sleep(1000);
+    }
+   // WaitForSingleObject(pScan->m_eScanComEnd->m_hObject, INFINITE);  //等待串口 modbus通讯扫描完毕;
+   // pScan->m_eScanComEnd->SetEvent();   // 用完这个通知后要释放 因为BACNET 转 modbus 的 那个线程也在判断这个信号 是否有被通知;
+    Sleep(2000);
 
-    //如果不要MSTP扫描 就打开下面代码
-    //if(m_scan_info.at(scan_bacnet_ip_item).scan_skip)
-    //{
-    //    if (pScan->m_eScanBacnetIpEnd->m_hObject)
-    //    {
-    //        pScan->m_eScanBacnetIpEnd->SetEvent();
-    //    }
-    //    //is_in_scan_mode = false;
-    //    return 1;
-    //}
 
     m_bac_handle_Iam_data.clear();	//清空上次扫描的遗留数据;
     m_bac_scan_result_data.clear();
@@ -4831,32 +4856,23 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
     //scaning_mode = true;
     m_scan_info.at(scan_bacnet_ip_item).scan_status = SCAN_STATUS_RUNNING;
 
+    //CString temp_debug;
 
-	////等串口的modbus 的 完全释放了之后在开始 扫描 bacnet 的mstp ， 不然的话 其他地方的close_COM 容易出现 异常报错;
-	// if(WaitForSingleObject(pScan->m_eScanComEnd->m_hObject, INFINITE) == WAIT_OBJECT_0)
-	// {
-
-	// }
-	//   pScan->m_eScanComEnd->SetEvent();
-#if 1 // bacnet mstp
-
-    //int n_comport = 2;
-    //int n_baudrate = 115200;
-    //int n_find_mstp = 1;
-#if 1
-    int n_comport = 0;
-    int n_baudrate = 19200;
     int n_find_mstp = false;
     for (int j = 0; j < m_com_mstp_detect.size(); j++)
     {
-        if (m_com_mstp_detect.at(j).test_ret == 1)
+        //CString temp1;
+        //temp1.Format(_T("com%d baud%d ret=%d\r\n"), m_com_mstp_detect.at(j).ncomport, m_com_mstp_detect.at(j).baudrate, m_com_mstp_detect.at(j).test_ret);
+        //temp_debug = temp_debug + temp1;
+        if ((m_com_mstp_detect.at(j).test_ret == 1) ||((m_com_mstp_detect.at(j).test_ret == -2)))
         {
             n_find_mstp = true;
-            n_comport = m_com_mstp_detect.at(j).ncomport;
-            n_baudrate = m_com_mstp_detect.at(j).baudrate;
+            n_mstp_comport = m_com_mstp_detect.at(j).ncomport;
+            n_mstp_baudrate = m_com_mstp_detect.at(j).baudrate;
             break;
         }
     }
+    //AfxMessageBox(temp_debug);
     //发布版本 先忽略 bacnet 的部分 不扫描 
     if (n_find_mstp == false)
     {
@@ -4865,9 +4881,6 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
         {
             pScan->m_eScanBacnetIpEnd->SetEvent();
         }
-        //m_scan_info.at(scan_bacnet_ip_item).scan_status = SCAN_STATUS_FINISHED;
-        //pScan->m_bStopScan = TRUE;
-
         temphandle1 = Get_RS485_Handle();
         if (temphandle1 != NULL)
         {
@@ -4878,27 +4891,47 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
             Set_RS485_Handle(NULL);
         }
         m_scan_info.at(scan_bacnet_ip_item).scan_status = SCAN_STATUS_FINISHED;
+        pScan->m_pScanBacnetIPThread = NULL;
         return 1;
     }
-#endif
+    else
+    {
+        bool found_mstp_port = false;
+        for (int j = 0; j < m_com_mstp_detect.size(); j++)
+        {
+            if (m_com_mstp_detect.at(j).test_ret == 1)
+            {
+                found_mstp_port = true;
+                n_mstp_comport = m_com_mstp_detect.at(j).ncomport;
+                n_mstp_baudrate = m_com_mstp_detect.at(j).baudrate;
+                break;
+            }
+        }
+        if (found_mstp_port == false)  //没有找到MSTP的波特率和com 口 才提示客户 自己选择;
+        {
+            CT3000Option dlg;
+            dlg.DoModal();
+        }
+    }
+
     CString temp_cs;
     CString temp_cstring;
     //temp_cstring = pScan->m_szComs.at(i).Right(pScan->m_szComs.at(i).GetLength() - 3);
 
-    int temp_port = n_comport;// current_building_comport;
+    int temp_port = n_mstp_comport;// current_building_comport;
 
 
 
     int ret_results;
 
 
-    Initial_bac(temp_port,_T(""), n_baudrate);
+    Initial_bac(temp_port,_T(""), n_mstp_baudrate);
     TRACE(_T("Now scan with COM%d\r\n"),temp_port);
     Sleep(5000);//等待几秒让MSTP 的token 运行起来.
-    for (int i=0; i<15; i++)
+    for (int i=0; i<25; i++)
     {
         CString strInfo;
-        strInfo.Format(_T("Send MSTP command time left(%d)"),15-i);
+        strInfo.Format(_T("Send MSTP command time left(%d)"),25-i);
         memset(m_scan_info.at(scan_bacnet_ip_item).scan_notes,0,250);
         char temp_char[250];
         WideCharToMultiByte( CP_ACP, 0, strInfo.GetBuffer(), -1, temp_char, 250, NULL, NULL );
@@ -4906,7 +4939,7 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
         Send_WhoIs_Global(-1,-1);
         Sleep(2000);
         m_scan_info.at(scan_bacnet_ip_item).scan_found = m_bac_handle_Iam_data.size();
-        if((m_bac_handle_Iam_data.size() > 0) && (i > 10))
+        if((m_bac_handle_Iam_data.size() > 0) && (i > 15))
             break;
     }
 
@@ -4938,6 +4971,25 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
                 ntest_ret = GetPrivateBacnetToModbusData(m_temp_com_data.at(i).device_id, 0, 100, test_array);
                 if (ntest_ret >= 0)
                 {
+                    if ((debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA) || (debug_item_show == DEBUG_SHOW_ALL))
+                    {
+                        CString total_char_test;
+                        //total_char_test = _T("Read MSTP To Modbus : ");
+                        total_char_test.Format(_T("Read MSTP To Modbus %d , %d:"), 0, 100);
+                        unsigned short * temp_print_test = NULL;
+                        temp_print_test = test_array;
+                        for (int i = 0; i< 100; i++)
+                        {
+                            CString temp_char_test;
+                            temp_char_test.Format(_T("%04x"), (unsigned char)*temp_print_test);
+                            temp_char_test.MakeUpper();
+                            temp_print_test++;
+                            total_char_test = total_char_test + temp_char_test + _T(" ");
+                        }
+                        DFTrace(total_char_test);
+
+                    }
+
                     _Bac_Scan_results_Info  temp_info;
                     temp_info.serialnumber = test_array[0] + test_array[1] * 256 + test_array[2] * 256 * 256 + test_array[3] * 256 * 256 * 256;
                     temp_info.product_type = test_array[7];
@@ -4964,7 +5016,7 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
 
 
 
-#endif
+
     CppSQLite3DB SqliteDBBuilding;
     CppSQLite3Table table;
     CppSQLite3Query q;
@@ -5008,7 +5060,7 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
         int count;
         temp_serial_number.Format(_T("%u"), m_temp_result_data.at(l).serialnumber);
         str_temp.Format(_T("select * from ALL_NODE where Serial_ID = '%s'"),temp_serial_number);
-        temp_baud.Format(_T("%u"), n_baudrate);
+        temp_baud.Format(_T("%u"), n_mstp_baudrate);
 		q = SqliteDBBuilding.execQuery((UTF8MBSTR)str_temp);
 		table = SqliteDBBuilding.getTable((UTF8MBSTR)str_temp);
         count =table.numRows();
@@ -5020,7 +5072,7 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
         temp_view_name = temp_pname + _T(":") + temp_serial_number + _T("-") + temp_modbusid;
         temp_protocol.Format(_T("%d"), PROTOCOL_MSTP_TO_MODBUS);
         temp_product_id_string.Format(_T("%d"), m_temp_result_data.at(l).product_type);
-        temp_port_string.Format(_T("%d"), n_comport);
+        temp_port_string.Format(_T("%d"), n_mstp_comport);
         temp_object_instance.Format(_T("%u"), m_temp_result_data.at(l).device_id);
         temp_panel_number.Format(_T("%u"), m_temp_result_data.at(l).panel_number);
 
@@ -5062,6 +5114,7 @@ end_mstp_thread:
     //}
 
     //is_in_scan_mode = false;
+    pScan->m_pScanBacnetIPThread = NULL;
     return 1;
 }
 

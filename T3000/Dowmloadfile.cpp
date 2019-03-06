@@ -784,11 +784,11 @@ BOOL Dowmloadfile::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-    string temp_md5 = MD5(ifstream(_T("C:\\Fance\\T3000\\T3000_Building_Automation_System\\T3000 Output\\release\\TemcoStandardBacnetTool.dll"))).toString();
+    //string temp_md5 = MD5(ifstream(_T("C:\\Fance\\T3000\\T3000_Building_Automation_System\\T3000 Output\\release\\TemcoStandardBacnetTool.dll"))).toString();
 
-    string temp_md1 = MD5(ifstream(_T("C:\\Fance\\T3000\\T3000_Building_Automation_System\\T3000 Output\\release\\T3000Controls.dll"))).toString();
+    //string temp_md1 = MD5(ifstream(_T("C:\\Fance\\T3000\\T3000_Building_Automation_System\\T3000 Output\\release\\T3000Controls.dll"))).toString();
 
-    string temp_md2 = MD5(ifstream(_T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe"))).toString();
+    //string temp_md2 = MD5(ifstream(_T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe"))).toString();
 
 
     m_static_persent.SetWindowTextW(_T(""));
@@ -961,20 +961,43 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
     CString CheckVersionIniFilePath;
     CString T3000FtpPath;//测试用;
     CString temp_download_path;
+
+    CString revisionFtpPath;//保存revision 的本地路径
+    CString temp_revision_path;
+    CString DesDownloadRevisionPath;
     CFileFind tempfind;
     CString strFileName;
+    CString str_product_section;
 
-    bool download_ret = false;
+    HRESULT download_ret = NULL;
     DownloadIniFilePath = Folder_Path + _T("//ProductPath.ini");
     CheckVersionIniFilePath = Folder_Path + _T("//CheckVersionPath.ini");
     download_ret = URLDownloadToFile(NULL, _T("https://temcocontrols.com/ftp/firmware/ProductPath.ini"), DownloadIniFilePath, 0, NULL);
     //T3000_FTP_Version = GetPrivateProfileIntW(_T("Version"), _T("T3000Version"), 0, DownloadIniFilePath);
+    if (download_ret != S_OK)
+    {
+        CS_Info.Format(_T("The network connection is not available,please check the network connection"));
+        pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
+        pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
 
-    CString str_product_section;
+        if (INET_E_DOWNLOAD_FAILURE == download_ret)
+        {
+            CS_Info.Format(_T("This is an HTTPS(secure) address, click Tools, click Internet Options, click Advanced, and check to be sure the SSL and TLS protocols are enabled under the security section."));
+            pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
+            pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
+        }
+
+        goto ftp_download_end;
+    }
+    
+
 
     str_product_section.Format(_T("%d"), pParent->m_download_product_type);
     GetPrivateProfileString(_T("ProductPath"), str_product_section, _T(""), temp_download_path.GetBuffer(MAX_PATH), MAX_PATH, DownloadIniFilePath);
     temp_download_path.ReleaseBuffer();
+
+    GetPrivateProfileString(_T("RevisionFilePath"), str_product_section, _T(""), temp_revision_path.GetBuffer(MAX_PATH), MAX_PATH, DownloadIniFilePath);
+    temp_revision_path.ReleaseBuffer();
 
     ftp_version_date = GetPrivateProfileInt(_T("LastUpdateTime"), str_product_section, 0, DownloadIniFilePath);
     local_version_date = GetPrivateProfileInt(_T("LastUpdateTime"), str_product_section, 0, CheckVersionIniFilePath);
@@ -997,7 +1020,43 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
 
     DesDownloadFilePath = Folder_Path + _T("\\") + strFileName;     
 
+    //若存在 版本信息文件路径 就去下载并显示出来;
+    if (temp_revision_path.IsEmpty() == false)
+    {
+        revisionFtpPath = _T("https://www.temcocontrols.com/ftp/firmware/") + temp_revision_path;
+        strFileName = PathFindFileName(revisionFtpPath);  //根据组合的下载路径，获取最后得文件名
+        DesDownloadRevisionPath = Folder_Path + _T("\\") + strFileName;
+        download_ret = URLDownloadToFile(NULL, revisionFtpPath, DesDownloadRevisionPath, 0, &cbc);
+        if (download_ret == S_OK)
+        {
+            CFile myfile(DesDownloadRevisionPath, CFile::modeRead);
+            char *pBuf;
+            DWORD dwFileLen;
+            dwFileLen = myfile.GetLength();
+            pBuf = new char[dwFileLen + 1];
+            pBuf[dwFileLen] = 0;
+            myfile.Read(pBuf, dwFileLen);     //MFC   CFile 类 很方便
+            myfile.Close();
 
+            CString temp_revision_notes;
+            MultiByteToWideChar(CP_ACP, 0, pBuf, dwFileLen + 1, temp_revision_notes.GetBuffer(dwFileLen + 1), dwFileLen + 1);
+            temp_revision_notes.ReleaseBuffer();
+            CStringArray temparray;
+            SplitCStringA(temparray, temp_revision_notes, _T("\r\n"));
+
+            for (int j = 0; j < temparray.GetSize(); j++)
+            {
+                if (j > 20) //只展示前20行.
+                    break;
+                CS_Info.Format(_T("%s"), temparray.GetAt(j));
+                pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
+                pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
+                Sleep(10);
+            }
+
+            delete pBuf;
+        }
+    }
 
     if ((local_version_date == ftp_version_date) && (ftp_version_date != 0) && tempfind.FindFile(DesDownloadFilePath))  //与FTP上相等 并且存在;
     {
@@ -1373,7 +1432,22 @@ void Dowmloadfile::AutoFlashFirmware()
 
 void Dowmloadfile::OnBnClickedButtonUpdateT3000()
 {
-	
+    CString DownloadIniFilePath;
+    CString CheckVersionIniFilePath;
+    bool download_ret = false;
+    DownloadIniFilePath = Folder_Path + _T("//ProductPath.ini");
+    CheckVersionIniFilePath = Folder_Path + _T("//CheckVersionPath.ini");
+    download_ret = URLDownloadToFile(NULL, _T("https://temcocontrols.com/ftp/firmware/ProductPath.ini"), DownloadIniFilePath, 0, NULL);
+    //T3000_FTP_Version = GetPrivateProfileIntW(_T("Version"), _T("T3000Version"), 0, DownloadIniFilePath);
+    if ((download_ret != S_OK) && is_local_temco_net == false)  //如果不是本地的temco
+    {
+        CString CS_Info;
+        CS_Info.Format(_T("The network connection is not available,please check the network connection"));
+        m_download_info.InsertString(m_download_info.GetCount(), CS_Info);
+        m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
+        return;
+    }
+
 
 	CString tempApplicationFolder;
 	GetModuleFileName(NULL, tempApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);

@@ -11,7 +11,7 @@
 #include <io.h>
 #include "FileOperations.h"
 #include "BuildingConfigEditDlg.h"
-
+#include "BacnetAddRemoteDevice.h"
 #include "global_function.h"
 #include "ConnectRemoteServer.h"
 #include "RemotePtpLogin.h"
@@ -1267,7 +1267,11 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
         WritePrivateProfileStringW(m_BuildNameLst.at(Changed_Item).MainBuildingName,_T("Remote_IP"),temp_ip,g_achive_device_name_path);
 
 
+
         Update_Building();
+
+        CBacnetAddRemoteDevice RemoteDlg;
+        RemoteDlg.DoModal();
     }
     else if(Changed_SubItem == BC_IPPORT)
     {
