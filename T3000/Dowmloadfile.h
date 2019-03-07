@@ -48,6 +48,7 @@ public:
     static DWORD WINAPI  FtpDownloadThread(LPVOID lpVoid);
     CStaticEx m_static_persent;
     CString download_file_name;
+    void Update_File();
 };
 
 

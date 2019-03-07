@@ -130,7 +130,7 @@ typedef struct _tree_product//////////////////////
 	int protocol;
 	unsigned int ncomport;
 	bool status;
-	bool status_last_time[3];
+	bool status_last_time[5];
 	CString NetworkCard_Address;
 	CString NameShowOnTree;
     CString Custom;

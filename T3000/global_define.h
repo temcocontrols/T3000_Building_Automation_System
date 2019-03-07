@@ -276,7 +276,6 @@ const int CONNECT_TO_MODBUS_FAILED = 202;
 const int PASSWORD_OK_INITIAL_UI = 203;
 const int SHOW_PROGRAM_IDE = 204;
 const int SHOW_DEVICE_STATUS = 205;
-const int SHOW_PROGRAM_NEWIDE = 206;
 
 const int BAC_READ_ALL_LIST = 255;
 const int BAC_READ_SVAE_CONFIG = 254;
@@ -1463,6 +1462,29 @@ const int CONTROLLER_COL_NUMBER = 15;
 const int CONTROLLOR_REFRESH_TIME = 4000;
 #pragma endregion PID_DIFINE
 
+#pragma region WEEKLY_DEFINE
+const int WEEKLY_ROUTINE_NUM = 0;
+const int WEEKLY_ROUTINE_FULL_LABLE = 1;
+const int WEEKLY_ROUTINE_AUTO_MANUAL = 2;
+const int WEEKLY_ROUTINE_OUTPUT = 3;
+const int WEEKLY_ROUTINE_HOLIDAY1 = 4;
+const int WEEKLY_ROUTINE_STATE1 = 5;
+const int WEEKLY_ROUTINE_HOLIDAY2 = 6;
+const int WEEKLY_ROUTINE_STATE2 = 7;
+const int WEEKLY_ROUTINE_LABEL = 8;
+
+const int WEEKLY_COL_NUMBER = 9;
+#pragma region WEEKLY_DEFINE
+
+#pragma region ANNUAL_DEFINE
+const int ANNUAL_ROUTINE_NUM = 0;
+const int ANNUAL_ROUTINE_FULL_LABEL = 1;
+const int ANNUAL_ROUTINE_AUTO_MANUAL = 2;
+const int ANNUAL_ROUTINE_VALUE = 3;
+const int ANNUAL_ROUTINE_LABLE = 4;
+
+const int ANNUAL_COL_NUMBER = 5;
+#pragma endregion ANNUAL_DEFINE
 
 #pragma region VARIABLE_DEFINE
 
