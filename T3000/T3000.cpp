@@ -26,7 +26,7 @@
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);  
 
 LPFN_ISWOW64PROCESS fnIsWow64Process;  
-const int g_versionNO= 20190222;
+const int g_versionNO= 20190305;
 
 
 #ifdef _DEBUG
@@ -66,7 +66,7 @@ CT3000App::CT3000App()
 #endif 
     //*******************************************************
     
-	T3000_Version = 20190222; //
+	T3000_Version = 20190305; //
 
 	m_lastinterface=19;
 }

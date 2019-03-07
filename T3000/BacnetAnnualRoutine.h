@@ -46,12 +46,6 @@ public:
 	//afx_msg LRESULT AnnualResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
 };
 
-const int ANNUAL_ROUTINE_NUM = 0 ;
-const int ANNUAL_ROUTINE_FULL_LABEL = 1 ;
-const int ANNUAL_ROUTINE_AUTO_MANUAL = 2 ;
-const int ANNUAL_ROUTINE_VALUE = 3 ;
-const int ANNUAL_ROUTINE_LABLE = 4 ;
 
-const int ANNUAL_COL_NUMBER = 5 ;
 
 

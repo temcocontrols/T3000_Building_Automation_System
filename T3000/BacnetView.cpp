@@ -2,6 +2,16 @@
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
 //使用VS2010 编译需删除 c:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cvtres.exe 来确保用更高版本的 来转换资源文件
+
+2019 03 04
+1. 解决 program 读出来 存入prg文件 只存了1600个字节的问题;
+
+2019 03 01
+1. 解决 program 中  save  load  某些 program decode error的问题;
+2. ProgramEditDebug 中可以 显示 并更改 SCH ，HOL.
+3. 更新Update 引擎， 并自动在T3000中替换原有Update.exe 文件.
+
+
 2018 12 21
 1. ScreenEdit 中 Sch 以及Hol 可以显示 ON OFF 值
 2. AR1 AR2 动态加载至  SCH的 combo 中
@@ -826,8 +836,6 @@ Update by Fance
 #include "BacnetScreenEdit.h"
 #include "BacnetRemotePoint.h"
 #include "ShowMessageDlg.h"
-
-#include "NewT3000ProgramEditorDlg.h"
 int g_gloab_bac_comport = 1;
 int g_gloab_bac_baudrate = 19200;
 CString temp_device_id,temp_mac,temp_vendor_id;
@@ -858,7 +866,7 @@ extern CBacnetAlarmWindow * AlarmWindow_Window;
 CBacnetProgramEdit *ProgramEdit_Window = NULL;
 CBacnetScheduleTime *ScheduleEdit_Window = NULL;
 AnnualRout_InsertDia *HolidayEdit_Window = NULL;
-CNewT3000ProgramEditorDlg *ProgramNEWEdit_Window = NULL;
+
 extern char mycode[2000];
 int click_resend_time = 0;//当点击的时候，要切换device时 发送whois的次数;
 
@@ -1608,7 +1616,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 						ProgramEdit_Window = NULL;
 					}
 					ProgramEdit_Window = new CBacnetProgramEdit;
-					ProgramEdit_Window->Create(IDD_DIALOG_BACNET_PROGRAM_EDIT,this);
+					ProgramEdit_Window->Create(IDD_DIALOG_BACNET_PROGRAM_EDIT,this);	
 					ProgramEdit_Window->ShowWindow(SW_SHOW);
 
 
@@ -1618,31 +1626,6 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 			}
 		}
 		break;
-	case SHOW_PROGRAM_NEWIDE:
-	{
-		if (bac_read_which_list == BAC_READ_PROGRAMCODE_LIST)
-		{
-			if (bac_programcode_read_results)
-			{
-				bac_read_which_list = -1;
-				bac_programcode_read_results = false;
-
-				//显示非模态对话框;
-				if (ProgramNEWEdit_Window != NULL)
-				{
-					delete ProgramNEWEdit_Window;
-					ProgramNEWEdit_Window = NULL;
-				}
-				ProgramNEWEdit_Window = new CNewT3000ProgramEditorDlg;
-				ProgramNEWEdit_Window->Create(IDD_DIALOG_NEW_T3000_PRG_EDIT, this);
-				ProgramNEWEdit_Window->ShowWindow(SW_SHOW);
-
-
-			}
-
-			return 0;
-		}
-	}
 	}
 
 	return 0;
@@ -3139,9 +3122,13 @@ void CDialogCM5_BacNet::Fresh()
 		g_llTxCount ++;
 		g_llerrCount ++;
 		bac_select_device_online = false;
-		pFrame->m_product.at(selected_product_index).status_last_time[0] = false;//没有读到的话就将左边的list和状态都设置为false;
-		pFrame->m_product.at(selected_product_index).status_last_time[1] = false;
-		pFrame->m_product.at(selected_product_index).status_last_time[2] = false;
+        for (int x = 0; x < 5; x++)
+        {
+            pFrame->m_product.at(selected_product_index).status_last_time[x] = false;//没有读到的话就将左边的list和状态都设置为false;
+        }
+		//pFrame->m_product.at(selected_product_index).status_last_time[0] = false;//没有读到的话就将左边的list和状态都设置为false;
+		//pFrame->m_product.at(selected_product_index).status_last_time[1] = false;
+		//pFrame->m_product.at(selected_product_index).status_last_time[2] = false;
 		::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,CONNECT_TO_MODBUS_FAILED,0);
 	}
 
@@ -4946,15 +4933,7 @@ part_success:
 		}
 
 		bac_programcode_read_results = true;
-		if (g_new_old_IDE == 0)
-		{
-			::PostMessage(BacNet_hwd, WM_DELETE_NEW_MESSAGE_DLG, SHOW_PROGRAM_IDE, 0);
-		} 
-		else
-		{
-			::PostMessage(BacNet_hwd, WM_DELETE_NEW_MESSAGE_DLG, SHOW_PROGRAM_NEWIDE, 0);
-		}
-		
+		::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,SHOW_PROGRAM_IDE,0);
 
 
 		//::PostMessage(m_program_edit_hwnd,WM_REFRESH_BAC_PROGRAM_RICHEDIT,NULL,NULL);
@@ -5245,10 +5224,14 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 					KillTimer(BAC_READ_SETTING_TIMER);
 					CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 					pFrame->m_pTreeViewCrl->turn_item_image(selected_tree_item ,false);
-					pFrame->m_product.at(selected_product_index).status_last_time[0] = false;
-					pFrame->m_product.at(selected_product_index).status_last_time[1] = false;
-					pFrame->m_product.at(selected_product_index).status_last_time[2] = false;
+					//pFrame->m_product.at(selected_product_index).status_last_time[0] = false;
+					//pFrame->m_product.at(selected_product_index).status_last_time[1] = false;
+					//pFrame->m_product.at(selected_product_index).status_last_time[2] = false;
 
+                    for (int x = 0; x < 5; x++)
+                    {
+                        pFrame->m_product.at(selected_product_index).status_last_time[x] = false;
+                    }
 					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read data timeout. "));
 					break;
 				}
@@ -5958,8 +5941,8 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 	}
 	else if (n_read_product_type == PWM_TRANSDUCER)
 	{
-		output_reg = 6; // (6+8)*23 = 322
-		input_reg = 6; //  23 * 22 = 506
+		output_reg = 2; // (0 + 6)*23 = 138
+		input_reg = 2; //  (0+6) * 22 = 132
 	}
 	else if(n_read_product_type == PID_T3PT12)
 	{

@@ -304,7 +304,7 @@ int write_one_org(unsigned char device_var,unsigned short address,short value,in
 int write_one(unsigned char device_var,unsigned short address,short value,int retry_times)
 {
     //2018 0606 在底层公共读写函数增加对不同协议的处理
-    if (g_protocol == PROTOCOL_MSTP_TO_MODBUS)
+    if ((g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
     {
         int n_ret = 0;
         for (int i = 0; i < retry_times; i++)
