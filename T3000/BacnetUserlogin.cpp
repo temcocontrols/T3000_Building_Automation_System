@@ -185,7 +185,7 @@ void CBacnetUserlogin::OnBnClickedButtonLogin()
 	}
 	else if(nret == LOGIN_PASSWORD_ERROR)
 	{
-		MessageBox(_T("Password error!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+		MessageBox(_T("User name or password error!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
 		return;
 	}
 }

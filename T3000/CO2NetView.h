@@ -502,6 +502,9 @@ public:
 	int m_curcol;
 	int m_currow;
 
+    afx_msg void OnBnClickedRadioCo2CalEnable();
+    afx_msg void OnBnClickedRadioCo2CalDisable();
+    afx_msg void OnBnClickedRadioHumidityHeatEnable();
 };
 
 

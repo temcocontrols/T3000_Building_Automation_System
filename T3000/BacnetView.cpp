@@ -4,6 +4,41 @@
 //使用VS2010 编译需删除 c:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cvtres.exe 来确保用更高版本的 来转换资源文件
 1. Fix the program bug "10 28AO5 = 3" when open again it show "10  = 3"
 
+2019 03 04
+1. 解决 program 读出来 存入prg文件 只存了1600个字节的问题;
+
+2019 03 01
+1. 解决 program 中  save  load  某些 program decode error的问题;
+2. ProgramEditDebug 中可以 显示 并更改 SCH ，HOL.
+3. 更新Update 引擎， 并自动在T3000中替换原有Update.exe 文件.
+
+
+2018 12 21
+1. ScreenEdit 中 Sch 以及Hol 可以显示 ON OFF 值
+2. AR1 AR2 动态加载至  SCH的 combo 中
+3. 新增 BTU 界面  创建 resourcefile 的文件夹 以后资源文件都放在这个文件夹下更新
+4. Zigbee Pan ID   for TSTAT8 
+
+2018 12 11
+1. 修复CO2 NET 无法显示 MODBUS_DEW_PT  的值
+2. 修复CO2  Output2  value为负值的
+3. Graphic view 下面的时间刻度 整数化, 左右移动改25%.
+
+2018 11 27
+1. Setting 界面 Done 不在修改IP
+2. Setting Show LCD 只有BB 有，其他的需要隐藏;
+3. Monitor 处新增 SD卡状态显示;
+
+2018 09 03
+1.TSTAT8 输入根据 寄存器来判断 是否显示HUM CO2 和光强;
+
+2018 08 27
+1.加载或保存 TSTAT8的配置时 新增更多寄存器
+2.不在显示 初次加载TB 之类的对话框.
+
+
+1. Fix the program bug "10 28AO5 = 3" when open again it show "10  = 3"
+
 2018 05 29 
 1.T3系列 扩展IO支持 T3-PT12 
 2.支持更改名字  HUM CO2 PRESSURE .
@@ -864,7 +899,7 @@ int n_read_list_flag = -1;
 // int m_Input_data_length;
 extern void  init_info_table( void );
 extern void Init_table_bank();
-
+CShowMessageDlg * ShowMessageDlg = NULL;
 IMPLEMENT_DYNCREATE(CDialogCM5_BacNet, CFormView)
 
 CDialogCM5_BacNet::CDialogCM5_BacNet()
@@ -1030,8 +1065,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					CString temp_serial;
 					temp_serial.Format(_T("%u.prog"),g_selected_serialnumber);
 					temp_file = g_achive_folder + _T("\\") + temp_serial;
-					//SaveBacnetConfigFile(temp_file);
-					SaveBacnetConfigFile_Cache(temp_file);
+                    SaveBacnetBinaryFile(temp_file);
 				}
 
 
@@ -2711,59 +2745,76 @@ void CDialogCM5_BacNet::Fresh()
 	Gsm_communication = false;
 
 
-#ifndef test_ptp
-	if(initial_bip == false)
-	{
-		
-		g_gloab_bac_comport = 0;
-		set_datalink_protocol(2);
+    if (offline_mode == false)
+    {
+        if (initial_bip == false)
+        {
 
-		Re_Initial_Bac_Socket_IP = pFrame->m_product.at(selected_product_index).NetworkCard_Address;
-		
-		if((!offline_mode) &&(Initial_bac(g_gloab_bac_comport,pFrame->m_product.at(selected_product_index).NetworkCard_Address)))
-		{
-            initial_bip = true;
-		}
-		else
-		{
-			DFTrace(_T("Initial_bac function failed!"));
-            return;
-		}
-	}
-	else
-	{
+            g_gloab_bac_comport = 0;
+            set_datalink_protocol(2);
 
+            Re_Initial_Bac_Socket_IP = pFrame->m_product.at(selected_product_index).NetworkCard_Address;
 
-		if(pFrame->m_product.at(selected_product_index).NetworkCard_Address.CompareNoCase(Re_Initial_Bac_Socket_IP) != 0)
-		{
-			closesocket(my_sokect);
-			int ret_1 = Open_bacnetSocket2(pFrame->m_product.at(selected_product_index).NetworkCard_Address,BACNETIP_PORT,my_sokect);
-			if(ret_1 >= 0)
-			{
-				Re_Initial_Bac_Socket_IP = pFrame->m_product.at(selected_product_index).NetworkCard_Address;
-			}
-		}
-        set_datalink_protocol(PROTOCOL_BACNET_IP);
-		bip_set_socket(my_sokect);
-		 bip_set_port(htons(47808));
-		in_addr BIP_Address;
-		char temp_ip_2[100];
-		memset(temp_ip_2,0,100);
-		WideCharToMultiByte( CP_ACP, 0, pFrame->m_product.at(selected_product_index).NetworkCard_Address, -1, temp_ip_2, 255, NULL, NULL );
-		BIP_Address.S_un.S_addr =  inet_addr(temp_ip_2);
-		bip_set_addr((uint32_t)BIP_Address.S_un.S_addr);
+            if ((!offline_mode) && (Initial_bac(g_gloab_bac_comport, pFrame->m_product.at(selected_product_index).NetworkCard_Address)))
+            {
+                initial_bip = true;
+            }
+            else
+            {
+                DFTrace(_T("Initial_bac function failed!"));
+                return;
+            }
+        }
+        else
+        {
 
 
+            if (pFrame->m_product.at(selected_product_index).NetworkCard_Address.CompareNoCase(Re_Initial_Bac_Socket_IP) != 0)
+            {
+                closesocket(my_sokect);
+                int ret_1 = Open_bacnetSocket2(pFrame->m_product.at(selected_product_index).NetworkCard_Address, BACNETIP_PORT, my_sokect);
+                if (ret_1 >= 0)
+                {
+                    Re_Initial_Bac_Socket_IP = pFrame->m_product.at(selected_product_index).NetworkCard_Address;
+                }
+            }
+            set_datalink_protocol(PROTOCOL_BACNET_IP);
+            bip_set_socket(my_sokect);
+            bip_set_port(htons(47808));
+            in_addr BIP_Address;
+            char temp_ip_2[100];
+            memset(temp_ip_2, 0, 100);
+            WideCharToMultiByte(CP_ACP, 0, pFrame->m_product.at(selected_product_index).NetworkCard_Address, -1, temp_ip_2, 255, NULL, NULL);
+            BIP_Address.S_un.S_addr = inet_addr(temp_ip_2);
+            bip_set_addr((uint32_t)BIP_Address.S_un.S_addr);
 
-		if(g_bac_instance>0)
-			Send_WhoIs_Global(g_bac_instance, g_bac_instance);
-	}
+
+
+            if (g_bac_instance>0)
+                Send_WhoIs_Global(g_bac_instance, g_bac_instance);
+        }
+    }
+    else
+    {
+        receive_customer_unit = true;  // 虚拟设备很多地方判断是否有接收到了  客户的自定义range
+        //虚拟设备也需要初始化bacnet 的相关参数;
+        if (!bac_net_initial_once)
+        {
+            bac_net_initial_once = true;
+            timesec1970 = (unsigned long)time(NULL);
+            timestart = 0;
+            init_info_table();
+            Init_table_bank();
+        }
+        LoadBacnetBinaryFile(false, offline_prg_path);
+    }
+
 
 	//
 	//SetTimer(1,500,NULL);
 	SetTimer(BAC_TIMER_2_WHOIS,60000,NULL);//定时器2用于间隔发送 whois;不知道设备什么时候会被移除;
 	SetTimer(BAC_TIMER_3_CHECKALARM,1000,NULL); //Check whether need  show Alarm dialog.
-#endif
+
 	BacNet_hwd = this->m_hWnd;
 
 
@@ -3072,9 +3123,13 @@ void CDialogCM5_BacNet::Fresh()
 		g_llTxCount ++;
 		g_llerrCount ++;
 		bac_select_device_online = false;
-		pFrame->m_product.at(selected_product_index).status_last_time[0] = false;//没有读到的话就将左边的list和状态都设置为false;
-		pFrame->m_product.at(selected_product_index).status_last_time[1] = false;
-		pFrame->m_product.at(selected_product_index).status_last_time[2] = false;
+        for (int x = 0; x < 5; x++)
+        {
+            pFrame->m_product.at(selected_product_index).status_last_time[x] = false;//没有读到的话就将左边的list和状态都设置为false;
+        }
+		//pFrame->m_product.at(selected_product_index).status_last_time[0] = false;//没有读到的话就将左边的list和状态都设置为false;
+		//pFrame->m_product.at(selected_product_index).status_last_time[1] = false;
+		//pFrame->m_product.at(selected_product_index).status_last_time[2] = false;
 		::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,CONNECT_TO_MODBUS_FAILED,0);
 	}
 
@@ -3240,7 +3295,14 @@ LRESULT CDialogCM5_BacNet::Fresh_UI(WPARAM wParam,LPARAM lParam)
 		//break;
 
 	case MENU_CLICK:
-
+        if ((User_Login_Window->IsWindowVisible()) && (lParam != BAC_READ_USER_LOGIN_INFO))
+        {
+            CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+            pFrame->HideBacnetWindow();
+            User_Login_Window->ShowWindow(SW_NORMAL);
+            break;
+        }
+            
 		button_click = lParam;
 		tsm_free_all_invoke_id();//每次点击的时候都将所有INVOKE ID 清零;
 		if(button_click == WRITEPRGFLASH_COMMAND)
@@ -3839,7 +3901,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 
 	if(offline_mode)
 	{
-		LoadBacnetConfigFile(false,offline_prg_path);
+		LoadBacnetBinaryFile(false,offline_prg_path);
 		hwait_thread = NULL;
 		if(bac_read_which_list == BAC_READ_PROGRAMCODE_LIST)
 		{
@@ -5012,11 +5074,17 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 				g_bPauseMultiRead = true; // 只要在minipanel的界面 就暂停 读 寄存器的那个线程;
 				if(!Gsm_communication)
 					m_bac_handle_Iam_data.clear();
-				if(g_bac_instance>0)
-					Send_WhoIs_Global(-1, -1);
+
+
+
 
 				if(m_is_remote_device)
 					Send_WhoIs_remote_ip(remote_ip_address);
+                else
+                {
+                    if (g_bac_instance>0)
+                        Send_WhoIs_Global(-1, -1);
+                }
 
 				if(bac_select_device_online)
 				{
@@ -5024,8 +5092,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 					CString temp_serial;
 					temp_serial.Format(_T("%u.prog"),g_selected_serialnumber);
 					temp_file = g_achive_folder + _T("\\") + temp_serial;
-					//SaveBacnetConfigFile(temp_file);
-					SaveBacnetConfigFile_Cache(temp_file);
+                    SaveBacnetBinaryFile(temp_file);
 				}
 			}
 
@@ -5158,10 +5225,14 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 					KillTimer(BAC_READ_SETTING_TIMER);
 					CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 					pFrame->m_pTreeViewCrl->turn_item_image(selected_tree_item ,false);
-					pFrame->m_product.at(selected_product_index).status_last_time[0] = false;
-					pFrame->m_product.at(selected_product_index).status_last_time[1] = false;
-					pFrame->m_product.at(selected_product_index).status_last_time[2] = false;
+					//pFrame->m_product.at(selected_product_index).status_last_time[0] = false;
+					//pFrame->m_product.at(selected_product_index).status_last_time[1] = false;
+					//pFrame->m_product.at(selected_product_index).status_last_time[2] = false;
 
+                    for (int x = 0; x < 5; x++)
+                    {
+                        pFrame->m_product.at(selected_product_index).status_last_time[x] = false;
+                    }
 					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read data timeout. "));
 					break;
 				}
@@ -5257,32 +5328,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 	case BAC_SET_LAST_UI:
 		{
 			KillTimer(BAC_SET_LAST_UI);
-			int first_view_ui;
-			first_view_ui = (unsigned int)GetPrivateProfileInt(_T("LastView"),_T("FistLevelViewUI"),-1,g_cstring_ini_path);
-			if(first_view_ui == TYPE_OUTPUT)
-				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_OUTPUTS,BN_CLICKED),NULL);
-			else if(first_view_ui == TYPE_VARIABLE)
-				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_VARIABLES,BN_CLICKED),NULL);
-			else if(first_view_ui == TYPE_INPUT)
-				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_INPUTS,BN_CLICKED),NULL);
-			else if(first_view_ui == TYPE_PROGRAM)
-				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_PROGRAMS,BN_CLICKED),NULL);
-			else if(first_view_ui == TYPE_CONTROLLER)
-				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_CONTROLLERS,BN_CLICKED),NULL);
-			else if(first_view_ui == TYPE_SCREENS)
-				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_SCREENS,BN_CLICKED),NULL);
-			else if(first_view_ui == TYPE_WEEKLY)
-				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_WEEKLY,BN_CLICKED),NULL);
-			else if(first_view_ui == TYPE_ANNUAL)
-				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_ANNUALROUTINES,BN_CLICKED),NULL);
-			else if(first_view_ui == TYPE_MONITOR)
-				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_MONITORS,BN_CLICKED),NULL);
-			else if(first_view_ui == TYPE_ALARMLOG)
-				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_ALARM_LOG,BN_CLICKED),NULL);
-			else if(first_view_ui == TYPE_READ_REMOTE_POINT_INFO)
-				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_TSTAT,BN_CLICKED),NULL);
-			else if(first_view_ui == TYPE_SETTING)
-				::SendMessage(MainFram_hwd,WM_COMMAND,MAKEWPARAM(ID_CONTROL_SETTINGS,BN_CLICKED),NULL);
+            switch_product_last_view();
 		}
 		break;
 	default:
@@ -5318,7 +5364,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 	if(m_user_level == LOGIN_SUCCESS_GRAPHIC_MODE)
 	{
 
-		if(LoadBacnetConfigFile_Cache(achive_file_path) < 0 )
+		if(LoadBacnetBinaryFile(false,achive_file_path) < 0 )
 			PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ALL);
 		m_bac_main_tab.SetCurSel(WINDOW_SCREEN);
 		for (int i=0;i<WINDOW_TAB_COUNT;i++)
@@ -5341,7 +5387,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 	}
 	else if(m_user_level == LOGIN_SUCCESS_ROUTINE_MODE)
 	{
-		if(LoadBacnetConfigFile_Cache(achive_file_path) < 0 )
+		if(LoadBacnetBinaryFile(false,achive_file_path) < 0 )
 			PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,BAC_READ_ALL_LIST);
 		m_bac_main_tab.SetCurSel(WINDOW_WEEKLY);
 		for (int i=0;i<WINDOW_TAB_COUNT;i++)
@@ -5368,29 +5414,37 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 		{
 			if(offline_mode)
 			{
-				CString offline_folder;
-				offline_folder = g_strBuildingFolder + pFrame->m_strCurMainBuildingName;
-				CreateDirectory(offline_folder,NULL);//
-				offline_prg_path = offline_folder + _T("\\Offline.prog");
-
-				LoadBacnetConfigFile(false,offline_prg_path);
+				LoadBacnetBinaryFile(false,offline_prg_path);
 				PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,BAC_READ_ALL_LIST);
 			}
-			else if(LoadBacnetConfigFile_Cache(achive_file_path) < 0 )
+            else if(LoadBacnetBinaryFile(false, achive_file_path) < 0)
+			//else if(LoadBacnetBinaryFile_Cache(achive_file_path) < 0 )
 			{
                 if (g_protocol == PROTOCOL_BACNET_IP)
                 {
                     pFrame->Show_Wait_Dialog_And_ReadBacnet();
+#if 0
+                    if (ShowMessageDlg != NULL)
+                    {
+                        delete ShowMessageDlg;
+                        ShowMessageDlg = NULL;
+                    }
+                    ShowMessageDlg = new CShowMessageDlg;
 
-                    CShowMessageDlg dlg;
+
+
+                    //CShowMessageDlg dlg;
                     CString temp_task_info;
                     temp_task_info.Format(_T("This is the first time the device has been accessed , the data is being read"));
-                    dlg.SetStaticText(temp_task_info);
+                    ShowMessageDlg->SetStaticText(temp_task_info);
                     //dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
-                    dlg.SetStaticTextColor(RGB(0, 0, 255));
-                    dlg.SetStaticTextSize(25, 20);
-                    dlg.SetProgressAutoClose(250, 100, EVENT_FIRST_LOAD_PROG);
-                    dlg.DoModal();
+                    ShowMessageDlg->SetStaticTextColor(RGB(0, 0, 255));
+                    ShowMessageDlg->SetStaticTextSize(25, 20);
+                    ShowMessageDlg->SetProgressAutoClose(250, 100, EVENT_FIRST_LOAD_PROG);
+                    //dlg.DoModal();
+                    ShowMessageDlg->Create(IDD_AA_SHOWMESSAGE, this);
+                    ShowMessageDlg->ShowWindow(SW_HIDE);
+#endif
                 }
 				//PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,BAC_READ_ALL_LIST);
 			}
@@ -5591,16 +5645,22 @@ void CDialogCM5_BacNet::Inital_Tab_Loaded_Parameter()
 	static unsigned int static_value_read = 0;
 	if(static_value_read == 0)
 	{
-		read_customer_unit = false;
-		receive_customer_unit = false;
-		read_analog_customer_unit = false;
+        if (offline_mode == false)
+        {
+            read_customer_unit = false;
+            receive_customer_unit = false;
+            read_analog_customer_unit = false;
+        }
 		static_value_read = g_selected_serialnumber ;
 	}
 	else if(static_value_read != g_selected_serialnumber) 
 	{
-		read_customer_unit = false;
-		read_analog_customer_unit = false;
-		receive_customer_unit = false;
+        if (offline_mode == false)
+        {
+            read_customer_unit = false;
+            read_analog_customer_unit = false;
+            receive_customer_unit = false;
+        }
 		static_value_read = g_selected_serialnumber;
 	}
 
@@ -5860,7 +5920,9 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 {
 	unsigned char  read_device_id = 0;
 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-	read_device_id =  pFrame->m_product.at(selected_product_index).product_id;
+    if ((pFrame->m_product.size() == 0) || (selected_product_index  >= pFrame->m_product.size()))
+        return 0;
+	read_device_id = pFrame->m_product.at(selected_product_index).product_id;
 	bool read_result = true;
 	unsigned short read_data_buffer[3200];
 	memset(read_data_buffer,0,sizeof(unsigned short)*3200);
@@ -5880,8 +5942,8 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 	}
 	else if (n_read_product_type == PWM_TRANSDUCER)
 	{
-		output_reg = 6; // (6+8)*23 = 322
-		input_reg = 6; //  23 * 22 = 506
+		output_reg = 2; // (0 + 6)*23 = 138
+		input_reg = 2; //  (0+6) * 22 = 132
 	}
 	else if(n_read_product_type == PID_T3PT12)
 	{
@@ -6068,15 +6130,6 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 				{
 					memcpy( &m_controller_data.at(i),&read_data_buffer[i*14],sizeof(Str_controller_point));
 				}
-
-				//CString str_serialid;
-				//str_serialid.Format(_T("%u"), pFrame->m_product.at(selected_product_index).serial_number);
-				//CString achive_file_path;
-				//CString temp_serial;
-				//achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
-
-				//SaveModbusConfigFile_Cache(achive_file_path,NULL,3200*2);
-
 
 				if(Controller_Window->IsWindowVisible())
 					::PostMessage(m_controller_dlg_hwnd,WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);

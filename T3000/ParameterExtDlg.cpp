@@ -27,6 +27,7 @@ void CParameterExtDlg::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_EDIT_PARA_EXT_DELAY, m_edit_delay_time);
     DDX_Control(pDX, IDC_EDIT_PARA_EXT_TIME_REMAINING, m_edit_time_remaining);
     DDX_Control(pDX, IDC_EDIT_PARA_EXT_MIN_PWM, m_edit_min_pwm);
+    DDX_Control(pDX, IDC_EDIT_ZIGBEE_PAN_ID, m_zigbee_panid);
 }
 
 
@@ -35,6 +36,7 @@ BEGIN_MESSAGE_MAP(CParameterExtDlg, CDialogEx)
     ON_EN_KILLFOCUS(IDC_EDIT_PARA_EXT_MIN_PWM, &CParameterExtDlg::OnEnKillfocusEditParaExtMinPwm)
     ON_BN_CLICKED(IDC_BUTTON_PARA_EXT_OK, &CParameterExtDlg::OnBnClickedButtonParaExtOk)
     ON_EN_KILLFOCUS(IDC_EDIT_PARA_EXT_TIME_REMAINING, &CParameterExtDlg::OnEnKillfocusEditParaExtTimeRemaining)
+    ON_EN_KILLFOCUS(IDC_EDIT_ZIGBEE_PAN_ID, &CParameterExtDlg::OnEnKillfocusEditZigbeePanId)
 END_MESSAGE_MAP()
 
 
@@ -55,19 +57,23 @@ BOOL CParameterExtDlg::OnInitDialog()
 
     // TODO:  在此添加额外的初始化
     m_edit_delay_time.SetWindowTextW(temp_delay_time);
-    m_edit_delay_time.textColor(RGB(0, 0, 0));
+    //m_edit_delay_time.textColor(RGB(0, 0, 0));
     //m_edit_delay_time.bkColor(RGB(0,255,255));
-    m_edit_delay_time.setFont(18, 12, NULL, _T("Arial"));
+    //m_edit_delay_time.setFont(18, 12, NULL, _T("Arial"));
 
     m_edit_time_remaining.SetWindowTextW(temp_time_left);
-    m_edit_time_remaining.textColor(RGB(0, 0, 0));
+    //m_edit_time_remaining.textColor(RGB(0, 0, 0));
     //m_edit_time_remaining.bkColor(RGB(0,255,255));
-    m_edit_time_remaining.setFont(18, 12, NULL, _T("Arial"));
+    //m_edit_time_remaining.setFont(18, 12, NULL, _T("Arial"));
 
     m_edit_min_pwm.SetWindowTextW(temp_min_pwm);
-    m_edit_min_pwm.textColor(RGB(0, 0, 0));
+    //m_edit_min_pwm.textColor(RGB(0, 0, 0));
     //m_edit_min_pwm.bkColor(RGB(0,255,255));
-    m_edit_min_pwm.setFont(18, 12, NULL, _T("Arial"));
+    //m_edit_min_pwm.setFont(18, 12, NULL, _T("Arial"));
+
+    CString zigbeepanid;
+    zigbeepanid.Format(_T("%d"), product_register_value[801]);
+    m_zigbee_panid.SetWindowTextW(zigbeepanid);
 
     return TRUE;  // return TRUE unless you set the focus to a control
                   // 异常: OCX 属性页应返回 FALSE
@@ -197,4 +203,25 @@ void CParameterExtDlg::OnEnKillfocusEditParaExtTimeRemaining()
     }
 
 
+}
+
+
+void CParameterExtDlg::OnEnKillfocusEditZigbeePanId()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString strText;
+    m_edit_time_remaining.GetWindowText(strText);
+    int nValue = _wtoi(strText);
+
+    if (write_one(g_tstat_id, 801, short(nValue)) > 0)
+    {
+        product_register_value[801] = nValue;
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Set Zigbee Pan ID Success"));
+    }
+    else
+    {
+        CString temp_cs;
+        temp_cs.Format(_T("%d"), product_register_value[801]);
+        m_edit_min_pwm.SetWindowTextW(temp_cs);
+    }
 }

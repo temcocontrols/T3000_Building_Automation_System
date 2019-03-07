@@ -232,8 +232,8 @@ typedef struct
 typedef  struct
 {
 
-	int8_t description[STR_IN_DESCRIPTION_LENGTH]; 	      /* (21 bytes; string)*/
-	int8_t label[STR_IN_LABEL];		      	/* (9 bytes; string)*/
+    uint8_t description[STR_IN_DESCRIPTION_LENGTH]; 	      /* (21 bytes; string)*/
+    uint8_t label[STR_IN_LABEL];		      	/* (9 bytes; string)*/
 	int value;		     						/* (4 bytes; int32_t)*/
 	uint8_t  filter;  /* (3 bits; 0=1,1=2,2=4,3=8,4=16,5=32, 6=64,7=128,)*/
 	uint8_t decom;/* (1 bit; 0=ok, 1=point decommissioned)*/
@@ -819,6 +819,10 @@ typedef union
          unsigned char flag_time_sync_pc;  // 0: 不需要   1:同步.
          unsigned char time_sync_auto_manual;  // 0 和时间服务器同步   1：和PC 时间同步
          unsigned char sync_time_results;      //与时间服务器同步的结果 0 失败         1成功   注：只有在 reset_default 写99 要求同步后才去读次位用以判断同步结果;
+         //unsigned char network_ID[3];   //三个口 用于编程的ID；
+         unsigned char mstp_id;         //MSTP_ID
+         unsigned short zigbee_panid;
+         unsigned char max_master; //可设置的最大matser值  245 个
 	}reg;
 }Str_Setting_Info;
 
@@ -1004,7 +1008,7 @@ typedef struct
 	uint8_t count;//              : 8;
 	uint8_t read_write;//         : 2;    0 - read only 1- written
 	uint8_t time_remaining ;//          : 2; //远程点 剩余生命周期
-
+    uint32_t object_instance;
 } Str_remote_point; /* 1+5+4+2+2=14 bytes */
 
 
@@ -1050,8 +1054,8 @@ typedef union
 
 typedef struct
 {
-	unsigned short value;         /* (2 bytes; ) */
-	int unit;         /* (4 bytes; ) */
+	unsigned short m_volts;         /* (2 bytes; ) */
+	int m_value;         /* (4 bytes; ) */
 
 } Tbl_point;     /* (size = 6 bytes); */
 

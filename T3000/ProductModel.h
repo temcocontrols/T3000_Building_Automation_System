@@ -63,6 +63,7 @@
 #define PM_TSTAT8_220V                94
 #define PM_T36CTA                     95
 #define PM_NC                         100
+#define PM_TSTAT8_PROGRAM             101  //TSTAT8 的可编程版本;
 #define PWM_TRANSDUCER                104
 #define PM_LightingController         120
 #define PM_BTU_METER                  121

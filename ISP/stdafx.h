@@ -44,11 +44,12 @@
 #include <map>
 using namespace std;
 
+#include "Bacnet_Include.h"
 #include "Global_Struct.h"
-
-
+#pragma comment(lib,"BACnet_Stack_Library" )
 
 #define INPUT extern "C" __declspec(dllimport)
+INPUT int write_multi_Short(unsigned char device_var, unsigned short *to_write, unsigned short start_address, int length);
 
 INPUT int Write_One(unsigned char device_var,unsigned short address,unsigned short value);
 INPUT int Read_One(unsigned char device_var,unsigned short address);

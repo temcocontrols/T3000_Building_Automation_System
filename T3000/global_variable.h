@@ -27,7 +27,7 @@ bool list_mouse_click = false;
 //#include "stdafx.h"
 unsigned short multi_register_value[1024]={-1};
 unsigned short multi_register_value_tcp[10000]={-1};
-unsigned short product_register_value[1024]={-1};
+unsigned short product_register_value[20000]={-1};
 
 int product_type = 0;
 int old_product_type = 0;
@@ -1815,6 +1815,13 @@ int	MODBUS_PID3_OFF_OUTPUT_HEAT1		=	-1	;
 int	MODBUS_PID3_OFF_OUTPUT_HEAT2		=	-1	;
 int	MODBUS_PID3_OFF_OUTPUT_HEAT3		=	-1	;
 
+int MODBUS_HEAT_COOL_MODE   =                691;
+
+int MODBUS_PID3_DAY_SETPOINT = 705;
+int MODBUS_PID3_NIGHT_SETPOINT = 706;
+
+int MODBUS_PID_D_TERM       =                799;
+int MODBUS_PID_SAMPLE_TIME  =                800;
 //used for record the selected product , if user want to update this product ,we need to check whether it is on line or not.
 int selected_product_index = -1;
 HTREEITEM selected_tree_item = NULL;
@@ -1824,7 +1831,7 @@ HTREEITEM selected_tree_item = NULL;
 CString temp_off[BAC_CUSTOMER_UNITS_COUNT];		//ÓÃÓÚ ±£´æ ¿Í»§×Ô¶¨ÒåµÄ µ¥Î»;
 CString temp_on[BAC_CUSTOMER_UNITS_COUNT];
 CString temp_unit[BAC_CUSTOMER_UNITS_COUNT];
-CString temp_unit_no_index[BAC_CUSTOMER_UNITS_COUNT];
+CString Custom_Digital_Range[BAC_CUSTOMER_UNITS_COUNT];
 bool read_customer_unit;	//Èç¹ûÕâ¸öÉè±¸Ã»ÓÐ¶Á¹ý customer unitÕâÒ»Ïî,¾ÍÒª³¢ÊÔÈ¥¶Á£¬ÒÔÇ°ÀÏ°æ±¾µÄÃ»ÓÐ;
 bool receive_customer_unit; //ÊÕµ½»Ø¸´£¬flag¾ÍÖÃ true;
 bool read_analog_customer_unit;  // Õâ¸öÊÇÄ£ÄâµÄcus tabel ;
@@ -1837,6 +1844,7 @@ int bacnet_device_type;
 int g_bac_instance;
 unsigned int g_sub_instace;
 unsigned int g_selected_serialnumber;
+unsigned int g_selected_product_id;
 unsigned short g_mac;
 HWND MainFram_hwd;
 HWND BacNet_hwd;
@@ -1918,6 +1926,7 @@ HWND      m_tstat_schedule_dlg_hwnd = NULL;
 HWND analog_cus_range_dlg=NULL;
 
 HWND	  m_statusbar_hwnd = NULL;
+HWND      m_t3000_log_window = NULL;
 vector <Str_out_point> m_Output_data;
 vector <Str_in_point>  m_Input_data;
 vector <Str_program_point>  m_Program_data;
@@ -1989,6 +1998,7 @@ DWORD nThreadID_x;
 DWORD cm5_nThreadID;
 CDialog *pDialog[14];
 CDialog *DebugWindow;
+CDialog *T3000LogWindow = NULL;
 CDialog *Tcp_Server_Window =NULL;
 HWND h_debug_window;
 CString PrintText[1000];
@@ -2217,6 +2227,7 @@ bool graphic_view_visible[14];
 CString bacnet_message_input_title;	//ÊäÈëµÄÌáÊ¾ÐÅÏ¢
 CString bacnet_message_return_string;  //µÃµ½µÄÊäÈë×Ö·û´®
 pidname_map product_map;
+pid_reglist_map product_reglist_map;
 bool offline_mode = false; //È«¾ÖÀëÏßÄ£Ê½ÅÐ¶Ï;
 CString offline_prg_path;   //ÀëÏßÄ£Ê½µÃprg ±£´æÂ·¾¶;
 
@@ -2228,3 +2239,11 @@ Str_modbus_reg bacnet_to_modbus_struct;  //ÓÃÓÚbacnet Ð­Òé×ª»»Îªmodbus Ð­ÒéµÄ½á¹
 
 
 panelname_map g_panelname_map;
+
+CString HolLable[BAC_HOLIDAY_COUNT] =   //ÓÃÓÚ¶¯Ì¬¼ÓÔØListÖÐµÄÏÂÀ­¿ò
+{
+    _T("AR1"),
+    _T("AR2"),
+    _T("AR3"),
+    _T("AR4")
+};

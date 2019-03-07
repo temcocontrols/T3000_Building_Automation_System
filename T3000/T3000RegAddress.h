@@ -5,6 +5,7 @@ const int T3000_5EH_LCD_ADDRESS = 2;
 const int T3000_6_ADDRESS = 3;
 const int T3000_T3_MODULES=10;
 const int CS3000 = 11;
+const int POWER_METER_MODULE = 73;
 
 //UCHAR Mdb_Adress_Map;
 

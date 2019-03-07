@@ -797,7 +797,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 			else if((m_Input_data.at(i).range >= 23) && (m_Input_data.at(i).range <= 30))
 			{
 				if(receive_customer_unit)
-				   m_input_list.SetItemText(i,INPUT_RANGE,temp_unit_no_index[m_Input_data.at(i).range - 23]);
+				   m_input_list.SetItemText(i,INPUT_RANGE,Custom_Digital_Range[m_Input_data.at(i).range - 23]);
 				else
 					m_input_list.SetItemText(i,INPUT_RANGE,Digital_Units_Array[0]);
 			}
@@ -819,7 +819,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 				else if((m_Input_data.at(i).range >=23) && (m_Input_data.at(i).range <= 30))
 				{
 					if(receive_customer_unit)
-						temp1 = temp_unit_no_index[m_Input_data.at(i).range - 23];
+						temp1 = Custom_Digital_Range[m_Input_data.at(i).range - 23];
 				}
 
 				SplitCStringA(temparray,temp1,_T("/"));
@@ -1072,7 +1072,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 		else if((m_Input_data.at(lRow).range >=23) && (m_Input_data.at(lRow).range <= 30))
 		{
 			if(receive_customer_unit)
-				temp1 = temp_unit_no_index[m_Input_data.at(lRow).range - 23];
+				temp1 = Custom_Digital_Range[m_Input_data.at(lRow).range - 23];
 			else
 			{
 				m_input_list.Set_Edit(false);
@@ -1172,8 +1172,8 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 		BacnetRange dlg;
 
 
-        if ((g_protocol != PROTOCOL_MSTP_TO_MODBUS) &&
-            (g_protocol != PROTOCOL_BIP_T0_MSTP_TO_MODBUS))// MSTP_转MUDBUS 协议，因为10000以后没有自定义的CUSTOM 表;
+        if ((g_protocol == MODBUS_BACNET_MSTP) ||
+            (g_protocol == PROTOCOL_BACNET_IP))// MSTP_转MUDBUS 协议，因为10000以后没有自定义的CUSTOM 表;
         {
             if (!read_customer_unit)//点击产品的时候 需要读custom units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
             {
@@ -1243,8 +1243,15 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 
 		//if(temp_cs.CompareNoCase(Units_Type[UNITS_TYPE_ANALOG])==0)
 		//{
+
+        if (m_Input_data.at(lRow).sub_product == PM_T3PT12)
+        {
+            dlg.m_device_type = PM_T3PT12;
+           // bacnet_device_type = PM_T3PT12;
+        }
 			initial_dialog = 2;
 			dlg.DoModal();
+
 			if(range_cancel)
 			{
 				PostMessage(WM_REFRESH_BAC_INPUT_LIST,lRow,REFRESH_ON_ITEM);//这里调用 刷新线程重新刷新会方便一点;
@@ -1316,7 +1323,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 				CStringArray temparray;
 				if((bac_range_number_choose >= 23) && (bac_range_number_choose <= 30))
 				{
-					temp1 = temp_unit_no_index[bac_range_number_choose - 23];
+					temp1 = Custom_Digital_Range[bac_range_number_choose - 23];
 				}
 				else
 					temp1 = Digital_Units_Array[bac_range_number_choose];//22 is the sizeof the array
@@ -1748,7 +1755,7 @@ int GetInputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Aut
 			else if((m_Input_data.at(i).range >=23) && (m_Input_data.at(i).range <= 30))
 			{
 				if(receive_customer_unit)
-					temp1 = temp_unit_no_index[m_Input_data.at(i).range - 23];
+					temp1 = Custom_Digital_Range[m_Input_data.at(i).range - 23];
 			}
 
 

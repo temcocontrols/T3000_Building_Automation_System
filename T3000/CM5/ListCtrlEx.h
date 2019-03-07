@@ -142,7 +142,10 @@ namespace ListCtrlEx
 		BOOL				DeleteAllItems( );
 		BOOL				DeleteItem( int nItem );
 
-
+        CToolTipCtrl m_toolTip;        //文本提示类
+        int m_nSubItem;                //存放行号
+        int m_nItem;                //存放列号
+        BOOL m_bEnableTips;
 		int InsertItem(int nIndex, LPCTSTR lpText);
 
 // operations
@@ -175,7 +178,7 @@ namespace ListCtrlEx
 
 		int CListCtrlEx::GetColumnLimitChar(int nColIndex);
 		void CListCtrlEx::SetColumnLimitChar(int nColIndex, int nlimitchar);
-		void CListCtrlEx::Setlistcolcharlimit(unsigned char ncol,unsigned char nlimitchar);
+		void CListCtrlEx::Setlistcolcharlimit(unsigned char ncol,unsigned char nlimitchar); //限制单元格 输入的最大字符个数;
 
 		ColumnType	GetColumnType(int nColIndex);
 		void				SetColumnType(int nColIndex, ColumnType eColType);
@@ -304,6 +307,9 @@ namespace ListCtrlEx
 		static int		StrCompare(LPCTSTR str1st, LPCTSTR str2nd);
 		void				PreSortItems( vector<DWORD_PTR> &vec2StoreData );
 		void				PostSortItems( vector<DWORD_PTR> &vec2StoreData );
+public:
+    afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+    virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
 
 }

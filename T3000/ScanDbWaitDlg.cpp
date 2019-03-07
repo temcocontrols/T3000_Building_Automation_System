@@ -62,7 +62,7 @@ void CScanDbWaitDlg::OnBnClickedCancel()
     ;
 }
 
-
+extern HANDLE * hScanComData ; //用于串口多线程同时扫描
 void CScanDbWaitDlg::OnBnClickedExitbutton()
 {
     
@@ -72,7 +72,19 @@ void CScanDbWaitDlg::OnBnClickedExitbutton()
 	//pScanner->m_bNetScanFinish = TRUE; // at this time, two thread end, all scan end
 	TerminateThread(hwait_scan_thread, 0);
     TerminateThread(m_pScaner->m_pScanTCP_to_485Thread, 0);
-
+    for (int j = 0; j < m_pScaner->m_szComs.size(); j++)
+    {
+        if (hScanComData[j] != NULL)
+        {
+            TerminateThread(hScanComData[j], 0);
+            hScanComData[j] = NULL;
+        }
+    }
+    if (m_pScaner->m_pScanBacnetIPThread != NULL)
+    {
+        TerminateThread(m_pScaner->m_pScanBacnetIPThread, 0);
+        
+    }
     for (int i = 0; i < controller_counter; i++)
     {
         if (hScanTCPData[i] != NULL)

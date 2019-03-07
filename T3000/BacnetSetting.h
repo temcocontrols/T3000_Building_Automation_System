@@ -116,6 +116,15 @@ public:
     afx_msg void OnBnClickedRadioSettingLcdOn();
     afx_msg void OnBnClickedRadioSettingLcdOff();
     char m_tcp_type; //用于记录 IP地址是否是动态的，来判别是否有改变;
+    afx_msg void OnEnKillfocusEditNetworkSub();
+    afx_msg void OnEnKillfocusEditNetworkZigbee();
+    afx_msg void OnEnKillfocusEditNetworkMain();
+    CEdit m_network_sub;
+    CEdit m_network_zigbee;
+    CEdit m_network_main;
+    afx_msg void OnEnKillfocusEditSettingMstpId();
+    afx_msg void OnEnKillfocusEditSettingZeigbeePanid();
+    afx_msg void OnEnKillfocusEditSettingMaxMaster();
 };
 
 

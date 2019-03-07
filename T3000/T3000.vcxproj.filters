@@ -696,6 +696,27 @@
     <ClCompile Include="TstatIconSetting.cpp">
       <Filter>Source Files\TSTAT</Filter>
     </ClCompile>
+    <ClCompile Include="NewT3000ProgramEditorDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Powermeter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PowerMeterList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="T3000LogWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetRegisterListView.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="CO2_NodeView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetAddRemoteDevice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ApplyDisable.bmp">
@@ -1477,9 +1498,6 @@
     <ClInclude Include="BuildingConfigration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NewHumChamberView.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DllFunction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1790,6 +1808,48 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TstatIconSetting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NewT3000ProgramEditorDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Powermeter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PowerMeterList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T3000LogWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CApplication0.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CWorkbook0.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CWorkbooks0.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CWorksheets0.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CWorksheet0.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CRange0.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetRegisterListView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CO2_Node.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CO2_NodeView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetAddRemoteDevice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

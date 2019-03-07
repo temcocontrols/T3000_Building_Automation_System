@@ -50,6 +50,28 @@ public:
 	  BOOL CheckAllDataValid();
 	  afx_msg void OnPaint();
 	  afx_msg void OnTimer(UINT_PTR nIDEvent);
+      afx_msg void OnEnKillfocusEditcusPointValue();
+      afx_msg void OnEnKillfocusEditMinVoltValue();
+      afx_msg void OnEnKillfocusEditMinValueValue();
+      afx_msg void OnEnKillfocusEditMaxVoltValue3();
+      afx_msg void OnEnKillfocusEditMaxValueValue();
+      void ReSetSlideAndList();
+      void InitialPointCount(); //弹出对话框 初始化 个数以及最大最小值;
+      void ShowWindowByCount(int n_count);
+      int n_point_count ;
+      void ReAllocationValue();
+      void ReAllocationVolts();
+      void Handle_Static_ctrl_0();
+      void Handle_Static_ctrl_1();
+      void Handle_Static_ctrl_2();
+      void Handle_Static_ctrl_3();
+      void Handle_Static_ctrl_4();
+      void Handle_Static_ctrl_5();
+      void Handle_Static_ctrl_6();
+      void Handle_Static_ctrl_7();
+      void Handle_Static_ctrl_8();
+      void Handle_Static_ctrl_9();
+      void Handle_Static_ctrl_10();
 };
 
 const int ANALOG_CUS_RANGE_RBL_VALUE = 0;

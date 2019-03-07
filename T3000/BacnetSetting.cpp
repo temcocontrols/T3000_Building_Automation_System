@@ -45,21 +45,24 @@ CBacnetSetting::~CBacnetSetting()
 
 void CBacnetSetting::DoDataExchange(CDataExchange* pDX)
 {
-	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_TIME_PICKER, m_cm5_time_picker);
-	DDX_Control(pDX, IDC_DATE_PICKER, m_cm5_date_picker);
-	DDX_Control(pDX, IDC_COMBO_BACNET_SETTING_COM0, m_device_com0);
-	DDX_Control(pDX, IDC_STATIC_SETTING_PANEL_TITLE, m_static_panel_title);
-	DDX_Control(pDX, IDC_EDIT_SETTING_PANEL, m_edit_panel);
-	DDX_Control(pDX, IDC_STATIC_SETTING_NODES_LABEL_TITLE, m_static_nodes_title);
-	DDX_Control(pDX, IDC_EDIT_SETTING_NODES_LABEL_SETTING, m_edit_nodes_label);
-	DDX_Control(pDX, IDC_EDIT_DYNDNS_USER_NAME, m_dyndns_user);
-	DDX_Control(pDX, IDC_EDIT_DYNDNS_PASSWORD, m_dyndns_password);
-	DDX_Control(pDX, IDC_EDIT_DYNDNS_DOMAIN, m_dyndns_domain);
-	DDX_Control(pDX, IDC_EDIT_TIME_UPDATE, m_edit_ddns_update_time);
-	DDX_Control(pDX, IDC_EDIT_SETTING_PORT, m_edit_port);
-	DDX_Control(pDX, IDC_EDIT_SETTING_OBJ_INSTANCE, m_setting_obj_instance);
-	DDX_Control(pDX, IDC_EDIT_SETTING_MODBUS_ID, m_edit_modbus_id);
+    CDialogEx::DoDataExchange(pDX);
+    DDX_Control(pDX, IDC_TIME_PICKER, m_cm5_time_picker);
+    DDX_Control(pDX, IDC_DATE_PICKER, m_cm5_date_picker);
+    DDX_Control(pDX, IDC_COMBO_BACNET_SETTING_COM0, m_device_com0);
+    DDX_Control(pDX, IDC_STATIC_SETTING_PANEL_TITLE, m_static_panel_title);
+    DDX_Control(pDX, IDC_EDIT_SETTING_PANEL, m_edit_panel);
+    DDX_Control(pDX, IDC_STATIC_SETTING_NODES_LABEL_TITLE, m_static_nodes_title);
+    DDX_Control(pDX, IDC_EDIT_SETTING_NODES_LABEL_SETTING, m_edit_nodes_label);
+    DDX_Control(pDX, IDC_EDIT_DYNDNS_USER_NAME, m_dyndns_user);
+    DDX_Control(pDX, IDC_EDIT_DYNDNS_PASSWORD, m_dyndns_password);
+    DDX_Control(pDX, IDC_EDIT_DYNDNS_DOMAIN, m_dyndns_domain);
+    DDX_Control(pDX, IDC_EDIT_TIME_UPDATE, m_edit_ddns_update_time);
+    DDX_Control(pDX, IDC_EDIT_SETTING_PORT, m_edit_port);
+    DDX_Control(pDX, IDC_EDIT_SETTING_OBJ_INSTANCE, m_setting_obj_instance);
+    DDX_Control(pDX, IDC_EDIT_SETTING_MODBUS_ID, m_edit_modbus_id);
+    DDX_Control(pDX, IDC_EDIT_NETWORK_SUB, m_network_sub);
+    DDX_Control(pDX, IDC_EDIT_NETWORK_ZIGBEE, m_network_zigbee);
+    DDX_Control(pDX, IDC_EDIT_NETWORK_MAIN, m_network_main);
 }
 
 
@@ -125,6 +128,12 @@ BEGIN_MESSAGE_MAP(CBacnetSetting, CDialogEx)
     ON_BN_CLICKED(IDC_RADIO_SETTING_SYNC_PC, &CBacnetSetting::OnBnClickedRadioSettingSyncPc)
     ON_BN_CLICKED(IDC_RADIO_SETTING_LCD_ON, &CBacnetSetting::OnBnClickedRadioSettingLcdOn)
     ON_BN_CLICKED(IDC_RADIO_SETTING_LCD_OFF, &CBacnetSetting::OnBnClickedRadioSettingLcdOff)
+    ON_EN_KILLFOCUS(IDC_EDIT_NETWORK_SUB, &CBacnetSetting::OnEnKillfocusEditNetworkSub)
+    ON_EN_KILLFOCUS(IDC_EDIT_NETWORK_ZIGBEE, &CBacnetSetting::OnEnKillfocusEditNetworkZigbee)
+    ON_EN_KILLFOCUS(IDC_EDIT_NETWORK_MAIN, &CBacnetSetting::OnEnKillfocusEditNetworkMain)
+   // ON_EN_KILLFOCUS(IDC_EDIT_SETTING_MSTP_ID, &CBacnetSetting::OnEnKillfocusEditSettingMstpId)
+    ON_EN_KILLFOCUS(IDC_EDIT_SETTING_ZEIGBEE_PANID, &CBacnetSetting::OnEnKillfocusEditSettingZeigbeePanid)
+    ON_EN_KILLFOCUS(IDC_EDIT_SETTING_MAX_MASTER, &CBacnetSetting::OnEnKillfocusEditSettingMaxMaster)
 END_MESSAGE_MAP()
 
 
@@ -419,14 +428,14 @@ void CBacnetSetting::OnBnClickedBtnBacIPChange()
 	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->GetAddress(gatway1,gatway2,gatway3,gatway4);
 
 
-    if (0 == (address1 != Device_Basic_Setting.reg.ip_addr[0] || address2 != Device_Basic_Setting.reg.ip_addr[1] || address3 != Device_Basic_Setting.reg.ip_addr[2] || address4 != Device_Basic_Setting.reg.ip_addr[3] ||
-        subnet1 != Device_Basic_Setting.reg.subnet[0] || subnet2 != Device_Basic_Setting.reg.subnet[1] || subnet3 != Device_Basic_Setting.reg.subnet[2] || subnet4 != Device_Basic_Setting.reg.subnet[3] ||
-        gatway1 != Device_Basic_Setting.reg.gate_addr[0] || gatway2 != Device_Basic_Setting.reg.gate_addr[1] || gatway3 != Device_Basic_Setting.reg.gate_addr[2] || gatway4 != Device_Basic_Setting.reg.gate_addr[3]) ||
-        m_tcp_type != Device_Basic_Setting.reg.tcp_type)
-    {
-        //fandu 20180201 如果没有变更就不要往设备里写了。
-        return;
-    }
+//    if (0 == (address1 != Device_Basic_Setting.reg.ip_addr[0] || address2 != Device_Basic_Setting.reg.ip_addr[1] || address3 != Device_Basic_Setting.reg.ip_addr[2] || address4 != Device_Basic_Setting.reg.ip_addr[3] ||
+//        subnet1 != Device_Basic_Setting.reg.subnet[0] || subnet2 != Device_Basic_Setting.reg.subnet[1] || subnet3 != Device_Basic_Setting.reg.subnet[2] || subnet4 != Device_Basic_Setting.reg.subnet[3] ||
+//        gatway1 != Device_Basic_Setting.reg.gate_addr[0] || gatway2 != Device_Basic_Setting.reg.gate_addr[1] || gatway3 != Device_Basic_Setting.reg.gate_addr[2] || gatway4 != Device_Basic_Setting.reg.gate_addr[3]) //||
+///*        m_tcp_type != Device_Basic_Setting.reg.tcp_type*/)
+//    {
+//        //fandu 20180201 如果没有变更就不要往设备里写了。
+//        return;
+//    }
 
     CString strIP;
     strIP.Format(_T("%u.%u.%u.%u"), address1, address2, address3, address4);
@@ -610,9 +619,6 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 	::GetTimeZoneInformation(&lp_time_zone);
      DaylightBias = lp_time_zone.DaylightBias;
 
-     //CString temp_1111111111;
-     //temp_1111111111.Format(_T("DaylightBias = %d"), DaylightBias);
-     //DFTrace(temp_1111111111);
 
 	 n_tempBias = 0 - lp_time_zone.Bias;
 	 n_tempBias = (n_tempBias*100)/60;
@@ -632,7 +638,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				Device_Basic_Setting.reg.subnet[1],Device_Basic_Setting.reg.subnet[2],Device_Basic_Setting.reg.subnet[3]);
 			((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->SetAddress(Device_Basic_Setting.reg.gate_addr[0],
 				Device_Basic_Setting.reg.gate_addr[1],Device_Basic_Setting.reg.gate_addr[2],Device_Basic_Setting.reg.gate_addr[3]);
-
+            bacnet_device_type = Device_Basic_Setting.reg.mini_type;
 			if(Device_Basic_Setting.reg.tcp_type == 1)
 			{
                 m_tcp_type = 1;
@@ -663,7 +669,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 			}
 
 			//版本大于38.6 的才有在setting 里面改port 的功能
-			if(Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 +Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 386)
+			if(Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 +Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 476)
 			{
 				CString temp_port;
 				temp_port.Format(_T("%u"),Device_Basic_Setting.reg.modbus_port);
@@ -674,6 +680,28 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 			{
 				m_edit_port.EnableWindow(false);
 			}
+
+            //版本大于38.6 的才有在setting 里面改port 的功能
+            //if ((Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub) > 470)
+            //{
+            //    CString temp_value;
+            //    m_network_sub.ShowWindow(1);
+            //    m_network_zigbee.ShowWindow(1);
+            //    m_network_main.ShowWindow(1);
+            //    temp_value.Format(_T("%d"), Device_Basic_Setting.reg.network_ID[0]);
+            //    m_network_sub.SetWindowTextW(temp_value);
+            //    temp_value.Format(_T("%d"), Device_Basic_Setting.reg.network_ID[1]);
+            //    m_network_zigbee.SetWindowTextW(temp_value);
+            //    temp_value.Format(_T("%d"), Device_Basic_Setting.reg.network_ID[2]);
+            //    m_network_main.SetWindowTextW(temp_value);
+            //}
+            //else
+            //{
+            //    m_network_sub.EnableWindow(0);
+            //    m_network_zigbee.EnableWindow(0);
+            //    m_network_main.EnableWindow(0);
+            //}
+            
 
             //20180201 fandu  ARM 的 板子才有 zone schedual 这个功能
 			//版本大于46.1 的才有在setting 里面改port 的功能
@@ -765,91 +793,91 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 					((CButton *)GetDlgItem(IDC_CHECK_SETTING_DYNDNS))->SetCheck(true);
 				}
 				else
-				{
-					Device_Basic_Setting.reg.en_dyndns = 1;
-					((CButton *)GetDlgItem(IDC_CHECK_SETTING_DYNDNS))->SetCheck(false);
-				}
+                {
+                Device_Basic_Setting.reg.en_dyndns = 1;
+                ((CButton *)GetDlgItem(IDC_CHECK_SETTING_DYNDNS))->SetCheck(false);
+                }
+
+                ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->ResetContent();
+                ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->AddString(DDNS_Server_Name[0]);
+                ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->AddString(DDNS_Server_Name[1]);
+                ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->AddString(DDNS_Server_Name[2]);
+                ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->AddString(DDNS_Server_Name[3]);
+
+                //if(Device_Basic_Setting.reg.dyndns_provider == 0)
+                //	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(DDNS_Server_Name[0]);
+                //else if(Device_Basic_Setting.reg.dyndns_provider == 1)
+                //	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(DDNS_Server_Name[1]);
+                //else if(Device_Basic_Setting.reg.dyndns_provider == 2)
+                //	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(DDNS_Server_Name[2]);
+                //else if(Device_Basic_Setting.reg.dyndns_provider == 3)
+                //	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(DDNS_Server_Name[3]);
+                //else
+                //	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(_T(""));
+
+                if (Device_Basic_Setting.reg.dyndns_provider == 0)
+                    ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetCurSel(0);
+                else if (Device_Basic_Setting.reg.dyndns_provider == 1)
+                    ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetCurSel(1);
+                else if (Device_Basic_Setting.reg.dyndns_provider == 2)
+                    ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetCurSel(2);
+                else if (Device_Basic_Setting.reg.dyndns_provider == 3)
+                    ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetCurSel(3);
+                else
+                {
+                    Device_Basic_Setting.reg.dyndns_provider = 3;
+                    ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetCurSel(3);
+                }
 
 
+                CString temp_time;
+                temp_time.Format(_T("%u"), Device_Basic_Setting.reg.dyndns_update_time);
+                m_edit_ddns_update_time.SetWindowText(temp_time);
 
-				
-				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->ResetContent();
-				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->AddString(DDNS_Server_Name[0]);
-				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->AddString(DDNS_Server_Name[1]);
-				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->AddString(DDNS_Server_Name[2]);
-				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->AddString(DDNS_Server_Name[3]);
-
-				//if(Device_Basic_Setting.reg.dyndns_provider == 0)
-				//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(DDNS_Server_Name[0]);
-				//else if(Device_Basic_Setting.reg.dyndns_provider == 1)
-				//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(DDNS_Server_Name[1]);
-				//else if(Device_Basic_Setting.reg.dyndns_provider == 2)
-				//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(DDNS_Server_Name[2]);
-				//else if(Device_Basic_Setting.reg.dyndns_provider == 3)
-				//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(DDNS_Server_Name[3]);
-				//else
-				//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(_T(""));
-
-				if(Device_Basic_Setting.reg.dyndns_provider == 0)
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetCurSel(0);
-				else if(Device_Basic_Setting.reg.dyndns_provider == 1)
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetCurSel(1);
-				else if(Device_Basic_Setting.reg.dyndns_provider == 2)
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetCurSel(2);
-				else if(Device_Basic_Setting.reg.dyndns_provider == 3)
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetCurSel(3);
-				else
-				{
-					Device_Basic_Setting.reg.dyndns_provider = 3;
-					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetCurSel(3);
-				}
-
-
-				CString temp_time;
-				temp_time.Format(_T("%u"),Device_Basic_Setting.reg.dyndns_update_time);
-				m_edit_ddns_update_time.SetWindowText(temp_time);
-
-				CString temp_dyndns_user;
-				CString temp_dyndns_password;
-				CString temp_dyndns_domain;
-				MultiByteToWideChar( CP_ACP, 0, (char *)Device_Basic_Setting.reg.dyndns_user, 	(int)strlen((char *)Device_Basic_Setting.reg.dyndns_user)+1,temp_dyndns_user.GetBuffer(MAX_PATH), MAX_PATH );
-				temp_dyndns_user.ReleaseBuffer();
+                CString temp_dyndns_user;
+                CString temp_dyndns_password;
+                CString temp_dyndns_domain;
+                MultiByteToWideChar(CP_ACP, 0, (char *)Device_Basic_Setting.reg.dyndns_user, (int)strlen((char *)Device_Basic_Setting.reg.dyndns_user) + 1, temp_dyndns_user.GetBuffer(MAX_PATH), MAX_PATH);
+                temp_dyndns_user.ReleaseBuffer();
                 temp_dyndns_user = temp_dyndns_user.Left(31);
                 temp_dyndns_user = temp_dyndns_user.Trim();
-				MultiByteToWideChar( CP_ACP, 0, (char *)Device_Basic_Setting.reg.dyndns_pass, 	(int)strlen((char *)Device_Basic_Setting.reg.dyndns_pass)+1,temp_dyndns_password.GetBuffer(MAX_PATH), MAX_PATH );
-				temp_dyndns_password.ReleaseBuffer();	
+                MultiByteToWideChar(CP_ACP, 0, (char *)Device_Basic_Setting.reg.dyndns_pass, (int)strlen((char *)Device_Basic_Setting.reg.dyndns_pass) + 1, temp_dyndns_password.GetBuffer(MAX_PATH), MAX_PATH);
+                temp_dyndns_password.ReleaseBuffer();
                 temp_dyndns_password = temp_dyndns_password.Left(31);
                 temp_dyndns_password = temp_dyndns_password.Trim();
-				MultiByteToWideChar( CP_ACP, 0, (char *)Device_Basic_Setting.reg.dyndns_domain, 	(int)strlen((char *)Device_Basic_Setting.reg.dyndns_domain)+1,temp_dyndns_domain.GetBuffer(MAX_PATH), MAX_PATH );
-				temp_dyndns_domain.ReleaseBuffer();	
+                MultiByteToWideChar(CP_ACP, 0, (char *)Device_Basic_Setting.reg.dyndns_domain, (int)strlen((char *)Device_Basic_Setting.reg.dyndns_domain) + 1, temp_dyndns_domain.GetBuffer(MAX_PATH), MAX_PATH);
+                temp_dyndns_domain.ReleaseBuffer();
                 temp_dyndns_domain = temp_dyndns_domain.Left(31);
                 temp_dyndns_domain = temp_dyndns_domain.Trim();
-				m_dyndns_user.SetWindowTextW(temp_dyndns_user);
-				m_dyndns_password.SetWindowTextW(temp_dyndns_password);
-				m_dyndns_domain.SetWindowTextW(temp_dyndns_domain);
-			}
+                m_dyndns_user.SetWindowTextW(temp_dyndns_user);
+                m_dyndns_password.SetWindowTextW(temp_dyndns_password);
+                m_dyndns_domain.SetWindowTextW(temp_dyndns_domain);
+            }
 
-			if(Device_Basic_Setting.reg.time_zone_summer_daytime == 0)
-			{
-				((CButton *)GetDlgItem(IDC_CHECK_SETTING_ZONE_DAYLIGHT_TIME))->SetCheck(false);
-			}
-			else
-			{
-				Device_Basic_Setting.reg.time_zone_summer_daytime = 1;
-				((CButton *)GetDlgItem(IDC_CHECK_SETTING_ZONE_DAYLIGHT_TIME))->SetCheck(true);
-			}
+            if (Device_Basic_Setting.reg.time_zone_summer_daytime == 0)
+            {
+                ((CButton *)GetDlgItem(IDC_CHECK_SETTING_ZONE_DAYLIGHT_TIME))->SetCheck(false);
+            }
+            else
+            {
+                Device_Basic_Setting.reg.time_zone_summer_daytime = 1;
+                ((CButton *)GetDlgItem(IDC_CHECK_SETTING_ZONE_DAYLIGHT_TIME))->SetCheck(true);
+            }
 
-			if(Device_Basic_Setting.reg.zegbee_exsit == 0x74)
-			{
-				((CButton *)GetDlgItem(IDC_BUTTON_BAC_SHOW_ZIGBEE))->EnableWindow(TRUE);
+            if (Device_Basic_Setting.reg.zegbee_exsit == 0x74)
+            {
+                ((CButton *)GetDlgItem(IDC_BUTTON_BAC_SHOW_ZIGBEE))->EnableWindow(TRUE);
                 GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1)->EnableWindow(TRUE);
-			}
-			else
-			{
-				((CButton *)GetDlgItem(IDC_BUTTON_BAC_SHOW_ZIGBEE))->EnableWindow(FALSE);
+                ((CEdit *)GetDlgItem(IDC_EDIT_SETTING_ZEIGBEE_PANID))->EnableWindow(TRUE);
+                
+            }
+            else
+            {
+                ((CButton *)GetDlgItem(IDC_BUTTON_BAC_SHOW_ZIGBEE))->EnableWindow(FALSE);
                 GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1)->EnableWindow(FALSE);
-			}
-			
+                ((CEdit *)GetDlgItem(IDC_EDIT_SETTING_ZEIGBEE_PANID))->EnableWindow(FALSE);
+            }
+
             if (Device_Basic_Setting.reg.LCD_Display == 0)
             {
                 //1 常灭
@@ -861,6 +889,18 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
                 //1 常亮
                 ((CButton *)GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->SetCheck(true);
                 ((CButton *)GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->SetCheck(false);
+            }
+
+            if ((Device_Basic_Setting.reg.mini_type == PRODUCT_CM5) ||
+                Device_Basic_Setting.reg.mini_type == BIG_MINIPANEL)
+            {
+                ((CButton *)GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->EnableWindow(true);
+                ((CButton *)GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->EnableWindow(true);
+            }
+            else
+            {
+                ((CButton *)GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->EnableWindow(false);
+                ((CButton *)GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->EnableWindow(false);
             }
 
 			if(Device_Basic_Setting.reg.en_sntp == 0)
@@ -1110,31 +1150,32 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 
 			}
 
-			if(bacnet_device_type == PRODUCT_CM5)
+            
+			if(Device_Basic_Setting.reg.mini_type == PRODUCT_CM5)
 			{
 				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("CM5"));
 			}
-			else if (bacnet_device_type == MINIPANELARM)
+			else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM)
 			{
 				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-BB"));
 			}
-			else if (bacnet_device_type == MINIPANELARM_LB)
+			else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_LB)
 			{
 				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-LB"));
 			}
-			else if (bacnet_device_type == MINIPANELARM_TB)
+			else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_TB)
 			{
 				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-TB"));
 			}
-			else if (bacnet_device_type == BIG_MINIPANEL)
+			else if (Device_Basic_Setting.reg.mini_type == BIG_MINIPANEL)
 			{
 				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-BB"));
 			}
-			else if(bacnet_device_type == SMALL_MINIPANEL)
+			else if(Device_Basic_Setting.reg.mini_type == SMALL_MINIPANEL)
 			{
 				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-LB"));
 			}
-			else if((bacnet_device_type == TINY_MINIPANEL) || (bacnet_device_type == TINY_EX_MINIPANEL))
+			else if((Device_Basic_Setting.reg.mini_type == TINY_MINIPANEL) || (Device_Basic_Setting.reg.mini_type == TINY_EX_MINIPANEL))
 			{
 				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-TB"));
 			}
@@ -1187,6 +1228,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 			CString temp_mstp_network;
 			CString temp_bip_network;
 			CString temp_modbus_id;
+            CString temp_mstp_id;
 			temp_object.Format(_T("%u"),Device_Basic_Setting.reg.object_instance);
 			temp_mac_address.Format(_T("%02x-%02x-%02x-%02x-%02x-%02x"),Device_Basic_Setting.reg.mac_addr[0],Device_Basic_Setting.reg.mac_addr[1],Device_Basic_Setting.reg.mac_addr[2],
 															Device_Basic_Setting.reg.mac_addr[3],Device_Basic_Setting.reg.mac_addr[4],Device_Basic_Setting.reg.mac_addr[5]);
@@ -1203,12 +1245,23 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				temp_modbus_id.Format(_T("%d"),Device_Basic_Setting.reg.modbus_id);
 				((CEdit *)GetDlgItem(IDC_EDIT_SETTING_MODBUS_ID))->EnableWindow(TRUE);
 			}
+
+            temp_mstp_id.Format(_T("%d"), Device_Basic_Setting.reg.mstp_id);
+
 			((CEdit *)GetDlgItem(IDC_EDIT_SETTING_OBJ_INSTANCE))->SetWindowTextW(temp_object);
 			((CEdit *)GetDlgItem(IDC_EDIT_SETTING_MAC_ADDRESS))->SetWindowTextW(temp_mac_address);
 			((CEdit *)GetDlgItem(IDC_EDIT_SETTING_MSTP_NETWORK))->SetWindowTextW(temp_mstp_network);
 			((CEdit *)GetDlgItem(IDC_EDIT_SETTING_BIP_NETWORK2))->SetWindowTextW(temp_bip_network);
 			((CEdit *)GetDlgItem(IDC_EDIT_SETTING_MODBUS_ID))->SetWindowTextW(temp_modbus_id);
 
+            CString cszigbeeanid;
+            cszigbeeanid.Format(_T("%d"), Device_Basic_Setting.reg.zigbee_panid);
+            ((CEdit *)GetDlgItem(IDC_EDIT_SETTING_ZEIGBEE_PANID))->SetWindowTextW(cszigbeeanid);
+            
+            CString csmax_master;
+            csmax_master.Format(_T("%u"), Device_Basic_Setting.reg.max_master);
+            ((CEdit *)GetDlgItem(IDC_EDIT_SETTING_MAX_MASTER))->SetWindowTextW(csmax_master);
+            
 		}
 		break;
 	case TIME_COMMAND:
@@ -1220,8 +1273,8 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
             if (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 469)
             {
                 unsigned long  temp_time_long = time(NULL);
-                //if (abs(long(temp_time_long - Device_time.new_time.n_time)) > 600)
-                //    OnBnClickedBtnBacSYNCTime();
+                if (abs(long(temp_time_long - Device_time.new_time.n_time)) > 600)
+                    OnBnClickedBtnBacSYNCTime();
             }
             else
             {
@@ -2092,7 +2145,6 @@ void CBacnetSetting::OnEnKillfocusEditSettingPort()
 
 void CBacnetSetting::OnBnClickedButtonHealth()
 {
-	
 	GetPrivateData_Blocking(g_bac_instance,READ_MISC,0,0,sizeof(Str_MISC));
 	CBacnetSettingHealth Health_Dlg;
 	Health_Dlg.DoModal();
@@ -2568,7 +2620,7 @@ void CBacnetSetting::OnBnClickedButtonZoneSchedule()
 void CBacnetSetting::OnBnClickedButtonSettingDone()
 {
     // TODO: 在此添加控件通知处理程序代码
-    OnBnClickedBtnBacIPChange();
+    //OnBnClickedBtnBacIPChange();
 }
 
 
@@ -2612,4 +2664,94 @@ void CBacnetSetting::OnBnClickedRadioSettingLcdOff()
     Device_Basic_Setting.reg.LCD_Display = 0;
 
     Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
+}
+
+
+void CBacnetSetting::OnEnKillfocusEditNetworkSub()
+{
+    // TODO: 在此添加控件通知处理程序代码
+ 
+}
+
+
+void CBacnetSetting::OnEnKillfocusEditNetworkZigbee()
+{
+    // TODO: 在此添加控件通知处理程序代码
+ 
+}
+
+
+void CBacnetSetting::OnEnKillfocusEditNetworkMain()
+{
+    // TODO: 在此添加控件通知处理程序代码
+ 
+}
+
+
+void CBacnetSetting::OnEnKillfocusEditSettingZeigbeePanid()
+{
+    // TODO: 在此添加控件通知处理程序代码
+
+    CString temp_cstring;
+    ((CEdit *)GetDlgItem(IDC_EDIT_SETTING_ZEIGBEE_PANID))->GetWindowTextW(temp_cstring);
+    int temp_panid = _wtoi(temp_cstring);
+    if ((temp_panid >0) && (temp_panid <65535) && (temp_panid != Device_Basic_Setting.reg.zigbee_panid))
+    {
+        CString temp_warning;
+        temp_warning.Format(_T("Do you really want to change the zigbee pan ID to %u ?"), temp_panid);
+        if (IDYES == MessageBox(temp_warning, _T("Notoce"), MB_YESNO))
+        {
+            unsigned short old_panid = Device_Basic_Setting.reg.zigbee_panid;	//写之前先保存起来；写失败 恢复原值;
+            Device_Basic_Setting.reg.zigbee_panid = (unsigned short)temp_panid;
+            if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change zigbee Pan id failed!"));
+                Device_Basic_Setting.reg.zigbee_panid = old_panid;
+                PostMessage(WM_FRESH_CM_LIST, READ_SETTING_COMMAND, NULL);
+            }
+            else
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change zigbee Pan id success!"));
+            }
+        }
+    }
+}
+
+
+void CBacnetSetting::OnEnKillfocusEditSettingMaxMaster()
+{
+    // TODO: 在此添加控件通知处理程序代码
+
+    CString temp_cstring;
+    GetDlgItemTextW(IDC_EDIT_SETTING_MAX_MASTER, temp_cstring);
+    unsigned int temp_max_master = unsigned int(_wtoi(temp_cstring));
+    if ((temp_max_master<1) || (temp_max_master >255))
+    {
+        MessageBox(_T("Invalid value."));
+        return;
+    }
+    if ((temp_max_master >0) && (temp_max_master <= 254) && (temp_max_master != Device_Basic_Setting.reg.max_master))
+    {
+        CString temp_warning;
+        temp_warning.Format(_T("Do you really want to change the max master to %u ?"), temp_max_master);
+        if (IDYES == MessageBox(temp_warning, _T("Notoce"), MB_YESNO))
+        {
+            unsigned char old_max_master = Device_Basic_Setting.reg.max_master;	//写之前先保存起来；写失败 恢复原值;
+            Device_Basic_Setting.reg.max_master = (unsigned char)temp_max_master;
+            if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change max master failed!"));
+                Device_Basic_Setting.reg.max_master = old_max_master;
+                PostMessage(WM_FRESH_CM_LIST, READ_SETTING_COMMAND, NULL);
+            }
+            else
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change max master success!"));
+            }
+        }
+        else
+        {
+            PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//这里调用 刷新线程重新刷新会方便一点;
+        }
+    }
 }

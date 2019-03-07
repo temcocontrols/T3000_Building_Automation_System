@@ -69,14 +69,7 @@ BEGIN_MESSAGE_MAP(CT3000View, CFormView)
     ON_BN_CLICKED(IDC_BUTTON_SCHEDULE, &CT3000View::OnBnClickedButtonSchedule)
 
     ON_BN_CLICKED(IDC_UNOCCUPIED_MARK, &CT3000View::OnBnClickedUnoccupiedMark)
-
-
-    
-
-
     ON_CBN_SELCHANGE(IDC_STATICUNINT, &CT3000View::OnCbnSelchangeStaticunint)
-
-
     ON_WM_HELPINFO()
     ON_BN_CLICKED(IDC_HELP, &CT3000View::OnBnClickedHelp)
 //	ON_BN_CLICKED(IDC_BTN_TOPOLOGICAL, &CT3000View::OnBnClickedBtnTopological)
@@ -86,6 +79,7 @@ BEGIN_MESSAGE_MAP(CT3000View, CFormView)
     ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)
     ON_EN_KILLFOCUS(IDC_DAY_EDIT, &CT3000View::OnEnKillfocusDayEdit)
     //ON_BN_CLICKED(IDC_TEST_SLIDER, &CT3000View::OnBnClickedTestSlider)
+    ON_CBN_SELCHANGE(IDC_COMBO_SYS_MODE, &CT3000View::OnCbnSelchangeComboSysMode)
 END_MESSAGE_MAP()
 
 // CT3000View construction/destruction
@@ -457,6 +451,9 @@ void CT3000View::OnFileOpen()
 void CT3000View::Fresh()
 {
     CMainFrame* pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
+
+
+
     g_ifanStatus = product_register_value[MODBUS_FAN_SPEED];
     g_NEED_MULTI_READ=TRUE;
     int  Fresh_Min=(short)product_register_value[MODBUS_MIN_SETPOINT];
@@ -2575,13 +2572,63 @@ void CT3000View::FreshIOGridTable()
 // load input ,output tables about tstat3
 void CT3000View::FreshIOGridTable_Tstat6()
 {
+
     m_Input_Grid.put_Rows(13);
     m_Input_Grid.put_Cols(3);
     CString strTemp;
     m_Input_Grid.put_TextMatrix(0,1,_T("Name"));
     m_Input_Grid.put_TextMatrix(0,2,_T("Value"));
+    bool b_hum_sensor = false;   //用于判断TSTAT 输入 有无 Hum
+    bool b_co2_sensor = false;   //输入 有无 CO2 用此标志 来判断是否显示在输入想里;
+    bool b_lux_sensor = false;   // 光强
     for (int i=0; i<(int)m_tstat_input_data.size(); i++)
     {
+        if (i > 8)
+        {
+            bitset<16> module_type(product_register_value[20]);
+            if (module_type.at(1) == true)
+            {
+                b_hum_sensor = true;
+            }
+            else
+            {
+                b_hum_sensor = false;
+            }
+            if ((i == 9) && (b_hum_sensor == false))
+            {
+                continue;
+            }
+
+            if (module_type.at(2) == true)
+            {
+                b_co2_sensor = true;
+            }
+            else
+            {
+                b_co2_sensor = false;
+            }
+
+            if ((i == 10) && (b_co2_sensor == false))
+            {
+                continue;
+            }
+
+            if (module_type.at(3) == true)
+            {
+                b_lux_sensor = true;
+            }
+            else
+            {
+                b_lux_sensor = false;
+            }
+
+            if ((i == 11) && (b_lux_sensor == false))
+            {
+                continue;
+            }
+        }
+
+
         strTemp.Format(_T("%d"),i);
         m_Input_Grid.put_TextMatrix(i+1,0,strTemp);
         m_Input_Grid.put_TextMatrix(i+1,1,m_tstat_input_data.at(i).InputName.StrValue);
@@ -2613,6 +2660,24 @@ void CT3000View::FreshIOGridTable_Tstat6()
 
 
         m_Output_Grid.put_TextMatrix(i+1,2,strTemp);
+    }
+
+
+    ((CComboBox *)GetDlgItem(IDC_COMBO_SYS_MODE))->ResetContent();
+    ((CComboBox *)GetDlgItem(IDC_COMBO_SYS_MODE))->AddString(Sys_Tstat_Mode_Name[0]);
+    ((CComboBox *)GetDlgItem(IDC_COMBO_SYS_MODE))->AddString(Sys_Tstat_Mode_Name[1]);
+    ((CComboBox *)GetDlgItem(IDC_COMBO_SYS_MODE))->AddString(Sys_Tstat_Mode_Name[2]);
+    if (product_register_value[691] == 0)
+    {
+        ((CComboBox *)GetDlgItem(IDC_COMBO_SYS_MODE))->SetCurSel(0);
+    }
+    else if (product_register_value[691] == 1)
+    {
+        ((CComboBox *)GetDlgItem(IDC_COMBO_SYS_MODE))->SetCurSel(1);
+    }
+    if (product_register_value[691] == 2)
+    {
+        ((CComboBox *)GetDlgItem(IDC_COMBO_SYS_MODE))->SetCurSel(2);
     }
 
 }
@@ -3776,8 +3841,8 @@ void CT3000View::OnCbnSelchangeFanspeedcombo()
     CMainFrame* pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
 
     //恢复T3000主线程
-    pMain->m_pFreshMultiRegisters->SuspendThread();
-    pMain->m_pRefreshThread->SuspendThread();
+    //pMain->m_pFreshMultiRegisters->SuspendThread();
+    //pMain->m_pRefreshThread->SuspendThread();
 
 //
 //int ret=0;
@@ -3791,8 +3856,12 @@ void CT3000View::OnCbnSelchangeFanspeedcombo()
     int ret=write_one(g_tstat_id, MODBUS_FAN_SPEED,sel);
     if (ret>0)
     {
-
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Set fan speed success!"));
         product_register_value[MODBUS_FAN_SPEED]=sel;
+    }
+    else
+    {
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Set fan speed failed!"));
     }
     /*m_FanComBox.SetCurSel(0);*/
 // 		}
@@ -3836,8 +3905,8 @@ void CT3000View::OnCbnSelchangeFanspeedcombo()
 		int sel = m_FanComBox.GetCurSel();
 
 	}
-    pMain->m_pFreshMultiRegisters->ResumeThread();
-    pMain->m_pRefreshThread->ResumeThread();//
+    //pMain->m_pFreshMultiRegisters->ResumeThread();
+    //pMain->m_pRefreshThread->ResumeThread();//
 }
 
 
@@ -7241,3 +7310,41 @@ void CT3000View::NightFeedBackNewSliderFor5ABCD()
 // {
 // 	
 // }
+
+
+void CT3000View::OnCbnSelchangeComboSysMode()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    int write_value = -1;
+    UpdateData();
+    CString temp_string;
+    int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_SYS_MODE))->GetCurSel();
+    ((CComboBox *)GetDlgItem(IDC_COMBO_SYS_MODE))->GetLBText(nSel, temp_string);
+
+
+    for (int i = 0;i<3;i++)
+    {
+        if (temp_string.CompareNoCase(Sys_Tstat_Mode_Name[i]) == 0)
+        {
+            write_value = i;
+            break;
+        }
+    }
+
+    if (write_value == -1)
+    {
+        return;
+    }
+    int ret =  write_one(g_tstat_id, 691, write_value);	//184  109
+    CString temp_cs;
+    if (ret >= 0)
+    {
+
+        temp_cs = _T("Change system mode to ") + temp_string + _T(" success!");
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs);
+    }
+    else
+    {
+        temp_cs = _T("Change system mode to ") + temp_string + _T(" failed!");
+    }
+}

@@ -26,7 +26,7 @@
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);  
 
 LPFN_ISWOW64PROCESS fnIsWow64Process;  
-const int g_versionNO= 20180608;
+const int g_versionNO= 20190305;
 
 
 #ifdef _DEBUG
@@ -51,8 +51,6 @@ CT3000App::CT3000App()
     sprintf(strASCIICompileTime, "    %s ", __DATE__);
 
 
-
-
     MultiByteToWideChar(CP_ACP, 0, (char *)strASCIICompileTime, (int)strlen(strASCIICompileTime) + 1, CurrentT3000Version.GetBuffer(MAX_PATH), MAX_PATH);
     CurrentT3000Version.ReleaseBuffer();
 
@@ -68,7 +66,8 @@ CT3000App::CT3000App()
 #endif 
     //*******************************************************
     
-	T3000_Version = 20180608; //
+	T3000_Version = 20190305; //
+
 	m_lastinterface=19;
 }
 // The one and only CT3000App object
@@ -413,9 +412,10 @@ BOOL CT3000App::InitInstance()
 			g_strDatabasefilepath=exeFullPath;//
 			g_strExePth=g_strDatabasefilepath;//
 
-
-
-
+            CreateDirectory(g_strExePth + _T("ResourceFile"), NULL);//creat database folder;//
+            CString cs_update_folder;
+            cs_update_folder = g_strDatabasefilepath + _T("Database") + _T("\\") + _T("Update");
+            DeleteDirectory(cs_update_folder);
 			CreateDirectory(g_strExePth+_T("Database"),NULL);//creat database folder;//
 
 			g_achive_device_name_path = g_strDatabasefilepath + _T("Database") + _T("\\") + _T("temp\\") + _T("device_name.ini") ;

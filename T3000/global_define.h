@@ -231,7 +231,7 @@ const int READ_DIGITAL = 2;
 
 const COLORREF LIST_ITEM_CHANGED_BKCOLOR = RGB(255, 0, 0);
 const COLORREF LIST_ITEM_DEFAULT_BKCOLOR = GetSysColor(COLOR_WINDOW);
-const COLORREF LIST_ITEM_DEFAULT_BKCOLOR_GRAY = RGB(235, 235, 235);
+const COLORREF LIST_ITEM_DEFAULT_BKCOLOR_GRAY = RGB(225, 225, 225);
 const COLORREF LIST_ITEM_SELECTED = RGB(150, 150, 200);
 
 const bool REFRESH_ON_ITEM = TRUE;
@@ -354,7 +354,7 @@ const int BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER = 8;
 const int BAC_VARIABLE_CUS_UNIT_GROUP_NUMBER = 5;
 
 const int BAC_READ_GRPHIC_LABEL_GROUP_NUMBER = 6;
-const int BAC_REMOTE_POINT_GROUP_NUMBER = 25;
+const int BAC_REMOTE_POINT_GROUP_NUMBER = 20;
 const int BAC_ALALOG_CUSTMER_RANGE_TABLE_GROUP_NUMBER = 1;
 
 
@@ -839,12 +839,12 @@ const CString Input_Analog_Units_Array[] =
 	_T("Unused"),
 	_T("Y3K -40 to 150"),
 	_T("Y3K -40 to 300"),
-	_T("10K -40 to 120"),
-	_T("10K -40 to 250"),
+	_T("10K Type2"),
+	_T("10K Type2"),
 	_T("G3K -40 to 120"),
 	_T("G3K -40 to 250"),
-	_T("KM10K -40 to 120"),
-	_T("KM10K -40 to 250"),
+	_T("10K Type3"),
+	_T("10K Type3"),
 	_T("A10K -50 to 110"),
 	_T("A10K -60 to 200"),
 	_T("0.0 to 5.0"),
@@ -982,6 +982,13 @@ const CString DDNS_Server_Name[] =
     _T("dynu.com")
 };
 
+const CString Sys_Tstat_Mode_Name[] =
+{
+    _T("Auto Mode"),
+    _T("Cool Mode"),
+    _T("Heat Mode")
+};
+
 const CString Device_Serial_Port_Status[] =
 {
 	_T("Unused"),
@@ -1069,6 +1076,7 @@ const int WINDOW_REMOTE_POINT = 13;
 
 
 const int KEY_INSERT = 1020;
+const int KEY_INSERT_CONTROL = 1021;
 
 
 typedef enum
@@ -1245,6 +1253,7 @@ const int LABEL_ICON_VALUE = 3;
 const int LABEL_ICON_FULL_DESCRIPTION = 4;
 const int LABEL_ICON_LABEL = 5;
 const int LABEL_ICON_SHOW_VALUE = 6;
+const int LABEL_ICON_ONLY = 7;
 const CString Label_Display_Array[] =
 {
 	_T("Value"),
@@ -1254,7 +1263,7 @@ const CString Label_Display_Array[] =
 	_T("Icon Description"),
 	_T("Icon Label"),
 	_T("Icon Value"),
-	_T(""),
+	_T("Icon Only"),
 	_T(""),
 	_T(""),
 };
@@ -1334,6 +1343,8 @@ const int m_screenHotKeyID[SCREEN_HOTKEY_COUNT] =
 
 typedef map<int, CString> pidname_map;
 
+typedef map<int, CString> pid_reglist_map;
+
 struct AddressMap
 {
 	char AddressName[255];
@@ -1372,7 +1383,7 @@ const CString Building_Baudrate[] =
 #define  DEFAULT_PRG_COMMAND_COLOR		RGB(0,0,130)
 #define  DEFAULT_PRG_FUNCTION_COLOR		RGB(4,135,255)
 #define  DEFAULT_PRG_ERROR_LABEL_COLOR	RGB(255,0,0)
-
+#define  DEFAULT_PRG_LOCAL_VAR_COLOR    RGB(111, 111, 111)
 
 const CString Program_Fonts[] =
 {
@@ -1451,6 +1462,29 @@ const int CONTROLLER_COL_NUMBER = 15;
 const int CONTROLLOR_REFRESH_TIME = 4000;
 #pragma endregion PID_DIFINE
 
+#pragma region WEEKLY_DEFINE
+const int WEEKLY_ROUTINE_NUM = 0;
+const int WEEKLY_ROUTINE_FULL_LABLE = 1;
+const int WEEKLY_ROUTINE_AUTO_MANUAL = 2;
+const int WEEKLY_ROUTINE_OUTPUT = 3;
+const int WEEKLY_ROUTINE_HOLIDAY1 = 4;
+const int WEEKLY_ROUTINE_STATE1 = 5;
+const int WEEKLY_ROUTINE_HOLIDAY2 = 6;
+const int WEEKLY_ROUTINE_STATE2 = 7;
+const int WEEKLY_ROUTINE_LABEL = 8;
+
+const int WEEKLY_COL_NUMBER = 9;
+#pragma region WEEKLY_DEFINE
+
+#pragma region ANNUAL_DEFINE
+const int ANNUAL_ROUTINE_NUM = 0;
+const int ANNUAL_ROUTINE_FULL_LABEL = 1;
+const int ANNUAL_ROUTINE_AUTO_MANUAL = 2;
+const int ANNUAL_ROUTINE_VALUE = 3;
+const int ANNUAL_ROUTINE_LABLE = 4;
+
+const int ANNUAL_COL_NUMBER = 5;
+#pragma endregion ANNUAL_DEFINE
 
 #pragma region VARIABLE_DEFINE
 
@@ -1756,19 +1790,22 @@ const int REG_SCHEDULE_START_ADDRESS = REG_PRG_START_ADDRESS + LENGTH_MODBUS_PRG
 #define BAC_WR_TIME   16
 #define BAC_AR_Y      17
 
-#define COIL_REG  23
+#define BAC_BI        20
+#define BAC_BV        21
+#define COIL_REG      23
 #define DIS_INPUT_REG 24
-#define INPUT_REG    25
-#define MB_REG    26
+#define INPUT_REG     25
+#define MB_REG        26
 
-#define BAC_AV         27
-#define BAC_AI  28
-#define BAC_AO  29
-#define BAC_DO  30
+#define BAC_AV        27
+#define BAC_AI        28
+#define BAC_AO        29
+#define BAC_DO        30
 
-#define BAC_MAIN		255
+#define BAC_MAX       31
+#define BAC_MAIN      255
 
-
+#define MAX_FUNCTION_COUNT    31
 #define MAX_OBJ_INSTANCE  4194303
 
 
@@ -2002,3 +2039,41 @@ const int SD_STATUS_NORMAL = 2;
 const int SD_STATUS_FILESYSTEM_ERROR = 3;
 
 typedef map<int, int> panelname_map;
+
+const CString RegisterView_Format[] =
+{
+    _T("Data_Format"),
+    _T("8 Bit Unsigned Integer"),
+    _T("8 Bit Signed Integer"),
+    _T("16 Bit Unsigned Integer"),
+    _T("16 Bit Signed Integer"),
+    _T("32 Bit Unsigned Integer HI_LO"),
+    _T("32 Bit Unsigned Integer LO_HI"),
+    _T("32 Bit Signed Integer HI_LO"),
+    _T("32 Bit Signed Integer LO_HI"),
+    _T("Floating HI_LO / 10"),
+    _T("Floating LO_HI / 10"),
+    _T("Floating HI_LO / 100"),
+    _T("Floating LO_HI / 100"),
+    _T("Floating HI_LO / 1000"),
+    _T("Floating LO_HI / 1000"),
+    _T("Character String HI_LO"),
+    _T("Character String LO_HI")
+};
+const int REGISTER_UNKNOWN = 0;
+const int REGISTER_8_BIT_UNSIGNED_INTEGER = 1;
+const int REGISTER_8_BIT_SIGNED_INTEGER = 2;
+const int REGISTER_16_BIT_UNSIGNED_INTEGER = 3;
+const int REGISTER_16_BIT_SIGNED_INTEGER = 4;
+const int REGISTER_32_BIT_UNSIGNED_INTEGER_HI_LO = 5;
+const int REGISTER_32_BIT_UNSIGNED_INTEGER_LO_HI = 6;
+const int REGISTER_32_BIT_SIGNED_INTEGER_HI_LO = 7;
+const int REGISTER_32_BIT_SIGNED_INTEGER_LO_HI = 8;
+const int REGISTER_FLOATING_HI_LO_DIV_10 = 9;
+const int REGISTER_FLOATING_LO_HI_DIV_10 = 10;
+const int REGISTER_FLOATING_HI_LO_DIV_100 = 11;
+const int REGISTER_FLOATING_LO_HI_DIV_100 = 12;
+const int REGISTER_FLOATING_HI_LO_DIV_1000 = 13;
+const int REGISTER_FLOATING_LO_HI_DIV_1000 = 14;
+const int REGISTER_CHARACTER_STRING_HI_LO = 15;
+const int REGISTER_CHARACTER_STRING_LO_HI = 16;

@@ -46,6 +46,7 @@ bool show_upper;
 DWORD prg_text_color;
 DWORD prg_label_color;
 DWORD prg_command_color;
+DWORD prg_local_var_color;
 DWORD prg_function_color;
 CString prg_character_font;
 bool prg_color_change;
@@ -192,6 +193,9 @@ void CBacnetProgramEdit::GetColor()
 	prg_label_color = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"),_T("Label Color"),DEFAULT_PRG_LABEL_COLOR,g_cstring_ini_path);
 	prg_command_color = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"),_T("Command Color"),DEFAULT_PRG_COMMAND_COLOR,g_cstring_ini_path);
 	prg_function_color = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"),_T("Function Color"),DEFAULT_PRG_FUNCTION_COLOR,g_cstring_ini_path);
+    prg_local_var_color = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"), _T("LOVAL_VAR Color"), DEFAULT_PRG_LOCAL_VAR_COLOR, g_cstring_ini_path);
+
+
 	show_upper = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"),_T("Upper Case"),1,g_cstring_ini_path);
 	GetPrivateProfileString(_T("Program_IDE_Color"),_T("Text Font"),_T("Arial"),prg_character_font.GetBuffer(MAX_PATH),MAX_PATH,g_cstring_ini_path);
 	prg_character_font.ReleaseBuffer();
@@ -343,6 +347,9 @@ LRESULT CBacnetProgramEdit::Fresh_Program_RichEdit(WPARAM wParam,LPARAM lParam)
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetWindowTextW(temp1);
 	m_edit_changed = false;
 	program_string = temp1;
+
+
+
 	UpdateDataProgramText();
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(-1,-1);
 	return 0;
@@ -405,7 +412,7 @@ void CBacnetProgramEdit::Syntax_analysis()
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetReadOnly(TRUE);
 	memset(program_code[program_list_line],0,2000);
 
-	renumvar = 1;
+	renumvar = 0;
 	error = -1; //Default no error;
 	CString tempcs;
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetWindowTextW(tempcs);
@@ -514,7 +521,7 @@ void CBacnetProgramEdit::OnSend()
 	//reset the program buffer
 	memset(program_code[program_list_line],0,2000);
 
-	renumvar = 1;
+	renumvar = 0;
 	error = -1; //Default no error;
 	CString tempcs;
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetWindowTextW(tempcs);
@@ -1030,6 +1037,8 @@ int CBacnetProgramEdit::Bacnet_Show_Debug(CString &retselstring)
     case BAC_IN:
     case BAC_PID:
     case BAC_VAR:
+    case BAC_SCH:
+    case BAC_HOL:
 			if((point_number >= BAC_OUTPUT_ITEM_COUNT) && (point_type == BAC_OUT))
 				break;
 			if((point_number >= BAC_INPUT_ITEM_COUNT) && (point_type == BAC_IN))
@@ -1039,6 +1048,13 @@ int CBacnetProgramEdit::Bacnet_Show_Debug(CString &retselstring)
 
 			if((point_number >= BAC_VARIABLE_ITEM_COUNT) && (point_type == BAC_VAR))
 				break;
+
+            if ((point_number >= BAC_VARIABLE_ITEM_COUNT) && (point_type == BAC_SCH))
+                break;
+
+            if ((point_number >= BAC_VARIABLE_ITEM_COUNT) && (point_type == BAC_HOL))
+                break;
+
 
 			if(Program_Debug_Window != NULL)
 			{

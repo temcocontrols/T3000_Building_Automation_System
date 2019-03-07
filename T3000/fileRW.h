@@ -135,9 +135,10 @@ void var_write_CO2_NODE(wofstream & out);
 void var_write_Tstat67(wofstream & out);
 void save_write_input_output(wofstream & out);
 void save_write_TStatAllLabel(wofstream & out);
+void save_write_TStatSchedual(wofstream & out);
 void write_input_output_var(wifstream & inf,float tstat_version,CStdioFile *p_log_file=NULL,load_file_every_step *p_log_file_one_time=NULL); 
 void write_TStatAllLabel(wifstream & inf,float tstat_version,CStdioFile *p_log_file=NULL,load_file_every_step *p_log_file_one_time=NULL);
-
+void write_TStatSchedual(wifstream & inf, float tstat_version, CStdioFile *p_log_file = NULL, load_file_every_step *p_log_file_one_time = NULL);
 bool section_end_find(TCHAR *buf);
 int  get_fan_var(wifstream & inf,int fan_value[]);
 bool Check_Config_File(wifstream & inf);

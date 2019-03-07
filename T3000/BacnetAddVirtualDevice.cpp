@@ -145,10 +145,15 @@ void CBacnetAddVirtualDevice::OnBnClickedButtonVirtualOk()
         offline_folder = g_strBuildingFolder + pFrame->m_strCurMainBuildingName;
         pFrame->HideBacnetWindow();
         CreateDirectory(offline_folder, NULL);//
+        offline_folder = offline_folder + _T("\\VirtualDeviceData");
+        CreateDirectory(offline_folder, NULL);//
         CString virtual_prg_filename;
-        virtual_prg_filename.Format(_T("Virtual_%s"), str_serialid);
-        
-        offline_prg_path = offline_folder + _T("\\") +  virtual_prg_filename;
+        virtual_prg_filename.Format(_T("%s"), str_serialid);
+        g_mac = _wtoi( modbus_id);
+        g_bac_instance = _wtof(str_object_instance);
+        offline_prg_path = offline_folder + _T("\\") +  virtual_prg_filename +_T(".prog");
+        ClearBacnetData();
+        SaveBacnetBinaryFile(offline_prg_path);
     }
 
 	strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,\
