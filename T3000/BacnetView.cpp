@@ -2,6 +2,7 @@
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
 //使用VS2010 编译需删除 c:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cvtres.exe 来确保用更高版本的 来转换资源文件
+1. Fix the program bug "10 28AO5 = 3" when open again it show "10  = 3"
 
 2019 03 04
 1. 解决 program 读出来 存入prg文件 只存了1600个字节的问题;
