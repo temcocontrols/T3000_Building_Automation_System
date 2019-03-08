@@ -1,4 +1,4 @@
-// ImageTreeCtrl.cpp : ÊµÏÖÎÄ¼ş
+// ImageTreeCtrl.cpp : å®ç°æ–‡ä»¶
 //
 
 #include "stdafx.h"
@@ -84,7 +84,7 @@ enum ERightDragHandler {
                     IPPort = pFrame->m_product.at(i).ncomport;
                     if (Open_Socket2(strIPAddress,IPPort))
                     {
-                        if(dlg->m_name_new.GetLength()> 17)	//³¤¶È²»ÄÜ´óÓÚ½á¹¹Ìå¶¨ÒåµÄ³¤¶È;
+                        if(dlg->m_name_new.GetLength()> 17)	//é•¿åº¦ä¸èƒ½å¤§äºç»“æ„ä½“å®šä¹‰çš„é•¿åº¦;
                         {
                             dlg->m_name_new.Delete(16,dlg->m_name_new.GetLength()-16);
                         }
@@ -189,7 +189,7 @@ bool CImageTreeCtrl::DoEditLabel(HTREEITEM hItem)
 	m_hSelItem=hItem;
 
 
-	//root ½ÚµãºÍroot ÏÂÒ»¼¶µÄ½Úµã²»ÔÊĞí¸ü¸ÄÃû×Ö;
+	//root èŠ‚ç‚¹å’Œroot ä¸‹ä¸€çº§çš„èŠ‚ç‚¹ä¸å…è®¸æ›´æ”¹åå­—;
 	HTREEITEM root_item = CImageTreeCtrl::GetRootItem();
 	
 	if(hItem == root_item)
@@ -306,9 +306,9 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
 	try 
 	{
 		////////////////////////////////////////////////////////////////////////////////////////////
-		//»ñÈ¡Êı¾İ¿âÃû³Æ¼°Â·¾¶
+		//è·å–æ•°æ®åº“åç§°åŠè·¯å¾„
 		/////////////////////////////////////////////////////////////////////////////////////////////////
-		//Á¬½ÓÊı¾İ¿â
+		//è¿æ¥æ•°æ®åº“
 	    
 		CString strSql;   BOOL is_exist=FALSE;	  CString str_temp;
 		switch (m_level)
@@ -333,7 +333,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
 				q.nextRow();
 				}
 				 
-				if (!is_exist)	 //¸üĞÂµÄÃû×ÖÔÚÊı¾İ¿âÖĞ²éÕÒ²»µ½µÄ
+				if (!is_exist)	 //æ›´æ–°çš„åå­—åœ¨æ•°æ®åº“ä¸­æŸ¥æ‰¾ä¸åˆ°çš„
 				{
  
 					 strSql.Format(_T("update Building_ALL set Building_Name='%s' where Building_Name='%s' "),m_name_new,m_name_old);
@@ -480,7 +480,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
                                 if (open_com(ComPort))
                                 {
                                     Change_BaudRate(brandrate);
-                                    if(m_name_new.GetLength()> 17)	//³¤¶È²»ÄÜ´óÓÚ½á¹¹Ìå¶¨ÒåµÄ³¤¶È;
+                                    if(m_name_new.GetLength()> 17)	//é•¿åº¦ä¸èƒ½å¤§äºç»“æ„ä½“å®šä¹‰çš„é•¿åº¦;
                                     {
                                         m_name_new.Delete(16,m_name_new.GetLength()-16);
                                     }
@@ -510,7 +510,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
                                 IPPort = _wtoi(pFrame->m_product.at(i).BuildingInfo.strIpPort);
                                 if (Open_Socket2(strIPAddress,IPPort))
                                 {
-                                    if(m_name_new.GetLength()> 17)	//³¤¶È²»ÄÜ´óÓÚ½á¹¹Ìå¶¨ÒåµÄ³¤¶È;
+                                    if(m_name_new.GetLength()> 17)	//é•¿åº¦ä¸èƒ½å¤§äºç»“æ„ä½“å®šä¹‰çš„é•¿åº¦;
                                     {
                                         m_name_new.Delete(16,m_name_new.GetLength()-16);
                                     }
@@ -539,7 +539,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
                         
                         if (product_register_value[714]==0x56)
                         {
-                            if(m_name_new.GetLength()> 16)	//³¤¶È²»ÄÜ´óÓÚ½á¹¹Ìå¶¨ÒåµÄ³¤¶È;
+                            if(m_name_new.GetLength()> 16)	//é•¿åº¦ä¸èƒ½å¤§äºç»“æ„ä½“å®šä¹‰çš„é•¿åº¦;
                             {
                                 m_name_new.Delete(16,m_name_new.GetLength()-16);
                             }
@@ -592,7 +592,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
 //        return test1;
 //    }
 //   
-//    return 715; // Èç¹ûÃ»ÓĞÄ¬ÈÏ°´ÕÕ´Ó715 ¿ªÊ¼ 8¸ö¼Ä´æÆ÷.
+//    return 715; // å¦‚æœæ²¡æœ‰é»˜è®¤æŒ‰ç…§ä»715 å¼€å§‹ 8ä¸ªå¯„å­˜å™¨.
 //}
 
 BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
@@ -624,7 +624,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
             int sn=pFrame->m_product.at(i).serial_number;
             temp_serial.Format(_T("%d"),sn);
             int  int_product_type = pFrame->m_product.at(i).product_class_id;
-            int panel_name_start_reg = 0;  //»ñÈ¡¶ÔÓ¦²úÆ·ºÅ
+            int panel_name_start_reg = 0;  //è·å–å¯¹åº”äº§å“å·
             panel_name_start_reg = PanelName_Map(int_product_type);
             /* if( int_product_type == PM_TSTAT6) 
             {
@@ -674,7 +674,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
                     IPPort = pFrame->m_product.at(i).ncomport;
                     if (Open_Socket2(strIPAddress,IPPort))
                     {
-                        if(m_name_new.GetLength()> 17)	//³¤¶È²»ÄÜ´óÓÚ½á¹¹Ìå¶¨ÒåµÄ³¤¶È;
+                        if(m_name_new.GetLength()> 17)	//é•¿åº¦ä¸èƒ½å¤§äºç»“æ„ä½“å®šä¹‰çš„é•¿åº¦;
                         {
                             m_name_new.Delete(16,m_name_new.GetLength()-16);
                         }
@@ -703,7 +703,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
             SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
             SqliteDBBuilding.closedb();
 
-            if (m_name_new.GetLength() > 16)	//³¤¶È²»ÄÜ´óÓÚ½á¹¹Ìå¶¨ÒåµÄ³¤¶È;
+            if (m_name_new.GetLength() > 16)	//é•¿åº¦ä¸èƒ½å¤§äºç»“æ„ä½“å®šä¹‰çš„é•¿åº¦;
             {
                 m_name_new.Delete(16, m_name_new.GetLength() - 16);
             }
@@ -735,9 +735,9 @@ bool CImageTreeCtrl::DoDeleteItem(HTREEITEM hItem)
         try 
     {
         ////////////////////////////////////////////////////////////////////////////////////////////
-        //»ñÈ¡Êı¾İ¿âÃû³Æ¼°Â·¾¶
+        //è·å–æ•°æ®åº“åç§°åŠè·¯å¾„
         /////////////////////////////////////////////////////////////////////////////////////////////////
-        //Á¬½ÓÊı¾İ¿â
+        //è¿æ¥æ•°æ®åº“
 
         CString strSql;   BOOL is_exist=FALSE;	  CString str_temp;
         if(m_level >= 2)
@@ -825,7 +825,7 @@ bool CImageTreeCtrl::DoDeleteItem(HTREEITEM hItem)
 //        ::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
         return true;
 }
-// CImageTreeCtrl ÏûÏ¢´¦Àí³ÌĞò
+// CImageTreeCtrl æ¶ˆæ¯å¤„ç†ç¨‹åº
 bool CImageTreeCtrl::HandleKeyDown(WPARAM wParam, LPARAM lParam) {
 	bool bCtrl = (::GetKeyState(VK_CONTROL) & 0x8000) != 0;
 	bool bShift = (::GetKeyState(VK_SHIFT) & 0x8000) != 0;
@@ -927,18 +927,18 @@ bool CImageTreeCtrl::CanSetLabelText(TVITEM & item) {
 }
 BOOL CImageTreeCtrl::SetItemImage(HTREEITEM hItem, int nImage, int nSelectedImage)
 {
-	//tree0412 ÆÁ±ÎÏÂÃæÔ­ÓĞµÄ
+	//tree0412 å±è”½ä¸‹é¢åŸæœ‰çš„
 #if 0
 	BOOL bReturn=CTreeCtrl::SetItemImage( hItem, nImage, nSelectedImage );
 
 	HTREEITEM hParentItem;//,hBrotherItem;	
 	static int dd=0;
-	//²éÕÒ×Ó½Úµã£¬Ã»ÓĞ¾Í½áÊø
+	//æŸ¥æ‰¾å­èŠ‚ç‚¹ï¼Œæ²¡æœ‰å°±ç»“æŸ
 	hParentItem=GetParentItem(hItem);
 	int brother_nImage,brother_nSelectedImage;
 	if(hParentItem)
 	{	 
-//Subnet,Floor_xx,Room_xx Ö»ÓĞµ±È«²¿Éè±¸Ã»ÓĞÁ¬½ÓÊ±²ÅÏÔÊ¾¡°Ã»Á¬½ÓÍ¼±ê¡±£¬·ñÔò²»¸Ä±äÕâÈı¸öÍ¼±ê
+//Subnet,Floor_xx,Room_xx åªæœ‰å½“å…¨éƒ¨è®¾å¤‡æ²¡æœ‰è¿æ¥æ—¶æ‰æ˜¾ç¤ºâ€œæ²¡è¿æ¥å›¾æ ‡â€ï¼Œå¦åˆ™ä¸æ”¹å˜è¿™ä¸‰ä¸ªå›¾æ ‡
 #if 0  //LSC
 		//have parentitem 
 		if(!is_connection_by_image(nImage,nSelectedImage))
@@ -1012,7 +1012,7 @@ int CImageTreeCtrl::get_item_level(HTREEITEM hItem)
 
 void CImageTreeCtrl::turn_item_image(HTREEITEM hItem,bool state)
 {
-//tree0412  //ÆÁ±ÎÏÂÃæÔ­ÓĞµÄ
+//tree0412  //å±è”½ä¸‹é¢åŸæœ‰çš„
 #if 0
 	int brother_nImage,brother_nSelectedImage;
 	GetItemImage(hItem,brother_nImage,brother_nSelectedImage);
@@ -1241,7 +1241,7 @@ void CImageTreeCtrl::turn_item_image(HTREEITEM hItem,bool state)
 
 BOOL CImageTreeCtrl::is_connection_by_image(int nImage,int nSelectedImage)
 {//return value :true is connection,false is unconnection
-//tree0412 //ÆÁ±ÎÏÂÃæÔ­ÓĞµÄ
+//tree0412 //å±è”½ä¸‹é¢åŸæœ‰çš„
 #if 0
 	if (nImage == 6)		
 		return false;	
@@ -1347,7 +1347,7 @@ BOOL CImageTreeCtrl::Retofline( HTREEITEM hItem )//tree0412
 //This function add by Fance ,used for when some click ,the device will change color
 //and user will know which one is selected
 //add time  2014 01 06
-//Ìí¼ÓÉèÖÃ×ÖÌå¡¢ÑÕÉ«¡¢´ÖÌåµÄº¯Êı
+//æ·»åŠ è®¾ç½®å­—ä½“ã€é¢œè‰²ã€ç²—ä½“çš„å‡½æ•°
 	void CImageTreeCtrl::SetItemFont(HTREEITEM hItem, LOGFONT& logfont)
 {
 	Color_Font cf;
@@ -1483,39 +1483,39 @@ COLORREF CImageTreeCtrl::GetItemColor(HTREEITEM hItem)
 // }
 
 
-//Ìí¼ÓWM_PAINT ĞÅÏ¢¼à¿Ø£¬ÖØÔØOnPaint()º¯ÊıÀ´ÊµÏÖ»æÖÆ
+//æ·»åŠ WM_PAINT ä¿¡æ¯ç›‘æ§ï¼Œé‡è½½OnPaint()å‡½æ•°æ¥å®ç°ç»˜åˆ¶
 
 void CImageTreeCtrl::OnPaint()
 {
 try
 {
-	//»ñÈ¡µ±Ç°»æÖÆ¶ÔÏóµÄDC
+	//è·å–å½“å‰ç»˜åˆ¶å¯¹è±¡çš„DC
 	CPaintDC dc(this);
 
-	// Ê¹ÓÃ½«Òª»æÖÆµÄ¶ÔÏóµÄDC´´½¨Ò»¸ömemory DC
-	//memory device contextµÄ¸ÅÄî£ºÊÇÔÚÄÚ´æÖĞ´´½¨Ò»¸ö½á¹¹À´·´Ó³Ò»¸öÏÔÊ¾£¨ÆÁÄ»ÇøÓò¡¢´°¿Ú¡¢
-	//´òÓ¡»úµÈ£©µÄ±íÃæ¡£¿ÉÒÔÓÃÀ´ÏÈÔÚÄÚ´æÖĞ×¼±¸ºÃÒªÏÔÊ¾µÄÍ¼Ïñ£¬´Ó¶øÊµÏÖË«»º´æ£¬Ìá¸ßË¢ĞÂ
-	//ËÙ¶È¼õÉÙË¢ĞÂÊ±²úÉúµÄÉÁË¸¡£
+	// ä½¿ç”¨å°†è¦ç»˜åˆ¶çš„å¯¹è±¡çš„DCåˆ›å»ºä¸€ä¸ªmemory DC
+	//memory device contextçš„æ¦‚å¿µï¼šæ˜¯åœ¨å†…å­˜ä¸­åˆ›å»ºä¸€ä¸ªç»“æ„æ¥åæ˜ ä¸€ä¸ªæ˜¾ç¤ºï¼ˆå±å¹•åŒºåŸŸã€çª—å£ã€
+	//æ‰“å°æœºç­‰ï¼‰çš„è¡¨é¢ã€‚å¯ä»¥ç”¨æ¥å…ˆåœ¨å†…å­˜ä¸­å‡†å¤‡å¥½è¦æ˜¾ç¤ºçš„å›¾åƒï¼Œä»è€Œå®ç°åŒç¼“å­˜ï¼Œæé«˜åˆ·æ–°
+	//é€Ÿåº¦å‡å°‘åˆ·æ–°æ—¶äº§ç”Ÿçš„é—ªçƒã€‚
 	CDC memDC;
-	//´Óµ±Ç°DC´´½¨ÄÚ´æ¶ÔÏó
+	//ä»å½“å‰DCåˆ›å»ºå†…å­˜å¯¹è±¡
 	memDC.CreateCompatibleDC( &dc );
 
-	//¶¨ÒåCRect¶ÔÏó£¬ÓÃÀ´È·¶¨ÇøÓò
+	//å®šä¹‰CRectå¯¹è±¡ï¼Œç”¨æ¥ç¡®å®šåŒºåŸŸ
 	CRect rcClip, rcClient;
-	//»ñÈ¡µ±Ç°¶ÔÏóµÄ±ß½çÇøÓò
+	//è·å–å½“å‰å¯¹è±¡çš„è¾¹ç•ŒåŒºåŸŸ
 	dc.GetClipBox( &rcClip );
-	//»ñÈ¡µ±Ç°¶ÔÏóµÄÓÃ»§ÇøÓò
+	//è·å–å½“å‰å¯¹è±¡çš„ç”¨æˆ·åŒºåŸŸ
 	GetClientRect(&rcClient);
 
 	// Select a compatible bitmap into the memory DC
-	//´´½¨Ò»¸öbmpÎÄ¼ş£¬×÷ÎªmemDCµÄÄÚÈİ
-	//¸ÃÎÄ¼şµÄ´óĞ¡ÓëÓÃÓÚÇøÓòÏàÍ¬
+	//åˆ›å»ºä¸€ä¸ªbmpæ–‡ä»¶ï¼Œä½œä¸ºmemDCçš„å†…å®¹
+	//è¯¥æ–‡ä»¶çš„å¤§å°ä¸ç”¨äºåŒºåŸŸç›¸åŒ
 	CBitmap bitmap;
 	bitmap.CreateCompatibleBitmap( &dc, rcClient.Width(), rcClient.Height() );
 	memDC.SelectObject( &bitmap );
 
 	// Set clip region to be same as that in paint DC
-	//Í¨¹ı¶ÔÏóµÄ±ß½çÇøÓò´´½¨CRgn¶ÔÏó
+	//é€šè¿‡å¯¹è±¡çš„è¾¹ç•ŒåŒºåŸŸåˆ›å»ºCRgnå¯¹è±¡
 	CRgn rgn;
 	rgn.CreateRectRgnIndirect( &rcClip );
 
@@ -1525,20 +1525,20 @@ try
 	rgn.DeleteObject();
 
 	// First let the control do its default drawing.
-	//Ê×ÏÈÈÃ¿Ø¼ş×Ô¼º½øĞĞÄ¬ÈÏµÄ»æÖÆ£¬»æÖÆµ½ÄÚ´æÖĞ
+	//é¦–å…ˆè®©æ§ä»¶è‡ªå·±è¿›è¡Œé»˜è®¤çš„ç»˜åˆ¶ï¼Œç»˜åˆ¶åˆ°å†…å­˜ä¸­
 	CWnd::DefWindowProc( WM_PAINT, (WPARAM)memDC.m_hDC, 0 );
 
-	//»ñÈ¡Ê÷×´¿Ø¼şµÄµÚÒ»¸ö½Úµã
+	//è·å–æ ‘çŠ¶æ§ä»¶çš„ç¬¬ä¸€ä¸ªèŠ‚ç‚¹
 	HTREEITEM hItem = GetFirstVisibleItem();
 
-	//±éÀúÕâ¿ÃÊ÷
+	//éå†è¿™æ£µæ ‘
 	int n = GetVisibleCount()+1;
 	while( hItem && n--)
 	{
 		CRect rect;
 
 		// Do not meddle with selected items or drop highlighted items
-		//²»¶ÔÑ¡ÖĞµÄ½ÚµãºÍÊµĞĞÍÏ·Å¹¦ÄÜµÄ½Úµã½øĞĞ²Ù×÷
+		//ä¸å¯¹é€‰ä¸­çš„èŠ‚ç‚¹å’Œå®è¡Œæ‹–æ”¾åŠŸèƒ½çš„èŠ‚ç‚¹è¿›è¡Œæ“ä½œ
 		//UINT selflag = TVIS_DROPHILITED;// | TVIS_SELECTED;
 		UINT selflag;
 		if(is_focus)
@@ -1546,11 +1546,11 @@ try
 		else
 			selflag = TVIS_DROPHILITED;
 
-		//¶¨Òå×ÖÌå¡¢ÑÕÉ«
+		//å®šä¹‰å­—ä½“ã€é¢œè‰²
 		Color_Font cf;
 
 
-		//ÉèÖÃ×ÖÌå
+		//è®¾ç½®å­—ä½“
 		if ( !(GetItemState( hItem, selflag ) & selflag )
 			&& m_mapColorFont.Lookup( hItem, cf ))
 		{
@@ -1560,38 +1560,38 @@ try
 
 			if( cf.logfont.lfFaceName[0] != '/0' )
 			{
-				//ÓÃ»§¶¨ÒåÁË×ÖÌå
+				//ç”¨æˆ·å®šä¹‰äº†å­—ä½“
 				logfont = cf.logfont;
 			}
 			else
 			{
-				// ÓÃ»§Ã»ÓĞ¶¨Òå£¬Ê¹ÓÃÏµÍ³×ÖÌå
+				// ç”¨æˆ·æ²¡æœ‰å®šä¹‰ï¼Œä½¿ç”¨ç³»ç»Ÿå­—ä½“
 				CFont *pFont = GetFont();
 				pFont->GetLogFont( &logfont );
 			}
 
-			//ÓÃ»§ÊÇ·ñÉè¶¨½ÚµãÎª¼Ó´Ö
+			//ç”¨æˆ·æ˜¯å¦è®¾å®šèŠ‚ç‚¹ä¸ºåŠ ç²—
 			if( GetItemBold( hItem ) )
 				logfont.lfWeight = 700;
-			//´´½¨×ÖÌå
+			//åˆ›å»ºå­—ä½“
 			fontDC.CreateFontIndirect( &logfont );
 			pFontDC = memDC.SelectObject( &fontDC );
 
-			//ÉèÖÃ×ÖÌåÑÕÉ«
+			//è®¾ç½®å­—ä½“é¢œè‰²
 			if( cf.color != (COLORREF)-1 )
 				memDC.SetTextColor( cf.color );
 
-			//»ñÈ¡½ÚµãÎÄ×Ö
+			//è·å–èŠ‚ç‚¹æ–‡å­—
 			CString sItem = GetItemText( hItem );
 
-			//»ñÈ¡½ÚµãÇøÓò
+			//è·å–èŠ‚ç‚¹åŒºåŸŸ
 			GetItemRect( hItem, &rect, TRUE );
 			//rect.bottom = rect.bottom + 2;
-			//ÉèÖÃ±³¾°É«ÎªÏµÍ³É«
+			//è®¾ç½®èƒŒæ™¯è‰²ä¸ºç³»ç»Ÿè‰²
 			memDC.FillSolidRect(&rect,GetSysColor( COLOR_WINDOW ));//clr);
 
 			memDC.SetBkColor( GetSysColor( COLOR_WINDOW ) );
-			//ÏòÄÚ´æÖĞµÄÍ¼Æ¬Ğ´ÈëÄÚÈİ,Îª¸Ã½ÚµãµÄÄÚÈİ
+			//å‘å†…å­˜ä¸­çš„å›¾ç‰‡å†™å…¥å†…å®¹,ä¸ºè¯¥èŠ‚ç‚¹çš„å†…å®¹
 			memDC.TextOut( rect.left+2, rect.top+1, sItem );
 			if(tree_offline_mode)
 			{
@@ -1801,7 +1801,7 @@ void CImageTreeCtrl::OnTimer(UINT_PTR nIDEvent)
 
 void CImageTreeCtrl::PreSubclassWindow()
 {
-    // TODO: ÔÚ´ËÌí¼Ó×¨ÓÃ´úÂëºÍ/»òµ÷ÓÃ»ùÀà
+    // TODO: åœ¨æ­¤æ·»åŠ ä¸“ç”¨ä»£ç å’Œ/æˆ–è°ƒç”¨åŸºç±»
 
     CTreeCtrl::PreSubclassWindow();
 
@@ -1812,7 +1812,7 @@ void CImageTreeCtrl::PreSubclassWindow()
 
 INT_PTR CImageTreeCtrl::OnToolHitTest(CPoint point, TOOLINFO* pTI) const
 {
-    // TODO: ÔÚ´ËÌí¼Ó×¨ÓÃ´úÂëºÍ/»òµ÷ÓÃ»ùÀà
+    // TODO: åœ¨æ­¤æ·»åŠ ä¸“ç”¨ä»£ç å’Œ/æˆ–è°ƒç”¨åŸºç±»
     RECT rect;
 
     UINT nFlags;

@@ -784,12 +784,6 @@ BOOL Dowmloadfile::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-    //string temp_md5 = MD5(ifstream(_T("C:\\Fance\\T3000\\T3000_Building_Automation_System\\T3000 Output\\release\\TemcoStandardBacnetTool.dll"))).toString();
-
-    //string temp_md1 = MD5(ifstream(_T("C:\\Fance\\T3000\\T3000_Building_Automation_System\\T3000 Output\\release\\T3000Controls.dll"))).toString();
-
-    //string temp_md2 = MD5(ifstream(_T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe"))).toString();
-
 
     m_static_persent.SetWindowTextW(_T(""));
     m_static_persent.textColor(RGB(255, 0, 0));
@@ -913,6 +907,9 @@ BOOL Dowmloadfile::OnInitDialog()
 //#endif
 	if(flash_multi_auto)
 		SetTimer(2,200,NULL);
+
+    Update_File();
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -929,6 +926,27 @@ BOOL Dowmloadfile::PreTranslateMessage(MSG* pMsg)
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
+//更新包打补丁的时候，在zip文件中放置 UpdateEng.exe 
+//在打开T3000的时候，更新时，替换 原有的Update.exe 达到自动更新引擎的目的
+//T3000 更新  Update.exe 更新 自己 .
+HANDLE h_updatefile = NULL;
+void Dowmloadfile::Update_File()
+{
+    CString temp_folder_path;
+    CString ApplicationFolder;
+    GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+    PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
+    ApplicationFolder.ReleaseBuffer();
+
+    CString update_exe_file_path = ApplicationFolder + _T("\\UpdateEng.exe");
+    CFileFind cs_temp_find;
+    if (cs_temp_find.FindFile(update_exe_file_path))
+    {
+        CString NewUpdateFilePath = ApplicationFolder + _T("\\Update.exe");
+        CopyFile(update_exe_file_path, NewUpdateFilePath, false);
+        DeleteFile(update_exe_file_path); //在更新完后删除Eng文件;
+    }
+}
 
 HANDLE hDownloadFtpThread = NULL;
 void Dowmloadfile::Start_Download_Ftp()
@@ -968,6 +986,9 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
     CFileFind tempfind;
     CString strFileName;
     CString str_product_section;
+
+    DeleteUrlCacheEntry(_T("https://temcocontrols.com/ftp/firmware/ProductPath.ini")); // 清理缓存
+    Sleep(2000);
 
     HRESULT download_ret = NULL;
     DownloadIniFilePath = Folder_Path + _T("//ProductPath.ini");
@@ -1026,6 +1047,10 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
         revisionFtpPath = _T("https://www.temcocontrols.com/ftp/firmware/") + temp_revision_path;
         strFileName = PathFindFileName(revisionFtpPath);  //根据组合的下载路径，获取最后得文件名
         DesDownloadRevisionPath = Folder_Path + _T("\\") + strFileName;
+
+        DeleteUrlCacheEntry(revisionFtpPath); // 清理缓存
+        Sleep(2000);
+
         download_ret = URLDownloadToFile(NULL, revisionFtpPath, DesDownloadRevisionPath, 0, &cbc);
         if (download_ret == S_OK)
         {
@@ -1067,6 +1092,9 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
     }
     else
     {
+        DeleteUrlCacheEntry(T3000FtpPath); // 清理缓存
+        Sleep(2000);
+
         download_ret = URLDownloadToFile(NULL, T3000FtpPath, DesDownloadFilePath, 0, &cbc); // 根据配置文档配置好的路径去下载.下载到指定目录，并记录目录位置;
         if (download_ret == S_FALSE)
         {
@@ -1437,6 +1465,9 @@ void Dowmloadfile::OnBnClickedButtonUpdateT3000()
     bool download_ret = false;
     DownloadIniFilePath = Folder_Path + _T("//ProductPath.ini");
     CheckVersionIniFilePath = Folder_Path + _T("//CheckVersionPath.ini");
+    DeleteUrlCacheEntry(_T("https://temcocontrols.com/ftp/firmware/ProductPath.ini")); // 清理缓存
+    Sleep(800);
+
     download_ret = URLDownloadToFile(NULL, _T("https://temcocontrols.com/ftp/firmware/ProductPath.ini"), DownloadIniFilePath, 0, NULL);
     //T3000_FTP_Version = GetPrivateProfileIntW(_T("Version"), _T("T3000Version"), 0, DownloadIniFilePath);
     if ((download_ret != S_OK) && is_local_temco_net == false)  //如果不是本地的temco

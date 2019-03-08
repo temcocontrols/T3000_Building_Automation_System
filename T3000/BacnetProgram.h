@@ -27,7 +27,6 @@ public:
 	LRESULT ProgramMessageCallBack(WPARAM wParam, LPARAM lParam);
 //	afx_msg LRESULT  ProgramResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnBnClickedButtonProgramEdit();
-	void ShowNewProgramEdit();
 //	afx_msg void OnLvnItemchangedListProgram(NMHDR *pNMHDR, LRESULT *pResult);
 	void UnCheckOtherItem(ListCtrlEx::CListCtrlEx& listCtrl, int index);
 //	afx_msg void OnHdnItemclickListProgram(NMHDR *pNMHDR, LRESULT *pResult);

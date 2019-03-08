@@ -2005,7 +2005,6 @@ CString PrintText[1000];
 CString g_Print;
 bool range_cancel;//用于监测Range 对话框是否正常修改，如果正常修改就为0，否则就为1;
 int g_protocol=PROTOCOL_UNKNOW;
-int g_new_old_IDE = 0;
 int g_bac_read_type;	//用于记录将要读取哪一个，input 还是output,给线程使用;
 bool g_bac_need_read_setting;  //如果是第一次点击 需要读Setting里面的 数据;判断是否需要更改Label之类的;
 HANDLE click_read_thread;
