@@ -5,7 +5,6 @@
 #include "T3000.h"
 #include "NewT3000ProgramEditorDlg.h"
 #include "afxdialogex.h"
-#include "NewT3000ProgramEditorDlg.h"
 #include "Resource.h"
 // CNewT3000ProgramEditorDlg dialog
 
