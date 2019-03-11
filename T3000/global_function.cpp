@@ -472,6 +472,8 @@ This does NOT lock the critical section.
 //	int retry_times );
 int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,int retry_times)
 {
+    CString data;
+    CString g_strT3000LogString;
     if ((g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
     {
         int n_ret = 0;
@@ -498,6 +500,9 @@ int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsig
                     }
                     DFTrace(total_char_test);
                 }
+                g_strT3000LogString.Format(_T("Multi Read ID=%d,start address=%d,length=%d"), device_var, start_address, length);
+                CString* pstrInfo = new CString(g_strT3000LogString);
+                ::SendMessage(MainFram_hwd, WM_SHOW_PANNELINFOR, WPARAM(pstrInfo), LPARAM(3));
 
                 g_llRxCount++;
                 Sleep(100);
@@ -513,8 +518,7 @@ int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsig
                 start_address,
                 length,
                 retry_times );
-    CString data;
-    CString g_strT3000LogString;
+
     for (int i=0; i<length; i++)
     {
         CString strTemp;

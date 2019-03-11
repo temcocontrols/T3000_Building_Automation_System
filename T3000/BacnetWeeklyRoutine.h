@@ -46,14 +46,4 @@ public:
 	bool window_max; // 标记是否已经最大化;
 };
 
-const int WEEKLY_ROUTINE_NUM = 0;
-const int WEEKLY_ROUTINE_FULL_LABLE = 1;
-const int WEEKLY_ROUTINE_AUTO_MANUAL = 2;
-const int WEEKLY_ROUTINE_OUTPUT = 3;
-const int WEEKLY_ROUTINE_HOLIDAY1 = 4;
-const int WEEKLY_ROUTINE_STATE1 = 5;
-const int WEEKLY_ROUTINE_HOLIDAY2 = 6;
-const int WEEKLY_ROUTINE_STATE2 = 7;
-const int WEEKLY_ROUTINE_LABEL = 8;
 
-const int WEEKLY_COL_NUMBER = 9;

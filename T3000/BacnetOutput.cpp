@@ -395,12 +395,14 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 	{
 		digital_special_output_count = T38AI8AO6DO_OUT_D;
 		analog_special_output_count = T38AI8AO6DO_OUT_A;
+        OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
 		Minipanel_device = 0;
 	}
 	else if (bacnet_device_type == PID_T322AI)
 	{
 		digital_special_output_count = T322AI_OUT_D;
 		analog_special_output_count = T322AI_OUT_A;
+        OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
 		Minipanel_device = 0;
 	}
 	else if (bacnet_device_type == PWM_TRANSDUCER)
@@ -409,6 +411,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		analog_special_output_count = PWM_TRANSDUCER_OUT_A;
 		Minipanel_device = 0;
 	}
+
 	if((bacnet_device_type == T38AI8AO6DO) ||
 		(bacnet_device_type == PID_T322AI))
 	{
@@ -431,6 +434,10 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 	{
 		//OUTPUT_LIMITE_ITEM_COUNT = 14;
 	}
+    else if (bacnet_device_type == PWM_TRANSDUCER)
+    {
+        OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
+    }
 	else
 	{
 		OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;

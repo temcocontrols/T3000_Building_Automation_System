@@ -2047,16 +2047,16 @@ void CMainFrame::LoadProductFromDB()
 						{
 							m_product_temp.status = is_online;
 							m_product_temp.status_last_time[0] = m_product_temp.status;
-							m_product_temp.status_last_time[1] = false;
-							m_product_temp.status_last_time[2] = false;
 						}
 						else
 						{
 							m_product_temp.status = false;
 							m_product_temp.status_last_time[0] = false;
-							m_product_temp.status_last_time[1] = false;
-							m_product_temp.status_last_time[2] = false;
 						}
+                        m_product_temp.status_last_time[1] = false;
+                        m_product_temp.status_last_time[2] = false;
+                        m_product_temp.status_last_time[3] = false;
+                        m_product_temp.status_last_time[4] = false;
 
 						m_product_temp.Custom=q.getValuebyName(L"Custom");
 
@@ -2288,16 +2288,19 @@ void CMainFrame::LoadProductFromDB()
 							{
 								m_product_temp.status = is_online;
 								m_product_temp.status_last_time[0] = m_product_temp.status;
-								m_product_temp.status_last_time[1] = false;
-								m_product_temp.status_last_time[2] = false;
+
 							}
 							else
 							{
 								m_product_temp.status = false;
 								m_product_temp.status_last_time[0] = false;
-								m_product_temp.status_last_time[1] = false;
-								m_product_temp.status_last_time[2] = false;
+
 							}
+                            m_product_temp.status_last_time[1] = false;
+                            m_product_temp.status_last_time[2] = false;
+                            m_product_temp.status_last_time[3] = false;
+                            m_product_temp.status_last_time[4] = false;
+
 
 							m_product_temp.NameShowOnTree=q.getValuebyName(L"Product_name");//
 
@@ -2514,16 +2517,18 @@ void CMainFrame::LoadProductFromDB()
 				{
 					m_product_temp.status = is_online;
 					m_product_temp.status_last_time[0] = m_product_temp.status;
-					m_product_temp.status_last_time[1] = false;
-					m_product_temp.status_last_time[2] = false;
 				}
 				else
 				{
 					m_product_temp.status = false;
 					m_product_temp.status_last_time[0] = false;
-					m_product_temp.status_last_time[1] = false;
-					m_product_temp.status_last_time[2] = false;
 				}
+
+                m_product_temp.status_last_time[1] = false;
+                m_product_temp.status_last_time[2] = false;
+                m_product_temp.status_last_time[3] = false;
+                m_product_temp.status_last_time[4] = false;
+
 
 				m_product_temp.Custom=q.getValuebyName(L"Custom");
 
@@ -2996,16 +3001,17 @@ void CMainFrame::ScanTstatInDB(void)
                     {
                         m_product_temp.status = temp_status;
                         m_product_temp.status_last_time[0] = m_product_temp.status;
-                        m_product_temp.status_last_time[1] = false;
-                        m_product_temp.status_last_time[2] = false;
                     }
                     else
                     {
                         m_product_temp.status = false;
                         m_product_temp.status_last_time[0] = false;
-                        m_product_temp.status_last_time[1] = false;
-                        m_product_temp.status_last_time[2] = false;
+
                     }
+                    m_product_temp.status_last_time[1] = false;
+                    m_product_temp.status_last_time[2] = false;
+                    m_product_temp.status_last_time[3] = false;
+                    m_product_temp.status_last_time[4] = false;
 
 					m_product_temp.NameShowOnTree = q.getValuebyName(L"Product_name");
 
@@ -3641,6 +3647,8 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
         tree_node.status_last_time[0] = false;
         tree_node.status_last_time[1] = false;
         tree_node.status_last_time[2] = false;
+        tree_node.status_last_time[3] = false;
+        tree_node.status_last_time[4] = false;
         return bRet;
     }
     else
@@ -4759,6 +4767,26 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 	 for (int z=0;z<BAC_PROGRAM_ITEM_COUNT;z++)
 	 {
 		 memset(program_code[z],0,2000);		 //清零;
+
+         for (int i = 0;i < 5;i++)
+         {
+             int ret_variable;
+             ret_variable = GetProgramData_Blocking(g_bac_instance, z, z, i);
+             if (ret_variable < 0)
+             {
+                 Mession_ret.Format(_T("Read program code %d part %d timeout."), z, i); //如果重试3次都失败就跳转至 失败;
+                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+                 goto read_end_thread;
+             }
+             else
+             {
+                 read_success_count++;
+                 g_progress_persent = read_success_count * 100 / read_total_count;
+                 Mession_ret.Format(_T("Read program code %d part %d success."), z, i);
+                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+             }
+         }
+#if 0
 		 for (int x=0;x<5;x++)
 		 {
              for (int z = 0;z < 3;z++) //重试次数
@@ -4807,6 +4835,7 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 			  SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			  continue;
 		 }
+#endif
 	 }
 	 read_write_bacnet_config = false;
 	 hwait_read_thread = NULL;
@@ -5187,6 +5216,7 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
     {
 
         int npart = (program_code_length[i] / 401) + 1;
+
 
 
         bool b_program_status = true;
@@ -6519,6 +6549,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                                 m_product.at(i).status_last_time[0] = false;
                                 m_product.at(i).status_last_time[1] = false;
                                 m_product.at(i).status_last_time[2] = false;
+                                m_product.at(i).status_last_time[3] = false;
+                                m_product.at(i).status_last_time[4] = false;
                                 m_product.at(i).status = false;
                                 //MessageBox(_T("Device is offline!"));	//Ping 不通 ， 还在一个网段 ， 还显示在线; 其实不在线;
 
@@ -6553,6 +6585,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             m_product.at(i).status_last_time[0] = false;
                             m_product.at(i).status_last_time[1] = false;
                             m_product.at(i).status_last_time[2] = false;
+                            m_product.at(i).status_last_time[3] = false;
+                            m_product.at(i).status_last_time[4] = false;
                             m_product.at(i).status = false;
 
                             ::PostMessage(MainFram_hwd, WM_PING_MESSAGE, (WPARAM)hTreeItem, NULL);
@@ -6580,6 +6614,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             m_product.at(i).status_last_time[0] = false;
                             m_product.at(i).status_last_time[1] = false;
                             m_product.at(i).status_last_time[2] = false;
+                            m_product.at(i).status_last_time[3] = false;
+                            m_product.at(i).status_last_time[4] = false;
                             m_product.at(i).status = false;
 							g_llTxCount = g_llTxCount + 4;
 							g_llerrCount = g_llerrCount + 4;
@@ -6606,6 +6642,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             m_product.at(i).status_last_time[0] = TRUE;
                             m_product.at(i).status_last_time[1] = false;
                             m_product.at(i).status_last_time[2] = false;
+                            m_product.at(i).status_last_time[3] = false;
+                            m_product.at(i).status_last_time[4] = false;
                             m_product.at(i).status = false;
 
                         }
@@ -6634,6 +6672,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 							m_product.at(i).status_last_time[0] = false;
 							m_product.at(i).status_last_time[1] = false;
 							m_product.at(i).status_last_time[2] = false;
+                            m_product.at(i).status_last_time[3] = false;
+                            m_product.at(i).status_last_time[4] = false;
 							 m_product.at(i).status = false;
 							 goto do_conncet_failed;
 							return;
@@ -7170,6 +7210,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     m_product.at(i).status_last_time[0] = false;
                     m_product.at(i).status_last_time[1] = false;
                     m_product.at(i).status_last_time[2] = false;
+                    m_product.at(i).status_last_time[3] = false;
+                    m_product.at(i).status_last_time[4] = false;
 					goto do_conncet_failed;
                     return;
                 }
@@ -7305,6 +7347,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 m_product.at(i).status_last_time[0] = false;
                 m_product.at(i).status_last_time[1] = false;
                 m_product.at(i).status_last_time[2] = false;
+                m_product.at(i).status_last_time[3] = false;
+                m_product.at(i).status_last_time[4] = false;
                 //20120424
                 if (pDlg !=NULL)
                 {
@@ -7437,6 +7481,7 @@ start_read_reg_data:
                         int i;
                         it =0;
                         float progress;
+                        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Reading data!"));
                         for(i=0; i<(length); i++)	//暂定为0 ，因为TSTAT6 目前为600多
                         {
                             int itemp = 0;
@@ -7456,6 +7501,10 @@ start_read_reg_data:
                             }
                             it++;
                             Sleep(20);
+                        }
+                        if (it == length)
+                        {
+                            SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read data success!"));
                         }
                         g_tstat_id_changed=FALSE;
                         register_critical_section.Unlock();
@@ -8353,10 +8402,23 @@ end_condition :
                     bOnLine = FALSE;
                     temp_online = false;
                 }
-				m_product.at(i).status_last_time[2] = m_product.at(i).status_last_time[1] ;
-				m_product.at(i).status_last_time[1] = m_product.at(i).status_last_time[0] ;
-				m_product.at(i).status_last_time[0] = temp_online ;
-				m_product.at(i).status = m_product.at(i).status_last_time[0] || m_product.at(i).status_last_time[1] || m_product.at(i).status_last_time[2];
+                if (temp_online)
+                {
+                    m_product.at(i).status_last_time[4] = true;
+                    m_product.at(i).status_last_time[3] = true;
+                    m_product.at(i).status_last_time[2] = true;
+                    m_product.at(i).status_last_time[1] = true;
+                    m_product.at(i).status_last_time[0] = true;
+                }
+                else
+                {
+                    m_product.at(i).status_last_time[4] = m_product.at(i).status_last_time[3];
+                    m_product.at(i).status_last_time[3] = m_product.at(i).status_last_time[2];
+                    m_product.at(i).status_last_time[2] = m_product.at(i).status_last_time[1];
+                    m_product.at(i).status_last_time[1] = m_product.at(i).status_last_time[0];
+                    m_product.at(i).status_last_time[0] = temp_online;
+                }
+				m_product.at(i).status = m_product.at(i).status_last_time[0] || m_product.at(i).status_last_time[1] || m_product.at(i).status_last_time[2] || m_product.at(i).status_last_time[3] || m_product.at(i).status_last_time[4];
 				continue;
             }
             else if(m_product.at(i).protocol == PROTOCOL_REMOTE_IP)
@@ -8378,11 +8440,23 @@ end_condition :
 					}
 				}
 
-
-				m_product.at(i).status_last_time[2] = m_product.at(i).status_last_time[1] ;
-				m_product.at(i).status_last_time[1] = m_product.at(i).status_last_time[0] ;
-				m_product.at(i).status_last_time[0] = temp_online ;
-				m_product.at(i).status =  m_product.at(i).status_last_time[0] || m_product.at(i).status_last_time[1] || m_product.at(i).status_last_time[2];
+                if (temp_online)
+                {
+                    m_product.at(i).status_last_time[4] = true;
+                    m_product.at(i).status_last_time[3] = true;
+                    m_product.at(i).status_last_time[2] = true;
+                    m_product.at(i).status_last_time[1] = true;
+                    m_product.at(i).status_last_time[0] = true;
+                }
+                else
+                {
+                    m_product.at(i).status_last_time[4] = m_product.at(i).status_last_time[3];
+                    m_product.at(i).status_last_time[3] = m_product.at(i).status_last_time[2];
+                    m_product.at(i).status_last_time[2] = m_product.at(i).status_last_time[1];
+                    m_product.at(i).status_last_time[1] = m_product.at(i).status_last_time[0];
+                    m_product.at(i).status_last_time[0] = temp_online;
+                }
+                m_product.at(i).status = m_product.at(i).status_last_time[0] || m_product.at(i).status_last_time[1] || m_product.at(i).status_last_time[2] || m_product.at(i).status_last_time[3] || m_product.at(i).status_last_time[4];
 				continue;
 			}
             else// if(m_product.at(i).protocol == MODBUS_TCPIP)
@@ -8399,16 +8473,44 @@ end_condition :
                         break;
                     }
                 }
-				m_product.at(i).status_last_time[2] = m_product.at(i).status_last_time[1] ;
-				m_product.at(i).status_last_time[1] = m_product.at(i).status_last_time[0] ;
-				m_product.at(i).status_last_time[0] = temp_online ;
-				m_product.at(i).status = m_product.at(i).status_last_time[0] || m_product.at(i).status_last_time[1] || m_product.at(i).status_last_time[2];
+                if (temp_online)
+                {
+                    m_product.at(i).status_last_time[4] = true;
+                    m_product.at(i).status_last_time[3] = true;
+                    m_product.at(i).status_last_time[2] = true;
+                    m_product.at(i).status_last_time[1] = true;
+                    m_product.at(i).status_last_time[0] = true;
+                }
+                else
+                {
+                    m_product.at(i).status_last_time[4] = m_product.at(i).status_last_time[3];
+                    m_product.at(i).status_last_time[3] = m_product.at(i).status_last_time[2];
+                    m_product.at(i).status_last_time[2] = m_product.at(i).status_last_time[1];
+                    m_product.at(i).status_last_time[1] = m_product.at(i).status_last_time[0];
+                    m_product.at(i).status_last_time[0] = temp_online;
+                }
+
+                m_product.at(i).status = m_product.at(i).status_last_time[0] || m_product.at(i).status_last_time[1] || m_product.at(i).status_last_time[2] || m_product.at(i).status_last_time[3] || m_product.at(i).status_last_time[4];
 				continue;
             }
         }
-
-
     }
+
+//#ifdef _DEBUG
+//    for (UINT i = 0; i < m_product.size(); i++)
+//    {
+//        TRACE(_T("IP:%-20s , serialnumber : %15u , name: %-20s, %d  ,%d  , %d ,%d  , %d\r\n"), \
+//            m_product.at(i).BuildingInfo.strIp ,
+//            m_product.at(i).serial_number , 
+//            m_product.at(i).NameShowOnTree,
+//            m_product.at(i).status_last_time[0], 
+//            m_product.at(i).status_last_time[1], 
+//            m_product.at(i).status_last_time[2],
+//            m_product.at(i).status_last_time[3],
+//            m_product.at(i).status_last_time[4]);
+//    }
+//#endif
+
     unsigned short mstp_array[1000];
     int nret_read_bac = 0;
 
