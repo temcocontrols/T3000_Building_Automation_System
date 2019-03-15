@@ -847,6 +847,8 @@ Update by Fance
 #include "BacnetScreenEdit.h"
 #include "BacnetRemotePoint.h"
 #include "ShowMessageDlg.h"
+
+#include "NewT3000ProgramEditorDlg.h"
 int g_gloab_bac_comport = 1;
 int g_gloab_bac_baudrate = 19200;
 CString temp_device_id,temp_mac,temp_vendor_id;
@@ -877,7 +879,7 @@ extern CBacnetAlarmWindow * AlarmWindow_Window;
 CBacnetProgramEdit *ProgramEdit_Window = NULL;
 CBacnetScheduleTime *ScheduleEdit_Window = NULL;
 AnnualRout_InsertDia *HolidayEdit_Window = NULL;
-
+CNewT3000ProgramEditorDlg *ProgramNEWEdit_Window = NULL;
 extern char mycode[2000];
 int click_resend_time = 0;//当点击的时候，要切换device时 发送whois的次数;
 
@@ -1637,6 +1639,31 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 			}
 		}
 		break;
+	case SHOW_PROGRAM_NEWIDE:
+	{
+		if (bac_read_which_list == BAC_READ_PROGRAMCODE_LIST)
+		{
+			if (bac_programcode_read_results)
+			{
+				bac_read_which_list = -1;
+				bac_programcode_read_results = false;
+
+				//显示非模态对话框;
+				if (ProgramNEWEdit_Window != NULL)
+				{
+					delete ProgramNEWEdit_Window;
+					ProgramNEWEdit_Window = NULL;
+				}
+				ProgramNEWEdit_Window = new CNewT3000ProgramEditorDlg;
+				ProgramNEWEdit_Window->Create(IDD_DIALOG_NEW_T3000_PRG_EDIT, this);
+				ProgramNEWEdit_Window->ShowWindow(SW_SHOW);
+
+
+			}
+
+			return 0;
+		}
+	}
 	}
 
 	return 0;
@@ -4944,7 +4971,15 @@ part_success:
 		}
 
 		bac_programcode_read_results = true;
-		::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,SHOW_PROGRAM_IDE,0);
+		if (g_new_old_IDE == 0)
+		{
+			::PostMessage(BacNet_hwd, WM_DELETE_NEW_MESSAGE_DLG, SHOW_PROGRAM_IDE, 0);
+		} 
+		else
+		{
+			::PostMessage(BacNet_hwd, WM_DELETE_NEW_MESSAGE_DLG, SHOW_PROGRAM_NEWIDE, 0);
+		}
+		
 
 
 		//::PostMessage(m_program_edit_hwnd,WM_REFRESH_BAC_PROGRAM_RICHEDIT,NULL,NULL);
