@@ -2,6 +2,16 @@
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
 //使用VS2010 编译需删除 c:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cvtres.exe 来确保用更高版本的 来转换资源文件
+
+2019 03 13
+1.修复Load prg schedule 不起作用的bug.
+2.修复Custom Unit 正反向 无法正常工作的问题.
+
+2019 03 08
+1.修复PWMTRANDUCER output 个数显示有错误的问题;
+2.修复 Asix 的T3  整个program   大于10000 时， 提示客户 删除之前 无法继续编程;
+
+
 1. Fix the program bug "10 28AO5 = 3" when open again it show "10  = 3"
 
 2019 03 04
