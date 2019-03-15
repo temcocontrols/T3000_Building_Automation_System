@@ -72,6 +72,7 @@ public:
       void Handle_Static_ctrl_8();
       void Handle_Static_ctrl_9();
       void Handle_Static_ctrl_10();
+      afx_msg void OnBnClickedButtonApply();
 };
 
 const int ANALOG_CUS_RANGE_RBL_VALUE = 0;

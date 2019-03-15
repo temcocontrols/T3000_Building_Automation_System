@@ -79,6 +79,7 @@ BEGIN_MESSAGE_MAP(CBacnetAnalogCusRang, CDialogEx)
     ON_EN_KILLFOCUS(IDC_EDIT_MIN_VALUE_VALUE, &CBacnetAnalogCusRang::OnEnKillfocusEditMinValueValue)
     ON_EN_KILLFOCUS(IDC_EDIT_MAX_VOLT_VALUE3, &CBacnetAnalogCusRang::OnEnKillfocusEditMaxVoltValue3)
     ON_EN_KILLFOCUS(IDC_EDIT_MAX_VALUE_VALUE, &CBacnetAnalogCusRang::OnEnKillfocusEditMaxValueValue)
+    ON_BN_CLICKED(IDC_BUTTON_APPLY, &CBacnetAnalogCusRang::OnBnClickedButtonApply)
 END_MESSAGE_MAP()
 
 
@@ -623,227 +624,47 @@ void CBacnetAnalogCusRang::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrol
 	if(pScrollBar->m_hWnd==m_cus_analog_range_ctrl_0.m_hWnd)
 	{
         Handle_Static_ctrl_0();
-  //      int CurPos;
-  //      int temp_value;
-  //      //float fvalue; 0oi-i--9999999999
-  //      CRect temp_1;
-  //      CRect temp_2;
-
-  //      int ret_top = 0;
-		//CurPos= m_cus_analog_range_ctrl_0.GetPos();
-
-		//temp_value=max_unit + min_unit - CurPos;
-		//CString strtext;
-		//strtext.Format(_T("%d"),temp_value);
-		//m_tipvalue = temp_value;
-		//m_analog_cus_range_list.SetItemText(0,1,strtext);
-		//m_tooltips.SetParent(GetDlgItem(IDC_SLIDER_BAC_DEF_1));
-		//m_tooltips.Update();
-		//m_cus_analog_range_ctrl_0.GetWindowRect(temp_1);
-		//GetDlgItem(IDC_STATIC_VALUE_1)->GetWindowRect(temp_2);
-		//ScreenToClient(temp_1);
-		//ScreenToClient(temp_2);
-  //      float n_persent = ((float)(CurPos - min_unit)) / (max_unit - min_unit);
-		//ret_top = temp_1.top  + (320 ) * n_persent;
-		//GetDlgItem(IDC_STATIC_VALUE_1)->SetWindowPos(NULL,temp_2.left,ret_top,0,0,SWP_NOZORDER|SWP_NOSIZE);
-		//GetDlgItem(IDC_STATIC_VALUE_1)->SetWindowText(strtext);
-
 	}
 	if(pScrollBar->m_hWnd==m_cus_analog_range_ctrl_1.m_hWnd)
 	{
         Handle_Static_ctrl_1();
-		//CurPos= m_cus_analog_range_ctrl_1.GetPos();
-		//temp_value=max_unit + min_unit - CurPos;
-		//CString strtext;
-		//strtext.Format(_T("%d"),temp_value);
-		//m_tipvalue = temp_value;
-		//m_analog_cus_range_list.SetItemText(1,1,strtext);
-		//m_tooltips.SetParent(GetDlgItem(IDC_SLIDER_BAC_DEF_2));
-		//m_tooltips.Update();
-		//m_cus_analog_range_ctrl_1.GetWindowRect(temp_1);
-		//GetDlgItem(IDC_STATIC_VALUE_2)->GetWindowRect(temp_2);
-		//ScreenToClient(temp_1);
-		//ScreenToClient(temp_2);
-  //      ret_top = temp_1.top + (380) * CurPos / 100;
-		//GetDlgItem(IDC_STATIC_VALUE_2)->SetWindowPos(NULL,temp_2.left,ret_top,0,0,SWP_NOZORDER|SWP_NOSIZE);
-		//GetDlgItem(IDC_STATIC_VALUE_2)->SetWindowText(strtext);
 	}
 	if(pScrollBar->m_hWnd==m_cus_analog_range_ctrl_2.m_hWnd)
 	{
         Handle_Static_ctrl_2();
-		//CurPos= m_cus_analog_range_ctrl_2.GetPos();
-		//temp_value=max_unit + min_unit - CurPos;
-		//CString strtext;
-		//strtext.Format(_T("%d"),temp_value);
-		//m_tipvalue = temp_value;
-		//m_analog_cus_range_list.SetItemText(2,1,strtext);
-		//m_tooltips.SetParent(GetDlgItem(IDC_SLIDER_BAC_DEF_3));
-		//m_tooltips.Update();
-		//m_cus_analog_range_ctrl_2.GetWindowRect(temp_1);
-		//GetDlgItem(IDC_STATIC_VALUE_3)->GetWindowRect(temp_2);
-		//ScreenToClient(temp_1);
-		//ScreenToClient(temp_2);
-  //      ret_top = temp_1.top + (380) * CurPos / 100;
-		//GetDlgItem(IDC_STATIC_VALUE_3)->SetWindowPos(NULL,temp_2.left,ret_top,0,0,SWP_NOZORDER|SWP_NOSIZE);
-		//GetDlgItem(IDC_STATIC_VALUE_3)->SetWindowText(strtext);
 	}	
 	if(pScrollBar->m_hWnd==m_cus_analog_range_ctrl_3.m_hWnd)
 	{
         Handle_Static_ctrl_3();
-		//CurPos= m_cus_analog_range_ctrl_3.GetPos();
-		//temp_value=max_unit + min_unit - CurPos;
-		//CString strtext;
-		//strtext.Format(_T("%d"),temp_value);
-		//m_tipvalue = temp_value;
-		//m_analog_cus_range_list.SetItemText(3,1,strtext);
-		//m_tooltips.SetParent(GetDlgItem(IDC_SLIDER_BAC_DEF_4));
-		//m_tooltips.Update();
-		//m_cus_analog_range_ctrl_3.GetWindowRect(temp_1);
-		//GetDlgItem(IDC_STATIC_VALUE_4)->GetWindowRect(temp_2);
-		//ScreenToClient(temp_1);
-		//ScreenToClient(temp_2);
-  //      ret_top = temp_1.top + (380) * CurPos / 100;
-		//GetDlgItem(IDC_STATIC_VALUE_4)->SetWindowPos(NULL,temp_2.left,ret_top,0,0,SWP_NOZORDER|SWP_NOSIZE);
-		//GetDlgItem(IDC_STATIC_VALUE_4)->SetWindowText(strtext);
 	}
 	if(pScrollBar->m_hWnd==m_cus_analog_range_ctrl_4.m_hWnd)
 	{
         Handle_Static_ctrl_4();
-		//CurPos= m_cus_analog_range_ctrl_4.GetPos();
-		//temp_value=max_unit + min_unit - CurPos;
-		//CString strtext;
-		//strtext.Format(_T("%d"),temp_value);
-		//m_tipvalue = temp_value;
-		//m_analog_cus_range_list.SetItemText(4,1,strtext);
-		//m_tooltips.SetParent(GetDlgItem(IDC_SLIDER_BAC_DEF_5));
-		//m_tooltips.Update();
-		//m_cus_analog_range_ctrl_4.GetWindowRect(temp_1);
-		//GetDlgItem(IDC_STATIC_VALUE_5)->GetWindowRect(temp_2);
-		//ScreenToClient(temp_1);
-		//ScreenToClient(temp_2);
-  //      ret_top = temp_1.top + (380) * CurPos / 100;
-		//GetDlgItem(IDC_STATIC_VALUE_5)->SetWindowPos(NULL,temp_2.left,ret_top,0,0,SWP_NOZORDER|SWP_NOSIZE);
-		//GetDlgItem(IDC_STATIC_VALUE_5)->SetWindowText(strtext);
 	}
 	if(pScrollBar->m_hWnd==m_cus_analog_range_ctrl_5.m_hWnd)
 	{
         Handle_Static_ctrl_5();
-		//CurPos= m_cus_analog_range_ctrl_5.GetPos();
-		//temp_value=max_unit + min_unit - CurPos;
-		//CString strtext;
-		//strtext.Format(_T("%d"),temp_value);
-		//m_tipvalue = temp_value;
-		//m_analog_cus_range_list.SetItemText(5,1,strtext);
-		//m_tooltips.SetParent(GetDlgItem(IDC_SLIDER_BAC_DEF_6));
-		//m_tooltips.Update();
-		//m_cus_analog_range_ctrl_5.GetWindowRect(temp_1);
-		//GetDlgItem(IDC_STATIC_VALUE_6)->GetWindowRect(temp_2);
-		//ScreenToClient(temp_1);
-		//ScreenToClient(temp_2);
-  //      ret_top = temp_1.top + (380) * CurPos / 100;
-		//GetDlgItem(IDC_STATIC_VALUE_6)->SetWindowPos(NULL,temp_2.left,ret_top,0,0,SWP_NOZORDER|SWP_NOSIZE);
-		//GetDlgItem(IDC_STATIC_VALUE_6)->SetWindowText(strtext);
 	}
 	if(pScrollBar->m_hWnd==m_cus_analog_range_ctrl_6.m_hWnd)
 	{
         Handle_Static_ctrl_6();
-		//CurPos= m_cus_analog_range_ctrl_6.GetPos();
-		//temp_value=max_unit + min_unit - CurPos;
-		//CString strtext;
-		//strtext.Format(_T("%d"),temp_value);
-		//m_tipvalue = temp_value;
-		//m_analog_cus_range_list.SetItemText(6,1,strtext);
-		//m_tooltips.SetParent(GetDlgItem(IDC_SLIDER_BAC_DEF_7));
-		//m_tooltips.Update();
-		//m_cus_analog_range_ctrl_6.GetWindowRect(temp_1);
-		//GetDlgItem(IDC_STATIC_VALUE_7)->GetWindowRect(temp_2);
-		//ScreenToClient(temp_1);
-		//ScreenToClient(temp_2);
-  //      ret_top = temp_1.top + (380) * CurPos / 100;
-		//GetDlgItem(IDC_STATIC_VALUE_7)->SetWindowPos(NULL,temp_2.left,ret_top,0,0,SWP_NOZORDER|SWP_NOSIZE);
-		//GetDlgItem(IDC_STATIC_VALUE_7)->SetWindowText(strtext);
 	}
 	if(pScrollBar->m_hWnd==m_cus_analog_range_ctrl_7.m_hWnd)
 	{
         Handle_Static_ctrl_7();
-		//CurPos= m_cus_analog_range_ctrl_7.GetPos();
-		//temp_value=max_unit + min_unit - CurPos;
-		//CString strtext;
-		//strtext.Format(_T("%d"),temp_value);
-		//m_tipvalue = temp_value;
-		//m_analog_cus_range_list.SetItemText(7,1,strtext);
-		//m_tooltips.SetParent(GetDlgItem(IDC_SLIDER_BAC_DEF_8));
-		//m_tooltips.Update();
-		//m_cus_analog_range_ctrl_7.GetWindowRect(temp_1);
-		//GetDlgItem(IDC_STATIC_VALUE_8)->GetWindowRect(temp_2);
-		//ScreenToClient(temp_1);
-		//ScreenToClient(temp_2);
-  //      ret_top = temp_1.top + (380) * CurPos / 100;
-		//GetDlgItem(IDC_STATIC_VALUE_8)->SetWindowPos(NULL,temp_2.left,ret_top,0,0,SWP_NOZORDER|SWP_NOSIZE);
-		//GetDlgItem(IDC_STATIC_VALUE_8)->SetWindowText(strtext);
 	}
 	if(pScrollBar->m_hWnd==m_cus_analog_range_ctrl_8.m_hWnd)
 	{
         Handle_Static_ctrl_8();
-		//CurPos= m_cus_analog_range_ctrl_8.GetPos();
-		//temp_value=max_unit + min_unit - CurPos;
-		//CString strtext;
-		//strtext.Format(_T("%d"),temp_value);
-		//m_tipvalue = temp_value;
-		//m_analog_cus_range_list.SetItemText(8,1,strtext);
-		//m_tooltips.SetParent(GetDlgItem(IDC_SLIDER_BAC_DEF_9));
-		//m_tooltips.Update();
-		//m_cus_analog_range_ctrl_8.GetWindowRect(temp_1);
-		//GetDlgItem(IDC_STATIC_VALUE_9)->GetWindowRect(temp_2);
-		//ScreenToClient(temp_1);
-		//ScreenToClient(temp_2);
-  //      ret_top = temp_1.top + (380) * CurPos / 100;
-		//GetDlgItem(IDC_STATIC_VALUE_9)->SetWindowPos(NULL,temp_2.left,ret_top,0,0,SWP_NOZORDER|SWP_NOSIZE);
-		//GetDlgItem(IDC_STATIC_VALUE_9)->SetWindowText(strtext);
 	}
 	if(pScrollBar->m_hWnd==m_cus_analog_range_ctrl_9.m_hWnd)
 	{
         Handle_Static_ctrl_9();
-		//CurPos= m_cus_analog_range_ctrl_9.GetPos();
-		//temp_value=max_unit + min_unit - CurPos;
-		//CString strtext;
-		//strtext.Format(_T("%d"),temp_value);
-		//m_tipvalue = temp_value;
-		//m_analog_cus_range_list.SetItemText(9,1,strtext);
-		//m_tooltips.SetParent(GetDlgItem(IDC_SLIDER_BAC_DEF_10));
-		//m_tooltips.Update();
-		//m_cus_analog_range_ctrl_9.GetWindowRect(temp_1);
-		//GetDlgItem(IDC_STATIC_VALUE_10)->GetWindowRect(temp_2);
-		//ScreenToClient(temp_1);
-		//ScreenToClient(temp_2);
-  //      ret_top = temp_1.top + (380) * CurPos / 100;
-		//GetDlgItem(IDC_STATIC_VALUE_10)->SetWindowPos(NULL,temp_2.left,ret_top,0,0,SWP_NOZORDER|SWP_NOSIZE);
-		//GetDlgItem(IDC_STATIC_VALUE_10)->SetWindowText(strtext);
 	}
 	if(pScrollBar->m_hWnd==m_cus_analog_range_ctrl_10.m_hWnd)
 	{
         Handle_Static_ctrl_10();
-		//CurPos= m_cus_analog_range_ctrl_10.GetPos();
-		//temp_value=max_unit + min_unit - CurPos;
-		//CString strtext;
-		//strtext.Format(_T("%d"),temp_value);
-		//m_tipvalue = temp_value;
-		//m_analog_cus_range_list.SetItemText(10,1,strtext);
-		//m_tooltips.SetParent(GetDlgItem(IDC_SLIDER_BAC_DEF_11));
-		//m_tooltips.Update();
-		//m_cus_analog_range_ctrl_10.GetWindowRect(temp_1);
-		//GetDlgItem(IDC_STATIC_VALUE_11)->GetWindowRect(temp_2);
-		//ScreenToClient(temp_1);
-		//ScreenToClient(temp_2);
-  //      ret_top = temp_1.top + (380) * CurPos / 100;
-		//GetDlgItem(IDC_STATIC_VALUE_11)->SetWindowPos(NULL,temp_2.left,ret_top,0,0,SWP_NOZORDER|SWP_NOSIZE);
-		//GetDlgItem(IDC_STATIC_VALUE_11)->SetWindowText(strtext);
 	}
-
-
-
-
-	//}
 
 	CDialog::OnVScroll(nSBCode, nPos, pScrollBar);
 }
@@ -1587,4 +1408,10 @@ void CBacnetAnalogCusRang::Handle_Static_ctrl_10()
     ret_top = temp_1.top + (320) * n_persent;
     GetDlgItem(IDC_STATIC_VALUE_11)->SetWindowPos(NULL, temp_2.left, ret_top, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
     GetDlgItem(IDC_STATIC_VALUE_11)->SetWindowText(strtext);
+}
+
+
+void CBacnetAnalogCusRang::OnBnClickedButtonApply()
+{
+    // TODO: 在此添加控件通知处理程序代码
 }

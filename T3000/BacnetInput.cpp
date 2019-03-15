@@ -1175,8 +1175,15 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
         if ((g_protocol == MODBUS_BACNET_MSTP) ||
             (g_protocol == PROTOCOL_BACNET_IP))// MSTP_转MUDBUS 协议，因为10000以后没有自定义的CUSTOM 表;
         {
-            if (!read_customer_unit)//点击产品的时候 需要读custom units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
+           // if (!read_customer_unit)//点击产品的时候 需要读custom units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
             {
+                int ret_cusunits = GetPrivateData_Blocking(g_bac_instance, READUNIT_T3000, 0, BAC_CUSTOMER_UNITS_COUNT - 1, sizeof(Str_Units_element), 3);
+                if (ret_cusunits < 0)
+                {
+                    temp_task_info.Format(_T("Read custom units failed!"));
+                    SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_task_info);
+                }
+#if 0
                 int temp_invoke_id = -1;
                 int send_status = true;
                 int	resend_count = 0;
@@ -1216,7 +1223,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
                     if (read_customer_unit)
                         break;
                 }
-
+#endif
             }
         }
 		bac_range_number_choose = m_Input_data.at(lRow).range;

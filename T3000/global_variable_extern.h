@@ -961,8 +961,9 @@ extern int selected_product_index;
 extern HTREEITEM selected_tree_item;
 #pragma region For_bacnet
 
-extern CString temp_off[BAC_CUSTOMER_UNITS_COUNT];		//用于 保存 客户自定义的 单位;
-extern CString temp_on[BAC_CUSTOMER_UNITS_COUNT];
+extern CString cus_digital_off[BAC_CUSTOMER_UNITS_COUNT];		//用于 保存 客户自定义的 单位;
+extern CString cus_digital_on[BAC_CUSTOMER_UNITS_COUNT];
+//extern int     cus_direction[BAC_CUSTOMER_UNITS_COUNT];  //自定义的  正向逻辑还是反向逻辑;
 extern CString temp_unit[BAC_CUSTOMER_UNITS_COUNT];
 extern CString Custom_Digital_Range[BAC_CUSTOMER_UNITS_COUNT];
 extern bool read_var_analog_cus_units;          //Var Cus units 自定义
