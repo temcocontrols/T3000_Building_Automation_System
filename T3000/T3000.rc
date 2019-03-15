@@ -2465,8 +2465,8 @@ BEGIN
     CONTROL         "",IDD_DIALOG_BACNET_RANGE_LIST,"SysListView32",LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,15,61,109,213
     LTEXT           "Units :",IDC_STATIC,21,37,28,8
     EDITTEXT        IDC_EDIT_BAC_CUS_ANALOG_UNIT,55,36,62,14,ES_AUTOHSCROLL
-    LTEXT           "Value :",IDC_STATIC,21,19,28,11
-    LTEXT           "Static",IDC_STATIC_CUS_ANALOG_VALUE,55,19,67,11
+    LTEXT           "Current Value :",IDC_STATIC,21,19,49,11
+    LTEXT           "Static",IDC_STATIC_CUS_ANALOG_VALUE,77,19,37,11
     LTEXT           "",IDC_STATIC_VC_1,154,284,27,8
     LTEXT           "",IDC_STATIC_VALUE_1,132,64,16,8
     LTEXT           "",IDC_STATIC_VC_2,199,284,27,8
@@ -2500,8 +2500,9 @@ BEGIN
     EDITTEXT        IDC_EDIT_MAX_VOLT_VALUE3,467,15,50,16,ES_CENTER | ES_AUTOHSCROLL
     LTEXT           "Last Point Value :",IDC_STATIC_CUS_MAX_V_LABLE2,393,37,69,12
     EDITTEXT        IDC_EDIT_MAX_VALUE_VALUE,466,36,50,16,ES_CENTER | ES_AUTOHSCROLL
-    GROUPBOX        "",IDC_STATIC,151,7,375,50
+    GROUPBOX        "",IDC_STATIC,151,7,455,50
     GROUPBOX        "",IDC_STATIC,14,7,111,49
+    PUSHBUTTON      "Apply",IDC_BUTTON_APPLY,529,30,48,23
 END
 
 IDD_DIALOG_BACNET_PROGRAM_DEBUG DIALOGEX 0, 0, 560, 73
@@ -10547,8 +10548,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2014,11,28,0
- PRODUCTVERSION 2015,11,28,0
+ FILEVERSION 2019,3,8,0
+ PRODUCTVERSION 2019,3,8,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x29L
@@ -10565,14 +10566,14 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Temcocontrols.Ltd."
             VALUE "FileDescription", "Building automation system"
-            VALUE "FileVersion", "2014.11.28build"
+            VALUE "FileVersion", "2019.3.8build"
             VALUE "InternalName", "T3000.exe"
             VALUE "LegalCopyright", "Temcocontrols.Ltd.  All rights reserved."
             VALUE "OriginalFilename", "T3000.exe"
-            VALUE "PrivateBuild", "2014.11.28"
+            VALUE "PrivateBuild", "2019.3.8"
             VALUE "ProductName", "Building automation system"
-            VALUE "ProductVersion", "2014.26 build6"
-            VALUE "SpecialBuild", "2014.11.28"
+            VALUE "ProductVersion", "2019.3 build6"
+            VALUE "SpecialBuild", "2019.3.8"
         END
     END
     BLOCK "VarFileInfo"

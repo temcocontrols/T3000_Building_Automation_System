@@ -4141,20 +4141,34 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 				memcpy_s(m_customer_unit_data.at(i).digital_units_on,12,my_temp_point,12);
 				my_temp_point = my_temp_point + 12;
 
-
+                CString temp_dig_off;
+                CString temp_dig_on;
 				MultiByteToWideChar( CP_ACP, 0, (char *)m_customer_unit_data.at(i).digital_units_off, (int)strlen((char *)m_customer_unit_data.at(i).digital_units_off)+1,
-					temp_off[i].GetBuffer(MAX_PATH), MAX_PATH );
-				temp_off[i].ReleaseBuffer();
-				if(temp_off[i].GetLength() >= 12)
-					temp_off[i].Empty();
+                    temp_dig_off.GetBuffer(MAX_PATH), MAX_PATH );
+                temp_dig_off.ReleaseBuffer();
+				if(temp_dig_off.GetLength() >= 12)
+                    temp_dig_off.Empty();
 
 				MultiByteToWideChar( CP_ACP, 0, (char *)m_customer_unit_data.at(i).digital_units_on, (int)strlen((char *)m_customer_unit_data.at(i).digital_units_on)+1,
-					temp_on[i].GetBuffer(MAX_PATH), MAX_PATH );
-				temp_on[i].ReleaseBuffer();
-				if(temp_on[i].GetLength() >= 12)
-					temp_on[i].Empty();
+                    temp_dig_on.GetBuffer(MAX_PATH), MAX_PATH );
+                temp_dig_on.ReleaseBuffer();
+				if(temp_dig_on.GetLength() >= 12)
+                    temp_dig_on.Empty();
 
-				Custom_Digital_Range[i] = temp_off[i] + _T("/") + temp_on[i];
+                //判断正反向逻辑 ，正逻辑处理方式如同  Range 1    负逻辑如同 12;
+                if (m_customer_unit_data.at(i).direct == DIGITAL_DIRECT)
+                {
+                    cus_digital_off[i] = temp_dig_off;
+                    cus_digital_on[i] = temp_dig_on;
+                }
+                else
+                {
+                    cus_digital_off[i] = temp_dig_on ;
+                    cus_digital_on[i] = temp_dig_off;
+                }
+                //cus_direction[i] = m_customer_unit_data.at(i).direct;
+
+				Custom_Digital_Range[i] = cus_digital_off[i] + _T("/") + cus_digital_on[i];
 
 			}
 
@@ -7362,18 +7376,18 @@ int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path)
 
                 //2018 07 23 对于虚拟设备 在加载时 解析 客户自定义的 range
                 MultiByteToWideChar(CP_ACP, 0, (char *)m_customer_unit_data.at(i).digital_units_off, (int)strlen((char *)m_customer_unit_data.at(i).digital_units_off) + 1,
-                    temp_off[i].GetBuffer(MAX_PATH), MAX_PATH);
-                temp_off[i].ReleaseBuffer();
-                if (temp_off[i].GetLength() >= 12)
-                    temp_off[i].Empty();
+                    cus_digital_off[i].GetBuffer(MAX_PATH), MAX_PATH);
+                cus_digital_off[i].ReleaseBuffer();
+                if (cus_digital_off[i].GetLength() >= 12)
+                    cus_digital_off[i].Empty();
 
                 MultiByteToWideChar(CP_ACP, 0, (char *)m_customer_unit_data.at(i).digital_units_on, (int)strlen((char *)m_customer_unit_data.at(i).digital_units_on) + 1,
-                    temp_on[i].GetBuffer(MAX_PATH), MAX_PATH);
-                temp_on[i].ReleaseBuffer();
-                if (temp_on[i].GetLength() >= 12)
-                    temp_on[i].Empty();
+                    cus_digital_on[i].GetBuffer(MAX_PATH), MAX_PATH);
+                cus_digital_on[i].ReleaseBuffer();
+                if (cus_digital_on[i].GetLength() >= 12)
+                    cus_digital_on[i].Empty();
 
-                Custom_Digital_Range[i] = temp_off[i] + _T("/") + temp_on[i];
+                Custom_Digital_Range[i] = cus_digital_off[i] + _T("/") + cus_digital_on[i];
 
 			}
 
@@ -7431,10 +7445,29 @@ int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path)
 				}
 			}
 
+
+            //for (int i = 0; i<BAC_WEEKLYCODE_ROUTINES_COUNT; i++)
+            //{
+            //    memcpy(temp_point, weeklt_time_schedule[i], WEEKLY_SCHEDULE_SIZE);
+            //    temp_point = temp_point + WEEKLY_SCHEDULE_SIZE;
+            //}
+
 			for (int i=0; i<BAC_WEEKLYCODE_ROUTINES_COUNT; i++)
 			{
+                char * temp_value = temp_point;
 				memcpy(weeklt_time_schedule[i],temp_point,WEEKLY_SCHEDULE_SIZE);
-				temp_point = temp_point + WEEKLY_SCHEDULE_SIZE;
+
+                for (int j = 0; j<9; j++)
+                {
+                    for (int x = 0; x < 8; x++)
+                    {
+                        m_Schedual_Time_data.at(i).Schedual_Day_Time[x][j].time_minutes = *(temp_value++);
+                        m_Schedual_Time_data.at(i).Schedual_Day_Time[x][j].time_hours = *(temp_value++);
+                    }
+                }
+
+                temp_point = temp_point + WEEKLY_SCHEDULE_SIZE;
+
 			}
 
 			for (int i=0; i<BAC_HOLIDAY_COUNT; i++)

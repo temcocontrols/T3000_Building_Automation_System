@@ -1828,8 +1828,9 @@ HTREEITEM selected_tree_item = NULL;
 #pragma region For_bacnet
 
 
-CString temp_off[BAC_CUSTOMER_UNITS_COUNT];		//用于 保存 客户自定义的 单位;
-CString temp_on[BAC_CUSTOMER_UNITS_COUNT];
+CString cus_digital_off[BAC_CUSTOMER_UNITS_COUNT];		//用于 保存 客户自定义的 单位;
+CString cus_digital_on[BAC_CUSTOMER_UNITS_COUNT];
+//int     cus_direction[BAC_CUSTOMER_UNITS_COUNT];  //自定义的  正向逻辑还是反向逻辑;
 CString temp_unit[BAC_CUSTOMER_UNITS_COUNT];
 CString Custom_Digital_Range[BAC_CUSTOMER_UNITS_COUNT];
 bool read_customer_unit;	//如果这个设备没有读过 customer unit这一项,就要尝试去读，以前老版本的没有;

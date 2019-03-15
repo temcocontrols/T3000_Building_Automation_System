@@ -551,6 +551,34 @@ void CBacnetProgramEdit::OnSend()
 			MessageBox(_T("Encode Program Code Length is too large"));
 			return;
 		}
+
+
+        if ((Device_Basic_Setting.reg.panel_type == PM_MINIPANEL) && (my_lengthcode > 9))// 
+        {
+
+            int total_program_size = 0;
+            for (int i = 0;i < (int)m_Program_data.size();i++)
+            {
+                if (i == program_list_line)
+                {
+                    total_program_size = total_program_size + my_lengthcode;
+                    continue;
+                }
+                if (m_Program_data.at(i).bytes != 0)
+                    total_program_size = total_program_size + (m_Program_data.at(i).bytes / 400 + 1) * 400;
+            }
+
+            if (total_program_size >= 10000)
+            {
+                CString temp_message;
+                temp_message.Format(_T("Send failed!\r\nThere is not enough storage space!\r\nTotal size 10000 bytes.\r\Need %d "), total_program_size);
+                MessageBox(temp_message);
+                return;
+            }
+        }
+
+
+
 		memset(program_code[program_list_line],0,2000);
 		memcpy_s(program_code[program_list_line],my_lengthcode,mycode,my_lengthcode);
 		program_code_length[program_list_line] = program_code[program_list_line][1] *256 + (unsigned char)program_code[program_list_line][0];
