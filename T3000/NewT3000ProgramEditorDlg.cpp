@@ -19,6 +19,11 @@
 #include "BacnetProgramSetting.h"
 #include "BacnetProgramDebug.h"
 
+/*
+1.可以支持从MINIPANEL中读取program code 
+2.添加了C#的program Editor 控件用来显示 program code
+3.添加了语法解析部分，用来显示不同的颜色标准
+*/
 
 extern CString program_string;
 extern CString AnalysisString;

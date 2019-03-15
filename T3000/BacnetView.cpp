@@ -879,6 +879,7 @@ extern CBacnetAlarmWindow * AlarmWindow_Window;
 CBacnetProgramEdit *ProgramEdit_Window = NULL;
 CBacnetScheduleTime *ScheduleEdit_Window = NULL;
 AnnualRout_InsertDia *HolidayEdit_Window = NULL;
+//define a dialg for new program ide 
 CNewT3000ProgramEditorDlg *ProgramNEWEdit_Window = NULL;
 extern char mycode[2000];
 int click_resend_time = 0;//当点击的时候，要切换device时 发送whois的次数;
@@ -1654,6 +1655,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					delete ProgramNEWEdit_Window;
 					ProgramNEWEdit_Window = NULL;
 				}
+				//create a new ide window
 				ProgramNEWEdit_Window = new CNewT3000ProgramEditorDlg;
 				ProgramNEWEdit_Window->Create(IDD_DIALOG_NEW_T3000_PRG_EDIT, this);
 				ProgramNEWEdit_Window->ShowWindow(SW_SHOW);

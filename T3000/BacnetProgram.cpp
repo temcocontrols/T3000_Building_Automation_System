@@ -121,15 +121,14 @@ LRESULT CBacnetProgram::OnHotKey(WPARAM wParam,LPARAM lParam)
 			}
 		}
 		g_new_old_IDE = 1;
-// 		CNewT3000ProgramEditorDlg dlg;
-// 		dlg.DoModal();
+          //show new program editor
           ShowNewProgramEdit();
 	}
 	
 	return 0;
 }
 
-
+//initial Dialog 
 BOOL CBacnetProgram::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
@@ -158,7 +157,7 @@ void CBacnetProgram::Unreg_Hotkey()
 	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
 	UnregisterHotKey(GetSafeHwnd(), KEY_INSERT_CONTROL);
 }
-
+ 
 void CBacnetProgram::Initial_List()
 {
 	m_program_list.ShowWindow(SW_HIDE);
@@ -416,7 +415,7 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 	copy_data_to_ptrpanel(TYPE_PROGRAM);
 	return 0;
 }
-
+//click to show new ide
 void CBacnetProgram::OnBnClickedButton1()
 {
 	CString temp_show_info;
