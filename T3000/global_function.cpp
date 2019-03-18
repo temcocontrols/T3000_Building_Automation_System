@@ -5791,6 +5791,11 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	{
 		if (temp_data.reg.product_id<220)
 		{
+            if ((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
+            {
+                g_Print.Format(_T("Serial = %12u     ID = %d ,ip = %s  product id error ,ignore this package!"), nSerial, temp_data.reg.modbus_id, nip_address);
+                DFTrace(g_Print);
+            }
 			return m_refresh_net_device_data.size();
 		}
 	}

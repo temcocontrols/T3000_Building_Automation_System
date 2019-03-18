@@ -240,19 +240,19 @@ LRESULT CCO2_NodeView::Fresh_CO2_Node_Item(WPARAM wParam, LPARAM lParam)
         {
             float nvalue = _wtof(New_CString);
             int nwritevalue = (int)(nvalue * 10);
-            if (product_register_value[124] == 0)
-            {
-                if (product_register_value[125] == 0)
-                {
-                    nreg = 121;
-                }
-                else
-                {
-                    nreg = 122;
-                }
-            }
-            else
-            {
+            //if (product_register_value[124] == 0)
+            //{
+            //    if (product_register_value[125] == 0)
+            //    {
+            //        nreg = 121;
+            //    }
+            //    else
+            //    {
+            //        nreg = 122;
+            //    }
+            //}
+            //else
+            //{
                 if (product_register_value[125] == 0)
                 {
                     nreg = 119;
@@ -261,7 +261,7 @@ LRESULT CCO2_NodeView::Fresh_CO2_Node_Item(WPARAM wParam, LPARAM lParam)
                 {
                     nreg = 120;
                 }
-            }
+            //}
             nret = write_one(g_tstat_id, nreg, nwritevalue);
         }
         else if (Changed_Item == ROW_HUMIDITY)
@@ -443,19 +443,19 @@ LRESULT CCO2_NodeView::Fresh_CO2_Node_List(WPARAM wParam, LPARAM lParam)
     cs_co2_value.Format(_T("%u"), product_register_value[108]);
 
     //125寄存器 为0 则为C   1为F
-    if (product_register_value[124] == 0)
-    {
-        if (product_register_value[125] == 0)
-        {
-            cs_temp_value.Format(_T("%.1f"), ((float)product_register_value[121]) / 10);
-        }
-        else
-        {
-            cs_temp_value.Format(_T("%.1f"), ((float)product_register_value[122]) / 10);
-        }
-    }
-    else
-    {
+    //if (product_register_value[124] == 0)
+    //{
+    //    if (product_register_value[125] == 0)
+    //    {
+    //        cs_temp_value.Format(_T("%.1f"), ((float)product_register_value[121]) / 10);
+    //    }
+    //    else
+    //    {
+    //        cs_temp_value.Format(_T("%.1f"), ((float)product_register_value[122]) / 10);
+    //    }
+    //}
+    //else
+    //{
         if (product_register_value[125] == 0)
         {
             cs_temp_value.Format(_T("%.1f"), ((float)product_register_value[119]) / 10);
@@ -464,7 +464,7 @@ LRESULT CCO2_NodeView::Fresh_CO2_Node_List(WPARAM wParam, LPARAM lParam)
         {
             cs_temp_value.Format(_T("%.1f"), ((float)product_register_value[120]) / 10);
         }
-    }
+    //}
 
     cs_Hum_value.Format(_T("%.1f"), ((float)product_register_value[116]) / 10);
 

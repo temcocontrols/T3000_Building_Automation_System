@@ -2,6 +2,10 @@
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
 //使用VS2010 编译需删除 c:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cvtres.exe 来确保用更高版本的 来转换资源文件
+2019 03 15
+1.修改modbus 底层库， 若服务器端强制断开连接 ，则主动去连接上次的ip和端口;
+2.修复CO2 Node 温度显示异常的问题，只从传感器上读取温度，不在从 内部板上读取;
+3.修复CO2 Net "Min Out Scale" "Max Out Scale" 无法写入值的问题; (Auto manual TBD)
 
 2019 03 13
 1.修复Load prg schedule 不起作用的bug.
