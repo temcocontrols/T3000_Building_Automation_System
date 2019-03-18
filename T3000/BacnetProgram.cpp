@@ -107,6 +107,7 @@ LRESULT CBacnetProgram::OnHotKey(WPARAM wParam,LPARAM lParam)
 				break;
 			}
 		}
+		g_new_old_IDE = 0;
 		OnBnClickedButtonProgramEdit();
 	}
 	if (wParam == KEY_INSERT_CONTROL)
@@ -119,14 +120,15 @@ LRESULT CBacnetProgram::OnHotKey(WPARAM wParam,LPARAM lParam)
 				break;
 			}
 		}
-		CNewT3000ProgramEditorDlg dlg;
-		dlg.DoModal();
+		g_new_old_IDE = 1;
+          //show new program editor
+          ShowNewProgramEdit();
 	}
 	
 	return 0;
 }
 
-
+//initial Dialog 
 BOOL CBacnetProgram::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
@@ -136,7 +138,7 @@ BOOL CBacnetProgram::OnInitDialog()
 	SetIcon(m_hIcon,TRUE);
 	PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
 	
-
+	g_new_old_IDE = 0;
 	ShowWindow(FALSE);
 	//RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//Insert键
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
@@ -155,7 +157,7 @@ void CBacnetProgram::Unreg_Hotkey()
 	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
 	UnregisterHotKey(GetSafeHwnd(), KEY_INSERT_CONTROL);
 }
-
+ 
 void CBacnetProgram::Initial_List()
 {
 	m_program_list.ShowWindow(SW_HIDE);
@@ -413,7 +415,7 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 	copy_data_to_ptrpanel(TYPE_PROGRAM);
 	return 0;
 }
-
+//click to show new ide
 void CBacnetProgram::OnBnClickedButton1()
 {
 	CString temp_show_info;
@@ -426,6 +428,7 @@ void CBacnetProgram::OnBnClickedButton1()
 
 void CBacnetProgram::OnBnClickedButtonProgramEdit()
 {
+	g_new_old_IDE = 0;
 	//2018 05 23 解决在切换panel时 ， 选中的 program_list_line 的值需要重新获取.
     for (int i = 0;i<m_program_list.GetItemCount();++i)
     {
@@ -499,7 +502,78 @@ void CBacnetProgram::OnBnClickedButtonProgramEdit()
 
 
 }
+void CBacnetProgram::ShowNewProgramEdit()
+{
+	for (int i = 0;i < m_program_list.GetItemCount();++i)
+	{
+		if (m_program_list.GetCellChecked(i, 0))
+		{
+			program_list_line = i;
+			break;
+		}
+	}
 
+	CString temp_show_info;
+	temp_show_info.Format(_T("Reading program code %d ..."), program_list_line + 1);
+	SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_show_info);
+	if (g_protocol == PROTOCOL_BIP_TO_MSTP)
+	{
+		//CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+		//pFrame->Create_Thread_Read_Item(TYPE_PROGRAMCODE);
+		if (WaitRead_Data_Dlg)
+		{
+			delete WaitRead_Data_Dlg;
+			WaitRead_Data_Dlg = 0;
+		}
+		WaitRead_Data_Dlg = new CDialog_Progess(this, 1, 100);
+		//创建对话框窗口
+		WaitRead_Data_Dlg->Create(IDD_DIALOG10_Progress, this);
+		WaitRead_Data_Dlg->ShowProgress(0, 0);
+		RECT RECT_SET1;
+		::GetWindowRect(BacNet_hwd, &RECT_SET1);
+		WaitRead_Data_Dlg->MoveWindow(RECT_SET1.left + 50, RECT_SET1.bottom - 19, 800, 20, 1);
+		WaitRead_Data_Dlg->ShowWindow(SW_SHOW);
+		g_bac_read_type = TYPE_PROGRAMCODE;
+
+
+		int m_finished_count = 0;
+		int m_persent = 0;
+		int m_total_count = 1;
+		bac_read_which_list = BAC_READ_PROGRAMCODE_LIST;
+		for (int i = 0;i < 4;i++)
+		{
+			int ret_variable;
+			ret_variable = GetProgramData_Blocking(g_bac_instance, program_list_line, program_list_line, i);
+			CString *temp_cstring = new CString;
+			if (ret_variable < 0)
+			{
+				temp_cstring->Format(_T("Read program item %d timeout!\r\n"), i + 1);
+				::PostMessage(BacNet_hwd, WM_SHOW_PANELSTRING, 0, (LPARAM)(temp_cstring));
+				::PostMessage(BacNet_hwd, WM_SHOW_PROGRESS, 0, 1);
+				click_read_thread = NULL;
+				return;
+			}
+			else
+			{
+				temp_cstring->Format(_T("Read program code part%d success!\r\n"), i + 1);
+				m_finished_count++;
+				m_persent = m_finished_count * 100 / m_total_count;
+				::PostMessage(BacNet_hwd, WM_SHOW_PROGRESS, 0, 0);
+				::PostMessage(BacNet_hwd, WM_SHOW_PANELSTRING, 0, (LPARAM)(temp_cstring));
+			}
+		}
+		if (g_bac_read_type == TYPE_PROGRAMCODE)
+		{
+			bac_programcode_read_results = true;
+			::PostMessage(BacNet_hwd, WM_DELETE_NEW_MESSAGE_DLG, SHOW_PROGRAM_NEWIDE, 0);
+		}
+
+	}
+	else
+	{
+		::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, TYPE_PROGRAMCODE);
+	}
+}
 
 
 void CBacnetProgram::OnNMClickListProgram(NMHDR *pNMHDR, LRESULT *pResult)
