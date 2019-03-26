@@ -3,7 +3,9 @@
 /Documentation/T3000InstallShield
 /Documentation/TemcoSoftware
 
-/T3000 Output
+/T3000 Output/
+
+
 /T3000 Output_VS2015
 # /.vs  <Need .vs in the repo for changes to the Visual Studio project files. 
 **/Thumbs.db

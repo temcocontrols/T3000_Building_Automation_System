@@ -1852,6 +1852,9 @@
     <ClInclude Include="BacnetAddRemoteDevice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CProgramEditor0.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="T3000.rc">

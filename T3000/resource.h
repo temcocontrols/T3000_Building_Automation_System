@@ -2328,7 +2328,6 @@
 #define IDC_BUTTON_ICON_SETTING         2406
 #define IDC_BUTTON_ICON_OK              2407
 #define IDC_BUTTON_ICON_CANCEL          2408
-#define IDC_FORMS1                      2409
 #define IDC_STATIC_OPTION_TIME          2409
 #define IDC_LIST_POWER_METER            2410
 #define IDC_POWERMETER_TITLE            2411
@@ -2412,7 +2411,9 @@
 #define IDC_BUTTON_REMOTEDLG_SCAN       2467
 #define IDC_STATIC_ADD_REMOTE1          2468
 #define IDC_STATIC_ADD_REMOTE2          2469
+#define IDC_FORMS2                      2469
 #define IDC_STATIC_ADD_REMOTE3          2470
+#define IDC_FORMS1                      2470
 #define IDC_STATIC_ADD_REMOTE4          2471
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
@@ -2970,9 +2971,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        726
+#define _APS_NEXT_RESOURCE_VALUE        731
 #define _APS_NEXT_COMMAND_VALUE         34070
-#define _APS_NEXT_CONTROL_VALUE         2469
+#define _APS_NEXT_CONTROL_VALUE         2471
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

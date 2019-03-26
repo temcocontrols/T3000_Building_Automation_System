@@ -22,7 +22,8 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
-
-	CProgramEditor0 m_programeditor;
+    void SetAllPoints_BACnetDevice();
+	CProgramEditor1 m_programeditor;
 	virtual BOOL OnInitDialog();
+	
 };
