@@ -165,7 +165,7 @@ void CBacnetTool::InitialBacnetConnection()
 	Device_Set_Object_Instance_Number(4194300);
 	address_init();
 	Init_Service_Handlers_Tool();
-	int ret_1 = Open_bacnetSocket2(_T(""),BACNETIP_PORT,my_sokect);
+	int ret_1 = Open_bacnetSocket2(_T("192.168.0.60"),BACNETIP_PORT + 321,my_sokect);
 	bip_set_socket(my_sokect);
 	bip_set_port(htons(47808));
 	static in_addr BIP_Broadcast_Address;
@@ -394,7 +394,7 @@ int Write_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, int prop
 
 //extern  MSTP_Port;
 //volatile struct mstp_port_struct_t MSTP_Port;
-int Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type,int property_id)
+int Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type,uint32_t object_instance,int property_id)
 {
    // uint32_t device_id = 0;
     bool status = false;
@@ -457,7 +457,7 @@ int Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type,int proper
  //           else 
 	//		{
                 /*status*/ 
-	g_invoke_id= Send_Read_Property_Request(deviceid,object_type, deviceid, (BACNET_PROPERTY_ID)object_props[property],BACNET_ARRAY_ALL);
+	g_invoke_id= Send_Read_Property_Request(deviceid,object_type,object_instance,(BACNET_PROPERTY_ID)object_props[property],BACNET_ARRAY_ALL);
               //  if (status)	Fance
               //      property++;
            // }
@@ -568,7 +568,7 @@ void CBacnetTool::OnBnClickedButtonBacToolTest2()
 	if(!read_property_cancel)
 	{
         //Write_Properties(object_instance, (BACNET_OBJECT_TYPE)object_identifier, property_identifier);
-		Read_Properties(object_instance,(BACNET_OBJECT_TYPE)object_identifier,property_identifier/*PROP_OBJECT_LIST*/);
+		Read_Properties(object_instance,(BACNET_OBJECT_TYPE)object_identifier,1,property_identifier/*PROP_OBJECT_LIST*/);
 	}
 		
 	//Read_Properties(1001,OBJECT_DEVICE,PROP_OBJECT_NAME/*PROP_OBJECT_LIST*/);

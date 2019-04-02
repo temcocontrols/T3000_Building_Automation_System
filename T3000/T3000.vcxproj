@@ -356,6 +356,7 @@
     <ClCompile Include="WriteRegistersValueDlg.cpp" />
     <ClCompile Include="WriteSingleRegDlg.cpp" />
     <ClCompile Include="ZigbeeInformationDlg.cpp" />
+    <ClCompile Include="ZigbeeRepeater.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ChartCtrl\ChartBalloonLabel.inl" />
@@ -744,6 +745,7 @@
     <ClInclude Include="WriteRegistersValueDlg.h" />
     <ClInclude Include="WriteSingleRegDlg.h" />
     <ClInclude Include="ZigbeeInformationDlg.h" />
+    <ClInclude Include="ZigbeeRepeater.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="T3000.rc" />

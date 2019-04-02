@@ -240,6 +240,7 @@ void COutputSetDlg::Fresh_Grid()
 	case 16:m_outRows=8;break;
 
     case PM_PM5E:m_outRows=8;break;
+    case PM_PM5E_ARM:m_outRows = 8;break;
 	case 17:m_outRows=6;break;
 	case 18:m_outRows=8;break;
 	case 19:m_outRows=8;break;
@@ -484,7 +485,7 @@ void COutputSetDlg::Fresh_Grid()
 
 //----------------------------------------------------------------------------------
 
-	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16 ||m_nModeType==PM_PM5E
+	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16 ||m_nModeType==PM_PM5E || m_nModeType == PM_PM5E_ARM
 		||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT8||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE
 		|| (m_nModeType == PM_TSTAT8_WIFI) || (m_nModeType == PM_TSTAT8_OCC) || (m_nModeType == PM_TSTAT7_ARM) || (m_nModeType == PM_TSTAT8_220V)
 		)//||m_nModeType==17||m_nModeType==18)
@@ -1079,7 +1080,7 @@ void COutputSetDlg::Fresh_Grid()
 		}
 	}
 	//row45/67 ANALOG
-	if ((m_nModeType==1||m_nModeType==3||m_nModeType==2)||m_nModeType==12||m_nModeType==16||m_nModeType==PM_PM5E||m_nModeType==PM_PRESSURE
+	if ((m_nModeType==1||m_nModeType==3||m_nModeType==2)||m_nModeType==12||m_nModeType==16||m_nModeType==PM_PM5E || m_nModeType == PM_PM5E_ARM ||m_nModeType==PM_PRESSURE
 		||m_nModeType==18||m_nModeType==6||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8||m_nModeType==7
 		
 		|| (m_nModeType == PM_TSTAT8_WIFI) || (m_nModeType == PM_TSTAT8_OCC) || (m_nModeType == PM_TSTAT7_ARM) || (m_nModeType == PM_TSTAT8_220V)
@@ -5319,7 +5320,7 @@ void COutputSetDlg::ClickMsflexgrid1()
 			
 			/////////////////////////////////////////////////////////////////////////////////
 			// below added by zgq;
-			if((m_nModeType==16||m_nModeType==PM_PM5E) && lRow==4)
+			if((m_nModeType==16||m_nModeType==PM_PM5E || m_nModeType == PM_PM5E_ARM) && lRow==4)
 			{
 				int nTempValue = product_register_value[310];
 				if(!(nTempValue & 0x08))	 // A/M，如选择Auto，不动，否则看Range
@@ -5339,7 +5340,7 @@ void COutputSetDlg::ClickMsflexgrid1()
 				}
 			}
 
-			if((product_register_value[7]==PM_TSTAT5D||product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR) ||
+			if((product_register_value[7]==PM_TSTAT5D||product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E|| product_register_value[7] == PM_PM5E_ARM || (product_register_value[7]==PM_TSTATRUNAR) ||
 				(product_register_value[7] == PM_TSTAT5G)) && lRow>5)
 			{
 				int nTempValue = product_register_value[310];
@@ -5472,7 +5473,7 @@ void COutputSetDlg::ClickMsflexgrid1()
 
 
 	
-			if((m_nModeType==12||m_nModeType==16||m_nModeType==PM_PM5E||m_nModeType==18||m_nModeType==PM_PRESSURE)&&lRow==6)
+			if((m_nModeType==12||m_nModeType==16||m_nModeType==PM_PM5E|| m_nModeType == PM_PM5E_ARM || m_nModeType==18||m_nModeType==PM_PRESSURE)&&lRow==6)
 			{
 				if((m_nModeType==17||m_nModeType==18)&&lRow==4)
 			{
@@ -5518,7 +5519,7 @@ void COutputSetDlg::ClickMsflexgrid1()
 				}
 			}
 			
-			if((m_nModeType==12||m_nModeType==16||m_nModeType==PM_PM5E||m_nModeType==18||m_nModeType==PM_PRESSURE)&&lRow==7)
+			if((m_nModeType==12||m_nModeType==16||m_nModeType==PM_PM5E|| m_nModeType == PM_PM5E_ARM || m_nModeType==18||m_nModeType==PM_PRESSURE)&&lRow==7)
 			{
 				if(product_register_value[187]==0)//ON/oFF
 					m_OutValueEdt.ShowWindow(SW_HIDE);	
@@ -5657,7 +5658,7 @@ void COutputSetDlg::ClickMsflexgrid1()
 					return;
 			}
 		}
-		else if (product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR))
+		else if (product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E|| product_register_value[7] == PM_PM5E_ARM || (product_register_value[7]==PM_TSTATRUNAR))
 		{
 			if (m_nCurRow<=5)
 			{
@@ -5949,7 +5950,7 @@ void COutputSetDlg::OnCbnSelchangeOvaluecombo()
 	}
 
 	//BCDE;
-	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16  ||m_nModeType==PM_PM5E
+	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16  ||m_nModeType==PM_PM5E || m_nModeType == PM_PM5E_ARM
 		||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8||m_nModeType==PM_PRESSURE
 		|| (m_nModeType == PM_TSTAT8_WIFI) || (m_nModeType == PM_TSTAT8_OCC) || (m_nModeType == PM_TSTAT7_ARM) || (m_nModeType == PM_TSTAT8_220V)
 		) 
@@ -6218,7 +6219,7 @@ void COutputSetDlg::OnCbnSelchangeOamcombo()
 	//end of first 3 rows.
 
 	//4,5
-	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16||m_nModeType==PM_PM5E||m_nModeType==17
+	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16||m_nModeType==PM_PM5E|| m_nModeType == PM_PM5E_ARM || m_nModeType==17
 		||m_nModeType==18||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8
 		|| (m_nModeType == PM_TSTAT8_WIFI) || (m_nModeType == PM_TSTAT8_OCC) || (m_nModeType == PM_TSTAT7_ARM) || (m_nModeType == PM_TSTAT8_220V) 
 		||m_nModeType==PM_PRESSURE)
@@ -6293,7 +6294,7 @@ void COutputSetDlg::OnCbnSelchangeOamcombo()
 	}
 
 	//6.7
-	if(m_nModeType==12||m_nModeType==16||m_nModeType==18||m_nModeType==PM_PM5E
+	if(m_nModeType==12||m_nModeType==16||m_nModeType==18||m_nModeType==PM_PM5E || m_nModeType == PM_PM5E_ARM
 		||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V) 
 		||m_nModeType==PM_PRESSURE)
@@ -7417,7 +7418,7 @@ void COutputSetDlg::OnEnKillfocusValueedit()
 			}
 
 		}
-		if(m_nModeType==12||(m_nModeType==16||m_nModeType==PM_PM5E)||(m_nModeType==18)||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT5i ||m_nModeType==PM_TSTAT8
+		if(m_nModeType==12||(m_nModeType==16||m_nModeType==PM_PM5E || m_nModeType == PM_PM5E_ARM)||(m_nModeType==18)||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT5i ||m_nModeType==PM_TSTAT8
 			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 
 			||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE)

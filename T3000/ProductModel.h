@@ -49,7 +49,9 @@
 #define PM_T38IOVG                    48
 #define PM_T3PTVG                     49
 #define PM_CM5                        50
+#define PM_PM5E_ARM                   51   //2019 03 18 由老款5964芯片移植过来
 #define STM32_PM25                    52
+#define PM_ZIGBEE_REPEATER            63   //zigbee的中继器
 #define PM_TSTAT6_HUM_Chamber         64
 #define PM_BEENY                      70
 #define PM_WATER_SENSOR               71

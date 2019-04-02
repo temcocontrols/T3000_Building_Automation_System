@@ -33,8 +33,8 @@ CString UnzipFileFolder;
 CString T3000_ini_file_path;
 int PC_T3000_Version = 0;
 unsigned int T3000_FTP_Version = 0;
-	int is_local_temco_net = false;
-	int local_persent = 0;
+int is_local_temco_net = false;
+int local_persent = 0;
 //#pragma comment(lib,"..\\Debug\\MSVC10APIW.lib")
 
 // CAboutDlg dialog used for App About
@@ -42,17 +42,17 @@ unsigned int T3000_FTP_Version = 0;
 class CAboutDlg : public CDialogEx
 {
 public:
-	CAboutDlg();
+    CAboutDlg();
 
-// Dialog Data
-	enum { IDD = IDD_ABOUTBOX };
+    // Dialog Data
+    enum { IDD = IDD_ABOUTBOX };
 
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
-// Implementation
 protected:
-	DECLARE_MESSAGE_MAP()
+    virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+                                                        // Implementation
+protected:
+    DECLARE_MESSAGE_MAP()
 };
 
 CAboutDlg::CAboutDlg() : CDialogEx(CAboutDlg::IDD)
@@ -61,7 +61,7 @@ CAboutDlg::CAboutDlg() : CDialogEx(CAboutDlg::IDD)
 
 void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialogEx::DoDataExchange(pDX);
+    CDialogEx::DoDataExchange(pDX);
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
@@ -74,257 +74,256 @@ END_MESSAGE_MAP()
 
 
 CUpdateDlg::CUpdateDlg(CWnd* pParent /*=NULL*/)
-	: CDialogEx(CUpdateDlg::IDD, pParent)
+    : CDialogEx(CUpdateDlg::IDD, pParent)
 {
-	m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_SW_UPDATE);
+    m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_SW_UPDATE);
 }
 
 void CUpdateDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_STATIC_DOWNLOAD, m_static_download);
-	DDX_Control(pDX, IDC_STATIC_UNCOMPRESS, m_static_uncompress);
-	DDX_Control(pDX, IDC_STATIC_INSTALL, m_static_install);
-	DDX_Control(pDX, IDC_STATIC_FINISHED, m_static_finish);
-	DDX_Control(pDX, IDC_STATIC_PIC_STEP, m_static_pic_step);
-	DDX_Control(pDX, IDC_STATIC_PACKAGE, m_static_persent);
-	DDX_Control(pDX, IDC_PROGRESS_UPDATE, m_progress);
-	DDX_Control(pDX, IDC_STATIC_CHECK_UPDATE, m_static_checkupdate);
-	DDX_Control(pDX, IDC_STATIC_UPDATE_INFO, m_static_cs_info);
+    CDialogEx::DoDataExchange(pDX);
+    DDX_Control(pDX, IDC_STATIC_DOWNLOAD, m_static_download);
+    DDX_Control(pDX, IDC_STATIC_UNCOMPRESS, m_static_uncompress);
+    DDX_Control(pDX, IDC_STATIC_INSTALL, m_static_install);
+    DDX_Control(pDX, IDC_STATIC_FINISHED, m_static_finish);
+    DDX_Control(pDX, IDC_STATIC_PIC_STEP, m_static_pic_step);
+    DDX_Control(pDX, IDC_STATIC_PACKAGE, m_static_persent);
+    DDX_Control(pDX, IDC_PROGRESS_UPDATE, m_progress);
+    DDX_Control(pDX, IDC_STATIC_CHECK_UPDATE, m_static_checkupdate);
+    DDX_Control(pDX, IDC_STATIC_UPDATE_INFO, m_static_cs_info);
 }
 
 BEGIN_MESSAGE_MAP(CUpdateDlg, CDialogEx)
-	ON_WM_SYSCOMMAND()
-	ON_WM_PAINT()
-	ON_WM_QUERYDRAGICON()
-	ON_WM_TIMER()
-	ON_BN_CLICKED(IDC_BUTTON_CANCEL, &CUpdateDlg::OnBnClickedButtonCancel)
-	ON_BN_CLICKED(IDC_CHECK_OPEN_T3000, &CUpdateDlg::OnBnClickedCheckOpenT3000)
+    ON_WM_SYSCOMMAND()
+    ON_WM_PAINT()
+    ON_WM_QUERYDRAGICON()
+    ON_WM_TIMER()
+    ON_BN_CLICKED(IDC_BUTTON_CANCEL, &CUpdateDlg::OnBnClickedButtonCancel)
+    ON_BN_CLICKED(IDC_CHECK_OPEN_T3000, &CUpdateDlg::OnBnClickedCheckOpenT3000)
 END_MESSAGE_MAP()
 
 
-bool CUpdateDlg::DeleteDirectory( CString DirName)
+bool CUpdateDlg::DeleteDirectory(CString DirName)
 {
-	CString PUBPATH;
-	PUBPATH=DirName;
-	CFileFind tempFind;
-	DirName+="\\*.*";
-	BOOL IsFinded=(BOOL)tempFind.FindFile(DirName);
-	while(IsFinded)
-	{
-		IsFinded=(BOOL)tempFind.FindNextFile();
-		if(!tempFind.IsDots())
-		{
-			CString strDirName;
-			strDirName+=PUBPATH;
-			strDirName+="\\";
-			strDirName+=tempFind.GetFileName();
-			//AfxMessageBox("strDirName :"+strDirName);
-			if(tempFind.IsDirectory())
-			{
-				//strDirName += PUBPATH;
-				DeleteDirectory(strDirName);
-			}
-			else
-			{
-				SetFileAttributes(strDirName,FILE_ATTRIBUTE_NORMAL); //È¥µôÎÄ¼þµÄÏµÍ³ºÍÒþ²ØÊôÐÔ
-				DeleteFile(strDirName);
-			}
-		}
-	}
-	tempFind.Close();
-	if(!RemoveDirectory(PUBPATH))
-	{
-		return false ;
-	}
-	return true;
+    CString PUBPATH;
+    PUBPATH = DirName;
+    CFileFind tempFind;
+    DirName += "\\*.*";
+    BOOL IsFinded = (BOOL)tempFind.FindFile(DirName);
+    while (IsFinded)
+    {
+        IsFinded = (BOOL)tempFind.FindNextFile();
+        if (!tempFind.IsDots())
+        {
+            CString strDirName;
+            strDirName += PUBPATH;
+            strDirName += "\\";
+            strDirName += tempFind.GetFileName();
+            if (tempFind.IsDirectory())
+            {
+                //strDirName += PUBPATH;
+                DeleteDirectory(strDirName);
+            }
+            else
+            {
+                SetFileAttributes(strDirName, FILE_ATTRIBUTE_NORMAL); //È¥µôÎÄ¼þµÄÏµÍ³ºÍÒþ²ØÊôÐÔ
+                DeleteFile(strDirName);
+            }
+        }
+    }
+    tempFind.Close();
+    if (!RemoveDirectory(PUBPATH))
+    {
+        return false;
+    }
+    return true;
 }
 // CUpdateDlg message handlers
 
 BOOL CUpdateDlg::OnInitDialog()
 {
-	CDialogEx::OnInitDialog();
+    CDialogEx::OnInitDialog();
 
-	// Add "About..." menu item to system menu.
+    // Add "About..." menu item to system menu.
 
-	// IDM_ABOUTBOX must be in the system command range.
-	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
-	ASSERT(IDM_ABOUTBOX < 0xF000);
+    // IDM_ABOUTBOX must be in the system command range.
+    ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
+    ASSERT(IDM_ABOUTBOX < 0xF000);
 
-	CMenu* pSysMenu = GetSystemMenu(FALSE);
-	if (pSysMenu != NULL)
-	{
-		BOOL bNameValid;
-		CString strAboutMenu;
-		bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
-		ASSERT(bNameValid);
-		if (!strAboutMenu.IsEmpty())
-		{
-			pSysMenu->AppendMenu(MF_SEPARATOR);
-			pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
-		}
-	}
-	CString m_strVersion;
-	m_strVersion.LoadString(IDS_UPDATE_VERSION);
-	SetWindowTextW(m_strVersion);
+    CMenu* pSysMenu = GetSystemMenu(FALSE);
+    if (pSysMenu != NULL)
+    {
+        BOOL bNameValid;
+        CString strAboutMenu;
+        bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
+        ASSERT(bNameValid);
+        if (!strAboutMenu.IsEmpty())
+        {
+            pSysMenu->AppendMenu(MF_SEPARATOR);
+            pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
+        }
+    }
+    CString m_strVersion;
+    m_strVersion.LoadString(IDS_UPDATE_VERSION);
+    SetWindowTextW(m_strVersion);
 
-	//APP_RUN_FOLDER
-	CString tempFilePath;
-	CString tempApplicationFolder;
-	GetModuleFileName(NULL, tempApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
-	PathRemoveFileSpec(tempApplicationFolder.GetBuffer(MAX_PATH));
-	tempApplicationFolder.ReleaseBuffer();
-	APP_RUN_FOLDER = tempApplicationFolder;
+    //APP_RUN_FOLDER
+    CString tempFilePath;
+    CString tempApplicationFolder;
+    GetModuleFileName(NULL, tempApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+    PathRemoveFileSpec(tempApplicationFolder.GetBuffer(MAX_PATH));
+    tempApplicationFolder.ReleaseBuffer();
+    APP_RUN_FOLDER = tempApplicationFolder;
 
-	T3000_ini_file_path = APP_RUN_FOLDER + _T("\\Database") + _T("\\") + _T("temp\\MonitorIndex.ini") ;
-	PC_T3000_Version = GetPrivateProfileInt(_T("Version"),_T("T3000"),0,T3000_ini_file_path);
-
-
-	is_local_temco_net  = GetPrivateProfileInt(_T("Setting"),_T("LocalTemcoNet"),0,T3000_ini_file_path);
+    T3000_ini_file_path = APP_RUN_FOLDER + _T("\\Database") + _T("\\") + _T("temp\\MonitorIndex.ini");
+    PC_T3000_Version = GetPrivateProfileInt(_T("Version"), _T("T3000"), 0, T3000_ini_file_path);
 
 
-	DownloadFileFolder = APP_RUN_FOLDER + _T("\\Database");
-	CreateDirectory(DownloadFileFolder,NULL);
-	DownloadFileFolder = DownloadFileFolder + _T("\\Update");
-		CreateDirectory(DownloadFileFolder,NULL);
-	UnzipFileFolder = DownloadFileFolder + _T("\\UNZIP");
-	DeleteDirectory(UnzipFileFolder);
-	CreateDirectory(UnzipFileFolder,NULL);
-	//int a = 123123; int b = 11;
-	//int c = 0;
-	//c = Test_Add(a,b);
-	SetTimer(1,300,NULL);
-	CS_Info.Format(_T(""));
-
-	InitialTemcoLogo();
-
-	if(getftpthread == NULL)
-	{
-	 m_static_step = UPDATE_STEP_CHECK_NEWVERSION;
-		getftpthread = CreateThread(NULL,NULL,GetFtpFileThread,this,NULL,NULL);
-		CloseHandle(getftpthread);
-	}
+    is_local_temco_net = GetPrivateProfileInt(_T("Setting"), _T("LocalTemcoNet"), 0, T3000_ini_file_path);
 
 
-	InitialStatic();
+    DownloadFileFolder = APP_RUN_FOLDER + _T("\\Database");
+    CreateDirectory(DownloadFileFolder, NULL);
+    DownloadFileFolder = DownloadFileFolder + _T("\\Update");
+    CreateDirectory(DownloadFileFolder, NULL);
+    UnzipFileFolder = DownloadFileFolder + _T("\\UNZIP");
+    DeleteDirectory(UnzipFileFolder);
+    CreateDirectory(UnzipFileFolder, NULL);
+    //int a = 123123; int b = 11;
+    //int c = 0;
+    //c = Test_Add(a,b);
+    SetTimer(1, 300, NULL);
+    CS_Info.Format(_T(""));
+
+    InitialTemcoLogo();
+
+    if (getftpthread == NULL)
+    {
+        m_static_step = UPDATE_STEP_CHECK_NEWVERSION;
+        getftpthread = CreateThread(NULL, NULL, GetFtpFileThread, this, NULL, NULL);
+        CloseHandle(getftpthread);
+    }
 
 
-	((CButton *)GetDlgItem(IDC_CHECK_OPEN_T3000))->SetCheck(true);
+    InitialStatic();
 
 
-	Sleep(1);
-	// Set the icon for this dialog.  The framework does this automatically
-	//  when the application's main window is not a dialog
-	SetIcon(m_hIcon, TRUE);			// Set big icon
-	SetIcon(m_hIcon, FALSE);		// Set small icon
+    ((CButton *)GetDlgItem(IDC_CHECK_OPEN_T3000))->SetCheck(true);
 
-	//  Add extra initialization here
 
-	return TRUE;  // return TRUE  unless you set the focus to a control
+    Sleep(1);
+    // Set the icon for this dialog.  The framework does this automatically
+    //  when the application's main window is not a dialog
+    SetIcon(m_hIcon, TRUE);			// Set big icon
+    SetIcon(m_hIcon, FALSE);		// Set small icon
+
+                                    //  Add extra initialization here
+
+    return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
 void CUpdateDlg::InitialTemcoLogo()
 {
-	hBitmap =(HBITMAP)LoadImage(AfxGetInstanceHandle(),  
-		MAKEINTRESOURCE(IDB_BITMAP_T3000_UPDATE),  
-		IMAGE_BITMAP,0,0,  
-		LR_LOADMAP3DCOLORS);  
+    hBitmap = (HBITMAP)LoadImage(AfxGetInstanceHandle(),
+        MAKEINTRESOURCE(IDB_BITMAP_T3000_UPDATE),
+        IMAGE_BITMAP, 0, 0,
+        LR_LOADMAP3DCOLORS);
 
-	CStatic *pStatic=(CStatic *)GetDlgItem(IDC_STATIC_T3000_UPDATE); //»ñµÃÖ¸Ïò¾²Ì¬¿Ø¼þµÄÖ¸Õë 
-	pStatic->ModifyStyle(0xF,SS_BITMAP/*|SS_CENTERIMAGE*/);  //ÉèÖÃ¾²Ì¬¿Ø¼þµÄÑùÊ½£¬Ê¹ÆäÎ»Í¼¾ÓÖÐ  ;
-	pStatic->SetBitmap(hBitmap);     //ÉèÖÃ¾²Ì¬¿Ø¼þÏÔÊ¾Î»Í¼ 
+    CStatic *pStatic = (CStatic *)GetDlgItem(IDC_STATIC_T3000_UPDATE); //»ñµÃÖ¸Ïò¾²Ì¬¿Ø¼þµÄÖ¸Õë 
+    pStatic->ModifyStyle(0xF, SS_BITMAP/*|SS_CENTERIMAGE*/);  //ÉèÖÃ¾²Ì¬¿Ø¼þµÄÑùÊ½£¬Ê¹ÆäÎ»Í¼¾ÓÖÐ  ;
+    pStatic->SetBitmap(hBitmap);     //ÉèÖÃ¾²Ì¬¿Ø¼þÏÔÊ¾Î»Í¼ 
 }
 
 void CUpdateDlg::InitialStatic()
 {
-	
-	m_static_cs_info.SetWindowTextW(_T(""));
-	m_static_cs_info.textColor(RGB(0,0,0));
-	//m_static_cs_info.bkColor(RGB(255,255,255));
-	m_static_cs_info.setFont(20,15,NULL,_T("Arial"));
 
-	m_static_checkupdate.SetWindowTextW(_T("Check Update"));
-	m_static_checkupdate.textColor(RGB(0,0,0));
-	//m_static_download.bkColor(RGB(255,255,255));
-	m_static_checkupdate.setFont(20,15,NULL,_T("Arial"));
+    m_static_cs_info.SetWindowTextW(_T(""));
+    m_static_cs_info.textColor(RGB(0, 0, 0));
+    //m_static_cs_info.bkColor(RGB(255,255,255));
+    m_static_cs_info.setFont(20, 15, NULL, _T("Arial"));
 
-	m_static_download.SetWindowTextW(_T("Download"));
-	m_static_download.textColor(RGB(0,0,0));
-	//m_static_download.bkColor(RGB(255,255,255));
-	m_static_download.setFont(20,15,NULL,_T("Arial"));
+    m_static_checkupdate.SetWindowTextW(_T("Check Update"));
+    m_static_checkupdate.textColor(RGB(0, 0, 0));
+    //m_static_download.bkColor(RGB(255,255,255));
+    m_static_checkupdate.setFont(20, 15, NULL, _T("Arial"));
 
-
-
-	m_static_uncompress.SetWindowTextW(_T("Extracting"));
-	m_static_uncompress.textColor(RGB(0,0,0));
-	//m_static_uncompress.bkColor(RGB(255,255,255));
-	m_static_uncompress.setFont(20,15,NULL,_T("Arial"));
-
-	m_static_install.SetWindowTextW(_T("Install"));
-	m_static_install.textColor(RGB(0,0,0));
-	//m_static_install.bkColor(RGB(255,255,255));
-	m_static_install.setFont(20,15,NULL,_T("Arial"));
-
-	m_static_finish.SetWindowTextW(_T("Done"));
-	m_static_finish.textColor(RGB(0,0,0));
-	//m_static_finish.bkColor(RGB(255,255,255));
-	m_static_finish.setFont(20,15,NULL,_T("Arial"));
+    m_static_download.SetWindowTextW(_T("Download"));
+    m_static_download.textColor(RGB(0, 0, 0));
+    //m_static_download.bkColor(RGB(255,255,255));
+    m_static_download.setFont(20, 15, NULL, _T("Arial"));
 
 
-	
-	m_static_persent.SetWindowTextW(_T(""));
-	m_static_persent.textColor(RGB(0,0,0));
-	//m_static_finish.bkColor(RGB(255,255,255));
-	m_static_persent.setFont(20,15,NULL,_T("Arial"));
-	//m_static_pic_step.SetWindowPos( NULL,252,165 + 45*(input_step-1),0,0,SWP_NOZORDER | SWP_NOSIZE );    
+
+    m_static_uncompress.SetWindowTextW(_T("Extracting"));
+    m_static_uncompress.textColor(RGB(0, 0, 0));
+    //m_static_uncompress.bkColor(RGB(255,255,255));
+    m_static_uncompress.setFont(20, 15, NULL, _T("Arial"));
+
+    m_static_install.SetWindowTextW(_T("Install"));
+    m_static_install.textColor(RGB(0, 0, 0));
+    //m_static_install.bkColor(RGB(255,255,255));
+    m_static_install.setFont(20, 15, NULL, _T("Arial"));
+
+    m_static_finish.SetWindowTextW(_T("Done"));
+    m_static_finish.textColor(RGB(0, 0, 0));
+    //m_static_finish.bkColor(RGB(255,255,255));
+    m_static_finish.setFont(20, 15, NULL, _T("Arial"));
+
+
+
+    m_static_persent.SetWindowTextW(_T(""));
+    m_static_persent.textColor(RGB(0, 0, 0));
+    //m_static_finish.bkColor(RGB(255,255,255));
+    m_static_persent.setFont(20, 15, NULL, _T("Arial"));
+    //m_static_pic_step.SetWindowPos( NULL,252,165 + 45*(input_step-1),0,0,SWP_NOZORDER | SWP_NOSIZE );    
 }
 
 
-bool CopyDirW(CString strSrcPath, CString strDstPath,bool bFailIfExists)
-{ 
-	CreateDirectory(strDstPath,NULL);// ´´½¨Ä¿±êÎÄ¼þ¼Ð£¬Èç¹û´æÔÚÔò²»´´½¨£¬Èç¹û²»´æÔÚÔò´´½¨¡£
-	if(PathIsDirectory(strDstPath)&&PathFileExists(strSrcPath))//Ä¿±êÄ¿Â¼ÊÇ·ñ´æÔÚ ¶øÇÒstrSrcPath ÒªÃ´ÊÇÎÄ¼þ¼ÐÒªÃ´ÊÇÎÄ¼þ
-	{
-		if(::PathIsDirectory(strSrcPath))//Èç¹ûÊÇÎÄ¼þ¼Ð¿½±´
-		{
-			CFileFind finder;
-			// ´ò¿ªÖ¸¶¨µÄÎÄ¼þ¼Ð½øÐÐËÑË÷
-			BOOL bWorking = finder.FindFile(strSrcPath + _T("\\") + _T("*.*")); 
-			while(bWorking)
-			{
-				// ´Óµ±Ç°Ä¿Â¼ËÑË÷ÎÄ¼þ
-				bWorking = finder.FindNextFile();
-				CString strFileName = finder.GetFileName();
-				CString strSrc = strSrcPath + _T("\\") + strFileName;
-				CString strDst = strDstPath + _T("\\") + strFileName;
-				// ÅÐ¶ÏËÑË÷µ½µÄÊÇ²»ÊÇ"."ºÍ".."Ä¿Â¼
-				if(!finder.IsDots())
-				{
-					// ÅÐ¶ÏËÑË÷µ½µÄÄ¿Â¼ÊÇ·ñÊÇÎÄ¼þ¼Ð
-					if(finder.IsDirectory())
-					{ // Èç¹ûÊÇÎÄ¼þ¼ÐµÄ»°£¬½øÐÐµÝ¹é
-						if(!CopyDirW(strSrc, strDst,bFailIfExists)) 
-							return false;
-					}
-					else
-					{// Èç¹ûÊÇÎÄ¼þ£¬½øÐÐ¸´ÖÆ
-						if(!CopyFileW(strSrc, strDst, bFailIfExists))
-							return false;
-					}
-				}
-			}       
-		}
-		else//Èç¹ûÊÇÎÄ¼þ¿½±´
-		{
-			strDstPath+=_T("\\");
-			strDstPath+=PathFindFileName(strSrcPath);
-			if(!CopyFile(strSrcPath, strDstPath, bFailIfExists))
-				return false;
-		}
-	}
-	else//Ä¿µÄÂ·¾¶²»´æÔÚ
-		return false;
-	return true;
+bool CopyDirW(CString strSrcPath, CString strDstPath, bool bFailIfExists)
+{
+    CreateDirectory(strDstPath, NULL);// ´´½¨Ä¿±êÎÄ¼þ¼Ð£¬Èç¹û´æÔÚÔò²»´´½¨£¬Èç¹û²»´æÔÚÔò´´½¨¡£
+    if (PathIsDirectory(strDstPath) && PathFileExists(strSrcPath))//Ä¿±êÄ¿Â¼ÊÇ·ñ´æÔÚ ¶øÇÒstrSrcPath ÒªÃ´ÊÇÎÄ¼þ¼ÐÒªÃ´ÊÇÎÄ¼þ
+    {
+        if (::PathIsDirectory(strSrcPath))//Èç¹ûÊÇÎÄ¼þ¼Ð¿½±´
+        {
+            CFileFind finder;
+            // ´ò¿ªÖ¸¶¨µÄÎÄ¼þ¼Ð½øÐÐËÑË÷
+            BOOL bWorking = finder.FindFile(strSrcPath + _T("\\") + _T("*.*"));
+            while (bWorking)
+            {
+                // ´Óµ±Ç°Ä¿Â¼ËÑË÷ÎÄ¼þ
+                bWorking = finder.FindNextFile();
+                CString strFileName = finder.GetFileName();
+                CString strSrc = strSrcPath + _T("\\") + strFileName;
+                CString strDst = strDstPath + _T("\\") + strFileName;
+                // ÅÐ¶ÏËÑË÷µ½µÄÊÇ²»ÊÇ"."ºÍ".."Ä¿Â¼
+                if (!finder.IsDots())
+                {
+                    // ÅÐ¶ÏËÑË÷µ½µÄÄ¿Â¼ÊÇ·ñÊÇÎÄ¼þ¼Ð
+                    if (finder.IsDirectory())
+                    { // Èç¹ûÊÇÎÄ¼þ¼ÐµÄ»°£¬½øÐÐµÝ¹é
+                        if (!CopyDirW(strSrc, strDst, bFailIfExists))
+                            return false;
+                    }
+                    else
+                    {// Èç¹ûÊÇÎÄ¼þ£¬½øÐÐ¸´ÖÆ
+                        if (!CopyFileW(strSrc, strDst, bFailIfExists))
+                            return false;
+                    }
+                }
+            }
+        }
+        else//Èç¹ûÊÇÎÄ¼þ¿½±´
+        {
+            strDstPath += _T("\\");
+            strDstPath += PathFindFileName(strSrcPath);
+            if (!CopyFile(strSrcPath, strDstPath, bFailIfExists))
+                return false;
+        }
+    }
+    else//Ä¿µÄÂ·¾¶²»´æÔÚ
+        return false;
+    return true;
 
 
 }
@@ -332,146 +331,148 @@ bool CopyDirW(CString strSrcPath, CString strDstPath,bool bFailIfExists)
 
 DWORD WINAPI InstallFileThread(LPVOID lPvoid)
 {
-	CUpdateDlg * mparent = (CUpdateDlg *)lPvoid;
+    CUpdateDlg * mparent = (CUpdateDlg *)lPvoid;
 
-	bool copy_ret = false;
-	SetCurrentDirectoryW(APP_RUN_FOLDER);
-	copy_ret = CopyDirW(UnzipFileFolder,APP_RUN_FOLDER,FALSE);
-	if(copy_ret)
-	{
-		CS_Info.Format(_T("Install success!"));
-		
-	}
-	else
-	{
-		CS_Info.Format(_T("Install failed!"));
-	}
-	installthread = NULL;
-	m_static_step = UPDATE_STEP_DONE;
-	return 0;
+    bool copy_ret = false;
+    SetCurrentDirectoryW(APP_RUN_FOLDER);
+    copy_ret = CopyDirW(UnzipFileFolder, APP_RUN_FOLDER, FALSE);
+    if (copy_ret)
+    {
+        CS_Info.Format(_T("Install success!"));
+
+    }
+    else
+    {
+        CS_Info.Format(_T("Install failed!"));
+    }
+
+    Sleep(3000);
+    installthread = NULL;
+    m_static_step = UPDATE_STEP_DONE;
+    return 0;
 }
 
 DWORD WINAPI UnzipFileThread(LPVOID lPvoid)
 {
-	CUpdateDlg * mparent = (CUpdateDlg *)lPvoid;
-	CS_Info.Format(_T("Extracting files"));
-	UnzipItem(DesDownloadFilePath,UnzipFileFolder);
-	CS_Info.Format(_T("Extracting files OK!"));
+    CUpdateDlg * mparent = (CUpdateDlg *)lPvoid;
+    CS_Info.Format(_T("Extracting files"));
+    UnzipItem(DesDownloadFilePath, UnzipFileFolder);
+    CS_Info.Format(_T("Extracting files OK!"));
 
-	
 
-	if(installthread == NULL)
-	{
-		Sleep(1000);
-		m_static_step = UPDATE_STEP_INSTALL;
-		installthread = CreateThread(NULL,NULL,InstallFileThread,mparent,NULL,NULL);
-		CloseHandle(installthread);
-	}
-		unzipthread = NULL;
-	return 0;
+
+    if (installthread == NULL)
+    {
+        Sleep(1000);
+        m_static_step = UPDATE_STEP_INSTALL;
+        installthread = CreateThread(NULL, NULL, InstallFileThread, mparent, NULL, NULL);
+        CloseHandle(installthread);
+    }
+    unzipthread = NULL;
+    return 0;
 }
 
 
 BOOL KillProcessFromName(CString strProcessName)
 {
-	//´´½¨½ø³Ì¿ìÕÕ(TH32CS_SNAPPROCESS±íÊ¾´´½¨ËùÓÐ½ø³ÌµÄ¿ìÕÕ)
+    //´´½¨½ø³Ì¿ìÕÕ(TH32CS_SNAPPROCESS±íÊ¾´´½¨ËùÓÐ½ø³ÌµÄ¿ìÕÕ)
 
-	HANDLE hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS,0);
-
-
-
-	//PROCESSENTRY32½ø³Ì¿ìÕÕµÄ½á¹¹Ìå
-
-	PROCESSENTRY32 pe;
+    HANDLE hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
 
 
-	//ÊµÀý»¯ºóÊ¹ÓÃProcess32First»ñÈ¡µÚÒ»¸ö¿ìÕÕµÄ½ø³ÌÇ°±Ø×öµÄ³õÊ¼»¯²Ù×÷
+    //PROCESSENTRY32½ø³Ì¿ìÕÕµÄ½á¹¹Ìå
 
-	pe.dwSize = sizeof(PROCESSENTRY32);
-
-
+    PROCESSENTRY32 pe;
 
 
 
-	//ÏÂÃæµÄIFÐ§¹ûÍ¬:
+    //ÊµÀý»¯ºóÊ¹ÓÃProcess32First»ñÈ¡µÚÒ»¸ö¿ìÕÕµÄ½ø³ÌÇ°±Ø×öµÄ³õÊ¼»¯²Ù×÷
 
-	//if(hProcessSnap == INVALID_HANDLE_VALUE)   ÎÞÐ§µÄ¾ä±ú
-
-	if(!Process32First(hSnapShot,&pe))
-
-	{
-
-		return FALSE;
-
-	}
-
-
-
-	//½«×Ö·û´®×ª»»ÎªÐ¡Ð´
-
-	strProcessName.MakeLower();
-
-
-
-	//Èç¹û¾ä±úÓÐÐ§  ÔòÒ»Ö±»ñÈ¡ÏÂÒ»¸ö¾ä±úÑ­»·ÏÂÈ¥
-
-	while (Process32Next(hSnapShot,&pe))
-
-	{
-
-
-
-		//pe.szExeFile»ñÈ¡µ±Ç°½ø³ÌµÄ¿ÉÖ´ÐÐÎÄ¼þÃû³Æ
-
-		CString scTmp = pe.szExeFile;
+    pe.dwSize = sizeof(PROCESSENTRY32);
 
 
 
 
 
-		//½«¿ÉÖ´ÐÐÎÄ¼þÃû³ÆËùÓÐÓ¢ÎÄ×ÖÄ¸ÐÞ¸ÄÎªÐ¡Ð´
+    //ÏÂÃæµÄIFÐ§¹ûÍ¬:
 
-		scTmp.MakeLower();
+    //if(hProcessSnap == INVALID_HANDLE_VALUE)   ÎÞÐ§µÄ¾ä±ú
 
+    if (!Process32First(hSnapShot, &pe))
 
+    {
 
-		//±È½Ïµ±Ç°½ø³ÌµÄ¿ÉÖ´ÐÐÎÄ¼þÃû³ÆºÍ´«µÝ½øÀ´µÄÎÄ¼þÃû³ÆÊÇ·ñÏàÍ¬
+        return FALSE;
 
-		//ÏàÍ¬µÄ»°Compare·µ»Ø0
-
-		if(!scTmp.Compare(strProcessName))
-
-		{
+    }
 
 
 
-			//´Ó¿ìÕÕ½ø³ÌÖÐ»ñÈ¡¸Ã½ø³ÌµÄPID(¼´ÈÎÎñ¹ÜÀíÆ÷ÖÐµÄPID)
+    //½«×Ö·û´®×ª»»ÎªÐ¡Ð´
 
-			DWORD dwProcessID = pe.th32ProcessID;
+    strProcessName.MakeLower();
 
-			HANDLE hProcess = ::OpenProcess(PROCESS_TERMINATE,FALSE,dwProcessID);
 
-			::TerminateProcess(hProcess,0);
 
-			CloseHandle(hProcess);
+    //Èç¹û¾ä±úÓÐÐ§  ÔòÒ»Ö±»ñÈ¡ÏÂÒ»¸ö¾ä±úÑ­»·ÏÂÈ¥
 
-			return TRUE;
+    while (Process32Next(hSnapShot, &pe))
 
-		}
+    {
 
-		scTmp.ReleaseBuffer();
 
-	}
 
-	strProcessName.ReleaseBuffer();
+        //pe.szExeFile»ñÈ¡µ±Ç°½ø³ÌµÄ¿ÉÖ´ÐÐÎÄ¼þÃû³Æ
 
-	return FALSE;
+        CString scTmp = pe.szExeFile;
+
+
+
+
+
+        //½«¿ÉÖ´ÐÐÎÄ¼þÃû³ÆËùÓÐÓ¢ÎÄ×ÖÄ¸ÐÞ¸ÄÎªÐ¡Ð´
+
+        scTmp.MakeLower();
+
+
+
+        //±È½Ïµ±Ç°½ø³ÌµÄ¿ÉÖ´ÐÐÎÄ¼þÃû³ÆºÍ´«µÝ½øÀ´µÄÎÄ¼þÃû³ÆÊÇ·ñÏàÍ¬
+
+        //ÏàÍ¬µÄ»°Compare·µ»Ø0
+
+        if (!scTmp.Compare(strProcessName))
+
+        {
+
+
+
+            //´Ó¿ìÕÕ½ø³ÌÖÐ»ñÈ¡¸Ã½ø³ÌµÄPID(¼´ÈÎÎñ¹ÜÀíÆ÷ÖÐµÄPID)
+
+            DWORD dwProcessID = pe.th32ProcessID;
+
+            HANDLE hProcess = ::OpenProcess(PROCESS_TERMINATE, FALSE, dwProcessID);
+
+            ::TerminateProcess(hProcess, 0);
+
+            CloseHandle(hProcess);
+
+            return TRUE;
+
+        }
+
+        scTmp.ReleaseBuffer();
+
+    }
+
+    strProcessName.ReleaseBuffer();
+
+    return FALSE;
 
 }
 
 //    //URLDownloadToFile(NULL, _T("https://temcocontrols.com/ftp/software/09T3000Software.zip"),
-    //    _T("C:\\09T3000Software.zip"), 0, NULL);
+//    _T("C:\\09T3000Software.zip"), 0, NULL);
 #include "ULRBindCallback.h"
 
 DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
@@ -486,6 +487,8 @@ DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
         bool download_ret = false;
         DownloadIniFilePath = DownloadFileFolder + _T("//T3000Version.ini");
         int retry_count_ini = 0;
+        DeleteUrlCacheEntry(_T("https://temcocontrols.com/ftp/firmware/ProductPath.ini")); // ÇåÀí»º´æ
+        Sleep(2000);
         while (1)
         {
             download_ret = URLDownloadToFile(NULL, _T("https://temcocontrols.com/ftp/firmware/ProductPath.ini"), DownloadIniFilePath, 0, NULL);
@@ -513,10 +516,12 @@ DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
         if ((PC_T3000_Version < T3000_FTP_Version) || (PC_T3000_Version == 0))
         {
             CS_Info.Format(_T("New version available, downloading now."));
+            Sleep(2000);
         }
         else
         {
             CS_Info.Format(_T("Your T3000.exe is up-to-date"));
+            Sleep(5000);
             m_static_step = UPDATE_STEP_READY_TO_CLOASE;
             getftpthread = NULL;
             return 0;
@@ -534,9 +539,10 @@ DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
         cbc.m_pdlg = mparent;
 
         DesDownloadFilePath = DownloadFileFolder + _T("\\T3000Update.zip");
-
         int retry_count = 0;
-        while(1)
+        DeleteUrlCacheEntry(T3000FtpPath); // ÇåÀí»º´æ
+        Sleep(2000);
+        while (1)
         {
             download_ret = URLDownloadToFile(NULL, T3000FtpPath, DesDownloadFilePath, 0, &cbc); // ¸ù¾ÝÅäÖÃÎÄµµÅäÖÃºÃµÄÂ·¾¶È¥ÏÂÔØ.
             if (download_ret == S_FALSE)
@@ -547,17 +553,20 @@ DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
             }
             else
             {
+                CString download_ret_value;
+                download_ret_value.Format(_T("Success ,Donwload ret value %d"), download_ret);
                 break;
             }
 
             if (retry_count > 10)
                 break;
         }
-       
+
 
         if (download_ret == S_FALSE)
         {
             CS_Info.Format(_T("Download failded!"));
+            Sleep(2000);
             m_static_step = UPDATE_STEP_READY_TO_CLOASE;
             getftpthread = NULL;
             return 0;
@@ -565,6 +574,7 @@ DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
         else
         {
             CS_Info.Format(_T("Download finished."));
+            Sleep(2000);
         }
     }
     else
@@ -588,6 +598,7 @@ DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
         else
         {
             CS_Info.Format(_T("Install failed!"));
+            Sleep(2000);
             return 0;
         }
     }
@@ -615,15 +626,15 @@ download_pass:
 
 void CUpdateDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
-	{
-		CAboutDlg dlgAbout;
-		dlgAbout.DoModal();
-	}
-	else
-	{
-		CDialogEx::OnSysCommand(nID, lParam);
-	}
+    if ((nID & 0xFFF0) == IDM_ABOUTBOX)
+    {
+        CAboutDlg dlgAbout;
+        dlgAbout.DoModal();
+    }
+    else
+    {
+        CDialogEx::OnSysCommand(nID, lParam);
+    }
 }
 
 // If you add a minimize button to your dialog, you will need the code below
@@ -632,326 +643,326 @@ void CUpdateDlg::OnSysCommand(UINT nID, LPARAM lParam)
 
 void CUpdateDlg::OnPaint()
 {
-	if (IsIconic())
-	{
-		CPaintDC dc(this); // device context for painting
+    if (IsIconic())
+    {
+        CPaintDC dc(this); // device context for painting
 
-		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
+        SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
-		// Center icon in client rectangle
-		int cxIcon = GetSystemMetrics(SM_CXICON);
-		int cyIcon = GetSystemMetrics(SM_CYICON);
-		CRect rect;
-		GetClientRect(&rect);
-		int x = (rect.Width() - cxIcon + 1) / 2;
-		int y = (rect.Height() - cyIcon + 1) / 2;
+        // Center icon in client rectangle
+        int cxIcon = GetSystemMetrics(SM_CXICON);
+        int cyIcon = GetSystemMetrics(SM_CYICON);
+        CRect rect;
+        GetClientRect(&rect);
+        int x = (rect.Width() - cxIcon + 1) / 2;
+        int y = (rect.Height() - cyIcon + 1) / 2;
 
-		// Draw the icon
-		dc.DrawIcon(x, y, m_hIcon);
-	}
-	else
-	{
-		CDialogEx::OnPaint();
-	}
+        // Draw the icon
+        dc.DrawIcon(x, y, m_hIcon);
+    }
+    else
+    {
+        CDialogEx::OnPaint();
+    }
 }
 
 // The system calls this function to obtain the cursor to display while the user drags
 //  the minimized window.
 HCURSOR CUpdateDlg::OnQueryDragIcon()
 {
-	return static_cast<HCURSOR>(m_hIcon);
+    return static_cast<HCURSOR>(m_hIcon);
 }
 
 
 
 void CUpdateDlg::OnTimer(UINT_PTR nIDEvent)
 {
-	 
-	CString temp_cs;
-static	int pic_static_step = 0;
 
-	switch(m_static_step)
-	{
-	case UPDATE_STEP_IDLE :
-		{
-			CS_Info.Empty();
-			m_static_persent.ShowWindow(FALSE);
-			m_progress.ShowWindow(FALSE);
-		}
-		break;
-	case UPDATE_STEP_CHECK_NEWVERSION:
-		{
-			if(pic_static_step == 1)
-			{
-				pic_static_step = 0;
-			}
-			else
-			{
-				pic_static_step = 1;
-			}
-			m_static_pic_step.SetWindowPos( NULL,10 + 18*(1- pic_static_step),12 ,0,0,SWP_NOZORDER | SWP_NOSIZE );   
-		}
-		break;
-	case UPDATE_STEP_DOWNLOAD :
-		{
-			m_static_checkupdate.textColor(RGB(0,0,255));
-			if(pic_static_step == 1)
-			{
-				pic_static_step = 0;
-			}
-			else
-			{
-				pic_static_step = 1;
-			}
-			m_static_pic_step.SetWindowPos( NULL,10 + 18*(1- pic_static_step),42 ,0,0,SWP_NOZORDER | SWP_NOSIZE );    
-			
-			m_static_persent.ShowWindow(TRUE);
-			m_progress.ShowWindow(TRUE);
-			unsigned int total_byte = 0;
-			unsigned int finished_bye = 0;
+    CString temp_cs;
+    static	int pic_static_step = 0;
 
-			int finished_persent = 0;
-			if(is_local_temco_net == false)
-			{
-				//GetFtpTransferPersent(&total_byte,&finished_bye,&finished_persent);
-				//temp_cs.Format(_T("%d/%d (Kb)   %d%%"),finished_bye/1024,total_byte/1024,finished_persent);
-				//m_static_persent.SetWindowTextW(temp_cs);
-				//m_progress.SetPos(finished_persent);
-			}
-			else
-			{
-				
-				temp_cs.Format(_T("%d%%"),local_persent);
-				m_static_persent.SetWindowTextW(temp_cs);
-				m_progress.SetPos(local_persent);
-			}
-			
+    switch (m_static_step)
+    {
+    case UPDATE_STEP_IDLE:
+    {
+        CS_Info.Empty();
+        m_static_persent.ShowWindow(FALSE);
+        m_progress.ShowWindow(FALSE);
+    }
+    break;
+    case UPDATE_STEP_CHECK_NEWVERSION:
+    {
+        if (pic_static_step == 1)
+        {
+            pic_static_step = 0;
+        }
+        else
+        {
+            pic_static_step = 1;
+        }
+        m_static_pic_step.SetWindowPos(NULL, 10 + 18 * (1 - pic_static_step), 12, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+    }
+    break;
+    case UPDATE_STEP_DOWNLOAD:
+    {
+        m_static_checkupdate.textColor(RGB(0, 0, 255));
+        if (pic_static_step == 1)
+        {
+            pic_static_step = 0;
+        }
+        else
+        {
+            pic_static_step = 1;
+        }
+        m_static_pic_step.SetWindowPos(NULL, 10 + 18 * (1 - pic_static_step), 42, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 
-		}
-		break;
-	case UPDATE_STEP_UNCOMPRESS:
-		{
-			m_static_download.textColor(RGB(0,0,255));
-			if(pic_static_step == 1)
-			{
-				pic_static_step = 0;
-			}
-			else
-			{
-				pic_static_step = 1;
-			}
-			m_static_pic_step.SetWindowPos( NULL,10 + 18*(1- pic_static_step),90 ,0,0,SWP_NOZORDER | SWP_NOSIZE );    
+        m_static_persent.ShowWindow(TRUE);
+        m_progress.ShowWindow(TRUE);
+        unsigned int total_byte = 0;
+        unsigned int finished_bye = 0;
+
+        int finished_persent = 0;
+        if (is_local_temco_net == false)
+        {
+            //GetFtpTransferPersent(&total_byte,&finished_bye,&finished_persent);
+            //temp_cs.Format(_T("%d/%d (Kb)   %d%%"),finished_bye/1024,total_byte/1024,finished_persent);
+            //m_static_persent.SetWindowTextW(temp_cs);
+            //m_progress.SetPos(finished_persent);
+        }
+        else
+        {
+
+            temp_cs.Format(_T("%d%%"), local_persent);
+            m_static_persent.SetWindowTextW(temp_cs);
+            m_progress.SetPos(local_persent);
+        }
 
 
-			temp_cs.Format(_T(""));
-			m_static_persent.SetWindowTextW(temp_cs);
-		}
-		break;
-	case UPDATE_STEP_INSTALL:
-		{
-			m_static_download.textColor(RGB(0,0,255));
-			m_static_uncompress.textColor(RGB(0,0,255));
-			if(pic_static_step == 1)
-			{
-				pic_static_step = 0;
-			}
-			else
-			{
-				pic_static_step = 1;
-			}
-			m_static_pic_step.SetWindowPos( NULL,10 + 18*(1- pic_static_step),138 ,0,0,SWP_NOZORDER | SWP_NOSIZE );   
-			CS_Info.Format(_T("Recover new files ,please wait."));
+    }
+    break;
+    case UPDATE_STEP_UNCOMPRESS:
+    {
+        m_static_download.textColor(RGB(0, 0, 255));
+        if (pic_static_step == 1)
+        {
+            pic_static_step = 0;
+        }
+        else
+        {
+            pic_static_step = 1;
+        }
+        m_static_pic_step.SetWindowPos(NULL, 10 + 18 * (1 - pic_static_step), 90, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 
-		}
-		break;
-	case UPDATE_STEP_DONE:
-		{
-			m_static_install.textColor(RGB(0,0,255));
-			m_static_finish.textColor(RGB(0,0,255));
-			pic_static_step = 0;
 
-			m_static_pic_step.SetWindowPos( NULL,10 + 14*(1- pic_static_step),185 ,0,0,SWP_NOZORDER | SWP_NOSIZE );   
-			CS_Info.Format(_T("Update done."));
-			m_static_step = UPDATE_STEP_READY_TO_CLOASE;
-		}
-		break;
-	case UPDATE_STEP_READY_TO_CLOASE:
-		{
-			m_static_persent.ShowWindow(FALSE);
-			m_progress.ShowWindow(FALSE);
-			Invalidate(TRUE);
-			static int ncount = 0;
-			if(++ncount > 10)
-			{
+        temp_cs.Format(_T(""));
+        m_static_persent.SetWindowTextW(temp_cs);
+    }
+    break;
+    case UPDATE_STEP_INSTALL:
+    {
+        m_static_download.textColor(RGB(0, 0, 255));
+        m_static_uncompress.textColor(RGB(0, 0, 255));
+        if (pic_static_step == 1)
+        {
+            pic_static_step = 0;
+        }
+        else
+        {
+            pic_static_step = 1;
+        }
+        m_static_pic_step.SetWindowPos(NULL, 10 + 18 * (1 - pic_static_step), 138, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+        CS_Info.Format(_T("Recover new files ,please wait."));
 
-				CString tempApplicationFolder;
-				GetModuleFileName(NULL, tempApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
-				PathRemoveFileSpec(tempApplicationFolder.GetBuffer(MAX_PATH));
-				tempApplicationFolder.ReleaseBuffer();
+    }
+    break;
+    case UPDATE_STEP_DONE:
+    {
+        m_static_install.textColor(RGB(0, 0, 255));
+        m_static_finish.textColor(RGB(0, 0, 255));
+        pic_static_step = 0;
 
-				if(run_t3000)
-					ShellExecute(NULL,_T("open"),_T("T3000.exe"),NULL,tempApplicationFolder,SW_SHOWNORMAL);
+        m_static_pic_step.SetWindowPos(NULL, 10 + 14 * (1 - pic_static_step), 185, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+        CS_Info.Format(_T("Update done."));
+        m_static_step = UPDATE_STEP_READY_TO_CLOASE;
+    }
+    break;
+    case UPDATE_STEP_READY_TO_CLOASE:
+    {
+        m_static_persent.ShowWindow(FALSE);
+        m_progress.ShowWindow(FALSE);
+        Invalidate(TRUE);
+        static int ncount = 0;
+        if (++ncount > 10)
+        {
 
-				PostMessage(WM_CLOSE,NULL,NULL);
-			}
-		}
-		break;
-	default:
-		break;
+            CString tempApplicationFolder;
+            GetModuleFileName(NULL, tempApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+            PathRemoveFileSpec(tempApplicationFolder.GetBuffer(MAX_PATH));
+            tempApplicationFolder.ReleaseBuffer();
 
-	}
-	GetDlgItem(IDC_STATIC_UPDATE_INFO)->SetWindowTextW(CS_Info);
-	CDialogEx::OnTimer(nIDEvent);
+            if (run_t3000)
+                ShellExecute(NULL, _T("open"), _T("T3000.exe"), NULL, tempApplicationFolder, SW_SHOWNORMAL);
+
+            PostMessage(WM_CLOSE, NULL, NULL);
+        }
+    }
+    break;
+    default:
+        break;
+
+    }
+    GetDlgItem(IDC_STATIC_UPDATE_INFO)->SetWindowTextW(CS_Info);
+    CDialogEx::OnTimer(nIDEvent);
 }
 
 
 void CUpdateDlg::OnBnClickedButtonCancel()
 {
-	
-	if(getftpthread)
-	{
-		TerminateThread(getftpthread,0);
-		getftpthread = NULL;
-	}
-	if(unzipthread)
-	{
-		TerminateThread(unzipthread,0);
-		unzipthread = NULL;
-	}
-	if(installthread)
-	{
-		TerminateThread(installthread,0);
-		installthread = NULL;
-	}
-	PostMessage(WM_CLOSE,NULL,NULL);
+
+    if (getftpthread)
+    {
+        TerminateThread(getftpthread, 0);
+        getftpthread = NULL;
+    }
+    if (unzipthread)
+    {
+        TerminateThread(unzipthread, 0);
+        unzipthread = NULL;
+    }
+    if (installthread)
+    {
+        TerminateThread(installthread, 0);
+        installthread = NULL;
+    }
+    PostMessage(WM_CLOSE, NULL, NULL);
 }
 
 
 BOOL CUpdateDlg::PreTranslateMessage(MSG* pMsg)
 {
-	
-	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN) 
-	{
-		return 1;
-	}
-	else if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_ESCAPE) 
-	{
-		return 1;
-	}
-	return CDialogEx::PreTranslateMessage(pMsg);
+
+    if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN)
+    {
+        return 1;
+    }
+    else if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_ESCAPE)
+    {
+        return 1;
+    }
+    return CDialogEx::PreTranslateMessage(pMsg);
 }
 
 BOOL CUpdateDlg::DownloadFileHttp(const CString& strFileURLInServer, //´ýÏÂÔØÎÄ¼þµÄURL
-	const CString & strFileLocalFullPath)//´æ·Åµ½±¾µØµÄÂ·¾¶
+    const CString & strFileLocalFullPath)//´æ·Åµ½±¾µØµÄÂ·¾¶
 {
-	ASSERT(strFileURLInServer != "");
-	ASSERT(strFileLocalFullPath != "");
-	CInternetSession session;
-	CHttpConnection* pHttpConnection = NULL;
-	CHttpFile* pHttpFile = NULL;
-	CString strServer, strObject;
-	INTERNET_PORT wPort;
+    ASSERT(strFileURLInServer != "");
+    ASSERT(strFileLocalFullPath != "");
+    CInternetSession session;
+    CHttpConnection* pHttpConnection = NULL;
+    CHttpFile* pHttpFile = NULL;
+    CString strServer, strObject;
+    INTERNET_PORT wPort;
 
-	DWORD dwType;
-	const int nTimeOut = 2000;
-	session.SetOption(INTERNET_OPTION_CONNECT_TIMEOUT, nTimeOut); //ÖØÊÔÖ®¼äµÄµÈ´ýÑÓÊ±
-	session.SetOption(INTERNET_OPTION_CONNECT_RETRIES, 1);   //ÖØÊÔ´ÎÊý
-	char* pszBuffer = NULL;  
+    DWORD dwType;
+    const int nTimeOut = 2000;
+    session.SetOption(INTERNET_OPTION_CONNECT_TIMEOUT, nTimeOut); //ÖØÊÔÖ®¼äµÄµÈ´ýÑÓÊ±
+    session.SetOption(INTERNET_OPTION_CONNECT_RETRIES, 1);   //ÖØÊÔ´ÎÊý
+    char* pszBuffer = NULL;
 
-	try
-	{
-		AfxParseURL(strFileURLInServer, dwType, strServer, strObject, wPort);
-		pHttpConnection = session.GetHttpConnection(strServer, wPort);
-		pHttpFile = pHttpConnection->OpenRequest(CHttpConnection::HTTP_VERB_GET, strObject);
-		if(pHttpFile->SendRequest() == FALSE)
-			return false;
-		DWORD dwStateCode;
+    try
+    {
+        AfxParseURL(strFileURLInServer, dwType, strServer, strObject, wPort);
+        pHttpConnection = session.GetHttpConnection(strServer, wPort);
+        pHttpFile = pHttpConnection->OpenRequest(CHttpConnection::HTTP_VERB_GET, strObject);
+        if (pHttpFile->SendRequest() == FALSE)
+            return false;
+        DWORD dwStateCode;
 
-		pHttpFile->QueryInfoStatusCode(dwStateCode);
-		if(dwStateCode == HTTP_STATUS_OK)
-		{
-			HANDLE hFile = CreateFile(strFileLocalFullPath, GENERIC_WRITE,
-				FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL,
-				NULL);  //´´½¨±¾µØÎÄ¼þ
-			if(hFile == INVALID_HANDLE_VALUE)
-			{
-				pHttpFile->Close();
-				pHttpConnection->Close();
-				session.Close();
-				return false;
-			}
+        pHttpFile->QueryInfoStatusCode(dwStateCode);
+        if (dwStateCode == HTTP_STATUS_OK)
+        {
+            HANDLE hFile = CreateFile(strFileLocalFullPath, GENERIC_WRITE,
+                FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL,
+                NULL);  //´´½¨±¾µØÎÄ¼þ
+            if (hFile == INVALID_HANDLE_VALUE)
+            {
+                pHttpFile->Close();
+                pHttpConnection->Close();
+                session.Close();
+                return false;
+            }
 
-			char szInfoBuffer[1000];  //·µ»ØÏûÏ¢
-			DWORD dwFileSize = 0;   //ÎÄ¼þ³¤¶È
-			DWORD dwInfoBufferSize = sizeof(szInfoBuffer);
-			BOOL bResult = FALSE;
-			bResult = pHttpFile->QueryInfo(HTTP_QUERY_CONTENT_LENGTH,
-				(void*)szInfoBuffer,&dwInfoBufferSize,NULL);
+            char szInfoBuffer[1000];  //·µ»ØÏûÏ¢
+            DWORD dwFileSize = 0;   //ÎÄ¼þ³¤¶È
+            DWORD dwInfoBufferSize = sizeof(szInfoBuffer);
+            BOOL bResult = FALSE;
+            bResult = pHttpFile->QueryInfo(HTTP_QUERY_CONTENT_LENGTH,
+                (void*)szInfoBuffer, &dwInfoBufferSize, NULL);
 
-			dwFileSize = atoi(szInfoBuffer);
-			const int BUFFER_LENGTH = 1024 * 10;
-			pszBuffer = new char[BUFFER_LENGTH];  //¶ÁÈ¡ÎÄ¼þµÄ»º³å
-			DWORD dwWrite, dwTotalWrite;
-			dwWrite = dwTotalWrite = 0;
-			UINT nRead = pHttpFile->Read(pszBuffer, BUFFER_LENGTH); //¶ÁÈ¡·þÎñÆ÷ÉÏÊý¾Ý
+            dwFileSize = atoi(szInfoBuffer);
+            const int BUFFER_LENGTH = 1024 * 10;
+            pszBuffer = new char[BUFFER_LENGTH];  //¶ÁÈ¡ÎÄ¼þµÄ»º³å
+            DWORD dwWrite, dwTotalWrite;
+            dwWrite = dwTotalWrite = 0;
+            UINT nRead = pHttpFile->Read(pszBuffer, BUFFER_LENGTH); //¶ÁÈ¡·þÎñÆ÷ÉÏÊý¾Ý
 
-			while(nRead > 0)
-			{
-				WriteFile(hFile, pszBuffer, nRead, &dwWrite, NULL);  //Ð´µ½±¾µØÎÄ¼þ
-				dwTotalWrite += dwWrite;
-				nRead = pHttpFile->Read(pszBuffer, BUFFER_LENGTH);
-			}
+            while (nRead > 0)
+            {
+                WriteFile(hFile, pszBuffer, nRead, &dwWrite, NULL);  //Ð´µ½±¾µØÎÄ¼þ
+                dwTotalWrite += dwWrite;
+                nRead = pHttpFile->Read(pszBuffer, BUFFER_LENGTH);
+            }
 
-			delete[]pszBuffer;
-			pszBuffer = NULL;
-			CloseHandle(hFile);
-		}
-		else
-		{
-			delete[]pszBuffer;
-			pszBuffer = NULL;
-			if(pHttpFile != NULL)
-			{
-				pHttpFile->Close();
-				delete pHttpFile;
-				pHttpFile = NULL;
-			}
-			if(pHttpConnection != NULL)
-			{
-				pHttpConnection->Close();
-				delete pHttpConnection;
-				pHttpConnection = NULL;
-			}
-			session.Close();
-			return false;
-		}
-	}
-	catch(...)
-	{
-		delete[]pszBuffer;
-		pszBuffer = NULL;
-		if(pHttpFile != NULL)
-		{
-			pHttpFile->Close();
-			delete pHttpFile;
-			pHttpFile = NULL;
-		}
-		if(pHttpConnection != NULL)
-		{
-			pHttpConnection->Close();
-			delete pHttpConnection;
-			pHttpConnection = NULL;
-		}
-		session.Close();
-		return false;
-	}
+            delete[]pszBuffer;
+            pszBuffer = NULL;
+            CloseHandle(hFile);
+        }
+        else
+        {
+            delete[]pszBuffer;
+            pszBuffer = NULL;
+            if (pHttpFile != NULL)
+            {
+                pHttpFile->Close();
+                delete pHttpFile;
+                pHttpFile = NULL;
+            }
+            if (pHttpConnection != NULL)
+            {
+                pHttpConnection->Close();
+                delete pHttpConnection;
+                pHttpConnection = NULL;
+            }
+            session.Close();
+            return false;
+        }
+    }
+    catch (...)
+    {
+        delete[]pszBuffer;
+        pszBuffer = NULL;
+        if (pHttpFile != NULL)
+        {
+            pHttpFile->Close();
+            delete pHttpFile;
+            pHttpFile = NULL;
+        }
+        if (pHttpConnection != NULL)
+        {
+            pHttpConnection->Close();
+            delete pHttpConnection;
+            pHttpConnection = NULL;
+        }
+        session.Close();
+        return false;
+    }
 
-	if(pHttpFile != NULL)
-		pHttpFile->Close();
-	if(pHttpConnection != NULL)
-		pHttpConnection->Close();
-	session.Close();
-	return true;
+    if (pHttpFile != NULL)
+        pHttpFile->Close();
+    if (pHttpConnection != NULL)
+        pHttpConnection->Close();
+    session.Close();
+    return true;
 }
 
 
@@ -960,6 +971,6 @@ BOOL CUpdateDlg::DownloadFileHttp(const CString& strFileURLInServer, //´ýÏÂÔØÎÄ¼
 
 void CUpdateDlg::OnBnClickedCheckOpenT3000()
 {
-	
-	run_t3000 =  ((CButton *)GetDlgItem(IDC_CHECK_OPEN_T3000))->GetCheck();
+
+    run_t3000 = ((CButton *)GetDlgItem(IDC_CHECK_OPEN_T3000))->GetCheck();
 }

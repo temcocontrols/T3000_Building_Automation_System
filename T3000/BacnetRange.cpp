@@ -1589,7 +1589,7 @@ void BacnetRange::Timer2_handle()
 			{
 				m_digital_select = sel_value;
 				CRect c4;
-				GetDlgItem(IDC_RADIO35 + m_digital_select)->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+				GetDlgItem(IDC_RADIO35 + m_digital_select)->GetWindowRect(c4); 
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -1614,7 +1614,7 @@ void BacnetRange::Timer2_handle()
 			{
 				m_digital_select = sel_value;
 				CRect c4;
-				GetDlgItem(IDC_RADIO35 + m_digital_select)->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+				GetDlgItem(IDC_RADIO35 + m_digital_select)->GetWindowRect(c4);  
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -1623,7 +1623,7 @@ void BacnetRange::Timer2_handle()
 				{
 					((CButton *)GetDlgItem(i))->SetCheck(false);
 				}
-				for (int i=IDC_RADIO89;i<=IDC_RADIO99;i++)  // 111111111111111111111111111111111111111111111111
+				for (int i=IDC_RADIO89;i<=IDC_RADIO99;i++)  
 				{
 					((CButton *)GetDlgItem(i))->SetCheck(false);
 				}
@@ -1637,7 +1637,7 @@ void BacnetRange::Timer2_handle()
 			{
 				m_digital_select = sel_value - 11;
 				CRect c4;
-				GetDlgItem(IDC_RADIO73 + sel_value - 23 )->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+				GetDlgItem(IDC_RADIO73 + sel_value - 23 )->GetWindowRect(c4); 
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -1674,7 +1674,7 @@ void BacnetRange::Timer2_handle()
 			}
 			m_output_Analog_select = sel_value - 30 ;
 			CRect c4;
-			GetDlgItem(IDC_RADIO47 + m_output_Analog_select )->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+			GetDlgItem(IDC_RADIO47 + m_output_Analog_select )->GetWindowRect(c4); 
 			ScreenToClient(c4);  
 			m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 			m_rang_pic.Invalidate(TRUE);
@@ -1729,7 +1729,7 @@ void BacnetRange::Timer2_handle()
 			{
 				m_digital_select = sel_value;
 				CRect c4;
-				GetDlgItem(IDC_RADIO35 + m_digital_select)->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+				GetDlgItem(IDC_RADIO35 + m_digital_select)->GetWindowRect(c4); 
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -1752,7 +1752,7 @@ void BacnetRange::Timer2_handle()
 				//m_digital_select = sel_value - 11;
 				m_digital_select = sel_value ;
 				CRect c4;
-				GetDlgItem(IDC_RADIO89 + m_digital_select - 12)->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+				GetDlgItem(IDC_RADIO89 + m_digital_select - 12)->GetWindowRect(c4);  
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -1774,7 +1774,7 @@ void BacnetRange::Timer2_handle()
 			{
 				m_digital_select = sel_value;
 				CRect c4;
-				GetDlgItem(IDC_RADIO73 + sel_value - 23 )->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+				GetDlgItem(IDC_RADIO73 + sel_value - 23 )->GetWindowRect(c4); 
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -1815,7 +1815,7 @@ void BacnetRange::Timer2_handle()
 			if(sel_value == 49)
 			{
 				CRect c4;
-				GetDlgItem(IDC_RADIO81)->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+				GetDlgItem(IDC_RADIO81)->GetWindowRect(c4); 
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -1823,7 +1823,7 @@ void BacnetRange::Timer2_handle()
 			else if(sel_value == 55)
 			{
 				CRect c4;
-				GetDlgItem(IDC_RADIO87)->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+				GetDlgItem(IDC_RADIO87)->GetWindowRect(c4); 
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);

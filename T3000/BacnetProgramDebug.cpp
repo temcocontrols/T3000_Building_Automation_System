@@ -223,6 +223,8 @@ void CBacnetProgramDebug::Initial_List(unsigned int list_type)
 					ListCtrlEx::CStrList strlist;
 					for (int i=0;i<(int)sizeof(JumperStatus)/sizeof(JumperStatus[0]);i++)
 					{
+                        if (i == 4)   //以前出于某些原因  0  和 4 都代表 Thermistor Dry Contact; 这里下拉框不希望显示两个 一样的，所以过滤掉
+                            continue;
 						strlist.push_back(JumperStatus[i]);
 					}
 					m_program_debug_list.SetCellStringList(0, INPUT_JUMPER, strlist);		
@@ -1681,8 +1683,8 @@ LRESULT CBacnetProgramDebug::Fresh_Program_Debug_Item(WPARAM wParam,LPARAM lPara
 					if(temp_jump.CompareNoCase(JumperStatus[z]) == 0)
 					{
 						unsigned char temp_value = 0;
-						if((z == 0) || (z == 1) || (z == 2) || (z == 3) || (z == 4))
-							temp_value = z;
+                        if ((z == 0) || (z == 1) || (z == 2) || (z == 3) || (z == 4) || (z == 5))
+                            temp_value = z;
 						unsigned char temp1;
 						temp1 = m_Input_data.at(Changed_Item).decom ;
 						temp1 = temp1 & 0x0f;
