@@ -422,6 +422,10 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 	{
 		OUTPUT_LIMITE_ITEM_COUNT = 0;
 	}
+    else if ((bacnet_device_type == STM32_CO2_NET) || (bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_PRESSURE_NET))
+    {
+        OUTPUT_LIMITE_ITEM_COUNT = 3;
+    }
 	else if (bacnet_device_type == PM_T3_LC)
 	{
 		OUTPUT_LIMITE_ITEM_COUNT = 8;
@@ -1707,7 +1711,7 @@ void CBacnetOutput::Reset_Output_Rect()
 		{
 			CRect temp_mynew_rect;
 			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
-			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), NULL);
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
 		}
 		else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
 		{

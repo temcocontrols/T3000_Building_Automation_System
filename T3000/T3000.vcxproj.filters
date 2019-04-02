@@ -717,6 +717,9 @@
     <ClCompile Include="BacnetAddRemoteDevice.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ZigbeeRepeater.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ApplyDisable.bmp">
@@ -1850,6 +1853,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BacnetAddRemoteDevice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ZigbeeRepeater.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

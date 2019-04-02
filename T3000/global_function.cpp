@@ -817,83 +817,6 @@ BOOL IS_Temco_Product(int product_model)
     {
         return true;
     }
-#if 0
-	switch(product_model)
-	{
-		    case   PM_TSTAT5B				   :
-			case   PM_TSTAT5A				   :
-			case   PM_TSTAT5B2				   :
-			case   PM_TSTAT5C				   :
-			case   PM_TSTAT6				   :
-			case   PM_TSTAT7				   :
-			case   PM_TSTAT5i				   :
-			case   PM_TSTAT8				   :
-			case   PM_TSTAT8_WIFI:
-			case   PM_TSTAT8_OCC:
-			case   PM_TSTAT7_ARM:
-			case   PM_TSTAT8_220V:
-
-			case   PM_TSTAT5D				   :
-			case   PM_AirQuality			   :
-			case   PM_HUMTEMPSENSOR			   :
-			case   PM_TSTATRUNAR			   :
-			case   PM_TSTAT5E				   :
-			case   PM_TSTAT5F				   :
-			case   PM_TSTAT5G				   :
-			case   PM_TSTAT5H				   :
-			case   PM_T3PT10				   :
-			case   PM_T3IOA					   :
-			case   PM_T332AI				   :
-			case   PM_T38AI16O				   :
-			case   PM_T38I13O				   :
-			case   PM_T34AO					   :
-			case   PM_T36CT					   :
-			case   PM_ZIGBEE				   :
-			case   PM_FLEXDRIVER			   :
-			case   PM_T3PERFORMANCE			   :
-			case   PM_SOLAR					   :
-			case   PM_FWMTRANSDUCER			   :
-			case   PM_CO2_NET				   :
-			case   PM_CO2_RS485				   :
-			case   PM_CO2_NODE				   :
-			case   PM_MINIPANEL				   :
-			case   PM_MINIPANEL_ARM					:
-			case   PM_CS_SM_AC				   :
-			case   PM_CS_SM_DC				   :
-			case   PM_CS_RSM_AC				   :
-			case   PM_CS_RSM_DC				   :
-			case   PM_PRESSURE				   :
-			case   PM_PM5E					   :
-			case   PM_HUM_R					   :
-			case   PM_T322AI				   :
-			case   PWM_TRANSDUCER				:
-			case   PM_T38AI8AO6DO			   :
-			case   PM_PRESSURE_SENSOR		   :
-			case   PM_T3PT12				   :
-			case   PM_T36CTA                   :
-			case   PM_CM5					   :
-			case   PM_TSTAT6_HUM_Chamber	   :
-			case   PM_BEENY					   :
-			case   PM_WATER_SENSOR         	   :
-			case   PM_NC					   :
-			case   PM_LightingController	   :
-			case   PM_BTU_METER 			   :
-			case   PM_MINI_TOP				   :
-			case   PM_LABBATS				   :
-			case   PM_TESTER_JIG			   :
-			case   STM32_CO2_NET			   :
-			case   STM32_CO2_RS485			   :
-			case   STM32_HUM_NET			   :
-			case   STM32_HUM_RS485			   :
-			case   STM32_PRESSURE_NET		   :
-			case   STM32_PRESSURE_RS3485	   :
-			case   STM32_CO2_NODE:
-			case   PM_T3_LC:
-			       return TRUE;
-			default:
-			       return FALSE;
-	}
-#endif
 }
 // Function : 获得单位名称，此单位用于Input Grid，Output Grid，Output Set Grid，主界面的Grid等等。
 // Param: int nRange: 指示当前的Range的选择值。函数应该根据Range的选择以及TStat的型号，
@@ -4236,6 +4159,51 @@ int handle_read_pic_data_ex(char *npoint,int nlength)
 
 
 
+int Bacnet_Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id)
+{
+    // uint32_t device_id = 0;
+    bool status = false;
+    unsigned max_apdu = 0;
+    BACNET_ADDRESS src;
+    bool next_device = false;
+    static unsigned index = 0;
+    static unsigned property = 0;
+    /* list of required (and some optional) properties in the
+    Device Object
+    note: you could just loop through
+    all the properties in all the objects. */
+    int object_props[] = {
+        property_id//PROP_MODEL_NAME//PROP_OBJECT_LIST
+    };
+    g_invoke_id = Send_Read_Property_Request(deviceid, object_type, object_instance, (BACNET_PROPERTY_ID)object_props[property], BACNET_ARRAY_ALL);
+
+    return g_invoke_id;
+}
+
+
+
+void localhandler_read_property_ack(
+    uint8_t * service_request,
+    uint16_t service_len,
+    BACNET_ADDRESS * src,
+    BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data)
+{
+    int len = 0;
+    BACNET_READ_PROPERTY_DATA data;
+
+    (void)src;
+    (void)service_data;        /* we could use these... */
+    len = rp_ack_decode_service_request(service_request, service_len, &data);
+
+    if (len > 0)
+    {
+        //local_rp_ack_print_data(&data);
+        BACNET_APPLICATION_DATA_VALUE value;
+        local_value_rp_ack_print_data(&data,value);
+        Sleep(1);
+    }
+}
+
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 void local_handler_conf_private_trans_ack(
     uint8_t * service_request,
@@ -4257,16 +4225,11 @@ void local_handler_conf_private_trans_ack(
     service_data = service_data;
 
     len = 0;
-#if PRINT_ENABLED
-    printf("Received Confirmed Private Transfer Ack!\n");
-#endif
+
 
     len = ptransfer_decode_service_request(service_request, service_len, &data);        /* Same decode for ack as for service request! */
     if (len < 0) {
 		return;
-#if PRINT_ENABLED
-        printf("cpta: Bad Encoding!\n");
-#endif
     }
     int receive_data_type;
     bool each_end_flag = false;
@@ -4462,6 +4425,7 @@ void Inial_Product_Reglist_map()
 
 
     product_reglist_map.insert(map<int, CString>::value_type(PM_PM5E, _T("Tstat 5 I-6-7-8")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_PM5E_ARM, _T("Tstat 5 I-6-7-8")));
     product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT5F, _T("Tstat 5 I-6-7-8")));
     product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT5G, _T("Tstat 5 I-6-7-8")));
     product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT5H, _T("Tstat 5 I-6-7-8")));
@@ -4537,6 +4501,7 @@ void Inial_Product_map()
 
 
 	product_map.insert(map<int,CString>::value_type(PM_PM5E,_T("PM5E")));
+    product_map.insert(map<int, CString>::value_type(PM_PM5E_ARM, _T("PM5E_ARM")));
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT5F,_T("TStat5F")));
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT5G,_T("TStat5G")));
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT5H,_T("TStat5H")));
@@ -5148,7 +5113,7 @@ void Init_Service_Handlers(	void)
 
     apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_PRIVATE_TRANSFER,local_handler_conf_private_trans_ack);
     //apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_READ_PROPERTY,Read_Property_feed_back);
-
+    apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_READ_PROPERTY, localhandler_read_property_ack);
     
     /* set the handler for all the services we don't implement */
     /* It is required to send the proper reject message... */
@@ -5168,7 +5133,6 @@ void Init_Service_Handlers(	void)
     apdu_set_confirmed_handler(SERVICE_CONFIRMED_SUBSCRIBE_COV,
                                handler_cov_subscribe);
 
-    apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_READ_PROPERTY,	Localhandler_read_property_ack);
 
     ////#if 0
     ////	/* Adding these handlers require the project(s) to change. */
@@ -5260,44 +5224,76 @@ void local_rp_ack_print_data(	BACNET_READ_PROPERTY_DATA * data)
 #endif
     }
 }
-void Localhandler_read_property_ack(
-    uint8_t * service_request,
-    uint16_t service_len,
-    BACNET_ADDRESS * src,
-    BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data)
+
+
+void local_value_rp_ack_print_data(BACNET_READ_PROPERTY_DATA * data , BACNET_APPLICATION_DATA_VALUE &value)
 {
-//    int len = 0;
-//    BACNET_READ_PROPERTY_DATA data;
-//
-//    (void) src;
-//    (void) service_data;        /* we could use these... */
-//    len = rp_ack_decode_service_request(service_request, service_len, &data);
-//    //char my_pro_name[100];
-//    //char * temp = get_prop_name();
-//    //strcpy_s(my_pro_name,100,temp);
-//
-//#if 0
-//    fprintf(stderr, "Received Read-Property Ack!\n");
-//#endif
-//    if (len > 0)
-//    {
-//        local_rp_ack_print_data(&data);
-//        //	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,WM_COMMAND_WHO_IS,NULL);
-//    }
+    //BACNET_OBJECT_PROPERTY_VALUE object_value;  /* for bacapp printing */
+    //BACNET_APPLICATION_DATA_VALUE value;        /* for decode value data */
 
-	 int len = 0;
-	BACNET_READ_PROPERTY_DATA data;
+    int len = 0;
+    uint8_t *application_data;
+    int application_data_len;
+    bool first_value = true;
+    bool print_brace = false;
 
- 
-	if(service_data->invoke_id == g_invoke_id) {
-		len =
-			rp_ack_decode_service_request(service_request, service_len, &data);
-		if (len > 0) {
-			//rp_ack_print_data(&data);
-		}
 
-	}
+
+    if (data)
+    {
+        application_data = data->application_data;
+        application_data_len = data->application_data_len;
+        /* FIXME: what if application_data_len is bigger than 255? */
+        /* value? need to loop until all of the len is gone... */
+        for (;;)
+        {
+            //BACnet_Object_Property_Value_Own object_value;  /* for bacapp printing */
+            //BACNET_APPLICATION_DATA_VALUE value;        /* for decode value data */
+            len = bacapp_decode_application_data(application_data, (uint8_t)application_data_len, &value);
+            if (first_value && (len < application_data_len))
+            {
+                first_value = false;
+#if PRINT_ENABLED
+                fprintf(stdout, "{");
+#endif
+                print_brace = true;
+            }
+            receive_object_value.object_type = data->object_type;
+            receive_object_value.object_instance = data->object_instance;
+            receive_object_value.object_property = data->object_property;
+            receive_object_value.array_index = data->array_index;
+            receive_object_value.value = &value;
+
+            if (len > 0)
+            {
+                if (len < application_data_len)
+                {
+                    application_data += len;
+                    application_data_len -= len;
+                    /* there's more! */
+
+#if PRINT_ENABLED
+                    fprintf(stdout, ",");
+#endif
+                }
+                else
+                {
+                    break;
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+#if PRINT_ENABLED
+        if (print_brace)
+            fprintf(stdout, "}");
+        fprintf(stdout, "\r\n");
+#endif
+    }
 }
+
 
 //This function add by Fance Du, used for changed the CString to hex
 //2013 12 02
@@ -5719,7 +5715,7 @@ BOOL CheckForUpdate(
 
 
 
-#if 1
+
 int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 {
 	refresh_net_device temp;
@@ -5791,6 +5787,11 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	{
 		if (temp_data.reg.product_id<220)
 		{
+            if ((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
+            {
+                g_Print.Format(_T("Serial = %12u     ID = %d ,ip = %s  product id error ,ignore this package!"), nSerial, temp_data.reg.modbus_id, nip_address);
+                DFTrace(g_Print);
+            }
 			return m_refresh_net_device_data.size();
 		}
 	}
@@ -5943,7 +5944,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 
 	return m_refresh_net_device_data.size();
 }
-#endif
+
 
  
 
@@ -7795,16 +7796,24 @@ int LoadModbusConfigFile_Cache(LPCTSTR tem_read_path)
 
 
 	memcpy(&Device_Basic_Setting.reg,temp_buffer,400); //Setting 的400个字节;
-
+    unsigned short * temp_short_point = temp_buffer + 200;
 	for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
 	{
-		memcpy( &m_Output_data.at(i),temp_buffer + 200 + i*23,sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
+		memcpy( &m_Output_data.at(i), temp_short_point + i*23,sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
 	}
+    temp_short_point = temp_short_point + BAC_OUTPUT_ITEM_COUNT * 23;
 
 	for (int j=0;j<BAC_INPUT_ITEM_COUNT;j++)
 	{
-		memcpy(&m_Input_data.at(j),temp_buffer + 200 + 23*64 + j*23,sizeof(Str_in_point)); //Input 46 个字节 ;
+		memcpy(&m_Input_data.at(j), temp_short_point + j*23,sizeof(Str_in_point)); //Input 46 个字节 ;
 	}
+    temp_short_point = temp_short_point + BAC_INPUT_ITEM_COUNT * 23;
+
+    for (int j = 0;j<BAC_VARIABLE_ITEM_COUNT;j++)
+    {
+        memcpy(&m_Variable_data.at(j), temp_short_point + j * 20, sizeof(Str_variable_point)); //Input 46 个字节 ;
+    }
+    temp_short_point = temp_short_point + BAC_VARIABLE_ITEM_COUNT * 20;
 
 	return 1;
 
@@ -8174,15 +8183,25 @@ void SaveModbusConfigFile_Cache(CString &SaveConfigFilePath,char *npoint,unsigne
 		memset(temp_update_buffer,0,50000);
 
 		memcpy(temp_update_buffer,&Device_Basic_Setting.reg,400); //Setting 的400个字节;
+
+        char * temp_buffer = NULL;
+        temp_buffer = temp_update_buffer + 400;
 		for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
 		{
-			memcpy(temp_update_buffer + 400 + i*(23*2), &m_Output_data.at(i),sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
+			memcpy(temp_buffer + i*(23*2), &m_Output_data.at(i),sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
 		}
-
+        temp_buffer = temp_buffer + BAC_OUTPUT_ITEM_COUNT*(23 * 2);
 		for (int j=0;j<BAC_INPUT_ITEM_COUNT;j++)
 		{
-			memcpy(temp_update_buffer + 400 + 23*2*64 + j*23*2,&m_Input_data.at(j),sizeof(Str_in_point)); //Input 46 个字节 ;
+			memcpy(temp_buffer + j*23*2,&m_Input_data.at(j),sizeof(Str_in_point)); //Input 46 个字节 ;
 		}
+        temp_buffer = temp_buffer + BAC_INPUT_ITEM_COUNT * 23 * 2;
+        for (int j = 0;j<BAC_VARIABLE_ITEM_COUNT;j++)
+        {
+            memcpy(temp_buffer + BAC_VARIABLE_ITEM_COUNT*20*2, &m_Variable_data.at(j), sizeof(Str_variable_point)); //variable 39 个字节 ;
+        }
+
+
 		memcpy(temp_buffer + 5,temp_update_buffer,bufferlength);
 		temp_point = temp_point + bufferlength;
 		dwFileLen = bufferlength + 5;//这5个字节是 版本和时间 ;

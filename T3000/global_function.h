@@ -131,6 +131,12 @@ void local_handler_conf_private_trans_ack(
 	uint16_t service_len,
 	BACNET_ADDRESS * src,
 	BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
+int Bacnet_Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id);
+void localhandler_read_property_ack(
+    uint8_t * service_request,
+    uint16_t service_len,
+    BACNET_ADDRESS * src,
+    BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data); //标准的读属性;
 
 void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_ADDRESS * src);
 
@@ -138,12 +144,8 @@ void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken);
 char * intervaltotext(char *textbuf, long seconds , unsigned minutes , unsigned hours, char *c =":");
 char * intervaltotextfull(char *textbuf, long seconds , unsigned minutes , unsigned hours,char *c =":");
  DWORD WINAPI   MSTP_Receive(LPVOID lpVoid);
- void Localhandler_read_property_ack(
-	 uint8_t * service_request,
-	 uint16_t service_len,
-	 BACNET_ADDRESS * src,
-	 BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
   void local_rp_ack_print_data(	BACNET_READ_PROPERTY_DATA * data);
+  void local_value_rp_ack_print_data(BACNET_READ_PROPERTY_DATA * data, BACNET_APPLICATION_DATA_VALUE &value);
   void close_bac_com();
  bool Initial_bac(int comport = 0,CString bind_local_ip = _T(""),int n_baudrate = 19200);
   bool Open_bacnetSocket2(CString strIPAdress,unsigned short nPort,SOCKET &mysocket);

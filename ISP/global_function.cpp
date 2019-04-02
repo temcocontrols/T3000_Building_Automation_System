@@ -356,6 +356,9 @@ CString GetProductName(int ModelID) //TBD: Change this to an array
 	case PM_TSTAT5E:
 		strProductName=_T("TStat5E");  //
 		break;
+    case PM_PM5E_ARM:
+        strProductName = _T("PM5EARM");  //
+        break;
     case PM_PM5E:
         strProductName=_T("PM5E");  //
         break;

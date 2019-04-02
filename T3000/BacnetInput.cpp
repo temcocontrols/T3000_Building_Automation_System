@@ -122,7 +122,7 @@ BOOL CBacnetInput::OnInitDialog()
 	//SetIcon(m_hIcon,FALSE);
 
 	ShowWindow(FALSE);
-	//SetTimer(6,250,NULL);
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -320,6 +320,8 @@ void CBacnetInput::Initial_List()
 			ListCtrlEx::CStrList strlist;
 			for (int j=0;j<(int)sizeof(JumperStatus)/sizeof(JumperStatus[0]);j++)
 			{
+                if (j == 4)   //以前出于某些原因  0  和 4 都代表 Thermistor Dry Contact; 这里下拉框不希望显示两个 一样的，所以过滤掉
+                    continue;
 				strlist.push_back(JumperStatus[j]);
 			}
 			m_input_list.SetCellStringList(i, INPUT_JUMPER, strlist);		
@@ -501,7 +503,7 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 			if(temp_jump.CompareNoCase(JumperStatus[z]) == 0)
 			{
 				unsigned char temp_value = 0;
-				if((z == 0) || (z == 1) || (z == 2) || (z == 3) || (z == 4))
+				if((z == 0) || (z == 1) || (z == 2) || (z == 3) || (z == 4) || (z == 5))
 					temp_value = z;
 				unsigned char temp1;
 				temp1 = m_Input_data.at(Changed_Item).decom ;
@@ -568,6 +570,11 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		//INPUT_LIMITE_ITEM_COUNT = 8;
 		Minipanel_device = 1;
 	}
+    else if ((bacnet_device_type == STM32_CO2_NET) || (bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_PRESSURE_NET))
+    {
+        INPUT_LIMITE_ITEM_COUNT = 3;
+        Minipanel_device = 0;
+    }
 	else
 	{
 		    INPUT_LIMITE_ITEM_COUNT = BAC_INPUT_ITEM_COUNT;
@@ -866,27 +873,37 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		m_input_list.SetItemText(i,INPUT_DECOM,temp_status);
 
 
-		if(temp_jumper == 1)
-		{
-			temp_status.Format(JumperStatus[1]);
-		}
-		else if(temp_jumper == 2)
-		{
-			temp_status.Format(JumperStatus[2]);
-		}
-		else if(temp_jumper == 3)
-		{
-			temp_status.Format(JumperStatus[3]);
-		}
-		else if(temp_jumper == 0)
-		{
-			temp_status.Format(JumperStatus[0]);
-		}
-		else
-		{
-			temp_status.Format(JumperStatus[0]);
-			m_Input_data.at(i).decom = m_Input_data.at(i).decom & 0x0f;	 //如果最高位不是 有效值，清零;
-		}
+        if ((temp_jumper >= 0) && (temp_jumper < sizeof(JumperStatus) / sizeof(JumperStatus[0])))
+        {
+            temp_status.Format(JumperStatus[temp_jumper]);
+        }
+        else
+        {
+            temp_status.Format(JumperStatus[0]);
+            m_Input_data.at(i).decom = m_Input_data.at(i).decom & 0x0f;	 //如果最高位不是 有效值，清零;
+        }
+
+		//if(temp_jumper == 1)
+		//{
+		//	temp_status.Format(JumperStatus[1]);
+		//}
+		//else if(temp_jumper == 2)
+		//{
+		//	temp_status.Format(JumperStatus[2]);
+		//}
+		//else if(temp_jumper == 3)
+		//{
+		//	temp_status.Format(JumperStatus[3]);
+		//}
+		//else if(temp_jumper == 0)
+		//{
+		//	temp_status.Format(JumperStatus[0]);
+		//}
+		//else
+		//{
+		//	temp_status.Format(JumperStatus[0]);
+		//	m_Input_data.at(i).decom = m_Input_data.at(i).decom & 0x0f;	 //如果最高位不是 有效值，清零;
+		//}
 		m_input_list.SetItemText(i,INPUT_JUMPER,temp_status);
 
 
@@ -1409,7 +1426,7 @@ void CBacnetInput::Reset_Input_Rect()
 	{
 		CRect temp_mynew_rect;
 		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
-		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), NULL);
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
 	}
 	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
 	{
@@ -1438,7 +1455,7 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 
 			if(g_protocol == PROTOCOL_BIP_TO_MSTP)
 			{
-				PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
+				//PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
 			}
 			else if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_INPUT))  )	//GSM连接时不要刷新;
 			{

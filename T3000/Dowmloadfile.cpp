@@ -988,12 +988,14 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
     CString str_product_section;
 
     DeleteUrlCacheEntry(_T("https://temcocontrols.com/ftp/firmware/ProductPath.ini")); // «Â¿Ìª∫¥Ê
-    Sleep(2000);
-
+    Sleep(1000);
+    DeleteUrlCacheEntry(_T("https://temcocontrols.com/ftp/software/20T3000Update.zip "));
+    Sleep(1000);
     HRESULT download_ret = NULL;
     DownloadIniFilePath = Folder_Path + _T("//ProductPath.ini");
     CheckVersionIniFilePath = Folder_Path + _T("//CheckVersionPath.ini");
     download_ret = URLDownloadToFile(NULL, _T("https://temcocontrols.com/ftp/firmware/ProductPath.ini"), DownloadIniFilePath, 0, NULL);
+
     //T3000_FTP_Version = GetPrivateProfileIntW(_T("Version"), _T("T3000Version"), 0, DownloadIniFilePath);
     if (download_ret != S_OK)
     {

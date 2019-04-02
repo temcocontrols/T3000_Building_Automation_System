@@ -564,7 +564,7 @@ BOOL CParameterDlg::OnInitDialog()
 			m_inputSelect3.AddString(INPUT_SETTING[i]);
 		}
 	}
-    else if ((product_register_value[7] == PM_PM5E) || (product_register_value[7] == PM_TSTAT5E))
+    else if ((product_register_value[7] == PM_PM5E) || (product_register_value[7] == PM_PM5E_ARM) || (product_register_value[7] == PM_TSTAT5E))
     {
         //Fandu add 2018 01 08;
         m_InputSelect1.ResetContent();
@@ -1491,7 +1491,7 @@ void CParameterDlg::OnCbnSelchangeInputselect1()
     if(g_ParamLevel==1)
         return;
     int sel = 0;
-    if ((product_register_value[7] == PM_PM5E) || (product_register_value[7] == PM_TSTAT5E))
+    if ((product_register_value[7] == PM_PM5E) || (product_register_value[7] == PM_PM5E_ARM) || (product_register_value[7] == PM_TSTAT5E))
     {
         int temp_sel;
         CString selstring;
@@ -1621,7 +1621,7 @@ void CParameterDlg::OnCbnSelchangeEapplication()
         nRet = write_one(g_tstat_id,reg_tststold[125],m_application_ctrl.GetCurSel()); //tstat6 350
 
     }
-    else if(((product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E)||(product_register_value[7]==PM_TSTATRUNAR)) && (m_fFirmwareVersion >= 35.4))//0912
+    else if(((product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E || product_register_value[7] == PM_PM5E_ARM)||(product_register_value[7]==PM_TSTATRUNAR)) && (m_fFirmwareVersion >= 35.4))//0912
     {
         write_one(g_tstat_id,423 ,m_application_ctrl.GetCurSel()); //
         nRet=write_one(g_tstat_id,125 ,m_application_ctrl.GetCurSel()); //
@@ -2056,7 +2056,7 @@ void CParameterDlg::OnEnKillfocusSpset1()
             }
             product_register_value[MODBUS_DAY_SETPOINT] = short(nOrig*10);
         }
-        else if(m_version<34.9 || product_register_value[7] == PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR))
+        else if(m_version<34.9 || product_register_value[7] == PM_TSTAT5E||product_register_value[7] == PM_PM5E || product_register_value[7] == PM_PM5E_ARM ||(product_register_value[7]==PM_TSTATRUNAR))
         {
             int nRet = write_one(g_tstat_id, 135, short(nOrig));	//Fance comments: because the version which below 34.9 is too low ,135 register I Don't know it's real meaning.
         }
@@ -2446,7 +2446,7 @@ void CParameterDlg::OnEnKillfocusSetvalue1()
 
 
     }
-    else if(product_register_value[7] == PM_TSTAT5G || product_register_value[7] == PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR))  // 只有5E使用135
+    else if(product_register_value[7] == PM_TSTAT5G || product_register_value[7] == PM_TSTAT5E||product_register_value[7] == PM_PM5E || product_register_value[7] == PM_PM5E_ARM ||(product_register_value[7]==PM_TSTATRUNAR))  // 只有5E使用135
     {
         //short nVal = short(fValue);
         /*Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,135,short(fValue),
@@ -2736,7 +2736,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
     }
 
 #if 1
-    if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT8||product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR)
+    if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT8||product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E|| product_register_value[7] == PM_PM5E_ARM || (product_register_value[7]==PM_TSTATRUNAR)
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 		)
     {
@@ -3445,7 +3445,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 
     float m_fFirmwareVersion=get_curtstat_version();//0912
-    if (product_register_value[7] == PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR))//0912
+    if (product_register_value[7] == PM_TSTAT5E||product_register_value[7] == PM_PM5E || product_register_value[7] == PM_PM5E_ARM ||(product_register_value[7]==PM_TSTATRUNAR))//0912
     {
         short nOccupied = product_register_value[184];  // Day setpoint option
         BOOL bOccupied = nOccupied & 0x0001;
@@ -3551,7 +3551,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
     if(product_type!=T3000_6_ADDRESS)
     {
-        if(m_version<34.9 || product_register_value[7] == PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR)||
+        if(m_version<34.9 || product_register_value[7] == PM_TSTAT5E||product_register_value[7] == PM_PM5E || product_register_value[7] == PM_PM5E_ARM ||(product_register_value[7]==PM_TSTATRUNAR)||
                 (product_register_value[7] == PM_TSTAT5G))   //
         {
             strTemp.Format(_T("%d"),(int)product_register_value[MODBUS_COOLING_SETPOINT]);//135
@@ -3562,7 +3562,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
         }
 
         m_dayOccEdt1.SetWindowText(strTemp+GetTempUnit());
-        if (product_register_value[7] == PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR)||
+        if (product_register_value[7] == PM_TSTAT5E||product_register_value[7] == PM_PM5E || product_register_value[7] == PM_PM5E_ARM ||(product_register_value[7]==PM_TSTATRUNAR)||
                 (product_register_value[7] == PM_TSTAT5G))//0911
         {
             strUnit=GetTempUnit();
@@ -3958,7 +3958,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
         m_heatdbN=((float)(short)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND])/10;//352
         m_heatspN=((float)(short)product_register_value[MODBUS_NIGHT_HEATING_SETPOINT])/10;
     }
-    else if ((product_register_value[7] == PM_PM5E) || (product_register_value[7] == PM_TSTAT5E))
+    else if ((product_register_value[7] == PM_PM5E) || product_register_value[7] == PM_PM5E_ARM || (product_register_value[7] == PM_TSTAT5E))
     {
         //Fandu add 2018 01 08;
         int TempSel = product_register_value[MODBUS_TEMP_SELECT];
@@ -4431,6 +4431,7 @@ void CParameterDlg::ShowPID3()
 		||
             product_register_value[7]==PM_TSTAT5E||
             product_register_value[7] == PM_PM5E||
+        product_register_value[7] == PM_PM5E_ARM ||
             (product_register_value[7]==PM_TSTATRUNAR)||
             ((product_register_value[7]==PM_TSTAT5G)
              &&(m_fFirmwareVersion>=37.5))
@@ -5355,7 +5356,7 @@ extern bool b_pause_refresh_tree ;
 
 void CParameterDlg::OnBnClickedTrendlogview()
 {
-    if ((product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR)||(product_register_value[7]==PM_TSTAT5G))||(product_register_value[7]==PM_TSTAT6)||(product_register_value[7] == PM_TSTAT8)
+    if ((product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E || product_register_value[7] == PM_PM5E_ARM ||(product_register_value[7]==PM_TSTATRUNAR)||(product_register_value[7]==PM_TSTAT5G))||(product_register_value[7]==PM_TSTAT6)||(product_register_value[7] == PM_TSTAT8)
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V) 
 		||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT7))
     {

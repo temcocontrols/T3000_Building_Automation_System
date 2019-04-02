@@ -26,7 +26,7 @@
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);  
 
 LPFN_ISWOW64PROCESS fnIsWow64Process;  
-const int g_versionNO= 20190313;
+const unsigned int g_versionNO= 20190329;
 
 
 #ifdef _DEBUG
@@ -50,7 +50,7 @@ CT3000App::CT3000App()
     char strASCIICompileTime[128] = { 0 };
     sprintf(strASCIICompileTime, "    %s ", __DATE__);
 
-
+    //_CrtSetBreakAlloc(261); //257
     MultiByteToWideChar(CP_ACP, 0, (char *)strASCIICompileTime, (int)strlen(strASCIICompileTime) + 1, CurrentT3000Version.GetBuffer(MAX_PATH), MAX_PATH);
     CurrentT3000Version.ReleaseBuffer();
 
@@ -66,7 +66,7 @@ CT3000App::CT3000App()
 #endif 
     //*******************************************************
     
-	T3000_Version = 20190313; //
+	T3000_Version = g_versionNO; //
 
 	m_lastinterface=19;
 }

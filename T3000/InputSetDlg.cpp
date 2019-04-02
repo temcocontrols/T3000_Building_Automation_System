@@ -292,6 +292,7 @@ BOOL CInputSetDlg::OnInitDialog()
 		case PM_TSTAT8_220V:	m_inRows = 12; break;
 		case 16:m_inRows=10;break; // 5E
         case PM_PM5E:m_inRows=10;break; // 5E
+        case PM_PM5E_ARM:m_inRows = 10;break; // 5E
 		case 17:m_inRows=5;break; // 5F
 		case 18:m_inRows=5;break; // 5G
 		case 19:m_inRows=9;break; // 5H
@@ -374,7 +375,7 @@ BOOL CInputSetDlg::OnInitDialog()
 	hIcon_Exit = AfxGetApp()->LoadIcon(IDI_ICON_EXIT);
 	((CButton *)GetDlgItem(IDEXIT))->SetIcon(hIcon_Exit);
 
-	if(m_nModel == 16||m_nModel == PM_PM5E)
+	if(m_nModel == 16||m_nModel == PM_PM5E || m_nModel == PM_PM5E_ARM)
 	{
 		Init_not_5ABCD_Grid();
 		m_nCurCol=1;
@@ -2004,7 +2005,7 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 		OnClickTstat6Grid(m_nCurRow, m_nCurCol, rc);
 		return;
 	}
-	if ((m_nModel == PM_TSTAT5E||m_nModel == PM_PM5E)||(product_register_value[7]==PM_TSTATRUNAR))
+	if ((m_nModel == PM_TSTAT5E||m_nModel == PM_PM5E || m_nModel == PM_PM5E_ARM)||(product_register_value[7]==PM_TSTATRUNAR))
 	{
 		ClickMsflexgrid5E(m_nCurRow, m_nCurCol, rc);
 		return;
@@ -2540,7 +2541,7 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 void CInputSetDlg::OnCbnSelchangeRangCombo()
 {
 //	if( m_nModel == 16 || m_nModel == PM_TSTAT6 )
-	if(m_nModel == PM_TSTAT6 || m_nModel == PM_TSTAT7|| m_nModel == PM_TSTAT8|| m_nModel == PM_TSTAT5E|| m_nModel == PM_PM5E||m_nModel==PM_TSTATRUNAR|| m_nModel == PM_TSTAT5i
+	if(m_nModel == PM_TSTAT6 || m_nModel == PM_TSTAT7|| m_nModel == PM_TSTAT8|| m_nModel == PM_TSTAT5E|| m_nModel == PM_PM5E || m_nModel == PM_PM5E_ARM  ||m_nModel==PM_TSTATRUNAR|| m_nModel == PM_TSTAT5i
 		|| (m_nModel == PM_TSTAT8_WIFI) || (m_nModel == PM_TSTAT8_OCC) || (m_nModel == PM_TSTAT7_ARM) || (m_nModel == PM_TSTAT8_220V))  //tstat6
 	{
 		OnCbnSelchangeRangComboFor5E();
@@ -3115,7 +3116,7 @@ void CInputSetDlg::OnEnKillfocusInputnameedit()
 	if(strText.CompareNoCase(strInName)==0)
 		return;
 	int nFlag = product_register_value[7];
-	if ((product_register_value[7]==PM_TSTAT5G)||(product_register_value[7]==PM_TSTAT5E)||(product_register_value[7]==PM_PM5E)||(product_register_value[7]==PM_TSTATRUNAR)||(product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT5i||(product_register_value[7]==PM_TSTAT8)
+	if ((product_register_value[7]==PM_TSTAT5G)||(product_register_value[7]==PM_TSTAT5E)||(product_register_value[7]==PM_PM5E) || (product_register_value[7] == PM_PM5E_ARM) ||(product_register_value[7]==PM_TSTATRUNAR)||(product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT5i||(product_register_value[7]==PM_TSTAT8)
 		|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V)
 		||(product_register_value[7]==PM_TSTAT7)))
 	{
@@ -6177,7 +6178,7 @@ void CInputSetDlg::ClickMsflexgrid1()
 void CInputSetDlg::OnCbnSelendokRangCombo()
 {
 	int nFlag = product_register_value[7];
-	if(m_nModel == PM_TSTAT6 || m_nModel == PM_TSTAT7|| m_nModel == PM_TSTAT5E|| m_nModel == PM_PM5E||m_nModel==PM_TSTATRUNAR|| m_nModel == PM_TSTAT5i|| m_nModel == PM_TSTAT8
+	if(m_nModel == PM_TSTAT6 || m_nModel == PM_TSTAT7|| m_nModel == PM_TSTAT5E|| m_nModel == PM_PM5E || m_nModel == PM_PM5E_ARM ||m_nModel==PM_TSTATRUNAR|| m_nModel == PM_TSTAT5i|| m_nModel == PM_TSTAT8
 		|| (m_nModel == PM_TSTAT8_WIFI) || (m_nModel == PM_TSTAT8_OCC) || (m_nModel == PM_TSTAT7_ARM) || (m_nModel == PM_TSTAT8_220V)
 		)  //tstat6
 	{

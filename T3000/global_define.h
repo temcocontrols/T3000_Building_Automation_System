@@ -5,7 +5,7 @@
 //  9800	-	9999    200个寄存器   setting
 //  10000	-   11471   1472		  OUT
 //  11472   -   12943   1472		  IN
-//	12943   -   15502	2560		  VAR					sizeof(Str_variable_point)= 39
+//	12944   -   15502	2560		  VAR					sizeof(Str_variable_point)= 39
 //	15503   -  	15806	16*19=304	  PRG	                sizeof(Str_program_point) = 37
 //  15807   -   15974	21*8=336	  SCH			sizeof(Str_weekly_routine_point) = 42
 //	15975   -	16043		17*4=68		  HOL				sizeof(Str_annual_routine_point) = 33
@@ -15,10 +15,10 @@
 #define BAC_SETTING_START_REG		9800
 #define BAC_OUT_START_REG			10000
 #define BAC_IN_START_REG			11472
-#define BAC_VAR_START_REG			12943
-#define BAC_PRG_START_REG			15503
-#define BAC_SCH_START_REG			15807
-#define BAC_HOL_START_REG			15975
+#define BAC_VAR_START_REG			12944
+#define BAC_PRG_START_REG			15504
+#define BAC_SCH_START_REG			15808
+#define BAC_HOL_START_REG			15976
 #define BAC_PID_CONTROL_START_REG   32712
 #define BAC_CUSTOMER_TABLE_START    32936
 
@@ -838,16 +838,16 @@ const CString Input_List_Analog_Units[] =
 const CString Input_Analog_Units_Array[] =
 {
 	_T("Unused"),
-	_T("Y3K -40 to 150"),
-	_T("Y3K -40 to 300"),
+	_T("PT100 -40 to 1000"),
+	_T("PT100 -40 to 1800"),
 	_T("10K Type2"),
 	_T("10K Type2"),
-	_T("G3K -40 to 120"),
-	_T("G3K -40 to 250"),
+	_T("PT1000 -40 to 450"),
+	_T("PT1000 -40 to 800"),
 	_T("10K Type3"),
 	_T("10K Type3"),
-	_T("A10K -50 to 110"),
-	_T("A10K -60 to 200"),
+	_T("PT 1K -200 to 300"),
+	_T("PT 1K -200 to 570"),
 	_T("0.0 to 5.0"),
 	_T("0.0 to 100"),
 	_T("4 to 20"),
@@ -1412,7 +1412,9 @@ const CString JumperStatus[] =
 	_T("Thermistor Dry Contact"),
 	_T("4-20 ma"),//_T("4-20 ma / 0-24 V"),
 	_T("0-5 V"),
-	_T("0-10 V")
+	_T("0-10 V"),
+    _T("Thermistor Dry Contact"),
+    _T("PT 1K")
 };
 
 
@@ -2082,3 +2084,7 @@ const int REGISTER_CHARACTER_STRING_LO_HI = 16;
 
 const int DIGITAL_DIRECT = 0; //自定义 数字量Range
 const int DIGITAL_INVERS = 1;
+
+const int DELTA_HEIGHT = 10; // 用于窗口最大化之后 显示的差值，以免挡住下面的状态栏
+
+

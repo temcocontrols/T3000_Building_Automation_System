@@ -1049,7 +1049,7 @@ DWORD WINAPI  CFlash_Multy::multy_isp_thread(LPVOID lpVoid)
         {
             product_type =T3000_6_ADDRESS;
         }
-        else if((nFlag == PM_TSTAT5E||nFlag == PM_PM5E)||(product_register_value[7]==PM_TSTATRUNAR) || (nFlag == PM_TSTAT5H)||(nFlag == PM_TSTAT5G))
+        else if((nFlag == PM_TSTAT5E||nFlag == PM_PM5E || nFlag == PM_PM5E_ARM)||(product_register_value[7]==PM_TSTATRUNAR) || (nFlag == PM_TSTAT5H)||(nFlag == PM_TSTAT5G))
         {
             product_type = T3000_5EH_LCD_ADDRESS;
         }

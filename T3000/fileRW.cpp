@@ -3763,7 +3763,7 @@ void get_write_var_line_input_output(TCHAR *buf,float tstat_version,int inputno,
 	    
 		int Model_ID=read_one(now_tstat_id,7,5);
 		int nFlag = Model_ID;
-	if ((Model_ID==PM_TSTAT5G)||(Model_ID==PM_TSTAT5E)||(Model_ID==PM_PM5E)||(Model_ID==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT5i)||(Model_ID==PM_TSTAT7)||(Model_ID==PM_TSTAT8)
+	if ((Model_ID==PM_TSTAT5G)||(Model_ID==PM_TSTAT5E)||(Model_ID==PM_PM5E) || (Model_ID == PM_PM5E_ARM)  ||(Model_ID==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT5i)||(Model_ID==PM_TSTAT7)||(Model_ID==PM_TSTAT8)
 		|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
 	{
 		strText.TrimRight();
@@ -4059,7 +4059,7 @@ void get_write_var_line_output(TCHAR *buf,float tstat_version,int outputno,CStdi
 		 int Model_ID =read_one(now_tstat_id,7,5);
 		if(Model_ID>0)
 		{  
-			if ((Model_ID == PM_TSTAT5G) || (Model_ID == PM_TSTAT5E) || (Model_ID == PM_PM5E) || (Model_ID == PM_TSTAT6) || (product_register_value[7] == PM_TSTAT5i) || (Model_ID == PM_TSTAT7) || (Model_ID == PM_TSTAT8)
+			if ((Model_ID == PM_TSTAT5G) || (Model_ID == PM_TSTAT5E) || (Model_ID == PM_PM5E) || (Model_ID == PM_PM5E_ARM) || (Model_ID == PM_TSTAT6) || (product_register_value[7] == PM_TSTAT5i) || (Model_ID == PM_TSTAT7) || (Model_ID == PM_TSTAT8)
 				|| (Model_ID == PM_TSTAT8_WIFI) || (Model_ID == PM_TSTAT8_OCC) || (Model_ID == PM_TSTAT7_ARM) || (Model_ID == PM_TSTAT8_220V))
 			{
 				strText.TrimRight();
@@ -7632,6 +7632,7 @@ _Twrite_to_file_a_line(out,_T("//Input Name Config"));//space
             m_inRows=11;
         }break;
     case PM_PM5E:
+    case PM_PM5E_ARM:
         {
             m_outRows=8;
             m_inRows=11;

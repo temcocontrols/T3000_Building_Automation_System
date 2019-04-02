@@ -1197,7 +1197,6 @@ void CImageTreeCtrl::turn_item_image(HTREEITEM hItem,bool state)
 	case 12:
 	case 14:
 	case 16:
-    case PM_PM5E:
 	case 18:
 	case 20:
 		if(state == false)
@@ -1206,7 +1205,7 @@ void CImageTreeCtrl::turn_item_image(HTREEITEM hItem,bool state)
 			brother_nSelectedImage++;
 		}
 	break;
-		case 7:
+	case 7:
 	case 9:
 	case 11:
 	case 13:
@@ -1229,6 +1228,14 @@ void CImageTreeCtrl::turn_item_image(HTREEITEM hItem,bool state)
 		   brother_nSelectedImage++;
 	   }
 	break;
+    case 28:
+        if (state == false)
+        {
+            brother_nImage++;
+            brother_nSelectedImage++;
+        }
+        break;
+
 
 	}
 	SetItemImage(hItem,brother_nImage,brother_nSelectedImage);
@@ -1266,6 +1273,7 @@ BOOL CImageTreeCtrl::is_connection_by_image(int nImage,int nSelectedImage)
 	case 14:
 	case 16:
     case PM_PM5E:
+    case PM_PM5E_ARM:
 		return true;
 	case 7:
 	case 9:
