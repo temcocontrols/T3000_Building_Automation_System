@@ -11,7 +11,7 @@
 #include "Bacnet_Include.h"
 #include "global_function.h"
 #include "BacnetProgramEdit.h"
-#include "NewT3000ProgramEditorDlg.h"
+#include "ControlBasicEditorView.h"
 #include "global_define.h"
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 
@@ -422,7 +422,7 @@ void CBacnetProgram::OnBnClickedButton1()
 	temp_show_info.Format(_T("Reading program code %d ..."), program_list_line + 1);
 	SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_show_info);
 
-	CNewT3000ProgramEditorDlg dlg;
+	ControlBasicEditorView dlg;
 	dlg.DoModal();
 }
 

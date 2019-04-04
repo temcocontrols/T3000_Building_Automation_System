@@ -696,7 +696,7 @@
     <ClCompile Include="TstatIconSetting.cpp">
       <Filter>Source Files\TSTAT</Filter>
     </ClCompile>
-    <ClCompile Include="NewT3000ProgramEditorDlg.cpp">
+    <ClCompile Include="ControlBasicEditorView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Powermeter.cpp">
@@ -1813,7 +1813,7 @@
     <ClInclude Include="TstatIconSetting.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NewT3000ProgramEditorDlg.h">
+    <ClInclude Include="ControlBasicEditorView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Powermeter.h">

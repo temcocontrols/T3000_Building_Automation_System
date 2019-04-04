@@ -852,7 +852,7 @@ Update by Fance
 #include "BacnetRemotePoint.h"
 #include "ShowMessageDlg.h"
 
-#include "NewT3000ProgramEditorDlg.h"
+#include "ControlBasicEditorView.h"
 int g_gloab_bac_comport = 1;
 int g_gloab_bac_baudrate = 19200;
 CString temp_device_id,temp_mac,temp_vendor_id;
@@ -884,7 +884,7 @@ CBacnetProgramEdit *ProgramEdit_Window = NULL;
 CBacnetScheduleTime *ScheduleEdit_Window = NULL;
 AnnualRout_InsertDia *HolidayEdit_Window = NULL;
 //define a dialg for new program ide 
-CNewT3000ProgramEditorDlg *ProgramNEWEdit_Window = NULL;
+ControlBasicEditorView *ProgramNEWEdit_Window = NULL;
 extern char mycode[2000];
 int click_resend_time = 0;//当点击的时候，要切换device时 发送whois的次数;
 
@@ -1660,8 +1660,8 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					ProgramNEWEdit_Window = NULL;
 				}
 				//create a new ide window
-				ProgramNEWEdit_Window = new CNewT3000ProgramEditorDlg;
-				ProgramNEWEdit_Window->Create(IDD_DIALOG_NEW_T3000_PRG_EDIT, this);
+				ProgramNEWEdit_Window = new ControlBasicEditorView;
+				ProgramNEWEdit_Window->Create(IDD_CONTROLBASIC_EDITOR_VIEW, this);
 				ProgramNEWEdit_Window->ShowWindow(SW_SHOW);
 
 
