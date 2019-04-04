@@ -341,6 +341,17 @@ BOOL CT3000App::InitInstance()
 			CopyFile(strSource, temp_bacnetdll, FALSE);
 			// ::ShellExecute(NULL, _T("open"), _T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe T3000Controls.dll"), _T(""), _T(""), SW_SHOW); 
 			ShellExecute(NULL, _T("open"), temp_Regasm_path, temp_bacnetdll, NULL, SW_HIDE);
+
+			strSource = g_strExePth+L"ControlBasicEditor.dll";
+			temp_bacnetdll=temp_dotnet_path+L"\\ControlBasicEditor.dll";
+			CopyFile(strSource, temp_bacnetdll, FALSE);
+			strSource = g_strExePth + L"ControlBasicEditor.tlb";
+			temp_bacnetdll = temp_dotnet_path + L"\\ControlBasicEditor.tlb";
+			CopyFile(strSource, temp_bacnetdll, FALSE);
+			strSource=_T("ControlBasicEditor.dll tlb:/ControlBasicEditor.tlb  /codebase");
+			// ::ShellExecute(NULL, _T("open"), _T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe T3000Controls.dll"), _T(""), _T(""), SW_SHOW); 
+			ShellExecute(NULL, _T("open"), temp_Regasm_path, strSource, NULL, SW_HIDE);
+
 #endif
 		}
 		
