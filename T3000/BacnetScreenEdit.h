@@ -71,7 +71,7 @@ public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnBnClickedButtonScreenExit();
 	afx_msg void OnBnClickedButtonDelete();
-	void AddLabel(unsigned char point_type,uint8_t point_number,uint8_t main_panel,uint8_t sub_panel,unsigned int point_x,unsigned int point_y);
+	void AddLabel(unsigned char point_type,uint8_t point_number,uint8_t main_panel,uint8_t sub_panel,unsigned int point_x,unsigned int point_y, unsigned char network = 0);
 	void SaveBacLabel(int nItem);
 
 	HICON default_icon;

@@ -154,8 +154,8 @@ LRESULT  CBacnetScreenEdit::Edit_label_Handle(WPARAM wParam, LPARAM lParam)
 
 	m_graphic_label_data.at(temp_info->nLabel_index).reg.nDisplay_Type = temp_info->nDisplay_Type;
 	m_graphic_label_data.at(temp_info->nLabel_index).reg.nclrTxt = temp_info->nclrTxt;
-	memcpy(&m_graphic_label_data.at(temp_info->nLabel_index).reg.icon_name_1,temp_info->ico_name,20);
-	memcpy(&m_graphic_label_data.at(temp_info->nLabel_index).reg.icon_name_2,temp_info->ico_name_2,20);
+	memcpy(&m_graphic_label_data.at(temp_info->nLabel_index).reg.icon_name_1,temp_info->ico_name, STR_ICON_1_NAME_LENGTH);
+	memcpy(&m_graphic_label_data.at(temp_info->nLabel_index).reg.icon_name_2,temp_info->ico_name_2, STR_ICON_2_NAME_LENGTH);
 	m_graphic_label_data.at(temp_info->nLabel_index).reg.nIcon_place = temp_info->ntext_place;
 	m_graphic_label_data.at(temp_info->nLabel_index).reg.nIcon_size = temp_info->n_iconsize;
 
@@ -236,10 +236,16 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
 		temp_number = temp_number - 1;
 
     char temp_1 = temp_point_type & 0x1F;
-		if((temp_1 == 23) || (temp_1 == 24) || (temp_1 == 25) || (temp_1 == 26))
+		if((temp_1 == COIL_REG) || (temp_1 == DIS_INPUT_REG) || (temp_1 == INPUT_REG) || (temp_1 == MB_REG))
 		{
 			temp_number = temp_number + 1;
 		}
+        if ((temp_1 == BAC_BI) || (temp_1 == BAC_BV) ||
+            (temp_1 == BAC_AV) || (temp_1 == BAC_AI) ||
+            (temp_1 == BAC_AO) || (temp_1 == BAC_DO))
+        {
+            temp_number = temp_number + 1;
+        }
 
 	::GetWindowRect(BacNet_hwd,&mynew_rect);	//获取 view的窗体大小;
 
@@ -268,9 +274,9 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
 	temp_point_type = temp_point_type + 1;
 
     if(temp_panel == Station_NUM)
-	    AddLabel(temp_point_type ,temp_number,Station_NUM,sub_panel,nLeft,nTop);
+	    AddLabel(temp_point_type ,temp_number,Station_NUM,sub_panel,nLeft,nTop, k);
     else
-        AddLabel(temp_point_type, temp_number, temp_panel, sub_panel, nLeft, nTop);
+        AddLabel(temp_point_type, temp_number, temp_panel, sub_panel, nLeft, nTop, k);
 	if(UpdateDeviceLabelFlash())
 	{
 		memcpy_s(&m_temp_graphic_label_data,sizeof(Str_label_point) * BAC_GRPHIC_LABEL_COUNT,&m_graphic_label_data.at(0),sizeof(Str_label_point) * BAC_GRPHIC_LABEL_COUNT);
@@ -280,7 +286,7 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
 }
 
 
-void CBacnetScreenEdit::AddLabel(unsigned char point_type,uint8_t point_number,uint8_t main_panel,uint8_t sub_panel,unsigned int point_x,unsigned int point_y)
+void CBacnetScreenEdit::AddLabel(unsigned char point_type,uint8_t point_number,uint8_t main_panel,uint8_t sub_panel,unsigned int point_x,unsigned int point_y , unsigned char network)
 {
 	nDefaultDisplayType = GetPrivateProfileInt(_T("Setting"),_T("AddLabelDefaultDisplay"),LABEL_SHOW_VALUE,g_cstring_ini_path);
 	nDefaultclrTxt = GetPrivateProfileInt(_T("Setting"),_T("AddLabelDefaultColor"),RGB(0,0,255),g_cstring_ini_path);
@@ -324,6 +330,7 @@ void CBacnetScreenEdit::AddLabel(unsigned char point_type,uint8_t point_number,u
 		m_graphic_label_data.at(item_insert).reg.nScreen_index = screen_list_line;
 		m_graphic_label_data.at(item_insert).reg.nSerialNum = m_nSerialNumber;
 		m_graphic_label_data.at(item_insert).reg.nSub_Panel = sub_panel;
+        m_graphic_label_data.at(item_insert).reg.network = network;
 
 	//ReloadLabelsFromDB();
 	Invalidate(1);
@@ -1153,7 +1160,7 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
 			bac_label.nMain_Panel = m_graphic_label_data.at(i).reg.nMain_Panel;
 			bac_label.nSub_Panel = m_graphic_label_data.at(i).reg.nSub_Panel;
 			bac_label.nPoint_type = m_graphic_label_data.at(i).reg.nPoint_type;
-
+            bac_label.network_point = m_graphic_label_data.at(i).reg.network;
 			if(bac_label.nPoint_type > 0)
 				bac_label.nPoint_type = bac_label.nPoint_type - 1;
 			bac_label.nPoint_number =  m_graphic_label_data.at(i).reg.nPoint_number;
@@ -1268,7 +1275,7 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
                     temp_group_data.point.sub_panel = bac_label.nSub_Panel;
                     temp_group_data.point.point_type = bac_label.nPoint_type;
                     temp_group_data.point.number = bac_label.nPoint_number;
-                    temp_group_data.point.network = 1;
+                    temp_group_data.point.network = bac_label.network_point;
 
                     m_read_group_data.push_back(temp_group_data);
                 }
@@ -1587,8 +1594,28 @@ void CBacnetScreenEdit::OnPaint()
 		{
 			icon_size_x = 96; icon_size_y = 96;
 		}
-
-        if ((m_bac_label_vector.at(i).nMain_Panel == m_bac_label_vector.at(i).nSub_Panel) &&
+        if ((m_bac_label_vector.at(i).nPoint_type == BAC_AI) || (m_bac_label_vector.at(i).nPoint_type == BAC_AV) ||
+            (m_bac_label_vector.at(i).nPoint_type == BAC_BI) || (m_bac_label_vector.at(i).nPoint_type == BAC_BV) ||
+            (m_bac_label_vector.at(i).nPoint_type == BAC_AO) || (m_bac_label_vector.at(i).nPoint_type == BAC_DO))
+        {
+            // 2019 04 03 新增支持 123456AI5的功能
+            Point_Net temp_point;
+            temp_point.panel = m_bac_label_vector.at(i).nMain_Panel;
+            temp_point.sub_panel = m_bac_label_vector.at(i).nSub_Panel;
+            temp_point.point_type = m_bac_label_vector.at(i).nPoint_type;
+            temp_point.number = m_bac_label_vector.at(i).nPoint_number;
+            temp_point.network = m_bac_label_vector.at(i).network_point;
+            char original_point[30];
+            memset(original_point, 0, 30);
+            pointtotext(original_point, &temp_point);
+            CString temp_des;
+            MultiByteToWideChar(CP_ACP, 0, original_point, (int)strlen(original_point) + 1,
+                temp_des.GetBuffer(MAX_PATH), MAX_PATH);
+            temp_des.ReleaseBuffer();
+            cs_label = temp_des;
+            cs_full_label = temp_des;
+        }
+        else if ((m_bac_label_vector.at(i).nMain_Panel == m_bac_label_vector.at(i).nSub_Panel) &&
             (m_bac_label_vector.at(i).nMain_Panel != Station_NUM))
         {
             //访问不同的 主panel 远程的点的情况;
@@ -1693,7 +1720,7 @@ void CBacnetScreenEdit::OnPaint()
 			temp_point.sub_panel = m_bac_label_vector.at(i).nSub_Panel;
 			temp_point.point_type = m_bac_label_vector.at(i).nPoint_type;
 			temp_point.number = m_bac_label_vector.at(i).nPoint_number;
-			temp_point.network = 1;
+			temp_point.network = m_bac_label_vector.at(i).network_point;
 			char original_point[30];
 			memset(original_point,0,30);
 			pointtotext(original_point,&temp_point);

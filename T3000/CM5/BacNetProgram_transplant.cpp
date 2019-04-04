@@ -3602,6 +3602,12 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 
 		if (k<= MAX_FUNCTION_COUNT)
 		{
+            if ((k == BAC_BI) || (k == BAC_BV) ||
+                (k == BAC_AV) || (k == BAC_AI) ||
+                (k == BAC_AO) || (k == BAC_DO))
+            {
+                b_is_instance = true;
+            }
 			if (p==NULL) 
 			{
 				memcpy(pmes,"error line : ",13);
@@ -7052,6 +7058,20 @@ int pointtotext(char *buf,Point_Net *point)
 
     if ((point->network >= 128) && (point_type != MB_REG)) // 说明是新的格式，最高位用来标识.
     {
+        if ((point_type == BAC_BI) || (point_type == BAC_BV) ||
+            (point_type == BAC_AV) || (point_type == BAC_AI) ||
+            (point_type == BAC_AO) || (point_type == BAC_DO))
+        {
+            unsigned int temp_value;
+            temp_value = ((point->network & 0x7F) << 16) + (point->panel << 8) + (point->sub_panel);
+            char temp_object_instance[10];
+            memset(temp_object_instance, 0, 10);
+            strcat(buf, itoa(temp_value, temp_object_instance, 10));
+            strcat(buf, ptr_panel.info[point_type].name);
+            strcat(buf, itoa(num, x, 10));
+            return 0;
+        }
+
         unsigned int temp_value;
         temp_value = ((point->network & 0x7F) << 16) + (point->panel << 8) + (point->sub_panel);
         char temp_object_instance[10];
@@ -7087,7 +7107,7 @@ int pointtotext(char *buf,Point_Net *point)
         return 0;
 
     }
-
+    
 	strcat(buf,itoa(panel,x,10));
 	//strcat(buf,itoa(panel+1,x,10));//2015-03-03修改，从此panel number 不在减一;
 	//if(panel+1<10 || num+1 < 100)

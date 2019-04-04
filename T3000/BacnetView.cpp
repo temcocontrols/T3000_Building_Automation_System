@@ -2683,7 +2683,7 @@ bool has_change_connect_ip = true;
 //INPUT int test_function_return_value();
 void CDialogCM5_BacNet::Fresh()
 {
-
+    str_bacnet_rp_info temp_test2;
 	g_bPauseMultiRead = true; // 只要在minipanel的界面 就暂停 读 寄存器的那个线程;
 
 	if ((g_protocol!=PROTOCOL_BACNET_IP) && 

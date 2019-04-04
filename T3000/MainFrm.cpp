@@ -10583,11 +10583,16 @@ void CMainFrame::OnControlPanel()
     //HideBacnetWindow();
 }
 
+
+
+
 void CMainFrame::OnControlPrograms()
 {
-
+    
 #ifdef DEBUG
-  int invoke_id =  Bacnet_Read_Properties(g_bac_instance, OBJECT_ANALOG_INPUT, 1, PROP_PRESENT_VALUE);
+    BACNET_APPLICATION_DATA_VALUE temp_value;
+    str_bacnet_rp_info temp_test;
+  //int invoke_id = Bacnet_Read_Properties_Blocking(g_bac_instance, OBJECT_ANALOG_INPUT, 1, PROP_PRESENT_VALUE, temp_value,3);
   Sleep(1);
 #endif // DEBUG
 

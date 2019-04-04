@@ -2238,10 +2238,10 @@ bac_mstp_com g_mstp_com; // 全局mstp com 口 连接状态
 bool custom_bacnet_register_listview = true;
 bool initial_bip = false;
 Str_modbus_reg bacnet_to_modbus_struct;  //用于bacnet 协议转换为modbus 协议的结构
+vector <str_bacnet_rp_info> standard_bacnet_data; // 用于bacnet 标准 读写 变量存取;
 
 
-panelname_map g_panelname_map;
-
+panelname_map g_panelname_map; 
 CString HolLable[BAC_HOLIDAY_COUNT] =   //用于动态加载List中的下拉框
 {
     _T("AR1"),
@@ -2249,3 +2249,6 @@ CString HolLable[BAC_HOLIDAY_COUNT] =   //用于动态加载List中的下拉框
     _T("AR3"),
     _T("AR4")
 };
+
+
+

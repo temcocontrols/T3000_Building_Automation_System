@@ -98,7 +98,15 @@
 #include "h_pt_a.h"
 
 
-
+typedef struct bacnet_rp_info  //bacnet 相关的部分必须放在 bacnet include 的头文件中;//Fan
+{
+    unsigned int bacnet_instance;
+    BACNET_OBJECT_TYPE object_type;
+    uint32_t object_item_number;
+    int property_id;
+    BACNET_APPLICATION_DATA_VALUE value;
+    int invoke_id;
+}str_bacnet_rp_info;
 
 //#include ""
 //#include ""

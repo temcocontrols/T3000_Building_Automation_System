@@ -1255,5 +1255,6 @@ extern bac_mstp_com g_mstp_com; // 全局mstp com 口 连接状态
 extern bool custom_bacnet_register_listview;
 extern bool initial_bip ;
 extern Str_modbus_reg bacnet_to_modbus_struct; //用于bacnet 协议转换为modbus 协议的结构
+extern vector <str_bacnet_rp_info> standard_bacnet_data; // 用于bacnet 标准 读写 变量存取;
 extern panelname_map g_panelname_map;
 extern CString HolLable[BAC_HOLIDAY_COUNT]; //用于动态加载List中的下拉框

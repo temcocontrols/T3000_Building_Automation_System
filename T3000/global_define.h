@@ -1,5 +1,6 @@
 #pragma once
 #include "RelayLabel.h"
+
 #include <map>
 //minipanel 寄存器表
 //  9800	-	9999    200个寄存器   setting
@@ -1225,6 +1226,7 @@ typedef struct
 	uint8_t nMouse_Status;
 	char ico_name[20];
 	char ico_name_2[20];
+    uint8_t network_point;
 	uint8_t ntext_place;
 	uint8_t n_iconsize;
     int x_length; // 用来确定标签是否点击，以及点击的宽度.
@@ -1923,6 +1925,9 @@ struct stLoginMessage
 	char userName[30];
 	char password[20];
 };
+
+
+
 
 typedef union
 {

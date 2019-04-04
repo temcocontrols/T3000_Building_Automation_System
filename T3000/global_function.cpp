@@ -2714,7 +2714,8 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 				else
 					memcpy_s( m_graphic_label_data.at(i).reg.icon_name_2,STR_ICON_2_NAME_LENGTH,my_temp_point,STR_ICON_2_NAME_LENGTH);
 				my_temp_point=my_temp_point + STR_ICON_2_NAME_LENGTH;
-				my_temp_point = my_temp_point + 7;
+                m_graphic_label_data.at(i).reg.network = *(my_temp_point++);
+				my_temp_point = my_temp_point + 6;
 			}
 
 
@@ -4156,7 +4157,112 @@ int handle_read_pic_data_ex(char *npoint,int nlength)
 	return 0;
 }
 
+int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE &value, uint8_t retrytime)
+{
+    int send_status = true;
 
+    str_bacnet_rp_info temp_standard_bacnet_data = {0};
+    temp_standard_bacnet_data.bacnet_instance = deviceid;
+    temp_standard_bacnet_data.object_item_number = object_instance;
+    temp_standard_bacnet_data.object_type = object_type;
+    temp_standard_bacnet_data.property_id = property_id;
+
+    vector<str_bacnet_rp_info>::iterator itr = standard_bacnet_data.begin();
+    vector<str_bacnet_rp_info>::iterator itrflag;
+    int find_exsit = false;
+    for (; itr != standard_bacnet_data.end(); itr++)
+    {
+        if ((itr->bacnet_instance == deviceid) &&
+            (itr->object_item_number == object_instance) &&
+            (itr->object_type == object_type) &&
+            (itr->property_id == property_id))
+        {
+            itrflag = itr;  //找到曾经读过
+            find_exsit = true;
+        }
+    }
+
+    if (!find_exsit)
+    {
+        standard_bacnet_data.push_back(temp_standard_bacnet_data);
+    }
+
+    
+
+    for (int z = 0; z<retrytime; z++)
+    {
+        int temp_invoke_id = -1;
+        int	resend_count = 0;
+        send_status = true;
+        do
+        {
+            resend_count++;
+            if (resend_count>retrytime)
+            {
+                send_status = false;
+                break;
+            }
+            temp_invoke_id = Bacnet_Read_Properties(deviceid, object_type, object_instance, property_id);
+
+            if (temp_invoke_id < 0)
+                Sleep(500);
+            else
+            {
+                if (find_exsit)
+                {
+                    itrflag->invoke_id = temp_invoke_id;
+                }
+                else
+                {
+                    itrflag = standard_bacnet_data.end() - 1;
+                    itrflag->invoke_id = temp_invoke_id;
+                }
+                send_status = true;
+            }
+        } while (temp_invoke_id<0);
+
+        if (send_status)
+        {
+            for (int i = 0; i<400; i++)
+            {
+                Sleep(10);
+                if (tsm_invoke_id_free(temp_invoke_id))
+                {
+                    Sleep(10);
+
+                    vector<str_bacnet_rp_info>::iterator itr = standard_bacnet_data.begin();
+                    vector<str_bacnet_rp_info>::iterator itrflag;
+                    int find_exsit = false;
+                    for (; itr != standard_bacnet_data.end(); itr++)
+                    {
+                        if ((itr->invoke_id == temp_invoke_id) &&
+                            (itr->object_item_number == object_instance) &&
+                            (itr->object_type == object_type) &&
+                            (itr->property_id == property_id))
+                        {
+                            itrflag = itr;  //找到曾经读过
+                            value = itrflag->value;
+                            find_exsit = true;
+                            break;
+                        }
+                    }
+                    if (!find_exsit)
+                    {
+                        continue;  //没有找到对应的点，没有赋值 value成功;
+                    }
+                    //standard_bacnet_data.erase(itrflag);
+                    return 1;
+                }
+                else
+                    continue;
+            }
+        }
+    }
+   
+    return -1;
+
+    
+}
 
 
 int Bacnet_Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id)
@@ -4200,6 +4306,27 @@ void localhandler_read_property_ack(
         //local_rp_ack_print_data(&data);
         BACNET_APPLICATION_DATA_VALUE value;
         local_value_rp_ack_print_data(&data,value);
+        
+        vector<str_bacnet_rp_info>::iterator itr = standard_bacnet_data.begin();
+        vector<str_bacnet_rp_info>::iterator itrflag;
+
+
+        
+        int find_exsit = false;
+        for (; itr != standard_bacnet_data.end(); itr++)
+        {
+            if ((itr->invoke_id == service_data->invoke_id) &&
+                (itr->object_item_number == data.object_instance) &&
+                (itr->object_type == data.object_type) &&
+                (itr->property_id == data.object_property))
+            {
+                itrflag = itr;  //找到曾经读过
+                itrflag->value = value;
+                find_exsit = true;
+            }
+        }
+
+
         Sleep(1);
     }
 }

@@ -993,6 +993,7 @@ typedef union
 		uint8_t nIcon_place;
 		char icon_name_1[STR_ICON_1_NAME_LENGTH];
 		char icon_name_2[STR_ICON_2_NAME_LENGTH];
+        uint8_t network;
 	}reg;
 
 } Str_label_point;
