@@ -35,8 +35,9 @@ extern char mycode[2000];
 extern char *desassembler_program();
 extern int Encode_Program();
 extern bool show_upper;
-int error;
-int renumvar;
+extern int error;
+extern int renumvar;
+extern int my_lengthcode;
 IMPLEMENT_DYNAMIC(ControlBasicEditorView, CDialogEx)
 
 ControlBasicEditorView::ControlBasicEditorView(CWnd* pParent /*=NULL*/)
@@ -59,7 +60,13 @@ void ControlBasicEditorView::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(ControlBasicEditorView, CDialogEx)
-	ON_COMMAND(ID_SEND, &ControlBasicEditorView::OnSend)
+	ON_COMMAND(ID_SEND34071, &ControlBasicEditorView::OnSend)
+	ON_COMMAND(ID_CLEAR34070, &ControlBasicEditorView::OnClear)
+	ON_COMMAND(ID_LOADFILE34072, &ControlBasicEditorView::OnLoadfile)
+	ON_COMMAND(ID_SAVEFILE34073, &ControlBasicEditorView::OnSavefile)
+	ON_COMMAND(ID_REFRESH34074, &ControlBasicEditorView::OnRefresh)
+	ON_COMMAND(ID_SETTINGS34075, &ControlBasicEditorView::OnProgramIdeSettings)
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 
@@ -860,4 +867,179 @@ void ControlBasicEditorView::OnSend()
 	}
 	//UpdateDataProgramText();
 }
+void ControlBasicEditorView::OnClear()
+{
+    
+	  m_programeditor.Clear_BASICControl();
+}
+void ControlBasicEditorView::OnLoadfile()
+{
 
+
+
+	CString FilePath;
+	CString ReadBuffer;
+
+	CFileDialog dlg(true, _T("*.txt"), _T(" "), OFN_HIDEREADONLY, _T("txt files (*.txt)|*.txt|All Files (*.*)|*.*||"), NULL, 0);
+	if (IDOK == dlg.DoModal())
+	{
+		FilePath = dlg.GetPathName();
+
+		//Write_Position = pParent->myapp_path + cs_file_time;
+		char *pBuf;
+		DWORD dwFileLen;
+
+
+		CFile file(FilePath, CFile::modeCreate | CFile::modeReadWrite | CFile::modeNoTruncate);
+
+		dwFileLen = (DWORD)file.GetLength();
+		pBuf = new char[dwFileLen + 1];
+		pBuf[dwFileLen] = 0;
+
+		file.SeekToBegin();
+		file.Read(pBuf, dwFileLen);
+		file.Close();
+
+		CString ReadBuffer;
+
+		int  len = 0;
+		len = strlen(pBuf);
+		int  unicodeLen = ::MultiByteToWideChar(CP_ACP, 0, pBuf, -1, NULL, 0);
+		::MultiByteToWideChar(CP_ACP, 0, pBuf, -1, ReadBuffer.GetBuffer(unicodeLen), unicodeLen);
+		ReadBuffer.ReleaseBuffer();
+
+		delete[] pBuf;
+		/*((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetWindowTextW(ReadBuffer);
+		((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(unicodeLen, unicodeLen);*/
+		m_programeditor.SendCode_T3000(ReadBuffer);
+
+	}
+}
+
+void ControlBasicEditorView::OnSavefile()
+{
+
+	CFileDialog dlg(false, _T("*.txt"), _T(" "), OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, _T("txt files (*.txt)|*.txt|All Files (*.*)|*.*||"), NULL, 0);
+	if (IDOK == dlg.DoModal())
+	{
+		CString Write_Buffer;
+		CString FilePath;
+		FilePath = dlg.GetPathName();
+		CFileFind temp_find;
+		if (temp_find.FindFile(FilePath))
+		{
+			DeleteFile(FilePath);
+		}
+
+
+		Write_Buffer=m_programeditor.get_Code();
+		//GetDlgItemText(IDC_RICHEDIT2_PROGRAM, Write_Buffer);
+		//char *readytowrite = 
+		char*     readytowrite;
+		int    iTextLen;
+		iTextLen = WideCharToMultiByte(CP_ACP, 0, Write_Buffer, -1, NULL, 0, NULL, NULL);
+		readytowrite = new char[iTextLen + 1];
+		memset((void*)readytowrite, 0, sizeof(char) * (iTextLen + 1));
+		::WideCharToMultiByte(CP_ACP, 0, Write_Buffer, -1, readytowrite, iTextLen, NULL, NULL);
+
+
+
+		CFile file(FilePath, CFile::modeCreate | CFile::modeReadWrite | CFile::modeNoTruncate);
+		file.SeekToEnd();
+		int write_length = strlen(readytowrite);
+		file.Write(readytowrite, write_length + 1);
+		file.Flush();
+		file.Close();
+		delete[] readytowrite;
+	}
+
+}
+void ControlBasicEditorView::OnRefresh()
+{
+
+
+	mParent_Hwnd = g_hwnd_now;
+	//prg_color_change = false;
+
+	m_program_edit_hwnd = this->m_hWnd;
+	g_hwnd_now = m_program_edit_hwnd;
+
+	copy_data_to_ptrpanel(TYPE_ALL);
+	memset(my_display, 0, sizeof(my_display));
+
+	char * temp_point;
+	temp_point = desassembler_program();
+	if (temp_point == NULL)
+	{
+		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Decode Error!"));
+		//return 0;
+	}
+	SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Decode success!"));
+	show_upper = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"), _T("Upper Case"), 1, g_cstring_ini_path);
+	CString temp;
+	int  len = 0;
+	len = strlen(my_display); //str.length();
+	int  unicodeLen = ::MultiByteToWideChar(CP_ACP, 0, my_display, -1, NULL, 0);
+	::MultiByteToWideChar(CP_ACP, 0, my_display, -1, temp.GetBuffer(unicodeLen), unicodeLen);
+	temp.ReleaseBuffer();
+	CString temp1 = temp;
+	if (show_upper)
+	{
+		temp1.MakeUpper();
+	}
+	else
+		temp1.MakeLower();
+
+	temp1.Replace(_T("\r\n"), _T(" \r\n"));
+	temp1.Replace(_T("\("), _T(" \( "));
+	temp1.Replace(_T("\)"), _T(" \) "));
+	temp1.Replace(_T("  "), _T(" "));
+	temp1.Replace(_T("  "), _T(" "));
+	temp1.Replace(_T("  "), _T(" "));
+	//temp1 = "110 BTUSUP = 19.253.REG108 / 10" ;
+
+	SetAllPoints_BACnetDevice();
+	// TODO:  Add extra initialization here
+	//m_programeditor.put_Code(temp1);
+	m_programeditor.SendCode_T3000(temp1);
+
+	AfxMessageBox(_T("Refresh Done"));
+
+}
+
+void ControlBasicEditorView::OnProgramIdeSettings()
+{
+
+	/*CBacnetProgramSetting ProgramSettingdlg;
+	ProgramSettingdlg.DoModal();
+	CString tempcs;
+	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetWindowTextW(tempcs);
+	if (show_upper)
+	{
+		tempcs.MakeUpper();
+	}
+	else
+	{
+		tempcs.MakeLower();
+	}
+	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetWindowTextW(tempcs);
+	Syntax_analysis();*/
+	m_programeditor.Setting_BASICControl();
+}
+
+void ControlBasicEditorView::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	CRect rc;
+	GetClientRect(rc);
+	if (m_programeditor.m_hWnd != NULL)
+	{
+		::SetWindowPos(this->m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+		//m_program_list.MoveWindow(&rc);
+		m_programeditor.MoveWindow(rc.left, rc.top, rc.Width(), rc.Height());
+
+		//GetDlgItem(IDC_BUTTON_PROGRAM_EDIT)->MoveWindow(rc.left + 20 ,rc.bottom - 60 , 120,50);
+	}
+
+}
