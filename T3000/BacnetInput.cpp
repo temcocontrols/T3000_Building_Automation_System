@@ -469,7 +469,14 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 	{
 		CString cs_temp=m_input_list.GetItemText(Changed_Item,INPUT_CAL);
 		float temp_value = (float)_wtof(cs_temp);
+        if (temp_value < 0)
+        {
+            m_Input_data.at(Changed_Item).calibration_sign = 1;
+            m_input_list.SetItemText(Changed_Item, INPUT_CAL_OPERATION, _T("-"));
+        }
+
 		int cal_value = (int)(temp_value * 10);
+        cal_value = abs(cal_value);
 		if((cal_value<0) || (cal_value >65535))
 		{
 			MessageBox(_T("Please Input an value between 0.0 - 6553.6"),_T("Warning"),MB_OK);

@@ -249,6 +249,7 @@ BOOL m_active_key_mouse = FALSE;
 #define TVINSERV_TSTAT8			    {tvInsert.item.iImage=24;tvInsert.item.iSelectedImage=24;}//TSTAT8
 #define TVINSERV_T3LC			    {tvInsert.item.iImage=26;tvInsert.item.iSelectedImage=26;}//LC
 #define TVINSERV_ZIGBEE_REPEATER    {tvInsert.item.iImage=28;tvInsert.item.iSelectedImage=28;}//zigbeerepeater
+#define TVINSERV_PM5E               {tvInsert.item.iImage=30;tvInsert.item.iSelectedImage=30;}//PM5E
 #endif
 
 #define ITEM_MASK				TVIF_IMAGE|TVIF_SELECTEDIMAGE|TVIF_TEXT
@@ -592,8 +593,8 @@ void CMainFrame::InitViews()
     CView* pActiveView = GetActiveView();
     if(pActiveView==NULL)
         return;
-
-    m_pViews[DLG_T3000_VIEW] = pActiveView;
+    m_pViews[DLG_T3000_VIEW] = (CView*) new CT3000View();  //Tstat user interface;
+    //m_pViews[DLG_T3000_VIEW] = pActiveView;
     m_pViews[DLG_NETWORKCONTROL_VIEW]=(CView*) new CNetworkControllView();
     m_pViews[DLG_GRAPGIC_VIEW]=(CView*) new CGraphicView();
     m_pViews[DLG_TRENDLOG_VIEW]=(CView*) new CTrendLogView();
@@ -635,7 +636,7 @@ void CMainFrame::InitViews()
 
     CRect rect(0, 0, 0, 0);
 
-    for (int nView =1; nView < NUMVIEWS; nView++)
+    for (int nView =0; nView < NUMVIEWS; nView++)
     {
         if(nView == DLG_DIALOGCM5_VIEW||nView == DLG_DIALOGMINIPANEL_VIEW || nView == DLG_HUMCHAMBER)
             continue;
@@ -681,7 +682,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
     if (CFrameWndEx::OnCreate(lpCreateStruct) == -1)
         return -1;
-
+    system_connect_info.mstp_status = 0;
     BOOL bNameValid;
     // set the visual manager and style based on persisted value
     OnApplicationLook(theApp.m_nAppLook);
@@ -734,6 +735,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	Inial_Product_map();
     Inial_Product_Reglist_map();
+    Inial_Product_Menu_map();
     //////////////////////////////////////////////////////////////////////////////////
     CString strToolBarName;
     bNameValid = strToolBarName.LoadString(IDS_TOOLBAR_STANDARD);
@@ -1853,7 +1855,7 @@ void CMainFrame::LoadProductFromDB()
 						//TRACE(strProdcut);
 						tvInsert.hInsertAfter =TVI_SORT;// TVI_LAST; // 项目插入方式
 						int temp_product_class_id=q.getIntField("Product_class_ID");
-						if(temp_product_class_id==PM_NC|| temp_product_class_id == PM_SOLAR  || temp_product_class_id == PM_PM5E || temp_product_class_id == PM_PM5E_ARM)
+						if(temp_product_class_id==PM_NC|| temp_product_class_id == PM_SOLAR  )
 							TVINSERV_NET_WORK
 						else if (temp_product_class_id == PM_CM5 ) //CM5
 						TVINSERV_CMFIVE
@@ -1885,7 +1887,7 @@ void CMainFrame::LoadProductFromDB()
 							TVINSERV_LED_TSTAT7 //tree0412
 						else if(temp_product_class_id == PM_TSTAT6||temp_product_class_id == PM_TSTAT5i)
 						TVINSERV_TSTAT6
-						else if(temp_product_class_id == PM_TSTAT8|| temp_product_class_id == PM_TSTAT8_WIFI || temp_product_class_id == PM_TSTAT8_OCC || temp_product_class_id == PM_TSTAT8_220V)
+						else if(temp_product_class_id == PM_TSTAT10 || temp_product_class_id == PM_TSTAT8|| temp_product_class_id == PM_TSTAT8_WIFI || temp_product_class_id == PM_TSTAT8_OCC || temp_product_class_id == PM_TSTAT8_220V)
 						TVINSERV_TSTAT8
                         else if(temp_product_class_id == PM_ZIGBEE_REPEATER)
                         TVINSERV_ZIGBEE_REPEATER
@@ -1901,6 +1903,8 @@ void CMainFrame::LoadProductFromDB()
 						TVINSERV_CO2
 						else if (temp_product_class_id == PM_CS_SM_AC||temp_product_class_id == PM_CS_SM_DC||temp_product_class_id == PM_CS_RSM_AC||temp_product_class_id == PM_CS_RSM_DC)
 							TVINSERV_CS3000
+                        else if(temp_product_class_id == PM_PM5E || temp_product_class_id == PM_PM5E_ARM)
+                            TVINSERV_PM5E
 						else
 							TVINSERV_TSTAT_DEFAULT
 
@@ -2098,8 +2102,10 @@ void CMainFrame::LoadProductFromDB()
 
 
 							int temp_product_class_id=q.getIntField("Product_class_ID");
-                            if (temp_product_class_id == PM_NC || temp_product_class_id == PM_SOLAR || temp_product_class_id == PM_PM5E || temp_product_class_id == PM_PM5E_ARM)
+                            if (temp_product_class_id == PM_NC || temp_product_class_id == PM_SOLAR )
 								TVINSERV_NET_WORK
+                            else if (temp_product_class_id == PM_PM5E || temp_product_class_id == PM_PM5E_ARM)
+                                TVINSERV_PM5E
 							else if (temp_product_class_id == PM_CM5) //CM5
 								TVINSERV_CMFIVE
 							else if (temp_product_class_id == PM_T3_LC) //CM5
@@ -2129,7 +2135,7 @@ void CMainFrame::LoadProductFromDB()
 								TVINSERV_LED_TSTAT7 //tree0412
 							else if (temp_product_class_id == PM_TSTAT6 || temp_product_class_id == PM_TSTAT5i)
 								TVINSERV_TSTAT6
-							else if (temp_product_class_id == PM_TSTAT8 || temp_product_class_id == PM_TSTAT8_WIFI || temp_product_class_id == PM_TSTAT8_OCC || temp_product_class_id == PM_TSTAT8_220V)
+							else if (temp_product_class_id == PM_TSTAT10 || temp_product_class_id == PM_TSTAT8 || temp_product_class_id == PM_TSTAT8_WIFI || temp_product_class_id == PM_TSTAT8_OCC || temp_product_class_id == PM_TSTAT8_220V)
 								TVINSERV_TSTAT8
                             else if (temp_product_class_id == PM_ZIGBEE_REPEATER)
                                 TVINSERV_ZIGBEE_REPEATER
@@ -2333,8 +2339,10 @@ void CMainFrame::LoadProductFromDB()
 				//TRACE(strProdcut);
 				tvInsert.hInsertAfter =TVI_SORT;// TVI_LAST; // 项目插入方式
 				int temp_product_class_id=q.getIntField("Product_class_ID");
-                if (temp_product_class_id == PM_NC || temp_product_class_id == PM_SOLAR || temp_product_class_id == PM_PM5E || temp_product_class_id == PM_PM5E_ARM)
+                if (temp_product_class_id == PM_NC || temp_product_class_id == PM_SOLAR )
 					TVINSERV_NET_WORK
+                else if (temp_product_class_id == PM_PM5E || temp_product_class_id == PM_PM5E_ARM)
+                    TVINSERV_PM5E
 				else if (temp_product_class_id == PM_CM5) //CM5
 					TVINSERV_CMFIVE
 				else if (temp_product_class_id == PM_T3_LC) //CM5
@@ -2364,7 +2372,7 @@ void CMainFrame::LoadProductFromDB()
 					TVINSERV_LED_TSTAT7 //tree0412
 				else if (temp_product_class_id == PM_TSTAT6 || temp_product_class_id == PM_TSTAT5i)
 					TVINSERV_TSTAT6
-				else if (temp_product_class_id == PM_TSTAT8 || temp_product_class_id == PM_TSTAT8_WIFI || temp_product_class_id == PM_TSTAT8_OCC || temp_product_class_id == PM_TSTAT8_220V)
+				else if (temp_product_class_id == PM_TSTAT10 || temp_product_class_id == PM_TSTAT8 || temp_product_class_id == PM_TSTAT8_WIFI || temp_product_class_id == PM_TSTAT8_OCC || temp_product_class_id == PM_TSTAT8_220V)
 					TVINSERV_TSTAT8
                 else if (temp_product_class_id == PM_ZIGBEE_REPEATER)
                     TVINSERV_ZIGBEE_REPEATER
@@ -2836,8 +2844,10 @@ void CMainFrame::ScanTstatInDB(void)
                     int temp_product_class_id=q.getIntField("Product_class_ID");
 
 #if 1
-					if (temp_product_class_id == PM_NC || temp_product_class_id == PM_SOLAR  || temp_product_class_id == PM_PM5E_ARM || temp_product_class_id == PM_PM5E)
+					if (temp_product_class_id == PM_NC || temp_product_class_id == PM_SOLAR )
 						TVINSERV_NET_WORK
+                    else if (temp_product_class_id == PM_PM5E || temp_product_class_id == PM_PM5E_ARM)
+                        TVINSERV_PM5E
 					else if (temp_product_class_id == PM_CM5) //CM5
 						TVINSERV_CMFIVE
 					else if (temp_product_class_id == PM_T3_LC) //CM5
@@ -4275,8 +4285,9 @@ if(hwait_write_thread==NULL)
     }
 }
 
-void CMainFrame::Show_Wait_Dialog_And_ReadBacnet()
+void CMainFrame::Show_Wait_Dialog_And_ReadBacnet(int ncontrol)
 {
+    m_read_control = ncontrol;
 	if(hwait_read_thread==NULL)
 	{
 		hwait_read_thread =CreateThread(NULL,NULL,Read_Bacnet_Thread,this,NULL, NULL);
@@ -4366,10 +4377,12 @@ DWORD WINAPI  CMainFrame::Read_Modbus_10000(LPVOID lpVoid)
 	 return true;
 }
 
-
+//点击 T3TBLBBB TSTAT10  CM5 的时候会通过此函数保存缓存数据至 本地文件;
+//点击菜单 Save file  也会 保存所有的配置信息;
 DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 {
 	 CMainFrame *pParent = (CMainFrame *)lpVoid;
+     int  nspecial_mode = pParent->m_read_control;  // 0 默认全读   1 缓存的时候不读 program;
 	 int end_temp_instance = 0;
 	  CString Mession_ret;
 	   read_write_bacnet_config = true;
@@ -4441,6 +4454,31 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 		 g_progress_persent = read_success_count * 100 /read_total_count;
 	 }
 
+     for (int i = 0; i<BAC_SCHEDULECODE_GOUP; i++)
+     {
+         if (READ_MODE_SIMPLIFICATION == nspecial_mode)
+         {
+             read_success_count++;
+             g_progress_persent = read_success_count * 100 / read_total_count;
+             Sleep(100);
+             continue;
+         }
+         if (GetPrivateData_Blocking(g_bac_instance, READTIMESCHEDULE_T3000, i, i, WEEKLY_SCHEDULE_SIZE) > 0)
+         {
+             Mession_ret.Format(_T("Read schedule form %d to %d success."), i, i);
+             SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+             read_success_count++;
+             Sleep(SEND_COMMAND_DELAY_TIME);
+         }
+         else
+         {
+             Mession_ret.Format(_T("Read schedule form %d to %d timeout."), i, i);
+             SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+             goto read_end_thread;
+         }
+         g_progress_persent = read_success_count * 100 / read_total_count;
+     }
+
 	 for (int i=0; i<BAC_VARIABLE_GROUP; i++)
 	 {
 		 end_temp_instance = BAC_READ_VARIABLE_REMAINDER + (BAC_READ_VARIABLE_GROUP_NUMBER)*i ;
@@ -4484,26 +4522,17 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 		 g_progress_persent = read_success_count * 100 /read_total_count;
 	 }
 
-	 for (int i=0; i<BAC_SCHEDULECODE_GOUP; i++)
-	 {
-		 if(GetPrivateData_Blocking(g_bac_instance,READTIMESCHEDULE_T3000,i,i,WEEKLY_SCHEDULE_SIZE) > 0)
-		 {
-			 Mession_ret.Format(_T("Read schedule form %d to %d success."),i,i);
-			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
-			 read_success_count ++ ;
-			 Sleep(SEND_COMMAND_DELAY_TIME);
-		 }
-		 else
-		 {
-			 Mession_ret.Format(_T("Read schedule form %d to %d timeout."),i,i);
-			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
-			 goto read_end_thread;
-		 }
-		 g_progress_persent = read_success_count * 100 /read_total_count;
-	 }
+
 
 	 for (int i=0; i<BAC_HOLIDAYCODE_GROUP; i++)
 	 {
+         if (READ_MODE_SIMPLIFICATION == nspecial_mode)
+         {
+             read_success_count++;
+             g_progress_persent = read_success_count * 100 / read_total_count;
+             Sleep(100);
+             continue;
+         }
 		 if(GetPrivateData_Blocking(g_bac_instance,READANNUALSCHEDULE_T3000,i,i, 48) > 0)
 		 {
 			 Mession_ret.Format(_T("Read holiday form %d to %d success."),i,i);
@@ -4679,6 +4708,13 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 
 	 for (int i=0; i<BAC_GRPHIC_LABEL_GROUP; i++)
 	 {
+         if (READ_MODE_SIMPLIFICATION == nspecial_mode)
+         {
+             read_success_count++;
+             g_progress_persent = read_success_count * 100 / read_total_count;
+             Sleep(100);
+             continue;
+         }
 		 end_temp_instance = BAC_READ_GRPHIC_LABEL_REMAINDER + (BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i ;
 		 if(end_temp_instance >= BAC_GRPHIC_LABEL_COUNT)
 			 end_temp_instance = BAC_GRPHIC_LABEL_COUNT - 1;
@@ -4715,7 +4751,39 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 	 }
 	  g_progress_persent = read_success_count * 100 /read_total_count;
 
-#if 1 ////////////////////////// 改为var cus units
+      for (int z = 0;z<BAC_PROGRAM_ITEM_COUNT;z++)
+      {
+
+          memset(program_code[z], 0, 2000);		 //清零;
+
+          for (int i = 0;i < 5;i++)
+          {
+              if (READ_MODE_SIMPLIFICATION == nspecial_mode)
+              {
+                  read_success_count++;
+                  g_progress_persent = read_success_count * 100 / read_total_count;
+                  continue;
+              }
+
+              int ret_variable;
+              ret_variable = GetProgramData_Blocking(g_bac_instance, z, z, i);
+              if (ret_variable < 0)
+              {
+                  Mession_ret.Format(_T("Read program code %d part %d timeout."), z, i); //如果重试3次都失败就跳转至 失败;
+                  SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+                  goto read_end_thread;
+              }
+              else
+              {
+                  read_success_count++;
+                  g_progress_persent = read_success_count * 100 / read_total_count;
+                  Mession_ret.Format(_T("Read program code %d part %d success."), z, i);
+                  SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+              }
+          }
+
+      }
+
 	  for (int i=0; i<1; i++)
 	  {
 		  if(GetPrivateData_Blocking(g_bac_instance,READVARIABLE_T3000,0,4,sizeof(Str_variable_uint_point)) > 0)
@@ -4733,7 +4801,7 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 		  }
 		  g_progress_persent = read_success_count * 100 /read_total_count;
 	  }
-#endif
+
 
 	 for (int i=0; i<BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT; i++)
 	 {
@@ -4759,79 +4827,7 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 
 
 
-	 for (int z=0;z<BAC_PROGRAM_ITEM_COUNT;z++)
-	 {
-		 memset(program_code[z],0,2000);		 //清零;
 
-         for (int i = 0;i < 5;i++)
-         {
-             int ret_variable;
-             ret_variable = GetProgramData_Blocking(g_bac_instance, z, z, i);
-             if (ret_variable < 0)
-             {
-                 Mession_ret.Format(_T("Read program code %d part %d timeout."), z, i); //如果重试3次都失败就跳转至 失败;
-                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
-                 goto read_end_thread;
-             }
-             else
-             {
-                 read_success_count++;
-                 g_progress_persent = read_success_count * 100 / read_total_count;
-                 Mession_ret.Format(_T("Read program code %d part %d success."), z, i);
-                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
-             }
-         }
-#if 0
-		 for (int x=0;x<5;x++)
-		 {
-             for (int z = 0;z < 3;z++) //重试次数
-             {
-
-                 int send_status = true;
-                 int resend_count = 0;
-                 int temp_invoke_id = -1;
-                 do
-                 {
-                     resend_count++;
-                     if (resend_count > RESEND_COUNT)
-                     {
-                         send_status = false;
-                         Sleep(200);
-                         break;
-                         //goto read_end_thread;
-                     }
-                     temp_invoke_id = GetProgramData(g_bac_instance, z, z, x);
-                     Sleep(SEND_COMMAND_DELAY_TIME * 2);
-                 } while (temp_invoke_id < 0);
-
-
-                 if (send_status)
-                 {
-                     for (int i = 0;i < 3000;i++)
-                     {
-                         Sleep(2);
-                         if (tsm_invoke_id_free(temp_invoke_id))
-                         {
-                             read_success_count++;
-                             goto	read_program_part_success;
-                         }
-                     }
-                     Sleep(500);
-                 }
-             }
-             Mession_ret.Format(_T("Read program code %d part %d timeout."), z, x); //如果重试3次都失败就跳转至 失败;
-             SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
-             goto read_end_thread;
-
-			 read_program_part_success:
-
-			  g_progress_persent = read_success_count * 100 /read_total_count;
-			  Mession_ret.Format(_T("Read program code %d part %d success."),z,x);
-			  SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
-			  continue;
-		 }
-#endif
-	 }
 	 read_write_bacnet_config = false;
 	 hwait_read_thread = NULL;
 	 SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read data success!"));
@@ -5632,7 +5628,7 @@ void CMainFrame::SaveConfigFile()
 
             if(g_protocol == PROTOCOL_BACNET_IP)
             {
-				Show_Wait_Dialog_And_ReadBacnet();
+				Show_Wait_Dialog_And_ReadBacnet(0);
             }
             else
             {
@@ -5946,8 +5942,11 @@ void CMainFrame::OnDestroy()
 				}
 
 		}
-        if(CM5_hThread!=NULL)
-            TerminateThread(CM5_hThread,0);
+        if (CM5_hThread != NULL)
+        {
+            system_connect_info.mstp_status = 0;
+            TerminateThread(CM5_hThread, 0);
+        }
         if(CM5_UI_Thread!=NULL)
             TerminateThread(CM5_UI_Thread,0);
         if(hDeal_thread!=NULL)
@@ -6413,22 +6412,14 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
     //创建对话框窗口
     pDlg->Create(IDD_DIALOG10_Progress, this);
 
-    //居中显示
-    //pDlg->CenterWindow();
-    //void MoveWindow( LPCRECT lpRect, BOOL bRepaint = TRUE );
-    //pDlg->MoveWindow(100,100,500,1000);
     pDlg->ShowProgress(0,0);
-    //显示对话框窗口
-   // g_llerrCount = g_llTxCount = g_llRxCount = 0;//click tree, clear all count;
     old_tx_count = persent_array_count = 0;
-    //::SetWindowPos(pDlg->m_hWnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
     RECT RECT_SET1;
     GetClientRect(&RECT_SET1);
     pDlg->MoveWindow(RECT_SET1.left+400,RECT_SET1.bottom-19,RECT_SET1.right/2+20,20,1);
     pDlg->ShowWindow(SW_HIDE);
     //20120420
     float flagsoftwareversion;
-    //HTREEITEM hSelItem=m_pTreeViewCrl->GetSelectedItem();
     HTREEITEM hSelItem=hTreeItem;
     int nCounts=m_product.size();
     
@@ -6447,7 +6438,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				hLastTreeItem = hSelItem;
 			}
 
-
+            
 
 			g_llTxCount = g_llTxCount + 1;
             int Scan_Product_ID=m_product.at(i).product_class_id;
@@ -6466,6 +6457,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             g_selected_serialnumber = selected_product_Node.serial_number;
             g_bac_instance = NULL;
             g_selected_product_id = selected_product_Node.product_class_id;
+            SetCommandDelayTime(g_selected_product_id);
             selected_product_index = i;//记录目前选中的是哪一个 产品;用于后面自动更新firmware;
             selected_tree_item = hTreeItem;
             Statuspanel.Empty();
@@ -6716,6 +6708,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             g_serialNum = selected_product_Node.serial_number;
             if((selected_product_Node.product_class_id == PM_CM5) ||
 				(selected_product_Node.product_class_id == PM_MINIPANEL) ||
+                (selected_product_Node.product_class_id == PM_TSTAT10) ||
 				(selected_product_Node.product_class_id == PM_MINIPANEL_ARM)
 				/*|| */
 				/*(product_Node.product_class_id == PM_T38AI8AO6DO) */  )	//如果是CM5或者MINIPANEL 才有 bacnet协议;
@@ -6853,7 +6846,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				{
 					g_protocol = MODBUS_RS485;
 					g_tstat_id = selected_product_Node.product_id;
-					SEND_COMMAND_DELAY_TIME = 200;
+				    SEND_COMMAND_DELAY_TIME = 200;
 					SwitchToPruductType(DLG_BACNET_VIEW);
 
 					pDlg->ShowWindow(SW_HIDE);
@@ -6868,14 +6861,14 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				}
                 else
                 {
-                    SEND_COMMAND_DELAY_TIME = 100;
+                    //SEND_COMMAND_DELAY_TIME = 100;
                     BOOL is_local = true;
                     if(selected_product_Node.protocol == PROTOCOL_REMOTE_IP)
                         is_local = false;
                     //BOOL is_local = IP_is_Local(product_Node.BuildingInfo.strIp);
                     if(is_local == false)	//判断是否是本地IP，不是本地的就要连接到远端的，远端的 Who  is  广播发布过去的;
                     {
-                        SEND_COMMAND_DELAY_TIME = 500;
+                        //SEND_COMMAND_DELAY_TIME = 500;
                         m_is_remote_device = true;
                         ((CDialogCM5_BacNet*)m_pViews[m_nCurView])->Set_remote_device_IP(selected_product_Node.BuildingInfo.strIp);
                         ((CDialogCM5_BacNet*)m_pViews[m_nCurView])->SetConnected_IP(selected_product_Node.BuildingInfo.strIp);
@@ -7166,13 +7159,27 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 m_nbaudrat= selected_product_Node.baudrate;
                 if ((m_nbaudrat !=9600 ) && (m_nbaudrat !=19200) && (m_nbaudrat != 38400)&& (m_nbaudrat != 57600)&& (m_nbaudrat != 76800) && (m_nbaudrat != 115200))
                     m_nbaudrat = 19200;
-                Change_BaudRate(m_nbaudrat);
+
                 if (selected_product_Node.protocol == PROTOCOL_MSTP_TO_MODBUS)
                 {
                     g_protocol = PROTOCOL_MSTP_TO_MODBUS;
                     g_mstp_deviceid = selected_product_Node.object_instance;
-                    Initial_bac(selected_product_Node.ncomport, _T(""), selected_product_Node.baudrate);
-
+                    if ((system_connect_info.mstp_status == 1) &&
+                        (system_connect_info.ncomport == selected_product_Node.ncomport )&&
+                        (system_connect_info.nbaudrate == selected_product_Node.baudrate))
+                    {
+                        Sleep(100);
+                    }
+                    else
+                    {
+                        int init_ret = 0;
+                        init_ret = Initial_bac(selected_product_Node.ncomport, _T(""), selected_product_Node.baudrate);
+                        if (init_ret == 0)
+                        {
+                            SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Initial Bacnet MSTP com port failed!"));
+                            return;
+                        }
+                    }
                     CShowMessageDlg TempDlg;
                     TempDlg.SetStaticText(_T("Establish Bacnet MSTP connection , please wait!"));
                     //dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
@@ -7186,6 +7193,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     TempDlg.SetMstpDeviceInfo(tempinfo);
 
                     TempDlg.DoModal();
+                }
+                else
+                {
+                    Change_BaudRate(m_nbaudrat);
                 }
 
                 register_critical_section.Lock();
@@ -9032,9 +9043,6 @@ BOOL CALLBACK enum3Dinstall_two(HWND   hwnd,   LPARAM   lParam)
 
 UINT _FreshTreeView(LPVOID pParam )
 {
-//#ifdef DEBUG
-//    return 1;
-//#endif // DEBUG
 
     CString g_strT3000LogString;
     CMainFrame* pMain = (CMainFrame*)pParam;
@@ -10380,7 +10388,7 @@ void CMainFrame::OnControlMain()
 void CMainFrame::OnControlInputs()
 {
 #if 0
-    m_testtoolbar.RemoveAllButtons();
+//    m_testtoolbar.RemoveAllButtons();
    // CMFCToolBar::ResetAllImages();
 
     CMFCPopupMenu::SetForceMenuFocus(FALSE);
@@ -10569,7 +10577,7 @@ void CMainFrame::OnControlInputs()
         }
         else
         {
-           MessageBox(_T("This device doesn't have a input menu item"));
+           MessageBox(_T("This device doesn't have a input grid display"));
         }
 
     }
@@ -10583,11 +10591,23 @@ void CMainFrame::OnControlPanel()
     //HideBacnetWindow();
 }
 
+
+
+
 void CMainFrame::OnControlPrograms()
 {
+    
+#if 0
+    BACNET_APPLICATION_DATA_VALUE temp_value;
+    str_bacnet_rp_info temp_test;
+    int invoke_id = Bacnet_Read_Properties_Blocking(g_bac_instance, OBJECT_ANALOG_INPUT, 1, PROP_PRESENT_VALUE, temp_value,3);
 
-#ifdef DEBUG
-  int invoke_id =  Bacnet_Read_Properties(g_bac_instance, OBJECT_ANALOG_INPUT, 1, PROP_PRESENT_VALUE);
+    temp_value.tag = TPYE_BACAPP_REAL;
+    temp_value.context_specific = false;
+    temp_value.type.Real = 1111;
+   // strcpy(test123.type.Character_String.value, "1123");
+
+     invoke_id = Bacnet_Write_Properties_Blocking(55555, OBJECT_ANALOG_INPUT, 1, PROP_PRESENT_VALUE, &temp_value);
   Sleep(1);
 #endif // DEBUG
 
@@ -10642,13 +10662,19 @@ void CMainFrame::OnControlPrograms()
     }
     else
     {
-       MessageBox(_T("This device doesn't have a programs menu item"));
+       MessageBox(_T("This device doesn't have a programs grid display"));
     }
 }
 
 
 void CMainFrame::OnControlOutputs()
 {
+//#ifdef DEBUG
+//    ShutDownMstpGlobal(5);
+//    return;
+//#endif // DEBUG
+
+
     g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
 
     if (product_type == T3000_6_ADDRESS || product_register_value[7] == PM_CS_RSM_AC || product_register_value[7] == PM_CS_RSM_DC)
@@ -10783,7 +10809,7 @@ void CMainFrame::OnControlOutputs()
         }
         else
         {
-			MessageBox(_T("This device doesn't have a output menu item"));
+			MessageBox(_T("This device doesn't have a output grid display"));
         }
     }
 		global_interface = BAC_OUT	;
@@ -10871,7 +10897,7 @@ void CMainFrame::OnControlVariables()
     }
     else
     {
-       MessageBox(_T("This device doesn't have a variable menu item"));
+       MessageBox(_T("This device doesn't have a variable grid display"));
     }
 }
 
@@ -10946,7 +10972,7 @@ void CMainFrame::OnControlWeekly()
 			g_bPauseMultiRead = FALSE;
 		}
 		else
-			MessageBox(_T("This feature is not supported by this product."));
+			MessageBox(_T("The device doesn't have a schedule grid display."));
     }
 }
 
@@ -11013,7 +11039,7 @@ void CMainFrame::OnControlAnnualroutines()
         }
 		 
         else
-			MessageBox(_T("This device doesn't have a holidays menu item"));
+			MessageBox(_T("This device doesn't have a holidays grid display"));
     }
 }
 #include "PowerMeterList.h"
@@ -11105,7 +11131,7 @@ void CMainFrame::OnControlSettings()
             dlg.DoModal();
         }
         else
-           MessageBox(_T("This device doesn't have a configuration menu item"));
+           MessageBox(_T("This device doesn't have a configuration display"));
     }
 }
 
@@ -11228,7 +11254,7 @@ void CMainFrame::OnControlControllers()
     }
     else
     {
-       MessageBox(_T("This device doesn't have a pid menu item"));
+       MessageBox(_T("This device doesn't have a pid  grid display"));
     }
 }
 
@@ -11289,7 +11315,7 @@ void CMainFrame::OnControlScreens()
         }
         else
         {
-            MessageBox(_T("Can't support Graphic"));
+            MessageBox(_T("This device doesn't have a graphic grid display"));
         }
         //
     }
@@ -11373,7 +11399,7 @@ void CMainFrame::OnControlMonitors()
     }
     else
     {
-        MessageBox(_T("This device doesn't have a trendlog menu item"));
+        MessageBox(_T("This device doesn't have a trendlog  grid display"));
     }
 }
 void CMainFrame::OnSizing(UINT fwSide, LPRECT pRect)
@@ -11429,11 +11455,22 @@ CTemcoStandardBacnetToolDlg *BacnetTool_Window = NULL;;
 void CMainFrame::OnDatabaseBacnettool()
 {
 
-#ifdef DEBUG
-    CBacnetTool dlg;
-    dlg.DoModal();
+//#ifdef DEBUG
+//    CBacnetTool dlg;
+//    dlg.DoModal();
+//    return;
+//#endif // DEBUG
+
+    CString CS_BacnetExplore_Path;
+    CString ApplicationFolder;
+    GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+    PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
+    ApplicationFolder.ReleaseBuffer();
+    CS_BacnetExplore_Path = ApplicationFolder + _T("\\BacnetExplore.exe");
+
+    ShellExecute(NULL, L"open", CS_BacnetExplore_Path, NULL, NULL, SW_SHOWNORMAL);
     return;
-#endif // DEBUG
+#if 0
 
 
     if (BacnetTool_Window != NULL)
@@ -11444,6 +11481,7 @@ void CMainFrame::OnDatabaseBacnettool()
     BacnetTool_Window = new CTemcoStandardBacnetToolDlg;
     BacnetTool_Window->Create(IDD_DIALOG_TEMCO_STANDARD_BACNET_TOOL, this);
     BacnetTool_Window->ShowWindow(SW_SHOW);
+#endif
 }
 
 void CMainFrame::OnControlAlarmLog()
@@ -11481,7 +11519,7 @@ void CMainFrame::OnControlAlarmLog()
     }
     else
     {
-       MessageBox(_T("This device doesn't have a alarms menu item"));
+       MessageBox(_T("This device doesn't have a alarms grid display"));
     }
 }
 
@@ -11497,7 +11535,7 @@ void CMainFrame::OnControlCustomerunits()
     }
     else
     {
-       MessageBox(_T("This device doesn't have a custom units menu item"));
+       MessageBox(_T("This device doesn't have a custom units  grid display"));
     }
 }
 
@@ -11585,7 +11623,7 @@ void CMainFrame::OnControlRemotePoint()
     }
     else
     {
-		MessageBox(_T("This device doesn't have a menu item"));
+		MessageBox(_T("This device doesn't have a remote point grid display"));
     }
 
     bacnet_view_number = TYPE_TSTAT ;
@@ -12685,6 +12723,7 @@ void CMainFrame::OnUpdateControlMain(CCmdUI *pCmdUI)
 {
     //  Add your command update UI handler code here
     pCmdUI->SetCheck(bacnet_view_number == TYPE_MAIN);
+    pCmdUI->Enable(Get_Product_Menu_Map(g_selected_product_id, MENU_HOME));
 }
 
 
@@ -12692,6 +12731,7 @@ void CMainFrame::OnUpdateControlInputs(CCmdUI *pCmdUI)
 {
     //  Add your command update UI handler code here
     pCmdUI->SetCheck(bacnet_view_number == TYPE_INPUT);
+    pCmdUI->Enable(Get_Product_Menu_Map(g_selected_product_id, MENU_INPUT));
 
 //       if(pCmdUI->m_pMenu != NULL)
 //       {
@@ -12704,6 +12744,7 @@ void CMainFrame::OnUpdateControlOutputs(CCmdUI *pCmdUI)
 {
     //  Add your command update UI handler code here
     pCmdUI->SetCheck(bacnet_view_number == TYPE_OUTPUT);
+    pCmdUI->Enable(Get_Product_Menu_Map(g_selected_product_id, MENU_OUTPUT));
 }
 
 
@@ -12711,6 +12752,7 @@ void CMainFrame::OnUpdateControlVariables(CCmdUI *pCmdUI)
 {
     //  Add your command update UI handler code here
     pCmdUI->SetCheck(bacnet_view_number == TYPE_VARIABLE);
+    pCmdUI->Enable(Get_Product_Menu_Map(g_selected_product_id, MENU_VARIABLE));
 }
 
 
@@ -12718,24 +12760,14 @@ void CMainFrame::OnUpdateControlPrograms(CCmdUI *pCmdUI)
 {
     //  Add your command update UI handler code here
     pCmdUI->SetCheck(bacnet_view_number == TYPE_PROGRAM);
+    pCmdUI->Enable(Get_Product_Menu_Map(g_selected_product_id, MENU_PROGRAM));
 }
 
 void CMainFrame::OnUpdateControlPanel(CCmdUI *pCmdUI)
 {
     //  Add your command update UI handler code here
-    //static bool test_bool = true;
-    //if (test_bool)
-    //{
-    //    pCmdUI->Enable(FALSE);
-    //    test_bool = false;
-    //}
-    //else
-    //{
-    //    pCmdUI->Enable(true);
-    //    test_bool = true;
-    //}
-
     pCmdUI->SetCheck(bacnet_view_number == TYPE_PANEL);
+    pCmdUI->Enable(Get_Product_Menu_Map(g_selected_product_id, MENU_PANELINFO));
 }
 
 
@@ -12744,6 +12776,7 @@ void CMainFrame::OnUpdateControlScreens(CCmdUI *pCmdUI)
 {
     //  Add your command update UI handler code here
     pCmdUI->SetCheck(bacnet_view_number == TYPE_SCREENS);
+    pCmdUI->Enable(Get_Product_Menu_Map(g_selected_product_id, MENU_SCREEN));
 }
 
 
@@ -12751,6 +12784,7 @@ void CMainFrame::OnUpdateControlControllers(CCmdUI *pCmdUI)
 {
     //  Add your command update UI handler code here
     pCmdUI->SetCheck(bacnet_view_number == TYPE_CONTROLLER);
+    pCmdUI->Enable(Get_Product_Menu_Map(g_selected_product_id, MENU_PID));
 }
 
 
@@ -12758,6 +12792,7 @@ void CMainFrame::OnUpdateControlWeekly(CCmdUI *pCmdUI)
 {
     //  Add your command update UI handler code here
     pCmdUI->SetCheck(bacnet_view_number == TYPE_WEEKLY);
+    pCmdUI->Enable(Get_Product_Menu_Map(g_selected_product_id, MENU_SCHEDUAL));
 }
 
 
@@ -12765,6 +12800,7 @@ void CMainFrame::OnUpdateControlAnnualroutines(CCmdUI *pCmdUI)
 {
     //  Add your command update UI handler code here
     pCmdUI->SetCheck(bacnet_view_number == TYPE_ANNUAL);
+    pCmdUI->Enable(Get_Product_Menu_Map(g_selected_product_id, MENU_HOLIDAY));
 }
 
 
@@ -12772,6 +12808,7 @@ void CMainFrame::OnUpdateControlMonitors(CCmdUI *pCmdUI)
 {
     //  Add your command update UI handler code here
     pCmdUI->SetCheck(bacnet_view_number == TYPE_MONITOR);
+    pCmdUI->Enable(Get_Product_Menu_Map(g_selected_product_id, MENU_TRENDLOG));
 }
 
 
@@ -12779,6 +12816,23 @@ void CMainFrame::OnUpdateControlAlarmLog(CCmdUI *pCmdUI)
 {
     //  Add your command update UI handler code here
     pCmdUI->SetCheck(bacnet_view_number == TYPE_ALARMLOG);
+    pCmdUI->Enable(Get_Product_Menu_Map(g_selected_product_id, MENU_ALARM));
+}
+
+
+void CMainFrame::OnUpdateControlTstat(CCmdUI *pCmdUI)
+{
+    //  Add your command update UI handler code here
+    pCmdUI->SetCheck(bacnet_view_number == TYPE_TSTAT);
+    pCmdUI->Enable(Get_Product_Menu_Map(g_selected_product_id, MENU_NETWORK_POINT));
+}
+
+
+void CMainFrame::OnUpdateControlSettings(CCmdUI *pCmdUI)
+{
+    //  Add your command update UI handler code here
+    pCmdUI->SetCheck(bacnet_view_number == TYPE_SETTING);
+    pCmdUI->Enable(Get_Product_Menu_Map(g_selected_product_id, MENU_SETTING));
 }
 
 void CMainFrame::Create_Thread_Read_Item(int n_item)
@@ -12803,18 +12857,6 @@ void CMainFrame::Create_Thread_Read_Item(int n_item)
     }
 }
 
-void CMainFrame::OnUpdateControlTstat(CCmdUI *pCmdUI)
-{
-    //  Add your command update UI handler code here
-    pCmdUI->SetCheck(bacnet_view_number == TYPE_TSTAT);
-}
-
-
-void CMainFrame::OnUpdateControlSettings(CCmdUI *pCmdUI)
-{
-    //  Add your command update UI handler code here
-    pCmdUI->SetCheck(bacnet_view_number == TYPE_SETTING);
-}
 
 
 BOOL CMainFrame::OnHelpInfo(HELPINFO* pHelpInfo)
@@ -13333,19 +13375,9 @@ void CMainFrame::OnHelpUsingUpdate()
 
 	if((temp_product_count > 0) && (selected_product_index!=-1) && (selected_product_index < temp_product_count))
 	{
-		m_product_isp_auto_flash.baudrate = m_product.at(selected_product_index).baudrate;
-		m_product_isp_auto_flash.BuildingInfo.strIp = m_product.at(selected_product_index).BuildingInfo.strIp;
-		m_product_isp_auto_flash.ncomport =  m_product.at(selected_product_index).ncomport;
-
-		m_product_isp_auto_flash.product_class_id =  m_product.at(selected_product_index).product_class_id;
-		m_product_isp_auto_flash.product_id =  m_product.at(selected_product_index).product_id;
-		m_product_isp_auto_flash.note_parent_serial_number = m_product.at(selected_product_index).note_parent_serial_number;
-		m_product_isp_auto_flash.software_version = m_product.at(selected_product_index).software_version;
+        m_product_isp_auto_flash = m_product.at(selected_product_index);
 	}
 
-
-	//	isp_product_id = m_product.at(selected_product_index).product_class_id;
-	//	if (!((product_Node.BuildingInfo.strIp.CompareNoCase(_T("9600")) ==0)||(product_Node.BuildingInfo.strIp.CompareNoCase(_T("19200"))==0) ||(product_Node.BuildingInfo.strIp.CompareNoCase(_T(""))) == 0))
 	SetCommunicationType(0);//关闭串口，供ISP 使用;
 	close_com();
 	Dowmloadfile Dlg;

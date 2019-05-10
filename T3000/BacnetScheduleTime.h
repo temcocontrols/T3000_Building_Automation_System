@@ -28,11 +28,12 @@ public:
 	afx_msg LRESULT Fresh_Schedual_List(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT Fresh_Schedual_Item(WPARAM wParam,LPARAM lParam);
 	CDateTimeCtrl m_schedual_time_picker;
-	afx_msg void OnNMClickListScheduleTime(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNMDBClickListScheduleTime(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMKillfocusDatetimepicker1Schedual(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnClose();
 	afx_msg void OnBnClickedCopyMon_Fri();
+    afx_msg void OnBnClickedClearSchedual();
 	//afx_msg LRESULT  SchedualTimeResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
 private:
 	int m_row;
