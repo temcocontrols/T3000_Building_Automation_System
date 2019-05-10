@@ -462,7 +462,7 @@ const int SCHEDULE_TIME_SATURDAY = 6;
 const int SCHEDULE_TIME_SUNDAY = 7;
 const int SCHEDULE_TIME_HOLIDAY1 = 8;
 const int SCHEDULE_TIME_HOLIDAY2 = 9;
-
+const int SCHEDULE_TIME_COUNT = 10;
 
 const int WEEKLY_SCHEDULE_SIZE = 144;
 const int ANNUAL_CODE_SIZE = 46;
@@ -1045,7 +1045,6 @@ const CString Variable_Analog_Units_Array[] =
 };
 
 
-
 struct _Graphic_Value_Info
 {
 	uint32_t deviceid;
@@ -1055,6 +1054,10 @@ struct _Graphic_Value_Info
 	unsigned short entitysize;
 	CRelayLabel* control_pt;
 	HWND hWnd;
+    //int8_t standard_command;  //0  非标      1 标准;
+    //int object_type;
+    //uint32_t object_instance;
+    //int property_id;
 };
 
 
@@ -1805,7 +1808,7 @@ const int REG_SCHEDULE_START_ADDRESS = REG_PRG_START_ADDRESS + LENGTH_MODBUS_PRG
 #define BAC_AV        27
 #define BAC_AI        28
 #define BAC_AO        29
-#define BAC_DO        30
+#define BAC_BO        30
 
 #define BAC_MAX       31
 #define BAC_MAIN      255
@@ -2092,4 +2095,50 @@ const int DIGITAL_INVERS = 1;
 
 const int DELTA_HEIGHT = 10; // 用于窗口最大化之后 显示的差值，以免挡住下面的状态栏
 
+const int MENU_HOME = 0;
+const int MENU_INPUT = 1;
+const int MENU_OUTPUT = 2;
+const int MENU_VARIABLE = 3;
+const int MENU_PROGRAM = 4;
+const int MENU_PID = 5;
+const int MENU_SCREEN = 6;
+const int MENU_SCHEDUAL = 7;
+const int MENU_HOLIDAY = 8;
+const int MENU_TRENDLOG = 9;
+const int MENU_ALARM = 10;
+const int MENU_PANELINFO = 11;
+const int MENU_NETWORK_POINT = 12;
+const int MENU_SETTING = 13;
+const int MENU_SCAN = 14;
+const int MENU_BUILDING = 15;
 
+const int READ_MODE_NORMAL = 0;
+const int READ_MODE_SIMPLIFICATION = 1;
+
+#pragma region define_bacnet_data_type  //定义标准的bacnet 数据结构类型;
+
+const int TPYE_BACAPP_BOOLEAN = 1;
+const int TPYE_BACAPP_UNSIGNED = 2;
+const int TPYE_BACAPP_SIGNED = 3;
+const int TPYE_BACAPP_REAL = 4;
+const int TPYE_BACAPP_DOUBLE = 5;
+const int TPYE_BACAPP_OCTET_STRING = 6;
+const int TPYE_BACAPP_CHARACTER_STRING = 7;
+const int TPYE_BACAPP_BIT_STRING = 8;
+const int TPYE_BACAPP_ENUMERATED = 9;
+const int TPYE_BACAPP_DATE = 10;
+const int TPYE_BACAPP_TIME = 11;
+const int TPYE_BACAPP_OBJECT_ID = 12;
+
+#pragma endregion
+
+
+#pragma region connect_region
+//用于标识目前整个系统的协议状态；
+typedef struct 
+{
+    unsigned char mstp_status;  // 0 stop    1 running
+    unsigned char ncomport;
+    int nbaudrate;
+}connect_Info;
+#pragma endregion

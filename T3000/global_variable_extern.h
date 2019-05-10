@@ -1008,12 +1008,14 @@ extern vector <Str_variable_point>  m_Variable_data;
 extern vector <Str_weekly_routine_point> m_Weekly_data;
 extern vector <Str_annual_routine_point> m_Annual_data;
 extern vector <Str_schedual_time_point> m_Schedual_Time_data;
+extern vector <Str_schedual_time_flag> m_Schedual_time_flag;
 extern vector <Str_controller_point> m_controller_data;
 extern vector <Control_group_point> m_screen_data;
 extern vector <Str_tstat_schedule> m_tatat_schedule_data;
 extern vector <Str_monitor_point> m_monitor_data;
 extern vector <_Bac_Scan_Com_Info> m_bac_handle_Iam_data;
 extern vector <_Graphic_Value_Info> m_graphic_refresh_data;
+extern vector <bacnet_standard_Info> m_standard_graphic_refresh_data;
 extern vector <_Bac_Scan_results_Info> m_bac_scan_result_data;
 extern vector <Alarm_point> m_alarmlog_data;
 extern vector <refresh_net_device> m_refresh_net_device_data;
@@ -1257,4 +1259,5 @@ extern bool initial_bip ;
 extern Str_modbus_reg bacnet_to_modbus_struct; //用于bacnet 协议转换为modbus 协议的结构
 extern vector <str_bacnet_rp_info> standard_bacnet_data; // 用于bacnet 标准 读写 变量存取;
 extern panelname_map g_panelname_map;
+extern connect_Info system_connect_info;
 extern CString HolLable[BAC_HOLIDAY_COUNT]; //用于动态加载List中的下拉框

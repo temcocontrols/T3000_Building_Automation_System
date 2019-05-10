@@ -40,7 +40,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-
+    __declspec(dllimport) INDTEXT_DATA bacnet_engineering_unit_names[];
     const char *bactext_confirmed_service_name(
         unsigned index);
     const char *bactext_unconfirmed_service_name(

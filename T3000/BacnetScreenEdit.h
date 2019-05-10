@@ -90,7 +90,7 @@ public:
 
 	HICON lock_icon;
 	HICON unlock_icon;
-
+    
 	int m_paint_right_limit ;
 	int m_paint_botton_limit ;
 	CString m_building_image_folder;
@@ -100,6 +100,7 @@ public:
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
     static DWORD WINAPI  ReadAllPanelThreadfun(LPVOID lpVoid);
     static DWORD WINAPI  ReadGroupDataThreadfun(LPVOID lpVoid);
+    static DWORD WINAPI  ReadStandardThreadfun(LPVOID lpVoid);
     afx_msg void OnClose();
 };
 

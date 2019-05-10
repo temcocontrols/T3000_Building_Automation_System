@@ -1935,6 +1935,7 @@ vector <Str_variable_point>  m_Variable_data;
 vector <Str_weekly_routine_point> m_Weekly_data;
 vector <Str_annual_routine_point> m_Annual_data;
 vector <Str_schedual_time_point> m_Schedual_Time_data;
+vector <Str_schedual_time_flag> m_Schedual_time_flag;
 vector <Str_controller_point> m_controller_data;
 vector <Control_group_point> m_screen_data;
 vector <Str_tstat_schedule> m_tatat_schedule_data;
@@ -1978,6 +1979,7 @@ int controller_counter = 0; //记录扫描的子节点
 
 
 vector <_Graphic_Value_Info> m_graphic_refresh_data;
+vector <bacnet_standard_Info> m_standard_graphic_refresh_data;
 
 byte	g_DayState[8][ANNUAL_CODE_SIZE];
 unsigned char weeklt_time_schedule[BAC_SCHEDULE_COUNT][WEEKLY_SCHEDULE_SIZE + 1];
@@ -2240,7 +2242,7 @@ bool initial_bip = false;
 Str_modbus_reg bacnet_to_modbus_struct;  //用于bacnet 协议转换为modbus 协议的结构
 vector <str_bacnet_rp_info> standard_bacnet_data; // 用于bacnet 标准 读写 变量存取;
 
-
+connect_Info system_connect_info;
 panelname_map g_panelname_map; 
 CString HolLable[BAC_HOLIDAY_COUNT] =   //用于动态加载List中的下拉框
 {

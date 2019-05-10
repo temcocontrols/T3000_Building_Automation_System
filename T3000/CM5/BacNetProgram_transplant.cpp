@@ -3604,7 +3604,7 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 		{
             if ((k == BAC_BI) || (k == BAC_BV) ||
                 (k == BAC_AV) || (k == BAC_AI) ||
-                (k == BAC_AO) || (k == BAC_DO))
+                (k == BAC_AO) || (k == BAC_BO))
             {
                 b_is_instance = true;
             }
@@ -3620,7 +3620,7 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 			}
 			else  if (((strlen(p)==1) && (*p=='0')) && 
 				((k!= COIL_REG) && (k!= DIS_INPUT_REG) && (k!= INPUT_REG) && (k!= MB_REG) &&
-				(k != BAC_AV) && (k != BAC_AI) && (k != BAC_AO) && (k != BAC_DO) && (k != BAC_BV) && (k != BAC_BI)))
+				(k != BAC_AV) && (k != BAC_AI) && (k != BAC_AO) && (k != BAC_BO) && (k != BAC_BV) && (k != BAC_BI)))
 			{
 				memcpy(pmes,"error line : ",13);
 				pmes += 13;
@@ -3756,7 +3756,7 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
     //// 例如 编程   123456IN4   会报错 ，因为这种利用object instance 去编程 只支持 AV AI AO DO
     if ((*num_panel >= 256) || b_is_instance)
     {
-        if ((k != BAC_AV) && (k != BAC_AI) && (k != BAC_AO) && (k != BAC_DO) && (k != BAC_BI) && (k != BAC_BV))
+        if ((k != BAC_AV) && (k != BAC_AI) && (k != BAC_AO) && (k != BAC_BO) && (k != BAC_BI) && (k != BAC_BV))
         {
             sntx_err(INSTANCE_NOT_SUPPORT); //instance 不支持 此 type. 
             error = INSTANCE_NOT_SUPPORT;
@@ -5813,7 +5813,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
                                 ((unsigned char)vars_table[cur_index].point_type == BAC_AV) ||
                                 ((unsigned char)vars_table[cur_index].point_type == BAC_AI) ||
                                 ((unsigned char)vars_table[cur_index].point_type == BAC_AO) ||
-                                ((unsigned char)vars_table[cur_index].point_type == BAC_DO))
+                                ((unsigned char)vars_table[cur_index].point_type == BAC_BO))
                             {
                                 point.number = (unsigned char)((vars_table[cur_index].num_point) & 0x00ff);
                                 high_3bit = ((vars_table[cur_index].num_point) & 0xff00) >> 3;
@@ -5888,7 +5888,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 								(temp_point_type == BAC_AV) ||
 								(temp_point_type == BAC_AI) ||
 								(temp_point_type == BAC_AO) ||
-								(temp_point_type == BAC_DO))
+								(temp_point_type == BAC_BO))
 							{
 								point.number     = (unsigned char)((vars_table[cur_index].num_point) & 0x00ff);
 								high_3bit = ((vars_table[cur_index].num_point) & 0xff00) >> 3;
@@ -5925,7 +5925,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 								((unsigned char)vars_table[cur_index].point_type == BAC_AV) ||
 								((unsigned char)vars_table[cur_index].point_type == BAC_AI) ||
 								((unsigned char)vars_table[cur_index].point_type == BAC_AO) ||
-								((unsigned char)vars_table[cur_index].point_type == BAC_DO))
+								((unsigned char)vars_table[cur_index].point_type == BAC_BO))
 							{
 								point.number     = (unsigned char)((vars_table[cur_index].num_point) & 0x00ff);
 								high_3bit = ((vars_table[cur_index].num_point) & 0xff00) >> 3;
@@ -6936,7 +6936,7 @@ int pointtotext(char *buf,Point_T3000 *point)
 		return 1;
 	}
 
-	if(point_type > BAC_DO)
+	if(point_type > BAC_BO)
 	{
 		buf[0]=0;
 		return 1;
@@ -6980,7 +6980,7 @@ int pointtotext(char *buf,Point_Net *point)
     //    (point->point_type == BAC_AV) ||
     //    (point->point_type == BAC_AI) ||
     //    (point->point_type == BAC_AO) ||
-    //    (point->point_type == BAC_DO))
+    //    (point->point_type == BAC_BO))
     //{
     //    num_point = num_point;
     //}
@@ -7041,7 +7041,7 @@ int pointtotext(char *buf,Point_Net *point)
         if ((point_type == BAC_AV) ||
             (point_type == BAC_AI) ||
             (point_type == BAC_AO) ||
-            (point_type == BAC_DO) ||
+            (point_type == BAC_BO) ||
             (point_type == BAC_BV) ||
             (point_type == BAC_BI) ||
             (point_type == COIL_REG) ||
@@ -7060,7 +7060,7 @@ int pointtotext(char *buf,Point_Net *point)
     {
         if ((point_type == BAC_BI) || (point_type == BAC_BV) ||
             (point_type == BAC_AV) || (point_type == BAC_AI) ||
-            (point_type == BAC_AO) || (point_type == BAC_DO))
+            (point_type == BAC_AO) || (point_type == BAC_BO))
         {
             unsigned int temp_value;
             temp_value = ((point->network & 0x7F) << 16) + (point->panel << 8) + (point->sub_panel);
@@ -7098,7 +7098,7 @@ int pointtotext(char *buf,Point_Net *point)
             (point->point_type == BAC_AV) ||
             (point->point_type == BAC_AI) ||
             (point->point_type == BAC_AO) ||
-            (point->point_type == BAC_DO))
+            (point->point_type == BAC_BO))
         {
             strcat(buf, itoa(num, x, 10));
         }
@@ -7132,7 +7132,7 @@ int pointtotext(char *buf,Point_Net *point)
 		(point->point_type == BAC_AV) ||
 		(point->point_type == BAC_AI) ||
 		(point->point_type == BAC_AO) ||
-		(point->point_type == BAC_DO) )
+		(point->point_type == BAC_BO) )
 	{
 		strcat(buf,itoa(num,x,10));
 	}
@@ -7752,7 +7752,7 @@ void init_info_table( void )
 			case BAC_AO:
 				ptr_panel.info[i].name = "AO";
 				break;
-			case BAC_DO:
+			case BAC_BO:
 				ptr_panel.info[i].name = "BO";  //change DO to BO.
 				break;
             case BAC_BV:

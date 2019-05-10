@@ -153,7 +153,7 @@
 #define BAC_AV  27
 #define BAC_AI  28
 #define BAC_AO  29
-#define BAC_DO  30
+#define BAC_BO  30
 
 #define PASS    USER_NAME
 

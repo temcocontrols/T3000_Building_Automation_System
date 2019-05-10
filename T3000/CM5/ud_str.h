@@ -75,7 +75,7 @@ typedef enum {
 		 READEXT_IO_T3000			= 37,
 		 READ_TSTATE_SCHEDULE_T3000 = 38,
 		 READ_REMOTE_POINT         = 40,
-
+         READ_SCHEDUAL_TIME_FLAG   = 41,
 
 		 WRITEOUTPUT_T3000         = 100+ENUM_OUT+1,  /* write outputs          */
 		 WRITEINPUT_T3000          = 100+ENUM_IN+1,   /* write inputs           */
@@ -99,6 +99,7 @@ typedef enum {
 		 WRITETSTAT_T3000			= 100 + READTSTAT_T3000,
 		 //COMMAND_50                = 50,
 		 //READ_COMMAND_50           = 50,
+         WRITE_SCHEDUAL_TIME_FLAG  = 141,
 		 WRITE_COMMAND_50          = 150,
 		 
          READ_NEW_TIME_COMMAND      = 88,           /* read new time            */  //2018 04 17 新的读时间命令
@@ -395,6 +396,11 @@ typedef struct 		// (size = 16 byte s)
 {
 	Day_Time Schedual_Day_Time[8][9];
 } Str_schedual_time_point;
+
+typedef struct 		// (size = 16 byte s)
+{
+    byte Time_flag[8][9];
+} Str_schedual_time_flag;
 
 typedef struct
 {

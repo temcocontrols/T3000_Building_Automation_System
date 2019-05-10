@@ -10,6 +10,7 @@
 #define PM_TSTAT7                     7
 #define PM_TSTAT5i                    8
 #define PM_TSTAT8                     9
+#define PM_TSTAT10                    10    //带Wifi 的TSTAT 拥有T3 program 的功能
 #define PM_TSTAT5D                    12
 #define PM_AirQuality                 13
 #define PM_HUMTEMPSENSOR              14
@@ -59,6 +60,7 @@
 #define PM_PWMETER			          73
 #define PM_MINIPANEL_ARM              74
 #define PM_WEATHER_STATION            75
+#define PWM_TRANSDUCER_2              90  //Lijun transudcer 新板子;
 #define PM_TSTAT8_WIFI                91
 #define PM_TSTAT8_OCC                 92
 #define PM_TSTAT7_ARM                 93

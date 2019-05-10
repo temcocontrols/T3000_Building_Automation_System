@@ -121,7 +121,7 @@ typedef enum {
 #define Tusage_delay 15
 
 #define DEFAULT_MAX_INFO_FRAMES 1
-#define DEFAULT_MAX_MASTER 127
+#define DEFAULT_MAX_MASTER 254
 #define DEFAULT_MAC_ADDRESS 127
 
 #ifdef __cplusplus

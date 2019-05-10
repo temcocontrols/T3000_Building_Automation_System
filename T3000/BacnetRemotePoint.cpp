@@ -22,7 +22,7 @@
 #define BAC_AV  27
 #define BAC_AI  28
 #define BAC_AO  29
-#define BAC_DO  30
+#define BAC_BO  30
 
 IMPLEMENT_DYNAMIC(CBacnetRemotePoint, CDialogEx)
 
@@ -275,7 +275,7 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 			temp_type = _T("AI");
 		else if (t_type == BAC_AO + 1)
 			temp_type = _T("AO");
-		else if (t_type == BAC_DO + 1)
+		else if (t_type == BAC_BO + 1)
 			temp_type = _T("BO");
         else if (t_type == BAC_BV + 1)
             temp_type = _T("BV");

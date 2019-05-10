@@ -260,7 +260,6 @@
 #define IDB_BITMAP8                     608
 #define IDB_BITMAP_ALARM_RED            608
 #define IDR_MENU_PROGRAMEDIT_RIGHT_CLICK 609
-#define IDB_BITMAP9                     610
 #define IDI_ICON_DEFAULT_VARIABLE       625
 #define IDI_ICON_DEFAULT_PROGRAM        626
 #define IDI_ICON_DEFAULT_HOLIDAY        629
@@ -300,7 +299,7 @@
 #define IDD_DIALOG_FREE_COOLING         676
 #define IDD_DIALOG_REMOTE_PORT_WARNING  677
 #define IDD_DIALOG16                    679
-#define IDD_CONTROLBASIC_EDITOR_VIEW   680
+#define IDD_CONTROLBASIC_EDITOR_VIEW    680
 #define IDD_DIALOG_MINIPANEL_GROUP_SCHEDULE 688
 #define IDD_DIALOG_MODBUS_BACNET_ROUTER 690
 #define IDB_BITMAP_NEW_BACNET_MENU_BIT  693
@@ -901,8 +900,10 @@
 #define IDC_INPUTVALUE3_PID3            1190
 #define IDC_AIREDIT                     1191
 #define IDC_CHECK182                    1191
+#define IDC_DELTA_SELECT_1              1191
 #define IDC_USETRSETPT                  1192
 #define IDC_CHECK183                    1192
+#define IDC_DELTA_SELECT_2              1192
 #define IDC_PTOFFEDIT                   1193
 #define IDC_CHECK184                    1193
 #define IDC_SETPTEDIT                   1194
@@ -2424,6 +2425,10 @@
 #define IDC_LIST_ZIGBEE_REPEATER        2475
 #define IDC_BUTTON_ZIGBEE_REFRESH       2476
 #define IDC_LIST_ZIGBEE_INPUT_MOUDLE    2477
+#define IDC_BUTTON_CLEAR_SCHEDULE       2478
+#define IDC_STATIC_DELTA                2479
+#define IDC_STATIC_ACE                  2480
+#define IDC_EDIT_BACNET_DEVICE_ID       2481
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -2982,7 +2987,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        728
 #define _APS_NEXT_COMMAND_VALUE         34070
-#define _APS_NEXT_CONTROL_VALUE         2478
+#define _APS_NEXT_CONTROL_VALUE         2482
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

@@ -892,7 +892,8 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
             }
 
             if ((Device_Basic_Setting.reg.mini_type == PRODUCT_CM5) ||
-                Device_Basic_Setting.reg.mini_type == BIG_MINIPANEL)
+                Device_Basic_Setting.reg.mini_type == BIG_MINIPANEL ||
+                Device_Basic_Setting.reg.mini_type == MINIPANELARM)
             {
                 ((CButton *)GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->EnableWindow(true);
                 ((CButton *)GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->EnableWindow(true);
@@ -2145,6 +2146,12 @@ void CBacnetSetting::OnEnKillfocusEditSettingPort()
 
 void CBacnetSetting::OnBnClickedButtonHealth()
 {
+#ifdef DEBUG
+    ShutDownMstpGlobal(5);
+    return;
+#endif // DEBUG
+
+
 	GetPrivateData_Blocking(g_bac_instance,READ_MISC,0,0,sizeof(Str_MISC));
 	CBacnetSettingHealth Health_Dlg;
 	Health_Dlg.DoModal();

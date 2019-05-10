@@ -98,6 +98,20 @@
 #include "h_pt_a.h"
 
 
+#define BACNET_TYPE_NULL                      0
+#define BACNET_TYPE_BOOLEAN                   1
+#define BACNET_TYPE_UNSIGNED                  2
+#define BACNET_TYPE_SIGNED                    3
+#define BACNET_TYPE_REAL                      4
+#define BACNET_TYPE_DOUBLE                    5
+#define BACNET_TYPE_OCTET_STRING              6
+#define BACNET_TYPE_CHARACTER_STRING          7
+#define BACNET_TYPE_BIT_STRING                8
+#define BACNET_TYPE_ENUMERATED                9
+#define BACNET_TYPE_DATE                      10
+#define BACNET_TYPE_TIME                      11
+#define BACNET_TYPE_OBJECT_ID                 12
+
 typedef struct bacnet_rp_info  //bacnet 相关的部分必须放在 bacnet include 的头文件中;//Fan
 {
     unsigned int bacnet_instance;
@@ -107,6 +121,21 @@ typedef struct bacnet_rp_info  //bacnet 相关的部分必须放在 bacnet include 的头文
     BACNET_APPLICATION_DATA_VALUE value;
     int invoke_id;
 }str_bacnet_rp_info;
+
+typedef struct bacnet_standard_Info
+{
+    //CRelayLabel* control_pt;
+    //HWND hWnd;
+    uint32_t deviceid;
+    int8_t standard_command;  //0  非标      1 标准;
+    int object_type;
+    uint32_t object_instance;
+    int property_id;
+    int lable_index;
+    int last_resault; // -1 没读到   -2 无whois     1 数据正常；
+    CString cs_value_show;  //显示出来的value 值;
+    BACNET_APPLICATION_DATA_VALUE value;
+}str_bacnet_screen_info;
 
 //#include ""
 //#include ""

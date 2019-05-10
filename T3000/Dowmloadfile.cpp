@@ -191,6 +191,16 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam, LPARAM lParam)
         }
         KillProcessFromName(_T("ISP.exe"));
 
+        if ((m_product_isp_auto_flash.protocol == PROTOCOL_BIP_TO_MSTP) ||
+            (m_product_isp_auto_flash.protocol == PROTOCOL_MSTP_TO_MODBUS) ||
+            (m_product_isp_auto_flash.protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
+        {
+            temp_isp_info.Format(_T("Don't support using bacnet protocol to update firmware ."));
+            m_download_info.InsertString(m_download_info.GetCount(), temp_isp_info);
+            m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
+
+            return 0;
+        }
         bool is_sub_device = false;
         CString temp_deal_ip = m_product_isp_auto_flash.BuildingInfo.strIp;
         if (!temp_deal_ip.IsEmpty())
@@ -946,7 +956,45 @@ void Dowmloadfile::Update_File()
         CopyFile(update_exe_file_path, NewUpdateFilePath, false);
         DeleteFile(update_exe_file_path); //在更新完后删除Eng文件;
     }
+
+#if 0
+    //删除exe目录下无用的动态库文件 ，只做一次;
+    CString temp_db_ini_folder;
+    temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
+    int n_already_check_old_file = 0;
+    n_already_check_old_file = GetPrivateProfileInt(_T("Setting"), _T("AlreadyCheckOldFile"), 0, temp_db_ini_folder);
+    if (n_already_check_old_file == 0)
+    {
+        CString temp_delete_old_file_path1 = ApplicationFolder + _T("\\FastColoredTextBox.dll");
+        CString temp_delete_old_file_path2 = ApplicationFolder + _T("\\FastColoredTextBoxNS.dll");
+        CString temp_delete_old_file_path3 = ApplicationFolder + _T("\\Irony.dll");
+        CString temp_delete_old_file_path4 = ApplicationFolder + _T("\\Irony.Interpreter.dll");
+        CString temp_delete_old_file_path5 = ApplicationFolder + _T("\\NGenerics.dll");
+        CString temp_delete_old_file_path6 = ApplicationFolder + _T("\\T3000Grammar.dll");
+        CString temp_delete_old_file_path7 = ApplicationFolder + _T("\\PRGReaderLibrary.dll");
+        CString temp_delete_old_file_path8 = ApplicationFolder + _T("\\ProgramEditor.dll");
+
+        if (cs_temp_find.FindFile(temp_delete_old_file_path1))
+            DeleteFile(temp_delete_old_file_path1);
+        if (cs_temp_find.FindFile(temp_delete_old_file_path2))
+            DeleteFile(temp_delete_old_file_path2);
+        if (cs_temp_find.FindFile(temp_delete_old_file_path3))
+            DeleteFile(temp_delete_old_file_path3);
+        if (cs_temp_find.FindFile(temp_delete_old_file_path4))
+            DeleteFile(temp_delete_old_file_path4);
+        if (cs_temp_find.FindFile(temp_delete_old_file_path5))
+            DeleteFile(temp_delete_old_file_path5);
+        if (cs_temp_find.FindFile(temp_delete_old_file_path6))
+            DeleteFile(temp_delete_old_file_path6);
+        if (cs_temp_find.FindFile(temp_delete_old_file_path7))
+            DeleteFile(temp_delete_old_file_path7);
+        if (cs_temp_find.FindFile(temp_delete_old_file_path8))
+            DeleteFile(temp_delete_old_file_path8);
+        WritePrivateProfileStringW(_T("Setting"), _T("AlreadyCheckOldFile"), _T("1"), temp_db_ini_folder);
+    }
+#endif
 }
+
 
 HANDLE hDownloadFtpThread = NULL;
 void Dowmloadfile::Start_Download_Ftp()

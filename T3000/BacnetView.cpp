@@ -2,6 +2,29 @@
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
 //使用VS2010 编译需删除 c:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cvtres.exe 来确保用更高版本的 来转换资源文件
+
+2019 04 29
+1. User can insert more remote point in the "Graphic" user interface.
+   Using the standard bacnet keywords "AV,AI,AO,BV,BI,BO" ,format is "Deviceid + Keywords + number"  
+   Such as 55555AI3   ,  125AV45  
+2. Select the label, user can change value.
+3. Fix T3TB/BB/LB  schedule can't add "00:00" in the first column and the second column.
+4. For Tstat8 user can change the bacnet device id ,need update Tstat8 firmware version 8.6
+5. For T3TB/BB/LB trendlog , user can monitor remote bacnet point .For this release , T3000 can show the unit and object name if they have.
+6. Optimize the T3 calibration . if input a minus number , the column "sign" will automatically set to "-" 
+7. Fix the twinkling UI when opening T3000.
+8. For TSTAT8,add a new function of pid.(for delta t logic).
+   For TSTAT8 pid loop 1, the input value and setpoint can set to minus .
+
+2019 04 04
+T3000 Revisions for the software release of Apr 4, 2019
+1.T3000 Support PM5E(new CPU chip) , use the same user interface as TSTAT8.
+2.CO2/HUM/PRESSURE using the same input list ,output list as T3.
+3.Change the icon of the humidity , before it use tstat5's icon.
+4.T3TB/LB/BB support connection using RS485 ,now T3000 can scan it ,and work both "Modbus protocol" and "bacnet mstp" protocol
+5.Add "ZigbeeRepeater" user interface .
+
+
 2019 03 15
 1.修改modbus 底层库， 若服务器端强制断开连接 ，则主动去连接上次的ip和端口;
 2.修复CO2 Node 温度显示异常的问题，只从传感器上读取温度，不在从 内部板上读取;
@@ -1522,6 +1545,13 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 						delete ScheduleEdit_Window;
 						ScheduleEdit_Window = NULL;
 					}
+
+                    if (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 480)
+                    {
+                        GetPrivateData_Blocking(g_bac_instance, READ_SCHEDUAL_TIME_FLAG, weekly_list_line, weekly_list_line, sizeof(Str_schedual_time_flag));
+                    }
+                    
+
 					ScheduleEdit_Window = new CBacnetScheduleTime;
 					ScheduleEdit_Window->Create(IDD_DIALOG_BACNET_SCHEDULE_TIME,this);	
 					ScheduleEdit_Window->ShowWindow(SW_SHOW);
@@ -1529,8 +1559,8 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 				}
 				else
 				{
-					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Weekly schedual time read time out!"));
-					//MessageBox(_T("Weekly schedual time read time out!"));
+					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Weekly schedule time read time out!"));
+					//MessageBox(_T("Weekly schedule time read time out!"));
 				}
 
 				return 0;
@@ -2049,6 +2079,7 @@ void CDialogCM5_BacNet::Initial_All_Point()
 	m_Weekly_data.clear();
 	m_Annual_data.clear();
 	m_Schedual_Time_data.clear();
+    m_Schedual_time_flag.clear();
 	m_controller_data.clear();
 	m_screen_data.clear();
 	m_monitor_data.clear();
@@ -2103,6 +2134,10 @@ void CDialogCM5_BacNet::Initial_All_Point()
 		Str_schedual_time_point temp_schedual;
 		memset(&temp_schedual,0,sizeof(temp_schedual));
 		m_Schedual_Time_data.push_back(temp_schedual);
+
+        Str_schedual_time_flag temp_time_flag;
+        memset(&temp_time_flag, 0, sizeof(Str_schedual_time_flag));
+        m_Schedual_time_flag.push_back(temp_time_flag);
 	}
 
 	for (int i=0;i<BAC_PID_COUNT;i++)
@@ -2683,6 +2718,8 @@ bool has_change_connect_ip = true;
 //INPUT int test_function_return_value();
 void CDialogCM5_BacNet::Fresh()
 {
+    //SEND_COMMAND_DELAY_TIME = 1000; //测试
+
     str_bacnet_rp_info temp_test2;
 	g_bPauseMultiRead = true; // 只要在minipanel的界面 就暂停 读 寄存器的那个线程;
 
@@ -5405,7 +5442,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 
 			if(click_resend_time == 9)
 			{
-				SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Please wait ...."));
+				SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Connecting! Please wait ...."));
 			}
 
 			if(find_exsit)
@@ -5438,7 +5475,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 					if(send_status)
 					{
 						bool need_break = false;
-						for (int z=0;z<100;z++)
+						for (int z=0;z<200;z++)
 						{
 							Sleep(10);
 							if(tsm_invoke_id_free(temp_invoke_id))
@@ -5485,9 +5522,6 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 					KillTimer(BAC_READ_SETTING_TIMER);
 					CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 					pFrame->m_pTreeViewCrl->turn_item_image(selected_tree_item ,false);
-					//selected_product_Node.status_last_time[0] = false;
-					//selected_product_Node.status_last_time[1] = false;
-					//selected_product_Node.status_last_time[2] = false;
 
                     for (int x = 0; x < 5; x++)
                     {
@@ -5496,9 +5530,6 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read data timeout. "));
 					break;
 				}
-
-
-
 			}
 
 			if(!find_exsit)
@@ -5682,7 +5713,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 			{
                 if (g_protocol == PROTOCOL_BACNET_IP)
                 {
-                    pFrame->Show_Wait_Dialog_And_ReadBacnet();
+                    pFrame->Show_Wait_Dialog_And_ReadBacnet(1);
 #if 0
                     if (ShowMessageDlg != NULL)
                     {
@@ -5844,6 +5875,8 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 		&& (
 			(selected_product_Node.product_class_id ==PM_CM5 ) 
 			||
+            (selected_product_Node.product_class_id == PM_TSTAT10)
+            ||
 			(selected_product_Node.product_class_id ==PM_MINIPANEL )	
 			||
 			(selected_product_Node.product_class_id == PM_MINIPANEL_ARM)
@@ -5861,8 +5894,8 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
       if((!read_analog_customer_unit) && 
 		selected_product_Node.protocol != MODBUS_RS485 && 
 		((selected_product_Node.product_class_id ==PM_CM5 ) ||
-		(selected_product_Node.product_class_id ==PM_MINIPANEL )
-			||
+		(selected_product_Node.product_class_id ==PM_MINIPANEL )||
+            (selected_product_Node.product_class_id == PM_TSTAT10) ||
 			(selected_product_Node.product_class_id == PM_MINIPANEL_ARM)
 			))
 	{

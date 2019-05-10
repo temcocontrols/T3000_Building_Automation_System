@@ -256,7 +256,12 @@ BOOL CBacnetEditLabel::PreTranslateMessage(MSG* pMsg)
 				if(((label_info.nSub_Panel == Station_NUM) && (label_info.nMain_Panel == Station_NUM)) ||
                     ((label_info.nSub_Panel == 0) && (label_info.nMain_Panel == Station_NUM)))
 					PostMessage(WM_EDIT_CHANGE_VALUE,CHANGE_VALUE,NULL);
-
+                else if ((label_info.nPoint_type == BAC_AI) || (label_info.nPoint_type == BAC_AV) ||
+                    (label_info.nPoint_type == BAC_BI) || (label_info.nPoint_type == BAC_BV) ||
+                    (label_info.nPoint_type == BAC_AO) || (label_info.nPoint_type == BAC_BO))
+                {
+                    PostMessage(WM_EDIT_CHANGE_VALUE, CHANGE_VALUE, NULL);
+                }
 				return 0;
 			}
 		}
@@ -274,6 +279,16 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 	CString show_temp;
 	CStringArray temparray;
 	CString temp_unit;
+    int temp_index = -1;
+    for (int i = 0; i < m_standard_graphic_refresh_data.size(); i++)
+    {
+        if (label_info.nLabel_index == m_standard_graphic_refresh_data.at(i).lable_index)
+        {
+            temp_index = i;
+            break;
+        }
+    }
+
 	switch(label_info.nPoint_type)
 	{
 	case BAC_IN: //input
@@ -610,6 +625,60 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 			}
 		}
 		break;
+    case BAC_AI:
+    case BAC_AO:
+    case BAC_AV:
+    {
+        if (temp_index < 0)
+            return 0;
+        CString temp_analog_value;
+        GetDlgItemTextW(IDC_EDIT_LABEL_VALUE, temp_analog_value);
+        float temp_float = _wtof(temp_analog_value) ;
+        BACNET_APPLICATION_DATA_VALUE temp_value = {0};
+        temp_value.tag = BACNET_TYPE_REAL;
+        temp_value.context_specific = false;
+        temp_value.type.Real = temp_float;
+        int ret_value = 0;
+        ret_value = Bacnet_Write_Properties_Blocking(m_standard_graphic_refresh_data.at(temp_index).deviceid,
+            (BACNET_OBJECT_TYPE)m_standard_graphic_refresh_data.at(temp_index).object_type,
+            m_standard_graphic_refresh_data.at(temp_index).object_instance,
+            m_standard_graphic_refresh_data.at(temp_index).property_id,
+            &temp_value);
+        if (ret_value > 0)
+        {
+            CString temp_cs;
+            temp_cs.Format(_T("Write value %.2f success"), temp_float);
+            MessageBox(temp_cs);
+        }
+    }
+        break;
+    case BAC_BI:
+    case BAC_BV:
+    case BAC_BO:
+    {
+        if (temp_index < 0)
+            return 0;
+        CString temp_analog_value;
+        GetDlgItemTextW(IDC_EDIT_LABEL_VALUE, temp_analog_value);
+        int temp_float = _wtoi(temp_analog_value);
+        BACNET_APPLICATION_DATA_VALUE temp_value = { 0 };
+        temp_value.tag = BACNET_TYPE_ENUMERATED;
+        temp_value.context_specific = false;
+        temp_value.type.Enumerated = (BOOL)temp_float;
+        int ret_value = 0;
+        ret_value = Bacnet_Write_Properties_Blocking(m_standard_graphic_refresh_data.at(temp_index).deviceid,
+            (BACNET_OBJECT_TYPE)m_standard_graphic_refresh_data.at(temp_index).object_type,
+            m_standard_graphic_refresh_data.at(temp_index).object_instance,
+            m_standard_graphic_refresh_data.at(temp_index).property_id,
+            &temp_value);
+        if (ret_value > 0)
+        {
+            CString temp_cs;
+            temp_cs.Format(_T("Write value %d success"), temp_float);
+            MessageBox(temp_cs);
+        }
+    }
+        break;
 	default:
 		break;
 	}
@@ -640,6 +709,9 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 	this->ShowWindow(SW_SHOW);
 
 
+
+
+    m_edit_auto_manual.ShowWindow(SW_SHOW);
 
 	memcpy(&label_info,&temp_info,sizeof(Bacnet_Label_Info));
 	memcpy(&label_info_buffer,&temp_info,sizeof(Bacnet_Label_Info));
@@ -784,8 +856,43 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 	//	return ;
 	//}
 
+
+    if ((temp_info.nPoint_type == BAC_AI) || (temp_info.nPoint_type == BAC_AV) ||
+        (temp_info.nPoint_type == BAC_BI) || (temp_info.nPoint_type == BAC_BV) ||
+        (temp_info.nPoint_type == BAC_AO) || (temp_info.nPoint_type == BAC_BO))
+    {
+        for (int i = 0; i < m_standard_graphic_refresh_data.size(); i++)
+        {
+            if (temp_info.nLabel_index == m_standard_graphic_refresh_data.at(i).lable_index)
+            {
+                m_value = m_standard_graphic_refresh_data.at(i).cs_value_show;
+                break;
+            }
+        }
+        // 2019 04 03 新增支持 123456AI5的功能
+        Point_Net temp_point;
+        temp_point.panel = temp_info.nMain_Panel;
+        temp_point.sub_panel = temp_info.nSub_Panel;
+        temp_point.point_type = temp_info.nPoint_type;
+        temp_point.number = temp_info.nPoint_number;
+        temp_point.network = temp_info.network_point;
+        char original_point[30];
+        memset(original_point, 0, 30);
+        pointtotext(original_point, &temp_point);
+        CString temp_des;
+        MultiByteToWideChar(CP_ACP, 0, original_point, (int)strlen(original_point) + 1,
+            temp_des.GetBuffer(MAX_PATH), MAX_PATH);
+        temp_des.ReleaseBuffer();
+
+        m_original_name = temp_des;
+        m_edit_value.EnableWindow(true);
+        m_static_point.SetWindowTextW(m_original_name);
+        m_edit_auto_manual.ShowWindow(SW_HIDE);
+        //m_value = temp_info
+        m_edit_value.SetWindowTextW(m_value);
+    }
     //2018 01 29 最新的 subpanel 为0 也是代表自己的
-	if((temp_info.nSub_Panel != Station_NUM) && (temp_info.nSub_Panel != 0))
+	else if((temp_info.nSub_Panel != Station_NUM) && (temp_info.nSub_Panel != 0))
 	{
 		Point_Net temp_point;
 		temp_point.panel = temp_info.nMain_Panel;
