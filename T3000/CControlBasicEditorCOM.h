@@ -53,16 +53,25 @@ public:
 		static BYTE parms[] = VTS_BSTR;
 		InvokeHelper(0x60020004, DISPATCH_PROPERTYPUT, VT_EMPTY, NULL, parms, newValue);
 	}
-	void AddControlPoint(long type, LPCTSTR Label, LPCTSTR AutoManual, LPCTSTR Value, LPCTSTR FullLabel, LPCTSTR Units, long index)
+	void AddControlPoint(long type, LPCTSTR Label, LPCTSTR AutoManual, LPCTSTR value, LPCTSTR FullLabel, LPCTSTR Units, long index)
 	{
 		static BYTE parms[] = VTS_I4 VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_I4;
-		InvokeHelper(0x60020006, DISPATCH_METHOD, VT_EMPTY, NULL, parms, type, Label, AutoManual, Value, FullLabel, Units, index);
+		InvokeHelper(0x60020006, DISPATCH_METHOD, VT_EMPTY, NULL, parms, type, Label, AutoManual, value, FullLabel, Units, index);
 	}
 	void SendCode_T3000(LPCTSTR Code)
 	{
 		static BYTE parms[] = VTS_BSTR;
 		InvokeHelper(0x60020007, DISPATCH_METHOD, VT_EMPTY, NULL, parms, Code);
 	}
+	void Clear_BASICControl()
+	{
+		InvokeHelper(0x60020008, DISPATCH_METHOD, VT_EMPTY, NULL, NULL);
+	}
+	void Setting_BASICControl()
+	{
+		InvokeHelper(0x60020009, DISPATCH_METHOD, VT_EMPTY, NULL, NULL);
+	}
+
 	// IProgramEditor properties
 public:
 
