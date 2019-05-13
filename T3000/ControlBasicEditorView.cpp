@@ -31,8 +31,13 @@ extern char my_display[10240];
 extern HWND mParent_Hwnd;
 extern void copy_data_to_ptrpanel(int Data_type);
 extern char editbuf[25000];
+extern char mycode[2000];
 extern char *desassembler_program();
+extern int Encode_Program();
 extern bool show_upper;
+extern int error;
+extern int renumvar;
+extern int my_lengthcode;
 IMPLEMENT_DYNAMIC(ControlBasicEditorView, CDialogEx)
 
 ControlBasicEditorView::ControlBasicEditorView(CWnd* pParent /*=NULL*/)
@@ -55,6 +60,13 @@ void ControlBasicEditorView::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(ControlBasicEditorView, CDialogEx)
+	ON_COMMAND(ID_SEND34071, &ControlBasicEditorView::OnSend)
+	ON_COMMAND(ID_CLEAR34070, &ControlBasicEditorView::OnClear)
+	ON_COMMAND(ID_LOADFILE34072, &ControlBasicEditorView::OnLoadfile)
+	ON_COMMAND(ID_SAVEFILE34073, &ControlBasicEditorView::OnSavefile)
+	ON_COMMAND(ID_REFRESH34074, &ControlBasicEditorView::OnRefresh)
+	ON_COMMAND(ID_SETTINGS34075, &ControlBasicEditorView::OnProgramIdeSettings)
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 
@@ -639,5 +651,395 @@ void ControlBasicEditorView::SetAllPoints_BACnetDevice()
 
 	 
 }
+void ControlBasicEditorView::OnSend()
+{
+	//reset the program buffer
+	memset(program_code[program_list_line], 0, 2000);
+
+	renumvar = 0;
+	error = -1; //Default no error;
+	CString tempcs;
+	/*((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetWindowTextW(tempcs);*/
+	tempcs = m_programeditor.get_Code();
+	tempcs.MakeUpper();
+	//	char*     pElementText;
+	int    iTextLen;
+	// wide char to multi char
+	iTextLen = WideCharToMultiByte(CP_ACP, 0, tempcs, -1, NULL, 0, NULL, NULL);
+	memset((void*)editbuf, 0, sizeof(char) * (iTextLen + 1));
+	::WideCharToMultiByte(CP_ACP, 0, tempcs, -1, editbuf, iTextLen, NULL, NULL);
+
+	//2017/ 12 / 04   dufan 不允许使用 在THEN 中嵌套使用IF ，否则 解码时会出错。暂时找不出更好的解决办法。
+	if (tempcs.Find(_T("THEN IF")) != -1)
+	{
+		MessageBox(_T("Don't allowed use nested 'IF'."));
+		return;
+	}
+
+	Encode_Program();
+	if (error == -1)
+	{
+
+		TRACE(_T("Encode_Program length is %d ,copy length is %d\r\n"), program_code_length[program_list_line], my_lengthcode);
+
+		if (my_lengthcode > 1920)
+		{
+			MessageBox(_T("Encode Program Code Length is too large"));
+			return;
+		}
 
 
+		if ((Device_Basic_Setting.reg.panel_type == PM_MINIPANEL) && (my_lengthcode > 9))// 
+		{
+
+			int total_program_size = 0;
+			for (int i = 0;i < (int)m_Program_data.size();i++)
+			{
+				if (i == program_list_line)
+				{
+					total_program_size = total_program_size + my_lengthcode;
+					continue;
+				}
+				if (m_Program_data.at(i).bytes != 0)
+					total_program_size = total_program_size + (m_Program_data.at(i).bytes / 400 + 1) * 400;
+			}
+
+			if (total_program_size >= 10000)
+			{
+				CString temp_message;
+				temp_message.Format(_T("Send failed!\r\nThere is not enough storage space!\r\nTotal size 10000 bytes.\r\Need %d "), total_program_size);
+				MessageBox(temp_message);
+				return;
+			}
+		}
+
+
+
+		memset(program_code[program_list_line], 0, 2000);
+		memcpy_s(program_code[program_list_line], my_lengthcode, mycode, my_lengthcode);
+		program_code_length[program_list_line] = program_code[program_list_line][1] * 256 + (unsigned char)program_code[program_list_line][0];
+		bac_program_size = program_code_length[program_list_line];// my_lengthcode;
+		bac_free_memory = 2000 - bac_program_size;
+
+
+		int npart = (my_lengthcode / 401) + 1;
+
+		bool b_program_status = true;
+
+		if (g_protocol == PROTOCOL_BIP_TO_MSTP)
+		{
+			for (int j = 0;j < npart;j++)
+			{
+				int n_ret = 0;
+				n_ret = WriteProgramData_Blocking(g_bac_instance, WRITEPROGRAMCODE_T3000, program_list_line, program_list_line, j);
+				if (n_ret < 0)
+				{
+					MessageBox(_T("Write Program Code Timeout!"));
+					return;
+				}
+			}
+			b_program_status = true;
+		}
+		else
+		{
+			for (int j = 0;j < npart;j++)
+			{
+				int send_status = true;
+				int resend_count = 0;
+				int temp_invoke_id = -1;
+				do
+				{
+					resend_count++;
+					if (resend_count > 5)
+					{
+						send_status = false;
+						b_program_status = false;
+						MessageBox(_T("Write Program Code Timeout!"));
+						return;
+					}
+					temp_invoke_id = WriteProgramData(g_bac_instance, WRITEPROGRAMCODE_T3000, program_list_line, program_list_line, j);
+
+					Sleep(SEND_COMMAND_DELAY_TIME);
+				} while (temp_invoke_id < 0);
+
+				if (send_status)
+				{
+					for (int i = 0;i < 3000;i++)
+					{
+						Sleep(1);
+						if (tsm_invoke_id_free(temp_invoke_id))
+						{
+							//MessageBox(_T("Operation success!"),_T("Information"),MB_OK);
+							//return;
+							goto	program_part_success;
+						}
+					}
+					b_program_status = false;
+					MessageBox(_T("Write Program Code Timeout!"));
+					return;
+
+				program_part_success:
+					continue;
+				}
+			}
+		}
+
+		if (b_program_status)
+		{
+			CString temp_string;
+			temp_string.Format(_T("Resource Compile succeeded.\r\nTotal size 2000 bytes.\r\nAlready used %d"), bac_program_size);
+
+
+
+			CTime temp_time = CTime::GetCurrentTime();
+			CString str_g_serialNum;
+			CString str_txt_file = g_achive_folder_temp_txt;
+			str_g_serialNum.Format(_T("%u_prg%d"), g_serialNum, program_list_line + 1);
+			CString temp_time_format = temp_time.Format(_T("%y_%m_%d %H_%M_%S"));
+			str_txt_file = str_txt_file + _T("\\") + str_g_serialNum + _T("    ") + temp_time_format + _T(".txt");
+			CString Write_Buffer;
+			CString FilePath;
+			FilePath = str_txt_file;
+			CFileFind temp_find;
+
+
+			GetDlgItemText(IDC_RICHEDIT2_PROGRAM, Write_Buffer);
+			CString temp_write_buf;
+			temp_write_buf = Write_Buffer;
+			temp_write_buf.Trim();
+			if ((temp_write_buf.GetLength() != 0) && (program_string.CompareNoCase(Write_Buffer) != 0))
+			{
+				char*     readytowrite;
+				int    iTextLen;
+				iTextLen = WideCharToMultiByte(CP_ACP, 0, Write_Buffer, -1, NULL, 0, NULL, NULL);
+				readytowrite = new char[iTextLen + 1];
+				memset((void*)readytowrite, 0, sizeof(char) * (iTextLen + 1));
+				::WideCharToMultiByte(CP_ACP, 0, Write_Buffer, -1, readytowrite, iTextLen, NULL, NULL);
+
+
+
+				CFile file(FilePath, CFile::modeCreate | CFile::modeReadWrite | CFile::modeNoTruncate);
+				file.SeekToEnd();
+				int write_length = strlen(readytowrite);
+				file.Write(readytowrite, write_length + 1);
+				file.Flush();
+				file.Close();
+				delete[] readytowrite;
+			}
+
+
+
+
+			MessageBox(temp_string);
+		}
+
+		//m_information_window.ResetContent();
+		//m_information_window.InsertString(0, _T("Resource Compile succeeded."));
+		m_Program_data.at(program_list_line).bytes = bac_program_size;
+		//Initial_static();
+		//CString temp1;
+		//((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetWindowTextW(temp1);
+		//m_edit_changed = false;
+		//program_string = temp1;
+	}
+	else
+	{
+		//m_information_window.ResetContent();
+		//CString cstring_error;
+
+		//int len = strlen(mesbuf);
+// 		int  unicodeLen = ::MultiByteToWideChar(CP_ACP, 0, mesbuf, -1, NULL, 0);
+// 		::MultiByteToWideChar(CP_ACP, 0, mesbuf, -1, cstring_error.GetBuffer(2000), unicodeLen);
+// 		cstring_error.ReleaseBuffer();
+
+
+		//		MessageBox(cstring_error);
+// 		CStringArray  Error_info;
+// 		SplitCStringA(Error_info, cstring_error, _T("\r\n"));//Split the CString with "\r\n" and then add to the list.(Fance)
+// 		Sleep(1);
+		//m_information_window.ResetContent();
+		//for (int i = 0;i < (int)Error_info.GetSize();i++)
+		//{
+			//m_information_window.InsertString(i, Error_info.GetAt(i));
+		//}
+
+		//MessageBox(_T("Errors,program NOT Sent!"));
+	}
+	//UpdateDataProgramText();
+}
+void ControlBasicEditorView::OnClear()
+{
+    
+	  m_programeditor.Clear_BASICControl();
+}
+void ControlBasicEditorView::OnLoadfile()
+{
+
+
+
+	CString FilePath;
+	CString ReadBuffer;
+
+	CFileDialog dlg(true, _T("*.txt"), _T(" "), OFN_HIDEREADONLY, _T("txt files (*.txt)|*.txt|All Files (*.*)|*.*||"), NULL, 0);
+	if (IDOK == dlg.DoModal())
+	{
+		FilePath = dlg.GetPathName();
+
+		//Write_Position = pParent->myapp_path + cs_file_time;
+		char *pBuf;
+		DWORD dwFileLen;
+
+
+		CFile file(FilePath, CFile::modeCreate | CFile::modeReadWrite | CFile::modeNoTruncate);
+
+		dwFileLen = (DWORD)file.GetLength();
+		pBuf = new char[dwFileLen + 1];
+		pBuf[dwFileLen] = 0;
+
+		file.SeekToBegin();
+		file.Read(pBuf, dwFileLen);
+		file.Close();
+
+		CString ReadBuffer;
+
+		int  len = 0;
+		len = strlen(pBuf);
+		int  unicodeLen = ::MultiByteToWideChar(CP_ACP, 0, pBuf, -1, NULL, 0);
+		::MultiByteToWideChar(CP_ACP, 0, pBuf, -1, ReadBuffer.GetBuffer(unicodeLen), unicodeLen);
+		ReadBuffer.ReleaseBuffer();
+
+		delete[] pBuf;
+		/*((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetWindowTextW(ReadBuffer);
+		((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(unicodeLen, unicodeLen);*/
+		m_programeditor.SendCode_T3000(ReadBuffer);
+
+	}
+}
+
+void ControlBasicEditorView::OnSavefile()
+{
+
+	CFileDialog dlg(false, _T("*.txt"), _T(" "), OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, _T("txt files (*.txt)|*.txt|All Files (*.*)|*.*||"), NULL, 0);
+	if (IDOK == dlg.DoModal())
+	{
+		CString Write_Buffer;
+		CString FilePath;
+		FilePath = dlg.GetPathName();
+		CFileFind temp_find;
+		if (temp_find.FindFile(FilePath))
+		{
+			DeleteFile(FilePath);
+		}
+
+
+		Write_Buffer=m_programeditor.get_Code();
+		//GetDlgItemText(IDC_RICHEDIT2_PROGRAM, Write_Buffer);
+		//char *readytowrite = 
+		char*     readytowrite;
+		int    iTextLen;
+		iTextLen = WideCharToMultiByte(CP_ACP, 0, Write_Buffer, -1, NULL, 0, NULL, NULL);
+		readytowrite = new char[iTextLen + 1];
+		memset((void*)readytowrite, 0, sizeof(char) * (iTextLen + 1));
+		::WideCharToMultiByte(CP_ACP, 0, Write_Buffer, -1, readytowrite, iTextLen, NULL, NULL);
+
+
+
+		CFile file(FilePath, CFile::modeCreate | CFile::modeReadWrite | CFile::modeNoTruncate);
+		file.SeekToEnd();
+		int write_length = strlen(readytowrite);
+		file.Write(readytowrite, write_length + 1);
+		file.Flush();
+		file.Close();
+		delete[] readytowrite;
+	}
+
+}
+void ControlBasicEditorView::OnRefresh()
+{
+
+
+	mParent_Hwnd = g_hwnd_now;
+	//prg_color_change = false;
+
+	m_program_edit_hwnd = this->m_hWnd;
+	g_hwnd_now = m_program_edit_hwnd;
+
+	copy_data_to_ptrpanel(TYPE_ALL);
+	memset(my_display, 0, sizeof(my_display));
+
+	char * temp_point;
+	temp_point = desassembler_program();
+	if (temp_point == NULL)
+	{
+		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Decode Error!"));
+		//return 0;
+	}
+	SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Decode success!"));
+	show_upper = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"), _T("Upper Case"), 1, g_cstring_ini_path);
+	CString temp;
+	int  len = 0;
+	len = strlen(my_display); //str.length();
+	int  unicodeLen = ::MultiByteToWideChar(CP_ACP, 0, my_display, -1, NULL, 0);
+	::MultiByteToWideChar(CP_ACP, 0, my_display, -1, temp.GetBuffer(unicodeLen), unicodeLen);
+	temp.ReleaseBuffer();
+	CString temp1 = temp;
+	if (show_upper)
+	{
+		temp1.MakeUpper();
+	}
+	else
+		temp1.MakeLower();
+
+	temp1.Replace(_T("\r\n"), _T(" \r\n"));
+	temp1.Replace(_T("\("), _T(" \( "));
+	temp1.Replace(_T("\)"), _T(" \) "));
+	temp1.Replace(_T("  "), _T(" "));
+	temp1.Replace(_T("  "), _T(" "));
+	temp1.Replace(_T("  "), _T(" "));
+	//temp1 = "110 BTUSUP = 19.253.REG108 / 10" ;
+
+	SetAllPoints_BACnetDevice();
+	// TODO:  Add extra initialization here
+	//m_programeditor.put_Code(temp1);
+	m_programeditor.SendCode_T3000(temp1);
+
+	AfxMessageBox(_T("Refresh Done"));
+
+}
+
+void ControlBasicEditorView::OnProgramIdeSettings()
+{
+
+	/*CBacnetProgramSetting ProgramSettingdlg;
+	ProgramSettingdlg.DoModal();
+	CString tempcs;
+	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetWindowTextW(tempcs);
+	if (show_upper)
+	{
+		tempcs.MakeUpper();
+	}
+	else
+	{
+		tempcs.MakeLower();
+	}
+	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetWindowTextW(tempcs);
+	Syntax_analysis();*/
+	m_programeditor.Setting_BASICControl();
+}
+
+void ControlBasicEditorView::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	CRect rc;
+	GetClientRect(rc);
+	if (m_programeditor.m_hWnd != NULL)
+	{
+		::SetWindowPos(this->m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+		//m_program_list.MoveWindow(&rc);
+		m_programeditor.MoveWindow(rc.left, rc.top, rc.Width(), rc.Height());
+
+		//GetDlgItem(IDC_BUTTON_PROGRAM_EDIT)->MoveWindow(rc.left + 20 ,rc.bottom - 60 , 120,50);
+	}
+
+}

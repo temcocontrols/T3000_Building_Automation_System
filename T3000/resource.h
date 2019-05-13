@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ …˙≥…µƒ∞¸∫¨Œƒº˛°£
-// π© T3000.rc  π”√
+// Microsoft Visual C++ ÁîüÊàêÁöÑÂåÖÂê´Êñá‰ª∂„ÄÇ
+// ‰æõ T3000.rc ‰ΩøÁî®
 //
 #define IDCANCEL2                       3
 #define IDCWRITEONE                     3
@@ -314,6 +314,7 @@
 #define IDD_DIALOG_REGISTER_LIST        716
 #define IDD_DIALOG_CO2_NODE             718
 #define IDD_DIALOG_BACNET_ADD_REMOTE_DEVICE 724
+#define IDR_MENU_CONTROL_BASIC          733
 #define IDD_DIALOG_ZIGBEE_REPEATER      726
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
@@ -2912,6 +2913,12 @@
 #define ID_CONTROL_MODBUSBACNETREGISTERLISTVIEW 34068
 #define ID_CONTROL_PANEL                34068
 #define ID_CONTROL_NETWORK              34069
+#define ID_CLEAR34070                   34070
+#define ID_SEND34071                    34071
+#define ID_LOADFILE34072                34072
+#define ID_SAVEFILE34073                34073
+#define ID_REFRESH34074                 34074
+#define ID_SETTINGS34075                34075
 #define ID_HELP_USING_UPDATE            34904
 #define ID_DATABASE_BACNETTOOL          34905
 #define IDD_DIALOG_BACNET_PROGRAM       34906
@@ -2985,9 +2992,10 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        728
-#define _APS_NEXT_COMMAND_VALUE         34070
-#define _APS_NEXT_CONTROL_VALUE         2482
+#define _APS_NEXT_RESOURCE_VALUE        734
+#define _APS_NEXT_COMMAND_VALUE         34076
+#define _APS_NEXT_CONTROL_VALUE         2471
+
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif
