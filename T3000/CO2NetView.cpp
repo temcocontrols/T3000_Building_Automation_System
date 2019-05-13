@@ -1712,13 +1712,13 @@ void CCO2NetView::Initial_OutputList()
 
 		if (output_range==1||output_range == 2)
 		{
-			Temp=((float)((short)TempDataArray[3066 - 3060]));
+			Temp=((float)((short)TempDataArray[3067 - 3060]));
 			Vtemp=(Temp)/100;
 			strTemp.Format(_T("%.2f v"),Vtemp);
 		}
 		else if (output_range==3)
 		{
-			Temp=((float)((short)TempDataArray[3066 - 3060]));
+			Temp=((float)((short)TempDataArray[3067 - 3060]));
 			Vtemp=(Temp)/100;
 			strTemp.Format(_T("%.2f ma"),Vtemp);
 		}
@@ -1730,13 +1730,13 @@ void CCO2NetView::Initial_OutputList()
  
 		if (output_range==1||output_range == 2)
 		{
-			Temp=((float)((short)TempDataArray[3067 - 3060]));
+			Temp=((float)((short)TempDataArray[3066 - 3060]));
 			Vtemp=(Temp)/100;
 			strTemp.Format(_T("%.2f v"),Vtemp);
 		}
 		else if (output_range==3)
 		{
-			Temp=((float)((short)TempDataArray[3067 - 3060]));
+			Temp=((float)((short)TempDataArray[3066 - 3060]));
 			Vtemp=(Temp)/100;
 			strTemp.Format(_T("%.2f ma"),Vtemp);
 		}

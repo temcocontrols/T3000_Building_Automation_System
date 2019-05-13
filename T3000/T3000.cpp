@@ -6,7 +6,7 @@
 #include "afxwinappex.h"
 #include "T3000.h"
 #include "MainFrm.h"
-
+#include "T3000DefaultView.h"
 #include "T3000Doc.h"
 #include "T3000View.h"
 #include "DialogCM5_BacNet.h"
@@ -26,7 +26,7 @@
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);  
 
 LPFN_ISWOW64PROCESS fnIsWow64Process;  
-const unsigned int g_versionNO= 20190329;
+const unsigned int g_versionNO= 20190508;
 
 
 #ifdef _DEBUG
@@ -734,9 +734,10 @@ BOOL CT3000App::InitInstance()
 			IDR_MAINFRAME,
 			RUNTIME_CLASS(CT3000Doc),
 			RUNTIME_CLASS(CMainFrame),       // main SDI frame window
-			RUNTIME_CLASS(CT3000View));
-
-
+			//RUNTIME_CLASS(CT3000View));
+            RUNTIME_CLASS(CT3000DefaultView));
+        
+        
 		if (!pDocTemplate)
 			return FALSE;
 

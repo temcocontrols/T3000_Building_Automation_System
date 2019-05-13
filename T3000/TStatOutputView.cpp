@@ -946,6 +946,7 @@ void CTStatOutputView::Fresh()
 {
     Initial_ListFor_Tstat();
     PostMessage(WM_REFRESH_BAC_OUTPUT_LIST, NULL, NULL);
+
 }
 
 void CTStatOutputView::OnInitialUpdate()

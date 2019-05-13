@@ -649,7 +649,7 @@ void CBacnetGraphic::Create_Line_Point()
 				if(TimeValueToPoint(analog_data_point[x][i].loggingtime,analog_data_point[x][i].analogdata,mytemppoint) == false)
 				{
 					point_error_2 = 1;
-					break;
+                    continue;
 				}
 
 				//CString strTime;
@@ -747,7 +747,7 @@ void CBacnetGraphic::Create_Line_Point()
 
 	if(point_error_2 == 1)
 	{
-		draw_graphic_finished = false;
+		draw_graphic_finished = true;
 		b_has_create_point = false;
 	}
 	else
@@ -2507,7 +2507,7 @@ int CBacnetGraphic::MaxMinRound(int Data,bool UP)
 	{
 		if (UP)
 		{
-			if ((Data % 5 == 0) || (Data % 10 == 0))
+			if ((Data % 2 == 0) || (Data % 10 == 0))
 			{
 				return Data;
 			}
@@ -2518,7 +2518,7 @@ int CBacnetGraphic::MaxMinRound(int Data,bool UP)
 		}
 		else
 		{
-			if ((Data % 5 == 0) || (Data % 10 == 0))
+			if ((Data % 2 == 0) || (Data % 10 == 0))
 			{
 				return Data;
 			}
@@ -2599,13 +2599,17 @@ void CBacnetGraphic::Reset_X_Y_Parameter()
 	//bef_max = total_y_max_value / 1000 + 1;
 	//bef_min = total_y_min_value /1000  - 1;	
     bef_max = total_y_max_value / 1000 ;
+    if (total_y_max_value % 1000 != 0)
+        bef_max = bef_max + 1;
     bef_min = total_y_min_value / 1000 ;
-
+    if (total_y_min_value % 1000 != 0)
+        bef_min = bef_min - 1;
 	int temp_max;
 	int temp_min;
 
 	re_calc_max_and_min(bef_max,bef_min,temp_max,temp_min);
 	total_y_max_value = temp_max * 1000;
+
 
 	if((total_y_min_value >= 0) && (total_y_min_value < 5000))
 		total_y_min_value = 0;
@@ -2874,16 +2878,27 @@ void CBacnetGraphic::OnZoomout()
 	}
 }
 
+//typedef struct {
+//    unsigned index;     /* index number that matches the text */
+//    const char *pString;        /* text pair - use NULL to end the list */
+//} INDTEXT_DATA1;
+
+extern  INDTEXT_DATA  _declspec(dllimport) bacnet_engineering_unit_names[];
+//extern int _declspec(dllimport) dllGlobalVar; //ÓÃ_declspec(dllimport)µ¼Èë
 void CBacnetGraphic::Get_Input_Unit()
 {
 	int inputs_count = m_monitor_data.at(monitor_list_line).num_inputs;
 	int analog_count = m_monitor_data.at(monitor_list_line).an_inputs;
+ 
 	for (int i=0;i<inputs_count;i++)
 	{
+        Point_Net temp = m_monitor_data.at(monitor_list_line).inputs[i];
+        //unsigned char temp_point_type = m_monitor_data.at(monitor_list_line).inputs[i].point_type;
+        //unsigned char temp_number = m_monitor_data.at(monitor_list_line).inputs[i].number;
 		 int temp_range = m_monitor_data.at(monitor_list_line).range[i];
 		if(i<analog_count)
 		{
-				if( m_monitor_data.at(monitor_list_line).inputs[i].point_type == ENUM_OUT + 1)
+				if(temp.point_type == ENUM_OUT + 1)
 				{
 					if(temp_range == 0)
 					{
@@ -2907,7 +2922,7 @@ void CBacnetGraphic::Get_Input_Unit()
 					else
 						InputUnit[i].Empty();
 				}
-				else if(m_monitor_data.at(monitor_list_line).inputs[i].point_type == ENUM_IN + 1)
+				else if(temp.point_type == ENUM_IN + 1)
 				{
 					if(temp_range == 0)
 					{
@@ -2931,7 +2946,7 @@ void CBacnetGraphic::Get_Input_Unit()
 					else
 						InputUnit[i].Empty();
 				}
-				else if(m_monitor_data.at(monitor_list_line).inputs[i].point_type == ENUM_VAR + 1)
+				else if(temp.point_type == ENUM_VAR + 1)
 				{
 					if(temp_range == 0)
 					{
@@ -2955,6 +2970,75 @@ void CBacnetGraphic::Get_Input_Unit()
 					else
 						InputUnit[i].Empty();
 				}
+                else if ((temp.point_type == BAC_AV + 1) ||
+                    (temp.point_type == BAC_AI + 1) ||
+                    (temp.point_type == BAC_AO + 1))
+                {
+                    int temp_object_type = 0;
+                    if (temp.point_type == BAC_AV + 1)
+                    {
+                        temp_object_type = OBJECT_ANALOG_VALUE;
+                    }
+                    else if (temp.point_type == BAC_AI + 1)
+                    {
+                        temp_object_type = OBJECT_ANALOG_INPUT;
+                    }
+                    else if (temp.point_type == BAC_AO + 1)
+                    {
+                        temp_object_type = OBJECT_ANALOG_OUTPUT;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+
+                    unsigned int temp_deviceid = ((temp.network & 0x7F) << 16) + (temp.panel << 8) + (temp.sub_panel);
+                    int n_find = false;
+                    int ncount = address_count();
+                    for (int j = 0;j < ncount;j++)
+                    {
+                        unsigned int ndevice_id = 0;
+                        unsigned int nmax_apdu = 0;
+                        BACNET_ADDRESS src;
+                        address_get_by_index(j, &ndevice_id, &nmax_apdu, &src);
+                        //device_id_vector.push_back(ndevice_id);
+                        if (ndevice_id == temp_deviceid)
+                        {
+                            n_find = true;
+                            break;
+                        }
+                    }
+
+                    if (n_find == false)
+                    {
+                        continue;
+                    }
+
+                    BACNET_APPLICATION_DATA_VALUE temp_value;
+                    int invoke_id = Bacnet_Read_Properties_Blocking(temp_deviceid, (BACNET_OBJECT_TYPE)temp_object_type, temp.number, PROP_UNITS, temp_value, 3);
+                    if (invoke_id >= 0)
+                    {
+                        if (temp_value.tag == TPYE_BACAPP_ENUMERATED)
+                        {
+                            MultiByteToWideChar(CP_ACP, 0, (char *)bacnet_engineering_unit_names[temp_value.type.Enumerated].pString, 
+                                (int)strlen((char *)bacnet_engineering_unit_names[temp_value.type.Enumerated].pString) + 1,
+                                InputUnit[i].GetBuffer(MAX_PATH), MAX_PATH);
+                            InputUnit[i].ReleaseBuffer();
+                        }
+                    }
+                    
+                    invoke_id = Bacnet_Read_Properties_Blocking(temp_deviceid, (BACNET_OBJECT_TYPE)temp_object_type, temp.number, PROP_OBJECT_NAME, temp_value, 3);
+                    if (invoke_id >= 0)
+                    {
+                        if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING)
+                        {
+                            MultiByteToWideChar(CP_ACP, 0, (char *)temp_value.type.Character_String.value,
+                                (int)strlen((char *)temp_value.type.Character_String.value) + 1,
+                                InputLable[i].GetBuffer(MAX_PATH), MAX_PATH);
+                            InputLable[i].ReleaseBuffer();
+                        }
+                    }
+                }
 				else
 				{
 					InputUnit[i].Empty();

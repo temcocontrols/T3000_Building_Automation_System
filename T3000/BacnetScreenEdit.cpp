@@ -14,7 +14,7 @@
 #include "global_define.h"
 extern int pointtotext(char *buf,Point_Net *point);
 Str_label_point m_temp_graphic_label_data[BAC_GRPHIC_LABEL_COUNT];
-
+int loading_labels;   //用来判断是否正在加载label;
 static int m_bac_select_label_old = -1;
 static bool click_ret_old = false;
 CBacnetEditLabel * Edit_Label_Window = NULL;
@@ -56,16 +56,15 @@ int GetAmonLabel(int index,CString &ret_label);
 
 unsigned int control_object_instance = 0;
 
+volatile HANDLE GraphicLable_Mutex = NULL;
 // CBacnetScreenEdit dialog
 // CGraphicView
 #define XStart 0
 //#define YStart 30
 #define YStart 0
 CRect mynew_rect;	//用来存储 窗体应该有多大;
-
+HANDLE h_read_standard_thread = NULL;
 vector <int> screnn_sequence;
-HANDLE h_read_all_panel_des_thread = NULL;
-HANDLE h_refresh_group_thread = NULL;
 
 bool show_not_exsit_dlg = true;
 bool screen_lock_label = false;
@@ -154,8 +153,8 @@ LRESULT  CBacnetScreenEdit::Edit_label_Handle(WPARAM wParam, LPARAM lParam)
 
 	m_graphic_label_data.at(temp_info->nLabel_index).reg.nDisplay_Type = temp_info->nDisplay_Type;
 	m_graphic_label_data.at(temp_info->nLabel_index).reg.nclrTxt = temp_info->nclrTxt;
-	memcpy(&m_graphic_label_data.at(temp_info->nLabel_index).reg.icon_name_1,temp_info->ico_name,20);
-	memcpy(&m_graphic_label_data.at(temp_info->nLabel_index).reg.icon_name_2,temp_info->ico_name_2,20);
+	memcpy(&m_graphic_label_data.at(temp_info->nLabel_index).reg.icon_name_1,temp_info->ico_name, STR_ICON_1_NAME_LENGTH);
+	memcpy(&m_graphic_label_data.at(temp_info->nLabel_index).reg.icon_name_2,temp_info->ico_name_2, STR_ICON_2_NAME_LENGTH);
 	m_graphic_label_data.at(temp_info->nLabel_index).reg.nIcon_place = temp_info->ntext_place;
 	m_graphic_label_data.at(temp_info->nLabel_index).reg.nIcon_size = temp_info->n_iconsize;
 
@@ -236,10 +235,16 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
 		temp_number = temp_number - 1;
 
     char temp_1 = temp_point_type & 0x1F;
-		if((temp_1 == 23) || (temp_1 == 24) || (temp_1 == 25) || (temp_1 == 26))
+		if((temp_1 == COIL_REG) || (temp_1 == DIS_INPUT_REG) || (temp_1 == INPUT_REG) || (temp_1 == MB_REG))
 		{
 			temp_number = temp_number + 1;
 		}
+        if ((temp_1 == BAC_BI) || (temp_1 == BAC_BV) ||
+            (temp_1 == BAC_AV) || (temp_1 == BAC_AI) ||
+            (temp_1 == BAC_AO) || (temp_1 == BAC_BO))
+        {
+            temp_number = temp_number + 1;
+        }
 
 	::GetWindowRect(BacNet_hwd,&mynew_rect);	//获取 view的窗体大小;
 
@@ -268,9 +273,9 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
 	temp_point_type = temp_point_type + 1;
 
     if(temp_panel == Station_NUM)
-	    AddLabel(temp_point_type ,temp_number,Station_NUM,sub_panel,nLeft,nTop);
+	    AddLabel(temp_point_type ,temp_number,Station_NUM,sub_panel,nLeft,nTop, k);
     else
-        AddLabel(temp_point_type, temp_number, temp_panel, sub_panel, nLeft, nTop);
+        AddLabel(temp_point_type, temp_number, temp_panel, sub_panel, nLeft, nTop, k);
 	if(UpdateDeviceLabelFlash())
 	{
 		memcpy_s(&m_temp_graphic_label_data,sizeof(Str_label_point) * BAC_GRPHIC_LABEL_COUNT,&m_graphic_label_data.at(0),sizeof(Str_label_point) * BAC_GRPHIC_LABEL_COUNT);
@@ -280,7 +285,7 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
 }
 
 
-void CBacnetScreenEdit::AddLabel(unsigned char point_type,uint8_t point_number,uint8_t main_panel,uint8_t sub_panel,unsigned int point_x,unsigned int point_y)
+void CBacnetScreenEdit::AddLabel(unsigned char point_type,uint8_t point_number,uint8_t main_panel,uint8_t sub_panel,unsigned int point_x,unsigned int point_y , unsigned char network)
 {
 	nDefaultDisplayType = GetPrivateProfileInt(_T("Setting"),_T("AddLabelDefaultDisplay"),LABEL_SHOW_VALUE,g_cstring_ini_path);
 	nDefaultclrTxt = GetPrivateProfileInt(_T("Setting"),_T("AddLabelDefaultColor"),RGB(0,0,255),g_cstring_ini_path);
@@ -324,6 +329,7 @@ void CBacnetScreenEdit::AddLabel(unsigned char point_type,uint8_t point_number,u
 		m_graphic_label_data.at(item_insert).reg.nScreen_index = screen_list_line;
 		m_graphic_label_data.at(item_insert).reg.nSerialNum = m_nSerialNumber;
 		m_graphic_label_data.at(item_insert).reg.nSub_Panel = sub_panel;
+        m_graphic_label_data.at(item_insert).reg.network = network;
 
 	//ReloadLabelsFromDB();
 	Invalidate(1);
@@ -723,6 +729,7 @@ LRESULT CBacnetScreenEdit::OnHotKey(WPARAM wParam,LPARAM lParam)
 BOOL CBacnetScreenEdit::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
+    loading_labels = false;
 	screen_lock_label  =(bool)GetPrivateProfileInt(_T("Setting"),_T("LockScreenLabel"),0,g_cstring_ini_path);
 
 	//show no pic 如果是0的话就不在显示没有图片.
@@ -873,6 +880,10 @@ BOOL CBacnetScreenEdit::OnInitDialog()
     //if(h_refresh_group_thread == NULL)
     //   h_refresh_group_thread = CreateThread(NULL, NULL, ReadGroupDataThreadfun, this, NULL, NULL);
 
+    if(h_read_standard_thread == NULL)
+        h_read_standard_thread = CreateThread(NULL, NULL, ReadStandardThreadfun, this, NULL, NULL);
+
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -882,6 +893,91 @@ vector <Bacnet_RemotePoint_Info> m_remote_screen_data;
 bool sort_by_panelnumber(Bacnet_RemotePoint_Info object1, Bacnet_RemotePoint_Info object2)
 {
     return object1.npanelnum < object2.npanelnum;
+}
+
+
+
+DWORD WINAPI CBacnetScreenEdit::ReadStandardThreadfun(LPVOID lpVoid)
+{
+    CBacnetScreenEdit *mParent = (CBacnetScreenEdit *)lpVoid;
+
+    GraphicLable_Mutex = CreateMutex(NULL, TRUE, _T("Read_Standard_Mutex"));
+    ReleaseMutex(GraphicLable_Mutex);
+
+    while (true)
+    {
+        //vector <unsigned int> device_id_vector;
+        //device_id_vector.clear();
+        Send_WhoIs_Global(-1, -1);
+        Sleep(1000);
+
+        WaitForSingleObject(GraphicLable_Mutex, INFINITE);
+        for (int i = 0; i < m_standard_graphic_refresh_data.size(); i++)
+        {
+            if (loading_labels)
+            {
+                break;
+            }
+            int n_find = 0;
+            unsigned int temp_device_id = m_standard_graphic_refresh_data.at(i).deviceid;
+            
+            int ncount = address_count();
+            for (int j = 0;j < ncount;j++)
+            {
+                unsigned int ndevice_id = 0;
+                unsigned int nmax_apdu = 0;
+                BACNET_ADDRESS src;
+                address_get_by_index(j, &ndevice_id, &nmax_apdu, &src);
+                //device_id_vector.push_back(ndevice_id);
+                if (ndevice_id == temp_device_id)
+                {
+                    n_find = true;
+                    break;
+                }
+            }
+
+            if (n_find == false)
+            {
+                m_standard_graphic_refresh_data.at(i).last_resault = -2;
+                m_standard_graphic_refresh_data.at(i).cs_value_show = _T("N/A");
+                continue;
+            }
+            BACNET_APPLICATION_DATA_VALUE temp_value;
+            int invoke_id = Bacnet_Read_Properties_Blocking(temp_device_id, (BACNET_OBJECT_TYPE)m_standard_graphic_refresh_data.at(i).object_type, m_standard_graphic_refresh_data.at(i).object_instance, m_standard_graphic_refresh_data.at(i).property_id, m_standard_graphic_refresh_data.at(i).value, 3);
+            m_standard_graphic_refresh_data.at(i).last_resault = invoke_id;
+            if (invoke_id > 0)
+            {
+                if (m_standard_graphic_refresh_data.at(i).value.tag == BACNET_TYPE_REAL) //value 4
+                {
+                    m_standard_graphic_refresh_data.at(i).cs_value_show.Format(_T("%.2f"), m_standard_graphic_refresh_data.at(i).value.type.Real);
+                }
+                if (m_standard_graphic_refresh_data.at(i).value.tag == BACNET_TYPE_ENUMERATED) //on off  9
+                {
+                    m_standard_graphic_refresh_data.at(i).cs_value_show.Format(_T("%d"), m_standard_graphic_refresh_data.at(i).value.type.Enumerated);
+                }
+                
+            }
+            else
+            {
+                m_standard_graphic_refresh_data.at(i).cs_value_show = _T("N/A");
+            }
+            Sleep(1);
+        }
+        ReleaseMutex(GraphicLable_Mutex);
+
+
+
+
+        if (ScreenEdit_Window == NULL)
+        {
+            h_read_standard_thread = NULL;
+            return true;
+        }
+
+        Sleep(10000);
+    }
+
+    h_read_standard_thread = NULL;
 }
 
 DWORD WINAPI CBacnetScreenEdit::ReadGroupDataThreadfun(LPVOID lpVoid)
@@ -944,7 +1040,7 @@ DWORD WINAPI CBacnetScreenEdit::ReadGroupDataThreadfun(LPVOID lpVoid)
         //至少让先运行一次，以便下次打开的时候显示非常快速
         if (ScreenEdit_Window == NULL)
         {
-            h_refresh_group_thread = NULL;
+            //h_refresh_group_thread = NULL;
             return true;
         }
     }
@@ -1029,7 +1125,7 @@ DWORD WINAPI  CBacnetScreenEdit::ReadAllPanelThreadfun(LPVOID lpVoid)
 
         if (ScreenEdit_Window == NULL)
         {
-            h_read_all_panel_des_thread = NULL;
+            //h_read_all_panel_des_thread = NULL;
             return true;
         }
     }
@@ -1112,9 +1208,11 @@ void CBacnetScreenEdit::InitGraphic(int nSerialNum,int nInstanceID,unsigned char
 
 void CBacnetScreenEdit::ReloadLabelsFromDB()
 {
-
+    loading_labels = true;
+    WaitForSingleObject(GraphicLable_Mutex, INFINITE);
 	m_bac_label_vector.clear();
 	m_graphic_refresh_data.clear();
+    m_standard_graphic_refresh_data.clear();
 	CString strSql;
 
 	CString strtemp;
@@ -1153,7 +1251,7 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
 			bac_label.nMain_Panel = m_graphic_label_data.at(i).reg.nMain_Panel;
 			bac_label.nSub_Panel = m_graphic_label_data.at(i).reg.nSub_Panel;
 			bac_label.nPoint_type = m_graphic_label_data.at(i).reg.nPoint_type;
-
+            bac_label.network_point = m_graphic_label_data.at(i).reg.network;
 			if(bac_label.nPoint_type > 0)
 				bac_label.nPoint_type = bac_label.nPoint_type - 1;
 			bac_label.nPoint_number =  m_graphic_label_data.at(i).reg.nPoint_number;
@@ -1192,7 +1290,9 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
 			bac_label.nMouse_Status = LABEL_MOUSE_NORMAL;
 			m_bac_label_vector.push_back(bac_label);
 
+            
 			_Graphic_Value_Info temp1;
+            bacnet_standard_Info temp2;
             if (bac_label.nMain_Panel == Station_NUM)
 			    temp1.deviceid = g_bac_instance;//暂时只支持 读本地的 instance;
             else
@@ -1212,7 +1312,6 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
                 
 			temp1.value_type = bac_label.nPoint_type;
 			temp1.value_item = bac_label.nPoint_number;
-
             //dufan 改为能够支持远程的panel.
 			//if((bac_label.nMain_Panel == Station_NUM) && (bac_label.nSub_Panel == Station_NUM))  //如果是这个设备下面的 才加到自动刷新 的里面;
 			//{
@@ -1248,6 +1347,34 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
 					temp1.entitysize = sizeof(Str_controller_point);
 					m_graphic_refresh_data.push_back(temp1);
 				}
+                else if ((bac_label.nPoint_type == BAC_BI) || (bac_label.nPoint_type == BAC_BV) ||
+                    (bac_label.nPoint_type == BAC_AV) || (bac_label.nPoint_type == BAC_AI) ||
+                    (bac_label.nPoint_type == BAC_AO) || (bac_label.nPoint_type == BAC_BO))
+                {
+                    temp2.standard_command = true;
+                    if (bac_label.nPoint_type == BAC_BI)
+                        temp2.object_type = OBJECT_BINARY_INPUT;
+                    else if (bac_label.nPoint_type == BAC_BV)
+                        temp2.object_type = OBJECT_BINARY_VALUE;
+                    else if (bac_label.nPoint_type == BAC_AV)
+                        temp2.object_type = OBJECT_ANALOG_VALUE;
+                    else if (bac_label.nPoint_type == BAC_AI)
+                        temp2.object_type = OBJECT_ANALOG_INPUT;
+                    else if (bac_label.nPoint_type == BAC_AO)
+                        temp2.object_type = OBJECT_ANALOG_OUTPUT;
+                    else if (bac_label.nPoint_type == BAC_BO)
+                        temp2.object_type = OBJECT_BINARY_OUTPUT;
+                    
+                    temp2.deviceid = ((bac_label.network_point & 0x7F) << 16) + (bac_label.nMain_Panel << 8) + (bac_label.nSub_Panel);
+                    temp2.object_instance = bac_label.nPoint_number;
+                    temp2.property_id = PROP_PRESENT_VALUE;
+                    temp2.lable_index = bac_label.nLabel_index;
+                    Sleep(1);
+
+                    
+
+                    m_standard_graphic_refresh_data.push_back(temp2);
+                }
 
 			//}
                 bool temp_exsit = false;
@@ -1268,7 +1395,7 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
                     temp_group_data.point.sub_panel = bac_label.nSub_Panel;
                     temp_group_data.point.point_type = bac_label.nPoint_type;
                     temp_group_data.point.number = bac_label.nPoint_number;
-                    temp_group_data.point.network = 1;
+                    temp_group_data.point.network = bac_label.network_point;
 
                     m_read_group_data.push_back(temp_group_data);
                 }
@@ -1282,7 +1409,10 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
 
 		}
 	}
-	  
+    loading_labels = false;
+    ReleaseMutex(GraphicLable_Mutex);
+    Sleep(1);
+
 }
 
 
@@ -1587,8 +1717,40 @@ void CBacnetScreenEdit::OnPaint()
 		{
 			icon_size_x = 96; icon_size_y = 96;
 		}
+        if ((m_bac_label_vector.at(i).nPoint_type == BAC_AI) || (m_bac_label_vector.at(i).nPoint_type == BAC_AV) ||
+            (m_bac_label_vector.at(i).nPoint_type == BAC_BI) || (m_bac_label_vector.at(i).nPoint_type == BAC_BV) ||
+            (m_bac_label_vector.at(i).nPoint_type == BAC_AO) || (m_bac_label_vector.at(i).nPoint_type == BAC_BO))
+        {
+            // 2019 04 03 新增支持 123456AI5的功能
+            Point_Net temp_point;
+            temp_point.panel = m_bac_label_vector.at(i).nMain_Panel;
+            temp_point.sub_panel = m_bac_label_vector.at(i).nSub_Panel;
+            temp_point.point_type = m_bac_label_vector.at(i).nPoint_type;
+            temp_point.number = m_bac_label_vector.at(i).nPoint_number;
+            temp_point.network = m_bac_label_vector.at(i).network_point;
+            char original_point[30];
+            memset(original_point, 0, 30);
+            pointtotext(original_point, &temp_point);
+            CString temp_des;
+            MultiByteToWideChar(CP_ACP, 0, original_point, (int)strlen(original_point) + 1,
+                temp_des.GetBuffer(MAX_PATH), MAX_PATH);
+            temp_des.ReleaseBuffer();
+            cs_label = temp_des;
+            cs_full_label = temp_des;
+            cs_value = _T("N/A");
 
-        if ((m_bac_label_vector.at(i).nMain_Panel == m_bac_label_vector.at(i).nSub_Panel) &&
+            //int find_label_value = false;
+            for (int j = 0; j < m_standard_graphic_refresh_data.size(); j++)
+            {
+                if (m_standard_graphic_refresh_data.at(j).lable_index == m_bac_label_vector.at(i).nLabel_index) //找到对应的label存储的值了
+                {
+                    cs_value = m_standard_graphic_refresh_data.at(j).cs_value_show;
+                    break;
+                }
+            }
+
+        }
+        else if ((m_bac_label_vector.at(i).nMain_Panel == m_bac_label_vector.at(i).nSub_Panel) &&
             (m_bac_label_vector.at(i).nMain_Panel != Station_NUM))
         {
             //访问不同的 主panel 远程的点的情况;
@@ -1693,7 +1855,7 @@ void CBacnetScreenEdit::OnPaint()
 			temp_point.sub_panel = m_bac_label_vector.at(i).nSub_Panel;
 			temp_point.point_type = m_bac_label_vector.at(i).nPoint_type;
 			temp_point.number = m_bac_label_vector.at(i).nPoint_number;
-			temp_point.network = 1;
+			temp_point.network = m_bac_label_vector.at(i).network_point;
 			char original_point[30];
 			memset(original_point,0,30);
 			pointtotext(original_point,&temp_point);
@@ -1960,15 +2122,19 @@ void CBacnetScreenEdit::OnPaint()
 		cs_show_info = cs_show_info.Trim();
 		if((cs_show_info.IsEmpty()) && (m_bac_label_vector.at(i).nDisplay_Type != LABEL_ICON_VALUE))
 		{
-			if(m_bac_label_vector.at(i).nPoint_type == BAC_PRG)
-				cs_show_info.Format(_T("PRG%u"),m_bac_label_vector.at(i).nPoint_number + 1);
-			else if(m_bac_label_vector.at(i).nPoint_type == BAC_SCH)
-				cs_show_info.Format(_T("SCH%u"),m_bac_label_vector.at(i).nPoint_number + 1);
-			else if(m_bac_label_vector.at(i).nPoint_type == BAC_HOL)
-				cs_show_info.Format(_T("HOL%u"),m_bac_label_vector.at(i).nPoint_number + 1);
-			else if(m_bac_label_vector.at(i).nPoint_type == BAC_AMON)
-				cs_show_info.Format(_T("AMON%u"),m_bac_label_vector.at(i).nPoint_number + 1);
-			else
+            if (m_bac_label_vector.at(i).nPoint_type == BAC_PRG)
+                cs_show_info.Format(_T("PRG%u"), m_bac_label_vector.at(i).nPoint_number + 1);
+            else if (m_bac_label_vector.at(i).nPoint_type == BAC_SCH)
+                cs_show_info.Format(_T("SCH%u"), m_bac_label_vector.at(i).nPoint_number + 1);
+            else if (m_bac_label_vector.at(i).nPoint_type == BAC_HOL)
+                cs_show_info.Format(_T("HOL%u"), m_bac_label_vector.at(i).nPoint_number + 1);
+            else if (m_bac_label_vector.at(i).nPoint_type == BAC_AMON)
+                cs_show_info.Format(_T("AMON%u"), m_bac_label_vector.at(i).nPoint_number + 1);
+            else if (!cs_label.IsEmpty())
+                cs_show_info = cs_label;
+            else if (!cs_full_label.IsEmpty())
+                cs_show_info = cs_full_label;
+			else 
 				cs_show_info = _T("Empty Label");
 		}
 		int x_point = 0;
@@ -2673,6 +2839,9 @@ void CBacnetScreenEdit::OnCancel()
 	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
 	::PostMessage(m_screen_dlg_hwnd,WM_SCREENEDIT_CLOSE,NULL,NULL);
 	
+    TerminateThread(h_read_standard_thread, 0);
+    h_read_standard_thread = NULL;
+
 	KillTimer(1);
 	CDialogEx::OnCancel();
 }
@@ -2843,6 +3012,5 @@ void CBacnetScreenEdit::OnLButtonDblClk(UINT nFlags, CPoint point)
 void CBacnetScreenEdit::OnClose()
 {
     // TODO: 在此添加消息处理程序代码和/或调用默认值
-
     CDialogEx::OnClose();
 }

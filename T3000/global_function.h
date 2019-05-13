@@ -132,6 +132,9 @@ void local_handler_conf_private_trans_ack(
 	BACNET_ADDRESS * src,
 	BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
 int Bacnet_Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id);
+int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE &value, uint8_t retrytime = 3);
+int Bacnet_Write_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE * object_value, uint8_t priority = 16);
+int Bacnet_Write_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE * object_value, uint8_t priority = 16, uint8_t retrytime = 3);
 void localhandler_read_property_ack(
     uint8_t * service_request,
     uint16_t service_len,
@@ -154,6 +157,8 @@ char * intervaltotextfull(char *textbuf, long seconds , unsigned minutes , unsig
 CString GetProductName(int ModelID);
 void Inial_Product_map();
 void Inial_Product_Reglist_map();
+void Inial_Product_Menu_map();
+int Get_Product_Menu_Map(unsigned char product_tpye, int menu_item);
 CString Get_Table_Name(int SerialNo,CString Type ,int Row);
 void    Insert_Update_Table_Name(int SerialNo,CString Type,int Row,CString TableName); 
 int Get_Unit_Process(CString Unit);
@@ -263,7 +268,7 @@ bool Save_VariableData_to_db(unsigned char  temp_output_index, unsigned int nser
 bool Save_OutputData_to_db(unsigned char  temp_output_index);
 bool Save_AVData_to_db();
 CString GetGUID();
-
+int  SetCommandDelayTime(unsigned char product_id); //用于设置每个产品的 应答延时时间.默认为100ms.
 bool Open_Socket_Retry(CString strIPAdress, short nPort, int retry_time = 3);
 void Inial_ProductName_map();  //初始化 Panel Name 存放的位置 默认是714位置 
 int PanelName_Map(int product_type);  //查找 Panel  Name 存放的位置 没有找到就认为是从714位置开始的

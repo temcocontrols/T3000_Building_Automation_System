@@ -62,6 +62,7 @@ public:
 	CEdit m_Edit_NodeID;
 	CEdit m_Edit_FrequenceID;
     afx_msg void OnEnChangeEditAesEncrypt();
+    afx_msg void OnEnKillfocusEditBacnetDeviceId();
 };
 
 

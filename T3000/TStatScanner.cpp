@@ -4997,7 +4997,13 @@ DWORD WINAPI   CTStatScanner::_ScanBacnetMSTPThread(LPVOID lpVoid)
                     temp_info.panel_number = m_temp_com_data.at(i).macaddress;
                     temp_info.software_version = 0;
                     temp_info.hardware_version = 0;
-                    temp_info.m_protocol = PROTOCOL_MSTP_TO_MODBUS;
+                    if((temp_info.product_type == PM_MINIPANEL) || 
+                        (temp_info.product_type == PM_MINIPANEL_ARM) || 
+                        (temp_info.product_type == PM_TSTAT10) ||
+                        (temp_info.product_type == PM_CM5))
+                        temp_info.m_protocol = MODBUS_BACNET_MSTP;
+                    else
+                        temp_info.m_protocol = PROTOCOL_MSTP_TO_MODBUS;
                     temp_info.device_id = m_temp_com_data.at(i).device_id;
 
                     temp_info.ipaddress[0] = test_array[47];
@@ -5070,7 +5076,7 @@ DWORD WINAPI   CTStatScanner::_ScanBacnetMSTPThread(LPVOID lpVoid)
         temp_pname = GetProductName(m_temp_result_data.at(l).product_type);
         temp_modbusid.Format(_T("%u"), m_temp_result_data.at(l).modbus_addr);
         temp_view_name = temp_pname + _T(":") + temp_serial_number + _T("-") + temp_modbusid;
-        temp_protocol.Format(_T("%d"), PROTOCOL_MSTP_TO_MODBUS);
+        temp_protocol.Format(_T("%d"), m_temp_result_data.at(l).m_protocol);
         temp_product_id_string.Format(_T("%d"), m_temp_result_data.at(l).product_type);
         temp_port_string.Format(_T("%d"), n_mstp_comport);
         temp_object_instance.Format(_T("%u"), m_temp_result_data.at(l).device_id);

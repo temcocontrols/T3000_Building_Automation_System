@@ -1464,7 +1464,9 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
 	case WRITEMONITOR_T3000:
 		entitysize = sizeof(Str_monitor_point);
 		break;
-
+    case WRITE_SCHEDUAL_TIME_FLAG:
+        entitysize = sizeof(Str_schedual_time_flag);
+            break;
 	case  WRITEALARM_T3000:
 		entitysize = sizeof(Alarm_point);
 		break;
@@ -1619,6 +1621,21 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
             }
         }
 
+        break;
+    case WRITE_SCHEDUAL_TIME_FLAG:
+    {
+        temp_buffer = temp_buffer + HEADER_LENGTH;
+        for (int x = 0; x < (end_instance - start_instance + 1); x++)
+        {
+            for (int j = 0; j < 9; j++)
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    *(temp_buffer++) = m_Schedual_time_flag.at(x + start_instance).Time_flag[i][j];
+                }
+            }
+        }
+    }
         break;
     case  WRITEHOLIDAY_T3000:
         for (int i=0; i<(end_instance-start_instance + 1); i++)
@@ -2714,7 +2731,8 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 				else
 					memcpy_s( m_graphic_label_data.at(i).reg.icon_name_2,STR_ICON_2_NAME_LENGTH,my_temp_point,STR_ICON_2_NAME_LENGTH);
 				my_temp_point=my_temp_point + STR_ICON_2_NAME_LENGTH;
-				my_temp_point = my_temp_point + 7;
+                m_graphic_label_data.at(i).reg.network = *(my_temp_point++);
+				my_temp_point = my_temp_point + 6;
 			}
 
 
@@ -3357,6 +3375,33 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 			return READTIMESCHEDULE_T3000;
 		}
 		break;
+    case READ_SCHEDUAL_TIME_FLAG:
+    {
+        if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_schedual_time_flag)) != 0)
+            return -1;	//得到的结构长度错误;
+        block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_schedual_time_flag);
+        //m_Input_data_length = block_length;
+        my_temp_point = (char *)Temp_CS.value + 3;
+        start_instance = *my_temp_point;
+        my_temp_point++;
+        end_instance = *my_temp_point;
+        my_temp_point++;
+        my_temp_point = my_temp_point + 2;
+
+        for (int x = start_instance; x <= end_instance; x++)
+        {
+            //copy the schedule day time to my own buffer.
+            for (int j = 0; j<9; j++)
+            {
+                for (int i = 0; i<8; i++)
+                {
+                    m_Schedual_time_flag.at(x).Time_flag[i][j] = *(my_temp_point++);
+                }
+            }
+        }
+        Sleep(1);
+    }
+    break;
 	case READANNUALSCHEDULE_T3000:
 		{
 			my_temp_point = (char *)Temp_CS.value + 3;
@@ -4158,9 +4203,79 @@ int handle_read_pic_data_ex(char *npoint,int nlength)
 
 
 
+int Bacnet_Write_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE  *object_value, uint8_t priority)
+{
+    int n_invoke_id = 0;
+    bool status = false;
+    unsigned max_apdu = 0;
+    BACNET_ADDRESS src;
+    bool next_device = false;
+    static unsigned index = 0;
+    static unsigned property = 0;
+    /* list of required (and some optional) properties in the
+    Device Object
+    note: you could just loop through
+    all the properties in all the objects. */
+    int object_props[] = {
+        property_id
+    };
+
+    //BACNET_APPLICATION_DATA_VALUE test123 = { 0x00 };
+    //test123.tag = 7;
+    //test123.context_specific = false;
+    //test123.type.Character_String.length = 10;
+    //strcpy(test123.type.Character_String.value, "1123");
+
+
+
+    n_invoke_id = Send_Write_Property_Request(deviceid,
+        object_type, object_instance,
+        (BACNET_PROPERTY_ID)object_props[property], object_value,
+        priority,
+        BACNET_ARRAY_ALL);
+    return n_invoke_id;
+}
+
+int Bacnet_Write_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE  *object_value ,  uint8_t priority ,  uint8_t retrytime)
+{
+    for (int i = 0; i < 3; i++)
+    {
+        int send_status = true;
+        int temp_invoke_id = -1;
+        int	resend_count = 0;
+        send_status = true;
+        do
+        {
+            resend_count++;
+            if (resend_count > 10)
+            {
+                send_status = false;
+                break;
+            }
+            temp_invoke_id = Bacnet_Write_Properties(deviceid, object_type, object_instance, property_id, object_value, priority);
+        } while (temp_invoke_id<0);
+
+        if (send_status)
+        {
+            for (int i = 0; i < 200; i++)
+            {
+                Sleep(10);
+                if (tsm_invoke_id_free(temp_invoke_id))
+                {
+                    return 1;
+                    Sleep(10);
+                }
+            }
+        }
+        Sleep(SEND_COMMAND_DELAY_TIME);
+    }
+    return -1;
+
+}
 
 int Bacnet_Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id)
 {
+    int n_invoke_id = 0;
     // uint32_t device_id = 0;
     bool status = false;
     unsigned max_apdu = 0;
@@ -4175,12 +4290,118 @@ int Bacnet_Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, ui
     int object_props[] = {
         property_id//PROP_MODEL_NAME//PROP_OBJECT_LIST
     };
-    g_invoke_id = Send_Read_Property_Request(deviceid, object_type, object_instance, (BACNET_PROPERTY_ID)object_props[property], BACNET_ARRAY_ALL);
+    n_invoke_id = Send_Read_Property_Request(deviceid, object_type, object_instance, (BACNET_PROPERTY_ID)object_props[property], BACNET_ARRAY_ALL);
 
-    return g_invoke_id;
+    return n_invoke_id;
 }
 
 
+int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE &value, uint8_t retrytime)
+{
+    int send_status = true;
+
+    str_bacnet_rp_info temp_standard_bacnet_data = { 0 };
+    temp_standard_bacnet_data.bacnet_instance = deviceid;
+    temp_standard_bacnet_data.object_item_number = object_instance;
+    temp_standard_bacnet_data.object_type = object_type;
+    temp_standard_bacnet_data.property_id = property_id;
+
+    vector<str_bacnet_rp_info>::iterator itr = standard_bacnet_data.begin();
+    vector<str_bacnet_rp_info>::iterator itrflag;
+    int find_exsit = false;
+    for (; itr != standard_bacnet_data.end(); itr++)
+    {
+        if ((itr->bacnet_instance == deviceid) &&
+            (itr->object_item_number == object_instance) &&
+            (itr->object_type == object_type) &&
+            (itr->property_id == property_id))
+        {
+            itrflag = itr;  //找到曾经读过
+            find_exsit = true;
+        }
+    }
+
+    if (!find_exsit)
+    {
+        standard_bacnet_data.push_back(temp_standard_bacnet_data);
+    }
+
+
+
+    for (int z = 0; z<retrytime; z++)
+    {
+        int temp_invoke_id = -1;
+        int	resend_count = 0;
+        send_status = true;
+        do
+        {
+            resend_count++;
+            if (resend_count>retrytime)
+            {
+                send_status = false;
+                break;
+            }
+            temp_invoke_id = Bacnet_Read_Properties(deviceid, object_type, object_instance, property_id);
+
+            if (temp_invoke_id < 0)
+                Sleep(500);
+            else
+            {
+                if (find_exsit)
+                {
+                    itrflag->invoke_id = temp_invoke_id;
+                }
+                else
+                {
+                    itrflag = standard_bacnet_data.end() - 1;
+                    itrflag->invoke_id = temp_invoke_id;
+                }
+                send_status = true;
+            }
+        } while (temp_invoke_id<0);
+
+        if (send_status)
+        {
+            for (int i = 0; i<400; i++)
+            {
+                Sleep(10);
+                if (tsm_invoke_id_free(temp_invoke_id))
+                {
+                    Sleep(10);
+
+                    vector<str_bacnet_rp_info>::iterator itr = standard_bacnet_data.begin();
+                    vector<str_bacnet_rp_info>::iterator itrflag;
+                    int find_exsit = false;
+                    for (; itr != standard_bacnet_data.end(); itr++)
+                    {
+                        if ((itr->invoke_id == temp_invoke_id) &&
+                            (itr->object_item_number == object_instance) &&
+                            (itr->object_type == object_type) &&
+                            (itr->property_id == property_id))
+                        {
+                            itrflag = itr;  //找到曾经读过
+                            value = itrflag->value;
+                            find_exsit = true;
+                            break;
+                        }
+                    }
+                    if (!find_exsit)
+                    {
+                        continue;  //没有找到对应的点，没有赋值 value成功;
+                    }
+                    //standard_bacnet_data.erase(itrflag);
+                    return 1;
+                }
+                else
+                    continue;
+            }
+        }
+    }
+
+    return -1;
+
+
+}
 
 void localhandler_read_property_ack(
     uint8_t * service_request,
@@ -4200,6 +4421,27 @@ void localhandler_read_property_ack(
         //local_rp_ack_print_data(&data);
         BACNET_APPLICATION_DATA_VALUE value;
         local_value_rp_ack_print_data(&data,value);
+        
+        vector<str_bacnet_rp_info>::iterator itr = standard_bacnet_data.begin();
+        vector<str_bacnet_rp_info>::iterator itrflag;
+
+
+        
+        int find_exsit = false;
+        for (; itr != standard_bacnet_data.end(); itr++)
+        {
+            if ((itr->invoke_id == service_data->invoke_id) &&
+                (itr->object_item_number == data.object_instance) &&
+                (itr->object_type == data.object_type) &&
+                (itr->property_id == data.object_property))
+            {
+                itrflag = itr;  //找到曾经读过
+                itrflag->value = value;
+                find_exsit = true;
+            }
+        }
+
+
         Sleep(1);
     }
 }
@@ -4490,6 +4732,47 @@ void Inial_Product_Reglist_map()
     product_reglist_map.insert(map<int, CString>::value_type(STM32_CO2_NODE, _T("CO2-W+Ethernet")));
 }
 
+unsigned char product_menu[255][20] = { 0 };
+//初始化 产品菜单状态 2019 04 10
+void Inial_Product_Menu_map()
+{
+    
+    unsigned char default_menu[20] = { 1,1,1,0  ,0,0,1,1 ,1,0,0,0   ,0 ,1,1,1   ,0,0,0,0};
+
+    for (int i = 0; i < 255; i++)
+    {
+        memcpy(product_menu[i], default_menu, 20);
+        switch (i)
+        {
+        case PM_TSTAT10:
+        case PM_MINIPANEL:
+        case PM_MINIPANEL_ARM:
+        {
+            unsigned char  temp[20] = { 1,1,1,1,  1,1,1,1,  1,1,1,1,   1,1,1,1  ,0,0,0,0 };
+            memcpy(product_menu[i], temp, 20);
+        }
+            break;
+        case PM_TSTAT8:
+        {
+            unsigned char  temp[20] = { 1,1,1,0,  0,0,1,1,  1,0,0,0,   0,1,1,1  ,0,0,0,0 };
+            memcpy(product_menu[i], temp, 20);
+        }
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+
+
+int Get_Product_Menu_Map(unsigned char product_tpye, int menu_item)
+{
+    if (menu_item > 20)
+        return 0;
+    return product_menu[product_tpye][menu_item];
+}
+
 void Inial_Product_map()
 {
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT5A,_T("TStat5A")));
@@ -4509,6 +4792,8 @@ void Inial_Product_map()
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT5i,_T("TStat5i")));
 
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT8,_T("TStat8")));
+    product_map.insert(map<int, CString>::value_type(PM_TSTAT10, _T("TStat10")));
+
 	product_map.insert(map<int,CString>::value_type(PM_HUMTEMPSENSOR,_T("HUM Sensor")));
 	product_map.insert(map<int,CString>::value_type(STM32_HUM_NET,_T("HUM Sensor")));
 	product_map.insert(map<int,CString>::value_type(STM32_HUM_RS485,_T("HUM Sensor")));
@@ -4891,6 +5176,7 @@ void close_bac_com()
         Set_RS485_Handle(NULL);
         //g_mstp_com.status = 0;
     }
+    system_connect_info.mstp_status = 0;
 }
 
 SOCKET my_sokect;
@@ -4929,16 +5215,21 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
     {
         //2017-12-20  杜帆修改  尝试绑定本地的通讯 UDP 47809 端口 ，若绑定失败就尝试其他端口;
         //T3000 不在绑定47808端口了，改为绑定 47809以后得端口，为了 同时能使用其他bacnet软件.
+        system_connect_info.mstp_status = 0;
+        close_bac_com();
+
+
         bool port_bind_results = false;
         for (int i = 1;i <= 3;i++)
         {
+            int temp_add_port = rand() % 10000;
             if (bind_local_ip.IsEmpty())
             {
-                port_bind_results = Open_bacnetSocket2(_T("192.168.0.62"), BACNETIP_PORT + i, my_sokect);
+                port_bind_results = Open_bacnetSocket2(_T("192.168.0.62"), BACNETIP_PORT + temp_add_port, my_sokect);
             }
             else
             {
-                port_bind_results = Open_bacnetSocket2(bind_local_ip, BACNETIP_PORT + i, my_sokect);
+                port_bind_results = Open_bacnetSocket2(bind_local_ip, BACNETIP_PORT + temp_add_port, my_sokect);
             }
             if (port_bind_results)  //如果绑定47808端口失败 尝试绑定其他端口
                 break;
@@ -5002,6 +5293,7 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
         //*comport_parameter = PROTOCOL_BACNET_IP;
         if(CM5_hThread!=NULL)
         {
+            system_connect_info.mstp_status = 0;
             TerminateThread(CM5_hThread,0);
             CM5_hThread = NULL;
         }
@@ -5011,37 +5303,16 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
     {
         initial_bip = false;
         set_datalink_protocol(MODBUS_BACNET_MSTP);
-        //if ((g_mstp_com.status == 0) ||((g_mstp_com.status == 1) && ((g_mstp_com.ncomport != comport) || (g_mstp_com.nbaudrate != m_nbaudrat))))
-       // {
-       //    close_bac_com();
-            m_bac_handle_Iam_data.clear();
-       //     g_mstp_com.status = 1;
-       //     g_mstp_com.ncomport = comport;
-       //     g_mstp_com.nbaudrate = m_nbaudrat;
-       // }
-       // else
-       // {
-            close_bac_com();
-       //     m_bac_handle_Iam_data.clear();
-            //return true;
-       // }
-        //HANDLE temphandle;
-        //temphandle = Get_RS485_Handle();
-        //if(temphandle !=NULL)
-        //{
-        //    TerminateThread((HANDLE)Get_Thread1(),0);
-        //    TerminateThread((HANDLE)Get_Thread2(),0);
-
-        //    CloseHandle(temphandle);
-        //    Set_RS485_Handle(NULL);
-        //}
+        m_bac_handle_Iam_data.clear();
+        close_bac_com();
         close_com();
 
         dlmstp_set_baud_rate(n_baudrate);
         //		dlmstp_set_baud_rate(19200);
         dlmstp_set_mac_address(0);
         dlmstp_set_max_info_frames(DEFAULT_MAX_INFO_FRAMES);
-        dlmstp_set_max_master(DEFAULT_MAX_MASTER);
+        //dlmstp_set_max_master(DEFAULT_MAX_MASTER);
+        dlmstp_set_max_master(254);
         memset(my_port,0,50);
 
         CString temp_cs;
@@ -5054,7 +5325,12 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
 
 
         sprintf(my_port,cTemp1);
-        dlmstp_init(my_port);
+        int mstp_init_ret = dlmstp_init(my_port);
+        if (mstp_init_ret == false)
+        {
+            system_connect_info.mstp_status = 0;
+            return false;
+        }
 
         set_datalink_protocol(MODBUS_BACNET_MSTP);
         datalink_get_broadcast_address(&broadcast_address);
@@ -5063,10 +5339,15 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
         *comport_parameter = MODBUS_BACNET_MSTP;
         if(CM5_hThread!=NULL)
         {
+            system_connect_info.mstp_status = 0;
             TerminateThread(CM5_hThread,0);
             CM5_hThread = NULL;
         }
         CM5_hThread =CreateThread(NULL,NULL,MSTP_Receive,comport_parameter,NULL, &nThreadID_x);
+
+        system_connect_info.mstp_status = 1;
+        system_connect_info.ncomport = comport;
+        system_connect_info.nbaudrate = n_baudrate;
     }
 
     if(!bac_net_initial_once)
@@ -5507,6 +5788,7 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
     int bind_ret =	bind(mysocket, (struct sockaddr*)&servAddr, sizeof(servAddr));
     if(bind_ret != 0)
     {
+        int  nError = WSAGetLastError();
         //DFTrace(_T("Local UDP port 47808 is not available."));
         //AfxMessageBox(_T("Local UDP port 47808 is not available."));
         return false;
@@ -10003,9 +10285,33 @@ void LoadTstat_OutputData()
             ////comments by Fance ,此前没有 348 -》对应 t6的598  ，现在有了。;所以该不该改为现在的？？？
 			 
 				 
-		 
-
-			int nValueTemp = product_register_value[MODBUS_PWM_OUT4]; //348 //598
+            int nValueTemp = 0;
+            if (i == 1)
+            {
+                if (product_register_value[254] & 0x01)
+                    nValueTemp =   product_register_value[255]; //348 //598
+            }
+            else if (i == 2)
+            {
+                if (product_register_value[254] & 0x02)
+                    nValueTemp = product_register_value[256]; //348 //598
+            }
+            else if (i == 3)
+            {
+                if (product_register_value[254] & 0x04)
+                    nValueTemp = product_register_value[257]; //348 //598
+            }
+            else if (i == 4)
+            {
+                if (product_register_value[254] & 0x08)
+                    nValueTemp = product_register_value[258]; //348 //598
+            }
+            else if (i == 5)
+            {
+                if (product_register_value[254] & 0x10)
+                    nValueTemp = product_register_value[259]; //348 //598
+            }
+            
 			strTemp.Format(_T("%d%%"), nValueTemp);
 			m_tstat_output_data.at(i-1).Value.regAddress= MODBUS_PWM_OUT4;
 			m_tstat_output_data.at(i-1).Value.RegValue=nValueTemp;
@@ -12944,6 +13250,25 @@ void switch_product_last_view()
         ::SendMessage(MainFram_hwd, WM_COMMAND, MAKEWPARAM(ID_CONTROL_TSTAT, BN_CLICKED), NULL);
     else if (first_view_ui == TYPE_SETTING)
         ::SendMessage(MainFram_hwd, WM_COMMAND, MAKEWPARAM(ID_CONTROL_SETTINGS, BN_CLICKED), NULL);
+}
+
+int  SetCommandDelayTime(unsigned char product_id)
+{
+    switch (product_id)
+    {
+    case PM_TSTAT10:
+    {
+        SEND_COMMAND_DELAY_TIME = 1000;
+    }
+        break;
+    default:
+    {
+        SEND_COMMAND_DELAY_TIME = 100;
+    }
+        break;
+    }
+
+    return 0;
 }
 
 int PanelName_Map(int product_type)

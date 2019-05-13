@@ -71,7 +71,7 @@ public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnBnClickedButtonScreenExit();
 	afx_msg void OnBnClickedButtonDelete();
-	void AddLabel(unsigned char point_type,uint8_t point_number,uint8_t main_panel,uint8_t sub_panel,unsigned int point_x,unsigned int point_y);
+	void AddLabel(unsigned char point_type,uint8_t point_number,uint8_t main_panel,uint8_t sub_panel,unsigned int point_x,unsigned int point_y, unsigned char network = 0);
 	void SaveBacLabel(int nItem);
 
 	HICON default_icon;
@@ -90,7 +90,7 @@ public:
 
 	HICON lock_icon;
 	HICON unlock_icon;
-
+    
 	int m_paint_right_limit ;
 	int m_paint_botton_limit ;
 	CString m_building_image_folder;
@@ -100,6 +100,7 @@ public:
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
     static DWORD WINAPI  ReadAllPanelThreadfun(LPVOID lpVoid);
     static DWORD WINAPI  ReadGroupDataThreadfun(LPVOID lpVoid);
+    static DWORD WINAPI  ReadStandardThreadfun(LPVOID lpVoid);
     afx_msg void OnClose();
 };
 

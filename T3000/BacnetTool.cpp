@@ -361,7 +361,7 @@ int Write_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, int prop
     };
 
         BACNET_APPLICATION_DATA_VALUE test123 = { 0x00 };
-        test123.tag = 7;
+        test123.tag = TPYE_BACAPP_CHARACTER_STRING;
         test123.context_specific = false;
         test123.type.Character_String.length = 10;
         strcpy(test123.type.Character_String.value, "1123");
@@ -371,7 +371,7 @@ int Write_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, int prop
         g_invoke_id =  Send_Write_Property_Request(deviceid,
             object_type, deviceid,
             (BACNET_PROPERTY_ID)object_props[property], &test123,
-            1,
+            16,
             BACNET_ARRAY_ALL);
 
        // g_invoke_id = Send_Write_Property_Request(deviceid, object_type, deviceid, (BACNET_PROPERTY_ID)object_props[property], &test123, 1, BACNET_ARRAY_ALL);

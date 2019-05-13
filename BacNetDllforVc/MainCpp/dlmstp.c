@@ -515,7 +515,7 @@ uint8_t dlmstp_max_info_frames(
 void dlmstp_set_max_master(
     uint8_t max_master)
 {
-    if (max_master <= 127) {
+    if (max_master <= 254) {
         if (MSTP_Port.This_Station <= max_master) {
             MSTP_Port.Nmax_master = max_master;
             /* FIXME: implement your data storage */
@@ -604,12 +604,14 @@ bool dlmstp_init(
     Receive_Packet.ready = false;
     Receive_Packet.pdu_len = 0;
     Receive_Packet_Flag = CreateSemaphore(NULL, 0, 1, "dlmstpReceivePacket");
-   // if (Receive_Packet_Flag == NULL)
-   //     exit(1);
+    if (Receive_Packet_Flag == NULL)
+    {
+        return 0;
+    }
     Received_Frame_Flag = CreateSemaphore(NULL, 0, 1, "dlsmtpReceiveFrame");
     if (Received_Frame_Flag == NULL) {
         CloseHandle(Receive_Packet_Flag);
-   //     exit(1);
+        return 0;
     }
     /* initialize hardware */
     timer_init();
@@ -663,11 +665,13 @@ bool dlmstp_init(
 	  hThread1 = _beginthread(dlmstp_receive_fsm_task, 4096, &arg_value);
     if (hThread1 == 0) {
         fprintf(stderr, "Failed to start recive FSM task\n");
+        return 0;
     }
     //hThread2 = _beginthread(dlmstp_master_fsm_task, 4096, &arg_value);
 	  hThread2 = _beginthread(dlmstp_master_fsm_task, 4096, &arg_value);
     if (hThread2 == 0) {
         fprintf(stderr, "Failed to start Master Node FSM task\n");
+        return 0;
     }
 
     return true;

@@ -100,6 +100,7 @@ void CTCP_Server::OnBnClickedButtonStartServer()
 
 		if (CM5_hThread != NULL)
 		{
+            system_connect_info.mstp_status = 0;
 			TerminateThread(CM5_hThread, 0);
 			CM5_hThread = NULL;
 		}
@@ -182,8 +183,11 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
 
 
 	bip_set_socket(s);
-	if (CM5_hThread == NULL)
-		CM5_hThread = CreateThread(NULL,NULL, MSTP_Receive,NULL,NULL, &nThreadID_x);
+    if (CM5_hThread == NULL)
+    {
+        system_connect_info.mstp_status = 0;
+        CM5_hThread = CreateThread(NULL, NULL, MSTP_Receive, NULL, NULL, &nThreadID_x);
+    }
 	char pSendBuf[1024] = {0x81, 0x0B, 0x00, 0x0C, 0x01, 0x20, 0xFF, 0xFF, 0x00, 0xFF, 0x10, 0x08};
 	int nSendLen = 12;
 
@@ -218,6 +222,7 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
 		AfxMessageBox(_T("No device response!"));
 		if (CM5_hThread != NULL)
 		{
+            system_connect_info.mstp_status = 0;
 			TerminateThread(CM5_hThread, 0);
 			CM5_hThread = NULL;
 			Sleep(1000);
@@ -266,6 +271,7 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
 		AfxMessageBox(_T("No device found in remote area!"));
 		if (CM5_hThread != NULL)
 		{
+            system_connect_info.mstp_status = 0;
 			TerminateThread(CM5_hThread, 0);
 			CM5_hThread = NULL;
 		}
@@ -392,6 +398,7 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
 
 	if (CM5_hThread != NULL)
 	{
+        system_connect_info.mstp_status = 0;
 		TerminateThread(CM5_hThread, 0);
 		CM5_hThread = NULL;
 	}

@@ -379,191 +379,25 @@ BOOL CScanDlg::GetNewIP(CString &newIP,CString BaseIP){
 BOOL CScanDlg::TestPing(const CString& strIP)
 {	
  #ifdef CPING_USE_ICMP
-CPing p1;
-CPingReply pr1;
-if (p1.Ping1((LPCTSTR)strIP, pr1))
-{
-// 	hostent* phostent = gethostbyaddr((char *)&pr1.Address.S_un.S_addr, 4, PF_INET);
-// 	printf("%d.%d.%d.%d [%s], replied in RTT:%dms\n", 
-// 		pr1.Address.S_un.S_un_b.s_b1, pr1.Address.S_un.S_un_b.s_b2, pr1.Address.S_un.S_un_b.s_b3, 
-// 		pr1.Address.S_un.S_un_b.s_b4, phostent->h_name, pr1.RTT);
-return TRUE;
-}
-else
-{
- return FALSE;
-}
+
+    for (int i = 0; i < 3; i++)
+    {
+        CPing p1;
+        CPingReply pr1;
+        if (p1.Ping1((LPCTSTR)strIP, pr1))
+        {
+            return TRUE;
+        }
+        else
+        {
+            Sleep(500);
+            continue;
+        }
+    }
+
+    return false;
 #endif	
 
-
-// #ifdef CPING_USE_WINSOCK2
-// {
-// 	CPing p2;
-// 	CPingReply pr2;
-// 	if (p2.Ping2((LPCTSTR)strIP, pr2))
-// 	{
-// // 		hostent* phostent = gethostbyaddr((char *)&pr2.Address.S_un.S_addr, 4, PF_INET);
-// 		printf("%d.%d.%d.%d [%s], replied in RTT:%dms\n", 
-// 			pr2.Address.S_un.S_un_b.s_b1, pr2.Address.S_un.S_un_b.s_b2, pr2.Address.S_un.S_un_b.s_b3, 
-// 			pr2.Address.S_un.S_un_b.s_b4, phostent->h_name, pr2.RTT);
-// return TRUE;
-// 	}
-// 	else
-// 		 return FALSE;
-// }
-// #end
-
-// 	USES_CONVERSION;   
-// 	LPSTR szIP=W2A(strIP); 
-// 	WSADATA wsaData; 
-// 	SOCKET sockRaw; 
-// 	struct sockaddr_in dest,from; 
-// 	struct hostent * hp; 
-// 	int bread,datasize,times; 
-// 	int fromlen = sizeof(from); 
-// 	int timeout = 300;
-// 	int statistic = 0;  /* 用于统计结果 */  
-// 	char *dest_ip; 
-// 	char *icmp_data; 
-// 	char *recvbuf; 
-// 	unsigned int addr=0; 
-// 	USHORT seq_no = 0; 
-// 	if (WSAStartup(MAKEWORD(2,1),&wsaData) != 0)
-// 	{  
-// 		return FALSE;
-// 	} 
-//  
-// 
-// 	sockRaw = WSASocket(AF_INET,SOCK_RAW,IPPROTO_ICMP,NULL, 0,WSA_FLAG_OVERLAPPED);
-// 	//
-// 	//注：为了使用发送接收超时设置(即设置SO_RCVTIMEO, SO_SNDTIMEO)，
-// 	//    必须将标志位设为WSA_FLAG_OVERLAPPED !
-// 	// 
-// 	if (sockRaw == INVALID_SOCKET) 
-// 	{  
-// 		return FALSE;
-// 	} 
-// 	BOOL bDontLinger = FALSE;
-// 	setsockopt(sockRaw,SOL_SOCKET,SO_DONTLINGER,(const char* )&bDontLinger, sizeof( BOOL ) );
-// 	bread = setsockopt(sockRaw,SOL_SOCKET,SO_RCVTIMEO,(char*)&timeout, sizeof(timeout)); 
-// 	
-// 	if(bread == SOCKET_ERROR) 
-// 	{ 
-// 		//ExitProcess(STATUS_FAILED); 
-// 		return FALSE;
-// 	} 
-// 	
-// 
-// 	 bDontLinger = FALSE;
-// 	        setsockopt(sockRaw,SOL_SOCKET,SO_DONTLINGER,(const char* )&bDontLinger, sizeof( BOOL ) );
-// 
-// 	bread = setsockopt(sockRaw,SOL_SOCKET,SO_SNDTIMEO,(char*)&timeout, sizeof(timeout)); 
-// 	if(bread == SOCKET_ERROR) 
-// 	{ 
-// 		return FALSE;
-// 	} 
-// memset(&dest,0,sizeof(dest)); 
-// 	hp = gethostbyname(szIP); 
-// 	if (!hp)
-// 	{ 
-// 		addr = inet_addr(szIP); 
-// 	} 
-// 	if ((!hp) && (addr == INADDR_NONE) ) 
-// 	{ 
-// 		return FALSE;
-// 	} 
-// 
-// 	if (hp != NULL) 
-// 		memcpy(&(dest.sin_addr),hp->h_addr,hp->h_length); 
-// 	else 
-// 		dest.sin_addr.s_addr = addr; 
-// 	if (hp) 
-// 		dest.sin_family = hp->h_addrtype; 
-// 	else 
-// 		dest.sin_family = AF_INET; 
-// 	dest_ip = inet_ntoa(dest.sin_addr); 
-// 		times=DEF_PACKET_NUMBER;
-// 		datasize = DEF_PACKET_SIZE; 
-// 
-// 	datasize += sizeof(IcmpHeader); 
-// 	icmp_data = (char*)xmalloc(MAX_PACKET); 
-// 	recvbuf = (char*)xmalloc(MAX_PACKET); 
-// 	if (!icmp_data) 
-// 	{ 
-// 		return FALSE;
-// 	} 
-// 
-// 	memset(icmp_data,0,MAX_PACKET); 
-//  
-// 	FillIcmpData(icmp_data,datasize);
-// 	
-// 	
-// 	
-// 		int bwrote; 
-// 		((IcmpHeader*)icmp_data)->i_cksum = 0; 
-// 		((IcmpHeader*)icmp_data)->timestamp = GetTickCount(); 
-// 		((IcmpHeader*)icmp_data)->i_seq = seq_no++; 
-// 		((IcmpHeader*)icmp_data)->i_cksum = Checksum((USHORT*)icmp_data,datasize);
-// 		bwrote = sendto(sockRaw,icmp_data,datasize,0,(struct sockaddr*)&dest,sizeof(dest)); 
-// 		if (bwrote == SOCKET_ERROR)
-// 		{ 
-// 			if (WSAGetLastError() == WSAETIMEDOUT) 
-// 			{ 
-// 				//printf("Request timed out.\n"); 
-// 				CString str;
-// 				str.Format(_T("Request timed out.\n"));
-// 				//SendEchoMessage(str);
-// 				 
-// 			} 
-// 			//fprintf(stderr,"sendto failed: %d\n",WSAGetLastError()); 
-// 			//ExitProcess(STATUS_FAILED); 
-// 			CString str;
-// 			str.Format(_T("sendto failed: %d\n"),WSAGetLastError());
-// 			//SendEchoMessage(str);
-// 			return FALSE;
-// 		} 
-// 
-// 		if (bwrote < datasize ) 
-// 		{ 
-// 			//fprintf(stdout,"Wrote %d bytes\n",bwrote);
-// 			CString str;
-// 			str.Format(_T("Wrote %d bytes\n"),bwrote);
-// 			//SendEchoMessage(str);
-// 		} 
-// 
-// 		bread = recvfrom(sockRaw,recvbuf,MAX_PACKET,0,(struct sockaddr*)&from,&fromlen); 
-// 		if (bread == SOCKET_ERROR)
-// 		{ 
-// 			if (WSAGetLastError() == WSAETIMEDOUT) 
-// 			{ 
-// 				//printf("Request timed out.\n"); 
-// 				CString str;
-// 				str.Format(_T("Request timed out.\n"));
-// 				//SendEchoMessage(str);
-// 				 
-// 			} 
-// 
-// 			//fprintf(stderr,"recvfrom failed: %d\n",WSAGetLastError()); 
-// 			//ExitProcess(STATUS_FAILED); 
-// 			CString str;
-// 			str.Format(_T("recvfrom failed: %d\n"),WSAGetLastError());
-// 			//SendEchoMessage(str);
-// 			return FALSE;
-// 		} 
-// 
-// 		if(!DecodeResp(recvbuf,bread,&from))
-// 		{
-// 			xfree(icmp_data);
-// 			xfree(recvbuf);
-// 			WSACleanup();
-// 			return TRUE;
-// 		}
-// 		
-// 	
-// 		xfree(icmp_data);
-// 		xfree(recvbuf);
-// 		WSACleanup();
-// 	return 0; 
 }
 
 int CScanDlg::DecodeResp(char *buf, int bytes,struct sockaddr_in *from)
