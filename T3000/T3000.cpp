@@ -26,7 +26,7 @@
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);  
 
 LPFN_ISWOW64PROCESS fnIsWow64Process;  
-const unsigned int g_versionNO= 20190508;
+const unsigned int g_versionNO= 20190510;
 
 
 #ifdef _DEBUG
