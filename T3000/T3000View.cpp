@@ -4043,39 +4043,67 @@ void CT3000View::OnBnClickedBtnSynctime()
     GetDlgItem(IDC_BTN_SYNCTIME)->EnableWindow(FALSE);
 
     szTime[0] =(BYTE)(time.GetYear()%100);
-    int nRet = write_one(g_tstat_id,MODBUS_YEAR, szTime[0]);
-	/*if (product_register_value[7] == PM_TSTAT8
-		|| product_register_value[7] == PM_TSTAT8_WIFI
-		|| product_register_value[7] == PM_TSTAT8_OCC
-		|| product_register_value[7] == PM_TSTAT7_ARMX
-		|| product_register_value[7] == PM_TSTAT8_220V)
-	{
-		 
-		write_one(g_tstat_id, MODBUS_YEAR, time.GetYear());
-	}*/
-    Sleep(1000);
+    int nRet[7] = {0};
+    nRet[0] = write_one(g_tstat_id, MODBUS_YEAR, szTime[0]);
+    if (nRet[0] < 0)
+    {
+        AfxMessageBox(_T("Time synchronization failed!"));
+        goto endsynctime;
+    }
+    Sleep(200);
     szTime[1] = (BYTE)(time.GetMonth());
-    nRet = write_one(g_tstat_id, MODBUS_MONTH, szTime[1]);
-    Sleep(1000);
+    nRet[1] = write_one(g_tstat_id, MODBUS_MONTH, szTime[1],6);
+    if (nRet[1] < 0)
+    {
+        AfxMessageBox(_T("Time synchronization failed!"));
+        goto endsynctime;
+    }
+    Sleep(200);
     szTime[2] = (BYTE)(time.GetDayOfWeek()-1);
-    nRet = write_one(g_tstat_id, MODBUS_WEEK, szTime[2]);
-    Sleep(1000);
+    nRet[2] = write_one(g_tstat_id, MODBUS_WEEK, szTime[2], 6);
+    if (nRet[2] < 0)
+    {
+        AfxMessageBox(_T("Time synchronization failed!"));
+        goto endsynctime;
+    }
+    Sleep(200);
     szTime[3] = (BYTE)(time.GetDay());
-    nRet = write_one(g_tstat_id, MODBUS_DAY, szTime[3]);
-    Sleep(1000);
+    nRet[3] = write_one(g_tstat_id, MODBUS_DAY, szTime[3], 6);
+    if (nRet[3] < 0)
+    {
+        AfxMessageBox(_T("Time synchronization failed!"));
+        goto endsynctime;
+    }
+    Sleep(200);
     szTime[4] = (BYTE)(time.GetHour());
-    nRet = write_one(g_tstat_id, MODBUS_HOUR, szTime[4]);
-    Sleep(1000);
+    nRet[4] = write_one(g_tstat_id, MODBUS_HOUR, szTime[4], 6);
+    if (nRet[4] < 0)
+    {
+        AfxMessageBox(_T("Time synchronization failed!"));
+        goto endsynctime;
+    }
+    Sleep(200);
     szTime[5] = (BYTE)(time.GetMinute());
-    nRet = write_one(g_tstat_id, MODBUS_MINUTE, szTime[5]);
-    Sleep(1000);
+    nRet[5] = write_one(g_tstat_id, MODBUS_MINUTE, szTime[5], 6);
+    if (nRet[5] < 0)
+    {
+        AfxMessageBox(_T("Time synchronization failed!"));
+        goto endsynctime;
+    }
+    Sleep(200);
     szTime[6] = (BYTE)(time.GetSecond());
-    nRet = write_one(g_tstat_id, MODBUS_SECOND, szTime[6]);
+    nRet[6] = write_one(g_tstat_id, MODBUS_SECOND, szTime[6], 6);
+    if (nRet[6] < 0)
+    {
+        AfxMessageBox(_T("Time synchronization failed!"));
+        goto endsynctime;
+    }
 
+    AfxMessageBox(_T("Time synchronization success!"));
+endsynctime:
     GetDlgItem(IDC_BTN_SYNCTIME)->EnableWindow(TRUE);
 
     EndWaitCursor();
-    AfxMessageBox(_T("Time synchronization is complete!"));
 #endif
 
     //int nRet = Write_Multi(g_tstat_id, szTime, 450, 8, 3);  // 这个写入有问题，所以变成单个字节写多次

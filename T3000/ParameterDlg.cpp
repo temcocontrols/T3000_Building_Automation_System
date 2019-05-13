@@ -2915,6 +2915,11 @@ void CParameterDlg::Reflesh_ParameterDlg()
     strTemp.Format(_T("%d"),product_register_value[MODBUS_CYCLING_DELAY]);	//201  T6=241
     m_cycledlayEdit.SetWindowText(strTemp);
 
+    CString cs_temp2;
+    cs_temp2.Format(_T("X10 = %u seconds"), product_register_value[MODBUS_CYCLING_DELAY] * 10);
+    GetDlgItem(IDC_STATIC_CYCLE_INFO)->SetWindowText(cs_temp2);
+    
+
     //301	114	2	Full	W/R	Period timer ON time.
     //strTemp.Format(_T("%d"),product_register_value[301]);
     strTemp.Format(_T("%d"),product_register_value[MODBUS_TIMER_ON]);	//301   T6=114
