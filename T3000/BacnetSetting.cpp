@@ -214,7 +214,7 @@ void CBacnetSetting::Get_Time_Edit_By_Control()
         memset(Device_time.new_time.reserved, 0, 3);
     }
 
-	Post_Write_Message(g_bac_instance,RESTARTMINI_COMMAND,0,0,sizeof(Time_block_mini),this->m_hWnd,temp_task_info);
+	Post_Write_Message(g_bac_instance,WRITE_TIMECOMMAND,0,0,sizeof(Time_block_mini),this->m_hWnd,temp_task_info);
 }
 
 void CBacnetSetting::OnNMKillfocusDatePicker(NMHDR *pNMHDR, LRESULT *pResult)
@@ -259,6 +259,7 @@ void CBacnetSetting::OnBnClickedBtnBacSYNCTime()
 
     time_t scale_time = temp_time_long;
 
+#if 1 //2019 05 19
     if (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 469)
     {
         panel_time_to_basic_delt = Device_Basic_Setting.reg.time_zone * 360 / 10;
@@ -277,7 +278,7 @@ void CBacnetSetting::OnBnClickedBtnBacSYNCTime()
         //}
 
     }
-
+#endif
     temp_time = scale_time;
 
 
@@ -428,14 +429,6 @@ void CBacnetSetting::OnBnClickedBtnBacIPChange()
 	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->GetAddress(gatway1,gatway2,gatway3,gatway4);
 
 
-//    if (0 == (address1 != Device_Basic_Setting.reg.ip_addr[0] || address2 != Device_Basic_Setting.reg.ip_addr[1] || address3 != Device_Basic_Setting.reg.ip_addr[2] || address4 != Device_Basic_Setting.reg.ip_addr[3] ||
-//        subnet1 != Device_Basic_Setting.reg.subnet[0] || subnet2 != Device_Basic_Setting.reg.subnet[1] || subnet3 != Device_Basic_Setting.reg.subnet[2] || subnet4 != Device_Basic_Setting.reg.subnet[3] ||
-//        gatway1 != Device_Basic_Setting.reg.gate_addr[0] || gatway2 != Device_Basic_Setting.reg.gate_addr[1] || gatway3 != Device_Basic_Setting.reg.gate_addr[2] || gatway4 != Device_Basic_Setting.reg.gate_addr[3]) //||
-///*        m_tcp_type != Device_Basic_Setting.reg.tcp_type*/)
-//    {
-//        //fandu 20180201 如果没有变更就不要往设备里写了。
-//        return;
-//    }
 
     CString strIP;
     strIP.Format(_T("%u.%u.%u.%u"), address1, address2, address3, address4);
@@ -472,10 +465,7 @@ void CBacnetSetting::OnBnClickedBtnBacIPChange()
 			Device_Basic_Setting.reg.tcp_type = 0;
 		else
 			Device_Basic_Setting.reg.tcp_type = 1;
-		//Device_Basic_Setting.reg.tcp_type = isstatic;
-		//CString temp_task_info;
-		//temp_task_info.Format(_T("Change IP Address Information !"));
-		//Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
+
 		if(Write_Private_Data_Blocking(WRITE_SETTING_COMMAND,0,0) <= 0)
 		{
 			CString temp_task_info;
@@ -681,27 +671,6 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				m_edit_port.EnableWindow(false);
 			}
 
-            //版本大于38.6 的才有在setting 里面改port 的功能
-            //if ((Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub) > 470)
-            //{
-            //    CString temp_value;
-            //    m_network_sub.ShowWindow(1);
-            //    m_network_zigbee.ShowWindow(1);
-            //    m_network_main.ShowWindow(1);
-            //    temp_value.Format(_T("%d"), Device_Basic_Setting.reg.network_ID[0]);
-            //    m_network_sub.SetWindowTextW(temp_value);
-            //    temp_value.Format(_T("%d"), Device_Basic_Setting.reg.network_ID[1]);
-            //    m_network_zigbee.SetWindowTextW(temp_value);
-            //    temp_value.Format(_T("%d"), Device_Basic_Setting.reg.network_ID[2]);
-            //    m_network_main.SetWindowTextW(temp_value);
-            //}
-            //else
-            //{
-            //    m_network_sub.EnableWindow(0);
-            //    m_network_zigbee.EnableWindow(0);
-            //    m_network_main.EnableWindow(0);
-            //}
-            
 
             //20180201 fandu  ARM 的 板子才有 zone schedual 这个功能
 			//版本大于46.1 的才有在setting 里面改port 的功能
@@ -803,17 +772,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
                 ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->AddString(DDNS_Server_Name[1]);
                 ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->AddString(DDNS_Server_Name[2]);
                 ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->AddString(DDNS_Server_Name[3]);
-
-                //if(Device_Basic_Setting.reg.dyndns_provider == 0)
-                //	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(DDNS_Server_Name[0]);
-                //else if(Device_Basic_Setting.reg.dyndns_provider == 1)
-                //	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(DDNS_Server_Name[1]);
-                //else if(Device_Basic_Setting.reg.dyndns_provider == 2)
-                //	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(DDNS_Server_Name[2]);
-                //else if(Device_Basic_Setting.reg.dyndns_provider == 3)
-                //	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(DDNS_Server_Name[3]);
-                //else
-                //	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(_T(""));
+                ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->AddString(DDNS_Server_Name[4]);
 
                 if (Device_Basic_Setting.reg.dyndns_provider == 0)
                     ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetCurSel(0);
@@ -823,10 +782,12 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
                     ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetCurSel(2);
                 else if (Device_Basic_Setting.reg.dyndns_provider == 3)
                     ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetCurSel(3);
+                else if (Device_Basic_Setting.reg.dyndns_provider == 4)
+                    ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetCurSel(4);
                 else
                 {
-                    Device_Basic_Setting.reg.dyndns_provider = 3;
-                    ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetCurSel(3);
+                    Device_Basic_Setting.reg.dyndns_provider = 4;
+                    ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetCurSel(4);
                 }
 
 
@@ -1300,6 +1261,13 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
             unsigned long  temp_time_long123    = time(NULL);
             unsigned long  temp_time_long = Device_time.new_time.n_time;
 
+            //**********************************************************
+            //2019 05 20 Fance 用于处理 电脑勾选了夏令时 引起的 T3 显示时间 与实际时间总是相差一小时的问题;
+            TIME_ZONE_INFORMATION tzi;
+            GetTimeZoneInformation(&tzi);
+            short computer_DaylightBias = tzi.DaylightBias * 60;
+            //**********************************************************
+
 
             panel_time_to_basic_delt  = Device_Basic_Setting.reg.time_zone * 360 / 10;
 
@@ -1311,8 +1279,9 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
                 scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt + 3600; //如果选中夏令时 需要显示的时候加一个小时
             else
                 scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt; // 其他值当作没有夏令时处理.
-            TimeTemp = scale_time;
+            TimeTemp = scale_time + computer_DaylightBias;
         }
+
         //减去系统现在的时区 ，然后在加上 minipanel自己的时区.
 
 
@@ -2038,6 +2007,8 @@ void CBacnetSetting::OnCbnSelchangeComboBacnetSettingDdnsServer()
 		Device_Basic_Setting.reg.dyndns_provider = 2;
 	else if(nSel == 3)
 		Device_Basic_Setting.reg.dyndns_provider = 3;
+    else if (nSel == 4)
+        Device_Basic_Setting.reg.dyndns_provider = 4;
 
 	CString temp_task_info;
 	temp_task_info.Format(_T("Change DDNS server to "));
@@ -2195,18 +2166,14 @@ void CBacnetSetting::OnEnKillfocusEditSettingObjInstance()
 BOOL CBacnetSetting::OnHelpInfo(HELPINFO* pHelpInfo)
 {
 	 
-	// 	if((m_latest_protocol == PROTOCOL_BACNET_IP) || (m_latest_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
-	// 	{
+
 	HWND hWnd;
 
 	if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
 	else
 		hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_PANEL_CONFIGURATION);
 	return (hWnd != NULL);
-	// 	}
-	// 	else{
-	// 		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
-	// 	}
+
 	return CDialogEx::OnHelpInfo(pHelpInfo);
 }
 

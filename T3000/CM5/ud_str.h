@@ -76,6 +76,7 @@ typedef enum {
 		 READ_TSTATE_SCHEDULE_T3000 = 38,
 		 READ_REMOTE_POINT         = 40,
          READ_SCHEDUAL_TIME_FLAG   = 41,
+         READ_MSV_COMMAND          = 42,
 
 		 WRITEOUTPUT_T3000         = 100+ENUM_OUT+1,  /* write outputs          */
 		 WRITEINPUT_T3000          = 100+ENUM_IN+1,   /* write inputs           */
@@ -99,7 +100,7 @@ typedef enum {
 		 WRITETSTAT_T3000			= 100 + READTSTAT_T3000,
 		 //COMMAND_50                = 50,
 		 //READ_COMMAND_50           = 50,
-         WRITE_SCHEDUAL_TIME_FLAG  = 141,
+
 		 WRITE_COMMAND_50          = 150,
 		 
          READ_NEW_TIME_COMMAND      = 88,           /* read new time            */  //2018 04 17 新的读时间命令
@@ -122,13 +123,15 @@ typedef enum {
 		 SENDDATAMINI_COMMAND      = 118,
 		 READFLASHSTATUS_COMMAND   = 119,
 		 READSTATUSWRITEFLASH_COMMAND = 120,
-		 RESTARTMINI_COMMAND       = 121,
+		 WRITE_TIMECOMMAND       = 121,
 		 WRITEPRGFLASH_COMMAND     = 122,
 		 WRITEANALOG_CUS_TABLE_T3000	       = 134,
 		 WRITEVARUNIT_T3000			= 136,
 		 WRITEEXT_IO_T3000			= 137,
 		 WRITE_TSTATE_SCHEDULE_T3000= 138,
 		 WRITE_REMOTE_POINT         = 140,
+         WRITE_SCHEDUAL_TIME_FLAG   = 141,
+         WRITE_MSV_COMMAND          = 142,
          WRITE_NEW_TIME_COMMAND     = 188,  //2018 04 17 新的写时间命令
 		 WRITE_AT_COMMAND			= 190,	//100 length
 		 WRITE_GRPHIC_LABEL_COMMAND  = 191,
@@ -161,6 +164,9 @@ typedef enum {
 
 #define STR_VARIABLE_DESCRIPTION_LENGTH  21
 #define	 STR_VARIABLE_LABEL  9
+
+#define STR_MSV_NAME_LENGTH 20
+#define STR_MSV_MULTIPLE_COUNT 8
 
 #define STR_USER_NAME_LENGTH 16
 #define  STR_USER_PASSWORD_LENGTH 9
@@ -838,18 +844,22 @@ typedef enum
 };
 
  
+//**************************************************
+//2019 05 20 Fandu 用于远程访问时，读取 T3 下面子设备信息;
+typedef	struct
+{
+    uint8_t protocal;  // 0  是modbus设备   1 是bacnet 设备;
+    uint8_t modbus_id;
+    uint32_t instance;
+}Str_Remote_Info;
 typedef struct
 {
-	//uint8_t sn[4];
-	unsigned int sn;
-	uint8_t product_type;
-	uint8_t modbus_id;
-	uint8_t ip_addr[4];
-	uint16_t port;
-	uint8_t reserved[10];
+    uint8_t number;
+
+    Str_Remote_Info sub[64];
 
 }Str_Remote_TstDB;
-
+//**************************************************
 
 
 
@@ -959,7 +969,17 @@ typedef struct
 
 } Str_Units_element;  
 
+typedef struct
+{
+    char status;
+    char msv_name[STR_MSV_NAME_LENGTH];
+    unsigned short msv_value;
+}multiple_struct;
 
+typedef struct
+{
+    multiple_struct msv_data[STR_MSV_MULTIPLE_COUNT];
+} Str_MSV;
 
 
 typedef struct

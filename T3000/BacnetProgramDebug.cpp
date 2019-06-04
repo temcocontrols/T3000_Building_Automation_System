@@ -779,7 +779,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 					temp_jumper = (m_Input_data.at(point_number).decom & 0xf0 ) >> 4;
 
 					//如果range 是0 或者 不在正常范围内，就不要显示 open short 的报警 状态;
-					if((temp_decom==0) || (m_Input_data.at(point_number).range == 0) || (m_Input_data.at(point_number).range > 30))
+					if((temp_decom==0) || (m_Input_data.at(point_number).range == 0) || (bac_Invalid_range(m_Input_data.at(point_number).range)))
 					{
 						temp_status.Format(Decom_Array[0]);
 						m_program_debug_list.SetItemTextColor(0,INPUT_DECOM,RGB(0,0,0),false);
@@ -2209,7 +2209,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 				else
 				{
 					bac_ranges_type = OUTPUT_RANGE_DIGITAL_TYPE;
-					if(m_Output_data.at(point_number).range > 30)
+					if(bac_Invalid_range(m_Output_data.at(point_number).range))
 					{
 						m_Output_data.at(point_number).range = 0;
 						bac_range_number_choose = 0;
@@ -2493,7 +2493,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 				else
 				{
 					bac_ranges_type = INPUT_RANGE_DIGITAL_TYPE;
-					if(m_Input_data.at(point_number).range > 30)
+					if(bac_Invalid_range(m_Input_data.at(point_number).range))
 					{
 						m_Input_data.at(point_number).range = 0;
 						bac_range_number_choose = 0;
@@ -2780,7 +2780,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 				else
 				{
 					bac_ranges_type = VARIABLE_RANGE_DIGITAL_TYPE;
-					if(m_Variable_data.at(point_number).range > 30)
+					if(bac_Invalid_range(m_Variable_data.at(point_number).range))
 					{
 						m_Variable_data.at(point_number).range = 0;
 						bac_range_number_choose = 0;

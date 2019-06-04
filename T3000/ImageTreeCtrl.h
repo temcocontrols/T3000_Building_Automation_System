@@ -67,10 +67,8 @@ bool CanDeleteItem(HTREEITEM hItem);
 	BOOL SetItemImage(HTREEITEM hItem, int nImage, int nSelectedImage);
 	int get_item_level(HTREEITEM hItem);
 	void turn_item_image(HTREEITEM hItem,bool state=true);
-	BOOL is_connection_by_image(int nImage,int nSelectedImage);
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/);
-	BOOL Retofline(HTREEITEM hItem);//tree0412
     virtual BOOL PreTranslateMessage(MSG* pMsg);
 	//virtual bool	CanSetLabelText(TVITEM & item);
 	//////////////////////////////////////////////////////////////////////////

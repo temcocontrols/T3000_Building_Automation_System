@@ -1257,7 +1257,7 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 			else
 			{
 				bac_ranges_type = OUTPUT_RANGE_DIGITAL_TYPE;
-				if(m_Output_data.at(lRow).range > 30)
+				if(bac_Invalid_range(m_Output_data.at(lRow).range))
 				{
 					m_Output_data.at(lRow).range = 0;
 					bac_range_number_choose = 0;
