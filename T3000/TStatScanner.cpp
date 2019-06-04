@@ -4740,6 +4740,7 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
     }
     Sleep(500);
 
+#if 0
 
     for (int i=0; i<(int)m_remote_device_db.size(); i++)
     {
@@ -4811,6 +4812,7 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
 
 
     }
+#endif
     SqliteDBBuilding.closedb();
     m_scan_info.at(scan_remote_ip_item).scan_status = SCAN_STATUS_FINISHED;
 

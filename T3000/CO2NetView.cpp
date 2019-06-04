@@ -537,7 +537,7 @@ void CCO2NetView::Initial_Window()
     m_grid_input.put_TextMatrix(3,0,_T("3"));
 
 
-    m_grid_input.put_TextMatrix(1,1,_T("Tempreture"));
+    m_grid_input.put_TextMatrix(1,1,_T("Temperature"));
     m_grid_input.put_TextMatrix(2,1,_T("Hum"));
     m_grid_input.put_TextMatrix(3,1,_T("CO2"));
 

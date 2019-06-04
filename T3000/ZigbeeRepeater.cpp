@@ -58,7 +58,8 @@ void CZigbeeRepeater::Dump(CDumpContext& dc) const
 
 void CZigbeeRepeater::Fresh()
 {
-
+    CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+    pFrame->SetWindowTextW(_T("T3000 Building Automation System") + CurrentT3000Version);
     Initial_List();
     Initial_Moudle_List();
     ((CComboBox *)GetDlgItem(IDC_COMBO_REPEATER_BAUDRATE))->ResetContent();

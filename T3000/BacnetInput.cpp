@@ -857,7 +857,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		temp_jumper = (m_Input_data.at(i).decom & 0xf0 ) >> 4;
 
 		//如果range 是0 或者 不在正常范围内，就不要显示 open short 的报警 状态;
-		if((temp_decom==0) || (m_Input_data.at(i).range == 0) || (m_Input_data.at(i).range > 30))
+		if((temp_decom==0) || (m_Input_data.at(i).range == 0) || bac_Invalid_range(m_Input_data.at(i).range))
 		{
 			temp_status.Format(Decom_Array[0]);
 			m_input_list.SetItemTextColor(i,INPUT_DECOM,RGB(0,0,0),false);
@@ -1193,6 +1193,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 	else if(lCol == INPUT_RANGE)
 	{
+        m_dialog_signal_type = 0xff;
 		BacnetRange dlg;
 
 
@@ -1264,7 +1265,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 		else
 		{
 			bac_ranges_type = INPUT_RANGE_DIGITAL_TYPE;
-			if(m_Input_data.at(lRow).range > 30)
+			if(bac_Invalid_range(m_Input_data.at(lRow).range))
 			{
 				m_Input_data.at(lRow).range = 0;
 				bac_range_number_choose = 0;
@@ -1339,6 +1340,20 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 				temp_float_value = ((float)m_Input_data.at(lRow).value) / 1000;
 				cstemp_value.Format(_T("%.2f"),temp_float_value);
 				m_input_list.SetItemText(lRow,INPUT_VALUE,cstemp_value);	
+                int temp_jumper = 0;
+                if (m_dialog_signal_type != 0xff)  // 0xff 说明并没有任何改动;
+                {
+                    temp_jumper = m_dialog_signal_type >> 4;
+                    if ((temp_jumper == 0) || (temp_jumper == 1) || (temp_jumper == 2) || (temp_jumper == 3) || (temp_jumper == 5))
+                    {
+                        unsigned char temp1;
+                        temp1 = m_Input_data.at(lRow).decom;
+                        temp1 = temp1 & 0x0f;
+                        temp1 = temp1 | (temp_jumper << 4);
+                        m_Input_data.at(lRow).decom = temp1;
+                    }
+                }
+
 			}
 			else if((bac_ranges_type == VARIABLE_RANGE_DIGITAL_TYPE) || (bac_ranges_type == INPUT_RANGE_DIGITAL_TYPE) || (bac_ranges_type == OUTPUT_RANGE_DIGITAL_TYPE))
 			{

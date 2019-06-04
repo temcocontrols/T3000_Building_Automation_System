@@ -2,7 +2,7 @@
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
 //使用VS2010 编译需删除 c:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cvtres.exe 来确保用更高版本的 来转换资源文件
-
+81 0B 00 0C 01 20 FF FF 00 FF 10 08
 2019 04 29
 1. User can insert more remote point in the "Graphic" user interface.
    Using the standard bacnet keywords "AV,AI,AO,BV,BI,BO" ,format is "Deviceid + Keywords + number"  
@@ -2088,6 +2088,7 @@ void CDialogCM5_BacNet::Initial_All_Point()
 	m_customer_unit_data.clear();
 	m_user_login_data.clear();
 	m_tatat_schedule_data.clear();
+    m_msv_data.clear();
 	//vector <Str_TstatInfo_point> m_Tstat_data;
 	for(int i=0;i<BAC_INPUT_ITEM_COUNT;i++)
 	{
@@ -2224,482 +2225,17 @@ void CDialogCM5_BacNet::Initial_All_Point()
 		Str_tstat_schedule temp_tstat_schedule;
 		memset(&temp_tstat_schedule, 0, sizeof(Str_tstat_schedule));
 		m_tatat_schedule_data.push_back(temp_tstat_schedule);
-
-		//m_tatat_schedule_data.at(i).tstat.id = i + 1;
-		//m_tatat_schedule_data.at(i).tstat.on_line = i % 2;
-		//m_tatat_schedule_data.at(i).tstat.schedule = i % 9;
-		//m_tatat_schedule_data.at(i).tstat.flag = 0x80;
-
 	}
 
+    for (int i = 0;i < BAC_MSV_COUNT;i++)
+    {
+        Str_MSV temp_msv_point;
+        memset(&temp_msv_point, 0, sizeof(Str_MSV));
+        m_msv_data.push_back(temp_msv_point);
+    }
 }
 
 
-class Complex
-{
-public:
-	Complex() {} //缺省构造函数
-	Complex(double);	//带参数的构造函数
-	Complex(double,double);
-	Complex(int length, char *str);				 //构造函数;
-	Complex operator * (const Complex&) const;   //重载操作符  *
-	Complex operator / (const Complex&) const;	 //重载操作符  /
-	Complex(const Complex&);					 //拷贝构造函数	->本例浅拷贝
-	Complex &operator = (const Complex&);		//赋值构造函数 ->本例浅拷贝
-
-	~Complex() {}
-private:
-	double real;
-	double imag;
-	int str_length;
-	char * name;
-};
-
-Complex::Complex(int length, char * str)
-{
-	str_length = length;
-	name = new char[str_length];
-	if (name != NULL)
-	{
-		strcpy(name, str);
-	}
-}
-
-Complex::Complex(double e)
-{
-	real = e;
-	imag = 0;
-	str_length = 0;
-	name = NULL;
-
-}
-
-Complex::Complex(double treal, double timag)
-{
-	real = treal;
-	imag = timag;
-	str_length = 0;
-	name = NULL;
-}
-
-Complex::Complex(const Complex &other)
-{
-	real = other.real;
-	imag = other.imag;
-
-
-	
-}
-
-Complex &Complex::operator= (const Complex & other)
-{
-	real = other.real;
-	imag = other.imag;
-	return *this;
-}
-
-
-Complex Complex::operator*(const Complex &other) const
-{
-	Complex Ret(real*other.real, imag*other.imag);
-	return Ret;
-}
-
-Complex Complex::operator/(const Complex &other) const
-{
-	Complex Ret(real / other.real, imag / other.imag);
-	return Ret;
-}
-
-
-
-
-typedef struct test_struct
-{
-	int index;
-	int  name;
-};
-
-
-
-class FreshValue
-{
-public:
-	FreshValue();   //缺省构造函数
-	FreshValue(int, char*);
-	FreshValue(double);
-	FreshValue(double, double);
-	FreshValue(const FreshValue&); //拷贝构造函数
-
-	FreshValue &operator = (const FreshValue &); //赋值构造函数;
-	FreshValue operator+  (const FreshValue &); //重载加号操作符;
-	~FreshValue();
-private:
-	int str_length;
-	char *name;
-	double real;
-	double imag;
-};
-
-FreshValue::~FreshValue()
-{
-	if(name!= NULL)
-		delete name;
-}
-
-//重载操作符 + 号
-FreshValue FreshValue::operator+ (const FreshValue &other)
-{
-	FreshValue Ret(real + other.real,imag + other.imag);
-	return Ret;
-	
-}
-
-
-//赋值构造函数 ，需要释放原有内存，开辟新内存接受 值.
-FreshValue &FreshValue::operator= (const FreshValue& other)
-{
-	str_length = other.str_length;
-	if(name!=NULL)
-		delete name;
-	else
-	{
-		return *this;
-	}
-	name = new char[str_length];
-	if (name != NULL)
-	{
-		strcpy(name, other.name);
-	}
-	real = other.real;
-	imag = other.imag;
-
-	return *this;
-}
-
-
-FreshValue::FreshValue()
-{
-	str_length = 0;
-	name = NULL;
-	real = 0;
-	imag = 0;
-}
-
-FreshValue::FreshValue(int temp_length, char *pchar)
-{
-	str_length = temp_length;
-	name = new char[str_length];
-	if (name != NULL)
-	{
-		strcpy(name, pchar);
-	}
-	real = 0;
-	imag = 0;
-}
-
-FreshValue::FreshValue(double temp_real)
-{
-	real = temp_real;
-	imag = 0;
-	str_length = 0;
-	name = NULL;
-}
-
-
-FreshValue::FreshValue(double temp_real, double temp_imag)
-{
-	real = temp_real;
-	imag = temp_imag;
-	str_length = 0;
-	name = NULL;
-}
-
-
-//拷贝构造函数 -> 深拷贝.
-FreshValue::FreshValue(const FreshValue&other)
-{
-	str_length = other.str_length;
-	if ((other.name != NULL) && (other.str_length > 0))
-	{
-		name = new char[str_length];
-		if (name != NULL)
-		{
-			strcpy(name, other.name);
-		}
-	}
-
-	real = other.real;
-	imag = other.imag;
-}
-
-typedef struct MyTree
-{
-	int index;
-	MyTree * left;
-	MyTree * right;
-
-	MyTree()
-	{
-		left = NULL;
-		right = NULL;
-	}
-};
-
-int   isB(MyTree   *t)
-{
-	if (!t)   return   0;
-	int   left = isB(t->left);
-	int   right = isB(t->right);
-	if (left >= 0 && right >= 0 && left - right <= 1 || left - right >= -1)
-		return   (left < right) ? (right + 1) : (left + 1);
-	else   return   -1;
-
-}
-
-
-
-class Bacnet
-{
-public:
-	char * char_bac;
-
-	Bacnet()
-	{
-		char_bac = NULL;
-	}
-
-	Bacnet(char *temp)
-	{
-		if (temp != NULL)
-		{
-			int length = strlen(temp);
-			if (length > 0)
-			{
-				char_bac = new char[length+1];
-				if (char_bac != NULL)
-				{
-					strcpy(char_bac, temp);
-				}
-			}
-
-		}
-	}
-
-	Bacnet(const Bacnet &other)
-	{
-		if (other.char_bac != NULL)
-		{
-			int length = strlen(other.char_bac);
-			if (length > 0)
-			{
-				char_bac = new char[length+1];
-				if (char_bac != NULL)
-				{
-					strcpy(char_bac, other.char_bac);
-				}
-			}
-		}
-	}
-
-	Bacnet &operator = (const Bacnet &other)
-	{
-		int length = strlen(other.char_bac);
-		if (char_bac != NULL)
-			delete[] char_bac;
-		char_bac = new char[length+1];
-		if (char_bac != NULL)
-		{
-			strcpy(char_bac, other.char_bac);
-		}
-		return *this;
-	}
-
-	Bacnet operator+ (const Bacnet &other)
-	{
-		int length = strlen(other.char_bac);
-		if (length == 0)
-		{
-			return *this;
-		}
-
-		int new_length = length + strlen(char_bac);
-		if (new_length > 0)
-		{
-			char *old_char = char_bac;
-			char_bac = new char[new_length+1];
-			if (char_bac != NULL)
-			{
-				if (old_char != NULL)
-				{
-					strcpy(char_bac, old_char);
-					if (other.char_bac != NULL)
-					{
-						strcat(char_bac, other.char_bac);
-						return *this;
-					}
-				}
-			}
-		}
-		return *this;
-	}
-
-};
-
-/*volatile*/ int test_thread = 0;
-#if 0
-HANDLE my_mutex = NULL;
-
-
-DWORD WINAPI  Thread_1(LPVOID lpVoid)
-{
-	my_mutex = CreateMutex(NULL, true, _T("test_mutex"));
-	ReleaseMutex(my_mutex);
-	while (1)
-	{
-		WaitForSingleObject(my_mutex, INFINITE);
-		test_thread++;
-		TRACE(_T("thread1 %d \r\n"), test_thread);
-		ReleaseMutex(my_mutex);
-		Sleep(3000);
-		
-		
-	}
-	return 0;
-}
-
-
-DWORD WINAPI  Thread_2(LPVOID lpVoid)
-{
-	while (1)
-	{
-		WaitForSingleObject(my_mutex, INFINITE);
-		test_thread++;
-		TRACE(_T("thread2 %d\r\n"), test_thread);
-		ReleaseMutex(my_mutex);
-		Sleep(5000);
-		
-	}
-	return 0;
-}
-#endif
-
-#if 0
-class String
-{
-private:
-	char * str;
-	int length;
-	static int number ;
-	enum {MAXNUMBER = 90};
-public:
-	String();
-	String(const char *);
-	String(const String&);
-	String &operator = (const String&);
-	String &operator = (const char *);
-	char &operator[] (int);
-	const char &operator[] (int) const;
-
-	friend bool operator<(const String&, const String&);
-	friend bool operator>(const String&, const String&);
-	friend bool operator=(const String&, const String&);
-	friend String operator+(const String&, const String&);
-
-	friend ostream operator<<(ostream &os, const String&);
-	friend istream operator >> (istream &is, const String&);
-}
-#endif
-
-
-
-
-
-class Mystr
-{
-private:
-	int length;
-	char *str;
-public:
-	Mystr();
-	Mystr(const char *);
-	Mystr(const Mystr&);
-	Mystr &operator=(const char *);
-	Mystr &operator=(const Mystr&);
-	char &operator[] (int);
-	const char &operator[] (int) const;
-	friend bool operator<(const Mystr&, const Mystr&);
-	friend bool operator>(const Mystr&, const Mystr&);
-	friend bool operator==(const Mystr&, const Mystr&);
-
-	friend Mystr operator+(const Mystr&, const Mystr&);
-};
-
-char &Mystr::operator[](int index)
-{
-	return str[index];
-}
-
-const char &Mystr::operator[](int index) const
-{
-	return str[index];
-}
-
-
-bool operator<(const Mystr &str1, const Mystr &str2)
-{
-	return (strcmp(str1.str, str2.str) < 0);
-}
-
-
-Mystr &Mystr::operator=(const char *other)
-{
-	delete[] str;
-	length = strlen(other);
-	str = new char[length + 1];
-	if(str!= NULL)
-		strcpy(str, other);
-	return *this;
-}
-
-Mystr &Mystr::operator=(const Mystr&other)
-{
-	if (this == &other)
-		return *this;
-	delete[] str;
-	length = other.length;
-	str = new char[length + 1];
-	if (str != NULL)
-	{
-		strcpy(str, other.str);
-	}
-
-	return *this;
-}
-
-Mystr::Mystr()
-{
-	length = 0;
-	str = new char[1];
-	str[0] = '\0';
-}
-
-Mystr::Mystr(const char *other)
-{
-	length = strlen(other);
-	str = new char[length + 1];
-	strcpy_s(str, length, other);
-}
-
-Mystr::Mystr(const Mystr&other)
-{
-	length = other.length;
-	str = new char[length + 1];
-	if (str != NULL)
-	{
-		strcpy_s(str, length, other.str);
-	}
-}
 
 
 
@@ -3243,27 +2779,27 @@ void CDialogCM5_BacNet::Fresh()
 
 
 
-typedef struct BACnet_Object_Property_Value_Own {
-	BACNET_OBJECT_TYPE object_type;
-	uint32_t object_instance;
-	BACNET_PROPERTY_ID object_property;
-	uint32_t array_index;
-	BACNET_APPLICATION_DATA_VALUE value;
-	HTREEITEM t_PropertyChild;
-} BACNET_OBJECT_PROPERTY_VALUE_Own;
+//typedef struct BACnet_Object_Property_Value_Own {
+//	BACNET_OBJECT_TYPE object_type;
+//	uint32_t object_instance;
+//	BACNET_PROPERTY_ID object_property;
+//	uint32_t array_index;
+//	BACNET_APPLICATION_DATA_VALUE value;
+//	HTREEITEM t_PropertyChild;
+//} BACNET_OBJECT_PROPERTY_VALUE_Own;
 
-typedef struct _DEVICE_INFO
-{
-	uint32_t i_device_id;
-	uint32_t i_vendor_id;
-	uint32_t i_mac;
-	HTREEITEM t_DeviceChild;
-	vector	<BACnet_Object_Property_Value_Own> my_Property_value;
+//typedef struct _DEVICE_INFO
+//{
+//	uint32_t i_device_id;
+//	uint32_t i_vendor_id;
+//	uint32_t i_mac;
+//	HTREEITEM t_DeviceChild;
+//	vector	<BACnet_Object_Property_Value_Own> my_Property_value;
+//
+//}DEVICE_INFO;
 
-}DEVICE_INFO;
 
-
-volatile struct mstp_port_struct_t MSTP_Port;
+//volatile struct mstp_port_struct_t MSTP_Port;
 static void Read_Properties(
     void)
 {
@@ -5552,36 +5088,6 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 
 
 					}
-					//else
-					//{
-					//	bac_select_device_online = false;
-					//	KillTimer(4);
-					//	//SetPaneString(2,_T("Offline"));
-					//	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-					//	pFrame->m_pTreeViewCrl->turn_item_image(selected_tree_item ,false);
-					//	selected_product_Node.status_last_time[0] = false;
-					//	selected_product_Node.status_last_time[1] = false;
-					//	selected_product_Node.status_last_time[2] = false;
-
-					//	HKEY hkey;
-					//	char sz[256];
-					//	DWORD dwtype, sl = 256;
-
-					//	RegOpenKeyEx(HKEY_LOCAL_MACHINE,	_T("SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\StandardProfile"),	NULL, KEY_READ, &hkey);
-					//	RegQueryValueEx(hkey, _T("EnableFirewall"), NULL, &dwtype, (LPBYTE)sz, &sl);
-					//	DWORD dw_firewall;
-					//	dw_firewall = sz[0] + sz[1] * 256 + sz[2] * 256*256 + sz[3] * 256*256*256;
-					//	if(dw_firewall != 0 )
-					//	{
-					//		//AfxMessageBox(_T("Please turn off your firewall .If not , some broadcast communication may fail."));
-					//		pFrame->m_pDialogInfo->ShowWindow(SW_SHOW);
-					//		pFrame->m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Please turn off your firewall or add 'T3000.exe' to firewall exception list.\r\nIf not , some broadcast communication may fail."));
-					//	}
-
-					//	RegCloseKey(hkey);
-
-					//}
-
 					
 				}
 				else

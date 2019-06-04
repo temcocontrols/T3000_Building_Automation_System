@@ -714,10 +714,16 @@
     <ClCompile Include="CO2_NodeView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BacnetAddRemoteDevice.cpp">
+    <ClCompile Include="ZigbeeRepeater.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ZigbeeRepeater.cpp">
+    <ClCompile Include="BacnetAddRemoteDevice.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="Bacnet_Range_Msv.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TstatAQ.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1856,6 +1862,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ZigbeeRepeater.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CControlBasicEditorCOM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Bacnet_Range_Msv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TstatAQ.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -6,7 +6,7 @@
 #include "T3000.h"
  
 
-
+#include "ShowMessageDlg.h"
 #include "T3000RegAddress.h"
 #include "global_define.h"
 #include "DialogCM5_BacNet.h"
@@ -1449,7 +1449,7 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
 	case WRITEANNUALSCHEDULE_T3000:
 		entitysize = 48;
 		break;
-	case RESTARTMINI_COMMAND:
+	case WRITE_TIMECOMMAND:
 		entitysize = sizeof(Time_block_mini);
 		break;
 	case WRITE_SETTING_COMMAND:
@@ -1467,6 +1467,9 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
     case WRITE_SCHEDUAL_TIME_FLAG:
         entitysize = sizeof(Str_schedual_time_flag);
             break;
+    case WRITE_MSV_COMMAND:
+        entitysize = sizeof(Str_MSV);
+        break;
 	case  WRITEALARM_T3000:
 		entitysize = sizeof(Alarm_point);
 		break;
@@ -1637,6 +1640,15 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
         }
     }
         break;
+    case WRITE_MSV_COMMAND:
+    {
+        temp_buffer = temp_buffer + HEADER_LENGTH;
+        for (int i = 0; i < (end_instance - start_instance + 1); i++)
+        {
+            memcpy_s(SendBuffer + i * sizeof(Str_MSV) + HEADER_LENGTH, sizeof(Str_MSV), &m_msv_data.at(i + start_instance), sizeof(Str_MSV));
+        }
+    }
+    break;
     case  WRITEHOLIDAY_T3000:
         for (int i=0; i<(end_instance-start_instance + 1); i++)
         {
@@ -1648,7 +1660,7 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
 
         //memcpy_s(g_DayState[annual_list_line],block_length,my_temp_point,block_length);
         break;
-    case RESTARTMINI_COMMAND:
+    case WRITE_TIMECOMMAND:
     {
         memcpy_s(SendBuffer + HEADER_LENGTH,sizeof(Time_block_mini),&Device_time,sizeof(Time_block_mini));
     }
@@ -3402,6 +3414,35 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
         Sleep(1);
     }
     break;
+    case READ_MSV_COMMAND:
+    {
+        if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_MSV)) != 0)
+            return -1;	//得到的结构长度错误;
+        block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_MSV);
+        //m_Input_data_length = block_length;
+        my_temp_point = (char *)Temp_CS.value + 3;
+        start_instance = *my_temp_point;
+        my_temp_point++;
+        end_instance = *my_temp_point;
+        my_temp_point++;
+        my_temp_point = my_temp_point + 2;
+
+        for (int x = start_instance; x <= end_instance; x++)
+        {
+            //copy the schedule day time to my own buffer.
+            for (int j = 0; j<STR_MSV_MULTIPLE_COUNT; j++)
+            {
+                m_msv_data.at(x).msv_data[j].status = *(my_temp_point++); //status 用来判断是否 这一组数据 使用与否;
+                memcpy_s(m_msv_data.at(x).msv_data[j].msv_name, STR_MSV_NAME_LENGTH, my_temp_point, STR_MSV_NAME_LENGTH);
+                my_temp_point = my_temp_point + STR_MSV_NAME_LENGTH;
+                m_msv_data.at(x).msv_data[j].msv_value = ((unsigned char)my_temp_point[1] << 8) | ((unsigned char)my_temp_point[0]);
+                my_temp_point = my_temp_point + 2;
+            }
+        }
+        return READ_MSV_COMMAND;
+        Sleep(1);
+    }
+    break;
 	case READANNUALSCHEDULE_T3000:
 		{
 			my_temp_point = (char *)Temp_CS.value + 3;
@@ -3933,8 +3974,9 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 		{
 			if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Str_Remote_TstDB))!=0)
 				return -1;
-			m_remote_device_db.clear();
-
+			//m_remote_device_db.clear();
+            memset(&m_remote_device_db, 0, sizeof(Str_Remote_TstDB));
+            //m_remote_device_db = { 0 };
 			block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Str_Remote_TstDB);
 			if(block_length == 0)
 				break;
@@ -3945,6 +3987,17 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 			my_temp_point++;
 			my_temp_point = my_temp_point + 2;
 
+            Str_Remote_TstDB temp_data = { 0 };
+            temp_data.number = *(my_temp_point++);
+            for (int i = 0; i < temp_data.number; i++)
+            {
+                temp_data.sub[i].protocal = *(my_temp_point++);
+                temp_data.sub[i].modbus_id = *(my_temp_point++);
+                temp_data.sub[i].instance = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+                my_temp_point = my_temp_point + 4;
+            }
+            m_remote_device_db = temp_data;
+#if 0
 			for (int x=0; x<block_length; x++)
 			{
 				Str_Remote_TstDB temp;
@@ -3974,6 +4027,7 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 
 				m_remote_device_db.push_back(temp);
 			}
+#endif
 		}
 		break;
 	case GETSERIALNUMBERINFO:
@@ -4591,6 +4645,9 @@ void local_handler_conf_private_trans_ack(
         //if(each_end_flag)
         //	::PostMessage(m_tstat_dlg_hwnd,WM_REFRESH_BAC_TSTAT_LIST,NULL,NULL);
         break;
+    case READ_MSV_COMMAND:
+        ::PostMessage(m_msv_dlg_hwnd, WM_REFRESH_BAC_MSV_LIST, NULL, NULL);
+        break;
     case READMONITOR_T3000:
     {
         if(each_end_flag)
@@ -4826,13 +4883,16 @@ void Inial_Product_map()
 	product_map.insert(map<int,CString>::value_type(PM_T322AI,_T("T3-22I")));
 	product_map.insert(map<int,CString>::value_type(PWM_TRANSDUCER,_T("PWM_Tranducer")));
 	product_map.insert(map<int,CString>::value_type(PM_BTU_METER,_T("BTU_Meter")));
+    product_map.insert(map<int, CString>::value_type(PM_T38AI8AO6DO, _T("T3-8AI8AO6DO")));
 	product_map.insert(map<int,CString>::value_type(PM_T3PT12,_T("T3-PT12")));
-	product_map.insert(map<int,CString>::value_type(PM_T36CTA,_T("T3-6CTA")));
-	product_map.insert(map<int,CString>::value_type(PM_T38AI8AO6DO,_T("T3-8AI8AO6DO")));
+
+
 	product_map.insert(map<int,CString>::value_type(PM_CS_SM_AC,_T("CS-SM-AC")));
 	product_map.insert(map<int,CString>::value_type(PM_CS_SM_DC,_T("CS-SM-DC")));
 	product_map.insert(map<int,CString>::value_type(PM_CS_RSM_AC,_T("CS-RSM-AC")));
 	product_map.insert(map<int,CString>::value_type(PM_CS_RSM_DC,_T("CS-RSM-DC")));
+
+    product_map.insert(map<int, CString>::value_type(PM_TSTAT_AQ, _T("TSTAT-AQ")));
 
     
     product_map.insert(map<int, CString>::value_type(PM_PWMETER, _T("Power_Meter")));
@@ -4841,7 +4901,7 @@ void Inial_Product_map()
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT7_ARM,_T("TStat7_ARM")));
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT8_220V,_T("TStat8_220V")));
 	product_map.insert(map<int, CString>::value_type(PM_T3_LC, _T("T3_LC")));
-
+    product_map.insert(map<int, CString>::value_type(PM_T36CTA, _T("T3-6CTA")));
 	product_map.insert(map<int, CString>::value_type(STM32_CO2_NET, _T("CO2 Net")));
 	product_map.insert(map<int, CString>::value_type(STM32_CO2_RS485, _T("CO2")));
 	product_map.insert(map<int, CString>::value_type(STM32_HUM_NET, _T("Hum Net")));
@@ -8743,12 +8803,12 @@ void SaveBacnetBinaryFile(CString &SaveConfigFilePath)
 }
 
 
-bool Is_Bacnet_Device(unsigned short n_product_class_id)
+bool Bacnet_Private_Device(unsigned short n_product_class_id)
 {
-    if((n_product_class_id == PM_CM5) ||
-            (n_product_class_id == PM_MINIPANEL)
-		||
-		(n_product_class_id == PM_MINIPANEL_ARM)
+    if(  (n_product_class_id == PM_CM5)            ||
+         (n_product_class_id == PM_MINIPANEL)      ||
+		 (n_product_class_id == PM_MINIPANEL_ARM)  ||
+         (n_product_class_id == PM_TSTAT10)
 		)
     {
         return true;
@@ -11877,7 +11937,7 @@ bool Input_data_to_string(unsigned char  temp_input_index ,
 	temp_jumper = (temp_input_data.decom & 0xf0 ) >> 4;
 	CString temp_status;
 	//如果range 是0 或者 不在正常范围内，就不要显示 open short 的报警 状态;
-	if((temp_decom==0) || (temp_input_data.range == 0) || (temp_input_data.range > 30))
+	if((temp_decom==0) || (temp_input_data.range == 0) || (bac_Invalid_range(temp_input_data.range)))
 	{
 		temp_status.Format(Decom_Array[0]);
 	}
@@ -12094,7 +12154,7 @@ bool Save_InputData_to_db(unsigned char  temp_input_index )
 	temp_jumper = (temp_input_data.decom & 0xf0 ) >> 4;
 	CString temp_status;
 	//如果range 是0 或者 不在正常范围内，就不要显示 open short 的报警 状态;
-	if((temp_decom==0) || (temp_input_data.range == 0) || (temp_input_data.range > 30))
+	if((temp_decom==0) || (temp_input_data.range == 0) || (bac_Invalid_range(temp_input_data.range)))
 	{
 		temp_status.Format(Decom_Array[0]);
 	}
@@ -12387,7 +12447,7 @@ bool Save_AVData_to_db()
 		if (m_Variable_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
 		{
 
-			if ((m_Variable_data.at(i).range == 0) || (m_Variable_data.at(i).range > 30))
+			if ((m_Variable_data.at(i).range == 0) || (bac_Invalid_range(m_Variable_data.at(i).range)))
 			{
 				CString cstemp_value2;
 				float temp_float_value1;
@@ -12663,7 +12723,7 @@ bool Save_InputData_to_db(unsigned char  temp_input_index, unsigned int nserialn
 	temp_jumper = (temp_input_data.decom & 0xf0) >> 4;
 	CString temp_status;
 	//Èç¹ûrange ÊÇ0 »òÕß ²»ÔÚÕý³£·¶Î§ÄÚ£¬¾Í²»ÒªÏÔÊ¾ open short µÄ±¨¾¯ ×´Ì¬;
-	if ((temp_decom == 0) || (temp_input_data.range == 0) || (temp_input_data.range > 30))
+	if ((temp_decom == 0) || (temp_input_data.range == 0) || (bac_Invalid_range(temp_input_data.range)))
 	{
 		temp_status.Format(Decom_Array[0]);
 	}
@@ -12993,7 +13053,7 @@ bool Save_VariableData_to_db(unsigned char  temp_output_index, unsigned int nser
 	if (m_Variable_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
 	{
 
-		if ((m_Variable_data.at(i).range == 0) || (m_Variable_data.at(i).range > 30))
+		if ((m_Variable_data.at(i).range == 0) || (bac_Invalid_range(m_Variable_data.at(i).range)))
 		{
 			CString cstemp_value2;
 			float temp_float_value1;
@@ -13203,13 +13263,6 @@ int handle_bacnet_to_modbus_data(char *npoint, int nlength)
 
 
 
-void Inial_ProductName_map()
-{
-    g_panelname_map.insert(map<int, int>::value_type(STM32_PRESSURE_NET, 901));
-    g_panelname_map.insert(map<int, int>::value_type(STM32_PRESSURE_RS3485, 901));
-
-}
-
 bool Open_Socket_Retry(CString strIPAdress, short nPort,int retry_time)
 {
     for (int i = 0; i < retry_time; i++)
@@ -13269,6 +13322,97 @@ int  SetCommandDelayTime(unsigned char product_id)
     }
 
     return 0;
+}
+
+unsigned int GetDeviceInstance(unsigned char pid_type)
+{
+    CString temp_cs =  Get_Instance_Reg_Map(pid_type);
+    int temp_low = 0;
+    int temp_high = 0;
+    CStringArray temparray;
+    SplitCStringA(temparray, temp_cs, _T(","));
+    if (temparray.GetSize() == 2)
+    {
+        temp_low = _wtoi(temparray.GetAt(0));
+        temp_high = _wtoi(temparray.GetAt(1));
+    }
+
+    int ret_low = read_one(g_tstat_id, temp_low, 6);
+    int ret_high = read_one(g_tstat_id, temp_high, 6);
+
+    if ((ret_low >= 0) && (ret_high >= 0))
+    {
+        return ret_high * 65536 + ret_low;
+    }
+    else
+    {
+        return 0;
+    }
+
+}
+
+
+
+int ChangeDeviceProtocol(bool modbus_0_bacnet_1,   // 0  modbus           1  bacnet 
+                         unsigned char modbus_id,
+                         unsigned short nreg_address,
+                         unsigned short nreg_value,
+                         unsigned char sub_device,         // 如果是子设备  ，数据库中的协议 比较特殊;
+                         LPCTSTR Dbpath)
+{
+
+    CShowMessageDlg dlg;
+
+    dlg.SetStaticText(_T("Ready to change the device protocol!"));
+    //dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
+    dlg.SetStaticTextColor(RGB(0, 0, 255));
+    dlg.SetStaticTextSize(25, 20);
+    dlg.SetEvent(EVENT_CHANGE_PROTOCOL);
+    dlg.SetChangeProtocol(modbus_0_bacnet_1, modbus_id, nreg_address, nreg_value, sub_device, Dbpath);
+    dlg.DoModal();
+
+    return 1;
+}
+
+CString Get_Instance_Reg_Map(int product_type)
+{
+    map<int, CString >::iterator iter;
+    CString test1;
+    iter = g_bacnet_reg_ins_map.find(product_type);
+    if (iter != g_bacnet_reg_ins_map.end())
+    {
+        test1 = g_bacnet_reg_ins_map.at(product_type);
+        return test1;
+    }
+
+    return _T("37,38"); // 如果没有默认按照从715 开始 8个寄存器.
+}
+
+void Initial_Instance_Reg_Map()
+{
+    g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_TSTAT7, _T("991,992")));
+    g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_TSTAT8, _T("991,992")));
+    g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_PM5E_ARM, _T("991,992")));
+}
+
+void Inial_ProductName_map()
+{
+    g_panelname_map.insert(map<int, int>::value_type(STM32_PRESSURE_NET, 901));
+    g_panelname_map.insert(map<int, int>::value_type(STM32_PRESSURE_RS3485, 901));
+
+}
+
+bool bac_Invalid_range(unsigned char nrange)
+{
+    if ((nrange > 30) &&
+        (nrange != 101) &&
+        (nrange != 102) &&
+        (nrange != 103))
+    {
+        return true;
+    }
+
+    return false;
 }
 
 int PanelName_Map(int product_type)

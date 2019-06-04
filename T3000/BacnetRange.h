@@ -57,6 +57,8 @@ public:
     afx_msg void OnBnClickedRadio86();
     void ShowAnalogCusRange();
     int m_device_type;
+    afx_msg void OnBnClickedBtnEditMsvRange();
+    afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 };
 
 const CString Range_Type[] =

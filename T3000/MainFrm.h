@@ -58,7 +58,8 @@ const int DLG_DIALOG_BTUMETER = 28;
 const int DLG_DIALOG_POWERMETER = 29;
 const int DLG_DIALOG_CO2_NODE = 30;
 const int DLG_DIALOG_ZIGBEE_REPEATER = 31;
-const int NUMVIEWS = 32;
+const int DLG_DIALOG_TSTAT_AQ = 32;
+const int NUMVIEWS = 33;
 
 
 

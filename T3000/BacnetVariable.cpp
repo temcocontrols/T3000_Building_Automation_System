@@ -743,7 +743,7 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 		else
 		{
 			bac_ranges_type = VARIABLE_RANGE_DIGITAL_TYPE;
-			if(m_Variable_data.at(lRow).range > 30)
+			if(bac_Invalid_range(m_Variable_data.at(lRow).range))
 			{
 				m_Variable_data.at(lRow).range = 0;
 				bac_range_number_choose = 0;
@@ -810,14 +810,15 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 
 
 				CStringArray temparray;
-				if((bac_range_number_choose >= 23) && (bac_range_number_choose <= 30))
-				{
-					//temp1.Format(_T("%s"), Custom_Digital_Range[bac_range_number_choose - 23]);
-					temp1 = Custom_Digital_Range[bac_range_number_choose - 23];
-				}
-				else
-					temp1 = Digital_Units_Array[bac_range_number_choose];//22 is the sizeof the array
-
+                if ((bac_range_number_choose >= 23) && (bac_range_number_choose <= 30))
+                {
+                    //temp1.Format(_T("%s"), Custom_Digital_Range[bac_range_number_choose - 23]);
+                    temp1 = Custom_Digital_Range[bac_range_number_choose - 23];
+                }
+                else if (bac_range_number_choose < 23)
+                    temp1 = Digital_Units_Array[bac_range_number_choose];//22 is the sizeof the array
+                else
+                    temp1 = _T("MSV");
 				SplitCStringA(temparray,temp1,_T("/"));
 
 

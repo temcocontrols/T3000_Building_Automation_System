@@ -1889,6 +1889,7 @@ int annual_list_line ;
 int screen_list_line ;
 int monitor_list_line;
 int analog_range_tbl_line;
+int msv_range_tbl_line;  //MSV 多态 range 选择的  变量
 int ext_io_list_line;
 
 HWND      g_hwnd_now;
@@ -1923,7 +1924,7 @@ HWND      m_remote_point_hwnd = NULL;
 HWND	  m_program_debug_list_hwnd = NULL;
 HWND	  m_ext_io_dlg_hwmd = NULL;
 HWND      m_tstat_schedule_dlg_hwnd = NULL;
-
+HWND      m_msv_dlg_hwnd;
 HWND analog_cus_range_dlg=NULL;
 
 HWND	  m_statusbar_hwnd = NULL;
@@ -1944,7 +1945,7 @@ vector <_Bac_Scan_Com_Info> m_bac_handle_Iam_data;
 vector <_Bac_Scan_results_Info> m_bac_scan_result_data;
 vector <Alarm_point> m_alarmlog_data;
 vector <Str_TstatInfo_point> m_Tstat_data;
-vector <Str_Remote_TstDB> m_remote_device_db;
+Str_Remote_TstDB m_remote_device_db;
 vector <Str_Units_element> m_customer_unit_data;
 vector <Str_userlogin_point> m_user_login_data;
 vector <Client_Info> m_tcp_connect_info;
@@ -1953,6 +1954,8 @@ vector <Str_remote_point> m_remote_point_data;  //Mini panel 里面Tstat 远端点的 
 vector <Str_table_point> m_analog_custmer_range;
 vector <Str_variable_uint_point> m_variable_analog_unite;
 vector <Str_Extio_point> m_extio_config_data;
+
+vector <Str_MSV> m_msv_data;
 
 Time_block_mini Device_time;
 Str_Setting_Info Device_Basic_Setting;
@@ -2241,9 +2244,10 @@ bool custom_bacnet_register_listview = true;
 bool initial_bip = false;
 Str_modbus_reg bacnet_to_modbus_struct;  //用于bacnet 协议转换为modbus 协议的结构
 vector <str_bacnet_rp_info> standard_bacnet_data; // 用于bacnet 标准 读写 变量存取;
-
+unsigned char m_dialog_signal_type;
 connect_Info system_connect_info;
 panelname_map g_panelname_map; 
+bacnet_instance_reg_map g_bacnet_reg_ins_map;
 CString HolLable[BAC_HOLIDAY_COUNT] =   //用于动态加载List中的下拉框
 {
     _T("AR1"),

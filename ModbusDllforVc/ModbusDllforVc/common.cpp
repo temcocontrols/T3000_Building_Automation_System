@@ -9426,6 +9426,16 @@ OUTPUT int Modbus_Standard_Read(TS_UC device_var, TS_US *put_data_into_here, int
 		int nn = sizeof(to_Reive_data);
 		int nRecv = ::recv(m_hSocket, (char*)to_Reive_data, length * 2 + 12, 0);
 
+        if (nRecv < 0)
+        {
+            int nErr = WSAGetLastError();
+            //if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            //{
+            //    if (last_connected_port != 0)
+            //        Open_Socket2(last_connected_ip, last_connected_port);
+            //}
+            return -2;
+        }
 		*recvDataLength = nRecv;
 		for (int i = 0; i < *recvDataLength; i++)
 		{

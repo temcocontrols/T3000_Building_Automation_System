@@ -16,7 +16,7 @@
 #include "AddBuilding.h"
 #include "StatusbarCtrl.h"
 CMyStatusbarCtrl * statusbar = NULL;
-
+#include "TstatAQ.h"
 #include "ISPModeSlove.h"
 #include "AllNodesDiaolg.h"
 #include "GridLoad.h"
@@ -626,6 +626,7 @@ void CMainFrame::InitViews()
     m_pViews[DLG_DIALOG_POWERMETER] = (CView *)new CPowermeter;
     m_pViews[DLG_DIALOG_CO2_NODE] = (CView *)new CCO2_NodeView;
     m_pViews[DLG_DIALOG_ZIGBEE_REPEATER] = NULL /*(CView *)new CZigbeeRepeater;*/;
+    m_pViews[DLG_DIALOG_TSTAT_AQ] = NULL /*(CView *)new CTstatAQ;*/;
     CDocument* pCurrentDoc = GetActiveDocument();
     CCreateContext newContext;
     newContext.m_pNewViewClass = NULL;
@@ -696,6 +697,13 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     // prevent the menu bar from taking the focus on activation
     SEND_COMMAND_DELAY_TIME = 100;
 
+#ifdef DEBUG
+
+    unsigned long  temp_time_long = time(NULL);
+
+
+    Sleep(1);
+#endif // DEBUG
 
 
 
@@ -1887,7 +1895,12 @@ void CMainFrame::LoadProductFromDB()
 							TVINSERV_LED_TSTAT7 //tree0412
 						else if(temp_product_class_id == PM_TSTAT6||temp_product_class_id == PM_TSTAT5i)
 						TVINSERV_TSTAT6
-						else if(temp_product_class_id == PM_TSTAT10 || temp_product_class_id == PM_TSTAT8|| temp_product_class_id == PM_TSTAT8_WIFI || temp_product_class_id == PM_TSTAT8_OCC || temp_product_class_id == PM_TSTAT8_220V)
+						else if(temp_product_class_id == PM_TSTAT10 || 
+                                temp_product_class_id == PM_TSTAT8  || 
+                                temp_product_class_id == PM_TSTAT8_WIFI || 
+                                temp_product_class_id == PM_TSTAT8_OCC || 
+                                temp_product_class_id == PM_TSTAT_AQ ||
+                                temp_product_class_id == PM_TSTAT8_220V)
 						TVINSERV_TSTAT8
                         else if(temp_product_class_id == PM_ZIGBEE_REPEATER)
                         TVINSERV_ZIGBEE_REPEATER
@@ -2031,7 +2044,8 @@ void CMainFrame::LoadProductFromDB()
 
 						m_product_temp.ncomport=q.getIntField("Com_Port");//
 
-						m_product_temp.BuildingInfo.strIpPort = _T("10000");
+						//m_product_temp.BuildingInfo.strIpPort = _T("10000");
+                        m_product_temp.BuildingInfo.strIpPort.Format(_T("%d"), m_product_temp.ncomport);
 						m_product_temp.strImgPathName=q.getValuebyName(L"Background_imgID");
 
 						m_product_temp.note_parent_serial_number=q.getIntField("Parent_SerialNum");
@@ -2060,7 +2074,9 @@ void CMainFrame::LoadProductFromDB()
 				}
 				else if(z == REMOTE_CONNECTION)
 				{
-					strSql.Format(_T("select * from ALL_NODE where Building_Name = '%s' and Parent_SerialNum <> '0' and Parent_SerialNum <> '' and Protocol ='6'"),strBuilding);
+                    //下面这句因为远程连接的时候 加上协议 6  会出现不显示 子设备的情况 ，所以去掉 2019 05 22
+					//strSql.Format(_T("select * from ALL_NODE where Building_Name = '%s' and Parent_SerialNum <> '0' and Parent_SerialNum <> '' and Protocol ='6'"),strBuilding);
+                    strSql.Format(_T("select * from ALL_NODE where Building_Name = '%s' and Parent_SerialNum <> '0' and Parent_SerialNum <> ''"), strBuilding);
 				}
 
 
@@ -2135,7 +2151,12 @@ void CMainFrame::LoadProductFromDB()
 								TVINSERV_LED_TSTAT7 //tree0412
 							else if (temp_product_class_id == PM_TSTAT6 || temp_product_class_id == PM_TSTAT5i)
 								TVINSERV_TSTAT6
-							else if (temp_product_class_id == PM_TSTAT10 || temp_product_class_id == PM_TSTAT8 || temp_product_class_id == PM_TSTAT8_WIFI || temp_product_class_id == PM_TSTAT8_OCC || temp_product_class_id == PM_TSTAT8_220V)
+							else if (temp_product_class_id == PM_TSTAT10 || 
+                                     temp_product_class_id == PM_TSTAT8 || 
+                                     temp_product_class_id == PM_TSTAT8_WIFI || 
+                                     temp_product_class_id == PM_TSTAT8_OCC || 
+                                     temp_product_class_id == PM_TSTAT_AQ ||
+                                     temp_product_class_id == PM_TSTAT8_220V)
 								TVINSERV_TSTAT8
                             else if (temp_product_class_id == PM_ZIGBEE_REPEATER)
                                 TVINSERV_ZIGBEE_REPEATER
@@ -2372,7 +2393,12 @@ void CMainFrame::LoadProductFromDB()
 					TVINSERV_LED_TSTAT7 //tree0412
 				else if (temp_product_class_id == PM_TSTAT6 || temp_product_class_id == PM_TSTAT5i)
 					TVINSERV_TSTAT6
-				else if (temp_product_class_id == PM_TSTAT10 || temp_product_class_id == PM_TSTAT8 || temp_product_class_id == PM_TSTAT8_WIFI || temp_product_class_id == PM_TSTAT8_OCC || temp_product_class_id == PM_TSTAT8_220V)
+				else if (temp_product_class_id == PM_TSTAT10 || 
+                         temp_product_class_id == PM_TSTAT8 || 
+                         temp_product_class_id == PM_TSTAT8_WIFI || 
+                         temp_product_class_id == PM_TSTAT8_OCC || 
+                         temp_product_class_id == PM_TSTAT_AQ ||
+                         temp_product_class_id == PM_TSTAT8_220V)
 					TVINSERV_TSTAT8
                 else if (temp_product_class_id == PM_ZIGBEE_REPEATER)
                     TVINSERV_ZIGBEE_REPEATER
@@ -2876,7 +2902,11 @@ void CMainFrame::ScanTstatInDB(void)
 						TVINSERV_LED_TSTAT7 //tree0412
 					else if (temp_product_class_id == PM_TSTAT6 || temp_product_class_id == PM_TSTAT5i)
 						TVINSERV_TSTAT6
-					else if (temp_product_class_id == PM_TSTAT8 || temp_product_class_id == PM_TSTAT8_WIFI || temp_product_class_id == PM_TSTAT8_OCC || temp_product_class_id == PM_TSTAT8_220V)
+					else if (temp_product_class_id == PM_TSTAT8 || 
+                             temp_product_class_id == PM_TSTAT8_WIFI || 
+                             temp_product_class_id == PM_TSTAT8_OCC || 
+                             temp_product_class_id == PM_TSTAT_AQ ||
+                             temp_product_class_id == PM_TSTAT8_220V)
 						TVINSERV_TSTAT8
                     else if (temp_product_class_id == PM_ZIGBEE_REPEATER)
                         TVINSERV_ZIGBEE_REPEATER
@@ -3812,6 +3842,7 @@ void CMainFrame::ClearBuilding()
 }
 void CMainFrame::SwitchToPruductType(int nIndex)
 {
+    HideBacnetWindow();
     CView* pNewView = m_pViews[nIndex];
     if (nIndex >= DLG_DIALOG_ZIGBEE_REPEATER)
     {
@@ -3837,6 +3868,16 @@ void CMainFrame::SwitchToPruductType(int nIndex)
                 m_pViews[DLG_DIALOG_ZIGBEE_REPEATER]->OnInitialUpdate();//?
 
                 break;
+            case DLG_DIALOG_TSTAT_AQ:
+                m_pViews[DLG_DIALOG_TSTAT_AQ] = (CView *)new CTstatAQ();
+                m_pViews[DLG_DIALOG_TSTAT_AQ]->Create(NULL, NULL,
+                    (AFX_WS_DEFAULT_VIEW & ~WS_VISIBLE),
+                    rect, this,
+                    AFX_IDW_PANE_FIRST + DLG_DIALOG_TSTAT_AQ, &newContext);
+
+                m_pViews[DLG_DIALOG_TSTAT_AQ]->OnInitialUpdate();//?
+
+                break;
             default:
                 return;
                     break;
@@ -3855,10 +3896,14 @@ void CMainFrame::SwitchToPruductType(int nIndex)
     if ( !pActiveView )    // No currently active view
         return;
 
-    if ( pNewView == pActiveView )    // Already there
+    if (nIndex < DLG_DIALOG_ZIGBEE_REPEATER)
     {
-        goto here;
+        if (pNewView == pActiveView)    // Already there
+        {
+            goto here;
+        }
     }
+
     m_nCurView = nIndex;    // Store the new current view's index
 
     // exchange view window ID's so RecalcLayout() works
@@ -4076,6 +4121,14 @@ here:
     {
         m_nCurView = DLG_DIALOG_ZIGBEE_REPEATER;
         ((CZigbeeRepeater*)m_pViews[m_nCurView])->Fresh();
+        PostMessage(WM_SIZE, 0, 0);
+    }
+    break;
+    case DLG_DIALOG_TSTAT_AQ:
+    {
+        m_nCurView = DLG_DIALOG_TSTAT_AQ;
+        ((CTstatAQ*)m_pViews[m_nCurView])->Fresh();
+        PostMessage(WM_SIZE, 0, 0);
     }
     break;
         //here
@@ -5864,6 +5917,7 @@ void CMainFrame::OnDestroy()
     m_user_login_data.clear();
     m_graphic_label_data.clear();
     m_remote_point_data.clear();
+    m_msv_data.clear();
     //CDialogInfo *pDialogInfo = NULL;
     try
     {
@@ -6347,7 +6401,7 @@ void CMainFrame::OnToolRefreshLeftTreee()
 #include "ScanDlg.h"
 void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 {
-
+    CString strUpdateSqlOn;
 	CppSQLite3DB SqliteDBT3000;
 	CppSQLite3DB SqliteDBBuilding;
 	CppSQLite3Table table;
@@ -7181,7 +7235,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                         }
                     }
                     CShowMessageDlg TempDlg;
-                    TempDlg.SetStaticText(_T("Establish Bacnet MSTP connection , please wait!"));
+                    TempDlg.SetStaticText(_T("Establishing Bacnet MSTP connection , please wait!"));
                     //dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
                     TempDlg.SetStaticTextColor(RGB(0, 0, 255));
                     TempDlg.SetStaticTextSize(25, 20);
@@ -7702,7 +7756,7 @@ start_read_reg_data:
                             SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
                             PostMessage(WM_MYMSG_REFRESHBUILDING,0,0); 
                         }
-                        SqliteDBBuilding.closedb();
+                        
 #endif
                     }
 
@@ -8023,6 +8077,10 @@ start_read_reg_data:
             {
                 SwitchToPruductType(DLG_DIALOG_ZIGBEE_REPEATER);
             }
+            else if (nFlag == PM_TSTAT_AQ)
+            {
+                SwitchToPruductType(DLG_DIALOG_TSTAT_AQ);
+            }
             else if(nFlag<PM_NC)
             {
 
@@ -8074,21 +8132,25 @@ start_read_reg_data:
             break;
         }
     }
-    SqliteDBT3000.closedb();
+    //SqliteDBT3000.closedb();
 
     g_bPauseMultiRead = FALSE;
 
 
 do_connect_success:
-		//hTreeItem_retry = NULL;
-		g_llRxCount = g_llRxCount + 4;
-		Sleep(1);
-		return;
+    
+    strUpdateSqlOn.Format(_T("update ALL_NODE set Online_Status = 1 where Serial_ID = %u"), g_selected_serialnumber);
+    SqliteDBBuilding.execDML((UTF8MBSTR)strUpdateSqlOn);
+    SqliteDBBuilding.closedb();
+    //hTreeItem_retry = NULL;
+    g_llRxCount = g_llRxCount + 4;
+    Sleep(1);
+    return;
 	do_conncet_failed:
 
 		//Fandu 2017/12/13 设备离线时 更新 数据库设备状态字段。因为有太多地方调用  重新加载数据库的函数，导致如果不更新状态显示不正常.
 		CString strUpdateSql;
-		strUpdateSql.Format(_T("update ALL_NODE set Online_Status = 0 where Serial_ID = %u and protocol = 1"), g_selected_serialnumber);
+		strUpdateSql.Format(_T("update ALL_NODE set Online_Status = 0 where Serial_ID = %u"), g_selected_serialnumber);
 		SqliteDBBuilding.execDML((UTF8MBSTR)strUpdateSql);
 	    SqliteDBBuilding.closedb();
 
@@ -10380,6 +10442,10 @@ void CMainFrame::OnControlMain()
 		{ 
 			SwitchToPruductType(DLG_AIRQUALITY_VIEW);
 		} 
+        else if (product_register_value[7] == PM_TSTAT_AQ)
+        {
+            SwitchToPruductType(DLG_DIALOG_TSTAT_AQ);
+        }
     }
      bacnet_view_number = TYPE_MAIN		;
  	 global_interface = BAC_MAIN;
@@ -11109,6 +11175,7 @@ void CMainFrame::OnControlSettings()
 	              ||product_register_value[7]==PM_T3PT12
 				  ||product_register_value[7]==PM_T36CTA
 					|| product_register_value[7] == PM_T3_LC
+        || product_register_value[7] == PM_TSTAT_AQ
 	             ||product_register_value[7]==STM32_HUM_NET )
 	{
 		HideBacnetWindow();

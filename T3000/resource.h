@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ ÁîüÊàêÁöÑÂåÖÂê´Êñá‰ª∂„ÄÇ
-// ‰æõ T3000.rc ‰ΩøÁî®
+// Microsoft Visual C++ …˙≥…µƒ∞¸∫¨Œƒº˛°£
+// π© T3000.rc  π”√
 //
 #define IDCANCEL2                       3
 #define IDCWRITEONE                     3
@@ -314,8 +314,10 @@
 #define IDD_DIALOG_REGISTER_LIST        716
 #define IDD_DIALOG_CO2_NODE             718
 #define IDD_DIALOG_BACNET_ADD_REMOTE_DEVICE 724
-#define IDR_MENU_CONTROL_BASIC          733
 #define IDD_DIALOG_ZIGBEE_REPEATER      726
+#define IDR_MENU_CONTROL_BASIC          733
+#define IDD_DIALOG_BACNET_RANGE_MSV     734
+#define IDD_DIALOG_TSTAT_AQ             736
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -2431,6 +2433,26 @@
 #define IDC_STATIC_ACE                  2480
 #define IDC_EDIT_BACNET_DEVICE_ID       2481
 #define IDC_STATIC_CYCLE_INFO           2482
+#define IDC_COMBO_CUSRANGE_STIGNALTYPE  2483
+#define IDC_STATIC_DATA_STATUS          2484
+#define IDC_STATIC_MSV_GROUP            2485
+#define IDC_RADIO_MSV_1                 2486
+#define IDC_RADIO_MSV_2                 2487
+#define IDC_LIST_RANGE_MSV              2487
+#define IDC_RADIO_MSV_3                 2488
+#define IDC_STATIC_TEMPERATURE_VALUE    2488
+#define IDC_STATIC_HUM_VALUE            2489
+#define IDC_STATIC_CO2_VALUE            2490
+#define IDC_STATIC_AQ_VALUE             2491
+#define IDC_STATIC_WEIGHT_PM1_0         2492
+#define IDC_STATIC_INDEX_PM1_0          2493
+#define IDC_STATIC_WEIGHT_PM2_5         2494
+#define IDC_STATIC_INDEX_PM2_5          2495
+#define IDC_STATIC_WEIGHT_PM4_0         2496
+#define IDC_STATIC_INDEX_PM4_0          2497
+#define IDC_STATIC_WEIGHT_PM10          2498
+#define IDC_STATIC_INDEX_PM4_1          2499
+#define IDC_STATIC_INDEX_PM10           2499
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -2453,6 +2475,7 @@
 #define IDC_SLIDERCONTROL3              3835
 #define IDC_BTN_EDIT_CUSTOMER_RANGE     5714
 #define IDC_EDIT_TIMEOUT_3              5715
+#define IDC_BTN_EDIT_MSV_RANGE          5715
 #define IDC_BUTTON_SYNC_TIME            5716
 #define IDC_STATIC_BAC_SETTING_SD_CARD  5817
 #define IDC_MFCCOLORBUTTON_FUNCTION     5818
@@ -2647,20 +2670,6 @@
 #define IDC_RADIO_VAR_CUS_5             15597
 #define IDC_RADIO101                    15598
 #define IDC_RADIO102                    15599
-#define IDC_RADIO103                    15600
-#define IDC_RADIO104                    15601
-#define IDC_RADIO105                    15602
-#define IDC_RADIO106                    15603
-#define IDC_RADIO107                    15604
-#define IDC_RADIO108                    15605
-#define IDC_RADIO109                    15606
-#define IDC_RADIO110                    15607
-#define IDC_RADIO111                    15608
-#define IDC_RADIO112                    15609
-#define IDC_RADIO113                    15610
-#define IDC_RADIO114                    15611
-#define IDC_RADIO115                    15612
-#define IDC_RADIO116                    15613
 #define IDC_RADIO_NEW200                19484
 #define ID_TIMEBASE_1HOUR               19485
 #define IDC_RADIO_NEW201                19485
@@ -2993,12 +3002,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-
-#define _APS_NEXT_RESOURCE_VALUE        734
+#define _APS_NEXT_RESOURCE_VALUE        738
 #define _APS_NEXT_COMMAND_VALUE         34076
-#define _APS_NEXT_CONTROL_VALUE         2483
-
-
+#define _APS_NEXT_CONTROL_VALUE         2489
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

@@ -352,7 +352,7 @@ const int BAC_READ_MONITOR_GROUP_NUMBER = 4;
 const int BAC_READ_ALARMLOG_GROUP_NUMBER = 4;
 const int BAC_READ_TSTAT_GROUP_NUMBER = 8;
 const int BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER = 8;
-
+const int BAC_MSV_GROUP_NUMBER = 2;
 const int BAC_VARIABLE_CUS_UNIT_GROUP_NUMBER = 5;
 
 const int BAC_READ_GRPHIC_LABEL_GROUP_NUMBER = 6;
@@ -401,7 +401,7 @@ const int BAC_MONITOR_COUNT = 12;
 const int BAC_ALARMLOG_COUNT = 16;
 const int BAC_TSTAT_COUNT = 32;
 const int BAC_CUSTOMER_UNITS_COUNT = 8;
-
+const int BAC_MSV_COUNT = 3;
 const int BAC_SCHEDULE_TIME_COUNT = 8;
 const int BAC_TIME_COMMAND_COUNT = 1;
 const int BAC_BASIC_SETTING_COUNT = 1;
@@ -445,7 +445,7 @@ const int BAC_USER_LOGIN_GROUP = (BAC_USER_LOGIN_COUNT + BAC_READ_USER_LOGIN_INF
 const int BAC_GRPHIC_LABEL_GROUP = (BAC_GRPHIC_LABEL_COUNT + BAC_READ_GRPHIC_LABEL_GROUP_NUMBER - 1) / BAC_READ_GRPHIC_LABEL_GROUP_NUMBER;
 const int BAC_REMOTE_POINT_GROUP = (BAC_REMOTE_POINT_COUNT + BAC_REMOTE_POINT_GROUP_NUMBER - 1) / BAC_REMOTE_POINT_GROUP_NUMBER;
 const int BAC_TSTAT_SCHEDULE_GROUP = (BAC_TSTAT_SCHEDULE + BAC_READ_TSTAT_SCHEDULE_GROUP_NUMBER - 1) / BAC_READ_TSTAT_SCHEDULE_GROUP_NUMBER;
-
+const int BAC_MSV_GROUP = (BAC_MSV_COUNT + BAC_MSV_GROUP_NUMBER - 1) / BAC_MSV_GROUP_NUMBER;
 const int BAC_SHOW_CONNECT_RESULTS = 1;
 const int BAC_SHOW_MISSION_RESULTS = 3;
 
@@ -819,21 +819,7 @@ const CString Input_List_Analog_Units[] =
 	_T("HZ"),
 
 	_T("%"),
-	_T("PPM"),
-	_T("inWc"),
-	_T("Kpa"),
-	_T("Psi"),
-	_T("mmHg"),
-	_T("inHg"),
-	_T("Kgcm"),
-	_T("atmos"),
-	_T("bar"),
-	_T(" "),
-	_T(" "),
-	_T(" "),
-	_T("Amps"),
-	_T("Amps"),
-	_T("Amps")
+	_T("PPM")
 };
 
 const CString Input_Analog_Units_Array[] =
@@ -866,21 +852,7 @@ const CString Input_Analog_Units_Array[] =
 	_T("Pulse Count (Fast 100Hz)"),
 	_T("Frequency"),
 	_T("Humidty %"),
-	_T("CO2  PPM"),
-	_T("Pressure   inWc"),
-	_T("Pressure   Kpa"),
-	_T("Pressure   Psi"),
-	_T("Pressure   mmHg"),
-	_T("Pressure   inHg"),
-	_T("Pressure   Kgcm"),
-	_T("Pressure   atmos"),
-	_T("Pressure   bar"),
-	_T("Reserved"),
-	_T("Reserved"),
-	_T("Reserved"),
-	_T("20Amps"),
-	_T("50Amps"),
-	_T("75Amps"),
+	_T("CO2  PPM")
 };
 
 const CString Output_Analog_Units_Array[] =
@@ -981,7 +953,8 @@ const CString DDNS_Server_Name[] =
 	_T("www.3322.org"),
 	_T("www.dyndns.com"),
 	_T("www.no-ip.com"),
-    _T("dynu.com")
+    _T("dynu.com"),
+    _T("bravocontrols.com")
 };
 
 const CString Sys_Tstat_Mode_Name[] =
@@ -2050,7 +2023,7 @@ const int SD_STATUS_NORMAL = 2;
 const int SD_STATUS_FILESYSTEM_ERROR = 3;
 
 typedef map<int, int> panelname_map;
-
+typedef map<int, CString> bacnet_instance_reg_map;
 const CString RegisterView_Format[] =
 {
     _T("Data_Format"),

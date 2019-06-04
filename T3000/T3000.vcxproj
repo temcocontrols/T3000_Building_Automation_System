@@ -183,6 +183,7 @@
     <ClCompile Include="BacnetVariable.cpp" />
     <ClCompile Include="BacnetWait.cpp" />
     <ClCompile Include="BacnetWeeklyRoutine.cpp" />
+    <ClCompile Include="Bacnet_Range_Msv.cpp" />
     <ClCompile Include="BADO\BADO.cpp" />
     <ClCompile Include="BatchSNDlg.cpp" />
     <ClCompile Include="BinFileParser.cpp" />
@@ -333,6 +334,7 @@
     <ClCompile Include="TrendLogView.cpp" />
     <ClCompile Include="TrendLogWnd.cpp" />
     <ClCompile Include="TroubleShootDlg.cpp" />
+    <ClCompile Include="TstatAQ.cpp" />
     <ClCompile Include="TstatIconSetting.cpp" />
     <ClCompile Include="TStatInputView.cpp" />
     <ClCompile Include="TStatOutputView.cpp" />
@@ -523,6 +525,7 @@
     <ClInclude Include="BacnetVariable.h" />
     <ClInclude Include="BacnetWait.h" />
     <ClInclude Include="Bacnet_Include.h" />
+    <ClInclude Include="Bacnet_Range_Msv.h" />
     <ClInclude Include="BADO\BADO.h" />
     <ClInclude Include="BatchSNDlg.h" />
     <ClInclude Include="BinFileParser.h" />
@@ -656,6 +659,7 @@
     <ClInclude Include="TempHumSensorForm.h" />
     <ClInclude Include="TrendLogWnd.h" />
     <ClInclude Include="TroubleShootDlg.h" />
+    <ClInclude Include="TstatAQ.h" />
     <ClInclude Include="TstatIconSetting.h" />
     <ClInclude Include="TStatInputView.h" />
     <ClInclude Include="TStatOutputView.h" />

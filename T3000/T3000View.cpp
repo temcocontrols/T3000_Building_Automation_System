@@ -219,19 +219,12 @@ void CT3000View::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_COOL_RADIO, m_CoolCtrl);
     DDX_Control(pDX, IDC_HEAT_RADIO, m_HeatCtrl);
 
-    //DDX_Radio(pDX, IDC_OCCUPA_RADIO, m_OcupaCtrl);
-    //DDX_Radio(pDX, IDC_UNOCCUPA_RADIO, m_UnOcupaCtrl);
     DDX_Check(pDX, IDC_OCCUPACHECK, m_bOccupied);
     DDX_Control(pDX, IDC_OCCUPACHECK, m_OcupiedBtn);
     DDX_Text(pDX, IDC_FREECOOLA_EDIT, m_strFreeCool);
     DDX_Text(pDX, IDC_FREECOOLF_EDIT, m_strFreeCoolFN);
 
-    // 	DDX_Control(pDX, IDC_TEMPRETURE_SLIDER, m_TemperaureSlider);
-    // 	DDX_Control(pDX, IDC_DAY_SLIDER, m_daySlider);
-    // 	DDX_Control(pDX, IDC_NIGHT_SLIDER, m_nightSlider);
-    // 	DDX_Control(pDX, IDC_NIGHTHEAT_SLIDER, m_nightHeatSlider);
 
-   
     DDX_Control(pDX, IDC_OUTPUT_MSFLEXGRID, m_Output_Grid);
     DDX_Control(pDX, IDC_INPUT_MSFLEXGRID, m_Input_Grid);
     DDX_Control(pDX, IDC_INPUTNAMEEDIT, m_inNameEdt);
@@ -2130,26 +2123,9 @@ void CT3000View::Fresh_Out()
         }
         else
         {
-            //strTemp.Format(_T("%.1f"),product_register_value[102]/100.0);
             float nvalue=0.0;
 
-            //if(nRange==1)//0-10v
-            //{
-            //nvalue=product_register_value[102]/100 /10.0 * 100%;
             nvalue=(float)(product_register_value[MODBUS_COOLING_VALVE]/10.0);
-            //}
-            //if(nRange==2)//0-5v
-            //{
-            //	nvalue=(float)(product_register_value[MODBUS_COOLING_VALVE]/5.0);
-            //}
-            //if(nRange==3)//2-10v
-            //{
-            //	nvalue=(float)(product_register_value[MODBUS_COOLING_VALVE]/8.0);
-            //}
-            //if(nRange==4)//10-0v
-            //{
-            //	nvalue=float((10-product_register_value[MODBUS_COOLING_VALVE]/100.0)/10.0 *100);
-            //}
             strTemp.Format(_T("%.1f%%"),nvalue);
         }
         m_Output_Grid.put_TextMatrix(6,2,strTemp);
