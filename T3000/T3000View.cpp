@@ -2530,7 +2530,7 @@ void CT3000View::FreshIOGridTable_Tstat6()
         if (i > 8)
         {
             bitset<16> module_type(product_register_value[20]);
-            if (module_type.at(1) == true)
+            if (module_type.test(1) == true)
             {
                 b_hum_sensor = true;
             }
@@ -2543,7 +2543,7 @@ void CT3000View::FreshIOGridTable_Tstat6()
                 continue;
             }
 
-            if (module_type.at(2) == true)
+            if (module_type.test(2) == true)
             {
                 b_co2_sensor = true;
             }
@@ -2557,7 +2557,7 @@ void CT3000View::FreshIOGridTable_Tstat6()
                 continue;
             }
 
-            if (module_type.at(3) == true)
+            if (module_type.test(3) == true)
             {
                 b_lux_sensor = true;
             }
