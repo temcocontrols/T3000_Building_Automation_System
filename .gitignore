@@ -77,3 +77,6 @@ T3000 - VS2010.VC.db
 .vs/T3000 - VS2017/v15/Solution.VC.db-wal
 .vs/T3000_Building_Automation_System/v15/Browse.VC.db
 .vs/T3000 - VS2017/v15/Browse.VC.opendb
+.vs/T3000 - VS2017/v15/Server/sqlite3/storage.ide
+.vs/T3000 - VS2017/v15/Server/sqlite3/storage.ide-shm
+.vs/T3000 - VS2017/v15/Server/sqlite3/storage.ide-wal
