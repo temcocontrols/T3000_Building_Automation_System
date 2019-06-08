@@ -307,7 +307,7 @@ LRESULT CTStatInputView::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
         if (i > 8)
         {
             bitset<16> module_type(product_register_value[20]);
-            if (module_type.at(1) == true)
+            if (module_type.test(1) == true)
             {
                 b_hum_sensor = true;
             }
@@ -320,7 +320,7 @@ LRESULT CTStatInputView::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
                 continue;
             }
 
-            if (module_type.at(2) == true)
+            if (module_type.test(2) == true)
             {
                 b_co2_sensor = true;
             }
@@ -334,7 +334,7 @@ LRESULT CTStatInputView::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
                 continue;
             }
 
-            if (module_type.at(3) == true)
+            if (module_type.test(3) == true)
             {
                 b_lux_sensor = true;
             }

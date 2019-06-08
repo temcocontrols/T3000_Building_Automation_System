@@ -1631,7 +1631,7 @@ int read_monitordata(int digtal_or_analog,unsigned int timeleft,unsigned int tim
         {
             if (read_index < read_analog_package.size())
             {
-                if ((read_analog_package.at(read_index) == true) && (read_index != m_monitor_head.seg_index + m_monitor_head.total_seg))  //已经读过的;
+                if ((read_analog_package.test(read_index) == true) && (read_index != m_monitor_head.seg_index + m_monitor_head.total_seg))  //已经读过的;
                     continue; 
             }
             else
@@ -1643,7 +1643,7 @@ int read_monitordata(int digtal_or_analog,unsigned int timeleft,unsigned int tim
         {
             if (read_index < read_dig_package.size())
             {
-                if ((read_dig_package.at(read_index) == true) && (read_index != m_monitor_head.seg_index + m_monitor_head.total_seg))  //已经读过的;
+                if ((read_dig_package.test(read_index) == true) && (read_index != m_monitor_head.seg_index + m_monitor_head.total_seg))  //已经读过的;
                     continue;
             }
             else
