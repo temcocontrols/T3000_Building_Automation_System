@@ -88,7 +88,7 @@ using namespace Gdiplus;
 //using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 //#pragma  comment(lib,"ISP.lib")
 //#pragma  comment(lib,"RegisterMonitor.lib")
-#import "C:\Program Files\Common Files\System\ado\msado15.dll" no_namespace rename("EOF","EndOfFile") rename("BOF","FirstOfFile")
+#import "C:\Program Files (x86)\Common Files\System\ado\msado15.dll" no_namespace rename("EOF","EndOfFile") rename("BOF","FirstOfFile")
 //**********************************link to dll*********************
 #define INPUT extern "C" __declspec(dllimport)
 #pragma comment(lib, "WS2_32")
