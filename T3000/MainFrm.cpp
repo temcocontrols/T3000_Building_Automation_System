@@ -304,7 +304,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
     ON_COMMAND(ID_DATABASE_MBPOLL, &CMainFrame::OnDatabaseMbpoll)
     ON_COMMAND(ID_DATABASE_IONAMECONFIG, &CMainFrame::OnDatabaseIonameconfig)
     ON_COMMAND(ID_TOOL_ISPTOOLFORONE, &CMainFrame::OnToolIsptoolforone)
-    ON_COMMAND(ID_VIEW_COMMUNICATETRAFFIC, &CMainFrame::OnViewCommunicatetraffic)
     ON_COMMAND(ID_CONTROL_MAIN, &CMainFrame::OnControlMain)
     ON_COMMAND(ID_CONTROL_INPUTS, &CMainFrame::OnControlInputs)
     ON_COMMAND(ID_CONTROL_PROGRAMS, &CMainFrame::OnControlPrograms)
@@ -10346,9 +10345,6 @@ void CMainFrame::OnToolIsptoolforone()
 
 
 
-void CMainFrame::OnViewCommunicatetraffic()
-{
-}
 
 
 void CMainFrame::OnControlMain()

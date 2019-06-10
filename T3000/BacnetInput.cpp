@@ -1518,7 +1518,7 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 		break;
 	case 5:
 		{
-			
+#if 0
 			static int test_count = 0;
 			if(move_direction == 1)
 				test_count = (++ test_count )%4;
@@ -1576,6 +1576,7 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 
 			pWnd->ModifyStyle(0, SS_ICON | SS_CENTERIMAGE);
 			pWnd->SetIcon(m_hIcon); 
+#endif
 		}
 		break;
 	default:
