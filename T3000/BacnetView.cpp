@@ -2568,6 +2568,8 @@ void CDialogCM5_BacNet::Fresh()
 					bacnet_device_type = MINIPANELARM_LB;
 				else if (ret == MINIPANELARM_TB)
 					bacnet_device_type = MINIPANELARM_TB;
+                else if (ret == BACNET_ROUTER)
+                    bacnet_device_type = BACNET_ROUTER;
 				else
 					bacnet_device_type = PRODUCT_CM5;
 			}

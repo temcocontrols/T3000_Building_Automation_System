@@ -3867,6 +3867,8 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 				bacnet_device_type = MINIPANELARM_LB;
 			else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_TB)
 				bacnet_device_type = MINIPANELARM_TB;
+            else if (Device_Basic_Setting.reg.mini_type == BACNET_ROUTER)
+                bacnet_device_type = BACNET_ROUTER;
 			else
 				bacnet_device_type = PM_CM5;
 			my_temp_point = my_temp_point + 1;	//中间 minitype  和 debug  没什么用;
@@ -13326,16 +13328,10 @@ int  SetCommandDelayTime(unsigned char product_id)
 
 unsigned int GetDeviceInstance(unsigned char pid_type)
 {
-    CString temp_cs =  Get_Instance_Reg_Map(pid_type);
-    int temp_low = 0;
-    int temp_high = 0;
-    CStringArray temparray;
-    SplitCStringA(temparray, temp_cs, _T(","));
-    if (temparray.GetSize() == 2)
-    {
-        temp_low = _wtoi(temparray.GetAt(0));
-        temp_high = _wtoi(temparray.GetAt(1));
-    }
+    unsigned short temp_low = 0;
+    unsigned short temp_high = 0;
+    Get_Instance_Reg_Map(pid_type, temp_high, temp_low);
+
 
     int ret_low = read_one(g_tstat_id, temp_low, 6);
     int ret_high = read_one(g_tstat_id, temp_high, 6);
@@ -13374,18 +13370,32 @@ int ChangeDeviceProtocol(bool modbus_0_bacnet_1,   // 0  modbus           1  bac
     return 1;
 }
 
-CString Get_Instance_Reg_Map(int product_type)
+//获取产品对应的 bacnet object instance;
+int Get_Instance_Reg_Map(int product_type , unsigned short &temp_high , unsigned short &temp_low)
 {
+    CString temp_cs;
     map<int, CString >::iterator iter;
     CString test1;
     iter = g_bacnet_reg_ins_map.find(product_type);
     if (iter != g_bacnet_reg_ins_map.end())
     {
         test1 = g_bacnet_reg_ins_map.at(product_type);
-        return test1;
+        temp_cs = test1;
+    }
+    else
+    {
+        temp_cs = _T("37,38");// 如果没有默认按照从37 38 寄存器
     }
 
-    return _T("37,38"); // 如果没有默认按照从715 开始 8个寄存器.
+    CStringArray temparray;
+    SplitCStringA(temparray, temp_cs, _T(","));
+    if (temparray.GetSize() == 2)
+    {
+        temp_low = _wtoi(temparray.GetAt(0));
+        temp_high = _wtoi(temparray.GetAt(1));
+    }
+
+    return 1;
 }
 
 void Initial_Instance_Reg_Map()
@@ -13414,6 +13424,8 @@ bool bac_Invalid_range(unsigned char nrange)
 
     return false;
 }
+
+
 
 int PanelName_Map(int product_type)
 {

@@ -429,7 +429,6 @@ public:
  //   static DWORD WINAPI ConnectToTreeNode(LPVOID);
 	afx_msg void OnDatabaseIonameconfig();
 	afx_msg void OnDatabaseMbpoll();
-	afx_msg void OnViewCommunicatetraffic();
 	afx_msg void OnToolIsptoolforone();
 	 
 	afx_msg LRESULT OnHotKey(WPARAM wParam,LPARAM lParam);

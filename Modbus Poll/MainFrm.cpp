@@ -504,12 +504,12 @@ void CMainFrame::Read_Config(){
 
 
 		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("IP Address"),_T("127.0.0.1"),g_configfile_path);
-		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("IP Port"),_T("6001"),g_configfile_path);
+		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("IP Port"),_T("502"),g_configfile_path);
 
 		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Response Timeout"),_T("1000"),g_configfile_path);
 		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Delay Between Time"),_T("1000"),g_configfile_path);
 
-		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Connect Timeout"),_T("1000"),g_configfile_path);
+		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Connect Timeout"),_T("3000"),g_configfile_path);
 	}
 
 	CString comport;
@@ -518,9 +518,9 @@ void CMainFrame::Read_Config(){
 	m_comport=GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("COM_Port"),1,g_configfile_path);
 	GetPrivateProfileString(_T("MBPOLL_Setting"),_T("IP Address"),_T("127.0.0.1"),m_ipaddress.GetBuffer(MAX_PATH),MAX_PATH,g_configfile_path);
     m_ipaddress.ReleaseBuffer();
-	m_port=GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("IP Port"),6001,g_configfile_path);
+	m_port=GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("IP Port"),502,g_configfile_path);
 	m_connecttimeout=GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("Connect Timeout"),1000,g_configfile_path);
-    m_responsetimeout =GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("Response Timeout"),1000,g_configfile_path);
+    m_responsetimeout =GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("Response Timeout"),3000,g_configfile_path);
 
 }
 void CMainFrame::OnConnectionQuickconnectf5()

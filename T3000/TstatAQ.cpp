@@ -46,10 +46,28 @@ void CTstatAQ::Dump(CDumpContext& dc) const
 }
 #endif
 #endif //_DEBUG
-
+CString AQ_image_fordor;
 void CTstatAQ::Fresh()
 {
-    ShowWindow(SW_SHOW);
+    CStatic* pWnd = (CStatic*)GetDlgItem(IDC_STATIC_AQ_TEMPERATURE); // 得到 Picture Control 句柄 ;
+    CString icon_temperature;
+    
+   
+    CString ApplicationFolder;
+    GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+    PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
+    ApplicationFolder.ReleaseBuffer();
+    AQ_image_fordor = ApplicationFolder + _T("\\ResourceFile");
+    icon_temperature = AQ_image_fordor + _T("\\temperature.bmp");
+    HBITMAP bitmap;
+    bitmap = (HBITMAP)LoadImage(AfxGetInstanceHandle(), icon_temperature, IMAGE_BITMAP, 40, 120, LR_LOADFROMFILE);
+
+    CStatic *p = (CStatic *)GetDlgItem(IDC_STATIC_AQ_TEMPERATURE);
+    //设置静态控件窗口风格为位图居中显示  
+    p->ModifyStyle(0xf, SS_BITMAP | SS_CENTERIMAGE);
+    //将图片设置到Picture控件上  
+    p->SetBitmap(bitmap);
+
     CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
     pFrame->SetWindowTextW(_T("T3000 Building Automation System") + CurrentT3000Version);
     if (h_tstat_aq_thread == NULL)
@@ -98,10 +116,17 @@ void CTstatAQ::UpdateUI()
     else
         cs_weight_pm10 = _T("-");
 
+    CString cs_weight_total;
+    cs_weight_total.Format(_T("%u"), product_register_value[TSTAT_AQ_WEIGHT_1] +
+        product_register_value[TSTAT_AQ_WEIGHT_2_5] +
+        product_register_value[TSTAT_AQ_WEIGHT_4] +
+        product_register_value[TSTAT_AQ_WEIGHT_10]);
+
     GetDlgItem(IDC_STATIC_WEIGHT_PM1_0)->SetWindowTextW(cs_weight_pm1);
     GetDlgItem(IDC_STATIC_WEIGHT_PM2_5)->SetWindowTextW(cs_weight_pm2_5);
     GetDlgItem(IDC_STATIC_WEIGHT_PM4_0)->SetWindowTextW(cs_weight_pm4);
     GetDlgItem(IDC_STATIC_WEIGHT_PM10)->SetWindowTextW(cs_weight_pm10);
+    GetDlgItem(IDC_STATIC_WEIGHT_TOTAL)->SetWindowTextW(cs_weight_total);
 
     CString cs_index_pm1;
     if(product_register_value[TSTAT_AQ_INDEX_1] != 0)
@@ -124,10 +149,17 @@ void CTstatAQ::UpdateUI()
     else
         cs_index_pm10 = _T("-");
 
+    CString cs_index_total;
+    cs_index_total.Format(_T("%u"), product_register_value[TSTAT_AQ_INDEX_1] +
+        product_register_value[TSTAT_AQ_INDEX_2_5] +
+        product_register_value[TSTAT_AQ_INDEX_4] +
+        product_register_value[TSTAT_AQ_INDEX_10]);
+
     GetDlgItem(IDC_STATIC_INDEX_PM1_0)->SetWindowTextW(cs_index_pm1);
     GetDlgItem(IDC_STATIC_INDEX_PM2_5)->SetWindowTextW(cs_index_pm2_5);
     GetDlgItem(IDC_STATIC_INDEX_PM4_0)->SetWindowTextW(cs_index_pm4);
     GetDlgItem(IDC_STATIC_INDEX_PM10)->SetWindowTextW(cs_index_pm10);
+    GetDlgItem(IDC_STATIC_INDEX_TOTAL)->SetWindowTextW(cs_index_total);
 }
 // CTstatAQ 消息处理程序
 

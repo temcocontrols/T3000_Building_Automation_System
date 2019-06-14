@@ -274,7 +274,7 @@ void Inial_ProductName_map();  //初始化 Panel Name 存放的位置 默认是714位置
 bool bac_Invalid_range(unsigned char nrange);  //判断bacnet range 是否在合理值范围内;
 void Initial_Instance_Reg_Map();  //初始化 instance 存放位置;
 int PanelName_Map(int product_type);  //查找 Panel  Name 存放的位置 没有找到就认为是从714位置开始的
-CString Get_Instance_Reg_Map(int product_type);
+int Get_Instance_Reg_Map(int product_type, unsigned short &temp_high, unsigned short &temp_low);
 unsigned int GetDeviceInstance(unsigned char pid_type);  //通过 map 中存放的 instance 寄存器 获取 对应产品的 instance 值;
 int ChangeDeviceProtocol(bool modbus_0_bacnet_1,   // 0  modbus           1  bacnet 
     unsigned char modbus_id,
