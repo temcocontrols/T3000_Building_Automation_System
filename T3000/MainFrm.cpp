@@ -504,7 +504,7 @@ UINT _ReadMultiRegisters(LPVOID pParam)
             int multy_ret = 0;
             multy_ret = Read_Multi(g_tstat_id,&multi_register_value[i*100],i*100,100);
             //register_critical_section.Unlock();
-            Sleep(100);
+            Sleep(SEND_COMMAND_DELAY_TIME);
             if(multy_ret<0)		//Fance : 如果出现读失败 就跳出循环体,因为如果是由断开连接 造成的 读失败 会使其他需要用到读的地方一直无法获得资源;
                 break;
         }
@@ -4512,7 +4512,7 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
          {
              read_success_count++;
              g_progress_persent = read_success_count * 100 / read_total_count;
-             Sleep(100);
+             Sleep(SEND_COMMAND_DELAY_TIME);
              continue;
          }
          if (GetPrivateData_Blocking(g_bac_instance, READTIMESCHEDULE_T3000, i, i, WEEKLY_SCHEDULE_SIZE) > 0)
@@ -4582,7 +4582,7 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
          {
              read_success_count++;
              g_progress_persent = read_success_count * 100 / read_total_count;
-             Sleep(100);
+             Sleep(SEND_COMMAND_DELAY_TIME);
              continue;
          }
 		 if(GetPrivateData_Blocking(g_bac_instance,READANNUALSCHEDULE_T3000,i,i, 48) > 0)
@@ -4764,7 +4764,7 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
          {
              read_success_count++;
              g_progress_persent = read_success_count * 100 / read_total_count;
-             Sleep(100);
+             Sleep(SEND_COMMAND_DELAY_TIME);
              continue;
          }
 		 end_temp_instance = BAC_READ_GRPHIC_LABEL_REMAINDER + (BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i ;
@@ -6564,175 +6564,177 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             {
                 if((!m_product.at(i).BuildingInfo.strIp.IsEmpty()) && (m_product.at(i).protocol != PROTOCOL_MSTP_TO_MODBUS))
                 {
-
-                    CScanDlg scandlg;
-
-                    if (!offline_mode &&(!scandlg.TestPing(m_product.at(i).BuildingInfo.strIp)))
+                    if (m_product.at(i).BuildingInfo.strProtocol.CompareNoCase(_T("Remote Device")) != 0)
                     {
-                        //尝试Ping数据库中保存的IP地址失败 做如下动作     去掉进度条
-                        pDlg->ShowWindow(SW_HIDE);
-                        if(pDlg)
-                            delete pDlg;//20120220
-                        pDlg = NULL;
-                        BOOL is_OK = FALSE;
-
-                        if(m_product.at(i).status_last_time[0] == true)
+                        CScanDlg scandlg;
+                        if (!offline_mode && (!scandlg.TestPing(m_product.at(i).BuildingInfo.strIp)))
                         {
-                            if(CheckTheSameSubnet(m_product.at(i).NetworkCard_Address,m_product.at(i).BuildingInfo.strIp) == false)
+                            //尝试Ping数据库中保存的IP地址失败 做如下动作     去掉进度条
+                            pDlg->ShowWindow(SW_HIDE);
+                            if (pDlg)
+                                delete pDlg;//20120220
+                            pDlg = NULL;
+                            BOOL is_OK = FALSE;
+
+                            if (m_product.at(i).status_last_time[0] == true)
                             {
-                                CTroubleShootDlg dlg;
-                                dlg.SetNode(m_product.at(i));
-                                if (dlg.DoModal()==IDOK)
+                                if (CheckTheSameSubnet(m_product.at(i).NetworkCard_Address, m_product.at(i).BuildingInfo.strIp) == false)
                                 {
-                                    is_OK=dlg.b_changeip_ok;
-									refresh_tree_status_immediately = true;//在改完IP后立刻在去扫描，更新数据库;
+                                    CTroubleShootDlg dlg;
+                                    dlg.SetNode(m_product.at(i));
+                                    if (dlg.DoModal() == IDOK)
+                                    {
+                                        is_OK = dlg.b_changeip_ok;
+                                        refresh_tree_status_immediately = true;//在改完IP后立刻在去扫描，更新数据库;
+                                    }
+                                    return;
                                 }
-                                return;
+                                else
+                                {
+                                    g_llTxCount = g_llTxCount + 4;
+                                    g_llerrCount = g_llerrCount + 4;
+                                    bac_select_device_online = false;
+                                    m_pTreeViewCrl->turn_item_image(hSelItem, false);//Can't connect to the device , it will show disconnection;
+                                    m_product.at(i).status_last_time[0] = false;
+                                    m_product.at(i).status_last_time[1] = false;
+                                    m_product.at(i).status_last_time[2] = false;
+                                    m_product.at(i).status_last_time[3] = false;
+                                    m_product.at(i).status_last_time[4] = false;
+                                    m_product.at(i).status = false;
+                                    //MessageBox(_T("Device is offline!"));	//Ping 不通 ， 还在一个网段 ， 还显示在线; 其实不在线;
+
+                                    //连不上时，发送ping命令，显示出来.
+                                    ::PostMessage(MainFram_hwd, WM_PING_MESSAGE, (WPARAM)hTreeItem, NULL);
+
+#if 0      //T3 无法连接  需要额外处理函数诊断问题
+                                    PostMessage(WM_TROUBLESHOOT_MSG, 0, 0);
+                                    if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
+                                    {
+                                        m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Device is offline!"));
+                                        m_pDialogInfo->ShowWindow(SW_SHOW);
+                                    }
+                                    /*  while(m_pDialogInfo->IsWindowVisible()){
+                                    Sleep(50);
+                                    continue;
+                                    }*/
+
+                                    goto do_conncet_failed;
+#endif
+                                    HideBacnetWindow();
+                                    return;
+                                }
+
                             }
                             else
                             {
                                 g_llTxCount = g_llTxCount + 4;
                                 g_llerrCount = g_llerrCount + 4;
                                 bac_select_device_online = false;
-                                m_pTreeViewCrl->turn_item_image(hSelItem ,false);//Can't connect to the device , it will show disconnection;
+                                m_pTreeViewCrl->turn_item_image(hSelItem, false);//Can't connect to the device , it will show disconnection;
                                 m_product.at(i).status_last_time[0] = false;
                                 m_product.at(i).status_last_time[1] = false;
                                 m_product.at(i).status_last_time[2] = false;
                                 m_product.at(i).status_last_time[3] = false;
                                 m_product.at(i).status_last_time[4] = false;
                                 m_product.at(i).status = false;
-                                //MessageBox(_T("Device is offline!"));	//Ping 不通 ， 还在一个网段 ， 还显示在线; 其实不在线;
 
-                                //连不上时，发送ping命令，显示出来.
                                 ::PostMessage(MainFram_hwd, WM_PING_MESSAGE, (WPARAM)hTreeItem, NULL);
-                                
-#if 0      //T3 无法连接  需要额外处理函数诊断问题
-                                PostMessage(WM_TROUBLESHOOT_MSG, 0, 0);
+#if 0      //T3 无法连接 需要额外处理函数诊断问题
+                                //MessageBox(_T("Device is offline!"));
                                 if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
                                 {
                                     m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Device is offline!"));
                                     m_pDialogInfo->ShowWindow(SW_SHOW);
                                 }
-                                /*  while(m_pDialogInfo->IsWindowVisible()){
-                                Sleep(50);
-                                continue;
-                                }*/
-
-								goto do_conncet_failed;
+                                //                             while(m_pDialogInfo->IsWindowVisible()){
+                                //                                 Sleep(50);
+                                //                                 continue;
+                                //                             }
+                                goto do_conncet_failed;
 #endif
                                 HideBacnetWindow();
                                 return;
                             }
-
-                        }
-                        else
-                        {
-							g_llTxCount = g_llTxCount + 4;
-							g_llerrCount = g_llerrCount + 4;
-                            bac_select_device_online = false;
-                            m_pTreeViewCrl->turn_item_image(hSelItem ,false);//Can't connect to the device , it will show disconnection;
-                            m_product.at(i).status_last_time[0] = false;
-                            m_product.at(i).status_last_time[1] = false;
-                            m_product.at(i).status_last_time[2] = false;
-                            m_product.at(i).status_last_time[3] = false;
-                            m_product.at(i).status_last_time[4] = false;
-                            m_product.at(i).status = false;
-
-                            ::PostMessage(MainFram_hwd, WM_PING_MESSAGE, (WPARAM)hTreeItem, NULL);
-#if 0      //T3 无法连接 需要额外处理函数诊断问题
-                            //MessageBox(_T("Device is offline!"));
-                            if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
+                            if (!is_OK)
                             {
-                                m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Device is offline!"));
-                                m_pDialogInfo->ShowWindow(SW_SHOW);
+                                CString strTitle;
+                                strTitle.Format(_T("Can't connect to %s,Ping %s -> Noresponse"), m_product.at(i).BuildingInfo.strIp, m_product.at(i).BuildingInfo.strIp);
+                                m_pTreeViewCrl->turn_item_image(hSelItem, false);//Can't connect to the device , it will show disconnection;
+                                m_product.at(i).status_last_time[0] = false;
+                                m_product.at(i).status_last_time[1] = false;
+                                m_product.at(i).status_last_time[2] = false;
+                                m_product.at(i).status_last_time[3] = false;
+                                m_product.at(i).status_last_time[4] = false;
+                                m_product.at(i).status = false;
+                                g_llTxCount = g_llTxCount + 4;
+                                g_llerrCount = g_llerrCount + 4;
+                                bac_select_device_online = false;
+                                //MessageBox(strTitle);
+                                if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
+                                {
+                                    m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(strTitle);
+                                    m_pDialogInfo->ShowWindow(SW_SHOW);
+                                }
+                                //                             while(m_pDialogInfo->IsWindowVisible()){
+                                //                                 Sleep(50);
+                                //                                 continue;
+                                //                             }
+                                goto do_conncet_failed;
+                                return;
                             }
-                            //                             while(m_pDialogInfo->IsWindowVisible()){
-                            //                                 Sleep(50);
-                            //                                 continue;
-                            //                             }
-							goto do_conncet_failed;
-#endif
-                            HideBacnetWindow();
-                            return;
-                        }
-                        if (!is_OK)
-                        {
-                            CString strTitle;
-                            strTitle.Format(_T("Can't connect to %s,Ping %s -> Noresponse"),m_product.at(i).BuildingInfo.strIp,m_product.at(i).BuildingInfo.strIp);
-                            m_pTreeViewCrl->turn_item_image(hSelItem ,false);//Can't connect to the device , it will show disconnection;
-                            m_product.at(i).status_last_time[0] = false;
-                            m_product.at(i).status_last_time[1] = false;
-                            m_product.at(i).status_last_time[2] = false;
-                            m_product.at(i).status_last_time[3] = false;
-                            m_product.at(i).status_last_time[4] = false;
-                            m_product.at(i).status = false;
-							g_llTxCount = g_llTxCount + 4;
-							g_llerrCount = g_llerrCount + 4;
-                            bac_select_device_online = false;
-                            //MessageBox(strTitle);
-                            if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
+                            else
                             {
-                                m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(strTitle);
-                                m_pDialogInfo->ShowWindow(SW_SHOW);
+                                g_llTxCount = g_llTxCount + 4;
+                                g_llerrCount = g_llerrCount + 4;
+                                bac_select_device_online = true;
+                                m_pTreeViewCrl->turn_item_image(hSelItem, TRUE);//Can't connect to the device , it will show disconnection;
+                                m_product.at(i).status_last_time[0] = TRUE;
+                                m_product.at(i).status_last_time[1] = false;
+                                m_product.at(i).status_last_time[2] = false;
+                                m_product.at(i).status_last_time[3] = false;
+                                m_product.at(i).status_last_time[4] = false;
+                                m_product.at(i).status = false;
+
                             }
-                            //                             while(m_pDialogInfo->IsWindowVisible()){
-                            //                                 Sleep(50);
-                            //                                 continue;
-                            //                             }
-							goto do_conncet_failed;
+
+                            goto do_conncet_failed;
                             return;
                         }
                         else
                         {
-							g_llTxCount = g_llTxCount + 4;
-							g_llerrCount = g_llerrCount + 4;
-                            bac_select_device_online = true;
-                            m_pTreeViewCrl->turn_item_image(hSelItem ,TRUE);//Can't connect to the device , it will show disconnection;
-                            m_product.at(i).status_last_time[0] = TRUE;
-                            m_product.at(i).status_last_time[1] = false;
-                            m_product.at(i).status_last_time[2] = false;
-                            m_product.at(i).status_last_time[3] = false;
-                            m_product.at(i).status_last_time[4] = false;
-                            m_product.at(i).status = false;
-
-                        }
-
-						goto do_conncet_failed;
-                        return;
-                    }
-                    else
-                    {
-                        ::PostMessage(MainFram_hwd,MY_RX_TX_COUNT,1,0);
-                        CString IP=m_product.at(i).BuildingInfo.strIp;
-                        int Port=m_product.at(i).ncomport;
-                        SetCommunicationType(1);
-                        if ((!offline_mode)&&(!Open_Socket_Retry(IP,Port)))
-                        {
-							g_llTxCount = g_llTxCount + 4;
-							g_llerrCount = g_llerrCount + 4;
-                            bac_select_device_online = false;
-                            // MessageBox(_T("Connect failed!Please try again!"));
-                            if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
+                            ::PostMessage(MainFram_hwd, MY_RX_TX_COUNT, 1, 0);
+                            CString IP = m_product.at(i).BuildingInfo.strIp;
+                            int Port = m_product.at(i).ncomport;
+                            SetCommunicationType(1);
+                            if ((!offline_mode) && (!Open_Socket_Retry(IP, Port)))
                             {
-                                m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Connect failed!Please try again!"));
-                                m_pDialogInfo->ShowWindow(SW_SHOW);
-                            }
-							 m_pTreeViewCrl->turn_item_image(hSelItem ,false);//Can't connect to the device , it will show disconnection;
-							m_product.at(i).status_last_time[0] = false;
-							m_product.at(i).status_last_time[1] = false;
-							m_product.at(i).status_last_time[2] = false;
-                            m_product.at(i).status_last_time[3] = false;
-                            m_product.at(i).status_last_time[4] = false;
-							 m_product.at(i).status = false;
-							 goto do_conncet_failed;
-							return;
+                                g_llTxCount = g_llTxCount + 4;
+                                g_llerrCount = g_llerrCount + 4;
+                                bac_select_device_online = false;
+                                // MessageBox(_T("Connect failed!Please try again!"));
+                                if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
+                                {
+                                    m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Connect failed!Please try again!"));
+                                    m_pDialogInfo->ShowWindow(SW_SHOW);
+                                }
+                                m_pTreeViewCrl->turn_item_image(hSelItem, false);//Can't connect to the device , it will show disconnection;
+                                m_product.at(i).status_last_time[0] = false;
+                                m_product.at(i).status_last_time[1] = false;
+                                m_product.at(i).status_last_time[2] = false;
+                                m_product.at(i).status_last_time[3] = false;
+                                m_product.at(i).status_last_time[4] = false;
+                                m_product.at(i).status = false;
+                                goto do_conncet_failed;
+                                return;
 
-                        }
-                        else
-                        {
-                            close_com();
+                            }
+                            else
+                            {
+                                close_com();
+                            }
                         }
                     }
+
 
                 }
             }
@@ -6914,14 +6916,12 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				}
                 else
                 {
-                    //SEND_COMMAND_DELAY_TIME = 100;
                     BOOL is_local = true;
                     if(selected_product_Node.protocol == PROTOCOL_REMOTE_IP)
                         is_local = false;
                     //BOOL is_local = IP_is_Local(product_Node.BuildingInfo.strIp);
                     if(is_local == false)	//判断是否是本地IP，不是本地的就要连接到远端的，远端的 Who  is  广播发布过去的;
                     {
-                        //SEND_COMMAND_DELAY_TIME = 500;
                         m_is_remote_device = true;
                         ((CDialogCM5_BacNet*)m_pViews[m_nCurView])->Set_remote_device_IP(selected_product_Node.BuildingInfo.strIp);
                         ((CDialogCM5_BacNet*)m_pViews[m_nCurView])->SetConnected_IP(selected_product_Node.BuildingInfo.strIp);
@@ -7570,7 +7570,7 @@ start_read_reg_data:
                                 }
                             }
                             it++;
-                            Sleep(20);
+                            Sleep(SEND_COMMAND_DELAY_TIME);
                         }
                         if (it == length)
                         {
@@ -7606,7 +7606,7 @@ start_read_reg_data:
                                 }
                             }
                             it++;
-                            Sleep(20 );
+                            Sleep(SEND_COMMAND_DELAY_TIME);
                         }
                         g_tstat_id_changed=FALSE;
                         register_critical_section.Unlock();
@@ -7636,7 +7636,7 @@ start_read_reg_data:
                                 }
                             }
                             it++;
-                            Sleep(20);
+                            Sleep(SEND_COMMAND_DELAY_TIME);
                         }
                         g_tstat_id_changed = FALSE;
                         register_critical_section.Unlock();
@@ -7667,7 +7667,7 @@ start_read_reg_data:
                                 }
                             }
                             it++;
-                            Sleep(20);
+                            Sleep(200);
                         }
                         g_tstat_id_changed=FALSE;
                         register_critical_section.Unlock();
@@ -8143,7 +8143,6 @@ do_connect_success:
     SqliteDBBuilding.closedb();
     //hTreeItem_retry = NULL;
     g_llRxCount = g_llRxCount + 4;
-    Sleep(1);
     return;
 	do_conncet_failed:
 
@@ -8153,12 +8152,6 @@ do_connect_success:
 		SqliteDBBuilding.execDML((UTF8MBSTR)strUpdateSql);
 	    SqliteDBBuilding.closedb();
 
-		//if(hretryThread == NULL)
-		//{
-		//	SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("T3000 can't connect to your device ,it will try again in 20 seconds."));
-		//	hretryThread =CreateThread(NULL,NULL,retry_connect,this,NULL, NULL);
-		//}
-		Sleep(1);
 		return;
 }
 
@@ -11167,12 +11160,22 @@ void CMainFrame::OnControlSettings()
         }
     }
 	
-	else if (product_type == CS3000||product_register_value[7]==PM_T322AI || product_register_value[7] == PWM_TRANSDUCER ||product_register_value[7]==PM_T38AI8AO6DO
-	              ||product_register_value[7]==PM_T3PT12
-				  ||product_register_value[7]==PM_T36CTA
-					|| product_register_value[7] == PM_T3_LC
-        || product_register_value[7] == PM_TSTAT_AQ
-	             ||product_register_value[7]==STM32_HUM_NET )
+	else if (product_type == CS3000||
+        product_register_value[7]==PM_T322AI || 
+        product_register_value[7] == PWM_TRANSDUCER ||
+        product_register_value[7]==PM_T38AI8AO6DO   ||
+        product_register_value[7]==PM_T3PT12      ||
+        product_register_value[7]==PM_T36CTA|| 
+        product_register_value[7] == PM_T3_LC      || 
+        product_register_value[7] == PM_TSTAT_AQ   ||
+
+        product_register_value[7] == STM32_CO2_NET ||
+        product_register_value[7] == STM32_PRESSURE_NET ||
+        product_register_value[7] == STM32_CO2_RS485 ||
+        product_register_value[7] == STM32_HUM_RS485 ||
+        product_register_value[7] == STM32_PRESSURE_RS3485 ||
+        product_register_value[7]==STM32_HUM_NET 
+        )
 	{
 		HideBacnetWindow();
 		bacnet_view_number = TYPE_SETTING;

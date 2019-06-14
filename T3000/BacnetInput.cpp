@@ -238,9 +238,14 @@ void CBacnetInput::Reload_Unit_Type()
 				m_input_list.SetCellStringList(i, INPUT_RANGE, strlist);		
 			}
 		}
-		
-		
 	}
+    else if (bacnet_device_type == BACNET_ROUTER)
+    {
+        if (BACNET_ROUTER_IN_A > (int)m_Input_data.size())
+            initial_count = (int)m_Input_data.size();
+        else
+            initial_count = BACNET_ROUTER_IN_A;
+    }
 
 
 
@@ -582,6 +587,11 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
         INPUT_LIMITE_ITEM_COUNT = 3;
         Minipanel_device = 0;
     }
+    //else if (bacnet_device_type == BACNET_ROUTER)
+    //{
+    //    INPUT_LIMITE_ITEM_COUNT = BACNET_ROUTER_IN_A + BACNET_ROUTER_IN_D;
+    //    Minipanel_device = 1;
+    //}
 	else
 	{
 		    INPUT_LIMITE_ITEM_COUNT = BAC_INPUT_ITEM_COUNT;

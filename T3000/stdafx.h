@@ -84,11 +84,8 @@ using namespace Gdiplus;
 
 #include "T3000_Help_Map.h"
 
-//#include <CppUnitTest.h>
-//using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-//#pragma  comment(lib,"ISP.lib")
-//#pragma  comment(lib,"RegisterMonitor.lib")
-#import "C:\Program Files (x86)\Common Files\System\ado\msado15.dll" no_namespace rename("EOF","EndOfFile") rename("BOF","FirstOfFile")
+// if error on this line , please replace to your own system  msado15dll folder .
+#import "C:\Program Files\Common Files\System\ado\msado15.dll" no_namespace rename("EOF","EndOfFile") rename("BOF","FirstOfFile")
 //**********************************link to dll*********************
 #define INPUT extern "C" __declspec(dllimport)
 #pragma comment(lib, "WS2_32")
@@ -96,10 +93,9 @@ using namespace Gdiplus;
 #pragma comment(lib,"FlexSlideBar")
 //#pragma comment(lib,"ISP")
 #pragma comment(lib,"BACnet_Stack_Library" )
-//INPUT void  show_ISPDlg();
-//INPUT void  show_RegisterMonitorDlg(); 
+
 INPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length);
-//INPUT bool open_com(unsigned char m_com);
+
 
 
 INPUT int Write_One_tap(unsigned char device_var,unsigned short address,unsigned short value);
@@ -145,7 +141,6 @@ INPUT int CheckTstatOnline_nocretical(unsigned char  devLo, unsigned char devHi,
 
 INPUT int Read_One2(unsigned char  device_var,unsigned short  address, bool bComm_Type);
 INPUT int Write_One2(unsigned char  device_var,unsigned short  address,unsigned short  value, bool bComm_Type);
-//OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length);
 INPUT int read_multi2(unsigned char device_var,unsigned short  *put_data_into_here,unsigned short  start_address,int length, bool bComm_Type);
 INPUT int read_multi2_nocretical(unsigned char device_var, unsigned short *put_data_into_here, unsigned short start_address, int length, bool bComm_Type,int ncomport);
 INPUT void close_T3000_log_file();//scan
@@ -203,13 +198,15 @@ using namespace std;  // Ensure that the namespace is set to std
 #define     WM_SHOW_SCANN_RESULTS                       WM_USER + 2691
 #define     WM_CO2_NODE_THREAD_READ                     WM_USER + 2692
 #define     WM_PING_MESSAGE                             WM_USER + 6677
-//#pragma warning(disable:4244)
-//#pragma warning(disable:4018)
-//#pragma warning(disable:4800)
-//#pragma warning(disable:4101)
-//#pragma warning(disable:4554)
-//#pragma warning(disable:4305)
-//#pragma warning(disable:4005)
+#pragma warning(once : 4244)
+#pragma warning(once : 4018)
+#pragma warning(once : 4800)
+#pragma warning(once : 4101)
+#pragma warning(once : 4554)
+#pragma warning(once : 4305)
+#pragma warning(once : 4005)
+#pragma warning(once : 4091)
+#pragma warning(once : 4838)
 
 
 #pragma warning(disable:4146)	//Add by Fance

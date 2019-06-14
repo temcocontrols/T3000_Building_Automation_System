@@ -18,6 +18,7 @@
 #include "ShowMessageDlg.h"
 #include "BacnetTstatSchedule.h"
 // CBacnetSetting dialog
+extern HTREEITEM  hTreeItem_retry;
 extern bool cancle_send ;
 bool show_user_list_window = false;
 CBacnetTstatSchedule *BacnetTstatSchedule_Window = NULL;
@@ -68,7 +69,7 @@ void CBacnetSetting::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CBacnetSetting, CDialogEx)
 	ON_MESSAGE(WM_FRESH_SETTING_UI,Fresh_Setting_UI)
-	ON_BN_CLICKED(IDC_BUTTON_BAC_TEST, &CBacnetSetting::OnBnClickedButtonBacTest)
+	ON_BN_CLICKED(IDC_BUTTON_BAC_TEST, &CBacnetSetting::OnBnClickedButtonRefreshTime)
 	ON_NOTIFY(NM_KILLFOCUS, IDC_DATE_PICKER, &CBacnetSetting::OnNMKillfocusDatePicker)
 	ON_NOTIFY(NM_KILLFOCUS, IDC_TIME_PICKER, &CBacnetSetting::OnNMKillfocusTimePicker)
 	ON_NOTIFY(NM_SETFOCUS, IDC_DATE_PICKER, &CBacnetSetting::OnNMSetfocusDatePicker)
@@ -143,7 +144,7 @@ END_MESSAGE_MAP()
 
 
 
-void CBacnetSetting::OnBnClickedButtonBacTest()
+void CBacnetSetting::OnBnClickedButtonRefreshTime()
 {
 	
 
@@ -259,7 +260,6 @@ void CBacnetSetting::OnBnClickedBtnBacSYNCTime()
 
     time_t scale_time = temp_time_long;
 
-#if 1 //2019 05 19
     if (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 469)
     {
         panel_time_to_basic_delt = Device_Basic_Setting.reg.time_zone * 360 / 10;
@@ -278,15 +278,9 @@ void CBacnetSetting::OnBnClickedBtnBacSYNCTime()
         //}
 
     }
-#endif
+
     temp_time = scale_time;
 
-
-
-
-
-
-	//temp_time = CTime::GetCurrentTime();
 	if(temp_time.GetYear()<2000)
 		nyear = temp_time.GetYear() + 2000;
 	else
@@ -301,11 +295,9 @@ void CBacnetSetting::OnBnClickedBtnBacSYNCTime()
 	m_cm5_time_picker.SetFormat(_T("HH:mm"));
 	m_cm5_time_picker.SetTime(&TimeTemp);
 
-	//m_cm5_date_picker.SetFormat(_T("YY/MM/DD"));
 	m_cm5_date_picker.SetTime(&TimeTemp);
 
 	Get_Time_Edit_By_Control();
-    //Device_Basic_Setting.reg.time_zone = n_tempBias;
     Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0);
 }
 
@@ -322,9 +314,6 @@ void CBacnetSetting::OnBnClickedBtnBacIPAuto()
     UCHAR temp_data = 0;
     temp_data = Device_Basic_Setting.reg.tcp_type;
 	Device_Basic_Setting.reg.tcp_type = 1;
-
-
-
 
 	CString temp_task_info;
     temp_task_info.Format(_T("IP address has been changed! \r\nRebooting now! Please wait."));
@@ -366,9 +355,6 @@ void CBacnetSetting::OnBnClickedBtnBacIPAuto()
         refresh_tree_status_immediately = true;
     }
 
-
-
-
 }
 
 void CBacnetSetting::OnBnClickedBtnBacIPStatic()
@@ -378,55 +364,16 @@ void CBacnetSetting::OnBnClickedBtnBacIPStatic()
 	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->EnableWindow(true);
 	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(true);
 }
-extern HTREEITEM  hTreeItem_retry ;
+
 void CBacnetSetting::OnBnClickedBtnBacIPChange()
 {
-#if 0
-    unsigned short test_array[1000];
-    memset(test_array, 0, 2000);
-    int ntest_ret = GetPrivateBacnetToModbusData(95237, 0, 100, test_array);
-    Sleep(1000);
-    if (ntest_ret > 0)
-    {
-        CString total_char_test;
-        if ((debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA) || (debug_item_show == DEBUG_SHOW_ALL))
-        {
-            char * temp_print_test = NULL;
-            temp_print_test = (char *)&test_array;
-            for (int i = 0; i< ntest_ret; i++)
-            {
-                CString temp_char_test;
-                temp_char_test.Format(_T("%02x"), (unsigned char)*temp_print_test);
-                temp_char_test.MakeUpper();
-                temp_print_test++;
-                total_char_test = total_char_test + temp_char_test + _T(" ");
-            }
-            DFTrace(total_char_test);
-        }
-    }
-    else
-    {
-        DFTrace(_T("No replay"));
-    }
 
-    return;
-    //memset(test_array, 0, 2000);
-    //memcpy(test_array, "11223344556677889900AABBCC", 46);
-    //int ntest_ret =  WritePrivateBacnetToModbusData(g_bac_instance, 10000, 23, test_array);
-    //Sleep(2000);
-
-    //memset(test_array, 0, 2000);
-    //test_array[0] = 0x04;
-    //int ntest_ret = WritePrivateBacnetToModbusData(g_bac_instance, 205, 1, test_array);
-    //Sleep(2000);
-    //return;
-#endif
-	BYTE address1,address2,address3,address4;
-	BYTE subnet1, subnet2, subnet3, subnet4;
-	BYTE gatway1,gatway2,gatway3,gatway4;
-	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->GetAddress(address1,address2,address3,address4);
-	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->GetAddress(subnet1,subnet2,subnet3,subnet4);
-	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->GetAddress(gatway1,gatway2,gatway3,gatway4);
+    BYTE address1, address2, address3, address4;
+    BYTE subnet1, subnet2, subnet3, subnet4;
+    BYTE gatway1, gatway2, gatway3, gatway4;
+    ((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->GetAddress(address1, address2, address3, address4);
+    ((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->GetAddress(subnet1, subnet2, subnet3, subnet4);
+    ((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->GetAddress(gatway1, gatway2, gatway3, gatway4);
 
 
 
@@ -445,89 +392,89 @@ void CBacnetSetting::OnBnClickedBtnBacIPChange()
             return;
         }
     }
-    
 
 
-		Device_Basic_Setting.reg.ip_addr[0] = address1;
-		Device_Basic_Setting.reg.ip_addr[1] = address2;
-		Device_Basic_Setting.reg.ip_addr[2] = address3;
-		Device_Basic_Setting.reg.ip_addr[3] = address4;
-		Device_Basic_Setting.reg.subnet[0]  = subnet1;
-		Device_Basic_Setting.reg.subnet[1]  = subnet2;
-		Device_Basic_Setting.reg.subnet[2]  = subnet3;
-		Device_Basic_Setting.reg.subnet[3]  = subnet4;
-		Device_Basic_Setting.reg.gate_addr[0] = gatway1;
-		Device_Basic_Setting.reg.gate_addr[1] = gatway2;
-		Device_Basic_Setting.reg.gate_addr[2] = gatway3;
-		Device_Basic_Setting.reg.gate_addr[3] = gatway4;
-		bool isstatic = ((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_STATIC))->GetCheck(); //返回1表示选上，0表示没选上;
-		if(isstatic == true)
-			Device_Basic_Setting.reg.tcp_type = 0;
-		else
-			Device_Basic_Setting.reg.tcp_type = 1;
 
-		if(Write_Private_Data_Blocking(WRITE_SETTING_COMMAND,0,0) <= 0)
-		{
-			CString temp_task_info;
-			temp_task_info.Format(_T("Change IP Address Information Timeout!"));
-			MessageBox(temp_task_info);
-		}
-		else
-		{
-			//在Ip 修改成功后 更新数据库;
-            m_tcp_type = Device_Basic_Setting.reg.tcp_type;
-			CString strnewipadress;
-			strnewipadress.Format(_T("%u.%u.%u.%u"),address1,address2,address3,address4);
-			CString temp_task_info;
-			temp_task_info.Format(_T("IP address has been changed! \r\nRebooting now! Please wait."));
+    Device_Basic_Setting.reg.ip_addr[0] = address1;
+    Device_Basic_Setting.reg.ip_addr[1] = address2;
+    Device_Basic_Setting.reg.ip_addr[2] = address3;
+    Device_Basic_Setting.reg.ip_addr[3] = address4;
+    Device_Basic_Setting.reg.subnet[0] = subnet1;
+    Device_Basic_Setting.reg.subnet[1] = subnet2;
+    Device_Basic_Setting.reg.subnet[2] = subnet3;
+    Device_Basic_Setting.reg.subnet[3] = subnet4;
+    Device_Basic_Setting.reg.gate_addr[0] = gatway1;
+    Device_Basic_Setting.reg.gate_addr[1] = gatway2;
+    Device_Basic_Setting.reg.gate_addr[2] = gatway3;
+    Device_Basic_Setting.reg.gate_addr[3] = gatway4;
+    bool isstatic = ((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_STATIC))->GetCheck(); //返回1表示选上，0表示没选上;
+    if (isstatic == true)
+        Device_Basic_Setting.reg.tcp_type = 0;
+    else
+        Device_Basic_Setting.reg.tcp_type = 1;
 
-			CString strSql;
-			CppSQLite3DB SqliteDBBuilding;
-			CppSQLite3Table table;
-			CppSQLite3Query q;
-			SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+    if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
+    {
+        CString temp_task_info;
+        temp_task_info.Format(_T("Change IP Address Information Timeout!"));
+        MessageBox(temp_task_info);
+    }
+    else
+    {
+        //在Ip 修改成功后 更新数据库;
+        m_tcp_type = Device_Basic_Setting.reg.tcp_type;
+        CString strnewipadress;
+        strnewipadress.Format(_T("%u.%u.%u.%u"), address1, address2, address3, address4);
+        CString temp_task_info;
+        temp_task_info.Format(_T("IP address has been changed! \r\nRebooting now! Please wait."));
 
-			CString temp_serial_cs;
-			temp_serial_cs.Format(_T("%u"),g_selected_serialnumber);
-			strSql.Format(_T("select * from ALL_NODE where Serial_ID = '%s' "),temp_serial_cs);
-			//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-			q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
-			while(!q.eof())
-			{
-				strSql.Format(_T("update ALL_NODE set Bautrate='%s' where Serial_ID= '%s'"),strnewipadress,temp_serial_cs);
-				SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
-			    q.nextRow();
-			}
-			 
-            refresh_tree_status_immediately = true;
-            CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+        CString strSql;
+        CppSQLite3DB SqliteDBBuilding;
+        CppSQLite3Table table;
+        CppSQLite3Query q;
+        SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
-            for (int i = 0; i < pFrame->m_product.size(); i++)
+        CString temp_serial_cs;
+        temp_serial_cs.Format(_T("%u"), g_selected_serialnumber);
+        strSql.Format(_T("select * from ALL_NODE where Serial_ID = '%s' "), temp_serial_cs);
+        //m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+        q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+        while (!q.eof())
+        {
+            strSql.Format(_T("update ALL_NODE set Bautrate='%s' where Serial_ID= '%s'"), strnewipadress, temp_serial_cs);
+            SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+            q.nextRow();
+        }
+
+        refresh_tree_status_immediately = true;
+        CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+
+        for (int i = 0; i < pFrame->m_product.size(); i++)
+        {
+            if (g_selected_serialnumber == pFrame->m_product.at(i).serial_number)
             {
-                if (g_selected_serialnumber == pFrame->m_product.at(i).serial_number)
-                {
-                    pFrame->m_product.at(i).BuildingInfo.strIp = strIP;
-                    break;
-                }
+                pFrame->m_product.at(i).BuildingInfo.strIp = strIP;
+                break;
             }
+        }
 
-            
-            CShowMessageDlg dlg;
 
-            dlg.SetStaticText(temp_task_info);
-            //dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
-            dlg.SetStaticTextColor(RGB(0, 0, 255));
-            dlg.SetStaticTextSize(25, 20);
-            dlg.SetProgressAutoClose(250, 100, EVENT_IP_STATIC_CHANGE);
-            dlg.SetChangedIPaddress(strIP);
-            dlg.SetHwnd(pFrame->m_hWnd, MY_RETRY_IP_CHANGE_MESSAGE);
-            dlg.DoModal();
+        CShowMessageDlg dlg;
 
-            return;
+        dlg.SetStaticText(temp_task_info);
+        //dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
+        dlg.SetStaticTextColor(RGB(0, 0, 255));
+        dlg.SetStaticTextSize(25, 20);
+        dlg.SetProgressAutoClose(250, 100, EVENT_IP_STATIC_CHANGE);
+        dlg.SetChangedIPaddress(strIP);
+        dlg.SetHwnd(pFrame->m_hWnd, MY_RETRY_IP_CHANGE_MESSAGE);
+        dlg.DoModal();
 
-		}
-        //m_reboot_time_left = 10;
-        //SetTimer(TIMER_IP_CHANGED_RECONNECT, 1000, NULL);
+        return;
+
+    }
+    //m_reboot_time_left = 10;
+    //SetTimer(TIMER_IP_CHANGED_RECONNECT, 1000, NULL);
 
 }
 
@@ -945,12 +892,9 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
                 }
                 else if (Device_Basic_Setting.reg.time_sync_auto_manual == 1)
                 {
-                    //GetDlgItem(IDC_DATE_PICKER)->EnableWindow(true);
-                    //GetDlgItem(IDC_TIME_PICKER)->EnableWindow(true);
                     GetDlgItem(IDC_BAC_SYNC_LOCAL_PC)->EnableWindow(true);
                     GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER)->EnableWindow(false);
                     GetDlgItem(IDC_BUTTON_SYNC_TIME)->EnableWindow(false);
-
 
                     ((CButton *)GetDlgItem(IDC_RADIO_SETTING_SYNC_TIME))->SetCheck(false);
                     ((CButton *)GetDlgItem(IDC_RADIO_SETTING_SYNC_PC))->SetCheck(true);
@@ -1014,7 +958,15 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				((CStatic *)GetDlgItem(IDC_STATIC_BAC_SETTING_SD_CARD))->SetWindowTextW(_T("unknown"));
 			}
 
-			if((bacnet_device_type == BIG_MINIPANEL || bacnet_device_type == MINIPANELARM || bacnet_device_type == MINIPANELARM_LB || bacnet_device_type == MINIPANELARM_TB) || (bacnet_device_type == SMALL_MINIPANEL) || (bacnet_device_type == TINY_MINIPANEL) || (bacnet_device_type == TINY_EX_MINIPANEL) || (bacnet_device_type == PRODUCT_CM5))
+			if((bacnet_device_type == BIG_MINIPANEL || 
+                bacnet_device_type == MINIPANELARM || 
+                bacnet_device_type == MINIPANELARM_LB || 
+                bacnet_device_type == MINIPANELARM_TB) || 
+                bacnet_device_type == SMALL_MINIPANEL || 
+                bacnet_device_type == TINY_MINIPANEL || 
+                bacnet_device_type == TINY_EX_MINIPANEL || 
+                bacnet_device_type == BACNET_ROUTER ||
+                bacnet_device_type == PRODUCT_CM5)
 			{
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->ResetContent();
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->AddString(Device_Serial_Port_Status[NOUSE]);
@@ -1141,18 +1093,21 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 			{
 				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-TB"));
 			}
+            else if (Device_Basic_Setting.reg.mini_type == BACNET_ROUTER)
+            {
+                ((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("BacnetRouter"));
+            }
 			else
 			{
 				((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("Unknown device"));
 			}
-
-			//((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3Controller"));
 
 			if(
 				(bacnet_device_type == BIG_MINIPANEL || bacnet_device_type == MINIPANELARM) ||
 				(Device_Basic_Setting.reg.mini_type == SMALL_MINIPANEL || bacnet_device_type == MINIPANELARM_LB) ||
 				(Device_Basic_Setting.reg.mini_type == TINY_MINIPANEL || bacnet_device_type == MINIPANELARM_TB) ||
 				(Device_Basic_Setting.reg.mini_type == TINY_EX_MINIPANEL) ||
+                (Device_Basic_Setting.reg.mini_type == BACNET_ROUTER) ||
 				(Device_Basic_Setting.reg.mini_type == PRODUCT_CM5)
 				
 				)
@@ -2063,7 +2018,7 @@ void CBacnetSetting::OnCbnSelchangeComboBacnetSettingTimeZone()
 	temp_task_info = temp_task_info + temp_string;
 	Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
     Sleep(1000);
-    OnBnClickedButtonBacTest();
+    OnBnClickedButtonRefreshTime();
 }
 
 
@@ -2241,7 +2196,7 @@ void CBacnetSetting::OnBnClickedCheckSettingZoneDaylightTime()
 	Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
 
     Sleep(1000);
-    OnBnClickedButtonBacTest();
+    OnBnClickedButtonRefreshTime();
 }
 
 

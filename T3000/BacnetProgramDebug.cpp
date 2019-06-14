@@ -469,6 +469,11 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 						digital_special_output_count = TINYEX_MINIPANEL_OUT_D;
 						analog_special_output_count = TINYEX_MINIPANEL_OUT_A;
 					}
+                    else if (bacnet_device_type == BACNET_ROUTER)
+                    {
+                        digital_special_output_count = BACNET_ROUTER_OUT_D;
+                        analog_special_output_count = BACNET_ROUTER_OUT_A;
+                    }
 					if(point_number < (digital_special_output_count +analog_special_output_count) )
 					{
 						if(m_Output_data.at(point_number).hw_switch_status == HW_SW_OFF)

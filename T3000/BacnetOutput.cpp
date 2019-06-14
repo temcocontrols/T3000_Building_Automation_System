@@ -411,41 +411,65 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		analog_special_output_count = PWM_TRANSDUCER_OUT_A;
 		Minipanel_device = 0;
 	}
-
-	if((bacnet_device_type == T38AI8AO6DO) ||
-		(bacnet_device_type == PID_T322AI))
-	{
-		OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
-	}
-	else if((bacnet_device_type == PID_T322AI) ||
-		    (bacnet_device_type == PID_T3PT12))
-	{
-		OUTPUT_LIMITE_ITEM_COUNT = 0;
-	}
+    //else if (bacnet_device_type == BACNET_ROUTER)
+    //{
+    //    digital_special_output_count = BACNET_ROUTER_OUT_D;
+    //    analog_special_output_count = BACNET_ROUTER_OUT_A;
+    //    OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
+    //    Minipanel_device = 1;
+    //}
     else if ((bacnet_device_type == STM32_CO2_NET) || (bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_PRESSURE_NET))
     {
         OUTPUT_LIMITE_ITEM_COUNT = 3;
+        Minipanel_device = 0;
     }
-	else if (bacnet_device_type == PM_T3_LC)
-	{
-		OUTPUT_LIMITE_ITEM_COUNT = 8;
-	}
-	else if ((bacnet_device_type == PID_T36CTA))
-	{
-		OUTPUT_LIMITE_ITEM_COUNT = 2;
-	}
-	else if (bacnet_device_type == TINY_EX_MINIPANEL)
-	{
-		//OUTPUT_LIMITE_ITEM_COUNT = 14;
-	}
-    else if (bacnet_device_type == PWM_TRANSDUCER)
+    else if (bacnet_device_type == PM_T3_LC)
     {
-        OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
+        OUTPUT_LIMITE_ITEM_COUNT = 8;
     }
-	else
-	{
-		OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
-	}
+    else if ((bacnet_device_type == PID_T36CTA))
+    {
+        OUTPUT_LIMITE_ITEM_COUNT = 2;
+    }
+    else
+    {
+        OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
+    }
+
+	//if((bacnet_device_type == T38AI8AO6DO) ||
+	//	(bacnet_device_type == PID_T322AI))
+	//{
+	//	OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
+	//}
+	//else if((bacnet_device_type == PID_T322AI) ||
+	//	    (bacnet_device_type == PID_T3PT12))
+	//{
+	//	OUTPUT_LIMITE_ITEM_COUNT = 0;
+	//}
+    //else if ((bacnet_device_type == STM32_CO2_NET) || (bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_PRESSURE_NET))
+    //{
+    //    OUTPUT_LIMITE_ITEM_COUNT = 3;
+    //}
+	//else if (bacnet_device_type == PM_T3_LC)
+	//{
+	//	OUTPUT_LIMITE_ITEM_COUNT = 8;
+	//}
+	//else if ((bacnet_device_type == PID_T36CTA))
+	//{
+	//	OUTPUT_LIMITE_ITEM_COUNT = 2;
+	//}
+	//else if (bacnet_device_type == TINY_EX_MINIPANEL)
+	//{
+	//	//OUTPUT_LIMITE_ITEM_COUNT = 14;
+	//}
+    //else if (bacnet_device_type == PWM_TRANSDUCER)
+    //{
+    //    OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
+    //}
+	//else
+	//{
+	//	OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
+	//}
 
 	int temp_need_show_external = 0;
 	for (int z= 0 ;z < (int)m_Output_data.size();z++)
