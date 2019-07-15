@@ -1313,6 +1313,7 @@ BOOL TFTPServer::StartServer()
 							}
 							else if((m_StrProductName.CompareNoCase(_T("HUMNET")) == 0) ||
 								(m_StrProductName.CompareNoCase(_T("CO2NET")) == 0) ||
+                                (m_StrProductName.CompareNoCase(_T("CO2")) == 0) ||
 								(m_StrProductName.CompareNoCase(_T("PSNET")) == 0))
 							{
 								Sleep(1);

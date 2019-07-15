@@ -3,6 +3,22 @@
 /*
 //使用VS2010 编译需删除 c:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cvtres.exe 来确保用更高版本的 来转换资源文件
 81 0B 00 0C 01 20 FF FF 00 FF 10 08
+
+MSFLXGRD.MSM
+COMCAT.MSM
+拷贝 这两个文件至 2018 打包目录才不至于 打包编译失败
+
+2019 07 11
+1.Fixed program failure caused by lack of .net frame dynamic library files
+2.Fixing remote connection ，unnecessary prompts about IP addresses are not in the same network segment。
+3.Remote connections can now be scanned to subdevices properly。
+4.Devices connected via RS485 can also configure addresses normally.
+5.Unselectable when the device does not support certain ranges。
+6.Add email alarm user interface .(partly completed)
+7.All T3 modules can change bacnet device id.
+8.Fix the value display anomalies caused by coding and decoding errors in programming
+9.Use InstallShield 2018 packaged T3000 applications.
+
 2019 04 29
 1. User can insert more remote point in the "Graphic" user interface.
    Using the standard bacnet keywords "AV,AI,AO,BV,BI,BO" ,format is "Deviceid + Keywords + number"  

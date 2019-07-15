@@ -112,7 +112,7 @@ BOOL COutputSetDlg::OnInitDialog()
 	m_Interlockcombo.ShowWindow(SW_HIDE);//tsta5
 	//m_FlexGrid.put_Cols(TOTAL_OUTCOLS);//tsta5
 	m_FlexGrid.put_Cols(9);	//原来是7 后来加了ON/OFF Time Set,ON/OFFTime left,OFF/ON Time Set OFF/ON Time left 
-	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8)
+	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 		)
 	{
@@ -232,6 +232,7 @@ void COutputSetDlg::Fresh_Grid()
 	case PM_TSTAT6:
     case PM_TSTAT5i:
     case PM_TSTAT8:
+    case PM_TSTAT9:
 	case PM_TSTAT7:
 	case PM_TSTAT8_WIFI:
 	case PM_TSTAT8_OCC:
@@ -298,7 +299,7 @@ void COutputSetDlg::Fresh_Grid()
 		//strTemp=_T("On/Off");
 		nRange=product_register_value[MODBUS_MODE_OUTPUT1+i-1];
 		 
-		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7] == PM_TSTAT5i)
+		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9) ||(product_register_value[7] == PM_TSTAT5i)
 			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 			
 			)
@@ -486,7 +487,7 @@ void COutputSetDlg::Fresh_Grid()
 //----------------------------------------------------------------------------------
 
 	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16 ||m_nModeType==PM_PM5E || m_nModeType == PM_PM5E_ARM
-		||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT8||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE
+		||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT8 || m_nModeType == PM_TSTAT9 ||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE
 		|| (m_nModeType == PM_TSTAT8_WIFI) || (m_nModeType == PM_TSTAT8_OCC) || (m_nModeType == PM_TSTAT7_ARM) || (m_nModeType == PM_TSTAT8_220V)
 		)//||m_nModeType==17||m_nModeType==18)
 	{
@@ -516,7 +517,7 @@ void COutputSetDlg::Fresh_Grid()
 		 
 		{
 			nRange = product_register_value[MODBUS_MODE_OUTPUT4];//283  205
-			if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+			if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 				|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 				)
 			{
@@ -674,7 +675,7 @@ void COutputSetDlg::Fresh_Grid()
 		//nRange=product_register_value[284];
 		//284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
 		nRange = product_register_value[MODBUS_MODE_OUTPUT5];
-		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 			)
 		{
@@ -862,8 +863,15 @@ void COutputSetDlg::Fresh_Grid()
 		//283	205	1	Low byte	W/R	Determine the output4 mode. 0, ON/OFF mode; 1, floating valve for cooling; 2, lighting control; 3, PWM 
 
 		nRange = product_register_value[MODBUS_MODE_OUTPUT4]; //283  205
-		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
-			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
+		if((product_register_value[7] == PM_TSTAT6)||
+            (product_register_value[7] == PM_TSTAT7)||
+            (product_register_value[7] == PM_TSTAT5i)||
+            product_register_value[7] == PM_TSTAT8 || 
+            product_register_value[7] == PM_TSTAT9 || 
+             (product_register_value[7] == PM_TSTAT8_WIFI) || 
+                (product_register_value[7] == PM_TSTAT8_OCC) || 
+                (product_register_value[7] == PM_TSTAT7_ARM) || 
+                (product_register_value[7] == PM_TSTAT8_220V)
 			)
 		{if(nRange>=0&&nRange<=3)
 		{
@@ -904,7 +912,7 @@ void COutputSetDlg::Fresh_Grid()
 		{
 			int indext=-1;
 			//336	269	1	Low byte	W/R	Output4 function setting (see above)
-			if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+			if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 				|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 				)
 			{
@@ -926,7 +934,7 @@ void COutputSetDlg::Fresh_Grid()
 		//284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
 
 		////337	270	1	Low byte	W/R	Output5 function setting (see above)
-        if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+        if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 			)
         {
@@ -938,7 +946,7 @@ void COutputSetDlg::Fresh_Grid()
 		//108	209	1	Low byte	W/R	Output1 tot 5, bit 0 thru 4 = relay 1 thru 5.
 
 		nValue1 = product_register_value[MODBUS_DIGITAL_OUTPUT_STATUS];//108   209
-		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 			)
 		{
@@ -1014,7 +1022,7 @@ void COutputSetDlg::Fresh_Grid()
 
 
 		nRange = product_register_value[MODBUS_MODE_OUTPUT5];  //284  206
-		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 			)
 		{
@@ -1058,7 +1066,7 @@ void COutputSetDlg::Fresh_Grid()
 			//337	270	1	Low byte	W/R	Output5 function setting (see above)
 
 			int indext=-1;
-			if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+			if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 				|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 				)
 			{
@@ -1081,7 +1089,7 @@ void COutputSetDlg::Fresh_Grid()
 	}
 	//row45/67 ANALOG
 	if ((m_nModeType==1||m_nModeType==3||m_nModeType==2)||m_nModeType==12||m_nModeType==16||m_nModeType==PM_PM5E || m_nModeType == PM_PM5E_ARM ||m_nModeType==PM_PRESSURE
-		||m_nModeType==18||m_nModeType==6||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8||m_nModeType==7
+		||m_nModeType==18||m_nModeType==6||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8 || m_nModeType == PM_TSTAT9 ||m_nModeType==7
 		
 		|| (m_nModeType == PM_TSTAT8_WIFI) || (m_nModeType == PM_TSTAT8_OCC) || (m_nModeType == PM_TSTAT7_ARM) || (m_nModeType == PM_TSTAT8_220V)
 		
@@ -1271,7 +1279,7 @@ else
 			{
 				float nvalue=0.0;
 				//if (product_register_value[7] == 6)
-				if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+				if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 					|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 					)
 				{
@@ -1381,7 +1389,7 @@ else
 					//strTemp.Format(_T("%.1f"),nValue/100.0);
 					float nvalue=0.0;
 					 
-					if ((product_register_value[7] == 6)||(product_register_value[7] == 7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+					if ((product_register_value[7] == 6)||(product_register_value[7] == 7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 						|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 						)
 					{
@@ -1489,7 +1497,7 @@ else
 	CString strlock;
 	int stradd;// = 286;
 	//if (product_register_value[7] == 6)
-	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 		)
 	{
@@ -1523,7 +1531,7 @@ else
 	
 	//Delay
 	
-	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 
 		)
@@ -1563,7 +1571,7 @@ else
 	}
 	
 	
-	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 		)
 	{
@@ -1610,7 +1618,7 @@ else
 	}
 
 	///////////////////////////////////////重现写Range//////////////////////////
-	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8
+	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8 || product_register_value[7] == PM_TSTAT9
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 		)
 	{
@@ -4938,7 +4946,7 @@ void COutputSetDlg::ClickMsflexgrid1()
 	*/
 
  #if 1//Tstat67
-	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 
 		)
@@ -5106,7 +5114,7 @@ void COutputSetDlg::ClickMsflexgrid1()
 			//	for(int i=0;i<2;i++)
 			 
 
-			if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+			if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 				|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 				)
 			{
@@ -5951,7 +5959,7 @@ void COutputSetDlg::OnCbnSelchangeOvaluecombo()
 
 	//BCDE;
 	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16  ||m_nModeType==PM_PM5E || m_nModeType == PM_PM5E_ARM
-		||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8||m_nModeType==PM_PRESSURE
+		||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8 || m_nModeType == PM_TSTAT9 ||m_nModeType==PM_PRESSURE
 		|| (m_nModeType == PM_TSTAT8_WIFI) || (m_nModeType == PM_TSTAT8_OCC) || (m_nModeType == PM_TSTAT7_ARM) || (m_nModeType == PM_TSTAT8_220V)
 		) 
 	{
@@ -6107,7 +6115,7 @@ void COutputSetDlg::OnCbnSelchangeOvaluecombo()
 
 	//DEG:out6/out7:
 	//186	207	1	Low byte	W/R	Analog Output1 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V 
-	if(m_nModeType==12||m_nModeType==16||m_nModeType==18||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8
+	if(m_nModeType==12||m_nModeType==16||m_nModeType==18||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8 || m_nModeType == PM_TSTAT9
 		|| (m_nModeType == PM_TSTAT8_WIFI) || (m_nModeType == PM_TSTAT8_OCC) || (m_nModeType == PM_TSTAT7_ARM) || (m_nModeType == PM_TSTAT8_220V)
 		||m_nModeType==PM_TSTAT7 ||m_nModeType==PM_PRESSURE)
 	{
@@ -6220,7 +6228,7 @@ void COutputSetDlg::OnCbnSelchangeOamcombo()
 
 	//4,5
 	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16||m_nModeType==PM_PM5E|| m_nModeType == PM_PM5E_ARM || m_nModeType==17
-		||m_nModeType==18||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8
+		||m_nModeType==18||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8 || m_nModeType == PM_TSTAT9
 		|| (m_nModeType == PM_TSTAT8_WIFI) || (m_nModeType == PM_TSTAT8_OCC) || (m_nModeType == PM_TSTAT7_ARM) || (m_nModeType == PM_TSTAT8_220V) 
 		||m_nModeType==PM_PRESSURE)
 	{
@@ -6295,7 +6303,7 @@ void COutputSetDlg::OnCbnSelchangeOamcombo()
 
 	//6.7
 	if(m_nModeType==12||m_nModeType==16||m_nModeType==18||m_nModeType==PM_PM5E || m_nModeType == PM_PM5E_ARM
-		||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8
+		||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8 || m_nModeType == PM_TSTAT9
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V) 
 		||m_nModeType==PM_PRESSURE)
 	{
@@ -7263,7 +7271,7 @@ void COutputSetDlg::OnCbnSelchangeOfuncombo()
 void COutputSetDlg::OnEnKillfocusValueedit()
 {
 	BeginWaitCursor();
-	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 		)
 	{
@@ -7418,7 +7426,7 @@ void COutputSetDlg::OnEnKillfocusValueedit()
 			}
 
 		}
-		if(m_nModeType==12||(m_nModeType==16||m_nModeType==PM_PM5E || m_nModeType == PM_PM5E_ARM)||(m_nModeType==18)||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT5i ||m_nModeType==PM_TSTAT8
+		if(m_nModeType==12||(m_nModeType==16||m_nModeType==PM_PM5E || m_nModeType == PM_PM5E_ARM)||(m_nModeType==18)||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT5i ||m_nModeType==PM_TSTAT8 || m_nModeType == PM_TSTAT9
 			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 
 			||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE)

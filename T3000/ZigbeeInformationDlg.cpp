@@ -44,7 +44,7 @@ BOOL CZigbeeInformationDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	CString strTemp;
-	if ((product_register_value[7] == PM_TSTAT6 || product_register_value[7] == PM_TSTAT8
+	if ((product_register_value[7] == PM_TSTAT6 || product_register_value[7] == PM_TSTAT8 || product_register_value[7] == PM_TSTAT9
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 		) )
 	{

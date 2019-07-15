@@ -543,7 +543,7 @@ struct refresh_net_device
 	CString NetCard_Address;
 	CString show_label_name;
 	unsigned short bacnetip_port;
-    int zigbee_exsit;
+    int hardware_info;     //bit  0x74 zigbee   bit1 wifi
     int nprotocol;
 };
 
@@ -967,7 +967,7 @@ const CString Sys_Tstat_Mode_Name[] =
 const CString Device_Serial_Port_Status[] =
 {
 	_T("Unused"),
-	_T("MSTP Slave"),
+	_T("MSTP Slave"),       //1
 	_T("Modbus Slave"),
 	_T("Bacnet PTP"),
 	_T("GSM"),
@@ -975,7 +975,7 @@ const CString Device_Serial_Port_Status[] =
 	_T("Sub Zigbee"),
 	_T("Modbus Master"),
 	_T("RS232 Meter"),
-	_T("MSTP Master")
+	_T("MSTP Master")       // 9
 };
 
 
@@ -2001,7 +2001,7 @@ typedef union
 		UCHAR object_instance_3;
 		UCHAR isp_mode;  //非0 在isp mode   , 0 在应用代码;    第60个字节
 		USHORT bacnetip_port;	//bacnet 的端口号;
-		UCHAR  zigbee_exsit;	// 1 代表有zigbee模块;
+		UCHAR  hardware_info;	//  //bit0 zigbee   bit1 wifi
         UCHAR  subnet_protocol;   //0 旧的 modbus   12 ： PROTOCOL_BIP_T0_MSTP_TO_MODBUS
 	}reg;
 }Str_UPD_SCAN;
@@ -2121,3 +2121,6 @@ typedef struct
     int nbaudrate;
 }connect_Info;
 #pragma endregion
+
+
+#define CHELSEA_TEST  0

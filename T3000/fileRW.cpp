@@ -1477,7 +1477,7 @@ void delay_time_write(wofstream & out)
 	//used by save2file functiojn
 	int rows;
 	int nFlag = product_register_value[7];
-	if ((product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT6)||(product_register_value[7]== PM_TSTAT7)||(product_register_value[7]== PM_TSTAT8)
+	if ((product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT6)||(product_register_value[7]== PM_TSTAT7)||(product_register_value[7]== PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 		|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
 	{
 	  rows=7;
@@ -1530,7 +1530,7 @@ void delay_time_write_Tstat67(wofstream & out)
 	//used by save2file functiojn
 	int nFlag = product_register_value[7];
 	int rows;
-	if ((product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT6)||(product_register_value[7]== PM_TSTAT7)||(product_register_value[7]== PM_TSTAT8)
+	if ((product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT6)||(product_register_value[7]== PM_TSTAT7)||(product_register_value[7]== PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 		|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
 	{
 		rows=7;
@@ -3251,7 +3251,7 @@ void get_delay_setting_line_value(TCHAR *buf,int array[7])
 void get_delay_setting(wifstream & inf,int value_setting[14])
 {    int rows=5;
 int nFlag = product_register_value[7];
-    if ((product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT6)||(product_register_value[7]== PM_TSTAT7)||(product_register_value[7]== PM_TSTAT8)
+    if ((product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT6)||(product_register_value[7]== PM_TSTAT7)||(product_register_value[7]== PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 		|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
         rows=7;
 	TCHAR buf[1024];
@@ -3763,7 +3763,8 @@ void get_write_var_line_input_output(TCHAR *buf,float tstat_version,int inputno,
 	    
 		int Model_ID=read_one(now_tstat_id,7,5);
 		int nFlag = Model_ID;
-	if ((Model_ID==PM_TSTAT5G)||(Model_ID==PM_TSTAT5E)||(Model_ID==PM_PM5E) || (Model_ID == PM_PM5E_ARM)  ||(Model_ID==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT5i)||(Model_ID==PM_TSTAT7)||(Model_ID==PM_TSTAT8)
+	if ((Model_ID==PM_TSTAT5G)||(Model_ID==PM_TSTAT5E)||(Model_ID==PM_PM5E) || (Model_ID == PM_PM5E_ARM)  ||
+        (Model_ID==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT5i)||(Model_ID==PM_TSTAT7)||(Model_ID==PM_TSTAT8) || (Model_ID == PM_TSTAT9)
 		|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
 	{
 		strText.TrimRight();
@@ -4059,7 +4060,9 @@ void get_write_var_line_output(TCHAR *buf,float tstat_version,int outputno,CStdi
 		 int Model_ID =read_one(now_tstat_id,7,5);
 		if(Model_ID>0)
 		{  
-			if ((Model_ID == PM_TSTAT5G) || (Model_ID == PM_TSTAT5E) || (Model_ID == PM_PM5E) || (Model_ID == PM_PM5E_ARM) || (Model_ID == PM_TSTAT6) || (product_register_value[7] == PM_TSTAT5i) || (Model_ID == PM_TSTAT7) || (Model_ID == PM_TSTAT8)
+			if ((Model_ID == PM_TSTAT5G) || (Model_ID == PM_TSTAT5E) || (Model_ID == PM_PM5E) || (Model_ID == PM_PM5E_ARM) || 
+                (Model_ID == PM_TSTAT6) || (product_register_value[7] == PM_TSTAT5i) || (Model_ID == PM_TSTAT7) || 
+                (Model_ID == PM_TSTAT8) || (Model_ID == PM_TSTAT9)
 				|| (Model_ID == PM_TSTAT8_WIFI) || (Model_ID == PM_TSTAT8_OCC) || (Model_ID == PM_TSTAT7_ARM) || (Model_ID == PM_TSTAT8_220V))
 			{
 				strText.TrimRight();
@@ -4654,7 +4657,8 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 		{
 			int nFlag = product_register_value[7];
 			int rows;
-		    if ((product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT6)||(product_register_value[7]== PM_TSTAT7)||(product_register_value[7]== PM_TSTAT8)
+		    if ((product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT6)||(product_register_value[7]== PM_TSTAT7)||
+                (product_register_value[7]== PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 				|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
 		    {
 			rows=7;
@@ -7602,6 +7606,7 @@ _Twrite_to_file_a_line(out,_T("//Input Name Config"));//space
             m_inRows=12;
         }break;
     case PM_TSTAT8:
+    case PM_TSTAT9:
         {
             m_outRows=8;
             m_inRows=12;

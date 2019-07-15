@@ -77,6 +77,7 @@ typedef enum {
 		 READ_REMOTE_POINT         = 40,
          READ_SCHEDUAL_TIME_FLAG   = 41,
          READ_MSV_COMMAND          = 42,
+         READ_EMAIL_ALARM          = 43,
 
 		 WRITEOUTPUT_T3000         = 100+ENUM_OUT+1,  /* write outputs          */
 		 WRITEINPUT_T3000          = 100+ENUM_IN+1,   /* write inputs           */
@@ -132,6 +133,7 @@ typedef enum {
 		 WRITE_REMOTE_POINT         = 140,
          WRITE_SCHEDUAL_TIME_FLAG   = 141,
          WRITE_MSV_COMMAND          = 142,
+         WRITE_EMAIL_ALARM           = 143,
          WRITE_NEW_TIME_COMMAND     = 188,  //2018 04 17 新的写时间命令
 		 WRITE_AT_COMMAND			= 190,	//100 length
 		 WRITE_GRPHIC_LABEL_COMMAND  = 191,
@@ -188,6 +190,24 @@ typedef enum {
 
 #pragma pack(push) //保存对齐状态 
 #pragma pack(1)
+
+
+typedef union
+{
+    uint8_t all[400];
+    struct
+    {
+        unsigned char smtp_type;  //  0   ipaddress   // 1   domain
+        unsigned char smtp_ip[4];
+        char smtp_domain[40];
+        unsigned short smtp_port;
+        char email_address[60];
+        char user_name[60];
+        char password[20];
+        char secure_connection_type;  //0 -NULL   1-SSL   2-TLS
+    }reg;
+}Str_Email_point;
+
 
 typedef union
 {
@@ -835,6 +855,8 @@ typedef union
          unsigned char mstp_id;         //MSTP_ID
          unsigned short zigbee_panid;
          unsigned char max_master; //可设置的最大matser值  245 个
+         unsigned char special_flag; // bit 0  代表是否支持 PT1K snesor 0 不支持 1支持;
+                                     // bit 1 PT100
 	}reg;
 }Str_Setting_Info;
 

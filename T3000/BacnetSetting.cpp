@@ -17,6 +17,7 @@
 #include "ping.h"
 #include "ShowMessageDlg.h"
 #include "BacnetTstatSchedule.h"
+#include "BacnetRemotePortWarning.h"
 // CBacnetSetting dialog
 extern HTREEITEM  hTreeItem_retry;
 extern bool cancle_send ;
@@ -80,9 +81,9 @@ BEGIN_MESSAGE_MAP(CBacnetSetting, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_BAC_IP_CHANGED, &CBacnetSetting::OnBnClickedBtnBacIPChange)
 	ON_WM_TIMER()
 	ON_MESSAGE(MY_RESUME_DATA, ResumeMessageCallBack)
-	ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_COM0, &CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom0)
+	ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_COM0, &CBacnetSetting::OnCbnSelchangeComboBacnetSettingSubCom)
 	ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_COM1, &CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom1)
-	ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_COM2, &CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom2)
+	ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_COM2, &CBacnetSetting::OnCbnSelchangeComboBacnetSettingMainCom)
 	ON_BN_CLICKED(IDC_BUTTON_SETTING_LDF, &CBacnetSetting::OnBnClickedButtonSettingLdf)
 	ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_BAUDRATE0, &CBacnetSetting::OnCbnSelchangeComboBacnetSettingBaudrate0)
 	ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_BAUDRATE1, &CBacnetSetting::OnCbnSelchangeComboBacnetSettingBaudrate1)
@@ -374,7 +375,7 @@ void CBacnetSetting::OnBnClickedBtnBacIPChange()
     ((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->GetAddress(address1, address2, address3, address4);
     ((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->GetAddress(subnet1, subnet2, subnet3, subnet4);
     ((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->GetAddress(gatway1, gatway2, gatway3, gatway4);
-
+    bool ip_change_flag = false;
 
 
     CString strIP;
@@ -412,14 +413,41 @@ void CBacnetSetting::OnBnClickedBtnBacIPChange()
         Device_Basic_Setting.reg.tcp_type = 0;
     else
         Device_Basic_Setting.reg.tcp_type = 1;
-
-    if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
+    if (g_protocol == MODBUS_RS485)  //  若是Modbus 485 的协议
     {
-        CString temp_task_info;
-        temp_task_info.Format(_T("Change IP Address Information Timeout!"));
-        MessageBox(temp_task_info);
+        int test_value1 = 0;
+        int test_value2 = 0;
+        unsigned short write_buffer[200];
+        memset(write_buffer, 0, 400);
+        memcpy(write_buffer, &Device_Basic_Setting, sizeof(Str_Setting_Info));
+        for (int j = 0;j < 200;j++)
+        {
+            write_buffer[j] = htons(write_buffer[j]);
+        }
+        test_value1 = Write_Multi_org_short(g_tstat_id, write_buffer, BAC_SETTING_START_REG , 100, 4);
+
+        test_value2 = Write_Multi_org_short(g_tstat_id, &write_buffer[100], BAC_SETTING_START_REG+100, 100, 4);
+        if ((test_value1 >= 0) && (test_value2 >= 0))
+        {
+            ip_change_flag = true;
+        }
     }
     else
+    {
+        if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
+        {
+            CString temp_task_info;
+            temp_task_info.Format(_T("Change IP Address Information Timeout!"));
+            MessageBox(temp_task_info);
+        }
+        else
+        {
+            ip_change_flag = true;
+
+        }
+    }
+
+    if (ip_change_flag)
     {
         //在Ip 修改成功后 更新数据库;
         m_tcp_type = Device_Basic_Setting.reg.tcp_type;
@@ -457,7 +485,11 @@ void CBacnetSetting::OnBnClickedBtnBacIPChange()
                 break;
             }
         }
-
+        if (g_protocol == MODBUS_RS485)
+        {
+            MessageBox(_T("IP Address configured successfully!"));
+            return;
+        }
 
         CShowMessageDlg dlg;
 
@@ -471,8 +503,8 @@ void CBacnetSetting::OnBnClickedBtnBacIPChange()
         dlg.DoModal();
 
         return;
-
     }
+
     //m_reboot_time_left = 10;
     //SetTimer(TIMER_IP_CHANGED_RECONNECT, 1000, NULL);
 
@@ -1441,7 +1473,7 @@ LRESULT  CBacnetSetting::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
 
 
 
-void CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom0()
+void CBacnetSetting::OnCbnSelchangeComboBacnetSettingSubCom()
 {
 	
 	UpdateData();
@@ -1485,9 +1517,9 @@ void CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom1()
 }
 
 
-void CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom2()
+void CBacnetSetting::OnCbnSelchangeComboBacnetSettingMainCom()
 {
-	
+    unsigned char temp_main_value = Device_Basic_Setting.reg.com2_config;
 
 	CString temp_string;
 	int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->GetCurSel();	
@@ -1500,6 +1532,21 @@ void CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom2()
 			break;
 		}
 	}
+
+#if 0    //暂时屏蔽     以后在客户升级许多次 后 在  禁止许 Asix 改;
+    if (Device_Basic_Setting.reg.panel_type == PM_MINIPANEL)
+    {
+        if ((Device_Basic_Setting.reg.com2_config == 1) ||
+            (Device_Basic_Setting.reg.com2_config == 9))
+        {
+            CBacnetRemotePortWarning Dlg;
+            Dlg.SetWindowType(MESSAGE_ASIX_MAINPORT);
+            Dlg.DoModal();
+            return;
+        }
+    }
+#endif
+
 	CString temp_task_info;
 	temp_task_info.Format(_T("Change serial port 2 "));
 	Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
@@ -2072,10 +2119,10 @@ void CBacnetSetting::OnEnKillfocusEditSettingPort()
 
 void CBacnetSetting::OnBnClickedButtonHealth()
 {
-#ifdef DEBUG
-    ShutDownMstpGlobal(5);
-    return;
-#endif // DEBUG
+//#ifdef DEBUG
+//    ShutDownMstpGlobal(5);
+//    return;
+//#endif // DEBUG
 
 
 	GetPrivateData_Blocking(g_bac_instance,READ_MISC,0,0,sizeof(Str_MISC));

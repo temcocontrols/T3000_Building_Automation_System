@@ -44,9 +44,9 @@ public:
 	//afx_msg void OnBnClickedButtonResetTcpip();
 	LRESULT  ResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
 	//afx_msg void OnBnClickedButtonEraseFlash();
-	afx_msg void OnCbnSelchangeComboBacnetSettingCom0();
+	afx_msg void OnCbnSelchangeComboBacnetSettingSubCom();
 	afx_msg void OnCbnSelchangeComboBacnetSettingCom1();
-	afx_msg void OnCbnSelchangeComboBacnetSettingCom2();
+	afx_msg void OnCbnSelchangeComboBacnetSettingMainCom();
 	CComboBox m_device_com0;
 	virtual void OnCancel();
 	afx_msg void OnBnClickedButtonSettingLdf();

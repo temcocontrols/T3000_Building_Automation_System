@@ -52,6 +52,7 @@
 #define PM_CM5                        50
 #define PM_PM5E_ARM                   51   //2019 03 18 由老款5964芯片移植过来
 #define STM32_PM25                    52
+#define PM_TSTAT9                     59   //2019 06 20 
 #define PM_TSTAT_AQ                   62   //TSTAT AQ 没有各种控制 输入输出的版本; 
 #define PM_ZIGBEE_REPEATER            63   //zigbee的中继器
 #define PM_TSTAT6_HUM_Chamber         64

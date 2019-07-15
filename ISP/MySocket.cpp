@@ -147,6 +147,7 @@ void MySocket::OnReceive(int nErrorCode)
 						((DeviceProductName.CompareNoCase(_T("Minipanel")) == 0) && (FileProductName.CompareNoCase(_T("MINI")) == 0 ))  ||
                         ((DeviceProductName.CompareNoCase(_T("CO2NET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0)) ||  // 2018 0307 有人把 CO2NET 改为CO2ALL了，导致匹配不到，无法烧写.为了兼容，加特例.
                         ((DeviceProductName.CompareNoCase(_T("UMNET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0)) ||
+                        ((DeviceProductName.CompareNoCase(_T("CO2")) == 0) && (FileProductName.CompareNoCase(_T("CO2 NET")) == 0)) ||
                         ((DeviceProductName.CompareNoCase(_T("PSNET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0)))
 					{
 
@@ -230,6 +231,7 @@ void MySocket::OnReceive(int nErrorCode)
 						((DeviceProductName.CompareNoCase(_T("Minipanel")) == 0) && (FileProductName.CompareNoCase(_T("MINI")) == 0))  ||
                         ((DeviceProductName.CompareNoCase(_T("CO2NET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0)) ||  //特殊情况加入的.
                         ((DeviceProductName.CompareNoCase(_T("UMNET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0))  ||
+                        ((DeviceProductName.CompareNoCase(_T("CO2")) == 0) && (FileProductName.CompareNoCase(_T("CO2 NET")) == 0)) ||
                         ((DeviceProductName.CompareNoCase(_T("PSNET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0)))
 					{
 						ISP_STEP =ISP_Send_TFTP_PAKAGE;

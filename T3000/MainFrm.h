@@ -129,7 +129,7 @@ typedef struct _tree_product//////////////////////
     int product_id;
     float software_version;
     float hardware_version;
-    int nEPsize;
+    int nhardware_info;
     CString strImgPathName;
     int protocol;
     unsigned int ncomport;

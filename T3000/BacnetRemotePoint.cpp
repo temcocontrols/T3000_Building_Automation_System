@@ -332,7 +332,7 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 
 		CString temp_description;
 		unsigned char nFlag = m_remote_point_data.at(i).product_id;
-		if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT5i)|| (nFlag == PM_TSTAT8) )
+		if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT5i)|| (nFlag == PM_TSTAT8) || (nFlag == PM_TSTAT9))
 		{
 			MultiByteToWideChar( CP_ACP, 0, (char *)TSTAT_6_ADDRESS[dev_reg].AddressName,(int)strlen((char *)TSTAT_6_ADDRESS[dev_reg].AddressName)+1, temp_description.GetBuffer(MAX_PATH), MAX_PATH );
 			temp_description.ReleaseBuffer();	

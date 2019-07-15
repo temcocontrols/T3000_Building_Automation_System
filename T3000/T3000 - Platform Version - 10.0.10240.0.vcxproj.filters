@@ -726,6 +726,9 @@
     <ClCompile Include="TstatAQ.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BacnetEmailAlarm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ApplyDisable.bmp">
@@ -1871,6 +1874,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TstatAQ.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetEmailAlarm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
