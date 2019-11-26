@@ -438,7 +438,7 @@ DWORD WINAPI   CTStatScanner::ScanTCPSubPortThreadNoCritical(LPVOID lpVoid)
 
                 if (sub_com == 1)
                 {
-                    if (m_T3BB_device_data.at(ncount).zigbee_exsit != 1)
+                    if ((m_T3BB_device_data.at(ncount).hardware_info & 0x02) != 2)
                     {
                         break;
                     }
@@ -2133,7 +2133,7 @@ int CTStatScanner::AddNCToList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	temp_data.reg.isp_mode = *(my_temp_point++);	//isp_mode = 0 表示在应用代码 ，非0 表示在bootload.
     temp_data.reg.bacnetip_port = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
     my_temp_point = my_temp_point + 2;
-    temp_data.reg.zigbee_exsit = *(my_temp_point++);
+    temp_data.reg.hardware_info = *(my_temp_point++);
     temp_data.reg.subnet_protocol = *(my_temp_point++);
 
     if (temp_data.reg.subnet_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)
@@ -3506,7 +3506,7 @@ void CTStatScanner::WriteOneDevInfoToDB( _ComDeviceInfo* pInfo)
         strBaudRate=pInfo->m_tstatip;
         strCom=pInfo->m_tstatport;
     }
-    if (nClassID == PM_TSTAT6||nClassID == PM_TSTAT7||nClassID == PM_TSTAT8
+    if (nClassID == PM_TSTAT6||nClassID == PM_TSTAT7||nClassID == PM_TSTAT8 || nClassID == PM_TSTAT9
 		|| (nClassID == PM_TSTAT8_WIFI) || (nClassID == PM_TSTAT8_OCC) || (nClassID == PM_TSTAT7_ARM) || (nClassID == PM_TSTAT8_220V)
 		||nClassID == PM_TSTAT5i
             ||nClassID == PM_HUMTEMPSENSOR||nClassID ==PM_AirQuality||nClassID ==PM_HUM_R||nClassID == PM_CO2_RS485||nClassID == PM_CO2_NODE)

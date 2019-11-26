@@ -68,11 +68,33 @@ void CTstatAQ::Fresh()
     //将图片设置到Picture控件上  
     p->SetBitmap(bitmap);
 
+
+
+
+
     CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
     pFrame->SetWindowTextW(_T("T3000 Building Automation System") + CurrentT3000Version);
     if (h_tstat_aq_thread == NULL)
         h_tstat_aq_thread = CreateThread(NULL, NULL, Update_TstatAQ_Thread, this, NULL, NULL);
     UpdateUI();
+
+
+    CString sound_full_path;
+    CStatic* pWnd_sound_pic = (CStatic*)GetDlgItem(IDC_STATIC_SOUND); // 得到 Picture Control 句柄 ;
+    if(product_register_value[TSTAT_AQ_SOUND] <= 10)
+        sound_full_path = ApplicationFolder + _T("\\ResourceFile\\Icon\\sound_0.ico");
+    else if (product_register_value[TSTAT_AQ_SOUND] <= 30)
+        sound_full_path = ApplicationFolder + _T("\\ResourceFile\\Icon\\sound_1.ico");
+    else if (product_register_value[TSTAT_AQ_SOUND] <= 50)
+        sound_full_path = ApplicationFolder + _T("\\ResourceFile\\Icon\\sound_2.ico");
+    else 
+        sound_full_path = ApplicationFolder + _T("\\ResourceFile\\Icon\\sound_3.ico");
+    Bitmap icon_bitmap(sound_full_path);
+    HICON m_hIcon = ExtractIcon(AfxGetInstanceHandle(), sound_full_path,0);
+    pWnd_sound_pic->ModifyStyle(0, SS_ICON | SS_CENTERIMAGE);
+    pWnd_sound_pic->SetIcon(m_hIcon);
+
+   
 
 }
 
@@ -90,11 +112,19 @@ void CTstatAQ::UpdateUI()
     CString cs_AQ;
     cs_AQ.Format(_T("%d"), product_register_value[TSTAT_AQ_AQ]);
 
+    CString cs_light;
+    cs_light.Format(_T("%u"), product_register_value[TSTAT_AQ_LIGHT]);
+
+    CString cs_sound;
+    cs_sound.Format(_T("%u"), product_register_value[TSTAT_AQ_SOUND]);
+
+
     GetDlgItem(IDC_STATIC_TEMPERATURE_VALUE)->SetWindowTextW(cs_temp);
     GetDlgItem(IDC_STATIC_HUM_VALUE)->SetWindowTextW(cs_hum);
     GetDlgItem(IDC_STATIC_CO2_VALUE)->SetWindowTextW(cs_ppm);
     GetDlgItem(IDC_STATIC_AQ_VALUE)->SetWindowTextW(cs_AQ);
-
+    GetDlgItem(IDC_STATIC_LIGHT_VALUE)->SetWindowTextW(cs_light);
+    GetDlgItem(IDC_STATIC_SOUND_VALUE)->SetWindowTextW(cs_sound);
     CString cs_weight_pm1;
     if (product_register_value[TSTAT_AQ_WEIGHT_1] != 0)
         cs_weight_pm1.Format(_T("%u"), product_register_value[TSTAT_AQ_WEIGHT_1]);

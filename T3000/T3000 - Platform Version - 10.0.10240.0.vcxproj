@@ -163,6 +163,7 @@
     <ClCompile Include="BacnetController.cpp" />
     <ClCompile Include="BacnetCustomerDigitalRange.cpp" />
     <ClCompile Include="BacnetEditLabel.cpp" />
+    <ClCompile Include="BacnetEmailAlarm.cpp" />
     <ClCompile Include="BacnetGraphic.cpp" />
     <ClCompile Include="BacnetGraphicSetting.cpp" />
     <ClCompile Include="BacnetInput.cpp" />
@@ -509,6 +510,7 @@
     <ClInclude Include="BacnetATCommand.h" />
     <ClInclude Include="BacnetCustomerDigitalRange.h" />
     <ClInclude Include="BacnetEditLabel.h" />
+    <ClInclude Include="BacnetEmailAlarm.h" />
     <ClInclude Include="BacnetGraphic.h" />
     <ClInclude Include="BacnetGraphicSetting.h" />
     <ClInclude Include="BacnetInput.h" />

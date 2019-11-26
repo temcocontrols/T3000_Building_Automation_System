@@ -242,7 +242,7 @@ void AnnualRout_InsertDia::load()
 		int nFlag = product_register_value[7];
 		if (m_strtype.CompareNoCase(_T("Lightingcontroller")) == 0)
 			Read_Multi(g_tstat_id, the_days, 5752 + ONE_YEAR_BETYS*(m_addr - 1), ONE_YEAR_BETYS);//get from network
-		else if (product_register_value[7] == PM_TSTAT8 || (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
+		else if (product_register_value[7] == PM_TSTAT8 || product_register_value[7] == PM_TSTAT9 || (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
 		{
 
 			Read_Multi(g_tstat_id, the_days, 925, ONE_YEAR_BETYS);
@@ -382,7 +382,7 @@ BOOL AnnualRout_InsertDia::OnInitDialog()
 
 
 		}
-		else if ((product_register_value[7] == PM_TSTAT8) || (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
+		else if ((product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9) || (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
 		{
 			GetDlgItem(IDC_LIST1)->ShowWindow(0);
 			GetDlgItem(IDC_YEARSTATIC)->ShowWindow(0);
@@ -740,33 +740,6 @@ void AnnualRout_InsertDia::OnAnnualroutAdd()
 	
 	UpdateData(true);
 	
-	//CString str;
-	//str.Format(_T("%d-%d"),m_date_time.GetMonth(),m_date_time.GetDay());
-	//int day_number=the_day_number(str);
-	//int l=1,m;
-	//int address_offset = day_number / 8;
-	//m=day_number%8;//bit day
-	//for(int j=0;j<m;j++)
-	//	l*=2;
-	//the_days[day_number/8]=the_days[day_number/8] ^ l;//Òì»ò¡£
-	//if (product_register_value[7] == PM_TSTAT8)
-	//{
-	//	int ret = write_one(g_tstat_id, 918 + address_offset, the_days[address_offset]);
-	//} 
-	//else
-	//{
-	//	unsigned char ttt[ONE_YEAR_BETYS];
-	//	for (int i = 0; i < ONE_YEAR_BETYS; i++)
-	//		ttt[i] = (unsigned char)the_days[i];
-	//	if (m_strtype.CompareNoCase(_T("Lightingcontroller")) == 0)
-	//		Write_Multi(g_tstat_id, ttt, 5752 + ONE_YEAR_BETYS*(m_addr - 1), ONE_YEAR_BETYS);
-	//	else
-	//		Write_Multi(g_tstat_id, ttt, MODBUS_AR_TIME_FIRST + ONE_YEAR_BETYS*(m_addr - 1), ONE_YEAR_BETYS);
-	//}
-	//
-
-	//NET_WORK_SLEEP_BETWEEN_WRITE_READ
-	//load();
 	
 }
 
@@ -992,7 +965,7 @@ void AnnualRout_InsertDia::OnMcnSelectBacMonthcalendar(NMHDR *pNMHDR, LRESULT *p
 #endif
 
 
-			if ((product_register_value[7] == PM_TSTAT8) || (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
+			if ((product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9) || (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
 			{
                 //int address_offset = 0;
                 //unsigned short nvalue = 0;

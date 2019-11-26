@@ -493,6 +493,7 @@ void CT3000View::Fresh()
     m_nID=product_register_value[6];
 
 	if (product_register_value[7] == PM_TSTAT5i || (  product_register_value[7] == PM_TSTAT8
+        || product_register_value[7] == PM_TSTAT9
 		|| product_register_value[7] == PM_TSTAT8_WIFI
 		|| product_register_value[7] == PM_TSTAT8_OCC
 		|| product_register_value[7] == PM_TSTAT7_ARM
@@ -1082,7 +1083,9 @@ void CT3000View::Fresh_In()
     CString strTemp;
     strTemp.Empty();
     if( nModel==2||nModel==1||nModel==4||nModel==PM_TSTAT5D||nModel==17||nModel==18
-		|| nModel == 3 || nModel == PM_TSTAT6 || nModel == PM_TSTAT5i || nModel == PM_TSTAT7 || ( product_register_value[7] == PM_TSTAT8
+		|| nModel == 3 || nModel == PM_TSTAT6 || nModel == PM_TSTAT5i || nModel == PM_TSTAT7 || 
+        ( product_register_value[7] == PM_TSTAT8
+            || product_register_value[7] == PM_TSTAT9
 			|| product_register_value[7] == PM_TSTAT8_WIFI
 			|| product_register_value[7] == PM_TSTAT8_OCC
 			|| product_register_value[7] == PM_TSTAT7_ARM
@@ -1423,7 +1426,9 @@ void CT3000View::Fresh_In()
 
 
 
-	if (nModel == PM_TSTAT6 || nModel == PM_TSTAT7 || (  product_register_value[7] == PM_TSTAT8
+	if (nModel == PM_TSTAT6 || nModel == PM_TSTAT7 || 
+        (  product_register_value[7] == PM_TSTAT8
+            || product_register_value[7] == PM_TSTAT9
 		|| product_register_value[7] == PM_TSTAT8_WIFI
 		|| product_register_value[7] == PM_TSTAT8_OCC
 		|| product_register_value[7] == PM_TSTAT7_ARM
@@ -1805,7 +1810,7 @@ void CT3000View::Fresh_Out()
     //==========================================================================
     //ABCDEFG,noH
     if(nModel==2||nModel==1||nModel==4||nModel==12||nModel==16||nModel==PM_PM5E || nModel == PM_PM5E_ARM ||nModel==17||nModel==18||nModel==3
-            ||nModel==PM_TSTAT6||nModel==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7] == PM_TSTAT8)||nModel==PM_TSTAT7||nModel==PM_PRESSURE)
+            ||nModel==PM_TSTAT6||nModel==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8)|| (product_register_value[7] == PM_TSTAT9) ||nModel==PM_TSTAT7||nModel==PM_PRESSURE)
     {
         m_Output_Grid.put_TextMatrix(1,1,g_strOutName1);
         m_Output_Grid.put_TextMatrix(2,1,g_strOutName2);
@@ -1900,6 +1905,7 @@ void CT3000View::Fresh_Out()
     //4,5
     if(nModel==1||nModel==4||nModel==12||nModel==16||nModel==3||nModel==PM_PM5E || nModel == PM_PM5E_ARM
 		|| nModel == PM_TSTAT6 || nModel == PM_TSTAT5i || (  product_register_value[7] == PM_TSTAT8
+            || product_register_value[7] == PM_TSTAT9
 			|| product_register_value[7] == PM_TSTAT8_WIFI
 			|| product_register_value[7] == PM_TSTAT8_OCC
 			|| product_register_value[7] == PM_TSTAT7_ARM
@@ -2366,6 +2372,7 @@ void CT3000View::FreshIOGridTable()
     }
     break;
 	case PM_TSTAT8:
+    case PM_TSTAT9:
 	case PM_TSTAT8_WIFI:
 	case PM_TSTAT8_OCC:
 	case PM_TSTAT7_ARM:
@@ -2810,6 +2817,7 @@ void CT3000View::OnEnKillfocusInputnameedit()
 
 	if (product_register_value[7]== PM_TSTAT6|| 
 		(product_register_value[7] == PM_TSTAT8 
+            || (product_register_value[7] == PM_TSTAT9)
 			|| (product_register_value[7] == PM_TSTAT8_WIFI)
 			|| (product_register_value[7] == PM_TSTAT8_OCC) 
 			|| (product_register_value[7] == PM_TSTAT7_ARM) 
@@ -3061,6 +3069,7 @@ void CT3000View::OnEnKillfocusOutputnameedit()
     //if(g_serialNum>0&&product_register_value[6]>0)
 	if (  product_register_value[7]== PM_TSTAT6
 		|| product_register_value[7] == PM_TSTAT8 
+        || product_register_value[7] == PM_TSTAT9
 		|| product_register_value[7] == PM_TSTAT8_WIFI
 		|| product_register_value[7] == PM_TSTAT8_OCC
 		|| product_register_value[7] == PM_TSTAT7_ARM
@@ -3602,6 +3611,7 @@ int CT3000View::get_real_fan_select()
 
 	 
 	if (    product_register_value[7] == PM_TSTAT8
+        || product_register_value[7] == PM_TSTAT9
 		|| product_register_value[7] == PM_TSTAT8_WIFI
 		|| product_register_value[7] == PM_TSTAT8_OCC
 		|| product_register_value[7] == PM_TSTAT7_ARM
@@ -3724,6 +3734,7 @@ int CT3000View::set_real_fan_select()
     }
 
 	if (product_register_value[7] == PM_TSTAT8
+        || product_register_value[7] == PM_TSTAT9
 		|| product_register_value[7] == PM_TSTAT8_WIFI
 		|| product_register_value[7] == PM_TSTAT8_OCC
 		|| product_register_value[7] == PM_TSTAT7_ARM
@@ -3841,6 +3852,7 @@ void CT3000View::OnCbnSelchangeFanspeedcombo()
 
 
 	if (product_register_value[7] == PM_TSTAT8
+        || product_register_value[7] == PM_TSTAT9
 		|| product_register_value[7] == PM_TSTAT8_WIFI
 		|| product_register_value[7] == PM_TSTAT8_OCC
 		|| product_register_value[7] == PM_TSTAT7_ARM
@@ -3859,7 +3871,9 @@ LRESULT CT3000View::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
     
     if(MsgT3000ViewFresh==message)
     {
-		if ((product_register_value[7] == PM_TSTAT6) || (product_register_value[7] == PM_TSTAT7) || (product_register_value[7] == PM_TSTAT5i) || (product_register_value[7] == PM_TSTAT8
+		if ((product_register_value[7] == PM_TSTAT6) || (product_register_value[7] == PM_TSTAT7) || (product_register_value[7] == PM_TSTAT5i) || 
+            (product_register_value[7] == PM_TSTAT8
+             ||   product_register_value[7] == PM_TSTAT9
 			|| product_register_value[7] == PM_TSTAT8_WIFI
 			|| product_register_value[7] == PM_TSTAT8_OCC
 			|| product_register_value[7] == PM_TSTAT7_ARM
@@ -3882,7 +3896,10 @@ LRESULT CT3000View::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
         if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
             //if (product_register_value[7] == 6)
         {
-			if ((product_register_value[7] == PM_TSTAT6&&m_fFirmwareVersion > 35.5) || (product_register_value[7] == PM_TSTAT7) || (product_register_value[7] == PM_TSTAT8
+			if ((product_register_value[7] == PM_TSTAT6&&m_fFirmwareVersion > 35.5) || 
+                (product_register_value[7] == PM_TSTAT7) 
+                || (product_register_value[7] == PM_TSTAT8
+                    || product_register_value[7] == PM_TSTAT9
 				|| product_register_value[7] == PM_TSTAT8_WIFI
 				|| product_register_value[7] == PM_TSTAT8_OCC
 				|| product_register_value[7] == PM_TSTAT7_ARM
@@ -4497,6 +4514,7 @@ void CT3000View::InitFanSpeed()
 	
 
 	if (product_register_value[7] == PM_TSTAT8
+        || product_register_value[7] == PM_TSTAT9
 		|| product_register_value[7] == PM_TSTAT8_WIFI
 		|| product_register_value[7] == PM_TSTAT8_OCC
 		|| product_register_value[7] == PM_TSTAT7_ARM
@@ -5367,7 +5385,9 @@ void CT3000View::Initial_Max_Min()
     int dCoolDB;
     int dHeatDB;
 
-	if ((product_register_value[7] == PM_TSTAT6) || (product_register_value[7] == PM_TSTAT8
+	if ((product_register_value[7] == PM_TSTAT6) 
+        || (product_register_value[7] == PM_TSTAT8
+        || product_register_value[7] == PM_TSTAT9
 		|| product_register_value[7] == PM_TSTAT8_WIFI
 		|| product_register_value[7] == PM_TSTAT8_OCC
 		|| product_register_value[7] == PM_TSTAT7_ARM
@@ -5937,6 +5957,7 @@ void CT3000View::FreshCtrl()
 
     if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i)
 		|| (product_register_value[7] == PM_TSTAT8
+            || product_register_value[7] == PM_TSTAT9
 			|| product_register_value[7] == PM_TSTAT8_WIFI
 			|| product_register_value[7] == PM_TSTAT8_OCC
 			|| product_register_value[7] == PM_TSTAT7_ARM
@@ -6213,6 +6234,7 @@ void CT3000View::Read_SliderData()
 
     if (product_register_value[7]==PM_TSTAT5i
 		|| (product_register_value[7] == PM_TSTAT8
+            || product_register_value[7] == PM_TSTAT9
 			|| product_register_value[7] == PM_TSTAT8_WIFI
 			|| product_register_value[7] == PM_TSTAT8_OCC
 			|| product_register_value[7] == PM_TSTAT7_ARM
@@ -6386,7 +6408,9 @@ void CT3000View::DayHandleMovedSlidercontrol1(const VARIANT& sender, float newVa
 		int nHDB;
 		int nCDB;
 	 
-		if ((product_register_value[7] == PM_TSTAT6) || (product_register_value[7] == PM_TSTAT7) || (product_register_value[7] == PM_TSTAT8
+		if ((product_register_value[7] == PM_TSTAT6) || (product_register_value[7] == PM_TSTAT7) || 
+            (product_register_value[7] == PM_TSTAT8
+            || product_register_value[7] == PM_TSTAT9
 			|| product_register_value[7] == PM_TSTAT8_WIFI
 			|| product_register_value[7] == PM_TSTAT8_OCC
 			|| product_register_value[7] == PM_TSTAT7_ARM
@@ -6589,7 +6613,9 @@ void CT3000View::NightHandleMovedSlidercontrol1(const VARIANT& sender, float new
 	int nCDB;
 	 
 	CString strTemp;
-	if ((product_register_value[7] == PM_TSTAT6) || (product_register_value[7] == PM_TSTAT7) || (product_register_value[7] == PM_TSTAT8
+	if ((product_register_value[7] == PM_TSTAT6) || (product_register_value[7] == PM_TSTAT7) || (
+        product_register_value[7] == PM_TSTAT8
+        || product_register_value[7] == PM_TSTAT9
 		|| product_register_value[7] == PM_TSTAT8_WIFI
 		|| product_register_value[7] == PM_TSTAT8_OCC
 		|| product_register_value[7] == PM_TSTAT7_ARM

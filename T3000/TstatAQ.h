@@ -49,6 +49,8 @@ const int TSTAT_AQ_INDEX_1 = 764;
 const int TSTAT_AQ_INDEX_2_5 = 765;
 const int TSTAT_AQ_INDEX_4 = 766;
 const int TSTAT_AQ_INDEX_10 = 767;
+const int TSTAT_AQ_LIGHT = 628;
+const int TSTAT_AQ_SOUND = 640;
 
 
 

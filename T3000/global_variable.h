@@ -1959,6 +1959,7 @@ vector <Str_MSV> m_msv_data;
 
 Time_block_mini Device_time;
 Str_Setting_Info Device_Basic_Setting;
+Str_Email_point  Device_Email_Point;
 Str_MISC Device_Misc_Data;
 Str_Special Device_Special_Data;
 char m_at_write_buf[100];
@@ -2239,7 +2240,7 @@ bool offline_mode = false; //全局离线模式判断;
 CString offline_prg_path;   //离线模式得prg 保存路径;
 
 bac_mstp_com g_mstp_com; // 全局mstp com 口 连接状态
-
+bool n_background_list_refresh;  //后台列表 刷新开关
 bool custom_bacnet_register_listview = true;
 bool initial_bip = false;
 Str_modbus_reg bacnet_to_modbus_struct;  //用于bacnet 协议转换为modbus 协议的结构

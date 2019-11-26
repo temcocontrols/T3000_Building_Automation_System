@@ -1592,7 +1592,11 @@ BOOL CComWriter::UpdataDeviceInformation_ex(unsigned short device_productID)
 	{
 		return TRUE;
 	}
-
+    else if ((prodcutname.CompareNoCase(_T("CO2")) == 0 ) &&
+        hexproductname.CompareNoCase(_T("CO2 NET")) == 0)
+    {
+        return TRUE;
+    }
     else if ((hexproductname.CompareNoCase(_T("tstat6"))==0)&&(prodcutname.CompareNoCase(_T("tstat5i"))==0))
     {
         return TRUE;

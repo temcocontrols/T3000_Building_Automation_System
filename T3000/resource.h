@@ -318,6 +318,7 @@
 #define IDR_MENU_CONTROL_BASIC          733
 #define IDD_DIALOG_BACNET_RANGE_MSV     734
 #define IDD_DIALOG_TSTAT_AQ             736
+#define IDD_DIALOG_BACNET_EMAIL_ALARM   739
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -560,6 +561,7 @@
 #define IDC_HUM9                        1071
 #define IDC_EDIT54                      1071
 #define IDC_EDIT_FREID                  1071
+#define IDC_EDIT_SECURE_CONNECTION      1071
 #define ID_VIEW_IOPANE_DLGBAR           1072
 #define IDC_NIGHTHEAT_EDIT2             1072
 #define IDC_EDIT_DAYHEAT                1072
@@ -2454,8 +2456,16 @@
 #define IDC_STATIC_INDEX_PM10           2499
 #define IDC_STATIC_AQ_TEMPERATURE       2500
 #define IDC_STATIC_WEIGHT_TOTAL         2501
-#define IDC_STATIC_INDEX_PM11           2502
 #define IDC_STATIC_INDEX_TOTAL          2502
+#define IDC_STATIC_LIGHT_VALUE          2503
+#define IDC_STATIC_SOUND_VALUE          2504
+#define IDC_STATIC_SOUND                2505
+#define IDC_BUTTON_EMAIL_ALARM          2506
+#define IDC_EDIT_SMTP_SERVER            2507
+#define IDC_EDIT_PORT_NUMBER            2508
+#define IDC_EDIT_EMAIL                  2509
+#define IDC_EDIT_USERNAME               2510
+#define IDC_COMBO_SECURE_TYPE           2511
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -3004,9 +3014,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        738
+#define _APS_NEXT_RESOURCE_VALUE        741
 #define _APS_NEXT_COMMAND_VALUE         34076
-#define _APS_NEXT_CONTROL_VALUE         2501
+#define _APS_NEXT_CONTROL_VALUE         2512
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

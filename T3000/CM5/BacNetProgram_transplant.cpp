@@ -3681,15 +3681,20 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 						else
 							high_3bit = ((*num_point) & 0xff00) >> 3;
 
-                        if ((k == MB_REG) && (*num_point >=2000))
+                        if ((k == MB_REG)  && (*num_point >=2000))
                         {
                             int temp_num_point = *num_point;
                             temp_num_point = temp_num_point >> 11;
                             temp_num_point = temp_num_point | 0x0080;
                             *netpresent = temp_num_point; // 去Number 的 最高5位;
-
                         }
-
+                        else if ((k == BAC_VAR) && (*num_point >= 2000))
+                        {
+                            int temp_num_point = *num_point -1;
+                            temp_num_point = temp_num_point >> 11;
+                            temp_num_point = temp_num_point | 0x0080;
+                            *netpresent = temp_num_point; // 去Number 的 最高5位;
+                        }
 						*point_type = k;
 						*point_type = *point_type | high_3bit;
 						//if(*num_panel<10 || *num_point<100)
@@ -5800,20 +5805,23 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 				else
 					if ((vars_table[cur_index].type == POINT_VAR) || (vars_table[cur_index].type == LABEL_VAR))
 					{
-                        if (((unsigned char)vars_table[cur_index].network >= 128) && (( ((unsigned char)vars_table[cur_index].point_type) & 0x1F) != MB_REG)) //network 的最高位用来标识  是否是新的数据格式
+                        //if (((unsigned char)vars_table[cur_index].network >= 128) && (( ((unsigned char)vars_table[cur_index].point_type) & 0x1F) != MB_REG)) //network 的最高位用来标识  是否是新的数据格式
+                        if ((unsigned char)vars_table[cur_index].network >= 128)  //network 的最高位用来标识  是否是新的数据格式
                         {
                             unsigned char high_3bit;
                             cod_line[Byte++] = REMOTE_POINT_PRG;
-                            if (((unsigned char)vars_table[cur_index].point_type == COIL_REG) ||
-                                ((unsigned char)vars_table[cur_index].point_type == DIS_INPUT_REG) ||
-                                ((unsigned char)vars_table[cur_index].point_type == INPUT_REG) ||
-                                ((unsigned char)vars_table[cur_index].point_type == MB_REG) ||
-                                ((unsigned char)vars_table[cur_index].point_type == BAC_BV) ||
-                                ((unsigned char)vars_table[cur_index].point_type == BAC_BI) ||
-                                ((unsigned char)vars_table[cur_index].point_type == BAC_AV) ||
-                                ((unsigned char)vars_table[cur_index].point_type == BAC_AI) ||
-                                ((unsigned char)vars_table[cur_index].point_type == BAC_AO) ||
-                                ((unsigned char)vars_table[cur_index].point_type == BAC_BO))
+                            unsigned char temp_point_type = (unsigned char)(vars_table[cur_index].point_type & 0x1F);
+                            if ((temp_point_type == COIL_REG) ||
+                                (temp_point_type == DIS_INPUT_REG) ||
+                                (temp_point_type == INPUT_REG) ||
+                                (temp_point_type == MB_REG) ||
+                                (temp_point_type == BAC_VAR) ||
+                                (temp_point_type == BAC_BV) ||
+                                (temp_point_type == BAC_BI) ||
+                                (temp_point_type == BAC_AV) ||
+                                (temp_point_type == BAC_AI) ||
+                                (temp_point_type == BAC_AO) ||
+                                (temp_point_type == BAC_BO))
                             {
                                 point.number = (unsigned char)((vars_table[cur_index].num_point) & 0x00ff);
                                 high_3bit = ((vars_table[cur_index].num_point) & 0xff00) >> 3;
@@ -5916,16 +5924,17 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 						{
 							unsigned char high_3bit;
 							cod_line[Byte++]=REMOTE_POINT_PRG;
+                            unsigned char temp_point_type = (unsigned char)(vars_table[cur_index].point_type & 0x1F);
 							if(((unsigned char)vars_table[cur_index].point_type == COIL_REG) ||
-								((unsigned char)vars_table[cur_index].point_type == DIS_INPUT_REG) ||
-								((unsigned char)vars_table[cur_index].point_type == INPUT_REG) ||
-								((unsigned char)vars_table[cur_index].point_type == MB_REG) ||
-                                ((unsigned char)vars_table[cur_index].point_type == BAC_BV) ||
-                                ((unsigned char)vars_table[cur_index].point_type == BAC_BI) ||
-								((unsigned char)vars_table[cur_index].point_type == BAC_AV) ||
-								((unsigned char)vars_table[cur_index].point_type == BAC_AI) ||
-								((unsigned char)vars_table[cur_index].point_type == BAC_AO) ||
-								((unsigned char)vars_table[cur_index].point_type == BAC_BO))
+								(temp_point_type == DIS_INPUT_REG) ||
+								(temp_point_type == INPUT_REG) ||
+								(temp_point_type == MB_REG) ||
+                                (temp_point_type == BAC_BV) ||
+                                (temp_point_type == BAC_BI) ||
+								(temp_point_type == BAC_AV) ||
+								(temp_point_type == BAC_AI) ||
+								(temp_point_type == BAC_AO) ||
+								(temp_point_type == BAC_BO))
 							{
 								point.number     = (unsigned char)((vars_table[cur_index].num_point) & 0x00ff);
 								high_3bit = ((vars_table[cur_index].num_point) & 0xff00) >> 3;
@@ -6993,9 +7002,13 @@ int pointtotext(char *buf,Point_Net *point)
 
 	panel=point->panel;
 	point_type= (point->point_type ) & 0x1F;
-    if ((point_type == MB_REG) && (point->network >=128))
+    if ((point_type == MB_REG)  && (point->network >=128))
     {
         num = (point->number)  + ((point->network -128)*8 + high_3_bit)*256;
+    }
+    if ((point_type == BAC_VAR) && (point->network >= 128))
+    {
+        num = (point->number) + ((point->network - 128) * 8 + high_3_bit) * 256 - 1;
     }
 	sub_panel = point->sub_panel;
 	if(point_type > BAC_MAX)
@@ -7056,7 +7069,7 @@ int pointtotext(char *buf,Point_Net *point)
         return 0;
     }
 
-    if ((point->network >= 128) && (point_type != MB_REG)) // 说明是新的格式，最高位用来标识.
+    if ((point->network >= 128) && (point_type != MB_REG) && (point_type != BAC_VAR)) // 说明是新的格式，最高位用来标识.
     {
         if ((point_type == BAC_BI) || (point_type == BAC_BV) ||
             (point_type == BAC_AV) || (point_type == BAC_AI) ||

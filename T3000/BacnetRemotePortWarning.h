@@ -25,4 +25,9 @@ public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	CStaticEx m_static_ignore_text;
 	afx_msg void OnBnClickedCheckRemotePortWarning();
+    int m_show_message_value;
+    void SetWindowType(unsigned char nvalue);
 };
+
+const unsigned char MESSAGE_PORTFORWARDING = 0;
+const unsigned char MESSAGE_ASIX_MAINPORT = 1;

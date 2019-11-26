@@ -150,7 +150,7 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 		int nFlag=0;
 		nFlag = read_one(now_tstat_id,7,6);
 
-		if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7) || (nFlag == PM_TSTAT5i)|| (nFlag == PM_TSTAT8)
+		if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7) || (nFlag == PM_TSTAT5i)|| (nFlag == PM_TSTAT8) || (nFlag == PM_TSTAT9)
 			|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
 		{
 			product_type =T3000_6_ADDRESS;
@@ -192,7 +192,7 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 			M_RegAddress.Change_Register_Table();
 		}
 //		int nFlag = product_register_value[7];
-		if (product_register_value[7] == PM_TSTAT8
+		if (product_register_value[7] == PM_TSTAT8 || product_register_value[7] == PM_TSTAT9
 			|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
 		{
 			MODBUS_BAUDRATE = 15;
@@ -515,6 +515,9 @@ BOOL CGridLoad::OnInitDialog()
             break;
         case PM_TSTAT8:
             strTemp="TStat8";
+            break;
+        case PM_TSTAT9:
+            strTemp = "TStat9";
             break;
 		case PM_TSTAT8_WIFI:
 			strTemp = "TStat8_Wifi";
@@ -1161,6 +1164,9 @@ void CGridLoad::LoadDeviceToGrid()
             break;
         case PM_TSTAT8:
             strTemp="TStat8";
+            break;
+        case PM_TSTAT9:
+            strTemp = "TStat9";
             break;
 		case PM_TSTAT8_WIFI:
 			strTemp = "TStat8_Wifi";

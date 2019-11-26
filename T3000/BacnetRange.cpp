@@ -682,6 +682,32 @@ void BacnetRange::Initial_static()
 			GetDlgItem(IDC_RADIO69)->EnableWindow(TRUE);	
 			GetDlgItem(IDC_RADIO87)->EnableWindow(FALSE);
 		}
+        
+        if ((Device_Basic_Setting.reg.special_flag & 0x01) == 0x01)
+        {
+            GetDlgItem(IDC_RADIO59)->EnableWindow(true);  //使能PT1K Sensor 的 按钮
+            GetDlgItem(IDC_RADIO60)->EnableWindow(true);
+            GetDlgItem(IDC_RADIO63)->EnableWindow(true);
+            GetDlgItem(IDC_RADIO64)->EnableWindow(true);
+        }
+        else
+        {
+            GetDlgItem(IDC_RADIO59)->EnableWindow(FALSE);  //禁用PT1K Sensor 的 按钮
+            GetDlgItem(IDC_RADIO60)->EnableWindow(FALSE);
+            GetDlgItem(IDC_RADIO63)->EnableWindow(FALSE);
+            GetDlgItem(IDC_RADIO64)->EnableWindow(FALSE);
+        }
+
+        if ((Device_Basic_Setting.reg.special_flag & 0x02) == 0x02)
+        {
+            GetDlgItem(IDC_RADIO55)->EnableWindow(true);  //使能PT100 Sensor 的 按钮
+            GetDlgItem(IDC_RADIO56)->EnableWindow(true);
+        }
+        else
+        {
+            GetDlgItem(IDC_RADIO55)->EnableWindow(FALSE);  //禁用PT100 Sensor 的 按钮
+            GetDlgItem(IDC_RADIO56)->EnableWindow(FALSE);
+        }
 
 		GetDlgItem(IDC_RADIO54)->ShowWindow(false);
 

@@ -371,6 +371,7 @@ int Write_Multi_org(unsigned char device_var,unsigned char *to_write,unsigned sh
     for(int i=0; i<retry_times; i++)
     {
         register_critical_section.Lock();
+        g_llTxCount++;
         j=write_multi(device_var,to_write,start_address,length);
         register_critical_section.Unlock();
         if (g_CommunicationType==Modbus_Serial)
@@ -379,17 +380,18 @@ int Write_Multi_org(unsigned char device_var,unsigned char *to_write,unsigned sh
         }
         if(j!=-2)
         {
+            g_llRxCount++;
             //SetPaneString(2,_T("Multi-Write successful!"));
-            CString str;
-            str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d]"), device_var, ++g_llTxCount, ++g_llRxCount,g_llTxCount-g_llRxCount);
-            SetPaneString(0,str);
+            //CString str;
+            //str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d]"), device_var, ++g_llTxCount, ++g_llRxCount,g_llTxCount-g_llRxCount);
+            //SetPaneString(0,str);
             return j;
         }
     }
     //SetPaneString(2,_T("Multi-write failure!"));
-    CString str;
-    str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d]"), device_var, ++g_llTxCount, g_llRxCount,g_llTxCount-g_llRxCount);
-    SetPaneString(0,str);
+    //CString str;
+    //str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d]"), device_var, ++g_llTxCount, g_llRxCount,g_llTxCount-g_llRxCount);
+    //SetPaneString(0,str);
     return j;
 }
 
@@ -418,6 +420,7 @@ int Write_Multi_org_short(unsigned char device_var,unsigned short *to_write,unsi
     for(int i=0; i<retry_times; i++)
     {
         register_critical_section.Lock();
+        g_llTxCount++;
         j=write_multi_Short(device_var,to_write,start_address,length);
         register_critical_section.Unlock();
         if (g_CommunicationType==Modbus_Serial)
@@ -426,17 +429,18 @@ int Write_Multi_org_short(unsigned char device_var,unsigned short *to_write,unsi
         }
         if(j!=-2)
         {
+            g_llRxCount++;
             //SetPaneString(2,_T("Multi-Write successful!"));
-            CString str;
-            str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d]"), device_var, ++g_llTxCount, ++g_llRxCount,g_llTxCount-g_llRxCount);
-            SetPaneString(0,str);
+            //CString str;
+            //str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d]"), device_var, ++g_llTxCount, ++g_llRxCount,g_llTxCount-g_llRxCount);
+            //SetPaneString(0,str);
             return j;
         }
     }
     //SetPaneString(2,_T("Multi-write failure!"));
-    CString str;
-    str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d]"), device_var, ++g_llTxCount, g_llRxCount,g_llTxCount-g_llRxCount);
-    SetPaneString(0,str);
+    //CString str;
+    //str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d]"), device_var, ++g_llTxCount, g_llRxCount,g_llTxCount-g_llRxCount);
+    //SetPaneString(0,str);
     return j;
 }
 /**
@@ -1420,14 +1424,9 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
 	case WRITEUNIT_T3000:
 		entitysize = sizeof(Str_Units_element);
 		break;
-		//case WRITEPROGRAMCODE_T3000:
-		//	entitysize = program_code_length[start_instance];
-		//
-		//	//m_Program_data.at(program_list_line).bytes = my_lengthcode -7;
-		//	//entitysize = my_lengthcode;
-		//	if((entitysize<0)||(entitysize>400))
-		//		entitysize = 0;
-		//	break;
+    case WRITE_EMAIL_ALARM:
+        entitysize = sizeof(Str_Email_point);
+        break;
 	case WRITE_TSTATE_SCHEDULE_T3000:
 		entitysize = sizeof(Str_tstat_schedule);
 		break;
@@ -1521,6 +1520,11 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
 
     switch(command)
     {
+    case WRITE_EMAIL_ALARM:
+    {
+        memcpy_s(SendBuffer + HEADER_LENGTH, sizeof(Str_Email_point), &Device_Email_Point, sizeof(Str_Email_point));
+    }
+        break;
 	case WRITEEXT_IO_T3000:
 		{
 			for (int i=0; i<(end_instance - start_instance + 1); i++)
@@ -1576,25 +1580,6 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
         memcpy_s(SendBuffer + HEADER_LENGTH,entitysize,m_at_read_buf,entitysize);
     }
     break;
-    //case WRITEPROGRAMCODE_T3000:
-    //	{
-//		//memcpy_s(SendBuffer + PRIVATE_HEAD_LENGTH,entitysize,mycode,my_lengthcode);
-    //	memcpy_s(SendBuffer + PRIVATE_HEAD_LENGTH,entitysize,program_code[start_instance],entitysize);
-    //
-    //	CString n_temp_print;
-    //	n_temp_print.Format(_T("Tx : "));
-    //	CString temp_char;
-    //	char * temp_print = SendBuffer;
-    //	for (int i = 0; i< entitysize + 2 ; i++)
-    //	{
-    //		temp_char.Format(_T("%02x"),(unsigned char)*temp_print);
-    //		temp_char.MakeUpper();
-    //		temp_print ++;
-    //		n_temp_print = n_temp_print + temp_char + _T(" ");
-    //	}
-    //	DFTrace(n_temp_print);
-    //	}
-    //	break;
     case WRITEVARIABLE_T3000:
         for (int i=0; i<(end_instance-start_instance + 1); i++)
         {
@@ -3951,9 +3936,33 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
             Device_Basic_Setting.reg.zigbee_panid = (unsigned char)my_temp_point[1] << 8 | (unsigned char)my_temp_point[0];
             my_temp_point = my_temp_point + 2;
             Device_Basic_Setting.reg.max_master = *(my_temp_point++);
+            Device_Basic_Setting.reg.special_flag = *(my_temp_point++);
 			return READ_SETTING_COMMAND;
 		}
 		break;
+    case READ_EMAIL_ALARM:
+    {
+        block_length = len_value_type - PRIVATE_HEAD_LENGTH;//Program code length  =  total -  head;
+        my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
+        if (block_length != sizeof(Str_Email_point))
+            return -1;
+
+        Device_Email_Point.reg.smtp_type = *(my_temp_point++);
+        memcpy_s(Device_Email_Point.reg.smtp_ip, 4, my_temp_point, 4);
+        my_temp_point = my_temp_point + 4;
+        memcpy_s(Device_Email_Point.reg.smtp_domain, 40, my_temp_point, 40);
+        my_temp_point = my_temp_point + 40;
+        Device_Email_Point.reg.smtp_port = (unsigned char)my_temp_point[1] << 8 | (unsigned char)my_temp_point[0];
+        my_temp_point = my_temp_point + 2;
+        memcpy_s(Device_Email_Point.reg.email_address, 60, my_temp_point, 60);
+        my_temp_point = my_temp_point + 60;
+        memcpy_s(Device_Email_Point.reg.user_name, 60, my_temp_point, 60);
+        my_temp_point = my_temp_point + 60;
+        memcpy_s(Device_Email_Point.reg.password, 20, my_temp_point, 20);
+        my_temp_point = my_temp_point + 20;
+        Device_Email_Point.reg.secure_connection_type = *(my_temp_point++);
+    }
+        break;
 	case READMONITORDATA_T3000:
 		{
 			handle_read_monitordata_ex((char *)Temp_CS.value,len_value_type);
@@ -4734,6 +4743,7 @@ void Inial_Product_Reglist_map()
     product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT5i, _T("Tstat 5 I-6-7-8")));
 
     product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT8, _T("Tstat 5 I-6-7-8")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT9, _T("Tstat 5 I-6-7-8")));
     product_reglist_map.insert(map<int, CString>::value_type(PM_HUMTEMPSENSOR, _T("Humidity Sensor")));
     product_reglist_map.insert(map<int, CString>::value_type(STM32_HUM_NET, _T("STM32-hum-w")));
     product_reglist_map.insert(map<int, CString>::value_type(STM32_HUM_RS485, _T("STM32-hum-w")));
@@ -4812,6 +4822,7 @@ void Inial_Product_Menu_map()
         }
             break;
         case PM_TSTAT8:
+        case PM_TSTAT9:
         {
             unsigned char  temp[20] = { 1,1,1,0,  0,0,1,1,  1,0,0,0,   0,1,1,1  ,0,0,0,0 };
             memcpy(product_menu[i], temp, 20);
@@ -4851,7 +4862,10 @@ void Inial_Product_map()
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT5i,_T("TStat5i")));
 
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT8,_T("TStat8")));
+    product_map.insert(map<int, CString>::value_type(PM_TSTAT9, _T("TStat9")));
+    
     product_map.insert(map<int, CString>::value_type(PM_TSTAT10, _T("TStat10")));
+
 
 	product_map.insert(map<int,CString>::value_type(PM_HUMTEMPSENSOR,_T("HUM Sensor")));
 	product_map.insert(map<int,CString>::value_type(STM32_HUM_NET,_T("HUM Sensor")));
@@ -6121,7 +6135,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	temp_data.reg.isp_mode = *(my_temp_point++);	//isp_mode = 0 表示在应用代码 ，1 表示在bootload.  2表示坏掉了    3 表示是MSTP
 	temp_data.reg.bacnetip_port =  ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
 	my_temp_point= my_temp_point + 2;
-	temp_data.reg.zigbee_exsit =  *(my_temp_point++); // 1 代表存在，其他任何代表不存在;
+	temp_data.reg.hardware_info =  *(my_temp_point++); // 1 代表存在，其他任何代表不存在;
     temp_data.reg.subnet_protocol = *(my_temp_point++);   //0 旧的 modbus   12 ： PROTOCOL_BIP_T0_MSTP_TO_MODBUS
 	DWORD nSerial=temp_data.reg.serial_low + temp_data.reg.serial_low_2 *256+temp_data.reg.serial_low_3*256*256+temp_data.reg.serial_low_4*256*256*256;
 	CString nip_address;
@@ -6155,7 +6169,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	temp.panal_number = temp_data.reg.station_number;
 
 	temp.bacnetip_port = temp_data.reg.bacnetip_port;
-    temp.zigbee_exsit = temp_data.reg.zigbee_exsit;
+    temp.hardware_info = temp_data.reg.hardware_info;
     temp.nprotocol = temp_data.reg.subnet_protocol;
 
     if (temp.nprotocol == MODBUS_RS485)   //通过64 命令回的 都属于网络的modbus tcp ，除非直接回 12 
@@ -6178,30 +6192,6 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
         CString temp_serial_number;
         temp_serial_number.Format(_T("%u"), temp_label.serial_number);
         temp.show_label_name = cs_temp_label;
-        //int need_to_write_into_device = GetPrivateProfileInt(temp_serial_number, _T("WriteFlag"), 0, g_achive_device_name_path);
-       // if (need_to_write_into_device == 0)
-        //{
-        //    temp.show_label_name = cs_temp_label;
-            
-            //bool found_device = false;
-            //bool found_device_new_name = false;
-            //for (int i = 0; i<m_refresh_net_device_data.size(); i++)
-            //{
-            //    if (temp_label.serial_number == m_refresh_net_device_data.at(i).nSerial)
-            //    {
-            //        if (cs_temp_label.CompareNoCase(m_refresh_net_device_data.at(i).show_label_name) == 0)
-            //        {
-            //            found_device_new_name = false;
-            //        }
-            //        else
-            //        {
-            //            m_refresh_net_device_data.at(i).show_label_name = cs_temp_label;
-            //            found_device_new_name = true;
-            //        }
-            //        break;
-            //    }
-            //}
-        //}
     }
 
 
@@ -8000,9 +7990,11 @@ int LoadMiniModbusConfigFile(LPCTSTR tem_read_path)
 	CString FilePath;
 	FilePath.Format(_T("%s"),tem_read_path);
 	CFileFind temp_find;
-	if(!temp_find.FindFile(FilePath))
-		return -1;
-
+    if (!temp_find.FindFile(FilePath))
+    {
+        AfxMessageBox(_T("File not found!"));
+        return -1;
+    }
 	CFile myfile(tem_read_path,CFile::modeRead);
 	char *pBuf;
 	DWORD dwFileLen;
@@ -8014,8 +8006,14 @@ int LoadMiniModbusConfigFile(LPCTSTR tem_read_path)
 	myfile.Close();
 	//MessageBox(pBuf);
 	char * temp_point = pBuf;
-	if(temp_point[0] != 4)
-		return -1;
+    if (temp_point[0] != 4)
+    {
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Unrecognized file!"));
+        AfxMessageBox(_T("Unrecognized file!"));
+        g_progress_persent = 0;
+        Sleep(2000);
+        return -1;
+    }
 	temp_point = temp_point + 1;
 
 	unsigned long temp_file_time;
@@ -8059,11 +8057,13 @@ int LoadMiniModbusConfigFile(LPCTSTR tem_read_path)
 		}
 		else
 		{
-			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Write config file timeout!"));
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Write outputtimeout!"));
+            AfxMessageBox(_T("Write outputtimeout!"));
 			g_progress_persent = 0;
+            Sleep(2000);
 			return -1;
 		}
-		Sleep(10);
+		Sleep(100);
 	}
 	SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Write  output OK!"));
 	for (int j=0;j<BAC_INPUT_ITEM_COUNT;j++)
@@ -8084,11 +8084,13 @@ int LoadMiniModbusConfigFile(LPCTSTR tem_read_path)
 		}
 		else
 		{
-			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Write config file timeout!"));
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Write Input timeout!"));
+            AfxMessageBox(_T("Write Input timeout!"));
 			g_progress_persent = 0;
+            Sleep(2000);
 			return -1;
 		}
-		Sleep(10);
+		Sleep(100);
 	}
 	SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Write input OK!"));
 	return 1;
@@ -9383,7 +9385,7 @@ void LoadTstat_InputData()
     m_sn=product_register_value[0]+product_register_value[1]*256+product_register_value[2]*256*256+product_register_value[3]*256*256*256;
     int	m_nModel=product_register_value[MODBUS_PRODUCT_MODEL];
     int Product_Type=product_register_value[7];
-    if((Product_Type!=PM_TSTAT6)&&(Product_Type!=PM_TSTAT5i)&&(Product_Type!=PM_TSTAT7)&&(Product_Type!=PM_TSTAT8)
+    if((Product_Type!=PM_TSTAT6)&&(Product_Type!=PM_TSTAT5i)&&(Product_Type!=PM_TSTAT7)&&(Product_Type!=PM_TSTAT8) && (Product_Type != PM_TSTAT9)
 		&& (Product_Type != PM_TSTAT8_WIFI) && (Product_Type != PM_TSTAT8_OCC) && (Product_Type != PM_TSTAT7_ARM) && (Product_Type != PM_TSTAT8_220V))
     {
         return;
@@ -10078,7 +10080,7 @@ void LoadTstat_OutputData()
     int nValue=0;
     int m_crange=0;
     int m_nModeType = product_register_value[7];
-    if((m_nModeType!=PM_TSTAT6)&&(m_nModeType!=PM_TSTAT5i)&&(m_nModeType!=PM_TSTAT7)&&(m_nModeType!=PM_TSTAT8)
+    if((m_nModeType!=PM_TSTAT6)&&(m_nModeType!=PM_TSTAT5i)&&(m_nModeType!=PM_TSTAT7)&&(m_nModeType!=PM_TSTAT8) && (m_nModeType != PM_TSTAT9)
 		&& (m_nModeType != PM_TSTAT8_WIFI) && (m_nModeType != PM_TSTAT8_OCC) && (m_nModeType != PM_TSTAT7_ARM) && (m_nModeType != PM_TSTAT8_220V))
     {
         return;
@@ -10206,7 +10208,8 @@ void LoadTstat_OutputData()
     out_struct_temp.OutputName.regAddress=MODBUS_OUTPUT7_CHAR1  ;
     m_tstat_output_data.push_back(out_struct_temp);
 	int nFlag = product_register_value[7];
-    if ((product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8)
+    if ((product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7||
+        product_register_value[7]==PM_TSTAT8 || product_register_value[7] == PM_TSTAT9)
 		|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
     {
     }
@@ -10247,7 +10250,8 @@ void LoadTstat_OutputData()
         //strTemp=_T("On/Off");
         nRange=product_register_value[MODBUS_MODE_OUTPUT1+i-1];
 		int nFlag = product_register_value[7];
-        if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+        if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||
+            (product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 			|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
         {
 			CppSQLite3DB SqliteDBT3000;
@@ -10277,8 +10281,7 @@ void LoadTstat_OutputData()
                 }
                 else
                 {
-
-                    if(nRange>=0)
+                    if (nRange >= 0 && nRange<4)
                     {
                         strTemp=OUTPUT_RANGE45[nRange];
                     }
@@ -10288,7 +10291,7 @@ void LoadTstat_OutputData()
             else
             {
 
-                if(nRange>=0)
+                if (nRange >= 0 && nRange<4)
                 {
                     strTemp=OUTPUT_RANGE45[nRange];
                 }
@@ -10402,7 +10405,7 @@ void LoadTstat_OutputData()
 #endif
 
     if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16
-            ||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE
+            ||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8 || m_nModeType == PM_TSTAT9 ||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE
 		|| (m_nModeType == PM_TSTAT8_WIFI) || (m_nModeType == PM_TSTAT8_OCC) || (m_nModeType == PM_TSTAT7_ARM) || (m_nModeType == PM_TSTAT8_220V))//||m_nModeType==17||m_nModeType==18)
     {
         // just for row4 ///////////////////////////////////////////////////////////////
@@ -10421,7 +10424,7 @@ void LoadTstat_OutputData()
     }
 
     nRange = product_register_value[MODBUS_MODE_OUTPUT4];//283  205
-    if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+    if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V))
     {
 		CppSQLite3DB SqliteDBT3000;
@@ -10442,15 +10445,14 @@ void LoadTstat_OutputData()
                     q.nextRow();
                 }
                 nRange=m_crange;
-                if(nRange>=0)
+                if (nRange >= 0 && nRange<4)
                 {
                     strTemp=OUTPUT_RANGE45[nRange];
                 }
             }
             else
             {
-
-                if(nRange>=0)
+                if (nRange >= 0 && nRange<4)
                 {
                     strTemp=OUTPUT_RANGE45[nRange];
                 }
@@ -10459,8 +10461,7 @@ void LoadTstat_OutputData()
         }
         else
         {
-
-            if(nRange>=0)
+            if (nRange >= 0 && nRange<4)
             {
                 strTemp=OUTPUT_RANGE45[nRange];
             }
@@ -10545,7 +10546,7 @@ void LoadTstat_OutputData()
     //nRange=product_register_value[284];
     //284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
     nRange = product_register_value[MODBUS_MODE_OUTPUT5];
-    if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+    if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V))
     {
 		CppSQLite3DB SqliteDBT3000;
@@ -10566,7 +10567,7 @@ void LoadTstat_OutputData()
                     q.nextRow();
                 }
                 nRange=m_crange;
-                if(nRange>=0)
+                if (nRange >= 0 && nRange<4)
                 {
                     strTemp=OUTPUT_RANGE45[nRange];
                 }
@@ -10574,7 +10575,7 @@ void LoadTstat_OutputData()
             else
             {
 
-                if(nRange>=0)
+                if (nRange >= 0 && nRange<4)
                 {
                     strTemp=OUTPUT_RANGE45[nRange];
                 }
@@ -10584,7 +10585,7 @@ void LoadTstat_OutputData()
         else
         {
 
-            if(nRange>=0)
+            if (nRange >= 0 && nRange<4)
             {
                 strTemp=OUTPUT_RANGE45[nRange];
             }
@@ -10656,7 +10657,7 @@ void LoadTstat_OutputData()
 
 
     if ((m_nModeType==1||m_nModeType==3||m_nModeType==2)||m_nModeType==12||m_nModeType==16||m_nModeType==PM_PRESSURE
-            ||m_nModeType==18||m_nModeType==6||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8||m_nModeType==7
+            ||m_nModeType==18||m_nModeType==6||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8 || m_nModeType == PM_TSTAT9 ||m_nModeType==7
 		|| (m_nModeType == PM_TSTAT8_WIFI) || (m_nModeType == PM_TSTAT8_OCC) || (m_nModeType == PM_TSTAT7_ARM) || (m_nModeType == PM_TSTAT8_220V))//5ADEG
     {
         //186	207	1	Low byte	W/R	Analog Output1 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V
@@ -10809,53 +10810,7 @@ void LoadTstat_OutputData()
             else
             {
                 float nvalue=0.0;
-                //if (product_register_value[7] == 6)
-                // 				if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
-                // 				{
-                // 					//AfxMessageBox(_T("It's impossible to enter this place!"));
-                // 					if(nRange==1)//0-10v
-                // 					{
                 nvalue= product_register_value[MODBUS_COOLING_VALVE]/10.0f;//  T6=210
-                // 					}
-                // 					if(nRange==2)//0-5v
-                // 					{
-                // 						nvalue=product_register_value[MODBUS_COOLING_VALVE]/5.0f;
-                // 					}
-                // 					if(nRange==3)//2-10v
-                // 					{
-                // 						nvalue=product_register_value[MODBUS_COOLING_VALVE]/8.0f;
-                // 					}
-                // 					if(nRange==3)//10-0v
-                // 					{
-                // 						nvalue=(10-product_register_value[MODBUS_COOLING_VALVE]/100.0f)/10.0f *100;
-                // 					}
-                // 					if (nRange==17)
-                // 					{
-                // 						nvalue= product_register_value[MODBUS_COOLING_VALVE]/10.0f;
-                // 					}
-                // 				}
-                // 				else
-                // 				{
-                //
-                //
-                // 					if(nRange==1)//0-10v
-                // 					{
-                // 						//nvalue=product_register_value[102]/100 /10.0 * 100%;
-                // 						nvalue=product_register_value[MODBUS_COOLING_VALVE]/10.0f;//102   210
-                // 					}
-                // 					if(nRange==2)//0-5v
-                // 					{
-                // 						nvalue=product_register_value[MODBUS_COOLING_VALVE]/5.0f;
-                // 					}
-                // 					if(nRange==3)//2-10v
-                // 					{
-                // 						nvalue=product_register_value[MODBUS_COOLING_VALVE]/8.0f;
-                // 					}
-                // 					if(nRange==3)//10-0v
-                // 					{
-                // 						nvalue=(10-product_register_value[MODBUS_COOLING_VALVE]/100.0f)/10.0f *100;
-                // 					}
-                // 				}
                 strTemp.Format(_T("%.1f%%"),nvalue);
                 m_tstat_output_data.at(5).Unit.StrValue = _T("%");
             }
@@ -10869,16 +10824,10 @@ void LoadTstat_OutputData()
                 if((int)(nAMVAlue & 32))
                 {
                     strTemp=_T("Manual");
-                    // 					m_FlexGrid.put_Col(VALUE_OUTFIELD);
-                    // 					m_FlexGrid.put_Row(6);
-                    // 					m_FlexGrid.put_CellBackColor(COLOR_CELL);
                 }
                 else
                 {
                     strTemp=_T("Auto");
-                    // 					m_FlexGrid.put_Col(VALUE_OUTFIELD);
-                    // 					m_FlexGrid.put_Row(6);
-                    // 					m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
                 }
                 m_tstat_output_data.at(5).AM.regAddress=MODBUS_OUTPUT_MANU_ENABLE;
                 m_tstat_output_data.at(5).AM.RegValue=nAMVAlue;
@@ -11010,7 +10959,7 @@ void LoadTstat_OutputData()
         }
         //Delay
 
-        if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+        if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V))
         {
             CString strdelay;
@@ -11088,7 +11037,7 @@ void LoadTstat_OutputData()
         //	}
         //}
         ///////////////////////////////////////Signal Type//////////////////////////
-        if ((product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT8||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7)
+        if ((product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT8 || product_register_value[7] == PM_TSTAT9 ||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7)
 			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V))
         {
             if (product_register_value[7]==PM_TSTAT6)
@@ -13402,7 +13351,16 @@ void Initial_Instance_Reg_Map()
 {
     g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_TSTAT7, _T("991,992")));
     g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_TSTAT8, _T("991,992")));
+    g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_TSTAT9, _T("991,992")));
     g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_PM5E_ARM, _T("991,992")));
+
+    g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_T322AI, _T("23,22")));
+    g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_T38AI8AO6DO, _T("23,22")));
+    g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_T3PT12, _T("23,22")));
+    g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_T322AIVG, _T("23,22")));
+    g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_T38IOVG, _T("23,22")));
+    g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_T3PTVG, _T("23,22")));
+
 }
 
 void Inial_ProductName_map()

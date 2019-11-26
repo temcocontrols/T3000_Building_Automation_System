@@ -1185,6 +1185,7 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 			if (GetPrivateProfileInt(_T("Setting"), _T("ENABLE_PORT_WARNING"), 1, g_cstring_ini_path) == 1)
 			{
 				CBacnetRemotePortWarning Dlg;
+                Dlg.SetWindowType(MESSAGE_PORTFORWARDING);
 				Dlg.DoModal();
 			}
         }

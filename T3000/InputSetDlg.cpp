@@ -286,6 +286,7 @@ BOOL CInputSetDlg::OnInitDialog()
 		case PM_TSTAT6:	m_inRows=12;break;
         case PM_TSTAT5i:	m_inRows=12;break;
         case PM_TSTAT8:	m_inRows=12;break;
+        case PM_TSTAT9:	m_inRows = 12;break;
 		case PM_TSTAT8_WIFI:	m_inRows = 12; break;
 		case PM_TSTAT8_OCC:	m_inRows = 12; break;
 		case PM_TSTAT7_ARM:	m_inRows = 12; break;
@@ -325,7 +326,7 @@ BOOL CInputSetDlg::OnInitDialog()
 	m_FlexGrid.put_TextMatrix(0,CAL_FIELD,_T("Calibration"));
 	m_FlexGrid.put_ColWidth(CAL_FIELD,750);	
 	int nFlag = product_register_value[7];
-	if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT8)
+	if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 		|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V)
 		)
 	{
@@ -390,7 +391,7 @@ BOOL CInputSetDlg::OnInitDialog()
 		SetCurrentCell();
 		return true;
 	}
-	if (m_nModel==PM_TSTAT7||m_nModel==PM_TSTAT6||m_nModel==PM_TSTAT5i||m_nModel==PM_TSTAT8
+	if (m_nModel==PM_TSTAT7||m_nModel==PM_TSTAT6||m_nModel==PM_TSTAT5i||m_nModel==PM_TSTAT8 || m_nModel == PM_TSTAT9
 		|| (m_nModel == PM_TSTAT8_WIFI) || (m_nModel == PM_TSTAT8_OCC) || (m_nModel == PM_TSTAT7_ARM) || (m_nModel == PM_TSTAT8_220V))
 	{
 		InitGridtstat6();
@@ -651,7 +652,7 @@ void CInputSetDlg::Fresh_Grid()
 		Init_not_5ABCD_Grid();
 		return ;
 	}
-	if (m_nModel==PM_TSTAT6||m_nModel==PM_TSTAT5i||m_nModel==PM_TSTAT8||m_nModel==PM_TSTAT7
+	if (m_nModel==PM_TSTAT6||m_nModel==PM_TSTAT5i||m_nModel==PM_TSTAT8 || m_nModel == PM_TSTAT9 ||m_nModel==PM_TSTAT7
 		|| (m_nModel == PM_TSTAT8_WIFI) || (m_nModel == PM_TSTAT8_OCC) || (m_nModel == PM_TSTAT7_ARM) || (m_nModel == PM_TSTAT8_220V))
 	{
 		//InitGridtstat6();
@@ -1298,7 +1299,7 @@ void CInputSetDlg::Fresh_GridForAll(){
 		Fresh_GridForTstat5E();
 		return ;
 	}
-	if (m_nModel==PM_TSTAT6||m_nModel==PM_TSTAT5i||m_nModel==PM_TSTAT8||m_nModel==PM_TSTAT7
+	if (m_nModel==PM_TSTAT6||m_nModel==PM_TSTAT5i||m_nModel==PM_TSTAT8 || m_nModel == PM_TSTAT9 ||m_nModel==PM_TSTAT7
 		|| (m_nModel == PM_TSTAT8_WIFI) || (m_nModel == PM_TSTAT8_OCC) || (m_nModel == PM_TSTAT7_ARM) || (m_nModel == PM_TSTAT8_220V))
 	{
 		//InitGridtstat6();
@@ -1999,7 +2000,7 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 	m_nCurRow=lRow;
 	m_nCurCol=lCol;
 	
-	if (m_nModel == PM_TSTAT7||m_nModel == PM_TSTAT6||m_nModel == PM_TSTAT5i||m_nModel == PM_TSTAT8
+	if (m_nModel == PM_TSTAT7||m_nModel == PM_TSTAT6||m_nModel == PM_TSTAT5i||m_nModel == PM_TSTAT8 || m_nModel == PM_TSTAT9
 		|| (m_nModel == PM_TSTAT8_WIFI) || (m_nModel == PM_TSTAT8_OCC) || (m_nModel == PM_TSTAT7_ARM) || (m_nModel == PM_TSTAT8_220V))
 	{
 		OnClickTstat6Grid(m_nCurRow, m_nCurCol, rc);
@@ -2541,7 +2542,7 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 void CInputSetDlg::OnCbnSelchangeRangCombo()
 {
 //	if( m_nModel == 16 || m_nModel == PM_TSTAT6 )
-	if(m_nModel == PM_TSTAT6 || m_nModel == PM_TSTAT7|| m_nModel == PM_TSTAT8|| m_nModel == PM_TSTAT5E|| m_nModel == PM_PM5E || m_nModel == PM_PM5E_ARM  ||m_nModel==PM_TSTATRUNAR|| m_nModel == PM_TSTAT5i
+	if(m_nModel == PM_TSTAT6 || m_nModel == PM_TSTAT7|| m_nModel == PM_TSTAT8 || m_nModel == PM_TSTAT9 || m_nModel == PM_TSTAT5E|| m_nModel == PM_PM5E || m_nModel == PM_PM5E_ARM  ||m_nModel==PM_TSTATRUNAR|| m_nModel == PM_TSTAT5i
 		|| (m_nModel == PM_TSTAT8_WIFI) || (m_nModel == PM_TSTAT8_OCC) || (m_nModel == PM_TSTAT7_ARM) || (m_nModel == PM_TSTAT8_220V))  //tstat6
 	{
 		OnCbnSelchangeRangComboFor5E();
@@ -2723,7 +2724,7 @@ void CInputSetDlg::OnCbnKillfocusRangCombo()
 
 void CInputSetDlg::OnBnClickedUpbutton()
 {
-	if (m_nModel == 16 || m_nModel == PM_TSTAT6||m_nModel == PM_TSTAT7|| m_nModel == PM_TSTAT5i || m_nModel == PM_TSTAT8
+	if (m_nModel == 16 || m_nModel == PM_TSTAT6||m_nModel == PM_TSTAT7|| m_nModel == PM_TSTAT5i || m_nModel == PM_TSTAT8 || m_nModel == PM_TSTAT9
 		|| (m_nModel == PM_TSTAT8_WIFI) || (m_nModel == PM_TSTAT8_OCC) || (m_nModel == PM_TSTAT7_ARM) || (m_nModel == PM_TSTAT8_220V)) // for 5E
 	{
 		OnBnClickedUpbuttonFor5E();
@@ -2766,7 +2767,7 @@ void CInputSetDlg::OnBnClickedUpbutton()
 //The button has hide ,unnecessary to change.
 void CInputSetDlg::OnBnClickedDownbutton()
 {
-	if (m_nModel == 16 || m_nModel == PM_TSTAT6||m_nModel == PM_TSTAT7|| m_nModel == PM_TSTAT5i|| m_nModel == PM_TSTAT8 
+	if (m_nModel == 16 || m_nModel == PM_TSTAT6||m_nModel == PM_TSTAT7|| m_nModel == PM_TSTAT5i|| m_nModel == PM_TSTAT8 || m_nModel == PM_TSTAT9
 		|| (m_nModel == PM_TSTAT8_WIFI) || (m_nModel == PM_TSTAT8_OCC) || (m_nModel == PM_TSTAT7_ARM) || (m_nModel == PM_TSTAT8_220V)) // for 5E
 	{
 		OnBnClickedDownbuttonFor5E();
@@ -2896,7 +2897,7 @@ void CInputSetDlg::OnBnClickedExit()
 
 void CInputSetDlg::OnEnKillfocusInvalueedit()
 {
-	if(m_nModel == 16 || m_nModel == PM_TSTAT6||m_nModel == PM_TSTAT7|| m_nModel == PM_TSTAT5i|| m_nModel == PM_TSTAT8
+	if(m_nModel == 16 || m_nModel == PM_TSTAT6||m_nModel == PM_TSTAT7|| m_nModel == PM_TSTAT5i|| m_nModel == PM_TSTAT8 || m_nModel == PM_TSTAT9
 		|| (m_nModel == PM_TSTAT8_WIFI) || (m_nModel == PM_TSTAT8_OCC) || (m_nModel == PM_TSTAT7_ARM) || (m_nModel == PM_TSTAT8_220V))
 	{
 		OnEnKillfocusInvalueeditFor5E();	//5E 以及更高的版本 不让改这一项，点击不会弹出 Edit框。;
@@ -2986,7 +2987,7 @@ void CInputSetDlg::OnEnKillfocusInvalueedit()
 //OFF/ON  Off=1, On=0;
 void CInputSetDlg::OnCbnKillfocusValuecombo()
 {
-	if (m_nModel == 16 || m_nModel == PM_TSTAT6||m_nModel == PM_TSTAT7|| m_nModel == PM_TSTAT5i|| m_nModel == PM_TSTAT8
+	if (m_nModel == 16 || m_nModel == PM_TSTAT6||m_nModel == PM_TSTAT7|| m_nModel == PM_TSTAT5i|| m_nModel == PM_TSTAT8 || m_nModel == PM_TSTAT9
 		|| (m_nModel == PM_TSTAT8_WIFI) || (m_nModel == PM_TSTAT8_OCC) || (m_nModel == PM_TSTAT7_ARM) || (m_nModel == PM_TSTAT8_220V))
 	{
 		//OnCbnKillfocusValuecombo;//这里原来有错
@@ -3116,7 +3117,9 @@ void CInputSetDlg::OnEnKillfocusInputnameedit()
 	if(strText.CompareNoCase(strInName)==0)
 		return;
 	int nFlag = product_register_value[7];
-	if ((product_register_value[7]==PM_TSTAT5G)||(product_register_value[7]==PM_TSTAT5E)||(product_register_value[7]==PM_PM5E) || (product_register_value[7] == PM_PM5E_ARM) ||(product_register_value[7]==PM_TSTATRUNAR)||(product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT5i||(product_register_value[7]==PM_TSTAT8)
+	if ((product_register_value[7]==PM_TSTAT5G)||(product_register_value[7]==PM_TSTAT5E)||(product_register_value[7]==PM_PM5E) || 
+        (product_register_value[7] == PM_PM5E_ARM) ||(product_register_value[7]==PM_TSTATRUNAR)||(product_register_value[7]==PM_TSTAT6)||
+        (product_register_value[7]==PM_TSTAT5i||(product_register_value[7]==PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 		|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V)
 		||(product_register_value[7]==PM_TSTAT7)))
 	{
@@ -4173,7 +4176,7 @@ void CInputSetDlg::Init_not_5ABCD_Grid()
 				}
 				else if ((product_register_value[7]==PM_TSTAT6)
 					|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V)
-					||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT8))
+					||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9))
 				{
 				   strTemp.Format(_T("%.1f"),product_register_value[MODBUS_INTERNAL_THERMISTOR]/10.0);
 				}
@@ -4418,7 +4421,7 @@ void CInputSetDlg::Fresh_GridForTstat5E(){
 				}
 				else if ((product_register_value[7]==PM_TSTAT6)
 					|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V)
-					||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT8))
+					||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9))
 				{
 					strTemp.Format(_T("%.1f"),product_register_value[MODBUS_INTERNAL_THERMISTOR]/10.0);
 				}
@@ -4777,7 +4780,7 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 			
 			if ((product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT6)||(product_register_value[7]== PM_TSTAT5i)
 				|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V)
-				||(product_register_value[7]== PM_TSTAT8))
+				||(product_register_value[7]== PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9))
 			{
 				nRange= product_register_value[122+nRow-2];
 			}else
@@ -4859,7 +4862,7 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 			if ((product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT6)||(product_register_value[7]== PM_TSTAT5i)
 
 				|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V)
-				||(product_register_value[7]== PM_TSTAT8))
+				||(product_register_value[7]== PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9))
 			{
 				nValue = product_register_value[104];
 			}else
@@ -4941,7 +4944,7 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 		if ((product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT6)
 
 			|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V)
-			||(product_register_value[7]== PM_TSTAT5i)||(product_register_value[7]== PM_TSTAT8))
+			||(product_register_value[7]== PM_TSTAT5i)||(product_register_value[7]== PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9))
 		{
 			nValue=product_register_value[167+nRow-2];
 		}
@@ -5009,7 +5012,7 @@ void CInputSetDlg::OnCbnSelchangeRangComboFor5E()
 	}
 
 	Read_Multi(g_tstat_id,&product_register_value[MODBUS_TEMPRATURE_CHIP],MODBUS_TEMPRATURE_CHIP,20);
-	if(m_nModel == PM_TSTAT6 || m_nModel == PM_TSTAT7||m_nModel == PM_TSTAT5i||m_nModel == PM_TSTAT8
+	if(m_nModel == PM_TSTAT6 || m_nModel == PM_TSTAT7||m_nModel == PM_TSTAT5i||m_nModel == PM_TSTAT8 || m_nModel == PM_TSTAT9
 		|| (m_nModel == PM_TSTAT8_WIFI) || (m_nModel == PM_TSTAT8_OCC) || (m_nModel == PM_TSTAT7_ARM) || (m_nModel == PM_TSTAT8_220V)
 		)  //tstat6
 	{
@@ -6178,7 +6181,8 @@ void CInputSetDlg::ClickMsflexgrid1()
 void CInputSetDlg::OnCbnSelendokRangCombo()
 {
 	int nFlag = product_register_value[7];
-	if(m_nModel == PM_TSTAT6 || m_nModel == PM_TSTAT7|| m_nModel == PM_TSTAT5E|| m_nModel == PM_PM5E || m_nModel == PM_PM5E_ARM ||m_nModel==PM_TSTATRUNAR|| m_nModel == PM_TSTAT5i|| m_nModel == PM_TSTAT8
+	if(m_nModel == PM_TSTAT6 || m_nModel == PM_TSTAT7|| m_nModel == PM_TSTAT5E|| m_nModel == PM_PM5E || m_nModel == PM_PM5E_ARM ||
+        m_nModel==PM_TSTATRUNAR|| m_nModel == PM_TSTAT5i|| m_nModel == PM_TSTAT8 || m_nModel == PM_TSTAT9
 		|| (m_nModel == PM_TSTAT8_WIFI) || (m_nModel == PM_TSTAT8_OCC) || (m_nModel == PM_TSTAT7_ARM) || (m_nModel == PM_TSTAT8_220V)
 		)  //tstat6
 	{

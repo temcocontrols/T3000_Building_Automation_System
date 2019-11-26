@@ -699,8 +699,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 #ifdef DEBUG
 
     unsigned long  temp_time_long = time(NULL);
-
-
     Sleep(1);
 #endif // DEBUG
 
@@ -1896,6 +1894,7 @@ void CMainFrame::LoadProductFromDB()
 						TVINSERV_TSTAT6
 						else if(temp_product_class_id == PM_TSTAT10 || 
                                 temp_product_class_id == PM_TSTAT8  || 
+                                temp_product_class_id == PM_TSTAT9 ||
                                 temp_product_class_id == PM_TSTAT8_WIFI || 
                                 temp_product_class_id == PM_TSTAT8_OCC || 
                                 temp_product_class_id == PM_TSTAT_AQ ||
@@ -1973,7 +1972,7 @@ void CMainFrame::LoadProductFromDB()
 
 
 						strSql=q.getValuebyName(L"EPsize");
-						m_product_temp.nEPsize=(int)_wtol(strSql);
+						m_product_temp.nhardware_info =(int)_wtol(strSql);
 
 
 						strSql=q.getValuebyName(L"Protocol");
@@ -2152,6 +2151,7 @@ void CMainFrame::LoadProductFromDB()
 								TVINSERV_TSTAT6
 							else if (temp_product_class_id == PM_TSTAT10 || 
                                      temp_product_class_id == PM_TSTAT8 || 
+                                     temp_product_class_id == PM_TSTAT9 ||
                                      temp_product_class_id == PM_TSTAT8_WIFI || 
                                      temp_product_class_id == PM_TSTAT8_OCC || 
                                      temp_product_class_id == PM_TSTAT_AQ ||
@@ -2228,7 +2228,7 @@ void CMainFrame::LoadProductFromDB()
 
 
 							strSql=q.getValuebyName(L"EPsize");
-							m_product_temp.nEPsize=(int)_wtol(strSql);
+							m_product_temp.nhardware_info =(int)_wtol(strSql);
 
 
 							strSql=q.getValuebyName(L"Protocol");
@@ -2394,6 +2394,7 @@ void CMainFrame::LoadProductFromDB()
 					TVINSERV_TSTAT6
 				else if (temp_product_class_id == PM_TSTAT10 || 
                          temp_product_class_id == PM_TSTAT8 || 
+                         temp_product_class_id == PM_TSTAT9 ||
                          temp_product_class_id == PM_TSTAT8_WIFI || 
                          temp_product_class_id == PM_TSTAT8_OCC || 
                          temp_product_class_id == PM_TSTAT_AQ ||
@@ -2466,7 +2467,7 @@ void CMainFrame::LoadProductFromDB()
 
 
 				strSql=q.getValuebyName(L"EPsize");
-				m_product_temp.nEPsize=(int)_wtol(strSql);
+				m_product_temp.nhardware_info =(int)_wtol(strSql);
 
 
 				strSql=q.getValuebyName(L"Protocol");
@@ -2902,6 +2903,7 @@ void CMainFrame::ScanTstatInDB(void)
 					else if (temp_product_class_id == PM_TSTAT6 || temp_product_class_id == PM_TSTAT5i)
 						TVINSERV_TSTAT6
 					else if (temp_product_class_id == PM_TSTAT8 || 
+                             temp_product_class_id == PM_TSTAT9 ||
                              temp_product_class_id == PM_TSTAT8_WIFI || 
                              temp_product_class_id == PM_TSTAT8_OCC || 
                              temp_product_class_id == PM_TSTAT_AQ ||
@@ -2965,7 +2967,7 @@ void CMainFrame::ScanTstatInDB(void)
 
                     m_product_temp.hardware_version=q.getFloatField("Hardware_Ver");
                     m_product_temp.software_version=q.getFloatField("Software_Ver");
-                    m_product_temp.nEPsize=q.getIntField("EPsize");
+                    m_product_temp.nhardware_info =q.getIntField("EPsize");
                     m_product_temp.protocol = q.getIntField("Protocol");
 					 strSql= q.getValuebyName(L"Bautrate");
 					
@@ -3092,7 +3094,7 @@ void CMainFrame::OnLoadConfigFile()
 			hwait_write_modbus10000 =CreateThread(NULL,NULL,Write_Modbus_10000,this,NULL, NULL);
 		}
 	}
-    else if ((product_register_value[7] == PM_TSTAT6) || (product_register_value[7] == PM_TSTAT7) || (product_register_value[7] == PM_TSTAT5i) || (product_register_value[7] == PM_TSTAT8)
+    else if ((product_register_value[7] == PM_TSTAT6) || (product_register_value[7] == PM_TSTAT7) || (product_register_value[7] == PM_TSTAT5i) || (product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
         || (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V))
     {
         CFileDialog dlg(true, _T("*.txt"), _T(" "), OFN_HIDEREADONLY, _T("Txt files (*.txt)|*.txt||"), NULL, 0);
@@ -3118,11 +3120,11 @@ void CMainFrame::OnLoadConfigFile()
         return;
     }
 
-    int nCurID=g_tstat_id;
-    g_bPauseMultiRead=TRUE;
-    g_tstat_id=nCurID;
-    ReFresh();
-    g_bPauseMultiRead=FALSE;
+    //int nCurID=g_tstat_id;
+    //g_bPauseMultiRead=TRUE;
+    //g_tstat_id=nCurID;
+    //ReFresh();
+    //g_bPauseMultiRead=FALSE;
 }
 
 #include "Flash_Multy.h"
@@ -5780,7 +5782,7 @@ void CMainFrame::SaveConfigFile()
         strTips.Format(_T("Config file \" %s \" saved successful."), strFilename);
         SetPaneString(1, strTips);
     }
-    else if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)
+    else if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V))
     {
 
@@ -6511,6 +6513,15 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             g_bac_instance = NULL;
             g_selected_product_id = selected_product_Node.product_class_id;
             SetCommandDelayTime(g_selected_product_id);
+            if ((selected_product_Node.nhardware_info & 0x02) == 2) //说明是wifi 连接 ，延时要加长，并关闭后台刷新;
+            {
+                n_background_list_refresh = false; //关闭后台刷新;
+                SEND_COMMAND_DELAY_TIME = 1000;
+            }
+            else
+            {
+                n_background_list_refresh = true;
+            }
             selected_product_index = i;//记录目前选中的是哪一个 产品;用于后面自动更新firmware;
             selected_tree_item = hTreeItem;
             Statuspanel.Empty();
@@ -7502,7 +7513,7 @@ start_read_reg_data:
                     int length = 10;
                     nFlag = Device_Type;
                     int it = 0;
-                    if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT5i) || (nFlag == PM_TSTAT8)
+                    if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7) || (nFlag == PM_TSTAT9) || (nFlag == PM_TSTAT5i) || (nFlag == PM_TSTAT8) || (nFlag == PM_TSTAT9)
 						|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
                     {
                         product_type =T3000_6_ADDRESS;
@@ -7771,7 +7782,7 @@ start_read_reg_data:
                         MyRegAddress.Change_Register_Table();
                     }
 					int nFlag = product_register_value[7];
-					if (product_register_value[7] == PM_TSTAT8
+					if (product_register_value[7] == PM_TSTAT8 || product_register_value[7] == PM_TSTAT9
 						|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
 					{
 						MODBUS_BAUDRATE = 15;
@@ -8043,7 +8054,7 @@ start_read_reg_data:
             }
 
 		 
-            else if (nFlag==PM_TSTAT6||nFlag==PM_TSTAT7||nFlag==PM_TSTAT5i||nFlag==PM_TSTAT8
+            else if (nFlag==PM_TSTAT6||nFlag==PM_TSTAT7||nFlag==PM_TSTAT5i||nFlag==PM_TSTAT8 || nFlag == PM_TSTAT9
 				|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
             {
                 CString g_configfile_path =g_strExePth + g_strStartInterface_config;
@@ -8087,7 +8098,7 @@ start_read_reg_data:
                 //if product module is TSTAT6 or TSTAT7 use T3000_6_ADDRESS. T3000_6_ADDRESS is a register table in t3000.mdb  T3000_Register_Address_By_Name
                 //else if product module is PM_TSTAT5E PM_TSTAT5H use T3000_5EH_LCD_ADDRESS
                 //else if product module is TSTAT5 ABCDFG USE T3000_5ABCDFG_LED_ADDRESS
-                if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT5i) || (nFlag == PM_TSTAT8)
+                if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT5i) || (nFlag == PM_TSTAT8) || (nFlag == PM_TSTAT9)
 					|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V)
 					)
                 {
@@ -8114,7 +8125,7 @@ start_read_reg_data:
                     MyRegAddress.Change_Register_Table();
                 }
 				int nFlag = product_register_value[7];
-				if (product_register_value[7] == PM_TSTAT8
+				if (product_register_value[7] == PM_TSTAT8 || product_register_value[7] == PM_TSTAT9
 					|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
 				{
 					MODBUS_BAUDRATE = 15;
@@ -8332,126 +8343,7 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
             if((m_product.at(i).protocol == MODBUS_RS485) && (rs485_scan_count == 0) && (temp_port > 0 ) && (m_product.at(i).BuildingInfo.strIp.IsEmpty()))
             {
                 continue;
-#if 0
-                if(refresh_com !=0 )
-                    continue;
-                //register_critical_section.Lock();
-                int nCom = GetLastOpenedComport();
-                int temp_comunicationtype = GetLastCommunicationType();
-                int temp_baudrate = GetLastSuccessBaudrate();
-                //m_product.at(i).status = false;
-                temp_online = false;
-                SetCommunicationType(0);
-                //close_com(); // 先不关闭;
-                int nComPort = m_product.at(i).ncomport;
-                int n_baudrate = m_product.at(i).baudrate;
-                //38400是有一个zigbee 的 USB  它的波特率,所以也需要判断38400;
-                if((n_baudrate != 19200) 
-				&& (n_baudrate != 9600) 
-				&& (n_baudrate != 38400)
-				&& (n_baudrate != 57600)
-				&& (n_baudrate != 115200)
-				)
-                    n_baudrate = 19200;
-                if(nComPort == 0)
-                {
-                    temp_online = false;
-                    //m_product.at(i).status = false;
-                    bOnLine=FALSE;
-                    //register_critical_section.Unlock();
-                    goto end_condition;
-                }
-                BOOL  bret = 0;
-                if((nComPort>0) && (nComPort<20))
-                {
-                    if(nComPort!=nCom)	//如果不等于当前选择的设备的串口，就不要检测状态;免得串口一开一关的.
-                        continue;
-                    bret = 1;
-                }
-                else
-                {
-                    bret = 0;
-                }
-                if (!bret)
-                {
-                    temp_online = false;
-                    bOnLine=FALSE;
-                    goto end_condition;
-                }
-                else
-                {
-                    Change_BaudRate(n_baudrate);
-                    unsigned short first_ten_reg[10];
-                    int read_block_ret;
-                    read_block_ret=Read_Multi(nIDNode,&first_ten_reg[0],0,10,3);
 
-
-                    //TRACE(_T("%d = Read_One(%d)     "),nID,nIDNode);
-                    /*
-                    If an error was returned from the read,
-                    we previously attempted to try again with a reduced baud rate.
-                    However, a bug in the code meant this never was done correctly
-                    and problems were reported when the baud rate was changed.
-                    See discussion in ticket #14
-                    Now we simply set the online flag to FALSE and give up.
-                    */
-
-
-                    if( read_block_ret <0)
-                    {
-						m_product.at(i).status = false;
-                        temp_online = false;
-                        //m_product.at(i).status = false;
-                        bOnLine=FALSE;
-                    }
-                    else
-                    {
-                        // successful read of register offset 6
-                        //unsigned short SerialNum[4];
-                        //memset(SerialNum,0,sizeof(SerialNum));
-                        int nRet=0;//
-                        // read first 4 registers
-                        //	nRet=modbus_read_multi_value(&SerialNum[0],nID,0,4,5);
-                        //nRet=Read_Multi(nID,&SerialNum[0],0,4,5);
-                        //memcpy((char *)SerialNum,(char *)first_ten_reg,4);
-
-                        unsigned int nSerialNumberRead;
-
-                        if(nRet>=0)  // 计算串口号
-                        {
-                            nSerialNumberRead=first_ten_reg[0]+first_ten_reg[1]*256+first_ten_reg[2]*256*256+first_ten_reg[3]*256*256*256;
-                        }
-
-                        if(nSerialNumber>=0)
-                        {
-                            if(nSerialNumberRead==nSerialNumber) // 取到串口号，并相等，说明online;
-                            {
-                                temp_online = true;
-                                //m_product.at(i).status = true;
-                                bOnLine=TRUE;
-                            }
-                        }
-                    }
-                }
-end_condition :
-
-                if(temp_comunicationtype == 0)
-                {
-                    if((nCom >0) && (nCom <=20))
-                    {
-                        SetCommunicationType(0);
-                        if((temp_baudrate != 19200) && (temp_baudrate != 9600)  && (temp_baudrate != 38400))
-                            temp_baudrate = 19200;
-                        Change_BaudRate(temp_baudrate);
-                    }
-                }
-                SetCommunicationType(temp_comunicationtype);
-				m_product.at(i).status_last_time[2] = m_product.at(i).status_last_time[1] ;
-				m_product.at(i).status_last_time[1] = m_product.at(i).status_last_time[0] ;
-				m_product.at(i).status_last_time[0] = temp_online ;
-				m_product.at(i).status = m_product.at(i).status_last_time[0] || m_product.at(i).status_last_time[1] || m_product.at(i).status_last_time[2];
-				continue;
-#endif
             }
             else if(m_product.at(i).protocol == PROTOCOL_GSM)
             {
@@ -8571,20 +8463,6 @@ end_condition :
         }
     }
 
-//#ifdef _DEBUG
-//    for (UINT i = 0; i < m_product.size(); i++)
-//    {
-//        TRACE(_T("IP:%-20s , serialnumber : %15u , name: %-20s, %d  ,%d  , %d ,%d  , %d\r\n"), \
-//            m_product.at(i).BuildingInfo.strIp ,
-//            m_product.at(i).serial_number , 
-//            m_product.at(i).NameShowOnTree,
-//            m_product.at(i).status_last_time[0], 
-//            m_product.at(i).status_last_time[1], 
-//            m_product.at(i).status_last_time[2],
-//            m_product.at(i).status_last_time[3],
-//            m_product.at(i).status_last_time[4]);
-//    }
-//#endif
 
     unsigned short mstp_array[1000];
     int nret_read_bac = 0;
@@ -8611,6 +8489,8 @@ end_condition :
                 break;
             }
         }
+        CString str_hardware_info;
+        
         CString str_object_instance;
         CString str_panel_number;
         CString str_hw_version;
@@ -8620,6 +8500,7 @@ end_condition :
 
         str_object_instance.Format(_T("%u"),m_refresh_net_device_data.at(y).object_instance);
         str_panel_number.Format(_T("%u"),m_refresh_net_device_data.at(y).panal_number);
+        str_hardware_info.Format(_T("%u"), m_refresh_net_device_data.at(y).hardware_info);
         if(db_exsit)	//数据库存在，就查看是否要更新;
         {
             //如果是BIP 转MSTP 对已经存在的 不作刷新动作;  //需解决的问题是 已经存在的 子设备 如何刷新？
@@ -8632,6 +8513,7 @@ end_condition :
                     (m_refresh_net_device_data.at(y).nport != m_product.at(n_index).ncomport) ||
 					(m_refresh_net_device_data.at(y).product_id != m_product.at(n_index).product_class_id) ||
                     (m_refresh_net_device_data.at(y).modbusID != m_product.at(n_index).product_id) ||
+                    (m_refresh_net_device_data.at(y).hardware_info != m_product.at(n_index).nhardware_info) ||   //
                     (m_refresh_net_device_data.at(y).parent_serial_number != m_product.at(n_index).note_parent_serial_number) ||
                     //((m_product.at(n_index).protocol != MODBUS_TCPIP) && (m_product.at(n_index).protocol != PROTOCOL_BACNET_IP) && (m_product.at(n_index).protocol != PROTOCOL_BIP_TO_MSTP)) ||
                     (m_refresh_net_device_data.at(y).nprotocol!= m_product.at(n_index).protocol ) ||
@@ -8693,17 +8575,20 @@ end_condition :
                     {
                         CString temp_pro;
                         temp_pro.Format(_T("%u"),PROTOCOL_BIP_TO_MSTP);
-                        strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s', Product_class_ID = '%s', Object_Instance = '%s' , Panal_Number = '%s' , Bautrate ='%s',Software_Ver = '%s' , Com_Port ='%s',Product_ID ='%s', Protocol ='%s',Product_name = '%s',Online_Status = 1 ,Parent_SerialNum = '%s' where Serial_ID = '%s'"),NetwordCard_Address,temp_product_class_id,str_object_instance,str_panel_number,str_ip_address_exist,str_fw_version,str_n_port,str_modbus_id,temp_pro,str_Product_name_view,str_parents_serial,str_serialid);
+                        strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s', Product_class_ID = '%s', Object_Instance = '%s' , Panal_Number = '%s' , Bautrate ='%s',Software_Ver = '%s' , Com_Port ='%s',Product_ID ='%s', Protocol ='%s',Product_name = '%s',Online_Status = 1 ,Parent_SerialNum = '%s' ,EPsize = '%s' where Serial_ID = '%s'"),
+                            NetwordCard_Address,temp_product_class_id,str_object_instance,str_panel_number,str_ip_address_exist,str_fw_version,str_n_port,str_modbus_id,temp_pro,str_Product_name_view,str_parents_serial, str_hardware_info,str_serialid);
                     }
                     else if (m_refresh_net_device_data.at(y).nprotocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)
                     {
                         CString temp_pro;
                         temp_pro.Format(_T("%u"), PROTOCOL_BIP_T0_MSTP_TO_MODBUS);
-                        strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s', Product_class_ID = '%s', Object_Instance = '%s' , Panal_Number = '%s' , Bautrate ='%s',Software_Ver = '%s' , Com_Port ='%s',Product_ID ='%s', Protocol ='%s',Online_Status = 1 ,Parent_SerialNum = '%s' where Serial_ID = '%s'"), NetwordCard_Address, temp_product_class_id, str_object_instance, str_panel_number, str_ip_address_exist, str_fw_version, str_n_port, str_modbus_id, temp_pro, str_parents_serial, str_serialid);
+                        strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s', Product_class_ID = '%s', Object_Instance = '%s' , Panal_Number = '%s' , Bautrate ='%s',Software_Ver = '%s' , Com_Port ='%s',Product_ID ='%s', Protocol ='%s',Online_Status = 1 ,Parent_SerialNum = '%s'  ,EPsize = '%s' where Serial_ID = '%s'"), 
+                            NetwordCard_Address, temp_product_class_id, str_object_instance, str_panel_number, str_ip_address_exist, str_fw_version, str_n_port, str_modbus_id, temp_pro, str_parents_serial, str_hardware_info, str_serialid);
 
                     }
                     else
-                        strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s', Product_class_ID = '%s', Object_Instance = '%s' , Panal_Number = '%s' ,  Bautrate ='%s',Software_Ver = '%s' ,Com_Port ='%s',Product_ID ='%s', Protocol ='1',Product_name = '%s',Online_Status = 1,Parent_SerialNum = '%s' where Serial_ID = '%s'"),NetwordCard_Address,temp_product_class_id,str_object_instance,str_panel_number,str_ip_address_exist,str_fw_version,str_n_port,str_modbus_id,str_Product_name_view,str_parents_serial,str_serialid);
+                        strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s', Product_class_ID = '%s', Object_Instance = '%s' , Panal_Number = '%s' ,  Bautrate ='%s',Software_Ver = '%s' ,Com_Port ='%s',Product_ID ='%s', Protocol ='1',Product_name = '%s',Online_Status = 1,Parent_SerialNum = '%s'  ,EPsize = '%s' where Serial_ID = '%s'"),
+                            NetwordCard_Address,temp_product_class_id,str_object_instance,str_panel_number,str_ip_address_exist,str_fw_version,str_n_port,str_modbus_id,str_Product_name_view,str_parents_serial, str_hardware_info , str_serialid);
                     find_new_device = true;
 					SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
                      
@@ -8803,13 +8688,13 @@ end_condition :
             {
                 CString temp_pro2;
                 temp_pro2.Format(_T("%u"),PROTOCOL_BIP_TO_MSTP);
-                strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('"+m_strCurMainBuildingName+"','"+m_strCurSubBuldingName+"','"+NetwordCard_Address+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','""','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','"+str_hw_version+"','"+str_fw_version+"','"+str_n_port+"','0','"+temp_pro2+"','1','"+str_parents_serial +"' ,'"+str_panel_number +"' ,'"+str_object_instance +"' ,'"+is_custom +"' )"));
+                strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('"+m_strCurMainBuildingName+"','"+m_strCurSubBuldingName+"','"+NetwordCard_Address+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','""','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','"+str_hw_version+"','"+str_fw_version+"','"+str_n_port+"','"+ str_hardware_info +"','"+temp_pro2+"','1','"+str_parents_serial +"' ,'"+str_panel_number +"' ,'"+str_object_instance +"' ,'"+is_custom +"' )"));
             }
 			else if((m_refresh_net_device_data.at(y).object_instance != 0) && (m_refresh_net_device_data.at(y).panal_number != 0) && is_bacnet_device)
 			{
 				CString temp_pro3;
 				temp_pro3.Format(_T("%u"),PROTOCOL_BACNET_IP);
-				strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('"+m_strCurMainBuildingName+"','"+m_strCurSubBuldingName+"','"+NetwordCard_Address+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','""','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','"+str_hw_version+"','"+str_fw_version+"','"+str_n_port+"','0','"+temp_pro3+"','1','"+str_parents_serial +"' ,'"+str_panel_number +"' ,'"+str_object_instance +"' ,'"+is_custom +"' )"));
+				strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('"+m_strCurMainBuildingName+"','"+m_strCurSubBuldingName+"','"+NetwordCard_Address+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','""','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','"+str_hw_version+"','"+str_fw_version+"','"+str_n_port+"','"+ str_hardware_info +"','"+temp_pro3+"','1','"+str_parents_serial +"' ,'"+str_panel_number +"' ,'"+str_object_instance +"' ,'"+is_custom +"' )"));
 			}
             else if (m_refresh_net_device_data.at(y).nprotocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)
             {
@@ -8823,7 +8708,7 @@ end_condition :
                         //str_serialid.Format(_T("%u"), mstp_array[0] + mstp_array[1] * 256 + mstp_array[2] * 256 * 256 + mstp_array[3] * 256 * 256 * 256);
                         CString temp_pro4;
                         temp_pro4.Format(_T("%u"), PROTOCOL_BIP_T0_MSTP_TO_MODBUS);
-                        strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('" + m_strCurMainBuildingName + "','" + m_strCurSubBuldingName + "','" + NetwordCard_Address + "','" + str_serialid + "','floor1','room1','" + product_name + "','" + product_class_id + "','" + modbusid + "','""','" + str_ip_address + "','T3000_Default_Building_PIC.bmp','" + str_hw_version + "','" + str_fw_version + "','" + str_n_port + "','0','" + temp_pro4 + "','1','" + str_parents_serial + "' ,'" + str_panel_number + "' ,'" + str_object_instance + "' ,'" + is_custom + "' )"));
+                        strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('" + m_strCurMainBuildingName + "','" + m_strCurSubBuldingName + "','" + NetwordCard_Address + "','" + str_serialid + "','floor1','room1','" + product_name + "','" + product_class_id + "','" + modbusid + "','""','" + str_ip_address + "','T3000_Default_Building_PIC.bmp','" + str_hw_version + "','" + str_fw_version + "','" + str_n_port + "','"+ str_hardware_info +"','" + temp_pro4 + "','1','" + str_parents_serial + "' ,'" + str_panel_number + "' ,'" + str_object_instance + "' ,'" + is_custom + "' )"));
                 //    }
                 //    else if (nret_read_bac < 0)
                 //    {
@@ -8839,7 +8724,7 @@ end_condition :
 				CString temp_pro4;
 				temp_pro4.Format(_T("%u"),MODBUS_TCPIP);
 
-                strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('"+m_strCurMainBuildingName+"','"+m_strCurSubBuldingName+"','"+NetwordCard_Address+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','""','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','"+str_hw_version+"','"+str_fw_version+"','"+str_n_port+"','0','"+temp_pro4+"','1','"+str_parents_serial +"' ,'"+str_panel_number +"' ,'"+str_object_instance +"' ,'"+is_custom +"' )"));
+                strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('"+m_strCurMainBuildingName+"','"+m_strCurSubBuldingName+"','"+NetwordCard_Address+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','""','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','"+str_hw_version+"','"+str_fw_version+"','"+str_n_port+"','"+ str_hardware_info +"','"+temp_pro4+"','1','"+str_parents_serial +"' ,'"+str_panel_number +"' ,'"+str_object_instance +"' ,'"+is_custom +"' )"));
 			}
             try
             {
@@ -10141,6 +10026,8 @@ loop1:
                 _MessageRefreshListInfo *My_WriteList_Struct = (_MessageRefreshListInfo *)msg.wParam;
                 My_Receive_msg.erase(My_Receive_msg.begin());
                 MyCriticalSection.Unlock();
+                if (n_background_list_refresh == false)
+                    break;
                 for (int i=0; i<My_WriteList_Struct->block_size; i++)
                 {
                     resend_count = 0;
@@ -10485,7 +10372,7 @@ void CMainFrame::OnControlInputs()
     //    return;
     //}
     
-    if (product_type == CS3000 || product_register_value[7] == PM_TSTAT6 || product_register_value[7] == PM_TSTAT5i || product_register_value[7] == PM_TSTAT7 || product_register_value[7] == PM_TSTAT8
+    if (product_type == CS3000 || product_register_value[7] == PM_TSTAT6 || product_register_value[7] == PM_TSTAT5i || product_register_value[7] == PM_TSTAT7 || product_register_value[7] == PM_TSTAT8 || product_register_value[7] == PM_TSTAT9
         || (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V))
     {
 
@@ -11012,7 +10899,7 @@ void CMainFrame::OnControlWeekly()
     else
     {
 		int nFlag = product_register_value[7];
-		if (product_register_value[7] == PM_TSTAT8 || (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
+		if (product_register_value[7] == PM_TSTAT8 || product_register_value[7] == PM_TSTAT9 || (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
 		{
 			g_bPauseMultiRead = TRUE;
 			CNewTstatSchedulesDlg dlg;
@@ -11083,7 +10970,7 @@ void CMainFrame::OnControlAnnualroutines()
     }
     else
     {
-        if(product_register_value[7]==PM_TSTAT8
+        if(product_register_value[7]==PM_TSTAT8 || product_register_value[7] == PM_TSTAT9
 			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 			)
         {
@@ -11183,7 +11070,7 @@ void CMainFrame::OnControlSettings()
 	}
     else
     {
-        if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8
+        if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8 || product_register_value[7] == PM_TSTAT9
 			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 			)
         {
@@ -11373,7 +11260,7 @@ void CMainFrame::OnControlScreens()
     }
     else
     {
-        if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8
+        if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8 || product_register_value[7] == PM_TSTAT9
 			|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 			)
         {
