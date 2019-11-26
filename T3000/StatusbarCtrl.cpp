@@ -64,6 +64,7 @@ IMPLEMENT_DYNAMIC(CMyStatusbarCtrl, CDialogEx)
 CMyStatusbarCtrl::CMyStatusbarCtrl(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CMyStatusbarCtrl::IDD, pParent)
 {
+    m_health_persent = 0;
 }
 
 CMyStatusbarCtrl::~CMyStatusbarCtrl()

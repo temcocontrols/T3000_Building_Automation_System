@@ -504,12 +504,12 @@ void CMainFrame::Read_Config(){
 
 
 		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("IP Address"),_T("127.0.0.1"),g_configfile_path);
-		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("IP Port"),_T("6001"),g_configfile_path);
+		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("IP Port"),_T("502"),g_configfile_path);
 
 		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Response Timeout"),_T("1000"),g_configfile_path);
 		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Delay Between Time"),_T("1000"),g_configfile_path);
 
-		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Connect Timeout"),_T("1000"),g_configfile_path);
+		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Connect Timeout"),_T("3000"),g_configfile_path);
 	}
 
 	CString comport;
@@ -517,9 +517,10 @@ void CMainFrame::Read_Config(){
 	m_communication_type=GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("Connection Type"),2,g_configfile_path);
 	m_comport=GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("COM_Port"),1,g_configfile_path);
 	GetPrivateProfileString(_T("MBPOLL_Setting"),_T("IP Address"),_T("127.0.0.1"),m_ipaddress.GetBuffer(MAX_PATH),MAX_PATH,g_configfile_path);
-	m_port=GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("IP Port"),6001,g_configfile_path);
+    m_ipaddress.ReleaseBuffer();
+	m_port=GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("IP Port"),502,g_configfile_path);
 	m_connecttimeout=GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("Connect Timeout"),1000,g_configfile_path);
-    m_responsetimeout =GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("Response Timeout"),1000,g_configfile_path);
+    m_responsetimeout =GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("Response Timeout"),3000,g_configfile_path);
 
 }
 void CMainFrame::OnConnectionQuickconnectf5()
@@ -561,6 +562,7 @@ void CMainFrame::OnConnectionQuickconnectf5()
 		if (!Open_Socket2(m_ipaddress,m_port))
 		{
 			temp.Format(_T("%s can't be connected"),m_ipaddress.GetBuffer());
+            m_ipaddress.ReleaseBuffer();
 			AfxMessageBox(temp);
 			CString strpannel;
 			strpannel=temp;
@@ -759,13 +761,31 @@ void Update_ViewData(CView* MBPollView){
 			if (pMBPollView->m_PLC_Addresses==1)
 			{
 				//ret=read_multi_log(ID,&DataBuffer[0],startAdd-1,quantity,&send_data[0],&rev_back_rawData[0],&Send_length,&Rev_length);
-				ret = Modbus_Standard_Read(ID, &DataBuffer[0], functioncode,startAdd - 1, quantity, &send_data[0], &rev_back_rawData[0], &Send_length, &Rev_length);
-
+                for (int j = 0; j < 3; j++)
+                {
+                    ret = Modbus_Standard_Read(ID, &DataBuffer[0], functioncode, startAdd - 1, quantity, &send_data[0], &rev_back_rawData[0], &Send_length, &Rev_length);
+                    if (ret >= 0)
+                        break;
+                    else
+                    {
+                        Sleep(100);
+                    }
+                }
 			}
 			else
 			{
 				//ret = read_multi_log(ID,&DataBuffer[0],startAdd,quantity,&send_data[0],&rev_back_rawData[0],&Send_length,&Rev_length);
-				ret = Modbus_Standard_Read(ID, &DataBuffer[0], functioncode,startAdd, quantity, &send_data[0], &rev_back_rawData[0], &Send_length, &Rev_length);
+                for (int  j = 0; j < 3; j++)
+                {
+                    ret = Modbus_Standard_Read(ID, &DataBuffer[0], functioncode, startAdd, quantity, &send_data[0], &rev_back_rawData[0], &Send_length, &Rev_length);
+                    if (ret >= 0)
+                        break;
+                    else
+                    {
+                        Sleep(100);
+                    }
+                }
+				
 
 			}
 			register_critical_section.Unlock();

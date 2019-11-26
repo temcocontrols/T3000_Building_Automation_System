@@ -260,7 +260,6 @@
 #define IDB_BITMAP8                     608
 #define IDB_BITMAP_ALARM_RED            608
 #define IDR_MENU_PROGRAMEDIT_RIGHT_CLICK 609
-#define IDB_BITMAP9                     610
 #define IDI_ICON_DEFAULT_VARIABLE       625
 #define IDI_ICON_DEFAULT_PROGRAM        626
 #define IDI_ICON_DEFAULT_HOLIDAY        629
@@ -300,7 +299,7 @@
 #define IDD_DIALOG_FREE_COOLING         676
 #define IDD_DIALOG_REMOTE_PORT_WARNING  677
 #define IDD_DIALOG16                    679
-#define IDD_DIALOG_NEW_T3000_PRG_EDIT   680
+#define IDD_CONTROLBASIC_EDITOR_VIEW    680
 #define IDD_DIALOG_MINIPANEL_GROUP_SCHEDULE 688
 #define IDD_DIALOG_MODBUS_BACNET_ROUTER 690
 #define IDB_BITMAP_NEW_BACNET_MENU_BIT  693
@@ -315,6 +314,10 @@
 #define IDD_DIALOG_REGISTER_LIST        716
 #define IDD_DIALOG_CO2_NODE             718
 #define IDD_DIALOG_BACNET_ADD_REMOTE_DEVICE 724
+#define IDD_DIALOG_ZIGBEE_REPEATER      726
+#define IDR_MENU_CONTROL_BASIC          733
+#define IDD_DIALOG_BACNET_RANGE_MSV     734
+#define IDD_DIALOG_TSTAT_AQ             736
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -900,8 +903,10 @@
 #define IDC_INPUTVALUE3_PID3            1190
 #define IDC_AIREDIT                     1191
 #define IDC_CHECK182                    1191
+#define IDC_DELTA_SELECT_1              1191
 #define IDC_USETRSETPT                  1192
 #define IDC_CHECK183                    1192
+#define IDC_DELTA_SELECT_2              1192
 #define IDC_PTOFFEDIT                   1193
 #define IDC_CHECK184                    1193
 #define IDC_SETPTEDIT                   1194
@@ -2412,8 +2417,45 @@
 #define IDC_BUTTON_REMOTEDLG_SCAN       2467
 #define IDC_STATIC_ADD_REMOTE1          2468
 #define IDC_STATIC_ADD_REMOTE2          2469
+#define IDC_COMBO_REPEATER_BAUDRATE     2469
 #define IDC_STATIC_ADD_REMOTE3          2470
+#define IDC_COMBO_REPEATER_MODE         2470
 #define IDC_STATIC_ADD_REMOTE4          2471
+#define IDC_EDIT_CHANNEL                2471
+#define IDC_EDIT_PANID                  2472
+#define IDC_STATIC_SERIALNUM            2473
+#define IDC_EDIT_MODBUSID               2474
+#define IDC_LIST_ZIGBEE_REPEATER        2475
+#define IDC_BUTTON_ZIGBEE_REFRESH       2476
+#define IDC_LIST_ZIGBEE_INPUT_MOUDLE    2477
+#define IDC_BUTTON_CLEAR_SCHEDULE       2478
+#define IDC_STATIC_DELTA                2479
+#define IDC_STATIC_ACE                  2480
+#define IDC_EDIT_BACNET_DEVICE_ID       2481
+#define IDC_STATIC_CYCLE_INFO           2482
+#define IDC_COMBO_CUSRANGE_STIGNALTYPE  2483
+#define IDC_STATIC_DATA_STATUS          2484
+#define IDC_STATIC_MSV_GROUP            2485
+#define IDC_RADIO_MSV_1                 2486
+#define IDC_RADIO_MSV_2                 2487
+#define IDC_LIST_RANGE_MSV              2487
+#define IDC_RADIO_MSV_3                 2488
+#define IDC_STATIC_TEMPERATURE_VALUE    2488
+#define IDC_STATIC_HUM_VALUE            2489
+#define IDC_STATIC_CO2_VALUE            2490
+#define IDC_STATIC_AQ_VALUE             2491
+#define IDC_STATIC_WEIGHT_PM1_0         2492
+#define IDC_STATIC_INDEX_PM1_0          2493
+#define IDC_STATIC_WEIGHT_PM2_5         2494
+#define IDC_STATIC_INDEX_PM2_5          2495
+#define IDC_STATIC_WEIGHT_PM4_0         2496
+#define IDC_STATIC_INDEX_PM4_0          2497
+#define IDC_STATIC_WEIGHT_PM10          2498
+#define IDC_STATIC_INDEX_PM10           2499
+#define IDC_STATIC_AQ_TEMPERATURE       2500
+#define IDC_STATIC_WEIGHT_TOTAL         2501
+#define IDC_STATIC_INDEX_PM11           2502
+#define IDC_STATIC_INDEX_TOTAL          2502
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -2436,6 +2478,7 @@
 #define IDC_SLIDERCONTROL3              3835
 #define IDC_BTN_EDIT_CUSTOMER_RANGE     5714
 #define IDC_EDIT_TIMEOUT_3              5715
+#define IDC_BTN_EDIT_MSV_RANGE          5715
 #define IDC_BUTTON_SYNC_TIME            5716
 #define IDC_STATIC_BAC_SETTING_SD_CARD  5817
 #define IDC_MFCCOLORBUTTON_FUNCTION     5818
@@ -2630,20 +2673,6 @@
 #define IDC_RADIO_VAR_CUS_5             15597
 #define IDC_RADIO101                    15598
 #define IDC_RADIO102                    15599
-#define IDC_RADIO103                    15600
-#define IDC_RADIO104                    15601
-#define IDC_RADIO105                    15602
-#define IDC_RADIO106                    15603
-#define IDC_RADIO107                    15604
-#define IDC_RADIO108                    15605
-#define IDC_RADIO109                    15606
-#define IDC_RADIO110                    15607
-#define IDC_RADIO111                    15608
-#define IDC_RADIO112                    15609
-#define IDC_RADIO113                    15610
-#define IDC_RADIO114                    15611
-#define IDC_RADIO115                    15612
-#define IDC_RADIO116                    15613
 #define IDC_RADIO_NEW200                19484
 #define ID_TIMEBASE_1HOUR               19485
 #define IDC_RADIO_NEW201                19485
@@ -2812,7 +2841,6 @@
 #define ID_CONTROL_OUTPUTS              32877
 #define ID_CONTROL_VARIABLES            32878
 #define ID_CONTROL_CONTROLLERS          32879
-#define ID_VIEW_COMMUNICATETRAFFIC      32880
 #define ID_CONTROL_ANNUALROUTINES       32881
 #define ID_MISCELLANEOUS_LOADDESCRIPTORS 32882
 #define ID_FILE_OPEN32883               32883
@@ -2897,6 +2925,12 @@
 #define ID_CONTROL_MODBUSBACNETREGISTERLISTVIEW 34068
 #define ID_CONTROL_PANEL                34068
 #define ID_CONTROL_NETWORK              34069
+#define ID_CLEAR34070                   34070
+#define ID_SEND34071                    34071
+#define ID_LOADFILE34072                34072
+#define ID_SAVEFILE34073                34073
+#define ID_REFRESH34074                 34074
+#define ID_SETTINGS34075                34075
 #define ID_HELP_USING_UPDATE            34904
 #define ID_DATABASE_BACNETTOOL          34905
 #define IDD_DIALOG_BACNET_PROGRAM       34906
@@ -2970,9 +3004,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        726
-#define _APS_NEXT_COMMAND_VALUE         34070
-#define _APS_NEXT_CONTROL_VALUE         2469
+#define _APS_NEXT_RESOURCE_VALUE        738
+#define _APS_NEXT_COMMAND_VALUE         34076
+#define _APS_NEXT_CONTROL_VALUE         2501
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

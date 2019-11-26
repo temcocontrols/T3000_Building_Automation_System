@@ -57,7 +57,10 @@ const int DLG_DIALOG_BOATMONITOR = 27;
 const int DLG_DIALOG_BTUMETER = 28;
 const int DLG_DIALOG_POWERMETER = 29;
 const int DLG_DIALOG_CO2_NODE = 30;
-const int NUMVIEWS = 31;
+const int DLG_DIALOG_ZIGBEE_REPEATER = 31;
+const int DLG_DIALOG_TSTAT_AQ = 32;
+const int NUMVIEWS = 33;
+
 
 
 extern int g_gloab_bac_comport;
@@ -114,32 +117,32 @@ typedef struct _BUILDING_TAG
 	CString strConnectionType;
 }Building_info;
 
+
 typedef struct _tree_product//////////////////////
 {//for vector 
-	//every product leaf of the leaf
-	Building_info  BuildingInfo;
-	HTREEITEM product_item;//product name 
-	unsigned int serial_number;//the id of product ;Modbus protocol need
-	int product_class_id;//maybe 1 is Tstat;2 is led;3 is minipanel;and others
-	int baudrate;
-	int product_id;
-	float software_version;
-	float hardware_version;
-	int nEPsize;
-	CString strImgPathName;
-	int protocol;
-	unsigned int ncomport;
-	bool status;
-	bool status_last_time[3];
-	CString NetworkCard_Address;
-	CString NameShowOnTree;
+ //every product leaf of the leaf
+    Building_info  BuildingInfo;
+    HTREEITEM product_item;//product name 
+    unsigned int serial_number;//the id of product ;Modbus protocol need
+    int product_class_id;//maybe 1 is Tstat;2 is led;3 is minipanel;and others
+    int baudrate;
+    int product_id;
+    float software_version;
+    float hardware_version;
+    int nEPsize;
+    CString strImgPathName;
+    int protocol;
+    unsigned int ncomport;
+    bool status;
+    bool status_last_time[5];
+    CString NetworkCard_Address;
+    CString NameShowOnTree;
     CString Custom;
-	unsigned int note_parent_serial_number;
-	unsigned char panel_number;
-	unsigned int object_instance;
-	
-}tree_product;///////////////////////////////////////////////////////////////////////////////
+    unsigned int note_parent_serial_number;
+    unsigned char panel_number;
+    unsigned int object_instance;
 
+}tree_product;///////////////////////////////////////////////////////////////////////////////
 //
 
 typedef struct _binary_search_result
@@ -301,8 +304,10 @@ public:
 	void  CheckDuplicate();
     void  CheckIPDuplicate();
 	void  Show_Wait_Dialog_And_SendConfigMessage();
-	void  Show_Wait_Dialog_And_ReadBacnet();
+    void  Show_Wait_Dialog_And_ReadBacnet(int ncontrol);
 	static DWORD WINAPI  Send_Set_Config_Command_Thread(LPVOID lpVoid);
+
+    int m_read_control;   // 0 默认全部读取     1  读缓存的时候使用 ;
 	static DWORD WINAPI  Read_Bacnet_Thread(LPVOID lpVoid);
 	static DWORD WINAPI  Read_Modbus_10000(LPVOID lpVoid);
 	static DWORD WINAPI  Write_Modbus_10000(LPVOID lpVoid);
@@ -424,7 +429,6 @@ public:
  //   static DWORD WINAPI ConnectToTreeNode(LPVOID);
 	afx_msg void OnDatabaseIonameconfig();
 	afx_msg void OnDatabaseMbpoll();
-	afx_msg void OnViewCommunicatetraffic();
 	afx_msg void OnToolIsptoolforone();
 	 
 	afx_msg LRESULT OnHotKey(WPARAM wParam,LPARAM lParam);

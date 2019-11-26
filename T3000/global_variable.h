@@ -1828,8 +1828,9 @@ HTREEITEM selected_tree_item = NULL;
 #pragma region For_bacnet
 
 
-CString temp_off[BAC_CUSTOMER_UNITS_COUNT];		//用于 保存 客户自定义的 单位;
-CString temp_on[BAC_CUSTOMER_UNITS_COUNT];
+CString cus_digital_off[BAC_CUSTOMER_UNITS_COUNT];		//用于 保存 客户自定义的 单位;
+CString cus_digital_on[BAC_CUSTOMER_UNITS_COUNT];
+//int     cus_direction[BAC_CUSTOMER_UNITS_COUNT];  //自定义的  正向逻辑还是反向逻辑;
 CString temp_unit[BAC_CUSTOMER_UNITS_COUNT];
 CString Custom_Digital_Range[BAC_CUSTOMER_UNITS_COUNT];
 bool read_customer_unit;	//如果这个设备没有读过 customer unit这一项,就要尝试去读，以前老版本的没有;
@@ -1888,6 +1889,7 @@ int annual_list_line ;
 int screen_list_line ;
 int monitor_list_line;
 int analog_range_tbl_line;
+int msv_range_tbl_line;  //MSV 多态 range 选择的  变量
 int ext_io_list_line;
 
 HWND      g_hwnd_now;
@@ -1922,7 +1924,7 @@ HWND      m_remote_point_hwnd = NULL;
 HWND	  m_program_debug_list_hwnd = NULL;
 HWND	  m_ext_io_dlg_hwmd = NULL;
 HWND      m_tstat_schedule_dlg_hwnd = NULL;
-
+HWND      m_msv_dlg_hwnd;
 HWND analog_cus_range_dlg=NULL;
 
 HWND	  m_statusbar_hwnd = NULL;
@@ -1934,6 +1936,7 @@ vector <Str_variable_point>  m_Variable_data;
 vector <Str_weekly_routine_point> m_Weekly_data;
 vector <Str_annual_routine_point> m_Annual_data;
 vector <Str_schedual_time_point> m_Schedual_Time_data;
+vector <Str_schedual_time_flag> m_Schedual_time_flag;
 vector <Str_controller_point> m_controller_data;
 vector <Control_group_point> m_screen_data;
 vector <Str_tstat_schedule> m_tatat_schedule_data;
@@ -1942,7 +1945,7 @@ vector <_Bac_Scan_Com_Info> m_bac_handle_Iam_data;
 vector <_Bac_Scan_results_Info> m_bac_scan_result_data;
 vector <Alarm_point> m_alarmlog_data;
 vector <Str_TstatInfo_point> m_Tstat_data;
-vector <Str_Remote_TstDB> m_remote_device_db;
+Str_Remote_TstDB m_remote_device_db;
 vector <Str_Units_element> m_customer_unit_data;
 vector <Str_userlogin_point> m_user_login_data;
 vector <Client_Info> m_tcp_connect_info;
@@ -1951,6 +1954,8 @@ vector <Str_remote_point> m_remote_point_data;  //Mini panel 里面Tstat 远端点的 
 vector <Str_table_point> m_analog_custmer_range;
 vector <Str_variable_uint_point> m_variable_analog_unite;
 vector <Str_Extio_point> m_extio_config_data;
+
+vector <Str_MSV> m_msv_data;
 
 Time_block_mini Device_time;
 Str_Setting_Info Device_Basic_Setting;
@@ -1977,6 +1982,7 @@ int controller_counter = 0; //记录扫描的子节点
 
 
 vector <_Graphic_Value_Info> m_graphic_refresh_data;
+vector <bacnet_standard_Info> m_standard_graphic_refresh_data;
 
 byte	g_DayState[8][ANNUAL_CODE_SIZE];
 unsigned char weeklt_time_schedule[BAC_SCHEDULE_COUNT][WEEKLY_SCHEDULE_SIZE + 1];
@@ -2005,6 +2011,7 @@ CString PrintText[1000];
 CString g_Print;
 bool range_cancel;//用于监测Range 对话框是否正常修改，如果正常修改就为0，否则就为1;
 int g_protocol=PROTOCOL_UNKNOW;
+int g_new_old_IDE = 0;
 int g_bac_read_type;	//用于记录将要读取哪一个，input 还是output,给线程使用;
 bool g_bac_need_read_setting;  //如果是第一次点击 需要读Setting里面的 数据;判断是否需要更改Label之类的;
 HANDLE click_read_thread;
@@ -2236,10 +2243,11 @@ bac_mstp_com g_mstp_com; // 全局mstp com 口 连接状态
 bool custom_bacnet_register_listview = true;
 bool initial_bip = false;
 Str_modbus_reg bacnet_to_modbus_struct;  //用于bacnet 协议转换为modbus 协议的结构
-
-
-panelname_map g_panelname_map;
-
+vector <str_bacnet_rp_info> standard_bacnet_data; // 用于bacnet 标准 读写 变量存取;
+unsigned char m_dialog_signal_type;
+connect_Info system_connect_info;
+panelname_map g_panelname_map; 
+bacnet_instance_reg_map g_bacnet_reg_ins_map;
 CString HolLable[BAC_HOLIDAY_COUNT] =   //用于动态加载List中的下拉框
 {
     _T("AR1"),
@@ -2247,3 +2255,6 @@ CString HolLable[BAC_HOLIDAY_COUNT] =   //用于动态加载List中的下拉框
     _T("AR3"),
     _T("AR4")
 };
+
+
+

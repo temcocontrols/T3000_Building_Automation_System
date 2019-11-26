@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -18,7 +18,7 @@
     <ProjectGuid>{F7226464-C41C-4909-BF74-97328B72FFC8}</ProjectGuid>
     <RootNamespace>T3000</RootNamespace>
     <Keyword>MFCProj</Keyword>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -27,17 +27,17 @@
     <UseOfAtl>false</UseOfAtl>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CLRSupport>false</CLRSupport>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -59,6 +59,9 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\T3000 Output\T3000 object\release\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
     <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</EmbedManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -92,6 +95,9 @@
       <TargetMachine>MachineX86</TargetMachine>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
+    <PreBuildEvent>
+      <Command>XCOPY "$(SolutionDir)"\SQLiteDriver\*.DLL "$(TargetDir)" /D /K /Y</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -117,7 +123,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>setupapi.lib.;$(SolutionDir)SQLiteDriver\sqlite3.lib;$(SolutionDir)T3000 Output\release\MultipleMonthCal32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>setupapi.lib;$(SolutionDir)SQLiteDriver\sqlite3.lib;$(SolutionDir)T3000 Output\release\MultipleMonthCal32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\T3000 Output\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -128,6 +134,9 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <UACUIAccess>false</UACUIAccess>
     </Link>
+    <PreBuildEvent>
+      <Command>XCOPY "$(SolutionDir)"\SQLiteDriver\*.DLL "$(TargetDir)" /D /K /Y</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\ISP\MyPing.cpp" />
@@ -183,6 +192,7 @@
     <ClCompile Include="BacnetVariable.cpp" />
     <ClCompile Include="BacnetWait.cpp" />
     <ClCompile Include="BacnetWeeklyRoutine.cpp" />
+    <ClCompile Include="Bacnet_Range_Msv.cpp" />
     <ClCompile Include="BADO\BADO.cpp" />
     <ClCompile Include="BatchSNDlg.cpp" />
     <ClCompile Include="BinFileParser.cpp" />
@@ -276,7 +286,7 @@
     <ClCompile Include="msflexgrid1.cpp" />
     <ClCompile Include="MySocket.cpp" />
     <ClCompile Include="NetworkControllView.cpp" />
-    <ClCompile Include="NewT3000ProgramEditorDlg.cpp" />
+    <ClCompile Include="ControlBasicEditorView.cpp" />
     <ClCompile Include="NewTstatSchedulesDlg.cpp" />
     <ClCompile Include="OfficeStPtDlg.cpp" />
     <ClCompile Include="OutPutDlg.cpp" />
@@ -333,6 +343,7 @@
     <ClCompile Include="TrendLogView.cpp" />
     <ClCompile Include="TrendLogWnd.cpp" />
     <ClCompile Include="TroubleShootDlg.cpp" />
+    <ClCompile Include="TstatAQ.cpp" />
     <ClCompile Include="TstatIconSetting.cpp" />
     <ClCompile Include="TStatInputView.cpp" />
     <ClCompile Include="TStatOutputView.cpp" />
@@ -356,6 +367,7 @@
     <ClCompile Include="WriteRegistersValueDlg.cpp" />
     <ClCompile Include="WriteSingleRegDlg.cpp" />
     <ClCompile Include="ZigbeeInformationDlg.cpp" />
+    <ClCompile Include="ZigbeeRepeater.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ChartCtrl\ChartBalloonLabel.inl" />
@@ -522,6 +534,7 @@
     <ClInclude Include="BacnetVariable.h" />
     <ClInclude Include="BacnetWait.h" />
     <ClInclude Include="Bacnet_Include.h" />
+    <ClInclude Include="Bacnet_Range_Msv.h" />
     <ClInclude Include="BADO\BADO.h" />
     <ClInclude Include="BatchSNDlg.h" />
     <ClInclude Include="BinFileParser.h" />
@@ -579,6 +592,7 @@
     <ClInclude Include="CO2_View.h" />
     <ClInclude Include="ConfigFileHandler.h" />
     <ClInclude Include="ConnectRemoteServer.h" />
+    <ClInclude Include="CControlBasicEditorCOM.h" />
     <ClInclude Include="CRange0.h" />
     <ClInclude Include="CustomSTable.h" />
     <ClInclude Include="CWorkbook0.h" />
@@ -610,7 +624,7 @@
     <ClInclude Include="LanguageLocale.h" />
     <ClInclude Include="LCOutNameConfig.h" />
     <ClInclude Include="ModbusToBacnetRouterDlg.h" />
-    <ClInclude Include="NewT3000ProgramEditorDlg.h" />
+    <ClInclude Include="ControlBasicEditorView.h" />
     <ClInclude Include="NewTstatSchedulesDlg.h" />
     <ClInclude Include="OXBitmapButton.h" />
     <ClInclude Include="OXDllExt.h" />
@@ -654,6 +668,7 @@
     <ClInclude Include="TempHumSensorForm.h" />
     <ClInclude Include="TrendLogWnd.h" />
     <ClInclude Include="TroubleShootDlg.h" />
+    <ClInclude Include="TstatAQ.h" />
     <ClInclude Include="TstatIconSetting.h" />
     <ClInclude Include="TStatInputView.h" />
     <ClInclude Include="TStatOutputView.h" />
@@ -744,19 +759,17 @@
     <ClInclude Include="WriteRegistersValueDlg.h" />
     <ClInclude Include="WriteSingleRegDlg.h" />
     <ClInclude Include="ZigbeeInformationDlg.h" />
+    <ClInclude Include="ZigbeeRepeater.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="T3000.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\SQLiteDriver\sqlite3.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties RESOURCE_FILE="T3000.rc" _x007B_232E456A-87C3-11D1-8BE3-0000F8754DA1_x007D_="CMonthview1" _x007B_6262D3A0-531B-11CF-91F6-C2863C385E30_x007D_="CMsflexgrid1" _x007B_3A2B370C-BA0A-11D1-B137-0000F8753F5D_x007D_="CMschart1" />
+      <UserProperties _x007B_E8789EA8-CA99-48DF-B920-1A1DCB4FF6AD_x007D_="CForms1" _x007B_3A2B370C-BA0A-11D1-B137-0000F8753F5D_x007D_="CMschart1" RESOURCE_FILE="T3000.rc" _x007B_6262D3A0-531B-11CF-91F6-C2863C385E30_x007D_="CMsflexgrid1" _x007B_232E456A-87C3-11D1-8BE3-0000F8754DA1_x007D_="CMonthview1" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

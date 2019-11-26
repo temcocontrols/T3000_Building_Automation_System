@@ -696,7 +696,7 @@
     <ClCompile Include="TstatIconSetting.cpp">
       <Filter>Source Files\TSTAT</Filter>
     </ClCompile>
-    <ClCompile Include="NewT3000ProgramEditorDlg.cpp">
+    <ClCompile Include="ControlBasicEditorView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Powermeter.cpp">
@@ -714,7 +714,16 @@
     <ClCompile Include="CO2_NodeView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ZigbeeRepeater.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="BacnetAddRemoteDevice.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="Bacnet_Range_Msv.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TstatAQ.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1810,7 +1819,7 @@
     <ClInclude Include="TstatIconSetting.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NewT3000ProgramEditorDlg.h">
+    <ClInclude Include="ControlBasicEditorView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Powermeter.h">
@@ -1852,13 +1861,22 @@
     <ClInclude Include="BacnetAddRemoteDevice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ZigbeeRepeater.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CControlBasicEditorCOM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Bacnet_Range_Msv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TstatAQ.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="T3000.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\SQLiteDriver\sqlite3.lib" />
   </ItemGroup>
 </Project>

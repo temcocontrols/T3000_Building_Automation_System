@@ -153,7 +153,7 @@
 #define BAC_AV  27
 #define BAC_AI  28
 #define BAC_AO  29
-#define BAC_DO  30
+#define BAC_BO  30
 
 #define PASS    USER_NAME
 
@@ -402,7 +402,7 @@ typedef enum {
 		 SENDDATAMINI_COMMAND      = 118,
 		 READFLASHSTATUS_COMMAND   = 119,
 		 READSTATUSWRITEFLASH_COMMAND = 120,
-		 RESTARTMINI_COMMAND       = 121,
+		 WRITE_TIMECOMMAND       = 121,
 		 WRITEPRGFLASH_COMMAND     = 122,
 		 OPENSCREEN_COMMAND        = 123,
 		 INFODATA_COMMAND          = 124

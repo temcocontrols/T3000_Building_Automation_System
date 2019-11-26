@@ -1,11 +1,12 @@
 #pragma once
 #include "RelayLabel.h"
+
 #include <map>
 //minipanel 寄存器表
 //  9800	-	9999    200个寄存器   setting
 //  10000	-   11471   1472		  OUT
 //  11472   -   12943   1472		  IN
-//	12943   -   15502	2560		  VAR					sizeof(Str_variable_point)= 39
+//	12944   -   15502	2560		  VAR					sizeof(Str_variable_point)= 39
 //	15503   -  	15806	16*19=304	  PRG	                sizeof(Str_program_point) = 37
 //  15807   -   15974	21*8=336	  SCH			sizeof(Str_weekly_routine_point) = 42
 //	15975   -	16043		17*4=68		  HOL				sizeof(Str_annual_routine_point) = 33
@@ -15,10 +16,10 @@
 #define BAC_SETTING_START_REG		9800
 #define BAC_OUT_START_REG			10000
 #define BAC_IN_START_REG			11472
-#define BAC_VAR_START_REG			12943
-#define BAC_PRG_START_REG			15503
-#define BAC_SCH_START_REG			15807
-#define BAC_HOL_START_REG			15975
+#define BAC_VAR_START_REG			12944
+#define BAC_PRG_START_REG			15504
+#define BAC_SCH_START_REG			15808
+#define BAC_HOL_START_REG			15976
 #define BAC_PID_CONTROL_START_REG   32712
 #define BAC_CUSTOMER_TABLE_START    32936
 
@@ -276,6 +277,7 @@ const int CONNECT_TO_MODBUS_FAILED = 202;
 const int PASSWORD_OK_INITIAL_UI = 203;
 const int SHOW_PROGRAM_IDE = 204;
 const int SHOW_DEVICE_STATUS = 205;
+const int SHOW_PROGRAM_NEWIDE = 206;
 
 const int BAC_READ_ALL_LIST = 255;
 const int BAC_READ_SVAE_CONFIG = 254;
@@ -350,7 +352,7 @@ const int BAC_READ_MONITOR_GROUP_NUMBER = 4;
 const int BAC_READ_ALARMLOG_GROUP_NUMBER = 4;
 const int BAC_READ_TSTAT_GROUP_NUMBER = 8;
 const int BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER = 8;
-
+const int BAC_MSV_GROUP_NUMBER = 2;
 const int BAC_VARIABLE_CUS_UNIT_GROUP_NUMBER = 5;
 
 const int BAC_READ_GRPHIC_LABEL_GROUP_NUMBER = 6;
@@ -399,7 +401,7 @@ const int BAC_MONITOR_COUNT = 12;
 const int BAC_ALARMLOG_COUNT = 16;
 const int BAC_TSTAT_COUNT = 32;
 const int BAC_CUSTOMER_UNITS_COUNT = 8;
-
+const int BAC_MSV_COUNT = 3;
 const int BAC_SCHEDULE_TIME_COUNT = 8;
 const int BAC_TIME_COMMAND_COUNT = 1;
 const int BAC_BASIC_SETTING_COUNT = 1;
@@ -443,7 +445,7 @@ const int BAC_USER_LOGIN_GROUP = (BAC_USER_LOGIN_COUNT + BAC_READ_USER_LOGIN_INF
 const int BAC_GRPHIC_LABEL_GROUP = (BAC_GRPHIC_LABEL_COUNT + BAC_READ_GRPHIC_LABEL_GROUP_NUMBER - 1) / BAC_READ_GRPHIC_LABEL_GROUP_NUMBER;
 const int BAC_REMOTE_POINT_GROUP = (BAC_REMOTE_POINT_COUNT + BAC_REMOTE_POINT_GROUP_NUMBER - 1) / BAC_REMOTE_POINT_GROUP_NUMBER;
 const int BAC_TSTAT_SCHEDULE_GROUP = (BAC_TSTAT_SCHEDULE + BAC_READ_TSTAT_SCHEDULE_GROUP_NUMBER - 1) / BAC_READ_TSTAT_SCHEDULE_GROUP_NUMBER;
-
+const int BAC_MSV_GROUP = (BAC_MSV_COUNT + BAC_MSV_GROUP_NUMBER - 1) / BAC_MSV_GROUP_NUMBER;
 const int BAC_SHOW_CONNECT_RESULTS = 1;
 const int BAC_SHOW_MISSION_RESULTS = 3;
 
@@ -460,7 +462,7 @@ const int SCHEDULE_TIME_SATURDAY = 6;
 const int SCHEDULE_TIME_SUNDAY = 7;
 const int SCHEDULE_TIME_HOLIDAY1 = 8;
 const int SCHEDULE_TIME_HOLIDAY2 = 9;
-
+const int SCHEDULE_TIME_COUNT = 10;
 
 const int WEEKLY_SCHEDULE_SIZE = 144;
 const int ANNUAL_CODE_SIZE = 46;
@@ -817,36 +819,22 @@ const CString Input_List_Analog_Units[] =
 	_T("HZ"),
 
 	_T("%"),
-	_T("PPM"),
-	_T("inWc"),
-	_T("Kpa"),
-	_T("Psi"),
-	_T("mmHg"),
-	_T("inHg"),
-	_T("Kgcm"),
-	_T("atmos"),
-	_T("bar"),
-	_T(" "),
-	_T(" "),
-	_T(" "),
-	_T("Amps"),
-	_T("Amps"),
-	_T("Amps")
+	_T("PPM")
 };
 
 const CString Input_Analog_Units_Array[] =
 {
 	_T("Unused"),
-	_T("Y3K -40 to 150"),
-	_T("Y3K -40 to 300"),
+	_T("PT100 -40 to 1000"),
+	_T("PT100 -40 to 1800"),
 	_T("10K Type2"),
 	_T("10K Type2"),
-	_T("G3K -40 to 120"),
-	_T("G3K -40 to 250"),
+	_T("PT1000 -40 to 450"),
+	_T("PT1000 -40 to 800"),
 	_T("10K Type3"),
 	_T("10K Type3"),
-	_T("A10K -50 to 110"),
-	_T("A10K -60 to 200"),
+	_T("PT 1K -200 to 300"),
+	_T("PT 1K -200 to 570"),
 	_T("0.0 to 5.0"),
 	_T("0.0 to 100"),
 	_T("4 to 20"),
@@ -864,21 +852,7 @@ const CString Input_Analog_Units_Array[] =
 	_T("Pulse Count (Fast 100Hz)"),
 	_T("Frequency"),
 	_T("Humidty %"),
-	_T("CO2  PPM"),
-	_T("Pressure   inWc"),
-	_T("Pressure   Kpa"),
-	_T("Pressure   Psi"),
-	_T("Pressure   mmHg"),
-	_T("Pressure   inHg"),
-	_T("Pressure   Kgcm"),
-	_T("Pressure   atmos"),
-	_T("Pressure   bar"),
-	_T("Reserved"),
-	_T("Reserved"),
-	_T("Reserved"),
-	_T("20Amps"),
-	_T("50Amps"),
-	_T("75Amps"),
+	_T("CO2  PPM")
 };
 
 const CString Output_Analog_Units_Array[] =
@@ -979,7 +953,8 @@ const CString DDNS_Server_Name[] =
 	_T("www.3322.org"),
 	_T("www.dyndns.com"),
 	_T("www.no-ip.com"),
-    _T("dynu.com")
+    _T("dynu.com"),
+    _T("bravocontrols.com")
 };
 
 const CString Sys_Tstat_Mode_Name[] =
@@ -1043,7 +1018,6 @@ const CString Variable_Analog_Units_Array[] =
 };
 
 
-
 struct _Graphic_Value_Info
 {
 	uint32_t deviceid;
@@ -1053,6 +1027,10 @@ struct _Graphic_Value_Info
 	unsigned short entitysize;
 	CRelayLabel* control_pt;
 	HWND hWnd;
+    //int8_t standard_command;  //0  非标      1 标准;
+    //int object_type;
+    //uint32_t object_instance;
+    //int property_id;
 };
 
 
@@ -1089,6 +1067,7 @@ typedef enum
 	MINIPANELARM = 5,
 	MINIPANELARM_LB = 6,
 	MINIPANELARM_TB = 7,
+    BACNET_ROUTER = 8,
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,
 	PID_T3PT12 = 46,
@@ -1108,6 +1087,11 @@ const int TINY_MINIPANEL_IN_D = 0;
 
 const int TINYEX_MINIPANEL_IN_A = 8;
 const int TINYEX_MINIPANEL_IN_D = 0;
+
+const int BACNET_ROUTER_IN_A = 0;
+const int BACNET_ROUTER_IN_D = 0;
+const int BACNET_ROUTER_OUT_A = 0;
+const int BACNET_ROUTER_OUT_D = 0;
 
 const int BIG_MINIPANEL_OUT_A = 12;
 const int BIG_MINIPANEL_OUT_D = 12;
@@ -1224,6 +1208,7 @@ typedef struct
 	uint8_t nMouse_Status;
 	char ico_name[20];
 	char ico_name_2[20];
+    uint8_t network_point;
 	uint8_t ntext_place;
 	uint8_t n_iconsize;
     int x_length; // 用来确定标签是否点击，以及点击的宽度.
@@ -1411,7 +1396,9 @@ const CString JumperStatus[] =
 	_T("Thermistor Dry Contact"),
 	_T("4-20 ma"),//_T("4-20 ma / 0-24 V"),
 	_T("0-5 V"),
-	_T("0-10 V")
+	_T("0-10 V"),
+    _T("Thermistor Dry Contact"),
+    _T("PT 1K")
 };
 
 
@@ -1462,6 +1449,29 @@ const int CONTROLLER_COL_NUMBER = 15;
 const int CONTROLLOR_REFRESH_TIME = 4000;
 #pragma endregion PID_DIFINE
 
+#pragma region WEEKLY_DEFINE
+const int WEEKLY_ROUTINE_NUM = 0;
+const int WEEKLY_ROUTINE_FULL_LABLE = 1;
+const int WEEKLY_ROUTINE_AUTO_MANUAL = 2;
+const int WEEKLY_ROUTINE_OUTPUT = 3;
+const int WEEKLY_ROUTINE_HOLIDAY1 = 4;
+const int WEEKLY_ROUTINE_STATE1 = 5;
+const int WEEKLY_ROUTINE_HOLIDAY2 = 6;
+const int WEEKLY_ROUTINE_STATE2 = 7;
+const int WEEKLY_ROUTINE_LABEL = 8;
+
+const int WEEKLY_COL_NUMBER = 9;
+#pragma region WEEKLY_DEFINE
+
+#pragma region ANNUAL_DEFINE
+const int ANNUAL_ROUTINE_NUM = 0;
+const int ANNUAL_ROUTINE_FULL_LABEL = 1;
+const int ANNUAL_ROUTINE_AUTO_MANUAL = 2;
+const int ANNUAL_ROUTINE_VALUE = 3;
+const int ANNUAL_ROUTINE_LABLE = 4;
+
+const int ANNUAL_COL_NUMBER = 5;
+#pragma endregion ANNUAL_DEFINE
 
 #pragma region VARIABLE_DEFINE
 
@@ -1777,7 +1787,7 @@ const int REG_SCHEDULE_START_ADDRESS = REG_PRG_START_ADDRESS + LENGTH_MODBUS_PRG
 #define BAC_AV        27
 #define BAC_AI        28
 #define BAC_AO        29
-#define BAC_DO        30
+#define BAC_BO        30
 
 #define BAC_MAX       31
 #define BAC_MAIN      255
@@ -1898,6 +1908,9 @@ struct stLoginMessage
 	char password[20];
 };
 
+
+
+
 typedef union
 {
 	unsigned char all_data[T3000_CONNECT_LENGTH];
@@ -2016,7 +2029,7 @@ const int SD_STATUS_NORMAL = 2;
 const int SD_STATUS_FILESYSTEM_ERROR = 3;
 
 typedef map<int, int> panelname_map;
-
+typedef map<int, CString> bacnet_instance_reg_map;
 const CString RegisterView_Format[] =
 {
     _T("Data_Format"),
@@ -2054,3 +2067,57 @@ const int REGISTER_FLOATING_HI_LO_DIV_1000 = 13;
 const int REGISTER_FLOATING_LO_HI_DIV_1000 = 14;
 const int REGISTER_CHARACTER_STRING_HI_LO = 15;
 const int REGISTER_CHARACTER_STRING_LO_HI = 16;
+
+
+const int DIGITAL_DIRECT = 0; //自定义 数字量Range
+const int DIGITAL_INVERS = 1;
+
+const int DELTA_HEIGHT = 10; // 用于窗口最大化之后 显示的差值，以免挡住下面的状态栏
+
+const int MENU_HOME = 0;
+const int MENU_INPUT = 1;
+const int MENU_OUTPUT = 2;
+const int MENU_VARIABLE = 3;
+const int MENU_PROGRAM = 4;
+const int MENU_PID = 5;
+const int MENU_SCREEN = 6;
+const int MENU_SCHEDUAL = 7;
+const int MENU_HOLIDAY = 8;
+const int MENU_TRENDLOG = 9;
+const int MENU_ALARM = 10;
+const int MENU_PANELINFO = 11;
+const int MENU_NETWORK_POINT = 12;
+const int MENU_SETTING = 13;
+const int MENU_SCAN = 14;
+const int MENU_BUILDING = 15;
+
+const int READ_MODE_NORMAL = 0;
+const int READ_MODE_SIMPLIFICATION = 1;
+
+#pragma region define_bacnet_data_type  //定义标准的bacnet 数据结构类型;
+
+const int TPYE_BACAPP_BOOLEAN = 1;
+const int TPYE_BACAPP_UNSIGNED = 2;
+const int TPYE_BACAPP_SIGNED = 3;
+const int TPYE_BACAPP_REAL = 4;
+const int TPYE_BACAPP_DOUBLE = 5;
+const int TPYE_BACAPP_OCTET_STRING = 6;
+const int TPYE_BACAPP_CHARACTER_STRING = 7;
+const int TPYE_BACAPP_BIT_STRING = 8;
+const int TPYE_BACAPP_ENUMERATED = 9;
+const int TPYE_BACAPP_DATE = 10;
+const int TPYE_BACAPP_TIME = 11;
+const int TPYE_BACAPP_OBJECT_ID = 12;
+
+#pragma endregion
+
+
+#pragma region connect_region
+//用于标识目前整个系统的协议状态；
+typedef struct 
+{
+    unsigned char mstp_status;  // 0 stop    1 running
+    unsigned char ncomport;
+    int nbaudrate;
+}connect_Info;
+#pragma endregion

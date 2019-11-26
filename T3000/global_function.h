@@ -131,6 +131,15 @@ void local_handler_conf_private_trans_ack(
 	uint16_t service_len,
 	BACNET_ADDRESS * src,
 	BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
+int Bacnet_Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id);
+int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE &value, uint8_t retrytime = 3);
+int Bacnet_Write_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE * object_value, uint8_t priority = 16);
+int Bacnet_Write_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE * object_value, uint8_t priority = 16, uint8_t retrytime = 3);
+void localhandler_read_property_ack(
+    uint8_t * service_request,
+    uint16_t service_len,
+    BACNET_ADDRESS * src,
+    BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data); //标准的读属性;
 
 void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_ADDRESS * src);
 
@@ -138,12 +147,8 @@ void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken);
 char * intervaltotext(char *textbuf, long seconds , unsigned minutes , unsigned hours, char *c =":");
 char * intervaltotextfull(char *textbuf, long seconds , unsigned minutes , unsigned hours,char *c =":");
  DWORD WINAPI   MSTP_Receive(LPVOID lpVoid);
- void Localhandler_read_property_ack(
-	 uint8_t * service_request,
-	 uint16_t service_len,
-	 BACNET_ADDRESS * src,
-	 BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
   void local_rp_ack_print_data(	BACNET_READ_PROPERTY_DATA * data);
+  void local_value_rp_ack_print_data(BACNET_READ_PROPERTY_DATA * data, BACNET_APPLICATION_DATA_VALUE &value);
   void close_bac_com();
  bool Initial_bac(int comport = 0,CString bind_local_ip = _T(""),int n_baudrate = 19200);
   bool Open_bacnetSocket2(CString strIPAdress,unsigned short nPort,SOCKET &mysocket);
@@ -152,6 +157,8 @@ char * intervaltotextfull(char *textbuf, long seconds , unsigned minutes , unsig
 CString GetProductName(int ModelID);
 void Inial_Product_map();
 void Inial_Product_Reglist_map();
+void Inial_Product_Menu_map();
+int Get_Product_Menu_Map(unsigned char product_tpye, int menu_item);
 CString Get_Table_Name(int SerialNo,CString Type ,int Row);
 void    Insert_Update_Table_Name(int SerialNo,CString Type,int Row,CString TableName); 
 int Get_Unit_Process(CString Unit);
@@ -181,7 +188,7 @@ void Copy_Data_From_485_to_Bacnet(unsigned short *start_point);
 int handle_read_monitordata_ex(char *npoint,int nlength);
 int handle_read_pic_data_ex(char *npoint,int nlength);
 bool IP_is_Local(LPCTSTR ip_address);
-bool Is_Bacnet_Device(unsigned short n_product_class_id);
+bool Bacnet_Private_Device(unsigned short n_product_class_id);
 BOOL DirectoryExist(CString Path);
 BOOL CreateDirectory(CString path);
 BOOL DeleteDirectory(CString path);
@@ -261,9 +268,20 @@ bool Save_VariableData_to_db(unsigned char  temp_output_index, unsigned int nser
 bool Save_OutputData_to_db(unsigned char  temp_output_index);
 bool Save_AVData_to_db();
 CString GetGUID();
-
+int  SetCommandDelayTime(unsigned char product_id); //用于设置每个产品的 应答延时时间.默认为100ms.
 bool Open_Socket_Retry(CString strIPAdress, short nPort, int retry_time = 3);
 void Inial_ProductName_map();  //初始化 Panel Name 存放的位置 默认是714位置 
+bool bac_Invalid_range(unsigned char nrange);  //判断bacnet range 是否在合理值范围内;
+void Initial_Instance_Reg_Map();  //初始化 instance 存放位置;
 int PanelName_Map(int product_type);  //查找 Panel  Name 存放的位置 没有找到就认为是从714位置开始的
+int Get_Instance_Reg_Map(int product_type, unsigned short &temp_high, unsigned short &temp_low);
+unsigned int GetDeviceInstance(unsigned char pid_type);  //通过 map 中存放的 instance 寄存器 获取 对应产品的 instance 值;
+int ChangeDeviceProtocol(bool modbus_0_bacnet_1,   // 0  modbus           1  bacnet 
+    unsigned char modbus_id,
+    unsigned short nreg_address,
+    unsigned short nreg_value,
+    unsigned char sub_device,         // 如果是子设备  ，数据库中的协议 比较特殊;
+    LPCTSTR Dbpath);
+
 void switch_product_last_view();
 #endif

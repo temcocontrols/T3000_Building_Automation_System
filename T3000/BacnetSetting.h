@@ -21,7 +21,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	afx_msg void OnBnClickedButtonBacTest();
+	afx_msg void OnBnClickedButtonRefreshTime();
 	CDateTimeCtrl m_cm5_time_picker;
 	CDateTimeCtrl m_cm5_date_picker;
 	//afx_msg void OnBnClickedBacEnableEditTime();

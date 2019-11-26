@@ -516,7 +516,7 @@ BOOL COutPutDlg::OnInitDialog()
 
                                                        // ||product_register_value[7]==PM_TSTAT7
 	CenterWindow(this);
-	if (product_register_value[7] == PM_PM5E||product_register_value[7]==PM_TSTAT5G||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i || product_register_value[7] == PM_TSTAT8
+	if (product_register_value[7] == PM_PM5E|| product_register_value[7] == PM_PM5E_ARM || product_register_value[7]==PM_TSTAT5G||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i || product_register_value[7] == PM_TSTAT8
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 		)
 	{
@@ -1172,11 +1172,11 @@ void COutPutDlg::FreshGrids()
 		FreshGrid_PID2tstat6();
 		//FreshGrid_PID1tstat6();
 	}
-	else if ((product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E||product_register_value[7]==PM_TSTAT5G)||(product_register_value[7]==PM_TSTATRUNAR))
+	else if ((product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E || product_register_value[7] == PM_PM5E_ARM  ||product_register_value[7]==PM_TSTAT5G)||(product_register_value[7]==PM_TSTATRUNAR))
 	{
 		FreshGrid_PID1tstat6();
 		float version=get_curtstat_version();
-		if ((product_register_value[7]==PM_TSTAT5E)||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR))
+		if ((product_register_value[7]==PM_TSTAT5E)||product_register_value[7] == PM_PM5E||  product_register_value[7] == PM_PM5E_ARM || (product_register_value[7]==PM_TSTATRUNAR))
 		{
          FreshGrid_PID2tstat6();
 		} 
@@ -1192,7 +1192,7 @@ void COutPutDlg::FreshGrids()
 		FreshGrid_PID2();
 	}
 	//CenterWindow(this);
-	if (product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E||product_register_value[7]==PM_TSTAT5G||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7
+	if (product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E || product_register_value[7] == PM_PM5E_ARM ||product_register_value[7]==PM_TSTAT5G||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V) 
 		||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT8)
 	{
@@ -1324,6 +1324,7 @@ if(product_register_value[129]==1)
 		case PM_TSTAT7:
 		case PM_TSTAT5E:m_nmoduleType=3;break;//tstat 5e
         case PM_PM5E:m_nmoduleType=3;break;//tstat 5e
+        case PM_PM5E_ARM:m_nmoduleType = 3;break;//tstat 5e
 		case 4:m_nmoduleType=2;break;//tstat 5c
 		case 3:m_nmoduleType=0;break;//tstat 5b2 ,same to tstat 5b
 		case 2:m_nmoduleType=1;break;//tstat 5a
@@ -4359,7 +4360,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 		 FreshGrids();
 		 //FreshGrids();
 	}
-	else if(product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E||product_register_value[7]==PM_TSTAT5G||(product_register_value[7]==PM_TSTATRUNAR))
+	else if(product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E|| product_register_value[7] == PM_PM5E_ARM || product_register_value[7]==PM_TSTAT5G||(product_register_value[7]==PM_TSTATRUNAR))
 	{
 			if(g_OutPutLevel==1)
 			return;
@@ -6125,7 +6126,7 @@ void COutPutDlg::OnEnKillfocusPid2Heatstageedit2()
 			{
 			product_register_value[MODBUS_HEAT_UNIVERSAL_TABLE] = m_PID2_heat_stages;
 			float version=get_curtstat_version();
-			if (version>=36.8||product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR))
+			if (version>=36.8||product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E|| product_register_value[7] == PM_PM5E_ARM || (product_register_value[7]==PM_TSTATRUNAR))
 			{
 				FreshGrid_PID2tstat6();
 			} 
@@ -6170,7 +6171,7 @@ void COutPutDlg::OnEnKillfocusPid2coolstageedit2()
 			{
 				product_register_value[MODBUS_COOL_UNIVERSAL_TABLE] =m_PID2_cool_stages;
 				float version=get_curtstat_version();
-				if (version>=36.8||product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR))
+				if (version>=36.8||product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E|| product_register_value[7] == PM_PM5E_ARM || (product_register_value[7]==PM_TSTATRUNAR))
 				{
 					FreshGrid_PID2tstat6();
 				} 

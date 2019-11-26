@@ -162,8 +162,8 @@ void CBacnetProgramDebug::Initial_List(unsigned int list_type)
 
 
 				width_length = 60 + 140 + 80 + 80 + 80 + 80 + 100 + 80 + 70 + 70 + 50 + 70 + 50 + 50;
-				SetWindowPos(NULL,0,0,width_length,120,SWP_NOMOVE);
-				::SetWindowPos(m_program_debug_list.m_hWnd,NULL,0,0,width_length - 20,70,SWP_NOMOVE);
+				SetWindowPos(NULL,0,0,width_length + 70,120 + 50,SWP_NOMOVE);
+				::SetWindowPos(m_program_debug_list.m_hWnd,NULL,0,0,width_length + 10,80,SWP_NOMOVE);
 				Fresh_Program_List(list_type);
 
 
@@ -223,14 +223,16 @@ void CBacnetProgramDebug::Initial_List(unsigned int list_type)
 					ListCtrlEx::CStrList strlist;
 					for (int i=0;i<(int)sizeof(JumperStatus)/sizeof(JumperStatus[0]);i++)
 					{
+                        if (i == 4)   //以前出于某些原因  0  和 4 都代表 Thermistor Dry Contact; 这里下拉框不希望显示两个 一样的，所以过滤掉
+                            continue;
 						strlist.push_back(JumperStatus[i]);
 					}
 					m_program_debug_list.SetCellStringList(0, INPUT_JUMPER, strlist);		
 				}
 
 				width_length =50 + 100 + 80 + 80 + 80 + 100 + 70 + 50 + 60 + 60 + 90 + 80 + 50 + 60;
-				SetWindowPos(NULL,0,0,width_length,120,SWP_NOMOVE);
-				::SetWindowPos(m_program_debug_list.m_hWnd,NULL,0,0,width_length - 20,70,SWP_NOMOVE);
+				SetWindowPos(NULL,0,0,width_length + 70,120 + 50,SWP_NOMOVE);
+				::SetWindowPos(m_program_debug_list.m_hWnd,NULL,0,0,width_length + 10,80,SWP_NOMOVE);
 				Fresh_Program_List(list_type);
 
 		}
@@ -263,7 +265,7 @@ void CBacnetProgramDebug::Initial_List(unsigned int list_type)
 			}
 			m_program_debug_list.SetCellStringList(0, VARIABLE_UNITE, strlist);	
 			width_length = 70 + 150 + 150 + 120 + 120 + 100 + 50;
-			SetWindowPos(NULL,0,0,width_length,120,SWP_NOMOVE);
+			SetWindowPos(NULL,0,0,width_length + 70,120 + 50,SWP_NOMOVE);
 			::SetWindowPos(m_program_debug_list.m_hWnd,NULL,0,0,width_length - 20,70,SWP_NOMOVE);
 			Fresh_Program_List(point_type);
 		}
@@ -305,13 +307,98 @@ void CBacnetProgramDebug::Initial_List(unsigned int list_type)
 			}
 			m_program_debug_list.SetCellStringList(0, CONTROLLER_I_TIME, strlist);		
 			width_length = 40 + 80 + 60 + 60 + 80 + 100 + 60 + 60 + 70 + 50 +50 +50 +50 +50 +50 +50 +50;
-			SetWindowPos(NULL,0,0,width_length,120,SWP_NOMOVE);
-			::SetWindowPos(m_program_debug_list.m_hWnd,NULL,0,0,width_length - 20,70,SWP_NOMOVE);
+			SetWindowPos(NULL,0,0,width_length + 70,120 + 50,SWP_NOMOVE);
+			::SetWindowPos(m_program_debug_list.m_hWnd,NULL,0,0,width_length + 10,80,SWP_NOMOVE);
 			Fresh_Program_List(point_type);
 
 
 		}
 		break;
+    case BAC_HOL:
+    {
+        m_program_debug_list.ModifyStyle(0, LVS_SINGLESEL | LVS_REPORT | LVS_SHOWSELALWAYS);
+        m_program_debug_list.SetExtendedStyle(m_program_debug_list.GetExtendedStyle() | LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
+        m_program_debug_list.InsertColumn(ANNUAL_ROUTINE_NUM, _T("NUM"), 60, ListCtrlEx::CheckBox, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
+        m_program_debug_list.InsertColumn(ANNUAL_ROUTINE_FULL_LABEL, _T("Full Label"), 150, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+        m_program_debug_list.InsertColumn(ANNUAL_ROUTINE_AUTO_MANUAL, _T("Auto/Manual"), 90, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+        m_program_debug_list.InsertColumn(ANNUAL_ROUTINE_VALUE, _T("Value"), 80, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+        m_program_debug_list.InsertColumn(ANNUAL_ROUTINE_LABLE, _T("Label"), 90, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+
+        m_program_debug_list_hwnd = this->m_hWnd;
+        g_hwnd_now = m_program_debug_list_hwnd;
+
+        m_program_debug_list.SetListHwnd(this->m_hWnd);
+
+        m_program_debug_list.DeleteAllItems();
+        CString temp_item;
+        temp_item.Format(_T("%d"), 0 + 1);
+        m_program_debug_list.InsertItem(0, temp_item);
+        m_program_debug_list.SetCellEnabled(0, ANNUAL_ROUTINE_NUM, 0);
+
+
+        if (ListCtrlEx::ComboBox == m_program_debug_list.GetColumnType(ANNUAL_ROUTINE_VALUE))
+        {
+            ListCtrlEx::CStrList strlist;
+            strlist.push_back(_T("OFF"));
+            strlist.push_back(_T("ON"));
+            m_program_debug_list.SetCellStringList(0, ANNUAL_ROUTINE_VALUE, strlist);
+        }
+
+        width_length = 60 + 150 + 90 + 80 + 90;
+        SetWindowPos(NULL, 0, 0, width_length + 70, 120 + 50, SWP_NOMOVE);
+        ::SetWindowPos(m_program_debug_list.m_hWnd, NULL, 0, 0, width_length + 10, 100, SWP_NOMOVE);
+        Fresh_Program_List(list_type);
+
+    }
+        break;
+    case BAC_SCH:
+    {
+        m_program_debug_list.ModifyStyle(0, LVS_SINGLESEL | LVS_REPORT | LVS_SHOWSELALWAYS);
+        //m_program_debug_list.SetExtendedStyle(m_program_debug_list.GetExtendedStyle() | LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
+        m_program_debug_list.InsertColumn(WEEKLY_ROUTINE_NUM, _T("NUM"), 60, ListCtrlEx::CheckBox, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
+        m_program_debug_list.InsertColumn(WEEKLY_ROUTINE_FULL_LABLE, _T("Full Label"), 150, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+        m_program_debug_list.InsertColumn(WEEKLY_ROUTINE_AUTO_MANUAL, _T("Auto/Manual"), 90, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+        m_program_debug_list.InsertColumn(WEEKLY_ROUTINE_OUTPUT, _T("Output"), 80, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+        m_program_debug_list.InsertColumn(WEEKLY_ROUTINE_HOLIDAY1, _T("Holiday1"), 90, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+        m_program_debug_list.InsertColumn(WEEKLY_ROUTINE_STATE1, _T("State1"), 70, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+        m_program_debug_list.InsertColumn(WEEKLY_ROUTINE_HOLIDAY2, _T("Holiday2"), 90, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+        m_program_debug_list.InsertColumn(WEEKLY_ROUTINE_STATE2, _T("State2"), 70, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+        m_program_debug_list.InsertColumn(WEEKLY_ROUTINE_LABEL, _T("Label"), 90, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+
+        m_program_debug_list_hwnd = this->m_hWnd;
+        g_hwnd_now = m_program_debug_list_hwnd;
+
+        m_program_debug_list.SetListHwnd(this->m_hWnd);
+
+        m_program_debug_list.DeleteAllItems();
+        CString temp_item;
+        temp_item.Format(_T("%d"), 0 + 1);
+        m_program_debug_list.InsertItem(0, temp_item);
+        m_program_debug_list.SetCellEnabled(0, WEEKLY_ROUTINE_NUM, 0);
+
+        if (ListCtrlEx::ComboBox == m_program_debug_list.GetColumnType(WEEKLY_ROUTINE_AUTO_MANUAL))
+        {
+            ListCtrlEx::CStrList strlist;
+            strlist.push_back(_T("Auto"));
+            strlist.push_back(_T("Manual"));
+            m_program_debug_list.SetCellStringList(0, WEEKLY_ROUTINE_AUTO_MANUAL, strlist);
+        }
+
+        if (ListCtrlEx::ComboBox == m_program_debug_list.GetColumnType(WEEKLY_ROUTINE_OUTPUT))
+        {
+            ListCtrlEx::CStrList strlist;
+            strlist.push_back(_T("OFF"));
+            strlist.push_back(_T("ON"));
+            m_program_debug_list.SetCellStringList(0, WEEKLY_ROUTINE_OUTPUT, strlist);
+        }
+
+        width_length = 60 + 150 + 90 + 80 + 90 + 70 + 90 + 70 + 90;
+        SetWindowPos(NULL, 0, 0, width_length + 70, 120 + 50, SWP_NOMOVE);
+        ::SetWindowPos(m_program_debug_list.m_hWnd, NULL, 0, 0, width_length + 10, 100, SWP_NOMOVE);
+        Fresh_Program_List(list_type);
+
+    }
+        break;
 	default:
 		break;
 	}
@@ -382,6 +469,11 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 						digital_special_output_count = TINYEX_MINIPANEL_OUT_D;
 						analog_special_output_count = TINYEX_MINIPANEL_OUT_A;
 					}
+                    else if (bacnet_device_type == BACNET_ROUTER)
+                    {
+                        digital_special_output_count = BACNET_ROUTER_OUT_D;
+                        analog_special_output_count = BACNET_ROUTER_OUT_A;
+                    }
 					if(point_number < (digital_special_output_count +analog_special_output_count) )
 					{
 						if(m_Output_data.at(point_number).hw_switch_status == HW_SW_OFF)
@@ -692,7 +784,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 					temp_jumper = (m_Input_data.at(point_number).decom & 0xf0 ) >> 4;
 
 					//如果range 是0 或者 不在正常范围内，就不要显示 open short 的报警 状态;
-					if((temp_decom==0) || (m_Input_data.at(point_number).range == 0) || (m_Input_data.at(point_number).range > 30))
+					if((temp_decom==0) || (m_Input_data.at(point_number).range == 0) || (bac_Invalid_range(m_Input_data.at(point_number).range)))
 					{
 						temp_status.Format(Decom_Array[0]);
 						m_program_debug_list.SetItemTextColor(0,INPUT_DECOM,RGB(0,0,0),false);
@@ -1243,6 +1335,107 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 				}
 			}
 			break;
+        case BAC_HOL:
+        {
+
+            MultiByteToWideChar(CP_ACP, 0, (char *)m_Annual_data.at(point_number).description, (int)strlen((char *)m_Annual_data.at(point_number).description) + 1,
+                temp_des.GetBuffer(MAX_PATH), MAX_PATH);
+            temp_des.ReleaseBuffer();
+            m_program_debug_list.SetItemText(0, ANNUAL_ROUTINE_FULL_LABEL, temp_des);
+            if (m_Annual_data.at(point_number).auto_manual == 0)
+            {
+                m_program_debug_list.SetItemText(0, ANNUAL_ROUTINE_AUTO_MANUAL, _T("Auto"));
+                m_program_debug_list.SetCellEnabled(0, ANNUAL_ROUTINE_VALUE, 0);
+            }
+            else
+            {
+                m_program_debug_list.SetItemText(0, ANNUAL_ROUTINE_AUTO_MANUAL, _T("Manual"));
+                m_program_debug_list.SetCellEnabled(0, ANNUAL_ROUTINE_VALUE, 1);
+            }
+
+
+            if (m_Annual_data.at(point_number).value == 0)
+                m_program_debug_list.SetItemText(0, ANNUAL_ROUTINE_VALUE, _T("OFF"));
+            else
+                m_program_debug_list.SetItemText(0, ANNUAL_ROUTINE_VALUE, _T("ON"));
+
+
+
+            CString temp_des2;
+            MultiByteToWideChar(CP_ACP, 0, (char *)m_Annual_data.at(point_number).label, (int)strlen((char *)m_Annual_data.at(point_number).label) + 1,
+                temp_des2.GetBuffer(MAX_PATH), MAX_PATH);
+            temp_des2.ReleaseBuffer();
+            m_program_debug_list.SetItemText(0, ANNUAL_ROUTINE_LABLE, temp_des2);
+
+        }
+            break;
+        case BAC_SCH:
+        {
+            MultiByteToWideChar(CP_ACP, 0, (char *)m_Weekly_data.at(point_number).description, (int)strlen((char *)m_Weekly_data.at(point_number).description) + 1,
+                temp_des.GetBuffer(MAX_PATH), MAX_PATH);
+            temp_des.ReleaseBuffer();
+            m_program_debug_list.SetItemText(0, WEEKLY_ROUTINE_FULL_LABLE, temp_des);
+            if (m_Weekly_data.at(point_number).auto_manual == 0)
+            {
+                m_program_debug_list.SetItemText(0, WEEKLY_ROUTINE_AUTO_MANUAL, _T("Auto"));
+                m_program_debug_list.SetCellEnabled(0, WEEKLY_ROUTINE_OUTPUT, 0);
+            }
+            else
+            {
+                m_program_debug_list.SetItemText(0, WEEKLY_ROUTINE_AUTO_MANUAL, _T("Manual"));
+                m_program_debug_list.SetCellEnabled(0, WEEKLY_ROUTINE_OUTPUT, 1);
+            }
+
+
+            //uint8_t value ;  /* (1 bit; 0=off, 1=on)*/
+            //uint8_t auto_manual;  /* (1 bit; 0=auto, 1=manual)*/
+            //uint8_t override_1_value;  /* (1 bit; 0=off, 1=on)*/
+            //uint8_t override_2_value;  /* (1 bit; 0=off, 1=on)*/
+            //uint8_t off  ;
+            //uint8_t unused	; /* (11 bits)*/
+            if (m_Weekly_data.at(point_number).value == 0)
+                m_program_debug_list.SetItemText(0, WEEKLY_ROUTINE_OUTPUT, _T("OFF"));
+            else
+                m_program_debug_list.SetItemText(0, WEEKLY_ROUTINE_OUTPUT, _T("ON"));
+
+            if (m_Weekly_data.at(point_number).override_1_value == 0)
+                m_program_debug_list.SetItemText(0, WEEKLY_ROUTINE_STATE1, _T("OFF"));
+            else
+                m_program_debug_list.SetItemText(0, WEEKLY_ROUTINE_STATE1, _T("ON"));
+
+            if (m_Weekly_data.at(point_number).override_2_value == 0)
+                m_program_debug_list.SetItemText(0, WEEKLY_ROUTINE_STATE2, _T("OFF"));
+            else
+                m_program_debug_list.SetItemText(0, WEEKLY_ROUTINE_STATE2, _T("ON"));
+
+            CString temp_des2;
+            MultiByteToWideChar(CP_ACP, 0, (char *)m_Weekly_data.at(point_number).label, (int)strlen((char *)m_Weekly_data.at(point_number).label) + 1,
+                temp_des2.GetBuffer(MAX_PATH), MAX_PATH);
+            temp_des2.ReleaseBuffer();
+            m_program_debug_list.SetItemText(0, WEEKLY_ROUTINE_LABEL, temp_des2);
+
+
+            if ((m_Weekly_data.at(point_number).override_1.point_type == BAC_HOL + 1) && (m_Weekly_data.at(point_number).override_1.number < BAC_HOLIDAY_COUNT))
+            {
+                m_program_debug_list.SetItemText(0, WEEKLY_ROUTINE_HOLIDAY1, HolLable[m_Weekly_data.at(point_number).override_1.number]);
+
+            }
+            else
+            {
+                m_program_debug_list.SetItemText(0, WEEKLY_ROUTINE_HOLIDAY1, _T(""));
+            }
+
+            if ((m_Weekly_data.at(point_number).override_2.point_type == BAC_HOL + 1) && (m_Weekly_data.at(point_number).override_2.number < 8))
+            {
+                m_program_debug_list.SetItemText(0, WEEKLY_ROUTINE_HOLIDAY2, HolLable[m_Weekly_data.at(point_number).override_2.number]);
+            }
+            else
+            {
+                m_program_debug_list.SetItemText(0, WEEKLY_ROUTINE_HOLIDAY2, _T(""));
+            }
+
+        }
+            break;
 		default:
 			break;
 		}
@@ -1495,8 +1688,8 @@ LRESULT CBacnetProgramDebug::Fresh_Program_Debug_Item(WPARAM wParam,LPARAM lPara
 					if(temp_jump.CompareNoCase(JumperStatus[z]) == 0)
 					{
 						unsigned char temp_value = 0;
-						if((z == 0) || (z == 1) || (z == 2) || (z == 3) || (z == 4))
-							temp_value = z;
+                        if ((z == 0) || (z == 1) || (z == 2) || (z == 3) || (z == 4) || (z == 5))
+                            temp_value = z;
 						unsigned char temp1;
 						temp1 = m_Input_data.at(Changed_Item).decom ;
 						temp1 = temp1 & 0x0f;
@@ -1599,6 +1792,235 @@ LRESULT CBacnetProgramDebug::Fresh_Program_Debug_Item(WPARAM wParam,LPARAM lPara
 			}
 		}
 		break;
+    case BAC_SCH:
+    {
+        int cmp_ret;//compare if match it will 0;
+        int Changed_Item = (int)wParam;
+        int Changed_SubItem = (int)lParam;
+
+        CString temp_task_info;
+        CString New_CString = m_program_debug_list.GetItemText(Changed_Item, Changed_SubItem);
+        memcpy_s(&m_temp_weekly_data[point_number], sizeof(Str_weekly_routine_point), &m_Weekly_data.at(point_number), sizeof(Str_weekly_routine_point));
+        if (Changed_SubItem == WEEKLY_ROUTINE_LABEL)
+        {
+            CString cs_temp = m_program_debug_list.GetItemText(Changed_Item, Changed_SubItem);
+            if (cs_temp.GetLength() >= STR_WEEKLY_LABEL_LENGTH)	//长度不能大于结构体定义的长度;
+            {
+                MessageBox(_T("Length can not higher than 8"), _T("Warning"));
+                PostMessage(WM_REFRESH_BAC_WEEKLY_LIST, NULL, NULL);
+                return 0;
+            }
+            cs_temp.MakeUpper();
+            if (Check_Label_Exsit(cs_temp))
+            {
+                PostMessage(WM_REFRESH_BAC_WEEKLY_LIST, Changed_Item, REFRESH_ON_ITEM);
+                return 0;
+            }
+            char cTemp1[255];
+            memset(cTemp1, 0, 255);
+            WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL);
+            memcpy_s(m_Weekly_data.at(point_number).label, STR_WEEKLY_LABEL_LENGTH, cTemp1, STR_WEEKLY_LABEL_LENGTH);
+        }
+
+        if (Changed_SubItem == WEEKLY_ROUTINE_FULL_LABLE)
+        {
+            CString cs_temp = m_program_debug_list.GetItemText(Changed_Item, Changed_SubItem);
+            if (cs_temp.GetLength() >= STR_WEEKLY_DESCRIPTION_LENGTH)	//长度不能大于结构体定义的长度;
+            {
+                MessageBox(_T("Length can not higher than 20"), _T("Warning"));
+                PostMessage(WM_REFRESH_BAC_WEEKLY_LIST, NULL, NULL);
+                return 0;
+            }
+            if (Check_FullLabel_Exsit(cs_temp))
+            {
+                PostMessage(WM_REFRESH_BAC_WEEKLY_LIST, Changed_Item, REFRESH_ON_ITEM);
+                return 0;
+            }
+            char cTemp1[255];
+            memset(cTemp1, 0, 255);
+            WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL);
+            memcpy_s(m_Weekly_data.at(point_number).description, STR_WEEKLY_DESCRIPTION_LENGTH, cTemp1, STR_WEEKLY_DESCRIPTION_LENGTH);
+        }
+
+        if (Changed_SubItem == WEEKLY_ROUTINE_OUTPUT)
+        {
+            CString cs_temp = m_program_debug_list.GetItemText(Changed_Item, WEEKLY_ROUTINE_OUTPUT);
+            if (cs_temp.CompareNoCase(_T("OFF")) == 0)
+            {
+                m_Weekly_data.at(point_number).value = 0;
+            }
+            else
+            {
+                m_Weekly_data.at(point_number).value = 1;
+            }
+        }
+        if (Changed_SubItem == WEEKLY_ROUTINE_AUTO_MANUAL)
+        {
+            CString cs_temp = m_program_debug_list.GetItemText(Changed_Item, WEEKLY_ROUTINE_AUTO_MANUAL);
+            if (cs_temp.CompareNoCase(_T("Auto")) == 0)
+            {
+                m_Weekly_data.at(point_number).auto_manual = 0;
+                m_program_debug_list.SetCellEnabled(Changed_Item, WEEKLY_ROUTINE_OUTPUT, 0);
+            }
+            else
+            {
+                m_Weekly_data.at(point_number).auto_manual = 1;
+                m_program_debug_list.SetCellEnabled(Changed_Item, WEEKLY_ROUTINE_OUTPUT, 1);
+            }
+        }
+
+        if (Changed_SubItem == WEEKLY_ROUTINE_HOLIDAY1)
+        {
+            CString cs_temp = m_program_debug_list.GetItemText(Changed_Item, WEEKLY_ROUTINE_HOLIDAY1);
+            if (cs_temp.CompareNoCase(_T(" ")) == 0)
+            {
+                m_Weekly_data.at(point_number).override_1.panel = 0;
+                m_Weekly_data.at(point_number).override_1.point_type = 0;
+                m_Weekly_data.at(point_number).override_1.number = 0;
+            }
+            else
+            {
+                int sel_index = 1;
+                for (int x = 0; x < BAC_HOLIDAY_COUNT; x++)
+                {
+                    if (cs_temp.CompareNoCase(HolLable[x]) == 0)
+                        sel_index = x + 1;
+                }
+
+                cs_temp = cs_temp.Right(1);
+                int temp_value = _wtoi(cs_temp);
+                m_Weekly_data.at(point_number).override_1.panel = Station_NUM;
+                m_Weekly_data.at(point_number).override_1.point_type = BAC_HOL + 1;
+                m_Weekly_data.at(point_number).override_1.number = temp_value - 1;
+            }
+
+
+        }
+
+        if (Changed_SubItem == WEEKLY_ROUTINE_HOLIDAY2)
+        {
+            CString cs_temp = m_program_debug_list.GetItemText(Changed_Item, WEEKLY_ROUTINE_HOLIDAY2);
+            if (cs_temp.CompareNoCase(_T(" ")) == 0)
+            {
+                m_Weekly_data.at(point_number).override_2.panel = 0;
+                m_Weekly_data.at(point_number).override_2.point_type = 0;
+                m_Weekly_data.at(point_number).override_2.number = 0;
+            }
+            else
+            {
+                int sel_index = 1;
+                for (int x = 0; x < BAC_HOLIDAY_COUNT; x++)
+                {
+                    if (cs_temp.CompareNoCase(HolLable[x]) == 0)
+                        sel_index = x + 1;
+                }
+
+                cs_temp = cs_temp.Right(1);
+                int temp_value = _wtoi(cs_temp);
+                m_Weekly_data.at(point_number).override_2.panel = Station_NUM;
+                m_Weekly_data.at(point_number).override_2.point_type = BAC_HOL + 1;
+                m_Weekly_data.at(point_number).override_2.number = temp_value - 1;
+            }
+
+        }
+
+        cmp_ret = memcmp(&m_temp_weekly_data[point_number], &m_Weekly_data.at(point_number), sizeof(Str_weekly_routine_point));
+        if (cmp_ret != 0)
+        {
+            m_program_debug_list.SetItemBkColor(Changed_Item, Changed_SubItem, LIST_ITEM_CHANGED_BKCOLOR);
+            temp_task_info.Format(_T("Write Weekly Routine List Item%d .Changed to \"%s\" "), Changed_Item + 1, New_CString);
+            Post_Write_Message(g_bac_instance, WRITESCHEDULE_T3000, point_number, point_number, sizeof(Str_weekly_routine_point), m_weekly_dlg_hwnd, temp_task_info, Changed_Item, Changed_SubItem);
+        }
+    }
+        break;
+    case BAC_HOL:
+    {
+        int cmp_ret;//compare if match it will 0;
+        int Changed_Item = (int)wParam;
+        int Changed_SubItem = (int)lParam;
+
+        CString temp_task_info;
+        CString New_CString = m_program_debug_list.GetItemText(Changed_Item, Changed_SubItem);
+
+        //先保存 原来的值，等结束的时候来比对，看是否有改变，有改变就进行写动作;
+        memcpy_s(&m_temp_annual_data[point_number], sizeof(Str_annual_routine_point), &m_Annual_data.at(point_number), sizeof(Str_annual_routine_point));
+
+        if (Changed_SubItem == ANNUAL_ROUTINE_LABLE)
+        {
+            CString cs_temp = m_program_debug_list.GetItemText(Changed_Item, Changed_SubItem);
+            if (cs_temp.GetLength() >= STR_ANNUAL_LABEL_LENGTH)	//长度不能大于结构体定义的长度;
+            {
+                MessageBox(_T("Length can not higher than 8"), _T("Warning"));
+                PostMessage(WM_REFRESH_BAC_ANNUAL_LIST, NULL, NULL);
+                return 0;
+            }
+            if (Check_Label_Exsit(cs_temp))
+            {
+                PostMessage(WM_REFRESH_BAC_ANNUAL_LIST, Changed_Item, REFRESH_ON_ITEM);
+                return 0;
+            }
+
+            char cTemp1[255];
+            memset(cTemp1, 0, 255);
+            WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL);
+            memcpy_s(m_Annual_data.at(point_number).label, STR_ANNUAL_LABEL_LENGTH, cTemp1, STR_ANNUAL_LABEL_LENGTH);
+        }
+
+        if (Changed_SubItem == ANNUAL_ROUTINE_FULL_LABEL)
+        {
+            CString cs_temp = m_program_debug_list.GetItemText(Changed_Item, Changed_SubItem);
+            if (cs_temp.GetLength() >= STR_ANNUAL_DESCRIPTION_LENGTH)	//长度不能大于结构体定义的长度;
+            {
+                MessageBox(_T("Length can not higher than 20"), _T("Warning"));
+                PostMessage(WM_REFRESH_BAC_ANNUAL_LIST, NULL, NULL);
+                return 0;
+            }
+            if (Check_FullLabel_Exsit(cs_temp))
+            {
+                PostMessage(WM_REFRESH_BAC_ANNUAL_LIST, Changed_Item, REFRESH_ON_ITEM);
+                return 0;
+            }
+            char cTemp1[255];
+            memset(cTemp1, 0, 255);
+            WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL);
+            memcpy_s(m_Annual_data.at(point_number).description, STR_ANNUAL_DESCRIPTION_LENGTH, cTemp1, STR_ANNUAL_DESCRIPTION_LENGTH);
+        }
+
+        if (Changed_SubItem == ANNUAL_ROUTINE_VALUE)
+        {
+            CString cs_temp = m_program_debug_list.GetItemText(Changed_Item, ANNUAL_ROUTINE_VALUE);
+            if (cs_temp.CompareNoCase(_T("OFF")) == 0)
+            {
+                m_Annual_data.at(point_number).value = 0;
+            }
+            else
+            {
+                m_Annual_data.at(point_number).value = 1;
+            }
+        }
+        if (Changed_SubItem == ANNUAL_ROUTINE_AUTO_MANUAL)
+        {
+            CString cs_temp = m_program_debug_list.GetItemText(Changed_Item, ANNUAL_ROUTINE_AUTO_MANUAL);
+            if (cs_temp.CompareNoCase(_T("Auto")) == 0)
+            {
+                m_Annual_data.at(point_number).auto_manual = 0;
+                m_program_debug_list.SetCellEnabled(Changed_Item, ANNUAL_ROUTINE_VALUE, 0);
+            }
+            else
+            {
+                m_Annual_data.at(point_number).auto_manual = 1;
+                m_program_debug_list.SetCellEnabled(Changed_Item, ANNUAL_ROUTINE_VALUE, 1);
+            }
+        }
+        cmp_ret = memcmp(&m_temp_annual_data[point_number], &m_Annual_data.at(point_number), sizeof(Str_annual_routine_point));
+        if (cmp_ret != 0)
+        {
+            m_program_debug_list.SetItemBkColor(Changed_Item, Changed_SubItem, LIST_ITEM_CHANGED_BKCOLOR);
+            temp_task_info.Format(_T("Write Annual Routine List Item%d .Changed to \"%s\" "), Changed_Item + 1, New_CString);
+            Post_Write_Message(g_bac_instance, WRITEHOLIDAY_T3000, point_number, point_number, sizeof(Str_annual_routine_point), m_annual_dlg_hwnd, temp_task_info, Changed_Item, Changed_SubItem);
+        }
+    }
+        break;
 	default:
 		{
 
@@ -1653,7 +2075,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 
 	switch(point_type)
 	{
-	case 0: //OUT
+	case BAC_OUT: //OUT
 		{
 			CString New_CString;
 			CString temp_task_info;
@@ -1792,7 +2214,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 				else
 				{
 					bac_ranges_type = OUTPUT_RANGE_DIGITAL_TYPE;
-					if(m_Output_data.at(point_number).range > 30)
+					if(bac_Invalid_range(m_Output_data.at(point_number).range))
 					{
 						m_Output_data.at(point_number).range = 0;
 						bac_range_number_choose = 0;
@@ -1888,7 +2310,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 			}
 		}
 		break;
-	case 1: //IN
+	case BAC_IN: //IN
 		{
 			CString New_CString;
 			CString temp_task_info;
@@ -2076,7 +2498,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 				else
 				{
 					bac_ranges_type = INPUT_RANGE_DIGITAL_TYPE;
-					if(m_Input_data.at(point_number).range > 30)
+					if(bac_Invalid_range(m_Input_data.at(point_number).range))
 					{
 						m_Input_data.at(point_number).range = 0;
 						bac_range_number_choose = 0;
@@ -2177,7 +2599,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 
 		}
 		break;
-	case 2: //VAR
+	case BAC_VAR: //VAR
 		{
 			//*************************************************************************************************************************************
 			memcpy_s(&m_temp_variable_data[point_number],sizeof(Str_variable_point),&m_Variable_data.at(point_number),sizeof(Str_variable_point));
@@ -2363,7 +2785,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 				else
 				{
 					bac_ranges_type = VARIABLE_RANGE_DIGITAL_TYPE;
-					if(m_Variable_data.at(point_number).range > 30)
+					if(bac_Invalid_range(m_Variable_data.at(point_number).range))
 					{
 						m_Variable_data.at(point_number).range = 0;
 						bac_range_number_choose = 0;
@@ -2471,6 +2893,52 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 			//*************************************************************************************************************************************
 		}
 		break;
+    case BAC_SCH:
+    {
+
+    }
+        break;
+    case BAC_HOL:
+    {
+        long lRow, lCol;
+        lRow = lvinfo.iItem;
+        lCol = lvinfo.iSubItem;
+        CString New_CString;
+        CString temp_task_info;
+
+        if (lCol == ANNUAL_ROUTINE_AUTO_MANUAL)
+        {
+            //先保存 原来的值，等结束的时候来比对，看是否有改变，有改变就进行写动作;
+            memcpy_s(&m_temp_annual_data[point_number], sizeof(Str_annual_routine_point), &m_Annual_data.at(point_number), sizeof(Str_annual_routine_point));
+
+            if (m_Annual_data.at(point_number).auto_manual == 0)
+            {
+                m_Annual_data.at(point_number).auto_manual = 1;
+                m_program_debug_list.SetItemText(0, ANNUAL_ROUTINE_AUTO_MANUAL, _T("Manual"));
+                m_program_debug_list.SetCellEnabled(0, ANNUAL_ROUTINE_VALUE, TRUE);
+                New_CString = _T("Manual");
+            }
+            else
+            {
+                m_Annual_data.at(point_number).auto_manual = 0;
+                m_program_debug_list.SetItemText(0, ANNUAL_ROUTINE_AUTO_MANUAL, _T("Auto"));
+                m_program_debug_list.SetCellEnabled(0, ANNUAL_ROUTINE_VALUE, FALSE);
+                New_CString = _T("Auto");
+            }
+            temp_task_info.Format(_T("Write Annual List Item%d .Changed to \"%s\" "), lRow + 1, New_CString);
+        }
+        else
+            return;
+
+        int cmp_ret = memcmp(&m_temp_annual_data[point_number], &m_Annual_data.at(point_number), sizeof(Str_annual_routine_point));
+        if (cmp_ret != 0)
+        {
+            m_program_debug_list.SetItemBkColor(0, lCol, LIST_ITEM_CHANGED_BKCOLOR);
+            temp_task_info.Format(_T("Write Annual Routine List Item%d .Changed to \"%s\" "), point_number + 1, New_CString);
+            Post_Write_Message(g_bac_instance, WRITEHOLIDAY_T3000, point_number, point_number, sizeof(Str_annual_routine_point), m_annual_dlg_hwnd, temp_task_info, 0, lCol);
+        }
+    }
+        break;
 	default:
 		break;
 	}

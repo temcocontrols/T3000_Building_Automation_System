@@ -1147,8 +1147,14 @@ OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,u
 
         int n=::send(m_hSocket,(char *)data_to_write,13+2*length,0);
         int nRecv = ::recv(m_hSocket, (char *)data_back_write,13, 0);
-        if(nRecv<0)
+        if (nRecv < 0)
         {
+            int nErr = WSAGetLastError();
+            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            {
+                if (last_connected_port != 0)
+                    Open_Socket2(last_connected_ip, last_connected_port);
+            }
             return -2;
         }
         //	memcpy((void*)&to_send_data[0],(void*)&to_Reive_data[6],sizeof(to_Reive_data));
@@ -1346,7 +1352,15 @@ OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_ad
 
         int n=::send(m_hSocket,(char *)data_to_write,13+2*length,0);
         int nRecv = ::recv(m_hSocket, (char *)data_back_write,13, 0);
-
+        if (nRecv < 0)
+        {
+            int nErr = WSAGetLastError();
+            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            {
+                if (last_connected_port != 0)
+                    Open_Socket2(last_connected_ip, last_connected_port);
+            }
+        }
         *recvDataLength=13;
         for(int i=0; i<13; i++)
         {
@@ -1832,14 +1846,18 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
         TS_UC rvData[17];
         //int nRecv = ::recv(m_hSocket, (char*)gval, sizeof(gval), 0);
         int nRecv = ::recv(m_hSocket, (char*)&rvData, sizeof(rvData), 0);
+
+        if (nRecv < 0)
+        {
+            int nErr = WSAGetLastError();
+            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            {
+                if (last_connected_port != 0)
+                    Open_Socket2(last_connected_ip, last_connected_port);
+            }
+        }
         //gval=rvData.pval;
         memcpy((void*)gval,(void*)&rvData[6],13/*sizeof(gval)*/);
-
-        /*
-        xx=::send(m_hSocket,(char*)pval,sizeof(pval),MSG_OOB);
-        nRecv = ::recv(m_hSocket, (char*)gval, sizeof(gval), 0);*/
-
-        int nerro= WSAGetLastError();
 
         if(address!=10)
         {
@@ -3815,6 +3833,16 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
         if (bytes_available == 0) return -1;
         int nRecv = ::recv(m_hSocket, (char*)to_Reive_data, length*2+12, 0);
 
+        if (nRecv < 0)
+        {
+            int nErr = WSAGetLastError();
+            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            {
+                if (last_connected_port != 0)
+                    Open_Socket2(last_connected_ip, last_connected_port);
+            }
+        }
+
         memcpy((void*)&to_send_data[0],(void*)&to_Reive_data[6],sizeof(to_Reive_data));
         ///////////////////////////////////////////////////////////
         if(to_send_data[0]!=device_var || to_send_data[1]!=3 || to_send_data[2]!=length*2)
@@ -4063,6 +4091,16 @@ OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         Sleep(LATENCY_TIME_NET);
         int nn=sizeof(to_Reive_data);
         int nRecv = ::recv(m_hSocket, (char*)to_Reive_data, length*2+12, 0);
+
+        if (nRecv < 0)
+        {
+            int nErr = WSAGetLastError();
+            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            {
+                if (last_connected_port != 0)
+                    Open_Socket2(last_connected_ip, last_connected_port);
+            }
+        }
 
         *recvDataLength = nRecv;
         for (int i = 0; i < *recvDataLength; i++)
@@ -5295,6 +5333,16 @@ OUTPUT int Read_One2(TS_UC device_var,TS_US address, bool bComm_Type)
         TS_UC rvData[17];
         //int nRecv = ::recv(m_hSocket, (char*)gval, sizeof(gval), 0);
         int nRecv = ::recv(m_hSocket, (char*)&rvData, sizeof(rvData), 0);
+
+        if (nRecv < 0)
+        {
+            int nErr = WSAGetLastError();
+            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            {
+                if (last_connected_port != 0)
+                    Open_Socket2(last_connected_ip, last_connected_port);
+            }
+        }
         //gval=rvData.pval;
         memcpy((void*)gval,(void*)&rvData[6],13/*sizeof(gval)*/);
 
@@ -5689,7 +5737,15 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
         //Sleep(300);
         TS_UC rvdata[17];
         int nRecv = ::recv(m_hSocket, (char*)rvdata, sizeof(rvdata), 0);
-
+        if (nRecv < 0)
+        {
+            int nErr = WSAGetLastError();
+            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            {
+                if (last_connected_port != 0)
+                    Open_Socket2(last_connected_ip, last_connected_port);
+            }
+        }
         int nErr = WSAGetLastError();
 
         memcpy((void*)&gval[0],(void*)&rvdata[6],13/*sizeof(gval)*/);
@@ -8745,11 +8801,30 @@ OUTPUT int read_multi_tap(TS_UC device_var,TS_US *put_data_into_here,TS_US start
             return -1;
         }
 
-        ::send(m_hSocket,(char*)data_to_send,sizeof(data_to_send),0);
+        int xx=::send(m_hSocket,(char*)data_to_send,sizeof(data_to_send),0);
+
+        if (xx < 0)
+        {
+            if (last_connected_port != 0)
+                Open_Socket2(last_connected_ip, last_connected_port);
+        }
 
         Sleep(LATENCY_TIME_NET);
         int nn=sizeof(to_Reive_data);
         int nRecv = ::recv(m_hSocket, (char*)to_Reive_data, length*2+12, 0);
+
+        if (nRecv < 0)
+        {
+            int nErr = WSAGetLastError();
+            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            {
+                if (last_connected_port != 0)
+                    Open_Socket2(last_connected_ip, last_connected_port);
+            }
+            Sleep(1);
+        }
+        
+
 
         memcpy((void*)&to_send_data[0],(void*)&to_Reive_data[6],sizeof(to_Reive_data));
         ///////////////////////////////////////////////////////////
@@ -9351,6 +9426,16 @@ OUTPUT int Modbus_Standard_Read(TS_UC device_var, TS_US *put_data_into_here, int
 		int nn = sizeof(to_Reive_data);
 		int nRecv = ::recv(m_hSocket, (char*)to_Reive_data, length * 2 + 12, 0);
 
+        if (nRecv < 0)
+        {
+            int nErr = WSAGetLastError();
+            //if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            //{
+            //    if (last_connected_port != 0)
+            //        Open_Socket2(last_connected_ip, last_connected_port);
+            //}
+            return -2;
+        }
 		*recvDataLength = nRecv;
 		for (int i = 0; i < *recvDataLength; i++)
 		{

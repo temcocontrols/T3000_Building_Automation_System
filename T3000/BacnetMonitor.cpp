@@ -360,7 +360,7 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_List(WPARAM wParam,LPARAM lParam)
 
         //2018 01 26   sub panel 可以为0 代表访问本地;
         //if (((temp_panel == 0) || (m_monitor_data.at(monitor_list_line).inputs[i].sub_panel == 0)) || (lowbyte_point_type > BAC_AV + 10))
-		if(((temp_panel == 0) && (temp_sub_panel == 0)) || (lowbyte_point_type > BAC_DO + 1))
+		if(((temp_panel == 0) && (temp_sub_panel == 0)) || (lowbyte_point_type > BAC_BO + 1))
 		{
 			m_monitor_data.at(monitor_list_line).inputs[i].network = 0;	//发 现panel 是0  就说明这个数据是无效的,先设置为初始化值;
 			m_monitor_data.at(monitor_list_line).inputs[i].number = 0;
@@ -388,7 +388,7 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_List(WPARAM wParam,LPARAM lParam)
         //    (temp_point_type == BAC_AV) ||
         //    (temp_point_type == BAC_AI) ||
         //    (temp_point_type == BAC_AO) ||
-        //    (temp_point_type == BAC_DO))
+        //    (temp_point_type == BAC_BO))
         //{
         //    temp_point.number = temp_point.number - 1;
         //}
@@ -396,7 +396,7 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_List(WPARAM wParam,LPARAM lParam)
         //if ((temp_point_type == BAC_AV) ||
         //    (temp_point_type == BAC_AI) ||
         //    (temp_point_type == BAC_AO) ||
-        //    (temp_point_type == BAC_DO))
+        //    (temp_point_type == BAC_BO))
         //{
         //    temp_point.number = temp_point.number - 1;
         //}
@@ -573,7 +573,7 @@ void CBacnetMonitor::Set_Input_Range_And_count()
 
             temp_monitor_data_analog.range[temp_analog_count - 1] = 0; //不知道AV 的单位
         }
-        else if ((and_pointtype == BAC_DO + 1) ||
+        else if ((and_pointtype == BAC_BO + 1) ||
                  (and_pointtype == BAC_BV + 1) ||
                  (and_pointtype == BAC_BI + 1) )
         {
@@ -666,7 +666,7 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
             (temp_point == BAC_AV) ||
             (temp_point == BAC_AI) ||
             (temp_point == BAC_AO) ||
-            (temp_point == BAC_DO))
+            (temp_point == BAC_BO))
         {
             num_point = num_point;
         }
@@ -1631,7 +1631,7 @@ int read_monitordata(int digtal_or_analog,unsigned int timeleft,unsigned int tim
         {
             if (read_index < read_analog_package.size())
             {
-                if ((read_analog_package.at(read_index) == true) && (read_index != m_monitor_head.seg_index + m_monitor_head.total_seg))  //已经读过的;
+                if ((read_analog_package.test(read_index) == true) && (read_index != m_monitor_head.seg_index + m_monitor_head.total_seg))  //已经读过的;
                     continue; 
             }
             else
@@ -1643,7 +1643,7 @@ int read_monitordata(int digtal_or_analog,unsigned int timeleft,unsigned int tim
         {
             if (read_index < read_dig_package.size())
             {
-                if ((read_dig_package.at(read_index) == true) && (read_index != m_monitor_head.seg_index + m_monitor_head.total_seg))  //已经读过的;
+                if ((read_dig_package.test(read_index) == true) && (read_index != m_monitor_head.seg_index + m_monitor_head.total_seg))  //已经读过的;
                     continue;
             }
             else
@@ -2024,7 +2024,7 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
         {
             temp_type_word = _T("AO");
         }
-        else if (temp_data.point.point_type == BAC_DO + 1)
+        else if (temp_data.point.point_type == BAC_BO + 1)
         {
             temp_type_word = _T("DO");
         }
@@ -2100,11 +2100,14 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 		CString strSql;
 		strSql.Format(_T("insert into MonitorData values('%s',#%s#,%u,%d,%u,%u,'%s')"),temp_type,display_time,temp_data.time,temp_data.value,  analog_data ,temp_flag,Label_Des);
 
-#ifdef _DEBUG
-        CString tem1111;
-        tem1111 = strSql + _T("\r\n");
-        TRACE(tem1111);
-#endif
+        if (((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_MONITOR_DATA_ONLY)))
+        {
+            CString tem1111;
+            tem1111 = strSql + _T("\r\n");
+            //TRACE(tem1111);
+            DFTrace(strSql);
+
+        }
 		//strSql.Format(_T("insert into MonitorData values('%s',%d,%u,%u,%u,'%s','%s')"),temp_type,temp_data.value,temp_data.time , analog_data ,temp_flag,display_time,Label_Des);
 		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
 
@@ -2193,7 +2196,7 @@ void CBacnetMonitor::Reset_Monitor_Rect()
 	{
 		CRect temp_mynew_rect;
 		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
-		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), NULL);
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
 	}
 	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
 	{

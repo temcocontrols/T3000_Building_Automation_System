@@ -831,7 +831,7 @@ void CCO2_View::Initial_List()
      m_grid_input.put_TextMatrix(3,0,_T("3"));
 
 
-     m_grid_input.put_TextMatrix(1,1,_T("Tempreture"));
+     m_grid_input.put_TextMatrix(1,1,_T("Temperature"));
      m_grid_input.put_TextMatrix(2,1,_T("Hum"));
      m_grid_input.put_TextMatrix(3,1,_T("CO2"));
 
@@ -2887,7 +2887,7 @@ void CCO2_View::Initial_InputList(){
       m_input_list.InsertItem(1,_T("2"));
       m_input_list.InsertItem(2,_T("3"));
 
-      m_input_list.SetItemText(0,1,_T("Tempreture"));
+      m_input_list.SetItemText(0,1,_T("Temperature"));
       m_input_list.SetItemText(1,1,_T("Hum"));
       m_input_list.SetItemText(2,1,_T("CO2"));
 
@@ -2990,7 +2990,7 @@ if (m_product_type == 1)
 	m_output_list.InsertItem(2,_T("3"));
 
 	m_output_list.SetItemText(0,1,_T("Hum"));
-	m_output_list.SetItemText(1,1,_T("Tempreture"));
+	m_output_list.SetItemText(1,1,_T("Temperature"));
 	m_output_list.SetItemText(2,1,_T("CO2"));
 
 	AddressValue =284 ;
@@ -3139,7 +3139,7 @@ else if (m_product_type == 3)
     m_output_list.InsertItem(0,_T("1"));
     m_output_list.InsertItem(1,_T("2"));
     m_output_list.InsertItem(2,_T("3"));
-    m_output_list.SetItemText(0,1,_T("Tempreture"));
+    m_output_list.SetItemText(0,1,_T("Temperature"));
     m_output_list.SetItemText(1,1,_T("Hum"));
     m_output_list.SetItemText(2,1,_T("CO2"));
 
@@ -4066,7 +4066,7 @@ LRESULT CCO2_View::Fresh_Lists(WPARAM wParam,LPARAM lParam){
             m_input_list.InsertItem(1,_T("2"));
             m_input_list.InsertItem(2,_T("3"));
 
-            m_input_list.SetItemText(0,1,_T("Tempreture"));
+            m_input_list.SetItemText(0,1,_T("Temperature"));
             m_input_list.SetItemText(1,1,_T("Hum"));
             m_input_list.SetItemText(2,1,_T("CO2"));
 
@@ -4218,7 +4218,7 @@ LRESULT CCO2_View::Fresh_Lists(WPARAM wParam,LPARAM lParam){
             m_output_list.InsertItem(0,_T("1"));
             m_output_list.InsertItem(1,_T("2"));
             m_output_list.InsertItem(2,_T("3"));
-            m_output_list.SetItemText(0,1,_T("Tempreture"));
+            m_output_list.SetItemText(0,1,_T("Temperature"));
             m_output_list.SetItemText(1,1,_T("Hum"));
             m_output_list.SetItemText(2,1,_T("CO2"));
 
@@ -4360,7 +4360,7 @@ LRESULT CCO2_View::Fresh_Lists(WPARAM wParam,LPARAM lParam){
 			m_output_list.InsertItem(2,_T("3"));
 
 			m_output_list.SetItemText(0,1,_T("Hum"));
-			m_output_list.SetItemText(1,1,_T("Tempreture"));
+			m_output_list.SetItemText(1,1,_T("Temperature"));
 			m_output_list.SetItemText(2,1,_T("CO2"));
 
 			AddressValue =284 ;

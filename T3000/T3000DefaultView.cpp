@@ -53,33 +53,10 @@ void CT3000DefaultView::Dump(CDumpContext& dc) const
 
 void CT3000DefaultView::OnInitialUpdate()
 {
-/*	hBitmap_default_bmp =(HBITMAP)LoadImage(AfxGetInstanceHandle(),  
-		MAKEINTRESOURCE(IDB_BITMAP_BUILDING_DEFAULT),  
-		IMAGE_BITMAP,0,0,  
-		LR_LOADMAP3DCOLORS); */ 
-//     HANDLE hFind;//
-//     WIN32_FIND_DATA wfd;//
-//     CString bmppath = GetExePath(true)+_T("default_screen.bmp");
-//     hFind = FindFirstFile(bmppath, &wfd);//
-//     if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
-//     {
         hBitmap_default_bmp =(HBITMAP)LoadImage(AfxGetInstanceHandle(),  
             MAKEINTRESOURCE(IDB_BITMAP_BUILDING_DEFAULT),  
             IMAGE_BITMAP,0,0,  
             LR_LOADMAP3DCOLORS);
-//     }
-//     else
-//     {
-//         hBitmap_default_bmp =(HBITMAP)LoadImage(AfxGetInstanceHandle(),
-//             bmppath,  
-//             IMAGE_BITMAP,0,0,  
-//             LR_LOADFROMFILE|LR_CREATEDIBSECTION); 
-//         if(NULL == hBitmap_default_bmp)
-//         {
-//             // LoadImage faled so get extended error information.
-//             DWORD dwError = ::GetLastError();
-//         }
-//     }
    
 	CFormView::OnInitialUpdate();
 }
@@ -93,6 +70,7 @@ void CT3000DefaultView::OnPaint()
 	CPaintDC dc(this); // device context for painting
 	
 	// Do not call CFormView::OnPaint() for painting messages
+#if 0
 	CMemDC memDC(dc,this);
 	Graphics graphics(memDC.GetDC());
 
@@ -101,4 +79,5 @@ void CT3000DefaultView::OnPaint()
 	::GetWindowRect(temp_hwnd,&test_rect);	//获取 view的窗体大小;
 	Bitmap bitmap(hBitmap_default_bmp,NULL);
 	graphics.DrawImage(&bitmap,0 ,0,test_rect.Width(),test_rect.Height());
+#endif
 }

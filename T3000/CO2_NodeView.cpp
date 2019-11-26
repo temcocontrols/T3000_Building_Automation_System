@@ -5,9 +5,9 @@
 #include "T3000.h"
 #include "CO2_NodeView.h"
 #include "global_function.h"
-
+#include "MainFrm.h"
 // CCO2_NodeView
-
+extern tree_product selected_product_Node; // 选中的设备信息;
 IMPLEMENT_DYNCREATE(CCO2_NodeView, CFormView)
 
 CCO2_NodeView::CCO2_NodeView()
@@ -153,8 +153,8 @@ const CString CO2_Node_Baudrate_Array[] =
 
 const CString CO2_Node_Protocol[] =
 {
-    _T("Bacnet MSTP"),  //3
-    _T("Modbus RS485")  // 0
+    _T("Bacnet MSTP"),  //0
+    _T("Modbus RS485")  // 3
 };
 
 
@@ -240,19 +240,19 @@ LRESULT CCO2_NodeView::Fresh_CO2_Node_Item(WPARAM wParam, LPARAM lParam)
         {
             float nvalue = _wtof(New_CString);
             int nwritevalue = (int)(nvalue * 10);
-            if (product_register_value[124] == 0)
-            {
-                if (product_register_value[125] == 0)
-                {
-                    nreg = 121;
-                }
-                else
-                {
-                    nreg = 122;
-                }
-            }
-            else
-            {
+            //if (product_register_value[124] == 0)
+            //{
+            //    if (product_register_value[125] == 0)
+            //    {
+            //        nreg = 121;
+            //    }
+            //    else
+            //    {
+            //        nreg = 122;
+            //    }
+            //}
+            //else
+            //{
                 if (product_register_value[125] == 0)
                 {
                     nreg = 119;
@@ -261,7 +261,7 @@ LRESULT CCO2_NodeView::Fresh_CO2_Node_Item(WPARAM wParam, LPARAM lParam)
                 {
                     nreg = 120;
                 }
-            }
+            //}
             nret = write_one(g_tstat_id, nreg, nwritevalue);
         }
         else if (Changed_Item == ROW_HUMIDITY)
@@ -443,19 +443,19 @@ LRESULT CCO2_NodeView::Fresh_CO2_Node_List(WPARAM wParam, LPARAM lParam)
     cs_co2_value.Format(_T("%u"), product_register_value[108]);
 
     //125寄存器 为0 则为C   1为F
-    if (product_register_value[124] == 0)
-    {
-        if (product_register_value[125] == 0)
-        {
-            cs_temp_value.Format(_T("%.1f"), ((float)product_register_value[121]) / 10);
-        }
-        else
-        {
-            cs_temp_value.Format(_T("%.1f"), ((float)product_register_value[122]) / 10);
-        }
-    }
-    else
-    {
+    //if (product_register_value[124] == 0)
+    //{
+    //    if (product_register_value[125] == 0)
+    //    {
+    //        cs_temp_value.Format(_T("%.1f"), ((float)product_register_value[121]) / 10);
+    //    }
+    //    else
+    //    {
+    //        cs_temp_value.Format(_T("%.1f"), ((float)product_register_value[122]) / 10);
+    //    }
+    //}
+    //else
+    //{
         if (product_register_value[125] == 0)
         {
             cs_temp_value.Format(_T("%.1f"), ((float)product_register_value[119]) / 10);
@@ -464,7 +464,7 @@ LRESULT CCO2_NodeView::Fresh_CO2_Node_List(WPARAM wParam, LPARAM lParam)
         {
             cs_temp_value.Format(_T("%.1f"), ((float)product_register_value[120]) / 10);
         }
-    }
+    //}
 
     cs_Hum_value.Format(_T("%.1f"), ((float)product_register_value[116]) / 10);
 
@@ -853,6 +853,9 @@ void CCO2_NodeView::OnCbnSelchangeComboCo2NodeProtocol()
 {
     // TODO: 在此添加控件通知处理程序代码
     CString temp_string;
+    bool  modbus_0_bacnet_1 = 0;
+    int sub_node = 0;
+
     int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_CO2_NODE_PROTOCOL))->GetCurSel();
     ((CComboBox *)GetDlgItem(IDC_COMBO_CO2_NODE_PROTOCOL))->GetLBText(nSel, temp_string);
     int temp_protocol = product_register_value[21];
@@ -860,22 +863,31 @@ void CCO2_NodeView::OnCbnSelchangeComboCo2NodeProtocol()
     {
         if (temp_string.CompareNoCase(CO2_Node_Protocol[i]) == 0)
         {
-            temp_protocol = i;
+            if(i == 0)
+                temp_protocol = 0;
+            if (i == 1)
+                temp_protocol = 3;
             break;
         }
     }
 
-    int nret = write_one(g_tstat_id, 21, temp_protocol);
-    if (nret <= 0)
+    if (temp_protocol == 3)
     {
-        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change protocol failed!"));
-        PostMessage(WM_CO2_NODE_THREAD_READ, NULL, NULL);
+        modbus_0_bacnet_1 = 0;
     }
+    else if (temp_protocol == 0)
+    {
+        modbus_0_bacnet_1 = 1;
+    }
+
+    if (selected_product_Node.note_parent_serial_number != 0)
+        sub_node = 1;
     else
-    {
-        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Operation Done!"));
-    }
+        sub_node = 0;
+
+    ChangeDeviceProtocol(modbus_0_bacnet_1, product_register_value[6], 21, temp_protocol, sub_node, g_strCurBuildingDatabasefilePath);
     ((CButton *)GetDlgItem(IDC_BUTTON_OK))->SetFocus();
+    return;
 }
 
 

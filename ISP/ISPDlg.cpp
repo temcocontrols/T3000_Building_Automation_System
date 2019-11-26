@@ -3094,10 +3094,11 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
             Sleep(1000);
         }
 
-        n_ret = Write_One_Retry(temp_read_reg[6], 16, 1);
+        n_ret = Write_One_Retry(temp_read_reg[6], 16, 1,10);
         if ((n_ret < 0) && (b_com_or_ip == 0))
         {
             sn_mac_info.Format(_T("写入命令使设备跳转至应用代码失败"));
+            Sleep(2000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
@@ -3156,6 +3157,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
     if ((n_ret_low < 0) || (n_ret_high < 0))
     {
         sn_mac_info.Format(_T("写入序列号失败"));
+        Sleep(1000);
         ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
         return 1;
     }
@@ -3169,6 +3171,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
     if (n_ret_id < 0)
     {
         sn_mac_info.Format(_T("写入Modbus ID失败"));
+        Sleep(1000);
         ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
         return 1;
     }
@@ -3185,6 +3188,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
         if (n_ret_id < 0)
         {
             sn_mac_info.Format(_T("写入产品ID：%d失败"), g_sn_product_id);
+            Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
@@ -3201,6 +3205,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
         if (n_ret_id < 0)
         {
             sn_mac_info.Format(_T("写入产品ID：%d失败"), temp_read_reg[7]);
+            Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
@@ -3217,6 +3222,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
     if (n_ret_id < 0)
     {
         sn_mac_info.Format(_T("写入硬件版本号失败"));
+        Sleep(1000);
         ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
         return 1;
     }
@@ -3303,6 +3309,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
         if (n_ret_id < 0)
         {
             sn_mac_info.Format(_T("写入MAC使能命令失败"));
+            Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
@@ -3319,7 +3326,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
         }
 
         int n_mac_ret = 0;
-        if ((temp_read_reg[7] == 74) || temp_read_reg[7] == 35)
+        if ((temp_read_reg[7] == PM_MINIPANEL_ARM) || temp_read_reg[7] == PM_MINIPANEL || temp_read_reg[7] == PM_CM5)
         {
             n_mac_ret = write_multi_Short(temp_read_reg[6], write_value,100, 6);
         }
@@ -3455,6 +3462,10 @@ BOOL CAboutDlg::OnInitDialog()
     // TODO:  在此添加额外的初始化
     CString release_note;
     CString temp;
+    temp.Format(_T("Rev6.0.5  (2019-04-22)\r\n  1.Support PM5E ARM .\r\n"));
+    release_note = release_note + temp;
+    temp.Format(_T("Rev6.0.4  (2019-03-18)\r\n  1.Support PM5E ARM .\r\n"));
+    release_note = release_note + temp;
     temp.Format(_T("Rev6.0.3  (2019-01-02)\r\n  1.Support PM5E don't check.\r\n"));
     release_note = release_note + temp;
     temp.Format(_T("Rev6.0.2  (2018-12-25)\r\n  1.Support don't check temco firmware.\r\n"));

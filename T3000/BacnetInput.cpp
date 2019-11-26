@@ -122,7 +122,7 @@ BOOL CBacnetInput::OnInitDialog()
 	//SetIcon(m_hIcon,FALSE);
 
 	ShowWindow(FALSE);
-	//SetTimer(6,250,NULL);
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -238,9 +238,14 @@ void CBacnetInput::Reload_Unit_Type()
 				m_input_list.SetCellStringList(i, INPUT_RANGE, strlist);		
 			}
 		}
-		
-		
 	}
+    else if (bacnet_device_type == BACNET_ROUTER)
+    {
+        if (BACNET_ROUTER_IN_A > (int)m_Input_data.size())
+            initial_count = (int)m_Input_data.size();
+        else
+            initial_count = BACNET_ROUTER_IN_A;
+    }
 
 
 
@@ -320,6 +325,8 @@ void CBacnetInput::Initial_List()
 			ListCtrlEx::CStrList strlist;
 			for (int j=0;j<(int)sizeof(JumperStatus)/sizeof(JumperStatus[0]);j++)
 			{
+                if (j == 4)   //以前出于某些原因  0  和 4 都代表 Thermistor Dry Contact; 这里下拉框不希望显示两个 一样的，所以过滤掉
+                    continue;
 				strlist.push_back(JumperStatus[j]);
 			}
 			m_input_list.SetCellStringList(i, INPUT_JUMPER, strlist);		
@@ -467,7 +474,14 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 	{
 		CString cs_temp=m_input_list.GetItemText(Changed_Item,INPUT_CAL);
 		float temp_value = (float)_wtof(cs_temp);
+        if (temp_value < 0)
+        {
+            m_Input_data.at(Changed_Item).calibration_sign = 1;
+            m_input_list.SetItemText(Changed_Item, INPUT_CAL_OPERATION, _T("-"));
+        }
+
 		int cal_value = (int)(temp_value * 10);
+        cal_value = abs(cal_value);
 		if((cal_value<0) || (cal_value >65535))
 		{
 			MessageBox(_T("Please Input an value between 0.0 - 6553.6"),_T("Warning"),MB_OK);
@@ -501,7 +515,7 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 			if(temp_jump.CompareNoCase(JumperStatus[z]) == 0)
 			{
 				unsigned char temp_value = 0;
-				if((z == 0) || (z == 1) || (z == 2) || (z == 3) || (z == 4))
+				if((z == 0) || (z == 1) || (z == 2) || (z == 3) || (z == 4) || (z == 5))
 					temp_value = z;
 				unsigned char temp1;
 				temp1 = m_Input_data.at(Changed_Item).decom ;
@@ -568,6 +582,16 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		//INPUT_LIMITE_ITEM_COUNT = 8;
 		Minipanel_device = 1;
 	}
+    else if ((bacnet_device_type == STM32_CO2_NET) || (bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_PRESSURE_NET))
+    {
+        INPUT_LIMITE_ITEM_COUNT = 3;
+        Minipanel_device = 0;
+    }
+    //else if (bacnet_device_type == BACNET_ROUTER)
+    //{
+    //    INPUT_LIMITE_ITEM_COUNT = BACNET_ROUTER_IN_A + BACNET_ROUTER_IN_D;
+    //    Minipanel_device = 1;
+    //}
 	else
 	{
 		    INPUT_LIMITE_ITEM_COUNT = BAC_INPUT_ITEM_COUNT;
@@ -843,7 +867,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		temp_jumper = (m_Input_data.at(i).decom & 0xf0 ) >> 4;
 
 		//如果range 是0 或者 不在正常范围内，就不要显示 open short 的报警 状态;
-		if((temp_decom==0) || (m_Input_data.at(i).range == 0) || (m_Input_data.at(i).range > 30))
+		if((temp_decom==0) || (m_Input_data.at(i).range == 0) || bac_Invalid_range(m_Input_data.at(i).range))
 		{
 			temp_status.Format(Decom_Array[0]);
 			m_input_list.SetItemTextColor(i,INPUT_DECOM,RGB(0,0,0),false);
@@ -866,27 +890,37 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		m_input_list.SetItemText(i,INPUT_DECOM,temp_status);
 
 
-		if(temp_jumper == 1)
-		{
-			temp_status.Format(JumperStatus[1]);
-		}
-		else if(temp_jumper == 2)
-		{
-			temp_status.Format(JumperStatus[2]);
-		}
-		else if(temp_jumper == 3)
-		{
-			temp_status.Format(JumperStatus[3]);
-		}
-		else if(temp_jumper == 0)
-		{
-			temp_status.Format(JumperStatus[0]);
-		}
-		else
-		{
-			temp_status.Format(JumperStatus[0]);
-			m_Input_data.at(i).decom = m_Input_data.at(i).decom & 0x0f;	 //如果最高位不是 有效值，清零;
-		}
+        if ((temp_jumper >= 0) && (temp_jumper < sizeof(JumperStatus) / sizeof(JumperStatus[0])))
+        {
+            temp_status.Format(JumperStatus[temp_jumper]);
+        }
+        else
+        {
+            temp_status.Format(JumperStatus[0]);
+            m_Input_data.at(i).decom = m_Input_data.at(i).decom & 0x0f;	 //如果最高位不是 有效值，清零;
+        }
+
+		//if(temp_jumper == 1)
+		//{
+		//	temp_status.Format(JumperStatus[1]);
+		//}
+		//else if(temp_jumper == 2)
+		//{
+		//	temp_status.Format(JumperStatus[2]);
+		//}
+		//else if(temp_jumper == 3)
+		//{
+		//	temp_status.Format(JumperStatus[3]);
+		//}
+		//else if(temp_jumper == 0)
+		//{
+		//	temp_status.Format(JumperStatus[0]);
+		//}
+		//else
+		//{
+		//	temp_status.Format(JumperStatus[0]);
+		//	m_Input_data.at(i).decom = m_Input_data.at(i).decom & 0x0f;	 //如果最高位不是 有效值，清零;
+		//}
 		m_input_list.SetItemText(i,INPUT_JUMPER,temp_status);
 
 
@@ -1169,14 +1203,22 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 	else if(lCol == INPUT_RANGE)
 	{
+        m_dialog_signal_type = 0xff;
 		BacnetRange dlg;
 
 
         if ((g_protocol == MODBUS_BACNET_MSTP) ||
             (g_protocol == PROTOCOL_BACNET_IP))// MSTP_转MUDBUS 协议，因为10000以后没有自定义的CUSTOM 表;
         {
-            if (!read_customer_unit)//点击产品的时候 需要读custom units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
+           // if (!read_customer_unit)//点击产品的时候 需要读custom units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
             {
+                int ret_cusunits = GetPrivateData_Blocking(g_bac_instance, READUNIT_T3000, 0, BAC_CUSTOMER_UNITS_COUNT - 1, sizeof(Str_Units_element), 3);
+                if (ret_cusunits < 0)
+                {
+                    temp_task_info.Format(_T("Read custom units failed!"));
+                    SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_task_info);
+                }
+#if 0
                 int temp_invoke_id = -1;
                 int send_status = true;
                 int	resend_count = 0;
@@ -1216,7 +1258,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
                     if (read_customer_unit)
                         break;
                 }
-
+#endif
             }
         }
 		bac_range_number_choose = m_Input_data.at(lRow).range;
@@ -1233,7 +1275,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 		else
 		{
 			bac_ranges_type = INPUT_RANGE_DIGITAL_TYPE;
-			if(m_Input_data.at(lRow).range > 30)
+			if(bac_Invalid_range(m_Input_data.at(lRow).range))
 			{
 				m_Input_data.at(lRow).range = 0;
 				bac_range_number_choose = 0;
@@ -1308,6 +1350,20 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 				temp_float_value = ((float)m_Input_data.at(lRow).value) / 1000;
 				cstemp_value.Format(_T("%.2f"),temp_float_value);
 				m_input_list.SetItemText(lRow,INPUT_VALUE,cstemp_value);	
+                int temp_jumper = 0;
+                if (m_dialog_signal_type != 0xff)  // 0xff 说明并没有任何改动;
+                {
+                    temp_jumper = m_dialog_signal_type >> 4;
+                    if ((temp_jumper == 0) || (temp_jumper == 1) || (temp_jumper == 2) || (temp_jumper == 3) || (temp_jumper == 5))
+                    {
+                        unsigned char temp1;
+                        temp1 = m_Input_data.at(lRow).decom;
+                        temp1 = temp1 & 0x0f;
+                        temp1 = temp1 | (temp_jumper << 4);
+                        m_Input_data.at(lRow).decom = temp1;
+                    }
+                }
+
 			}
 			else if((bac_ranges_type == VARIABLE_RANGE_DIGITAL_TYPE) || (bac_ranges_type == INPUT_RANGE_DIGITAL_TYPE) || (bac_ranges_type == OUTPUT_RANGE_DIGITAL_TYPE))
 			{
@@ -1402,7 +1458,7 @@ void CBacnetInput::Reset_Input_Rect()
 	{
 		CRect temp_mynew_rect;
 		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
-		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), NULL);
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
 	}
 	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
 	{
@@ -1431,7 +1487,7 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 
 			if(g_protocol == PROTOCOL_BIP_TO_MSTP)
 			{
-				PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
+				//PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
 			}
 			else if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_INPUT))  )	//GSM连接时不要刷新;
 			{
@@ -1472,7 +1528,7 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 		break;
 	case 5:
 		{
-			
+#if 0
 			static int test_count = 0;
 			if(move_direction == 1)
 				test_count = (++ test_count )%4;
@@ -1530,6 +1586,7 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 
 			pWnd->ModifyStyle(0, SS_ICON | SS_CENTERIMAGE);
 			pWnd->SetIcon(m_hIcon); 
+#endif
 		}
 		break;
 	default:

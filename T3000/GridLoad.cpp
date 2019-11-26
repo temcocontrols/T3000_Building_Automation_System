@@ -155,7 +155,7 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 		{
 			product_type =T3000_6_ADDRESS;
 		}
-		else if((nFlag == PM_TSTAT5E||nFlag == PM_PM5E)||(product_register_value[7]==PM_TSTATRUNAR) || (nFlag == PM_TSTAT5H)||(nFlag == PM_TSTAT5G))
+		else if((nFlag == PM_TSTAT5E||nFlag == PM_PM5E || nFlag == PM_PM5E_ARM)||(product_register_value[7]==PM_TSTATRUNAR) || (nFlag == PM_TSTAT5H)||(nFlag == PM_TSTAT5G))
 		{
 			product_type = T3000_5EH_LCD_ADDRESS;
 		}
@@ -492,6 +492,7 @@ BOOL CGridLoad::OnInitDialog()
 			strTemp="TStat5E";
 			break;
         case PM_PM5E:
+        case PM_PM5E_ARM:
             strTemp="PM5E";
             break;
 		case PM_TSTATRUNAR:
@@ -1137,6 +1138,7 @@ void CGridLoad::LoadDeviceToGrid()
 			strTemp="TStat5E";
 			break;
         case PM_PM5E:
+        case PM_PM5E_ARM:
             strTemp="PM5E";
             break;
 		case PM_TSTATRUNAR:

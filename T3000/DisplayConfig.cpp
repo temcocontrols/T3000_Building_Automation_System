@@ -25,7 +25,7 @@ CDisplayConfig::~CDisplayConfig()
 BOOL CDisplayConfig::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-    if (product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E)
+    if (product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E || product_register_value[7] == PM_PM5E_ARM)
     {
         MODBUS_LINE1_CHAR1=MODBUS_UI_LINE1_CHAR1;
         MODBUS_LINE2_CHAR1=MODBUS_UI_LINE2_CHAR1;

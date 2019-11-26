@@ -6,7 +6,7 @@
 #include "afxwinappex.h"
 #include "T3000.h"
 #include "MainFrm.h"
-
+#include "T3000DefaultView.h"
 #include "T3000Doc.h"
 #include "T3000View.h"
 #include "DialogCM5_BacNet.h"
@@ -26,7 +26,7 @@
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);  
 
 LPFN_ISWOW64PROCESS fnIsWow64Process;  
-const int g_versionNO= 20190222;
+const unsigned int g_versionNO= 20190613;
 
 
 #ifdef _DEBUG
@@ -50,7 +50,7 @@ CT3000App::CT3000App()
     char strASCIICompileTime[128] = { 0 };
     sprintf(strASCIICompileTime, "    %s ", __DATE__);
 
-
+    //_CrtSetBreakAlloc(261); //257
     MultiByteToWideChar(CP_ACP, 0, (char *)strASCIICompileTime, (int)strlen(strASCIICompileTime) + 1, CurrentT3000Version.GetBuffer(MAX_PATH), MAX_PATH);
     CurrentT3000Version.ReleaseBuffer();
 
@@ -66,7 +66,7 @@ CT3000App::CT3000App()
 #endif 
     //*******************************************************
     
-	T3000_Version = 20190222; //
+	T3000_Version = g_versionNO; //
 
 	m_lastinterface=19;
 }
@@ -341,6 +341,17 @@ BOOL CT3000App::InitInstance()
 			CopyFile(strSource, temp_bacnetdll, FALSE);
 			// ::ShellExecute(NULL, _T("open"), _T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe T3000Controls.dll"), _T(""), _T(""), SW_SHOW); 
 			ShellExecute(NULL, _T("open"), temp_Regasm_path, temp_bacnetdll, NULL, SW_HIDE);
+
+			strSource = g_strExePth+L"ControlBasicEditor.dll";
+			temp_bacnetdll=temp_dotnet_path+L"\\ControlBasicEditor.dll";
+			CopyFile(strSource, temp_bacnetdll, FALSE);
+			strSource = g_strExePth + L"ControlBasicEditor.tlb";
+			temp_bacnetdll = temp_dotnet_path + L"\\ControlBasicEditor.tlb";
+			CopyFile(strSource, temp_bacnetdll, FALSE);
+			strSource=_T("ControlBasicEditor.dll tlb:/ControlBasicEditor.tlb  /codebase");
+			// ::ShellExecute(NULL, _T("open"), _T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe T3000Controls.dll"), _T(""), _T(""), SW_SHOW); 
+			ShellExecute(NULL, _T("open"), temp_Regasm_path, strSource, NULL, SW_HIDE);
+
 #endif
 		}
 		
@@ -723,9 +734,10 @@ BOOL CT3000App::InitInstance()
 			IDR_MAINFRAME,
 			RUNTIME_CLASS(CT3000Doc),
 			RUNTIME_CLASS(CMainFrame),       // main SDI frame window
-			RUNTIME_CLASS(CT3000View));
-
-
+			//RUNTIME_CLASS(CT3000View));
+            RUNTIME_CLASS(CT3000DefaultView));
+        
+        
 		if (!pDocTemplate)
 			return FALSE;
 

@@ -2,8 +2,9 @@
 #include "afxcmn.h"
 
 #include "CM5/ListCtrlEx.h"
+#include "afxwin.h"
 // CBacnetAnalogCusRang dialog
-
+#include "CM5\CStatic\staticex.h"
 class CBacnetAnalogCusRang : public CDialogEx
 {
 	DECLARE_DYNAMIC(CBacnetAnalogCusRang)
@@ -72,6 +73,10 @@ public:
       void Handle_Static_ctrl_8();
       void Handle_Static_ctrl_9();
       void Handle_Static_ctrl_10();
+      afx_msg void OnBnClickedButtonApply();
+      afx_msg void OnCbnKillfocusComboCusrangeStignaltype();
+      
+      CStaticEx m_static_data_status;
 };
 
 const int ANALOG_CUS_RANGE_RBL_VALUE = 0;

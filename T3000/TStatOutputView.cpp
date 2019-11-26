@@ -946,6 +946,7 @@ void CTStatOutputView::Fresh()
 {
     Initial_ListFor_Tstat();
     PostMessage(WM_REFRESH_BAC_OUTPUT_LIST, NULL, NULL);
+
 }
 
 void CTStatOutputView::OnInitialUpdate()
@@ -1083,7 +1084,7 @@ void CTStatOutputView::Initial_Combox_Show_Tstat(){
                 }
                 m_output_list.SetCellStringList(lRow, TStat_Range, strlist);
             }
-        }else if (product_register_value[7]==PM_TSTAT5E||product_register_value[7]==PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR)){
+        }else if (product_register_value[7]==PM_TSTAT5E||product_register_value[7]==PM_PM5E || product_register_value[7] == PM_PM5E_ARM ||(product_register_value[7]==PM_TSTATRUNAR)){
             for (int lRow=0;lRow<7;lRow++)
             {
                 ListCtrlEx::CStrList strlist;

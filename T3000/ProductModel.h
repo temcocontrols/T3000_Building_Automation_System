@@ -10,6 +10,7 @@
 #define PM_TSTAT7                     7
 #define PM_TSTAT5i                    8
 #define PM_TSTAT8                     9
+#define PM_TSTAT10                    10    //带Wifi 的TSTAT 拥有T3 program 的功能
 #define PM_TSTAT5D                    12
 #define PM_AirQuality                 13
 #define PM_HUMTEMPSENSOR              14
@@ -49,7 +50,10 @@
 #define PM_T38IOVG                    48
 #define PM_T3PTVG                     49
 #define PM_CM5                        50
+#define PM_PM5E_ARM                   51   //2019 03 18 由老款5964芯片移植过来
 #define STM32_PM25                    52
+#define PM_TSTAT_AQ                   62   //TSTAT AQ 没有各种控制 输入输出的版本; 
+#define PM_ZIGBEE_REPEATER            63   //zigbee的中继器
 #define PM_TSTAT6_HUM_Chamber         64
 #define PM_BEENY                      70
 #define PM_WATER_SENSOR               71
@@ -57,6 +61,7 @@
 #define PM_PWMETER			          73
 #define PM_MINIPANEL_ARM              74
 #define PM_WEATHER_STATION            75
+#define PWM_TRANSDUCER_2              90  //Lijun transudcer 新板子;
 #define PM_TSTAT8_WIFI                91
 #define PM_TSTAT8_OCC                 92
 #define PM_TSTAT7_ARM                 93

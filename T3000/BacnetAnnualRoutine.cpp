@@ -612,7 +612,7 @@ void BacnetAnnualRoutine::Reset_Annual_Rect()
 	{
 		CRect temp_mynew_rect;
 		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
-		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), NULL);
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
 	}
 	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
 	{

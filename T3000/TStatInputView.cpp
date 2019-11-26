@@ -25,13 +25,15 @@ UINT BackMainUIFresh_TstatInput(LPVOID pParam)
     {
         if(pdlg->IsWindowVisible())
         {
-
-
+            Sleep(5000);
+            PostMessage(g_hwnd_now, WM_REFRESH_BAC_INPUT_LIST, NULL, NULL);
+            continue;
+#if 0
             if ((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
             {
                 break; 
             }
-            Sleep(2000);
+            Sleep(5000);
 
             if (!is_connect())
             {
@@ -50,6 +52,32 @@ UINT BackMainUIFresh_TstatInput(LPVOID pParam)
             {
                 continue;
             }
+#endif
+#if 0
+            int it = 0;
+            float progress;
+            for (int i = 0; i<12; i++)
+            {
+                //register_critical_section.Lock();
+                //int nStart = GetTickCount();
+                int itemp = 0;
+                itemp = Read_Multi(g_tstat_id, &product_register_value[i * 100], i * 100, 100, 3);
+                if (itemp < 0)
+                {
+                    //continue;
+                    break; //读不到就退出，很多时候 NC在读的过程中断开连接T3000 还一直去读剩余的 就会引起无响应;
+                }
+                else
+                {
+                    progress = float((it + 1)*(100 / 12));
+                    g_progress_persent = progress;
+                }
+                it++;
+                Sleep(100);
+            }
+            g_progress_persent = 0;
+#endif
+#if 0
             if(no_mouse_keyboard_event_enable_refresh) 
             {
                 if (MODBUS_INTERNAL_THERMISTOR>0)
@@ -106,6 +134,7 @@ UINT BackMainUIFresh_TstatInput(LPVOID pParam)
                 }
 
             }
+#endif
             CString achive_file_path;
             CString temp_serial;
             temp_serial.Format(_T("%d.prog"),g_selected_serialnumber);
@@ -127,6 +156,7 @@ UINT BackMainUIFresh_TstatInput(LPVOID pParam)
             break;
         }
     }
+    pdlg->m_Fresh_BackgroundThreadHandle = NULL;
     return 0;
 }
 
@@ -277,7 +307,7 @@ LRESULT CTStatInputView::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
         if (i > 8)
         {
             bitset<16> module_type(product_register_value[20]);
-            if (module_type.at(1) == true)
+            if (module_type.test(1) == true)
             {
                 b_hum_sensor = true;
             }
@@ -290,7 +320,7 @@ LRESULT CTStatInputView::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
                 continue;
             }
 
-            if (module_type.at(2) == true)
+            if (module_type.test(2) == true)
             {
                 b_co2_sensor = true;
             }
@@ -304,7 +334,7 @@ LRESULT CTStatInputView::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
                 continue;
             }
 
-            if (module_type.at(3) == true)
+            if (module_type.test(3) == true)
             {
                 b_lux_sensor = true;
             }

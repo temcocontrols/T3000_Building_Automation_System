@@ -6,6 +6,8 @@
 #include "ShowMessageDlg.h"
 #include "afxdialogex.h"
 #include "ping.h"
+#include "global_function.h"
+#include "MainFrm.h"
 HANDLE hShowMessageHandle = NULL;
 extern HANDLE hwait_read_thread;
 // CShowMessageDlg 对话框
@@ -82,6 +84,29 @@ void CShowMessageDlg::SetProgressAutoClose( int mi_seconds,int time_count, int n
 
 }
 
+void CShowMessageDlg::SetEvent(int nEvent)
+{
+    mevent = nEvent;
+}
+
+void CShowMessageDlg::SetChangeProtocol(bool modbus_to_bacnet,   // 0  modbus to bacnet          1  bacnet to modbus
+    unsigned char modbus_id,
+    unsigned short nreg_address,
+    unsigned short nreg_value,
+    unsigned char sub_device,         // 如果是子设备  ，数据库中的协议 比较特殊;
+    LPCTSTR Dbpath)
+{
+     cprotocol_modbus_to_bacnet = modbus_to_bacnet;   // 0  modbus to bacnet          1  bacnet to modbus
+     cprotocol_modbus_id = modbus_id;
+      cprotocol_nreg_address = nreg_address;
+      cprotocol_nreg_value = nreg_value;
+      cprotocol_sub_device = sub_device;         // 如果是子设备  ，数据库中的协议 比较特殊;
+     cprotocol_Dbpath = Dbpath;
+
+     b_show_progress = true;
+
+}
+
 
 void CShowMessageDlg::SetHwnd(HWND h_hwnd ,int nMessage)
 {
@@ -131,7 +156,7 @@ BOOL CShowMessageDlg::OnInitDialog()
 DWORD WINAPI CShowMessageDlg::ShowMessageThread(LPVOID lPvoid)
 {
     CShowMessageDlg * mparent = (CShowMessageDlg *)lPvoid;
-
+    CMainFrame* pFrame = NULL;
         if (mparent->mevent == EVENT_IP_STATIC_CHANGE)
         {
             for (int i = 0; i < 50; i++)
@@ -239,7 +264,90 @@ DWORD WINAPI CShowMessageDlg::ShowMessageThread(LPVOID lPvoid)
             mparent->KillTimer(1);
             ::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
         }
+        else if (mparent->mevent == EVENT_CHANGE_PROTOCOL)
+        {
+            CppSQLite3DB SqliteDBBuilding;
+            CppSQLite3Table table;
+            CppSQLite3Query q;
+            CString SqlText;
+            mparent->m_pos = 5;
+            mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
 
+            mparent->static_text.Format(_T("Reading device Bacnet device id!"));
+            unsigned int temp_instance = GetDeviceInstance(product_register_value[7]);
+            Sleep(1000);
+            mparent->m_pos = 25;
+            mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
+
+            if (temp_instance <= 0)
+            {
+                mparent->static_text.Format(_T("Read Bacnet device id failed!"));
+                Sleep(2000);
+                goto failed_path;
+            }
+            int n_ret = 0;
+
+            mparent->static_text.Format(_T("Writing command, please wait!"));
+            n_ret = write_one(mparent->cprotocol_modbus_id, mparent->cprotocol_nreg_address, mparent->cprotocol_nreg_value, 6);
+            mparent->m_pos = 50;
+            mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
+            Sleep(1000);
+            if (n_ret < 0)
+            {
+                mparent->static_text.Format(_T("Writing command failed!!"));
+                goto failed_path;
+            }
+
+            if (mparent->cprotocol_modbus_to_bacnet == 0)  //bacnet 切  modbus
+            {
+                if (mparent->cprotocol_sub_device) //BIP下的mstp
+                {
+                    //这里要做很多特殊情况处理 ，例如母设备下的   总线上还有没有其他mstp设备在运行;
+                    //SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), temp_protocol, get_serialnumber());
+                }
+                else //单纯的 mstp 协议 
+                {
+                    SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), MODBUS_RS485, get_serialnumber());
+                }
+
+            }
+            else//modbus  切  bacnet  
+            {
+                if (mparent->cprotocol_sub_device) //BIP下的mstp
+                {
+                    //这里要做很多特殊情况处理 ，例如母设备下的   总线上还有没有其他mstp设备在运行;
+                    //SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), temp_protocol, get_serialnumber());
+                }
+                else //单纯的 modbus 485 qie mstp 协议 
+                {
+                    SqlText.Format(_T("update ALL_NODE set Protocol = '%d' , Object_Instance = '%d' where Serial_ID='%d'"), PROTOCOL_MSTP_TO_MODBUS, temp_instance, get_serialnumber());
+                }
+            }
+
+            mparent->static_text.Format(_T("Changing the local configuration file!"));
+
+            SqliteDBBuilding.open((UTF8MBSTR)mparent->cprotocol_Dbpath);
+
+            SqliteDBBuilding.execDML((UTF8MBSTR)SqlText);
+            SqliteDBBuilding.closedb();
+
+            mparent->m_pos = 75;
+            mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
+
+            Sleep(1000);
+            mparent->static_text.Format(_T("The operation has completed successfully"));
+
+            mparent->m_pos = 100;
+            mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
+            Sleep(1000);
+
+failed_path:
+            pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+            pFrame->PostMessage(WM_MYMSG_REFRESHBUILDING, 0, 0);
+            mparent->PostMessage(WM_CLOSE, NULL, NULL);
+            pFrame->SetTimer(5, 2000, NULL);
+
+        }
     hShowMessageHandle = NULL;
     return true;
 }
@@ -259,6 +367,7 @@ void CShowMessageDlg::OnTimer(UINT_PTR nIDEvent)
     {
     case 1:
     {
+        m_static_title.SetWindowTextW(static_text);
                 m_static_persent.SetWindowTextW(static_percent);
                 m_progress_showmessage.SetPos(m_pos);
     }

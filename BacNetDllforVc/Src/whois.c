@@ -72,7 +72,6 @@ int shutdown_mstp_encode_apdu(
     uint8_t * apdu,
     int32_t low_limit,
     int32_t high_limit,
-    uint8_t mstp_id,
     uint8_t n_time)
 {
     int len = 0;        /* length of each encoding */
@@ -94,7 +93,7 @@ int shutdown_mstp_encode_apdu(
         apdu_len++;
         apdu[apdu_len] = 0xFD;
         apdu_len++;
-        apdu[apdu_len] = mstp_id;
+        apdu[apdu_len] = n_time;
         apdu_len++;
     }
 

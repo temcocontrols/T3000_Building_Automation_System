@@ -253,6 +253,10 @@ void CAirQuality::Fresh()
 	//InitChartData();
 	CString strTemp;
 	strTemp.Format(_T("%d"), product_register_value[9]);
+    if (product_register_value[9] >= 30)   //hum version 大于等于30的 传感器不用校准;  老的传感器用的 27 以前的版本 ，旧的有校准表格;
+    {
+        GetDlgItem(IDC_GRAPIC)->EnableWindow(false);
+    }
 	GetDlgItem(IDC_EDIT_PIC_VERSION)->SetWindowText(strTemp);
 	LoadRegistersGraphicMode();
 

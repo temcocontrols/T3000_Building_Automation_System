@@ -348,29 +348,6 @@ LRESULT CBacnetProgramEdit::Fresh_Program_RichEdit(WPARAM wParam,LPARAM lParam)
 	m_edit_changed = false;
 	program_string = temp1;
 
-	//if (!program_string.IsEmpty())
-	//{
-	//	CppSQLite3DB SqliteDBT3000;
-	//	CppSQLite3DB SqliteDBBuilding;
-	//	CppSQLite3Table table;
-	//	CppSQLite3Query q;
-	//	SqliteDBT3000.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
-	//	CString strSql;
-	//	strSql.Format(_T("SELECT COUNT(*) FROM sqlite_master where type = 'table' and name = 'PRG_CODE'"));
-	//	q = SqliteDBT3000.execQuery((UTF8MBSTR)strSql);
-	//	if(q.eof()) {
-	//		strSql.Format(_T("CREATE TABLE PRG_CODE (Station_NUM INTEGER, program_list_line integer, CODE TEXT)"));
-	//		SqliteDBT3000.execDML((UTF8MBSTR)strSql);
-	//	}
-	//	 
-	// 
-	//	strSql.Format(_T("Delete From PRG_CODE where Station_NUM=%d AND program_list_line=%d"), Station_NUM, program_list_line);
-	//	int test = SqliteDBT3000.execDML((UTF8MBSTR)strSql);
-	//	strSql.Format(_T("INSERT INTO PRG_CODE VALUES(%d,%d,'%s')"), Station_NUM, program_list_line, program_string);
-	//	test = SqliteDBT3000.execDML((UTF8MBSTR)strSql);
-	//	SqliteDBT3000.closedb();
-	//}
-	 
 
 
 	UpdateDataProgramText();
@@ -574,6 +551,34 @@ void CBacnetProgramEdit::OnSend()
 			MessageBox(_T("Encode Program Code Length is too large"));
 			return;
 		}
+
+
+        if ((Device_Basic_Setting.reg.panel_type == PM_MINIPANEL) && (my_lengthcode > 9))// 
+        {
+
+            int total_program_size = 0;
+            for (int i = 0;i < (int)m_Program_data.size();i++)
+            {
+                if (i == program_list_line)
+                {
+                    total_program_size = total_program_size + my_lengthcode;
+                    continue;
+                }
+                if (m_Program_data.at(i).bytes != 0)
+                    total_program_size = total_program_size + (m_Program_data.at(i).bytes / 400 + 1) * 400;
+            }
+
+            if (total_program_size >= 10000)
+            {
+                CString temp_message;
+                temp_message.Format(_T("Send failed!\r\nThere is not enough storage space!\r\nTotal size 10000 bytes.\r\Need %d "), total_program_size);
+                MessageBox(temp_message);
+                return;
+            }
+        }
+
+
+
 		memset(program_code[program_list_line],0,2000);
 		memcpy_s(program_code[program_list_line],my_lengthcode,mycode,my_lengthcode);
 		program_code_length[program_list_line] = program_code[program_list_line][1] *256 + (unsigned char)program_code[program_list_line][0];
@@ -1060,6 +1065,8 @@ int CBacnetProgramEdit::Bacnet_Show_Debug(CString &retselstring)
     case BAC_IN:
     case BAC_PID:
     case BAC_VAR:
+    case BAC_SCH:
+    case BAC_HOL:
 			if((point_number >= BAC_OUTPUT_ITEM_COUNT) && (point_type == BAC_OUT))
 				break;
 			if((point_number >= BAC_INPUT_ITEM_COUNT) && (point_type == BAC_IN))
@@ -1069,6 +1076,13 @@ int CBacnetProgramEdit::Bacnet_Show_Debug(CString &retselstring)
 
 			if((point_number >= BAC_VARIABLE_ITEM_COUNT) && (point_type == BAC_VAR))
 				break;
+
+            if ((point_number >= BAC_VARIABLE_ITEM_COUNT) && (point_type == BAC_SCH))
+                break;
+
+            if ((point_number >= BAC_VARIABLE_ITEM_COUNT) && (point_type == BAC_HOL))
+                break;
+
 
 			if(Program_Debug_Window != NULL)
 			{

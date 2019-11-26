@@ -266,4 +266,6 @@ public:
     afx_msg void OnEnKillfocusEditSamplingInterval();
     afx_msg void OnBnClickedButtonParameterExt();
     afx_msg void OnBnClickedButtonIconSetting();
+    afx_msg void OnCbnSelchangeDeltaSelect1();
+    afx_msg void OnCbnSelchangeDeltaSelect2();
 };

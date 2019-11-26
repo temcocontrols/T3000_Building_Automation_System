@@ -395,12 +395,14 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 	{
 		digital_special_output_count = T38AI8AO6DO_OUT_D;
 		analog_special_output_count = T38AI8AO6DO_OUT_A;
+        OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
 		Minipanel_device = 0;
 	}
 	else if (bacnet_device_type == PID_T322AI)
 	{
 		digital_special_output_count = T322AI_OUT_D;
 		analog_special_output_count = T322AI_OUT_A;
+        OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
 		Minipanel_device = 0;
 	}
 	else if (bacnet_device_type == PWM_TRANSDUCER)
@@ -409,32 +411,65 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		analog_special_output_count = PWM_TRANSDUCER_OUT_A;
 		Minipanel_device = 0;
 	}
-	if((bacnet_device_type == T38AI8AO6DO) ||
-		(bacnet_device_type == PID_T322AI))
-	{
-		OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
-	}
-	else if((bacnet_device_type == PID_T322AI) ||
-		    (bacnet_device_type == PID_T3PT12))
-	{
-		OUTPUT_LIMITE_ITEM_COUNT = 0;
-	}
-	else if (bacnet_device_type == PM_T3_LC)
-	{
-		OUTPUT_LIMITE_ITEM_COUNT = 8;
-	}
-	else if ((bacnet_device_type == PID_T36CTA))
-	{
-		OUTPUT_LIMITE_ITEM_COUNT = 2;
-	}
-	else if (bacnet_device_type == TINY_EX_MINIPANEL)
-	{
-		//OUTPUT_LIMITE_ITEM_COUNT = 14;
-	}
-	else
-	{
-		OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
-	}
+    //else if (bacnet_device_type == BACNET_ROUTER)
+    //{
+    //    digital_special_output_count = BACNET_ROUTER_OUT_D;
+    //    analog_special_output_count = BACNET_ROUTER_OUT_A;
+    //    OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
+    //    Minipanel_device = 1;
+    //}
+    else if ((bacnet_device_type == STM32_CO2_NET) || (bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_PRESSURE_NET))
+    {
+        OUTPUT_LIMITE_ITEM_COUNT = 3;
+        Minipanel_device = 0;
+    }
+    else if (bacnet_device_type == PM_T3_LC)
+    {
+        OUTPUT_LIMITE_ITEM_COUNT = 8;
+    }
+    else if ((bacnet_device_type == PID_T36CTA))
+    {
+        OUTPUT_LIMITE_ITEM_COUNT = 2;
+    }
+    else
+    {
+        OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
+    }
+
+	//if((bacnet_device_type == T38AI8AO6DO) ||
+	//	(bacnet_device_type == PID_T322AI))
+	//{
+	//	OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
+	//}
+	//else if((bacnet_device_type == PID_T322AI) ||
+	//	    (bacnet_device_type == PID_T3PT12))
+	//{
+	//	OUTPUT_LIMITE_ITEM_COUNT = 0;
+	//}
+    //else if ((bacnet_device_type == STM32_CO2_NET) || (bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_PRESSURE_NET))
+    //{
+    //    OUTPUT_LIMITE_ITEM_COUNT = 3;
+    //}
+	//else if (bacnet_device_type == PM_T3_LC)
+	//{
+	//	OUTPUT_LIMITE_ITEM_COUNT = 8;
+	//}
+	//else if ((bacnet_device_type == PID_T36CTA))
+	//{
+	//	OUTPUT_LIMITE_ITEM_COUNT = 2;
+	//}
+	//else if (bacnet_device_type == TINY_EX_MINIPANEL)
+	//{
+	//	//OUTPUT_LIMITE_ITEM_COUNT = 14;
+	//}
+    //else if (bacnet_device_type == PWM_TRANSDUCER)
+    //{
+    //    OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
+    //}
+	//else
+	//{
+	//	OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
+	//}
 
 	int temp_need_show_external = 0;
 	for (int z= 0 ;z < (int)m_Output_data.size();z++)
@@ -1246,7 +1281,7 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 			else
 			{
 				bac_ranges_type = OUTPUT_RANGE_DIGITAL_TYPE;
-				if(m_Output_data.at(lRow).range > 30)
+				if(bac_Invalid_range(m_Output_data.at(lRow).range))
 				{
 					m_Output_data.at(lRow).range = 0;
 					bac_range_number_choose = 0;
@@ -1700,7 +1735,7 @@ void CBacnetOutput::Reset_Output_Rect()
 		{
 			CRect temp_mynew_rect;
 			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
-			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), NULL);
+			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
 		}
 		else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
 		{

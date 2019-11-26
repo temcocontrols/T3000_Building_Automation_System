@@ -743,7 +743,7 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 		else
 		{
 			bac_ranges_type = VARIABLE_RANGE_DIGITAL_TYPE;
-			if(m_Variable_data.at(lRow).range > 30)
+			if(bac_Invalid_range(m_Variable_data.at(lRow).range))
 			{
 				m_Variable_data.at(lRow).range = 0;
 				bac_range_number_choose = 0;
@@ -810,14 +810,15 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 
 
 				CStringArray temparray;
-				if((bac_range_number_choose >= 23) && (bac_range_number_choose <= 30))
-				{
-					//temp1.Format(_T("%s"), Custom_Digital_Range[bac_range_number_choose - 23]);
-					temp1 = Custom_Digital_Range[bac_range_number_choose - 23];
-				}
-				else
-					temp1 = Digital_Units_Array[bac_range_number_choose];//22 is the sizeof the array
-
+                if ((bac_range_number_choose >= 23) && (bac_range_number_choose <= 30))
+                {
+                    //temp1.Format(_T("%s"), Custom_Digital_Range[bac_range_number_choose - 23]);
+                    temp1 = Custom_Digital_Range[bac_range_number_choose - 23];
+                }
+                else if (bac_range_number_choose < 23)
+                    temp1 = Digital_Units_Array[bac_range_number_choose];//22 is the sizeof the array
+                else
+                    temp1 = _T("MSV");
 				SplitCStringA(temparray,temp1,_T("/"));
 
 
@@ -1189,7 +1190,7 @@ void CBacnetVariable::Reset_Variable_Rect()
 	{
 		CRect temp_mynew_rect;
 		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
-		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), NULL);
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
 	}
 	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
 	{

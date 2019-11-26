@@ -151,63 +151,6 @@ extern unsigned int g_llRxCount;
 extern int g_llerrCount ;
 extern BOOL g_unint;
 
-//int const PM_TSTAT5B = 1;
-//int const PM_TSTAT5A = 2;
-//int const PM_TSTAT5B2 = 3;
-//int const PM_TSTAT5C = 4;
-//int const PM_TSTAT6 = 6;
-//int const PM_TSTAT7 = 7;
-//int const PM_TSTAT5i= 8;
-//int const PM_TSTAT8 = 9 ;
-//int const PM_TSTAT5D = 12;
-//int const PM_AirQuality = 13;
-//int const PM_HUMTEMPSENSOR = 14;
-//int const PM_TSTATRUNAR = 15;
-//const int PM_TSTAT5E = 16;
-//int const PM_TSTAT5F = 17;
-//int const PM_TSTAT5G = 18;
-//int const PM_TSTAT5H = 19;
-//
-//int const PM_T3PT10= 26;
-//int const PM_T3IOA = 21;
-//int const PM_T332AI = 22;
-//int const PM_T38AI16O = 23;
-//int const PM_T38I13O = 20;
-//int const PM_T34AO = 28;
-//int const PM_T36CT = 29;
-//
-//int const PM_ZIGBEE = 24;
-//int const PM_FLEXDRIVER = 25;
-//int const PM_T3PERFORMANCE = 27;
-//int const PM_SOLAR = 30;
-//int const PM_FWMTRANSDUCER = 31;
-//int const PM_CO2_NET = 32;
-//int const PM_CO2_RS485 = 33;
-//int const PM_CO2_NODE = 34;
-//int const PM_MINIPANEL = 35;
-//int const PM_CS_SM_AC = 36;
-//int const PM_CS_SM_DC = 37;
-//int const PM_CS_RSM_AC = 38;
-//int const PM_CS_RSM_DC = 39;
-//
-//
-//int const PM_PRESSURE = 40;
-//int const PM_PM5E = 41;
-//int const PM_HUM_R=42;
-//
-//int const PM_T322AI=43;
-//int const PM_T38AI8AO6DO=44;
-//int const PM_PRESSURE_SENSOR=45;
-// 
-//
-//
-//int const PM_CM5 = 50;
-//int const PM_TSTAT6_HUM_Chamber=64;
-//
-//int const PM_NC = 100;
-//int const PM_LightingController = 103;
-
-/*int const PM_TSTATRUNAR = 15;*/
 
 
 extern int MODBUS_SERIALNUMBER_LOWORD                          ;
@@ -961,8 +904,9 @@ extern int selected_product_index;
 extern HTREEITEM selected_tree_item;
 #pragma region For_bacnet
 
-extern CString temp_off[BAC_CUSTOMER_UNITS_COUNT];		//用于 保存 客户自定义的 单位;
-extern CString temp_on[BAC_CUSTOMER_UNITS_COUNT];
+extern CString cus_digital_off[BAC_CUSTOMER_UNITS_COUNT];		//用于 保存 客户自定义的 单位;
+extern CString cus_digital_on[BAC_CUSTOMER_UNITS_COUNT];
+//extern int     cus_direction[BAC_CUSTOMER_UNITS_COUNT];  //自定义的  正向逻辑还是反向逻辑;
 extern CString temp_unit[BAC_CUSTOMER_UNITS_COUNT];
 extern CString Custom_Digital_Range[BAC_CUSTOMER_UNITS_COUNT];
 extern bool read_var_analog_cus_units;          //Var Cus units 自定义
@@ -1020,6 +964,7 @@ extern int annual_list_line ;
 extern int screen_list_line ;
 extern int monitor_list_line;
 extern int analog_range_tbl_line;
+extern int msv_range_tbl_line;
 extern Time_block_mini Device_time;
 extern int ext_io_list_line;
 
@@ -1057,6 +1002,8 @@ extern HWND	     m_ext_io_dlg_hwmd ;
 extern HWND		 analog_cus_range_dlg;
 extern HWND      m_tstat_schedule_dlg_hwnd ;
 extern HWND      m_t3000_log_window ;
+extern HWND      m_msv_dlg_hwnd;
+
 extern vector <Str_out_point> m_Output_data;
 extern vector <Str_in_point>  m_Input_data;
 extern vector <Str_program_point>  m_Program_data;
@@ -1064,23 +1011,27 @@ extern vector <Str_variable_point>  m_Variable_data;
 extern vector <Str_weekly_routine_point> m_Weekly_data;
 extern vector <Str_annual_routine_point> m_Annual_data;
 extern vector <Str_schedual_time_point> m_Schedual_Time_data;
+extern vector <Str_schedual_time_flag> m_Schedual_time_flag;
 extern vector <Str_controller_point> m_controller_data;
 extern vector <Control_group_point> m_screen_data;
 extern vector <Str_tstat_schedule> m_tatat_schedule_data;
 extern vector <Str_monitor_point> m_monitor_data;
 extern vector <_Bac_Scan_Com_Info> m_bac_handle_Iam_data;
 extern vector <_Graphic_Value_Info> m_graphic_refresh_data;
+extern vector <bacnet_standard_Info> m_standard_graphic_refresh_data;
 extern vector <_Bac_Scan_results_Info> m_bac_scan_result_data;
 extern vector <Alarm_point> m_alarmlog_data;
 extern vector <refresh_net_device> m_refresh_net_device_data;
 extern vector <refresh_net_device> m_T3BB_device_data;
 extern vector <Str_TstatInfo_point> m_Tstat_data;
-extern vector <Str_Remote_TstDB> m_remote_device_db;
+extern Str_Remote_TstDB m_remote_device_db;
 extern vector <Str_Units_element> m_customer_unit_data;
 extern vector <Str_userlogin_point> m_user_login_data;
 extern vector <Str_table_point> m_analog_custmer_range;
 extern vector <Str_variable_uint_point> m_variable_analog_unite;
 extern vector <Str_Extio_point> m_extio_config_data;
+
+extern vector <Str_MSV> m_msv_data;
 
 extern vector <GSM_connection_info> m_gsm_connect_info;
 extern vector <Scan_Info> m_scan_info;
@@ -1112,6 +1063,8 @@ extern HANDLE CM5_UI_Thread;
 extern DWORD nThreadID_x;
 extern DWORD cm5_nThreadID;
 extern int g_protocol;
+//to flag ,call new ,old IDE
+extern int g_new_old_IDE;
 extern int g_bac_read_type;
 extern bool g_bac_need_read_setting;  //如果是第一次点击 需要读Setting里面的 数据;判断是否需要更改Label之类的;
 extern HANDLE click_read_thread;
@@ -1295,7 +1248,7 @@ extern int input_item_select_for_range;
 
 extern bitset<65536*3> read_analog_package;  //用于记录trendlog 已经记录了哪些模拟包
 extern bitset<65536*3> read_dig_package;     //用于记录trendlog 已经记录了哪些数字包
-
+extern unsigned char m_dialog_signal_type;
 extern int graphic_view_index ;
 extern CString grapgic_view_name[3];
 extern bool graphic_view_visible[14];
@@ -1309,5 +1262,8 @@ extern bac_mstp_com g_mstp_com; // 全局mstp com 口 连接状态
 extern bool custom_bacnet_register_listview;
 extern bool initial_bip ;
 extern Str_modbus_reg bacnet_to_modbus_struct; //用于bacnet 协议转换为modbus 协议的结构
+extern vector <str_bacnet_rp_info> standard_bacnet_data; // 用于bacnet 标准 读写 变量存取;
 extern panelname_map g_panelname_map;
+extern bacnet_instance_reg_map g_bacnet_reg_ins_map;  //用来区分每个instance 存放在那两个字节，不同产品，不同处理;
+extern connect_Info system_connect_info;
 extern CString HolLable[BAC_HOLIDAY_COUNT]; //用于动态加载List中的下拉框

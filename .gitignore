@@ -58,8 +58,8 @@
 **/*.MNL
 **/*.MAX
 /T3000.VC.db
-<<<<<<< HEAD
-=======
+
+
 /*.opendb
 /Psychrometric Tool/T3000 Output_VS2015
 /Psychrometric Tool/WFA_psychometric_chart/packages
@@ -68,4 +68,16 @@
 >>>Ultraedit User interface and cache
 **/*.pui
 **/*.cache
->>>>>>> 16f951e4dc1ccd60c5ad13a7476e318c452b6160
+T3000 - VS2015.VC.db
+T3000Controls/obj/Release/TempPE/Properties.Resources.Designer.cs.dll
+T3000 - VS2010.VC.db
+.vs/T3000 - VS2017/v15/Browse.VC.db
+.vs/T3000 - VS2017/v15/Solution.VC.db
+.vs/T3000 - VS2017/v15/Solution.VC.db-shm
+.vs/T3000 - VS2017/v15/Solution.VC.db-wal
+.vs/T3000_Building_Automation_System/v15/Browse.VC.db
+.vs/T3000 - VS2017/v15/Browse.VC.opendb
+.vs/T3000 - VS2017/v15/Server/sqlite3/storage.ide
+.vs/T3000 - VS2017/v15/Server/sqlite3/storage.ide-shm
+.vs/T3000 - VS2017/v15/Server/sqlite3/storage.ide-wal
+T3000 - VS2015 -  Platform Version - 10.0.10240.0.VC.db

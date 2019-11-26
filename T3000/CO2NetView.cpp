@@ -150,7 +150,7 @@ BEGIN_MESSAGE_MAP(CCO2NetView, CFormView)
     ON_EN_KILLFOCUS(IDC_EDIT_CO2_VALUE, &CCO2NetView::OnEnKillfocusEditCo2Value)
     ON_MESSAGE(MY_RESUME_DATA, ResumeMessageCallBack)
     ON_MESSAGE(MY_READ_DATA_CALLBACK, ReadDataCallBack)
-
+    ON_MESSAGE(WM_LIST_ITEM_CHANGED, Fresh_Co2Output_Item)
     ON_WM_CTLCOLOR()
 	ON_EN_KILLFOCUS(IDC_EDIT_NAME, &CCO2NetView::OnEnKillfocusEditName)
     ON_BN_CLICKED(IDC_RADIO_CO2_CAL_ENABLE, &CCO2NetView::OnBnClickedRadioCo2CalEnable)
@@ -537,7 +537,7 @@ void CCO2NetView::Initial_Window()
     m_grid_input.put_TextMatrix(3,0,_T("3"));
 
 
-    m_grid_input.put_TextMatrix(1,1,_T("Tempreture"));
+    m_grid_input.put_TextMatrix(1,1,_T("Temperature"));
     m_grid_input.put_TextMatrix(2,1,_T("Hum"));
     m_grid_input.put_TextMatrix(3,1,_T("CO2"));
 
@@ -1614,15 +1614,13 @@ void CCO2NetView::Initial_OutputList()
 
 		m_output_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 		m_output_list.SetExtendedStyle(m_output_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));
-		m_output_list.InsertColumn(0, _T("NUM"), 40, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
-		m_output_list.InsertColumn(1, _T("Full Label"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-		m_output_list.InsertColumn(2, _T("Value"), 45, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-		m_output_list.InsertColumn(3, _T("Range"), 45, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-		m_output_list.InsertColumn(4, _T("Min Out Scale"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-		m_output_list.InsertColumn(5, _T("Max Out Scale"), 85, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-		//不现实 AM
-		
-		m_output_list.InsertColumn(6, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+		m_output_list.InsertColumn(CO2NET_NUM, _T("NUM"), 40, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
+		m_output_list.InsertColumn(CO2NET_FULL_LABEL, _T("Full Label"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+		m_output_list.InsertColumn(CO2NET_VALUE, _T("Value"), 45, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+		m_output_list.InsertColumn(CO2NET_RANGE, _T("Range"), 45, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+		m_output_list.InsertColumn(CO2NET_MIN_OUT_SCALE, _T("Min Out Scale"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+		m_output_list.InsertColumn(CO2NET_MAX_OUT_SCALE, _T("Max Out Scale"), 85, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+		m_output_list.InsertColumn(CO2NET_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	
 
 		g_hwnd_now = this->m_hWnd;
@@ -1714,13 +1712,13 @@ void CCO2NetView::Initial_OutputList()
 
 		if (output_range==1||output_range == 2)
 		{
-			Temp=((float)((short)TempDataArray[3066 - 3060]));
+			Temp=((float)((short)TempDataArray[3067 - 3060]));
 			Vtemp=(Temp)/100;
 			strTemp.Format(_T("%.2f v"),Vtemp);
 		}
 		else if (output_range==3)
 		{
-			Temp=((float)((short)TempDataArray[3066 - 3060]));
+			Temp=((float)((short)TempDataArray[3067 - 3060]));
 			Vtemp=(Temp)/100;
 			strTemp.Format(_T("%.2f ma"),Vtemp);
 		}
@@ -1732,13 +1730,13 @@ void CCO2NetView::Initial_OutputList()
  
 		if (output_range==1||output_range == 2)
 		{
-			Temp=((float)((short)TempDataArray[3067 - 3060]));
+			Temp=((float)((short)TempDataArray[3066 - 3060]));
 			Vtemp=(Temp)/100;
 			strTemp.Format(_T("%.2f v"),Vtemp);
 		}
 		else if (output_range==3)
 		{
-			Temp=((float)((short)TempDataArray[3067 - 3060]));
+			Temp=((float)((short)TempDataArray[3066 - 3060]));
 			Vtemp=(Temp)/100;
 			strTemp.Format(_T("%.2f ma"),Vtemp);
 		}
@@ -1908,7 +1906,65 @@ void CCO2NetView::Initial_VarList()
 
 BEGIN_EVENTSINK_MAP(CCO2NetView, CFormView)
 	ON_EVENT(CCO2NetView, IDC_MSFLEXGRID_INPUT, DISPID_DBLCLICK, CCO2NetView::DblClickMsflexgridInput, VTS_NONE)
+    
 END_EVENTSINK_MAP()
+
+
+
+LRESULT CCO2NetView::Fresh_Co2Output_Item(WPARAM wParam, LPARAM lParam)
+{
+    int cmp_ret;//compare if match it will 0;
+    int Changed_Item = (int)wParam;
+    int Changed_SubItem = (int)lParam;
+
+
+    CString temp_task_info;
+    CString New_CString = m_output_list.GetItemText(Changed_Item, Changed_SubItem);
+
+    //CO2 NET  Output 温湿度  允许 改变 Min 以及Max
+    if (Changed_SubItem == CO2NET_MIN_OUT_SCALE)
+    {
+        int n_value = 0;
+
+        if (Changed_Item == 0) //温度;
+        {
+            n_value = _wtof(New_CString) * 10;
+            write_one(g_tstat_id, 1255, n_value);
+        }
+        else if (Changed_Item == 1)
+        {
+            n_value = _wtof(New_CString) * 10;
+            write_one(g_tstat_id, 1257, n_value);
+        }
+        else if (Changed_Item == 2)
+        {
+            n_value = _wtoi(New_CString);
+            write_one(g_tstat_id, 1259, (int)(n_value ));
+        }
+    }
+    else if (Changed_SubItem == CO2NET_MAX_OUT_SCALE)
+    {
+        int n_value = 0;
+
+        if (Changed_Item == 0) //温度;
+        {
+            n_value = _wtof(New_CString) * 10;
+            write_one(g_tstat_id, 1256, n_value);
+        }
+        else if (Changed_Item == 1)
+        {
+            n_value = _wtof(New_CString) * 10;
+            write_one(g_tstat_id, 1258, n_value);
+        }
+        else if (Changed_Item == 2)
+        {
+            n_value = _wtoi(New_CString);
+            write_one(g_tstat_id, 1260, (int)(n_value));
+        }
+    }
+
+    return 0;
+}
 
 
 void CCO2NetView::DblClickMsflexgridInput()
@@ -1955,6 +2011,9 @@ void CCO2NetView::DblClickMsflexgridInput()
 		m_inNameEdt.SetSel(nLenth,nLenth); //全选//
 	}
 }
+
+
+
 
 
 void CCO2NetView::OnEnKillfocusEditName()

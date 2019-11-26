@@ -499,12 +499,23 @@ public:
 
 	CString m_oldname;
 	bool m_isinput;
+    bool m_isoutput;
 	int m_curcol;
 	int m_currow;
 
     afx_msg void OnBnClickedRadioCo2CalEnable();
     afx_msg void OnBnClickedRadioCo2CalDisable();
     afx_msg void OnBnClickedRadioHumidityHeatEnable();
+
+    afx_msg LRESULT Fresh_Co2Output_Item(WPARAM wParam, LPARAM lParam);
 };
+
+const int CO2NET_NUM = 0;
+const int CO2NET_FULL_LABEL = 1;
+const int CO2NET_VALUE = 2;
+const int CO2NET_RANGE = 3;
+const int CO2NET_MIN_OUT_SCALE = 4;
+const int CO2NET_MAX_OUT_SCALE = 5;
+const int CO2NET_AUTO_MANUAL = 6;
 
 

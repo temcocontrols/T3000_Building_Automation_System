@@ -22,7 +22,7 @@
 #define BAC_AV  27
 #define BAC_AI  28
 #define BAC_AO  29
-#define BAC_DO  30
+#define BAC_BO  30
 
 IMPLEMENT_DYNAMIC(CBacnetRemotePoint, CDialogEx)
 
@@ -275,7 +275,7 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 			temp_type = _T("AI");
 		else if (t_type == BAC_AO + 1)
 			temp_type = _T("AO");
-		else if (t_type == BAC_DO + 1)
+		else if (t_type == BAC_BO + 1)
 			temp_type = _T("BO");
         else if (t_type == BAC_BV + 1)
             temp_type = _T("BV");
@@ -437,7 +437,7 @@ void CBacnetRemotePoint::Reset_RemotePoint_Rect()
 	{
 		CRect temp_mynew_rect;
 		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
-		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), NULL);
+		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
 	}
 	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
 	{

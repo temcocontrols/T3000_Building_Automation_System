@@ -82,6 +82,9 @@ BEGIN_MESSAGE_MAP(CT3000View, CFormView)
     ON_CBN_SELCHANGE(IDC_COMBO_SYS_MODE, &CT3000View::OnCbnSelchangeComboSysMode)
 END_MESSAGE_MAP()
 
+#include "TStatInputView.h"
+#include "TStatOutputView.h"
+#include "MainFrm.h"
 // CT3000View construction/destruction
 UINT BackMainUIFresh(LPVOID pParam)
 {
@@ -90,95 +93,59 @@ UINT BackMainUIFresh(LPVOID pParam)
     int multy_ret = 0;
     while(1)
     {
-        if(pdlg->IsWindowVisible())
+        
+        CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+
+        if (((CTStatInputView*)pFrame->m_pViews[DLG_DIALOG_TSTAT_INPUT_VIEW] == NULL) ||
+            ((CTStatOutputView*)pFrame->m_pViews[DLG_DIALOG_TSTAT_OUTPUT_VIEW] == NULL))
         {
+        pdlg->m_pFreshBackground = NULL;
+        return 0;
+        }
 
+        if( ((CTStatInputView*)pFrame->m_pViews[DLG_DIALOG_TSTAT_INPUT_VIEW])->IsWindowVisible() ||
+            ((CTStatOutputView*)pFrame->m_pViews[DLG_DIALOG_TSTAT_OUTPUT_VIEW])->IsWindowVisible() ||
+             pdlg->IsWindowVisible())
+        {
+        //if(pdlg->IsWindowVisible())
+        //{
+            Sleep(20000);
 
-            //pdlg->Fresh();
-
-            Sleep(5000);
-            continue;
-            if (!is_connect())
-            {
-                continue;
-            }
             if (!no_mouse_keyboard_event_enable_refresh)
             {
                 continue;
             }
-            if (g_tstat_id==255)
+
+            int it = 0;
+            float progress;
+            for (int i = 0; i<12; i++)
             {
-                continue;
-            }
-            if (m_active_key_mouse)
-            {
-                continue;
-            }
-            if (g_fresh_T3000_background)
-            {
-                continue;
-            }
-            if(no_mouse_keyboard_event_enable_refresh)
-            {
-                if (MODBUS_INTERNAL_THERMISTOR>0)
+                //register_critical_section.Lock();
+                //int nStart = GetTickCount();
+                int itemp = 0;
+                itemp = Read_Multi(g_tstat_id, &product_register_value[i * 100], i * 100, 100, 3);
+                if (itemp < 0)
                 {
-
-                    multy_ret =  Read_Multi(g_tstat_id,&multi_register_value[MODBUS_INTERNAL_THERMISTOR],MODBUS_INTERNAL_THERMISTOR,2);
-                    if (multy_ret>0)
-                    {
-                        // memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
-                        for (int i = 0; i<2; i++)
-                        {
-                            product_register_value[MODBUS_INTERNAL_THERMISTOR+i]=multi_register_value[MODBUS_INTERNAL_THERMISTOR+i];
-                        }
-                    }
+                    //continue;
+                    break; //读不到就退出，很多时候 NC在读的过程中断开连接T3000 还一直去读剩余的 就会引起无响应;
                 }
-
-            }
-            if (!no_mouse_keyboard_event_enable_refresh)
-            {
-                continue;
-            }
-            if(no_mouse_keyboard_event_enable_refresh)
-            {
-                if (MODBUS_EXTERNAL_SENSOR_0>0)
+                else
                 {
-                    multy_ret = Read_Multi(g_tstat_id,&multi_register_value[MODBUS_EXTERNAL_SENSOR_0],MODBUS_EXTERNAL_SENSOR_0,5);
-                    if (multy_ret>0)
-                    {
-                        //memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
-                        for (int i = 0; i<5; i++)
-                        {
-                            product_register_value[MODBUS_EXTERNAL_SENSOR_0+i]=multi_register_value[MODBUS_EXTERNAL_SENSOR_0+i];
-                        }
-                    }
+                    //progress = float((it + 1)*(100 / 12));
+                    //g_progress_persent = progress;
                 }
-
+                it++;
+                Sleep(100);
             }
-            if (!no_mouse_keyboard_event_enable_refresh)
-            {
-                continue;
-            }
-            if(no_mouse_keyboard_event_enable_refresh)
-            {
-                if (MODBUS_TEMPRATURE_CHIP>0)
-                {
-                    multy_ret = Read_Multi(g_tstat_id,&multi_register_value[MODBUS_TEMPRATURE_CHIP],MODBUS_TEMPRATURE_CHIP,10);
-                    if (multy_ret>0)
-                    {
-                        //memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
-                        for (int i = 0; i<10; i++)
-                        {
-                            product_register_value[MODBUS_TEMPRATURE_CHIP+i]=multi_register_value[MODBUS_TEMPRATURE_CHIP+i];
-                        }
-                    }
-                }
+            //g_progress_persent = 0;
 
-            }
-
-
-
-
+            LoadTstat_InputData();
+            LoadTstat_OutputData();
+        }
+        else
+        {
+            pdlg->m_pFreshBackground = NULL;
+            return 0;
         }
 
     }
@@ -252,19 +219,12 @@ void CT3000View::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_COOL_RADIO, m_CoolCtrl);
     DDX_Control(pDX, IDC_HEAT_RADIO, m_HeatCtrl);
 
-    //DDX_Radio(pDX, IDC_OCCUPA_RADIO, m_OcupaCtrl);
-    //DDX_Radio(pDX, IDC_UNOCCUPA_RADIO, m_UnOcupaCtrl);
     DDX_Check(pDX, IDC_OCCUPACHECK, m_bOccupied);
     DDX_Control(pDX, IDC_OCCUPACHECK, m_OcupiedBtn);
     DDX_Text(pDX, IDC_FREECOOLA_EDIT, m_strFreeCool);
     DDX_Text(pDX, IDC_FREECOOLF_EDIT, m_strFreeCoolFN);
 
-    // 	DDX_Control(pDX, IDC_TEMPRETURE_SLIDER, m_TemperaureSlider);
-    // 	DDX_Control(pDX, IDC_DAY_SLIDER, m_daySlider);
-    // 	DDX_Control(pDX, IDC_NIGHT_SLIDER, m_nightSlider);
-    // 	DDX_Control(pDX, IDC_NIGHTHEAT_SLIDER, m_nightHeatSlider);
 
-   
     DDX_Control(pDX, IDC_OUTPUT_MSFLEXGRID, m_Output_Grid);
     DDX_Control(pDX, IDC_INPUT_MSFLEXGRID, m_Input_Grid);
     DDX_Control(pDX, IDC_INPUTNAMEEDIT, m_inNameEdt);
@@ -452,8 +412,6 @@ void CT3000View::Fresh()
 {
     CMainFrame* pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
 
-
-
     g_ifanStatus = product_register_value[MODBUS_FAN_SPEED];
     g_NEED_MULTI_READ=TRUE;
     int  Fresh_Min=(short)product_register_value[MODBUS_MIN_SETPOINT];
@@ -592,6 +550,8 @@ void CT3000View::Fresh()
 	{
 		InitFlexSliderBars_tstat6();
 	}
+
+    switch_product_last_view();
 }
 
 
@@ -1699,7 +1659,7 @@ void CT3000View::Fresh_In()
 
 
     ////////////////
-    if(nModel==PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR)) // E
+    if(nModel==PM_TSTAT5E||product_register_value[7] == PM_PM5E || product_register_value[7] == PM_PM5E_ARM ||(product_register_value[7]==PM_TSTATRUNAR)) // E
     {
         g_strSensorName=_T("Internal Sensor");
         m_Input_Grid.put_TextMatrix(1,1,g_strSensorName);
@@ -1844,7 +1804,7 @@ void CT3000View::Fresh_Out()
     //first 3
     //==========================================================================
     //ABCDEFG,noH
-    if(nModel==2||nModel==1||nModel==4||nModel==12||nModel==16||nModel==PM_PM5E	||nModel==17||nModel==18||nModel==3
+    if(nModel==2||nModel==1||nModel==4||nModel==12||nModel==16||nModel==PM_PM5E || nModel == PM_PM5E_ARM ||nModel==17||nModel==18||nModel==3
             ||nModel==PM_TSTAT6||nModel==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7] == PM_TSTAT8)||nModel==PM_TSTAT7||nModel==PM_PRESSURE)
     {
         m_Output_Grid.put_TextMatrix(1,1,g_strOutName1);
@@ -1938,7 +1898,7 @@ void CT3000View::Fresh_Out()
 
     ////----------------------------------------------------------------------
     //4,5
-    if(nModel==1||nModel==4||nModel==12||nModel==16||nModel==3||nModel==PM_PM5E
+    if(nModel==1||nModel==4||nModel==12||nModel==16||nModel==3||nModel==PM_PM5E || nModel == PM_PM5E_ARM
 		|| nModel == PM_TSTAT6 || nModel == PM_TSTAT5i || (  product_register_value[7] == PM_TSTAT8
 			|| product_register_value[7] == PM_TSTAT8_WIFI
 			|| product_register_value[7] == PM_TSTAT8_OCC
@@ -2138,7 +2098,7 @@ void CT3000View::Fresh_Out()
 
     //:DEG 6. 7
     nRange=product_register_value[MODBUS_OUTPUT1_SCALE];
-    if(nModel==12||nModel==16||nModel==PM_PM5E||nModel==18||nModel==PM_TSTAT6
+    if(nModel==12||nModel==16||nModel==PM_PM5E || nModel == PM_PM5E_ARM ||nModel==18||nModel==PM_TSTAT6
 		|| (  product_register_value[7] == PM_TSTAT8
 			|| product_register_value[7] == PM_TSTAT8_WIFI
 			|| product_register_value[7] == PM_TSTAT8_OCC
@@ -2163,26 +2123,9 @@ void CT3000View::Fresh_Out()
         }
         else
         {
-            //strTemp.Format(_T("%.1f"),product_register_value[102]/100.0);
             float nvalue=0.0;
 
-            //if(nRange==1)//0-10v
-            //{
-            //nvalue=product_register_value[102]/100 /10.0 * 100%;
             nvalue=(float)(product_register_value[MODBUS_COOLING_VALVE]/10.0);
-            //}
-            //if(nRange==2)//0-5v
-            //{
-            //	nvalue=(float)(product_register_value[MODBUS_COOLING_VALVE]/5.0);
-            //}
-            //if(nRange==3)//2-10v
-            //{
-            //	nvalue=(float)(product_register_value[MODBUS_COOLING_VALVE]/8.0);
-            //}
-            //if(nRange==4)//10-0v
-            //{
-            //	nvalue=float((10-product_register_value[MODBUS_COOLING_VALVE]/100.0)/10.0 *100);
-            //}
             strTemp.Format(_T("%.1f%%"),nvalue);
         }
         m_Output_Grid.put_TextMatrix(6,2,strTemp);
@@ -2438,6 +2381,7 @@ void CT3000View::FreshIOGridTable()
     }
     break;
     case PM_PM5E:
+    case PM_PM5E_ARM:
     {
         m_outRows=8;
         m_inRows=11;
@@ -2586,7 +2530,7 @@ void CT3000View::FreshIOGridTable_Tstat6()
         if (i > 8)
         {
             bitset<16> module_type(product_register_value[20]);
-            if (module_type.at(1) == true)
+            if (module_type.test(1) == true)
             {
                 b_hum_sensor = true;
             }
@@ -2599,7 +2543,7 @@ void CT3000View::FreshIOGridTable_Tstat6()
                 continue;
             }
 
-            if (module_type.at(2) == true)
+            if (module_type.test(2) == true)
             {
                 b_co2_sensor = true;
             }
@@ -2613,7 +2557,7 @@ void CT3000View::FreshIOGridTable_Tstat6()
                 continue;
             }
 
-            if (module_type.at(3) == true)
+            if (module_type.test(3) == true)
             {
                 b_lux_sensor = true;
             }
@@ -3923,7 +3867,7 @@ LRESULT CT3000View::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
         {
             product_type =T3000_6_ADDRESS;
         }
-        else if((product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E) ||(product_register_value[7]==PM_TSTATRUNAR)|| (product_register_value[7] == PM_TSTAT5H))
+        else if((product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E || product_register_value[7] == PM_PM5E_ARM) ||(product_register_value[7]==PM_TSTATRUNAR)|| (product_register_value[7] == PM_TSTAT5H))
         {
             product_type = T3000_5EH_LCD_ADDRESS;
         }
@@ -4075,39 +4019,67 @@ void CT3000View::OnBnClickedBtnSynctime()
     GetDlgItem(IDC_BTN_SYNCTIME)->EnableWindow(FALSE);
 
     szTime[0] =(BYTE)(time.GetYear()%100);
-    int nRet = write_one(g_tstat_id,MODBUS_YEAR, szTime[0]);
-	/*if (product_register_value[7] == PM_TSTAT8
-		|| product_register_value[7] == PM_TSTAT8_WIFI
-		|| product_register_value[7] == PM_TSTAT8_OCC
-		|| product_register_value[7] == PM_TSTAT7_ARMX
-		|| product_register_value[7] == PM_TSTAT8_220V)
-	{
-		 
-		write_one(g_tstat_id, MODBUS_YEAR, time.GetYear());
-	}*/
-    Sleep(1000);
+    int nRet[7] = {0};
+    nRet[0] = write_one(g_tstat_id, MODBUS_YEAR, szTime[0]);
+    if (nRet[0] < 0)
+    {
+        AfxMessageBox(_T("Time synchronization failed!"));
+        goto endsynctime;
+    }
+    Sleep(200);
     szTime[1] = (BYTE)(time.GetMonth());
-    nRet = write_one(g_tstat_id, MODBUS_MONTH, szTime[1]);
-    Sleep(1000);
+    nRet[1] = write_one(g_tstat_id, MODBUS_MONTH, szTime[1],6);
+    if (nRet[1] < 0)
+    {
+        AfxMessageBox(_T("Time synchronization failed!"));
+        goto endsynctime;
+    }
+    Sleep(200);
     szTime[2] = (BYTE)(time.GetDayOfWeek()-1);
-    nRet = write_one(g_tstat_id, MODBUS_WEEK, szTime[2]);
-    Sleep(1000);
+    nRet[2] = write_one(g_tstat_id, MODBUS_WEEK, szTime[2], 6);
+    if (nRet[2] < 0)
+    {
+        AfxMessageBox(_T("Time synchronization failed!"));
+        goto endsynctime;
+    }
+    Sleep(200);
     szTime[3] = (BYTE)(time.GetDay());
-    nRet = write_one(g_tstat_id, MODBUS_DAY, szTime[3]);
-    Sleep(1000);
+    nRet[3] = write_one(g_tstat_id, MODBUS_DAY, szTime[3], 6);
+    if (nRet[3] < 0)
+    {
+        AfxMessageBox(_T("Time synchronization failed!"));
+        goto endsynctime;
+    }
+    Sleep(200);
     szTime[4] = (BYTE)(time.GetHour());
-    nRet = write_one(g_tstat_id, MODBUS_HOUR, szTime[4]);
-    Sleep(1000);
+    nRet[4] = write_one(g_tstat_id, MODBUS_HOUR, szTime[4], 6);
+    if (nRet[4] < 0)
+    {
+        AfxMessageBox(_T("Time synchronization failed!"));
+        goto endsynctime;
+    }
+    Sleep(200);
     szTime[5] = (BYTE)(time.GetMinute());
-    nRet = write_one(g_tstat_id, MODBUS_MINUTE, szTime[5]);
-    Sleep(1000);
+    nRet[5] = write_one(g_tstat_id, MODBUS_MINUTE, szTime[5], 6);
+    if (nRet[5] < 0)
+    {
+        AfxMessageBox(_T("Time synchronization failed!"));
+        goto endsynctime;
+    }
+    Sleep(200);
     szTime[6] = (BYTE)(time.GetSecond());
-    nRet = write_one(g_tstat_id, MODBUS_SECOND, szTime[6]);
+    nRet[6] = write_one(g_tstat_id, MODBUS_SECOND, szTime[6], 6);
+    if (nRet[6] < 0)
+    {
+        AfxMessageBox(_T("Time synchronization failed!"));
+        goto endsynctime;
+    }
 
+    AfxMessageBox(_T("Time synchronization success!"));
+endsynctime:
     GetDlgItem(IDC_BTN_SYNCTIME)->EnableWindow(TRUE);
 
     EndWaitCursor();
-    AfxMessageBox(_T("Time synchronization is complete!"));
 #endif
 
     //int nRet = Write_Multi(g_tstat_id, szTime, 450, 8, 3);  // 这个写入有问题，所以变成单个字节写多次
@@ -4171,7 +4143,7 @@ void CT3000View::InitFlexSliderBars()
     if (bOccupied) // day setpoint
     {
         int nOfficeSelReg=454;
-        if((product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR)||(product_register_value[7]==PM_TSTAT5G)) && m_fFirmwareVersion >= 35.4)
+        if((product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E || product_register_value[7] == PM_PM5E_ARM ||(product_register_value[7]==PM_TSTATRUNAR)||(product_register_value[7]==PM_TSTAT5G)) && m_fFirmwareVersion >= 35.4)
         {
             nOfficeSelReg = 423;
         }
@@ -4239,7 +4211,7 @@ void CT3000View::InitFlexSliderBars()
             int nCoolDeadband = product_register_value[MODBUS_COOLING_DEADBAND];//119
             nSP = product_register_value[MODBUS_NEW_COOLING_SETPOINT]/10;	//380
             nCoolSP = product_register_value[MODBUS_COOLING_DEADBAND] + nSP;
-            if((product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR)||(product_register_value[7]==PM_TSTAT5G)) && m_fFirmwareVersion >= 35.4)
+            if((product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E|| product_register_value[7] == PM_PM5E_ARM || (product_register_value[7]==PM_TSTATRUNAR)||(product_register_value[7]==PM_TSTAT5G)) && m_fFirmwareVersion >= 35.4)
             {
                 nCoolingDBRegister = 422;
                 nHeatingDBRegister = MODBUS_HEATING_SETPOINT;//136
@@ -4337,7 +4309,7 @@ void CT3000View::InitFlexSliderBars()
             int nSPRegister = MODBUS_NEW_COOLING_SETPOINT;	//380
             nSP = product_register_value[nSPRegister]/10;
 
-            if((product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR)||(product_register_value[7]==PM_TSTAT5G)) && m_fFirmwareVersion >= 34.09)
+            if((product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E || product_register_value[7] == PM_PM5E_ARM ||(product_register_value[7]==PM_TSTATRUNAR)||(product_register_value[7]==PM_TSTAT5G)) && m_fFirmwareVersion >= 34.09)
             {
                 nSPRegister = MODBUS_COOLING_SETPOINT;//135
                 nSP = product_register_value[nSPRegister];
@@ -4607,12 +4579,12 @@ void CT3000View::InitFlexSliderBars_tstat6()
 
 
     product_register_value[MODBUS_DAY_SETPOINT]=Round_SetPoint_Max(product_register_value[MODBUS_DAY_SETPOINT]);
-    product_register_value[MODBUS_DAY_COOLING_DEADBAND]=Round_SetPoint_Max(product_register_value[MODBUS_DAY_COOLING_DEADBAND]);
-    product_register_value[MODBUS_DAY_HEATING_DEADBAND]=Round_SetPoint_Max(product_register_value[MODBUS_DAY_HEATING_DEADBAND]);
+    //product_register_value[MODBUS_DAY_COOLING_DEADBAND]=Round_SetPoint_Max(product_register_value[MODBUS_DAY_COOLING_DEADBAND]);
+    //product_register_value[MODBUS_DAY_HEATING_DEADBAND]=Round_SetPoint_Max(product_register_value[MODBUS_DAY_HEATING_DEADBAND]);
 
     product_register_value[MODBUS_NIGHT_SETPOINT]=Round_SetPoint_Max(product_register_value[MODBUS_NIGHT_SETPOINT]);
-    product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]=Round_SetPoint_Max(product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]);
-    product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]=Round_SetPoint_Max(product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]);
+    //product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]=Round_SetPoint_Max(product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]);
+    //product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]=Round_SetPoint_Max(product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]);
 
     BOOL Day_Default=FALSE;
     BOOL Night_Default=FALSE;
@@ -5402,8 +5374,8 @@ void CT3000View::Initial_Max_Min()
 		|| product_register_value[7] == PM_TSTAT8_220V) || (product_register_value[7] == PM_TSTAT7) || (product_register_value[7] == PM_TSTAT5i))
     {
         product_register_value[MODBUS_DAY_SETPOINT]=Round_SetPoint_Max(product_register_value[MODBUS_DAY_SETPOINT]);
-        product_register_value[MODBUS_DAY_COOLING_DEADBAND]=Round_SetPoint_Max(product_register_value[MODBUS_DAY_COOLING_DEADBAND]);
-        product_register_value[MODBUS_DAY_HEATING_DEADBAND]=Round_SetPoint_Max(product_register_value[MODBUS_DAY_HEATING_DEADBAND]);
+        //product_register_value[MODBUS_DAY_COOLING_DEADBAND]=Round_SetPoint_Max(product_register_value[MODBUS_DAY_COOLING_DEADBAND]);
+        //product_register_value[MODBUS_DAY_HEATING_DEADBAND]=Round_SetPoint_Max(product_register_value[MODBUS_DAY_HEATING_DEADBAND]);
 
         dSP= ((float)((short)product_register_value[MODBUS_DAY_SETPOINT]))/10;
         dCDB = ((float)((short)product_register_value[MODBUS_DAY_COOLING_DEADBAND]))/10;
@@ -5420,8 +5392,8 @@ void CT3000View::Initial_Max_Min()
         DayHeatingSP=product_register_value[MODBUS_DAY_HEATING_SETPOINT];
 
         product_register_value[MODBUS_NIGHT_SETPOINT]=Round_SetPoint_Max(product_register_value[MODBUS_NIGHT_SETPOINT]);
-        product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]=Round_SetPoint_Max(product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]);
-        product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]=Round_SetPoint_Max(product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]);
+        //product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]=Round_SetPoint_Max(product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]);
+        //product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]=Round_SetPoint_Max(product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]);
 
         nSP =((float)(short) product_register_value[MODBUS_NIGHT_SETPOINT])/10;
         nCDB=((float)(short) product_register_value[MODBUS_NIGHT_COOLING_DEADBAND])/10;
@@ -5713,65 +5685,6 @@ void CT3000View::FreshCtrl()
     if(nModel==0)
         return;
 	m_strModelName = GetProductName(nModel);
-	/*switch (nModel)
-	{
-	case 2:
-		m_strModelName=g_strTstat5a;
-		break;
-	case 1:
-		m_strModelName=g_strTstat5b;
-		break;
-	case 3:
-		m_strModelName=g_strTstat5b;
-		break;
-	case 4:
-		m_strModelName=g_strTstat5c;
-		break;
-	case 12:
-		m_strModelName=g_strTstat5d;
-		break;
-	case PM_NC:
-		m_strModelName=g_strnetWork;
-		break;
-	case PM_TSTATRUNAR:
-		m_strModelName=_T("TStatRunar");
-	case PM_TSTAT5E:
-		m_strModelName=g_strTstat5e;
-		break;
-	case PM_PM5E:
-		m_strModelName=_T("PM5E");
-		break;
-	case 17:
-		m_strModelName=g_strTstat5f;
-		break;
-	case 18:
-		m_strModelName=g_strTstat5g;
-		break;
-	case 19:
-		m_strModelName=g_strTstat5h;
-		break;
-	case PM_TSTAT5i:
-		m_strModelName=_T("Tstat 5i");
-		break;
-	case PM_TSTAT8:
-		m_strModelName=_T("Tstat8");
-		break;
-	case PM_TSTAT6:
-		m_strModelName=g_strTstat6;
-		break;
-	case PM_TSTAT7:
-		m_strModelName=g_strTstat7;
-		break;
-	case PM_PRESSURE:
-		m_strModelName=g_strPressure;
-		break;
-	case PM_HUMTEMPSENSOR:
-		m_strModelName="TstatHUM";
-		break;
-	default:
-		m_strModelName=g_strTstat5a;
-		break;
-	}*/
 
     //m_fTemperature=(float)product_register_value[MODBUS_INTERNAL_THERMISTOR]/10;	//101   121MODBUS_TEMPRATURE_CHIP
     m_fTemperature=((float)((short)product_register_value[MODBUS_TEMPRATURE_CHIP]))/10;
